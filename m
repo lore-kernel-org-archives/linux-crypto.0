@@ -1,233 +1,116 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lamorak.hansenpartnership.com (lamorak.hansenpartnership.com [198.37.111.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D70B335C1B4;
-	Thu, 19 Mar 2026 19:09:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B7D230EF82
+	for <linux-crypto@vger.kernel.org>; Thu, 19 Mar 2026 19:12:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.37.111.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773947353; cv=none; b=gUoyeE09iqvm6PYJcl+QzdExBR6xwj6Bq3aBAnvMlWyBEoT/h3Gews2AB0juiwCce1HXuK0ChBtyLQQtnUUpVYUdj1jFfqxDQNoo+Np7AOYO8FzGPSos2Gbwm9lKjpffSs29DgtXmHNb9F5iqtq+2lm+328Ogs5OqblT5u5o8W4=
+	t=1773947538; cv=none; b=Y9ItPzctQ6Ewe7lP4ZZnJxl95j0w9GUHhHVLltPeUX6wOGSra8MxbGXVp31VmK2iv7JDlOujaUQ7plzUxSyHhobwLbJTzEBHJb00dwoHJS86hEkS/dJBWbP3z1cS5692feeq7PC0g2iu41vjfM7xgLU/yonAXSVezF8KKkQRDKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773947353; c=relaxed/simple;
-	bh=LN9pKIEm8CVhPvn+kJ0ya0tyrc4TCbDobALCWmgaZ70=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P6po77+YctiPX1nSeM5VXL2sBUuAlwffl6aDHMu73VJYEjHHdCt2IWGertnxZOY25VE5NOKiEkQlL4i+HNng53QwPaM0euGcu3Vej4Xla/2pAB4oOD/cVXPLotMQwThHldMMpr/sO6LafRC+OWVCcwc8zWVztDhN9z8/6+LboHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WURVGIXt; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773947538; c=relaxed/simple;
+	bh=trbiVUTP13adI2TZp4WnwV3pXAeXa/avcsZqEY5o9ec=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=J00aZZCjbzW4Sv0SFNdzY45Hcl2uKXFmN9plL4S8VcjBnNW+NSmrR8uI27EcDFR2D2PJlXHXxQxsjXIfUaqEl6p/Rz8KWOQGoW+TAxdy6V+/4YgB3CSp1OqS6XlkLOSnViGOP47yfi+Zasxx9DL8xEkOET0AsPE51tcfuT60FyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=JoUahBr5; arc=none smtp.client-ip=198.37.111.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WURVGIXt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0D8EC19424;
-	Thu, 19 Mar 2026 19:09:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773947353;
-	bh=LN9pKIEm8CVhPvn+kJ0ya0tyrc4TCbDobALCWmgaZ70=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WURVGIXtHaxXgZj883lLZ76xRRo+5LgvswfrpIOQ0SpLEafoM4GQXKD11OboRtAEf
-	 eY2GdYng1D60KTkaez1cix3pbdMEbghcfIE7Zz+z1DwehZTmy8fqMsXzhkmZWTuM9I
-	 ucM/sVEflEcFeGvlEPLHkVF3hBWk1Ex8KHWVTsZSdJIGKYFE9tQ8Y0ykjlq6RDLlGq
-	 5lTa5PloqA23tz38UQUes2KsG2amAw/dO5tncskkSn4+GHAX0A0+xsSqUfkNEkJ/Id
-	 ahA5Mj3DkBQ+xW+oi963yfHYdE+imWo5ODPRh3aoboWssyN412Fo4G8vkX2V0zMS9D
-	 GoQ9LUH3hBOIA==
-Date: Thu, 19 Mar 2026 12:09:08 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Demian Shulhan <demyansh@gmail.com>
-Cc: ardb@kernel.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] lib/crc: arm64: add NEON accelerated CRC64-NVMe
- implementation
-Message-ID: <20260319190908.GB10208@quark>
-References: <20260317065425.2684093-1-demyansh@gmail.com>
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="JoUahBr5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1773947534;
+	bh=trbiVUTP13adI2TZp4WnwV3pXAeXa/avcsZqEY5o9ec=;
+	h=From:To:Subject:Date:Message-ID:From;
+	b=JoUahBr587dpQV2BQ3aRAplrNIfqiaAQZ+6hLNTqK0GNlJZD1vlMOix/5qr83NU01
+	 XpDL0Gw2DkvjRp/U7mUY1HW0Eyx1TU13FKcVHjP2S4U/UUOUPJIkiVITy3tg7opYZs
+	 K8E7ERR6eUkps7NjR1pMzBa6C055LLXxOrv0rAyo=
+Received: from lingrow.int.hansenpartnership.com (unknown [153.66.160.227])
+	by lamorak.hansenpartnership.com (Postfix) with ESMTP id A90781C02C6;
+	Thu, 19 Mar 2026 15:12:14 -0400 (EDT)
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+To: linux-crypto@vger.kernel.org
+Cc: David Howells <dhowells@redhat.com>,
+	Blaise Boscaccy <bboscaccy@linux.microsoft.com>
+Subject: [PATCH v4 0/3] pkcs7: better handling of signed attributes
+Date: Thu, 19 Mar 2026 15:12:05 -0400
+Message-ID: <20260319191208.831-1-James.Bottomley@HansenPartnership.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260317065425.2684093-1-demyansh@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Mar 17, 2026 at 06:54:25AM +0000, Demian Shulhan wrote:
-> Implement an optimized CRC64 (NVMe) algorithm for ARM64 using NEON
-> Polynomial Multiply Long (PMULL) instructions. The generic shift-and-XOR
-> software implementation is slow, which creates a bottleneck in NVMe and
-> other storage subsystems.
-> 
-> The acceleration is implemented using C intrinsics (<arm_neon.h>) rather
-> than raw assembly for better readability and maintainability.
-> 
-> Key highlights of this implementation:
-> - Uses 4KB chunking inside scoped_ksimd() to avoid preemption latency
->   spikes on large buffers.
-> - Pre-calculates and loads fold constants via vld1q_u64() to minimize
->   register spilling.
-> - Benchmarks show the break-even point against the generic implementation
->   is around 128 bytes. The PMULL path is enabled only for len >= 128.
-> - Safely falls back to the generic implementation on Big-Endian systems.
-> 
-> Performance results (kunit crc_benchmark on Cortex-A72):
-> - Generic (len=4096): ~268 MB/s
-> - PMULL (len=4096): ~1556 MB/s (nearly 6x improvement)
-> 
-> Signed-off-by: Demian Shulhan <demyansh@gmail.com>
+v4: the patch set got much smaller thanks to dumping the ability to
+verify only the signature itself without having to supply the buffer
+for verification (all potential consumers confirmed they have the
+buffer and it's not a huge overhead).  So the use flow now is parse
+the pkcs7, call the existing verify_pkcs7_message_sig to get the trust
+for the signed attributes and then extract them.
 
-Thanks!  I'm planning to accept this once the relatively minor comments
-later on in this email are addressed.
+v3 updates for the now-upstream ml-dsa.  The ml-dsa patches actually
+changed the definition of authattrs in struct pkcs7_signed_info, which
+means I now don't have to justify stepping one back in patch 4
+(thanks!).  Just in case I checked that nothing else was affected by
+this change.
 
-But just FYI, having separate code for each CRC variant isn't very
-sustainable.  CRC-T10DIF, CRC64-NVME, and CRC64-BE should all have
-similar PMULL based implementations.  x86 and riscv solve this using a
-"template" that supports all CRC variants.  I'd like to eventually bring
-a similar solution to arm64 (and arm) as well.
+Original cover letter:
 
-So while this code is fine for now, later I'd like to replace it with
-something more general, like x86 and riscv have now.  Then we can
-optimize CRC-T10DIF, CRC64-NVME, and CRC64-BE together.
+Although the biggest use of signed attributes is PKCS#7 and X509
+specific data, they can be added to a signature to support arbitrary
+and verifiable objects.  This makes them particularly useful when you
+want to take an existing signature scheme and extend it with
+additional (but always verified) data in such a way that it still
+looks valid to both the old and new schemes.
 
-E.g., consider that the CRC64-NVME code added by patch folds across at
-most 1 vector.  That's much less optimized than the existing CRC-T10DIF
-code in lib/crc/arm64/crc-t10dif-core.S, which folds across 8.  If we
-used a unified approach, we could optimize these CRC variants together.
+To use a scheme like this to extend signatures requires that the
+authenticated attribute only be pulled out of a signer info that can
+be verified by one of the trusted keys, so the implementation loops
+over all signer infos, discarding those that haven't been verified and
+returns the first OID match it finds in the verified ones.  Note that
+if you reparse a pkcs7 it starts out with no trusted signer infos, and
+you must anchor trust by calling validate_pkcs7_trust() with the
+trusted keyring.
 
-As for intristics vs. assembly: the kernel usually uses assembly.
-However, I'm supportive of starting to use intrinsics more, and this a
-good start.  But we'll need to keep an eye out for any compiler issues.
+The first three patches in this series are new to v2.  They add the
+new validate_pkcs7_trust() call, thread a verified flag through struct
+pkcs7_signer_info so we can tell which signers have been validated
+against the trusted keyring. And finally thread pkcs7_digest through
+the pkcs7_validate functions so they can operate on a plain parsed
+pkcs7 structure that hasn't gone through pkcs7_verify.  Note we could
+simply drop the last patch and insist that the pkcs7 be re-verified;
+it just looked a bit inefficient, especially as the default way of
+doing this (verify_pkcs7_signature() frees the pkcs7 structure before
+returning.
 
-Various fairly minor comments below:
+The final two patches search for the authenticated attribute by OID,
+stopping at the first one it finds belonging to a verified signer
+info.  The final patch demonstrates how to use it.  I've added a check
+to show that if you don't in any way validate the pkcs7 then no signed
+attributes get returned.
 
-> diff --git a/lib/crc/Kconfig b/lib/crc/Kconfig
-> index 70e7a6016de3..6b6c7d9f5ea5 100644
-> --- a/lib/crc/Kconfig
-> +++ b/lib/crc/Kconfig
-> @@ -82,6 +82,7 @@ config CRC64
->  config CRC64_ARCH
->  	bool
->  	depends on CRC64 && CRC_OPTIMIZATIONS
-> +	default y if ARM64 && KERNEL_MODE_NEON
+Regards,
 
-Just "default y if ARM64".  KERNEL_MODE_NEON is always enabled on ARM64.
-Changes have already been submitted to remove the existing checks of
-KERNEL_MODE_NEON in ARM64-specific code in lib/crc/ and lib/crypto/.
+James
 
-> diff --git a/lib/crc/Makefile b/lib/crc/Makefile
-> index 7543ad295ab6..552760f28003 100644
-> --- a/lib/crc/Makefile
-> +++ b/lib/crc/Makefile
-> @@ -38,6 +38,10 @@ obj-$(CONFIG_CRC64) += crc64.o
->  crc64-y := crc64-main.o
->  ifeq ($(CONFIG_CRC64_ARCH),y)
->  CFLAGS_crc64-main.o += -I$(src)/$(SRCARCH)
-> +CFLAGS_REMOVE_arm64/crc64-neon-inner.o += -mgeneral-regs-only
-> +CFLAGS_arm64/crc64-neon-inner.o += -ffreestanding -march=armv8-a+crypto
-> +CFLAGS_arm64/crc64-neon-inner.o += -isystem $(shell $(CC) -print-file-name=include)
-> +crc64-$(CONFIG_ARM64) += arm64/crc64-neon-inner.o
->  crc64-$(CONFIG_RISCV) += riscv/crc64_lsb.o riscv/crc64_msb.o
->  crc64-$(CONFIG_X86) += x86/crc64-pclmul.o
->  endif
+---
 
-To make this a bit easier to read, add newlines before and after the
-arm64-specific parts, and change 'endif' to 'endif # CONFIG_CRC64_ARCH'
+James Bottomley (3):
+  crypto: pkcs7: add flag for validated trust on a signed info block
+  crypto: pkcs7: add ability to extract signed attributes by OID
+  crypto: pkcs7: add tests for pkcs7_get_authattr
 
-> diff --git a/lib/crc/arm64/crc64-neon-inner.c b/lib/crc/arm64/crc64-neon-inner.c
-> new file mode 100644
-> index 000000000000..beefdec5456b
-> --- /dev/null
-> +++ b/lib/crc/arm64/crc64-neon-inner.c
-> @@ -0,0 +1,82 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Accelerated CRC64 (NVMe) using ARM NEON C intrinsics
-> + */
-> +
-> +#include <linux/types.h>
-> +#include <linux/crc64.h>
+ certs/system_keyring.c                  |  1 +
+ crypto/asymmetric_keys/Makefile         |  4 +-
+ crypto/asymmetric_keys/pkcs7_aa.asn1    | 18 ++++++
+ crypto/asymmetric_keys/pkcs7_key_type.c | 44 +++++++++++++-
+ crypto/asymmetric_keys/pkcs7_parser.c   | 81 +++++++++++++++++++++++++
+ crypto/asymmetric_keys/pkcs7_parser.h   |  1 +
+ crypto/asymmetric_keys/pkcs7_trust.c    |  1 +
+ include/crypto/pkcs7.h                  |  4 ++
+ 8 files changed, 152 insertions(+), 2 deletions(-)
+ create mode 100644 crypto/asymmetric_keys/pkcs7_aa.asn1
 
-No need for <linux/crc64.h> here
+-- 
+2.51.0
 
-> +#ifdef CONFIG_ARM64
-> +#include <asm/neon-intrinsics.h>
-> +#else
-> +#include <arm_neon.h>
-> +#endif
-
-This is arm64-specific code, so all that's needed above is the part
-under CONFIG_ARM64.
-
-> static const u64 fold_consts_val[2] = {0xeadc41fd2ba3d420ULL, 0x21e9761e252621acULL};
-> static const u64 bconsts_val[2] = {0x27ecfa329aef9f77ULL, 0x34d926535897936aULL};
-
-Add comments that document what these constants are.  As per
-lib/crc/x86/crc-pclmul-consts.h which has the same constants, these are:
-x^191 mod G, x^127 mod G, floor(x^127 / G), and (G - x^64) / x.
-
-> +u64 crc64_nvme_arm64_c(u64 crc, const u8 *p, size_t len)
-
-Declare this function first earlier in the file, otherwise a
--Wmissing-prototypes warning is generated.
-
-> +{
-> +	if (len == 0)
-> +		return crc;
-> +
-> +	uint64x2_t v0_u64 = {crc, 0};
-> +	poly64x2_t v0 = vreinterpretq_p64_u64(v0_u64);
-> +
-> +	poly64x2_t fold_consts = vreinterpretq_p64_u64(vld1q_u64(fold_consts_val));
-> +
-> +	if (len >= 16) {
-
-> +		poly64x2_t v1 = vreinterpretq_p64_u8(vld1q_u8(p));
-> +
-> +		v0 = vreinterpretq_p64_u8(veorq_u8(vreinterpretq_u8_p64(v0),
-> +						   vreinterpretq_u8_p64(v1)));
-> +		p += 16;
-> +		len -= 16;
-> +
-> +		while (len >= 16) {
-
-Since this function is called only when len >= 128, and it exists
-specifically for that caller and isn't available for wider use, it
-doesn't need to handle other cases.  So the 'if (len == 0)' block should
-be removed, 'len >= 16' should be made unconditional, 'while (len >=
-16)' should be replaced with 'do ... while (len >= 16)'.
-
-> diff --git a/lib/crc/arm64/crc64.h b/lib/crc/arm64/crc64.h
-> new file mode 100644
-> index 000000000000..12b1a8bd518a
-> --- /dev/null
-> +++ b/lib/crc/arm64/crc64.h
-> @@ -0,0 +1,35 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * CRC64 using ARM64 PMULL instructions
-> + */
-> +#ifndef _ARM64_CRC64_H
-> +#define _ARM64_CRC64_H
-
-We haven't been using include guards in the headers
-lib/{crc,crypto}/${ARCH}/${ALGORITHM}.h, as they are intended only for
-inclusion in a specific C file -- lib/crc/crc64-main.c in this case.
-Probably best to stay with the existing convention of omitting these.
-
-> +static inline u64 crc64_nvme_arch(u64 crc, const u8 *p, size_t len)
-> +{
-> +	if (!IS_ENABLED(CONFIG_CPU_BIG_ENDIAN) && len >= 128 &&
-
-No need to check !IS_ENABLED(CONFIG_CPU_BIG_ENDIAN), since arm64 kernels
-are little-endian-only these days.
-
->               while (len >= 128)
-
-Replace with a do-while loop, as this is already conditional on
-'len >= 128'.
-
-> +			scoped_ksimd() {
-> +				crc = crc64_nvme_arm64_c(crc, p, chunk);
-> +			}
-
-Remove the braces above, as the contents of the block are a single
-statement.
-
-Finally, this patch also has many overly-long lines.  I recommend
-running 'git clang-format'.  It's not perfect, but it's easier and often
-produces better results than manual formatting.
-
-- Eric
