@@ -1,308 +1,299 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A95FF35AC35;
-	Thu, 19 Mar 2026 22:43:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773960239; cv=fail; b=BSQ/SbrX0QEBuV/W0Wn9sbcteL2hZsK1dIJkot8MCu2cAvC4R0/feFT15cqpnGG40wzsusdPR/xpEeH88Nr6kt8MBet9+ZZPNqNR6mzX5xoIRt1Lfie2mBwqnIanRnnFBQvIp7VMCOPcxUihXcfkO/PtaOtQ63eSFswI+Ryd86g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773960239; c=relaxed/simple;
-	bh=0r2+/XxZ8S3fvFdHJeNisoZFYJMMAq7VkoMLFb4ZTM0=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=dGmA2S9tuf74Xqp5ks4FMA/gv6a58cDraWGcAaL58doq4h1yPk9r2T/IqDNwmiPjpiMz19brzzOUJeQ//GfNziaCgyKLCWJPPtjoHGsHGLAx8Ahvr2SiqRO64UtIEPhS0QXcddzedWn0kgF1XyaVbILhXYc0lP2G5XmazXNRaPE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UYKK9Jql; arc=fail smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E5594035D5
+	for <linux-crypto@vger.kernel.org>; Thu, 19 Mar 2026 23:31:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1773963099; cv=none; b=c7lsQmxuLjBdcCqh1xUFVy2vcNCebdrQ2Vmjd12ERVDz4DNLubYj2H5hegRjwanGb+bmf5lh7rmq8q5sJUEW6WHcFAWbinu4JVDEbfR1rzrZm+JIaJRbCC8ep4o7DFxgdaLiK7i7M9S08en7LllciiADc9cKBmDN12Ld7ftPkVU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1773963099; c=relaxed/simple;
+	bh=qZY7IPEpKQHZP+0wQyFn5BMkUw6hrtYGUHt8mRRlGn4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Lxs1MTDhP/4Rnb19Bdn/fJmY7PCTeOLbH4ROEZddV8FH+HZ/cjHiSCA4BCEFmhi46G4pWFWZQXNiEz2xzRprBOQLX6+KiMSVjjUxZElZGeJyFmRAS/ebWjlNkXkSrH4yUKUEsniFst/RLUcDGQGcRXuAv2QmSCIwveMLea6u0xQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lH5LHeLX; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UYKK9Jql"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1773960237; x=1805496237;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=0r2+/XxZ8S3fvFdHJeNisoZFYJMMAq7VkoMLFb4ZTM0=;
-  b=UYKK9JqlX6fTK6tRho2bS6x5I/GasWK6pucYsdrtxCZsH71PNMXeL6d7
-   TLI3x505LfchUCiZC96bMTZSWUxrgXvsSGeKgX417uLzZhzzqdFVi+tCl
-   vJX8fLK51DNHygR/b49bE9a/csPeTZYA0/5Svb8B2qwJNncPoPHosvsb4
-   RZ7oqvyXMOTAqXISJpdEjIYRBEtabmagLZvCoTYTd5Ribfs5KQeI3xzBB
-   dgBn/nRgyb9ynRJqrRxzQV7bNppImawGWLhTcC7DCfP4JQfpnZJSUGFan
-   3yz5ZtZq7n2VM+ZYfzR2oMWJDP+nEmrKJ+TeRixWTbJXJak6ibB6gpjgt
-   g==;
-X-CSE-ConnectionGUID: jXSQYt01Ta2/NRoiN8lJlw==
-X-CSE-MsgGUID: abHvIM+iSqeYUg1x+IWRJg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11734"; a="74932339"
-X-IronPort-AV: E=Sophos;i="6.23,130,1770624000"; 
-   d="scan'208";a="74932339"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2026 15:43:57 -0700
-X-CSE-ConnectionGUID: 9smSN6sXRYKRvMZ667I4Tw==
-X-CSE-MsgGUID: zIejGQWrSiud2xWukFYr2g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,130,1770624000"; 
-   d="scan'208";a="220049689"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2026 15:43:57 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Thu, 19 Mar 2026 15:43:56 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37 via Frontend Transport; Thu, 19 Mar 2026 15:43:56 -0700
-Received: from BN8PR05CU002.outbound.protection.outlook.com (52.101.57.28) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.37; Thu, 19 Mar 2026 15:43:55 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NIdTW2FNcQ2Lw2pgzMUiJhiRAugmG/kgcT+ufxzfjh1joNu8pNX+Apubp9F+6uMLJzRfvdHz8a7u650Sduok/nzq5/PgQyZuE/ugLtRIO2y6RyBDe0WXwiaG7MOmhMEv+lAkP5AkQAdrEWll/Sp0AbvzxbaFeNvbQKbzklKsSKA+79ACRmhjiqg2Q9M1A+3CcVZkuWLg+ph1u7E7O67nocoJfNnffrVJIQUCBRWsqTUMkC3B2lkNBL1NhXaZczkVLbaMbM0B93Vpcbp1PoopPcbd2SUdf2L9zQV4wt/K9G6QQBbi6vQ96EV8MOQ6HfnVnNY0B0Cg2SXFnmXYx57dgw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Q8aPngyKMpLoEsW0HnlIgavW2E6IyenaECABkdZfjs0=;
- b=hH2vpLgO8HmDciT3+9KRaLbZK1vM/S3gxLyS8LA8lZl2Dwmf6+BcGJ8KVgo2TJFvMx6xOvx7YrAA81djVqHnxwz3vMa13oo94P/B9AX3VIbHr+7FQIoNnHH39YmugmSpEU12y2v6sju9VpqtZwoAoeyd0aWt5un8SmSEjtm4JFD9Zq3b+36F2OYI2D3spG0TS3bYAhvqBgxBy23/w5mdkEUwcLwIGlQoEOboO9bKDv79bLNtpzXJRoXti7PeMpjv+dbgyflCRVRRzl3UlbE+C4Bgq2zhNdJrGh9AnPkcq6FIfddzejiUvo+/+Qz5UZQtIp71xWDwYU9rtrVUbPvgCA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6407.namprd11.prod.outlook.com (2603:10b6:8:b4::11) by
- SA3PR11MB7655.namprd11.prod.outlook.com (2603:10b6:806:307::9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9745.9; Thu, 19 Mar 2026 22:43:52 +0000
-Received: from DM4PR11MB6407.namprd11.prod.outlook.com
- ([fe80::26bd:1704:645f:7fd4]) by DM4PR11MB6407.namprd11.prod.outlook.com
- ([fe80::26bd:1704:645f:7fd4%6]) with mapi id 15.20.9745.007; Thu, 19 Mar 2026
- 22:43:52 +0000
-Date: Thu, 19 Mar 2026 22:43:44 +0000
-From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To: Wesley Atwell <atwellwea@gmail.com>
-CC: <herbert@gondor.apana.org.au>, <davem@davemloft.net>, <terrelln@fb.com>,
-	<dsterba@suse.com>, <suman.kumar.chakraborty@intel.com>,
-	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] crypto: zstd - fix segmented acomp streaming paths
-Message-ID: <abx7522F7DLyBauU@gcabiddu-mobl.ger.corp.intel.com>
-References: <20260309082051.2087363-1-atwellwea@gmail.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20260309082051.2087363-1-atwellwea@gmail.com>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-X-ClientProxiedBy: DU2PR04CA0188.eurprd04.prod.outlook.com
- (2603:10a6:10:28d::13) To DM4PR11MB6407.namprd11.prod.outlook.com
- (2603:10b6:8:b4::11)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lH5LHeLX"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-486fba7ce4cso9178385e9.3
+        for <linux-crypto@vger.kernel.org>; Thu, 19 Mar 2026 16:31:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1773963096; x=1774567896; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aKi0wuTPJMqhmhYRR+cZkwrRHJTsFrhSyCr65EK1waU=;
+        b=lH5LHeLXalVH8QTKBL/Qkm06iLe3+Er5xc+Qrpw/TvodFF44ngsBV3FhYa3jJPHsCX
+         7lt5YiG/PdsLnBC5tVBFF9OLnbRzrOiq7hRyrAJHPdAol8EbblMx1Ggf0++KY6FxhnCH
+         1IVQLBosDXVQbJUxg6TYUz8EkNzcV7+fQC8TQlg0auRK18VQ1LfCCJzfh2LQP22I+EG3
+         6hhbl2GStA7XQ87nLyi4lKzKPsVCo/tUpfBiHSZajErjQGrbg5PIOSCefTwcwI2aPJNH
+         c37b7IqghbnqHO8PRz6dEQ5EbxCXk6GWrI6DM/a7xRNCEfoAy7Y/mDkODyW8RM+5x2ip
+         hZVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1773963096; x=1774567896;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=aKi0wuTPJMqhmhYRR+cZkwrRHJTsFrhSyCr65EK1waU=;
+        b=JS0GdJ/C8rkRXN6RTZ6gb8JJH4TgVyQyrz8+JdnbPUZn+JcPgZa1qKdNvY9TSBEa49
+         PHIvz2+HgRs5Zp08zyka4juIepyLcWsjpvPKyxKhyH6bZjkB0uA33/q7YsmYNQbuNG7G
+         AWUCDU0yrrt001BlJ5p7ilMfTYCa74jMNxZq6ATt+ymrmxkZkfu8dfbWga0r5utyVcq1
+         9iHvXYtj8ymMFmrFjM4FtIgJy177FccfQ3/gpOmddVAyJSVNUZUSlsiEYtyd6otfoCjx
+         FxKyC5m3HRI4WgwiOCGABKrffkA3Io6mLzS3we8oAE7IgS+P+nubg+ULJr6JbAoefB6C
+         8j3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVYjsGSPKMHWATVFpWpnDtDYS0fE/ofwmE/KKuqktDzETTiZh99qD27sjOvPiYtsQgDriNWJCGK+/HO+e8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+tyw7CG19aSfzCXWkdFdvw+Ih6w+4Qs/lE992ii8QSkgzXdaT
+	XMR9q5sxAxYEtQ6Xt+oBAD/YuWwuR0KERUacWPhktuNQIy9gJ7FyHS5P
+X-Gm-Gg: ATEYQzxjjLDQuFSfGZ5L6xdvV7Jf29g6/flTW7J1aQJ+dMs+HS0uj0cP4NDfchyOjoP
+	8SHZ+MmyHJVN8RFBdi+iW5Fge+LEl1bKxowksGJHeEn1zlfzcgsJkzVqCqjwb4dIYO5CZB9NJk9
+	KafpvjQoq3WRQBcZq2cVxUV5QnqVi5YST/8b1pMSIuRmluKold0e0zPEmDDfypzj19LQqG8hid+
+	x/Mj6sPf+XDcE+l6X0FN8E0r2AzmYi7Ush8dkIW91tRVrWvtWhzPFZAOOopPk33WfcuLKYgaTTr
+	6qSQm7/wkyStoFGld6ofPM7Lox05QlCrIKXRARcC1Fxa4YAORdsHJixBB6FERzmNU82qgXVmtqH
+	iD6hr+eAEtelmyHWNUB46KL01/BaJIqi1p9pJ9nnA6sa9QSkCBFI+9O/LRRBtBZlNuIS2MC5G7O
+	03MxxiEjx7P2M1hpr1E56PXBnVLRb36z1TQKn3A3fbBK2U2jXCUgtw53AJs15PPqLyn87RnFY8v
+	XE=
+X-Received: by 2002:a05:600c:8710:b0:486:d76c:fa21 with SMTP id 5b1f17b1804b1-486fee051a3mr14018675e9.12.1773963096430;
+        Thu, 19 Mar 2026 16:31:36 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-486fe8367d8sm23947715e9.14.2026.03.19.16.31.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Mar 2026 16:31:36 -0700 (PDT)
+Date: Thu, 19 Mar 2026 23:31:34 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Demian Shulhan <demyansh@gmail.com>
+Cc: ebiggers@kernel.org, ardb@kernel.org, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] lib/crc: arm64: add NEON accelerated CRC64-NVMe
+ implementation
+Message-ID: <20260319233134.58fb994c@pumpkin>
+In-Reply-To: <20260317065425.2684093-1-demyansh@gmail.com>
+References: <20260317065425.2684093-1-demyansh@gmail.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6407:EE_|SA3PR11MB7655:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9d718b10-e223-4422-a32e-08de8608fe9c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|18002099003|22082099003|56012099003|7053199007;
-X-Microsoft-Antispam-Message-Info: Q2UPtb9PE8HfZnC7ZXF5zPhmJWZcgxLW61tH8jotO2zo927QDFz9P9IkdoKtEVphGmiKtYZJN6uDckiDNSAQjxR0LyjvX6qJ2T2jsL/EjKSbGFcuht9efV6dN6Kwc5SZonE4/NpnRoZ9eOxMC1xSJOLYIKM6ewsygfLkHPbdgv4jkyzNpBMVzmi9YyniD99UvLtnN1Fk/LZZAcaX4fQMBcurcSAiR8ojvAuMzyu//aYIMJqizrx5Ejjo9yelgr/7FM9503XKnj8X+stAhn6VuX+UeBvBib9Ky3kj1rmAAWQ8Lt8nNXSAgmh7kiLWZIoNKwxC19Qh63UZv9wnqmPd6Xt1g/22E6U5ogPLmY301oQ098ntiaNlVfc4hsxlQo37V5gcQgz/EjZLCVoO55uIRRJ9w3dJLemzRbVwdW+SUauln+zd/mOC9Jhhe9gZWuEgHC3YyQfw+NjT0U79DhOPsFZejkyf6Faug4HvuOWZYXyYtt9h2bcclJ+SisNV1Yuz7cRH3/zA0nEVIzzk5CbXAqUafiuxpHop020n1QZ1ge3IDFzMLEELKBzIsrGB09CGC3yZChmwAbhsBeOlX8S64WnzCSidaUIGxI9tZ8Ny2JljzMZlfZ1qcc6phGYDBLPITEpv6W21C3XOJMWc5I4Mhiz2SG7ts4RLG6Dte0ceJiiLIqnv+okluaEahsJz9B9WeUwLhLWw9fhtbn7oKwUsrQSubyxrMouRCJ7CQS6t3OI=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6407.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(18002099003)(22082099003)(56012099003)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?pAttFtQDSVmb4qmcZGxZ5UI4eAipk5IHbUbbxyeogHQ2gmuW8cF2LpTKQm0+?=
- =?us-ascii?Q?Zzt0FswyPp9rShGAC7vGtkF4PaR4HgXC5q4FeJZYeDTiSzrKejRnYcB1cZql?=
- =?us-ascii?Q?3oXkfGXQwTNe1+xBsfgBXcDx+WoXPiGzdSeVLwcuxj6xmSaDVud6Yt5Mq1gE?=
- =?us-ascii?Q?7KK8AtH1vTPRxPBKH64Xti6NIafDFtYtyeGGUh4gcXq+4UU9Fa23w6UtNTmU?=
- =?us-ascii?Q?rhr+brIBRJe27/C232EXTWsXeSzCoChSc8k882yvDpIzW219cpB64xhAKzkR?=
- =?us-ascii?Q?DFZWGHpY6ETJJP2GARxHNTifVZmzN6yOcYjF71AfASVomiFZUj7g9l8cehus?=
- =?us-ascii?Q?GFEaC4OULuw6bIYJIWrl8aT6hyO9d8TYNXgAXM5BOnd6PkHR2AGQwKusRRA9?=
- =?us-ascii?Q?cX71H6lkmGsqI9QcVD896ivV8z1HK5ueHvquV+MrDyH+KVm7Vw2P6RTn4iJZ?=
- =?us-ascii?Q?wqXTPfC6ei7hU6v4/friaAzD+dxjgDLCGAgRgtm7bzVQShvy35Lk8iEFiWe4?=
- =?us-ascii?Q?uTvc0cGtjGhDw59RgR98rKmOYYKLxznt3Rbm7Fqy9tfrPB5Vjk8Qaf2eXxhJ?=
- =?us-ascii?Q?rWDZkzBEz0I19tmZwbBNU7DO7YZ0qaEuPDasQGcJfrwMj3a2OVdrAbj7FqVM?=
- =?us-ascii?Q?wuHo3aotaP27O/FUap1SDrxuTofhQgiFibYVQ+WFWPFR+cyTXhqW2i7Wr5xq?=
- =?us-ascii?Q?ybjBY8gwUTJKQ+ByXvFAshdu0N+mNHJtKkuZc99zLv6u1L6q+Iqkh8dhzqrv?=
- =?us-ascii?Q?STV4QgwY3hMBL17SM252uJ+p+k5t1ZnYd446Ww7pLNnrSDfcFuSMckkfk7ju?=
- =?us-ascii?Q?swkCTdE2yHjVOHlikGjH5PDcafL2oQ/l09mGhxgQ/GT9Yq+RgGTo9YOvGUgv?=
- =?us-ascii?Q?2ZdDpPpCy2BODi3e0z7SxDPlvpSTyyweRJpnk0wYGdmR1Rcm4G772ooJxg6D?=
- =?us-ascii?Q?rIBwm6zWKuLqoXlHmkPP1i8WU85PUaS/ElD29pId5T/L8kBgwSl1+E1bHuWr?=
- =?us-ascii?Q?qAiE7fPZ/xmzXaXAEMrfZyBNDFDpZI5YPyd2Kq3vqA2GmoRE0YtXkyahHRjN?=
- =?us-ascii?Q?j+83RSiPQ05wDH0Zr6NAZyE9bdKQiYwbyArttRh/Osr8lO9OD8ooSSVA4Ta/?=
- =?us-ascii?Q?/A8u4+LKZqqr5+qyWyq1J/Hx3x+xwQR9ELFzQacSwSBTEQeyFGCwcJkxruHz?=
- =?us-ascii?Q?BRvoS3H7OdbKu5IlkTll6DT/Xz3szHjk24+thOKfEOA9q2XvO3kcMgp6IvRz?=
- =?us-ascii?Q?Kyf3GNytbERvHdQLZDifAILBb6VCcyZumhBfVXoSRJJvOJQgU2zMANK29VR7?=
- =?us-ascii?Q?shi8CU73OG3TzxefQjVW67jywfe1GI1rzTnCZBuk93/M6I4mk2yfwIxsNmy7?=
- =?us-ascii?Q?8SLCrqFX5CSdOAGmdk8Fn2k2HFtgwg5CAXVNLVc1dsns9kzAE/U8akctgKTC?=
- =?us-ascii?Q?tli0vlV8MN+a3TZXYL/q9q2hyVFHrEt1J1pipcfpgT7eqUHARR9Yj+dJGZJq?=
- =?us-ascii?Q?rkobTQdUaj7FrtJby8yJrjTdDs14gusoya0X9zsp2CbMwKJoqiud8txU29XB?=
- =?us-ascii?Q?qn0Ui33TXLQkz4fL1Yieh7SvE1yJcG5XHem7/AgeTJmIPL+Ym4TiH30i8LJJ?=
- =?us-ascii?Q?Ey6kPxqv41dQcNhYDKl76nn+W2KrRsZXk94edjD9GL+qgvUilb8CNH19gHh/?=
- =?us-ascii?Q?1tsyY4f1/g0E348O+utFMXHpqAEDMpBtR2o82M6HddRkSAs/gShIBPYnZ/hC?=
- =?us-ascii?Q?7IQcVA3zilmNDr/y2/wThYlC1G3m5H0=3D?=
-X-Exchange-RoutingPolicyChecked: FBMddUqRiYzTwRCEaAka2pBqsoWDNC3jm1d5SSYVZKlDaplR9SuvUJWRK69nDKcIFQ7WiPcYifMpvmGbK7ByyXofenO2PuhKVoU5/K7tjAfBDhRfTzcBYYVOrZqLmuvhbG3NQBn8dA9FfEzrWXTJnmevB7PvYWH8eUkU4rJFQNRZtunU6L+52qL7SPXbYBiDYOhqgu5tF1p9Wvu2UwN+mY3nkWagjW8sRG3fN8Xgh4zlHz2VRsPpFlX9/pl2DGlzTdt4lnibNaESfV1TLCLRqSJ82Mqxth+sAPjtV/QMj379pz0/MskrfgDpmk/FuvR9x6HOlRaKHF8akbG8YTIuMQ==
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9d718b10-e223-4422-a32e-08de8608fe9c
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6407.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2026 22:43:52.3879
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: tLKVpJWS0UDtydDxxJ9mmeIo518qGKIM90iH236CQeOavbfJ1BaDLY9lkony8OVJMqt7j+zQvNS86XSDrJGMZuGBhWxpMCWLnsrQbnXhw3c=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR11MB7655
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 09, 2026 at 02:20:51AM -0600, Wesley Atwell wrote:
-> The zstd acomp implementation does not correctly handle segmented
-> source and destination walks.
+On Tue, 17 Mar 2026 06:54:25 +0000
+Demian Shulhan <demyansh@gmail.com> wrote:
+
+> Implement an optimized CRC64 (NVMe) algorithm for ARM64 using NEON
+> Polynomial Multiply Long (PMULL) instructions. The generic shift-and-XOR
+> software implementation is slow, which creates a bottleneck in NVMe and
+> other storage subsystems.
 > 
-> The compression path advances the destination walk by the full
-> segment length rather than the bytes actually produced, and it only
-> calls zstd_end_stream() once even though the streaming API requires it
-> to be called until it returns 0.  With segmented destinations this can
-> leave buffered output behind and misaccount the walk progress.
+> The acceleration is implemented using C intrinsics (<arm_neon.h>) rather
+> than raw assembly for better readability and maintainability.
 > 
-> The decompression path has the same destination accounting issue, and
-> it stops when the source walk is exhausted even if
-> zstd_decompress_stream() has not yet reported that the frame is fully
-> decoded and flushed.  That can report success too early for segmented
-> requests and incomplete frames.
+> Key highlights of this implementation:
+> - Uses 4KB chunking inside scoped_ksimd() to avoid preemption latency
+>   spikes on large buffers.
+> - Pre-calculates and loads fold constants via vld1q_u64() to minimize
+>   register spilling.
+> - Benchmarks show the break-even point against the generic implementation
+>   is around 128 bytes. The PMULL path is enabled only for len >= 128.
+> - Safely falls back to the generic implementation on Big-Endian systems.
 > 
-> Fix both streaming paths by advancing destination segments by actual
-> output bytes, refilling destination segments as needed, draining
-> zstd_end_stream() until completion, and continuing to flush buffered
-> decompression output after the source walk is exhausted.  Return
-> -EINVAL if decompression cannot finish once the input has been fully
-> consumed.
+> Performance results (kunit crc_benchmark on Cortex-A72):
+> - Generic (len=4096): ~268 MB/s
+> - PMULL (len=4096): ~1556 MB/s (nearly 6x improvement)
 > 
-> Fixes: f5ad93ffb541 ("crypto: zstd - convert to acomp")
-> Assisted-by: Codex:GPT-5
-> Signed-off-by: Wesley Atwell <atwellwea@gmail.com>
+> Signed-off-by: Demian Shulhan <demyansh@gmail.com>
 > ---
-> Local validation:
-> - built bzImage with CONFIG_CRYPTO_SELFTESTS=y and CONFIG_CRYPTO_SELFTESTS_FULL=y
-> - exercised segmented zstd acomp requests using temporary local testmgr scaffolding
-> - booted under virtme and verified zstd-generic selftest passed in /proc/crypto
+>  lib/crc/Kconfig                  |  1 +
+>  lib/crc/Makefile                 |  4 ++
+>  lib/crc/arm64/crc64-neon-inner.c | 82 ++++++++++++++++++++++++++++++++
+>  lib/crc/arm64/crc64.h            | 35 ++++++++++++++
+>  4 files changed, 122 insertions(+)
+>  create mode 100644 lib/crc/arm64/crc64-neon-inner.c
+>  create mode 100644 lib/crc/arm64/crc64.h
 > 
->  crypto/zstd.c | 228 ++++++++++++++++++++++++++++++++++----------------
->  1 file changed, 156 insertions(+), 72 deletions(-)
-> 
-> diff --git a/crypto/zstd.c b/crypto/zstd.c
-> index 556f5d2bdd5f..3e19da1fed22 100644
-> --- a/crypto/zstd.c
-> +++ b/crypto/zstd.c
-> @@ -94,18 +94,30 @@ static int zstd_compress_one(struct acomp_req *req, struct zstd_ctx *ctx,
->  	return 0;
->  }
+> diff --git a/lib/crc/Kconfig b/lib/crc/Kconfig
+> index 70e7a6016de3..6b6c7d9f5ea5 100644
+> --- a/lib/crc/Kconfig
+> +++ b/lib/crc/Kconfig
+> @@ -82,6 +82,7 @@ config CRC64
+>  config CRC64_ARCH
+>  	bool
+>  	depends on CRC64 && CRC_OPTIMIZATIONS
+> +	default y if ARM64 && KERNEL_MODE_NEON
+>  	default y if RISCV && RISCV_ISA_ZBC && 64BIT
+>  	default y if X86_64
 >  
-> +static int zstd_acomp_next_dst(struct acomp_walk *walk, zstd_out_buffer *outbuf)
+> diff --git a/lib/crc/Makefile b/lib/crc/Makefile
+> index 7543ad295ab6..552760f28003 100644
+> --- a/lib/crc/Makefile
+> +++ b/lib/crc/Makefile
+> @@ -38,6 +38,10 @@ obj-$(CONFIG_CRC64) += crc64.o
+>  crc64-y := crc64-main.o
+>  ifeq ($(CONFIG_CRC64_ARCH),y)
+>  CFLAGS_crc64-main.o += -I$(src)/$(SRCARCH)
+> +CFLAGS_REMOVE_arm64/crc64-neon-inner.o += -mgeneral-regs-only
+> +CFLAGS_arm64/crc64-neon-inner.o += -ffreestanding -march=armv8-a+crypto
+> +CFLAGS_arm64/crc64-neon-inner.o += -isystem $(shell $(CC) -print-file-name=include)
+> +crc64-$(CONFIG_ARM64) += arm64/crc64-neon-inner.o
+>  crc64-$(CONFIG_RISCV) += riscv/crc64_lsb.o riscv/crc64_msb.o
+>  crc64-$(CONFIG_X86) += x86/crc64-pclmul.o
+>  endif
+> diff --git a/lib/crc/arm64/crc64-neon-inner.c b/lib/crc/arm64/crc64-neon-inner.c
+> new file mode 100644
+> index 000000000000..beefdec5456b
+> --- /dev/null
+> +++ b/lib/crc/arm64/crc64-neon-inner.c
+> @@ -0,0 +1,82 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Accelerated CRC64 (NVMe) using ARM NEON C intrinsics
+> + */
+> +
+> +#include <linux/types.h>
+> +#include <linux/crc64.h>
+> +#ifdef CONFIG_ARM64
+> +#include <asm/neon-intrinsics.h>
+> +#else
+> +#include <arm_neon.h>
+> +#endif
+> +
+> +#define GET_P64_0(v) ((poly64_t)vgetq_lane_u64(vreinterpretq_u64_p64(v), 0))
+> +#define GET_P64_1(v) ((poly64_t)vgetq_lane_u64(vreinterpretq_u64_p64(v), 1))
+> +
+> +static const u64 fold_consts_val[2] = {0xeadc41fd2ba3d420ULL, 0x21e9761e252621acULL};
+> +static const u64 bconsts_val[2] = {0x27ecfa329aef9f77ULL, 0x34d926535897936aULL};
+> +
+> +u64 crc64_nvme_arm64_c(u64 crc, const u8 *p, size_t len)
 > +{
-> +	unsigned int dcur = acomp_walk_next_dst(walk);
+> +	if (len == 0)
+> +		return crc;
 > +
-> +	if (!dcur)
-> +		return -ENOSPC;
+> +	uint64x2_t v0_u64 = {crc, 0};
+> +	poly64x2_t v0 = vreinterpretq_p64_u64(v0_u64);
 > +
-> +	outbuf->pos = 0;
-> +	outbuf->dst = walk->dst.virt.addr;
-> +	outbuf->size = dcur;
+> +	poly64x2_t fold_consts = vreinterpretq_p64_u64(vld1q_u64(fold_consts_val));
 > +
-> +	return 0;
+> +	if (len >= 16) {
+> +		poly64x2_t v1 = vreinterpretq_p64_u8(vld1q_u8(p));
+> +
+> +		v0 = vreinterpretq_p64_u8(veorq_u8(vreinterpretq_u8_p64(v0),
+> +						   vreinterpretq_u8_p64(v1)));
+> +		p += 16;
+> +		len -= 16;
+> +
+> +		while (len >= 16) {
+> +			v1 = vreinterpretq_p64_u8(vld1q_u8(p));
+> +
+> +			poly128_t v2 = vmull_high_p64(fold_consts, v0);
+> +			poly128_t v0_128 = vmull_p64(GET_P64_0(fold_consts), GET_P64_0(v0));
+
+If the cpu can execute two PMULL at the same time it should be possible
+to speed things up.
+With the correct constant the PMULL output can be xor'ed onto the p[32-63]
+instead of p[16-47] (which is where I think it ends up) so you can execute
+two in parallel - just needs some very careful register use.
+
+> +
+> +			uint8x16_t x0 = veorq_u8(vreinterpretq_u8_p128(v0_128),
+> +						 vreinterpretq_u8_p128(v2));
+> +
+> +			x0 = veorq_u8(x0, vreinterpretq_u8_p64(v1));
+> +			v0 = vreinterpretq_p64_u8(x0);
+> +
+> +			p += 16;
+> +			len -= 16;
+> +		}
+
+I can't help feeling the part below really needs a few comments.
+I think I know what it has to be doing - reducing 128 bits to 64
+(or possibly 256 to 64 depending on the width of the multiply).
+Although you only need to do it at the end of the outer loop.
+Between the 4k blocks I think you can just save the output in 64bit
+registers.
+
+I'm also not entirely certain, but I think the code is equivalent to
+calling crc64_nvme_generic() for 8 bytes (which could be xor'ed with
+the last 8 bytes of the buffer).
+(Or that might need a different constant and the code is actually
+running the crc backwards on 8 bytes 'beyond the crc'.)
+
+
+> +
+> +		poly64x2_t v7 = vreinterpretq_p64_u64((uint64x2_t){0, 0});
+> +
+> +		poly128_t v1_128 = vmull_p64(GET_P64_1(fold_consts), GET_P64_0(v0));
+> +
+> +		uint8x16_t ext_v0 = vextq_u8(vreinterpretq_u8_p64(v0), vreinterpretq_u8_p64(v7), 8);
+> +		uint8x16_t x0 = veorq_u8(ext_v0, vreinterpretq_u8_p128(v1_128));
+> +
+> +		v0 = vreinterpretq_p64_u8(x0);
+> +
+> +		poly64x2_t bconsts = vreinterpretq_p64_u64(vld1q_u64(bconsts_val));
+> +
+> +		v1_128 = vmull_p64(GET_P64_0(bconsts), GET_P64_0(v0));
+> +
+> +		poly64x2_t v1_64 = vreinterpretq_p64_u8(vreinterpretq_u8_p128(v1_128));
+> +		poly128_t v3_128 = vmull_p64(GET_P64_1(bconsts), GET_P64_0(v1_64));
+> +
+> +		x0 = veorq_u8(vreinterpretq_u8_p64(v0), vreinterpretq_u8_p128(v3_128));
+> +
+> +		uint8x16_t ext_v2 = vextq_u8(vreinterpretq_u8_p64(v7),
+> +					     vreinterpretq_u8_p128(v1_128), 8);
+> +
+> +		x0 = veorq_u8(x0, ext_v2);
+> +
+> +		v0 = vreinterpretq_p64_u8(x0);
+> +		crc = vgetq_lane_u64(vreinterpretq_u64_p64(v0), 1);
+> +	}
+> +
+> +	return crc;
+> +}
+> diff --git a/lib/crc/arm64/crc64.h b/lib/crc/arm64/crc64.h
+> new file mode 100644
+> index 000000000000..12b1a8bd518a
+> --- /dev/null
+> +++ b/lib/crc/arm64/crc64.h
+> @@ -0,0 +1,35 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * CRC64 using ARM64 PMULL instructions
+> + */
+> +#ifndef _ARM64_CRC64_H
+> +#define _ARM64_CRC64_H
+> +
+> +#include <asm/cpufeature.h>
+> +#include <asm/simd.h>
+> +#include <linux/minmax.h>
+> +#include <linux/sizes.h>
+> +
+> +u64 crc64_nvme_arm64_c(u64 crc, const u8 *p, size_t len);
+> +
+> +#define crc64_be_arch crc64_be_generic
+> +
+> +static inline u64 crc64_nvme_arch(u64 crc, const u8 *p, size_t len)
+> +{
+> +	if (!IS_ENABLED(CONFIG_CPU_BIG_ENDIAN) && len >= 128 &&
+> +	    cpu_have_named_feature(PMULL) && likely(may_use_simd())) {
+> +		while (len >= 128) {
+> +			size_t chunk = min_t(size_t, len & ~15, SZ_4K);
+
+That shouldn't need to be min_t().
+
+	David
+
+> +
+> +			scoped_ksimd() {
+> +				crc = crc64_nvme_arm64_c(crc, p, chunk);
+> +			}
+> +			p += chunk;
+> +			len -= chunk;
+> +		}
+> +	}
+> +	return crc64_nvme_generic(crc, p, len);
 > +}
 > +
->  static int zstd_compress(struct acomp_req *req)
->  {
->  	struct crypto_acomp_stream *s;
-> -	unsigned int pos, scur, dcur;
-> +	unsigned int scur;
->  	unsigned int total_out = 0;
-> -	bool data_available = true;
->  	zstd_out_buffer outbuf;
->  	struct acomp_walk walk;
->  	zstd_in_buffer inbuf;
->  	struct zstd_ctx *ctx;
-> -	size_t pending_bytes;
-> -	size_t num_bytes;
-> +	size_t remaining;
->  	int ret;
->  
->  	s = crypto_acomp_lock_stream_bh(&zstd_streams);
-> @@ -115,66 +127,87 @@ static int zstd_compress(struct acomp_req *req)
->  	if (ret)
->  		goto out;
->  
-> +	ret = zstd_acomp_next_dst(&walk, &outbuf);
-> +	if (ret)
-> +		goto out;
+> +#endif /* _ARM64_CRC64_H */
 > +
->  	ctx->cctx = zstd_init_cstream(&ctx->params, 0, ctx->wksp, ctx->wksp_size);
->  	if (!ctx->cctx) {
->  		ret = -EINVAL;
->  		goto out;
->  	}
->  
-> -	do {
-> -		dcur = acomp_walk_next_dst(&walk);
-> -		if (!dcur) {
-> -			ret = -ENOSPC;
-> +	for (;;) {
-> +		scur = acomp_walk_next_src(&walk);
-> +		if (outbuf.size == req->dlen && scur == req->slen) {
-> +			ret = zstd_compress_one(req, ctx, walk.src.virt.addr,
-> +						walk.dst.virt.addr, &total_out);
-> +			if (!ret) {
-> +				acomp_walk_done_src(&walk, scur);
-> +				acomp_walk_done_dst(&walk, total_out);
-These two functions should be called regardless of the return code of
-zstd_compress_one() as they are unmapping the buffers.
 
-...
-
-> @@ -209,12 +242,12 @@ static int zstd_decompress(struct acomp_req *req)
->  {
->  	struct crypto_acomp_stream *s;
->  	unsigned int total_out = 0;
-> -	unsigned int scur, dcur;
-> +	unsigned int scur;
->  	zstd_out_buffer outbuf;
->  	struct acomp_walk walk;
->  	zstd_in_buffer inbuf;
->  	struct zstd_ctx *ctx;
-> -	size_t pending_bytes;
-> +	size_t remaining = 1;
->  	int ret;
->  
->  	s = crypto_acomp_lock_stream_bh(&zstd_streams);
-> @@ -224,54 +257,105 @@ static int zstd_decompress(struct acomp_req *req)
->  	if (ret)
->  		goto out;
->  
-> +	ret = zstd_acomp_next_dst(&walk, &outbuf);
-> +	if (ret)
-> +		goto out;
-> +
->  	ctx->dctx = zstd_init_dstream(ZSTD_MAX_SIZE, ctx->wksp, ctx->wksp_size);
->  	if (!ctx->dctx) {
->  		ret = -EINVAL;
->  		goto out;
->  	}
->  
-> -	do {
-> +	for (;;) {
->  		scur = acomp_walk_next_src(&walk);
-> -		if (scur) {
-> -			inbuf.pos = 0;
-> -			inbuf.size = scur;
-> -			inbuf.src = walk.src.virt.addr;
-> -		} else {
-> -			break;
-> +		if (outbuf.size == req->dlen && scur == req->slen) {
-> +			ret = zstd_decompress_one(req, ctx, walk.src.virt.addr,
-> +						  walk.dst.virt.addr, &total_out);
-> +			if (!ret) {
-> +				acomp_walk_done_src(&walk, scur);
-> +				acomp_walk_done_dst(&walk, total_out);
-> +			}
-Same here.
-
-Regards,
-
--- 
-Giovanni
