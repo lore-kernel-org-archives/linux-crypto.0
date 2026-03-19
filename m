@@ -1,247 +1,128 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D4B363C45;
-	Thu, 19 Mar 2026 06:19:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0AE73B4E81
+	for <linux-crypto@vger.kernel.org>; Thu, 19 Mar 2026 09:30:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773901164; cv=none; b=a5QQ//YmkLX9VLXMl5Zj5yicoYYY6anKeFP1c9WyxaqeNnz0Ct5N+7mFZOGUxqunntNc7y9o38CK9aT4hCEJMmTMqMH0yAOYdxsfECLQBE1qVaJ1HWrEZWgBD4hkymtPOEJGfplnKTuclpXjg2lJoDNErJ2GCcnepqPFw8UoIr0=
+	t=1773912608; cv=none; b=QUctmTkReUWbnLU09AGCr4Kdxg5cIOVN32pwpdEjQeYvSA9sg5q781TEj9nWKo0QazAitzUFt7qqInx2SoIAlbJa2SXYhtxp7K3WnYZafTBoZyAchenoM5LJt+cnasFQVvSK9+wQzyadXwebEc0wKvqT4YQaKOvCkIb7XT/OFUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773901164; c=relaxed/simple;
-	bh=3U+NGORzr+uh9rj8G+n62LLimEQQsU/GR7nNllucuSc=;
+	s=arc-20240116; t=1773912608; c=relaxed/simple;
+	bh=5Tn2GSJy9+z5AN9rUCr5S9E+wQKe4/XNxtQvB/al9GE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ek/jBPphnbE6S7Rhtv71zrc6G2HtGtcOHScdCQ0sYBQRcyAr9iJwWdSb+bfXv6jCL0ZdPVNHe3hnisjX3k9HQyhZ4+mDUacgC2Xba4G7xwUHeTPXakEp7y26j88zSXjt0ILvETQoVoMmnVzvT5VmRzZBCUEDC0KUGiuhvs25tf4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m2Y3GEVL; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=p32mfw8h3z7JgeBHDFUUqQAH1VbzDpHY2ERSdjX72RDLRgHV5pYreg9CKHjTH9eobAZaotT308KVzSoHiC6LsPfPWP7MB3+WDmE2h2xKcSyD7b8lLLlFQpYJ4s3FG5JJlXYcMjegoo6FGJt5hTfp7gcBKVD4m+7P135PYV0PnRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KNiqUR7f; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m2Y3GEVL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B06FC2BCB2;
-	Thu, 19 Mar 2026 06:19:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773901163;
-	bh=3U+NGORzr+uh9rj8G+n62LLimEQQsU/GR7nNllucuSc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=m2Y3GEVLGtbsHY8WNRU+QFtRIEvKC6sgYmhQjrPtaNQJHos9ekuXQTY0AiXpp5Ygs
-	 36CIJ5QSZzuwHHRdIXj6WbXCskrNNkJtG1oBpEzt4z9NgHtoD5om3QeKkjnKsG3DJG
-	 olZFYsn7vYCLr4TlueikipE26Ea42XWUA11/b/XDxSNOGqi6H1NzHuQUWQOpKGm0iN
-	 4+kAS02ryjXuwJez66eLP6nwrbpJuxJMs8VzC8IO0YNdj3sCyGZ4iS4Uv2hUxZZ2OW
-	 MW5pYJD4e1KYvCs/nNWHL7g0aMpyDayR3GGYAzrBIms8gHhr697QWnkIQAZZH0/OBX
-	 yhtS5h/NzKhMw==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KNiqUR7f"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1773912605;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=a4m5UwRuqyM/t4XvLlwc+wdoOn18dTnoMotq/73CZ3Q=;
+	b=KNiqUR7fBuStfgzVa6UzT9qSiV/Zino8T5kUP8DTYuVqQN9baqfB8IZ+7GfnVwIPGOqmCl
+	9kc6GxvydTSeJQn30WDzw7U1GHW0mHs04absHIRN2WgkScc8SVlfJDkbcVQyf7vUtSzJb9
+	maP2Vmm+yaC9xPSFChP1KBdu2T/busU=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+	Pankaj Gupta <pankaj.gupta@nxp.com>,
+	Gaurav Jain <gaurav.jain@nxp.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-arm-kernel@lists.infradead.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org,
-	x86@kernel.org,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 19/19] lib/crypto: aesgcm: Use GHASH library API
-Date: Wed, 18 Mar 2026 23:17:20 -0700
-Message-ID: <20260319061723.1140720-20-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260319061723.1140720-1-ebiggers@kernel.org>
-References: <20260319061723.1140720-1-ebiggers@kernel.org>
+	"David S. Miller" <davem@davemloft.net>,
+	Kim Phillips <kim.phillips@freescale.com>,
+	Yuan Kang <Yuan.Kang@freescale.com>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	stable@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3 2/2] crypto: caam - guard HMAC key hex dumps in hash_digest_key
+Date: Thu, 19 Mar 2026 10:29:33 +0100
+Message-ID: <20260319092932.208939-4-thorsten.blum@linux.dev>
+In-Reply-To: <20260319092932.208939-3-thorsten.blum@linux.dev>
+References: <20260319092932.208939-3-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3285; i=thorsten.blum@linux.dev; h=from:subject; bh=5Tn2GSJy9+z5AN9rUCr5S9E+wQKe4/XNxtQvB/al9GE=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDJm7D/65tezRtGMbJBj+e+2fuGTnRHONyoj/LJPWPIi51 j3146Oc9x2lLAxiXAyyYoosD2b9mOFbWlO5ySRiJ8wcViaQIQxcnAIwkbwURob/G8LOhQp5dD8/ IfD2toSDz6/jjD/UHE6yycetkLlxon0qwz+1BfGrkw0D+t/GzJeYf0YhIfdaMNempvtTV5pk+74 7s4wHAA==
+X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Make the AES-GCM library use the GHASH library instead of directly
-calling gf128mul_lle().  This allows the architecture-optimized GHASH
-implementations to be used, or the improved generic implementation if no
-architecture-optimized implementation is usable.
+Use print_hex_dump_devel() for dumping sensitive HMAC key bytes in
+hash_digest_key() to avoid leaking secrets at runtime when
+CONFIG_DYNAMIC_DEBUG is enabled.
 
-Note: this means that <crypto/gcm.h> no longer needs to include
-<crypto/gf128mul.h>.  Remove that inclusion, and include
-<crypto/gf128mul.h> explicitly from arch/x86/crypto/aesni-intel_glue.c
-which previously was relying on the transitive inclusion.
-
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+Fixes: 045e36780f11 ("crypto: caam - ahash hmac support")
+Fixes: 3f16f6c9d632 ("crypto: caam/qi2 - add support for ahash algorithms")
+Cc: stable@vger.kernel.org
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 ---
- arch/x86/crypto/aesni-intel_glue.c |  1 +
- include/crypto/gcm.h               |  4 +--
- lib/crypto/Kconfig                 |  2 +-
- lib/crypto/aesgcm.c                | 55 +++++++++++++++---------------
- 4 files changed, 32 insertions(+), 30 deletions(-)
+This patch now depends on patch 1 in the series.
 
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index e6c38d1d8a92..f522fff9231e 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -23,10 +23,11 @@
- #include <linux/err.h>
- #include <crypto/algapi.h>
- #include <crypto/aes.h>
- #include <crypto/b128ops.h>
- #include <crypto/gcm.h>
-+#include <crypto/gf128mul.h>
- #include <crypto/xts.h>
- #include <asm/cpu_device_id.h>
- #include <asm/simd.h>
- #include <crypto/scatterwalk.h>
- #include <crypto/internal/aead.h>
-diff --git a/include/crypto/gcm.h b/include/crypto/gcm.h
-index b524e47bd4d0..1d5f39ff1dc4 100644
---- a/include/crypto/gcm.h
-+++ b/include/crypto/gcm.h
-@@ -2,11 +2,11 @@
- #define _CRYPTO_GCM_H
- 
- #include <linux/errno.h>
- 
- #include <crypto/aes.h>
--#include <crypto/gf128mul.h>
-+#include <crypto/gf128hash.h>
- 
- #define GCM_AES_IV_SIZE 12
- #define GCM_RFC4106_IV_SIZE 8
- #define GCM_RFC4543_IV_SIZE 8
- 
-@@ -63,11 +63,11 @@ static inline int crypto_ipsec_check_assoclen(unsigned int assoclen)
- 
- 	return 0;
- }
- 
- struct aesgcm_ctx {
--	be128			ghash_key;
-+	struct ghash_key	ghash_key;
- 	struct aes_enckey	aes_key;
- 	unsigned int		authsize;
- };
- 
- int aesgcm_expandkey(struct aesgcm_ctx *ctx, const u8 *key,
-diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-index a39e7707e9ee..32fafe245f47 100644
---- a/lib/crypto/Kconfig
-+++ b/lib/crypto/Kconfig
-@@ -39,11 +39,11 @@ config CRYPTO_LIB_AES_CBC_MACS
- 	  <crypto/aes-cbc-macs.h>.
- 
- config CRYPTO_LIB_AESGCM
- 	tristate
- 	select CRYPTO_LIB_AES
--	select CRYPTO_LIB_GF128MUL
-+	select CRYPTO_LIB_GF128HASH
- 	select CRYPTO_LIB_UTILS
- 
- config CRYPTO_LIB_ARC4
- 	tristate
- 
-diff --git a/lib/crypto/aesgcm.c b/lib/crypto/aesgcm.c
-index 02f5b5f32c76..8c7e74d2d147 100644
---- a/lib/crypto/aesgcm.c
-+++ b/lib/crypto/aesgcm.c
-@@ -3,13 +3,12 @@
-  * Minimal library implementation of GCM
-  *
-  * Copyright 2022 Google LLC
-  */
- 
--#include <crypto/algapi.h>
- #include <crypto/gcm.h>
--#include <crypto/ghash.h>
-+#include <crypto/utils.h>
- #include <linux/export.h>
- #include <linux/module.h>
- #include <asm/irqflags.h>
- 
- static void aesgcm_encrypt_block(const struct aes_enckey *key, void *dst,
-@@ -43,37 +42,26 @@ static void aesgcm_encrypt_block(const struct aes_enckey *key, void *dst,
-  * that are not permitted by the GCM specification.
-  */
- int aesgcm_expandkey(struct aesgcm_ctx *ctx, const u8 *key,
- 		     unsigned int keysize, unsigned int authsize)
- {
--	u8 kin[AES_BLOCK_SIZE] = {};
-+	u8 h[AES_BLOCK_SIZE] = {};
- 	int ret;
- 
- 	ret = crypto_gcm_check_authsize(authsize) ?:
- 	      aes_prepareenckey(&ctx->aes_key, key, keysize);
- 	if (ret)
- 		return ret;
- 
- 	ctx->authsize = authsize;
--	aesgcm_encrypt_block(&ctx->aes_key, &ctx->ghash_key, kin);
--
-+	aesgcm_encrypt_block(&ctx->aes_key, h, h);
-+	ghash_preparekey(&ctx->ghash_key, h);
-+	memzero_explicit(h, sizeof(h));
- 	return 0;
- }
- EXPORT_SYMBOL(aesgcm_expandkey);
- 
--static void aesgcm_ghash(be128 *ghash, const be128 *key, const void *src,
--			 int len)
--{
--	while (len > 0) {
--		crypto_xor((u8 *)ghash, src, min(len, GHASH_BLOCK_SIZE));
--		gf128mul_lle(ghash, key);
--
--		src += GHASH_BLOCK_SIZE;
--		len -= GHASH_BLOCK_SIZE;
--	}
--}
--
- /**
-  * aesgcm_mac - Generates the authentication tag using AES-GCM algorithm.
-  * @ctx: The data structure that will hold the AES-GCM key schedule
-  * @src: The input source data.
-  * @src_len: Length of the source data.
-@@ -86,24 +74,37 @@ static void aesgcm_ghash(be128 *ghash, const be128 *key, const void *src,
-  * and an output buffer for the authentication tag.
-  */
- static void aesgcm_mac(const struct aesgcm_ctx *ctx, const u8 *src, int src_len,
- 		       const u8 *assoc, int assoc_len, __be32 *ctr, u8 *authtag)
- {
--	be128 tail = { cpu_to_be64(assoc_len * 8), cpu_to_be64(src_len * 8) };
--	u8 buf[AES_BLOCK_SIZE];
--	be128 ghash = {};
-+	static const u8 zeroes[GHASH_BLOCK_SIZE];
-+	__be64 tail[2] = {
-+		cpu_to_be64((u64)assoc_len * 8),
-+		cpu_to_be64((u64)src_len * 8),
-+	};
-+	struct ghash_ctx ghash;
-+	u8 ghash_out[AES_BLOCK_SIZE];
-+	u8 enc_ctr[AES_BLOCK_SIZE];
-+
-+	ghash_init(&ghash, &ctx->ghash_key);
-+
-+	ghash_update(&ghash, assoc, assoc_len);
-+	ghash_update(&ghash, zeroes, -assoc_len & (GHASH_BLOCK_SIZE - 1));
- 
--	aesgcm_ghash(&ghash, &ctx->ghash_key, assoc, assoc_len);
--	aesgcm_ghash(&ghash, &ctx->ghash_key, src, src_len);
--	aesgcm_ghash(&ghash, &ctx->ghash_key, &tail, sizeof(tail));
-+	ghash_update(&ghash, src, src_len);
-+	ghash_update(&ghash, zeroes, -src_len & (GHASH_BLOCK_SIZE - 1));
-+
-+	ghash_update(&ghash, (const u8 *)&tail, sizeof(tail));
-+
-+	ghash_final(&ghash, ghash_out);
- 
- 	ctr[3] = cpu_to_be32(1);
--	aesgcm_encrypt_block(&ctx->aes_key, buf, ctr);
--	crypto_xor_cpy(authtag, buf, (u8 *)&ghash, ctx->authsize);
-+	aesgcm_encrypt_block(&ctx->aes_key, enc_ctr, ctr);
-+	crypto_xor_cpy(authtag, ghash_out, enc_ctr, ctx->authsize);
- 
--	memzero_explicit(&ghash, sizeof(ghash));
--	memzero_explicit(buf, sizeof(buf));
-+	memzero_explicit(ghash_out, sizeof(ghash_out));
-+	memzero_explicit(enc_ctr, sizeof(enc_ctr));
- }
- 
- static void aesgcm_crypt(const struct aesgcm_ctx *ctx, u8 *dst, const u8 *src,
- 			 int len, __be32 *ctr)
- {
--- 
-2.53.0
+Changes in v3:
+- Convert single CAAM patch into a 2-patch series
+- Use print_hex_dump_devel() helper from patch 1/2 to keep call sites
+  compiled (Herbert)
+- Link to v2: https://lore.kernel.org/lkml/20260318194649.137257-3-thorsten.blum@linux.dev/
 
+Changes in v2:
+- Debug-guard key hex dumps instead of removing them entirely (Herbert)
+- Use print_hex_dump() instead of print_hex_dump_debug() since the dumps
+  are already guarded by DEBUG
+- Link to v1: https://lore.kernel.org/lkml/20260306111204.302544-1-thorsten.blum@linux.dev/
+---
+ drivers/crypto/caam/caamalg_qi2.c | 4 ++--
+ drivers/crypto/caam/caamhash.c    | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
+index 167372936ca7..ec40d8ada4a9 100644
+--- a/drivers/crypto/caam/caamalg_qi2.c
++++ b/drivers/crypto/caam/caamalg_qi2.c
+@@ -3269,7 +3269,7 @@ static int hash_digest_key(struct caam_hash_ctx *ctx, u32 *keylen, u8 *key,
+ 	dpaa2_fl_set_addr(out_fle, key_dma);
+ 	dpaa2_fl_set_len(out_fle, digestsize);
+ 
+-	print_hex_dump_debug("key_in@" __stringify(__LINE__)": ",
++	print_hex_dump_devel("key_in@" __stringify(__LINE__)": ",
+ 			     DUMP_PREFIX_ADDRESS, 16, 4, key, *keylen, 1);
+ 	print_hex_dump_debug("shdesc@" __stringify(__LINE__)": ",
+ 			     DUMP_PREFIX_ADDRESS, 16, 4, desc, desc_bytes(desc),
+@@ -3289,7 +3289,7 @@ static int hash_digest_key(struct caam_hash_ctx *ctx, u32 *keylen, u8 *key,
+ 		/* in progress */
+ 		wait_for_completion(&result.completion);
+ 		ret = result.err;
+-		print_hex_dump_debug("digested key@" __stringify(__LINE__)": ",
++		print_hex_dump_devel("digested key@" __stringify(__LINE__)": ",
+ 				     DUMP_PREFIX_ADDRESS, 16, 4, key,
+ 				     digestsize, 1);
+ 	}
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index 628c43a7efc4..b8e6cc382d93 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -393,7 +393,7 @@ static int hash_digest_key(struct caam_hash_ctx *ctx, u32 *keylen, u8 *key,
+ 	append_seq_store(desc, digestsize, LDST_CLASS_2_CCB |
+ 			 LDST_SRCDST_BYTE_CONTEXT);
+ 
+-	print_hex_dump_debug("key_in@"__stringify(__LINE__)": ",
++	print_hex_dump_devel("key_in@"__stringify(__LINE__)": ",
+ 			     DUMP_PREFIX_ADDRESS, 16, 4, key, *keylen, 1);
+ 	print_hex_dump_debug("jobdesc@"__stringify(__LINE__)": ",
+ 			     DUMP_PREFIX_ADDRESS, 16, 4, desc, desc_bytes(desc),
+@@ -408,7 +408,7 @@ static int hash_digest_key(struct caam_hash_ctx *ctx, u32 *keylen, u8 *key,
+ 		wait_for_completion(&result.completion);
+ 		ret = result.err;
+ 
+-		print_hex_dump_debug("digested key@"__stringify(__LINE__)": ",
++		print_hex_dump_devel("digested key@"__stringify(__LINE__)": ",
+ 				     DUMP_PREFIX_ADDRESS, 16, 4, key,
+ 				     digestsize, 1);
+ 	}
