@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F35E435A3AB;
-	Thu, 19 Mar 2026 06:19:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F1F635AC22;
+	Thu, 19 Mar 2026 06:19:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773901160; cv=none; b=YURSsvGxL/J8NGkHHIPLryHAmpX03/YllGKrenKlmX6IkCUQHantmpak/nx4x8d3piKIQBZkCaS7d6tr/ajnvgDNZfgLv5qexpnK7DYnV8KTcMUDt6Xxzl0jd8s4M8L0+dbhR4T6IhoPDG3FGm2WjL1efIEYh8Q4Ox0yno6dkUA=
+	t=1773901160; cv=none; b=NGo1flKntbYo3DQPT2DNf0PM1H6QUCY9+z+sgC9FEVgIspRvYwc1rFSYM6JOM7wHz+qLv3Lk5tfelFdcEUKXedvAKJZWZPSofKEZH/GTPlMzaU1WsqNMQRQVbFATcSYzQthuGAtRfszuHXvJimXKQePg3QBevzogPPLZItrCxo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1773901160; c=relaxed/simple;
-	bh=EHqY05M4yxDEHTjZmJV/a9yk3e/LPZ0/CaDs3VLZU30=;
+	bh=+ZmjSDH5DIbHkhs8sGfuQZibCGDn1Tzw/dqhYSngFD8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SnjRlUmnC0bi0l5shB5qD/cb/r1QH8955ccjj9+qql/db2d8ghS2q/doYdDq/BdzZHYotdfvYa1iukUIK24vz9+nUOm//FRD29VvFDvxG4TeJd1kWMCCzNOqXJWEjQ9tFyYOtyGv/iqPonS9cAZjvmoolqxBbvv7cpqg36AHWVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lTH7i7+A; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=j3vr7r5Udqw6UFMJerradT65zKdWsQ1sK52AEV1z/ekqsfb5gdE1OC8sICJvrgij1Eladznp93Xt2j5FkjNYD/xz06ZetIqawpVvLs+DASapJ6mpxsuYmhNLJFDKfU0Hhx7YjOqTg0l2kyAv0UGNj7UXygusWfrhAwqYx0/p4Iw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hnean7F5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lTH7i7+A"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A8ADC2BCC9;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hnean7F5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9139C2BCB1;
 	Thu, 19 Mar 2026 06:19:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773901159;
-	bh=EHqY05M4yxDEHTjZmJV/a9yk3e/LPZ0/CaDs3VLZU30=;
+	s=k20201202; t=1773901160;
+	bh=+ZmjSDH5DIbHkhs8sGfuQZibCGDn1Tzw/dqhYSngFD8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lTH7i7+AKBT1f9uNWK9OSxjGE6ei2uH1GkKTY8+xpc9FlDr0DMQuJePlqkkCjJ2Ke
-	 4rTUYwQJXc03wMLPswL/AR9mPhfGP9L/OgsAQ5FvQi5fFWf5NZQLcNCPAFwe00vASm
-	 OD4sOQkZmhds255aXuAxBqpIw9TJhTyObvxYrEVqhBVuXqzokmLzvzCFmzOtVGwY1y
-	 e8G6vltDnKmM0HY6wmzwZNzVJwVdDPoWPsJEDmiWaQ2TaTNgGdUZe9c6FhltliBFwU
-	 cB75GRdjB2+y2h3JCenbHseWg69IMMnG/OxeOzVDTFgLuPPlwbfFvi7i3EwtsbZkIC
-	 /IXCz1t+GxFdQ==
+	b=hnean7F5sIW0j/PDDxjaqGyGILEQL5LWC1ZOa2gtGq3EkrwAV03/l3rgTmOOHTpHf
+	 zuWiucXxFt0bIE/omsLvX3AYzKLw35DJ0KiTAXUiu9rnnVV3Go7xE7twTP3m4a9u4k
+	 kuPIiu4CjMhPqmQlqBhSgq836J+HHGm9m7WGDcJHOWIDXrjaGPWWdc9IThZSx53uz8
+	 H4ZXX1uojF+l9CmYgAMCgkuREmq7GPg5yOYWBKCe7vY+YlOQDe0U1ZT7l6KuRL/+a1
+	 Cto/yQ8kWtV3VUj+9ES3MrtArOdzHHnqThiXY2S9ptS6HVrdHf4U3bv7k3V7NpVhmB
+	 i8tqNk8NcHEbw==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: linux-kernel@vger.kernel.org,
 	linux-s390@vger.kernel.org,
 	x86@kernel.org,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 11/19] lib/crypto: powerpc/ghash: Migrate optimized code into library
-Date: Wed, 18 Mar 2026 23:17:12 -0700
-Message-ID: <20260319061723.1140720-12-ebiggers@kernel.org>
+Subject: [PATCH 12/19] lib/crypto: riscv/ghash: Migrate optimized code into library
+Date: Wed, 18 Mar 2026 23:17:13 -0700
+Message-ID: <20260319061723.1140720-13-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260319061723.1140720-1-ebiggers@kernel.org>
 References: <20260319061723.1140720-1-ebiggers@kernel.org>
@@ -52,542 +52,319 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Remove the "p8_ghash" crypto_shash algorithm.  Move the corresponding
-assembly code into lib/crypto/, and wire it up to the GHASH library.
+Remove the "ghash-riscv64-zvkg" crypto_shash algorithm.  Move the
+corresponding assembly code into lib/crypto/, modify it to take the
+length in blocks instead of bytes, and wire it up to the GHASH library.
 
-This makes the GHASH library be optimized for POWER8.  It also greatly
-reduces the amount of powerpc-specific glue code that is needed, and it
-fixes the issue where this optimized GHASH code was disabled by default.
+This makes the GHASH library be optimized with the RISC-V Vector
+Cryptography Extension.  It also greatly reduces the amount of
+riscv-specific glue code that is needed, and it fixes the issue where
+this optimized GHASH code was disabled by default.
 
-Note that previously the C code defined the POWER8 GHASH key format as
-"u128 htable[16]", despite the assembly code only using four entries.
-Fix the C code to use the correct key format.  To fulfill the library
-API contract, also make the key preparation work in all contexts.
+Note that this RISC-V code has multiple opportunities for improvement,
+such as adding more parallelism, providing an optimized multiplication
+function, and directly supporting POLYVAL.  But for now, this commit
+simply tweaks ghash_zvkg() slightly to make it compatible with the
+library, then wires it up to ghash_blocks_arch().
 
-Note that the POWER8 assembly code takes the accumulator in GHASH
-format, but it actually byte-reflects it to get it into POLYVAL format.
-The library already works with POLYVAL natively.  For now, just wire up
-this existing code by converting it to/from GHASH format in C code.
-This should be cleaned up to eliminate the unnecessary conversion later.
+ghash_preparekey_arch() is also implemented to store the copy of the raw
+key needed by the vghsh.vv instruction.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- MAINTAINERS                                   |   4 +-
- arch/powerpc/crypto/Kconfig                   |   5 +-
- arch/powerpc/crypto/Makefile                  |   8 +-
- arch/powerpc/crypto/aesp8-ppc.h               |   1 -
- arch/powerpc/crypto/ghash.c                   | 160 ------------------
- arch/powerpc/crypto/vmx.c                     |  10 +-
- include/crypto/gf128hash.h                    |   4 +
- lib/crypto/Kconfig                            |   1 +
- lib/crypto/Makefile                           |  25 ++-
- lib/crypto/powerpc/.gitignore                 |   1 +
- lib/crypto/powerpc/gf128hash.h                | 109 ++++++++++++
- .../crypto/powerpc}/ghashp8-ppc.pl            |   1 +
- 12 files changed, 143 insertions(+), 186 deletions(-)
- delete mode 100644 arch/powerpc/crypto/ghash.c
- create mode 100644 lib/crypto/powerpc/gf128hash.h
- rename {arch/powerpc/crypto => lib/crypto/powerpc}/ghashp8-ppc.pl (98%)
+ arch/riscv/crypto/Kconfig                     |  11 --
+ arch/riscv/crypto/Makefile                    |   3 -
+ arch/riscv/crypto/ghash-riscv64-glue.c        | 146 ------------------
+ include/crypto/gf128hash.h                    |   3 +
+ lib/crypto/Kconfig                            |   2 +
+ lib/crypto/Makefile                           |   1 +
+ lib/crypto/riscv/gf128hash.h                  |  57 +++++++
+ .../crypto/riscv}/ghash-riscv64-zvkg.S        |  13 +-
+ 8 files changed, 69 insertions(+), 167 deletions(-)
+ delete mode 100644 arch/riscv/crypto/ghash-riscv64-glue.c
+ create mode 100644 lib/crypto/riscv/gf128hash.h
+ rename {arch/riscv/crypto => lib/crypto/riscv}/ghash-riscv64-zvkg.S (91%)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 77fdfcb55f06..f088f4085653 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -12265,14 +12265,14 @@ F:	arch/powerpc/crypto/Makefile
- F:	arch/powerpc/crypto/aes.c
- F:	arch/powerpc/crypto/aes_cbc.c
- F:	arch/powerpc/crypto/aes_ctr.c
- F:	arch/powerpc/crypto/aes_xts.c
- F:	arch/powerpc/crypto/aesp8-ppc.*
--F:	arch/powerpc/crypto/ghash.c
--F:	arch/powerpc/crypto/ghashp8-ppc.pl
- F:	arch/powerpc/crypto/ppc-xlate.pl
- F:	arch/powerpc/crypto/vmx.c
-+F:	lib/crypto/powerpc/gf128hash.h
-+F:	lib/crypto/powerpc/ghashp8-ppc.pl
+diff --git a/arch/riscv/crypto/Kconfig b/arch/riscv/crypto/Kconfig
+index 22d4eaab15f3..c208f54afbcd 100644
+--- a/arch/riscv/crypto/Kconfig
++++ b/arch/riscv/crypto/Kconfig
+@@ -15,21 +15,10 @@ config CRYPTO_AES_RISCV64
+ 	  - Zvkned vector crypto extension
+ 	  - Zvbb vector extension (XTS)
+ 	  - Zvkb vector crypto extension (CTR)
+ 	  - Zvkg vector crypto extension (XTS)
  
- IBM ServeRAID RAID DRIVER
- S:	Orphan
- F:	drivers/scsi/ips.*
- 
-diff --git a/arch/powerpc/crypto/Kconfig b/arch/powerpc/crypto/Kconfig
-index 2d056f1fc90f..b247f7ed973e 100644
---- a/arch/powerpc/crypto/Kconfig
-+++ b/arch/powerpc/crypto/Kconfig
-@@ -52,14 +52,13 @@ config CRYPTO_DEV_VMX_ENCRYPT
- 	tristate "Encryption acceleration support on P8 CPU"
- 	depends on CRYPTO_DEV_VMX
- 	select CRYPTO_AES
- 	select CRYPTO_CBC
- 	select CRYPTO_CTR
--	select CRYPTO_GHASH
- 	select CRYPTO_XTS
- 	default m
- 	help
- 	  Support for VMX cryptographic acceleration instructions on Power8 CPU.
--	  This module supports acceleration for AES and GHASH in hardware. If you
--	  choose 'M' here, this module will be called vmx-crypto.
-+	  This module supports acceleration for AES in hardware. If you choose
-+	  'M' here, this module will be called vmx-crypto.
- 
- endmenu
-diff --git a/arch/powerpc/crypto/Makefile b/arch/powerpc/crypto/Makefile
-index 3ac0886282a2..a1fe102a90ae 100644
---- a/arch/powerpc/crypto/Makefile
-+++ b/arch/powerpc/crypto/Makefile
-@@ -9,11 +9,11 @@ obj-$(CONFIG_CRYPTO_AES_PPC_SPE) += aes-ppc-spe.o
- obj-$(CONFIG_CRYPTO_AES_GCM_P10) += aes-gcm-p10-crypto.o
- obj-$(CONFIG_CRYPTO_DEV_VMX_ENCRYPT) += vmx-crypto.o
- 
- aes-ppc-spe-y := aes-spe-glue.o
- aes-gcm-p10-crypto-y := aes-gcm-p10-glue.o aes-gcm-p10.o ghashp10-ppc.o aesp10-ppc.o
--vmx-crypto-objs := vmx.o ghashp8-ppc.o aes_cbc.o aes_ctr.o aes_xts.o ghash.o
-+vmx-crypto-objs := vmx.o aes_cbc.o aes_ctr.o aes_xts.o
- 
- ifeq ($(CONFIG_CPU_LITTLE_ENDIAN),y)
- override flavour := linux-ppc64le
- else
- ifdef CONFIG_PPC64_ELF_ABI_V2
-@@ -24,16 +24,12 @@ endif
- endif
- 
- quiet_cmd_perl = PERL    $@
-       cmd_perl = $(PERL) $< $(flavour) > $@
- 
--targets += aesp10-ppc.S ghashp10-ppc.S ghashp8-ppc.S
-+targets += aesp10-ppc.S ghashp10-ppc.S
- 
- $(obj)/aesp10-ppc.S $(obj)/ghashp10-ppc.S: $(obj)/%.S: $(src)/%.pl FORCE
- 	$(call if_changed,perl)
- 
--$(obj)/ghashp8-ppc.S: $(obj)/%.S: $(src)/%.pl FORCE
--	$(call if_changed,perl)
+-config CRYPTO_GHASH_RISCV64
+-	tristate "Hash functions: GHASH"
+-	depends on 64BIT && TOOLCHAIN_HAS_VECTOR_CRYPTO && \
+-		   RISCV_EFFICIENT_VECTOR_UNALIGNED_ACCESS
+-	select CRYPTO_GCM
+-	help
+-	  GCM GHASH function (NIST SP 800-38D)
 -
- OBJECT_FILES_NON_STANDARD_aesp10-ppc.o := y
- OBJECT_FILES_NON_STANDARD_ghashp10-ppc.o := y
--OBJECT_FILES_NON_STANDARD_ghashp8-ppc.o := y
-diff --git a/arch/powerpc/crypto/aesp8-ppc.h b/arch/powerpc/crypto/aesp8-ppc.h
-index 6862c605cc33..c68f5b6965fa 100644
---- a/arch/powerpc/crypto/aesp8-ppc.h
-+++ b/arch/powerpc/crypto/aesp8-ppc.h
-@@ -1,8 +1,7 @@
- /* SPDX-License-Identifier: GPL-2.0 */
- #include <linux/types.h>
- #include <crypto/aes.h>
+-	  Architecture: riscv64 using:
+-	  - Zvkg vector crypto extension
+-
+ config CRYPTO_SM3_RISCV64
+ 	tristate "Hash functions: SM3 (ShangMi 3)"
+ 	depends on 64BIT && TOOLCHAIN_HAS_VECTOR_CRYPTO && \
+ 		   RISCV_EFFICIENT_VECTOR_UNALIGNED_ACCESS
+ 	select CRYPTO_HASH
+diff --git a/arch/riscv/crypto/Makefile b/arch/riscv/crypto/Makefile
+index 183495a95cc0..5c9ee1b876fa 100644
+--- a/arch/riscv/crypto/Makefile
++++ b/arch/riscv/crypto/Makefile
+@@ -2,13 +2,10 @@
  
--extern struct shash_alg p8_ghash_alg;
- extern struct skcipher_alg p8_aes_cbc_alg;
- extern struct skcipher_alg p8_aes_ctr_alg;
- extern struct skcipher_alg p8_aes_xts_alg;
-diff --git a/arch/powerpc/crypto/ghash.c b/arch/powerpc/crypto/ghash.c
+ obj-$(CONFIG_CRYPTO_AES_RISCV64) += aes-riscv64.o
+ aes-riscv64-y := aes-riscv64-glue.o aes-riscv64-zvkned.o \
+ 		 aes-riscv64-zvkned-zvbb-zvkg.o aes-riscv64-zvkned-zvkb.o
+ 
+-obj-$(CONFIG_CRYPTO_GHASH_RISCV64) += ghash-riscv64.o
+-ghash-riscv64-y := ghash-riscv64-glue.o ghash-riscv64-zvkg.o
+-
+ obj-$(CONFIG_CRYPTO_SM3_RISCV64) += sm3-riscv64.o
+ sm3-riscv64-y := sm3-riscv64-glue.o sm3-riscv64-zvksh-zvkb.o
+ 
+ obj-$(CONFIG_CRYPTO_SM4_RISCV64) += sm4-riscv64.o
+ sm4-riscv64-y := sm4-riscv64-glue.o sm4-riscv64-zvksed-zvkb.o
+diff --git a/arch/riscv/crypto/ghash-riscv64-glue.c b/arch/riscv/crypto/ghash-riscv64-glue.c
 deleted file mode 100644
-index 7308735bdb33..000000000000
---- a/arch/powerpc/crypto/ghash.c
+index d86073d25387..000000000000
+--- a/arch/riscv/crypto/ghash-riscv64-glue.c
 +++ /dev/null
-@@ -1,160 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0
+@@ -1,146 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-only
 -/*
-- * GHASH routines supporting VMX instructions on the Power 8
+- * GHASH using the RISC-V vector crypto extensions
 - *
-- * Copyright (C) 2015, 2019 International Business Machines Inc.
+- * Copyright (C) 2023 VRULL GmbH
+- * Author: Heiko Stuebner <heiko.stuebner@vrull.eu>
 - *
-- * Author: Marcelo Henrique Cerri <mhcerri@br.ibm.com>
-- *
-- * Extended by Daniel Axtens <dja@axtens.net> to replace the fallback
-- * mechanism. The new approach is based on arm64 code, which is:
-- *   Copyright (C) 2014 - 2018 Linaro Ltd. <ard.biesheuvel@linaro.org>
+- * Copyright (C) 2023 SiFive, Inc.
+- * Author: Jerry Shih <jerry.shih@sifive.com>
 - */
 -
--#include "aesp8-ppc.h"
--#include <asm/switch_to.h>
--#include <crypto/aes.h>
+-#include <asm/simd.h>
+-#include <asm/vector.h>
+-#include <crypto/b128ops.h>
 -#include <crypto/gf128mul.h>
 -#include <crypto/ghash.h>
 -#include <crypto/internal/hash.h>
 -#include <crypto/internal/simd.h>
--#include <linux/err.h>
+-#include <crypto/utils.h>
+-#include <linux/errno.h>
 -#include <linux/kernel.h>
 -#include <linux/module.h>
 -#include <linux/string.h>
--#include <linux/uaccess.h>
 -
--void gcm_init_p8(u128 htable[16], const u64 Xi[2]);
--void gcm_gmult_p8(u64 Xi[2], const u128 htable[16]);
--void gcm_ghash_p8(u64 Xi[2], const u128 htable[16],
--		  const u8 *in, size_t len);
+-asmlinkage void ghash_zvkg(be128 *accumulator, const be128 *key, const u8 *data,
+-			   size_t len);
 -
--struct p8_ghash_ctx {
--	/* key used by vector asm */
--	u128 htable[16];
--	/* key used by software fallback */
+-struct riscv64_ghash_tfm_ctx {
 -	be128 key;
 -};
 -
--struct p8_ghash_desc_ctx {
--	u64 shash[2];
+-struct riscv64_ghash_desc_ctx {
+-	be128 accumulator;
 -};
 -
--static int p8_ghash_init(struct shash_desc *desc)
+-static int riscv64_ghash_setkey(struct crypto_shash *tfm, const u8 *key,
+-				unsigned int keylen)
 -{
--	struct p8_ghash_desc_ctx *dctx = shash_desc_ctx(desc);
--
--	memset(dctx->shash, 0, GHASH_DIGEST_SIZE);
--	return 0;
--}
--
--static int p8_ghash_setkey(struct crypto_shash *tfm, const u8 *key,
--			   unsigned int keylen)
--{
--	struct p8_ghash_ctx *ctx = crypto_tfm_ctx(crypto_shash_tfm(tfm));
+-	struct riscv64_ghash_tfm_ctx *tctx = crypto_shash_ctx(tfm);
 -
 -	if (keylen != GHASH_BLOCK_SIZE)
 -		return -EINVAL;
 -
--	preempt_disable();
--	pagefault_disable();
--	enable_kernel_vsx();
--	gcm_init_p8(ctx->htable, (const u64 *) key);
--	disable_kernel_vsx();
--	pagefault_enable();
--	preempt_enable();
--
--	memcpy(&ctx->key, key, GHASH_BLOCK_SIZE);
+-	memcpy(&tctx->key, key, GHASH_BLOCK_SIZE);
 -
 -	return 0;
 -}
 -
--static inline void __ghash_block(struct p8_ghash_ctx *ctx,
--				 struct p8_ghash_desc_ctx *dctx,
--				 const u8 *src)
+-static int riscv64_ghash_init(struct shash_desc *desc)
 -{
--	if (crypto_simd_usable()) {
--		preempt_disable();
--		pagefault_disable();
--		enable_kernel_vsx();
--		gcm_ghash_p8(dctx->shash, ctx->htable, src, GHASH_BLOCK_SIZE);
--		disable_kernel_vsx();
--		pagefault_enable();
--		preempt_enable();
--	} else {
--		crypto_xor((u8 *)dctx->shash, src, GHASH_BLOCK_SIZE);
--		gf128mul_lle((be128 *)dctx->shash, &ctx->key);
--	}
+-	struct riscv64_ghash_desc_ctx *dctx = shash_desc_ctx(desc);
+-
+-	*dctx = (struct riscv64_ghash_desc_ctx){};
+-
+-	return 0;
 -}
 -
--static inline int __ghash_blocks(struct p8_ghash_ctx *ctx,
--				 struct p8_ghash_desc_ctx *dctx,
--				 const u8 *src, unsigned int srclen)
+-static inline void
+-riscv64_ghash_blocks(const struct riscv64_ghash_tfm_ctx *tctx,
+-		     struct riscv64_ghash_desc_ctx *dctx,
+-		     const u8 *src, size_t srclen)
 -{
--	int remain = srclen - round_down(srclen, GHASH_BLOCK_SIZE);
--
--	srclen -= remain;
+-	/* The srclen is nonzero and a multiple of 16. */
 -	if (crypto_simd_usable()) {
--		preempt_disable();
--		pagefault_disable();
--		enable_kernel_vsx();
--		gcm_ghash_p8(dctx->shash, ctx->htable,
--				src, srclen);
--		disable_kernel_vsx();
--		pagefault_enable();
--		preempt_enable();
+-		kernel_vector_begin();
+-		ghash_zvkg(&dctx->accumulator, &tctx->key, src, srclen);
+-		kernel_vector_end();
 -	} else {
 -		do {
--			crypto_xor((u8 *)dctx->shash, src, GHASH_BLOCK_SIZE);
--			gf128mul_lle((be128 *)dctx->shash, &ctx->key);
--			srclen -= GHASH_BLOCK_SIZE;
+-			crypto_xor((u8 *)&dctx->accumulator, src,
+-				   GHASH_BLOCK_SIZE);
+-			gf128mul_lle(&dctx->accumulator, &tctx->key);
 -			src += GHASH_BLOCK_SIZE;
+-			srclen -= GHASH_BLOCK_SIZE;
 -		} while (srclen);
 -	}
--
--	return remain;
 -}
 -
--static int p8_ghash_update(struct shash_desc *desc,
--			   const u8 *src, unsigned int srclen)
+-static int riscv64_ghash_update(struct shash_desc *desc, const u8 *src,
+-				unsigned int srclen)
 -{
--	struct p8_ghash_ctx *ctx = crypto_tfm_ctx(crypto_shash_tfm(desc->tfm));
--	struct p8_ghash_desc_ctx *dctx = shash_desc_ctx(desc);
+-	const struct riscv64_ghash_tfm_ctx *tctx = crypto_shash_ctx(desc->tfm);
+-	struct riscv64_ghash_desc_ctx *dctx = shash_desc_ctx(desc);
 -
--	return __ghash_blocks(ctx, dctx, src, srclen);
+-	riscv64_ghash_blocks(tctx, dctx, src,
+-			     round_down(srclen, GHASH_BLOCK_SIZE));
+-	return srclen - round_down(srclen, GHASH_BLOCK_SIZE);
 -}
 -
--static int p8_ghash_finup(struct shash_desc *desc, const u8 *src,
--			  unsigned int len, u8 *out)
+-static int riscv64_ghash_finup(struct shash_desc *desc, const u8 *src,
+-			       unsigned int len, u8 *out)
 -{
--	struct p8_ghash_ctx *ctx = crypto_tfm_ctx(crypto_shash_tfm(desc->tfm));
--	struct p8_ghash_desc_ctx *dctx = shash_desc_ctx(desc);
+-	const struct riscv64_ghash_tfm_ctx *tctx = crypto_shash_ctx(desc->tfm);
+-	struct riscv64_ghash_desc_ctx *dctx = shash_desc_ctx(desc);
 -
 -	if (len) {
 -		u8 buf[GHASH_BLOCK_SIZE] = {};
 -
 -		memcpy(buf, src, len);
--		__ghash_block(ctx, dctx, buf);
+-		riscv64_ghash_blocks(tctx, dctx, buf, GHASH_BLOCK_SIZE);
 -		memzero_explicit(buf, sizeof(buf));
 -	}
--	memcpy(out, dctx->shash, GHASH_DIGEST_SIZE);
+-
+-	memcpy(out, &dctx->accumulator, GHASH_DIGEST_SIZE);
 -	return 0;
 -}
 -
--struct shash_alg p8_ghash_alg = {
+-static struct shash_alg riscv64_ghash_alg = {
+-	.init = riscv64_ghash_init,
+-	.update = riscv64_ghash_update,
+-	.finup = riscv64_ghash_finup,
+-	.setkey = riscv64_ghash_setkey,
+-	.descsize = sizeof(struct riscv64_ghash_desc_ctx),
 -	.digestsize = GHASH_DIGEST_SIZE,
--	.init = p8_ghash_init,
--	.update = p8_ghash_update,
--	.finup = p8_ghash_finup,
--	.setkey = p8_ghash_setkey,
--	.descsize = sizeof(struct p8_ghash_desc_ctx),
 -	.base = {
--		 .cra_name = "ghash",
--		 .cra_driver_name = "p8_ghash",
--		 .cra_priority = 1000,
--		 .cra_flags = CRYPTO_AHASH_ALG_BLOCK_ONLY,
--		 .cra_blocksize = GHASH_BLOCK_SIZE,
--		 .cra_ctxsize = sizeof(struct p8_ghash_ctx),
--		 .cra_module = THIS_MODULE,
+-		.cra_blocksize = GHASH_BLOCK_SIZE,
+-		.cra_ctxsize = sizeof(struct riscv64_ghash_tfm_ctx),
+-		.cra_priority = 300,
+-		.cra_flags = CRYPTO_AHASH_ALG_BLOCK_ONLY,
+-		.cra_name = "ghash",
+-		.cra_driver_name = "ghash-riscv64-zvkg",
+-		.cra_module = THIS_MODULE,
 -	},
 -};
-diff --git a/arch/powerpc/crypto/vmx.c b/arch/powerpc/crypto/vmx.c
-index 7d2beb774f99..08da5311dfdf 100644
---- a/arch/powerpc/crypto/vmx.c
-+++ b/arch/powerpc/crypto/vmx.c
-@@ -12,26 +12,21 @@
- #include <linux/types.h>
- #include <linux/err.h>
- #include <linux/cpufeature.h>
- #include <linux/crypto.h>
- #include <asm/cputable.h>
--#include <crypto/internal/hash.h>
- #include <crypto/internal/skcipher.h>
- 
- #include "aesp8-ppc.h"
- 
- static int __init p8_init(void)
- {
- 	int ret;
- 
--	ret = crypto_register_shash(&p8_ghash_alg);
--	if (ret)
--		goto err;
 -
- 	ret = crypto_register_skcipher(&p8_aes_cbc_alg);
- 	if (ret)
--		goto err_unregister_ghash;
-+		goto err;
- 
- 	ret = crypto_register_skcipher(&p8_aes_ctr_alg);
- 	if (ret)
- 		goto err_unregister_aes_cbc;
- 
-@@ -43,22 +38,19 @@ static int __init p8_init(void)
- 
- err_unregister_aes_ctr:
- 	crypto_unregister_skcipher(&p8_aes_ctr_alg);
- err_unregister_aes_cbc:
- 	crypto_unregister_skcipher(&p8_aes_cbc_alg);
--err_unregister_ghash:
--	crypto_unregister_shash(&p8_ghash_alg);
- err:
- 	return ret;
- }
- 
- static void __exit p8_exit(void)
- {
- 	crypto_unregister_skcipher(&p8_aes_xts_alg);
- 	crypto_unregister_skcipher(&p8_aes_ctr_alg);
- 	crypto_unregister_skcipher(&p8_aes_cbc_alg);
--	crypto_unregister_shash(&p8_ghash_alg);
- }
- 
- module_cpu_feature_match(PPC_MODULE_FEATURE_VEC_CRYPTO, p8_init);
- module_exit(p8_exit);
- 
+-static int __init riscv64_ghash_mod_init(void)
+-{
+-	if (riscv_isa_extension_available(NULL, ZVKG) &&
+-	    riscv_vector_vlen() >= 128)
+-		return crypto_register_shash(&riscv64_ghash_alg);
+-
+-	return -ENODEV;
+-}
+-
+-static void __exit riscv64_ghash_mod_exit(void)
+-{
+-	crypto_unregister_shash(&riscv64_ghash_alg);
+-}
+-
+-module_init(riscv64_ghash_mod_init);
+-module_exit(riscv64_ghash_mod_exit);
+-
+-MODULE_DESCRIPTION("GHASH (RISC-V accelerated)");
+-MODULE_AUTHOR("Heiko Stuebner <heiko.stuebner@vrull.eu>");
+-MODULE_LICENSE("GPL");
+-MODULE_ALIAS_CRYPTO("ghash");
 diff --git a/include/crypto/gf128hash.h b/include/crypto/gf128hash.h
-index 5090fbaa87f8..650652dd6003 100644
+index 650652dd6003..b798438cce23 100644
 --- a/include/crypto/gf128hash.h
 +++ b/include/crypto/gf128hash.h
-@@ -39,10 +39,14 @@ struct polyval_elem {
-  * struct ghash_key - Prepared key for GHASH
-  *
-  * Use ghash_preparekey() to initialize this.
+@@ -42,10 +42,13 @@ struct polyval_elem {
   */
  struct ghash_key {
-+#if defined(CONFIG_CRYPTO_LIB_GF128HASH_ARCH) && defined(CONFIG_PPC64)
-+	/** @htable: GHASH key format used by the POWER8 assembly code */
-+	u64 htable[4][2];
-+#endif
+ #if defined(CONFIG_CRYPTO_LIB_GF128HASH_ARCH) && defined(CONFIG_PPC64)
+ 	/** @htable: GHASH key format used by the POWER8 assembly code */
+ 	u64 htable[4][2];
++#elif defined(CONFIG_CRYPTO_LIB_GF128HASH_ARCH) && defined(CONFIG_RISCV)
++	/** @h_raw: The hash key H, in GHASH format */
++	u8 h_raw[GHASH_BLOCK_SIZE];
+ #endif
  	/** @h: The hash key H, in POLYVAL format */
  	struct polyval_elem h;
  };
  
- /**
 diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-index 4f1a79883a56..f54add7d9070 100644
+index f54add7d9070..027802e0de33 100644
 --- a/lib/crypto/Kconfig
 +++ b/lib/crypto/Kconfig
-@@ -119,10 +119,11 @@ config CRYPTO_LIB_GF128HASH
- config CRYPTO_LIB_GF128HASH_ARCH
+@@ -120,10 +120,12 @@ config CRYPTO_LIB_GF128HASH_ARCH
  	bool
  	depends on CRYPTO_LIB_GF128HASH && !UML
  	default y if ARM && KERNEL_MODE_NEON
  	default y if ARM64
-+	default y if PPC64 && VSX
+ 	default y if PPC64 && VSX
++	default y if RISCV && 64BIT && TOOLCHAIN_HAS_VECTOR_CRYPTO && \
++		     RISCV_EFFICIENT_VECTOR_UNALIGNED_ACCESS
  	default y if X86_64
  
  config CRYPTO_LIB_MD5
  	tristate
  	help
 diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
-index 4ce0bac8fd93..8a9084188778 100644
+index 8a9084188778..8950509833af 100644
 --- a/lib/crypto/Makefile
 +++ b/lib/crypto/Makefile
-@@ -6,10 +6,14 @@ quiet_cmd_perlasm = PERLASM $@
-       cmd_perlasm = $(PERL) $(<) > $(@)
- 
- quiet_cmd_perlasm_with_args = PERLASM $@
-       cmd_perlasm_with_args = $(PERL) $(<) void $(@)
- 
-+ppc64-perlasm-flavour-y := linux-ppc64
-+ppc64-perlasm-flavour-$(CONFIG_PPC64_ELF_ABI_V2) := linux-ppc64-elfv2
-+ppc64-perlasm-flavour-$(CONFIG_CPU_LITTLE_ENDIAN) := linux-ppc64le
-+
- obj-$(CONFIG_KUNIT)				+= tests/
- 
- obj-$(CONFIG_CRYPTO_HASH_INFO)			+= hash_info.o
- 
- obj-$(CONFIG_CRYPTO_LIB_UTILS)			+= libcryptoutils.o
-@@ -34,15 +38,12 @@ libaes-y += powerpc/aes-spe-core.o \
- 	    powerpc/aes-spe-keys.o \
- 	    powerpc/aes-spe-modes.o \
- 	    powerpc/aes-tab-4k.o
- else
- libaes-y += powerpc/aesp8-ppc.o
--aes-perlasm-flavour-y := linux-ppc64
--aes-perlasm-flavour-$(CONFIG_PPC64_ELF_ABI_V2) := linux-ppc64-elfv2
--aes-perlasm-flavour-$(CONFIG_CPU_LITTLE_ENDIAN) := linux-ppc64le
- quiet_cmd_perlasm_aes = PERLASM $@
--      cmd_perlasm_aes = $(PERL) $< $(aes-perlasm-flavour-y) $@
-+      cmd_perlasm_aes = $(PERL) $< $(ppc64-perlasm-flavour-y) $@
- # Use if_changed instead of cmd, in case the flavour changed.
- $(obj)/powerpc/aesp8-ppc.S: $(src)/powerpc/aesp8-ppc.pl FORCE
- 	$(call if_changed,perlasm_aes)
- targets += powerpc/aesp8-ppc.S
- OBJECT_FILES_NON_STANDARD_powerpc/aesp8-ppc.o := y
-@@ -159,13 +160,27 @@ libgf128hash-y := gf128hash.o
- ifeq ($(CONFIG_CRYPTO_LIB_GF128HASH_ARCH),y)
- CFLAGS_gf128hash.o += -I$(src)/$(SRCARCH)
- libgf128hash-$(CONFIG_ARM) += arm/ghash-neon-core.o
- libgf128hash-$(CONFIG_ARM64) += arm64/ghash-neon-core.o \
- 				arm64/polyval-ce-core.o
--libgf128hash-$(CONFIG_X86) += x86/polyval-pclmul-avx.o
-+
-+ifeq ($(CONFIG_PPC),y)
-+libgf128hash-y += powerpc/ghashp8-ppc.o
-+quiet_cmd_perlasm_ghash = PERLASM $@
-+      cmd_perlasm_ghash = $(PERL) $< $(ppc64-perlasm-flavour-y) $@
-+$(obj)/powerpc/ghashp8-ppc.S: $(src)/powerpc/ghashp8-ppc.pl FORCE
-+	$(call if_changed,perlasm_ghash)
-+targets += powerpc/ghashp8-ppc.S
-+OBJECT_FILES_NON_STANDARD_powerpc/ghashp8-ppc.o := y
+@@ -171,10 +171,11 @@ $(obj)/powerpc/ghashp8-ppc.S: $(src)/powerpc/ghashp8-ppc.pl FORCE
+ 	$(call if_changed,perlasm_ghash)
+ targets += powerpc/ghashp8-ppc.S
+ OBJECT_FILES_NON_STANDARD_powerpc/ghashp8-ppc.o := y
  endif
  
-+libgf128hash-$(CONFIG_X86) += x86/polyval-pclmul-avx.o
-+endif # CONFIG_CRYPTO_LIB_GF128HASH_ARCH
-+
-+# clean-files must be defined unconditionally
-+clean-files += powerpc/ghashp8-ppc.S
-+
- ################################################################################
++libgf128hash-$(CONFIG_RISCV) += riscv/ghash-riscv64-zvkg.o
+ libgf128hash-$(CONFIG_X86) += x86/polyval-pclmul-avx.o
+ endif # CONFIG_CRYPTO_LIB_GF128HASH_ARCH
  
- obj-$(CONFIG_CRYPTO_LIB_MD5) += libmd5.o
- libmd5-y := md5.o
- ifeq ($(CONFIG_CRYPTO_LIB_MD5_ARCH),y)
-diff --git a/lib/crypto/powerpc/.gitignore b/lib/crypto/powerpc/.gitignore
-index 598ca7aff6b1..7aa71d83f739 100644
---- a/lib/crypto/powerpc/.gitignore
-+++ b/lib/crypto/powerpc/.gitignore
-@@ -1,2 +1,3 @@
- # SPDX-License-Identifier: GPL-2.0-only
- aesp8-ppc.S
-+ghashp8-ppc.S
-diff --git a/lib/crypto/powerpc/gf128hash.h b/lib/crypto/powerpc/gf128hash.h
+ # clean-files must be defined unconditionally
+ clean-files += powerpc/ghashp8-ppc.S
+diff --git a/lib/crypto/riscv/gf128hash.h b/lib/crypto/riscv/gf128hash.h
 new file mode 100644
-index 000000000000..629cd325d0c7
+index 000000000000..4301a0384f60
 --- /dev/null
-+++ b/lib/crypto/powerpc/gf128hash.h
-@@ -0,0 +1,109 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
++++ b/lib/crypto/riscv/gf128hash.h
+@@ -0,0 +1,57 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
-+ * GHASH routines supporting VMX instructions on the Power 8
++ * GHASH, RISC-V optimized
 + *
-+ * Copyright (C) 2015, 2019 International Business Machines Inc.
-+ * Copyright (C) 2014 - 2018 Linaro Ltd.
++ * Copyright (C) 2023 VRULL GmbH
++ * Copyright (C) 2023 SiFive, Inc.
 + * Copyright 2026 Google LLC
 + */
 +
 +#include <asm/simd.h>
-+#include <asm/switch_to.h>
-+#include <linux/cpufeature.h>
-+#include <linux/jump_label.h>
-+#include <linux/preempt.h>
-+#include <linux/uaccess.h>
++#include <asm/vector.h>
 +
-+static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_vec_crypto);
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_zvkg);
 +
-+void gcm_init_p8(u64 htable[4][2], const u8 h[16]);
-+void gcm_gmult_p8(u8 Xi[16], const u64 htable[4][2]);
-+void gcm_ghash_p8(u8 Xi[16], const u64 htable[4][2], const u8 *in, size_t len);
++asmlinkage void ghash_zvkg(u8 accumulator[GHASH_BLOCK_SIZE],
++			   const u8 key[GHASH_BLOCK_SIZE],
++			   const u8 *data, size_t nblocks);
 +
 +#define ghash_preparekey_arch ghash_preparekey_arch
 +static void ghash_preparekey_arch(struct ghash_key *key,
 +				  const u8 raw_key[GHASH_BLOCK_SIZE])
 +{
++	/* Save key in POLYVAL format for fallback */
 +	ghash_key_to_polyval(raw_key, &key->h);
 +
-+	if (static_branch_likely(&have_vec_crypto) && likely(may_use_simd())) {
-+		preempt_disable();
-+		pagefault_disable();
-+		enable_kernel_vsx();
-+		gcm_init_p8(key->htable, raw_key);
-+		disable_kernel_vsx();
-+		pagefault_enable();
-+		preempt_enable();
-+	} else {
-+		/* This reproduces gcm_init_p8() on both LE and BE systems. */
-+		key->htable[0][0] = 0;
-+		key->htable[0][1] = 0xc200000000000000;
-+
-+		key->htable[1][0] = 0;
-+		key->htable[1][1] = le64_to_cpu(key->h.lo);
-+
-+		key->htable[2][0] = le64_to_cpu(key->h.lo);
-+		key->htable[2][1] = le64_to_cpu(key->h.hi);
-+
-+		key->htable[3][0] = le64_to_cpu(key->h.hi);
-+		key->htable[3][1] = 0;
-+	}
-+}
-+
-+#define ghash_mul_arch ghash_mul_arch
-+static void ghash_mul_arch(struct polyval_elem *acc,
-+			   const struct ghash_key *key)
-+{
-+	if (static_branch_likely(&have_vec_crypto) && likely(may_use_simd())) {
-+		u8 ghash_acc[GHASH_BLOCK_SIZE];
-+
-+		polyval_acc_to_ghash(acc, ghash_acc);
-+
-+		preempt_disable();
-+		pagefault_disable();
-+		enable_kernel_vsx();
-+		gcm_gmult_p8(ghash_acc, key->htable);
-+		disable_kernel_vsx();
-+		pagefault_enable();
-+		preempt_enable();
-+
-+		ghash_acc_to_polyval(ghash_acc, acc);
-+		memzero_explicit(ghash_acc, sizeof(ghash_acc));
-+	} else {
-+		polyval_mul_generic(acc, &key->h);
-+	}
++	/* Save key in GHASH format for zvkg */
++	memcpy(key->h_raw, raw_key, GHASH_BLOCK_SIZE);
 +}
 +
 +#define ghash_blocks_arch ghash_blocks_arch
@@ -595,19 +372,14 @@ index 000000000000..629cd325d0c7
 +			      const struct ghash_key *key,
 +			      const u8 *data, size_t nblocks)
 +{
-+	if (static_branch_likely(&have_vec_crypto) && likely(may_use_simd())) {
++	if (static_branch_likely(&have_zvkg) && likely(may_use_simd())) {
 +		u8 ghash_acc[GHASH_BLOCK_SIZE];
 +
 +		polyval_acc_to_ghash(acc, ghash_acc);
 +
-+		preempt_disable();
-+		pagefault_disable();
-+		enable_kernel_vsx();
-+		gcm_ghash_p8(ghash_acc, key->htable, data,
-+			     nblocks * GHASH_BLOCK_SIZE);
-+		disable_kernel_vsx();
-+		pagefault_enable();
-+		preempt_enable();
++		kernel_vector_begin();
++		ghash_zvkg(ghash_acc, key->h_raw, data, nblocks);
++		kernel_vector_end();
 +
 +		ghash_acc_to_polyval(ghash_acc, acc);
 +		memzero_explicit(ghash_acc, sizeof(ghash_acc));
@@ -619,29 +391,49 @@ index 000000000000..629cd325d0c7
 +#define gf128hash_mod_init_arch gf128hash_mod_init_arch
 +static void gf128hash_mod_init_arch(void)
 +{
-+	if (cpu_has_feature(CPU_FTR_ARCH_207S) &&
-+	    (cur_cpu_spec->cpu_user_features2 & PPC_FEATURE2_VEC_CRYPTO))
-+		static_branch_enable(&have_vec_crypto);
++	if (riscv_isa_extension_available(NULL, ZVKG) &&
++	    riscv_vector_vlen() >= 128)
++		static_branch_enable(&have_zvkg);
 +}
-diff --git a/arch/powerpc/crypto/ghashp8-ppc.pl b/lib/crypto/powerpc/ghashp8-ppc.pl
-similarity index 98%
-rename from arch/powerpc/crypto/ghashp8-ppc.pl
-rename to lib/crypto/powerpc/ghashp8-ppc.pl
-index 041e633c214f..7c38eedc02cc 100644
---- a/arch/powerpc/crypto/ghashp8-ppc.pl
-+++ b/lib/crypto/powerpc/ghashp8-ppc.pl
-@@ -45,10 +45,11 @@ if ($flavour =~ /64/) {
- } else { die "nonsense $flavour"; }
+diff --git a/arch/riscv/crypto/ghash-riscv64-zvkg.S b/lib/crypto/riscv/ghash-riscv64-zvkg.S
+similarity index 91%
+rename from arch/riscv/crypto/ghash-riscv64-zvkg.S
+rename to lib/crypto/riscv/ghash-riscv64-zvkg.S
+index f2b43fb4d434..2839ff1a990c 100644
+--- a/arch/riscv/crypto/ghash-riscv64-zvkg.S
++++ b/lib/crypto/riscv/ghash-riscv64-zvkg.S
+@@ -48,25 +48,24 @@
+ .option arch, +zvkg
  
- $0 =~ m/(.*[\/\\])[^\/\\]+$/; $dir=$1;
- ( $xlate="${dir}ppc-xlate.pl" and -f $xlate ) or
- ( $xlate="${dir}../../perlasm/ppc-xlate.pl" and -f $xlate) or
-+( $xlate="${dir}../../../arch/powerpc/crypto/ppc-xlate.pl" and -f $xlate) or
- die "can't locate ppc-xlate.pl";
+ #define ACCUMULATOR	a0
+ #define KEY		a1
+ #define DATA		a2
+-#define LEN		a3
++#define NBLOCKS		a3
  
- open STDOUT,"| $^X $xlate $flavour $output" || die "can't call $xlate: $!";
+-// void ghash_zvkg(be128 *accumulator, const be128 *key, const u8 *data,
+-//		   size_t len);
+-//
+-// |len| must be nonzero and a multiple of 16 (GHASH_BLOCK_SIZE).
++// void ghash_zvkg(u8 accumulator[GHASH_BLOCK_SIZE],
++//		   const u8 key[GHASH_BLOCK_SIZE],
++//		   const u8 *data, size_t nblocks);
+ SYM_FUNC_START(ghash_zvkg)
+ 	vsetivli	zero, 4, e32, m1, ta, ma
+ 	vle32.v		v1, (ACCUMULATOR)
+ 	vle32.v		v2, (KEY)
+ .Lnext_block:
+ 	vle32.v		v3, (DATA)
+ 	vghsh.vv	v1, v2, v3
+ 	addi		DATA, DATA, 16
+-	addi		LEN, LEN, -16
+-	bnez		LEN, .Lnext_block
++	addi		NBLOCKS, NBLOCKS, -1
++	bnez		NBLOCKS, .Lnext_block
  
- my ($Xip,$Htbl,$inp,$len)=map("r$_",(3..6));	# argument block
+ 	vse32.v		v1, (ACCUMULATOR)
+ 	ret
+ SYM_FUNC_END(ghash_zvkg)
 -- 
 2.53.0
 
