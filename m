@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 984FF34D923;
-	Thu, 19 Mar 2026 06:19:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D74634F487;
+	Thu, 19 Mar 2026 06:19:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773901157; cv=none; b=tTEWlY48/7uRO0qbVPFg0Ib6CSFlxbodoPLncTGYXZ29QLPCU4ghhf0xb0pI9vl2RMeZUAzYpbE2YzcUCTuQl+YQMyhCY9J19KGQSCgJggAMK0hDLuSCnzcykhpKLSEQCTJc3p8uy+ziu1yxjPUQbmEtp82ulS0uYJk/OBvryj0=
+	t=1773901158; cv=none; b=L41DYXdnjnG5A3EA8dCTf0G3Gx0tInu6Uh3X2RXfvlv/8HMjmfFEw92Dfspt3WAcSyPU0CitiY15on6fILom8Tb/1vBQf7JITo+67031KXNqIc89T7J8EdNKUFE5CaFQChZIAQl+IvfjR+ypD4s1KtnRG7gm+gDedFA0YRIkmzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773901157; c=relaxed/simple;
-	bh=V2j6hPx45gvxh0kD2ugA9ZQq+RDxK4vT1DIHz7d+PX4=;
+	s=arc-20240116; t=1773901158; c=relaxed/simple;
+	bh=SUlBh6ude964ptwoct2eRUqHN2yhqaxUURXeunMfh1w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=o7RpOuSfotlBJnrTRQB/+snhdq2nZKtcF4vEh8BHIGBnHUuStwkeWRA8kohP/QZny8OVzBHtnmeddp+28wZZSccEFV7BrZ5K+Kyo2RhlFg/9eblvNmwjmBDYflBPQdzJTZHB+k5VFyOIqp/jJQwZo0nB2iqXMzYUhgGDEL/5XKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d8TTmcAi; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=b3pa7vLwNkbsMKy8RZNn8A8H5SeWcAOeLx3x6TLUxtyuydkruSU+15ObincppYDfXB7M3ZwzdSkr8SGpXbSjPjLzo8vv304v3JQr6GYV9+jTl8TkydX16cNlmUeBoJy+mBrhTAervux/FDaAgDqmfl00LaVDLyau/zGHBTITTIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c9oN+4HY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d8TTmcAi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CB32C2BCB0;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c9oN+4HY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9917BC2BCAF;
 	Thu, 19 Mar 2026 06:19:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1773901157;
-	bh=V2j6hPx45gvxh0kD2ugA9ZQq+RDxK4vT1DIHz7d+PX4=;
+	bh=SUlBh6ude964ptwoct2eRUqHN2yhqaxUURXeunMfh1w=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=d8TTmcAiFzhKSiHPR+WkM8CA6ky0KX2q3kPE3nwbJyewHZyMixuvB6X7fm9EZk9SJ
-	 t93dNZFdBMtGNa4fkJSJyx4bY6DicytwSb7/HdnKtrq5pWkvH0bnHuzB6rkv9ieG7A
-	 DdopRLVS+mLHrpWt6qhNXQxULA55S/4OGeXyBcIrBAQC7vuMQ8WDcxgJZi2k5Q6Vow
-	 uVBZCFKQyz6Thxst9LgukjuoVA9uECrZC7fGQNsEMoF1uPmUfgkcyLBQ5Pc/rkbDhR
-	 fZIbppcMdMQ+bl5l1xRzcnEagqDeIzv5gTO+LPZEZ+ucVt4GqtwA/Hod2eNr/OeAJI
-	 iGe4zZbaGC2SQ==
+	b=c9oN+4HYz50QQhyhsYQS0uoK8sVJjrgvy/HMW9/IDw+Bksg5NpyRYOFIftimZWHqV
+	 vxwhE6XtM6scxfGLKGA9D2lrnYfiQygnqngC2RzY6Xj4fkebDCXyHXWDqIyT7kmiM6
+	 JjkehxjMri8fQq2rI1BC9+5GopxUSlVkC+EvJL9qXN5uInDMgpIMRCQPLeBjyAqpXy
+	 q6XXI78pR9PfCWrCIs8kPi6Vf81yTVijCWZ+AR2jpcCUNf1lVfsR0BpbRf7ncVccYQ
+	 C/biGma0wwnRC21kXe9SOZ14mh9r+L7TqUF3W+0wDW3SbhgrR7+vAA45u1hBl3+DJy
+	 bwj2qMifmZ/Wg==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -38,9 +38,9 @@ Cc: linux-kernel@vger.kernel.org,
 	linux-s390@vger.kernel.org,
 	x86@kernel.org,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 06/19] crypto: arm/ghash - Move NEON GHASH assembly into its own file
-Date: Wed, 18 Mar 2026 23:17:07 -0700
-Message-ID: <20260319061723.1140720-7-ebiggers@kernel.org>
+Subject: [PATCH 07/19] lib/crypto: arm/ghash: Migrate optimized code into library
+Date: Wed, 18 Mar 2026 23:17:08 -0700
+Message-ID: <20260319061723.1140720-8-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260319061723.1140720-1-ebiggers@kernel.org>
 References: <20260319061723.1140720-1-ebiggers@kernel.org>
@@ -52,27 +52,75 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-arch/arm/crypto/ghash-ce-core.S implements pmull_ghash_update_p8(),
-which is used only by a crypto_shash implementation of GHASH.  It also
-implements other functions, including pmull_ghash_update_p64() and
-others, which are used only by a crypto_aead implementation of AES-GCM.
+Remove the "ghash-neon" crypto_shash algorithm.  Move the corresponding
+assembly code into lib/crypto/, and wire it up to the GHASH library.
 
-While some code is shared between pmull_ghash_update_p8() and
-pmull_ghash_update_p64(), it's not very much.  Since
-pmull_ghash_update_p8() will also need to be migrated into lib/crypto/
-to achieve parity in the standalone GHASH support, let's move it into a
-separate file ghash-neon-core.S.
+This makes the GHASH library be optimized on arm (though only with NEON,
+not PMULL; for now the goal is just parity with crypto_shash).  It
+greatly reduces the amount of arm-specific glue code that is needed, and
+it fixes the issue where this optimization was disabled by default.
+
+To integrate the assembly code correctly with the library, make the
+following tweaks:
+
+- Change the type of 'blocks' from int to size_t.
+- Change the types of 'dg' and 'k' to polyval_elem.  Note that this
+  simply reflects the format that the code was already using, at least
+  on little endian CPUs.  For big endian CPUs, add byte-swaps.
+- Remove the 'head' argument, which is no longer needed.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- arch/arm/crypto/Makefile          |   2 +-
- arch/arm/crypto/ghash-ce-core.S   | 171 ++----------------------
- arch/arm/crypto/ghash-neon-core.S | 207 ++++++++++++++++++++++++++++++
- 3 files changed, 222 insertions(+), 158 deletions(-)
- create mode 100644 arch/arm/crypto/ghash-neon-core.S
+ arch/arm/crypto/Kconfig                       |  13 +-
+ arch/arm/crypto/Makefile                      |   2 +-
+ arch/arm/crypto/ghash-ce-glue.c               | 144 +-----------------
+ lib/crypto/Kconfig                            |   1 +
+ lib/crypto/Makefile                           |   1 +
+ lib/crypto/arm/gf128hash.h                    |  43 ++++++
+ .../crypto/arm}/ghash-neon-core.S             |  24 +--
+ 7 files changed, 66 insertions(+), 162 deletions(-)
+ create mode 100644 lib/crypto/arm/gf128hash.h
+ rename {arch/arm/crypto => lib/crypto/arm}/ghash-neon-core.S (92%)
 
+diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
+index b9c28c818b7c..f884b8b2fd93 100644
+--- a/arch/arm/crypto/Kconfig
++++ b/arch/arm/crypto/Kconfig
+@@ -1,30 +1,21 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
+ menu "Accelerated Cryptographic Algorithms for CPU (arm)"
+ 
+ config CRYPTO_GHASH_ARM_CE
+-	tristate "Hash functions: GHASH (PMULL/NEON/ARMv8 Crypto Extensions)"
++	tristate "AEAD cipher: AES in GCM mode (ARMv8 Crypto Extensions)"
+ 	depends on KERNEL_MODE_NEON
+ 	select CRYPTO_AEAD
+-	select CRYPTO_HASH
+-	select CRYPTO_CRYPTD
+ 	select CRYPTO_LIB_AES
+ 	select CRYPTO_LIB_GF128MUL
+ 	help
+-	  GCM GHASH function (NIST SP800-38D)
++	  AEAD cipher: AES-GCM
+ 
+ 	  Architecture: arm using
+-	  - PMULL (Polynomial Multiply Long) instructions
+-	  - NEON (Advanced SIMD) extensions
+ 	  - ARMv8 Crypto Extensions
+ 
+-	  Use an implementation of GHASH (used by the GCM AEAD chaining mode)
+-	  that uses the 64x64 to 128 bit polynomial multiplication (vmull.p64)
+-	  that is part of the ARMv8 Crypto Extensions, or a slower variant that
+-	  uses the vmull.p8 instruction that is part of the basic NEON ISA.
+-
+ config CRYPTO_AES_ARM_BS
+ 	tristate "Ciphers: AES, modes: ECB/CBC/CTR/XTS (bit-sliced NEON)"
+ 	depends on KERNEL_MODE_NEON
+ 	select CRYPTO_SKCIPHER
+ 	select CRYPTO_LIB_AES
 diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
-index e73099e120b3..cedce94d5ee5 100644
+index cedce94d5ee5..e73099e120b3 100644
 --- a/arch/arm/crypto/Makefile
 +++ b/arch/arm/crypto/Makefile
 @@ -8,6 +8,6 @@ obj-$(CONFIG_CRYPTO_AES_ARM_BS) += aes-arm-bs.o
@@ -81,547 +129,383 @@ index e73099e120b3..cedce94d5ee5 100644
  
  aes-arm-bs-y	:= aes-neonbs-core.o aes-neonbs-glue.o
  aes-arm-ce-y	:= aes-ce-core.o aes-ce-glue.o
--ghash-arm-ce-y	:= ghash-ce-core.o ghash-ce-glue.o
-+ghash-arm-ce-y	:= ghash-ce-core.o ghash-ce-glue.o ghash-neon-core.o
-diff --git a/arch/arm/crypto/ghash-ce-core.S b/arch/arm/crypto/ghash-ce-core.S
-index 858c0d66798b..a449525d61f8 100644
---- a/arch/arm/crypto/ghash-ce-core.S
-+++ b/arch/arm/crypto/ghash-ce-core.S
+-ghash-arm-ce-y	:= ghash-ce-core.o ghash-ce-glue.o ghash-neon-core.o
++ghash-arm-ce-y	:= ghash-ce-core.o ghash-ce-glue.o
+diff --git a/arch/arm/crypto/ghash-ce-glue.c b/arch/arm/crypto/ghash-ce-glue.c
+index d7d787de7dd3..9aa0ada5b627 100644
+--- a/arch/arm/crypto/ghash-ce-glue.c
++++ b/arch/arm/crypto/ghash-ce-glue.c
 @@ -1,8 +1,8 @@
- /* SPDX-License-Identifier: GPL-2.0-only */
+ // SPDX-License-Identifier: GPL-2.0-only
  /*
-- * Accelerated GHASH implementation with NEON/ARMv8 vmull.p8/64 instructions.
-+ * Accelerated AES-GCM implementation with ARMv8 Crypto Extensions.
+- * Accelerated GHASH implementation with ARMv8 vmull.p64 instructions.
++ * AES-GCM using ARMv8 Crypto Extensions
   *
-  * Copyright (C) 2015 - 2017 Linaro Ltd.
-  * Copyright (C) 2023 Google LLC. <ardb@google.com>
+  * Copyright (C) 2015 - 2018 Linaro Ltd.
+  * Copyright (C) 2023 Google LLC.
   */
  
-@@ -27,43 +27,14 @@
- 	XL_H		.req	d5
- 	XM_L		.req	d6
- 	XM_H		.req	d7
- 	XH_L		.req	d8
+@@ -12,116 +12,38 @@
+ #include <crypto/b128ops.h>
+ #include <crypto/gcm.h>
+ #include <crypto/gf128mul.h>
+ #include <crypto/ghash.h>
+ #include <crypto/internal/aead.h>
+-#include <crypto/internal/hash.h>
+ #include <crypto/internal/skcipher.h>
+ #include <crypto/scatterwalk.h>
+ #include <linux/cpufeature.h>
+ #include <linux/errno.h>
+ #include <linux/jump_label.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/string.h>
+ #include <linux/unaligned.h>
  
--	t0l		.req	d10
--	t0h		.req	d11
--	t1l		.req	d12
--	t1h		.req	d13
--	t2l		.req	d14
--	t2h		.req	d15
--	t3l		.req	d16
--	t3h		.req	d17
--	t4l		.req	d18
--	t4h		.req	d19
+-MODULE_DESCRIPTION("GHASH hash function using ARMv8 Crypto Extensions");
++MODULE_DESCRIPTION("AES-GCM using ARMv8 Crypto Extensions");
+ MODULE_AUTHOR("Ard Biesheuvel <ardb@kernel.org>");
+ MODULE_LICENSE("GPL");
+-MODULE_ALIAS_CRYPTO("ghash");
+ MODULE_ALIAS_CRYPTO("gcm(aes)");
+ MODULE_ALIAS_CRYPTO("rfc4106(gcm(aes))");
+ 
+ #define RFC4106_NONCE_SIZE	4
+ 
+-struct ghash_key {
+-	be128	k;
+-	u64	h[1][2];
+-};
 -
--	t0q		.req	q5
--	t1q		.req	q6
--	t2q		.req	q7
--	t3q		.req	q8
--	t4q		.req	q9
- 	XH2		.req	q9
+ struct gcm_key {
+ 	u64	h[4][2];
+ 	u32	rk[AES_MAX_KEYLENGTH_U32];
+ 	int	rounds;
+ 	u8	nonce[];	// for RFC4106 nonce
+ };
  
--	s1l		.req	d20
--	s1h		.req	d21
--	s2l		.req	d22
--	s2h		.req	d23
--	s3l		.req	d24
--	s3h		.req	d25
--	s4l		.req	d26
--	s4h		.req	d27
+-struct arm_ghash_desc_ctx {
+-	u64 digest[GHASH_DIGEST_SIZE/sizeof(u64)];
+-};
 -
- 	MASK		.req	d28
--	SHASH2_p8	.req	d28
+ asmlinkage void pmull_ghash_update_p64(int blocks, u64 dg[], const char *src,
+ 				       u64 const h[4][2], const char *head);
  
--	k16		.req	d29
--	k32		.req	d30
--	k48		.req	d31
- 	SHASH2_p64	.req	d31
- 
- 	HH		.req	q10
- 	HH3		.req	q11
- 	HH4		.req	q12
-@@ -91,76 +62,10 @@
- 	T3_L		.req	d16
- 	T3_H		.req	d17
- 
- 	.text
- 
--	.macro		__pmull_p64, rd, rn, rm, b1, b2, b3, b4
--	vmull.p64	\rd, \rn, \rm
--	.endm
+-asmlinkage void pmull_ghash_update_p8(int blocks, u64 dg[], const char *src,
+-				      u64 const h[1][2], const char *head);
 -
--	/*
--	 * This implementation of 64x64 -> 128 bit polynomial multiplication
--	 * using vmull.p8 instructions (8x8 -> 16) is taken from the paper
--	 * "Fast Software Polynomial Multiplication on ARM Processors Using
--	 * the NEON Engine" by Danilo Camara, Conrado Gouvea, Julio Lopez and
--	 * Ricardo Dahab (https://hal.inria.fr/hal-01506572)
--	 *
--	 * It has been slightly tweaked for in-order performance, and to allow
--	 * 'rq' to overlap with 'ad' or 'bd'.
--	 */
--	.macro		__pmull_p8, rq, ad, bd, b1=t4l, b2=t3l, b3=t4l, b4=t3l
--	vext.8		t0l, \ad, \ad, #1	@ A1
--	.ifc		\b1, t4l
--	vext.8		t4l, \bd, \bd, #1	@ B1
--	.endif
--	vmull.p8	t0q, t0l, \bd		@ F = A1*B
--	vext.8		t1l, \ad, \ad, #2	@ A2
--	vmull.p8	t4q, \ad, \b1		@ E = A*B1
--	.ifc		\b2, t3l
--	vext.8		t3l, \bd, \bd, #2	@ B2
--	.endif
--	vmull.p8	t1q, t1l, \bd		@ H = A2*B
--	vext.8		t2l, \ad, \ad, #3	@ A3
--	vmull.p8	t3q, \ad, \b2		@ G = A*B2
--	veor		t0q, t0q, t4q		@ L = E + F
--	.ifc		\b3, t4l
--	vext.8		t4l, \bd, \bd, #3	@ B3
--	.endif
--	vmull.p8	t2q, t2l, \bd		@ J = A3*B
--	veor		t0l, t0l, t0h		@ t0 = (L) (P0 + P1) << 8
--	veor		t1q, t1q, t3q		@ M = G + H
--	.ifc		\b4, t3l
--	vext.8		t3l, \bd, \bd, #4	@ B4
--	.endif
--	vmull.p8	t4q, \ad, \b3		@ I = A*B3
--	veor		t1l, t1l, t1h		@ t1 = (M) (P2 + P3) << 16
--	vmull.p8	t3q, \ad, \b4		@ K = A*B4
--	vand		t0h, t0h, k48
--	vand		t1h, t1h, k32
--	veor		t2q, t2q, t4q		@ N = I + J
--	veor		t0l, t0l, t0h
--	veor		t1l, t1l, t1h
--	veor		t2l, t2l, t2h		@ t2 = (N) (P4 + P5) << 24
--	vand		t2h, t2h, k16
--	veor		t3l, t3l, t3h		@ t3 = (K) (P6 + P7) << 32
--	vmov.i64	t3h, #0
--	vext.8		t0q, t0q, t0q, #15
--	veor		t2l, t2l, t2h
--	vext.8		t1q, t1q, t1q, #14
--	vmull.p8	\rq, \ad, \bd		@ D = A*B
--	vext.8		t2q, t2q, t2q, #13
--	vext.8		t3q, t3q, t3q, #12
--	veor		t0q, t0q, t1q
--	veor		t2q, t2q, t3q
--	veor		\rq, \rq, t0q
--	veor		\rq, \rq, t2q
--	.endm
+-static int ghash_init(struct shash_desc *desc)
+-{
+-	struct arm_ghash_desc_ctx *ctx = shash_desc_ctx(desc);
 -
--	//
--	// PMULL (64x64->128) based reduction for CPUs that can do
--	// it in a single instruction.
--	//
- 	.macro		__pmull_reduce_p64
- 	vmull.p64	T1, XL_L, MASK
+-	*ctx = (struct arm_ghash_desc_ctx){};
+-	return 0;
+-}
+-
+-static void ghash_do_update(int blocks, u64 dg[], const char *src,
+-			    struct ghash_key *key, const char *head)
+-{
+-	kernel_neon_begin();
+-	pmull_ghash_update_p8(blocks, dg, src, key->h, head);
+-	kernel_neon_end();
+-}
+-
+-static int ghash_update(struct shash_desc *desc, const u8 *src,
+-			unsigned int len)
+-{
+-	struct ghash_key *key = crypto_shash_ctx(desc->tfm);
+-	struct arm_ghash_desc_ctx *ctx = shash_desc_ctx(desc);
+-	int blocks;
+-
+-	blocks = len / GHASH_BLOCK_SIZE;
+-	ghash_do_update(blocks, ctx->digest, src, key, NULL);
+-	return len - blocks * GHASH_BLOCK_SIZE;
+-}
+-
+-static int ghash_export(struct shash_desc *desc, void *out)
+-{
+-	struct arm_ghash_desc_ctx *ctx = shash_desc_ctx(desc);
+-	u8 *dst = out;
+-
+-	put_unaligned_be64(ctx->digest[1], dst);
+-	put_unaligned_be64(ctx->digest[0], dst + 8);
+-	return 0;
+-}
+-
+-static int ghash_import(struct shash_desc *desc, const void *in)
+-{
+-	struct arm_ghash_desc_ctx *ctx = shash_desc_ctx(desc);
+-	const u8 *src = in;
+-
+-	ctx->digest[1] = get_unaligned_be64(src);
+-	ctx->digest[0] = get_unaligned_be64(src + 8);
+-	return 0;
+-}
+-
+-static int ghash_finup(struct shash_desc *desc, const u8 *src,
+-		       unsigned int len, u8 *dst)
+-{
+-	struct ghash_key *key = crypto_shash_ctx(desc->tfm);
+-	struct arm_ghash_desc_ctx *ctx = shash_desc_ctx(desc);
+-
+-	if (len) {
+-		u8 buf[GHASH_BLOCK_SIZE] = {};
+-
+-		memcpy(buf, src, len);
+-		ghash_do_update(1, ctx->digest, buf, key, NULL);
+-		memzero_explicit(buf, sizeof(buf));
+-	}
+-	return ghash_export(desc, dst);
+-}
+-
+ static void ghash_reflect(u64 h[], const be128 *k)
+ {
+ 	u64 carry = be64_to_cpu(k->a) >> 63;
  
- 	veor		XH_L, XH_L, XM_H
- 	vext.8		T1, T1, T1, #8
-@@ -168,34 +73,11 @@
- 	veor		T1, T1, XL
+ 	h[0] = (be64_to_cpu(k->b) << 1) | carry;
+@@ -129,44 +51,10 @@ static void ghash_reflect(u64 h[], const be128 *k)
  
- 	vmull.p64	XL, T1_H, MASK
+ 	if (carry)
+ 		h[1] ^= 0xc200000000000000UL;
+ }
+ 
+-static int ghash_setkey(struct crypto_shash *tfm,
+-			const u8 *inkey, unsigned int keylen)
+-{
+-	struct ghash_key *key = crypto_shash_ctx(tfm);
+-
+-	if (keylen != GHASH_BLOCK_SIZE)
+-		return -EINVAL;
+-
+-	/* needed for the fallback */
+-	memcpy(&key->k, inkey, GHASH_BLOCK_SIZE);
+-	ghash_reflect(key->h[0], &key->k);
+-	return 0;
+-}
+-
+-static struct shash_alg ghash_alg = {
+-	.digestsize		= GHASH_DIGEST_SIZE,
+-	.init			= ghash_init,
+-	.update			= ghash_update,
+-	.finup			= ghash_finup,
+-	.setkey			= ghash_setkey,
+-	.export			= ghash_export,
+-	.import			= ghash_import,
+-	.descsize		= sizeof(struct arm_ghash_desc_ctx),
+-	.statesize		= sizeof(struct ghash_desc_ctx),
+-
+-	.base.cra_name		= "ghash",
+-	.base.cra_driver_name	= "ghash-neon",
+-	.base.cra_priority	= 300,
+-	.base.cra_flags		= CRYPTO_AHASH_ALG_BLOCK_ONLY,
+-	.base.cra_blocksize	= GHASH_BLOCK_SIZE,
+-	.base.cra_ctxsize	= sizeof(struct ghash_key),
+-	.base.cra_module	= THIS_MODULE,
+-};
+-
+ void pmull_gcm_encrypt(int blocks, u64 dg[], const char *src,
+ 		       struct gcm_key const *k, char *dst,
+ 		       const char *iv, int rounds, u32 counter);
+ 
+ void pmull_gcm_enc_final(int blocks, u64 dg[], char *tag,
+@@ -541,40 +429,18 @@ static struct aead_alg gcm_aes_algs[] = {{
+ 	.base.cra_module	= THIS_MODULE,
+ }};
+ 
+ static int __init ghash_ce_mod_init(void)
+ {
+-	int err;
+-
+-	if (!(elf_hwcap & HWCAP_NEON))
++	if (!(elf_hwcap & HWCAP_NEON) || !(elf_hwcap2 & HWCAP2_PMULL))
+ 		return -ENODEV;
+ 
+-	if (elf_hwcap2 & HWCAP2_PMULL) {
+-		err = crypto_register_aeads(gcm_aes_algs,
+-					    ARRAY_SIZE(gcm_aes_algs));
+-		if (err)
+-			return err;
+-	}
+-
+-	err = crypto_register_shash(&ghash_alg);
+-	if (err)
+-		goto err_aead;
+-
+-	return 0;
+-
+-err_aead:
+-	if (elf_hwcap2 & HWCAP2_PMULL)
+-		crypto_unregister_aeads(gcm_aes_algs,
+-					ARRAY_SIZE(gcm_aes_algs));
+-	return err;
++	return crypto_register_aeads(gcm_aes_algs, ARRAY_SIZE(gcm_aes_algs));
+ }
+ 
+ static void __exit ghash_ce_mod_exit(void)
+ {
+-	crypto_unregister_shash(&ghash_alg);
+-	if (elf_hwcap2 & HWCAP2_PMULL)
+-		crypto_unregister_aeads(gcm_aes_algs,
+-					ARRAY_SIZE(gcm_aes_algs));
++	crypto_unregister_aeads(gcm_aes_algs, ARRAY_SIZE(gcm_aes_algs));
+ }
+ 
+ module_init(ghash_ce_mod_init);
+ module_exit(ghash_ce_mod_exit);
+diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
+index 98cedd95c2a5..4f1a79883a56 100644
+--- a/lib/crypto/Kconfig
++++ b/lib/crypto/Kconfig
+@@ -117,10 +117,11 @@ config CRYPTO_LIB_GF128HASH
+ 	  uses any of the functions from <crypto/gf128hash.h>.
+ 
+ config CRYPTO_LIB_GF128HASH_ARCH
+ 	bool
+ 	depends on CRYPTO_LIB_GF128HASH && !UML
++	default y if ARM && KERNEL_MODE_NEON
+ 	default y if ARM64
+ 	default y if X86_64
+ 
+ config CRYPTO_LIB_MD5
+ 	tristate
+diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
+index fc30622123d2..8a06dd6a43ea 100644
+--- a/lib/crypto/Makefile
++++ b/lib/crypto/Makefile
+@@ -156,10 +156,11 @@ libdes-y					:= des.o
+ 
+ obj-$(CONFIG_CRYPTO_LIB_GF128HASH) += libgf128hash.o
+ libgf128hash-y := gf128hash.o
+ ifeq ($(CONFIG_CRYPTO_LIB_GF128HASH_ARCH),y)
+ CFLAGS_gf128hash.o += -I$(src)/$(SRCARCH)
++libgf128hash-$(CONFIG_ARM) += arm/ghash-neon-core.o
+ libgf128hash-$(CONFIG_ARM64) += arm64/polyval-ce-core.o
+ libgf128hash-$(CONFIG_X86) += x86/polyval-pclmul-avx.o
+ endif
+ 
+ ################################################################################
+diff --git a/lib/crypto/arm/gf128hash.h b/lib/crypto/arm/gf128hash.h
+new file mode 100644
+index 000000000000..cb929bed29d5
+--- /dev/null
++++ b/lib/crypto/arm/gf128hash.h
+@@ -0,0 +1,43 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * GHASH, arm optimized
++ *
++ * Copyright 2026 Google LLC
++ */
++
++#include <asm/hwcap.h>
++#include <asm/neon.h>
++#include <asm/simd.h>
++
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_neon);
++
++void pmull_ghash_update_p8(size_t blocks, struct polyval_elem *dg,
++			   const u8 *src, const struct polyval_elem *k);
++
++#define ghash_blocks_arch ghash_blocks_arch
++static void ghash_blocks_arch(struct polyval_elem *acc,
++			      const struct ghash_key *key,
++			      const u8 *data, size_t nblocks)
++{
++	if (static_branch_likely(&have_neon) && may_use_simd()) {
++		do {
++			/* Allow rescheduling every 4 KiB. */
++			size_t n =
++				min_t(size_t, nblocks, 4096 / GHASH_BLOCK_SIZE);
++
++			scoped_ksimd()
++				pmull_ghash_update_p8(n, acc, data, &key->h);
++			data += n * GHASH_BLOCK_SIZE;
++			nblocks -= n;
++		} while (nblocks);
++	} else {
++		ghash_blocks_generic(acc, &key->h, data, nblocks);
++	}
++}
++
++#define gf128hash_mod_init_arch gf128hash_mod_init_arch
++static void gf128hash_mod_init_arch(void)
++{
++	if (elf_hwcap & HWCAP_NEON)
++		static_branch_enable(&have_neon);
++}
+diff --git a/arch/arm/crypto/ghash-neon-core.S b/lib/crypto/arm/ghash-neon-core.S
+similarity index 92%
+rename from arch/arm/crypto/ghash-neon-core.S
+rename to lib/crypto/arm/ghash-neon-core.S
+index bdf6fb6d063c..bf423fb06a75 100644
+--- a/arch/arm/crypto/ghash-neon-core.S
++++ b/lib/crypto/arm/ghash-neon-core.S
+@@ -139,26 +139,25 @@
+ 	veor		XL, XL, T1
+ 	vshr.u64	T1, T1, #6
+ 	vshr.u64	XL, XL, #1
  	.endm
  
--	//
--	// Alternative reduction for CPUs that lack support for the
--	// 64x64->128 PMULL instruction
--	//
--	.macro		__pmull_reduce_p8
--	veor		XL_H, XL_H, XM_L
--	veor		XH_L, XH_L, XM_H
--
--	vshl.i64	T1, XL, #57
--	vshl.i64	T2, XL, #62
--	veor		T1, T1, T2
--	vshl.i64	T2, XL, #63
--	veor		T1, T1, T2
--	veor		XL_H, XL_H, T1_L
--	veor		XH_L, XH_L, T1_H
--
--	vshr.u64	T1, XL, #1
--	veor		XH, XH, XL
--	veor		XL, XL, T1
--	vshr.u64	T1, T1, #6
--	vshr.u64	XL, XL, #1
--	.endm
--
--	.macro		ghash_update, pn, enc, aggregate=1, head=1
-+	.macro		ghash_update, enc, aggregate=1, head=1
++	.macro		vrev64_if_be	a
++#ifdef CONFIG_CPU_BIG_ENDIAN
++	vrev64.8	\a, \a
++#endif
++	.endm
++
+ 	.macro		ghash_update
  	vld1.64		{XL}, [r1]
+-
+-	/* do the head block first, if supplied */
+-	ldr		ip, [sp]
+-	teq		ip, #0
+-	beq		0f
+-	vld1.64		{T1}, [ip]
+-	teq		r0, #0
+-	b		3f
++	vrev64_if_be	XL
  
- 	.if		\head
- 	/* do the head block first, if supplied */
- 	ldr		ip, [sp]
-@@ -204,12 +86,11 @@
- 	vld1.64		{T1}, [ip]
- 	teq		r0, #0
- 	b		3f
- 	.endif
+ 0:
+ 	vld1.8		{T1}, [r2]!
+ 	subs		r0, r0, #1
  
--0:	.ifc		\pn, p64
--	.if		\aggregate
-+0:	.if		\aggregate
- 	tst		r0, #3			// skip until #blocks is a
- 	bne		2f			// round multiple of 4
- 
- 	vld1.8		{XL2-XM2}, [r2]!
- 1:	vld1.8		{T2-T3}, [r2]!
-@@ -286,11 +167,10 @@
- 	veor		T1, T1, XH
- 	veor		XL, XL, T1
- 
- 	b		1b
- 	.endif
--	.endif
- 
- 2:	vld1.8		{T1}, [r2]!
- 
- 	.ifnb		\enc
- 	\enc\()_1x	T1
-@@ -306,29 +186,29 @@
+-3:	/* multiply XL by SHASH in GF(2^128) */
++	/* multiply XL by SHASH in GF(2^128) */
+ 	vrev64.8	T1, T1
  
  	vext.8		IN1, T1, T1, #8
  	veor		T1_L, T1_L, XL_H
  	veor		XL, XL, IN1
- 
--	__pmull_\pn	XH, XL_H, SHASH_H, s1h, s2h, s3h, s4h	@ a1 * b1
-+	vmull.p64	XH, XL_H, SHASH_H		@ a1 * b1
- 	veor		T1, T1, XL
--	__pmull_\pn	XL, XL_L, SHASH_L, s1l, s2l, s3l, s4l	@ a0 * b0
--	__pmull_\pn	XM, T1_L, SHASH2_\pn			@ (a1+a0)(b1+b0)
-+	vmull.p64	XL, XL_L, SHASH_L		@ a0 * b0
-+	vmull.p64	XM, T1_L, SHASH2_p64		@ (a1+a0)(b1+b0)
- 
- 4:	veor		T1, XL, XH
- 	veor		XM, XM, T1
- 
--	__pmull_reduce_\pn
-+	__pmull_reduce_p64
- 
- 	veor		T1, T1, XH
- 	veor		XL, XL, T1
+@@ -178,15 +177,17 @@
  
  	bne		0b
  	.endm
  
  	/*
--	 * void pmull_ghash_update(int blocks, u64 dg[], const char *src,
--	 *			   struct ghash_key const *k, const char *head)
-+	 * void pmull_ghash_update_p64(int blocks, u64 dg[], const char *src,
-+	 *			       u64 const h[4][2], const char *head)
+-	 * void pmull_ghash_update_p8(int blocks, u64 dg[], const char *src,
+-	 *			      u64 const h[1][2], const char *head)
++	 * void pmull_ghash_update_p8(size_t blocks, struct polyval_elem *dg,
++	 *			      const u8 *src,
++	 *			      const struct polyval_elem *k)
  	 */
- ENTRY(pmull_ghash_update_p64)
- 	vld1.64		{SHASH}, [r3]!
- 	vld1.64		{HH}, [r3]!
- 	vld1.64		{HH3-HH4}, [r3]
-@@ -339,39 +219,16 @@ ENTRY(pmull_ghash_update_p64)
- 	veor		HH34_H, HH4_L, HH4_H
+ ENTRY(pmull_ghash_update_p8)
+ 	vld1.64		{SHASH}, [r3]
++	vrev64_if_be	SHASH
+ 	veor		SHASH2_p8, SHASH_L, SHASH_H
  
- 	vmov.i8		MASK, #0xe1
- 	vshl.u64	MASK, MASK, #57
+ 	vext.8		s1l, SHASH_L, SHASH_L, #1
+ 	vext.8		s2l, SHASH_L, SHASH_L, #2
+ 	vext.8		s3l, SHASH_L, SHASH_L, #3
+@@ -199,9 +200,10 @@ ENTRY(pmull_ghash_update_p8)
+ 	vmov.i64	k16, #0xffff
+ 	vmov.i64	k32, #0xffffffff
+ 	vmov.i64	k48, #0xffffffffffff
  
--	ghash_update	p64
-+	ghash_update
+ 	ghash_update
++	vrev64_if_be	XL
  	vst1.64		{XL}, [r1]
  
  	bx		lr
- ENDPROC(pmull_ghash_update_p64)
- 
--ENTRY(pmull_ghash_update_p8)
--	vld1.64		{SHASH}, [r3]
--	veor		SHASH2_p8, SHASH_L, SHASH_H
--
--	vext.8		s1l, SHASH_L, SHASH_L, #1
--	vext.8		s2l, SHASH_L, SHASH_L, #2
--	vext.8		s3l, SHASH_L, SHASH_L, #3
--	vext.8		s4l, SHASH_L, SHASH_L, #4
--	vext.8		s1h, SHASH_H, SHASH_H, #1
--	vext.8		s2h, SHASH_H, SHASH_H, #2
--	vext.8		s3h, SHASH_H, SHASH_H, #3
--	vext.8		s4h, SHASH_H, SHASH_H, #4
--
--	vmov.i64	k16, #0xffff
--	vmov.i64	k32, #0xffffffff
--	vmov.i64	k48, #0xffffffffffff
--
--	ghash_update	p8
--	vst1.64		{XL}, [r1]
--
--	bx		lr
--ENDPROC(pmull_ghash_update_p8)
--
- 	e0		.req	q9
- 	e1		.req	q10
- 	e2		.req	q11
- 	e3		.req	q12
- 	e0l		.req	d18
-@@ -534,11 +391,11 @@ ENTRY(pmull_gcm_encrypt)
- 	ldrd		r4, r5, [sp, #24]
- 	ldrd		r6, r7, [sp, #32]
- 
- 	vld1.64		{SHASH}, [r3]
- 
--	ghash_update	p64, enc, head=0
-+	ghash_update	enc, head=0
- 	vst1.64		{XL}, [r1]
- 
- 	pop		{r4-r8, pc}
- ENDPROC(pmull_gcm_encrypt)
- 
-@@ -552,11 +409,11 @@ ENTRY(pmull_gcm_decrypt)
- 	ldrd		r4, r5, [sp, #24]
- 	ldrd		r6, r7, [sp, #32]
- 
- 	vld1.64		{SHASH}, [r3]
- 
--	ghash_update	p64, dec, head=0
-+	ghash_update	dec, head=0
- 	vst1.64		{XL}, [r1]
- 
- 	pop		{r4-r8, pc}
- ENDPROC(pmull_gcm_decrypt)
- 
-@@ -601,11 +458,11 @@ ENTRY(pmull_gcm_enc_final)
- 	vmov.i8		MASK, #0xe1
- 	veor		SHASH2_p64, SHASH_L, SHASH_H
- 	vshl.u64	MASK, MASK, #57
- 	mov		r0, #1
- 	bne		3f			// process head block first
--	ghash_update	p64, aggregate=0, head=0
-+	ghash_update	aggregate=0, head=0
- 
- 	vrev64.8	XL, XL
- 	vext.8		XL, XL, XL, #8
- 	veor		XL, XL, e1
- 
-@@ -658,11 +515,11 @@ ENTRY(pmull_gcm_dec_final)
- 	vmov.i8		MASK, #0xe1
- 	veor		SHASH2_p64, SHASH_L, SHASH_H
- 	vshl.u64	MASK, MASK, #57
- 	mov		r0, #1
- 	bne		3f			// process head block first
--	ghash_update	p64, aggregate=0, head=0
-+	ghash_update	aggregate=0, head=0
- 
- 	vrev64.8	XL, XL
- 	vext.8		XL, XL, XL, #8
- 	veor		XL, XL, e1
- 
-diff --git a/arch/arm/crypto/ghash-neon-core.S b/arch/arm/crypto/ghash-neon-core.S
-new file mode 100644
-index 000000000000..bdf6fb6d063c
---- /dev/null
-+++ b/arch/arm/crypto/ghash-neon-core.S
-@@ -0,0 +1,207 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Accelerated GHASH implementation with NEON vmull.p8 instructions.
-+ *
-+ * Copyright (C) 2015 - 2017 Linaro Ltd.
-+ * Copyright (C) 2023 Google LLC. <ardb@google.com>
-+ */
-+
-+#include <linux/linkage.h>
-+#include <asm/assembler.h>
-+
-+	.fpu		neon
-+
-+	SHASH		.req	q0
-+	T1		.req	q1
-+	XL		.req	q2
-+	XM		.req	q3
-+	XH		.req	q4
-+	IN1		.req	q4
-+
-+	SHASH_L		.req	d0
-+	SHASH_H		.req	d1
-+	T1_L		.req	d2
-+	T1_H		.req	d3
-+	XL_L		.req	d4
-+	XL_H		.req	d5
-+	XM_L		.req	d6
-+	XM_H		.req	d7
-+	XH_L		.req	d8
-+
-+	t0l		.req	d10
-+	t0h		.req	d11
-+	t1l		.req	d12
-+	t1h		.req	d13
-+	t2l		.req	d14
-+	t2h		.req	d15
-+	t3l		.req	d16
-+	t3h		.req	d17
-+	t4l		.req	d18
-+	t4h		.req	d19
-+
-+	t0q		.req	q5
-+	t1q		.req	q6
-+	t2q		.req	q7
-+	t3q		.req	q8
-+	t4q		.req	q9
-+
-+	s1l		.req	d20
-+	s1h		.req	d21
-+	s2l		.req	d22
-+	s2h		.req	d23
-+	s3l		.req	d24
-+	s3h		.req	d25
-+	s4l		.req	d26
-+	s4h		.req	d27
-+
-+	SHASH2_p8	.req	d28
-+
-+	k16		.req	d29
-+	k32		.req	d30
-+	k48		.req	d31
-+
-+	T2		.req	q7
-+
-+	.text
-+
-+	/*
-+	 * This implementation of 64x64 -> 128 bit polynomial multiplication
-+	 * using vmull.p8 instructions (8x8 -> 16) is taken from the paper
-+	 * "Fast Software Polynomial Multiplication on ARM Processors Using
-+	 * the NEON Engine" by Danilo Camara, Conrado Gouvea, Julio Lopez and
-+	 * Ricardo Dahab (https://hal.inria.fr/hal-01506572)
-+	 *
-+	 * It has been slightly tweaked for in-order performance, and to allow
-+	 * 'rq' to overlap with 'ad' or 'bd'.
-+	 */
-+	.macro		__pmull_p8, rq, ad, bd, b1=t4l, b2=t3l, b3=t4l, b4=t3l
-+	vext.8		t0l, \ad, \ad, #1	@ A1
-+	.ifc		\b1, t4l
-+	vext.8		t4l, \bd, \bd, #1	@ B1
-+	.endif
-+	vmull.p8	t0q, t0l, \bd		@ F = A1*B
-+	vext.8		t1l, \ad, \ad, #2	@ A2
-+	vmull.p8	t4q, \ad, \b1		@ E = A*B1
-+	.ifc		\b2, t3l
-+	vext.8		t3l, \bd, \bd, #2	@ B2
-+	.endif
-+	vmull.p8	t1q, t1l, \bd		@ H = A2*B
-+	vext.8		t2l, \ad, \ad, #3	@ A3
-+	vmull.p8	t3q, \ad, \b2		@ G = A*B2
-+	veor		t0q, t0q, t4q		@ L = E + F
-+	.ifc		\b3, t4l
-+	vext.8		t4l, \bd, \bd, #3	@ B3
-+	.endif
-+	vmull.p8	t2q, t2l, \bd		@ J = A3*B
-+	veor		t0l, t0l, t0h		@ t0 = (L) (P0 + P1) << 8
-+	veor		t1q, t1q, t3q		@ M = G + H
-+	.ifc		\b4, t3l
-+	vext.8		t3l, \bd, \bd, #4	@ B4
-+	.endif
-+	vmull.p8	t4q, \ad, \b3		@ I = A*B3
-+	veor		t1l, t1l, t1h		@ t1 = (M) (P2 + P3) << 16
-+	vmull.p8	t3q, \ad, \b4		@ K = A*B4
-+	vand		t0h, t0h, k48
-+	vand		t1h, t1h, k32
-+	veor		t2q, t2q, t4q		@ N = I + J
-+	veor		t0l, t0l, t0h
-+	veor		t1l, t1l, t1h
-+	veor		t2l, t2l, t2h		@ t2 = (N) (P4 + P5) << 24
-+	vand		t2h, t2h, k16
-+	veor		t3l, t3l, t3h		@ t3 = (K) (P6 + P7) << 32
-+	vmov.i64	t3h, #0
-+	vext.8		t0q, t0q, t0q, #15
-+	veor		t2l, t2l, t2h
-+	vext.8		t1q, t1q, t1q, #14
-+	vmull.p8	\rq, \ad, \bd		@ D = A*B
-+	vext.8		t2q, t2q, t2q, #13
-+	vext.8		t3q, t3q, t3q, #12
-+	veor		t0q, t0q, t1q
-+	veor		t2q, t2q, t3q
-+	veor		\rq, \rq, t0q
-+	veor		\rq, \rq, t2q
-+	.endm
-+
-+	.macro		__pmull_reduce_p8
-+	veor		XL_H, XL_H, XM_L
-+	veor		XH_L, XH_L, XM_H
-+
-+	vshl.i64	T1, XL, #57
-+	vshl.i64	T2, XL, #62
-+	veor		T1, T1, T2
-+	vshl.i64	T2, XL, #63
-+	veor		T1, T1, T2
-+	veor		XL_H, XL_H, T1_L
-+	veor		XH_L, XH_L, T1_H
-+
-+	vshr.u64	T1, XL, #1
-+	veor		XH, XH, XL
-+	veor		XL, XL, T1
-+	vshr.u64	T1, T1, #6
-+	vshr.u64	XL, XL, #1
-+	.endm
-+
-+	.macro		ghash_update
-+	vld1.64		{XL}, [r1]
-+
-+	/* do the head block first, if supplied */
-+	ldr		ip, [sp]
-+	teq		ip, #0
-+	beq		0f
-+	vld1.64		{T1}, [ip]
-+	teq		r0, #0
-+	b		3f
-+
-+0:
-+	vld1.8		{T1}, [r2]!
-+	subs		r0, r0, #1
-+
-+3:	/* multiply XL by SHASH in GF(2^128) */
-+	vrev64.8	T1, T1
-+
-+	vext.8		IN1, T1, T1, #8
-+	veor		T1_L, T1_L, XL_H
-+	veor		XL, XL, IN1
-+
-+	__pmull_p8	XH, XL_H, SHASH_H, s1h, s2h, s3h, s4h	@ a1 * b1
-+	veor		T1, T1, XL
-+	__pmull_p8	XL, XL_L, SHASH_L, s1l, s2l, s3l, s4l	@ a0 * b0
-+	__pmull_p8	XM, T1_L, SHASH2_p8			@ (a1+a0)(b1+b0)
-+
-+	veor		T1, XL, XH
-+	veor		XM, XM, T1
-+
-+	__pmull_reduce_p8
-+
-+	veor		T1, T1, XH
-+	veor		XL, XL, T1
-+
-+	bne		0b
-+	.endm
-+
-+	/*
-+	 * void pmull_ghash_update_p8(int blocks, u64 dg[], const char *src,
-+	 *			      u64 const h[1][2], const char *head)
-+	 */
-+ENTRY(pmull_ghash_update_p8)
-+	vld1.64		{SHASH}, [r3]
-+	veor		SHASH2_p8, SHASH_L, SHASH_H
-+
-+	vext.8		s1l, SHASH_L, SHASH_L, #1
-+	vext.8		s2l, SHASH_L, SHASH_L, #2
-+	vext.8		s3l, SHASH_L, SHASH_L, #3
-+	vext.8		s4l, SHASH_L, SHASH_L, #4
-+	vext.8		s1h, SHASH_H, SHASH_H, #1
-+	vext.8		s2h, SHASH_H, SHASH_H, #2
-+	vext.8		s3h, SHASH_H, SHASH_H, #3
-+	vext.8		s4h, SHASH_H, SHASH_H, #4
-+
-+	vmov.i64	k16, #0xffff
-+	vmov.i64	k32, #0xffffffff
-+	vmov.i64	k48, #0xffffffffffff
-+
-+	ghash_update
-+	vst1.64		{XL}, [r1]
-+
-+	bx		lr
-+ENDPROC(pmull_ghash_update_p8)
+ ENDPROC(pmull_ghash_update_p8)
 -- 
 2.53.0
 
