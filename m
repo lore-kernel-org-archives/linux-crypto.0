@@ -1,112 +1,307 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.wp.pl (mx3.wp.pl [212.77.101.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EDD73CD8C5;
-	Thu, 19 Mar 2026 16:55:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C5493CD8C5
+	for <linux-crypto@vger.kernel.org>; Thu, 19 Mar 2026 17:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1773939311; cv=none; b=oYrUvSD2qE06+eszIu9fJSllDmsQlqYE+/nmxyF7AkKRnqcFRIwOmX4LF3mSZkyA7/wj3OFxpkHnEmN0Q3LI3nmV4yfY7jacWs0H2Tce3qi6QPhQVa94i9HSJpC2Cq+N/robOZnKEOMM4wuCJawZ7cUUgOhWUFq9R1NiI2iq8w4=
+	t=1773940307; cv=none; b=POUXS0XealY1VX5uGmg5F90IMXCgN49lOuu4DWT5sk7MTNFKA3qkZM22rM8zAB0DJsngfFOVxj0w3IZKOIxPN0xRxJUJgCBKDZRAG8uO6xQLqh07cmGZyXCO48JQ8MJ/gYeGYQF3oor3MM92NK5QJwHnOSlKhqamLIQ7aeYjAxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1773939311; c=relaxed/simple;
-	bh=u0rlrNL+lCmtFU3Fc0MLpZV46OuyEYraGXFyUIw5+yA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DnUqe/FtOET/FdmwNafTFKZFo1cbRQ0I6idPEDmToqMEm3FJPGvFNDe25caGi1OHyirTuET0WMIGwyln4Z/I/qTGC3g1qftWvYvrmDucW1MTQC9zwUQed0pCYdy4JmgscO8A537T1ktDl5S0GR73h4eKEirPN6vPZoN66HVixxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SGoEwMDo; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1773940307; c=relaxed/simple;
+	bh=Pvb5c4hEdXUx8WNItUsE3pPdxp1EUepS+jAcL5FFFmI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nd5pO/Ljdy8lW0uzXC16pEAPWNXPkOO15YdTAs9zVRUAJnGOlmHeNwsOoZyFiuegb21jdYRi1IBWIbYz+R5axo83BHL9ob8HgS8/dIC+swPcZ2s5QH8Wne4R0xuMzCyU9uxkV0lnLFZ8XC7f2YVF+gCS+zmoIQ2bjB877mNJK9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=nOIDcroT; arc=none smtp.client-ip=212.77.101.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SGoEwMDo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F459C19424;
-	Thu, 19 Mar 2026 16:55:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1773939311;
-	bh=u0rlrNL+lCmtFU3Fc0MLpZV46OuyEYraGXFyUIw5+yA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=SGoEwMDoQCugUF9QZfl7tTZahFbUByXF575VPQaN9R5a8BdMr/SjR2+hBZLwwObpk
-	 u+PwUSMwzK986YMI4yp7BrjGk2wWeSy3MeXIrBtVVwsDPzBJ7m6W1B0apuzRvLh6yx
-	 CIuRXddM7sJTDruPQk6+fnTSXWyyBjFSy2RAajq3afzYLP+wa5LjGaMPRyH8WpzP4n
-	 pFdH+9wkM6rlXglKxlByw//yLcoWXuDz29LW3IJZaOq3s4octljgpQJfpa72NOB1AX
-	 oZmjxgz8v1W3LafU1B+HemZIyFHnFZ28djeNvVRiHxS1h5/loJIsQFA3mwZpALjUay
-	 9igKP4hFJpXyA==
-Message-ID: <314ab59a-3958-4f7f-bd7c-2b6ac8c8e3cb@kernel.org>
-Date: Thu, 19 Mar 2026 17:55:07 +0100
+	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="nOIDcroT"
+Received: (wp-smtpd smtp.wp.pl 19729 invoked from network); 19 Mar 2026 18:11:30 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
+          t=1773940290; bh=0+To5Oldsyjsh6CXaltYAKaEBPHs70iTVl7p7m0e7Ls=;
+          h=From:To:Cc:Subject;
+          b=nOIDcroTi/IEgix0yJ++Yzxz4ewQrKZXEZMFzxTJLnDWe+cFdsRMHiT3llaej5FNo
+           qllg6UGbAY5i1SWfLRqB5OIAZil+CvpkjuNgHhuiwMsBrfNvgCxFlNNy30kj8ah1Db
+           rWbH/dBPteN4j7ukk6r5yb2Jlt5jBNVdxL+f6hAQmyUcY3D3/R7WEmnnIyInelrbYC
+           q2xUluytOjgS8BbsCy4ESEBKSlQ2v6UjoMqrvUNuYR6KOqKXbOzA2Smp1xiu58Yctx
+           ufwmf8P0lkFfdE3CMZxx2nPd9S+sgqxtR8oID0WJY1yq9eSsshnHWCHo3t0Y+wt7IU
+           w9ilcNItzwBKw==
+Received: from 83.5.169.164.ipv4.supernova.orange.pl (HELO abajkowski.lan) (olek2@wp.pl@[83.5.169.164])
+          (envelope-sender <olek2@wp.pl>)
+          by smtp.wp.pl (WP-SMTPD) with TLS_AES_256_GCM_SHA384 encrypted SMTP
+          for <herbert@gondor.apana.org.au>; 19 Mar 2026 18:11:30 +0100
+From: Aleksander Jan Bajkowski <olek2@wp.pl>
+To: herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	linux-crypto@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
+Subject: [PATCH] crypto: testmgr - Add test vectors for authenc(hmac(md5),rfc3686(ctr(aes)))
+Date: Thu, 19 Mar 2026 18:11:21 +0100
+Message-ID: <20260319171128.10566-1-olek2@wp.pl>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: s5p-sss - use unregister_{ahashes,skciphers} in
- probe/remove
-To: Thorsten Blum <thorsten.blum@linux.dev>, Vladimir Zapolskiy
- <vz@mleia.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260317080450.1054742-3-thorsten.blum@linux.dev>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20260317080450.1054742-3-thorsten.blum@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-WP-DKIM-Status: good (id: wp.pl)                                                      
+X-WP-MailID: 8c8e5934cbb3688a84be6a86bd03e4f3
+X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
+X-WP-SPAM: NO 0000009 [INMB]                               
 
-On 17/03/2026 09:04, Thorsten Blum wrote:
-> Replace multiple for loops with calls to crypto_unregister_ahashes() and
-> crypto_unregister_skciphers().
-> 
-> If crypto_register_skcipher() fails in s5p_aes_probe(), log the error
-> directly instead of checking 'i < ARRAY_SIZE(algs)' later.  Also drop
-> now-unused local index variables.  No functional changes.
-> 
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
-> ---
->  drivers/crypto/s5p-sss.c | 27 ++++++++++-----------------
->  1 file changed, 10 insertions(+), 17 deletions(-)
+Test vectors were generated starting from existing RFC3686(CTR(AES)) test
+vectors and adding HMAC(MD5) computed with software implementation.
+Then, the results were double-checked on Mediatek MT7986 (safexcel).
+Platform pass self-tests.
 
+Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+---
+ crypto/testmgr.c |   7 ++
+ crypto/testmgr.h | 207 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 214 insertions(+)
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 4985411dedae..bce14894f1a2 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -4093,6 +4093,13 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.suite = {
+ 			.aead = __VECS(hmac_md5_ecb_cipher_null_tv_template)
+ 		}
++	}, {
++		.alg = "authenc(hmac(md5),rfc3686(ctr(aes)))",
++		.generic_driver = "authenc(hmac-md5-lib,rfc3686(ctr(aes-lib)))",
++		.test = alg_test_aead,
++		.suite = {
++			.aead = __VECS(hmac_md5_aes_ctr_rfc3686_tv_temp)
++		}
+ 	}, {
+ 		.alg = "authenc(hmac(sha1),cbc(aes))",
+ 		.generic_driver = "authenc(hmac-sha1-lib,cbc(aes-lib))",
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 1c69c11c0cdb..8ee15a3e0ed1 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -16450,6 +16450,213 @@ static const struct aead_testvec hmac_sha512_des_cbc_tv_temp[] = {
+ 	},
+ };
+ 
++static const struct aead_testvec hmac_md5_aes_ctr_rfc3686_tv_temp[] = {
++	{ /* RFC 3686 Case 1 */
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x14"	/* enc key length */
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\xae\x68\x52\xf8\x12\x10\x67\xcc"
++			  "\x4b\xf7\xa5\x76\x55\x77\xf3\x9e"
++			  "\x00\x00\x00\x30",
++		.klen	= 8 + 16 + 20,
++		.iv	= "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.assoc	= "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.alen	= 8,
++		.ptext	= "Single block msg",
++		.plen	= 16,
++		.ctext	= "\xe4\x09\x5d\x4f\xb7\xa7\xb3\x79"
++			  "\x2d\x61\x75\xa3\x26\x13\x11\xb8"
++			  "\xdd\x5f\xea\x13\x2a\xf2\xb0\xf1"
++			  "\x91\x79\x46\x40\x62\x6c\x87\x5b",
++		.clen	= 16 + 16,
++	}, { /* RFC 3686 Case 2 */
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x14"	/* enc key length */
++			  "\x20\x21\x22\x23\x24\x25\x26\x27"
++			  "\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++			  "\x7e\x24\x06\x78\x17\xfa\xe0\xd7"
++			  "\x43\xd6\xce\x1f\x32\x53\x91\x63"
++			  "\x00\x6c\xb6\xdb",
++		.klen	= 8 + 16 + 20,
++		.iv	= "\xc0\x54\x3b\x59\xda\x48\xd9\x0b",
++		.assoc	= "\xc0\x54\x3b\x59\xda\x48\xd9\x0b",
++		.alen	= 8,
++		.ptext	= "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			  "\x10\x11\x12\x13\x14\x15\x16\x17"
++			  "\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
++		.plen	= 32,
++		.ctext	= "\x51\x04\xa1\x06\x16\x8a\x72\xd9"
++			  "\x79\x0d\x41\xee\x8e\xda\xd3\x88"
++			  "\xeb\x2e\x1e\xfc\x46\xda\x57\xc8"
++			  "\xfc\xe6\x30\xdf\x91\x41\xbe\x28"
++			  "\x03\x39\x23\xcd\x22\x5f\x1b\x8b"
++			  "\x93\x70\xbc\x45\xf3\xba\xde\x2e",
++		.clen	= 32 + 16,
++	}, { /* RFC 3686 Case 3 */
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x14"	/* enc key length */
++			  "\x11\x22\x33\x44\x55\x66\x77\x88"
++			  "\x99\xaa\xbb\xcc\xdd\xee\xff\x11"
++			  "\x76\x91\xbe\x03\x5e\x50\x20\xa8"
++			  "\xac\x6e\x61\x85\x29\xf9\xa0\xdc"
++			  "\x00\xe0\x01\x7b",
++		.klen	= 8 + 16 + 20,
++		.iv	= "\x27\x77\x7f\x3f\x4a\x17\x86\xf0",
++		.assoc	= "\x27\x77\x7f\x3f\x4a\x17\x86\xf0",
++		.alen	= 8,
++		.ptext	= "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			  "\x10\x11\x12\x13\x14\x15\x16\x17"
++			  "\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
++			  "\x20\x21\x22\x23",
++		.plen	= 36,
++		.ctext	= "\xc1\xcf\x48\xa8\x9f\x2f\xfd\xd9"
++			  "\xcf\x46\x52\xe9\xef\xdb\x72\xd7"
++			  "\x45\x40\xa4\x2b\xde\x6d\x78\x36"
++			  "\xd5\x9a\x5c\xea\xae\xf3\x10\x53"
++			  "\x25\xb2\x07\x2f"
++			  "\xb4\x40\x0c\x7b\x4c\x55\x8a\x4b"
++			  "\x04\xf7\x48\x9e\x0f\x9a\xae\x73",
++		.clen	= 36 + 16,
++	}, { /* RFC 3686 Case 4 */
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x1c"	/* enc key length */
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x16\xaf\x5b\x14\x5f\xc9\xf5\x79"
++			  "\xc1\x75\xf9\x3e\x3b\xfb\x0e\xed"
++			  "\x86\x3d\x06\xcc\xfd\xb7\x85\x15"
++			  "\x00\x00\x00\x48",
++		.klen	= 8 + 16 + 28,
++		.iv	= "\x36\x73\x3c\x14\x7d\x6d\x93\xcb",
++		.assoc	= "\x36\x73\x3c\x14\x7d\x6d\x93\xcb",
++		.alen	= 8,
++		.ptext	= "Single block msg",
++		.plen	= 16,
++		.ctext	= "\x4b\x55\x38\x4f\xe2\x59\xc9\xc8"
++			  "\x4e\x79\x35\xa0\x03\xcb\xe9\x28"
++			  "\xc4\x5d\xa1\x16\x6c\x2d\xa5\x43"
++			  "\x60\x7b\x58\x98\x11\x9b\x50\x06",
++		.clen	= 16 + 16,
++	}, { /* RFC 3686 Case 5 */
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x1c"	/* enc key length */
++			  "\x20\x21\x22\x23\x24\x25\x26\x27"
++			  "\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++			  "\x7c\x5c\xb2\x40\x1b\x3d\xc3\x3c"
++			  "\x19\xe7\x34\x08\x19\xe0\xf6\x9c"
++			  "\x67\x8c\x3d\xb8\xe6\xf6\xa9\x1a"
++			  "\x00\x96\xb0\x3b",
++		.klen	= 8 + 16 + 28,
++		.iv	= "\x02\x0c\x6e\xad\xc2\xcb\x50\x0d",
++		.assoc	= "\x02\x0c\x6e\xad\xc2\xcb\x50\x0d",
++		.alen	= 8,
++		.ptext	= "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			  "\x10\x11\x12\x13\x14\x15\x16\x17"
++			  "\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
++		.plen	= 32,
++		.ctext	= "\x45\x32\x43\xfc\x60\x9b\x23\x32"
++			  "\x7e\xdf\xaa\xfa\x71\x31\xcd\x9f"
++			  "\x84\x90\x70\x1c\x5a\xd4\xa7\x9c"
++			  "\xfc\x1f\xe0\xff\x42\xf4\xfb\x00"
++			  "\xc5\xec\x47\x33\xae\x05\x28\x49"
++			  "\xd5\x2b\x08\xad\x10\x98\x24\x01",
++		.clen	= 32 + 16,
++	}, { /* RFC 3686 Case 7 */
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x24"	/* enc key length */
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x00\x00\x00\x00\x00\x00\x00\x00"
++			  "\x77\x6b\xef\xf2\x85\x1d\xb0\x6f"
++			  "\x4c\x8a\x05\x42\xc8\x69\x6f\x6c"
++			  "\x6a\x81\xaf\x1e\xec\x96\xb4\xd3"
++			  "\x7f\xc1\xd6\x89\xe6\xc1\xc1\x04"
++			  "\x00\x00\x00\x60",
++		.klen	= 8 + 16 + 36,
++		.iv	= "\xdb\x56\x72\xc9\x7a\xa8\xf0\xb2",
++		.assoc	= "\xdb\x56\x72\xc9\x7a\xa8\xf0\xb2",
++		.alen	= 8,
++		.ptext	= "Single block msg",
++		.plen	= 16,
++		.ctext	= "\x14\x5a\xd0\x1d\xbf\x82\x4e\xc7"
++			  "\x56\x08\x63\xdc\x71\xe3\xe0\xc0"
++			  "\xc6\x26\xb2\x27\x0d\x21\xd4\x40"
++			  "\x6c\x4f\x53\xea\x19\x75\xda\x8e",
++		.clen	= 16 + 16,
++	}, { /* RFC 3686 Case 8 */
++#ifdef __LITTLE_ENDIAN
++		.key    = "\x08\x00"		/* rta length */
++			  "\x01\x00"		/* rta type */
++#else
++		.key    = "\x00\x08"		/* rta length */
++			  "\x00\x01"		/* rta type */
++#endif
++			  "\x00\x00\x00\x24"	/* enc key length */
++			  "\x20\x21\x22\x23\x24\x25\x26\x27"
++			  "\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++			  "\xf6\xd6\x6d\x6b\xd5\x2d\x59\xbb"
++			  "\x07\x96\x36\x58\x79\xef\xf8\x86"
++			  "\xc6\x6d\xd5\x1a\x5b\x6a\x99\x74"
++			  "\x4b\x50\x59\x0c\x87\xa2\x38\x84"
++			  "\x00\xfa\xac\x24",
++		.klen	= 8 + 16 + 36,
++		.iv	= "\xc1\x58\x5e\xf1\x5a\x43\xd8\x75",
++		.assoc	= "\xc1\x58\x5e\xf1\x5a\x43\xd8\x75",
++		.alen	= 8,
++		.ptext	= "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			  "\x10\x11\x12\x13\x14\x15\x16\x17"
++			  "\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
++		.plen	= 32,
++		.ctext	= "\xf0\x5e\x23\x1b\x38\x94\x61\x2c"
++			  "\x49\xee\x00\x0b\x80\x4e\xb2\xa9"
++			  "\xb8\x30\x6b\x50\x8f\x83\x9d\x6a"
++			  "\x55\x30\x83\x1d\x93\x44\xaf\x1c"
++			  "\x8c\x4d\x2a\x8d\x23\x47\x59\x6f"
++			  "\x1e\x74\x62\x39\xed\x14\x50\x6c",
++		.clen	= 32 + 16,
++	},
++};
++
+ static const struct aead_testvec hmac_md5_des3_ede_cbc_tv_temp[] = {
+ 	{ /*Generated with cryptopp*/
+ #ifdef __LITTLE_ENDIAN
+-- 
+2.51.0
 
-Best regards,
-Krzysztof
