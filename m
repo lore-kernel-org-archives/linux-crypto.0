@@ -1,39 +1,64 @@
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA2E3DA5A5;
-	Fri, 20 Mar 2026 17:57:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA4C3286D73
+	for <linux-crypto@vger.kernel.org>; Fri, 20 Mar 2026 18:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774029450; cv=none; b=HICLdnJHM0NrGH+6/ZObDfxCVAkWEVqnQRyQsbla3nM5wLVWWNr49aj7kYetf9qQvjQVAYylNKw6uFpOcll3bteWWGGtYEwMZKRHr8/0K1OHTXRMZmjOrXTHoyL6oydzbdt1vEHx+PrvJbXncZCrtV1MK/H5178u0JrowiPedUg=
+	t=1774030780; cv=none; b=MgG066qv5JTb0SNGh5kbPOcpNNVwJu+dc9ZRWZy+zu/4pAIRIKq0yk0JePx679aCGxxWOjK7EJD/XMeH5206NwfnBzIEDw/gL3lwrx5aNSptiEtfSEWBrMeE0M4dMschBMhowOlqXUi6iQA3uhZFQb39enRBjFvGeg40PB4A8+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774029450; c=relaxed/simple;
-	bh=fVfV+dg4pefPLaq5wbrR0HxC3vTbP1hv0mlpSnuGkSU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=G9UltzPHsN1A7EhnQP2zgbhzPik3i2+npkwKwNWe0M/eI4Zbb7VMCoEtQhuuO+tc1lleVfVcXysfRhLE+R/+4CzwYyUvrUmaWWQpKN7CVygV/7ib0tVDo4MfimzfSZBSHd8suLKX4D2mHGTWEoZ17fjlHAhLrF3Tza0lvTULTEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=NUdvJ3j6; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+	s=arc-20240116; t=1774030780; c=relaxed/simple;
+	bh=7fESqhDf2H0GUn5V37K9O8WpKhbqlyLBKpFZ4HRMN7Q=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=s0HWCRRD6+UPuE7YXmGD8lQSlZxWeXsPOqIvgIEe1KTwVsI9xKK1v4Q8WnzZ9/mmOzv4NjBEMMcZSQaYTtrJ+XC5ZzvMITFL/UoQ1EjFbX4ri6ANcux2T2Weg0x/2Sue8FsZd7PYaKvNxPhywY6oRdI7sECzq1emPw+7Z832fso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D2ng0ttm; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="NUdvJ3j6"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:Cc:To:In-Reply-To:References:
-	Message-Id:Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:
-	From:Reply-To:Content-ID:Content-Description;
-	bh=uPLEgN0Y4iP2f3Jy+ESOwggpjSmfDh5GaHCB2jXthXA=; b=NUdvJ3j6ryT8NYpywCFAenz9RW
-	mhYJ/eybi/AR+QXBSlCv72eoblbMllR6MAP1XLMi+Camo8vfkTuPowMVo/12ZXSdsceW1dpv8K/ha
-	w2iqVJZ+X8WfFNW8ccuU0NxlY4iahrMXbQNOrDfAPa/Mr0002BwDS2mxLBT/cYZ3u3okHap6dRiHf
-	BGiOCFtIlZEB1mSetKWuhEBlTaQ8jjq6aUM1K0pZMTYKLp4/Xdpe3ot3XL3aBNLObgV6FwD24pGf8
-	40fXaOLxAvagKwVLofWiUdcKyDBHUmguEZw/uqPlHgV5u0NIg8GuTZLdENLrPyWzY8Cx9Bkalv7D3
-	nbOL2iXg==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.94.2)
-	(envelope-from <leitao@debian.org>)
-	id 1w3e6A-005Nfl-TV; Fri, 20 Mar 2026 17:57:25 +0000
-From: Breno Leitao <leitao@debian.org>
-Date: Fri, 20 Mar 2026 10:56:31 -0700
-Subject: [PATCH v2 5/5] workqueue: add test_workqueue benchmark module
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D2ng0ttm"
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-8297310ce0aso926921b3a.2
+        for <linux-crypto@vger.kernel.org>; Fri, 20 Mar 2026 11:19:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1774030779; x=1774635579; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZHZ6Ubx9LHMWB6rqhYcMl9MpcqJFvsOzesv/BgCZYCY=;
+        b=D2ng0ttmfiBZKh3S7tFuPi1Gj9MenKXPRVw6hwaLjNoKUUqFSDixeb/lKQgWfGBxSD
+         qM/fFnD5RcE3SE5UYJWgr30hGdB3zBJhp4gQLsjtzPD1/MgViFk6V0HeyAyLZYXWZQ1O
+         iaO5m0n0WEz7Tl/6+T23MTZdkWCmJFVuOvsEQfJIA3G61vup8GdiIik+MvNWgJ0H4KNk
+         ZhlMYViWhDYLbcLj27nBSU9xWOAH53fkVIiqC6MUDtttwlwhtmwB1oG6dD6XWcJQPvsU
+         TqndO9aAPhjTwLjH6HRO4AjnYmAsOFuEP2zE3NDt2G2DZTfZEIlx7HKjOae2bxXxOb8H
+         7J2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774030779; x=1774635579;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZHZ6Ubx9LHMWB6rqhYcMl9MpcqJFvsOzesv/BgCZYCY=;
+        b=NzY+PE8njOZvj89PbgSbGJWnM0DXw7cCFywFteyTJ7WGBte5V893EH1DcHJiids+7t
+         R8PMKuzNbA2R0Xu2qmHJYgciqxgtpnKPkYaOXTv5KifqmG4NXdrx/SOC6NYsGH907kaC
+         q9BxGMPa2Yhg0+jauucrrXdCpD5nphy71nVq8ll7JipuiJIp7yGwseqls/cBynYJISKW
+         T7eDlw9tP9q89+CCuo/yTOyBcTTC+zpKhE3e7lT7oQq8bhmdq+TJUWYGmDxKs3hXHW7r
+         Yts84/g0fUQ0JcRS4/ToDNKAip+TYSBOOoIb7SElvmoP0kZZLJgw0+E1b+BiwvxTDri8
+         x/ig==
+X-Forwarded-Encrypted: i=1; AJvYcCXz7d66io5UeDiwCwFBBVPZH0larhZCT+EPZRL8J0id8RIfvCQoaRUVzKxziX5LgHnzXzmKMnFpTD1vE4c=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1E3JNKh05Hfn+5IEwbOr0W/m9LKtrujNGHkvL3byieeIznfvo
+	6XQhocUMuCxNDrw24z3tX3tRWPJZgQcRRspPhNgmHxqVAq4iPzfsYozA
+X-Gm-Gg: ATEYQzwF9+gTFOWtCAXpcrgvOG4UzDvSrKOyNFldLePNlaoFxp8XY/y8EHV4KeH5PUg
+	jbCtbnteDQMbhKh4gBzXaRtjjC4ZqWiAvOu6W5pQ38f10LZjjaNDrleD7YpbKBRjFU0xnuADuGg
+	xUxEwR2C1sPs7EcSOT5z2YgoNRGICpDyCPWFLIVQGkDxXZ4qOWxT58xVKGrrjehEE14oEmJpqNR
+	eAJgGvt23GJ2Su5B+Hn8se5TtWBdUxTg0op0g5TBbW0nZcbLWxDFa3/E/NGaPjJHhkZ+mWq9dHC
+	ReBoj+kdvoAFraZQ8fZnTerzIhkLFNYJEAd6kTK9lpKcJzgj9IzWe7c5asb8h77F1RnRN7KX+u5
+	Bj9cfqdr6ByrOMuMRj6MCu50hjqI8cCDeRyRWcbcXthqjXMIRChLgeAggfosh4/pOgwwpkta1EF
+	+ubHYp8moovRnB9Z8Isw/UipphHw==
+X-Received: by 2002:a05:6a00:880b:b0:82c:215d:5e9d with SMTP id d2e1a72fcca58-82c215d6c5dmr1005621b3a.32.1774030779046;
+        Fri, 20 Mar 2026 11:19:39 -0700 (PDT)
+Received: from [127.0.1.1] ([103.216.213.160])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82b03bbf0c2sm3198614b3a.15.2026.03.20.11.19.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Mar 2026 11:19:38 -0700 (PDT)
+From: Atharv Dubey <atharvd440@gmail.com>
+Date: Fri, 20 Mar 2026 23:49:28 +0530
+Subject: [PATCH] Crypto : qat: Replace scnprintf with sysfs_emit function
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,386 +67,78 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260320-workqueue_sharded-v2-5-8372930931af@debian.org>
-References: <20260320-workqueue_sharded-v2-0-8372930931af@debian.org>
-In-Reply-To: <20260320-workqueue_sharded-v2-0-8372930931af@debian.org>
-To: Tejun Heo <tj@kernel.org>, Lai Jiangshan <jiangshanlai@gmail.com>, 
- Andrew Morton <akpm@linux-foundation.org>
-Cc: linux-kernel@vger.kernel.org, puranjay@kernel.org, 
- linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org, 
- linux-fsdevel@vger.kernel.org, Michael van der Westhuizen <rmikey@meta.com>, 
- kernel-team@meta.com, Chuck Lever <chuck.lever@oracle.com>, 
- Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.15-dev-363b9
-X-Developer-Signature: v=1; a=openpgp-sha256; l=9898; i=leitao@debian.org;
- h=from:subject:message-id; bh=fVfV+dg4pefPLaq5wbrR0HxC3vTbP1hv0mlpSnuGkSU=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpvYpsQpCFFCS6Stdm13hh3rU2USIxnonVGR38q
- mEMNeSo1z2JAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCab2KbAAKCRA1o5Of/Hh3
- bQOjD/49gPh2gnFcTxUjeB8k+HtVhOz4JJy5FQkHUNh6WYEYpnG/JUGvYoXk618cli/QxM21Y75
- Unw3wSYLW2hfBUvvRG++8DxpcEE07vYGlHD6Xye1o0YlyjLHy1pTD0Pymp/y9oJtH8EG/c0yxgO
- 6AT7Iyv+PB6zzUVs42sfup7OWUtnNdezQqUUsENRn6MWz13UbMgvxjyyaK74AH6jRKTo2YPaHaT
- KA4r4WbY7qS3voEtvBJ/A49A0uPZGUZsAM28mgadY1Dt51WVZtPDAY/hFHLBnNhP0DRXmNy/HkA
- 4J5k2WKIWPY9H4E/xY2a16NUNWqVendA7vznOf6GISRp+pcvbmGH6LsDxtWy1qCOn6Q+8Y/T2Ve
- BWXbN9UbpjCT0mwuoWQdO0L92k9PmxxxqaJjkMLHzeu1pF56Me2N4OZkxxBsfDQ6x2IFkIxcyg9
- zA1qUaK5eMbE5USZTMrOqUI9WRy3MJ6BbDCCv9j2e4SF0HvJY4UgBvVe0ryzVOi01QoQw6H9lqP
- i6ClgY/O9ypCIaOYBLH8LBLL3xRQ9fRBJYMhkYhbXhAenEt5P+OBW6ss5RaZuxj+/N9rvNhyi/C
- vLfovLiJfX7q4motwj3azeH2HJLZH1ic3wiCKV4dplz8mqfcyaiYV3+uIJTu0wPbI1jG6DKCOY9
- NcvmzzV/x2wapfA==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
-X-Debian-User: leitao
+Message-Id: <20260320-sysfs-v1-1-91fd5ef42dea@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAK+PvWkC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIzMDYyMD3eLK4rRiXfNUQ8vU1CQDM1MLMyWg2oKi1LTMCrA50bG1tQBJwd/
+ FVwAAAA==
+X-Change-ID: 20260320-sysfs-7e19eeb06586
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, 
+ "David S. Miller" <davem@davemloft.net>
+Cc: qat-linux@intel.com, linux-crypto@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Atharv Dubey <atharvd440@gmail.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1774030773; l=2159;
+ i=atharvd440@gmail.com; s=20260314; h=from:subject:message-id;
+ bh=7fESqhDf2H0GUn5V37K9O8WpKhbqlyLBKpFZ4HRMN7Q=;
+ b=cwYk8xAbgvcZ3nZ5DbDfY2BIS2IRTPZ75Mm4uLLLluGbc9ISzmWULipdBo9/U6TSccqyyflor
+ Ap0SeNoVdKcAY/lRm/opyux366au3b3Rn/3Zcm5Vpcz9bKrVGoy5g2Z
+X-Developer-Key: i=atharvd440@gmail.com; a=ed25519;
+ pk=T6i1xWOKT/RUSDYATSgyVG/4X7ac8jPjRSG1mMAcqVk=
 
-Add a kernel module that benchmarks queue_work() throughput on an
-unbound workqueue to measure pool->lock contention under different
-affinity scope configurations (cache vs cache_shard).
+Replace 3 sysfs functions in the Intel Qat Driver
+to use sysfs_emit() instead of scnprintf.
 
-The module spawns N kthreads (default: num_online_cpus()), each bound
-to a different CPU. All threads start simultaneously and queue work
-items, measuring the latency of each queue_work() call. Results are
-reported as p50/p90/p95 latencies for each affinity scope.
+- erros_correctable_show(): Replace scnprint() with sysfs_emit()
+- errors_nonfatal_show(): Replace scnprint() with sysfs_emit()
+- errors_fatal_show(): Replace scnprint() with sysfs_emit()
 
-The affinity scope is switched between runs via the workqueue's sysfs
-affinity_scope attribute (WQ_SYSFS), avoiding the need for any new
-exported symbols.
+This change is in accordance with Documentation/filesystems/sysfs.rst,
+which recommends using sysfs_emit/sysfs_emit_at in all sysfs show()
+callbacks for buffer safety, clarity, and consistency.
 
-The module runs as __init-only, returning -EAGAIN to auto-unload,
-and can be re-run via insmod.
-
-Example of the output:
-
- running 50 threads, 50000 items/thread
-
-   cpu              6806017 items/sec p50=2574    p90=5068    p95=5818 ns
-   smt              6821040 items/sec p50=2624    p90=5168    p95=5949 ns
-   cache_shard      1633653 items/sec p50=5337    p90=9694    p95=11207 ns
-   cache            286069 items/sec p50=72509    p90=82304   p95=85009 ns
-   numa             319403 items/sec p50=63745    p90=73480   p95=76505 ns
-   system           308461 items/sec p50=66561    p90=75714   p95=78048 ns
-
-Signed-off-by: Breno Leitao <leitao@debian.org>
+Signed-off-by: Atharv Dubey <atharvd440@gmail.com>
 ---
- lib/Kconfig.debug    |  10 ++
- lib/Makefile         |   1 +
- lib/test_workqueue.c | 277 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 288 insertions(+)
+ drivers/crypto/intel/qat/qat_common/adf_sysfs_ras_counters.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 93f356d2b3d95..38bee649697f3 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -2628,6 +2628,16 @@ config TEST_VMALLOC
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_sysfs_ras_counters.c b/drivers/crypto/intel/qat/qat_common/adf_sysfs_ras_counters.c
+index e97c67c87b3c..2ca757e13c72 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_sysfs_ras_counters.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_sysfs_ras_counters.c
+@@ -20,7 +20,7 @@ static ssize_t errors_correctable_show(struct device *dev,
+ 		return -EINVAL;
  
- 	  If unsure, say N.
+ 	counter = ADF_RAS_ERR_CTR_READ(accel_dev->ras_errors, ADF_RAS_CORR);
+-	return scnprintf(buf, PAGE_SIZE, "%ld\n", counter);
++	return sysfs_emit(buf, "%ld\n", counter);
+ }
  
-+config TEST_WORKQUEUE
-+	tristate "Test module for stress/performance analysis of workqueue"
-+	default n
-+	help
-+	  This builds the "test_workqueue" module for benchmarking
-+	  workqueue throughput under contention. Useful for evaluating
-+	  affinity scope changes (e.g., cache_shard vs cache).
-+
-+	  If unsure, say N.
-+
- config TEST_BPF
- 	tristate "Test BPF filter functionality"
- 	depends on m && NET
-diff --git a/lib/Makefile b/lib/Makefile
-index 1b9ee167517f3..ea660cca04f40 100644
---- a/lib/Makefile
-+++ b/lib/Makefile
-@@ -79,6 +79,7 @@ UBSAN_SANITIZE_test_ubsan.o := y
- obj-$(CONFIG_TEST_KSTRTOX) += test-kstrtox.o
- obj-$(CONFIG_TEST_LKM) += test_module.o
- obj-$(CONFIG_TEST_VMALLOC) += test_vmalloc.o
-+obj-$(CONFIG_TEST_WORKQUEUE) += test_workqueue.o
- obj-$(CONFIG_TEST_RHASHTABLE) += test_rhashtable.o
- obj-$(CONFIG_TEST_STATIC_KEYS) += test_static_keys.o
- obj-$(CONFIG_TEST_STATIC_KEYS) += test_static_key_base.o
-diff --git a/lib/test_workqueue.c b/lib/test_workqueue.c
-new file mode 100644
-index 0000000000000..a949af1d7e978
---- /dev/null
-+++ b/lib/test_workqueue.c
-@@ -0,0 +1,277 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+/*
-+ * Test module for stress and performance analysis of workqueue.
-+ *
-+ * Benchmarks queue_work() throughput on an unbound workqueue to measure
-+ * pool->lock contention under different affinity scope configurations
-+ * (e.g., cache vs cache_shard).
-+ *
-+ * The affinity scope is changed between runs via the workqueue's sysfs
-+ * affinity_scope attribute (WQ_SYSFS).
-+ *
-+ * Copyright (c) 2026 Meta Platforms, Inc. and affiliates
-+ * Copyright (c) 2026 Breno Leitao <leitao@debian.org>
-+ *
-+ */
-+#include <linux/init.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/workqueue.h>
-+#include <linux/kthread.h>
-+#include <linux/moduleparam.h>
-+#include <linux/completion.h>
-+#include <linux/atomic.h>
-+#include <linux/slab.h>
-+#include <linux/ktime.h>
-+#include <linux/cpumask.h>
-+#include <linux/sched.h>
-+#include <linux/sort.h>
-+#include <linux/fs.h>
-+
-+#define WQ_NAME "bench_wq"
-+#define SCOPE_PATH "/sys/bus/workqueue/devices/" WQ_NAME "/affinity_scope"
-+
-+static int nr_threads;
-+module_param(nr_threads, int, 0444);
-+MODULE_PARM_DESC(nr_threads,
-+		 "Number of threads to spawn (default: 0 = num_online_cpus())");
-+
-+static int wq_items = 50000;
-+module_param(wq_items, int, 0444);
-+MODULE_PARM_DESC(wq_items,
-+		 "Number of work items each thread queues (default: 50000)");
-+
-+static struct workqueue_struct *bench_wq;
-+static atomic_t threads_done;
-+static DECLARE_COMPLETION(start_comp);
-+static DECLARE_COMPLETION(all_done_comp);
-+
-+struct thread_ctx {
-+	struct completion work_done;
-+	struct work_struct work;
-+	u64 *latencies;
-+	int cpu;
-+	int items;
-+};
-+
-+static void bench_work_fn(struct work_struct *work)
-+{
-+	struct thread_ctx *ctx = container_of(work, struct thread_ctx, work);
-+
-+	complete(&ctx->work_done);
-+}
-+
-+static int bench_kthread_fn(void *data)
-+{
-+	struct thread_ctx *ctx = data;
-+	ktime_t t_start, t_end;
-+	int i;
-+
-+	/* Wait for all threads to be ready */
-+	wait_for_completion(&start_comp);
-+
-+	for (i = 0; i < ctx->items; i++) {
-+		reinit_completion(&ctx->work_done);
-+		INIT_WORK(&ctx->work, bench_work_fn);
-+
-+		t_start = ktime_get();
-+		queue_work(bench_wq, &ctx->work);
-+		t_end = ktime_get();
-+
-+		ctx->latencies[i] = ktime_to_ns(ktime_sub(t_end, t_start));
-+		wait_for_completion(&ctx->work_done);
-+	}
-+
-+	if (atomic_dec_and_test(&threads_done))
-+		complete(&all_done_comp);
-+
-+	return 0;
-+}
-+
-+static int cmp_u64(const void *a, const void *b)
-+{
-+	u64 va = *(const u64 *)a;
-+	u64 vb = *(const u64 *)b;
-+
-+	if (va < vb)
-+		return -1;
-+	if (va > vb)
-+		return 1;
-+	return 0;
-+}
-+
-+static int __init set_affn_scope(const char *scope)
-+{
-+	struct file *f;
-+	loff_t pos = 0;
-+	ssize_t ret;
-+
-+	f = filp_open(SCOPE_PATH, O_WRONLY, 0);
-+	if (IS_ERR(f)) {
-+		pr_err("test_workqueue: open %s failed: %ld\n",
-+		       SCOPE_PATH, PTR_ERR(f));
-+		return PTR_ERR(f);
-+	}
-+
-+	ret = kernel_write(f, scope, strlen(scope), &pos);
-+	filp_close(f, NULL);
-+
-+	if (ret < 0) {
-+		pr_err("test_workqueue: write '%s' failed: %zd\n", scope, ret);
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static int __init run_bench(int n_threads, const char *scope, const char *label)
-+{
-+	struct task_struct **tasks;
-+	unsigned long total_items;
-+	struct thread_ctx *ctxs;
-+	u64 *all_latencies;
-+	ktime_t start, end;
-+	int cpu, i, j, ret;
-+	s64 elapsed_us;
-+
-+	ret = set_affn_scope(scope);
-+	if (ret)
-+		return ret;
-+
-+	ctxs = kcalloc(n_threads, sizeof(*ctxs), GFP_KERNEL);
-+	if (!ctxs)
-+		return -ENOMEM;
-+
-+	tasks = kcalloc(n_threads, sizeof(*tasks), GFP_KERNEL);
-+	if (!tasks) {
-+		kfree(ctxs);
-+		return -ENOMEM;
-+	}
-+
-+	total_items = (unsigned long)n_threads * wq_items;
-+	all_latencies = kvmalloc_array(total_items, sizeof(u64), GFP_KERNEL);
-+	if (!all_latencies) {
-+		kfree(tasks);
-+		kfree(ctxs);
-+		return -ENOMEM;
-+	}
-+
-+	/* Allocate per-thread latency arrays */
-+	for (i = 0; i < n_threads; i++) {
-+		ctxs[i].latencies = kvmalloc_array(wq_items, sizeof(u64),
-+						   GFP_KERNEL);
-+		if (!ctxs[i].latencies) {
-+			while (--i >= 0)
-+				kvfree(ctxs[i].latencies);
-+			kvfree(all_latencies);
-+			kfree(tasks);
-+			kfree(ctxs);
-+			return -ENOMEM;
-+		}
-+	}
-+
-+	atomic_set(&threads_done, n_threads);
-+	reinit_completion(&all_done_comp);
-+	reinit_completion(&start_comp);
-+
-+	/* Create kthreads, each bound to a different online CPU */
-+	i = 0;
-+	for_each_online_cpu(cpu) {
-+		if (i >= n_threads)
-+			break;
-+
-+		ctxs[i].cpu = cpu;
-+		ctxs[i].items = wq_items;
-+		init_completion(&ctxs[i].work_done);
-+
-+		tasks[i] = kthread_create(bench_kthread_fn, &ctxs[i],
-+					  "wq_bench/%d", cpu);
-+		if (IS_ERR(tasks[i])) {
-+			ret = PTR_ERR(tasks[i]);
-+			pr_err("test_workqueue: failed to create kthread %d: %d\n",
-+			       i, ret);
-+			while (--i >= 0)
-+				kthread_stop(tasks[i]);
-+			goto out_free;
-+		}
-+
-+		kthread_bind(tasks[i], cpu);
-+		wake_up_process(tasks[i]);
-+		i++;
-+	}
-+
-+	/* Start timing and release all threads */
-+	start = ktime_get();
-+	complete_all(&start_comp);
-+
-+	/* Wait for all threads to finish */
-+	wait_for_completion(&all_done_comp);
-+
-+	/* Drain any remaining work */
-+	flush_workqueue(bench_wq);
-+
-+	end = ktime_get();
-+	elapsed_us = ktime_us_delta(end, start);
-+
-+	/* Merge all per-thread latencies and sort for percentile calculation */
-+	j = 0;
-+	for (i = 0; i < n_threads; i++) {
-+		memcpy(&all_latencies[j], ctxs[i].latencies,
-+		       wq_items * sizeof(u64));
-+		j += wq_items;
-+	}
-+
-+	sort(all_latencies, total_items, sizeof(u64), cmp_u64, NULL);
-+
-+	pr_info("test_workqueue:   %-16s %llu items/sec\tp50=%llu\tp90=%llu\tp95=%llu ns\n",
-+		label,
-+		elapsed_us ? total_items * 1000000ULL / elapsed_us : 0,
-+		all_latencies[total_items * 50 / 100],
-+		all_latencies[total_items * 90 / 100],
-+		all_latencies[total_items * 95 / 100]);
-+
-+	ret = 0;
-+out_free:
-+	for (i = 0; i < n_threads; i++)
-+		kvfree(ctxs[i].latencies);
-+	kvfree(all_latencies);
-+	kfree(tasks);
-+	kfree(ctxs);
-+
-+	return ret;
-+}
-+
-+static const char * const bench_scopes[] = {
-+	"cpu", "smt", "cache", "cache_shard", "numa", "system",
-+};
-+
-+static int __init test_workqueue_init(void)
-+{
-+	int n_threads = nr_threads ?: num_online_cpus();
-+	int i;
-+
-+	if (wq_items <= 0) {
-+		pr_err("test_workqueue: wq_items must be > 0\n");
-+		return -EINVAL;
-+	}
-+
-+	bench_wq = alloc_workqueue(WQ_NAME, WQ_UNBOUND | WQ_SYSFS, 0);
-+	if (!bench_wq)
-+		return -ENOMEM;
-+
-+	pr_info("test_workqueue: running %d threads, %d items/thread\n",
-+		n_threads, wq_items);
-+
-+	for (i = 0; i < ARRAY_SIZE(bench_scopes); i++)
-+		run_bench(n_threads, bench_scopes[i], bench_scopes[i]);
-+
-+	destroy_workqueue(bench_wq);
-+
-+	return -EAGAIN;
-+}
-+
-+module_init(test_workqueue_init);
-+MODULE_AUTHOR("Breno Leitao <leitao@debian.org>");
-+MODULE_DESCRIPTION("Stress/performance benchmark for workqueue subsystem");
-+MODULE_LICENSE("GPL");
+ static ssize_t errors_nonfatal_show(struct device *dev,
+@@ -35,7 +35,7 @@ static ssize_t errors_nonfatal_show(struct device *dev,
+ 		return -EINVAL;
+ 
+ 	counter = ADF_RAS_ERR_CTR_READ(accel_dev->ras_errors, ADF_RAS_UNCORR);
+-	return scnprintf(buf, PAGE_SIZE, "%ld\n", counter);
++	return sysfs_emit(buf, "%ld\n", counter);
+ }
+ 
+ static ssize_t errors_fatal_show(struct device *dev,
+@@ -50,7 +50,7 @@ static ssize_t errors_fatal_show(struct device *dev,
+ 		return -EINVAL;
+ 
+ 	counter = ADF_RAS_ERR_CTR_READ(accel_dev->ras_errors, ADF_RAS_FATAL);
+-	return scnprintf(buf, PAGE_SIZE, "%ld\n", counter);
++	return sysfs_emit(buf,  "%ld\n", counter);
+ }
+ 
+ static ssize_t reset_error_counters_store(struct device *dev,
 
+---
+base-commit: 8a30aeb0d1b4e4aaf7f7bae72f20f2ae75385ccb
+change-id: 20260320-sysfs-7e19eeb06586
+
+Best regards,
 -- 
-2.52.0
+Atharv Dubey <atharvd440@gmail.com>
 
