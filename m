@@ -1,130 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B313C3469FA;
-	Sat, 21 Mar 2026 04:12:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD3F2E175F
+	for <linux-crypto@vger.kernel.org>; Sat, 21 Mar 2026 04:44:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774066325; cv=none; b=mMXbG0ly/SnWwEa4qV9Ll6I0Vks0OkD8+TQQ83/kai1wLitAaBbr12X6nwbe1x8HfrmLqg4648ZDVOL21tODTEgeDMPVORSdppsh1kJZXFs5QaBy6ERSjIJMKZpEzoMIyjnTkUn/8cBwuQGNBtGLVQZjyHnJ7SQaQFjP4Slfbb4=
+	t=1774068256; cv=none; b=KsjTlPCjDCqlnQkM7aP5U49U5NczG73UsUh28mx5GyYGSg75EDlU6EZYULFV0jmNpjqi6YAxvMdz27iCKvTL+HeoDSOXzKBSLLIQWTbpAGHg1L10/INTAsmLcUCAW7hD0BHl2vs0DHVUtsYDvqOp29hfPV3etNMkcBujOR5OVa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774066325; c=relaxed/simple;
-	bh=lXet9mn/RNAHfsi2ltnD8G94KFEGqvjdvngfRQ0H8xE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=okYDwi3Rq0gl6qA2RctYZ/sg/DP9niZIk9OwExKxIvFbGZadv+NEK3n4RHj52D2uJe+TzjWTuPMvyEcwDVp/eP2k/AnFDhZXFIf+0RFZZdPA3sZMOUeebiVgDyLw8kUCvah9apgwvtXGO9quN7zQsW9V96st+PWf0TXfS/1yy70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=so3kgmeO; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774068256; c=relaxed/simple;
+	bh=Bwqr5bQvT2QVLBZS5BmRUn0DZsUeaSqSykbvXA/p2vI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=J3bIz5SIsl4wrBZQxOd+1hyYEp++kdtOHDylyBOi0fIPq5Utb+JyzuDHSNQ1beZ5DI+pn0wq6kkV8mdNEaz5bjcsNQcw8IcoKxFS3d5FicipzaqSGzAzYvvSu3UIYeE9/tCduMd237BuuhSPnlO9mMvD6ep0TJ7Z/AYN44QUMHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c0QfTxI9; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="so3kgmeO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A1DBC2BCB0;
-	Sat, 21 Mar 2026 04:12:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774066323;
-	bh=lXet9mn/RNAHfsi2ltnD8G94KFEGqvjdvngfRQ0H8xE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=so3kgmeOeNqPqhjFKKKrVJiXY3XDI150LSByS/ickjQ8CnQMe+SSUL5qSwkyVMzRU
-	 PJUEXz2dRmuc760kR7ocy/pQ6EFKC0THsdgeyzyS3IkmkPo6PL9rPwA4Fkm6vC/CK2
-	 Bz/1K1w8CD7XaK1WfzyxHxwy3TaLUt8nrFCaPwvqk9XJ/FG8TdnTjZtiL+Oip8o01X
-	 7pHs90GBou3BCXaX5p2FeXnitMTKQYcnotFrVQfoz1qHruvXKrIQAiE2434944WG+u
-	 5QwhP+6EtJY3s/d9lMRhkmYUlRtivs2HNyBCMoTFGSHbrNg/It4DtYRyCIhXOBDPc2
-	 z5zrOZ5jm5yBQ==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-riscv@lists.infradead.org,
-	x86@kernel.org,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 12/12] crypto: sm3 - Remove 'struct sm3_state'
-Date: Fri, 20 Mar 2026 21:09:35 -0700
-Message-ID: <20260321040935.410034-13-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260321040935.410034-1-ebiggers@kernel.org>
-References: <20260321040935.410034-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c0QfTxI9"
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-82a646c96bdso1917526b3a.2
+        for <linux-crypto@vger.kernel.org>; Fri, 20 Mar 2026 21:44:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1774068254; x=1774673054; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lxnRdiDpSSBZYjdW0jVsW/gXZ4/lhIs//xte0OaizbU=;
+        b=c0QfTxI94tIOASH3Y7LktIhDFa+kc6mgL5BHBWPnYA6UySZKQMZI2qDgPeaTzDLKBS
+         jlNdh3vn3faLzsveCUXi8VeNw7Kb887a3Nk3byR0xXrp9c4wIzY/tBn0GAWFatsN/ac+
+         iBvWo/Sw8Ga6cc8kkckNzWOcPCuS83tCLhB44wlo79nxrqXpKeMzdiNtsZWO46uB+GMW
+         6qpWP3d/ZI1SSBAx2IQQVD1Nx4otHe6JjpkS4yaR5sUYfbzVjeDIHgjt5JV3GKJWbV9r
+         9rasYw5QWUiXYHGMmY1TvY8F6xsOVr28JUPaLXR6uZb578l9IAWIAnHFGzHDIdC+ZdJU
+         iTLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774068254; x=1774673054;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lxnRdiDpSSBZYjdW0jVsW/gXZ4/lhIs//xte0OaizbU=;
+        b=H16zDjJxxDgPYNI8Ep7xvE//Jd4zxj5SfF/+ZaI7CiBqmasIxV6rU72oOpCxGha+I8
+         0wMiujbABrA3Bolpdj2i64BQnq6SyGjUL8fX1x4B3gRRmxHoW6YW2kWUfu4f9FkxKCUX
+         bkb+OLVnKAM/6SMyAoDYXXxZ29oW4nq/eg2hhWYaQjNYwNnsb2z8Zenvqs1Bqd8+wZln
+         XDAMyKJtQtKJzP3BnqIYPAIRRqYswpGgoca5bG10v5Go3wBa+aCA826zcuP0rV4UuZjo
+         zE5NI9Sx3LA7D4RtMZHmiEMKBmC/+06w52F3G07bqgylN8G7nqKPVtIK65uagnwqAPvg
+         w+HA==
+X-Forwarded-Encrypted: i=1; AJvYcCXUNRz535yWCygpq7+C75J1zPtd/eY7KBrgx71yMFo/MfTf0pk0sSNC5l7ITxvc4Rv2tuFQBx3sR83kzfg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSKc7UnczYyNCv4SFldOTqWA4WHU8DsuAt26X+JzkDgZXLlJmu
+	omQUvBhcZQopPziLbLXYpuvAW/MWijuSmBrLbGnjPwUhK1M9VB9WCW42
+X-Gm-Gg: ATEYQzw+C1UDbrNI9uTOzekhTOhkKMqPYHKU48/JLMdvk+/+Dj1U7DTKsaA579voy7s
+	3pqbr+eX68cM/QkBWqTqei4+5YW9ULkFHjzZWIg+UfxdxzpPla9/6qK0zk+iRW9qq79H4Va7KOc
+	wSy24ATtpa3TFpauGN2fIDt2y8rQyFedwuTfvf36ZdpGhesAvTi1whuiu6kwssuFt7vrCdRU4Ih
+	vk9pSd/IYt1eRwni8AbTA4WGp02Ll6xp78CO2v8WdQlFj7wb03G9+9V/eYCnfklBslMz0xmwiX8
+	vVzrLSVwmqHqTeOKZ4dOCem0dn67HXu/mbz0YwwY8xlIcKithc3bPvSDYaV653x0AhNccV26wHv
+	yNkTgzjbElnfcrPOs6gOt0juPXRSZ69juzVV5vAkGGMRFfmUHXMp+G4k6Qq3gXcMuvpGc7gtcfA
+	wkeyAnZlmaluBqdcSxutpgfzB6+t2Ss4g=
+X-Received: by 2002:a05:6a00:2eaa:b0:829:793f:da6c with SMTP id d2e1a72fcca58-82a8c3003f9mr4384350b3a.39.1774068253994;
+        Fri, 20 Mar 2026 21:44:13 -0700 (PDT)
+Received: from [192.168.0.106] ([103.216.213.160])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82b0410b1bdsm4344941b3a.57.2026.03.20.21.44.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Mar 2026 21:44:13 -0700 (PDT)
+Message-ID: <e89054b1-5549-4fe6-be0b-a55cc5b185ed@gmail.com>
+Date: Sat, 21 Mar 2026 10:14:08 +0530
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Crypto : qat: Replace scnprintf with sysfs_emit function
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, qat-linux@intel.com,
+ linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260320-sysfs-v1-1-91fd5ef42dea@gmail.com>
+ <ab232/oVbFU/+7Pd@gcabiddu-mobl.ger.corp.intel.com>
+Content-Language: en-US
+From: Atharv Dubey <atharvd440@gmail.com>
+In-Reply-To: <ab232/oVbFU/+7Pd@gcabiddu-mobl.ger.corp.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Update one driver that used sizeof(struct sm3_state) to use
-sizeof(struct sm3_ctx) instead.  Then, remove struct sm3_state and
-SM3_STATE_SIZE.
+Sure, I will send a v2 of the patch.
 
-This completes the replacement of struct sm3_state with struct sm3_ctx.
+Regards,
+Atharv
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- drivers/crypto/starfive/jh7110-hash.c | 4 ++--
- include/crypto/sm3.h                  | 7 -------
- 2 files changed, 2 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/crypto/starfive/jh7110-hash.c b/drivers/crypto/starfive/jh7110-hash.c
-index 742038a5201a..008a47baa165 100644
---- a/drivers/crypto/starfive/jh7110-hash.c
-+++ b/drivers/crypto/starfive/jh7110-hash.c
-@@ -793,11 +793,11 @@ static struct ahash_engine_alg algs_sha2_sm3[] = {
- 	.base.import   = starfive_hash_import,
- 	.base.init_tfm = starfive_sm3_init_tfm,
- 	.base.exit_tfm = starfive_hash_exit_tfm,
- 	.base.halg = {
- 		.digestsize = SM3_DIGEST_SIZE,
--		.statesize  = sizeof(struct sm3_state),
-+		.statesize  = sizeof(struct sm3_ctx),
- 		.base = {
- 			.cra_name		= "sm3",
- 			.cra_driver_name	= "sm3-starfive",
- 			.cra_priority		= 200,
- 			.cra_flags		= CRYPTO_ALG_ASYNC |
-@@ -822,11 +822,11 @@ static struct ahash_engine_alg algs_sha2_sm3[] = {
- 	.base.init_tfm = starfive_hmac_sm3_init_tfm,
- 	.base.exit_tfm = starfive_hash_exit_tfm,
- 	.base.setkey	  = starfive_hash_setkey,
- 	.base.halg = {
- 		.digestsize = SM3_DIGEST_SIZE,
--		.statesize  = sizeof(struct sm3_state),
-+		.statesize  = sizeof(struct sm3_ctx),
- 		.base = {
- 			.cra_name		= "hmac(sm3)",
- 			.cra_driver_name	= "sm3-hmac-starfive",
- 			.cra_priority		= 200,
- 			.cra_flags		= CRYPTO_ALG_ASYNC |
-diff --git a/include/crypto/sm3.h b/include/crypto/sm3.h
-index 34d7eb32b7db..371e8a661705 100644
---- a/include/crypto/sm3.h
-+++ b/include/crypto/sm3.h
-@@ -12,27 +12,20 @@
- 
- #include <linux/types.h>
- 
- #define SM3_DIGEST_SIZE	32
- #define SM3_BLOCK_SIZE	64
--#define SM3_STATE_SIZE	40
- 
- #define SM3_IVA		0x7380166f
- #define SM3_IVB		0x4914b2b9
- #define SM3_IVC		0x172442d7
- #define SM3_IVD		0xda8a0600
- #define SM3_IVE		0xa96f30bc
- #define SM3_IVF		0x163138aa
- #define SM3_IVG		0xe38dee4d
- #define SM3_IVH		0xb0fb0e4e
- 
--struct sm3_state {
--	u32 state[SM3_DIGEST_SIZE / 4];
--	u64 count;
--	u8 buffer[SM3_BLOCK_SIZE];
--};
--
- /* State for the SM3 compression function */
- struct sm3_block_state {
- 	u32 h[SM3_DIGEST_SIZE / 4];
- };
- 
--- 
-2.53.0
-
+On 3/21/26 02:40, Giovanni Cabiddu wrote:
+> Thanks.
+>
+> Can you re-submit with the headline below?
+>
+>      crypto: qat - replace scnprintf() with sysfs_emit()
+>
+> On Fri, Mar 20, 2026 at 11:49:28PM +0530, Atharv Dubey wrote:
+>> Replace 3 sysfs functions in the Intel Qat Driver
+>> to use sysfs_emit() instead of scnprintf.
+> nit. scnprintf().
+>> - erros_correctable_show(): Replace scnprint() with sysfs_emit()
+>> - errors_nonfatal_show(): Replace scnprint() with sysfs_emit()
+>> - errors_fatal_show(): Replace scnprint() with sysfs_emit()
+>>
+>> This change is in accordance with Documentation/filesystems/sysfs.rst,
+>> which recommends using sysfs_emit/sysfs_emit_at in all sysfs show()
+>> callbacks for buffer safety, clarity, and consistency.
+>>
+>> Signed-off-by: Atharv Dubey <atharvd440@gmail.com>
+>> ---
+>>   drivers/crypto/intel/qat/qat_common/adf_sysfs_ras_counters.c | 6 +++---
+>>   1 file changed, 3 insertions(+), 3 deletions(-)
+> Apart from the commit message, it looks fine.
+>
+> Thanks,
+>
