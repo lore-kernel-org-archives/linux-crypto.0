@@ -1,180 +1,226 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 728A839C010
-	for <linux-crypto@vger.kernel.org>; Mon, 23 Mar 2026 12:27:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBAD93AC0CD
+	for <linux-crypto@vger.kernel.org>; Mon, 23 Mar 2026 13:37:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774268870; cv=none; b=mbJaYDMu+wdPHHYZHGzd3QOmI7NsaHB+pRmVhjHvrMXPOBLuj2YX2Po6pO/RNZ8DxuCZZDr9hOc2o5tMAsygF9lmdH2RbiHpT9LG2Jl31TwNm5IPfDXo9kj28CBvz1OxN3okJ5d09waF0OJRWnBHFHedfYBgLkETHA16QxX77BQ=
+	t=1774273033; cv=none; b=hC/U/XufjBpM2kWDLgOzlAEJblMbgEEdF1wF8Hw6FuhGjA9c88CdTgF2tSkVjjqDlNn5IiePSoodP1WGXf/nQ9jiY++JM5USwjuDSWgi4kr0dxQAtb5aX6rs0yPBpeyGFBCa+OWfHkt1bWzExmEX2067+iFG4FKymi/jVgDjYPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774268870; c=relaxed/simple;
-	bh=WugqA9yyDrviBAh0oWni+13P4SXt1aezRSrY3nIa230=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=k45zMQXepJCxNF6HnUE4FcCsySIGWN17EPFdrqlCEG8L3dEWLGQCnXjSNT9ffkK0unD4MWgCPvFhz5ekrA6x5vBDcR1gpUXHnY92oPOPUug7drKCI9KuXqit+B9Ks/G2IxQWyFB0MicyCWy5vWmKM9hVJxf/oGATsHGhJ1lS/x0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=oqyXUA+e; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=gv4iBN1M; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1774273033; c=relaxed/simple;
+	bh=bv/SaUq1HdOMFnRKapZs5n44wqZCvMp+Q5Yg1ZUqQT4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qvziRVPw3FvYPgm+d8r5HbfR7wDAjopqjrXBjuaH4uqbsnb/o0Dmg5UvCcjKZvQz+3qYpnib6O3vzGWnslCiULXROT3XvFwuLKWv1NkMaqhr8Hyo0rglshUXRI1NXeHT1wvryaIYUR8U55oxduMtt6qpvVTGOJzNCzjXbnnRFA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m7zrVHz8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="oqyXUA+e";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="gv4iBN1M"
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62N7tdwH1627218
-	for <linux-crypto@vger.kernel.org>; Mon, 23 Mar 2026 12:27:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	n5X6SCCrZlhH0x7gW7E0uH0Hbsvi0PHB4OLS3xzpkYs=; b=oqyXUA+eQddQwFEZ
-	F06Q3nB093RH9ixHXHtfqBcpobMOMhWInd0ug2SJgr2WdTffxYbLKocnlvPt+qqL
-	mNu2Mm4Fkzk22fqpgQxZklSdL1KIJ5yk99mRutwwC0zHxilhEMM7jO+XQ6PRIO/W
-	4zZWydokO2GgcM2AjTGfI9hOVlYzxIk/NPWO2RQGA4jUVzaKut61KI6MQmrJ4pdi
-	pAC2bk9rTQpCczMvoFAYXnqEUljesYw0jROycVtyX8kV4cihuSs0ts0IdJFylRTz
-	eVJaqDMkapL6y9mDf13idd+rK127kAPZ47i9IIFnjnQEqjbQr0heyMxYVKbc62sp
-	/yRX1w==
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com [209.85.160.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4d31jc0x8m-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Mon, 23 Mar 2026 12:27:48 +0000 (GMT)
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-50b317c4041so27437371cf.1
-        for <linux-crypto@vger.kernel.org>; Mon, 23 Mar 2026 05:27:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1774268868; x=1774873668; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=n5X6SCCrZlhH0x7gW7E0uH0Hbsvi0PHB4OLS3xzpkYs=;
-        b=gv4iBN1MkLTbWsF2zkwndOfI3gUimIU2fcANH1tCWfk1hcrOUjMMSoceExlyfcdlAx
-         myuDaW7W8jMdsqPwkTatvhQvE98njKjziUVlLRZ1G4utQTmLHfxv8M+rb9QhGB3SNy4f
-         Cgex3CF2XX3rZsTM+1MIg1Ol9cwSZYp7ZJrkAlh1QLWndiTXJt28hGI0qfCl+BwP8/XI
-         dky3zP/hjHTLiTaYBOvl6A6YXNNnTEPJbUVOWKJWzPcotPOrX58U2edQGQzBGw/QwlOq
-         IWejv+ihZtzzeGxJaC3GMPeJwW4DC+v5LTG3LZiScJeS66sYQQz/dbJtlvHlX2+akVso
-         xTog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774268868; x=1774873668;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=n5X6SCCrZlhH0x7gW7E0uH0Hbsvi0PHB4OLS3xzpkYs=;
-        b=GJ9Ql/zLLlto9ONCziDvNB2ptHvtbZjXCHBgSzAmZaLCsySqN+g1+z6pLUUlvN4Izw
-         epfZQvsBf2Cp2ht1c82lBPYTU0+LMNeuDcdn9b1vaW6db9/5ahCKB7rulDMrHDqveQVE
-         Wg2hzofTsGrYC+K79/x9TRyXHXeUnPKmw8tfXoxmhB3lPucrMA9lPcZ+UyvJSdkJuF6u
-         m6IOBcesNDJvI++7KMhNbhBl/U4skavbEUr7P/LlH0OWcXf2WWHnbiViD5DGUU/5MU3s
-         0FvY9HtCUa+yvJdg0Z76ENudVFPu6ONb2HKRBirlJjKlnmXCJoSqv0NuIg9EEgFNmT7Y
-         w6lw==
-X-Forwarded-Encrypted: i=1; AJvYcCUT6dswtNv1cgO+mzqWF5lYECGGm2tUhUEcPmZC9Hf4aftOHkv3etE11mYsKjGTvt+TovySkBkU8VeJua8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyHlDXB5m6Uc+MWdzp6H9nTciOxwJtMCFOeXIx7+LSalxvS4Nr+
-	wUoFTV/oAhpnMbczd94Z6LPiSZ52pCOdahI2scSjFGqq4/+CYyVFNCS50Qj/+YW85kaTRFeE+Ll
-	V7VB3bgkBAe/um6tt/HXCyQWFz46c0DfnfviRsO7SIV5Mz6TGuprl+EsQZl1aRB+8tms=
-X-Gm-Gg: ATEYQzyE3xVWl/8eI81CGfQ8xnvMJ24TtuyWdsYGMPVpmQ9uzilOccFrkGA/mtY+bZ3
-	IXxIRDGPoQ6h4PPi7fHDN6II0Setf4z0l6S+8qPMT0N+UuIQJukIJ6fV1Fw5TTyUy7wxsKBCMam
-	qZ11A9VGXjojw1AN4YJrAfSwlbU+sd2P476BfBaIYFnqCOWJPHQ3jlBupH05lnIqHnKR3GQoGGY
-	vFZP3enpO7otToNjCbuhh1fLdgRmTx2G4wJjqEeVWtd8gEHF60Lv/yNe4arB9+d5ZQOsn2BPXw8
-	gREakJSwcUY+U9aOHZrKybiSM+BTA8DNSZXi4LxHvDlix1TBj9wTZK00TAM5b5oFAxo1ud+HfLp
-	HbFp89o28+SA9o+kDb27i03AugXB20CPnWKdd84Yac4YMBLXWX9FOJyYhy/DsMKSVXJ2g4ESIfW
-	Bg1/4=
-X-Received: by 2002:a05:622a:1992:b0:509:d76:fe73 with SMTP id d75a77b69052e-50b373d748amr144814951cf.3.1774268867888;
-        Mon, 23 Mar 2026 05:27:47 -0700 (PDT)
-X-Received: by 2002:a05:622a:1992:b0:509:d76:fe73 with SMTP id d75a77b69052e-50b373d748amr144814541cf.3.1774268867450;
-        Mon, 23 Mar 2026 05:27:47 -0700 (PDT)
-Received: from [192.168.119.254] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b983398c16esm487370966b.61.2026.03.23.05.27.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Mar 2026 05:27:46 -0700 (PDT)
-Message-ID: <632d2e2d-82c1-4e4f-b477-96c5e75767bd@oss.qualcomm.com>
-Date: Mon, 23 Mar 2026 13:27:41 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m7zrVHz8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD7C5C4CEF7
+	for <linux-crypto@vger.kernel.org>; Mon, 23 Mar 2026 13:37:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774273032;
+	bh=bv/SaUq1HdOMFnRKapZs5n44wqZCvMp+Q5Yg1ZUqQT4=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=m7zrVHz8jG70gOBJcuvGd9dQDhChoJnZeciGZMEwB53wUhOugKsxbQdtTrzaMLE3K
+	 woO/Y0CCFVTtdfxh7PBN0MdrIo/XxqM+d1R6o95whzgIxItgVy1RiPKVlCgpnSYUJn
+	 3rC/v/c6EyhgWN07TN5XFfJM0fHtI7fIJ6Ax7QK1CyvhBX6dJJqIycyep4Lr0vs/3K
+	 5vf/eoZ90MF5eg1u1jFqhozl0yY8btTvkEWzPUtTccVnHiwkQN12MKkhvfz1G0OJkN
+	 LEn9AaxmO+cngxDe3AgvKNSpPpZyP6KFlH3OLBIfRGoQYTmaZiRBHIvCCB3vbuQo1K
+	 xrIdkAq1a9mqg==
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5a13f6bcbf4so182562e87.1
+        for <linux-crypto@vger.kernel.org>; Mon, 23 Mar 2026 06:37:12 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVuQ+nza+diVBaPVLLh5SDp+3XUWR41ECf1nqwLQF1GlFlYsjAzuNBG0821AjgB18DnmQRV3h+dU48HSOs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5DZjQi5apTwg7EUBgVT+3I9loPY62X4Mo6iTOI5a8YgJ/qCfA
+	PBaJi/DSpHIEHsWSTZaCWIMhcTTUgQ3uM8Todw3buxqD9PewSfz2zyRFi+IvrJ5zKyckq9rCojg
+	68/PIeKxqDkfNxqeMpxznEtWaywuEWtPx/w4hrVYk4Q==
+X-Received: by 2002:a05:6512:10d3:b0:5a1:7458:c17e with SMTP id
+ 2adb3069b0e04-5a285b55dd3mr3848196e87.37.1774273031248; Mon, 23 Mar 2026
+ 06:37:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 02/11] soc: qcom: ice: Allow explicit votes on 'iface'
- clock for ICE
-To: Harshal Dev <harshal.dev@oss.qualcomm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
- <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Abel Vesa <abel.vesa@oss.qualcomm.com>,
-        Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>,
-        cros-qcom-dts-watchers@chromium.org,
-        Eric Biggers <ebiggers@google.com>,
-        Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
-        Jingyi Wang <jingyi.wang@oss.qualcomm.com>,
-        Tengfei Fan <tengfei.fan@oss.qualcomm.com>,
-        Bartosz Golaszewski <brgl@kernel.org>,
-        David Wronek <davidwronek@gmail.com>,
-        Luca Weiss <luca.weiss@fairphone.com>,
-        Neil Armstrong <neil.armstrong@linaro.org>,
-        Melody Olvera <quic_molvera@quicinc.com>,
-        Alexander Koskovich <akoskovich@pm.me>
-Cc: Brian Masney <bmasney@redhat.com>,
-        Neeraj Soni <neeraj.soni@oss.qualcomm.com>,
-        Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
-References: <20260323-qcom_ice_power_and_clk_vote-v4-0-e36044bbdfe9@oss.qualcomm.com>
- <20260323-qcom_ice_power_and_clk_vote-v4-2-e36044bbdfe9@oss.qualcomm.com>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <20260323-qcom_ice_power_and_clk_vote-v4-2-e36044bbdfe9@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Authority-Analysis: v=2.4 cv=fKc0HJae c=1 sm=1 tr=0 ts=69c131c4 cx=c_pps
- a=WeENfcodrlLV9YRTxbY/uA==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
- a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yOCtJkima9RkubShWh1s:22
- a=EUspDBNiAAAA:8 a=SBCaeXWvHhY2KLIX7PwA:9 a=QEXdDO2ut3YA:10 a=zZCYzV9kfG8A:10
- a=kacYvNCVWA4VmyqE58fU:22
-X-Proofpoint-GUID: 0JGdWPWtagJhcveLe83P7lOjJMDDeWBz
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzIzMDA5NiBTYWx0ZWRfX+za7hq2O/W1X
- wd11VusW39x6RVRbDaLc7pkRNCjGZFQFRSdswb6IZ8dG56RjN1+Un+D1eq3xaFW5Y/lot9EJZ7N
- 6FbWoa22hyzm0ypk/u2v31rJCMBGBMt/mpM6EJ7623+tu2/PYMhT0FpHVgwASwTxn0cZaMWw/NN
- b9NNSdAZq7/8izC21qv/yvctD42LKsxGxkrlNn5Z0Rmg8EOq02B9of8+uT0LFou2fLEO1alnR/h
- 5gG6ZEEmcngv/XB2MfJ3uFIhGMFy8/qbkXPYjl3MS0ZbmhEqI4ygev7pPBLk1/5dlH2FruYxNcS
- aIroY/y5dVGKDV1V+S+ix+SA4QACTxqw0uCGKEhtGVpQniwu7wwAnrD5rJRzYUSUnGpcsZ0WDaq
- gXT4hCxZT9XEcN2vpOVHccwZgnkwThYeiZ2KEe/adHVwvSngBnzwCcW1631vuCmQGcmbAvM5q4N
- QlYvH7IiuK0WgbDleNQ==
-X-Proofpoint-ORIG-GUID: 0JGdWPWtagJhcveLe83P7lOjJMDDeWBz
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-03-23_03,2026-03-20_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 priorityscore=1501 phishscore=0 lowpriorityscore=0
- adultscore=0 bulkscore=0 spamscore=0 suspectscore=0 malwarescore=0
- clxscore=1015 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2603050001
- definitions=main-2603230096
+References: <20260317-qcom-qce-cmd-descr-v13-0-0968eb4f8c40@oss.qualcomm.com>
+ <20260317-qcom-qce-cmd-descr-v13-5-0968eb4f8c40@oss.qualcomm.com> <hohx2judes5c6na4svpah254hqbaf4kbeyu7prwkprfv5dy7hj@26nxwlvb76yp>
+In-Reply-To: <hohx2judes5c6na4svpah254hqbaf4kbeyu7prwkprfv5dy7hj@26nxwlvb76yp>
+From: Bartosz Golaszewski <brgl@kernel.org>
+Date: Mon, 23 Mar 2026 14:36:59 +0100
+X-Gmail-Original-Message-ID: <CAMRc=McostnmVjE=uV=2KA7-dqLvQ2BAJYTXzANacFpPGgS+Sw@mail.gmail.com>
+X-Gm-Features: AaiRm52smHlzaZX3o3c7rJCXBkH0quFZvqCL-0liNookxclyfizWuRA5g5cCXoU
+Message-ID: <CAMRc=McostnmVjE=uV=2KA7-dqLvQ2BAJYTXzANacFpPGgS+Sw@mail.gmail.com>
+Subject: Re: [PATCH v13 05/12] dmaengine: qcom: bam_dma: add support for BAM locking
+To: Manivannan Sadhasivam <mani@kernel.org>
+Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, Vinod Koul <vkoul@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Thara Gopinath <thara.gopinath@gmail.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Udit Tiwari <quic_utiwari@quicinc.com>, Md Sadre Alam <mdalam@qti.qualcomm.com>, 
+	Dmitry Baryshkov <lumag@kernel.org>, Stephan Gerhold <stephan.gerhold@linaro.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Peter Ujfalusi <peter.ujfalusi@gmail.com>, 
+	Michal Simek <michal.simek@amd.com>, Frank Li <Frank.Li@kernel.org>, dmaengine@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 3/23/26 10:17 AM, Harshal Dev wrote:
-> Since Qualcomm inline-crypto engine (ICE) is now a dedicated driver
-> de-coupled from the QCOM UFS driver, it explicitly votes for its required
-> clocks during probe. For scenarios where the 'clk_ignore_unused' flag is
-> not passed on the kernel command line, to avoid potential unclocked ICE
-> hardware register access during probe the ICE driver should additionally
-> vote on the 'iface' clock.
-> Also update the suspend and resume callbacks to handle un-voting and voting
-> on the 'iface' clock.
-> 
-> Fixes: 2afbf43a4aec6 ("soc: qcom: Make the Qualcomm UFS/SDCC ICE a dedicated driver")
-> Signed-off-by: Harshal Dev <harshal.dev@oss.qualcomm.com>
-> ---
+On Mon, Mar 23, 2026 at 10:35=E2=80=AFAM Manivannan Sadhasivam <mani@kernel=
+.org> wrote:
+>
+> On Tue, Mar 17, 2026 at 03:02:12PM +0100, Bartosz Golaszewski wrote:
+> > Add support for BAM pipe locking. To that end: when starting DMA on an =
+RX
+> > channel - prepend the existing queue of issued descriptors with an
+> > additional "dummy" command descriptor with the LOCK bit set. Once the
+> > transaction is done (no more issued descriptors), issue one more dummy
+> > descriptor with the UNLOCK bit.
+>
+> I've left some comments in v12, but looks like you've missed them.
 
-[...]
+Sorry for that, as I explained in private, this email did not end up
+in my inbox and I didn't see it on lore.
 
+> >
+> > +static int bam_metadata_attach(struct dma_async_tx_descriptor *desc, v=
+oid *data, size_t len)
+> > +{
+> > +     struct bam_chan *bchan =3D to_bam_chan(desc->chan);
+> > +     const struct bam_device_data *bdata =3D bchan->bdev->dev_data;
+> > +     struct bam_desc_metadata *metadata =3D data;
+> > +
+> > +     if (!data)
+> > +             return -EINVAL;
+> > +
+> > +     if (!bdata->pipe_lock_supported)
+> > +             return -EOPNOTSUPP;
+>
+> As mentioned in v12, you should return 0 to avoid erroring out the client=
+s if
+> pipe lock is not supported.
+>
 
-> +	if (!engine->core_clk)
-> +		engine->core_clk = devm_clk_get_optional_enabled(dev, "core");
+If the client attaches the scratchpad register then it probably does
+want to use locking, right? On the other hand, I assume you're
+thinking about a situation where the client wants locking but BAM does
+not support it. It's unlikely but ok, I'll change it.
 
-This change is a little sneaky given the commit message but I don't mind
+> >
+> > +static struct bam_async_desc *
+> > +bam_make_lock_desc(struct bam_chan *bchan, struct scatterlist *sg,
+> > +                struct bam_cmd_element *ce, unsigned long flag)
+> > +{
+> > +     struct dma_chan *chan =3D &bchan->vc.chan;
+> > +     struct bam_async_desc *async_desc;
+> > +     struct bam_desc_hw *desc;
+> > +     struct virt_dma_desc *vd;
+> > +     struct virt_dma_chan *vc;
+> > +     unsigned int mapped;
+> > +     dma_cookie_t cookie;
+> > +     int ret;
+> > +
+> > +     sg_init_table(sg, 1);
+> > +
+> > +     async_desc =3D kzalloc_flex(*async_desc, desc, 1, GFP_NOWAIT);
+> > +     if (!async_desc) {
+> > +             dev_err(bchan->bdev->dev, "failed to allocate the BAM loc=
+k descriptor\n");
+> > +             return NULL;
+> > +     }
+> > +
+> > +     async_desc->num_desc =3D 1;
+> > +     async_desc->curr_desc =3D async_desc->desc;
+> > +     async_desc->dir =3D DMA_MEM_TO_DEV;
+> > +
+> > +     desc =3D async_desc->desc;
+> > +
+> > +     bam_prep_ce_le32(ce, bchan->scratchpad_addr, BAM_WRITE_COMMAND, 0=
+);
+> > +     sg_set_buf(sg, ce, sizeof(*ce));
+> > +
+> > +     mapped =3D dma_map_sg_attrs(chan->slave, sg, 1, DMA_TO_DEVICE, DM=
+A_PREP_CMD);
+> > +     if (!mapped) {
+> > +             kfree(async_desc);
+> > +             return NULL;
+> > +     }
+> > +
+> > +     desc->flags |=3D cpu_to_le16(DESC_FLAG_CMD | flag);
+> > +     desc->addr =3D sg_dma_address(sg);
+> > +     desc->size =3D sizeof(struct bam_cmd_element);
+> > +
+> > +     vc =3D &bchan->vc;
+> > +     vd =3D &async_desc->vd;
+> > +
+> > +     dma_async_tx_descriptor_init(&vd->tx, &vc->chan);
+> > +     vd->tx.flags =3D DMA_PREP_CMD;
+> > +     vd->tx.desc_free =3D vchan_tx_desc_free;
+> > +     vd->tx_result.result =3D DMA_TRANS_NOERROR;
+> > +     vd->tx_result.residue =3D 0;
+> > +
+> > +     cookie =3D dma_cookie_assign(&vd->tx);
+> > +     ret =3D dma_submit_error(cookie);
+> > +     if (ret)
+> > +             return NULL;
+>
+> You are leaking async_desc here.
+>
 
-Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+Yeah, not only that but also should unmap the sg here too. Thanks.
 
-Konrad
+> > +
+> > +     return async_desc;
+> > +}
+> > +
+> > +static int bam_do_setup_pipe_lock(struct bam_chan *bchan, bool lock)
+> > +{
+> > +     struct bam_device *bdev =3D bchan->bdev;
+> > +     const struct bam_device_data *bdata =3D bdev->dev_data;
+> > +     struct bam_async_desc *lock_desc;
+> > +     struct bam_cmd_element *ce;
+> > +     struct scatterlist *sgl;
+> > +     unsigned long flag;
+> > +
+> > +     lockdep_assert_held(&bchan->vc.lock);
+> > +
+> > +     if (!bdata->pipe_lock_supported || !bchan->scratchpad_addr ||
+> > +         bchan->slave.direction !=3D DMA_MEM_TO_DEV)
+> > +             return 0;
+> > +
+> > +     if (lock) {
+> > +             sgl =3D &bchan->lock_sg;
+> > +             ce =3D &bchan->lock_ce;
+> > +             flag =3D DESC_FLAG_LOCK;
+> > +     } else {
+> > +             sgl =3D &bchan->unlock_sg;
+> > +             ce =3D &bchan->unlock_ce;
+> > +             flag =3D DESC_FLAG_UNLOCK;
+> > +     }
+> > +
+> > +     lock_desc =3D bam_make_lock_desc(bchan, sgl, ce, flag);
+> > +     if (!lock_desc)
+> > +             return -ENOMEM;
+> > +
+> > +     if (lock)
+> > +             list_add(&lock_desc->vd.node, &bchan->vc.desc_issued);
+> > +     else
+> > +             list_add_tail(&lock_desc->vd.node, &bchan->vc.desc_issued=
+);
+> > +
+> > +     bchan->locked =3D lock;
+>
+> What is this flag for?
+>
+
+Just a leftover. I'll drop it, thanks.
+
+> >
+> > +struct bam_desc_metadata {
+> > +     phys_addr_t scratchpad_addr;
+>
+> I think it'd be worth adding a comment for this.
+>
+
+Will do.
+
+Bart
