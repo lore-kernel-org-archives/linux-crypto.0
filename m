@@ -1,83 +1,120 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CC263A5E85;
-	Mon, 23 Mar 2026 18:19:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BA1F1B86C7;
+	Mon, 23 Mar 2026 18:20:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774289994; cv=none; b=r7wdSc8Ujoo23BYkvC0YnzB9sDYG3D+EZLDrI1opHa8besa5KknQFlWPD2YflLTm0z752hcbCT6jtT0/n7UrZIhphW3TJge3fTHnoRdYY1DH5NqZ5zga/8DOegG+3C/f1bqyL0EbGEcRUFZjUwYwNK21fS+jXvLys6hN8F0/lKk=
+	t=1774290045; cv=none; b=oHfhgInYavSsXFls58bW3nH6Varyhy+75LfUQcOg5/0VuzDiHk7s1vMLIVGDrY5OjUjAEsnPnSTaKfr9vwqm94Xkkpf3s4molWgS+I/VCdT49V8pkz6ouprGVI/CUyoeoAQdAiVBpX9a4rmVZclVs51JygaDOJ/8E15qAhDRWRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774289994; c=relaxed/simple;
-	bh=4wxpOyklf0R2XiN92izrinwc+Y/UCGsNqfcUGq1tncg=;
+	s=arc-20240116; t=1774290045; c=relaxed/simple;
+	bh=9vpkkBfXRkLZrtOLMsxA44Brq1gUhkeUk+l1ZYdlBlk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C0CFUoR2cUzNWWctKu2bPIFU373PIVQVRGf6yIcVOrhAXuLe9ZQ15ketZSVoeLDbmausmNvE40g7z10PIn1EewVOaobEqlT6hdB4dveniuOZn4XoKgOxuzsMhTwJBXv+iFs1C3rceCsd1NFO3fE1UdRePeDHU9m35pEKvkUBj/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ULYcJxMC; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=jGIiouNba2mqFp3kIrQoWju8G5yR2HBSmx32g2nnd/nqe6IMIofKH5wyxUHbatohxpuAJF3T5JSlBW+nIDT4GE1GoE0tMAwVJ2Zcr2kzIZA81jcCgG3CrOfkpO0LPUJoKi014Aa+2TDIDS3PhlkAgMunP3fMJNzw4myQef1Vjos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rmz/4IvE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ULYcJxMC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86E33C4CEF7;
-	Mon, 23 Mar 2026 18:19:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rmz/4IvE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1972EC4CEF7;
+	Mon, 23 Mar 2026 18:20:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774289993;
-	bh=4wxpOyklf0R2XiN92izrinwc+Y/UCGsNqfcUGq1tncg=;
+	s=k20201202; t=1774290044;
+	bh=9vpkkBfXRkLZrtOLMsxA44Brq1gUhkeUk+l1ZYdlBlk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ULYcJxMCOlOX5abYtvkiGFmJayVoEANH6C7eC/b+GMzZ2bG1Xbucw702ICEeu55CU
-	 8lmmV/O5RY3YZMoCaQIZQ161Y+/DpK9AhczzLukFop+2s//UMgHJeG6T6M1Dlwakt4
-	 Xh8mKWbyqDDidZjrOuOgcP6zh1sFppJLbA6+7hBuyolChvLgbJFqJI+Iq+aByMYn4X
-	 0UGTN59LIuaCBGh5NDLjR0eRXn3BsGQMYFK3qXj6Ufq3gwHGoqdQLFpeXyVAwNUxPK
-	 imz3b7WDEuIo+Be4f/JVxqfmfhHb7mN6YpXmgAsaWSEbXBoruzpiozD31VTddxk406
-	 WD10xpxfegk9Q==
-Date: Mon, 23 Mar 2026 08:19:52 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Chuck Lever <cel@kernel.org>
-Cc: Breno Leitao <leitao@debian.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org, puranjay@kernel.org,
-	linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	Michael van der Westhuizen <rmikey@meta.com>, kernel-team@meta.com,
-	Chuck Lever <chuck.lever@oracle.com>
-Subject: Re: [PATCH v2 0/5] workqueue: Introduce a sharded cache affinity
- scope
-Message-ID: <acGESIKl0Aqa318l@slm.duckdns.org>
-References: <20260320-workqueue_sharded-v2-0-8372930931af@debian.org>
- <04af531d-d8a3-4fbb-993d-e1da2df62a03@app.fastmail.com>
- <acFVEr7iVnU_70yh@gmail.com>
- <f2f7fff3-2f6a-4ebb-aa5e-33188be4dd9a@kernel.org>
- <acFmcCcbPfznH_it@gmail.com>
- <53a8bc40-f22a-4447-a233-1cf88f837bbf@kernel.org>
+	b=Rmz/4IvEYdHKDOlM+Phbfig880vMCGnk9Td0EE+6xaEYHFuSWbIB2N8q/S89OlyPh
+	 y9Oj+n9qIf2rHm2RVNTPfDuFgSqgF8+9A9zsvR/wF6fN44nr2LdM3ZOCcv08Ikztb6
+	 FoItttsING5a0NUSYgz57GxYgdIbm1S0tVfcoJMgrP32N/YTemMXky4obCCHzODVlt
+	 j+2W5jfVu6t8b6Heh1WobGuUBl0kH7Q7gF2WO00anVa9rVS3rzMtHgsgImmSbQgsGL
+	 dRgGBNFaqFrXVtlLIsVUEDbzzmlsEVtzzLRT5gS3bAe8R1Coe3DTnfjIihhVlTWWYM
+	 +iBfMAYnX5ifw==
+Date: Mon, 23 Mar 2026 11:20:42 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Nathaniel Roach <nroach44@nroach44.id.au>
+Cc: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+	Andreas Larsson <andreas@gaisler.com>,
+	"David S. Miller" <davem@davemloft.net>, sparclinux@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: Re: Does the SPARC optimized crypto and CRC code actually work?
+Message-ID: <20260323182042.GA2205@quark>
+References: <20260316204211.GA2661@quark>
+ <ca9ba2ec-849c-4f86-8ac9-274ac4b5f885@nroach44.id.au>
+ <20260317034539.GA2705965@google.com>
+ <76ed4ac4c86341c5c9168aeee8cd53566e018001.camel@physik.fu-berlin.de>
+ <29665ec3-5052-4cdd-8eb9-e6c91092de79@nroach44.id.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <53a8bc40-f22a-4447-a233-1cf88f837bbf@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <29665ec3-5052-4cdd-8eb9-e6c91092de79@nroach44.id.au>
 
-Hello,
-
-On Mon, Mar 23, 2026 at 02:04:57PM -0400, Chuck Lever wrote:
-> > I don't see why the cores-per-shard approach wouldn't scale down
-> > effectively.
+On Mon, Mar 23, 2026 at 06:36:52PM +0800, Nathaniel Roach wrote:
+> On 17/3/26 15:16, John Paul Adrian Glaubitz wrote:
+> > Hi Eric,
+> > 
+> > On Tue, 2026-03-17 at 03:45 +0000, Eric Biggers wrote:
+> > > On Tue, Mar 17, 2026 at 10:48:52AM +0800, Nathaniel Roach wrote:
+> > > > I've been testing some of the PCI changes that have come through on my T5-2.
+> > > > I'll happily add some tests for the crypto functions, I've just got no idea
+> > > > how to do so.
+> > > Well, try enabling all KUnit tests in lib/crc/ and lib/crypto/, as well
+> > > as CONFIG_CRYPTO_SELFTESTS=y and CONFIG_CRYPTO_SELFTESTS_FULL=y.
+> > > 
+> > > However, will this be a regular testing run, or only a one-off run?  If
+> > > it will only be one-off, we'll quickly be back to where we started.
+> > > 
+> > > We need regular testing on either hardware or QEMU.
+> > If Nathaniel can test the code from time to time for the time being, we should
+> > already get some coverage. In the near future, we could certainly set up a CI
+> > job if you let me know what infrastructure to use for it.
+> > 
+> > Please keep in mind that a lot of us are doing this as volunteers and we don't
+> > always have the possibilities to respond to such requests within a short time.
+> > 
+> > Feel free to use the sparclinux issue tracker if you want to file any requests:
+> > 
+> > https://github.com/sparclinux/issues/issues
+> > 
+> > Adrian
+> I enabled the below options, based on what I could find, in my test config:
 > 
-> Sharding the UNBOUND pool is fine. But with a fixed cores-per-shard
-> ratio of 8, it doesn't scale down to smaller systems.
+> CONFIG_CRYPTO_SELFTESTS=y
+> CONFIG_CRYPTO_SELFTESTS_FULL=y
+> CONFIG_CRYPTO_ARIA,BLOWFISH,CAMELLIA,CAST5,CAST6,DES,FCRYPT,SERPENT,
+>   SM4_GENERIC,TWOFISH,CTR=m
+> CONFIG_CRC_KUNIT_TEST=m
+> CONFIG_CRC_BENCHMARK=y
+> CONFIG_CRYPTO_LIB_BENCHMARK=y
+> CONFIG_DEBUG_MEMORY_INIT=y
+> CONFIG_KUNIT=m
 
-You aren't making a lot of sense. Contention is primarily the function of
-the number of CPUs competing, not inverse of how many cores are in the LLC.
+I recommend using the latest linux-next, to get the latest KUnit-related
+kconfig updates, and using the following on top of sparc64_defconfig:
 
-> A shard size of 2 clearly won't scale properly to hundreds of cores. A
-> varying default cores-per-shard ratio would help scaling in both
-> directions, without having to manually tune.
+(
+    cat lib/{crc,crypto}/.kunitconfig
+    echo CONFIG_EXPERT=y
+    echo CONFIG_CRYPTO=y
+    echo CONFIG_CRYPTO_SELFTESTS=y
+    echo CONFIG_CRYPTO_SELFTESTS_FULL=y
+    echo CONFIG_CRYPTO_DES_SPARC64=y
+    echo CONFIG_CRYPTO_AES_SPARC64=y
+    echo CONFIG_CRYPTO_CAMELLIA_SPARC64=y
+    echo CONFIG_CRYPTO_AES=y
+    echo CONFIG_CRYPTO_DES=y
+    echo CONFIG_CRYPTO_CAMELLIA=y
+    echo CONFIG_CRYPTO_ECB=y
+    echo CONFIG_CRYPTO_CBC=y
+    echo CONFIG_CRYPTO_CTR=y
+) >> .config
 
-If your workload is bottlenecked on pool lock on small machines, the right
-course of action is either making the offending workqueue per-cpu or
-configure the unbound workqueue for that specific use case. That's why it's
-progrmatically configurable in the first place.
+Note: most of the complexity here is to fully enable the traditional
+crypto self-tests to cover arch/sparc/crypto/.  The plan is to finish
+migrating those into lib/crypto/, in which case that code will become
+covered by the lib/crypto/ tests and only the kunitconfigs would be
+needed.  But for now, the traditional tests are still needed too.
 
-Thanks.
-
--- 
-tejun
+- Eric
