@@ -1,120 +1,138 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BA1F1B86C7;
-	Mon, 23 Mar 2026 18:20:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B335537CD55
+	for <linux-crypto@vger.kernel.org>; Mon, 23 Mar 2026 21:28:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774290045; cv=none; b=oHfhgInYavSsXFls58bW3nH6Varyhy+75LfUQcOg5/0VuzDiHk7s1vMLIVGDrY5OjUjAEsnPnSTaKfr9vwqm94Xkkpf3s4molWgS+I/VCdT49V8pkz6ouprGVI/CUyoeoAQdAiVBpX9a4rmVZclVs51JygaDOJ/8E15qAhDRWRQ=
+	t=1774301289; cv=none; b=Se+Izn3wYKOxGCC33MY2TFHDM7ne0Zz6sIQ1RH3WAwxvVCKnCPtDYrER9abKiNblz7LKF1aJVtlMI7c5Ea883thsm/+rOuud+Z3aji/17gz4mtiSMwiwKNovn0UiZ9vLq0EBC/C724BpXAijiA6O5QCBNfXkCo6/5U87plZNMcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774290045; c=relaxed/simple;
-	bh=9vpkkBfXRkLZrtOLMsxA44Brq1gUhkeUk+l1ZYdlBlk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jGIiouNba2mqFp3kIrQoWju8G5yR2HBSmx32g2nnd/nqe6IMIofKH5wyxUHbatohxpuAJF3T5JSlBW+nIDT4GE1GoE0tMAwVJ2Zcr2kzIZA81jcCgG3CrOfkpO0LPUJoKi014Aa+2TDIDS3PhlkAgMunP3fMJNzw4myQef1Vjos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rmz/4IvE; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774301289; c=relaxed/simple;
+	bh=o4H6Hut+h0tHrw3UiVjbV/T7sznmvIec7t4P4KjX4c4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Gvuf5JJKqYL3FRAup+TPDajb0cluTNWEcRoQsJXQB9v8XAA0pX/+pOV2O9tVohAJNFbzKU3iQ/FosI6F00nAnN37XFcCdWowiepIvP7XO1iTvsiWSkUZnVsIg/vvPTbjXKBh/Yj/PvMrvawdX7e4TuayQVO7MRzZsfvve1MoMbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ilavk4T0; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rmz/4IvE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1972EC4CEF7;
-	Mon, 23 Mar 2026 18:20:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774290044;
-	bh=9vpkkBfXRkLZrtOLMsxA44Brq1gUhkeUk+l1ZYdlBlk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Rmz/4IvEYdHKDOlM+Phbfig880vMCGnk9Td0EE+6xaEYHFuSWbIB2N8q/S89OlyPh
-	 y9Oj+n9qIf2rHm2RVNTPfDuFgSqgF8+9A9zsvR/wF6fN44nr2LdM3ZOCcv08Ikztb6
-	 FoItttsING5a0NUSYgz57GxYgdIbm1S0tVfcoJMgrP32N/YTemMXky4obCCHzODVlt
-	 j+2W5jfVu6t8b6Heh1WobGuUBl0kH7Q7gF2WO00anVa9rVS3rzMtHgsgImmSbQgsGL
-	 dRgGBNFaqFrXVtlLIsVUEDbzzmlsEVtzzLRT5gS3bAe8R1Coe3DTnfjIihhVlTWWYM
-	 +iBfMAYnX5ifw==
-Date: Mon, 23 Mar 2026 11:20:42 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Nathaniel Roach <nroach44@nroach44.id.au>
-Cc: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-	Andreas Larsson <andreas@gaisler.com>,
-	"David S. Miller" <davem@davemloft.net>, sparclinux@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: Does the SPARC optimized crypto and CRC code actually work?
-Message-ID: <20260323182042.GA2205@quark>
-References: <20260316204211.GA2661@quark>
- <ca9ba2ec-849c-4f86-8ac9-274ac4b5f885@nroach44.id.au>
- <20260317034539.GA2705965@google.com>
- <76ed4ac4c86341c5c9168aeee8cd53566e018001.camel@physik.fu-berlin.de>
- <29665ec3-5052-4cdd-8eb9-e6c91092de79@nroach44.id.au>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ilavk4T0"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4836cd6e0d4so6043175e9.3
+        for <linux-crypto@vger.kernel.org>; Mon, 23 Mar 2026 14:28:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774301286; x=1774906086; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XxYw5y0oMDbij9HIoXO4SjbrHQlZ4oAoi5+oWu+ZDXY=;
+        b=Ilavk4T0tqtSguzh9kZZLMf9MGTr3xU+65YUaOUKC2sSgbmpLU5E6dy8yj0nMhq67j
+         JuINuiE8TnRF5jfb9QuSepNTb5hzfm/vjCbvQG7qE+L57XbLSP6FYJ7mWTn1WJbi2kx7
+         oS+2ZnFEBgMbCXKitLXPWk89rYfXEBZdExC4gD8AgI0HsUgX9AxvB261ww8rcbY9/me1
+         D6G8eWq4Eo44tQ/clyIyEIzjx/YzRt2Flf6cghRpuCI5NULC826fhuO/gdEdhfiiXuin
+         use+AAZE/YQAth7Dhbf6UVul5mFgWZ2BK9MjmAK+xJHfstIiafgh7EfttIjoSy8Opy1x
+         pnkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774301286; x=1774906086;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XxYw5y0oMDbij9HIoXO4SjbrHQlZ4oAoi5+oWu+ZDXY=;
+        b=Knsa2gUQpLO7K8D5rklZkGkqWvwEU0sCzQkjhc7XDlx8vd99Swa2AZvClABiIHkTbK
+         kBpaAGI+cglOcsLIHe9NiywDHeNmGZ2qu8K7h6QXyaZKVWBiUOzqd34zYlkWA7yihZaw
+         pdlRALD9Tg5rtQ4Pyf3TW17nQZYqMUROzXSCrhbryLaKqqNQpS+ParIMQUA6ovHXtVmi
+         PBZ2hxj7Xe70gQcCvR8bTpp9oAnflb0bmrvPlC1veT78XEQm5+krWD53l977SJJvqNHv
+         UP26+d6LQwnau+p3v/wC+Fh69yKUQm/0qJ1Eu++MPeT9AJ0aszR0XLPqTaDn3R6LY48d
+         8MHw==
+X-Gm-Message-State: AOJu0YypbeqpD/Ridi0sqicTdH5TK2L+nR9D3q1Q+VOsS20AMZD5tadQ
+	BJaSbwyA2jxwUsj2cSCa5zANYjEgCiK31xquAHO7+ufRR7M652JmOR90
+X-Gm-Gg: ATEYQzz72E2Hla1LiPdezCN5C8SMPyMoQ1ZpV8MWq30V+NEfjyS5QNdkMHvhBztswur
+	8yXseO+M80R4AkNY02e+/3xVYelQoxMFQn9JXNa3o8BvPdSAv+DFg+zU54W05C4MXqfm4wRvPMz
+	dQ0Tjdhd0S04fsPeSkW4+MILznzWo6emslGCErMMQSOZATkMDCZ4sWAXNCFS0HNv1gZk1BTuv8H
+	TMW35DUT7Nzc3tkV2tgNvi/DmhL2SXLm9vIO9Ae7BlP4Ukk+DdS8LYAvkjW4cTtAKX71mb6WN6l
+	RWKx90hZu+AjnRvaq80351yP36MHPUQFCa/4OmZQNsTrZMIi/H1roYKVmhL9QYeP0puSeRG63ix
+	8pZoRxXLWlOfBlCJXmYGZE88+06v6oRhaDkrRRz/eYmjl4Qs9zf3z6Xn7dbj2CURKsWtX0MbxT6
+	KX5Kkn/ixHNmeb9NslnTImxnOQjUq52pkVmAEW6NWIkMVZ4vp3yvz7qR+NTiS0zmenbG9LoM8Gd
+	Q==
+X-Received: by 2002:a05:6000:702:b0:439:c122:4fe3 with SMTP id ffacd0b85a97d-43b64243dd2mr12046889f8f.1.1774301285791;
+        Mon, 23 Mar 2026 14:28:05 -0700 (PDT)
+Received: from menon.v.cablecom.net (84-74-0-139.dclient.hispeed.ch. [84.74.0.139])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43b6470393fsm33386975f8f.17.2026.03.23.14.28.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Mar 2026 14:28:05 -0700 (PDT)
+From: Lothar Rubusch <l.rubusch@gmail.com>
+To: herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	nicolas.ferre@microchip.com,
+	alexandre.belloni@bootlin.com,
+	claudiu.beznea@tuxon.dev,
+	ardb@kernel.org,
+	linusw@kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	l.rubusch@gmail.com
+Subject: [PATCH 0/3] crypto: atmel-sha204a - multiple RNG fixes
+Date: Mon, 23 Mar 2026 21:27:52 +0000
+Message-Id: <20260323212755.687342-1-l.rubusch@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <29665ec3-5052-4cdd-8eb9-e6c91092de79@nroach44.id.au>
 
-On Mon, Mar 23, 2026 at 06:36:52PM +0800, Nathaniel Roach wrote:
-> On 17/3/26 15:16, John Paul Adrian Glaubitz wrote:
-> > Hi Eric,
-> > 
-> > On Tue, 2026-03-17 at 03:45 +0000, Eric Biggers wrote:
-> > > On Tue, Mar 17, 2026 at 10:48:52AM +0800, Nathaniel Roach wrote:
-> > > > I've been testing some of the PCI changes that have come through on my T5-2.
-> > > > I'll happily add some tests for the crypto functions, I've just got no idea
-> > > > how to do so.
-> > > Well, try enabling all KUnit tests in lib/crc/ and lib/crypto/, as well
-> > > as CONFIG_CRYPTO_SELFTESTS=y and CONFIG_CRYPTO_SELFTESTS_FULL=y.
-> > > 
-> > > However, will this be a regular testing run, or only a one-off run?  If
-> > > it will only be one-off, we'll quickly be back to where we started.
-> > > 
-> > > We need regular testing on either hardware or QEMU.
-> > If Nathaniel can test the code from time to time for the time being, we should
-> > already get some coverage. In the near future, we could certainly set up a CI
-> > job if you let me know what infrastructure to use for it.
-> > 
-> > Please keep in mind that a lot of us are doing this as volunteers and we don't
-> > always have the possibilities to respond to such requests within a short time.
-> > 
-> > Feel free to use the sparclinux issue tracker if you want to file any requests:
-> > 
-> > https://github.com/sparclinux/issues/issues
-> > 
-> > Adrian
-> I enabled the below options, based on what I could find, in my test config:
-> 
-> CONFIG_CRYPTO_SELFTESTS=y
-> CONFIG_CRYPTO_SELFTESTS_FULL=y
-> CONFIG_CRYPTO_ARIA,BLOWFISH,CAMELLIA,CAST5,CAST6,DES,FCRYPT,SERPENT,
->   SM4_GENERIC,TWOFISH,CTR=m
-> CONFIG_CRC_KUNIT_TEST=m
-> CONFIG_CRC_BENCHMARK=y
-> CONFIG_CRYPTO_LIB_BENCHMARK=y
-> CONFIG_DEBUG_MEMORY_INIT=y
-> CONFIG_KUNIT=m
+When testing the RNG functionality on the Atmel SHA204a hardware, I
+found the following issues: rngtest reported failures and hexdump
+reveiled only the first 8 bytes out of 32 provided actually entropy.
 
-I recommend using the latest linux-next, to get the latest KUnit-related
-kconfig updates, and using the following on top of sparc64_defconfig:
+Having a closer look into it, I found a (small) memory leak, missing
+to free work_data, miss-reading of the count field into the entropy
+fields and parts of the 32 random bytes staying 0 due to reading the
+slow i2c device.
 
-(
-    cat lib/{crc,crypto}/.kunitconfig
-    echo CONFIG_EXPERT=y
-    echo CONFIG_CRYPTO=y
-    echo CONFIG_CRYPTO_SELFTESTS=y
-    echo CONFIG_CRYPTO_SELFTESTS_FULL=y
-    echo CONFIG_CRYPTO_DES_SPARC64=y
-    echo CONFIG_CRYPTO_AES_SPARC64=y
-    echo CONFIG_CRYPTO_CAMELLIA_SPARC64=y
-    echo CONFIG_CRYPTO_AES=y
-    echo CONFIG_CRYPTO_DES=y
-    echo CONFIG_CRYPTO_CAMELLIA=y
-    echo CONFIG_CRYPTO_ECB=y
-    echo CONFIG_CRYPTO_CBC=y
-    echo CONFIG_CRYPTO_CTR=y
-) >> .config
+The series proposes fixes and how fixed functionality can be/was
+verified. Executing rngtest afterward showed a decent result, due
+to the i2c bus a bit slow.
 
-Note: most of the complexity here is to fully enable the traditional
-crypto self-tests to cover arch/sparc/crypto/.  The plan is to finish
-migrating those into lib/crypto/, in which case that code will become
-covered by the lib/crypto/ tests and only the kunitconfigs would be
-needed.  But for now, the traditional tests are still needed too.
+All setups require selecting the Atmel-sha204a as active RNG.
+$ cat /sys/class/misc/hw_random/rng_available
+    3f104000.rng 1-0064 none
 
-- Eric
+$ echo 1-0064 > /sys/class/misc/hw_random/rng_current
+
+$ cat /sys/class/misc/hw_random/rng_current
+    1-0064
+
+Testing RNG properties currently shows problematic results:
+$ rngtest < /dev/hwrng
+    rngtest 2.6
+    Copyright (c) 2004 by Henrique de Moraes Holschuh
+    This is free software; see the source for copying conditions.  There is NO
+    warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+    rngtest: starting FIPS tests...
+    rngtest: bits received from input: 1040032
+    rngtest: FIPS 140-2 successes: 0
+    rngtest: FIPS 140-2 failures: 52
+    rngtest: FIPS 140-2(2001-10-10) Monobit: 52
+    rngtest: FIPS 140-2(2001-10-10) Poker: 52
+    rngtest: FIPS 140-2(2001-10-10) Runs: 52
+    rngtest: FIPS 140-2(2001-10-10) Long run: 52
+    rngtest: FIPS 140-2(2001-10-10) Continuous run: 52
+    rngtest: input channel speed: (min=7.631; avg=7.804; max=7.827)Kibits/s
+    rngtest: FIPS tests speed: (min=32.273; avg=32.701; max=33.056)Mibits/s
+    rngtest: Program run time: 130177956 microseconds
+
+---
+Lothar Rubusch (3):
+  crypto: atmel-sha204a - fix memory leak at non-blocking RNG work_data
+  crypto: atmel-sha204a - fix truncated 32-byte blocking read
+  crypto: atmel-sha204a - fix non-blocking read logic
+
+ drivers/crypto/atmel-sha204a.c | 61 ++++++++++++++++++++++------------
+ 1 file changed, 40 insertions(+), 21 deletions(-)
+
+
+base-commit: 5c52607c43c397b79a9852ce33fc61de58c3645c
+-- 
+2.53.0
+
