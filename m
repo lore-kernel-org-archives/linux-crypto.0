@@ -1,221 +1,116 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFDBE344D9A;
-	Mon, 23 Mar 2026 13:42:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 344303B0ADA;
+	Mon, 23 Mar 2026 14:11:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774273333; cv=none; b=YkDG7c3P5YSjqywpoe1mD5yLpq7YVU3WJ1S3xPYcinO0sOuM6ZgshnRqwAx+WoD9rlMTfGw2c0hBddXUh4PcdB3rkEUmgF6/eIp0bi2Cu/PeJoai9G7zW0auraSbIon3m6jC3ryNzaKi+bf2PkbARPJc3z9VxtokI3jdyWSaIOw=
+	t=1774275089; cv=none; b=FXAcDkEhBwKLQefmoWZDHHnBn980CpuAqGQ0C70EusTlStd+OYLNTr7i4Da9pCQ0QeEY5lBlIKhnH85pH66ZeW2LnQBvMeL/IV1aM+tHjs3xjbeiV/gGG04LJ2+6RVW1K0UpTZx+thCNp6RF5T0mR5n5mDtXw4hOHv1NCgpx2Aw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774273333; c=relaxed/simple;
-	bh=ZtPoRCkru0zgzMg1Dtr1KtTXqI/BbXwaUF7s9LHVs9g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jAi0xP2Y6j8XcceHQDElLFIvoYwd2UFV9cVaeip6du/EX0OhQKFKW5u3WkNH3lo+G1dTmlULBSSgZQqo66wz64oe6WjR03CCloAmvqhvS931SnA3CSCTXArsbrHZm7AhsDNX1VM6JebyAYurxtKpvmK6WYGwxHCsHrM+RC4+KEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QIxB7vn8; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774275089; c=relaxed/simple;
+	bh=0+CZ6ku7umQV9JD+LWSWo22te4Wf6f5NpXO6DvOaRKM=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=FhwXikti5kYhXgrr9djujvMgaJVlE4AS2GpfQjgK5laKnXjmcISJrFh57qhlwotd8fbRn3s1rLjrQPYtB1Ryntqy1Po7+bdg3Pv3BZso8C1k1EfuqoXYsDksb4mwC6grkc92ldgi5GhpGewnORWRpZgbQ5adrWsIGCv7f8xmybM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZV8iAnp2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QIxB7vn8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF8C8C2BC9E;
-	Mon, 23 Mar 2026 13:42:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZV8iAnp2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6981C4AF0B;
+	Mon, 23 Mar 2026 14:11:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774273333;
-	bh=ZtPoRCkru0zgzMg1Dtr1KtTXqI/BbXwaUF7s9LHVs9g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QIxB7vn8lilMCHPxPp+kxXTrecdLy1a7i2KTdVl3MMbLYSvrJVTyOCSfscdRkKN33
-	 MCVYxvIfx2UPiEWZASusQSJ0bK67Y3D4sUd1r/Aj1ecHcsFFOROGx+xxJPwRVxhHJQ
-	 hZiyy3CaMLMsRjh81BqYBWMfAGWCPCd+cBjNfZIMrByTtUeRZEllBttXO+yg055goV
-	 XUWcLiHHgMYd5ePrUwlGkcQIW0yKROm7dH9ZoifRjCDabIRhAXPPAeJG4OG7W8zm5k
-	 A934KPuhHN69KZgJbiXYoSEbjW49m/et+1nOeMto3lzz0GYpXBrMAaEonnllPUUEJZ
-	 eFuG/V0t6QoXQ==
-Date: Mon, 23 Mar 2026 19:11:58 +0530
-From: Manivannan Sadhasivam <mani@kernel.org>
-To: Bartosz Golaszewski <brgl@kernel.org>
-Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, 
-	Vinod Koul <vkoul@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Thara Gopinath <thara.gopinath@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Udit Tiwari <quic_utiwari@quicinc.com>, 
-	Md Sadre Alam <mdalam@qti.qualcomm.com>, Dmitry Baryshkov <lumag@kernel.org>, 
-	Stephan Gerhold <stephan.gerhold@linaro.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Peter Ujfalusi <peter.ujfalusi@gmail.com>, Michal Simek <michal.simek@amd.com>, 
-	Frank Li <Frank.Li@kernel.org>, dmaengine@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH v13 05/12] dmaengine: qcom: bam_dma: add support for BAM
- locking
-Message-ID: <5i4vef45tsr5oquo4kpdnydgnmmciprpzif3do5g5clfx3ny2e@tfjapk6haitq>
-References: <20260317-qcom-qce-cmd-descr-v13-0-0968eb4f8c40@oss.qualcomm.com>
- <20260317-qcom-qce-cmd-descr-v13-5-0968eb4f8c40@oss.qualcomm.com>
- <hohx2judes5c6na4svpah254hqbaf4kbeyu7prwkprfv5dy7hj@26nxwlvb76yp>
- <CAMRc=McostnmVjE=uV=2KA7-dqLvQ2BAJYTXzANacFpPGgS+Sw@mail.gmail.com>
+	s=k20201202; t=1774275089;
+	bh=0+CZ6ku7umQV9JD+LWSWo22te4Wf6f5NpXO6DvOaRKM=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=ZV8iAnp2q8LQP4eoryVZXUsTV5WFVtS3n2YQFYZ2Lfw+1JEhm3VdiZKxaexWiEamA
+	 /DLEv5daEKPFE1OqJkBEySZX/BwZjp1buCFNOhT+7FukMvHBivMgP4GwhC1SXumib+
+	 NDe03Pn4adVnJwnGLBuqeZ+crAC46kWLyLG3QjUA5Ks5X6RTbujozV4wgm7E9ywFxG
+	 Zp7E+L8TcyzFjUjkQoZ4BVE1MiUxrCTb9UWWa+mR8eHS0+Ci5eAPUBbvF6H7gGl33J
+	 SZBO2lBLAm2bsLyyawfJERPnJQp5jQ5LkWdRiyG36nfj2H/uLEHXdR/sJ3FJjTFFGq
+	 pUzYqHzdghCzA==
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfauth.phl.internal (Postfix) with ESMTP id DA857F40078;
+	Mon, 23 Mar 2026 10:11:27 -0400 (EDT)
+Received: from phl-imap-15 ([10.202.2.104])
+  by phl-compute-10.internal (MEProxy); Mon, 23 Mar 2026 10:11:27 -0400
+X-ME-Sender: <xms:D0rBadsRqZsE1EeVbeZFSNtFEQZhJfjO9xJH1Vw4Qh4KuY_KYD0AXQ>
+    <xme:D0rBaRQwemiIU8SoTSVhF15XDhjDo8IcMJA68LaCOsAyeDhcq_RHQq7cLcUhQ2RXQ
+    UVhqlDbqwBTXR0yW2mooYWwzph9D9-EScv_yrrbVTNZlsvkpyKMJSze>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdefudekledvucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedfvehhuhgt
+    khcunfgvvhgvrhdfuceotggvlheskhgvrhhnvghlrdhorhhgqeenucggtffrrghtthgvrh
+    hnpefhffekffeftdfgheeiveekudeuhfdvjedvfedvueduvdegleekgeetgfduhfefleen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegthhhutg
+    hklhgvvhgvrhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudeifeegleel
+    leehledqfedvleekgeegvdefqdgtvghlpeepkhgvrhhnvghlrdhorhhgsehfrghsthhmrg
+    hilhdrtghomhdpnhgspghrtghpthhtohepuddvpdhmohguvgepshhmthhpohhuthdprhgt
+    phhtthhopehlvghithgrohesuggvsghirghnrdhorhhgpdhrtghpthhtohepjhhirghngh
+    hshhgrnhhlrghisehgmhgrihhlrdgtohhmpdhrtghpthhtohepphhurhgrnhhjrgihsehk
+    vghrnhgvlhdrohhrghdprhgtphhtthhopehtjheskhgvrhhnvghlrdhorhhgpdhrtghpth
+    htoheprghkphhmsehlihhnuhigqdhfohhunhgurghtihhonhdrohhrghdprhgtphhtthho
+    pehkvghrnhgvlhdqthgvrghmsehmvghtrgdrtghomhdprhgtphhtthhopehrmhhikhgvhi
+    esmhgvthgrrdgtohhmpdhrtghpthhtoheptghhuhgtkhdrlhgvvhgvrhesohhrrggtlhgv
+    rdgtohhmpdhrtghpthhtoheplhhinhhugidqsghtrhhfshesvhhgvghrrdhkvghrnhgvlh
+    drohhrgh
+X-ME-Proxy: <xmx:D0rBaWcHLCbnRNgOyVgaJfYZsLpRcBIfC4DXtKZM5-pjUVwh5lcjww>
+    <xmx:D0rBaWtQx1mTtp-aDx2DkvT7srYIq8Hcewa8nkceV7yO8OIrZpwilQ>
+    <xmx:D0rBaVhqq9EdGH4Ss3jvcn9szlcXvJh_NT1yVpfACmeGkCdSy0Q-UQ>
+    <xmx:D0rBaWujUa56ZDElJ1ycxC9E-sxFqcsb9b_qbGTQyRlHIjgZaIFK0g>
+    <xmx:D0rBaY-ZJnxhWBgya2DfdnEgc5T8xOZVEQOdGysyEHTS_t51z8N65xTI>
+Feedback-ID: ifa6e4810:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id B0971780075; Mon, 23 Mar 2026 10:11:27 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMRc=McostnmVjE=uV=2KA7-dqLvQ2BAJYTXzANacFpPGgS+Sw@mail.gmail.com>
+X-ThreadId: AUmdj42xMw6V
+Date: Mon, 23 Mar 2026 10:11:07 -0400
+From: "Chuck Lever" <cel@kernel.org>
+To: "Breno Leitao" <leitao@debian.org>, "Tejun Heo" <tj@kernel.org>,
+ "Lai Jiangshan" <jiangshanlai@gmail.com>,
+ "Andrew Morton" <akpm@linux-foundation.org>
+Cc: linux-kernel@vger.kernel.org, puranjay@kernel.org,
+ linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org,
+ "Michael van der Westhuizen" <rmikey@meta.com>, kernel-team@meta.com,
+ "Chuck Lever" <chuck.lever@oracle.com>
+Message-Id: <04af531d-d8a3-4fbb-993d-e1da2df62a03@app.fastmail.com>
+In-Reply-To: <20260320-workqueue_sharded-v2-0-8372930931af@debian.org>
+References: <20260320-workqueue_sharded-v2-0-8372930931af@debian.org>
+Subject: Re: [PATCH v2 0/5] workqueue: Introduce a sharded cache affinity scope
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 23, 2026 at 02:36:59PM +0100, Bartosz Golaszewski wrote:
-> On Mon, Mar 23, 2026 at 10:35 AM Manivannan Sadhasivam <mani@kernel.org> wrote:
-> >
-> > On Tue, Mar 17, 2026 at 03:02:12PM +0100, Bartosz Golaszewski wrote:
-> > > Add support for BAM pipe locking. To that end: when starting DMA on an RX
-> > > channel - prepend the existing queue of issued descriptors with an
-> > > additional "dummy" command descriptor with the LOCK bit set. Once the
-> > > transaction is done (no more issued descriptors), issue one more dummy
-> > > descriptor with the UNLOCK bit.
-> >
-> > I've left some comments in v12, but looks like you've missed them.
-> 
-> Sorry for that, as I explained in private, this email did not end up
-> in my inbox and I didn't see it on lore.
-> 
-> > >
-> > > +static int bam_metadata_attach(struct dma_async_tx_descriptor *desc, void *data, size_t len)
-> > > +{
-> > > +     struct bam_chan *bchan = to_bam_chan(desc->chan);
-> > > +     const struct bam_device_data *bdata = bchan->bdev->dev_data;
-> > > +     struct bam_desc_metadata *metadata = data;
-> > > +
-> > > +     if (!data)
-> > > +             return -EINVAL;
-> > > +
-> > > +     if (!bdata->pipe_lock_supported)
-> > > +             return -EOPNOTSUPP;
-> >
-> > As mentioned in v12, you should return 0 to avoid erroring out the clients if
-> > pipe lock is not supported.
-> >
-> 
-> If the client attaches the scratchpad register then it probably does
-> want to use locking, right? On the other hand, I assume you're
-> thinking about a situation where the client wants locking but BAM does
-> not support it. It's unlikely but ok, I'll change it.
-> 
+On Fri, Mar 20, 2026, at 1:56 PM, Breno Leitao wrote:
+> TL;DR: Some modern processors have many CPUs per LLC (L3 cache), and
+> unbound workqueues using the default affinity (WQ_AFFN_CACHE) collapse
+> to a single worker pool, causing heavy spinlock (pool->lock) contention.
+> Create a new affinity (WQ_AFFN_CACHE_SHARD) that caps each pool at
+> wq_cache_shard_size CPUs (default 8).
+>
+> Changes from RFC:
+>
+> * wq_cache_shard_size is in terms of cores (not vCPU). So,
+>   wq_cache_shard_size=8 means the pool will have 8 cores and their siblings,
+>   like 16 threads/CPUs if SMT=1
 
-Locking is supported only since v1.4.0. So I was trying to avoid erroring out
-the clients wanting to use DMA on older platforms (pre 1.4.0). I'm not sure if
-such platforms exist, but could be possible.
+My concern about the "cores per shard" approach is that it
+improves the default situation for moderately-sized machines
+little or not at all.
 
-- Mani
+A machine with one L3 and 10 cores will go from 1 UNBOUND
+pool to only 2. For virtual machines commonly deployed as
+cloud instances, which are 2, 4, or 8 core systems (up to
+16 threads) there will still be significant contention for
+UNBOUND workers.
 
-> > >
-> > > +static struct bam_async_desc *
-> > > +bam_make_lock_desc(struct bam_chan *bchan, struct scatterlist *sg,
-> > > +                struct bam_cmd_element *ce, unsigned long flag)
-> > > +{
-> > > +     struct dma_chan *chan = &bchan->vc.chan;
-> > > +     struct bam_async_desc *async_desc;
-> > > +     struct bam_desc_hw *desc;
-> > > +     struct virt_dma_desc *vd;
-> > > +     struct virt_dma_chan *vc;
-> > > +     unsigned int mapped;
-> > > +     dma_cookie_t cookie;
-> > > +     int ret;
-> > > +
-> > > +     sg_init_table(sg, 1);
-> > > +
-> > > +     async_desc = kzalloc_flex(*async_desc, desc, 1, GFP_NOWAIT);
-> > > +     if (!async_desc) {
-> > > +             dev_err(bchan->bdev->dev, "failed to allocate the BAM lock descriptor\n");
-> > > +             return NULL;
-> > > +     }
-> > > +
-> > > +     async_desc->num_desc = 1;
-> > > +     async_desc->curr_desc = async_desc->desc;
-> > > +     async_desc->dir = DMA_MEM_TO_DEV;
-> > > +
-> > > +     desc = async_desc->desc;
-> > > +
-> > > +     bam_prep_ce_le32(ce, bchan->scratchpad_addr, BAM_WRITE_COMMAND, 0);
-> > > +     sg_set_buf(sg, ce, sizeof(*ce));
-> > > +
-> > > +     mapped = dma_map_sg_attrs(chan->slave, sg, 1, DMA_TO_DEVICE, DMA_PREP_CMD);
-> > > +     if (!mapped) {
-> > > +             kfree(async_desc);
-> > > +             return NULL;
-> > > +     }
-> > > +
-> > > +     desc->flags |= cpu_to_le16(DESC_FLAG_CMD | flag);
-> > > +     desc->addr = sg_dma_address(sg);
-> > > +     desc->size = sizeof(struct bam_cmd_element);
-> > > +
-> > > +     vc = &bchan->vc;
-> > > +     vd = &async_desc->vd;
-> > > +
-> > > +     dma_async_tx_descriptor_init(&vd->tx, &vc->chan);
-> > > +     vd->tx.flags = DMA_PREP_CMD;
-> > > +     vd->tx.desc_free = vchan_tx_desc_free;
-> > > +     vd->tx_result.result = DMA_TRANS_NOERROR;
-> > > +     vd->tx_result.residue = 0;
-> > > +
-> > > +     cookie = dma_cookie_assign(&vd->tx);
-> > > +     ret = dma_submit_error(cookie);
-> > > +     if (ret)
-> > > +             return NULL;
-> >
-> > You are leaking async_desc here.
-> >
-> 
-> Yeah, not only that but also should unmap the sg here too. Thanks.
-> 
-> > > +
-> > > +     return async_desc;
-> > > +}
-> > > +
-> > > +static int bam_do_setup_pipe_lock(struct bam_chan *bchan, bool lock)
-> > > +{
-> > > +     struct bam_device *bdev = bchan->bdev;
-> > > +     const struct bam_device_data *bdata = bdev->dev_data;
-> > > +     struct bam_async_desc *lock_desc;
-> > > +     struct bam_cmd_element *ce;
-> > > +     struct scatterlist *sgl;
-> > > +     unsigned long flag;
-> > > +
-> > > +     lockdep_assert_held(&bchan->vc.lock);
-> > > +
-> > > +     if (!bdata->pipe_lock_supported || !bchan->scratchpad_addr ||
-> > > +         bchan->slave.direction != DMA_MEM_TO_DEV)
-> > > +             return 0;
-> > > +
-> > > +     if (lock) {
-> > > +             sgl = &bchan->lock_sg;
-> > > +             ce = &bchan->lock_ce;
-> > > +             flag = DESC_FLAG_LOCK;
-> > > +     } else {
-> > > +             sgl = &bchan->unlock_sg;
-> > > +             ce = &bchan->unlock_ce;
-> > > +             flag = DESC_FLAG_UNLOCK;
-> > > +     }
-> > > +
-> > > +     lock_desc = bam_make_lock_desc(bchan, sgl, ce, flag);
-> > > +     if (!lock_desc)
-> > > +             return -ENOMEM;
-> > > +
-> > > +     if (lock)
-> > > +             list_add(&lock_desc->vd.node, &bchan->vc.desc_issued);
-> > > +     else
-> > > +             list_add_tail(&lock_desc->vd.node, &bchan->vc.desc_issued);
-> > > +
-> > > +     bchan->locked = lock;
-> >
-> > What is this flag for?
-> >
-> 
-> Just a leftover. I'll drop it, thanks.
-> 
-> > >
-> > > +struct bam_desc_metadata {
-> > > +     phys_addr_t scratchpad_addr;
-> >
-> > I think it'd be worth adding a comment for this.
-> >
-> 
-> Will do.
-> 
-> Bart
+IOW, if you want good scaling, human intervention (via a
+boot command-line option) is still needed.
+
 
 -- 
-மணிவண்ணன் சதாசிவம்
+Chuck Lever
