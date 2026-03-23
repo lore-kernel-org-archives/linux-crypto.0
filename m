@@ -1,51 +1,51 @@
 Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F1653B38BE;
-	Mon, 23 Mar 2026 15:44:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A91462517AF;
+	Mon, 23 Mar 2026 15:47:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774280692; cv=none; b=VgKSWSW+2RSFO4NLVETn5HNaHb9A5CbxtVp1HqmoyQO5ISAjQAhxWe/42djlOtLTKaLYFCwvQ2gcewXlab4VxEjjs9uXQ97keV3q94prmYZ3DDmYHr1ba3NSS7tOw/O6qjgHjz+W7ATxNbDzKBZbJ5QYwKqWQyWEraAwxCYq8zw=
+	t=1774280853; cv=none; b=DAP9yxjSHnIxIZkx5vB4t6KJIVBOkd4Rj1qrmNy2zwPJqMhjhPww4Elm74Nx75w8C5Yyou3J3RqV2eydXkN7cEq0nmgPz7Gz+giXFhS1WalXdFQV4+S3EzS13ONYBRaQE2mXeyd1qO58IvHwbWsnqNpy9lc1pz/9IF300AW6d30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774280692; c=relaxed/simple;
-	bh=2grEF0owYI9WF+xRaLIDysBuE48HsNfhyg70TY0vzq0=;
+	s=arc-20240116; t=1774280853; c=relaxed/simple;
+	bh=joCNnMqjilSmKJyyYetjOdhS9xLaXMkKBhscCp3nPBI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z9Im9YDwC3K2ui6DaShCxFDkivXNy6pON+VM6UckazXlgZKn8SfntqHGtu00urJsUmpRWJAD9Imz8K4f0vjX0VU1tdd8AeeckVDZAm2MhXt10e8k8m904uJmnLUbEC+JziUdqVr9jcIUktM2etPZvL2IjNO1zm/qgMmj70me2+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=SD66FKhR; arc=none smtp.client-ip=65.109.113.108
+	 Content-Type:Content-Disposition:In-Reply-To; b=TbhzeWKK1X4iLgFqseLb0iv/a9b++UnXGFc+chrOYe4DYJMa+UtPJdSoskV78B317Ym8s+O1mb+3suqggMTh6P5JfF49dPb2k5/kcX52k/E0KW9+YTZypQoVcgWwZ7YFW7W//nFk44mlcUI2r6Na1R/QVIIX8ER6+6geli+z+KY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=LYRHHvwS; arc=none smtp.client-ip=65.109.113.108
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="SD66FKhR"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="LYRHHvwS"
 Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 3568340E0293;
-	Mon, 23 Mar 2026 15:44:48 +0000 (UTC)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 22CE440E01B5;
+	Mon, 23 Mar 2026 15:47:27 +0000 (UTC)
 X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
 Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
 	header.d=alien8.de
 Received: from mail.alien8.de ([127.0.0.1])
 	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id mJhI1BeAhHI2; Mon, 23 Mar 2026 15:44:45 +0000 (UTC)
+	with ESMTP id AshPm7v0_NYd; Mon, 23 Mar 2026 15:47:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1774280684; bh=oAVscFPcc3C8iO6uT3crj22h7vYp8tZZnju+WCdNfTk=;
+	t=1774280843; bh=zqulSAdpxOM1UEu9rcgn1fNvE9odXJe6bRV4qgcBX2w=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SD66FKhRzzuZKDW4iWqgHTsnhzNLD8BmoUJEK9ISp3FUFMaRPuSDTiude++Z/EFT7
-	 KibLhlpzYOZtOSAaBc+yuPb7LyfhFjHEU5wshEvD0dDSaJYeOdADy3+c7xQduVvYL2
-	 aeozar5qz3KFPh+/PHQrvDC3t6D6N5DmmcNk6S80v/40DVXSieIyou/5ePxwyPVFKO
-	 hVbS9jlQ3kr/DI/Z65Y9pOkLPOxYpMO2tPpmS7lHkathF2FPedAQ+rNpI4WN5baMhQ
-	 HF/fVNY5gM5cba3PHAgG0hg25i23RpjZ/JpYvSU6gz23JQK7BR4fP11Mh2xAdP+m8p
-	 dnZiKjOuwXWdokWexZXW5gtTDAtO8Rgqealg3Em4UGOjYiQ9koGGSx635SamRiAFGv
-	 2XX1uvaqZEkXdnPL+q+rvZOs0PVVesUvMS+mzAL0lI6ms2Vq6qbvD5J5figAzzOt34
-	 edMj67DLido/IBYcy0raWUsMKaSI/HJLh2Wbn2Lo+izPzorXJHrR/D3cXXXSeplrpP
-	 fKNdYttYzNr/95JFV2SwrO4sAumCfY44gNu/i1XVYo4LI4Cv9X5ILcswq94b+mamHF
-	 6UlbZUKELc1M2pDybd6q6DsvS7llyb7ByPmkHsg6k6uj4W+BrWuUSPo3LtXAxyuS4A
-	 0+rAmnwNf0N1hxDHicOQ2LbQ=
+	b=LYRHHvwS6y2ouOqN8YiLhORGgkG3wP+PtBdskvxHkcfJne1mXhGj/wEWUHvisI+1O
+	 cZfhv/S/2AKYvG6kVmF9XmgVvUZNXcKowpUw1AmYA4beEaqrciIeZoYVMDTy/qeIFd
+	 ab1roOya6UI/igFOjgVQ0ljckVfqUhJ/MmKjHBLih5ugWHxXfb9hc2vjvImwd7wQR2
+	 Fn6HXcV59KIBphrDav1CIONqPog/KQUkrqhyzw0574T9TZYLZzOxFplEc48QRfjlwV
+	 8XMIHx6xOsoK2KahIHKMoebTF0V8FUhbf54HLTmLRleZ9QSApv3lUnPpDChK4yoNX0
+	 IW5CEzEzAj1m2oZ67tTxi2CD23/hh0pzRn4ZnLaF+v+9RwbOKPFQrrvnjXbINvtjkB
+	 Lzrn0IfXm5lNOuboQtKaDQ0AwftXJ7lomXvzIJav9vKiU3GeM7eKUnH+/Ja7LoqcWz
+	 GrcAMp5jl0Ev0TIpVr+ktMrYzjczavKONAXMT1LHWskM9F5wnkOVVJPWri/LZq2bdn
+	 Z6UsIeVHCUL/IR6/sNCwCeq75V7HetlTysckDNMa/eF6PWpsJyDc+wHbHVyqqL9qPR
+	 eF1BIxcUqJyy1ZKEizAys1cv7WhgDfIxEYc6ig1Oo78AgIDbHwXLuy4blzEFPJCwyl
+	 QYEaY7YnpmXP8uzRwCAZJ2Ag=
 Received: from zn.tnic (p5de8e020.dip0.t-ipconnect.de [93.232.224.32])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id 89D4340E015C;
-	Mon, 23 Mar 2026 15:44:23 +0000 (UTC)
-Date: Mon, 23 Mar 2026 16:44:17 +0100
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with UTF8SMTPSA id 8D31640E019D;
+	Mon, 23 Mar 2026 15:47:02 +0000 (UTC)
+Date: Mon, 23 Mar 2026 16:47:01 +0100
 From: Borislav Petkov <bp@alien8.de>
 To: Tycho Andersen <tycho@kernel.org>
 Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
@@ -65,12 +65,10 @@ Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
 	Kim Phillips <kim.phillips@amd.com>,
 	Sean Christopherson <seanjc@google.com>,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v3 3/7] x86/snp: create snp_x86_shutdown()
-Message-ID: <20260323154417.GAacFf0X_UGizsaORY@fat_crate.local>
+Subject: Re: [PATCH v3 5/7] x86/snp, crypto: move HSAVE_PA setup to arch/
+Message-ID: <20260323154701.GDacFgdcf_3HRsmGAQ@fat_crate.local>
 References: <20260317162157.150842-1-tycho@kernel.org>
- <20260317162157.150842-4-tycho@kernel.org>
- <20260321170534.GBab7P3t0jJsRmPUE3@fat_crate.local>
- <acFczQda7Xsx4oJg@tycho.pizza>
+ <20260317162157.150842-6-tycho@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -79,26 +77,14 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <acFczQda7Xsx4oJg@tycho.pizza>
+In-Reply-To: <20260317162157.150842-6-tycho@kernel.org>
 
-On Mon, Mar 23, 2026 at 09:31:25AM -0600, Tycho Andersen wrote:
-> :) I can add a macro for this. Let me know if you want a full args
-> struct instead.
+On Tue, Mar 17, 2026 at 10:21:55AM -0600, Tycho Andersen wrote:
+> Subject: Re: [PATCH v3 5/7] x86/snp, crypto: move HSAVE_PA setup to arch/
 
-"ew" meant: this is not nice but I don't have a better idea...
+		... arch/x86/
 
-A full args struct doesn't really change anything AFAICT. Maybe play with it
-a bit and see what the resulting asm is but I'm sceptical it would be any
-different...
-
-> My intent here was to indicate that it's doing the x86 (i.e.
-> non-firmware) parts of the SNP shutdown process. I will change it to
-> just snp_shutdown(), but that will still have a prefix. Just
-> shutdown() seemed to generic...
-
-Yeah, snp_shutdown() - just one prefix :) - is enough.
-
-Thx.
+There are other arches, you know. :)
 
 -- 
 Regards/Gruss,
