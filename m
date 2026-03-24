@@ -1,62 +1,57 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7667138423C
-	for <linux-crypto@vger.kernel.org>; Tue, 24 Mar 2026 18:19:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75D723A3E69
+	for <linux-crypto@vger.kernel.org>; Tue, 24 Mar 2026 18:29:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774376385; cv=none; b=nkLJNtXL1ESLHB2bZXBxhpDhl5o2qkyWC9VUuMjhr1WhOSxhUeU46ANy3pMaUoMIz1rfeJ2AOKODla7LeakG0hFP3CwhB8tIo86iHnxJuCJeeHVeK3H3xnRE/2g9VGw72eldXiDa8YiAR7E7TPfacaHFz7iTaC8Sngq0FVT9Ghc=
+	t=1774376961; cv=none; b=dmNKqmJJ9StJn51R5Oi1+2LVLvVE9/3VXw4l1ws/D1EwpSIzDB8yPwcEZvt1hq3EAFxBKated2QSj80yNL8xIdmhKZaARkzeB/d+q3VBBMXxc12FAZv2O2HTqITa9Oh7xWprc61bUwXgnRKfEmgQ0H8JsCHFWyJMl0RKqS3D/To=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774376385; c=relaxed/simple;
-	bh=5Vz4E956yHjZIPFsxvaJb/PxVJ+4F/osD3QqwH/0lRI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZQ0QVFNhVcmg3Blbq9z+F2c+XXEQoO5Tf3NkGTQ8ZnXj/yij6icUQI9yjjfZDf/fadjGLHIWtlzvIhHIjWtH8JyBl8vBS4ZMHLwSz62QrEbssOtWv+WrmQyCSV28NiMZ0748GXYydVp6oMIZad4W6NzZ338opBMmtCQNXgT8d7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YSR7xrJv; arc=none smtp.client-ip=198.175.65.13
+	s=arc-20240116; t=1774376961; c=relaxed/simple;
+	bh=CSOzL48peOt1Ul9PHLo64FCrVIrnooxqRYiSe08+skc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cNdFPmZ62yY3n0i+WiIxXcIrmjQJupcq9klGuJQ5YOD8LUUiVMcp8b88udziekSrxoxwopcLrVEM4MdcPy8BBv4XX0tPeGacohpi2WzDPs/jECn8727T5Wpx08Nre2SFKEMr3m6BMQ91PN2L8Q9PHgswjqQ3KuPqLGuRxgKB3Ps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eow2nQHu; arc=none smtp.client-ip=198.175.65.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YSR7xrJv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eow2nQHu"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774376382; x=1805912382;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=5Vz4E956yHjZIPFsxvaJb/PxVJ+4F/osD3QqwH/0lRI=;
-  b=YSR7xrJvkByMO8ZzuXD5LYyrO3FlSdGFNvew1D214rOSbRTtvCNkz6at
-   rP5JU3zbQU0V/5dgqxHqSC2rm69fdHzEcIZQza/hDgv2kN18I/mX/x1RL
-   ZThuspuLMSIrHExBwDoKYcXnfSqPBnGq4OdAYLxoigfWrhCTXxmz6uFqE
-   ZKiFMoxtlUZtEWlPl9TwA70nrQcKnxBnVIpsuqZY6qldSfjygy/r4I6/K
-   tc4BKvUmjwI36hxPRnEdU15I3GFI4jXyPDReAb/f8u9+UFHldp6fz9OMB
-   icWUG/j8fI/dnYpWU55g2p3UENzsYr2lX5UNqHwBbhWmszcyQKij3Qogd
-   w==;
-X-CSE-ConnectionGUID: 7+bVs7+QS6+OR0YPShFw2w==
-X-CSE-MsgGUID: Rv+lhlZsRg6so/39z0USdg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11739"; a="86480286"
+  t=1774376961; x=1805912961;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=CSOzL48peOt1Ul9PHLo64FCrVIrnooxqRYiSe08+skc=;
+  b=eow2nQHuCVZvDAwJ96JDe4yWsgvd3Gn25U2G0vCM4JkAB4j/5gDPO30C
+   tX5SYGx3HWZqm7TgaGYsiRy0hLl1gdaP+5fwyiHCaJ4V089abtxq8Yqf6
+   iUDd8S8/J5sw4acvpcYbmY4I20fV9SRtSCB9i5ABM5rzICHNraqq+ha1j
+   yrFU9hiMGoqpQz1RYhzsI73GLGwaktGtcUkI7fSULH8MMMIxw471fb4sH
+   dzGwahVU9aMQ7F8W2dqV4WwgXngei/RKjcza6x3PWmu2PGOYW3pcY1a1I
+   mc72U8ndP/Aw5HVSVULV5GK9znppg+I6X9+onQ5dmiAqdxCcICe/Ks/11
+   Q==;
+X-CSE-ConnectionGUID: Lrr/cP6eSTmPdOAL53Ms1Q==
+X-CSE-MsgGUID: eVZHndkQQsyave7K+GsIrw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11739"; a="86881267"
 X-IronPort-AV: E=Sophos;i="6.23,138,1770624000"; 
-   d="scan'208";a="86480286"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2026 11:19:42 -0700
-X-CSE-ConnectionGUID: yJuyCay4RFmr72INuff2eQ==
-X-CSE-MsgGUID: 62k8eoN9TC6D/xBQWN36rA==
+   d="scan'208";a="86881267"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2026 11:29:20 -0700
+X-CSE-ConnectionGUID: YVScqp44T9CwCBbz4IDIrA==
+X-CSE-MsgGUID: jFQ4+JHRTPqxb9d7dj5VWw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,138,1770624000"; 
-   d="scan'208";a="247489434"
+   d="scan'208";a="219563023"
 Received: from silpixa00401971.ir.intel.com ([10.20.226.106])
-  by fmviesa002.fm.intel.com with ESMTP; 24 Mar 2026 11:19:42 -0700
+  by fmviesa006.fm.intel.com with ESMTP; 24 Mar 2026 11:29:18 -0700
 From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To: herbert@gondor.apana.org.au
+To: herbert@gondor.apana.org.au,
+	vinicius.gomes@intel.com,
+	kristen.c.accardi@intel.com
 Cc: linux-crypto@vger.kernel.org,
-	qat-linux@intel.com,
-	atharvd440@gmail.com,
-	andriy.shevchenko@intel.com,
-	ahsan.atta@intel.com,
 	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH 2/2] crypto: qat - replace scnprintf() with sysfs_emit()
-Date: Tue, 24 Mar 2026 18:17:24 +0000
-Message-ID: <20260324181936.122027-3-giovanni.cabiddu@intel.com>
+Subject: [PATCH] crypto: iaa - fix per-node CPU counter reset in rebalance_wq_table()
+Date: Tue, 24 Mar 2026 18:29:05 +0000
+Message-ID: <20260324182912.123665-1-giovanni.cabiddu@intel.com>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260324181936.122027-1-giovanni.cabiddu@intel.com>
-References: <20260324181936.122027-1-giovanni.cabiddu@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -66,52 +61,37 @@ MIME-Version: 1.0
 Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Content-Transfer-Encoding: 8bit
 
-From: Atharv Dubey <atharvd440@gmail.com>
+The cpu counter used to compute the IAA device index is reset to zero
+at the start of each NUMA node iteration. This causes CPUs on every
+node to map starting from IAA index 0 instead of continuing from the
+previous node's last index. On multi-node systems, this results in all
+nodes mapping their CPUs to the same initial set of IAA devices,
+leaving higher-indexed devices unused.
 
-Replace scnprintf() with sysfs_emit() in the three RAS error counter
-sysfs show callbacks. sysfs_emit() is the recommended API for sysfs show
-functions as per Documentation/filesystems/sysfs.rst; it enforces the
-PAGE_SIZE limit implicitly, removing the need to pass it explicitly.
+Move the cpu counter initialization before the for_each_node_with_cpus()
+loop so that the IAA index computation accumulates correctly across all
+nodes.
 
-Signed-off-by: Atharv Dubey <atharvd440@gmail.com>
+Fixes: 714ca27e9bf4 ("crypto: iaa - Optimize rebalance_wq_table()")
 Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Ahsan Atta <ahsan.atta@intel.com>
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@intel.com>
 ---
- .../crypto/intel/qat/qat_common/adf_sysfs_ras_counters.c    | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/crypto/intel/iaa/iaa_crypto_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_sysfs_ras_counters.c b/drivers/crypto/intel/qat/qat_common/adf_sysfs_ras_counters.c
-index 6abb57bfd328..ef1420199210 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_sysfs_ras_counters.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_sysfs_ras_counters.c
-@@ -20,7 +20,7 @@ static ssize_t errors_correctable_show(struct device *dev,
- 		return -EINVAL;
+diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
+index 547abf453d4a..f62b994e18e5 100644
+--- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
++++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
+@@ -906,8 +906,8 @@ static void rebalance_wq_table(void)
+ 		return;
+ 	}
  
- 	counter = ADF_RAS_ERR_CTR_READ(accel_dev->ras_errors, ADF_RAS_CORR);
--	return scnprintf(buf, PAGE_SIZE, "%d\n", counter);
-+	return sysfs_emit(buf, "%d\n", counter);
- }
++	cpu = 0;
+ 	for_each_node_with_cpus(node) {
+-		cpu = 0;
+ 		node_cpus = cpumask_of_node(node);
  
- static ssize_t errors_nonfatal_show(struct device *dev,
-@@ -35,7 +35,7 @@ static ssize_t errors_nonfatal_show(struct device *dev,
- 		return -EINVAL;
- 
- 	counter = ADF_RAS_ERR_CTR_READ(accel_dev->ras_errors, ADF_RAS_UNCORR);
--	return scnprintf(buf, PAGE_SIZE, "%d\n", counter);
-+	return sysfs_emit(buf, "%d\n", counter);
- }
- 
- static ssize_t errors_fatal_show(struct device *dev,
-@@ -50,7 +50,7 @@ static ssize_t errors_fatal_show(struct device *dev,
- 		return -EINVAL;
- 
- 	counter = ADF_RAS_ERR_CTR_READ(accel_dev->ras_errors, ADF_RAS_FATAL);
--	return scnprintf(buf, PAGE_SIZE, "%d\n", counter);
-+	return sysfs_emit(buf, "%d\n", counter);
- }
- 
- static ssize_t reset_error_counters_store(struct device *dev,
+ 		for_each_cpu(node_cpu, node_cpus) {
 -- 
 2.53.0
 
