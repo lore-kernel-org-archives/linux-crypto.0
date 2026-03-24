@@ -1,127 +1,86 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DEB13E6DE1
-	for <linux-crypto@vger.kernel.org>; Tue, 24 Mar 2026 11:12:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E9663E558F
+	for <linux-crypto@vger.kernel.org>; Tue, 24 Mar 2026 11:27:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774350772; cv=none; b=c0u4rfhMiIxuQ+Omt7mS6LgIPQO57PwpIg66lBPNVxKEtIpwH5eZoDGDyNAW2RBR75DcCKlGrw4aVrsXdTrkmA8vODoxEhrZcxJb6mj9qst/FuxBjHWCrMQeMQx0DPxLgmYBBdEicRhF66koU6Zk7qy5PMVqSizlWF53kvQcvCQ=
+	t=1774351655; cv=none; b=tUAGdbAiKmQGX9CbJ9le+eGL/dloatmSxLfXZ7Fn+F+gkVSzstxMk5T2xFIDUw5IVI64DqkiyeD5UobKfI9PO+8fJEVT+tc3TqJ1szpEjKniU6hkJ79bJxsfJooefItLHtBYh85Svr49WOhSFBJd7EUkAlRU1Cpi5gN9O/R6j20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774350772; c=relaxed/simple;
-	bh=cddc3tnx8VIEeDiR+s9ZvIptZDljE4Shkj8TPlaHS0k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XXUNU49vOMF0GKRa9t0RZ9+dWnz4p60ni3hWHE9WBCBPzGBWP6xQHbiPzi0pSgg0GkBKB/OXkOUCC8okMn6fkK78ilXQiVLNBe8bn78vfxOKodGpQyarCbaOYNXWCAQqOa+MHola62np3RKiHxySiYlWrieP9yOHMO/c39K18FQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TmEzk208; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1774351655; c=relaxed/simple;
+	bh=j2OPAl+SveGv2rqOW2bNGBFPaFwznwlHpIiFdQ6UZ88=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tEoA5+7b3UWn194ZT9CMG+SQLSR/40XLryLh/j/n5RP3LoXhKVimXqaS6s1A+rOmGx/EllJZHXNHGf4iyeUrWPNZixxMnXBA0ohbTGuY+t4HOLUsqbxV4XaweAa3p+ylLMo/wd2VWu127F1bSCQ8K7+NVKi7JHMkfXxl/Hy5/dk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=E/GXtiNH; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TmEzk208"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774350770; x=1805886770;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=cddc3tnx8VIEeDiR+s9ZvIptZDljE4Shkj8TPlaHS0k=;
-  b=TmEzk208LPorqzLyRxCT/0y7D+PlS/BsxzZyrJm8RbmYqEgJiEGT8CjL
-   UQDZc6TA7TUNQ+ZG1IUMfZMKJVrbKm7v5+Gg+cAt/I8CMIwx96/P+Mu91
-   1qaTVX1GleljQtWPfNIjR6W4voIIqzKuqAAlBJ0mszGZscU7jGjcZBon5
-   qfcWJhStqOiHm7F5uil6AFEDynJroYKovOyI+oNdTlPZia/sG2BL8RPgr
-   u31unZRMuOYIOP53AzuhRUJt4AfZ40TVQ46ECThc2rcqsYNr9raP/FFNY
-   /e8bCoaQ/m0N1PwaP9GIbbJ7ZC6opKq6QaHWOUQ34Z8eGjaHhYZEZpNyg
-   g==;
-X-CSE-ConnectionGUID: WCqXl3w9Sp+lFWv8CwaWZQ==
-X-CSE-MsgGUID: 7lVsEJF5RtOx+VtXBgHJgQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11738"; a="86732932"
-X-IronPort-AV: E=Sophos;i="6.23,138,1770624000"; 
-   d="scan'208";a="86732932"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2026 04:12:49 -0700
-X-CSE-ConnectionGUID: iY962mm8TLycApP/TQwDwA==
-X-CSE-MsgGUID: doK/vPjkR6u59cmolBuo8Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,138,1770624000"; 
-   d="scan'208";a="223392912"
-Received: from silpixa00401812.ir.intel.com ([10.20.226.90])
-  by orviesa006.jf.intel.com with ESMTP; 24 Mar 2026 04:12:39 -0700
-From: Ahsan Atta <ahsan.atta@intel.com>
-To: herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org,
-	qat-linux@intel.com,
-	Ahsan Atta <ahsan.atta@intel.com>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH] crypto: qat - disable 420xx AE cluster when lead engine is fused off
-Date: Tue, 24 Mar 2026 11:12:34 +0000
-Message-ID: <20260324111234.227329-1-ahsan.atta@intel.com>
-X-Mailer: git-send-email 2.50.1
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="E/GXtiNH"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1774351652;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=rD8r+L4ewlCmSe6Mc1BgIUAya3UWUPOpi16rXKFsJGo=;
+	b=E/GXtiNHq41iQVw39I0E4iRYYd2z+wED+YpqsON6vPaEJ9SqySyVZC0M1UqBv3EW+X/FsN
+	V8uiN20s7ZoxfFKW037gthdvccBsjlxORzPqUgZhrasJABpdwBDVcjSNiFXd0pnnetj+h4
+	B8TZAtXpzjo5/C3PpaeYrb4G1xMzcgg=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: hifn_795x - Replace snprintf("%s") with strscpy
+Date: Tue, 24 Mar 2026 12:27:05 +0100
+Message-ID: <20260324112703.94917-3-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Intel Corporation....
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1467; i=thorsten.blum@linux.dev; h=from:subject; bh=j2OPAl+SveGv2rqOW2bNGBFPaFwznwlHpIiFdQ6UZ88=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDJmHStlPHkqoPSvwNjovtvb3O9+GT4taYjecsukISPi/Q UKulyGzo5SFQYyLQVZMkeXBrB8zfEtrKjeZROyEmcPKBDKEgYtTACZi/ZzhD3/Hw7vtixTep8n9 uTyn1Z6hxnP7y6idt4KWsIjoHvg0Zwkjw/Y/66+xvcz32s23t6GMiyNPXeBqXXjlk7XH7xceei3 sygUA
+X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-The get_ae_mask() function only disables individual engines based on
-the fuse register, but engines are organized in clusters of 4. If the
-lead engine of a cluster is fused off, the entire cluster must be
-disabled.
+Replace snprintf("%s", ...) with the faster and more direct strscpy().
+Check if the return value is less than 0 to detect string truncation.
 
-Replace the single bitmask inversion with explicit test_bit() checks
-on the lead engine of each group, disabling the full ADF_AE_GROUP
-when the lead bit is set.
-
-Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Fixes: fcf60f4bcf54 ("crypto: qat - add support for 420xx devices")
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 ---
- .../intel/qat/qat_420xx/adf_420xx_hw_data.c   | 20 +++++++++++++++++--
- 1 file changed, 18 insertions(+), 2 deletions(-)
+ drivers/crypto/hifn_795x.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c b/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c
-index 35105213d40c..0002122219bc 100644
---- a/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c
-@@ -97,9 +97,25 @@ static struct adf_hw_device_class adf_420xx_class = {
+diff --git a/drivers/crypto/hifn_795x.c b/drivers/crypto/hifn_795x.c
+index edf36f6add52..afea061c3070 100644
+--- a/drivers/crypto/hifn_795x.c
++++ b/drivers/crypto/hifn_795x.c
+@@ -15,6 +15,7 @@
+ #include <linux/mm.h>
+ #include <linux/dma-mapping.h>
+ #include <linux/scatterlist.h>
++#include <linux/string.h>
+ #include <linux/highmem.h>
+ #include <linux/crypto.h>
+ #include <linux/hw_random.h>
+@@ -2256,8 +2257,7 @@ static int hifn_alg_alloc(struct hifn_device *dev, const struct hifn_alg_templat
+ 	alg->alg.init = hifn_init_tfm;
  
- static u32 get_ae_mask(struct adf_hw_device_data *self)
- {
--	u32 me_disable = self->fuses[ADF_FUSECTL4];
-+	unsigned long fuses = self->fuses[ADF_FUSECTL4];
-+	u32 mask = ADF_420XX_ACCELENGINES_MASK;
+ 	err = -EINVAL;
+-	if (snprintf(alg->alg.base.cra_name, CRYPTO_MAX_ALG_NAME,
+-		     "%s", t->name) >= CRYPTO_MAX_ALG_NAME)
++	if (strscpy(alg->alg.base.cra_name, t->name) < 0)
+ 		goto out_free_alg;
+ 	if (snprintf(alg->alg.base.cra_driver_name, CRYPTO_MAX_ALG_NAME,
+ 		     "%s-%s", t->drv_name, dev->name) >= CRYPTO_MAX_ALG_NAME)
+@@ -2367,7 +2367,7 @@ static int hifn_probe(struct pci_dev *pdev, const struct pci_device_id *id)
  
--	return ~me_disable & ADF_420XX_ACCELENGINES_MASK;
-+	if (test_bit(0, &fuses))
-+		mask &= ~ADF_AE_GROUP_0;
-+
-+	if (test_bit(4, &fuses))
-+		mask &= ~ADF_AE_GROUP_1;
-+
-+	if (test_bit(8, &fuses))
-+		mask &= ~ADF_AE_GROUP_2;
-+
-+	if (test_bit(12, &fuses))
-+		mask &= ~ADF_AE_GROUP_3;
-+
-+	if (test_bit(16, &fuses))
-+		mask &= ~ADF_AE_GROUP_4;
-+
-+	return mask;
- }
+ 	INIT_LIST_HEAD(&dev->alg_list);
  
- static u32 uof_get_num_objs(struct adf_accel_dev *accel_dev)
--- 
-2.50.1
-
---------------------------------------------------------------
-Intel Research and Development Ireland Limited
-Registered in Ireland
-Registered Office: Collinstown Industrial Park, Leixlip, County Kildare
-Registered Number: 308263
-
-
-This e-mail and any attachments may contain confidential material for the sole
-use of the intended recipient(s). Any review or distribution by others is
-strictly prohibited. If you are not the intended recipient, please contact the
-sender and delete all copies.
-
+-	snprintf(dev->name, sizeof(dev->name), "%s", name);
++	strscpy(dev->name, name);
+ 	spin_lock_init(&dev->lock);
+ 
+ 	for (i = 0; i < 3; ++i) {
