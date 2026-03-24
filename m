@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6085931691A;
-	Tue, 24 Mar 2026 19:42:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCD7731F9AE;
+	Tue, 24 Mar 2026 19:42:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774381320; cv=none; b=CqYw6njqZkmTN1thMkvqNO7KI2yu1tBnJBKao2PLsCof0xT8OLceFXyU/MHb6H2NJw75KUCVy5nDfu0775ZmGNd29dTcerg8R/xmfmVLroxaqoX7QXyHP0mMBajUIgNDkT7Diyak1F6/UzBHVPCI/+GOyaP9B09E58C9bSDS7kw=
+	t=1774381322; cv=none; b=Ybe/hpzDmKdQtMQxRE4rZdx0ie+3q6CHfvfxKL/kBJsddCZNILBkvHV0Jg6KVUk8EoBgYMYcfRGSBO8cjqQyRyx9wuV2ZGWLPKnHLrsM6oFvN+fED7rl58bJqxdopvPREMQcDx/Q7usIHl7TzPWyLzwB5oJ62KDbrgr8tNm87yU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774381320; c=relaxed/simple;
-	bh=uSy52ecrsDgShw6jrs/tIu/591cJxNs1LYgkMzC/Poo=;
+	s=arc-20240116; t=1774381322; c=relaxed/simple;
+	bh=EDp2PqomJ7j/PaKC37IBr/64z9hRuHXco1IUNza/j7w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DvxWDBBnFIYdaqR/+lXI0s/CKX4LYHYYta93jsz4i+9fxVdGhUr/uXnoRBPRb3o8B8LumrHR7JmRMY34McI3zRQgJWtv/SnCcJPh3rpaOYFZxoxIkg0OrfcB2h3x0WpfMeJu/wpKPF0Ly54iaxVnwAhtAzmdOQLTVGIJ1Ca+Ugk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J0ARYfPe; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=CxlO5Vxc5HKcd0PojYSXBnIrBzFY9Q3q/32NYIcfNPM2cRFaxNmI4ScwGxgT1sQTjgn5wAQJlzDljlW0zHN/7rox9XITeQR+zMUVH5rt9dVP3ci+OcqPVPsMIKi47lexzGKYoYOqNa5sfQ25wENkr2YZM/z/NYnELmZGk1V7QNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TBQwnK//; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J0ARYfPe"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBA3FC2BC9E;
-	Tue, 24 Mar 2026 19:41:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TBQwnK//"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 429DEC2BCB2;
+	Tue, 24 Mar 2026 19:42:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774381320;
-	bh=uSy52ecrsDgShw6jrs/tIu/591cJxNs1LYgkMzC/Poo=;
+	s=k20201202; t=1774381322;
+	bh=EDp2PqomJ7j/PaKC37IBr/64z9hRuHXco1IUNza/j7w=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=J0ARYfPeRqiCWFhOuCR+rL7WX6ci2gG+MOOBIlm36LY/j+00JDI/nuWjUz95zv+5V
-	 z31zil8CWmEtrG3hU0KCL0/4da5fBlb7F2+zjc/SUhjweCew73XLV406lolQmlyElN
-	 WX8xNpEcLcxchpkg/kwaUxWUgvpq57KGprjKARP9TcOCEEx1vzF09Kwd7RFo6j08Dy
-	 A39UYNZH4Qw/xiGwYeabFVSriU1xW+OCxpeFOWJdHb6Nn+kb/L3JLMLz+KkRd3GiAV
-	 vlxFZlzLn96+bfvRl8yeTfJDl3YMye6ymD8bvHS/trf0UrHDpHdZ1VWghSwb65e0lZ
-	 6H9GuKTBiZchw==
+	b=TBQwnK//oM+RnXbrzeoFI5pONhC9XR2JG96K6YLtnwhKsbDsC+CHLnOEB+OqfLOsQ
+	 lW0/VBvmyjDHNueFRwk00F+cWoJtsC4E8ZvM9lvegTcdUrXTV1Nu7HorYZxycARAU6
+	 N5qfVR3ZG0HsV5laIJ5TJOc1nG+oMg/2bZ/p+OkJBsI6E6iwd6ZKkNW3v+Rxuz8gMo
+	 DMORGJM4CqfHhQDkr8YlYaqVB00K1HmYfsIuh7k2njJnKxX7gsq8INN5QED16tST+4
+	 X3CEptoWI4rks1MOy1fiEF8gkCcfyyOmWqr/qA4S2DmH7Ae9ch+9nUfMYpRg1Yc8+d
+	 WZcFBs6S1IlqQ==
 From: Tycho Andersen <tycho@kernel.org>
 To: Ashish Kalra <ashish.kalra@amd.com>,
 	Tom Lendacky <thomas.lendacky@amd.com>,
@@ -49,9 +49,9 @@ Cc: linux-crypto@vger.kernel.org,
 	Nikunj A Dadhania <nikunj@amd.com>,
 	kvm@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH v2 1/5] crypto/ccp: hoist kernel part of SNP_PLATFORM_STATUS
-Date: Tue, 24 Mar 2026 13:40:30 -0600
-Message-ID: <20260324194034.1442133-2-tycho@kernel.org>
+Subject: [PATCH v2 2/5] crypto/ccp: export firmware supported vm types
+Date: Tue, 24 Mar 2026 13:40:31 -0600
+Message-ID: <20260324194034.1442133-3-tycho@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260324194034.1442133-1-tycho@kernel.org>
 References: <20260324194034.1442133-1-tycho@kernel.org>
@@ -65,85 +65,166 @@ Content-Transfer-Encoding: 8bit
 
 From: "Tycho Andersen (AMD)" <tycho@kernel.org>
 
-...to its own function. This way it can be used when the kernel needs
-access to the platform status regardless of the INIT state of the firmware.
+In some configurations, the firmware does not support all VM types. The SEV
+firmware has an entry in the TCB_VERSION structure referred to as the
+Security Version Number in the SEV-SNP firmware specification and referred
+to as the "SPL" in SEV firmware release notes. The SEV firmware release
+notes say:
 
-No functional change intended.
+    On every SEV firmware release where a security mitigation has been
+    added, the SNP SPL gets increased by 1. This is to let users know that
+    it is important to update to this version.
+
+The SEV firmware release that fixed CVE-2025-48514 by disabling SEV-ES
+support on vulnerable platforms has this SVN increased to reflect the fix.
+The SVN is platform-specific, as is the structure of TCB_VERSION.
+
+Check CURRENT_TCB instead of REPORTED_TCB, since the firmware behaves with
+the CURRENT_TCB SVN level and will reject SEV-ES VMs accordingly.
+
+Parse the SVN, and mask off the SEV_ES supported VM type from the list of
+supported types if it is above the per-platform threshold for the relevant
+platforms.
 
 Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
 ---
- drivers/crypto/ccp/sev-dev.c | 31 +++++++++++++++++++++++--------
- 1 file changed, 23 insertions(+), 8 deletions(-)
+ drivers/crypto/ccp/sev-dev.c | 70 ++++++++++++++++++++++++++++++++++++
+ include/linux/psp-sev.h      | 37 +++++++++++++++++++
+ 2 files changed, 107 insertions(+)
 
 diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index aebf4dad545e..64fc402f58df 100644
+index 64fc402f58df..1e3286c048fe 100644
 --- a/drivers/crypto/ccp/sev-dev.c
 +++ b/drivers/crypto/ccp/sev-dev.c
-@@ -2367,7 +2367,8 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
- 	return ret;
+@@ -2940,3 +2940,73 @@ void sev_pci_exit(void)
+ 
+ 	sev_firmware_shutdown(sev);
  }
- 
--static int sev_ioctl_do_snp_platform_status(struct sev_issue_cmd *argp)
-+static int __sev_do_snp_platform_status(struct sev_user_data_snp_status *status,
-+					int *error)
- {
- 	struct sev_device *sev = psp_master->sev_data;
- 	struct sev_data_snp_addr buf;
-@@ -2375,9 +2376,6 @@ static int sev_ioctl_do_snp_platform_status(struct sev_issue_cmd *argp)
- 	void *data;
- 	int ret;
- 
--	if (!argp->data)
--		return -EINVAL;
--
- 	status_page = alloc_page(GFP_KERNEL_ACCOUNT);
- 	if (!status_page)
- 		return -ENOMEM;
-@@ -2400,7 +2398,7 @@ static int sev_ioctl_do_snp_platform_status(struct sev_issue_cmd *argp)
- 	}
- 
- 	buf.address = __psp_pa(data);
--	ret = __sev_do_cmd_locked(SEV_CMD_SNP_PLATFORM_STATUS, &buf, &argp->error);
-+	ret = __sev_do_cmd_locked(SEV_CMD_SNP_PLATFORM_STATUS, &buf, error);
- 
- 	if (sev->snp_initialized) {
- 		/*
-@@ -2415,15 +2413,32 @@ static int sev_ioctl_do_snp_platform_status(struct sev_issue_cmd *argp)
- 	if (ret)
- 		goto cleanup;
- 
--	if (copy_to_user((void __user *)argp->data, data,
--			 sizeof(struct sev_user_data_snp_status)))
--		ret = -EFAULT;
-+	memcpy(status, data, sizeof(*status));
- 
- cleanup:
- 	__free_pages(status_page, 0);
- 	return ret;
- }
- 
-+static int sev_ioctl_do_snp_platform_status(struct sev_issue_cmd *argp)
++
++static int get_v1_svn(struct sev_device *sev)
 +{
++	struct sev_snp_tcb_version_genoa_milan *tcb;
 +	struct sev_user_data_snp_status status;
-+	int ret;
++	int ret, error = 0;
 +
-+	if (!argp->data)
-+		return -EINVAL;
-+
-+	ret = __sev_do_snp_platform_status(&status, &argp->error);
++	mutex_lock(&sev_cmd_mutex);
++	ret = __sev_do_snp_platform_status(&status, &error);
++	mutex_unlock(&sev_cmd_mutex);
 +	if (ret < 0)
 +		return ret;
 +
-+	if (copy_to_user((void __user *)argp->data, &status,
-+			 sizeof(struct sev_user_data_snp_status)))
-+		ret = -EFAULT;
-+
-+	return ret;
++	tcb = (struct sev_snp_tcb_version_genoa_milan *)&status
++		      .current_tcb_version;
++	return tcb->snp;
 +}
 +
- static int sev_ioctl_do_snp_commit(struct sev_issue_cmd *argp)
- {
- 	struct sev_device *sev = psp_master->sev_data;
++static int get_v2_svn(struct sev_device *sev)
++{
++	struct sev_user_data_snp_status status;
++	struct sev_snp_tcb_version_turin *tcb;
++	int ret, error = 0;
++
++	mutex_lock(&sev_cmd_mutex);
++	ret = __sev_do_snp_platform_status(&status, &error);
++	mutex_unlock(&sev_cmd_mutex);
++	if (ret < 0)
++		return ret;
++
++	tcb = (struct sev_snp_tcb_version_turin *)&status
++		      .current_tcb_version;
++	return tcb->snp;
++}
++
++static bool sev_firmware_allows_es(struct sev_device *sev)
++{
++	/* Documented in AMD-SB-3023 */
++	if (boot_cpu_has(X86_FEATURE_ZEN4) || boot_cpu_has(X86_FEATURE_ZEN3))
++		return get_v1_svn(sev) < 0x1b;
++	else if (boot_cpu_has(X86_FEATURE_ZEN5))
++		return get_v2_svn(sev) < 0x4;
++	else
++		return true;
++}
++
++int sev_firmware_supported_vm_types(void)
++{
++	int supported_vm_types = 0;
++	struct sev_device *sev;
++
++	if (!psp_master || !psp_master->sev_data)
++		return supported_vm_types;
++	sev = psp_master->sev_data;
++
++	supported_vm_types |= BIT(KVM_X86_SEV_VM);
++	supported_vm_types |= BIT(KVM_X86_SEV_ES_VM);
++
++	if (!sev->snp_initialized)
++		return supported_vm_types;
++
++	supported_vm_types |= BIT(KVM_X86_SNP_VM);
++
++	if (!sev_firmware_allows_es(sev))
++		supported_vm_types &= ~BIT(KVM_X86_SEV_ES_VM);
++
++	return supported_vm_types;
++
++}
++EXPORT_SYMBOL_FOR_MODULES(sev_firmware_supported_vm_types, "kvm-amd");
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index 69ffa4b4d1fa..383a682e94fd 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -899,6 +899,42 @@ struct snp_feature_info {
+ /* Feature bits in EBX */
+ #define SNP_SEV_TIO_SUPPORTED			BIT(1)
+ 
++/**
++ * struct sev_snp_tcb_version_genoa_milan
++ *
++ * @boot_loader: SVN of PSP bootloader
++ * @tee: SVN of PSP operating system
++ * @reserved: reserved
++ * @snp: SVN of SNP firmware
++ * @microcode: Lowest current patch level of all cores
++ */
++struct sev_snp_tcb_version_genoa_milan {
++	u8 boot_loader;
++	u8 tee;
++	u8 reserved[4];
++	u8 snp;
++	u8 microcode;
++};
++
++/**
++ * struct sev_snp_tcb_version_turin
++ *
++ * @fmc: SVN of FMC firmware
++ * @boot_loader: SVN of PSP bootloader
++ * @tee: SVN of PSP operating system
++ * @snp: SVN of SNP firmware
++ * @reserved: reserved
++ * @microcode: Lowest current patch level of all cores
++ */
++struct sev_snp_tcb_version_turin {
++	u8 fmc;
++	u8 boot_loader;
++	u8 tee;
++	u8 snp;
++	u8 reserved[3];
++	u8 microcode;
++};
++
+ #ifdef CONFIG_CRYPTO_DEV_SP_PSP
+ 
+ /**
+@@ -1045,6 +1081,7 @@ void snp_free_firmware_page(void *addr);
+ void sev_platform_shutdown(void);
+ bool sev_is_snp_ciphertext_hiding_supported(void);
+ u64 sev_get_snp_policy_bits(void);
++int sev_firmware_supported_vm_types(void);
+ 
+ #else	/* !CONFIG_CRYPTO_DEV_SP_PSP */
+ 
 -- 
 2.53.0
 
