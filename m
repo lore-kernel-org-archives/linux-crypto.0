@@ -1,202 +1,174 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9660581AA8;
-	Tue, 24 Mar 2026 00:50:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B44823B62C
+	for <linux-crypto@vger.kernel.org>; Tue, 24 Mar 2026 04:48:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774313410; cv=none; b=k48wtb7iwatWCpUM1NItK7Ecea3FvhNX1YwlBIFfWqFi0MSHOh48UyauSE/0ewcp61NiPiTQBqgPTQKxwShKpE6ZxymmWdA9CYnsZHzRDdkCf5PvcfkJqSNYsAZ943yJBVKuShD+8/ZRU24uV3tXQxYYUQ5F/S/5e04q6CXVX0I=
+	t=1774327712; cv=none; b=hPsEVS0UEHvj2mn0LJxLOheKJiG4G8W3KQke/Ax5iOvQzRDmzIGofJ7qH9QYLtCHO+Qo7+XUONPxydoOQ2lbBp8FUuqQtFMFUeaLhod56a2SgUbSRp/A5WR8ajHgC5jzGBKuIC4KZe2Jml4x88rp+J+gHT1n3KsWj1n4ZzPa9sg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774313410; c=relaxed/simple;
-	bh=DP5RvThrmwwduBuiuEP/nEGN+iF6viTzjV4BJyGugH8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EFn6+m3r087audEpG+LpwC6kxRKTTjlkQCkJKJ7A5rL9+0V8RkkxjwUAhgh7iNjpLBvHybBXYNFQmjviFpXROyryQq4O1r5xAefjBtMjydVfvBXCnbWvh7VPLJMOsUX/3sZkoH+qJUIASWsE9gPIwTaq3L9jDfx8l0BeAxjKzSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mVUvJehR; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774327712; c=relaxed/simple;
+	bh=MqY0rvVxZ8EWepxH1jMTKMbCOC3ejPwoTXI2X/mtWe0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EWchz18/hb9LsOqH+vabT+mkO0SptrY8I8tuSeblhKMcTP+rDat8bnyvoKlV8NxgyI5xAPlTrfzpDsksNaEekMM/Oj+JWTGNdhibXE4rhdwVmeIvw+6MBy9SiRrclpQcA/BeoOpM8W00Eq33SElnVL/iOXRMR1zMZDMmt51gU70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=DfwQtmA2; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=gP9BbTMA; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mVUvJehR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA925C4CEF7;
-	Tue, 24 Mar 2026 00:50:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774313410;
-	bh=DP5RvThrmwwduBuiuEP/nEGN+iF6viTzjV4BJyGugH8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mVUvJehR5AUXtELkMkllJyiKebZxIhNmZ4/nR7tNivljvmNUK+Gr+qeKt9Xqd5x5j
-	 W1Csj6TDL+5/kw21+fZ5hvfQogofACPndgaN/us19ikMXxy5h3PlbMa+6QPhbRojiW
-	 EyGsbnTgyVyQN4ym8TCN83arfrUXWDqp2+00cK3UA8unudbTZZWdRPjvXNdtxqDFTK
-	 v6KLy8t0Cal/AuIKun5oxq+fI9oUp+iKLPS6sSZQaVWx4KPk92BppcUbR64S7ABivL
-	 tS8urKJZM9cFNEmumEwfBZCj4AdAgc2whQSprO8YMntDSeIZ/Cp4XF+tQHCe7ocSWG
-	 uZo43DtLFvRCA==
-Date: Mon, 23 Mar 2026 17:50:08 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	x86@kernel.org
-Subject: Re: [PATCH 00/19] GHASH library
-Message-ID: <20260324005008.GA230053@quark>
-References: <20260319061723.1140720-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="DfwQtmA2";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="gP9BbTMA"
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62O3WKBE3903725
+	for <linux-crypto@vger.kernel.org>; Tue, 24 Mar 2026 04:48:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	zeigFvaue2fOm1v1THIQ2tyCHptET7HZIXbAdvlVh1g=; b=DfwQtmA2Tol8kT0p
+	AyfPrBdbO7Pg7VbmAULGksQZ6QurwM65gWFE7oNJkgDyzwKoiVeXJLGLiNMwYDw7
+	P+eI/Aqs3BZsdC5v97cUxj0NqiYgBqoERnwM4UpjDhd36IIpBD6BAQwO1OLCq3DH
+	NoHgCh2U125+kq8tAXfcqg9F7YZe4/j5TGinmJ2UwkcLCD+T/7qLd7PRlgEx0bLq
+	wxQ1C0I25n2+pZSHBg80E34lf0IE+gDgHsQ+8YgC306yGx/3rsqRVP6Twt2cR8oJ
+	ETh71+liKIfWTefm08atbUCwZZbb+bKwPe0lxI/zFjCGsd9xTxTdPKZEJbDrpD03
+	6BAcQA==
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com [209.85.216.72])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4d3jt0g728-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Tue, 24 Mar 2026 04:48:30 +0000 (GMT)
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-35b9246248dso5112131a91.0
+        for <linux-crypto@vger.kernel.org>; Mon, 23 Mar 2026 21:48:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1774327710; x=1774932510; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zeigFvaue2fOm1v1THIQ2tyCHptET7HZIXbAdvlVh1g=;
+        b=gP9BbTMAD7dLckdvq0sONZnQj+ztBgMGvVXDEf7ErmPyYFUMjMTxmI1AR3eb+Emk3w
+         OBLvaFC8qpMh4DjKagzPDJaha9t+PrhUPv3hB1biya7Yfx8QHYnfAlv9Y2KAbDXldVbj
+         DU1HO+kp6/M9IXl8wdD5DwIEs2rZkoazY0+1QfcdMg8cjMn3UmsJoBhA030SwQqpojQo
+         a3C3Bora9w2SHI8g5nwMvkQ/B/cV7Z9XW3hodDR1nPvJphKRPA/T1JahMUEAItC8CiCf
+         RExsCfprWyZOvP1QnOQ+wDN3vMqYtOEFWH5LlYb8+W54w8HosNR8oJVZmuKPkRgyHR12
+         evpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774327710; x=1774932510;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zeigFvaue2fOm1v1THIQ2tyCHptET7HZIXbAdvlVh1g=;
+        b=HkrqVNXCNP/QGp1IpZtVqNtoaXPsqhXxPRpjy7thZCIqqZxz8NeaXMLMVC4g9HV21e
+         xhwSSKss01fdage8T6fMy9vYRDw1OtkAi863Rj3mp4fOpmPIDOpW7pYcQ+GmVhO5ZgGt
+         xWWqsfeWiRdF6t3pnnx35VKZK/kynKKr96bRQ6akXyQLsTlgCM6CbX19+QI0pQUxz+Ig
+         7lerb94NKbHAKDNHJ0+iMd9eReZ86nWOWCDJ5fnc64aHcTGtbIrW0PFekKla5wq3Kc2n
+         y0bXwc+H/ZORtak4i6cbHJFnW8mhqhq4I1cK+GHQ0JiEttQ1q27APF2ZcJEoJigTt5N+
+         YcyA==
+X-Forwarded-Encrypted: i=1; AJvYcCWgGRSZvkuGJ3eI0zrq8Ym8T93I3dsVo1Zx3AuFrnujNVmotylAE82YpNT1Q2XjbgR7wb+KHLgCfbnaeSk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWq4IM5fFzNXBx0rS0WYWCQ3CZO308UFo8A8wEdoO4GRvu8Rlp
+	KiH4J5jj9sTxWUgDFMhf7sFTPN0K4CbD9fsOV9IBlIJN6M0TOVwpLnE8dM90fHkWw1QN59kS7LL
+	PemqnfNSMZ0oiTSyH1gY6tAsNZCr1ZKvF+oLOgQtTZDINJAx2ofUUU6WVJFOuyzhzJRU=
+X-Gm-Gg: ATEYQzyVunkdkAXdmNV1a9EXZDeDh4bkjDYSx12Tm+5UwixlNXwuuovB8u80RRNtyX0
+	nXgjMg5JdrpqWB3+2yUvWcyKsgC3308T2xmJML8PmUjsONDtHOtL178BQ+rBvgJT5/OoRCVK1Ly
+	grlKhCpdGPRmbR9Lwbr3c7/+YrJzBQDiqZbLFEw7FNxhz6vrPQSQSohogjrYBkO9of7oOH+7m9h
+	EfJ7Vq1sZZcnxFZgwisaXMp/vFZ3fIM/94aKtZIMTXX0T/TdfeeokX08+lxgPoaBMOMU3yVRvNM
+	ZKiVwWuKz2ESvsMZGxvsFj51SS6R34LMSxyI23id82JKV1IGJ9QGwK0WON3RjPnqVOkGikvD50c
+	GL58sj+L+mtwozSHTn43eoqoBtsIK1i5xVtCuvL+RU8JSuhb47B4R
+X-Received: by 2002:a17:90b:5108:b0:35b:9cd5:232e with SMTP id 98e67ed59e1d1-35bd2ce4493mr13430868a91.29.1774327709480;
+        Mon, 23 Mar 2026 21:48:29 -0700 (PDT)
+X-Received: by 2002:a17:90b:5108:b0:35b:9cd5:232e with SMTP id 98e67ed59e1d1-35bd2ce4493mr13430834a91.29.1774327708987;
+        Mon, 23 Mar 2026 21:48:28 -0700 (PDT)
+Received: from [10.217.223.92] ([202.46.22.19])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-35c017477eesm386657a91.1.2026.03.23.21.48.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Mar 2026 21:48:28 -0700 (PDT)
+Message-ID: <7d797c67-25b6-48c9-b98a-4545de86e45b@oss.qualcomm.com>
+Date: Tue, 24 Mar 2026 10:18:18 +0530
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260319061723.1140720-1-ebiggers@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 02/11] soc: qcom: ice: Allow explicit votes on 'iface'
+ clock for ICE
+To: Harshal Dev <harshal.dev@oss.qualcomm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Abel Vesa <abel.vesa@oss.qualcomm.com>,
+        Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>,
+        cros-qcom-dts-watchers@chromium.org,
+        Eric Biggers <ebiggers@google.com>,
+        Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+        Jingyi Wang <jingyi.wang@oss.qualcomm.com>,
+        Tengfei Fan <tengfei.fan@oss.qualcomm.com>,
+        Bartosz Golaszewski <brgl@kernel.org>,
+        David Wronek <davidwronek@gmail.com>,
+        Luca Weiss <luca.weiss@fairphone.com>,
+        Neil Armstrong <neil.armstrong@linaro.org>,
+        Melody Olvera <quic_molvera@quicinc.com>,
+        Alexander Koskovich <akoskovich@pm.me>
+Cc: Brian Masney <bmasney@redhat.com>,
+        Neeraj Soni <neeraj.soni@oss.qualcomm.com>,
+        Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+References: <20260323-qcom_ice_power_and_clk_vote-v4-0-e36044bbdfe9@oss.qualcomm.com>
+ <20260323-qcom_ice_power_and_clk_vote-v4-2-e36044bbdfe9@oss.qualcomm.com>
+Content-Language: en-US
+From: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
+In-Reply-To: <20260323-qcom_ice_power_and_clk_vote-v4-2-e36044bbdfe9@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: VOzl754QVp74fQV7sM1jeReSM08Jz950
+X-Authority-Analysis: v=2.4 cv=Nc3rFmD4 c=1 sm=1 tr=0 ts=69c2179e cx=c_pps
+ a=RP+M6JBNLl+fLTcSJhASfg==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
+ a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=rJkE3RaqiGZ5pbrm-msn:22
+ a=EUspDBNiAAAA:8 a=SBCaeXWvHhY2KLIX7PwA:9 a=QEXdDO2ut3YA:10 a=zZCYzV9kfG8A:10
+ a=iS9zxrgQBfv6-_F4QbHw:22
+X-Proofpoint-GUID: VOzl754QVp74fQV7sM1jeReSM08Jz950
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzI0MDAzNyBTYWx0ZWRfX7MdmS2aS6afg
+ a4xd2S/9a7KThKfLrvMEcBi7r5PQZ7drPmaBY+zW6oKRgbp9bgDqieqmJk+HrUZNxAC9eGIPsdM
+ vUS1SAXD3OITpeMeROyuq2BYVyr3KhcJeRpoTFfi7k2HCvRTHCsbltjD4Lq0FZxLDz0SAkpXRhm
+ 1ukqMQrMp7vwNNnJ/1pm+LH86wyqo/kvo2ziMZge7nRMnI/6u0TmceQviPmP5G90fUKah+lUogD
+ x4H966qaPLJG9hChajDgnZW+E0TUThxfZOhqoACqfLPRBf5YA6fBf6bqNr0QS/zqFq8SvzxuwoK
+ A2cCBh0lebysIE9Rm69qef8DYRNdTf3986hAZqAjFG4uT+39tz4WWnhZO2IXDHqnDuzcnG8+o3j
+ q9ubw8AjaUcQHNoXP+t8y3zbbs1fcCdFT90gaPauKin79N98QqofwXDfQIK424SbbRyHayHPrzu
+ rVirUlm6XRVTRrVpp8Q==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-24_01,2026-03-23_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 impostorscore=0 spamscore=0 clxscore=1011 priorityscore=1501
+ bulkscore=0 lowpriorityscore=0 malwarescore=0 suspectscore=0 phishscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2603240037
 
-On Wed, Mar 18, 2026 at 11:17:01PM -0700, Eric Biggers wrote:
-> This series is targeting libcrypto-next.  It can also be retrieved from:
-> 
->     git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git ghash-lib-v1
-> 
-> This series migrates the standalone GHASH code to lib/crypto/, then
-> converts the "gcm" template and AES-GCM library code to use it.  (GHASH
-> is the universal hash function used by GCM mode.)  As was the case with
-> POLYVAL and Poly1305 as well, the library is a much better fit for it.
-> 
-> Since GHASH and POLYVAL are closely related and it often makes sense to
-> implement one in terms of the other, the existing "polyval" library
-> module is renamed to "gf128hash" and the GHASH support is added to it.
-> 
-> The generic implementation of GHASH is also replaced with a better one
-> utilizing the existing polyval_mul_generic().
-> 
-> Note that some GHASH implementations, often faster ones using more
-> recent CPU features, still exist in arch/*/crypto/ as internal
-> components of AES-GCM implementations.  Those are left as-is for now.
-> The goal with this GHASH library is just to provide parity with the
-> existing standalone GHASH support, which is used when a full
-> implementation of AES-GCM (or ${someothercipher}-GCM, if another block
-> cipher is being used) is unavailable.  Migrating the
-> architecture-optimized AES-GCM code to lib/crypto/ will be a next step.
-> 
 
-Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
 
-As usual, the s390 code will need to be tested by someone who has the
-privilege of access to a z/Architecture mainframe.  That is the only way
-to test that code, given that the s390 community has not yet updated
-QEMU to support the CPACF_KIMD_GHASH instruction.
+On 3/23/2026 2:47 PM, Harshal Dev wrote:
+> Since Qualcomm inline-crypto engine (ICE) is now a dedicated driver
+> de-coupled from the QCOM UFS driver, it explicitly votes for its required
+> clocks during probe. For scenarios where the 'clk_ignore_unused' flag is
+> not passed on the kernel command line, to avoid potential unclocked ICE
+> hardware register access during probe the ICE driver should additionally
+> vote on the 'iface' clock.
+> Also update the suspend and resume callbacks to handle un-voting and voting
+> on the 'iface' clock.
+> 
+> Fixes: 2afbf43a4aec6 ("soc: qcom: Make the Qualcomm UFS/SDCC ICE a dedicated driver")
+> Signed-off-by: Harshal Dev <harshal.dev@oss.qualcomm.com>
 
-From another review pass I also folded in some trivial cleanups that
-don't seem worth sending a v2 for unless something else comes up.
-Removed a definition I forgot to remove, dropped unnecessary rename of
-'h' to 'k', improved consistency in a couple places, etc.
+Reviewed-by: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
 
-diff --git a/arch/arm64/crypto/ghash-ce-glue.c b/arch/arm64/crypto/ghash-ce-glue.c
-index c74066d430fa..eaf2932ceaf5 100644
---- a/arch/arm64/crypto/ghash-ce-glue.c
-+++ b/arch/arm64/crypto/ghash-ce-glue.c
-@@ -35,10 +35,6 @@ struct arm_ghash_key {
- 	u64			h[4][2];
- };
- 
--struct arm_ghash_desc_ctx {
--	u64 digest[GHASH_DIGEST_SIZE/sizeof(u64)];
--};
--
- struct gcm_aes_ctx {
- 	struct aes_enckey	aes_key;
- 	u8			nonce[RFC4106_NONCE_SIZE];
-diff --git a/lib/crypto/arm/gf128hash.h b/lib/crypto/arm/gf128hash.h
-index cb929bed29d5..c33c8cbe51fe 100644
---- a/lib/crypto/arm/gf128hash.h
-+++ b/lib/crypto/arm/gf128hash.h
-@@ -12,7 +12,7 @@
- static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_neon);
- 
- void pmull_ghash_update_p8(size_t blocks, struct polyval_elem *dg,
--			   const u8 *src, const struct polyval_elem *k);
-+			   const u8 *src, const struct polyval_elem *h);
- 
- #define ghash_blocks_arch ghash_blocks_arch
- static void ghash_blocks_arch(struct polyval_elem *acc,
-diff --git a/lib/crypto/arm/ghash-neon-core.S b/lib/crypto/arm/ghash-neon-core.S
-index bf423fb06a75..eeffd12504a9 100644
---- a/lib/crypto/arm/ghash-neon-core.S
-+++ b/lib/crypto/arm/ghash-neon-core.S
-@@ -181,7 +181,7 @@
- 	/*
- 	 * void pmull_ghash_update_p8(size_t blocks, struct polyval_elem *dg,
- 	 *			      const u8 *src,
--	 *			      const struct polyval_elem *k)
-+	 *			      const struct polyval_elem *h)
- 	 */
- ENTRY(pmull_ghash_update_p8)
- 	vld1.64		{SHASH}, [r3]
-diff --git a/lib/crypto/arm64/gf128hash.h b/lib/crypto/arm64/gf128hash.h
-index d5ef1b1b77e1..b2c85585b758 100644
---- a/lib/crypto/arm64/gf128hash.h
-+++ b/lib/crypto/arm64/gf128hash.h
-@@ -12,14 +12,14 @@
- static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_asimd);
- static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_pmull);
- 
-+asmlinkage void pmull_ghash_update_p8(size_t blocks, struct polyval_elem *dg,
-+				      const u8 *src,
-+				      const struct polyval_elem *h);
- asmlinkage void polyval_mul_pmull(struct polyval_elem *a,
- 				  const struct polyval_elem *b);
- asmlinkage void polyval_blocks_pmull(struct polyval_elem *acc,
- 				     const struct polyval_key *key,
- 				     const u8 *data, size_t nblocks);
--asmlinkage void pmull_ghash_update_p8(size_t blocks, struct polyval_elem *dg,
--				      const u8 *src,
--				      const struct polyval_elem *k);
- 
- #define polyval_preparekey_arch polyval_preparekey_arch
- static void polyval_preparekey_arch(struct polyval_key *key,
-@@ -91,8 +91,8 @@ static void ghash_blocks_arch(struct polyval_elem *acc,
- 	if (static_branch_likely(&have_asimd) && may_use_simd()) {
- 		do {
- 			/* Allow rescheduling every 4 KiB. */
--			size_t n =
--				min_t(size_t, nblocks, 4096 / GHASH_BLOCK_SIZE);
-+			size_t n = min_t(size_t, nblocks,
-+					 4096 / GHASH_BLOCK_SIZE);
- 
- 			scoped_ksimd()
- 				pmull_ghash_update_p8(n, acc, data, &key->h);
-diff --git a/lib/crypto/arm64/ghash-neon-core.S b/lib/crypto/arm64/ghash-neon-core.S
-index eadd6da47247..85b20fcd98fe 100644
---- a/lib/crypto/arm64/ghash-neon-core.S
-+++ b/lib/crypto/arm64/ghash-neon-core.S
-@@ -180,7 +180,7 @@
- 	/*
- 	 * void pmull_ghash_update_p8(size_t blocks, struct polyval_elem *dg,
- 	 *			      const u8 *src,
--	 *			      const struct polyval_elem *k)
-+	 *			      const struct polyval_elem *h)
- 	 */
- SYM_FUNC_START(pmull_ghash_update_p8)
- 	ld1		{SHASH.2d}, [x3]
-diff --git a/lib/crypto/riscv/ghash-riscv64-zvkg.S b/lib/crypto/riscv/ghash-riscv64-zvkg.S
-index 2839ff1a990c..6a2a2f2bc7c8 100644
---- a/lib/crypto/riscv/ghash-riscv64-zvkg.S
-+++ b/lib/crypto/riscv/ghash-riscv64-zvkg.S
-@@ -55,6 +55,8 @@
- // void ghash_zvkg(u8 accumulator[GHASH_BLOCK_SIZE],
- //		   const u8 key[GHASH_BLOCK_SIZE],
- //		   const u8 *data, size_t nblocks);
-+//
-+// |nblocks| must be nonzero.
- SYM_FUNC_START(ghash_zvkg)
- 	vsetivli	zero, 4, e32, m1, ta, ma
- 	vle32.v		v1, (ACCUMULATOR)
-diff --git a/lib/crypto/tests/Kconfig b/lib/crypto/tests/Kconfig
-index 279ff1a339be..5b60d5c3644b 100644
---- a/lib/crypto/tests/Kconfig
-+++ b/lib/crypto/tests/Kconfig
-@@ -41,7 +41,7 @@ config CRYPTO_LIB_GHASH_KUNIT_TEST
- 	default KUNIT_ALL_TESTS
- 	select CRYPTO_LIB_BENCHMARK_VISIBLE
- 	help
--	  KUnit tests for GHASH library functions.
-+	  KUnit tests for the GHASH library functions.
- 
- config CRYPTO_LIB_MD5_KUNIT_TEST
- 	tristate "KUnit tests for MD5" if !KUNIT_ALL_TESTS
+-- 
+Regards
+Kuldeep
+
