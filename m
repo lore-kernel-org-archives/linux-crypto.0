@@ -1,85 +1,99 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98026345741
-	for <linux-crypto@vger.kernel.org>; Tue, 24 Mar 2026 19:44:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0542A39478D;
+	Tue, 24 Mar 2026 19:54:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774381475; cv=none; b=B3D0M8B9ZNb1c1TcWKO+9AoE+y5KHusR2X6pAfGKbYQMmiPPs/hOaTCqeyRmvNudA1W6v+IgFRa2V4qj81I1bIybnwAobAUvAViQ+VojTcxZzRwbUHb4nIzN8RD1OmezTdeEIQWOxNuEC2+9ReaTm0EZoReWvLZK2LHSk3zf6uY=
+	t=1774382055; cv=none; b=SVZO0tUtnEM9JQu/QE9Gu6324WZ0HiJt+x6BtBpnxZiGmY3kFq9jl+CNh+cB1mVO0EBA6PjUloVMz67DzoA9kHGWGl5YqY0rfeMKbH6WB63FwNsbBKkYTEEMfS2erQSsHGeZUx3t+M0MraieL2+glgnsHz0TNRBCa9Tagkvvnpc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774381475; c=relaxed/simple;
-	bh=UziImsq7zUjs4NQ2kslg0HUFulUNI5cwJCWZ92dxJrs=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=dpEN4e7HatOqn01vIbAbrZAzg5UMRKI2vf87JxabjVpp2bEpwgcEC9Xs75eg+GvYQ1RrK/NzF7WEyC24Tsf2vbz5064cvlQ+cj1AQYOcrxMEAWxGr1lDTqZBHYtomhlciiSroPubbrCvjXqD1qQ17EiJRaz2oKqHsj13um1ymCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z9SCSqbK; arc=none smtp.client-ip=198.175.65.13
+	s=arc-20240116; t=1774382055; c=relaxed/simple;
+	bh=UkMGwqq22iwoXvq8WTHO2sEi1l7YHym5mkOuSu27Ctw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QYfIXepnVWLbThxrbN/cwSLy8OIp74SNUo5fCwWmBFll3kUEJca2297q1L7U0D1FZ2EaSXPi1+UJgKc96AMgbC8csXQIp2IJEIezQSBs3L0k2c35xdWry8lSq4iS7tYFWbQQUEN03GJ3Nruk2ojncO0hpiNoL7L84C5mI7w9eGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MUhFdOaR; arc=none smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z9SCSqbK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MUhFdOaR"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774381473; x=1805917473;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=UziImsq7zUjs4NQ2kslg0HUFulUNI5cwJCWZ92dxJrs=;
-  b=Z9SCSqbK97YnvBb0zshd2bhJg3XTo4nohgVoVtg/0d0EiUfAF5u/KG/C
-   msEG9Si9TNvz6+Fq87GjDL4WXmEqEkBJK9COwGQuOQdAlN5p6kiSDL3zl
-   og80P5lygeCfGyX3gUU9PjWstn2jPMXIYW0ckLij1WC1rNyB1ytlvJgBz
-   f1ilZLunxV8LYTS8XSMZkawRaqfRkAcs/WlbZlQ1IfAlSrTEALc+a1K3N
-   yGd+LyR6JZMVchT4rqZFYxThlYyrer3MLVsTFuN9ezKm327YRCEXPvI69
-   vRbSi59r4vi1CEcSH3N1577gZSuW8izWK4MWgI/UxG4Jkw3c9WJgFBczI
-   Q==;
-X-CSE-ConnectionGUID: C8x9xQQ4T4+IzfuJ+ViiAw==
-X-CSE-MsgGUID: 893t0a9XTJ2sYnR0ZqAKgA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11739"; a="86486826"
+  t=1774382054; x=1805918054;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=UkMGwqq22iwoXvq8WTHO2sEi1l7YHym5mkOuSu27Ctw=;
+  b=MUhFdOaR6u7sdh8atAvXECJKgEzLaFGsZscEkI63Sp9kemXs0P5Sgh3C
+   WGfEya5CZUh9+TmJKEHr/tCta5QUvXE9bgKKwBknJPPEj2kplOZJCM55j
+   je+ze/3rTDoq0/eDWMOp8661/5Uehx08gT1zictdvhBBX7/udRbODtODL
+   AheKg3dPujOrLPgFIPkTgh3rH1oB/uWdllCOplAq7UklcHPWAClulTqRL
+   gG1ywe23ldwghHVIct6Pgwx/67g3a9x+uprcHizPp1zCNzNgF7jCHC3+C
+   UuXo6k3rQE8nI8pYzLYwDpwxqjzKhRHXAe0BA4BEIvKgeoOrKmIJjM8i4
+   g==;
+X-CSE-ConnectionGUID: zoOPZMp6QqWmJ0kvLyP62g==
+X-CSE-MsgGUID: Rg6NgN5vSPWesmIdAJSEMQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11739"; a="75381624"
 X-IronPort-AV: E=Sophos;i="6.23,138,1770624000"; 
-   d="scan'208";a="86486826"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2026 12:44:32 -0700
-X-CSE-ConnectionGUID: KKx5/mYXTPeIHnM8tAQ+ag==
-X-CSE-MsgGUID: uNW4RXIyR2yKNmT27sorgg==
+   d="scan'208";a="75381624"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2026 12:54:09 -0700
+X-CSE-ConnectionGUID: xHKOCFOHQn6/6LoPjrqBGA==
+X-CSE-MsgGUID: Sfj9w7JSTAS9x8PTYS+lPA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,138,1770624000"; 
-   d="scan'208";a="223661759"
-Received: from vcostago-desk1.jf.intel.com (HELO vcostago-desk1) ([10.88.27.144])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Mar 2026 12:44:33 -0700
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
- herbert@gondor.apana.org.au, kristen.c.accardi@intel.com
-Cc: linux-crypto@vger.kernel.org, Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: Re: [PATCH] crypto: iaa - fix per-node CPU counter reset in
- rebalance_wq_table()
-In-Reply-To: <20260324182912.123665-1-giovanni.cabiddu@intel.com>
-References: <20260324182912.123665-1-giovanni.cabiddu@intel.com>
-Date: Tue, 24 Mar 2026 12:44:31 -0700
-Message-ID: <878qbh6mhs.fsf@intel.com>
+   d="scan'208";a="248027229"
+Received: from lkp-server01.sh.intel.com (HELO 3905d212be1b) ([10.239.97.150])
+  by fmviesa001.fm.intel.com with ESMTP; 24 Mar 2026 12:54:07 -0700
+Received: from kbuild by 3905d212be1b with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1w57pE-000000005N3-38Le;
+	Tue, 24 Mar 2026 19:54:04 +0000
+Date: Wed, 25 Mar 2026 03:53:51 +0800
+From: kernel test robot <lkp@intel.com>
+To: Eric Biggers <ebiggers@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: Re: [PATCH v2] crypto: cryptomgr - Select algorithm types only when
+ CRYPTO_SELFTESTS
+Message-ID: <202603250302.MimbBMTL-lkp@intel.com>
+References: <20260324050123.9494-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260324050123.9494-1-ebiggers@kernel.org>
 
-Giovanni Cabiddu <giovanni.cabiddu@intel.com> writes:
+Hi Eric,
 
-> The cpu counter used to compute the IAA device index is reset to zero
-> at the start of each NUMA node iteration. This causes CPUs on every
-> node to map starting from IAA index 0 instead of continuing from the
-> previous node's last index. On multi-node systems, this results in all
-> nodes mapping their CPUs to the same initial set of IAA devices,
-> leaving higher-indexed devices unused.
->
-> Move the cpu counter initialization before the for_each_node_with_cpus()
-> loop so that the IAA index computation accumulates correctly across all
-> nodes.
->
-> Fixes: 714ca27e9bf4 ("crypto: iaa - Optimize rebalance_wq_table()")
-> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> ---
+kernel test robot noticed the following build errors:
 
-Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+[auto build test ERROR on f9bbd547cfb98b1c5e535aab9b0671a2ff22453a]
 
+url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Biggers/crypto-cryptomgr-Select-algorithm-types-only-when-CRYPTO_SELFTESTS/20260324-131705
+base:   f9bbd547cfb98b1c5e535aab9b0671a2ff22453a
+patch link:    https://lore.kernel.org/r/20260324050123.9494-1-ebiggers%40kernel.org
+patch subject: [PATCH v2] crypto: cryptomgr - Select algorithm types only when CRYPTO_SELFTESTS
+config: sparc-randconfig-002-20260325 (https://download.01.org/0day-ci/archive/20260325/202603250302.MimbBMTL-lkp@intel.com/config)
+compiler: sparc-linux-gcc (GCC) 14.3.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260325/202603250302.MimbBMTL-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202603250302.MimbBMTL-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   sparc-linux-ld: drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.o: in function `sun8i_ce_unregister_algs':
+>> sun8i-ce-core.c:(.text+0x19c): undefined reference to `crypto_unregister_rng'
+   sparc-linux-ld: drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.o: in function `sun8i_ce_register_algs':
+>> sun8i-ce-core.c:(.text+0x654): undefined reference to `crypto_register_rng'
 
 -- 
-Vinicius
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
