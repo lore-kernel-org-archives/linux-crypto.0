@@ -1,92 +1,217 @@
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 094C53D1CAA
-	for <linux-crypto@vger.kernel.org>; Wed, 25 Mar 2026 12:26:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB4839A7FE;
+	Wed, 25 Mar 2026 15:25:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774441582; cv=none; b=oz+TpYVuSOX8hmYUht6SngGiwrabY9Iwrekh/pUKG3DUI3GUklf+reluIkCoMEgd+LtjEFKCkK469yWLUuhOwarVYYSftEZE3QN5G/oMPaCFUI+65SPqx0kQiAy4hp08JkAmbM6DABmOgi2PQ8MBNJAZRu/13ipc38bYzxZ0Nqc=
+	t=1774452310; cv=none; b=NS9wRMfTVkZHzKDs/Q11YPSt4XZloYCGfBLyMww5vqLYGFjGdUfAGsJfcFYyfLV3uQCI2CejAZD4IrAIXIFMaA2pQuHFD6tT6ixr+GexiztYQ+aL1I0bD1OMqBoYgK530IFLIqD6RBE9V660ydWrEHtMOUPsc0q+dZvZrmptso4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774441582; c=relaxed/simple;
-	bh=NZmy9A71+mGjb0JyggN74KFegUmUlepYAcOg34BAaFw=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:References:Cc:
-	 In-Reply-To:Content-Type; b=YN8PcT/+fZ8fu3EtkYMjQPMVsQ08oQ4ZpIk+A7tSjiT2SwN5rK7sX6CqhuLybFSXhmbuZS/O21hLBzCcqKGSjLcDfCpiAPHzeYxd8ZW+DsHW9L8KLAAjMwEEmom+SKJH7r9ausjiW5D6Xm5IhpHAvZ1Y3xyzilxV1f1fBkuoqVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=EF5MXwAS; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	s=arc-20240116; t=1774452310; c=relaxed/simple;
+	bh=sI6cjAIO1yZ54Gqe2yyUZeshtZbWqpAlSGw4L5lRmzk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GW9ldIb9fsQggkygD51oGBay06GZz3uyF8Py4Af+3TxIV2Ev0f3923I4BC//uOENWgdrkjRSc+syP2R9Ld3k81LNGhHic8CwJqwsOcxeNSJcYfWiUd4zRfo+e2Pyed8YSu+wE1wthi01AvPuhPHB7MIrR9pYsLbLs4kDv5Qwg/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dEelH2eT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="EF5MXwAS"
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id C38201A2F86;
-	Wed, 25 Mar 2026 12:26:19 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 9137C601E2;
-	Wed, 25 Mar 2026 12:26:19 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 882C910451362;
-	Wed, 25 Mar 2026 13:26:15 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1774441578; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=Nsz0GR6Zk0VoXYbxqVh2SRpOfgafRwZhwcA2/A7RPXA=;
-	b=EF5MXwASWIYiahatIX3d0Mo/1pBcLlgzcwZ0RYJmtK3/S9xwyWTEu2h5YFT4hR1SafkZby
-	tj04jSrlt57xTQDZ/1n4QbL/mNTyi5O9PeC/ucUnLCoLqCiIOThjaB1JkMzlN6WXdyGO+X
-	07V8nxfwQS0rXkwfKC8HRbUydvzhWK3FakHHJ2KeXD9poL9hzz4T6DUJfHekHskUoEY/VF
-	vHzSLjbnTVv26B+8qeTITwbjvV7Yri0ZFejHF/CBHSnJJSyAHFjbFJWiO3kXJ2BKTb4zZi
-	AbetPhsgpnJQOxGQVLtAuqlpc5Q+/iYykuIeiFRdnx0Qw7pKz4PNxMW1TQPT+Q==
-Message-ID: <b53feadd-8246-43cf-a768-740cb73d2553@bootlin.com>
-Date: Wed, 25 Mar 2026 13:26:16 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dEelH2eT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C57FC116C6;
+	Wed, 25 Mar 2026 15:25:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774452310;
+	bh=sI6cjAIO1yZ54Gqe2yyUZeshtZbWqpAlSGw4L5lRmzk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dEelH2eT5mI+c6A7F+qjo0dLLdE+xa197XUVe60Mhv0mnAGmz3EUpb0SMesUh77FN
+	 rJsqcC7DSPfuv6KCfeUqXTHkQTtVBvwgKOVqoIajkpjdR4PupLRDeu85R9dUUB8JXK
+	 gio07OmXnBtRgIE6r6GGuzVjX8MkhW6fldH2JsWPQXzENPAbOlur1Swt9Tpi8UVk36
+	 iddHFWastQZqwC0neCEzxzrApvImZSjirzsgS3oj/kVfoHuamMKMTJXpBE5V/hK7k/
+	 C3kv90fsQkBskE2P5ihN1/sqU/mYqqNpnW9jNhx95rHbNDN0Bg0nqEe39jWQuLOnGT
+	 VlbjGuqrBJETA==
+Date: Wed, 25 Mar 2026 09:25:05 -0600
+From: Tycho Andersen <tycho@kernel.org>
+To: Borislav Petkov <bp@alien8.de>
+Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Ashish Kalra <ashish.kalra@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	John Allen <john.allen@amd.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>,
+	Kishon Vijay Abraham I <kvijayab@amd.com>,
+	Alexey Kardashevskiy <aik@amd.com>,
+	Nikunj A Dadhania <nikunj@amd.com>,
+	"Peter Zijlstra (Intel)" <peterz@infradead.org>,
+	Kim Phillips <kim.phillips@amd.com>,
+	Sean Christopherson <seanjc@google.com>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v4 0/7] Move SNP initialization to the CCP driver
+Message-ID: <acP-UdjBy06MnBgY@tycho.pizza>
+References: <20260324161301.1353976-1-tycho@kernel.org>
+ <6A6AA56D-6B4C-4C32-A639-18C14BC0C358@alien8.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Need some clarification about CRYPTO_AHASH_ALG_BLOCK_ONLY
-From: Paul Louvel <paul.louvel@bootlin.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>
-References: <4f93481a-a0e5-4a9f-8aae-00d3189ccc58@bootlin.com>
-Content-Language: en-US
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-In-Reply-To: <4f93481a-a0e5-4a9f-8aae-00d3189ccc58@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6A6AA56D-6B4C-4C32-A639-18C14BC0C358@alien8.de>
 
-Hello,
+On Wed, Mar 25, 2026 at 09:07:42AM +0000, Borislav Petkov wrote:
+> Sachiko has some questions:
+> 
+> https://sashiko.dev/#/patchset/20260324161301.1353976-1-tycho%40kernel.org
 
-I forgot to include the maintainers in the initial e-mail.
+Interesting, review-prompts directly didn't complain about these,
 
-Additional link to the source code :
-https://elixir.bootlin.com/linux/v7.0-rc1/source/crypto/ahash.c#L467
-
-Thank you,
-Paul.
-
-On 3/20/26 10:42 AM, Paul Louvel wrote:
-> Hello,
+> Could this lead to a NULL pointer dereference in clear_rmp() if
+> setup_rmptable() fails during early boot?
 >
-> I have stumbled across a flag defined in include/crypto/internal/hash.h : 
-> CRYPTO_AHASH_ALG_BLOCK_ONLY.
-> To get more information about what exact behavior this flag do, I read the 
-> crypto_ahash_update function.
-> From the looks of it, it seems that the API will call the tfm update if there 
-> is enough bytes (and by enough I mean at least a block size), from the 
-> internal buffer and the incoming ahash_request.
-> In this case, I find the BLOCK_ONLY naming a bit of a misnomer, since it only 
-> guarantee you than req->nbytes will be at least a block size.
-> I initially though that the API would only give a request that are a multiple 
-> of the block size.
->
-> This flag, among others, are relatively recent.
-> I think adding documentation about these flags would be a great idea.
->
-> Regards,
-> Paul.
->
--- 
-Paul Louvel, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+> If setup_rmptable() returns false (for example, if the BIOS did not
+> reserve memory for the RMP table), it exits without allocating
+> rmp_bookkeeping or rmp_segment_table, but leaves the CC_ATTR_HOST_SEV_SNP
+> platform attribute active.
 
+If setup_rmptable() fails, snp_rmptable_init() returns -ENOSYS and
+iommu_snp_enable() clears CC_ATTR_HOST_SEV_SNP.
+__sev_snp_init_locked() checks CC_ATTR_HOST_SEV_SNP before doing
+anything else, so I think this is not possible.
+
+You did complain about this call chain before off-list though, maybe
+we should clear CC_ATTR_HOST_SEV_SNP in more places directly vs.
+returning an errno to make it more obvious?
+
+> Is there a race condition with CPU hotplug here?
+>
+> Since snp_prepare() lacks cpus_read_lock() protection, a CPU could
+> come online exactly between the two passes, missing the mfd_enable step
+> but receiving snp_enable.
+
+I think it makes sense to do the operations on the same set of CPUs
+even if we don't support hotplug. I will resend with
+cpus_read_lock().
+
+> Additionally, without a CPU hotplug state callback (such as
+> cpuhp_setup_state()), any CPUs brought online after snp_prepare()
+> completes will miss these MSR configurations completely. If an SNP
+> guest is later scheduled on one of these uninitialized CPUs, will it cause
+> hardware exceptions?
+
+Yes, WONTFIX.
+
+> Can deferring this call cause a NULL pointer dereference? Previously,
+> snp_prepare() was called only after setup_rmptable() succeeded. By
+> moving it to the CCP driver, it may be called unconditionally as long
+> as CC_ATTR_HOST_SEV_SNP is true, even if setup_rmptable() was skipped
+> or failed. Does clear_rmp() inside snp_prepare() safely handle the
+> uninitialized rmp_bookkeeping pointer?
+
+Same as above, CC_ATTR_HOST_SEV_SNP should perhaps be cleared in more
+places.
+
+> Also, moving snp_prepare() out of early boot might expand the window for
+> CPU hotplug events. Does this create an asymmetry where newly onlined
+> CPUs miss the MSR_AMD64_SYSCFG_SNP_EN configuration applied by
+> on_each_cpu(snp_enable, NULL, 1) because the SEV subsystem lacks a CPU
+> hotplug callback? Could this cause host crashes when KVM schedules VMs
+> on these uninitialized CPUs?
+
+Same as above, WONTFIX.
+
+> Additionally, does deferring SNP enablement in the hardware coordinate
+> with the IOMMU feature degradation? The AMD IOMMU driver evaluates
+> amd_iommu_snp_en at early boot and permanently disables identity mapping
+> domains and IOMMUv2. Will the system suffer this permanent penalty even
+> if the CCP driver is never loaded?
+
+This is about the bios setting:
+
+        amd_iommu_snp_en = check_feature(FEATURE_SNP);
+        if (!amd_iommu_snp_en) {
+                pr_warn("SNP: IOMMU SNP feature not enabled, SNP cannot be supported.\n");
+                goto disable_snp;
+        }
+
+so I don't think the question really makes sense.
+
+> Could placing snp_prepare() here cause prolonged blocking of all SEV
+> operations? Since __sev_snp_init_locked() holds sev_cmd_mutex, the long
+> execution time of clear_rmp() (which zeroes the entire RMP table and scales
+> with system RAM) might block SEV firmware ioctls and VM lifecycle operations
+> globally for several seconds.
+
+Yes, it does :). Actually the firmware call is the expensive part, not
+the rmp zeroing, but it definitely blocks for a while.
+
+> This isn't a bug introduced by this commit, but if SEV initialization
+> fails and KVM is actively running normal VMs, could a userspace process
+> trigger this code path via /dev/sev ioctls (e.g., SEV_PDH_GEN) and zero out
+> MSR_VM_HSAVE_PA globally? Would the next VMRUN execution for an active VM
+> trigger a general protection fault and crash the host?
+
+Oof, yes. I wonder if we shouldn't set psp_dead = true if
+sev_platform_init() sees an error. After this series, if
+the error is e.g. init_ex_path failure, you can unload, fix the
+failure, and try again.
+
+>  	if (sev_version_greater_or_equal(SNP_MIN_API_MAJOR, 52)) {
+[ ... ]
+>  		memset(&data, 0, sizeof(data));
+[ ... ]
+>  		data.tio_en = tio_supp && sev_tio_enabled && amd_iommu_sev_tio_supported();
+[ ... ]
+>  	} else {
+>  		cmd = SEV_CMD_SNP_INIT;
+>  		arg = NULL;
+>  	}
+> This isn't a bug introduced by this commit, but is the stack variable
+> data left uninitialized when taking the else branch? Since data.tio_en is
+> later evaluated unconditionally, could stack garbage cause it to evaluate
+> to true, leading to erroneous attempts to allocate pages and initialize
+> SEV-TIO on unsupported hardware?
+
+No, arg is the actual pointer passed, and it is set to NULL. non-EX
+init doesn't support TIO anyway...
+
+> Also, regarding the bounds check in snp_filter_reserved_mem_regions()
+> called via walk_iomem_res_desc(): does the check
+> if ((range_list->num_elements * 16 + 8) > PAGE_SIZE)
+> allow an off-by-one heap buffer overflow?
+>
+> If range_list->num_elements is 255, 255 * 16 + 8 = 4088, which is <= 4096.
+> Writing range->base (8 bytes) fills 4088-4095, but writing range->page_count
+> (4 bytes) would write to 4096-4099, overflowing the kzalloc-allocated
+> PAGE_SIZE buffer.
+
+Yes, this also looks real, and needs:
+
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 939fa8aa155c..3642226c0fc0 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -1328,10 +1328,11 @@ static int snp_filter_reserved_mem_regions(struct resource *rs, void *arg)
+ 	size_t size;
+ 
+ 	/*
+-	 * Ensure the list of HV_FIXED pages that will be passed to firmware
+-	 * do not exceed the page-sized argument buffer.
++	 * Ensure the list of HV_FIXED pages including the one we are about to
++	 * use that will be passed to firmware do not exceed the page-sized
++	 * argument buffer.
+ 	 */
+-	if ((range_list->num_elements * sizeof(struct sev_data_range) +
++	if (((range_list->num_elements + 1) * sizeof(struct sev_data_range) +
+ 	     sizeof(struct sev_data_range_list)) > PAGE_SIZE)
+ 		return -E2BIG;
+
+I have another bug that review-prompts found unrelated to this series.
+I can put the two fixes above with that or include them here, let me
+know what you prefer. Either way I'll resend one more with
+cpus_read_lock().
+
+Thanks,
+
+Tycho
