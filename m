@@ -1,109 +1,101 @@
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ED1E3E928D
-	for <linux-crypto@vger.kernel.org>; Wed, 25 Mar 2026 16:23:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BA2C3F880D;
+	Wed, 25 Mar 2026 16:30:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774455833; cv=none; b=UABUE0G4Ac5ItWJzM7Xfg9cmaudE8E2o7toE9xIyQJyATJ9JGGVH07eL/CoRlNhI1Ygfv54wIJSyz+QhCjFB/elfIoUO87zbHqpLki3ht2qMXcRVb9KK+8wpmL9Fkt2jEnry4N4XA458aMKm9ix7Fyy0cNZctOHEnMrkUIVIOXs=
+	t=1774456254; cv=none; b=f0AgBNUiEpmxXbZIcYak92bxoKPVlBQOCd2FM46PjqQnIcu6//eFfHxWGW6qSWSL+sN6v0ka1ZpgOp9QyxFGti9o4hDMvmGaRbgutpuD76QfGahvUH/cKDYCNkMjpiihXvkLQR3ljqTaAHR2cFdl5scnbFne6aCspqw8QWSJkDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774455833; c=relaxed/simple;
-	bh=nO86jVfdQ63Cy3MQ5IB90yb3gxkkrH+dYp7vjBgXzjM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=U/5+OP0F8tKDihTxEY6LTbuEa2/zt2YmaMmKVWAfbe+PzdRmT9CeFAQVNqqNVNsgglgFHuM8O9tSe1720i3OoH8bF/xTm93w2VfUBSMWQ06MOi54UdcX6v0W4XMi+iaHsA7trBMWFWKacvJMQUMcWlcZSA9Ny2ds+FdFCcFAVVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=dErEMNCQ; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	s=arc-20240116; t=1774456254; c=relaxed/simple;
+	bh=+AmS+tOzD2cSA2LrII2fvtTfr6fN6xggErI+us8oNsU=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=LJsu54Hl9HwsWmnks0SA600+IghioZhBaylQZ7O86RicIwNyxA2Gmy6SRaJYJVB2gqY49GtJSyhsVCCidVTv5z8WDz6hGx6eVzBhDkFhpXL6SNP8pj02Cyzn039NNiiBRkBZMJPLT5u5lvvw6+kIXk0XeVZzKSjW9yUlwXP6qXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=J5ymzmT6; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="dErEMNCQ"
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b980785a0bfso389079966b.3
-        for <linux-crypto@vger.kernel.org>; Wed, 25 Mar 2026 09:23:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1774455829; x=1775060629; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=xqRumgqylqhdvOolgAnZpUvCcbCRYsHI+2vuXt4pFJ0=;
-        b=dErEMNCQ480Bb/YNjqWnZfDSV6befDLBk4n1ho9rlQbBuluDQ0Yue7+3RnpFnd9KIF
-         lC0VZRrf0QRu2l9SLiAJzuAyYx5lmYv+XLBj71Tqo1DQ/5UFjvF7B7QTx3gIQiCCfTNl
-         nrqrfsdUDXVEFHSMCebHj9EbkjmHVDMlXBTdo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774455829; x=1775060629;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xqRumgqylqhdvOolgAnZpUvCcbCRYsHI+2vuXt4pFJ0=;
-        b=myFAh34L06k82uRP6HyZAC1wqeFnrJNAAIwY+iOBT6xaabdwwXnT5jsU3ZAjGGnIsI
-         LnXJaHzCmCQ3zBwG1z4Yv5Z58udGutIcU7B2/OUjIwpJgD2hViBur2UOUeAzHAchAeie
-         nHlu758IHsntHg2vH/a4gvuH7CO53wPPo9r2SPOosZ9Oxn4VAVYW5AG+zyBE78sRNkMf
-         qcuwQDaj6+SW2tvAIcOakNdqRNGVTF9I6PW4GeVKH9aJiNHd38zlr4Om4mUX7YmkWfs5
-         9JZY8v1LZ2DKgadW8uE3SoGQz2XQhFVMt3/cs4n0C6MOr34pCpa2makfhYireGy5d237
-         JsKA==
-X-Gm-Message-State: AOJu0YwGr8eBw3nq1WRYZ0Vae/vZspJjXDMo25+m+IBxm9992dsWb5GN
-	nl9crgLOutQoe2w6E9snTk5MH4pIkU3GzRr9ob3Q8PUhYfMHvLoP6AjgCSg7bCSiE2t5JMAf7Vl
-	u5+CkrLg=
-X-Gm-Gg: ATEYQzw5SL3xUbRVHw/RWo29itMgZYgfWLd2O8giR3rPGG0xuNuhFiKSRbEOVYEPvN7
-	gTEIfd7hZceqOJafjDPpZAK8RjUuZuvlXDkIohyQBwzJ0JEatLYDq6Kwkvs8yNwqzEtMHjRRG0a
-	bSMCkdwIcNEahXqs2eCk40b7qWUVvi0BSj0AQi3ymc1SZsMyU1oa7JvVU8W+xWWDh41lX+e97q1
-	dWuOtnVhFSRcpAFYyhq2mHR2oK4/S3mCPsGe8y5bthAfGgE5mM859tI7K7zuX3zRxQB+iib9zAR
-	5H1ah95TrTZLCOGyu4Qvj6Jffc1CPIHlUkBfedmYVjxr1XJi3Yneb4Dp9P91B0h6tnH+NkQXNUA
-	q+xQoMsznOnKsXvA6Uo/URlq/eXG4gm4Bh53LS7rqtoBuJVe06hqTfFIWx69KcKM4s7O21o/zq2
-	9yo/D5XtPQV5RIB2spcp2mkk3iL31QsoXTfxL4iMxw6wGybmHmsaf4UaG6Nry4QVKLzQ6+4Gw=
-X-Received: by 2002:a17:906:f5a2:b0:b97:c719:14d4 with SMTP id a640c23a62f3a-b9a542527f8mr277233466b.29.1774455829516;
-        Wed, 25 Mar 2026 09:23:49 -0700 (PDT)
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com. [209.85.208.49])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9b202192desm6900366b.2.2026.03.25.09.23.48
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Mar 2026 09:23:49 -0700 (PDT)
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-661d20c9787so3964154a12.0
-        for <linux-crypto@vger.kernel.org>; Wed, 25 Mar 2026 09:23:48 -0700 (PDT)
-X-Received: by 2002:a05:6402:52c7:b0:66a:5c2:51cc with SMTP id
- 4fb4d7f45d1cf-66a82618054mr2725783a12.4.1774455828155; Wed, 25 Mar 2026
- 09:23:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="J5ymzmT6"
+Received: from [IPV6:2601:646:8081:9481:619:3ffd:957c:6748] ([IPv6:2601:646:8081:9481:619:3ffd:957c:6748])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 62PGDMNL3153560
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Wed, 25 Mar 2026 09:13:22 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 62PGDMNL3153560
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2026022301; t=1774455208;
+	bh=v2u7ExN5eifBevZeC2xb3xyOceea1RmqMBZtOrcYzMg=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=J5ymzmT6BQR65DUAALhhSYjcHADheoqS/Y1TB20cnYBvtYJoCBoHEmdHJLu/Si20r
+	 6rz3J3dMJE/DEAiYOO3Fx6vfsrD2MnYD1ixgvwprxcGhIEVWzMLmCHreu1sLIn5SNP
+	 6VBBW2+SCSgr4uOYIIcCe+9jSspVTz7NsGduU1IHGnQyH3sgnggWaXIAuTY0sSScDJ
+	 hy7fCQlaHvFN3juiyk0mVo/l0cAc4F3B4clshklYM45be69gwY6re6ju8/GDKmI3HX
+	 ln5NoZUdBqzuxxOWGyGyQysV8OXGXSO4zB7ByDmwCtm51dOIhtQh0z8KO6LEy/vgUL
+	 bF7T6QJ+oA0WA==
+Message-ID: <fa11e4d3-1c70-4fa7-9f03-8772c002be6a@zytor.com>
+Date: Wed, 25 Mar 2026 09:13:16 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <acOpDrnN3cVfiASk@gondor.apana.org.au>
-In-Reply-To: <acOpDrnN3cVfiASk@gondor.apana.org.au>
-From: Linus Torvalds <torvalds@linuxfoundation.org>
-Date: Wed, 25 Mar 2026 09:23:31 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wiEzzo=LQ4TasUqFDkSYYAXa3VT6PvLx+AS8asOEA6hng@mail.gmail.com>
-X-Gm-Features: AQROBzCvobMTeSr66Doog6JxPYO6sueQRqpfgG5bNFV_fR0cItaL4yWoGy3wQ-4
-Message-ID: <CAHk-=wiEzzo=LQ4TasUqFDkSYYAXa3VT6PvLx+AS8asOEA6hng@mail.gmail.com>
-Subject: Re: [PATCH] crypto: authencesn - Copy high sequence number from src
- after out-of-place decryption
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Eric Biggers <ebiggers@kernel.org>, 
-	Taeyang Lee <0wn@theori.io>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Greg KH <gregkh@linuxfoundation.org>, davem@davemloft.net, 
-	Brian Pak <bpak@theori.io>, Juno Im <juno@theori.io>, Jungwon Lim <setuid0@theori.io>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 02/17] raid6: remove __KERNEL__ ifdefs
+From: "H. Peter Anvin" <hpa@zytor.com>
+To: Christoph Hellwig <hch@lst.de>, Andrew Morton <akpm@linux-foundation.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Madhavan Srinivasan <maddy@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+        Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Thomas Gleixner <tglx@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Dan Williams <dan.j.williams@intel.com>, Chris Mason <clm@fb.com>,
+        David Sterba <dsterba@suse.com>, Arnd Bergmann <arnd@arndb.de>,
+        Song Liu <song@kernel.org>,
+        Yu Kuai <yukuai@alb-78bjiv52429oh8qptp.cn-shenzhen.alb.aliyuncs.com>,
+        Li Nan <linan122@huawei.com>, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
+        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-raid@vger.kernel.org
+References: <20260324064115.3217136-1-hch@lst.de>
+ <20260324064115.3217136-3-hch@lst.de>
+ <59d1d178-c141-4229-81e9-a6c23fa81f2f@zytor.com>
+Content-Language: en-US, sv-SE
+In-Reply-To: <59d1d178-c141-4229-81e9-a6c23fa81f2f@zytor.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, 25 Mar 2026 at 02:21, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
->         /* Move high-order bits of sequence number back. */
-> -       scatterwalk_map_and_copy(tmp, dst, 4, 4, 0);
-> -       scatterwalk_map_and_copy(tmp + 1, dst, assoclen + cryptlen, 4, 0);
-> -       scatterwalk_map_and_copy(tmp, dst, 0, 8, 1);
-> +       if (req->src == dst) {
-> +               scatterwalk_map_and_copy(tmp, dst, 4, 4, 0);
-> +               scatterwalk_map_and_copy(tmp + 1, dst, assoclen + cryptlen, 4, 0);
-> +               scatterwalk_map_and_copy(tmp, dst, 0, 8, 1);
-> +       } else
-> +               memcpy_sglist(dst, req->src, 8);
+On 2026-03-25 08:13, H. Peter Anvin wrote:
+> On 2026-03-23 23:40, Christoph Hellwig wrote:
+>> With the test code ported to kernel space, none of this is required.
+> 
+> I really *really* don't like this.
+> 
+> The ability of running in user space is really useful when it comes to
+> developing new code for new platforms, which happens often enough for this code.
+> 
 
-Side note: can we please just get rid of the horrid
-scatterwalk_map_and_copy() when making changes to code?
+That being said -- and I do say this as the original author of this code --
+this should be reduced to the maximum extent possible to a (minimal) set of
+#ifndef __KERNEL__, which should be localized as much as possible. The actual
+user space components, even such a thing as a simple #include, should be moved
+to a separate user space header.
 
-That function is disgusting. It's really hard to see which direction it copies.
+But pretty please do leave the ability to debug the algorithms in user space.
+This is hard code to write and debug; it is not just about regression testing.
 
-At least with memcpy_to/from_sglist() the function name and the order
-of the arguments gives a better hint of what the code is trying to do.
+	-hpa
 
-This code is all very hard to read even _without_ the code being
-intentionally obfuscated with that horrid interface.
-
-                  Linus
