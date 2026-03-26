@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD8163A3826;
-	Thu, 26 Mar 2026 20:12:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A05AE3A6B7B;
+	Thu, 26 Mar 2026 20:12:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774555973; cv=none; b=WtvTi80lNifmjFG+a/v80azUVdZwvREPCZPIoYCr9+DRbHDRSp/ljQaahbGwpqgIfCIJiOT9kDO34j+meAIdkmWxQQYs09ON6Rx0vU3t0BrbhvNYBaepvrDDkNc64Tadtvb+KXNzQjGyUzl5k3beh2hKdErqC6fbTihLSZPyNjQ=
+	t=1774555974; cv=none; b=G9mbTs4bDZNfyrEwjvW5TXMt9e1gpcHlGyfUIiNt/eox4S56Nf31rZly3LcXsfv33NxGjHexqkPz2NAM+oWLT0XdOi05eRIEycs8NoD7DdoEE42wleknuu935qYVjs+MvPuckeSvtZiW7OQLG5NpBiZfvP/prsXhRTa/H4MXIwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774555973; c=relaxed/simple;
-	bh=VBVbTnQFXp4h+uFwG4gUTfOTUBJpwgXxdOn1hji6UY0=;
+	s=arc-20240116; t=1774555974; c=relaxed/simple;
+	bh=KXDFQH+yQTzWkSm24WreW8WQUK4NNhpR/Il4B1yD/eU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZPqfFDAl+WfI/Qom+Q5HOjN4BCcf3mURBdYVf8bGTnjWycVOO6TN1HsxScqofhzfJNq0bNRDiG7BtGOPSJOl0m356xUIwnm+chxbzasjmhF1eNwZDtijiUXulkJ/ONdwPZciTvTiESHYV/g2SfHhBXmWQF3HNZ7UYDeSLU/Gxzo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=thnbTqB0; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=qyF4OmAelY0lEU1Vxwxrw+yvAZ41CitPQZLRW8th17H4Reb2JtcfkOKB/2GZZiipmpdhTutMea8ABP/ymtLBURl88OuG9iQqCpGSa+LOmw8ihBkgyypvOGTFn9tKiACxCyvo66YBN3BZTIA999WVa0ZJfymT5wiEhD8xkkLRCtw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vIXP04gr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="thnbTqB0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DFA9C2BCB1;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vIXP04gr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDA4AC19423;
 	Thu, 26 Mar 2026 20:12:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774555973;
-	bh=VBVbTnQFXp4h+uFwG4gUTfOTUBJpwgXxdOn1hji6UY0=;
+	s=k20201202; t=1774555974;
+	bh=KXDFQH+yQTzWkSm24WreW8WQUK4NNhpR/Il4B1yD/eU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=thnbTqB0IwEiYEgAHBFF/XuTaulWZ9X97gpbRDxSi8doWNitFUb6AwRH8vET7hjw8
-	 uzTMNLS2AgNVD5g/KcRmg9740TlNrRsGeqbak+fDr8p++Ah8jL9eYCgcDj1cUqB5Tb
-	 ZTRCMOmyJQFXjCPWHJMmoYNEPHaDFbqak8xU9qxA6lNkE5xMBO18bJmH+owXMbNpjX
-	 l/1Rp8OKfvwYAXmrpjUkXt2jkVeb5a8/3LjzM2QRLhg0wES52qF6mt47gXKFUlGXL4
-	 nZrmmq9at0hl+4C9szCaI5zcYJWLCo6vvcQsP/d9I0CDv6RqAKTtgYvwreqkfUZ+6Y
-	 okChQq1lYxXRg==
+	b=vIXP04greD9QV95+wvpeBPUWwdLX8HSFd7hPKEc5scvQZb1S+715E+h5cHLHHNESJ
+	 OBRQ2jCTSE/Kg0mZu+uxayW+F1OEHwsx6JMs8gT7bRrpuzjfrXL86UT0BnUMeGaY4y
+	 FttZ50NerIDoHnjHXS2Q19VdIjnUGy5DBDi2rc5ObgZAR++xWqc1cUOJ6gnlWF0VKI
+	 W9pvAp4EB2P0i+muqlO2401k0hZjDh1GGXJgaSCr1oIy8HbjrsOroigwx3qHQh4vwb
+	 8YM2Y8zW0UX4c8Kex4GNXk2d0cmg5BGYMCCDSxdxPvUY7pJRdRI7FuqQzDH2I0+vSP
+	 IrMs9DMbQxwdA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>
@@ -36,9 +36,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Harald Freudenberger <freude@linux.ibm.com>,
 	Holger Dengler <dengler@linux.ibm.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 1/3] crypto: s390 - Remove des and des3_ede code
-Date: Thu, 26 Mar 2026 13:12:43 -0700
-Message-ID: <20260326201246.57544-2-ebiggers@kernel.org>
+Subject: [PATCH 2/3] crypto: sparc - Remove des and des3_ede code
+Date: Thu, 26 Mar 2026 13:12:44 -0700
+Message-ID: <20260326201246.57544-3-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260326201246.57544-1-ebiggers@kernel.org>
 References: <20260326201246.57544-1-ebiggers@kernel.org>
@@ -55,601 +55,971 @@ maintining architecture-optimized code for them.  Remove it.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- arch/s390/configs/debug_defconfig |   1 -
- arch/s390/configs/defconfig       |   1 -
- arch/s390/crypto/Kconfig          |  16 -
- arch/s390/crypto/Makefile         |   1 -
- arch/s390/crypto/des_s390.c       | 502 ------------------------------
- 5 files changed, 521 deletions(-)
- delete mode 100644 arch/s390/crypto/des_s390.c
+ arch/sparc/crypto/Kconfig    |  14 -
+ arch/sparc/crypto/Makefile   |   2 -
+ arch/sparc/crypto/des_asm.S  | 419 ------------------------------
+ arch/sparc/crypto/des_glue.c | 482 -----------------------------------
+ 4 files changed, 917 deletions(-)
+ delete mode 100644 arch/sparc/crypto/des_asm.S
+ delete mode 100644 arch/sparc/crypto/des_glue.c
 
-diff --git a/arch/s390/configs/debug_defconfig b/arch/s390/configs/debug_defconfig
-index 98fd0a2f51c6..74e4bb236623 100644
---- a/arch/s390/configs/debug_defconfig
-+++ b/arch/s390/configs/debug_defconfig
-@@ -809,11 +809,10 @@ CONFIG_CRYPTO_USER_API_HASH=m
- CONFIG_CRYPTO_USER_API_SKCIPHER=m
- CONFIG_CRYPTO_USER_API_RNG=m
- CONFIG_CRYPTO_USER_API_AEAD=m
- CONFIG_CRYPTO_GHASH_S390=m
- CONFIG_CRYPTO_AES_S390=m
--CONFIG_CRYPTO_DES_S390=m
- CONFIG_CRYPTO_HMAC_S390=m
- CONFIG_ZCRYPT=m
- CONFIG_PKEY=m
- CONFIG_PKEY_CCA=m
- CONFIG_PKEY_EP11=m
-diff --git a/arch/s390/configs/defconfig b/arch/s390/configs/defconfig
-index 0f4cedcab3ce..5cb7b715ba6b 100644
---- a/arch/s390/configs/defconfig
-+++ b/arch/s390/configs/defconfig
-@@ -794,11 +794,10 @@ CONFIG_CRYPTO_USER_API_HASH=m
- CONFIG_CRYPTO_USER_API_SKCIPHER=m
- CONFIG_CRYPTO_USER_API_RNG=m
- CONFIG_CRYPTO_USER_API_AEAD=m
- CONFIG_CRYPTO_GHASH_S390=m
- CONFIG_CRYPTO_AES_S390=m
--CONFIG_CRYPTO_DES_S390=m
- CONFIG_CRYPTO_HMAC_S390=m
- CONFIG_ZCRYPT=m
- CONFIG_PKEY=m
- CONFIG_PKEY_CCA=m
- CONFIG_PKEY_EP11=m
-diff --git a/arch/s390/crypto/Kconfig b/arch/s390/crypto/Kconfig
-index 79a2d0034258..4218d21f1f00 100644
---- a/arch/s390/crypto/Kconfig
-+++ b/arch/s390/crypto/Kconfig
-@@ -29,26 +29,10 @@ config CRYPTO_AES_S390
- 
- 	  As of z196 the CTR mode is hardware accelerated for all AES
- 	  key sizes and XTS mode is hardware accelerated for 256 and
- 	  512 bit keys.
- 
--config CRYPTO_DES_S390
--	tristate "Ciphers: DES and Triple DES EDE, modes: ECB, CBC, CTR"
--	select CRYPTO_ALGAPI
--	select CRYPTO_SKCIPHER
--	select CRYPTO_LIB_DES
--	help
--	  Block ciphers: DES (FIPS 46-2) cipher algorithm
--	  Block ciphers: Triple DES EDE (FIPS 46-3) cipher algorithm
--	  Length-preserving ciphers: DES with ECB, CBC, and CTR modes
--	  Length-preserving ciphers: Triple DES EDED with ECB, CBC, and CTR modes
--
--	  Architecture: s390
--
--	  As of z990 the ECB and CBC mode are hardware accelerated.
--	  As of z196 the CTR mode is hardware accelerated.
--
- config CRYPTO_HMAC_S390
- 	tristate "Keyed-hash message authentication code: HMAC"
- 	select CRYPTO_HASH
- 	help
- 	  s390 specific HMAC hardware support for SHA224, SHA256, SHA384 and
-diff --git a/arch/s390/crypto/Makefile b/arch/s390/crypto/Makefile
-index 387a229e1038..bf5e061ebf13 100644
---- a/arch/s390/crypto/Makefile
-+++ b/arch/s390/crypto/Makefile
-@@ -1,11 +1,10 @@
+diff --git a/arch/sparc/crypto/Kconfig b/arch/sparc/crypto/Kconfig
+index c1932ce46c7f..8db3f6eea5dc 100644
+--- a/arch/sparc/crypto/Kconfig
++++ b/arch/sparc/crypto/Kconfig
+@@ -1,23 +1,9 @@
  # SPDX-License-Identifier: GPL-2.0
+ 
+ menu "Accelerated Cryptographic Algorithms for CPU (sparc64)"
+ 
+-config CRYPTO_DES_SPARC64
+-	tristate "Ciphers: DES and Triple DES EDE, modes: ECB/CBC"
+-	depends on SPARC64
+-	select CRYPTO_ALGAPI
+-	select CRYPTO_LIB_DES
+-	select CRYPTO_SKCIPHER
+-	help
+-	  Block cipher: DES (FIPS 46-2) cipher algorithm
+-	  Block cipher: Triple DES EDE (FIPS 46-3) cipher algorithm
+-	  Length-preserving ciphers: DES with ECB and CBC modes
+-	  Length-preserving ciphers: Tripe DES EDE with ECB and CBC modes
+-
+-	  Architecture: sparc64
+-
+ config CRYPTO_AES_SPARC64
+ 	tristate "Ciphers: AES, modes: ECB, CBC, CTR"
+ 	depends on SPARC64
+ 	select CRYPTO_LIB_AES
+ 	select CRYPTO_SKCIPHER
+diff --git a/arch/sparc/crypto/Makefile b/arch/sparc/crypto/Makefile
+index cdf9f4b3efbb..ab4a7765babf 100644
+--- a/arch/sparc/crypto/Makefile
++++ b/arch/sparc/crypto/Makefile
+@@ -2,11 +2,9 @@
  #
- # Cryptographic API
+ # Arch-specific CryptoAPI modules.
  #
  
--obj-$(CONFIG_CRYPTO_DES_S390) += des_s390.o
- obj-$(CONFIG_CRYPTO_AES_S390) += aes_s390.o
- obj-$(CONFIG_CRYPTO_PAES_S390) += paes_s390.o
- obj-$(CONFIG_S390_PRNG) += prng.o
- obj-$(CONFIG_CRYPTO_GHASH_S390) += ghash_s390.o
- obj-$(CONFIG_CRYPTO_HMAC_S390) += hmac_s390.o
-diff --git a/arch/s390/crypto/des_s390.c b/arch/s390/crypto/des_s390.c
+ obj-$(CONFIG_CRYPTO_AES_SPARC64) += aes-sparc64.o
+-obj-$(CONFIG_CRYPTO_DES_SPARC64) += des-sparc64.o
+ obj-$(CONFIG_CRYPTO_CAMELLIA_SPARC64) += camellia-sparc64.o
+ 
+ aes-sparc64-y := aes_glue.o
+-des-sparc64-y := des_asm.o des_glue.o
+ camellia-sparc64-y := camellia_asm.o camellia_glue.o
+diff --git a/arch/sparc/crypto/des_asm.S b/arch/sparc/crypto/des_asm.S
 deleted file mode 100644
-index 8e75b83a5ddc..000000000000
---- a/arch/s390/crypto/des_s390.c
+index d534446cbef9..000000000000
+--- a/arch/sparc/crypto/des_asm.S
 +++ /dev/null
-@@ -1,502 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0+
--/*
-- * Cryptographic API.
+@@ -1,419 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#include <linux/linkage.h>
+-#include <asm/opcodes.h>
+-#include <asm/visasm.h>
+-
+-	.align	32
+-ENTRY(des_sparc64_key_expand)
+-	/* %o0=input_key, %o1=output_key */
+-	VISEntryHalf
+-	ld	[%o0 + 0x00], %f0
+-	ld	[%o0 + 0x04], %f1
+-	DES_KEXPAND(0, 0, 0)
+-	DES_KEXPAND(0, 1, 2)
+-	DES_KEXPAND(2, 3, 6)
+-	DES_KEXPAND(2, 2, 4)
+-	DES_KEXPAND(6, 3, 10)
+-	DES_KEXPAND(6, 2, 8)
+-	DES_KEXPAND(10, 3, 14)
+-	DES_KEXPAND(10, 2, 12)
+-	DES_KEXPAND(14, 1, 16)
+-	DES_KEXPAND(16, 3, 20)
+-	DES_KEXPAND(16, 2, 18)
+-	DES_KEXPAND(20, 3, 24)
+-	DES_KEXPAND(20, 2, 22)
+-	DES_KEXPAND(24, 3, 28)
+-	DES_KEXPAND(24, 2, 26)
+-	DES_KEXPAND(28, 1, 30)
+-	std	%f0, [%o1 + 0x00]
+-	std	%f2, [%o1 + 0x08]
+-	std	%f4, [%o1 + 0x10]
+-	std	%f6, [%o1 + 0x18]
+-	std	%f8, [%o1 + 0x20]
+-	std	%f10, [%o1 + 0x28]
+-	std	%f12, [%o1 + 0x30]
+-	std	%f14, [%o1 + 0x38]
+-	std	%f16, [%o1 + 0x40]
+-	std	%f18, [%o1 + 0x48]
+-	std	%f20, [%o1 + 0x50]
+-	std	%f22, [%o1 + 0x58]
+-	std	%f24, [%o1 + 0x60]
+-	std	%f26, [%o1 + 0x68]
+-	std	%f28, [%o1 + 0x70]
+-	std	%f30, [%o1 + 0x78]
+-	retl
+-	 VISExitHalf
+-ENDPROC(des_sparc64_key_expand)
+-
+-	.align	32
+-ENTRY(des_sparc64_crypt)
+-	/* %o0=key, %o1=input, %o2=output */
+-	VISEntry
+-	ldd	[%o1 + 0x00], %f32
+-	ldd	[%o0 + 0x00], %f0
+-	ldd	[%o0 + 0x08], %f2
+-	ldd	[%o0 + 0x10], %f4
+-	ldd	[%o0 + 0x18], %f6
+-	ldd	[%o0 + 0x20], %f8
+-	ldd	[%o0 + 0x28], %f10
+-	ldd	[%o0 + 0x30], %f12
+-	ldd	[%o0 + 0x38], %f14
+-	ldd	[%o0 + 0x40], %f16
+-	ldd	[%o0 + 0x48], %f18
+-	ldd	[%o0 + 0x50], %f20
+-	ldd	[%o0 + 0x58], %f22
+-	ldd	[%o0 + 0x60], %f24
+-	ldd	[%o0 + 0x68], %f26
+-	ldd	[%o0 + 0x70], %f28
+-	ldd	[%o0 + 0x78], %f30
+-	DES_IP(32, 32)
+-	DES_ROUND(0, 2, 32, 32)
+-	DES_ROUND(4, 6, 32, 32)
+-	DES_ROUND(8, 10, 32, 32)
+-	DES_ROUND(12, 14, 32, 32)
+-	DES_ROUND(16, 18, 32, 32)
+-	DES_ROUND(20, 22, 32, 32)
+-	DES_ROUND(24, 26, 32, 32)
+-	DES_ROUND(28, 30, 32, 32)
+-	DES_IIP(32, 32)
+-	std	%f32, [%o2 + 0x00]
+-	retl
+-	 VISExit
+-ENDPROC(des_sparc64_crypt)
+-
+-	.align	32
+-ENTRY(des_sparc64_load_keys)
+-	/* %o0=key */
+-	VISEntry
+-	ldd	[%o0 + 0x00], %f0
+-	ldd	[%o0 + 0x08], %f2
+-	ldd	[%o0 + 0x10], %f4
+-	ldd	[%o0 + 0x18], %f6
+-	ldd	[%o0 + 0x20], %f8
+-	ldd	[%o0 + 0x28], %f10
+-	ldd	[%o0 + 0x30], %f12
+-	ldd	[%o0 + 0x38], %f14
+-	ldd	[%o0 + 0x40], %f16
+-	ldd	[%o0 + 0x48], %f18
+-	ldd	[%o0 + 0x50], %f20
+-	ldd	[%o0 + 0x58], %f22
+-	ldd	[%o0 + 0x60], %f24
+-	ldd	[%o0 + 0x68], %f26
+-	ldd	[%o0 + 0x70], %f28
+-	retl
+-	 ldd	[%o0 + 0x78], %f30
+-ENDPROC(des_sparc64_load_keys)
+-
+-	.align	32
+-ENTRY(des_sparc64_ecb_crypt)
+-	/* %o0=input, %o1=output, %o2=len */
+-1:	ldd	[%o0 + 0x00], %f32
+-	add	%o0, 0x08, %o0
+-	DES_IP(32, 32)
+-	DES_ROUND(0, 2, 32, 32)
+-	DES_ROUND(4, 6, 32, 32)
+-	DES_ROUND(8, 10, 32, 32)
+-	DES_ROUND(12, 14, 32, 32)
+-	DES_ROUND(16, 18, 32, 32)
+-	DES_ROUND(20, 22, 32, 32)
+-	DES_ROUND(24, 26, 32, 32)
+-	DES_ROUND(28, 30, 32, 32)
+-	DES_IIP(32, 32)
+-	std	%f32, [%o1 + 0x00]
+-	subcc	%o2, 0x08, %o2
+-	bne,pt	%icc, 1b
+-	 add	%o1, 0x08, %o1
+-	retl
+-	 nop
+-ENDPROC(des_sparc64_ecb_crypt)
+-
+-	.align	32
+-ENTRY(des_sparc64_cbc_encrypt)
+-	/* %o0=input, %o1=output, %o2=len, %o3=IV */
+-	ldd	[%o3 + 0x00], %f32
+-1:	ldd	[%o0 + 0x00], %f34
+-	fxor	%f32, %f34, %f32
+-	DES_IP(32, 32)
+-	DES_ROUND(0, 2, 32, 32)
+-	DES_ROUND(4, 6, 32, 32)
+-	DES_ROUND(8, 10, 32, 32)
+-	DES_ROUND(12, 14, 32, 32)
+-	DES_ROUND(16, 18, 32, 32)
+-	DES_ROUND(20, 22, 32, 32)
+-	DES_ROUND(24, 26, 32, 32)
+-	DES_ROUND(28, 30, 32, 32)
+-	DES_IIP(32, 32)
+-	std	%f32, [%o1 + 0x00]
+-	add	%o0, 0x08, %o0
+-	subcc	%o2, 0x08, %o2
+-	bne,pt	%icc, 1b
+-	 add	%o1, 0x08, %o1
+-	retl
+-	 std	%f32, [%o3 + 0x00]
+-ENDPROC(des_sparc64_cbc_encrypt)
+-
+-	.align	32
+-ENTRY(des_sparc64_cbc_decrypt)
+-	/* %o0=input, %o1=output, %o2=len, %o3=IV */
+-	ldd	[%o3 + 0x00], %f34
+-1:	ldd	[%o0 + 0x00], %f36
+-	DES_IP(36, 32)
+-	DES_ROUND(0, 2, 32, 32)
+-	DES_ROUND(4, 6, 32, 32)
+-	DES_ROUND(8, 10, 32, 32)
+-	DES_ROUND(12, 14, 32, 32)
+-	DES_ROUND(16, 18, 32, 32)
+-	DES_ROUND(20, 22, 32, 32)
+-	DES_ROUND(24, 26, 32, 32)
+-	DES_ROUND(28, 30, 32, 32)
+-	DES_IIP(32, 32)
+-	fxor	%f32, %f34, %f32
+-	fsrc2	%f36, %f34
+-	std	%f32, [%o1 + 0x00]
+-	add	%o0, 0x08, %o0
+-	subcc	%o2, 0x08, %o2
+-	bne,pt	%icc, 1b
+-	 add	%o1, 0x08, %o1
+-	retl
+-	 std	%f36, [%o3 + 0x00]
+-ENDPROC(des_sparc64_cbc_decrypt)
+-
+-	.align	32
+-ENTRY(des3_ede_sparc64_crypt)
+-	/* %o0=key, %o1=input, %o2=output */
+-	VISEntry
+-	ldd	[%o1 + 0x00], %f32
+-	ldd	[%o0 + 0x00], %f0
+-	ldd	[%o0 + 0x08], %f2
+-	ldd	[%o0 + 0x10], %f4
+-	ldd	[%o0 + 0x18], %f6
+-	ldd	[%o0 + 0x20], %f8
+-	ldd	[%o0 + 0x28], %f10
+-	ldd	[%o0 + 0x30], %f12
+-	ldd	[%o0 + 0x38], %f14
+-	ldd	[%o0 + 0x40], %f16
+-	ldd	[%o0 + 0x48], %f18
+-	ldd	[%o0 + 0x50], %f20
+-	ldd	[%o0 + 0x58], %f22
+-	ldd	[%o0 + 0x60], %f24
+-	ldd	[%o0 + 0x68], %f26
+-	ldd	[%o0 + 0x70], %f28
+-	ldd	[%o0 + 0x78], %f30
+-	DES_IP(32, 32)
+-	DES_ROUND(0, 2, 32, 32)
+-	ldd	[%o0 + 0x80], %f0
+-	ldd	[%o0 + 0x88], %f2
+-	DES_ROUND(4, 6, 32, 32)
+-	ldd	[%o0 + 0x90], %f4
+-	ldd	[%o0 + 0x98], %f6
+-	DES_ROUND(8, 10, 32, 32)
+-	ldd	[%o0 + 0xa0], %f8
+-	ldd	[%o0 + 0xa8], %f10
+-	DES_ROUND(12, 14, 32, 32)
+-	ldd	[%o0 + 0xb0], %f12
+-	ldd	[%o0 + 0xb8], %f14
+-	DES_ROUND(16, 18, 32, 32)
+-	ldd	[%o0 + 0xc0], %f16
+-	ldd	[%o0 + 0xc8], %f18
+-	DES_ROUND(20, 22, 32, 32)
+-	ldd	[%o0 + 0xd0], %f20
+-	ldd	[%o0 + 0xd8], %f22
+-	DES_ROUND(24, 26, 32, 32)
+-	ldd	[%o0 + 0xe0], %f24
+-	ldd	[%o0 + 0xe8], %f26
+-	DES_ROUND(28, 30, 32, 32)
+-	ldd	[%o0 + 0xf0], %f28
+-	ldd	[%o0 + 0xf8], %f30
+-	DES_IIP(32, 32)
+-	DES_IP(32, 32)
+-	DES_ROUND(0, 2, 32, 32)
+-	ldd	[%o0 + 0x100], %f0
+-	ldd	[%o0 + 0x108], %f2
+-	DES_ROUND(4, 6, 32, 32)
+-	ldd	[%o0 + 0x110], %f4
+-	ldd	[%o0 + 0x118], %f6
+-	DES_ROUND(8, 10, 32, 32)
+-	ldd	[%o0 + 0x120], %f8
+-	ldd	[%o0 + 0x128], %f10
+-	DES_ROUND(12, 14, 32, 32)
+-	ldd	[%o0 + 0x130], %f12
+-	ldd	[%o0 + 0x138], %f14
+-	DES_ROUND(16, 18, 32, 32)
+-	ldd	[%o0 + 0x140], %f16
+-	ldd	[%o0 + 0x148], %f18
+-	DES_ROUND(20, 22, 32, 32)
+-	ldd	[%o0 + 0x150], %f20
+-	ldd	[%o0 + 0x158], %f22
+-	DES_ROUND(24, 26, 32, 32)
+-	ldd	[%o0 + 0x160], %f24
+-	ldd	[%o0 + 0x168], %f26
+-	DES_ROUND(28, 30, 32, 32)
+-	ldd	[%o0 + 0x170], %f28
+-	ldd	[%o0 + 0x178], %f30
+-	DES_IIP(32, 32)
+-	DES_IP(32, 32)
+-	DES_ROUND(0, 2, 32, 32)
+-	DES_ROUND(4, 6, 32, 32)
+-	DES_ROUND(8, 10, 32, 32)
+-	DES_ROUND(12, 14, 32, 32)
+-	DES_ROUND(16, 18, 32, 32)
+-	DES_ROUND(20, 22, 32, 32)
+-	DES_ROUND(24, 26, 32, 32)
+-	DES_ROUND(28, 30, 32, 32)
+-	DES_IIP(32, 32)
+-
+-	std	%f32, [%o2 + 0x00]
+-	retl
+-	 VISExit
+-ENDPROC(des3_ede_sparc64_crypt)
+-
+-	.align	32
+-ENTRY(des3_ede_sparc64_load_keys)
+-	/* %o0=key */
+-	VISEntry
+-	ldd	[%o0 + 0x00], %f0
+-	ldd	[%o0 + 0x08], %f2
+-	ldd	[%o0 + 0x10], %f4
+-	ldd	[%o0 + 0x18], %f6
+-	ldd	[%o0 + 0x20], %f8
+-	ldd	[%o0 + 0x28], %f10
+-	ldd	[%o0 + 0x30], %f12
+-	ldd	[%o0 + 0x38], %f14
+-	ldd	[%o0 + 0x40], %f16
+-	ldd	[%o0 + 0x48], %f18
+-	ldd	[%o0 + 0x50], %f20
+-	ldd	[%o0 + 0x58], %f22
+-	ldd	[%o0 + 0x60], %f24
+-	ldd	[%o0 + 0x68], %f26
+-	ldd	[%o0 + 0x70], %f28
+-	ldd	[%o0 + 0x78], %f30
+-	ldd	[%o0 + 0x80], %f32
+-	ldd	[%o0 + 0x88], %f34
+-	ldd	[%o0 + 0x90], %f36
+-	ldd	[%o0 + 0x98], %f38
+-	ldd	[%o0 + 0xa0], %f40
+-	ldd	[%o0 + 0xa8], %f42
+-	ldd	[%o0 + 0xb0], %f44
+-	ldd	[%o0 + 0xb8], %f46
+-	ldd	[%o0 + 0xc0], %f48
+-	ldd	[%o0 + 0xc8], %f50
+-	ldd	[%o0 + 0xd0], %f52
+-	ldd	[%o0 + 0xd8], %f54
+-	ldd	[%o0 + 0xe0], %f56
+-	retl
+-	 ldd	[%o0 + 0xe8], %f58
+-ENDPROC(des3_ede_sparc64_load_keys)
+-
+-#define DES3_LOOP_BODY(X) \
+-	DES_IP(X, X) \
+-	DES_ROUND(0, 2, X, X) \
+-	DES_ROUND(4, 6, X, X) \
+-	DES_ROUND(8, 10, X, X) \
+-	DES_ROUND(12, 14, X, X) \
+-	DES_ROUND(16, 18, X, X) \
+-	ldd	[%o0 + 0xf0], %f16; \
+-	ldd	[%o0 + 0xf8], %f18; \
+-	DES_ROUND(20, 22, X, X) \
+-	ldd	[%o0 + 0x100], %f20; \
+-	ldd	[%o0 + 0x108], %f22; \
+-	DES_ROUND(24, 26, X, X) \
+-	ldd	[%o0 + 0x110], %f24; \
+-	ldd	[%o0 + 0x118], %f26; \
+-	DES_ROUND(28, 30, X, X) \
+-	ldd	[%o0 + 0x120], %f28; \
+-	ldd	[%o0 + 0x128], %f30; \
+-	DES_IIP(X, X) \
+-	DES_IP(X, X) \
+-	DES_ROUND(32, 34, X, X) \
+-	ldd	[%o0 + 0x130], %f0; \
+-	ldd	[%o0 + 0x138], %f2; \
+-	DES_ROUND(36, 38, X, X) \
+-	ldd	[%o0 + 0x140], %f4; \
+-	ldd	[%o0 + 0x148], %f6; \
+-	DES_ROUND(40, 42, X, X) \
+-	ldd	[%o0 + 0x150], %f8; \
+-	ldd	[%o0 + 0x158], %f10; \
+-	DES_ROUND(44, 46, X, X) \
+-	ldd	[%o0 + 0x160], %f12; \
+-	ldd	[%o0 + 0x168], %f14; \
+-	DES_ROUND(48, 50, X, X) \
+-	DES_ROUND(52, 54, X, X) \
+-	DES_ROUND(56, 58, X, X) \
+-	DES_ROUND(16, 18, X, X) \
+-	ldd	[%o0 + 0x170], %f16; \
+-	ldd	[%o0 + 0x178], %f18; \
+-	DES_IIP(X, X) \
+-	DES_IP(X, X) \
+-	DES_ROUND(20, 22, X, X) \
+-	ldd	[%o0 + 0x50], %f20; \
+-	ldd	[%o0 + 0x58], %f22; \
+-	DES_ROUND(24, 26, X, X) \
+-	ldd	[%o0 + 0x60], %f24; \
+-	ldd	[%o0 + 0x68], %f26; \
+-	DES_ROUND(28, 30, X, X) \
+-	ldd	[%o0 + 0x70], %f28; \
+-	ldd	[%o0 + 0x78], %f30; \
+-	DES_ROUND(0, 2, X, X) \
+-	ldd	[%o0 + 0x00], %f0; \
+-	ldd	[%o0 + 0x08], %f2; \
+-	DES_ROUND(4, 6, X, X) \
+-	ldd	[%o0 + 0x10], %f4; \
+-	ldd	[%o0 + 0x18], %f6; \
+-	DES_ROUND(8, 10, X, X) \
+-	ldd	[%o0 + 0x20], %f8; \
+-	ldd	[%o0 + 0x28], %f10; \
+-	DES_ROUND(12, 14, X, X) \
+-	ldd	[%o0 + 0x30], %f12; \
+-	ldd	[%o0 + 0x38], %f14; \
+-	DES_ROUND(16, 18, X, X) \
+-	ldd	[%o0 + 0x40], %f16; \
+-	ldd	[%o0 + 0x48], %f18; \
+-	DES_IIP(X, X)
+-
+-	.align	32
+-ENTRY(des3_ede_sparc64_ecb_crypt)
+-	/* %o0=key, %o1=input, %o2=output, %o3=len */
+-1:	ldd	[%o1 + 0x00], %f60
+-	DES3_LOOP_BODY(60)
+-	std	%f60, [%o2 + 0x00]
+-	add	%o1, 0x08, %o1
+-	subcc	%o3, 0x08, %o3
+-	bne,pt	%icc, 1b
+-	 add	%o2, 0x08, %o2
+-	retl
+-	 nop
+-ENDPROC(des3_ede_sparc64_ecb_crypt)
+-
+-	.align	32
+-ENTRY(des3_ede_sparc64_cbc_encrypt)
+-	/* %o0=key, %o1=input, %o2=output, %o3=len, %o4=IV */
+-	ldd	[%o4 + 0x00], %f60
+-1:	ldd	[%o1 + 0x00], %f62
+-	fxor	%f60, %f62, %f60
+-	DES3_LOOP_BODY(60)
+-	std	%f60, [%o2 + 0x00]
+-	add	%o1, 0x08, %o1
+-	subcc	%o3, 0x08, %o3
+-	bne,pt	%icc, 1b
+-	 add	%o2, 0x08, %o2
+-	retl
+-	 std	%f60, [%o4 + 0x00]
+-ENDPROC(des3_ede_sparc64_cbc_encrypt)
+-
+-	.align	32
+-ENTRY(des3_ede_sparc64_cbc_decrypt)
+-	/* %o0=key, %o1=input, %o2=output, %o3=len, %o4=IV */
+-	ldd	[%o4 + 0x00], %f62
+-1:	ldx	[%o1 + 0x00], %g1
+-	MOVXTOD_G1_F60
+-	DES3_LOOP_BODY(60)
+-	fxor	%f62, %f60, %f60
+-	MOVXTOD_G1_F62
+-	std	%f60, [%o2 + 0x00]
+-	add	%o1, 0x08, %o1
+-	subcc	%o3, 0x08, %o3
+-	bne,pt	%icc, 1b
+-	 add	%o2, 0x08, %o2
+-	retl
+-	 stx	%g1, [%o4 + 0x00]
+-ENDPROC(des3_ede_sparc64_cbc_decrypt)
+diff --git a/arch/sparc/crypto/des_glue.c b/arch/sparc/crypto/des_glue.c
+deleted file mode 100644
+index e50ec4cd57cd..000000000000
+--- a/arch/sparc/crypto/des_glue.c
++++ /dev/null
+@@ -1,482 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-only
+-/* Glue code for DES encryption optimized for sparc64 crypto opcodes.
 - *
-- * s390 implementation of the DES Cipher Algorithm.
-- *
-- * Copyright IBM Corp. 2003, 2011
-- * Author(s): Thomas Spatzier
-- *	      Jan Glauber (jan.glauber@de.ibm.com)
+- * Copyright (C) 2012 David S. Miller <davem@davemloft.net>
 - */
 -
+-#define pr_fmt(fmt)	KBUILD_MODNAME ": " fmt
+-
+-#include <linux/crypto.h>
 -#include <linux/init.h>
 -#include <linux/module.h>
--#include <linux/cpufeature.h>
--#include <linux/crypto.h>
--#include <linux/fips.h>
--#include <linux/mutex.h>
+-#include <linux/mm.h>
+-#include <linux/types.h>
 -#include <crypto/algapi.h>
 -#include <crypto/internal/des.h>
 -#include <crypto/internal/skcipher.h>
--#include <asm/cpacf.h>
 -
--#define DES3_KEY_SIZE	(3 * DES_KEY_SIZE)
+-#include <asm/fpumacro.h>
+-#include <asm/opcodes.h>
+-#include <asm/pstate.h>
+-#include <asm/elf.h>
 -
--static u8 *ctrblk;
--static DEFINE_MUTEX(ctrblk_lock);
--
--static cpacf_mask_t km_functions, kmc_functions, kmctr_functions;
--
--struct s390_des_ctx {
--	u8 iv[DES_BLOCK_SIZE];
--	u8 key[DES3_KEY_SIZE];
+-struct des_sparc64_ctx {
+-	u64 encrypt_expkey[DES_EXPKEY_WORDS / 2];
+-	u64 decrypt_expkey[DES_EXPKEY_WORDS / 2];
 -};
 -
--static int des_setkey(struct crypto_tfm *tfm, const u8 *key,
--		      unsigned int key_len)
+-struct des3_ede_sparc64_ctx {
+-	u64 encrypt_expkey[DES3_EDE_EXPKEY_WORDS / 2];
+-	u64 decrypt_expkey[DES3_EDE_EXPKEY_WORDS / 2];
+-};
+-
+-static void encrypt_to_decrypt(u64 *d, const u64 *e)
 -{
--	struct s390_des_ctx *ctx = crypto_tfm_ctx(tfm);
+-	const u64 *s = e + (DES_EXPKEY_WORDS / 2) - 1;
+-	int i;
+-
+-	for (i = 0; i < DES_EXPKEY_WORDS / 2; i++)
+-		*d++ = *s--;
+-}
+-
+-extern void des_sparc64_key_expand(const u32 *input_key, u64 *key);
+-
+-static int des_set_key(struct crypto_tfm *tfm, const u8 *key,
+-		       unsigned int keylen)
+-{
+-	struct des_sparc64_ctx *dctx = crypto_tfm_ctx(tfm);
 -	int err;
 -
+-	/* Even though we have special instructions for key expansion,
+-	 * we call des_verify_key() so that we don't have to write our own
+-	 * weak key detection code.
+-	 */
 -	err = crypto_des_verify_key(tfm, key);
 -	if (err)
 -		return err;
 -
--	memcpy(ctx->key, key, key_len);
+-	des_sparc64_key_expand((const u32 *) key, &dctx->encrypt_expkey[0]);
+-	encrypt_to_decrypt(&dctx->decrypt_expkey[0], &dctx->encrypt_expkey[0]);
+-
 -	return 0;
 -}
 -
--static int des_setkey_skcipher(struct crypto_skcipher *tfm, const u8 *key,
--			       unsigned int key_len)
+-static int des_set_key_skcipher(struct crypto_skcipher *tfm, const u8 *key,
+-				unsigned int keylen)
 -{
--	return des_setkey(crypto_skcipher_tfm(tfm), key, key_len);
+-	return des_set_key(crypto_skcipher_tfm(tfm), key, keylen);
 -}
 -
--static void s390_des_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
--{
--	struct s390_des_ctx *ctx = crypto_tfm_ctx(tfm);
+-extern void des_sparc64_crypt(const u64 *key, const u64 *input,
+-			      u64 *output);
 -
--	cpacf_km(CPACF_KM_DEA, ctx->key, out, in, DES_BLOCK_SIZE);
+-static void sparc_des_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+-{
+-	struct des_sparc64_ctx *ctx = crypto_tfm_ctx(tfm);
+-	const u64 *K = ctx->encrypt_expkey;
+-
+-	des_sparc64_crypt(K, (const u64 *) src, (u64 *) dst);
 -}
 -
--static void s390_des_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+-static void sparc_des_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
 -{
--	struct s390_des_ctx *ctx = crypto_tfm_ctx(tfm);
+-	struct des_sparc64_ctx *ctx = crypto_tfm_ctx(tfm);
+-	const u64 *K = ctx->decrypt_expkey;
 -
--	cpacf_km(CPACF_KM_DEA | CPACF_DECRYPT,
--		 ctx->key, out, in, DES_BLOCK_SIZE);
+-	des_sparc64_crypt(K, (const u64 *) src, (u64 *) dst);
 -}
 -
--static struct crypto_alg des_alg = {
--	.cra_name		=	"des",
--	.cra_driver_name	=	"des-s390",
--	.cra_priority		=	300,
--	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
--	.cra_blocksize		=	DES_BLOCK_SIZE,
--	.cra_ctxsize		=	sizeof(struct s390_des_ctx),
--	.cra_module		=	THIS_MODULE,
--	.cra_u			=	{
--		.cipher = {
--			.cia_min_keysize	=	DES_KEY_SIZE,
--			.cia_max_keysize	=	DES_KEY_SIZE,
--			.cia_setkey		=	des_setkey,
--			.cia_encrypt		=	s390_des_encrypt,
--			.cia_decrypt		=	s390_des_decrypt,
--		}
--	}
--};
+-extern void des_sparc64_load_keys(const u64 *key);
 -
--static int ecb_desall_crypt(struct skcipher_request *req, unsigned long fc)
+-extern void des_sparc64_ecb_crypt(const u64 *input, u64 *output,
+-				  unsigned int len);
+-
+-static int __ecb_crypt(struct skcipher_request *req, bool encrypt)
 -{
 -	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	struct s390_des_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	const struct des_sparc64_ctx *ctx = crypto_skcipher_ctx(tfm);
 -	struct skcipher_walk walk;
--	unsigned int nbytes, n;
--	int ret;
+-	unsigned int nbytes;
+-	int err;
 -
--	ret = skcipher_walk_virt(&walk, req, false);
+-	err = skcipher_walk_virt(&walk, req, true);
+-	if (err)
+-		return err;
+-
+-	if (encrypt)
+-		des_sparc64_load_keys(&ctx->encrypt_expkey[0]);
+-	else
+-		des_sparc64_load_keys(&ctx->decrypt_expkey[0]);
 -	while ((nbytes = walk.nbytes) != 0) {
--		/* only use complete blocks */
--		n = nbytes & ~(DES_BLOCK_SIZE - 1);
--		cpacf_km(fc, ctx->key, walk.dst.virt.addr,
--			 walk.src.virt.addr, n);
--		ret = skcipher_walk_done(&walk, nbytes - n);
+-		des_sparc64_ecb_crypt(walk.src.virt.addr, walk.dst.virt.addr,
+-				      round_down(nbytes, DES_BLOCK_SIZE));
+-		err = skcipher_walk_done(&walk, nbytes % DES_BLOCK_SIZE);
 -	}
--	return ret;
+-	fprs_write(0);
+-	return err;
 -}
 -
--static int cbc_desall_crypt(struct skcipher_request *req, unsigned long fc)
+-static int ecb_encrypt(struct skcipher_request *req)
+-{
+-	return __ecb_crypt(req, true);
+-}
+-
+-static int ecb_decrypt(struct skcipher_request *req)
+-{
+-	return __ecb_crypt(req, false);
+-}
+-
+-extern void des_sparc64_cbc_encrypt(const u64 *input, u64 *output,
+-				    unsigned int len, u64 *iv);
+-
+-extern void des_sparc64_cbc_decrypt(const u64 *input, u64 *output,
+-				    unsigned int len, u64 *iv);
+-
+-static int __cbc_crypt(struct skcipher_request *req, bool encrypt)
 -{
 -	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	struct s390_des_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	const struct des_sparc64_ctx *ctx = crypto_skcipher_ctx(tfm);
 -	struct skcipher_walk walk;
--	unsigned int nbytes, n;
--	int ret;
--	struct {
--		u8 iv[DES_BLOCK_SIZE];
--		u8 key[DES3_KEY_SIZE];
--	} param;
+-	unsigned int nbytes;
+-	int err;
 -
--	ret = skcipher_walk_virt(&walk, req, false);
--	if (ret)
--		return ret;
--	memcpy(param.iv, walk.iv, DES_BLOCK_SIZE);
--	memcpy(param.key, ctx->key, DES3_KEY_SIZE);
+-	err = skcipher_walk_virt(&walk, req, true);
+-	if (err)
+-		return err;
+-
+-	if (encrypt)
+-		des_sparc64_load_keys(&ctx->encrypt_expkey[0]);
+-	else
+-		des_sparc64_load_keys(&ctx->decrypt_expkey[0]);
 -	while ((nbytes = walk.nbytes) != 0) {
--		/* only use complete blocks */
--		n = nbytes & ~(DES_BLOCK_SIZE - 1);
--		cpacf_kmc(fc, &param, walk.dst.virt.addr,
--			  walk.src.virt.addr, n);
--		memcpy(walk.iv, param.iv, DES_BLOCK_SIZE);
--		ret = skcipher_walk_done(&walk, nbytes - n);
+-		if (encrypt)
+-			des_sparc64_cbc_encrypt(walk.src.virt.addr,
+-						walk.dst.virt.addr,
+-						round_down(nbytes,
+-							   DES_BLOCK_SIZE),
+-						walk.iv);
+-		else
+-			des_sparc64_cbc_decrypt(walk.src.virt.addr,
+-						walk.dst.virt.addr,
+-						round_down(nbytes,
+-							   DES_BLOCK_SIZE),
+-						walk.iv);
+-		err = skcipher_walk_done(&walk, nbytes % DES_BLOCK_SIZE);
 -	}
--	return ret;
+-	fprs_write(0);
+-	return err;
 -}
 -
--static int ecb_des_encrypt(struct skcipher_request *req)
+-static int cbc_encrypt(struct skcipher_request *req)
 -{
--	return ecb_desall_crypt(req, CPACF_KM_DEA);
+-	return __cbc_crypt(req, true);
 -}
 -
--static int ecb_des_decrypt(struct skcipher_request *req)
+-static int cbc_decrypt(struct skcipher_request *req)
 -{
--	return ecb_desall_crypt(req, CPACF_KM_DEA | CPACF_DECRYPT);
+-	return __cbc_crypt(req, false);
 -}
 -
--static struct skcipher_alg ecb_des_alg = {
--	.base.cra_name		=	"ecb(des)",
--	.base.cra_driver_name	=	"ecb-des-s390",
--	.base.cra_priority	=	400,	/* combo: des + ecb */
--	.base.cra_blocksize	=	DES_BLOCK_SIZE,
--	.base.cra_ctxsize	=	sizeof(struct s390_des_ctx),
--	.base.cra_module	=	THIS_MODULE,
--	.min_keysize		=	DES_KEY_SIZE,
--	.max_keysize		=	DES_KEY_SIZE,
--	.setkey			=	des_setkey_skcipher,
--	.encrypt		=	ecb_des_encrypt,
--	.decrypt		=	ecb_des_decrypt,
--};
--
--static int cbc_des_encrypt(struct skcipher_request *req)
+-static int des3_ede_set_key(struct crypto_tfm *tfm, const u8 *key,
+-			    unsigned int keylen)
 -{
--	return cbc_desall_crypt(req, CPACF_KMC_DEA);
--}
--
--static int cbc_des_decrypt(struct skcipher_request *req)
--{
--	return cbc_desall_crypt(req, CPACF_KMC_DEA | CPACF_DECRYPT);
--}
--
--static struct skcipher_alg cbc_des_alg = {
--	.base.cra_name		=	"cbc(des)",
--	.base.cra_driver_name	=	"cbc-des-s390",
--	.base.cra_priority	=	400,	/* combo: des + cbc */
--	.base.cra_blocksize	=	DES_BLOCK_SIZE,
--	.base.cra_ctxsize	=	sizeof(struct s390_des_ctx),
--	.base.cra_module	=	THIS_MODULE,
--	.min_keysize		=	DES_KEY_SIZE,
--	.max_keysize		=	DES_KEY_SIZE,
--	.ivsize			=	DES_BLOCK_SIZE,
--	.setkey			=	des_setkey_skcipher,
--	.encrypt		=	cbc_des_encrypt,
--	.decrypt		=	cbc_des_decrypt,
--};
--
--/*
-- * RFC2451:
-- *
-- *   For DES-EDE3, there is no known need to reject weak or
-- *   complementation keys.  Any weakness is obviated by the use of
-- *   multiple keys.
-- *
-- *   However, if the first two or last two independent 64-bit keys are
-- *   equal (k1 == k2 or k2 == k3), then the DES3 operation is simply the
-- *   same as DES.  Implementers MUST reject keys that exhibit this
-- *   property.
-- *
-- *   In fips mode additionally check for all 3 keys are unique.
-- *
-- */
--static int des3_setkey(struct crypto_tfm *tfm, const u8 *key,
--		       unsigned int key_len)
--{
--	struct s390_des_ctx *ctx = crypto_tfm_ctx(tfm);
+-	struct des3_ede_sparc64_ctx *dctx = crypto_tfm_ctx(tfm);
+-	u64 k1[DES_EXPKEY_WORDS / 2];
+-	u64 k2[DES_EXPKEY_WORDS / 2];
+-	u64 k3[DES_EXPKEY_WORDS / 2];
 -	int err;
 -
 -	err = crypto_des3_ede_verify_key(tfm, key);
 -	if (err)
 -		return err;
 -
--	memcpy(ctx->key, key, key_len);
+-	des_sparc64_key_expand((const u32 *)key, k1);
+-	key += DES_KEY_SIZE;
+-	des_sparc64_key_expand((const u32 *)key, k2);
+-	key += DES_KEY_SIZE;
+-	des_sparc64_key_expand((const u32 *)key, k3);
+-
+-	memcpy(&dctx->encrypt_expkey[0], &k1[0], sizeof(k1));
+-	encrypt_to_decrypt(&dctx->encrypt_expkey[DES_EXPKEY_WORDS / 2], &k2[0]);
+-	memcpy(&dctx->encrypt_expkey[(DES_EXPKEY_WORDS / 2) * 2],
+-	       &k3[0], sizeof(k3));
+-
+-	encrypt_to_decrypt(&dctx->decrypt_expkey[0], &k3[0]);
+-	memcpy(&dctx->decrypt_expkey[DES_EXPKEY_WORDS / 2],
+-	       &k2[0], sizeof(k2));
+-	encrypt_to_decrypt(&dctx->decrypt_expkey[(DES_EXPKEY_WORDS / 2) * 2],
+-			   &k1[0]);
+-
 -	return 0;
 -}
 -
--static int des3_setkey_skcipher(struct crypto_skcipher *tfm, const u8 *key,
--				unsigned int key_len)
+-static int des3_ede_set_key_skcipher(struct crypto_skcipher *tfm, const u8 *key,
+-				     unsigned int keylen)
 -{
--	return des3_setkey(crypto_skcipher_tfm(tfm), key, key_len);
+-	return des3_ede_set_key(crypto_skcipher_tfm(tfm), key, keylen);
 -}
 -
--static void des3_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
--{
--	struct s390_des_ctx *ctx = crypto_tfm_ctx(tfm);
+-extern void des3_ede_sparc64_crypt(const u64 *key, const u64 *input,
+-				   u64 *output);
 -
--	cpacf_km(CPACF_KM_TDEA_192, ctx->key, dst, src, DES_BLOCK_SIZE);
+-static void sparc_des3_ede_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+-{
+-	struct des3_ede_sparc64_ctx *ctx = crypto_tfm_ctx(tfm);
+-	const u64 *K = ctx->encrypt_expkey;
+-
+-	des3_ede_sparc64_crypt(K, (const u64 *) src, (u64 *) dst);
 -}
 -
--static void des3_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+-static void sparc_des3_ede_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
 -{
--	struct s390_des_ctx *ctx = crypto_tfm_ctx(tfm);
+-	struct des3_ede_sparc64_ctx *ctx = crypto_tfm_ctx(tfm);
+-	const u64 *K = ctx->decrypt_expkey;
 -
--	cpacf_km(CPACF_KM_TDEA_192 | CPACF_DECRYPT,
--		 ctx->key, dst, src, DES_BLOCK_SIZE);
+-	des3_ede_sparc64_crypt(K, (const u64 *) src, (u64 *) dst);
 -}
 -
--static struct crypto_alg des3_alg = {
--	.cra_name		=	"des3_ede",
--	.cra_driver_name	=	"des3_ede-s390",
--	.cra_priority		=	300,
--	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
--	.cra_blocksize		=	DES_BLOCK_SIZE,
--	.cra_ctxsize		=	sizeof(struct s390_des_ctx),
--	.cra_module		=	THIS_MODULE,
--	.cra_u			=	{
--		.cipher = {
--			.cia_min_keysize	=	DES3_KEY_SIZE,
--			.cia_max_keysize	=	DES3_KEY_SIZE,
--			.cia_setkey		=	des3_setkey,
--			.cia_encrypt		=	des3_encrypt,
--			.cia_decrypt		=	des3_decrypt,
--		}
--	}
--};
+-extern void des3_ede_sparc64_load_keys(const u64 *key);
 -
--static int ecb_des3_encrypt(struct skcipher_request *req)
--{
--	return ecb_desall_crypt(req, CPACF_KM_TDEA_192);
--}
+-extern void des3_ede_sparc64_ecb_crypt(const u64 *expkey, const u64 *input,
+-				       u64 *output, unsigned int len);
 -
--static int ecb_des3_decrypt(struct skcipher_request *req)
--{
--	return ecb_desall_crypt(req, CPACF_KM_TDEA_192 | CPACF_DECRYPT);
--}
--
--static struct skcipher_alg ecb_des3_alg = {
--	.base.cra_name		=	"ecb(des3_ede)",
--	.base.cra_driver_name	=	"ecb-des3_ede-s390",
--	.base.cra_priority	=	400,	/* combo: des3 + ecb */
--	.base.cra_blocksize	=	DES_BLOCK_SIZE,
--	.base.cra_ctxsize	=	sizeof(struct s390_des_ctx),
--	.base.cra_module	=	THIS_MODULE,
--	.min_keysize		=	DES3_KEY_SIZE,
--	.max_keysize		=	DES3_KEY_SIZE,
--	.setkey			=	des3_setkey_skcipher,
--	.encrypt		=	ecb_des3_encrypt,
--	.decrypt		=	ecb_des3_decrypt,
--};
--
--static int cbc_des3_encrypt(struct skcipher_request *req)
--{
--	return cbc_desall_crypt(req, CPACF_KMC_TDEA_192);
--}
--
--static int cbc_des3_decrypt(struct skcipher_request *req)
--{
--	return cbc_desall_crypt(req, CPACF_KMC_TDEA_192 | CPACF_DECRYPT);
--}
--
--static struct skcipher_alg cbc_des3_alg = {
--	.base.cra_name		=	"cbc(des3_ede)",
--	.base.cra_driver_name	=	"cbc-des3_ede-s390",
--	.base.cra_priority	=	400,	/* combo: des3 + cbc */
--	.base.cra_blocksize	=	DES_BLOCK_SIZE,
--	.base.cra_ctxsize	=	sizeof(struct s390_des_ctx),
--	.base.cra_module	=	THIS_MODULE,
--	.min_keysize		=	DES3_KEY_SIZE,
--	.max_keysize		=	DES3_KEY_SIZE,
--	.ivsize			=	DES_BLOCK_SIZE,
--	.setkey			=	des3_setkey_skcipher,
--	.encrypt		=	cbc_des3_encrypt,
--	.decrypt		=	cbc_des3_decrypt,
--};
--
--static unsigned int __ctrblk_init(u8 *ctrptr, u8 *iv, unsigned int nbytes)
--{
--	unsigned int i, n;
--
--	/* align to block size, max. PAGE_SIZE */
--	n = (nbytes > PAGE_SIZE) ? PAGE_SIZE : nbytes & ~(DES_BLOCK_SIZE - 1);
--	memcpy(ctrptr, iv, DES_BLOCK_SIZE);
--	for (i = (n / DES_BLOCK_SIZE) - 1; i > 0; i--) {
--		memcpy(ctrptr + DES_BLOCK_SIZE, ctrptr, DES_BLOCK_SIZE);
--		crypto_inc(ctrptr + DES_BLOCK_SIZE, DES_BLOCK_SIZE);
--		ctrptr += DES_BLOCK_SIZE;
--	}
--	return n;
--}
--
--static int ctr_desall_crypt(struct skcipher_request *req, unsigned long fc)
+-static int __ecb3_crypt(struct skcipher_request *req, bool encrypt)
 -{
 -	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	struct s390_des_ctx *ctx = crypto_skcipher_ctx(tfm);
--	u8 buf[DES_BLOCK_SIZE], *ctrptr;
+-	const struct des3_ede_sparc64_ctx *ctx = crypto_skcipher_ctx(tfm);
 -	struct skcipher_walk walk;
--	unsigned int n, nbytes;
--	int ret, locked;
+-	const u64 *K;
+-	unsigned int nbytes;
+-	int err;
 -
--	locked = mutex_trylock(&ctrblk_lock);
+-	err = skcipher_walk_virt(&walk, req, true);
+-	if (err)
+-		return err;
 -
--	ret = skcipher_walk_virt(&walk, req, false);
--	while ((nbytes = walk.nbytes) >= DES_BLOCK_SIZE) {
--		n = DES_BLOCK_SIZE;
--		if (nbytes >= 2*DES_BLOCK_SIZE && locked)
--			n = __ctrblk_init(ctrblk, walk.iv, nbytes);
--		ctrptr = (n > DES_BLOCK_SIZE) ? ctrblk : walk.iv;
--		cpacf_kmctr(fc, ctx->key, walk.dst.virt.addr,
--			    walk.src.virt.addr, n, ctrptr);
--		if (ctrptr == ctrblk)
--			memcpy(walk.iv, ctrptr + n - DES_BLOCK_SIZE,
--				DES_BLOCK_SIZE);
--		crypto_inc(walk.iv, DES_BLOCK_SIZE);
--		ret = skcipher_walk_done(&walk, nbytes - n);
+-	if (encrypt)
+-		K = &ctx->encrypt_expkey[0];
+-	else
+-		K = &ctx->decrypt_expkey[0];
+-	des3_ede_sparc64_load_keys(K);
+-	while ((nbytes = walk.nbytes) != 0) {
+-		des3_ede_sparc64_ecb_crypt(K, walk.src.virt.addr,
+-					   walk.dst.virt.addr,
+-					   round_down(nbytes, DES_BLOCK_SIZE));
+-		err = skcipher_walk_done(&walk, nbytes % DES_BLOCK_SIZE);
 -	}
--	if (locked)
--		mutex_unlock(&ctrblk_lock);
--	/* final block may be < DES_BLOCK_SIZE, copy only nbytes */
--	if (nbytes) {
--		cpacf_kmctr(fc, ctx->key, buf, walk.src.virt.addr,
--			    DES_BLOCK_SIZE, walk.iv);
--		memcpy(walk.dst.virt.addr, buf, nbytes);
--		crypto_inc(walk.iv, DES_BLOCK_SIZE);
--		ret = skcipher_walk_done(&walk, 0);
--	}
--	return ret;
+-	fprs_write(0);
+-	return err;
 -}
 -
--static int ctr_des_crypt(struct skcipher_request *req)
+-static int ecb3_encrypt(struct skcipher_request *req)
 -{
--	return ctr_desall_crypt(req, CPACF_KMCTR_DEA);
+-	return __ecb3_crypt(req, true);
 -}
 -
--static struct skcipher_alg ctr_des_alg = {
--	.base.cra_name		=	"ctr(des)",
--	.base.cra_driver_name	=	"ctr-des-s390",
--	.base.cra_priority	=	400,	/* combo: des + ctr */
--	.base.cra_blocksize	=	1,
--	.base.cra_ctxsize	=	sizeof(struct s390_des_ctx),
--	.base.cra_module	=	THIS_MODULE,
--	.min_keysize		=	DES_KEY_SIZE,
--	.max_keysize		=	DES_KEY_SIZE,
--	.ivsize			=	DES_BLOCK_SIZE,
--	.setkey			=	des_setkey_skcipher,
--	.encrypt		=	ctr_des_crypt,
--	.decrypt		=	ctr_des_crypt,
--	.chunksize		=	DES_BLOCK_SIZE,
--};
--
--static int ctr_des3_crypt(struct skcipher_request *req)
+-static int ecb3_decrypt(struct skcipher_request *req)
 -{
--	return ctr_desall_crypt(req, CPACF_KMCTR_TDEA_192);
+-	return __ecb3_crypt(req, false);
 -}
 -
--static struct skcipher_alg ctr_des3_alg = {
--	.base.cra_name		=	"ctr(des3_ede)",
--	.base.cra_driver_name	=	"ctr-des3_ede-s390",
--	.base.cra_priority	=	400,	/* combo: des3 + ede */
--	.base.cra_blocksize	=	1,
--	.base.cra_ctxsize	=	sizeof(struct s390_des_ctx),
--	.base.cra_module	=	THIS_MODULE,
--	.min_keysize		=	DES3_KEY_SIZE,
--	.max_keysize		=	DES3_KEY_SIZE,
--	.ivsize			=	DES_BLOCK_SIZE,
--	.setkey			=	des3_setkey_skcipher,
--	.encrypt		=	ctr_des3_crypt,
--	.decrypt		=	ctr_des3_crypt,
--	.chunksize		=	DES_BLOCK_SIZE,
--};
+-extern void des3_ede_sparc64_cbc_encrypt(const u64 *expkey, const u64 *input,
+-					 u64 *output, unsigned int len,
+-					 u64 *iv);
 -
--static struct crypto_alg *des_s390_algs_ptr[2];
--static int des_s390_algs_num;
--static struct skcipher_alg *des_s390_skciphers_ptr[6];
--static int des_s390_skciphers_num;
+-extern void des3_ede_sparc64_cbc_decrypt(const u64 *expkey, const u64 *input,
+-					 u64 *output, unsigned int len,
+-					 u64 *iv);
 -
--static int des_s390_register_alg(struct crypto_alg *alg)
+-static int __cbc3_crypt(struct skcipher_request *req, bool encrypt)
 -{
--	int ret;
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	const struct des3_ede_sparc64_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	struct skcipher_walk walk;
+-	const u64 *K;
+-	unsigned int nbytes;
+-	int err;
 -
--	ret = crypto_register_alg(alg);
--	if (!ret)
--		des_s390_algs_ptr[des_s390_algs_num++] = alg;
--	return ret;
--}
+-	err = skcipher_walk_virt(&walk, req, true);
+-	if (err)
+-		return err;
 -
--static int des_s390_register_skcipher(struct skcipher_alg *alg)
--{
--	int ret;
--
--	ret = crypto_register_skcipher(alg);
--	if (!ret)
--		des_s390_skciphers_ptr[des_s390_skciphers_num++] = alg;
--	return ret;
--}
--
--static void des_s390_exit(void)
--{
--	while (des_s390_algs_num--)
--		crypto_unregister_alg(des_s390_algs_ptr[des_s390_algs_num]);
--	while (des_s390_skciphers_num--)
--		crypto_unregister_skcipher(des_s390_skciphers_ptr[des_s390_skciphers_num]);
--	if (ctrblk)
--		free_page((unsigned long) ctrblk);
--}
--
--static int __init des_s390_init(void)
--{
--	int ret;
--
--	/* Query available functions for KM, KMC and KMCTR */
--	cpacf_query(CPACF_KM, &km_functions);
--	cpacf_query(CPACF_KMC, &kmc_functions);
--	cpacf_query(CPACF_KMCTR, &kmctr_functions);
--
--	if (cpacf_test_func(&km_functions, CPACF_KM_DEA)) {
--		ret = des_s390_register_alg(&des_alg);
--		if (ret)
--			goto out_err;
--		ret = des_s390_register_skcipher(&ecb_des_alg);
--		if (ret)
--			goto out_err;
+-	if (encrypt)
+-		K = &ctx->encrypt_expkey[0];
+-	else
+-		K = &ctx->decrypt_expkey[0];
+-	des3_ede_sparc64_load_keys(K);
+-	while ((nbytes = walk.nbytes) != 0) {
+-		if (encrypt)
+-			des3_ede_sparc64_cbc_encrypt(K, walk.src.virt.addr,
+-						     walk.dst.virt.addr,
+-						     round_down(nbytes,
+-								DES_BLOCK_SIZE),
+-						     walk.iv);
+-		else
+-			des3_ede_sparc64_cbc_decrypt(K, walk.src.virt.addr,
+-						     walk.dst.virt.addr,
+-						     round_down(nbytes,
+-								DES_BLOCK_SIZE),
+-						     walk.iv);
+-		err = skcipher_walk_done(&walk, nbytes % DES_BLOCK_SIZE);
 -	}
--	if (cpacf_test_func(&kmc_functions, CPACF_KMC_DEA)) {
--		ret = des_s390_register_skcipher(&cbc_des_alg);
--		if (ret)
--			goto out_err;
--	}
--	if (cpacf_test_func(&km_functions, CPACF_KM_TDEA_192)) {
--		ret = des_s390_register_alg(&des3_alg);
--		if (ret)
--			goto out_err;
--		ret = des_s390_register_skcipher(&ecb_des3_alg);
--		if (ret)
--			goto out_err;
--	}
--	if (cpacf_test_func(&kmc_functions, CPACF_KMC_TDEA_192)) {
--		ret = des_s390_register_skcipher(&cbc_des3_alg);
--		if (ret)
--			goto out_err;
--	}
+-	fprs_write(0);
+-	return err;
+-}
 -
--	if (cpacf_test_func(&kmctr_functions, CPACF_KMCTR_DEA) ||
--	    cpacf_test_func(&kmctr_functions, CPACF_KMCTR_TDEA_192)) {
--		ctrblk = (u8 *) __get_free_page(GFP_KERNEL);
--		if (!ctrblk) {
--			ret = -ENOMEM;
--			goto out_err;
+-static int cbc3_encrypt(struct skcipher_request *req)
+-{
+-	return __cbc3_crypt(req, true);
+-}
+-
+-static int cbc3_decrypt(struct skcipher_request *req)
+-{
+-	return __cbc3_crypt(req, false);
+-}
+-
+-static struct crypto_alg cipher_algs[] = {
+-	{
+-		.cra_name		= "des",
+-		.cra_driver_name	= "des-sparc64",
+-		.cra_priority		= SPARC_CR_OPCODE_PRIORITY,
+-		.cra_flags		= CRYPTO_ALG_TYPE_CIPHER,
+-		.cra_blocksize		= DES_BLOCK_SIZE,
+-		.cra_ctxsize		= sizeof(struct des_sparc64_ctx),
+-		.cra_alignmask		= 7,
+-		.cra_module		= THIS_MODULE,
+-		.cra_u	= {
+-			.cipher	= {
+-				.cia_min_keysize	= DES_KEY_SIZE,
+-				.cia_max_keysize	= DES_KEY_SIZE,
+-				.cia_setkey		= des_set_key,
+-				.cia_encrypt		= sparc_des_encrypt,
+-				.cia_decrypt		= sparc_des_decrypt
+-			}
+-		}
+-	}, {
+-		.cra_name		= "des3_ede",
+-		.cra_driver_name	= "des3_ede-sparc64",
+-		.cra_priority		= SPARC_CR_OPCODE_PRIORITY,
+-		.cra_flags		= CRYPTO_ALG_TYPE_CIPHER,
+-		.cra_blocksize		= DES3_EDE_BLOCK_SIZE,
+-		.cra_ctxsize		= sizeof(struct des3_ede_sparc64_ctx),
+-		.cra_alignmask		= 7,
+-		.cra_module		= THIS_MODULE,
+-		.cra_u	= {
+-			.cipher	= {
+-				.cia_min_keysize	= DES3_EDE_KEY_SIZE,
+-				.cia_max_keysize	= DES3_EDE_KEY_SIZE,
+-				.cia_setkey		= des3_ede_set_key,
+-				.cia_encrypt		= sparc_des3_ede_encrypt,
+-				.cia_decrypt		= sparc_des3_ede_decrypt
+-			}
 -		}
 -	}
+-};
 -
--	if (cpacf_test_func(&kmctr_functions, CPACF_KMCTR_DEA)) {
--		ret = des_s390_register_skcipher(&ctr_des_alg);
--		if (ret)
--			goto out_err;
+-static struct skcipher_alg skcipher_algs[] = {
+-	{
+-		.base.cra_name		= "ecb(des)",
+-		.base.cra_driver_name	= "ecb-des-sparc64",
+-		.base.cra_priority	= SPARC_CR_OPCODE_PRIORITY,
+-		.base.cra_blocksize	= DES_BLOCK_SIZE,
+-		.base.cra_ctxsize	= sizeof(struct des_sparc64_ctx),
+-		.base.cra_alignmask	= 7,
+-		.base.cra_module	= THIS_MODULE,
+-		.min_keysize		= DES_KEY_SIZE,
+-		.max_keysize		= DES_KEY_SIZE,
+-		.setkey			= des_set_key_skcipher,
+-		.encrypt		= ecb_encrypt,
+-		.decrypt		= ecb_decrypt,
+-	}, {
+-		.base.cra_name		= "cbc(des)",
+-		.base.cra_driver_name	= "cbc-des-sparc64",
+-		.base.cra_priority	= SPARC_CR_OPCODE_PRIORITY,
+-		.base.cra_blocksize	= DES_BLOCK_SIZE,
+-		.base.cra_ctxsize	= sizeof(struct des_sparc64_ctx),
+-		.base.cra_alignmask	= 7,
+-		.base.cra_module	= THIS_MODULE,
+-		.min_keysize		= DES_KEY_SIZE,
+-		.max_keysize		= DES_KEY_SIZE,
+-		.ivsize			= DES_BLOCK_SIZE,
+-		.setkey			= des_set_key_skcipher,
+-		.encrypt		= cbc_encrypt,
+-		.decrypt		= cbc_decrypt,
+-	}, {
+-		.base.cra_name		= "ecb(des3_ede)",
+-		.base.cra_driver_name	= "ecb-des3_ede-sparc64",
+-		.base.cra_priority	= SPARC_CR_OPCODE_PRIORITY,
+-		.base.cra_blocksize	= DES3_EDE_BLOCK_SIZE,
+-		.base.cra_ctxsize	= sizeof(struct des3_ede_sparc64_ctx),
+-		.base.cra_alignmask	= 7,
+-		.base.cra_module	= THIS_MODULE,
+-		.min_keysize		= DES3_EDE_KEY_SIZE,
+-		.max_keysize		= DES3_EDE_KEY_SIZE,
+-		.setkey			= des3_ede_set_key_skcipher,
+-		.encrypt		= ecb3_encrypt,
+-		.decrypt		= ecb3_decrypt,
+-	}, {
+-		.base.cra_name		= "cbc(des3_ede)",
+-		.base.cra_driver_name	= "cbc-des3_ede-sparc64",
+-		.base.cra_priority	= SPARC_CR_OPCODE_PRIORITY,
+-		.base.cra_blocksize	= DES3_EDE_BLOCK_SIZE,
+-		.base.cra_ctxsize	= sizeof(struct des3_ede_sparc64_ctx),
+-		.base.cra_alignmask	= 7,
+-		.base.cra_module	= THIS_MODULE,
+-		.min_keysize		= DES3_EDE_KEY_SIZE,
+-		.max_keysize		= DES3_EDE_KEY_SIZE,
+-		.ivsize			= DES3_EDE_BLOCK_SIZE,
+-		.setkey			= des3_ede_set_key_skcipher,
+-		.encrypt		= cbc3_encrypt,
+-		.decrypt		= cbc3_decrypt,
 -	}
--	if (cpacf_test_func(&kmctr_functions, CPACF_KMCTR_TDEA_192)) {
--		ret = des_s390_register_skcipher(&ctr_des3_alg);
--		if (ret)
--			goto out_err;
--	}
+-};
 -
--	return 0;
--out_err:
--	des_s390_exit();
--	return ret;
+-static bool __init sparc64_has_des_opcode(void)
+-{
+-	unsigned long cfr;
+-
+-	if (!(sparc64_elf_hwcap & HWCAP_SPARC_CRYPTO))
+-		return false;
+-
+-	__asm__ __volatile__("rd %%asr26, %0" : "=r" (cfr));
+-	if (!(cfr & CFR_DES))
+-		return false;
+-
+-	return true;
 -}
 -
--module_cpu_feature_match(S390_CPU_FEATURE_MSA, des_s390_init);
--module_exit(des_s390_exit);
+-static int __init des_sparc64_mod_init(void)
+-{
+-	int err;
+-
+-	if (!sparc64_has_des_opcode()) {
+-		pr_info("sparc64 des opcodes not available.\n");
+-		return -ENODEV;
+-	}
+-	pr_info("Using sparc64 des opcodes optimized DES implementation\n");
+-	err = crypto_register_algs(cipher_algs, ARRAY_SIZE(cipher_algs));
+-	if (err)
+-		return err;
+-	err = crypto_register_skciphers(skcipher_algs,
+-					ARRAY_SIZE(skcipher_algs));
+-	if (err)
+-		crypto_unregister_algs(cipher_algs, ARRAY_SIZE(cipher_algs));
+-	return err;
+-}
+-
+-static void __exit des_sparc64_mod_fini(void)
+-{
+-	crypto_unregister_algs(cipher_algs, ARRAY_SIZE(cipher_algs));
+-	crypto_unregister_skciphers(skcipher_algs, ARRAY_SIZE(skcipher_algs));
+-}
+-
+-module_init(des_sparc64_mod_init);
+-module_exit(des_sparc64_mod_fini);
+-
+-MODULE_LICENSE("GPL");
+-MODULE_DESCRIPTION("DES & Triple DES EDE Cipher Algorithms, sparc64 des opcode accelerated");
 -
 -MODULE_ALIAS_CRYPTO("des");
 -MODULE_ALIAS_CRYPTO("des3_ede");
 -
--MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("DES & Triple DES EDE Cipher Algorithms");
+-#include "crop_devid.c"
 -- 
 2.53.0
 
