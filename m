@@ -1,138 +1,100 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3C04348477
-	for <linux-crypto@vger.kernel.org>; Thu, 26 Mar 2026 17:44:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774547043; cv=pass; b=MCRuTbunTnHSss1HxJ6u+sZLs6/h0ZRiz0ldnr99z+eCVhTkjLWvnGWqbVRhkmO7Hq5Ku/apZMOuQ/udm/aoUhP0a+DfgzR1OLqFeNYxmQEugsThTqvOOgsduLhZQMkf8Pz0K22yLIO01Gr27diyADIZ7Idr93SQgVBkQsDVK3A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774547043; c=relaxed/simple;
-	bh=zrsCLS+SQTlQb03AFpk57v8MGREVn2wqLR1L25NKBU8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Pb77MWp5I3H3q9GqyfYYtrj8C8EtRo8tXjBqMPFqnYnaCS6kGNtzHxduUK7rJ89+Ty27Bs8mvxdRfhIKCh19l5wuzV5nNfTGJJwwdEVJkjF/TYdphYWaZOg8HdMWNJP6OpSJU0dwxJ2eOpUt/1dm8wpNM0Op3yNq4NYF/R1zOCA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=theori.io; spf=pass smtp.mailfrom=theori.io; dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b=QKhp1j5V; arc=pass smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=theori.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=theori.io
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC043A0E88;
+	Thu, 26 Mar 2026 19:41:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774554076; cv=none; b=DiBEycZ7oWGl0duzAIzap+fs9C2R2wauxcQXYHbildkpYYp9r+Dd6+6cfrQvafH4ab0bDxGCvfBTYYD9Zx1QVx+zCh39ChAIrvAXctYMQdHNXceO2B98idYQ/BeVaUerP0/uzU07zl6KPYU5RHSR0iNLA8E3Zn3UELN52zJJpQ4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774554076; c=relaxed/simple;
+	bh=C9/NPr+Pl9jEmgwpnRIFZPHBQXxhE7qS+DKPun17jRU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oEIypXcQE2GTS7e8J2+P/1DLmaQvh/TgQFxCEt/DUmdK/J8SFwlhsKkqANQkFT8086iewy1v0Jrsfd8f7lt69mfryEAmXfwyXI/p+oOzmGTocGHAfroTngywqPS7QfEzU41IFMWI6EABWpvvxcaSkQErbdRQw6FGFvjlYAEVC2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Luq0fhBB; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=theori.io header.i=@theori.io header.b="QKhp1j5V"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4852c9b4158so10487625e9.0
-        for <linux-crypto@vger.kernel.org>; Thu, 26 Mar 2026 10:44:01 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1774547040; cv=none;
-        d=google.com; s=arc-20240605;
-        b=ihmGV5KtcLFrut/QBX7OwAp1DJkHTdL+r8xufkenz3YYMrTBY+PiaZb3C65JQ5iarj
-         cCSL5BMJSxZEVkoT2b8jLSIHdrKyoj0LhZtYgF/Mc7Q33kF/t7AAP1rlve1hOSTTD0pS
-         862fY9yoJyQ40qpC9O7BURhGW6Hiylr9c/ZnHO+DXurABhav5uhx1L1mFjN3FdBvaWbv
-         AdnzGLCQ67XGoPHhp1U5iO8j7acnxlp/k1RYa6Pftbr4Wv9be7V2rUEZaesc0uDfyjoA
-         ShsMwsISDZzoPNSmBOUMSjFnFHqVgcZ89VfVfJUdqWw+n8XLINCL6H3WkZuSroIYRXZW
-         KQEQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=p6SzyHTLkCR+6NEWAKrMuYJMhCmjxCFZr6WpRPZiz1w=;
-        fh=5NrMv9mtW1OmH1vGgLGo4st5nuutcYrzFScqlg6A3Co=;
-        b=IoxVw5bhjVXMkWdJ3Ri8mO6XraDr4Wqdyv/+HIByoKzsNdaAXUTCn80rLjbYqXACtE
-         InzpLU+QstoWuP0EqbRhTJAjhy9oTd1Jo+poHuP6RZzCpHtSUxVuGjDxaNpeOkv0kmiz
-         gIl77N1qnUz3gCgAyxNjJwylPQy2Mnux/g0C74npYsgyo8zHNAEUZaWEgtJrB9rLQC/E
-         SKizQn69r+HbsmZcHH9GwslplFeSR2FNcQdDlwYEOEhJnyWRlqoUZ5W7QZPj2UsVCV4Q
-         P7Us2MjoQ4uVbN/jiMgzIdvbUmEzZ/jav9cjSmNWh3uKlrmF/EAow24pZ8XOhSDqhgLX
-         yl+A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=theori.io; s=google; t=1774547040; x=1775151840; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=p6SzyHTLkCR+6NEWAKrMuYJMhCmjxCFZr6WpRPZiz1w=;
-        b=QKhp1j5VBhhFxTY4WRx2jptchkku6Htdy5NLzi2IP34+3GumLO7QgVjCeDL7D64M46
-         qNk8sYI00e0EAilkVHmNWOpNPd2+1Od3XIB/tvIsYx6E0WybiZWit6g0KSqNVZF5quIX
-         FQ7v7H6+lMg4iKsli8H7eWGFfAAhGSi0BCArc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774547040; x=1775151840;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=p6SzyHTLkCR+6NEWAKrMuYJMhCmjxCFZr6WpRPZiz1w=;
-        b=naQ52+FRP7dr5j6uL7bfOZiEqG0dJSW44B0euK02Pp4BKa5YmzlJwhB0vWgOci8o/F
-         hLic661se15zEoz+GE5zyeHfMdZiip4XjeI636BM+LlnxpW8DzsSrAljLOniKUZgwPtu
-         +LxUuxRoLnEDN4/enIHlEeg/tfi86ys8YyRFw8GkVtaEyPl+NtBdhFLmDFxfnlt057Bz
-         FFWaFO/jvItC8Dp4g6ofT3hv5S9dgSelFg8AkznMKS+B2bhJjyghbwFmu4kM9+sbvmpu
-         VXucI4cmvIRCEOS2Syln68r9IxX165mTh/ELxMSJ/xPQW3s5n2fbunhO+Xm1a8efmBW7
-         jy+Q==
-X-Gm-Message-State: AOJu0YzkShK19bGAb1OVm8I7/V8M9QAjw43i+ti2Kv4RwG8dqqlQbBY7
-	iT6GjGml/V3jklqHtXTYEFWqWp9RqGw5DZ6ZLiTdpYI3ZyxgRKEMj0YNr9xEPzfHk2npLD0z9jS
-	pFDlJ+HSVxfzyE0I74/51tfq6UbRtJVix6RUfjU4Yyw==
-X-Gm-Gg: ATEYQzzpj+i+/LK5CVYWQ55XUBrErArFw7wSbr6/aWdf09wL/juZDcYYS1FLAfYglgm
-	+86Wlh0KiwxDrKIbxTBpLEn+toClpbiQrH0mhMqitbMXM4/HdyHJBvwDthM108TbHR3rNDXVHEx
-	5IKdLXOBsSe2Ocj+kWxHEVl163Zawtx7//ogQRQOrdxStjYGERJ99zo0DEB0zp9oNbHp7/EU0fW
-	vCuMhLIgjGAyz+ljUzlbcamV5awIyN/o+Dj0SZFLRE2OblEMdorxjToEbF4Cfrmu/g96+teHiw2
-	/2TqsljChW9ETGI=
-X-Received: by 2002:a05:600c:3b16:b0:485:ae14:8192 with SMTP id
- 5b1f17b1804b1-48715fc3291mr126488425e9.7.1774547039754; Thu, 26 Mar 2026
- 10:43:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Luq0fhBB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 481ABC116C6;
+	Thu, 26 Mar 2026 19:41:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774554076;
+	bh=C9/NPr+Pl9jEmgwpnRIFZPHBQXxhE7qS+DKPun17jRU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Luq0fhBBvzuS68tdGrtzBRVbaH6F0u71w94JQ5jl8BJZ6EU+NlyhUlt9ojWyV5JId
+	 8n1NjlymQFXD2/hdKtTgTzzjBL58MKIxYXjWixu4nhbMTLf31PEcUQbRF3mz3MgdYB
+	 ugp/abGLULr7kmkqLOFOZLys4fA0+ZKIcP/o8BYlzUCRVl5TIYYUy3uLiujrWIIInW
+	 3sPBmRr3RaItnMh0A5/DYKtRKjYXLVe5NO1YIilKQjQ0ahLscsAsWXIzYCZTsUTTer
+	 5d2157eWwXaZs7aHMpkA7+5+AmCs1vPQh6u8t98bY2wdlmkmLWY2q7Vfk5bQl0vyjF
+	 KZrpHW/gMK8Ng==
+Date: Thu, 26 Mar 2026 09:41:14 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: Lai Jiangshan <jiangshanlai@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-kernel@vger.kernel.org, puranjay@kernel.org,
+	linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	Michael van der Westhuizen <rmikey@meta.com>, kernel-team@meta.com,
+	Chuck Lever <chuck.lever@oracle.com>, jlayton@kernel.or
+Subject: Re: [PATCH v2 2/5] workqueue: add WQ_AFFN_CACHE_SHARD affinity scope
+Message-ID: <acWL2hxO7m2H4g_r@slm.duckdns.org>
+References: <20260320-workqueue_sharded-v2-0-8372930931af@debian.org>
+ <20260320-workqueue_sharded-v2-2-8372930931af@debian.org>
+ <acHCE96gzEUaGZFP@slm.duckdns.org>
+ <acVbF0cGGJx--Tci@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <acOpDrnN3cVfiASk@gondor.apana.org.au> <CAH-2XvLZD_-CVQT0omao2+GrdQt1Loq+oo4X6q=0NUAeUk==1w@mail.gmail.com>
- <acTSfLPWDGTaGIf7@gondor.apana.org.au>
-In-Reply-To: <acTSfLPWDGTaGIf7@gondor.apana.org.au>
-From: Taeyang Lee <0wn@theori.io>
-Date: Fri, 27 Mar 2026 02:43:23 +0900
-X-Gm-Features: AQROBzB3aXz1ENPeUwhNKE7Hy5OZwIRzauxI6g0L-SZC5Rw6wRPbllRTcgIiZRA
-Message-ID: <CAH-2XvLaZR+Ee+q35wXexKEh3AE7R0w1AGC__kV9To_6sLMdhQ@mail.gmail.com>
-Subject: Re: [PATCH] crypto: algif_aead - Revert to operating out-of-place
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Eric Biggers <ebiggers@kernel.org>, 
-	Linus Torvalds <torvalds@linuxfoundation.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Greg KH <gregkh@linuxfoundation.org>, davem@davemloft.net, 
-	Brian Pak <bpak@theori.io>, Juno Im <juno@theori.io>, Jungwon Lim <setuid0@theori.io>, 
-	Tim Becker <tjbecker@theori.io>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <acVbF0cGGJx--Tci@gmail.com>
 
-On Thu, Mar 26, 2026 at 3:30=E2=80=AFPM Herbert Xu <herbert@gondor.apana.or=
-g.au> wrote:
->
-> On Thu, Mar 26, 2026 at 02:59:24AM +0900, Taeyang Lee wrote:
-> >
-> > I don't think checking only `src !=3D dst` is sufficient for the issue =
-I
-> > reported.
-> >
-> > In the AF_ALG AEAD decrypt path, the child AEAD request is intentionall=
-y
-> > set up to look in-place: `req->src =3D=3D req->dst` on the RX SGL head,=
- and
-> > the TX-backed authentication-tag pages are then chained behind that RX
-> > SGL. So from authencesn's point of view this still takes the `src =3D=
-=3D dst`
-> > path, while `dst[assoclen + cryptlen]` can still resolve to TX-backed
-> > pages, including splice()/MSG_SPLICE_PAGES-backed page-cache pages.
->
-> Right, that's a separate bug.  algif_aead should not attach a
-> read-only mapping to the dst SG list, which will be written to.
+On Thu, Mar 26, 2026 at 09:20:15AM -0700, Breno Leitao wrote:
+> Assuming wq_cache_shard_size = 8;, we would have the following number of pool
+> per number of CPU (not vCPU):
+> 
+>   - 1–11 CPUs → DIV_ROUND_CLOSEST(n, 8) ≤ 1 → 1 pool containing all CPUs.
+>   - 12 CPUs → DIV_ROUND_CLOSEST(12, 8) = 2 → 2 pools of 6 cores each. This is the first split.
+>   - 12–19 → 2 pools
+>   - 20–27 → 3 pools
+>   - 28–35 → 4 pools
+>   - 36–43 → 5 pools
+>   - 44–51 → 6 pools
+>   - 52–59 → 7 pools
+>   - 60–67 → 8 pools
+>   - 68–75 → 9 pools (e.g. 72-CPU NVIDIA Grace → 9×8)
+>   - 76–83 → 10 pools
+>   - 84–91 → 11 pools
+>   - 92–99 → 12 pools
+>   - 100 → 13 pools (9×8 + 4×7)
+> 
+> Is this what you meant?
 
-Agreed.
+Yes.
 
-By removing the RX/TX tag-page chaining and turning the child request into
-a genuine out-of-place AEAD request, this looks like it closes the AF_ALG
-page-cache exposure path.
+> +static int __init llc_core_to_shard(int core_pos, int cores_per_shard,
+> +				    int remainder)
+> +{
+> +	int ret;
+> +
+> +	/*
+> +	 * These cores falls within the large shards.
+> +	 * Each large shard has (cores_per_shard + 1) cores
+> +	 */
+> +	if (core_pos < remainder * (cores_per_shard + 1))
+> +		return core_pos / (cores_per_shard + 1);
+> +
+> +	/* These are standard shards */
+> +	ret = (core_pos - remainder * (cores_per_shard + 1)) / cores_per_shard;
 
-With that in place, I think the security impact I reported should be
-addressed, even though the authencesn-side use of req->dst as temporary
-scratch storage during ESN rearrangement would still remain as separate
-cleanup for now.
+This is too smart. Any chance you can dumb it down? If you have to go
+through intermediate data structures, that's fine too.
 
 Thanks.
 
---=20
-___
-
-Taeyang Lee, Security Researcher
-Theori, Inc. / Xint Code
-Website. www.theori.io / xint.io
-Email. 0wn@theori.io
+-- 
+tejun
