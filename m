@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D60B18CBE1;
-	Thu, 26 Mar 2026 00:16:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC7D3249E5;
+	Thu, 26 Mar 2026 00:16:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774484213; cv=none; b=tCcdpxUQ0mAtWl7Mdqv1BPVflM7/0EK5hy5Rs4rpKoxUPlAOlHTGt4hFRFsFULZzHVBc3UQK4WjX2A9JHH10zVNKPiDFdsveK3/5vpmRJ1RiQPkQ9zBvTP+FPHKbkBoAKc+Ywv5NlNQugRMjf9/+/AQzEn91SebVkHYUiAOFqJU=
+	t=1774484216; cv=none; b=iFBxTTIvdm7+XtD2DY9sWuPUhZZPV7eUgmZ/oElwRhU4dbqiyiounYr/VdzNWSXgUbcNEFMnpuM8QWvxcfi1gWi7Mh4oJDLl/gysGBdO1FANY0jgLcqkI9GMbdanB5ZKlGBm7SqsOP2NQ1l/dO2+AKFseDsJny7a1zLm4vAunDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774484213; c=relaxed/simple;
-	bh=RXIR7mC7JY9QlvcxmBcv1kp5mVy6xC1YKrj0WphyGMk=;
+	s=arc-20240116; t=1774484216; c=relaxed/simple;
+	bh=nmi817YIkL7ox8Zps1fGLGLUBGKM1rMUbPb1VZNqjPI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OuqYE9QcZnDmMeN9AfVQ5Evc5z+qAUjJS/tTH5vrZHA2s9LfazaQqQ8Dzkv0mcsU/OVThUO+wnoqJ3Pl/uBoRI4OjxyOMpe6lJSWIPSOWzN9HoiHczs1p+emXv0hut7m2VgYFJRcAjwcAC6Ducr4xlr4IqgHLH4FLVkOXYEeHHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hZmR1veT; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=cLBGhryN7erSxzCaGQxYvHmplTzzvmIC/h6BYdeTERNnAFbEv+1nTYV1uVkwvju/1uxVBNrmTMCBMH5YF31MzM2tX9FNgxTl3nPteSGU6ht3oSqboZ70eDUbTan9DAIa+elHwGk4YXXhlOZRUwcLohTALlcT96cHVGvA+hjomy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eweshMVU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hZmR1veT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1281C2BCB0;
-	Thu, 26 Mar 2026 00:16:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eweshMVU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBC12C4CEF7;
+	Thu, 26 Mar 2026 00:16:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774484213;
-	bh=RXIR7mC7JY9QlvcxmBcv1kp5mVy6xC1YKrj0WphyGMk=;
+	s=k20201202; t=1774484214;
+	bh=nmi817YIkL7ox8Zps1fGLGLUBGKM1rMUbPb1VZNqjPI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hZmR1veTizFuzFNomq0BeGssGbIyndMbPU4ITx+VrhgP60qa++DZZJHKfrc1s41b+
-	 MnbAmyJ+uhake7+d7yUG2UF/5cJLc9fWJj7tcLvBhStL6ZS8aH+kYbPIJZTkRUdVGC
-	 xkzs11NjFL2nRjqusE1/7ST5EPN072kT2oFQBR0Q4Ia7eJu0ZFQFpiZsFR3mRUm4tW
-	 cvlsEoVujDPQpeiAczxRXWeoFvD6MdgLU2XzvnuFK3/hmx9QNE312v8geDuV44/hZY
-	 PnoHrZtMxn1eoDfLXCBkksXq7T3FDCCl2ino1W2/VY67BePCLWvbYHV+79+85L4Yzn
-	 YUp9x95vhEBog==
+	b=eweshMVUCXMzZRRsI7njXxgeBTjXcBMKmJpoNC9jNCZyfIr/4c6DKo7DSLf6uvq1k
+	 9nnVRPEEgZXPRynSM/FGx6iVXPuKub2TSg1cxv6UFO0l/lMrKT5I+dUXOnVWexp75y
+	 OP6UApBY4y3/iW5rdcQb5x8o11niALeP1VbrEXHd+pHos7Xe/mm0NW7/B7UREFpOIS
+	 fLHgnPM84IHjtgXG4A2O5HuLOTAv52gYBehRnlmhEgvjDXOWt1wMLkfpx5YD8zLYh4
+	 bD/d10NJ8BVjITNfjDwzme3S9VAsIgw76Bnp8dBuNAG6VS31zPB1nLoKIPU55852lh
+	 q8vYqS42XkyaQ==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>
@@ -33,9 +33,9 @@ Cc: linux-kernel@vger.kernel.org,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Stephan Mueller <smueller@chronox.de>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 08/11] crypto: rng - Unexport "default RNG" symbols
-Date: Wed, 25 Mar 2026 17:15:04 -0700
-Message-ID: <20260326001507.66500-9-ebiggers@kernel.org>
+Subject: [PATCH 09/11] crypto: rng - Make crypto_stdrng_get_bytes() use normal RNG in non-FIPS mode
+Date: Wed, 25 Mar 2026 17:15:05 -0700
+Message-ID: <20260326001507.66500-10-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260326001507.66500-1-ebiggers@kernel.org>
 References: <20260326001507.66500-1-ebiggers@kernel.org>
@@ -47,88 +47,100 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Now that crypto_default_rng, crypto_get_default_rng(), and
-crypto_put_default_rng() have no users outside crypto/rng.c itself,
-unexport them and make them static.
+"stdrng" is needed only in "FIPS mode".  Therefore, make
+crypto_stdrng_get_bytes() delegate to either the normal Linux RNG or to
+"stdrng", depending on the current mode.
+
+This will eliminate the need to built the SP800-90A DRBG and its
+dependencies into CRYPTO_FIPS=n kernels.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- crypto/rng.c         | 9 +++------
- include/crypto/rng.h | 5 -----
- 2 files changed, 3 insertions(+), 11 deletions(-)
+ crypto/rng.c         |  4 ++--
+ include/crypto/rng.h | 15 +++++++++++++--
+ 2 files changed, 15 insertions(+), 4 deletions(-)
 
 diff --git a/crypto/rng.c b/crypto/rng.c
-index 53a268ad5104..f52f4793f9ea 100644
+index f52f4793f9ea..1d4b9177bad4 100644
 --- a/crypto/rng.c
 +++ b/crypto/rng.c
-@@ -22,12 +22,11 @@
- #include <net/netlink.h>
- 
- #include "internal.h"
- 
- static DEFINE_MUTEX(crypto_default_rng_lock);
--struct crypto_rng *crypto_default_rng;
--EXPORT_SYMBOL_GPL(crypto_default_rng);
-+static struct crypto_rng *crypto_default_rng;
- static int crypto_default_rng_refcnt;
- 
- int crypto_rng_reset(struct crypto_rng *tfm, const u8 *seed, unsigned int slen)
- {
- 	u8 *buf = NULL;
-@@ -104,11 +103,11 @@ struct crypto_rng *crypto_alloc_rng(const char *alg_name, u32 type, u32 mask)
- {
- 	return crypto_alloc_tfm(alg_name, &crypto_rng_type, type, mask);
- }
- EXPORT_SYMBOL_GPL(crypto_alloc_rng);
- 
--int crypto_get_default_rng(void)
-+static int crypto_get_default_rng(void)
- {
- 	struct crypto_rng *rng;
- 	int err;
- 
- 	mutex_lock(&crypto_default_rng_lock);
-@@ -133,19 +132,17 @@ int crypto_get_default_rng(void)
- unlock:
- 	mutex_unlock(&crypto_default_rng_lock);
- 
- 	return err;
- }
--EXPORT_SYMBOL_GPL(crypto_get_default_rng);
- 
--void crypto_put_default_rng(void)
-+static void crypto_put_default_rng(void)
- {
+@@ -140,11 +140,11 @@ static void crypto_put_default_rng(void)
  	mutex_lock(&crypto_default_rng_lock);
  	crypto_default_rng_refcnt--;
  	mutex_unlock(&crypto_default_rng_lock);
  }
--EXPORT_SYMBOL_GPL(crypto_put_default_rng);
  
- int crypto_stdrng_get_bytes(void *buf, unsigned int len)
+-int crypto_stdrng_get_bytes(void *buf, unsigned int len)
++int __crypto_stdrng_get_bytes(void *buf, unsigned int len)
  {
  	int err;
  
+ 	err = crypto_get_default_rng();
+ 	if (err)
+@@ -152,11 +152,11 @@ int crypto_stdrng_get_bytes(void *buf, unsigned int len)
+ 
+ 	err = crypto_rng_get_bytes(crypto_default_rng, buf, len);
+ 	crypto_put_default_rng();
+ 	return err;
+ }
+-EXPORT_SYMBOL_GPL(crypto_stdrng_get_bytes);
++EXPORT_SYMBOL_GPL(__crypto_stdrng_get_bytes);
+ 
+ #if defined(CONFIG_CRYPTO_RNG) || defined(CONFIG_CRYPTO_RNG_MODULE)
+ int crypto_del_default_rng(void)
+ {
+ 	int err = -EBUSY;
 diff --git a/include/crypto/rng.h b/include/crypto/rng.h
-index db6c3962a7df..f61e037afed9 100644
+index f61e037afed9..07f494b2c881 100644
 --- a/include/crypto/rng.h
 +++ b/include/crypto/rng.h
-@@ -55,15 +55,10 @@ struct rng_alg {
+@@ -10,10 +10,12 @@
+ #define _CRYPTO_RNG_H
+ 
+ #include <linux/atomic.h>
+ #include <linux/container_of.h>
+ #include <linux/crypto.h>
++#include <linux/fips.h>
++#include <linux/random.h>
+ 
+ struct crypto_rng;
+ 
+ /**
+  * struct rng_alg - random number generator definition
+@@ -55,22 +57,31 @@ struct rng_alg {
  
  struct crypto_rng {
  	struct crypto_tfm base;
  };
  
--extern struct crypto_rng *crypto_default_rng;
--
--int crypto_get_default_rng(void);
--void crypto_put_default_rng(void);
--
++int __crypto_stdrng_get_bytes(void *buf, unsigned int len);
++
  /**
   * crypto_stdrng_get_bytes() - get cryptographically secure random bytes
   * @buf: output buffer holding the random numbers
   * @len: length of the output buffer
   *
+  * This function fills the caller-allocated buffer with random numbers using the
+- * highest-priority "stdrng" algorithm in the crypto_rng subsystem.
++ * normal Linux RNG if fips_enabled=0, or the highest-priority "stdrng"
++ * algorithm in the crypto_rng subsystem if fips_enabled=1.
+  *
+  * Context: May sleep
+  * Return: 0 function was successful; < 0 if an error occurred
+  */
+-int crypto_stdrng_get_bytes(void *buf, unsigned int len);
++static inline int crypto_stdrng_get_bytes(void *buf, unsigned int len)
++{
++	might_sleep();
++	if (fips_enabled)
++		return __crypto_stdrng_get_bytes(buf, len);
++	return get_random_bytes_wait(buf, len);
++}
+ 
+ /**
+  * DOC: Random number generator API
+  *
+  * The random number generator API is used with the ciphers of type
 -- 
 2.53.0
 
