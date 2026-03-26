@@ -1,163 +1,74 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7239D3A6B8B;
-	Thu, 26 Mar 2026 20:48:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D96A730EF7D;
+	Thu, 26 Mar 2026 21:07:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774558115; cv=none; b=rhJMX6KuC2fjdAwG59cmU5B9Nsi6eBdKHup+YHlNEPY3n+v15Ap3EOMPT6QYKGJ6yOCEIKywmyHS6B463snNpx8rUwrfYFJDy+B6nuYLE0X45kuSMkhR81qbj53B4b9b55itqHidV3EHNt6rZhSxvXNZdHpldc4DfjD2f7kDLXw=
+	t=1774559231; cv=none; b=pMBCs6QCr6AIkb8XJZ+jriK4r3dykynZvk2N3wzDtNV1rdUEikjD9815BwQpzhxKOczHqJHPm+htvcKyZZBG0zowngoOuBkEaP4h5QqMLwMiupabhsALbypLJsjXoSu7O7L3fmjETEJ7/ugd2XgLIJkMqwGsrsZLAyWaxn5xgeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774558115; c=relaxed/simple;
-	bh=6LoLx7+aqrBPNFDurIy0LwoP04hwrB/2gDEyo0yPcT8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SMrjuT7CvLAUA0EmCvQuiL3iHyqU1Jf4iyFmYXB3Yj4te2lDg7QMOTBHvaz2PhfyYESvQoHGvOpc630eMm6mmDM9Ss6Qz4IIaV/ZXZfF4I0DFU3qffG/hl1yPBvLqY4W7yDxrHN2ctQjUjDFhPTQj+/bJnAzS2DBeKPW6NSMi6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z0qW4FBp; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774559231; c=relaxed/simple;
+	bh=3svQX6qc5PxiXPOem8MaoHy/6R/4uF3gAu03wT1Xy/0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O9cEHLA5X/4yIv0DVbNUq8BWLNoxrcAYh772QwTNnIgWdWDC1P5dGZzTRh1Uz6PQ7kzbmD8PPDfjt25CPaZUI13Av1M72oTIaGhHQb+1yw+Frz/oqwVdYzlTbXUWx3WKpvyfsizgWo/W9Lmrdnqdc47EfKbTq3qkcllmU5iOaHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HSiv81Ui; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z0qW4FBp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12FBBC19423;
-	Thu, 26 Mar 2026 20:48:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HSiv81Ui"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10135C116C6;
+	Thu, 26 Mar 2026 21:07:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774558115;
-	bh=6LoLx7+aqrBPNFDurIy0LwoP04hwrB/2gDEyo0yPcT8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Z0qW4FBpjsVkidAfp2bDKU/xuaIf3zwUx2PkDNEgGZEr+53Oc25pPypuT2ZQbd5wm
-	 VhVWJda7VYPppnCg3XTeKqpfWiV6Is2rMIHl3b4EciO9TGFWtW3NjX/mFnnZORQsJo
-	 n4PEqTY7gbDUCBjW04MP4p/HtbYVf64uU8iYH9M8e5MVukZh3hwLIcrghV3I+C8eLO
-	 gdd9cCQA6G1l8VuBlPP3dfVFdc3Ekzrm6sSlefYaf4gGXhkeWYxI6xDG5MeYUs2EfC
-	 W1vxKmUn82gryFgkUmeof9KYWopPjNy3h3rPV6VQLe/tk4FQI1IHLdsjXuecPAAPfc
-	 OoT6YDvRcURhQ==
+	s=k20201202; t=1774559231;
+	bh=3svQX6qc5PxiXPOem8MaoHy/6R/4uF3gAu03wT1Xy/0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HSiv81UiNCklEtRboUIrwAGIULMazqPbXTV3+7tNmC9ltD1NgwlFAYSfOYM4a3JyT
+	 cct4VZcREbG986HX1a3GA/9Nrgq9/uB+Va0XPxw4w2dN2/MoBj9RDwu1OI735b+Eb3
+	 jg7LyKwCH9hvFNLzMveIrAtDnlyJ2KS1H5HGM3VvwebP/af+q9+qA+YoJN1OOwg7X0
+	 zs0M5aoV4wYQZ/LHvUyWfizxw2YfFqvfFUc/cIEfh5KiNdJeTyqj1Wmjd9VqH3S0ZH
+	 Ld9b2KfIKpqFbpoNGgvmPqXniaRADDbViBhqwbNoE1IYEi077BqdxOBj0aTVueBm1q
+	 v1gKLFqFRRdzw==
+Date: Thu, 26 Mar 2026 14:07:09 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-mips@vger.kernel.org,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] lib/crypto: mips: Drop optimized MD5 code
-Date: Thu, 26 Mar 2026 13:48:24 -0700
-Message-ID: <20260326204824.62010-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.53.0
+To: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+	sparclinux@vger.kernel.org, x86@kernel.org,
+	Harald Freudenberger <freude@linux.ibm.com>,
+	Holger Dengler <dengler@linux.ibm.com>
+Subject: Re: [PATCH 0/3] crypto: Remove arch-optimized des and des3_ede code
+Message-ID: <20260326210709.GB2657@quark>
+References: <20260326201246.57544-1-ebiggers@kernel.org>
+ <0982d4341f58e2f1181bc472dc9c9d8542148e3c.camel@physik.fu-berlin.de>
+ <20260326202733.GA2657@quark>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260326202733.GA2657@quark>
 
-MD5 is obsolete.  Continuing to maintain architecture-optimized
-implementations of MD5 is unnecessary and risky.  It diverts resources
-from the modern algorithms that are actually important.
+On Thu, Mar 26, 2026 at 01:27:33PM -0700, Eric Biggers wrote:
+> On Thu, Mar 26, 2026 at 09:20:51PM +0100, John Paul Adrian Glaubitz wrote:
+> > On Thu, 2026-03-26 at 13:12 -0700, Eric Biggers wrote:
+> > > DES and 3DES are cryptographically obsolete and insecure by modern
+> > > standards.  Continuing to maintain highly specific, complex assembly and
+> > > glue code for them, especially when the code isn't testable in QEMU
+> > > (s390 and sparc), is unnecessary and risky.
+> > 
+> > We're working on getting crypto instructions added to QEMU though.
+> > 
+> > Adrian
+> 
+> In general that's good of course, but DES and 3DES?  Really?  Why is
+> effort going into these obsolete algorithms at all?
+> 
+> - Eric
 
-While there was demand for continuing to maintain the PowerPC optimized
-MD5 code to accommodate userspace programs that are misusing AF_ALG
-(https://lore.kernel.org/linux-crypto/c4191597-341d-4fd7-bc3d-13daf7666c41@csgroup.eu/),
-no such demand has been seen for the MIPS Cavium Octeon optimized MD5
-code.  Note that this code runs on only one particular line of SoCs.
+I would suggest focusing your efforts on more modern algorithms, like
+AES (which has its own SPARC instructions and code), and not worrying
+about DES and 3DES.  It's just not worth it anymore.  Note that I'm
+proposing dropping the x86 DES and 3DES code as well.
 
-Thus, let's drop it and focus effort on the more modern SHA algorithms,
-which already have optimized code for the same SoCs.
-
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
-
-This patch is targeting libcrypto-next
-
- lib/crypto/Kconfig    |  1 -
- lib/crypto/mips/md5.h | 65 -------------------------------------------
- 2 files changed, 66 deletions(-)
- delete mode 100644 lib/crypto/mips/md5.h
-
-diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-index 4b6f593dc72f..9f31f03062f0 100644
---- a/lib/crypto/Kconfig
-+++ b/lib/crypto/Kconfig
-@@ -132,11 +132,10 @@ config CRYPTO_LIB_MD5
- 	  uses any of the functions from <crypto/md5.h>.
- 
- config CRYPTO_LIB_MD5_ARCH
- 	bool
- 	depends on CRYPTO_LIB_MD5 && !UML
--	default y if MIPS && CPU_CAVIUM_OCTEON
- 	default y if PPC
- 	default y if SPARC64
- 
- config CRYPTO_LIB_MLDSA
- 	tristate
-diff --git a/lib/crypto/mips/md5.h b/lib/crypto/mips/md5.h
-deleted file mode 100644
-index e08e28aeffa4..000000000000
---- a/lib/crypto/mips/md5.h
-+++ /dev/null
-@@ -1,65 +0,0 @@
--/*
-- * Cryptographic API.
-- *
-- * MD5 Message Digest Algorithm (RFC1321).
-- *
-- * Adapted for OCTEON by Aaro Koskinen <aaro.koskinen@iki.fi>.
-- *
-- * Based on crypto/md5.c, which is:
-- *
-- * Derived from cryptoapi implementation, originally based on the
-- * public domain implementation written by Colin Plumb in 1993.
-- *
-- * Copyright (c) Cryptoapi developers.
-- * Copyright (c) 2002 James Morris <jmorris@intercode.com.au>
-- *
-- * This program is free software; you can redistribute it and/or modify it
-- * under the terms of the GNU General Public License as published by the Free
-- * Software Foundation; either version 2 of the License, or (at your option)
-- * any later version.
-- */
--
--#include <asm/octeon/crypto.h>
--#include <asm/octeon/octeon.h>
--
--/*
-- * We pass everything as 64-bit. OCTEON can handle misaligned data.
-- */
--
--static void md5_blocks(struct md5_block_state *state,
--		       const u8 *data, size_t nblocks)
--{
--	struct octeon_cop2_state cop2_state;
--	u64 *state64 = (u64 *)state;
--	unsigned long flags;
--
--	if (!octeon_has_crypto())
--		return md5_blocks_generic(state, data, nblocks);
--
--	cpu_to_le32_array(state->h, ARRAY_SIZE(state->h));
--
--	flags = octeon_crypto_enable(&cop2_state);
--	write_octeon_64bit_hash_dword(state64[0], 0);
--	write_octeon_64bit_hash_dword(state64[1], 1);
--
--	do {
--		const u64 *block = (const u64 *)data;
--
--		write_octeon_64bit_block_dword(block[0], 0);
--		write_octeon_64bit_block_dword(block[1], 1);
--		write_octeon_64bit_block_dword(block[2], 2);
--		write_octeon_64bit_block_dword(block[3], 3);
--		write_octeon_64bit_block_dword(block[4], 4);
--		write_octeon_64bit_block_dword(block[5], 5);
--		write_octeon_64bit_block_dword(block[6], 6);
--		octeon_md5_start(block[7]);
--
--		data += MD5_BLOCK_SIZE;
--	} while (--nblocks);
--
--	state64[0] = read_octeon_64bit_hash_dword(0);
--	state64[1] = read_octeon_64bit_hash_dword(1);
--	octeon_crypto_disable(&cop2_state, flags);
--
--	le32_to_cpu_array(state->h, ARRAY_SIZE(state->h));
--}
-
-base-commit: 7ac21b4032e5b9b8a6a312b6f1d54f4ba24d1c16
--- 
-2.53.0
-
+- Eric
