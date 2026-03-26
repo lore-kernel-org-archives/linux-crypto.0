@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4020F21D3E4;
-	Thu, 26 Mar 2026 00:16:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 677D9215F5C;
+	Thu, 26 Mar 2026 00:16:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774484205; cv=none; b=IIuGrv8asW/geH3iPGU/f2JxoLzXkWv1RUmHwLDEY9p8fGNDI2MQv0mrPH31jnK9woS7vBxzLv/gTj2b+thncHVSg358rWTJY/8EBDhCzjEoLmYKDIYsiq4iz+Y3QKrL4PrVzZ3Fs3VdvoYzYGa/FrKNJP+OLYGv/emo6wge2MY=
+	t=1774484206; cv=none; b=s8ehDaSNK7vchgMgXES0hgPWtKIVre6ZZyc1Ldjou5b03hXp9kDF06uTP14XnSNcuLu8Z6VjbW2FOFZ5SNymr9gTKzum8Kist5/H3AGO6PnbglmFSOetBiXoSc1PLaBNc4Jw6TaGoS+qvg1esbdDekzJAtpkincdoR35639qN3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774484205; c=relaxed/simple;
-	bh=8RXRQarUEH5v46Pvke7LgdMNRlK7yH/04VpO240qSdY=;
+	s=arc-20240116; t=1774484206; c=relaxed/simple;
+	bh=b0/9b/j23QPsJQ1pApefZrlxDXVK8JIv6o1ngIZmr9Y=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gLu1AkBDoRLGKofH9OZvb8djA6HqiHqsQMSxX+SIJa+/cY6ueY18T+vpFMiua1jI3Ynzbyeu76hGmJzIOElnhsYDjkimnXe7KEeUU+BRX14ohOZOwznE6KwHpmCDIydRAytU1Za5L6oXGviluGMM22NyJB60YqXFweXtviu1RHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FqhazUoT; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=lYmWQl/NEFUIwazBKHcUDLkl2vsX8P/rT8HeP14jFiVocDQiYoQ7tjss0R/j5j7ntg98bjCK/ISUwpPxNqIZ0/tWBjyORCH6Pqio0OFkpxAdJZ6tej4h5W8Gv+CXKBY2xB/519Llk+qMQkEP3g1P1nVzA3M0MB8Knp3W5OnJQ6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g0NAbTCt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FqhazUoT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26978C4CEF7;
-	Thu, 26 Mar 2026 00:16:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g0NAbTCt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 438F9C2BCB5;
+	Thu, 26 Mar 2026 00:16:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774484205;
-	bh=8RXRQarUEH5v46Pvke7LgdMNRlK7yH/04VpO240qSdY=;
+	s=k20201202; t=1774484206;
+	bh=b0/9b/j23QPsJQ1pApefZrlxDXVK8JIv6o1ngIZmr9Y=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FqhazUoTcDANuwlR0ubP5mgbR77uZCK281aBYKQrHpu1PTu8FdHXW7/83zylTM5dg
-	 qv5jfNNJVUGgJgxC24bqFSMV5ejFeWUjltDawJcrgYYaQrMa27zG1WbE4ywFkkVkcF
-	 ACWqgxZlKCa76XQhbxz6mMuve9yDq3am4+oNxIl0jeyvSUV13zyf6D45wyMVVeUYjL
-	 wf6+zaI01Ab8Duizg0OIPDd+IEB9ORIyLNLplCB3owwyRnSLMG/NYGLaDKYKoBBMOf
-	 27q2kmqF4+peqIxAt2b37m4oV5G7ALOOXWdztsb9q6k0BSSIpwZ1RYUD7+fJkDcpeV
-	 BMM7EHM3O/cdA==
+	b=g0NAbTCtv3sAhG5/8AYqHK0RgQy9mISxvmLWfKkA8jS8o36CILlL0dYZB47Mtk89A
+	 Z4/2kEeIzO+K9//O6vNHtPxJ7KOpnuSSALYC8g91DIO7oJYhGTbbejLgegBnBH3p7q
+	 +xH7w40vANwVIbndUxPEgD7luBUuTScuD+YHOidJI/oeRSIdCEbtapm3fPbb6enJTp
+	 dFZokPkNd+fy4ogTlzmb1soMv4nKyfoa52oE/fZik3Y0sFYDKs/UcEp1/C5CSx6ahC
+	 pKZ1tpK2mDi22SBFfwTJ9WfFXO8tuou9azKKCKz6XB3U0bCfVcbbShBPR+kizU9InT
+	 DCh8BvF28Z0sw==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>
@@ -33,9 +33,9 @@ Cc: linux-kernel@vger.kernel.org,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Stephan Mueller <smueller@chronox.de>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 02/11] crypto: dh - Use crypto_stdrng_get_bytes()
-Date: Wed, 25 Mar 2026 17:14:58 -0700
-Message-ID: <20260326001507.66500-3-ebiggers@kernel.org>
+Subject: [PATCH 03/11] crypto: ecc - Use crypto_stdrng_get_bytes()
+Date: Wed, 25 Mar 2026 17:14:59 -0700
+Message-ID: <20260326001507.66500-4-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260326001507.66500-1-ebiggers@kernel.org>
 References: <20260326001507.66500-1-ebiggers@kernel.org>
@@ -53,32 +53,37 @@ helper function crypto_stdrng_get_bytes().
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- crypto/dh.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ crypto/ecc.c | 11 +++--------
+ 1 file changed, 3 insertions(+), 8 deletions(-)
 
-diff --git a/crypto/dh.c b/crypto/dh.c
-index 8250eeeebd0f..7ad4768716c8 100644
---- a/crypto/dh.c
-+++ b/crypto/dh.c
-@@ -386,17 +386,11 @@ static void *dh_safe_prime_gen_privkey(const struct dh_safe_prime *safe_prime,
- 
- 	/*
- 	 * 5.6.1.1.3, step 3 (and implicitly step 4): obtain N + 64
- 	 * random bits and interpret them as a big endian integer.
+diff --git a/crypto/ecc.c b/crypto/ecc.c
+index 08150b14e17e..43b0def3a225 100644
+--- a/crypto/ecc.c
++++ b/crypto/ecc.c
+@@ -1531,20 +1531,15 @@ int ecc_gen_privkey(unsigned int curve_id, unsigned int ndigits,
+ 	 * strength associated with N.
+ 	 *
+ 	 * The maximum security strength identified by NIST SP800-57pt1r4 for
+ 	 * ECC is 256 (N >= 512).
+ 	 *
+-	 * This condition is met by the default RNG because it selects a favored
+-	 * DRBG with a security strength of 256.
++	 * This condition is met by stdrng because it selects a favored DRBG
++	 * with a security strength of 256.
  	 */
--	err = -EFAULT;
 -	if (crypto_get_default_rng())
--		goto out_err;
+-		return -EFAULT;
 -
--	err = crypto_rng_get_bytes(crypto_default_rng, (u8 *)key,
--				   oversampling_size);
+ 	/* Step 3: obtain N returned_bits from the DRBG. */
+-	err = crypto_rng_get_bytes(crypto_default_rng,
+-				   (u8 *)private_key, nbytes);
 -	crypto_put_default_rng();
-+	err = crypto_stdrng_get_bytes(key, oversampling_size);
++	err = crypto_stdrng_get_bytes(private_key, nbytes);
  	if (err)
- 		goto out_err;
+ 		return err;
  
- 	/*
- 	 * 5.6.1.1.3, step 5 is implicit: 2^N < q and thus,
+ 	/* Step 4: make sure the private key is in the valid range. */
+ 	if (__ecc_is_key_valid(curve, private_key, ndigits))
 -- 
 2.53.0
 
