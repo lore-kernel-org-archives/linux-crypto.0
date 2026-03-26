@@ -1,100 +1,89 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC043A0E88;
-	Thu, 26 Mar 2026 19:41:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E043A3800;
+	Thu, 26 Mar 2026 20:12:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774554076; cv=none; b=DiBEycZ7oWGl0duzAIzap+fs9C2R2wauxcQXYHbildkpYYp9r+Dd6+6cfrQvafH4ab0bDxGCvfBTYYD9Zx1QVx+zCh39ChAIrvAXctYMQdHNXceO2B98idYQ/BeVaUerP0/uzU07zl6KPYU5RHSR0iNLA8E3Zn3UELN52zJJpQ4=
+	t=1774555973; cv=none; b=BfP6l4qdyRu2uOiAmSpRCnlSFpgc4wqVWGWkP+NMmVqHtPYxs/sSclOB7XIZpbXtiYIoDD8BxMDPDsc8NwdZU/3O62mfLJaeQVIi8f/X1PhzzzQLZ9keapWi2Vj2x4pPs+sIBPB3/4uZThWcHgrUGmyyNdKnjPQATV+ovpz1s8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774554076; c=relaxed/simple;
-	bh=C9/NPr+Pl9jEmgwpnRIFZPHBQXxhE7qS+DKPun17jRU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oEIypXcQE2GTS7e8J2+P/1DLmaQvh/TgQFxCEt/DUmdK/J8SFwlhsKkqANQkFT8086iewy1v0Jrsfd8f7lt69mfryEAmXfwyXI/p+oOzmGTocGHAfroTngywqPS7QfEzU41IFMWI6EABWpvvxcaSkQErbdRQw6FGFvjlYAEVC2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Luq0fhBB; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774555973; c=relaxed/simple;
+	bh=Jncs6DjzXM9ebzv1x3ezfUU5Po/qgF4SZLeP17IU7gQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XaPpCbh/IbyH2lvxpc8OofbAZmms3gCpNEytt9e5lsZsIb0DTfIYAtZYZEv5aqrmAz9LMBX2MlRQb3/Bexklrvfti2Hh1Qs5MXn6BoDHr2zTTGimItqzBifOhMDq1o1EbMaqDFhvmK+8d8Grilq3f0XXq8sLJeXSlUNHxD3HEPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hJNjV9YJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Luq0fhBB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 481ABC116C6;
-	Thu, 26 Mar 2026 19:41:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hJNjV9YJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FD5FC19423;
+	Thu, 26 Mar 2026 20:12:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774554076;
-	bh=C9/NPr+Pl9jEmgwpnRIFZPHBQXxhE7qS+DKPun17jRU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Luq0fhBBvzuS68tdGrtzBRVbaH6F0u71w94JQ5jl8BJZ6EU+NlyhUlt9ojWyV5JId
-	 8n1NjlymQFXD2/hdKtTgTzzjBL58MKIxYXjWixu4nhbMTLf31PEcUQbRF3mz3MgdYB
-	 ugp/abGLULr7kmkqLOFOZLys4fA0+ZKIcP/o8BYlzUCRVl5TIYYUy3uLiujrWIIInW
-	 3sPBmRr3RaItnMh0A5/DYKtRKjYXLVe5NO1YIilKQjQ0ahLscsAsWXIzYCZTsUTTer
-	 5d2157eWwXaZs7aHMpkA7+5+AmCs1vPQh6u8t98bY2wdlmkmLWY2q7Vfk5bQl0vyjF
-	 KZrpHW/gMK8Ng==
-Date: Thu, 26 Mar 2026 09:41:14 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: Lai Jiangshan <jiangshanlai@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org, puranjay@kernel.org,
-	linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	Michael van der Westhuizen <rmikey@meta.com>, kernel-team@meta.com,
-	Chuck Lever <chuck.lever@oracle.com>, jlayton@kernel.or
-Subject: Re: [PATCH v2 2/5] workqueue: add WQ_AFFN_CACHE_SHARD affinity scope
-Message-ID: <acWL2hxO7m2H4g_r@slm.duckdns.org>
-References: <20260320-workqueue_sharded-v2-0-8372930931af@debian.org>
- <20260320-workqueue_sharded-v2-2-8372930931af@debian.org>
- <acHCE96gzEUaGZFP@slm.duckdns.org>
- <acVbF0cGGJx--Tci@gmail.com>
+	s=k20201202; t=1774555973;
+	bh=Jncs6DjzXM9ebzv1x3ezfUU5Po/qgF4SZLeP17IU7gQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=hJNjV9YJP3MOknABU+M4uPH5auJM6rEiAndYCc+kq4jOBJaMwKFDBlEptLvWPGrAZ
+	 STPz8Jp7E8DmOfpsrdi7+X3BRQPomzgZIxhq19FadUiK/PMTP6LE9qA2DUaFBDHu8g
+	 VapmWXBJ2cl4FmE8jEgewKmrUfCE2OHOuu3CLHPLl42hHt94BmQ7ogShyaGgyTogee
+	 /D2Mqw7iGiFdbtmEaA4tzOeiCmnFXvMBu8u4K6aQL1F1NLlEVDQOJDl3pVpw66jOKD
+	 SgJyva9DlU91njD9kNB2o41JGptkdvb6noJCfZh2rVq3lRTIhugs29Lromblh7cLmW
+	 m2P32X4AcO0QQ==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-kernel@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	sparclinux@vger.kernel.org,
+	x86@kernel.org,
+	Harald Freudenberger <freude@linux.ibm.com>,
+	Holger Dengler <dengler@linux.ibm.com>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH 0/3] crypto: Remove arch-optimized des and des3_ede code
+Date: Thu, 26 Mar 2026 13:12:42 -0700
+Message-ID: <20260326201246.57544-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <acVbF0cGGJx--Tci@gmail.com>
 
-On Thu, Mar 26, 2026 at 09:20:15AM -0700, Breno Leitao wrote:
-> Assuming wq_cache_shard_size = 8;, we would have the following number of pool
-> per number of CPU (not vCPU):
-> 
->   - 1–11 CPUs → DIV_ROUND_CLOSEST(n, 8) ≤ 1 → 1 pool containing all CPUs.
->   - 12 CPUs → DIV_ROUND_CLOSEST(12, 8) = 2 → 2 pools of 6 cores each. This is the first split.
->   - 12–19 → 2 pools
->   - 20–27 → 3 pools
->   - 28–35 → 4 pools
->   - 36–43 → 5 pools
->   - 44–51 → 6 pools
->   - 52–59 → 7 pools
->   - 60–67 → 8 pools
->   - 68–75 → 9 pools (e.g. 72-CPU NVIDIA Grace → 9×8)
->   - 76–83 → 10 pools
->   - 84–91 → 11 pools
->   - 92–99 → 12 pools
->   - 100 → 13 pools (9×8 + 4×7)
-> 
-> Is this what you meant?
+DES and 3DES are cryptographically obsolete and insecure by modern
+standards.  Continuing to maintain highly specific, complex assembly and
+glue code for them, especially when the code isn't testable in QEMU
+(s390 and sparc), is unnecessary and risky.
 
-Yes.
+Thus, this series removes the architecture-optimized DES and 3DES code
+for the three architectures that had it: s390, sparc, and x86.
 
-> +static int __init llc_core_to_shard(int core_pos, int cores_per_shard,
-> +				    int remainder)
-> +{
-> +	int ret;
-> +
-> +	/*
-> +	 * These cores falls within the large shards.
-> +	 * Each large shard has (cores_per_shard + 1) cores
-> +	 */
-> +	if (core_pos < remainder * (cores_per_shard + 1))
-> +		return core_pos / (cores_per_shard + 1);
-> +
-> +	/* These are standard shards */
-> +	ret = (core_pos - remainder * (cores_per_shard + 1)) / cores_per_shard;
+This series is targeting cryptodev/master.
 
-This is too smart. Any chance you can dumb it down? If you have to go
-through intermediate data structures, that's fine too.
+Eric Biggers (3):
+  crypto: s390 - Remove des and des3_ede code
+  crypto: sparc - Remove des and des3_ede code
+  crypto: x86 - Remove des and des3_ede code
 
-Thanks.
+ arch/s390/configs/debug_defconfig |   1 -
+ arch/s390/configs/defconfig       |   1 -
+ arch/s390/crypto/Kconfig          |  16 -
+ arch/s390/crypto/Makefile         |   1 -
+ arch/s390/crypto/des_s390.c       | 502 ------------------
+ arch/sparc/crypto/Kconfig         |  14 -
+ arch/sparc/crypto/Makefile        |   2 -
+ arch/sparc/crypto/des_asm.S       | 419 ---------------
+ arch/sparc/crypto/des_glue.c      | 482 -----------------
+ arch/x86/crypto/Kconfig           |  14 -
+ arch/x86/crypto/Makefile          |   3 -
+ arch/x86/crypto/des3_ede-asm_64.S | 831 ------------------------------
+ arch/x86/crypto/des3_ede_glue.c   | 391 --------------
+ 13 files changed, 2677 deletions(-)
+ delete mode 100644 arch/s390/crypto/des_s390.c
+ delete mode 100644 arch/sparc/crypto/des_asm.S
+ delete mode 100644 arch/sparc/crypto/des_glue.c
+ delete mode 100644 arch/x86/crypto/des3_ede-asm_64.S
+ delete mode 100644 arch/x86/crypto/des3_ede_glue.c
 
+
+base-commit: f9bbd547cfb98b1c5e535aab9b0671a2ff22453a
 -- 
-tejun
+2.53.0
+
