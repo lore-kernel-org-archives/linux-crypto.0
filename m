@@ -1,49 +1,69 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CC122F362B
-	for <linux-crypto@vger.kernel.org>; Thu, 26 Mar 2026 04:17:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E609E26159E;
+	Thu, 26 Mar 2026 05:18:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774498665; cv=none; b=hDMPQjxAvEB85u4EPMe09Bfjg/EhHGxlHk6v+1X3vvNMeAS2+AVPGj8v1EEA9JxUBYe2Aj+G2vaH+bC05UyG7HlhonwbMFZKAPzWXr1fBaYlJEjWQSMN2FnYHt3HnKmFd5LUHGFq4dm1FNSJbOHsXJJO65hjiMbndSP/jLhbcgI=
+	t=1774502326; cv=none; b=JZPT25COfHYPxt5ZBeQMsC51RQLdl5g6r2hVhc8AiDAl2sv3SrpIEhVcK3TEYL/tZj4pO1mwWS24hOYvME4IuVGGxc5aFPE+tIVX30ew5MLbqpvHc/OF3WBHBcR/YruPvluh6nEwskB1Jk/cVmBsqh4R2SBAvPqQyup8R55o36E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774498665; c=relaxed/simple;
-	bh=7Vc+IZwEKI/aExoAPMqrLzSVFvvBkLiAV4ALug/+rIg=;
+	s=arc-20240116; t=1774502326; c=relaxed/simple;
+	bh=LQ2AOVAyiIuqBIVY7X3bbSu1jE1YtSBoBtGFX3IePZI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dcU4Z2mXBgKlbIbR8cJZwGHyh7PfEVBy+AdsugiATal3DZmF4nVxxeKDj7YI1b2W5ohy1IgRpuxLepGHfqEF0ccmw+Pj7iWfEdLb+msm9gfuOhd4AbxNSPk7Y8xJt/CRtxEQcQJrP3/p6az7gDu9ORSixpKX7GzwUBzp8t7Q7Kk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=RqjE+/ST; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="RqjE+/ST"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=di36djunGzh1zDhUYAsOQHLljST8a0a9F6Tpb/7N5vA=; 
-	b=RqjE+/ST7jEp2RMx3TugM3QH210G4LlXrTdTzKd8mATe1BqZdDWvWoc0i2ng/s2rSxLj5q57QV8
-	SxrV5mE3DomrWo8FW4aO/23xA1b5DNZCYa0wimLLKXzPc//2j2SDDa4+k+NTdHf8vPmBeZTiFldR2
-	17tz0SFpml1lAdl6NnjUf5MtxOoEesuawlUlBqYdwpUt5s30nzcAwMO4FwHjez2Li1hwyeijGSxsC
-	WlXKgbNSFyIIiIw5GBkKiYYDRQs/v2ccvzCEGXSHxcnWbunnaZK/gNPUD4ascM96eGs/MyWR6EBRE
-	jlDCINW5gmWbKfnRfxKOkkFYFXHsiDIrAzKA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1w5bkV-001C3I-3D;
-	Thu, 26 Mar 2026 12:17:31 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 26 Mar 2026 13:17:30 +0900
-Date: Thu, 26 Mar 2026 13:17:30 +0900
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linus Torvalds <torvalds@linuxfoundation.org>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Eric Biggers <ebiggers@kernel.org>, Taeyang Lee <0wn@theori.io>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Greg KH <gregkh@linuxfoundation.org>, davem@davemloft.net,
-	Brian Pak <bpak@theori.io>, Juno Im <juno@theori.io>,
-	Jungwon Lim <setuid0@theori.io>
-Subject: Re: [PATCH] crypto: authencesn - Copy high sequence number from src
- after out-of-place decryption
-Message-ID: <acSzWm2bzRXTkhVH@gondor.apana.org.au>
-References: <acOpDrnN3cVfiASk@gondor.apana.org.au>
- <CAHk-=wiEzzo=LQ4TasUqFDkSYYAXa3VT6PvLx+AS8asOEA6hng@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Il7kQUO/SmmAuaU3o7Kg+qlV+zh/8Dbt+VJu4O0/OmPhjTsWOuIbKZQiObpkhto7HGfDXkB2/5F1hzJkYVdFU3eJ8nn0iI6/IqaGL3ZQD5bcnB9SC6dClL9QR8MTWWlOApCOKS3fYf8Vtzj5gzOAFwIz7qaWFKr6Cx//bBz8H4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
+Received: by verein.lst.de (Postfix, from userid 2407)
+	id 7351F68B05; Thu, 26 Mar 2026 06:18:37 +0100 (CET)
+Date: Thu, 26 Mar 2026 06:18:37 +0100
+From: Christoph Hellwig <hch@lst.de>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Matt Turner <mattst88@gmail.com>,
+	Magnus Lindholm <linmag7@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andreas Larsson <andreas@gaisler.com>,
+	Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Dan Williams <dan.j.williams@intel.com>, Chris Mason <clm@fb.com>,
+	David Sterba <dsterba@suse.com>, Arnd Bergmann <arnd@arndb.de>,
+	Song Liu <song@kernel.org>, Yu Kuai <yukuai@fnnas.com>,
+	Li Nan <linan122@huawei.com>, Theodore Ts'o <tytso@mit.edu>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>, linux-alpha@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	loongarch@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+	linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-raid@vger.kernel.org
+Subject: Re: cleanup the RAID5 XOR library v3
+Message-ID: <20260326051837.GA22847@lst.de>
+References: <20260324062211.3216301-1-hch@lst.de> <20260325193954.GC2305@quark>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,23 +72,35 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAHk-=wiEzzo=LQ4TasUqFDkSYYAXa3VT6PvLx+AS8asOEA6hng@mail.gmail.com>
+In-Reply-To: <20260325193954.GC2305@quark>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Wed, Mar 25, 2026 at 09:23:31AM -0700, Linus Torvalds wrote:
->
-> Side note: can we please just get rid of the horrid
-> scatterwalk_map_and_copy() when making changes to code?
+On Wed, Mar 25, 2026 at 12:39:54PM -0700, Eric Biggers wrote:
+> This generally looks good, but yes, please check the comments from
+> https://sashiko.dev/#/patchset/20260324062211.3216301-1-hch@lst.de, as
+> Andrew mentioned.
+
+Yes, I've looked into them and fixed the, the current version in the
+git branch already has the changes.
+
+> looks real as well, though I haven't tested it.  If preemption is indeed
+> not the right thing to check, then I guess (following up from
+> https://lore.kernel.org/linux-crypto/20260303195517.GC2846@sol/) it
+> would need to be something like:
 > 
-> That function is disgusting. It's really hard to see which direction it copies.
+>     WARN_ON_ONCE(!in_task() || irqs_disabled() || softirq_count() != 0);
 > 
-> At least with memcpy_to/from_sglist() the function name and the order
-> of the arguments gives a better hint of what the code is trying to do.
+> Ugly, but we're running out of options.
 
-Sure, I'll post a follow-up patch to convert scatterwalk_map_and_copy
-to memcpy_to/from_sglist.
+So far I've just reverted back to the in_interrupted() check we had
+before.  I can switch to the above, though.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> (This sort of thing is why the functions in lib/crypto/ and lib/crc/ are
+> just supported in all contexts instead.  If FPU/vector/SIMD registers
+> cannot be used in the current context, then a scalar fallback is used.)
+
+We could do this fairly easily, but I'm not sure it is a good idea.
+The callers of these routines are extremely limited, so we'd have to
+add code for this which will then only be used by the new extensive
+test code we'd have to add for it.
+
