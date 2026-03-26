@@ -1,121 +1,109 @@
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EA4831717B
-	for <linux-crypto@vger.kernel.org>; Thu, 26 Mar 2026 09:46:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 647CD34EEE7
+	for <linux-crypto@vger.kernel.org>; Thu, 26 Mar 2026 10:04:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774518395; cv=none; b=Ei2/kHuavI09ZnTMPyvXzYReg5+z1hCPpmyiF9rLAMZ+8egSZZRJQmmkpn1vreyBO0zQVSMGAh3tqTxs1Sx9jKB6UqEmgwQDN/BiBJBPKgNixqClCBljkfKjveWXxxMaz9LBlakOZXt3mgMLG9TNhFMsBxQAF0nfg/mNrxXrG5U=
+	t=1774519482; cv=none; b=Cj4Bl5NuZODaUyBxaD6ouajC4vIJqv89R9qMoBmrsGUtKhuZQozV4QDiKg45nblA8yJM2ihpHe7cMxvDcYXUKEi0RHCo61XoZUS1JPMc6UsTbDumIMys70x3REYQUQ0+YkDE1gPkch6GHtX7J7eANVnTWj3GI9azmnHQ86TnMMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774518395; c=relaxed/simple;
-	bh=/ePnU4+lOo5eOaImX73MZTOmaKDBi4z3YpI5LmFb2YY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=I/UImdh1YOkDRnw94EVoPuRb/wcOVBZSW4O5WdNaKxMFQmEqwm5R2alMHwl+mR9rWxTsoBqbi8IjQcgUAmb3TlQ0nG8+l4z4Cn4oWAHfMfiMMTTMu40dbSaDBT6Xm7Gal0ukUIaQ804sQ90QW6bd9yKcqlhEI6xtKckaARKutL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=VNaGRExV; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	s=arc-20240116; t=1774519482; c=relaxed/simple;
+	bh=EKHc8UZRl7Y1xRPOrJAOYj/pVHhoxoc5HmxGsIfSpOY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gg+9GAYu4IFyjntMCUC8/mdBQhRkSDrSqgeVJZcpfiCUTxiWqEoO1dXB06BWParmlZFpv46vBbNbucodVE/a94Ei8vhdudDPH1bSVLXT35ZZoLbjehUzaRaBiYIjezwZvi8qZk5iHDVLisyniAAJ79RfAiyY91mh2zfZEmpYvuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ddjgGiwh; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="VNaGRExV"
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 7D94EC56685;
-	Thu, 26 Mar 2026 09:46:58 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 5A3BD5FDEB;
-	Thu, 26 Mar 2026 09:46:30 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id CD9B810451B26;
-	Thu, 26 Mar 2026 10:46:25 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1774518389; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=pGegp8oyJ+w6MV5D1IOR1vrx6d1Kzo4MmL6SdV9FVl4=;
-	b=VNaGRExVqdYCbZuqLlv0Waj54YxFHewZwTeKzUKxIfTYKlrn3TFHA/aVlW3Iyt12AvO23G
-	les20wLbIhVmpJxnO+oWOy1TzsRs0uLWTkrBioZ1kOWPIbgJf2Oc8pacUL6dft3izTPUkZ
-	Yc54CvZtUH6fhwbieyTFIpbHl7fZOYdfGAbDv8j8DdH8TC+ciSaZomx+XDvezyi+OdTK0g
-	EDXubBm/TilDGXxg1fKpEI3srciv68hRJgl1M/YYwLOLHkxiGntzqSbKoqaS0+J33RPwrm
-	h6kNdXZLUdquKYkoehwNVzGI3mcgPzpOyWObc1NDB2A8ubMc3aM9OGqYrl5q5g==
-Message-ID: <5a91d084-a1f6-4911-8592-a4f5dd3f3e13@bootlin.com>
-Date: Thu, 26 Mar 2026 10:46:26 +0100
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ddjgGiwh"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1774519481; x=1806055481;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=EKHc8UZRl7Y1xRPOrJAOYj/pVHhoxoc5HmxGsIfSpOY=;
+  b=ddjgGiwhFi1fyPrkIYOrFvDdhHka8KmYDRZ4YHRG2TJBhSoPFViA2eyw
+   9egGjDlLpiOUmeNrOhTrr6nD/m1jTPGFJ87g2HygVjCQzSpSJL5GAEjzQ
+   oMB4VAAuL738a6g1U5awHtQXa/zKW7c3dt8cIDXzHeIU4KOpXhmM6HY2Z
+   GC1y6SlQ7HDcTzlQp6drHliGdiFNZieHC1iAZPCYYdT6ZT0hV7HTwQYvb
+   4mySxBEQnvN41k4UlX9Ru94ARJPU4DZqR7a/C4KHkarFiouL2nnxbFgB4
+   tFDiK98e4Ub8wlAg6tR98/jOkCDTqwgwFRtJBOsEWwaNCzXdDy0I1WpgO
+   w==;
+X-CSE-ConnectionGUID: lsAoaIuTSB+No4VX/YTg3Q==
+X-CSE-MsgGUID: HCcSbp+aQI+WPfZFUrpgBQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11740"; a="63124265"
+X-IronPort-AV: E=Sophos;i="6.23,141,1770624000"; 
+   d="scan'208";a="63124265"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2026 03:04:40 -0700
+X-CSE-ConnectionGUID: i6TJ0/JjTWOHLTnwl8xfWg==
+X-CSE-MsgGUID: RsonTxjKTeyr0AupYsoAjQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,141,1770624000"; 
+   d="scan'208";a="262874350"
+Received: from silpixa00401971.ir.intel.com ([10.20.226.106])
+  by orviesa001.jf.intel.com with ESMTP; 26 Mar 2026 03:04:38 -0700
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To: herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org,
+	qat-linux@intel.com,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Laurent M Coquerel <laurent.m.coquerel@intel.com>
+Subject: [PATCH v2] crypto: deflate - fix decompression window size
+Date: Thu, 26 Mar 2026 09:59:22 +0000
+Message-ID: <20260326100433.57324-1-giovanni.cabiddu@intel.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Need some clarification about CRYPTO_AHASH_ALG_BLOCK_ONLY
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, Herve Codina <herve.codina@bootlin.com>
-References: <4f93481a-a0e5-4a9f-8aae-00d3189ccc58@bootlin.com>
- <b53feadd-8246-43cf-a768-740cb73d2553@bootlin.com>
- <acTt7q5nXMBsDcxv@gondor.apana.org.au>
-Content-Language: en-US
-From: Paul Louvel <paul.louvel@bootlin.com>
-In-Reply-To: <acTt7q5nXMBsDcxv@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Transfer-Encoding: 8bit
 
-Hi,
+deflate_decompress() initializes the inflate stream with windowBits set
+to -DEFLATE_DEF_WINBITS (11 bits, 2KB window). Valid raw DEFLATE streams
+allow window sizes up to MAX_WBITS (15 bits, 32KB).
 
-> This flag is meant to be temporary in nature.
-What does that mean ? The flag will be subject to changes in the near future ?
+Data compressed with a history window larger than 2 KB, for example
+produced by hardware compressors such as QAT or IAA, might not be
+decompressed by deflate-generic since the inflate stream is initialized
+with a 2 KB window. This might be seen, for example, when
+deflate-generic is used as fallback.
 
-> Historically, crypto API hash drivers processed partial blocks at the
-> end directly and the API played no role in it.
->
-> This has resulted in complexities in the drivers and associated bugs.
-I agree. I am currently working on the talitos crypto driver, which includes 
-code to handle partial blocks. The SEC1 (currently supported by the talitos 
-driver) is older hardware that only accepts data with a length that is a 
-multiple of the underlying hashing algorithm's block size. Would it make sense 
-for the crypto API to have a flag to handle such limitations automatically?
+Use -MAX_WBITS when calling zlib_inflateInit2() to accept all valid raw
+DEFLATE streams. The inflate workspace allocated in deflate_alloc_stream()
+is already sized using zlib_inflate_workspacesize(), which accounts for
+the maximum window size, so no allocation change is needed.
 
-> The API is now able to handle partial blocks for the drivers and
-> the flag is an indication of the driver's preference for it.
-Understood.
+Fixes: f6ded09de8bd ("crypto: acomp - add support for deflate via scomp")
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Laurent M Coquerel <laurent.m.coquerel@intel.com>
+---
+Changes since v1:
+- Updated commit message to clearly state why this is needed for the
+  deflate algorithm (i.e. allow data produced by HW compressors with
+  larger history windows to be decompressed by deflate-generic, which
+  is used as fallback).
+- Updated fixes tag to point to the commit that introduced deflate
+  support in scomp.
 
-> For a reference, see the aspeed driver which has been converted
-> to the new way of handling partial block data.
-Ok.
+ crypto/deflate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thank you,
-
-On 3/26/26 9:27 AM, Herbert Xu wrote:
->> On 3/20/26 10:42 AM, Paul Louvel wrote:
->>> Hello,
->>>
->>> I have stumbled across a flag defined in include/crypto/internal/hash.h
->>> : CRYPTO_AHASH_ALG_BLOCK_ONLY.
->>> To get more information about what exact behavior this flag do, I read
->>> the crypto_ahash_update function.
->>>  From the looks of it, it seems that the API will call the tfm update if
->>> there is enough bytes (and by enough I mean at least a block size), from
->>> the internal buffer and the incoming ahash_request.
->>> In this case, I find the BLOCK_ONLY naming a bit of a misnomer, since it
->>> only guarantee you than req->nbytes will be at least a block size.
->>> I initially though that the API would only give a request that are a
->>> multiple of the block size.
->>>
->>> This flag, among others, are relatively recent.
->>> I think adding documentation about these flags would be a great idea.
-> This flag is meant to be temporary in nature.
->
-> Historically, crypto API hash drivers processed partial blocks at the
-> end directly and the API played no role in it.
->
-> This has resulted in complexities in the drivers and associated bugs.
->
-> The API is now able to handle partial blocks for the drivers and
-> the flag is an indication of the driver's preference for it.
->
-> For a reference, see the aspeed driver which has been converted
-> to the new way of handling partial block data.
->
-> Cheers,
-
+diff --git a/crypto/deflate.c b/crypto/deflate.c
+index 46fc7def8d4c..d347e506e6c3 100644
+--- a/crypto/deflate.c
++++ b/crypto/deflate.c
+@@ -203,7 +203,7 @@ static int deflate_decompress(struct acomp_req *req)
+ 	s = crypto_acomp_lock_stream_bh(&deflate_streams);
+ 	ds = s->ctx;
+ 
+-	err = zlib_inflateInit2(&ds->stream, -DEFLATE_DEF_WINBITS);
++	err = zlib_inflateInit2(&ds->stream, -MAX_WBITS);
+ 	if (err != Z_OK) {
+ 		err = -EINVAL;
+ 		goto out;
 -- 
-Paul Louvel, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+2.53.0
 
