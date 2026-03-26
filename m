@@ -1,49 +1,44 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C4C030C632
-	for <linux-crypto@vger.kernel.org>; Thu, 26 Mar 2026 06:46:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5E14330651;
+	Thu, 26 Mar 2026 08:27:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774507578; cv=none; b=g0Mw2hgv1LUTr+Hx1jdOQeWpiRNY84O5E4omlhd7VGHvx5pWDowqBKzhwnoYjhf1VhUVlKwGZcO+oVOL86zX7RMkKnnn4AKBp3pJ0mmStxqya+b4ySW4uG/NobkjHm8uSVElvn2iVZA93byTsXTRrWH8yfz8a8UTAkHdVTQsT18=
+	t=1774513660; cv=none; b=XXcVokC/nPdmXvtohm9+7sylb+onkXhM5aAryTya3iTw5pF/7GPOaq3/xagNEL9vU1EyKgAuWH73pqyQ7op4V93rVZY2d+1gxFV1f3t49Aji4cT3MOcpnUVTqnFVmSHC5EugMCsYpUxnt40yzb4Q4O/TyMvTH40dCWddGTg1CIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774507578; c=relaxed/simple;
-	bh=AYO4dat2f2ipiPd09eACXVqr7HDEIA3bzjOpHtK2fok=;
+	s=arc-20240116; t=1774513660; c=relaxed/simple;
+	bh=wTVEv8T+Dn3sJDZL4R+of8cpiiiK7ZWIgBCBhfMXpZ4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H8XTKuxUL8LCJjhiA+B/5RyzkAbtfFEJfqi2HYNcfGiY8UUzCDMZIGUFQTBMmgQJN2WB73bGYfCyB/rc7EIDWRy07vAb7UiwI+gJqWBE6wN0RpkwHlaTyvFFhAGo1oewMAKiynVXJVAqnhNYnIHzL2wnTYlko8Lsvt8XTw//i3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=TLLaqHoS; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=agKQbjfPrr4GN/IKAhKvgXI2mbQ+H7WMcyc5mSnbKIIZGc72Mqb5i6uzfU8opx55s1usV+rdrWUOBhaaMGNZNUo7mFhs78uZNM1lcReiYT+iA5KWcxE9qWPUad9VxuB3o6dqtHO5GkiSFOZi1aFuNke3+He3EOucQAzNg+5aCMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=kjuSG+2I; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="TLLaqHoS"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="kjuSG+2I"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=xhMy9m6jINVftH0BykMwE8TYkwhYKMqyHFBFu/BT75Q=; 
-	b=TLLaqHoSzQ6jh4f2agFOBSZB7YCN3IpwykHMfFpEBZojCyWZHNYhqaTDVmSqDATBf4kt5oJ3U3f
-	CM05bF8g+HS/RG1jf9E1NbWg8UmopmXjFjD4Hbe39DA/EyS88C7z9lJgn4aBDsYjTZZOmNTQJVEfp
-	GqizvUejy2XNKlPoojUT3JIjiqRjvRa78/qcWUlxYU/hiMQFfNcbt5Jqc1HA6URaWko9xjvVC/zzv
-	XJ76VX3F7uTD+/yX4+PkvAjc7MRe8T50Xfcu+aNfEB9YB/LrL7riKYya0gkytXeudotZ9gjRJic6I
-	QedDybQEMaopuQFycn3dJMVSfngO0aPfpFJw==;
+	from:content-type:reply-to; bh=PWyb1zeeOXETmO3QFKFYUGHiFYZfZaGPiLKzkzKbi5Y=; 
+	b=kjuSG+2IF/i0I7T8mjvboIn/wujrKb6wrgZ67tB2YgQ86bUTTqII59iFjj3qSiBQ0LjytyhENy8
+	ynbiJeSVu93NnGdEtHRJM6YyyKnipVMVoPYkaXAbzzclnV1MtBfj+qTXHf14uF4Yp5COLBqm8ITk2
+	034C0kQiOCRH66RZQLoMc57Q1Om51EP7b5KoYeiCCRK3Nsdp1qXXT7NiRiHqfrGDzQoNeMO/C9/0V
+	iZ4Y/TRW6cOoHuDzR9ac1+zuQS88yPrHZOQd7awDr63LAagYk8qGanKO3OaWeeD9OXFLpr9KSe9Pd
+	hn0/K2NqqHwLWk9bEPsjsfRB1mg/rtgM18QA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1w5e4P-001DTi-1r;
-	Thu, 26 Mar 2026 14:46:13 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 26 Mar 2026 15:46:12 +0900
-Date: Thu, 26 Mar 2026 15:46:12 +0900
+	id 1w5feO-001F1X-0A;
+	Thu, 26 Mar 2026 16:27:28 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 26 Mar 2026 17:27:26 +0900
+Date: Thu, 26 Mar 2026 17:27:26 +0900
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linus Torvalds <torvalds@linuxfoundation.org>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Eric Biggers <ebiggers@kernel.org>, Taeyang Lee <0wn@theori.io>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Greg KH <gregkh@linuxfoundation.org>, davem@davemloft.net,
-	Brian Pak <bpak@theori.io>, Juno Im <juno@theori.io>,
-	Jungwon Lim <setuid0@theori.io>
-Subject: [PATCH] crypto: authencesn - Use memcpy_from/to_sglist
-Message-ID: <acTWNAs0eBc9F-d0@gondor.apana.org.au>
-References: <acOpDrnN3cVfiASk@gondor.apana.org.au>
- <CAHk-=wiEzzo=LQ4TasUqFDkSYYAXa3VT6PvLx+AS8asOEA6hng@mail.gmail.com>
- <acSzWm2bzRXTkhVH@gondor.apana.org.au>
+To: Paul Louvel <paul.louvel@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: Need some clarification about CRYPTO_AHASH_ALG_BLOCK_ONLY
+Message-ID: <acTt7q5nXMBsDcxv@gondor.apana.org.au>
+References: <4f93481a-a0e5-4a9f-8aae-00d3189ccc58@bootlin.com>
+ <b53feadd-8246-43cf-a768-740cb73d2553@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,81 +47,40 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <acSzWm2bzRXTkhVH@gondor.apana.org.au>
+In-Reply-To: <b53feadd-8246-43cf-a768-740cb73d2553@bootlin.com>
 
-Convert scatterwalk_map_and_copy to memcpy_to/from_sglist as they
-are more readable and less error-prone.
+> On 3/20/26 10:42 AM, Paul Louvel wrote:
+> > Hello,
+> > 
+> > I have stumbled across a flag defined in include/crypto/internal/hash.h
+> > : CRYPTO_AHASH_ALG_BLOCK_ONLY.
+> > To get more information about what exact behavior this flag do, I read
+> > the crypto_ahash_update function.
+> > From the looks of it, it seems that the API will call the tfm update if
+> > there is enough bytes (and by enough I mean at least a block size), from
+> > the internal buffer and the incoming ahash_request.
+> > In this case, I find the BLOCK_ONLY naming a bit of a misnomer, since it
+> > only guarantee you than req->nbytes will be at least a block size.
+> > I initially though that the API would only give a request that are a
+> > multiple of the block size.
+> > 
+> > This flag, among others, are relatively recent.
+> > I think adding documentation about these flags would be a great idea.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+This flag is meant to be temporary in nature.
 
-diff --git a/crypto/authencesn.c b/crypto/authencesn.c
-index fae8c1dbf495..1cb7133bfb14 100644
---- a/crypto/authencesn.c
-+++ b/crypto/authencesn.c
-@@ -94,11 +94,11 @@ static int crypto_authenc_esn_genicv_tail(struct aead_request *req,
- 	u32 tmp[2];
- 
- 	/* Move high-order bits of sequence number back. */
--	scatterwalk_map_and_copy(tmp, dst, 4, 4, 0);
--	scatterwalk_map_and_copy(tmp + 1, dst, assoclen + cryptlen, 4, 0);
--	scatterwalk_map_and_copy(tmp, dst, 0, 8, 1);
-+	memcpy_from_sglist(tmp, dst, 4, 4);
-+	memcpy_from_sglist(tmp + 1, dst, assoclen + cryptlen, 4);
-+	memcpy_to_sglist(dst, 0, tmp, 8);
- 
--	scatterwalk_map_and_copy(hash, dst, assoclen + cryptlen, authsize, 1);
-+	memcpy_to_sglist(dst, assoclen + cryptlen, hash, authsize);
- 	return 0;
- }
- 
-@@ -129,9 +129,9 @@ static int crypto_authenc_esn_genicv(struct aead_request *req,
- 		return 0;
- 
- 	/* Move high-order bits of sequence number to the end. */
--	scatterwalk_map_and_copy(tmp, dst, 0, 8, 0);
--	scatterwalk_map_and_copy(tmp, dst, 4, 4, 1);
--	scatterwalk_map_and_copy(tmp + 1, dst, assoclen + cryptlen, 4, 1);
-+	memcpy_from_sglist(tmp, dst, 0, 8);
-+	memcpy_to_sglist(dst, 4, tmp, 4);
-+	memcpy_to_sglist(dst, assoclen + cryptlen, tmp + 1, 4);
- 
- 	sg_init_table(areq_ctx->dst, 2);
- 	dst = scatterwalk_ffwd(areq_ctx->dst, dst, 4);
-@@ -216,9 +216,9 @@ static int crypto_authenc_esn_decrypt_tail(struct aead_request *req,
- 
- 	/* Move high-order bits of sequence number back. */
- 	if (req->src == dst) {
--		scatterwalk_map_and_copy(tmp, dst, 4, 4, 0);
--		scatterwalk_map_and_copy(tmp + 1, dst, assoclen + cryptlen, 4, 0);
--		scatterwalk_map_and_copy(tmp, dst, 0, 8, 1);
-+		memcpy_from_sglist(tmp, dst, 4, 4);
-+		memcpy_from_sglist(tmp + 1, dst, assoclen + cryptlen, 4);
-+		memcpy_to_sglist(dst, 0, tmp, 8);
- 	} else
- 		memcpy_sglist(dst, req->src, 8);
- 
-@@ -270,17 +270,16 @@ static int crypto_authenc_esn_decrypt(struct aead_request *req)
- 	if (req->src != dst)
- 		memcpy_sglist(dst, req->src, assoclen + cryptlen);
- 
--	scatterwalk_map_and_copy(ihash, req->src, assoclen + cryptlen,
--				 authsize, 0);
-+	memcpy_from_sglist(ihash, req->src, assoclen + cryptlen, authsize);
- 
- 	if (!authsize)
- 		goto tail;
- 
--	scatterwalk_map_and_copy(tmp, dst, 0, 8, 0);
--	scatterwalk_map_and_copy(tmp, dst, 4, 4, 1);
-+	memcpy_from_sglist(tmp, dst, 0, 8);
-+	memcpy_to_sglist(dst, 4, tmp, 4);
- 	if (req->src == dst) {
- 		/* Move high-order bits of sequence number to the end. */
--		scatterwalk_map_and_copy(tmp + 1, dst, assoclen + cryptlen, 4, 1);
-+		memcpy_to_sglist(dst, assoclen + cryptlen, tmp + 1, 4);
- 	}
- 
- 	sg_init_table(areq_ctx->dst, 2);
+Historically, crypto API hash drivers processed partial blocks at the
+end directly and the API played no role in it.
+
+This has resulted in complexities in the drivers and associated bugs.
+
+The API is now able to handle partial blocks for the drivers and
+the flag is an indication of the driver's preference for it.
+
+For a reference, see the aspeed driver which has been converted
+to the new way of handling partial block data.
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
