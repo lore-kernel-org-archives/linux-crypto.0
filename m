@@ -1,44 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5E14330651;
-	Thu, 26 Mar 2026 08:27:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2120235F612
+	for <linux-crypto@vger.kernel.org>; Thu, 26 Mar 2026 08:44:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774513660; cv=none; b=XXcVokC/nPdmXvtohm9+7sylb+onkXhM5aAryTya3iTw5pF/7GPOaq3/xagNEL9vU1EyKgAuWH73pqyQ7op4V93rVZY2d+1gxFV1f3t49Aji4cT3MOcpnUVTqnFVmSHC5EugMCsYpUxnt40yzb4Q4O/TyMvTH40dCWddGTg1CIo=
+	t=1774514650; cv=none; b=H3UtcDs43vF8ttV2x4EBmseCRDwX5/uuMntmZZFS+UQpnYuUD4hdNjY54AIascPXqCgqOvkCElieA8odeZ1JgAWjaFbyJzmh8QMbbsg2DmByitTAOaTBlrxBP5uNgA4cSTFFaEpm/WtRc546PNjKTVDyWQEJd+Cavx0G70+3I0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774513660; c=relaxed/simple;
-	bh=wTVEv8T+Dn3sJDZL4R+of8cpiiiK7ZWIgBCBhfMXpZ4=;
+	s=arc-20240116; t=1774514650; c=relaxed/simple;
+	bh=88sQCgKTRlKiKBHna8cGbW0kdS1ure7TvUoaXmdZ5A0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=agKQbjfPrr4GN/IKAhKvgXI2mbQ+H7WMcyc5mSnbKIIZGc72Mqb5i6uzfU8opx55s1usV+rdrWUOBhaaMGNZNUo7mFhs78uZNM1lcReiYT+iA5KWcxE9qWPUad9VxuB3o6dqtHO5GkiSFOZi1aFuNke3+He3EOucQAzNg+5aCMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=kjuSG+2I; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=IeXIrLWGBZqpXgymutGlJkEURvB9tlk8k8DZQt44byrtx6ToigyXLBnQEidi9Kdt6mSEpM/Wg2QYjYzkHTFCvhwMi9VZb9A+ho018NZfU+6awnv5qT6hs/5ADKMB3PR8ja0eB5zhcuXvURTKFYw9nO5J+9QEDJhJApcd0MQ8UUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Br6l2bSi; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="kjuSG+2I"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Br6l2bSi"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=PWyb1zeeOXETmO3QFKFYUGHiFYZfZaGPiLKzkzKbi5Y=; 
-	b=kjuSG+2IF/i0I7T8mjvboIn/wujrKb6wrgZ67tB2YgQ86bUTTqII59iFjj3qSiBQ0LjytyhENy8
-	ynbiJeSVu93NnGdEtHRJM6YyyKnipVMVoPYkaXAbzzclnV1MtBfj+qTXHf14uF4Yp5COLBqm8ITk2
-	034C0kQiOCRH66RZQLoMc57Q1Om51EP7b5KoYeiCCRK3Nsdp1qXXT7NiRiHqfrGDzQoNeMO/C9/0V
-	iZ4Y/TRW6cOoHuDzR9ac1+zuQS88yPrHZOQd7awDr63LAagYk8qGanKO3OaWeeD9OXFLpr9KSe9Pd
-	hn0/K2NqqHwLWk9bEPsjsfRB1mg/rtgM18QA==;
+	from:content-type:reply-to; bh=C0LDul5N3CuDJJoqVLY27CdIZPw8bM8qyBfdQyjcvHo=; 
+	b=Br6l2bSirvglDpwIQ2KDSCkG1Gw2JDILyZXHhvWydps0Qmwdaz8g9uxqTl+JqYLJCrd2EflJd1p
+	/TPq+9A7J1minfJ//XKVQj1K/JBVHLFpST3atnRedrLWhMCfOy6qNIZoJ7DqfX0+UWC3QJhB0puk+
+	WX5iCtdDOhKnzG6cZfcNl6HnN7wP1KYDz7BXQL1KRMzoWm3Qpip8kXNK7Zyo1CeVEB+2DoioU0JOV
+	4xe+hJewaq8RXffxEok3CSa01kD3wdrOe7yfxyBvGp3vMcrKsgF7DlbRfYhZ6eon6WXvLy+Iey8ix
+	/CojpobtkYeqmpxntR/EkIHJekACwivZRCXQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1w5feO-001F1X-0A;
-	Thu, 26 Mar 2026 16:27:28 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 26 Mar 2026 17:27:26 +0900
-Date: Thu, 26 Mar 2026 17:27:26 +0900
+	id 1w5fuT-001FIa-0R;
+	Thu, 26 Mar 2026 16:44:05 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 26 Mar 2026 17:44:03 +0900
+Date: Thu, 26 Mar 2026 17:44:03 +0900
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Paul Louvel <paul.louvel@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: Need some clarification about CRYPTO_AHASH_ALG_BLOCK_ONLY
-Message-ID: <acTt7q5nXMBsDcxv@gondor.apana.org.au>
-References: <4f93481a-a0e5-4a9f-8aae-00d3189ccc58@bootlin.com>
- <b53feadd-8246-43cf-a768-740cb73d2553@bootlin.com>
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
+	Laurent M Coquerel <laurent.m.coquerel@intel.com>
+Subject: Re: [PATCH] crypto: deflate - fix decompression window size
+Message-ID: <acTx0-uYRgjaTLU9@gondor.apana.org.au>
+References: <20260324180905.120703-1-giovanni.cabiddu@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,40 +46,44 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b53feadd-8246-43cf-a768-740cb73d2553@bootlin.com>
+In-Reply-To: <20260324180905.120703-1-giovanni.cabiddu@intel.com>
 
-> On 3/20/26 10:42 AM, Paul Louvel wrote:
-> > Hello,
-> > 
-> > I have stumbled across a flag defined in include/crypto/internal/hash.h
-> > : CRYPTO_AHASH_ALG_BLOCK_ONLY.
-> > To get more information about what exact behavior this flag do, I read
-> > the crypto_ahash_update function.
-> > From the looks of it, it seems that the API will call the tfm update if
-> > there is enough bytes (and by enough I mean at least a block size), from
-> > the internal buffer and the incoming ahash_request.
-> > In this case, I find the BLOCK_ONLY naming a bit of a misnomer, since it
-> > only guarantee you than req->nbytes will be at least a block size.
-> > I initially though that the API would only give a request that are a
-> > multiple of the block size.
-> > 
-> > This flag, among others, are relatively recent.
-> > I think adding documentation about these flags would be a great idea.
+On Tue, Mar 24, 2026 at 06:08:58PM +0000, Giovanni Cabiddu wrote:
+> deflate_decompress() initializes the inflate stream with windowBits set
+> to -DEFLATE_DEF_WINBITS (11 bits, 2KB window). Valid raw DEFLATE streams
+> allow window sizes up to MAX_WBITS (15 bits, 32KB).  Using a smaller
+> window than the one used during compression causes decompression to fail
+> for externally generated data. This might occur if data is compressed
+> with a compressor that is not deflate-generic (i.e. this
+> implementation).
+> 
+> Use -MAX_WBITS when calling zlib_inflateInit2() to accept all valid raw
+> DEFLATE streams. The inflate workspace allocated in deflate_alloc_stream()
+> is already sized using zlib_inflate_workspacesize(), which accounts for
+> the maximum window size, so no allocation change is needed.
+> 
+> Fixes: 08cabc7d3c86 ("crypto: deflate - Convert to acomp")
 
-This flag is meant to be temporary in nature.
+That commit doesn't touch this at all.  I think you meant
 
-Historically, crypto API hash drivers processed partial blocks at the
-end directly and the API played no role in it.
+commit 62a465c25e99b9a98259a6b7f5bb759f5296d501
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Wed Aug 30 17:56:25 2023 +0800
 
-This has resulted in complexities in the drivers and associated bugs.
+    crypto: deflate - Remove zlib-deflate
 
-The API is now able to handle partial blocks for the drivers and
-the flag is an indication of the driver's preference for it.
+But this simply restored the status quo prior to
 
-For a reference, see the aspeed driver which has been converted
-to the new way of handling partial block data.
+commit a368f43d6e3a001e684e9191a27df384fbff12f5
+Author: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Date:   Fri Apr 21 21:54:30 2017 +0100
 
-Cheers,
+    crypto: scomp - add support for deflate rfc1950 (zlib)
+
+So the commit message needs to be rewritten to clearly state
+why this is needed for the "deflate" algorithm.
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
