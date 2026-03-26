@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A05AE3A6B7B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF1303A6B97;
 	Thu, 26 Mar 2026 20:12:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774555974; cv=none; b=G9mbTs4bDZNfyrEwjvW5TXMt9e1gpcHlGyfUIiNt/eox4S56Nf31rZly3LcXsfv33NxGjHexqkPz2NAM+oWLT0XdOi05eRIEycs8NoD7DdoEE42wleknuu935qYVjs+MvPuckeSvtZiW7OQLG5NpBiZfvP/prsXhRTa/H4MXIwE=
+	t=1774555975; cv=none; b=haXEWeMT1SwEpVQcI/VeHaOujh705zfVa0yRVQs+/k9aclVbmGryiBsO8LT7+XAvNJ6dS4AyfaUYRM7Qt5Or50w8rblpGxh4UFfCuDFar6bHsMabcw6miwRBrkrJIUCdWf8Q7MivODRBkqolyvmQOhdZnfnUJYSx9ksw4SRxXEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774555974; c=relaxed/simple;
-	bh=KXDFQH+yQTzWkSm24WreW8WQUK4NNhpR/Il4B1yD/eU=;
+	s=arc-20240116; t=1774555975; c=relaxed/simple;
+	bh=HdokhCp0qf4fCEu1SzCv4Q5EVdAYGzwxQidjE5/B+MA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qyF4OmAelY0lEU1Vxwxrw+yvAZ41CitPQZLRW8th17H4Reb2JtcfkOKB/2GZZiipmpdhTutMea8ABP/ymtLBURl88OuG9iQqCpGSa+LOmw8ihBkgyypvOGTFn9tKiACxCyvo66YBN3BZTIA999WVa0ZJfymT5wiEhD8xkkLRCtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vIXP04gr; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=A0qY92Fix6YF497MnsqVAkZURTxEgL+Aa26lBSNvJGeTbzDNaMRLNzeSF01Kr/Y+PwnKTr5tU+Betg0D14EUumGVthiQrd/sqpSoFcJcQfp60rcf4B+ksdZUAvAYPhuzSv6YfeddXWmAeM2Ozjx5rzatOOAuPDWj7wKVAIs768g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p8pOSR48; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vIXP04gr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDA4AC19423;
-	Thu, 26 Mar 2026 20:12:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p8pOSR48"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74E96C2BC87;
+	Thu, 26 Mar 2026 20:12:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1774555974;
-	bh=KXDFQH+yQTzWkSm24WreW8WQUK4NNhpR/Il4B1yD/eU=;
+	bh=HdokhCp0qf4fCEu1SzCv4Q5EVdAYGzwxQidjE5/B+MA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=vIXP04greD9QV95+wvpeBPUWwdLX8HSFd7hPKEc5scvQZb1S+715E+h5cHLHHNESJ
-	 OBRQ2jCTSE/Kg0mZu+uxayW+F1OEHwsx6JMs8gT7bRrpuzjfrXL86UT0BnUMeGaY4y
-	 FttZ50NerIDoHnjHXS2Q19VdIjnUGy5DBDi2rc5ObgZAR++xWqc1cUOJ6gnlWF0VKI
-	 W9pvAp4EB2P0i+muqlO2401k0hZjDh1GGXJgaSCr1oIy8HbjrsOroigwx3qHQh4vwb
-	 8YM2Y8zW0UX4c8Kex4GNXk2d0cmg5BGYMCCDSxdxPvUY7pJRdRI7FuqQzDH2I0+vSP
-	 IrMs9DMbQxwdA==
+	b=p8pOSR48P7xMnyYoJl+WJ0X4iI1qtYZIO1NFlZ4zEokXbeROShcWJ/lXFyDY5JaJG
+	 E7kaLmySgN4cC3vkdwDsh1emhQxMl93Wzp/O9CBd4eav3LIlVGWllhuEZdNj5yFpGS
+	 Bel4cDU46nmvuvjaXWFBo6mYepTvawnYWMD4bpi8HeWwqZveoYtabUBuxqUjiwoaXn
+	 yVpa2qA6d+mU0YOdUuJBv/aQS1O2T+rdQ/rKwycHxA1nd59qUL1IUahy2OwJw/om93
+	 B5W5MTXKJpr0MO6vPiCvCJDkRX9Ff/bIp9Bvv6bzeKlpBGl51GnC/3oMLwPg1v5KAV
+	 KdB7TJN9g8ykA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>
@@ -36,9 +36,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Harald Freudenberger <freude@linux.ibm.com>,
 	Holger Dengler <dengler@linux.ibm.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 2/3] crypto: sparc - Remove des and des3_ede code
-Date: Thu, 26 Mar 2026 13:12:44 -0700
-Message-ID: <20260326201246.57544-3-ebiggers@kernel.org>
+Subject: [PATCH 3/3] crypto: x86 - Remove des and des3_ede code
+Date: Thu, 26 Mar 2026 13:12:45 -0700
+Message-ID: <20260326201246.57544-4-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260326201246.57544-1-ebiggers@kernel.org>
 References: <20260326201246.57544-1-ebiggers@kernel.org>
@@ -48,6 +48,7 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 Since DES and Triple DES are obsolete, there is very little point in
@@ -55,971 +56,1295 @@ maintining architecture-optimized code for them.  Remove it.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- arch/sparc/crypto/Kconfig    |  14 -
- arch/sparc/crypto/Makefile   |   2 -
- arch/sparc/crypto/des_asm.S  | 419 ------------------------------
- arch/sparc/crypto/des_glue.c | 482 -----------------------------------
- 4 files changed, 917 deletions(-)
- delete mode 100644 arch/sparc/crypto/des_asm.S
- delete mode 100644 arch/sparc/crypto/des_glue.c
+ arch/x86/crypto/Kconfig           |  14 -
+ arch/x86/crypto/Makefile          |   3 -
+ arch/x86/crypto/des3_ede-asm_64.S | 831 ------------------------------
+ arch/x86/crypto/des3_ede_glue.c   | 391 --------------
+ 4 files changed, 1239 deletions(-)
+ delete mode 100644 arch/x86/crypto/des3_ede-asm_64.S
+ delete mode 100644 arch/x86/crypto/des3_ede_glue.c
 
-diff --git a/arch/sparc/crypto/Kconfig b/arch/sparc/crypto/Kconfig
-index c1932ce46c7f..8db3f6eea5dc 100644
---- a/arch/sparc/crypto/Kconfig
-+++ b/arch/sparc/crypto/Kconfig
-@@ -1,23 +1,9 @@
- # SPDX-License-Identifier: GPL-2.0
+diff --git a/arch/x86/crypto/Kconfig b/arch/x86/crypto/Kconfig
+index 7fb2319a0916..03c5cdfe8eb0 100644
+--- a/arch/x86/crypto/Kconfig
++++ b/arch/x86/crypto/Kconfig
+@@ -97,24 +97,10 @@ config CRYPTO_CAST6_AVX_X86_64
+ 	  Architecture: x86_64 using:
+ 	  - AVX (Advanced Vector Extensions)
  
- menu "Accelerated Cryptographic Algorithms for CPU (sparc64)"
+ 	  Processes eight blocks in parallel.
  
--config CRYPTO_DES_SPARC64
--	tristate "Ciphers: DES and Triple DES EDE, modes: ECB/CBC"
--	depends on SPARC64
--	select CRYPTO_ALGAPI
--	select CRYPTO_LIB_DES
+-config CRYPTO_DES3_EDE_X86_64
+-	tristate "Ciphers: Triple DES EDE with modes: ECB, CBC"
+-	depends on 64BIT
 -	select CRYPTO_SKCIPHER
+-	select CRYPTO_LIB_DES
+-	imply CRYPTO_CTR
 -	help
--	  Block cipher: DES (FIPS 46-2) cipher algorithm
 -	  Block cipher: Triple DES EDE (FIPS 46-3) cipher algorithm
--	  Length-preserving ciphers: DES with ECB and CBC modes
--	  Length-preserving ciphers: Tripe DES EDE with ECB and CBC modes
+-	  Length-preserving ciphers: Triple DES EDE with ECB and CBC modes
 -
--	  Architecture: sparc64
+-	  Architecture: x86_64
 -
- config CRYPTO_AES_SPARC64
- 	tristate "Ciphers: AES, modes: ECB, CBC, CTR"
- 	depends on SPARC64
- 	select CRYPTO_LIB_AES
+-	  Processes one or three blocks in parallel.
+-
+ config CRYPTO_SERPENT_SSE2_X86_64
+ 	tristate "Ciphers: Serpent with modes: ECB, CBC (SSE2)"
+ 	depends on 64BIT
  	select CRYPTO_SKCIPHER
-diff --git a/arch/sparc/crypto/Makefile b/arch/sparc/crypto/Makefile
-index cdf9f4b3efbb..ab4a7765babf 100644
---- a/arch/sparc/crypto/Makefile
-+++ b/arch/sparc/crypto/Makefile
-@@ -2,11 +2,9 @@
- #
- # Arch-specific CryptoAPI modules.
- #
+ 	select CRYPTO_SERPENT
+diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+index b21ad0978c52..cb07260f7f4f 100644
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -18,13 +18,10 @@ serpent-sse2-x86_64-y := serpent-sse2-x86_64-asm_64.o serpent_sse2_glue.o
+ obj-$(CONFIG_CRYPTO_SERPENT_AVX_X86_64) += serpent-avx-x86_64.o
+ serpent-avx-x86_64-y := serpent-avx-x86_64-asm_64.o serpent_avx_glue.o
+ obj-$(CONFIG_CRYPTO_SERPENT_AVX2_X86_64) += serpent-avx2.o
+ serpent-avx2-y := serpent-avx2-asm_64.o serpent_avx2_glue.o
  
- obj-$(CONFIG_CRYPTO_AES_SPARC64) += aes-sparc64.o
--obj-$(CONFIG_CRYPTO_DES_SPARC64) += des-sparc64.o
- obj-$(CONFIG_CRYPTO_CAMELLIA_SPARC64) += camellia-sparc64.o
- 
- aes-sparc64-y := aes_glue.o
--des-sparc64-y := des_asm.o des_glue.o
- camellia-sparc64-y := camellia_asm.o camellia_glue.o
-diff --git a/arch/sparc/crypto/des_asm.S b/arch/sparc/crypto/des_asm.S
+-obj-$(CONFIG_CRYPTO_DES3_EDE_X86_64) += des3_ede-x86_64.o
+-des3_ede-x86_64-y := des3_ede-asm_64.o des3_ede_glue.o
+-
+ obj-$(CONFIG_CRYPTO_CAMELLIA_X86_64) += camellia-x86_64.o
+ camellia-x86_64-y := camellia-x86_64-asm_64.o camellia_glue.o
+ obj-$(CONFIG_CRYPTO_CAMELLIA_AESNI_AVX_X86_64) += camellia-aesni-avx-x86_64.o
+ camellia-aesni-avx-x86_64-y := camellia-aesni-avx-asm_64.o camellia_aesni_avx_glue.o
+ obj-$(CONFIG_CRYPTO_CAMELLIA_AESNI_AVX2_X86_64) += camellia-aesni-avx2.o
+diff --git a/arch/x86/crypto/des3_ede-asm_64.S b/arch/x86/crypto/des3_ede-asm_64.S
 deleted file mode 100644
-index d534446cbef9..000000000000
---- a/arch/sparc/crypto/des_asm.S
+index cf21b998e77c..000000000000
+--- a/arch/x86/crypto/des3_ede-asm_64.S
 +++ /dev/null
-@@ -1,419 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0 */
--#include <linux/linkage.h>
--#include <asm/opcodes.h>
--#include <asm/visasm.h>
--
--	.align	32
--ENTRY(des_sparc64_key_expand)
--	/* %o0=input_key, %o1=output_key */
--	VISEntryHalf
--	ld	[%o0 + 0x00], %f0
--	ld	[%o0 + 0x04], %f1
--	DES_KEXPAND(0, 0, 0)
--	DES_KEXPAND(0, 1, 2)
--	DES_KEXPAND(2, 3, 6)
--	DES_KEXPAND(2, 2, 4)
--	DES_KEXPAND(6, 3, 10)
--	DES_KEXPAND(6, 2, 8)
--	DES_KEXPAND(10, 3, 14)
--	DES_KEXPAND(10, 2, 12)
--	DES_KEXPAND(14, 1, 16)
--	DES_KEXPAND(16, 3, 20)
--	DES_KEXPAND(16, 2, 18)
--	DES_KEXPAND(20, 3, 24)
--	DES_KEXPAND(20, 2, 22)
--	DES_KEXPAND(24, 3, 28)
--	DES_KEXPAND(24, 2, 26)
--	DES_KEXPAND(28, 1, 30)
--	std	%f0, [%o1 + 0x00]
--	std	%f2, [%o1 + 0x08]
--	std	%f4, [%o1 + 0x10]
--	std	%f6, [%o1 + 0x18]
--	std	%f8, [%o1 + 0x20]
--	std	%f10, [%o1 + 0x28]
--	std	%f12, [%o1 + 0x30]
--	std	%f14, [%o1 + 0x38]
--	std	%f16, [%o1 + 0x40]
--	std	%f18, [%o1 + 0x48]
--	std	%f20, [%o1 + 0x50]
--	std	%f22, [%o1 + 0x58]
--	std	%f24, [%o1 + 0x60]
--	std	%f26, [%o1 + 0x68]
--	std	%f28, [%o1 + 0x70]
--	std	%f30, [%o1 + 0x78]
--	retl
--	 VISExitHalf
--ENDPROC(des_sparc64_key_expand)
--
--	.align	32
--ENTRY(des_sparc64_crypt)
--	/* %o0=key, %o1=input, %o2=output */
--	VISEntry
--	ldd	[%o1 + 0x00], %f32
--	ldd	[%o0 + 0x00], %f0
--	ldd	[%o0 + 0x08], %f2
--	ldd	[%o0 + 0x10], %f4
--	ldd	[%o0 + 0x18], %f6
--	ldd	[%o0 + 0x20], %f8
--	ldd	[%o0 + 0x28], %f10
--	ldd	[%o0 + 0x30], %f12
--	ldd	[%o0 + 0x38], %f14
--	ldd	[%o0 + 0x40], %f16
--	ldd	[%o0 + 0x48], %f18
--	ldd	[%o0 + 0x50], %f20
--	ldd	[%o0 + 0x58], %f22
--	ldd	[%o0 + 0x60], %f24
--	ldd	[%o0 + 0x68], %f26
--	ldd	[%o0 + 0x70], %f28
--	ldd	[%o0 + 0x78], %f30
--	DES_IP(32, 32)
--	DES_ROUND(0, 2, 32, 32)
--	DES_ROUND(4, 6, 32, 32)
--	DES_ROUND(8, 10, 32, 32)
--	DES_ROUND(12, 14, 32, 32)
--	DES_ROUND(16, 18, 32, 32)
--	DES_ROUND(20, 22, 32, 32)
--	DES_ROUND(24, 26, 32, 32)
--	DES_ROUND(28, 30, 32, 32)
--	DES_IIP(32, 32)
--	std	%f32, [%o2 + 0x00]
--	retl
--	 VISExit
--ENDPROC(des_sparc64_crypt)
--
--	.align	32
--ENTRY(des_sparc64_load_keys)
--	/* %o0=key */
--	VISEntry
--	ldd	[%o0 + 0x00], %f0
--	ldd	[%o0 + 0x08], %f2
--	ldd	[%o0 + 0x10], %f4
--	ldd	[%o0 + 0x18], %f6
--	ldd	[%o0 + 0x20], %f8
--	ldd	[%o0 + 0x28], %f10
--	ldd	[%o0 + 0x30], %f12
--	ldd	[%o0 + 0x38], %f14
--	ldd	[%o0 + 0x40], %f16
--	ldd	[%o0 + 0x48], %f18
--	ldd	[%o0 + 0x50], %f20
--	ldd	[%o0 + 0x58], %f22
--	ldd	[%o0 + 0x60], %f24
--	ldd	[%o0 + 0x68], %f26
--	ldd	[%o0 + 0x70], %f28
--	retl
--	 ldd	[%o0 + 0x78], %f30
--ENDPROC(des_sparc64_load_keys)
--
--	.align	32
--ENTRY(des_sparc64_ecb_crypt)
--	/* %o0=input, %o1=output, %o2=len */
--1:	ldd	[%o0 + 0x00], %f32
--	add	%o0, 0x08, %o0
--	DES_IP(32, 32)
--	DES_ROUND(0, 2, 32, 32)
--	DES_ROUND(4, 6, 32, 32)
--	DES_ROUND(8, 10, 32, 32)
--	DES_ROUND(12, 14, 32, 32)
--	DES_ROUND(16, 18, 32, 32)
--	DES_ROUND(20, 22, 32, 32)
--	DES_ROUND(24, 26, 32, 32)
--	DES_ROUND(28, 30, 32, 32)
--	DES_IIP(32, 32)
--	std	%f32, [%o1 + 0x00]
--	subcc	%o2, 0x08, %o2
--	bne,pt	%icc, 1b
--	 add	%o1, 0x08, %o1
--	retl
--	 nop
--ENDPROC(des_sparc64_ecb_crypt)
--
--	.align	32
--ENTRY(des_sparc64_cbc_encrypt)
--	/* %o0=input, %o1=output, %o2=len, %o3=IV */
--	ldd	[%o3 + 0x00], %f32
--1:	ldd	[%o0 + 0x00], %f34
--	fxor	%f32, %f34, %f32
--	DES_IP(32, 32)
--	DES_ROUND(0, 2, 32, 32)
--	DES_ROUND(4, 6, 32, 32)
--	DES_ROUND(8, 10, 32, 32)
--	DES_ROUND(12, 14, 32, 32)
--	DES_ROUND(16, 18, 32, 32)
--	DES_ROUND(20, 22, 32, 32)
--	DES_ROUND(24, 26, 32, 32)
--	DES_ROUND(28, 30, 32, 32)
--	DES_IIP(32, 32)
--	std	%f32, [%o1 + 0x00]
--	add	%o0, 0x08, %o0
--	subcc	%o2, 0x08, %o2
--	bne,pt	%icc, 1b
--	 add	%o1, 0x08, %o1
--	retl
--	 std	%f32, [%o3 + 0x00]
--ENDPROC(des_sparc64_cbc_encrypt)
--
--	.align	32
--ENTRY(des_sparc64_cbc_decrypt)
--	/* %o0=input, %o1=output, %o2=len, %o3=IV */
--	ldd	[%o3 + 0x00], %f34
--1:	ldd	[%o0 + 0x00], %f36
--	DES_IP(36, 32)
--	DES_ROUND(0, 2, 32, 32)
--	DES_ROUND(4, 6, 32, 32)
--	DES_ROUND(8, 10, 32, 32)
--	DES_ROUND(12, 14, 32, 32)
--	DES_ROUND(16, 18, 32, 32)
--	DES_ROUND(20, 22, 32, 32)
--	DES_ROUND(24, 26, 32, 32)
--	DES_ROUND(28, 30, 32, 32)
--	DES_IIP(32, 32)
--	fxor	%f32, %f34, %f32
--	fsrc2	%f36, %f34
--	std	%f32, [%o1 + 0x00]
--	add	%o0, 0x08, %o0
--	subcc	%o2, 0x08, %o2
--	bne,pt	%icc, 1b
--	 add	%o1, 0x08, %o1
--	retl
--	 std	%f36, [%o3 + 0x00]
--ENDPROC(des_sparc64_cbc_decrypt)
--
--	.align	32
--ENTRY(des3_ede_sparc64_crypt)
--	/* %o0=key, %o1=input, %o2=output */
--	VISEntry
--	ldd	[%o1 + 0x00], %f32
--	ldd	[%o0 + 0x00], %f0
--	ldd	[%o0 + 0x08], %f2
--	ldd	[%o0 + 0x10], %f4
--	ldd	[%o0 + 0x18], %f6
--	ldd	[%o0 + 0x20], %f8
--	ldd	[%o0 + 0x28], %f10
--	ldd	[%o0 + 0x30], %f12
--	ldd	[%o0 + 0x38], %f14
--	ldd	[%o0 + 0x40], %f16
--	ldd	[%o0 + 0x48], %f18
--	ldd	[%o0 + 0x50], %f20
--	ldd	[%o0 + 0x58], %f22
--	ldd	[%o0 + 0x60], %f24
--	ldd	[%o0 + 0x68], %f26
--	ldd	[%o0 + 0x70], %f28
--	ldd	[%o0 + 0x78], %f30
--	DES_IP(32, 32)
--	DES_ROUND(0, 2, 32, 32)
--	ldd	[%o0 + 0x80], %f0
--	ldd	[%o0 + 0x88], %f2
--	DES_ROUND(4, 6, 32, 32)
--	ldd	[%o0 + 0x90], %f4
--	ldd	[%o0 + 0x98], %f6
--	DES_ROUND(8, 10, 32, 32)
--	ldd	[%o0 + 0xa0], %f8
--	ldd	[%o0 + 0xa8], %f10
--	DES_ROUND(12, 14, 32, 32)
--	ldd	[%o0 + 0xb0], %f12
--	ldd	[%o0 + 0xb8], %f14
--	DES_ROUND(16, 18, 32, 32)
--	ldd	[%o0 + 0xc0], %f16
--	ldd	[%o0 + 0xc8], %f18
--	DES_ROUND(20, 22, 32, 32)
--	ldd	[%o0 + 0xd0], %f20
--	ldd	[%o0 + 0xd8], %f22
--	DES_ROUND(24, 26, 32, 32)
--	ldd	[%o0 + 0xe0], %f24
--	ldd	[%o0 + 0xe8], %f26
--	DES_ROUND(28, 30, 32, 32)
--	ldd	[%o0 + 0xf0], %f28
--	ldd	[%o0 + 0xf8], %f30
--	DES_IIP(32, 32)
--	DES_IP(32, 32)
--	DES_ROUND(0, 2, 32, 32)
--	ldd	[%o0 + 0x100], %f0
--	ldd	[%o0 + 0x108], %f2
--	DES_ROUND(4, 6, 32, 32)
--	ldd	[%o0 + 0x110], %f4
--	ldd	[%o0 + 0x118], %f6
--	DES_ROUND(8, 10, 32, 32)
--	ldd	[%o0 + 0x120], %f8
--	ldd	[%o0 + 0x128], %f10
--	DES_ROUND(12, 14, 32, 32)
--	ldd	[%o0 + 0x130], %f12
--	ldd	[%o0 + 0x138], %f14
--	DES_ROUND(16, 18, 32, 32)
--	ldd	[%o0 + 0x140], %f16
--	ldd	[%o0 + 0x148], %f18
--	DES_ROUND(20, 22, 32, 32)
--	ldd	[%o0 + 0x150], %f20
--	ldd	[%o0 + 0x158], %f22
--	DES_ROUND(24, 26, 32, 32)
--	ldd	[%o0 + 0x160], %f24
--	ldd	[%o0 + 0x168], %f26
--	DES_ROUND(28, 30, 32, 32)
--	ldd	[%o0 + 0x170], %f28
--	ldd	[%o0 + 0x178], %f30
--	DES_IIP(32, 32)
--	DES_IP(32, 32)
--	DES_ROUND(0, 2, 32, 32)
--	DES_ROUND(4, 6, 32, 32)
--	DES_ROUND(8, 10, 32, 32)
--	DES_ROUND(12, 14, 32, 32)
--	DES_ROUND(16, 18, 32, 32)
--	DES_ROUND(20, 22, 32, 32)
--	DES_ROUND(24, 26, 32, 32)
--	DES_ROUND(28, 30, 32, 32)
--	DES_IIP(32, 32)
--
--	std	%f32, [%o2 + 0x00]
--	retl
--	 VISExit
--ENDPROC(des3_ede_sparc64_crypt)
--
--	.align	32
--ENTRY(des3_ede_sparc64_load_keys)
--	/* %o0=key */
--	VISEntry
--	ldd	[%o0 + 0x00], %f0
--	ldd	[%o0 + 0x08], %f2
--	ldd	[%o0 + 0x10], %f4
--	ldd	[%o0 + 0x18], %f6
--	ldd	[%o0 + 0x20], %f8
--	ldd	[%o0 + 0x28], %f10
--	ldd	[%o0 + 0x30], %f12
--	ldd	[%o0 + 0x38], %f14
--	ldd	[%o0 + 0x40], %f16
--	ldd	[%o0 + 0x48], %f18
--	ldd	[%o0 + 0x50], %f20
--	ldd	[%o0 + 0x58], %f22
--	ldd	[%o0 + 0x60], %f24
--	ldd	[%o0 + 0x68], %f26
--	ldd	[%o0 + 0x70], %f28
--	ldd	[%o0 + 0x78], %f30
--	ldd	[%o0 + 0x80], %f32
--	ldd	[%o0 + 0x88], %f34
--	ldd	[%o0 + 0x90], %f36
--	ldd	[%o0 + 0x98], %f38
--	ldd	[%o0 + 0xa0], %f40
--	ldd	[%o0 + 0xa8], %f42
--	ldd	[%o0 + 0xb0], %f44
--	ldd	[%o0 + 0xb8], %f46
--	ldd	[%o0 + 0xc0], %f48
--	ldd	[%o0 + 0xc8], %f50
--	ldd	[%o0 + 0xd0], %f52
--	ldd	[%o0 + 0xd8], %f54
--	ldd	[%o0 + 0xe0], %f56
--	retl
--	 ldd	[%o0 + 0xe8], %f58
--ENDPROC(des3_ede_sparc64_load_keys)
--
--#define DES3_LOOP_BODY(X) \
--	DES_IP(X, X) \
--	DES_ROUND(0, 2, X, X) \
--	DES_ROUND(4, 6, X, X) \
--	DES_ROUND(8, 10, X, X) \
--	DES_ROUND(12, 14, X, X) \
--	DES_ROUND(16, 18, X, X) \
--	ldd	[%o0 + 0xf0], %f16; \
--	ldd	[%o0 + 0xf8], %f18; \
--	DES_ROUND(20, 22, X, X) \
--	ldd	[%o0 + 0x100], %f20; \
--	ldd	[%o0 + 0x108], %f22; \
--	DES_ROUND(24, 26, X, X) \
--	ldd	[%o0 + 0x110], %f24; \
--	ldd	[%o0 + 0x118], %f26; \
--	DES_ROUND(28, 30, X, X) \
--	ldd	[%o0 + 0x120], %f28; \
--	ldd	[%o0 + 0x128], %f30; \
--	DES_IIP(X, X) \
--	DES_IP(X, X) \
--	DES_ROUND(32, 34, X, X) \
--	ldd	[%o0 + 0x130], %f0; \
--	ldd	[%o0 + 0x138], %f2; \
--	DES_ROUND(36, 38, X, X) \
--	ldd	[%o0 + 0x140], %f4; \
--	ldd	[%o0 + 0x148], %f6; \
--	DES_ROUND(40, 42, X, X) \
--	ldd	[%o0 + 0x150], %f8; \
--	ldd	[%o0 + 0x158], %f10; \
--	DES_ROUND(44, 46, X, X) \
--	ldd	[%o0 + 0x160], %f12; \
--	ldd	[%o0 + 0x168], %f14; \
--	DES_ROUND(48, 50, X, X) \
--	DES_ROUND(52, 54, X, X) \
--	DES_ROUND(56, 58, X, X) \
--	DES_ROUND(16, 18, X, X) \
--	ldd	[%o0 + 0x170], %f16; \
--	ldd	[%o0 + 0x178], %f18; \
--	DES_IIP(X, X) \
--	DES_IP(X, X) \
--	DES_ROUND(20, 22, X, X) \
--	ldd	[%o0 + 0x50], %f20; \
--	ldd	[%o0 + 0x58], %f22; \
--	DES_ROUND(24, 26, X, X) \
--	ldd	[%o0 + 0x60], %f24; \
--	ldd	[%o0 + 0x68], %f26; \
--	DES_ROUND(28, 30, X, X) \
--	ldd	[%o0 + 0x70], %f28; \
--	ldd	[%o0 + 0x78], %f30; \
--	DES_ROUND(0, 2, X, X) \
--	ldd	[%o0 + 0x00], %f0; \
--	ldd	[%o0 + 0x08], %f2; \
--	DES_ROUND(4, 6, X, X) \
--	ldd	[%o0 + 0x10], %f4; \
--	ldd	[%o0 + 0x18], %f6; \
--	DES_ROUND(8, 10, X, X) \
--	ldd	[%o0 + 0x20], %f8; \
--	ldd	[%o0 + 0x28], %f10; \
--	DES_ROUND(12, 14, X, X) \
--	ldd	[%o0 + 0x30], %f12; \
--	ldd	[%o0 + 0x38], %f14; \
--	DES_ROUND(16, 18, X, X) \
--	ldd	[%o0 + 0x40], %f16; \
--	ldd	[%o0 + 0x48], %f18; \
--	DES_IIP(X, X)
--
--	.align	32
--ENTRY(des3_ede_sparc64_ecb_crypt)
--	/* %o0=key, %o1=input, %o2=output, %o3=len */
--1:	ldd	[%o1 + 0x00], %f60
--	DES3_LOOP_BODY(60)
--	std	%f60, [%o2 + 0x00]
--	add	%o1, 0x08, %o1
--	subcc	%o3, 0x08, %o3
--	bne,pt	%icc, 1b
--	 add	%o2, 0x08, %o2
--	retl
--	 nop
--ENDPROC(des3_ede_sparc64_ecb_crypt)
--
--	.align	32
--ENTRY(des3_ede_sparc64_cbc_encrypt)
--	/* %o0=key, %o1=input, %o2=output, %o3=len, %o4=IV */
--	ldd	[%o4 + 0x00], %f60
--1:	ldd	[%o1 + 0x00], %f62
--	fxor	%f60, %f62, %f60
--	DES3_LOOP_BODY(60)
--	std	%f60, [%o2 + 0x00]
--	add	%o1, 0x08, %o1
--	subcc	%o3, 0x08, %o3
--	bne,pt	%icc, 1b
--	 add	%o2, 0x08, %o2
--	retl
--	 std	%f60, [%o4 + 0x00]
--ENDPROC(des3_ede_sparc64_cbc_encrypt)
--
--	.align	32
--ENTRY(des3_ede_sparc64_cbc_decrypt)
--	/* %o0=key, %o1=input, %o2=output, %o3=len, %o4=IV */
--	ldd	[%o4 + 0x00], %f62
--1:	ldx	[%o1 + 0x00], %g1
--	MOVXTOD_G1_F60
--	DES3_LOOP_BODY(60)
--	fxor	%f62, %f60, %f60
--	MOVXTOD_G1_F62
--	std	%f60, [%o2 + 0x00]
--	add	%o1, 0x08, %o1
--	subcc	%o3, 0x08, %o3
--	bne,pt	%icc, 1b
--	 add	%o2, 0x08, %o2
--	retl
--	 stx	%g1, [%o4 + 0x00]
--ENDPROC(des3_ede_sparc64_cbc_decrypt)
-diff --git a/arch/sparc/crypto/des_glue.c b/arch/sparc/crypto/des_glue.c
-deleted file mode 100644
-index e50ec4cd57cd..000000000000
---- a/arch/sparc/crypto/des_glue.c
-+++ /dev/null
-@@ -1,482 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-only
--/* Glue code for DES encryption optimized for sparc64 crypto opcodes.
+@@ -1,831 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
+-/*
+- * des3_ede-asm_64.S  -  x86-64 assembly implementation of 3DES cipher
 - *
-- * Copyright (C) 2012 David S. Miller <davem@davemloft.net>
+- * Copyright © 2014 Jussi Kivilinna <jussi.kivilinna@iki.fi>
 - */
 -
--#define pr_fmt(fmt)	KBUILD_MODNAME ": " fmt
+-#include <linux/linkage.h>
 -
+-.file "des3_ede-asm_64.S"
+-.text
+-
+-#define s1 .L_s1
+-#define s2 ((s1) + (64*8))
+-#define s3 ((s2) + (64*8))
+-#define s4 ((s3) + (64*8))
+-#define s5 ((s4) + (64*8))
+-#define s6 ((s5) + (64*8))
+-#define s7 ((s6) + (64*8))
+-#define s8 ((s7) + (64*8))
+-
+-/* register macros */
+-#define CTX %rdi
+-
+-#define RL0 %r8
+-#define RL1 %r9
+-#define RL2 %r10
+-
+-#define RL0d %r8d
+-#define RL1d %r9d
+-#define RL2d %r10d
+-
+-#define RR0 %r11
+-#define RR1 %r12
+-#define RR2 %r13
+-
+-#define RR0d %r11d
+-#define RR1d %r12d
+-#define RR2d %r13d
+-
+-#define RW0 %rax
+-#define RW1 %rbx
+-#define RW2 %rcx
+-
+-#define RW0d %eax
+-#define RW1d %ebx
+-#define RW2d %ecx
+-
+-#define RW0bl %al
+-#define RW1bl %bl
+-#define RW2bl %cl
+-
+-#define RW0bh %ah
+-#define RW1bh %bh
+-#define RW2bh %ch
+-
+-#define RT0 %r15
+-#define RT1 %rsi
+-#define RT2 %r14
+-#define RT3 %rdx
+-
+-#define RT0d %r15d
+-#define RT1d %esi
+-#define RT2d %r14d
+-#define RT3d %edx
+-
+-/***********************************************************************
+- * 1-way 3DES
+- ***********************************************************************/
+-#define do_permutation(a, b, offset, mask) \
+-	movl a, RT0d; \
+-	shrl $(offset), RT0d; \
+-	xorl b, RT0d; \
+-	andl $(mask), RT0d; \
+-	xorl RT0d, b; \
+-	shll $(offset), RT0d; \
+-	xorl RT0d, a;
+-
+-#define expand_to_64bits(val, mask) \
+-	movl val##d, RT0d; \
+-	rorl $4, RT0d; \
+-	shlq $32, RT0; \
+-	orq RT0, val; \
+-	andq mask, val;
+-
+-#define compress_to_64bits(val) \
+-	movq val, RT0; \
+-	shrq $32, RT0; \
+-	roll $4, RT0d; \
+-	orl RT0d, val##d;
+-
+-#define initial_permutation(left, right) \
+-	do_permutation(left##d, right##d,  4, 0x0f0f0f0f); \
+-	do_permutation(left##d, right##d, 16, 0x0000ffff); \
+-	do_permutation(right##d, left##d,  2, 0x33333333); \
+-	do_permutation(right##d, left##d,  8, 0x00ff00ff); \
+-	movabs $0x3f3f3f3f3f3f3f3f, RT3; \
+-	movl left##d, RW0d; \
+-	roll $1, right##d; \
+-	xorl right##d, RW0d; \
+-	andl $0xaaaaaaaa, RW0d; \
+-	xorl RW0d, left##d; \
+-	xorl RW0d, right##d; \
+-	roll $1, left##d; \
+-	expand_to_64bits(right, RT3); \
+-	expand_to_64bits(left, RT3);
+-
+-#define final_permutation(left, right) \
+-	compress_to_64bits(right); \
+-	compress_to_64bits(left); \
+-	movl right##d, RW0d; \
+-	rorl $1, left##d; \
+-	xorl left##d, RW0d; \
+-	andl $0xaaaaaaaa, RW0d; \
+-	xorl RW0d, right##d; \
+-	xorl RW0d, left##d; \
+-	rorl $1, right##d; \
+-	do_permutation(right##d, left##d,  8, 0x00ff00ff); \
+-	do_permutation(right##d, left##d,  2, 0x33333333); \
+-	do_permutation(left##d, right##d, 16, 0x0000ffff); \
+-	do_permutation(left##d, right##d,  4, 0x0f0f0f0f);
+-
+-#define round1(n, from, to, load_next_key) \
+-	xorq from, RW0; \
+-	\
+-	movzbl RW0bl, RT0d; \
+-	movzbl RW0bh, RT1d; \
+-	shrq $16, RW0; \
+-	movzbl RW0bl, RT2d; \
+-	movzbl RW0bh, RT3d; \
+-	shrq $16, RW0; \
+-	leaq s8(%rip), RW1; \
+-	movq (RW1, RT0, 8), RT0; \
+-	leaq s6(%rip), RW1; \
+-	xorq (RW1, RT1, 8), to; \
+-	movzbl RW0bl, RL1d; \
+-	movzbl RW0bh, RT1d; \
+-	shrl $16, RW0d; \
+-	leaq s4(%rip), RW1; \
+-	xorq (RW1, RT2, 8), RT0; \
+-	leaq s2(%rip), RW1; \
+-	xorq (RW1, RT3, 8), to; \
+-	movzbl RW0bl, RT2d; \
+-	movzbl RW0bh, RT3d; \
+-	leaq s7(%rip), RW1; \
+-	xorq (RW1, RL1, 8), RT0; \
+-	leaq s5(%rip), RW1; \
+-	xorq (RW1, RT1, 8), to; \
+-	leaq s3(%rip), RW1; \
+-	xorq (RW1, RT2, 8), RT0; \
+-	load_next_key(n, RW0); \
+-	xorq RT0, to; \
+-	leaq s1(%rip), RW1; \
+-	xorq (RW1, RT3, 8), to; \
+-
+-#define load_next_key(n, RWx) \
+-	movq (((n) + 1) * 8)(CTX), RWx;
+-
+-#define dummy2(a, b) /*_*/
+-
+-#define read_block(io, left, right) \
+-	movl    (io), left##d; \
+-	movl   4(io), right##d; \
+-	bswapl left##d; \
+-	bswapl right##d;
+-
+-#define write_block(io, left, right) \
+-	bswapl left##d; \
+-	bswapl right##d; \
+-	movl   left##d,   (io); \
+-	movl   right##d, 4(io);
+-
+-SYM_FUNC_START(des3_ede_x86_64_crypt_blk)
+-	/* input:
+-	 *	%rdi: round keys, CTX
+-	 *	%rsi: dst
+-	 *	%rdx: src
+-	 */
+-	pushq %rbx;
+-	pushq %r12;
+-	pushq %r13;
+-	pushq %r14;
+-	pushq %r15;
+-
+-	pushq %rsi; /* dst */
+-
+-	read_block(%rdx, RL0, RR0);
+-	initial_permutation(RL0, RR0);
+-
+-	movq (CTX), RW0;
+-
+-	round1(0, RR0, RL0, load_next_key);
+-	round1(1, RL0, RR0, load_next_key);
+-	round1(2, RR0, RL0, load_next_key);
+-	round1(3, RL0, RR0, load_next_key);
+-	round1(4, RR0, RL0, load_next_key);
+-	round1(5, RL0, RR0, load_next_key);
+-	round1(6, RR0, RL0, load_next_key);
+-	round1(7, RL0, RR0, load_next_key);
+-	round1(8, RR0, RL0, load_next_key);
+-	round1(9, RL0, RR0, load_next_key);
+-	round1(10, RR0, RL0, load_next_key);
+-	round1(11, RL0, RR0, load_next_key);
+-	round1(12, RR0, RL0, load_next_key);
+-	round1(13, RL0, RR0, load_next_key);
+-	round1(14, RR0, RL0, load_next_key);
+-	round1(15, RL0, RR0, load_next_key);
+-
+-	round1(16+0, RL0, RR0, load_next_key);
+-	round1(16+1, RR0, RL0, load_next_key);
+-	round1(16+2, RL0, RR0, load_next_key);
+-	round1(16+3, RR0, RL0, load_next_key);
+-	round1(16+4, RL0, RR0, load_next_key);
+-	round1(16+5, RR0, RL0, load_next_key);
+-	round1(16+6, RL0, RR0, load_next_key);
+-	round1(16+7, RR0, RL0, load_next_key);
+-	round1(16+8, RL0, RR0, load_next_key);
+-	round1(16+9, RR0, RL0, load_next_key);
+-	round1(16+10, RL0, RR0, load_next_key);
+-	round1(16+11, RR0, RL0, load_next_key);
+-	round1(16+12, RL0, RR0, load_next_key);
+-	round1(16+13, RR0, RL0, load_next_key);
+-	round1(16+14, RL0, RR0, load_next_key);
+-	round1(16+15, RR0, RL0, load_next_key);
+-
+-	round1(32+0, RR0, RL0, load_next_key);
+-	round1(32+1, RL0, RR0, load_next_key);
+-	round1(32+2, RR0, RL0, load_next_key);
+-	round1(32+3, RL0, RR0, load_next_key);
+-	round1(32+4, RR0, RL0, load_next_key);
+-	round1(32+5, RL0, RR0, load_next_key);
+-	round1(32+6, RR0, RL0, load_next_key);
+-	round1(32+7, RL0, RR0, load_next_key);
+-	round1(32+8, RR0, RL0, load_next_key);
+-	round1(32+9, RL0, RR0, load_next_key);
+-	round1(32+10, RR0, RL0, load_next_key);
+-	round1(32+11, RL0, RR0, load_next_key);
+-	round1(32+12, RR0, RL0, load_next_key);
+-	round1(32+13, RL0, RR0, load_next_key);
+-	round1(32+14, RR0, RL0, load_next_key);
+-	round1(32+15, RL0, RR0, dummy2);
+-
+-	final_permutation(RR0, RL0);
+-
+-	popq %rsi /* dst */
+-	write_block(%rsi, RR0, RL0);
+-
+-	popq %r15;
+-	popq %r14;
+-	popq %r13;
+-	popq %r12;
+-	popq %rbx;
+-
+-	RET;
+-SYM_FUNC_END(des3_ede_x86_64_crypt_blk)
+-
+-/***********************************************************************
+- * 3-way 3DES
+- ***********************************************************************/
+-#define expand_to_64bits(val, mask) \
+-	movl val##d, RT0d; \
+-	rorl $4, RT0d; \
+-	shlq $32, RT0; \
+-	orq RT0, val; \
+-	andq mask, val;
+-
+-#define compress_to_64bits(val) \
+-	movq val, RT0; \
+-	shrq $32, RT0; \
+-	roll $4, RT0d; \
+-	orl RT0d, val##d;
+-
+-#define initial_permutation3(left, right) \
+-	do_permutation(left##0d, right##0d,  4, 0x0f0f0f0f); \
+-	do_permutation(left##0d, right##0d, 16, 0x0000ffff); \
+-	  do_permutation(left##1d, right##1d,  4, 0x0f0f0f0f); \
+-	  do_permutation(left##1d, right##1d, 16, 0x0000ffff); \
+-	    do_permutation(left##2d, right##2d,  4, 0x0f0f0f0f); \
+-	    do_permutation(left##2d, right##2d, 16, 0x0000ffff); \
+-	    \
+-	do_permutation(right##0d, left##0d,  2, 0x33333333); \
+-	do_permutation(right##0d, left##0d,  8, 0x00ff00ff); \
+-	  do_permutation(right##1d, left##1d,  2, 0x33333333); \
+-	  do_permutation(right##1d, left##1d,  8, 0x00ff00ff); \
+-	    do_permutation(right##2d, left##2d,  2, 0x33333333); \
+-	    do_permutation(right##2d, left##2d,  8, 0x00ff00ff); \
+-	    \
+-	movabs $0x3f3f3f3f3f3f3f3f, RT3; \
+-	    \
+-	movl left##0d, RW0d; \
+-	roll $1, right##0d; \
+-	xorl right##0d, RW0d; \
+-	andl $0xaaaaaaaa, RW0d; \
+-	xorl RW0d, left##0d; \
+-	xorl RW0d, right##0d; \
+-	roll $1, left##0d; \
+-	expand_to_64bits(right##0, RT3); \
+-	expand_to_64bits(left##0, RT3); \
+-	  movl left##1d, RW1d; \
+-	  roll $1, right##1d; \
+-	  xorl right##1d, RW1d; \
+-	  andl $0xaaaaaaaa, RW1d; \
+-	  xorl RW1d, left##1d; \
+-	  xorl RW1d, right##1d; \
+-	  roll $1, left##1d; \
+-	  expand_to_64bits(right##1, RT3); \
+-	  expand_to_64bits(left##1, RT3); \
+-	    movl left##2d, RW2d; \
+-	    roll $1, right##2d; \
+-	    xorl right##2d, RW2d; \
+-	    andl $0xaaaaaaaa, RW2d; \
+-	    xorl RW2d, left##2d; \
+-	    xorl RW2d, right##2d; \
+-	    roll $1, left##2d; \
+-	    expand_to_64bits(right##2, RT3); \
+-	    expand_to_64bits(left##2, RT3);
+-
+-#define final_permutation3(left, right) \
+-	compress_to_64bits(right##0); \
+-	compress_to_64bits(left##0); \
+-	movl right##0d, RW0d; \
+-	rorl $1, left##0d; \
+-	xorl left##0d, RW0d; \
+-	andl $0xaaaaaaaa, RW0d; \
+-	xorl RW0d, right##0d; \
+-	xorl RW0d, left##0d; \
+-	rorl $1, right##0d; \
+-	  compress_to_64bits(right##1); \
+-	  compress_to_64bits(left##1); \
+-	  movl right##1d, RW1d; \
+-	  rorl $1, left##1d; \
+-	  xorl left##1d, RW1d; \
+-	  andl $0xaaaaaaaa, RW1d; \
+-	  xorl RW1d, right##1d; \
+-	  xorl RW1d, left##1d; \
+-	  rorl $1, right##1d; \
+-	    compress_to_64bits(right##2); \
+-	    compress_to_64bits(left##2); \
+-	    movl right##2d, RW2d; \
+-	    rorl $1, left##2d; \
+-	    xorl left##2d, RW2d; \
+-	    andl $0xaaaaaaaa, RW2d; \
+-	    xorl RW2d, right##2d; \
+-	    xorl RW2d, left##2d; \
+-	    rorl $1, right##2d; \
+-	    \
+-	do_permutation(right##0d, left##0d,  8, 0x00ff00ff); \
+-	do_permutation(right##0d, left##0d,  2, 0x33333333); \
+-	  do_permutation(right##1d, left##1d,  8, 0x00ff00ff); \
+-	  do_permutation(right##1d, left##1d,  2, 0x33333333); \
+-	    do_permutation(right##2d, left##2d,  8, 0x00ff00ff); \
+-	    do_permutation(right##2d, left##2d,  2, 0x33333333); \
+-	    \
+-	do_permutation(left##0d, right##0d, 16, 0x0000ffff); \
+-	do_permutation(left##0d, right##0d,  4, 0x0f0f0f0f); \
+-	  do_permutation(left##1d, right##1d, 16, 0x0000ffff); \
+-	  do_permutation(left##1d, right##1d,  4, 0x0f0f0f0f); \
+-	    do_permutation(left##2d, right##2d, 16, 0x0000ffff); \
+-	    do_permutation(left##2d, right##2d,  4, 0x0f0f0f0f);
+-
+-#define round3(n, from, to, load_next_key, do_movq) \
+-	xorq from##0, RW0; \
+-	movzbl RW0bl, RT3d; \
+-	movzbl RW0bh, RT1d; \
+-	shrq $16, RW0; \
+-	leaq s8(%rip), RT2; \
+-	xorq (RT2, RT3, 8), to##0; \
+-	leaq s6(%rip), RT2; \
+-	xorq (RT2, RT1, 8), to##0; \
+-	movzbl RW0bl, RT3d; \
+-	movzbl RW0bh, RT1d; \
+-	shrq $16, RW0; \
+-	leaq s4(%rip), RT2; \
+-	xorq (RT2, RT3, 8), to##0; \
+-	leaq s2(%rip), RT2; \
+-	xorq (RT2, RT1, 8), to##0; \
+-	movzbl RW0bl, RT3d; \
+-	movzbl RW0bh, RT1d; \
+-	shrl $16, RW0d; \
+-	leaq s7(%rip), RT2; \
+-	xorq (RT2, RT3, 8), to##0; \
+-	leaq s5(%rip), RT2; \
+-	xorq (RT2, RT1, 8), to##0; \
+-	movzbl RW0bl, RT3d; \
+-	movzbl RW0bh, RT1d; \
+-	load_next_key(n, RW0); \
+-	leaq s3(%rip), RT2; \
+-	xorq (RT2, RT3, 8), to##0; \
+-	leaq s1(%rip), RT2; \
+-	xorq (RT2, RT1, 8), to##0; \
+-		xorq from##1, RW1; \
+-		movzbl RW1bl, RT3d; \
+-		movzbl RW1bh, RT1d; \
+-		shrq $16, RW1; \
+-		leaq s8(%rip), RT2; \
+-		xorq (RT2, RT3, 8), to##1; \
+-		leaq s6(%rip), RT2; \
+-		xorq (RT2, RT1, 8), to##1; \
+-		movzbl RW1bl, RT3d; \
+-		movzbl RW1bh, RT1d; \
+-		shrq $16, RW1; \
+-		leaq s4(%rip), RT2; \
+-		xorq (RT2, RT3, 8), to##1; \
+-		leaq s2(%rip), RT2; \
+-		xorq (RT2, RT1, 8), to##1; \
+-		movzbl RW1bl, RT3d; \
+-		movzbl RW1bh, RT1d; \
+-		shrl $16, RW1d; \
+-		leaq s7(%rip), RT2; \
+-		xorq (RT2, RT3, 8), to##1; \
+-		leaq s5(%rip), RT2; \
+-		xorq (RT2, RT1, 8), to##1; \
+-		movzbl RW1bl, RT3d; \
+-		movzbl RW1bh, RT1d; \
+-		do_movq(RW0, RW1); \
+-		leaq s3(%rip), RT2; \
+-		xorq (RT2, RT3, 8), to##1; \
+-		leaq s1(%rip), RT2; \
+-		xorq (RT2, RT1, 8), to##1; \
+-			xorq from##2, RW2; \
+-			movzbl RW2bl, RT3d; \
+-			movzbl RW2bh, RT1d; \
+-			shrq $16, RW2; \
+-			leaq s8(%rip), RT2; \
+-			xorq (RT2, RT3, 8), to##2; \
+-			leaq s6(%rip), RT2; \
+-			xorq (RT2, RT1, 8), to##2; \
+-			movzbl RW2bl, RT3d; \
+-			movzbl RW2bh, RT1d; \
+-			shrq $16, RW2; \
+-			leaq s4(%rip), RT2; \
+-			xorq (RT2, RT3, 8), to##2; \
+-			leaq s2(%rip), RT2; \
+-			xorq (RT2, RT1, 8), to##2; \
+-			movzbl RW2bl, RT3d; \
+-			movzbl RW2bh, RT1d; \
+-			shrl $16, RW2d; \
+-			leaq s7(%rip), RT2; \
+-			xorq (RT2, RT3, 8), to##2; \
+-			leaq s5(%rip), RT2; \
+-			xorq (RT2, RT1, 8), to##2; \
+-			movzbl RW2bl, RT3d; \
+-			movzbl RW2bh, RT1d; \
+-			do_movq(RW0, RW2); \
+-			leaq s3(%rip), RT2; \
+-			xorq (RT2, RT3, 8), to##2; \
+-			leaq s1(%rip), RT2; \
+-			xorq (RT2, RT1, 8), to##2;
+-
+-#define __movq(src, dst) \
+-	movq src, dst;
+-
+-SYM_FUNC_START(des3_ede_x86_64_crypt_blk_3way)
+-	/* input:
+-	 *	%rdi: ctx, round keys
+-	 *	%rsi: dst (3 blocks)
+-	 *	%rdx: src (3 blocks)
+-	 */
+-
+-	pushq %rbx;
+-	pushq %r12;
+-	pushq %r13;
+-	pushq %r14;
+-	pushq %r15;
+-
+-	pushq %rsi /* dst */
+-
+-	/* load input */
+-	movl 0 * 4(%rdx), RL0d;
+-	movl 1 * 4(%rdx), RR0d;
+-	movl 2 * 4(%rdx), RL1d;
+-	movl 3 * 4(%rdx), RR1d;
+-	movl 4 * 4(%rdx), RL2d;
+-	movl 5 * 4(%rdx), RR2d;
+-
+-	bswapl RL0d;
+-	bswapl RR0d;
+-	bswapl RL1d;
+-	bswapl RR1d;
+-	bswapl RL2d;
+-	bswapl RR2d;
+-
+-	initial_permutation3(RL, RR);
+-
+-	movq 0(CTX), RW0;
+-	movq RW0, RW1;
+-	movq RW0, RW2;
+-
+-	round3(0, RR, RL, load_next_key, __movq);
+-	round3(1, RL, RR, load_next_key, __movq);
+-	round3(2, RR, RL, load_next_key, __movq);
+-	round3(3, RL, RR, load_next_key, __movq);
+-	round3(4, RR, RL, load_next_key, __movq);
+-	round3(5, RL, RR, load_next_key, __movq);
+-	round3(6, RR, RL, load_next_key, __movq);
+-	round3(7, RL, RR, load_next_key, __movq);
+-	round3(8, RR, RL, load_next_key, __movq);
+-	round3(9, RL, RR, load_next_key, __movq);
+-	round3(10, RR, RL, load_next_key, __movq);
+-	round3(11, RL, RR, load_next_key, __movq);
+-	round3(12, RR, RL, load_next_key, __movq);
+-	round3(13, RL, RR, load_next_key, __movq);
+-	round3(14, RR, RL, load_next_key, __movq);
+-	round3(15, RL, RR, load_next_key, __movq);
+-
+-	round3(16+0, RL, RR, load_next_key, __movq);
+-	round3(16+1, RR, RL, load_next_key, __movq);
+-	round3(16+2, RL, RR, load_next_key, __movq);
+-	round3(16+3, RR, RL, load_next_key, __movq);
+-	round3(16+4, RL, RR, load_next_key, __movq);
+-	round3(16+5, RR, RL, load_next_key, __movq);
+-	round3(16+6, RL, RR, load_next_key, __movq);
+-	round3(16+7, RR, RL, load_next_key, __movq);
+-	round3(16+8, RL, RR, load_next_key, __movq);
+-	round3(16+9, RR, RL, load_next_key, __movq);
+-	round3(16+10, RL, RR, load_next_key, __movq);
+-	round3(16+11, RR, RL, load_next_key, __movq);
+-	round3(16+12, RL, RR, load_next_key, __movq);
+-	round3(16+13, RR, RL, load_next_key, __movq);
+-	round3(16+14, RL, RR, load_next_key, __movq);
+-	round3(16+15, RR, RL, load_next_key, __movq);
+-
+-	round3(32+0, RR, RL, load_next_key, __movq);
+-	round3(32+1, RL, RR, load_next_key, __movq);
+-	round3(32+2, RR, RL, load_next_key, __movq);
+-	round3(32+3, RL, RR, load_next_key, __movq);
+-	round3(32+4, RR, RL, load_next_key, __movq);
+-	round3(32+5, RL, RR, load_next_key, __movq);
+-	round3(32+6, RR, RL, load_next_key, __movq);
+-	round3(32+7, RL, RR, load_next_key, __movq);
+-	round3(32+8, RR, RL, load_next_key, __movq);
+-	round3(32+9, RL, RR, load_next_key, __movq);
+-	round3(32+10, RR, RL, load_next_key, __movq);
+-	round3(32+11, RL, RR, load_next_key, __movq);
+-	round3(32+12, RR, RL, load_next_key, __movq);
+-	round3(32+13, RL, RR, load_next_key, __movq);
+-	round3(32+14, RR, RL, load_next_key, __movq);
+-	round3(32+15, RL, RR, dummy2, dummy2);
+-
+-	final_permutation3(RR, RL);
+-
+-	bswapl RR0d;
+-	bswapl RL0d;
+-	bswapl RR1d;
+-	bswapl RL1d;
+-	bswapl RR2d;
+-	bswapl RL2d;
+-
+-	popq %rsi /* dst */
+-	movl RR0d, 0 * 4(%rsi);
+-	movl RL0d, 1 * 4(%rsi);
+-	movl RR1d, 2 * 4(%rsi);
+-	movl RL1d, 3 * 4(%rsi);
+-	movl RR2d, 4 * 4(%rsi);
+-	movl RL2d, 5 * 4(%rsi);
+-
+-	popq %r15;
+-	popq %r14;
+-	popq %r13;
+-	popq %r12;
+-	popq %rbx;
+-
+-	RET;
+-SYM_FUNC_END(des3_ede_x86_64_crypt_blk_3way)
+-
+-.section	.rodata, "a", @progbits
+-.align 16
+-.L_s1:
+-	.quad 0x0010100001010400, 0x0000000000000000
+-	.quad 0x0000100000010000, 0x0010100001010404
+-	.quad 0x0010100001010004, 0x0000100000010404
+-	.quad 0x0000000000000004, 0x0000100000010000
+-	.quad 0x0000000000000400, 0x0010100001010400
+-	.quad 0x0010100001010404, 0x0000000000000400
+-	.quad 0x0010000001000404, 0x0010100001010004
+-	.quad 0x0010000001000000, 0x0000000000000004
+-	.quad 0x0000000000000404, 0x0010000001000400
+-	.quad 0x0010000001000400, 0x0000100000010400
+-	.quad 0x0000100000010400, 0x0010100001010000
+-	.quad 0x0010100001010000, 0x0010000001000404
+-	.quad 0x0000100000010004, 0x0010000001000004
+-	.quad 0x0010000001000004, 0x0000100000010004
+-	.quad 0x0000000000000000, 0x0000000000000404
+-	.quad 0x0000100000010404, 0x0010000001000000
+-	.quad 0x0000100000010000, 0x0010100001010404
+-	.quad 0x0000000000000004, 0x0010100001010000
+-	.quad 0x0010100001010400, 0x0010000001000000
+-	.quad 0x0010000001000000, 0x0000000000000400
+-	.quad 0x0010100001010004, 0x0000100000010000
+-	.quad 0x0000100000010400, 0x0010000001000004
+-	.quad 0x0000000000000400, 0x0000000000000004
+-	.quad 0x0010000001000404, 0x0000100000010404
+-	.quad 0x0010100001010404, 0x0000100000010004
+-	.quad 0x0010100001010000, 0x0010000001000404
+-	.quad 0x0010000001000004, 0x0000000000000404
+-	.quad 0x0000100000010404, 0x0010100001010400
+-	.quad 0x0000000000000404, 0x0010000001000400
+-	.quad 0x0010000001000400, 0x0000000000000000
+-	.quad 0x0000100000010004, 0x0000100000010400
+-	.quad 0x0000000000000000, 0x0010100001010004
+-.L_s2:
+-	.quad 0x0801080200100020, 0x0800080000000000
+-	.quad 0x0000080000000000, 0x0001080200100020
+-	.quad 0x0001000000100000, 0x0000000200000020
+-	.quad 0x0801000200100020, 0x0800080200000020
+-	.quad 0x0800000200000020, 0x0801080200100020
+-	.quad 0x0801080000100000, 0x0800000000000000
+-	.quad 0x0800080000000000, 0x0001000000100000
+-	.quad 0x0000000200000020, 0x0801000200100020
+-	.quad 0x0001080000100000, 0x0001000200100020
+-	.quad 0x0800080200000020, 0x0000000000000000
+-	.quad 0x0800000000000000, 0x0000080000000000
+-	.quad 0x0001080200100020, 0x0801000000100000
+-	.quad 0x0001000200100020, 0x0800000200000020
+-	.quad 0x0000000000000000, 0x0001080000100000
+-	.quad 0x0000080200000020, 0x0801080000100000
+-	.quad 0x0801000000100000, 0x0000080200000020
+-	.quad 0x0000000000000000, 0x0001080200100020
+-	.quad 0x0801000200100020, 0x0001000000100000
+-	.quad 0x0800080200000020, 0x0801000000100000
+-	.quad 0x0801080000100000, 0x0000080000000000
+-	.quad 0x0801000000100000, 0x0800080000000000
+-	.quad 0x0000000200000020, 0x0801080200100020
+-	.quad 0x0001080200100020, 0x0000000200000020
+-	.quad 0x0000080000000000, 0x0800000000000000
+-	.quad 0x0000080200000020, 0x0801080000100000
+-	.quad 0x0001000000100000, 0x0800000200000020
+-	.quad 0x0001000200100020, 0x0800080200000020
+-	.quad 0x0800000200000020, 0x0001000200100020
+-	.quad 0x0001080000100000, 0x0000000000000000
+-	.quad 0x0800080000000000, 0x0000080200000020
+-	.quad 0x0800000000000000, 0x0801000200100020
+-	.quad 0x0801080200100020, 0x0001080000100000
+-.L_s3:
+-	.quad 0x0000002000000208, 0x0000202008020200
+-	.quad 0x0000000000000000, 0x0000200008020008
+-	.quad 0x0000002008000200, 0x0000000000000000
+-	.quad 0x0000202000020208, 0x0000002008000200
+-	.quad 0x0000200000020008, 0x0000000008000008
+-	.quad 0x0000000008000008, 0x0000200000020000
+-	.quad 0x0000202008020208, 0x0000200000020008
+-	.quad 0x0000200008020000, 0x0000002000000208
+-	.quad 0x0000000008000000, 0x0000000000000008
+-	.quad 0x0000202008020200, 0x0000002000000200
+-	.quad 0x0000202000020200, 0x0000200008020000
+-	.quad 0x0000200008020008, 0x0000202000020208
+-	.quad 0x0000002008000208, 0x0000202000020200
+-	.quad 0x0000200000020000, 0x0000002008000208
+-	.quad 0x0000000000000008, 0x0000202008020208
+-	.quad 0x0000002000000200, 0x0000000008000000
+-	.quad 0x0000202008020200, 0x0000000008000000
+-	.quad 0x0000200000020008, 0x0000002000000208
+-	.quad 0x0000200000020000, 0x0000202008020200
+-	.quad 0x0000002008000200, 0x0000000000000000
+-	.quad 0x0000002000000200, 0x0000200000020008
+-	.quad 0x0000202008020208, 0x0000002008000200
+-	.quad 0x0000000008000008, 0x0000002000000200
+-	.quad 0x0000000000000000, 0x0000200008020008
+-	.quad 0x0000002008000208, 0x0000200000020000
+-	.quad 0x0000000008000000, 0x0000202008020208
+-	.quad 0x0000000000000008, 0x0000202000020208
+-	.quad 0x0000202000020200, 0x0000000008000008
+-	.quad 0x0000200008020000, 0x0000002008000208
+-	.quad 0x0000002000000208, 0x0000200008020000
+-	.quad 0x0000202000020208, 0x0000000000000008
+-	.quad 0x0000200008020008, 0x0000202000020200
+-.L_s4:
+-	.quad 0x1008020000002001, 0x1000020800002001
+-	.quad 0x1000020800002001, 0x0000000800000000
+-	.quad 0x0008020800002000, 0x1008000800000001
+-	.quad 0x1008000000000001, 0x1000020000002001
+-	.quad 0x0000000000000000, 0x0008020000002000
+-	.quad 0x0008020000002000, 0x1008020800002001
+-	.quad 0x1000000800000001, 0x0000000000000000
+-	.quad 0x0008000800000000, 0x1008000000000001
+-	.quad 0x1000000000000001, 0x0000020000002000
+-	.quad 0x0008000000000000, 0x1008020000002001
+-	.quad 0x0000000800000000, 0x0008000000000000
+-	.quad 0x1000020000002001, 0x0000020800002000
+-	.quad 0x1008000800000001, 0x1000000000000001
+-	.quad 0x0000020800002000, 0x0008000800000000
+-	.quad 0x0000020000002000, 0x0008020800002000
+-	.quad 0x1008020800002001, 0x1000000800000001
+-	.quad 0x0008000800000000, 0x1008000000000001
+-	.quad 0x0008020000002000, 0x1008020800002001
+-	.quad 0x1000000800000001, 0x0000000000000000
+-	.quad 0x0000000000000000, 0x0008020000002000
+-	.quad 0x0000020800002000, 0x0008000800000000
+-	.quad 0x1008000800000001, 0x1000000000000001
+-	.quad 0x1008020000002001, 0x1000020800002001
+-	.quad 0x1000020800002001, 0x0000000800000000
+-	.quad 0x1008020800002001, 0x1000000800000001
+-	.quad 0x1000000000000001, 0x0000020000002000
+-	.quad 0x1008000000000001, 0x1000020000002001
+-	.quad 0x0008020800002000, 0x1008000800000001
+-	.quad 0x1000020000002001, 0x0000020800002000
+-	.quad 0x0008000000000000, 0x1008020000002001
+-	.quad 0x0000000800000000, 0x0008000000000000
+-	.quad 0x0000020000002000, 0x0008020800002000
+-.L_s5:
+-	.quad 0x0000001000000100, 0x0020001002080100
+-	.quad 0x0020000002080000, 0x0420001002000100
+-	.quad 0x0000000000080000, 0x0000001000000100
+-	.quad 0x0400000000000000, 0x0020000002080000
+-	.quad 0x0400001000080100, 0x0000000000080000
+-	.quad 0x0020001002000100, 0x0400001000080100
+-	.quad 0x0420001002000100, 0x0420000002080000
+-	.quad 0x0000001000080100, 0x0400000000000000
+-	.quad 0x0020000002000000, 0x0400000000080000
+-	.quad 0x0400000000080000, 0x0000000000000000
+-	.quad 0x0400001000000100, 0x0420001002080100
+-	.quad 0x0420001002080100, 0x0020001002000100
+-	.quad 0x0420000002080000, 0x0400001000000100
+-	.quad 0x0000000000000000, 0x0420000002000000
+-	.quad 0x0020001002080100, 0x0020000002000000
+-	.quad 0x0420000002000000, 0x0000001000080100
+-	.quad 0x0000000000080000, 0x0420001002000100
+-	.quad 0x0000001000000100, 0x0020000002000000
+-	.quad 0x0400000000000000, 0x0020000002080000
+-	.quad 0x0420001002000100, 0x0400001000080100
+-	.quad 0x0020001002000100, 0x0400000000000000
+-	.quad 0x0420000002080000, 0x0020001002080100
+-	.quad 0x0400001000080100, 0x0000001000000100
+-	.quad 0x0020000002000000, 0x0420000002080000
+-	.quad 0x0420001002080100, 0x0000001000080100
+-	.quad 0x0420000002000000, 0x0420001002080100
+-	.quad 0x0020000002080000, 0x0000000000000000
+-	.quad 0x0400000000080000, 0x0420000002000000
+-	.quad 0x0000001000080100, 0x0020001002000100
+-	.quad 0x0400001000000100, 0x0000000000080000
+-	.quad 0x0000000000000000, 0x0400000000080000
+-	.quad 0x0020001002080100, 0x0400001000000100
+-.L_s6:
+-	.quad 0x0200000120000010, 0x0204000020000000
+-	.quad 0x0000040000000000, 0x0204040120000010
+-	.quad 0x0204000020000000, 0x0000000100000010
+-	.quad 0x0204040120000010, 0x0004000000000000
+-	.quad 0x0200040020000000, 0x0004040100000010
+-	.quad 0x0004000000000000, 0x0200000120000010
+-	.quad 0x0004000100000010, 0x0200040020000000
+-	.quad 0x0200000020000000, 0x0000040100000010
+-	.quad 0x0000000000000000, 0x0004000100000010
+-	.quad 0x0200040120000010, 0x0000040000000000
+-	.quad 0x0004040000000000, 0x0200040120000010
+-	.quad 0x0000000100000010, 0x0204000120000010
+-	.quad 0x0204000120000010, 0x0000000000000000
+-	.quad 0x0004040100000010, 0x0204040020000000
+-	.quad 0x0000040100000010, 0x0004040000000000
+-	.quad 0x0204040020000000, 0x0200000020000000
+-	.quad 0x0200040020000000, 0x0000000100000010
+-	.quad 0x0204000120000010, 0x0004040000000000
+-	.quad 0x0204040120000010, 0x0004000000000000
+-	.quad 0x0000040100000010, 0x0200000120000010
+-	.quad 0x0004000000000000, 0x0200040020000000
+-	.quad 0x0200000020000000, 0x0000040100000010
+-	.quad 0x0200000120000010, 0x0204040120000010
+-	.quad 0x0004040000000000, 0x0204000020000000
+-	.quad 0x0004040100000010, 0x0204040020000000
+-	.quad 0x0000000000000000, 0x0204000120000010
+-	.quad 0x0000000100000010, 0x0000040000000000
+-	.quad 0x0204000020000000, 0x0004040100000010
+-	.quad 0x0000040000000000, 0x0004000100000010
+-	.quad 0x0200040120000010, 0x0000000000000000
+-	.quad 0x0204040020000000, 0x0200000020000000
+-	.quad 0x0004000100000010, 0x0200040120000010
+-.L_s7:
+-	.quad 0x0002000000200000, 0x2002000004200002
+-	.quad 0x2000000004000802, 0x0000000000000000
+-	.quad 0x0000000000000800, 0x2000000004000802
+-	.quad 0x2002000000200802, 0x0002000004200800
+-	.quad 0x2002000004200802, 0x0002000000200000
+-	.quad 0x0000000000000000, 0x2000000004000002
+-	.quad 0x2000000000000002, 0x0000000004000000
+-	.quad 0x2002000004200002, 0x2000000000000802
+-	.quad 0x0000000004000800, 0x2002000000200802
+-	.quad 0x2002000000200002, 0x0000000004000800
+-	.quad 0x2000000004000002, 0x0002000004200000
+-	.quad 0x0002000004200800, 0x2002000000200002
+-	.quad 0x0002000004200000, 0x0000000000000800
+-	.quad 0x2000000000000802, 0x2002000004200802
+-	.quad 0x0002000000200800, 0x2000000000000002
+-	.quad 0x0000000004000000, 0x0002000000200800
+-	.quad 0x0000000004000000, 0x0002000000200800
+-	.quad 0x0002000000200000, 0x2000000004000802
+-	.quad 0x2000000004000802, 0x2002000004200002
+-	.quad 0x2002000004200002, 0x2000000000000002
+-	.quad 0x2002000000200002, 0x0000000004000000
+-	.quad 0x0000000004000800, 0x0002000000200000
+-	.quad 0x0002000004200800, 0x2000000000000802
+-	.quad 0x2002000000200802, 0x0002000004200800
+-	.quad 0x2000000000000802, 0x2000000004000002
+-	.quad 0x2002000004200802, 0x0002000004200000
+-	.quad 0x0002000000200800, 0x0000000000000000
+-	.quad 0x2000000000000002, 0x2002000004200802
+-	.quad 0x0000000000000000, 0x2002000000200802
+-	.quad 0x0002000004200000, 0x0000000000000800
+-	.quad 0x2000000004000002, 0x0000000004000800
+-	.quad 0x0000000000000800, 0x2002000000200002
+-.L_s8:
+-	.quad 0x0100010410001000, 0x0000010000001000
+-	.quad 0x0000000000040000, 0x0100010410041000
+-	.quad 0x0100000010000000, 0x0100010410001000
+-	.quad 0x0000000400000000, 0x0100000010000000
+-	.quad 0x0000000400040000, 0x0100000010040000
+-	.quad 0x0100010410041000, 0x0000010000041000
+-	.quad 0x0100010010041000, 0x0000010400041000
+-	.quad 0x0000010000001000, 0x0000000400000000
+-	.quad 0x0100000010040000, 0x0100000410000000
+-	.quad 0x0100010010001000, 0x0000010400001000
+-	.quad 0x0000010000041000, 0x0000000400040000
+-	.quad 0x0100000410040000, 0x0100010010041000
+-	.quad 0x0000010400001000, 0x0000000000000000
+-	.quad 0x0000000000000000, 0x0100000410040000
+-	.quad 0x0100000410000000, 0x0100010010001000
+-	.quad 0x0000010400041000, 0x0000000000040000
+-	.quad 0x0000010400041000, 0x0000000000040000
+-	.quad 0x0100010010041000, 0x0000010000001000
+-	.quad 0x0000000400000000, 0x0100000410040000
+-	.quad 0x0000010000001000, 0x0000010400041000
+-	.quad 0x0100010010001000, 0x0000000400000000
+-	.quad 0x0100000410000000, 0x0100000010040000
+-	.quad 0x0100000410040000, 0x0100000010000000
+-	.quad 0x0000000000040000, 0x0100010410001000
+-	.quad 0x0000000000000000, 0x0100010410041000
+-	.quad 0x0000000400040000, 0x0100000410000000
+-	.quad 0x0100000010040000, 0x0100010010001000
+-	.quad 0x0100010410001000, 0x0000000000000000
+-	.quad 0x0100010410041000, 0x0000010000041000
+-	.quad 0x0000010000041000, 0x0000010400001000
+-	.quad 0x0000010400001000, 0x0000000400040000
+-	.quad 0x0100000010000000, 0x0100010010041000
+diff --git a/arch/x86/crypto/des3_ede_glue.c b/arch/x86/crypto/des3_ede_glue.c
+deleted file mode 100644
+index 34600f90d8a6..000000000000
+--- a/arch/x86/crypto/des3_ede_glue.c
++++ /dev/null
+@@ -1,391 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-or-later
+-/*
+- * Glue Code for assembler optimized version of 3DES
+- *
+- * Copyright © 2014 Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+- *
+- * CBC & ECB parts based on code (crypto/cbc.c,ecb.c) by:
+- *   Copyright (c) 2006 Herbert Xu <herbert@gondor.apana.org.au>
+- */
+-
+-#include <crypto/algapi.h>
+-#include <crypto/des.h>
+-#include <crypto/internal/skcipher.h>
 -#include <linux/crypto.h>
 -#include <linux/init.h>
 -#include <linux/module.h>
--#include <linux/mm.h>
 -#include <linux/types.h>
--#include <crypto/algapi.h>
--#include <crypto/internal/des.h>
--#include <crypto/internal/skcipher.h>
 -
--#include <asm/fpumacro.h>
--#include <asm/opcodes.h>
--#include <asm/pstate.h>
--#include <asm/elf.h>
--
--struct des_sparc64_ctx {
--	u64 encrypt_expkey[DES_EXPKEY_WORDS / 2];
--	u64 decrypt_expkey[DES_EXPKEY_WORDS / 2];
+-struct des3_ede_x86_ctx {
+-	struct des3_ede_ctx enc;
+-	struct des3_ede_ctx dec;
 -};
 -
--struct des3_ede_sparc64_ctx {
--	u64 encrypt_expkey[DES3_EDE_EXPKEY_WORDS / 2];
--	u64 decrypt_expkey[DES3_EDE_EXPKEY_WORDS / 2];
--};
+-/* regular block cipher functions */
+-asmlinkage void des3_ede_x86_64_crypt_blk(const u32 *expkey, u8 *dst,
+-					  const u8 *src);
 -
--static void encrypt_to_decrypt(u64 *d, const u64 *e)
+-/* 3-way parallel cipher functions */
+-asmlinkage void des3_ede_x86_64_crypt_blk_3way(const u32 *expkey, u8 *dst,
+-					       const u8 *src);
+-
+-static inline void des3_ede_enc_blk(struct des3_ede_x86_ctx *ctx, u8 *dst,
+-				    const u8 *src)
 -{
--	const u64 *s = e + (DES_EXPKEY_WORDS / 2) - 1;
--	int i;
+-	u32 *enc_ctx = ctx->enc.expkey;
 -
--	for (i = 0; i < DES_EXPKEY_WORDS / 2; i++)
--		*d++ = *s--;
+-	des3_ede_x86_64_crypt_blk(enc_ctx, dst, src);
 -}
 -
--extern void des_sparc64_key_expand(const u32 *input_key, u64 *key);
--
--static int des_set_key(struct crypto_tfm *tfm, const u8 *key,
--		       unsigned int keylen)
+-static inline void des3_ede_dec_blk(struct des3_ede_x86_ctx *ctx, u8 *dst,
+-				    const u8 *src)
 -{
--	struct des_sparc64_ctx *dctx = crypto_tfm_ctx(tfm);
--	int err;
+-	u32 *dec_ctx = ctx->dec.expkey;
 -
--	/* Even though we have special instructions for key expansion,
--	 * we call des_verify_key() so that we don't have to write our own
--	 * weak key detection code.
--	 */
--	err = crypto_des_verify_key(tfm, key);
--	if (err)
--		return err;
--
--	des_sparc64_key_expand((const u32 *) key, &dctx->encrypt_expkey[0]);
--	encrypt_to_decrypt(&dctx->decrypt_expkey[0], &dctx->encrypt_expkey[0]);
--
--	return 0;
+-	des3_ede_x86_64_crypt_blk(dec_ctx, dst, src);
 -}
 -
--static int des_set_key_skcipher(struct crypto_skcipher *tfm, const u8 *key,
--				unsigned int keylen)
+-static inline void des3_ede_dec_blk_3way(struct des3_ede_x86_ctx *ctx, u8 *dst,
+-					 const u8 *src)
 -{
--	return des_set_key(crypto_skcipher_tfm(tfm), key, keylen);
+-	u32 *dec_ctx = ctx->dec.expkey;
+-
+-	des3_ede_x86_64_crypt_blk_3way(dec_ctx, dst, src);
 -}
 -
--extern void des_sparc64_crypt(const u64 *key, const u64 *input,
--			      u64 *output);
--
--static void sparc_des_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+-static void des3_ede_x86_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
 -{
--	struct des_sparc64_ctx *ctx = crypto_tfm_ctx(tfm);
--	const u64 *K = ctx->encrypt_expkey;
--
--	des_sparc64_crypt(K, (const u64 *) src, (u64 *) dst);
+-	des3_ede_enc_blk(crypto_tfm_ctx(tfm), dst, src);
 -}
 -
--static void sparc_des_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+-static void des3_ede_x86_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
 -{
--	struct des_sparc64_ctx *ctx = crypto_tfm_ctx(tfm);
--	const u64 *K = ctx->decrypt_expkey;
--
--	des_sparc64_crypt(K, (const u64 *) src, (u64 *) dst);
+-	des3_ede_dec_blk(crypto_tfm_ctx(tfm), dst, src);
 -}
 -
--extern void des_sparc64_load_keys(const u64 *key);
--
--extern void des_sparc64_ecb_crypt(const u64 *input, u64 *output,
--				  unsigned int len);
--
--static int __ecb_crypt(struct skcipher_request *req, bool encrypt)
+-static int ecb_crypt(struct skcipher_request *req, const u32 *expkey)
 -{
--	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	const struct des_sparc64_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	const unsigned int bsize = DES3_EDE_BLOCK_SIZE;
 -	struct skcipher_walk walk;
 -	unsigned int nbytes;
 -	int err;
 -
--	err = skcipher_walk_virt(&walk, req, true);
--	if (err)
--		return err;
+-	err = skcipher_walk_virt(&walk, req, false);
 -
--	if (encrypt)
--		des_sparc64_load_keys(&ctx->encrypt_expkey[0]);
--	else
--		des_sparc64_load_keys(&ctx->decrypt_expkey[0]);
--	while ((nbytes = walk.nbytes) != 0) {
--		des_sparc64_ecb_crypt(walk.src.virt.addr, walk.dst.virt.addr,
--				      round_down(nbytes, DES_BLOCK_SIZE));
--		err = skcipher_walk_done(&walk, nbytes % DES_BLOCK_SIZE);
+-	while ((nbytes = walk.nbytes)) {
+-		const u8 *wsrc = walk.src.virt.addr;
+-		u8 *wdst = walk.dst.virt.addr;
+-
+-		/* Process four block batch */
+-		if (nbytes >= bsize * 3) {
+-			do {
+-				des3_ede_x86_64_crypt_blk_3way(expkey, wdst,
+-							       wsrc);
+-
+-				wsrc += bsize * 3;
+-				wdst += bsize * 3;
+-				nbytes -= bsize * 3;
+-			} while (nbytes >= bsize * 3);
+-
+-			if (nbytes < bsize)
+-				goto done;
+-		}
+-
+-		/* Handle leftovers */
+-		do {
+-			des3_ede_x86_64_crypt_blk(expkey, wdst, wsrc);
+-
+-			wsrc += bsize;
+-			wdst += bsize;
+-			nbytes -= bsize;
+-		} while (nbytes >= bsize);
+-
+-done:
+-		err = skcipher_walk_done(&walk, nbytes);
 -	}
--	fprs_write(0);
+-
 -	return err;
 -}
 -
 -static int ecb_encrypt(struct skcipher_request *req)
 -{
--	return __ecb_crypt(req, true);
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	struct des3_ede_x86_ctx *ctx = crypto_skcipher_ctx(tfm);
+-
+-	return ecb_crypt(req, ctx->enc.expkey);
 -}
 -
 -static int ecb_decrypt(struct skcipher_request *req)
 -{
--	return __ecb_crypt(req, false);
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	struct des3_ede_x86_ctx *ctx = crypto_skcipher_ctx(tfm);
+-
+-	return ecb_crypt(req, ctx->dec.expkey);
 -}
 -
--extern void des_sparc64_cbc_encrypt(const u64 *input, u64 *output,
--				    unsigned int len, u64 *iv);
--
--extern void des_sparc64_cbc_decrypt(const u64 *input, u64 *output,
--				    unsigned int len, u64 *iv);
--
--static int __cbc_crypt(struct skcipher_request *req, bool encrypt)
+-static unsigned int __cbc_encrypt(struct des3_ede_x86_ctx *ctx,
+-				  struct skcipher_walk *walk)
 -{
--	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	const struct des_sparc64_ctx *ctx = crypto_skcipher_ctx(tfm);
--	struct skcipher_walk walk;
--	unsigned int nbytes;
--	int err;
+-	unsigned int bsize = DES3_EDE_BLOCK_SIZE;
+-	unsigned int nbytes = walk->nbytes;
+-	u64 *src = (u64 *)walk->src.virt.addr;
+-	u64 *dst = (u64 *)walk->dst.virt.addr;
+-	u64 *iv = (u64 *)walk->iv;
 -
--	err = skcipher_walk_virt(&walk, req, true);
--	if (err)
--		return err;
+-	do {
+-		*dst = *src ^ *iv;
+-		des3_ede_enc_blk(ctx, (u8 *)dst, (u8 *)dst);
+-		iv = dst;
 -
--	if (encrypt)
--		des_sparc64_load_keys(&ctx->encrypt_expkey[0]);
--	else
--		des_sparc64_load_keys(&ctx->decrypt_expkey[0]);
--	while ((nbytes = walk.nbytes) != 0) {
--		if (encrypt)
--			des_sparc64_cbc_encrypt(walk.src.virt.addr,
--						walk.dst.virt.addr,
--						round_down(nbytes,
--							   DES_BLOCK_SIZE),
--						walk.iv);
--		else
--			des_sparc64_cbc_decrypt(walk.src.virt.addr,
--						walk.dst.virt.addr,
--						round_down(nbytes,
--							   DES_BLOCK_SIZE),
--						walk.iv);
--		err = skcipher_walk_done(&walk, nbytes % DES_BLOCK_SIZE);
--	}
--	fprs_write(0);
--	return err;
+-		src += 1;
+-		dst += 1;
+-		nbytes -= bsize;
+-	} while (nbytes >= bsize);
+-
+-	*(u64 *)walk->iv = *iv;
+-	return nbytes;
 -}
 -
 -static int cbc_encrypt(struct skcipher_request *req)
 -{
--	return __cbc_crypt(req, true);
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	struct des3_ede_x86_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	struct skcipher_walk walk;
+-	unsigned int nbytes;
+-	int err;
+-
+-	err = skcipher_walk_virt(&walk, req, false);
+-
+-	while (walk.nbytes) {
+-		nbytes = __cbc_encrypt(ctx, &walk);
+-		err = skcipher_walk_done(&walk, nbytes);
+-	}
+-
+-	return err;
+-}
+-
+-static unsigned int __cbc_decrypt(struct des3_ede_x86_ctx *ctx,
+-				  struct skcipher_walk *walk)
+-{
+-	unsigned int bsize = DES3_EDE_BLOCK_SIZE;
+-	unsigned int nbytes = walk->nbytes;
+-	u64 *src = (u64 *)walk->src.virt.addr;
+-	u64 *dst = (u64 *)walk->dst.virt.addr;
+-	u64 ivs[3 - 1];
+-	u64 last_iv;
+-
+-	/* Start of the last block. */
+-	src += nbytes / bsize - 1;
+-	dst += nbytes / bsize - 1;
+-
+-	last_iv = *src;
+-
+-	/* Process four block batch */
+-	if (nbytes >= bsize * 3) {
+-		do {
+-			nbytes -= bsize * 3 - bsize;
+-			src -= 3 - 1;
+-			dst -= 3 - 1;
+-
+-			ivs[0] = src[0];
+-			ivs[1] = src[1];
+-
+-			des3_ede_dec_blk_3way(ctx, (u8 *)dst, (u8 *)src);
+-
+-			dst[1] ^= ivs[0];
+-			dst[2] ^= ivs[1];
+-
+-			nbytes -= bsize;
+-			if (nbytes < bsize)
+-				goto done;
+-
+-			*dst ^= *(src - 1);
+-			src -= 1;
+-			dst -= 1;
+-		} while (nbytes >= bsize * 3);
+-	}
+-
+-	/* Handle leftovers */
+-	for (;;) {
+-		des3_ede_dec_blk(ctx, (u8 *)dst, (u8 *)src);
+-
+-		nbytes -= bsize;
+-		if (nbytes < bsize)
+-			break;
+-
+-		*dst ^= *(src - 1);
+-		src -= 1;
+-		dst -= 1;
+-	}
+-
+-done:
+-	*dst ^= *(u64 *)walk->iv;
+-	*(u64 *)walk->iv = last_iv;
+-
+-	return nbytes;
 -}
 -
 -static int cbc_decrypt(struct skcipher_request *req)
 -{
--	return __cbc_crypt(req, false);
--}
--
--static int des3_ede_set_key(struct crypto_tfm *tfm, const u8 *key,
--			    unsigned int keylen)
--{
--	struct des3_ede_sparc64_ctx *dctx = crypto_tfm_ctx(tfm);
--	u64 k1[DES_EXPKEY_WORDS / 2];
--	u64 k2[DES_EXPKEY_WORDS / 2];
--	u64 k3[DES_EXPKEY_WORDS / 2];
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	struct des3_ede_x86_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	struct skcipher_walk walk;
+-	unsigned int nbytes;
 -	int err;
 -
--	err = crypto_des3_ede_verify_key(tfm, key);
--	if (err)
+-	err = skcipher_walk_virt(&walk, req, false);
+-
+-	while (walk.nbytes) {
+-		nbytes = __cbc_decrypt(ctx, &walk);
+-		err = skcipher_walk_done(&walk, nbytes);
+-	}
+-
+-	return err;
+-}
+-
+-static int des3_ede_x86_setkey(struct crypto_tfm *tfm, const u8 *key,
+-			       unsigned int keylen)
+-{
+-	struct des3_ede_x86_ctx *ctx = crypto_tfm_ctx(tfm);
+-	u32 i, j, tmp;
+-	int err;
+-
+-	err = des3_ede_expand_key(&ctx->enc, key, keylen);
+-	if (err == -ENOKEY) {
+-		if (crypto_tfm_get_flags(tfm) & CRYPTO_TFM_REQ_FORBID_WEAK_KEYS)
+-			err = -EINVAL;
+-		else
+-			err = 0;
+-	}
+-
+-	if (err) {
+-		memset(ctx, 0, sizeof(*ctx));
 -		return err;
+-	}
 -
--	des_sparc64_key_expand((const u32 *)key, k1);
--	key += DES_KEY_SIZE;
--	des_sparc64_key_expand((const u32 *)key, k2);
--	key += DES_KEY_SIZE;
--	des_sparc64_key_expand((const u32 *)key, k3);
+-	/* Fix encryption context for this implementation and form decryption
+-	 * context. */
+-	j = DES3_EDE_EXPKEY_WORDS - 2;
+-	for (i = 0; i < DES3_EDE_EXPKEY_WORDS; i += 2, j -= 2) {
+-		tmp = ror32(ctx->enc.expkey[i + 1], 4);
+-		ctx->enc.expkey[i + 1] = tmp;
 -
--	memcpy(&dctx->encrypt_expkey[0], &k1[0], sizeof(k1));
--	encrypt_to_decrypt(&dctx->encrypt_expkey[DES_EXPKEY_WORDS / 2], &k2[0]);
--	memcpy(&dctx->encrypt_expkey[(DES_EXPKEY_WORDS / 2) * 2],
--	       &k3[0], sizeof(k3));
--
--	encrypt_to_decrypt(&dctx->decrypt_expkey[0], &k3[0]);
--	memcpy(&dctx->decrypt_expkey[DES_EXPKEY_WORDS / 2],
--	       &k2[0], sizeof(k2));
--	encrypt_to_decrypt(&dctx->decrypt_expkey[(DES_EXPKEY_WORDS / 2) * 2],
--			   &k1[0]);
+-		ctx->dec.expkey[j + 0] = ctx->enc.expkey[i + 0];
+-		ctx->dec.expkey[j + 1] = tmp;
+-	}
 -
 -	return 0;
 -}
 -
--static int des3_ede_set_key_skcipher(struct crypto_skcipher *tfm, const u8 *key,
--				     unsigned int keylen)
+-static int des3_ede_x86_setkey_skcipher(struct crypto_skcipher *tfm,
+-					const u8 *key,
+-					unsigned int keylen)
 -{
--	return des3_ede_set_key(crypto_skcipher_tfm(tfm), key, keylen);
+-	return des3_ede_x86_setkey(&tfm->base, key, keylen);
 -}
 -
--extern void des3_ede_sparc64_crypt(const u64 *key, const u64 *input,
--				   u64 *output);
--
--static void sparc_des3_ede_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
--{
--	struct des3_ede_sparc64_ctx *ctx = crypto_tfm_ctx(tfm);
--	const u64 *K = ctx->encrypt_expkey;
--
--	des3_ede_sparc64_crypt(K, (const u64 *) src, (u64 *) dst);
--}
--
--static void sparc_des3_ede_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
--{
--	struct des3_ede_sparc64_ctx *ctx = crypto_tfm_ctx(tfm);
--	const u64 *K = ctx->decrypt_expkey;
--
--	des3_ede_sparc64_crypt(K, (const u64 *) src, (u64 *) dst);
--}
--
--extern void des3_ede_sparc64_load_keys(const u64 *key);
--
--extern void des3_ede_sparc64_ecb_crypt(const u64 *expkey, const u64 *input,
--				       u64 *output, unsigned int len);
--
--static int __ecb3_crypt(struct skcipher_request *req, bool encrypt)
--{
--	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	const struct des3_ede_sparc64_ctx *ctx = crypto_skcipher_ctx(tfm);
--	struct skcipher_walk walk;
--	const u64 *K;
--	unsigned int nbytes;
--	int err;
--
--	err = skcipher_walk_virt(&walk, req, true);
--	if (err)
--		return err;
--
--	if (encrypt)
--		K = &ctx->encrypt_expkey[0];
--	else
--		K = &ctx->decrypt_expkey[0];
--	des3_ede_sparc64_load_keys(K);
--	while ((nbytes = walk.nbytes) != 0) {
--		des3_ede_sparc64_ecb_crypt(K, walk.src.virt.addr,
--					   walk.dst.virt.addr,
--					   round_down(nbytes, DES_BLOCK_SIZE));
--		err = skcipher_walk_done(&walk, nbytes % DES_BLOCK_SIZE);
--	}
--	fprs_write(0);
--	return err;
--}
--
--static int ecb3_encrypt(struct skcipher_request *req)
--{
--	return __ecb3_crypt(req, true);
--}
--
--static int ecb3_decrypt(struct skcipher_request *req)
--{
--	return __ecb3_crypt(req, false);
--}
--
--extern void des3_ede_sparc64_cbc_encrypt(const u64 *expkey, const u64 *input,
--					 u64 *output, unsigned int len,
--					 u64 *iv);
--
--extern void des3_ede_sparc64_cbc_decrypt(const u64 *expkey, const u64 *input,
--					 u64 *output, unsigned int len,
--					 u64 *iv);
--
--static int __cbc3_crypt(struct skcipher_request *req, bool encrypt)
--{
--	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	const struct des3_ede_sparc64_ctx *ctx = crypto_skcipher_ctx(tfm);
--	struct skcipher_walk walk;
--	const u64 *K;
--	unsigned int nbytes;
--	int err;
--
--	err = skcipher_walk_virt(&walk, req, true);
--	if (err)
--		return err;
--
--	if (encrypt)
--		K = &ctx->encrypt_expkey[0];
--	else
--		K = &ctx->decrypt_expkey[0];
--	des3_ede_sparc64_load_keys(K);
--	while ((nbytes = walk.nbytes) != 0) {
--		if (encrypt)
--			des3_ede_sparc64_cbc_encrypt(K, walk.src.virt.addr,
--						     walk.dst.virt.addr,
--						     round_down(nbytes,
--								DES_BLOCK_SIZE),
--						     walk.iv);
--		else
--			des3_ede_sparc64_cbc_decrypt(K, walk.src.virt.addr,
--						     walk.dst.virt.addr,
--						     round_down(nbytes,
--								DES_BLOCK_SIZE),
--						     walk.iv);
--		err = skcipher_walk_done(&walk, nbytes % DES_BLOCK_SIZE);
--	}
--	fprs_write(0);
--	return err;
--}
--
--static int cbc3_encrypt(struct skcipher_request *req)
--{
--	return __cbc3_crypt(req, true);
--}
--
--static int cbc3_decrypt(struct skcipher_request *req)
--{
--	return __cbc3_crypt(req, false);
--}
--
--static struct crypto_alg cipher_algs[] = {
--	{
--		.cra_name		= "des",
--		.cra_driver_name	= "des-sparc64",
--		.cra_priority		= SPARC_CR_OPCODE_PRIORITY,
--		.cra_flags		= CRYPTO_ALG_TYPE_CIPHER,
--		.cra_blocksize		= DES_BLOCK_SIZE,
--		.cra_ctxsize		= sizeof(struct des_sparc64_ctx),
--		.cra_alignmask		= 7,
--		.cra_module		= THIS_MODULE,
--		.cra_u	= {
--			.cipher	= {
--				.cia_min_keysize	= DES_KEY_SIZE,
--				.cia_max_keysize	= DES_KEY_SIZE,
--				.cia_setkey		= des_set_key,
--				.cia_encrypt		= sparc_des_encrypt,
--				.cia_decrypt		= sparc_des_decrypt
--			}
--		}
--	}, {
--		.cra_name		= "des3_ede",
--		.cra_driver_name	= "des3_ede-sparc64",
--		.cra_priority		= SPARC_CR_OPCODE_PRIORITY,
--		.cra_flags		= CRYPTO_ALG_TYPE_CIPHER,
--		.cra_blocksize		= DES3_EDE_BLOCK_SIZE,
--		.cra_ctxsize		= sizeof(struct des3_ede_sparc64_ctx),
--		.cra_alignmask		= 7,
--		.cra_module		= THIS_MODULE,
--		.cra_u	= {
--			.cipher	= {
--				.cia_min_keysize	= DES3_EDE_KEY_SIZE,
--				.cia_max_keysize	= DES3_EDE_KEY_SIZE,
--				.cia_setkey		= des3_ede_set_key,
--				.cia_encrypt		= sparc_des3_ede_encrypt,
--				.cia_decrypt		= sparc_des3_ede_decrypt
--			}
+-static struct crypto_alg des3_ede_cipher = {
+-	.cra_name		= "des3_ede",
+-	.cra_driver_name	= "des3_ede-asm",
+-	.cra_priority		= 200,
+-	.cra_flags		= CRYPTO_ALG_TYPE_CIPHER,
+-	.cra_blocksize		= DES3_EDE_BLOCK_SIZE,
+-	.cra_ctxsize		= sizeof(struct des3_ede_x86_ctx),
+-	.cra_module		= THIS_MODULE,
+-	.cra_u = {
+-		.cipher = {
+-			.cia_min_keysize	= DES3_EDE_KEY_SIZE,
+-			.cia_max_keysize	= DES3_EDE_KEY_SIZE,
+-			.cia_setkey		= des3_ede_x86_setkey,
+-			.cia_encrypt		= des3_ede_x86_encrypt,
+-			.cia_decrypt		= des3_ede_x86_decrypt,
 -		}
 -	}
 -};
 -
--static struct skcipher_alg skcipher_algs[] = {
+-static struct skcipher_alg des3_ede_skciphers[] = {
 -	{
--		.base.cra_name		= "ecb(des)",
--		.base.cra_driver_name	= "ecb-des-sparc64",
--		.base.cra_priority	= SPARC_CR_OPCODE_PRIORITY,
--		.base.cra_blocksize	= DES_BLOCK_SIZE,
--		.base.cra_ctxsize	= sizeof(struct des_sparc64_ctx),
--		.base.cra_alignmask	= 7,
--		.base.cra_module	= THIS_MODULE,
--		.min_keysize		= DES_KEY_SIZE,
--		.max_keysize		= DES_KEY_SIZE,
--		.setkey			= des_set_key_skcipher,
--		.encrypt		= ecb_encrypt,
--		.decrypt		= ecb_decrypt,
--	}, {
--		.base.cra_name		= "cbc(des)",
--		.base.cra_driver_name	= "cbc-des-sparc64",
--		.base.cra_priority	= SPARC_CR_OPCODE_PRIORITY,
--		.base.cra_blocksize	= DES_BLOCK_SIZE,
--		.base.cra_ctxsize	= sizeof(struct des_sparc64_ctx),
--		.base.cra_alignmask	= 7,
--		.base.cra_module	= THIS_MODULE,
--		.min_keysize		= DES_KEY_SIZE,
--		.max_keysize		= DES_KEY_SIZE,
--		.ivsize			= DES_BLOCK_SIZE,
--		.setkey			= des_set_key_skcipher,
--		.encrypt		= cbc_encrypt,
--		.decrypt		= cbc_decrypt,
--	}, {
 -		.base.cra_name		= "ecb(des3_ede)",
--		.base.cra_driver_name	= "ecb-des3_ede-sparc64",
--		.base.cra_priority	= SPARC_CR_OPCODE_PRIORITY,
+-		.base.cra_driver_name	= "ecb-des3_ede-asm",
+-		.base.cra_priority	= 300,
 -		.base.cra_blocksize	= DES3_EDE_BLOCK_SIZE,
--		.base.cra_ctxsize	= sizeof(struct des3_ede_sparc64_ctx),
--		.base.cra_alignmask	= 7,
+-		.base.cra_ctxsize	= sizeof(struct des3_ede_x86_ctx),
 -		.base.cra_module	= THIS_MODULE,
 -		.min_keysize		= DES3_EDE_KEY_SIZE,
 -		.max_keysize		= DES3_EDE_KEY_SIZE,
--		.setkey			= des3_ede_set_key_skcipher,
--		.encrypt		= ecb3_encrypt,
--		.decrypt		= ecb3_decrypt,
+-		.setkey			= des3_ede_x86_setkey_skcipher,
+-		.encrypt		= ecb_encrypt,
+-		.decrypt		= ecb_decrypt,
 -	}, {
 -		.base.cra_name		= "cbc(des3_ede)",
--		.base.cra_driver_name	= "cbc-des3_ede-sparc64",
--		.base.cra_priority	= SPARC_CR_OPCODE_PRIORITY,
+-		.base.cra_driver_name	= "cbc-des3_ede-asm",
+-		.base.cra_priority	= 300,
 -		.base.cra_blocksize	= DES3_EDE_BLOCK_SIZE,
--		.base.cra_ctxsize	= sizeof(struct des3_ede_sparc64_ctx),
--		.base.cra_alignmask	= 7,
+-		.base.cra_ctxsize	= sizeof(struct des3_ede_x86_ctx),
 -		.base.cra_module	= THIS_MODULE,
 -		.min_keysize		= DES3_EDE_KEY_SIZE,
 -		.max_keysize		= DES3_EDE_KEY_SIZE,
 -		.ivsize			= DES3_EDE_BLOCK_SIZE,
--		.setkey			= des3_ede_set_key_skcipher,
--		.encrypt		= cbc3_encrypt,
--		.decrypt		= cbc3_decrypt,
+-		.setkey			= des3_ede_x86_setkey_skcipher,
+-		.encrypt		= cbc_encrypt,
+-		.decrypt		= cbc_decrypt,
 -	}
 -};
 -
--static bool __init sparc64_has_des_opcode(void)
+-static bool is_blacklisted_cpu(void)
 -{
--	unsigned long cfr;
--
--	if (!(sparc64_elf_hwcap & HWCAP_SPARC_CRYPTO))
+-	if (boot_cpu_data.x86_vendor != X86_VENDOR_INTEL)
 -		return false;
 -
--	__asm__ __volatile__("rd %%asr26, %0" : "=r" (cfr));
--	if (!(cfr & CFR_DES))
--		return false;
+-	if (boot_cpu_data.x86 == 0x0f) {
+-		/*
+-		 * On Pentium 4, des3_ede-x86_64 is slower than generic C
+-		 * implementation because use of 64bit rotates (which are really
+-		 * slow on P4). Therefore blacklist P4s.
+-		 */
+-		return true;
+-	}
 -
--	return true;
+-	return false;
 -}
 -
--static int __init des_sparc64_mod_init(void)
+-static int force;
+-module_param(force, int, 0);
+-MODULE_PARM_DESC(force, "Force module load, ignore CPU blacklist");
+-
+-static int __init des3_ede_x86_init(void)
 -{
 -	int err;
 -
--	if (!sparc64_has_des_opcode()) {
--		pr_info("sparc64 des opcodes not available.\n");
+-	if (!force && is_blacklisted_cpu()) {
+-		pr_info("des3_ede-x86_64: performance on this CPU would be suboptimal: disabling des3_ede-x86_64.\n");
 -		return -ENODEV;
 -	}
--	pr_info("Using sparc64 des opcodes optimized DES implementation\n");
--	err = crypto_register_algs(cipher_algs, ARRAY_SIZE(cipher_algs));
+-
+-	err = crypto_register_alg(&des3_ede_cipher);
 -	if (err)
 -		return err;
--	err = crypto_register_skciphers(skcipher_algs,
--					ARRAY_SIZE(skcipher_algs));
+-
+-	err = crypto_register_skciphers(des3_ede_skciphers,
+-					ARRAY_SIZE(des3_ede_skciphers));
 -	if (err)
--		crypto_unregister_algs(cipher_algs, ARRAY_SIZE(cipher_algs));
+-		crypto_unregister_alg(&des3_ede_cipher);
+-
 -	return err;
 -}
 -
--static void __exit des_sparc64_mod_fini(void)
+-static void __exit des3_ede_x86_fini(void)
 -{
--	crypto_unregister_algs(cipher_algs, ARRAY_SIZE(cipher_algs));
--	crypto_unregister_skciphers(skcipher_algs, ARRAY_SIZE(skcipher_algs));
+-	crypto_unregister_alg(&des3_ede_cipher);
+-	crypto_unregister_skciphers(des3_ede_skciphers,
+-				    ARRAY_SIZE(des3_ede_skciphers));
 -}
 -
--module_init(des_sparc64_mod_init);
--module_exit(des_sparc64_mod_fini);
+-module_init(des3_ede_x86_init);
+-module_exit(des3_ede_x86_fini);
 -
 -MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("DES & Triple DES EDE Cipher Algorithms, sparc64 des opcode accelerated");
--
--MODULE_ALIAS_CRYPTO("des");
+-MODULE_DESCRIPTION("Triple DES EDE Cipher Algorithm, asm optimized");
 -MODULE_ALIAS_CRYPTO("des3_ede");
--
--#include "crop_devid.c"
+-MODULE_ALIAS_CRYPTO("des3_ede-asm");
+-MODULE_AUTHOR("Jussi Kivilinna <jussi.kivilinna@iki.fi>");
 -- 
 2.53.0
 
