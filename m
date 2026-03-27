@@ -1,69 +1,91 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 419DF3FA5D7;
-	Fri, 27 Mar 2026 17:32:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACCCC3FBEDB;
+	Fri, 27 Mar 2026 17:49:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774632751; cv=none; b=b2CE3RppXor3Xnn44a/P0uEztu4Ptg4zLb44WS/T9kbAnmEX2hgVuekRp7L/pTW7wlZZWEV/1z41SaTduJ9roIpAL8RHAtBO8C6hVa6unTakb6Vk+DwDjV6dZLfayw+YJkb2tfu53ejW2iNDz2cAO78qkafUd6YVZQYoao3QUaM=
+	t=1774633795; cv=none; b=M4MOVrf481rDbj9MOcoG8j9aSjzuXXaS+0aMCeCy+Red8sjU2JbBgYxm6vHMUmVsmhA5usDAj7bP6Z+uJhN2pbx+su4MwP8h5y5a1oMx1YoCDlEksSU4mlGSCjHgSv3ioX8mN6GAGOpi9Fa6WZUNnLXpp8sThL+o5oGWRDl1g9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774632751; c=relaxed/simple;
-	bh=ydMb4+IQ+hhK/QaHD2SxsMw+W+OpnZiZISpWVGow/Qk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=caYjlXEp1LNkujMiXFK+sL60LsofeJvq4QzC3qm8VljRWd32+5wUm65bxZjup6UB5C/ug+VhfI3uDj0APbbiquZMvbJiRCIaSQSa5syS1DDFfZMAC88SID0AQExsPsZyxgNurhzsSqnSZZLJJ3MNre8ZD1ceBShLdciAE6VqKUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cqOgLT4V; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774633795; c=relaxed/simple;
+	bh=fvV+eUnldLQbPdva1eQggufDFhZTLIQCCYJJa9ryFGE=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=MUdLyO0QQVemGfaTE/oNSw9kLFNobPGBdqGr7BbTkEVWVaYsCAikhYX8V4QAkZpMXwlpq+rV6GdnlFWhnhGMzWXnqNk0/3KvOkqI8Bi7yx1UXo/UTSPDvof2qhjCUf94YIZ0QPGd7R1il7W2Pp2kmwegDLQjXXseSclkf8ite1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=Xukem7pw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cqOgLT4V"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE8B8C19423;
-	Fri, 27 Mar 2026 17:32:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774632751;
-	bh=ydMb4+IQ+hhK/QaHD2SxsMw+W+OpnZiZISpWVGow/Qk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cqOgLT4Vd1Gdqag5ixeksQVO/HJulYRVJ3W0IVg4L1TbEY4KqbnkipZ+repoMpY8V
-	 SKlbB8yPMxVl6i2HbkNP3fACiJQVSZttDas0zigtaC7frMGoDH4FxIqICrgEbEmYc3
-	 A7hnf6+3CPIR8Rir5nK/6JuBm09gvbENZ0WF76Tyz2SxwUm2jw/jelfznshH4b2Mak
-	 8F+ZAAJnEc1pMVvtRB3wwYBXx2Qfb4n0KiLyPXNxO42F/aGbXeVEcRUQSIrDbt3/iK
-	 Rzlrl3FRQxnPjsTsjAm1TQ5/7RZlXWILBGSOE364btN+nS6At371AlJqRm2zbXOrz5
-	 iEth5MVwj9HLw==
-Date: Fri, 27 Mar 2026 17:32:29 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Holger Dengler <dengler@linux.ibm.com>
-Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-	sparclinux@vger.kernel.org, x86@kernel.org,
-	Harald Freudenberger <freude@linux.ibm.com>
-Subject: Re: [PATCH 1/3] crypto: s390 - Remove des and des3_ede code
-Message-ID: <20260327173229.GB3407398@google.com>
-References: <20260326201246.57544-1-ebiggers@kernel.org>
- <20260326201246.57544-2-ebiggers@kernel.org>
- <65c3d229-57ee-4980-a13f-bc9661b4dda1@linux.ibm.com>
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="Xukem7pw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D99ECC19423;
+	Fri, 27 Mar 2026 17:49:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1774633795;
+	bh=fvV+eUnldLQbPdva1eQggufDFhZTLIQCCYJJa9ryFGE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Xukem7pwvHhzUBxAXhQ9NUugrvHjO83NuPglCq+AOxMC7jcj5knJ1iWiLSA3qMyPR
+	 XN8WgX2Ez7pjNH1P4TD8C2yL80THz5zSN5msmXHHVRwpdESPm9OS0FEtlzvOIU70KT
+	 MQ9zvWTqdnQj4+10/Ab7Ocs563lJZMmYcKdIZNc0=
+Date: Fri, 27 Mar 2026 10:49:53 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Richard Henderson <richard.henderson@linaro.org>, Matt Turner
+ <mattst88@gmail.com>, Magnus Lindholm <linmag7@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will
+ Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>, Huacai Chen
+ <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>, Madhavan
+ Srinivasan <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>,
+ Nicholas Piggin <npiggin@gmail.com>, "Christophe Leroy (CS GROUP)"
+ <chleroy@kernel.org>, Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti
+ <alex@ghiti.fr>, Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik
+ <gor@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, Christian
+ Borntraeger <borntraeger@linux.ibm.com>, Sven Schnelle
+ <svens@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, Andreas
+ Larsson <andreas@gaisler.com>, Richard Weinberger <richard@nod.at>, Anton
+ Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg
+ <johannes@sipsolutions.net>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar
+ <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
+ <hpa@zytor.com>, Herbert Xu <herbert@gondor.apana.org.au>, Dan Williams
+ <dan.j.williams@intel.com>, Chris Mason <clm@fb.com>, David Sterba
+ <dsterba@suse.com>, Arnd Bergmann <arnd@arndb.de>, Song Liu
+ <song@kernel.org>, Yu Kuai <yukuai@fnnas.com>, Li Nan
+ <linan122@huawei.com>, "Theodore Ts'o" <tytso@mit.edu>,
+ "Jason A. Donenfeld" <Jason@zx2c4.com>, linux-alpha@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ loongarch@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+ linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-raid@vger.kernel.org
+Subject: Re: cleanup the RAID5 XOR library v4
+Message-Id: <20260327104953.b91d7a4a71b1c1cd202e5a1c@linux-foundation.org>
+In-Reply-To: <20260327061704.3707577-1-hch@lst.de>
+References: <20260327061704.3707577-1-hch@lst.de>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <65c3d229-57ee-4980-a13f-bc9661b4dda1@linux.ibm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Mar 27, 2026 at 09:52:31AM +0100, Holger Dengler wrote:
-> Hi Eric,
+On Fri, 27 Mar 2026 07:16:32 +0100 Christoph Hellwig <hch@lst.de> wrote:
+
+> the XOR library used for the RAID5 parity is a bit of a mess right now.
+> The main file sits in crypto/ despite not being cryptography and not
+> using the crypto API, with the generic implementations sitting in
+> include/asm-generic and the arch implementations sitting in an asm/
+> header in theory.  The latter doesn't work for many cases, so
+> architectures often build the code directly into the core kernel, or
+> create another module for the architecture code.
 > 
-> On 26/03/2026 21:12, Eric Biggers wrote:
-> > Since DES and Triple DES are obsolete, there is very little point in
-> > maintining architecture-optimized code for them.  Remove it.
-> > 
-> > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> 
-> Are there plans to completely remove des/3des in-kernel crypto support from
-> the kernel or is it just the arch-specific code, that is removed?
+> Changes this to a single module in lib/ that also contains the
+> architecture optimizations, similar to the library work Eric Biggers
+> has done for the CRC and crypto libraries later.  After that it changes
+> to better calling conventions that allow for smarter architecture
+> implementations (although none is contained here yet), and uses
+> static_call to avoid indirection function call overhead.
 
-Just the arch-specific code for now.  It will just make these like RC4
-and MD4 which are still implemented for compatibility reasons but only
-with generic C code.  Someday (years from now) we should remove all of
-these entirely, but for now the best we can hope for is simplifying the
-implementations to just the generic C code.
-
-- Eric
+Thanks, I've updated mm.git's mm-nonmm-unstable to this version of the
+patchset.
