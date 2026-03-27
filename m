@@ -1,42 +1,46 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C4AC3AC0F1;
-	Fri, 27 Mar 2026 10:09:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39B3C32C942;
+	Fri, 27 Mar 2026 10:09:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774606171; cv=none; b=bXhmeBgURcSL62LP8vIua0YujiJ57IMqAzoRUQHNex7CRrePpHylJ+pFYIhwExHC512FpiOeLxqKg8KNGLEusyfnQuM/o2bCSCG+iTKhUoViyAEjZgO2YRuxnVJ3r5vw3lm3sjaOF29viilWNfLmmz3xokgixNIHF+lIbNjYREQ=
+	t=1774606191; cv=none; b=UOID5v62XY5Q6W2yLRucGt+3GOqkd4LEAcYjUEiRiTtUF1Viy9OK8gVHjGIzO555HFSalp7sxR9EgxRc8+F0IgQ+PD0PAEHy4WjmGfnaJCyKgjiN55IuwjcwXBy4y/i8a3nIp02XXhHSXrsXjK0vi62w+EDRtipu9QYsFFyNScQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774606171; c=relaxed/simple;
-	bh=m+g54bgFjEeNIeN5rDj0Rp/5IZ+j0+Y7vLSRHt2kNwA=;
+	s=arc-20240116; t=1774606191; c=relaxed/simple;
+	bh=gTvXuReAjPAHASbBqememMh2xAfDOENN+LVHcJgIniQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=grnz4n57Hw/8cNzYYikHbfCIM4P7eDC5bsYdCHMfz391QhdtKGxCAi5kjVWmNRwlwNDqONzBOzBwu2H28wggkCXJtu5WKs8RLAGVV75GtIXnq9i2nA0dzomO5AhtqqG1XuzWRbu/j2tDCiKxtAdlNE4HxNpxaJQ6MAGNlktgla4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Of2njq76; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=rp0ZHwxBVg/9g5F+xkrYYgJBSqJyeJfhpMCsEpTBADUCTXXZ8wElmryOLTYpKEHKlClNoQ+vASiTEAdb1FS46Jxm5x7OZNirYEB/Wlw2Z5jLrVBO1gcWl9WQxaacJ5OXPnkLjSXgPFCY9RdmDOyXgK6Es1LiAGTlKBTDqs1ytwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=HysPy/Yo; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Of2njq76"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="HysPy/Yo"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=Ug6KQeKU90/8ytgLrLm9lw8LnN82lF3wPwmFFLQbIwg=; 
-	b=Of2njq76FdkIclNaIEopTiU7xXao5bXf0nwdQk+MrbyzMs6sgFz7tMFTSWZ8QIPhItguu+6LppE
-	g4xsZMS7S9jWysu0t00JGkejbB2LkMC2EE367PKcpCvcWRTnj5EcOvWR8dji89v4Bp1QompvBqc2g
-	wwfF63EhRsLkvnLxYobXFOyBSuecqJdMg/lGDiMxjrui2ZqrNbq+E3NSzxYt2IyfKmJ9Gx2kr8/nF
-	U7OEQlu524iMQ1m8S3yodrVZuCrfoxJu06TM+ic5HIXCZIX93XYMbYHMmzMQ4fOcIk7gewjHzTK2h
-	3m30LUHcxVL3yO6XvMXW5wfW+0zfeAC7N0lQ==;
+	from:content-type:reply-to; bh=Elqfb1zrZbxu2yixOnTRFdEca09tffbB/3BR31L15h8=; 
+	b=HysPy/YotyLf6MJXwTL8jI5zpyBP0cEu1RfUAs/jaNC4Y2rE8MDsIbWnF09AS7IWuooOBXxS2Hf
+	//1OMxhjNjct2/CMiHimOAAIut+d1lLj6OZViS+EPXpYb+hRwTQDmquUt7KcrJIzKLxdFmPsWyFcj
+	XoDHfSQSi9a37GGLhCkrOwZJUNwlrF7K/L8ieU1Mk3wJLb+/7y10lrO//BuFi/joMxe79T0xDQeff
+	xt62B/s9BcuHCvsOUR07Iaa2lPZ/trwS+CDokrkr8GFOldgDpYJeU8vaW3V9IWgrzCtwHn/RWQDny
+	R3liqMZn5ORwRz1+DDuwebx6L09LyIhUYW7w==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1w63id-001br9-3C;
-	Fri, 27 Mar 2026 18:09:27 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Mar 2026 19:09:26 +0900
-Date: Fri, 27 Mar 2026 19:09:26 +0900
+	id 1w63ix-001brH-1B;
+	Fri, 27 Mar 2026 18:09:47 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Mar 2026 19:09:46 +0900
+Date: Fri, 27 Mar 2026 19:09:46 +0900
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: cryptd - Remove unused functions
-Message-ID: <acZXVtF7xAVpS0AK@gondor.apana.org.au>
-References: <20260320221727.38346-1-ebiggers@kernel.org>
+To: Chenghai Huang <huangchenghai2@huawei.com>
+Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, fanghao11@huawei.com,
+	liulongfang@huawei.com, qianweili@huawei.com,
+	linwenkai6@hisilicon.com, wangzhou1@hisilicon.com
+Subject: Re: [PATCH] crypto: hisilicon/sec2 - prevent req used-after-free for
+ sec
+Message-ID: <acZXavY-RlQHBw09@gondor.apana.org.au>
+References: <20260321070038.2023844-1-huangchenghai2@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -45,24 +49,24 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260320221727.38346-1-ebiggers@kernel.org>
+In-Reply-To: <20260321070038.2023844-1-huangchenghai2@huawei.com>
 
-On Fri, Mar 20, 2026 at 03:17:27PM -0700, Eric Biggers wrote:
-> Many functions in cryptd.c no longer have any caller.  Remove them.
+On Sat, Mar 21, 2026 at 03:00:38PM +0800, Chenghai Huang wrote:
+> From: Wenkai Lin <linwenkai6@hisilicon.com>
 > 
-> Also remove several associated structs and includes.  Finally, inline
-> cryptd_shash_desc() into its only caller, allowing it to be removed too.
+> During packet transmission, if the system is under heavy load,
+> the hardware might complete processing the packet and free the
+> request memory (req) before the transmission function finishes.
+> If the software subsequently accesses this req, a use-after-free
+> error will occur. The qp_ctx memory exists throughout the packet
+> sending process, so replace the req with the qp_ctx.
 > 
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> Fixes: f0ae287c5045 ("crypto: hisilicon/sec2 - implement full backlog mode for sec")
+> Signed-off-by: Wenkai Lin <linwenkai6@hisilicon.com>
+> Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
 > ---
-> 
-> This patch is targeting cryptodev/master.  It has a dependency on
-> "crypto: simd - Remove unused skcipher support"
-> (https://lore.kernel.org/r/20260314213720.91525-1-ebiggers@kernel.org/)
-> 
->  crypto/cryptd.c         | 112 +---------------------------------------
->  include/crypto/cryptd.h |  33 ------------
->  2 files changed, 2 insertions(+), 143 deletions(-)
+>  drivers/crypto/hisilicon/sec2/sec_crypto.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
