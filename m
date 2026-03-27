@@ -1,87 +1,112 @@
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from psionic.psi5.com (psionic.psi5.com [185.187.169.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E58C3932DD
-	for <linux-crypto@vger.kernel.org>; Fri, 27 Mar 2026 09:24:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEC143A640A;
+	Fri, 27 Mar 2026 09:59:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.187.169.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774603488; cv=none; b=GN1eO7KvNcgNcKjImepVtukmVTQTbDoD7crxiK7YTmP6oL2Qorza+f3bDWJTkTmCpoz3d1TnaWp3ed0zau91AOwDhKvGAlEZlqyNvyWIW/yQaHFrRy14tF60zWzi1hfkAp+xXngx7UwEtmqQ+iFrowodrW5evxFAJZ7Eh499o+E=
+	t=1774605581; cv=none; b=MbFVof/JreQxw0fVeBWe7iAKuB0UMn7zKq1Pq2RoP2idPr+r34W2uwjQjs8QzG2fF0r7KWBN3oz1Rld37cZL0hUiVYpVoFi/ddphO4X2y3qSAEFXf6o5djRxKQBLD7SzIo+CL04DncB3oYA62taeGOMAssdZD6O6BDQB0bnPG7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774603488; c=relaxed/simple;
-	bh=XQ4qcyKbXradsSabJGMbGq4/IFuov6bVlgxDE4ai67Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GOrTvFme9nVODUKw3xUFgAFU9s/o3dd//YasXy2AfDp1b61b0aCdpl0ycyK0QsdMrB431/BvH0C39hhrXO55dYk3Yuo4/s/MOHt40V/g9FDkxdpNOgUbqNW8dVlH3l29GdSL+cGEq231HFL/O4KWPl2fIS0C9MAaun6bB14q0mM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=xSWvcl8I; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="xSWvcl8I"
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 3D3F44E4280A;
-	Fri, 27 Mar 2026 09:24:45 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id EBE7960230;
-	Fri, 27 Mar 2026 09:24:44 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C40C210450F33;
-	Fri, 27 Mar 2026 10:24:38 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1774603484; h=from:subject:date:message-id:to:cc:mime-version:
-	 content-transfer-encoding; bh=uX0ZkDshfrjUuQd8q4yz2ndynx0ogljmjvdsdmFxGS0=;
-	b=xSWvcl8Isbuq0d92ng8BHqR2A3YD/pHQymygkKgvTGzvpJ/9TUPBQ5jualNb6iSeS3B/5i
-	+57n2WSDTy/VWyaeVK08FOZkJNuKikPRGIapifgdHbDCJ9ZVFrsduV9/fUrJANVTpnRhrx
-	2ld29wYDZxahiOPJwVtWp8hdCr5cDNzBt/sfpvNU57UZAp3f0cKeGC0wxuEhl6/8F/JBN5
-	nxf5oYT+3UZw0LCt+nwOAmrVcAk20MBawzmq2bBImMdMoN4/plhIY/2oA6nx1SxCpCOKRi
-	PDQ/77dJF6F5/n3wOy/p0eR4hlX9LJIZNRVgRSGfYVLDb+B37c4uG8wyb//msQ==
-From: Paul Louvel <paul.louvel@bootlin.com>
-To: Neal Liu <neal_liu@aspeedtech.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Joel Stanley <joel@jms.id.au>,
-	Andrew Jeffery <andrew@codeconstruct.com.au>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	Paul Louvel <paul.louvel@bootlin.com>,
-	linux-aspeed@lists.ozlabs.org,
-	linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: aspeed/hash: Use memcpy_from_sglist() in aspeed_ahash_dma_prepare()
-Date: Fri, 27 Mar 2026 10:24:18 +0100
-Message-ID: <20260327092418.10476-1-paul.louvel@bootlin.com>
-X-Mailer: git-send-email 2.53.0
+	s=arc-20240116; t=1774605581; c=relaxed/simple;
+	bh=/5Bw5lC9kJ+iFDnZK+UIW5K4PD0LHuzTSnNiSrEXoZA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=omSJJfHAXGsk/TE4VbMV2WrlgnFYkScLJ9FPBRQIbMnvHgzvMB9zJj+83AFVA+CjjT0wqBr1z1dSZYc17dGPnX57JkZAJe2OmP67bG+tmvvHSPFVkNJ/ZEeGgLX6wkUBsTqNoEpQ0j+zehi2ccHJhxFUwGf5pmOH7fDbZjgvXAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de; spf=pass smtp.mailfrom=hogyros.de; arc=none smtp.client-ip=185.187.169.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hogyros.de
+Received: from [IPV6:2400:2410:b120:f200:a1f3:73da:3a04:160d] (unknown [IPv6:2400:2410:b120:f200:a1f3:73da:3a04:160d])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by psionic.psi5.com (Postfix) with ESMTPSA id E405D3F01D;
+	Fri, 27 Mar 2026 10:59:24 +0100 (CET)
+Message-ID: <35e00d0f-85f6-457a-99b4-703caf3e1e6e@hogyros.de>
+Date: Fri, 27 Mar 2026 18:59:21 +0900
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/3] crypto: Remove arch-optimized des and des3_ede code
+To: Eric Biggers <ebiggers@kernel.org>,
+ John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+ linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+ sparclinux@vger.kernel.org, x86@kernel.org,
+ Harald Freudenberger <freude@linux.ibm.com>,
+ Holger Dengler <dengler@linux.ibm.com>
+References: <20260326201246.57544-1-ebiggers@kernel.org>
+ <0982d4341f58e2f1181bc472dc9c9d8542148e3c.camel@physik.fu-berlin.de>
+ <20260326202733.GA2657@quark>
+Content-Language: en-US
+From: Simon Richter <Simon.Richter@hogyros.de>
+In-Reply-To: <20260326202733.GA2657@quark>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Replace scatterwalk_map_and_copy() with memcpy_from_sglist() in
-aspeed_ahash_dma_prepare(). The latter provides a simpler interface
-without requiring a direction parameter, making the code easier to
-read and less error-prone.
+Hi,
 
-No functional change intended.
+On 3/27/26 5:27 AM, Eric Biggers wrote:
 
-Signed-off-by: Paul Louvel <paul.louvel@bootlin.com>
----
- drivers/crypto/aspeed/aspeed-hace-hash.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+> In general that's good of course, but DES and 3DES?  Really?  Why is
+> effort going into these obsolete algorithms at all?
 
-diff --git a/drivers/crypto/aspeed/aspeed-hace-hash.c b/drivers/crypto/aspeed/aspeed-hace-hash.c
-index f8f37c9d5f3c..6f0d03cfbefc 100644
---- a/drivers/crypto/aspeed/aspeed-hace-hash.c
-+++ b/drivers/crypto/aspeed/aspeed-hace-hash.c
-@@ -182,8 +182,7 @@ static int aspeed_ahash_dma_prepare(struct aspeed_hace_dev *hace_dev)
- 			final = true;
- 	} else
- 		length -= remain;
--	scatterwalk_map_and_copy(hash_engine->ahash_src_addr, rctx->src_sg,
--				 rctx->offset, length, 0);
-+	memcpy_from_sglist(hash_engine->ahash_src_addr, rctx->src_sg, rctx->offset, length);
- 	aspeed_ahash_update_counter(rctx, length);
- 	if (final)
- 		length += aspeed_ahash_fill_padding(
--- 
-2.53.0
+If there's dedicated instructions, we need to emulate them, even if the 
+kernel stops using them, because userspace might still use them. The 
+alternative is implementing them as a trap in the kernel that delegates 
+to the crypto subsystem, and nobody wants that. O_O
 
+I wonder if it would make sense to split between "crypto" and "offload" 
+subsystems, so the "crypto" side can focus on a small number of 
+contemporary algorithms and give them simple, easily auditable 
+interfaces, and move all the complexity of asynchronous request 
+processing in offload hardware over to the "offloading" side. The 
+userspace API would also move to the "offloading" subsystem.
+
+This would give the offloading subsystem a bit more flexibility in API 
+design as well, so we could maybe represent offload capabilities in 
+network or storage hardware as well, or allow userspace to set policies 
+or find an optimized routing, without compromising security in the 
+crypto subsystem.
+
+However, even from the "crypto" perspective I believe that we can't get 
+around support for asynchronous offload devices, because of mobile 
+devices. I suspect no one would be building dedicated silicon for 
+asynchronous AES into mobile CPUs if that wasn't worth it somehow -- so 
+if such a device is present, we want to use it as much as possible, 
+because the expectation is that while the difference in performance 
+compared to the CPU is hardly noticeable, the difference in battery 
+lifetime is (that's why dropping async request support from fscrypt 
+makes it largely useless on mobile).
+
+Most of the other offload scenarios are already handled bypassing the 
+crypto subsystem: the network stack has its own offloading mechanism, 
+while nx-gzip is a regular device driver and does not even register an 
+acomp algorithm (even though that would be really cool for zram/zswap, 
+and would benefit dozens (dozens!) of users).
+
+A lot of the resistance to changes in the crypto subsystem comes from 
+the long tail, either hardware that is somewhat seldom, or built for 
+some special purpose where the crypto APIs are already a limiting 
+factor, and further consolidation towards standard PCs is making the 
+situation worse.
+
+I can certainly see that the complexity in the API that would be needed 
+to support all the interesting use cases is somewhat undesirable, hence 
+the idea to split off generic transforms and allow the interfaces there 
+to become more expressive (on-device dmabufs, in-place operation, 
+device-side contexts, device-side queues, device-to-device transfer 
+offload, ...).
+
+The current state where these use cases are technically inside the scope 
+of the crypto subsystem, but deemed out of scope by the crypto subsystem 
+leaves them in a kind of limbo, and that is very frustrating.
+
+I don't know if it will be worth it to dedicate a weekend to 
+implementing nx-gzip support as an acomp module, or nx-aes support as 
+acrypt, or if that work would be rejected or removed in half a year, and 
+I'm sure maintainers of ports to older hardware feel similar.
+
+    Simon
