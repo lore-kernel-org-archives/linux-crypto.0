@@ -1,41 +1,42 @@
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BFE538F920;
-	Fri, 27 Mar 2026 20:10:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43532390C95;
+	Fri, 27 Mar 2026 20:10:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774642228; cv=none; b=PJVjeHGqaKj0CLcs7A2KRdABgIqdnUBIyIWTnPb6P6ul58tiBhDMIGDy2NZMZ/DuCb8HXA9f7AF/okxRzROr/cXToJGLyJ5Hws2Lxr7rgO+QH72mMdugzqVQETrZvv1oCHFEBWxVXnYjJxGbRgR08xeNvs382rHYO0nzYT/sLIk=
+	t=1774642231; cv=none; b=k/ddSeG3zIuFCLM3LO/D74zK0TuevlmdL+d8EmfoAZ6B8N1HIGUM64D1vcQeLWzGAv+9W+kNav3Yto1xPOiAltN5N49GyAXCKuB5kDKxBrpZeo7VFB+fvEZ2t6UyXMd0QNjYYIF81PEvxixJwYplK8JjLNKkGO5Besuz2tAMCRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774642228; c=relaxed/simple;
-	bh=53ISBKabvLXIGpST9KmWh9Un7jYPoZOrSqGNFBlPPog=;
+	s=arc-20240116; t=1774642231; c=relaxed/simple;
+	bh=sVqPuDmF9xHaBRF6OFpbGvH89BwIdivjgPf1rMw5go4=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=raPvwwwDKmHjod9YFMo4qL0JmFllemhi4Hh3rgeLYUvpocibixaJXfLpXgWyLGKwenoyhuXW+EQ3B1mWNXBeZLP4Ue/A9BEfvx0X5sNU+JZfGYk0Q/3YrGOVsHgiZ7SXBopvzWEAmn8waHVkbIDpjno4oxZo+iUTGJdyKVM772k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=s8LU75QG; arc=none smtp.client-ip=185.246.85.4
+	 In-Reply-To:To:Cc; b=cnqwON4QlwdwRtyn7UIPy0+PRA/wPZBnO7tRaH/t93xphH2AAUQcTrUZFSMDCanaMsmEVK4oBjD4iiJVXSyKg0Lxk4sJJkM3MYwHJK9FQjhUVmZ8T5DV2+izGpKX8W5CojvxFljjprZoVdRZvM++xDtuKE2yLfpJmY+HbTK0Ozo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=TazAGxoC; arc=none smtp.client-ip=185.246.84.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="s8LU75QG"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="TazAGxoC"
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id C8C3F4E4282D;
-	Fri, 27 Mar 2026 20:10:25 +0000 (UTC)
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 0A19B1A302C;
+	Fri, 27 Mar 2026 20:10:29 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 8FC7D60268;
-	Fri, 27 Mar 2026 20:10:25 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id F1B5310451AD3;
-	Fri, 27 Mar 2026 21:10:20 +0100 (CET)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id CD46860268;
+	Fri, 27 Mar 2026 20:10:28 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9F7F810451AF7;
+	Fri, 27 Mar 2026 21:10:24 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1774642223; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1774642227; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=lE3QKXVXrOESVFGZ+EtmwjmJziMWMpwyr3ofoukXeI4=;
-	b=s8LU75QGO5PxR0VmI003T4y+A+OZdpHPLs8YNMTPr1r0366jG4m8cvSZaol9G77Dav1vIt
-	EeX6Sz5X5P59OZk7XXsQz8lWrnWBNkw+syOb3nRghVMJhWLWAf42gUAp6wCpU5jZRuUjKk
-	0+7T7lRjEMagnD1gccSqfuyZ5vMpzo2nK8zs9LEAQP63NKAm7wdcwAAGcJNwXLe3TVR0Z8
-	PW98+Pzbu2psIZgoBEZLT0+FFfB9WDEIJ0UBa58emzZ+bIkMrdHF1IO+LVggV2QkbpF5wg
-	YmN8uAnuNdjUqTfPdDfBebnxF2mf+tVrYiXOlBN6W55Z41bj7rkTqZJeMYzaGA==
+	bh=F7KByxnZKYpIC4KwssijV6OI8JnCVJ1fz1NVPkaqHkg=;
+	b=TazAGxoCfrmXyOrbi+2KpJ0PifSweozMCGHe+9LvEboTSY0XgEw+gcSOZE02YRHON2lflA
+	ewciCTp71XVuJ7axUJ8OGI5j3xk/da3bEa4D+kDjS+cs9n8JlzL2SAwEGmaZliUg4CA+kk
+	T3snOgCPIXRbk1SCu4rgeDmm1lwzK5+cya7furyT5B5nDWtguPGGiUO56IPDFJhmyF8qRh
+	+GSzAqghDDtxf8pDAOr+fOqYcJvAfo5A6QbFO6YJ+yL4BkafGlzKPhplRmBniD/pgeHmoo
+	hDMia6pncXaLolqSVBQaT9rGSqEyPxCZRXEzsfR7aPWoOO2QLQMtHr3sTNhDQg==
 From: "Miquel Raynal (Schneider Electric)" <miquel.raynal@bootlin.com>
-Date: Fri, 27 Mar 2026 21:09:23 +0100
-Subject: [PATCH 01/16] dt-bindings: clock: Introduce nexus nodes
+Date: Fri, 27 Mar 2026 21:09:24 +0100
+Subject: [PATCH 02/16] dt-bindings: interrupt-controller: Describe EIP-201
+ AIC
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -43,8 +44,8 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20260327-schneider-v7-0-rc1-crypto-v1-1-5e6ff7853994@bootlin.com>
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260327-schneider-v7-0-rc1-crypto-v1-2-5e6ff7853994@bootlin.com>
 References: <20260327-schneider-v7-0-rc1-crypto-v1-0-5e6ff7853994@bootlin.com>
 In-Reply-To: <20260327-schneider-v7-0-rc1-crypto-v1-0-5e6ff7853994@bootlin.com>
 To: Michael Turquette <mturquette@baylibre.com>, 
@@ -68,65 +69,84 @@ Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
 X-Mailer: b4 0.14.3
 X-Last-TLS-Session-Version: TLSv1.3
 
-Hardware containers can just decouple external resources like clock
-without any more control. Nexus nodes already exist for PWM and GPIOs,
-add a binding to allow them for clocks as well.
-
-No examples are given, the file is litteraly a copy-paste from Hervé
-Codina's work on PWM Nexus nodes, hence we just point to the examples
-there which already illustrate very clearly the concept of the various
-properties.
+The EIP-201 Advanced Interrupt Controller is part of a bigger container
+block from Inside Secure nicely named EIP-150. It typically takes one
+clock from the EIP-150 and offers basic controls through a few simple
+registers.
 
 Signed-off-by: Miquel Raynal (Schneider Electric) <miquel.raynal@bootlin.com>
 ---
- .../bindings/clock/clock-nexus-node.yaml           | 39 ++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+ .../inside-secure,safexcel-eip201.yaml             | 41 ++++++++++++++++++++++
+ .../inside-secure,safexcel-eip201.h                | 14 ++++++++
+ 2 files changed, 55 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/clock/clock-nexus-node.yaml b/Documentation/devicetree/bindings/clock/clock-nexus-node.yaml
+diff --git a/Documentation/devicetree/bindings/interrupt-controller/inside-secure,safexcel-eip201.yaml b/Documentation/devicetree/bindings/interrupt-controller/inside-secure,safexcel-eip201.yaml
 new file mode 100644
-index 000000000000..f07e2972e8aa
+index 000000000000..ddad8e5eab96
 --- /dev/null
-+++ b/Documentation/devicetree/bindings/clock/clock-nexus-node.yaml
-@@ -0,0 +1,39 @@
++++ b/Documentation/devicetree/bindings/interrupt-controller/inside-secure,safexcel-eip201.yaml
+@@ -0,0 +1,41 @@
 +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 +%YAML 1.2
 +---
-+$id: http://devicetree.org/schemas/clock/clock-nexus-node.yaml#
++$id: http://devicetree.org/schemas/interrupt-controller/inside-secure,safexcel-eip201.yaml#
 +$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
-+title: Clock Nexus
-+
-+description: >
-+  A nexus node allows to remap a phandle list in a consumer node through a
-+  container or a connector node in a generic way. With this remapping,
-+  the consumer node needs to know only about the nexus node. Resources
-+  behind the nexus node are decoupled by the nexus node itself.
++title: Inside-Secure SafeXcel EIP-201 Advanced Interrupt Controller
 +
 +maintainers:
 +  - Miquel Raynal <miquel.raynal@bootlin.com>
 +
-+select: true
++allOf:
++  - $ref: /schemas/interrupt-controller.yaml#
 +
 +properties:
-+  '#clock-cells': true
++  compatible:
++    const: inside-secure,safexcel-eip201
 +
-+  clock-map:
-+    $ref: /schemas/types.yaml#/definitions/uint32-matrix
++  reg:
++    maxItems: 1
 +
-+  clock-map-mask:
-+    $ref: /schemas/types.yaml#/definitions/uint32-array
++  interrupts:
++    maxItems: 1
 +
-+  clock-map-pass-thru:
-+    $ref: /schemas/types.yaml#/definitions/uint32-array
++  clocks:
++    minItems: 1
 +
-+dependentRequired:
-+  clock-map: ['#clock-cells']
-+  clock-map-mask: [ clock-map ]
-+  clock-map-pass-thru: [ clock-map ]
++  interrupt-controller: true
 +
-+additionalProperties: true
++  "#interrupt-cells":
++    const: 2
 +
-+# See the original pwm-nexus-node.yaml description for examples
++required:
++  - compatible
++  - reg
++  - interrupts
++  - clocks
++  - interrupt-controller
++  - "#interrupt-cells"
++
++unevaluatedProperties: false
+diff --git a/include/dt-bindings/interrupt-controller/inside-secure,safexcel-eip201.h b/include/dt-bindings/interrupt-controller/inside-secure,safexcel-eip201.h
+new file mode 100644
+index 000000000000..ead73bd96296
+--- /dev/null
++++ b/include/dt-bindings/interrupt-controller/inside-secure,safexcel-eip201.h
+@@ -0,0 +1,14 @@
++/* SPDX-License-Identifier: (GPL-2.0-only OR MIT) */
++
++#ifndef _DT_BINDINGS_IRQ_SAFEXCEL_EIP201_AIC_H
++#define _DT_BINDINGS_IRQ_SAFEXCEL_EIP201_AIC_H
++
++#define AIC_PKA_INT0 0
++#define AIC_PKA_INT1 1
++#define AIC_PKA_INT2 2
++#define AIC_TRNG_INT 3
++#define AIC_RESERVED 4
++#define AIC_SL_ERR_INT  5
++#define AIC_PROTECTION_INT 6
++
++#endif
 
 -- 
 2.51.1
