@@ -1,180 +1,243 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A49FA2FF155
-	for <linux-crypto@vger.kernel.org>; Fri, 27 Mar 2026 06:04:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCED326FA60;
+	Fri, 27 Mar 2026 06:17:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774591471; cv=none; b=T86dycAdY4ydxVMZg8lueYMV5DeRpRts4zkZNrdZso4GvGcxZriBlhze6l+5UxZBqgwIiJGdk5mXGxMG+sLK83fXIvm/bndaBGWcyYdhtOeaR+B8SnnAukpmgytykWTNvY5sz3lNq5TZeLyUKZ+lhpKLR14paUpVSmukRrWwI5Q=
+	t=1774592279; cv=none; b=MGJfwpeUb2YvEEh70mEN53urz3NV3XReXB+FfxHCb4bgiuXA5siz0usx+aeX86T19MtuonzbeXdqWJ3EAKjOR0c/otHO+DiP4Ldm0BaKrXeU3rvT4E5+xXhtxMZF88sf3CravanckC2oHm3JdLgOU32Hk5xnJHzBTubOx1HV330=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774591471; c=relaxed/simple;
-	bh=FoDw6VZynM90c0u76LrPiKidkWDGZfNUqbU18ZFsCu0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BNK8CSrmmNY8kfsoNLL9GQ+BsOcMHtPATQq6BH+wXhFAEHbDPmT7khhbzP1pQjvRWv4z55R/Z2oq03BfT9gdRmQt+7KzBBUrIVOSk+fJJUaB9XPYVv+nr018k6IhkJspxpw3Aqd9/waK7UG/snair8IwsU6kqq9/j1/IFbkwApw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=aYzqo4uE; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1774592279; c=relaxed/simple;
+	bh=xSkAWtw6Z8oPBDIt/HvL25vD4lce3XEvpQlpr3sTrnM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NCCjJYOKSjSyLxOqKo61cVxRHoTwT5ST1/i0JpnpmuJsikUrPvaqf3g61IXGM9sQxdHuJuizdFj+6+sHxpNrb8mlW+BOt++pCXhf9tkOYhAqSi8rT/r5YYopAw42EoKHDmXBvdTkxSpqORbiMz0AMoP2U4vfd8+LIy/VZV3XYfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ReyAcynB; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="aYzqo4uE"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ReyAcynB"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=taS8vPaZDnhLAK4el+1/DQ5nLp6f6BWMnsF0JffABlE=; 
-	b=aYzqo4uEm21QWNrg+Q4uhFT8NWCJ+o5j/mtr+zd0R5hF/kQGD8JSJ5M1386jr9zls9y1jPziMjh
-	DGe9eZb6v9ulDQgwDJdqAPc14psXvU5mE+0x+8VXRM3nM1CNETSxisFeg19Cviae6Fct2niUKFPSY
-	oZgGRAFeidallzwNj0xE+qIagvn6t7qFxMZo1I/OCxYoaMmmQBre+usPrZ763JSI42b/k0dQQmiRY
-	2JPH2oSikLM3WhsnrYbH9PY6RJS+XL0PAIKNWfsb4NDIu4YN/LfqM6NtIQ6h4WWowKw7VJc02Otlu
-	AqTcujjSuhmksNqZhJ7l3mIHS8/dqtjxR+9g==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1w5ztO-001Y4B-0r;
-	Fri, 27 Mar 2026 14:04:18 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Mar 2026 15:04:17 +0900
-Date: Fri, 27 Mar 2026 15:04:17 +0900
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Cc: Eric Biggers <ebiggers@kernel.org>,
-	Linus Torvalds <torvalds@linuxfoundation.org>,
-	Taeyang Lee <0wn@theori.io>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Greg KH <gregkh@linuxfoundation.org>, davem@davemloft.net,
-	Brian Pak <bpak@theori.io>, Juno Im <juno@theori.io>,
-	Jungwon Lim <setuid0@theori.io>
-Subject: [v2 PATCH] crypto: authencesn - Do not place hiseq at end of dst for
- out-of-place decryption
-Message-ID: <acYd4c4CBbtvl7Mi@gondor.apana.org.au>
-References: <acOpDrnN3cVfiASk@gondor.apana.org.au>
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=I9U105Jg7WywsQM1muyaLAAIkpN6KCb+lW3Mwrd4CdE=; b=ReyAcynBk0WVaSF3hMVuefAVw6
+	HP+y7I5unpYc1JvmMeCR/kbFcq4sBUYYpKkLpAyea9N9ihBG2wmgzi/7QK6VK8psjUFM62Dc0MgpG
+	xlz36CWaU5eJbSs4ES78JtOzTWnJuaSIoQIfJ9Aq+vTvy1eX2bIp5PzwdatCUATbkHyLMBP7rkHVq
+	13HvpcB7yQIImN6hQRXJbGHypLU3CbLesnT9h7T1xtRV5IKrmDSmD/GCfuDYZZtBjPgsjVV4to7xJ
+	SH+eI7Pem/7XclKWkjZDpPs+pFnLJgJzHStxv805jpenCZ/6utrnGKdsN5myPiuzxmb6SvM/967KI
+	ZYCmRlFQ==;
+Received: from 2a02-8389-2341-5b80-d601-7564-c2e0-491c.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:d601:7564:c2e0:491c] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1w60VS-00000006kaa-09oB;
+	Fri, 27 Mar 2026 06:17:18 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+	Matt Turner <mattst88@gmail.com>,
+	Magnus Lindholm <linmag7@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+	Paul Walmsley <pjw@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andreas Larsson <andreas@gaisler.com>,
+	Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Chris Mason <clm@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Song Liu <song@kernel.org>,
+	Yu Kuai <yukuai@fnnas.com>,
+	Li Nan <linan122@huawei.com>,
+	"Theodore Ts'o" <tytso@mit.edu>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	linux-alpha@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	loongarch@lists.linux.dev,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org,
+	sparclinux@vger.kernel.org,
+	linux-um@lists.infradead.org,
+	linux-crypto@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	linux-arch@vger.kernel.org,
+	linux-raid@vger.kernel.org
+Subject: cleanup the RAID5 XOR library v4
+Date: Fri, 27 Mar 2026 07:16:32 +0100
+Message-ID: <20260327061704.3707577-1-hch@lst.de>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <acOpDrnN3cVfiASk@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Wed, Mar 25, 2026 at 06:21:18PM +0900, Herbert Xu wrote:
-> When decrypting data that is not in-place (src != dst), there is
-> no need to save the high-order sequence bits in dst as it could
-> simply be re-copied from the source.
+Hi all,
 
-This doesn't actually work because the high sequence number are
-missing in the out-of-place case.  Here is an updated version to
-handle that properly.  I will revise the follow-up patch to get
-rid of scatterwalk_map_and_copy.
+the XOR library used for the RAID5 parity is a bit of a mess right now.
+The main file sits in crypto/ despite not being cryptography and not
+using the crypto API, with the generic implementations sitting in
+include/asm-generic and the arch implementations sitting in an asm/
+header in theory.  The latter doesn't work for many cases, so
+architectures often build the code directly into the core kernel, or
+create another module for the architecture code.
 
----8<---
-When decrypting data that is not in-place (src != dst), there is
-no need to save the high-order sequence bits in dst as it could
-simply be re-copied from the source.
+Changes this to a single module in lib/ that also contains the
+architecture optimizations, similar to the library work Eric Biggers
+has done for the CRC and crypto libraries later.  After that it changes
+to better calling conventions that allow for smarter architecture
+implementations (although none is contained here yet), and uses
+static_call to avoid indirection function call overhead.
 
-However, the data to be hashed need to be rearranged accordingly.
+A git tree is also available here:
 
-Reported-by: Taeyang Lee <0wn@theori.io>
-Fixes: 104880a6b470 ("crypto: authencesn - Convert to new AEAD interface")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+    git://git.infradead.org/users/hch/misc.git xor-improvements
 
-diff --git a/crypto/authencesn.c b/crypto/authencesn.c
-index 542a978663b9..c0a01d738d9b 100644
---- a/crypto/authencesn.c
-+++ b/crypto/authencesn.c
-@@ -207,6 +207,7 @@ static int crypto_authenc_esn_decrypt_tail(struct aead_request *req,
- 	u8 *ohash = areq_ctx->tail;
- 	unsigned int cryptlen = req->cryptlen - authsize;
- 	unsigned int assoclen = req->assoclen;
-+	struct scatterlist *src = req->src;
- 	struct scatterlist *dst = req->dst;
- 	u8 *ihash = ohash + crypto_ahash_digestsize(auth);
- 	u32 tmp[2];
-@@ -214,23 +215,27 @@ static int crypto_authenc_esn_decrypt_tail(struct aead_request *req,
- 	if (!authsize)
- 		goto decrypt;
- 
--	/* Move high-order bits of sequence number back. */
--	scatterwalk_map_and_copy(tmp, dst, 4, 4, 0);
--	scatterwalk_map_and_copy(tmp + 1, dst, assoclen + cryptlen, 4, 0);
--	scatterwalk_map_and_copy(tmp, dst, 0, 8, 1);
-+	if (src == dst) {
-+		/* Move high-order bits of sequence number back. */
-+		scatterwalk_map_and_copy(tmp, dst, 4, 4, 0);
-+		scatterwalk_map_and_copy(tmp + 1, dst, assoclen + cryptlen, 4, 0);
-+		scatterwalk_map_and_copy(tmp, dst, 0, 8, 1);
-+	} else
-+		memcpy_sglist(dst, src, assoclen);
- 
- 	if (crypto_memneq(ihash, ohash, authsize))
- 		return -EBADMSG;
- 
- decrypt:
- 
--	sg_init_table(areq_ctx->dst, 2);
-+	if (src != dst)
-+		src = scatterwalk_ffwd(areq_ctx->src, src, assoclen);
- 	dst = scatterwalk_ffwd(areq_ctx->dst, dst, assoclen);
- 
- 	skcipher_request_set_tfm(skreq, ctx->enc);
- 	skcipher_request_set_callback(skreq, flags,
- 				      req->base.complete, req->base.data);
--	skcipher_request_set_crypt(skreq, dst, dst, cryptlen, req->iv);
-+	skcipher_request_set_crypt(skreq, src, dst, cryptlen, req->iv);
- 
- 	return crypto_skcipher_decrypt(skreq);
- }
-@@ -255,6 +260,7 @@ static int crypto_authenc_esn_decrypt(struct aead_request *req)
- 	unsigned int assoclen = req->assoclen;
- 	unsigned int cryptlen = req->cryptlen;
- 	u8 *ihash = ohash + crypto_ahash_digestsize(auth);
-+	struct scatterlist *src = req->src;
- 	struct scatterlist *dst = req->dst;
- 	u32 tmp[2];
- 	int err;
-@@ -262,24 +268,28 @@ static int crypto_authenc_esn_decrypt(struct aead_request *req)
- 	if (assoclen < 8)
- 		return -EINVAL;
- 
--	cryptlen -= authsize;
--
--	if (req->src != dst)
--		memcpy_sglist(dst, req->src, assoclen + cryptlen);
--
--	scatterwalk_map_and_copy(ihash, req->src, assoclen + cryptlen,
--				 authsize, 0);
--
- 	if (!authsize)
- 		goto tail;
- 
--	/* Move high-order bits of sequence number to the end. */
--	scatterwalk_map_and_copy(tmp, dst, 0, 8, 0);
--	scatterwalk_map_and_copy(tmp, dst, 4, 4, 1);
--	scatterwalk_map_and_copy(tmp + 1, dst, assoclen + cryptlen, 4, 1);
-+	cryptlen -= authsize;
-+	scatterwalk_map_and_copy(ihash, req->src, assoclen + cryptlen,
-+				 authsize, 0);
- 
--	sg_init_table(areq_ctx->dst, 2);
--	dst = scatterwalk_ffwd(areq_ctx->dst, dst, 4);
-+	/* Move high-order bits of sequence number to the end. */
-+	scatterwalk_map_and_copy(tmp, src, 0, 8, 0);
-+	if (src == dst) {
-+		scatterwalk_map_and_copy(tmp, dst, 4, 4, 1);
-+		scatterwalk_map_and_copy(tmp + 1, dst, assoclen + cryptlen, 4, 1);
-+		dst = scatterwalk_ffwd(areq_ctx->dst, dst, 4);
-+	} else {
-+		scatterwalk_map_and_copy(tmp, dst, 0, 4, 1);
-+		scatterwalk_map_and_copy(tmp + 1, dst, assoclen + cryptlen - 4, 4, 1);
-+
-+		src = scatterwalk_ffwd(areq_ctx->src, src, 8);
-+		dst = scatterwalk_ffwd(areq_ctx->dst, dst, 4);
-+		memcpy_sglist(dst, src, assoclen + cryptlen - 8);
-+		dst = req->dst;
-+	}
- 
- 	ahash_request_set_tfm(ahreq, auth);
- 	ahash_request_set_crypt(ahreq, dst, ohash, assoclen + cryptlen);
+Gitweb:
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+    https://git.infradead.org/?p=users/hch/misc.git;a=shortlog;h=refs/heads/xor-improvements
+
+Changes since v3:
+ - switch away from lockdep_assert_preemption_enabled() again
+ - fix a @ reference in a kerneldoc comment.
+ - build the arm4regs implementation also without kernel-mode neon
+   support
+ - fix a pre-existing issue about mismatched attributes on arm64's
+   xor_block_inner_neon
+ - reject 0-sized xor request and adjust the kunit test case to not
+   generate them
+
+Changes since v2:
+ - drop use of CONFIG_KERNEL_MODE_NEON for arm64
+ - drop the new __limit_random_u32_below for the unit test
+ - require 64-bit alignment because sparc64 requires it
+ - use DEFINE_STATIC_CALL_NULL to avoid exposing a specific xor_gen
+   routine
+ - keep CONFIG_XOR_BLOCKS_ARCH self-contained in lib/raid/
+ - don't select library option from kunit test and add a .kunitconfig
+   instead
+ - fix the module description for the kunit test
+ - add a case where buffers are at the end of the allocation in the kunit test
+ - use separate src/dst alignment in the kunit test
+ - fix and improve the kunit assert message
+
+Changes since v1:
+ - use lockdep_assert_preemption_enabled()
+ - improve the commit message for the initial um xor.h cleanup
+ - further clean up the um arch specific header
+ - add SPDX identifier to the new build system files
+ - use bool for xor_forced
+ - fix an incorrect printk level conversion from warn to info
+ - include xor_impl.h in xor-neon.c
+ - remove unused exports for riscv
+ - simply move the sparc code instead of splititng it
+ - simplify the makefile for the x86-specific implementations
+ - remove stray references to xor_blocks in crypto/async_tx
+ - rework __DO_XOR_BLOCKS to avoid (theoretical) out of bounds references
+ - improve the kerneldoc API documentration for xor_gen()
+ - spell the name of the srcs argument to xor_gen correctly in xor.h
+ - add a kunit test, and a new random helper for it.
+
+Diffstat:
+ arch/arm64/include/asm/xor.h              |   73 --
+ arch/loongarch/include/asm/xor.h          |   68 --
+ arch/loongarch/include/asm/xor_simd.h     |   34 -
+ arch/loongarch/lib/xor_simd_glue.c        |   72 --
+ arch/powerpc/include/asm/xor.h            |   47 -
+ arch/powerpc/include/asm/xor_altivec.h    |   22 
+ arch/powerpc/lib/xor_vmx.h                |   22 
+ arch/powerpc/lib/xor_vmx_glue.c           |   63 --
+ arch/riscv/include/asm/xor.h              |   68 --
+ arch/s390/include/asm/xor.h               |   21 
+ arch/sparc/include/asm/xor.h              |    9 
+ arch/um/include/asm/xor.h                 |   24 
+ arch/x86/include/asm/xor_64.h             |   28 -
+ b/arch/arm/lib/Makefile                   |    5 
+ b/arch/arm64/lib/Makefile                 |    6 
+ b/arch/loongarch/lib/Makefile             |    2 
+ b/arch/powerpc/lib/Makefile               |    5 
+ b/arch/riscv/lib/Makefile                 |    1 
+ b/arch/s390/lib/Makefile                  |    2 
+ b/arch/sparc/include/asm/asm-prototypes.h |    1 
+ b/arch/sparc/lib/Makefile                 |    2 
+ b/crypto/Kconfig                          |    2 
+ b/crypto/Makefile                         |    1 
+ b/crypto/async_tx/async_xor.c             |   34 -
+ b/fs/btrfs/raid56.c                       |   27 -
+ b/include/asm-generic/Kbuild              |    1 
+ b/include/linux/raid/xor.h                |   27 -
+ b/lib/Kconfig                             |    1 
+ b/lib/Makefile                            |    2 
+ b/lib/raid/.kunitconfig                   |    3 
+ b/lib/raid/Kconfig                        |   30 +
+ b/lib/raid/Makefile                       |    3 
+ b/lib/raid/xor/Makefile                   |   42 +
+ b/lib/raid/xor/alpha/xor.c                |   46 -
+ b/lib/raid/xor/alpha/xor_arch.h           |   22 
+ b/lib/raid/xor/arm/xor-neon-glue.c        |   19 
+ b/lib/raid/xor/arm/xor-neon.c             |   22 
+ b/lib/raid/xor/arm/xor.c                  |  105 ----
+ b/lib/raid/xor/arm/xor_arch.h             |   22 
+ b/lib/raid/xor/arm64/xor-neon-glue.c      |   26 +
+ b/lib/raid/xor/arm64/xor-neon.c           |   94 +--
+ b/lib/raid/xor/arm64/xor-neon.h           |    6 
+ b/lib/raid/xor/arm64/xor_arch.h           |   21 
+ b/lib/raid/xor/loongarch/xor_arch.h       |   33 +
+ b/lib/raid/xor/loongarch/xor_simd_glue.c  |   37 +
+ b/lib/raid/xor/powerpc/xor_arch.h         |   22 
+ b/lib/raid/xor/powerpc/xor_vmx.c          |   40 -
+ b/lib/raid/xor/powerpc/xor_vmx.h          |   10 
+ b/lib/raid/xor/powerpc/xor_vmx_glue.c     |   28 +
+ b/lib/raid/xor/riscv/xor-glue.c           |   25 +
+ b/lib/raid/xor/riscv/xor.S                |    4 
+ b/lib/raid/xor/riscv/xor_arch.h           |   17 
+ b/lib/raid/xor/s390/xor.c                 |   15 
+ b/lib/raid/xor/s390/xor_arch.h            |   13 
+ b/lib/raid/xor/sparc/xor-sparc32.c        |   32 -
+ b/lib/raid/xor/sparc/xor-sparc64-glue.c   |   48 -
+ b/lib/raid/xor/sparc/xor-sparc64.S        |   10 
+ b/lib/raid/xor/sparc/xor_arch.h           |   35 +
+ b/lib/raid/xor/tests/Makefile             |    3 
+ b/lib/raid/xor/tests/xor_kunit.c          |  187 +++++++
+ b/lib/raid/xor/um/xor_arch.h              |    2 
+ b/lib/raid/xor/x86/xor-avx.c              |   52 --
+ b/lib/raid/xor/x86/xor-mmx.c              |  120 +---
+ b/lib/raid/xor/x86/xor-sse.c              |  105 +---
+ b/lib/raid/xor/x86/xor_arch.h             |   36 +
+ b/lib/raid/xor/xor-32regs-prefetch.c      |  267 ++++++++++
+ b/lib/raid/xor/xor-32regs.c               |  217 ++++++++
+ b/lib/raid/xor/xor-8regs-prefetch.c       |  146 +++++
+ b/lib/raid/xor/xor-8regs.c                |  103 ++++
+ b/lib/raid/xor/xor-core.c                 |  193 +++++++
+ b/lib/raid/xor/xor_impl.h                 |   56 ++
+ crypto/xor.c                              |  174 -------
+ include/asm-generic/xor.h                 |  738 ------------------------------
+ 73 files changed, 1832 insertions(+), 2067 deletions(-)
