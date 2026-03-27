@@ -1,86 +1,87 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F4A73FE368;
-	Fri, 27 Mar 2026 17:51:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A70238F252;
+	Fri, 27 Mar 2026 19:38:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774633889; cv=none; b=qUl0lhQYiZNPf4q9V0a28Ai4zVAa9NhgutYTk+RV6fNyxGsAb6C8k+tp1FjefCvtn3d+Tx+49GrkMA+4Y5C3CMJ47WInoHobZ6GhoGFtQ8xRmzfyn0hffP5e5aLdr0qotHWpc6akhikA5es/D8cvuWhMvwz0KslzICLa8LGTeBk=
+	t=1774640338; cv=none; b=Pc/0V2MJcYp86VAZNih49b2QFsKOOhm7WKyntHWjWhNH59yB9sTmutPuv9CNOXOOqM9JHKQCNEj6CZLp5/Otknxu6XBm1dAe+HeZRGNg76JpfGPqYOBp79uDeTltLLLQARkE1Pif568eZD6U6XJfMQFQT6L7xHX74oIPIhB3S5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774633889; c=relaxed/simple;
-	bh=ut3C5Oibhu02lZBarl5gtLhPMmjWlwAPsAficDpw9oU=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=L/ypn8uEVlhBbYyTZCWBaskHKV25xUD6CYFd5TOk11oR/L2ElQC3Y3Sm0wn9iFwjl+tynTZgenBF409FCzx8K+sGZSnXcJZIO1fPCm5IhJ7sONKbA5a8f5+a14whZ+pgaUN+boCxHNRvt4BpX4Zrpzifbte1cbmgNV39wWdn3J8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=tDB0MgLH; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774640338; c=relaxed/simple;
+	bh=6m+QQM3HH64vBWB9ttrYHPv7p/YraE7ev05IU3DXyzc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PPYRZsiOs2ZzFCmaNw0+i94LRgsgUNtnW5AbWEgHh6OBblq0KI+CHcsmGVmLAuhSqcaf75/AzEhmCarnD2bA3+q9spw9OnvSU4VsHIsDrwcLTVx9YNhKReUKzz4n8O/nlgyS3JTB7kLg09n3EbIftqFtXtmppnYXpElc/V5jOU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d7chMGXe; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="tDB0MgLH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF370C19423;
-	Fri, 27 Mar 2026 17:51:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-	s=korg; t=1774633889;
-	bh=ut3C5Oibhu02lZBarl5gtLhPMmjWlwAPsAficDpw9oU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tDB0MgLHz5uhVLWEaFReNs99y5u/YY74Iml33dpseoOBD0A8VJRFFQYeU9FvqxCuP
-	 nyqAUmYCNk1T74zARlT1dAb3bA7OmvIjh9mNwh7l1JQENaDWThwxkEsSuzSKK+Qc4+
-	 obJODpvlMAd7z/q0AZNLNKGt9R6dV77UeQmuFqzk=
-Date: Fri, 27 Mar 2026 10:51:27 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Richard Henderson <richard.henderson@linaro.org>, Matt Turner
- <mattst88@gmail.com>, Magnus Lindholm <linmag7@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will
- Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>, Huacai Chen
- <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>, Madhavan
- Srinivasan <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>,
- Nicholas Piggin <npiggin@gmail.com>, "Christophe Leroy (CS GROUP)"
- <chleroy@kernel.org>, Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti
- <alex@ghiti.fr>, Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik
- <gor@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, Christian
- Borntraeger <borntraeger@linux.ibm.com>, Sven Schnelle
- <svens@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, Andreas
- Larsson <andreas@gaisler.com>, Richard Weinberger <richard@nod.at>, Anton
- Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg
- <johannes@sipsolutions.net>, Thomas Gleixner <tglx@kernel.org>, Ingo Molnar
- <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
- <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
- <hpa@zytor.com>, Herbert Xu <herbert@gondor.apana.org.au>, Dan Williams
- <dan.j.williams@intel.com>, Chris Mason <clm@fb.com>, David Sterba
- <dsterba@suse.com>, Arnd Bergmann <arnd@arndb.de>, Song Liu
- <song@kernel.org>, Yu Kuai <yukuai@fnnas.com>, Li Nan
- <linan122@huawei.com>, "Theodore Ts'o" <tytso@mit.edu>,
- "Jason A. Donenfeld" <Jason@zx2c4.com>, linux-alpha@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- loongarch@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
- linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-raid@vger.kernel.org
-Subject: Re: [PATCH 23/28] xor: add a better public API
-Message-Id: <20260327105127.1a1f3895adb14681141a0a30@linux-foundation.org>
-In-Reply-To: <20260327061704.3707577-24-hch@lst.de>
-References: <20260327061704.3707577-1-hch@lst.de>
-	<20260327061704.3707577-24-hch@lst.de>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d7chMGXe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 457F3C2BC86;
+	Fri, 27 Mar 2026 19:38:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774640337;
+	bh=6m+QQM3HH64vBWB9ttrYHPv7p/YraE7ev05IU3DXyzc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=d7chMGXe+3e7WS1rbF6pR+y/vGBrhxSxU3qNZw1UwKPw8/QT6vy8P4a51xnltG0b4
+	 npraO7vFyKbiRssc/Cd2H1zqfgTF9twKPad2qQJewDwAFgeAaZBZeAxem7LtY4XANw
+	 nwIRSi6DQb8HN5aB6yKQS77Q9OEQSg7kcwRQkNaWPsf7FnVMzBmQ/l6wp0RGOk6cLN
+	 d3zzOp3hRVi+7WVhbYJoBosBKfd88Rc7SiKPs3wDA5C7q1tfO4MWgadLpMmokyx/Ba
+	 wv5w7lGgsVi7Q7nWoFjGPdPgm2hZDSrYrnN90eufSib7wlIE0BSTXbq5NmO8XjB+2s
+	 QG7/JKEyK93nA==
+Date: Fri, 27 Mar 2026 12:38:55 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Demian Shulhan <demyansh@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	ardb@kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2] lib/crc: arm64: add NEON accelerated CRC64-NVMe
+ implementation
+Message-ID: <20260327193855.GA25969@quark>
+References: <20260317065425.2684093-1-demyansh@gmail.com>
+ <20260327060211.902077-1-demyansh@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260327060211.902077-1-demyansh@gmail.com>
 
-On Fri, 27 Mar 2026 07:16:55 +0100 Christoph Hellwig <hch@lst.de> wrote:
+[+Cc linux-arm-kernel@lists.infradead.org]
 
-> xor_blocks is very annoying to use, because it is limited to 4 + 1
-> sources / destinations, has an odd argument order and is completely
-> undocumented.
-> 
-> Lift the code that loops around it from btrfs and async_tx/async_xor into
-> common code under the name xor_gen and properly document it.
+Thanks!  This is almost ready.  Just a few more comments:
 
-Something funny here - two different patches with the same title and
-changelog.
+On Fri, Mar 27, 2026 at 06:02:11AM +0000, Demian Shulhan wrote:
+> - Safely falls back to the generic implementation on Big-Endian systems.
 
-If you can send over new versions of title&changelog I can paste that in.
+Drop the above bullet point.  This patch doesn't explicitly exclude big
+endian.  Which is correct: Linux arm64 is little-endian-only now.
+
+> +	/*
+> +	 * Reduce the 128-bit value to 64 bits.
+> +	 * By multiplying the high 64 bits by x^127 mod G (fold_consts_val[1])
+> +	 * and XORing the result with the low 64 bits.
+> +	 */
+
+That is not what this code does.  How about something like:
+
+	/* Multiply the 128-bit value by x^64 and reduce it back to 128 bits. */
+
+Granted, that doesn't do a good job explaining it either.  However, a
+full explanation of this stuff, like the one in the comments in
+lib/crc/x86/crc-pclmul-template.S, would be much longer.
+
+I suggest we leave the full explanation for when a similar template is
+written for arm64.  For now brief comments or even no comments are fine.
+
+Just if any comments are included they really ought to be correct, as
+otherwise they are worse than no comments.
+
+> +			scoped_ksimd() crc = crc64_nvme_arm64_c(crc, p, chunk);
+
+clang-format doesn't know about scoped_ksimd(), so I suggest overriding
+the formatting in this particular case:
+
+	scoped_ksimd()
+		crc = crc64_nvme_arm64_c(crc, p, chunk);
+
+- Eric
