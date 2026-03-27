@@ -1,41 +1,42 @@
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD4A0392C4B;
-	Fri, 27 Mar 2026 20:10:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7294393DE8;
+	Fri, 27 Mar 2026 20:10:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774642255; cv=none; b=BTyn6yiFnuXWHjdak9twhx75mojuEGyew7o2SEIvEB9QhOEVHOSwruS2SH/Iz+HN9xFGr2IGE3KhaLB7Vwfqa1CPFsiNs1MbRF9Abp216NR+NsuHXclufw2lBjkJz+nDwwOSvwGi+2IuDAWptsC2LToPKej1C6xtH81nbH/AiVA=
+	t=1774642257; cv=none; b=n129ZgRdOpKZfyPYaz7+QRhQOBuajaaXxW2d9TxMFCZXZarMTAaHD414yr8i343zTEoges3R9ezmjbdi1KYXTkwB3Kr5vyOYNGhR5IPbXSnoTQ+ot2uuYpAFMSFbusRdrbePvd7KjKP8cNIFDu+NYpCVFGZErASk5OkJ8oLlSzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774642255; c=relaxed/simple;
-	bh=yOafjVFOKW6zrotbALbaw1A8cYq6BLe+Fi3zFv/LbCU=;
+	s=arc-20240116; t=1774642257; c=relaxed/simple;
+	bh=yEqFKL+Bru9EBWmeBMnux2IV5jrF0EdWAnEFW09Zyiw=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=hvTxFQQ3X8nJkM+KvIRHRyGot0vTsDShvLG4MnnymU4bYTyNzXMITTxz+/NYw5xZyz93zZPWOmiu4ogWNM5DMBzYtv5JNY/iMIgP0C0JXyzwFqs094QZryru/iImfS/ZVV8foQWjJFqSu0T6BRGkFwCqgWjPJ2v9EyL5VMz0+zU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=2xAXeYlc; arc=none smtp.client-ip=185.246.84.56
+	 In-Reply-To:To:Cc; b=tMQJP2y3juYXc1d5JowgasGrUwPvwbgn01NKPeGh+YT7UrUmB49888M7pS/PyBE1QKe/NgBMIeeP0GGDljZeQWE4tx9kbXKxdawcaBPiYIFAqu1o2vOEBt9VnvCFBrI2GZSKLX6IORv81siHmZB4C1g0Itisuw3QCBt2SbEN2BM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=1coECAk/; arc=none smtp.client-ip=185.171.202.116
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="2xAXeYlc"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="1coECAk/"
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 637231A3031;
-	Fri, 27 Mar 2026 20:10:51 +0000 (UTC)
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 63E5EC58756;
+	Fri, 27 Mar 2026 20:11:23 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 34E5060268;
-	Fri, 27 Mar 2026 20:10:51 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 6654010451AF7;
-	Fri, 27 Mar 2026 21:10:47 +0100 (CET)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 8EC3860268;
+	Fri, 27 Mar 2026 20:10:54 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A53BC10451AD3;
+	Fri, 27 Mar 2026 21:10:50 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1774642250; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1774642253; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=mBs4tOA5jzY9GXFpfbtVqcNMinyS6IW1J+L41OKuwoU=;
-	b=2xAXeYlccuP9mqpArLBXM11iR8JFplbq7kh9Qa7Y7avKFCJkx6fGejA/+yA+hnFJr4YjKs
-	eB2jR7VbJRbg8GkK0Ie3cKSO24FI4xqffRD7qM0gWLADje7GWpO8tr/d3qTegWH72+V5ma
-	0rlA9CKMgbp3uQNgIzHDUw4tAX4ZvURznu3ztMUPV7S2Lao/4O2wjPaufFj2x5IxU7//rD
-	GQtZJ+eu002u42EX2YMA/6dC+FxlTDMyWk2wW1IcdFMsHHZvCEzuaHDctKZXoysA3Dhx6s
-	yuBE0NZffeYEo1LO/xVY72HPC/FvMXeUJK33kzX5sXFauttv32btQGYhMM/2Qw==
+	bh=G0soYlY6tYSZ/jALE0v3RpWgs8GiSeAJyuFOmZIYGLE=;
+	b=1coECAk/P/7FYMN/IC97+8jU4B0YZIHpCFGPOjegsulHNGGmRvDf+/6GJr+eh6aLYfOJ2z
+	ZpRVgEhzJnK7uBrECyMtEraFIN4ePvoj5t2xwY3DGqojTOFsq94+i1DCygRHyZjVg1iV+W
+	wECCGPdKmCizgiK9GguSpIWzpNQqPo5USURcPNsUCvIFI1HTJ93NbwvWkfIagH+BFB7LV4
+	whjK8U9ATntdB/6AkhhYhDpZ3kqLf9Sr0Kl1sjJvf0yITQXa13YF9aVsGQflfW60Ps4z2D
+	jL+QCFyoYneYcGOdEnC6wic1jYVCVYyRNXPE1Zhk+rJyaHQ9kpfXc5iXEZ133g==
 From: "Miquel Raynal (Schneider Electric)" <miquel.raynal@bootlin.com>
-Date: Fri, 27 Mar 2026 21:09:30 +0100
-Subject: [PATCH 08/16] clk: Improve a couple of comments
+Date: Fri, 27 Mar 2026 21:09:31 +0100
+Subject: [PATCH 09/16] clk: Use the generic OF phandle parsing in only one
+ place
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -44,7 +45,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260327-schneider-v7-0-rc1-crypto-v1-8-5e6ff7853994@bootlin.com>
+Message-Id: <20260327-schneider-v7-0-rc1-crypto-v1-9-5e6ff7853994@bootlin.com>
 References: <20260327-schneider-v7-0-rc1-crypto-v1-0-5e6ff7853994@bootlin.com>
 In-Reply-To: <20260327-schneider-v7-0-rc1-crypto-v1-0-5e6ff7853994@bootlin.com>
 To: Michael Turquette <mturquette@baylibre.com>, 
@@ -68,38 +69,32 @@ Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
 X-Mailer: b4 0.14.3
 X-Last-TLS-Session-Version: TLSv1.3
 
-Avoid mentioning the function names directly in the comments, it makes
-them easily out of sync with the rest of the code. Use a more generic
-wording.
+There should be one single entry in the OF world, so that the way we
+parse the DT is always the same. make sure this is the case by avoid
+calling of_parse_phandle_with_args() from of_clk_get_parent_name(). This
+is even more relevant as we currently fail to parse clock-ranges. As a
+result, it seems to be safer to directly call of_parse_clkspec() there.
 
 Suggested-by: Stephen Boyd <sboyd@kernel.org>
 Signed-off-by: Miquel Raynal (Schneider Electric) <miquel.raynal@bootlin.com>
 ---
- drivers/clk/clk.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/clk/clk.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/drivers/clk/clk.c b/drivers/clk/clk.c
-index 1795246b10a0..591c0780b61e 100644
+index 591c0780b61e..93e33ff30f3a 100644
 --- a/drivers/clk/clk.c
 +++ b/drivers/clk/clk.c
-@@ -5213,7 +5213,7 @@ static int of_parse_clkspec(const struct device_node *np, int index,
- 		/*
- 		 * For named clocks, first look up the name in the
- 		 * "clock-names" property.  If it cannot be found, then index
--		 * will be an error code and of_parse_phandle_with_args() will
-+		 * will be an error code and the OF phandle parser will
- 		 * return -EINVAL.
- 		 */
- 		if (name)
-@@ -5286,7 +5286,7 @@ of_clk_get_hw_from_clkspec(struct of_phandle_args *clkspec)
-  *
-  * This function looks up a struct clk from the registered list of clock
-  * providers, an input is a clock specifier data structure as returned
-- * from the of_parse_phandle_with_args() function call.
-+ * from the OF phandle parser.
-  */
- struct clk *of_clk_get_from_provider(struct of_phandle_args *clkspec)
- {
+@@ -5375,8 +5375,7 @@ const char *of_clk_get_parent_name(const struct device_node *np, int index)
+ 	int count;
+ 	struct clk *clk;
+ 
+-	rc = of_parse_phandle_with_args(np, "clocks", "#clock-cells", index,
+-					&clkspec);
++	rc = of_parse_clkspec(np, index, NULL, &clkspec);
+ 	if (rc)
+ 		return NULL;
+ 
 
 -- 
 2.51.1
