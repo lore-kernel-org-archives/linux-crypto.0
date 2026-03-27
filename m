@@ -1,63 +1,64 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B40AD346E44
-	for <linux-crypto@vger.kernel.org>; Fri, 27 Mar 2026 16:16:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD337347530;
+	Fri, 27 Mar 2026 16:17:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774628208; cv=none; b=htwc2j43HfM/mWjTZtkLjIiEPKdrXqwS+WzVreAevCLbDWuSCWR211XWMo8BKW0aZVmQdEJSE1XR0wV+e0uKPlsgh1+OqniO4F9hXIvbLdcj97YJKnm7zyYaIdp5K3EX7btwvAE0J5Yso9ZS3Y1PV91GFf9BhIZbvNr5wCdf6wo=
+	t=1774628238; cv=none; b=YTkIBP6yhpAQRl/uzWhGcab3aeZqpRQFEB4OrBCt4RGJC4WsmtNytroJ05Ec2waGrS93EkmJ8/761hr/18sr/4BuGRkZtGyvTrrqH3GgjbVTh4gmVI6jyiOgQN0XhFE+E0zpIqJAXNtn7/Vf7LriHM2tDoYFS+tX312gid6o5AU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774628208; c=relaxed/simple;
-	bh=p2wleutj7gYEYfqp8wsNQmb3yrUSIIBHZbHzlnxTN5A=;
+	s=arc-20240116; t=1774628238; c=relaxed/simple;
+	bh=BKJFY2NIxudZsPuHzaM9oRP1BXkSuTngg+X2PglP7zs=;
 	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=O8wjGoSE6PZ75mI4SbpsCiehmCVS9/bkPylwcRI4f1gfOLSWeiDB2q6wvsIW2qDEj3pkNVoY2AK/JhsDh9DBwvhjEEW8So+vEg9vEojAd7Aiip7SBkG+4b9syeAgSdpotD455xp2FPXM9AHrGYY+dFn2uiEfcsPE1cve4hX0YFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oV5jcNu7; arc=none smtp.client-ip=10.30.226.201
+	 Subject:Content-Type; b=Udfj8YIyuJ98Y53cLPr9vabGStFimJ1p7bEVKDE46IwaZL3va+RqmgIEIDa8LraVGFHl+JqeUGKt+P7TA6cC6sBuRUievvIuSk5k9w1tWjDSkLVlSB7HPD1UW8iQcuDuh9d9QzY/UUSWe8mCvxdIxjKinqgU5bVn6gPGqmtPbSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ta4/5kO6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oV5jcNu7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A074C2BC87;
-	Fri, 27 Mar 2026 16:16:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ta4/5kO6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CE87C2BC87;
+	Fri, 27 Mar 2026 16:17:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774628208;
-	bh=p2wleutj7gYEYfqp8wsNQmb3yrUSIIBHZbHzlnxTN5A=;
+	s=k20201202; t=1774628238;
+	bh=BKJFY2NIxudZsPuHzaM9oRP1BXkSuTngg+X2PglP7zs=;
 	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=oV5jcNu7B3nZNgmXLr3Vc7aVLmTnX8EUEnEy1cIyNM6XhHUi8fRRdNVdBPFEXXODl
-	 CtU0DLSdwLJ6JPGhQHZ3rjI82dQDnUJwnS5MbiMGLZOkcYE/des8/sIa/hOq+yozma
-	 WSveCldB6ufdCm1BOMwzavc+NYfh/fgGWwBCbHglW4KIIlQfCp4gc8T4N/iGphYVAv
-	 JPmDvq5wKSJTgBk0VbEREN3Rzi67eMqNigYVwOzOdpyUiyoa9fTCwRlmn8rECmhyuX
-	 RgQHBR4na15gW12P6DEou8Nx7Qnp/jLhi0kFnhO1xcxs3XVBEfn/oCRT6bxuik3/+a
-	 4LPXhN5wQjvOg==
+	b=ta4/5kO6i/NoZ7jADBQwO1eVl+FIre1hh0h3wpQHkxv7xYyFLKwxgZtjEZf1OWzIn
+	 YmzwATeKQVgyqqRz3FpOuZBxp7rnkYLuxauGXJC3zhTGT7TWXc2/5NKIdMN8PUYamM
+	 o/9YrOkXgCmQljqeQv4MX/DVcEXvO+fPIeVKr6aegHULbZhFZseK5e440w53chOKUS
+	 cGJfdYnQht6rlYChproMSvVkL0x1/XeeX6Rpqcsje8E0s13CCLdxx+1gK50R5DXok7
+	 slpUplsCZvVBRquI4qaJVKo6foLIrLD01y+8/3h9OZxMVM2S3PD5SRA+l3fgzSsM0x
+	 RTu4VbknguuFg==
 Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 265E6F4007D;
-	Fri, 27 Mar 2026 12:16:47 -0400 (EDT)
+	by mailfauth.phl.internal (Postfix) with ESMTP id 639E3F4007F;
+	Fri, 27 Mar 2026 12:17:17 -0400 (EDT)
 Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-01.internal (MEProxy); Fri, 27 Mar 2026 12:16:47 -0400
-X-ME-Sender: <xms:b63GaSRXrszDK3bDzO9S3kKeO1327y6mb_aYjedxXhy5OFBbXs5Tpw>
-    <xme:b63GaSlGRDGOMG9SDQW1ZOuIk5P6v_4FY3Hw-y8qmp27bDvlScQpD4QUh6VgY1njz
-    JjA0NHPrHzp_CznsRnMIscFgf8RohRK2Wu7oqzqIw6fy0NlJSPvjes>
+  by phl-compute-01.internal (MEProxy); Fri, 27 Mar 2026 12:17:17 -0400
+X-ME-Sender: <xms:ja3GaR2ZnKms9mzEpICKhnwmpuiK3DQwLPKIwyZsR4-V5XZI8Z2Dng>
+    <xme:ja3GaS4TiBH1x0Yunyb9YQb4ifOLPAAIyswY_sRDKj0WC9Fdaj-G2xS6qAH-HRPrG
+    Aoh02IP2t1mW-OOUfWBJBsr8d-_uHC4VyaRXGzdy4DnRBqOgMp4R-o>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeffedtjeegucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
     rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
     gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrugcu
     uehivghshhgvuhhvvghlfdcuoegrrhgusgeskhgvrhhnvghlrdhorhhgqeenucggtffrrg
-    htthgvrhhnpedvueehiedtvedtleekuddutefgffdtleetfeetveejveejieehfefhjeei
-    jeefudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    grrhguodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduieejtdehtddtjeel
-    qdeffedvudeigeduhedqrghruggspeepkhgvrhhnvghlrdhorhhgseifohhrkhhofhgrrh
-    gurdgtohhmpdhnsggprhgtphhtthhopeejpdhmohguvgepshhmthhpohhuthdprhgtphht
-    thhopehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdrohhrghdrrghupdhrtghpth
-    htohepvggsihhgghgvrhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehthihtshho
-    sehmihhtrdgvughupdhrtghpthhtoheplhhinhhugidqtghrhihpthhosehvghgvrhdrkh
-    gvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdr
-    khgvrhhnvghlrdhorhhgpdhrtghpthhtohepshhtrggslhgvsehvghgvrhdrkhgvrhhnvg
-    hlrdhorhhgpdhrtghpthhtohepjhgrshhonhesiiigvdgtgedrtghomh
-X-ME-Proxy: <xmx:b63GadRIBGDKkWIN2_sNHX1maNujxNbIqePdwMAaQ7QJ90N96bSZQw>
-    <xmx:b63GaSx4aZf3P_-qr42msW8cSjti93XvTS15PWyF0qz0I73yy5VIwg>
-    <xmx:b63GaVADM63lSwYTvgPmHqzMiJoY--t8BVtDM39WmcpYBx_GpgnTIw>
-    <xmx:b63GaWEpJjQCV0LUYL-yn8HsoMqF8W11FU0X2BNUlDZoUBPWAbB0Zw>
-    <xmx:b63GaUOZ9keqjeQZKesXMaq5ALXUMKH-Ht6nNkv_4Ue1ooWQPHL5_Th6>
+    htthgvrhhnpeekvdffkefhgfegveekfedtieffhfelgeetiedvieffhfekfeeikeetueeg
+    teetteenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivg
+    eptdenucfrrghrrghmpehmrghilhhfrhhomheprghrugdomhgvshhmthhprghuthhhphgv
+    rhhsohhnrghlihhthidqudeijedthedttdejledqfeefvdduieegudehqdgrrhgusgeppe
+    hkvghrnhgvlhdrohhrghesfihorhhkohhfrghrugdrtghomhdpnhgspghrtghpthhtohep
+    jedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepthhssghoghgvnhgusegrlhhphh
+    grrdhfrhgrnhhkvghnrdguvgdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdr
+    rghprghnrgdrohhrghdrrghupdhrtghpthhtohepvggsihhgghgvrhhssehkvghrnhgvlh
+    drohhrghdprhgtphhtthhopehlihhnuhigqdgtrhihphhtohesvhhgvghrrdhkvghrnhgv
+    lhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnh
+    gvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhmihhpshesvhhgvghrrdhkvghrnhgv
+    lhdrohhrghdprhgtphhtthhopehjrghsohhnseiigidvtgegrdgtohhm
+X-ME-Proxy: <xmx:ja3GaSmEaoF7GOySYIoRDIbYRksB5hdSAWFizXRGPzGEGguoXhTbZw>
+    <xmx:ja3Gacb7lmOfkVDThy6x-4aj-0_p0fA5pvcnGtT6O-VDMuo8p2WLug>
+    <xmx:ja3GaUTsImO6Keb3OW39MqVZogk0lmfsL0H8JUjqwkY7SSkt37BmIg>
+    <xmx:ja3GaWtmYGozyZghlvoKBKSS_IxXqfAjdkPtctY5fdsglcHwwmpAvQ>
+    <xmx:ja3GaWHtM51ifQOiy6bDSpuIoNtENT3YAZfx8KYzG1zHaFGaffygST3V>
 Feedback-ID: ice86485a:Fastmail
 Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id F3E7F700069; Fri, 27 Mar 2026 12:16:46 -0400 (EDT)
+	id 432DD700065; Fri, 27 Mar 2026 12:17:17 -0400 (EDT)
 X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -65,44 +66,45 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: A6qQJ9sHejL-
-Date: Fri, 27 Mar 2026 17:16:26 +0100
+X-ThreadId: AgNmpo8XctVF
+Date: Fri, 27 Mar 2026 17:16:57 +0100
 From: "Ard Biesheuvel" <ardb@kernel.org>
 To: "Eric Biggers" <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, "Jason A . Donenfeld" <Jason@zx2c4.com>,
- "Herbert Xu" <herbert@gondor.apana.org.au>, "Theodore Ts'o" <tytso@mit.edu>,
- stable@vger.kernel.org
-Message-Id: <dd050a2d-a7fb-41db-9c03-c5e601c752cc@app.fastmail.com>
-In-Reply-To: <20260326032920.39408-1-ebiggers@kernel.org>
-References: <20260326032920.39408-1-ebiggers@kernel.org>
-Subject: Re: [PATCH] lib/crypto: chacha - Zeroize permuted_state before it leaves scope
+ "Herbert Xu" <herbert@gondor.apana.org.au>, linux-mips@vger.kernel.org,
+ "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>
+Message-Id: <62b754e9-b619-46a0-8646-aafaf7a6fa73@app.fastmail.com>
+In-Reply-To: <20260326204824.62010-1-ebiggers@kernel.org>
+References: <20260326204824.62010-1-ebiggers@kernel.org>
+Subject: Re: [PATCH] lib/crypto: mips: Drop optimized MD5 code
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
 
 
-On Thu, 26 Mar 2026, at 04:29, Eric Biggers wrote:
-> Since the ChaCha permutation is invertible, the local variable
-> 'permuted_state' is sufficient to compute the original 'state', and thus
-> the key, even after the permutation has been done.
+On Thu, 26 Mar 2026, at 21:48, Eric Biggers wrote:
+> MD5 is obsolete.  Continuing to maintain architecture-optimized
+> implementations of MD5 is unnecessary and risky.  It diverts resources
+> from the modern algorithms that are actually important.
 >
-> While the kernel is quite inconsistent about zeroizing secrets on the
-> stack (and some prominent userspace crypto libraries don't bother at all
-> since it's not guaranteed to work anyway), the kernel does try to do it
-> as a best practice, especially in cases involving the RNG.
+> While there was demand for continuing to maintain the PowerPC optimized
+> MD5 code to accommodate userspace programs that are misusing AF_ALG
+> (https://lore.kernel.org/linux-crypto/c4191597-341d-4fd7-bc3d-13daf7666c41@csgroup.eu/),
+> no such demand has been seen for the MIPS Cavium Octeon optimized MD5
+> code.  Note that this code runs on only one particular line of SoCs.
 >
-> Thus, explicitly zeroize 'permuted_state' before it goes out of scope.
+> Thus, let's drop it and focus effort on the more modern SHA algorithms,
+> which already have optimized code for the same SoCs.
 >
-> Fixes: c08d0e647305 ("crypto: chacha20 - Add a generic ChaCha20 stream 
-> cipher implementation")
-> Cc: stable@vger.kernel.org
 > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 > ---
 >
-> This patch is targeting libcrypto-fixes
+> This patch is targeting libcrypto-next
 >
->  lib/crypto/chacha-block-generic.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>  lib/crypto/Kconfig    |  1 -
+>  lib/crypto/mips/md5.h | 65 -------------------------------------------
+>  2 files changed, 66 deletions(-)
+>  delete mode 100644 lib/crypto/mips/md5.h
 >
 
 Acked-by: Ard Biesheuvel <ardb@kernel.org>
