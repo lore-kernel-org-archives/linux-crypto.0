@@ -1,56 +1,60 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 473B623741
-	for <linux-crypto@vger.kernel.org>; Sat, 28 Mar 2026 22:34:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97F211A8F97
+	for <linux-crypto@vger.kernel.org>; Sat, 28 Mar 2026 22:35:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774737301; cv=none; b=flpuFBoGzoaA6Na9LIpSLxEy5WToK9W9R3tdi2j2iv6gdDODAaBGTqg9JSGDBLCwamH3bNRD+7LFNsZy+ld1T/N+LmGPDn9xJmJ1KkMr1huN/7YCNx5O1FyMrcZ8EscfSmzzSIlWzfJwKecnuni9T9ERnoQpdvzlB8v7n+sdY0w=
+	t=1774737302; cv=none; b=uK1VO6W6jeF7uQ/tkUDyrugNBYRlzp9UKT17TbCZIw3IJl2YuUg6+4RUPc5LzPnRNSbbnwc1YOnhOB0Lbmoe42FM+R7z4qFIDb+FejPjv3kJ8L6r+tiewnWqcjy2js8q3RV/AgGm5TLg2g2a75h7HnjIl2Qg1wKing0W/k00dCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774737301; c=relaxed/simple;
-	bh=5Hg1iZN3fp9eX9wKeHe0mI/PRsfoP0/EAtDJjldBaU0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PVbyZ7dyjFtoI5HKHqwKZFsbuHhCzPY/qnfQ05bL72cXdcrV52xuICA05f3FOW1toIdSxJxFee8bhgdmbczoMbs/tQAxV3SYHZIL7myBQdHjg9idKFFV7rKcyj9YPTld8SqidP+2pjf72Df2SgtkIEYuFT1Z+eKJ1cnvxvO28Rc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VbZ7ydm0; arc=none smtp.client-ip=192.198.163.13
+	s=arc-20240116; t=1774737302; c=relaxed/simple;
+	bh=FRBRzyvLEVHzqIkisrCMLmVBLazrYr8o9WpySEGMbgQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=snqsH6Q2PuiHwWmsFBnm0aIXp3AlacTsBh2CpZuk5MLW2RSLxTIQ8fswL/06zHTegJiB5j2gtFOKWsYX/VV4HJ1kPNmgH37gW82yKJ52EMzPZQ55HvskF5CLGmAIFzxiYCqTbM4becv7u5ONpR7GAh2A+mI958moK6hwZWLPVbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Fkadz8rK; arc=none smtp.client-ip=192.198.163.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VbZ7ydm0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Fkadz8rK"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774737299; x=1806273299;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=5Hg1iZN3fp9eX9wKeHe0mI/PRsfoP0/EAtDJjldBaU0=;
-  b=VbZ7ydm0JZMRlv9c7ldumYiwAF3bP+G/zHMTQD94wCmCLfd33V/0AQyf
-   krSuLD21kX4HQKeBVucq2XEydNEnrqKM7VJy5X6VaXfOXtd/oVDuw2IRa
-   fLjZHSuteH+DRIRHY8F/r6xvH5IVJrh9u98DzRGKYLKC6xHjRNZsCfkrB
-   zlmJ7CCqj1kvtlhqLxniTMmJPq8vBhE9a2z2H6fOgp+CkWVPkvC8pL5P5
-   0sOqAllzCOB8AGZfLsrWKZmnN3aYRXGy6ICYmBYSKCyRp8KI+uus/DOB9
-   IXMUGiGBotPfuKTJYcR2lLp+Mb21cJK12kCIXfScfwuwF77SUKL0FimJN
+  t=1774737301; x=1806273301;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=FRBRzyvLEVHzqIkisrCMLmVBLazrYr8o9WpySEGMbgQ=;
+  b=Fkadz8rKb5sF2xIs9RwbSZXWruNDzDgUeSYRy9k4qMoZnNKvf8h8iIPQ
+   17N5mxRUjyXjng4Snujhg4Vq7beqB0Qd4mBvNjv1u/nf2km5xsnkSTpWG
+   y2YDsuBLPm6fiQqRFYYQm/5/fZ0i+9JP4/2weOv/axINPeyUEYynrJDKz
+   eo5p1eYQmLax2s9ByLk7b0ebexH8i8UxEsq3eYIjRBjKyMeVTp/OmwOd2
+   nPRv1j00z8snFv/QHz1Xa0XToH3PH+PgecTB1JzFxQ40ClO5GxllkMv3u
+   0kfzsvEqyJc4/1oMupAH+00MKyTpjIDhEsRbkQ/DvsEUjDFPmbrugLq4P
    w==;
-X-CSE-ConnectionGUID: 4r8PGI9JShaWKufvA4nruw==
-X-CSE-MsgGUID: Z8NjrojBREu+tdGpK2ydiQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11742"; a="78372913"
+X-CSE-ConnectionGUID: qbtRWEuIQvS5ucxNrUKbIA==
+X-CSE-MsgGUID: sZPIrgYNTHSkEO6JkjWeWQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11742"; a="78372915"
 X-IronPort-AV: E=Sophos;i="6.23,146,1770624000"; 
-   d="scan'208";a="78372913"
+   d="scan'208";a="78372915"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2026 15:34:59 -0700
-X-CSE-ConnectionGUID: cJMezhCmSpyMEtmMiTJD0Q==
-X-CSE-MsgGUID: Pm+pWXCLQyCkJPkx2Vd+YA==
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2026 15:35:00 -0700
+X-CSE-ConnectionGUID: tSSYfQu1QaaPnys0z7Dybw==
+X-CSE-MsgGUID: kOzH4+Q8RR2g6vtE0zW9iw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,146,1770624000"; 
-   d="scan'208";a="222339205"
+   d="scan'208";a="222339224"
 Received: from silpixa00401971.ir.intel.com ([10.20.226.106])
-  by fmviesa007.fm.intel.com with ESMTP; 28 Mar 2026 15:34:57 -0700
+  by fmviesa007.fm.intel.com with ESMTP; 28 Mar 2026 15:34:58 -0700
 From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 To: herbert@gondor.apana.org.au
 Cc: linux-crypto@vger.kernel.org,
 	qat-linux@intel.com,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH v2 0/2] crypto: qat - add support for zstd
-Date: Sat, 28 Mar 2026 22:29:45 +0000
-Message-ID: <20260328223445.39445-1-giovanni.cabiddu@intel.com>
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	kernel test robot <lkp@intel.com>
+Subject: [PATCH v2 1/2] crypto: qat - use swab32 macro
+Date: Sat, 28 Mar 2026 22:29:46 +0000
+Message-ID: <20260328223445.39445-2-giovanni.cabiddu@intel.com>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260328223445.39445-1-giovanni.cabiddu@intel.com>
+References: <20260328223445.39445-1-giovanni.cabiddu@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -60,65 +64,74 @@ MIME-Version: 1.0
 Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Content-Transfer-Encoding: 8bit
 
-The Intel QuickAssist Technology (QAT) driver currently supports deflate
-compression via the acomp API, but lacks support for the ZSTD algorithm.
+Replace __builtin_bswap32() with swab32 in icp_qat_hw_20_comp.h to fix
+the following build errors on architectures without native byte-swap
+support:
 
-This series adds ZSTD compression support for QAT GEN4, QAT GEN5 and QAT
-GEN6 devices.
+   alpha-linux-ld: drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.o: in function `adf_gen4_build_decomp_block':
+   drivers/crypto/intel/qat/qat_common/icp_qat_hw_20_comp.h:141:(.text+0xeec): undefined reference to `__bswapsi2'
+   alpha-linux-ld: drivers/crypto/intel/qat/qat_common/icp_qat_hw_20_comp.h:141:(.text+0xef8): undefined reference to `__bswapsi2'
+   alpha-linux-ld: drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.o: in function `adf_gen4_build_comp_block':
+   drivers/crypto/intel/qat/qat_common/icp_qat_hw_20_comp.h:57:(.text+0xf64): undefined reference to `__bswapsi2'
+   alpha-linux-ld: drivers/crypto/intel/qat/qat_common/icp_qat_hw_20_comp.h:57:(.text+0xf7c): undefined reference to `__bswapsi2'
 
-On GEN4 and GEN5, hardware compresses data using LZ4s (a QAT-specific
-variant of LZ4). The LZ4s output is then parsed and passed to the kernel
-zstd library via zstd_compress_sequences_and_literals() to produce a
-standard ZSTD stream. The post-processing step uses per-CPU scratch
-buffers managed via the acomp stream infrastructure.
+Fixes: 5b14b2b307e4 ("crypto: qat - enable deflate for QAT GEN4")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202603290259.Ig9kDOmI-lkp@intel.com/
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+---
+ .../crypto/intel/qat/qat_common/icp_qat_hw_20_comp.h   | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-On GEN6, both compression and decompression are natively offloaded to
-the accelerator. Decompression of frames with a history window exceeding
-the 64 KB hardware limit falls back to software.
-
-A filtering mechanism is also introduced to prevent GEN2 plug-in cards,
-which do not support ZSTD or LZ4s, from being selected for these
-algorithms when a GEN4, GEN5 or GEN6 embedded device is also present on
-the system.
-
-In summary:
-- Patch #1 fixes a build error on architectures without a native
-  byte-swap instruction
-- Patch #2 exposes the ZSTD algorithm through the acomp API for QAT
-  GEN4, GEN5 and GEN6 accelerators
-
-Changes since v1:
-- Add a patch to fix a build error on architectures without a native
-  byte-swap instruction
-
-Giovanni Cabiddu (2):
-  crypto: qat - use swab32 macro
-  crypto: qat - add support for zstd
-
- drivers/crypto/intel/qat/Kconfig              |   1 +
- .../intel/qat/qat_420xx/adf_420xx_hw_data.c   |   1 +
- .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     |   1 +
- .../intel/qat/qat_6xxx/adf_6xxx_hw_data.c     |  17 +
- drivers/crypto/intel/qat/qat_common/Makefile  |   1 +
- .../intel/qat/qat_common/adf_accel_devices.h  |   6 +
- .../intel/qat/qat_common/adf_common_drv.h     |   6 +-
- .../intel/qat/qat_common/adf_gen4_hw_data.c   |  18 +-
- .../crypto/intel/qat/qat_common/adf_init.c    |   6 +-
- .../crypto/intel/qat/qat_common/icp_qat_fw.h  |   7 +
- .../intel/qat/qat_common/icp_qat_fw_comp.h    |   2 +
- .../crypto/intel/qat/qat_common/icp_qat_hw.h  |   3 +-
- .../intel/qat/qat_common/icp_qat_hw_20_comp.h |  10 +-
- .../intel/qat/qat_common/qat_comp_algs.c      | 524 +++++++++++++++++-
- .../intel/qat/qat_common/qat_comp_req.h       |   9 +
- .../qat/qat_common/qat_comp_zstd_utils.c      | 165 ++++++
- .../qat/qat_common/qat_comp_zstd_utils.h      |  13 +
- .../intel/qat/qat_common/qat_compression.c    |  23 +-
- 18 files changed, 779 insertions(+), 34 deletions(-)
- create mode 100644 drivers/crypto/intel/qat/qat_common/qat_comp_zstd_utils.c
- create mode 100644 drivers/crypto/intel/qat/qat_common/qat_comp_zstd_utils.h
-
-
-base-commit: 93e03a16c015b8e55e2ec97865f67d9bf1ec1921
+diff --git a/drivers/crypto/intel/qat/qat_common/icp_qat_hw_20_comp.h b/drivers/crypto/intel/qat/qat_common/icp_qat_hw_20_comp.h
+index 7ea8962272f2..d28732225c9e 100644
+--- a/drivers/crypto/intel/qat/qat_common/icp_qat_hw_20_comp.h
++++ b/drivers/crypto/intel/qat/qat_common/icp_qat_hw_20_comp.h
+@@ -3,6 +3,8 @@
+ #ifndef _ICP_QAT_HW_20_COMP_H_
+ #define _ICP_QAT_HW_20_COMP_H_
+ 
++#include <linux/swab.h>
++
+ #include "icp_qat_hw_20_comp_defs.h"
+ #include "icp_qat_fw.h"
+ 
+@@ -54,7 +56,7 @@ ICP_QAT_FW_COMP_20_BUILD_CONFIG_LOWER(struct icp_qat_hw_comp_20_config_csr_lower
+ 	QAT_FIELD_SET(val32, csr.abd, ICP_QAT_HW_COMP_20_CONFIG_CSR_ABD_BITPOS,
+ 		      ICP_QAT_HW_COMP_20_CONFIG_CSR_ABD_MASK);
+ 
+-	return __builtin_bswap32(val32);
++	return swab32(val32);
+ }
+ 
+ struct icp_qat_hw_comp_20_config_csr_upper {
+@@ -106,7 +108,7 @@ ICP_QAT_FW_COMP_20_BUILD_CONFIG_UPPER(struct icp_qat_hw_comp_20_config_csr_upper
+ 		      ICP_QAT_HW_COMP_20_CONFIG_CSR_NICE_PARAM_BITPOS,
+ 		      ICP_QAT_HW_COMP_20_CONFIG_CSR_NICE_PARAM_MASK);
+ 
+-	return __builtin_bswap32(val32);
++	return swab32(val32);
+ }
+ 
+ struct icp_qat_hw_decomp_20_config_csr_lower {
+@@ -138,7 +140,7 @@ ICP_QAT_FW_DECOMP_20_BUILD_CONFIG_LOWER(struct icp_qat_hw_decomp_20_config_csr_l
+ 		      ICP_QAT_HW_DECOMP_20_CONFIG_CSR_LZ4_BLOCK_CHECKSUM_PRESENT_BITPOS,
+ 		      ICP_QAT_HW_DECOMP_20_CONFIG_CSR_LZ4_BLOCK_CHECKSUM_PRESENT_MASK);
+ 
+-	return __builtin_bswap32(val32);
++	return swab32(val32);
+ }
+ 
+ struct icp_qat_hw_decomp_20_config_csr_upper {
+@@ -158,7 +160,7 @@ ICP_QAT_FW_DECOMP_20_BUILD_CONFIG_UPPER(struct icp_qat_hw_decomp_20_config_csr_u
+ 		      ICP_QAT_HW_DECOMP_20_CONFIG_CSR_MINI_CAM_CONTROL_BITPOS,
+ 		      ICP_QAT_HW_DECOMP_20_CONFIG_CSR_MINI_CAM_CONTROL_MASK);
+ 
+-	return __builtin_bswap32(val32);
++	return swab32(val32);
+ }
+ 
+ #endif
 -- 
 2.53.0
 
