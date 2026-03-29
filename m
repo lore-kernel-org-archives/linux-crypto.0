@@ -1,127 +1,125 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8459E1D5170;
-	Sun, 29 Mar 2026 21:31:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7576742AB7
+	for <linux-crypto@vger.kernel.org>; Sun, 29 Mar 2026 21:57:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774819885; cv=none; b=oenbhVjMfUjDs9Qyaj4/n5FMrt+clwZYq1hUP97YTDeT+WLlFQSTnlOQoXzW0tSzOyZ1Nd7CBkBCx0SZFyZ6h6upr2H2uni1u6eMdZid7ybJfDO1NWLA/ZjEf6F6Giyog3QEo8+iw+kgGegGPYFiZs/ndLB4b6BZMQ48HTsMvX0=
+	t=1774821428; cv=none; b=MO5enKhi9Oi9ICVhX5lWSzTb9gKmmC+QJ4IJCLaCJYQhXV7nojOo5oEAkVe/NyzISc3RF+ZlywwZP9nFpROtU7SShXinoG4VOd0cUn9VktyI/VmqDpwAP68UyvyqX22Vef1+/Xcpq2QR20zEuy6GXkRTGohsGt1xzHjRfKI3Png=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774819885; c=relaxed/simple;
-	bh=PZ1wpSjnIe92PCeQuI7dS0b860us4G2UnkohZEsZsEU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CP5t2LKYrtn3ig9fIkY/Wm0lsvEmcBuWfiS0guX3WStantniwAhchIWzRGeYydHohqTB1/HlKEZt6kAIT5eWoqBoGVpxsEbPt5KZ7BOjZ8CWdEpKDnHaEbfzx/iermB1KxuLCOnrSLLNJxR0gRmqoYgmlWZvtSByotSEt0Pu30E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ULb4+Wxd; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774821428; c=relaxed/simple;
+	bh=WnfU5UGN+TVTG1dIBUcOpKv+B6jRulWifk7HcxeXPHQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=X1uxGAgXjLDimMdShOy2UToMQJqTn+l3wBFfFmdRLSRSPwPQp5ry85fmXmVBScQP0EUgMp+/4gggDSuwO4ux0Bndv4Yb8LFII0U5SSjsOJ5cP7ArOyi7WlEDwyJ2GOE74cWRCLL5woaMBEHhKF60nSkFy94E7tKsgKZzGenSS04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lmp5AdmJ; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ULb4+Wxd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2530AC116C6;
-	Sun, 29 Mar 2026 21:31:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774819885;
-	bh=PZ1wpSjnIe92PCeQuI7dS0b860us4G2UnkohZEsZsEU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ULb4+WxdcWS0LYY9+V+ZhbQ2W3+gIjbkOcw58cK44Qjr9h22rlhdWgqrzvN7R6PFm
-	 JREZi4dijq69Gaojf+s0flL7jtbEMPdMc1H9xiVEXRPZGXJ+mlST60uJB7ykogcxSg
-	 kmfGm8RBCtS/7B0rt59NZvGOlgpFTgi1GJtUu13b3N8GxcTN5UmObfYBhRebgAbOcw
-	 s6hlqjkrksTerC1XE20F/dvAdRtaJ9guJhs99OCpaYdx7JLVTyioUmYJlr1WpZMw7X
-	 u3sIge99HyZ1zxhIvJaxFTUekKZ6rH63KCJunK++uOHXMhMrLVzR5ifEDLGHmrI7Dj
-	 yDWAS2zzXgozA==
-Date: Sun, 29 Mar 2026 14:31:19 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Matt Turner <mattst88@gmail.com>,
-	Magnus Lindholm <linmag7@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andreas Larsson <andreas@gaisler.com>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Dan Williams <dan.j.williams@intel.com>, Chris Mason <clm@fb.com>,
-	David Sterba <dsterba@suse.com>, Arnd Bergmann <arnd@arndb.de>,
-	Song Liu <song@kernel.org>, Yu Kuai <yukuai@fnnas.com>,
-	Li Nan <linan122@huawei.com>, Theodore Ts'o <tytso@mit.edu>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>, linux-alpha@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	loongarch@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
-	linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-raid@vger.kernel.org
-Subject: Re: cleanup the RAID5 XOR library v4
-Message-ID: <20260329213119.GA2106@quark>
-References: <20260327061704.3707577-1-hch@lst.de>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lmp5AdmJ"
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-43b7481f9d3so2066283f8f.3
+        for <linux-crypto@vger.kernel.org>; Sun, 29 Mar 2026 14:57:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774821426; x=1775426226; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/PPpHwpK+XhWFnGV+Za6xJpLzu8J3tufoqK8mJt5f1M=;
+        b=lmp5AdmJR9l8tPsZTiuNS6f3uQKdC9KB9eYIlgzkwuix9rYyqhIGpClT9zUP/IhZFO
+         DrVUagNIT09oIP4a8TIvGf/8vl0dHhbTBM4EPQSqdrIu5Brm2AfQ2TG/Vex8s24AOQiT
+         XCmCYzF/G0HR0Q7xmrEf6oIXWsLlcks9Y3sxL/XFNL+/zkhBnIbHDoOk/NhxE68zFoST
+         iDxVk2eB1nIfLHLI3OkrzWsTsXWznz8NKnVJNcq8DxJkpfQSl7xesBecRpSw83tXpSz/
+         gWZhDv1cjFF0UqLv+ybSoMSM8+AGzrlVvsZ6xyn7z/EVsL+iLbHcNyQNtabWcOfG7GIm
+         eTXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774821426; x=1775426226;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=/PPpHwpK+XhWFnGV+Za6xJpLzu8J3tufoqK8mJt5f1M=;
+        b=JViAw0TBnURfcvAMk9ymloPpvWgVOTT/Xfo/oI47ZOsC2C3njBCJ5I+bkN4LfkIyQ9
+         SD5B3L9Ma87IFfcVPQPoXq2H7le3U0Pbughj3803ouJ9R90AY7GZQBSYav9Po99grKRK
+         15RLCQWUj4Qv+s+nN8EjaEoWpgUj2/QBVMnJ8XVMda7mwUspGLFQWZdSt+PPiq9/Y15n
+         woJNbLd8++V8ER6tdCBaPu58hMt/0aru20Ar9obNRJ2LOj5G5dwQp0wFPKCgdYJ9WEcT
+         exhRtXvVNP86lvjphqu2XDo3VUkQEpIGvOJoJagX+L0qopdBe2BbdmDTBcKPgH7rUgtH
+         xWXA==
+X-Forwarded-Encrypted: i=1; AJvYcCXRevxZ6V/icwUgVE7SsxR5TVvCe8A+/XXln8g98K/ine0W7Z/6CaU59jPRD7jSMv1b2dvc+cHeLEoPrv0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLdpj/hLGpX8cGY/nhmQVBLv2DeY/vce4LWze6+ThamEKQ8UNr
+	doIxYPI/9hVCizy08gdHRFqefiKw+79bnO4nVnVd1XnfwqcbpQ0tNjm+
+X-Gm-Gg: ATEYQzxHsgODYMjyKLD7g657FgbJWZ1KkhDli2Zy5bIjP8ElsLkhthRQHwAhV+uQFFr
+	L6RtP9Ecs5yrveIBo/W8y6VvlLpH+erBiGt7/07tleqL+TFEUtDvTb/5lGHcIdJID4tqd9RTwfc
+	a3fj8fhcpRVaKs0r2ZhIVnC7zmhxPnS13Zt072gMJZ4NQTUTKi0a4YJNV3QNASNMGxTsPZO4c67
+	djeQqts3tW1pMnX3asnxfQyOvT/TWwFUVoEcEpfodfD2Oo4YITyFTpNY0q14saxslPjC5l+kbRr
+	18KTSrljgaGY/VudtNEPp+M8L36IeLAhty/P76qpK3sgz5pCpxXev4Vxei2sbSpuWCgAl3SLw7V
+	Php+p6iW1u+PfDyQJsyXHtM567/fN0Fe5XsCEUjUBeVaeeC0BqEXYIeRiJ4+9l2fzm8t+uE/bzM
+	vkDjizkf5fil10BmkRALG3sC+fZPWscdv/8s/dIAncPhaXyIxJmXieQh90mLP90Qlp
+X-Received: by 2002:a05:6000:400f:b0:43c:fdd9:188f with SMTP id ffacd0b85a97d-43cfdd919d1mr3533554f8f.23.1774821425608;
+        Sun, 29 Mar 2026 14:57:05 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43cf21e3602sm14596947f8f.4.2026.03.29.14.57.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 29 Mar 2026 14:57:05 -0700 (PDT)
+Date: Sun, 29 Mar 2026 22:57:04 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Demian Shulhan <demyansh@gmail.com>, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ ardb@kernel.org
+Subject: Re: [PATCH v3] lib/crc: arm64: add NEON accelerated CRC64-NVMe
+ implementation
+Message-ID: <20260329225704.0eb82966@pumpkin>
+In-Reply-To: <20260329203829.GA2746@quark>
+References: <20260317065425.2684093-1-demyansh@gmail.com>
+	<20260329074338.1053550-1-demyansh@gmail.com>
+	<20260329203829.GA2746@quark>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260327061704.3707577-1-hch@lst.de>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Mar 27, 2026 at 07:16:32AM +0100, Christoph Hellwig wrote:
-> Hi all,
-> 
-> the XOR library used for the RAID5 parity is a bit of a mess right now.
-> The main file sits in crypto/ despite not being cryptography and not
-> using the crypto API, with the generic implementations sitting in
-> include/asm-generic and the arch implementations sitting in an asm/
-> header in theory.  The latter doesn't work for many cases, so
-> architectures often build the code directly into the core kernel, or
-> create another module for the architecture code.
-> 
-> Changes this to a single module in lib/ that also contains the
-> architecture optimizations, similar to the library work Eric Biggers
-> has done for the CRC and crypto libraries later.  After that it changes
-> to better calling conventions that allow for smarter architecture
-> implementations (although none is contained here yet), and uses
-> static_call to avoid indirection function call overhead.
-> 
-> A git tree is also available here:
-> 
->     git://git.infradead.org/users/hch/misc.git xor-improvements
-> 
-> Gitweb:
-> 
->     https://git.infradead.org/?p=users/hch/misc.git;a=shortlog;h=refs/heads/xor-improvements
-> 
-> Changes since v3:
->  - switch away from lockdep_assert_preemption_enabled() again
->  - fix a @ reference in a kerneldoc comment.
->  - build the arm4regs implementation also without kernel-mode neon
->    support
->  - fix a pre-existing issue about mismatched attributes on arm64's
->    xor_block_inner_neon
->  - reject 0-sized xor request and adjust the kunit test case to not
->    generate them
+On Sun, 29 Mar 2026 13:38:29 -0700
+Eric Biggers <ebiggers@kernel.org> wrote:
 
-Reviewed-by: Eric Biggers <ebiggers@kernel.org>
+> On Sun, Mar 29, 2026 at 07:43:38AM +0000, Demian Shulhan wrote:
+> > Implement an optimized CRC64 (NVMe) algorithm for ARM64 using NEON
+> > Polynomial Multiply Long (PMULL) instructions. The generic shift-and-XOR
+> > software implementation is slow, which creates a bottleneck in NVMe and
+> > other storage subsystems.
+> > 
+> > The acceleration is implemented using C intrinsics (<arm_neon.h>) rather
+> > than raw assembly for better readability and maintainability.
+> > 
+> > Key highlights of this implementation:
+> > - Uses 4KB chunking inside scoped_ksimd() to avoid preemption latency
+> >   spikes on large buffers.
+> > - Pre-calculates and loads fold constants via vld1q_u64() to minimize
+> >   register spilling.
+> > - Benchmarks show the break-even point against the generic implementation
+> >   is around 128 bytes. The PMULL path is enabled only for len >= 128.
 
-But yes, as Andrew mentioned there are two "xor: add a better public
-API" patches.  They should be folded together.
+Final thought:
+Is that allowing for the cost of kernel_fpu_begin()? - which I think only
+affects the first call.
+And the cost of the data-cache misses for the lookup table reads? - again
+worse for the first call.
 
-- Eric
+	David
+
+> > 
+> > Performance results (kunit crc_benchmark on Cortex-A72):
+> > - Generic (len=4096): ~268 MB/s
+> > - PMULL (len=4096): ~1556 MB/s (nearly 6x improvement)
+> > 
+> > Signed-off-by: Demian Shulhan <demyansh@gmail.com>  
+> 
+> Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=crc-next
+> 
+> Thanks!
+> 
+> - Eric
+> 
+
