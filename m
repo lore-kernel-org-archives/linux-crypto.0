@@ -1,1326 +1,277 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E48192877F4
-	for <linux-crypto@vger.kernel.org>; Sat, 28 Mar 2026 22:35:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF96B26ED59
+	for <linux-crypto@vger.kernel.org>; Sun, 29 Mar 2026 07:43:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774737304; cv=none; b=BqpIh0hlzrsx6EjyIx/Y50+N+eMSwmF5KYt8ymBIWq1YFSM3JD7izbuP4j4NUCIb0FXMcmn4zO4JC6FFcEVaomQrgT2mN0ckqnrWtrr3Pv8sgHgHw/310RX6pMA9m9GGtSW4a553nhA7yWT0wGLuMm1djvFEyo7Av/+nbFmhI+A=
+	t=1774770226; cv=none; b=g/F/AsGv2M9Eo/ENkKsrximUK8cxa5Eq+bWIN+fy3ULhU1abIdr0K/IxOZNBeIH1bB762/eNhgHtnd/jN4kHBrGuEhD74HxY5gRmT6Q5vzQdQgf5rD4+wFwgNIriSfzh61BhD8Wu2ir3u04qa/IrOUW27YvF0azGiLEjc2LVip0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774737304; c=relaxed/simple;
-	bh=uS2zxG+TifFcR+EjLd2SmD4S3vDudzLnYb0C1E01sqk=;
+	s=arc-20240116; t=1774770226; c=relaxed/simple;
+	bh=ZQxTUnGJ7EyXTmiyyB9+ysKAsAt1gRuRaGjAPxV88fc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=H1Vwk/6ELuTQY89qiOJwrhXWF2gXObt1oNDmMLqamr/xYqtwpVlKJnW4cObYIXTguGK9epAZFjWo9EKrY3K5VqA4QchPcKFIzKvyezcZYMr+nDfX3PxwJJnVWTTTRQl5DJIP9gFeMq6ZoPBzc2mB17odBcrqgTogl1O9Q8xNANs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=STpkIHrO; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 MIME-Version; b=oOaxaw5k/ZsSKjr/M20tgobcFFuo0RIDfTAWaq1GpCA0O+382+nZxSXtQ1VkuLxNpdK5/4RVwuFt5RWjh2SbABxAZLvO1ImQS6GzlYRkHX9egRhdjJq2ckoOm5jiYYpIjPwvQvAB7WgROEx14Ztzjxx01GJmbxmZ+fFGLmiQLbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d34oj+z4; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="STpkIHrO"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774737302; x=1806273302;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=uS2zxG+TifFcR+EjLd2SmD4S3vDudzLnYb0C1E01sqk=;
-  b=STpkIHrOtlwaG8yJHLwWDywjS/6Ob9OMTrg0iPgJ0SvNJqNDq0eA4T4h
-   EwmnzAlxUuE61zOBZrt8MvbCNurFREFp+HA/q/aWaKhLbWy8N31v7u+JV
-   BiO3Fx+cYdnzTajC49j+tMugqEzKkYCX0Rv91lFyyVyD/KspH0HjdZNTA
-   x2RGfZcAuRTCyu5B8F8bSRXSkarlz/KgZULzrbmiywVq0Re4lVoRmhIHI
-   enN9eBXylw8PRN82tXhIHyWvzTaU4AfIYdd3unQ77AmFJ178S1TmdcdV+
-   zFOTOh7ow1eO7mD5RvBQituW1k6za8JWVUdWqTlbT6OccbgUEyCdPcJew
-   g==;
-X-CSE-ConnectionGUID: 1DZ87tHRS9mZ5y6lhNM1Hw==
-X-CSE-MsgGUID: TAoYuD3uRDivOS9Tps+G9g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11742"; a="78372917"
-X-IronPort-AV: E=Sophos;i="6.23,146,1770624000"; 
-   d="scan'208";a="78372917"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Mar 2026 15:35:02 -0700
-X-CSE-ConnectionGUID: dqP/ndIKRmOTvrxFMbScEA==
-X-CSE-MsgGUID: fHf3KOUGRPO/em0Kpa8PHw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,146,1770624000"; 
-   d="scan'208";a="222339242"
-Received: from silpixa00401971.ir.intel.com ([10.20.226.106])
-  by fmviesa007.fm.intel.com with ESMTP; 28 Mar 2026 15:35:00 -0700
-From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To: herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org,
-	qat-linux@intel.com,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>,
-	Laurent M Coquerel <laurent.m.coquerel@intel.com>
-Subject: [PATCH v2 2/2] crypto: qat - add support for zstd
-Date: Sat, 28 Mar 2026 22:29:47 +0000
-Message-ID: <20260328223445.39445-3-giovanni.cabiddu@intel.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260328223445.39445-1-giovanni.cabiddu@intel.com>
-References: <20260328223445.39445-1-giovanni.cabiddu@intel.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d34oj+z4"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-486fd5360d4so45747425e9.1
+        for <linux-crypto@vger.kernel.org>; Sun, 29 Mar 2026 00:43:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774770222; x=1775375022; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mR7zW5huiWH1x5CVyoEzlAdCsPYlEqDzaC0AadT8DWY=;
+        b=d34oj+z40cPqo3BbYPhEwncEeElBDQRfbnXoK9DfzdTxxacQGQXnwKTF7EKxYWrxvb
+         RWuUum/z8F31WwQxi7p/qwKmWiS19A9vJjrsZ+soVLyYw6C3kMuxf95g4zD2BUh/4/Kt
+         w1gNZhjC0mJ9bJvxSwQUg3LcZG6ku2gFn3Te+lSnKmD5cQaODiIbu5cw57XvT60Es4//
+         R/r3O2Iv86CqZqe8bOjPQ81gylQnrdCGfhCq/hkqbSO2dTaf79O6WErTbgdqiEagDQyX
+         UJZIuYBEmmx4CgSj3gsJtq4+nsu2Gm8cc8kCXNrms2VGDDIyHz5NTxRHimFR3o+kV77J
+         9TtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774770222; x=1775375022;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=mR7zW5huiWH1x5CVyoEzlAdCsPYlEqDzaC0AadT8DWY=;
+        b=m6p14JGD7sKEzeoPr2p4YD6+PKpEw08Ix36EZEV40hyX82dZ7MK00eYux5EYB7XMgT
+         TQpqCiFilI/PGu8Ol5bQk1sRkf/WwbBqyPfnuRcjOZrXJdQwOLQyeL+ANokQERLN3QQ9
+         gAn+pchvL1MhcpdY2zxiwUAyb/4ihdDiIZjya7jvzj34sUj98RXsqAa9gfCco6IYZ9Ae
+         M0TXArZVocUS+9EVYOfJlIySiKbGU4I0efCjk84xDfi16SVm2utYlagzf+uw25nTbWg2
+         zBI1B6AarFahqGalaQWmyy7ywvV9Fo1JrVAA7IZDclvemnA55IeimPNbconmeXxcLIfN
+         6rCQ==
+X-Gm-Message-State: AOJu0YwMg2qif6yUCABcvrpqCLj+B98Fo6po2YSg+Gu5D7/Y2wNbn5Pf
+	s7+LoEP9ghFK5Efq8HI7rdolqQ0FsCu6EHPoM2h/EXYTOaDH6IXOhQJSHgtYhEgB
+X-Gm-Gg: ATEYQzyn3lD46Z6xYifVa8gwP29M2ur90h/OkBYiqXCrAsgfdEbySLBrFDNWYo3Nbgd
+	M56lWAqG7c0OKDSrHcZlxn5t3ahY+to7y0dJvQXjqJfgQ3BmF6kTyhu/Ju7AAISFook7OxAfUDv
+	7RhwMvJse11V1jM3kaNefSMuDuSebDcrxL29I66HLtALLUKE1f7egnDD3qPnjyZbN53/LPYF8Oh
+	c8vq4WG7dlBmw0dJomRkHZJp8UtVZr62g5wUBblsOiyjOR14ZX7VUzELoDC1f/RwQNm7Y+b/4Zk
+	dTcbmrr1zVq9sHOSlWGSIrjSyk00G6db5JKlthSU5VSpbXyXfksfcMOA1sOKKiMmMBIEl0WP1MG
+	ebVcS1bKW52s3jK9ORTVoeOru7fq9L5G6uwx/RvuaT/uc5/qv7rZ5mnjQL4ZrHALD3TMxSMeoXt
+	0OnXGRXVqpiwt8VDzEU3SVmhG4ItLlXmZR
+X-Received: by 2002:a05:600c:8b31:b0:485:30f7:6e88 with SMTP id 5b1f17b1804b1-48727efabdemr165719785e9.31.1774770221785;
+        Sun, 29 Mar 2026 00:43:41 -0700 (PDT)
+Received: from lima-dev.. ([45.89.90.224])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48722d38a5fsm193112255e9.12.2026.03.29.00.43.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 29 Mar 2026 00:43:41 -0700 (PDT)
+From: Demian Shulhan <demyansh@gmail.com>
+To: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: ebiggers@kernel.org,
+	ardb@kernel.org,
+	Demian Shulhan <demyansh@gmail.com>
+Subject: [PATCH v3] lib/crc: arm64: add NEON accelerated CRC64-NVMe implementation
+Date: Sun, 29 Mar 2026 07:43:38 +0000
+Message-ID: <20260329074338.1053550-1-demyansh@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260317065425.2684093-1-demyansh@gmail.com>
+References: <20260317065425.2684093-1-demyansh@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Content-Transfer-Encoding: 8bit
 
-Add support for the ZSTD algorithm for QAT GEN4, GEN5 and GEN6 via the
-acomp API.
+Implement an optimized CRC64 (NVMe) algorithm for ARM64 using NEON
+Polynomial Multiply Long (PMULL) instructions. The generic shift-and-XOR
+software implementation is slow, which creates a bottleneck in NVMe and
+other storage subsystems.
 
-For GEN4 and GEN5, compression is performed in hardware using LZ4s, a
-QAT-specific variant of LZ4. The compressed output is post-processed to
-generate ZSTD sequences, and the ZSTD library is then used to produce
-the final ZSTD stream via zstd_compress_sequences_and_literals(). Only
-inputs between 8 KB and 512 KB are offloaded to the device. The minimum
-size restriction will be relaxed once polling support is added. The
-maximum size is limited by the use of pre-allocated per-CPU scratch
-buffers. On these generations, only compression is offloaded to hardware;
-decompression always falls back to software.
+The acceleration is implemented using C intrinsics (<arm_neon.h>) rather
+than raw assembly for better readability and maintainability.
 
-For GEN6, both compression and decompression are offloaded to the
-accelerator, which natively supports the ZSTD algorithm. There is no
-limit on the input buffer size supported. However, since GEN6 is limited
-to a history size of 64 KB, decompression of frames compressed with a
-larger history falls back to software.
+Key highlights of this implementation:
+- Uses 4KB chunking inside scoped_ksimd() to avoid preemption latency
+  spikes on large buffers.
+- Pre-calculates and loads fold constants via vld1q_u64() to minimize
+  register spilling.
+- Benchmarks show the break-even point against the generic implementation
+  is around 128 bytes. The PMULL path is enabled only for len >= 128.
 
-Since GEN2 devices do not support ZSTD or LZ4s, add a mechanism that
-prevents selecting GEN2 compression instances for ZSTD or LZ4s when a
-GEN2 plug-in card is present on a system with an embedded GEN4, GEN5 or
-GEN6 device.
+Performance results (kunit crc_benchmark on Cortex-A72):
+- Generic (len=4096): ~268 MB/s
+- PMULL (len=4096): ~1556 MB/s (nearly 6x improvement)
 
-In addition, modify the algorithm registration logic to allow
-registering the correct implementation, i.e. LZ4s based for GEN4 and
-GEN5 or native ZSTD for GEN6.
-
-Co-developed-by: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
-Signed-off-by: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Laurent M Coquerel <laurent.m.coquerel@intel.com>
+Signed-off-by: Demian Shulhan <demyansh@gmail.com>
 ---
- drivers/crypto/intel/qat/Kconfig              |   1 +
- .../intel/qat/qat_420xx/adf_420xx_hw_data.c   |   1 +
- .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     |   1 +
- .../intel/qat/qat_6xxx/adf_6xxx_hw_data.c     |  17 +
- drivers/crypto/intel/qat/qat_common/Makefile  |   1 +
- .../intel/qat/qat_common/adf_accel_devices.h  |   6 +
- .../intel/qat/qat_common/adf_common_drv.h     |   6 +-
- .../intel/qat/qat_common/adf_gen4_hw_data.c   |  18 +-
- .../crypto/intel/qat/qat_common/adf_init.c    |   6 +-
- .../crypto/intel/qat/qat_common/icp_qat_fw.h  |   7 +
- .../intel/qat/qat_common/icp_qat_fw_comp.h    |   2 +
- .../crypto/intel/qat/qat_common/icp_qat_hw.h  |   3 +-
- .../intel/qat/qat_common/qat_comp_algs.c      | 524 +++++++++++++++++-
- .../intel/qat/qat_common/qat_comp_req.h       |   9 +
- .../qat/qat_common/qat_comp_zstd_utils.c      | 165 ++++++
- .../qat/qat_common/qat_comp_zstd_utils.h      |  13 +
- .../intel/qat/qat_common/qat_compression.c    |  23 +-
- 17 files changed, 773 insertions(+), 30 deletions(-)
- create mode 100644 drivers/crypto/intel/qat/qat_common/qat_comp_zstd_utils.c
- create mode 100644 drivers/crypto/intel/qat/qat_common/qat_comp_zstd_utils.h
+v2: - Removed KERNEL_MODE_NEON check from Kconfig as it's redundant on arm64.
+  - Added missing prototype for crc64_nvme_arm64_c to fix sparse/W=1 warning.
+  - Improved readability in Makefile with extra newlines and comments.
+  - Removed redundant include guards in crc64.h.
+  - Switched to do-while loops for better optimization in hot paths.
+  - Added comments explaining the magic constants (fold/Barrett).
+---
+v3: - Removed big-endian fallback from the commit message.
+  - Rewrote the comment explaining the final Barrett reduction step.
+  - Adjusted the formatting of the scoped_ksimd() call.
+---
+ lib/crc/Kconfig                  |  1 +
+ lib/crc/Makefile                 |  8 +++-
+ lib/crc/arm64/crc64-neon-inner.c | 78 ++++++++++++++++++++++++++++++++
+ lib/crc/arm64/crc64.h            | 30 ++++++++++++
+ 4 files changed, 116 insertions(+), 1 deletion(-)
+ create mode 100644 lib/crc/arm64/crc64-neon-inner.c
+ create mode 100644 lib/crc/arm64/crc64.h
 
-diff --git a/drivers/crypto/intel/qat/Kconfig b/drivers/crypto/intel/qat/Kconfig
-index 4b4861460dd4..9a48bc7c3118 100644
---- a/drivers/crypto/intel/qat/Kconfig
-+++ b/drivers/crypto/intel/qat/Kconfig
-@@ -11,6 +11,7 @@ config CRYPTO_DEV_QAT
- 	select CRYPTO_LIB_SHA1
- 	select CRYPTO_LIB_SHA256
- 	select CRYPTO_LIB_SHA512
-+	select CRYPTO_ZSTD
- 	select FW_LOADER
- 	select CRC8
+diff --git a/lib/crc/Kconfig b/lib/crc/Kconfig
+index 70e7a6016de3..16cb42d5e306 100644
+--- a/lib/crc/Kconfig
++++ b/lib/crc/Kconfig
+@@ -82,6 +82,7 @@ config CRC64
+ config CRC64_ARCH
+ 	bool
+ 	depends on CRC64 && CRC_OPTIMIZATIONS
++	default y if ARM64
+ 	default y if RISCV && RISCV_ISA_ZBC && 64BIT
+ 	default y if X86_64
  
-diff --git a/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c b/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c
-index 0002122219bc..19f9f738630b 100644
---- a/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_420xx/adf_420xx_hw_data.c
-@@ -488,6 +488,7 @@ void adf_init_hw_data_420xx(struct adf_hw_device_data *hw_data, u32 dev_id)
- 	hw_data->clock_frequency = ADF_420XX_AE_FREQ;
- 	hw_data->services_supported = adf_gen4_services_supported;
- 	hw_data->get_svc_slice_cnt = adf_gen4_get_svc_slice_cnt;
-+	hw_data->accel_capabilities_ext_mask = ADF_ACCEL_CAPABILITIES_EXT_ZSTD_LZ4S;
+diff --git a/lib/crc/Makefile b/lib/crc/Makefile
+index 7543ad295ab6..c9c35419b39c 100644
+--- a/lib/crc/Makefile
++++ b/lib/crc/Makefile
+@@ -38,9 +38,15 @@ obj-$(CONFIG_CRC64) += crc64.o
+ crc64-y := crc64-main.o
+ ifeq ($(CONFIG_CRC64_ARCH),y)
+ CFLAGS_crc64-main.o += -I$(src)/$(SRCARCH)
++
++CFLAGS_REMOVE_arm64/crc64-neon-inner.o += -mgeneral-regs-only
++CFLAGS_arm64/crc64-neon-inner.o += -ffreestanding -march=armv8-a+crypto
++CFLAGS_arm64/crc64-neon-inner.o += -isystem $(shell $(CC) -print-file-name=include)
++crc64-$(CONFIG_ARM64) += arm64/crc64-neon-inner.o
++
+ crc64-$(CONFIG_RISCV) += riscv/crc64_lsb.o riscv/crc64_msb.o
+ crc64-$(CONFIG_X86) += x86/crc64-pclmul.o
+-endif
++endif # CONFIG_CRC64_ARCH
  
- 	adf_gen4_set_err_mask(&hw_data->dev_err_mask);
- 	adf_gen4_init_hw_csr_ops(&hw_data->csr_ops);
-diff --git a/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c b/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
-index 900f19b90b2d..49b425be34c8 100644
---- a/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_4xxx/adf_4xxx_hw_data.c
-@@ -473,6 +473,7 @@ void adf_init_hw_data_4xxx(struct adf_hw_device_data *hw_data, u32 dev_id)
- 	hw_data->clock_frequency = ADF_4XXX_AE_FREQ;
- 	hw_data->services_supported = adf_gen4_services_supported;
- 	hw_data->get_svc_slice_cnt = adf_gen4_get_svc_slice_cnt;
-+	hw_data->accel_capabilities_ext_mask = ADF_ACCEL_CAPABILITIES_EXT_ZSTD_LZ4S;
+ obj-y += tests/
  
- 	adf_gen4_set_err_mask(&hw_data->dev_err_mask);
- 	adf_gen4_init_hw_csr_ops(&hw_data->csr_ops);
-diff --git a/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c b/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c
-index 177bc4eb3c24..205680797e2c 100644
---- a/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_6xxx/adf_6xxx_hw_data.c
-@@ -33,6 +33,8 @@
- #define ADF_AE_GROUP_1		GENMASK(7, 4)
- #define ADF_AE_GROUP_2		BIT(8)
- 
-+#define ASB_MULTIPLIER		9
-+
- struct adf_ring_config {
- 	u32 ring_mask;
- 	enum adf_cfg_service_type ring_type;
-@@ -509,6 +511,9 @@ static int build_comp_block(void *ctx, enum adf_dc_algo algo)
- 	case QAT_DEFLATE:
- 		header->service_cmd_id = ICP_QAT_FW_COMP_CMD_DYNAMIC;
- 	break;
-+	case QAT_ZSTD:
-+		header->service_cmd_id = ICP_QAT_FW_COMP_CMD_ZSTD_COMPRESS;
-+	break;
- 	default:
- 		return -EINVAL;
- 	}
-@@ -519,6 +524,13 @@ static int build_comp_block(void *ctx, enum adf_dc_algo algo)
- 	cd_pars->u.sl.comp_slice_cfg_word[0] = lower_val;
- 	cd_pars->u.sl.comp_slice_cfg_word[1] = 0;
- 
-+	/*
-+	 * Store Auto Select Best (ASB) multiplier in the request template.
-+	 * This will be used in the data path to set the actual threshold
-+	 * value based on the input data size.
-+	 */
-+	req_tmpl->u3.asb_threshold.asb_value = ASB_MULTIPLIER;
-+
- 	return 0;
- }
- 
-@@ -532,12 +544,16 @@ static int build_decomp_block(void *ctx, enum adf_dc_algo algo)
- 	case QAT_DEFLATE:
- 		header->service_cmd_id = ICP_QAT_FW_COMP_CMD_DECOMPRESS;
- 	break;
-+	case QAT_ZSTD:
-+		header->service_cmd_id = ICP_QAT_FW_COMP_CMD_ZSTD_DECOMPRESS;
-+	break;
- 	default:
- 		return -EINVAL;
- 	}
- 
- 	cd_pars->u.sl.comp_slice_cfg_word[0] = 0;
- 	cd_pars->u.sl.comp_slice_cfg_word[1] = 0;
-+	req_tmpl->u3.asb_threshold.asb_value = 0;
- 
- 	return 0;
- }
-@@ -1030,6 +1046,7 @@ void adf_init_hw_data_6xxx(struct adf_hw_device_data *hw_data)
- 	hw_data->num_rps = ADF_GEN6_ETR_MAX_BANKS;
- 	hw_data->clock_frequency = ADF_6XXX_AE_FREQ;
- 	hw_data->get_svc_slice_cnt = adf_gen6_get_svc_slice_cnt;
-+	hw_data->accel_capabilities_ext_mask = ADF_ACCEL_CAPABILITIES_EXT_ZSTD;
- 
- 	adf_gen6_init_services_supported(hw_data);
- 	adf_gen6_init_hw_csr_ops(&hw_data->csr_ops);
-diff --git a/drivers/crypto/intel/qat/qat_common/Makefile b/drivers/crypto/intel/qat/qat_common/Makefile
-index 016b81e60cfb..9478111c8437 100644
---- a/drivers/crypto/intel/qat/qat_common/Makefile
-+++ b/drivers/crypto/intel/qat/qat_common/Makefile
-@@ -41,6 +41,7 @@ intel_qat-y := adf_accel_engine.o \
- 	qat_bl.o \
- 	qat_comp_algs.o \
- 	qat_compression.o \
-+	qat_comp_zstd_utils.o \
- 	qat_crypto.o \
- 	qat_hal.o \
- 	qat_mig_dev.o \
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
-index cac110215c5e..03a4e9690208 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
-@@ -59,6 +59,11 @@ enum adf_accel_capabilities {
- 	ADF_ACCEL_CAPABILITIES_RANDOM_NUMBER = 128
- };
- 
-+enum adf_accel_capabilities_ext {
-+	ADF_ACCEL_CAPABILITIES_EXT_ZSTD_LZ4S = BIT(0),
-+	ADF_ACCEL_CAPABILITIES_EXT_ZSTD = BIT(1),
-+};
-+
- enum adf_fuses {
- 	ADF_FUSECTL0,
- 	ADF_FUSECTL1,
-@@ -336,6 +341,7 @@ struct adf_hw_device_data {
- 	u32 fuses[ADF_MAX_FUSES];
- 	u32 straps;
- 	u32 accel_capabilities_mask;
-+	u32 accel_capabilities_ext_mask;
- 	u32 extended_dc_capabilities;
- 	u16 fw_capabilities;
- 	u32 clock_frequency;
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_common_drv.h b/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
-index 6cf3a95489e8..7b8b295ac459 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
-@@ -111,12 +111,12 @@ void qat_algs_unregister(void);
- int qat_asym_algs_register(void);
- void qat_asym_algs_unregister(void);
- 
--struct qat_compression_instance *qat_compression_get_instance_node(int node);
-+struct qat_compression_instance *qat_compression_get_instance_node(int node, int alg);
- void qat_compression_put_instance(struct qat_compression_instance *inst);
- int qat_compression_register(void);
- int qat_compression_unregister(void);
--int qat_comp_algs_register(void);
--void qat_comp_algs_unregister(void);
-+int qat_comp_algs_register(u32 caps);
-+void qat_comp_algs_unregister(u32 caps);
- void qat_comp_alg_callback(void *resp);
- 
- int adf_isr_resource_alloc(struct adf_accel_dev *accel_dev);
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
-index 349fdb323763..f4a58f04071a 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
-@@ -504,14 +504,20 @@ static int adf_gen4_build_comp_block(void *ctx, enum adf_dc_algo algo)
- 	switch (algo) {
- 	case QAT_DEFLATE:
- 		header->service_cmd_id = ICP_QAT_FW_COMP_CMD_DYNAMIC;
-+		hw_comp_lower_csr.algo = ICP_QAT_HW_COMP_20_HW_COMP_FORMAT_ILZ77;
-+		hw_comp_lower_csr.lllbd = ICP_QAT_HW_COMP_20_LLLBD_CTRL_LLLBD_ENABLED;
-+		hw_comp_lower_csr.skip_ctrl = ICP_QAT_HW_COMP_20_BYTE_SKIP_3BYTE_LITERAL;
-+		break;
-+	case QAT_LZ4S:
-+		header->service_cmd_id = ICP_QAT_FW_COMP_20_CMD_LZ4S_COMPRESS;
-+		hw_comp_lower_csr.algo = ICP_QAT_HW_COMP_20_HW_COMP_FORMAT_LZ4S;
-+		hw_comp_lower_csr.lllbd = ICP_QAT_HW_COMP_20_LLLBD_CTRL_LLLBD_DISABLED;
-+		hw_comp_lower_csr.abd = ICP_QAT_HW_COMP_20_ABD_ABD_DISABLED;
- 		break;
- 	default:
- 		return -EINVAL;
- 	}
- 
--	hw_comp_lower_csr.skip_ctrl = ICP_QAT_HW_COMP_20_BYTE_SKIP_3BYTE_LITERAL;
--	hw_comp_lower_csr.algo = ICP_QAT_HW_COMP_20_HW_COMP_FORMAT_ILZ77;
--	hw_comp_lower_csr.lllbd = ICP_QAT_HW_COMP_20_LLLBD_CTRL_LLLBD_ENABLED;
- 	hw_comp_lower_csr.sd = ICP_QAT_HW_COMP_20_SEARCH_DEPTH_LEVEL_1;
- 	hw_comp_lower_csr.hash_update = ICP_QAT_HW_COMP_20_SKIP_HASH_UPDATE_DONT_ALLOW;
- 	hw_comp_lower_csr.edmm = ICP_QAT_HW_COMP_20_EXTENDED_DELAY_MATCH_MODE_EDMM_ENABLED;
-@@ -538,12 +544,16 @@ static int adf_gen4_build_decomp_block(void *ctx, enum adf_dc_algo algo)
- 	switch (algo) {
- 	case QAT_DEFLATE:
- 		header->service_cmd_id = ICP_QAT_FW_COMP_CMD_DECOMPRESS;
-+		hw_decomp_lower_csr.algo = ICP_QAT_HW_DECOMP_20_HW_DECOMP_FORMAT_DEFLATE;
-+		break;
-+	case QAT_LZ4S:
-+		header->service_cmd_id = ICP_QAT_FW_COMP_20_CMD_LZ4S_DECOMPRESS;
-+		hw_decomp_lower_csr.algo = ICP_QAT_HW_DECOMP_20_HW_DECOMP_FORMAT_LZ4S;
- 		break;
- 	default:
- 		return -EINVAL;
- 	}
- 
--	hw_decomp_lower_csr.algo = ICP_QAT_HW_DECOMP_20_HW_DECOMP_FORMAT_DEFLATE;
- 	lower_val = ICP_QAT_FW_DECOMP_20_BUILD_CONFIG_LOWER(hw_decomp_lower_csr);
- 
- 	cd_pars->u.sl.comp_slice_cfg_word[0] = lower_val;
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_init.c b/drivers/crypto/intel/qat/qat_common/adf_init.c
-index ec376583b3ae..f8088388cf12 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_init.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_init.c
-@@ -180,6 +180,7 @@ static int adf_dev_start(struct adf_accel_dev *accel_dev)
- {
- 	struct adf_hw_device_data *hw_data = accel_dev->hw_device;
- 	struct service_hndl *service;
-+	u32 caps;
- 	int ret;
- 
- 	set_bit(ADF_STATUS_STARTING, &accel_dev->status);
-@@ -253,7 +254,8 @@ static int adf_dev_start(struct adf_accel_dev *accel_dev)
- 	}
- 	set_bit(ADF_STATUS_CRYPTO_ALGS_REGISTERED, &accel_dev->status);
- 
--	if (!list_empty(&accel_dev->compression_list) && qat_comp_algs_register()) {
-+	caps = hw_data->accel_capabilities_ext_mask;
-+	if (!list_empty(&accel_dev->compression_list) && qat_comp_algs_register(caps)) {
- 		dev_err(&GET_DEV(accel_dev),
- 			"Failed to register compression algs\n");
- 		set_bit(ADF_STATUS_STARTING, &accel_dev->status);
-@@ -308,7 +310,7 @@ static void adf_dev_stop(struct adf_accel_dev *accel_dev)
- 
- 	if (!list_empty(&accel_dev->compression_list) &&
- 	    test_bit(ADF_STATUS_COMP_ALGS_REGISTERED, &accel_dev->status))
--		qat_comp_algs_unregister();
-+		qat_comp_algs_unregister(hw_data->accel_capabilities_ext_mask);
- 	clear_bit(ADF_STATUS_COMP_ALGS_REGISTERED, &accel_dev->status);
- 
- 	list_for_each_entry(service, &service_table, list) {
-diff --git a/drivers/crypto/intel/qat/qat_common/icp_qat_fw.h b/drivers/crypto/intel/qat/qat_common/icp_qat_fw.h
-index c141160421e1..2fea30a78340 100644
---- a/drivers/crypto/intel/qat/qat_common/icp_qat_fw.h
-+++ b/drivers/crypto/intel/qat/qat_common/icp_qat_fw.h
-@@ -151,6 +151,13 @@ struct icp_qat_fw_comn_resp {
- 	ICP_QAT_FW_COMN_CNV_FLAG_BITPOS, \
- 	ICP_QAT_FW_COMN_CNV_FLAG_MASK)
- 
-+#define ICP_QAT_FW_COMN_ST_BLK_FLAG_BITPOS 4
-+#define ICP_QAT_FW_COMN_ST_BLK_FLAG_MASK 0x1
-+#define ICP_QAT_FW_COMN_HDR_ST_BLK_FLAG_GET(hdr_flags) \
-+	QAT_FIELD_GET(hdr_flags, \
-+	ICP_QAT_FW_COMN_ST_BLK_FLAG_BITPOS, \
-+	ICP_QAT_FW_COMN_ST_BLK_FLAG_MASK)
-+
- #define ICP_QAT_FW_COMN_HDR_CNV_FLAG_SET(hdr_t, val) \
- 	QAT_FIELD_SET((hdr_t.hdr_flags), (val), \
- 	ICP_QAT_FW_COMN_CNV_FLAG_BITPOS, \
-diff --git a/drivers/crypto/intel/qat/qat_common/icp_qat_fw_comp.h b/drivers/crypto/intel/qat/qat_common/icp_qat_fw_comp.h
-index 81969c515a17..2526053ee630 100644
---- a/drivers/crypto/intel/qat/qat_common/icp_qat_fw_comp.h
-+++ b/drivers/crypto/intel/qat/qat_common/icp_qat_fw_comp.h
-@@ -8,6 +8,8 @@ enum icp_qat_fw_comp_cmd_id {
- 	ICP_QAT_FW_COMP_CMD_STATIC = 0,
- 	ICP_QAT_FW_COMP_CMD_DYNAMIC = 1,
- 	ICP_QAT_FW_COMP_CMD_DECOMPRESS = 2,
-+	ICP_QAT_FW_COMP_CMD_ZSTD_COMPRESS = 10,
-+	ICP_QAT_FW_COMP_CMD_ZSTD_DECOMPRESS = 11,
- 	ICP_QAT_FW_COMP_CMD_DELIMITER
- };
- 
-diff --git a/drivers/crypto/intel/qat/qat_common/icp_qat_hw.h b/drivers/crypto/intel/qat/qat_common/icp_qat_hw.h
-index 0223bd541f1f..16ef6d98fa42 100644
---- a/drivers/crypto/intel/qat/qat_common/icp_qat_hw.h
-+++ b/drivers/crypto/intel/qat/qat_common/icp_qat_hw.h
-@@ -336,7 +336,8 @@ enum icp_qat_hw_compression_delayed_match {
- enum icp_qat_hw_compression_algo {
- 	ICP_QAT_HW_COMPRESSION_ALGO_DEFLATE = 0,
- 	ICP_QAT_HW_COMPRESSION_ALGO_LZS = 1,
--	ICP_QAT_HW_COMPRESSION_ALGO_DELIMITER = 2
-+	ICP_QAT_HW_COMPRESSION_ALGO_ZSTD = 2,
-+	ICP_QAT_HW_COMPRESSION_ALGO_DELIMITER
- };
- 
- enum icp_qat_hw_compression_depth {
-diff --git a/drivers/crypto/intel/qat/qat_common/qat_comp_algs.c b/drivers/crypto/intel/qat/qat_common/qat_comp_algs.c
-index bfc820a08ada..e0d003b50358 100644
---- a/drivers/crypto/intel/qat/qat_common/qat_comp_algs.c
-+++ b/drivers/crypto/intel/qat/qat_common/qat_comp_algs.c
-@@ -6,6 +6,7 @@
- #include <crypto/scatterwalk.h>
- #include <linux/dma-mapping.h>
- #include <linux/workqueue.h>
-+#include <linux/zstd.h>
- #include "adf_accel_devices.h"
- #include "adf_common_drv.h"
- #include "adf_dc.h"
-@@ -13,9 +14,104 @@
- #include "qat_comp_req.h"
- #include "qat_compression.h"
- #include "qat_algs_send.h"
-+#include "qat_comp_zstd_utils.h"
-+
-+#define QAT_ZSTD_SCRATCH_SIZE		524288
-+#define QAT_ZSTD_MAX_BLOCK_SIZE		65535
-+#define QAT_ZSTD_MAX_CONTENT_SIZE	4096
-+#define QAT_LZ4S_MIN_INPUT_SIZE		8192
-+#define QAT_LZ4S_MAX_OUTPUT_SIZE	QAT_ZSTD_SCRATCH_SIZE
-+#define QAT_MAX_SEQUENCES		(128 * 1024)
- 
- static DEFINE_MUTEX(algs_lock);
--static unsigned int active_devs;
-+static unsigned int active_devs_deflate;
-+static unsigned int active_devs_lz4s;
-+static unsigned int active_devs_zstd;
-+
-+struct qat_zstd_scratch {
-+	size_t		cctx_buffer_size;
-+	void		*lz4s;
-+	void		*literals;
-+	void		*out_seqs;
-+	void		*workspace;
-+	ZSTD_CCtx	*ctx;
-+};
-+
-+static void *qat_zstd_alloc_scratch(void)
-+{
-+	struct qat_zstd_scratch *scratch;
-+	ZSTD_parameters params;
-+	size_t cctx_size;
-+	ZSTD_CCtx *ctx;
-+	size_t zret;
-+	int ret;
-+
-+	ret = -ENOMEM;
-+	scratch = kzalloc_obj(*scratch);
-+	if (!scratch)
-+		return ERR_PTR(ret);
-+
-+	scratch->lz4s = kvmalloc(QAT_ZSTD_SCRATCH_SIZE, GFP_KERNEL);
-+	if (!scratch->lz4s)
-+		goto error;
-+
-+	scratch->literals = kvmalloc(QAT_ZSTD_SCRATCH_SIZE, GFP_KERNEL);
-+	if (!scratch->literals)
-+		goto error;
-+
-+	scratch->out_seqs = kvcalloc(QAT_MAX_SEQUENCES, sizeof(ZSTD_Sequence),
-+				     GFP_KERNEL);
-+	if (!scratch->out_seqs)
-+		goto error;
-+
-+	params = zstd_get_params(zstd_max_clevel(), QAT_ZSTD_SCRATCH_SIZE);
-+	cctx_size = zstd_cctx_workspace_bound(&params.cParams);
-+
-+	scratch->workspace = kvmalloc(cctx_size, GFP_KERNEL | __GFP_ZERO);
-+	if (!scratch->workspace)
-+		goto error;
-+
-+	ret = -EINVAL;
-+	ctx = zstd_init_cctx(scratch->workspace, cctx_size);
-+	if (!ctx)
-+		goto error;
-+
-+	scratch->ctx = ctx;
-+	scratch->cctx_buffer_size = cctx_size;
-+
-+	zret = zstd_cctx_set_param(ctx, ZSTD_c_blockDelimiters, ZSTD_sf_explicitBlockDelimiters);
-+	if (zstd_is_error(zret))
-+		goto error;
-+
-+	return scratch;
-+
-+error:
-+	kvfree(scratch->lz4s);
-+	kvfree(scratch->literals);
-+	kvfree(scratch->out_seqs);
-+	kvfree(scratch->workspace);
-+	kfree(scratch);
-+	return ERR_PTR(ret);
-+}
-+
-+static void qat_zstd_free_scratch(void *ctx)
-+{
-+	struct qat_zstd_scratch *scratch = ctx;
-+
-+	if (!scratch)
-+		return;
-+
-+	kvfree(scratch->lz4s);
-+	kvfree(scratch->literals);
-+	kvfree(scratch->out_seqs);
-+	kvfree(scratch->workspace);
-+	kfree(scratch);
-+}
-+
-+static struct crypto_acomp_streams qat_zstd_streams = {
-+	.alloc_ctx = qat_zstd_alloc_scratch,
-+	.free_ctx = qat_zstd_free_scratch,
-+};
- 
- enum direction {
- 	DECOMPRESSION = 0,
-@@ -24,10 +120,18 @@ enum direction {
- 
- struct qat_compression_req;
- 
-+struct qat_callback_params {
-+	unsigned int produced;
-+	unsigned int dlen;
-+	bool plain;
-+};
-+
- struct qat_compression_ctx {
- 	u8 comp_ctx[QAT_COMP_CTX_SIZE];
- 	struct qat_compression_instance *inst;
--	int (*qat_comp_callback)(struct qat_compression_req *qat_req, void *resp);
-+	int (*qat_comp_callback)(struct qat_compression_req *qat_req, void *resp,
-+				 struct qat_callback_params *params);
-+	struct crypto_acomp *ftfm;
- };
- 
- struct qat_compression_req {
-@@ -62,6 +166,7 @@ static void qat_comp_generic_callback(struct qat_compression_req *qat_req,
- 	struct adf_accel_dev *accel_dev = ctx->inst->accel_dev;
- 	struct crypto_acomp *tfm = crypto_acomp_reqtfm(areq);
- 	struct qat_compression_instance *inst = ctx->inst;
-+	struct qat_callback_params params = { };
- 	int consumed, produced;
- 	s8 cmp_err, xlt_err;
- 	int res = -EBADMSG;
-@@ -76,6 +181,10 @@ static void qat_comp_generic_callback(struct qat_compression_req *qat_req,
- 	consumed = qat_comp_get_consumed_ctr(resp);
- 	produced = qat_comp_get_produced_ctr(resp);
- 
-+	/* Cache parameters for algorithm specific callback */
-+	params.produced = produced;
-+	params.dlen = areq->dlen;
-+
- 	dev_dbg(&GET_DEV(accel_dev),
- 		"[%s][%s][%s] slen = %8d dlen = %8d consumed = %8d produced = %8d cmp_err = %3d xlt_err = %3d",
- 		crypto_tfm_alg_driver_name(crypto_acomp_tfm(tfm)),
-@@ -83,16 +192,20 @@ static void qat_comp_generic_callback(struct qat_compression_req *qat_req,
- 		status ? "ERR" : "OK ",
- 		areq->slen, areq->dlen, consumed, produced, cmp_err, xlt_err);
- 
--	areq->dlen = 0;
-+	if (unlikely(status != ICP_QAT_FW_COMN_STATUS_FLAG_OK)) {
-+		if (cmp_err == ERR_CODE_OVERFLOW_ERROR || xlt_err == ERR_CODE_OVERFLOW_ERROR)
-+			res = -E2BIG;
- 
--	if (unlikely(status != ICP_QAT_FW_COMN_STATUS_FLAG_OK))
-+		areq->dlen = 0;
- 		goto end;
-+	}
- 
- 	if (qat_req->dir == COMPRESSION) {
- 		cnv = qat_comp_get_cmp_cnv_flag(resp);
- 		if (unlikely(!cnv)) {
- 			dev_err(&GET_DEV(accel_dev),
- 				"Verified compression not supported\n");
-+			areq->dlen = 0;
- 			goto end;
- 		}
- 
-@@ -102,33 +215,36 @@ static void qat_comp_generic_callback(struct qat_compression_req *qat_req,
- 			dev_dbg(&GET_DEV(accel_dev),
- 				"Actual buffer overflow: produced=%d, dlen=%d\n",
- 				produced, qat_req->actual_dlen);
-+
-+			res = -E2BIG;
-+			areq->dlen = 0;
- 			goto end;
- 		}
-+
-+		params.plain = !!qat_comp_get_cmp_uncomp_flag(resp);
- 	}
- 
- 	res = 0;
- 	areq->dlen = produced;
- 
- 	if (ctx->qat_comp_callback)
--		res = ctx->qat_comp_callback(qat_req, resp);
-+		res = ctx->qat_comp_callback(qat_req, resp, &params);
- 
- end:
- 	qat_bl_free_bufl(accel_dev, &qat_req->buf);
- 	acomp_request_complete(areq, res);
-+	qat_alg_send_backlog(qat_req->alg_req.backlog);
- }
- 
- void qat_comp_alg_callback(void *resp)
- {
- 	struct qat_compression_req *qat_req =
- 			(void *)(__force long)qat_comp_get_opaque(resp);
--	struct qat_instance_backlog *backlog = qat_req->alg_req.backlog;
- 
- 	qat_comp_generic_callback(qat_req, resp);
--
--	qat_alg_send_backlog(backlog);
- }
- 
--static int qat_comp_alg_init_tfm(struct crypto_acomp *acomp_tfm)
-+static int qat_comp_alg_init_tfm(struct crypto_acomp *acomp_tfm, int alg)
- {
- 	struct qat_compression_ctx *ctx = acomp_tfm_ctx(acomp_tfm);
- 	struct crypto_tfm *tfm = crypto_acomp_tfm(acomp_tfm);
-@@ -141,12 +257,12 @@ static int qat_comp_alg_init_tfm(struct crypto_acomp *acomp_tfm)
- 		node = tfm->node;
- 
- 	memset(ctx, 0, sizeof(*ctx));
--	inst = qat_compression_get_instance_node(node);
-+	inst = qat_compression_get_instance_node(node, alg);
- 	if (!inst)
- 		return -EINVAL;
- 	ctx->inst = inst;
- 
--	ret = qat_comp_build_ctx(inst->accel_dev, ctx->comp_ctx, QAT_DEFLATE);
-+	ret = qat_comp_build_ctx(inst->accel_dev, ctx->comp_ctx, alg);
- 	if (ret) {
- 		qat_compression_put_instance(inst);
- 		memset(ctx, 0, sizeof(*ctx));
-@@ -155,6 +271,11 @@ static int qat_comp_alg_init_tfm(struct crypto_acomp *acomp_tfm)
- 	return ret;
- }
- 
-+static int qat_comp_alg_deflate_init_tfm(struct crypto_acomp *acomp_tfm)
-+{
-+	return qat_comp_alg_init_tfm(acomp_tfm, QAT_DEFLATE);
-+}
-+
- static void qat_comp_alg_exit_tfm(struct crypto_acomp *acomp_tfm)
- {
- 	struct qat_compression_ctx *ctx = acomp_tfm_ctx(acomp_tfm);
-@@ -237,7 +358,234 @@ static int qat_comp_alg_decompress(struct acomp_req *req)
- 	return qat_comp_alg_compress_decompress(req, DECOMPRESSION, 0, 0, 0, 0);
- }
- 
--static struct acomp_alg qat_acomp[] = { {
-+static int qat_comp_alg_zstd_decompress(struct acomp_req *req)
-+{
-+	struct crypto_acomp *acomp_tfm = crypto_acomp_reqtfm(req);
-+	struct qat_compression_ctx *ctx = acomp_tfm_ctx(acomp_tfm);
-+	struct acomp_req *nreq = acomp_request_ctx(req);
-+	zstd_frame_header header;
-+	void *buffer;
-+	size_t zret;
-+	int ret;
-+
-+	buffer = kmap_local_page(sg_page(req->src)) + req->src->offset;
-+	zret = zstd_get_frame_header(&header, buffer, req->src->length);
-+	kunmap_local(buffer);
-+	if (zret) {
-+		dev_err(&GET_DEV(ctx->inst->accel_dev),
-+			"ZSTD-compressed data has an incomplete frame header\n");
-+		return -EINVAL;
-+	}
-+
-+	if (header.windowSize > QAT_ZSTD_MAX_BLOCK_SIZE ||
-+	    header.frameContentSize >= QAT_ZSTD_MAX_CONTENT_SIZE) {
-+		dev_dbg(&GET_DEV(ctx->inst->accel_dev), "Window size=0x%llx\n",
-+			header.windowSize);
-+
-+		memcpy(nreq, req, sizeof(*req));
-+		acomp_request_set_tfm(nreq, ctx->ftfm);
-+
-+		ret = crypto_acomp_decompress(nreq);
-+		req->dlen = nreq->dlen;
-+
-+		return ret;
-+	}
-+
-+	return qat_comp_alg_compress_decompress(req, DECOMPRESSION, 0, 0, 0, 0);
-+}
-+
-+static int qat_comp_lz4s_zstd_callback(struct qat_compression_req *qat_req, void *resp,
-+				       struct qat_callback_params *params)
-+{
-+	struct qat_compression_ctx *qat_ctx = qat_req->qat_compression_ctx;
-+	struct acomp_req *areq = qat_req->acompress_req;
-+	struct qat_zstd_scratch *scratch;
-+	struct crypto_acomp_stream *s;
-+	unsigned int lit_len = 0;
-+	ZSTD_Sequence *out_seqs;
-+	void *lz4s, *zstd;
-+	size_t comp_size;
-+	ZSTD_CCtx *ctx;
-+	void *literals;
-+	int seq_count;
-+	int ret = 0;
-+
-+	if (params->produced + QAT_ZSTD_LIT_COPY_LEN > QAT_ZSTD_SCRATCH_SIZE) {
-+		dev_dbg(&GET_DEV(qat_ctx->inst->accel_dev),
-+			"LZ4s-ZSTD: produced size (%u) + COPY_SIZE > QAT_ZSTD_SCRATCH_SIZE (%u)\n",
-+			params->produced, QAT_ZSTD_SCRATCH_SIZE);
-+		areq->dlen = 0;
-+		return -E2BIG;
-+	}
-+
-+	s = crypto_acomp_lock_stream_bh(&qat_zstd_streams);
-+	scratch = s->ctx;
-+
-+	lz4s = scratch->lz4s;
-+	zstd = lz4s;  /* Output buffer is same as lz4s */
-+	out_seqs = scratch->out_seqs;
-+	ctx = scratch->ctx;
-+	literals = scratch->literals;
-+
-+	if (likely(!params->plain)) {
-+		if (likely(sg_nents(areq->dst) == 1)) {
-+			zstd = sg_virt(areq->dst);
-+			lz4s = zstd;
-+		} else {
-+			memcpy_from_sglist(lz4s, areq->dst, 0, params->produced);
-+		}
-+
-+		seq_count = qat_alg_dec_lz4s(out_seqs, QAT_MAX_SEQUENCES, lz4s,
-+					     params->produced, literals, &lit_len);
-+		if (seq_count < 0) {
-+			ret = seq_count;
-+			comp_size = 0;
-+			goto out;
-+		}
-+	} else {
-+		out_seqs[0].litLength = areq->slen;
-+		out_seqs[0].offset = 0;
-+		out_seqs[0].matchLength = 0;
-+
-+		seq_count = 1;
-+	}
-+
-+	comp_size = zstd_compress_sequences_and_literals(ctx, zstd, params->dlen,
-+							 out_seqs, seq_count,
-+							 literals, lit_len,
-+							 QAT_ZSTD_SCRATCH_SIZE,
-+							 areq->slen);
-+	if (zstd_is_error(comp_size)) {
-+		if (comp_size == ZSTD_error_cannotProduce_uncompressedBlock)
-+			ret = -E2BIG;
-+		else
-+			ret = -EOPNOTSUPP;
-+
-+		comp_size = 0;
-+		goto out;
-+	}
-+
-+	if (comp_size > params->dlen) {
-+		dev_dbg(&GET_DEV(qat_ctx->inst->accel_dev),
-+			"LZ4s-ZSTD: compressed_size (%u) > output buffer size (%u)\n",
-+			(unsigned int)comp_size, params->dlen);
-+		ret = -EOVERFLOW;
-+		goto out;
-+	}
-+
-+	if (unlikely(sg_nents(areq->dst) != 1))
-+		memcpy_to_sglist(areq->dst, 0, zstd, comp_size);
-+
-+out:
-+	areq->dlen = comp_size;
-+	crypto_acomp_unlock_stream_bh(s);
-+
-+	return ret;
-+}
-+
-+static int qat_comp_alg_lz4s_zstd_init_tfm(struct crypto_acomp *acomp_tfm)
-+{
-+	struct qat_compression_ctx *ctx = acomp_tfm_ctx(acomp_tfm);
-+	struct crypto_tfm *tfm = crypto_acomp_tfm(acomp_tfm);
-+	int reqsize;
-+	int ret;
-+
-+	/* qat_comp_alg_init_tfm() wipes out the ctx */
-+	ret = qat_comp_alg_init_tfm(acomp_tfm, QAT_LZ4S);
-+	if (ret)
-+		return ret;
-+
-+	ctx->ftfm = crypto_alloc_acomp_node("zstd", 0, CRYPTO_ALG_NEED_FALLBACK,
-+					    tfm->node);
-+	if (IS_ERR(ctx->ftfm)) {
-+		qat_comp_alg_exit_tfm(acomp_tfm);
-+		return PTR_ERR(ctx->ftfm);
-+	}
-+
-+	reqsize = max(sizeof(struct qat_compression_req),
-+		      sizeof(struct acomp_req) + crypto_acomp_reqsize(ctx->ftfm));
-+
-+	acomp_tfm->reqsize = reqsize;
-+
-+	ctx->qat_comp_callback = qat_comp_lz4s_zstd_callback;
-+
-+	return 0;
-+}
-+
-+static int qat_comp_alg_zstd_init_tfm(struct crypto_acomp *acomp_tfm)
-+{
-+	struct qat_compression_ctx *ctx = acomp_tfm_ctx(acomp_tfm);
-+	struct crypto_tfm *tfm = crypto_acomp_tfm(acomp_tfm);
-+	int reqsize;
-+	int ret;
-+
-+	/* qat_comp_alg_init_tfm() wipes out the ctx */
-+	ret = qat_comp_alg_init_tfm(acomp_tfm, QAT_ZSTD);
-+	if (ret)
-+		return ret;
-+
-+	ctx->ftfm = crypto_alloc_acomp_node("zstd", 0, CRYPTO_ALG_NEED_FALLBACK,
-+					    tfm->node);
-+	if (IS_ERR(ctx->ftfm)) {
-+		qat_comp_alg_exit_tfm(acomp_tfm);
-+		return PTR_ERR(ctx->ftfm);
-+	}
-+
-+	reqsize = max(sizeof(struct qat_compression_req),
-+		      sizeof(struct acomp_req) + crypto_acomp_reqsize(ctx->ftfm));
-+
-+	acomp_tfm->reqsize = reqsize;
-+
-+	return 0;
-+}
-+
-+static void qat_comp_alg_zstd_exit_tfm(struct crypto_acomp *acomp_tfm)
-+{
-+	struct qat_compression_ctx *ctx = acomp_tfm_ctx(acomp_tfm);
-+
-+	if (ctx->ftfm)
-+		crypto_free_acomp(ctx->ftfm);
-+
-+	qat_comp_alg_exit_tfm(acomp_tfm);
-+}
-+
-+static int qat_comp_alg_lz4s_zstd_compress(struct acomp_req *req)
-+{
-+	struct crypto_acomp *acomp_tfm = crypto_acomp_reqtfm(req);
-+	struct qat_compression_ctx *ctx = acomp_tfm_ctx(acomp_tfm);
-+	struct acomp_req *nreq = acomp_request_ctx(req);
-+	int ret;
-+
-+	if (req->slen >= QAT_LZ4S_MIN_INPUT_SIZE && req->dlen >= QAT_LZ4S_MIN_INPUT_SIZE &&
-+	    req->slen <= QAT_LZ4S_MAX_OUTPUT_SIZE && req->dlen <= QAT_LZ4S_MAX_OUTPUT_SIZE)
-+		return qat_comp_alg_compress(req);
-+
-+	memcpy(nreq, req, sizeof(*req));
-+	acomp_request_set_tfm(nreq, ctx->ftfm);
-+
-+	ret = crypto_acomp_compress(nreq);
-+	req->dlen = nreq->dlen;
-+
-+	return ret;
-+}
-+
-+static int qat_comp_alg_sw_decompress(struct acomp_req *req)
-+{
-+	struct crypto_acomp *acomp_tfm = crypto_acomp_reqtfm(req);
-+	struct qat_compression_ctx *ctx = acomp_tfm_ctx(acomp_tfm);
-+	struct acomp_req *nreq = acomp_request_ctx(req);
-+	int ret;
-+
-+	memcpy(nreq, req, sizeof(*req));
-+	acomp_request_set_tfm(nreq, ctx->ftfm);
-+
-+	ret = crypto_acomp_decompress(nreq);
-+	req->dlen = nreq->dlen;
-+
-+	return ret;
-+}
-+
-+static struct acomp_alg qat_acomp_deflate[] = { {
- 	.base = {
- 		.cra_name = "deflate",
- 		.cra_driver_name = "qat_deflate",
-@@ -247,27 +595,165 @@ static struct acomp_alg qat_acomp[] = { {
- 		.cra_reqsize = sizeof(struct qat_compression_req),
- 		.cra_module = THIS_MODULE,
- 	},
--	.init = qat_comp_alg_init_tfm,
-+	.init = qat_comp_alg_deflate_init_tfm,
- 	.exit = qat_comp_alg_exit_tfm,
- 	.compress = qat_comp_alg_compress,
- 	.decompress = qat_comp_alg_decompress,
- }};
- 
--int qat_comp_algs_register(void)
-+static struct acomp_alg qat_acomp_zstd_lz4s = {
-+	.base = {
-+		.cra_name = "zstd",
-+		.cra_driver_name = "qat_zstd",
-+		.cra_priority = 4001,
-+		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY |
-+			     CRYPTO_ALG_NEED_FALLBACK,
-+		.cra_reqsize = sizeof(struct qat_compression_req),
-+		.cra_ctxsize = sizeof(struct qat_compression_ctx),
-+		.cra_module = THIS_MODULE,
-+	},
-+	.init = qat_comp_alg_lz4s_zstd_init_tfm,
-+	.exit = qat_comp_alg_zstd_exit_tfm,
-+	.compress = qat_comp_alg_lz4s_zstd_compress,
-+	.decompress = qat_comp_alg_sw_decompress,
-+};
-+
-+static struct acomp_alg qat_acomp_zstd_native = {
-+	.base = {
-+		.cra_name = "zstd",
-+		.cra_driver_name = "qat_zstd",
-+		.cra_priority = 4001,
-+		.cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_ALLOCATES_MEMORY |
-+			     CRYPTO_ALG_NEED_FALLBACK,
-+		.cra_reqsize = sizeof(struct qat_compression_req),
-+		.cra_ctxsize = sizeof(struct qat_compression_ctx),
-+		.cra_module = THIS_MODULE,
-+	},
-+	.init = qat_comp_alg_zstd_init_tfm,
-+	.exit = qat_comp_alg_zstd_exit_tfm,
-+	.compress = qat_comp_alg_compress,
-+	.decompress = qat_comp_alg_zstd_decompress,
-+};
-+
-+static int qat_comp_algs_register_deflate(void)
- {
- 	int ret = 0;
- 
- 	mutex_lock(&algs_lock);
--	if (++active_devs == 1)
--		ret = crypto_register_acomps(qat_acomp, ARRAY_SIZE(qat_acomp));
-+	if (++active_devs_deflate == 1) {
-+		ret = crypto_register_acomps(qat_acomp_deflate,
-+					     ARRAY_SIZE(qat_acomp_deflate));
-+		if (ret)
-+			active_devs_deflate--;
-+	}
- 	mutex_unlock(&algs_lock);
-+
- 	return ret;
- }
- 
--void qat_comp_algs_unregister(void)
-+static void qat_comp_algs_unregister_deflate(void)
- {
- 	mutex_lock(&algs_lock);
--	if (--active_devs == 0)
--		crypto_unregister_acomps(qat_acomp, ARRAY_SIZE(qat_acomp));
-+	if (--active_devs_deflate == 0)
-+		crypto_unregister_acomps(qat_acomp_deflate, ARRAY_SIZE(qat_acomp_deflate));
- 	mutex_unlock(&algs_lock);
- }
-+
-+static int qat_comp_algs_register_lz4s(void)
-+{
-+	int ret = 0;
-+
-+	mutex_lock(&algs_lock);
-+	if (++active_devs_lz4s == 1) {
-+		ret = crypto_acomp_alloc_streams(&qat_zstd_streams);
-+		if (ret) {
-+			active_devs_lz4s--;
-+			goto unlock;
-+		}
-+
-+		ret = crypto_register_acomp(&qat_acomp_zstd_lz4s);
-+		if (ret) {
-+			crypto_acomp_free_streams(&qat_zstd_streams);
-+			active_devs_lz4s--;
-+		}
-+	}
-+unlock:
-+	mutex_unlock(&algs_lock);
-+
-+	return ret;
-+}
-+
-+static void qat_comp_algs_unregister_lz4s(void)
-+{
-+	mutex_lock(&algs_lock);
-+	if (--active_devs_lz4s == 0) {
-+		crypto_unregister_acomp(&qat_acomp_zstd_lz4s);
-+		crypto_acomp_free_streams(&qat_zstd_streams);
-+	}
-+	mutex_unlock(&algs_lock);
-+}
-+
-+static int qat_comp_algs_register_zstd(void)
-+{
-+	int ret = 0;
-+
-+	mutex_lock(&algs_lock);
-+	if (++active_devs_zstd == 1) {
-+		ret = crypto_register_acomp(&qat_acomp_zstd_native);
-+		if (ret)
-+			active_devs_zstd--;
-+	}
-+	mutex_unlock(&algs_lock);
-+
-+	return ret;
-+}
-+
-+static void qat_comp_algs_unregister_zstd(void)
-+{
-+	mutex_lock(&algs_lock);
-+	if (--active_devs_zstd == 0)
-+		crypto_unregister_acomp(&qat_acomp_zstd_native);
-+	mutex_unlock(&algs_lock);
-+}
-+
-+int qat_comp_algs_register(u32 caps)
-+{
-+	int ret;
-+
-+	ret = qat_comp_algs_register_deflate();
-+	if (ret)
-+		return ret;
-+
-+	if (caps & ADF_ACCEL_CAPABILITIES_EXT_ZSTD_LZ4S) {
-+		ret = qat_comp_algs_register_lz4s();
-+		if (ret)
-+			goto err_unregister_deflate;
-+	}
-+
-+	if (caps & ADF_ACCEL_CAPABILITIES_EXT_ZSTD) {
-+		ret = qat_comp_algs_register_zstd();
-+		if (ret)
-+			goto err_unregister_lz4s;
-+	}
-+
-+	return ret;
-+
-+err_unregister_lz4s:
-+	if (caps & ADF_ACCEL_CAPABILITIES_EXT_ZSTD_LZ4S)
-+		qat_comp_algs_unregister_lz4s();
-+err_unregister_deflate:
-+	qat_comp_algs_unregister_deflate();
-+
-+	return ret;
-+}
-+
-+void qat_comp_algs_unregister(u32 caps)
-+{
-+	qat_comp_algs_unregister_deflate();
-+
-+	if (caps & ADF_ACCEL_CAPABILITIES_EXT_ZSTD_LZ4S)
-+		qat_comp_algs_unregister_lz4s();
-+
-+	if (caps & ADF_ACCEL_CAPABILITIES_EXT_ZSTD)
-+		qat_comp_algs_unregister_zstd();
-+}
-diff --git a/drivers/crypto/intel/qat/qat_common/qat_comp_req.h b/drivers/crypto/intel/qat/qat_common/qat_comp_req.h
-index 18a1f33a6db9..f165d28aaaf4 100644
---- a/drivers/crypto/intel/qat/qat_common/qat_comp_req.h
-+++ b/drivers/crypto/intel/qat/qat_common/qat_comp_req.h
-@@ -23,6 +23,7 @@ static inline void qat_comp_create_req(void *ctx, void *req, u64 src, u32 slen,
- 	fw_req->comn_mid.opaque_data = opaque;
- 	req_pars->comp_len = slen;
- 	req_pars->out_buffer_sz = dlen;
-+	fw_req->u3.asb_threshold.asb_value *= slen >> 4;
- }
- 
- static inline void qat_comp_create_compression_req(void *ctx, void *req,
-@@ -110,4 +111,12 @@ static inline u8 qat_comp_get_cmp_cnv_flag(void *resp)
- 	return ICP_QAT_FW_COMN_HDR_CNV_FLAG_GET(flags);
- }
- 
-+static inline u8 qat_comp_get_cmp_uncomp_flag(void *resp)
-+{
-+	struct icp_qat_fw_comp_resp *qat_resp = resp;
-+	u8 flags = qat_resp->comn_resp.hdr_flags;
-+
-+	return ICP_QAT_FW_COMN_HDR_ST_BLK_FLAG_GET(flags);
-+}
-+
- #endif
-diff --git a/drivers/crypto/intel/qat/qat_common/qat_comp_zstd_utils.c b/drivers/crypto/intel/qat/qat_common/qat_comp_zstd_utils.c
+diff --git a/lib/crc/arm64/crc64-neon-inner.c b/lib/crc/arm64/crc64-neon-inner.c
 new file mode 100644
-index 000000000000..62ec2d5c3ab8
+index 000000000000..881cdafadb37
 --- /dev/null
-+++ b/drivers/crypto/intel/qat/qat_common/qat_comp_zstd_utils.c
-@@ -0,0 +1,165 @@
++++ b/lib/crc/arm64/crc64-neon-inner.c
+@@ -0,0 +1,78 @@
 +// SPDX-License-Identifier: GPL-2.0-only
-+/* Copyright(c) 2026 Intel Corporation */
-+#include <linux/errno.h>
-+#include <linux/printk.h>
-+#include <linux/string.h>
-+#include <linux/unaligned.h>
-+#include <linux/zstd.h>
-+
-+#include "qat_comp_zstd_utils.h"
-+
-+#define ML_BITS		4
-+#define ML_MASK		((1U << ML_BITS) - 1)
-+#define RUN_BITS	(8 - ML_BITS)
-+#define RUN_MASK	((1U << RUN_BITS) - 1)
-+#define LZ4S_MINMATCH	2
-+
 +/*
-+ * ZSTD blocks can decompress to at most min(windowSize, 128KB) bytes.
-+ * Insert explicit block delimiters to keep blocks within this limit.
++ * Accelerated CRC64 (NVMe) using ARM NEON C intrinsics
 + */
-+#define QAT_ZSTD_BLOCK_MAX	ZSTD_BLOCKSIZE_MAX
 +
-+static int emit_delimiter(ZSTD_Sequence *out_seqs, size_t *seqs_idx,
-+			  size_t out_seqs_capacity, unsigned int lz4s_buff_size)
++#include <linux/types.h>
++#include <asm/neon-intrinsics.h>
++
++u64 crc64_nvme_arm64_c(u64 crc, const u8 *p, size_t len);
++
++#define GET_P64_0(v) ((poly64_t)vgetq_lane_u64(vreinterpretq_u64_p64(v), 0))
++#define GET_P64_1(v) ((poly64_t)vgetq_lane_u64(vreinterpretq_u64_p64(v), 1))
++
++/* x^191 mod G, x^127 mod G */
++static const u64 fold_consts_val[2] = { 0xeadc41fd2ba3d420ULL,
++					0x21e9761e252621acULL };
++/* floor(x^127 / G), (G - x^64) / x */
++static const u64 bconsts_val[2] = { 0x27ecfa329aef9f77ULL,
++				    0x34d926535897936aULL };
++
++u64 crc64_nvme_arm64_c(u64 crc, const u8 *p, size_t len)
 +{
-+	if (*seqs_idx >= out_seqs_capacity - 1) {
-+		pr_debug("QAT ZSTD: sequence overflow (seqs_idx:%zu, capacity:%zu, lz4s_size:%u)\n",
-+			 *seqs_idx, out_seqs_capacity, lz4s_buff_size);
-+		return -EOVERFLOW;
-+	}
++	uint64x2_t v0_u64 = { crc, 0 };
++	poly64x2_t v0 = vreinterpretq_p64_u64(v0_u64);
++	poly64x2_t fold_consts =
++		vreinterpretq_p64_u64(vld1q_u64(fold_consts_val));
++	poly64x2_t v1 = vreinterpretq_p64_u8(vld1q_u8(p));
 +
-+	out_seqs[*seqs_idx].offset = 0;
-+	out_seqs[*seqs_idx].litLength = 0;
-+	out_seqs[*seqs_idx].matchLength = 0;
-+	(*seqs_idx)++;
++	v0 = vreinterpretq_p64_u8(veorq_u8(vreinterpretq_u8_p64(v0),
++					   vreinterpretq_u8_p64(v1)));
++	p += 16;
++	len -= 16;
 +
-+	return 0;
++	do {
++		v1 = vreinterpretq_p64_u8(vld1q_u8(p));
++
++		poly128_t v2 = vmull_high_p64(fold_consts, v0);
++		poly128_t v0_128 =
++			vmull_p64(GET_P64_0(fold_consts), GET_P64_0(v0));
++
++		uint8x16_t x0 = veorq_u8(vreinterpretq_u8_p128(v0_128),
++					 vreinterpretq_u8_p128(v2));
++
++		x0 = veorq_u8(x0, vreinterpretq_u8_p64(v1));
++		v0 = vreinterpretq_p64_u8(x0);
++
++		p += 16;
++		len -= 16;
++	} while (len >= 16);
++
++	/* Multiply the 128-bit value by x^64 and reduce it back to 128 bits. */
++	poly64x2_t v7 = vreinterpretq_p64_u64((uint64x2_t){ 0, 0 });
++	poly128_t v1_128 = vmull_p64(GET_P64_1(fold_consts), GET_P64_0(v0));
++
++	uint8x16_t ext_v0 =
++		vextq_u8(vreinterpretq_u8_p64(v0), vreinterpretq_u8_p64(v7), 8);
++	uint8x16_t x0 = veorq_u8(ext_v0, vreinterpretq_u8_p128(v1_128));
++
++	v0 = vreinterpretq_p64_u8(x0);
++
++	/* Final Barrett reduction */
++	poly64x2_t bconsts = vreinterpretq_p64_u64(vld1q_u64(bconsts_val));
++
++	v1_128 = vmull_p64(GET_P64_0(bconsts), GET_P64_0(v0));
++
++	poly64x2_t v1_64 = vreinterpretq_p64_u8(vreinterpretq_u8_p128(v1_128));
++	poly128_t v3_128 = vmull_p64(GET_P64_1(bconsts), GET_P64_0(v1_64));
++
++	x0 = veorq_u8(vreinterpretq_u8_p64(v0), vreinterpretq_u8_p128(v3_128));
++
++	uint8x16_t ext_v2 = vextq_u8(vreinterpretq_u8_p64(v7),
++				     vreinterpretq_u8_p128(v1_128), 8);
++
++	x0 = veorq_u8(x0, ext_v2);
++
++	v0 = vreinterpretq_p64_u8(x0);
++	return vgetq_lane_u64(vreinterpretq_u64_p64(v0), 1);
 +}
-+
-+int qat_alg_dec_lz4s(ZSTD_Sequence *out_seqs, size_t out_seqs_capacity,
-+		     unsigned char *lz4s_buff, unsigned int lz4s_buff_size,
-+		     unsigned char *literals, unsigned int *lit_len)
-+{
-+	unsigned char *end_ip = lz4s_buff + lz4s_buff_size;
-+	unsigned char *start, *dest, *dest_end;
-+	unsigned int hist_literal_len = 0;
-+	unsigned char *ip = lz4s_buff;
-+	size_t block_decomp_size = 0;
-+	size_t seqs_idx = 0;
-+	int ret;
-+
-+	*lit_len = 0;
-+
-+	if (!lz4s_buff_size)
-+		return 0;
-+
-+	while (ip < end_ip) {
-+		size_t literal_len = 0, match_len = 0;
-+		const unsigned int token = *ip++;
-+		size_t length = 0;
-+		size_t offset = 0;
-+
-+		/* Get literal length */
-+		length = token >> ML_BITS;
-+		if (length == RUN_MASK) {
-+			unsigned int s;
-+
-+			do {
-+				s = *ip++;
-+				length += s;
-+			} while (s == 255);
-+		}
-+
-+		literal_len = length;
-+
-+		start = ip;
-+		dest = literals;
-+		dest_end = literals + length;
-+
-+		do {
-+			memcpy(dest, start, QAT_ZSTD_LIT_COPY_LEN);
-+			dest += QAT_ZSTD_LIT_COPY_LEN;
-+			start += QAT_ZSTD_LIT_COPY_LEN;
-+		} while (dest < dest_end);
-+
-+		literals += length;
-+		*lit_len += length;
-+
-+		ip += length;
-+		if (ip == end_ip) {
-+			literal_len += hist_literal_len;
-+			/*
-+			 * If adding trailing literals would overflow the
-+			 * current block, close it first.
-+			 */
-+			if (block_decomp_size + literal_len > QAT_ZSTD_BLOCK_MAX) {
-+				ret = emit_delimiter(out_seqs, &seqs_idx,
-+						     out_seqs_capacity,
-+						     lz4s_buff_size);
-+				if (ret)
-+					return ret;
-+			}
-+			out_seqs[seqs_idx].litLength = literal_len;
-+			out_seqs[seqs_idx].offset = offset;
-+			out_seqs[seqs_idx].matchLength = match_len;
-+			break;
-+		}
-+
-+		offset = get_unaligned_le16(ip);
-+		ip += 2;
-+
-+		length = token & ML_MASK;
-+		if (length == ML_MASK) {
-+			unsigned int s;
-+
-+			do {
-+				s = *ip++;
-+				length += s;
-+			} while (s == 255);
-+		}
-+		if (length != 0) {
-+			length += LZ4S_MINMATCH;
-+			match_len = (unsigned short)length;
-+			literal_len += hist_literal_len;
-+
-+			/*
-+			 * If this sequence would push the current block past
-+			 * the ZSTD maximum, close the block first.
-+			 */
-+			if (block_decomp_size + literal_len + match_len > QAT_ZSTD_BLOCK_MAX) {
-+				ret = emit_delimiter(out_seqs, &seqs_idx,
-+						     out_seqs_capacity,
-+						     lz4s_buff_size);
-+				if (ret)
-+					return ret;
-+
-+				block_decomp_size = 0;
-+			}
-+
-+			out_seqs[seqs_idx].offset = offset;
-+			out_seqs[seqs_idx].litLength = literal_len;
-+			out_seqs[seqs_idx].matchLength = match_len;
-+			hist_literal_len = 0;
-+			seqs_idx++;
-+			if (seqs_idx >= out_seqs_capacity - 1) {
-+				pr_debug("QAT ZSTD: sequence overflow (seqs_idx:%zu, capacity:%zu, lz4s_size:%u)\n",
-+					 seqs_idx, out_seqs_capacity, lz4s_buff_size);
-+				return -EOVERFLOW;
-+			}
-+
-+			block_decomp_size += literal_len + match_len;
-+		} else {
-+			if (literal_len > 0) {
-+				/*
-+				 * When match length is 0, the literal length needs
-+				 * to be temporarily stored and processed together
-+				 * with the next data block.
-+				 */
-+				hist_literal_len += literal_len;
-+			}
-+		}
-+	}
-+
-+	return seqs_idx + 1;
-+}
-diff --git a/drivers/crypto/intel/qat/qat_common/qat_comp_zstd_utils.h b/drivers/crypto/intel/qat/qat_common/qat_comp_zstd_utils.h
+diff --git a/lib/crc/arm64/crc64.h b/lib/crc/arm64/crc64.h
 new file mode 100644
-index 000000000000..55c7a1b9b848
+index 000000000000..cc65abeee24c
 --- /dev/null
-+++ b/drivers/crypto/intel/qat/qat_common/qat_comp_zstd_utils.h
-@@ -0,0 +1,13 @@
++++ b/lib/crc/arm64/crc64.h
+@@ -0,0 +1,30 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
-+/* Copyright(c) 2026 Intel Corporation */
-+#ifndef QAT_COMP_ZSTD_UTILS_H_
-+#define QAT_COMP_ZSTD_UTILS_H_
-+#include <linux/zstd_lib.h>
++/*
++ * CRC64 using ARM64 PMULL instructions
++ */
 +
-+#define QAT_ZSTD_LIT_COPY_LEN	8
++#include <linux/cpufeature.h>
++#include <asm/simd.h>
++#include <linux/minmax.h>
++#include <linux/sizes.h>
 +
-+int qat_alg_dec_lz4s(ZSTD_Sequence *out_seqs, size_t out_seqs_capacity,
-+		     unsigned char *lz4s_buff, unsigned int lz4s_buff_size,
-+		     unsigned char *literals, unsigned int *lit_len);
++u64 crc64_nvme_arm64_c(u64 crc, const u8 *p, size_t len);
 +
-+#endif
-diff --git a/drivers/crypto/intel/qat/qat_common/qat_compression.c b/drivers/crypto/intel/qat/qat_common/qat_compression.c
-index 53a4db5507ec..1424d7a9bcd3 100644
---- a/drivers/crypto/intel/qat/qat_common/qat_compression.c
-+++ b/drivers/crypto/intel/qat/qat_common/qat_compression.c
-@@ -46,12 +46,14 @@ static int qat_compression_free_instances(struct adf_accel_dev *accel_dev)
- 	return 0;
- }
- 
--struct qat_compression_instance *qat_compression_get_instance_node(int node)
-+struct qat_compression_instance *qat_compression_get_instance_node(int node, int alg)
- {
- 	struct qat_compression_instance *inst = NULL;
-+	struct adf_hw_device_data *hw_data = NULL;
- 	struct adf_accel_dev *accel_dev = NULL;
- 	unsigned long best = ~0;
- 	struct list_head *itr;
-+	u32 caps, mask;
- 
- 	list_for_each(itr, adf_devmgr_get_head()) {
- 		struct adf_accel_dev *tmp_dev;
-@@ -61,6 +63,15 @@ struct qat_compression_instance *qat_compression_get_instance_node(int node)
- 		tmp_dev = list_entry(itr, struct adf_accel_dev, list);
- 		tmp_dev_node = dev_to_node(&GET_DEV(tmp_dev));
- 
-+		if (alg == QAT_ZSTD || alg == QAT_LZ4S) {
-+			hw_data = tmp_dev->hw_device;
-+			caps = hw_data->accel_capabilities_ext_mask;
-+			mask = ADF_ACCEL_CAPABILITIES_EXT_ZSTD |
-+			       ADF_ACCEL_CAPABILITIES_EXT_ZSTD_LZ4S;
-+			if (!(caps & mask))
-+				continue;
-+		}
++#define crc64_be_arch crc64_be_generic
 +
- 		if ((node == tmp_dev_node || tmp_dev_node < 0) &&
- 		    adf_dev_started(tmp_dev) && !list_empty(&tmp_dev->compression_list)) {
- 			ctr = atomic_read(&tmp_dev->ref_count);
-@@ -78,6 +89,16 @@ struct qat_compression_instance *qat_compression_get_instance_node(int node)
- 			struct adf_accel_dev *tmp_dev;
- 
- 			tmp_dev = list_entry(itr, struct adf_accel_dev, list);
++static inline u64 crc64_nvme_arch(u64 crc, const u8 *p, size_t len)
++{
++	if (len >= 128 && cpu_have_named_feature(PMULL) &&
++	    likely(may_use_simd())) {
++		do {
++			size_t chunk = min_t(size_t, len & ~15, SZ_4K);
 +
-+			if (alg == QAT_ZSTD || alg == QAT_LZ4S) {
-+				hw_data = tmp_dev->hw_device;
-+				caps = hw_data->accel_capabilities_ext_mask;
-+				mask = ADF_ACCEL_CAPABILITIES_EXT_ZSTD |
-+				       ADF_ACCEL_CAPABILITIES_EXT_ZSTD_LZ4S;
-+				if (!(caps & mask))
-+					continue;
-+			}
++			scoped_ksimd()
++				crc = crc64_nvme_arm64_c(crc, p, chunk);
 +
- 			if (adf_dev_started(tmp_dev) &&
- 			    !list_empty(&tmp_dev->compression_list)) {
- 				accel_dev = tmp_dev;
++			p += chunk;
++			len -= chunk;
++		} while (len >= 128);
++	}
++	return crc64_nvme_generic(crc, p, len);
++}
 -- 
-2.53.0
+2.43.0
 
