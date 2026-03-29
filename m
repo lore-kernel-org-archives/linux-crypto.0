@@ -1,44 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7C4C76026;
-	Sun, 29 Mar 2026 22:18:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 169F521E091;
+	Sun, 29 Mar 2026 22:50:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774822704; cv=none; b=XQp1AO8hae0+RqJBPlNDRn2D3qdkJh41D2cJFV4RDmbndbdclmwhEI2wEjnvvHVaOSCbpEr947VF5ROwEBueAxPci/0j61CghKUBkVYm0Df3isNYCP5aUB5S3+p4QB+BokaDfYq+bEc3oUfx9tsJseFzTdpdblq2HZkbADg7vIY=
+	t=1774824654; cv=none; b=P6pWbsj/27NWMlRBta+XednlnGkSUQQ2DM6JDyFS9UaC+EZ2LsFDawTS4HMeY+6xqMNUJQet79dDx77/EG1vp+Qtfnr6FfP9AhObQuVtgvs1WPJXTKVYBRj47TPaZk839pnxfTOrV37P7WzqA5tgUwlE0kw96ivnin8wAnmsi4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774822704; c=relaxed/simple;
-	bh=t8bKj8rddtYM3Jbs12wLmW5gizkNWgk7J2FrmPL7YAM=;
+	s=arc-20240116; t=1774824654; c=relaxed/simple;
+	bh=8LiQypyuQD4fJJRYqGpzrs3WMEZdJ2aKFKRiogiJJtQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hxLp1jKYALvbGfZ/HF2YiavP9ACFlXMas4dQjtKcKtMi9jZ+oEOcCQ04dAbeXjsJq7qlYfU/UBDeqeLl8elXgb0Oq8AAgpHVXmU9bhu77HPjjbemuAE3jSDUy2u3dBWhLW0SIDgSIA4y8tudWriZqsXe/ki2kb/MJ+TiPsS8kJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vMZKB+pv; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=I4wW02A5mVH+mQgwuWsxEXEZmnpSjJDHr3zpJZjWCWEDfRa6BmEBEgJD/3zPB9KDKhwa6jGDObCrIUqoCBWiPL/bjRNJlcFZ4cR2QCtI9hjPcFolNYKWOCv0jKutliX84ayF0dVpixi5F5K9WcV7Mq1YIVsDD8UCKU0DydBTqqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sHnIaAvT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vMZKB+pv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E03CC116C6;
-	Sun, 29 Mar 2026 22:18:23 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sHnIaAvT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71E7BC116C6;
+	Sun, 29 Mar 2026 22:50:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774822703;
-	bh=t8bKj8rddtYM3Jbs12wLmW5gizkNWgk7J2FrmPL7YAM=;
+	s=k20201202; t=1774824653;
+	bh=8LiQypyuQD4fJJRYqGpzrs3WMEZdJ2aKFKRiogiJJtQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=vMZKB+pvpu5fxqqVroKT+MU6KLyohNGrpVaztPDLXbFpKCvOM5Zm2dEQt82yPTdh+
-	 OlkrFCmrtpYCSiTF8jdczbInElDu9ZG45m8RcDpSRAQKBi9rHSZmiGyvN7j+DQ3rqg
-	 whMuSjL3LNvLQAti8FELLvrAcXMeA04u6n6ZF2n6r6C1XLe9FJtBTBKcCVRu3QbL83
-	 l9Gq0y9BpmnjDQbNo3NHgoHbbv7qyJOprVkbV+sasK5QzQX6PfHcFYQaTkkNYXQzlX
-	 iH/hYTkTz9IcJqP5pl4eNlYD+gaWb2NY9DPIrrqbFF+/kwKVgFI3EYKqH1NdFy59yQ
-	 wwbjOr19Vshkw==
-Date: Sun, 29 Mar 2026 15:18:21 -0700
+	b=sHnIaAvTGiSmCm1RovoUapTsV76TgLjmHoIUpvhU4pjCtKwVk8U1A+fnG5rVruvEW
+	 3lyL3PaOAJGBWcXD25m+mFHFtfxl7OE+eLZQCouepAZIQJjfLk4bnDWVzuPzU5cLBE
+	 v3Z/3WNad1EkN/eXrnr7rVFFu2XUvm2/MlC7Q13j/kZNQhkLyJrr4A92saU+D+z8bs
+	 xFaNxCLgiBTU65TmD0eknvC5zzsHLhjOrYDfGAXXxLy0kohxupNsNhDz3S3e9Ravmq
+	 1DjvdwxCa5r6VOiOvgiDNkUV7tiqxoc81SFR+Q3+687vP/aMqW9aufYXBV6tz/OQyj
+	 cCvsKsUnNuy4w==
+Date: Sun, 29 Mar 2026 15:50:51 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: David Laight <david.laight.linux@gmail.com>
-Cc: Demian Shulhan <demyansh@gmail.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	ardb@kernel.org
-Subject: Re: [PATCH v3] lib/crc: arm64: add NEON accelerated CRC64-NVMe
- implementation
-Message-ID: <20260329221821.GC2106@quark>
-References: <20260317065425.2684093-1-demyansh@gmail.com>
- <20260329074338.1053550-1-demyansh@gmail.com>
- <20260329203829.GA2746@quark>
- <20260329225704.0eb82966@pumpkin>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 01/11] crypto: rng - Add crypto_stdrng_get_bytes()
+Message-ID: <20260329225051.GA140406@quark>
+References: <20260326001507.66500-1-ebiggers@kernel.org>
+ <20260326001507.66500-2-ebiggers@kernel.org>
+ <CAHmME9qWks00NyM8-kLKCcZNM6LAme5VZJkgrpg3ZVjbZFtH4Q@mail.gmail.com>
+ <20260326023105.GA2304@sol>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,31 +45,38 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260329225704.0eb82966@pumpkin>
+In-Reply-To: <20260326023105.GA2304@sol>
 
-On Sun, Mar 29, 2026 at 10:57:04PM +0100, David Laight wrote:
-> Final thought:
-> Is that allowing for the cost of kernel_fpu_begin()? - which I think only
-> affects the first call.
-> And the cost of the data-cache misses for the lookup table reads? - again
-> worse for the first call.
+On Wed, Mar 25, 2026 at 07:31:05PM -0700, Eric Biggers wrote:
+> On Thu, Mar 26, 2026 at 02:38:47AM +0100, Jason A. Donenfeld wrote:
+> > I'm a little worried about this because I don't want to see a
+> > proliferation of crypto_stdrng_get_bytes() users. How can we be sure
+> > that this is mostly never used?
+> > 
+> > 
+> > Jason
+> 
+> Perhaps a slightly different comment?  By the end of the series it is:
+> 
+> /**
+>  * crypto_stdrng_get_bytes() - get cryptographically secure random bytes
+>  * @buf: output buffer holding the random numbers
+>  * @len: length of the output buffer
+>  *
+>  * This function fills the caller-allocated buffer with random numbers using the
+>  * normal Linux RNG if fips_enabled=0, or the highest-priority "stdrng"
+>  * algorithm in the crypto_rng subsystem if fips_enabled=1.
+>  *
+>  * Context: May sleep
+>  * Return: 0 function was successful; < 0 if an error occurred
+>  */
+> 
+> We could add something like:
+> 
+>     Don't call this unless you are sure you need it.  In most cases you
+>     should just call get_random_bytes_wait() directly.
 
-I assume you mean kernel_neon_begin().  This is an arm64 patch.  (I
-encourage you to actually read the code.  You seem to send a lot of
-speculation-heavy comments without actually reading the code.)
-
-Currently, the benchmark in crc_kunit just measures the throughput in a
-loop (as has been discussed before).  So no, it doesn't currently
-capture the overhead of pulling code and data into cache.  For NEON
-register use it captures only the amortized overhead.
-
-Note that using PMULL saves having to pull the table into memory, while
-using the table is a bit less code and saves having to use kernel-mode
-NEON.  So both have their advantages and disadvantages.
-
-This patch does fall back to the table for the last 'len & ~15' bytes,
-which means the table may be needed anyway.  That is not the optimal way
-to do it, and it's something to address later when this is replaced with
-something similar to x86's crc-pclmul-template.S.
+Let me know if that addresses your concern, or if you're looking for
+something else.
 
 - Eric
