@@ -1,195 +1,89 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8892929DB86;
-	Mon, 30 Mar 2026 23:33:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09006346E54
+	for <linux-crypto@vger.kernel.org>; Mon, 30 Mar 2026 23:44:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774913619; cv=none; b=PMgJyrvRffnGkQy02UQUF6//aFLMHqydzjrmijJY6czup2rOyT1UdAgyERAv73BjkRcaRgxjoh/UeeZ+f5vMEfS181bwR1S/UtlFUL2YGjd2b08k7+adQS/nWi4CetWGs/c3k2rTnrchR+Eqjz2+C1yP8ukfJJOFMSj+9CAMRpI=
+	t=1774914278; cv=none; b=m1SgMPLm0L4HKTmgD1KV2w0SmcsdCJ8RzJ0RLrQFnir3WASNhbbpcYpOeW4Owm7/rACwHvXC6cz9tewcBb7ISWQa+IcI/mBLL1vFQb+nMhtj3QMnc1fTFGxwDhzaSlTC0iaRco0aSnQKO4Mztkcrw8JoqjUyfibqYQOWTyNW4uU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774913619; c=relaxed/simple;
-	bh=7YXl+pOjG4hYgFqQrK9HkiGp6Swi+QLOpufQlhlt8Bc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rN3iWFHNa/nYwsf3/h1NVWSEBTaEbHImRAoKEGNovZpNgMn2ejJ7QiboOC2LmSNoaBcdxYqWx3UGBHE//vwMA6/Re2NaKX2iu1yvMO+QJ0h0xotQuOjSRTgc645d3wxg47yhojL7Td2eCg4pbXRKaEMj9NSBixbFduokm7BtHWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cTeT//xb; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1774914278; c=relaxed/simple;
+	bh=rFPnKKeRu/ZRYlgv+EHmX2Yx2rS5K1i5o/cY9KugaRo=;
+	h=Content-Type:From:Mime-Version:Date:Subject:Message-Id:To; b=TWq92HeBYGXDsgOza6O9dGcThOyUGZSnPEspvHvBOTgQ9wz8C5ZgQgFNNc/BIrxImaPPpV5KUkxprxgsYLLKd8Xbe1EsZy3KhsdQCLDK5YfTMBwIQvDxPXOybdyTlDrIrHeQL1ttyvRuAE2fR5h7q7EA7Z+09EdtYiwWfOi5H8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N1oEmP5Y; arc=none smtp.client-ip=209.85.161.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cTeT//xb"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774913619; x=1806449619;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=7YXl+pOjG4hYgFqQrK9HkiGp6Swi+QLOpufQlhlt8Bc=;
-  b=cTeT//xbtBl64yAmr6l1aCe5kR/QHfi2yNdLTgBb1VKQeF6jvx/RWW01
-   q+dkgSfuL8boLCKaO2MgHtC8Q45a5CsgMiCjsM4Dw9/YvVCwA9Z4Va+JY
-   QFBgQuoAIvQbzLgtaVh8FJuGmNY4wNFTNzWp/69+/N9U/GjTpAQfAyBOo
-   d7DDPjTai57H7YfB6hMZ28tabfq9W4rmXIchYh56eISWm3Bhy10oV+Hwf
-   eF52UJM4jW6/XLr8/D4OZACXMRS3Ima+o/0j7akF3wG4Sj3ZQw1oLeJuo
-   RevVwQv7/bzQPdJwXbmzSVDYRtNZ6A1pCTMRv1DZ/8BtJ/KPrWC6rHrb1
-   g==;
-X-CSE-ConnectionGUID: UOxnSewtSEecf89XsB7E8w==
-X-CSE-MsgGUID: dOwKwObGQkqYRSfnxZMHrQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11744"; a="78510325"
-X-IronPort-AV: E=Sophos;i="6.23,150,1770624000"; 
-   d="scan'208";a="78510325"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2026 16:33:38 -0700
-X-CSE-ConnectionGUID: cdckBsU1R3WZzm9NtTYWwA==
-X-CSE-MsgGUID: 3gDFkZN4T1GYP4FdGwNgmw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,150,1770624000"; 
-   d="scan'208";a="227809357"
-Received: from schen9-mobl4.amr.corp.intel.com (HELO [10.125.111.27]) ([10.125.111.27])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2026 16:33:36 -0700
-Message-ID: <23267200-9fed-43a9-a28b-a6daa701159b@intel.com>
-Date: Mon, 30 Mar 2026 16:33:42 -0700
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N1oEmP5Y"
+Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-67e0ac36d87so1886450eaf.1
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Mar 2026 16:44:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774914275; x=1775519075; darn=vger.kernel.org;
+        h=to:message-id:subject:date:mime-version:from
+         :content-transfer-encoding:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BgqJ359FqbPO5HXcYUOeliz4KNjCDupb8Zml7ezG6b8=;
+        b=N1oEmP5Y+cgs1XdC2ndkE2jzXHNfTklLICqiMSkbnSHDTT+4xavZRkmfvQCIdMHsbx
+         UkoZGZ8jP8BFrrM/pEyK4HVugSCRmXac7t8KFAlpdi4TCQA1KRWSlLIUOPHO/DExT1CG
+         WQqAEDDcVAwYWFC+ixrVf9Se7T6QLBk36GnYo/E2n4O031QIt7jTppAPDNHcjZZUZI9S
+         6vszFGqFF+lecVFLqwRyU14XVnvPb/EWBNevegiVOUOgOGT2F8D/gq30YFW/2F9Mmg1a
+         c6K3PUlh5h5u6dLyOjtJE/eKDkPBndPs90aRkf7uq1QpW2/D8q47G4ONqgjm/g9pi3B4
+         M/5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774914275; x=1775519075;
+        h=to:message-id:subject:date:mime-version:from
+         :content-transfer-encoding:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BgqJ359FqbPO5HXcYUOeliz4KNjCDupb8Zml7ezG6b8=;
+        b=UvdRHawGYKmv66cjex/UBu3xV1q3RcLpAor7Bt1GsXR256ZAj/FXWKRxlecBri0A8l
+         77OazCXYk/K7f1E14SMGpd4oiQ2nb3GgiJpqY1quzGID2glUkrBgl5lpnI8AeJrihNRP
+         WhwwIl5HF8wJd1LaWmaxGfmHzpa8Ed4Kp2DDgqbSUJZjge9wIXa2H04eu8dvONRM3+hm
+         pU4yDnOI3ApGrIK+lD/ckvkl7/sq99xYc9/CSkZzNTf5TdYyoxtdx51+9Oc9m4CnBzAh
+         H6HM9+o+iFOVBrYIIm14ms/xlwqdzBbIu/QF1DKZWm6mnSrenn9x7AXTwRe6CsC2koUM
+         41JA==
+X-Gm-Message-State: AOJu0Yx8ZHz/FNBk1blJjp4qBPatKtBxY/Czmb6XL+61X1zwl67nQ3Jb
+	Oe272CocB7JDi8mJFNrcmT2gcyT8Rl2K6uMLa+mY5KnCe2ql2v7CrqbL2Sx7nvhC
+X-Gm-Gg: ATEYQzyHoLYPcymjosVSl1FfS6SfzgCTQvqXD4g7VjnMZAliEYwsLIvbApDAmIiO8v8
+	GrylbzAKv8ztj0qdh4GxGCxNbtjYgEOC6F55lI4svSxms/a+26wcenFTWhamLTw4cgmNG6hZOIy
+	5stJp/ybgXxhBKhMJjxDulbtI/SU0FYzQD7eY5x8VS4MkjWOMj1vr35sFRdzUBKPwJawsEU7j6F
+	dF9HJ0iRcL7OuwGzudPr+HJi9paiYaXEnlluc+GoUJeRBi4HKP1ynkputndIMx5cqX1U5N9wnkU
+	Jlek61LftCxsu9j+pFi0HD9puauMQNHs7bd09//S9051YwCkfXD4SNkgGrN0sQiPLyoWrG0k4hT
+	CNPaQEY3Tg9lz5U08OP30F211RfTjCM4SUOnKj8sZ9lSZGThdrxug7IJGBA+78tYrLNZRGA+0GV
+	qqy2tHiG5N6Pteq0Xn9PkUf8Yor21sIC+70T6XWp6/RaJNkh25QQU3o3tt1BJ9AOglLA0Ss2A40
+	uafJg==
+X-Received: by 2002:a05:6820:810a:b0:67d:f53c:9ed9 with SMTP id 006d021491bc7-67e18642995mr7919308eaf.25.1774914275535;
+        Mon, 30 Mar 2026 16:44:35 -0700 (PDT)
+Received: from smtpclient.apple ([2600:381:6705:e5f:ad55:112f:ba58:2819])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-67e231e1329sm5916529eaf.13.2026.03.30.16.44.34
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Mar 2026 16:44:35 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+From: Ryan Appel <ryan.appel.333@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 4/6] x86/sev: Add interface to re-enable RMP
- optimizations.
-To: Ashish Kalra <Ashish.Kalra@amd.com>, tglx@kernel.org, mingo@redhat.com,
- bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- seanjc@google.com, peterz@infradead.org, thomas.lendacky@amd.com,
- herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org
-Cc: pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
- KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com,
- jackyli@google.com, pgonda@google.com, rientjes@google.com,
- jacobhxu@google.com, xin@zytor.com, pawan.kumar.gupta@linux.intel.com,
- babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com, john.allen@amd.com,
- darwi@linutronix.de, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev
-References: <cover.1774755884.git.ashish.kalra@amd.com>
- <a30809d43368d6ddeb82e6717be83327282ee52e.1774755884.git.ashish.kalra@amd.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <a30809d43368d6ddeb82e6717be83327282ee52e.1774755884.git.ashish.kalra@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0 (1.0)
+Date: Mon, 30 Mar 2026 18:41:46 -0500
+Subject: Kernel ML-KEM implementation plans
+Message-Id: <5F9ACD7A-F3B8-463A-A00E-28F68819A66C@gmail.com>
+To: linux-crypto@vger.kernel.org
+X-Mailer: iPhone Mail (23D8133)
 
-The subject seems rather imprecise. This both adds a function to
-"re-enable RMP optimizations" *AND* calls it.
+Hello all,=20
 
-> RMPOPT table is a per-processor table which indicates if 1GB regions of
-> physical memory are entirely hypervisor-owned or not.
+Looking through the mail archives I see no information on an implementation o=
+f ML-KEM that has been planned, except for leancrypto attempting to make a K=
+ey-Agreement Scheme a Key-Encapsulation Mechanism.
 
-It's per-core, right? Why not just be precise about it?
-
-> When performing host memory accesses in hypervisor mode as well as
-> non-SNP guest mode, the processor may consult the RMPOPT table to
-> potentially skip an RMP access and improve performance.
-> 
-> Events such as RMPUPDATE or SNP_INIT can clear RMP optimizations. Add
-> an interface to re-enable those optimizations.
+Is there a plan to implement a KEM interface at this point? Is this somethin=
+g that needs support?
+How could someone contribute to this? Just fork and code and pull request / r=
+eview code?
 
 
-> +int snp_perform_rmp_optimization(void)
-> +{
-> +	if (!cpu_feature_enabled(X86_FEATURE_RMPOPT))
-> +		return -EINVAL;
-> +
-> +	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
-> +		return -EINVAL;
-> +
-> +	if (!(rmp_cfg & MSR_AMD64_SEG_RMP_ENABLED))
-> +		return -EINVAL;
-
-This seems wrong. How about we just make 'X86_FEATURE_RMPOPT' the one
-true source of RMP support?
-
-If you don't have CC_ATTR_HOST_SEV_SNP you:
-
-	setup_clear_cpu_cap(X86_FEATURE_RMPOPT)
-
-Ditto for MSR_AMD64_SEG_RMP_ENABLED.
-
-It could also potentially replace the 'rmpopt_wq' checks.
-
-> +	rmpopt_all_physmem(FALSE);
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(snp_perform_rmp_optimization);
-> +
->  void __snp_leak_pages(u64 pfn, unsigned int npages, bool dump_rmp)
->  {
->  	struct page *page = pfn_to_page(pfn);
-> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index aebf4dad545e..0cbe828d204c 100644
-> --- a/drivers/crypto/ccp/sev-dev.c
-> +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -1476,6 +1476,10 @@ static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
->  	}
->  
->  	snp_hv_fixed_pages_state_update(sev, HV_FIXED);
-> +
-> +	/* SNP_INIT clears the RMPOPT table, re-enable RMP optimizations */
-> +	snp_perform_rmp_optimization();
-
-Ahhh, so this isn't happening at boot, it happens when kvm_amd.ko gets
-loaded? That escaped me until now. It would be nice to mention
-somewhere, please.
-
-There is basically no naming difference between
-snp_perform_rmp_optimization() and rmpopt_all_physmem(). Can you just
-get this all down to a single function, please?
-
-If you really have a reason to have a scan now and scan later mode, just
-do this:
-
-	rmpopt_all_physmem(RMPOPT_SCAN_NOW);
-
-and:
-
-	rmpopt_all_physmem(RMPOPT_SCAN_LATER);
-
-*That* function can do the X86_FEATURE_RMPOPT check.
+Thank you,
+    Ryan Appel=
