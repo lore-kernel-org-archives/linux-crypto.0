@@ -1,63 +1,63 @@
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43E28373C1E
-	for <linux-crypto@vger.kernel.org>; Mon, 30 Mar 2026 20:40:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75DEC3939BC;
+	Mon, 30 Mar 2026 21:02:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774903254; cv=none; b=exDBTk3TxkOcl9pNW67XblcIBTSVTlhj+KeX1l3ZsVRYS76Dk46RdOdHf+rTHmKvJ5VxyClZ/CDMln++UDflwANdigE0q5C6c9u8ipGugeUjKbkk7F4VZWw2xyD/p1M6b1e666v7Y55XFHUK3WzrgcU/QKpDxRJtOCYn8byveF8=
+	t=1774904543; cv=none; b=JY2nEOt3eXcIXT1I4FHn2RXZCOOihMVu8CGsC2WcxFN806AiXaTO029VtbNRmWVWNZ/Nm8qcnxmm37D2nVZ3Bn4v/9tBpjsi31dPvTQrOhE54k3bhJY/ZV/MnSJpm8S3Bv6G2HkhQfDQYlCDsWsAIR1HYYIN+sHWbHXpWBv9iTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774903254; c=relaxed/simple;
-	bh=EOWaw231OXh+OCxOVHHgKO4PsXZfxwWLnNexMXm5QQY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RPJp3PDKvy/6xpdaL9K3+LwDzUCDqEmqegpdEnDYpx8dYJ+voPL6/g94ClG6JAFn1OuaUBgjzBRlTX8jL/fj5xDF4RSu7U7KkdPRVKb+q6RDE1RJZbvPrlRbZ9w1HDnF/UxXkIDlBH1XvuQ6N05yIftA1wPb2ujW7GhVXlLYVZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HagsZGlw; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1774904543; c=relaxed/simple;
+	bh=PCgwVl5MtqbTZ8yXjzSvPBHHkATmETn2i773a/x4nP4=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=NpJOfyhUCr+CsTHA+DLS2vi3mVYdKfo5Kj38VBAEx3xHdlaC4+1vlyS80V19gqskGnpDxcd2v6PhU0BnnFwPxk6KHccQThkrA0EWcNSTrabAMaANdtSphbwEGHWX2jJM1ZmRoKVXlBojXPhTjHVKn3xjzaqHYc+D1HMSy9y3eqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fxPdICtm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HagsZGlw"
-Date: Mon, 30 Mar 2026 22:40:42 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1774903250;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DIyuPEO9vyWDylSg0YsJe0wIWRfP6LZmQavPdsYHxNQ=;
-	b=HagsZGlws8VdmhpA4ru3LgmD73bBL6yVU3Z1fdSrTifZ9DwS7G3uBmC1NNYUdeWmjDkhUj
-	MrDF1ixdgb+eDMWtUE+8/Zhjz6Aovj1QDWabPOL4HMDub+WvV0MJjiLFhGvvO6ypfHtjx+
-	pEBwtQ0LlAhmWejfJmvp10RR4vpO8FY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Thomas Fourier <fourier.thomas@gmail.com>
-Cc: stable@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Kees Cook <kees@kernel.org>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: hisilicon - Fix dma_unmap_single() direction
-Message-ID: <acrfym5HGJK8NfzQ@linux.dev>
-References: <20260330151937.83837-2-fourier.thomas@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fxPdICtm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B33EC4CEF7;
+	Mon, 30 Mar 2026 21:02:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774904543;
+	bh=PCgwVl5MtqbTZ8yXjzSvPBHHkATmETn2i773a/x4nP4=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=fxPdICtmQOh4c40FRiBfcvLrZJA7FxGaeR/SIfSZ5IbDCLChe8HxSfCyUyyTjJVG6
+	 YH9iLusRCuTjbY50P8dRPzcMqMpLPKQJAn/otJ315mAPf4Ppr3sJsfPCjfSHdIssjE
+	 G4RddZdk0BHHWhf3jDeny6ODI/6jG8GwgdXqToaAqM1EUasCwE/+jj2Yp0dASBEjGU
+	 Zzz3vRVp5S5gMzcDX9OxU7V5HNTMK4mrtCWLIZPH3oBGN7wxzdKPsJczKoZKgXg5fD
+	 k2P8i98S6L0uEPMi3xVCQTF63Z9Ar/IY78J2G6gFaIFZTK4TV87r4sGRLLh454V6Vy
+	 i8jTzBiRGACdQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7D0FD392FF83;
+	Mon, 30 Mar 2026 21:02:08 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto library fix for v7.0-rc7
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20260330194508.GD4303@sol>
+References: <20260330194508.GD4303@sol>
+X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20260330194508.GD4303@sol>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-for-linus
+X-PR-Tracked-Commit-Id: e5046823f8fa3677341b541a25af2fcb99a5b1e0
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: d0c3bcd5b8976159d835a897254048e078f447e6
+Message-Id: <177490452701.1933951.3943505546071372769.pr-tracker-bot@kernel.org>
+Date: Mon, 30 Mar 2026 21:02:07 +0000
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>, Theodore Ts'o <tytso@mit.edu>, Herbert Xu <herbert@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260330151937.83837-2-fourier.thomas@gmail.com>
-X-Migadu-Flow: FLOW_OUT
 
-On Mon, Mar 30, 2026 at 05:19:32PM +0200, Thomas Fourier wrote:
-> The direction used to map the buffer skreq->iv is DMA_TO_DEVICE but it is
-> unmapped with direction DMA_BIDIRECTIONAL in the error path.
-> 
-> Change the unmap to match the mapping.
-> 
-> Fixes: 915e4e8413da ("crypto: hisilicon - SEC security accelerator driver")
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
+The pull request you sent on Mon, 30 Mar 2026 12:45:08 -0700:
 
-LGTM, thanks.
+> https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-for-linus
 
-Reviewed-by: Thorsten Blum <thorsten.blum@linux.dev>
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/d0c3bcd5b8976159d835a897254048e078f447e6
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
