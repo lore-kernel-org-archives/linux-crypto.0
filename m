@@ -1,46 +1,48 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 981C73A8757;
-	Mon, 30 Mar 2026 08:51:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A85C2C21EE;
+	Mon, 30 Mar 2026 09:17:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774860692; cv=none; b=FkiUxuETjOsqX+rkk/u6gQIr853H/LIMmjNhZDa84LnzUBoKEcXe08DG0jUvudMToMvYJT0COvg6q9O+N8cZ+kNASd5wiCYO8K1aXq4k6Ugl9vTvTzcxW8PP/zxz7UkO1orh27fRjxAmANfLyLWsDXMZggsrIU9IqEO2i04ljLg=
+	t=1774862278; cv=none; b=uhaX4G88PdzEG24L7vu0s3qIQpK8vhqgB+5I+1avPAzyesllEa1r/dBaVHdnUTFR9UdEviORfAxLDXuV7rwDxPW36pQuGnRO6ckiEhgbL2IfXF/jPl55EEKFvdsn4HhjOBcXyAqM8BdKCE4m5TVm1smZ67fbd7fl+nD58o5023c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774860692; c=relaxed/simple;
-	bh=G6QNBerDZ98GetajaXxuct5Ddi8jrV/1us3rggiuPmk=;
+	s=arc-20240116; t=1774862278; c=relaxed/simple;
+	bh=eo2F6IByeg7TMJu94lVkFvqCB8Rm1o+fhRKaxK7pK8s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bfKe76N+iUN2sO9u5B60LdAOJNGNwM/R5Zuob0lpgyq3AG4+k0AKo2mrBM2TMvu1evDpm0i3vecatdLq1MARpHOlisMCYa3fNL77cm8yBDdOOBUFcnAkYLNrq0hfG6AaUWieysMR5s6RNRGQBNLeWVJLkkTR+oh7puKRq7HHKbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Us4rGFuy; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZI99hevs7F+3HUl5/ycfEwDSxpCrXppEvJH7qbg6Lfm/iy7eMorDnBNUoR+UStnEagq3seWkh97+ut7nHNA4xbpqvRoTZtCL1Vk4cDbw/GH7D8x8QjSfvwKg3BD1v1HwbOn67FCNoasE0jbo8Pm7X0mWVFuvQwr1VPAxY2yZGYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=pCtl85fV; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Us4rGFuy"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="pCtl85fV"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=vllDIm3R4mkZyxMgh7GwL09LhN/fvKaSHp29p/+2HRQ=; 
-	b=Us4rGFuyPG/2sBNhep65E+P+CponNoHajLXzctH3sqx3dmnMTSRmedRjNYkguWzbS+TOoraSFJa
-	M7wfTuhPU8G3ZgJoVNyoFdgYM1nCYQDmK9yDroJpy6kAALDORpfV2hewYU4G/zJbz3g8NX11HMwCC
-	ucpNbGGXi1gBmJPLbUj1hDi2+PbVOWsTIIrtljREhF7As2UXFfq1wVGpYitc3qFley50dPaF4HNKx
-	OOlIzjT4ktlGowKqBV2G1hI0EnmSxMZ1Rg+2xZuVYXrz8yC5xlY49XIURkvdDteuvKDYwYH79Nxi8
-	WnZ+8qwqq6oAtv9SDKHb2WTvppnYrHRrUSJw==;
+	from:content-type:reply-to; bh=zUwEBaG9uQ3dYUOCSfxdYyIp/VwIgG+fgAgoqoHEw7s=; 
+	b=pCtl85fVKvJ4gT8TC0bbHnVsIG4tjKeAj5ZU70JfKTbYx8dNtGB3xzBNhk17ypp8+h3FPZA3x5V
+	n+tFi3zI3+U0SjwkmOEu30E5j1SwEcwNSDxlroMzDOOCLPiXyMEFgG99jEtEJgCu2PSza+KIY6zeN
+	HU9GKQ00oh8lIgiM3aW8560cW9QkTHJzLGroXkMq4sOI2pkf/dd2p5wd/ih8HO1ZVx+T1PDuiMEwH
+	Vkayki76rrjQRJONtCCllWUjfblnHGFlHGXppTcN4vL51EY4o6fITxtGs6Wta1a0eBBD19EmFHcyy
+	hwfrPwGKhqNIp2eM1JDdN4wqrt5d127md5/w==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1w77vk-002Fjv-0I;
-	Mon, 30 Mar 2026 16:51:23 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 30 Mar 2026 17:51:22 +0900
-Date: Mon, 30 Mar 2026 17:51:22 +0900
+	id 1w77qc-002Fdh-2B;
+	Mon, 30 Mar 2026 16:46:06 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 30 Mar 2026 17:46:05 +0900
+Date: Mon, 30 Mar 2026 17:46:05 +0900
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Haixin Xu <jerryxucs@gmail.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	davem@davemloft.net, smueller@chronox.de, yifanwucs@gmail.com,
-	tomapufckgml@gmail.com, yuantan098@gmail.com, bird@lzu.edu.cn
-Subject: Re: [PATCH 1/1] crypto: jitterentropy - replace long-held spinlock
- with mutex
-Message-ID: <aco5ijLVPL8EjS8g@gondor.apana.org.au>
-References: <cover.1774854094.git.jerryxucs@gmail.com>
- <9a8ef1cbcc68b752a495acf0a23e7095eb0a7796.1774854094.git.jerryxucs@gmail.com>
+To: Aleksander Jan Bajkowski <olek2@wp.pl>
+Cc: davem@davemloft.net, mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com, linux-crypto@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4] crypto: testmgr - Add test vectors for
+ authenc(hmac(md5),cbc(aes))
+Message-ID: <aco4TfqpfWBZ1UIm@gondor.apana.org.au>
+References: <20260303184916.69132-1-olek2@wp.pl>
+ <abToanZh-mkEjmJ-@gondor.apana.org.au>
+ <c2a3dc2e-8d4a-4a59-ac5a-ca22be705488@wp.pl>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,21 +51,18 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9a8ef1cbcc68b752a495acf0a23e7095eb0a7796.1774854094.git.jerryxucs@gmail.com>
+In-Reply-To: <c2a3dc2e-8d4a-4a59-ac5a-ca22be705488@wp.pl>
 
-On Mon, Mar 30, 2026 at 03:23:46PM +0800, Haixin Xu wrote:
+On Fri, Mar 27, 2026 at 06:03:48PM +0100, Aleksander Jan Bajkowski wrote:
 >
-> @@ -298,7 +298,7 @@ static int jent_kcapi_random(struct crypto_rng *tfm,
->  		ret = -EINVAL;
->  	}
->  
-> -	spin_unlock(&rng->jent_lock);
-> +	mutex_unlock(&rng->jent_lock);
+> Checked the crypto tree, and this patch still isn't applied. I've sent
+> multiple test vectors, and you're probably referring to a another patch.
+> Should I send it again, or will you accept it as is?
+> 
+> By the way, that's the last one. As of now, all my routers have the missing
+> vectors added :)
 
-Are you sure that this function never gets called from softirq
-context?
-
-Thanks,
+Thanks I'll put the patch back into the queue.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
