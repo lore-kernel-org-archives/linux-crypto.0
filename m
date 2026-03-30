@@ -1,50 +1,50 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2E363BB48;
-	Mon, 30 Mar 2026 23:22:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8892929DB86;
+	Mon, 30 Mar 2026 23:33:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774912936; cv=none; b=rK1+35sy4QLstHDQtz7/XXOllQYT+zUuN4dRBrSbGkpOxNeVcsGenhKpcwIYXwZWdCGov6XLNR31LqIf1cvdAgHRI7bLRrgHd62gszRyQBIdOf9w/GiFTAeBH89NkTZSBSIbcuINtW1gHXcVyWvQnm9uXF+vyGE+ENi20VsLBPs=
+	t=1774913619; cv=none; b=PMgJyrvRffnGkQy02UQUF6//aFLMHqydzjrmijJY6czup2rOyT1UdAgyERAv73BjkRcaRgxjoh/UeeZ+f5vMEfS181bwR1S/UtlFUL2YGjd2b08k7+adQS/nWi4CetWGs/c3k2rTnrchR+Eqjz2+C1yP8ukfJJOFMSj+9CAMRpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774912936; c=relaxed/simple;
-	bh=ng9W5b/WchynJ+QCgePlqtKnClGVfH9wutZDSpGWAQ0=;
+	s=arc-20240116; t=1774913619; c=relaxed/simple;
+	bh=7YXl+pOjG4hYgFqQrK9HkiGp6Swi+QLOpufQlhlt8Bc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IoRCGrwZf4UyArA79zagDOD5Llnu4qDDubtgU6oQSSZ5Q0jWA/mw+sSMFzHJ1N7O3SY5o4ono9Zr1b6b6wnmsTgwXxMDyBw20qsb/7mNONB3iZkrmj19+GEJOgIFnWcaZN0uBR100hfr5UW0erv60cNSWc+2fjVA5DMveJz0mBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hrFNQpd2; arc=none smtp.client-ip=198.175.65.18
+	 In-Reply-To:Content-Type; b=rN3iWFHNa/nYwsf3/h1NVWSEBTaEbHImRAoKEGNovZpNgMn2ejJ7QiboOC2LmSNoaBcdxYqWx3UGBHE//vwMA6/Re2NaKX2iu1yvMO+QJ0h0xotQuOjSRTgc645d3wxg47yhojL7Td2eCg4pbXRKaEMj9NSBixbFduokm7BtHWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cTeT//xb; arc=none smtp.client-ip=192.198.163.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hrFNQpd2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cTeT//xb"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1774912935; x=1806448935;
+  t=1774913619; x=1806449619;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=ng9W5b/WchynJ+QCgePlqtKnClGVfH9wutZDSpGWAQ0=;
-  b=hrFNQpd2+83NYDThaxJ3OC8zqZZoegPp2LuTNGOjzwX42RDHq2p0iay9
-   TgoAmYInKjfZ68sgjEnspgdfSmW0DGTaIEQxALY891JYzWz/2/VxhAuhj
-   GTXScElbRE5ceJkAPS2tqbmLXWzbRyXHcRbglII8vivdwlJVUXgUjmxUN
-   +MhGLc95RBcqvAqmOi20oDyUUqDYqr3FTnZQiJAP8hq3dFdG37fljGY/u
-   tEIiNuiYncAkXqrORmv/Pa+tQHYtCFti64YPwhsOIPn975AmQ3rNRjxKb
-   2tuwRK6JdowcfUNX+7ddSTG/SQ6E1Me3E3+DXFT4ylRVlfoaVf2Pk1g38
-   A==;
-X-CSE-ConnectionGUID: aAoOyiwrTbqubecHpr/9Ug==
-X-CSE-MsgGUID: SxTBZNp5R/Cz1UHLGaz38w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11744"; a="75933006"
+  bh=7YXl+pOjG4hYgFqQrK9HkiGp6Swi+QLOpufQlhlt8Bc=;
+  b=cTeT//xbtBl64yAmr6l1aCe5kR/QHfi2yNdLTgBb1VKQeF6jvx/RWW01
+   q+dkgSfuL8boLCKaO2MgHtC8Q45a5CsgMiCjsM4Dw9/YvVCwA9Z4Va+JY
+   QFBgQuoAIvQbzLgtaVh8FJuGmNY4wNFTNzWp/69+/N9U/GjTpAQfAyBOo
+   d7DDPjTai57H7YfB6hMZ28tabfq9W4rmXIchYh56eISWm3Bhy10oV+Hwf
+   eF52UJM4jW6/XLr8/D4OZACXMRS3Ima+o/0j7akF3wG4Sj3ZQw1oLeJuo
+   RevVwQv7/bzQPdJwXbmzSVDYRtNZ6A1pCTMRv1DZ/8BtJ/KPrWC6rHrb1
+   g==;
+X-CSE-ConnectionGUID: UOxnSewtSEecf89XsB7E8w==
+X-CSE-MsgGUID: dOwKwObGQkqYRSfnxZMHrQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11744"; a="78510325"
 X-IronPort-AV: E=Sophos;i="6.23,150,1770624000"; 
-   d="scan'208";a="75933006"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2026 16:22:15 -0700
-X-CSE-ConnectionGUID: Oa2UjkAoTKigWg3WH8W9EQ==
-X-CSE-MsgGUID: fGbeimd5SPa57jZBjYC+1g==
+   d="scan'208";a="78510325"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2026 16:33:38 -0700
+X-CSE-ConnectionGUID: cdckBsU1R3WZzm9NtTYWwA==
+X-CSE-MsgGUID: 3gDFkZN4T1GYP4FdGwNgmw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,150,1770624000"; 
-   d="scan'208";a="226165170"
+   d="scan'208";a="227809357"
 Received: from schen9-mobl4.amr.corp.intel.com (HELO [10.125.111.27]) ([10.125.111.27])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2026 16:22:13 -0700
-Message-ID: <ab41b1d8-e464-4ad6-ac07-7318686db10e@intel.com>
-Date: Mon, 30 Mar 2026 16:22:19 -0700
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Mar 2026 16:33:36 -0700
+Message-ID: <23267200-9fed-43a9-a28b-a6daa701159b@intel.com>
+Date: Mon, 30 Mar 2026 16:33:42 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,8 +52,8 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 3/6] x86/sev: Add support to perform RMP optimizations
- asynchronously
+Subject: Re: [PATCH v3 4/6] x86/sev: Add interface to re-enable RMP
+ optimizations.
 To: Ashish Kalra <Ashish.Kalra@amd.com>, tglx@kernel.org, mingo@redhat.com,
  bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
  seanjc@google.com, peterz@infradead.org, thomas.lendacky@amd.com,
@@ -66,7 +66,7 @@ Cc: pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
  darwi@linutronix.de, linux-kernel@vger.kernel.org,
  linux-crypto@vger.kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev
 References: <cover.1774755884.git.ashish.kalra@amd.com>
- <6345df31337125280f91ad8f37843aa865fd85fc.1774755884.git.ashish.kalra@amd.com>
+ <a30809d43368d6ddeb82e6717be83327282ee52e.1774755884.git.ashish.kalra@amd.com>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -112,190 +112,84 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <6345df31337125280f91ad8f37843aa865fd85fc.1774755884.git.ashish.kalra@amd.com>
+In-Reply-To: <a30809d43368d6ddeb82e6717be83327282ee52e.1774755884.git.ashish.kalra@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 3/30/26 15:26, Ashish Kalra wrote:
-...
-> As SEV-SNP is enabled by default on boot when an RMP table is
-> allocated by BIOS, the hypervisor and non-SNP guests are subject to
-> RMP write checks to provide integrity of SNP guest memory.
+The subject seems rather imprecise. This both adds a function to
+"re-enable RMP optimizations" *AND* calls it.
 
-This is a long-winded way of saying:
+> RMPOPT table is a per-processor table which indicates if 1GB regions of
+> physical memory are entirely hypervisor-owned or not.
 
-	When SEV-SNP is enabled, all writes to memory are checked to
-	ensure integrity of SNP guest memory. This imposes performance
-	overhead on the whole system.
+It's per-core, right? Why not just be precise about it?
 
-> RMPOPT is a new instruction that minimizes the performance overhead of
-> RMP checks on the hypervisor and on non-SNP guests by allowing RMP
-> checks to be skipped for 1GB regions of memory that are known not to
-> contain any SEV-SNP guest memory.
+> When performing host memory accesses in hypervisor mode as well as
+> non-SNP guest mode, the processor may consult the RMPOPT table to
+> potentially skip an RMP access and improve performance.
 > 
-> Add support for performing RMP optimizations asynchronously using a
-> dedicated workqueue, scheduling delayed work to perform RMP
-> optimizations every 10 seconds.
+> Events such as RMPUPDATE or SNP_INIT can clear RMP optimizations. Add
+> an interface to re-enable those optimizations.
 
-Gah, does it really do this _every_ 10 seconds? Whether or not any
-guests are running or if the SEV-SNP state has changed at *all*? This
-code doesn't implement that, right? If so, why mention it here?
 
-> +static void rmpopt_work_handler(struct work_struct *work)
+> +int snp_perform_rmp_optimization(void)
 > +{
-> +	phys_addr_t pa;
+> +	if (!cpu_feature_enabled(X86_FEATURE_RMPOPT))
+> +		return -EINVAL;
 > +
-> +	pr_info("Attempt RMP optimizations on physical address range @1GB alignment [0x%016llx - 0x%016llx]\n",
-> +		rmpopt_pa_start, rmpopt_pa_end);
+> +	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
+> +		return -EINVAL;
 > +
-> +	/*
-> +	 * RMPOPT optimizations skip RMP checks at 1GB granularity if this
-> +	 * range of memory does not contain any SNP guest memory. Optimize
-> +	 * each range on one CPU first, then let other CPUs execute RMPOPT
-> +	 * in parallel so they can skip most work as the range has already
-> +	 * been optimized.
-> +	 */
+> +	if (!(rmp_cfg & MSR_AMD64_SEG_RMP_ENABLED))
+> +		return -EINVAL;
 
-This comment could be much more clear.
+This seems wrong. How about we just make 'X86_FEATURE_RMPOPT' the one
+true source of RMP support?
 
-First, the granularity has *zero* to do with this optimization.
+If you don't have CC_ATTR_HOST_SEV_SNP you:
 
-Second, the optimization this code is doing only makes sense if the RMP
-itself is caching the RMPOPT result in a global, single place. That's
-not explained. It needs something like:
+	setup_clear_cpu_cap(X86_FEATURE_RMPOPT)
 
-	RMPOPT does three things: It scans the RMP table, stores the
-	result of the scan in the global RMP table and copies that
-	result to a per-CPU table. The scan is the most expensive part.
-	If a second RMPOPT occurs, it can skip the expensive scan if it
-	sees the "cached" scan result in the RMP.
+Ditto for MSR_AMD64_SEG_RMP_ENABLED.
 
-	Do RMPOPT on one CPU alone. Then, follow that up with RMPOPT
-	on every other primary thread. This potentially allows the
-	followers to use the "cached" scan results to avoid repeating
-	full scans.
+It could also potentially replace the 'rmpopt_wq' checks.
 
-> +	cpumask_clear_cpu(smp_processor_id(), &primary_threads_cpumask);
-
-How do you know that the current CPU is *in* 'primary_threads_cpumask'
-in the first place? I guess it doesn't hurt to do RMPOPT in two places,
-but why not just be careful about it?
-
-Also, logically, 'primary_threads_cpumask' never changes (modulo CPU
-hotplug). The thing you're tracking here is "primary CPUs that need to
-have RMPOPT executed on them". That's a far different thing than the
-name for the variable.
-
-> +	/* current CPU */
-> +	for (pa = rmpopt_pa_start; pa < rmpopt_pa_end; pa += SZ_1G)
-> +		rmpopt((void *)pa);
-
-This _looks_ rather wonky because it's casting a 'pa' to a virtual
-address for no apparent reason.
-
-Also, rmpopt() itself does 1G alignment. This code ^ also aligns the
-start and end. Why?
-
-> +	for (pa = rmpopt_pa_start; pa < rmpopt_pa_end; pa += SZ_1G) {
-> +		on_each_cpu_mask(&primary_threads_cpumask, rmpopt,
-> +				 (void *)pa, true);
+> +	rmpopt_all_physmem(FALSE);
 > +
-> +		 /* Give a chance for other threads to run */
-> +		cond_resched();
-> +
-> +	}
-> +
-> +	cpumask_set_cpu(smp_processor_id(), &primary_threads_cpumask);
+> +	return 0;
 > +}
-
-Honestly, I _really_ wish this series would dispense with *all* the
-optimizations in the first version. This looks really wonky because
-'primary_threads_cpumask' is a global variable and is initialized before
-the work function when it could probably be done within the work function.
-
-It's also *really* generically and non-descriptively named for a
-global-scope variable.
-
-> +static void rmpopt_all_physmem(bool early)
-> +{
-> +	if (!rmpopt_wq)
-> +		return;
+> +EXPORT_SYMBOL_GPL(snp_perform_rmp_optimization);
 > +
-> +	if (early)
-> +		queue_delayed_work(rmpopt_wq, &rmpopt_delayed_work,
-> +				   msecs_to_jiffies(1));
-> +	else
-> +		queue_delayed_work(rmpopt_wq, &rmpopt_delayed_work,
-> +				   msecs_to_jiffies(RMPOPT_WORK_TIMEOUT));
-> +}
-
-This is rather unfortunate on several levels.
-
-First, even if the 'bool early' thing was a good idea, this should be
-written:
-
-	unsigned long timeout = RMPOPT_WORK_TIMEOUT;
-
-	if (early)
-		timeout = 1;
-	
-	queue_delayed_work(rmpopt_wq,
-			   &rmpopt_delayed_work,			
-			   msecs_to_jiffies(timeout));
-
-But, really, why does it even *need* a bool for early/late? Just do a
-late_initcall() if you want this done near boot time.
-
-
->  static __init void configure_and_enable_rmpopt(void)
+>  void __snp_leak_pages(u64 pfn, unsigned int npages, bool dump_rmp)
 >  {
->  	phys_addr_t pa_start = ALIGN_DOWN(PFN_PHYS(min_low_pfn), SZ_1G);
-> @@ -499,6 +582,37 @@ static __init void configure_and_enable_rmpopt(void)
->  	 */
->  	for_each_online_cpu(cpu)
->  		wrmsrq_on_cpu(cpu, MSR_AMD64_RMPOPT_BASE, rmpopt_base);
-
-What is the scope of MSR_AMD64_RMPOPT_BASE? Can you have it enabled on
-one thread and not the other? Could they be different values both for
-enabling and the rmpopt_base value?
-
-If it's not per-thread, then why is it being initialized for each thread?
-
-> +	/*
-> +	 * Create an RMPOPT-specific workqueue to avoid scheduling
-> +	 * RMPOPT workitem on the global system workqueue.
-> +	 */
-> +	rmpopt_wq = alloc_workqueue("rmpopt_wq", WQ_UNBOUND, 1);
-> +	if (!rmpopt_wq)
-> +		return;
-
-I'd probably just put this first. Then if the allocation fails, you
-don't even bother doing the WRMSRs. Heck if you did that, you could even
-use the MSR bit for the indicator of if RMPOPT is supported.
-
-> +	INIT_DELAYED_WORK(&rmpopt_delayed_work, rmpopt_work_handler);
+>  	struct page *page = pfn_to_page(pfn);
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index aebf4dad545e..0cbe828d204c 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -1476,6 +1476,10 @@ static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
+>  	}
+>  
+>  	snp_hv_fixed_pages_state_update(sev, HV_FIXED);
 > +
-> +	rmpopt_pa_start = pa_start;
+> +	/* SNP_INIT clears the RMPOPT table, re-enable RMP optimizations */
+> +	snp_perform_rmp_optimization();
 
-Why is there a 'rmpopt_pa_start' and 'pa_start'?
+Ahhh, so this isn't happening at boot, it happens when kvm_amd.ko gets
+loaded? That escaped me until now. It would be nice to mention
+somewhere, please.
 
-> +	rmpopt_pa_end = ALIGN(PFN_PHYS(max_pfn), SZ_1G);
-> +
-> +	/* Limit memory scanning to the first 2 TB of RAM */
-> +	if ((rmpopt_pa_end - rmpopt_pa_start) > SZ_2T)
-> +		rmpopt_pa_end = rmpopt_pa_start + SZ_2T;
-> +
-> +	/* Only one thread per core needs to issue RMPOPT instruction */
-> +	for_each_online_cpu(cpu) {
-> +		if (!topology_is_primary_thread(cpu))
-> +			continue;
-> +
-> +		cpumask_set_cpu(cpu, &primary_threads_cpumask);
-> +	}
-> +
-> +	/*
-> +	 * Once all per-CPU RMPOPT tables have been configured, enable RMPOPT
-> +	 * optimizations on all physical memory.
-> +	 */
-> +	rmpopt_all_physmem(TRUE);
->  }
+There is basically no naming difference between
+snp_perform_rmp_optimization() and rmpopt_all_physmem(). Can you just
+get this all down to a single function, please?
+
+If you really have a reason to have a scan now and scan later mode, just
+do this:
+
+	rmpopt_all_physmem(RMPOPT_SCAN_NOW);
+
+and:
+
+	rmpopt_all_physmem(RMPOPT_SCAN_LATER);
+
+*That* function can do the X86_FEATURE_RMPOPT check.
