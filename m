@@ -1,81 +1,142 @@
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EDE228C87C;
-	Mon, 30 Mar 2026 03:34:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8C7A34CFCF;
+	Mon, 30 Mar 2026 04:08:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774841662; cv=none; b=iZIRb3Rt0NzSRmqm2f0kUZSKkOjixHYTh0YIfxopUK5Mu1/tusimzcqgPb9z9M1FptxhLXt9aDUCTasAQgKVB0zd2+PWrmwsbCnBwg/o73KvyGA5qO/v3qmSuEfjJN+kXUeRHGRjNmf1t1GRhyJ6CtkgTbCxZ8zyfOEiDzgbFJI=
+	t=1774843715; cv=none; b=Nxqskf0OvfX4X6CnUDc7artaL2lb8SLu0pDd5ZMltBP+CNClRg1j4yG4G0nlRo+SNsEZvVLfyQwCaOGqWVKfKTypox2mLBgqTwkmR1Cu11PLiVT7FTR+oANwV0cLRfrlz3uN/x1P4Y+Dm3P6LKIe5WhlWRSh3awYiuqU0gVXuSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774841662; c=relaxed/simple;
-	bh=gF94nN1HNBBYofW7e29FtsWe5UV4FRx4xsLOF+VQ5xs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Sox8a8BhezBfAH4O34uNLqVHtY6ti0XdRKKTXX8QS9mKbfkGzG7CBc1AF8Zv2LtjdV1AwLE+82//Q1zuOAGXSlCKfWISLBFhQCj9w5JHJ2Ur7gkEhd96B3+f9cjRZUluYmPZgzxEKhfafiKc+qOy3bYXZcTa1BU91F6pBBKdb80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn; spf=pass smtp.mailfrom=isrc.iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=isrc.iscas.ac.cn
-Received: from localhost.localdomain (unknown [36.112.3.223])
-	by APP-03 (Coremail) with SMTP id rQCowAD32uEr78lpGQhGDA--.29555S2;
-	Mon, 30 Mar 2026 11:34:03 +0800 (CST)
-From: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>
-To: gilad@benyossef.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH] crypto: ccree: fix a memory leak in cc_mac_digest()
-Date: Mon, 30 Mar 2026 11:34:02 +0800
-Message-Id: <20260330033402.2758074-1-lihaoxiang@isrc.iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1774843715; c=relaxed/simple;
+	bh=+A5NQMhCBBRKzoUSudLKLJZAfA7+8FwRJRitDmnyubY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=acUczmSJLmHsBQAP7KwT5UTCbi1bqGOWfVxgObxvehqVDFD+g7lfSV8nek9M3iLDJTbZ4wjG887WFTBbx/vHFtgEu8OAbhSp5qcD395CNWJ5rozSJCIkQc3L4qqG1EEkUP8Gz3Oh5DN7fg4BUboXL+ASBGVmcu50Y1/ZN2YBWzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rk5v/EL7; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rk5v/EL7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFE31C2BCB0;
+	Mon, 30 Mar 2026 04:08:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774843715;
+	bh=+A5NQMhCBBRKzoUSudLKLJZAfA7+8FwRJRitDmnyubY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rk5v/EL75EZ+hbfqEshAQz2QQe+iuSZNg84JSHBgQeHC7MQpiAlomNcv0214mZuA/
+	 gbjlTaVuay4FRB4MdNSX8Dc51tayHV0e0emc/xX42elGiN+vJjajX0Mj+DjRgCotku
+	 NJi0Cx4TsK5vFwnV0mTb3dWliU8/DvykqoMFl4Ne60JHqqLvWC6hKlA59DG+0Ub0mK
+	 i/RlQXksnWCqxo0T2LZaEiVWOLa6KPURQ9Z4xB+WBPWlEQnWDb+1w70onILoyinJz8
+	 gZZx9gSRcK/J1hwQTRHyR8albh/f2o81y7CxFJD3rwa1khO6zG0Hxaks+qBoOStyxZ
+	 Du8I3EdOFGAig==
+Date: Sun, 29 Mar 2026 21:07:24 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Matt Turner <mattst88@gmail.com>,
+	Magnus Lindholm <linmag7@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andreas Larsson <andreas@gaisler.com>,
+	Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Dan Williams <dan.j.williams@intel.com>, Chris Mason <clm@fb.com>,
+	David Sterba <dsterba@suse.com>, Arnd Bergmann <arnd@arndb.de>,
+	Song Liu <song@kernel.org>, Yu Kuai <yukuai@fnnas.com>,
+	Li Nan <linan122@huawei.com>, Theodore Ts'o <tytso@mit.edu>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>, linux-alpha@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	loongarch@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
+	linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-raid@vger.kernel.org
+Subject: Re: cleanup the RAID5 XOR library v4
+Message-ID: <20260330040724.GA647721@sol>
+References: <20260327061704.3707577-1-hch@lst.de>
+ <20260329213119.GA2106@quark>
+ <20260329155126.a01a5729b7d8376712182851@linux-foundation.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowAD32uEr78lpGQhGDA--.29555S2
-X-Coremail-Antispam: 1UD129KBjvdXoWruFWkZw18JF4ktw43CF1UGFg_yoWfAwb_Cw
-	1UuF97ZryUCF1rXF12y347XryF9a43uF1kuFnFqrW5ta4UCan29F17ZFsIyF17ZF48Xr1k
-	Ca17tFy3tr15ujkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb48FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Jr0_
-	Gr1l84ACjcxK6I8E87Iv67AKxVWUJVW8JwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr0_Gr
-	1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v26r12
-	6r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
-	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y
-	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
-	WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
-	IxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbSfO7UUUU
-	U==
-X-CM-SenderInfo: 5olkt0x0ld0ww6lv2u4olvutnvoduhdfq/1tbiBwsCE2nJxjS+gQAAsw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260329155126.a01a5729b7d8376712182851@linux-foundation.org>
 
-Add cc_unmap_result() if cc_map_hash_request_final()
-fails to prevent potential memory leak.
+On Sun, Mar 29, 2026 at 03:51:26PM -0700, Andrew Morton wrote:
+> > 
+> > Reviewed-by: Eric Biggers <ebiggers@kernel.org>
+> 
+> Great, thanks, added to all changelogs.
+> 
+> > But yes, as Andrew mentioned there are two "xor: add a better public
+> > API" patches.  They should be folded together.
+> 
+> I folded them.
+> 
+> I'm a bit wobbly about upstreaming all this for 7.1-rc1.  It hits on a
+> lot of stuff and I don't think we've heard a lot from the affected
+> maintainers.
+> 
+> otoh, we're unlikely to learn much from an additional nine weeks in
+> linux-next so at some point one has to forge ahead and rely on seven
+> weeks of -rc to address any remaining niggles.  And I'm confident that
+> Christoph will support his work well.
+> 
+> But still, hearing some reassuring words about this would be
+> appreciated ;)
 
-Fixes: 63893811b0fc ("crypto: ccree - add ahash support")
-Cc: stable@vger.kernel.org
-Signed-off-by: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>
----
- drivers/crypto/ccree/cc_hash.c | 1 +
- 1 file changed, 1 insertion(+)
+The architecture-optimized crypto and CRC code has been the same way.
+I've been working on it across architectures, and most of the arch
+maintainers don't pay much attention to it.
 
-diff --git a/drivers/crypto/ccree/cc_hash.c b/drivers/crypto/ccree/cc_hash.c
-index c6d085c8ff79..73179bf725a7 100644
---- a/drivers/crypto/ccree/cc_hash.c
-+++ b/drivers/crypto/ccree/cc_hash.c
-@@ -1448,6 +1448,7 @@ static int cc_mac_digest(struct ahash_request *req)
- 	if (cc_map_hash_request_final(ctx->drvdata, state, req->src,
- 				      req->nbytes, 1, flags)) {
- 		dev_err(dev, "map_ahash_request_final() failed\n");
-+		cc_unmap_result(dev, state, digestsize, req->result);
- 		cc_unmap_req(dev, state, ctx);
- 		return -ENOMEM;
- 	}
--- 
-2.25.1
+I've seen engagement from a few of them, for example s390.  But as a
+general rule it's a separate group of people working on this code.
 
+I think seeing the same for lib/raid/ is expected.  So while the arch
+maintainers are always welcome to chime in, I don't think we need to
+wait for all of them, as then we'd be waiting forever.
+
+Re testing, I've been running the crypto, CRC, and now the XOR KUnit
+tests in QEMU for 8 architectures (arm, arm64, mips, powerpc, riscv,
+s390, sparc, and x86), and over 40 variants within those (e.g. varying
+CONFIG_64BIT, CONFIG_CPU_BIG_ENDIAN, and QEMU's "-cpu" flag).  They are
+all passing, including the XOR test that Christoph added in this series.
+
+(So I guess feel free to add:
+
+    Tested-by: Eric Biggers <ebiggers@kernel.org>
+
+to all the patches in this series as well.)
+
+That still doesn't cover all the arch-optimized code, due to me missing
+various combinations or QEMU not supporting them.  But it's something.
+
+I'm also hoping that with the move to standard KUnit tests, we'll get a
+larger group of people, including projects like KernelCI, that simply
+run *all* the kernel's KUnit tests on whatever platforms they care
+about.  That approach is more scalable.
+
+- Eric
