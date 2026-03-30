@@ -1,82 +1,82 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 536E23385B6
-	for <linux-crypto@vger.kernel.org>; Mon, 30 Mar 2026 15:09:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF2652F25F0
+	for <linux-crypto@vger.kernel.org>; Mon, 30 Mar 2026 15:16:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774883352; cv=none; b=Ty3Nktn73WU2xGHGN8Forf8XIuJJZRsAdpi1I8+kpSucZqyjOT3Y9sYPXIkeFWLYCxzlJ1IfxJKnXzMqoDHnWa/M97TKdmulJfTFHgWkXNg2H8P8graDh7SMc7AJQj4xZdTTixGV/LKMrJHwf1EGjFpi2m6TMfgxREy9rLOenks=
+	t=1774883812; cv=none; b=K3xvEG+zBE3FJOj+RQVW/5p9+b8hgoxsu2jeHAhlwyWlGF2atk+aV+OukV1JBP4WMWH8eK4x+N9GBGqE/5bdcRrHHViKJTIMOK9lBsLpJeNfLEXfSiQ/drjF0E2b16hj7Y9l1RaIceWeepSQJ+bXLZkqUaRu5zbsJLHopvxExmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774883352; c=relaxed/simple;
-	bh=UETGGgVBuUFVU//IoPb6yqREGa8Fyc8FmIKlatx8jKM=;
+	s=arc-20240116; t=1774883812; c=relaxed/simple;
+	bh=NaVH8zIkqEU9AmQE+qLztKesEUMzinfCvffvpnQjuyQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MDnRWO3z0qwfcnpmuo+hdaZTUCvdOqNQgCRE330UG+9HVDas/WM999HQP+Wo2B+8xyHkr09WlhuqKrfjRa+eYU6gpbN28pz47hgTK2kAXdf1Gs6RU6dvrKXb9pE/Xr6lXWU2ZtdsL4CbpCay7pWVgKeOy4IB1h6Qjsb8Q4ijWzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P8vUAr6k; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ol99mi3B; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=n4XZjOglAHEMn0pPwR2gE7lqgUtr9SSri4gPmh4J0wKR1fpF/RQrVIxtoE2E18t3c6k8EYFLDmN88pUlWino2THWL/6jq9vovYpo6pPcrezWvmkj3A/vSYtIim3C118084R0ADTOUYLHpaNUkeIPABXAmIOYfVECwi04DR3g/7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SJZXbHr7; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=pnucoW9B; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P8vUAr6k";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ol99mi3B"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SJZXbHr7";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="pnucoW9B"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774883350;
+	s=mimecast20190719; t=1774883809;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7RZylSVCYgAIw5EH+90iXOfbLfETW2Xky5UhPlA+i2U=;
-	b=P8vUAr6kFaYk/Ch4fnNpG9bGn2sPJV3RtjeRefSlJK0RP718rfk11wWj3nrwFBtLykaVx7
-	CEKfOn9BUa6mfrUnAlPjz7jt8BIZjAuDc15Hzx1aZyIuEjNuQv13tzrYZJrmH/b0CVGGgF
-	PM26Vyynv7adL/ufZ8ZtDAKsnAyDU3s=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=beybqvcHZSF5ZRRU/l09CbOmW2h45yqjTC07lws0qAA=;
+	b=SJZXbHr7nQOBX5oozngNRdGHnxJA6vXpiPG8edLaFRNQIzNwIQjjvRRUJKWYCovMknceJw
+	UvcX5dZik57GQ33eYN3IlTUfqq6TbaMIkFqh/9/NL7YZ4LvfplVmqMdgWcCuXZ6d37LaAQ
+	DPkZ7qDmDO5tuSbsXECu2MWoLlSELJM=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-365-HQwbu09kNr2iOz1BrrF1JA-1; Mon, 30 Mar 2026 11:09:09 -0400
-X-MC-Unique: HQwbu09kNr2iOz1BrrF1JA-1
-X-Mimecast-MFC-AGG-ID: HQwbu09kNr2iOz1BrrF1JA_1774883348
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-50937cf66b5so235983631cf.3
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Mar 2026 08:09:09 -0700 (PDT)
+ us-mta-612-aIs9ima4O3Cr0MgWVy4a9A-1; Mon, 30 Mar 2026 11:16:48 -0400
+X-MC-Unique: aIs9ima4O3Cr0MgWVy4a9A-1
+X-Mimecast-MFC-AGG-ID: aIs9ima4O3Cr0MgWVy4a9A_1774883808
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-8cd77e5e187so778220585a.1
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Mar 2026 08:16:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1774883348; x=1775488148; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1774883808; x=1775488608; darn=vger.kernel.org;
         h=user-agent:in-reply-to:content-disposition:mime-version:references
          :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7RZylSVCYgAIw5EH+90iXOfbLfETW2Xky5UhPlA+i2U=;
-        b=Ol99mi3ByiWoZqk2YGxdee5Ky9+lYtw255wjlUjibu9l6572lHPLF0dP59LFtQKngU
-         w08awrwKoeRJKHsf8luQYoAa8mz4C41vFLwWyji/F36OU1k4qseYMmhBMlRKxI4nPKK9
-         MCKNCCKKJr2xFL8JowkuaiWqlg5g9f7VqhKdKNQv7LrtLU7wTj9DVXn4sCdheIim4J8q
-         l7ZzEXZIhB87/xNIjBqt3/VPs4jXBTTFXCkSokyke285ls3ckSKMFC2azLGcCU+p2DHs
-         brT9yXQOYMWHeRYQFXOLtkGB8RqaD2uVW0MXF88d0Tu/ydSVPOxK+rUwudLi9uGQEois
-         GHQA==
+        bh=beybqvcHZSF5ZRRU/l09CbOmW2h45yqjTC07lws0qAA=;
+        b=pnucoW9BDxiiYnarMq7wcIbhr40vyrhzuWZgDJJqSDvattYjknVyHet34Ae9Mv1tQ+
+         kt6ZKLtGGENenyXoG4nvp7OfFaBv6OMlVGNcDbbkQXHo4L3LbghH8TCoyBhuHTFeHQlg
+         ehjImeap2Z2jclbM1K5PCh0Ds/57M4hP358VHsi6laAF6TqEpSIP/0ApBlAJ8T4MZmXn
+         O87NHKzFbjGolQ7y5FcFYQ/b9ftn/Mjr/ikrvusV2MV3FYt3Cnm7TabFqhUO+esII+a2
+         ukkhPrvfln8e3a6gHaNUl1sprq0ZyFGiaAi5a0Dj6saxohz66cPfib3cQ8xkcnq0mo1m
+         ytvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774883348; x=1775488148;
+        d=1e100.net; s=20251104; t=1774883808; x=1775488608;
         h=user-agent:in-reply-to:content-disposition:mime-version:references
          :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=7RZylSVCYgAIw5EH+90iXOfbLfETW2Xky5UhPlA+i2U=;
-        b=sUd2ECL6N853mDmomTusXnt2o5eJ/Ib1TyTEYSCituEvp/7Dqe8Qz9XLAA4MtHzBWf
-         ArS+SgtxJvn/Jdt8ZN6l5NU4Bscw8bYmUJltv/SD/WrGm1/X5V/UeSZ/PY81jPUg6Ng4
-         BVzIsZtU3CFTIQ7AtEFGU28ujyJmHGGcj3iSdJpEKOPFt2OcnsslKwC/qCakScj8FS9L
-         hCA6GT8b86RTL2QIm+RYiRStRGZBCwU7LbX1yyDsvE+rqbBEHGmWvPl0IT4Fbyj4ZAur
-         OUV2FkX0DnZpNK/wO+Rwaq0L7VEgelljYDS2pjtkPw3MXgKmIZYC35Mj/X0bNe2W+xQ4
-         SpKg==
-X-Forwarded-Encrypted: i=1; AJvYcCX4ZxFBu2SZ5lTgGURb4HajizuxCiCw2zKWfby03PCbQySvUEQfVGIe89ulwsJK8b9ihJbPX+SbSMC1W18=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzkDxb+nkROLPmsfQJuYoVepP1a+tdFVMhTM4PDGbBMuqmPIJnT
-	SK7SihlwLuXq1P0UuJafuQ8OPFcPN+Y38a1/PjQcgUOr6tZsfLeVR2t0Rn2seNZR1C4oXc9axOP
-	M+XwiyeiBONTVxCsiYVLO8LmSNTccefKcjZPpQaqE9R9yPIp0jbN1JlFmo16nwxFqTQ==
-X-Gm-Gg: ATEYQzx96PQxVPAD8a+yDwUt8ypp9EBzeuP93znCLGnqJHmArSO/O2O9cz4WtYC8jYJ
-	7xFPRAVSyqBTBAEyG2x3rVXs3anr5N3D3cY9O0ldP5WoQxc5r1EmzcqT1Kl4/KPPgSeBJEzITZi
-	pwoH28NnuSJQcWayI9Ti009dARKz0seuchQBcLGnWPnF3UCrVboaW+BcmKvUxIdJ7UEbk3mZy2U
-	tblRu9xzOp1DAgadt3ZzSm/ytHuWADo1KS2I+O2GGOUEoyNUEFeDBwP1D1AI/Fom4Juo86Qoi4N
-	VCRaI6UIYin7e8BoPzi5fFAE4fW5pfRu2TnOHB0hQmjun74se4EPCeADwMxbRcuabP66DUszOgg
-	L+jAIFn0+8xevezLs7Z18tM25vJVDmPk4Cwxtkr9i88TggKNuOA/Tu0WT
-X-Received: by 2002:ac8:5dd1:0:b0:50b:3b54:d796 with SMTP id d75a77b69052e-50ba380f13dmr171149551cf.27.1774883348254;
-        Mon, 30 Mar 2026 08:09:08 -0700 (PDT)
-X-Received: by 2002:ac8:5dd1:0:b0:50b:3b54:d796 with SMTP id d75a77b69052e-50ba380f13dmr171148751cf.27.1774883347545;
-        Mon, 30 Mar 2026 08:09:07 -0700 (PDT)
+        bh=beybqvcHZSF5ZRRU/l09CbOmW2h45yqjTC07lws0qAA=;
+        b=ghRG3f+gzhcf3Eh7yCZpQtQeRWgg416W7e/qTpmQGkFOaq7X4DzX1DJg1Hsk2sY+WZ
+         S0gWy0iDFKKd4Up7mjdJ1f6PvamOEJ/bdhqNa7NyqN/fgHP41i67KY4VYu7fd7BQdM9P
+         3dw5Ahy09TEFkBNesGgWkMGazhDxY3lsD3BVlYoXwWcXAHdZc/bUAN+yKCg/FKOaB9Ce
+         nZstpb+Up5ResRoXRi3ivXYa427PMA9o3sT8Y+jSWR86fLhrKKHixqKhjq1DLfoIdSMH
+         LAAKkaMdgvoQ9B/fUlN6upTisZKJoV6QpRyVyGQ7uPGJlAw4Pfd4e+z5vyaW3ARFLzGq
+         bKuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWOAlfYMPuDxUFfBIe9S31W/GZnn/W7b4whEYPR4s4vVMmtWq82/tlpHzGcKcy7ObAjNDBEt5G0vzTvEYE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5LMiLOuuf/TF4rBxqB7wKizydPP1znKtiYZrlegdkWs+ae5Lk
+	J6Z/pzcWaU5lqAUXtnfpp05mk3pcpv1mKEFh+U8Mgh9ESKhACR7J29WX1vhYiKQheH6m6xKwd9R
+	e1xgpwDW8AIyvZLz0O/PQ/o4j1L2vCL2Sdt/wuoBaXBTKihWdTymcPWq8JFL3ZDONwg==
+X-Gm-Gg: ATEYQzzNyMHOYSVyWw7S4g9TApnX5akSR2pK5UtZtvE24uw9XsWzQBeUfLckKq65sP+
+	b87CpthDbZ03jLX37MBH/b3OjGW8JbsQAv2/vuF/cEx0xZjY5LiWdWNYOkU+wIB+fWK4aUIfOq4
+	lOAzjKFHZTCSHqMixk07IiCWYVYVHPYtv+YNa9yjaw7jgQtw8kyzUvdK71iyFTxPB4FxzaEDeXi
+	jJ4fKWP7p8NzEK5xBv+EuPLIwfXbx075E/r1VZv1GPqx90l5z93MOU3yQsfWcHe+6fcVXZLUpRM
+	6ZYb8up4174h1TE4x8Zo4gRmI3Zb1OUzSWShPKTdU5xj6PWoAJl2EV1/Yf505Q3ARkwq20x+MR+
+	2FY5IFHWC6Xxmjl41za3yoPhbzF2G4aCqycpm/MI5kiWYa3D6y/0uVid2
+X-Received: by 2002:a05:620a:448a:b0:8cd:c04f:c6a1 with SMTP id af79cd13be357-8d01c816db2mr1669490685a.58.1774883807923;
+        Mon, 30 Mar 2026 08:16:47 -0700 (PDT)
+X-Received: by 2002:a05:620a:448a:b0:8cd:c04f:c6a1 with SMTP id af79cd13be357-8d01c816db2mr1669485885a.58.1774883807244;
+        Mon, 30 Mar 2026 08:16:47 -0700 (PDT)
 Received: from redhat.com (c-73-183-52-120.hsd1.pa.comcast.net. [73.183.52.120])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50bb2e0fe31sm63567841cf.20.2026.03.30.08.09.05
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8d02806a37bsm617484985a.34.2026.03.30.08.16.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Mar 2026 08:09:06 -0700 (PDT)
-Date: Mon, 30 Mar 2026 11:09:03 -0400
+        Mon, 30 Mar 2026 08:16:46 -0700 (PDT)
+Date: Mon, 30 Mar 2026 11:16:44 -0400
 From: Brian Masney <bmasney@redhat.com>
 To: "Miquel Raynal (Schneider Electric)" <miquel.raynal@bootlin.com>
 Cc: Michael Turquette <mturquette@baylibre.com>,
@@ -100,7 +100,7 @@ Cc: Michael Turquette <mturquette@baylibre.com>,
 	linux-renesas-soc@vger.kernel.org,
 	Herve Codina <herve.codina@bootlin.com>
 Subject: Re: [PATCH 10/16] clk: Add support for clock nexus dt bindings
-Message-ID: <acqSD1k91pKGj0Rr@redhat.com>
+Message-ID: <acqT3Dh03y3JiLLc@redhat.com>
 References: <20260327-schneider-v7-0-rc1-crypto-v1-0-5e6ff7853994@bootlin.com>
  <20260327-schneider-v7-0-rc1-crypto-v1-10-5e6ff7853994@bootlin.com>
 Precedence: bulk
@@ -176,6 +176,35 @@ On Fri, Mar 27, 2026 at 09:09:32PM +0100, Miquel Raynal (Schneider Electric) wro
 > 
 > Signed-off-by: Miquel Raynal (Schneider Electric) <miquel.raynal@bootlin.com>
 > Reviewed-by: Herve Codina <herve.codina@bootlin.com>
+> ---
+>  drivers/clk/clk.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/clk/clk.c b/drivers/clk/clk.c
+> index 93e33ff30f3a..196ba727e84b 100644
+> --- a/drivers/clk/clk.c
+> +++ b/drivers/clk/clk.c
+> @@ -5218,8 +5218,8 @@ static int of_parse_clkspec(const struct device_node *np, int index,
+>  		 */
+>  		if (name)
+>  			index = of_property_match_string(np, "clock-names", name);
+> -		ret = of_parse_phandle_with_args(np, "clocks", "#clock-cells",
+> -						 index, out_args);
+> +		ret = of_parse_phandle_with_args_map(np, "clocks", "clock",
+> +						     index, out_args);
 
-Reviewed-by: Brian Masney <bmasney@redhat.com>
+Before I left my Reviewed-by, I should have double checked Sashiko. It
+has several questions about this patch. The first is:
+
+    Are there other places in the clock framework that need to transition to the
+    new map API to ensure assigned clocks work?
+    
+    For instance, assigned-clocks and assigned-clock-parents are parsed in
+    drivers/clk/clk-conf.c using of_parse_phandle_with_args(). If a device
+    specifies an assigned clock that routes through a nexus node, will it fail
+    to configure because the map is not traversed?
+
+https://sashiko.dev/#/patchset/20260327-schneider-v7-0-rc1-crypto-v1-0-5e6ff7853994%40bootlin.com?patch=12563
+
+Brian
 
