@@ -1,40 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E0723254B3
-	for <linux-crypto@vger.kernel.org>; Mon, 30 Mar 2026 14:46:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A9F3271FD
+	for <linux-crypto@vger.kernel.org>; Mon, 30 Mar 2026 14:46:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774882003; cv=none; b=QAefJkTTBOWvxg6KEUJswEOXa0M6IXZuXG6ORT1uXDQH/C4xjCyRQVTRyVuRtS0dLfEvIKeH3UuCVkHKHmib4yOyBVspJlC1dkOboOIgQhR7JwefHL1OoITcaEPnn5LbFDtgWTG9j+MZQXnzJSAaGMymoYnN/gCGhynvPHF2te4=
+	t=1774882005; cv=none; b=CiPjyXpFRI29SHd3HSUmhVlCk+nUThvsrJ7UfGJRjhK5biGeFTko6J6xcnS8ojIJ4Fec7F4aZdurKVv5q2axmHO+Tggec90MFAfhFHLpmeZSzoOwwBfGplIBXQ2quyBOIezokq47VqlLT3NWXV8vpWgs5DdAbSgo6j2ZNGso2IQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774882003; c=relaxed/simple;
-	bh=5V9bXxWmYXvrmutVJY6nsrGoOdvZArmahKRGSQilrU0=;
+	s=arc-20240116; t=1774882005; c=relaxed/simple;
+	bh=fAIBhC+LS5rsHZRLsEihWNrSlr1ZuUtu4ZmF07BHqog=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YT3h+1ii7Z794Eai5LHdXY8XEpRY0qGF5bO9ZCBNzwjk03n6T33q+BSqkirboqv9K0dxCchQ4w1G6/EefxyI3PivdzhWNm4Zx0hPS+djO46gxhJnCB9J5zZu4AAkbsEvO45Dfw1kDjoPB20JIc+EPB6EoDA6ocI0BFrDXnOIqCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=spme1y9S; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=Z+MePPfBEZnk0sb+7BfpMAlWKi/GFPnCuDYh2MfIvNbaumtYKUEv3Qrqlym0xGCANj/Xsy7fvgSOWFu/cKXyzHMIoDBA0NVjgawdAiVh5eUNbnOV1UiHdK+654etB2wIJSdRB6leNmA3xfBfTRKmPY+WsaIMr36zAXSOCU+3HsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NSwxlE1d; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="spme1y9S"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43AA9C4CEF7;
-	Mon, 30 Mar 2026 14:46:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NSwxlE1d"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DD61C19423;
+	Mon, 30 Mar 2026 14:46:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774882002;
-	bh=5V9bXxWmYXvrmutVJY6nsrGoOdvZArmahKRGSQilrU0=;
+	s=k20201202; t=1774882005;
+	bh=fAIBhC+LS5rsHZRLsEihWNrSlr1ZuUtu4ZmF07BHqog=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=spme1y9S3UqclPAT4pHAj/Gm6PPg0wyYqc3gZigumyeUc/d4esllbb7n5apOSz0W7
-	 P2A9/zuvpLw8qdiuoxBBkOWIxwYMBsu5n2JN0ymE6W2bHN8sm4darlB8MZcaYCGqAD
-	 f/jpBy/WQoLNNHNUqsZ1Zafq8YiD1EUd11vTkPQh1Cnvi9ILe1jHz84Og4T8Zd+sdp
-	 W8Kt1Gi5p43sia9HH64hJSZ+ycs7Til0AcqfotW07GWdGDFbiEr6jDbu5BZYEU2PJT
-	 LQHCKnBRz2yIFU4/EjF7S6NcbuWj5IxISApwEmiXM7tpHQn7+eGq0XU8dlwA9/iinB
-	 MIFNzSq+vaGgQ==
+	b=NSwxlE1di3ozYoRomiji1GzZVuvPUlLR6iuQFkbfdRuRdfbZibnuNXm734/cII0Wg
+	 9nOOxf7oSgUSiPQrqFjmsrqY72mxneS3Z5OP0Y8OPfppeJBrGNX+he/TvMxabWEKFg
+	 VRVbKaTX0uQ+lE3os6fFA9A3HP2wEJG72SVdudX5fogoQGgr0krvQJsa681tX+LhgM
+	 UkCW/GlgKZTPJwUbhbuH53wKXEa0jXhvbLEm03w404fuBhhkL+jaZU/wlPRC46Gr0N
+	 t05GanApVtlUXBC1MlpYJWxryIljY9T6O+MHy37Jay8uuchWttilfOZNtRwrCKaj+2
+	 NVfHIziIZ4mJw==
 From: Ard Biesheuvel <ardb@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-arm-kernel@lists.infradead.org,
 	Ard Biesheuvel <ardb@kernel.org>,
 	Demian Shulhan <demyansh@gmail.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 1/5] lib/crc: arm64: Drop unnecessary chunking logic from crc64
-Date: Mon, 30 Mar 2026 16:46:32 +0200
-Message-ID: <20260330144630.33026-8-ardb@kernel.org>
+Subject: [PATCH 2/5] lib/crc: arm64: Use existing macros for kernel-mode FPU cflags
+Date: Mon, 30 Mar 2026 16:46:33 +0200
+Message-ID: <20260330144630.33026-9-ardb@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260330144630.33026-7-ardb@kernel.org>
 References: <20260330144630.33026-7-ardb@kernel.org>
@@ -44,43 +44,36 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1010; i=ardb@kernel.org; h=from:subject; bh=5V9bXxWmYXvrmutVJY6nsrGoOdvZArmahKRGSQilrU0=; b=owGbwMvMwCn83sBh/rljoYmMp9WSGDJP9RyXXunSke/JOvfT9e+75tWpXl72fMMKB+XX5+aly gXNEl29sWMqC4MwJ4OsmCLLTuWc7tcuou/0FSpzYOawMoEMYeDiFICJ7M1lrHfW6Gd5Wv+XK//2 jVx/ttKZC0q3JL9/+m7HP5kLy+WvKX+5wZ+844jHGdWc1XraEyOrJjDWZwmubvoim1h3Sv6OTbP AkQkVe2y2fDv8WD769aTzEZckg7N0RKue35nbpp2wMUM1a+d9AA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1145; i=ardb@kernel.org; h=from:subject; bh=fAIBhC+LS5rsHZRLsEihWNrSlr1ZuUtu4ZmF07BHqog=; b=owGbwMvMwCn83sBh/rljoYmMp9WSGDJP9Ry/GXTvwAzbr+9l9S1qeJObxU/mKLG2LUp+/un3w mWmW5KMOqayMAhzMsiKKbLsVM7pfu0i+k5foTIHZg4rE8gQBi5OAZjIfnnGhtuqlZ+fZ76PDPg/ MZ7zhcmFjmsfLtv/+zJfL4vXKF3wt8pEuWrt0FsrE7VF9ixbmfZEjrHORkp3q+b7qxHKW19+nBz BUW/nrHTh9hFhruCkW59X8n4I2RmmfTAuXS7s9CnN23dm7owAAA==
 X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
 Content-Transfer-Encoding: 8bit
 
-On arm64, kernel mode NEON executes with preemption enabled, so there is
-no need to chunk the input by hand.
+Use the existing CC_FPU_CFLAGS and CC_NO_FPU_CFLAGS to pass the
+appropriate compiler command line options for building kernel mode NEON
+intrinsics code. This is tidier, and will make it easier to reuse the
+code for 32-bit ARM.
 
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- lib/crc/arm64/crc64.h | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ lib/crc/Makefile | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/lib/crc/arm64/crc64.h b/lib/crc/arm64/crc64.h
-index cc65abeee24c..ab052a782c07 100644
---- a/lib/crc/arm64/crc64.h
-+++ b/lib/crc/arm64/crc64.h
-@@ -16,15 +16,13 @@ static inline u64 crc64_nvme_arch(u64 crc, const u8 *p, size_t len)
- {
- 	if (len >= 128 && cpu_have_named_feature(PMULL) &&
- 	    likely(may_use_simd())) {
--		do {
--			size_t chunk = min_t(size_t, len & ~15, SZ_4K);
-+		size_t chunk = len & ~15;
+diff --git a/lib/crc/Makefile b/lib/crc/Makefile
+index c9c35419b39c..ff213590e4e3 100644
+--- a/lib/crc/Makefile
++++ b/lib/crc/Makefile
+@@ -39,9 +39,8 @@ crc64-y := crc64-main.o
+ ifeq ($(CONFIG_CRC64_ARCH),y)
+ CFLAGS_crc64-main.o += -I$(src)/$(SRCARCH)
  
--			scoped_ksimd()
--				crc = crc64_nvme_arm64_c(crc, p, chunk);
-+		scoped_ksimd()
-+			crc = crc64_nvme_arm64_c(crc, p, chunk);
+-CFLAGS_REMOVE_arm64/crc64-neon-inner.o += -mgeneral-regs-only
+-CFLAGS_arm64/crc64-neon-inner.o += -ffreestanding -march=armv8-a+crypto
+-CFLAGS_arm64/crc64-neon-inner.o += -isystem $(shell $(CC) -print-file-name=include)
++CFLAGS_REMOVE_arm64/crc64-neon-inner.o += $(CC_FLAGS_NO_FPU)
++CFLAGS_arm64/crc64-neon-inner.o += $(CC_FLAGS_FPU) -march=armv8-a+crypto
+ crc64-$(CONFIG_ARM64) += arm64/crc64-neon-inner.o
  
--			p += chunk;
--			len -= chunk;
--		} while (len >= 128);
-+		p += chunk;
-+		len &= 15;
- 	}
- 	return crc64_nvme_generic(crc, p, len);
- }
+ crc64-$(CONFIG_RISCV) += riscv/crc64_lsb.o riscv/crc64_msb.o
 -- 
 2.53.0.1018.g2bb0e51243-goog
 
