@@ -1,275 +1,140 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3BC8363C6F;
-	Mon, 30 Mar 2026 15:38:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA4D37BE6E;
+	Mon, 30 Mar 2026 16:05:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774885133; cv=none; b=A2wlP/MjxKpyim8PK8gI4iEcuoLdlivVX/5+gVddRSwHmyLtCx5M9eEuA8pEC8ugpy8Eey/C5QP+t9z4nU5FC67s+9r6spvdkZFoz5RQFH4UW/Jp+V1c7k7vx7+2dVif64iMDpVIDN4OGBJh68nR5yvGsDokvCKxyPF7Uc9+XZ8=
+	t=1774886715; cv=none; b=XZm5seCikrMpOdOktRZRVmujuTI/fkgiDY53HemKC1XEOdKpJaJiQ9WUA9V1HxkZ+rOISuaWIisStAgsuK668CCL4b0NHv7alKnt1w05d8ifP98hG4IP+z8OtMt1wsCmCLYp4P06ohZBzIttvocD3SmwF4VeABKrUWuRvf+IyEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774885133; c=relaxed/simple;
-	bh=eLxEypI8QBApRQ3sdD4fMBa2d3tUuSgbVJXyuNnVOwA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gUMMHTgiKoKN9LT/uYdqboKjKkkgvuPVHMCeQbOZRn6y65oT0+VPnZJhqK3Yqisb8Z7zwVnuM/oO3uqW261/mZ6i4ueo9JchWHIaTTVJT9rLmkMyry3tc3ILR5L1V7b6KdYIdsWUFyOPgE5jflFCDsvOhsV75Ikt0YGnx21DuUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ShhnGkBh; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774886715; c=relaxed/simple;
+	bh=TgLSk+5bBoGnTqULZQT4gLbfagMrrJBmQBpdAzOaMYc=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=ul98ur24mThBYLiDRmOBsl8WYcT7YYB+P8+Fealys6/KNESpr+bXAjNxlAJNNgngcCF6y+8ATlihRjK3r+i+3V0lLmzDV10tZoq4Nk0Or6iHY/uJitXPIwvUPcyxoZGX37wuq+bwuWoNsd+0hNXk7DQWd6gV7KS2KHWSU9AV2wM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mw8D5kZy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ShhnGkBh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D27CC4CEF7;
-	Mon, 30 Mar 2026 15:38:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mw8D5kZy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FEE7C19423;
+	Mon, 30 Mar 2026 16:05:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774885133;
-	bh=eLxEypI8QBApRQ3sdD4fMBa2d3tUuSgbVJXyuNnVOwA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ShhnGkBhdmk+1FgyMHV0D8aig+eCJ8yIZnPjYPGIw5OXC0ooRhAA0HvlDUPC7d71I
-	 lMphy0IgcUg2npZDjKmNf3RmewrITBbiuHy7Y3Ge18DbDde5Kp09h3X9R48d77sZep
-	 wfM/Ex7Ea2txq1k5F0ChenekIg0GnZviN+hOSBpRwOQHubZkUZdVKeTa7S4p5s2F01
-	 /ae4nrrtO/SpWbXHdoKP71sOyXh5slUAcm3hPwH1NG+UIcptK0GRSYjhXStkLucKXR
-	 gZsZkLy4Pzyj7COBZ/jg3vUrjvwJGtB0nd5IO4o38JWMJyhW1/60VvpiPtWJdOTQRM
-	 ekrP9sJFnZa0A==
-Date: Mon, 30 Mar 2026 09:38:49 -0600
-From: Tycho Andersen <tycho@kernel.org>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Ashish Kalra <ashish.kalra@amd.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	John Allen <john.allen@amd.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>,
-	Kishon Vijay Abraham I <kvijayab@amd.com>,
-	Alexey Kardashevskiy <aik@amd.com>,
-	Nikunj A Dadhania <nikunj@amd.com>,
-	"Peter Zijlstra (Intel)" <peterz@infradead.org>,
-	Kim Phillips <kim.phillips@amd.com>,
-	Sean Christopherson <seanjc@google.com>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v4 0/7] Move SNP initialization to the CCP driver
-Message-ID: <acqZCYwNdepPnNMB@tycho.pizza>
-References: <20260324161301.1353976-1-tycho@kernel.org>
- <6A6AA56D-6B4C-4C32-A639-18C14BC0C358@alien8.de>
- <acP-UdjBy06MnBgY@tycho.pizza>
- <20260328113814.GSace9ppUByOyRrTFI@fat_crate.local>
+	s=k20201202; t=1774886715;
+	bh=TgLSk+5bBoGnTqULZQT4gLbfagMrrJBmQBpdAzOaMYc=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=mw8D5kZyZGE8J6onjn91vjtSVKw192T4fATzMQ0s/QKMJdbGcyqjJntVvZp1TmRXZ
+	 wKCtwrofk87HajEFfTS3EozCDk1e5tms0NnCGSZ/pXWFgIXaz7nwBDlKG761jfF9EW
+	 q9SzFRsAKzb1Y14Zknfd088X9kT6t14qkBHkYP1W1nija/ovRJ483U6EFvQPqZ8RzB
+	 m6oXZ3EsUdzJndPYeOV4cfgMvKTgbHtcfLss/fCkhlVFzSfkJLS0Ittc4fTLKKB7v0
+	 PHF7K4gnveSpMjYTZJ3qi3nULiVbavhEiZJZyFRJv7g4UX7giBRJnEwd4TrBSqMXZX
+	 7LDt3sG9A6o1A==
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 2963DF40073;
+	Mon, 30 Mar 2026 12:05:14 -0400 (EDT)
+Received: from phl-imap-02 ([10.202.2.81])
+  by phl-compute-01.internal (MEProxy); Mon, 30 Mar 2026 12:05:14 -0400
+X-ME-Sender: <xms:Op_KaXWl9o0KRTOQXZLXHVAri9Q6c3x7Jt7ItTK-Ypq2UhE285VZKQ>
+    <xme:Op_KaaZkFuSik0xg-IysdMa_7BBHFnc-Fg94XVKsZtrjrbTbgh5WS3qNKTocwngte
+    vcGMgo6T4LLvWwR2Qkf7KxXbvAEP0KsIRp4JJZ3CkKo5bcMX4JfOa5j>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeffeelgeduucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrugcu
+    uehivghshhgvuhhvvghlfdcuoegrrhgusgeskhgvrhhnvghlrdhorhhgqeenucggtffrrg
+    htthgvrhhnpedvueehiedtvedtleekuddutefgffdtleetfeetveejveejieehfefhjeei
+    jeefudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    grrhguodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduieejtdehtddtjeel
+    qdeffedvudeigeduhedqrghruggspeepkhgvrhhnvghlrdhorhhgseifohhrkhhofhgrrh
+    gurdgtohhmpdhnsggprhgtphhtthhopeejpdhmohguvgepshhmthhpohhuthdprhgtphht
+    thhopehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdrohhrghdrrghupdhrtghpth
+    htohepvggsihhgghgvrhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehglhgruhgs
+    ihhtiiesphhhhihsihhkrdhfuhdqsggvrhhlihhnrdguvgdprhgtphhtthhopehlihhnuh
+    igqdgtrhihphhtohesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhn
+    uhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehsph
+    grrhgtlhhinhhugiesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehjrghs
+    ohhnseiigidvtgegrdgtohhm
+X-ME-Proxy: <xmx:Op_KaYHVnBcbAbW-NRIAlDnkxxEUz3YOrs91uVVJtt1sFsK7Zs9D4g>
+    <xmx:Op_KaT6uONk5y3TkK_EC_aRP5m3SB4enFi-ORxj-cRy1E-vHTvhjIA>
+    <xmx:Op_KaVy581VDm6ljNoLnDZ3pUtcbi0uFUrPfR6720EOyZ6IASZ4d3g>
+    <xmx:Op_KaaNJq0cJpQLMGnYT79K6g0pw6AiQzkle9GoBaBKZbxE7_b43eQ>
+    <xmx:Op_KaTn82iWTLowQbvRxwn0QGWB5MK2xHquiiirFovcHpyUhpOTsHnvz>
+Feedback-ID: ice86485a:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id F197D700071; Mon, 30 Mar 2026 12:05:13 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260328113814.GSace9ppUByOyRrTFI@fat_crate.local>
+X-ThreadId: A5MJLS9D-sX3
+Date: Mon, 30 Mar 2026 18:04:53 +0200
+From: "Ard Biesheuvel" <ardb@kernel.org>
+To: "Eric Biggers" <ebiggers@kernel.org>,
+ "John Paul Adrian Glaubitz" <glaubitz@physik.fu-berlin.de>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ "Jason A . Donenfeld" <Jason@zx2c4.com>,
+ "Herbert Xu" <herbert@gondor.apana.org.au>, sparclinux@vger.kernel.org
+Message-Id: <5ad43f1d-8a89-495c-a331-7bfc8ae8c389@app.fastmail.com>
+In-Reply-To: <20260327201456.GB25969@quark>
+References: <20260326203341.60393-1-ebiggers@kernel.org>
+ <fc5a80f3579d642a9f792a33b0f7ef6101838f83.camel@physik.fu-berlin.de>
+ <20260326230232.GA67831@quark> <20260327201456.GB25969@quark>
+Subject: Re: [PATCH] lib/crypto: sparc: Drop optimized MD5 code
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Sat, Mar 28, 2026 at 12:38:14PM +0100, Borislav Petkov wrote:
-> > > Is there a race condition with CPU hotplug here?
-> > >
-> > > Since snp_prepare() lacks cpus_read_lock() protection, a CPU could
-> > > come online exactly between the two passes, missing the mfd_enable step
-> > > but receiving snp_enable.
-> > 
-> > I think it makes sense to do the operations on the same set of CPUs
-> > even if we don't support hotplug. I will resend with
-> > cpus_read_lock().
-> 
-> Right, especially if that function would run now at arbitrary points in time
-> - as this is the main reason we're doing this whole dance.
-> 
-> BUT!
-> 
-> If you grab the hotplug lock and you realize that you don't have all CPUs
-> online and since we zapped the hotplug notifier and since SNP enable would
-> fail anyway, we should simply check if all CPUs are online and return error
-> if not instead of running the IPIs.
 
-Sure, I will send a patch on top with that.
+On Fri, 27 Mar 2026, at 21:14, Eric Biggers wrote:
+> On Thu, Mar 26, 2026 at 04:02:32PM -0700, Eric Biggers wrote:
+>> On Thu, Mar 26, 2026 at 10:51:01PM +0100, John Paul Adrian Glaubitz wrote:
+>> > On Thu, 2026-03-26 at 13:33 -0700, Eric Biggers wrote:
+>> > > MD5 is obsolete.  Continuing to maintain architecture-optimized
+>> > > implementations of MD5 is unnecessary and risky.  It diverts resources
+>> > > from the modern algorithms that are actually important.
+>> > 
+>> > Why is it risky? That makes no sense.
+>> 
+>> Because there can be issues in architecture-optimized algorithm
+>> implementations that don't exist in the generic implementations.  That's
+>> a very common class of issue that has repeated over time.
+>> 
+>> > I also don't see how it diverts resources as no one is forced to work
+>> > on the code.
+>> > 
+>> > SPARC is an architecture used by hobbyists and in space these days (in
+>> > the form of Leon). I don't think any other kernel developer will have
+>> > to take a look at it.
+>> 
+>> Huh?  We've been refactoring how the various crypto and CRC algorithms
+>> are integrated, for all architectures.
+>> 
+>> So people outside the SPARC community, especially myself, been having to
+>> spend quite a bit of time updating the SPARC code so that it can still
+>> be used.
+>> 
+>> And this isn't new.  I've had to patch arch/sparc/crypto/ many times
+>> over the years as things change in the crypto subsystem.  Many other
+>> people, again outside the SPARC community, have as well.
+>> 
+>> The fact that you're denying that we've had to do this is really
+>> frustrating.  There is a significant maintenance cost to keeping this
+>> code working, which is being paid by people outside the SPARC community.
+>> 
+>> It seems best to at least focus that effort on modern algorithms like
+>> AES and SHA-256, and not obsolete ones like MD5 and DES.  Note that
+>> dropping those eliminates the need to add them to QEMU, as well.
+>> 
+>> I think that makes things easier for everyone.
+>
+> Let me know if you're aware of a real user that needs the obsolete MD5
+> algorithm to be accelerated for SPARC in the kernel.
+>
+> Otherwise, I suggest we proceed with this patch, as this objection seems
+> to based only on principles and misunderstandings.
+>
 
-> > > This isn't a bug introduced by this commit, but if SEV initialization
-> > > fails and KVM is actively running normal VMs, could a userspace process
-> > > trigger this code path via /dev/sev ioctls (e.g., SEV_PDH_GEN) and zero out
-> > > MSR_VM_HSAVE_PA globally? Would the next VMRUN execution for an active VM
-> > > trigger a general protection fault and crash the host?
-> > 
-> > Oof, yes. I wonder if we shouldn't set psp_dead = true if
-> > sev_platform_init() sees an error. After this series, if
-> > the error is e.g. init_ex_path failure, you can unload, fix the
-> > failure, and try again.
-> 
-> Let's slow down here.
-> 
-> So the LLM is talking about a use case where you have unencrypted VMs running
-> and then userspace can go and poke /dev/sev, zero out that MSR_VM_HSAVE_PA in
-> the process but that's the MSR which contains the physical address where host
-> state is saved on a VMRUN and if that MSR is cleared because SNP init needs
-> it, the machine would explode.
-> 
-> Ok, so far so good, I don't see anything wrong with the use case - nothing's
-> stopping the admin from modprobing ccp and then launching SNP guests.
-> 
-> Now, you're talking about some psp_dead - yet another silly boolean folks love
-> to introduce in the SEV code - and then something about that init_ex_path
-> hack. I don't know what that means, frankly.
-> 
-> What my simple intuition says is, *if* snp_prepare() runs,  then no guests
-> should do VMRUN anymore until they're ready to do that again.
-> 
-> Which begs the question: if snp_prepare() clears MSR_VM_HSAVE_PA, how can you
-> even run normal VMs after that?
+Agreed. I do sympathise with the hobbyists, (and with the astronauts, for that matter), but the mainline kernel is not a museum. If someone has a desire to run obsolete code on an obsolete architecture, they are more than welcome to do so. But demanding that the rest of the world spends time on this is unreasonable, especially given that few people have access to the hardware.
 
-IIUC, the normal flow is:
+The upshot of that is that the burden falls on the maintainers to chase bot reports and other reported regressions on obsolete architectures, and doing so for code such as MD5 which is entirely obsolete itself is just busywork.
 
-1. amd_iommu_init() -> snp_rmptable_init() // previously snp_prepare()
-1. kvm load
-1. ccp load, /dev/sev created  // now snp_prepare()
-1. kvm_amd load, sev_init()
-1. kvm_x86_vendor_init() -> sev_hardware_setup()
-1. kvm_init() -> kvm_arch_enable_virtualization_cpu() ->
-       svm_enable_virtualization_cpu() -> HSAVE_PA = $real_pa
-
-So the happy path works fine. The problem is if e.g. the first
-snp_prepare() fails, userspace can do ioctl(/dev/sev, SEV_PDH_GEN, ...)
-or try to start an SNP VM, which will unconditionally do
-sev_platform_init(). Both of those trigger the snp_prepare() again,
-and you can't run normal VMs.
-
-IMO if you fail SNP init once, you probably will again. I was
-suggesting setting psp_dead to just kill everything.
-
-But the real issue is that late-SNP initialization is problematic.
-I'll see if there's some way we can figure out if we're in that path
-and forbid it.
-
-> > >  	if (sev_version_greater_or_equal(SNP_MIN_API_MAJOR, 52)) {
-> > [ ... ]
-> > >  		memset(&data, 0, sizeof(data));
-> > [ ... ]
-> > >  		data.tio_en = tio_supp && sev_tio_enabled && amd_iommu_sev_tio_supported();
-> > [ ... ]
-> > >  	} else {
-> > >  		cmd = SEV_CMD_SNP_INIT;
-> > >  		arg = NULL;
-> > >  	}
-> > > This isn't a bug introduced by this commit, but is the stack variable
-> > > data left uninitialized when taking the else branch? Since data.tio_en is
-> > > later evaluated unconditionally, could stack garbage cause it to evaluate
-> > > to true, leading to erroneous attempts to allocate pages and initialize
-> > > SEV-TIO on unsupported hardware?
-> > 
-> > No, arg is the actual pointer passed, and it is set to NULL. non-EX
-> > init doesn't support TIO anyway...
-> 
-> This code is a total mess.
-> 
-> struct sev_data_snp_init_ex data;
-> ...
-> 
-> ... the else branch executes so you do
-> 
-> 	arg = NULL;
-> 
-> ...
-> 
-> and now *after* it, you're testing data:
-> 
->         dev_dbg(sev->dev, "SEV-SNP firmware initialized, SEV-TIO is %s\n",
->                 data.tio_en ? "enabled" : "disabled");
-> 
-> Which *is* uninitialized stack data.
-> 
-> So the AI is right AFAICT.
-
-do'h, yes, I glossed over the printk(), thanks.
-
-> If I were the AI, I'd say, what a total mess this code is. This
-> __sev_snp_init_locked() thing needs serious cleanup because it is too
-> convoluted to exist. And silly bugs like that creep in, as a result.
-> 
-> If I were maintaining this, I'd enforce a mandatory driver cleanup before any
-> new features come in. For example, __sev_snp_init_locked() needs proper
-> splitting and streamlining instead of doing gazillion things and with
-> a conditional in it which has consequences about the code after it. :-\
-> 
-> > > Also, regarding the bounds check in snp_filter_reserved_mem_regions()
-> > > called via walk_iomem_res_desc(): does the check
-> > > if ((range_list->num_elements * 16 + 8) > PAGE_SIZE)
-> > > allow an off-by-one heap buffer overflow?
-> > >
-> > > If range_list->num_elements is 255, 255 * 16 + 8 = 4088, which is <= 4096.
-> > > Writing range->base (8 bytes) fills 4088-4095, but writing range->page_count
-> > > (4 bytes) would write to 4096-4099, overflowing the kzalloc-allocated
-> > > PAGE_SIZE buffer.
-> 
-> That's a good catch.
-> 
-> > Yes, this also looks real, and needs:
-> > 
-> > diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> > index 939fa8aa155c..3642226c0fc0 100644
-> > --- a/drivers/crypto/ccp/sev-dev.c
-> > +++ b/drivers/crypto/ccp/sev-dev.c
-> > @@ -1328,10 +1328,11 @@ static int snp_filter_reserved_mem_regions(struct resource *rs, void *arg)
-> >  	size_t size;
-> >  
-> >  	/*
-> > -	 * Ensure the list of HV_FIXED pages that will be passed to firmware
-> > -	 * do not exceed the page-sized argument buffer.
-> > +	 * Ensure the list of HV_FIXED pages including the one we are about to
-> 
-> No "we" - use passive voice pls.
-
-Thanks, will fix.
-
-> > +	 * use that will be passed to firmware do not exceed the page-sized
-> > +	 * argument buffer.
-> >  	 */
-> > -	if ((range_list->num_elements * sizeof(struct sev_data_range) +
-> > +	if (((range_list->num_elements + 1) * sizeof(struct sev_data_range) +
-> >  	     sizeof(struct sev_data_range_list)) > PAGE_SIZE)
-> >  		return -E2BIG;
-> 
-> Yes, this is a short-term fix for stable.
-> 
-> But that "handling" in there is just nuts. You have this:
-> 
-> 	snp_range_list = kzalloc(PAGE_SIZE, GFP_KERNEL);
-> 
-> 	...
-> 
->         rc = walk_iomem_res_desc(IORES_DESC_NONE, IORESOURCE_MEM, 0, ~0,
-> 				  snp_range_list, snp_filter_reserved_mem_regions);
-> 
-> That function calls
-> 
-> 		snp_filter_reserved_mem_regions(resource *, snp_range_list);
-> 
-> and that resource walking BIOS-like yuck code is iterating over the resources
-> and calling ->func each time.
-> 
-> So we pass in a *page* but then that range list *array* we turn it into, is
-> not a multiple of the element size of 24 AFAICT.
-> 
-> So that last element can trail and overflow heap. Lovely.
-> 
-> So this thing needs complete change: *actually* pass in an array instead of
-> a page so that you're not trailing, check the current element index against
-> the array size instead of doing obscure struct size calculations which are
-> visible only to very motivated reviewers like an AI and then just get rid of
-> the overflow possibility in the first place.
-> 
-> > I have another bug that review-prompts found unrelated to this series.
-> > I can put the two fixes above with that or include them here, let me
-> > know what you prefer. Either way I'll resend one more with
-> > cpus_read_lock().
-> 
-> So, your set is kinda ready to go and I'll take it but if I were you, right
-> after this, I'll sit down and fix all that crap in sev-dev.c. Do a nice
-> patchset, simple backportable fixes first and proper refactoring and cleanup
-> ontop.
-
-Thanks for applying it. I have a stack of patches from this and my own
-review-prompts use that I'm testing now, but they are just the simple
-fixes. I'll work on trying to make things a little for the future
-too...
-
-Tycho
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
