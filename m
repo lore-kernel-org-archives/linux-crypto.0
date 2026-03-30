@@ -1,82 +1,82 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46695333730
-	for <linux-crypto@vger.kernel.org>; Mon, 30 Mar 2026 15:02:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 536E23385B6
+	for <linux-crypto@vger.kernel.org>; Mon, 30 Mar 2026 15:09:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774882928; cv=none; b=m6jvGoyIB+V18RT2pGadINhuB6XKjtil4nPw3zGDqnQga2R1FOWaDCUlcc7PtulFqJ5EhMT7rNLxFy5bf8HXx8E37LZ2aIvZMWjPK/BHixB5Gq+3ju3gjzkC87eAFunXKXRM/fQ+L7aHWHQ+wmhq99Kwlwh7ORfzk6j87T9rQYk=
+	t=1774883352; cv=none; b=Ty3Nktn73WU2xGHGN8Forf8XIuJJZRsAdpi1I8+kpSucZqyjOT3Y9sYPXIkeFWLYCxzlJ1IfxJKnXzMqoDHnWa/M97TKdmulJfTFHgWkXNg2H8P8graDh7SMc7AJQj4xZdTTixGV/LKMrJHwf1EGjFpi2m6TMfgxREy9rLOenks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774882928; c=relaxed/simple;
-	bh=fVkuWa4a6/cQxsnJg9pRm7tn6P2ndJyKnXupZf2dZoQ=;
+	s=arc-20240116; t=1774883352; c=relaxed/simple;
+	bh=UETGGgVBuUFVU//IoPb6yqREGa8Fyc8FmIKlatx8jKM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ac1eIUuanenXO48ATp3efLRN3PNgP3j82NBJmTSUtfhouJi6RuWyXGZ7Bu3zPPbXFH4pzeMbZfdbyGwEncqI9DXi3b6ZhldINNNKTUtvWsUwuCxG6pZCMyQmWOzaDr4BkSPY1vqHomodOcJkhhO1BskHTejMpbR26viI6HkZp5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cSnCQC1v; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=cJtfOKq0; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=MDnRWO3z0qwfcnpmuo+hdaZTUCvdOqNQgCRE330UG+9HVDas/WM999HQP+Wo2B+8xyHkr09WlhuqKrfjRa+eYU6gpbN28pz47hgTK2kAXdf1Gs6RU6dvrKXb9pE/Xr6lXWU2ZtdsL4CbpCay7pWVgKeOy4IB1h6Qjsb8Q4ijWzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P8vUAr6k; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ol99mi3B; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cSnCQC1v";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="cJtfOKq0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P8vUAr6k";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ol99mi3B"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1774882926;
+	s=mimecast20190719; t=1774883350;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ioaGBccEulsVefeHIBPg305ScRFhJiChwS24LCLi1yU=;
-	b=cSnCQC1vC7tbWlnR4vS3hUzdtWwdN05EhRHEFdi8f2wxvYX8N01fzjMUeueCxuaz9C2MUo
-	+9HNol1PtSbr9gyMEs0Ml1ktxJuptQ2ImO8YN2pheHdd6FRkoEoO5c6euEt5vY6Qqxy3Ev
-	tgl/DMwjp4yC23YlukVgqSxebZ9fv3U=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=7RZylSVCYgAIw5EH+90iXOfbLfETW2Xky5UhPlA+i2U=;
+	b=P8vUAr6kFaYk/Ch4fnNpG9bGn2sPJV3RtjeRefSlJK0RP718rfk11wWj3nrwFBtLykaVx7
+	CEKfOn9BUa6mfrUnAlPjz7jt8BIZjAuDc15Hzx1aZyIuEjNuQv13tzrYZJrmH/b0CVGGgF
+	PM26Vyynv7adL/ufZ8ZtDAKsnAyDU3s=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-189-JK-R1RSMNRyINHvfd_Pfaw-1; Mon, 30 Mar 2026 11:02:04 -0400
-X-MC-Unique: JK-R1RSMNRyINHvfd_Pfaw-1
-X-Mimecast-MFC-AGG-ID: JK-R1RSMNRyINHvfd_Pfaw_1774882923
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-89cd8b56114so13749386d6.2
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Mar 2026 08:02:04 -0700 (PDT)
+ us-mta-365-HQwbu09kNr2iOz1BrrF1JA-1; Mon, 30 Mar 2026 11:09:09 -0400
+X-MC-Unique: HQwbu09kNr2iOz1BrrF1JA-1
+X-Mimecast-MFC-AGG-ID: HQwbu09kNr2iOz1BrrF1JA_1774883348
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-50937cf66b5so235983631cf.3
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Mar 2026 08:09:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1774882923; x=1775487723; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1774883348; x=1775488148; darn=vger.kernel.org;
         h=user-agent:in-reply-to:content-disposition:mime-version:references
          :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ioaGBccEulsVefeHIBPg305ScRFhJiChwS24LCLi1yU=;
-        b=cJtfOKq0lZ6i/yu1JBQBHyPriJHNaODHTnTGIib5Who8FQp5rOcp+wqs9D7SX1NGkG
-         iyVRNVZfSBfmmYosF1xa3GnCi+k8+V5FW90GnpRJv771BB6wTIeBjyxGCrjFIpQIIrC/
-         Jbjei/04AEHcqITxrB3yLMUrqBHKDkBnTXxnwVwQDJwGYHZ+8r57C98aQpsPdBzk5+Js
-         EaLDPIiqtSnw5oqHJBY4QfxXHVDXzS1zxrlvLciJRJVtYTqbFeOynMObjrqEsyvug9B6
-         m3FM7+wMxIOQEVEXTrWHfBWbcYpPAlZATqVbnEl6tkGiD9MalCbrEKljYcwljSDudkFy
-         iL/g==
+        bh=7RZylSVCYgAIw5EH+90iXOfbLfETW2Xky5UhPlA+i2U=;
+        b=Ol99mi3ByiWoZqk2YGxdee5Ky9+lYtw255wjlUjibu9l6572lHPLF0dP59LFtQKngU
+         w08awrwKoeRJKHsf8luQYoAa8mz4C41vFLwWyji/F36OU1k4qseYMmhBMlRKxI4nPKK9
+         MCKNCCKKJr2xFL8JowkuaiWqlg5g9f7VqhKdKNQv7LrtLU7wTj9DVXn4sCdheIim4J8q
+         l7ZzEXZIhB87/xNIjBqt3/VPs4jXBTTFXCkSokyke285ls3ckSKMFC2azLGcCU+p2DHs
+         brT9yXQOYMWHeRYQFXOLtkGB8RqaD2uVW0MXF88d0Tu/ydSVPOxK+rUwudLi9uGQEois
+         GHQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774882923; x=1775487723;
+        d=1e100.net; s=20251104; t=1774883348; x=1775488148;
         h=user-agent:in-reply-to:content-disposition:mime-version:references
          :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ioaGBccEulsVefeHIBPg305ScRFhJiChwS24LCLi1yU=;
-        b=jAvqwwsmehUzQ3wqbs9K8iEWSHIHq2yWOpQX5Px9jIPVMyZuP5O0+KRTsTEf/EwoXa
-         BNsnUaSkWytRP/dD1CAchW6ln0qooCOwExQhZC9yD8rErwJK2ZB34c1H+mI01enIPouM
-         9cLJMNp452zfwiZY933Bq9dyHRPtzkNk6mXIryrXRG/D2WEjKFhKoxS9B6bWPuhIZphs
-         g50lm1zaR/1O394SkTa3r0AiT59+OPydg3yv6nrVVwFkQ+LLd/bi8VBCZcs1ArmNZLhj
-         Fwj8AScC98iiNZRPxFU+G7UuQ9HwI2X9Kb0iNltYibJ5B+WGZ1zUeDpVjq8n56Uf7Kqo
-         FdRg==
-X-Forwarded-Encrypted: i=1; AJvYcCU20a9crWKLxDCUY3VTmM/vf5xiHixq1Ie6Jbree1MIQ+Z8b0dAxD305AtyAsMorbCs8K6bCYuQ2exH1kU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjV6pUfMl8Xi9hJwzsnrtL5Av56L/yHX2b3VuNm5GzQxOk93Q6
-	JcQ+kdI/QZM61cmUIUrbsF5xhHJudvfyFWVjZakejIcAH86VKlFCrDVihIjt87gdYth4fkSZC3W
-	l1WL0D5BERvpMu91zxM1pFZq68B7sbE7QMgHjeQVva4osKyexvgh4eV9CkkrHXQmdXA==
-X-Gm-Gg: ATEYQzzR4c2jHQ5ZAL/a/TWwKgM6kmBxm9TpuIRobXhtTIJ2UvkwiaeimjfeXwB7+in
-	/3pnNsn/rnHlYfyBGRNG8vYn/cJNUmvxSi2O/Hb2T4z8ZUL/gJh/MG+3Jkjo49QpW2CJaxrsVwW
-	jpGgdmpKyZpmkG4w+RZAFcNKBWhnXA4IJC0mOYa7Uv/j0R4qkrGtxUd7QEaf17JboIyktu9ko2k
-	0LJniLf7qcwXBUeJUTzUsKHkc0ya0hoMLcYgOcTk/RQ+Yc4OriJW15MAx3iR2lOGVTZXNyyKum0
-	0gI8WZWw2pjko/PMZf81zb4JrN9nCxASy77pZnAWM+uDJt4Kg8jSKB5zY8Pi1L5wHzHEtHpvLfv
-	GYmVBfCYLu1TE/Y5f1e5UBcdGu5548Y0hMnPYGZpZ//TBVhyqhYFeAoMj
-X-Received: by 2002:a05:6214:498f:b0:8a0:7c8:409b with SMTP id 6a1803df08f44-8a007c84819mr89272166d6.33.1774882923332;
-        Mon, 30 Mar 2026 08:02:03 -0700 (PDT)
-X-Received: by 2002:a05:6214:498f:b0:8a0:7c8:409b with SMTP id 6a1803df08f44-8a007c84819mr89271186d6.33.1774882922650;
-        Mon, 30 Mar 2026 08:02:02 -0700 (PDT)
+        bh=7RZylSVCYgAIw5EH+90iXOfbLfETW2Xky5UhPlA+i2U=;
+        b=sUd2ECL6N853mDmomTusXnt2o5eJ/Ib1TyTEYSCituEvp/7Dqe8Qz9XLAA4MtHzBWf
+         ArS+SgtxJvn/Jdt8ZN6l5NU4Bscw8bYmUJltv/SD/WrGm1/X5V/UeSZ/PY81jPUg6Ng4
+         BVzIsZtU3CFTIQ7AtEFGU28ujyJmHGGcj3iSdJpEKOPFt2OcnsslKwC/qCakScj8FS9L
+         hCA6GT8b86RTL2QIm+RYiRStRGZBCwU7LbX1yyDsvE+rqbBEHGmWvPl0IT4Fbyj4ZAur
+         OUV2FkX0DnZpNK/wO+Rwaq0L7VEgelljYDS2pjtkPw3MXgKmIZYC35Mj/X0bNe2W+xQ4
+         SpKg==
+X-Forwarded-Encrypted: i=1; AJvYcCX4ZxFBu2SZ5lTgGURb4HajizuxCiCw2zKWfby03PCbQySvUEQfVGIe89ulwsJK8b9ihJbPX+SbSMC1W18=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkDxb+nkROLPmsfQJuYoVepP1a+tdFVMhTM4PDGbBMuqmPIJnT
+	SK7SihlwLuXq1P0UuJafuQ8OPFcPN+Y38a1/PjQcgUOr6tZsfLeVR2t0Rn2seNZR1C4oXc9axOP
+	M+XwiyeiBONTVxCsiYVLO8LmSNTccefKcjZPpQaqE9R9yPIp0jbN1JlFmo16nwxFqTQ==
+X-Gm-Gg: ATEYQzx96PQxVPAD8a+yDwUt8ypp9EBzeuP93znCLGnqJHmArSO/O2O9cz4WtYC8jYJ
+	7xFPRAVSyqBTBAEyG2x3rVXs3anr5N3D3cY9O0ldP5WoQxc5r1EmzcqT1Kl4/KPPgSeBJEzITZi
+	pwoH28NnuSJQcWayI9Ti009dARKz0seuchQBcLGnWPnF3UCrVboaW+BcmKvUxIdJ7UEbk3mZy2U
+	tblRu9xzOp1DAgadt3ZzSm/ytHuWADo1KS2I+O2GGOUEoyNUEFeDBwP1D1AI/Fom4Juo86Qoi4N
+	VCRaI6UIYin7e8BoPzi5fFAE4fW5pfRu2TnOHB0hQmjun74se4EPCeADwMxbRcuabP66DUszOgg
+	L+jAIFn0+8xevezLs7Z18tM25vJVDmPk4Cwxtkr9i88TggKNuOA/Tu0WT
+X-Received: by 2002:ac8:5dd1:0:b0:50b:3b54:d796 with SMTP id d75a77b69052e-50ba380f13dmr171149551cf.27.1774883348254;
+        Mon, 30 Mar 2026 08:09:08 -0700 (PDT)
+X-Received: by 2002:ac8:5dd1:0:b0:50b:3b54:d796 with SMTP id d75a77b69052e-50ba380f13dmr171148751cf.27.1774883347545;
+        Mon, 30 Mar 2026 08:09:07 -0700 (PDT)
 Received: from redhat.com (c-73-183-52-120.hsd1.pa.comcast.net. [73.183.52.120])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89f49cbb8besm57387836d6.43.2026.03.30.08.02.00
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-50bb2e0fe31sm63567841cf.20.2026.03.30.08.09.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Mar 2026 08:02:01 -0700 (PDT)
-Date: Mon, 30 Mar 2026 11:01:59 -0400
+        Mon, 30 Mar 2026 08:09:06 -0700 (PDT)
+Date: Mon, 30 Mar 2026 11:09:03 -0400
 From: Brian Masney <bmasney@redhat.com>
 To: "Miquel Raynal (Schneider Electric)" <miquel.raynal@bootlin.com>
 Cc: Michael Turquette <mturquette@baylibre.com>,
@@ -97,12 +97,12 @@ Cc: Michael Turquette <mturquette@baylibre.com>,
 	Wolfram Sang <wsa+renesas@sang-engineering.com>,
 	linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH 09/16] clk: Use the generic OF phandle parsing in only
- one place
-Message-ID: <acqQZ5sx_WZrr4KJ@redhat.com>
+	linux-renesas-soc@vger.kernel.org,
+	Herve Codina <herve.codina@bootlin.com>
+Subject: Re: [PATCH 10/16] clk: Add support for clock nexus dt bindings
+Message-ID: <acqSD1k91pKGj0Rr@redhat.com>
 References: <20260327-schneider-v7-0-rc1-crypto-v1-0-5e6ff7853994@bootlin.com>
- <20260327-schneider-v7-0-rc1-crypto-v1-9-5e6ff7853994@bootlin.com>
+ <20260327-schneider-v7-0-rc1-crypto-v1-10-5e6ff7853994@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -111,41 +111,71 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260327-schneider-v7-0-rc1-crypto-v1-9-5e6ff7853994@bootlin.com>
+In-Reply-To: <20260327-schneider-v7-0-rc1-crypto-v1-10-5e6ff7853994@bootlin.com>
 User-Agent: Mutt/2.3.0 (2026-01-25)
 
-On Fri, Mar 27, 2026 at 09:09:31PM +0100, Miquel Raynal (Schneider Electric) wrote:
-> There should be one single entry in the OF world, so that the way we
-> parse the DT is always the same. make sure this is the case by avoid
-> calling of_parse_phandle_with_args() from of_clk_get_parent_name(). This
-> is even more relevant as we currently fail to parse clock-ranges. As a
-> result, it seems to be safer to directly call of_parse_clkspec() there.
+On Fri, Mar 27, 2026 at 09:09:32PM +0100, Miquel Raynal (Schneider Electric) wrote:
+> A nexus node is some kind of parent device abstracting the outer
+> connections. They are particularly useful for describing connectors-like
+> interfaces but not only. Certain IP blocks will typically include inner
+> blocks and distribute resources to them.
 > 
-> Suggested-by: Stephen Boyd <sboyd@kernel.org>
+> In the case of clocks, there is already the concept of clock controller,
+> but this usually indicates some kind of control over the said clock,
+> ie. gate or rate control. When there is none of this, an existing
+> approach is to reference the upper clock, which is wrong from a hardware
+> point of view.
+> 
+> Nexus nodes are already part of the device-tree specification and clocks
+> are already mentioned:
+> https://github.com/devicetree-org/devicetree-specification/blob/v0.4/source/chapter2-devicetree-basics.rst#nexus-nodes-and-specifier-mapping
+> 
+> Following the introductions of nexus nodes support for interrupts, gpios
+> and pwms, here is the same logic applied again to the clk subsystem,
+> just by transitioning from of_parse_phandle_with_args() to
+> of_parse_phandle_with_args_map():
+> 
+> * Nexus OF support:
+> commit bd6f2fd5a1d5 ("of: Support parsing phandle argument lists through a nexus node")
+> * GPIO adoption:
+> commit c11e6f0f04db ("gpio: Support gpio nexus dt bindings")
+> * PWM adoption:
+> commit e71e46a6f19c ("pwm: Add support for pwm nexus dt bindings")
+> 
+> Expected Nexus properties supported:
+> - clock-map: maps inner clocks to inlet clocks,
+> - clock-map-mask: specifier cell(s) which will be remapped,
+> - clock-map-pass-thru: specifier cell(s) not used for remapping,
+>   forwarded as-is.
+> 
+> In my own usage I had to deal with controllers where clock-map-mask and
+> clock-map-pass-thru were not relevant, but here is a made up example
+> showing how all these properties could go together:
+> 
+> Example:
+>     soc_clk: clock-controller {
+>         #clock-cells = <2>;
+>     };
+> 
+>     container: container {
+>         #clock-cells = <2>;
+>         clock-map = <0 0 &soc_clk 2 0>,
+>                     <1 0 &soc_clk 6 0>;
+>         clock-map-mask = <0xffffffff 0x0>;
+>         clock-map-pass-thru = <0x0 0xffffffff>;
+> 
+>         child-device {
+>             clocks = <&container 1 0>;
+> 	    /* This is equivalent to <&soc_clk 6 0> */
+>         };
+>     };
+> 
+> The child device does not need to know about the outer implementation,
+> and only knows about what the nexus provides. The nexus acts as a
+> pass-through, with no extra control.
+> 
 > Signed-off-by: Miquel Raynal (Schneider Electric) <miquel.raynal@bootlin.com>
-> ---
->  drivers/clk/clk.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/drivers/clk/clk.c b/drivers/clk/clk.c
-> index 591c0780b61e..93e33ff30f3a 100644
-> --- a/drivers/clk/clk.c
-> +++ b/drivers/clk/clk.c
-> @@ -5375,8 +5375,7 @@ const char *of_clk_get_parent_name(const struct device_node *np, int index)
->  	int count;
->  	struct clk *clk;
->  
-> -	rc = of_parse_phandle_with_args(np, "clocks", "#clock-cells", index,
-> -					&clkspec);
-> +	rc = of_parse_clkspec(np, index, NULL, &clkspec);
->  	if (rc)
->  		return NULL;
+> Reviewed-by: Herve Codina <herve.codina@bootlin.com>
 
 Reviewed-by: Brian Masney <bmasney@redhat.com>
-
-In case a Fixes tag is warranted, it's not exactly clear what should be
-used. This was introduced in commit 766e6a4ec602 ("clk: add DT clock
-binding support") in 2012. However of_parse_clkspec was introduced in
-commit 4472287a3b2f5 ("clk: Introduce of_clk_get_hw_from_clkspec()") in
-2018.
 
