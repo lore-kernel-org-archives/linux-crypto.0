@@ -1,76 +1,87 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAD9E383C9C;
-	Mon, 30 Mar 2026 05:32:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B3536DCE1;
+	Mon, 30 Mar 2026 06:25:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774848761; cv=none; b=gX8atkPu9eGPHp26ih63jdPV/xDWfUEV10EKZ8frAof9zHRqHae1bGJ16IWl/qVtPo8xfyCNA//4IOl4oSoq4oFRtca/nFbzHXb8FWy5wszIsrAg68Wc18hDaiUPHw2qX+Vf4BeRkFwxyA+YN9HlUfNFmDJ23JIlFdCO1IDl/I4=
+	t=1774851939; cv=none; b=rSD0mRkxu4FV9iTWz+jKCxxl37Hls10rdznxtWkL69TIX4H/3kF4jzfZzrWeQ7oZ1NLv4ts1b2OY2ss8h/F8Y5wFC0ufhl+0k/j0ZSTlARS7EyZ1eXNhUYtWx6pJFMaBaGXEkzmDx9/rNAvvz1VNGb49VorcgpKwnL+0CImeiPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774848761; c=relaxed/simple;
-	bh=z4P9oyID9BRbkYw9uutU61ptnHn0Bu/AoOKemxJPTPU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eVu/9u8JQQWxyRD28XyRMAUmz5tueKN+JJz3077cNkk7iPMCS6cPVT5b2Qt9f++ARtztcx3skKhi3qYnZGC/zH+T+HYiMvRS/tsU+rZknJNQBRiH/ws6XFe00WGe/DuxKOPKaUysu23TONRdSlOUAq/2xe+hBaAZjbEqBX1BlKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id B66A768B05; Mon, 30 Mar 2026 07:32:33 +0200 (CEST)
-Date: Mon, 30 Mar 2026 07:32:33 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>, Ard Biesheuvel <ardb+git@google.com>,
-	linux-raid@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-crypto@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
-	Arnd Bergmann <arnd@arndb.de>, Eric Biggers <ebiggers@kernel.org>
-Subject: Re: [PATCH 4/5] xor/arm64: Use shared NEON intrinsics
- implementation from 32-bit ARM
-Message-ID: <20260330053233.GB4736@lst.de>
-References: <20260327113047.4043492-7-ardb+git@google.com> <20260327113047.4043492-11-ardb+git@google.com> <20260327135051.GA739@lst.de> <cca6facc-6c37-48d0-81e6-f8568f36b91d@app.fastmail.com>
+	s=arc-20240116; t=1774851939; c=relaxed/simple;
+	bh=7KanPuewHIOLBesG3BaN02X+/HFdP2sq5BsR6u0HqAw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tx9hpR5VFyJJTrelqJ8uUh34EbZKFmVT4DRuzSAfGZWAd+QVI8WPNCpfZFFb8RirvtEJQfC0zBCnwL0FXJyzCJTn8KJ0JOoCFDglk2XP8GWKVEe3gQcdkhkCgcy6dbV9zja2kP8+3GXwo07g3djg3lSna1hDY55RDWGONzNfyhI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=AkYu1nUf; arc=none smtp.client-ip=113.46.200.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="AkYu1nUf"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=Xlag/lRv/euF55TRCqUD67CXI1xKrYaszh8bt07tpDU=;
+	b=AkYu1nUfqP0KdC8/0G2LX8MIPSqczVqtdAkHNs1DiGXfzfCSxINbWYSv+DiaT1wYos0PzViR+
+	0oceKzE1JM9TXYG2+6W5H7f4pHvzY2hC5libQ6nVjdgwM20AfWXAtcL1KXtGtBt2tr5jjCVjGR/
+	9uFl7AFdN9d4C5s5kwOcwag=
+Received: from mail.maildlp.com (unknown [172.19.163.214])
+	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4fkh1h3Z6LznV4L;
+	Mon, 30 Mar 2026 14:20:08 +0800 (CST)
+Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5DD3540561;
+	Mon, 30 Mar 2026 14:25:33 +0800 (CST)
+Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
+ dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 30 Mar 2026 14:25:33 +0800
+Received: from localhost.huawei.com (10.90.31.46) by
+ kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 30 Mar 2026 14:25:32 +0800
+From: Chenghai Huang <huangchenghai2@huawei.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<fanghao11@huawei.com>, <liulongfang@huawei.com>, <qianweili@huawei.com>,
+	<wangzhou1@hisilicon.com>, <yinzhushuai@huawei.com>
+Subject: [PATCH 0/5] crypto: hisilicon - series of cleanups and format fixes for hisilicon driver
+Date: Mon, 30 Mar 2026 14:25:26 +0800
+Message-ID: <20260330062531.2976138-1-huangchenghai2@huawei.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cca6facc-6c37-48d0-81e6-f8568f36b91d@app.fastmail.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemq200001.china.huawei.com (7.202.195.16)
 
-On Fri, Mar 27, 2026 at 03:45:56PM +0100, Ard Biesheuvel wrote:
-> On Fri, 27 Mar 2026, at 14:50, Christoph Hellwig wrote:
-> > On Fri, Mar 27, 2026 at 12:30:52PM +0100, Ard Biesheuvel wrote:
-> >> From: Ard Biesheuvel <ardb@kernel.org>
-> >> 
-> >> Tweak the arm64 code so that the pure NEON intrinsics implementation of
-> >> XOR is shared between arm64 and ARM.
-> >
-> > Instead of hiding the implementation in a header, just split xor-neon.c
-> > into two .c files, one of which could be built by arm32 as well.
-> 
-> That is what patch 3/5 does. This patch wires up that version into arm64, and drops the copy that has become redundant as a result.
+1.Fixed a format string type mismatch issue identified through static
+analysis and code review, which could have caused display errors.
+2.A const qualifier addition to improve type safety.
+3.Removing unnecessary else statements after a return.
+4.Removal of redundant variable initializations that are overwritten
+before their first use.
+5.A cleanup of unused and non-public APIs to shrink the public interface
+and remove dead code.
 
-Yeah, sorry - I misread the series a little.
+Chenghai Huang (4):
+  crypto: hisilicon/qm - add const qualifier to info_name in struct
+    qm_cmd_dump_item
+  crypto: hisilicon/qm - remove else after return
+  crypto: hisilicon/qm - drop redundant variable initialization
+  crypto: hisilicon - remove unused and non-public APIs for qm and sec
 
-> 
-> > probably
-> > in the arm/ instead of the arm64/ subdirectory, but we can also add a
-> > new arm-common one if that's what the arm maintainers prefer.
-> 
-> Having the shared pure NEON version in arm/ is perfectly fine.
+Zhushuai Yin (1):
+  crypto: hisilicon - fix the format string type error
 
-So here would be my preference:
+ drivers/crypto/hisilicon/debugfs.c       | 22 +++++++++++-----------
+ drivers/crypto/hisilicon/qm.c            | 16 ++++++++--------
+ drivers/crypto/hisilicon/sec2/sec.h      |  2 --
+ drivers/crypto/hisilicon/sec2/sec_main.c |  2 +-
+ include/linux/hisi_acc_qm.h              |  2 --
+ 5 files changed, 20 insertions(+), 24 deletions(-)
 
- - keep all the arm/arm64 code in lib/raid/xor/arm
- - have the neon and EOR3 code in a single xor-neon.c file, with an
-   ifdef CONFIG_ARM64 around the EOE3 routines
+-- 
+2.33.0
 
-This avoid the including of .c files which is always a bit ugly.
-But if there is a strong argument to prefer including of the .c file I
-can live with that as well.
-
-> 
-> Building it as a separate compilation unit for arm64 should also be straight-forward, the only issue is that the 2-way NEON version needs to be shared with the EOR3 compilation unit.
-> 
----end quoted text---
