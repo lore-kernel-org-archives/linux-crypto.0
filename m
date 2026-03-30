@@ -1,40 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C59953DD524;
-	Mon, 30 Mar 2026 17:54:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5AA2399354;
+	Mon, 30 Mar 2026 19:37:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774893249; cv=none; b=anvTeLEuA6Fg6haseC9W4d8yOMZsCG4nziVVX2Jrsd07lee9eclTG5exXCAtoIjiwyVLUz33OMleu1712t9O0V9957Uj/Beod96fdedp6y+3ZujEt+bqO3rQsvOOSdfN5Xhfeje+pvIahKhpOGiZMPHnJKbQjAvTCCIScG9ZOpo=
+	t=1774899470; cv=none; b=gasYN05HSCF4TfnV8kKFpJ3GFArgFdWHIBQrcthO8Ltihbv8Epx/nln9hvZFB1nK4TIPG62pwsrL/CqlV9IwmsY1yUAOFI7WkCbLIkE5rv2pHt2hujnF0L+HEqlPBep72i/tc6H18z6d3gX6I+vYJ3a6JeBi9YbHegKPTHrOunA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774893249; c=relaxed/simple;
-	bh=H3IgmI8SPQqZwZqBlE4k/HBTvNhjHHrneHdkjCbtS0g=;
+	s=arc-20240116; t=1774899470; c=relaxed/simple;
+	bh=HcPfb3mUQYlrygZRolUZecA4/UgyE3xPkjXDPzjCIFY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lSECkWNqSjT8TGNl2eXZgAnwC8xypYlj/6e+c+7f7XsO7mwVDlT+H8yeZbo30yuwL2sqnLhQtGewFlxrh8cMO9hJswxwTM0t6s8i44O+sSW239yhF5mmYMHn+4+ZqCSsS7Nl7A1xtMXH4tM87vzJz2ywcaGD79lzDdYJoOjWbRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BRW69b8x; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=jYWm3vVAhx0e0sJZf+cQnPa+vKR5wDIcYdx4ducSY/TIIqOVHv/09O6eNnjYC0YKbNCPveFx09/rSumBzrkdIG19uy69jtuHDWtMaRF+JoTdqdffIi+9VGZMXXbYdpbZeA2w4pDIEVvAEV/5wW3kLOoeVHrhs3+xea8wxls/xLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gVzLr6Co; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BRW69b8x"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5EDBC4CEF7;
-	Mon, 30 Mar 2026 17:54:08 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gVzLr6Co"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46B3BC4CEF7;
+	Mon, 30 Mar 2026 19:37:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774893249;
-	bh=H3IgmI8SPQqZwZqBlE4k/HBTvNhjHHrneHdkjCbtS0g=;
+	s=k20201202; t=1774899470;
+	bh=HcPfb3mUQYlrygZRolUZecA4/UgyE3xPkjXDPzjCIFY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BRW69b8xDpsonfZwvopUmO/koZ1TBhIo/k+vhWDLJnkT+pl8EOGPuG6FWQ3sy5OgY
-	 I+EXY9Z9SH7ZcC2PQf0WphgN1lLs6n7hpiAIMaoYOGd3c5HcKXw5au//oxMQJHT6eR
-	 yvM0cRT7/CbHNfL6IbmC7KYHlh755orPxoKSlB/FsdEQUMCu9yMuRA9ohrjA1Vqa+q
-	 dGkEkLhldycHrejUbuF+v9uFWUibQKwjXxIISZwD9Gwk2PlynnhqpsnaLMPvG1pzbf
-	 rkJL3lwJ6+Z1ZKFbSBcrp8libFkkqkmCz3UWY/LX5kdwn/cy9a5lNfjIy1/LevmEft
-	 OCI8l1aIt2xlg==
-Date: Mon, 30 Mar 2026 12:54:05 -0500
-From: Bjorn Andersson <andersson@kernel.org>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: Thara Gopinath <thara.gopinath@gmail.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: qce - simplify qce_xts_swapiv()
-Message-ID: <acq4s7kcrS6vA2AW@baldur>
-References: <20260330173923.479407-3-thorsten.blum@linux.dev>
+	b=gVzLr6CoWsODYt4pAj5Te3R7GDslta5b4Y/aFJhhgL3KYA43wvsEEfPe+SIPALhbv
+	 XLL3sGO43tDRylb3UmTW0L3qGHOQda1GzCibZ98EbnDOJEtqw7W0Mtc2FaRuOPEm70
+	 t89447QRzczhqaBB6G9G2bM0BqEtekkrk82HdGCGZjjVauES57xOP/70qqsw9gEhKZ
+	 DRD76dYpU31snBzJwqpaqWUCLS+vKus6OcCkP2qxK3/HuDzlPR/q/X16VNDAOCFEbF
+	 1ROp3fme6zygQAveKSOD+L44cg1FA80CZXZb9vfyj6Uw9kSoONiQYU1HgjNoji/s6I
+	 sB5CHNpFJJwFw==
+Date: Mon, 30 Mar 2026 12:36:41 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-mips@vger.kernel.org,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Subject: Re: [PATCH] lib/crypto: mips: Drop optimized MD5 code
+Message-ID: <20260330193641.GA4303@sol>
+References: <20260326204824.62010-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -43,50 +45,27 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260330173923.479407-3-thorsten.blum@linux.dev>
+In-Reply-To: <20260326204824.62010-1-ebiggers@kernel.org>
 
-On Mon, Mar 30, 2026 at 07:39:25PM +0200, Thorsten Blum wrote:
-> Declare 'swap' as zero-initialized and use a single index variable to
-> simplify the byte-swapping loop in qce_xts_swapiv(). Add a comment for
-> clarity.
+On Thu, Mar 26, 2026 at 01:48:24PM -0700, Eric Biggers wrote:
+> MD5 is obsolete.  Continuing to maintain architecture-optimized
+> implementations of MD5 is unnecessary and risky.  It diverts resources
+> from the modern algorithms that are actually important.
 > 
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
-
-Reviewed-by: Bjorn Andersson <andersson@kernel.org>
-
-Regards,
-Bjorn
-
+> While there was demand for continuing to maintain the PowerPC optimized
+> MD5 code to accommodate userspace programs that are misusing AF_ALG
+> (https://lore.kernel.org/linux-crypto/c4191597-341d-4fd7-bc3d-13daf7666c41@csgroup.eu/),
+> no such demand has been seen for the MIPS Cavium Octeon optimized MD5
+> code.  Note that this code runs on only one particular line of SoCs.
+> 
+> Thus, let's drop it and focus effort on the more modern SHA algorithms,
+> which already have optimized code for the same SoCs.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 > ---
->  drivers/crypto/qce/common.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
 > 
-> diff --git a/drivers/crypto/qce/common.c b/drivers/crypto/qce/common.c
-> index 04253a8d3340..54a78a57f630 100644
-> --- a/drivers/crypto/qce/common.c
-> +++ b/drivers/crypto/qce/common.c
-> @@ -280,17 +280,17 @@ static u32 qce_encr_cfg(unsigned long flags, u32 aes_key_size)
->  #ifdef CONFIG_CRYPTO_DEV_QCE_SKCIPHER
->  static void qce_xts_swapiv(__be32 *dst, const u8 *src, unsigned int ivsize)
->  {
-> -	u8 swap[QCE_AES_IV_LENGTH];
-> -	u32 i, j;
-> +	u8 swap[QCE_AES_IV_LENGTH] = {0};
-> +	unsigned int i, offset;
->  
->  	if (ivsize > QCE_AES_IV_LENGTH)
->  		return;
->  
-> -	memset(swap, 0, QCE_AES_IV_LENGTH);
-> +	offset = QCE_AES_IV_LENGTH - ivsize;
->  
-> -	for (i = (QCE_AES_IV_LENGTH - ivsize), j = ivsize - 1;
-> -	     i < QCE_AES_IV_LENGTH; i++, j--)
-> -		swap[i] = src[j];
-> +	/* Reverse and right-align IV bytes. */
-> +	for (i = 0; i < ivsize; i++)
-> +		swap[offset + i] = src[ivsize - 1 - i];
->  
->  	qce_cpu_to_be32p_array(dst, swap, QCE_AES_IV_LENGTH);
->  }
-> 
+> This patch is targeting libcrypto-next
+
+Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
+
+- Eric
