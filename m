@@ -1,170 +1,148 @@
-Received: from TYPPR03CU001.outbound.protection.outlook.com (mail-japaneastazon11022098.outbound.protection.outlook.com [52.101.126.98])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E3AC3B47EF;
-	Mon, 30 Mar 2026 09:36:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.126.98
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774863400; cv=fail; b=uW97WTeco/1mSJ0Cn78GOoNi8BVmx/NCEx/bzLzoD9vZevv6fywgEhudL4s4rYw63KTV/s7TtgdnzVolfXsPH8W6sCq6enEh6rXzApdfjrq38HpyBBvdioiryGPx16vdL7DFczK/QxXslAj86HlemNbt38t0lIoPQLerxWlh1PI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774863400; c=relaxed/simple;
-	bh=+W7QevSyW0++d+cfhj6us2hiwVwmhH1Q5njgwCuSTPc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=h8ksAEIkIVIbINiNORVGpgijIIPqoJvfKpEnlxC3mZ1BeBwetIr6bUAIVjWZZ5RfO6e45gj7L7Jo/y32rPJrTU1bTJjKirwsjz4N1u5lueSishnLMWW15D1yZ0yhhJ9JtulGSNaIK7LYZ71Wtb5EKWJcEpfd0J2+l7jz2PxJ/hY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; dkim=pass (2048-bit key) header.d=aspeedtech.com header.i=@aspeedtech.com header.b=Q6J2UMbJ; arc=fail smtp.client-ip=52.101.126.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 917163AB29D
+	for <linux-crypto@vger.kernel.org>; Mon, 30 Mar 2026 09:37:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1774863454; cv=none; b=bLRRQHrm+2N2Jx+qhLzN5lHh4W+3+tLVAbWmJfx9upAOlp3LWvuSN97YWG/N3/IF9ZMFSIt4/oHRYY2u6qzIgwwFwUPAI7LsPWVOHesCQrPV10/naR81FtPYl326NOwDe7WgC/g+3DqzqGt4QnL6cLSeWLuFNWTKpyjalm9Nug0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1774863454; c=relaxed/simple;
+	bh=v/KejTXhe3Zobl17Vlv8GeZMvuW60lczEwBitAa+7XA=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YLzGS4rO1maJG948ofKM0y0X46IU0B8mjzEkUuTM9METu+TGqkHLsy9d9BRVL8qGxJfMv2+ZLAxXQfkejV6AYz0jR2Q4LmkJmZPQ5Oskbmm9nmIqrwlI6WCaLBSanymQqqXjGnFggC0fnKUsKjDz4JcgOB8q+6qXZzZxwzBAY88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Odn278ys; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=aspeedtech.com header.i=@aspeedtech.com header.b="Q6J2UMbJ"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=UJebsJc/jN8ubzJ/Pko0e4nQk5KAr0/xR8D1V01mvNYowVVszinO5iBkXxUjaAbOqXmqVAVcUo4eGtjVkwTVZhaZZF1n+67lDG+6sAc298wXqcG1xn/JibHf8oYi0dHDWV2pnLvJIXrefKWt3O70bXls2obo8HxVRVX8EHWIp5WOxxvOQtHx1jqEockIbQQcBbPOSUgP/KPfAV6cXCQU/60yQsWDljoyo6ReVeJVeXFpUg6w8gggijOnoRmVPEhOBSqoU9cFhc5P8Z13wi/juNJcjrcVjkd/oqToMq8A7NMy+aMQpy1fIePZvjucK7rRVKB2ArNy5ZFTArt3TRpKCw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+W7QevSyW0++d+cfhj6us2hiwVwmhH1Q5njgwCuSTPc=;
- b=dm2/r3vjfSbKhCVET949wmzhHu3913p2g/HNO/5gcgeQj6ltsFUTa092Qcw9uhQfB/soANuCrjGmGj8thS7uJIKKpE9hph7FwKXs1ZGDEU+URgAj6fzmJ1C4mOvePSX+418jVv5Ah9Zqh5cUmmInXzq2Q0Ye3IEPD5nOB1K4sutyV9hSXJDDOXy7HZVC9KNmX6FJEbPlRQQ8a0N288U8Acy9g43WywG1CEZovDZhOFOU78CgoLDURRJHGgQdk1N/kArVvm4UZZkb+3K/5XUT53k6XSqdQPipQeXKpSX1ZoKpSgDXdv1fP9r1eYCXlXlimEYqn53sOIDT/8drR+Kd3Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=aspeedtech.com; dmarc=pass action=none
- header.from=aspeedtech.com; dkim=pass header.d=aspeedtech.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aspeedtech.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+W7QevSyW0++d+cfhj6us2hiwVwmhH1Q5njgwCuSTPc=;
- b=Q6J2UMbJfoFxFnXfW5W6d6MbexRIWrGqP51Q7s+2cFyra2RXkuBja8qtsTqfQYKgmZoDPUvT0h2SxImtnSaMKavALIKpIDUKRbjyKsv1YbGfJmlcvmTMYeGKBvmKmXzfvI6swD3CGXp0QDtF6VtlUH89ntDk6rnfgHt/JB7ElmaPgK9AN0Is9QNXHMr6t3AMsN5Tl8mstlIymH00gVvW1yBuvC5565zYbtw2Dleqpi+EQ/G8JG4/NhQKd8bEsW96Li+emlc/0mc+14XW1zHQdEKnWjLrXuW+fRcCyuVntz4AI8SA6FRu3oytX0AWHLOu3BEos8PKARAPqpwn1vuC2g==
-Received: from SEZPR06MB6958.apcprd06.prod.outlook.com (2603:1096:101:1ef::9)
- by TYSPR06MB6673.apcprd06.prod.outlook.com (2603:1096:400:47f::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9745.28; Mon, 30 Mar
- 2026 09:36:32 +0000
-Received: from SEZPR06MB6958.apcprd06.prod.outlook.com
- ([fe80::4dc1:6d4c:47c8:4928]) by SEZPR06MB6958.apcprd06.prod.outlook.com
- ([fe80::4dc1:6d4c:47c8:4928%6]) with mapi id 15.20.9745.027; Mon, 30 Mar 2026
- 09:36:32 +0000
-From: Neal Liu <neal_liu@aspeedtech.com>
-To: Paul Louvel <paul.louvel@bootlin.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, Joel
- Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@codeconstruct.com.au>
-CC: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	"linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] crypto: aspeed/hash: Use memcpy_from_sglist() in
- aspeed_ahash_dma_prepare()
-Thread-Topic: [PATCH] crypto: aspeed/hash: Use memcpy_from_sglist() in
- aspeed_ahash_dma_prepare()
-Thread-Index: AQHcvcuSChYte+1WIEepzcuwY3YOjLXG1Hpj
-Date: Mon, 30 Mar 2026 09:36:32 +0000
-Message-ID:
- <SEZPR06MB69583063476D6F61E9A7A42C8052A@SEZPR06MB6958.apcprd06.prod.outlook.com>
-References: <20260327092418.10476-1-paul.louvel@bootlin.com>
-In-Reply-To: <20260327092418.10476-1-paul.louvel@bootlin.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=aspeedtech.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SEZPR06MB6958:EE_|TYSPR06MB6673:EE_
-x-ms-office365-filtering-correlation-id: fb377b5a-1c92-4067-5dde-08de8e3fd40f
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|7416014|376014|1800799024|22082099003|56012099003|18002099003|38070700021;
-x-microsoft-antispam-message-info:
- cAYkv+YwcsB7SDe9YD2KWi6dztv9ymHk1fAdy9dCSm8KtyMU/mFLduM6gU1fz6daOHl8I/0I0XNhsQ7DmS51/YIna4hgSRJEoWOiB4xfioS/282lZCHEXuNJwc0JPAd5uM50rH80BvR03x7lN6baUy95H4PUDahYCvCRtpERvGY7twTvDJecCjuvxsZqQZ/5fiOurO49Ba9hnBo7Rh+IhE0vght9/eypAlpOW3bTyjN+vhejKJGwaQl0Nj0e83AmASs3k3PHpIEYVGSPIFJ8W9upNVWQILhfpuQNnRURAZ72DtcuMznQLz8g3218TnVDJ98MZniJL9bHCKrwZCp7GPny7T4fk2WgE6/b8cbgLg0xYE2/KGRSd+L14QdFEzeVQEEvLy7J5gplwO/UWNh28s7dMkZsJlvz7uRpBjzKjSdIlqNSsG/FhbehR9kGJ+nl4PmTiEGHFF91CyLblsOBmjuDT7QMl3peK9XxKSkJ8+qeF/R/XRyWJT2e2bRhzvzvZZ0cco9Un0FnFf0Xy+SSZ5JCWontzBz6fgEL4O1xaZkCNWCtELF8bnH5WqN8q5au6/wzTmGeaLsUGOzIwI9SS4VpG/SgsYVpgIFtuA1Rq9i24oukgrd+wbstwonJQE+n43ADp/pGAkvY5EMfLWIIWOnIvYBfnsnTiircecV+0vtCSYN+mmjtNmrcY1p4RQHKzNrxTbVTKWvIdvDk2w89Rr3Ep6DPT+AC//+kuR/XnccsjIk/uyGNElp3g2/v0bdFy2rNyzCXvzqLC7Uk1imqIssaBdKuQUVRaxXASZZywic=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SEZPR06MB6958.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(22082099003)(56012099003)(18002099003)(38070700021);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?E+iT2JMoKt5r9foi/otW79sXfCGF+oYwY5AUFmKa/9dMN6LIiK54uautRg?=
- =?iso-8859-1?Q?sLOaSmS1NbJ5INqAdv4bgPY8GOz1/lzKhaldpAdlJcqY/7WacbMZ1Nq4og?=
- =?iso-8859-1?Q?edDqWtSrpJk0JdoP04ab9SF2EiGOqKbP4qrKMUkJ2MoaV/fhSbJvXwhwXA?=
- =?iso-8859-1?Q?3unvj2dpaRydNetlhGWfaeSxTmCbpkVj2FDT2e3gQeD8iMxKX4U/wb008K?=
- =?iso-8859-1?Q?2R7UAt3ap5dOXrD9Zg2Vkwqu6Fro8iELKUXxrtYrUTTKxk/oqX8DHeYHAZ?=
- =?iso-8859-1?Q?/XgP8YrGXNSv/N/1q/qQbPWvgoncMS6LLOJFwCiFrJi9mNpLMI28ko5VNO?=
- =?iso-8859-1?Q?GaW84yHU2yYVs02hKTFuGpn6YxAK8DWvdhxS11FrtAZQS35CO8R2W39pEl?=
- =?iso-8859-1?Q?WU31k8BcV6LzxCV90IRm2grXhuHqeC1k84/qjH+NVeCHrbFUieRvvHqFvQ?=
- =?iso-8859-1?Q?+okZKM2PcX/hLbv3vS2qZveL7xiyfFqHZDqS0sla7OBTxOzyUbKA7YpHBr?=
- =?iso-8859-1?Q?MMvr9wFSHOhDZW1eZbwIYfRzyqp676BIEmYjb1PGWr+p7uOBMrUyZ2XYzD?=
- =?iso-8859-1?Q?dS/CnoIh8VYB9CKs9K0TqhJ2UBwArxXMnxmb2zA7UxxHmSe0ZBg0H2iI/2?=
- =?iso-8859-1?Q?Dq7bNLYRwfN6M0jjsPcvIgsYw8lqJC66aLpa1NZK4LCNwAdYgDoeQRkriH?=
- =?iso-8859-1?Q?YwvatM80fyxHUaa/KnzUKh5vGTWPrJtVQ1+lhWDOFAOue7zpUGMtEkafgE?=
- =?iso-8859-1?Q?coEROII8IlpZIR61SOPY8dwkOTSfszxa9v3QmzjORxGB7RdoyHZALs8oE+?=
- =?iso-8859-1?Q?279VmfAJuYJloW+hRn/eBfiRY4sgfm/EjQ6ZKvaFex8TBZQjqvoMtvyqi2?=
- =?iso-8859-1?Q?Vv4NHaYGBwObyMuJiXUQqS8pK3JXx6egRnmqB4nMXVL8AELcnBV2zpBA8J?=
- =?iso-8859-1?Q?MuiTgQDO/WzTpo0ajW3aJOrGibTUDJDfkcEUOyZoyV52hvNpsIEPb8hnDE?=
- =?iso-8859-1?Q?23exnMNGu4ah/gLRGb2QnjcEaXruf65JpAY3OpUa3hDh0YHZj+1bUM/eWo?=
- =?iso-8859-1?Q?YOx41HEO2UMbJHBnalzVRLXVAxkq/WZztwoK6uTBqgoMd6kdnizaed/9vi?=
- =?iso-8859-1?Q?n9lZbaZ6BekFZf/OdBUQVdRwVZxg1KnPXW03viPS37cge+0DmHh4lWkHey?=
- =?iso-8859-1?Q?+Zq6PycIW2xMVwbbhkVJ0smmzGHmM0lq3PdTsS3Yu0rmBX3v2vbN2hA8B8?=
- =?iso-8859-1?Q?OE6X/orl94C89QhXA3DS2dG/FHmbsdkrkiYoXU9HbLwTeWtT45WTZv5t9M?=
- =?iso-8859-1?Q?okot2/rEv4FC0hf0Ysd7k7ibonLWIMcqX/Fr0kYGKr+Q1udlgvQkR+0owZ?=
- =?iso-8859-1?Q?l91jnbhcHbXitPY+3PGKzr+L9teGRfWModMePmC5bhbgbA1qQW+cQA4rN0?=
- =?iso-8859-1?Q?Y6iEFWmP5aiSfuCbVG1GeC4T+rXEnGxKBHT06XCgkFzJoEtt8J7NJjDUMa?=
- =?iso-8859-1?Q?USZ/86iXDUzfa3j4L8vi7tfvkwaJLRYkyQSgtx2qhKTpb2ZHxURSvubfAt?=
- =?iso-8859-1?Q?Km/BU5pa5Vuz39kKACfKbFR8PsXzxi+0rlckmZGGzJyPaoaSCbEuVQrQr8?=
- =?iso-8859-1?Q?QEbCjPv6gmfX61B0KSrqnm+ANNZ21xnOrC67ilfGd6awbRuJeY5DLuRA4n?=
- =?iso-8859-1?Q?GqXXANkmHJCtV9VPd4gFbAaON2pSX5wLChYJP3ttGdSnpXLta+MNRfD9Qf?=
- =?iso-8859-1?Q?zBb5Xg8gFb7zXTqwTClGmkb4jKYRbWC/p5LwpA3O9dBYdYHB4xXDTupCAZ?=
- =?iso-8859-1?Q?u6r8zaw5dA=3D=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Odn278ys"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-486fd3a577eso37656635e9.1
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Mar 2026 02:37:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774863449; x=1775468249; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=pI4JUCEtE5qRlwuJumNxTzoSp2/TgL1Oh7MLg7cH5Is=;
+        b=Odn278ysLnV1x5LZUsi8JtPbQ9iLZ64GqOX3HMOTGGXka9u/T6+/ALsdkoJFdEMlLw
+         VvX413eXiZAOdJvyMejA0cQAn+oJdFvX5Pspkt0R/9LSuBrOwAeCvTsGruWuIYn4jiS6
+         oL4iNtuINIXrzfXUEu3cCrAhfep6ufXlEmRD9OqcwFGh/8eK+XMtg0xNnXHxfKrYa0KB
+         Gj2fvWEjBEOWYmKJgYWXzZiWLsEPN9bYu9X20MCJGrQSZt68U9+jDTZ9Z2g/CndDxCMV
+         4MisH/Dkx2q5AU4H5amAqLb0kUz2MknIrSyshjOzbnIdlck9qHbF1FG5+6i0lOUN7db2
+         wPEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774863449; x=1775468249;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pI4JUCEtE5qRlwuJumNxTzoSp2/TgL1Oh7MLg7cH5Is=;
+        b=ZLFjOg/SEyFdy/1HgZ8X+m+DIaiBh1kE1X4R5weRPTouZK76oq10p82BzycdNb8He8
+         Fi9OG5PuBS1bZy+AzKqUQlgAFzIkZvbK6V/4g7TPu2bXYKM8MZGR8SOzJ383t/bWPGGm
+         2Y8klGx/BivzRCFOP/VO6czto/F2qF54D6/0JrgfGTpY+aBauvQfLoanr6FHqRGF5iIR
+         +tHVgqCr5k4sN9SNFW1qumD7iqOf3taM2JsO8/r0XJcpLHWZZNRsqD29t/G9JRgZppvO
+         Jw0VcQ2UFa9+a8IX57p7Xj2siyJ3iCqtgS/j4DtBohbIFmGO9KitCzvSv3do0ORVJCiv
+         ZvOg==
+X-Forwarded-Encrypted: i=1; AJvYcCXauySuXsRgtKCEbYsBhwm2Va7zOeIdf9tJOxsExKmyfPmonD0psn3KuebYs6S+x9T/Mzfqry4qC/wPrKE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxy6wtSntx7g4AzNx1p98jXL4go41Cc61KapZanNtQ/zH0uu6DE
+	iq5dgXcj3HGruVboD5Pagr3qdQKIbAs5cGoIdpQte8+IoJK+nr+Vvtd3
+X-Gm-Gg: ATEYQzz3jMhg0ikIvSim9T0+HM6/YJcbjaP4uWlu73fXWxdcUY4TlBl70LUd57/vMmL
+	uLWf869/dFg3PirJ4Wjkitbj1paQ8+V+2kqIMOKR1oq24DxNuXmBj9q6HJvG+hHGFPlpOzkvCoD
+	Uzh1pftRe+YwEc+SdyHZaWYfIDzRJ8r6dL1sq+vt9fC3NZy3HEktDokDuSEcHR1ipFVG6dFmCuw
+	4JTXQ/i5hp03eV0lSxEx5fIcooukB18ikU0O4Tw3Xs4s3Zr3K3rTTsFo2xY6iq4hl+rAvlXUsFZ
+	w9WCjyZM73fcLgLBbHYhlSS6wTCQl8s9Y5z7nRVk6CwDhgKhMcX51ASOEOrkI9+JLoeKiI3M0BO
+	5We896BNkKicgEIH8VwyLOFvqTYPz5fqBgaGFcg+sALV38jNQHRrF5JrKh3+OdrP4kIZe7ocAQ9
+	EfAPFENVwIgyiblmXha2C01Z86zpQJF5ITEXvcbsVOJvFlrOpzwRn3IQ==
+X-Received: by 2002:a05:600c:c493:b0:487:575:5e1 with SMTP id 5b1f17b1804b1-48727ef5571mr186959755e9.24.1774863448505;
+        Mon, 30 Mar 2026 02:37:28 -0700 (PDT)
+Received: from Ansuel-XPS. (93-34-88-122.ip49.fastwebnet.it. [93.34.88.122])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48722d49c18sm262788815e9.14.2026.03.30.02.37.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Mar 2026 02:37:28 -0700 (PDT)
+Message-ID: <69ca4458.050a0220.3569e7.2980@mx.google.com>
+X-Google-Original-Message-ID: <acpEVX2A5bhnShFI@Ansuel-XPS.>
+Date: Mon, 30 Mar 2026 11:37:25 +0200
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Thomas Fourier <fourier.thomas@gmail.com>
+Cc: stable@vger.kernel.org, Antoine Tenart <atenart@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Richard van Schagen <vschagen@icloud.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: eip93 - Fix dma_unmap_single() direction in
+ eip93_hash_handle_result()
+References: <20260330091817.25797-2-fourier.thomas@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: aspeedtech.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SEZPR06MB6958.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fb377b5a-1c92-4067-5dde-08de8e3fd40f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Mar 2026 09:36:32.4404
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43d4aa98-e35b-4575-8939-080e90d5a249
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: u82OPKpqxd+jfa2Q9hQZdBSRAOMVWS7Ob8MFwCIC0TEC+PrIPw/8YSsXKi25c30kvPBYnCWcp+RZu3sue4JwtQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYSPR06MB6673
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260330091817.25797-2-fourier.thomas@gmail.com>
 
-> Replace scatterwalk_map_and_copy() with memcpy_from_sglist() in=0A=
-> aspeed_ahash_dma_prepare(). The latter provides a simpler interface=0A=
-> without requiring a direction parameter, making the code easier to=0A=
-> read and less error-prone.=0A=
-> =0A=
-> No functional change intended.=0A=
-> =0A=
-> Signed-off-by: Paul Louvel <paul.louvel@bootlin.com>=0A=
-> ---=0A=
-> =A0drivers/crypto/aspeed/aspeed-hace-hash.c | 3 +--=0A=
-> =A01 file changed, 1 insertion(+), 2 deletions(-)=0A=
-> =0A=
-> diff --git a/drivers/crypto/aspeed/aspeed-hace-hash.c b/drivers/crypto/as=
-peed/aspeed-hace-hash.c=0A=
-> index f8f37c9d5f3c..6f0d03cfbefc 100644=0A=
-> --- a/drivers/crypto/aspeed/aspeed-hace-hash.c=0A=
-> +++ b/drivers/crypto/aspeed/aspeed-hace-hash.c=0A=
-> @@ -182,8 +182,7 @@ static int aspeed_ahash_dma_prepare(struct aspeed_hac=
-e_dev *hace_dev)=0A=
-> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 =
-final =3D true;=0A=
-> =A0=A0=A0=A0=A0=A0=A0=A0 } else=0A=
-> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 length -=3D remain;=0A=
-> -=A0=A0=A0=A0=A0=A0 scatterwalk_map_and_copy(hash_engine->ahash_src_addr,=
- rctx->src_sg,=0A=
-> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0=A0=A0=A0 rctx->offset, length, 0);=0A=
-> +=A0=A0=A0=A0=A0=A0 memcpy_from_sglist(hash_engine->ahash_src_addr, rctx-=
->src_sg, rctx->offset, length);=0A=
-> =A0=A0=A0=A0=A0=A0=A0=A0 aspeed_ahash_update_counter(rctx, length);=0A=
-> =A0=A0=A0=A0=A0=A0=A0=A0 if (final)=0A=
-> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 length +=3D aspeed_ahash=
-_fill_padding(=0A=
-> --=0A=
-> 2.53.0=0A=
-=0A=
-Reviewed-by: Neal Liu <neal_liu@aspeedtech.com>=0A=
+On Mon, Mar 30, 2026 at 11:18:14AM +0200, Thomas Fourier wrote:
+> The buffer rctx->sa_record_base was mapped in eip93_hash_update();
+> rctx->sa_state_ctr_base and rctx->sa_state_base in eip93_send_req()
+> with direction DMA_TO_DEVICE but unmap with DMA_FROM_DEVICE in
+> eip93_hash_handle_result() and eip93_handle_result().
+> 
+> Change the unmap to match the mapping.
+> 
+> Fixes: 9739f5f93b78 ("crypto: eip93 - Add Inside Secure SafeXcel EIP-93 crypto engine support")
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
+
+Hi,
+
+was this tested with the crypto self test?
+
+I need to check the code again but in theory with handle result, we should
+get the data from device in sa_state and cache should be invalidated. If we
+want to use matching maybe we should change to BIDIRECTIONAL?
+
+The mismatched flag was to invalidate relevant cache on tramissing to device and
+then invalidate relevant cache when reading it.
+
+> ---
+>  drivers/crypto/inside-secure/eip93/eip93-common.c | 4 ++--
+>  drivers/crypto/inside-secure/eip93/eip93-hash.c   | 2 +-
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/crypto/inside-secure/eip93/eip93-common.c b/drivers/crypto/inside-secure/eip93/eip93-common.c
+> index f4ad6beff15e..75659a45ea5a 100644
+> --- a/drivers/crypto/inside-secure/eip93/eip93-common.c
+> +++ b/drivers/crypto/inside-secure/eip93/eip93-common.c
+> @@ -687,12 +687,12 @@ void eip93_handle_result(struct eip93_device *eip93, struct eip93_cipher_reqctx
+>  	if (rctx->sa_state_ctr)
+>  		dma_unmap_single(eip93->dev, rctx->sa_state_ctr_base,
+>  				 sizeof(*rctx->sa_state_ctr),
+> -				 DMA_FROM_DEVICE);
+> +				 DMA_TO_DEVICE);
+>  
+>  	if (rctx->sa_state)
+>  		dma_unmap_single(eip93->dev, rctx->sa_state_base,
+>  				 sizeof(*rctx->sa_state),
+> -				 DMA_FROM_DEVICE);
+> +				 DMA_TO_DEVICE);
+>  
+>  	if (!IS_ECB(rctx->flags))
+>  		memcpy(reqiv, rctx->sa_state->state_iv, rctx->ivsize);
+> diff --git a/drivers/crypto/inside-secure/eip93/eip93-hash.c b/drivers/crypto/inside-secure/eip93/eip93-hash.c
+> index 2705855475b2..19a41a0db667 100644
+> --- a/drivers/crypto/inside-secure/eip93/eip93-hash.c
+> +++ b/drivers/crypto/inside-secure/eip93/eip93-hash.c
+> @@ -67,7 +67,7 @@ void eip93_hash_handle_result(struct crypto_async_request *async, int err)
+>  	int i;
+>  
+>  	dma_unmap_single(eip93->dev, rctx->sa_state_base,
+> -			 sizeof(*sa_state), DMA_FROM_DEVICE);
+> +			 sizeof(*sa_state), DMA_TO_DEVICE);
+>  
+>  	/*
+>  	 * With partial_hash assume SHA256_DIGEST_SIZE buffer is passed.
+> -- 
+> 2.43.0
+> 
+
+-- 
+	Ansuel
