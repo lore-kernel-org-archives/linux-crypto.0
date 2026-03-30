@@ -1,40 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BFD6328635
-	for <linux-crypto@vger.kernel.org>; Mon, 30 Mar 2026 14:46:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 969353264FA
+	for <linux-crypto@vger.kernel.org>; Mon, 30 Mar 2026 14:46:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774882009; cv=none; b=NyUNB0H7Kp9Sf8S5Uj4Vuf3wR27OYrXSybODg0QKIx1vVmEH619aBPxrGZJrEeMJ+Jsd+LvwadVHiHs0eIYzUO6Dt98ruf7D8ZlILrGMkjj74iPD1sOOHEfBIUXCtTwYbk+na0KGPOpOchU6yVGU9Zc2aXyHpTC/gAHH/o9ttlc=
+	t=1774882011; cv=none; b=r+AsFWcxsWRLKRcOC5qTnAy5U6neBsLw2RghXBBHjqbXjL5TjmFtuK1sh0OCON5KyB93F1cHgq94j21L1GBkHbYeg/slmbEXlMRiXxEgqgSYiGkTJs5vCaPyoJx0fQD81Bh8qIvVdPVWpQy18REKF/CWRjEmUQLAQ9Od4JZb3gw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774882009; c=relaxed/simple;
-	bh=a2bRJJV06pDUfar9AVIXf8mKBfCBb7ekOHr20b95eZc=;
+	s=arc-20240116; t=1774882011; c=relaxed/simple;
+	bh=Jv9spUpAK9RVhgbG4TZly9WpqFqZUiyy7ckkNarpWN8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EYDV1Eb8jvvUQX9OENOGqplWfPxBB0UOr5hQH80E+mkfQivfQsbrDG8xKXQsY6py1FtOWwMLlV3TaVermiV/R1f8eV9dwF6ooyOjJmuhdXL0rv10DtcGa1af52Eh6v+KDPYz37lcbc8p4oZ3OnIdduNgqYcY7f6rRgcQXPWuArA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=inwoVNV9; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=jkX7GwQccdDeixL5Nyhpxkd1Ac3X8Sclrwk1muD1hHOC13oRnEIx+guGa/VHTvGbJ1LXU8ygGDRCEHchMo22rRxS+9lunvQ6VL+qfGGyTkoshn7DC9fsDWFW1hNmKXERs8n5nfmFujv8x9sxkL0Zl8ZN6B9CBoIAR6xCIeQKLg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yj7icNuh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="inwoVNV9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F961C4CEF7;
-	Mon, 30 Mar 2026 14:46:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yj7icNuh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D62DC2BCB7;
+	Mon, 30 Mar 2026 14:46:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774882009;
-	bh=a2bRJJV06pDUfar9AVIXf8mKBfCBb7ekOHr20b95eZc=;
+	s=k20201202; t=1774882011;
+	bh=Jv9spUpAK9RVhgbG4TZly9WpqFqZUiyy7ckkNarpWN8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=inwoVNV9Q1GkftBVGCxjJs9iVmztdDuqEN/OmLXP02ajSRTDySrGMzsugVDetN7Gg
-	 PMcf/+bGoPaxOd7saE+Nyamb1qLgXaaJ/qyjPocT2OJmtraI15yt9eBwY8o1cwNKMc
-	 zf0SH444+N0C93Cx+ZGh+g+TrfEp8qmG+emX+c1BStrPycYMy/c/E63dHYz+Eruwin
-	 FQ6CVmpI4S84buVbQ7CEyhyHeP8EmuQ6O8McfAtqnfGOVQdNdNq3vS5voqByEE1Kd6
-	 VAUH9Vj1Ic2jMfbaYBG6WDFNF4rQhG4juCzDFezB0ZtVZJ6kLwH8/Mc0WTcAFV+q2S
-	 F9/0aC2cPIXoQ==
+	b=Yj7icNuh/R+mnYDYtOIYPrRN7XLx5pI89g9nkoqHWAbJZBpDaUstlaxv0MgrJebQi
+	 k/edNz/ZzULdZVu5GCPgdymI9Z9a+8xRDlOUAYSK+W9ph1bRK36VaZA7fov8FI/tBH
+	 iswdvA82MTHihhWnU4zRE5kgvoCHLASq8tJXJPCsayiV4hXOY+jUYP0B2QKOCKZaTT
+	 WA2gH6wX2VSPXXXnFc7ghqQNwjd+zQ5ULjdoMqXk36nM+GW2N4CVHVxdOdArg69NLb
+	 AQz/nstcOEVtLzCQXwzwzlqaTWZiJbaq9OVE6dsv7tgC6p+59Y4cS3xKgWbEZkzi3o
+	 smB1AmfC/7HEA==
 From: Ard Biesheuvel <ardb@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-arm-kernel@lists.infradead.org,
 	Ard Biesheuvel <ardb@kernel.org>,
 	Demian Shulhan <demyansh@gmail.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 4/5] lib/crc: arm64: Simplify intrinsics implementation
-Date: Mon, 30 Mar 2026 16:46:35 +0200
-Message-ID: <20260330144630.33026-11-ardb@kernel.org>
+Subject: [PATCH 5/5] lib/crc: arm: Enable arm64's NEON intrinsics implementation of crc64
+Date: Mon, 30 Mar 2026 16:46:36 +0200
+Message-ID: <20260330144630.33026-12-ardb@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260330144630.33026-7-ardb@kernel.org>
 References: <20260330144630.33026-7-ardb@kernel.org>
@@ -44,139 +44,184 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4877; i=ardb@kernel.org; h=from:subject; bh=a2bRJJV06pDUfar9AVIXf8mKBfCBb7ekOHr20b95eZc=; b=owGbwMvMwCn83sBh/rljoYmMp9WSGDJP9Zw4dP5E6R6nqSm+OyeVHrz113L1o00vZp/dEKzMt 5it/shf/o6pLAzCnAyyYoosO5Vzul+7iL7TV6jMgZnDygQyhIGLUwAmwnGfsc5eQuUS884F3jrn psacCss40Vjr5Glt1MikIjr7rQFvqHbL71bJd+2cV7Mzuq7WzZj5mbFhfk1wYD5btNmsqSXavbN W3e6aFxecO6ew94bGoq7+rc9Xt7os0eO53bZKtt1A0XHd3ZsA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=5845; i=ardb@kernel.org; h=from:subject; bh=Jv9spUpAK9RVhgbG4TZly9WpqFqZUiyy7ckkNarpWN8=; b=owGbwMvMwCn83sBh/rljoYmMp9WSGDJP9Zzg37rFUviswuLoLZ6vOMPkf0p6iNdlue0yZlDbq CxaOGFdx1QWBmFOBlkxRZadyjndr11E3+krVObAzGFlAhnCwMUpABPZv5KxhifLWdK+gGXZrZeG xh0x3Zx/Q8+/NGOd1nRvWUBj4r/6du8skTUa9/94HZS7t+nYMyclxoYvYdrph8/32+qoVp+90L7 /UuNj3hvKhz0D48+Ver0SvMwXE7Ti5951wf68bd4M/d+FCwE=
 X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
 Content-Transfer-Encoding: 8bit
 
-NEON intrinsics are useful because they remove the need for manual
-register allocation, and the resulting code can be re-compiled and
-optimized for different micro-architectures, and shared between arm64
-and 32-bit ARM.
+Tweak the NEON intrinsics crc64 code written for arm64 so it can be
+built for 32-bit ARM as well. The only workaround needed is to provide
+alternatives for vmull_p64() and vmull_high_p64() on Clang, which only
+defines those when building for the AArch64 or arm64ec ISA.
 
-However, the strong typing of the vector variables can lead to
-incomprehensible gibberish, as is the case with the new CRC64
-implementation. To address this, let's repaint all variables as
-uint64x2_t to minimize the number of vreinterpretq_xxx() calls, and to
-be able to rely on the ^ operator for exclusive OR operations. This
-makes the code much more concise and readable.
+KUnit benchmark results (Cortex-A53 @ 1 Ghz)
 
-While at it, wrap the calls to vmull_p64() et al in order to have a more
-consistent calling convention, and encapsulate any remaining
-vreinterpret() calls that are still needed.
+Before:
+
+   # crc64_nvme_benchmark: len=1: 35 MB/s
+   # crc64_nvme_benchmark: len=16: 78 MB/s
+   # crc64_nvme_benchmark: len=64: 87 MB/s
+   # crc64_nvme_benchmark: len=127: 88 MB/s
+   # crc64_nvme_benchmark: len=128: 88 MB/s
+   # crc64_nvme_benchmark: len=200: 89 MB/s
+   # crc64_nvme_benchmark: len=256: 89 MB/s
+   # crc64_nvme_benchmark: len=511: 89 MB/s
+   # crc64_nvme_benchmark: len=512: 89 MB/s
+   # crc64_nvme_benchmark: len=1024: 90 MB/s
+   # crc64_nvme_benchmark: len=3173: 90 MB/s
+   # crc64_nvme_benchmark: len=4096: 90 MB/s
+   # crc64_nvme_benchmark: len=16384: 90 MB/s
+
+After:
+
+   # crc64_nvme_benchmark: len=1: 32 MB/s
+   # crc64_nvme_benchmark: len=16: 76 MB/s
+   # crc64_nvme_benchmark: len=64: 71 MB/s
+   # crc64_nvme_benchmark: len=127: 88 MB/s
+   # crc64_nvme_benchmark: len=128: 618 MB/s
+   # crc64_nvme_benchmark: len=200: 542 MB/s
+   # crc64_nvme_benchmark: len=256: 920 MB/s
+   # crc64_nvme_benchmark: len=511: 836 MB/s
+   # crc64_nvme_benchmark: len=512: 1261 MB/s
+   # crc64_nvme_benchmark: len=1024: 1531 MB/s
+   # crc64_nvme_benchmark: len=3173: 1731 MB/s
+   # crc64_nvme_benchmark: len=4096: 1851 MB/s
+   # crc64_nvme_benchmark: len=16384: 1858 MB/s
+
+Enable big-endian support only on GCC - the code generated by Clang is
+horribly broken.
 
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- lib/crc/arm64/crc64-neon-inner.c | 77 ++++++++------------
- 1 file changed, 32 insertions(+), 45 deletions(-)
+ lib/crc/Kconfig                  |  1 +
+ lib/crc/Makefile                 |  5 ++-
+ lib/crc/arm/crc64.h              | 36 ++++++++++++++++++++
+ lib/crc/arm64/crc64-neon-inner.c | 35 +++++++++++++++++++
+ 4 files changed, 76 insertions(+), 1 deletion(-)
 
+diff --git a/lib/crc/Kconfig b/lib/crc/Kconfig
+index 31038c8d111a..2f93d4c4d52d 100644
+--- a/lib/crc/Kconfig
++++ b/lib/crc/Kconfig
+@@ -82,6 +82,7 @@ config CRC64
+ config CRC64_ARCH
+ 	bool
+ 	depends on CRC64 && CRC_OPTIMIZATIONS
++	default y if ARM && KERNEL_MODE_NEON && !(CPU_BIG_ENDIAN && CC_IS_CLANG)
+ 	default y if ARM64
+ 	default y if RISCV && RISCV_ISA_ZBC && 64BIT
+ 	default y if X86_64
+diff --git a/lib/crc/Makefile b/lib/crc/Makefile
+index ff213590e4e3..b6c381cc66bb 100644
+--- a/lib/crc/Makefile
++++ b/lib/crc/Makefile
+@@ -39,8 +39,11 @@ crc64-y := crc64-main.o
+ ifeq ($(CONFIG_CRC64_ARCH),y)
+ CFLAGS_crc64-main.o += -I$(src)/$(SRCARCH)
+ 
++crc64-cflags-$(CONFIG_ARM) += -march=armv8-a -mfpu=crypto-neon-fp-armv8
++crc64-cflags-$(CONFIG_ARM64) += -march=armv8-a+crypto
+ CFLAGS_REMOVE_arm64/crc64-neon-inner.o += $(CC_FLAGS_NO_FPU)
+-CFLAGS_arm64/crc64-neon-inner.o += $(CC_FLAGS_FPU) -march=armv8-a+crypto
++CFLAGS_arm64/crc64-neon-inner.o += $(CC_FLAGS_FPU) $(crc64-cflags-y)
++crc64-$(CONFIG_ARM) += arm64/crc64-neon-inner.o
+ crc64-$(CONFIG_ARM64) += arm64/crc64-neon-inner.o
+ 
+ crc64-$(CONFIG_RISCV) += riscv/crc64_lsb.o riscv/crc64_msb.o
+diff --git a/lib/crc/arm/crc64.h b/lib/crc/arm/crc64.h
+new file mode 100644
+index 000000000000..7c8d54f38e5c
+--- /dev/null
++++ b/lib/crc/arm/crc64.h
+@@ -0,0 +1,36 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * CRC64 using ARM PMULL instructions
++ */
++
++#include <asm/simd.h>
++
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_pmull);
++
++u64 crc64_nvme_arm64_c(u64 crc, const u8 *p, size_t len);
++
++#define crc64_be_arch crc64_be_generic
++
++static inline u64 crc64_nvme_arch(u64 crc, const u8 *p, size_t len)
++{
++	if (len >= 128 && static_branch_likely(&have_pmull) &&
++	    likely(may_use_simd())) {
++		do {
++			size_t chunk = min_t(size_t, len & ~15, SZ_4K);
++
++			scoped_ksimd()
++				crc = crc64_nvme_arm64_c(crc, p, chunk);
++
++			p += chunk;
++			len -= chunk;
++		} while (len >= 128);
++	}
++	return crc64_nvme_generic(crc, p, len);
++}
++
++#define crc64_mod_init_arch crc64_mod_init_arch
++static void crc64_mod_init_arch(void)
++{
++	if (elf_hwcap2 & HWCAP2_PMULL)
++		static_branch_enable(&have_pmull);
++}
 diff --git a/lib/crc/arm64/crc64-neon-inner.c b/lib/crc/arm64/crc64-neon-inner.c
-index 881cdafadb37..28527e544ff6 100644
+index 28527e544ff6..99607dbb7bfd 100644
 --- a/lib/crc/arm64/crc64-neon-inner.c
 +++ b/lib/crc/arm64/crc64-neon-inner.c
-@@ -8,9 +8,6 @@
- 
- u64 crc64_nvme_arm64_c(u64 crc, const u8 *p, size_t len);
- 
--#define GET_P64_0(v) ((poly64_t)vgetq_lane_u64(vreinterpretq_u64_p64(v), 0))
--#define GET_P64_1(v) ((poly64_t)vgetq_lane_u64(vreinterpretq_u64_p64(v), 1))
--
- /* x^191 mod G, x^127 mod G */
- static const u64 fold_consts_val[2] = { 0xeadc41fd2ba3d420ULL,
- 					0x21e9761e252621acULL };
-@@ -18,61 +15,51 @@ static const u64 fold_consts_val[2] = { 0xeadc41fd2ba3d420ULL,
+@@ -15,6 +15,40 @@ static const u64 fold_consts_val[2] = { 0xeadc41fd2ba3d420ULL,
  static const u64 bconsts_val[2] = { 0x27ecfa329aef9f77ULL,
  				    0x34d926535897936aULL };
  
--u64 crc64_nvme_arm64_c(u64 crc, const u8 *p, size_t len)
++#if defined(CONFIG_ARM) && defined(CONFIG_CC_IS_CLANG)
 +static inline uint64x2_t pmull64(uint64x2_t a, uint64x2_t b)
- {
--	uint64x2_t v0_u64 = { crc, 0 };
--	poly64x2_t v0 = vreinterpretq_p64_u64(v0_u64);
--	poly64x2_t fold_consts =
--		vreinterpretq_p64_u64(vld1q_u64(fold_consts_val));
--	poly64x2_t v1 = vreinterpretq_p64_u8(vld1q_u8(p));
-+	return vreinterpretq_u64_p128(vmull_p64(vgetq_lane_u64(a, 0),
-+						vgetq_lane_u64(b, 0)));
++{
++	uint64_t l = vgetq_lane_u64(a, 0);
++	uint64_t m = vgetq_lane_u64(b, 0);
++	uint64x2_t result;
++
++	asm("vmull.p64	%q0, %1, %2" : "=w"(result) : "w"(l), "w"(m));
++
++	return result;
 +}
- 
--	v0 = vreinterpretq_p64_u8(veorq_u8(vreinterpretq_u8_p64(v0),
--					   vreinterpretq_u8_p64(v1)));
--	p += 16;
--	len -= 16;
++
 +static inline uint64x2_t pmull64_high(uint64x2_t a, uint64x2_t b)
 +{
-+	poly64x2_t l = vreinterpretq_p64_u64(a);
-+	poly64x2_t m = vreinterpretq_p64_u64(b);
- 
--	do {
--		v1 = vreinterpretq_p64_u8(vld1q_u8(p));
-+	return vreinterpretq_u64_p128(vmull_high_p64(l, m));
++	uint64_t l = vgetq_lane_u64(a, 1);
++	uint64_t m = vgetq_lane_u64(b, 1);
++	uint64x2_t result;
++
++	asm("vmull.p64	%q0, %1, %2" : "=w"(result) : "w"(l), "w"(m));
++
++	return result;
 +}
- 
--		poly128_t v2 = vmull_high_p64(fold_consts, v0);
--		poly128_t v0_128 =
--			vmull_p64(GET_P64_0(fold_consts), GET_P64_0(v0));
++
 +static inline uint64x2_t pmull64_hi_lo(uint64x2_t a, uint64x2_t b)
 +{
-+	return vreinterpretq_u64_p128(vmull_p64(vgetq_lane_u64(a, 1),
-+						vgetq_lane_u64(b, 0)));
++	uint64_t l = vgetq_lane_u64(a, 1);
++	uint64_t m = vgetq_lane_u64(b, 0);
++	uint64x2_t result;
++
++	asm("vmull.p64	%q0, %1, %2" : "=w"(result) : "w"(l), "w"(m));
++
++	return result;
 +}
- 
--		uint8x16_t x0 = veorq_u8(vreinterpretq_u8_p128(v0_128),
--					 vreinterpretq_u8_p128(v2));
-+u64 crc64_nvme_arm64_c(u64 crc, const u8 *p, size_t len)
-+{
-+	uint64x2_t fold_consts = vld1q_u64(fold_consts_val);
-+	uint64x2_t v0 = { crc, 0 };
-+	uint64x2_t zero = { };
- 
--		x0 = veorq_u8(x0, vreinterpretq_u8_p64(v1));
--		v0 = vreinterpretq_p64_u8(x0);
-+	for (;;) {
-+		v0 ^= vreinterpretq_u64_u8(vld1q_u8(p));
- 
- 		p += 16;
- 		len -= 16;
--	} while (len >= 16);
--
--	/* Multiply the 128-bit value by x^64 and reduce it back to 128 bits. */
--	poly64x2_t v7 = vreinterpretq_p64_u64((uint64x2_t){ 0, 0 });
--	poly128_t v1_128 = vmull_p64(GET_P64_1(fold_consts), GET_P64_0(v0));
-+		if (len < 16)
-+			break;
- 
--	uint8x16_t ext_v0 =
--		vextq_u8(vreinterpretq_u8_p64(v0), vreinterpretq_u8_p64(v7), 8);
--	uint8x16_t x0 = veorq_u8(ext_v0, vreinterpretq_u8_p128(v1_128));
-+		v0 = pmull64(fold_consts, v0) ^ pmull64_high(fold_consts, v0);
-+	}
- 
--	v0 = vreinterpretq_p64_u8(x0);
-+	/* Multiply the 128-bit value by x^64 and reduce it back to 128 bits. */
-+	v0 = vextq_u64(v0, zero, 1) ^ pmull64_hi_lo(fold_consts, v0);
- 
- 	/* Final Barrett reduction */
--	poly64x2_t bconsts = vreinterpretq_p64_u64(vld1q_u64(bconsts_val));
--
--	v1_128 = vmull_p64(GET_P64_0(bconsts), GET_P64_0(v0));
--
--	poly64x2_t v1_64 = vreinterpretq_p64_u8(vreinterpretq_u8_p128(v1_128));
--	poly128_t v3_128 = vmull_p64(GET_P64_1(bconsts), GET_P64_0(v1_64));
--
--	x0 = veorq_u8(vreinterpretq_u8_p64(v0), vreinterpretq_u8_p128(v3_128));
--
--	uint8x16_t ext_v2 = vextq_u8(vreinterpretq_u8_p64(v7),
--				     vreinterpretq_u8_p128(v1_128), 8);
-+	uint64x2_t bconsts = vld1q_u64(bconsts_val);
-+	uint64x2_t final = pmull64(bconsts, v0);
- 
--	x0 = veorq_u8(x0, ext_v2);
-+	v0 ^= vextq_u64(zero, final, 1) ^ pmull64_hi_lo(bconsts, final);
- 
--	v0 = vreinterpretq_p64_u8(x0);
--	return vgetq_lane_u64(vreinterpretq_u64_p64(v0), 1);
-+	return vgetq_lane_u64(v0, 1);
++#else
+ static inline uint64x2_t pmull64(uint64x2_t a, uint64x2_t b)
+ {
+ 	return vreinterpretq_u64_p128(vmull_p64(vgetq_lane_u64(a, 0),
+@@ -34,6 +68,7 @@ static inline uint64x2_t pmull64_hi_lo(uint64x2_t a, uint64x2_t b)
+ 	return vreinterpretq_u64_p128(vmull_p64(vgetq_lane_u64(a, 1),
+ 						vgetq_lane_u64(b, 0)));
  }
++#endif
+ 
+ u64 crc64_nvme_arm64_c(u64 crc, const u8 *p, size_t len)
+ {
 -- 
 2.53.0.1018.g2bb0e51243-goog
 
