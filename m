@@ -1,156 +1,361 @@
-Received: from mout.web.de (mout.web.de [212.227.15.14])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9B5E296BD6;
-	Mon, 30 Mar 2026 11:36:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E83E63D1CB3;
+	Mon, 30 Mar 2026 12:55:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774870580; cv=none; b=kh44NoUIFHScmLJSm0gcQVeoy2gXCwikjyuo1bgmjNWgclKFpEO53YaJQUVeiI7iFpZan+hF1PypnJpzHYI8Z0dgQN/R2r9ZWf2+9SsDErJ1kJPe/7tSdnS+6opXQJinftKMNHrpnimd1YU7ZTCoynlW6Elk6UzNzxqB8m3kJ88=
+	t=1774875306; cv=none; b=hO9lBEqKp7ULnOtKYM2bjiLOipASmLO3aa8+Ncq9qLDABuvvMcJNSEucIeMVoNxM02KGq64jYQsTn+TDonwV5aXQs6rEQenBtjcRO5J5elSxfVYLqKN5zxFRYRZOvIT5w6XJWU412HWTqmUA1k4IPTVLzx95PVSV5hDk1XP3dCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774870580; c=relaxed/simple;
-	bh=m/yypgSy3gvluXK+bM8YRRytv4SNV2rgEUpt2OiVPHw=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=p34aJd+Gaha0a2omk1ayCOXSQpmNmsexvv127klDh3Z3p2fUpYgaqczU94KQzy/XBoVFCwV/0qG7ax76FuiLNHWVlBf8ZfloJOr0u1KjeY5qMPR3XX2talnNeID+fsPz0xb524Z7Vy85+ZcUJVk6t+jgaDZynRHE5av2fqlanko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=bIuSW1AB; arc=none smtp.client-ip=212.227.15.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+	s=arc-20240116; t=1774875306; c=relaxed/simple;
+	bh=R3YvVBoJbN9lPtFjocI0Duh7724R1ylPOyLBNcDb1zc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jwn+LldhOQe6Ah6tAGJkaHqHeQXJIbq4TPNksU0ULjaylaQGWlHP3oM7EkS9AaNfma4nck9Meq39yOIfQMORihalQcw6rKOmzDBgFg/SySX0RKkvaAsgYwMBy7QmUWAko6ORRILB4Ni03d8hvDZlR9m6Ib5zRnGDPqWcd9EA7cQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WfkRN5aC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="bIuSW1AB"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1774870562; x=1775475362; i=markus.elfring@web.de;
-	bh=UR3jtSm0SxVlozfRvG0fs/edI07S6CbStADlAD21ugY=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=bIuSW1ABJD0rDXLZ7N1qMmUDDN7jnxajGJORJzy6j0zLlHtWTOiwvjp6oSEbrPcR
-	 B1zr+CfoEX6CcHJnYX2ywltv8y9xF7dJ6VakVYpURjO3W81WG46XnuXEts7gqKB5G
-	 az0JjDdChqXAGaGrTxAXzDjb0nA+tinBhgvENuHBYCP1nevycMMnvU8gWlZGEPnlV
-	 7yb0iTJeETikJZW4501U2fQxzX7mpK7VjOhVMNGi0AWo5X/IIcFsx2vFDhCGL5EOD
-	 yb9uMxYWaoqoYs/596/X9yHCv7BAswgmtgHKfZGychZBJ0VP8XS7NC4Ak9eARtFO/
-	 g56V4wFdB1OTeHDsfQ==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from client.hidden.invalid by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1Mt8kX-1vEX5n2hbt-018ETq; Mon, 30
- Mar 2026 13:36:02 +0200
-Message-ID: <7460d990-f4c9-404f-958d-4e0287e7b347@web.de>
-Date: Mon, 30 Mar 2026 13:35:58 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WfkRN5aC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FDD4C4CEF7;
+	Mon, 30 Mar 2026 12:54:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1774875305;
+	bh=R3YvVBoJbN9lPtFjocI0Duh7724R1ylPOyLBNcDb1zc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WfkRN5aCWVLbI0R2daRo0rZ+06XRIjrYv7LxhrUjOHEvJuy9DY71yL4PDIn1ltHYn
+	 oA7TQYJZMTUjC5r30E1AXuCHMB2kT5pTvdPo8jR693BYbH0XMYjKXjGnmAEs+Od1sI
+	 8ELrYYr7F9Y9nVsQky8x1V0ESQ/fheGt25dOdPyKmI6V4vgkzZaOALyKx+FSRZF9TI
+	 hcz8JWD03FFU5v072uUigXc+fxpgPGrFRjEjB1ig6jLllJ1O7sxLrMk2C9obw97cGL
+	 kIMspojUjJAupYkVX7h0yQtCFXDYnz1D1dtXu9Ay1NAEe3s05m4f9n+GB+O+PzkjwN
+	 8Bs+mc/9afXVA==
+Date: Mon, 30 Mar 2026 18:24:50 +0530
+From: Manivannan Sadhasivam <mani@kernel.org>
+To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Cc: Vinod Koul <vkoul@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Thara Gopinath <thara.gopinath@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Udit Tiwari <quic_utiwari@quicinc.com>, 
+	Md Sadre Alam <mdalam@qti.qualcomm.com>, Dmitry Baryshkov <lumag@kernel.org>, 
+	Stephan Gerhold <stephan.gerhold@linaro.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Peter Ujfalusi <peter.ujfalusi@gmail.com>, Michal Simek <michal.simek@amd.com>, 
+	Frank Li <Frank.Li@kernel.org>, dmaengine@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, brgl@kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v14 05/12] dmaengine: qcom: bam_dma: add support for BAM
+ locking
+Message-ID: <ho3e26nrbz6ppxvs6cq2q76i2h6zpbbrssyekvuzc6e3koupvs@fpajvjgb2qjq>
+References: <20260323-qcom-qce-cmd-descr-v14-0-f323af411274@oss.qualcomm.com>
+ <20260323-qcom-qce-cmd-descr-v14-5-f323af411274@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>, linux-crypto@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>,
- Gilad Ben-Yossef <gilad@benyossef.com>,
- Herbert Xu <herbert@gondor.apana.org.au>
-Cc: stable@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
- Felix Gu <ustc.gu@gmail.com>
-References: <20260330033402.2758074-1-lihaoxiang@isrc.iscas.ac.cn>
-Subject: Re: [PATCH] crypto: ccree: fix a memory leak in cc_mac_digest()
-Content-Language: en-GB, de-DE
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20260330033402.2758074-1-lihaoxiang@isrc.iscas.ac.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:ENYhTy7Yx72WI7yWaSZ5XY60F3FzIxCJlMUN/6x+Xvywcjf4zSi
- 8k8nJUxW1cPQNQ5NmZkeBoV59faCeG/WtnY8H40JQ0snI3rT8bcPM0nIchOxWOM424dBK4z
- 2aZ14p+yMlwuipqgxdZEWB+6ih/bP+cMzMMg0pBYw2JY9NCCFsoKaURmTTrriAKoghWE6RX
- EI1ztAl25X+PXAqKn39OQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:J5/ZT/zdF6o=;2H4LgAJnv8FqO9EsjzFK2d+Eoo6
- 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
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260323-qcom-qce-cmd-descr-v14-5-f323af411274@oss.qualcomm.com>
 
-=E2=80=A6
-> +++ b/drivers/crypto/ccree/cc_hash.c
-> @@ -1448,6 +1448,7 @@ static int cc_mac_digest(struct ahash_request *req=
-)
->  	if (cc_map_hash_request_final(ctx->drvdata, state, req->src,
->  				      req->nbytes, 1, flags)) {
->  		dev_err(dev, "map_ahash_request_final() failed\n");
-> +		cc_unmap_result(dev, state, digestsize, req->result);
->  		cc_unmap_req(dev, state, ctx);
->  		return -ENOMEM;
+On Mon, Mar 23, 2026 at 04:17:11PM +0100, Bartosz Golaszewski wrote:
+> Add support for BAM pipe locking. To that end: when starting DMA on an RX
+> channel - prepend the existing queue of issued descriptors with an
+> additional "dummy" command descriptor with the LOCK bit set. Once the
+> transaction is done (no more issued descriptors), issue one more dummy
+> descriptor with the UNLOCK bit.
+> 
+> We *must* wait until the transaction is signalled as done because we
+> must not perform any writes into config registers while the engine is
+> busy.
+> 
+> The dummy writes must be issued into a scratchpad register of the client
+> so provide a mechanism to communicate the right address via descriptor
+> metadata.
+> 
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+
+Reviewed-by: Manivannan Sadhasivam <mani@kernel.org>
+
+- Mani
+
+> ---
+>  drivers/dma/qcom/bam_dma.c       | 165 ++++++++++++++++++++++++++++++++++++++-
+>  include/linux/dma/qcom_bam_dma.h |  10 +++
+>  2 files changed, 171 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/dma/qcom/bam_dma.c b/drivers/dma/qcom/bam_dma.c
+> index 83491e7c2f17d8c9d12a1a055baea7e3a0a75a53..309681e798d2e44992e3d20679c3a7564ad8f29e 100644
+> --- a/drivers/dma/qcom/bam_dma.c
+> +++ b/drivers/dma/qcom/bam_dma.c
+> @@ -28,11 +28,13 @@
+>  #include <linux/clk.h>
+>  #include <linux/device.h>
+>  #include <linux/dma-mapping.h>
+> +#include <linux/dma/qcom_bam_dma.h>
+>  #include <linux/dmaengine.h>
+>  #include <linux/init.h>
+>  #include <linux/interrupt.h>
+>  #include <linux/io.h>
+>  #include <linux/kernel.h>
+> +#include <linux/lockdep.h>
+>  #include <linux/module.h>
+>  #include <linux/of_address.h>
+>  #include <linux/of_dma.h>
+> @@ -60,6 +62,8 @@ struct bam_desc_hw {
+>  #define DESC_FLAG_EOB BIT(13)
+>  #define DESC_FLAG_NWD BIT(12)
+>  #define DESC_FLAG_CMD BIT(11)
+> +#define DESC_FLAG_LOCK BIT(10)
+> +#define DESC_FLAG_UNLOCK BIT(9)
+>  
+>  struct bam_async_desc {
+>  	struct virt_dma_desc vd;
+> @@ -391,6 +395,13 @@ struct bam_chan {
+>  	struct list_head desc_list;
+>  
+>  	struct list_head node;
+> +
+> +	/* BAM locking infrastructure */
+> +	phys_addr_t scratchpad_addr;
+> +	struct scatterlist lock_sg;
+> +	struct scatterlist unlock_sg;
+> +	struct bam_cmd_element lock_ce;
+> +	struct bam_cmd_element unlock_ce;
+>  };
+>  
+>  static inline struct bam_chan *to_bam_chan(struct dma_chan *common)
+> @@ -652,6 +663,32 @@ static int bam_slave_config(struct dma_chan *chan,
+>  	return 0;
+>  }
+>  
+> +static int bam_metadata_attach(struct dma_async_tx_descriptor *desc, void *data, size_t len)
+> +{
+> +	struct bam_chan *bchan = to_bam_chan(desc->chan);
+> +	const struct bam_device_data *bdata = bchan->bdev->dev_data;
+> +	struct bam_desc_metadata *metadata = data;
+> +
+> +	if (!data)
+> +		return -EINVAL;
+> +
+> +	if (!bdata->pipe_lock_supported)
+> +		/*
+> +		 * The client wants to use locking but this BAM version doesn't
+> +		 * support it. Don't return an error here as this will stop the
+> +		 * client from using DMA at all for no reason.
+> +		 */
+> +		return 0;
+> +
+> +	bchan->scratchpad_addr = metadata->scratchpad_addr;
+> +
+> +	return 0;
+> +}
+> +
+> +static const struct dma_descriptor_metadata_ops bam_metadata_ops = {
+> +	.attach = bam_metadata_attach,
+> +};
+> +
+>  /**
+>   * bam_prep_slave_sg - Prep slave sg transaction
+>   *
+> @@ -668,6 +705,7 @@ static struct dma_async_tx_descriptor *bam_prep_slave_sg(struct dma_chan *chan,
+>  	void *context)
+>  {
+>  	struct bam_chan *bchan = to_bam_chan(chan);
+> +	struct dma_async_tx_descriptor *tx_desc;
+>  	struct bam_device *bdev = bchan->bdev;
+>  	struct bam_async_desc *async_desc;
+>  	struct scatterlist *sg;
+> @@ -723,7 +761,12 @@ static struct dma_async_tx_descriptor *bam_prep_slave_sg(struct dma_chan *chan,
+>  		} while (remainder > 0);
 >  	}
+>  
+> -	return vchan_tx_prep(&bchan->vc, &async_desc->vd, flags);
+> +	tx_desc = vchan_tx_prep(&bchan->vc, &async_desc->vd, flags);
+> +	if (!tx_desc)
+> +		return NULL;
+> +
+> +	tx_desc->metadata_ops = &bam_metadata_ops;
+> +	return tx_desc;
+>  }
+>  
+>  /**
+> @@ -1012,13 +1055,116 @@ static void bam_apply_new_config(struct bam_chan *bchan,
+>  	bchan->reconfigure = 0;
+>  }
+>  
+> +static struct bam_async_desc *
+> +bam_make_lock_desc(struct bam_chan *bchan, struct scatterlist *sg,
+> +		   struct bam_cmd_element *ce, unsigned long flag)
+> +{
+> +	struct dma_chan *chan = &bchan->vc.chan;
+> +	struct bam_async_desc *async_desc;
+> +	struct bam_desc_hw *desc;
+> +	struct virt_dma_desc *vd;
+> +	struct virt_dma_chan *vc;
+> +	unsigned int mapped;
+> +	dma_cookie_t cookie;
+> +	int ret;
+> +
+> +	sg_init_table(sg, 1);
+> +
+> +	async_desc = kzalloc_flex(*async_desc, desc, 1, GFP_NOWAIT);
+> +	if (!async_desc) {
+> +		dev_err(bchan->bdev->dev, "failed to allocate the BAM lock descriptor\n");
+> +		return ERR_PTR(-ENOMEM);
+> +	}
+> +
+> +	async_desc->num_desc = 1;
+> +	async_desc->curr_desc = async_desc->desc;
+> +	async_desc->dir = DMA_MEM_TO_DEV;
+> +
+> +	desc = async_desc->desc;
+> +
+> +	bam_prep_ce_le32(ce, bchan->scratchpad_addr, BAM_WRITE_COMMAND, 0);
+> +	sg_set_buf(sg, ce, sizeof(*ce));
+> +
+> +	mapped = dma_map_sg_attrs(chan->slave, sg, 1, DMA_TO_DEVICE, DMA_PREP_CMD);
+> +	if (!mapped) {
+> +		kfree(async_desc);
+> +		return ERR_PTR(-ENOMEM);
+> +	}
+> +
+> +	desc->flags |= cpu_to_le16(DESC_FLAG_CMD | flag);
+> +	desc->addr = sg_dma_address(sg);
+> +	desc->size = sizeof(struct bam_cmd_element);
+> +
+> +	vc = &bchan->vc;
+> +	vd = &async_desc->vd;
+> +
+> +	dma_async_tx_descriptor_init(&vd->tx, &vc->chan);
+> +	vd->tx.flags = DMA_PREP_CMD;
+> +	vd->tx.desc_free = vchan_tx_desc_free;
+> +	vd->tx_result.result = DMA_TRANS_NOERROR;
+> +	vd->tx_result.residue = 0;
+> +
+> +	cookie = dma_cookie_assign(&vd->tx);
+> +	ret = dma_submit_error(cookie);
+> +	if (ret) {
+> +		dma_unmap_sg(chan->slave, sg, 1, DMA_TO_DEVICE);
+> +		kfree(async_desc);
+> +		return ERR_PTR(ret);
+> +	}
+> +
+> +	return async_desc;
+> +}
+> +
+> +static int bam_do_setup_pipe_lock(struct bam_chan *bchan, bool lock)
+> +{
+> +	struct bam_device *bdev = bchan->bdev;
+> +	const struct bam_device_data *bdata = bdev->dev_data;
+> +	struct bam_async_desc *lock_desc;
+> +	struct bam_cmd_element *ce;
+> +	struct scatterlist *sgl;
+> +	unsigned long flag;
+> +
+> +	lockdep_assert_held(&bchan->vc.lock);
+> +
+> +	if (!bdata->pipe_lock_supported || !bchan->scratchpad_addr ||
+> +	    bchan->slave.direction != DMA_MEM_TO_DEV)
+> +		return 0;
+> +
+> +	if (lock) {
+> +		sgl = &bchan->lock_sg;
+> +		ce = &bchan->lock_ce;
+> +		flag = DESC_FLAG_LOCK;
+> +	} else {
+> +		sgl = &bchan->unlock_sg;
+> +		ce = &bchan->unlock_ce;
+> +		flag = DESC_FLAG_UNLOCK;
+> +	}
+> +
+> +	lock_desc = bam_make_lock_desc(bchan, sgl, ce, flag);
+> +	if (IS_ERR(lock_desc))
+> +		return PTR_ERR(lock_desc);
+> +
+> +	if (lock)
+> +		list_add(&lock_desc->vd.node, &bchan->vc.desc_issued);
+> +	else
+> +		list_add_tail(&lock_desc->vd.node, &bchan->vc.desc_issued);
+> +
+> +	return 0;
+> +}
+> +
+> +static void bam_setup_pipe_lock(struct bam_chan *bchan)
+> +{
+> +	if (bam_do_setup_pipe_lock(bchan, true) || bam_do_setup_pipe_lock(bchan, false))
+> +		dev_err(bchan->vc.chan.slave, "Failed to setup BAM pipe lock descriptors");
+> +}
+> +
+>  /**
+>   * bam_start_dma - start next transaction
+>   * @bchan: bam dma channel
+>   */
+>  static void bam_start_dma(struct bam_chan *bchan)
+>  {
+> -	struct virt_dma_desc *vd = vchan_next_desc(&bchan->vc);
+> +	struct virt_dma_desc *vd;
+>  	struct bam_device *bdev = bchan->bdev;
+>  	struct bam_async_desc *async_desc = NULL;
+>  	struct bam_desc_hw *desc;
+> @@ -1030,6 +1176,9 @@ static void bam_start_dma(struct bam_chan *bchan)
+>  
+>  	lockdep_assert_held(&bchan->vc.lock);
+>  
+> +	bam_setup_pipe_lock(bchan);
+> +
+> +	vd = vchan_next_desc(&bchan->vc);
+>  	if (!vd)
+>  		return;
+>  
+> @@ -1157,8 +1306,15 @@ static void bam_issue_pending(struct dma_chan *chan)
+>   */
+>  static void bam_dma_free_desc(struct virt_dma_desc *vd)
+>  {
+> -	struct bam_async_desc *async_desc = container_of(vd,
+> -			struct bam_async_desc, vd);
+> +	struct bam_async_desc *async_desc = container_of(vd, struct bam_async_desc, vd);
+> +	struct bam_desc_hw *desc = async_desc->desc;
+> +	struct dma_chan *chan = vd->tx.chan;
+> +	struct bam_chan *bchan = to_bam_chan(chan);
+> +
+> +	if (le16_to_cpu(desc->flags) & DESC_FLAG_LOCK)
+> +		dma_unmap_sg(chan->slave, &bchan->lock_sg, 1, DMA_TO_DEVICE);
+> +	else if (le16_to_cpu(desc->flags) & DESC_FLAG_UNLOCK)
+> +		dma_unmap_sg(chan->slave, &bchan->unlock_sg, 1, DMA_TO_DEVICE);
+>  
+>  	kfree(async_desc);
+>  }
+> @@ -1350,6 +1506,7 @@ static int bam_dma_probe(struct platform_device *pdev)
+>  	bdev->common.device_terminate_all = bam_dma_terminate_all;
+>  	bdev->common.device_issue_pending = bam_issue_pending;
+>  	bdev->common.device_tx_status = bam_tx_status;
+> +	bdev->common.desc_metadata_modes = DESC_METADATA_CLIENT;
+>  	bdev->common.dev = bdev->dev;
+>  
+>  	ret = dma_async_device_register(&bdev->common);
+> diff --git a/include/linux/dma/qcom_bam_dma.h b/include/linux/dma/qcom_bam_dma.h
+> index 68fc0e643b1b97fe4520d5878daa322b81f4f559..5f0d2a27face8223ecb77da33d9e050c1ff2622f 100644
+> --- a/include/linux/dma/qcom_bam_dma.h
+> +++ b/include/linux/dma/qcom_bam_dma.h
+> @@ -34,6 +34,16 @@ enum bam_command_type {
+>  	BAM_READ_COMMAND,
+>  };
+>  
+> +/**
+> + * struct bam_desc_metadata - DMA descriptor metadata specific to the BAM driver.
+> + *
+> + * @scratchpad_addr: Physical address to use for dummy write operations when
+> + *                   queuing command descriptors with LOCK/UNLOCK bits set.
+> + */
+> +struct bam_desc_metadata {
+> +	phys_addr_t scratchpad_addr;
+> +};
+> +
+>  /*
+>   * prep_bam_ce_le32 - Wrapper function to prepare a single BAM command
+>   * element with the data already in le32 format.
+> 
+> -- 
+> 2.47.3
+> 
 
-How do you think about to avoid also a bit of duplicate source code here?
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
-cumentation/process/coding-style.rst?h=3Dv7.0-rc6#n526
-
-Regards,
-Markus
+-- 
+மணிவண்ணன் சதாசிவம்
