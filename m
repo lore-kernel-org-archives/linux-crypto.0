@@ -1,158 +1,270 @@
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B949437997E
-	for <linux-crypto@vger.kernel.org>; Tue, 31 Mar 2026 08:56:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 558AB3ED5DA
+	for <linux-crypto@vger.kernel.org>; Tue, 31 Mar 2026 09:40:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774947417; cv=none; b=dbcpgYhQcc/isPstmY/KnGgid2j+6TkZksXfd5fVR2KmCNepdSsPEqI0bia7VmhgLdrEhgVvIGk+Bmcij5yzJ7Kpfb5VX/RuBP4iPtgYXifEkDgorLEXBOFvCASJCedF/6dcE11zSTonYUX5oOvRzLkeUbi2K6rTlYJhqjxCotk=
+	t=1774950036; cv=none; b=AVcEfpg9diBbK7meh/JJlenVH0TS2L6h5axaP8tbx7S7sMmX6fMEanBWc0YGBXb6wOISV2cxV5Ic9ypdC662Y4UCOSWTfTmCf2Sm/xOP6sSVdmQkDNqWrhpNfI4js7CLvxbUMpYn84RJi9iQ6HuKjyMlT41TLJzZHIChH06qgNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774947417; c=relaxed/simple;
-	bh=NfCIvD9EKCBGG09dklHcwf400e4LoX12LOmkMPlap6Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rPSU7uk52Q5h0TzVA2XOtXmS8GTHE/I3h6jSn+ppDQ3wJexz2byAaK7p8u2ikHCAZi280JihQNeefM8YUPZbDHG5YJ0uaiqFDkrBYWTPWw8wA4rG30P7zFjiUnvlpWUNR0uTdODdf2jOpFdsIFHHfOY39XhGAS8irdT4oN3+XEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.win; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.win
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b9825ba7e8dso740267366b.3
-        for <linux-crypto@vger.kernel.org>; Tue, 31 Mar 2026 01:56:55 -0700 (PDT)
+	s=arc-20240116; t=1774950036; c=relaxed/simple;
+	bh=6TtXtGHuwbeOGc43RV1ox/wCKy7dGy+cBU/v5F7GGuY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QLCHYpigExFv+YnLmjz+9+debjQRo7V4q+vjnD1K87iDCADzlEcT77+oKaoEZFc5VAtwP05loIfjnXSfdpcXhN1DhDbQp0DqTdQly1qsBR0e2FP/EVxq8C9acu453qmChatgQyN64NBePnehiew+2zckQBXEbYPL9141NtsBUM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=labxpXx4; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=OdzHmQgO; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="labxpXx4";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="OdzHmQgO"
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 62V8CP2V430939
+	for <linux-crypto@vger.kernel.org>; Tue, 31 Mar 2026 09:40:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	oO9fj8VnemesVNw4Kd4kvPTyxIt0YprBH9NBYs6VYwU=; b=labxpXx4emFwd9Yw
+	YA7lhLzAwsnly1/7QCm/HoKB4VvxJk5Kd+9ioBAV7C+Q1bSWsvFm8NGPdb7IPM1F
+	s7gYkJu+AJTSPV6gPZlURLmaRK5BoJJDFI7oXaAfVBQqNTYiuppLjohFJwODGIcQ
+	JM3rfwvQRshKKTeUV06sbxM89gBJLxVaJL9KIM1GqT6DvH+/iNUNsgCV8PS5Hud8
+	nugOPtJl3acxB4J+FYMqejbVL235iFwAi561ZOq2YfL6GWECeWw+YunfjAMccSUr
+	ktG+r/tV2m7yVXFNV92+i7eHQooqF8TLpLOhMBQsHDRrhMjEtlp/uHfvSPwfJV3/
+	vcri9g==
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4d84bfhs10-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Tue, 31 Mar 2026 09:40:34 +0000 (GMT)
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-2b2523e0299so64915345ad.3
+        for <linux-crypto@vger.kernel.org>; Tue, 31 Mar 2026 02:40:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1774950033; x=1775554833; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=oO9fj8VnemesVNw4Kd4kvPTyxIt0YprBH9NBYs6VYwU=;
+        b=OdzHmQgOyB4myKofD7Sd+W3RDBvUMbFZX2FQWPlSNdapC6RPoXxzBswgb75zxyMlpi
+         cmKlJVCd81eO7hrciagYFaIACfE92SZYoB8O+C0TSfbFZych+b3nISFtERp3ZteiXbF/
+         NPJWLfZKNTcNo+1qhmm2ee67NOxLRbjRlgVCtRLTqFwJrNLSnkNZ+KyFcbCCDBG/NDqZ
+         yAYMCXBLSoroO6e0UwP2vSeyyi2+tgU5omRXzIRFIdA8W+GqcM6qfLq+nuqOtVX8nsOn
+         2ZPj2MYXyOZsxKKEqoh2CXaHE/Tm1dIL7rWMk0atSOGJXYoupolVXKVuWGzUZIyTZZRN
+         Aauw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1774947414; x=1775552214;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=fkKySBZ7X7iczOeZdeOY7AG3jh/Ec5V+U3FeSPchdFc=;
-        b=bnX6NCkkl3drUHACwrU10iC+VIQIs3D7pg6d6Ds2ykOg2eTfevFMywQUATfwPYZHvO
-         RY5qbQR10sv3dX+vWuL0wz2DkEdSXTM4YYBMKSL9M8x319P+BlQ4fO5H7wphBZUob0Ei
-         sOVs96XzT7GB+Ex0BaI3MUI0dGkzEFaCaxn5rIJ/7VCOmSy6oornzs97qp1+ML8FiTn0
-         y3dPJz5ZQVZGwhE3SpY+cl5gMeS92qJt1/Ik0w16e/hmBWDlmE4O8kW1Uzxda9kAdRqM
-         Z1JPzwZBefKOjmY9eSeJSvPYirOtNdf7fcXN2lcmhEp8D/UafWToQENmzmVKjUqsAOHi
-         QJiQ==
-X-Gm-Message-State: AOJu0YzNmpM9+2Fbvf7PCAMLJsAZEceypUPrf3Za18XPUbioCiFdyIBR
-	TCAvisIbR6tyYbZQfm2BZIpF8+Z/y4k9jbw8DQXqfTbySdDKchbU315nYcAI/BMjfSg=
-X-Gm-Gg: ATEYQzydUtgAJ41kmhUSUJIL8BsbMdQqRr2280LCxwBUKrRONdUbennCd7TPN7AVKHg
-	F8W6EjFL4XwT8MoYkT4QAorLpKBxgMrIgkX5CjvQkMnS7OaMrHV/ymiogDFqi/WWawuijIppcrs
-	kpDr0NIJoimS1DEg42M5kcj3OLfYcJCS2eJ9pMuUguRZvSfaHeIZo0ptoF3fYrlMDp6M5TskfJO
-	1cxPHN+0a1bTiLCaqxq0lntm1/90O7fKLxhzBivA4HnpxvvBo67YcphPGzUyMM1txSoWahbKgza
-	nq5KPRJJrvnn1a786HAuwidU+Ge9adCIblFrHCCcgi8SbAdnuugF71o3WwgILp3xsrNtvW4SFJZ
-	wPzQJIx3WJwyPtpwOpC0AGUumcMA5VN3aENFnSAr/KvFbjxsvHGDRnxhUyhQSRBbRWMPerkx8cH
-	UOTQmxkRX8NgY7vFd6kxQ5iabcHKkPpv1+D72QooF0JGCgTikPfdH5lw==
-X-Received: by 2002:a17:907:846:b0:b98:51d6:883b with SMTP id a640c23a62f3a-b9b502bee4bmr1082896366b.4.1774947413429;
-        Tue, 31 Mar 2026 01:56:53 -0700 (PDT)
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com. [209.85.218.42])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b9b7b225193sm382246966b.57.2026.03.31.01.56.52
-        for <linux-crypto@vger.kernel.org>
+        d=1e100.net; s=20251104; t=1774950033; x=1775554833;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oO9fj8VnemesVNw4Kd4kvPTyxIt0YprBH9NBYs6VYwU=;
+        b=KAFYrBtrV8U3+6xUS/t+ZnBeseMmhHERbvUfa5PjtGxLVvf0afRL8XuYiBDmYR3Zzu
+         mV0OiTBDKgFlXkeUzUG1PT+UGVYjNGDRZgi8y/VQNZnnVYDMMhCNUNV63DTxxNna57Xk
+         0q3n7X1EcxA2EJh0+HsATNjY//caSB0ViCNVG+KMvpsyPAz+cFFhWZ2teVJu0eVjdHcj
+         1Ixq6GMxM86gdd/CEVPEKqNvf4zIDC7/q0oKcDfQCOx9ODG5tA72ZgwDbG/QW7NTolwj
+         AwYUv6PFCDMae40FI2Ef5FIxWD5ac3qLCUBUwAlqcF/2touVoi1jJtOk0kP2qrFFidsw
+         7KwA==
+X-Forwarded-Encrypted: i=1; AJvYcCVjFu58QaqFeQ2rqBnIx6wJFt0G5jagIMGOVFnEpaa6d+CcjRDtkMmd4h0D54GUcuiAzAm2wlWUlFPisio=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzvDwtvCjsoeAutPYKyQhu4cUMpPBA+ZreKaPQJoDVQSbqGwj6o
+	CwFK3b9iVltUEOC8UAk/DM3n1+mbXPlvIQK4XDIf1jbx1qyPpYd3eV8ptcIKB0b51QcmzaVffQH
+	OyFbo+RTQatWs8zdZdVgOfaIDsJeHaRPmtL3+jmiA/lkNHDwUuLpmE6cDcFyrwB6DpiU=
+X-Gm-Gg: ATEYQzykpFEb36X9aiaA4s5O01O/3Tg7DSt/0ZuDH0qY76JCjjIZTc40O2QCie5/Uax
+	9XLYpqZ7WLh7ojhF5v9rCgKorXdhIowBylSwOzwfU3tqCoSu4QCpqHe10vlpfWtHarIuGP+yHqN
+	m9tbEu3yCEa0FjQoNku0Cfe1CXkh2V8yRCMksq8hMkEXN3iXQ2vSrCULu00d0mK6wSrPC1dP1K3
+	hJMPNdBFh/BINJ65mVNUg1kJEQUI3bZ08KlrBE2zu6YxjLtci0eTgKo35n5jt3Qcw4DGEpFEVVt
+	vaAzREKn5NF8g2/VbIOc3pLl8ytUR6fHNfv28vxp7BQ2Kox0l2N5cZh6MCDXqJZCilMK7E+AQDL
+	53V0Kv6LBx59C6XhnHtbEpxp3IgirbwKBM9D6+mvNx6tJfGrfU3M=
+X-Received: by 2002:a17:902:ef4f:b0:2b0:b1e7:8841 with SMTP id d9443c01a7336-2b0cdcb0990mr168484675ad.32.1774950033393;
+        Tue, 31 Mar 2026 02:40:33 -0700 (PDT)
+X-Received: by 2002:a17:902:ef4f:b0:2b0:b1e7:8841 with SMTP id d9443c01a7336-2b0cdcb0990mr168484325ad.32.1774950032814;
+        Tue, 31 Mar 2026 02:40:32 -0700 (PDT)
+Received: from [10.217.223.121] ([202.46.22.19])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2b2427660c7sm106046705ad.44.2026.03.31.02.40.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Mar 2026 01:56:52 -0700 (PDT)
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b9b1df1a6b3so613478566b.0
-        for <linux-crypto@vger.kernel.org>; Tue, 31 Mar 2026 01:56:52 -0700 (PDT)
-X-Received: by 2002:a17:907:3e07:b0:b9b:207c:f7b7 with SMTP id
- a640c23a62f3a-b9b502bd373mr1030630666b.3.1774947412225; Tue, 31 Mar 2026
- 01:56:52 -0700 (PDT)
+        Tue, 31 Mar 2026 02:40:32 -0700 (PDT)
+Message-ID: <2b71dd68-ff35-411e-905d-3ffa2ea3efe4@oss.qualcomm.com>
+Date: Tue, 31 Mar 2026 15:10:22 +0530
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CALPOzVkz5dzdOTJyWGGNyQOuSG9d2fhjdL2cLSvAOFXFA80bLw@mail.gmail.com>
- <actCBln9jaznIovi@1wt.eu> <actUQV7g8uy6Ta4C@wunner.de>
-In-Reply-To: <actUQV7g8uy6Ta4C@wunner.de>
-From: Ignat Korchagin <ignat@linux.win>
-Date: Tue, 31 Mar 2026 09:56:40 +0100
-X-Gmail-Original-Message-ID: <CAOs+rJUy7CUoauGnrwZGw3PyzK2ZS+gfgk=Bx1SMx=qLWYfvXw@mail.gmail.com>
-X-Gm-Features: AQROBzAISIosIxRDNQhTYd1AR4DPMA5fuTfo_Rz0XqVSko_UZJUuFr6Vd5lr2_M
-Message-ID: <CAOs+rJUy7CUoauGnrwZGw3PyzK2ZS+gfgk=Bx1SMx=qLWYfvXw@mail.gmail.com>
-Subject: Re: KASAN: slab-out-of-bounds Read in x509_process_extension
- (keyUsage / basicConstraints)
-To: David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>, Willy Tarreau <w@1wt.eu>, 
-	Leo Lin <leo@depthfirst.com>
-Cc: linux-crypto@vger.kernel.org, security@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 01/11] dt-bindings: crypto: qcom,ice: Fix missing
+ power-domain and iface clk
+To: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Abel Vesa <abel.vesa@oss.qualcomm.com>,
+        Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>,
+        cros-qcom-dts-watchers@chromium.org,
+        Eric Biggers <ebiggers@google.com>,
+        Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+        Jingyi Wang <jingyi.wang@oss.qualcomm.com>,
+        Tengfei Fan <tengfei.fan@oss.qualcomm.com>,
+        Bartosz Golaszewski <brgl@kernel.org>,
+        David Wronek <davidwronek@gmail.com>,
+        Luca Weiss <luca.weiss@fairphone.com>,
+        Neil Armstrong <neil.armstrong@linaro.org>,
+        Melody Olvera <quic_molvera@quicinc.com>,
+        Alexander Koskovich <akoskovich@pm.me>
+Cc: Brian Masney <bmasney@redhat.com>,
+        Neeraj Soni <neeraj.soni@oss.qualcomm.com>,
+        Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+References: <20260323-qcom_ice_power_and_clk_vote-v4-0-e36044bbdfe9@oss.qualcomm.com>
+ <20260323-qcom_ice_power_and_clk_vote-v4-1-e36044bbdfe9@oss.qualcomm.com>
+ <873e8ad2-50cd-4c09-9a51-20ad745fe8dc@oss.qualcomm.com>
+Content-Language: en-US
+From: Harshal Dev <harshal.dev@oss.qualcomm.com>
+In-Reply-To: <873e8ad2-50cd-4c09-9a51-20ad745fe8dc@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Authority-Analysis: v=2.4 cv=INwPywvG c=1 sm=1 tr=0 ts=69cb9692 cx=c_pps
+ a=cmESyDAEBpBGqyK7t0alAg==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
+ a=IkcTkHD0fZMA:10 a=Yq5XynenixoA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=rJkE3RaqiGZ5pbrm-msn:22
+ a=P-IC7800AAAA:8 a=EUspDBNiAAAA:8 a=11eJxmzFO3uqpiRjfBAA:9 a=QEXdDO2ut3YA:10
+ a=1OuFwYUASf3TG4hYMiVC:22 a=d3PnA9EDa4IxuAV0gXij:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwMzMxMDA5MiBTYWx0ZWRfXyuqhWqowY1ib
+ XspWdqZYi43NjZDjwk7VDB18jPgp1LbmgvAvQml41QXnOQjB5roQIlHXxqEZhBYp/mmCVQ0920x
+ YkCVLRIhi/mH3h2t/ic4PbEVH09FvkyicwV46A2fU68WjOX4LK6xWVhy0nqNiZ8SmUduN5eooBu
+ Mj5ThF/xnsxYdsIt8RM89Zw/zvqqWiJInEKmhxGwoAyejcUd10O+YMUntH1NGTBSlW62BzuR0M9
+ qQYhMiGCN5CVk/eBISGYTwQ/NQkGscWcZPwbVVTOvC96BSq4BNmptM797L7t1ql9s9uwmYX2qCL
+ lGgfHvY1Qu1KxarOZW1oqNO5BK2qPFEveUWt9WKS0ESMTfWdhKa7b6Zn9tJkeiYvvXZcVIun59b
+ FpuEDKqxqP4H1Ib36TsJJK1W/7PewyXvLEclLAe3li04NzVpotse/oI/1ADejqr12XPQGLh/UVZ
+ NCSBj3stng3cnvvLUsA==
+X-Proofpoint-GUID: N-runFwL4tIMGR6Y5PEMG4fSZe5z0uIt
+X-Proofpoint-ORIG-GUID: N-runFwL4tIMGR6Y5PEMG4fSZe5z0uIt
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-03-31_02,2026-03-28_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 lowpriorityscore=0 clxscore=1015 malwarescore=0
+ impostorscore=0 adultscore=0 phishscore=0 priorityscore=1501 spamscore=0
+ bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2603050001
+ definitions=main-2603310092
 
-Cc: linux-crypto
+Hi Kuldeep,
 
-On Tue, Mar 31, 2026 at 5:57=E2=80=AFAM Lukas Wunner <lukas@wunner.de> wrot=
-e:
->
-> On Tue, Mar 31, 2026 at 05:39:50AM +0200, Willy Tarreau wrote:
-> > On Mon, Mar 30, 2026 at 04:10:51PM -0700, Leo Lin wrote:
-> > > An out-of-bounds read exists in x509_process_extension() in
-> > > crypto/asymmetric_keys/x509_cert_parser.c. When parsing the keyUsage
-> > > (and basicConstraints) X.509 extension, v[0] is dereferenced before
-> > > vlen is validated, so a crafted certificate with an empty extnValue
-> > > triggers a 1-byte OOB read past a slab object.
-> >
-> > Please note that 6.12 is not the latest LTS and is more than one year
-> > old, 6.18 is the latest LTS, 6.19 is the latest stable, and 7.0-rc is
-> > under development. If you could confirm that current versions are still
-> > affected, it would be nice.
->
-> I hereby confirm that current versions are still affected.
->
-> Patch is below, in case Leo doesn't want to craft a patch of their own.
->
-> Thanks,
->
-> Lukas
->
-> -- >8 --
->
-> Subject: [PATCH] X.509: Fix out-of-bounds access when parsing extensions
->
-> Leo reports an out-of-bounds access when parsing a certificate with
-> empty Basic Constraints or Key Usage extension because the first byte of
-> the extension is accessed before checking its length.  Fix it.
->
-> Fixes: 30eae2b037af ("KEYS: X.509: Parse Basic Constraints for CA")
-> Fixes: 567671281a75 ("KEYS: X.509: Parse Key Usage")
-> Reported-by: Leo Lin <leo@depthfirst.com>
-> Signed-off-by: Lukas Wunner <lukas@wunner.de>
-> Cc: stable@vger.kernel.org # v6.4+
+On 3/24/2026 4:16 PM, Kuldeep Singh wrote:
+> 
+> On 3/23/2026 2:47 PM, Harshal Dev wrote:
+>> The DT bindings for inline-crypto engine do not specify the UFS_PHY_GDSC
+>> power-domain and iface clock. Without enabling the iface clock and the
+>> associated power-domain the ICE hardware cannot function correctly and
+>> leads to unclocked hardware accesses being observed during probe.
+>>
+>> Fix the DT bindings for inline-crypto engine to require the UFS_PHY_GDSC
+>> power-domain and iface clock for new devices (Eliza and Milos) introduced
+>> in the current release (7.0) with yet-to-stabilize ABI, while preserving
+>> backward compatibility for older devices.
+>>
+>> Fixes: 618195a7ac3df ("dt-bindings: crypto: qcom,inline-crypto-engine: Document the Eliza ICE")
+>> Fixes: 85faec1e85555 ("dt-bindings: crypto: qcom,inline-crypto-engine: document the Milos ICE")
+>> Signed-off-by: Harshal Dev <harshal.dev@oss.qualcomm.com>
+>> ---
+>>  .../bindings/crypto/qcom,inline-crypto-engine.yaml | 35 +++++++++++++++++++++-
+>>  1 file changed, 34 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+>> index 876bf90ed96e..ccb6b8dd8e11 100644
+>> --- a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+>> +++ b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+>> @@ -30,6 +30,16 @@ properties:
+>>      maxItems: 1
+>>  
+>>    clocks:
+>> +    minItems: 1
+>> +    maxItems: 2
+>> +
+>> +  clock-names:
+>> +    minItems: 1
+>> +    items:
+>> +      - const: core
+>> +      - const: iface
+>> +
+>> +  power-domains:
+>>      maxItems: 1
+>>  
+>>    operating-points-v2: true
+>> @@ -44,6 +54,25 @@ required:
+>>  
+>>  additionalProperties: false
+>>  
+>> +allOf:
+>> +  - if:
+>> +      properties:
+>> +        compatible:
+>> +          contains:
+>> +            enum:
+>> +              - qcom,eliza-inline-crypto-engine
+>> +              - qcom,milos-inline-crypto-engine
+>> +
+>> +    then:
+>> +      required:
+>> +        - power-domains
+>> +        - clock-names
+>> +      properties:
+>> +        clocks:
+>> +          minItems: 2
+>> +        clock-names:
+>> +          minItems: 2
+>> +
+> 
+> Hi Krzysztof,
+> 
+> As motive here is to enforce 2 clocks for upcoming targets and keep
+> minItems as 1 for already merged ones for ensuring backward
+> compatibility. Can we do like below?
+> 
+> allOf:
+>   - if:
+>       not:
+>         properties:
+>           compatible:
+>             contains:
+>               enum:
+>                 - qcom,kaanapali-inline-crypto-engine
+>                 - qcom,qcs8300-inline-crypto-engine
+>                 - qcom,sa8775p-inline-crypto-engine
+>                 - qcom,sc7180-inline-crypto-engine
+>                 - qcom,sc7280-inline-crypto-engine
+>                 - qcom,sm8450-inline-crypto-engine
+>                 - qcom,sm8550-inline-crypto-engine
+>                 - qcom,sm8650-inline-crypto-engine
+>                 - qcom,sm8750-inline-crypto-engine
+> 
+>     then:
+>       required:
+>         - power-domains
+>         - clock-names
+>       properties:
+>         clocks:
+>           minItems: 2
+>         clock-names:
+>           minItems: 2
+> 
+> This will ensure for every new target addition, default clock count is
+> enforced as 2 default.
+> Please share your thoughts as well.
+> 
 
-Reviewed-by: Ignat Korchagin <ignat@linux.win>
+I don't really have any particular objections to this proposal, but I can
+see that other bindings where the need for an additional clock was realized
+later on use a similar pattern as this patchset does:
+https://elixir.bootlin.com/linux/v7.0-rc2/source/Documentation/devicetree/bindings/timer/fsl,imxgpt.yaml
 
-> ---
->  crypto/asymmetric_keys/x509_cert_parser.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetri=
-c_keys/x509_cert_parser.c
-> index b37cae914987..aac2d55345a9 100644
-> --- a/crypto/asymmetric_keys/x509_cert_parser.c
-> +++ b/crypto/asymmetric_keys/x509_cert_parser.c
-> @@ -584,10 +584,10 @@ int x509_process_extension(void *context, size_t hd=
-rlen,
->                  *   0x04 is where keyCertSign lands in this bit string
->                  *   0x80 is where digitalSignature lands in this bit str=
-ing
->                  */
-> -               if (v[0] !=3D ASN1_BTS)
-> -                       return -EBADMSG;
->                 if (vlen < 4)
->                         return -EBADMSG;
-> +               if (v[0] !=3D ASN1_BTS)
-> +                       return -EBADMSG;
->                 if (v[2] >=3D 8)
->                         return -EBADMSG;
->                 if (v[3] & 0x80)
-> @@ -620,10 +620,10 @@ int x509_process_extension(void *context, size_t hd=
-rlen,
->                  *      (Expect 0xFF if the CA is TRUE)
->                  * vlen should match the entire extension size
->                  */
-> -               if (v[0] !=3D (ASN1_CONS_BIT | ASN1_SEQ))
-> -                       return -EBADMSG;
->                 if (vlen < 2)
->                         return -EBADMSG;
-> +               if (v[0] !=3D (ASN1_CONS_BIT | ASN1_SEQ))
-> +                       return -EBADMSG;
->                 if (v[1] !=3D vlen - 2)
->                         return -EBADMSG;
->                 /* Empty SEQUENCE means CA:FALSE (default value omitted p=
-er DER) */
-> --
-> 2.51.0
->
->
+I'll wait for Krzysztof to take a final call on this.
+
+Regards,
+Harshal
+
