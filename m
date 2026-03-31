@@ -1,114 +1,183 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E1283DA5C8
-	for <linux-crypto@vger.kernel.org>; Tue, 31 Mar 2026 08:20:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37C483CA48F
+	for <linux-crypto@vger.kernel.org>; Tue, 31 Mar 2026 08:21:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774945225; cv=none; b=A6JWWkkdnr0j8VEubups3RiRhOLTWfb/CFulRelx0eSLeqeNPXfRyh41okc7I9lMOHB7V6V7JSHiibpSwpVIcKNKDeRJQK3kv20pNFbDgBPGsVjudXDjrsNlbxpwB+y8iDds7YKD8cosU6gKHJw9UBPA7jNizUyFNvMP6h82j3Q=
+	t=1774945280; cv=none; b=VuJ9IRsrYoVPRSm1sSGyGrrXW7OGCNRbJ/N5xXP90E2fcP69o22UoyLQTXqvnyFo+FhOA5AN+fWFyGlqQE70t8GVwPRStE5sDHly8cyc4Q7soB5a+gL8WyHLCgG3wzsqoqM9eB71Rqt9wT/uHIlM7T0qdcOGDg7sjmmXJZMYp6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774945225; c=relaxed/simple;
-	bh=ROq3VRnEKIKK9hBJkmpGUe23U+FD0G+M72+mozJ94YI=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=BQKDplVYY9FPO8oOSxq2DmehpkjhIAff+09zkMmtYm0SM38FcrOLpS02wvzUj4cBG+V1mk6KGlW0muOGJUKxwmc9QDNg8UeI9Xec4pUe6Shmo/nxD01wN0dcm6cekaW/xmyIvzWQA7uGe5yseX0Tw6c5sBMRLPido5OmOGojcgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FHFi78M6; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774945280; c=relaxed/simple;
+	bh=8IgV1on/CYjRoqaNPKrhP/jyDrUspemaCDxzCZHev6c=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=QbtRvyXrIXVdva58N5HAfxol8JckmlFWUZyC3lTw6Ol66qvWmNe4cGGZXIMyvjXBfxBxk7vJMbONG1mwcLKj19azFqSLMQz91+o8zGr7iGGNIC7NeMI5yUMS5lcP/wvOFw4abt/xTva4d7BQNk4M0KFXDhYQQgEekH1a/ErWElI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OVz/Y51f; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FHFi78M6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40E74C2BCB1;
-	Tue, 31 Mar 2026 08:20:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774945224;
-	bh=ROq3VRnEKIKK9hBJkmpGUe23U+FD0G+M72+mozJ94YI=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=FHFi78M6ZBPEw3UVs5Ouyv+sgrCxwGlGxxYHEfpy83SrgKNiaGhJ900+RBFYT0rFb
-	 f5YPxhGTKIcezQ/7GWSAUwLOdQ8hnsrcyslNpUB6SxGtP87eCzQaXAmvqD9MLAcdcE
-	 xf/ZAmbtnNEyLUqbaIfBwV/+iYM7Y8C6vrUy9aBQn/F15nfY9SHstoqD9HSvjrfTQp
-	 +xPBqsZjps4+O4fxWkOyYSiwGjjl1QGqMbyVJJw4qNKORvak4BjNfIgPzhgoKIrJ9z
-	 HHPK6Nkpu9CJFobQ0scqCZpedAwrO7t4vKLJ24mJFASYuYeN2C1AqsXQXzouzrR4R2
-	 U+6Yq7YoBTp8A==
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 2C39CF4007A;
-	Tue, 31 Mar 2026 04:20:23 -0400 (EDT)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-01.internal (MEProxy); Tue, 31 Mar 2026 04:20:23 -0400
-X-ME-Sender: <xms:x4PLaU7q0jl3LvEYHSHeNaV595X0lIiEosPESvcehG0-jUGP69rv5A>
-    <xme:x4PLaQurxpyd935rNMgKcbA6MP6-3XT4FDyQochN0GnmlRoEa_SpH9gUj1Gzat5SW
-    C2vyKXlANrb1nDsTU5zXZOwx8YrvJYr1zc-knCdLFqOzH8kFj-FvQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdefgedufeekucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrugcu
-    uehivghshhgvuhhvvghlfdcuoegrrhgusgeskhgvrhhnvghlrdhorhhgqeenucggtffrrg
-    htthgvrhhnpedvueehiedtvedtleekuddutefgffdtleetfeetveejveejieehfefhjeei
-    jeefudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    grrhguodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduieejtdehtddtjeel
-    qdeffedvudeigeduhedqrghruggspeepkhgvrhhnvghlrdhorhhgseifohhrkhhofhgrrh
-    gurdgtohhmpdhnsggprhgtphhtthhopeehpdhmohguvgepshhmthhpohhuthdprhgtphht
-    thhopeguvghmhigrnhhshhesghhmrghilhdrtghomhdprhgtphhtthhopehhtghhsehinh
-    hfrhgruggvrggurdhorhhgpdhrtghpthhtohepvggsihhgghgvrhhssehkvghrnhgvlhdr
-    ohhrghdprhgtphhtthhopehlihhnuhigqdgrrhhmqdhkvghrnhgvlheslhhishhtshdrih
-    hnfhhrrgguvggrugdrohhrghdprhgtphhtthhopehlihhnuhigqdgtrhihphhtohesvhhg
-    vghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:x4PLaaERw6U4Oxd-8dQZL-H79-Eex1oKa8FVHJ3fyrfsSixyD-nj4A>
-    <xmx:x4PLaUSBTbh2ckTyRbLY_wZA6HCOejncj-weqpdQ3nSqodEfQUvcRA>
-    <xmx:x4PLaftpDJTtLpOnJrJUormyOye5j8rd7Jo44QnQj01HcdUkJUwp7g>
-    <xmx:x4PLaULjVYXS9rSw-SBeYHg5dVvhdaQTeZBJSE3U0_wkC_hF3IM4Pg>
-    <xmx:x4PLaclpWvUsiY0eSBlBBYZqteqyaWhqGoLwe1SILD7FOJJeZmjg9VH6>
-Feedback-ID: ice86485a:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 09865700069; Tue, 31 Mar 2026 04:20:23 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OVz/Y51f"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4853a5ffc05so11516675e9.0
+        for <linux-crypto@vger.kernel.org>; Tue, 31 Mar 2026 01:21:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1774945278; x=1775550078; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZlXweF85hjs0Cz7hgZ4Sc8jEj+2x0ePWSuvmjZUgVoc=;
+        b=OVz/Y51fQxzM9AEi/DIJuUxGcsOy1/jYZ0tEvclQb+SHqh+e9Xm2Tv2lXecb3OJbbM
+         kls+b2Mb/jVPDVIFRlnlcbhtiyIdZkBhSfHCVfzg3NGUMtt4q9JM4q9IdfRwTsUUZFCb
+         Yeb+QYaAkM8SI0PIMXThNFlXV+U5mv1VCCpBe4RsqJ0Ad1Y5bsRyjMNjAyZrCIPtlGq6
+         OV1gga4jCdKV8r40nFWkgoAfId/6zuzrEBaLDo3aWTuYYuMDsn72X/2IcMrOa0mady/x
+         cCRp++jG7MOiUBS+hHB8nN8meMv0YQYtoVeFacV/ySp6ISD1I0KrtNk5vuOFGol2irFe
+         7A+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774945278; x=1775550078;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ZlXweF85hjs0Cz7hgZ4Sc8jEj+2x0ePWSuvmjZUgVoc=;
+        b=WFqlWSD6VpXRTagyUt+WBX3yRxNxtAwpYPgXrR46Os1FJL2evnJX8B4ctvvBaRnP09
+         kU9Dc7baL56q7BZFgx4Lt9cAj387FFYIcdlPX65jHWkwR+VQv0V87AffbPJ+Wh5oatvw
+         cHb7L7msh8I0rTIVpoa3Fzyg0UmyQW7Vcb5nTtNSrBoMCT6u7Z6LpXa+brjabRN/4R35
+         J/kvd+PyldOw4bQOi/EuABL39rxmx87iKAeYY7rJ7bbe60L8HnrOOxTSolcBxEZGsgU3
+         emGf0IIR3keCpcwocy6DorTejNfTztjd9vU4IeFrF+kQ0nfUZriZs4c77VDNHYEO+q5s
+         uVeQ==
+X-Gm-Message-State: AOJu0YyRWHyO5ha6pGhr2n/rDlA3zWtfxfI5NgYL32waMRlyiuuOw7Nf
+	b16Cabq0urww6lPY3WVtzqpoC+GrQVphPIZQiPZoDaDZUNZ2k3Oc4fBS
+X-Gm-Gg: ATEYQzxR5Yavx31fVeOeqPt84/+D9TFPLK/KA/9yMpx0Ir2SrK2i8O13dHraag4gYcS
+	8j5+o43OLzECeceBovyYQCBArlMZgK/LSEfFH7Taum6IxuX4oxwEDNhbtXY8EPDAqCnvgCpQ6hZ
+	E6/PWLCZmpWERAYx4B8dracE0HDwxLaRj0i3bfvspdWnnMeS903EAqQFIFFWznRXUKVHKwppJjt
+	v5QYSq+U83bHMIx40k0LATE6XSYgglHevpeadUQeCtXiSy764bILI8KvtrPudftwsNM8l18Xpxy
+	Ehu2uAYBSQaOS8zNww1ifafh0k6fnMHuV06E604Jql2dkq7qewtIXzxUAzNHM274nLu4eX8J0gq
+	0Lm0kII7W2ahmtPcRjao3p9i1ev9sN+emjU6HP3RsZUUDS652OkNSckYpR8yTxx7Q9eq8Y3CSx8
+	WGRuS+l0VG+ZmFE8fTQsgJEPmOYz3MaGSOlQsAcFcoxROcytIVbuQMHF6Pa9H4vPw=
+X-Received: by 2002:a05:600c:1f8d:b0:47a:94fc:d063 with SMTP id 5b1f17b1804b1-48727d6fc1cmr150113965e9.1.1774945277374;
+        Tue, 31 Mar 2026 01:21:17 -0700 (PDT)
+Received: from menon.v.cablecom.net (84-74-0-139.dclient.hispeed.ch. [84.74.0.139])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4887ad8d28bsm14542485e9.10.2026.03.31.01.21.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 31 Mar 2026 01:21:17 -0700 (PDT)
+From: Lothar Rubusch <l.rubusch@gmail.com>
+To: herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	nicolas.ferre@microchip.com,
+	alexandre.belloni@bootlin.com,
+	claudiu.beznea@tuxon.dev,
+	ardb@kernel.org,
+	linusw@kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	l.rubusch@gmail.com
+Subject: [PATCH v2 1/3] crypto: atmel-sha204a - fix memory leak at non-blocking RNG work_data
+Date: Tue, 31 Mar 2026 08:21:03 +0000
+Message-Id: <20260331082105.697468-2-l.rubusch@gmail.com>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20260331082105.697468-1-l.rubusch@gmail.com>
+References: <20260331082105.697468-1-l.rubusch@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: A8AYNq7FA6_V
-Date: Tue, 31 Mar 2026 10:20:02 +0200
-From: "Ard Biesheuvel" <ardb@kernel.org>
-To: "Christoph Hellwig" <hch@infradead.org>
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- "Demian Shulhan" <demyansh@gmail.com>, "Eric Biggers" <ebiggers@kernel.org>
-Message-Id: <416ca128-715c-449f-a614-1d97d8f193f2@app.fastmail.com>
-In-Reply-To: <actuDkpYbzLj0sI8@infradead.org>
-References: <20260330144630.33026-7-ardb@kernel.org>
- <20260330144630.33026-12-ardb@kernel.org> <actuDkpYbzLj0sI8@infradead.org>
-Subject: Re: [PATCH 5/5] lib/crc: arm: Enable arm64's NEON intrinsics implementation of
- crc64
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+The driver allocated memory for work_data in the non-blocking read
+path but never free'd it again. After first read-out the memory pointer
+seemed to be recycled and never was allocated again, due to some errors
+in the logic, so that the leak was not growing.
 
-On Tue, 31 Mar 2026, at 08:47, Christoph Hellwig wrote:
->>  	depends on CRC64 && CRC_OPTIMIZATIONS
->> +	default y if ARM && KERNEL_MODE_NEON && !(CPU_BIG_ENDIAN && CC_IS_CLANG)
->
-> It would be useful to throw in a comment here why it is disabled for
-> big-endian on clang.
->
+Add kfree(work_data) in the completion callback on error. then add
+kfree(work_data) after the data is consumed in the subsequent read
+call. Finally ensure atomic_dec() is called only after the data has
+been consumed or an error occurred to prevent race conditions.
 
-Ack.
+Fixes: da001fb651b0 ("crypto: atmel-i2c - add support for SHA204A random number generator")
+Signed-off-by: Lothar Rubusch <l.rubusch@gmail.com>
+---
+ drivers/crypto/atmel-sha204a.c | 44 +++++++++++++++++++++-------------
+ 1 file changed, 27 insertions(+), 17 deletions(-)
 
->> +#define crc64_be_arch crc64_be_generic
->> +
->> +static inline u64 crc64_nvme_arch(u64 crc, const u8 *p, size_t len)
->> +{
->> +	if (len >= 128 && static_branch_likely(&have_pmull) &&
->> +	    likely(may_use_simd())) {
->> +		do {
->> +			size_t chunk = min_t(size_t, len & ~15, SZ_4K);
->> +
->> +			scoped_ksimd()
->> +				crc = crc64_nvme_arm64_c(crc, p, chunk);
->> +
->> +			p += chunk;
->> +			len -= chunk;
->> +		} while (len >= 128);
->> +	}
->
-> From reading the earlier patches, I'll assume arm SIMD code is
-> non-preemptable and thus you want the chunking here?  Maybe add
-> a little comment explaining that?
+diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha204a.c
+index 98d1023007e3..1baf4750d311 100644
+--- a/drivers/crypto/atmel-sha204a.c
++++ b/drivers/crypto/atmel-sha204a.c
+@@ -24,15 +24,20 @@ static void atmel_sha204a_rng_done(struct atmel_i2c_work_data *work_data,
+ 	struct atmel_i2c_client_priv *i2c_priv = work_data->ctx;
+ 	struct hwrng *rng = areq;
+ 
+-	if (status)
++	if (status) {
+ 		dev_warn_ratelimited(&i2c_priv->client->dev,
+ 				     "i2c transaction failed (%d)\n",
+ 				     status);
++		kfree(work_data);
++		rng->priv = 0;
++		atomic_dec(&i2c_priv->tfm_count);
++		return;
++	}
+ 
+ 	rng->priv = (unsigned long)work_data;
+-	atomic_dec(&i2c_priv->tfm_count);
+ }
+ 
++
+ static int atmel_sha204a_rng_read_nonblocking(struct hwrng *rng, void *data,
+ 					      size_t max)
+ {
+@@ -41,31 +46,36 @@ static int atmel_sha204a_rng_read_nonblocking(struct hwrng *rng, void *data,
+ 
+ 	i2c_priv = container_of(rng, struct atmel_i2c_client_priv, hwrng);
+ 
+-	/* keep maximum 1 asynchronous read in flight at any time */
+-	if (!atomic_add_unless(&i2c_priv->tfm_count, 1, 1))
+-		return 0;
+-
++	/* Verify if data available from last run */
+ 	if (rng->priv) {
+ 		work_data = (struct atmel_i2c_work_data *)rng->priv;
+ 		max = min(sizeof(work_data->cmd.data), max);
+ 		memcpy(data, &work_data->cmd.data, max);
+-		rng->priv = 0;
+-	} else {
+-		work_data = kmalloc_obj(*work_data, GFP_ATOMIC);
+-		if (!work_data) {
+-			atomic_dec(&i2c_priv->tfm_count);
+-			return -ENOMEM;
+-		}
+-		work_data->ctx = i2c_priv;
+-		work_data->client = i2c_priv->client;
+ 
+-		max = 0;
++		/* Now, free memory */
++		kfree(work_data);
++		rng->priv = 0;
++		atomic_dec(&i2c_priv->tfm_count);
++		return max;
+ 	}
+ 
++	/* When a request is still in-flight but not processed */
++	if (atomic_read(&i2c_priv->tfm_count) > 0)
++		return 0;
++
++	/* Start a new request */
++	work_data = kmalloc_obj(*work_data, GFP_ATOMIC);
++	if (!work_data)
++		return -ENOMEM;
++
++	atomic_inc(&i2c_priv->tfm_count);
++	work_data->ctx = i2c_priv;
++	work_data->client = i2c_priv->client;
++
+ 	atmel_i2c_init_random_cmd(&work_data->cmd);
+ 	atmel_i2c_enqueue(work_data, atmel_sha204a_rng_done, rng);
+ 
+-	return max;
++	return 0;
+ }
+ 
+ static int atmel_sha204a_rng_read(struct hwrng *rng, void *data, size_t max,
+-- 
+2.39.5
 
-Indeed.
