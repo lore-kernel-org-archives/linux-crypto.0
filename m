@@ -1,99 +1,146 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0AA4184524;
-	Tue, 31 Mar 2026 01:49:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A2D619CD1D;
+	Tue, 31 Mar 2026 02:45:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774921787; cv=none; b=Yd7PNRG5UJoZpARkAPb3D5UZEYUGFzenzIyDOJrqq/TdIM/GMQMGHYaS9HQdpEUtM+EfpT67VhjcpgH/XGypQwGkbxWWiNB4ZdTKW0SWFTjmr38JxVfijjplz/q3aAlbPSLBznYG37TpPuxlR1PNEIw670oBmgxnAGg8YB+rjas=
+	t=1774925136; cv=none; b=ExFnZsBUmSWH1KV9OdvvOLA3v4DrR5c7AE1q+u5c+/CJvGinPrQ0px3l77J2QHSmTBGLon24amUPBo5CuKbWf/tJmtEkkEXPB1DvL/79gxZ24zagp+nOOIs2w3XL1GkHu3z3RkP2a64X1zPaG3K1AqvVkP2TviVasiXGFv9tfIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774921787; c=relaxed/simple;
-	bh=PkI133hxpyomjeVUtgKx63fvmx/xJt8VuhQdt5D0O9A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A3gBwDtDL1ZaZcQpTMcFR6Mw/nA25PWE5D2g7T5r/+0dGCD2runNruUD7VzuvYqo6fIhyX7hpIdbOLVClid6cNJgPjRbtLr+MnVJwgs74XpcBOHHV7OojYd3fPrheXYepOvMzSA9yB8YznmUOaMDI+MUalcypacpyEeSqzV2Hk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EZ4auciO; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774925136; c=relaxed/simple;
+	bh=cITE7sLpK0CtWqStCEjMcIzT8mXsvR4Cmls0lRmjhQI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SVQhi4t1Q+vOkOym7/n3PmYe6iStxpwXxZWuxA4WaVUqrgL/t1TxlfEPjFqsFAyipxR+tVG62sjXb6PhOxnc+mh3/jTMSVu/rGaSbgfrK3e4qmLc829kIaY7g8Fqs/VWxLXgtruiFcWRVl/fqBCRFMXA25Qrei/KDYMQ7Wom8B4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DSHf+vvO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EZ4auciO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FDBAC4CEF7;
-	Tue, 31 Mar 2026 01:49:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DSHf+vvO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7319C4CEF7;
+	Tue, 31 Mar 2026 02:45:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774921787;
-	bh=PkI133hxpyomjeVUtgKx63fvmx/xJt8VuhQdt5D0O9A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EZ4auciONLLYUeuDYJ8guHi0sJS8PVtZSbPJDn2gEHs7UNsPoTBtUe35mF0p/QEvl
-	 FHKJD2yQvght4sdFCez9oT3TBDjRaFLhkYOjo4MA/ELZIqdVKs5F/r76tSSMxHsZ/T
-	 fmCSquPTGwT4IFJBSLpFa58YXFXCQkAv91hFuXE379vAOL6ZyWBFFlPwRqZ/Et9tbC
-	 T7ejagBIuWYcEEciK/LYq7rgk2RRptj8Xj3l81kBqbJal7BeC+jKJ7L0S3xB4pn3GL
-	 Vu1mzibtyE2oIW7KVHe4OHKUdu6HfOV1dI30i6siYwe7X6kDr8EFZUSCs9L5Kg6Z1S
-	 4/e/wA0uFrrDA==
-Date: Mon, 30 Mar 2026 18:48:37 -0700
+	s=k20201202; t=1774925135;
+	bh=cITE7sLpK0CtWqStCEjMcIzT8mXsvR4Cmls0lRmjhQI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=DSHf+vvOQUrppckolhI1Putjjpri5KrrcB/ekvfQ6mZ4+SX1lXNxLa1jJGVc027im
+	 /xs6ErEryOD6/NGeNgOoN2LMkjxI8o/SZ/gi1eUv14WL5764e4yjCJq7bmS3PlEQSw
+	 EYQGDVzdq8H1AUCriPT8vpNj1YP7GTPCPfFIj6HbdefF1L8RNM1wDgbwu+RV4AoUG0
+	 Cd94A+fDmd+LGqBzUE2y+Cur2f+7JvEHTG8pqBjbcDzzWveVi1GzRJAoswyeS8QiyQ
+	 StNdg6tBoDQ+WF9L0euyT3kmNfgsr8w+2Yb3pniW6FzPNqEfcmmd6borZiZidi43Yk
+	 8Y5obaG5B6c7A==
 From: Eric Biggers <ebiggers@kernel.org>
-To: "Maciej W. Rozycki" <macro@orcam.me.uk>
-Cc: kernel test robot <lkp@intel.com>, oe-kbuild-all@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Sohil Mehta <sohil.mehta@intel.com>, linux-crypto@vger.kernel.org,
-	linux-mips@vger.kernel.org, "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-Subject: Re: lib/crypto/mips/poly1305-core.S:95: Error: opcode not supported
- on this processor: mips64r6 (mips64r6) `lwl $8,0+3($5)'
-Message-ID: <20260331014837.GC5190@sol>
-References: <202603210105.sdD4rsTq-lkp@intel.com>
- <20260330203731.GG4303@sol>
- <alpine.DEB.2.21.2603310147220.60268@angie.orcam.me.uk>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH] lib/crypto: aescfb: Don't disable IRQs during AES block encryption
+Date: Mon, 30 Mar 2026 19:44:14 -0700
+Message-ID: <20260331024414.51545-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.21.2603310147220.60268@angie.orcam.me.uk>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Mar 31, 2026 at 02:01:44AM +0100, Maciej W. Rozycki wrote:
-> On Mon, 30 Mar 2026, Eric Biggers wrote:
-> 
-> > > All errors (new ones prefixed by >>):
-> > > 
-> > >    lib/crypto/mips/poly1305-core.S: Assembler messages:
-> > > >> lib/crypto/mips/poly1305-core.S:95: Error: opcode not supported on this processor: mips64r6 (mips64r6) `lwl $8,0+3($5)'
-> > >    lib/crypto/mips/poly1305-core.S:96: Error: opcode not supported on this processor: mips64r6 (mips64r6) `lwl $9,4+3($5)'
-> > >    lib/crypto/mips/poly1305-core.S:97: Error: opcode not supported on this processor: mips64r6 (mips64r6) `lwl $10,8+3($5)'
-> > >    lib/crypto/mips/poly1305-core.S:98: Error: opcode not supported on this processor: mips64r6 (mips64r6) `lwl $11,12+3($5)'
-> > 
-> > This isn't new.  It was first reported in 2021:
-> > https://lore.kernel.org/all/202108040636.P6t1LvPP-lkp@intel.com/
-> > 
-> > It's caused by:
-> > 
-> > CONFIG_64BIT=n causes the 32-bit Poly1305 assembly code to be generated.
-> > That code checks the _MIPS_ARCH_MIPS32R6 macro.  But, the code is
-> > actually built with -march=mips64r6, due to CONFIG_CPU_MIPS64_R6=y.
-> > Thus _MIPS_ARCH_MIPS32R6 is not defined; _MIPS_ARCH_MIPS64R6 is defined
-> > instead.  So the wrong code gets built.
-> > 
-> > Maybe someone from linux-mips@vger.kernel.org can confirm whether
-> > CONFIG_64BIT=n && CONFIG_CPU_MIPS64_R6=y actually makes sense?
-> 
->  Absolutely, you can build a 32-bit kernel for and run on 64-bit hardware 
-> and we have supported it since forever across all the MIPS architecture 
-> revisions.
-> 
->  You probably want to check for CONFIG_CPU_MIPSR6 instead (and similarly 
-> for CONFIG_CPU_MIPSR2, etc.).
+aes_encrypt() now uses AES instructions when available instead of always
+using table-based code.  AES instructions are constant-time and don't
+benefit from disabling IRQs as a constant-time hardening measure.
 
-Okay, but does it make sense to use -march=mips64r6 in that case,
-instead of -march=mips32r6?  I guess you get something that uses the
-32-bit ABI but is free to use 64-bit instructions?  It looks like
-poly1305-mips.pl doesn't really support that combination: it just has
-32-bit ABI + 32-bit instructions, and 64-bit ABI + 64-bit instructions.
+In fact, on two architectures (arm and riscv) disabling IRQs is
+counterproductive because it prevents the AES instructions from being
+used.  (See the may_use_simd() implementation on those architectures.)
 
-Maybe it would be easiest to always compile poly1305-mips.pl with the
-corresponding mips32 flag when CONFIG_64BIT is unset?  Note: since
-poly1305-mips.pl was taken from an external source
-(https://github.com/dot-asm/cryptogams/blob/master/mips/poly1305-mips.pl),
-modifying the build system to pass the appropriate flag might be
-preferable to extensive local patching of that file.
+Therefore, let's remove the IRQ disabling/enabling and leave the choice
+of constant-time hardening measures to the AES library code.
 
-- Eric
+Note that currently the arm table-based AES code (which runs on arm
+kernels that don't have ARMv8 CE) disables IRQs, while the generic
+table-based AES code does not.  So this does technically regress in
+constant-time hardening when that generic code is used.  But as
+discussed in commit a22fd0e3c495 ("lib/crypto: aes: Introduce improved
+AES library") I think just leaving IRQs enabled is the right choice.
+Disabling them is slow and can cause problems, and AES instructions
+(which modern CPUs have) solve the problem in a much better way anyway.
+
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ lib/crypto/aescfb.c | 25 +++----------------------
+ 1 file changed, 3 insertions(+), 22 deletions(-)
+
+diff --git a/lib/crypto/aescfb.c b/lib/crypto/aescfb.c
+index 147e5211728f..e38848d101e3 100644
+--- a/lib/crypto/aescfb.c
++++ b/lib/crypto/aescfb.c
+@@ -7,29 +7,10 @@
+ 
+ #include <crypto/aes.h>
+ #include <crypto/algapi.h>
+ #include <linux/export.h>
+ #include <linux/module.h>
+-#include <asm/irqflags.h>
+-
+-static void aescfb_encrypt_block(const struct aes_enckey *key, void *dst,
+-				 const void *src)
+-{
+-	unsigned long flags;
+-
+-	/*
+-	 * In AES-CFB, the AES encryption operates on known 'plaintext' (the IV
+-	 * and ciphertext), making it susceptible to timing attacks on the
+-	 * encryption key. The AES library already mitigates this risk to some
+-	 * extent by pulling the entire S-box into the caches before doing any
+-	 * substitutions, but this strategy is more effective when running with
+-	 * interrupts disabled.
+-	 */
+-	local_irq_save(flags);
+-	aes_encrypt(key, dst, src);
+-	local_irq_restore(flags);
+-}
+ 
+ /**
+  * aescfb_encrypt - Perform AES-CFB encryption on a block of data
+  *
+  * @key:	The AES-CFB key schedule
+@@ -43,11 +24,11 @@ void aescfb_encrypt(const struct aes_enckey *key, u8 *dst, const u8 *src,
+ {
+ 	u8 ks[AES_BLOCK_SIZE];
+ 	const u8 *v = iv;
+ 
+ 	while (len > 0) {
+-		aescfb_encrypt_block(key, ks, v);
++		aes_encrypt(key, ks, v);
+ 		crypto_xor_cpy(dst, src, ks, min(len, AES_BLOCK_SIZE));
+ 		v = dst;
+ 
+ 		dst += AES_BLOCK_SIZE;
+ 		src += AES_BLOCK_SIZE;
+@@ -70,20 +51,20 @@ EXPORT_SYMBOL(aescfb_encrypt);
+ void aescfb_decrypt(const struct aes_enckey *key, u8 *dst, const u8 *src,
+ 		    int len, const u8 iv[AES_BLOCK_SIZE])
+ {
+ 	u8 ks[2][AES_BLOCK_SIZE];
+ 
+-	aescfb_encrypt_block(key, ks[0], iv);
++	aes_encrypt(key, ks[0], iv);
+ 
+ 	for (int i = 0; len > 0; i ^= 1) {
+ 		if (len > AES_BLOCK_SIZE)
+ 			/*
+ 			 * Generate the keystream for the next block before
+ 			 * performing the XOR, as that may update in place and
+ 			 * overwrite the ciphertext.
+ 			 */
+-			aescfb_encrypt_block(key, ks[!i], src);
++			aes_encrypt(key, ks[!i], src);
+ 
+ 		crypto_xor_cpy(dst, src, ks[i], min(len, AES_BLOCK_SIZE));
+ 
+ 		dst += AES_BLOCK_SIZE;
+ 		src += AES_BLOCK_SIZE;
+
+base-commit: d2a68aba8505ce88b39c34ecb3b707c776af79d4
+-- 
+2.53.0
+
