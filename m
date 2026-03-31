@@ -1,155 +1,138 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f73.google.com (mail-ed1-f73.google.com [209.85.208.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46BCB2EC57C
-	for <linux-crypto@vger.kernel.org>; Tue, 31 Mar 2026 07:05:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD8B33C1408
+	for <linux-crypto@vger.kernel.org>; Tue, 31 Mar 2026 07:49:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1774940745; cv=none; b=ZyzrtH4pTKh+yAr8KFYN5OcmhBDzhBeoo+9WfV1QtdQx4UUC9w3rIc7i77Wg1DT65SIY6LRVgibwiJHsEl1MTBldDQ5JMQu7NN5B25KsuKfWwjZIvkEmOLgJorESUX28dq3vlL0sUuyVjwJAz+335ExNbrLtEgmaa1c+hPG7Wv8=
+	t=1774943394; cv=none; b=g6b1P1fnLQzsC6By9kUW3nRG+tPiNP8CF0hCo5DXZ0LH5YuzG6A7BP12tZzmknhTSttnePOWDC2kcJFmpCOqAMndvjJzW9H1hE6jXWg6h5vWTCvDCAiTzI3zC6BDhl+M3QEwRnZnUKvWaoXO4jdfgyfGnRUX/dB3HP2JkmuHxCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1774940745; c=relaxed/simple;
-	bh=Nqj656cYHLYMu8uugfANhkIu+GZROg/PNwW4UUyvLRQ=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=DfRYAXId1C2OYt+7SmRHv91Qu7xcGcSDbwnZ6Hk0oJlBmRJlMivICRi0GTiOB7Az8mB/8jJH57WoEW6jVAD2ENHMZq1BrMhyuKQnea+/fSuveq7ROviCyICAvtKWP/DKQE8Xv1cdgvSWyiYFZ/yo16x5frEoI5ELajikR/2grFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YmKa8CQh; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1774943394; c=relaxed/simple;
+	bh=iXJrBlKmLTcqP1wDNnrbo+d2gBcbIcXAmCzPaC4nVao=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=gA/9Jlk1DkhQLJtuEnLeCjzpj+qEguvvvXhI6jYxGYz6iMpk6hFl3B88eQ7htU5Td1616MhMKtFa5Orw8AY09gTqJrOmLo4P+xEMzfpHMHaSXaHPHdAe6jB9RRWY8H/5Y2C9H88ZfXTNt81h+N1MPYqMXzdvbJ3up3mHROtVLpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y/n9oT9k; arc=none smtp.client-ip=209.85.208.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YmKa8CQh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2891C4AF09;
-	Tue, 31 Mar 2026 07:05:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1774940745;
-	bh=Nqj656cYHLYMu8uugfANhkIu+GZROg/PNwW4UUyvLRQ=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=YmKa8CQhnJDi2XWHDeBw+t9FeZO4sFlWUcRbtAxMdq5NEmpzlHFxLmCwdcsB73lH8
-	 6xFzn8OGWIvfxxJc+Yx9db+z0nquN5dkWI9t4vsaCaokXeiuCZwD/2lgkOU0Dziyji
-	 hNzcJHua8KhPc/vHW8HYKMvE/FkNUsG6na7lEHI3tCipx/CxkEoZ0yATTGv/iFTKh/
-	 5qsEm6S9ZKIVowR5u2Gze6npYBHmJaSs+K3DCA479V9iD6lS8Uhj8r+Isj1JXOKlfy
-	 JTHc9kvAWdTdLx3MZZTgBEBNCBnZdGwaFXG+Uf3zMYsNw+qmU+Mbbdy/H/OhmBs9CS
-	 hnp7QRB/G3nqA==
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfauth.phl.internal (Postfix) with ESMTP id D0A9CF4007E;
-	Tue, 31 Mar 2026 03:05:43 -0400 (EDT)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-01.internal (MEProxy); Tue, 31 Mar 2026 03:05:43 -0400
-X-ME-Sender: <xms:R3LLaXxyvSy4ZnkiaKahfqH2N44pBB-qcbLcdo7HKp-pHFZqnleltQ>
-    <xme:R3LLaaH6Yy_sBbTJBu8_43PoqfVXA8dzojyJHQ2Exwiu7iDQwNK3RVev2SJFjqz3J
-    OaLi2RZcMkquNHaUNNe1XNY3ssdcI6QF4BIRFAR7hAj7LK2MDVLIA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdefgeduvdefucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrugcu
-    uehivghshhgvuhhvvghlfdcuoegrrhgusgeskhgvrhhnvghlrdhorhhgqeenucggtffrrg
-    htthgvrhhnpeekvdffkefhgfegveekfedtieffhfelgeetiedvieffhfekfeeikeetueeg
-    teetteenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivg
-    eptdenucfrrghrrghmpehmrghilhhfrhhomheprghrugdomhgvshhmthhprghuthhhphgv
-    rhhsohhnrghlihhthidqudeijedthedttdejledqfeefvdduieegudehqdgrrhgusgeppe
-    hkvghrnhgvlhdrohhrghesfihorhhkohhfrghrugdrtghomhdpnhgspghrtghpthhtohep
-    kedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepnhhikhhunhhjsegrmhgurdgtoh
-    hmpdhrtghpthhtohepthhhohhmrghsrdhlvghnuggrtghkhiesrghmugdrtghomhdprhgt
-    phhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdrohhrghdrrghupdhrtg
-    hpthhtohepvggsihhgghgvrhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopeigkeei
-    sehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgtrhihphhtohesvhhgvg
-    hrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhg
-    vghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehjrghsohhnseiigidvtgegrdgtoh
-    hm
-X-ME-Proxy: <xmx:R3LLaVutvVUDz5OfeDhtr9b-dcBBDrg1LbMPpnwOBZKSokHpn5WubQ>
-    <xmx:R3LLaTZH87L6k5-Xv_NnSWCaa5F0LSa7nKIuG832l1TClcoWEgJ8MA>
-    <xmx:R3LLadAF2L4twzirBHtwqBVceXY0GkdvIPHuDzkWpYrcDTgbMZvQlQ>
-    <xmx:R3LLab8PlSRiqKHXA8Vq-hbufDun6Hzct7pcdEmJWwwTjhcfVLtMIA>
-    <xmx:R3LLaZRKuG6W6I7FOT1u4jVj_3eU04UfWI0yGLNKnC-VZ8iCFDyGHJ90>
-Feedback-ID: ice86485a:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id ACC4870006A; Tue, 31 Mar 2026 03:05:43 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y/n9oT9k"
+Received: by mail-ed1-f73.google.com with SMTP id 4fb4d7f45d1cf-66b0d92bffaso4316087a12.1
+        for <linux-crypto@vger.kernel.org>; Tue, 31 Mar 2026 00:49:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1774943391; x=1775548191; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ZGH3ymB2jwjCiHm6wtb76PJ1E35x0Um1oAlYfSnm17o=;
+        b=Y/n9oT9kr3v/M0Wss7hClJywmi0iGgrHWQBD09mybkpb5CARDcXmgqh9tyDdCeNnMb
+         vQesWOepu9AtW+L/tn0nUKS+jwwW+YubJWM1vH7cqYUhnC3sTpO9Woeefw5yNaFAEZtX
+         s+FLAKlUhzDNK7kLiolmqJG4g6PqESHw7LWnJpb4e5lzTCnNMZDoXxHZu3C5RR7wzg12
+         3qz4EIwS1k0eukD6IjmexZNXnLhmWrCL7axd7jXVwQ3gk65cvHbLZ90xPkuY1RwcX3Bz
+         JmWtP98qt/17ZKEwqgkIY+gd/W6neNxVe/BfC3v2Yt8koddcRKoNDr9fsoLN+Gii86dt
+         0dxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1774943391; x=1775548191;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZGH3ymB2jwjCiHm6wtb76PJ1E35x0Um1oAlYfSnm17o=;
+        b=GN9BnExzBy+Qkb0zzR4bfTw7Hiav7kOrWOLKDujqk08xU54oAyKf3WPfwEbn93tFkG
+         RPgVCzygrDyfVp6vvc8jiUGzEHDN9XsAk5mOac9Z/1PJTuzg0ALkGniUM0LfjMwxpeRc
+         Sr+NQy1XdZvk5rzykTytsIyg1tVnFR1MU/QRN/+8mThvBzH2+1UN+V5TryJ3ntVjtHLp
+         Sm2Rox7kQ3NMM+GJDawHycYK8BB9Sxp/FQSWOCF45Iva5A2g8l/gxqiJCq7bKFIFCfAD
+         uysjhoiDUm81GcsxD8XMTtX17SdKPMmAGeQNcAiKcFaFeqibJjvzfv1m6wprv9w4CwlY
+         FLfw==
+X-Forwarded-Encrypted: i=1; AJvYcCWbUvTwSxr3kAcyHDIcBsdwbBh4K0uhhAcM93ntflTTXGlo/iJ9brzabq0cIPNfZux/ReLhgGQybNmKH3s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwK/yH34CujukoZBpJev8BtTGio5o8KcvsLRX+1sLIwTR7aAdZN
+	KqAOz8CIGuSSr6lw3s7ncfRMRQqpfe5upYvYmt3trnisSfGWbztpCPui51giQwN+Oy4I8IED8Q=
+	=
+X-Received: from eday9.prod.google.com ([2002:a05:6402:4409:b0:66b:a77e:548e])
+ (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:46db:b0:661:8ccc:473
+ with SMTP id 4fb4d7f45d1cf-66b28c6ac35mr7784086a12.27.1774943391017; Tue, 31
+ Mar 2026 00:49:51 -0700 (PDT)
+Date: Tue, 31 Mar 2026 09:49:40 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-ThreadId: A2qvLZQkzXz-
-Date: Tue, 31 Mar 2026 09:05:23 +0200
-From: "Ard Biesheuvel" <ardb@kernel.org>
-To: "Eric Biggers" <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, "Jason A . Donenfeld" <Jason@zx2c4.com>,
- "Herbert Xu" <herbert@gondor.apana.org.au>, x86@kernel.org,
- "Nikunj A Dadhania" <nikunj@amd.com>,
- "Tom Lendacky" <thomas.lendacky@amd.com>
-Message-Id: <1e04994d-4d82-48f4-8022-ea488d203653@app.fastmail.com>
-In-Reply-To: <20260331050234.GA4451@sol>
-References: <20260331024430.51755-1-ebiggers@kernel.org>
- <20260331050234.GA4451@sol>
-Subject: Re: [PATCH] lib/crypto: aesgcm: Don't disable IRQs during AES block encryption
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2643; i=ardb@kernel.org;
+ h=from:subject; bh=zSkjOYBXbEwftTvpZU0nBNQV37U7ijaf9h5sMhcXtdM=;
+ b=owGbwMvMwCVmkMcZplerG8N4Wi2JIfN0zZRXt/cX/t1Uv+9+V197wPEbC1971nnN7nh85P+T4
+ myVpztKOkpZGMS4GGTFFFkEZv99t/P0RKla51myMHNYmUCGMHBxCsBEfsszMqzZ7C0+2a4gdZOy
+ cWiLnK/U7piDl4ydXjMxJzX0/53zchLD/5r6H65XFsbfEbZRyczUjHwy/Uj3tnadPSXqnX6bGEI 6WAE=
+X-Mailer: git-send-email 2.53.0.1018.g2bb0e51243-goog
+Message-ID: <20260331074940.55502-7-ardb+git@google.com>
+Subject: [PATCH v2 0/5] xor/arm: Replace vectorized version with intrinsics
+From: Ard Biesheuvel <ardb+git@google.com>
+To: linux-raid@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org, 
+	Ard Biesheuvel <ardb@kernel.org>, Christoph Hellwig <hch@lst.de>, Russell King <linux@armlinux.org.uk>, 
+	Arnd Bergmann <arnd@arndb.de>, Eric Biggers <ebiggers@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-(cc Tom)
+From: Ard Biesheuvel <ardb@kernel.org>
 
-On Tue, 31 Mar 2026, at 07:02, Eric Biggers wrote:
-> [Added x86@kernel.org and nikunj@amd.com]
->
-> On Mon, Mar 30, 2026 at 07:44:30PM -0700, Eric Biggers wrote:
->> aes_encrypt() now uses AES instructions when available instead of always
->> using table-based code.  AES instructions are constant-time and don't
->> benefit from disabling IRQs as a constant-time hardening measure.
->> 
->> In fact, on two architectures (arm and riscv) disabling IRQs is
->> counterproductive because it prevents the AES instructions from being
->> used.  (See the may_use_simd() implementation on those architectures.)
->> 
->> Therefore, let's remove the IRQ disabling/enabling and leave the choice
->> of constant-time hardening measures to the AES library code.
->> 
-...
-> I just noticed the rationale in the patch series that originally added
-> lib/crypto/aesgcm.c in 2022
-> (https://lore.kernel.org/all/20221103192259.2229-1-ardb@kernel.org/):
->
->     Provide a generic library implementation of AES-GCM which can be
->     used really early during boot, e.g., to communicate with the
->     security coprocessor on SEV-SNP virtual machines to bring up
->     secondary cores.  This is needed because the crypto API is not
->     available yet this early.
->
->     We cannot rely on special instructions for AES or polynomial
->     multiplication, which are arch specific and rely on in-kernel SIMD
->     infrastructure. Instead, add a generic C implementation that
->     combines the existing C implementations of AES and multiplication in
->     GF(2^128).
->
->     To reduce the risk of forgery attacks, replace data dependent table
->     lookups and conditional branches in the used gf128mul routine with
->     constant-time equivalents. The AES library has already been
->     robustified to some extent to prevent known-plaintext timing attacks
->     on the key, but we call it with interrupts disabled to make it a bit
->     more robust. (Note that in SEV-SNP context, the VMM is untrusted,
->     and is able to inject interrupts arbitrarily, and potentially
->     maliciously.)
->
-> So, the user of AES-GCM in arch/x86/coco/sev/ is a bit special.  It runs
-> super early, before the crypto library initcalls have run and enabled
-> the use of AES-NI and PCLMULQDQ optimized routines.  And apparently it
-> really needs protection from timing attacks, as well.
->
-> I think this patch is still the way to go, but it does slightly weaken
-> the protection from timing attacks for super early users like this.  So
-> I think we'll likely want to do something else as well.  Either:
->
-> - Disable IRQs in the callers in arch/x86/coco/sev/.
->
-> - Or, enable the AES-NI and PCLMULQDQ optimized crypto library routines
->   earlier on x86, so that they will be used in this case.  Specifically,
->   enable them in arch_cpu_finalize_init() between fpu__init_cpu() and
->   mem_encrypt_init().
->
-> I'd prefer the latter.  The dedicated instructions are the proper way to
-> get data and key-independent timing for AES-GCM.  It's much less clear
-> that the generic C code has data and key-independent timing, even if
-> it's run with IRQs disabled.
->
+Replace the compiler vectorized XOR implementation for ARM with the
+existing NEON intrinsics implementation used by arm64. This is slightly
+faster, and allows some minor cleanups of the type hacks in the headers
+now that intrinsics are the only C code permitted to use FP/SIMD
+instructions.
 
-AIUI, if we drop the IRQ dis/enable from this code, the generic path will be taken during early boot, but later invocations will use the accelerated implementations once they become available, right?
+Changes since v1:
+- Update kernel_mode_neon.rst to state that arm_neon.h must not be
+  included directly, but the new asm/neon-intrinsics.h should be used
+  instead
+- Avoid #include's of .c files - instead, build arm/xor-neon.c for arm64
+  as a separate compilation unit, and export the symbol that is shared
+  between the EOR and EOR3 implementations.
 
-Mounting a timing attack requires accurate timing observations and a large number of samples, and it seems unlikely to me that a hostile VMM would be able to obtain those during the time window in question.
+Performance (QEMU mach-virt VM running on Synquacer [Cortex-A53 @ 1 GHz]
 
+Before:
+
+[    3.519687] xor: measuring software checksum speed
+[    3.521725]    neon            :  1660 MB/sec
+[    3.524733]    32regs          :  1105 MB/sec
+[    3.527751]    8regs           :  1098 MB/sec
+[    3.529911]    arm4regs        :  1540 MB/sec
+
+After:
+
+[    3.517654] xor: measuring software checksum speed
+[    3.519454]    neon            :  1896 MB/sec
+[    3.522499]    32regs          :  1090 MB/sec
+[    3.525560]    8regs           :  1083 MB/sec
+[    3.527700]    arm4regs        :  1556 MB/sec
+
+This applies onto Christoph's XOR cleanup series.
+
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Russell King <linux@armlinux.org.uk>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Eric Biggers <ebiggers@kernel.org>
+
+Ard Biesheuvel (5):
+  ARM: Add a neon-intrinsics.h header like on arm64
+  crypto: aegis128 - Use neon-intrinsics.h on ARM too
+  xor/arm: Replace vectorized implementation with arm64's intrinsics
+  xor/arm64: Use shared NEON intrinsics implementation from 32-bit ARM
+  ARM: Remove hacked-up asm/types.h header
+
+ Documentation/arch/arm/kernel_mode_neon.rst |   4 +-
+ arch/arm/include/asm/neon-intrinsics.h      |  64 +++++++
+ arch/arm/include/uapi/asm/types.h           |  41 -----
+ crypto/aegis128-neon-inner.c                |   4 +-
+ lib/raid/xor/Makefile                       |   3 +-
+ lib/raid/xor/arm/xor-neon.c                 | 187 ++++++++++++++++++--
+ lib/raid/xor/arm/xor-neon.h                 |   7 +
+ lib/raid/xor/arm/xor_arch.h                 |   7 +-
+ lib/raid/xor/arm64/xor-neon.c               | 172 +-----------------
+ lib/raid/xor/xor-8regs.c                    |   2 -
+ 10 files changed, 251 insertions(+), 240 deletions(-)
+ create mode 100644 arch/arm/include/asm/neon-intrinsics.h
+ delete mode 100644 arch/arm/include/uapi/asm/types.h
+ create mode 100644 lib/raid/xor/arm/xor-neon.h
+
+-- 
+2.53.0.1018.g2bb0e51243-goog
 
