@@ -1,38 +1,38 @@
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4913D222580;
-	Wed,  1 Apr 2026 08:49:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABBBC3B19DF;
+	Wed,  1 Apr 2026 08:59:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775033386; cv=none; b=DYijG5RSr6skZt1PoQVVznbwKqPqVgyHzqHZv1ESlf2OMDn/W67U53h/NfCjm1p6StrNRZhGbePxH8Bbb0lQQB09A4vuXrbZhKRqYUf2ACDiSKSTAhPr0jYySj4MHDiABv8RGVgTsYGbnM7hpDfrpgVfp+nt/an4TLzrRW4cSWw=
+	t=1775033978; cv=none; b=HEweGnp8ihVxAp/6RjKveYHcjluxhQmh9obklOc8F+oWpf/XGt1QbQxMIa/2E1tfCbB5pn1cBibUlg1IIJiK8gxXzh+/BMSW/6L3y9YN90H4qEOstckrmLfb+XdKvGscjJejeGbdX4y5f7WuT1R55IXuHF7C5+7arU4GdVFlFrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775033386; c=relaxed/simple;
-	bh=jMllAiNzS9cWod+MVPKKd+bgclJPQsP6g3jKKwGPnaU=;
+	s=arc-20240116; t=1775033978; c=relaxed/simple;
+	bh=VbFdMq7YtqJd7UMOCDrFbjpr28i5Wpb/2QUpdDPoTAw=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=EjOY8L0dNIdPpATzqZN6RwCCHU6RVeAcqboXQi07KyCpElfs31eY3j0pCLRgL9+67FVZ8UPAwzfhAlcbLH2AHeWPjbIl62TE4gg/cRehBv1r3f2rDK8E69FsbDwTwq8fi2XAy/O/1Hyhz7/a/91Nwlxs8zJaSnR5Po2wPKWy2P0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=GQF/BJD4; arc=none smtp.client-ip=185.246.84.56
+	 MIME-Version:Content-Type; b=ueVzXEfzU9UznauF1JXaYH/ABtY7LJs+unRJ5czvZT2QvGAqRyTxX2QH6298ib7/w7dgRBg/VJj8b0kjV9B0i2VWyLSUGKWAoQlonpAplG+feuT8IXELkY6UJIxtfklU/sH+YGFTe5DOOGJMeTHRKuBpBXUD4+JeLFEf0xBgrSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=FCc2mioU; arc=none smtp.client-ip=185.171.202.116
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="GQF/BJD4"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FCc2mioU"
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 0D1951A310E;
-	Wed,  1 Apr 2026 08:49:43 +0000 (UTC)
+	by smtpout-04.galae.net (Postfix) with ESMTPS id A315DC5996A;
+	Wed,  1 Apr 2026 08:59:57 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id D72A4602BF;
-	Wed,  1 Apr 2026 08:49:42 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id DC3D2104502B1;
-	Wed,  1 Apr 2026 10:49:37 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 9F62E602BF;
+	Wed,  1 Apr 2026 08:59:26 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C9559104509A9;
+	Wed,  1 Apr 2026 10:59:20 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1775033381; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1775033965; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=ZdDof3E64VuKteZJZYyiQE0W9ztWcs73qsS2cREQvAI=;
-	b=GQF/BJD4QwFxFBgX9eNsIRAVzAxsLPiCxbs7s2rLRDyj2QieSJ1OS3E2OjxhUojDFdUngQ
-	wBrFqRD8YeCN8/eALU/6syeKCjicRV2N3v9UYIi9P2SBRpVs1q5XkiSVn/nvoXNkA7PrqH
-	ERkbal5Ep7glNJJMMB45hFRg6EaEUwT5vVNhLk+4et8BU1zVrKIRYJLTEcPt1BMZZtzcF6
-	tCJqjF5bmQ5SMdi5x9bjg0ptoSGz7LUwKfac4X1wcOH30L7Kx4K+DxWvHp0uynmyWLCNFJ
-	Z6yzQ+Ay/iw/i0GF8ar/H7KTvcK+zUHLBcCwslCGDKTTz3tVZY7jduwOTu8kXw==
+	bh=9o8MaFCKhNvDQQOGJOIQriskUC+pXVGT8BSTas/AoKM=;
+	b=FCc2mioUSJNqSy8zEA6YSaAVOkW85hhYpfbVo5k/rVve7f6y/M1WdrXIuZqcQoHMbvwfPC
+	XM5oVuMFeheFhDZTM7u+4Qas8aKQHS0BcJKz4rfadGZwSQYwZUTHdXkZzhB2uxtlXGOLlG
+	YkYWrxR4ii4CmLhJQOidmxnLpjkqr7jVPHHF+DZHsFUOetkgKfwFZbQm9MQdXp4oG5vj9Y
+	JmC8lh4CpKwRAfCMySeA7wFm6GaP3CZBPeRY8hhebPV/TexDYquDCaPk5xy8IKGWFTuBPL
+	JHOJG+xdY4gtnFjxEzEvQgjKi6SqWX512JRtzOoQHJs2RXamGr0RZg37ZT3bOg==
 From: Miquel Raynal <miquel.raynal@bootlin.com>
 To: Brian Masney <bmasney@redhat.com>
 Cc: Michael Turquette <mturquette@baylibre.com>,  Stephen Boyd
@@ -47,17 +47,17 @@ Cc: Michael Turquette <mturquette@baylibre.com>,  Stephen Boyd
   Pascal EBERHARD <pascal.eberhard@se.com>,  Wolfram Sang
  <wsa+renesas@sang-engineering.com>,  linux-clk@vger.kernel.org,
   devicetree@vger.kernel.org,  linux-kernel@vger.kernel.org,
-  linux-crypto@vger.kernel.org,  linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH 09/16] clk: Use the generic OF phandle parsing in only
- one place
-In-Reply-To: <acqQZ5sx_WZrr4KJ@redhat.com> (Brian Masney's message of "Mon, 30
-	Mar 2026 11:01:59 -0400")
+  linux-crypto@vger.kernel.org,  linux-renesas-soc@vger.kernel.org,
+  Chen-Yu Tsai <wenst@chromium.org>
+Subject: Re: [PATCH 06/16] clk: tests: Add clk_parse_clkspec() Kunit testing
+In-Reply-To: <acqNRVLrPxABvecZ@redhat.com> (Brian Masney's message of "Mon, 30
+	Mar 2026 10:48:37 -0400")
 References: <20260327-schneider-v7-0-rc1-crypto-v1-0-5e6ff7853994@bootlin.com>
-	<20260327-schneider-v7-0-rc1-crypto-v1-9-5e6ff7853994@bootlin.com>
-	<acqQZ5sx_WZrr4KJ@redhat.com>
+	<20260327-schneider-v7-0-rc1-crypto-v1-6-5e6ff7853994@bootlin.com>
+	<acqNRVLrPxABvecZ@redhat.com>
 User-Agent: mu4e 1.12.7; emacs 30.2
-Date: Wed, 01 Apr 2026 10:49:37 +0200
-Message-ID: <87se9f6p5q.fsf@bootlin.com>
+Date: Wed, 01 Apr 2026 10:59:20 +0200
+Message-ID: <87mrzn6opj.fsf@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -68,50 +68,134 @@ Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-Last-TLS-Session-Version: TLSv1.3
 
-On 30/03/2026 at 11:01:59 -04, Brian Masney <bmasney@redhat.com> wrote:
+Hi Brian,
 
-> On Fri, Mar 27, 2026 at 09:09:31PM +0100, Miquel Raynal (Schneider Electr=
-ic) wrote:
->> There should be one single entry in the OF world, so that the way we
->> parse the DT is always the same. make sure this is the case by avoid
->> calling of_parse_phandle_with_args() from of_clk_get_parent_name(). This
->> is even more relevant as we currently fail to parse clock-ranges. As a
->> result, it seems to be safer to directly call of_parse_clkspec() there.
->>=20
->> Suggested-by: Stephen Boyd <sboyd@kernel.org>
->> Signed-off-by: Miquel Raynal (Schneider Electric) <miquel.raynal@bootlin=
-.com>
->> ---
->>  drivers/clk/clk.c | 3 +--
->>  1 file changed, 1 insertion(+), 2 deletions(-)
->>=20
->> diff --git a/drivers/clk/clk.c b/drivers/clk/clk.c
->> index 591c0780b61e..93e33ff30f3a 100644
->> --- a/drivers/clk/clk.c
->> +++ b/drivers/clk/clk.c
->> @@ -5375,8 +5375,7 @@ const char *of_clk_get_parent_name(const struct de=
-vice_node *np, int index)
->>  	int count;
->>  	struct clk *clk;
+>> @@ -5312,6 +5312,7 @@ struct clk_hw *of_clk_get_hw(struct device_node *n=
+p, int index,
 >>=20=20
->> -	rc =3D of_parse_phandle_with_args(np, "clocks", "#clock-cells", index,
->> -					&clkspec);
->> +	rc =3D of_parse_clkspec(np, index, NULL, &clkspec);
->>  	if (rc)
->>  		return NULL;
+>>  	return hw;
+>>  }
+>> +EXPORT_SYMBOL_GPL(of_clk_get_hw);
 >
-> Reviewed-by: Brian Masney <bmasney@redhat.com>
+> So that we don't unnecessarily broaden the API that's available to the
+> clk providers, you can use EXPORT_SYMBOL_IF_KUNIT so that this is only
+> available to the kunit tests.
+
+Ah, good idea.
+
+> Note that Chen-Yu posted a separate patch to add the includes for a
+> separate test. The two patches will conflict since Stephen hasn't picked
+> this up yet.
 >
-> In case a Fixes tag is warranted, it's not exactly clear what should be
-> used. This was introduced in commit 766e6a4ec602 ("clk: add DT clock
-> binding support") in 2012. However of_parse_clkspec was introduced in
-> commit 4472287a3b2f5 ("clk: Introduce of_clk_get_hw_from_clkspec()") in
-> 2018.
+> https://lore.kernel.org/linux-clk/20260225083413.3384950-1-wenst@chromium=
+.org/
 
-I didn't plan to add a Fixes here, but I can. In this case I would go
-for:
+Thanks for the warning, I will synchronize with Chen-Yu.
 
-    commit 4472287a3b2f5 ("clk: Introduce of_clk_get_hw_from_clkspec()")
+>>  static struct clk *__of_clk_get(struct device_node *np,
+>>  				int index, const char *dev_id,
+>> diff --git a/drivers/clk/clk_test.c b/drivers/clk/clk_test.c
+>> index a268d7b5d4cb..b814b45f1f7e 100644
+>> --- a/drivers/clk/clk_test.c
+>> +++ b/drivers/clk/clk_test.c
+>> @@ -3541,10 +3541,134 @@ static struct kunit_suite clk_hw_get_dev_of_nod=
+e_test_suite =3D {
+>>  	.test_cases =3D clk_hw_get_dev_of_node_test_cases,
+>>  };
+>>=20=20
+>> +static const struct clk_init_data clk_parse_clkspec_1_init_data =3D {
+>> +	.name =3D "clk_parse_clkspec_1",
+>> +	.ops =3D &empty_clk_ops,
+>> +};
+>> +
+>> +static const struct clk_init_data clk_parse_clkspec_2_init_data =3D {
+>> +	.name =3D "clk_parse_clkspec_2",
+>> +	.ops =3D &empty_clk_ops,
+>> +};
+>> +
+>> +static struct clk_hw *kunit_clk_get(struct of_phandle_args *clkspec, vo=
+id *data)
+>> +{
+>> +	return (struct clk_hw *)data;
+>> +}
+>> +
+>> +struct clk_parse_clkspec_ctx {
+>> +	struct device_node *prov1_np;
+>> +	struct device_node *prov2_np;
+>> +	struct device_node *cons_np;
+>> +};
+>> +
+>> +static int clk_parse_clkspec_init(struct kunit *test)
+>> +{
+>> +	struct clk_parse_clkspec_ctx *ctx;
+>> +	struct clk_hw *hw1, *hw2;
+>> +
+>> +	ctx =3D kunit_kzalloc(test, sizeof(*ctx), GFP_KERNEL);
+>> +	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, ctx);
+>> +	test->priv =3D ctx;
+>> +
+>> +	KUNIT_ASSERT_EQ(test, 0, of_overlay_apply_kunit(test, kunit_clk_parse_=
+clkspec));
+>> +
+>> +	/* Register provider 1 */
+>> +	hw1 =3D kunit_kzalloc(test, sizeof(*hw1), GFP_KERNEL);
+>> +	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, hw1);
+>> +	hw1->init =3D &clk_parse_clkspec_1_init_data;
+>> +
+>> +	ctx->prov1_np =3D of_find_compatible_node(NULL, NULL, "test,clock-prov=
+ider1");
+>> +	KUNIT_ASSERT_NOT_NULL(test, ctx->prov1_np);
+>> +
+>> +	KUNIT_ASSERT_EQ(test, 0, of_clk_hw_register_kunit(test, ctx->prov1_np,=
+ hw1));
+>> +	of_clk_add_hw_provider(ctx->prov1_np, kunit_clk_get, hw1);
+>
+> Can you just use of_clk_hw_simple_get() and drop kunit_clk_get()
+> above?
 
-Thanks,
+I will try.
+
+>> +	of_node_put(ctx->prov1_np);
+>> +
+>> +	/* Register provider 2 */
+>> +	hw2 =3D kunit_kzalloc(test, sizeof(*hw2), GFP_KERNEL);
+>> +	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, hw2);
+>> +	hw2->init =3D &clk_parse_clkspec_2_init_data;
+>> +
+>> +	ctx->prov2_np =3D of_find_compatible_node(NULL, NULL, "test,clock-prov=
+ider2");
+>> +	KUNIT_ASSERT_NOT_NULL(test, ctx->prov2_np);
+>> +
+>> +	KUNIT_ASSERT_EQ(test, 0, of_clk_hw_register_kunit(test, ctx->prov2_np,=
+ hw2));
+>> +	of_clk_add_hw_provider(ctx->prov2_np, kunit_clk_get, hw2);
+>> +	of_node_put(ctx->prov2_np);
+>> +
+>> +	ctx->cons_np =3D of_find_compatible_node(NULL, NULL, "test,clock-consu=
+mer");
+>> +	KUNIT_ASSERT_NOT_NULL(test, ctx->cons_np);
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static void clk_parse_clkspec_exit(struct kunit *test)
+>> +{
+>> +	struct clk_parse_clkspec_ctx *ctx =3D test->priv;
+>> +
+>> +	of_node_put(ctx->prov1_np);
+>> +	of_node_put(ctx->prov2_np);
+>
+> Is there a double free of prov1_np and prov2_np? If this is dropped from
+> the test exit, then they should't need to be in the ctx struct.
+
+These two calls increment the refcount on the node:
+- of_find_compatible_node()
+- of_clk_add_hw_provider()
+
+However this makes me realize maybe I should call of_clk_del_provider()
+in the exit() function. In any case, I believe keeping a reference over
+the nodes during the test is correct and if there is an of_node_put()
+call to remove, it should be the on in the _init().
+
+Thanks for pointing this out!
 Miqu=C3=A8l
