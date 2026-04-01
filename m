@@ -1,159 +1,149 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAB782DA765
-	for <linux-crypto@vger.kernel.org>; Wed,  1 Apr 2026 14:04:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A1422DA765;
+	Wed,  1 Apr 2026 14:38:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775052275; cv=none; b=EL7URky5tnWbJmDQhf7W1+XJHXvUT0cuhmVZe6C60609R60TlB3owlXKa8bTcQeXwq5VyASA7Me607P/uHFTLJrqT3kVj8X/HYAg1r2r4pKpxCZ4OkieZHBlJE0pov8yO/8DoRb1kStdlie7Lx3pIvx+f6yPkSSsew6QJxP4R38=
+	t=1775054291; cv=none; b=heDpDnPDR3ckr3kBUeQHrBfLVr8TUNJWgthqrOYRMf7HaFGNMan+xNJpjZAAWD9mMdIO2Ty9vi9H6UQl6bn3ikN3EPORN9q4jQTSXzpEUDS9w2pbviOaoUc27eYaCBb81682HpMB2G5gcdVHsoKqnWcantUVzXmxLEvNiR35Ofw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775052275; c=relaxed/simple;
-	bh=ENBbqPvMtgDBrtNY5Maiukm89IlJO8HyVFmraI/eHfM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G9sJ5IV9PoM4kdjX1fYNcOkVGvuaaCQ28k52HHxDRBfQm2rivX+5oX0+BPRqsGUa/M3zSto8hdq/ex+MS9dsc+pIC3QoS1yu1oMaVXCQmInZyyDsjpjZfL7s7Z8FrntPokJgXWbzrCjAfnlYIH/7y2yv0iYgF1ptkCnuqXMI0FU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MQctaaUu; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=OsP54f9/; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1775054291; c=relaxed/simple;
+	bh=XAbFxS6dIsoB+vJMxVqDhwktDJ77oSl0nf+NrQHhmeo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nhgJaQfVsjjf/Zu0kDtuucFwWhqjBvdYwIWXnw6o46Vq7oks8wpS5WNJ+YWqbktHDwNWP4sIHXLpCXA4supD4hiib//YRw+i8rUh2MI6dZ/jh0IhZUk7S9czP8gdPhd6HfNq1jYlXWKyq5qGXKtW5gwJGaObyblHATW8fLQ/Le4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lldep2b2; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MQctaaUu";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="OsP54f9/"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1775052273;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tcMceLtrrOoF9OBObZDKWhIp/2bPn54+SJ2oUftQ6n8=;
-	b=MQctaaUu6qEnE0fykNKj7lmbdilz+j+/wmnC+FpwPkzZFxuciX4IUR0MTdaCmL+6WxXauH
-	T+txM0iRZjFqixbPWYNNVNQVNdub3ommwu1FdTTMdcXPCOm6jcgDYJKNZfWbb+eyf0Gs7n
-	VBK+uGYC9RzmFgf5WS5qyF5ObDcx6WQ=
-Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
- [209.85.161.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-209-kpDRYzZwOV6RPKW_mg7STQ-1; Wed, 01 Apr 2026 10:04:30 -0400
-X-MC-Unique: kpDRYzZwOV6RPKW_mg7STQ-1
-X-Mimecast-MFC-AGG-ID: kpDRYzZwOV6RPKW_mg7STQ_1775052270
-Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-67df0afe23dso24149485eaf.3
-        for <linux-crypto@vger.kernel.org>; Wed, 01 Apr 2026 07:04:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1775052270; x=1775657070; darn=vger.kernel.org;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tcMceLtrrOoF9OBObZDKWhIp/2bPn54+SJ2oUftQ6n8=;
-        b=OsP54f9/cRkV5KVwx73LS4B/Kq7ktCySUtk9oZFpaM6W0upTXpY19rwVHfRsavgDEp
-         GE4vL7VsNbVNjWJgDf70xKDWQTw/zWkPiX97MtiG+m+YJoGAwmzTqpfjtAA7H+hf/Nw7
-         0m2Doue+m/Ih9mYhVFugzbeluApxsdcFLLim/E7FBhjdqiUMmUz4hESiZZNywAJ59fYq
-         mnGcwXv3WtDYFdN5L+5rWUn7yC/v6j3XdWWM6xY3RsjxFwl7bDI8p8E2ogWE5jOokpNX
-         4dNO+7YcSMFQYjQMlYGklsOXKkXPiwGx+Wphq12pjvI0aPqM/xWnfBJ6BgUVHfEnnlJL
-         T7jQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775052270; x=1775657070;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=tcMceLtrrOoF9OBObZDKWhIp/2bPn54+SJ2oUftQ6n8=;
-        b=tYnTdNUMvndj4yOdIofFTW3ntBvi6Q7zZMS81BmAeJHBopAJYZABzPdWt2dOOnM1TT
-         OyJyG4hfZIpXRgD0lE8ZJTXLZMYf6mDotUuUoIJybseI8KajGn/hjH7w4C0qH3Nrzp9e
-         w87Mow61EdBEwmrCNWDO/PyhntmJzUwv9F2zbZkZeq6p17kdZwo3lDThVA7xBbME2kaL
-         GfLb73t3HjtYbNtt8t8bBgTeISwP1SKuzBVkXKlbZN03/Q1KZ69ozill6Qnadj2BfiGd
-         SSeA8IQbheUGrnXRNgSJnZnz05ydAJoz+3arVFJmilR/jjODId8j7KesT4qEG5LeKqaM
-         YZHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUofE5hHpup2qWvhhl8M9ZvP/7mJiusuqKgNZX9AGxKLZVzhIqZcyrs9Z7rOxlZz+NBXqq162Zj3j1BEnU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwsBQ2B7lPVIIugTGlt/kBxagP/xBh0PrvbmQLYgwUR76WWCXra
-	JdldcKH0g3gcYSl7JvtPAOR7fIgN+EdOK35DrPUev1Ujco1H+DTILfN+5bUjHMuvjYzNOiGXUKT
-	+xayWn5m+AazoUe3ZUN56HzBvE7iPVRew+mgB8xkEbcDhgt4WWdoEhtdxDE953rsLSw==
-X-Gm-Gg: ATEYQzzIO2GBhY+zMTgmlgDkCN35RcOtbxb0dHM1Ev50UMLS7Bn2xifh6eAN1bJUqCn
-	lfRxNIeHST9XZb3ghlWRoe0GCw0zGTyv3Jbu9PRxC+r8ZJ9pZx1JWaK6TP2X1gkE/NoBSTmS33o
-	vgSFLBVm3x/Gu3Xpj2NluYLyKfbwj3v+pvLqTnAzLYvT8UisTENStwH2GcUhUN6vxw6i9uyiDNM
-	VYVkI3qaqAGz+VxBgdX+EcKN2uWSAGkuC/QNOPzxiNEXPDn+Y7GsnU7oxtMRAEPDtWc/xVvJn5W
-	2Ra7GXFCfb1Q7TLxALEYCYdFhUDoQZ4ZfyGGJEtADS/lFYA6ECVkI2u+ZCZPSBMJkLuiCSTtzH1
-	y9cZmaeXK3dT51ywV9ktx+2lKcECSVmiwRn+JrO+4dA==
-X-Received: by 2002:a05:6820:4b81:b0:67d:e102:da05 with SMTP id 006d021491bc7-67fabd323a0mr1831342eaf.63.1775052269885;
-        Wed, 01 Apr 2026 07:04:29 -0700 (PDT)
-X-Received: by 2002:a05:6820:4b81:b0:67d:e102:da05 with SMTP id 006d021491bc7-67fabd323a0mr1831271eaf.63.1775052269221;
-        Wed, 01 Apr 2026 07:04:29 -0700 (PDT)
-Received: from redhat.com (c-73-183-52-120.hsd1.pa.comcast.net. [73.183.52.120])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-89ecf960d2esm117933246d6.34.2026.04.01.07.04.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Apr 2026 07:04:25 -0700 (PDT)
-Date: Wed, 1 Apr 2026 10:04:23 -0400
-From: Brian Masney <bmasney@redhat.com>
-To: Miquel Raynal <miquel.raynal@bootlin.com>
-Cc: Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Thomas Gleixner <tglx@kernel.org>,
-	Olivia Mackall <olivia@selenic.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lldep2b2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2E82C4CEF7;
+	Wed,  1 Apr 2026 14:38:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775054291;
+	bh=XAbFxS6dIsoB+vJMxVqDhwktDJ77oSl0nf+NrQHhmeo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Lldep2b27Ps7IrIVqP+7BUuXdPl8tlsuWwqIpjqlyytSaWjJJteHwAr109Y/Du5qL
+	 poCSixs/b2VhqQfU416glic48P4nONK7FtQh2P5E8sTtfneKCAcxr7kAJeMdciRqhE
+	 kNCmSvZIxc3Z+RImvVutJvZ7BmJyXJnBx/XDxDtbVIto5zf6o5AjjKAGUXjpvXYW1l
+	 m7BImWp6rbxGeyedLBrZpgN64ncRrzx+2w3GI/ZLyj54p1VhSvGkK8/D1HtY6XdmjW
+	 CjGiAs85iac7DSVT3W/HORyuLAILQJ9D4oannU5mU4dr3de/kwCbGJwJ9GjSaGSdck
+	 CU3JviYqIsjtg==
+From: Tycho Andersen <tycho@kernel.org>
+To: Thomas Gleixner <tglx@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Ashish Kalra <ashish.kalra@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	John Allen <john.allen@amd.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Jayesh Choudhary <j-choudhary@ti.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Antoine Tenart <atenart@kernel.org>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	Pascal EBERHARD <pascal.eberhard@se.com>,
-	Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	Herve Codina <herve.codina@bootlin.com>
-Subject: Re: [PATCH 10/16] clk: Add support for clock nexus dt bindings
-Message-ID: <ac0l51ikCd_r22da@redhat.com>
-References: <20260327-schneider-v7-0-rc1-crypto-v1-0-5e6ff7853994@bootlin.com>
- <20260327-schneider-v7-0-rc1-crypto-v1-10-5e6ff7853994@bootlin.com>
- <acqT3Dh03y3JiLLc@redhat.com>
- <87y0j76p8o.fsf@bootlin.com>
+	Ard Biesheuvel <ardb@kernel.org>,
+	Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>,
+	Kishon Vijay Abraham I <kvijayab@amd.com>,
+	Alexey Kardashevskiy <aik@amd.com>,
+	Nikunj A Dadhania <nikunj@amd.com>,
+	"Peter Zijlstra (Intel)" <peterz@infradead.org>,
+	Kim Phillips <kim.phillips@amd.com>,
+	Sean Christopherson <seanjc@google.com>
+Cc: linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	"Tycho Andersen (AMD)" <tycho@kernel.org>
+Subject: [PATCH v1 1/2] x86/sev: Do not initialize SNP if missing CPUs
+Date: Wed,  1 Apr 2026 08:35:50 -0600
+Message-ID: <20260401143552.3038979-1-tycho@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87y0j76p8o.fsf@bootlin.com>
-User-Agent: Mutt/2.3.0 (2026-01-25)
+Content-Transfer-Encoding: 8bit
 
-Hi Miquel,
+From: "Tycho Andersen (AMD)" <tycho@kernel.org>
 
-On Wed, Apr 01, 2026 at 10:47:51AM +0200, Miquel Raynal wrote:
-> First, thanks for the whole review.
-> 
-> On 30/03/2026 at 11:16:44 -04, Brian Masney <bmasney@redhat.com> wrote:
-> >> -		ret = of_parse_phandle_with_args(np, "clocks", "#clock-cells",
-> >> -						 index, out_args);
-> >> +		ret = of_parse_phandle_with_args_map(np, "clocks", "clock",
-> >> +						     index, out_args);
-> >
-> > Before I left my Reviewed-by, I should have double checked Sashiko. It
-> > has several questions about this patch. The first is:
-> >
-> >     Are there other places in the clock framework that need to transition to the
-> >     new map API to ensure assigned clocks work?
-> >     
-> >     For instance, assigned-clocks and assigned-clock-parents are parsed in
-> >     drivers/clk/clk-conf.c using of_parse_phandle_with_args(). If a device
-> >     specifies an assigned clock that routes through a nexus node, will it fail
-> >     to configure because the map is not traversed?
-> 
-> The goal of the nexus node is to isolate what is behind. Are
-> assigned-clocks et al. supposed to traverse a nexus node? I am tempted
-> to say "no", but I'm open to discussing this ofc.
+The SEV firmware checks that the SNP enable bit is set on each CPU during
+SNP initialization, and will fail if it is not. If there are some CPUs
+offline, they will not run the setup functions, so SNP initialization will
+always fail.
 
-I agree that it's not needed as well, however I want to defer to
-Stephen's expertise here. I mainly brought this up trying to help him
-with reviews.
+Skip the IPIs in this case and return an error so that the CCP driver can
+skip the SNP_INIT that will fail.
 
-> > https://sashiko.dev/#/patchset/20260327-schneider-v7-0-rc1-crypto-v1-0-5e6ff7853994%40bootlin.com?patch=12563
-> 
-> I have mixed feelings concerning Sashiko's feedback. I will go through
-> that page nevertheless, there are interesting comments in there.
+Suggested-by: Borislav Petkov (AMD) <bp@alien8.de>
+Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
+---
+ arch/x86/include/asm/sev.h |  4 ++--
+ arch/x86/virt/svm/sev.c    | 11 +++++++++--
+ 2 files changed, 11 insertions(+), 4 deletions(-)
 
-I have mixed feelings as well about the feedback from Sashiko. It finds
-issues, however not all of the feedback has been helpful. On the whole,
-I'm glad that it's available.
+diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+index 09e605c85de4..594cfa19cbd4 100644
+--- a/arch/x86/include/asm/sev.h
++++ b/arch/x86/include/asm/sev.h
+@@ -661,7 +661,7 @@ static inline void snp_leak_pages(u64 pfn, unsigned int pages)
+ {
+ 	__snp_leak_pages(pfn, pages, true);
+ }
+-void snp_prepare(void);
++int snp_prepare(void);
+ void snp_shutdown(void);
+ #else
+ static inline bool snp_probe_rmptable_info(void) { return false; }
+@@ -679,7 +679,7 @@ static inline void __snp_leak_pages(u64 pfn, unsigned int npages, bool dump_rmp)
+ static inline void snp_leak_pages(u64 pfn, unsigned int npages) {}
+ static inline void kdump_sev_callback(void) { }
+ static inline void snp_fixup_e820_tables(void) {}
+-static inline void snp_prepare(void) {}
++static inline int snp_prepare(void) { return -ENODEV; }
+ static inline void snp_shutdown(void) {}
+ #endif
+ 
+diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
+index 41f76f15caa1..e9ded15dbe60 100644
+--- a/arch/x86/virt/svm/sev.c
++++ b/arch/x86/virt/svm/sev.c
+@@ -511,8 +511,9 @@ static void clear_hsave_pa(void *arg)
+ 	wrmsrq(MSR_VM_HSAVE_PA, 0);
+ }
+ 
+-void snp_prepare(void)
++int snp_prepare(void)
+ {
++	int ret = -EOPNOTSUPP;
+ 	u64 val;
+ 
+ 	/*
+@@ -521,12 +522,15 @@ void snp_prepare(void)
+ 	 */
+ 	rdmsrq(MSR_AMD64_SYSCFG, val);
+ 	if (val & MSR_AMD64_SYSCFG_SNP_EN)
+-		return;
++		return 0;
+ 
+ 	clear_rmp();
+ 
+ 	cpus_read_lock();
+ 
++	if (!cpumask_equal(cpu_online_mask, cpu_possible_mask))
++		goto unlock;
++
+ 	/*
+ 	 * MtrrFixDramModEn is not shared between threads on a core,
+ 	 * therefore it must be set on all CPUs prior to enabling SNP.
+@@ -537,7 +541,10 @@ void snp_prepare(void)
+ 	/* SNP_INIT requires MSR_VM_HSAVE_PA to be cleared on all CPUs. */
+ 	on_each_cpu(clear_hsave_pa, NULL, 1);
+ 
++	ret = 0;
++unlock:
+ 	cpus_read_unlock();
++	return ret;
+ }
+ EXPORT_SYMBOL_FOR_MODULES(snp_prepare, "ccp");
+ 
 
-Brian
+base-commit: cf112712c193e837225d740ec3e139774f2496f2
+-- 
+2.53.0
 
