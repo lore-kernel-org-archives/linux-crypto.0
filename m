@@ -1,106 +1,105 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0610E38B159;
-	Wed,  1 Apr 2026 07:31:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8BB33A75A8;
+	Wed,  1 Apr 2026 08:48:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775028710; cv=none; b=c7D7jijf4j8/z11dWN7bXQEwOfJYqjC0LDMyj2mfzzsv/1MYpRsy52OMYHmtpdFnNYL+XhOWK154Dq9zH3yrsUNryOYd9EufO5t7WoLD4dL8G7gyDEfwauEcZCdB3CnOI4oxAFzVX9E0wjRiQq8YCrci5eWOvwQkh7d5Q3A9dL4=
+	t=1775033284; cv=none; b=vATJLElk+l6ddWOLxGkdCi1VHu74O1ag6yFxqAH+tMGE2jRo4TXOMY2bkXP6s4qMqYWv4UGSdPXBqBCgmRYVHREPBEbXvSqZG6A97TycMKlQ3fBRlJ30bKjEArf5VOHZ3LEMhLC0kBJ0lGBdx+Pl9O1BgIb7S5D4mxFZPuDxSuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775028710; c=relaxed/simple;
-	bh=IZ+lq6z/zre6b9tz3T6OUxgEWHImu6aX2Wtg9rskWfk=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=AZhjTOWO8WkRKvzuZjyDQWGhyndluOmblT6Gz/0Oq+1hgRztzpIMwrX9aLYOAlJZHvn7gECwBXoIyA2PGZsVSxNGHxqZ4qC6nudqB8RJllicXaFeR8PL+Zk7BE1Cv/mRPG/2YcbgSDhN0juv7dupYjFu9I+0Ki2vp/Yqcm+oR38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UlUJKOsR; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1775033284; c=relaxed/simple;
+	bh=kbzqwPjUI5FPIJ6Pezp/hV9jTHQNFhZvMfXHh1uylQM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=CFEjtTjWNbwSsPQZE7v5kvUoxcgE1WckWYU3U3Lze2WgSUuZiDv0BBy5jPaaDUPgK0IOD/mamQNGERO6bgjwykU42W3WVZQwGX134haD84496odZcI0vXoUut5ECKRhd2paUYx57AZrVT6eWOax6VfEVJDzycKn9qdfOXRlxYR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=O8gwdWor; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UlUJKOsR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B947C4CEF7;
-	Wed,  1 Apr 2026 07:31:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775028709;
-	bh=IZ+lq6z/zre6b9tz3T6OUxgEWHImu6aX2Wtg9rskWfk=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=UlUJKOsRldvU9XmGgo4G4xKaAeCvD+h6hEQ9jwYGt8/ewvbqTcQ2q9AiMCYkCqYK5
-	 +KJLSWWNprt8ry+D1z5mmyjP8+RQcM8LH2c7aN2e4DpfKAQMo+1gf4yQ1V98OpgRxr
-	 qHzZUwm88dj5806tiqSfgnBRDYMJETmPF1KoWzLS6b1b2PbDYdKObCnUrCkEKHXDz1
-	 wpK2850kxt3Aw0Tzf0HRvO9kBZadTlNcieS4ol1YlttXPS5Dz4DBgKh18QmYTOFbJe
-	 2uOMiIJ4kbAsKZIiW+NAoZX52X9YvYOj1pzVU/etfK0fnFZAGYgns939c5vE4u7/sK
-	 SY1/6GTJJkn0Q==
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 65A5FF40068;
-	Wed,  1 Apr 2026 03:31:48 -0400 (EDT)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-01.internal (MEProxy); Wed, 01 Apr 2026 03:31:48 -0400
-X-ME-Sender: <xms:5MnMaeKg8A1q61tCZsM8venvrnLAz-sbzqWepjRwBedys6pwX81JYg>
-    <xme:5MnMaQ9g5kfMHRttn6gGr7HTAlHIV0M5Qp0T-qvHNOH7AVPy695SPPm-3l_AhKdoN
-    9pj0xELjZ6HXJc3MrgUvX0d1Qfps-LMEg1iYn-3tTHS3VI8siRUow8>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddvheduucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceurghi
-    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
-    epofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrugcuuehi
-    vghshhgvuhhvvghlfdcuoegrrhgusgeskhgvrhhnvghlrdhorhhgqeenucggtffrrghtth
-    gvrhhnpedvueehiedtvedtleekuddutefgffdtleetfeetveejveejieehfefhjeeijeef
-    udenucevlhhushhtvghrufhiiigvpedvnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrh
-    guodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduieejtdehtddtjeelqdef
-    fedvudeigeduhedqrghruggspeepkhgvrhhnvghlrdhorhhgseifohhrkhhofhgrrhgurd
-    gtohhmpdhnsggprhgtphhtthhopeeipdhmohguvgepshhmthhpohhuthdprhgtphhtthho
-    pehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdrohhrghdrrghupdhrtghpthhtoh
-    epvggsihhgghgvrhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgr
-    rhhmqdhkvghrnhgvlheslhhishhtshdrihhnfhhrrgguvggrugdrohhrghdprhgtphhtth
-    hopehlihhnuhigqdgtrhihphhtohesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphht
-    thhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtph
-    htthhopehjrghsohhnseiigidvtgegrdgtohhm
-X-ME-Proxy: <xmx:5MnMaby4mtw-gACOFsUupxx4Pkwx1rFt_0YnBoUPOLjKwcjPoI4Hsg>
-    <xmx:5MnMadXvdpfwQXqSJAWR3u_Ug0hX1IzdZY3pKg5gAFlU937gkyqElw>
-    <xmx:5MnMaVPXU5v8oUnjZmyXXXM6pHTpbWiorTTciQiaQMef8iMKKrG9ZQ>
-    <xmx:5MnMaXA7FH-ZnmRw-7YZ8vU7vYQxglgEODEFaHgPASd74M7bJ7tHWQ>
-    <xmx:5MnMaaes0MfeYHxl76zBapdvrxOqz63mNr3G8aulUFUWgNP3Q8XJwVfg>
-Feedback-ID: ice86485a:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 48FA2700065; Wed,  1 Apr 2026 03:31:48 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="O8gwdWor"
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 5CF441A310E;
+	Wed,  1 Apr 2026 08:48:01 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 2799F602BF;
+	Wed,  1 Apr 2026 08:48:01 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 0A232104502B1;
+	Wed,  1 Apr 2026 10:47:51 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1775033279; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=MulX6YMpnNOMv0Pee5WdBa40QBlB89kOy61SqtPUmhY=;
+	b=O8gwdWorFGZ31oS+MUxUypavWrJm+WPFW7B9iYYf3nLc9EIVFbgNYH63p4x6hVyLOQ0owi
+	DVEKZRJGe9fKHyuKzeosSHTJjPuClPcoe3qKSHiASpnph+6DJYEI1QO86tbKGmq7tNAaCa
+	eOZa4WUj92yF+GeqNgexZfhQ6FQVTPliQN9YsLW/80Qi3IgqJuVChweuxfHjjKvFjwRShm
+	3GZ2JwjptP7jnvMgvRTcNYaI887GlPBQOYCE2fEkiYjuNSFuqKDRTX48XzHD3BxGfmK6Xj
+	ThbolGyeWrENnGcYTK/LswFcFGTPIfjdoy0tPogo5o9nL3igAjB/PihoOY+Mmw==
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Brian Masney <bmasney@redhat.com>
+Cc: Michael Turquette <mturquette@baylibre.com>,  Stephen Boyd
+ <sboyd@kernel.org>,  Rob Herring <robh@kernel.org>,  Krzysztof Kozlowski
+ <krzk+dt@kernel.org>,  Conor Dooley <conor+dt@kernel.org>,  Thomas
+ Gleixner <tglx@kernel.org>,  Olivia Mackall <olivia@selenic.com>,  Herbert
+ Xu <herbert@gondor.apana.org.au>,  Jayesh Choudhary <j-choudhary@ti.com>,
+  "David S. Miller" <davem@davemloft.net>,  Christian Marangi
+ <ansuelsmth@gmail.com>,  Antoine Tenart <atenart@kernel.org>,  Geert
+ Uytterhoeven <geert+renesas@glider.be>,  Magnus Damm
+ <magnus.damm@gmail.com>,  Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+  Pascal EBERHARD <pascal.eberhard@se.com>,  Wolfram Sang
+ <wsa+renesas@sang-engineering.com>,  linux-clk@vger.kernel.org,
+  devicetree@vger.kernel.org,  linux-kernel@vger.kernel.org,
+  linux-crypto@vger.kernel.org,  linux-renesas-soc@vger.kernel.org,  Herve
+ Codina <herve.codina@bootlin.com>
+Subject: Re: [PATCH 10/16] clk: Add support for clock nexus dt bindings
+In-Reply-To: <acqT3Dh03y3JiLLc@redhat.com> (Brian Masney's message of "Mon, 30
+	Mar 2026 11:16:44 -0400")
+References: <20260327-schneider-v7-0-rc1-crypto-v1-0-5e6ff7853994@bootlin.com>
+	<20260327-schneider-v7-0-rc1-crypto-v1-10-5e6ff7853994@bootlin.com>
+	<acqT3Dh03y3JiLLc@redhat.com>
+User-Agent: mu4e 1.12.7; emacs 30.2
+Date: Wed, 01 Apr 2026 10:47:51 +0200
+Message-ID: <87y0j76p8o.fsf@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AbuMglSPIfTN
-Date: Wed, 01 Apr 2026 09:31:28 +0200
-From: "Ard Biesheuvel" <ardb@kernel.org>
-To: "Eric Biggers" <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, "Jason A . Donenfeld" <Jason@zx2c4.com>,
- "Herbert Xu" <herbert@gondor.apana.org.au>,
- linux-arm-kernel@lists.infradead.org
-Message-Id: <dd3a1dbb-4426-49e4-899c-a9377ec0939d@app.fastmail.com>
-In-Reply-To: <20260401003331.144065-1-ebiggers@kernel.org>
-References: <20260401003331.144065-1-ebiggers@kernel.org>
-Subject: Re: [PATCH] lib/crypto: arm64: Assume a little-endian kernel
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
+Hello Brian,
 
+First, thanks for the whole review.
 
-On Wed, 1 Apr 2026, at 02:33, Eric Biggers wrote:
-> Since support for big-endian arm64 kernels was removed, the CPU_LE()
-> macro now unconditionally emits the code it is passed, and the CPU_BE()
-> macro now unconditionally discards the code it is passed.
+On 30/03/2026 at 11:16:44 -04, Brian Masney <bmasney@redhat.com> wrote:
+>> -		ret =3D of_parse_phandle_with_args(np, "clocks", "#clock-cells",
+>> -						 index, out_args);
+>> +		ret =3D of_parse_phandle_with_args_map(np, "clocks", "clock",
+>> +						     index, out_args);
 >
-> Simplify the assembly code in lib/crypto/arm64/ accordingly.
+> Before I left my Reviewed-by, I should have double checked Sashiko. It
+> has several questions about this patch. The first is:
 >
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
->
-> This patch is targeting libcrypto-next
->
->  lib/crypto/arm64/aes-cipher-core.S  | 10 -------
->  lib/crypto/arm64/chacha-neon-core.S | 16 -----------
->  lib/crypto/arm64/ghash-neon-core.S  |  2 +-
->  lib/crypto/arm64/sha1-ce-core.S     |  8 +++---
->  lib/crypto/arm64/sha256-ce.S        | 41 +++++++++++++----------------
->  lib/crypto/arm64/sha512-ce-core.S   | 16 +++++------
->  lib/crypto/arm64/sm3-ce-core.S      |  8 +++---
->  7 files changed, 36 insertions(+), 65 deletions(-)
->
+>     Are there other places in the clock framework that need to transition=
+ to the
+>     new map API to ensure assigned clocks work?
+>=20=20=20=20=20
+>     For instance, assigned-clocks and assigned-clock-parents are parsed in
+>     drivers/clk/clk-conf.c using of_parse_phandle_with_args(). If a device
+>     specifies an assigned clock that routes through a nexus node, will it=
+ fail
+>     to configure because the map is not traversed?
 
-Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
+The goal of the nexus node is to isolate what is behind. Are
+assigned-clocks et al. supposed to traverse a nexus node? I am tempted
+to say "no", but I'm open to discussing this ofc.
+
+> https://sashiko.dev/#/patchset/20260327-schneider-v7-0-rc1-crypto-v1-0-5e=
+6ff7853994%40bootlin.com?patch=3D12563
+
+I have mixed feelings concerning Sashiko's feedback. I will go through
+that page nevertheless, there are interesting comments in there.
+
+Thanks,
+Miqu=C3=A8l
