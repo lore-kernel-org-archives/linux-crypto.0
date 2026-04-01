@@ -1,229 +1,109 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FDA81C861D;
-	Wed,  1 Apr 2026 00:44:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CDC826E70E
+	for <linux-crypto@vger.kernel.org>; Wed,  1 Apr 2026 06:57:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775004277; cv=none; b=S3+uiPMoA3omKR+g3TAdhxViOnEBL7aoLhOs6JMbqJUR3BUnjo/btv/207D2jtJI+jxql33mEJHfIyhDKJwd24Kbu1SvinxUgPLulpSebFGactpvwoJ789oMvpYLiHnzAz7jsA/Jd/XXRfZnQbFCjFwEBRSjcPXklPcuwFzcn1k=
+	t=1775026665; cv=none; b=s2QETh6kbBp8vJilJZ106vkjY7KK5t/G0nyo+IYmTvRVV/eAh86d4shdACM7+UWnCCOSFUqDvriXA8DcUlE5Ae0hdE3R5hx3teKNTVg7VKfxVoJ42M8bpOIOJVw22mI0oobHV0ndkeKYCxZhQPABSFufRhJefrRfuRBtETqrcPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775004277; c=relaxed/simple;
-	bh=t9YRv1FqbSlnih+jiMm26EVjV/zSLNM1/2jxkIcSIjs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aYEUWNFg1EABT/LwFvurfoF/iU/ivoG3ShQmI7vVI91e1aVb/p1uPL396j2t61M1mMS836Hr8PNUBIQNC7fEGbwBztdqWWJnF6l7GmbCjMxAL8abM/Y0QkhmLH3e7lgzC2f8b7FEo369xOmxVdUav0+CIlg8n0bfP8Qn+nJsCmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ERvBGU2N; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1775026665; c=relaxed/simple;
+	bh=RNdUik6TjbyGhb6unGHczt6oHQzdTiA5XXduOoNpS6M=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=GIncdY5adNPD8In8B32UB8yO7iIiPRTJQWatENRglIxPvVIt6pn4mM1deDA4LsYzKBU6yNs2p+nnyHYPtzm4fPZr0kjwZRD9cW0+KWqrxw+/1uerjVkyYss3GZZXDC328lYeYb4IkeJ2sTBbx+UmuYFGFMkBCkqyiC4SuTwbSHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t5dMmES7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ERvBGU2N"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4780C19423;
-	Wed,  1 Apr 2026 00:44:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t5dMmES7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC1F3C4CEF7;
+	Wed,  1 Apr 2026 06:57:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775004276;
-	bh=t9YRv1FqbSlnih+jiMm26EVjV/zSLNM1/2jxkIcSIjs=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ERvBGU2NLCwuIPnM0xNf5xHUWYs8lLiFAMvnctaKqOI4d8PhhNaRPsPUfjsX8dY2+
-	 pI3SzoCS0DtOm/SZnfYT80dczPAyx85cS+P1AEngy2TZRxt1tTJZ1bP3rTb3gb6cy5
-	 eiFrxPCurR5Q9X2DKq8/H4RAlZ3Q6NXLX6/DMmgZfrCX1/V8CagNPR+KVHF3ZLpPhE
-	 RaLW1bNyKlUdt4+79UzYC5brz0OWpfXcUmOBOsBSQaj/woYgJ+VC95snOmqSz5zjA7
-	 E5KEds5pKtTgw11l1jmpcKqAMbYgGjk1kxAWv1DhrE3BzUwBeZmxrhw5rQ5hf9FtlF
-	 SoP9duTZWsnwg==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH] lib/crc: arm64: Assume a little-endian kernel
-Date: Tue, 31 Mar 2026 17:44:31 -0700
-Message-ID: <20260401004431.151432-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.53.0
+	s=k20201202; t=1775026665;
+	bh=RNdUik6TjbyGhb6unGHczt6oHQzdTiA5XXduOoNpS6M=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=t5dMmES7g+Yo0xGsg9xg6PzGk1qKTSHD8FKn6ImpnF6Q28onXkAMa8kCpTQlzkYxk
+	 EwZkuJ9lbrGSlU60/hui1S6oFD0ROoL24YTYSSBBfWGN5qyLADizbeMi3SaT4HAX3e
+	 3sF6gYo0ThApX/eyzcrZdOSdTocBRkCMmewIiW/ZCkbTjDolTf+25o1xE7U1SBGfL7
+	 hkclV2i2djRnIC4HYMYY77Ic/ngCbdkE6eeSPwTjEVdn4yk6Lj6q+0d3TsxvHdcFKj
+	 MB5BKReQ1Drao8RB/BGeQEQK+sWag+tlBim86xoflkRrdficFYkvTBga2qbC/zlBff
+	 S2IVLG7ETvVKw==
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfauth.phl.internal (Postfix) with ESMTP id BC705F40080;
+	Wed,  1 Apr 2026 02:57:43 -0400 (EDT)
+Received: from phl-imap-02 ([10.202.2.81])
+  by phl-compute-01.internal (MEProxy); Wed, 01 Apr 2026 02:57:43 -0400
+X-ME-Sender: <xms:58HMaaX3BvCkhu4E7btKqvpqeBRBTkkEK6BbQt2vDrKF9Sno8JvReQ>
+    <xme:58HMaRaDILMdGvCpw_h7-AfE8w1n7QftxparP40_-n-3knykbk1Mmag-HDwuEPoSW
+    SnoEXVYcahEQqPNvau057g_YptkAnm4P0Lf2Aqb1-jxxP8K1Q9wJ20>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgddvgeehucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceurghi
+    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
+    epofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrugcuuehi
+    vghshhgvuhhvvghlfdcuoegrrhgusgeskhgvrhhnvghlrdhorhhgqeenucggtffrrghtth
+    gvrhhnpedvueehiedtvedtleekuddutefgffdtleetfeetveejveejieehfefhjeeijeef
+    udenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrh
+    guodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduieejtdehtddtjeelqdef
+    fedvudeigeduhedqrghruggspeepkhgvrhhnvghlrdhorhhgseifohhrkhhofhgrrhgurd
+    gtohhmpdhnsggprhgtphhtthhopeegpdhmohguvgepshhmthhpohhuthdprhgtphhtthho
+    peguvghmhigrnhhshhesghhmrghilhdrtghomhdprhgtphhtthhopegvsghighhgvghrsh
+    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqrghrmhdqkhgvrhhnvghl
+    sehlihhsthhsrdhinhhfrhgruggvrggurdhorhhgpdhrtghpthhtoheplhhinhhugidqtg
+    hrhihpthhosehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:58HMaffov1of8JNuHMN4oOxsHFNxSxWtDF3-qvRP1QWE_I-HptSNww>
+    <xmx:58HMaQppTlMbBH2euTNr0rKhLClv-OxbZzZFM5tmg71hN90MXYhP6w>
+    <xmx:58HMacDI5PMUgwJHLm-NvmSMoDoJcWk7plETcj4gWsuXaeGcpcZZ8g>
+    <xmx:58HMaVbg8hCTBb-N592BhE8KskDO9brbEXrFJrdSXOtP9LsAspaLGQ>
+    <xmx:58HMaX5bUXNzsaX815sclL6u6prvohGQto4K0BBKWez3iEeF78XHt6zv>
+Feedback-ID: ice86485a:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 9D820700065; Wed,  1 Apr 2026 02:57:43 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-ThreadId: Aics4N9pNpZs
+Date: Wed, 01 Apr 2026 08:57:23 +0200
+From: "Ard Biesheuvel" <ardb@kernel.org>
+To: "Eric Biggers" <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ "Demian Shulhan" <demyansh@gmail.com>
+Message-Id: <232d35ea-433b-4eef-86e7-5cfb9f033bf5@app.fastmail.com>
+In-Reply-To: <20260331223300.GA45047@quark>
+References: <20260330144630.33026-7-ardb@kernel.org>
+ <20260330144630.33026-8-ardb@kernel.org> <20260331223300.GA45047@quark>
+Subject: Re: [PATCH 1/5] lib/crc: arm64: Drop unnecessary chunking logic from crc64
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-Since support for big-endian arm64 kernels was removed, the CPU_LE()
-macro now unconditionally emits the code it is passed, and the CPU_BE()
-macro now unconditionally discards the code it is passed.
 
-Simplify the assembly code in lib/crc/arm64/ accordingly.
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
+On Wed, 1 Apr 2026, at 00:33, Eric Biggers wrote:
+> On Mon, Mar 30, 2026 at 04:46:32PM +0200, Ard Biesheuvel wrote:
+>> On arm64, kernel mode NEON executes with preemption enabled, so there is
+>> no need to chunk the input by hand.
+>> 
+>> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+>
+> There's still similar "chunking" in other arm64 code:
+>
+>     $ git grep -E 'SZ_4K|cond_yield' lib/crypto/arm64
+>     lib/crypto/arm64/chacha.h:              unsigned int todo = 
+> min_t(unsigned int, bytes, SZ_4K);
+>     lib/crypto/arm64/poly1305.h:                    unsigned int todo = 
+> min_t(unsigned int, len, SZ_4K);
+>     lib/crypto/arm64/sha1-ce-core.S:        cond_yield      1f, x5, x6
+>     lib/crypto/arm64/sha256-ce.S:   cond_yield      1f, x5, x6
+>     lib/crypto/arm64/sha3-ce-core.S:        cond_yield 4f, x8, x9
+>     lib/crypto/arm64/sha512-ce-core.S:      cond_yield      3f, x4, x5
+>
+> I thought it was still sticking around, despite kernel-mode NEON now
+> being preemptible on arm64, because of CONFIG_PREEMPT_VOLUNTARY.
+>
+> However, I see that support for CONFIG_PREEMPT_VOLUNTARY was recently
+> removed on arm64.  So that's what finally makes this no longer needed,
+> and we can now clean up these other cases too, right?
+>
 
-This patch is targeting crc-next
-
- lib/crc/arm64/crc-t10dif-core.S | 56 ++++++++++++++++-----------------
- lib/crc/arm64/crc32-core.S      |  9 ++----
- 2 files changed, 30 insertions(+), 35 deletions(-)
-
-diff --git a/lib/crc/arm64/crc-t10dif-core.S b/lib/crc/arm64/crc-t10dif-core.S
-index 87dd6d46224d8..71388466825b9 100644
---- a/lib/crc/arm64/crc-t10dif-core.S
-+++ b/lib/crc/arm64/crc-t10dif-core.S
-@@ -179,17 +179,17 @@ SYM_FUNC_END(__pmull_p8_16x64)
- 	.macro		fold_32_bytes, p, reg1, reg2
- 	ldp		q11, q12, [buf], #0x20
- 
- 	pmull16x64_\p	fold_consts, \reg1, v8
- 
--CPU_LE(	rev64		v11.16b, v11.16b		)
--CPU_LE(	rev64		v12.16b, v12.16b		)
-+	rev64		v11.16b, v11.16b
-+	rev64		v12.16b, v12.16b
- 
- 	pmull16x64_\p	fold_consts, \reg2, v9
- 
--CPU_LE(	ext		v11.16b, v11.16b, v11.16b, #8	)
--CPU_LE(	ext		v12.16b, v12.16b, v12.16b, #8	)
-+	ext		v11.16b, v11.16b, v11.16b, #8
-+	ext		v12.16b, v12.16b, v12.16b, #8
- 
- 	eor		\reg1\().16b, \reg1\().16b, v8.16b
- 	eor		\reg2\().16b, \reg2\().16b, v9.16b
- 	eor		\reg1\().16b, \reg1\().16b, v11.16b
- 	eor		\reg2\().16b, \reg2\().16b, v12.16b
-@@ -218,26 +218,26 @@ CPU_LE(	ext		v12.16b, v12.16b, v12.16b, #8	)
- 	ldp		q0, q1, [buf]
- 	ldp		q2, q3, [buf, #0x20]
- 	ldp		q4, q5, [buf, #0x40]
- 	ldp		q6, q7, [buf, #0x60]
- 	add		buf, buf, #0x80
--CPU_LE(	rev64		v0.16b, v0.16b			)
--CPU_LE(	rev64		v1.16b, v1.16b			)
--CPU_LE(	rev64		v2.16b, v2.16b			)
--CPU_LE(	rev64		v3.16b, v3.16b			)
--CPU_LE(	rev64		v4.16b, v4.16b			)
--CPU_LE(	rev64		v5.16b, v5.16b			)
--CPU_LE(	rev64		v6.16b, v6.16b			)
--CPU_LE(	rev64		v7.16b, v7.16b			)
--CPU_LE(	ext		v0.16b, v0.16b, v0.16b, #8	)
--CPU_LE(	ext		v1.16b, v1.16b, v1.16b, #8	)
--CPU_LE(	ext		v2.16b, v2.16b, v2.16b, #8	)
--CPU_LE(	ext		v3.16b, v3.16b, v3.16b, #8	)
--CPU_LE(	ext		v4.16b, v4.16b, v4.16b, #8	)
--CPU_LE(	ext		v5.16b, v5.16b, v5.16b, #8	)
--CPU_LE(	ext		v6.16b, v6.16b, v6.16b, #8	)
--CPU_LE(	ext		v7.16b, v7.16b, v7.16b, #8	)
-+	rev64		v0.16b, v0.16b
-+	rev64		v1.16b, v1.16b
-+	rev64		v2.16b, v2.16b
-+	rev64		v3.16b, v3.16b
-+	rev64		v4.16b, v4.16b
-+	rev64		v5.16b, v5.16b
-+	rev64		v6.16b, v6.16b
-+	rev64		v7.16b, v7.16b
-+	ext		v0.16b, v0.16b, v0.16b, #8
-+	ext		v1.16b, v1.16b, v1.16b, #8
-+	ext		v2.16b, v2.16b, v2.16b, #8
-+	ext		v3.16b, v3.16b, v3.16b, #8
-+	ext		v4.16b, v4.16b, v4.16b, #8
-+	ext		v5.16b, v5.16b, v5.16b, #8
-+	ext		v6.16b, v6.16b, v6.16b, #8
-+	ext		v7.16b, v7.16b, v7.16b, #8
- 
- 	// XOR the first 16 data *bits* with the initial CRC value.
- 	movi		v8.16b, #0
- 	mov		v8.h[7], init_crc
- 	eor		v0.16b, v0.16b, v8.16b
-@@ -286,12 +286,12 @@ CPU_LE(	ext		v7.16b, v7.16b, v7.16b, #8	)
- 	b.lt		.Lfold_16_bytes_loop_done_\@
- .Lfold_16_bytes_loop_\@:
- 	pmull16x64_\p	fold_consts, v7, v8
- 	eor		v7.16b, v7.16b, v8.16b
- 	ldr		q0, [buf], #16
--CPU_LE(	rev64		v0.16b, v0.16b			)
--CPU_LE(	ext		v0.16b, v0.16b, v0.16b, #8	)
-+	rev64		v0.16b, v0.16b
-+	ext		v0.16b, v0.16b, v0.16b, #8
- 	eor		v7.16b, v7.16b, v0.16b
- 	subs		len, len, #16
- 	b.ge		.Lfold_16_bytes_loop_\@
- 
- .Lfold_16_bytes_loop_done_\@:
-@@ -308,12 +308,12 @@ CPU_LE(	ext		v0.16b, v0.16b, v0.16b, #8	)
- 	// chunk of 16 bytes, then fold the first chunk into the second.
- 
- 	// v0 = last 16 original data bytes
- 	add		buf, buf, len
- 	ldr		q0, [buf, #-16]
--CPU_LE(	rev64		v0.16b, v0.16b			)
--CPU_LE(	ext		v0.16b, v0.16b, v0.16b, #8	)
-+	rev64		v0.16b, v0.16b
-+	ext		v0.16b, v0.16b, v0.16b, #8
- 
- 	// v1 = high order part of second chunk: v7 left-shifted by 'len' bytes.
- 	adr_l		x4, .Lbyteshift_table + 16
- 	sub		x4, x4, len
- 	ld1		{v2.16b}, [x4]
-@@ -342,12 +342,12 @@ CPU_LE(	ext		v0.16b, v0.16b, v0.16b, #8	)
- 
- 	adr_l		fold_consts_ptr, .Lfold_across_16_bytes_consts
- 
- 	// Load the first 16 data bytes.
- 	ldr		q7, [buf], #0x10
--CPU_LE(	rev64		v7.16b, v7.16b			)
--CPU_LE(	ext		v7.16b, v7.16b, v7.16b, #8	)
-+	rev64		v7.16b, v7.16b
-+	ext		v7.16b, v7.16b, v7.16b, #8
- 
- 	// XOR the first 16 data *bits* with the initial CRC value.
- 	movi		v0.16b, #0
- 	mov		v0.h[7], init_crc
- 	eor		v7.16b, v7.16b, v0.16b
-@@ -380,12 +380,12 @@ SYM_FUNC_START(crc_t10dif_pmull_p8)
- 	zip1		perm.16b, perm.16b, perm.16b
- 	zip1		perm.16b, perm.16b, perm.16b
- 
- 	crc_t10dif_pmull p8
- 
--CPU_LE(	rev64		v7.16b, v7.16b			)
--CPU_LE(	ext		v7.16b, v7.16b, v7.16b, #8	)
-+	rev64		v7.16b, v7.16b
-+	ext		v7.16b, v7.16b, v7.16b, #8
- 	str		q7, [x3]
- 
- 	frame_pop
- 	ret
- SYM_FUNC_END(crc_t10dif_pmull_p8)
-diff --git a/lib/crc/arm64/crc32-core.S b/lib/crc/arm64/crc32-core.S
-index 68825317460fc..49d02cc485b3e 100644
---- a/lib/crc/arm64/crc32-core.S
-+++ b/lib/crc/arm64/crc32-core.S
-@@ -27,28 +27,23 @@
- 	rbit		\reg, \reg
- 	lsr		\reg, \reg, #24
- 	.endm
- 
- 	.macro		hwordle, reg
--CPU_BE(	rev16		\reg, \reg	)
- 	.endm
- 
- 	.macro		hwordbe, reg
--CPU_LE(	rev		\reg, \reg	)
-+	rev		\reg, \reg
- 	rbit		\reg, \reg
--CPU_BE(	lsr		\reg, \reg, #16	)
- 	.endm
- 
- 	.macro		le, regs:vararg
--	.irp		r, \regs
--CPU_BE(	rev		\r, \r		)
--	.endr
- 	.endm
- 
- 	.macro		be, regs:vararg
- 	.irp		r, \regs
--CPU_LE(	rev		\r, \r		)
-+	rev		\r, \r
- 	.endr
- 	.irp		r, \regs
- 	rbit		\r, \r
- 	.endr
- 	.endm
-
-base-commit: 63432fd625372a0e79fb00a4009af204f4edc013
--- 
-2.53.0
-
+Indeed.
