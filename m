@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50C0C322A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F275C613;
 	Wed,  1 Apr 2026 00:07:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775002070; cv=none; b=lI2uWB8rJ1tZ/LBSj6JHu2gwANUMXRCXIwAp9KxnHCToz0DsIPBXSWRwU30utcq9pI6fBZAJGPkru/URJsLBRqJ2Ioj0Mfy5qU2U9YMwxZMZaLYtqwSlQAHk78lNBKT2M/TZMk1uQZzet7U3ZqeJDyq2ZnPohJkQD4lKEzcV2Vk=
+	t=1775002070; cv=none; b=pGlufmnYmNzOgKjOQcuYYYEfBpMLZbNszJbGMTo8KgHV8yNdwwa7fqXrQfjzYvDR9onn/IZ554VUNGEG2cgjQbq/ICVi1N12ITbKDwcXQaOkZomjYlpPeqv1SiQSjqakastOLMtdnGzIfrzy9uSe80AR8wmdYtxPebYW3Y/YZbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1775002070; c=relaxed/simple;
-	bh=IDxofDV1l6itbnGBXpDqaJyt+/X6blNaQzeWk25J7Ts=;
+	bh=lMl6Llb6SKdL6D1zgOk+w6G/KGWKdefJM1MFe8cedTY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pSOjU9RFHkjl/SYVHAEZ2JcQONC1589QQVQwVftgIulr+44OS3YxpRdA8dm5yxOTrtm7f6MLfNRiAKzDmcg2qkTW+AakYa9CECSEhDZ5D4RBniRLTo9U9my8Oqj8WHrna02DZSS4F2mMIVrc3dYgnnw9UvYQMUCUBfbh/MoUAF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MLnFZ9ZG; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=fjVlgHZkY85f1zWGaqCp7I/wWWmLjZz/Xoa7imQXsVenAwvgTTmZWaE3lEhiX1HulRd5wbl6jTcy3Ogm+Lk1fiLMT7hAKkBQVK4gATgRxxG2o4kEtyH7qZvJMDHFpFt/UAXWQJP96dSKL2i3NgPyehtFYKZOMH81k6DImZRj19o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d2PAyarZ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MLnFZ9ZG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8D7EC2BCB4;
-	Wed,  1 Apr 2026 00:07:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d2PAyarZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B457C2BCB3;
+	Wed,  1 Apr 2026 00:07:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1775002070;
-	bh=IDxofDV1l6itbnGBXpDqaJyt+/X6blNaQzeWk25J7Ts=;
+	bh=lMl6Llb6SKdL6D1zgOk+w6G/KGWKdefJM1MFe8cedTY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MLnFZ9ZGjNSPQd/8I/31b5XsbGh4co6ArbnJCiY8mDm0jMZkPalDqjTX5wNAnkBNo
-	 hjJnO+ANvexDSdzaAxZhxTYJT4F61XpgLpkvVPd++oiCnG57LPEr22T2+SeYSLVSel
-	 +nxzysiwnMsFChEc1Ho0QgXp9yeVk/usNn8bz9/UWDc6YeZz/6eQ2Zsj8UPVCTyG9s
-	 L+pFRYyUMQBPa8wRe89v3DROFp5Njl2tucohO6Y4LV9uzwAnal0dfP3mAtew+i9cn1
-	 9VFc6z+HXIUkGapBP9Oq/Da6Eszzw0zImOdMXcqwYswJQtxXFqzM6ehAQcwbB4FP5V
-	 yX1vWGuxuQibQ==
+	b=d2PAyarZnxFpl6bvbCZYNUP1+rkfXxWgt+4MxWncO6fhwgsOwE0CXriXvLc61Szij
+	 dJETPQA9L+XuNjEWDoShv+7YLByys1tmpYDprg9gI0AAIysOozOoItbBgdnwFO3+gf
+	 v4cAKKnTtHLNmcNSTAEgXuaaXnKXsgPGvYcN6yGQxFj8mMxSuzOSMnwoonoyEytV8L
+	 YmhkDE/F71A/Jon5LY7To5UGsD2tPacVEUrmIa27jDukiHbrisVrvlX+Ba+RtwvfpJ
+	 EbAQ6FxbglMwrf+IdHlvOLgvUZ+otsqBgN/zcpKPPO8T+ihi1sHAaTePb29Pegbxet
+	 LVnHbHCPmhAwA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -34,9 +34,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	linux-arm-kernel@lists.infradead.org,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 4/9] lib/crypto: arm64/poly1305: Remove obsolete chunking logic
-Date: Tue, 31 Mar 2026 17:05:43 -0700
-Message-ID: <20260401000548.133151-5-ebiggers@kernel.org>
+Subject: [PATCH 5/9] lib/crypto: arm64/sha1: Remove obsolete chunking logic
+Date: Tue, 31 Mar 2026 17:05:44 -0700
+Message-ID: <20260401000548.133151-6-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260401000548.133151-1-ebiggers@kernel.org>
 References: <20260401000548.133151-1-ebiggers@kernel.org>
@@ -55,43 +55,91 @@ restrict the preemption modes"), voluntary preemption is no longer
 supported on arm64 either.  Therefore, there's no longer any need to
 limit the length of kernel-mode NEON sections on arm64.
 
-Simplify the Poly1305 code accordingly.
+Simplify the SHA-1 code accordingly.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- lib/crypto/arm64/poly1305.h | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
+ lib/crypto/arm64/sha1-ce-core.S | 14 +++++---------
+ lib/crypto/arm64/sha1.h         | 15 ++++-----------
+ 2 files changed, 9 insertions(+), 20 deletions(-)
 
-diff --git a/lib/crypto/arm64/poly1305.h b/lib/crypto/arm64/poly1305.h
-index b77669767cd6..3d4bde857699 100644
---- a/lib/crypto/arm64/poly1305.h
-+++ b/lib/crypto/arm64/poly1305.h
-@@ -25,21 +25,15 @@ static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_neon);
+diff --git a/lib/crypto/arm64/sha1-ce-core.S b/lib/crypto/arm64/sha1-ce-core.S
+index 8fbd4767f0f0..59d27fda0714 100644
+--- a/lib/crypto/arm64/sha1-ce-core.S
++++ b/lib/crypto/arm64/sha1-ce-core.S
+@@ -60,14 +60,14 @@
+ 	movk		\tmp, :abs_g1:\val
+ 	dup		\k, \tmp
+ 	.endm
  
- static void poly1305_blocks(struct poly1305_block_state *state, const u8 *src,
- 			    unsigned int len, u32 padbit)
+ 	/*
+-	 * size_t __sha1_ce_transform(struct sha1_block_state *state,
+-	 *			      const u8 *data, size_t nblocks);
++	 * void sha1_ce_transform(struct sha1_block_state *state,
++	 *			  const u8 *data, size_t nblocks);
+ 	 */
+-SYM_FUNC_START(__sha1_ce_transform)
++SYM_FUNC_START(sha1_ce_transform)
+ 	/* load round constants */
+ 	loadrc		k0.4s, 0x5a827999, w6
+ 	loadrc		k1.4s, 0x6ed9eba1, w6
+ 	loadrc		k2.4s, 0x8f1bbcdc, w6
+ 	loadrc		k3.4s, 0xca62c1d6, w6
+@@ -114,17 +114,13 @@ CPU_LE(	rev32		v11.16b, v11.16b	)
+ 
+ 	/* update state */
+ 	add		dgbv.2s, dgbv.2s, dg1v.2s
+ 	add		dgav.4s, dgav.4s, dg0v.4s
+ 
+-	/* return early if voluntary preemption is needed */
+-	cond_yield	1f, x5, x6
+-
+ 	/* handled all input blocks? */
+ 	cbnz		x2, 0b
+ 
+ 	/* store new state */
+-1:	st1		{dgav.4s}, [x0]
++	st1		{dgav.4s}, [x0]
+ 	str		dgb, [x0, #16]
+-	mov		x0, x2
+ 	ret
+-SYM_FUNC_END(__sha1_ce_transform)
++SYM_FUNC_END(sha1_ce_transform)
+diff --git a/lib/crypto/arm64/sha1.h b/lib/crypto/arm64/sha1.h
+index bc7071f1be09..112c5d443c56 100644
+--- a/lib/crypto/arm64/sha1.h
++++ b/lib/crypto/arm64/sha1.h
+@@ -7,26 +7,19 @@
+ #include <asm/simd.h>
+ #include <linux/cpufeature.h>
+ 
+ static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_ce);
+ 
+-asmlinkage size_t __sha1_ce_transform(struct sha1_block_state *state,
+-				      const u8 *data, size_t nblocks);
++asmlinkage void sha1_ce_transform(struct sha1_block_state *state,
++				  const u8 *data, size_t nblocks);
+ 
+ static void sha1_blocks(struct sha1_block_state *state,
+ 			const u8 *data, size_t nblocks)
  {
- 	if (static_branch_likely(&have_neon) && likely(may_use_simd())) {
+ 	if (static_branch_likely(&have_ce) && likely(may_use_simd())) {
 -		do {
--			unsigned int todo = min_t(unsigned int, len, SZ_4K);
+-			size_t rem;
 -
 -			scoped_ksimd()
--				poly1305_blocks_neon(state, src, todo, padbit);
+-				rem = __sha1_ce_transform(state, data, nblocks);
 -
--			len -= todo;
--			src += todo;
--		} while (len);
--	} else
+-			data += (nblocks - rem) * SHA1_BLOCK_SIZE;
+-			nblocks = rem;
+-		} while (nblocks);
 +		scoped_ksimd()
-+			poly1305_blocks_neon(state, src, len, padbit);
-+	} else {
- 		poly1305_blocks_arm64(state, src, len, padbit);
-+	}
++			sha1_ce_transform(state, data, nblocks);
+ 	} else {
+ 		sha1_blocks_generic(state, data, nblocks);
+ 	}
  }
  
- #define poly1305_mod_init_arch poly1305_mod_init_arch
- static void poly1305_mod_init_arch(void)
- {
 -- 
 2.53.0
 
