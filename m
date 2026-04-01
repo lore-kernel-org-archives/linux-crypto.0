@@ -1,40 +1,40 @@
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABBBC3B19DF;
-	Wed,  1 Apr 2026 08:59:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A5923C9ED0;
+	Wed,  1 Apr 2026 09:02:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775033978; cv=none; b=HEweGnp8ihVxAp/6RjKveYHcjluxhQmh9obklOc8F+oWpf/XGt1QbQxMIa/2E1tfCbB5pn1cBibUlg1IIJiK8gxXzh+/BMSW/6L3y9YN90H4qEOstckrmLfb+XdKvGscjJejeGbdX4y5f7WuT1R55IXuHF7C5+7arU4GdVFlFrI=
+	t=1775034142; cv=none; b=qSt6Gf5TIFWZAVTTZf8GuZr9S85b7ZNvUJq/GDgJTva4bH6JCN2eXtiBVJclQILyH32TxjPWEAGb4dbtLqZDNsuXCfDjyeIlQo0yEdyMm3WdpwNH8FjwlRbskf66wuyHXKbGsfXS9VpFZqPutViJPdN/m1c9krNbH4NaiCEZLB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775033978; c=relaxed/simple;
-	bh=VbFdMq7YtqJd7UMOCDrFbjpr28i5Wpb/2QUpdDPoTAw=;
+	s=arc-20240116; t=1775034142; c=relaxed/simple;
+	bh=Nv1tyXdxUtYtJcdXLQEiG6kmoUSuQqWiLrIF7eSvS3k=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ueVzXEfzU9UznauF1JXaYH/ABtY7LJs+unRJ5czvZT2QvGAqRyTxX2QH6298ib7/w7dgRBg/VJj8b0kjV9B0i2VWyLSUGKWAoQlonpAplG+feuT8IXELkY6UJIxtfklU/sH+YGFTe5DOOGJMeTHRKuBpBXUD4+JeLFEf0xBgrSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=FCc2mioU; arc=none smtp.client-ip=185.171.202.116
+	 MIME-Version:Content-Type; b=EJDoe+mEb1LCnWLJmddOkE0GU2GQDYFoL+6++Y0PNuvn847AM4sVT3tsGhQvqiMEubxLMdmqfD8NP5n+C63Qx2s5XpvRtSZD5i89Xhdyogt7yezkZpkOTTgk3TPTTHoc1Qi8imqMVzRVXo/po6M2HMpJIueedYnKkbcbjb/Kyu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hDOrUGUu; arc=none smtp.client-ip=185.246.84.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FCc2mioU"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hDOrUGUu"
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id A315DC5996A;
-	Wed,  1 Apr 2026 08:59:57 +0000 (UTC)
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 4BB181A311E;
+	Wed,  1 Apr 2026 09:02:16 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 9F62E602BF;
-	Wed,  1 Apr 2026 08:59:26 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C9559104509A9;
-	Wed,  1 Apr 2026 10:59:20 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 1B0F3602BF;
+	Wed,  1 Apr 2026 09:02:16 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 1207A104502B1;
+	Wed,  1 Apr 2026 11:02:01 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1775033965; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1775034127; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=9o8MaFCKhNvDQQOGJOIQriskUC+pXVGT8BSTas/AoKM=;
-	b=FCc2mioUSJNqSy8zEA6YSaAVOkW85hhYpfbVo5k/rVve7f6y/M1WdrXIuZqcQoHMbvwfPC
-	XM5oVuMFeheFhDZTM7u+4Qas8aKQHS0BcJKz4rfadGZwSQYwZUTHdXkZzhB2uxtlXGOLlG
-	YkYWrxR4ii4CmLhJQOidmxnLpjkqr7jVPHHF+DZHsFUOetkgKfwFZbQm9MQdXp4oG5vj9Y
-	JmC8lh4CpKwRAfCMySeA7wFm6GaP3CZBPeRY8hhebPV/TexDYquDCaPk5xy8IKGWFTuBPL
-	JHOJG+xdY4gtnFjxEzEvQgjKi6SqWX512JRtzOoQHJs2RXamGr0RZg37ZT3bOg==
+	bh=wYh5/DOXlK3Zu21yc+XZNP6692NE6CVxLYbVNhxF1NU=;
+	b=hDOrUGUulrBEOgQGL3u/cF4Li6GmbbcvLmsd73TmBA3GQz4swD+P4B6IZue+v8BDpjeYF/
+	YefBd51oKWW+lvzdM+fftMk8fM05xzK7BqvzHqMkmm3eH0UgP9C1oD9i8odO8y4uH33zkA
+	48SP9bRmYpn6YRBYjbMt+xVH+PhCEXrhMQ30AlL8rJKeb4XDtZBQyyc66LJoIMdh12WNNX
+	z9Jiqss1cxFGmJAxsZUNmCippmFwcq5s+nbmTbbCtZ9t3Zic8U5/6oj17kB59cAXC21BMg
+	HPxOIMNIyCNJaVIOtbvZEoyzEegLWwoQ2kp9qbNcN0lrV3SaZQC3kax7cfRGlw==
 From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Brian Masney <bmasney@redhat.com>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
 Cc: Michael Turquette <mturquette@baylibre.com>,  Stephen Boyd
  <sboyd@kernel.org>,  Rob Herring <robh@kernel.org>,  Krzysztof Kozlowski
  <krzk+dt@kernel.org>,  Conor Dooley <conor+dt@kernel.org>,  Thomas
@@ -47,17 +47,16 @@ Cc: Michael Turquette <mturquette@baylibre.com>,  Stephen Boyd
   Pascal EBERHARD <pascal.eberhard@se.com>,  Wolfram Sang
  <wsa+renesas@sang-engineering.com>,  linux-clk@vger.kernel.org,
   devicetree@vger.kernel.org,  linux-kernel@vger.kernel.org,
-  linux-crypto@vger.kernel.org,  linux-renesas-soc@vger.kernel.org,
-  Chen-Yu Tsai <wenst@chromium.org>
-Subject: Re: [PATCH 06/16] clk: tests: Add clk_parse_clkspec() Kunit testing
-In-Reply-To: <acqNRVLrPxABvecZ@redhat.com> (Brian Masney's message of "Mon, 30
-	Mar 2026 10:48:37 -0400")
+  linux-crypto@vger.kernel.org,  linux-renesas-soc@vger.kernel.org,  Herve
+ Codina <herve.codina@bootlin.com>
+Subject: Re: [PATCH 00/16] Add support for Inside-Secure EIP-150 crypto block
+In-Reply-To: <CAMuHMdX23LQYFFzs9STykFVECb4uv1u3DmEMCh453GBK=4XbYQ@mail.gmail.com>
+	(Geert Uytterhoeven's message of "Mon, 30 Mar 2026 15:33:30 +0200")
 References: <20260327-schneider-v7-0-rc1-crypto-v1-0-5e6ff7853994@bootlin.com>
-	<20260327-schneider-v7-0-rc1-crypto-v1-6-5e6ff7853994@bootlin.com>
-	<acqNRVLrPxABvecZ@redhat.com>
+	<CAMuHMdX23LQYFFzs9STykFVECb4uv1u3DmEMCh453GBK=4XbYQ@mail.gmail.com>
 User-Agent: mu4e 1.12.7; emacs 30.2
-Date: Wed, 01 Apr 2026 10:59:20 +0200
-Message-ID: <87mrzn6opj.fsf@bootlin.com>
+Date: Wed, 01 Apr 2026 11:02:01 +0200
+Message-ID: <87h5pv6ol2.fsf@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -68,134 +67,41 @@ Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-Last-TLS-Session-Version: TLSv1.3
 
-Hi Brian,
+Hi Geert,
 
->> @@ -5312,6 +5312,7 @@ struct clk_hw *of_clk_get_hw(struct device_node *n=
-p, int index,
->>=20=20
->>  	return hw;
->>  }
->> +EXPORT_SYMBOL_GPL(of_clk_get_hw);
+On 30/03/2026 at 15:33:30 +02, Geert Uytterhoeven <geert@linux-m68k.org> wr=
+ote:
+
+> Hi Miquel,
 >
-> So that we don't unnecessarily broaden the API that's available to the
-> clk providers, you can use EXPORT_SYMBOL_IF_KUNIT so that this is only
-> available to the kunit tests.
-
-Ah, good idea.
-
-> Note that Chen-Yu posted a separate patch to add the includes for a
-> separate test. The two patches will conflict since Stephen hasn't picked
-> this up yet.
+> On Fri, 27 Mar 2026 at 21:10, Miquel Raynal (Schneider Electric)
+> <miquel.raynal@bootlin.com> wrote:
+>> This is a series adding support for the EIP-150, which is a crypto block
+>> containing:
+>> - a public key accelerator
+>> - a random number generator
+>> - an interrupt controller
 >
-> https://lore.kernel.org/linux-clk/20260225083413.3384950-1-wenst@chromium=
-.org/
-
-Thanks for the warning, I will synchronize with Chen-Yu.
-
->>  static struct clk *__of_clk_get(struct device_node *np,
->>  				int index, const char *dev_id,
->> diff --git a/drivers/clk/clk_test.c b/drivers/clk/clk_test.c
->> index a268d7b5d4cb..b814b45f1f7e 100644
->> --- a/drivers/clk/clk_test.c
->> +++ b/drivers/clk/clk_test.c
->> @@ -3541,10 +3541,134 @@ static struct kunit_suite clk_hw_get_dev_of_nod=
-e_test_suite =3D {
->>  	.test_cases =3D clk_hw_get_dev_of_node_test_cases,
->>  };
->>=20=20
->> +static const struct clk_init_data clk_parse_clkspec_1_init_data =3D {
->> +	.name =3D "clk_parse_clkspec_1",
->> +	.ops =3D &empty_clk_ops,
->> +};
->> +
->> +static const struct clk_init_data clk_parse_clkspec_2_init_data =3D {
->> +	.name =3D "clk_parse_clkspec_2",
->> +	.ops =3D &empty_clk_ops,
->> +};
->> +
->> +static struct clk_hw *kunit_clk_get(struct of_phandle_args *clkspec, vo=
-id *data)
->> +{
->> +	return (struct clk_hw *)data;
->> +}
->> +
->> +struct clk_parse_clkspec_ctx {
->> +	struct device_node *prov1_np;
->> +	struct device_node *prov2_np;
->> +	struct device_node *cons_np;
->> +};
->> +
->> +static int clk_parse_clkspec_init(struct kunit *test)
->> +{
->> +	struct clk_parse_clkspec_ctx *ctx;
->> +	struct clk_hw *hw1, *hw2;
->> +
->> +	ctx =3D kunit_kzalloc(test, sizeof(*ctx), GFP_KERNEL);
->> +	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, ctx);
->> +	test->priv =3D ctx;
->> +
->> +	KUNIT_ASSERT_EQ(test, 0, of_overlay_apply_kunit(test, kunit_clk_parse_=
-clkspec));
->> +
->> +	/* Register provider 1 */
->> +	hw1 =3D kunit_kzalloc(test, sizeof(*hw1), GFP_KERNEL);
->> +	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, hw1);
->> +	hw1->init =3D &clk_parse_clkspec_1_init_data;
->> +
->> +	ctx->prov1_np =3D of_find_compatible_node(NULL, NULL, "test,clock-prov=
-ider1");
->> +	KUNIT_ASSERT_NOT_NULL(test, ctx->prov1_np);
->> +
->> +	KUNIT_ASSERT_EQ(test, 0, of_clk_hw_register_kunit(test, ctx->prov1_np,=
- hw1));
->> +	of_clk_add_hw_provider(ctx->prov1_np, kunit_clk_get, hw1);
+> Thanks for your series!
 >
-> Can you just use of_clk_hw_simple_get() and drop kunit_clk_get()
-> above?
-
-I will try.
-
->> +	of_node_put(ctx->prov1_np);
->> +
->> +	/* Register provider 2 */
->> +	hw2 =3D kunit_kzalloc(test, sizeof(*hw2), GFP_KERNEL);
->> +	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, hw2);
->> +	hw2->init =3D &clk_parse_clkspec_2_init_data;
->> +
->> +	ctx->prov2_np =3D of_find_compatible_node(NULL, NULL, "test,clock-prov=
-ider2");
->> +	KUNIT_ASSERT_NOT_NULL(test, ctx->prov2_np);
->> +
->> +	KUNIT_ASSERT_EQ(test, 0, of_clk_hw_register_kunit(test, ctx->prov2_np,=
- hw2));
->> +	of_clk_add_hw_provider(ctx->prov2_np, kunit_clk_get, hw2);
->> +	of_node_put(ctx->prov2_np);
->> +
->> +	ctx->cons_np =3D of_find_compatible_node(NULL, NULL, "test,clock-consu=
-mer");
->> +	KUNIT_ASSERT_NOT_NULL(test, ctx->cons_np);
->> +
->> +	return 0;
->> +}
->> +
->> +static void clk_parse_clkspec_exit(struct kunit *test)
->> +{
->> +	struct clk_parse_clkspec_ctx *ctx =3D test->priv;
->> +
->> +	of_node_put(ctx->prov1_np);
->> +	of_node_put(ctx->prov2_np);
+>>       irqchip/eip201-aic: Add support for Safexcel EIP-201 AIC
+> [...]
+>>       crypto: eip28: Add support for SafeXcel EIP-28 Public Key Accelera=
+tor
 >
-> Is there a double free of prov1_np and prov2_np? If this is dropped from
-> the test exit, then they should't need to be in the ctx struct.
+> My OCD tells me to ask for using "SafeXcel" consistently,  ;-)
 
-These two calls increment the refcount on the node:
-- of_find_compatible_node()
-- of_clk_add_hw_provider()
+Ah, yeah :) I initially wrote "Safexcel" everywhere, and at some point I
+realized the marketing department had put a capital letter in the middle
+of the word. My anti kamel-case heart fought back, but not enough, ending
+up with a mix of both.
 
-However this makes me realize maybe I should call of_clk_del_provider()
-in the exit() function. In any case, I believe keeping a reference over
-the nodes during the test is correct and if there is an of_node_put()
-call to remove, it should be the on in the _init().
+> drivers/crypto/inside-secure/eip28.c: .name =3D "Safexcel EIP28 PKA",
+> drivers/irqchip/Kconfig:        tristate "Safexcel EIP201 AIC"
+> drivers/irqchip/Kconfig:   inside Safexcel EIP150 IPs, gathering
+> Public Key Accelerator
 
-Thanks for pointing this out!
+I'll address these.
+
+Thanks,
 Miqu=C3=A8l
