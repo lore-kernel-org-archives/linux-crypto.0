@@ -1,74 +1,56 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E62D3630B9;
-	Wed,  1 Apr 2026 20:18:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93E901EB19B;
+	Wed,  1 Apr 2026 20:32:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775074729; cv=none; b=KnRD5BCLDtcbYCx3abuYn527oK6iOKlauP5ZKpkFwvFfLsHBtsBwpXRoBlKZmQ2EJEkrwmEqCQpw9xzk+1kN2omdMNrIEDuc13It1SwGQQvlT8PeVpuAz5my91Syvcs2whmJ4+yRQVll0+S0Ubb8cl9rN8zyTdu1LekVxurd+F8=
+	t=1775075533; cv=none; b=nI7rqrN+Dony40ItERbWYEJSLP28VpBTRwUFb7hsgQtzQDYs91nQFHOKxvc+F0ThRpxyIYks9w1qhlagQwpmAJCUeEsXIJXiEbI4AdIKTuLqWQ5Pa/riRoSuD6uEmL7iimfERNjZfedalkt73uyMjCNxSyYkFrr9Sc7fJJEm9ls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775074729; c=relaxed/simple;
-	bh=QuFRnM3S5kd6qPOKy5HubX7OVOmossUj5JDjFTFx+Nk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QSSrKN2nAr1mlJE2RIwIAwk5D5At3POXTFTafitnVtQeh10JUbX5pgHriZV75mpsPtqb0EsRh2pIWfM0cURsQ57seR2SccwaNeQHOqS5RA48w73wpH27oOTOOWapPHuVWTp+yaofqR5pHe4u+8Op0n5V1VVdx8zVFVLkMjHkODs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lvkmYeXx; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1775075533; c=relaxed/simple;
+	bh=nYW5g1VvC9kM7IdnhRH0cccs40ZcgKrVNoGr3sp/v00=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References; b=cCvkT7Dx/4tm02XOohhC2Z9/XwKrRJ9XLYnivUA/KMj2FXYXgJpRUzEc5PfhOAKcgm45g9ukJeNt+y04W/4csoCS5y87pMySyVkrRCnAT+qGiImINbwIh3OubKBQLlThQMvG8J5AQaZJMNoOMFcV7VBi3Ol1sZu3BWyI5Gl/EZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KVTaksi5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lvkmYeXx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60A1AC116C6;
-	Wed,  1 Apr 2026 20:18:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KVTaksi5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48C86C4CEF7;
+	Wed,  1 Apr 2026 20:32:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775074728;
-	bh=QuFRnM3S5kd6qPOKy5HubX7OVOmossUj5JDjFTFx+Nk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lvkmYeXxF0QgMqshyCDLkNzXA/pUmC4ubmso8EWA8Zps6J+qSktZrcUYx09MKkzCX
-	 ZYe5a1tNbrccGFW/95Qqyxi4ugsCejCrn7cdGHsSjomxHC4nOrdol+EKZp6+niTHLi
-	 l33iMQneIK+IxygjNn32WnwJ+YY6xxrCjJJWlbORM2Nmd1jMSm5j+udxlBGTrF6hLB
-	 EoZH3jNO/4MAS+Gw7Gapl4Mg+4V54Ud9opqxKPStaLxeG8kX9zcqB/yQ3KuhjJY3Zh
-	 D0+oDbJqLLA5a/MYMpTZIDQI1ToHc3umDcmbEbbwVqWncnO7JZN6+BkxO+TBwyGhXP
-	 ORCI3nfP2I5Ig==
-Date: Wed, 1 Apr 2026 13:18:46 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, x86@kernel.org,
-	Nikunj A Dadhania <nikunj@amd.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH] lib/crypto: aesgcm: Don't disable IRQs during AES block
- encryption
-Message-ID: <20260401201846.GB2466@quark>
-References: <20260331024430.51755-1-ebiggers@kernel.org>
- <20260331050234.GA4451@sol>
- <1e04994d-4d82-48f4-8022-ea488d203653@app.fastmail.com>
- <20260331205511.GA2452@quark>
+	s=k20201202; t=1775075533;
+	bh=nYW5g1VvC9kM7IdnhRH0cccs40ZcgKrVNoGr3sp/v00=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=KVTaksi5fPbboDT950vmqdBszxdhgA1A5brMOIXrcq+DLA1aoxyQMreJzZwEW0MqG
+	 3nhpMieq2A/mc2uUYLlgY/+7VMyIvZsiaMIZ7vwGvwmEV5z7yX0iBVQFovBAQ6PGhl
+	 yJPwqpTUI2IkbLk/Rch1U1f4rgQ1SsKv65FUUKMU8XXf4klia46gskOSSLMRoRTOdC
+	 VPz8atsYBaHJN+6Fp7K628vhd0OP4t5p6UFMXSLhvduVKxDSpuR33rFWEhI343zDUb
+	 tXrZf77V8xdz42teYi5bjG33ee29bRIyKOFVAW6t3SOVt+1MWcbwRyaS8WEGMWrjmQ
+	 E5mb8Gzq4oT7g==
+Date: Wed, 01 Apr 2026 10:32:12 -1000
+Message-ID: <d689b6644895ab4ab0cec5e316db1022@kernel.org>
+From: Tejun Heo <tj@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: Lai Jiangshan <jiangshanlai@gmail.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ linux-kernel@vger.kernel.org, puranjay@kernel.org,
+ linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org,
+ Michael van der Westhuizen <rmikey@meta.com>,
+ kernel-team@meta.com, Chuck Lever <chuck.lever@oracle.com>
+Subject: Re: [PATCH v3 0/6] workqueue: Introduce a sharded cache affinity
+ scope
+In-Reply-To: <20260401-workqueue_sharded-v3-0-ab0b9336bf0b@debian.org>
+References: <20260401-workqueue_sharded-v3-0-ab0b9336bf0b@debian.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260331205511.GA2452@quark>
 
-On Tue, Mar 31, 2026 at 01:55:11PM -0700, Eric Biggers wrote:
-> > AIUI, if we drop the IRQ dis/enable from this code, the generic path
-> > will be taken during early boot, but later invocations will use the
-> > accelerated implementations once they become available, right?
-> 
-> Yes, that's correct.  The optimized code gets enabled by a
-> subsys_initcall.
+Hello,
 
-Also just to clarify, once the optimized crypto library code has been
-enabled by the initcalls, it applies to all later function calls.  So
-the library (e.g. the aesgcm_*() functions) doesn't have the problem
-that the traditional crypto API (e.g. crypto_aead) has where unoptimized
-code may continue to be used for an arbitrarily long time.
+Applied 1-6 to wq/for-7.1.
 
-Anyway, I'll plan to apply this patch.  But it would be interesting to
-hear from the x86 and SEV folks whether there is interest in making the
-early AES-GCM operations in snp_secure_tsc_prepare() use the AES-NI and
-PCLMULQDQ optimized code for better performance and side-channel
-resistance.
+Thanks.
 
-- Eric
+-- 
+tejun
