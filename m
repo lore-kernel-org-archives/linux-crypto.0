@@ -1,145 +1,107 @@
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DF1936BCCA
-	for <linux-crypto@vger.kernel.org>; Thu,  2 Apr 2026 17:08:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BC8931B803;
+	Thu,  2 Apr 2026 21:58:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775149725; cv=none; b=HBlgQ71/t3h9OSOP9E/ujIeUpg+K3XClLmGUK9/DTV/bQvpZeogIGvA0CblGHLCIHzQlrSGn/+kjIdPGiefeDMn+C2dDZRQCMjiOzDsvuLg9UHzce7Mci8jh2Svki8XuBxjBDWfi9Wso0vnxlzk9lL9hWWwZSzJkBfMo/Cf39aY=
+	t=1775167107; cv=none; b=k0KTnsXAl0U1zEWJXPFqqxg/0Ps3JXPapOn3I1EGDoeKTvF9US/PyIfdG+xpLI7tvChHd36X2Tl7BxvkXQId6eqjJ0CvRUFjBPnNvmh0R8aT2gMib5ftcekYMyYcmiA1YqUefTFMScCkjx1iMYXus6GRMr0nosElGxpPdOE0UK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775149725; c=relaxed/simple;
-	bh=fmYZLi1lImwg8+a9bcQBLsvrUdTVG73HXeUaVqgBOZU=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=RQvIULxMimOljxpQ92eeUJnzufkpRCZ5MKQNqXGxiZ7CfmDDgyiux1GUqx6Xm2r2w4pePApw+9f1gZ/txXdR/CrNxOQGN+u8EDNS1+RCm4TbggLXCc0C1Nh6FHowiwzt4fbql4M6DYYXFHEf0vLWBAhyg/ir6y/1rXQG+ZSfGDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q6t8e5Ah; arc=none smtp.client-ip=209.85.210.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1775167107; c=relaxed/simple;
+	bh=QvUc9vANqYsb1luDp8UYk1f8BqkeVaTMVXLV75eutnQ=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=DVJp2RZb27ELpuSXbKU4Hp/Y6oxtY4GVZi+hvh0cGpfFqwLi3iiECU8FkXW3LsP2E4BFa3lHd7gKiNOQi5H6gIaKO0hKHraIz2ZSgvjaY8pL8Nj3ueFJ33XzKXy8KKHzyLjplHoEp/PCfYJu8MKrJG/teYDsTZ/J1SYs3fWx0zQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KBJzCsq7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q6t8e5Ah"
-Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-7d7f09aa39fso1444369a34.0
-        for <linux-crypto@vger.kernel.org>; Thu, 02 Apr 2026 10:08:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1775149713; x=1775754513; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=anVZF/hO86rDuA0y2cSK6zli4sip6Rs95gAxI1zYy+s=;
-        b=Q6t8e5AhYXwJ4qU8U0xA18VYgYHogX1D7Roos7uvO5DrKTAbemFddYms28berdM17A
-         pIMTJeiNn/DzwI7VsFojM3TWM+Gu6ZZ/kgUrcwSf+sffBd9VhLDQBF27ABErCVwAdTDc
-         tJXhL/U4S9lAzaB+nCqC623pESCHZBfvMj+u8CCz8ffot0DWawBEN0X9fYOi+JUXK4Co
-         nw6X18adDdV3B3djWR7zhWNY5W7QjP3/KVh07WvAP+BavfLVptoZVqvJ2hppiZo5a06Z
-         2Rx6U66ggzpB9KFpdswoJH9sf+tBncCBkX5Ol+hSPKzzLmNUuK+1nMfqKkyZu+U1hHAx
-         U2HQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775149713; x=1775754513;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=anVZF/hO86rDuA0y2cSK6zli4sip6Rs95gAxI1zYy+s=;
-        b=s89MVQ6qbUxZgyOtL+HHyK+CnInnhRfg9JGWevEYqZM2lXtkb6Fu+MwbPOi/Xzj+44
-         dfllphGI9qsqlby/yW6zLH27grU4OayIHujvAwdExiqaGO0c4H8SGFX0o4eBejMOIOPe
-         rUtLvXoWNtVEghmNJ7LJ5pVml91emjGyKCdFH1hOo8Eo/uKpLl/OR6pfSDbwbA/CBlMu
-         uDQ5INH7eFpbTV8fKpX5b/Bw1BPZXfUWM2zk7IJ52jvGtzs6htujsE9c6G17B4ObqPRh
-         QFxldMsTAYUuSwbzh0lnBpHrvgIbndU1uJd7cuf/BFjJX+bdRgNfoCY+YW5l47jCXuGQ
-         iD5w==
-X-Gm-Message-State: AOJu0YxhFTFsqads2Y907ZkvgJ6wqBCMyIoFrhA/5zr9U5tipdCrf7KQ
-	DfMFjjY/9g1TCmb36+Oyj6LH+og7Ncz3TYtvjBGZhkz2lSUYMYL0ztWzGyawIzxq
-X-Gm-Gg: ATEYQzwOrdko/GqjpIaaobYvOvWck7AkjNijKt4F/JDpHDDFEofRk3JZcORns13crRQ
-	C1MrloZSK2E37PppZ9wUCPRKiUAq36KKFIhvf1uuUpxY7/43dMs5SY59f6KlhSKYz0FJ4WlW838
-	cQLTU9CMLiDF3RF4XjYtvW2ecm7dv6nBhUNV/H78lW9fqCrRAVJzRuEsAbhScew7aEqcslY1GZZ
-	8fbcpbkz3Gt2nVbR77aiX6DpUXfT2f9/5CQRn0xdMilHOOumrn8hXe2EiNnigkip7LVrUZ2NB0P
-	8S2xiprN49Gx3jBPKbvSeUsvW779PVI1Nx8artXc2TkMJTMQYzLiJJ+mSV6kcRisZkWUKgGcwdd
-	1d69/8dmqE705NbbBbAli96daOhEhzUBbt1h41raIirIlYyIwPtHPa1KfVeajpuO8vB31uwQ7BH
-	z/wheVuHEOq5t9ddKUMApMIONDhPK6Pax/JM2ovCVX5+8mcf2rqjUTNMg=
-X-Received: by 2002:a05:6830:621b:b0:7d1:9da9:c6c with SMTP id 46e09a7af769-7dbb70d044fmr87778a34.17.1775149712878;
-        Thu, 02 Apr 2026 10:08:32 -0700 (PDT)
-Received: from smtpclient.apple ([72.47.112.202])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7dbb40b1507sm427083a34.21.2026.04.02.10.08.30
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 02 Apr 2026 10:08:31 -0700 (PDT)
-Content-Type: text/plain;
-	charset=utf-8
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KBJzCsq7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76D96C116C6;
+	Thu,  2 Apr 2026 21:58:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775167106;
+	bh=QvUc9vANqYsb1luDp8UYk1f8BqkeVaTMVXLV75eutnQ=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References:From;
+	b=KBJzCsq7TNcgHpU+TWPAd3W8YuuJXdgpviR9Ow38UzYp/E+eDMYCQdUq5+04/Mnru
+	 vF8yruBgH9Kqoxj3RdUA00tDQnEgnr1qE7AXbmqG7qka9IVu/f1eZKTg86JWT+ETrn
+	 TjxI1jdECoYVYFvAydaPvhTr0DLyOkSNS0rHhfEWArmmkmeciwTpFwX+5aQHpstoUl
+	 foXfbAlUvknuR2UINHvJ3kK1f5ozCCWUSVy6PFFL3eEN4gpoDz+keSHvFP6Ep2zvPe
+	 Ej2doeiB7lotVTyVy6ov80wS5IsFWdnGSH4WR6z1XJ7lBV9TObDwXGWdYhpggyK3MT
+	 1b1VbHt8uneOw==
+Date: Thu, 2 Apr 2026 15:58:18 -0600 (MDT)
+From: Paul Walmsley <pjw@kernel.org>
+To: Yury Norov <ynorov@nvidia.com>
+cc: Andrew Morton <akpm@linux-foundation.org>, 
+    "David S. Miller" <davem@davemloft.net>, 
+    "Michael S. Tsirkin" <mst@redhat.com>, Theodore Ts'o <tytso@mit.edu>, 
+    Albert Ou <aou@eecs.berkeley.edu>, Alexander Duyck <alexanderduyck@fb.com>, 
+    Alexander Gordeev <agordeev@linux.ibm.com>, 
+    Alexander Viro <viro@zeniv.linux.org.uk>, 
+    Alexandra Winter <wintera@linux.ibm.com>, 
+    Andreas Dilger <adilger.kernel@dilger.ca>, 
+    Andrew Lunn <andrew+netdev@lunn.ch>, Anna Schumaker <anna@kernel.org>, 
+    Anton Yakovlev <anton.yakovlev@opensynergy.com>, 
+    Arnaldo Carvalho de Melo <acme@kernel.org>, 
+    Aswin Karuvally <aswin@linux.ibm.com>, Borislav Petkov <bp@alien8.de>, 
+    Carlos Maiolino <cem@kernel.org>, 
+    Catalin Marinas <catalin.marinas@arm.com>, Chao Yu <chao@kernel.org>, 
+    Christian Borntraeger <borntraeger@linux.ibm.com>, 
+    Christian Brauner <brauner@kernel.org>, 
+    Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+    Dave Hansen <dave.hansen@linux.intel.com>, 
+    David Airlie <airlied@gmail.com>, 
+    Dominique Martinet <asmadeus@codewreck.org>, 
+    Dongsheng Yang <dongsheng.yang@linux.dev>, 
+    Eric Dumazet <edumazet@google.com>, 
+    Eric Van Hensbergen <ericvh@kernel.org>, 
+    Heiko Carstens <hca@linux.ibm.com>, 
+    Herbert Xu <herbert@gondor.apana.org.au>, Ingo Molnar <mingo@redhat.com>, 
+    Jaegeuk Kim <jaegeuk@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+    Jani Nikula <jani.nikula@linux.intel.com>, 
+    Janosch Frank <frankja@linux.ibm.com>, Jaroslav Kysela <perex@perex.cz>, 
+    Jens Axboe <axboe@kernel.dk>, 
+    Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, 
+    Latchesar Ionkov <lucho@ionkov.net>, Linus Walleij <linusw@kernel.org>, 
+    Madhavan Srinivasan <maddy@linux.ibm.com>, Mark Brown <broonie@kernel.org>, 
+    Michael Ellerman <mpe@ellerman.id.au>, Miklos Szeredi <miklos@szeredi.hu>, 
+    Namhyung Kim <namhyung@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
+    Paolo Abeni <pabeni@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+    Paul Walmsley <pjw@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
+    Rodrigo Vivi <rodrigo.vivi@intel.com>, 
+    Sean Christopherson <seanjc@google.com>, Simona Vetter <simona@ffwll.ch>, 
+    Takashi Iwai <tiwai@suse.com>, Thomas Gleixner <tglx@kernel.org>, 
+    Trond Myklebust <trondmy@kernel.org>, 
+    Tvrtko Ursulin <tursulin@ursulin.net>, Vasily Gorbik <gor@linux.ibm.com>, 
+    Will Deacon <will@kernel.org>, Yury Norov <yury.norov@gmail.com>, 
+    Zheng Gu <cengku@gmail.com>, linux-kernel@vger.kernel.org, x86@kernel.org, 
+    linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org, 
+    linux-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+    linux-s390@vger.kernel.org, linux-block@vger.kernel.org, 
+    intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
+    dm-devel@lists.linux.dev, netdev@vger.kernel.org, 
+    linux-spi@vger.kernel.org, linux-ext4@vger.kernel.org, 
+    linux-f2fs-devel@lists.sourceforge.net, linux-fsdevel@vger.kernel.org, 
+    linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org, 
+    linux-crypto@vger.kernel.org, linux-mm@kvack.org, 
+    linux-perf-users@vger.kernel.org, v9fs@lists.linux.dev, 
+    virtualization@lists.linux.dev, linux-sound@vger.kernel.org
+Subject: Re: [PATCH 8/8] arch: use rest_of_page() macro where appropriate
+In-Reply-To: <20260304012717.201797-9-ynorov@nvidia.com>
+Message-ID: <ee15482d-22a8-9686-ba64-d216b25d8e68@kernel.org>
+References: <20260304012717.201797-1-ynorov@nvidia.com> <20260304012717.201797-9-ynorov@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81.1.4\))
-Subject: Re: Kernel ML-KEM implementation plans
-From: Ryan Appel <ryan.appel.333@gmail.com>
-In-Reply-To: <20260331011133.GB5190@sol>
-Date: Thu, 2 Apr 2026 12:08:17 -0500
-Cc: linux-crypto@vger.kernel.org,
- wireguard@lists.zx2c4.com,
- "Jason A. Donenfeld" <Jason@zx2c4.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <8721F1CE-0E84-4A2B-816F-0A4485BA808E@gmail.com>
-References: <20260331001358.GA5190@sol>
- <7507DE2E-1507-4D03-B6EF-9C139BBF34F8@gmail.com> <20260331011133.GB5190@sol>
-To: Eric Biggers <ebiggers@kernel.org>
-X-Mailer: Apple Mail (2.3826.700.81.1.4)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 
-Another potential and likely use case is Wi-Fi.=20
+On Tue, 3 Mar 2026, Yury Norov wrote:
 
-WPA3 supports both SAE-PK (which currently uses ECDSA-P256 and will =
-likely migrate to ML-DSA or other,
-And WPA3 enterprise supports EAP, which uses the IKE Diffie-Hellman =
-groups, which already have added support for (pending finalization) =
-ML-KEM groups.
+> Switch arch code to using the macro. No functional changes intended.
+> 
+> Signed-off-by: Yury Norov <ynorov@nvidia.com>
 
-Of course the spec will have to be updated, but it=E2=80=99s highly =
-likely that at least ML-KEM-512 will be supported.=20
-
-The actual use of the algorithm is as simple as calling it instead of =
-ECDH, but in theory, we typically care very much about the difference =
-between key agreement and key exchange.=20
-
-The major difference on a code front is that with ECDH, you input a =
-public and private key, and get out a shared key.
-But with ML-KEM, you input a public key, and get out a shared key, and a =
-cipher text.
-Or you input a private key and a cipher text and get out the same shared =
-key.
-
-(Encapsulation -> one input, two outputs)
-(Decapsulation -> two inputs, one output)
-
-I understand that there is a chicken and egg scenario where there=E2=80=99=
-s need to wait for the need before developing, but something at least to =
-consider for the roadmap.
+Acked-by: Paul Walmsley <pjw@kernel.org> # arch/riscv
 
 
-> On Mar 30, 2026, at 8:11=E2=80=AFPM, Eric Biggers =
-<ebiggers@kernel.org> wrote:
->=20
-> On Mon, Mar 30, 2026 at 07:44:55PM -0500, Ryan Appel wrote:
->> WireGuard was my big implementation user.
->=20
-> Any more details on this?  Googling for research papers shows that =
-there
-> have indeed been several proposals for quantum-resistant WireGuard.  =
-But
-> some use algorithms other than ML-KEM.  Others don't modify the kernel
-> code but rather do the key establishment in userspace.  I haven't =
-looked
-> into the details, but it also sounds like it's not as simple as =
-swapping
-> out the algorithm, either.
->=20
-> I think step 1 is work out some plan with the WireGuard folks.  Which
-> may or may not turn out to involve in-kernel ML-KEM.
->=20
->> I also know that VMware uses the kernel crypto space for many of its
->> crypto operations.  I do not know when they will want ML-KEM and if
->> they will want it only within BoringCrypto or OpenSSL, but if there =
-is
->> need for it in the market before it can be developed then that makes
->> sense.
->=20
-> That code isn't upstream though, right?  So even if hypothetically =
-they
-> (will?) need ML-KEM in the kernel (for what?), that doesn't count for
-> upstream purposes.
->=20
-> - Eric
-
+- Paul
