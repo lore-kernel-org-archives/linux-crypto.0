@@ -1,128 +1,197 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 076903C1419
-	for <linux-crypto@vger.kernel.org>; Thu,  2 Apr 2026 08:52:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD7E53E3DAB;
+	Thu,  2 Apr 2026 12:44:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775119960; cv=none; b=SzI3wDNDQjLfSVx5ZZWjE0HP5tfuTkkTij/Rp0TaXwbmB+uRZ9DT01dy4KnLjmnJ8V9xQjxPq6zOmx/xNXvoJq0s2qGgi2yGcUGmnxofd4ehnI7em3iPV7Zo7CgFeFaXY4R69Ncvom9JovuWBciS8Mk18NQZYXovnx4+z3eEjY4=
+	t=1775133852; cv=none; b=g5O8MqP6IgV3JYSGzJzKDlFMVR+AlMsCBHOm3Xc0wBDeQ9OruPk0nYMkuj06WCMgCLHl3U0t6oD5ZXaAoqDutXsvmxJ5+YtsIT8Mt8uOozWKSq/AuqW3eNwTl7/VVszFSppWf9CGRSjeGZ9ccFY+5WX6Nr/8CWdm57X66n/qxqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775119960; c=relaxed/simple;
-	bh=aFk5VIQZLPLBAhuZ3QT5cJKl7kQu65ln885pZk6irZw=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=GQ64dLr9w/E7ewlHzLBjfc8xt+8QPqmR8rGvHDuQkV7p4Er8M4dKSLbyh5rokgTl0B2sjHkJeYSZVUBPJ8M6frWjDuKFXHQKBW8YMG6Wy47v9eNiDwsCh3Wr5fvisTJu/aQfdIgFpfJ/YbLATRjBomgZeAd+RZKsh8hVkRUvEko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dlgXU84Y; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dlgXU84Y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 631EDC116C6;
-	Thu,  2 Apr 2026 08:52:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775119959;
-	bh=aFk5VIQZLPLBAhuZ3QT5cJKl7kQu65ln885pZk6irZw=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=dlgXU84YMpPtmX8D0M3SxY1GpJzaY0VW0KSI4sQMyjwSDWvpV7321hiG3SNCa3l0n
-	 pANn2ztGup9LuOUV5j1y/SZsE9/gcX19TxFi1yLiYIOYR8KK6CkcnH6iR4CfzYNfxN
-	 w+NG884KJioS3bdaDJdalUUdkPUggf2KG60syQ6Ol/b37GA4wq1WC3iMFIqvNnt5zZ
-	 8KtidtbV+81Iq8OgW2b/7ZuP72rkOIlpgTXxnpdQzQhBOMxCQzysiKjrIIkq3Z2eu1
-	 +Dp8IEbfGG7cZp5RRYmR1++/bFVdy+yeonLfibLs4QprdkToVJNUNA9H+oucs6SYj/
-	 phMb9GjvuMkJQ==
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 57641F40068;
-	Thu,  2 Apr 2026 04:52:38 -0400 (EDT)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-01.internal (MEProxy); Thu, 02 Apr 2026 04:52:38 -0400
-X-ME-Sender: <xms:Vi7OaXUOX3OR_q7wadGFI1HLHaJzOwizJRERy8ZkEJL_2TNjGlXewg>
-    <xme:Vi7OaaYZ4SvwBB4T22fbmuWMtzBO5fUcBUCJeGDOq2Jh_1ROdxeJRW0vewYyipr0F
-    yXII37AoYXxY4XoF7_C7EjlI-D9lNscukdwZnM6aqswFTiyjlNncF0>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdehheelucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceurghi
-    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
-    epofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrugcuuehi
-    vghshhgvuhhvvghlfdcuoegrrhgusgeskhgvrhhnvghlrdhorhhgqeenucggtffrrghtth
-    gvrhhnpedvueehiedtvedtleekuddutefgffdtleetfeetveejveejieehfefhjeeijeef
-    udenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrh
-    guodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduieejtdehtddtjeelqdef
-    fedvudeigeduhedqrghruggspeepkhgvrhhnvghlrdhorhhgseifohhrkhhofhgrrhgurd
-    gtohhmpdhnsggprhgtphhtthhopeegpdhmohguvgepshhmthhpohhuthdprhgtphhtthho
-    peguvghmhigrnhhshhesghhmrghilhdrtghomhdprhgtphhtthhopegvsghighhgvghrsh
-    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqrghrmhdqkhgvrhhnvghl
-    sehlihhsthhsrdhinhhfrhgruggvrggurdhorhhgpdhrtghpthhtoheplhhinhhugidqtg
-    hrhihpthhosehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:Vi7OaUe3WJ63jWQWN4NFvDE7BXPfsjmVn4PoZK8oD2Ad3k5S1_6dCQ>
-    <xmx:Vi7OaRohevZo5IBjUi_wRhdj-MyfLQLXeniIqLsZ_rhTaaHwmuUWIA>
-    <xmx:Vi7OaZCHoEPwDm8x9wTlSoL_EhdC1AV9GpZg3JTm_qjhqRzW2SROsg>
-    <xmx:Vi7Oaeb-Efn41mnbbupW8mznN12y6zWqXFAVBk9XwlxM2Wre8q1lOg>
-    <xmx:Vi7Oac6-xkrIjQhSXf-JxgEz6ixwwTBrg-ldLiSRH2MkcQDyMUxT8QuV>
-Feedback-ID: ice86485a:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 33D0D700065; Thu,  2 Apr 2026 04:52:38 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1775133852; c=relaxed/simple;
+	bh=fxj56lluS0uKTzYojwNmJa9pafLEkTEI4H7SzhdcBic=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dnTa5RxlSUxiQCftuIeIr3AyfC64shXuXSMyXbQkSzAEWuNNVEZxk8/RXvBrcSk7WBTGaKVJA35LghVGigwMmaH1GkZkSXKodkpmlZRWyrQKnqmYLT8XZSjKIBajrHcEvYIDEQBfEUgJKr0f1bn1+LxSvBP/hutPf2m1kF4nsNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1w8HOm-000000004C2-42Qe;
+	Thu, 02 Apr 2026 12:43:49 +0000
+Date: Thu, 2 Apr 2026 13:43:45 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Sean Wang <sean.wang@mediatek.com>, linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH v2 1/2] dt-bindings: rng: mtk-rng: add SMC-based TRNG
+ variants
+Message-ID: <ac5kgYh6Jbv4SSz4@makrotopia.org>
+References: <0a951e34b7030e514091d6c0922c5982ae349221.1775090165.git.daniel@makrotopia.org>
+ <20260402-towering-transparent-malamute-1e44b8@quoll>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AfnkVD7BdAFw
-Date: Thu, 02 Apr 2026 10:52:17 +0200
-From: "Ard Biesheuvel" <ardb@kernel.org>
-To: "Eric Biggers" <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- "Demian Shulhan" <demyansh@gmail.com>
-Message-Id: <dc424b4a-11b5-475f-a53a-987b5813bac5@app.fastmail.com>
-In-Reply-To: <20260401195943.GA2466@quark>
-References: <20260330144630.33026-7-ardb@kernel.org>
- <20260401195943.GA2466@quark>
-Subject: Re: [PATCH 0/5] crc64: Tweak intrinsics code and enable it for ARM
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260402-towering-transparent-malamute-1e44b8@quoll>
 
+On Thu, Apr 02, 2026 at 09:57:59AM +0200, Krzysztof Kozlowski wrote:
+> On Thu, Apr 02, 2026 at 01:37:02AM +0100, Daniel Golle wrote:
+> > Add compatible strings for MediaTek SoCs where the hardware random number
+> > generator is accessed via a vendor-defined Secure Monitor Call (SMC)
+> > rather than direct MMIO register access:
+> > 
+> >   - mediatek,mt7981-rng
+> >   - mediatek,mt7987-rng
+> >   - mediatek,mt7988-rng
+> > 
+> > These variants require no reg, clocks, or clock-names properties since
+> > the RNG hardware is managed by ARM Trusted Firmware-A.
+> > 
+> > Relax the $nodename pattern to also allow 'rng' in addition to the
+> > existing 'rng@...' pattern.
+> > 
+> > Add a second example showing the minimal SMC variant binding.
+> > 
+> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> > ---
+> > v2: express compatibilities with fallback
+> > 
+> >  .../devicetree/bindings/rng/mtk-rng.yaml      | 28 ++++++++++++++++---
+> >  1 file changed, 24 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/Documentation/devicetree/bindings/rng/mtk-rng.yaml b/Documentation/devicetree/bindings/rng/mtk-rng.yaml
+> > index 7e8dc62e5d3a6..34648b53d14c6 100644
+> > --- a/Documentation/devicetree/bindings/rng/mtk-rng.yaml
+> > +++ b/Documentation/devicetree/bindings/rng/mtk-rng.yaml
+> > @@ -11,12 +11,13 @@ maintainers:
+> >  
+> >  properties:
+> >    $nodename:
+> > -    pattern: "^rng@[0-9a-f]+$"
+> > +    pattern: "^rng(@[0-9a-f]+)?$"
+> >  
+> >    compatible:
+> >      oneOf:
+> >        - enum:
+> >            - mediatek,mt7623-rng
+> > +          - mediatek,mt7981-rng
+> >        - items:
+> >            - enum:
+> >                - mediatek,mt7622-rng
+> > @@ -25,6 +26,11 @@ properties:
+> >                - mediatek,mt8365-rng
+> >                - mediatek,mt8516-rng
+> >            - const: mediatek,mt7623-rng
+> > +      - items:
+> > +          - enum:
+> > +              - mediatek,mt7987-rng
+> > +              - mediatek,mt7988-rng
+> > +          - const: mediatek,mt7981-rng
+> >  
+> >    reg:
+> >      maxItems: 1
+> > @@ -38,9 +44,19 @@ properties:
+> >  
+> >  required:
+> >    - compatible
+> > -  - reg
+> > -  - clocks
+> > -  - clock-names
+> > +
+> > +allOf:
+> > +  - if:
+> > +      properties:
+> > +        compatible:
+> > +          not:
+> 
+> As requested last time - drop
+> 
+> > +            contains:
+> > +              const: mediatek,mt7981-rng
+> > +    then:
+> 
+> missing constraints for mediatek,mt7981-rng. So does it have IO space
+> and clocks or not?
 
-On Wed, 1 Apr 2026, at 21:59, Eric Biggers wrote:
-> On Mon, Mar 30, 2026 at 04:46:31PM +0200, Ard Biesheuvel wrote:
->> Apply some tweaks to the new arm64 crc64 NEON intrinsics code, and wire
->> it up for the 32-bit ARM build. Note that true 32-bit ARM CPUs usually
->> don't implement the prerequisite 64x64 PMULL instructions, but 32-bit
->> kernels are commonly used on 64-bit capable hardware too, which do
->> implement the 32-bit versions of the crypto instructions if they are
->> implemented for the 64-bit ISA (as per the architecture).
->> 
->> Cc: Demian Shulhan <demyansh@gmail.com>
->> Cc: Eric Biggers <ebiggers@kernel.org>
->> 
->> Ard Biesheuvel (5):
->>   lib/crc: arm64: Drop unnecessary chunking logic from crc64
->>   lib/crc: arm64: Use existing macros for kernel-mode FPU cflags
->>   ARM: Add a neon-intrinsics.h header like on arm64
->>   lib/crc: arm64: Simplify intrinsics implementation
->>   lib/crc: arm: Enable arm64's NEON intrinsics implementation of crc64
->
-> I think patches 3 and 4 should be swapped, so it's cleanups first (which
-> make sense regardless of the 32-bit ARM support) and then the 32-bit ARM
-> support.
->
+The firmware variant which has the RNG under the control of TF-A and
+requires Linux to use SMC to access it implies that Linux should not
+touch the clk and cannot access the IO space (which is accessible from
+secure-land only in this case).
 
-Ok.
+Do you think something like the hunk below would properly express that?
 
-> I do think we should be aware that even with the code mostly shared
-> using the NEON intrinsics, the 32-bit ARM support (which works only on
-> CPUs that support PMULL, i.e. are also 64-bit capable) doesn't come for
-> free.  We should expect to deal with occasional issues related to the
-> intrinsics with certain compiler versions, compiler flags, etc.
->
-> I assume that "32-bit kernels on ARMv8 CPUs" is currently still a big
-> enough niche to bother with this, despite that niche getting smaller
-> over time.
+@@ -38,9 +44,23 @@ properties:
+ 
+ required:
+   - compatible
+-  - reg
+-  - clocks
+-  - clock-names
++
++allOf:
++  - if:
++      properties:
++        compatible:
++          contains:
++            const: mediatek,mt7981-rng
++    then:
++      properties:
++        reg: false
++        clocks: false
++        clock-names: false
++    else:
++      required:
++        - reg
++        - clocks
++        - clock-names
+ 
+ additionalProperties: false
+ 
 
-Running a 32-bit kernel on 64-bit capable hardware is usually done to reduce the RAM footprint, and that problem hasn't gotten any smaller lately. And 20x speedup is rather significant.
+> 
+> > +      required:
+> > +        - reg
+> > +        - clocks
+> > +        - clock-names
+> >  
+> >  additionalProperties: false
+> >  
+> > @@ -53,3 +69,7 @@ examples:
+> >              clocks = <&infracfg CLK_INFRA_TRNG>;
+> >              clock-names = "rng";
+> >      };
+> > +  - |
+> > +    rng {
+> > +            compatible = "mediatek,mt7981-rng";
+> 
+> No improvements.
+> 
+> Also, make the example complete since binding claims you have clocks and
+> reg.
 
->  But as I mentioned I do think we should try to simplify it
-> as much as possible, e.g. by supporting little-endian only and avoiding
-> #ifdefs based on things like the compiler whenever possible.
->
+So clocks and reg have to be prohibited, not just allowed to be absent,
+right?
 
-Sure. The only reason I think this is worth the effort is because the same code can be used on ARM and arm64, so once this is no longer the case, I don't think we should bother.
+> 
+> I am not sure it should be even same file, but if you are making it same
+> file, then make it correct.
 
-So it makes sense to apply this reasoning to little endian as well - arm64 supports it so we can support in on ARM too.
-
-
+It's the same hardware. In case of the MT7986 SoC MediaTek has even switched
+from requiring the mediatek,mt7623-rng driver implementation to have the TRNG
+controlled by TF-A in newer firmware, see driver implementation
+auto-detecting this as a work-around...
