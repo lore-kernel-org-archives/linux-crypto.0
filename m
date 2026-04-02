@@ -1,181 +1,128 @@
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657AE396593
-	for <linux-crypto@vger.kernel.org>; Thu,  2 Apr 2026 08:00:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.170
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775116852; cv=pass; b=ktaD/2kbod65Pit3Vy0Woo9m54RXUx1Rprcx7Fuk0UuWGuIlAe6K26yCBGzFYkXGR2ebgLAwcP5wi5OdkF+e3+j87fwM9H82XyupyS3ODyontpBJyQ2FHS8KlImKtU7fEMxUACRy75E2DB5JU2NJJz96ukZrnQAA+W5fo2Kr5iI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775116852; c=relaxed/simple;
-	bh=rr3SsXqnFSAqPX9BzB2mxQCJl5MZOQv2jjKjpfB46DY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cksPHls6QkHO6A73X5YJxftAT7egqC+tqawgZ2BN/6CXFJU6Q5O6LBlVdo3KHSV0x0qczajz2AGl3/zR1mpPlHcqEEXg2h8hOV7oogiwJECLz3uXds4Ldug+9jYefrd77Jpl+u1z67bwH1Fml/oBAPc00XKqYtmccdo0BfjoFrA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=ggFTvU6w; arc=pass smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 076903C1419
+	for <linux-crypto@vger.kernel.org>; Thu,  2 Apr 2026 08:52:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775119960; cv=none; b=SzI3wDNDQjLfSVx5ZZWjE0HP5tfuTkkTij/Rp0TaXwbmB+uRZ9DT01dy4KnLjmnJ8V9xQjxPq6zOmx/xNXvoJq0s2qGgi2yGcUGmnxofd4ehnI7em3iPV7Zo7CgFeFaXY4R69Ncvom9JovuWBciS8Mk18NQZYXovnx4+z3eEjY4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775119960; c=relaxed/simple;
+	bh=aFk5VIQZLPLBAhuZ3QT5cJKl7kQu65ln885pZk6irZw=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=GQ64dLr9w/E7ewlHzLBjfc8xt+8QPqmR8rGvHDuQkV7p4Er8M4dKSLbyh5rokgTl0B2sjHkJeYSZVUBPJ8M6frWjDuKFXHQKBW8YMG6Wy47v9eNiDwsCh3Wr5fvisTJu/aQfdIgFpfJ/YbLATRjBomgZeAd+RZKsh8hVkRUvEko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dlgXU84Y; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="ggFTvU6w"
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-506a747448dso5115801cf.0
-        for <linux-crypto@vger.kernel.org>; Thu, 02 Apr 2026 01:00:48 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775116848; cv=none;
-        d=google.com; s=arc-20240605;
-        b=XJo2vgo7SvYGMceggseiXyuZJ9Br/jIMe8fUS97i1mzoEj0Iago6vtzEKyJPur34Wg
-         yYbwhYgyeewPHOaX1LcTdSNLRsC7udwv/b2kRucNn5jR+UKUzphwgfMX4RRhLkDy43Xo
-         hHJrezUGyEkg4VVk2/IEOuz/RAvWgJ0VzB2q6FUW64923Wpi3wYh4VHstc4e2LY97bpD
-         UV9Pr22egaOt6Uuiv7iDouVJjrwQtLPJ+Qy1m/7M1aAoWnrCA+JWbe6C6HcISrKIlo3L
-         5Ix4IuvQNnV+MreTzvn3BMyJqzMHjIlM0QLXxUkWTX4x3mmd8peXsrsA0OvQn9LA7gud
-         MDiA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=4ZApBiaYJIfo0LmQu+lhhcdVUEe5rNYCCRSxXFzn05Q=;
-        fh=RIaseGxQFyc4BaNbPfLN0YMYNmMpnfffvXGYEP5tTL0=;
-        b=hdiWzchJySiN/eDvi1g47EKC0Ov9oyqknJVh/Oc4znNgymCZuLrbhp/NkRJ4UnKwVD
-         cSmIRBFMpLmLiE0YVAf4T/Po/SD3449g3Mk0AuB7X+qtywMT3wfM9zqbrGOfBB/tQNc8
-         1qLyteInUTjq0PfS2GfmcHZnjdzwg149VaIq3rLZgZeb9wNdoVWjPEoFhjZxNQZv+tnh
-         RxaptWUZ6vofoi0gDiXbtIgCUsqeG/b4sV+0Q2uHaog2N3mvXr5L/NxNkmi1sKcmayrY
-         qbD9iz5HLEKl38eeATmJD1L2GuW5Srmm2TaBwTA9CBHII88Hw7hP8+bu6WZwyx7ab/U2
-         wfmA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1775116848; x=1775721648; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4ZApBiaYJIfo0LmQu+lhhcdVUEe5rNYCCRSxXFzn05Q=;
-        b=ggFTvU6wmh+zgn/z4DCHrVO996bmTWBVZtRtKiR5GW5kS785eWXHfpPnXuA8wjyQxs
-         81JHp8qwpSauL92YYUhHZHg/TLBScUlrBu9/cw42eX0RuUumCWQVsRUg/COVJtAL+lMj
-         ZFQ81CkJf7PDnD5kP8+kt76/4C+BFZdOJLCu8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775116848; x=1775721648;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=4ZApBiaYJIfo0LmQu+lhhcdVUEe5rNYCCRSxXFzn05Q=;
-        b=NTjlPNTkOPCzbzb//Gt3J86fhEKJMiuIYy87qF+3ytFk/p2p9PfGcyyXh8YBDmHm93
-         Dyzj1uto4zb1cT0PgWMlcYx/iJvJywbL4bUDbcZwVpCaJZxvTjvpoG/mFE1VZao9U9T5
-         fd20QIpYf2PEpiel8oj2aUFZJzBN2ZV8MjIiMxggZYfsKTTmdFju672qymaBRVdyvOW5
-         o3tNu2W7SBsxbuQSLlNGlF7mzaQmxAbEIhrdfimQg7TsKmSBQTo2S0rGYpk+KQq8GNe5
-         FUFHawQhbfsqNtCNc7ERPmb8pa/E3ZWFn/Sy5gW/7tscDArWZGFFFTEf0/0wmbYYc6kd
-         dXMw==
-X-Gm-Message-State: AOJu0YzNC6ZMSI6XUjFBXyhnsOnX0j8DX2eX340XplsNZq3ojIhAcjW9
-	7171oeK+WLRNa3TZC1uV34pBg1Il496Hs9QlxXtURKQrzJamwbE0AxLm5Sw9Tm6ANxJssJxb3nR
-	IUxH8+lVmJc/+6CVt09KZfg+6ssLs4H6DcrZjR0f4uw==
-X-Gm-Gg: ATEYQzzJkSY4bC8rHqa7WUqt2vBc8q+H8RErTqhsHykbvdFhLw3G415vNbZS8GoMaqH
-	Z+9RqZ9pCUbavj0LGss4eWTRGiyikRdjvIRSAvwfeSiv6UP0dBzvdLI87Wb9EMIwnYnMs2RQhGL
-	yN4AYQwZ0v5FQp2a7R7qlAAEK/7e+V5Q/xv4j3lBHMfZdP2Ape67L/msoHdO7xVOPDjtbzBYmwJ
-	caHki8cnP+CNxhEYYHKWGWG7/vJ3yHeSl1WPlewxqi8JsREmpOYLRro0Z6l/Q+480H5qD/jyr8d
-	329W4gv9bPqKzylNSXYxd2ciDYNttLkH1LQqwi0LeXw5Ci9ndDXrTvE7Sb4v3yCqBim7AFgF0pj
-	bLo6M1kzBH+ibPlna4sK7zt1jKBc5w+Vz+EpsrtR/yu+UYXJ9npc2XjTLInoBQrMOkEzI
-X-Received: by 2002:ac8:5e10:0:b0:50b:31ad:32a2 with SMTP id
- d75a77b69052e-50d3bd5dd9dmr89661801cf.65.1775116847867; Thu, 02 Apr 2026
- 01:00:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dlgXU84Y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 631EDC116C6;
+	Thu,  2 Apr 2026 08:52:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775119959;
+	bh=aFk5VIQZLPLBAhuZ3QT5cJKl7kQu65ln885pZk6irZw=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=dlgXU84YMpPtmX8D0M3SxY1GpJzaY0VW0KSI4sQMyjwSDWvpV7321hiG3SNCa3l0n
+	 pANn2ztGup9LuOUV5j1y/SZsE9/gcX19TxFi1yLiYIOYR8KK6CkcnH6iR4CfzYNfxN
+	 w+NG884KJioS3bdaDJdalUUdkPUggf2KG60syQ6Ol/b37GA4wq1WC3iMFIqvNnt5zZ
+	 8KtidtbV+81Iq8OgW2b/7ZuP72rkOIlpgTXxnpdQzQhBOMxCQzysiKjrIIkq3Z2eu1
+	 +Dp8IEbfGG7cZp5RRYmR1++/bFVdy+yeonLfibLs4QprdkToVJNUNA9H+oucs6SYj/
+	 phMb9GjvuMkJQ==
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 57641F40068;
+	Thu,  2 Apr 2026 04:52:38 -0400 (EDT)
+Received: from phl-imap-02 ([10.202.2.81])
+  by phl-compute-01.internal (MEProxy); Thu, 02 Apr 2026 04:52:38 -0400
+X-ME-Sender: <xms:Vi7OaXUOX3OR_q7wadGFI1HLHaJzOwizJRERy8ZkEJL_2TNjGlXewg>
+    <xme:Vi7OaaYZ4SvwBB4T22fbmuWMtzBO5fUcBUCJeGDOq2Jh_1ROdxeJRW0vewYyipr0F
+    yXII37AoYXxY4XoF7_C7EjlI-D9lNscukdwZnM6aqswFTiyjlNncF0>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdehheelucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceurghi
+    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
+    epofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedftehrugcuuehi
+    vghshhgvuhhvvghlfdcuoegrrhgusgeskhgvrhhnvghlrdhorhhgqeenucggtffrrghtth
+    gvrhhnpedvueehiedtvedtleekuddutefgffdtleetfeetveejveejieehfefhjeeijeef
+    udenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrh
+    guodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduieejtdehtddtjeelqdef
+    fedvudeigeduhedqrghruggspeepkhgvrhhnvghlrdhorhhgseifohhrkhhofhgrrhgurd
+    gtohhmpdhnsggprhgtphhtthhopeegpdhmohguvgepshhmthhpohhuthdprhgtphhtthho
+    peguvghmhigrnhhshhesghhmrghilhdrtghomhdprhgtphhtthhopegvsghighhgvghrsh
+    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqrghrmhdqkhgvrhhnvghl
+    sehlihhsthhsrdhinhhfrhgruggvrggurdhorhhgpdhrtghpthhtoheplhhinhhugidqtg
+    hrhihpthhosehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:Vi7OaUe3WJ63jWQWN4NFvDE7BXPfsjmVn4PoZK8oD2Ad3k5S1_6dCQ>
+    <xmx:Vi7OaRohevZo5IBjUi_wRhdj-MyfLQLXeniIqLsZ_rhTaaHwmuUWIA>
+    <xmx:Vi7OaZCHoEPwDm8x9wTlSoL_EhdC1AV9GpZg3JTm_qjhqRzW2SROsg>
+    <xmx:Vi7Oaeb-Efn41mnbbupW8mznN12y6zWqXFAVBk9XwlxM2Wre8q1lOg>
+    <xmx:Vi7Oac6-xkrIjQhSXf-JxgEz6ixwwTBrg-ldLiSRH2MkcQDyMUxT8QuV>
+Feedback-ID: ice86485a:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 33D0D700065; Thu,  2 Apr 2026 04:52:38 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260318071808.817074-1-pavitrakumarm@vayavyalabs.com>
- <20260318071808.817074-3-pavitrakumarm@vayavyalabs.com> <acZL65nbtfMCPHhq@gondor.apana.org.au>
-In-Reply-To: <acZL65nbtfMCPHhq@gondor.apana.org.au>
-From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Date: Thu, 2 Apr 2026 13:30:36 +0530
-X-Gm-Features: AQROBzD-MihXKut6IzaeXppNB01Tn268fd7Zvwld1MBl_X440XsNcpzfx7Ujg2Y
-Message-ID: <CALxtO0nFEG2Lm18Fnb=YVQfy4-Qjb5+WtOxsHNOwYTy2Kzyb4g@mail.gmail.com>
-Subject: Re: [PATCH v11 2/4] crypto: spacc - Add SPAcc ahash support
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	devicetree@vger.kernel.org, robh@kernel.org, conor+dt@kernel.org, 
-	Ruud.Derwig@synopsys.com, manjunath.hadli@vayavyalabs.com, 
-	adityak@vayavyalabs.com, navami.telsang@vayavyalabs.com, 
-	bhoomikak@vayavyalabs.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-Hi Herbert,
-   As per your inputs, I've replaced the do_shash switch to use
-lib/crypto single-shot calls for SHA-1, SHA-224, SHA-256, SHA-384,
-SHA-512, and MD5.
-
-However, SM3 does not have a single-shot library API in lib/crypto yet
-=E2=80=94 include/crypto/sm3.h exposes sm3_init() and sm3_block_generic(),
-with no sm3()/sm3_update()/sm3_final() equivalents.
-
-For now, I've retained do_shash only for the SM3 case. Would this be
-acceptable, or would you prefer a different approach?
+X-ThreadId: AfnkVD7BdAFw
+Date: Thu, 02 Apr 2026 10:52:17 +0200
+From: "Ard Biesheuvel" <ardb@kernel.org>
+To: "Eric Biggers" <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ "Demian Shulhan" <demyansh@gmail.com>
+Message-Id: <dc424b4a-11b5-475f-a53a-987b5813bac5@app.fastmail.com>
+In-Reply-To: <20260401195943.GA2466@quark>
+References: <20260330144630.33026-7-ardb@kernel.org>
+ <20260401195943.GA2466@quark>
+Subject: Re: [PATCH 0/5] crc64: Tweak intrinsics code and enable it for ARM
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
 
-Code snippet below for your reference
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D snip start =3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
- switch (salg->mode->id) {
- case CRYPTO_MODE_HMAC_SHA224:
-         sha224(key, keylen, tctx->ipad);
-         break;
-
- case CRYPTO_MODE_HMAC_SHA256:
-         sha256(key, keylen, tctx->ipad);
-         break;
-
- case CRYPTO_MODE_HMAC_SHA384:
-         sha384(key, keylen, tctx->ipad);
-         break;
-
- case CRYPTO_MODE_HMAC_SHA512:
-         sha512(key, keylen, tctx->ipad);
-         break;
-
- case CRYPTO_MODE_HMAC_MD5:
-         md5(key, keylen, tctx->ipad);
-         break;
-
- case CRYPTO_MODE_HMAC_SHA1:
-         sha1(key, keylen, tctx->ipad);
-         break;
-
- case CRYPTO_MODE_HMAC_SM3:
-         rc =3D do_shash(salg->dev, "sm3", tctx->ipad, key,
-                 keylen);
-         if (rc < 0) {
-                 dev_err(salg->dev,
-                         "ERR: %d computing shash for sm3\n", rc);
-                 return -EIO;
-         }
-         break;
-
- default:
-         return -EINVAL;
- }
-
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D snip end =3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-Warm Regards,
-PK
-
-
-
-On Fri, Mar 27, 2026 at 2:50=E2=80=AFPM Herbert Xu <herbert@gondor.apana.or=
-g.au> wrote:
+On Wed, 1 Apr 2026, at 21:59, Eric Biggers wrote:
+> On Mon, Mar 30, 2026 at 04:46:31PM +0200, Ard Biesheuvel wrote:
+>> Apply some tweaks to the new arm64 crc64 NEON intrinsics code, and wire
+>> it up for the 32-bit ARM build. Note that true 32-bit ARM CPUs usually
+>> don't implement the prerequisite 64x64 PMULL instructions, but 32-bit
+>> kernels are commonly used on 64-bit capable hardware too, which do
+>> implement the 32-bit versions of the crypto instructions if they are
+>> implemented for the 64-bit ISA (as per the architecture).
+>> 
+>> Cc: Demian Shulhan <demyansh@gmail.com>
+>> Cc: Eric Biggers <ebiggers@kernel.org>
+>> 
+>> Ard Biesheuvel (5):
+>>   lib/crc: arm64: Drop unnecessary chunking logic from crc64
+>>   lib/crc: arm64: Use existing macros for kernel-mode FPU cflags
+>>   ARM: Add a neon-intrinsics.h header like on arm64
+>>   lib/crc: arm64: Simplify intrinsics implementation
+>>   lib/crc: arm: Enable arm64's NEON intrinsics implementation of crc64
 >
-> On Wed, Mar 18, 2026 at 12:48:06PM +0530, Pavitrakumar Managutte wrote:
-> >
-> > +             switch (salg->mode->id) {
-> > +             case CRYPTO_MODE_HMAC_SHA224:
-> > +                     rc =3D do_shash(salg->dev, "sha224", tctx->ipad, =
-key,
-> > +                                   keylen);
-> > +                     break;
+> I think patches 3 and 4 should be swapped, so it's cleanups first (which
+> make sense regardless of the 32-bit ARM support) and then the 32-bit ARM
+> support.
 >
-> Since you're doing a giant switch statement anyway, please convert
-> this to use lib/crypto instead of shash.
+
+Ok.
+
+> I do think we should be aware that even with the code mostly shared
+> using the NEON intrinsics, the 32-bit ARM support (which works only on
+> CPUs that support PMULL, i.e. are also 64-bit capable) doesn't come for
+> free.  We should expect to deal with occasional issues related to the
+> intrinsics with certain compiler versions, compiler flags, etc.
 >
-> Thanks,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> I assume that "32-bit kernels on ARMv8 CPUs" is currently still a big
+> enough niche to bother with this, despite that niche getting smaller
+> over time.
+
+Running a 32-bit kernel on 64-bit capable hardware is usually done to reduce the RAM footprint, and that problem hasn't gotten any smaller lately. And 20x speedup is rather significant.
+
+>  But as I mentioned I do think we should try to simplify it
+> as much as possible, e.g. by supporting little-endian only and avoiding
+> #ifdefs based on things like the compiler whenever possible.
+>
+
+Sure. The only reason I think this is worth the effort is because the same code can be used on ARM and arm64, so once this is no longer the case, I don't think we should bother.
+
+So it makes sense to apply this reasoning to little endian as well - arm64 supports it so we can support in on ARM too.
+
+
