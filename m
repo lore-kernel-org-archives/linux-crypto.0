@@ -1,46 +1,44 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF0AF225788;
-	Fri,  3 Apr 2026 01:03:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 706D978F3A
+	for <linux-crypto@vger.kernel.org>; Fri,  3 Apr 2026 01:03:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775178204; cv=none; b=jEWGRgMCQGP5/6irgp8t7xyohXLBROMy5PBDZGFlKKMKnjrM/4X0Px++toqC8ocoNmWTzoGwa+JAUGa+tckOg6bfnq18gk4kye2Ut3gTIUWbV9Yg/vPM/mq0e4hrPoZ39s8Qt1O88FNAsuTVI0azL4WsJPgK7k0+MS4NG7qUHx8=
+	t=1775178204; cv=none; b=LjmLZGVfQ3Ogorq5xbtKaCE28lvos+RvIA6jixv1PFe2VmgXz/duL1Y7IGWT2EH6TQ6MMFTGWKCr9qk/x6X1WTZ55kkzibsV1HYyg7i7pqQ3kQkeK2el/H0pz88NV2Gj+/OOfVhkmBAFgRWJerQjZUnOManJ3OYkLQYJ9BZxeaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1775178204; c=relaxed/simple;
-	bh=NfwTVSpbumr5ncGwU3SCdxm2fQb0+GayhCGGoZ00aM8=;
+	bh=50+udKKbWTX1x4K3rA+7PlgGvctdvPu/wrAYeOQjCqs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nzKq3c+FHjI3dLEm3OVHKkRp+2L2kOGFS4ivN47D7MMnKyfXEmUAIo4cdwZ+WVdTkikj6piQ31i3gzfBJTOqOMHcMa+KqfhfcLBbzCiWhZaKPgEhP5BJSgFuwpm9oSvkgXMFuvWkXD+a0GggTzujbqYyNnff0hU3uroyUmIAyW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Pcy7ukdf; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=jc3s8ezFwMWo/qWJus21GQfkTtf7dU0hJfUWpspM9lFiEdt5qOY8MbES90vDGnncs4MtlammsuL21FBY36FdUCf6xxVSKDbYPc6IYLF8KClRCzMx4sqlOla6Hir9wXLgShD+dibtjdA/7YMrd/Fqc1HpaAoX+/oAcKOco/4Ls+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=VrRTTO4a; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Pcy7ukdf"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="VrRTTO4a"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=7YoSEJ++U+bhsZHS7opTnIXvFxUfS1Ektt6/OuIFNhc=; 
-	b=Pcy7ukdfzC+ko0Rih10LxJA/9qlFtoganjfS6zaAZ35WkeQrRSOlmAvvaXUwmNwR7B37BTMhg7k
-	/ew7Tnlw/GUdOMSIDiMQPqRdnmeTsGRdARmFHP4IPEy0xsgKgXmzo+pZVXXD8KXDv+zabAez2r5w/
-	ZcbVGDNKtTC0zAHqKY34A+hn29cQzJiWBiDLC3u+BsxRqlfAbqHbMW9SA+7DmANiyje9TF3GVV0aZ
-	lJLzf0h9wabmwP4bLXE3fpetHCOsCoNaH2sao3DxGZiJ/nxFAcWQGnA9hOGvkxpdpW/oj7GEpy75m
-	iggZIsDgon/bj2jdGfOKUmUC4oYRfkwQH0Lw==;
+	from:content-type:reply-to; bh=J1wvmRp6NMrNvCMkg0wAkSVk8XC9OfRjASJGcw09Xg0=; 
+	b=VrRTTO4aJlECb9TsM+VOwdm1lRUZ+AsENMN1OiPWpoJs5KIuUwWjtWbCNXYaufKNcFWUbORT1ju
+	wYZFanPZUNF5Pfo7lrmwOpIWNC90HMl7dzSh0gte887acO65Oqcq6wmiFuovAEZSmcTHZQ6ID15KO
+	NUrxAjO/qNO01TkkthX1MWCbUjzDU3Dq9ssBK1dc9gJFICxTf7no6N7qmMBChVwnAROawoj2hW+T/
+	9B1F/n4uzN+aOJM9n3MwL5U8/XDBePK8KTwLRWgecSdZK1rhSlu9lxnHdNlic7SXuDDBd5JcYi09p
+	60fVj0px9vV5SQRx86FTQDgisgI2DNoB5RqA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1w8SWg-003Qwj-0L;
-	Fri, 03 Apr 2026 09:03:02 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 03 Apr 2026 09:03:00 +0800
-Date: Fri, 3 Apr 2026 09:03:00 +0800
+	id 1w8SWy-003Qwx-0o;
+	Fri, 03 Apr 2026 09:03:20 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 03 Apr 2026 09:03:19 +0800
+Date: Fri, 3 Apr 2026 09:03:19 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Aleksander Jan Bajkowski <olek2@wp.pl>
-Cc: davem@davemloft.net, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com, linux-crypto@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4] crypto: testmgr - Add test vectors for
- authenc(hmac(md5),cbc(aes))
-Message-ID: <ac8RxOP3h7SEqBN5@gondor.apana.org.au>
-References: <20260303184916.69132-1-olek2@wp.pl>
+To: Ahsan Atta <ahsan.atta@intel.com>
+Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: Re: [PATCH] crypto: qat - disable 420xx AE cluster when lead engine
+ is fused off
+Message-ID: <ac8R1yLXy3M9UqC3@gondor.apana.org.au>
+References: <20260324111234.227329-1-ahsan.atta@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,26 +47,24 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260303184916.69132-1-olek2@wp.pl>
+In-Reply-To: <20260324111234.227329-1-ahsan.atta@intel.com>
 
-On Tue, Mar 03, 2026 at 07:48:44PM +0100, Aleksander Jan Bajkowski wrote:
-> Test vectors were generated starting from existing CBC(AES) test vectors
-> (RFC3602, NIST SP800-38A) and adding HMAC(MD5) computed with Python
-> script. Then, the results were double-checked on Mediatek MT7981 (safexcel)
-> and NXP P2020 (talitos). Both platforms pass self-tests.
+On Tue, Mar 24, 2026 at 11:12:34AM +0000, Ahsan Atta wrote:
+> The get_ae_mask() function only disables individual engines based on
+> the fuse register, but engines are organized in clusters of 4. If the
+> lead engine of a cluster is fused off, the entire cluster must be
+> disabled.
 > 
-> Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+> Replace the single bitmask inversion with explicit test_bit() checks
+> on the lead engine of each group, disabling the full ADF_AE_GROUP
+> when the lead bit is set.
+> 
+> Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
+> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> Fixes: fcf60f4bcf54 ("crypto: qat - add support for 420xx devices")
 > ---
-> v4:
-> - rename aes-generic -> aes-lib
-> v3:
-> - correct sha384 -> md5 in description
-> v2:
-> - rebase and resolve conflicts
-> ---
->  crypto/testmgr.c |   7 ++
->  crypto/testmgr.h | 255 +++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 262 insertions(+)
+>  .../intel/qat/qat_420xx/adf_420xx_hw_data.c   | 20 +++++++++++++++++--
+>  1 file changed, 18 insertions(+), 2 deletions(-)
 
 Patch applied.  Thanks.
 -- 
