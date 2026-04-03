@@ -1,50 +1,50 @@
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010042.outbound.protection.outlook.com [52.101.85.42])
+Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010010.outbound.protection.outlook.com [40.93.198.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0513B3AF66D;
-	Fri,  3 Apr 2026 13:31:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFEAF3B775E;
+	Fri,  3 Apr 2026 13:34:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.10
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775223091; cv=fail; b=TdMQuRNZDKfe1wSofen4zZmD3oUpAoHBSIN5s+K48x8tHhJF0iVD2TI0KjZ8/m1GTJWnz+uw27gbe5Py7CSIgm1rnNszucJtVxdPf0shShOBLIxcDx75KkCppgePT3Q35LI13vAbmcYkE4B+/UA5CipXjMbvvIfyeGZyg9G9GtU=
+	t=1775223245; cv=fail; b=ch+2+mbo9Mw3Y4kn2yHpL3gBYPuA2bci/rwfBeV+wLNlOpnz9PoATasX4NCfPcAfpXUXy04Ihf5ZAjTDjq1FwWN3EuVKzXNR1Jx+kxkfsqk6hiEAVH/6tEI2RKdxZRckqO0i+/SVQglIEGWbt+mSGH+Uzq/qiRvWOrvEEqvkAbA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775223091; c=relaxed/simple;
-	bh=g1JCGiGUL6Jy0xzhWT/kXcl7T2AejObjNbqokiwd67I=;
+	s=arc-20240116; t=1775223245; c=relaxed/simple;
+	bh=oX83JGmYS9J05EB7UL6jQIMiwD0+75alhoiTh1U49BI=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=W1vMZjVe8u0k5QVext01ctrnhAVwWgKAiZ6UZrEJkbBayEz1mvTCBqPvoltzMZ94MiyL/CsEVWPUELWlOzeBin/KxtqjzvtFjBt40U8fUtC4r3x6F6qaw4+MsohnF3oIbGDYD/X2JNaDKhZ0OtDOtsmRQljYL9XP2qrFOn5oWkI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=AMtNHdRX; arc=fail smtp.client-ip=52.101.85.42
+	 Content-Type:MIME-Version; b=Hg2gS1H5Eo7ZhYEyzJ8uX9hBIyA3ng2X0G+apoSqlKIyBQxpHIxDyI7rkcWzELuYXa8Nc/CL5zVSlB+Yxs+dJtxEkNlrgrCKsINyPkx77Ox4C7f4WRZB75dOubpwbwpna77kYZ/Q4zW2SEHe8Yeqw0MWQ2O0sVNUNTDcwl78muU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=YAcd+VMa; arc=fail smtp.client-ip=40.93.198.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="AMtNHdRX"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="YAcd+VMa"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=HpGrwkyzyj6c507m9qAf/w0O1JHtPujXr7b46k2Zk/Mq0X0BDiRxEr8zzYC3mwjv4kzb+/zNHJv5K6NxIUAGcdIGovi7N2V1leYKuesR166EUQk1zb7JWEF/Ac4TfF50mQ65gqCqVMqBevI/QLNaCzmgiFXKYiMinAaP0eN8YMhSz2yujlkPK95XiZjCBIClRAmQUAzorJkwa5jwGhLJulLADOmwV9wAGeLsKbl6CvsXbNpDtUegvTfpkF9SvyN7iQcBAZoZyiIkfZLxCyAc93OlwpUoerDmW6x+VMi6F5mzKCFmQ+qLsew6iiJyjzJf5jUQ6dpjfQAETlg7WvmVSA==
+ b=WyQIFiHEzYbwBmntfkRq0aomdi6B+WbXgRV54ggLkB6+7OqY7TdkaZSvAKnlirmrrt7e1aTNPmVBvPqsRE1WpaZgCspOx4dHl3eBnejSOBadi7/+0LX9w7a00GMIrV9UBmmayDyYQyN11HNwaSLIvx0dw2CU+nPfpemTt4niLPH7sV2D6fsDTZuJgjqVIDPZjEieVXs6Qifrjz/oLDwNInh2sAdkrjBBg0C+dwnk/fKM6tcF82L4g5FAqWmvfVHtwFi3Wp6uq5PC/ewP81Hlj0Sg6J1os2A/ZrGVuSS/zS+6ppROgrhRcb6zN3O+rqJxXsuROWjfg7iBMjgxvhFctg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6nVdyWlEpxaTzokJkAEwiXB6sM8QjUFJzuNeIYn4YWQ=;
- b=NZFqu33wG5u/5/pAZ6x4kl+ocjS9RmYzV77+kbalRxprSmp4rucjMQuFAWUbRfS8sKzLni5ycS5vrdHe4S8FNal4AQpuleYfRsSe/relqEbo7SsmsYKYJ6b7L2eXcq9QRi1bJHvh9Mv3xhWRewei30l+MpFG7atwYCjyw9BjSVGe54NQu9dmQ+5qbOOcynNQ+npVeJ5Q8gC9kc8GxZG78Jm3facihuFTeL5OzRhTLbnUKDfYAgaq6wHrC5lRdrBWNJ38dSQlXsOEdLno8gcKXBibBIWYwyFVXkLhor9ORCDCEkSOHKHU/GyfGoZgyq0AjikAbKuv9QaysNQa449cOw==
+ bh=teFpS6mcK9nqh+YMKAFfkkWBYs0MkaJPaWf4rC1qTXE=;
+ b=tueJUSmRCEhIv+Qmwxtxrn2N/YDbuZ06TK91GNKXW1SoFR+gV3FTmLJ1htgbUcMXxCmNWY8krClg8m2Jq9HKXV4Gjc1ioyGkkr1wGB4DhIo444KkkO4km4jns8rMEzemE/oy2a789ebBtkiOU08haFeAjcfGrQvMwbNRF6oOgwDcph5x9NrVSDpgANXGniHU/a+JlAYttE2OD3IWzUjwBkpIgbUjspfZNScpYmUlaslQvt7fUmU2W5cVJH0cgnIcgFDOWMt/WG5ES46kp/RF1QCX3lvIMhUC7RQpe6puAokafleyazJhZ/X0KwxSpHK0Ldl6AgvmmCzYgta0rnCL5Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6nVdyWlEpxaTzokJkAEwiXB6sM8QjUFJzuNeIYn4YWQ=;
- b=AMtNHdRXZUCkZkRWEoCvxaS9+JRJaegwhqfs3bul67wHcfUE159YEXS5u19NZxzEZvan8+p12snEIsfHDvA+bOkPnXJ4xfiQDkhLUvC+bzuViHs/xCVST56yjpda6sA5zVkrmutOsmBSNgUxjRtdmTjEG95puAXVe2+/jwjIjKY=
+ bh=teFpS6mcK9nqh+YMKAFfkkWBYs0MkaJPaWf4rC1qTXE=;
+ b=YAcd+VMaZBJ0HakJ4okF5YSQ/7ARYRM6HZGegU3M+0Rn54Q0kw/AqE/EpamM0nwpfKZmioeoxgU0m3TJIfVFECsYLowGOJkMgdQUYatAYokWvSol6FpAaSZuq9RRDwuZiyniI/pPES0nmJU8na4MFav7zYmrOnQRoDKnYSKd/gs=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
- by SA1PR12MB7318.namprd12.prod.outlook.com (2603:10b6:806:2b3::18) with
+ by MN0PR12MB5882.namprd12.prod.outlook.com (2603:10b6:208:37a::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.20; Fri, 3 Apr
- 2026 13:31:27 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.17; Fri, 3 Apr
+ 2026 13:33:59 +0000
 Received: from DM4PR12MB5070.namprd12.prod.outlook.com
  ([fe80::f3f2:852c:78d5:9353]) by DM4PR12MB5070.namprd12.prod.outlook.com
  ([fe80::f3f2:852c:78d5:9353%4]) with mapi id 15.20.9769.020; Fri, 3 Apr 2026
- 13:31:26 +0000
-Message-ID: <70635612-76e5-488a-bb82-e66752dc9857@amd.com>
-Date: Fri, 3 Apr 2026 08:31:24 -0500
+ 13:33:59 +0000
+Message-ID: <fd1efca2-ef3b-48c9-8910-f89dd55c11bf@amd.com>
+Date: Fri, 3 Apr 2026 08:33:55 -0500
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 1/2] x86/sev: Do not initialize SNP if missing CPUs
+Subject: Re: [PATCH v1 2/2] crypto/ccp: skip SNP_INIT if preparation fails
 To: Tycho Andersen <tycho@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
  Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
  Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
@@ -58,6 +58,7 @@ To: Tycho Andersen <tycho@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
  Kim Phillips <kim.phillips@amd.com>, Sean Christopherson <seanjc@google.com>
 Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 References: <20260401143552.3038979-1-tycho@kernel.org>
+ <20260401143552.3038979-2-tycho@kernel.org>
 Content-Language: en-US
 From: Tom Lendacky <thomas.lendacky@amd.com>
 Autocrypt: addr=thomas.lendacky@amd.com; keydata=
@@ -104,11 +105,11 @@ Autocrypt: addr=thomas.lendacky@amd.com; keydata=
  qFAgP+x+ODm6/SYn0LE0VLbYuEGfyx5XcdNnSvww1NLUxSvuShcJMII0bSgP3+KJtFqrUx9z
  l+/NCGvn/wMy6NpYUpRSOmsqVv0N71LbtXnHRrJ42LzWiRW2I5IWsb1TfdMAyVToHPNaEb0i
  WiyqywZI5g==
-In-Reply-To: <20260401143552.3038979-1-tycho@kernel.org>
+In-Reply-To: <20260401143552.3038979-2-tycho@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN7PR04CA0207.namprd04.prod.outlook.com
- (2603:10b6:806:126::32) To DM4PR12MB5070.namprd12.prod.outlook.com
+X-ClientProxiedBy: SA9PR13CA0019.namprd13.prod.outlook.com
+ (2603:10b6:806:21::24) To DM4PR12MB5070.namprd12.prod.outlook.com
  (2603:10b6:5:389::22)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -117,161 +118,107 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|SA1PR12MB7318:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8834f54b-b7a3-4179-b5c0-08de91854e68
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|MN0PR12MB5882:EE_
+X-MS-Office365-Filtering-Correlation-Id: a1568b7d-257a-47cc-6037-08de9185a91c
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|1800799024|366016|921020|22082099003|56012099003|18002099003;
+	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|22082099003|18002099003|56012099003|921020;
 X-Microsoft-Antispam-Message-Info:
-	17qoYngEUysencezlKoktKfbdRjwj5fe2Qnw/+UJFmNCiJPmTOUgt8xfTJaXCjjffQ7V463YzOOdjclPHmWHhVr/wqQxwCGTi5iBDYPBNSC6MMykCIMQtx5VXGWvquSMUMXnwWkPx4ym/QXnfTx0PH+IqhaK/b1R/Cqb7xblLXcGaP9riiFP0LqDwTbtMjBghw4WJ38S7o6XvjUKQJuS+8QP4/LmE4OxOxWZ5+AvGXiAtBpOrrvIabaPvftsc03LVME/HQQobWz2DlgqXVt0xnAPiGRWthC7NBO9KQm8Ixn7OlePZI9YLzZ2SCPxTNQtCjAFId+AYKwUmgPb/CAz6AE23o+3jQfbH+Xzih6920myjCB/9ZIJFX3tngJK6SmamBi1QdrtCZacevIbtfboEAdPGZQw9ZYaQvZsaKnho6fqkyk9oTDpESP/fj/sgicCUwSro8hBMBl8IFLCivPvZiXiEez59nT5ZCV4FlnwoPpGHcZlcnnfhlIr6PzRPsWKErnIK/zT7YSuC/YLeysNQ9AVhfycsTJQtRoizD8COZ/BauvRXXRkDs/X/Ur7o3PXiptGn9qPpg1HGbzvusguB/TwURft3Kuf8nh1BDOgrjf5QGyVO90Iym1Z3KCkzzSj5IkLSlY87Dfz4LcYLuKpSVQ/RXABFKVS6Q17yn3zy5+fRL7/AscjtrwwmrbxEsAUu7kYQEYGZRuQL6a7WtS2b2AlXmL8yZqOE0ITmUeLgvoCC/2Uz38GgvguAg3PJKWaRsGWfDHPFnH2dOw6tnyndw==
+	bUi4RCxedvEGYix+hM22LB8sgumKbDbSjvGXTk/r8B2bOo/VMBxQhPtn5vffSQQxRsCQHf4bAJJwoa8zie7tZDCfFqsUtTHQX0t0+7k08rS3AUSmYk5JFReZG3UtHzqwaUN0DQQh4oQjOzIuvy3+ZvLslD0BGbEPaVqraBqUSqU/vu9vEA3jZ6Mr8L+teV7MGDqCuTM/STBPiwKpq6SlPxhJtY6TxJ/4fuu4H5Z8lTUd5DBxkH+KBgOvdkFNWJjN7ABcuZ2MYmZ3wG+rFxEITdvIP8dlsXJM0GH0/ZKeTBuVc7YZQs1ThulNaGaiE/+LHXSYyZncx8oLe00v0yCy7YUX+hbNy8gzR1EZZWIJRrTrJVfol1rras3tQz48DNYTO6Nw3MD5O0Risi4UeWnJ1Pj/5EQBIMYCTbTrrcstcbikw2padeRipMAelFoBN9RrawYxw22lnDxBe0XOGV61YsCXJ5DOJgbrI14261cmxYryKNeiLey2Yh5sHQDOlmvUKgPngMi+DrZxeK00bPtMLnwG3Ve93P5fEJUS/HywNq/cqJV5HkDNVSlggSnrpnvHrYJQ3C4cicDJdnXe2IOKNPwDGBM+hYPKBw3ZMnneKINcoMp6J7vhFnjwlRjoaZuHhpGQZpLyurd21bcJqX+Bavj9f9n3psCgRRZxLO1Nsj/wdUgqYEM0yxiw2G61J3eKqI1O8HBKrrUuEXSRkjwJTZNDW8lePYJBwfGAE1TLKcnvx4RSsxS60LOmzNHpXFdfrNF97dLo7iK0EEFoMOuTTw==
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(921020)(22082099003)(56012099003)(18002099003);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(22082099003)(18002099003)(56012099003)(921020);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?bVdnZXE2ZExjdkVxSXRoclhqT1VtelB5NHFWbEl2UmVFcmhCRTIxT3ZDbU5U?=
- =?utf-8?B?VHZML1RXU0tEV1BCNCs4KzBBZTJycW8rY0o3MkVQc1RUQWNmTitaVWxVY0J6?=
- =?utf-8?B?T1lGUWFHNXo0RURzM09JL0VLNnJvcXdkWDR1VXR2RU5mam55TDdJU2N3aEdR?=
- =?utf-8?B?N1lkSmp5VjVtR3R4UHhsYjYzVW52MjlIOFNnZWoxUFhhU3BwYUZ2NS9KVy9j?=
- =?utf-8?B?Z3hyY3p0Z0R6TXN3d0JHeUlKSDlzZEliKzhTQzltSDNiWWZDci9sT2NKell0?=
- =?utf-8?B?dmM2bjgvVTFPOW4xbnR1YzRJeWErRnEvRHpPUmxReWlmNnR1c2VPdFRCSVlk?=
- =?utf-8?B?QWRUcGxmVGRkWnlPSStUa3QyK1N6UE11UStCN0JUbVlrZGVYYWcxRTJhZmU1?=
- =?utf-8?B?d3pvMmxNSjR3RTJUN216am5uNC8zMXQyNG9jVzYrUUtTa2dzL0RoSW5YcE9u?=
- =?utf-8?B?RzZpaHJ3U1piT2ttYWVjSStUWkdTeUlVcXFYQ3VMa0Q5QzRpQ3VLcVRNbkti?=
- =?utf-8?B?UzI5UDRIYnR4aVdnWHU4MStER1k1c3FtSjFZakdQUldrYWd3WnQ4SUJ1OGRx?=
- =?utf-8?B?c2pwY0xEdENWbXg5UzA0ZmNNSTZLRk1yTUx0SGlkREh0RlkwRXNvdEM5NVFC?=
- =?utf-8?B?alNRWjNXcy9INzlYTXk4cEthTmhzVEVTMjFVeDNGRVBkMkRreWJJSExzWVhi?=
- =?utf-8?B?R1d6MVlJTHIyRGVUS3J2amNnZXBtOFlhVGdCU3RSYUhKekFOUlFJR01nY3Ft?=
- =?utf-8?B?VENmNlZmSW1hSldRZHJHaDBuTzdsT3cxNmNPTW5Jc2lBdXZtZFI0dXFpcCtr?=
- =?utf-8?B?V1hMdGhzYkd6eU1CZmlJUUw2Ky9wbnhlc0Qyb3NBNGkzTXdsazk3OThHb1oz?=
- =?utf-8?B?Zy9xMlNlZ0FTQnFoY2hxelZjSjZkbW9sbG56SkJDQ0wrTTFBb1lxcFE5UVRh?=
- =?utf-8?B?cWt2Ti9tN0diUG15enJNK2dWU1dOcDJVTGFvakd0dEx3b3BxbkJibDlBVC9U?=
- =?utf-8?B?ekZZcitwbXZaci9xaTQ5bk84RmxQZHhPTmVtK3pIcGxOLyttWm9rU0ZQNUw0?=
- =?utf-8?B?Qm54dXpEM0x3amhxYlE2djNMM2VpTVB6MzlOS213eSs2TnZsb3BiejkzYlh5?=
- =?utf-8?B?R2dRNDYyWUgwTHRZcEVWWVlzRnRXN1UwOWYra1MveVBrbitpRnZRNHdyWHFu?=
- =?utf-8?B?NlExV1RiT2xlZ0RvelpNWWJPNS9zOTFTZFVmRSsyUTA3VkhsMkg1UFV0VUdj?=
- =?utf-8?B?cEd5UWpVVU5KSHlSK09OdXdkTUJ2MUUvOGwrV1lBN0RoanQ2c3RwTGh1a3lu?=
- =?utf-8?B?bTcxaFR0ZnFqZ2hsUllHaDA5V1FocU52dkVDZGRXQ2FaeEpQUGtxMlRmMEpW?=
- =?utf-8?B?TTl2MWtGWkVhT3V6Z0Rhc1UvSGZINlBzNTRsUW95QU9IQ2tzMzREc0V0UEI0?=
- =?utf-8?B?dHVxQ3d3RmdBT0tZd3pZQ0JvS3JHM0hCODlzR0FkUFkrUm9Sa29XcElqSi9r?=
- =?utf-8?B?YzRxdXZGQXpTeEU0SWJOOGUwMnFzY0owMXJpb29tazYvNnJibkxVUWkydWFE?=
- =?utf-8?B?SE1xZUJKSUZYTmt0RG9oS01UZno3ZmlnajdiakpOZWZjNDhkTk1NdWoxNjlx?=
- =?utf-8?B?b0cxeGdYbHBFT0lkZlVMRXZ6Vm1iUDRnTkE1NU14bkdvY0l6ZndMNFJkOE5r?=
- =?utf-8?B?Q2dIQ1Y3b1VJcVQ5SkpES3NvcDVsRkJvQnRrbmNoUjNYQjBJV0hUc2xHSzF3?=
- =?utf-8?B?WE5mSVJkMjBVTGlZTjlGR0ZzZndpeTlTZ09SMTVrS2lvMmRnM3BVZFNiRzV3?=
- =?utf-8?B?NlBSbC9oaVc4K1Z3L3pKMjJ5aHZLVzBObDhaWFNZYWF2aGpDZk0yMWlnaUxR?=
- =?utf-8?B?MU0xTWJDSEJJNzl2VWhuVzJFMUU1L21yMlNqRit4bm5yUm5DYVZhRStIQ2F5?=
- =?utf-8?B?bDFscDl0ZGVYYXZGM0dhZEVUUXlndXBtN09TUEJnRzZxRTNROVJ4R25MVkpu?=
- =?utf-8?B?QmJqSVdPdkNPMVdWdkRSWGwzLzBKa01xd3NMWUlXNHI1U3F3UUtsRUJEeWhT?=
- =?utf-8?B?cFJMeVA4K08rMG1zdGY3dlV1QXpZdVFyY2pNQ1BwdHFoYlRZN2t4ODBKYUFn?=
- =?utf-8?B?UG4zNXZsM2hmWXNOOWdaQWJRUnRkR0RFbXVTazN1UE0vQlk1LzlHdlk1RTll?=
- =?utf-8?B?MWVjWHV5NnVTOTY2STYrNytTNVB6Rk1jellnN1o0UkYweEg2TGFzYUJVY1Bn?=
- =?utf-8?B?N0pHdjkrQjdWVVV4U1ZJcFJDUHhkci9mUkdIbElCd0UyQjdXWld5Ulp0bmdK?=
- =?utf-8?Q?ghspVfB7jKFE4yb4Mx?=
+	=?utf-8?B?SC8rbFpWMWxhcmNqSDFGZHRYaTVTMEkvbjdGMUh4T2JqTDZaWFpIQjZiaVZy?=
+ =?utf-8?B?UTR1WHpBaU5OZzFuWkJQb0JaRFY4VFVIMHZHSC9pbjdheUI3VFFVK1Rud3FL?=
+ =?utf-8?B?QUpGQkREbUNqSVpsdUVQUlQ5SEIrWHJoOXJCL3E0ME4wMmhIYVdvVmtBNzRY?=
+ =?utf-8?B?UHRmV3NoQmdFZ0dTWHM5MXlmSnpodVllQ0d2QmRMNjV4cGN0cHdwejhIdXB3?=
+ =?utf-8?B?cDcrRGUrcU51QnYySjBkeHBLVXN4RGV2aUEvYThGNEVhNDBRbVBveGxlQndV?=
+ =?utf-8?B?RFhVN3dpYm1zWWZDeENuY0FmUEtlR3lWQzdHNlZXb3BwMlA2OWRkRUE0WllB?=
+ =?utf-8?B?TVhXU2xyZU9GYWpVdFk2YVkyT1I3QnlkSXI5bW9qaktlaWs2cTQ3SnIrbDhG?=
+ =?utf-8?B?MFlIMTdVM0xpcmxZOC8va05QSHlGeXNVV3FUbmxkVHRzeUZhdVJkRkZwV29W?=
+ =?utf-8?B?dHNIM0ZKelZnQVJoT2xCOWxJZDVtbVRNQ3gyUHI5QUlYQmNxekxCMXJ2UjVK?=
+ =?utf-8?B?b2I0bUlSSUkzazdZQkVKb0lPcXlURFpwN0lPWmdOcnFxaEp5WUY1Kzh3ZTMx?=
+ =?utf-8?B?NFRlZHcvMmRsemo5a1RtQUNYTUNxaVJOZUhUQUVXZnFhYVN3QWM1RklXWWkx?=
+ =?utf-8?B?TmN6dUN6dGRRR2xNK1doZVVuSlQ1eHZ2a0F4NjdnWkh5SXRKTjB2SnZoTDNZ?=
+ =?utf-8?B?WUJNM1IrTTNGaGNwbnkrMExBdXBUR2xzMXpuYm5nSDRoY2liZ2QrbVEvMG90?=
+ =?utf-8?B?amwvelpzL2RQbmtVNCtuL2dWRDM4RGh6emFUOHc0T3h1bUFDRlc1WUZpTWdj?=
+ =?utf-8?B?YWNaT1pqSXRadzFHYmduTDloc3JybGpHMWxOVTBWUWUvZUlkaEZhK09SNGo4?=
+ =?utf-8?B?eUllRldRL3RqZGRsZklnRSt1Y3B2cjFQQlhWSXhMaVdPQWhCU0l6OUdpMDhr?=
+ =?utf-8?B?SXQrcWpsOHVCd0VUdWlPMGQ2M0JnbWRuQUZoamlJRVdrQkhxWkdldFA5K2Uy?=
+ =?utf-8?B?cFJYelhlNnZLMTZsbE9TNUZBV215OGVwbEpJQ21TaFpDTHkyaWNPdkl5M3Y3?=
+ =?utf-8?B?amdyZ1pzYTFVMmwzTnZmVmNEVzhOU2JGVkNZeDBFL3RidGwzSHROUWRubEIy?=
+ =?utf-8?B?UnQxcndybVcrdW96NTVETlNhcjYvUkFkclhrazZVelNJQklhT2JoS01RZFpG?=
+ =?utf-8?B?ckxRanUxNFhRWndmY09yWXlZN1RQblBjU3Q4L1pSRHQzYXJnYzhJeW1FdE5h?=
+ =?utf-8?B?Q2JMN0laeWdUaUxNZ3E5dVdpWUZJWUhGa1BRc3IvWkx4UDNyVnAzWkxRSmVC?=
+ =?utf-8?B?VGoyQ1EzQWx6L09hL1Q4UnpSME15c1RGOVM5M3VlQUNUVTlYVm5xaWJEMDdY?=
+ =?utf-8?B?WE5iNjA1QzdKMUZtSFJvY05aMDV1amRsdjY4bHV2M29sdFFzRWRWdDUzQUdG?=
+ =?utf-8?B?eWlzV3JjNEJLMFplY0t0TkdoWVpzcTVMRFV3a1B4b0tPd1NKUmdjdUkxRG54?=
+ =?utf-8?B?ZUFaN0xGSXd0V3V1SlRDS1hmL1E0bHgwRTdQS3VvcXRYY0RsckthZ2xVZFhH?=
+ =?utf-8?B?SUQvN2ZlT2Y4UjIweVBvUzQySjNIaDRrQlNicG90aEZVeTQyVlJYZjZ0TmtM?=
+ =?utf-8?B?Tm5Ic3BRR2xHMUE4NTN6NkhoUXh3Z0EvbE1IbnVsZzhBdFFJOEFHUCs4OVY2?=
+ =?utf-8?B?OU5FY3ZBbjhtTEJ6YnVsR2RVQ0YraWVBZ0pLc0Q4RHZ2RmYreWZwNWdRWXJ3?=
+ =?utf-8?B?MWo2bk9DTGx5N0xPOFhvaEdkak9NZjBtR25BUGFkektIUzhUdXhKdnZWbndo?=
+ =?utf-8?B?MzNrNnJmWXhGTXFzOFFLR3p5a0tVdWVwWjNtblFFdkErUE95Wm9RTjlCZit0?=
+ =?utf-8?B?K2s3dXQrcVEwRHdOYmc0aWsyTGFkYkFzRnUxa1c3ZzB5T3VLZ1h2SzU4cXpR?=
+ =?utf-8?B?N2pUSTl3a09rQVV5ek0rUTJsMlVmVE96OEhGUy90ZFBBTjRkUUthNmluZXlG?=
+ =?utf-8?B?ZzJyVFRmUENuNXFJSGpsUjFHWGNqN0lZRUplcGJ1WlFtTDVHb09ETGRGWGY2?=
+ =?utf-8?B?bUlNNytTWElpVjZ6YVlCVVh2UU9CbUE2ZkFpOFYydEREdjRFYnVTNEViR3lO?=
+ =?utf-8?B?alk2VHFxeWc3TWhTOUdyZ3N4S1EzUlpQQ3djcXkzaHdlV2FZUnJLNkIwcHdh?=
+ =?utf-8?B?MDhGU3hUU0xjaitXVlBOczAzV0R0RGxiQktBNzdSa2tQcjlwb1RwakxuNnE0?=
+ =?utf-8?B?azB1RUpxN2pzUUJ2NGFXNzUrWFk2TWYwT1V4M0EwOS9QT2ZKSHdJOWFXNGF1?=
+ =?utf-8?Q?iVRu9rp4lqtZr7wyAu?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8834f54b-b7a3-4179-b5c0-08de91854e68
+X-MS-Exchange-CrossTenant-Network-Message-Id: a1568b7d-257a-47cc-6037-08de9185a91c
 X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Apr 2026 13:31:26.7513
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Apr 2026 13:33:58.9197
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: XM7BJtFNxSyMpF+j1HHCKbGAeWcar4vm13DeHZN9zHcL/RScE/9+WZSpo/qT0yt1kQ/mf4emecZXv835mSm7rw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7318
+X-MS-Exchange-CrossTenant-UserPrincipalName: JLsTjPdK2EB/UKLDRttE+wTusw1Ob6lAFzL7ShIYpDf9frs/dC4veTyy9AZxOn3z/cMBgqAobKApjhXkR/tHQA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5882
 
 On 4/1/26 09:35, Tycho Andersen wrote:
 > From: "Tycho Andersen (AMD)" <tycho@kernel.org>
 > 
-> The SEV firmware checks that the SNP enable bit is set on each CPU during
-> SNP initialization, and will fail if it is not. If there are some CPUs
-> offline, they will not run the setup functions, so SNP initialization will
-> always fail.
+> During SNP_INIT, the firmware checks to see that the SNP enable bit is set
+> on all CPUs. If snp_prepare() failed because not all CPUs were online,
+> SNP_INIT will fail, so skip it.
 > 
-> Skip the IPIs in this case and return an error so that the CCP driver can
-> skip the SNP_INIT that will fail.
-> 
-> Suggested-by: Borislav Petkov (AMD) <bp@alien8.de>
 > Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
 > ---
->  arch/x86/include/asm/sev.h |  4 ++--
->  arch/x86/virt/svm/sev.c    | 11 +++++++++--
->  2 files changed, 11 insertions(+), 4 deletions(-)
+>  drivers/crypto/ccp/sev-dev.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
-> index 09e605c85de4..594cfa19cbd4 100644
-> --- a/arch/x86/include/asm/sev.h
-> +++ b/arch/x86/include/asm/sev.h
-> @@ -661,7 +661,7 @@ static inline void snp_leak_pages(u64 pfn, unsigned int pages)
->  {
->  	__snp_leak_pages(pfn, pages, true);
->  }
-> -void snp_prepare(void);
-> +int snp_prepare(void);
->  void snp_shutdown(void);
->  #else
->  static inline bool snp_probe_rmptable_info(void) { return false; }
-> @@ -679,7 +679,7 @@ static inline void __snp_leak_pages(u64 pfn, unsigned int npages, bool dump_rmp)
->  static inline void snp_leak_pages(u64 pfn, unsigned int npages) {}
->  static inline void kdump_sev_callback(void) { }
->  static inline void snp_fixup_e820_tables(void) {}
-> -static inline void snp_prepare(void) {}
-> +static inline int snp_prepare(void) { return -ENODEV; }
->  static inline void snp_shutdown(void) {}
->  #endif
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index 939fa8aa155c..1fc7ee432e28 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -1374,7 +1374,10 @@ static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
+>  		return -EOPNOTSUPP;
+>  	}
 >  
-> diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-> index 41f76f15caa1..e9ded15dbe60 100644
-> --- a/arch/x86/virt/svm/sev.c
-> +++ b/arch/x86/virt/svm/sev.c
-> @@ -511,8 +511,9 @@ static void clear_hsave_pa(void *arg)
->  	wrmsrq(MSR_VM_HSAVE_PA, 0);
->  }
->  
-> -void snp_prepare(void)
-> +int snp_prepare(void)
->  {
-> +	int ret = -EOPNOTSUPP;
->  	u64 val;
->  
->  	/*
-> @@ -521,12 +522,15 @@ void snp_prepare(void)
->  	 */
->  	rdmsrq(MSR_AMD64_SYSCFG, val);
->  	if (val & MSR_AMD64_SYSCFG_SNP_EN)
-> -		return;
-> +		return 0;
->  
->  	clear_rmp();
->  
->  	cpus_read_lock();
->  
-> +	if (!cpumask_equal(cpu_online_mask, cpu_possible_mask))
+> -	snp_prepare();
+> +	if (snp_prepare() < 0) {
+> +		dev_dbg(sev->dev, "SNP preparation failed, are all CPUs online?\n");
+> +		return -EOPNOTSUPP;
+> +	}
 
-If CONFIG_INIT_ALL_POSSIBLE is set, won't that set cpu_possible_mask to
-include all CPUs up to NR_CPUS? That would result in this always failing.
+Shouldn't this propagate the snp_prepare() return code:
 
-Not sure if this change is worth it.
+	rc = snp_prepare();
+	if (rc) {
+		dev_dbg(...)
+		return ret;
+	}
 
 Thanks,
 Tom
 
-> +		goto unlock;
-> +
+>  
 >  	/*
->  	 * MtrrFixDramModEn is not shared between threads on a core,
->  	 * therefore it must be set on all CPUs prior to enabling SNP.
-> @@ -537,7 +541,10 @@ void snp_prepare(void)
->  	/* SNP_INIT requires MSR_VM_HSAVE_PA to be cleared on all CPUs. */
->  	on_each_cpu(clear_hsave_pa, NULL, 1);
->  
-> +	ret = 0;
-> +unlock:
->  	cpus_read_unlock();
-> +	return ret;
->  }
->  EXPORT_SYMBOL_FOR_MODULES(snp_prepare, "ccp");
->  
-> 
-> base-commit: cf112712c193e837225d740ec3e139774f2496f2
+>  	 * Starting in SNP firmware v1.52, the SNP_INIT_EX command takes a list
 
