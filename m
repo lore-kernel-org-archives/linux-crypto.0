@@ -1,106 +1,86 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7736F1FC7C5;
-	Fri,  3 Apr 2026 00:24:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B56F1FC7C5
+	for <linux-crypto@vger.kernel.org>; Fri,  3 Apr 2026 00:25:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775175864; cv=none; b=I93SCdAgQcTtf7tvpeh9MgKa8qrl1Tj7Pvh0JFIIENDaQ8MgC872iLZRujag9j6zSsmkR70doBYPAXC1MdZcrUzfealXJHJjc0NxQYUbEssFUjdfKsAMI4wV0METfaBvlh05UoJNro/EDz63TIVd4w+Za3CFg947BH1AB3Edpxc=
+	t=1775175911; cv=none; b=mInmIEl9+kJeJeJav6KfhVm6gw8DWmLuj8xUMDG+A8bIJLaoNHMoqdTFLWGFyR/wHbdc4I82MVarVjPBtJyWwl8g71oHPn8bVIauWW+8bXNGzxPBlakLIvypvCUjkwz9VKVP69HPhnju4sUTo99ZwD90i0bG3RvVAHNT+Sz2Hho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775175864; c=relaxed/simple;
-	bh=PSG2pD1bxaF3huDleq3gxn76NJIKWKsUixYHeu6X70U=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=qCkoIG4L8P3hG3l2Qs0EpP+uEnV5FQtEzYqKKYE664kfAO++VfamBKV7TgUPx5TXc7CTo6xe36pdVd8U0JrRaEdOFzW+c1ndzlGWcygoPYCNSxJ6NWL38kVU7o7PugE6s2LHvBy+sbJvSCtr9tSb//upKsAl3xVgHZUVcB9M4kM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=AyuIMpP4; arc=none smtp.client-ip=180.181.231.80
+	s=arc-20240116; t=1775175911; c=relaxed/simple;
+	bh=3529xiERrkywvKDzSPpWMVIHa089ppIneL/dH9HCT4A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T0K/7JpP8crzMdJTkNuq5Ewl7bAEQPgtTCsbW2x/EonJ8KNiSXtnOzD6NlZwYCMbhjPlbwYb1k/SJMzBDQOZNd0psUa7VCxZnpAq9STx3G7ZdMNrVqCGsfmsuTu84znr6hTyS0oUZRmz3R6IGGwZ48PjCSAOUfdjkXq83y3zZmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=ZH8S941D; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="AyuIMpP4"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="ZH8S941D"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=Content-Type:MIME-Version:Message-ID:Subject:
-	To:From:Date:cc:to:subject:message-id:date:from:content-type:in-reply-to:
-	references:reply-to; bh=NYv/MV28FqzZDMKaGximea77+EENWj/EDOqqkqglnlU=; b=AyuIM
-	pP45f4Ze06CcZTvpBjE4ppxJ4hvqRN7SkAUb9hR0c0BBG7LXNG5AhnGoDAkUt+iDVIFJaUgEWNZv+
-	/fXjQ6PnKPwi0uKYtqQIcxQexn8be6iO9Naj36gN7sGWPbzo9P/1+VO33TnKTClbRstqcAZEAPFC8
-	R2Q52zIwzVJAmtBf/3Db7Sd0s9ga1bnZ2zE/cv0RlPsGRfNH2vQCsAd5ax2lXo8TOQYrcP2DQ2pwR
-	xmncCi8G0KuBHvhY10AhR/yuFMYmJLSy07rcR/TzVfNKWeHijL1yOOfeXQEEZXwLcxUm2F2o2t187
-	A9UxCaoK5OZMv/rluTi01enQSAJbQ==;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=A5y1B4w3iYMnD3UXmYC0FaOgVuQlnJHsLd3jFdnKQtE=; 
+	b=ZH8S941DHJ90D0gfGoYR718DMJfwOpj35wucf6IT6vw5zsqpmsr1eZ8bP42inRI92nqxSQKGmfo
+	e6pB3c9t1eFc1uez7PMAt/sUdG6lDOv2/2l1mcMtMD2WDPntghmNySMoHL2SaWkEuMUwfFxfA13xL
+	Orjy9z3geZ2IL4+f+bWjR4IGimyf6vpaxhvRp2ESQFGjw97QyzjEfPwYqZDhlx5gvIDFO86ynfyAf
+	th+G5HJPe522noXPob0dnM30GEXLZ95xk7NqXRZTcvP/htHrq5J72mGqKJMg4Snc5FYNMTYVUKXCL
+	9Xs8ePNNuKGdVVMyoZlfu0aFXBCNi/1xxFWA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1w8Rv1-003QOo-0R;
-	Fri, 03 Apr 2026 08:24:07 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 03 Apr 2026 08:24:05 +0800
-Date: Fri, 3 Apr 2026 08:24:05 +0800
+	id 1w8Rvz-003QPL-1b;
+	Fri, 03 Apr 2026 08:25:07 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 03 Apr 2026 08:25:06 +0800
+Date: Fri, 3 Apr 2026 08:25:06 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [GIT PULL] Crypto Fixes for 7.0
-Message-ID: <ac8IpdQbWxiGuq0E@gondor.apana.org.au>
+To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
+	Laurent M Coquerel <laurent.m.coquerel@intel.com>
+Subject: Re: [PATCH v2] crypto: deflate - fix decompression window size
+Message-ID: <ac8I4mpkdn8uy8TE@gondor.apana.org.au>
+References: <20260326100433.57324-1-giovanni.cabiddu@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260326100433.57324-1-giovanni.cabiddu@intel.com>
 
-Hi Linus:
+On Thu, Mar 26, 2026 at 09:59:22AM +0000, Giovanni Cabiddu wrote:
+> deflate_decompress() initializes the inflate stream with windowBits set
+> to -DEFLATE_DEF_WINBITS (11 bits, 2KB window). Valid raw DEFLATE streams
+> allow window sizes up to MAX_WBITS (15 bits, 32KB).
+> 
+> Data compressed with a history window larger than 2 KB, for example
+> produced by hardware compressors such as QAT or IAA, might not be
+> decompressed by deflate-generic since the inflate stream is initialized
+> with a 2 KB window. This might be seen, for example, when
+> deflate-generic is used as fallback.
+> 
+> Use -MAX_WBITS when calling zlib_inflateInit2() to accept all valid raw
+> DEFLATE streams. The inflate workspace allocated in deflate_alloc_stream()
+> is already sized using zlib_inflate_workspacesize(), which accounts for
+> the maximum window size, so no allocation change is needed.
+> 
+> Fixes: f6ded09de8bd ("crypto: acomp - add support for deflate via scomp")
+> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> Reviewed-by: Laurent M Coquerel <laurent.m.coquerel@intel.com>
+> ---
+> Changes since v1:
+> - Updated commit message to clearly state why this is needed for the
+>   deflate algorithm (i.e. allow data produced by HW compressors with
+>   larger history windows to be decompressed by deflate-generic, which
+>   is used as fallback).
+> - Updated fixes tag to point to the commit that introduced deflate
+>   support in scomp.
+> 
+>  crypto/deflate.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-The following changes since commit 5c52607c43c397b79a9852ce33fc61de58c3645c:
-
-  crypto: ccp - Fix leaking the same page twice (2026-03-14 14:01:37 +0900)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6 tags/v7.0-p4
-
-for you to fetch changes up to e02494114ebf7c8b42777c6cd6982f113bfdbec7:
-
-  crypto: authencesn - Do not place hiseq at end of dst for out-of-place decryption (2026-03-31 17:11:48 +0900)
-
-----------------------------------------------------------------
-This push contains the following changes:
-
-- Add missing async markers to tegra.
-- Fix long hmac key DMA handling in caam.
-- Fix spurious ENOSPC errors in deflate.
-- Fix SG chaining in af_alg.
-- Do not use in-place process in algif_aead.
-- Fix out-of-place destination overflow in authencesn.
-----------------------------------------------------------------
-
-Eric Biggers (1):
-      crypto: tegra - Add missing CRYPTO_ALG_ASYNC
-
-Herbert Xu (2):
-      crypto: algif_aead - Revert to operating out-of-place
-      crypto: authencesn - Do not place hiseq at end of dst for out-of-place decryption
-
-Horia Geantă (2):
-      crypto: caam - fix DMA corruption on long hmac keys
-      crypto: caam - fix overflow on long hmac keys
-
-Mikulas Patocka (1):
-      crypto: deflate - fix spurious -ENOSPC
-
-Norbert Szetei (1):
-      crypto: af-alg - fix NULL pointer dereference in scatterwalk
-
- crypto/af_alg.c                      |  53 +++++--------------
- crypto/algif_aead.c                  | 100 +++++++----------------------------
- crypto/algif_skcipher.c              |   6 +--
- crypto/authencesn.c                  |  50 +++++++++++-------
- crypto/deflate.c                     |  11 ++--
- drivers/crypto/caam/caamalg_qi2.c    |   3 +-
- drivers/crypto/caam/caamhash.c       |   3 +-
- drivers/crypto/tegra/tegra-se-aes.c  |  11 ++--
- drivers/crypto/tegra/tegra-se-hash.c |  30 ++++++-----
- include/crypto/if_alg.h              |   5 +-
- 10 files changed, 102 insertions(+), 170 deletions(-)
+What happened to the parameters patch-set? Wouldn't this be something
+that should be treated as a parameter?
 
 Thanks,
 -- 
