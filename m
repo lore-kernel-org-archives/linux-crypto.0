@@ -1,44 +1,49 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87D5722FF22;
-	Fri,  3 Apr 2026 01:07:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7FCB248F62;
+	Fri,  3 Apr 2026 01:08:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775178467; cv=none; b=MYdieShsVk8A5VdyX+aR2GLmw2XNF11TeFZxGsi/JH2tMlDaSYm7ms0mTX22vfKNiaxPDnasWN3ChRHcXbXqvYe2gltfUYqDV/x9n20ZowlgakCFRwbF875eUWTytg00rTwvAYFg1ub26jRzORhj5lFv3kORUiIBL5egv1ahEjM=
+	t=1775178507; cv=none; b=WXFQgMg4uOmIg/XD+MQzTdYqphLRDEQhO3gesIlr3yTdXXAjqDwf9HqK8AfdUsDAVXmSTLVjVz9DauR1tTP2oWonWx0i1JzgD+eFZOt/GGEy7PDZZJmEugAYlyw1YqXQRtFgFkLKPT7UNguFY4RZsU3B3kZjt6tRhKeZseI0//s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775178467; c=relaxed/simple;
-	bh=k5C6gkgiXA/NqaObl8ZDaVJKXaLqajdyhBGn2dYY0nk=;
+	s=arc-20240116; t=1775178507; c=relaxed/simple;
+	bh=Q9C7SGmedoYXbH0WOQKLHcH9U2xGYdzCgSllpkNeeE0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oAm6FhD1W5CWb5HrDNkfoV5eNqVVLgSxzHur9CklK4gF1lUNCNBRcrwOQtJ9CN/p0Fdz6DcROMpUoRb6SyE+QuCWrY5Wr9PfNPJV5tl2BmqJ9g06gIzy66xZun8z0grs1ptGBpj9mEp2RiDa8EYcTKhrVPIcXnoLAwMwTA0SNEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=lepwGg7g; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=VnzPSqpGeL6NV7PRXdRJAcRDOf80TL5bOrBToOfVukM6yHDYanVtN4SrYqMRhhhzx13ergyBliOJiVz80Bs55inJOJ94p4915uja5ce8rONFiKNYN0Srb42FyVo5Ig4bZXh3eesBNSTxi75Wx9zDuBCniSrvK0Ewi/w934BP8TI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=AA08h6YE; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="lepwGg7g"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="AA08h6YE"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=ctXhGbNa+e4/eyfqo6kJTXzrkgv1KbKT2pXNmgf3Hbo=; 
-	b=lepwGg7gqwvAltb4R7R1FmGjWbbAI1OzE2Xb0YefMeUmQiwTXgDIjLlmh1ye/XEv51C1NfZnRMb
-	iDr8FTGGPwhruDs1Mkq/1L0ONlgm5S/Jm78l66LxbnyT25785SKrXsxf1vd8Ys7lrFpSLvoSTt6pK
-	ZPaq6/SaCp/4aCEbYTxFUNW2WsO37yUJq+0tL/FmqwR/bQeSnRnSi+Lj0yQqkxIJgUdguxi6h5h2e
-	/igIwl2dyS/sxvxNrXpXs+99bDTiiN+m9f76JdDr3iQCQ1nqqC+l8STeZyC0EhfnYieTSA/RB0kVD
-	15yfXAna+7RiM2Vu5aCv+O68BQWUlTFqr+tw==;
+	from:content-type:reply-to; bh=+USeSNrd+VSsWq4NWpR8STtSmRmf5rBfxlBSk+ilRjc=; 
+	b=AA08h6YEptjPw1421+YEP9vDDsn+1EuiCqm+5zGTK1lJnsyCbFH6dRC6U9wVkitvpmXzxA+8t2w
+	DQtagT41wHKDNp7O2/+JWthWqPJTAxTThvmZFRhY321eAcjuflFwbl6NxXb4WElIJuUGbZPuKfuCM
+	Ndi77UxTBrmTKU6KlCayvnb9z15qE/x+jptTlwE+/LGurxByoU7YY6efkhzcHwj0h260Ktt41Fibo
+	Y846aq+hjxXFM1lbV/A2IqFBjccVdJLRrZQj8f3gf1mylLTSItiAOTmJJZRLcGRbM8O3zxkDgE38C
+	ghrlFACL/aK1Hd5ly5W8x2TOa7BfiSW5xNBA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1w8SbB-003R2e-1Z;
-	Fri, 03 Apr 2026 09:07:41 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 03 Apr 2026 09:07:40 +0800
-Date: Fri, 3 Apr 2026 09:07:40 +0800
+	id 1w8SbY-003R2l-08;
+	Fri, 03 Apr 2026 09:08:03 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 03 Apr 2026 09:08:02 +0800
+Date: Fri, 3 Apr 2026 09:08:02 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: kconfig - fix typos in atmel-ecc and
- atmel-sha204a help
-Message-ID: <ac8S3CTB009wEG8v@gondor.apana.org.au>
-References: <20260327001725.2301-3-thorsten.blum@linux.dev>
+To: Paul Louvel <paul.louvel@bootlin.com>
+Cc: Neal Liu <neal_liu@aspeedtech.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Joel Stanley <joel@jms.id.au>,
+	Andrew Jeffery <andrew@codeconstruct.com.au>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	linux-aspeed@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: aspeed/hash: Use memcpy_from_sglist() in
+ aspeed_ahash_dma_prepare()
+Message-ID: <ac8S8jLrZrXg8M-K@gondor.apana.org.au>
+References: <20260327092418.10476-1-paul.louvel@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,15 +52,20 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260327001725.2301-3-thorsten.blum@linux.dev>
+In-Reply-To: <20260327092418.10476-1-paul.louvel@bootlin.com>
 
-On Fri, Mar 27, 2026 at 01:17:27AM +0100, Thorsten Blum wrote:
-> s/Microhip/Microchip/
+On Fri, Mar 27, 2026 at 10:24:18AM +0100, Paul Louvel wrote:
+> Replace scatterwalk_map_and_copy() with memcpy_from_sglist() in
+> aspeed_ahash_dma_prepare(). The latter provides a simpler interface
+> without requiring a direction parameter, making the code easier to
+> read and less error-prone.
 > 
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> No functional change intended.
+> 
+> Signed-off-by: Paul Louvel <paul.louvel@bootlin.com>
 > ---
->  drivers/crypto/Kconfig | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  drivers/crypto/aspeed/aspeed-hace-hash.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 
 Patch applied.  Thanks.
 -- 
