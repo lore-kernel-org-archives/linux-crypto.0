@@ -1,46 +1,46 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DC2D237713
-	for <linux-crypto@vger.kernel.org>; Fri,  3 Apr 2026 00:44:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C579E233134
+	for <linux-crypto@vger.kernel.org>; Fri,  3 Apr 2026 00:55:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775177063; cv=none; b=Zmv8ArWCb4KE+yNqsCtmC6qA/VhZf8s/eZNoX6gJE0fWeGswnSifKEDxVbZXjRzRIDqLCs30LP0HM2if9Sjg4GuV5FeZL6uBnxoPX6zhzI/uDZ6f9rAsEoujDr+S7e/jDv9jid2QvtSwhVRWcxQiVzRqu+4xZBZeZhvKozV4ndE=
+	t=1775177722; cv=none; b=IdWuXgOWLT2tF2GRFgJpRIbhHb0jBvyoUpBAktErFJEkAzh8uVicRiZe45E3DunzR5PAS+dNjbdQXmusPYqPAGsbO8526un5D/w4BLA1qXVlf5uNDmZX/rCqRhdNmWnN1BNNN3v+v5r9SQfv4OA1PAEo/MT2Ullo5ZPxcW5arxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775177063; c=relaxed/simple;
-	bh=qxqrQ6wKX9lQmiHQNeNN0srwUcwrN4TT3VBm3NEzn+g=;
+	s=arc-20240116; t=1775177722; c=relaxed/simple;
+	bh=8XSfAfxNuW+TXaeqBkfQU0yzF6Wb/cu7osXOGgDzMtE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IhKNpyTQNX2NjTT/qNLQ9Q+gaQ1NCgP9x0TyRYvAhfA5KnXq5MQx5ONXXK5KnfRgDLSjFGY0kQEMOqhyDrDZ6dHkFGYRlnPxS3dm3xo5Re74pC7bDhNs6WHr79gqigFwojVo8x6aN5cOipwhgaFaOwW/5DJuMIPnqUDpKwk9ja8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=ImgPRD6w; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=Lbgk4rMhPkz3rnMdBc2pL57tb6+SFcL4HyYG2hxzB8i9uRvCe+qwSAIDjYupbbM7JKh9sb8eoV5ZRHtfwytUHSZZ8yZNHdKZSpYdHot4Hq4MX6zh3eYw3/jzLS3sV6FSLLOzOGVRkBeOOFjT03R7A4ger6t0ho8z5JeTuJJB0BQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Dn3Vi/Us; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="ImgPRD6w"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Dn3Vi/Us"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=u4jJ9vo9vcaqqgi5LhFVhFnPvQpmbto8g6k9guRK7Dk=; 
-	b=ImgPRD6wPOUVrbeclzzr32aiW6gGlQGxaDWmUnR5o84CxjYuMN6KlUWogUQ7+Ek+C1DN7SxvvEC
-	5G1ROBOI0R9ZOH+BMK5He7INybbpOl+/s9DquB5Lo18M3U2woiaC+bIpL07d1KJVxBb795Tcwhbmg
-	TSFJRBxRefcxa1ooDEzw/R5tobdVv9pM53lorJ/XKB9erm0uzwTv6G+r4+Bj23TZUPPVUBAmc2w8t
-	GcsEKXdX3n3PQPrBIREE2SPNKhoZwOZZHOgmSuqJfwqYffhkIfcXdveFokuWRWJDgRFdg11ll4Wbk
-	hCu0NDIue8h7mR8BL3DsSFwaSC1XU8sUalcA==;
+	from:content-type:reply-to; bh=pvnUOnltIT5QkRUcioKpnyjBxk8ZJhpYwrWtkhgyC4Q=; 
+	b=Dn3Vi/UscYigbqXSeG5+Ia+aFeEFzxd8kBNpZsOOzShrCyRXHIvqWyU3rAgkWXplG9DBOtIMQic
+	jAX9M3ppAeH2X7FNiiJGBs4Xt478HETNU4t0sJqo3Z+g8pGXFsfeIFg/S05Zv7g6mIL9vrk3sPxvS
+	ns5r/DIEcqlZ3cqdiXAgkOmR6N1L7aGL2bnflfZIHDKLX39jOh36sOMLvwp24yV7oWkkmmPRm5bYi
+	ENPaUKwyN67wAE5reJo/NpespT7kLpmtgGQ9dG1j++q+AMAgpLtAfZUWS83V4hGuseEy2OwdFbsQs
+	Zahp7JBYaHQ2F9Cy2YBe4TG7scOTiOfl8K/g==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1w8SEX-003QhD-19;
-	Fri, 03 Apr 2026 08:44:17 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 03 Apr 2026 08:44:16 +0800
-Date: Fri, 3 Apr 2026 08:44:16 +0800
+	id 1w8SP9-003Qs1-2z;
+	Fri, 03 Apr 2026 08:55:15 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 03 Apr 2026 08:55:14 +0800
+Date: Fri, 3 Apr 2026 08:55:14 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
-	Laurent M Coquerel <laurent.m.coquerel@intel.com>,
-	Wojciech Drewek <wojciech.drewek@linux.intel.com>,
-	Andy Shevchenko <andriy.shevchenko@intel.com>
-Subject: Re: [PATCH] crypto: acomp - fix wrong pointer in
- acomp_reqchain_done()
-Message-ID: <ac8NYE0XsniCvNSk@gondor.apana.org.au>
-References: <20260324180721.120175-1-giovanni.cabiddu@intel.com>
+To: Ren Wei <n05ec@lzu.edu.cn>
+Cc: linux-crypto@vger.kernel.org, davem@davemloft.net, smueller@chronox.de,
+	yifanwucs@gmail.com, tomapufckgml@gmail.com, yuantan098@gmail.com,
+	bird@lzu.edu.cn, ldy3087146292@gmail.com
+Subject: Re: [PATCH v2] crypto: af_alg: limit RX SG extraction by receive
+ buffer budget
+Message-ID: <ac8P8tcqzxATISXt@gondor.apana.org.au>
+References: <20260322141516.283737-1-n05ec@lzu.edu.cn>
+ <7094f2ac73594db6f240466220a0fb8fb85b898b.1775051536.git.ldy3087146292@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,20 +49,45 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260324180721.120175-1-giovanni.cabiddu@intel.com>
+In-Reply-To: <7094f2ac73594db6f240466220a0fb8fb85b898b.1775051536.git.ldy3087146292@gmail.com>
 
-On Tue, Mar 24, 2026 at 06:07:09PM +0000, Giovanni Cabiddu wrote:
->
-> @@ -251,7 +252,7 @@ static int acomp_reqchain_finish(struct acomp_req *req, int err)
->  
->  static void acomp_reqchain_done(void *data, int err)
->  {
-> -	struct acomp_req *req = data;
-> +	struct acomp_req *req = container_of(data, struct acomp_req, chain);
+On Thu, Apr 02, 2026 at 11:34:55PM +0800, Ren Wei wrote:
+> From: Douya Le <ldy3087146292@gmail.com>
+> 
+> Make af_alg_get_rsgl() limit each RX scatterlist extraction to the
+> remaining receive buffer budget.
+> 
+> af_alg_get_rsgl() currently uses af_alg_readable() only as a gate
+> before extracting data into the RX scatterlist. Limit each extraction
+> to the remaining af_alg_rcvbuf(sk) budget so that receive-side
+> accounting matches the amount of data attached to the request.
+> 
+> If skcipher cannot obtain enough RX space for at least one chunk while
+> more data remains to be processed, reject the recvmsg call instead of
+> rounding the request length down to zero.
+> 
+> Fixes: e870456d8e7c8d57c059ea479b5aadbb55ff4c3a ("crypto: algif_skcipher - overhaul memory management")
+> Reported-by: Yifan Wu <yifanwucs@gmail.com>
+> Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+> Co-developed-by: Yuan Tan <yuantan098@gmail.com>
+> Signed-off-by: Yuan Tan <yuantan098@gmail.com>
+> Suggested-by: Xin Liu <bird@lzu.edu.cn>
+> Signed-off-by: Douya Le <ldy3087146292@gmail.com>
+> Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+> 
+> ---
+> Changes in v2:
+> - keep the af_alg_get_rsgl() change minimal and only cap seglen by the
+>   remaining af_alg_rcvbuf() budget
+> - fix the Fixes tag to point to e870456d8e7c
+> - reject skcipher recvmsg calls that cannot obtain one full chunk of RX
+>   space, instead of rounding the request length down to zero
+> 
+>  crypto/af_alg.c         | 2 ++
+>  crypto/algif_skcipher.c | 5 +++++
+>  2 files changed, 7 insertions(+)
 
-How about just passing the request in as data?
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
