@@ -1,73 +1,177 @@
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8DC7282F3D
-	for <linux-crypto@vger.kernel.org>; Sat,  4 Apr 2026 13:52:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E03948F49;
+	Sun,  5 Apr 2026 01:16:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775310749; cv=none; b=CeO29zhJ3x0dgl7AC8QbqlvTlA0XZdiQiKUJ0lDvBptOIUng6R6M0NwXQETXLkkQef6k2j0jhF3mhFBOWLQ92cSlWozrTv3K4C39WwIPj1Z/lwxK4Tq+ioCHfAnpdXQ6aqvUgHPBZjTi1rLJmqSp5XRKXEnnmAL1Hni48eJsfq8=
+	t=1775351771; cv=none; b=MlT2LWmfL9F2ST2UTiIOObP6q0Ev2hc9JscsGTSJeeOGJlOHk63nxuEkmki1Kja38mXVqdtceacXtlobFCCQLqdDzgdmoCiO6h6fXEM2XDwxC3eVFYZm26RtiW7DEcDkO2ET48uavaOKQ8zNsz7aivDhi9olgBLxAxbpNV4SDJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775310749; c=relaxed/simple;
-	bh=T+WBnsRzSsi9V7lBTNOlL6zTFFzPwMJQmCFrj4ILtQE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bgn0nfMJG6zirGjsbMMbtFNee472xeAPwD4mk0iXKJQSNS03uZPQoaBUO/AhOLyhnFeRZDPU0LY541GsWCjoyY1Fnn6kyOmVqAHRKi8FnZ9T+xvwL7ZLl+CMHDGmn0MywyNaJrTfbJjqGlD/ZxjaGpLmFb7+sx9YejboiRPFmYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SOs+2pv/; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1775351771; c=relaxed/simple;
+	bh=wUgAW77gLesDjJ7akGuuOi0lJVwMR3VmDH0R9wN+Zqc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SodeKMBIuMKFIj3uZrrXWop61ZixRAcWVYW66Ikpsn9wGmos0Nuc5A/PYmY//LmiXItMFWWoNi5NkOhuMREfV7mGjfS4Xv9YJTq0PwLAzswRCtT5FkcXeTio1o/p2yL5G++w16ahtXqkCnuSDHJ1+zUfPF8cY+kWD14Sd1h2ZZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=efXHlYEj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SOs+2pv/"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1775310736;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=czDC25ht1eY1VXvbm8sYEHIoT3VxE/0qluN+o4Kueb0=;
-	b=SOs+2pv/6Y+AX9IvNXarqe/IR26PA5yPV1Iyp07x8MiPKBIoF5ILo7bc19dYvDSBFztJFG
-	ofBrnL56UqkzVbwUMEZlu1PM4pgHupwqy5faxm6u+m7tdF5sjxdGwWo60b2fzuoFZVY0di
-	3XTLKxukhFETOUSTgKCl3X//zEi6dXw=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="efXHlYEj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44F63C19421;
+	Sun,  5 Apr 2026 01:16:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775351770;
+	bh=wUgAW77gLesDjJ7akGuuOi0lJVwMR3VmDH0R9wN+Zqc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=efXHlYEja0pThEY2fOHOyN/swby0n6ciyBLloFawRc51FOtUFPvmsiFI7hTO/TeIa
+	 IG8a34tByjKDnkVGYkI7T0N1KQ1QIPw9zERC5DYReQvNvKktwG+FYVr4scTWUfZxuw
+	 vDKp3U492MeGimClOFRSeQYZRrz5I54VerJbdlgWVxUHQNP7HvTP0ms9Sh1X9bUN/l
+	 sajcqgjmE8c8t2oc9ICQimbOx0AkrTYc/5lVZHIBlTNjbDdsxvi1speai5C/SXuPQg
+	 w9+XDGMk7MFmffsoI5fcT9uK4ISuw0gtH3RiYtRYoFWs5qhNShY2H4mNMye3hvkSdp
+	 j5mYlEf1r+LdA==
+From: Eric Biggers <ebiggers@kernel.org>
+To: netdev@vger.kernel.org,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: vmx - remove CRYPTO_DEV_VMX from Kconfig
-Date: Sat,  4 Apr 2026 15:52:03 +0200
-Message-ID: <20260404135203.943986-2-thorsten.blum@linux.dev>
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH ipsec-next] xfrm: Drop support for HMAC-RIPEMD-160
+Date: Sat,  4 Apr 2026 18:15:13 -0700
+Message-ID: <20260405011513.64909-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=910; i=thorsten.blum@linux.dev; h=from:subject; bh=T+WBnsRzSsi9V7lBTNOlL6zTFFzPwMJQmCFrj4ILtQE=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDJkXxZv7HUszQl/MPriI++D8DX9aY86v7+cxfmW+k7PKu 0t47zyLjlIWBjEuBlkxRZYHs37M8C2tqdxkErETZg4rE8gQBi5OAZiIizHD/1R3/fBXU/lz2K4p n87cZJVQvNRA5N+udMW5t137xMTE8hn+1336PT2mcWvUc85uloS0IuOfmatP333LnNclrfdkD88 yTgA=
-X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-CRYPTO_DEV_VMX has been moved to arch/powerpc/crypto/Kconfig, remove it.
+Drop support for HMAC-RIPEMD-160 from IPsec to reduce the UAPI surface
+and simplify future maintenance.  It's almost certainly unused.
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+RIPEMD-160 received some attention in the early 2000s when SHA-* weren't
+quite as well established.  But it never received much adoption outside
+of certain niches such as Bitcoin.
+
+It's actually unclear that Linux + IPsec + HMAC-RIPEMD-160 has *ever*
+been used, even historically.  When support for it was added in 2003, it
+was done so in a "cleanup" commit without any justification [1].  It
+didn't actually work until someone happened to fix it 5 years later [2].
+That person didn't use or test it either [3].  Finally, also note that
+"hmac(rmd160)" is by far the slowest of the algorithms in aalg_list[].
+
+Of course, today IPsec is usually used with an AEAD, such as AES-GCM.
+But even for IPsec users still using a dedicated auth algorithm, they
+almost certainly aren't using, and shouldn't use, HMAC-RIPEMD-160.
+
+Thus, let's just drop support for it.  Note: no kconfig update is
+needed, since CRYPTO_RMD160 wasn't actually being selected anyway.
+
+References:
+  [1] linux-history commit d462985fc1941a47
+      ("[IPSEC]: Clean up key manager algorithm handling.")
+  [2] linux commit a13366c632132bb9
+      ("xfrm: xfrm_algo: correct usage of RIPEMD-160")
+  [3] https://lore.kernel.org/all/1212340578-15574-1-git-send-email-rueegsegger@swiss-it.ch
+
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- drivers/crypto/Kconfig | 8 --------
- 1 file changed, 8 deletions(-)
+ net/xfrm/xfrm_algo.c                | 20 --------------------
+ tools/testing/selftests/net/ipsec.c |  8 ++------
+ 2 files changed, 2 insertions(+), 26 deletions(-)
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 8d3b5d2890f8..5b5b488ab09d 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -667,14 +667,6 @@ config CRYPTO_DEV_QCOM_RNG
- 	  To compile this driver as a module, choose M here. The
- 	  module will be called qcom-rng. If unsure, say N.
- 
--#config CRYPTO_DEV_VMX
--#	bool "Support for VMX cryptographic acceleration instructions"
--#	depends on PPC64 && VSX
--#	help
--#	  Support for VMX cryptographic acceleration instructions.
--#
--#source "drivers/crypto/vmx/Kconfig"
+diff --git a/net/xfrm/xfrm_algo.c b/net/xfrm/xfrm_algo.c
+index 749011e031c0a..70434495f23f5 100644
+--- a/net/xfrm/xfrm_algo.c
++++ b/net/xfrm/xfrm_algo.c
+@@ -288,30 +288,10 @@ static struct xfrm_algo_desc aalg_list[] = {
+ 		.sadb_alg_ivlen = 0,
+ 		.sadb_alg_minbits = 512,
+ 		.sadb_alg_maxbits = 512
+ 	}
+ },
+-{
+-	.name = "hmac(rmd160)",
+-	.compat = "rmd160",
 -
- config CRYPTO_DEV_IMGTEC_HASH
- 	tristate "Imagination Technologies hardware hash accelerator"
- 	depends on MIPS || COMPILE_TEST
+-	.uinfo = {
+-		.auth = {
+-			.icv_truncbits = 96,
+-			.icv_fullbits = 160,
+-		}
+-	},
+-
+-	.pfkey_supported = 1,
+-
+-	.desc = {
+-		.sadb_alg_id = SADB_X_AALG_RIPEMD160HMAC,
+-		.sadb_alg_ivlen = 0,
+-		.sadb_alg_minbits = 160,
+-		.sadb_alg_maxbits = 160
+-	}
+-},
+ {
+ 	.name = "xcbc(aes)",
+ 
+ 	.uinfo = {
+ 		.auth = {
+diff --git a/tools/testing/selftests/net/ipsec.c b/tools/testing/selftests/net/ipsec.c
+index f4afef51b9307..89c32c354c008 100644
+--- a/tools/testing/selftests/net/ipsec.c
++++ b/tools/testing/selftests/net/ipsec.c
+@@ -60,12 +60,10 @@
+ #define grchild_ip(nr)	(4*nr + 2)
+ 
+ #define VETH_FMT	"ktst-%d"
+ #define VETH_LEN	12
+ 
+-#define XFRM_ALGO_NR_KEYS 29
+-
+ static int nsfd_parent	= -1;
+ static int nsfd_childa	= -1;
+ static int nsfd_childb	= -1;
+ static long page_size;
+ 
+@@ -94,11 +92,10 @@ struct xfrm_key_entry xfrm_key_entries[] = {
+ 	{"cmac(aes)", 128},
+ 	{"xcbc(aes)", 128},
+ 	{"cbc(cast5)", 128},
+ 	{"cbc(serpent)", 128},
+ 	{"hmac(sha1)", 160},
+-	{"hmac(rmd160)", 160},
+ 	{"cbc(des3_ede)", 192},
+ 	{"hmac(sha256)", 256},
+ 	{"cbc(aes)", 256},
+ 	{"cbc(camellia)", 256},
+ 	{"cbc(twofish)", 256},
+@@ -811,11 +808,11 @@ static int do_ping(int cmd_fd, char *buf, size_t buf_len, struct in_addr from,
+ static int xfrm_fill_key(char *name, char *buf,
+ 		size_t buf_len, unsigned int *key_len)
+ {
+ 	int i;
+ 
+-	for (i = 0; i < XFRM_ALGO_NR_KEYS; i++) {
++	for (i = 0; i < ARRAY_SIZE(xfrm_key_entries); i++) {
+ 		if (strncmp(name, xfrm_key_entries[i].algo_name, ALGO_LEN) == 0)
+ 			*key_len = xfrm_key_entries[i].key_len;
+ 	}
+ 
+ 	if (*key_len > buf_len) {
+@@ -2059,12 +2056,11 @@ static int write_desc(int proto, int test_desc_fd,
+ }
+ 
+ int proto_list[] = { IPPROTO_AH, IPPROTO_COMP, IPPROTO_ESP };
+ char *ah_list[] = {
+ 	"digest_null", "hmac(md5)", "hmac(sha1)", "hmac(sha256)",
+-	"hmac(sha384)", "hmac(sha512)", "hmac(rmd160)",
+-	"xcbc(aes)", "cmac(aes)"
++	"hmac(sha384)", "hmac(sha512)", "xcbc(aes)", "cmac(aes)"
+ };
+ char *comp_list[] = {
+ 	"deflate",
+ #if 0
+ 	/* No compression backend realization */
+
+base-commit: be14d13625c9b070c33c423026b598ed65695225
+-- 
+2.53.0
+
