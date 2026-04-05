@@ -1,147 +1,133 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB142D8DDB
-	for <linux-crypto@vger.kernel.org>; Sun,  5 Apr 2026 22:41:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A07F63845BA;
+	Sun,  5 Apr 2026 23:12:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775428921; cv=none; b=GgRuPTlY8teEzdKLsQNh0ROZJpZGy+7GVBNe5UAjX3AuYWjpJvx9xPGbWCGv6wl5oJ5vuOTQcqTmV2u2gAtWkbF6uXaqf2cYEJJD3dtA6MmIJYPxsflkUWecor5VQhkdobxCHjvbhyDjuyv0xNtdSQJMj4DviBaneIIMTYQTCsU=
+	t=1775430772; cv=none; b=SRkWHWmJwMaB6EBpSXly8DAG1BppsMmG7Mp3Jjaw+zcZU9J2QwlhTEJM9KI9+0Tcc87mTpND3dLkiEjhI0rClL40jy6EPqXeU3bZEHn3W9WJBSaVrRVI39wRLXaOezWQMywZhMxg61C7v4nXGYdNuydp+jO9hc0jJghls1ZJiOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775428921; c=relaxed/simple;
-	bh=ZYwBfPbzxvAcO9wNEIv1uS7MZg/5/tJ7dM0qM9V2B68=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FLzY1BmsMR91AQ0+a+jfWJlfBj1eOSp1gsB7jfpspAUR3z5IOQFwPzQYJfQvhxfw2Tut5IIwdpJdKy0aEV68c0G/2mPZmAMlXjpdSkaSZYcTp9V34+Iw1HVdm3IkOdlEaW/hn40+g1M2bnxCnlq0ni32itbf810krkfOpPK8t50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ZYo+AyJT; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=QQg0THQw; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1775430772; c=relaxed/simple;
+	bh=RKscOPFvYdq0dd98pq3pzwNgVvMIRTQZM+3SnWFroVk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=cIDNGs3QqKTSVX/OFCjyYKBWYkMa8jHoPlnjTODbneAYL+RTW++s61HrlxUKxiPp2e5zENJkRLr/TYWHn2KWDNhKqRMn/iM6Km1NFiNw5WA1tbT+TbkWVCCOG5j1iXzwQT4gdB4tNAJM1YDatEEoYGjAMwMwlAcOVBbjzTQLtgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Qn7JKr4T; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="ZYo+AyJT";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="QQg0THQw"
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 635MVC9U1056963
-	for <linux-crypto@vger.kernel.org>; Sun, 5 Apr 2026 22:41:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	nV0P98lyDdzdwF7jAXLCXCBbvBHVzZd/AEsYBJrQ12c=; b=ZYo+AyJTFEyylReX
-	K5VtAcGHMnD7MaIrxRHkzfeKzMf5Z2goztsBRcsjDnR+NvO8x376SytupI13qs+B
-	f/ce1Q9Mfx1bhD0TUv0vf4HhkhDVP8Hh7gJnmXzNOO4YVrdqjG/WpnT2I3wveLrU
-	xEaoH94xG0hN3gzlXHizm57B22NnyjbnViPjssJoXrqM3KWjiEpsfwRX0rjIAjKw
-	VznmM0QjVHU8adYqUDmgRhCH+9EB6mGMBispXgklJ/ohclERJT9Sp9q+kJWcT3GD
-	phO0o2lOlEA++6A0qBt2GlYnV3i/b5meVRkwLGLPdQ+7F6SODjTrpNx/G9Og/Dtu
-	vO+u1w==
-Received: from mail-dy1-f198.google.com (mail-dy1-f198.google.com [74.125.82.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4dasn5uc8w-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Sun, 05 Apr 2026 22:41:58 +0000 (GMT)
-Received: by mail-dy1-f198.google.com with SMTP id 5a478bee46e88-2d054421d19so85371eec.1
-        for <linux-crypto@vger.kernel.org>; Sun, 05 Apr 2026 15:41:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1775428918; x=1776033718; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nV0P98lyDdzdwF7jAXLCXCBbvBHVzZd/AEsYBJrQ12c=;
-        b=QQg0THQwJJ9xnRbHwQT8UYCEyTyb3gXioaU7N9UMZ8/IyYcS+5/I32wcWnYZL6J8wz
-         WNCzOCPEZasHnpExhlHwBeKHsSSThgi2cZk2mElVJuEDaXp930vkcWABTGbBPA9Hmb6Z
-         6QsKQND+HWcDcjUE8IMnerCllnYoN0uCTDt2hw4F1CEQzVcQyKnyAEdYoAG49ficRpOM
-         /u4ksB6i4wuHnuRGsLNsX+Okw2bcEyJugv10yn88WIKZkmtqHTyoKUragHDuxDw/wrMD
-         cjzwrMCw1N9Qp1sdeQfPN4Z3SpQPIs3Lva5qRLJiUZNww29Z6F+euiUzfH2MXdE6vRzV
-         2KSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775428918; x=1776033718;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nV0P98lyDdzdwF7jAXLCXCBbvBHVzZd/AEsYBJrQ12c=;
-        b=KO9rCDM/s6piOkBPpKF4YXSMqcaS9Ycpw0DAcPhAqPSmb/V0iMstv15DqHt5jCrn+q
-         mYb6RS4pT1kQr0TCeAzpYSwawQD3xrIkH6TPxDMVqrD0C0Knz+V8ESiYqgomtlxN7xWE
-         XCzrQvRGOJb+RjeZ9jKE4o1XTcqfRsVRWgqQ3QEgFYPwzNJ6N0oG1HM9DhAZzjvep14u
-         Uq7TRettZuKch39pWxyh9w0BVL6x0EziyXAmpG+gniMbuY/vQfXkVj2AGbMREs7kXpOE
-         TZlFY045+ig7uXRoFVvj7FbeuyODr6mnVK7fUGn4TpS9ZZIicYLP69OKA/8ahFkn2Dkf
-         pGgw==
-X-Gm-Message-State: AOJu0Yx8IJ8HrngpQs5o8y9TYMgynFgAhTJbdw0nExygJmES1lUR1W5S
-	zp/o1QByjYSDaIUrDCk/uxnp8jflX+HjKvNLLJOSBeVm90/doFpBjn4VfrUAG9s9CQz0wxVdGnc
-	BPJD6R7ii56nk2K+AjcEMlDZp9Q43koE2cSBAAp0dtPn0u4d8jFtrJq3xume8O77ilYU=
-X-Gm-Gg: AeBDieulo9AJ7ie4NcnF/HVoratfk/XPE7wjgntYL0XiZB7kLJFlQ7qG305z2fipriP
-	sYzHfRavbe1kkhy73dsr3la5/PAygjAyVESR54rS+8jfpaH4Iro5Kw/KIKTkfyUy/RWjCeGR6ym
-	EEMqT7ess6umudDYV6BGvkuBu5hstzMR2CBeBvYJ1S/Ufmz6iiscW4cYqeYD0iXqQInNzif2FYh
-	htKYgqdTjrlvAY/875NELR4rqVpqQDf4EMm2K1kC3+qGMp3MRWRmCIpKwm6M5xn3K4JOAPP1ceA
-	OWRJRDVqOzuljxv4Ncora/w9G0bGxrahl9Dby3sgnxmRi/nOQs4QKBy4kJ4QQMmQFtOTQEfwD1+
-	XogNDQ86cF7JoYFPJbTovV3jRuwHQyJ/i8BvwYX7X0EOEf/FzwfsWopm7VuSmhlHFl+C3Nk6q1B
-	Nx6fubyW4LHeNEhA==
-X-Received: by 2002:a05:7022:ec17:b0:119:e569:fbb4 with SMTP id a92af1059eb24-12bfb770b25mr5167890c88.35.1775428917880;
-        Sun, 05 Apr 2026 15:41:57 -0700 (PDT)
-X-Received: by 2002:a05:7022:ec17:b0:119:e569:fbb4 with SMTP id a92af1059eb24-12bfb770b25mr5167878c88.35.1775428917420;
-        Sun, 05 Apr 2026 15:41:57 -0700 (PDT)
-Received: from [192.168.1.44] (c-24-130-122-79.hsd1.ca.comcast.net. [24.130.122.79])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12c07a8703esm4325942c88.8.2026.04.05.15.41.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 05 Apr 2026 15:41:56 -0700 (PDT)
-Message-ID: <9a3cbef9-5599-48cf-8307-3114ac2de704@oss.qualcomm.com>
-Date: Sun, 5 Apr 2026 15:41:55 -0700
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Qn7JKr4T"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 635K04So3444047;
+	Sun, 5 Apr 2026 23:12:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=pp1; bh=YC0+m+DhEARNhrzYM
+	b8TiEdynyxP4Br8iE3bDr8XovE=; b=Qn7JKr4THG+kS6BY0aMMtUMBXT6eYpYX9
+	55pA0Cr6sElQlUhAAtrTwBRWnKQk/gFA5yziYggj3e4FgI8wHOKLjSMoxfVEx4rg
+	npXWSamHb4gWUjZWql2WycrJXjhbQeN45tk3OpPhKPk7lf2bwA8NYU3KdaP9iAl4
+	33v8lVpmr5yf5uWRrIF3lT+uZC94uVIZbfel/lmqWE8M0BK4jWAx+wbetJDg2ZST
+	cHWEKAWy0Y/ilvpbxZvW2g3UJ4/TKQnLMIslEJ78sPKTEGC5th1f0q3sre9GXvfx
+	IknkilwXVgL+9l4z6eyjlJXEfWRAjipxWMd25AyhtpJWqLEczlTzw==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4dat9rc64b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 05 Apr 2026 23:12:35 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 635MsDcI020298;
+	Sun, 5 Apr 2026 23:12:35 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4dbdynanxd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 05 Apr 2026 23:12:35 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 635NCXRS24904230
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 5 Apr 2026 23:12:33 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 615D15805B;
+	Sun,  5 Apr 2026 23:12:33 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4BE6858059;
+	Sun,  5 Apr 2026 23:12:32 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Sun,  5 Apr 2026 23:12:32 +0000 (GMT)
+From: Stefan Berger <stefanb@linux.ibm.com>
+To: linux-integrity@vger.kernel.org, linux-security-module@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, zohar@linux.ibm.com,
+        roberto.sassu@huawei.com, ebiggers@kernel.org,
+        Stefan Berger <stefanb@linux.ibm.com>,
+        David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>,
+        Ignat Korchagin <ignat@linux.win>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH 1/3] crypto: public_key: Remove check for valid hash_algo for ML-DSA keys
+Date: Sun,  5 Apr 2026 19:12:22 -0400
+Message-ID: <20260405231224.4008298-2-stefanb@linux.ibm.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260405231224.4008298-1-stefanb@linux.ibm.com>
+References: <20260405231224.4008298-1-stefanb@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH wireless-next 4/6] wifi: ipw2x00: Depend on MAC80211
-To: Eric Biggers <ebiggers@kernel.org>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        linux-wireless@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-References: <20260405052734.130368-1-ebiggers@kernel.org>
- <20260405052734.130368-5-ebiggers@kernel.org>
-From: Jeff Johnson <jeff.johnson@oss.qualcomm.com>
-Content-Language: en-US
-In-Reply-To: <20260405052734.130368-5-ebiggers@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDA1MDIzNiBTYWx0ZWRfX5oAb84oM1oQQ
- mhjJ5lkYWMRht58H0e/uyIfbfFijakBhJIaIWU3vdKN/gMI15REyn/kFbhycXu92XMAJJiZM9Pg
- csaAvnNeSIH86EV5MttajRs/Xc+LYvP8fRLej/0LPwku/740wy8UrHwbiPNCVwiSRV8YQZaRQcp
- EIUWato+VBUx8cE1j5EaaCnV7VCRvmV7kkOKT6ve0CYEmdPHiSYA5b7whBlSpcLnzHT40CAbH/w
- HpbNIkWSH4i/lJzxKaiRYIkeUPmj4BXmiDye4fLPp7iYToulZMzMXbkG4NbePb2lzQXsUo2giXf
- joL5wj4C3xJ2aLwF/rDlShX3+3kZyz71gZdBk1RLohJCsrc8hRQ9S7L6AzimMnCvOTLi4Ug3lNZ
- yLpRkR/cGMd+36VrqTCdLIKy/uM9ILdzOpUhjFdFPjQk52RselCSE0Lqr/kxvUJ+i1PLp5ODcuJ
- TOdomSHBJ+IVQNrY73Q==
-X-Proofpoint-ORIG-GUID: WXTm6y-CrS7QZ6AgA-Tp-TEJSMnvrgUK
-X-Authority-Analysis: v=2.4 cv=K9wv3iWI c=1 sm=1 tr=0 ts=69d2e536 cx=c_pps
- a=wEP8DlPgTf/vqF+yE6f9lg==:117 a=Tg7Z00WN3eLgNEO9NLUKUQ==:17
- a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=_glEPmIy2e8OvE2BGh3C:22
- a=NS484S8f6nxxdAqyviwA:9 a=QEXdDO2ut3YA:10 a=nGxtSMqkhFwA:10
- a=bBxd6f-gb0O0v-kibOvt:22
-X-Proofpoint-GUID: WXTm6y-CrS7QZ6AgA-Tp-TEJSMnvrgUK
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: E2_gpMsXKyTCKxIyhMMyi9dQ7_Ljeu70
+X-Proofpoint-ORIG-GUID: E2_gpMsXKyTCKxIyhMMyi9dQ7_Ljeu70
+X-Authority-Analysis: v=2.4 cv=bLYb4f+Z c=1 sm=1 tr=0 ts=69d2ec63 cx=c_pps
+ a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
+ a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
+ a=RzCfie-kr_QcCd8fBx8p:22 a=20KFwNOVAAAA:8 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8
+ a=ZmJwLY9U1ndrk4b8UDEA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDA1MDIzNyBTYWx0ZWRfX8M6uFqyctA6d
+ W8Ps4YI/PoLhVbuEhrcEZwVKkL/n5DbGkg2QemXdx7ZAxWrIIQlL7VLnsF3MEbjM0rKU5/97LYW
+ n5X/1zD21efxESlHEyUu78vrOSsSsEB/+JIunvB0shbqbcnj0J5LZTCPVUo/E2i7qrVv+ZI/NsS
+ Xk3gepLpDmTIPK5DRu37R6+kahvU64Jy32GQkHxDj80iSnQhJg8AGGq8OArE+9pLb2Qxb8Eceih
+ DEeY4H1WDUL7rsPzzmxCkZZjfb/EmdIGBG8fz2umew0VaptwIPvhW3Gs/JwwZ/hY/V11F6ufvjY
+ PzoQB0Zpr44OIb+0hn4MYLoWcN8uffrVPjlw3HJ/nvBelOCC9TWLKNzETc63ngx9e8LsfJPNKnY
+ 25gEOy3Pyy7SQeBFW+6pau4si0cKb3JwtJvAkDxYyeiOXxrh6J7XY6dRiqPgFL5/AIDVIfMGkXK
+ q+nNnXAu80/ozCa01JQ==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-04-05_07,2026-04-03_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 malwarescore=0 suspectscore=0 bulkscore=0 clxscore=1011
- lowpriorityscore=0 impostorscore=0 adultscore=0 phishscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2603050001 definitions=main-2604050236
+ clxscore=1011 adultscore=0 suspectscore=0 phishscore=0 bulkscore=0
+ spamscore=0 priorityscore=1501 lowpriorityscore=0 malwarescore=0
+ impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2603050001
+ definitions=main-2604050237
 
-On 4/4/2026 10:27 PM, Eric Biggers wrote:
-...
-> @@ -149,11 +149,11 @@ config IPW2200_DEBUG
->  
->  	  If you are not sure, say N here.
->  
->  config LIBIPW
->  	tristate
-> -	depends on PCI && CFG80211
-> +	depends on PCI && MAC80211
->  	select WIRELESS_EXT
->  	select CRYPTO
->  	select CRYPTO_MICHAEL_MIC
+Remove the check for the hash_algo since ML-DSA is only used in pure mode
+and there is no relevance of a hash_algo for the input data.
 
-remove??
+Cc: David Howells <dhowells@redhat.com>
+Cc: Lukas Wunner <lukas@wunner.de>
+Cc: Ignat Korchagin <ignat@linux.win>
+Cc: keyrings@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+---
+ crypto/asymmetric_keys/public_key.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
->  	select CRYPTO_LIB_ARC4
->  	select CRC32
+diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+index 09a0b83d5d77..df6918a77ab8 100644
+--- a/crypto/asymmetric_keys/public_key.c
++++ b/crypto/asymmetric_keys/public_key.c
+@@ -147,11 +147,6 @@ software_key_determine_akcipher(const struct public_key *pkey,
+ 		   strcmp(pkey->pkey_algo, "mldsa87") == 0) {
+ 		if (strcmp(encoding, "raw") != 0)
+ 			return -EINVAL;
+-		if (!hash_algo)
+-			return -EINVAL;
+-		if (strcmp(hash_algo, "none") != 0 &&
+-		    strcmp(hash_algo, "sha512") != 0)
+-			return -EINVAL;
+ 	} else {
+ 		/* Unknown public key algorithm */
+ 		return -ENOPKG;
+-- 
+2.53.0
 
