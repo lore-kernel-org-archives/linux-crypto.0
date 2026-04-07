@@ -1,77 +1,108 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26FDD35AC2F;
-	Tue,  7 Apr 2026 19:29:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A30A30C61B;
+	Tue,  7 Apr 2026 19:33:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775590182; cv=none; b=HS2PYu2McbQrmtulCqm4mV9AeKVGKLqOJxu3ZIdU/pMGEt/Cniig4BIiskJc1NKUTf1KsEbguCbJsNGQjTZWR3X3VXO4XGCKKpbAM76A8l1ZekRiNbjWPrAOnzZ8xcCvDs4dTPTH4Ou+6fTtJ6wCtJTTaSFLUZxNmg3gAAqOoiA=
+	t=1775590439; cv=none; b=oDIsKGZ7pr5JGCiXAF2lXJDfFz6gHJwQd4tBDg6ePbfhclh0eqOWwIkgXHiK1MTFYV8eemXA6BeOmidFxhi+CkS4Q9aiFtE3VM3A+tORIEOY6ppgU7CXksQT0n0fwM9EbnHRRXiyQLABBOET4AXHpZWDUf2kHeSNVzfSAuqYvHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775590182; c=relaxed/simple;
-	bh=57m/MHhmb5jz7OVk2BzrYzPNeKdwEks4x6zwHLZ0J6I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VwGqP7jMO376O8P69l0gTK72IRZ7ZOCqEM+hRFmw/WMEm851g6CPqYK7kTFkCaNGjMNoH9pDDf3050m8He0k9TXaYmIRtyZxZX25BcbKPLkx3tEBjQGONAS524jEcU9YB4j1hs7JQYjZkRu8Cy32zxS9gVRj2qZo603qLwu6yE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=AExyMAdr; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1775590439; c=relaxed/simple;
+	bh=+VjAbOhrU4zSzvQ97yDAQ8yIuYHE6jTCE7CNjVM7FSA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ISSssZOKzAqbfvHXpw27tNwCQKH0PE8QSXg8H6igL7ie/GCWWj1uMHHLuQ+neXtsgllHsHC7WFAX/uauz9BVP9NrEaNE0ds70IJGifQUJK/RTB7k0UeSKtLEi4Qu5j1tQNN7ialMUQ3U2e8qzqAFEW9bqHPjS8sUCQVEH5U3ltc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gi8PAVZk; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="AExyMAdr"
-Received: by linux.microsoft.com (Postfix, from userid 1216)
-	id 0337820B7135; Tue,  7 Apr 2026 12:29:41 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 0337820B7135
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1775590181;
-	bh=s7BvHIXUu/KyBlp0Bh64m9iU1jIIBC4g+vpzAyrmhA8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=AExyMAdr/2moVZ3cwtjXrEfUHWE8ytLxMd0Bi3A3BWIfMTPoNYqZgo6ige9DgkoAu
-	 eAbIdTsod9SyuHLV177tEg9OwAnZdUZa/hgWdX1n7vGFk0b8lohV77HAHWxXFUD+FP
-	 k0W3kNaUohEn0/X3HcoAoTUNCvkqDkRbHH39wz84=
-From: Hamza Mahfooz <hamzamahfooz@linux.microsoft.com>
-To: linux-crypto@vger.kernel.org
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gi8PAVZk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90EE6C116C6;
+	Tue,  7 Apr 2026 19:33:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775590438;
+	bh=+VjAbOhrU4zSzvQ97yDAQ8yIuYHE6jTCE7CNjVM7FSA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Gi8PAVZkL4brMY9NBpojQJyGAnXgJD4K9J9V2pL+i9irvsLGwsuxCNwkOwIgoyW78
+	 PrQ6KXYHcA40gvAtXaDVZXglOl2mMvEA1QNcD8ndYWC2QAtyMCA/dGz7ZdVpWsbKtR
+	 +ECgYLmeWnNveWs+HRXnfe10R+AH07bVPdXXtaJsL2gMKHnI9S/X4PIsNMS02MkcS9
+	 K8fcqS4LXAcLQsJuGm0AleTAeHtxxB8vtrnZFb6Kbzr49lDx0571/eFxiiBi3/m1Gh
+	 PECk0DcF9g5tP7EWIQ2fDVnLV8vdFxFDD4iTZ77/gchX+fUxIYVc6K6pw/fnZSvige
+	 NRpgatw2yhR+w==
+Date: Tue, 7 Apr 2026 14:33:56 -0500
+From: Rob Herring <robh@kernel.org>
+To: "Miquel Raynal (Schneider Electric)" <miquel.raynal@bootlin.com>
+Cc: Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jayesh Choudhary <j-choudhary@ti.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Hamza Mahfooz <hamzamahfooz@linux.microsoft.com>,
-	Jeff Barnes <jeffbarnes@linux.microsoft.com>,
-	Paul Monson <paul.monson@capgemini.com>
-Subject: [PATCH] crypto: tstmgr - guard xxhash tests
-Date: Tue,  7 Apr 2026 12:28:59 -0700
-Message-ID: <20260407192859.270745-1-hamzamahfooz@linux.microsoft.com>
-X-Mailer: git-send-email 2.43.7
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Antoine Tenart <atenart@kernel.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	Pascal EBERHARD <pascal.eberhard@se.com>,
+	Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH 16/16] ARM: dts: renesas: r9a06g032: Describe the EIP-150
+ block
+Message-ID: <20260407193356.GB3531350-robh@kernel.org>
+References: <20260327-schneider-v7-0-rc1-crypto-v1-0-5e6ff7853994@bootlin.com>
+ <20260327-schneider-v7-0-rc1-crypto-v1-16-5e6ff7853994@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260327-schneider-v7-0-rc1-crypto-v1-16-5e6ff7853994@bootlin.com>
 
-If the kernel isn't built with CONFIG_CRYPTO_XXHASH and booted with FIPS
-mode enabled it will currently panic. So, only benchmark xxhash64 if
-CRYPTO_XXHASH is enabled.
+On Fri, Mar 27, 2026 at 09:09:38PM +0100, Miquel Raynal (Schneider Electric) wrote:
+> The EIP-150 is composed of 3 blocks:
+> * An interrupt controller named EIP-201 AIC
+>     - fed by a clock coming from the EIP-150
+>     - connected to the main GIC
+> * A random number generator named EIP-76
+>     - fed by a clock coming from the EIP-150
+>     - signalling interrupts through the AIC
+> * A public key accelerator engine named EIP-28
+>     - Fed by a clock coming from the EIP-150
+>     - Signalling interrupts through the AIC
+> 
+> Signed-off-by: Miquel Raynal (Schneider Electric) <miquel.raynal@bootlin.com>
+> ---
+>  arch/arm/boot/dts/renesas/r9a06g032.dtsi | 42 ++++++++++++++++++++++++++++++++
+>  1 file changed, 42 insertions(+)
+> 
+> diff --git a/arch/arm/boot/dts/renesas/r9a06g032.dtsi b/arch/arm/boot/dts/renesas/r9a06g032.dtsi
+> index f4f760aff28b..6aaa93ed03d6 100644
+> --- a/arch/arm/boot/dts/renesas/r9a06g032.dtsi
+> +++ b/arch/arm/boot/dts/renesas/r9a06g032.dtsi
+> @@ -8,6 +8,7 @@
+>  
+>  #include <dt-bindings/interrupt-controller/arm-gic.h>
+>  #include <dt-bindings/clock/r9a06g032-sysctrl.h>
+> +#include <dt-bindings/interrupt-controller/inside-secure,safexcel-eip201.h>
+>  
+>  / {
+>  	compatible = "renesas,r9a06g032";
+> @@ -170,6 +171,47 @@ usb@2,0 {
+>  			};
+>  		};
+>  
+> +		eip150: bus@40040000 {
+> +			compatible = "inside-secure,safexcel-eip150", "simple-pm-bus";
+> +			clocks = <&sysctrl R9A06G032_HCLK_CRYPTO_EIP150>;
+> +			#clock-cells = <0>;
+> +			clock-map = <&sysctrl R9A06G032_HCLK_CRYPTO_EIP150>;
 
-Cc: Jeff Barnes <jeffbarnes@linux.microsoft.com>
-Cc: Paul Monson <paul.monson@capgemini.com>
-Signed-off-by: Hamza Mahfooz <hamzamahfooz@linux.microsoft.com>
----
- crypto/testmgr.c | 2 ++
- 1 file changed, 2 insertions(+)
+I don't get why you need clock-map here. Why can't you just put this 
+clock in each child node?
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 4985411dedaec..9e4a040029ab8 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -5609,7 +5609,9 @@ static const struct alg_test_desc alg_test_descs[] = {
- #endif
- 		.alg = "xxhash64",
- 		.test = alg_test_hash,
-+#if IS_ENABLED(CONFIG_CRYPTO_XXHASH)
- 		.fips_allowed = 1,
-+#endif
- 		.suite = {
- 			.hash = __VECS(xxhash64_tv_template)
- 		}
--- 
-2.53.0
-
+Rob
