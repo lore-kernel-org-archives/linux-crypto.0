@@ -1,67 +1,84 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58D29DDCD;
-	Tue,  7 Apr 2026 06:24:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52C6B3845B2;
+	Tue,  7 Apr 2026 06:25:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775543072; cv=none; b=BOCxp6X27/ipMXmC3+m91FqyX3P5rjnWn+Z/d60Qq1IWjkr2AQ4VRe8poT5iHOj+NZy4xjGA3jupor/djTW6w3D2F5P/PZxGq3wkWFmYoyIZ8jJEUQuYZQ9P+fqoFyoHCKH8yiyEP4Ed5y5zlJdv4uPM0VHlc9Pj4/qGvwn8tlA=
+	t=1775543134; cv=none; b=RJTYLYle9l5xByWartgFXjz7Q+ds9hix/GeRBaA2g+tyF9gPLUyeE7Lg5zrpRkI2SUKBDHRAiSp3T9ZIsxFGQWsX4Sj7+nlMfwBuM6l8+/BfmknwC7Std+nXvKdZU3TprI8m/HYjXtlGRcpADDjicmH1bq1Z4/ZD5EyC7/kYLZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775543072; c=relaxed/simple;
-	bh=gEmydQWU5H0gU/LawkroIsii6moWN5ZHx2VJ7BK0QnM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AKIR9RH5aEC47fHtES6qo6Quw/QUEw0am2dBvNxK+etLYUm7Bfjitu06RcL95zI2HuqOx8neso/J5ia3ZR0V7zAqo5DH/dfMHu1R4rcJcASPPpGa70y5tgRQRksBrTzVsTk7xGbxZRdZ9gJfbUYzJtGLOTSEmRd8Wbom5a2wraA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=bUYzNHPQ; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+	s=arc-20240116; t=1775543134; c=relaxed/simple;
+	bh=7myyrQLyPFYxdKfnkSXwkzBuz3EJBZB6Q5+S3A0CE+Q=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=WYNSXea5XSg0kvXar4b5L/J9hIkNcj7tbPNBed4CoLI7buGmk/nVbQ+4WghTQqw5j7miD89z/E2Mmc+XcOICWanEW9jVTsJSIIS9ZeUR/7tfz+e3tpdk83SFxOqNelUUjycLNOYv+QI6HQgimhe57ekHVh5e2fasFhJyPhh4AZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=IVery5rZ; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="bUYzNHPQ"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="IVery5rZ"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=lpdAosinKyrrqUh3CA7cYZ19ZJs2FIASHNDL4+fYZcs=; b=bUYzNHPQR6OUtUZTZtIoqpN1BA
-	/tCjamHLI+9iPG9hZYdkKzpmxnv5iLKYcCalZIxfmdnh82T+w6yWsXjp9WeDvKMabUHKqhh+kXs7R
-	Qpc09HwaCWCgfY5hklKxXNqzHtaNV5cI6lNjWb+0tOmiqhyCrOYP+o4+gZLel7E2BzWD+kB/VFVM+
-	70gHMYtS5/zYzSaD4qHkPlwBXKMbpR+TmV1BEW5vvRz9uxXlza+dMnUBnyS6RHV2ZPQeg1gDrCDGM
-	CNIo7I+9l8POlVsNSJSGEm9Ob6FJ8jO4V8smfaRPxI/LQL2DDHFC6q0UPw3EzA5hVDRewhLWsCGlw
-	zaRBcnJA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1w9zrS-00000005z4m-2Vc0;
-	Tue, 07 Apr 2026 06:24:30 +0000
-Date: Mon, 6 Apr 2026 23:24:30 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Johannes Berg <johannes@sipsolutions.net>,
-	linux-wireless@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=f34iJLD9ZZePI8PF+bqyMD2gigAtlHfku0r+4VhOe40=;
+	t=1775543132; x=1776752732; b=IVery5rZ3BU4vpMv+3oWBYQy7Bd3rV0amTl2oK7WCzPD8U/
+	KI3bIRp3N+ueIaBYrBE2L9wrvtQfup306oLiyW2aKGVcyy3O08OcMw4p40obMO4RNLHNjGR/vtAGJ
+	cdE5p2vco/cIOF5dnhCMPvDbS2fax/QiNxMJBygb2EaHGPsqzOOI7G4Ccqnl7j+22XgnP9xbHEIoj
+	GnS/Im8IP7l8Av7FU0mpXj1dKK3473qdtrusgykKgPQ5/CFpwpYU1sUPxcxcDfo4iY9bkUpQKoBNO
+	W0LP7rvqurqiCDSAr9PhjEWSiYeJADiVTCP3il2nccFBlVDfPYHLVwDlB+fTL/LQ==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1w9zUc-0000000C2JF-2VsW;
+	Tue, 07 Apr 2026 08:00:54 +0200
+Message-ID: <7f69d6e6c2057858eda5c65ec77be44d72c6ac78.camel@sipsolutions.net>
 Subject: Re: [PATCH wireless-next 0/6] Consolidate Michael MIC code into
  mac80211
-Message-ID: <adSjHlfi15v_U62B@infradead.org>
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Eric Biggers <ebiggers@kernel.org>, linux-wireless@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, Herbert Xu
+	 <herbert@gondor.apana.org.au>
+Date: Tue, 07 Apr 2026 08:00:53 +0200
+In-Reply-To: <20260405052734.130368-1-ebiggers@kernel.org>
 References: <20260405052734.130368-1-ebiggers@kernel.org>
- <7f69d6e6c2057858eda5c65ec77be44d72c6ac78.camel@sipsolutions.net>
- <20260407061508.GA7934@sol>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260407061508.GA7934@sol>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-malware-bazaar: not-scanned
 
-On Mon, Apr 06, 2026 at 11:15:08PM -0700, Eric Biggers wrote:
-> Just to clarify, mac80211 already contains the michael_mic() function.
-> And every driver that needs Michael MIC already depends on mac80211
-> except for ipw2x00.  So bloat-wise I assumed it's probably better to
-> make that one driver depend on mac80211, rather than make every driver
-> pull in the Michael MIC code (by moving it from mac80211 to cfg80211).
-> But if you prefer that the code be in cfg80211 we can do it that way.
+Hi,
 
-To me the most sensible thing would be to have a separate module for
-the code.  If you don't want to expose it too widely for understandable
-reasons, keep the module in net/wireless/.
+On Sat, 2026-04-04 at 22:27 -0700, Eric Biggers wrote:
+> Michael MIC is an inherently weak algorithm that is specific to WPA
+> TKIP, which itself was an interim security solution to replace the
+> broken WEP standard.
 
+Heh, yeah, we keep thinking about whether or not we can remove either of
+them completely, but ... backward compatibility is messy.
+
+> Seeing as Michael MIC is specific to WPA TKIP and should never be used
+> elsewhere, this series migrates those few drivers to the mac80211
+> implementation of Michael MIC, then removes the crypto implementation of
+> Michael MIC.  This consolidates duplicate code and prevents other kernel
+> subsystems from accidentally using this insecure algorithm.
+
+Makes sense, mostly.
+
+The one thing that feels odd to me in this is moving it to *mac80211*
+specifically, and then using that in the ancient drivers. Not only is
+that a big module those don't (otherwise) need, but also it makes it
+look like you need the softmac stack for those drivers, but they're
+really hardmac so that's a bit confusing.
+
+I wouldn't want to have a separate module just for this, but I think
+since it's going to be exported anyway, we could move the whole
+michael.c file to net/wireless/ and make it part of cfg80211. All
+wireless drivers ought to depend on that anyway.
+
+johannes
