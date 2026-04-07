@@ -1,30 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 944E033C52F;
-	Tue,  7 Apr 2026 17:49:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2340E33A032;
+	Tue,  7 Apr 2026 17:49:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775584145; cv=none; b=NVs1cqCD6oOr0AYGDjKvuBwNzyTTS1B5FmQXINZvu6cOeI8P06vY90s2w8ePeqzvYrvQpveP2F/J6/Xq5R/u9LAw9J5wiKrNURXCJ4yq1fobmpcbMLGvY4Sl9n6B4D98iCxDJewU8+BdPm8VNeyWofhJ18eyvMWHtw1qiJuKxOM=
+	t=1775584148; cv=none; b=diu0xPC6jdfKrm3bXclqKKMWyN/pQS6bS8ccCDC6U561iT0K3GUnRhoAO1G7ppaYCukTtSpuJBzzih259lQ92HTvKfxZ6yO8GByx35SxEmUlRC3DYJNwo2MpihyByR634yLtvjjWKsEIhrLV6yXtqm+y04V/aKzuWj6cHqafkzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775584145; c=relaxed/simple;
-	bh=FoRWT1w51xl6bRtE0JavfCiLUQUXEkZHllhk85PFQYM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k7kdthNnrYEzc2cOSPn8o3BNcupx8OiA76k/mAz8rQknPCma72CdL98J44C8eHmBDeIc77DVp6jvWZTUJ8AYWDCssTfLiyJM4BKc9xNSUYp+LRUKFXCW7Oc339Dm8VJ2RPKVaRUpNsLK8KHCjYNDBtTSK+1xk5PJ3hagPz/X8DY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sRjbX9+W; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1775584148; c=relaxed/simple;
+	bh=2lMBOE4+KHxFhAZiiqXAZc5Uiw6r48i2vTpqkJRI2bw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=l7DGZLgieJFaAFVVwLYM8tw8dnnE4ao9dN3qKFxMctbwoU7JZTSICJMZxOdoR+X9KAMOiPpPcEwdNVrrAmfdps5rDcEORO9dpOGGUQ3ViJyRrcEcXLW0yC0WOwsT4qmzsMrV76Q4JbqMK4aszmWf7BnC7V0Ck8qU6dv2RahaCes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ibIouRTs; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sRjbX9+W"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 980ACC116C6;
-	Tue,  7 Apr 2026 17:49:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ibIouRTs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 422EBC2BC9E;
+	Tue,  7 Apr 2026 17:49:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775584144;
-	bh=FoRWT1w51xl6bRtE0JavfCiLUQUXEkZHllhk85PFQYM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=sRjbX9+W25DVc5weQUQLcqh2uwYP37Kp5nA0G7HfoTbXLGS7l41WFzFADtSRzzjQj
-	 fDYnQGrxUTGjdv7alGTd9q7UeQuhKoD50b69LClx8iHsZYaJJTKOUXgd1K0Sd0SQCD
-	 jQPdhwlRIR2arPU1SfhcpQoN3VNF9kRWoagV7+cuQ0q2ybgzvNZAkbi4S/zDT7wLHn
-	 ohFmUm1EgOVPEUPJI8hecPtGq6hMFbe1j3/Orvdw2UN5VQjMwmSt0iuXdbLoMZ75Qd
-	 3sXWWYHOAAVF7BgEbg/DkY2EWMUuufC3xnk9+xs8EyNxvpaH27huOOd/3RzyFGYxSY
-	 97tX8tGFJoxOg==
+	s=k20201202; t=1775584147;
+	bh=2lMBOE4+KHxFhAZiiqXAZc5Uiw6r48i2vTpqkJRI2bw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=ibIouRTsZvoTMPIVLi5rAepgDa1XS7PEpQzcVQRjmz7B5U7iZe5GS7XMBZMEHmUP0
+	 27rR3hNr1y4lX+CuPEB6ziMZS6A4nHLK6YNMy4dy2PGxDjDRRNV8x1VFtoOZ7kjHxI
+	 pT4givI2coK1MOswa0ZETNQNAI4pYArS0FJ/OlDEPDprbg8I58S/6VTK3W/sQtDpca
+	 poG6XbgNHGUyw3PKvQTn729urCbn8pzQUyXITMkpltB1bAXY0dvpNNut0SVfqQVopk
+	 uOi6imRY0yVDq/ReCUA76D6gs5JzfjvApQYobbdbRDtYcS76T/szT/Q1KrmnCWVE1I
+	 71DCkF29exxjg==
 From: Tycho Andersen <tycho@kernel.org>
 To: Thomas Gleixner <tglx@kernel.org>,
 	Ingo Molnar <mingo@redhat.com>,
@@ -48,10 +49,12 @@ To: Thomas Gleixner <tglx@kernel.org>,
 Cc: linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org,
 	"Tycho Andersen (AMD)" <tycho@kernel.org>
-Subject: [PATCH v2 0/2] Skip SNP initialization if CPUs are offlined
-Date: Tue,  7 Apr 2026 11:47:11 -0600
-Message-ID: <20260407174713.439474-1-tycho@kernel.org>
+Subject: [PATCH v2 1/2] x86/sev: Do not initialize SNP if missing CPUs
+Date: Tue,  7 Apr 2026 11:47:12 -0600
+Message-ID: <20260407174713.439474-2-tycho@kernel.org>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260407174713.439474-1-tycho@kernel.org>
+References: <20260407174713.439474-1-tycho@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -62,29 +65,91 @@ Content-Transfer-Encoding: 8bit
 
 From: "Tycho Andersen (AMD)" <tycho@kernel.org>
 
-Here's a v2 of the series. Changes are:
+The SEV firmware checks that the SNP enable bit is set on each CPU during
+SNP initialization, and will fail if it is not. If there are some CPUs
+offline, they will not run the setup functions, so SNP initialization will
+always fail.
 
-* propagate the error from snp_prepare() through __sev_snp_init_locked()
-* use cpus_present_mask instead of cpus_possible_mask to reason about
-  the set of available CPUs
-* print the CPU masks for easier debugging
+Skip the IPIs in this case and return an error so that the CCP driver can
+skip the SNP_INIT that will fail. Also print the CPU masks as a breadcrumb
+so people can figure out what happened.
 
-It turns out that CONFIG_INIT_ALL_POSSIBLE is not user-settable, and
-only parisc selects it, so it shouldn't be a problem here.
+Suggested-by: Borislav Petkov (AMD) <bp@alien8.de>
+Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
+---
+ arch/x86/include/asm/sev.h |  4 ++--
+ arch/x86/virt/svm/sev.c    | 15 +++++++++++++--
+ 2 files changed, 15 insertions(+), 4 deletions(-)
 
-v1 is here: https://lore.kernel.org/all/20260401143552.3038979-1-tycho@kernel.org/
-
-Tycho Andersen (AMD) (2):
-  x86/sev: Do not initialize SNP if missing CPUs
-  crypto/ccp: Skip SNP_INIT if preparation fails
-
- arch/x86/include/asm/sev.h   |  4 ++--
- arch/x86/virt/svm/sev.c      | 15 +++++++++++++--
- drivers/crypto/ccp/sev-dev.c |  4 +++-
- 3 files changed, 18 insertions(+), 5 deletions(-)
-
-
-base-commit: 6c927e5ca9d238f8ae40b453a8382eb9cf4ee855
+diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+index 09e605c85de4..594cfa19cbd4 100644
+--- a/arch/x86/include/asm/sev.h
++++ b/arch/x86/include/asm/sev.h
+@@ -661,7 +661,7 @@ static inline void snp_leak_pages(u64 pfn, unsigned int pages)
+ {
+ 	__snp_leak_pages(pfn, pages, true);
+ }
+-void snp_prepare(void);
++int snp_prepare(void);
+ void snp_shutdown(void);
+ #else
+ static inline bool snp_probe_rmptable_info(void) { return false; }
+@@ -679,7 +679,7 @@ static inline void __snp_leak_pages(u64 pfn, unsigned int npages, bool dump_rmp)
+ static inline void snp_leak_pages(u64 pfn, unsigned int npages) {}
+ static inline void kdump_sev_callback(void) { }
+ static inline void snp_fixup_e820_tables(void) {}
+-static inline void snp_prepare(void) {}
++static inline int snp_prepare(void) { return -ENODEV; }
+ static inline void snp_shutdown(void) {}
+ #endif
+ 
+diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
+index 41f76f15caa1..160e60f5f3fb 100644
+--- a/arch/x86/virt/svm/sev.c
++++ b/arch/x86/virt/svm/sev.c
+@@ -511,8 +511,9 @@ static void clear_hsave_pa(void *arg)
+ 	wrmsrq(MSR_VM_HSAVE_PA, 0);
+ }
+ 
+-void snp_prepare(void)
++int snp_prepare(void)
+ {
++	int ret = -EOPNOTSUPP;
+ 	u64 val;
+ 
+ 	/*
+@@ -521,12 +522,19 @@ void snp_prepare(void)
+ 	 */
+ 	rdmsrq(MSR_AMD64_SYSCFG, val);
+ 	if (val & MSR_AMD64_SYSCFG_SNP_EN)
+-		return;
++		return 0;
+ 
+ 	clear_rmp();
+ 
+ 	cpus_read_lock();
+ 
++	if (!cpumask_equal(cpu_online_mask, cpu_present_mask)) {
++		pr_warn("Skipping SNP initialization. CPUs online %*pbl, present %*pbl\n",
++			cpumask_pr_args(cpu_online_mask),
++			cpumask_pr_args(cpu_present_mask));
++		goto unlock;
++	}
++
+ 	/*
+ 	 * MtrrFixDramModEn is not shared between threads on a core,
+ 	 * therefore it must be set on all CPUs prior to enabling SNP.
+@@ -537,7 +545,10 @@ void snp_prepare(void)
+ 	/* SNP_INIT requires MSR_VM_HSAVE_PA to be cleared on all CPUs. */
+ 	on_each_cpu(clear_hsave_pa, NULL, 1);
+ 
++	ret = 0;
++unlock:
+ 	cpus_read_unlock();
++	return ret;
+ }
+ EXPORT_SYMBOL_FOR_MODULES(snp_prepare, "ccp");
+ 
 -- 
 2.53.0
 
