@@ -1,48 +1,47 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7351F39D6F3;
-	Wed,  8 Apr 2026 08:09:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65C7637F8AE;
+	Wed,  8 Apr 2026 08:10:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775635750; cv=none; b=sxTKRTD0MzEAmkWkEPnmc+CRaxanSYFvkmO4cJye7MFinCm16lR0+0/joUPXv+kyI9xMSQOXc0Gf4/btLaTO2ZkzkOrHAzIS8NP0GGZmU/gRDrjRF1OtCeIbxpJL3RXFBkwR6mmaN/CmtoXTW4wGF7QY/1F8ayx9t4F+S2oGI+U=
+	t=1775635808; cv=none; b=OFTGPcEWwY8YKtSxnbtsbruA0P3biGxbrCi9b2TiXzQFlD1vsaji2by+HsczFUzXQr7/2uG7EFkRFHxGFNFp0XOqlo565XCI0wL0Ikl5dhGVu9kwqeW12mOXRDmWzjdmK6rmvB/iP3espiSY2sRm/93W+bg9drnvJkt2ku5wc0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775635750; c=relaxed/simple;
-	bh=koSehwWSxjU3ovsKT7f36DXu4y6eMsgpzShZGFK93+0=;
+	s=arc-20240116; t=1775635808; c=relaxed/simple;
+	bh=dO4bHNRPUKlKtwpt0obegHQbTntRcNbACjSuqqYdhnA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HAS80yalPCjXxpfXU5CSo6KY1Ix0WRezfdMH5BZe/Ql4+Zfyad9StDgLtJHbp+IO+vsvh7+KNHzwkl9e50NTAUiEQowKpCXaL0QkQzfMIEjIx9cSK0i6V0Z1NHG82bQ1BNP5FouLF2L5Tx88NtELzJmEmMQsl9os7RIVN015nns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=slUEtJ/a; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=qKoaqqNtKWh9Ftb1zD8hqGLyvDJqlpIulcqMIh57xbPJe3Qz5KdoOPXxCvcfWRpJJE/onjEfPYNCjdTZXXqmW1SWPdaNDkWr1ezDJNHTzGP1U47rTPLYMzFUpGMrhLBK/bMp04ZY+4o6qM0Cg0xhifL38s33tvOhxTVQyIiYi2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=nZWzoBmZ; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="slUEtJ/a"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="nZWzoBmZ"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=l8aaaehgysH2hcfIZINOSwreJrwK4RdOvdUPlIC0mwY=; 
-	b=slUEtJ/asWbPK7wnHP/gklNlHvd8xYUVOgV7KqsctVF0ppZufBjaEoKrx4uKCIFoT0WdMnVKWh+
-	bJAWhVlVJTOA2HTDu1xujmh/z0mzsLtscPH+w7p04GhBOG4vIVpWC43em4L/bs3MVLhwN2L8J8SDD
-	repz4041mk82cl6wgKpsEeZ6FX6WL3UWSpv4kYaVUjqnQLkCk0+Gg/R9BK+mz4c4CLwahZtGZaFmS
-	A+uTUvQhzSAR8Zjjo65NbuJaSYXxhjM/0tPbVstNxH5expWzTHbzCIX3xFDHfAxqIZzmlbFLLjFjW
-	kzGcG3agrG34DXtK3DBleJ1Bz6moytH7I1Hw==;
+	from:content-type:reply-to; bh=QEIvcTtiGRvK23zLPZf15u4o7zaJgmjEMQaoZVRypx8=; 
+	b=nZWzoBmZaHGX/HIl2o/RktOGugr36Y+JXcBY9zHFLA4MoJRynxUHzyv/UKKmprJh+E0hJ0SCTO0
+	H9l5XjqSmP1h7UYjWYI4ugvQ3uefVL+/o2Z/RjAprpVEOUpcrw7o8a/bH4/mxp/GhkCc6XjG+iLZ2
+	hVlg6WFYkS4oMNzFkX9Ug0Xd4szT7VRPEqJe74b00vQg9z8WAJBJLhcjHQLZEs94roIFTzHPhGV/P
+	c/OprzuqyP5v4p1V8X2RsQZWwgyaSYaFCE8qd/Fnl26CdHFq1NykxG/10Dk+dfGQgvFKHyfmvU1yd
+	jRnmAO01F+owIDfD5CUDj9+kvxPIef8jbHkw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wANYN-004dIK-1B;
-	Wed, 08 Apr 2026 16:08:43 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 08 Apr 2026 16:08:42 +0800
-Date: Wed, 8 Apr 2026 16:08:42 +0800
+	id 1wANZZ-004dJ0-10;
+	Wed, 08 Apr 2026 16:09:57 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 08 Apr 2026 16:09:56 +0800
+Date: Wed, 8 Apr 2026 16:09:56 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Hamza Mahfooz <hamzamahfooz@linux.microsoft.com>
-Cc: linux-crypto@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Jeff Barnes <jeffbarnes@linux.microsoft.com>,
-	Paul Monson <paul.monson@capgemini.com>
-Subject: Re: [PATCH] crypto: tstmgr - guard xxhash tests
-Message-ID: <adYNClYB6RY820Xl@gondor.apana.org.au>
-References: <20260407192859.270745-1-hamzamahfooz@linux.microsoft.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Johannes Berg <johannes@sipsolutions.net>,
+	linux-wireless@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: Re: [PATCH wireless-next v2 6/6] crypto: Remove michael_mic from
+ crypto_shash API
+Message-ID: <adYNVB3n358xm_s8@gondor.apana.org.au>
+References: <20260408030651.80336-1-ebiggers@kernel.org>
+ <20260408030651.80336-7-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,22 +50,23 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260407192859.270745-1-hamzamahfooz@linux.microsoft.com>
+In-Reply-To: <20260408030651.80336-7-ebiggers@kernel.org>
 
-On Tue, Apr 07, 2026 at 12:28:59PM -0700, Hamza Mahfooz wrote:
-> If the kernel isn't built with CONFIG_CRYPTO_XXHASH and booted with FIPS
-> mode enabled it will currently panic. So, only benchmark xxhash64 if
-> CRYPTO_XXHASH is enabled.
+On Tue, Apr 07, 2026 at 08:06:51PM -0700, Eric Biggers wrote:
+> Remove the "michael_mic" crypto_shash algorithm, since it's no longer
+> used.  Its only users were wireless drivers, which have now been
+> converted to use the michael_mic() function instead.
 > 
-> Cc: Jeff Barnes <jeffbarnes@linux.microsoft.com>
-> Cc: Paul Monson <paul.monson@capgemini.com>
-> Signed-off-by: Hamza Mahfooz <hamzamahfooz@linux.microsoft.com>
-> ---
->  crypto/testmgr.c | 2 ++
->  1 file changed, 2 insertions(+)
+> It makes sense that no other users ever appeared: Michael MIC is an
+> insecure algorithm that is specific to WPA TKIP, which itself was an
+> interim security solution to replace the broken WEP standard.
+> 
+> Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 
-Please show me the panic.  Normally it's not an issue if an algorithm
-is not present while the test vectors are.
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+Please feel free to take this via the wireless tree.
 
 Thanks,
 -- 
