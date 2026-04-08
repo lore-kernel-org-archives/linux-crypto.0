@@ -1,90 +1,75 @@
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A30CF397698;
-	Wed,  8 Apr 2026 08:07:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7351F39D6F3;
+	Wed,  8 Apr 2026 08:09:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775635668; cv=none; b=q8Ypkf3q3GkJVGcTX496NUtCECVvTVgasnLKB6kBS5XIIMKWyP5TRWCknsmlpP9KxLGAiopMqv+XWeXHpgHJ5U2z/4H8iZs3Nlm59vkJOPnkOOKXzAK6XyXTEggKhQBiH+mqh3gW04jlAczUz1JPwIEzcvMHhIJnKTOCDFk89nA=
+	t=1775635750; cv=none; b=sxTKRTD0MzEAmkWkEPnmc+CRaxanSYFvkmO4cJye7MFinCm16lR0+0/joUPXv+kyI9xMSQOXc0Gf4/btLaTO2ZkzkOrHAzIS8NP0GGZmU/gRDrjRF1OtCeIbxpJL3RXFBkwR6mmaN/CmtoXTW4wGF7QY/1F8ayx9t4F+S2oGI+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775635668; c=relaxed/simple;
-	bh=pQ/poFH3FHgZsLUSUCy8sfb2prMRFfFY/Beh5sSQzRw=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=AvkZLAoTb9PG34AvFlIjoskkJUyH/BxZXZXYGpJYFJ4CdlHH7z4o7DTO0hUxbPpAguJp9Qch6WgBxIahQ2sdYXdZDCjCmJfqr5vitssxQn2J4437SlQwAsoWni3EiPwji2Xor49PyiQLNHC85bCr1nq7P5tpWIcXPYXM/jW6IEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=m0jFcrU1; arc=none smtp.client-ip=113.46.200.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1775635750; c=relaxed/simple;
+	bh=koSehwWSxjU3ovsKT7f36DXu4y6eMsgpzShZGFK93+0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HAS80yalPCjXxpfXU5CSo6KY1Ix0WRezfdMH5BZe/Ql4+Zfyad9StDgLtJHbp+IO+vsvh7+KNHzwkl9e50NTAUiEQowKpCXaL0QkQzfMIEjIx9cSK0i6V0Z1NHG82bQ1BNP5FouLF2L5Tx88NtELzJmEmMQsl9os7RIVN015nns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=slUEtJ/a; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="m0jFcrU1"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=yDnwTnpB7RqrkOrBP4zO/1DeewnHWTgIU1dzZOBqu3k=;
-	b=m0jFcrU1ZU4cDCDbo8mJBzL9EVgTzn1DukboBNJFwLT/E+D90zssGx5sIUITY8961SUwKCpPB
-	FlKWkbV6mw9TNLITuduZmSddFCi++7devkWHGArLZKVgzylNxlQ7+WRj2IVMRp4JnZwMxArNImi
-	0buVFAc7yOJmxK5F3dbfHpw=
-Received: from mail.maildlp.com (unknown [172.19.162.197])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4frFrJ14cYz12LCq;
-	Wed,  8 Apr 2026 16:01:20 +0800 (CST)
-Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
-	by mail.maildlp.com (Postfix) with ESMTPS id 31ABC40576;
-	Wed,  8 Apr 2026 16:07:42 +0800 (CST)
-Received: from [10.67.121.110] (10.67.121.110) by
- dggpemf500015.china.huawei.com (7.185.36.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 8 Apr 2026 16:07:41 +0800
-Subject: Re: [PATCH 0/5] crypto: hisilicon - series of cleanups and format
- fixes for hisilicon driver
-To: Chenghai Huang <huangchenghai2@huawei.com>, <herbert@gondor.apana.org.au>,
-	<davem@davemloft.net>
-CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<fanghao11@huawei.com>, <qianweili@huawei.com>, <wangzhou1@hisilicon.com>,
-	<yinzhushuai@huawei.com>
-References: <20260330062531.2976138-1-huangchenghai2@huawei.com>
-From: liulongfang <liulongfang@huawei.com>
-Message-ID: <7b23bd5e-9a3c-f7cc-7d23-11efb75b08e7@huawei.com>
-Date: Wed, 8 Apr 2026 16:07:40 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="slUEtJ/a"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=l8aaaehgysH2hcfIZINOSwreJrwK4RdOvdUPlIC0mwY=; 
+	b=slUEtJ/asWbPK7wnHP/gklNlHvd8xYUVOgV7KqsctVF0ppZufBjaEoKrx4uKCIFoT0WdMnVKWh+
+	bJAWhVlVJTOA2HTDu1xujmh/z0mzsLtscPH+w7p04GhBOG4vIVpWC43em4L/bs3MVLhwN2L8J8SDD
+	repz4041mk82cl6wgKpsEeZ6FX6WL3UWSpv4kYaVUjqnQLkCk0+Gg/R9BK+mz4c4CLwahZtGZaFmS
+	A+uTUvQhzSAR8Zjjo65NbuJaSYXxhjM/0tPbVstNxH5expWzTHbzCIX3xFDHfAxqIZzmlbFLLjFjW
+	kzGcG3agrG34DXtK3DBleJ1Bz6moytH7I1Hw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1wANYN-004dIK-1B;
+	Wed, 08 Apr 2026 16:08:43 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 08 Apr 2026 16:08:42 +0800
+Date: Wed, 8 Apr 2026 16:08:42 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Hamza Mahfooz <hamzamahfooz@linux.microsoft.com>
+Cc: linux-crypto@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Jeff Barnes <jeffbarnes@linux.microsoft.com>,
+	Paul Monson <paul.monson@capgemini.com>
+Subject: Re: [PATCH] crypto: tstmgr - guard xxhash tests
+Message-ID: <adYNClYB6RY820Xl@gondor.apana.org.au>
+References: <20260407192859.270745-1-hamzamahfooz@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20260330062531.2976138-1-huangchenghai2@huawei.com>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- dggpemf500015.china.huawei.com (7.185.36.143)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260407192859.270745-1-hamzamahfooz@linux.microsoft.com>
 
-On 2026/3/30 14:25, Chenghai Huang wrote:
-> 1.Fixed a format string type mismatch issue identified through static
-> analysis and code review, which could have caused display errors.
-> 2.A const qualifier addition to improve type safety.
-> 3.Removing unnecessary else statements after a return.
-> 4.Removal of redundant variable initializations that are overwritten
-> before their first use.
-> 5.A cleanup of unused and non-public APIs to shrink the public interface
-> and remove dead code.
+On Tue, Apr 07, 2026 at 12:28:59PM -0700, Hamza Mahfooz wrote:
+> If the kernel isn't built with CONFIG_CRYPTO_XXHASH and booted with FIPS
+> mode enabled it will currently panic. So, only benchmark xxhash64 if
+> CRYPTO_XXHASH is enabled.
 > 
-> Chenghai Huang (4):
->   crypto: hisilicon/qm - add const qualifier to info_name in struct
->     qm_cmd_dump_item
->   crypto: hisilicon/qm - remove else after return
->   crypto: hisilicon/qm - drop redundant variable initialization
->   crypto: hisilicon - remove unused and non-public APIs for qm and sec
-> 
-> Zhushuai Yin (1):
->   crypto: hisilicon - fix the format string type error
-> 
->  drivers/crypto/hisilicon/debugfs.c       | 22 +++++++++++-----------
->  drivers/crypto/hisilicon/qm.c            | 16 ++++++++--------
->  drivers/crypto/hisilicon/sec2/sec.h      |  2 --
->  drivers/crypto/hisilicon/sec2/sec_main.c |  2 +-
->  include/linux/hisi_acc_qm.h              |  2 --
->  5 files changed, 20 insertions(+), 24 deletions(-)
-> 
-Reviewed-by: Longfang Liu <liulongfang@huawei.com>
+> Cc: Jeff Barnes <jeffbarnes@linux.microsoft.com>
+> Cc: Paul Monson <paul.monson@capgemini.com>
+> Signed-off-by: Hamza Mahfooz <hamzamahfooz@linux.microsoft.com>
+> ---
+>  crypto/testmgr.c | 2 ++
+>  1 file changed, 2 insertions(+)
 
-Thanks.
+Please show me the panic.  Normally it's not an issue if an algorithm
+is not present while the test vectors are.
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
