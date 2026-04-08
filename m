@@ -1,130 +1,114 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B83388E65;
-	Wed,  8 Apr 2026 19:44:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF92C2D3750;
+	Wed,  8 Apr 2026 20:57:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775677495; cv=none; b=dIccUnSjbXX+z1wzuBQ7CKzc+Oz4rEv/LXHR/MAYOvkUNeWpjhc83+NXRtxjYa9HZVoRQ6dv9hBI6QymlJl9Yv56L3HoSW+5Nfex7VFZW+WsOCDwmS8YmVVB8emNgdxpXotI7g2YQSm8xl7SpmTEmn71U73p+2SxXlGrs/Z9euk=
+	t=1775681872; cv=none; b=BnDuhZbXXwDuoiiLkhyjKc8eTZGq6MH7mC5/TYMEw+/PrLCOqcEoNpphjbe7jNPe1mDMNmHjg2kwmBr5AsqSMKZcLDo4ajENMcKRc+Vqaav6kdnL7/v06KhrazWks8D5ifiFqBkNVScH1p6iCnb2MQz5Eb6q4Rv3Dc/Mg5Ea6PQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775677495; c=relaxed/simple;
-	bh=lcVUF9NdcgHIwhDLmEoGh3PX5wOnl5WY4UWmvatBRRw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pTm+I964JGaJ08Ja53MRM2imdFlzstCCMnMrkrsMD+6pyLgyjHqRuxg/HjWXyGCih5uXwT4lFTfdbQrOFE/Y0gsfCWt9mRDYjIvekclq9mvPj7UKGkOwNri4hFmg4lGJesJ+/x6i0YCDNj7zJgfB2mibfFb8tHLUCwn80xGJI3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ib+U6841; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1775681872; c=relaxed/simple;
+	bh=8auXtSzLuQ4lqJdpdSvIYUcs2qq1su7sg5k5rP4onIw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JCdi1/Ii9aIp/cA6OCFhEGHtKuMdbtZD8iMLt8eU1sTGF/bxiI2XA7caKCnLCXT5XkQvnOQ2/HNRgT9U/NCGgaRNchM5CPx4+bvd6gHJeA/5C7t9UDAifxETQ+A5yr7Xcis62pZz0R/1jhH4fPqfpS0M4HIizbo4cIhr2oSlK3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n1Dyob8m; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ib+U6841"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1775677493; x=1807213493;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=lcVUF9NdcgHIwhDLmEoGh3PX5wOnl5WY4UWmvatBRRw=;
-  b=ib+U6841iOKzMkbElrjX3KGOW11kDh8vSu0VUKVWbMJ0lEeDbUxp9i5y
-   lGAK1JTw/XaAtEArB843pFo62c2tU1H0UXs+tsK7urilWIzSUjWHo1SlW
-   +aHsl/aAOuTosx2I91BAjEMrg520AC/7FZLI7tmTG4GRPjit0dPRfakt5
-   +cvfoeMi3yVvpDEyGFtCU5yTs1MmlGfwrqxS6Ysp9hPTV80nPI3uGksFQ
-   o+xHjP2YvM6zqDVqZHxzCdze7IOJKaJtZiTiHF7syAWjS3wgsubx1YJ2F
-   I1z1nfHo5U3BEQ9xs+h6B6Vz3E2+jBbf5ikLSQ4aESiPsvwHS1uy9NRvk
-   w==;
-X-CSE-ConnectionGUID: DEAXJrDmT0iuVCMnQbLOzw==
-X-CSE-MsgGUID: 1UnS+UoBQk+1dio0LwJEaQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11753"; a="80561119"
-X-IronPort-AV: E=Sophos;i="6.23,168,1770624000"; 
-   d="scan'208";a="80561119"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2026 12:44:51 -0700
-X-CSE-ConnectionGUID: ax3oSkwjSs++VWp59REsjA==
-X-CSE-MsgGUID: NO5sqPJYQbK7OqEO+fYvQw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,168,1770624000"; 
-   d="scan'208";a="233445739"
-Received: from rchatre-mobl4.amr.corp.intel.com (HELO [10.125.108.173]) ([10.125.108.173])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2026 12:44:50 -0700
-Message-ID: <b0f8f07d-1360-466e-acad-e0662625c227@intel.com>
-Date: Wed, 8 Apr 2026 12:45:02 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n1Dyob8m"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B392C19421;
+	Wed,  8 Apr 2026 20:57:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775681872;
+	bh=8auXtSzLuQ4lqJdpdSvIYUcs2qq1su7sg5k5rP4onIw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=n1Dyob8mII7PRXrdNqmJPv3JADBdvehkHZMKbZLfkz4C/2wnDGU5aipMyhBc5uDuD
+	 yh/GZiCfvDcQuYsXw2Uhyagz/qOEPNU2vMTs0PK7cka7IW06E0SjFUCIpy25/WgC/v
+	 MnYthtOq6vQ4tBRu3SPK2oEY7Wc+RjGiXG7TVsRSvnyuOPYkNDzC6NVjoKoaWyjW3t
+	 mEg9Ep0pu4Z80oOQ502dwU3IffkslyB1HSYVOsXheHGlNzeVfx+fw+q7x/yMGdf+aU
+	 sAC8HTGpsSfS+etQF5d/eN163pGiRyyc07fjbskmIudmUgIFk10tMJhbmMpG268yMT
+	 1im3SxucIDRSg==
+Date: Wed, 8 Apr 2026 13:57:46 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Lukas Wunner <lukas@wunner.de>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+	Ignat Korchagin <ignat@linux.win>,
+	Stefan Berger <stefanb@linux.ibm.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com,
+	Alexander Potapenko <glider@google.com>,
+	Andrey Konovalov <andreyknvl@gmail.com>,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Vincenzo Frascino <vincenzo.frascino@arm.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: Re: [PATCH] crypto: ecc - Unbreak the build on arm with
+ CONFIG_KASAN_STACK=y
+Message-ID: <20260408205746.GA2877926@ax162>
+References: <abfaede9ab2e963d784fb70598ed74935f7f8d93.1775628469.git.lukas@wunner.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 4/6] x86/sev: Add interface to re-enable RMP
- optimizations.
-To: "Kalra, Ashish" <ashish.kalra@amd.com>, tglx@kernel.org,
- mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
- hpa@zytor.com, seanjc@google.com, peterz@infradead.org,
- thomas.lendacky@amd.com, herbert@gondor.apana.org.au, davem@davemloft.net,
- ardb@kernel.org
-Cc: pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
- KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com,
- jackyli@google.com, pgonda@google.com, rientjes@google.com,
- jacobhxu@google.com, xin@zytor.com, pawan.kumar.gupta@linux.intel.com,
- babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com, john.allen@amd.com,
- darwi@linutronix.de, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev
-References: <cover.1774755884.git.ashish.kalra@amd.com>
- <a30809d43368d6ddeb82e6717be83327282ee52e.1774755884.git.ashish.kalra@amd.com>
- <23267200-9fed-43a9-a28b-a6daa701159b@intel.com>
- <2ef6cf92-3c84-43f6-a17e-cf9d5a026167@amd.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <2ef6cf92-3c84-43f6-a17e-cf9d5a026167@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <abfaede9ab2e963d784fb70598ed74935f7f8d93.1775628469.git.lukas@wunner.de>
 
-On 4/8/26 12:32, Kalra, Ashish wrote:
-> It is much more straightforward to check for both
-> CC_ATTR_HOST_SEV_SNP and MSR_AMD64_SEG_RMP_ENABLED in this API
-> function itself.
+On Wed, Apr 08, 2026 at 08:15:49AM +0200, Lukas Wunner wrote:
+> Andrew reports the following build breakage of arm allmodconfig,
+> reproducible with gcc 14.2.0 and 15.2.0:
+> 
+>   crypto/ecc.c: In function 'ecc_point_mult':
+>   crypto/ecc.c:1380:1: error: the frame size of 1360 bytes is larger than 1280 bytes [-Werror=frame-larger-than=]
+> 
+> gcc excessively inlines functions called by ecc_point_mult() (without
+> there being any explicit inline declarations) and doesn't seem smart
+> enough to stay below CONFIG_FRAME_WARN.
+> 
+> clang does not exhibit the issue.
+> 
+> The issue only occurs with CONFIG_KASAN_STACK=y because it enlarges the
+> frame size.  This has been a controversial topic a couple of times:
+> 
+> https://lore.kernel.org/r/CAK8P3a3_Tdc-XVPXrJ69j3S9048uzmVJGrNcvi0T6yr6OrHkPw@mail.gmail.com/
+> 
+> Prevent gcc from going overboard with inlining to unbreak the build.
+> The maximum inline limit to avoid the error is 101.  Use 100 to get a
+> nice round number per Andrew's preference.
+> 
+> Reported-by: Andrew Morton <akpm@linux-foundation.org> # off-list
+> Signed-off-by: Lukas Wunner <lukas@wunner.de>
+> ---
+>  crypto/Makefile | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/crypto/Makefile b/crypto/Makefile
+> index 04e269117589..b3ac7f29153e 100644
+> --- a/crypto/Makefile
+> +++ b/crypto/Makefile
+> @@ -181,6 +181,11 @@ obj-$(CONFIG_CRYPTO_ZSTD) += zstd.o
+>  obj-$(CONFIG_CRYPTO_ECC) += ecc.o
+>  obj-$(CONFIG_CRYPTO_ESSIV) += essiv.o
+>  
+> +# Avoid exceeding stack frame due to excessive gcc inlining in ecc_point_mult()
+> +ifeq ($(ARCH)$(CONFIG_KASAN_STACK)$(LLVM),army)
 
-I kinda think it's not straightforward. That's why I'd like to see the
-checks consolidated.
+Please use proper Kconfig variables here.
 
-It's may take a wee bit of refactoring, but I think it's totally doable.
+  ifeq ($(CONFIG_ARM)$(CONFIG_KASAN_STACK)$(CONFIG_CC_IS_GCC),yyy)
+
+Which is both more robust, as $(LLVM) may not be set but CC=clang could
+be, and it is clearer (in my opinion). If all supported versions of GCC
+support this flag, you could drop the cc-option at that point.
+
+> +CFLAGS_ecc.o += $(call cc-option,-finline-limit=100)
+> +endif
+> +
+>  ecdh_generic-y += ecdh.o
+>  ecdh_generic-y += ecdh_helper.o
+>  obj-$(CONFIG_CRYPTO_ECDH) += ecdh_generic.o
+> -- 
+> 2.51.0
+> 
