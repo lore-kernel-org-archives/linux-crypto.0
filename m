@@ -1,57 +1,72 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A0D35B65D;
-	Wed,  8 Apr 2026 07:14:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE8C33987;
+	Wed,  8 Apr 2026 07:28:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775632480; cv=none; b=f/x3OMMoN2ukFuJfLApZlwjc4JvVzFyjE27dNnGNhJfpjhEFd+GBCR1qi2GTetUMfI+tUVBe48XEiCxIQVt5WJ1xkoRZ/9OI8N/+5HqhmcF8VaI+7a9UG+PtI8E3CiRjnjvkjcOi+mRnLTL7Ucd86pS98SQbUwS16g1FxeJWOzA=
+	t=1775633294; cv=none; b=Tlw7G0uzlbsMQyJXZAsON3B4BqR9aTsnjwQQFZ0ld/B6OkAxzScMTFrtgo7GK0vMpzfYxnH19f3AtF2jo2q5uejhGxEziXjzo5SjkBGECkX1DRECsgw8Z9vBfp/oqL2jKTEEIHe4ZfcY//HSoSoJrLT8TGd+YZamLw/EqsXTTmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775632480; c=relaxed/simple;
-	bh=m7Yz2p3aVCXKQqlcwtRMbVyXwo44caQVriFS2/9CDvM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t/qrJseu5Oeu4pQPLtUosLu3UgeQc3ReJoe/iTBMiJYRNpqgehJWyC3tQUrh78pZxbsjelcdOjj07bWULD8Lm3JNVULmpjzvVrZCklakDoPoi3RzPHPqApqk8Npj2sS/ud7uhJhXcQ0Klgha7fjkZVcHcSyALE3Btn4eKIyjozE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HwdsTKgB; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1775633294; c=relaxed/simple;
+	bh=lO6Q+OOGXZ3NnrvZnKZzoHiyVE4EbXb7A+U70s9zza8=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=e4IYamL8t2+BBbqnNil4mZZpUZ9fcdqyERFQz/wDcMKAalq7112HW/fvHbBI9DuNXEwb0YEUhvFzKo2+U9rVT19Rly/FYaeUVtuT8HOVBrbY9e7eMeU49r6igt1nBet37ij0ln3vSAsMElzq/EtLzE7vPiC8dEyQzdECDalQ6to=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=PvP9sar0; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HwdsTKgB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEBCDC19424;
-	Wed,  8 Apr 2026 07:14:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775632480;
-	bh=m7Yz2p3aVCXKQqlcwtRMbVyXwo44caQVriFS2/9CDvM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HwdsTKgBZRw9wturcZ5tigyzMZnVfdYzixNLS8z9wjJowxPVQH8g71fkeUpbDsXRn
-	 edlb9X+k7H41+wmuGzOij6bqB7+o9LehDWrkGeG7oKMjKXWyaddXUt84kz0TsBRIlc
-	 ZvRAJSGMl4xD2DyDjFv1WOqAamb46Bdqt3H1ZDC7k4goFJ2xLFjRgCBPJHTmb07AaX
-	 nL/6edwa6T7TttfmQx4IauQqPAp7pCE1Uzr4L9MnoSNEbifvRgznFYNQgRO5TwzCBo
-	 e6mcU5ZaWgbS42WzThryRMmgs3Gt9qB4icOyt0SCpRyhtxLJYIktV9SVyoBo1CPXUG
-	 NPwMLm/4G51Ug==
-Date: Wed, 8 Apr 2026 00:13:23 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: linux-wireless@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="PvP9sar0"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=OTO3GfwSPFxFuPEaKyiSyGBlJanpijRNbTF2J9u7oUk=;
+	t=1775633293; x=1776842893; b=PvP9sar0C0qUC7PTxreddPJviD8p/NyTRcE9Lzrlj0hEUOv
+	MVVXvQhH8NJXufbGeWXkXgEiR0bpY7X0YsDHm+IHK+VFE3EdyIzvpmeN+6gWOMlxWIvysV5Z/le8u
+	OC/zM4HAIUKBoaAvqGL15imVgaqsLE5Vde7ncoTloUwNRj+VHD9brJyHNpPW94kHjGsJSlEK+8VL5
+	zFLhdzRKQOQiEtNOchz4GUEMeC35cIhV1p+P2cj8yjJyQOm2usdB+uBYOt9lur/VGsjurVT6ynt7o
+	J2tJwanhb4tlCPmPaXXXZSurzk/1fL519rK5s73xuHCCY/6GviYt8l5ezBohdArw==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1wANKc-0000000E6Pw-0UJK;
+	Wed, 08 Apr 2026 09:28:10 +0200
+Message-ID: <12181d5540b99b4dac83fc5b602f2256f6bb62c5.camel@sipsolutions.net>
 Subject: Re: [PATCH wireless-next v2 0/6] Consolidate Michael MIC code into
  cfg80211
-Message-ID: <20260408071323.GA157920@sol>
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-wireless@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
+Date: Wed, 08 Apr 2026 09:28:09 +0200
+In-Reply-To: <20260408071323.GA157920@sol>
 References: <20260408030651.80336-1-ebiggers@kernel.org>
- <56798292be29f3e76e88c837d41eff0cb9f8b36a.camel@sipsolutions.net>
+	 <56798292be29f3e76e88c837d41eff0cb9f8b36a.camel@sipsolutions.net>
+	 <20260408071323.GA157920@sol>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <56798292be29f3e76e88c837d41eff0cb9f8b36a.camel@sipsolutions.net>
+X-malware-bazaar: not-scanned
 
-On Wed, Apr 08, 2026 at 08:32:12AM +0200, Johannes Berg wrote:
-> So five out of six patches are wireless, should I apply the crypto one
-> too?
+On Wed, 2026-04-08 at 00:13 -0700, Eric Biggers wrote:
+> On Wed, Apr 08, 2026 at 08:32:12AM +0200, Johannes Berg wrote:
+> > So five out of six patches are wireless, should I apply the crypto one
+> > too?
+>=20
+> It doesn't conflict with anything in linux-next, so it would be possible
+> to take it too.  Maybe wait a day or two and see if Herbert acks it.
 
-It doesn't conflict with anything in linux-next, so it would be possible
-to take it too.  Maybe wait a day or two and see if Herbert acks it.
+Sounds good. I've picked up the other 5 now already, but for me that
+actually made the CRYPTO_MICHAEL_MIC Kconfig symbol show up as a prompt,
+which is a bit unfortunate perhaps. But should be gone soon either way
+:)
 
-- Eric
+Thanks!
+
+johannes
