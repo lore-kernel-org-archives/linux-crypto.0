@@ -1,48 +1,69 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E22433D16EA;
-	Wed,  8 Apr 2026 14:06:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F38DE3D3490;
+	Wed,  8 Apr 2026 14:32:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775657217; cv=none; b=rieUUmoZWo+R5iS76JThqTpQ+Gbg5uXnDTHJ9jrzopsoE9Zd8m+XSUVz3Jix9R6SPE0bZZJI9viaNuQa4vDne7/6hMzW/5pJF/q/UrALlVLoe1HV5wWotCP11SlH++jvns1hs20C+MfiVJBs0LHVtJ5CH1NKTW527KvxJJ0r33c=
+	t=1775658774; cv=none; b=o+H36zSInSRZH0RqQVzagLT9+lwxAtUXvoYbWGZosb3BD8tik4n1k3iytWZbA0kh07vuzX9gKmhFmSSQePMwpjjcl2/ruGvLxM396UEkefILR+du/r+s4EER9rtQWDPUqaMrQL2iav9P49/saDaqBeQ1dXb7ESRf891OWDcRh4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775657217; c=relaxed/simple;
-	bh=nVPN9n46FRLlu7+p+YjcOBDmYKxR4bWaQIWMioUe+CU=;
+	s=arc-20240116; t=1775658774; c=relaxed/simple;
+	bh=WK6IAGk5OXKfShONq3zXcI+AMHaVUcQ0AKZj76A+z9o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gBz5cp2gwJnWn/SZ+2L3Wjr0e9WSUJRHOkJmB4My8LU8kl/aNL/Q6Zpl7MBHNEe1DnNyUusitAinPKF0wsUzJ3CMhjgpmqlYVqBeuBaQqfFN4t9Pg0fCxtP8vzX+3VRj1a/JAKkfqlvuJlIpSOEtR/9Ondw49z7EdQsk9Kr37Nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i6gMYjXc; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=CeaQ7zPCvAvO1Gpglq0E6XlN01IClCAMGhXekotQVzQRVp2WiYdCXbnOqQgQvSdi9v6+0Iy1pcgfxcSlXzklorggKpkmGUgsIxwMbSiTlJ8TgCBmKm3aVBoVQSn/9dkXPp5mthwC9bXmdAIAkP5aIoxMElFcPJsrfinD+jflk1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=m5epMDsm; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i6gMYjXc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7166CC2BCB0;
-	Wed,  8 Apr 2026 14:06:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775657216;
-	bh=nVPN9n46FRLlu7+p+YjcOBDmYKxR4bWaQIWMioUe+CU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=i6gMYjXcG6U5kU9xekWPnqieahnULEf0SfBahQfyREyshPaC5ilVtgvEwKHtmElWY
-	 tG3e/fLadAqPP3sXhEQbdpCjnRt6SLHEVXlanZME6GB1dsWqqac7sUvU1Wzb2a8tq7
-	 7y92RbIEUxQ3rs/HaTOwo9Jnyt3kWy/47JA+z2+jYDyakPfoZuLyU+Mpqlsqg5jdS6
-	 PKi/3YH7nPBjB4s1iOH904xLDJJuT0HZvVmoXLCuffmSLEFN7ocKRBS9Vd/94gaQtl
-	 rkDbrAQalzW4qSwMUzidxkc9G9zaPwMslsy+7/A8EN7wImvFulT40JApGEy20+Leza
-	 sGBTdEiIcCWLg==
-Date: Wed, 8 Apr 2026 08:06:51 -0600
-From: Tycho Andersen <tycho@kernel.org>
-To: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Ashish Kalra <ashish.kalra@amd.com>, 
-	John Allen <john.allen@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Ard Biesheuvel <ardb@kernel.org>, 
-	Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>, Kishon Vijay Abraham I <kvijayab@amd.com>, 
-	Alexey Kardashevskiy <aik@amd.com>, Nikunj A Dadhania <nikunj@amd.com>, 
-	"Peter Zijlstra (Intel)" <peterz@infradead.org>, Kim Phillips <kim.phillips@amd.com>, 
-	Sean Christopherson <seanjc@google.com>, linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] crypto/ccp: Skip SNP_INIT if preparation fails
-Message-ID: <adZgbOx6-JPhKMU-@tycho.pizza>
-References: <20260407174713.439474-1-tycho@kernel.org>
- <20260407174713.439474-3-tycho@kernel.org>
- <d4f82d48-6f80-4e19-afd8-6f3df5a6d267@amd.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="m5epMDsm"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1775658773; x=1807194773;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=WK6IAGk5OXKfShONq3zXcI+AMHaVUcQ0AKZj76A+z9o=;
+  b=m5epMDsmzWLnow1K2Vl/ScjlEF/Q/hYiefrWAwTltz24LXYB/n2xN2NR
+   2/MMYe8XarHWKy9Mau/vxzOYti+kbYj7YPQCWCaS4h0DXolhHh+6GDBjo
+   H1IyZJJaTm4TbATW8lSLJNUnFWVVCkuLFZg55qADgIoNq6BfbWHz3a0cI
+   FUqngEvCLGt2JO4hYeKYeay/10KMgZMsyqYZtvylvsVCtadLy77UlssEH
+   6b6czqvQrLdzak5+RDUmgJfgMXLEsFTZhWzAjEpoxnagzRXcOqzCpeGAO
+   YInZVIsYCvsa5rx+605zNtnm8zEcYMtf1XNnqMD0jDGx0/0BYyWEluHLJ
+   Q==;
+X-CSE-ConnectionGUID: j/B1PghDTeKXG98Rq4JeQw==
+X-CSE-MsgGUID: rlb8RldDS92xEkWr59dYyg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11753"; a="75816537"
+X-IronPort-AV: E=Sophos;i="6.23,167,1770624000"; 
+   d="scan'208";a="75816537"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2026 07:32:52 -0700
+X-CSE-ConnectionGUID: w2xKx8xsRf2WQ30ZRb3Fbw==
+X-CSE-MsgGUID: ZvkEKAwYSZ+h+/iOxydE+g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,167,1770624000"; 
+   d="scan'208";a="227489911"
+Received: from vpanait-mobl.ger.corp.intel.com (HELO localhost) ([10.245.245.72])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2026 07:32:49 -0700
+Date: Wed, 8 Apr 2026 17:32:46 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Lukas Wunner <lukas@wunner.de>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+	Ignat Korchagin <ignat@linux.win>,
+	Stefan Berger <stefanb@linux.ibm.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com,
+	Alexander Potapenko <glider@google.com>,
+	Andrey Konovalov <andreyknvl@gmail.com>,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Vincenzo Frascino <vincenzo.frascino@arm.com>
+Subject: Re: [PATCH] crypto: ecc - Unbreak the build on arm with
+ CONFIG_KASAN_STACK=y
+Message-ID: <adZnDoSi0UInrKRd@ashevche-desk.local>
+References: <abfaede9ab2e963d784fb70598ed74935f7f8d93.1775628469.git.lukas@wunner.de>
+ <adY8iUPrnoXDp_-g@ashevche-desk.local>
+ <adZZ70lNnhoDnwok@wunner.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,29 +72,67 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d4f82d48-6f80-4e19-afd8-6f3df5a6d267@amd.com>
+In-Reply-To: <adZZ70lNnhoDnwok@wunner.de>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-On Wed, Apr 08, 2026 at 08:17:44AM -0500, Tom Lendacky wrote:
-> On 4/7/26 12:47, Tycho Andersen wrote:
-> > From: "Tycho Andersen (AMD)" <tycho@kernel.org>
+On Wed, Apr 08, 2026 at 03:36:47PM +0200, Lukas Wunner wrote:
+> On Wed, Apr 08, 2026 at 02:31:21PM +0300, Andy Shevchenko wrote:
+> > On Wed, Apr 08, 2026 at 08:15:49AM +0200, Lukas Wunner wrote:
+> > > Andrew reports the following build breakage of arm allmodconfig,
+> > > reproducible with gcc 14.2.0 and 15.2.0:
+> > > 
+> > >   crypto/ecc.c: In function 'ecc_point_mult':
+> > >   crypto/ecc.c:1380:1: error: the frame size of 1360 bytes is larger than 1280 bytes [-Werror=frame-larger-than=]
+> > > 
+> > > gcc excessively inlines functions called by ecc_point_mult() (without
+> > > there being any explicit inline declarations) and doesn't seem smart
+> > > enough to stay below CONFIG_FRAME_WARN.
+> > > 
+> > > clang does not exhibit the issue.
+> > > 
+> > > The issue only occurs with CONFIG_KASAN_STACK=y because it enlarges the
+> > > frame size.  This has been a controversial topic a couple of times:
+> > > 
+> > > https://lore.kernel.org/r/CAK8P3a3_Tdc-XVPXrJ69j3S9048uzmVJGrNcvi0T6yr6OrHkPw@mail.gmail.com/
+> > > 
+> > > Prevent gcc from going overboard with inlining to unbreak the build.
+> > > The maximum inline limit to avoid the error is 101.  Use 100 to get a
+> > > nice round number per Andrew's preference.
 > > 
-> > During SNP_INIT, the firmware checks to see that the SNP enable bit is set
-> > on all CPUs. If snp_prepare() failed because not all CPUs were online,
-> > SNP_INIT will fail, so skip it.
+> > I think this is not the best solution. We still can refactor the code
+> > and avoid being dependant to the (useful) kernel options.
+
+> Refactor how?  Mark functions "noinline"?  That may negatively impact
+> performance for everyone.
 > 
-> This should probably be more generic and state that if snp_prepare()
-> fails for any reason then SNP_INIT will fail, so skip it.
+> Note that this is a different kind of stack frame exhaustion than the one
+> in drivers/mtd/chips/cfi_cmdset_0001.c:do_write_buffer():  The latter
+> is a single function with lots of large local variables, whereas
+> ecc_point_mult() itself has a reasonable number of variables on the stack,
+> but gcc inlines numerous function calls that each increase the stack frame.
 
-Yep, thanks. I can send a v3 with all of these fixes.
+Ah, that makes the difference, thanks for elaborating!
 
-And to preempt questions about sashiko:
-https://sashiko.dev/#/patchset/20260407174713.439474-1-tycho%40kernel.org
+> And gcc isn't smart enough to stop inlining when it reaches the maximum
+> stack frame size allowed by CONFIG_FRAME_WARN.
+> 
+> It's apparently a compiler bug.  Why should we work around compiler bugs
+> by refactoring the code?  The proposed patch instructs gcc to limit
+> inlining and we can easily remove that once the bug is fixed.
+> 
+> As Arnd explains in the above-linked message, stack frame exhaustion
+> in crypto/ tends to be caused by compiler bugs.  There are already two
+> other workarounds for compiler bugs in crypto/Makefile, one for wp512.o
+> and another for serpent_generic.o.  Amending CFLAGS is how we've dealt
+> with these issues in the past, not by refactoring code.
 
-The first one is bogus, but I also got it from AI when reviewing this
-series: the previous code returned the error from the firmware as well
-and killed initialization completely.
+Yeah, that's the way we may deal with the issue.
 
-The other two are ones that were previously reported, I have fixes for
-them but have not yet posted...
+Acked-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 
-Tycho
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
