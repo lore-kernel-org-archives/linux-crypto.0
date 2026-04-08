@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D89FD3D3D03;
-	Wed,  8 Apr 2026 14:34:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9E063D47B1;
+	Wed,  8 Apr 2026 14:34:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775658846; cv=none; b=kg1L1XlhV8k7rUHPCYKN288wSADOcpk//42wZJRyNkc1wkUkdgJBrYexR+4EoTIEsWIFoxpOJ+RhyO7y722KNV/X6kJHFR3JXaFoa+Ln7E/tJ/j+9fOnyZ4Cu6bAegyno5xLGD8VrFmICeuRpcIw3YBLaEgyqCBu/Zr2fr0XoLQ=
+	t=1775658848; cv=none; b=nUKRMAF3O4cL9+aKHoLVx84uAxZCH4ZWpEj6dmoMKARFgB/UkfzBkieeYzmWHD8J47Kp2h0TgPZdcG5Q/Q2d+EkjQgxCWyDChWebFVQNWMuGdWIv/hfiWAd1qCUxsC3pRIkmyJJt5sb0lzO2xY4fnMywxevHErCJxv7EMZpQI30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775658846; c=relaxed/simple;
-	bh=eqeiAcPNJoTSStYt75yr4ts6fdSk7s1G6BqcIV2sk3A=;
+	s=arc-20240116; t=1775658848; c=relaxed/simple;
+	bh=HlbJlPHaIqGCg+7KyVe8KtzjmCdZxRsgKdRGK1QZLxk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CChm55ealw3fWp4xUv16KOfsiDwaW4FRb9wf/uFTygOP1JNBQ6B0+TMXa9vTNaXM0KcZVAYR8c+2OBv3R0lXowHvix2pdKruYoNTCxdW9C4ErsH7By3ONiazXWD81CSB5Mz93pJRoVgvPn/YEZmqQzPnvCbc15CgbUh7aR2AZ+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p+09DSAs; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=E88aSGJDqUnD7la4lvfE/FpEyQO9liHNtajYFYq/8LwKVAHStp7JYV4uvRWYyGJKk35zl3PhtEmyrX/YoahlxD0SBXaRKodKhrf4jxBNrvLGDsGBf309pcqUFk54x/HCjmkYl+Zq5iosQgTjhk5aX1nhIkHHPpSlYRVAWcufiWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BSSZrGLM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p+09DSAs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52616C2BC87;
-	Wed,  8 Apr 2026 14:34:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BSSZrGLM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0204AC19424;
+	Wed,  8 Apr 2026 14:34:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775658846;
-	bh=eqeiAcPNJoTSStYt75yr4ts6fdSk7s1G6BqcIV2sk3A=;
+	s=k20201202; t=1775658848;
+	bh=HlbJlPHaIqGCg+7KyVe8KtzjmCdZxRsgKdRGK1QZLxk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=p+09DSAsZv+juc5pNeg+j9ihUj/dDi0Hrufvk3YCYrzYs2aJzJ21EKC85zfI5wXL3
-	 DN7NP9D6R+cOIEMrRkeTyF9gT7cmFBwaLtABrQkC+v7Rqz5J1tqZlaETtb4jtkdzc5
-	 GHYQNPACKEUdqY42xF3FuVD/9blljao8uwxa0SfNbRAfP4U5L50A1uGGgltloirsNB
-	 7SujRG52zbKb1KkaJd/ah5Ga58sKU5YJ8ABbmF9BkAH4tgFYFyl1ZvyBlUleqZNbKW
-	 OqW7vXCi5VOybUgyQ/Qh8XyoEzCloiyjnPn2Lr0g3kcyH9QOQjFndTo/MHKgZbJ2nj
-	 DY+ykkLl3Yj9g==
+	b=BSSZrGLM352kFRI7kNegSvnCR+mKenmeoIKbP9CtVkz8xOMItrHmQn8az3eAu/FE7
+	 2Wqf+J75X6VPwBNaCgidTzH4d7Cgnkk2iaISEQaUINVRdkDYfUcCKEC3MSuW4WkWof
+	 lTj8s8yUwxM7lih5HAz9oY07VHpNBJ9p/7yUQ9IWx4S2YinkQ2pKcnoKGcEHMtBrF3
+	 gXQuAijpGpg2yg7fyQspMd2J7t8gfX1CetT7xdONPaA6+k44TMm+kHu2MF87uC1yhC
+	 kUQplrzYtM+Hhv73kdvEm7E7Ydj9qiog80Sm7eTN1BrrbOHdoQMQWCySG7Hc51skjg
+	 nbKM4WIAz2yKg==
 From: Tycho Andersen <tycho@kernel.org>
 To: Tom Lendacky <thomas.lendacky@amd.com>,
 	John Allen <john.allen@amd.com>,
@@ -40,9 +40,9 @@ Cc: "Borislav Petkov (AMD)" <bp@alien8.de>,
 	Alexey Kardashevskiy <aik@amd.com>,
 	Dan Williams <dan.j.williams@intel.com>,
 	"Tycho Andersen (AMD)" <tycho@kernel.org>
-Subject: [PATCH v1 2/4] crypto/ccp: Fix snp_filter_reserved_mem_regions() off-by-one
-Date: Wed,  8 Apr 2026 08:32:57 -0600
-Message-ID: <20260408143259.602767-3-tycho@kernel.org>
+Subject: [PATCH v1 3/4] crypto/ccp: Check for page allocation failure correctly in TIO
+Date: Wed,  8 Apr 2026 08:32:58 -0600
+Message-ID: <20260408143259.602767-4-tycho@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260408143259.602767-1-tycho@kernel.org>
 References: <20260408143259.602767-1-tycho@kernel.org>
@@ -58,46 +58,58 @@ From: "Tycho Andersen (AMD)" <tycho@kernel.org>
 
 Sashiko notes:
 
-> regarding the bounds check in snp_filter_reserved_mem_regions()
-> called via walk_iomem_res_desc(): does the check
-> if ((range_list->num_elements * 16 + 8) > PAGE_SIZE)
-> allow an off-by-one heap buffer overflow?
+> if __snp_alloc_firmware_pages() returns NULL under memory pressure, is it
+> safe to pass it directly to page_address()?
 >
-> If range_list->num_elements is 255, 255 * 16 + 8 = 4088, which is <= 4096.
-> Writing range->base (8 bytes) fills 4088-4095, but writing range->page_count
-> (4 bytes) would write to 4096-4099, overflowing the kzalloc-allocated
-> PAGE_SIZE buffer.
+> On architectures without HASHED_PAGE_VIRTUAL, page_address(NULL) might
+> compute a deterministic but invalid, non-zero virtual address. The
+> subsequent if (tio_status) check would then evaluate to true, and
+> sev_tsm_init_locked() would dereference the invalid pointer.
 
-Fix this by accounting for the entry about to be written to, in addition to
-the entries that are already allocated.
+Indeed, page_address(NULL) will return non-NULL garbage here. Fix this by
+checking the page allocation itself for NULL, not the resulting virtual
+address.
 
-Fixes: 1ca5614b84ee ("crypto: ccp: Add support to initialize the AMD-SP for SEV-SNP")
+Fixes: 4be423572da1 ("crypto/ccp: Implement SEV-TIO PCIe IDE (phase1)")
 Reported-by: Sashiko
 Assisted-by: Gemini:gemini-3.1-pro-preview
 Link: https://sashiko.dev/#/patchset/20260324161301.1353976-1-tycho%40kernel.org
 Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
 ---
- drivers/crypto/ccp/sev-dev.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ drivers/crypto/ccp/sev-dev.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 939fa8aa155c..e87efcff8df2 100644
+index e87efcff8df2..11e2c667c0ad 100644
 --- a/drivers/crypto/ccp/sev-dev.c
 +++ b/drivers/crypto/ccp/sev-dev.c
-@@ -1328,10 +1328,11 @@ static int snp_filter_reserved_mem_regions(struct resource *rs, void *arg)
- 	size_t size;
+@@ -1488,6 +1488,8 @@ static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
+ 				       &snp_panic_notifier);
  
- 	/*
--	 * Ensure the list of HV_FIXED pages that will be passed to firmware
--	 * do not exceed the page-sized argument buffer.
-+	 * Ensure the list of HV_FIXED pages passed to the firmware including
-+	 * the one about to be written to do not exceed the page-sized argument
-+	 * buffer.
- 	 */
--	if ((range_list->num_elements * sizeof(struct sev_data_range) +
-+	if (((range_list->num_elements + 1) * sizeof(struct sev_data_range) +
- 	     sizeof(struct sev_data_range_list)) > PAGE_SIZE)
- 		return -E2BIG;
+ 	if (data.tio_en) {
++		struct page *page;
++
+ 		/*
+ 		 * This executes with the sev_cmd_mutex held so down the stack
+ 		 * snp_reclaim_pages(locked=false) might be needed (which is extremely
+@@ -1495,12 +1497,14 @@ static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
+ 		 * Instead of exporting __snp_alloc_firmware_pages(), allocate a page
+ 		 * for this one call here.
+ 		 */
+-		void *tio_status = page_address(__snp_alloc_firmware_pages(
+-			GFP_KERNEL_ACCOUNT | __GFP_ZERO, 0, true));
++		page = __snp_alloc_firmware_pages(GFP_KERNEL_ACCOUNT | __GFP_ZERO,
++						  0, true);
++		if (page) {
++			void *tio_status = page_address(page);
+ 
+-		if (tio_status) {
+ 			sev_tsm_init_locked(sev, tio_status);
+-			__snp_free_firmware_pages(virt_to_page(tio_status), 0, true);
++
++			__snp_free_firmware_pages(page, 0, true);
+ 		}
+ 	}
  
 -- 
 2.53.0
