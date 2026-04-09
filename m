@@ -1,135 +1,128 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 402D43A4503;
-	Thu,  9 Apr 2026 08:22:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E7EE3BED4A;
+	Thu,  9 Apr 2026 11:02:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775722943; cv=none; b=EpsniydZisCACqL7T/IxxNS3nM9Ex59l7nqQZPjOTJ4VdBOo6oh5iezU7yOTHMFfSBQYVr2JXGA0uRweJXL5pUIrWXAquaR4ERuIFKJ5qjjIcj4trK5i7yLE5vcd+LAGSBUgr7l00SDvIrhRzEoIsGkez4ZM3WlExJXzlpi9YXA=
+	t=1775732551; cv=none; b=csfXRkVMjSk2QznWEcACkH89JZ5HZ/ojvUdwmduRKD/y829gGSEaKQeClldudf9lIEgGVdnzNqrqeL8lIn2U+rTbuKlrtw7NAv+VPlkIi3YcKOx88K7L6voQEMHKCxADlMlzXFDhF/Sop+PWEIIb79vVVNzCXMw0r7dj8kVkWV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775722943; c=relaxed/simple;
-	bh=4uAba8OI5T8Go5pGclaJOI0ikIPcUDGzn2OR2CK59cc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lNJFieu8FZiNWmoascKtNgEpG/K9w2RO3g0WrQIYIuJNp2IEobL37E33r8fHsSkW43xQDqzMGKGIArUYodUT4GZVjJehR4GilGvIBpbjV0tQnZzg6QRwliyevrn5/JE0aYjdN2BXrWw7rg2mNVTuYPuPCFAqCj7pC29YdBTziO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=rdlvwY+A; arc=none smtp.client-ip=148.163.156.1
+	s=arc-20240116; t=1775732551; c=relaxed/simple;
+	bh=52xoCoomqrF5WcBna2OKFT4m8+395iYAp3/zAnHiEU8=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=mq38k20omPzgEgBdJ7sHmEK+39P+9JXZxzG0MgMO6UNTz0rvXuAxjo9wN/KPj7o1jIXMoMxXkjphbAvGLJ9LQ0AN4T4JF32JJenkoCxz80TCi7fJ/iIpN3TdGYwOtmndulLFy7faTjWBJVDQr4+IGRfX5FDJ44KYS6x8kE8tNlM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=QM2X43so; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="rdlvwY+A"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 638IKt762314896;
-	Thu, 9 Apr 2026 08:22:15 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="QM2X43so"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 638JEEku2211010;
+	Thu, 9 Apr 2026 11:02:25 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=GQXOWG
-	SWDursGskd+z8LEeh4wYGacKmqrxF09Mg4clc=; b=rdlvwY+AqFE5OuzNF2Gfzt
-	eSTVX2Lom0FQLgXduASx/bURqNFYegg7679lL1mc2A9frV0lB8xikHG2aDP0kMHF
-	cWs53k9gtJrPLyeBych7JmdlOra/j7uuJQT82ZE0KD6lZ8EqJrd1JqZ3Ch/eceJI
-	HS88u3C8dAmH9RtUWtVix5081jhZDlmkwUpKrHbdc3AzISfUJ1Nc64RhurtaagwE
-	bUJoLv0Qlmji4fbXDimHkkBvOkGfCVioZY747tnToRSMoIrhl2P5G8DQwUb1BlVM
-	2MkE8ociG32NJ73wXM5ZTVas6s6REZa59Zr9/giui0T3HPVH7SQxNojp5oOGEidA
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4dcn2g4067-1
+	:message-id:mime-version:references:reply-to:subject:to; s=pp1;
+	 bh=aRI3KTKCgL8td0F1L+BS1JbWXX4gW6ENXsgBz4vkJFI=; b=QM2X43sof1Lg
+	FWZ9OOp+/p4u3a6cPhDW+Gbt+EpL7Cq5YBL/m06A07Z91WqjdE+E88nH3mGV0F7l
+	ZTNsZ3q35ymLflkMjFffN++y6vjNQ4h/BKpwT9pNp0HU0o897pJpG5+KiZGtqFap
+	biQj0YiHVDQB2ljgfjNSKqhnkJZDJtQjbGXQhMhoQbAN4Q1kmwo1C2y0bdfu25iy
+	3ekSOVx1B7ydp4I8Mm7PIFJhh3ImrMrvagdYm4SuJdc7BiaDswI78WT9EShfZUU7
+	fWGggT2Mqc1RBTlpvs5wz69STEiyLTdPM06mApy7AgX3cf8M665rqSb9dg66D8Ze
+	U+AajZxK8A==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4dcn2hkqb9-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 09 Apr 2026 08:22:15 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 6397iILj019008;
-	Thu, 9 Apr 2026 08:22:14 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4dcme9jt4t-1
+	Thu, 09 Apr 2026 11:02:24 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 63986LlF026655;
+	Thu, 9 Apr 2026 11:02:24 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4dcmg838cg-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 09 Apr 2026 08:22:14 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 6398MCZL43909524
+	Thu, 09 Apr 2026 11:02:24 +0000
+Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
+	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 639B2NFN14418600
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 9 Apr 2026 08:22:12 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 69E2620043;
-	Thu,  9 Apr 2026 08:22:12 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3F04B20040;
-	Thu,  9 Apr 2026 08:22:12 +0000 (GMT)
-Received: from [9.52.215.116] (unknown [9.52.215.116])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  9 Apr 2026 08:22:12 +0000 (GMT)
-Message-ID: <e1767c51-0bfc-45fa-896e-ac2de0268828@linux.ibm.com>
-Date: Thu, 9 Apr 2026 10:22:11 +0200
+	Thu, 9 Apr 2026 11:02:23 GMT
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CF9E0580C8;
+	Thu,  9 Apr 2026 11:02:23 +0000 (GMT)
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6A566580C9;
+	Thu,  9 Apr 2026 11:02:23 +0000 (GMT)
+Received: from ltc.linux.ibm.com (unknown [9.5.196.140])
+	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  9 Apr 2026 11:02:23 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] crypto: s390 - Remove des and des3_ede code
-To: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Cc: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
+Date: Thu, 09 Apr 2026 13:02:23 +0200
+From: Harald Freudenberger <freude@linux.ibm.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Holger Dengler <dengler@linux.ibm.com>, linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org,
-        Harald Freudenberger <freude@linux.ibm.com>
+        linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH 1/3] crypto: s390 - Remove des and des3_ede code
+Reply-To: freude@linux.ibm.com
+Mail-Reply-To: freude@linux.ibm.com
+In-Reply-To: <20260327173229.GB3407398@google.com>
 References: <20260326201246.57544-1-ebiggers@kernel.org>
  <20260326201246.57544-2-ebiggers@kernel.org>
- <09684f23-8937-4fed-b88a-361c9ccef04c@linux.ibm.com>
- <d5fb24534a56017e622ef15272eb2f0cfc6d6de6.camel@physik.fu-berlin.de>
-From: Holger Dengler <dengler@linux.ibm.com>
-Content-Language: de-DE, en-US
-In-Reply-To: <d5fb24534a56017e622ef15272eb2f0cfc6d6de6.camel@physik.fu-berlin.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+ <65c3d229-57ee-4980-a13f-bc9661b4dda1@linux.ibm.com>
+ <20260327173229.GB3407398@google.com>
+Message-ID: <b5ddfc370755c60fbdcfbc954391a088@linux.ibm.com>
+X-Sender: freude@linux.ibm.com
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=FKArAeos c=1 sm=1 tr=0 ts=69d761b7 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=NEAV23lmAAAA:8
- a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=w4HzK-rsqA_2YikTyBoA:9 a=3ZKOabzyN94A:10
- a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: Ngpa_VWaMMY_eVbLJ1I8VR420Ai-6YNB
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDA5MDA3MiBTYWx0ZWRfX2IdIJZuZ43ds
- CcWlWieupJqxnCUJDCk4db1up+S5M00QF9QQkpMCBPrNIt9j+B/hpXHnnfAq/5Bq7sjG89MdXKy
- 4mZ6wcbUsnQZT6rvrLKjjZ35QuNNHzFU9WgiQjZYtR5PBKGxeG+coGomoar39+DGLdEzcwwvcyP
- UWKlQ5UcDPjrAk6HSN8mg/PZze9zcrAa36nHzCN2ZOzON5CbT6Y5OrhAhHrlwytqTpXdRkPQPD2
- YR566c+iVFIi4Ml8AbFlg8UKfLBs9+/AlQrj9U1K7Wts8GRJOiSmfJcMaesOF8kDxRtvmOZbGP8
- /gPDLZZMeZnXtYpG4SU84ix4ZKy9skn/myi7Mq3thUbB5n1ucKeI7POCVa+4PkMtFKc+dlcxopj
- nkwplCbWyryFH81+Pq3Jv0wwr7Is9uP6aZNw9licbhPTcxHgD2oZQgYWtGiOzMIh+O+bhVV6uEc
- FDQo0xMC89k9dOUPePg==
-X-Proofpoint-GUID: Ngpa_VWaMMY_eVbLJ1I8VR420Ai-6YNB
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDA5MDA5NyBTYWx0ZWRfXwpQ4HoefbzbT
+ i7qTGPpifmClMxH7+LDYgCu6y+XEkp5uGaib4bMSs+igMDRlZLiaEXpC6+MhQ9RGzZQRkOCxlk3
+ S6CRIQygmRjr83fZas3uNHn5JUX2DGWCrR/Pi1UURKau8lGh6zMn0sJf6dwHJSH3Fsu2tQ02XE2
+ HaqjDHYMBXvPhdnBDXGl095aqR3A0gBzYCsWCnrkaWX+jfk9dDw5Ms0Ha553rI/+Ymo25et15Yd
+ p7TrV3Oj2Fduap4E1UI1VOkex1+JkVobmHTHH+CuhovKZnLHFiqm9Q+mA0EirOC4L+2YQu+k73B
+ TQ0tvSMudI66Ir/v4EzhDqR/Gb7gUJqtj/+56TP0lyNv/kcNZ39VpfQ0O3cF/zxPM9iq/mpdaCs
+ jCPXEQM1Y9FFX49zNhwXLDClYzri9NE4RZuLvgUrgVv/O/b6KCWIv4O6TsGj+6mqEaqXx9DFdfU
+ CFfdh8oiMjvAwFM+lAg==
+X-Proofpoint-GUID: mGc0xoxsUcJ1RFQ21OsWeuzsZ02FeeO4
+X-Authority-Analysis: v=2.4 cv=a/wAM0SF c=1 sm=1 tr=0 ts=69d78741 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=kj9zAlcOel0A:10 a=A5OVakUREuEA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=V8glGbnc2Ofi9Qvn3v5h:22 a=VwQbUJbxAAAA:8
+ a=VnNF1IyMAAAA:8 a=Vl4isb59Ea5TTis8JccA:9 a=CjuIK1q_8ugA:10
+X-Proofpoint-ORIG-GUID: mGc0xoxsUcJ1RFQ21OsWeuzsZ02FeeO4
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-09_02,2026-04-08_01,2025-10-01_01
+ definitions=2026-04-09_03,2026-04-09_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 clxscore=1015 lowpriorityscore=0 adultscore=0 bulkscore=0
- suspectscore=0 priorityscore=1501 impostorscore=0 spamscore=0 phishscore=0
+ bulkscore=0 clxscore=1015 spamscore=0 impostorscore=0 priorityscore=1501
+ phishscore=0 lowpriorityscore=0 adultscore=0 malwarescore=0 suspectscore=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2604010000 definitions=main-2604090072
+ reason=mlx scancount=1 engine=8.22.0-2604010000 definitions=main-2604090097
 
-Hi Adrian,
-
-On 09/04/2026 09:29, John Paul Adrian Glaubitz wrote:
-> On Thu, 2026-04-09 at 09:08 +0200, Holger Dengler wrote:
+On 2026-03-27 18:32, Eric Biggers wrote:
+> On Fri, Mar 27, 2026 at 09:52:31AM +0100, Holger Dengler wrote:
+>> Hi Eric,
+>> 
 >> On 26/03/2026 21:12, Eric Biggers wrote:
->>> Since DES and Triple DES are obsolete, there is very little point in
->>> maintining architecture-optimized code for them.  Remove it.
->>>
->>> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
->>
->> Reviewed-by: Holger Dengler <dengler@linux.ibm.com>
+>> > Since DES and Triple DES are obsolete, there is very little point in
+>> > maintining architecture-optimized code for them.  Remove it.
+>> >
+>> > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+>> 
+>> Are there plans to completely remove des/3des in-kernel crypto support 
+>> from
+>> the kernel or is it just the arch-specific code, that is removed?
 > 
-> Wouldn't it actually make sense to keep the old crypto code so we get
-> additional coverage for QEMU's emulation of crypto instructions?
+> Just the arch-specific code for now.  It will just make these like RC4
+> and MD4 which are still implemented for compatibility reasons but only
+> with generic C code.  Someday (years from now) we should remove all of
+> these entirely, but for now the best we can hope for is simplifying the
+> implementations to just the generic C code.
+> 
+> - Eric
 
-For qemu test coverage on s390, I would prefer the libica [1] test cases,
-which covers mostly all functions codes of the CPACF instructions.
-
-If you want to use the kernel code for testing in addition, you may stay with
-a kernel version before the code removal.
-
-[1] https://github.com/opencryptoki/libica
-
--- 
-Mit freundlichen Grüßen / Kind regards
-Holger Dengler
---
-IBM Systems, Linux on IBM Z Development
-dengler@linux.ibm.com
-
+Reviewed-by: Harald Freudenberger <freude@linux.ibm.com>
