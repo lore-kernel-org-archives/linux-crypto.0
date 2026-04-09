@@ -1,83 +1,90 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC678BE9;
-	Thu,  9 Apr 2026 17:48:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EA862472A6;
+	Thu,  9 Apr 2026 19:56:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775756902; cv=none; b=CXH8jD0jx9zgGoPLGtq0W57u7FyjZp6XZk5R0Krl2LzgwvZb4Bnja7JotGSnyiUkjYuicXAvOtLyWmwPbKmJJYFWg7gb1Qy8jP7w7TshwoXRB6C5MZAbFEVsgEOXEgoaBf/L5eOZow4K/DKXL0/r70FO16O1nkQg0/jYfjbXqkk=
+	t=1775764580; cv=none; b=Kd94CTPt3Hcm0fx1anNGNHSxcGlSF87O8GgJu/0cRMk4EeZMZC6n91/s9veUKnM6MkE75Oe8SjQFV4Ro0RmzaEAkP6KuBfZy7OYHGqqXH/VpFXRZxetoR2Rssq9H5NNMbFO26jCGOnmPC7ZP5FsvttwoKlUywy6noIXawesdbRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775756902; c=relaxed/simple;
-	bh=8q59SIFWEVq34cuARhd0ZskiMzGrBpaXP8qFu9ARl/8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kiuOGmH/csGoaD2rWb72pi6BJXOID9V6MyHPRv866tw5UEX606/KrPr+mSgd3tpiheXmwNB04jZyQDWfEXzFqZA9irnIm4K6LwMdmQ8OgkJAoex4WlN7o5JeipIiiQYoG5airV3Y6GTOQ4/1a7pq3hRAWASOnGAt7zoFKZWYJSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rl61ENT6; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1775764580; c=relaxed/simple;
+	bh=AWsXnQv98fIRWxVfdx70zhiJpa6+Hdrpnsq8JUjO7PM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TIfPO9Puf7QZnwgix8ZbkAQtO3MktQUAVDMXZTq+uOmmQtr3lYZIfhk/LYKKXkf4/PQ90ZZHQUg6A+xa6lt0/ujNDnoppKT1xeAQq5V0OctflTBtO5sHqUnN520xivRPNHEwYit7IOGVmXVB4WS0HkNMmVLMqwUlX57q/yZUI8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oUowbXXw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rl61ENT6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58966C4CEF7;
-	Thu,  9 Apr 2026 17:48:22 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oUowbXXw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BA8FC4CEF7;
+	Thu,  9 Apr 2026 19:56:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775756902;
-	bh=8q59SIFWEVq34cuARhd0ZskiMzGrBpaXP8qFu9ARl/8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Rl61ENT6PT27kifDfWND/EIh19RZuYNyCuiQJt5tMoYIInZ2qQ7vqw82Xe+1oWqzu
-	 qPoJpj/ZPEvGp0yu79kp3xUO5Ep63sgyWnGbRu9FD0/yFtQx5OuS8QJ3xRReO6FLPp
-	 ZGjBpXxdAdTwUUCwixhPs+XR+JFt4yI91scY456ruIV+3nn+wnghPjsejF5C9K58N5
-	 oP+8Ybkos3Q3/Nwjs9+Zfl2BInPWz3nVIbxy4gYv6R9mtiW/xzxzsbtiLpCPbinFr9
-	 C4XycfrkVAtFP4++knG9XMoXSesRWWNpi4OHgu//u1FxikR/gVwA5cT6zldAUbYxY2
-	 zfZKs3PYp+0bQ==
-Date: Thu, 9 Apr 2026 17:48:20 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Holger Dengler <dengler@linux.ibm.com>
-Cc: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-	linux-crypto@vger.kernel.org,
+	s=k20201202; t=1775764579;
+	bh=AWsXnQv98fIRWxVfdx70zhiJpa6+Hdrpnsq8JUjO7PM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=oUowbXXwJ8tET9Zf5u1wpTdll+QBnDwkiDIE52cEaL+lGUVZROjvrrRm5mS2eSNn5
+	 YfhYJBGVe88QG53GxjNrtYWEVWAimSLjNwP5wpMxRmACYWEnBQGV8k3icJSrddkCk1
+	 ZSN9XJGH3JKOs/w0JiQz/6nGpVx2pPqBjbF9RDdl+j/Tg2bBe3ysapJJzwJ49NJK7D
+	 ZpepKvWTTrmjMjGl36GE3bRrwxAjNI5rwg/2E5PDrvDIufuNv47/04HO/khJnSJObQ
+	 nkt3IuUzMirbd+ISNJg9JNpfgjYZpZZUwxIRwsPjfnnMd21+hDageQkOXm03vkVG9S
+	 dwODzNXW0jXDw==
+From: Tycho Andersen <tycho@kernel.org>
+To: Thomas Gleixner <tglx@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Ashish Kalra <ashish.kalra@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	John Allen <john.allen@amd.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-	sparclinux@vger.kernel.org, x86@kernel.org,
-	Harald Freudenberger <freude@linux.ibm.com>
-Subject: Re: [PATCH 1/3] crypto: s390 - Remove des and des3_ede code
-Message-ID: <20260409174820.GA535565@google.com>
-References: <20260326201246.57544-1-ebiggers@kernel.org>
- <20260326201246.57544-2-ebiggers@kernel.org>
- <09684f23-8937-4fed-b88a-361c9ccef04c@linux.ibm.com>
- <d5fb24534a56017e622ef15272eb2f0cfc6d6de6.camel@physik.fu-berlin.de>
- <e1767c51-0bfc-45fa-896e-ac2de0268828@linux.ibm.com>
+	"David S. Miller" <davem@davemloft.net>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Neeraj Upadhyay <Neeraj.Upadhyay@amd.com>,
+	Kishon Vijay Abraham I <kvijayab@amd.com>,
+	Alexey Kardashevskiy <aik@amd.com>,
+	Nikunj A Dadhania <nikunj@amd.com>,
+	"Peter Zijlstra (Intel)" <peterz@infradead.org>,
+	Kim Phillips <kim.phillips@amd.com>,
+	Sean Christopherson <seanjc@google.com>
+Cc: linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	"Tycho Andersen (AMD)" <tycho@kernel.org>
+Subject: [PATCH v3 0/2] Skip SNP initialization if CPUs are offlined
+Date: Thu,  9 Apr 2026 13:56:00 -0600
+Message-ID: <20260409195602.851513-1-tycho@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e1767c51-0bfc-45fa-896e-ac2de0268828@linux.ibm.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Apr 09, 2026 at 10:22:11AM +0200, Holger Dengler wrote:
-> Hi Adrian,
-> 
-> On 09/04/2026 09:29, John Paul Adrian Glaubitz wrote:
-> > On Thu, 2026-04-09 at 09:08 +0200, Holger Dengler wrote:
-> >> On 26/03/2026 21:12, Eric Biggers wrote:
-> >>> Since DES and Triple DES are obsolete, there is very little point in
-> >>> maintining architecture-optimized code for them.  Remove it.
-> >>>
-> >>> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> >>
-> >> Reviewed-by: Holger Dengler <dengler@linux.ibm.com>
-> > 
-> > Wouldn't it actually make sense to keep the old crypto code so we get
-> > additional coverage for QEMU's emulation of crypto instructions?
-> 
-> For qemu test coverage on s390, I would prefer the libica [1] test cases,
-> which covers mostly all functions codes of the CPACF instructions.
-> 
-> If you want to use the kernel code for testing in addition, you may stay with
-> a kernel version before the code removal.
-> 
-> [1] https://github.com/opencryptoki/libica
+From: "Tycho Andersen (AMD)" <tycho@kernel.org>
 
-Yes, the kernel is not a test suite for QEMU.  QEMU tests belong in the
-QEMU repository itself or in other projects.  We don't keep code around
-in the kernel purely to exercise functionality in QEMU.
+Changes are:
 
-- Eric
+* add some newlines
+* move error setting into cpumask check
+* head off AI review complaints by adding the note about SNP failing all
+  initialization previously to commit message of patch two
+* drop mention of reasons for snp_prepare() failure from commit message
+  of patch two
+* carry review tags as appropriate
+
+v2 is here: https://lore.kernel.org/all/20260407174713.439474-1-tycho@kernel.org/
+
+Tycho Andersen (AMD) (2):
+  x86/sev: Do not initialize SNP if missing CPUs
+  crypto/ccp: Skip SNP_INIT if preparation fails
+
+ arch/x86/include/asm/sev.h   |  4 ++--
+ arch/x86/virt/svm/sev.c      | 18 ++++++++++++++++--
+ drivers/crypto/ccp/sev-dev.c |  4 +++-
+ 3 files changed, 21 insertions(+), 5 deletions(-)
+
+
+base-commit: 6c927e5ca9d238f8ae40b453a8382eb9cf4ee855
+-- 
+2.53.0
+
