@@ -1,125 +1,148 @@
-Received: from mail-dl1-f42.google.com (mail-dl1-f42.google.com [74.125.82.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mega.nu (mega.nu [108.65.49.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A65833CC9FE
-	for <linux-crypto@vger.kernel.org>; Fri, 10 Apr 2026 15:32:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775835134; cv=pass; b=NvtvQo0dKjsBYfdEi89cqiiGliA3ZkwwlZl1E0sWJNRjv9PWDTDd2Ot6vHPGh4qMHkRcfJvo9t1zIBOEFMIBWh5ch4qdDk+/nemBINDclZwNHbVeYNBpy2mRYrtl83zo0yJOslwaDguWdL3KjIjTM4Y+zyo/Ge0C1B/2TvqQmx8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775835134; c=relaxed/simple;
-	bh=OBQJPBhzAm5teFuL1it4zrQEsej5woZw67yMwyO4d8U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hfousxzQ1tTsDm853eZKZJTNjoqg0ROqdi1J493WxRwXVQBIsM9JFkJMOMgLx8V/eFa3PPHYR26QugmvzBJ3hHxX9rF3gfv7mTaHGePeUa5r2jIUuAyU8NDlF6fk+O8KhzYBBoqfRtGmh3H6PaxngA7pmvg5E5tXIv67ZNfjMeo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x0f.com; spf=pass smtp.mailfrom=0x0f.com; dkim=pass (1024-bit key) header.d=0x0f.com header.i=@0x0f.com header.b=cs+zJ0r8; arc=pass smtp.client-ip=74.125.82.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0x0f.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0x0f.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1A803D9DB8
+	for <linux-crypto@vger.kernel.org>; Fri, 10 Apr 2026 15:34:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=108.65.49.10
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1775835249; cv=none; b=mSJAdyBDWDBgs4wtZ7PlkFTTNcfWJ+4vRfIRmeXxVMqvTGhMpnXO9dH7MuTopCnVD7bWiyWj+ddtIpk97jVx0Mcl/nG+HzKLxPMbd+I1u460bvQ1lYxdF4LZusL9r02Dd4WSPi4c5qznwCdCD0lIWvETK60C/gIwh04jGkjNq3w=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1775835249; c=relaxed/simple;
+	bh=Orci6oOMhHLWvSqQ+pL/ybY7L7xeeuOjpBePwpavgn8=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ES/8btK7Ocf6IRVk/wrv6HWe5m4aZR4ZrJv6EBcj91lq6v0KaeoEpzueVpxpMMO/bvXdfOGqTS1bFbuNbCcdGUJeolTWqRcg7UV5xXs++2CRMpEny5g1qL4AiUVm9BTaiJXGz4T/4h52AjOONut11YN+ymc+SezMBJ7lNnUSFtw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mega.nu; spf=pass smtp.mailfrom=mega.nu; dkim=pass (1024-bit key) header.d=mega.nu header.i=@mega.nu header.b=j/msZkNU; arc=none smtp.client-ip=108.65.49.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mega.nu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mega.nu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=0x0f.com header.i=@0x0f.com header.b="cs+zJ0r8"
-Received: by mail-dl1-f42.google.com with SMTP id a92af1059eb24-1271257ae53so9590780c88.1
-        for <linux-crypto@vger.kernel.org>; Fri, 10 Apr 2026 08:32:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1775835131; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Y603doJbnawmX8gdJsYLJ6oTsRxBYSDFkHoApUzzPXOwQD+BNU1X9rkKy172SNzK8R
-         FzqTMB6/JpHcxOlEr116r6WH0YOwUUy8KnCtPMgkZX+9iVzGS/ksyDSygGp8PWlXXmQY
-         9J6K/NChPmvtO+/gOwyuhs0YuibdYfZjZN5EVxBTs/oxkA7WHmoNsUPNYva1Wm/CMPH0
-         JmFDmIUcXRkmceXiZD8D5bAh63K/+ruJa7kzm5U6EUHG5rStA0xdRyeNnP16aIDVCJPk
-         +iMyz2CzIkk7GCj539QSxnhaBLYpv/ykKPTsz6UxO6JA5x1ABzo8YkVWIKWArCrkqfZi
-         P2lQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=OBQJPBhzAm5teFuL1it4zrQEsej5woZw67yMwyO4d8U=;
-        fh=yixzBeyvH9wTyAv/Wvv+qeJURJfmBWzeI9F8IqtRuVw=;
-        b=TzN7PKBlNTPwEpfqDPdCtrqytVRKicpn8q9j6mKy8HnN1Qb4nU8WLiQ1rc0AZA6SqA
-         3BRVWGoHxH/eTjK9EDmGXIcj810KKpQI5gbdU/gr9TVxgIzYQx4jERekz8iDRL++L7DA
-         7RCzYbLf2vxzqdAj3vaeHVHLJvWpav8xx0fjJz+HCmINHXqrVGcjlNTXOTQCbseEvDYb
-         OftvRYlcC1NABTyZyNTNP60R1GJ3YTpbnFG6zlk0my/1P2wprBSdSmQK8XlVJNrzh9Zu
-         XjNtTXtrigi13NoLOwheW59U0kOtGq/hNkr0GI6xHYxeAnftIirhFx74ehyeG8nqLSO/
-         fzpg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=0x0f.com; s=google; t=1775835131; x=1776439931; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=OBQJPBhzAm5teFuL1it4zrQEsej5woZw67yMwyO4d8U=;
-        b=cs+zJ0r8E1VxbeERL/6orYDfRzBNN0xV+FBDuuOmam2/EuHZ7scxaUctzZ3REo2LBr
-         KdQSu4tLtUeUQ/Am7PGmtjXBLQ/7knpdVClf5erC+tpkhYxe59BfVvuW88STHDIDr49T
-         TpKPrBeobAalm+DfnxseCj+mCeyPg4AFXq4Ow=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1775835131; x=1776439931;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OBQJPBhzAm5teFuL1it4zrQEsej5woZw67yMwyO4d8U=;
-        b=HfTb2o/QD7pqxRcYBQdPYKv7cxkpubYiH6f5/K6LqnZWS7a2MBOkggpqwfotFjTek+
-         MxheT1KCIUf0MQBxRD0wBhrKPy5iT8fugx3ChTFU0mpBnoasBcVVZhR7iNDv8EGhuqal
-         y2Ph+knjT0TjndF3GFebWug8j9i4l6DKFCV5kgqBbZta144sV/1srL5D97MlLWF3wToN
-         86vwxM7RsR5Z82z0PwYoBAY7uTxIW/DoOLUtxM8PDQkmyFdJUHRVrhwMN7WH2kpPtKXz
-         ZoZqn7WDPbCUWHE14gfkse5W+MQRaP45vjMF0lQQdssdt9u91lv0WsjI/38kqzOBHEBN
-         Nr8w==
-X-Forwarded-Encrypted: i=1; AJvYcCWTGH88Vp92VbbiISCMMnzZbp6rVQkmmKgGa5eTw99Yh1mF42y0myXTlPv3NlONyT3paqREf1GQvmwnEq8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyfKZqncm+CNxS+Q7ssdKZd2pMzeeVvuyPpoyq14UKZ/B3cHtLR
-	TNLwMQTZzvii4S+1Zn+PrMtuHVcH1dKn2Dl5fgRolUO33aExXK3Pm1roHy68FR64gG1C5z829pL
-	cul43aG6ew4QfULbNVlzJv01iSFvXXo2HxePspZpbGA==
-X-Gm-Gg: AeBDiev4XKlrhxDXr7maA+V6w+a0qj9gRZW5En+7ultevCKoPRtjhujdxkbHnaUWD25
-	dWUHE6RIE8T/TOGln5TWqhbpqnwdiEHE8pVSCIMDLN7zl9xedD3qDuDeyafV7LsREYL50KDOcF8
-	pNjX0ZXh9AmP289KHqGHQkZK/GHoq5LwX+IhhAqC/Syz+u4NfWe7zPh6KB7CnDa9lTCnQCCnWcz
-	XsWn7K+5u/0gm+wJwa133Rz8WIDTUTHNlVRTnGEipk02a8n8DHS171TumBjjYlDK0iZxk4DDA91
-	9+B3
-X-Received: by 2002:a05:7022:6097:b0:128:ccb7:7fa3 with SMTP id
- a92af1059eb24-12c34f069f8mr2159203c88.34.1775835130696; Fri, 10 Apr 2026
- 08:32:10 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=mega.nu header.i=@mega.nu header.b="j/msZkNU"
+Received-SPF: pass (mega.nu: authenticated connection)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mega.nu; s=20180922;
+	t=1775835219; bh=mPVBLwtOC+jo8k2ZiKBaBtmKJODVdXH5hiX0jEmEaIU=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:Content-Type:Cc:
+	 Subject:Reply-To:In-reply-to:References:Content-type;
+	b=j/msZkNUzApLexKjb37CilvlfxdGNdGBx6jXCcJEIFzb4aAA+G2Cdl0OvpEE8Lq8B
+	 KvMVFYkfnHKJzjvECk1qUx5p2TIvGKTPbwfKjttR+qjuwejepLtCyIrzibHikwkVKB
+	 ZjCZpuGIVqOziBvUZX2g7Pe9mpodVZLx7pmeMCIw=
+X-Authenticated-User: douzzer.mobile to mega.nu using PLAIN
+Received: from douzzer.mobile (localhost [127.0.0.1])
+	by mega.nu:587 (8.18.2/8.16.0.41) with ESMTPSA id 63AFXdiL017947
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
+	Fri, 10 Apr 2026 15:33:39 GMT
+	(envelope-from douzzer@mega.nu)
+Message-ID: <ac3f34e743737c128c289576c1f134d1991d4552.camel@mega.nu>
+Subject: Re: [PATCH] crypto: algif_aead - Revert to operating out-of-place
+From: Daniel Pouzzner <douzzer@mega.nu>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Thorsten Leemhuis <regressions@leemhuis.info>,
+        Taeyang Lee
+ <0wn@theori.io>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Linus Torvalds	
+ <torvalds@linuxfoundation.org>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni	 <pabeni@redhat.com>,
+        Greg KH <gregkh@linuxfoundation.org>, davem@davemloft.net,
+        Brian Pak <bpak@theori.io>, Juno Im <juno@theori.io>,
+        Jungwon Lim <setuid0@theori.io>,
+        Linux kernel regressions list
+ <regressions@lists.linux.dev>
+Date: Fri, 10 Apr 2026 10:33:39 -0500
+In-Reply-To: <adkOsK-uPRsv49Yz@gondor.apana.org.au>
+References: <acOpDrnN3cVfiASk@gondor.apana.org.au>
+	 <CAH-2XvLZD_-CVQT0omao2+GrdQt1Loq+oo4X6q=0NUAeUk==1w@mail.gmail.com>
+	 <acTSfLPWDGTaGIf7@gondor.apana.org.au>
+	 <73ab5267-57b8-4394-9c10-4ee3bf92e444@leemhuis.info>
+	 <adkOsK-uPRsv49Yz@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260410120044.031381086@kernel.org> <20260410120319.397219631@kernel.org>
-In-Reply-To: <20260410120319.397219631@kernel.org>
-From: Daniel Palmer <daniel@0x0f.com>
-Date: Sat, 11 Apr 2026 00:31:59 +0900
-X-Gm-Features: AQROBzAnX-XEClLFV-qWYFUzCuq4P43sNZviESiWFI1yCPXm2VtVZ2QkaUGJoPY
-Message-ID: <CAFr9PXk7qK8-2JWrrfgXHoS9JWTRL+WobLjmAesyCE9VLL8ZyQ@mail.gmail.com>
-Subject: Re: [patch 27/38] m68k: Select ARCH_HAS_RANDOM_ENTROPY
-To: Thomas Gleixner <tglx@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, Geert Uytterhoeven <geert@linux-m68k.org>, 
-	linux-m68k@lists.linux-m68k.org, Arnd Bergmann <arnd@arndb.de>, x86@kernel.org, 
-	Lu Baolu <baolu.lu@linux.intel.com>, iommu@lists.linux.dev, 
-	Michael Grzeschik <m.grzeschik@pengutronix.de>, netdev@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, 
-	linux-crypto@vger.kernel.org, Vlastimil Babka <vbabka@kernel.org>, linux-mm@kvack.org, 
-	David Woodhouse <dwmw2@infradead.org>, Bernie Thompson <bernie@plugable.com>, linux-fbdev@vger.kernel.org, 
-	Theodore Tso <tytso@mit.edu>, linux-ext4@vger.kernel.org, 
-	Andrew Morton <akpm@linux-foundation.org>, Uladzislau Rezki <urezki@gmail.com>, 
-	Marco Elver <elver@google.com>, Dmitry Vyukov <dvyukov@google.com>, kasan-dev@googlegroups.com, 
-	Andrey Ryabinin <ryabinin.a.a@gmail.com>, Thomas Sailer <t.sailer@alumni.ethz.ch>, 
-	linux-hams@vger.kernel.org, "Jason A. Donenfeld" <Jason@zx2c4.com>, 
-	Richard Henderson <richard.henderson@linaro.org>, linux-alpha@vger.kernel.org, 
-	Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, 
-	Catalin Marinas <catalin.marinas@arm.com>, Huacai Chen <chenhuacai@kernel.org>, 
-	loongarch@lists.linux.dev, Dinh Nguyen <dinguyen@kernel.org>, 
-	Jonas Bonn <jonas@southpole.se>, linux-openrisc@vger.kernel.org, 
-	Helge Deller <deller@gmx.de>, linux-parisc@vger.kernel.org, 
-	Michael Ellerman <mpe@ellerman.id.au>, linuxppc-dev@lists.ozlabs.org, 
-	Paul Walmsley <pjw@kernel.org>, linux-riscv@lists.infradead.org, 
-	Heiko Carstens <hca@linux.ibm.com>, linux-s390@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, sparclinux@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 
-Hi
+With your patches, no oopses in 20 iterations atop next-20260409.
 
-On Fri, 10 Apr 2026 at 21:39, Thomas Gleixner <tglx@kernel.org> wrote:
->
-> The only remaining usage of get_cycles() is to provide
-> random_get_entropy().
->
-> Switch m68k over to the new scheme of selecting ARCH_HAS_RANDOM_ENTROPY and
-> providing random_get_entropy() in asm/random.h.
+However, wrong results under libkcapi test.sh on several AES-CCM scenarios.
 
-I have built and booted this on my Amiga 4000 and it apparently still
-works so FWIW:
+7.0-rc7 with a664bf3d603 reverted produces correct results for these:
 
-Tested-by: Daniel Palmer <daniel@thingy.jp>
+[PASSED: 64-bit - 7.0.0-rc7-bug221332] AEAD ccm(aes) asynchronous one shot =
+multiple test
+[PASSED: 64-bit - 7.0.0-rc7-bug221332] AEAD ccm(aes) asynchronous stream mu=
+ltiple test
+[PASSED: 64-bit - 7.0.0-rc7-bug221332] AEAD ccm(aes) asynchronous vmsplice =
+multiple test
+
+Without the reversion, it produce Oopses on these:
+
+[PASSED: 64-bit - 7.0.0-rc7] AEAD ccm(aes) asynchronous one shot multiple t=
+est
+[PASSED: 64-bit - 7.0.0-rc7] AEAD ccm(aes) asynchronous stream multiple tes=
+t
+[   22.558016] BUG: kernel NULL pointer dereference, address: 0000000000000=
+9fc
+[   22.559018] #PF: supervisor read access in kernel mode
+[   22.559741] #PF: error_code(0x0000) - not-present page
+[   22.560470] PGD 108ff0067 P4D 0=20
+[   22.560942] Oops: Oops: 0000 [#1] SMP NOPTI
+[...]
+
+Meanwhile, next-20260409 with your point patches to
+crypto/algif_aead.c:_aead_recvmsg() and crypto/af_alg.c:af_alg_pull_tsgl()
+deterministically produces wrong results on these:
+
+[FAILED: 64-bit - 7.1.0-rc7-next-next-20260409-dirty] AEAD ccm(aes) asynchr=
+onous one shot multiple test
+(/usr/local/libexec/libkcapi/kcapi  -d 4 -x 10   -c ccm(aes) -q 4edb58e8d5e=
+b6bc711c43a6f3693daebde2e5524f1b55297abb29f003236e43d -t a7877c99 -n 674742=
+abd0f5ba -k 2861fd0253705d7875c95ba8a53171b4 -a fb7bc304a3909e66e2e0c5ef952=
+712dd884ce3e7324171369f2c5db1adc48c7d)
+Exp 8dd351509dcf1df9[...]
+Got EBADMSG
+[FAILED: 64-bit - 7.1.0-rc7-next-next-20260409-dirty] AEAD ccm(aes) asynchr=
+onous stream multiple test
+(/usr/local/libexec/libkcapi/kcapi -s -d 4 -x 10   -c ccm(aes) -q 4edb58e8d=
+5eb6bc711c43a6f3693daebde2e5524f1b55297abb29f003236e43d -t a7877c99 -n 6747=
+42abd0f5ba -k 2861fd0253705d7875c95ba8a53171b4 -a fb7bc304a3909e66e2e0c5ef9=
+52712dd884ce3e7324171369f2c5db1adc48c7d)
+Exp 8dd351509dcf1df9[...]
+Got EBADMSG
+[FAILED: 64-bit - 7.1.0-rc7-next-next-20260409-dirty] AEAD ccm(aes) asynchr=
+onous vmsplice multiple test
+(/usr/local/libexec/libkcapi/kcapi -v -d 4 -x 10   -c ccm(aes) -q 4edb58e8d=
+5eb6bc711c43a6f3693daebde2e5524f1b55297abb29f003236e43d -t a7877c99 -n 6747=
+42abd0f5ba -k 2861fd0253705d7875c95ba8a53171b4 -a fb7bc304a3909e66e2e0c5ef9=
+52712dd884ce3e7324171369f2c5db1adc48c7d)
+Exp 8dd351509dcf1df9[...]
+Got EBADMSG
+
+
+On Fri, 2026-04-10 at 22:52 +0800, Herbert Xu wrote:
+> On Thu, Apr 09, 2026 at 05:24:49PM +0200, Thorsten Leemhuis wrote:
+> >=20
+> > This meanwhile became a664bf3d603dc3 ("crypto: algif_aead - Revert to
+> > operating out-of-place") [v7.0-rc7] and according to Daniel Pouzzner
+> > causes a regression reported here:
+> > https://bugzilla.kernel.org/show_bug.cgi?id=3D221332
+> >=20
+> > To quote: """Seeing Oopses and some kernel panics in 7.0_rc7 under
+> > modest load, roughly 10% of test runs.  Discovered by serendipity
+> > running libkcapi test.sh to test our own crypto module (libwolfssl.ko),
+> > then reproduced on native crypto to exclude us as the cause.
+>=20
+> Please try these patches which are in the queue:
+>=20
+> https://patchwork.kernel.org/project/linux-crypto/patch/adCAFOgQ0y_I7SC7@=
+gondor.apana.org.au/
+> https://patchwork.kernel.org/project/linux-crypto/patch/adBbht8ERe0z-z3B@=
+gondor.apana.org.au/
+>=20
+> Both fix pre-existing bugs that were uncovered by the aformentioned
+> change and syzbot.
+>=20
+> Thanks,
