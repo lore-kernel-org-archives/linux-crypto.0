@@ -1,148 +1,211 @@
-Received: from mega.nu (mega.nu [108.65.49.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1A803D9DB8
-	for <linux-crypto@vger.kernel.org>; Fri, 10 Apr 2026 15:34:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=108.65.49.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91D2B37F8C5;
+	Fri, 10 Apr 2026 20:55:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775835249; cv=none; b=mSJAdyBDWDBgs4wtZ7PlkFTTNcfWJ+4vRfIRmeXxVMqvTGhMpnXO9dH7MuTopCnVD7bWiyWj+ddtIpk97jVx0Mcl/nG+HzKLxPMbd+I1u460bvQ1lYxdF4LZusL9r02Dd4WSPi4c5qznwCdCD0lIWvETK60C/gIwh04jGkjNq3w=
+	t=1775854529; cv=none; b=SpiuEDxx354np/8mh7+pdNXetW0ks3Ls4PDmrLxPocr7P63k66hLR81zgJAwQv0db5flucmEggMOUVjvafIQae8JvaEgV5olflTMxZX4ZohpBtJWOEeApHi7QgvwlE7yZk34HXbxpZoBJFJmffwUdVLpXcghzU6ybxW15B6wyTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775835249; c=relaxed/simple;
-	bh=Orci6oOMhHLWvSqQ+pL/ybY7L7xeeuOjpBePwpavgn8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ES/8btK7Ocf6IRVk/wrv6HWe5m4aZR4ZrJv6EBcj91lq6v0KaeoEpzueVpxpMMO/bvXdfOGqTS1bFbuNbCcdGUJeolTWqRcg7UV5xXs++2CRMpEny5g1qL4AiUVm9BTaiJXGz4T/4h52AjOONut11YN+ymc+SezMBJ7lNnUSFtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mega.nu; spf=pass smtp.mailfrom=mega.nu; dkim=pass (1024-bit key) header.d=mega.nu header.i=@mega.nu header.b=j/msZkNU; arc=none smtp.client-ip=108.65.49.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mega.nu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mega.nu
+	s=arc-20240116; t=1775854529; c=relaxed/simple;
+	bh=NCLwUcavida6lTRmcWsaKb5HSspL1nWNySBxMvO4hO8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=axDZ3ok7jmvbSO8WiiFFecMujCIaos94PQHn10ZAS1jNcaIe+ttHDe8/5uTtGdaOKewpJBqtSnBez4lF3Nuu/H1XzkOzqTNqKVEb6vfL04fMe0sZqj4NnfeZhbljOj5ng5bN3mUc0/Qx9CnH4lnWbaxww7CNADN2jrolKKRkPsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uBb+aK4w; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mega.nu header.i=@mega.nu header.b="j/msZkNU"
-Received-SPF: pass (mega.nu: authenticated connection)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mega.nu; s=20180922;
-	t=1775835219; bh=mPVBLwtOC+jo8k2ZiKBaBtmKJODVdXH5hiX0jEmEaIU=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:Content-Type:Cc:
-	 Subject:Reply-To:In-reply-to:References:Content-type;
-	b=j/msZkNUzApLexKjb37CilvlfxdGNdGBx6jXCcJEIFzb4aAA+G2Cdl0OvpEE8Lq8B
-	 KvMVFYkfnHKJzjvECk1qUx5p2TIvGKTPbwfKjttR+qjuwejepLtCyIrzibHikwkVKB
-	 ZjCZpuGIVqOziBvUZX2g7Pe9mpodVZLx7pmeMCIw=
-X-Authenticated-User: douzzer.mobile to mega.nu using PLAIN
-Received: from douzzer.mobile (localhost [127.0.0.1])
-	by mega.nu:587 (8.18.2/8.16.0.41) with ESMTPSA id 63AFXdiL017947
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Fri, 10 Apr 2026 15:33:39 GMT
-	(envelope-from douzzer@mega.nu)
-Message-ID: <ac3f34e743737c128c289576c1f134d1991d4552.camel@mega.nu>
-Subject: Re: [PATCH] crypto: algif_aead - Revert to operating out-of-place
-From: Daniel Pouzzner <douzzer@mega.nu>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Thorsten Leemhuis <regressions@leemhuis.info>,
-        Taeyang Lee
- <0wn@theori.io>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Linus Torvalds	
- <torvalds@linuxfoundation.org>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni	 <pabeni@redhat.com>,
-        Greg KH <gregkh@linuxfoundation.org>, davem@davemloft.net,
-        Brian Pak <bpak@theori.io>, Juno Im <juno@theori.io>,
-        Jungwon Lim <setuid0@theori.io>,
-        Linux kernel regressions list
- <regressions@lists.linux.dev>
-Date: Fri, 10 Apr 2026 10:33:39 -0500
-In-Reply-To: <adkOsK-uPRsv49Yz@gondor.apana.org.au>
-References: <acOpDrnN3cVfiASk@gondor.apana.org.au>
-	 <CAH-2XvLZD_-CVQT0omao2+GrdQt1Loq+oo4X6q=0NUAeUk==1w@mail.gmail.com>
-	 <acTSfLPWDGTaGIf7@gondor.apana.org.au>
-	 <73ab5267-57b8-4394-9c10-4ee3bf92e444@leemhuis.info>
-	 <adkOsK-uPRsv49Yz@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uBb+aK4w"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25D0DC19421;
+	Fri, 10 Apr 2026 20:55:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1775854529;
+	bh=NCLwUcavida6lTRmcWsaKb5HSspL1nWNySBxMvO4hO8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=uBb+aK4w3/2u4kyVJBiptzM0/JeHVU+h0LyuAGmXhRBB/wmY8nVPEGLrH6PIUauly
+	 xZ5jhTx/pd4jDAH6N0E8699fbCvDPdRPvQ/1U9PBOdvPEbxrui2vDJcfwacrKBJbAt
+	 K2KgH8S8N6W61I5bQqua5TC/HTbe1JJBDb2jmaIXqh11mio1s1ulWsCUgh1TEd2HU0
+	 +ZMxNL6Px/beH32xwdxJ9u73C9h58Vy+EiUKACVtBOcR0D3eWoYoTnffZnDWdkv8Q1
+	 Jq57olSI26FETBnKfPSYv2rHfBfCG49DcVZq8FGFKIXdb41avCYxrEXRj1YRJAzkeo
+	 CA0Wg7vMsMitA==
+From: Thomas Gleixner <tglx@kernel.org>
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, x86@kernel.org, Lu Baolu
+ <baolu.lu@linux.intel.com>, iommu@lists.linux.dev, Michael Grzeschik
+ <m.grzeschik@pengutronix.de>, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+ linux-crypto@vger.kernel.org, Vlastimil Babka <vbabka@kernel.org>,
+ linux-mm@kvack.org, David Woodhouse <dwmw2@infradead.org>, Bernie Thompson
+ <bernie@plugable.com>, linux-fbdev@vger.kernel.org, Theodore Tso
+ <tytso@mit.edu>, linux-ext4@vger.kernel.org, Andrew Morton
+ <akpm@linux-foundation.org>, Uladzislau Rezki <urezki@gmail.com>, Marco
+ Elver <elver@google.com>, Dmitry Vyukov <dvyukov@google.com>,
+ kasan-dev@googlegroups.com, Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+ Thomas Sailer <t.sailer@alumni.ethz.ch>, linux-hams@vger.kernel.org,
+ "Jason A. Donenfeld" <Jason@zx2c4.com>, Richard Henderson
+ <richard.henderson@linaro.org>, linux-alpha@vger.kernel.org, Russell King
+ <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, Catalin
+ Marinas <catalin.marinas@arm.com>, Huacai Chen <chenhuacai@kernel.org>,
+ loongarch@lists.linux.dev, Geert Uytterhoeven <geert@linux-m68k.org>,
+ linux-m68k@lists.linux-m68k.org, Dinh Nguyen <dinguyen@kernel.org>, Jonas
+ Bonn <jonas@southpole.se>, linux-openrisc@vger.kernel.org, Helge Deller
+ <deller@gmx.de>, linux-parisc@vger.kernel.org, Michael Ellerman
+ <mpe@ellerman.id.au>, linuxppc-dev@lists.ozlabs.org, Paul Walmsley
+ <pjw@kernel.org>, linux-riscv@lists.infradead.org, Heiko Carstens
+ <hca@linux.ibm.com>, linux-s390@vger.kernel.org, "David S. Miller"
+ <davem@davemloft.net>, sparclinux@vger.kernel.org
+Subject: [patch V1.1 02/38] x86: Cleanup include recursion hell
+In-Reply-To: <20260410120317.709923681@kernel.org>
+References: <20260410120044.031381086@kernel.org>
+ <20260410120317.709923681@kernel.org>
+Date: Fri, 10 Apr 2026 22:55:25 +0200
+Message-ID: <87ldeuzgaq.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain
 
-With your patches, no oopses in 20 iterations atop next-20260409.
+Including a random architecture specific header which requires global
+headers just to avoid including that header at the two usage sites is
+really beyond lazy and tasteless. Including global headers just to get the
+__percpu macro from linux/compiler_types.h falls into the same category.
 
-However, wrong results under libkcapi test.sh on several AES-CCM scenarios.
+Remove the linux/percpu.h and asm/cpumask.h includes from msr.h and smp.h
+and fix the resulting fallout by a simple forward struct declaration and by
+including the x86 specific asm/cpumask.h header where it is actually
+required.
 
-7.0-rc7 with a664bf3d603 reverted produces correct results for these:
+Signed-off-by: Thomas Gleixner <tglx@kernel.org>
+---
+V1.1: Fix PARAVIRT_XXL fallout....
+---
+ arch/x86/include/asm/cache.h             |    1 +
+ arch/x86/include/asm/msr.h               |    5 +++--
+ arch/x86/include/asm/paravirt.h          |    3 ++-
+ arch/x86/include/asm/pvclock.h           |    1 +
+ arch/x86/include/asm/smp.h               |    2 --
+ arch/x86/include/asm/vdso/gettimeofday.h |    5 ++---
+ arch/x86/kernel/cpu/mce/core.c           |    1 +
+ arch/x86/kernel/nmi.c                    |    1 +
+ arch/x86/kernel/smpboot.c                |    1 +
+ 9 files changed, 12 insertions(+), 8 deletions(-)
 
-[PASSED: 64-bit - 7.0.0-rc7-bug221332] AEAD ccm(aes) asynchronous one shot =
-multiple test
-[PASSED: 64-bit - 7.0.0-rc7-bug221332] AEAD ccm(aes) asynchronous stream mu=
-ltiple test
-[PASSED: 64-bit - 7.0.0-rc7-bug221332] AEAD ccm(aes) asynchronous vmsplice =
-multiple test
-
-Without the reversion, it produce Oopses on these:
-
-[PASSED: 64-bit - 7.0.0-rc7] AEAD ccm(aes) asynchronous one shot multiple t=
-est
-[PASSED: 64-bit - 7.0.0-rc7] AEAD ccm(aes) asynchronous stream multiple tes=
-t
-[   22.558016] BUG: kernel NULL pointer dereference, address: 0000000000000=
-9fc
-[   22.559018] #PF: supervisor read access in kernel mode
-[   22.559741] #PF: error_code(0x0000) - not-present page
-[   22.560470] PGD 108ff0067 P4D 0=20
-[   22.560942] Oops: Oops: 0000 [#1] SMP NOPTI
-[...]
-
-Meanwhile, next-20260409 with your point patches to
-crypto/algif_aead.c:_aead_recvmsg() and crypto/af_alg.c:af_alg_pull_tsgl()
-deterministically produces wrong results on these:
-
-[FAILED: 64-bit - 7.1.0-rc7-next-next-20260409-dirty] AEAD ccm(aes) asynchr=
-onous one shot multiple test
-(/usr/local/libexec/libkcapi/kcapi  -d 4 -x 10   -c ccm(aes) -q 4edb58e8d5e=
-b6bc711c43a6f3693daebde2e5524f1b55297abb29f003236e43d -t a7877c99 -n 674742=
-abd0f5ba -k 2861fd0253705d7875c95ba8a53171b4 -a fb7bc304a3909e66e2e0c5ef952=
-712dd884ce3e7324171369f2c5db1adc48c7d)
-Exp 8dd351509dcf1df9[...]
-Got EBADMSG
-[FAILED: 64-bit - 7.1.0-rc7-next-next-20260409-dirty] AEAD ccm(aes) asynchr=
-onous stream multiple test
-(/usr/local/libexec/libkcapi/kcapi -s -d 4 -x 10   -c ccm(aes) -q 4edb58e8d=
-5eb6bc711c43a6f3693daebde2e5524f1b55297abb29f003236e43d -t a7877c99 -n 6747=
-42abd0f5ba -k 2861fd0253705d7875c95ba8a53171b4 -a fb7bc304a3909e66e2e0c5ef9=
-52712dd884ce3e7324171369f2c5db1adc48c7d)
-Exp 8dd351509dcf1df9[...]
-Got EBADMSG
-[FAILED: 64-bit - 7.1.0-rc7-next-next-20260409-dirty] AEAD ccm(aes) asynchr=
-onous vmsplice multiple test
-(/usr/local/libexec/libkcapi/kcapi -v -d 4 -x 10   -c ccm(aes) -q 4edb58e8d=
-5eb6bc711c43a6f3693daebde2e5524f1b55297abb29f003236e43d -t a7877c99 -n 6747=
-42abd0f5ba -k 2861fd0253705d7875c95ba8a53171b4 -a fb7bc304a3909e66e2e0c5ef9=
-52712dd884ce3e7324171369f2c5db1adc48c7d)
-Exp 8dd351509dcf1df9[...]
-Got EBADMSG
-
-
-On Fri, 2026-04-10 at 22:52 +0800, Herbert Xu wrote:
-> On Thu, Apr 09, 2026 at 05:24:49PM +0200, Thorsten Leemhuis wrote:
-> >=20
-> > This meanwhile became a664bf3d603dc3 ("crypto: algif_aead - Revert to
-> > operating out-of-place") [v7.0-rc7] and according to Daniel Pouzzner
-> > causes a regression reported here:
-> > https://bugzilla.kernel.org/show_bug.cgi?id=3D221332
-> >=20
-> > To quote: """Seeing Oopses and some kernel panics in 7.0_rc7 under
-> > modest load, roughly 10% of test runs.  Discovered by serendipity
-> > running libkcapi test.sh to test our own crypto module (libwolfssl.ko),
-> > then reproduced on native crypto to exclude us as the cause.
->=20
-> Please try these patches which are in the queue:
->=20
-> https://patchwork.kernel.org/project/linux-crypto/patch/adCAFOgQ0y_I7SC7@=
-gondor.apana.org.au/
-> https://patchwork.kernel.org/project/linux-crypto/patch/adBbht8ERe0z-z3B@=
-gondor.apana.org.au/
->=20
-> Both fix pre-existing bugs that were uncovered by the aformentioned
-> change and syzbot.
->=20
-> Thanks,
+--- a/arch/x86/include/asm/cache.h
++++ b/arch/x86/include/asm/cache.h
+@@ -2,6 +2,7 @@
+ #ifndef _ASM_X86_CACHE_H
+ #define _ASM_X86_CACHE_H
+ 
++#include <vdso/page.h>
+ #include <linux/linkage.h>
+ 
+ /* L1 cache line size */
+--- a/arch/x86/include/asm/msr.h
++++ b/arch/x86/include/asm/msr.h
+@@ -8,12 +8,11 @@
+ 
+ #include <asm/asm.h>
+ #include <asm/errno.h>
+-#include <asm/cpumask.h>
+ #include <uapi/asm/msr.h>
+ #include <asm/shared/msr.h>
+ 
++#include <linux/compiler_types.h>
+ #include <linux/types.h>
+-#include <linux/percpu.h>
+ 
+ struct msr_info {
+ 	u32			msr_no;
+@@ -256,6 +255,8 @@ int msr_set_bit(u32 msr, u8 bit);
+ int msr_clear_bit(u32 msr, u8 bit);
+ 
+ #ifdef CONFIG_SMP
++struct cpumask;
++
+ int rdmsr_on_cpu(unsigned int cpu, u32 msr_no, u32 *l, u32 *h);
+ int wrmsr_on_cpu(unsigned int cpu, u32 msr_no, u32 l, u32 h);
+ int rdmsrq_on_cpu(unsigned int cpu, u32 msr_no, u64 *q);
+--- a/arch/x86/include/asm/paravirt.h
++++ b/arch/x86/include/asm/paravirt.h
+@@ -16,9 +16,10 @@
+ 
+ #ifndef __ASSEMBLER__
+ #include <linux/types.h>
+-#include <linux/cpumask.h>
+ #include <asm/frame.h>
+ 
++struct cpumask;
++
+ /* The paravirtualized I/O functions */
+ static inline void slow_down_io(void)
+ {
+--- a/arch/x86/include/asm/pvclock.h
++++ b/arch/x86/include/asm/pvclock.h
+@@ -2,6 +2,7 @@
+ #ifndef _ASM_X86_PVCLOCK_H
+ #define _ASM_X86_PVCLOCK_H
+ 
++#include <asm/barrier.h>
+ #include <asm/clocksource.h>
+ #include <asm/pvclock-abi.h>
+ 
+--- a/arch/x86/include/asm/smp.h
++++ b/arch/x86/include/asm/smp.h
+@@ -5,8 +5,6 @@
+ #include <linux/cpumask.h>
+ #include <linux/thread_info.h>
+ 
+-#include <asm/cpumask.h>
+-
+ DECLARE_PER_CPU_CACHE_HOT(int, cpu_number);
+ 
+ DECLARE_PER_CPU_READ_MOSTLY(cpumask_var_t, cpu_sibling_map);
+--- a/arch/x86/include/asm/vdso/gettimeofday.h
++++ b/arch/x86/include/asm/vdso/gettimeofday.h
+@@ -11,13 +11,12 @@
+ #define __ASM_VDSO_GETTIMEOFDAY_H
+ 
+ #ifndef __ASSEMBLER__
+-
++#include <clocksource/hyperv_timer.h>
+ #include <uapi/linux/time.h>
++
+ #include <asm/vgtod.h>
+ #include <asm/unistd.h>
+-#include <asm/msr.h>
+ #include <asm/pvclock.h>
+-#include <clocksource/hyperv_timer.h>
+ #include <asm/vdso/sys_call.h>
+ 
+ #define VDSO_HAS_TIME 1
+--- a/arch/x86/kernel/cpu/mce/core.c
++++ b/arch/x86/kernel/cpu/mce/core.c
+@@ -48,6 +48,7 @@
+ #include <linux/vmcore_info.h>
+ 
+ #include <asm/fred.h>
++#include <asm/cpumask.h>
+ #include <asm/cpu_device_id.h>
+ #include <asm/processor.h>
+ #include <asm/traps.h>
+--- a/arch/x86/kernel/nmi.c
++++ b/arch/x86/kernel/nmi.c
+@@ -26,6 +26,7 @@
+ #include <linux/sched/clock.h>
+ #include <linux/kvm_types.h>
+ 
++#include <asm/cpumask.h>
+ #include <asm/cpu_entry_area.h>
+ #include <asm/traps.h>
+ #include <asm/mach_traps.h>
+--- a/arch/x86/kernel/smpboot.c
++++ b/arch/x86/kernel/smpboot.c
+@@ -70,6 +70,7 @@
+ #include <asm/irq.h>
+ #include <asm/realmode.h>
+ #include <asm/cpu.h>
++#include <asm/cpumask.h>
+ #include <asm/numa.h>
+ #include <asm/tlbflush.h>
+ #include <asm/mtrr.h>
