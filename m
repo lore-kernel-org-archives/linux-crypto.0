@@ -1,145 +1,98 @@
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout1.hostsharing.net (mailout1.hostsharing.net [83.223.95.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2195137C914
-	for <linux-crypto@vger.kernel.org>; Sun, 12 Apr 2026 13:23:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.218.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776000187; cv=pass; b=BOLWqmlVas3o+RduEv/+VEalqX6Hv3ctIJ0ZD2b9D6kJI/bx1KgroDx28E1Nb1JExxcVfT2WLxrdZEl/1tn2JPSMQz9+PtMiCbAzmrN6Vg/ovv837LCj/B/MOX2yZAdqoSYxWuP/QhwfWXNqQIFGimkUl6fO7j7o8OTQaJ7ZC+s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776000187; c=relaxed/simple;
-	bh=1p6x7PvyQL+5PGqdAnx23TY8v0cVXdqCOnUZdmPD2Po=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ng4tRDlopiGY1SIQhRNq8Jkv6BFMVVBNBzASKGygQFn8R8CGigqwaJ6q8OV/scKIoOReyrPtejx1XzeJ2cCw2cwpm5Xdzpm8ZodtxA6j97SpvxKAExfdXJ0vLx4yE8oE21TItu+yVX7+bOUjrjU6xVLwxRkY4XZjvswAkJNwfCg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dccArJm9; arc=pass smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dccArJm9"
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b9c1da7ac63so541556466b.0
-        for <linux-crypto@vger.kernel.org>; Sun, 12 Apr 2026 06:23:04 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776000183; cv=none;
-        d=google.com; s=arc-20240605;
-        b=Qa8b1qo9tKbAj1ESD7YjER9riVuRwX6A1OREQyIvWepOP5EKcJyXlXUSKiatcaaXqm
-         Stub9z3zN7nQKrGKAdmdRbUcicrjryWb9U6HHh7s9kyX3HORDC6WIZxTDABJNFPfsUoE
-         qR+GA/mq5L9fM82GRPI1abVoXK+ty6VDG1W+apeYWma1L4GE6G7LAyn+aeSJaM45SJOA
-         SwmM2mFfRGK88GTYCKRwPBGZ+YbcTqTC8fKU1y/+16RjT9xWxb79/Wra1rC6/2Qh7R86
-         8r5B2UP/Nkrgwc8xBumkI3JRGr2Z2GEO9Qt4nzWHElFrizNcIbbJXABjDYSTzJ602NcF
-         NQGg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=gDdA9vu4Fz00bgurrj0mXlyC2hJ8rRfiuCUxuR8xwe8=;
-        fh=QrX/m6xswvee+UX8qeWsNxHkx1omDUiCWPRcMNOxC5I=;
-        b=cGmUHw8Cbldbqjl2T4o2ps2FPIK8Zseb7M3yU1oxcJBSdwfxctBjHq0Opjs126Ym7r
-         hRfu1+mzVLYyWMV9nbUduZhThBjFfEym2/df4b2ff7kJSuNxaLcmNj3y94JBpPgC0fRC
-         a5hro7V55dbEmveQlEHNx/XNZKWuxxue/01zjfs6pjl7Ld/nIhMTt4fO6X1Z/HX+Z6fK
-         HITEYnnbT+zA9zMH7yw7UU3HJcdvJhwAEfKSu6iT8fJ7pf2Y/gVt0vTx7UUTWMdJ+cbA
-         ajsUuXqmNQSwmHZLK1UYZhGWZ7ExQ7iylInNROzS9eknjxkGWloux8uNFqA2NoqrC6Q3
-         WKog==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776000183; x=1776604983; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gDdA9vu4Fz00bgurrj0mXlyC2hJ8rRfiuCUxuR8xwe8=;
-        b=dccArJm9v6h9Fdk8lDGNWZnQG14AQ9ZokHDnv7DAL1GW0R6BDoMR0waR0wHnO++sNY
-         YJPJSDf/Eo4Jqw4GQ8Gz/T/rsLkNap5uTZ+EpwANfeQ1dFGXyG88+fN/49+h4JvC9C7c
-         2+asFn0yzVsL4n2hJqrH+GINWtCINsNrMCDz6yHqeLWKks0EsNy7ssNes4vhdFLCd+tg
-         k2Ys2/EuxonOOeyCkSNs/L20e6zSdmHhXIY25hzHxXat+VjZowRiCo0VNk9bdjlPvxYt
-         DV9owUMCQ8VWv/4Ldm8HtUCj9QQlhYJyZr8JnJBv87EbzYIfO7KpnQu2sRPezsHrfV9J
-         1U2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776000183; x=1776604983;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=gDdA9vu4Fz00bgurrj0mXlyC2hJ8rRfiuCUxuR8xwe8=;
-        b=luFHi6lqyylcz5vUVKczhyaGeDbe/d3mniWTTNa2k00D0UmJDeJ/mGRwSOwO05glOn
-         F3kLdexlm8Vmof+fYOG3RTtnGTuokutmxwNlQt4/7TQLWldMx89jF7JnLgMWkgYvoZJs
-         LDPG7Na9mDU2Olghidm6JYbuxhHGPjv/dqneJV0dlZHvVPY6vJWJ9jHo1xGzuHquLbmC
-         fkbt8IMNttyjSJIIIWSOXnN4VzcQAWuyIutJW5FxJe6Ql2oxISIYi/OIDYO+krmob61X
-         tltkU+ju3oLOl0d7RetgGNoyuytk6P9mM/+QLgPhZ0KTfD17poHCPu6mQ7FgpLk9r8NK
-         DgzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVO57MIPvYVt3JtD0HJqUtDYbp3Hnk6QCfWv7JK5N+rhgqQ/hxiwB2UNLjVzc+cyjBzXNOnndO6bTpJ9YY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwlNoe/ppPiwIr4kZVcJCz4rD3JdTNYM+mD2n/PkLzUS6RQQ9uw
-	tBECwaCT+9IbHWd4dL4/zyyT2G5DL8TlVvDVapENpbPvHkThQ4RXSU4Wr45AITbAfKQYvqVpfT+
-	FJ1Xo6sub2vrPXixaUVoM5SM+r2xBtaM=
-X-Gm-Gg: AeBDietL/oFl8VT5I36xosO6zdIRKso2blpoJA6qSJTT7sYW9hIxwDOWzjLQzdafza/
-	eSC6/aM7DELewvF4POZnP3haQrwt4oN4evzoCMmKGFdVjhjcPwoBaW2B6eBI9oSaJM+eAJIMNh2
-	k9K86LJ4G5ceV6xObYpOfPA1PQh89SGJncKmllZ7nkoKy4B8ZOcwjkqeDpynmhY23fANG2rpl3j
-	43nfPpEix9Z2gSZ8nL0RPJLZTPwQgDo8WoiitRi1xYKi5WxjVW5PkPsF18+dO12b1OF9D3VfyzE
-	nW3VijbgGiqARrZZmJgkOlOZJ2aiajr8K0TsyXO3
-X-Received: by 2002:a17:907:e113:b0:b9c:6ef1:ed18 with SMTP id
- a640c23a62f3a-b9d727aa4fdmr352963766b.25.1776000183133; Sun, 12 Apr 2026
- 06:23:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27110244667
+	for <linux-crypto@vger.kernel.org>; Sun, 12 Apr 2026 14:19:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.204
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776003596; cv=none; b=E6wrfoU4hdHu7L+4M1GBlp7ryZJXMM+P2wu0dFL09Wm7XS31ys4JWtqVP+0AW0ow7VMB9MJMoPNY5QKwFoXo1SBIQV0vWrIwceWfCnzlCPUjAR0Bya7u9lR4F89hbnLbqiq/kEUdp/W2hSxkrDJzpYqXye3QFFzXNq5bbs57Oio=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776003596; c=relaxed/simple;
+	bh=Pcbb2tRThWqkv1QTC+btjQgdFa32s1SiYwSFCgJk9mI=;
+	h=Message-ID:From:Date:Subject:To:Cc; b=FUoHcpDInQ5a9FaDEX1fUGq97UxYYFZVrIsKnchr+VY1GhLASdN82OlqrRQdDSHjpuSJUzASgrd/0ONGk0ud6UTLuBiLD9sFRRDI+Jh6EgVlqarXLn5RnTyAG2smR28xg2p7yZw54a3Zm7hY8QUmr2RER2cLE0exiHtmhOyEbI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=83.223.95.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384
+	 client-signature ECDSA (secp384r1) client-digest SHA384)
+	(Client CN "*.hostsharing.net", Issuer "GlobalSign GCC R6 AlphaSSL CA 2025" (verified OK))
+	by mailout1.hostsharing.net (Postfix) with ESMTPS id C2AF9359;
+	Sun, 12 Apr 2026 16:19:51 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id AE09960694EE; Sun, 12 Apr 2026 16:19:51 +0200 (CEST)
+Message-ID: <59eca92ff4f87e2081777f1423a0efaaadcfdb39.1776003111.git.lukas@wunner.de>
+From: Lukas Wunner <lukas@wunner.de>
+Date: Sun, 12 Apr 2026 16:19:47 +0200
+Subject: [PATCH] crypto: lib/mpi - Fix integer underflow in
+ mpi_read_raw_from_sgl()
+To: Eric Biggers <ebiggers@kernel.org>, Jason Donenfeld <jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>, Yiming Qian <yimingqian591@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Ignat Korchagin <ignat@linux.win>, David Howells <dhowells@redhat.com>, Jarkko Sakkinen <jarkko@kernel.org>, Tadeusz Struk <tstruk@gigaio.com>, linux-crypto@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20260410120044.031381086@kernel.org> <20260410120319.131582521@kernel.org>
-In-Reply-To: <20260410120319.131582521@kernel.org>
-From: Magnus Lindholm <linmag7@gmail.com>
-Date: Sun, 12 Apr 2026 15:22:51 +0200
-X-Gm-Features: AQROBzAeMsaeSVePCJ__tEd4f2rWAY6MixXzp_fii2b8vyUpLt4xjSbtYzENFaw
-Message-ID: <CA+=Fv5S68wZQapeaYTspOfsuGk=nBj60sx-ojHBSqrxV59Q+ZA@mail.gmail.com>
-Subject: Re: [patch 23/38] alpha: Select ARCH_HAS_RANDOM_ENTROPY
-To: Thomas Gleixner <tglx@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, 
-	Richard Henderson <richard.henderson@linaro.org>, linux-alpha@vger.kernel.org, 
-	Arnd Bergmann <arnd@arndb.de>, x86@kernel.org, Lu Baolu <baolu.lu@linux.intel.com>, 
-	iommu@lists.linux.dev, Michael Grzeschik <m.grzeschik@pengutronix.de>, netdev@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, 
-	linux-crypto@vger.kernel.org, Vlastimil Babka <vbabka@kernel.org>, linux-mm@kvack.org, 
-	David Woodhouse <dwmw2@infradead.org>, Bernie Thompson <bernie@plugable.com>, linux-fbdev@vger.kernel.org, 
-	Theodore Tso <tytso@mit.edu>, linux-ext4@vger.kernel.org, 
-	Andrew Morton <akpm@linux-foundation.org>, Uladzislau Rezki <urezki@gmail.com>, 
-	Marco Elver <elver@google.com>, Dmitry Vyukov <dvyukov@google.com>, kasan-dev@googlegroups.com, 
-	Andrey Ryabinin <ryabinin.a.a@gmail.com>, Thomas Sailer <t.sailer@alumni.ethz.ch>, 
-	linux-hams@vger.kernel.org, "Jason A. Donenfeld" <Jason@zx2c4.com>, 
-	Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, 
-	Catalin Marinas <catalin.marinas@arm.com>, Huacai Chen <chenhuacai@kernel.org>, 
-	loongarch@lists.linux.dev, Geert Uytterhoeven <geert@linux-m68k.org>, 
-	linux-m68k@lists.linux-m68k.org, Dinh Nguyen <dinguyen@kernel.org>, 
-	Jonas Bonn <jonas@southpole.se>, linux-openrisc@vger.kernel.org, 
-	Helge Deller <deller@gmx.de>, linux-parisc@vger.kernel.org, 
-	Michael Ellerman <mpe@ellerman.id.au>, linuxppc-dev@lists.ozlabs.org, 
-	Paul Walmsley <pjw@kernel.org>, linux-riscv@lists.infradead.org, 
-	Heiko Carstens <hca@linux.ibm.com>, linux-s390@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, sparclinux@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 10, 2026 at 2:36=E2=80=AFPM Thomas Gleixner <tglx@kernel.org> w=
-rote:
->
-> The only remaining usage of get_cycles() is to provide
-> random_get_entropy().
->
-> Switch alpha over to the new scheme of selecting ARCH_HAS_RANDOM_ENTROPY
-> and providing random_get_entropy() in asm/random.h.
->
-> Remove asm/timex.h as it has no functionality anymore.
->
-> Signed-off-by: Thomas Gleixner <tglx@kernel.org>
-> Cc: Richard Henderson <richard.henderson@linaro.org>
-> Cc: linux-alpha@vger.kernel.org
-> ---
->  arch/alpha/Kconfig              |    1 +
->  arch/alpha/include/asm/random.h |   14 ++++++++++++++
->  arch/alpha/include/asm/timex.h  |   26 --------------------------
->  3 files changed, 15 insertions(+), 26 deletions(-)
+Yiming reports an integer underflow in mpi_read_raw_from_sgl() when
+subtracting "lzeros" from the unsigned "nbytes".
 
-Hi,
+For this to happen, the scatterlist "sgl" needs to occupy more bytes
+than the "nbytes" parameter and the first "nbytes + 1" bytes of the
+scatterlist must be zero.  Under these conditions, the while loop
+iterating over the scatterlist will count more zeroes than "nbytes",
+subtract the number of zeroes from "nbytes" and cause the underflow.
 
-The Alpha side looks fine to me.
+When commit 2d4d1eea540b ("lib/mpi: Add mpi sgl helpers") originally
+introduced the bug, it couldn't be triggered because all callers of
+mpi_read_raw_from_sgl() passed a scatterlist whose length was equal to
+"nbytes".
 
-I've applied this patch on top of v7.0-rc7, built a kernel successfully,
-boot-tested it on an Alpha UP2000+ (SMP) without issues.
+However since commit 63ba4d67594a ("KEYS: asymmetric: Use new crypto
+interface without scatterlists"), the underflow can now actually be
+triggered.  When invoking a KEYCTL_PKEY_ENCRYPT system call with a
+larger "out_len" than "in_len" and filling the "in" buffer with zeroes,
+crypto_akcipher_sync_prep() will create an all-zero scatterlist used for
+both the "src" and "dst" member of struct akcipher_request and thereby
+fulfil the conditions to trigger the bug:
 
-Acked-by: Magnus Lindholm <linmag7@gmail.com>
-Tested-by: Magnus Lindholm <linmag7@gmail.com>
+  sys_keyctl()
+    keyctl_pkey_e_d_s()
+      asymmetric_key_eds_op()
+        software_key_eds_op()
+          crypto_akcipher_sync_encrypt()
+            crypto_akcipher_sync_prep()
+              crypto_akcipher_encrypt()
+                rsa_enc()
+                  mpi_read_raw_from_sgl()
+
+To the user this will be visible as a DoS as the kernel spins forever,
+causing soft lockup splats as a side effect.
+
+Fix it.
+
+Reported-by: Yiming Qian <yimingqian591@gmail.com> # off-list
+Fixes: 2d4d1eea540b ("lib/mpi: Add mpi sgl helpers")
+Signed-off-by: Lukas Wunner <lukas@wunner.de>
+Cc: stable@vger.kernel.org # v4.4+
+---
+ lib/crypto/mpi/mpicoder.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/crypto/mpi/mpicoder.c b/lib/crypto/mpi/mpicoder.c
+index bf716a03c704..9359a58c29ec 100644
+--- a/lib/crypto/mpi/mpicoder.c
++++ b/lib/crypto/mpi/mpicoder.c
+@@ -347,7 +347,7 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
+ 	lzeros = 0;
+ 	len = 0;
+ 	while (nbytes > 0) {
+-		while (len && !*buff) {
++		while (len && !*buff && lzeros < nbytes) {
+ 			lzeros++;
+ 			len--;
+ 			buff++;
+-- 
+2.51.0
+
