@@ -1,102 +1,99 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A631F1991D4;
-	Sun, 12 Apr 2026 01:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8E23156F45;
+	Sun, 12 Apr 2026 01:51:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1775958031; cv=none; b=G2KsE71819LDmUsBXl2854gd1dBQ+hl4XoVLBilVpJ52C7MG3I/emmbUJOaE8L/yK2hgFDRV+DqS1bfrXauqTZua0losaP+ULZMqZYRJvDk8rVU4To1UOhsB2+6ZXmUwhJ+UWPDXObK1cfDv4KxpTKe8k3D9B2AI/nYrJ1biozc=
+	t=1775958705; cv=none; b=YIHuv9hxGsrBuf87eIJJTQZezgKxPEscpFOJ9vyNVCG3+/6hF+KkkvfpON2Oa/UzfLFqIpSXFzlEhXbkKvmMCmcmSmE35y0MHlscowLrEc5/sQFMPyNmDri0wY+d0yqsKyVapMvc968x+J65LVpyQgKCLcs838LACzrmhq7Ms2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1775958031; c=relaxed/simple;
-	bh=AC+RCvTCz+c2GqRZQE9ZugW202FLIvM+I/gCOZewGlI=;
-	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
-	 To:Date:Message-ID; b=OCYXO0JcUByZa1H1lO7AK/F5XUh9KwqH/8W3xRP6yTqdgTdHQOLWv0+MfGJ86gXvmHSQh4IvD8fIOcZNxd3JUP1QBs+W7UrNo3BMM7Qf7gNZ+cZG6UgjnPpsz46yzxjaldIOf18aDDdKFrm3gGuxw+8RTGB3QffmWZHIU+EVqMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QyzQDsmV; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1775958705; c=relaxed/simple;
+	bh=p43LWCrBdIDOSCiiR2D43lPcA0u6mbkljzridIfhFts=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fOsCpKqeD0qoJYS0SMnSFVJyZpnBj4FD4OMAMFti3EQc9FmTqZxmftmL8UqSDH50HmM5s3aDE86lbkacnRY00+aj/QtbRy43GderE0u5F7yKOeVEB5JB63ku4DCYa8StlndUM27lh9Fe1IUmYh5a5CiCdxbQ1lwQN3fgSIocP3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=edcOz6Rt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QyzQDsmV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E63FC116C6;
-	Sun, 12 Apr 2026 01:40:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="edcOz6Rt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2FE9C116C6;
+	Sun, 12 Apr 2026 01:51:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1775958031;
-	bh=AC+RCvTCz+c2GqRZQE9ZugW202FLIvM+I/gCOZewGlI=;
-	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
-	b=QyzQDsmVSomjO66kxUr9f+H4Zn0fdljrgQ4L+8TtDS6B4z9UXAb73YTVBBqf35UcE
-	 mgVoP7gittjDHMYM9NEu58yIRFz65u2iY2FB4GfqBzjwpa8pNumvQ2fjffU+eLwDeh
-	 FGZ0Hpw38ZmoBB/dyZCmAhZorf1hiCi59gXbRLemgIJ96rtZU3O2CNeK+YyzwM5Wbh
-	 g6szmtKIuyrHfd4FRMlveqvHJY/KXH9LnWC+DD/EGmAvsMsWc6c/49dixAonnbMJWC
-	 UJmzKSS3Kt31XE60gnLEzGsaArZ/2AwoPGIBJv9/53h6eB+frAQ8JotTrVPS2ttfFN
-	 q1Tuz0nOvfJoA==
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1775958705;
+	bh=p43LWCrBdIDOSCiiR2D43lPcA0u6mbkljzridIfhFts=;
+	h=From:To:Cc:Subject:Date:From;
+	b=edcOz6RtsiwEmN10z9PpwUDBfUSmiJ6r48Hwhi3GxD/2VyERzyaTZrLkDyHdgSEPs
+	 Wq4II7S1d/SV4+MAdnWxWfj0VzkUiCmVB8GNkeqjLHOX7lLSl9qPmq2aPcoPPXMbf7
+	 iFkXV37wK5JpevaUzdvZGhOC3uddqYYzKlIHo/H3kWIbAjEKDmanchq+ftb9lKDnoU
+	 7oj8Kwz2kP45zCg6M36p4RAA6zjdQf603r8KIGo/11C5e4QAM0rAWphi5MEOJyvmhK
+	 m0dkEwrGIr2PcprebT5yICdrRKkyc2tyJZBD3R6HP/Oano0BJ30NirMkKqKMd3CjSS
+	 yBhn4EXQZyCJw==
+From: Eric Biggers <ebiggers@kernel.org>
+To: stable@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH 6.12, 6.6, 6.1, 5.15, 5.10] lib/crypto: chacha: Zeroize permuted_state before it leaves scope
+Date: Sat, 11 Apr 2026 18:50:11 -0700
+Message-ID: <20260412015011.18887-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20260327-schneider-v7-0-rc1-crypto-v1-11-5e6ff7853994@bootlin.com>
-References: <20260327-schneider-v7-0-rc1-crypto-v1-0-5e6ff7853994@bootlin.com> <20260327-schneider-v7-0-rc1-crypto-v1-11-5e6ff7853994@bootlin.com>
-Subject: Re: [PATCH 11/16] clk: tests: Add Kunit testing for nexus nodes
-From: Stephen Boyd <sboyd@kernel.org>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Pascal EBERHARD <pascal.eberhard@se.com>, Wolfram Sang <wsa+renesas@sang-engineering.com>, linux-clk@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, linux-renesas-soc@vger.kernel.org, "Miquel Raynal (Schneider Electric)" <miquel.raynal@bootlin.com>
-To: "Miquel Raynal (Schneider Electric)" <miquel.raynal@bootlin.com>, Antoine Tenart <atenart@kernel.org>, Christian Marangi <ansuelsmth@gmail.com>, Conor Dooley <conor+dt@kernel.org>, David S. Miller <davem@davemloft.net>, Geert Uytterhoeven <geert+renesas@glider.be>, Herbert Xu <herbert@gondor.apana.org.au>, Jayesh Choudhary <j-choudhary@ti.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Magnus Damm <magnus.damm@gmail.com>, Michael Turquette <mturquette@baylibre.com>, Olivia Mackall <olivia@selenic.com>, Rob Herring <robh@kernel.org>, Thomas Gleixner <tglx@kernel.org>
-Date: Sat, 11 Apr 2026 18:40:29 -0700
-Message-ID: <177595802905.5403.1342882536380309490@lazor>
-User-Agent: alot/0.12
+Content-Transfer-Encoding: 8bit
 
-Quoting Miquel Raynal (Schneider Electric) (2026-03-27 13:09:33)
-> Add a nexus node with a child requesting a mapped clock in the fake DT
-> overlay to verify that the parsing is also correctly working.
->=20
-> Suggested-by: Stephen Boyd <sboyd@kernel.org>
-> Signed-off-by: Miquel Raynal (Schneider Electric) <miquel.raynal@bootlin.=
-com>
-> ---
->  drivers/clk/clk_test.c                   | 20 ++++++++++++++++++++
->  drivers/clk/kunit_clk_parse_clkspec.dtso | 10 ++++++++++
->  2 files changed, 30 insertions(+)
->=20
-> diff --git a/drivers/clk/clk_test.c b/drivers/clk/clk_test.c
-> index 8a17ad0d185f..cb0071955146 100644
-> --- a/drivers/clk/clk_test.c
-> +++ b/drivers/clk/clk_test.c
-> @@ -3660,10 +3660,30 @@ static void clk_parse_and_get_parent_name(struct =
-kunit *test)
->                            clk_parse_clkspec_1_init_data.name);
->  }
-> =20
-> +static void clk_parse_and_get_nexus(struct kunit *test)
+commit e5046823f8fa3677341b541a25af2fcb99a5b1e0 upstream.
 
-of_clk_get_hw_maps_thru_nexus()
+Since the ChaCha permutation is invertible, the local variable
+'permuted_state' is sufficient to compute the original 'state', and thus
+the key, even after the permutation has been done.
 
-> +{
-> +       struct clk_parse_clkspec_ctx *ctx =3D test->priv;
-> +       struct clk_hw *hw1, *hw2;
-> +       struct device_node *np;
-> +
-> +       /* Get clocks by index */
-> +       np =3D of_find_node_by_name(NULL, "kunit-clock-nexus-child");
-> +       KUNIT_ASSERT_NOT_ERR_OR_NULL(test, np);
-> +       hw1 =3D of_clk_get_hw(np, 0, NULL);
-> +       KUNIT_EXPECT_NOT_ERR_OR_NULL(test, hw1);
-> +
-> +       hw2 =3D of_clk_get_hw(ctx->cons_np, 1, NULL);
-> +       KUNIT_EXPECT_NOT_ERR_OR_NULL(test, hw2);
-> +       KUNIT_EXPECT_PTR_EQ(test, hw1, hw2);
+While the kernel is quite inconsistent about zeroizing secrets on the
+stack (and some prominent userspace crypto libraries don't bother at all
+since it's not guaranteed to work anyway), the kernel does try to do it
+as a best practice, especially in cases involving the RNG.
 
-I think hw2 is expected? Rewrite it like this?
+Thus, explicitly zeroize 'permuted_state' before it goes out of scope.
 
-	struct clk_parse_clkspec_ctx *ctx =3D test->priv;
-	struct clk_hw *expected;
-	struct device_node *np;
-=09
-	np =3D of_find_node_by_name(NULL, "kunit-clock-nexus-child");
-	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, np);
-	expected =3D of_clk_get_hw(ctx->cons_np, 1, NULL);
-	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, expected);
+Fixes: c08d0e647305 ("crypto: chacha20 - Add a generic ChaCha20 stream cipher implementation")
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
+Link: https://lore.kernel.org/r/20260326032920.39408-1-ebiggers@kernel.org
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ lib/crypto/chacha.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-	KUNIT_EXPECT_PTR_EQ(test, expected, of_clk_get_hw(np, 0, NULL));
+diff --git a/lib/crypto/chacha.c b/lib/crypto/chacha.c
+index 3cdda3b5ee060..1271a7de1ba79 100644
+--- a/lib/crypto/chacha.c
++++ b/lib/crypto/chacha.c
+@@ -84,10 +84,12 @@ void chacha_block_generic(u32 *state, u8 *stream, int nrounds)
+ 
+ 	for (i = 0; i < ARRAY_SIZE(x); i++)
+ 		put_unaligned_le32(x[i] + state[i], &stream[i * sizeof(u32)]);
+ 
+ 	state[12]++;
++
++	memzero_explicit(x, sizeof(x));
+ }
+ EXPORT_SYMBOL(chacha_block_generic);
+ 
+ /**
+  * hchacha_block_generic - abbreviated ChaCha core, for XChaCha
+@@ -108,7 +110,9 @@ void hchacha_block_generic(const u32 *state, u32 *stream, int nrounds)
+ 
+ 	chacha_permute(x, nrounds);
+ 
+ 	memcpy(&stream[0], &x[0], 16);
+ 	memcpy(&stream[4], &x[12], 16);
++
++	memzero_explicit(x, sizeof(x));
+ }
+ EXPORT_SYMBOL(hchacha_block_generic);
 
-We're also leaking the of_node if an assert triggers so we need to use a
-kunit wrapper version of of_find_node_by_name() or do a hand code
-version of putting the node when kunit asserts.
+base-commit: e7a3953084a7050ca349010deb22546834c2e196
+-- 
+2.53.0
+
