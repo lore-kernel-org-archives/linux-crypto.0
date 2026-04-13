@@ -1,160 +1,248 @@
-Received: from flow-a4-smtp.messagingengine.com (flow-a4-smtp.messagingengine.com [103.168.172.139])
+Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010051.outbound.protection.outlook.com [40.93.198.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FD1F3537FA;
-	Mon, 13 Apr 2026 19:31:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.139
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776108701; cv=none; b=Wwv7ysAI3pZa7lDmJhUWwipeGdvAQG/VIJHrVKio0YixISKcp4kFNSwJuI+cF04dMmLnjN1bNEPjAkhySfUuWAhcnMaTFdQW1GsQGiGI9UDDxNJUYgMSU4d/m+xnPPgy4QL812kozcop5wedzTQxfknEW7TYLwA7uUfBdYGk1b0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776108701; c=relaxed/simple;
-	bh=WrrLF4ZuZDSSPdaipSZzrKXRH2qtrS74BAAAonCIRps=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=n7g1Yx5W6plpXKy+rkozQ6xEgTTaO1xCblNw3ix8fDOKnFfVL16O7SZh497soJj3f4zqp/zSWU+KxfR5iG2eT19N4YiEsFirX1mWgV9neXuPLaq+B1XzLfWKQzwRina3cMiqA4CdgmYDmme3QAv4sOaeHSA6ZSdvV11+Z0V8qUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=eBEb3+z4; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=fK2XbJ97; arc=none smtp.client-ip=103.168.172.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFDC738F926;
+	Mon, 13 Apr 2026 19:42:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776109343; cv=fail; b=MWsKr48kTwJKcr+bd6WSHEXsDYE+YFX1qZjUX4IyftW01uLc533h0MxC11oFXDQZD3f+IarsjKqOj2NgwqM9KTMfeAfqOMFBHDC184DswcWJX8y8/uczRqtzoZwX9WUmLiK+bs4CY6xacedeZjx14B+SIkO5Vji8fjzLFvIFhhQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776109343; c=relaxed/simple;
+	bh=icw+3ZaUmiLNu0PTSJmlMXevz5hXOTm/+uvt4TElOWU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=cliKEmpcd4fe7wt6mkXVrBfJJ1eKKAZx12PHm/4C765/x5jALPeLT0lfat+EFbRkAVHEFcdgAQ8FUSxM4UA/WJ+y/XsPB7l3cFEsfQfX/C0pmaX71KnlBGqGaB/1dye8JX9AGW5068dpgJhLX6ObcmLbdvUvPpp4hovOjZB9Dbo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=h+nnoQS/; arc=fail smtp.client-ip=40.93.198.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="eBEb3+z4";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="fK2XbJ97"
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailflow.phl.internal (Postfix) with ESMTP id 9BAA81380415;
-	Mon, 13 Apr 2026 15:31:38 -0400 (EDT)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-04.internal (MEProxy); Mon, 13 Apr 2026 15:31:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1776108698;
-	 x=1776115898; bh=oF7+4SGRAImH9WMGSId2dJm+4RdrBt2YGrt25aFUZUA=; b=
-	eBEb3+z4uCJ5XpVJfmMDtd+Hz4pTmn4rIKoszU8vf+435LUmCEc3EJdi4K0/oVv8
-	C+yjXVYuraejFdA/rcQOSN6Zfi5pNlS43GslApllsudgHnK44npvkIwaUHWVTtuh
-	Dw/4I/j/UNeqyr1LQlKmH5vdXZciz/2GPqFtFHFDNoaInKEsvm7hwh9DYdVnGoah
-	lMAIbVhEjH95sryDmrUzci3AfaiCDHHYDZH3oXJ/R4+VlvsfKJPopXWx0JE7CxaE
-	ognvTjwa06PAMT31z/DBGKMGBcoGUsjb6Y3k+6cm618rMbyQ7yCpT6T6pE5XH3Hf
-	w2SGXNdq7Abx7TrcOF+CrA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1776108698; x=
-	1776115898; bh=oF7+4SGRAImH9WMGSId2dJm+4RdrBt2YGrt25aFUZUA=; b=f
-	K2XbJ97Y0jsbU1s6LswXOEcaT2AuIJQsZKTCiqB2bsDjsavXFxXjXN24HUjqmHPV
-	30lUfZzPVJ0GZrRSLZsyTrPlhAwj+oOp7rzHIcW4Q+ggBxcGWjNT+roTWJQkS80p
-	muhmPfZao8pyrAslQS6xE9YgbnnrpBmxpEViK0VuBn5kyHZfCSLFSApLiy8hZEkj
-	X3o7U4xt3roWjYEf/0QsKGiNqeP3myXk/e3+BEa4KYIE59wmYsrhudiDwV46CB5d
-	E8K4OFv0fHuOdK14nnUUxfff3rCPKj8vJw3X7p6M4i0BpN1E8RSwySIEaUf5sCqK
-	alHtK1Rc5jgsKIF8k3s0A==
-X-ME-Sender: <xms:l0TdaRMQ1ovC5UjXw9wB_riUJbJZBZQ47VcEC4ozPMlWVwTWyL-hPg>
-    <xme:l0Tdaey9qAPkMkkSsq5ZowyLiVSaVZg3Aabqq1QUbhdAX-Y8VC29U600TE9HTIGWj
-    W-h6ka_l-N0bKYGG_W-3bzXlHGY0ZcjcSbZR_zuoL-6Ds0X7Q55CQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdefledtkecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefoggffhffvvefkjghfufgtgfesthhqredtredtjeenucfhrhhomhepfdetrhhnugcu
-    uegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtthgvrh
-    hnpedvhfdvkeeuudevfffftefgvdevfedvleehvddvgeejvdefhedtgeegveehfeeljeen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnug
-    esrghrnhgusgdruggvpdhnsggprhgtphhtthhopeegkedpmhhouggvpehsmhhtphhouhht
-    pdhrtghpthhtohepthdrshgrihhlvghrsegrlhhumhhnihdrvghthhiirdgthhdprhgtph
-    htthhopegtrghtrghlihhnrdhmrghrihhnrghssegrrhhmrdgtohhmpdhrtghpthhtohep
-    lhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopegurghvvghmse
-    gurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepmhhpvgesvghllhgvrhhmrghnrdhi
-    ugdrrghupdhrtghpthhtoheprhihrggsihhnihhnrdgrrdgrsehgmhgrihhlrdgtohhmpd
-    hrtghpthhtohepuhhrvgiikhhisehgmhgrihhlrdgtohhmpdhrtghpthhtohepuggvlhhl
-    vghrsehgmhigrdguvgdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprg
-    hnrgdrohhrghdrrghu
-X-ME-Proxy: <xmx:l0TdaTelOssYXt15-FK9p6saYLM_nmrvIO6c-_F3ZyF6_xfZywmCYA>
-    <xmx:l0TdaUxOkh6ozfKMIVT4v_qdW_i5Tss0CLMqkf2F01TBmahdCnZo_w>
-    <xmx:l0TdaUWn-LdWx2_7oUHRu6zzNshE3wCLw-aFKzbUUXN26D6Q-_6vLw>
-    <xmx:l0TdacTwYVtUWJnf_Fdh14nt-sYvlNq7AaQbOTvOw2Uu221fQyzEjQ>
-    <xmx:mkTdaTH5uGiAlbaAI17-uSN6CKxYeQsdeWCm3ruscf_j0l2LK_Chakad>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 04818700069; Mon, 13 Apr 2026 15:31:35 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="h+nnoQS/"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=wM+xUYzOlWwS3Kbea7nBTvFKjDOJgiY7S5DYa5ZKuGIi7PNNEJnp9us0S1oRFIax7Cg4QX7pdGE1Z88X7PKgE25/gm8+fpdA5uPqmkIOvt6pCQY9vWO7lus0rzBrQAX/OmLMRkPakaZf+Xv4zK9eU4+Zjgq1FCOILFb0hXu4hDzmfcPkcgl1JZ2gfAf1LDT3pg5lNtdMAoYlIU8m1mKgbRCLvlHm9mNgApeHhSh6ok0khXe7mVDypqd0FMWJQGhCtoMc41KJCN+ZAP/byok+a5wrgDLfQ87HGgR3x2Uqa+TRkRJji0OzCgCWKJVuJqKD0ssNVzXuRd4P6CEynkN9Pw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=c504uU2ejCaPmOihqPXmnPhjlzOjhBHaH2Y24b7El5M=;
+ b=UV23PbbSpvl+OJsN20FqawCMc4i2690eqMkxL96Voa1oO+TRdq6TqtAxPZoeoal1IoSLYIbDdv6qW3EujpO2h5gu7aVGOqS+DVLUfbknHyyILRl5Uq/3jrP8WX9UQBM+DmF6psuNZg3BQ1a4eyR0WLyhCzEMqmGZMFfSJEhGEapgQRYVVVugF2Ud3h8sD+UJu+WI2/LJJGxvOrzJk4H7QXd+8edzLTKYS9LLr8tMu/4FDPTKv81UW3eHbj+p2d29K5qM+1b/qws18rIWuT4T8V3ehiQscVlcP7jhLhxEd7FEDds01hLN8ukWIxBrtCfGBjguTUT5Gkt2EY404URX4g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=c504uU2ejCaPmOihqPXmnPhjlzOjhBHaH2Y24b7El5M=;
+ b=h+nnoQS/O97Vs4GiqOxRfu0KGaX7EafpD1QzAD4Hr+CrHQzf+mx7kcmBy83IIMGZtFVqp3UfBVbfAy+lOAkILntTFMwMSzvNgCj1BG6YR02Zhne3pA2GNvlLtfjEjFDIGrCyyQ3O9I4udjdZv7zp32OpCA8NSbj6vnaLsJDF1NM=
+Received: from PH7P222CA0012.NAMP222.PROD.OUTLOOK.COM (2603:10b6:510:33a::17)
+ by DM4PR12MB7552.namprd12.prod.outlook.com (2603:10b6:8:10c::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9769.48; Mon, 13 Apr
+ 2026 19:42:16 +0000
+Received: from SN1PEPF00036F3C.namprd05.prod.outlook.com
+ (2603:10b6:510:33a:cafe::e7) by PH7P222CA0012.outlook.office365.com
+ (2603:10b6:510:33a::17) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9769.48 via Frontend Transport; Mon,
+ 13 Apr 2026 19:42:15 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ SN1PEPF00036F3C.mail.protection.outlook.com (10.167.248.20) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9769.17 via Frontend Transport; Mon, 13 Apr 2026 19:42:15 +0000
+Received: from nigeria-2635-os.amd.com (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Mon, 13 Apr
+ 2026 14:42:13 -0500
+From: Ashish Kalra <Ashish.Kalra@amd.com>
+To: <tglx@kernel.org>, <mingo@redhat.com>, <bp@alien8.de>,
+	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>,
+	<seanjc@google.com>, <peterz@infradead.org>, <thomas.lendacky@amd.com>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <ardb@kernel.org>
+CC: <pbonzini@redhat.com>, <aik@amd.com>, <Michael.Roth@amd.com>,
+	<KPrateek.Nayak@amd.com>, <Tycho.Andersen@amd.com>,
+	<Nathan.Fontenot@amd.com>, <jackyli@google.com>, <pgonda@google.com>,
+	<rientjes@google.com>, <jacobhxu@google.com>, <xin@zytor.com>,
+	<pawan.kumar.gupta@linux.intel.com>, <babu.moger@amd.com>,
+	<dyoung@redhat.com>, <nikunj@amd.com>, <john.allen@amd.com>,
+	<darwi@linutronix.de>, <linux-kernel@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<linux-coco@lists.linux.dev>
+Subject: [PATCH v4 0/7] Add RMPOPT support.
+Date: Mon, 13 Apr 2026 19:42:03 +0000
+Message-ID: <cover.1775874970.git.ashish.kalra@amd.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AMdy4yCH1GcR
-Date: Mon, 13 Apr 2026 21:30:11 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "David Woodhouse" <dwmw2@infradead.org>,
- "Thomas Gleixner" <tglx@kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Cc: x86@kernel.org, "Baolu Lu" <baolu.lu@linux.intel.com>,
- iommu@lists.linux.dev, "Michael Grzeschik" <m.grzeschik@pengutronix.de>,
- Netdev <netdev@vger.kernel.org>, linux-wireless@vger.kernel.org,
- "Herbert Xu" <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org,
- "Vlastimil Babka (SUSE)" <vbabka@kernel.org>, linux-mm@kvack.org,
- "Bernie Thompson" <bernie@plugable.com>, linux-fbdev@vger.kernel.org,
- "Theodore Ts'o" <tytso@mit.edu>, linux-ext4@vger.kernel.org,
- "Andrew Morton" <akpm@linux-foundation.org>,
- "Uladzislau Rezki (Sony)" <urezki@gmail.com>,
- "Marco Elver" <elver@google.com>, "Dmitry Vyukov" <dvyukov@google.com>,
- kasan-dev@googlegroups.com, "Andrey Ryabinin" <ryabinin.a.a@gmail.com>,
- "Thomas Sailer" <t.sailer@alumni.ethz.ch>, linux-hams@vger.kernel.org,
- "Jason A . Donenfeld" <Jason@zx2c4.com>,
- "Richard Henderson" <richard.henderson@linaro.org>,
- linux-alpha@vger.kernel.org, "Russell King" <linux@armlinux.org.uk>,
- linux-arm-kernel@lists.infradead.org,
- "Catalin Marinas" <catalin.marinas@arm.com>,
- "Huacai Chen" <chenhuacai@kernel.org>, loongarch@lists.linux.dev,
- "Geert Uytterhoeven" <geert@linux-m68k.org>,
- linux-m68k@lists.linux-m68k.org, "Dinh Nguyen" <dinguyen@kernel.org>,
- "Jonas Bonn" <jonas@southpole.se>,
- "linux-openrisc@vger.kernel.org" <linux-openrisc@vger.kernel.org>,
- "Helge Deller" <deller@gmx.de>, linux-parisc@vger.kernel.org,
- "Michael Ellerman" <mpe@ellerman.id.au>, linuxppc-dev@lists.ozlabs.org,
- "Paul Walmsley" <pjw@kernel.org>, linux-riscv@lists.infradead.org,
- "Heiko Carstens" <hca@linux.ibm.com>, linux-s390@vger.kernel.org,
- "David S . Miller" <davem@davemloft.net>, sparclinux@vger.kernel.org
-Message-Id: <07df88e5-208d-4aac-9668-a3b0c65ae529@app.fastmail.com>
-In-Reply-To: <7a48b636cb3146f4f7134c6d4fe42070ac2edb43.camel@infradead.org>
-References: <20260410120044.031381086@kernel.org>
- <20260410120318.592237447@kernel.org>
- <7a48b636cb3146f4f7134c6d4fe42070ac2edb43.camel@infradead.org>
-Subject: Re: [patch 15/38] ptp: ptp_vmclock: Replace get_cycles() usage
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF00036F3C:EE_|DM4PR12MB7552:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9f6ae0f3-1901-4040-ffe4-08de9994c425
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700016|376014|7416014|82310400026|921020|18002099003|56012099003;
+X-Microsoft-Antispam-Message-Info:
+	VS0r/0cmBhwXG7zQJtSzEhJBF57nswpcLd5vNCkWobDEDdK1NgerKGMUOemZlNEhZHVp+317MSERqwzfIXi4CeJro6UVwgoAyhezHGzflpy1J/MLo/pUUid0CnH2S74PQaDVy2M+HbAt1gFNIlDT0u6U8f70Btg9zglgsw0jmffRctPNwarmF9vcZy98E+0e8FuiDDXL2E1O7AxZHwFtK5aQ4pQqs1fZIoGCFMfsTiwjx/Oo0pv4njp0uV61t1tnT+2J83lvtDEdRni2Wb02WpYbX+N49sGBk9+4BtAzo1fka6ax+vV4XPT09Vre7B7nn0k4HFtB75NlOcOpk0DrWi9S4t4L4yy6m4Aij59IkSWss+nMzbri5jQxWlw0kQnWkzYDBca1aD8F2k4DbxurNsR9cImP+ArmcYfpvTDIF8l84pVAEwxr1foBXkqYOGWq+pCXL51yaeM9oiAmuiP16XiG0B1REjhW6EzukIwHKa/cJTJTmB4v7av723SLcqppCiTbrY2DEgcikCDbNpJNwlYif99UmiadwWdU0y56kCzbdurjzpUPRFl7yShjuh1DCd9q6MjPrmhIFpEv6mZ0q8QrNhNo3k7Sdd5Co29Yc9V+vyOjI15S12cYojz8YRL/STqXrbq1QcSRvAcxe9YDYST4nGSxWo/6mJeVNYw2bQgA1JzrXzpL6/tuI3PFXX3o7O9GcD3igA/O0H8lM2AQiLLtw168IPIDnbPzAaDjsVIVhnJL+UGBNjQGNpBXWd0/7BCHmYhxyq6teJsYxI0wq57UWrRbRPufNab5TZvPlAWhNA83J86CMrpO6qPJjt9L
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700016)(376014)(7416014)(82310400026)(921020)(18002099003)(56012099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	Xs+yRA+vmCZDdy+AdOaW2Zpee285tRViwNJ4arviPmlCHZSdy54kD8+TkimhMhItLERBSzwhAwwB8KSc2bmj7bXAvvX6rt0eQ8XOuTp7JOK9+k//FyRLtNAPpFWUY3zLwS/nMoGHWNcFs7VIWAFWpNr/KYn11UVig9aFUn9FQTRTxcW3W0qaz6kjRdHTglqP+re91mUZmD4xv9v4Do1nbRpnBHaoFvY6n1Dx7rX7xVzTgQH/SgpnBoA5a1aRjgXuyzrr7k5AXyKCtsF4AFHh8prA3+avv1tunkbjhlIi/n5U8m4pPy83mRk6vuhQybQnbne8HJL3Uq1CDHdWmOX+44NgeVd9cWpH8ShepM8PI+mDzjIp7iX7Q27cb+4Y58v5Vc4n8PASw8dlr5EQccbUz5b6AIrMOx68RVMhaaQoeOZ5Iva8tKbl1iHS4tz7Hdcb
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Apr 2026 19:42:15.7566
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9f6ae0f3-1901-4040-ffe4-08de9994c425
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF00036F3C.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7552
 
-On Mon, Apr 13, 2026, at 17:33, David Woodhouse wrote:
-> On Fri, 2026-04-10 at 14:19 +0200, Thomas Gleixner wrote:
->
-> ... depend on TSC_RELIABLE=C2=B9, since if the guest doesn't believe t=
-hat it
-> is, then the guest shouldn't be trying to use it as the basis for
-> precise timing.
->
-> =C2=B9 (Or... one of the other zoo of TSC flags for the gradually redu=
-cing
-> brokenness over the years...)
+From: Ashish Kalra <ashish.kalra@amd.com>
 
-It looks like this is sufficiently handled in the caller:
+In the SEV-SNP architecture, hypervisor and non-SNP guests are subject
+to RMP checks on writes to provide integrity of SEV-SNP guest memory.
 
-static int vmclock_get_crosststamp(struct vmclock_state *st,
-                                   struct ptp_system_timestamp *sts,
-                                   struct system_counterval_t *system_co=
-unter,
-                                   struct timespec64 *tspec)
-{
-....
-#ifdef CONFIG_X86
-        /*
-         * We'd expect the hypervisor to know this and to report the clo=
-ck
-         * status as VMCLOCK_STATUS_UNRELIABLE. But be paranoid.
-         */
-        if (check_tsc_unstable())
-                return -EINVAL;
-#endif
+The RMPOPT architecture enables optimizations whereby the RMP checks
+can be skipped if 1GB regions of memory are known to not contain any
+SNP guest memory.
 
-With 486 and ELAN out of the way, Winchip6 seems to be the only
-one without X86_FEATURE_TSC, so I think the next logical step would
-be to turn off Winchip6 as well and remove all X86_FEATURE_TSC
-and CONFIG_X86_TSC checks.
+RMPOPT is a new instruction designed to minimize the performance
+overhead of RMP checks for the hypervisor and non-SNP guests.
 
-      Arnd
+RMPOPT instruction currently supports two functions. In case of the
+verify and report status function the CPU will read the RMP contents,
+verify the entire 1GB region starting at the provided SPA is HV-owned.
+For the entire 1GB region it checks that all RMP entries in this region
+are HV-owned (i.e, not in assigned state) and then accordingly updates
+the RMPOPT table to indicate if optimization has been enabled and
+provide indication to software if the optimization was successful.
+
+In case of report status function, the CPU returns the optimization
+status for the 1GB region.
+
+The RMPOPT table is managed by a combination of software and hardware.
+Software uses the RMPOPT instruction to set bits in the table,
+indicating that regions of memory are entirely HV-owned.  Hardware
+automatically clears bits in the RMPOPT table when RMP contents are
+changed during RMPUPDATE instruction.
+
+For more information on the RMPOPT instruction, see the AMD64 RMPOPT
+technical documentation.
+
+As SNP is enabled by default the hypervisor and non-SNP guests are
+subject to RMP write checks to provide integrity of SNP guest memory.
+
+This patch-series adds support to enable RMP optimizations for up to
+2TB of system RAM across the system and allow RMPUPDATE to disable
+those optimizations as SNP guests are launched.
+
+Support for RAM larger than 2 TB will be added in follow-on series.
+
+This series also introduces support to re-enable RMP optimizations
+during SNP guest termination, after guest pages have been converted
+back to shared.
+
+RMP optimizations are performed asynchronously by queuing work on a
+dedicated workqueue after a 10 second delay.
+
+Delaying work allows batching of multiple SNP guest terminations.
+
+Once 1GB hugetlb guest_memfd support is merged, support for
+re-enabling RMPOPT optimizations during 1GB page cleanup will be added
+in follow-on series.
+
+Additionally add debugfs interface to report per-CPU RMPOPT status
+across all system RAM.
+
+v4:
+- Add new wrmsrq_on_cpus() helper to write same u64 value to a
+  per-CPU MSR across a cpumask without per-cpu struct allocation
+  overhead. 
+- Rename configure_and_enable_rmpopt() to snp_setup_rmpopt().
+- Use wrmsrq_on_cpus() instead of wrmsrq_on_cpu() loop for
+  programming RMPOPT_BASE MSRs.
+- Add setup_clear_cpu_cap(X86_FEATURE_RMPOPT) if segmented RMP
+  setup fails or workqueue allocation fails.
+- Add X86_FEATURE_RMPOPT feature clear logic in amd_cc_platform_clear()
+  for CC_ATTR_HOST_SEV_SNP.
+- All of the above allow checking for only X86_FEATURE_RMPOPT for both
+  RMPOPT setup/enable and RMP re-optimizations.
+- Rename snp_perform_rmp_optimization() to snp_rmpopt_all_physmem().
+- Split rmpopt() into rmpopt() and rmpopt_smp() for SMP callback use.
+- Introduce separate rmpopt_report_cpumask for debugfs reporting,
+  distinct from rmpopt_cpumask used for primary thread tracking.
+- Remove snp_perform_rmp_optimization() call from __sev_snp_init_locked() 
+  and instead setup and enable RMPOPT after SNP is enabled and 
+  initialized.
+
+v3:
+- Drop all RMPOPT kthread support and introduce adding custom and
+  dedicated workqueue to schedule delayed and asynchronous RMPOPT work.
+- Drop the guest_memfd inode cleanup interface and add support to
+  re-enable RMP optimizations during guest shutdown using the
+  asynchronous and delayed workqueue interface.
+- Introduce new __rmpopt() helper and rmpopt() and
+  rmpopt_report_status() wrappers on top which use rax and rcx
+  parameters to closely match RMPOPT specs.
+- Use new optimized RMPOPT loop to issue RMPOPT instructions on all
+  system RAM upto 2TB and all CPUs, by optimizing each range on one CPU
+  first, then let other CPUs execute RMPOPT in parallel so they can skip
+  most work as the range has already been optimized.
+- Also add support for running the optimized RMPOPT loop only on
+  one thread per core.
+- Replace all PUD_SIZE references with SZ_1G to conform to 1GB regions
+  as specified by RMPOPT specifications and not be dependent on PUD_SIZE
+  which makes the RMPOPT patch-set independent of x86 page table sizes.
+- Use wrmsrq_on_cpu() to program the RMPOPT_BASE MSR registers on
+  all CPUs that removes all ugly casting to use on_each_cpu_mask().
+- Fix inline commits and patch commit messages
+
+
+v2:
+- Drop all NUMA and Socket configuration and enablement support and
+  enable RMPOPT support for up to 2TB of system RAM.
+- Drop get_cpumask_of_primary_threads() and enable per-core RMPOPT
+  base MSRs and issue RMPOPT instruction on all CPUs.
+- Drop the configfs interface to manually re-enable RMP optimizations.
+- Add new guest_memfd cleanup interface to automatically re-enable
+  RMP optimizations during guest shutdown.
+- Include references to the public RMPOPT documentation.
+- Move debugfs directory for RMPOPT under architecuture specific
+  parent directory.
+
+Ashish Kalra (7):
+  x86/cpufeatures: Add X86_FEATURE_AMD_RMPOPT feature flag
+  x86/msr: add wrmsrq_on_cpus helper
+  x86/sev: Initialize RMPOPT configuration MSRs
+  x86/sev: Add support to perform RMP optimizations asynchronously
+  x86/sev: Add interface to re-enable RMP optimizations.
+  KVM: SEV: Perform RMP optimizations on SNP guest shutdown
+  x86/sev: Add debugfs support for RMPOPT
+
+ arch/x86/coco/core.c               |   1 +
+ arch/x86/include/asm/cpufeatures.h |   2 +-
+ arch/x86/include/asm/msr-index.h   |   3 +
+ arch/x86/include/asm/msr.h         |   5 +
+ arch/x86/include/asm/sev.h         |   4 +
+ arch/x86/kernel/cpu/scattered.c    |   1 +
+ arch/x86/kvm/svm/sev.c             |   2 +
+ arch/x86/lib/msr-smp.c             |  20 +++
+ arch/x86/virt/svm/sev.c            | 271 ++++++++++++++++++++++++++++-
+ drivers/crypto/ccp/sev-dev.c       |   3 +
+ 10 files changed, 310 insertions(+), 2 deletions(-)
+
+--
+2.43.0
+
