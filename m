@@ -1,206 +1,103 @@
-Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [160.30.148.35])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 517933CA4A6;
-	Mon, 13 Apr 2026 13:03:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.30.148.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1615332AAA7;
+	Mon, 13 Apr 2026 13:46:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776085383; cv=none; b=bwTHW/tkxY99tCwHUoJHgwpZjOo9A4zphWbzXQFy0xtA7LtE2/PHO1efJ1LD+FjrcqUYN4wmN8mwVemBWTxUOwUARtUUPAfmUc2U5/3KXlt4tN8Ag06OSFV/i1ujLw2Ka7S8QY8lALOq/meKjp99DeWScs8GUZysYV9QMRgJy4w=
+	t=1776087972; cv=none; b=Ne0lbnZgcjB69/j9mqnPGjdeU9F50Eoq4D856MJ2Cw6c8H1YTRIwTg1+eA5jlbG+HuxwF10eZMJ/AVVN7RC5teqXskbOeoPVucDyvOp5ga59vpyEGDFRHpFHwEexkwoS6I6Ksz+inkfYw+5scaDtUnaBqmudRAqdFIMVmqlxBTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776085383; c=relaxed/simple;
-	bh=EaqCVYb3mYfVBkGOFXvjwb/3rY9FtA9tCj0m3HXl1VM=;
-	h=Message-ID:In-Reply-To:References:Date:Mime-Version:From:To:Cc:
-	 Subject:Content-Type; b=E2FS0Mr44aeB66UkFZZ48HBwLHb5fdRBLmTQBxQVz5NXFeYCHKayBV+YvqzRMyLWWMZotdcE8UVuOqgnJWdgvSquHcamJwPcAlejOKjwDI3H3z1zYaykGK886Psv5TPOdGgdFb8ePR7Cxzxv0mzvy+YwqZTUZXgT6Hqx4CVxngs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=160.30.148.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
-Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4fvSJ26Vzyz8Xs70;
-	Mon, 13 Apr 2026 21:02:58 +0800 (CST)
-Received: from xaxapp05.zte.com.cn ([10.99.98.109])
-	by mse-fl2.zte.com.cn with SMTP id 63DD2n3P010875;
-	Mon, 13 Apr 2026 21:02:49 +0800 (+08)
-	(envelope-from hu.shengming@zte.com.cn)
-Received: from mapi (xaxapp01[null])
-	by mapi (Zmail) with MAPI id mid32;
-	Mon, 13 Apr 2026 21:02:52 +0800 (CST)
-X-Zmail-TransId: 2af969dce97c49e-2c715
-X-Mailer: Zmail v1.0
-Message-ID: <20260413210252672ZfdcegJLJtyvlYdFAUBlr@zte.com.cn>
-In-Reply-To: <adyyNeVTkXQlnh_2@hyeyoo>
-References: 20260410120044.031381086@kernel.org,20260410120318.525653921@kernel.org,adyyNeVTkXQlnh_2@hyeyoo
-Date: Mon, 13 Apr 2026 21:02:52 +0800 (CST)
+	s=arc-20240116; t=1776087972; c=relaxed/simple;
+	bh=oJltz7AJrAszH5NkylMptNLavhPpBeWeTGj56+4UuNQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Y1Pl8/DYl5swgABM+VcA815jM6zMn457GWRVYROyqKo2CdnpiPDrhPIkaXzfNWrAizTc+J49TjueXSUW8MlusjvNWKOvezGAllWyCo33gn326i1OzG2x7gSDSPM/C7lT6HlgYdnRLMJzhmbQoDk4xE1pFqFNRmUHQxt8Tr+iBh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W1c4yYbX; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W1c4yYbX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC1BFC2BCAF;
+	Mon, 13 Apr 2026 13:46:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776087971;
+	bh=oJltz7AJrAszH5NkylMptNLavhPpBeWeTGj56+4UuNQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=W1c4yYbXInfelp0eUQAv9gO8+XT0Sbrv81Gm0Adb5EvlP79aa60vW1qyaRs6863hq
+	 ywlFwnEXs2N+Csj1t8AT44QeeKBJG/F49Idi2q4rc2RmYot0SX7HMiTlvtWvn/yDH+
+	 7trrgahjvxasFZ1G1mSZHuMwpN/FLXdUKO5A3DE4xduSAFmVqypbzmuyI1rt6S5Skg
+	 mnVOocE28OqrI3sV0A1xJA4AMsFJUmV+SiC9+WzESG+evlqCHSH4Q/iOf94U+BkWPk
+	 AcZh4PrKZrOg/knioNZ+bkeabHdk27YLf4Gl2MWAVIr2/8lUMYASANuBHtyTuYAsV9
+	 CyYJUfeUbdazw==
+Message-ID: <ed8cf7e9-4271-48ab-a410-d7c0e2832020@kernel.org>
+Date: Mon, 13 Apr 2026 15:45:59 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-From: <hu.shengming@zte.com.cn>
-To: <harry@kernel.org>
-Cc: <tglx@kernel.org>, <linux-kernel@vger.kernel.org>, <vbabka@kernel.org>,
-        <linux-mm@kvack.org>, <arnd@arndb.de>, <x86@kernel.org>,
-        <baolu.lu@linux.intel.com>, <iommu@lists.linux.dev>,
-        <m.grzeschik@pengutronix.de>, <netdev@vger.kernel.org>,
-        <linux-wireless@vger.kernel.org>, <herbert@gondor.apana.org.au>,
-        <linux-crypto@vger.kernel.org>, <dwmw2@infradead.org>,
-        <bernie@plugable.com>, <linux-fbdev@vger.kernel.org>, <tytso@mit.edu>,
-        <linux-ext4@vger.kernel.org>, <akpm@linux-foundation.org>,
-        <urezki@gmail.com>, <elver@google.com>, <dvyukov@google.com>,
-        <kasan-dev@googlegroups.com>, <ryabinin.a.a@gmail.com>,
-        <t.sailer@alumni.ethz.ch>, <linux-hams@vger.kernel.org>,
-        <Jason@zx2c4.com>, <richard.henderson@linaro.org>,
-        <linux-alpha@vger.kernel.org>, <linux@armlinux.org.uk>,
-        <linux-arm-kernel@lists.infradead.org>, <catalin.marinas@arm.com>,
-        <chenhuacai@kernel.org>, <loongarch@lists.linux.dev>,
-        <geert@linux-m68k.org>, <linux-m68k@lists.linux-m68k.org>,
-        <dinguyen@kernel.org>, <jonas@southpole.se>,
-        <linux-openrisc@vger.kernel.org>, <deller@gmx.de>,
-        <linux-parisc@vger.kernel.org>, <mpe@ellerman.id.au>,
-        <linuxppc-dev@lists.ozlabs.org>, <pjw@kernel.org>,
-        <linux-riscv@lists.infradead.org>, <hca@linux.ibm.com>,
-        <linux-s390@vger.kernel.org>, <davem@davemloft.net>,
-        <sparclinux@vger.kernel.org>, <hao.li@linux.dev>, <cl@gentwo.org>,
-        <rientjes@google.com>, <roman.gushchin@linux.dev>
-Subject: =?UTF-8?B?UmU6IFtwYXRjaCAxNC8zOF0gc2x1YjogVXNlIHByYW5kb20gaW5zdGVhZCBvZiBnZXRfY3ljbGVzKCk=?=
-Content-Type: text/plain;
-	charset="UTF-8"
-X-MAIL:mse-fl2.zte.com.cn 63DD2n3P010875
-X-TLS: YES
-X-SPF-DOMAIN: zte.com.cn
-X-ENVELOPE-SENDER: hu.shengming@zte.com.cn
-X-SPF: None
-X-SOURCE-IP: 10.5.228.133 unknown Mon, 13 Apr 2026 21:02:58 +0800
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 69DCE982.001/4fvSJ26Vzyz8Xs70
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [patch 14/38] slub: Use prandom instead of get_cycles()
+Content-Language: en-US
+To: hu.shengming@zte.com.cn, harry@kernel.org
+Cc: tglx@kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ arnd@arndb.de, x86@kernel.org, baolu.lu@linux.intel.com,
+ iommu@lists.linux.dev, m.grzeschik@pengutronix.de, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, herbert@gondor.apana.org.au,
+ linux-crypto@vger.kernel.org, dwmw2@infradead.org, bernie@plugable.com,
+ linux-fbdev@vger.kernel.org, tytso@mit.edu, linux-ext4@vger.kernel.org,
+ akpm@linux-foundation.org, urezki@gmail.com, elver@google.com,
+ dvyukov@google.com, kasan-dev@googlegroups.com, ryabinin.a.a@gmail.com,
+ t.sailer@alumni.ethz.ch, linux-hams@vger.kernel.org, Jason@zx2c4.com,
+ richard.henderson@linaro.org, linux-alpha@vger.kernel.org,
+ linux@armlinux.org.uk, linux-arm-kernel@lists.infradead.org,
+ catalin.marinas@arm.com, chenhuacai@kernel.org, loongarch@lists.linux.dev,
+ geert@linux-m68k.org, linux-m68k@lists.linux-m68k.org, dinguyen@kernel.org,
+ jonas@southpole.se, linux-openrisc@vger.kernel.org, deller@gmx.de,
+ linux-parisc@vger.kernel.org, mpe@ellerman.id.au,
+ linuxppc-dev@lists.ozlabs.org, pjw@kernel.org,
+ linux-riscv@lists.infradead.org, hca@linux.ibm.com,
+ linux-s390@vger.kernel.org, davem@davemloft.net, sparclinux@vger.kernel.org,
+ hao.li@linux.dev, cl@gentwo.org, rientjes@google.com,
+ roman.gushchin@linux.dev
+References: <20260413210252672ZfdcegJLJtyvlYdFAUBlr@zte.com.cn>
+From: "Vlastimil Babka (SUSE)" <vbabka@kernel.org>
+In-Reply-To: <20260413210252672ZfdcegJLJtyvlYdFAUBlr@zte.com.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Harry wrote:
-> [Resending after fixing broken email headers]
-> 
-> On Fri, Apr 10, 2026 at 02:19:37PM +0200, Thomas Gleixner wrote:
-> > The decision whether to scan remote nodes is based on a 'random' number
-> > retrieved via get_cycles(). get_cycles() is about to be removed.
-> > 
-> > There is already prandom state in the code, so use that instead.
-> > 
-> > Signed-off-by: Thomas Gleixner <tglx@kernel.org>
-> > Cc: Vlastimil Babka <vbabka@kernel.org>
-> > Cc: linux-mm@kvack.org
-> > ---
-> 
-> Acked-by: Harry Yoo (Oracle) <harry@kernel.org>
-> 
-> Is this for this merge window?
-> 
-> This may conflict with upcoming changes on freelist shuffling [1]
-> (not queued for slab/for-next yet though), but it should be easy to
-> resolve.
-> 
+On 4/13/26 15:02, hu.shengming@zte.com.cn wrote:
+> Harry wrote:
+>> [Resending after fixing broken email headers]
+>> 
+>> On Fri, Apr 10, 2026 at 02:19:37PM +0200, Thomas Gleixner wrote:
+>> > The decision whether to scan remote nodes is based on a 'random' number
+>> > retrieved via get_cycles(). get_cycles() is about to be removed.
+>> > 
+>> > There is already prandom state in the code, so use that instead.
+>> > 
+>> > Signed-off-by: Thomas Gleixner <tglx@kernel.org>
+>> > Cc: Vlastimil Babka <vbabka@kernel.org>
+>> > Cc: linux-mm@kvack.org
+>> > ---
+>> 
+>> Acked-by: Harry Yoo (Oracle) <harry@kernel.org>
+>> 
+>> Is this for this merge window?
 
-Hi Harry,
+I'd say it's not intended for 7.1 as it's not in -next and v1 was posted
+just before the merge window.
 
-Would you like me to wait for this patch to land linux-next and then
-rebase and send v6 on top?
+>> This may conflict with upcoming changes on freelist shuffling [1]
+>> (not queued for slab/for-next yet though), but it should be easy to
+>> resolve.
 
-Thanks,
+Indeed, it's a simple conflict.
 
---
-With Best Regards,
-Shengming
-
-> [Cc'ing Shengming and SLAB ALLOCATOR folks]
-> [1] https://lore.kernel.org/linux-mm/20260409204352095kKWVYKtZImN59ybO6iRNj@zte.com.cn
 > 
-> -- 
-> Cheers,
-> Harry / Hyeonggon
+> Hi Harry,
 > 
-> >  mm/slub.c |   37 +++++++++++++++++++++++--------------
-> >  1 file changed, 23 insertions(+), 14 deletions(-)
-> > 
-> > --- a/mm/slub.c
-> > +++ b/mm/slub.c
-> > @@ -3302,6 +3302,25 @@ static inline struct slab *alloc_slab_pa
-> >      return slab;
-> >  }
-> >  
-> > +#if defined(CONFIG_SLAB_FREELIST_RANDOM) || defined(CONFIG_NUMA)
-> > +static DEFINE_PER_CPU(struct rnd_state, slab_rnd_state);
-> > +
-> > +static unsigned int slab_get_prandom_state(unsigned int limit)
-> > +{
-> > +    struct rnd_state *state;
-> > +    unsigned int res;
-> > +
-> > +    /*
-> > +     * An interrupt or NMI handler might interrupt and change
-> > +     * the state in the middle, but that's safe.
-> > +     */
-> > +    state = &get_cpu_var(slab_rnd_state);
-> > +    res = prandom_u32_state(state) % limit;
-> > +    put_cpu_var(slab_rnd_state);
-> > +    return res;
-> > +}
-> > +#endif
-> > +
-> >  #ifdef CONFIG_SLAB_FREELIST_RANDOM
-> >  /* Pre-initialize the random sequence cache */
-> >  static int init_cache_random_seq(struct kmem_cache *s)
-> > @@ -3365,8 +3384,6 @@ static void *next_freelist_entry(struct
-> >      return (char *)start + idx;
-> >  }
-> >  
-> > -static DEFINE_PER_CPU(struct rnd_state, slab_rnd_state);
-> > -
-> >  /* Shuffle the single linked freelist based on a random pre-computed sequence */
-> >  static bool shuffle_freelist(struct kmem_cache *s, struct slab *slab,
-> >                   bool allow_spin)
-> > @@ -3383,15 +3400,7 @@ static bool shuffle_freelist(struct kmem
-> >      if (allow_spin) {
-> >          pos = get_random_u32_below(freelist_count);
-> >      } else {
-> > -        struct rnd_state *state;
-> > -
-> > -        /*
-> > -         * An interrupt or NMI handler might interrupt and change
-> > -         * the state in the middle, but that's safe.
-> > -         */
-> > -        state = &get_cpu_var(slab_rnd_state);
-> > -        pos = prandom_u32_state(state) % freelist_count;
-> > -        put_cpu_var(slab_rnd_state);
-> > +        pos = slab_get_prandom_state(freelist_count);
-> >      }
-> >  
-> >      page_limit = slab->objects * s->size;
-> > @@ -3882,7 +3891,7 @@ static void *get_from_any_partial(struct
-> >       * with available objects.
-> >       */
-> >      if (!s->remote_node_defrag_ratio ||
-> > -            get_cycles() % 1024 > s->remote_node_defrag_ratio)
-> > +        slab_get_prandom_state(1024) > s->remote_node_defrag_ratio)
-> >          return NULL;
-> >  
-> >      do {
-> > @@ -7102,7 +7111,7 @@ static unsigned int
-> >  
-> >      /* see get_from_any_partial() for the defrag ratio description */
-> >      if (!s->remote_node_defrag_ratio ||
-> > -            get_cycles() % 1024 > s->remote_node_defrag_ratio)
-> > +        slab_get_prandom_state(1024) > s->remote_node_defrag_ratio)
-> >          return 0;
-> >  
-> >      do {
-> > @@ -8421,7 +8430,7 @@ void __init kmem_cache_init_late(void)
-> >      flushwq = alloc_workqueue("slub_flushwq", WQ_MEM_RECLAIM | WQ_PERCPU,
-> >                    0);
-> >      WARN_ON(!flushwq);
-> > -#ifdef CONFIG_SLAB_FREELIST_RANDOM
-> > +#if defined(CONFIG_SLAB_FREELIST_RANDOM) || defined(CONFIG_NUMA)
-> >      prandom_init_once(&slab_rnd_state);
-> >  #endif
-> >  }
-> > 
-> >
+> Would you like me to wait for this patch to land linux-next and then
+> rebase and send v6 on top?
+
+Just send it now based same as previously so we can finish the reviews, and
+we'll deal with it after rc1.
+
