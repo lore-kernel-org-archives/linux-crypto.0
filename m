@@ -1,63 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailout2.hostsharing.net (mailout2.hostsharing.net [83.223.78.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40D311AA7A6;
-	Tue, 14 Apr 2026 00:38:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32F96282F1B;
+	Tue, 14 Apr 2026 04:57:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776127104; cv=none; b=nu9+aiznYAS3OBZ+s6PO1nU+u8gyTHEdTHY2fIeJ76Rkf4a1ACj37ABqneMmQ0OGE4YrMJCrRyodUsXHEfKmoU76Cq4hrNqNFhWiuUvL9NC97tNXlSVwaPazTLYHOQ5pI9yYzH/RXQNk8GOj3LbWJsiDXksfs0K73J6AplF2zVw=
+	t=1776142639; cv=none; b=BbbUze9nNcxec80vK59YuxAdmzq4ZYTgR7PG5Dv3LuI3eA7wC1rznNXhFiLKan2hC+23FX75b9SdvIgguCM6NkdjO4Tel3eoLAocR1ChJ3dsXxI5GcW0Wuxdy1VWT3g/fUMGq+DGIosbYOVgFzDBHHsTnrUbB2OiwrtCSbaszWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776127104; c=relaxed/simple;
-	bh=Gc6PfR8mg78bc2nZBSOOeXTxrqwjLV39hOWe/+ycSm0=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=kUj6k449sDBjbqNeZrBLIDEBuaaPTrpbipmCnyPRmndE1fDt+3GLNeT4XZzohNbpBcSPJSQcQ3uo0B7yYugf7kqGuLrNvrY7oj8+91yd7yB6Mf10qu3743Z/+VVmP/Q89v63rteyI28XEFd/LHZMCZU77CuFdbBmG2Yb/ZRHARI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JZCkTh8F; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JZCkTh8F"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB618C2BCAF;
-	Tue, 14 Apr 2026 00:38:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776127103;
-	bh=Gc6PfR8mg78bc2nZBSOOeXTxrqwjLV39hOWe/+ycSm0=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=JZCkTh8FzLgkqnG+HxOg6tccMBA5tBfIgRtuUykc0wE16SvkBU2aPpIKeI3wHvGNF
-	 N9nWdAYPKnM8k8xWq0r+H6PO266XY3MalNKfMRYzDHL0GVxER2Of66U7mVVV0dRUje
-	 6+Ofup54e/PQbCfSsCDSaFYVa79azUiOMvtWotKo4EJsCtyGEu6ISYf5OzadMHe6M8
-	 6SzCbxSqgjOuCrB5GNeYelf4Ac9UaHFk43uuLLxCv/1dgz+3HEPRjT1XH5eEw17wO9
-	 Tj9q4vHXkrMm6tK7QXJOtjCbhpFauetGF9zjUQITCPWKx9uXx+W2Q5lfZ+04qMag75
-	 REhyTO0EMF8IA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3FD5D3809A0B;
-	Tue, 14 Apr 2026 00:37:56 +0000 (UTC)
-Subject: Re: [GIT PULL] Crypto library updates for 7.1
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20260412003225.GC6632@sol>
-References: <20260412003225.GC6632@sol>
-X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20260412003225.GC6632@sol>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-for-linus
-X-PR-Tracked-Commit-Id: 12b11e47f126d097839fd2f077636e2139b0151b
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 370c3883195566ee3e7d79e0146c3d735a406573
-Message-Id: <177612707471.625472.10128103824010012548.pr-tracker-bot@kernel.org>
-Date: Tue, 14 Apr 2026 00:37:54 +0000
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>, Herbert Xu <herbert@gondor.apana.org.au>, AlanSong-oc <AlanSong-oc@zhaoxin.com>, Arnd Bergmann <arnd@arndb.de>, Dan Williams <dan.j.williams@intel.com>, David Howells <dhowells@redhat.com>, Johannes Berg <johannes@sipsolutions.net>, Randy Dunlap <rdunlap@infradead.org>
+	s=arc-20240116; t=1776142639; c=relaxed/simple;
+	bh=YcFE1zTR0VoQmKhg4DX9tQnbK7qDKMKvLXxtRbRWo2k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OzBQEGwR5G19FEkIafcvRGXsnSVGvD85l9GSsclLyj9hMHygeNXJIR2fsK/2sPZzkQ/4T5Xsr/IK80As8LnXhe4YSYil/syxiySX8PcUvsvBhgj8ZvEwVrSFFA3RT4TI2Huo1aZuMWs22LkEJgznxWZQNjchZcRVl4NQCE37czQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=83.223.78.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
+Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384
+	 client-signature ECDSA (secp384r1) client-digest SHA384)
+	(Client CN "*.hostsharing.net", Issuer "GlobalSign GCC R6 AlphaSSL CA 2025" (verified OK))
+	by mailout2.hostsharing.net (Postfix) with ESMTPS id 2A7D01062F;
+	Tue, 14 Apr 2026 06:57:12 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 0A0BB6032450; Tue, 14 Apr 2026 06:57:12 +0200 (CEST)
+Date: Tue, 14 Apr 2026 06:57:12 +0200
+From: Lukas Wunner <lukas@wunner.de>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+	Ignat Korchagin <ignat@linux.win>,
+	Stefan Berger <stefanb@linux.ibm.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com,
+	Alexander Potapenko <glider@google.com>,
+	Andrey Konovalov <andreyknvl@gmail.com>,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Vincenzo Frascino <vincenzo.frascino@arm.com>
+Subject: Re: [PATCH] crypto: ecc - Unbreak the build on arm with
+ CONFIG_KASAN_STACK=y
+Message-ID: <ad3JKOrZcvJoerSP@wunner.de>
+References: <abfaede9ab2e963d784fb70598ed74935f7f8d93.1775628469.git.lukas@wunner.de>
+ <adY8iUPrnoXDp_-g@ashevche-desk.local>
+ <adZZ70lNnhoDnwok@wunner.de>
+ <05d3e296-1b61-4ab4-9bec-6c11407e6f89@app.fastmail.com>
+ <ad1IHo1rkVxqeMkc@wunner.de>
+ <d82181fe-a70d-4c64-a411-4bf80c51f58f@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d82181fe-a70d-4c64-a411-4bf80c51f58f@app.fastmail.com>
 
-The pull request you sent on Sat, 11 Apr 2026 17:32:25 -0700:
+On Mon, Apr 13, 2026 at 10:32:24PM +0200, Arnd Bergmann wrote:
+> On Mon, Apr 13, 2026, at 21:46, Lukas Wunner wrote:
+> > On Mon, Apr 13, 2026 at 05:42:39PM +0200, Arnd Bergmann wrote:
+> > > On Wed, Apr 8, 2026, at 15:36, Lukas Wunner wrote:
+> > Attached please find the Assembler output created by gcc -save-temps,
+> > both the original version and the one with limited inlining.
+> >
+> > The former requires a 1360 bytes stack frame, the latter 1232 bytes.
+> > E.g. xycz_initial_double() is not inlined into ecc_point_mult(),
+> > together with all its recursive baggage, so the latter version
+> > contains two branch instructions to that function which the former
+> > (original) version does not contain.
+> 
+> So it indeed appears that the problem does not go away but only
+> stays below the arbitrary threshold of 1280 bytes (which was
+> recently raised). I would not trust that to actually be the
+> case across all architectures then, as there are some targets
+> like mips or parisc tend to use even more stack space than
+> arm. With your current patch, that means there is a good chance
+> the problem will come back later.
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-for-linus
+The only 32-bit architectures with HAVE_ARCH_KASAN are:
+arm powerpc xtensa
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/370c3883195566ee3e7d79e0146c3d735a406573
+I've cross-compiled ecc.o successfully in an allmodconfig build for
+powerpc and xtensa, so arm seems to be the only architecture affected
+by the large stack frame issue.
 
-Thank you!
+Maybe mips and parisc will see the issue as well but they'd have to
+support KASAN first.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+The problem is that gcc *knows* that it should warn when the stack
+goes above CONFIG_FRAME_WARN and that warning is even promoted to
+an error, but gcc happily keeps inlining stuff and goes beyond that
+limit.  My expectation is it should stop inlining before that happens.
+clang doesn't have the same problem.
+
+Completely disabling KASAN for this file doesn't seem like a good option
+as this is security-relevant code.  On the other hand disabling inlining
+for this file isn't great either because I recall Google is dogfooding
+KASAN on internally used phones, I imagine it would ruin performance
+for such use cases (granted those are likely arm64 devices).
+
+*Limiting* inlining strikes a middle ground between those two extremes.
+
+And I don't want to annotate individual functions as noinline only
+because gcc does stupid things on a single architecture.
+
+Thanks,
+
+Lukas
