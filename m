@@ -1,118 +1,123 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FD3B3126D6
-	for <linux-crypto@vger.kernel.org>; Wed, 15 Apr 2026 02:46:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7048637E2ED;
+	Wed, 15 Apr 2026 06:38:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776221213; cv=none; b=R776F2sTikMKdEIAKYA65gqmXxSp9K3zcHSdO1dmUIbk+DC0NHIqVosbzZoI79i+Rlqz3LFWhcUDOZXgniG4AHeatrjwExNqY2nS30e91QR0lrgFZnFqK9vasWwoVe2DSTyg4RkqoX1lSF6LoT3kDRqCzh76hpR6DL0BWgnBxaw=
+	t=1776235117; cv=none; b=AgFZeuskP2O4SM3devXZMXFwhIOaBacACY0XUqQf1Qp/OogjqXqVctLR2T6ghOFFBjZ7sp3frQfVVRIcXE8nMWzqt23g+cglVzPYdA+4HUDTEhSwYroagHu7eNOVThvpIq9/Ux2SbJzImJkBWcKg2+Ok2GHnTE+nauN859mt3os=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776221213; c=relaxed/simple;
-	bh=1Y4OvV5vBQqB5sO2WotJgDBCGGHB2ogr+ahl4SSAHvk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C3aftmniTi4usbvs+bBM7yGltcCmlXiO1hODZkaonZh/6j2K2Hrhd/+OCpeerXR0ZbqfuB6UvGNTqFuIMCKtzXLvycF8RoJ/0E6gVyN4LHO272BMlpOi4VZsINNHulHR4NepE0gXrxFjgdKi3XNamtsDVhzEwgavHtfDf+AFXM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eCnMIwey; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776235117; c=relaxed/simple;
+	bh=oJA3I+zKvq9KD+ojZoVICzDS05lI3MCnC5Rlh6cn04Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jXjA0y5dHh8PQl81mmJoFRpXX7f1Fb3QKw1gPRR6LwyQEumT7Vng6SaFRUko6bOsur0xqrQuc2ybgALkH7j8SCToK8v++V1FvEViXVoYdQF1l3RqbyOYUfoFWEVaUJy3xVLGI9+XvHf5+P58E9+8xUG0WcWc8sLImnXC3M4k/Ko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CW1zPJNS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eCnMIwey"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D20F2C19425;
-	Wed, 15 Apr 2026 02:46:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CW1zPJNS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4603C19424;
+	Wed, 15 Apr 2026 06:38:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776221213;
-	bh=1Y4OvV5vBQqB5sO2WotJgDBCGGHB2ogr+ahl4SSAHvk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eCnMIweyLwxS+tT7C2lAHh5WojvTatmEM0u+Rfl7yx8qe0drJztP6HYw8/+cw3pQP
-	 xS0mwLOtPLjxIfCZ7Vy+BQPKdKo4qMnYGePUtYQNeV3yg9VZNo/CUmqaX50O8Cyd6m
-	 RW0ZSD2I7OVa1OC+056nEhtfuiJAaYpfRZTSEN10PdLV0ojcONQAz3gETyTp852Bwr
-	 cCT9K16J1x3rhYh9YW/RAcUV3nr3SjL9fkaVQRyceZRSA8pd5CNzdJxzk/vPi8i4uo
-	 0FT8jA+GU9M1Vi92MPaTF4e59NMA/dipqReMBvGXGp3hgQ0PTunw2wXxVUNx2jDYcd
-	 TBsJU3KyUl+MQ==
-Date: Wed, 15 Apr 2026 05:46:49 +0300
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: Lukas Wunner <lukas@wunner.de>
-Cc: Eric Biggers <ebiggers@kernel.org>, Jason Donenfeld <jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Yiming Qian <yimingqian591@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Ignat Korchagin <ignat@linux.win>,
-	David Howells <dhowells@redhat.com>,
-	Tadeusz Struk <tstruk@gigaio.com>, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] crypto: lib/mpi - Fix integer underflow in
- mpi_read_raw_from_sgl()
-Message-ID: <ad78GQxoNnOEss5G@kernel.org>
-References: <59eca92ff4f87e2081777f1423a0efaaadcfdb39.1776003111.git.lukas@wunner.de>
+	s=k20201202; t=1776235117;
+	bh=oJA3I+zKvq9KD+ojZoVICzDS05lI3MCnC5Rlh6cn04Q=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=CW1zPJNSJCGtniBmy6uyWDY71JAL0i4dK/N5qkFlNYs3kz0wXN03HHuHTh1S4hKQi
+	 e2yWcwq5RclCcCVX6A0Lopstyv1iJwvVwNRsKmdSs6NBxbKPvhq3apDF5Mh9EQ73Js
+	 q6/zItY3OOkWbN+i3+Ng0jCLJkMAwhrFhYQnM+LI0mETHNwewJwuPg1EQX95XcPKNN
+	 j2R4mf89jj4nr2TUgQRoKIUpiIuUlriELzBuol0ebMztd/ZZRtnQ1qtW+tQ2/QgIAp
+	 oYZF1auoZqP0e9mHU9TqSeeI5ff2Bxo+lnB6gCW6VWEs5KrEifF6NFFvP+OSWCop4o
+	 Cz3scEaJinP/g==
+Message-ID: <f6e6f630-07f1-46b4-888d-324a62a41070@kernel.org>
+Date: Wed, 15 Apr 2026 08:38:24 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <59eca92ff4f87e2081777f1423a0efaaadcfdb39.1776003111.git.lukas@wunner.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [patch 32/38] powerpc/spufs: Use mftb() directly
+To: Thomas Gleixner <tglx@kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Cc: Michael Ellerman <mpe@ellerman.id.au>, linuxppc-dev@lists.ozlabs.org,
+ Arnd Bergmann <arnd@arndb.de>, x86@kernel.org,
+ Lu Baolu <baolu.lu@linux.intel.com>, iommu@lists.linux.dev,
+ Michael Grzeschik <m.grzeschik@pengutronix.de>, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+ linux-crypto@vger.kernel.org, Vlastimil Babka <vbabka@kernel.org>,
+ linux-mm@kvack.org, David Woodhouse <dwmw2@infradead.org>,
+ Bernie Thompson <bernie@plugable.com>, linux-fbdev@vger.kernel.org,
+ Theodore Tso <tytso@mit.edu>, linux-ext4@vger.kernel.org,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Uladzislau Rezki <urezki@gmail.com>, Marco Elver <elver@google.com>,
+ Dmitry Vyukov <dvyukov@google.com>, kasan-dev@googlegroups.com,
+ Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+ Thomas Sailer <t.sailer@alumni.ethz.ch>, linux-hams@vger.kernel.org,
+ "Jason A. Donenfeld" <Jason@zx2c4.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ linux-alpha@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+ linux-arm-kernel@lists.infradead.org,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Huacai Chen <chenhuacai@kernel.org>, loongarch@lists.linux.dev,
+ Geert Uytterhoeven <geert@linux-m68k.org>, linux-m68k@lists.linux-m68k.org,
+ Dinh Nguyen <dinguyen@kernel.org>, Jonas Bonn <jonas@southpole.se>,
+ linux-openrisc@vger.kernel.org, Helge Deller <deller@gmx.de>,
+ linux-parisc@vger.kernel.org, Paul Walmsley <pjw@kernel.org>,
+ linux-riscv@lists.infradead.org, Heiko Carstens <hca@linux.ibm.com>,
+ linux-s390@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ sparclinux@vger.kernel.org
+References: <20260410120044.031381086@kernel.org>
+ <20260410120319.723429844@kernel.org>
+Content-Language: fr-FR
+From: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
+In-Reply-To: <20260410120319.723429844@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Sun, Apr 12, 2026 at 04:19:47PM +0200, Lukas Wunner wrote:
-> Yiming reports an integer underflow in mpi_read_raw_from_sgl() when
-> subtracting "lzeros" from the unsigned "nbytes".
+
+
+Le 10/04/2026 à 14:21, Thomas Gleixner a écrit :
+> There is no reason to indirect via get_cycles(), which is about to be
+> removed.
 > 
-> For this to happen, the scatterlist "sgl" needs to occupy more bytes
-> than the "nbytes" parameter and the first "nbytes + 1" bytes of the
-> scatterlist must be zero.  Under these conditions, the while loop
-> iterating over the scatterlist will count more zeroes than "nbytes",
-> subtract the number of zeroes from "nbytes" and cause the underflow.
+> Use mftb() directly.
 > 
-> When commit 2d4d1eea540b ("lib/mpi: Add mpi sgl helpers") originally
-> introduced the bug, it couldn't be triggered because all callers of
-> mpi_read_raw_from_sgl() passed a scatterlist whose length was equal to
-> "nbytes".
-> 
-> However since commit 63ba4d67594a ("KEYS: asymmetric: Use new crypto
-> interface without scatterlists"), the underflow can now actually be
-> triggered.  When invoking a KEYCTL_PKEY_ENCRYPT system call with a
-> larger "out_len" than "in_len" and filling the "in" buffer with zeroes,
-> crypto_akcipher_sync_prep() will create an all-zero scatterlist used for
-> both the "src" and "dst" member of struct akcipher_request and thereby
-> fulfil the conditions to trigger the bug:
-> 
->   sys_keyctl()
->     keyctl_pkey_e_d_s()
->       asymmetric_key_eds_op()
->         software_key_eds_op()
->           crypto_akcipher_sync_encrypt()
->             crypto_akcipher_sync_prep()
->               crypto_akcipher_encrypt()
->                 rsa_enc()
->                   mpi_read_raw_from_sgl()
-> 
-> To the user this will be visible as a DoS as the kernel spins forever,
-> causing soft lockup splats as a side effect.
-> 
-> Fix it.
-> 
-> Reported-by: Yiming Qian <yimingqian591@gmail.com> # off-list
-> Fixes: 2d4d1eea540b ("lib/mpi: Add mpi sgl helpers")
-> Signed-off-by: Lukas Wunner <lukas@wunner.de>
-> Cc: stable@vger.kernel.org # v4.4+
+> Signed-off-by: Thomas Gleixner <tglx@kernel.org>
+> Cc: Michael Ellerman <mpe@ellerman.id.au>
+> Cc: linuxppc-dev@lists.ozlabs.org
+
+Reviewed-by: Christophe Leroy (CS GROUP) <chleroy@kernel.org>
+
 > ---
->  lib/crypto/mpi/mpicoder.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>   arch/powerpc/platforms/cell/spufs/switch.c |    5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
 > 
-> diff --git a/lib/crypto/mpi/mpicoder.c b/lib/crypto/mpi/mpicoder.c
-> index bf716a03c704..9359a58c29ec 100644
-> --- a/lib/crypto/mpi/mpicoder.c
-> +++ b/lib/crypto/mpi/mpicoder.c
-> @@ -347,7 +347,7 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
->  	lzeros = 0;
->  	len = 0;
->  	while (nbytes > 0) {
-> -		while (len && !*buff) {
-> +		while (len && !*buff && lzeros < nbytes) {
->  			lzeros++;
->  			len--;
->  			buff++;
-> -- 
-> 2.51.0
+> --- a/arch/powerpc/platforms/cell/spufs/switch.c
+> +++ b/arch/powerpc/platforms/cell/spufs/switch.c
+> @@ -34,6 +34,7 @@
+>   #include <asm/spu_priv1.h>
+>   #include <asm/spu_csa.h>
+>   #include <asm/mmu_context.h>
+> +#include <asm/time.h>
+>   
+>   #include "spufs.h"
+>   
+> @@ -279,7 +280,7 @@ static inline void save_timebase(struct
+>   	 *    Read PPE Timebase High and Timebase low registers
+>   	 *    and save in CSA.  TBD.
+>   	 */
+> -	csa->suspend_time = get_cycles();
+> +	csa->suspend_time = mftb();
+>   }
+>   
+>   static inline void remove_other_spu_access(struct spu_state *csa,
+> @@ -1261,7 +1262,7 @@ static inline void setup_decr(struct spu
+>   	 *     in LSCSA.
+>   	 */
+>   	if (csa->priv2.mfc_control_RW & MFC_CNTL_DECREMENTER_RUNNING) {
+> -		cycles_t resume_time = get_cycles();
+> +		cycles_t resume_time = mftb();
+>   		cycles_t delta_time = resume_time - csa->suspend_time;
+>   
+>   		csa->lscsa->decr_status.slot[0] = SPU_DECR_STATUS_RUNNING;
+> 
 > 
 
-Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
-
-BR, Jarkko
