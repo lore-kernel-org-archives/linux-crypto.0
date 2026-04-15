@@ -1,41 +1,47 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23FAE41C71;
-	Wed, 15 Apr 2026 17:47:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D67B35DA42
+	for <linux-crypto@vger.kernel.org>; Wed, 15 Apr 2026 18:01:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776275277; cv=none; b=jUCikfKJUgkuKXcu0OaLL6UQk16D3DGOSlqiNMq83KupQUqvLJCVg63C7p1zbF1uRnI8YHTcthz58go6i5k0H1QOPxPB9c+BG5SHO/x9lVyR+d470l4fgzYUECZndRDEfGYgcuC2TL1mhwAp6FGGeqhG36xX+fpjApcMZr0KVCg=
+	t=1776276061; cv=none; b=Z1PCOzZGrZez3h3wLIXS7LR4q6C1ppQCeWHvZ0JrxPcGyw+yLWKSat9HVqgI9W17JYnnkXFJrwp0QZZCmoFMgMfdogMDbPdjKVzXhLRx53QNe+cUhG6I0U9b5yWVL7WUYAeasPnzkFY2bkgHUBRzLJed7nuOGL1c2GMLuZF8ZJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776275277; c=relaxed/simple;
-	bh=9R8GIgkY9znoWD22HXqzJPBSmLSQpA3WKgY6KvOeBS8=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=QMHIjjHF6PLoydIUOFJqFNW9poVJaMlG8G8MD5iP1l0Q70t1tasktJCmGFZpQl8syNzCKALoNFEf5nCLz++gp8QFGR0T9rqpR0fxUdQNs9MezBXKVavRL3S0hjZTASntqNDjdLd1ncbXhscQujuugC3/qjDUAERV/xAVHV+jX+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PZfr0SwT; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776276061; c=relaxed/simple;
+	bh=VPBvair3W2M3Ljf9VyfmlSdBd+CurMSIXOB9iZZhMMU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gWm4ISaMJ1oq1i1/ypnSm+VkJTR/iqLVhpquCOIAwZkUhA8mX4Ez2SCC+BroS9+CEg0FO1/hhFlxEMTe8rnF9R1YyiplELOZ7a+zi8+YXAtmaj0ARy/A6LgfJuUYx3p4P7K41VEm36sq7j04rwg8F998XoWLwSsq27JPhltFLoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XiiLGAPp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PZfr0SwT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A66DCC2BCB4;
-	Wed, 15 Apr 2026 17:47:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XiiLGAPp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80011C2BCB5;
+	Wed, 15 Apr 2026 18:01:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776275277;
-	bh=9R8GIgkY9znoWD22HXqzJPBSmLSQpA3WKgY6KvOeBS8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=PZfr0SwTG5RgSvn98QSiDA9r8eUy6qNR/sScVFsoqmcJwWtu8L+EKREFmTjj5ONAJ
-	 rRjNkYas14MTfHJwXOilRQO0/OM7CO0/gGtdyAZea7YmMVJ9K/h/tCNnX4wuCiel2Z
-	 CPmu9zSO0BDzBaZnWSpcH33fJ73w+3X5rZEONt6ngDD+5Sy9aeM73q6LAS0jpsJIpO
-	 Acx5tq9O+Xnvtd6bvnwAH65AzKTNDeq2gpGKD8vO1746p73vaAw1kgeW725gfTA8md
-	 CBh15zI6CZhL5412mq95kY+SNRrVYFllhcaEH5MK53F4VrZWcieFv5j+fkZWpTj9Zo
-	 U3jxqgO6jQo8g==
-Date: Wed, 15 Apr 2026 10:47:55 -0700
+	s=k20201202; t=1776276060;
+	bh=VPBvair3W2M3Ljf9VyfmlSdBd+CurMSIXOB9iZZhMMU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XiiLGAPpyOpvJF+8relTHb6zejRdPeSEta4US367grzO0yeYnKiGyu69gf1j/rKm2
+	 gbovijvquIZwYf5nHkywHllqnuzvpCxq7UZcscury72CX+5G3kJoYJSAFL5fQgkKFd
+	 R+yfIJVGD7/GK0BHBZtvb0F7tyiCeiaPVmy3k+1iFNOe+qoUtIc1PzrrtOqib5ZeyF
+	 UiShLfgZqYsAqBPadoY2iH7bT3RkAAQ8BuXx1g5a5DnM4lXO7VVV0FgLZV2hgCsi79
+	 5HfBx6TlwnWUhY7aCbkzY4xAh3QLPkUACH8aVdO/0aRZD7L74dZXYOdNATjYJgMeDW
+	 z/8cDpyI3cnLA==
+Date: Wed, 15 Apr 2026 11:00:58 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: kernel test robot <oliver.sang@intel.com>
-Cc: oe-lkp@lists.linux.dev, lkp@intel.com, Ard Biesheuvel <ardb@kernel.org>,
-	linux-crypto@vger.kernel.org,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [linus:master] [lib/crypto]  e5046823f8:
- stress-ng.urandom.ops_per_sec 4.3% regression
-Message-ID: <20260415174755.GB3142@quark>
+To: Lukas Wunner <lukas@wunner.de>
+Cc: Jason Donenfeld <jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Yiming Qian <yimingqian591@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Ignat Korchagin <ignat@linux.win>,
+	David Howells <dhowells@redhat.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Tadeusz Struk <tstruk@gigaio.com>, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] crypto: lib/mpi - Fix integer underflow in
+ mpi_read_raw_from_sgl()
+Message-ID: <20260415180058.GC3142@quark>
+References: <59eca92ff4f87e2081777f1423a0efaaadcfdb39.1776003111.git.lukas@wunner.de>
+ <20260414175903.GC24456@quark>
+ <ad68X6BveJXqynUk@wunner.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -44,31 +50,41 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <202604151657.8e26ef70-lkp@intel.com>
+In-Reply-To: <ad68X6BveJXqynUk@wunner.de>
 
-[+Cc Jason and Ted]
+On Wed, Apr 15, 2026 at 12:14:55AM +0200, Lukas Wunner wrote:
+> diff --git a/lib/crypto/mpi/mpicoder.c b/lib/crypto/mpi/mpicoder.c
+> index 9359a58..011434d 100644
+> --- a/lib/crypto/mpi/mpicoder.c
+> +++ b/lib/crypto/mpi/mpicoder.c
+> @@ -347,11 +347,9 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
+>  	lzeros = 0;
+>  	len = 0;
+>  	while (nbytes > 0) {
+> -		while (len && !*buff && lzeros < nbytes) {
+> -			lzeros++;
+> -			len--;
+> -			buff++;
+> -		}
+> +		lzeros = count_leading_zerobytes(buff, min(len, nbytes));
+> +		len -= lzeros;
+> +		buff += lzeros;
 
-On Wed, Apr 15, 2026 at 04:45:48PM +0800, kernel test robot wrote:
-> 
-> 
-> Hello,
-> 
-> kernel test robot noticed a 4.3% regression of stress-ng.urandom.ops_per_sec on:
-> 
-> 
-> commit: e5046823f8fa3677341b541a25af2fcb99a5b1e0 ("lib/crypto: chacha: Zeroize permuted_state before it leaves scope")
-> https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
+Well, now you're passing an uninitialized pointer as a function
+parameter.  (The loop body still operates on data from the previous
+iteration.)  So no, that isn't a step forwards.  This should be
+rewritten as a conventional loop and be switched to the scatterwalk API.
 
-This commit fixed the forward secrecy of the RNG, so it needed to go in.
+But this is really just a symptom of the larger issue with the pointless
+virtaddr => scatterlist => virtaddr conversion that is happening.  And
+lib/crypto/mpi/ is broken in other ways too, e.g. it's not constant-time
+but is being used for RSA signing.  And it has no tests.
 
-For large RNG requests, we could get most of this performance back by
-refactoring the chacha20_block() API to move the allocation of the
-temporary state array into the caller.
-
-We could also get much better performance than before by using the
-architecture-optimized ChaCha20 code instead of the generic ChaCha20
-code.
-
-However, neither would be a simple change.
+This is on my TODO list to fix up at some point, but it's a big task.
+Secure bignum implementations aren't easy; userspace projects have spent
+a long time to get them right.  So far I've instead been focusing on
+symmetric crypto, which is what actually matters in the kernel.  If
+someone is using the broken kernel RSA signing UAPIs (which should never
+have been added), they hopefully know what they're getting...
 
 - Eric
