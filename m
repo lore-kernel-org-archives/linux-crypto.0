@@ -1,131 +1,124 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC37535F5E4;
-	Thu, 16 Apr 2026 21:10:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B03039DBDB
+	for <linux-crypto@vger.kernel.org>; Thu, 16 Apr 2026 23:23:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776373849; cv=none; b=VG1Unz8Ua3wSwgqoSq1AV6Edf1kn5qi++RXFg5EwEt6uN5IrVAq5jDH7PZIecUSqZxVqObg3Hc5lFrw5SsMP1DGH6SrtvO5UndLuPWMo0xpZ4ABvmLdPbFHGs7rBJdWEmpcE3l5GAERdj+WUomwDpZtvkK4KWnlgi6IQhu2nOL8=
+	t=1776381819; cv=none; b=WfSnjucOJhJHTXA5BqUm/SK3jdl47VXAc4OOF27MOgQxtTPfF4yFr8TvmC+a0heDnpDIlHKC2rsx3G0kV9ZRno5uDZqIKilErjLVECtja2hFnbl9OUDmMRBwpIW3kkifA66v1Ivbl7HBt7w9H2/d+T1daZXxPtmT06iq4XD0bXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776373849; c=relaxed/simple;
-	bh=tK+Us+60ypdY+8xy5NOzQFC4IGCqHJkoia9xZDAS33s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=B3uhsZYRKMVldKCP0gLJ67djskyO4Bxj0oonFH+pPBn1s4amtodhfFVQ/wNsXF6y20eqfVYu+XWKpEbF1oBcZeA1WYsy8dZIGAD9pQDdznHavZh9ybaP6HZ3G6ZO0HXDIk9T8wsKX3JcgDnKwnwgMdOBiha67q9Vg1mIDmbvJeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=dqnX6oTM; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1776381819; c=relaxed/simple;
+	bh=XTF/Ml6zPKPfWMAwzbKlF2sbnfQKo9ci51FH3JVrn/w=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=WYy2GYnn/bW7UJ3exfG7XCDneSM6jDGGLcvxDvTmUn32uhZVwm99KXPVNnynV4hICMmYLz+mS81uCK1vDam/VFZ6lEcuuEM1XCP8jf6s7GsZw5B7AcjGA/vtIC9afxiQMZpVek74qvq8dxOosZrs4tN8z5p/5HghiHKXvOqtYV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cPMU6WdC; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="dqnX6oTM"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=pF+hcvOM+pTk5+aFxrJQ1Z7u1BA1J9lewId/mfJhv9E=; b=dqnX6oTMdHn41jQw2G4I273stF
-	o56JClDlwBgxP2oSZVA0wzadjEHwaZk03eXaAihQuBInpeJ6tb/80sZ+RbWSdXjk87ded4A1pWFna
-	DNJO0swuxArVAEF7YbVeEs3SXvV3VtAdnNdm+x/MZ7a1r5t6XaPpKyCh01uv6B8S1hUzxHIEQ/jyi
-	0oGnFS9cb1GB9CFSV/os9rNnkkbowU6kG31EDPPqX0OqBZBqoHV1LLBAm8HhZxCG44G9t9imQYSP0
-	9CsWRFFcc1ej4SA2EmAffaOvtrLkjb4C2V3UtSqpz009qqXubJkPsGiGfeAHglqcuFXxgR5mBxYJd
-	sJRzq/Fw==;
-Received: from [50.53.43.113] (helo=[192.168.254.34])
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1wDTz0-000000033AF-1ZYy;
-	Thu, 16 Apr 2026 21:10:42 +0000
-Message-ID: <491d3249-1995-4499-9dc2-150e0fd2acef@infradead.org>
-Date: Thu, 16 Apr 2026 14:10:40 -0700
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cPMU6WdC"
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-82f6b984b3aso54156b3a.3
+        for <linux-crypto@vger.kernel.org>; Thu, 16 Apr 2026 16:23:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20251104; t=1776381818; x=1776986618; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fcXVDSVlIDOLEOAoYc9j/aTZ1nVJQKX8oOKennXvDpE=;
+        b=cPMU6WdCRW33DdZt0pY1lre09BjuRg2Ql0DlVUa+Pp5aC0NitSBmZbImZWTtr2mtZV
+         3np5gYA3N3ipCuJbpwiZ9s2Kz1okQi0H/NWx/DQcnvwcZyyiL0Cz6rXi8ICVeY1HDBv/
+         m2+eqvBijVV8f9DIq0DjEAtAoZZ4BajXcC9MgV9YqwaBUzvuXdzU6DUuz2CU61dzqwUy
+         lHZDP7e7BJFHFkiF+lyaHbAR+/8E09aoae4JfBIoG9+N77mg14lc6HhqwWJ4WxChGCfb
+         YhrN5UEuofmi2z8r8/xTxzE+ayg3k+1JKXSGgzq4gysPaAt1BlAHI1llPdoPRkfnZ4RB
+         qVqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776381818; x=1776986618;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fcXVDSVlIDOLEOAoYc9j/aTZ1nVJQKX8oOKennXvDpE=;
+        b=NHHjHFsFCcXwRF+dbiws0HTs3iYOUfGq1ftpoC07S6CA7fcBjgMBJBvoG7SRyFRWpt
+         nQ28yBUZTRb+Ya7mMkATsd0jYnHl/g5v9DMNjfvQzS0reIKljCaQX+0naO3wlVFm7MW5
+         4E8Nw7uIa9NgSr/o6qUXpTqa3qbhCf7EsFpNF2LUL6OMe8O0yDZskG51gr5FX36J+L5h
+         TEGbuYcRmL3mzEDQlb3J7vFB2SySldVYmr3jKvWcUAT9ROzsE+VZguNPmpb3gpg6XutD
+         VTefMiGR4Wdu+www1+aSZY3S3JHCDkJ9Wz5le/+K14Xwjd9xYv96R+dbMfYMaOhQVeA/
+         lrtA==
+X-Forwarded-Encrypted: i=1; AFNElJ95Oa1CDpn7nVma146M7nOviLZPSPBn5Iyn4y05jwHW3E2THmxKA+E+JX20VdajGpFwrXNsE7b18VF2Qo4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxoEdhKDkyVUbb2IAEQDI429gqNMbIUkjpe+nX1l273Qd0isLaO
+	MXd1p1HnKFTg61NmP3t8Tr6zQ+2Rg37wxcMPhopOaFg+lzVNUw7qxQwdWlfVAJm5SXEqhPTvtB1
+	z9qjb7w==
+X-Received: from pfbg11.prod.google.com ([2002:a05:6a00:ae0b:b0:82c:989e:71f6])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2c94:b0:82f:656b:afe8
+ with SMTP id d2e1a72fcca58-82f8c86db35mr223189b3a.20.1776381817575; Thu, 16
+ Apr 2026 16:23:37 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 16 Apr 2026 16:23:22 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] docs: staging: fix various typos and grammar issues
-To: Zhang Xiaolei <zxl434815272@gmail.com>, corbet@lwn.net,
- ebiggers@kernel.org, andersson@kernel.org, mathieu.poirier@linaro.org
-Cc: ardb@kernel.org, skhan@linuxfoundation.org, linux-crypto@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-remoteproc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260416105854.788-1-zxl434815272@gmail.com>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20260416105854.788-1-zxl434815272@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.54.0.rc1.513.gad8abe7a5a-goog
+Message-ID: <20260416232329.3408497-1-seanjc@google.com>
+Subject: [PATCH v3 0/7] KVM: SEV: Don't advertise unusable VM types
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Ashish Kalra <ashish.kalra@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>, 
+	John Allen <john.allen@amd.com>
+Cc: kvm@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Tycho Andersen <tycho@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+
+My preference would be to take this through the KVM tree, with acks on the
+crypto patches.  I'd also be a-ok with a stable branch/tag of the crypto
+changes.
+
+In the words of Tycho:
+
+Recent SEV firmware [1] does not support SEV-ES VMs when SNP is enabled.
+Expose this by revoking VM-types that are not supported by the current
+configurations either from firmware restrictions or ASID configuration.
+
+My previous version of this patch series [2] used SNP_VERIFY_MITIGATION
+to test for a mitigation bit. While AMD-SB-3023 says that there is a
+mitigation bit (3) for CVE-2025-48514, bit 3 corresponds to an unrelated
+issue. The correct way to check for this is to use the SVN/SPL from the
+TCB. We are in the process of updating the SB to reflect this.
+
+v3:
+ - Relocate the supported_vm_types updates to sev_hardware_setup.
+ - Report unusable VM types as such in dmesg.
+
+v2:
+ - https://lore.kernel.org/all/20260324194034.1442133-1-tycho@kernel.org
+ - compare SVN as above
+ - fix commit message prefixes
+ - supported_vm_types local is a u32
+ - move crypto stuff before KVM stuff in the event of patch tetris
+
+[1]: https://www.amd.com/en/resources/product-security/bulletin/amd-sb-3023.html
+[2]: https://lore.kernel.org/all/20260303191509.1565629-1-tycho@kernel.org
+
+Sean Christopherson (3):
+  KVM: SEV: Set supported SEV+ VM types during sev_hardware_setup()
+  KVM: SEV: Consolidate logic for printing state of SEV{,-ES,-SNP}
+    enabling
+  KVM: SEV: Don't advertise support for unusable VM types
+
+Tycho Andersen (4):
+  crypto/ccp: hoist kernel part of SNP_PLATFORM_STATUS
+  crypto/ccp: export firmware supported vm types
+  KVM: SEV: Don't advertise VM types that are disabled by firmware
+  KVM: selftests: Teach sev_*_test about revoking VM types
+
+ arch/x86/kvm/svm/sev.c                        |  40 ++++---
+ drivers/crypto/ccp/sev-dev.c                  | 101 ++++++++++++++++--
+ include/linux/psp-sev.h                       |  37 +++++++
+ .../selftests/kvm/x86/sev_init2_tests.c       |  14 ++-
+ .../selftests/kvm/x86/sev_migrate_tests.c     |   2 +-
+ .../selftests/kvm/x86/sev_smoke_test.c        |   4 +-
+ 6 files changed, 163 insertions(+), 35 deletions(-)
 
 
-
-On 4/16/26 3:58 AM, Zhang Xiaolei wrote:
-> Fix a few typographical and grammatical issues across several
-> staging documentation files to improve readability:
-> - crc32.rst: replace "decide in" with "decide on"
-> - lzo.rst: replace "independent on" with "independent of"
-> - remoteproc.rst: fix word order in dependent clause
-> - static-keys.rst: add hyphen to "low-level"
-> 
-> Signed-off-by: Zhang Xiaolei <zxl434815272@gmail.com>
-
-Acked-by: Randy Dunlap <rdunlap@infradead.org>
-Thanks.
-
-> ---
->  Documentation/staging/crc32.rst       | 2 +-
->  Documentation/staging/lzo.rst         | 2 +-
->  Documentation/staging/remoteproc.rst  | 2 +-
->  Documentation/staging/static-keys.rst | 2 +-
->  4 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/Documentation/staging/crc32.rst b/Documentation/staging/crc32.rst
-> index 64f3dd430a6c..fc0d9564b99c 100644
-> --- a/Documentation/staging/crc32.rst
-> +++ b/Documentation/staging/crc32.rst
-> @@ -119,7 +119,7 @@ the byte-at-a-time table method, popularized by Dilip V. Sarwate,
->  v.31 no.8 (August 1988) p. 1008-1013.
->  
->  Here, rather than just shifting one bit of the remainder to decide
-> -in the correct multiple to subtract, we can shift a byte at a time.
-> +on the correct multiple to subtract, we can shift a byte at a time.
->  This produces a 40-bit (rather than a 33-bit) intermediate remainder,
->  and the correct multiple of the polynomial to subtract is found using
->  a 256-entry lookup table indexed by the high 8 bits.
-> diff --git a/Documentation/staging/lzo.rst b/Documentation/staging/lzo.rst
-> index f65b51523014..2d48b2667dd2 100644
-> --- a/Documentation/staging/lzo.rst
-> +++ b/Documentation/staging/lzo.rst
-> @@ -75,7 +75,7 @@ Description
->       are called under the assumption that a certain number of bytes follow
->       because it has already been guaranteed before parsing the instructions.
->       They just have to "refill" this credit if they consume extra bytes. This
-> -     is an implementation design choice independent on the algorithm or
-> +     is an implementation design choice independent of the algorithm or
->       encoding.
->  
->  Versions
-> diff --git a/Documentation/staging/remoteproc.rst b/Documentation/staging/remoteproc.rst
-> index 5c226fa076d6..c117b060e76c 100644
-> --- a/Documentation/staging/remoteproc.rst
-> +++ b/Documentation/staging/remoteproc.rst
-> @@ -24,7 +24,7 @@ handlers, and then all rpmsg drivers will then just work
->  (for more information about the virtio-based rpmsg bus and its drivers,
->  please read Documentation/staging/rpmsg.rst).
->  Registration of other types of virtio devices is now also possible. Firmwares
-> -just need to publish what kind of virtio devices do they support, and then
-> +just need to publish what kind of virtio devices they support, and then
->  remoteproc will add those devices. This makes it possible to reuse the
->  existing virtio drivers with remote processor backends at a minimal development
->  cost.
-> diff --git a/Documentation/staging/static-keys.rst b/Documentation/staging/static-keys.rst
-> index b0a519f456cf..e8dc3a87c381 100644
-> --- a/Documentation/staging/static-keys.rst
-> +++ b/Documentation/staging/static-keys.rst
-> @@ -90,7 +90,7 @@ out-of-line true branch. Thus, changing branch direction is expensive but
->  branch selection is basically 'free'. That is the basic tradeoff of this
->  optimization.
->  
-> -This lowlevel patching mechanism is called 'jump label patching', and it gives
-> +This low-level patching mechanism is called 'jump label patching', and it gives
->  the basis for the static keys facility.
->  
->  Static key label API, usage and examples
-
+base-commit: 6b802031877a995456c528095c41d1948546bf45
 -- 
-~Randy
+2.54.0.rc1.513.gad8abe7a5a-goog
+
