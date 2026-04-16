@@ -1,56 +1,56 @@
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B3603A2576
-	for <linux-crypto@vger.kernel.org>; Thu, 16 Apr 2026 23:23:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 286D43A3801
+	for <linux-crypto@vger.kernel.org>; Thu, 16 Apr 2026 23:23:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776381825; cv=none; b=GCWoXYubjm5g1xDse3t2fI8DttE/2mqxBac6jrA2DFdTGxRhTRS8qogqt6eFYxtyC9XublAWAtX2ng6reQH6LuBV/ICvV37m2iajFV76vVcdueVcg5a+proPi2HP4XkpLqIXOkuteUX+Jl+sgdIGiEHkz7hRPa0GtSF4qRcoRtA=
+	t=1776381829; cv=none; b=Yg6xMJdtGlVR9iwWAgfKpMzb+TLbhqUPF2fUw5y8AJAM1CsBGHCxkZIosSPMk+YldbrZmjuPpTX77l8i+Qjo+kl76NseUal4QOVNH4MvjbXahsqqVZ39TSzQlifDTbU9YDi45t5VkGVr0k9BDP1EUUMO2CPnJIgTZgZnJiRctC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776381825; c=relaxed/simple;
-	bh=jxXG1p7zC04tYFTfJPIVEx/ypGFjINDEhD2100oJ18Q=;
+	s=arc-20240116; t=1776381829; c=relaxed/simple;
+	bh=o/KPCcv0d3ZIO//tblY3V4eqnr+bbXLhDZG9zf54a2g=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=NTANTP3azHzsohWkDQ1NG/5wmnwVzgapxqx7H8yCOp9NtuPO+orBtoFQqkWgew1QIEHAQlyNQZDFyKT8QEpmR8Rel7FkEQJIIAF5uBa7KYlJM53ddAMQobeczQKDJZjQX9DMlOsLheUnk9o36gTEp2eOXp8nlT9at+uncZVnoF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WPZZeUYm; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=DkVq7dL3waW6IqIQaJ6NZjKvbeJv+CJM0ZPY8lpsn62uTtCjZOlCS20zT0lfEe4fuUxCMo5LwAkq3y7f9pwdk/ZdzUMz5ne9inHBlPBlqIJ0jxA8eHuSV45qiBvQqerD+jh1btSAyNH0NxbdVoxlAumJZe0MbH3QC4NvbOupq5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RDa/fCXm; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WPZZeUYm"
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-c6e24ee93a6so647435a12.0
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Apr 2026 16:23:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RDa/fCXm"
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-35e5791871fso334875a91.3
+        for <linux-crypto@vger.kernel.org>; Thu, 16 Apr 2026 16:23:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776381824; x=1776986624; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1776381826; x=1776986626; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=s+DOdHTafr7BremJNOxlZjtkuJmIgjyz+aBnTy0imDs=;
-        b=WPZZeUYmijAkwbcPlONBw1k/LKWRN19AOzfF8GccNlF7N/Bj7J5Cl1lcQF9rOGIEIQ
-         uzaGX2IKoVO7n7J6/SmRsBmC0ONyHoHV+TuyQfQ8p6jKyWlaZy2zX1n0lQjqTXshVb1E
-         RyIzA6GjmhdcDvDoYv7QEcRXQQr75eL8vpmMuibks0sMDxBOdSLbDdLWCKr1LXIS+xBw
-         zhXsZNgZ3VzqBHzINNzNYtKlCsGX7lgpOgzkhqPDGoFPVJRXQFLNnYOEQUxlFkZ/UTcZ
-         0Fua9LEviVwmgW0w/y01L9nu6DBr1kzNysGm72DOVmPVaRco934eXStFmc6IZbt4+4Sh
-         zehg==
+        bh=e3Dmu6K5niFFPRiSYNEdPEZTFH/H4F7a2yY+viQuAo0=;
+        b=RDa/fCXmpQkVDmUOIYcNscMe0P7EuFA/BtR19DNd6ZfALS/hbYV7YCrbIe/KHCnVHo
+         Wxb4b67PY3lKZ0o9SpWNGyn/TVA2hyF6sWo4TY90YGPVEX3KaC1ouYg2VTWWNJOCwVvz
+         keS7UJ+l6bpWmJf/nZRz4Bde/WY5GhZkWl0/qsMIrH/RBAMq3yGAGtjDzOkglDJDLxEp
+         W92No+ja6HVgyIvEae2HW76Xn1eA3SdYx2e1T/gLRhOjG0Z+ryjknMay1fr22xrxLKir
+         +vvvbMYMgI8D6w22BzARnrxrmGQeWDhnr+KTYYptrdOMGVnJIgEIniIw5q1ymI141kl5
+         oNhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776381824; x=1776986624;
+        d=1e100.net; s=20251104; t=1776381826; x=1776986626;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=s+DOdHTafr7BremJNOxlZjtkuJmIgjyz+aBnTy0imDs=;
-        b=Reso/ZY6SRBq2yRFMen0On6WULVxuTSJM36CwaCZrHVtDOq8ODHc62br/PhwmWzBIH
-         f0VDZX+sviPzR/TIm8z9cL4RvwHj3Sof2HSoa/tx2b748fn6Vb6NEVZ1GG/mcqWJRd0F
-         t4ktTLDqc1BDg6/v+DYEXYfRudMOUbZwzPvuxH1KtqP0N+JdJ6wkfgLX4MBXzcssUbRE
-         9VOT1l8ttaefCVH+ewch/iFcUh0SZPQbsURz0WRL+vsaZNh/nxltPj500QgSeE7g7X2u
-         3Fi0B9QPMNuw8a1l/uMfVfUaJugg3nI+O5jq5j53E7FrgaTmqOHIBmMH1cJjhQ4pi4q1
-         ONQg==
-X-Forwarded-Encrypted: i=1; AFNElJ9t68VwI+i0S0Q5+lboYTHu9H0SuxL4vTc5vDYaUau2q6bjRviwZQIaY94T93RH4RO8l/aFme8WxLguhT4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyfsdWrmnbz/o7eePJo9wb2QRbgsl2yxPty2w2WIJEd/Pqk1xjk
-	/vblpFxF2xSzYGHCAMb7EKwPXg+bERi8wQTZPAuAT4fodCo8kRU9wOjIi9WvacQgEnjsB+N7YqL
-	xac+1gQ==
-X-Received: from pfaz1.prod.google.com ([2002:aa7:91c1:0:b0:82f:2efd:4159])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:9389:b0:398:7daf:6d7e
- with SMTP id adf61e73a8af0-3a08ca74edbmr302078637.17.1776381823334; Thu, 16
- Apr 2026 16:23:43 -0700 (PDT)
+        bh=e3Dmu6K5niFFPRiSYNEdPEZTFH/H4F7a2yY+viQuAo0=;
+        b=jXhf8Og6NaTtchk9bm4lTRISHyMixETj6cUCFgVZcZPE4Qo9POpaVIVMHIhFHsjgKn
+         VHEa8F6Wa1rCzYNjpg3EYljHflxqPBTS4Im1s3VgbSxbQGe5c6jcopxSPxbC6Ez7jqfp
+         hV2ypPrxqac/DbQANLWJTA3/xzbCVPuKJsFlvEvN4stA47QIuTeqOe1iJXRCoYdLeQId
+         uX2z7p/8C/ZaRbhEahUuoj5tSXFjZb+mx1g2lAJjQhhtETDC+UiJduueTJewJXpFED1w
+         9Nv4d3tuZeqQG2hAJi+5Bs32VS94dSlDLNYgHc+9wEYc0XFozBGd8yPxNX492vNp2aWG
+         UiRA==
+X-Forwarded-Encrypted: i=1; AFNElJ+KqEWFi1yu0p1QIfD1zZVzgHAmk2wsLrfZyU/ELFThbO6SvZnSxDk4MT9IQBDGWe7rrO4zA//DI5dcUe4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxaorASjM6RetJJVUELLIG36xJUr2KsDg73WQlW3QEpW8wveicJ
+	t70EDm4NzwVG8NYKLiszeGcMdJuJR4Sj2S7hqEIiHB0oKqbfPOEg8GwPz3dpiazJ0qV+9gL9oqx
+	z9DLLoA==
+X-Received: from pgac11.prod.google.com ([2002:a05:6a02:294b:b0:c63:55bd:18f0])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:7354:b0:398:8002:8033
+ with SMTP id adf61e73a8af0-3a08d9362d0mr332172637.49.1776381825229; Thu, 16
+ Apr 2026 16:23:45 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 16 Apr 2026 16:23:25 -0700
+Date: Thu, 16 Apr 2026 16:23:26 -0700
 In-Reply-To: <20260416232329.3408497-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -60,8 +60,9 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260416232329.3408497-1-seanjc@google.com>
 X-Mailer: git-send-email 2.54.0.rc1.513.gad8abe7a5a-goog
-Message-ID: <20260416232329.3408497-4-seanjc@google.com>
-Subject: [PATCH v3 3/7] KVM: SEV: Set supported SEV+ VM types during sev_hardware_setup()
+Message-ID: <20260416232329.3408497-5-seanjc@google.com>
+Subject: [PATCH v3 4/7] KVM: SEV: Consolidate logic for printing state of
+ SEV{,-ES,-SNP} enabling
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Ashish Kalra <ashish.kalra@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>, 
@@ -71,59 +72,55 @@ Cc: kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
 	Tycho Andersen <tycho@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 
-Set the supported SEV+ VM types during sev_hardware_setup() instead of
-waiting until sev_set_cpu_caps().  This will using the set of *fully*
-supported VM types to print the enabled/unusable/disabled messaged.
+Add a helper to print enabled/unusable/disabled for SEV+ VM types in
+anticipation of SNP also being subjecting to "unusable" logic.
 
-For all intents and purposes, no functional change intended.
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/sev.c | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+ arch/x86/kvm/svm/sev.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index c2126b3c3072..ea4ce371d5f3 100644
+index ea4ce371d5f3..dfeb660b8f5d 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -3013,18 +3013,14 @@ void sev_vm_destroy(struct kvm *kvm)
- 
- void __init sev_set_cpu_caps(void)
- {
--	if (sev_enabled) {
-+	if (sev_enabled)
- 		kvm_cpu_cap_set(X86_FEATURE_SEV);
--		kvm_caps.supported_vm_types |= BIT(KVM_X86_SEV_VM);
--	}
--	if (sev_es_enabled) {
-+
-+	if (sev_es_enabled)
- 		kvm_cpu_cap_set(X86_FEATURE_SEV_ES);
--		kvm_caps.supported_vm_types |= BIT(KVM_X86_SEV_ES_VM);
--	}
--	if (sev_snp_enabled) {
-+
-+	if (sev_snp_enabled)
- 		kvm_cpu_cap_set(X86_FEATURE_SEV_SNP);
--		kvm_caps.supported_vm_types |= BIT(KVM_X86_SNP_VM);
--	}
+@@ -3050,6 +3050,11 @@ static bool is_sev_snp_initialized(void)
+ 	return initialized;
  }
  
- static bool is_sev_snp_initialized(void)
-@@ -3194,6 +3190,13 @@ void __init sev_hardware_setup(void)
- 		}
- 	}
- 
-+	if (sev_supported)
-+		kvm_caps.supported_vm_types |= BIT(KVM_X86_SEV_VM);
-+	if (sev_es_supported)
-+		kvm_caps.supported_vm_types |= BIT(KVM_X86_SEV_ES_VM);
-+	if (sev_snp_supported)
-+		kvm_caps.supported_vm_types |= BIT(KVM_X86_SNP_VM);
++static const char * __init sev_str_feature_state(bool is_supported, bool is_usable)
++{
++	return is_supported ? is_usable ? "enabled" : "unusable" : "disabled";
++}
 +
+ void __init sev_hardware_setup(void)
+ {
+ 	unsigned int eax, ebx, ecx, edx, sev_asid_count, sev_es_asid_count;
+@@ -3199,19 +3204,15 @@ void __init sev_hardware_setup(void)
+ 
  	if (boot_cpu_has(X86_FEATURE_SEV))
  		pr_info("SEV %s (ASIDs %u - %u)\n",
- 			sev_supported ? min_sev_asid <= max_sev_asid ? "enabled" :
+-			sev_supported ? min_sev_asid <= max_sev_asid ? "enabled" :
+-								       "unusable" :
+-								       "disabled",
++			sev_str_feature_state(sev_supported, min_sev_asid <= max_sev_asid),
+ 			min_sev_asid, max_sev_asid);
+ 	if (boot_cpu_has(X86_FEATURE_SEV_ES))
+ 		pr_info("SEV-ES %s (ASIDs %u - %u)\n",
+-			sev_es_supported ? min_sev_es_asid <= max_sev_es_asid ? "enabled" :
+-										"unusable" :
+-										"disabled",
++			sev_str_feature_state(sev_es_supported, min_sev_es_asid <= max_sev_es_asid),
+ 			min_sev_es_asid, max_sev_es_asid);
+ 	if (boot_cpu_has(X86_FEATURE_SEV_SNP))
+ 		pr_info("SEV-SNP %s (ASIDs %u - %u)\n",
+-			str_enabled_disabled(sev_snp_supported),
++			sev_str_feature_state(sev_snp_supported, true),
+ 			min_snp_asid, max_snp_asid);
+ 
+ 	sev_enabled = sev_supported;
 -- 
 2.54.0.rc1.513.gad8abe7a5a-goog
 
