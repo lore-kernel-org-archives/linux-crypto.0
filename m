@@ -1,130 +1,148 @@
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F14B3CE4A7
-	for <linux-crypto@vger.kernel.org>; Thu, 16 Apr 2026 13:44:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.170
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776347084; cv=pass; b=hDdF91O2ve88nDUOioKeBN6Zo/vMLhjPK1zAbiRorypn/DnTXWRN5qDhe9610NNx4OSUECDVFjNiwu2PEdyI7aNHPWg4FwArtvsvp+Oyh3yhtd6tat8nAxSsE3zomr8Ov0qBoj2ImUfM2WQpsJXV3vZFuLURmVC0lmgUOL3+3So=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776347084; c=relaxed/simple;
-	bh=mTVpBdjjI9oKXuDpma/uOA+GO9QV+eMtEK8P/UbJDZY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=P1GusatU0Opkg7zwVqhWqGopbI9wVa5YQ8O9J0MhzBihlTsJ/xevfJzK0kNRLM2q/QaXwLBB7uUz8B2aF8c+k02+NFQbWLJyIR0kDCq9ul0as550oQIGShCXUX8piEbl+HKdq0GG/FuzUmkbTtpTWltc5JO6L9J9K4ITs/UeJ9c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=dvILqsjE; arc=pass smtp.client-ip=209.85.222.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58B78388E66
+	for <linux-crypto@vger.kernel.org>; Thu, 16 Apr 2026 13:54:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776347671; cv=none; b=OMQJixsMceaMS7R69iPh/SOLfbsIVU72fpFEydFHvi3ufP0NSmERe3BGiVYYSZYn7/mzUY+gsj2Qs3GS5anPyfO9JRyB5Ly2E1eqH8mFEmRqmi8PvRO664KmBtPqv61IGMnXHtRojn3XKvf00zQLzzfsySiw/gUfRVtEYE1sxqw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776347671; c=relaxed/simple;
+	bh=5dFyc9ViG+IUPVU+ZTKPrFPBeru8WiIAA7c3t+2z4DA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=khFG1MFL+l4Mvqe7YfzvxMRb2bux30hvVcTt3USTcoPmz3qCk6DcZj2bJvz09aLuhqNWtO5f+yYhFdGX8jZehFdpPoOkoekfv65Tiyy3KGgydLAoVvS0ddV0bZ/9q1ZHuVtvCnryD6q8qVI9/SXymu70iYPUF71vzpYhvi4IMxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WMz1jt4U; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="dvILqsjE"
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-8d560ede296so938178185a.0
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Apr 2026 06:44:40 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1776347078; cv=none;
-        d=google.com; s=arc-20240605;
-        b=A0UG5KKNgAqqyZ0BgNQhYa3sZqTuUMeSj8CklbV2ckhHWnf0TQj6tr9Bz+YnrDtuAW
-         gbnC0aRq4KrecuVdPaQY2RDMvZkzU7wJYxGe0S11bQ0W4yNcWWUP9JcvF355GjmzTRP6
-         GlrHijVlj+PS40iiPlaXwuzZWmb+odWsjPsu1MSvoHod1oAIbE4q9O+rMjGPsNA38fe3
-         I8GLfOwQattGOeArsxN1Tj8Irw7IiWwSlhGx7yLomF6tk0EUSqaKiqh7jj52l6HY9Ve1
-         yLmNxqDPx6qMzVYFfwPqZjsh0cYq+7s8w7rCkeuiFOy2A7FB/zqcGGm1bot3TnUktQ05
-         DE8A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=vJytEO4edAXWK8urZx0Wgyg6Umc0OrtkWTX64gcjRrI=;
-        fh=RIaseGxQFyc4BaNbPfLN0YMYNmMpnfffvXGYEP5tTL0=;
-        b=Eh7RidOJjj6OlIQLDFpp7D+5dLxNr80XDmh2nBckF6V5lOduR30VOwka8grllkb7e6
-         y5Rp2cpfCkvYptLHJPZBaFkuP4rb1u6Of3e8ShdI+zHeKkIdPYg4eqBdiXvKymfLEWTg
-         +goxPdNqJM0fPEtX6/xWe1JUXdO5voMcHfaz4mF/8GUuJt+rNAnGCLPbT3TEmtatV5a+
-         mN7Yx3Lq77+Q4KbtMKu7+GGU60KIq4eDLF0HgFcCY+/0O9pwBXAJCBd26kIVZWVYYu0k
-         CH3c1U1QxMnVZWP96wT87m2tHH66dB+QEu8YZKHQa0eVEk1lSW3SzwWkJJpg38oJJfSJ
-         XBug==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WMz1jt4U"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-82cd70febc7so5406429b3a.2
+        for <linux-crypto@vger.kernel.org>; Thu, 16 Apr 2026 06:54:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1776347078; x=1776951878; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vJytEO4edAXWK8urZx0Wgyg6Umc0OrtkWTX64gcjRrI=;
-        b=dvILqsjEArZ6xXUf9nYlPSJ++t74PRSTEGhkELZj/hAPpLmm+he1LJGGmc1g6jnUO7
-         FLP+kppvDjX59dgv+y8Y/tqp05UZuxCaa+7IPUQHhLwH9xdY0PmuStcYVkjsrVIhOJgm
-         RpHJJ07mJFAB/rKshCNOe8rbDtXLImY7xVKtw=
+        d=gmail.com; s=20251104; t=1776347669; x=1776952469; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Hbv+oSdP3bIxxAxFi//tYgCtqT/PGPjRSP4DbveicnU=;
+        b=WMz1jt4UfZfNu3a/KGPKQYGyerSmAmSCVT1egUyJGO5QsZht1lGGIBRKTbLujIkUUV
+         EbnjwqdxKv6C6bmIH0iZ/3+Kt1Z8kyVdxP5pD4+aL5p9M3drrZRlzs+ahdr0lTChyd27
+         pxW+hHOqiXLhSud7qE2wc/d0CK1wW5RvtwFdX3j3jcHQwa2xrIeuwldB/8jamyoRvmOJ
+         K65msMaUiLqARDzNRhwubBgBCGcAwZAnYj5LWECg98PgVuMvnp0q2Htc9Rmr3SjeVIgu
+         Dc50NkuBnV/xweunMR/GTSruaeJGoYKREgoh+pL3uY2D+o7EoIHfPukM19O3m0NsNzbn
+         vXQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776347078; x=1776951878;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=vJytEO4edAXWK8urZx0Wgyg6Umc0OrtkWTX64gcjRrI=;
-        b=JQ7fYlCygxmDyze+ULr/oL1Q8BwWGuVJ7daUwa5HeUpXH5yxGeWuMvR6vXh3DBRIY/
-         QGf1rPzTzDEL+0qfiGCUe6pf0bFXKAR6UmFAdd+RA9g1qeXsuaqzbbmLH5DvPJBmx8SP
-         aeds/uIVzJt5cq3aA64/Uy1FLF8poRwD3gpCun3E6KldEv2+sa4oPqRJhwh6s48mr5KZ
-         OnhvYA7i305lSqE3moff6QjKC8aEJp3Peq1uEb3zJJj7hGWOcOgfujnBezMMHtJIyCZH
-         hH+GnXgHk6NqefTHChxNStllw1q+6BoxQyW95aXUcTZ4HmwKJeAaPAFp38yXH01YOmB0
-         1OOQ==
-X-Gm-Message-State: AOJu0Yz9MAYsWeYisJYUoe/aKpkY96Ei57wg5CXvId9+PPxA2D9qD4SZ
-	Z/l+TE8tGaZz6IFgQ/O6tWRPGi06fRfogEdyQG45wYqF2AY5hmNd0MG+Yy/PhQBCVe/kkrpBBfE
-	FZTfinfzkcG6etJTOVlQ15WdVft4OTrw6aa7ANRC8lQ==
-X-Gm-Gg: AeBDiete4EWbXAV++kYpID0N1z5ciPHlKezVLlLEQmUoPNtydNWL7UMFAWNH9jL8ttC
-	pZ6X1/oARSK2r5fweXGubh3PyaidQB6bgUwEjCoL680fhTB75uNPBcqXuZlsOSJTVqmxN9d0FFQ
-	l+fOp0xH5i1IcaDZgb9BUJr4CMpnlDErnrn7hyJSHBTfQm6Qx7lIb1/XYYT5yWgIQYSwvj1sNcp
-	wvuwkAUCsTbKfSM9S6tuG/i8DTKsJumEZzQ70YEQ6Aw7G/PZaEoS7STUA/Aac9/oy+3e54CEurR
-	9eACXc2u2k0mpEtKnn68pFvz01YZFGM8AGnY5/BRUFuiX0/1HB87hC4NWGfIUL0+H4Ge6REHQ3A
-	1Ttdg1vHUPNByQxM7EnAfWKrEbCKQzVuOOH1KBgd2sBCTNn7jyNdpxKJ8Vg==
-X-Received: by 2002:a05:622a:244e:b0:50e:5db:ec5c with SMTP id
- d75a77b69052e-50e05dbf7f7mr213657131cf.52.1776347077910; Thu, 16 Apr 2026
- 06:44:37 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1776347669; x=1776952469;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Hbv+oSdP3bIxxAxFi//tYgCtqT/PGPjRSP4DbveicnU=;
+        b=b7QJtAy6g3aTT/zzrSEVLCuLqVU0txfmCSL83kKKRPaIe2A2K6YVFo7n7iLggvDoQR
+         Cns5BOXFWjNQsN3hLIvsL3OluvTEL7E55ZakLxiPkApWeU9oI+J9d/7aVI5nLXa9f1mP
+         XTsXQnfsQ+ZhJ0bM5XUNsNq7gkJ3L/iCiUcfmL+B0y7zve4WgFL74rPpkRMb2ibmCJVj
+         Yn/DW7ARk0wcuH1nGJEu+3/7cTAEmPRrZA81Zsl6J2Vw7Hj+iTfjo5v2YZ5QdnVG2cfv
+         5GX1ww8rv1ch3A0ZtnZV7oVP0R1E1z6+CO0qSDCdDc+GeuQpw0/eZQsA190qt1lI5CTU
+         44Rw==
+X-Gm-Message-State: AOJu0YxMDa3U+mLGFQaaEuAWYGdarTS4CfqRw8F2u9WQqVAli2jmF8Ay
+	oySRYlPTvPfx3r3oCZJPdcDXOQ0wfCs214GyG61wxZCe+ap1jTsSR9LKNQG+xA==
+X-Gm-Gg: AeBDiev3A1R1HxsxmtxWAKsnPv7sl2hxY+b4ifngZYj/28ESXPOgYJubpHh79cBecXS
+	7piRsG75dtq7iiP2FI668Vk6ivN3qtEqlMWPZOqlqixG4IXfSo/SEkcpuBHf943BpLOA9T6V2wC
+	XwARpGUtw8wz/ioKCJgKK1SA+1S5M/rP9yHtZJ2749AurdT/Fq+0yzEqR95GQckh+KcDq0/mZ0n
+	R944Md9BsEIgNhHlgpi1E0u494mPQ2a9yskkoNJVgtabW4Eb4TlE5B4pqRylnelpVJy6p1V7FZ7
+	VPCB+MMNrrFCIujcnTMxElkNRTqdUJ98sMrbACFeu+uXpZiFhWMODDyyKBC3/QCAL3pC2mxb6Wz
+	iLmngifRMrX9qHgiSrdSqoOybrKSdM/wVzwipoODNpDHpd8jsG7El72tNYfi4/BwF8Jeoy/tu+C
+	D4u64YseZNB6OGJzVlowhKcsxf2xkXAyywj0/cCTGgZrxRRvPrU4K8sPuSK/d25HHc9h2jFqWCj
+	t/5MTKjlCYRdw==
+X-Received: by 2002:a05:6a00:e1b:b0:82c:20e9:fa53 with SMTP id d2e1a72fcca58-82f0c1d9fc2mr26207350b3a.5.1776347669169;
+        Thu, 16 Apr 2026 06:54:29 -0700 (PDT)
+Received: from localhost.localdomain (69-172-89-235.static.imsbiz.com. [69.172.89.235])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f66ea6950sm5148118b3a.0.2026.04.16.06.54.27
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 16 Apr 2026 06:54:28 -0700 (PDT)
+From: Dudu Lu <phx0fer@gmail.com>
+To: linux-crypto@vger.kernel.org
+Cc: herbert@gondor.apana.org.au,
+	Dudu Lu <phx0fer@gmail.com>
+Subject: [PATCH] crypto: krb5enc - fix async decrypt skipping hash verification
+Date: Thu, 16 Apr 2026 21:54:24 +0800
+Message-Id: <20260416135424.68785-1-phx0fer@gmail.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-145)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260318071808.817074-1-pavitrakumarm@vayavyalabs.com>
- <20260318071808.817074-3-pavitrakumarm@vayavyalabs.com> <acZL65nbtfMCPHhq@gondor.apana.org.au>
- <CALxtO0nFEG2Lm18Fnb=YVQfy4-Qjb5+WtOxsHNOwYTy2Kzyb4g@mail.gmail.com>
- <CALxtO0kj4JfL94qY-radGcLwMeTnq4NQF7vPqs6giuhBinvALw@mail.gmail.com> <ad4iJhEM-ZwgadBh@gondor.apana.org.au>
-In-Reply-To: <ad4iJhEM-ZwgadBh@gondor.apana.org.au>
-From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Date: Thu, 16 Apr 2026 19:14:26 +0530
-X-Gm-Features: AQROBzDWPjMyI40iDcqRckFcLA4-wp9ja-BQn6tZCrNmb6YScm7vzgbCOU3Mfcs
-Message-ID: <CALxtO0kZX58X1Yk2cmGuBJa98Gcroy0b-wPxL=1h+ph5rT9ebQ@mail.gmail.com>
-Subject: Re: [PATCH v11 2/4] crypto: spacc - Add SPAcc ahash support
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	devicetree@vger.kernel.org, robh@kernel.org, conor+dt@kernel.org, 
-	Ruud.Derwig@synopsys.com, manjunath.hadli@vayavyalabs.com, 
-	adityak@vayavyalabs.com, navami.telsang@vayavyalabs.com, 
-	bhoomikak@vayavyalabs.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Herbert,
-  I have pushed the V12 patchset as per your inputs. Dropped SM3 for
-now, added other code improvements.
+krb5enc_dispatch_decrypt() sets req->base.complete as the skcipher
+callback, which is the caller's own completion handler. When the
+skcipher completes asynchronously, this signals "done" to the caller
+without executing krb5enc_dispatch_decrypt_hash(), completely bypassing
+the integrity verification (hash check).
 
-Warm regards,
-PK
+Compare with the encrypt path which correctly uses
+krb5enc_encrypt_done as an intermediate callback to chain into the
+hash computation on async completion.
 
+Fix by adding krb5enc_decrypt_done as an intermediate callback that
+chains into krb5enc_dispatch_decrypt_hash() upon async skcipher
+completion, matching the encrypt path's callback pattern. Handle
+both -EINPROGRESS and -EBUSY notifications from backlogged requests,
+consistent with authenc's authenc_request_complete(). Also fix
+krb5enc_request_complete() to filter -EBUSY in addition to
+-EINPROGRESS, matching the authenc reference implementation.
 
-On Tue, Apr 14, 2026 at 4:47=E2=80=AFPM Herbert Xu <herbert@gondor.apana.or=
-g.au> wrote:
->
-> On Tue, Apr 14, 2026 at 03:58:16PM +0530, Pavitrakumar Managutte wrote:
-> > Hi Herbert,
-> >    If the above snip looks good, I can push that and some more code
-> > clean-ups/improvements as part of V12 patchset. Do let me know.
-> >
-> > Below are the code fixes and improvements
-> > 1. Multi-device safety handling - All packed up inside priv
-> > 2. Minor code polishes
-> > 3. memzero_explicit inside setkey, spacc_compute_xcbc_key etc.
-> > 4. Algo registration clean-ups
->
-> I would prefer if you left out sm3 for now.  If it really mattered
-> someone would move it to lib/crypto.
->
-> Thanks,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
->
+Fixes: d1775a177f7f ("crypto: Add 'krb5enc' hash and cipher AEAD algorithm")
+Signed-off-by: Dudu Lu <phx0fer@gmail.com>
+---
+ crypto/krb5enc.c | 22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/krb5enc.c b/crypto/krb5enc.c
+index a1de55994d92..2490343873a9 100644
+--- a/crypto/krb5enc.c
++++ b/crypto/krb5enc.c
+@@ -41,7 +41,7 @@ struct krb5enc_request_ctx {
+ 
+ static void krb5enc_request_complete(struct aead_request *req, int err)
+ {
+-	if (err != -EINPROGRESS)
++	if (err != -EINPROGRESS && err != -EBUSY)
+ 		aead_request_complete(req, err);
+ }
+ 
+@@ -300,6 +300,24 @@ static int krb5enc_dispatch_decrypt_hash(struct aead_request *req)
+ 	return krb5enc_verify_hash(req);
+ }
+ 
++static void krb5enc_decrypt_done(void *data, int err)
++{
++	struct aead_request *req = data;
++
++	if (err == -EINPROGRESS || err == -EBUSY)
++		return krb5enc_request_complete(req, err);
++
++	if (err)
++		goto out;
++
++	err = krb5enc_dispatch_decrypt_hash(req);
++	if (err == -EINPROGRESS || err == -EBUSY)
++		return;
++
++out:
++	aead_request_complete(req, err);
++}
++
+ /*
+  * Dispatch the decryption of the ciphertext.
+  */
+@@ -323,7 +341,7 @@ static int krb5enc_dispatch_decrypt(struct aead_request *req)
+ 
+ 	skcipher_request_set_tfm(skreq, ctx->enc);
+ 	skcipher_request_set_callback(skreq, aead_request_flags(req),
+-				      req->base.complete, req->base.data);
++				      krb5enc_decrypt_done, req);
+ 	skcipher_request_set_crypt(skreq, src, dst,
+ 				   req->cryptlen - authsize, req->iv);
+ 
+-- 
+2.39.3 (Apple Git-145)
+
