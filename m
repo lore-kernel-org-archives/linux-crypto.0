@@ -1,77 +1,80 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E33AC15A864;
-	Fri, 17 Apr 2026 01:22:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7AF033260B;
+	Fri, 17 Apr 2026 06:57:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776388947; cv=none; b=tbf8NrRt5rfBOOEIM2q/XGmkfup/Y16m8NWfCzUUgdE6Emwi2dGTDprJPI1fn9dWX4mvRx2vtiT4z1aXjrSw090qq5lfPZxAZVkh4TXFnkzAmqU0+hTVkVHbKcjcvU0B8NDx63yHcf5osA19G0LnfWccj9E9NmUcG1XwFaYf7Zc=
+	t=1776409074; cv=none; b=myNVvHrFypvyWsGQZq9Rk7LFGlqnHJUNi6C1GMk3yjZHh6tbSxUMSzKMSg+na5Jugoh/PirJtqpAjHkDwPvlodY993PM/8ZnemaBXQYhLLvD7s6eBGa7Xn30ZGKSrB/JjdapWdFPKH414N1I+jlc4UQLRy7gsrjkgAYO+oJDvGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776388947; c=relaxed/simple;
-	bh=CG/NCwO+nPOC20Kz0LGE7rqG2F59/6JWtxYLDPHWBXI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PTWJiRX7e8AsuV0G0WGzH7AIYRkXL1eFl2qg4joXeG47JPIhdH6OHfNUtXUz25MoAupxvYP0dhL0ZOd2qI9Wa+06WmTDN4Ng9O36EQLGkqPLGwCYl2/2xN0XriAQ5YnJ0iQf88RK1kKnTyJPumrZDpmPiytiRW19sTXUesAbANQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=YzXAvkC/; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1776409074; c=relaxed/simple;
+	bh=1neoicsm+sAaMjF/qdatKdX/YHOR+mGOwg+8+PbRhds=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Gw7SVRrjaRwV7FKR99TegW4LE+Duj3qAHrFUVnrZZaySJIYgS3OnAUJu8mJDfSRyi+U8IrmJu7gYAdtsxXad1dyF/vXMVgf6OWaLZt02JmEezM1tXsB1H0ycgMjD8T2eDKcTtIY53yXgPCPRvZeYlYJ6TaA/c972A0Eawrtr8ic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uEUg8B7P; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="YzXAvkC/"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=A8ox5tavZ4O1d/3nbNfsxMmrke14ukZABfXa6XYclBE=; 
-	b=YzXAvkC/aTuN6hcOqY0BSZbC0igguEt+AqnOjbpOeHIab9+hOWLFFunPIJnVkOgjqQE7IhAQ5hu
-	WjbI50xqezJBXyxwl/9LL7BLjbzY3S6bBp2HqcYGMlfPHaq3kZUXN7fSxZC+U68VfnNFI2c1ltA6o
-	T3Dvhqf55vk0vAS7jbT4jiQ9THh/zM/t9koLOmTM3CDqwRqDhAXqat+/OwMuUbfab06TZ4FR5t6jG
-	kjHwFjrZ5B3qhqpMaoHOdI/+Uoe2JkvhIkykWq1UTKec72oWTIkz7hIrNNtl9GQcPKevyV01B+XN9
-	ZPRyf1kxFzZz6Mfa9X/gMPyDie4vCJqKfG8Q==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wDXuN-006gxx-21;
-	Fri, 17 Apr 2026 09:22:12 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Apr 2026 09:22:11 +0800
-Date: Fri, 17 Apr 2026 09:22:11 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Tejun Heo <tj@kernel.org>
-Cc: Thomas Graf <tgraf@suug.ch>, David Vernet <void@manifault.com>,
-	Andrea Righi <arighi@nvidia.com>,
-	Changwoo Min <changwoo@igalia.com>,
-	Emil Tsalapatis <emil@etsalapatis.com>,
-	linux-crypto@vger.kernel.org, sched-ext@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Florian Westphal <fw@strlen.de>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH for-7.1-fixes 1/2] rhashtable: add no_sync_grow option
-Message-ID: <aeGLQ2X_svzH_00M@gondor.apana.org.au>
-References: <20260417002449.2290577-1-tj@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uEUg8B7P"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2536EC19425;
+	Fri, 17 Apr 2026 06:57:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776409074;
+	bh=1neoicsm+sAaMjF/qdatKdX/YHOR+mGOwg+8+PbRhds=;
+	h=From:To:Cc:Subject:Date:From;
+	b=uEUg8B7PoDNVmzwaTjA0PXCsTLTAA052tMZNxY8Qj5avl5tHv47sPEU0tGwsu3XSW
+	 o4eJLj9KYJvsYADX4rv7BW65bghCcUATX/7TEgqsVXN5w0o+PRcNdAvXpIWlq1vV7C
+	 nVskYsEzDIm9h47UYdi8DBvqc8YmwiZWZc1UeNOiWx3ij5VQ1eRWIHYRLB1cuJZGK7
+	 ZF7vp41vrJv5XXd6yZt1Lqrh4+l749BsuhCUUv6hxXzruohhoFS/KJelPvUL1wW7F7
+	 KmHDt6x6q6nlAKFKpMacaigwfxPV9esT3WsZKyzqX+tjNkxJ2EG0VLPEHUAwpir4XW
+	 OPizHj3TzOrrg==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-doc@vger.kernel.org,
+	Jonathan Corbet <corbet@lwn.net>,
+	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH 0/2] Improve the crypto library documentation
+Date: Thu, 16 Apr 2026 23:55:27 -0700
+Message-ID: <20260417065529.64925-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260417002449.2290577-1-tj@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Apr 16, 2026 at 02:24:48PM -1000, Tejun Heo wrote:
-> 
-> The follow-up sched_ext patch is a fix targeting sched_ext/for-7.1-fixes
-> which I'd like to send Linus's way sooner than later. Would it be okay
-> to route both patches through sched_ext/for-7.1-fixes? If you'd prefer
-> to route the rhashtable change differently, that works too. Please let
-> me know, thanks.
+While the crypto library already has a lot of kerneldoc, it's not being
+included in the HTML or PDF documentation.  Update Documentation/crypto/
+to include it, and also add a high-level overview of the library.
 
-As I said earlier, we should work out if this is really needed or
-not.
+I'd like to take this series via the libcrypto tree for 7.1.
 
-But if it is needed, we did have this feature before.  It's called
-insecure_elasticity which was removed because we moved all its users
-off to better solutions.
+Eric Biggers (2):
+  docs: kdoc: Expand 'at_least' when creating parameter list
+  lib/crypto: docs: Add rst documentation to Documentation/crypto/
 
-We can always bring it back.
+ Documentation/crypto/index.rst                |   2 +-
+ .../crypto/libcrypto-blockcipher.rst          |  19 ++
+ Documentation/crypto/libcrypto-hash.rst       |  86 +++++++++
+ Documentation/crypto/libcrypto-signature.rst  |  11 ++
+ Documentation/crypto/libcrypto-utils.rst      |   6 +
+ Documentation/crypto/libcrypto.rst            | 167 ++++++++++++++++++
+ Documentation/crypto/sha3.rst                 |   2 +
+ tools/lib/python/kdoc/kdoc_parser.py          |   5 +
+ 8 files changed, 297 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/crypto/libcrypto-blockcipher.rst
+ create mode 100644 Documentation/crypto/libcrypto-hash.rst
+ create mode 100644 Documentation/crypto/libcrypto-signature.rst
+ create mode 100644 Documentation/crypto/libcrypto-utils.rst
+ create mode 100644 Documentation/crypto/libcrypto.rst
 
-Cheers,
+
+base-commit: 3cd8b194bf3428dfa53120fee47e827a7c495815
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.53.0
+
