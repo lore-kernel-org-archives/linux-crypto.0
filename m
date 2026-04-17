@@ -1,115 +1,117 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E59503A0E8E
-	for <linux-crypto@vger.kernel.org>; Thu, 16 Apr 2026 23:23:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EBD763CB;
+	Fri, 17 Apr 2026 00:24:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776381836; cv=none; b=OWKWdpVqna6tNg6ouyO2+Ckhhfqzc5+yAYQAnwo5rwC46q7EYqkKJ7o/GEEGHYx+m9PHFytC7kfEwxkTR8tQJE/yBis3q16tBXpGPZy9+dCu106pj5evTjheJne0onqN1qd8YOG45NUjG7zhJJXy7Jz5sTAsQ8JmEWoScRahas4=
+	t=1776385491; cv=none; b=PIluADZjGkSpLcfqo7HDGD9DjZp2ria7Rgq0Nq2T6BHYKK/sNeQduDU7CZdYApMEtOFcIoCjRJ9rEoaw6E/9lThVlIEzJmTzNxl+t5uPzFJO9aA5b/pAPmoZzxOu27crXmxbTqwe1123LaGjLJfXcLZDDZNe/seUkpH9EdEbsmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776381836; c=relaxed/simple;
-	bh=5y9MQzmnNdA8fG73zq4cTMXDW78U5CKZAEWBePI7SwQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gXkwmLW28FUw2HvnUUHgnatogka0o2lV2E7DwVtHh1PG1XWnEyJLdMUKeoZtDMYsf3gSoGVJS/zee9iYwXxF/IO/k3Cuacpxx/wpgUzrfXLgdtkuaeyQWRUAIE3+Xp2jX8sDAQQ6AUkXEQNatOQlzyvYNsaQtbJdPITS28aRZEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PzwauzUp; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1776385491; c=relaxed/simple;
+	bh=y6LTZHncCej35ex2qI+cmlgV4pN0OztUwdHZgg34Av4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HiHAMOOI4GwCcmWbwr2JCl7688jkpkf/7flHCd+Qa8KNGeQWqEKLghuzo0BR7xN3Eq+sBWPqXUAdou/FCpABIA9hyyct7tXHna0+/Gb80lTFpRrSNFMuT7ylkDG9RCwmo5jlCvFr/wBrtz7Gj49n05WYcmtLV7nk65VKGocKykI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tsXuyWmT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PzwauzUp"
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-82cf8dcd079so66590b3a.1
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Apr 2026 16:23:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776381829; x=1776986629; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=I8i9cxkTxORgkUnwzKhG1n+FrAvtgU2d9BkG0Hg1zPQ=;
-        b=PzwauzUpASwgA6Rj6RSH/q/ggEzXA3HKTbyVkWG1uAoF3sCfi5COqAqDYQLeCpn8GT
-         NLwfGNqeffYtBy0zYjeWImLvN9NxX54tQNlmwiO/OTfwi3SDKtCaQnc6a8UlQqS+wTsS
-         NVuxPsev8iFHCre7Z3bnpSpLY2Ch+GfV616PsqcIVojJPkI9dVlQpIJBgSJz91GOvwIs
-         67AZbA+PcbdOZ1q0E0mGZL27mjX/AioEbWFK0zOrYJAoSBrck4SK8F5pljwHnlitY1LZ
-         S81Mu3d3ToOI+eiXviqP8b6v9LLYUyWwWJqzrpiqDiDpPVES+JMxJ0iuG7hG1aImBmwi
-         ZNrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776381829; x=1776986629;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=I8i9cxkTxORgkUnwzKhG1n+FrAvtgU2d9BkG0Hg1zPQ=;
-        b=HNFn5TXxmTt1xIlR0gBZeA/5uRfHA8GzvWuYaP3Iq8PcOqTYYMRrY83kurJr815Hh6
-         oO/jd4rdXpo+0DBRxqfMJVC0L5qgqHQae9iCz4ySrsTZOlDkPs6chyaErebmCKEhPGC4
-         D1B85t03gWRIDwxh1qLrFunJM+Bx8UIEwHRwsEmSK91hCUEV2rpMjcFSwiUK1sVFXpFR
-         H4nL60IUbMiwvaT3TOKfqAuelEuNK+/0HDMN0+jbAwYxepQNNrHzWPcaZzLO0AMT8llO
-         Lt3ePw/9kolbWHnlbp00z9c12qfv4PaGIktkpspijE4Cz9IgYDDn0C8Ja9Nmpd2MbJhr
-         kfKg==
-X-Forwarded-Encrypted: i=1; AFNElJ+f6MMdZGu9Vwwz7l0VuZwJCwDEOyfYnXwVBI++BZX+w8QefbaYvshucaw5/9htyoUl3SI1ItcmL3/cqBE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUX2xWYrgKFEfFAGD4bVdId8SwhxNDIKIoGekahLHWIJH+yEOk
-	bk3icCspMi+0F0xg2SpgOgItyHLgU6id9odV3fc/EoE8syBFx35kWRxVnnIFPAJarYMriLPijGA
-	OD2cSWQ==
-X-Received: from pfbdo20.prod.google.com ([2002:a05:6a00:4a14:b0:82f:120:fd71])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:928b:b0:82c:212a:a9b5
- with SMTP id d2e1a72fcca58-82f8c8df69fmr245291b3a.36.1776381829092; Thu, 16
- Apr 2026 16:23:49 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 16 Apr 2026 16:23:28 -0700
-In-Reply-To: <20260416232329.3408497-1-seanjc@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tsXuyWmT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB931C2BCAF;
+	Fri, 17 Apr 2026 00:24:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776385491;
+	bh=y6LTZHncCej35ex2qI+cmlgV4pN0OztUwdHZgg34Av4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=tsXuyWmTR4qJmHkfE6fjbc4g/gI67qzujeEOjk8lqAkyabNYiEt9TnT1rWKvi+sXt
+	 y/WASPpvaiirgHrYAwAxJhik8sD6X+eQnk3liP2oTdsFYuIKnGVF5wzDLCnZcb/yeL
+	 amkiw1CEL9+mq26q721Rf6RBVW3Dp+ggq5xniRNmSNa6IZkDMVILFs+uaOftDMqDCP
+	 qYlqztwn2hTwb0ix8lNW5rYj5gYOsa/8XQVzK26nEcg6TL2V7D3NQpt5fA0LenFXnj
+	 OxVRpFDMj3XmrJaV+6pdGG0nR7tefy9b6zMDnA1B73bWu+msquFwPpXM6XsKEpm6+P
+	 BYvFgQdYrvW1Q==
+From: Tejun Heo <tj@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Thomas Graf <tgraf@suug.ch>,
+	David Vernet <void@manifault.com>,
+	Andrea Righi <arighi@nvidia.com>,
+	Changwoo Min <changwoo@igalia.com>
+Cc: Emil Tsalapatis <emil@etsalapatis.com>,
+	linux-crypto@vger.kernel.org,
+	sched-ext@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH for-7.1-fixes 1/2] rhashtable: add no_sync_grow option
+Date: Thu, 16 Apr 2026 14:24:48 -1000
+Message-ID: <20260417002449.2290577-1-tj@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260416232329.3408497-1-seanjc@google.com>
-X-Mailer: git-send-email 2.54.0.rc1.513.gad8abe7a5a-goog
-Message-ID: <20260416232329.3408497-7-seanjc@google.com>
-Subject: [PATCH v3 6/7] KVM: SEV: Don't advertise VM types that are disabled
- by firmware
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Ashish Kalra <ashish.kalra@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>, 
-	John Allen <john.allen@amd.com>
-Cc: kvm@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Tycho Andersen <tycho@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-From: Tycho Andersen <tycho@kernel.org>
+The sync grow path on insert calls get_random_u32() and kvmalloc(), both of
+which take regular spinlocks and are unsafe under raw_spinlock_t. Add an
+opt-in flag that skips the >100% grow check; inserts always succeed by
+appending to the chain, and the deferred worker still grows at >75% load.
 
-As called out in a footnote for a recent SNP vulnerability[1], it is
-possible for a specific flavor of SEV+ to be disabled by the firmware even
-when the flavor is fully supported by the CPU and platform:
+sched_ext already uses rhashtable under raw_spinlock_t and is technically
+broken, though hard to hit in practice because the tables stay small.
 
-  Applying mitigation CVE-2025-48514 will result in disabling SEV-ES when
-  SEV-SNP is enabled.
-
-Restrict KVM's set of supported VM types based on the VM types that are
-fully supported by firmware to avoid over-reporting what KVM can actually
-support.  Like KVM's handling of ASID space exhaustion, don't modify KVM's
-CPUID capabilities, as the CPU/platform still supports the underlying
-technology and clearing e.g. SEV_ES while advertising SEV_SNP would confuse
-KVM and userspace.
-
-Link: https://www.amd.com/en/resources/product-security/bulletin/amd-sb-3023.html [1]
-Link: https://lore.kernel.org/all/aZyLIWtffvEnmtYh@google.com
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
-[sean: rewrite changelog to provide details on why/how this can happen]
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+Cc: stable@vger.kernel.org # prerequisite for the next sched_ext fix
+Signed-off-by: Tejun Heo <tj@kernel.org>
 ---
- arch/x86/kvm/svm/sev.c | 1 +
- 1 file changed, 1 insertion(+)
+Hello,
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 0971cf652b0b..ab386aa0c284 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -3202,6 +3202,7 @@ void __init sev_hardware_setup(void)
- 		vm_types |= BIT(KVM_X86_SEV_ES_VM);
- 	if (sev_snp_supported)
- 		vm_types |= BIT(KVM_X86_SNP_VM);
-+	vm_types &= sev_firmware_supported_vm_types();
- 
- 	kvm_caps.supported_vm_types |= vm_types;
+The follow-up sched_ext patch is a fix targeting sched_ext/for-7.1-fixes
+which I'd like to send Linus's way sooner than later. Would it be okay
+to route both patches through sched_ext/for-7.1-fixes? If you'd prefer
+to route the rhashtable change differently, that works too. Please let
+me know, thanks.
+
+Based on linus/master (3cd8b194bf34).
+
+ include/linux/rhashtable-types.h | 2 ++
+ include/linux/rhashtable.h       | 5 ++++-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/include/linux/rhashtable-types.h b/include/linux/rhashtable-types.h
+index 015c8298bebc..555eea6077f8 100644
+--- a/include/linux/rhashtable-types.h
++++ b/include/linux/rhashtable-types.h
+@@ -50,6 +50,7 @@ typedef int (*rht_obj_cmpfn_t)(struct rhashtable_compare_arg *arg,
+  * @max_size: Maximum size while expanding
+  * @min_size: Minimum size while shrinking
+  * @automatic_shrinking: Enable automatic shrinking of tables
++ * @no_sync_grow: Skip sync grow on insert (allows inserts under raw_spinlock_t)
+  * @hashfn: Hash function (default: jhash2 if !(key_len % 4), or jhash)
+  * @obj_hashfn: Function to hash object
+  * @obj_cmpfn: Function to compare key with object
+@@ -62,6 +63,7 @@ struct rhashtable_params {
+ 	unsigned int		max_size;
+ 	u16			min_size;
+ 	bool			automatic_shrinking;
++	bool			no_sync_grow;
+ 	rht_hashfn_t		hashfn;
+ 	rht_obj_hashfn_t	obj_hashfn;
+ 	rht_obj_cmpfn_t		obj_cmpfn;
+diff --git a/include/linux/rhashtable.h b/include/linux/rhashtable.h
+index 0480509a6339..a977a597d288 100644
+--- a/include/linux/rhashtable.h
++++ b/include/linux/rhashtable.h
+@@ -197,11 +197,14 @@ static inline bool rht_shrink_below_30(const struct rhashtable *ht,
+  * rht_grow_above_100 - returns true if nelems > table-size
+  * @ht:		hash table
+  * @tbl:	current table
++ *
++ * Returns false if the caller opted out of synchronous grow.
+  */
+ static inline bool rht_grow_above_100(const struct rhashtable *ht,
+ 				      const struct bucket_table *tbl)
+ {
+-	return atomic_read(&ht->nelems) > tbl->size &&
++	return !ht->p.no_sync_grow &&
++		atomic_read(&ht->nelems) > tbl->size &&
+ 		(!ht->p.max_size || tbl->size < ht->p.max_size);
+ }
  
 -- 
-2.54.0.rc1.513.gad8abe7a5a-goog
+2.53.0
 
