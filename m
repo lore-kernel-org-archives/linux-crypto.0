@@ -1,102 +1,188 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46B5B30EF9A;
-	Fri, 17 Apr 2026 08:51:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BD1D3264D0
+	for <linux-crypto@vger.kernel.org>; Fri, 17 Apr 2026 09:22:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776415875; cv=none; b=fIoKHONgk/QQYfoioYjTdQiUAGR5hcfqgeGNOJcOMwpporwFvb5ZXoPiihif1idcj5HgHU8FYHBni2WeXcUjAqI/9TK46DFdHCa6Cz2nsN/3lKZUIJ+DCSuiQF/OjslA6jIKq2SRQ+vkAuTWGCcTtlNNQSx6t/taPUS4W43ikf4=
+	t=1776417762; cv=none; b=qYiQTQNYspT71HGeZrZe84l510p3xtFtx5WEAGFcyNFXFQTvgeSQkXxfRnhH5btEcvZe95fUCGA5nVglfWw7xXShG91eJ9hIC2DlCjrhvargQh0VAVBayT1tT4LGfQWtEFi3f/FNWmXHhHcdDPon6hZ4X7aYyfrJFP2XREMjils=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776415875; c=relaxed/simple;
-	bh=ap+iXnWzakfIDboCoMGop07jDR538iwW3lzR/z/Ukto=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gi9lrJ5dncVWD4rAT0erR5kI13pTZp2s2vMBgGSaNz5Ywik+9ucP2JM6F2idQ5jW2hN7bIYqm1Dsj9q4YXvEvA44l1WDmXgabIMQepOpyjxAvDHiFOwN683Fk+8Dq7GcpXGvZsMhAcq56ntmlYh/rDkbPdn+XFm8wxbXAGGlH8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=NLbl3szX; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1776417762; c=relaxed/simple;
+	bh=O3zila/ZzXdCtVZV3F/hDT17khok2Nbf5KQ4nJluz7k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ej991totoBgsY3/v21bdcVx1FLL3i/eoW6QkxGv3VgkD8C0nBo4qDsNt0hkiIbxYuf1VdzEyKHNvxR9hSLo4dR+jTcHB57J/wXAg/NP2IKy8jR1el6lvYs/Y/MvetVN5fUdVSEbJrT07HlZaxB/KZl0QvJTBPizj9UNW4mFssYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=kMwJZvYD; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=MXQM6pCp; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="NLbl3szX"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=bcgvDmk0eRSEBtf4w4nfStWl+xXgTzkVjH73x7l3Iho=; 
-	b=NLbl3szXYigwajWBMBk1IMeSwXSzaEdbiSwQ9105jBZ9fAJRVytgo5cQ5qymE4LhHOsEBsCEf9P
-	G3o3aSO6/xvwaFln4OIyw0TbBQZAGeLGH5Ohlgq0ES3TyPtngfaD/Efg/HfRCVedkcsUy9IvVLk1v
-	t67vlff3MndPh5bY+HN9BwPRZCeygnV3tf7amRPjDEK+MWKqs1bCuj+BXzdGU9a6c6XIeqKFlmN21
-	MFO1WZ2zcjOaLQm4aD70k5+Lo4bp166kUU89C6zvQ7NJcHc3qTZOBpvhbFEqR2Q+FnLarCsuCSajp
-	28Ry/kgp9/aodpJBcTgtNGWeWkTVeAKmdSWg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wDeuk-006lSW-1D;
-	Fri, 17 Apr 2026 16:51:03 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Apr 2026 16:51:02 +0800
-Date: Fri, 17 Apr 2026 16:51:02 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
-	Laurent M Coquerel <laurent.m.coquerel@intel.com>,
-	Wojciech Drewek <wojciech.drewek@linux.intel.com>,
-	Andy Shevchenko <andriy.shevchenko@intel.com>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] crypto: acomp - fix wrong pointer stored by
- acomp_save_req()
-Message-ID: <aeH0djDrciHmaySt@gondor.apana.org.au>
-References: <20260324180721.120175-1-giovanni.cabiddu@intel.com>
- <ac8NYE0XsniCvNSk@gondor.apana.org.au>
- <aeEXNL2CH8njXY0Q@gcabiddu-mobl.ger.corp.intel.com>
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="kMwJZvYD";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="MXQM6pCp"
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63H80YWe065744
+	for <linux-crypto@vger.kernel.org>; Fri, 17 Apr 2026 09:22:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	618EE27hGTuXzJEXrKjDPcINKm+g78qgGdhJxKekRlk=; b=kMwJZvYD4S0IeblN
+	lVfexvLKXpNDL/UCANmOpZhhSKEjyW24uEbRb1AuNNiqfgtWcva8avaEF+r1eqsq
+	3mYcS6iNLduSsSHskOKYIw8PUhqSiAOm6a6UM11b4ZWHUBbD4ZiEn3fvYPzDDPmZ
+	EZRh97CcMsVWDIpZQugeRZLGUUrv+5/AqmIaQiKl5ZdCVnZsn1oF+X+yI+4OXi7O
+	IOZFOPn/2vcYw2yKUFtKGsxnm4G6n86DgMZAfAnvmGTjQA+OCyrkEXHftmcliRC1
+	QV9bK3Lkwf8e1ll7whTdosE2L76Bm0tmlmqgpv4r1QwHbRjR9UzykJvvk6s0CeA5
+	yHKdSw==
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com [209.85.215.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4dk3af31fj-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Fri, 17 Apr 2026 09:22:39 +0000 (GMT)
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-b6097ca315bso800052a12.3
+        for <linux-crypto@vger.kernel.org>; Fri, 17 Apr 2026 02:22:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1776417759; x=1777022559; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=618EE27hGTuXzJEXrKjDPcINKm+g78qgGdhJxKekRlk=;
+        b=MXQM6pCpHIpYbydJ/rvqeybsWPrxeavjf2C6Zrudfln3VzA9e7KMDH9Vy71xvK8p8S
+         3gBtq9S4XwssNXIB8mS/uiVOOVvXDM9A5W9pug/uEYO4RKImP9MC+CUPHT/F/BxDAXXF
+         z9cidh6IZzBma7ndPhJtr+8yL2UQIFrtPQ/8cCmAV4eMYqZptxKgXSUzHXEXFbx4d8wk
+         iG2x2eRS/74T8WHFiXEayL2kkPtTKEuCh3DqI+jlqIsOcwYEXIsfHd7UKzI7h5Gc4Ur0
+         mBwO4MvLAHgr1+6od/B8UoeLK1xqju37BHX+IDZKhXsG9ovqTnd1Jdl1kHcN6iSsUh/f
+         f9JA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1776417759; x=1777022559;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=618EE27hGTuXzJEXrKjDPcINKm+g78qgGdhJxKekRlk=;
+        b=mzadZBDGmD4V7veBreTWPj9pU082MmKnVEQccsYmNCLS4hO7pX7O8OcfvSrpYWs2kn
+         OMepTWynLi0aV6bz+zxIVo1+7TI789SGclJOEWiDrWf+0ozpusrCAsjrwyTE96tkeDmD
+         XUou+6PuwlScNX6g3CnjAqZLPr0xmLvsIXbpAb6NhVW5Pz9S5/usuraTyL85g4nfwwgb
+         6fu7ozP6QEwxYmHXwUC6148xa4oynTZs4QNRSyJQPH7oheZFE1H7OsN0+HLJa9AAiNmL
+         +ek5jz6/nUSZ2+PilPguTv7b4VArmJSKLc4MVr+4xpBRF/yKWKq522SlJbNUzsdbJCcj
+         mdXA==
+X-Forwarded-Encrypted: i=1; AFNElJ/tmVUzwu6gjWDVEae5slPm+Rc6hAmiKBZGA5fQZg9q9/cczxdEhpVmevgI1xwtDlP4MpTMcG3uiif129k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwEUFEuUd2pAHr6uT0SqHif9X68pG0uPSJjYvdmS2xHvTZUvEOj
+	BScZebxQ7W0f8Hoz41vJW+bTT+KfTkLxcTmJpQ0qELywhOmQbrB5FVae7YkIurymjkdf6uFI+Xd
+	wUiAkQ2ipbdXzqWPOUn5krCiQDUwjvDaA4kPnpQfn8eJDVwbgz9deMFWWXmF4U9wg4p8=
+X-Gm-Gg: AeBDieswxUjUX4jL0uiN+fAQgxpPrWv5wX+T0Y1X0t56Byoz9L7d5nnOLmHe2KYM/f8
+	fEXh9qcspRTLYdKhFl+/xBI4798lXdiQM3T32MBRHGtXKkcZHofDZGZyg7brco9+7Ntvi+KtBdP
+	1Jzz2FdoAn+steEQdHRIlUCdSFVVpWuHghTb7d5lJYtkT//e6/y8Pvps2UUVhr3zHyRXNU7qnxY
+	iFxcMbfOfaaha6K04Nldfptur9xSY6ClpD1ASOpaqwq6hObujhRIq0E1JFDDH++55qLMH/J1Qnu
+	kbAtHNFxmZAXOliPbEJInvUdA+/rgyYP04/JGAOEFnzbau4U788TgqFnDNrBkqKL/xRydl7YdsV
+	oAn3pVokFZbTV2dGlZGr3AV72b3Zk3S776onXPwwvqio0+h9kvXm/9GiyeSkZOA==
+X-Received: by 2002:a05:6a20:3d12:b0:398:8870:b58f with SMTP id adf61e73a8af0-3a08d6eec7dmr2234610637.14.1776417759048;
+        Fri, 17 Apr 2026 02:22:39 -0700 (PDT)
+X-Received: by 2002:a05:6a20:3d12:b0:398:8870:b58f with SMTP id adf61e73a8af0-3a08d6eec7dmr2234588637.14.1776417758576;
+        Fri, 17 Apr 2026 02:22:38 -0700 (PDT)
+Received: from [10.217.223.121] ([202.46.22.19])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c797703be34sm964756a12.26.2026.04.17.02.22.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Apr 2026 02:22:38 -0700 (PDT)
+Message-ID: <b8f781b0-f7ba-407e-8603-ca504535a894@oss.qualcomm.com>
+Date: Fri, 17 Apr 2026 14:52:32 +0530
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aeEXNL2CH8njXY0Q@gcabiddu-mobl.ger.corp.intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] arm64: dts: qcom: glymur: Add crypto engine
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+        Thara Gopinath <thara.gopinath@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Cc: Neeraj Soni <neeraj.soni@oss.qualcomm.com>,
+        Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
+        Abel Vesa <abel.vesa@oss.qualcomm.com>, linux-arm-msm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20260416-glymur_crypto_enablement-v1-0-75e768c1417c@oss.qualcomm.com>
+ <20260416-glymur_crypto_enablement-v1-2-75e768c1417c@oss.qualcomm.com>
+ <653fc8bb-295f-4f1d-b9ac-a33e0d8a933b@oss.qualcomm.com>
+Content-Language: en-US
+From: Harshal Dev <harshal.dev@oss.qualcomm.com>
+In-Reply-To: <653fc8bb-295f-4f1d-b9ac-a33e0d8a933b@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDE3MDA5MyBTYWx0ZWRfX9bT7A80BjkAR
+ zGrYIMF7vQQ1jpeRbX5AyTM/f4NYgZTg0iHvtoxKISgIVVVu9+5oQ8+P0oepXXuk5yTY/mhdByz
+ 4geOlxkeSpDEMnP87ixzqQglQ53Leav0xikQ860sKRYw7UFCisBSBvMsTxb8bKuQgqr8xPj079x
+ d4j+Zumc5Cot2G9wSaNugbkHtxVmTjoVtP03hjCr6+daGreOZuDb/IP8I3m0k6/upn4rHbTmwjK
+ f/p1Pd8RQXPA8jvVVY4X1f/2NdrwWs69zHD2Sk+UfcTMS4Qoew0yqaoca/3C65XNTMg6ZbZIFq0
+ vmRCBj3eK5LI31MouJ/UQCNWyXvWztyQcTU6OTLIcgWcPjr8c9GwbdEJvvWLpf60kyXCd9knBSI
+ qfFpILB+Ualk/XvHiaJkyFF2gCNP7I4G/QDI1EsPYj7FAr4Hlx+gQ/+JM5fVq8I7l3uVuv6euxw
+ CVBLDI15th/RR6its9A==
+X-Proofpoint-ORIG-GUID: 6pE3cKebsMLm6pXbES1TGyUoFKn9E5Zx
+X-Proofpoint-GUID: 6pE3cKebsMLm6pXbES1TGyUoFKn9E5Zx
+X-Authority-Analysis: v=2.4 cv=DfInbPtW c=1 sm=1 tr=0 ts=69e1fbdf cx=c_pps
+ a=Qgeoaf8Lrialg5Z894R3/Q==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
+ a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yOCtJkima9RkubShWh1s:22
+ a=EUspDBNiAAAA:8 a=RzAiLgmaXtKTj2OvRzIA:9 a=QEXdDO2ut3YA:10
+ a=x9snwWr2DeNwDh03kgHS:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-16_04,2026-04-16_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 adultscore=0 clxscore=1015 priorityscore=1501 phishscore=0
+ lowpriorityscore=0 malwarescore=0 bulkscore=0 spamscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2604070000 definitions=main-2604170093
 
-On Thu, Apr 16, 2026 at 06:07:00PM +0100, Giovanni Cabiddu wrote:
->
-> acomp_save_req() stores &req->chain in req->base.data. When
-> acomp_reqchain_done() is invoked on asynchronous completion, it receives
-> &req->chain as the data argument but casts it directly to struct
-> acomp_req. Since data points to the chain member, all subsequent field
-> accesses are at a wrong offset, resulting in memory corruption.
-> 
-> The issue occurs when an asynchronous hardware implementation, such as
-> the QAT driver, completes a request that uses the DMA virtual address
-> interface (e.g. acomp_request_set_src_dma()). This combination causes
-> crypto_acomp_compress() to enter the acomp_do_req_chain() path, which
-> sets acomp_reqchain_done() as the completion callback via
-> acomp_save_req().
-> 
-> With KASAN enabled, this manifests as a general protection fault in
-> acomp_reqchain_done():
-> 
->   general protection fault, probably for non-canonical address 0xe000040000000000
->   KASAN: probably user-memory-access in range [0x0000400000000000-0x0000400000000007]
->   RIP: 0010:acomp_reqchain_done+0x15b/0x4e0
->   Call Trace:
->    <IRQ>
->    qat_comp_alg_callback+0x5d/0xa0 [intel_qat]
->    adf_ring_response_handler+0x376/0x8b0 [intel_qat]
->    adf_response_handler+0x60/0x170 [intel_qat]
->    tasklet_action_common+0x223/0x820
->    handle_softirqs+0x1ab/0x640
->    </IRQ>
-> 
-> Fix this by storing the request itself in req->base.data instead of
-> &req->chain, so that acomp_reqchain_done() receives the correct pointer.
-> Simplify acomp_restore_req() accordingly to access req->chain directly.
-> 
-> Fixes: 64929fe8c0a4 ("crypto: acomp - Remove request chaining")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> ---
->  crypto/acompress.c | 8 +++-----
->  1 file changed, 3 insertions(+), 5 deletions(-)
+Hi,
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+On 4/16/2026 7:10 PM, Konrad Dybcio wrote:
+> On 4/16/26 3:07 PM, Harshal Dev wrote:
+>> On Glymur, there is a crypto engine IP block similar to the ones found on
+>> SM8x50 platforms.
+>>
+>> Describe the crypto engine and its BAM.
+>>
+>> Signed-off-by: Harshal Dev <harshal.dev@oss.qualcomm.com>
+>> ---
+>>  arch/arm64/boot/dts/qcom/glymur.dtsi | 26 ++++++++++++++++++++++++++
+>>  1 file changed, 26 insertions(+)
+>>
+>> diff --git a/arch/arm64/boot/dts/qcom/glymur.dtsi b/arch/arm64/boot/dts/qcom/glymur.dtsi
+>> index f23cf81ddb77..e8c796f2c572 100644
+>> --- a/arch/arm64/boot/dts/qcom/glymur.dtsi
+>> +++ b/arch/arm64/boot/dts/qcom/glymur.dtsi
+>> @@ -3675,6 +3675,32 @@ pcie3b_phy: phy@f10000 {
+>>  			status = "disabled";
+>>  		};
+>>  
+>> +		cryptobam: dma-controller@1dc4000 {
+>> +			compatible = "qcom,bam-v1.7.4", "qcom,bam-v1.7.0";
+>> +			reg = <0x0 0x01dc4000 0x0 0x28000>;
+>> +			interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
+>> +			#dma-cells = <1>;
+>> +			iommus = <&apps_smmu 0x480 0x0>,
+>> +				 <&apps_smmu 0x481 0x0>;
+> 
+> It seems like these aren't the right SIDs on this platform.. Have you
+> tested this patch on hw?
+
+Thanks a lot for catching this Konrad. The correct SID pairs are <0x80 0x0> and <0x81 0x0>.
+(I hope I don't need to pad them?)
+
+Unfortunately, I could only validate driver probe on my limited ramdisk environment:
+
+[    4.583802] qcrypto 1dfa000.crypto: Crypto device found, version 5.9.1
+
+I was waiting for Wenjia to run the full crypto user-space test suite once. I'll update the
+SIDs and wait for a Tested-by from him.
+
+Regards,
+Harshal
+
+> 
+> Konrad
+
