@@ -1,30 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7AF033260B;
-	Fri, 17 Apr 2026 06:57:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BEF736D51D;
+	Fri, 17 Apr 2026 06:57:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776409074; cv=none; b=myNVvHrFypvyWsGQZq9Rk7LFGlqnHJUNi6C1GMk3yjZHh6tbSxUMSzKMSg+na5Jugoh/PirJtqpAjHkDwPvlodY993PM/8ZnemaBXQYhLLvD7s6eBGa7Xn30ZGKSrB/JjdapWdFPKH414N1I+jlc4UQLRy7gsrjkgAYO+oJDvGs=
+	t=1776409075; cv=none; b=rXTkmTNuWfuOPQAqjbtajA0c9Oezhl7/Z78TEC0/Eqt36c3SJShFxx/y/8QdKeY2HjQjXe+aljjHtBUNAMFvg89BZtGJKce9UlJslZ1H4El65vLnNFQEUY118RMIRMsZkDzGg9wTw3X3JiKDLKTSNoOnKaC0jSpKpXbM0RU3p1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776409074; c=relaxed/simple;
-	bh=1neoicsm+sAaMjF/qdatKdX/YHOR+mGOwg+8+PbRhds=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Gw7SVRrjaRwV7FKR99TegW4LE+Duj3qAHrFUVnrZZaySJIYgS3OnAUJu8mJDfSRyi+U8IrmJu7gYAdtsxXad1dyF/vXMVgf6OWaLZt02JmEezM1tXsB1H0ycgMjD8T2eDKcTtIY53yXgPCPRvZeYlYJ6TaA/c972A0Eawrtr8ic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uEUg8B7P; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776409075; c=relaxed/simple;
+	bh=1pn8XGi6lKw0Bve1bbYGGWLCv35x/ywkE1kaA1Lwpzw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=CPKY0O0Ku3V7UplPFvjRNL8niGGqAKSnk3wN7KEQFB3J/sL4LoAg0F56botBFQth9KMWglb828qWxhs3wgNh1MeiBCxr7xnkMgMYBzasGZBh//rvNw8GzWKkCW+vBWxQP9XE4PLWgqCJ+fmOJxb0uilmul8TMUD7wVHmE+kvxFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b+9uFmbO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uEUg8B7P"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2536EC19425;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b+9uFmbO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95133C2BCB5;
 	Fri, 17 Apr 2026 06:57:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1776409074;
-	bh=1neoicsm+sAaMjF/qdatKdX/YHOR+mGOwg+8+PbRhds=;
-	h=From:To:Cc:Subject:Date:From;
-	b=uEUg8B7PoDNVmzwaTjA0PXCsTLTAA052tMZNxY8Qj5avl5tHv47sPEU0tGwsu3XSW
-	 o4eJLj9KYJvsYADX4rv7BW65bghCcUATX/7TEgqsVXN5w0o+PRcNdAvXpIWlq1vV7C
-	 nVskYsEzDIm9h47UYdi8DBvqc8YmwiZWZc1UeNOiWx3ij5VQ1eRWIHYRLB1cuJZGK7
-	 ZF7vp41vrJv5XXd6yZt1Lqrh4+l749BsuhCUUv6hxXzruohhoFS/KJelPvUL1wW7F7
-	 KmHDt6x6q6nlAKFKpMacaigwfxPV9esT3WsZKyzqX+tjNkxJ2EG0VLPEHUAwpir4XW
-	 OPizHj3TzOrrg==
+	bh=1pn8XGi6lKw0Bve1bbYGGWLCv35x/ywkE1kaA1Lwpzw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=b+9uFmbO9jMFwR/rwIMH6MU9m9GI22/yJLrkQ+h73lWaNyIR4y9F+d80+IvWRshiD
+	 kDy/sj4Xf1PqiGmAdmPtqJLljY2w7eiIh4TF2x5f+UcCjbtbMQ3PN+KFrdO6Y4AO52
+	 e2XNk1jqmreI0kM7wCFfG05b0O4lsWFi4St1vNLdL6cjNtQ69FFfQqb8xi7PZTcJks
+	 9zImnZryY735PltYuCGdCSu+8dFEm4UNpQp5uGhc3jdxMC2O0xVmmogGGzLn/KyHhY
+	 63tRiKZqgPJYbkaUyov1MVvFx2uIWMo9GaR2/8Yp/30a5nCYi5Qfb+7FATRujCrZZv
+	 poqaBj6M8daxg==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -36,10 +37,12 @@ Cc: linux-kernel@vger.kernel.org,
 	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
 	Randy Dunlap <rdunlap@infradead.org>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 0/2] Improve the crypto library documentation
-Date: Thu, 16 Apr 2026 23:55:27 -0700
-Message-ID: <20260417065529.64925-1-ebiggers@kernel.org>
+Subject: [PATCH 1/2] docs: kdoc: Expand 'at_least' when creating parameter list
+Date: Thu, 16 Apr 2026 23:55:28 -0700
+Message-ID: <20260417065529.64925-2-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260417065529.64925-1-ebiggers@kernel.org>
+References: <20260417065529.64925-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -48,33 +51,45 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-While the crypto library already has a lot of kerneldoc, it's not being
-included in the HTML or PDF documentation.  Update Documentation/crypto/
-to include it, and also add a high-level overview of the library.
+sphinx doesn't know that the kernel headers do:
 
-I'd like to take this series via the libcrypto tree for 7.1.
+    #define at_least static
 
-Eric Biggers (2):
-  docs: kdoc: Expand 'at_least' when creating parameter list
-  lib/crypto: docs: Add rst documentation to Documentation/crypto/
+Do this replacement before declarations are passed to it.
 
- Documentation/crypto/index.rst                |   2 +-
- .../crypto/libcrypto-blockcipher.rst          |  19 ++
- Documentation/crypto/libcrypto-hash.rst       |  86 +++++++++
- Documentation/crypto/libcrypto-signature.rst  |  11 ++
- Documentation/crypto/libcrypto-utils.rst      |   6 +
- Documentation/crypto/libcrypto.rst            | 167 ++++++++++++++++++
- Documentation/crypto/sha3.rst                 |   2 +
- tools/lib/python/kdoc/kdoc_parser.py          |   5 +
- 8 files changed, 297 insertions(+), 1 deletion(-)
- create mode 100644 Documentation/crypto/libcrypto-blockcipher.rst
- create mode 100644 Documentation/crypto/libcrypto-hash.rst
- create mode 100644 Documentation/crypto/libcrypto-signature.rst
- create mode 100644 Documentation/crypto/libcrypto-utils.rst
- create mode 100644 Documentation/crypto/libcrypto.rst
+This prevents errors like the following from appearing once the
+lib/crypto/ kerneldoc is wired up to the sphinx build:
 
+   linux/Documentation/crypto/libcrypto:128: ./include/crypto/sha2.h:773: WARNING: Error in declarator or parameters
+Error in declarator or parameters
+Invalid C declaration: Expected ']' in end of array operator. [error at 59]
+  void sha512_final (struct sha512_ctx *ctx, u8 out[at_least SHA512_DIGEST_SIZE])
 
-base-commit: 3cd8b194bf3428dfa53120fee47e827a7c495815
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ tools/lib/python/kdoc/kdoc_parser.py | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/tools/lib/python/kdoc/kdoc_parser.py b/tools/lib/python/kdoc/kdoc_parser.py
+index 74af7ae47aa47..f982db7fddac2 100644
+--- a/tools/lib/python/kdoc/kdoc_parser.py
++++ b/tools/lib/python/kdoc/kdoc_parser.py
+@@ -437,10 +437,15 @@ class KernelDoc:
+ 
+         for arg in args.split(splitter):
+             # Ignore argument attributes
+             arg = KernRe(r'\sPOS0?\s').sub(' ', arg)
+ 
++            # Replace '[at_least ' with '[static '.  This allows sphinx to parse
++            # array parameter declarations like 'char A[at_least 4]', where
++            # 'at_least' is #defined to 'static' by the kernel headers.
++            arg = KernRe(r'\[at_least ').sub('[static ', arg)
++
+             # Strip leading/trailing spaces
+             arg = arg.strip()
+             arg = KernRe(r'\s+').sub(' ', arg, count=1)
+ 
+             if arg.startswith('#'):
 -- 
 2.53.0
 
