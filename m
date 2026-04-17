@@ -1,36 +1,36 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E901A682C;
-	Fri, 17 Apr 2026 01:11:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E33AC15A864;
+	Fri, 17 Apr 2026 01:22:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776388289; cv=none; b=cK2URNwOY0Zw0JcZjzRl2g8ph9BDYueCtLzL2iuE0WutcaPq+ui1ECThmrTNWsfQph3YMuNrE/E/QjZngxMi1uLOb5EaFGk1tzoLki1R1LRU0El+5l4Ip86OtFw7ovUrijRGLkPFbvE9w11NC+k5kXHH3iNrJexvlpmltRgOwyk=
+	t=1776388947; cv=none; b=tbf8NrRt5rfBOOEIM2q/XGmkfup/Y16m8NWfCzUUgdE6Emwi2dGTDprJPI1fn9dWX4mvRx2vtiT4z1aXjrSw090qq5lfPZxAZVkh4TXFnkzAmqU0+hTVkVHbKcjcvU0B8NDx63yHcf5osA19G0LnfWccj9E9NmUcG1XwFaYf7Zc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776388289; c=relaxed/simple;
-	bh=WMSMos5iVbUo0mZwfTJOl5aWrEDlEy5VqJeLIp3vp1I=;
+	s=arc-20240116; t=1776388947; c=relaxed/simple;
+	bh=CG/NCwO+nPOC20Kz0LGE7rqG2F59/6JWtxYLDPHWBXI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t4CkvcDlwDKpPhL9O6DGOphMi9NY4D3xdoxoouklLJFL3wjQZp9LbKqIjIE+8NQExlXhzqFXHZpRg5PQWMLQq21X9g2NoDapmKA0R49gtaO7EABe0tK22vKXA19PtFnWcn0uaoil15Q8Hf704axDB7pnnWWf0SED1nPsYpd8BT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=nO19NUGo; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=PTWJiRX7e8AsuV0G0WGzH7AIYRkXL1eFl2qg4joXeG47JPIhdH6OHfNUtXUz25MoAupxvYP0dhL0ZOd2qI9Wa+06WmTDN4Ng9O36EQLGkqPLGwCYl2/2xN0XriAQ5YnJ0iQf88RK1kKnTyJPumrZDpmPiytiRW19sTXUesAbANQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=YzXAvkC/; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="nO19NUGo"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="YzXAvkC/"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=jiH9B4PEmmh2Yk95Os0y6miFjBZpZjOMuVtNsfFJLlE=; 
-	b=nO19NUGoRksLkXsDGvp7ABK27LOtxeLoKjDczc26MH9n3fh9NG5jcXWnvnxEEhD96LEoVUwjuvJ
-	JbMwZQJXzhEW0CpSKAeVOlBvaDvGcshbFwdC/NHBvILFBbzG5i9eqXWk3YbYEgb80vbEP0+RR0prp
-	LuMX0PV6k6a0XOXvOyjuVLntIWjfDNj4wpEgQo26VsZANSE5/TT661eyW7lY+dXDUBKqXEPYKLAE/
-	hEaGi1CiYvNMf5kzS4R5Etcl/pWKHCmIU85n7g5Kj4XiD8XFAAn0n3pY5GdKmhgLA7R4WdAZVIWCE
-	SgYrZy77EoDSgA7WiHqt4YWykUYy+/p8g8gw==;
+	from:content-type:reply-to; bh=A8ox5tavZ4O1d/3nbNfsxMmrke14ukZABfXa6XYclBE=; 
+	b=YzXAvkC/aTuN6hcOqY0BSZbC0igguEt+AqnOjbpOeHIab9+hOWLFFunPIJnVkOgjqQE7IhAQ5hu
+	WjbI50xqezJBXyxwl/9LL7BLjbzY3S6bBp2HqcYGMlfPHaq3kZUXN7fSxZC+U68VfnNFI2c1ltA6o
+	T3Dvhqf55vk0vAS7jbT4jiQ9THh/zM/t9koLOmTM3CDqwRqDhAXqat+/OwMuUbfab06TZ4FR5t6jG
+	kjHwFjrZ5B3qhqpMaoHOdI/+Uoe2JkvhIkykWq1UTKec72oWTIkz7hIrNNtl9GQcPKevyV01B+XN9
+	ZPRyf1kxFzZz6Mfa9X/gMPyDie4vCJqKfG8Q==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wDXjk-006gpl-26;
-	Fri, 17 Apr 2026 09:11:13 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Apr 2026 09:11:12 +0800
-Date: Fri, 17 Apr 2026 09:11:12 +0800
+	id 1wDXuN-006gxx-21;
+	Fri, 17 Apr 2026 09:22:12 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Apr 2026 09:22:11 +0800
+Date: Fri, 17 Apr 2026 09:22:11 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: Tejun Heo <tj@kernel.org>
 Cc: Thomas Graf <tgraf@suug.ch>, David Vernet <void@manifault.com>,
@@ -38,12 +38,11 @@ Cc: Thomas Graf <tgraf@suug.ch>, David Vernet <void@manifault.com>,
 	Changwoo Min <changwoo@igalia.com>,
 	Emil Tsalapatis <emil@etsalapatis.com>,
 	linux-crypto@vger.kernel.org, sched-ext@lists.linux.dev,
-	linux-kernel@vger.kernel.org
+	linux-kernel@vger.kernel.org, Florian Westphal <fw@strlen.de>,
+	netdev@vger.kernel.org
 Subject: Re: [PATCH for-7.1-fixes 1/2] rhashtable: add no_sync_grow option
-Message-ID: <aeGIsGi9fBqu9EZT@gondor.apana.org.au>
+Message-ID: <aeGLQ2X_svzH_00M@gondor.apana.org.au>
 References: <20260417002449.2290577-1-tj@kernel.org>
- <aeGCMkdg5Fgv8UMS@gondor.apana.org.au>
- <aeGElQ-TcCclEHwo@slm.duckdns.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,30 +51,24 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aeGElQ-TcCclEHwo@slm.duckdns.org>
+In-Reply-To: <20260417002449.2290577-1-tj@kernel.org>
 
-On Thu, Apr 16, 2026 at 02:53:41PM -1000, Tejun Heo wrote:
+On Thu, Apr 16, 2026 at 02:24:48PM -1000, Tejun Heo wrote:
 > 
-> Oops, that's a mistake. I meant GFP_ATOMIC kmalloc allocation. kmalloc uses
-> regular spin_lock so can't be called under raw_spin_lock. There's the new
-> kmalloc_nolock() but that means even smaller reserve size, so higher chance
-> of failing. I'm not sure it can even accomodate larger allocations.
+> The follow-up sched_ext patch is a fix targeting sched_ext/for-7.1-fixes
+> which I'd like to send Linus's way sooner than later. Would it be okay
+> to route both patches through sched_ext/for-7.1-fixes? If you'd prefer
+> to route the rhashtable change differently, that works too. Please let
+> me know, thanks.
 
-We should at least try to grow even if it fails.
+As I said earlier, we should work out if this is really needed or
+not.
 
-> Another aspect is that for some use cases, it's more problematic to fail
-> insertion than delaying hash table resize (e.g. that can lead to fork
-> failures on a thrashing system).
+But if it is needed, we did have this feature before.  It's called
+insecure_elasticity which was removed because we moved all its users
+off to better solutions.
 
-rhashtable is meant to grow way before you reach 100% occupancy.
-So the fact that you even reached this point means that something
-has gone terribly wrong.
-
-Is this failure reproducible?
-
-I had a look at kernel/sched/ext.c and all the calls to rhashtable
-insertion come from thread context.  So why does it even use a
-raw spinlock?
+We can always bring it back.
 
 Cheers,
 -- 
