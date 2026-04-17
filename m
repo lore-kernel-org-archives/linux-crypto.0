@@ -1,49 +1,46 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 042562253EB;
-	Fri, 17 Apr 2026 16:25:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3EC3239E7D;
+	Fri, 17 Apr 2026 17:42:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776443124; cv=none; b=taepZbrpTUep9Q7f2cU1sVHCtoou03FcYaCoRyRSwGH5kQbsBP5fcsqfZeI375AfY+xXcZ6/Cu/TXRhiP6iyT+JeP2dgmqrba6df8m7wEZDJdEZzH1Eb6nruPM8djr1tJZzkz77cc/IdTf5C8K7luCTajsG/BeRJOAFftuPsYp8=
+	t=1776447733; cv=none; b=CW80dozWuliTTI1hNIfu5hq2yYmgiK4muarPR5sC9Znr3Zd6+ST1B0UhCXYR1ICN1CHPKCtqz4bxGhXVhKKArlUGHiwo1mx0VXE63JImYlByOQqTR3pRKzCReL3CSIMrER7y3m7NTqvLSer+3BF5uMGwdmbP8L/+oXsLMVrLXy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776443124; c=relaxed/simple;
-	bh=E2r7+QJxXsHvtNOiZs+GhSrcgo3S7clUPj5gQzOlWEk=;
+	s=arc-20240116; t=1776447733; c=relaxed/simple;
+	bh=C/PEZD3fW8Z9QLLtFyuySoodXudScC97LdjE3jvGC90=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=moL+hqzAuEcZsMK+ls+PIT9i8owViF/nJPVXj38bW+An/TEFyOgg7Pj4m51uYIS2Ch0bfAXH78uOI2Ch0fvce0XUf6vSo3nl1pk66E3RC6pPYJSYsqiEMvaJ2H/UkRXc8tvFxLKXAg/drGQmot4vmptyGL8oU/ajsxrhHtrSVYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fMHlKXNu; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=WVLtIpsOP7HQixM2xY/mcIkV4QbkVdb5K3FiVGg3W2qzMq9J1CnPpZ3qeApdqSTWEZuvH8thoT3c1iksIApZckBwRvGlKvCSXOV0m8Uq/ZScfjdPxqiMGxqImKx8KIFjhuNuYfUKfBvaB0qIilvYlELEmVbmuHwRYNrgAjr/O50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=kqp6HbX8; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fMHlKXNu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85641C19425;
-	Fri, 17 Apr 2026 16:25:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776443123;
-	bh=E2r7+QJxXsHvtNOiZs+GhSrcgo3S7clUPj5gQzOlWEk=;
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="kqp6HbX8"
+Received: by linux.microsoft.com (Postfix, from userid 1216)
+	id B551120B7128; Fri, 17 Apr 2026 10:42:12 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B551120B7128
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1776447732;
+	bh=wc3r1qGYePa1HSg0tIR7M/rjUWPQEGZdbGUyWIvYyck=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fMHlKXNuFWPuhqiqKWS2hY7vvt8mXLyRY+li/CuVElazlwL/JELRdgWT0oc0sYvZ+
-	 bNzS93W2ATr66NQTZniFfPfoejF8h3tR9QcqNLnf7o7Df38suxPEbtCMTrIM4uwHnh
-	 HbakjFGBt4KQhbaFOs/FaZrKcWAKrt0ISD3bDlgoMkfIzmYt3uN9SabXo9M9Tkirdy
-	 qrbnuSG/IOptOGCaYOGQzfxfgQTgIwPW6da5rsIFmX+3y0+oTsXBcTPeFAif3oENEB
-	 tQh9V65SLnQPxr5ulfeGBEN6H71vlPz7rjhFYB1nzQbIXgwpE+RTpI2wfR8VGEZDNz
-	 /xEdcyAcyOOqw==
-Date: Fri, 17 Apr 2026 06:25:22 -1000
-From: Tejun Heo <tj@kernel.org>
+	b=kqp6HbX82MGPYm5sQBOX0TlOiyX88uXPl/LGHQSknVV9qi7u3dU2v75z8YbLy9BQJ
+	 cSU32fpvvwT3zbTEUsiyjiwfNYcLqxLpCCMlqMKV1wg2aL4AW1JP7rEKohCFEeZSqi
+	 +Aa7mxZyXLJmvMtdAE0hs1CohpomSxxN1wl5Np4E=
+Date: Fri, 17 Apr 2026 10:42:12 -0700
+From: Hamza Mahfooz <hamzamahfooz@linux.microsoft.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Thomas Graf <tgraf@suug.ch>, David Vernet <void@manifault.com>,
-	Andrea Righi <arighi@nvidia.com>,
-	Changwoo Min <changwoo@igalia.com>,
-	Emil Tsalapatis <emil@etsalapatis.com>,
-	linux-crypto@vger.kernel.org, sched-ext@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Florian Westphal <fw@strlen.de>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH for-7.1-fixes 1/2] rhashtable: add no_sync_grow option
-Message-ID: <aeJe8oIyYUi-NtCQ@slm.duckdns.org>
-References: <20260417002449.2290577-1-tj@kernel.org>
- <aeGCMkdg5Fgv8UMS@gondor.apana.org.au>
- <aeGElQ-TcCclEHwo@slm.duckdns.org>
- <aeGIsGi9fBqu9EZT@gondor.apana.org.au>
- <aeHjjGEhlikSsxCX@slm.duckdns.org>
- <aeHmeAz-Z-Rx2MqX@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Jeff Barnes <jeffbarnes@linux.microsoft.com>,
+	Paul Monson <paul.monson@capgemini.com>
+Subject: Re: [PATCH] crypto: tstmgr - guard xxhash tests
+Message-ID: <aeJw9I38heQRbbe6@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20260407192859.270745-1-hamzamahfooz@linux.microsoft.com>
+ <adYNClYB6RY820Xl@gondor.apana.org.au>
+ <adffSYxKIuaDLZit@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <aeCmk6LbLFT4Keo2@gondor.apana.org.au>
+ <aeCnNsNrK5o2JcMu@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,40 +49,17 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aeHmeAz-Z-Rx2MqX@gondor.apana.org.au>
+In-Reply-To: <aeCnNsNrK5o2JcMu@gondor.apana.org.au>
 
-Hello,
-
-On Fri, Apr 17, 2026 at 03:51:20PM +0800, Herbert Xu wrote:
-> rhashtable originated in networking where it tries very hard to
-> stop the hash table from ever degenerating into a linked list.
-
-I see.
-
-> If your use-case is not as adversarial as that, and you're happy
-> for the hash table to degenerate into a linked-list in the worst
-> case, then yes it's aboslutely fine to not grow the table (or
-> try to grow it and fail with kmalloc_nolock).
-
-My use case is a bit different. I want a resizable hashtable which can be
-used under raw spinlock and doesn't fail unnecessarily. My only adversary is
-memory pressure and operation failures can be harmful. ie. If the system is
-under severe memory pressure, hashtable becoming temporarily slower is not a
-big problem as long as it restores reasonable operation once the system
-recovers. However, if the insertion operation fails under e.g. sudden
-network rx burst that drains atomic reserve, that can lead to fatal failure
-- e.g. forks failing out of blue on a busy but mostly okay system. I think
-this pretty much requires all hashtable growths to be asynchronous.
-
-> It's just that we haven't had any users like this until now and
-> the feature that you want got removed because of that.
+On Thu, Apr 16, 2026 at 05:09:10PM +0800, Herbert Xu wrote:
+> On second thought, fips_allowed should not mean that an algorithm
+> must be present.
 > 
-> I'm more than happy to bring it back (commit 5f8ddeab10ce).
+> So we should change it such that an -ENOENT is not fatal, or at least
+> when it's called from tcrypt.
+> 
 
-That'd be great but looking at the commit, I'm not sure it reliably avoids
-allocation in the synchronous path.
-
-Thanks.
-
--- 
-tejun
+It appears that commit 6318fbe26e67 ("crypto: testmgr - Hide ENOENT
+errors better"), already does exactly that and it appears to resolve the
+issue that I'm seeing. So, is there any reason it can't be backported to
+stable?
