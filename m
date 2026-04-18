@@ -1,52 +1,52 @@
-Received: from pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com [34.218.115.239])
+Received: from pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com [35.155.198.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 385821F4C8C;
-	Sat, 18 Apr 2026 00:24:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.218.115.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A0A1F4C8C;
+	Sat, 18 Apr 2026 00:25:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.155.198.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776471901; cv=none; b=uKS+xfBwfWizOq3wKa71BR+0ErVDBBUWntAilgt1oiVwtYoaG4zjqeI8ZJMFEexhwpiol7VNKLSFL8nfl+dp8dTsTNT635XFnMjNlcVkTY6HFiI+poig0IS7xjdXDPmgoWBE+n5Mhp2wTVkx0vbFV2af/Bhnt6wd/WO9+M9oiSg=
+	t=1776471919; cv=none; b=mCsWekDEW2RqZ/a7uvGuLlBoSlVlePhJqq3A5ry9T1qO69hFh5Tal1X0E9DmzQfmbNuM60uPUkraMHKNZV6mMfEfnMPB5iesWm5ANFfCTp2Z2MpyK5GMwNS8t2EntnIbaHr48PuPdU4LnFPhzHGofs9LRda6LaQJqWdnYcwG4go=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776471901; c=relaxed/simple;
-	bh=i/oH7NEeVKZ2B5UDVBOlT3keJYQbCbEpvF/7RnLI9xE=;
+	s=arc-20240116; t=1776471919; c=relaxed/simple;
+	bh=Zvylec6FCKt9xxhowusGY0fFFcIQWG1hEVCLn1RRTjg=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=catwY/g7NyreMU8jMng6xuq+Z8fvZz348xpq389IajEJv0IG7DNLI5EwijTaaOt8mXSjru7Eszboz8yDXebwfBh7ya66xG5b8y4/TN26Wpx05+ialP44zxjiHSgNFQdQ9p0VYdxXqhKfV3NJC3FbGB33d94UKW5wuqIe9Pxvp48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=gnRMFmOw; arc=none smtp.client-ip=34.218.115.239
+	 MIME-Version:Content-Type; b=jd1OgmCC1tpJngvEGeMNheqUgtbyibQFD6z+hASeivTa2AGS8W3vECAL5I4MVqLFh75mahzhtrha4OA61kgo/GwKDB1JnSdpAk4rRpfwneMt6erxv3dmNMtCmRDv+6tYOoW/7gyfG/bMRsTikH/xG1kLGHkLCc70NfpJcyPm3hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=dNCSMfeb; arc=none smtp.client-ip=35.155.198.111
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="gnRMFmOw"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="dNCSMfeb"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1776471900; x=1808007900;
+  t=1776471918; x=1808007918;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ij2ZLCWKyx3FI3ftIkMWOkapg5XDdRnguHlYGirPSgU=;
-  b=gnRMFmOwOnRhXPWlqRdRxChQDVO/zMeHQW1ZklHH3vQd3UkxZCgKkWKT
-   4jwqoaCruDLRD5P8dZOV2zkIfTDLz+zRaE5dsBTWGbudS6nGWRonVtToy
-   VnFPcddrn55m4mZ9dy4Ww7WwCK2yWfbrB5Tz9c7lSpREGlIrYGlRyZS+v
-   /I9Uf7fS98zRe5F+hOMzH846JWJ9pudADq6hvyLejGvmAfwI+hEhYF1YH
-   NRVDCpqdeOHICNYdwh5rcZCAfMqaXCZmPmpXUxPGghibg8yHjL2XC5pRL
-   3DpFq0OrfpHJkBBfOIO1iNRIK4qrBsVTLlCbrYsh+CrL7OxmhxaJpgUpx
+  bh=TNvYe6iUcby5vTTkfjJF4gPqPCQmHMNsypoSY/zqQq0=;
+  b=dNCSMfebWR854ARFywnurVUwY9Fh2soQNuI9QuHNO1jrHm08DTJZpv8q
+   O0jFYvb6/Rtb+BI1hWLhqZT037R6MiUfEmWgGR2MRkwkI5Xd7f0Ge/GvI
+   kg2dcuMV0Faby9C5RlTYwDDjChbYVu0NABMz8yiEYt2U1TrSmrn+aSMqG
+   unaSGLHxiLD30nwkq1r9ExUrj+BDpk4VjMpo5938P6wOqGOtd9BYYUEEp
+   p6Cs107zfNDGCEqxpfPzfRIFt2mPsPqPXbSabxjwRp3IoID/eb1Jd8V/y
+   Z2H3+CBCEzzX92neA5SBi6wWV/PJP+o8p3+HwalSAF+XFngPMaGF84RgB
    A==;
-X-CSE-ConnectionGUID: BEP6Bi5uQVOIY4h7du4YcA==
-X-CSE-MsgGUID: H/U+dGGPR0W50mhTBP1Kug==
+X-CSE-ConnectionGUID: QoIqPz+iTLqZX5kDlbrwWQ==
+X-CSE-MsgGUID: rtnITjt0SlqzEtzTYEd0aA==
 X-IronPort-AV: E=Sophos;i="6.23,185,1770595200"; 
-   d="scan'208";a="17399352"
-Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
-  by internal-pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2026 00:24:59 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.111:30456]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.3.82:2525] with esmtp (Farcaster)
- id 21fb3888-86aa-48b4-9af6-82200b889620; Sat, 18 Apr 2026 00:24:59 +0000 (UTC)
-X-Farcaster-Flow-ID: 21fb3888-86aa-48b4-9af6-82200b889620
+   d="scan'208";a="17480723"
+Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
+  by internal-pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2026 00:25:17 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [205.251.233.234:31023]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.25.2:2525] with esmtp (Farcaster)
+ id fb4228d6-2b4d-451a-9d7d-58743ec3c5c5; Sat, 18 Apr 2026 00:25:17 +0000 (UTC)
+X-Farcaster-Flow-ID: fb4228d6-2b4d-451a-9d7d-58743ec3c5c5
 Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Sat, 18 Apr 2026 00:24:58 +0000
+ Sat, 18 Apr 2026 00:25:14 +0000
 Received: from dev-dsk-wanjay-2c-d25651b4.us-west-2.amazon.com (172.19.198.4)
  by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Sat, 18 Apr 2026 00:24:58 +0000
+ Sat, 18 Apr 2026 00:25:13 +0000
 From: Jay Wang <wanjay@amazon.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller"
 	<davem@davemloft.net>, <linux-crypto@vger.kernel.org>, Masahiro Yamada
@@ -69,9 +69,9 @@ CC: Jay Wang <jay.wang.upstream@gmail.com>, Vegard Nossum
 	"Andrii Nakryiko" <andrii@kernel.org>,
 	<linux-arm-kernel@lists.infradead.org>, <x86@kernel.org>,
 	<linux-modules@vger.kernel.org>
-Subject: [PATCH v2 17/19] x86/crypto: convert exported symbols in x86 crypto to pluggable symbols
-Date: Sat, 18 Apr 2026 00:20:25 +0000
-Message-ID: <20260418002032.2877-18-wanjay@amazon.com>
+Subject: [PATCH v2 18/19] arm64/crypto: convert exported symbols in arm64 crypto to pluggable symbols
+Date: Sat, 18 Apr 2026 00:20:26 +0000
+Message-ID: <20260418002032.2877-19-wanjay@amazon.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260418002032.2877-1-wanjay@amazon.com>
 References: <20260418002032.2877-1-wanjay@amazon.com>
@@ -83,10 +83,10 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWA003.ant.amazon.com (10.13.139.105) To
+X-ClientProxiedBy: EX19D045UWA001.ant.amazon.com (10.13.139.83) To
  EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-Include x86 architecture-specific crypto source files in
+Include arm64 architecture-specific crypto source files in
 fips140.ko by converting their Makefile rules from obj-y to
 crypto-objs-y, and apply the pluggable interface introduced
 in the earlier patch so that symbols defined in fips140.ko
@@ -99,7 +99,7 @@ beyond ensuring each function has an EXPORT_SYMBOL.
 
 For exported variable symbols, an architecture-specific
 fips140-var-redirect.c is introduced under
-arch/x86/crypto/fips140/ to hold DEFINE_CRYPTO_VAR_STUB()
+arch/arm64/crypto/fips140/ to hold DEFINE_CRYPTO_VAR_STUB()
 definitions. This file is compiled twice: once for vmlinux
 (as the "outlet" providing the placeholder pointers) and
 once for fips140.ko (as the "plug" populating them with
@@ -107,106 +107,69 @@ real addresses via the __crypto_var_keys section).
 
 Signed-off-by: Jay Wang <wanjay@amazon.com>
 ---
- arch/x86/crypto/Makefile                      | 41 ++++++++++---------
- arch/x86/crypto/fips140/Makefile              | 14 +++++++
- .../x86/crypto/fips140/fips140-var-redirect.c |  0
- 3 files changed, 36 insertions(+), 19 deletions(-)
- create mode 100644 arch/x86/crypto/fips140/Makefile
- create mode 100644 arch/x86/crypto/fips140/fips140-var-redirect.c
+ arch/arm64/crypto/Makefile                    | 23 +++++++++++--------
+ arch/arm64/crypto/fips140/Makefile            | 14 +++++++++++
+ .../crypto/fips140/fips140-var-redirect.c     |  0
+ 3 files changed, 27 insertions(+), 10 deletions(-)
+ create mode 100644 arch/arm64/crypto/fips140/Makefile
+ create mode 100644 arch/arm64/crypto/fips140/fips140-var-redirect.c
 
-diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
-index e04ff8718d6b6..e957739e80df1 100644
---- a/arch/x86/crypto/Makefile
-+++ b/arch/x86/crypto/Makefile
-@@ -4,42 +4,42 @@
+diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
+index a169f9033401c..0ade4ae586e54 100644
+--- a/arch/arm64/crypto/Makefile
++++ b/arch/arm64/crypto/Makefile
+@@ -5,32 +5,35 @@
+ # Copyright (C) 2014 Linaro Ltd <ard.biesheuvel@linaro.org>
+ #
  
- obj-$(CONFIG_CRYPTO_TWOFISH_586) += twofish-i586.o
- twofish-i586-y := twofish-i586-asm_32.o twofish_glue.o
--obj-$(CONFIG_CRYPTO_TWOFISH_X86_64) += twofish-x86_64.o
-+crypto-objs-$(CONFIG_CRYPTO_TWOFISH_X86_64) += twofish-x86_64.o
- twofish-x86_64-y := twofish-x86_64-asm_64.o twofish_glue.o
--obj-$(CONFIG_CRYPTO_TWOFISH_X86_64_3WAY) += twofish-x86_64-3way.o
-+crypto-objs-$(CONFIG_CRYPTO_TWOFISH_X86_64_3WAY) += twofish-x86_64-3way.o
- twofish-x86_64-3way-y := twofish-x86_64-asm_64-3way.o twofish_glue_3way.o
--obj-$(CONFIG_CRYPTO_TWOFISH_AVX_X86_64) += twofish-avx-x86_64.o
-+crypto-objs-$(CONFIG_CRYPTO_TWOFISH_AVX_X86_64) += twofish-avx-x86_64.o
- twofish-avx-x86_64-y := twofish-avx-x86_64-asm_64.o twofish_avx_glue.o
+-obj-$(CONFIG_CRYPTO_SM4_ARM64_CE) += sm4-ce-cipher.o
++crypto-objs-$(CONFIG_CRYPTO_SM4_ARM64_CE) += sm4-ce-cipher.o
+ sm4-ce-cipher-y := sm4-ce-cipher-glue.o sm4-ce-cipher-core.o
  
- obj-$(CONFIG_CRYPTO_SERPENT_SSE2_586) += serpent-sse2-i586.o
- serpent-sse2-i586-y := serpent-sse2-i586-asm_32.o serpent_sse2_glue.o
--obj-$(CONFIG_CRYPTO_SERPENT_SSE2_X86_64) += serpent-sse2-x86_64.o
-+crypto-objs-$(CONFIG_CRYPTO_SERPENT_SSE2_X86_64) += serpent-sse2-x86_64.o
- serpent-sse2-x86_64-y := serpent-sse2-x86_64-asm_64.o serpent_sse2_glue.o
--obj-$(CONFIG_CRYPTO_SERPENT_AVX_X86_64) += serpent-avx-x86_64.o
-+crypto-objs-$(CONFIG_CRYPTO_SERPENT_AVX_X86_64) += serpent-avx-x86_64.o
- serpent-avx-x86_64-y := serpent-avx-x86_64-asm_64.o serpent_avx_glue.o
--obj-$(CONFIG_CRYPTO_SERPENT_AVX2_X86_64) += serpent-avx2.o
-+crypto-objs-$(CONFIG_CRYPTO_SERPENT_AVX2_X86_64) += serpent-avx2.o
- serpent-avx2-y := serpent-avx2-asm_64.o serpent_avx2_glue.o
+-obj-$(CONFIG_CRYPTO_SM4_ARM64_CE_BLK) += sm4-ce.o
++crypto-objs-$(CONFIG_CRYPTO_SM4_ARM64_CE_BLK) += sm4-ce.o
+ sm4-ce-y := sm4-ce-glue.o sm4-ce-core.o
  
--obj-$(CONFIG_CRYPTO_CAMELLIA_X86_64) += camellia-x86_64.o
-+crypto-objs-$(CONFIG_CRYPTO_CAMELLIA_X86_64) += camellia-x86_64.o
- camellia-x86_64-y := camellia-x86_64-asm_64.o camellia_glue.o
--obj-$(CONFIG_CRYPTO_CAMELLIA_AESNI_AVX_X86_64) += camellia-aesni-avx-x86_64.o
-+crypto-objs-$(CONFIG_CRYPTO_CAMELLIA_AESNI_AVX_X86_64) += camellia-aesni-avx-x86_64.o
- camellia-aesni-avx-x86_64-y := camellia-aesni-avx-asm_64.o camellia_aesni_avx_glue.o
--obj-$(CONFIG_CRYPTO_CAMELLIA_AESNI_AVX2_X86_64) += camellia-aesni-avx2.o
-+crypto-objs-$(CONFIG_CRYPTO_CAMELLIA_AESNI_AVX2_X86_64) += camellia-aesni-avx2.o
- camellia-aesni-avx2-y := camellia-aesni-avx2-asm_64.o camellia_aesni_avx2_glue.o
+-obj-$(CONFIG_CRYPTO_SM4_ARM64_CE_CCM) += sm4-ce-ccm.o
++crypto-objs-$(CONFIG_CRYPTO_SM4_ARM64_CE_CCM) += sm4-ce-ccm.o
+ sm4-ce-ccm-y := sm4-ce-ccm-glue.o sm4-ce-ccm-core.o
  
--obj-$(CONFIG_CRYPTO_BLOWFISH_X86_64) += blowfish-x86_64.o
-+crypto-objs-$(CONFIG_CRYPTO_BLOWFISH_X86_64) += blowfish-x86_64.o
- blowfish-x86_64-y := blowfish-x86_64-asm_64.o blowfish_glue.o
+-obj-$(CONFIG_CRYPTO_SM4_ARM64_CE_GCM) += sm4-ce-gcm.o
++crypto-objs-$(CONFIG_CRYPTO_SM4_ARM64_CE_GCM) += sm4-ce-gcm.o
+ sm4-ce-gcm-y := sm4-ce-gcm-glue.o sm4-ce-gcm-core.o
  
--obj-$(CONFIG_CRYPTO_CAST5_AVX_X86_64) += cast5-avx-x86_64.o
-+crypto-objs-$(CONFIG_CRYPTO_CAST5_AVX_X86_64) += cast5-avx-x86_64.o
- cast5-avx-x86_64-y := cast5-avx-x86_64-asm_64.o cast5_avx_glue.o
+-obj-$(CONFIG_CRYPTO_SM4_ARM64_NEON_BLK) += sm4-neon.o
++crypto-objs-$(CONFIG_CRYPTO_SM4_ARM64_NEON_BLK) += sm4-neon.o
+ sm4-neon-y := sm4-neon-glue.o sm4-neon-core.o
  
--obj-$(CONFIG_CRYPTO_CAST6_AVX_X86_64) += cast6-avx-x86_64.o
-+crypto-objs-$(CONFIG_CRYPTO_CAST6_AVX_X86_64) += cast6-avx-x86_64.o
- cast6-avx-x86_64-y := cast6-avx-x86_64-asm_64.o cast6_avx_glue.o
+-obj-$(CONFIG_CRYPTO_GHASH_ARM64_CE) += ghash-ce.o
++crypto-objs-$(CONFIG_CRYPTO_GHASH_ARM64_CE) += ghash-ce.o
+ ghash-ce-y := ghash-ce-glue.o ghash-ce-core.o
  
--obj-$(CONFIG_CRYPTO_AEGIS128_AESNI_SSE2) += aegis128-aesni.o
-+crypto-objs-$(CONFIG_CRYPTO_AEGIS128_AESNI_SSE2) += aegis128-aesni.o
- aegis128-aesni-y := aegis128-aesni-asm.o aegis128-aesni-glue.o
+-obj-$(CONFIG_CRYPTO_AES_ARM64_CE_CCM) += aes-ce-ccm.o
++crypto-objs-$(CONFIG_CRYPTO_AES_ARM64_CE_CCM) += aes-ce-ccm.o
+ aes-ce-ccm-y := aes-ce-ccm-glue.o aes-ce-ccm-core.o
  
--obj-$(CONFIG_CRYPTO_AES_NI_INTEL) += aesni-intel.o
-+crypto-objs-$(CONFIG_CRYPTO_AES_NI_INTEL) += aesni-intel.o
- aesni-intel-y := aesni-intel_asm.o aesni-intel_glue.o
- aesni-intel-$(CONFIG_64BIT) += aes-ctr-avx-x86_64.o \
- 			       aes-gcm-aesni-x86_64.o \
-@@ -47,17 +47,20 @@ aesni-intel-$(CONFIG_64BIT) += aes-ctr-avx-x86_64.o \
- 			       aes-gcm-vaes-avx512.o \
- 			       aes-xts-avx-x86_64.o
+-obj-$(CONFIG_CRYPTO_AES_ARM64_CE_BLK) += aes-ce-blk.o
++crypto-objs-$(CONFIG_CRYPTO_AES_ARM64_CE_BLK) += aes-ce-blk.o
+ aes-ce-blk-y := aes-glue-ce.o
  
--obj-$(CONFIG_CRYPTO_SM4_AESNI_AVX_X86_64) += sm4-aesni-avx-x86_64.o
-+crypto-objs-$(CONFIG_CRYPTO_SM4_AESNI_AVX_X86_64) += sm4-aesni-avx-x86_64.o
- sm4-aesni-avx-x86_64-y := sm4-aesni-avx-asm_64.o sm4_aesni_avx_glue.o
+-obj-$(CONFIG_CRYPTO_AES_ARM64_NEON_BLK) += aes-neon-blk.o
++crypto-objs-$(CONFIG_CRYPTO_AES_ARM64_NEON_BLK) += aes-neon-blk.o
+ aes-neon-blk-y := aes-glue-neon.o
  
--obj-$(CONFIG_CRYPTO_SM4_AESNI_AVX2_X86_64) += sm4-aesni-avx2-x86_64.o
-+crypto-objs-$(CONFIG_CRYPTO_SM4_AESNI_AVX2_X86_64) += sm4-aesni-avx2-x86_64.o
- sm4-aesni-avx2-x86_64-y := sm4-aesni-avx2-asm_64.o sm4_aesni_avx2_glue.o
- 
--obj-$(CONFIG_CRYPTO_ARIA_AESNI_AVX_X86_64) += aria-aesni-avx-x86_64.o
-+crypto-objs-$(CONFIG_CRYPTO_ARIA_AESNI_AVX_X86_64) += aria-aesni-avx-x86_64.o
- aria-aesni-avx-x86_64-y := aria-aesni-avx-asm_64.o aria_aesni_avx_glue.o
- 
--obj-$(CONFIG_CRYPTO_ARIA_AESNI_AVX2_X86_64) += aria-aesni-avx2-x86_64.o
-+crypto-objs-$(CONFIG_CRYPTO_ARIA_AESNI_AVX2_X86_64) += aria-aesni-avx2-x86_64.o
- aria-aesni-avx2-x86_64-y := aria-aesni-avx2-asm_64.o aria_aesni_avx2_glue.o
- 
--obj-$(CONFIG_CRYPTO_ARIA_GFNI_AVX512_X86_64) += aria-gfni-avx512-x86_64.o
-+crypto-objs-$(CONFIG_CRYPTO_ARIA_GFNI_AVX512_X86_64) += aria-gfni-avx512-x86_64.o
- aria-gfni-avx512-x86_64-y := aria-gfni-avx512-asm_64.o aria_gfni_avx512_glue.o
+-obj-$(CONFIG_CRYPTO_AES_ARM64_BS) += aes-neon-bs.o
++crypto-objs-$(CONFIG_CRYPTO_AES_ARM64_BS) += aes-neon-bs.o
+ aes-neon-bs-y := aes-neonbs-core.o aes-neonbs-glue.o
 +
 +# FIPS 140 kernel module
 +obj-$(CONFIG_CRYPTO_FIPS140_EXTMOD) += fips140/
 \ No newline at end of file
-diff --git a/arch/x86/crypto/fips140/Makefile b/arch/x86/crypto/fips140/Makefile
+diff --git a/arch/arm64/crypto/fips140/Makefile b/arch/arm64/crypto/fips140/Makefile
 new file mode 100644
 index 0000000000000..a7a5259a43ab6
 --- /dev/null
-+++ b/arch/x86/crypto/fips140/Makefile
++++ b/arch/arm64/crypto/fips140/Makefile
 @@ -0,0 +1,14 @@
 +
 +crypto-objs-y += fips140-var-redirect-fips.o
@@ -222,7 +185,7 @@ index 0000000000000..a7a5259a43ab6
 +
 +CFLAGS_fips140-var-redirect-main.o += -I$(srctree)
 +CFLAGS_fips140-var-redirect-fips.o += -I$(srctree)
-diff --git a/arch/x86/crypto/fips140/fips140-var-redirect.c b/arch/x86/crypto/fips140/fips140-var-redirect.c
+diff --git a/arch/arm64/crypto/fips140/fips140-var-redirect.c b/arch/arm64/crypto/fips140/fips140-var-redirect.c
 new file mode 100644
 index 0000000000000..e69de29bb2d1d
 -- 
