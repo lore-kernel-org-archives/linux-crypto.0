@@ -1,42 +1,54 @@
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA7F2E1F0E;
-	Sun, 19 Apr 2026 12:05:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FC6A40DFCD;
+	Sun, 19 Apr 2026 15:33:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776600325; cv=none; b=GEN7M/rOvDoBQhGVWUM5ZrI6tufNyuc+8LYY2DFZCHpoTuhZC4lSk81xKM/gWOkgrtWiyygKwmJw+RWdfvnCi4uh5DMgDq5bqHWmRNeWFjNKgkd2HdXzB+1cQKjE0Kzf/X1B4pc0IMR/cXtBSyp0by6a7SkjaLIJTVaSsPoU6j0=
+	t=1776612823; cv=none; b=X2BpnqfJPz6pTICcliUQQhvFpFvEFLkmVzlHqZE6wwZUYFXIpnQSLQ8qDOwv7z275PPOCndSu6pseyoFPcWDCvHXDat3tu4zbM9r6jsjb/XtOWkCZ9gmSG0qzNjq8F0CaMPBUtzygaqOB0DXKobvqkH9i44BaMgkxfx5WSy6lZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776600325; c=relaxed/simple;
-	bh=hdzhi2G+9D/Vf+uOgAxmlCr+SPwKVjQQdTXDS51x7IA=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Yl21yo6ZXNt3q8wh1uxe3btoblvhp1jlTfmKQyN6zcr2gS/raX7979c2r5YWNusLbjg9VZq3uiAwpo8aTAYatnLjOvlqvW5l3VJnGEZWP+IJ/HN7KDAIbbExAtHtU6CqkmcY9eohTzD9TwXGRUcPLk10WXOqZy0XGAo4JFI7emc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1wEQtn-000000006Hd-3fA8;
-	Sun, 19 Apr 2026 12:05:15 +0000
-Date: Sun, 19 Apr 2026 13:05:13 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Daniel Golle <daniel@makrotopia.org>, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH v3 2/2] hwrng: mtk - add support for hw access via SMCC
-Message-ID: <7ebe4162e0e150cbe092c9e254bc933bb91b4989.1776600269.git.daniel@makrotopia.org>
-References: <585fc832e4e5d3656bd25ecee6bafb636993104a.1776600269.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1776612823; c=relaxed/simple;
+	bh=FYV6dcCGF4tINKzJvzQW04nH7vShjcheyrL6DKTDC4w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qAGTCd3uDNYNZceq88l57PoxjSiBGe0VNvg4JDhsBFLBWGz7+VY9e1XqRDaosqPRz0k6hG3LcZPZ29NdiZiGzGCU/z0W3PlhrvGrYLELnDNbAy17lxPlEOErQNFSd2/eViiL1K5SccOIlIKi+aYDgRcXyJkq/CzlJOnS3XtjWtk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SYN6DD6L; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SYN6DD6L"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5B9BC2BCAF;
+	Sun, 19 Apr 2026 15:33:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1776612823;
+	bh=FYV6dcCGF4tINKzJvzQW04nH7vShjcheyrL6DKTDC4w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SYN6DD6L7U7mUnOeAZRT+dmiVKwbGPcVG1Hd7A6uuiimRgyNZvburq+DNEMgZvKj5
+	 BGcWKVrKrWA1x0evbxAMR4R3dlorUlVzGdvt/gn8f/zPLk3iMpz2GHk1U5p/gGOmj5
+	 esUrsXci/wTdyeo9OeesaIOx4ybfGmvblZwdWU3XAyttQQfqcmESKzrZPYYx3or+nl
+	 pg5mHhjRpn1r40/WWuCkQdMkHylVYO+WNOMylB00RKC8smxN1buxEwB3Nb5uKB1Gj+
+	 h1KRCMrtsZgfu/sypVeCmBD+J8TmMkYmUEQmP+cQkRQjyUQTlVHAFYuLxRBTWQVb0d
+	 6wL8Yc5xeUchg==
+Date: Sun, 19 Apr 2026 05:33:41 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Thomas Graf <tgraf@suug.ch>, David Vernet <void@manifault.com>,
+	Andrea Righi <arighi@nvidia.com>,
+	Changwoo Min <changwoo@igalia.com>,
+	Emil Tsalapatis <emil@etsalapatis.com>,
+	linux-crypto@vger.kernel.org, sched-ext@lists.linux.dev,
+	linux-kernel@vger.kernel.org, Florian Westphal <fw@strlen.de>,
+	netdev@vger.kernel.org, NeilBrown <neil@brown.name>
+Subject: [PATCH v2 sched_ext/for-7.1-fixes] sched_ext: Mark scx_sched_hash
+ insecure_elasticity
+Message-ID: <aeT11WIF6kzvifm7@slm.duckdns.org>
+References: <aeGElQ-TcCclEHwo@slm.duckdns.org>
+ <aeGIsGi9fBqu9EZT@gondor.apana.org.au>
+ <aeHjjGEhlikSsxCX@slm.duckdns.org>
+ <aeHmeAz-Z-Rx2MqX@gondor.apana.org.au>
+ <aeJe8oIyYUi-NtCQ@slm.duckdns.org>
+ <aeLT8eB_xfzLxqbI@gondor.apana.org.au>
+ <aeLV6aDhM0-S4oQ1@slm.duckdns.org>
+ <aeLWH_HgSHF4buiJ@gondor.apana.org.au>
+ <aeLgjAeJuidWNy3N@gondor.apana.org.au>
+ <aeLhQRFPEY24ySIq@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -45,222 +57,32 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <585fc832e4e5d3656bd25ecee6bafb636993104a.1776600269.git.daniel@makrotopia.org>
+In-Reply-To: <aeLhQRFPEY24ySIq@gondor.apana.org.au>
 
-Newer versions of ARM TrustedFirmware-A on MediaTek's ARMv8 SoCs no longer
-allow accessing the TRNG from outside of the trusted firmware.
-Instead, a vendor-defined custom Secure Monitor Call can be used to
-acquire random bytes.
+scx_sched_hash is inserted into under scx_sched_lock (raw_spinlock_irq)
+in scx_link_sched(). rhashtable's sync grow path calls get_random_u32()
+and does a GFP_ATOMIC allocation; both acquire regular spinlocks, which
+is unsafe under raw_spinlock_t. Set insecure_elasticity to skip the
+sync grow.
 
-Add support for newer SoCs (MT7981, MT7987, MT7988).
+v2:
+- Dropped dsq_hash changes. Insertion is not under raw_spin_lock.
 
-As TF-A for the MT7986 may either follow the old or the new
-convention, the best bet is to test if firmware blocks direct access
-to the hwrng and if so, expect the SMCC interface to be usable.
+- Switched from no_sync_grow flag to insecure_elasticity.
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Fixes: 25037af712eb ("sched_ext: Add rhashtable lookup for sub-schedulers")
+Signed-off-by: Tejun Heo <tj@kernel.org>
 ---
-v3: unchanged
-v2: unchanged
+ kernel/sched/ext.c |    1 +
+ 1 file changed, 1 insertion(+)
 
- drivers/char/hw_random/mtk-rng.c | 127 ++++++++++++++++++++++++++-----
- 1 file changed, 106 insertions(+), 21 deletions(-)
-
-diff --git a/drivers/char/hw_random/mtk-rng.c b/drivers/char/hw_random/mtk-rng.c
-index 5808d09d12c45..8f5856b59ad66 100644
---- a/drivers/char/hw_random/mtk-rng.c
-+++ b/drivers/char/hw_random/mtk-rng.c
-@@ -3,6 +3,7 @@
-  * Driver for Mediatek Hardware Random Number Generator
-  *
-  * Copyright (C) 2017 Sean Wang <sean.wang@mediatek.com>
-+ * Copyright (C) 2026 Daniel Golle <daniel@makrotopia.org>
-  */
- #define MTK_RNG_DEV KBUILD_MODNAME
- 
-@@ -17,6 +18,8 @@
- #include <linux/of.h>
- #include <linux/platform_device.h>
- #include <linux/pm_runtime.h>
-+#include <linux/arm-smccc.h>
-+#include <linux/soc/mediatek/mtk_sip_svc.h>
- 
- /* Runtime PM autosuspend timeout: */
- #define RNG_AUTOSUSPEND_TIMEOUT		100
-@@ -30,6 +33,11 @@
- 
- #define RNG_DATA			0x08
- 
-+/* Driver feature flags */
-+#define MTK_RNG_SMC			BIT(0)
-+
-+#define MTK_SIP_KERNEL_GET_RND		MTK_SIP_SMC_CMD(0x550)
-+
- #define to_mtk_rng(p)	container_of(p, struct mtk_rng, rng)
- 
- struct mtk_rng {
-@@ -37,6 +45,7 @@ struct mtk_rng {
- 	struct clk *clk;
- 	struct hwrng rng;
- 	struct device *dev;
-+	unsigned long flags;
+--- a/kernel/sched/ext.c
++++ b/kernel/sched/ext.c
+@@ -32,6 +32,7 @@ static const struct rhashtable_params sc
+ 	.key_len		= sizeof_field(struct scx_sched, ops.sub_cgroup_id),
+ 	.key_offset		= offsetof(struct scx_sched, ops.sub_cgroup_id),
+ 	.head_offset		= offsetof(struct scx_sched, hash_node),
++	.insecure_elasticity	= true,	/* inserted under scx_sched_lock */
  };
  
- static int mtk_rng_init(struct hwrng *rng)
-@@ -103,6 +112,56 @@ static int mtk_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
- 	return retval || !wait ? retval : -EIO;
- }
- 
-+static int mtk_rng_read_smc(struct hwrng *rng, void *buf, size_t max,
-+			    bool wait)
-+{
-+	struct arm_smccc_res res;
-+	int retval = 0;
-+
-+	while (max >= sizeof(u32)) {
-+		arm_smccc_smc(MTK_SIP_KERNEL_GET_RND, 0, 0, 0, 0, 0, 0, 0,
-+			      &res);
-+		if (res.a0)
-+			break;
-+
-+		*(u32 *)buf = res.a1;
-+		retval += sizeof(u32);
-+		buf += sizeof(u32);
-+		max -= sizeof(u32);
-+	}
-+
-+	return retval || !wait ? retval : -EIO;
-+}
-+
-+static bool mtk_rng_hw_accessible(struct mtk_rng *priv)
-+{
-+	u32 val;
-+	int err;
-+
-+	err = clk_prepare_enable(priv->clk);
-+	if (err)
-+		return false;
-+
-+	val = readl(priv->base + RNG_CTRL);
-+	val |= RNG_EN;
-+	writel(val, priv->base + RNG_CTRL);
-+
-+	val = readl(priv->base + RNG_CTRL);
-+
-+	if (val & RNG_EN) {
-+		/* HW is accessible, clean up: disable RNG and clock */
-+		writel(val & ~RNG_EN, priv->base + RNG_CTRL);
-+		clk_disable_unprepare(priv->clk);
-+		return true;
-+	}
-+
-+	/*
-+	 * If TF-A blocks direct access, the register reads back as 0.
-+	 * Leave the clock enabled as TF-A needs it.
-+	 */
-+	return false;
-+}
-+
- static int mtk_rng_probe(struct platform_device *pdev)
- {
- 	int ret;
-@@ -114,23 +173,42 @@ static int mtk_rng_probe(struct platform_device *pdev)
- 
- 	priv->dev = &pdev->dev;
- 	priv->rng.name = pdev->name;
--#ifndef CONFIG_PM
--	priv->rng.init = mtk_rng_init;
--	priv->rng.cleanup = mtk_rng_cleanup;
--#endif
--	priv->rng.read = mtk_rng_read;
- 	priv->rng.quality = 900;
--
--	priv->clk = devm_clk_get(&pdev->dev, "rng");
--	if (IS_ERR(priv->clk)) {
--		ret = PTR_ERR(priv->clk);
--		dev_err(&pdev->dev, "no clock for device: %d\n", ret);
--		return ret;
-+	priv->flags = (unsigned long)device_get_match_data(&pdev->dev);
-+
-+	if (!(priv->flags & MTK_RNG_SMC)) {
-+		priv->clk = devm_clk_get(&pdev->dev, "rng");
-+		if (IS_ERR(priv->clk)) {
-+			ret = PTR_ERR(priv->clk);
-+			dev_err(&pdev->dev, "no clock for device: %d\n", ret);
-+			return ret;
-+		}
-+
-+		priv->base = devm_platform_ioremap_resource(pdev, 0);
-+		if (IS_ERR(priv->base))
-+			return PTR_ERR(priv->base);
-+
-+		if (IS_ENABLED(CONFIG_HAVE_ARM_SMCCC) &&
-+		    of_device_is_compatible(pdev->dev.of_node,
-+					    "mediatek,mt7986-rng") &&
-+		    !mtk_rng_hw_accessible(priv)) {
-+			priv->flags |= MTK_RNG_SMC;
-+			dev_info(&pdev->dev,
-+				 "HW RNG not MMIO accessible, using SMC\n");
-+		}
- 	}
- 
--	priv->base = devm_platform_ioremap_resource(pdev, 0);
--	if (IS_ERR(priv->base))
--		return PTR_ERR(priv->base);
-+	if (priv->flags & MTK_RNG_SMC) {
-+		if (!IS_ENABLED(CONFIG_HAVE_ARM_SMCCC))
-+			return -ENODEV;
-+		priv->rng.read = mtk_rng_read_smc;
-+	} else {
-+#ifndef CONFIG_PM
-+		priv->rng.init = mtk_rng_init;
-+		priv->rng.cleanup = mtk_rng_cleanup;
-+#endif
-+		priv->rng.read = mtk_rng_read;
-+	}
- 
- 	ret = devm_hwrng_register(&pdev->dev, &priv->rng);
- 	if (ret) {
-@@ -139,12 +217,15 @@ static int mtk_rng_probe(struct platform_device *pdev)
- 		return ret;
- 	}
- 
--	dev_set_drvdata(&pdev->dev, priv);
--	pm_runtime_set_autosuspend_delay(&pdev->dev, RNG_AUTOSUSPEND_TIMEOUT);
--	pm_runtime_use_autosuspend(&pdev->dev);
--	ret = devm_pm_runtime_enable(&pdev->dev);
--	if (ret)
--		return ret;
-+	if (!(priv->flags & MTK_RNG_SMC)) {
-+		dev_set_drvdata(&pdev->dev, priv);
-+		pm_runtime_set_autosuspend_delay(&pdev->dev,
-+						 RNG_AUTOSUSPEND_TIMEOUT);
-+		pm_runtime_use_autosuspend(&pdev->dev);
-+		ret = devm_pm_runtime_enable(&pdev->dev);
-+		if (ret)
-+			return ret;
-+	}
- 
- 	dev_info(&pdev->dev, "registered RNG driver\n");
- 
-@@ -181,8 +262,11 @@ static const struct dev_pm_ops mtk_rng_pm_ops = {
- #endif	/* CONFIG_PM */
- 
- static const struct of_device_id mtk_rng_match[] = {
--	{ .compatible = "mediatek,mt7986-rng" },
- 	{ .compatible = "mediatek,mt7623-rng" },
-+	{ .compatible = "mediatek,mt7981-rng", .data = (void *)MTK_RNG_SMC },
-+	{ .compatible = "mediatek,mt7986-rng" },
-+	{ .compatible = "mediatek,mt7987-rng", .data = (void *)MTK_RNG_SMC },
-+	{ .compatible = "mediatek,mt7988-rng", .data = (void *)MTK_RNG_SMC },
- 	{},
- };
- MODULE_DEVICE_TABLE(of, mtk_rng_match);
-@@ -200,4 +284,5 @@ module_platform_driver(mtk_rng_driver);
- 
- MODULE_DESCRIPTION("Mediatek Random Number Generator Driver");
- MODULE_AUTHOR("Sean Wang <sean.wang@mediatek.com>");
-+MODULE_AUTHOR("Daniel Golle <daniel@makrotopia.org>");
- MODULE_LICENSE("GPL");
--- 
-2.53.0
+ static struct rhashtable scx_sched_hash;
