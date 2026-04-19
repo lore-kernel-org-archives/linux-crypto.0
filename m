@@ -1,16 +1,16 @@
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA0318DB26;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA7F2E1F0E;
 	Sun, 19 Apr 2026 12:05:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776600325; cv=none; b=GtbaL+4MvuIuIb9MkG/R5JaPIZlp25fsHXBa9IyfgBJIZaUB8m9QHeLnWsTPGX9+BZ7bPy1ilrPZqRgJv7o/OPf/jkD4KvjOH2EiTxEhIgiYK0+PRTEOK08FnU00UUjYI1lNWKSuzX5gluWAzFWhM7ZrYiFTvYOH1Xa0dPesDik=
+	t=1776600325; cv=none; b=GEN7M/rOvDoBQhGVWUM5ZrI6tufNyuc+8LYY2DFZCHpoTuhZC4lSk81xKM/gWOkgrtWiyygKwmJw+RWdfvnCi4uh5DMgDq5bqHWmRNeWFjNKgkd2HdXzB+1cQKjE0Kzf/X1B4pc0IMR/cXtBSyp0by6a7SkjaLIJTVaSsPoU6j0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1776600325; c=relaxed/simple;
-	bh=sU+lBqCy95TUaGp6nCHLuIb1ds3xHsDuiuE6/pgp39U=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=Uhy5ghEjnZI0koAPlimYLSTgKfDKdNrgItzC2F4tFKGDUIPjbMz5LmIQlmZer7qvglLmSJ3LUi208UKSBKNM2O6rK7rSnoy8j5JjW1e0/1PbIgW14rgBgPaCi84zL04GIMGLgXG8gozGGgdrpXFbxVNoKNp5qGmTzgn21GMsogU=
+	bh=hdzhi2G+9D/Vf+uOgAxmlCr+SPwKVjQQdTXDS51x7IA=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Yl21yo6ZXNt3q8wh1uxe3btoblvhp1jlTfmKQyN6zcr2gS/raX7979c2r5YWNusLbjg9VZq3uiAwpo8aTAYatnLjOvlqvW5l3VJnGEZWP+IJ/HN7KDAIbbExAtHtU6CqkmcY9eohTzD9TwXGRUcPLk10WXOqZy0XGAo4JFI7emc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -18,9 +18,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.99)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1wEQte-000000006Ha-26VQ;
-	Sun, 19 Apr 2026 12:05:06 +0000
-Date: Sun, 19 Apr 2026 13:05:01 +0100
+	id 1wEQtn-000000006Hd-3fA8;
+	Sun, 19 Apr 2026 12:05:15 +0000
+Date: Sun, 19 Apr 2026 13:05:13 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Olivia Mackall <olivia@selenic.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
@@ -34,8 +34,9 @@ To: Olivia Mackall <olivia@selenic.com>,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org
-Subject: [PATCH v3 1/2] dt-bindings: rng: mtk-rng: add SMC-based TRNG variants
-Message-ID: <585fc832e4e5d3656bd25ecee6bafb636993104a.1776600269.git.daniel@makrotopia.org>
+Subject: [PATCH v3 2/2] hwrng: mtk - add support for hw access via SMCC
+Message-ID: <7ebe4162e0e150cbe092c9e254bc933bb91b4989.1776600269.git.daniel@makrotopia.org>
+References: <585fc832e4e5d3656bd25ecee6bafb636993104a.1776600269.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -44,100 +45,222 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <585fc832e4e5d3656bd25ecee6bafb636993104a.1776600269.git.daniel@makrotopia.org>
 
-Add compatible strings for MediaTek SoCs where the hardware random number
-generator is accessed via a vendor-defined Secure Monitor Call (SMC)
-rather than direct MMIO register access:
+Newer versions of ARM TrustedFirmware-A on MediaTek's ARMv8 SoCs no longer
+allow accessing the TRNG from outside of the trusted firmware.
+Instead, a vendor-defined custom Secure Monitor Call can be used to
+acquire random bytes.
 
-  - mediatek,mt7981-rng
-  - mediatek,mt7987-rng
-  - mediatek,mt7988-rng
+Add support for newer SoCs (MT7981, MT7987, MT7988).
 
-These variants require no reg, clocks, or clock-names properties since
-the RNG hardware is managed by ARM Trusted Firmware-A.
-
-Relax the $nodename pattern to also allow 'rng' in addition to the
-existing 'rng@...' pattern.
-
-Add a second example showing the minimal SMC variant binding.
+As TF-A for the MT7986 may either follow the old or the new
+convention, the best bet is to test if firmware blocks direct access
+to the hwrng and if so, expect the SMCC interface to be usable.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
-v3:
- * drop not: in compatible conditional
- * add reg/clocks/clock-names: false for mt7981-rng
- * add else: requiring reg/clocks/clock-names for others
+v3: unchanged
+v2: unchanged
 
-v2: express compatibilities with fallback
+ drivers/char/hw_random/mtk-rng.c | 127 ++++++++++++++++++++++++++-----
+ 1 file changed, 106 insertions(+), 21 deletions(-)
 
- .../devicetree/bindings/rng/mtk-rng.yaml      | 32 ++++++++++++++++---
- 1 file changed, 28 insertions(+), 4 deletions(-)
-
-diff --git a/Documentation/devicetree/bindings/rng/mtk-rng.yaml b/Documentation/devicetree/bindings/rng/mtk-rng.yaml
-index 7e8dc62e5d3a6..8fe6c209ab1e5 100644
---- a/Documentation/devicetree/bindings/rng/mtk-rng.yaml
-+++ b/Documentation/devicetree/bindings/rng/mtk-rng.yaml
-@@ -11,12 +11,13 @@ maintainers:
+diff --git a/drivers/char/hw_random/mtk-rng.c b/drivers/char/hw_random/mtk-rng.c
+index 5808d09d12c45..8f5856b59ad66 100644
+--- a/drivers/char/hw_random/mtk-rng.c
++++ b/drivers/char/hw_random/mtk-rng.c
+@@ -3,6 +3,7 @@
+  * Driver for Mediatek Hardware Random Number Generator
+  *
+  * Copyright (C) 2017 Sean Wang <sean.wang@mediatek.com>
++ * Copyright (C) 2026 Daniel Golle <daniel@makrotopia.org>
+  */
+ #define MTK_RNG_DEV KBUILD_MODNAME
  
- properties:
-   $nodename:
--    pattern: "^rng@[0-9a-f]+$"
-+    pattern: "^rng(@[0-9a-f]+)?$"
+@@ -17,6 +18,8 @@
+ #include <linux/of.h>
+ #include <linux/platform_device.h>
+ #include <linux/pm_runtime.h>
++#include <linux/arm-smccc.h>
++#include <linux/soc/mediatek/mtk_sip_svc.h>
  
-   compatible:
-     oneOf:
-       - enum:
-           - mediatek,mt7623-rng
-+          - mediatek,mt7981-rng
-       - items:
-           - enum:
-               - mediatek,mt7622-rng
-@@ -25,6 +26,11 @@ properties:
-               - mediatek,mt8365-rng
-               - mediatek,mt8516-rng
-           - const: mediatek,mt7623-rng
-+      - items:
-+          - enum:
-+              - mediatek,mt7987-rng
-+              - mediatek,mt7988-rng
-+          - const: mediatek,mt7981-rng
+ /* Runtime PM autosuspend timeout: */
+ #define RNG_AUTOSUSPEND_TIMEOUT		100
+@@ -30,6 +33,11 @@
  
-   reg:
-     maxItems: 1
-@@ -38,9 +44,23 @@ properties:
+ #define RNG_DATA			0x08
  
- required:
-   - compatible
--  - reg
--  - clocks
--  - clock-names
++/* Driver feature flags */
++#define MTK_RNG_SMC			BIT(0)
 +
-+allOf:
-+  - if:
-+      properties:
-+        compatible:
-+          contains:
-+            const: mediatek,mt7981-rng
-+    then:
-+      properties:
-+        reg: false
-+        clocks: false
-+        clock-names: false
-+    else:
-+      required:
-+        - reg
-+        - clocks
-+        - clock-names
++#define MTK_SIP_KERNEL_GET_RND		MTK_SIP_SMC_CMD(0x550)
++
+ #define to_mtk_rng(p)	container_of(p, struct mtk_rng, rng)
  
- additionalProperties: false
+ struct mtk_rng {
+@@ -37,6 +45,7 @@ struct mtk_rng {
+ 	struct clk *clk;
+ 	struct hwrng rng;
+ 	struct device *dev;
++	unsigned long flags;
+ };
  
-@@ -53,3 +73,7 @@ examples:
-             clocks = <&infracfg CLK_INFRA_TRNG>;
-             clock-names = "rng";
-     };
-+  - |
-+    rng {
-+            compatible = "mediatek,mt7981-rng";
-+    };
+ static int mtk_rng_init(struct hwrng *rng)
+@@ -103,6 +112,56 @@ static int mtk_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+ 	return retval || !wait ? retval : -EIO;
+ }
+ 
++static int mtk_rng_read_smc(struct hwrng *rng, void *buf, size_t max,
++			    bool wait)
++{
++	struct arm_smccc_res res;
++	int retval = 0;
++
++	while (max >= sizeof(u32)) {
++		arm_smccc_smc(MTK_SIP_KERNEL_GET_RND, 0, 0, 0, 0, 0, 0, 0,
++			      &res);
++		if (res.a0)
++			break;
++
++		*(u32 *)buf = res.a1;
++		retval += sizeof(u32);
++		buf += sizeof(u32);
++		max -= sizeof(u32);
++	}
++
++	return retval || !wait ? retval : -EIO;
++}
++
++static bool mtk_rng_hw_accessible(struct mtk_rng *priv)
++{
++	u32 val;
++	int err;
++
++	err = clk_prepare_enable(priv->clk);
++	if (err)
++		return false;
++
++	val = readl(priv->base + RNG_CTRL);
++	val |= RNG_EN;
++	writel(val, priv->base + RNG_CTRL);
++
++	val = readl(priv->base + RNG_CTRL);
++
++	if (val & RNG_EN) {
++		/* HW is accessible, clean up: disable RNG and clock */
++		writel(val & ~RNG_EN, priv->base + RNG_CTRL);
++		clk_disable_unprepare(priv->clk);
++		return true;
++	}
++
++	/*
++	 * If TF-A blocks direct access, the register reads back as 0.
++	 * Leave the clock enabled as TF-A needs it.
++	 */
++	return false;
++}
++
+ static int mtk_rng_probe(struct platform_device *pdev)
+ {
+ 	int ret;
+@@ -114,23 +173,42 @@ static int mtk_rng_probe(struct platform_device *pdev)
+ 
+ 	priv->dev = &pdev->dev;
+ 	priv->rng.name = pdev->name;
+-#ifndef CONFIG_PM
+-	priv->rng.init = mtk_rng_init;
+-	priv->rng.cleanup = mtk_rng_cleanup;
+-#endif
+-	priv->rng.read = mtk_rng_read;
+ 	priv->rng.quality = 900;
+-
+-	priv->clk = devm_clk_get(&pdev->dev, "rng");
+-	if (IS_ERR(priv->clk)) {
+-		ret = PTR_ERR(priv->clk);
+-		dev_err(&pdev->dev, "no clock for device: %d\n", ret);
+-		return ret;
++	priv->flags = (unsigned long)device_get_match_data(&pdev->dev);
++
++	if (!(priv->flags & MTK_RNG_SMC)) {
++		priv->clk = devm_clk_get(&pdev->dev, "rng");
++		if (IS_ERR(priv->clk)) {
++			ret = PTR_ERR(priv->clk);
++			dev_err(&pdev->dev, "no clock for device: %d\n", ret);
++			return ret;
++		}
++
++		priv->base = devm_platform_ioremap_resource(pdev, 0);
++		if (IS_ERR(priv->base))
++			return PTR_ERR(priv->base);
++
++		if (IS_ENABLED(CONFIG_HAVE_ARM_SMCCC) &&
++		    of_device_is_compatible(pdev->dev.of_node,
++					    "mediatek,mt7986-rng") &&
++		    !mtk_rng_hw_accessible(priv)) {
++			priv->flags |= MTK_RNG_SMC;
++			dev_info(&pdev->dev,
++				 "HW RNG not MMIO accessible, using SMC\n");
++		}
+ 	}
+ 
+-	priv->base = devm_platform_ioremap_resource(pdev, 0);
+-	if (IS_ERR(priv->base))
+-		return PTR_ERR(priv->base);
++	if (priv->flags & MTK_RNG_SMC) {
++		if (!IS_ENABLED(CONFIG_HAVE_ARM_SMCCC))
++			return -ENODEV;
++		priv->rng.read = mtk_rng_read_smc;
++	} else {
++#ifndef CONFIG_PM
++		priv->rng.init = mtk_rng_init;
++		priv->rng.cleanup = mtk_rng_cleanup;
++#endif
++		priv->rng.read = mtk_rng_read;
++	}
+ 
+ 	ret = devm_hwrng_register(&pdev->dev, &priv->rng);
+ 	if (ret) {
+@@ -139,12 +217,15 @@ static int mtk_rng_probe(struct platform_device *pdev)
+ 		return ret;
+ 	}
+ 
+-	dev_set_drvdata(&pdev->dev, priv);
+-	pm_runtime_set_autosuspend_delay(&pdev->dev, RNG_AUTOSUSPEND_TIMEOUT);
+-	pm_runtime_use_autosuspend(&pdev->dev);
+-	ret = devm_pm_runtime_enable(&pdev->dev);
+-	if (ret)
+-		return ret;
++	if (!(priv->flags & MTK_RNG_SMC)) {
++		dev_set_drvdata(&pdev->dev, priv);
++		pm_runtime_set_autosuspend_delay(&pdev->dev,
++						 RNG_AUTOSUSPEND_TIMEOUT);
++		pm_runtime_use_autosuspend(&pdev->dev);
++		ret = devm_pm_runtime_enable(&pdev->dev);
++		if (ret)
++			return ret;
++	}
+ 
+ 	dev_info(&pdev->dev, "registered RNG driver\n");
+ 
+@@ -181,8 +262,11 @@ static const struct dev_pm_ops mtk_rng_pm_ops = {
+ #endif	/* CONFIG_PM */
+ 
+ static const struct of_device_id mtk_rng_match[] = {
+-	{ .compatible = "mediatek,mt7986-rng" },
+ 	{ .compatible = "mediatek,mt7623-rng" },
++	{ .compatible = "mediatek,mt7981-rng", .data = (void *)MTK_RNG_SMC },
++	{ .compatible = "mediatek,mt7986-rng" },
++	{ .compatible = "mediatek,mt7987-rng", .data = (void *)MTK_RNG_SMC },
++	{ .compatible = "mediatek,mt7988-rng", .data = (void *)MTK_RNG_SMC },
+ 	{},
+ };
+ MODULE_DEVICE_TABLE(of, mtk_rng_match);
+@@ -200,4 +284,5 @@ module_platform_driver(mtk_rng_driver);
+ 
+ MODULE_DESCRIPTION("Mediatek Random Number Generator Driver");
+ MODULE_AUTHOR("Sean Wang <sean.wang@mediatek.com>");
++MODULE_AUTHOR("Daniel Golle <daniel@makrotopia.org>");
+ MODULE_LICENSE("GPL");
 -- 
 2.53.0
