@@ -1,102 +1,203 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E1CC29AAF3;
-	Sat, 18 Apr 2026 23:52:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776556351; cv=none; b=CC27a6UwKDHbJw9Dz6grOZlZYpR5qciHzgOjTqPndnciEnjhRsEmgmzD/BrFaCR5VaMuD6Y8Ba4LxUgiNLtSfNuAiiJtjBjDk7X2XiNWIVT8bITb2RvAkgI7HIHP3kcxjYi89dC1boyDyGGeS2RfbQZrF4+hlr/GI5D/2kLmqZU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776556351; c=relaxed/simple;
-	bh=8sj0LB7vRs97YPJ3eUBTA5AxlXkRZPMdaIMhReW+bYI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eUVEiedzY/aaJAZLyzWUABni8WBoBayhwsJVY4NH/5ExS3GI+H2nG1icwvEwyhqq4NnvwGt9pv1arlyYuI8h6t0q6ZDokrLmht2hRS0C4HRJ2QDg1i937JpgH2eXpziwygUUtbsI35+R2REbr7+mJG86AoZNRtaiF6lv8bl4kBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Qi40OZZn; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 528A11DD877;
+	Sun, 19 Apr 2026 00:36:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1776559001; cv=pass; b=acU/cpD+4hu1yQNJeV8zYDmGrTafHbiY0oKA6SBNcCRAZL1zU5V9dXXec05/B/gIWfTHcLokCID66HCyvvylHyz40AbrqTum9kjhL0e8FzR0YM99ZMBDJiXzSUqwm6KokYVebUo20sd/T5C0rt/gNgY+/YnLbwYP0r2UD99N8To=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1776559001; c=relaxed/simple;
+	bh=3exs+ddTpVpqEQ4Pu3BicOW7rgzcKWc1D9fzn8TYRMI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=THS6Q8tjg70O9R7YopBNI3kHWMdweK3/O8dX/6TrTINhNY2/PSG8TjLsyxoz89JTtL+4o26FbmZNoT3NidKpCAhP4zWyLSW0JBSVlAPL7sjBIZ9buglQCF2cpJlfbHqY6qX+3RAIU/vUpa/MEA7fMskUcFgRcpzlrdLp4TXVR+A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=B6ejUd2x; arc=pass smtp.client-ip=195.140.195.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Qi40OZZn"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=y9OQqXRvkvsl8GwgwOgbpA0ljpdAAoE+nFUbyuM2bNo=; b=Qi40OZZn1hQQ29Y5PVqIFvxKyy
-	wK7NzfTRkjXlFnmKeH1OXQJ3zzgNeOJ9qXOLNKekgCnJLmhjg5ZCdZeytmt3M+M9TIXVQn8JXku/r
-	1gpbp8fIjF3B025AmdMIbI3um43TXbPzoVGSLwrS7MHX3xE/OJiAzclbeMhzfJEaM3VfgNJG/rvyW
-	3tX1nAxh+Fi4FBji0BzbWiW7E/2aAwvU7T3rQ9qwOeuz8veOhndq5F1yd+vaUzSob7jqlirwmfVtk
-	5KsKf09UckVJngW+ax5C6mjy1Xd8gPXxOsMzn8bNZd9CbHEZrIScnW6ClpTR6lEgWj8jY6sHDAr8l
-	OaW3CNKQ==;
-Received: from [50.53.43.113] (helo=[192.168.254.34])
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1wEFSc-00000005KvL-09Ga;
-	Sat, 18 Apr 2026 23:52:28 +0000
-Message-ID: <5f476f04-b6ea-4c56-b416-da4c5cec19a0@infradead.org>
-Date: Sat, 18 Apr 2026 16:52:25 -0700
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="B6ejUd2x"
+Received: from darkstar.musicnaut.iki.fi (unknown [83.245.248.121])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: aaro.koskinen)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4fyqS36pznzyRb;
+	Sun, 19 Apr 2026 03:36:35 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1776558997;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PWCe8xN4awYR6g3iHR1feUaJdolK1aTOcRHBAQFeYZs=;
+	b=B6ejUd2xqNxkrCFSx+wr1uCq+x4+jA1zqkWDfWLIoeRU++0FN0bKeW1wNfkU9lULsplAde
+	mQmUG7Y1Vcqzy2M2njQexmMMj7ha1WyIOB1DusKNqY3fD4PjmoZ+mBCYYcyHTydHARQSXJ
+	dosvufX0xfLOa3Fq0fmMJCmb3YQwZto=
+ARC-Seal: i=1; a=rsa-sha256; d=iki.fi; s=meesny; cv=none; t=1776558997;
+	b=L64Y0vaRUfsqHka1OVWoqvmwWCcQVXx2GS1JjeEUiX1k0FNGABnesvfuMz3QQ78S64Q/EB
+	1SiePicvH3l2+5pzMjC1KkzKmIxN6mvcUVRxns0SkUvpJSMe1acHFOfiUrrUGNNG9KxkLT
+	TbdoyO0LuMDCO2wcSrL+yZSi4gBv8jA=
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=aaro.koskinen smtp.mailfrom=aaro.koskinen@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1776558997;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PWCe8xN4awYR6g3iHR1feUaJdolK1aTOcRHBAQFeYZs=;
+	b=FnS29HaA3UNktSZvfwIiMK7V9cuwVypHsoe6EX5epgw1B6cP1RDNva+DwF5YRxgzLQLw4z
+	SwRQcwvUptM69ZhnczeNKec0xbE3wS/U2zzwug3r81yPh+TcLoyXxhqDLqORam2rdxjWb+
+	yTrpmU94Q56s9UAKiAlbOkjSR+/Os3g=
+Date: Sun, 19 Apr 2026 03:36:31 +0300
+From: Aaro Koskinen <aaro.koskinen@iki.fi>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-mips@vger.kernel.org,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Subject: Re: [PATCH] lib/crypto: mips: Drop optimized MD5 code
+Message-ID: <aeQjj0J1k7siaqOF@darkstar.musicnaut.iki.fi>
+References: <20260326204824.62010-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/2] lib/crypto: docs: Add rst documentation to
- Documentation/crypto/
-To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
- "Jason A . Donenfeld" <Jason@zx2c4.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, linux-doc@vger.kernel.org,
- Jonathan Corbet <corbet@lwn.net>,
- Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-References: <20260418192138.15556-1-ebiggers@kernel.org>
- <20260418192138.15556-3-ebiggers@kernel.org>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20260418192138.15556-3-ebiggers@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260326204824.62010-1-ebiggers@kernel.org>
 
+Hi,
 
+On Thu, Mar 26, 2026 at 01:48:24PM -0700, Eric Biggers wrote:
+> MD5 is obsolete.  Continuing to maintain architecture-optimized
+> implementations of MD5 is unnecessary and risky.  It diverts resources
+> from the modern algorithms that are actually important.
+> 
+> While there was demand for continuing to maintain the PowerPC optimized
+> MD5 code to accommodate userspace programs that are misusing AF_ALG
+> (https://lore.kernel.org/linux-crypto/c4191597-341d-4fd7-bc3d-13daf7666c41@csgroup.eu/),
+> no such demand has been seen for the MIPS Cavium Octeon optimized MD5
+> code.  Note that this code runs on only one particular line of SoCs.
+> 
+> Thus, let's drop it and focus effort on the more modern SHA algorithms,
+> which already have optimized code for the same SoCs.
 
-On 4/18/26 12:21 PM, Eric Biggers wrote:
-> Add a documentation file Documentation/crypto/libcrypto.rst which
-> provides a high-level overview of lib/crypto/.
-> 
-> Also add several sub-pages which include the kernel-doc for the
-> algorithms that have it.  This makes the existing, quite extensive
-> kernel-doc start being included in the HTML and PDF documentation.
-> 
-> Note that the intent is very much *not* that everyone has to read these
-> Documentation/ files.  The library is intended to be straightforward and
-> use familiar conventions; generally it should be possible to dive right
-> into the kernel-doc.  You shouldn't need to read a lot of documentation
-> to just call `sha256()`, for example, or to run the unit tests if you're
-> already familiar with KUnit.  (This differs from the traditional crypto
-> API which has a larger barrier to entry.)
-> 
-> Nevertheless, this seems worth adding.  Hopefully it is useful and makes
-> LWN no longer consider the library to be "meticulously undocumented".
-> 
-> Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
+I don't mind deleting this (I shut down all my MIPS hardware already
+in new year 2020 to start a "fresh" decade), but just for the record,
+this will probably downgrade the performance of TCP_MD5SIG which I recall
+was the original reason this code got added...
+
+Also that PowerPC case about "misusing AF_ALG" is interesting - I often do
+similar on small systems (just to save binary space and avoid duplicate
+implementation) - why AF_ALG even allows such use if it's considered
+a bug?
+
+A.
+
 > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-
-Tested-by: Randy Dunlap <rdunlap@infradead.org>
-Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
-
 > ---
->  Documentation/crypto/index.rst                |   2 +-
->  .../crypto/libcrypto-blockcipher.rst          |  19 ++
->  Documentation/crypto/libcrypto-hash.rst       |  86 +++++++++
->  Documentation/crypto/libcrypto-signature.rst  |  11 ++
->  Documentation/crypto/libcrypto-utils.rst      |   6 +
->  Documentation/crypto/libcrypto.rst            | 165 ++++++++++++++++++
->  Documentation/crypto/sha3.rst                 |   2 +
->  7 files changed, 290 insertions(+), 1 deletion(-)
->  create mode 100644 Documentation/crypto/libcrypto-blockcipher.rst
->  create mode 100644 Documentation/crypto/libcrypto-hash.rst
->  create mode 100644 Documentation/crypto/libcrypto-signature.rst
->  create mode 100644 Documentation/crypto/libcrypto-utils.rst
->  create mode 100644 Documentation/crypto/libcrypto.rst
 > 
-
--- 
-~Randy
+> This patch is targeting libcrypto-next
+> 
+>  lib/crypto/Kconfig    |  1 -
+>  lib/crypto/mips/md5.h | 65 -------------------------------------------
+>  2 files changed, 66 deletions(-)
+>  delete mode 100644 lib/crypto/mips/md5.h
+> 
+> diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
+> index 4b6f593dc72f..9f31f03062f0 100644
+> --- a/lib/crypto/Kconfig
+> +++ b/lib/crypto/Kconfig
+> @@ -132,11 +132,10 @@ config CRYPTO_LIB_MD5
+>  	  uses any of the functions from <crypto/md5.h>.
+>  
+>  config CRYPTO_LIB_MD5_ARCH
+>  	bool
+>  	depends on CRYPTO_LIB_MD5 && !UML
+> -	default y if MIPS && CPU_CAVIUM_OCTEON
+>  	default y if PPC
+>  	default y if SPARC64
+>  
+>  config CRYPTO_LIB_MLDSA
+>  	tristate
+> diff --git a/lib/crypto/mips/md5.h b/lib/crypto/mips/md5.h
+> deleted file mode 100644
+> index e08e28aeffa4..000000000000
+> --- a/lib/crypto/mips/md5.h
+> +++ /dev/null
+> @@ -1,65 +0,0 @@
+> -/*
+> - * Cryptographic API.
+> - *
+> - * MD5 Message Digest Algorithm (RFC1321).
+> - *
+> - * Adapted for OCTEON by Aaro Koskinen <aaro.koskinen@iki.fi>.
+> - *
+> - * Based on crypto/md5.c, which is:
+> - *
+> - * Derived from cryptoapi implementation, originally based on the
+> - * public domain implementation written by Colin Plumb in 1993.
+> - *
+> - * Copyright (c) Cryptoapi developers.
+> - * Copyright (c) 2002 James Morris <jmorris@intercode.com.au>
+> - *
+> - * This program is free software; you can redistribute it and/or modify it
+> - * under the terms of the GNU General Public License as published by the Free
+> - * Software Foundation; either version 2 of the License, or (at your option)
+> - * any later version.
+> - */
+> -
+> -#include <asm/octeon/crypto.h>
+> -#include <asm/octeon/octeon.h>
+> -
+> -/*
+> - * We pass everything as 64-bit. OCTEON can handle misaligned data.
+> - */
+> -
+> -static void md5_blocks(struct md5_block_state *state,
+> -		       const u8 *data, size_t nblocks)
+> -{
+> -	struct octeon_cop2_state cop2_state;
+> -	u64 *state64 = (u64 *)state;
+> -	unsigned long flags;
+> -
+> -	if (!octeon_has_crypto())
+> -		return md5_blocks_generic(state, data, nblocks);
+> -
+> -	cpu_to_le32_array(state->h, ARRAY_SIZE(state->h));
+> -
+> -	flags = octeon_crypto_enable(&cop2_state);
+> -	write_octeon_64bit_hash_dword(state64[0], 0);
+> -	write_octeon_64bit_hash_dword(state64[1], 1);
+> -
+> -	do {
+> -		const u64 *block = (const u64 *)data;
+> -
+> -		write_octeon_64bit_block_dword(block[0], 0);
+> -		write_octeon_64bit_block_dword(block[1], 1);
+> -		write_octeon_64bit_block_dword(block[2], 2);
+> -		write_octeon_64bit_block_dword(block[3], 3);
+> -		write_octeon_64bit_block_dword(block[4], 4);
+> -		write_octeon_64bit_block_dword(block[5], 5);
+> -		write_octeon_64bit_block_dword(block[6], 6);
+> -		octeon_md5_start(block[7]);
+> -
+> -		data += MD5_BLOCK_SIZE;
+> -	} while (--nblocks);
+> -
+> -	state64[0] = read_octeon_64bit_hash_dword(0);
+> -	state64[1] = read_octeon_64bit_hash_dword(1);
+> -	octeon_crypto_disable(&cop2_state, flags);
+> -
+> -	le32_to_cpu_array(state->h, ARRAY_SIZE(state->h));
+> -}
+> 
+> base-commit: 7ac21b4032e5b9b8a6a312b6f1d54f4ba24d1c16
+> -- 
+> 2.53.0
+> 
+> 
