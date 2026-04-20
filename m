@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30454393DFD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59AEC39479D;
 	Mon, 20 Apr 2026 06:37:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776667031; cv=none; b=AeZIQTV6CVT69Pnghg190Nj266S3p8MtohFiP1fnWb5h4B6U67s1ARuw1vHg7l+66ccDTTUDCloLprOrvA6fdQH5YrLDoWKCl0LC+G4z3KnKey2VmzYzXakqNVK9s4jOHMI/E4vOIE7k6EbaymXOaKLWRIc5n2wNxPMQTOiEmJo=
+	t=1776667031; cv=none; b=nbJLc/xlX0RNCl0GmXrsk5XEmEYsbrWJFMMOmaroh9kbvv0RMIrvrww3wilnUOS5CoT0udRNjU3SgpwRA0Q/xJbWEDGCM/HT8qEpB66EW5wrgooQJjkYwQBiMcZmnnaqHzsxolnqej/wq1uS73lNj77vM0QKjedicunjPaimZmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1776667031; c=relaxed/simple;
-	bh=yWsOliU3FcFx45ZLBYbhLJzZMSG7sIHqGJUl35fV29I=;
+	bh=pa6SwK8StZ2Ab/1JoqAmWt9nbpuSbITMNoLFBxS8+i8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LmewH9uwrZi+G5KZuptwVnpKinlVL+JXwatmSKuHD42FE4NstqsXVZLZIe5gQ3o2P7zHQzEREC/Hx0oDi+qwvm8r1Vo/9lbMEEYAChuPvxM8eDMxsGQ78PXXo911K+Awd/4+KPhObiCr5E+XPxlSA/EfM+rPcL10TeHkHOzFxFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pBn2UudF; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=jzQqF+Dc841TDp/mY4RLkKqZgpVo+f933CETvuShSh7lrMT2lMeLWjrzd4Vt6saf6OCcB9ppqYJ867tYTSotLIiTEpJFfPdujqe25m8BAFKsAStDGWt7QP9v9hISKuvQf2XHdcDxFP7gEXNaa1rVUWg0Qug4Wrc2k3nLoxO8avw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LXu8/UKs; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pBn2UudF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0FD6C2BCC4;
-	Mon, 20 Apr 2026 06:37:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LXu8/UKs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07191C2BCB3;
+	Mon, 20 Apr 2026 06:37:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776667030;
-	bh=yWsOliU3FcFx45ZLBYbhLJzZMSG7sIHqGJUl35fV29I=;
+	s=k20201202; t=1776667031;
+	bh=pa6SwK8StZ2Ab/1JoqAmWt9nbpuSbITMNoLFBxS8+i8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pBn2UudFYSzREjfV5MykmmtIO2cijQoHaCbWM1pcu9b+yDTTO6OJCunoX3+GWJ/4/
-	 mTRcKIMKKHSJ19V1plR+coyB22VFE2t9+//dguDjLwggkkykD7NvC8yX72zSOruv9x
-	 HjPx9sa+jRe7LSBB/7iRbqTfJ6e+rAt08/rn57umSKqRf3wX6UZTV9knDnad4NWFyq
-	 fojkQ/5cgqfbd25srQm43dmS/Tm0KpCAdL49hvq+yhD75P4+f5bWkHXpuhLk0xihK8
-	 pZfn3nbzRYVjt5Kp5iX6P9uomBxxKHTgZcx4KRyXDMZdvol4Py5V7tUXRtpr6EGCWd
-	 2x6qApGL1RVAw==
+	b=LXu8/UKsrZSf2oz/gX3qNQQyrDo4e3syyveSui29kMC4d75eG5NINzzSnt7sbv4WA
+	 nIdwI3oxQ6vA764EAj4kZt9Kvjl72d3g1xyteJ9uvvbs54kVeZVk7qkoU6sRMvQsxp
+	 bGuxRlGFXLhFbRvyK6dqwr1dk5KAAf0ea7kW/my7Dd2WBk7DmagydkwCiRTtNWC5OE
+	 pzSeaQhZR1xKrg1FgPlBLxmMyKnxnGPAV1Aiae6ZNs5moeBtl3avdqPomW3aAvHwf7
+	 dN0J3RvDqA8suFE04KUcjL67/6EIK2+RWfT1NLr+juUz1Vwz3ACIU2iveU0gwZYOCK
+	 CF3DmnVEOUpDA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>
@@ -33,9 +33,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Stephan Mueller <smueller@chronox.de>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 37/38] crypto: drbg - Clean up generation code
-Date: Sun, 19 Apr 2026 23:34:21 -0700
-Message-ID: <20260420063422.324906-38-ebiggers@kernel.org>
+Subject: [PATCH 38/38] crypto: drbg - Clean up loop in drbg_hmac_update()
+Date: Sun, 19 Apr 2026 23:34:22 -0700
+Message-ID: <20260420063422.324906-39-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420063422.324906-1-ebiggers@kernel.org>
 References: <20260420063422.324906-1-ebiggers@kernel.org>
@@ -47,169 +47,59 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-A few miscellaneous cleanups to make the code a bit more readable:
-
-  - Replace (buf, buflen) with (out, outlen)
-  - Update (out, outlen) as we go along
-  - Use size_t for lengths
-  - Use min()
-  - Adjust some comments and log messages
-  - Rename a variable named 'len' to 'err', since it isn't a length
+This loop is a bit hard to read, with the loop counter that's used in
+the HMAC being separate from the actual loop counter, which counts
+backwards for some reason.  Just replace it with a regular loop.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- crypto/drbg.c | 53 ++++++++++++++++++---------------------------------
- 1 file changed, 19 insertions(+), 34 deletions(-)
+ crypto/drbg.c | 14 ++------------
+ 1 file changed, 2 insertions(+), 12 deletions(-)
 
 diff --git a/crypto/drbg.c b/crypto/drbg.c
-index bab766026177..b54c807930af 100644
+index b54c807930af..ad7b9577479e 100644
 --- a/crypto/drbg.c
 +++ b/crypto/drbg.c
-@@ -178,16 +178,13 @@ static void drbg_hmac_update(struct drbg_state *drbg,
- 	}
- 	memzero_explicit(new_key, sizeof(new_key));
- }
+@@ -135,37 +135,27 @@ struct drbg_state {
+ 	struct crypto_rng *jent;
+ 	const u8 *test_entropy;
+ 	size_t test_entropylen;
+ };
  
- /* generate function of HMAC DRBG as defined in 10.1.2.5 */
--static void drbg_hmac_generate(struct drbg_state *drbg,
--			       unsigned char *buf,
--			       unsigned int buflen,
-+static void drbg_hmac_generate(struct drbg_state *drbg, u8 *out, size_t outlen,
- 			       const u8 *addtl1, size_t addtl1_len)
+-enum drbg_prefixes {
+-	DRBG_PREFIX0 = 0x00,
+-	DRBG_PREFIX1,
+-};
+-
+ /******************************************************************
+  * HMAC DRBG functions
+  ******************************************************************/
+ 
+ /* update function of HMAC DRBG as defined in 10.1.2.2 */
+ static void drbg_hmac_update(struct drbg_state *drbg,
+ 			     const u8 *data1, size_t data1_len,
+ 			     const u8 *data2, size_t data2_len)
  {
--	int len = 0;
- 	u8 addtl2[32];
- 	size_t addtl2_len = 0;
+-	int i = 0;
+ 	struct hmac_sha512_ctx hmac_ctx;
+ 	u8 new_key[DRBG_STATE_LEN];
  
- 	/*
- 	 * Append some bytes from get_random_bytes() to the additional input
-@@ -208,21 +205,20 @@ static void drbg_hmac_generate(struct drbg_state *drbg,
+-	for (i = 2; 0 < i; i--) {
+-		/* first round uses 0x0, second 0x1 */
+-		unsigned char prefix = DRBG_PREFIX0;
+-		if (1 == i)
+-			prefix = DRBG_PREFIX1;
++	for (u8 i = 0; i < 2; i++) {
+ 		/* 10.1.2.2 step 1 and 4 -- concatenation and HMAC for key */
+ 		hmac_sha512_init(&hmac_ctx, &drbg->key);
+ 		hmac_sha512_update(&hmac_ctx, drbg->V, DRBG_STATE_LEN);
+-		hmac_sha512_update(&hmac_ctx, &prefix, 1);
++		hmac_sha512_update(&hmac_ctx, &i, 1);
+ 		hmac_sha512_update(&hmac_ctx, data1, data1_len);
+ 		hmac_sha512_update(&hmac_ctx, data2, data2_len);
+ 		hmac_sha512_final(&hmac_ctx, new_key);
+ 		hmac_sha512_preparekey(&drbg->key, new_key, DRBG_STATE_LEN);
  
- 	/* 10.1.2.5 step 2 */
- 	if (addtl1_len || addtl2_len)
- 		drbg_hmac_update(drbg, addtl1, addtl1_len, addtl2, addtl2_len);
- 
--	while (len < buflen) {
--		unsigned int outlen = 0;
-+	while (outlen) {
-+		size_t n = min(DRBG_STATE_LEN, outlen);
- 
- 		/* 10.1.2.5 step 4.1 */
- 		hmac_sha512(&drbg->key, drbg->V, DRBG_STATE_LEN, drbg->V);
--		outlen = (DRBG_STATE_LEN < (buflen - len)) ?
--			  DRBG_STATE_LEN : (buflen - len);
- 
- 		/* 10.1.2.5 step 4.2 */
--		memcpy(buf + len, drbg->V, outlen);
--		len += outlen;
-+		memcpy(out, drbg->V, n);
-+		out += n;
-+		outlen -= n;
- 	}
- 
- 	/* 10.1.2.5 step 6 */
- 	drbg_hmac_update(drbg, addtl1, addtl1_len, addtl2, addtl2_len);
- 
-@@ -329,47 +325,42 @@ static int drbg_seed(struct drbg_state *drbg, const u8 *pers, size_t pers_len,
- 
- 	return ret;
- }
- 
- /*
-- * DRBG generate function as required by SP800-90A - this function
-- * generates random numbers
-+ * Generate random bytes from an SP800-90A DRBG.
-  *
-  * @drbg DRBG state handle
-- * @buf Buffer where to store the random numbers -- the buffer must already
-- *      be pre-allocated by caller
-- * @buflen Length of output buffer - this value defines the number of random
-- *	   bytes pulled from DRBG
-+ * @out Buffer where to store the random bytes
-+ * @outlen Number of random bytes to generate
-  * @addtl Optional additional input that is mixed into state
-  * @addtl_len Length of @addtl in bytes, may be 0
-  *
-  * return: 0 when all bytes are generated; < 0 in case of an error
-  */
--static int drbg_generate(struct drbg_state *drbg,
--			 unsigned char *buf, unsigned int buflen,
-+static int drbg_generate(struct drbg_state *drbg, u8 *out, size_t outlen,
- 			 const u8 *addtl, size_t addtl_len)
- 	__must_hold(&drbg->drbg_mutex)
- {
--	int len = 0;
-+	int err;
- 
- 	if (!drbg->instantiated) {
- 		pr_devel("DRBG: not yet instantiated\n");
- 		return -EINVAL;
- 	}
--	if (0 == buflen || !buf) {
-+	if (out == NULL || outlen == 0) {
- 		pr_devel("DRBG: no output buffer provided\n");
- 		return -EINVAL;
- 	}
- 	if (addtl == NULL && addtl_len != 0) {
- 		pr_devel("DRBG: wrong format of additional information\n");
- 		return -EINVAL;
- 	}
- 
- 	/* 9.3.1 step 2 */
--	if (buflen > DRBG_MAX_REQUEST_BYTES) {
--		pr_devel("DRBG: requested random numbers too large %u\n",
--			 buflen);
-+	if (outlen > DRBG_MAX_REQUEST_BYTES) {
-+		pr_devel("DRBG: request length is too long %zu\n", outlen);
- 		return -EINVAL;
- 	}
- 
- 	/* 9.3.1 step 3 is implicit with the chosen DRBG */
- 
-@@ -391,20 +382,20 @@ static int drbg_generate(struct drbg_state *drbg,
- 	 */
- 	if (drbg->pr || drbg->reseed_ctr > DRBG_MAX_REQUESTS) {
- 		pr_devel("DRBG: reseeding before generation (prediction resistance: %s)\n",
- 			 str_true_false(drbg->pr));
- 		/* 9.3.1 steps 7.1 through 7.3 */
--		len = drbg_seed(drbg, addtl, addtl_len, true);
--		if (len)
--			goto err;
-+		err = drbg_seed(drbg, addtl, addtl_len, true);
-+		if (err)
-+			return err;
- 		/* 9.3.1 step 7.4 */
- 		addtl = NULL;
- 		addtl_len = 0;
- 	}
- 
- 	/* 9.3.1 step 8 and 10 */
--	drbg_hmac_generate(drbg, buf, buflen, addtl, addtl_len);
-+	drbg_hmac_generate(drbg, out, outlen, addtl, addtl_len);
- 
- 	/* 10.1.2.5 step 7 */
- 	drbg->reseed_ctr++;
- 
- 	/*
-@@ -418,17 +409,11 @@ static int drbg_generate(struct drbg_state *drbg,
- 	 * In this case, the entire kernel operation is questionable and it
- 	 * is unlikely that the integrity violation only affects the
- 	 * correct operation of the DRBG.
- 	 */
- 
--	/*
--	 * All operations were successful, return 0 as mandated by
--	 * the kernel crypto API interface.
--	 */
--	len = 0;
--err:
--	return len;
-+	return 0;
- }
- 
- /***************************************************************
-  * Kernel crypto API interface to DRBG
-  ***************************************************************/
 -- 
 2.53.0
 
