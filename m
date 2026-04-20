@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3E30386C08;
-	Mon, 20 Apr 2026 06:37:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34A0438734E;
+	Mon, 20 Apr 2026 06:37:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776667025; cv=none; b=YhLZCnagw0VhuRKT+36JwAwiLo30odCOaAZ4ZsPjlRyNg6DpbdH5FRdouttV2oSvgkHxgoSCRj5fPmbgH85AdxD0XjvGdkAVARDMOhv5Ed/3sI9X7DJRxHr/xbpxyWXvZ6XFMp7B5bGD8xUm5rGGencybGklSV4pjU5/RfgMBNc=
+	t=1776667025; cv=none; b=qp1jJKmPDvXCBofDYzFBs4n49bdlYvQz4UWh5MNU4ByeRxvcR3ECjSfvRZNxaEYGIDP45n/CsM4zffjXvJRLUOLPFj64/qA+8JJ29MzjVBB1TTFmuAGZfyyalbREVhBC1Pu8OX6SI1qn9NY2KMwA0qpe6Ozf9RqYsg1qUcGn/cc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1776667025; c=relaxed/simple;
-	bh=g74v/w/rNfq8HucffhieG1Gbw1mYglCOSqwkdqtHFuY=;
+	bh=/u+lRTImvLueD/+PSvEGy3iqrgX6BJzcHarFIttsMV8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=l8+beNMJG+n461g2MbUVYl3LkO8blqCG39exFQoSuaput6UMQgTo3ra3apWijWpswa7S1lw4MWdk8s3pdLjOa6o4J7T0yEXfSJRhe1cJJLTgV8ApeLrSrt+YSHb5HAG1nV2fKMOJYVS+9CSSH9Hr6/BW9Wj59IPA+LuWAp2AKOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sja3joT0; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=lpHZYgz3+Qq0pDl4qtuK85/ijBahydJ43Uhs5NKqY3xJ7joyIDoJTko5/crjCphvpI/ZJ/LA+jbHlGhuXh7KSGkiZ4Vltex8gOXivsrxyIguLu7kk/MBMMjxcOL1OLE5gFuLNweBMGwbba6BceBAVSBjd+y8dSrVhfkfpK3ANIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n5BtpE2u; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sja3joT0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 935F2C2BCB8;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n5BtpE2u"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DECB0C2BCB9;
 	Mon, 20 Apr 2026 06:37:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776667024;
-	bh=g74v/w/rNfq8HucffhieG1Gbw1mYglCOSqwkdqtHFuY=;
+	s=k20201202; t=1776667025;
+	bh=/u+lRTImvLueD/+PSvEGy3iqrgX6BJzcHarFIttsMV8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Sja3joT0Q4uofKy5V4i6d09gdiwts87TgZAguQecEBVCF88YgQc5fC+VYq6UWY9eT
-	 91LmvBqT4KFivE/ah2Xhe4zJnT3AQSMN9TqMX1Pnm2fDygm8x/sb70RRIqJbvwkuCX
-	 ONtYm8neWKsXrGVzxtbUqcC0W47yxjuMw1wU7EQUB5FQRoU3sAqB3VoZVi0rQPfMQ7
-	 EglDJyN1toJoL7JF0UotodoHkCFozXWKv0/V9kKm7t2IWamFW2Y2On7zcEjaJDGmIe
-	 vPuByenEKTvohbKnvpb7ksnyp8Sel4DVQK2XidNbedz51gA9oRGBaDZ4nN54KseNa/
-	 2SEqWxhmt3DMw==
+	b=n5BtpE2u8ubAw+5sN5HzYNJPxuntFInlg55edxdp9H5QeDA+re2ngA+aPlsbhNmLu
+	 Q8bo+kwPFTIkU7DhQLQfTIxj7jB9+IGmHT8+koF3QQXFWvg1upFrVmj/uwg4+EOWFP
+	 sEWTxCJY3qkiNDq2UwC66bUFr+isj6r5pxcT9w8rkF5uLdnm8Ev7TbCX9DoXeXmeH0
+	 fIDB0hN5k4enQ2zealLjH+TptK6pHgZC/fD8zBebVKUc/MazefRGiSvho3ziV2SPkd
+	 7mY8HDFUcY1JZMKM9Ll+Copbtpvv9+EgwIoUSQa2PVbeZia36GyptcQAm0EdfO1xJG
+	 JY7OzwCUOVlrw==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>
@@ -33,9 +33,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Stephan Mueller <smueller@chronox.de>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 17/38] crypto: drbg - Remove support for HMAC-SHA256 and HMAC-SHA384
-Date: Sun, 19 Apr 2026 23:34:01 -0700
-Message-ID: <20260420063422.324906-18-ebiggers@kernel.org>
+Subject: [PATCH 18/38] crypto: drbg - Simplify algorithm registration
+Date: Sun, 19 Apr 2026 23:34:02 -0700
+Message-ID: <20260420063422.324906-19-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420063422.324906-1-ebiggers@kernel.org>
 References: <20260420063422.324906-1-ebiggers@kernel.org>
@@ -47,427 +47,146 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Remove support for the HMAC-SHA256 and HMAC-SHA384 variants of
-HMAC_DRBG, leaving only the HMAC-SHA512 variant of HMAC_DRBG.
-
-HMAC-SHA512 is already the default.  The default did used to be
-HMAC-SHA256, but several years ago it was upgraded to HMAC-SHA512 "to
-support compliance with SP800-90B and SP800-90C".  Given that the point
-of crypto/drbg.c is compliance with those standards, and there's also no
-technical reason to prefer HMAC-SHA384 in this situation even if
-acceptable, there's really no point in offering anything else.
-
-Note: now that only HMAC-SHA512 remains, a lot of unnecessary
-abstractions can be removed.  A later commit will do that.  This commit
-just straightforwardly removes the HMAC-SHA256 and HMAC-SHA384 code.
+Now that "drbg_pr_hmac_sha512" and "drbg_nopr_hmac_sha512" are the only
+crypto_rng algorithms left in crypto/drbg.c, simplify the algorithm
+registration logic to register these more directly without relying on
+the drbg_cores[] array (which will be removed).
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- crypto/drbg.c    |  22 +---
- crypto/testmgr.c |  27 -----
- crypto/testmgr.h | 280 -----------------------------------------------
- 3 files changed, 2 insertions(+), 327 deletions(-)
+ crypto/drbg.c | 100 ++++++++++++++++++--------------------------------
+ 1 file changed, 35 insertions(+), 65 deletions(-)
 
 diff --git a/crypto/drbg.c b/crypto/drbg.c
-index 6301eb2e304c..81bccacd3595 100644
+index 81bccacd3595..4a778d0d1fc4 100644
 --- a/crypto/drbg.c
 +++ b/crypto/drbg.c
-@@ -1,11 +1,9 @@
- /*
-  * DRBG: Deterministic Random Bits Generator
-- *       Based on NIST Recommended DRBG from NIST SP800-90A with the following
-- *       properties:
-- *		* HMAC DRBG with DF with SHA-1, SHA-256, SHA-384, SHA-512 cores
-- *		* with and without prediction resistance
-+ *       Implementation of the HMAC SHA-512 DRBG from NIST SP800-90A,
-+ *       both with and without prediction resistance
-  *
-  * Copyright Stephan Mueller <smueller@chronox.de>, 2014
-  *
-  * Redistribution and use in source and binary forms, with or without
-  * modification, are permitted provided that the following conditions
-@@ -213,22 +211,10 @@ enum drbg_prefixes {
-  *
-  * Thus, the favored DRBGs are the latest entries in this array.
-  */
- static const struct drbg_core drbg_cores[] = {
- 	{
--		.flags = DRBG_HMAC | DRBG_STRENGTH256,
--		.statelen = 48, /* block length of cipher */
--		.blocklen_bytes = 48,
--		.cra_name = "hmac_sha384",
--		.backend_cra_name = "hmac(sha384)",
--	}, {
--		.flags = DRBG_HMAC | DRBG_STRENGTH256,
--		.statelen = 32, /* block length of cipher */
--		.blocklen_bytes = 32,
--		.cra_name = "hmac_sha256",
--		.backend_cra_name = "hmac(sha256)",
--	}, {
- 		.flags = DRBG_HMAC | DRBG_STRENGTH256,
- 		.statelen = 64, /* block length of cipher */
- 		.blocklen_bytes = 64,
- 		.cra_name = "hmac_sha512",
- 		.backend_cra_name = "hmac(sha512)",
-@@ -274,14 +260,10 @@ static void drbg_kcapi_hmacsetkey(struct drbg_state *drbg,
- static int drbg_init_hash_kernel(struct drbg_state *drbg);
- static int drbg_fini_hash_kernel(struct drbg_state *drbg);
+@@ -1143,90 +1143,60 @@ static inline int __init drbg_healthcheck_sanity(void)
  
- MODULE_ALIAS_CRYPTO("drbg_pr_hmac_sha512");
- MODULE_ALIAS_CRYPTO("drbg_nopr_hmac_sha512");
--MODULE_ALIAS_CRYPTO("drbg_pr_hmac_sha384");
--MODULE_ALIAS_CRYPTO("drbg_nopr_hmac_sha384");
--MODULE_ALIAS_CRYPTO("drbg_pr_hmac_sha256");
--MODULE_ALIAS_CRYPTO("drbg_nopr_hmac_sha256");
+ 	kfree(drbg);
+ 	return rc;
+ }
  
- /* update function of HMAC DRBG as defined in 10.1.2.2 */
- static int drbg_hmac_update(struct drbg_state *drbg, struct list_head *seed,
- 			    int reseed)
+-static struct rng_alg drbg_algs[22];
+-
+-/*
+- * Fill the array drbg_algs used to register the different DRBGs
+- * with the kernel crypto API. To fill the array, the information
+- * from drbg_cores[] is used.
+- */
+-static inline void __init drbg_fill_array(struct rng_alg *alg,
+-					  const struct drbg_core *core, int pr)
+-{
+-	int pos = 0;
+-	static int priority = 200;
+-
+-	memcpy(alg->base.cra_name, "stdrng", 6);
+-	if (pr) {
+-		memcpy(alg->base.cra_driver_name, "drbg_pr_", 8);
+-		pos = 8;
+-	} else {
+-		memcpy(alg->base.cra_driver_name, "drbg_nopr_", 10);
+-		pos = 10;
+-	}
+-	memcpy(alg->base.cra_driver_name + pos, core->cra_name,
+-	       strlen(core->cra_name));
+-
+-	alg->base.cra_priority = priority;
+-	priority++;
+-	/*
+-	 * If FIPS mode enabled, the selected DRBG shall have the
+-	 * highest cra_priority over other stdrng instances to ensure
+-	 * it is selected.
+-	 */
+-	if (fips_enabled)
+-		alg->base.cra_priority += 2000;
+-
+-	alg->base.cra_ctxsize 	= sizeof(struct drbg_state);
+-	alg->base.cra_module	= THIS_MODULE;
+-	alg->base.cra_init	= drbg_kcapi_init;
+-	alg->base.cra_exit	= drbg_kcapi_cleanup;
+-	alg->generate		= drbg_kcapi_random;
+-	alg->seed		= drbg_kcapi_seed;
+-	alg->set_ent		= drbg_kcapi_set_entropy;
+-	alg->seedsize		= 0;
+-}
++static struct rng_alg drbg_algs[] = {
++	{
++		.base.cra_name		= "stdrng",
++		.base.cra_driver_name	= "drbg_pr_hmac_sha512",
++		.base.cra_priority	= 200,
++		.base.cra_ctxsize	= sizeof(struct drbg_state),
++		.base.cra_module	= THIS_MODULE,
++		.base.cra_init		= drbg_kcapi_init,
++		.set_ent		= drbg_kcapi_set_entropy,
++		.seed			= drbg_kcapi_seed,
++		.generate		= drbg_kcapi_random,
++		.base.cra_exit		= drbg_kcapi_cleanup,
++	},
++	{
++		.base.cra_name		= "stdrng",
++		.base.cra_driver_name	= "drbg_nopr_hmac_sha512",
++		.base.cra_priority	= 201,
++		.base.cra_ctxsize	= sizeof(struct drbg_state),
++		.base.cra_module	= THIS_MODULE,
++		.base.cra_init		= drbg_kcapi_init,
++		.set_ent		= drbg_kcapi_set_entropy,
++		.seed			= drbg_kcapi_seed,
++		.generate		= drbg_kcapi_random,
++		.base.cra_exit		= drbg_kcapi_cleanup,
++	},
++};
+ 
+ static int __init drbg_init(void)
  {
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index ad4c2e66b812..4199b7d3e9fb 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -4647,44 +4647,17 @@ static const struct alg_test_desc alg_test_descs[] = {
- 			.kpp = __VECS(dh_tv_template)
- 		}
- 	}, {
- 		.alg = "digest_null",
- 		.test = alg_test_null,
--	}, {
--		.alg = "drbg_nopr_hmac_sha256",
--		.test = alg_test_drbg,
--		.fips_allowed = 1,
--		.suite = {
--			.drbg = __VECS(drbg_nopr_hmac_sha256_tv_template)
--		}
--	}, {
--		/*
--		 * There is no need to specifically test the DRBG with every
--		 * backend cipher -- covered by drbg_nopr_hmac_sha512 test
--		 */
--		.alg = "drbg_nopr_hmac_sha384",
--		.test = alg_test_null,
--		.fips_allowed = 1
- 	}, {
- 		.alg = "drbg_nopr_hmac_sha512",
- 		.test = alg_test_drbg,
- 		.fips_allowed = 1,
- 		.suite = {
- 			.drbg = __VECS(drbg_nopr_hmac_sha512_tv_template)
- 		}
--	}, {
--		.alg = "drbg_pr_hmac_sha256",
--		.test = alg_test_drbg,
--		.fips_allowed = 1,
--		.suite = {
--			.drbg = __VECS(drbg_pr_hmac_sha256_tv_template)
--		}
--	}, {
--		/* covered by drbg_pr_hmac_sha256 test */
--		.alg = "drbg_pr_hmac_sha384",
--		.test = alg_test_null,
--		.fips_allowed = 1
- 	}, {
- 		.alg = "drbg_pr_hmac_sha512",
- 		.test = alg_test_drbg,
- 		.fips_allowed = 1,
- 		.suite = {
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index fc70ca86d61f..c47203f73fd1 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -23431,290 +23431,10 @@ static const struct aead_testvec aegis128_tv_template[] = {
- 			  "\x78\x93\xec\xfc\xf4\xff\xe1\x2d",
- 		.clen	= 24,
- 	},
- };
+-	unsigned int i = 0; /* pointer to drbg_algs */
+-	unsigned int j = 0; /* pointer to drbg_cores */
+ 	int ret;
  
--static const struct drbg_testvec drbg_pr_hmac_sha256_tv_template[] = {
--	{
--		.entropy = (unsigned char *)
--			"\x99\x69\xe5\x4b\x47\x03\xff\x31\x78\x5b\x87\x9a"
--			"\x7e\x5c\x0e\xae\x0d\x3e\x30\x95\x59\xe9\xfe\x96"
--			"\xb0\x67\x6d\x49\xd5\x91\xea\x4d\x07\xd2\x0d\x46"
--			"\xd0\x64\x75\x7d\x30\x23\xca\xc2\x37\x61\x27\xab",
--		.entropylen = 48,
--		.entpra = (unsigned char *)
--			"\xc6\x0f\x29\x99\x10\x0f\x73\x8c\x10\xf7\x47\x92"
--			"\x67\x6a\x3f\xc4\xa2\x62\xd1\x37\x21\x79\x80\x46"
--			"\xe2\x9a\x29\x51\x81\x56\x9f\x54",
--		.entprb = (unsigned char *)
--			"\xc1\x1d\x45\x24\xc9\x07\x1b\xd3\x09\x60\x15\xfc"
--			"\xf7\xbc\x24\xa6\x07\xf2\x2f\xa0\x65\xc9\x37\x65"
--			"\x8a\x2a\x77\xa8\x69\x90\x89\xf4",
--		.entprlen = 32,
--		.expected = (unsigned char *)
--			"\xab\xc0\x15\x85\x60\x94\x80\x3a\x93\x8d\xff\xd2"
--			"\x0d\xa9\x48\x43\x87\x0e\xf9\x35\xb8\x2c\xfe\xc1"
--			"\x77\x06\xb8\xf5\x51\xb8\x38\x50\x44\x23\x5d\xd4"
--			"\x4b\x59\x9f\x94\xb3\x9b\xe7\x8d\xd4\x76\xe0\xcf"
--			"\x11\x30\x9c\x99\x5a\x73\x34\xe0\xa7\x8b\x37\xbc"
--			"\x95\x86\x23\x50\x86\xfa\x3b\x63\x7b\xa9\x1c\xf8"
--			"\xfb\x65\xef\xa2\x2a\x58\x9c\x13\x75\x31\xaa\x7b"
--			"\x2d\x4e\x26\x07\xaa\xc2\x72\x92\xb0\x1c\x69\x8e"
--			"\x6e\x01\xae\x67\x9e\xb8\x7c\x01\xa8\x9c\x74\x22"
--			"\xd4\x37\x2d\x6d\x75\x4a\xba\xbb\x4b\xf8\x96\xfc"
--			"\xb1\xcd\x09\xd6\x92\xd0\x28\x3f",
--		.expectedlen = 128,
--		.addtla = NULL,
--		.addtlb = NULL,
--		.addtllen = 0,
--		.pers = NULL,
--		.perslen = 0,
--	}, {
--		.entropy = (unsigned char *)
--			"\xb9\x1f\xe9\xef\xdd\x9b\x7d\x20\xb6\xec\xe0\x2f"
--			"\xdb\x76\x24\xce\x41\xc8\x3a\x4a\x12\x7f\x3e\x2f"
--			"\xae\x05\x99\xea\xb5\x06\x71\x0d\x0c\x4c\xb4\x05"
--			"\x26\xc6\xbd\xf5\x7f\x2a\x3d\xf2\xb5\x49\x7b\xda",
--		.entropylen = 48,
--		.entpra = (unsigned char *)
--			"\xef\x67\x50\x9c\xa7\x7d\xdf\xb7\x2d\x81\x01\xa4"
--			"\x62\x81\x6a\x69\x5b\xb3\x37\x45\xa7\x34\x8e\x26"
--			"\x46\xd9\x26\xa2\x19\xd4\x94\x43",
--		.entprb = (unsigned char *)
--			"\x97\x75\x53\x53\xba\xb4\xa6\xb2\x91\x60\x71\x79"
--			"\xd1\x6b\x4a\x24\x9a\x34\x66\xcc\x33\xab\x07\x98"
--			"\x51\x78\x72\xb2\x79\xfd\x2c\xff",
--		.entprlen = 32,
--		.expected = (unsigned char *)
--			"\x9c\xdc\x63\x8a\x19\x23\x22\x66\x0c\xc5\xb9\xd7"
--			"\xfb\x2a\xb0\x31\xe3\x8a\x36\xa8\x5a\xa8\x14\xda"
--			"\x1e\xa9\xcc\xfe\xb8\x26\x44\x83\x9f\xf6\xff\xaa"
--			"\xc8\x98\xb8\x30\x35\x3b\x3d\x36\xd2\x49\xd4\x40"
--			"\x62\x0a\x65\x10\x76\x55\xef\xc0\x95\x9c\xa7\xda"
--			"\x3f\xcf\xb7\x7b\xc6\xe1\x28\x52\xfc\x0c\xe2\x37"
--			"\x0d\x83\xa7\x51\x4b\x31\x47\x3c\xe1\x3c\xae\x70"
--			"\x01\xc8\xa3\xd3\xc2\xac\x77\x9c\xd1\x68\x77\x9b"
--			"\x58\x27\x3b\xa5\x0f\xc2\x7a\x8b\x04\x65\x62\xd5"
--			"\xe8\xd6\xfe\x2a\xaf\xd3\xd3\xfe\xbd\x18\xfb\xcd"
--			"\xcd\x66\xb5\x01\x69\x66\xa0\x3c",
--		.expectedlen = 128,
--		.addtla = (unsigned char *)
--			"\x17\xc1\x56\xcb\xcc\x50\xd6\x03\x7d\x45\x76\xa3"
--			"\x75\x76\xc1\x4a\x66\x1b\x2e\xdf\xb0\x2e\x7d\x56"
--			"\x6d\x99\x3b\xc6\x58\xda\x03\xf6",
--		.addtlb = (unsigned char *)
--			"\x7c\x7b\x4a\x4b\x32\x5e\x6f\x67\x34\xf5\x21\x4c"
--			"\xf9\x96\xf9\xbf\x1c\x8c\x81\xd3\x9b\x60\x6a\x44"
--			"\xc6\x03\xa2\xfb\x13\x20\x19\xb7",
--		.addtllen = 32,
--		.pers = NULL,
--		.perslen = 0,
--	}, {
--		.entropy = (unsigned char *)
--			"\x13\x54\x96\xfc\x1b\x7d\x28\xf3\x18\xc9\xa7\x89"
--			"\xb6\xb3\xc8\x72\xac\x00\xd4\x59\x36\x25\x05\xaf"
--			"\xa5\xdb\x96\xcb\x3c\x58\x46\x87\xa5\xaa\xbf\x20"
--			"\x3b\xfe\x23\x0e\xd1\xc7\x41\x0f\x3f\xc9\xb3\x67",
--		.entropylen = 48,
--		.entpra = (unsigned char *)
--			"\xe2\xbd\xb7\x48\x08\x06\xf3\xe1\x93\x3c\xac\x79"
--			"\xa7\x2b\x11\xda\xe3\x2e\xe1\x91\xa5\x02\x19\x57"
--			"\x20\x28\xad\xf2\x60\xd7\xcd\x45",
--		.entprb = (unsigned char *)
--			"\x8b\xd4\x69\xfc\xff\x59\x95\x95\xc6\x51\xde\x71"
--			"\x68\x5f\xfc\xf9\x4a\xab\xec\x5a\xcb\xbe\xd3\x66"
--			"\x1f\xfa\x74\xd3\xac\xa6\x74\x60",
--		.entprlen = 32,
--		.expected = (unsigned char *)
--			"\x1f\x9e\xaf\xe4\xd2\x46\xb7\x47\x41\x4c\x65\x99"
--			"\x01\xe9\x3b\xbb\x83\x0c\x0a\xb0\xc1\x3a\xe2\xb3"
--			"\x31\x4e\xeb\x93\x73\xee\x0b\x26\xc2\x63\xa5\x75"
--			"\x45\x99\xd4\x5c\x9f\xa1\xd4\x45\x87\x6b\x20\x61"
--			"\x40\xea\x78\xa5\x32\xdf\x9e\x66\x17\xaf\xb1\x88"
--			"\x9e\x2e\x23\xdd\xc1\xda\x13\x97\x88\xa5\xb6\x5e"
--			"\x90\x14\x4e\xef\x13\xab\x5c\xd9\x2c\x97\x9e\x7c"
--			"\xd7\xf8\xce\xea\x81\xf5\xcd\x71\x15\x49\x44\xce"
--			"\x83\xb6\x05\xfb\x7d\x30\xb5\x57\x2c\x31\x4f\xfc"
--			"\xfe\x80\xb6\xc0\x13\x0c\x5b\x9b\x2e\x8f\x3d\xfc"
--			"\xc2\xa3\x0c\x11\x1b\x80\x5f\xf3",
--		.expectedlen = 128,
--		.addtla = NULL,
--		.addtlb = NULL,
--		.addtllen = 0,
--		.pers = (unsigned char *)
--			"\x64\xb6\xfc\x60\xbc\x61\x76\x23\x6d\x3f\x4a\x0f"
--			"\xe1\xb4\xd5\x20\x9e\x70\xdd\x03\x53\x6d\xbf\xce"
--			"\xcd\x56\x80\xbc\xb8\x15\xc8\xaa",
--		.perslen = 32,
--	}, {
--		.entropy = (unsigned char *)
--			"\xc7\xcc\xbc\x67\x7e\x21\x66\x1e\x27\x2b\x63\xdd"
--			"\x3a\x78\xdc\xdf\x66\x6d\x3f\x24\xae\xcf\x37\x01"
--			"\xa9\x0d\x89\x8a\xa7\xdc\x81\x58\xae\xb2\x10\x15"
--			"\x7e\x18\x44\x6d\x13\xea\xdf\x37\x85\xfe\x81\xfb",
--		.entropylen = 48,
--		.entpra = (unsigned char *)
--			"\x7b\xa1\x91\x5b\x3c\x04\xc4\x1b\x1d\x19\x2f\x1a"
--			"\x18\x81\x60\x3c\x6c\x62\x91\xb7\xe9\xf5\xcb\x96"
--			"\xbb\x81\x6a\xcc\xb5\xae\x55\xb6",
--		.entprb = (unsigned char *)
--			"\x99\x2c\xc7\x78\x7e\x3b\x88\x12\xef\xbe\xd3\xd2"
--			"\x7d\x2a\xa5\x86\xda\x8d\x58\x73\x4a\x0a\xb2\x2e"
--			"\xbb\x4c\x7e\xe3\x9a\xb6\x81\xc1",
--		.entprlen = 32,
--		.expected = (unsigned char *)
--			"\x95\x6f\x95\xfc\x3b\xb7\xfe\x3e\xd0\x4e\x1a\x14"
--			"\x6c\x34\x7f\x7b\x1d\x0d\x63\x5e\x48\x9c\x69\xe6"
--			"\x46\x07\xd2\x87\xf3\x86\x52\x3d\x98\x27\x5e\xd7"
--			"\x54\xe7\x75\x50\x4f\xfb\x4d\xfd\xac\x2f\x4b\x77"
--			"\xcf\x9e\x8e\xcc\x16\xa2\x24\xcd\x53\xde\x3e\xc5"
--			"\x55\x5d\xd5\x26\x3f\x89\xdf\xca\x8b\x4e\x1e\xb6"
--			"\x88\x78\x63\x5c\xa2\x63\x98\x4e\x6f\x25\x59\xb1"
--			"\x5f\x2b\x23\xb0\x4b\xa5\x18\x5d\xc2\x15\x74\x40"
--			"\x59\x4c\xb4\x1e\xcf\x9a\x36\xfd\x43\xe2\x03\xb8"
--			"\x59\x91\x30\x89\x2a\xc8\x5a\x43\x23\x7c\x73\x72"
--			"\xda\x3f\xad\x2b\xba\x00\x6b\xd1",
--		.expectedlen = 128,
--		.addtla = (unsigned char *)
--			"\x18\xe8\x17\xff\xef\x39\xc7\x41\x5c\x73\x03\x03"
--			"\xf6\x3d\xe8\x5f\xc8\xab\xe4\xab\x0f\xad\xe8\xd6"
--			"\x86\x88\x55\x28\xc1\x69\xdd\x76",
--		.addtlb = (unsigned char *)
--			"\xac\x07\xfc\xbe\x87\x0e\xd3\xea\x1f\x7e\xb8\xe7"
--			"\x9d\xec\xe8\xe7\xbc\xf3\x18\x25\x77\x35\x4a\xaa"
--			"\x00\x99\x2a\xdd\x0a\x00\x50\x82",
--		.addtllen = 32,
--		.pers = (unsigned char *)
--			"\xbc\x55\xab\x3c\xf6\x52\xb0\x11\x3d\x7b\x90\xb8"
--			"\x24\xc9\x26\x4e\x5a\x1e\x77\x0d\x3d\x58\x4a\xda"
--			"\xd1\x81\xe9\xf8\xeb\x30\x8f\x6f",
--		.perslen = 32,
--	},
--};
+ 	ret = drbg_healthcheck_sanity();
+ 	if (ret)
+ 		return ret;
+ 
+-	if (ARRAY_SIZE(drbg_cores) * 2 > ARRAY_SIZE(drbg_algs)) {
+-		pr_info("DRBG: Cannot register all DRBG types"
+-			"(slots needed: %zu, slots available: %zu)\n",
+-			ARRAY_SIZE(drbg_cores) * 2, ARRAY_SIZE(drbg_algs));
+-		return -EFAULT;
+-	}
 -
--static const struct drbg_testvec drbg_nopr_hmac_sha256_tv_template[] = {
--	{
--		.entropy = (unsigned char *)
--			"\xca\x85\x19\x11\x34\x93\x84\xbf\xfe\x89\xde\x1c"
--			"\xbd\xc4\x6e\x68\x31\xe4\x4d\x34\xa4\xfb\x93\x5e"
--			"\xe2\x85\xdd\x14\xb7\x1a\x74\x88\x65\x9b\xa9\x6c"
--			"\x60\x1d\xc6\x9f\xc9\x02\x94\x08\x05\xec\x0c\xa8",
--		.entropylen = 48,
--		.expected = (unsigned char *)
--			"\xe5\x28\xe9\xab\xf2\xde\xce\x54\xd4\x7c\x7e\x75"
--			"\xe5\xfe\x30\x21\x49\xf8\x17\xea\x9f\xb4\xbe\xe6"
--			"\xf4\x19\x96\x97\xd0\x4d\x5b\x89\xd5\x4f\xbb\x97"
--			"\x8a\x15\xb5\xc4\x43\xc9\xec\x21\x03\x6d\x24\x60"
--			"\xb6\xf7\x3e\xba\xd0\xdc\x2a\xba\x6e\x62\x4a\xbf"
--			"\x07\x74\x5b\xc1\x07\x69\x4b\xb7\x54\x7b\xb0\x99"
--			"\x5f\x70\xde\x25\xd6\xb2\x9e\x2d\x30\x11\xbb\x19"
--			"\xd2\x76\x76\xc0\x71\x62\xc8\xb5\xcc\xde\x06\x68"
--			"\x96\x1d\xf8\x68\x03\x48\x2c\xb3\x7e\xd6\xd5\xc0"
--			"\xbb\x8d\x50\xcf\x1f\x50\xd4\x76\xaa\x04\x58\xbd"
--			"\xab\xa8\x06\xf4\x8b\xe9\xdc\xb8",
--		.expectedlen = 128,
--		.addtla = NULL,
--		.addtlb = NULL,
--		.addtllen = 0,
--		.pers = NULL,
--		.perslen = 0,
--	}, {
--		.entropy = (unsigned char *)
--			"\xf9\x7a\x3c\xfd\x91\xfa\xa0\x46\xb9\xe6\x1b\x94"
--			"\x93\xd4\x36\xc4\x93\x1f\x60\x4b\x22\xf1\x08\x15"
--			"\x21\xb3\x41\x91\x51\xe8\xff\x06\x11\xf3\xa7\xd4"
--			"\x35\x95\x35\x7d\x58\x12\x0b\xd1\xe2\xdd\x8a\xed",
--		.entropylen = 48,
--		.expected = (unsigned char *)
--			"\xc6\x87\x1c\xff\x08\x24\xfe\x55\xea\x76\x89\xa5"
--			"\x22\x29\x88\x67\x30\x45\x0e\x5d\x36\x2d\xa5\xbf"
--			"\x59\x0d\xcf\x9a\xcd\x67\xfe\xd4\xcb\x32\x10\x7d"
--			"\xf5\xd0\x39\x69\xa6\x6b\x1f\x64\x94\xfd\xf5\xd6"
--			"\x3d\x5b\x4d\x0d\x34\xea\x73\x99\xa0\x7d\x01\x16"
--			"\x12\x6d\x0d\x51\x8c\x7c\x55\xba\x46\xe1\x2f\x62"
--			"\xef\xc8\xfe\x28\xa5\x1c\x9d\x42\x8e\x6d\x37\x1d"
--			"\x73\x97\xab\x31\x9f\xc7\x3d\xed\x47\x22\xe5\xb4"
--			"\xf3\x00\x04\x03\x2a\x61\x28\xdf\x5e\x74\x97\xec"
--			"\xf8\x2c\xa7\xb0\xa5\x0e\x86\x7e\xf6\x72\x8a\x4f"
--			"\x50\x9a\x8c\x85\x90\x87\x03\x9c",
--		.expectedlen = 128,
--		.addtla = (unsigned char *)
--			"\x51\x72\x89\xaf\xe4\x44\xa0\xfe\x5e\xd1\xa4\x1d"
--			"\xbb\xb5\xeb\x17\x15\x00\x79\xbd\xd3\x1e\x29\xcf"
--			"\x2f\xf3\x00\x34\xd8\x26\x8e\x3b",
--		.addtlb = (unsigned char *)
--			"\x88\x02\x8d\x29\xef\x80\xb4\xe6\xf0\xfe\x12\xf9"
--			"\x1d\x74\x49\xfe\x75\x06\x26\x82\xe8\x9c\x57\x14"
--			"\x40\xc0\xc9\xb5\x2c\x42\xa6\xe0",
--		.addtllen = 32,
--		.pers = NULL,
--		.perslen = 0,
--	}, {
--		.entropy = (unsigned char *)
--			"\x8d\xf0\x13\xb4\xd1\x03\x52\x30\x73\x91\x7d\xdf"
--			"\x6a\x86\x97\x93\x05\x9e\x99\x43\xfc\x86\x54\x54"
--			"\x9e\x7a\xb2\x2f\x7c\x29\xf1\x22\xda\x26\x25\xaf"
--			"\x2d\xdd\x4a\xbc\xce\x3c\xf4\xfa\x46\x59\xd8\x4e",
--		.entropylen = 48,
--		.expected = (unsigned char *)
--			"\xb9\x1c\xba\x4c\xc8\x4f\xa2\x5d\xf8\x61\x0b\x81"
--			"\xb6\x41\x40\x27\x68\xa2\x09\x72\x34\x93\x2e\x37"
--			"\xd5\x90\xb1\x15\x4c\xbd\x23\xf9\x74\x52\xe3\x10"
--			"\xe2\x91\xc4\x51\x46\x14\x7f\x0d\xa2\xd8\x17\x61"
--			"\xfe\x90\xfb\xa6\x4f\x94\x41\x9c\x0f\x66\x2b\x28"
--			"\xc1\xed\x94\xda\x48\x7b\xb7\xe7\x3e\xec\x79\x8f"
--			"\xbc\xf9\x81\xb7\x91\xd1\xbe\x4f\x17\x7a\x89\x07"
--			"\xaa\x3c\x40\x16\x43\xa5\xb6\x2b\x87\xb8\x9d\x66"
--			"\xb3\xa6\x0e\x40\xd4\xa8\xe4\xe9\xd8\x2a\xf6\xd2"
--			"\x70\x0e\x6f\x53\x5c\xdb\x51\xf7\x5c\x32\x17\x29"
--			"\x10\x37\x41\x03\x0c\xcc\x3a\x56",
--		.expectedlen = 128,
--		.addtla = NULL,
--		.addtlb = NULL,
--		.addtllen = 0,
--		.pers = (unsigned char *)
--			"\xb5\x71\xe6\x6d\x7c\x33\x8b\xc0\x7b\x76\xad\x37"
--			"\x57\xbb\x2f\x94\x52\xbf\x7e\x07\x43\x7a\xe8\x58"
--			"\x1c\xe7\xbc\x7c\x3a\xc6\x51\xa9",
--		.perslen = 32,
--	}, {
--		.entropy = (unsigned char *)
--			"\xc2\xa5\x66\xa9\xa1\x81\x7b\x15\xc5\xc3\xb7\x78"
--			"\x17\x7a\xc8\x7c\x24\xe7\x97\xbe\x0a\x84\x5f\x11"
--			"\xc2\xfe\x39\x9d\xd3\x77\x32\xf2\xcb\x18\x94\xeb"
--			"\x2b\x97\xb3\xc5\x6e\x62\x83\x29\x51\x6f\x86\xec",
--		.entropylen = 48,
--		.expected = (unsigned char *)
--			"\xb3\xa3\x69\x8d\x77\x76\x99\xa0\xdd\x9f\xa3\xf0"
--			"\xa9\xfa\x57\x83\x2d\x3c\xef\xac\x5d\xf2\x44\x37"
--			"\xc6\xd7\x3a\x0f\xe4\x10\x40\xf1\x72\x90\x38\xae"
--			"\xf1\xe9\x26\x35\x2e\xa5\x9d\xe1\x20\xbf\xb7\xb0"
--			"\x73\x18\x3a\x34\x10\x6e\xfe\xd6\x27\x8f\xf8\xad"
--			"\x84\x4b\xa0\x44\x81\x15\xdf\xdd\xf3\x31\x9a\x82"
--			"\xde\x6b\xb1\x1d\x80\xbd\x87\x1a\x9a\xcd\x35\xc7"
--			"\x36\x45\xe1\x27\x0f\xb9\xfe\x4f\xa8\x8e\xc0\xe4"
--			"\x65\x40\x9e\xa0\xcb\xa8\x09\xfe\x2f\x45\xe0\x49"
--			"\x43\xa2\xe3\x96\xbb\xb7\xdd\x2f\x4e\x07\x95\x30"
--			"\x35\x24\xcc\x9c\xc5\xea\x54\xa1",
--		.expectedlen = 128,
--		.addtla = (unsigned char *)
--			"\x41\x3d\xd8\x3f\xe5\x68\x35\xab\xd4\x78\xcb\x96"
--			"\x93\xd6\x76\x35\x90\x1c\x40\x23\x9a\x26\x64\x62"
--			"\xd3\x13\x3b\x83\xe4\x9c\x82\x0b",
--		.addtlb = (unsigned char *)
--			"\xd5\xc4\xa7\x1f\x9d\x6d\x95\xa1\xbe\xdf\x0b\xd2"
--			"\x24\x7c\x27\x7d\x1f\x84\xa4\xe5\x7a\x4a\x88\x25"
--			"\xb8\x2a\x2d\x09\x7d\xe6\x3e\xf1",
--		.addtllen = 32,
--		.pers = (unsigned char *)
--			"\x13\xce\x4d\x8d\xd2\xdb\x97\x96\xf9\x41\x56\xc8"
--			"\xe8\xf0\x76\x9b\x0a\xa1\xc8\x2c\x13\x23\xb6\x15"
--			"\x36\x60\x3b\xca\x37\xc9\xee\x29",
--		.perslen = 32,
--	},
--};
--
- static const struct drbg_testvec drbg_pr_hmac_sha512_tv_template[] = {
  	/*
- 	 * Borrowed from the first applicable test vector from ACVP:
- 	 * https://github.com/usnistgov/ACVP-Server/blob/v1.1.0.33/gen-val/json-files/hmacDRBG-1.0/prompt.json#L1161
- 	 * https://github.com/usnistgov/ACVP-Server/blob/v1.1.0.33/gen-val/json-files/hmacDRBG-1.0/expectedResults.json#L271
+-	 * each DRBG definition can be used with PR and without PR, thus
+-	 * we instantiate each DRBG in drbg_cores[] twice.
+-	 *
+-	 * As the order of placing them into the drbg_algs array matters
+-	 * (the later DRBGs receive a higher cra_priority) we register the
+-	 * prediction resistance DRBGs first as the should not be too
+-	 * interesting.
++	 * In FIPS mode, boost the algorithm priorities to ensure that when
++	 * users request "stdrng", they really get an algorithm from here.
+ 	 */
+-	for (j = 0; ARRAY_SIZE(drbg_cores) > j; j++, i++)
+-		drbg_fill_array(&drbg_algs[i], &drbg_cores[j], 1);
+-	for (j = 0; ARRAY_SIZE(drbg_cores) > j; j++, i++)
+-		drbg_fill_array(&drbg_algs[i], &drbg_cores[j], 0);
+-	return crypto_register_rngs(drbg_algs, (ARRAY_SIZE(drbg_cores) * 2));
++	if (fips_enabled) {
++		for (size_t i = 0; i < ARRAY_SIZE(drbg_algs); i++)
++			drbg_algs[i].base.cra_priority += 2000;
++	}
++
++	return crypto_register_rngs(drbg_algs, ARRAY_SIZE(drbg_algs));
+ }
+ 
+ static void __exit drbg_exit(void)
+ {
+-	crypto_unregister_rngs(drbg_algs, (ARRAY_SIZE(drbg_cores) * 2));
++	crypto_unregister_rngs(drbg_algs, ARRAY_SIZE(drbg_algs));
+ }
+ 
+ module_init(drbg_init);
+ module_exit(drbg_exit);
+ MODULE_LICENSE("GPL");
 -- 
 2.53.0
 
