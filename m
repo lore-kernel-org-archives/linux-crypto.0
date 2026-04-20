@@ -1,41 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 892D015746F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1614382377;
 	Mon, 20 Apr 2026 06:36:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776667019; cv=none; b=NuWQzjumD4eFZ5KYUuzCFam/wuM+cTzTqyx5zoNyjcOiT84tgrApd6+WWGnnkbGAxj2Bmvomzlbv1mj8nHFArg6xveiOOis0MeJYqvDgP5q4vLy8ssnCb9r3yQLGjKQc8I65o2Qdx6ZMfkNF+YePnSXb8tba79XUu1dMvAJW3S8=
+	t=1776667020; cv=none; b=gDfKEy7nkD6Gi50RS9plTFC3BElFlfSwEHZGmFlmSRBBJL05euf4jZ8C1anV96DOleV/tCR5K9ntoLWu4itE++YFTkbEKkifVM7U1JL+77ERG05y143lm3V9v0M4PaqlRxSXDJKsJS5n98j7h/PefgZlWGPsbR4K6Tj276bzKys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776667019; c=relaxed/simple;
-	bh=eZIwjHTsAauKCfGAhduPaCDbK+KjBCoZ4p7G23eZu6U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=C3pXMkZ3LsbxF9qJQ8HhyB8dlQlUBhUdDkKbZ40DeYi+i0o0THt40aVKnIGjJrYF488tzaFOHHDKsZnfUqElpsbLL1K4HvrEi0x3o1V4TbFzL2kdMiW/3pn1JOxUv3SNj33RJ48IX/LYv0xXTaHiXuc15upiOnE1mhNYv2z8pp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FOsT7BQ+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776667020; c=relaxed/simple;
+	bh=DgjRJy3WrFHnXHJomMIkJwOT7NG0TlWT6zE8xZlCamw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Zt3Eujla6TixHf5LbHxCeA1/kuYfoskzQ3KU6tAqBgIA+/PG3ooTuZfcDklCmc+uW7ga5yuZ7n90GaKP9/ytCi3UvVHZxS3hKLZCDbfqlV0THj2Yf3GCvZkzZul2s+tJqxZ5NG9abn4CvcmX+1PGTtzDSYyMEw+1151iui6ZySI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JNR/fOq1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FOsT7BQ+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E50CCC19425;
-	Mon, 20 Apr 2026 06:36:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JNR/fOq1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 914C7C2BCB8;
+	Mon, 20 Apr 2026 06:36:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1776667019;
-	bh=eZIwjHTsAauKCfGAhduPaCDbK+KjBCoZ4p7G23eZu6U=;
-	h=From:To:Cc:Subject:Date:From;
-	b=FOsT7BQ+/9NUMGqg9/6JqpkxnT/Q1XKaySeK5Pe8olQPdvef+fLGKiAfbMUyqrlQm
-	 yGGFnHsGhUD3TF+eHMuDCmafdMRLNu321Hj6xGelzfQ/7SQXQ+YkoCHKRIx1jqZ2Pb
-	 eBRdg0Y5ytKW+j+zoNpq4qz5GKV1KP3QuU6/bJfogpDy79KBK935T2vHwJGD46dC/h
-	 N5mMzyYvt39QeUmvsSsBHJueNzu1Zn2tg885787aOe74QMdfRi5g1rqrObRBNe82sw
-	 1tx5P8eREy7Livk2M3RF4JgJBr/CEhsVcWN4ObwN7j4HASyOcbalIKVeoNJHXVtN1k
-	 sVeIEMUh4mTlw==
+	bh=DgjRJy3WrFHnXHJomMIkJwOT7NG0TlWT6zE8xZlCamw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=JNR/fOq10jCgAWiwjnPCIiL8+zaHscoC9UruJzuOnE7jHOTeLVgnDIquzPOidrhz2
+	 abd/qxiPsu/67ZlBpbdaVlp8aVwt5otpzrIfZYSFuAjz70qg7HKlVYgpamx5CxjkvT
+	 okT/SpHApwXXt/0cAfgOCYLkcwCmWk3lYvvm3DIHqAPN9sULbzgMfO0wjnRuBFucQd
+	 G98rzc3Sy4E2Jg2xIirmlfqE0XPkVoP3oqGYEsA5bjw2/nHP6VLusjdp85OXf0k96b
+	 qbrngpbAGXEUJaRBsD3LKWgWFk4szVYwpKOZTAnCwqLMfRMyEaxivz3SkRKDKi0Okn
+	 kYgXFrM0FIMAQ==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>
 Cc: linux-kernel@vger.kernel.org,
 	Stephan Mueller <smueller@chronox.de>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 00/38] Fix and simplify the NIST DRBG implementation
-Date: Sun, 19 Apr 2026 23:33:44 -0700
-Message-ID: <20260420063422.324906-1-ebiggers@kernel.org>
+	Eric Biggers <ebiggers@kernel.org>,
+	stable@vger.kernel.org
+Subject: [PATCH 02/38] crypto: drbg - Fix misaligned writes in CTR_DRBG and HASH_DRBG
+Date: Sun, 19 Apr 2026 23:33:46 -0700
+Message-ID: <20260420063422.324906-3-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260420063422.324906-1-ebiggers@kernel.org>
+References: <20260420063422.324906-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -44,136 +48,127 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series is intended to be taken through the cryptodev tree.  It can
-also be retrieved from:
+drbg_cpu_to_be32() is being used to do a plain write to a byte array,
+which doesn't have any alignment guarantee.  This can cause a misaligned
+write.  Replace it with the correct function, put_unaligned_be32().
 
-    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git drbg-v1
+Fixes: 72f3e00dd67e ("crypto: drbg - replace int2byte with cpu_to_be")
+Cc: stable@vger.kernel.org
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ crypto/df_sp80090a.c           |  7 ++++---
+ crypto/drbg.c                  |  3 ++-
+ include/crypto/internal/drbg.h | 18 ------------------
+ 3 files changed, 6 insertions(+), 22 deletions(-)
 
-This series fixes and greatly simplifies crypto/drbg.c, i.e. the
-kernel's implementation of NIST SP800-90A.  This code isn't normally
-used, but it's sometimes used by people doing FIPS 140-3 certifications.
-
-Note: this series is *not* meant to encourage using this code over
-random.c.  In fact, my recent commit 65b3c2f627851639 made "normal"
-systems stop using this code.  It's just that the reality is that this
-is in the kernel tree, it's been there for many years, and people are
-using it to get FIPS 140-3 certifications.  As long as that's the case,
-it might as well be fixed up and simplified.  Another reason to simplify
-this as much as possible is that for historical reasons it's accessible
-to unprivileged users via AF_ALG (even though it shouldn't be).  So I do
-think this is a clear step forwards, regardless of level of enthusiasm
-for FIPS, especially considering the massively negative diffstat.
-
-Patches 1-5 begin with some bug fixes.  Fixes for CTR_DRBG and HASH_DRBG
-are included, despite that code being removed later in the series, so
-that they can be backported (though that is likely unused code anyway).
-
-Patches 6-11 do some initial cleanups.
-
-Patches 12-17 clean up the museum of DRBG variants to just support the
-HMAC-SHA512 DRBG only, dropping support for the others.  This is already
-the default variant, it makes sense that it's the default, and it's
-probably the only one actually being used on current kernels.  In any
-case, supporting more than one is pretty pointless.  See the patches for
-more details about why it makes sense to keep using this one.
-
-Patches 18-33 contain many more cleanups, including switching from the
-crypto_shash API to the crypto library.
-
-Patch 34 is a significant one: it starts adding 32 bytes from
-get_random_bytes() to every additional input string.  This is to work
-around the forward secrecy bug described in Woodage & Shumow (2018)
-(https://eprint.iacr.org/2018/349.pdf), and to ensure that random.c
-reseeds are actually reflected in drbg.c.  Of course, for FIPS 140-3
-this is irrelevant, but this is the right thing to do in practice, and
-it should make drbg.c quite a bit more robust in practice.  (This isn't
-particularly novel, either; BoringSSL does essentially this same thing.)
-
-Patches 35-38 are some further cleanups, including some tweaks to when
-the formal reseeding happens.
-
-Note: while the primary goal of this series is to fix and simplify this
-code, this series is also intended to preserve the FIPS 140-3
-"certifiable" property of crypto/drbg.c.  I.e. after this series, it
-should still be possible to get a FIPS 140-3 certification that covers
-it.  In fact it should become quite a bit easier, since there will be
-only one DRBG variant to worry about and the code will be much more
-straightforward.  If there's anything I missed, let me know.
-
-Eric Biggers (38):
-  crypto: drbg - Fix returning success on failure in CTR_DRBG
-  crypto: drbg - Fix misaligned writes in CTR_DRBG and HASH_DRBG
-  crypto: drbg - Fix ineffective sanity check
-  crypto: drbg - Fix drbg_max_addtl() on 64-bit kernels
-  crypto: drbg - Fix the fips_enabled priority boost
-  crypto: drbg - Remove always-enabled symbol CRYPTO_DRBG_HMAC
-  crypto: drbg - Remove broken commented-out code
-  crypto: drbg - Remove unhelpful helper functions
-  crypto: drbg - Remove obsolete FIPS 140-2 continuous test
-  crypto: drbg - Fold include/crypto/drbg.h into crypto/drbg.c
-  crypto: drbg - Remove import of crypto_cipher functions
-  crypto: drbg - Remove support for CTR_DRBG
-  crypto: drbg - Remove support for HASH_DRBG
-  crypto: drbg - Flatten the DRBG menu
-  crypto: testmgr - Add test for drbg_pr_hmac_sha512
-  crypto: testmgr - Update test for drbg_nopr_hmac_sha512
-  crypto: drbg - Remove support for HMAC-SHA256 and HMAC-SHA384
-  crypto: drbg - Simplify algorithm registration
-  crypto: drbg - De-virtualize drbg_state_ops
-  crypto: drbg - Move fixed values into constants
-  crypto: drbg - Embed V and C into struct drbg_state
-  crypto: drbg - Use HMAC-SHA512 library API
-  crypto: drbg - Remove drbg_core
-  crypto: drbg - Install separate seed functions for pr and nopr
-  crypto: drbg - Move module aliases to end of file
-  crypto: drbg - Consolidate "instantiate" logic and remove
-    drbg_state::C
-  crypto: drbg - Eliminate use of 'drbg_string' and lists
-  crypto: drbg - Simplify drbg_generate_long() and fold into caller
-  crypto: drbg - Put rng_alg methods in logical order
-  crypto: drbg - Fold drbg_instantiate() into drbg_kcapi_seed()
-  crypto: drbg - Separate "reseed" case in drbg_kcapi_seed()
-  crypto: drbg - Fold drbg_prepare_hrng() into drbg_kcapi_seed()
-  crypto: drbg - Simplify "uninstantiate" logic
-  crypto: drbg - Include get_random_bytes() output in additional input
-  crypto: drbg - Change DRBG_MAX_REQUESTS to 4096
-  crypto: drbg - Remove redundant reseeding based on random.c state
-  crypto: drbg - Clean up generation code
-  crypto: drbg - Clean up loop in drbg_hmac_update()
-
- Documentation/crypto/api-samples.rst          |    2 +-
- Documentation/crypto/userspace-if.rst         |    2 +-
- arch/m68k/configs/amiga_defconfig             |    2 -
- arch/m68k/configs/apollo_defconfig            |    2 -
- arch/m68k/configs/atari_defconfig             |    2 -
- arch/m68k/configs/bvme6000_defconfig          |    2 -
- arch/m68k/configs/hp300_defconfig             |    2 -
- arch/m68k/configs/mac_defconfig               |    2 -
- arch/m68k/configs/multi_defconfig             |    2 -
- arch/m68k/configs/mvme147_defconfig           |    2 -
- arch/m68k/configs/mvme16x_defconfig           |    2 -
- arch/m68k/configs/q40_defconfig               |    2 -
- arch/m68k/configs/sun3_defconfig              |    2 -
- arch/m68k/configs/sun3x_defconfig             |    2 -
- arch/mips/configs/decstation_64_defconfig     |    2 -
- arch/mips/configs/decstation_defconfig        |    2 -
- arch/mips/configs/decstation_r4k_defconfig    |    2 -
- crypto/Kconfig                                |   40 +-
- crypto/df_sp80090a.c                          |    8 +-
- crypto/drbg.c                                 | 1800 +++--------------
- crypto/testmgr.c                              |  143 +-
- crypto/testmgr.h                              | 1262 ++++--------
- drivers/crypto/xilinx/xilinx-trng.c           |    1 -
- include/crypto/df_sp80090a.h                  |   25 +
- include/crypto/drbg.h                         |  263 ---
- include/crypto/internal/drbg.h                |   54 -
- .../crypto/chacha20-s390/test-cipher.c        |    1 -
- 27 files changed, 728 insertions(+), 2903 deletions(-)
- delete mode 100644 include/crypto/drbg.h
- delete mode 100644 include/crypto/internal/drbg.h
-
-
-base-commit: c1f49dea2b8f335813d3b348fd39117fb8efb428
+diff --git a/crypto/df_sp80090a.c b/crypto/df_sp80090a.c
+index b8134be6f7ad..f4bb7be016e8 100644
+--- a/crypto/df_sp80090a.c
++++ b/crypto/df_sp80090a.c
+@@ -8,10 +8,11 @@
+ 
+ #include <linux/errno.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/string.h>
++#include <linux/unaligned.h>
+ #include <crypto/aes.h>
+ #include <crypto/df_sp80090a.h>
+ #include <crypto/internal/drbg.h>
+ 
+ static void drbg_kcapi_sym(struct aes_enckey *aeskey, unsigned char *outval,
+@@ -139,14 +140,14 @@ int crypto_drbg_ctr_df(struct aes_enckey *aeskey,
+ 		return -EINVAL;
+ 
+ 	/* 10.4.2 step 2 -- calculate the entire length of all input data */
+ 	list_for_each_entry(seed, seedlist, list)
+ 		inputlen += seed->len;
+-	drbg_cpu_to_be32(inputlen, &L_N[0]);
++	put_unaligned_be32(inputlen, &L_N[0]);
+ 
+ 	/* 10.4.2 step 3 */
+-	drbg_cpu_to_be32(bytes_to_return, &L_N[4]);
++	put_unaligned_be32(bytes_to_return, &L_N[4]);
+ 
+ 	/* 10.4.2 step 5: length is L_N, input_string, one byte, padding */
+ 	padlen = (inputlen + sizeof(L_N) + 1) % (blocklen_bytes);
+ 	/* wrap the padlen appropriately */
+ 	if (padlen)
+@@ -173,11 +174,11 @@ int crypto_drbg_ctr_df(struct aes_enckey *aeskey,
+ 		/*
+ 		 * 10.4.2 step 9.1 - the padding is implicit as the buffer
+ 		 * holds zeros after allocation -- even the increment of i
+ 		 * is irrelevant as the increment remains within length of i
+ 		 */
+-		drbg_cpu_to_be32(i, iv);
++		put_unaligned_be32(i, iv);
+ 		/* 10.4.2 step 9.2 -- BCC and concatenation with temp */
+ 		drbg_ctr_bcc(aeskey, temp + templen, K, &bcc_list,
+ 			     blocklen_bytes, keylen);
+ 		/* 10.4.2 step 9.3 */
+ 		i++;
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index e4eb78ed222b..de4c69032155 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -101,10 +101,11 @@
+ #include <crypto/df_sp80090a.h>
+ #include <crypto/internal/cipher.h>
+ #include <linux/kernel.h>
+ #include <linux/jiffies.h>
+ #include <linux/string_choices.h>
++#include <linux/unaligned.h>
+ 
+ /***************************************************************
+  * Backend cipher definitions available to DRBG
+  ***************************************************************/
+ 
+@@ -599,11 +600,11 @@ static int drbg_hash_df(struct drbg_state *drbg,
+ 	unsigned char *tmp = drbg->scratchpad + drbg_statelen(drbg);
+ 	struct drbg_string data;
+ 
+ 	/* 10.4.1 step 3 */
+ 	input[0] = 1;
+-	drbg_cpu_to_be32((outlen * 8), &input[1]);
++	put_unaligned_be32(outlen * 8, &input[1]);
+ 
+ 	/* 10.4.1 step 4.1 -- concatenation of data for input into hash */
+ 	drbg_string_fill(&data, input, 5);
+ 	list_add(&data.list, entropylist);
+ 
+diff --git a/include/crypto/internal/drbg.h b/include/crypto/internal/drbg.h
+index 371e52dcee6c..b4e5ef0be602 100644
+--- a/include/crypto/internal/drbg.h
++++ b/include/crypto/internal/drbg.h
+@@ -7,28 +7,10 @@
+  */
+ 
+ #ifndef _INTERNAL_DRBG_H
+ #define _INTERNAL_DRBG_H
+ 
+-/*
+- * Convert an integer into a byte representation of this integer.
+- * The byte representation is big-endian
+- *
+- * @val value to be converted
+- * @buf buffer holding the converted integer -- caller must ensure that
+- *      buffer size is at least 32 bit
+- */
+-static inline void drbg_cpu_to_be32(__u32 val, unsigned char *buf)
+-{
+-	struct s {
+-		__be32 conv;
+-	};
+-	struct s *conversion = (struct s *)buf;
+-
+-	conversion->conv = cpu_to_be32(val);
+-}
+-
+ /*
+  * Concatenation Helper and string operation helper
+  *
+  * SP800-90A requires the concatenation of different data. To avoid copying
+  * buffers around or allocate additional memory, the following data structure
 -- 
 2.53.0
 
