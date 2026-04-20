@@ -1,152 +1,254 @@
-Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93C083859DF
-	for <linux-crypto@vger.kernel.org>; Mon, 20 Apr 2026 08:07:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06FC138642C
+	for <linux-crypto@vger.kernel.org>; Mon, 20 Apr 2026 08:13:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776672480; cv=none; b=HU1apsG8YyyGQDEx461ol4xzT0C3CGZAJBlKq7/6tpQA1js9FiMg7QxJ1iFIjwwFK+EkrQj+8gR71Qi3TXkP5LEYs/e5u5kig/47SDOfWDIkR/92bpia1HdFIxfJhlX2gLQVMZ1/FBkTfik543aE6b7saAlO7vu0qeZo5+o5eGY=
+	t=1776672835; cv=none; b=kMyT8qczqQ0cIZaqp9eiZuiaF1NYPQuobx2HN5HdV8GvmDYnd/bMhAqqUjaD6DywCdJlbDS471AR9J7uiYdxIXIX0iPiXp/Mx/puX1BKCbId+QktxPL8fwPp4aNA8u5q+JYtEnEQ07PmziEYGUOMhVIkDZh9uwY1hH98aszA2dY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776672480; c=relaxed/simple;
-	bh=UvVP6sPvQDWa2iOA2ZnJo3XziAKNEnnW1S9OnFPOiRY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ChejoT4Tb1FIobyB5XL2wovsGX/RHrapCSRhJ0wqIH7iQtdpkq/bL8DaFEZMLnatNJ2rsA0OM2X/BkJxq6h11IF2zLC5zPInO8Q/RmVqrbs9esoBAfCQP0qIij9ce8HQiQd8rHT+8EGIeaCZYi27ryhuVNqamKwbiTnm1yFEMlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-56d95bc93e3so1734978e0c.1
-        for <linux-crypto@vger.kernel.org>; Mon, 20 Apr 2026 01:07:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776672478; x=1777277278;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y76piFZ+kh6lscQExu9rpbEadv8KhXej2yUq0oHuYvE=;
-        b=nEzXrDIhn7GGNAfEi7hwAZvD6hgVvksGiORzuiLAGxiK5alT3B3fp5JRotn/JnOQ6m
-         xfP0HLA7AuX7AG/0wbzbLjHNDtMGaa8Y8NNK9zfOPmRMhpqbrUFvC68bYqGFd6maNyrh
-         J9OQ3Qii+8MOia9KO0+cQLJxFcY9B78FqN0lJAAk4KVTfIq9DNNcgkTdA1YVJl0DpV8e
-         5lUi1wRGV6Dyex5Mp0IuRvAjz6FqeU4B4hX/wmHMBPkw0PUFIsoVkExN/RihMcWdP7Mw
-         yKzgWHE3yTGlWE0XnLiHbZqlYwm0na64FI1vFTl0S+RquF9AykiPg0lQAXEuJNUZgPWY
-         y98g==
-X-Gm-Message-State: AOJu0Yz90X469qntGN4htASpd5YXnhv37kPLsvhZ411bbvSOMP3jlBte
-	U+vlewO+4MJANgE2GYGYM4BDL9IRln9olTZTDEBa7kakvZkKeQQAFfIyJx3zubrz
-X-Gm-Gg: AeBDieumrxjLOwD9Kvjzf0vINV0pYfPBuoAQUKa/xeioEUv5BNqm+X68sQeURK9Npr6
-	51e+9as5XJdV5gva3vyeVPXnTPgBH3b8IkLwxrhaHr6jCR1It2yZJQuTg1Eupv24/Bbzx61uya6
-	JOTxf+UvhB75C9E8HxqBc5ZdVMCE1WqtqVJmrEkp2fuTNnliMfDLN+iJeYNsTNi3QXCuhdG+yb2
-	SwuAoh9qIElZDr/jlxL6VF+5kSGsjNkTgie52vDCV4ULNgj5h87T8MeOHpZIpE8nIgNE0R10L9K
-	XlJcAh1EIsL/I/s7e5VVd2CuZYnIQp7thogKTUbwJWcKrpgknQrByowfLAIn0ny6+bUNuyobzm6
-	zqSbeoFYFpa0rc3t2ovgAcBzN8btlToOTCrdqZUFcyZ4/uqntZOLiwD3br9pQc6bbbZtKZhFCB9
-	FxYEV8hAO6+FezZFtuKvAylhwAQtY0oavBbmJ+ZviSP0mwr8EeG3m9DFJhV9B7hclU7ePbUs4=
-X-Received: by 2002:a05:6122:3c48:b0:570:2ace:c14a with SMTP id 71dfb90a1353d-5702aceca68mr707668e0c.0.1776672478493;
-        Mon, 20 Apr 2026 01:07:58 -0700 (PDT)
-Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com. [209.85.222.41])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-56fa91ea606sm5559588e0c.5.2026.04.20.01.07.57
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Apr 2026 01:07:57 -0700 (PDT)
-Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-9568bae58f7so1223551241.3
-        for <linux-crypto@vger.kernel.org>; Mon, 20 Apr 2026 01:07:57 -0700 (PDT)
-X-Received: by 2002:a05:6102:5491:b0:60a:7c2f:8ecb with SMTP id
- ada2fe7eead31-616f68d7579mr5660407137.15.1776672476969; Mon, 20 Apr 2026
- 01:07:56 -0700 (PDT)
+	s=arc-20240116; t=1776672835; c=relaxed/simple;
+	bh=jPa38Pwh1hialukoJ6ddXdRz0lTye+eXTsF1ZqTUUAo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jjVNlU57IwFkwak3xpldZDYio3t60bpm0+zj02CNsVzk7vq93gBhNQOC1NLX90IuiYD34PpT5qtNS3P3N6jXrnYmI+QXsu2H0YkBvCllH5bh+1IC0/MTxUpa/gGM5fuurOWoWd/9S3HEhmCa2WxmFf/N7zLnw47cW83D2aGknW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=XNbhJGcj; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="XNbhJGcj"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=G00g6ZzfcoWB31bEk6pRRncuIqqzGcmNkdfnuyGew0I=; 
+	b=XNbhJGcjYeJQZjYPUYc+CIoqrU5/sa7TevF7ak14NEK6A9/MfRywQMft9fkswo5aGhfZ0/1LNA/
+	IeB4OsMQXb//5y74YGwKSVzXADwLV+2bj87GOKECBQDn6ce7yUnVuNE/CRcwATCzprEiiYhQ2xBkK
+	k/GoOpFr7d7mKzODajy8YkmK5s+BpDfHl41HgtKn5C4I0pzbqJ4/D9Op0UisKeSw7vx7iqwQM3/Bz
+	dpKoxjYJ9wQYbjP1zv2ncZOETV2/xbN8zXzWLB98kZlzrBDpxNFK733uv/jGGaK6oaD1uX+bBfCkg
+	49wpLSk16JZVXemcPtJ0U41vkB3yo8C0tSPg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1wEjlE-007LMo-1i;
+	Mon, 20 Apr 2026 16:13:41 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 20 Apr 2026 16:13:40 +0800
+Date: Mon, 20 Apr 2026 16:13:40 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Dudu Lu <phx0fer@gmail.com>
+Cc: linux-crypto@vger.kernel.org, davem@davemloft.net,
+	David Howells <dhowells@redhat.com>
+Subject: Re: [PATCH] crypto: krb5enc - fix async decrypt skipping hash
+ verification
+Message-ID: <aeXgNAUkzhe1iieX@gondor.apana.org.au>
+References: <20260420044027.56413-1-phx0fer@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260420063422.324906-1-ebiggers@kernel.org> <20260420063422.324906-13-ebiggers@kernel.org>
-In-Reply-To: <20260420063422.324906-13-ebiggers@kernel.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Mon, 20 Apr 2026 10:07:45 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdXUaQ2k4gY9QwO+GxRVgUZm6AJ_FMWv_8P2pAkRrYoKeg@mail.gmail.com>
-X-Gm-Features: AQROBzCfGQob5s_jmfc4k5Hyr7YRG-yEyXXdAlN_u3YQ7qsotVEJLqMweG5GuRo
-Message-ID: <CAMuHMdXUaQ2k4gY9QwO+GxRVgUZm6AJ_FMWv_8P2pAkRrYoKeg@mail.gmail.com>
-Subject: Re: [PATCH 12/38] crypto: drbg - Remove support for CTR_DRBG
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, 
-	linux-kernel@vger.kernel.org, Stephan Mueller <smueller@chronox.de>, 
-	"Jason A . Donenfeld" <Jason@zx2c4.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260420044027.56413-1-phx0fer@gmail.com>
 
-On Mon, 20 Apr 2026 at 08:41, Eric Biggers <ebiggers@kernel.org> wrote:
-> Remove the support for CTR_DRBG.  It's likely unused code, seeing as
-> HMAC_DRBG is always enabled and prioritized over it unless
-> NETLINK_CRYPTO is used to change the algorithm priorities.
->
-> There's also no compelling reason to support more than one of
-> [HMAC_DRBG, HASH_DRBG, CTR_DRBG].  By definition, callers cannot tell
-> any difference in their outputs.  And all are FIPS-certifiable, which is
-> the only point of the kernel's NIST DRBGs anyway.
->
-> Switching to CTR_DRBG doesn't seem all that compelling, either.  While
-> it's often the fastest NIST DRBG, it has several disadvantages:
->
-> - CTR_DRBG uses AES.  Some platforms don't have AES acceleration at all,
->   causing a fallback to the table-based AES code which is very slow and
->   can be vulnerable to cache-timing attacks.  In contrast, HMAC_DRBG
->   uses primitives that are consistently constant-time.
->
-> - CTR_DRBG is usually considered to be somewhat less cryptographically
->   robust than HMAC_DRBG.  Granted, HMAC_DRBG isn't all that great
->   either, e.g. given the negative result from Woodage & Shumow (2018)
->   (https://eprint.iacr.org/2018/349.pdf), but that can be worked around.
->
-> - CTR_DRBG is more complex than HMAC_DRBG, risking bugs.  Indeed, while
->   reviewing the CTR_DRBG code, I found two bugs, including one where it
->   can return success while leaving the output buffer uninitialized.
->
-> - The kernel's implementation of CTR_DRBG uses an "ctr(aes)"
->   crypto_skcipher and relies on it returning the next counter value.
->   That's fragile, and indeed historically many "ctr(aes)"
->   crypto_skcipher implementations haven't done that.  E.g. see
->   commit 511306b2d075 ("crypto: arm/aes-ce - update IV after partial final CTR block"),
->   commit fa5fd3afc7e6 ("crypto: arm64/aes-blk - update IV after partial final CTR block"),
->   commit 371731ec2179 ("crypto: atmel-aes - Fix saving of IV for CTR mode"),
->   commit 25baaf8e2c93 ("crypto: crypto4xx - fix ctr-aes missing output IV"),
->   commit 334d37c9e263 ("crypto: caam - update IV using HW support"),
->   commit 0a4491d3febe ("crypto: chelsio - count incomplete block in IV"),
->   commit e8e3c1ca57d4 ("crypto: s5p - update iv after AES-CBC op end").
->
->   I.e., there were many years where the kernel's CTR_DRBG code (if it
->   were to have actually been used) repeated outputs on some platforms.
->
->   AES-CTR also uses a 128-bit counter, which creates overflow edge cases
->   that are sometimes gotten wrong.  E.g. see commit 009b30ac7444
->   ("crypto: vmx - CTR: always increment IV as quadword").
->
-> So, while switching to CTR_DRBG for performance reasons isn't completely
-> out of the question (notably BoringSSL uses it), it would take quite a
-> bit more work to create a solid implementation of it in the kernel,
-> including a more solid implementation of AES-CTR itself (in lib/crypto/,
-> with a scalar bit-sliced fallback, etc).  Since HMAC_DRBG has always
-> been the default NIST DRBG variant in the kernel and is in a better
-> state, let's just standardize on it for now.
->
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+On Mon, Apr 20, 2026 at 12:40:27PM +0800, Dudu Lu wrote:
+> krb5enc_dispatch_decrypt() sets req->base.complete as the skcipher
+> callback, which is the caller's own completion handler. When the
+> skcipher completes asynchronously, this signals "done" to the caller
+> without executing krb5enc_dispatch_decrypt_hash(), completely bypassing
+> the integrity verification (hash check).
+> 
+> Compare with the encrypt path which correctly uses
+> krb5enc_encrypt_done as an intermediate callback to chain into the
+> hash computation on async completion.
+> 
+> Fix by adding krb5enc_decrypt_done as an intermediate callback that
+> chains into krb5enc_dispatch_decrypt_hash() upon async skcipher
+> completion, matching the encrypt path's callback pattern.
+> 
+> Also fix EBUSY/EINPROGRESS handling throughout: remove
+> krb5enc_request_complete() which incorrectly swallowed EINPROGRESS
+> notifications that must be passed up to callers waiting on backlogged
+> requests, and add missing EBUSY checks in krb5enc_encrypt_ahash_done
+> for the dispatch_encrypt return value.
+> 
+> Fixes: d1775a177f7f ("crypto: Add 'krb5enc' hash and cipher AEAD algorithm")
+> Signed-off-by: Dudu Lu <phx0fer@gmail.com>
+> ---
+>  crypto/krb5enc.c | 42 ++++++++++++++++++++++++++----------------
+>  1 file changed, 26 insertions(+), 16 deletions(-)
 
->  arch/m68k/configs/amiga_defconfig          |   1 -
->  arch/m68k/configs/apollo_defconfig         |   1 -
->  arch/m68k/configs/atari_defconfig          |   1 -
->  arch/m68k/configs/bvme6000_defconfig       |   1 -
->  arch/m68k/configs/hp300_defconfig          |   1 -
->  arch/m68k/configs/mac_defconfig            |   1 -
->  arch/m68k/configs/multi_defconfig          |   1 -
->  arch/m68k/configs/mvme147_defconfig        |   1 -
->  arch/m68k/configs/mvme16x_defconfig        |   1 -
->  arch/m68k/configs/q40_defconfig            |   1 -
->  arch/m68k/configs/sun3_defconfig           |   1 -
->  arch/m68k/configs/sun3x_defconfig          |   1 -
+Thanks.  Your patch looks good to me.
 
-Acked-by: Geert Uytterhoeven <geert@linux-m68k.org> # m68k
+However, while applying it against mainline I got a conflict because
+of the recent change to unset the MAY_SLEEP flag on the async completion
+path.
 
-Gr{oetje,eeting}s,
+That got me thinking and I found one more issue, if we try to do a
+MAY_BACKLOG operation on the async completion path, then the user
+will see two back-to-back EINPROGRESS notifications which is wrong.
 
-                        Geert
+As David still hasn't indicated his preference to whether MAY_BACKLOG
+should be supported or not, I've taken the easy option and
+simply disallowed MAY_BACKLOG on the async completion path.  In order
+to support it, you need to add a flag to the request context so that
+the second EINPROGRESS notification can be selectively filtered out.
 
+So this is what I ended up applying:
+
+commit b51261043f3b6863ed4b65ccad967d998cd302f5
+Author: Dudu Lu <phx0fer@gmail.com>
+Date:   Mon Apr 20 12:40:27 2026 +0800
+
+    crypto: krb5enc - fix async decrypt skipping hash verification
+    
+    krb5enc_dispatch_decrypt() sets req->base.complete as the skcipher
+    callback, which is the caller's own completion handler. When the
+    skcipher completes asynchronously, this signals "done" to the caller
+    without executing krb5enc_dispatch_decrypt_hash(), completely bypassing
+    the integrity verification (hash check).
+    
+    Compare with the encrypt path which correctly uses
+    krb5enc_encrypt_done as an intermediate callback to chain into the
+    hash computation on async completion.
+    
+    Fix by adding krb5enc_decrypt_done as an intermediate callback that
+    chains into krb5enc_dispatch_decrypt_hash() upon async skcipher
+    completion, matching the encrypt path's callback pattern.
+    
+    Also fix EBUSY/EINPROGRESS handling throughout: remove
+    krb5enc_request_complete() which incorrectly swallowed EINPROGRESS
+    notifications that must be passed up to callers waiting on backlogged
+    requests, and add missing EBUSY checks in krb5enc_encrypt_ahash_done
+    for the dispatch_encrypt return value.
+    
+    Fixes: d1775a177f7f ("crypto: Add 'krb5enc' hash and cipher AEAD algorithm")
+    Signed-off-by: Dudu Lu <phx0fer@gmail.com>
+    
+    Unset MAY_BACKLOG on the async completion path so the user won't
+    see back-to-back EINPROGRESS notifications.
+    
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/krb5enc.c b/crypto/krb5enc.c
+index 1bfe8370cf94..fefa8d2c7532 100644
+--- a/crypto/krb5enc.c
++++ b/crypto/krb5enc.c
+@@ -39,12 +39,6 @@ struct krb5enc_request_ctx {
+ 	char tail[];
+ };
+ 
+-static void krb5enc_request_complete(struct aead_request *req, int err)
+-{
+-	if (err != -EINPROGRESS)
+-		aead_request_complete(req, err);
+-}
+-
+ /**
+  * crypto_krb5enc_extractkeys - Extract Ke and Ki keys from the key blob.
+  * @keys: Where to put the key sizes and pointers
+@@ -127,7 +121,7 @@ static void krb5enc_encrypt_done(void *data, int err)
+ {
+ 	struct aead_request *req = data;
+ 
+-	krb5enc_request_complete(req, err);
++	aead_request_complete(req, err);
+ }
+ 
+ /*
+@@ -188,14 +182,16 @@ static void krb5enc_encrypt_ahash_done(void *data, int err)
+ 	struct ahash_request *ahreq = (void *)(areq_ctx->tail + ictx->reqoff);
+ 
+ 	if (err)
+-		return krb5enc_request_complete(req, err);
++		goto out;
+ 
+ 	krb5enc_insert_checksum(req, ahreq->result);
+ 
+-	err = krb5enc_dispatch_encrypt(req,
+-				       aead_request_flags(req) & ~CRYPTO_TFM_REQ_MAY_SLEEP);
+-	if (err != -EINPROGRESS)
+-		aead_request_complete(req, err);
++	err = krb5enc_dispatch_encrypt(req, 0);
++	if (err == -EINPROGRESS)
++		return;
++
++out:
++	aead_request_complete(req, err);
+ }
+ 
+ /*
+@@ -265,17 +261,16 @@ static void krb5enc_decrypt_hash_done(void *data, int err)
+ {
+ 	struct aead_request *req = data;
+ 
+-	if (err)
+-		return krb5enc_request_complete(req, err);
+-
+-	err = krb5enc_verify_hash(req);
+-	krb5enc_request_complete(req, err);
++	if (!err)
++		err = krb5enc_verify_hash(req);
++	aead_request_complete(req, err);
+ }
+ 
+ /*
+  * Dispatch the hashing of the plaintext after we've done the decryption.
+  */
+-static int krb5enc_dispatch_decrypt_hash(struct aead_request *req)
++static int krb5enc_dispatch_decrypt_hash(struct aead_request *req,
++					 unsigned int flags)
+ {
+ 	struct crypto_aead *krb5enc = crypto_aead_reqtfm(req);
+ 	struct aead_instance *inst = aead_alg_instance(krb5enc);
+@@ -291,7 +286,7 @@ static int krb5enc_dispatch_decrypt_hash(struct aead_request *req)
+ 	ahash_request_set_tfm(ahreq, auth);
+ 	ahash_request_set_crypt(ahreq, req->dst, hash,
+ 				req->assoclen + req->cryptlen - authsize);
+-	ahash_request_set_callback(ahreq, aead_request_flags(req),
++	ahash_request_set_callback(ahreq, flags,
+ 				   krb5enc_decrypt_hash_done, req);
+ 
+ 	err = crypto_ahash_digest(ahreq);
+@@ -301,6 +296,21 @@ static int krb5enc_dispatch_decrypt_hash(struct aead_request *req)
+ 	return krb5enc_verify_hash(req);
+ }
+ 
++static void krb5enc_decrypt_done(void *data, int err)
++{
++	struct aead_request *req = data;
++
++	if (err)
++		goto out;
++
++	err = krb5enc_dispatch_decrypt_hash(req, 0);
++	if (err == -EINPROGRESS)
++		return;
++
++out:
++	aead_request_complete(req, err);
++}
++
+ /*
+  * Dispatch the decryption of the ciphertext.
+  */
+@@ -324,7 +334,7 @@ static int krb5enc_dispatch_decrypt(struct aead_request *req)
+ 
+ 	skcipher_request_set_tfm(skreq, ctx->enc);
+ 	skcipher_request_set_callback(skreq, aead_request_flags(req),
+-				      req->base.complete, req->base.data);
++				      krb5enc_decrypt_done, req);
+ 	skcipher_request_set_crypt(skreq, src, dst,
+ 				   req->cryptlen - authsize, req->iv);
+ 
+@@ -339,7 +349,7 @@ static int krb5enc_decrypt(struct aead_request *req)
+ 	if (err < 0)
+ 		return err;
+ 
+-	return krb5enc_dispatch_decrypt_hash(req);
++	return krb5enc_dispatch_decrypt_hash(req, aead_request_flags(req));
+ }
+ 
+ static int krb5enc_init_tfm(struct crypto_aead *tfm)
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
