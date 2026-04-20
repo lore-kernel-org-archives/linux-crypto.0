@@ -1,561 +1,306 @@
 Received: from smtp.jvdsn.com (smtp.jvdsn.com [129.153.194.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85C66333727;
-	Mon, 20 Apr 2026 16:06:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A57D333858B;
+	Mon, 20 Apr 2026 16:11:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.153.194.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776701167; cv=none; b=MIiNe0X9cZ3+a0IeSVSJRkdlCWZrb9+nIEdlALh7fhwpjHjqEiLwzAXtqvmhUMCA4td+QfHUu7lQ14ZbiLXzV+PDVmaLNS7hlHRearPIaVgFRwchZspXubhOdLvl4xgXDrkdA3yngeO8OLVpc5NsJ93Xe55ZjRLjnAs7YN/4jt8=
+	t=1776701486; cv=none; b=igeeR5NRUgxMwDn1HaA+exPyzNAbQ4AjH1HkdTSRZo4ek1MWQ8sZ04W7TSU/5EpfttiUy4qHYNi93kmar2fFbene/nXENSactbJLHs1GNZZxyNy/fKvR4sLZVYSh3diswUAgFsCZc6GSbU+wfjT2IcnpoGZLSM4a3wSWDoIEkls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776701167; c=relaxed/simple;
-	bh=Z3nMyQHxT2EyCzagfzd74vM9WoLfip6g2UhfTChBwS4=;
+	s=arc-20240116; t=1776701486; c=relaxed/simple;
+	bh=bNQdxlK3cnA0ZLpK93W1AD9MCntJsMXBJq80A29Qqyw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GDQbYh7eX1xCw69KZJ9+5rZjBeTm8zaJFg+6RtjxmU3hFvONxHGcG6lAy3goheIh8+dxinu9eIt5STzpmLFO1kvwZ/6Jin/eU19UBSHQ5nnZaNYWBdK8KSeYZBgjjPDVZNYwrGmDb5zbgQjAa9AvpK3C33UFTpWBJD3Vw9YOwlc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com; spf=pass smtp.mailfrom=jvdsn.com; dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b=0YAa9S1B; arc=none smtp.client-ip=129.153.194.31
+	 In-Reply-To:Content-Type; b=NvvGFEWYtHCyg8Z9vr0wUHp390I6OQywRDvqN5X4B3COAuWnQ6QbHOLv3IbWUUx7W9ib5zs1tB1SVfejzrL8D2bbmzcbbrkQ+Gsf9UPX9BA99r6/gVaW7BOjpLMgJzBiMvyuM4UfSMje2EVH+Tn5C+aDB1Pd0ii0lcJfCzlIhfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com; spf=pass smtp.mailfrom=jvdsn.com; dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b=3CLSapi6; arc=none smtp.client-ip=129.153.194.31
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvdsn.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b="0YAa9S1B"
+	dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b="3CLSapi6"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=jvdsn.com; s=mail;
-	t=1776701164; bh=Z3nMyQHxT2EyCzagfzd74vM9WoLfip6g2UhfTChBwS4=;
+	t=1776701092; bh=bNQdxlK3cnA0ZLpK93W1AD9MCntJsMXBJq80A29Qqyw=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=0YAa9S1BLIqZob3ejdDdXJUFPN1XkzX3esWWUfhdFUvUMqU5hBbmYLZsahWu9FO08
-	 FVfHUwwtzgwK89RKXFWLOOSytSav62WyZYVk5pAL3lUJeAh3Ey+zdksarkVr2LYVKH
-	 JgkAv8CN4bk5wlCm/WWWBhQvtz8stH4eUER65PWCz0O1L+l3adbGusN5zrimJE3rnW
-	 mk9grS3kz9BxHoywLUIAmukBaY1QUyCXn3fVQraUN98scuGAEZXkTqP4kkIAkQMxNE
-	 Y2E03Eu1LXo97RX+/XTrj5+4yJ5PW7XivuAGno4K1d2F8qPnCXJWWBSWy18XaP2d9g
-	 ruSnNwbmzfaGg==
-Message-ID: <f3e2f1d7-e541-45ef-961c-1d32e5dea655@jvdsn.com>
-Date: Mon, 20 Apr 2026 11:06:04 -0500
+	b=3CLSapi6UxEIs6X/Sw+363UjhTiKAvgDZHOswKjk+89CO7shn7YV7ONeceZ32GrxB
+	 FnitUGJvZIoVX/heRfTSibdILFyZ004gONYeoHxeWMHCWQdK5axmtLBMPfnFXZDuaF
+	 nLXikpj1ZiSnr+YIthtAJ7xj/DVHCnQr73wVMbJyxycEQVmvZ7+NqrbWj7ARycDp17
+	 Vvhs0fp9N0mdYwu10vNGc8qAVm42qM5Tn61qyVrapkN+eOoBtKVOXGoiTsWQcAZfdr
+	 PJ5OGDcRzmKJp3LxJ1LlVsVHI3cSDlpA3hnk585FBbF4PYaDVa8Gi4KNrRQMVLpjb8
+	 mozh3IWdf364A==
+Message-ID: <7fcf8910-ccbc-4bf5-a0f0-d2d206726e52@jvdsn.com>
+Date: Mon, 20 Apr 2026 11:04:51 -0500
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 20/38] crypto: drbg - Move fixed values into constants
+Subject: Re: [PATCH 15/38] crypto: testmgr - Add test for drbg_pr_hmac_sha512
 To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
  Herbert Xu <herbert@gondor.apana.org.au>
 Cc: linux-kernel@vger.kernel.org, Stephan Mueller <smueller@chronox.de>,
  "Jason A . Donenfeld" <Jason@zx2c4.com>
 References: <20260420063422.324906-1-ebiggers@kernel.org>
- <20260420063422.324906-21-ebiggers@kernel.org>
+ <20260420063422.324906-16-ebiggers@kernel.org>
 From: Joachim Vandersmissen <joachim@jvdsn.com>
 Content-Language: en-US
-In-Reply-To: <20260420063422.324906-21-ebiggers@kernel.org>
+In-Reply-To: <20260420063422.324906-16-ebiggers@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 Hi Eric,
 
-If possible, I suggest using "DRBG_MAX_ADDTL_BYTES" for consistency with 
-DRBG_MAX_REQUEST_BYTES and avoiding any possible confusion in the future.
+Was there any particular reason for adding this test? I don't think 
+there's any _explicit_ requirement for having tests for both non-PR and 
+PR DRBG variants.
+
+In fact, as part of this very comprehensive cleanup, maybe the PR 
+variants of the DRBGs should be removed as well? Is anyone actually 
+using those? PR variants are (were) registered before the non-PR 
+variants, so non-PR was always used by default.
 
 Kind regards,
 Joachim
 
-On 4/20/26 1:34 AM, Eric Biggers wrote:
-> Since only one drbg_core remains, the state length, block length, and
-> security strength are now fixed values.  Moreover, the maximum request
-> length, maximum additional data length, and maximum number of requests
-> were all already fixed values.
->
-> Simplify the code by just using #defines for all these fixed values.
->
-> In drbg_seed_from_random(), take advantage of the constant to define the
-> array size.  Remove assertions that are no longer useful.
->
-> In the case of drbg_blocklen() and drbg_statelen(), replace these with a
-> single value DRBG_STATE_LEN, as for HMAC_DRBG they are the same thing.
+On 4/20/26 1:33 AM, Eric Biggers wrote:
+> Add a test for drbg_pr_hmac_sha512, which previously didn't have a test.
 >
 > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 > ---
->   crypto/drbg.c | 183 +++++++++++++++++---------------------------------
->   1 file changed, 61 insertions(+), 122 deletions(-)
+>   crypto/testmgr.c |   5 +-
+>   crypto/testmgr.h | 199 +++++++++++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 203 insertions(+), 1 deletion(-)
 >
-> diff --git a/crypto/drbg.c b/crypto/drbg.c
-> index 04c798d7a8b6..34a7cbdda1f1 100644
-> --- a/crypto/drbg.c
-> +++ b/crypto/drbg.c
-> @@ -89,25 +89,22 @@
->    */
->   
->   #include <crypto/internal/drbg.h>
->   #include <crypto/internal/rng.h>
->   #include <crypto/hash.h>
-> +#include <crypto/sha2.h>
->   #include <linux/fips.h>
->   #include <linux/kernel.h>
->   #include <linux/jiffies.h>
->   #include <linux/module.h>
->   #include <linux/mutex.h>
->   #include <linux/string_choices.h>
->   #include <linux/unaligned.h>
->   
->   struct drbg_state;
-> -typedef uint32_t drbg_flag_t;
->   
->   struct drbg_core {
-> -	drbg_flag_t flags;	/* flags for the cipher */
-> -	__u8 statelen;		/* maximum state length */
-> -	__u8 blocklen_bytes;	/* block size of output in bytes */
->   	char cra_name[CRYPTO_MAX_ALG_NAME]; /* mapping to kernel crypto API */
->   	 /* kernel crypto API backend cipher name */
->   	char backend_cra_name[CRYPTO_MAX_ALG_NAME];
->   };
->   
-> @@ -115,10 +112,36 @@ enum drbg_seed_state {
->   	DRBG_SEED_STATE_UNSEEDED,
->   	DRBG_SEED_STATE_PARTIAL, /* Seeded with !rng_is_initialized() */
->   	DRBG_SEED_STATE_FULL,
->   };
->   
-> +/* State length in bytes */
-> +#define DRBG_STATE_LEN		SHA512_DIGEST_SIZE
-> +
-> +/* Security strength in bytes */
-> +#define DRBG_SEC_STRENGTH	(SHA512_DIGEST_SIZE / 2)
-> +
-> +/*
-> + * Maximum number of requests before reseeding is forced.
-> + * SP800-90A allows this to be up to 2**48.  We use a lower value.
-> + */
-> +#define DRBG_MAX_REQUESTS	(1 << 20)
-> +
-> +/*
-> + * Maximum number of random bytes that can be requested at once.
-> + * SP800-90A allows up to 2**19 bits, which is 2**16 bytes.
-> + */
-> +#define DRBG_MAX_REQUEST_BYTES	(1 << 16)
-> +
-> +/*
-> + * Maximum length of additional info and personalization strings, in bytes.
-> + * SP800-90A allows up to 2**35 bits, i.e. 2**32 bytes.  We use 2**32 - 2 bytes
-> + * so that the value never quite completely fills the range of a size_t,
-> + * allowing the health check to verify that larger values are rejected.
-> + */
-> +#define DRBG_MAX_ADDTL		(U32_MAX - 1)
-> +
->   struct drbg_state {
->   	struct mutex drbg_mutex;	/* lock around DRBG */
->   	unsigned char *V;	/* internal state -- 10.1.2.1 1a */
->   	unsigned char *Vbuf;
->   	unsigned char *C;	/* current key -- 10.1.2.1 1b */
-> @@ -134,57 +157,10 @@ struct drbg_state {
->   	struct crypto_rng *jent;
->   	const struct drbg_core *core;
->   	struct drbg_string test_data;
->   };
->   
-> -static inline __u8 drbg_statelen(struct drbg_state *drbg)
-> -{
-> -	if (drbg && drbg->core)
-> -		return drbg->core->statelen;
-> -	return 0;
-> -}
-> -
-> -static inline __u8 drbg_blocklen(struct drbg_state *drbg)
-> -{
-> -	if (drbg && drbg->core)
-> -		return drbg->core->blocklen_bytes;
-> -	return 0;
-> -}
-> -
-> -static inline size_t drbg_max_request_bytes(struct drbg_state *drbg)
-> -{
-> -	/* SP800-90A requires the limit 2**19 bits, but we return bytes */
-> -	return (1 << 16);
-> -}
-> -
-> -/*
-> - * SP800-90A allows implementations to support additional info / personalization
-> - * strings of up to 2**35 bits.  Implementations can have a smaller maximum.  We
-> - * use 2**35 - 16 bits == U32_MAX - 1 bytes so that the max + 1 always fits in a
-> - * size_t, allowing drbg_healthcheck_sanity() to verify its enforcement.
-> - */
-> -static inline size_t drbg_max_addtl(struct drbg_state *drbg)
-> -{
-> -	return U32_MAX - 1;
-> -}
-> -
-> -static inline size_t drbg_max_requests(struct drbg_state *drbg)
-> -{
-> -	/* SP800-90A requires 2**48 maximum requests before reseeding */
-> -	return (1<<20);
-> -}
-> -
-> -/* DRBG type flags */
-> -#define DRBG_HMAC	((drbg_flag_t)1<<1)
-> -#define DRBG_TYPE_MASK	DRBG_HMAC
-> -/* DRBG strength flags */
-> -#define DRBG_STRENGTH128	((drbg_flag_t)1<<3)
-> -#define DRBG_STRENGTH192	((drbg_flag_t)1<<4)
-> -#define DRBG_STRENGTH256	((drbg_flag_t)1<<5)
-> -#define DRBG_STRENGTH_MASK	(DRBG_STRENGTH128 | DRBG_STRENGTH192 | \
-> -				 DRBG_STRENGTH256)
-> -
->   enum drbg_prefixes {
->   	DRBG_PREFIX0 = 0x00,
->   	DRBG_PREFIX1,
->   };
->   
-> @@ -199,46 +175,17 @@ enum drbg_prefixes {
->    *
->    * Thus, the favored DRBGs are the latest entries in this array.
->    */
->   static const struct drbg_core drbg_cores[] = {
->   	{
-> -		.flags = DRBG_HMAC | DRBG_STRENGTH256,
-> -		.statelen = 64, /* block length of cipher */
-> -		.blocklen_bytes = 64,
->   		.cra_name = "hmac_sha512",
->   		.backend_cra_name = "hmac(sha512)",
+> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+> index fdc5051b73c5..5a984b3b9a9b 100644
+> --- a/crypto/testmgr.c
+> +++ b/crypto/testmgr.c
+> @@ -4672,12 +4672,15 @@ static const struct alg_test_desc alg_test_descs[] = {
+>   		.alg = "drbg_pr_hmac_sha384",
+>   		.test = alg_test_null,
+>   		.fips_allowed = 1
+>   	}, {
+>   		.alg = "drbg_pr_hmac_sha512",
+> -		.test = alg_test_null,
+> +		.test = alg_test_drbg,
+>   		.fips_allowed = 1,
+> +		.suite = {
+> +			.drbg = __VECS(drbg_pr_hmac_sha512_tv_template)
+> +		}
+>   	}, {
+>   		.alg = "ecb(aes)",
+>   		.generic_driver = "ecb(aes-lib)",
+>   		.test = alg_test_skcipher,
+>   		.fips_allowed = 1,
+> diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+> index d44a4c1e7313..77935a457313 100644
+> --- a/crypto/testmgr.h
+> +++ b/crypto/testmgr.h
+> @@ -23700,10 +23700,209 @@ static const struct drbg_testvec drbg_nopr_hmac_sha256_tv_template[] = {
+>   			"\x36\x60\x3b\xca\x37\xc9\xee\x29",
+>   		.perslen = 32,
 >   	},
 >   };
 >   
->   static int drbg_uninstantiate(struct drbg_state *drbg);
->   
-> -/******************************************************************
-> - * Generic helper functions
-> - ******************************************************************/
-> -
-> -/*
-> - * Return strength of DRBG according to SP800-90A section 8.4
-> - *
-> - * @flags DRBG flags reference
-> - *
-> - * Return: normalized strength in *bytes* value or 32 as default
-> - *	   to counter programming errors
-> - */
-> -static inline unsigned short drbg_sec_strength(drbg_flag_t flags)
-> -{
-> -	switch (flags & DRBG_STRENGTH_MASK) {
-> -	case DRBG_STRENGTH128:
-> -		return 16;
-> -	case DRBG_STRENGTH192:
-> -		return 24;
-> -	case DRBG_STRENGTH256:
-> -		return 32;
-> -	default:
-> -		return 32;
-> -	}
-> -}
-> -
->   /******************************************************************
->    * HMAC DRBG functions
->    ******************************************************************/
->   
->   static int drbg_kcapi_hash(struct drbg_state *drbg, unsigned char *outval,
-> @@ -261,24 +208,24 @@ static int drbg_hmac_update(struct drbg_state *drbg, struct list_head *seed,
->   	LIST_HEAD(seedlist);
->   	LIST_HEAD(vdatalist);
->   
->   	if (!reseed) {
->   		/* 10.1.2.3 step 2 -- memset(0) of C is implicit with kzalloc */
-> -		memset(drbg->V, 1, drbg_statelen(drbg));
-> +		memset(drbg->V, 1, DRBG_STATE_LEN);
->   		drbg_kcapi_hmacsetkey(drbg, drbg->C);
->   	}
->   
-> -	drbg_string_fill(&seed1, drbg->V, drbg_statelen(drbg));
-> +	drbg_string_fill(&seed1, drbg->V, DRBG_STATE_LEN);
->   	list_add_tail(&seed1.list, &seedlist);
->   	/* buffer of seed2 will be filled in for loop below with one byte */
->   	drbg_string_fill(&seed2, NULL, 1);
->   	list_add_tail(&seed2.list, &seedlist);
->   	/* input data of seed is allowed to be NULL at this point */
->   	if (seed)
->   		list_splice_tail(seed, &seedlist);
->   
-> -	drbg_string_fill(&vdata, drbg->V, drbg_statelen(drbg));
-> +	drbg_string_fill(&vdata, drbg->V, DRBG_STATE_LEN);
->   	list_add_tail(&vdata.list, &vdatalist);
->   	for (i = 2; 0 < i; i--) {
->   		/* first round uses 0x0, second 0x1 */
->   		unsigned char prefix = DRBG_PREFIX0;
->   		if (1 == i)
-> @@ -319,20 +266,20 @@ static int drbg_hmac_generate(struct drbg_state *drbg,
->   		ret = drbg_hmac_update(drbg, addtl, 1);
->   		if (ret)
->   			return ret;
->   	}
->   
-> -	drbg_string_fill(&data, drbg->V, drbg_statelen(drbg));
-> +	drbg_string_fill(&data, drbg->V, DRBG_STATE_LEN);
->   	list_add_tail(&data.list, &datalist);
->   	while (len < buflen) {
->   		unsigned int outlen = 0;
->   		/* 10.1.2.5 step 4.1 */
->   		ret = drbg_kcapi_hash(drbg, drbg->V, &datalist);
->   		if (ret)
->   			return ret;
-> -		outlen = (drbg_blocklen(drbg) < (buflen - len)) ?
-> -			  drbg_blocklen(drbg) : (buflen - len);
-> +		outlen = (DRBG_STATE_LEN < (buflen - len)) ?
-> +			  DRBG_STATE_LEN : (buflen - len);
->   
->   		/* 10.1.2.5 step 4.2 */
->   		memcpy(buf + len, drbg->V, outlen);
->   		len += outlen;
->   	}
-> @@ -375,11 +322,11 @@ static inline int __drbg_seed(struct drbg_state *drbg, struct list_head *seed,
->   	case DRBG_SEED_STATE_FULL:
->   		/*
->   		 * Seed source has become fully initialized, frequent
->   		 * reseeds no longer required.
->   		 */
-> -		drbg->reseed_threshold = drbg_max_requests(drbg);
-> +		drbg->reseed_threshold = DRBG_MAX_REQUESTS;
->   		break;
->   	}
->   
->   	return ret;
->   }
-> @@ -387,25 +334,21 @@ static inline int __drbg_seed(struct drbg_state *drbg, struct list_head *seed,
->   static int drbg_seed_from_random(struct drbg_state *drbg)
->   	__must_hold(&drbg->drbg_mutex)
->   {
->   	struct drbg_string data;
->   	LIST_HEAD(seedlist);
-> -	unsigned int entropylen = drbg_sec_strength(drbg->core->flags);
-> -	unsigned char entropy[32];
-> +	unsigned char entropy[DRBG_SEC_STRENGTH];
->   	int ret;
->   
-> -	BUG_ON(!entropylen);
-> -	BUG_ON(entropylen > sizeof(entropy));
-> -
-> -	drbg_string_fill(&data, entropy, entropylen);
-> +	drbg_string_fill(&data, entropy, DRBG_SEC_STRENGTH);
->   	list_add_tail(&data.list, &seedlist);
->   
-> -	get_random_bytes(entropy, entropylen);
-> +	get_random_bytes(entropy, DRBG_SEC_STRENGTH);
->   
->   	ret = __drbg_seed(drbg, &seedlist, true, DRBG_SEED_STATE_FULL);
->   
-> -	memzero_explicit(entropy, entropylen);
-> +	memzero_explicit(entropy, DRBG_SEC_STRENGTH);
->   	return ret;
->   }
->   
->   static bool drbg_nopr_reseed_interval_elapsed(struct drbg_state *drbg)
->   {
-> @@ -442,17 +385,17 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
->   		     bool reseed)
->   	__must_hold(&drbg->drbg_mutex)
->   {
->   	int ret;
->   	unsigned char entropy[((32 + 16) * 2)];
-> -	unsigned int entropylen = drbg_sec_strength(drbg->core->flags);
-> +	unsigned int entropylen;
->   	struct drbg_string data1;
->   	LIST_HEAD(seedlist);
->   	enum drbg_seed_state new_seed_state = DRBG_SEED_STATE_FULL;
->   
->   	/* 9.1 / 9.2 / 9.3.1 step 3 */
-> -	if (pers && pers->len > (drbg_max_addtl(drbg))) {
-> +	if (pers && pers->len > DRBG_MAX_ADDTL) {
->   		pr_devel("DRBG: personalization string too long %zu\n",
->   			 pers->len);
->   		return -EINVAL;
->   	}
->   
-> @@ -467,13 +410,14 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
->   		 * to the entropy. A nonce must be at least 1/2 of the security
->   		 * strength of the DRBG in size. Thus, entropy + nonce is 3/2
->   		 * of the strength. The consideration of a nonce is only
->   		 * applicable during initial seeding.
->   		 */
-> -		BUG_ON(!entropylen);
->   		if (!reseed)
-> -			entropylen = ((entropylen + 1) / 2) * 3;
-> +			entropylen = ((DRBG_SEC_STRENGTH + 1) / 2) * 3;
-> +		else
-> +			entropylen = DRBG_SEC_STRENGTH;
->   		BUG_ON((entropylen * 2) > sizeof(entropy));
->   
->   		/* Get seed from in-kernel /dev/urandom */
->   		if (!rng_is_initialized())
->   			new_seed_state = DRBG_SEED_STATE_PARTIAL;
-> @@ -529,18 +473,18 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
->   		list_add_tail(&pers->list, &seedlist);
->   		pr_devel("DRBG: using personalization string\n");
->   	}
->   
->   	if (!reseed) {
-> -		memset(drbg->V, 0, drbg_statelen(drbg));
-> -		memset(drbg->C, 0, drbg_statelen(drbg));
-> +		memset(drbg->V, 0, DRBG_STATE_LEN);
-> +		memset(drbg->C, 0, DRBG_STATE_LEN);
->   	}
->   
->   	ret = __drbg_seed(drbg, &seedlist, reseed, new_seed_state);
->   
->   out:
-> -	memzero_explicit(entropy, entropylen * 2);
-> +	memzero_explicit(entropy, sizeof(entropy));
->   
->   	return ret;
->   }
->   
->   /* Free all substructures in a DRBG state without the DRBG state structure */
-> @@ -568,17 +512,17 @@ static inline int drbg_alloc_state(struct drbg_state *drbg)
->   
->   	ret = drbg_init_hash_kernel(drbg);
->   	if (ret < 0)
->   		goto err;
->   
-> -	drbg->Vbuf = kmalloc(drbg_statelen(drbg) + ret, GFP_KERNEL);
-> +	drbg->Vbuf = kmalloc(DRBG_STATE_LEN + ret, GFP_KERNEL);
->   	if (!drbg->Vbuf) {
->   		ret = -ENOMEM;
->   		goto fini;
->   	}
->   	drbg->V = PTR_ALIGN(drbg->Vbuf, ret + 1);
-> -	drbg->Cbuf = kmalloc(drbg_statelen(drbg) + ret, GFP_KERNEL);
-> +	drbg->Cbuf = kmalloc(DRBG_STATE_LEN + ret, GFP_KERNEL);
->   	if (!drbg->Cbuf) {
->   		ret = -ENOMEM;
->   		goto fini;
->   	}
->   	drbg->C = PTR_ALIGN(drbg->Cbuf, ret + 1);
-> @@ -628,24 +572,23 @@ static int drbg_generate(struct drbg_state *drbg,
->   		pr_devel("DRBG: wrong format of additional information\n");
->   		return -EINVAL;
->   	}
->   
->   	/* 9.3.1 step 2 */
-> -	len = -EINVAL;
-> -	if (buflen > (drbg_max_request_bytes(drbg))) {
-> +	if (buflen > DRBG_MAX_REQUEST_BYTES) {
->   		pr_devel("DRBG: requested random numbers too large %u\n",
->   			 buflen);
-> -		goto err;
-> +		return -EINVAL;
->   	}
->   
->   	/* 9.3.1 step 3 is implicit with the chosen DRBG */
->   
->   	/* 9.3.1 step 4 */
-> -	if (addtl && addtl->len > (drbg_max_addtl(drbg))) {
-> +	if (addtl && addtl->len > DRBG_MAX_ADDTL) {
->   		pr_devel("DRBG: additional information string too long %zu\n",
->   			 addtl->len);
-> -		goto err;
-> +		return -EINVAL;
->   	}
->   	/* 9.3.1 step 5 is implicit with the chosen DRBG */
->   
->   	/*
->   	 * 9.3.1 step 6 and 9 supplemented by 9.3.2 step c is implemented
-> @@ -721,12 +664,12 @@ static int drbg_generate_long(struct drbg_state *drbg,
->   	unsigned int len = 0;
->   	unsigned int slice = 0;
->   	do {
->   		int err = 0;
->   		unsigned int chunk = 0;
-> -		slice = ((buflen - len) / drbg_max_request_bytes(drbg));
-> -		chunk = slice ? drbg_max_request_bytes(drbg) : (buflen - len);
-> +		slice = (buflen - len) / DRBG_MAX_REQUEST_BYTES;
-> +		chunk = slice ? DRBG_MAX_REQUEST_BYTES : (buflen - len);
->   		mutex_lock(&drbg->drbg_mutex);
->   		err = drbg_generate(drbg, buf + len, chunk, addtl);
->   		mutex_unlock(&drbg->drbg_mutex);
->   		if (0 > err)
->   			return err;
-> @@ -783,22 +726,21 @@ static int drbg_instantiate(struct drbg_state *drbg, struct drbg_string *pers,
->   
->   	/* 9.1 step 1 is implicit with the selected DRBG type */
->   
->   	/*
->   	 * 9.1 step 2 is implicit as caller can select prediction resistance
-> -	 * and the flag is copied into drbg->flags --
->   	 * all DRBG types support prediction resistance
->   	 */
->   
-> -	/* 9.1 step 4 is implicit in  drbg_sec_strength */
-> +	/* 9.1 step 4 is implicit in DRBG_SEC_STRENGTH */
->   
->   	if (!drbg->core) {
->   		drbg->core = &drbg_cores[coreref];
->   		drbg->pr = pr;
->   		drbg->seeded = DRBG_SEED_STATE_UNSEEDED;
->   		drbg->last_seed_time = 0;
-> -		drbg->reseed_threshold = drbg_max_requests(drbg);
-> +		drbg->reseed_threshold = DRBG_MAX_REQUESTS;
->   
->   		ret = drbg_alloc_state(drbg);
->   		if (ret)
->   			goto unlock;
->   
-> @@ -882,11 +824,11 @@ static int drbg_init_hash_kernel(struct drbg_state *drbg)
->   	if (IS_ERR(tfm)) {
->   		pr_info("DRBG: could not allocate digest TFM handle: %s\n",
->   				drbg->core->backend_cra_name);
->   		return PTR_ERR(tfm);
->   	}
-> -	BUG_ON(drbg_blocklen(drbg) != crypto_shash_digestsize(tfm));
-> +	BUG_ON(DRBG_STATE_LEN != crypto_shash_digestsize(tfm));
->   	sdesc = kzalloc(sizeof(struct shash_desc) + crypto_shash_descsize(tfm),
->   			GFP_KERNEL);
->   	if (!sdesc) {
->   		crypto_free_shash(tfm);
->   		return -ENOMEM;
-> @@ -912,11 +854,11 @@ static int drbg_fini_hash_kernel(struct drbg_state *drbg)
->   static void drbg_kcapi_hmacsetkey(struct drbg_state *drbg,
->   				  const unsigned char *key)
->   {
->   	struct sdesc *sdesc = drbg->priv_data;
->   
-> -	crypto_shash_setkey(sdesc->shash.tfm, key, drbg_statelen(drbg));
-> +	crypto_shash_setkey(sdesc->shash.tfm, key, DRBG_STATE_LEN);
->   }
->   
->   static int drbg_kcapi_hash(struct drbg_state *drbg, unsigned char *outval,
->   			   const struct list_head *in)
->   {
-> @@ -1058,11 +1000,10 @@ static inline int __init drbg_healthcheck_sanity(void)
->   	int ret;
->   	int rc = -EFAULT;
->   	bool pr = false;
->   	int coreref = 0;
->   	struct drbg_string addtl;
-> -	size_t max_addtllen, max_request_bytes;
->   
->   	/* only perform test in FIPS mode */
->   	if (!fips_enabled)
->   		return 0;
->   
-> @@ -1072,28 +1013,26 @@ static inline int __init drbg_healthcheck_sanity(void)
->   	if (!drbg)
->   		return -ENOMEM;
->   
->   	guard(mutex_init)(&drbg->drbg_mutex);
->   	drbg->core = &drbg_cores[coreref];
-> -	drbg->reseed_threshold = drbg_max_requests(drbg);
-> +	drbg->reseed_threshold = DRBG_MAX_REQUESTS;
->   
->   	/*
->   	 * if the following tests fail, it is likely that there is a buffer
->   	 * overflow as buf is much smaller than the requested or provided
->   	 * string lengths -- in case the error handling does not succeed
->   	 * we may get an OOPS. And we want to get an OOPS as this is a
->   	 * grave bug.
->   	 */
->   
-> -	max_addtllen = drbg_max_addtl(drbg);
-> -	max_request_bytes = drbg_max_request_bytes(drbg);
-> -	drbg_string_fill(&addtl, buf, max_addtllen + 1);
-> +	drbg_string_fill(&addtl, buf, DRBG_MAX_ADDTL + 1);
->   	/* overflow addtllen with additional info string */
->   	ret = drbg_generate(drbg, buf, OUTBUFLEN, &addtl);
->   	BUG_ON(ret == 0);
->   	/* overflow max_bits */
-> -	ret = drbg_generate(drbg, buf, max_request_bytes + 1, NULL);
-> +	ret = drbg_generate(drbg, buf, DRBG_MAX_REQUEST_BYTES + 1, NULL);
->   	BUG_ON(ret == 0);
->   
->   	/* overflow max addtllen with personalization string */
->   	ret = drbg_seed(drbg, &addtl, false);
->   	BUG_ON(0 == ret);
+> +static const struct drbg_testvec drbg_pr_hmac_sha512_tv_template[] = {
+> +	/*
+> +	 * Borrowed from the first applicable test vector from ACVP:
+> +	 * https://github.com/usnistgov/ACVP-Server/blob/v1.1.0.33/gen-val/json-files/hmacDRBG-1.0/prompt.json#L1161
+> +	 * https://github.com/usnistgov/ACVP-Server/blob/v1.1.0.33/gen-val/json-files/hmacDRBG-1.0/expectedResults.json#L271
+> +	 */
+> +	{
+> +		/* .entropy = ACVP entropyInput || nonce */
+> +		.entropy = "\x9B\xE9\xB2\x87\xA3\x9A\x08\x44\x1D\x67\x82\x20"
+> +			   "\xC9\x53\xFB\xEB\xA4\xB9\x0F\x44\x0B\x98\x33\x18"
+> +			   "\xAC\x6E\x25\x4A\x85\x83\x2D\x26\x21\x9F\x93\x64"
+> +			   "\xC8\x5A\x5F\x72\xDB\x88\x45\x96\x71\x41\xF4\xBF"
+> +			   "\x6E\xA7\x98\x00\x9D\xD1\x0C\x2E\x4D\x7A\xE2\x03"
+> +			   "\x0D\xE3\xCD\x62\xFE\xF3\x62\xBD\x12\x69\x92\x3D"
+> +			   "\xBA\xAC\x15\x17\xC7\x80\x93\x8E\x72\x32\x2D\x52"
+> +			   "\xE5\x2C\x19\x84\x5C\xA5\xCE\x5B\x98\x19\x1F\xF1"
+> +			   "\x9F\x0C\x17\x04\xD0\x66\xF1\x9B\xFA\x7E\x2C\xB6"
+> +			   "\x55\x68\xD4\x1B\xD6\x7A\x1D\x2C\xD4\x6D\x6E\x15"
+> +			   "\xF7\x32\x23\x04\x05\x8C\xBB\xE6\x63\x6B\x80\x9B"
+> +			   "\x9C\x69\x09\x8F\x5F\x02\xBF\x53\x42\x11\xB7\x80"
+> +			   "\xAA\xD4\xE8\x54\x00\x83\x5C\x20\xA8\xB3\x6E\xD9"
+> +			   "\xF5\x51\x9E\xB9\xD1\x6E\xC7\x0C\xE9\x7F\xF0\xBF"
+> +			   "\xCE\x1D\xB0\x31\x8D\x16\xC9\x65\x0C\x18\x55\xA4"
+> +			   "\x46\x8D\x54\x2B\x78\x69\x1B\x8C\x29\xD7\xAC\x0F"
+> +			   "\x34\x4D\x69\x0B\x76\xC3\x98\x00\x78\x2F\xE2\x54"
+> +			   "\xAF\xD5\x8A\xC3\x40\x97\xB1\xA2\x60\xD3\x07\x3B"
+> +			   "\x7A\x3E\xD0\x82\x80\x68\xEE\xB0\x72\x5F\x07\x17"
+> +			   "\xD9\x0A\xFC\xBD\xBA\xB6\x77\x4E\xC9\xCE\x6A\x48"
+> +			   "\xEB\x9C\xF5\x18\x88\x1E\x6E\x3B\x65\x43\x16\x73"
+> +			   "\x80\x53\xB7\xF0\x7E\xAB\x23\x19\x1E\x75\x60\x36"
+> +			   "\xAF\x39\xC0\xCF\x0F\x6D\x7F\x90\xB2\x50\xD5\x37"
+> +			   "\x58\x6D\x5C\x95\x78\x25\x8D\x3A\x40\xAB\xF6\x7B"
+> +			   "\x85\x86\xBB\x48\x5E\x1C\x99\xC1\xD3\x4E\x85\xE5"
+> +			   "\xB4\xE7\x61\xF3\x7D\x56\x1F\x77\xCF\x3C\x76\x3A"
+> +			   "\xF4\x82\x36\xB7\x37\x33\x84\x34\xBA\x0E\xE2\xE1"
+> +			   "\xAF\x0C\xD2\xAE\x97\x5C\x80\xD4\xD2\xFD\x37\x71"
+> +			   "\xC8\x70\x04\x29\x8B\x44\xB9\xD7\xC9\x8F\xE7\x99"
+> +			   "\x94\x9E\xFC\x49\x66\x24\xCB\x8B\x41\x40\x66\xC5"
+> +			   "\xA4\x00\xD5\x3F\x68\xDD\xB5\xA5\x62\x96\x7C\xAC"
+> +			   "\x63\x58\x95\x85\x99\x24\x21\x15\xD2\x76\xAF\x6D",
+> +		.entropylen = 384,
+> +		.pers = "\xDD\x07\x10\x10\x17\x34\xD5\xBD\x43\xAF\x03\x79\xE4"
+> +			"\x64\x2C\x58\x06\xEA\xE0\x39\xDA\x42\x96\x16\x0B\xF9"
+> +			"\xB8\xCE\x57\x7D\x53\x67\xBF\xF8\x0C\x40\x02\xB2\x77"
+> +			"\x16\xD5\x23\x75\x9F\x6A\x42\x0E\xE8\xCC\xD0\x9F\x40"
+> +			"\x64\xE9\x3B\xE9\x48\x13\xC3\x8E\x4B\xAB\xE1\xB9\x4F"
+> +			"\x6D\xBB\xF2\x4C\xF8\x29\xA5\x2B\x44\x23\x15\x2C\xDE"
+> +			"\x2A\xCF\x88\x04\x7A\x38\x37\xA2\xD5\x7B\xEA\x59\x39"
+> +			"\x2C\x58\xA2\x5B\xF9\x39\xA2\x7E\x94\x11\x97\xEC\x47"
+> +			"\x08\xD6\xE2\x39\x65\x26\x43\x81\x3F\x1B\x31\xA6\xA4"
+> +			"\x1A\x5C\xCD\x02\xCC\x89\x38\x3F\x32\x7C\x0E\x7E\x88"
+> +			"\x3B\x6F\x60\x69\xEA\xBA\xAA\x1F\x53\x93\x70\xD7\x48"
+> +			"\x74\x91\x79\x5E\xD4\xB0\xD9\x82\x74\x12\xDE\xFE\xFB"
+> +			"\x51\x96\x66\x5C\x6A\x53\x11\xAD\x9A\xD4\xFA\x9D\xF0"
+> +			"\xE2\x7F\x26\x8F\x6F\xAC\x00\xC8\xDB\xCF\xA5\x8E\xE6"
+> +			"\x61\x8F\x36\xD6\x44\x5B\x07\xDA\x9C\x2A\x46\xE3\x03"
+> +			"\x1C\xD8\x11\x4F\x61\x1F\xEC\xBA\x12\x68\xB9\x4B\x57"
+> +			"\x39\x05\xD6\xEE\xC1\xAC\x3F\x6D\x6F\xE9\xBF\xEA\x36"
+> +			"\x1A\x8A\xAA\xF4\xE8\xE0\xDB\xC6\xE5\x06\x9F\xC9\x91"
+> +			"\x52\xCD\x53\xD0\x78\xF6\xC1\x7B\x75\x91\x85\x91\x13"
+> +			"\x26\xBE\xC9\x02\xDE\xB0\x19\xF2\x71",
+> +		.perslen = 256,
+> +
+> +		.entpra = "\xDB\xBA\x25\xC7\x02\x0D\x3D\x95\x9C\xEB\xF5\x42"
+> +			  "\x52\x3A\x6B\xDA\xE8\xAF\xE9\x3D\x76\x2A\x9E\xB5"
+> +			  "\xD7\xE7\x5D\xC9\xB8\x1F\x3A\xC2\x91\x95\x9D\xFD"
+> +			  "\xE5\x48\x5F\x63\xD8\x84\x44\x82\x6A\x71\xF9\xDD"
+> +			  "\xAF\x4B\xE2\x28\xB4\x30\xCF\x78\xB7\x0B\x0F\x61"
+> +			  "\x71\x16\x1A\xE0\x6D\x5F\xB4\x4B\x17\x1A\x26\xCA"
+> +			  "\xD8\x9D\x6D\x46\xA3\x56\xC0\xE7\x49\xCF\xE0\xD2"
+> +			  "\xFF\xA8\x22\x45\xE0\xB4\x18\x0B\x13\x37\x01\x46"
+> +			  "\xCB\xE7\xD8\x2A\x59\x43\xAD\x90\x1E\xE1\xD0\xD7"
+> +			  "\x76\xB0\x2D\xCF\x17\x23\x99\x73\x5D\xE5\xC7\x46"
+> +			  "\x8A\x0D\x8E\xC4\xAB\x45\xAC\xA8\x74\xE4\xF7\xD0"
+> +			  "\x26\xD7\x0A\xE2\x43\x3D\xB8\xC7\xEE\xAD\x53\x6F"
+> +			  "\x78\xC3\x51\xC0\xE0\x76\x2A\xC2\xB7\xFE\x02\x64"
+> +			  "\x25\xF0\xCE\xD7\xA9\xBF\x85\xCA\x20\xA6\x93\x68"
+> +			  "\xE3\x79\xE9\x88\xA8\x7F\x45\x8D\x71\xB4\xB4\x79"
+> +			  "\x1C\x56\x68\xF9\xAE\x18\x76\xB9\x3F\xEE\x5B\x2C"
+> +			  "\xC6\x61\x47\x34\x3B\xC5\x24\x2D\x3C\x6D\x16\x48"
+> +			  "\x70\xD9\xDB\x2E\xB8\x42\x52\x81\x1C\x94\x39\xF0"
+> +			  "\xF4\xC0\x8F\x44\xD3\xCF\xD5\xF9\xC1\x59\x61\x83"
+> +			  "\xAE\xFD\xD0\xC4\x35\xD1\x0E\x55\x46\x5C\xBA\x3D"
+> +			  "\x5C\x4A\x89\x15\xE8\x1D\x86\x28\xE5\xF5\x31\x0B"
+> +			  "\x89\x59\xFE\x4A\xC3\x5D\xA5\x2A\x16\x37\x78\x41"
+> +			  "\x58\x3A\x9E\xA3\xBD\x1F\xE6\x25\xCC\x18\x9E\xD2"
+> +			  "\x1A\x99\x56\x66\x83\x78\xBB\x27\x3E\x28\xFE\xD4"
+> +			  "\x74\xCB\x75\x2D\x82\x86\x55\xFB\x1C\xA4\xAF\x3F"
+> +			  "\x84\x0A\xA0\xA1\x1C\x70\x34\x87\x2E\x73\x15\x38"
+> +			  "\x8A\x27\xB1\x6C\x33\x95\xE5\x07",
+> +		.entprb = "\x38\xF2\xC4\x8F\x4B\x9C\x2F\x03\x67\x8C\x8A\x47"
+> +			  "\xE1\xF2\x18\xC5\xB8\x4C\x05\x77\x77\x15\xA8\x94"
+> +			  "\x1F\x1F\x45\x6D\xD0\xEF\x60\x67\x63\x12\x5D\x38"
+> +			  "\x89\x22\x76\xF5\xF2\xC4\xE1\x15\x26\x7E\x8F\x52"
+> +			  "\x79\x1E\x96\x71\xCD\xE7\x32\x95\x2B\x4E\xB2\xC2"
+> +			  "\x92\x21\xC7\x48\xA2\xB1\xC5\x71\x44\x91\xE4\x4F"
+> +			  "\xBE\xD3\x5E\xA9\xAB\xD3\xE2\xD1\xE2\xD8\x8F\x98"
+> +			  "\x38\x03\x18\x29\x84\xA2\xCA\x6E\x72\x34\xC9\x51"
+> +			  "\x6D\x8C\xE8\x09\x50\x71\x2A\x08\xB7\xCF\x74\xE6"
+> +			  "\x11\xB6\x38\xF5\xBC\x24\xF7\x5B\x73\x34\xD5\x8B"
+> +			  "\xBB\x15\xE3\x6F\x9A\x9B\x1E\x32\xB9\x6F\x5F\xE3"
+> +			  "\xC9\x9F\xF6\xD9\x33\x03\xCD\x0D\x8E\xD4\x3F\x67"
+> +			  "\x11\x65\x0A\x90\x67\x83\xC1\xCC\x70\xB1\xA9\x46"
+> +			  "\x4B\x5E\x0B\x84\xDC\x02\xBA\x50\x1D\x4A\x5B\xC7"
+> +			  "\xB4\x5E\xDF\x35\x01\x45\x3D\x64\x5C\x2E\xCD\xA6"
+> +			  "\x20\xFB\x35\x74\xC0\x7C\x2D\x24\x66\xAB\x38\x12"
+> +			  "\x38\xCE\x52\xCB\x38\x9B\x95\xDE\x0C\x2A\x8C\x9D"
+> +			  "\xF7\x81\x48\x9E\xD6\x10\xF1\x83\x71\x44\x53\x2F"
+> +			  "\xCE\xF3\xEC\xB3\x29\x67\xF1\x41\xFC\xD6\xB6\x49"
+> +			  "\xE3\x13\x74\x4D\xB2\x3E\xEA\x73\x2B\x03\x68\xAC"
+> +			  "\x2F\x57\x8C\x58\xEC\x34\xE9\xEF\x18\x36\xDE\xAD"
+> +			  "\xE9\x48\x1D\xF7\x9E\xB7\xA1\x60\x2E\x78\xF5\x62"
+> +			  "\x68\xDD\xB8\x5B\x33\x6B\x66\xAD\xA1\xD5\xFB\x46"
+> +			  "\x5E\x8F\xF8\x9D\x37\xE5\xC2\xD8\x76\xDC\x2B\x6A"
+> +			  "\x99\x1E\xDF\x91\xB1\x0A\x81\x2A\x9D\xEB\xE7\xE4"
+> +			  "\xD1\x21\xD4\xDA\x0E\x55\x8A\x14\xB2\xB6\x15\x7D"
+> +			  "\x48\x52\x6A\xB0\xA2\x92\x4D\x50",
+> +		.entprlen = 320,
+> +		.addtla = "\xC2\x89\x7C\x07\x46\x74\x02\x2C\xEA\xAD\xFD\x74"
+> +			  "\x0C\x40\xEF\xA2\x95\x64\x6B\xC4\x2D\xED\xF4\x16"
+> +			  "\x26\x25\x06\xB3\x36\x6B\xD8\x9A\x5F\xF4\x25\xC1"
+> +			  "\xC3\x69\x3F\x7A\x19\xB7\x02\xA6\xCC\x3B\xA2\x4E"
+> +			  "\x05\xA1\x1C\x7B\x2D\xAD\x44\xE7\x4A\x40\x71\x85"
+> +			  "\xEF\x1C\xE4\xEC\x54\xCA\xB0\xAF\x8F\xF5\x43\xB1"
+> +			  "\xE0\x99\x71\x71\xD4\x3E\x56\x97\xAA\xF5\xD0\x1A"
+> +			  "\x58\x2D\x65\x0F\xA4\xB4\xB6\x07\x1B\x1F\x13\x8B"
+> +			  "\x29\xD6\xE5\x23\xD3\x4D\x43\xD6\xBC\x74\xA8\x92"
+> +			  "\xBD\xE9\x9B\x01\x47\x8C\xA5\x02\xA8\x0D\xC3\x3A"
+> +			  "\xED\x83\xFD\xD2\xCB\xFF\x25\x89\x2C\x2F\x5B\x70"
+> +			  "\x3F\x9E\x24\x50\xF8\x78\x28\x1B\x67\x52\x92\xA2"
+> +			  "\x87\x81\x07\x40\xA9\x40\xBA\x84\x47\x25\xC1\xF7"
+> +			  "\x9E\x3B\x4E\xE4\x8F\x10\xE5\x50\x8B\x22\x83\x4F"
+> +			  "\xCD\x4E\x42\x63\x92\x0A\x5F\xAF\x7A\x9B\x0E\x1A"
+> +			  "\xE3\xB4\x99\x11\x7F\xE6\x93\xC3\xED\xF1\x9F\x3A",
+> +		.addtlb = "\x1E\x75\xB6\x70\x60\xFD\xE6\xD1\xC7\xA5\x74\xCF"
+> +			  "\xA7\x50\x17\xAE\xDD\xC4\x6E\xC4\xE0\x15\xF0\x3B"
+> +			  "\xF7\x1C\x46\x45\xEE\x60\x66\x48\x1D\x2C\x36\xCC"
+> +			  "\x95\x3E\xB7\xEB\x1B\xFF\x8C\xC0\x78\x6D\x56\x3A"
+> +			  "\xC7\x24\x18\x9E\x7C\xA1\x60\x54\x41\x4B\xAF\x18"
+> +			  "\xE8\x02\xD1\x54\x65\xEC\x3D\xFD\x8B\xDF\xD2\xF5"
+> +			  "\x62\xEA\x66\x41\x6A\x32\x87\xA6\x34\x2F\x48\xBF"
+> +			  "\xB5\xCC\x35\x5A\x2A\xC1\xAB\x68\x34\x1A\xD6\x82"
+> +			  "\x40\xF7\xF2\x00\x14\x8B\x69\x0F\xE4\xCD\x6B\xB1"
+> +			  "\xFC\x8B\x16\xEC\xB4\xE3\x33\xBF\x84\x12\x4B\x58"
+> +			  "\xED\x51\x88\xF5\xEF\xB6\xC3\xCE\x9B\x63\xCC\x80"
+> +			  "\x1F\x3C\x8A\x67\xEE\xCD\xD2\x01\x25\x22\xAC\xB3"
+> +			  "\xB6\x9B\x1F\xF8\xE8\x71\xE6\x0D\x78\x11\x3C\x9E"
+> +			  "\xF2\x57\xDC\xB6\xCF\x90\xD3\xA8\x3E\xCD\x88\xD4"
+> +			  "\xDC\x1C\x31\x6B\x1F\xC3\x6A\x29\xF0\x7B\x4C\xCC"
+> +			  "\x6D\x92\x5E\x6F\x0C\x0B\x4D\xA7\x10\x66\x84\x1F",
+> +		.addtllen = 192,
+> +
+> +		.expected = "\xAA\x76\x91\xAE\x99\xCD\x8D\x83\x49\x9D\xC5\x51"
+> +			    "\xA5\x95\xC6\x9D\xAD\x4B\x40\x2B\x5F\x8C\x30\x5D"
+> +			    "\x1E\x89\x58\xD1\x8A\x86\xF9\x61\x2C\x45\x41\x8E"
+> +			    "\xC5\xC6\x0E\x33\x7C\xFE\x91\x71\xC9\x53\x76\xD6"
+> +			    "\xC2\x8D\x05\x09\xB8\x2A\x2B\x9B\x36\x1D\x31\xD7"
+> +			    "\x50\x45\xB1\x08\x58\xC4\x99\x25\xEA\x2F\x18\xDB"
+> +			    "\x34\x8A\x02\xD8\x38\xDD\x7B\x9E\x0E\xEF\x9C\x45"
+> +			    "\xC7\x4F\x7E\x36\x3A\x90\x8B\x41\x51\x4A\x1B\xE9"
+> +			    "\x8A\x61\xE9\xB5\x4E\xA5\xE2\xBD\x16\x59\x61\x0F"
+> +			    "\x9C\x5A\x63\xA7\x87\x79\x5C\x0A\x16\xDF\x6D\x88"
+> +			    "\x11\x25\x56\x8B\x5D\xA6\xF8\x4F\xB9\x01\x19\xAE"
+> +			    "\x57\x3B\xC4\x06\xBB\xE7\xCB\xAF\xB3\x8D\xE2\x40"
+> +			    "\xED\x42\x29\xB3\x0D\x64\x20\xF2\x66\x58\xB1\xDD"
+> +			    "\x59\xB1\x39\x7C\xD9\xB2\x34\x08\x53\x9B\x3A\xB7"
+> +			    "\x18\x35\xD0\x90\x7F\xB5\x30\xF2\x27\xA0\x90\x63"
+> +			    "\x6F\xF2\x72\x49\xBF\xD0\xAE\x4A\xF4\xCA\xB3\x1A"
+> +			    "\xAE\x7F\x93\xF3\xB9\x84\x99\x09\x50\xB9\xA0\x43"
+> +			    "\x4F\x83\x33\x92\xA5\xC7\x25\x44\x6A\x74\xF4\xFA"
+> +			    "\xBA\x60\x43\x13\x97\x53\x99\x98\xA3\x05\x02\xC1"
+> +			    "\x03\xDF\x53\x76\x9E\x74\xE7\xA0\xB5\xD7\xA7\x87"
+> +			    "\x1E\x00\x1D\x29\x47\x8F\x65\x4E\x0F\x76\xCA\xA9"
+> +			    "\x2A\xC5\x05\x4F\xA6\xFE\x96\xC6\x81\xC0\x55\xFC"
+> +			    "\x92\x89\xA6\x81\xF0\x37\xF1\x41\xA6\x88\x0B\x01"
+> +			    "\xE0\xA5\x78\x4C\xF4\x61\xA7\x91\xD8\x4B\xE9\x2C"
+> +			    "\xF0\x68\xEE\x46\x41\xD2\x74\xE5\x5F\x6F\x1F\xE6"
+> +			    "\xBE\x5C\xB1\x3C\x60\x1A\xAA\xB9\x88\x3C\xB9\x1C"
+> +			    "\xCD\x67\x78\x1F\x45\x18\xE7\x8B\xBD\xE4\x24\xDA"
+> +			    "\xA8\x26\xD1\x03\xF1\xC7\x6B\x28\x62\xAB\x5C\xAB"
+> +			    "\x98\xCA\xFB\xCB\x0B\x2D\x01\xD9\xC1\xA6\xFA\x91"
+> +			    "\x71\x3D\x9B\x3B\x60\xEB\xD7\xA2\x61\xC1\x92\x60"
+> +			    "\xB1\x02\x44\x0C\x97\x70\x77\x83\xF9\x35\xEA\x24"
+> +			    "\x85\xF8\x0A\x32\xA2\xC7\x05\x40\x90\x83\x4F\x87"
+> +			    "\x57\x66\xB5\xDE\xEE\xFF\x8B\x01\xBC\x96\xB0\xC5"
+> +			    "\x29\xB6\xC1\xF0\x11\x31\x51\x11\xB0\xC2\x0F\x08"
+> +			    "\xCF\x09\x69\x74\xE1\x0D\x6C\x0A\x10\xD0\x73\xF0"
+> +			    "\x8E\xDC\x5F\xB1\xBD\x47\x8A\xA7\x90\xB3\x08\x86"
+> +			    "\xD2\xE4\x58\xE5\x68\x33\x67\x3B\x37\xF1\x28\x28"
+> +			    "\x59\x91\xB5\x5F\x8D\x84\x54\xCE\x18\x76\xE3\x5C"
+> +			    "\x55\x37\x8E\x10\x34\x9B\x6E\x1F\x73\x88\x31\xBF"
+> +			    "\x0D\x5C\xED\x7A\xBC\xF2\xCE\x7A\x2E\x2E\xE7\x04"
+> +			    "\xE7\xF2\x8F\x33\xCC\x06\x77\x96\xBB\xA8\x65\x03"
+> +			    "\x26\x79\xC0\xF0\x52\x3B\xD4\xF2\x5D\x00\xE4\x80"
+> +			    "\x7F\x78\xC0\x45\x29\x55\xCA\x63",
+> +		.expectedlen = 512,
+> +	}
+> +};
+> +
+>   /* Test vector obtained during NIST ACVP testing */
+>   static const struct drbg_testvec drbg_nopr_hmac_sha512_tv_template[] = {
+>   	{
+>   		.entropy = (unsigned char *)
+>   			"\xDF\xB0\xF2\x18\xF0\x78\x07\x01\x29\xA4\x29\x26"
