@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 830F3382F12;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6734382F30;
 	Mon, 20 Apr 2026 06:37:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776667020; cv=none; b=FP+5RrhLRyMq69/E6SE/BL2t5tTSW14VEnIoUAPNmlwPzVVpVKaL8UlBGjP/LbEhZK1R2z1pOwSPG3O1GF984iD+7hrRJzEdiNafSx4eEUo/DOCNsI0CWpHR7PE2HWdsMSmoDI1m77+5ElnjH6VJ7cWcO02EtKwmvnEpU2dWAtc=
+	t=1776667020; cv=none; b=NqH3l3bUYgy2xy7A2uwQqs3uSVEfQonC01lkxgIroieWHzEUJMVsJFksWS77Y8hOo8j6Gk0xkcpMHBil4zlFhhk2+VFzs2u7ClfCUjsZW7wpBXbbhn+N5LVeem0CgB0DhRpkF8orDwS7B7aDULGjuSgEo4emcgjbUEotNJe6LLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1776667020; c=relaxed/simple;
-	bh=othQOxd/3rop0A1viyxlHVjq78QZgCky3GUdxbIdsWw=;
+	bh=E/caBFaT5oe5iu25OVDOFiTddXIWeBTyZnY1rZiZXwU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mLJU2pPFWpw2UgnJ/vhwqsTv5ojMR+x1mlZULfYwfMU3yswyr1a/2ayoP9J5mG+pF+EqMKczhl+T2B8QjAZptNqtAFlgQYmQ5mStGbV3c848mPyY38P8ZSZm4KUtuBfJp57OtKMDFxXx90Ka5deNlqEO4gzTpqyRE5M8w4DgMOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QJkyWjsg; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=UihbA5m7jH9BvZpg17TUlZxybQbQSlO/PIc7JTar610PlASyEx25yL/IN72NFTuZGGY0gYv+0uOu4VG1enCgaAZDw/yG6D7xg+8fvAuEVJ6xg1HU6OTSGs8wvCJssX8mOMjADTDIxU687I02AMkTKcPHIoJc7B6upaiI2wsOkzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tLjZBPx1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QJkyWjsg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3398C2BCB6;
-	Mon, 20 Apr 2026 06:36:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tLjZBPx1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C379C2BCB3;
+	Mon, 20 Apr 2026 06:37:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1776667020;
-	bh=othQOxd/3rop0A1viyxlHVjq78QZgCky3GUdxbIdsWw=;
+	bh=E/caBFaT5oe5iu25OVDOFiTddXIWeBTyZnY1rZiZXwU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QJkyWjsge9nNgsM4ouS1BF0MkQbnaTRg19SJoXXbZFg1R39cdEgnlpjlTlEhO6omQ
-	 dCn89o8oqkAB8uCt6dfK/ZtlKNeEwARet31mQUXdQPo3lY+NGRTNk8+quwcN6Ni4aA
-	 8uAd2GAgDMHsri5pPcR/UMdph6TLhyg9CF2/Ns6O8U74QGzwSUb/QsOM+EBksUNXHC
-	 Os2Pm/if1CEnnNYlrwgp/G2EF9PHXG1RE9BM903ecxwYz3dChVeSc/zejAwC6H6eRI
-	 RbFIDhAnLcWPAzOHDVGJF7WjQk5LyS4iONicUuNgoHejNXKg0skqFoEI7cBwNdUw0W
-	 1kA5tpRqF0QuQ==
+	b=tLjZBPx1SsrFsCND9zwOT0GbL8Z+Ft464paDL0WAqQbCS5LlrlkPHCOL4kVBgJcqR
+	 yDVJ1u1maay5aJtArBKYvjAnxDzz9nj2JfK6CKRtSU6YiOmDQmIf7RMn/VwAOHUBkE
+	 CnA5yOR+VnorBp2KbOTWHzZnmr0ueFBQ7ttjUM5crmqby9q2HJKSpbnChhYwdoAMIB
+	 6hFaDZ1VgJ6xgwMoqpap3y36C5ECNCZQPA4d8nH4pyS53fxWKmqWiyzJulgbBlp5LF
+	 UPjQOrVbpbKM1m98wxZEEKRZc229u7oQY5XK1LxBtquPjn+/WTzAU88V95xdd3bwYF
+	 m+ym9jsLKZ9EQ==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>
@@ -34,9 +34,9 @@ Cc: linux-kernel@vger.kernel.org,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Eric Biggers <ebiggers@kernel.org>,
 	stable@vger.kernel.org
-Subject: [PATCH 03/38] crypto: drbg - Fix ineffective sanity check
-Date: Sun, 19 Apr 2026 23:33:47 -0700
-Message-ID: <20260420063422.324906-4-ebiggers@kernel.org>
+Subject: [PATCH 04/38] crypto: drbg - Fix drbg_max_addtl() on 64-bit kernels
+Date: Sun, 19 Apr 2026 23:33:48 -0700
+Message-ID: <20260420063422.324906-5-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420063422.324906-1-ebiggers@kernel.org>
 References: <20260420063422.324906-1-ebiggers@kernel.org>
@@ -48,56 +48,61 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Fix drbg_healthcheck_sanity() to correctly check the return value of
-drbg_generate().  drbg_generate() returns 0 on success, or a negative
-errno value on failure.  drbg_healthcheck_sanity() incorrectly assumed
-that it returned a positive value on success.
+On 64-bit kernels, drbg_max_addtl() returns 2**35 bytes.  That's too
+large, for two reasons:
 
-This didn't make the sanity check fail, but it made it ineffective.
+1. SP800-90A says the maximum limit is 2**35 *bits*, not 2**35 bytes.
+   So the implemented limit has confused bits and bytes.
 
-Fixes: cde001e4c3c3 ("crypto: rng - RNGs must return 0 in success case")
+2. When drbg_kcapi_hash() calls crypto_shash_update() on the additional
+   information string, the length is implicitly cast to 'unsigned int'.
+   That truncates the additional information string to U32_MAX bytes.
+
+Fix the maximum additional information string length to always be
+U32_MAX - 1, causing an error to be returned for any longer lengths.
+
+Fixes: 541af946fe13 ("crypto: drbg - SP800-90A Deterministic Random Bit Generator")
 Cc: stable@vger.kernel.org
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- crypto/drbg.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ include/crypto/drbg.h | 18 +++++++-----------
+ 1 file changed, 7 insertions(+), 11 deletions(-)
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index de4c69032155..f23b431bd490 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -1735,11 +1735,10 @@ static int drbg_kcapi_seed(struct crypto_rng *tfm,
-  * Note 2: There is no sensible way of testing the reseed counter
-  * enforcement, so skip it.
-  */
- static inline int __init drbg_healthcheck_sanity(void)
+diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
+index 2d42518cbdce..c11eaf757ed0 100644
+--- a/include/crypto/drbg.h
++++ b/include/crypto/drbg.h
+@@ -146,23 +146,19 @@ static inline size_t drbg_max_request_bytes(struct drbg_state *drbg)
  {
--	int len = 0;
- #define OUTBUFLEN 16
- 	unsigned char buf[OUTBUFLEN];
- 	struct drbg_state *drbg = NULL;
- 	int ret;
- 	int rc = -EFAULT;
-@@ -1780,15 +1779,15 @@ static inline int __init drbg_healthcheck_sanity(void)
+ 	/* SP800-90A requires the limit 2**19 bits, but we return bytes */
+ 	return (1 << 16);
+ }
  
- 	max_addtllen = drbg_max_addtl(drbg);
- 	max_request_bytes = drbg_max_request_bytes(drbg);
- 	drbg_string_fill(&addtl, buf, max_addtllen + 1);
- 	/* overflow addtllen with additional info string */
--	len = drbg_generate(drbg, buf, OUTBUFLEN, &addtl);
--	BUG_ON(0 < len);
-+	ret = drbg_generate(drbg, buf, OUTBUFLEN, &addtl);
-+	BUG_ON(ret == 0);
- 	/* overflow max_bits */
--	len = drbg_generate(drbg, buf, (max_request_bytes + 1), NULL);
--	BUG_ON(0 < len);
-+	ret = drbg_generate(drbg, buf, max_request_bytes + 1, NULL);
-+	BUG_ON(ret == 0);
++/*
++ * SP800-90A allows implementations to support additional info / personalization
++ * strings of up to 2**35 bits.  Implementations can have a smaller maximum.  We
++ * use 2**35 - 16 bits == U32_MAX - 1 bytes so that the max + 1 always fits in a
++ * size_t, allowing drbg_healthcheck_sanity() to verify its enforcement.
++ */
+ static inline size_t drbg_max_addtl(struct drbg_state *drbg)
+ {
+-	/* SP800-90A requires 2**35 bytes additional info str / pers str */
+-#if (__BITS_PER_LONG == 32)
+-	/*
+-	 * SP800-90A allows smaller maximum numbers to be returned -- we
+-	 * return SIZE_MAX - 1 to allow the verification of the enforcement
+-	 * of this value in drbg_healthcheck_sanity.
+-	 */
+-	return (SIZE_MAX - 1);
+-#else
+-	return (1UL<<35);
+-#endif
++	return U32_MAX - 1;
+ }
  
- 	/* overflow max addtllen with personalization string */
- 	ret = drbg_seed(drbg, &addtl, false);
- 	BUG_ON(0 == ret);
- 	/* all tests passed */
+ static inline size_t drbg_max_requests(struct drbg_state *drbg)
+ {
+ 	/* SP800-90A requires 2**48 maximum requests before reseeding */
 -- 
 2.53.0
 
