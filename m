@@ -1,89 +1,97 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C28D139F18A;
-	Mon, 20 Apr 2026 17:26:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 022BD3446CC;
+	Mon, 20 Apr 2026 17:48:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776706009; cv=none; b=eKWL589hmvbiCHxHD+zZ9f3oGcErhMEOvDMGcwuD5VEcdcw6LoQjcWyUQ6oFpfX1pWcR+n4TCU6xHjHlP4qpNiLT4Cse4SE5BNTx3K9pXUkJEaekpuUA/ydx7WDU4ltCnyDNGVvyv5QJVMs0uNB0ba6nEpa+g/Eo356F/uMd0xY=
+	t=1776707309; cv=none; b=XSWNi7ZY6rn0sJkRFS8hmqmf1S00zvErEtuzzoC8UHAIm5v/WFvKUn9B7pGdqOaGLFPBC1ko1EgGMSgmZzAg4CmgBJ+U/won7QmfU6cpSG1wyAiL+RexiP/50mZRiT5AnZaFhERhjcbI8TRhBecNou4gd16N1tWY/iYFqw7p250=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776706009; c=relaxed/simple;
-	bh=1TJ7659gBIjljfsN5vIbDUBqCTI+XQzZvR9/ICt9cG0=;
+	s=arc-20240116; t=1776707309; c=relaxed/simple;
+	bh=FDeI1DTJ7gMmhAhnOgD4lEOmUlxLaOnfTDsK+A+8yAE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RnsCcAM7sK9/uOUdmb3zwFMTXbqdUtT7XM4yHkShJ5OyQ2iC6paiPjcwpD9T6BrA3LtevmmyCuo3eZniBaA2Mrlyb7C0AE1mmQt5iiVEkU71HTmUvnijZxgx0mVVYq7GTGGpmzbRsmxtqRIDj4ORY+9OyI76G6bslVIQsWU5iUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fFyq+4tm; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=GEPCO12oogB4OroKLb4WQTolunRPN2W5JLZC2UsCpivI5HnBwS6TMxFGFL61j1dqPNDueYUwrVvOHW3WeiLL+mU44p8VvELplzPI7Dw/3A1g7r9sPA4urkTdI9hG0vm8Izf7w6OHVdvrtJOukraJF+NgViiRbbAYWbD02X1xMc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qrv3mpr8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fFyq+4tm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2956BC19425;
-	Mon, 20 Apr 2026 17:26:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qrv3mpr8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86901C19425;
+	Mon, 20 Apr 2026 17:48:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776706009;
-	bh=1TJ7659gBIjljfsN5vIbDUBqCTI+XQzZvR9/ICt9cG0=;
+	s=k20201202; t=1776707308;
+	bh=FDeI1DTJ7gMmhAhnOgD4lEOmUlxLaOnfTDsK+A+8yAE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fFyq+4tm/gWpTapa3NwnYClwpNxx9LsS9gVxmfnPNwfMSndWm1GjNAfSzRTSPVd8d
-	 rwpW3OJUDtiyQNOF6xQeP6X3bLR/XNwUtocPMcFqMlW3a26igYX3stvA8YagCh4bgG
-	 35nUJ5ncGrvoFczXTUvE3Exo5uXwLAjAs2Y2iQcDhN97sYCd7Zry6j3FI6g77wr7O9
-	 lFAKL7CB3jhimm/WlLdQn9sZCdBKABg2HYvy3k6F9EVs8Q+2qmdD+Bd29Bjp6SNP21
-	 CLj5u2F3BILv5GzaSIwkcqGYMDfrqnuaHndHtr9duKsOn9tBeZdkpsKAEaLsEp4Q79
-	 Cm98Zm4uo1e3g==
-Date: Mon, 20 Apr 2026 10:25:34 -0700
+	b=qrv3mpr82fyEfpUsZ1z7bwW3M5XvtuRkTMTZ6GyLUHNwpMqiNY6OGDUPb60NHdVZ6
+	 T+Hrmg4eRj6mZ3MdgtQ0PpENpsEVM3x3Lac2e5XDuUnHNUfL4OepY/Er0wHDYI6+Bw
+	 5dOtMIMt9Pbw2s52RPoWJNL0aoiji9lrp5R8LPhZkt2K5XPJeztJI699QAFIPWpHEi
+	 Qo93DxEzw7i2uCd1FJ7S+hl6+lI3V0Io8qfUzHJsRk2k08CJzR+9QMgpYioHyED7mX
+	 5d32Gepnw/k+VG4OkNeW6LgDn0llsU1Jk60DP9TQv3ESTIfD34l0onSiLPWxtgMk6o
+	 7rJwLsLVq3cbg==
+Date: Mon, 20 Apr 2026 10:47:13 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: Joachim Vandersmissen <joachim@jvdsn.com>
+To: Stephan Mueller <smueller@chronox.de>
 Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-kernel@vger.kernel.org, Stephan Mueller <smueller@chronox.de>,
+	linux-kernel@vger.kernel.org,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH 36/38] crypto: drbg - Remove redundant reseeding based on
- random.c state
-Message-ID: <20260420172534.GB2221@sol>
+Subject: Re: [PATCH 12/38] crypto: drbg - Remove support for CTR_DRBG
+Message-ID: <20260420174713.GC2221@sol>
 References: <20260420063422.324906-1-ebiggers@kernel.org>
- <20260420063422.324906-37-ebiggers@kernel.org>
- <9e13b506-576f-4753-96e4-9e12085627bc@jvdsn.com>
+ <20260420063422.324906-13-ebiggers@kernel.org>
+ <2300345.NgBsaNRSFp@tauon>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <9e13b506-576f-4753-96e4-9e12085627bc@jvdsn.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2300345.NgBsaNRSFp@tauon>
 
-On Mon, Apr 20, 2026 at 11:48:47AM -0500, Joachim Vandersmissen wrote:
+On Mon, Apr 20, 2026 at 04:40:18PM +0200, Stephan Mueller wrote:
+> Am Montag, 20. April 2026, 08:33:56 Mitteleuropäische Sommerzeit schrieb Eric 
+> Biggers:
+> 
 > Hi Eric,
 > 
-> On 4/20/26 1:34 AM, Eric Biggers wrote:
-> > We're now incorporating 32 bytes from get_random_bytes() in the
-> > additional input string on every request.  The additional input string
-> > is processed with a call to drbg_hmac_update(), which is exactly how the
-> > seed is processed.  Thus, in reality this is as good as a reseed.
-> > 
-> >  From the perspective of FIPS 140-3, it isn't as good as a reseed.  But
-> > it doesn't actually matter, because from FIPS's point of view
-> > get_random_bytes() provides zero entropy anyway.
-> > 
-> > Thus, neither the reseed with more get_random_bytes() every 300s, nor
-> > the logic that reseeds more frequently before rng_is_initialized(), is
-> > actually needed anymore.  Remove it to simplify the code significantly.
-> > 
-> > (Technically the use of get_random_bytes() in drbg_seed() itself could
-> > be removed too.  But it's safer to keep it there for now.)
-> It's fair to say that the additional input is as good as a reseed (if FIPS
-> is not considered), but then is there any reason to keep get_random_bytes()
-> in drbg_seed()? You say it could be removed but it's safer to keep it there
-> for now? In what way is it safer? The additional input is mixed into the
-> HMAC_DRBG state prior to generating random bits, so should already provide
-> sufficient assurance that the generated bits incorporate the output of
-> get_random_bytes()?
+> > Remove the support for CTR_DRBG.  It's likely unused code, seeing as
+> > HMAC_DRBG is always enabled and prioritized over it unless
+> > NETLINK_CRYPTO is used to change the algorithm priorities.
+> 
+> Just as an FYI: the CTR DRBG implementation is used, because it provides 
+> massive superior performance. The CTR DRBG implementation is lined up to use 
+> the AES-CTR mode directly. If you have an accelerated implementation like AES-
+> NI or ARM-CE, your performance increase is significant.
+> 
+> For example, on my M4 development system, the generation of 1GB of data from 
+> the CTR DRBG takes 90ms whereas the HMAC DRBG takes more than 4 seconds.
+> 
+> The default of HMAC DRBG, however, was used since it has a simple logic and 
+> smaller code.
 
-I do agree that patch 34 makes the get_random_bytes() in drbg_seed()
-redundant too.  I'm just not yet sure that removing it would strike the
-right balance between defense in depth and eliminating redundancy.
+I guess I have to ask: by "it is used", do you mean that it's used by a
+significant number of users, or is it more of a personal thing where you
+happen to be personally using it?  Note that the only way to select it
+is directly by driver name (which has no in-kernel users), by running a
+custom userspace program that uses NETLINK_CRYPTO to modify the
+algorithm priorities.  I'm sure you know how to do the NETLINK_CRYPTO
+thing, but this very much seems like an idiosyncratic expert-level
+configuration that isn't really used in practice, similar to some other
+things that you've added like CONFIG_CRYPTO_JITTERENTROPY_MEMSIZE_*.
 
-Keeping it there also keeps it very clear that whenever jitterentropy
-entropy is used, we're also using an equal number of bytes from
-get_random_bytes() alongside it.  (Remember, not everyone "trusts"
-jitterentropy.  People auditing this code might *really* want to see the
-get_random_bytes().)  The additional input does achieve the
-get_random_bytes() integration anyway, just it's a bit more subtle.
+And even if it's being used, does it really need to be?  Do you really
+need more than 250 MB/s of "FIPS-approved" random numbers, and from the
+kernel (not a userspace library)?
+
+I also don't think we actually have much choice, given that we don't
+currently have a reliably correct implementation of CTR_DRBG anyway, and
+that takes priority over everything else.  As I explained in detail in
+this patch, this just hasn't been something that's ever been done.  It
+sometimes returns success on failure, it sometimes isn't constant-time,
+and it used to repeat output on some platforms (and maybe even still
+does).  Not particularly great properties for a RNG.
+
+While a reliable implementation of CTR_DRBG is possible (BoringSSL does
+it, for example), the reality is it would take quite a bit more work.
 
 - Eric
