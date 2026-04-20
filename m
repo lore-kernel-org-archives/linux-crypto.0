@@ -1,97 +1,200 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 022BD3446CC;
-	Mon, 20 Apr 2026 17:48:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D01323A0E97;
+	Mon, 20 Apr 2026 18:21:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776707309; cv=none; b=XSWNi7ZY6rn0sJkRFS8hmqmf1S00zvErEtuzzoC8UHAIm5v/WFvKUn9B7pGdqOaGLFPBC1ko1EgGMSgmZzAg4CmgBJ+U/won7QmfU6cpSG1wyAiL+RexiP/50mZRiT5AnZaFhERhjcbI8TRhBecNou4gd16N1tWY/iYFqw7p250=
+	t=1776709305; cv=none; b=SSRVoAUQtg6sThAxrPz5fwog9BtJc0U5nj8PDy+e5rggbhaZj+xqwNulA0kde1STRGQgBLUIJo0VyQrWA4ard71dJgdUTvUaC6q+x1Q7Mlox5yn/hQoIheo2CFJNY5maooTYrRTRy3lvHzfztlMHRacee7DD7GVZ/XCN8H0ZudU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776707309; c=relaxed/simple;
-	bh=FDeI1DTJ7gMmhAhnOgD4lEOmUlxLaOnfTDsK+A+8yAE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GEPCO12oogB4OroKLb4WQTolunRPN2W5JLZC2UsCpivI5HnBwS6TMxFGFL61j1dqPNDueYUwrVvOHW3WeiLL+mU44p8VvELplzPI7Dw/3A1g7r9sPA4urkTdI9hG0vm8Izf7w6OHVdvrtJOukraJF+NgViiRbbAYWbD02X1xMc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qrv3mpr8; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776709305; c=relaxed/simple;
+	bh=zCeKjbXoTI6kRJfbuAWC3zZGhUWlZwENSYzIegLsots=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PoilezZ0loonLkxge8MMYNe9HQgqnXEazxSJWoI8D/D0Fp8BixMDqcKsKjht6aNKf2VyNwqAmCC186Mwd5cIAg8N906OHiSOoOyzGu/lLlX5Efw8UTzsA2rmU6ULaUifqWHYrRs2Ystb8gpDZiRr2KZ7zcjOUElO3GIsYHRimZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qACMxoN4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qrv3mpr8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86901C19425;
-	Mon, 20 Apr 2026 17:48:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qACMxoN4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 541F9C19425;
+	Mon, 20 Apr 2026 18:21:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776707308;
-	bh=FDeI1DTJ7gMmhAhnOgD4lEOmUlxLaOnfTDsK+A+8yAE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qrv3mpr82fyEfpUsZ1z7bwW3M5XvtuRkTMTZ6GyLUHNwpMqiNY6OGDUPb60NHdVZ6
-	 T+Hrmg4eRj6mZ3MdgtQ0PpENpsEVM3x3Lac2e5XDuUnHNUfL4OepY/Er0wHDYI6+Bw
-	 5dOtMIMt9Pbw2s52RPoWJNL0aoiji9lrp5R8LPhZkt2K5XPJeztJI699QAFIPWpHEi
-	 Qo93DxEzw7i2uCd1FJ7S+hl6+lI3V0Io8qfUzHJsRk2k08CJzR+9QMgpYioHyED7mX
-	 5d32Gepnw/k+VG4OkNeW6LgDn0llsU1Jk60DP9TQv3ESTIfD34l0onSiLPWxtgMk6o
-	 7rJwLsLVq3cbg==
-Date: Mon, 20 Apr 2026 10:47:13 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Stephan Mueller <smueller@chronox.de>
-Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-kernel@vger.kernel.org,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH 12/38] crypto: drbg - Remove support for CTR_DRBG
-Message-ID: <20260420174713.GC2221@sol>
-References: <20260420063422.324906-1-ebiggers@kernel.org>
- <20260420063422.324906-13-ebiggers@kernel.org>
- <2300345.NgBsaNRSFp@tauon>
+	s=k20201202; t=1776709305;
+	bh=zCeKjbXoTI6kRJfbuAWC3zZGhUWlZwENSYzIegLsots=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=qACMxoN4aYV/2q841hxDi4EXfaqonP1MOgNQ2LZgKO6XKVqkNn6Rp1NdIYhFGxGiP
+	 d0fPF/Gw/JlQRWzJJ9ry/jJN2VgDJw2isoRu8JnUfurjhcy3yN6MNIwt+breG7ZmtV
+	 Cmd7L5//5NeQI0Y0/fVLXCpxUco8EI+Hhp8rWNcXoq7ujOmZiiM4eyG79moM9mbnoC
+	 VcVDohnvq/yhRPgm9Ddxm5fFd+XocCcRhAPlAfyu7k5dS0KasU8bb3C6i2zDpN3yL4
+	 DLlfNDgLFzUCMBKhrCdUo4LPqn/xqsG9hlskDRxxPpsGUZP/xgSO3QkPaBvok8VdT2
+	 KxTQDdBmq0rpg==
+From: Tejun Heo <tj@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Thomas Graf <tgraf@suug.ch>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: [PATCH v2] rhashtable: Bounce deferred worker kick through irq_work
+Date: Mon, 20 Apr 2026 08:12:58 -1000
+Message-ID: <4ff731fc-3791-4b96-a997-89c3bcd2d69b@kernel.org>
+In-Reply-To: <67fedbf2-914b-44f7-9422-1fe97d833705@kernel.org>
+References: <67fedbf2-914b-44f7-9422-1fe97d833705@kernel.org>
+ <aeXnak9Yl84a-kho@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <2300345.NgBsaNRSFp@tauon>
 
-On Mon, Apr 20, 2026 at 04:40:18PM +0200, Stephan Mueller wrote:
-> Am Montag, 20. April 2026, 08:33:56 Mitteleuropäische Sommerzeit schrieb Eric 
-> Biggers:
-> 
-> Hi Eric,
-> 
-> > Remove the support for CTR_DRBG.  It's likely unused code, seeing as
-> > HMAC_DRBG is always enabled and prioritized over it unless
-> > NETLINK_CRYPTO is used to change the algorithm priorities.
-> 
-> Just as an FYI: the CTR DRBG implementation is used, because it provides 
-> massive superior performance. The CTR DRBG implementation is lined up to use 
-> the AES-CTR mode directly. If you have an accelerated implementation like AES-
-> NI or ARM-CE, your performance increase is significant.
-> 
-> For example, on my M4 development system, the generation of 1GB of data from 
-> the CTR DRBG takes 90ms whereas the HMAC DRBG takes more than 4 seconds.
-> 
-> The default of HMAC DRBG, however, was used since it has a simple logic and 
-> smaller code.
+Inserts past 75% load call schedule_work(&ht->run_work) to kick an
+async resize. If a caller holds a raw spinlock (e.g. an
+insecure_elasticity user), schedule_work() under that lock records
 
-I guess I have to ask: by "it is used", do you mean that it's used by a
-significant number of users, or is it more of a personal thing where you
-happen to be personally using it?  Note that the only way to select it
-is directly by driver name (which has no in-kernel users), by running a
-custom userspace program that uses NETLINK_CRYPTO to modify the
-algorithm priorities.  I'm sure you know how to do the NETLINK_CRYPTO
-thing, but this very much seems like an idiosyncratic expert-level
-configuration that isn't really used in practice, similar to some other
-things that you've added like CONFIG_CRYPTO_JITTERENTROPY_MEMSIZE_*.
+  caller_lock -> pool->lock -> pi_lock -> rq->__lock
 
-And even if it's being used, does it really need to be?  Do you really
-need more than 250 MB/s of "FIPS-approved" random numbers, and from the
-kernel (not a userspace library)?
+A cycle forms if any of these locks is acquired in the reverse
+direction elsewhere. sched_ext, the only current insecure_elasticity
+user, hits this: it holds scx_sched_lock across rhashtable inserts of
+sub-schedulers, while scx_bypass() takes rq->__lock -> scx_sched_lock.
+Exercising the resize path produces:
 
-I also don't think we actually have much choice, given that we don't
-currently have a reliably correct implementation of CTR_DRBG anyway, and
-that takes priority over everything else.  As I explained in detail in
-this patch, this just hasn't been something that's ever been done.  It
-sometimes returns success on failure, it sometimes isn't constant-time,
-and it used to repeat output on some platforms (and maybe even still
-does).  Not particularly great properties for a RNG.
+  Chain exists of:
+    &pool->lock --> &rq->__lock --> scx_sched_lock
 
-While a reliable implementation of CTR_DRBG is possible (BoringSSL does
-it, for example), the reality is it would take quite a bit more work.
+Route the kick unconditionally through irq_work so schedule_work() runs
+from hard IRQ context with the caller's lock no longer held.
 
-- Eric
+v2: bounce unconditionally instead of gating on insecure_elasticity, as
+    suggested by Herbert.
+
+Signed-off-by: Tejun Heo <tj@kernel.org>
+---
+Herbert, any preference on how this should be routed?
+
+Thanks.
+
+ include/linux/rhashtable-types.h |  3 +++
+ include/linux/rhashtable.h       |  3 ++-
+ lib/rhashtable.c                 | 24 ++++++++++++++++++++----
+ 3 files changed, 25 insertions(+), 5 deletions(-)
+
+diff --git a/include/linux/rhashtable-types.h b/include/linux/rhashtable-types.h
+index 72082428d6c6..fc2f596a6df1 100644
+--- a/include/linux/rhashtable-types.h
++++ b/include/linux/rhashtable-types.h
+@@ -12,6 +12,7 @@
+ #include <linux/alloc_tag.h>
+ #include <linux/atomic.h>
+ #include <linux/compiler.h>
++#include <linux/irq_work_types.h>
+ #include <linux/mutex.h>
+ #include <linux/workqueue_types.h>
+
+@@ -77,6 +78,7 @@ struct rhashtable_params {
+  * @p: Configuration parameters
+  * @rhlist: True if this is an rhltable
+  * @run_work: Deferred worker to expand/shrink asynchronously
++ * @run_irq_work: Bounces the @run_work kick through hard IRQ context.
+  * @mutex: Mutex to protect current/future table swapping
+  * @lock: Spin lock to protect walker list
+  * @nelems: Number of elements in table
+@@ -88,6 +90,7 @@ struct rhashtable_params {
+ 	struct rhashtable_params	p;
+ 	bool				rhlist;
+ 	struct work_struct		run_work;
++	struct irq_work			run_irq_work;
+ 	struct mutex                    mutex;
+ 	spinlock_t			lock;
+ 	atomic_t			nelems;
+diff --git a/include/linux/rhashtable.h b/include/linux/rhashtable.h
+index 7def3f0f556b..ef5230cece36 100644
+--- a/include/linux/rhashtable.h
++++ b/include/linux/rhashtable.h
+@@ -20,6 +20,7 @@
+
+ #include <linux/err.h>
+ #include <linux/errno.h>
++#include <linux/irq_work.h>
+ #include <linux/jhash.h>
+ #include <linux/list_nulls.h>
+ #include <linux/workqueue.h>
+@@ -847,7 +848,7 @@ static __always_inline void *__rhashtable_insert_fast(
+ 	rht_assign_unlock(tbl, bkt, obj, flags);
+
+ 	if (rht_grow_above_75(ht, tbl))
+-		schedule_work(&ht->run_work);
++		irq_work_queue(&ht->run_irq_work);
+
+ 	data = NULL;
+ out:
+diff --git a/lib/rhashtable.c b/lib/rhashtable.c
+index fb2b7bc137ba..218d3c1f34fb 100644
+--- a/lib/rhashtable.c
++++ b/lib/rhashtable.c
+@@ -442,7 +442,21 @@ static void rht_deferred_worker(struct work_struct *work)
+ 	mutex_unlock(&ht->mutex);
+
+ 	if (err)
+-		schedule_work(&ht->run_work);
++		irq_work_queue(&ht->run_irq_work);
++}
++
++/*
++ * rhashtable can be used under raw spinlocks. Calling schedule_work()
++ * from such context can close a locking cycle through workqueue and
++ * scheduler locks. Bounce through irq_work so the schedule_work() runs
++ * from hard IRQ context with the caller's lock no longer held.
++ */
++static void rht_deferred_irq_work(struct irq_work *irq_work)
++{
++	struct rhashtable *ht = container_of(irq_work, struct rhashtable,
++					     run_irq_work);
++
++	schedule_work(&ht->run_work);
+ }
+
+ static int rhashtable_insert_rehash(struct rhashtable *ht,
+@@ -477,7 +491,7 @@ static int rhashtable_insert_rehash(struct rhashtable *ht,
+ 		if (err == -EEXIST)
+ 			err = 0;
+ 	} else
+-		schedule_work(&ht->run_work);
++		irq_work_queue(&ht->run_irq_work);
+
+ 	return err;
+
+@@ -488,7 +502,7 @@ static int rhashtable_insert_rehash(struct rhashtable *ht,
+
+ 	/* Schedule async rehash to retry allocation in process context. */
+ 	if (err == -ENOMEM)
+-		schedule_work(&ht->run_work);
++		irq_work_queue(&ht->run_irq_work);
+
+ 	return err;
+ }
+@@ -630,7 +644,7 @@ static void *rhashtable_try_insert(struct rhashtable *ht, const void *key,
+ 			rht_unlock(tbl, bkt, flags);
+
+ 			if (inserted && rht_grow_above_75(ht, tbl))
+-				schedule_work(&ht->run_work);
++				irq_work_queue(&ht->run_irq_work);
+ 		}
+ 	} while (!IS_ERR_OR_NULL(new_tbl));
+
+@@ -1085,6 +1099,7 @@ int rhashtable_init_noprof(struct rhashtable *ht,
+ 	RCU_INIT_POINTER(ht->tbl, tbl);
+
+ 	INIT_WORK(&ht->run_work, rht_deferred_worker);
++	init_irq_work(&ht->run_irq_work, rht_deferred_irq_work);
+
+ 	return 0;
+ }
+@@ -1150,6 +1165,7 @@ void rhashtable_free_and_destroy(struct rhashtable *ht,
+ 	struct bucket_table *tbl, *next_tbl;
+ 	unsigned int i;
+
++	irq_work_sync(&ht->run_irq_work);
+ 	cancel_work_sync(&ht->run_work);
+
+ 	mutex_lock(&ht->mutex);
