@@ -1,267 +1,303 @@
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.jvdsn.com (smtp.jvdsn.com [129.153.194.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D6A2346E7E;
-	Mon, 20 Apr 2026 16:35:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9D26372EF0;
+	Mon, 20 Apr 2026 16:48:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.153.194.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776702932; cv=none; b=nwtphqC2b93ELajwqm3HOjH7lMNDXpVCuhlA85wGevycJha/92o/S5CtU6hOqOgu/tySXATeofjOaOuJPciPOoYxIXKr2rxWSWmzuxxQckruXnlmSwEo0lMfczoL7wvY1BVJuCmxXYBoLFgmMRuY9x7yEmC8swA1AKnWfnWDAWA=
+	t=1776703730; cv=none; b=PoPeDj5U6IPWd1IAWaUp5F4sUIgHRpVig5451+7CklfwQh2QRhzXrw/mhkXYTf/SK8sNVzXae6VxS8/Nl4r0gVq2ay6znBePjNyO03dxuDGbr4ry7YHa6wA+TohZ5rr1cud2jNiQZ1ykKlgJntrJIkqN+O34hbVW50xg4CP8N3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776702932; c=relaxed/simple;
-	bh=ssLqSFLTYxVIUk25VJfp+OL2Z27tYstNKSVXAyJTL3w=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QUaf/sXDOhXj4sZHkR63S42r+v9dygy5t2x7YSiZmg2fmZN+W/SJKQteVHEie3XaoY8ZL/2MgwL42wcgkdXJ2FUjR+EfnRuobK4vlr0eWwMfBQOlu+ZAEczyIndIHJ7czmDwEpxUigdK5YE0sNl0KX933vGxbc0uAPuGJgNw36k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1wErap-000000001D6-1tcW;
-	Mon, 20 Apr 2026 16:35:27 +0000
-Date: Mon, 20 Apr 2026 17:35:24 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Daniel Golle <daniel@makrotopia.org>, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH v4 3/3] hwrng: mtk - add support for hw access via SMCC
-Message-ID: <e12b133a762f68628e29ac358a3a0605731ab7bd.1776702734.git.daniel@makrotopia.org>
-References: <912fe579eccf577f3064b69d6c945e2c9087cab8.1776702734.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1776703730; c=relaxed/simple;
+	bh=kcNBUdT1rAgPFcu1gMxQPN3qd7G83ytFuTKyNDWeDyM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PRWz0cnV7PFdh7IthmDeRZiX1NZqarxQyfBbQlbh4dXZY/DuCLJZ4UuvpHwYghmM50klTGCNY0F+lbExiMKAdA9PShkPjpd9ekoWe2mTJuu8BlNjRw9KKxbO+2YUOL9na0UqWJla8lbK5fIEF+dbUniOaoZlFD2cJaPB6c43eVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com; spf=pass smtp.mailfrom=jvdsn.com; dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b=Mp92CaG0; arc=none smtp.client-ip=129.153.194.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvdsn.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b="Mp92CaG0"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=jvdsn.com; s=mail;
+	t=1776703728; bh=kcNBUdT1rAgPFcu1gMxQPN3qd7G83ytFuTKyNDWeDyM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=Mp92CaG088gDQZE4zp+wImm0FzCZB0mbLDI6k4yg9F13yV4mtY/Zv2ojTJbeAEiDu
+	 7/2JAC3Oz+mO5BjgUr6vkMG5Z3LFf/21bbAT7TJ8iqwYpdLaxFbRZIgAoM8k2oUWk9
+	 dKtXuQR4NkxkarQjw1OhGLRbub3PWnfbz+oOIed+lcKmSOQmM2DotF7jlydOjISDc+
+	 cRyVxWnA/YD5mzsmxR2ZmLDPTqKi4w/JozxeyXjj70C+GNNFDu5Z2XgSwrnKb9VLmM
+	 m5FnOejYY0V1BKHTTUynFf4b9TUxSkNxzf4nV56MCtMSl9Y4y/P4smOFyKnOYE2qsh
+	 b+lx/gfs5LjIA==
+Message-ID: <9e13b506-576f-4753-96e4-9e12085627bc@jvdsn.com>
+Date: Mon, 20 Apr 2026 11:48:47 -0500
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <912fe579eccf577f3064b69d6c945e2c9087cab8.1776702734.git.daniel@makrotopia.org>
+Subject: Re: [PATCH 36/38] crypto: drbg - Remove redundant reseeding based on
+ random.c state
+To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
+ Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-kernel@vger.kernel.org, Stephan Mueller <smueller@chronox.de>,
+ "Jason A . Donenfeld" <Jason@zx2c4.com>
+References: <20260420063422.324906-1-ebiggers@kernel.org>
+ <20260420063422.324906-37-ebiggers@kernel.org>
+From: Joachim Vandersmissen <joachim@jvdsn.com>
+Content-Language: en-US
+In-Reply-To: <20260420063422.324906-37-ebiggers@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Newer versions of ARM TrustedFirmware-A on MediaTek's ARMv8 SoCs no longer
-allow accessing the TRNG from outside of the trusted firmware.
-Instead, a vendor-defined custom Secure Monitor Call can be used to
-acquire random bytes.
+Hi Eric,
 
-Add support for newer SoCs (MT7981, MT7987, MT7988).
-
-As TF-A for the MT7986 may either follow the old or the new
-convention, the best bet is to test if firmware blocks direct access
-to the hwrng and if so, expect the SMCC interface to be usable.
-
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
-v4: unchanged
-v3: unchanged
-v2: unchanged
-
- drivers/char/hw_random/mtk-rng.c | 127 ++++++++++++++++++++++++++-----
- 1 file changed, 106 insertions(+), 21 deletions(-)
-
-diff --git a/drivers/char/hw_random/mtk-rng.c b/drivers/char/hw_random/mtk-rng.c
-index 5808d09d12c45..8f5856b59ad66 100644
---- a/drivers/char/hw_random/mtk-rng.c
-+++ b/drivers/char/hw_random/mtk-rng.c
-@@ -3,6 +3,7 @@
-  * Driver for Mediatek Hardware Random Number Generator
-  *
-  * Copyright (C) 2017 Sean Wang <sean.wang@mediatek.com>
-+ * Copyright (C) 2026 Daniel Golle <daniel@makrotopia.org>
-  */
- #define MTK_RNG_DEV KBUILD_MODNAME
- 
-@@ -17,6 +18,8 @@
- #include <linux/of.h>
- #include <linux/platform_device.h>
- #include <linux/pm_runtime.h>
-+#include <linux/arm-smccc.h>
-+#include <linux/soc/mediatek/mtk_sip_svc.h>
- 
- /* Runtime PM autosuspend timeout: */
- #define RNG_AUTOSUSPEND_TIMEOUT		100
-@@ -30,6 +33,11 @@
- 
- #define RNG_DATA			0x08
- 
-+/* Driver feature flags */
-+#define MTK_RNG_SMC			BIT(0)
-+
-+#define MTK_SIP_KERNEL_GET_RND		MTK_SIP_SMC_CMD(0x550)
-+
- #define to_mtk_rng(p)	container_of(p, struct mtk_rng, rng)
- 
- struct mtk_rng {
-@@ -37,6 +45,7 @@ struct mtk_rng {
- 	struct clk *clk;
- 	struct hwrng rng;
- 	struct device *dev;
-+	unsigned long flags;
- };
- 
- static int mtk_rng_init(struct hwrng *rng)
-@@ -103,6 +112,56 @@ static int mtk_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
- 	return retval || !wait ? retval : -EIO;
- }
- 
-+static int mtk_rng_read_smc(struct hwrng *rng, void *buf, size_t max,
-+			    bool wait)
-+{
-+	struct arm_smccc_res res;
-+	int retval = 0;
-+
-+	while (max >= sizeof(u32)) {
-+		arm_smccc_smc(MTK_SIP_KERNEL_GET_RND, 0, 0, 0, 0, 0, 0, 0,
-+			      &res);
-+		if (res.a0)
-+			break;
-+
-+		*(u32 *)buf = res.a1;
-+		retval += sizeof(u32);
-+		buf += sizeof(u32);
-+		max -= sizeof(u32);
-+	}
-+
-+	return retval || !wait ? retval : -EIO;
-+}
-+
-+static bool mtk_rng_hw_accessible(struct mtk_rng *priv)
-+{
-+	u32 val;
-+	int err;
-+
-+	err = clk_prepare_enable(priv->clk);
-+	if (err)
-+		return false;
-+
-+	val = readl(priv->base + RNG_CTRL);
-+	val |= RNG_EN;
-+	writel(val, priv->base + RNG_CTRL);
-+
-+	val = readl(priv->base + RNG_CTRL);
-+
-+	if (val & RNG_EN) {
-+		/* HW is accessible, clean up: disable RNG and clock */
-+		writel(val & ~RNG_EN, priv->base + RNG_CTRL);
-+		clk_disable_unprepare(priv->clk);
-+		return true;
-+	}
-+
-+	/*
-+	 * If TF-A blocks direct access, the register reads back as 0.
-+	 * Leave the clock enabled as TF-A needs it.
-+	 */
-+	return false;
-+}
-+
- static int mtk_rng_probe(struct platform_device *pdev)
- {
- 	int ret;
-@@ -114,23 +173,42 @@ static int mtk_rng_probe(struct platform_device *pdev)
- 
- 	priv->dev = &pdev->dev;
- 	priv->rng.name = pdev->name;
--#ifndef CONFIG_PM
--	priv->rng.init = mtk_rng_init;
--	priv->rng.cleanup = mtk_rng_cleanup;
--#endif
--	priv->rng.read = mtk_rng_read;
- 	priv->rng.quality = 900;
--
--	priv->clk = devm_clk_get(&pdev->dev, "rng");
--	if (IS_ERR(priv->clk)) {
--		ret = PTR_ERR(priv->clk);
--		dev_err(&pdev->dev, "no clock for device: %d\n", ret);
--		return ret;
-+	priv->flags = (unsigned long)device_get_match_data(&pdev->dev);
-+
-+	if (!(priv->flags & MTK_RNG_SMC)) {
-+		priv->clk = devm_clk_get(&pdev->dev, "rng");
-+		if (IS_ERR(priv->clk)) {
-+			ret = PTR_ERR(priv->clk);
-+			dev_err(&pdev->dev, "no clock for device: %d\n", ret);
-+			return ret;
-+		}
-+
-+		priv->base = devm_platform_ioremap_resource(pdev, 0);
-+		if (IS_ERR(priv->base))
-+			return PTR_ERR(priv->base);
-+
-+		if (IS_ENABLED(CONFIG_HAVE_ARM_SMCCC) &&
-+		    of_device_is_compatible(pdev->dev.of_node,
-+					    "mediatek,mt7986-rng") &&
-+		    !mtk_rng_hw_accessible(priv)) {
-+			priv->flags |= MTK_RNG_SMC;
-+			dev_info(&pdev->dev,
-+				 "HW RNG not MMIO accessible, using SMC\n");
-+		}
- 	}
- 
--	priv->base = devm_platform_ioremap_resource(pdev, 0);
--	if (IS_ERR(priv->base))
--		return PTR_ERR(priv->base);
-+	if (priv->flags & MTK_RNG_SMC) {
-+		if (!IS_ENABLED(CONFIG_HAVE_ARM_SMCCC))
-+			return -ENODEV;
-+		priv->rng.read = mtk_rng_read_smc;
-+	} else {
-+#ifndef CONFIG_PM
-+		priv->rng.init = mtk_rng_init;
-+		priv->rng.cleanup = mtk_rng_cleanup;
-+#endif
-+		priv->rng.read = mtk_rng_read;
-+	}
- 
- 	ret = devm_hwrng_register(&pdev->dev, &priv->rng);
- 	if (ret) {
-@@ -139,12 +217,15 @@ static int mtk_rng_probe(struct platform_device *pdev)
- 		return ret;
- 	}
- 
--	dev_set_drvdata(&pdev->dev, priv);
--	pm_runtime_set_autosuspend_delay(&pdev->dev, RNG_AUTOSUSPEND_TIMEOUT);
--	pm_runtime_use_autosuspend(&pdev->dev);
--	ret = devm_pm_runtime_enable(&pdev->dev);
--	if (ret)
--		return ret;
-+	if (!(priv->flags & MTK_RNG_SMC)) {
-+		dev_set_drvdata(&pdev->dev, priv);
-+		pm_runtime_set_autosuspend_delay(&pdev->dev,
-+						 RNG_AUTOSUSPEND_TIMEOUT);
-+		pm_runtime_use_autosuspend(&pdev->dev);
-+		ret = devm_pm_runtime_enable(&pdev->dev);
-+		if (ret)
-+			return ret;
-+	}
- 
- 	dev_info(&pdev->dev, "registered RNG driver\n");
- 
-@@ -181,8 +262,11 @@ static const struct dev_pm_ops mtk_rng_pm_ops = {
- #endif	/* CONFIG_PM */
- 
- static const struct of_device_id mtk_rng_match[] = {
--	{ .compatible = "mediatek,mt7986-rng" },
- 	{ .compatible = "mediatek,mt7623-rng" },
-+	{ .compatible = "mediatek,mt7981-rng", .data = (void *)MTK_RNG_SMC },
-+	{ .compatible = "mediatek,mt7986-rng" },
-+	{ .compatible = "mediatek,mt7987-rng", .data = (void *)MTK_RNG_SMC },
-+	{ .compatible = "mediatek,mt7988-rng", .data = (void *)MTK_RNG_SMC },
- 	{},
- };
- MODULE_DEVICE_TABLE(of, mtk_rng_match);
-@@ -200,4 +284,5 @@ module_platform_driver(mtk_rng_driver);
- 
- MODULE_DESCRIPTION("Mediatek Random Number Generator Driver");
- MODULE_AUTHOR("Sean Wang <sean.wang@mediatek.com>");
-+MODULE_AUTHOR("Daniel Golle <daniel@makrotopia.org>");
- MODULE_LICENSE("GPL");
--- 
-2.53.0
+On 4/20/26 1:34 AM, Eric Biggers wrote:
+> We're now incorporating 32 bytes from get_random_bytes() in the
+> additional input string on every request.  The additional input string
+> is processed with a call to drbg_hmac_update(), which is exactly how the
+> seed is processed.  Thus, in reality this is as good as a reseed.
+>
+>  From the perspective of FIPS 140-3, it isn't as good as a reseed.  But
+> it doesn't actually matter, because from FIPS's point of view
+> get_random_bytes() provides zero entropy anyway.
+>
+> Thus, neither the reseed with more get_random_bytes() every 300s, nor
+> the logic that reseeds more frequently before rng_is_initialized(), is
+> actually needed anymore.  Remove it to simplify the code significantly.
+>
+> (Technically the use of get_random_bytes() in drbg_seed() itself could
+> be removed too.  But it's safer to keep it there for now.)
+It's fair to say that the additional input is as good as a reseed (if 
+FIPS is not considered), but then is there any reason to keep 
+get_random_bytes() in drbg_seed()? You say it could be removed but it's 
+safer to keep it there for now? In what way is it safer? The additional 
+input is mixed into the HMAC_DRBG state prior to generating random bits, 
+so should already provide sufficient assurance that the generated bits 
+incorporate the output of get_random_bytes()?
+>
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
+>   crypto/drbg.c | 107 +++++---------------------------------------------
+>   1 file changed, 9 insertions(+), 98 deletions(-)
+>
+> diff --git a/crypto/drbg.c b/crypto/drbg.c
+> index 7fd076ddc105..bab766026177 100644
+> --- a/crypto/drbg.c
+> +++ b/crypto/drbg.c
+> @@ -91,22 +91,15 @@
+>   
+>   #include <crypto/internal/rng.h>
+>   #include <crypto/sha2.h>
+>   #include <linux/fips.h>
+>   #include <linux/kernel.h>
+> -#include <linux/jiffies.h>
+>   #include <linux/module.h>
+>   #include <linux/mutex.h>
+>   #include <linux/string_choices.h>
+>   #include <linux/unaligned.h>
+>   
+> -enum drbg_seed_state {
+> -	DRBG_SEED_STATE_UNSEEDED,
+> -	DRBG_SEED_STATE_PARTIAL, /* Seeded with !rng_is_initialized() */
+> -	DRBG_SEED_STATE_FULL,
+> -};
+> -
+>   /* State length in bytes */
+>   #define DRBG_STATE_LEN		SHA512_DIGEST_SIZE
+>   
+>   /* Security strength in bytes */
+>   #define DRBG_SEC_STRENGTH	(SHA512_DIGEST_SIZE / 2)
+> @@ -135,13 +128,10 @@ struct drbg_state {
+>   	struct mutex drbg_mutex;	/* lock around DRBG */
+>   	u8 V[DRBG_STATE_LEN];		/* internal state -- 10.1.2.1 1a */
+>   	struct hmac_sha512_key key;	/* current key -- 10.1.2.1 1b */
+>   	/* Number of RNG requests since last reseed -- 10.1.2.1 1c */
+>   	size_t reseed_ctr;
+> -	size_t reseed_threshold;
+> -	enum drbg_seed_state seeded;		/* DRBG fully seeded? */
+> -	unsigned long last_seed_time;
+>   	bool instantiated;
+>   	bool pr;		/* Prediction resistance enabled? */
+>   	struct crypto_rng *jent;
+>   	const u8 *test_entropy;
+>   	size_t test_entropylen;
+> @@ -237,76 +227,10 @@ static void drbg_hmac_generate(struct drbg_state *drbg,
+>   	drbg_hmac_update(drbg, addtl1, addtl1_len, addtl2, addtl2_len);
+>   
+>   	memzero_explicit(addtl2, sizeof(addtl2));
+>   }
+>   
+> -static inline void __drbg_seed(struct drbg_state *drbg,
+> -			       const u8 *seed1, size_t seed1_len,
+> -			       const u8 *seed2, size_t seed2_len,
+> -			       enum drbg_seed_state new_seed_state)
+> -{
+> -	drbg_hmac_update(drbg, seed1, seed1_len, seed2, seed2_len);
+> -
+> -	drbg->seeded = new_seed_state;
+> -	drbg->last_seed_time = jiffies;
+> -	drbg->reseed_ctr = 1;
+> -
+> -	switch (drbg->seeded) {
+> -	case DRBG_SEED_STATE_UNSEEDED:
+> -		/* Impossible, but handle it to silence compiler warnings. */
+> -		fallthrough;
+> -	case DRBG_SEED_STATE_PARTIAL:
+> -		/*
+> -		 * Require frequent reseeds until the seed source is
+> -		 * fully initialized.
+> -		 */
+> -		drbg->reseed_threshold = 50;
+> -		break;
+> -
+> -	case DRBG_SEED_STATE_FULL:
+> -		/*
+> -		 * Seed source has become fully initialized, frequent
+> -		 * reseeds no longer required.
+> -		 */
+> -		drbg->reseed_threshold = DRBG_MAX_REQUESTS;
+> -		break;
+> -	}
+> -}
+> -
+> -static void drbg_seed_from_random(struct drbg_state *drbg)
+> -	__must_hold(&drbg->drbg_mutex)
+> -{
+> -	u8 entropy[DRBG_SEC_STRENGTH];
+> -
+> -	get_random_bytes(entropy, DRBG_SEC_STRENGTH);
+> -
+> -	__drbg_seed(drbg, entropy, DRBG_SEC_STRENGTH, NULL, 0,
+> -		    DRBG_SEED_STATE_FULL);
+> -
+> -	memzero_explicit(entropy, DRBG_SEC_STRENGTH);
+> -}
+> -
+> -static bool drbg_nopr_reseed_interval_elapsed(struct drbg_state *drbg)
+> -{
+> -	unsigned long next_reseed;
+> -
+> -	/* Don't ever reseed from get_random_bytes() in test mode. */
+> -	if (drbg->test_entropylen)
+> -		return false;
+> -
+> -	/*
+> -	 * Obtain fresh entropy for the nopr DRBGs after 300s have
+> -	 * elapsed in order to still achieve sort of partial
+> -	 * prediction resistance over the time domain at least. Note
+> -	 * that the period of 300s has been chosen to match the
+> -	 * CRNG_RESEED_INTERVAL of the get_random_bytes()' chacha
+> -	 * rngs.
+> -	 */
+> -	next_reseed = drbg->last_seed_time + 300 * HZ;
+> -	return time_after(jiffies, next_reseed);
+> -}
+> -
+>   /*
+>    * Seeding or reseeding of the DRBG
+>    *
+>    * @drbg: DRBG state struct
+>    * @pers: personalization / additional information buffer
+> @@ -323,11 +247,10 @@ static int drbg_seed(struct drbg_state *drbg, const u8 *pers, size_t pers_len,
+>   {
+>   	int ret;
+>   	u8 entropy_buf[(32 + 16) * 2];
+>   	size_t entropylen;
+>   	const u8 *entropy;
+> -	enum drbg_seed_state new_seed_state = DRBG_SEED_STATE_FULL;
+>   
+>   	/* 9.1 / 9.2 / 9.3.1 step 3 */
+>   	if (pers_len > DRBG_MAX_ADDTL) {
+>   		pr_devel("DRBG: personalization string too long %zu\n",
+>   			 pers_len);
+> @@ -353,13 +276,10 @@ static int drbg_seed(struct drbg_state *drbg, const u8 *pers, size_t pers_len,
+>   		else
+>   			entropylen = DRBG_SEC_STRENGTH;
+>   		BUG_ON(entropylen * 2 > sizeof(entropy_buf));
+>   
+>   		/* Get seed from in-kernel /dev/urandom */
+> -		if (!rng_is_initialized())
+> -			new_seed_state = DRBG_SEED_STATE_PARTIAL;
+> -
+>   		get_random_bytes(entropy_buf, entropylen);
+>   
+>   		if (!drbg->jent) {
+>   			pr_devel("DRBG: (re)seeding with %zu bytes of entropy\n",
+>   				 entropylen);
+> @@ -399,11 +319,12 @@ static int drbg_seed(struct drbg_state *drbg, const u8 *pers, size_t pers_len,
+>   	}
+>   
+>   	if (pers_len)
+>   		pr_devel("DRBG: using personalization string\n");
+>   
+> -	__drbg_seed(drbg, entropy, entropylen, pers, pers_len, new_seed_state);
+> +	drbg_hmac_update(drbg, entropy, entropylen, pers, pers_len);
+> +	drbg->reseed_ctr = 1;
+>   	ret = 0;
+>   out:
+>   	memzero_explicit(entropy_buf, sizeof(entropy_buf));
+>   
+>   	return ret;
+> @@ -461,31 +382,25 @@ static int drbg_generate(struct drbg_state *drbg,
+>   	/* 9.3.1 step 5 is implicit with the chosen DRBG */
+>   
+>   	/*
+>   	 * 9.3.1 step 6 and 9 supplemented by 9.3.2 step c is implemented
+>   	 * here. The spec is a bit convoluted here, we make it simpler.
+> +	 *
+> +	 * We no longer try to detect when random.c has reseeded itself and call
+> +	 * drbg_seed() then too, since drbg_hmac_generate() adds bytes from
+> +	 * random.c to the additional input, which is a de facto reseed anyway.
+>   	 */
+> -	if (drbg->reseed_threshold < drbg->reseed_ctr)
+> -		drbg->seeded = DRBG_SEED_STATE_UNSEEDED;
+> -
+> -	if (drbg->pr || drbg->seeded == DRBG_SEED_STATE_UNSEEDED) {
+> -		pr_devel("DRBG: reseeding before generation (prediction "
+> -			 "resistance: %s, state %s)\n",
+> -			 str_true_false(drbg->pr),
+> -			 (drbg->seeded ==  DRBG_SEED_STATE_FULL ?
+> -			  "seeded" : "unseeded"));
+> +	if (drbg->pr || drbg->reseed_ctr > DRBG_MAX_REQUESTS) {
+> +		pr_devel("DRBG: reseeding before generation (prediction resistance: %s)\n",
+> +			 str_true_false(drbg->pr));
+>   		/* 9.3.1 steps 7.1 through 7.3 */
+>   		len = drbg_seed(drbg, addtl, addtl_len, true);
+>   		if (len)
+>   			goto err;
+>   		/* 9.3.1 step 7.4 */
+>   		addtl = NULL;
+>   		addtl_len = 0;
+> -	} else if (rng_is_initialized() &&
+> -		   (drbg->seeded == DRBG_SEED_STATE_PARTIAL ||
+> -		    drbg_nopr_reseed_interval_elapsed(drbg))) {
+> -		drbg_seed_from_random(drbg);
+>   	}
+>   
+>   	/* 9.3.1 step 8 and 10 */
+>   	drbg_hmac_generate(drbg, buf, buflen, addtl, addtl_len);
+>   
+> @@ -562,13 +477,10 @@ static int drbg_kcapi_seed(struct crypto_rng *tfm,
+>   	 */
+>   
+>   	/* 9.1 step 4 is implicit in DRBG_SEC_STRENGTH */
+>   
+>   	drbg->pr = pr;
+> -	drbg->seeded = DRBG_SEED_STATE_UNSEEDED;
+> -	drbg->last_seed_time = 0;
+> -	drbg->reseed_threshold = DRBG_MAX_REQUESTS;
+>   	memset(drbg->V, 1, DRBG_STATE_LEN);
+>   	hmac_sha512_preparekey(&drbg->key, initial_key, DRBG_STATE_LEN);
+>   
+>   	/* Allocate jitterentropy_rng if not in test mode. */
+>   	if (drbg->test_entropylen == 0) {
+> @@ -671,11 +583,10 @@ static inline int __init drbg_healthcheck_sanity(void)
+>   	if (!drbg)
+>   		return -ENOMEM;
+>   
+>   	guard(mutex_init)(&drbg->drbg_mutex);
+>   	drbg->instantiated = true;
+> -	drbg->reseed_threshold = DRBG_MAX_REQUESTS;
+>   
+>   	/*
+>   	 * if the following tests fail, it is likely that there is a buffer
+>   	 * overflow as buf is much smaller than the requested or provided
+>   	 * string lengths -- in case the error handling does not succeed
