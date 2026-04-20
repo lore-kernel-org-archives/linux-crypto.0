@@ -1,121 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52B30388E7B
-	for <linux-crypto@vger.kernel.org>; Mon, 20 Apr 2026 08:53:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.175.55.52])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D48F0385524
+	for <linux-crypto@vger.kernel.org>; Mon, 20 Apr 2026 08:54:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.175.55.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776675228; cv=none; b=kabSiZKhXdncEkhP644T3mg4vqLe3/lsXghXyB2IL+FQu9CjhF9Q5r0F+tEfjrPA1Ns61GCBo3ahgKvmqVLZ/C/ct3dcLQoTeJomEDos0SyRbHG1svcKoF/kPH9wkun4rD8KKAEi2Rm3BUBmlNoQ3OR2l7Ev6KU0RCgWMhm2JqQ=
+	t=1776675259; cv=none; b=d/nbyz0GoQfZEsvW6+zC9Vo/X15kjm9DAnZuhFaLUyscJIAtDRvnNVRWGgRNWcnHHU0DpTFsPla/ox9OifYGJ+D9+Hat984g98+ORD7kGkhXz6ozkHbh8J8wcdU4zlGL73fv1BjwSg/Y670d7xnD+5yvLJSQTuEFiFG/yk21lT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776675228; c=relaxed/simple;
-	bh=eW002aUV/pDc7QNMwK4vUV0AbIjBkQcbKvXG8+FqB3k=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Okqj3GpSqpZM/d5Qg5Srdej2ALoO3SYJVgRJ7523lIaJ+zesNKqD4UoY52dIDeF2+Y+Q4c9YRBUpKkEwTTaxpkq32pTpst/Oi0bGamoAdj+ag/SlXFolzkU4lojZvtSWxen14ATrP0PEtDYLiLoQLUZM9qJhM+3Vucydp/IJoHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QLrHv/Xn; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QLrHv/Xn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBFB0C2BCB3
-	for <linux-crypto@vger.kernel.org>; Mon, 20 Apr 2026 08:53:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776675228;
-	bh=eW002aUV/pDc7QNMwK4vUV0AbIjBkQcbKvXG8+FqB3k=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc:From;
-	b=QLrHv/Xn6HC23/w6nn94mXgnR14YURNJd/57C9ACmoSi28uoI4wvopNGiWNSTISqk
-	 78cnOnCvjzts7uUxlJ2wLNIOuB/P+iqHNtQCc/OkO/HjTM3WjS1b3el4Un5TryA4bk
-	 ak0A/KZuetcg7qYwKr60Uf14N2FzQhz0J42w90uPR/AO5FF+vCbMVMm2UtyEqBvuwi
-	 o9dXFj+bhiZL/cLqBTkswi7Pxo8Kr744fjXAbk/1+1WQMAgmZcoNobJ5/m5b2LInQn
-	 AN+JlgjnbEzosd2ysvOHS5nAWhVq5gmfuCcGskbt65LABl0KazoycZT2Z07/NKgK+7
-	 Clru1DUVQ2tmA==
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5a3fcb2c718so2312421e87.0
-        for <linux-crypto@vger.kernel.org>; Mon, 20 Apr 2026 01:53:47 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ9xa2H80HqKExvzUdO+y2WDnxqeZZ/+pNhC9m2iD9gZQ/KMzA7AFo+stB3THw1ee71fS5AkXDaPpW+bmWw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFtoTxK3An3nExdBiHs6DTVTz1/yxzUOoK8dnCCTZvNmyDHEMf
-	Mxn8a+cQKoh9IVFYkLG2nTmRNo9MV96bnRA+u3aN20XWD6TPXrc2U32LsoQSqiuJzGlEqOo2pAe
-	8m91eQykLb0rDWyZvy+kkoicU4MPRD+f05If0xiUYKw==
-X-Received: by 2002:a05:6512:4142:b0:5a4:e6:8fce with SMTP id
- 2adb3069b0e04-5a4172f609dmr2938573e87.38.1776675226584; Mon, 20 Apr 2026
- 01:53:46 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 20 Apr 2026 10:53:44 +0200
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 20 Apr 2026 10:53:44 +0200
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20260416-qcom_ice_power_and_clk_vote-v5-4-5ccf5d7e2846@oss.qualcomm.com>
+	s=arc-20240116; t=1776675259; c=relaxed/simple;
+	bh=Swgw4q88qDcxf3DIoAK8gIhu97tKwfOCxSwyCaMzaV8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=FBmXbkDOIpXAoPFqu+wjzZxSJjRflZUgajEJi61sNWrW20nCBr1ukA2ZIV8JtUjRobxco4Odn6+SLfudO/OiqpSsEETf3M8/9l17v95VMfM2qD4vAJjG+GXS32QKg9GpERJxTgffcQAMpMF+ZodtAmKFHQ8fCNhvwEy1c1tHziE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=52.175.55.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
+	by app1 (Coremail) with SMTP id ygmowADXTv+l6eVp6jXWAA--.15504S3;
+	Mon, 20 Apr 2026 16:53:59 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
+To: linux-crypto@vger.kernel.org
+Cc: herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	ardb@kernel.org,
+	yuantan098@gmail.com,
+	yifanwucs@gmail.com,
+	tomapufckgml@gmail.com,
+	bird@lzu.edu.cn,
+	z1652074432@gmail.com,
+	kanolyc@gmail.com,
+	n05ec@lzu.edu.cn
+Subject: [PATCH 1/1] crypto: authencesn: reject short ahash digests during instance creation
+Date: Mon, 20 Apr 2026 16:48:25 +0800
+Message-ID: <cb1188757edab9b056961d4d2441be009ac73ce8.1775217403.git.kanolyc@gmail.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1775217403.git.kanolyc@gmail.com>
+References: <cover.1775217403.git.kanolyc@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260416-qcom_ice_power_and_clk_vote-v5-0-5ccf5d7e2846@oss.qualcomm.com>
- <20260416-qcom_ice_power_and_clk_vote-v5-4-5ccf5d7e2846@oss.qualcomm.com>
-Date: Mon, 20 Apr 2026 10:53:44 +0200
-X-Gmail-Original-Message-ID: <CAMRc=McE8YHGWuyRmJAt+x2mzMexgfz1zsnck6yYcupt-jcZtA@mail.gmail.com>
-X-Gm-Features: AQROBzACJ6Vdt_y2a3lRfsPW_8wLBcxtRDZ4npozYG3KDFhLtTX7xP1EwaHhPoM
-Message-ID: <CAMRc=McE8YHGWuyRmJAt+x2mzMexgfz1zsnck6yYcupt-jcZtA@mail.gmail.com>
-Subject: Re: [PATCH v5 04/13] arm64: dts: qcom: lemans: Add power-domain and
- iface clk for ice node
-To: Harshal Dev <harshal.dev@oss.qualcomm.com>
-Cc: Brian Masney <bmasney@redhat.com>, Neeraj Soni <neeraj.soni@oss.qualcomm.com>, 
-	Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>, linux-arm-msm@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Krzysztof Kozlowski <krzk@kernel.org>, 
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, 
-	Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Abel Vesa <abel.vesa@oss.qualcomm.com>, 
-	Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>, 
-	cros-qcom-dts-watchers@chromium.org, Eric Biggers <ebiggers@google.com>, 
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
-	Jingyi Wang <jingyi.wang@oss.qualcomm.com>, Tengfei Fan <tengfei.fan@oss.qualcomm.com>, 
-	Bartosz Golaszewski <brgl@kernel.org>, David Wronek <davidwronek@gmail.com>, 
-	Luca Weiss <luca.weiss@fairphone.com>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	Melody Olvera <quic_molvera@quicinc.com>, Alexander Koskovich <akoskovich@pm.me>, 
-	Abel Vesa <abelvesa@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:ygmowADXTv+l6eVp6jXWAA--.15504S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7KF43ZF13GrWxXFyDJF17trb_yoW8uF47pa
+	y3GFZrtrykJrW7CF1kJr4IqrW7Zr48JFy3JFZYkw1Yyr13uF1rtr12yFW2vF4UZrs5GFWq
+	yFWqvryUZw1DAaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBY1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2
+	z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcV
+	Aq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j
+	6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
+	vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0E
+	n4kS14v26r1q6r43MxkIecxEwVCm-wCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6c
+	x26r48MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
+	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
+	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
+	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
+	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQEDCWnl6GEAMgAAs9
 
-On Thu, 16 Apr 2026 13:59:21 +0200, Harshal Dev
-<harshal.dev@oss.qualcomm.com> said:
-> Qualcomm in-line crypto engine (ICE) platform driver specifies and votes
-> for its own resources. Before accessing ICE hardware during probe, to
-> avoid potential unclocked register access issues (when clk_ignore_unused
-> is not passed on the kernel command line), in addition to the 'core' clock
-> the 'iface' clock should also be turned on by the driver. This can only be
-> done if the UFS_PHY_GDSC power domain is enabled. Specify both the
-> UFS_PHY_GDSC power domain and the 'iface' clock in the ICE node for lemans.
->
-> Fixes: 96272ba7103d4 ("arm64: dts: qcom: sa8775p: enable the inline crypto engine")
-> Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-> Reviewed-by: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
-> Signed-off-by: Harshal Dev <harshal.dev@oss.qualcomm.com>
-> ---
->  arch/arm64/boot/dts/qcom/lemans.dtsi | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/boot/dts/qcom/lemans.dtsi b/arch/arm64/boot/dts/qcom/lemans.dtsi
-> index fe6e76351823..d83cad26a20f 100644
-> --- a/arch/arm64/boot/dts/qcom/lemans.dtsi
-> +++ b/arch/arm64/boot/dts/qcom/lemans.dtsi
-> @@ -2758,7 +2758,11 @@ ice: crypto@1d88000 {
->  			compatible = "qcom,sa8775p-inline-crypto-engine",
->  				     "qcom,inline-crypto-engine";
->  			reg = <0x0 0x01d88000 0x0 0x18000>;
-> -			clocks = <&gcc GCC_UFS_PHY_ICE_CORE_CLK>;
-> +			clocks = <&gcc GCC_UFS_PHY_ICE_CORE_CLK>,
-> +				 <&gcc GCC_UFS_PHY_AHB_CLK>;
-> +			clock-names = "core",
-> +				      "iface";
-> +			power-domains = <&gcc UFS_PHY_GDSC>;
->  		};
->
->  		cryptobam: dma-controller@1dc4000 {
->
-> --
-> 2.34.1
->
->
+From: Yucheng Lu <kanolyc@gmail.com>
 
-Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+authencesn requires either a zero authsize or an authsize of at least
+4 bytes because the ESN encrypt/decrypt paths always move 4 bytes of
+high-order sequence number data at the end of the authenticated data.
+
+While crypto_authenc_esn_setauthsize() already rejects explicit
+non-zero authsizes in the range 1..3, crypto_authenc_esn_create()
+still copied auth->digestsize into inst->alg.maxauthsize without
+validating it.  The AEAD core then initialized the tfm's default
+authsize from that value.
+
+As a result, selecting an ahash with digest size 1..3, such as
+cbcmac(cipher_null), exposed authencesn instances whose default
+authsize was invalid even though setauthsize() would have rejected the
+same value.  AF_ALG could then trigger the ESN tail handling with a
+too-short tag and hit an out-of-bounds access.
+
+Reject authencesn instances whose ahash digest size is in the invalid
+non-zero range 1..3 so that no tfm can inherit an unsupported default
+authsize.
+
+Fixes: f15f05b0a5de ("crypto: ccm - switch to separate cbcmac driver")
+Cc: stable@kernel.org
+Reported-by: Yuan Tan <yuantan098@gmail.com>
+Reported-by: Yifan Wu <yifanwucs@gmail.com>
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Reported-by: Xin Liu <bird@lzu.edu.cn>
+Tested-by: Yuhang Zheng <z1652074432@gmail.com>
+Signed-off-by: Yucheng Lu <kanolyc@gmail.com>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
+---
+ crypto/authencesn.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/crypto/authencesn.c b/crypto/authencesn.c
+index 542a978663b9..bf44f035f7f8 100644
+--- a/crypto/authencesn.c
++++ b/crypto/authencesn.c
+@@ -384,6 +384,11 @@ static int crypto_authenc_esn_create(struct crypto_template *tmpl,
+ 		goto err_free_inst;
+ 	enc = crypto_spawn_skcipher_alg_common(&ctx->enc);
+ 
++	if (auth->digestsize > 0 && auth->digestsize < 4) {
++		err = -EINVAL;
++		goto err_free_inst;
++	}
++
+ 	err = -ENAMETOOLONG;
+ 	if (snprintf(inst->alg.base.cra_name, CRYPTO_MAX_ALG_NAME,
+ 		     "authencesn(%s,%s)", auth_base->cra_name,
+-- 
+2.47.3
+
