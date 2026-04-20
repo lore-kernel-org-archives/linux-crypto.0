@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E091384257;
-	Mon, 20 Apr 2026 06:37:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EED33845AC;
+	Mon, 20 Apr 2026 06:37:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776667022; cv=none; b=bWJ5kXfSmurBwLyYbOW1IiS8QWpBXvM46gXJ1gXqk+rp2vfqXk41KcCCiSdYuzgQ2oZDHFnnw+npaMhX5QyrrMcu/DhpNDTwc9CTnKCTQbdaMy+8sNJ2Yy27pa13JlZezLzVE2ng9AY9x/zuA0XJL5IW2+cFyAYSvpVwEYYcrZE=
+	t=1776667022; cv=none; b=clZUxWoHokRFoaslZcvS6NEspNY5ZoVbOyu+sCRd4gxMXJ0JgQyp0wvJ5QDGIRkKv0E5S7+HL2LdZIAOB6FYfwPTz7Z1oIr1e/YVJeY2ZPom2eGuvv+FXRnrK+TEsiu81ZxhZ2VpG5YKva2D1q938Cvbl+rij3O10TI4eCImoqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1776667022; c=relaxed/simple;
-	bh=2LYwWJGPTmXrhei3+Y4NanvqZ9IlSajbocXmC4fcKwE=;
+	bh=KZcXy67sV84ulxFLxaLdP22xkti5GFL6GdBgNkqGEmw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WxTVROhIXfVse0j575ZZUFduTi99oMT9hoOr4sHvNF+MRC31qsjEv/0OTPIqm7OR/4CkWR2IfyLdX+NBTUpsx740uTzRcroPJN70EFutII/ZOC5FfeZG68AgrKr0B6DqTY/2FvP0ozwTLu+lmqdonsgBmEWQL5DZLI7vkBnxmZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pH4yhT+T; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=VliNqCK7T0iyS8Aa0HOXsr31pc8kwSZhOTIGBoeGyiSdBUq085xaIqHTYjxsli84eKN6hJlkN7NVEFIqNeW9mpK4xB60pWI2X64Y5EzYODrIz00FWYv7+ZK1XCB5NlVHM2+up3HpCsFBoTHMYciSzA999RlCIhlXheR0Q4Q43sQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fvQSiOob; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pH4yhT+T"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFFCDC2BCB7;
-	Mon, 20 Apr 2026 06:37:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fvQSiOob"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 071C0C2BCB3;
+	Mon, 20 Apr 2026 06:37:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776667021;
-	bh=2LYwWJGPTmXrhei3+Y4NanvqZ9IlSajbocXmC4fcKwE=;
+	s=k20201202; t=1776667022;
+	bh=KZcXy67sV84ulxFLxaLdP22xkti5GFL6GdBgNkqGEmw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pH4yhT+TbH9ZyPCRvCzEnGq8in0CRYLXKV6DLlwsovWhnnCfqVYb/I6pEf/+syQDA
-	 zygT+2BTMSBnlQFZWvoEtQAR0QltsH6hUQ6t6FqRAIeiytm7Bi6LiDlMTi8SUEs7Iw
-	 1wIgH5q7gePMotLovqpKi1SsZGuyMg0h3fCWG16Lm8F5lZqJ7QRPysEe0KTl4xsBA0
-	 RAxAEl5CUG/fCXt654nLQP6VSwEHb23XLW4yIjv+LTZRIFo7lJtSScmpXBJtiFWR2k
-	 t8+oMpZm2hPZhiFz8UyZ0Nn4ukoYzy/MVPArbmFCmPnFRi0PGsW7KLaX4WQAuFZU0R
-	 0Wom2jGNp8CPg==
+	b=fvQSiOobkZhSsEssNNaqxpaR/UWfiqRiop6hfojpgK3ZgtJrtiM5+tcIjInc7vGTe
+	 +kKQLkbBO+vHH2MFfa5C90SpeK5rIJBUkqxkRc1ekkfNKc80PIIFmyRqzD3WpGkFsN
+	 aLKmVogCGdpSnVO6E1AXDGclgRb3kASQzGycMF6dh97JBtHLfvQESBTN/vAXv/0y6A
+	 6lwtBVYLTw3SnmiM5Nl9ZwanFnJCLrneR+cHBsl4ToCvi14onds4uxJYS7StpxPMT1
+	 x2csChQjVDe4JbBpVSeeCnb31jPEFwzpEBzfLHfn/8WDIY3WicZ1pPDGS5BrBaNpqR
+	 htsTYi2lQsNsw==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>
@@ -33,9 +33,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Stephan Mueller <smueller@chronox.de>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 08/38] crypto: drbg - Remove unhelpful helper functions
-Date: Sun, 19 Apr 2026 23:33:52 -0700
-Message-ID: <20260420063422.324906-9-ebiggers@kernel.org>
+Subject: [PATCH 09/38] crypto: drbg - Remove obsolete FIPS 140-2 continuous test
+Date: Sun, 19 Apr 2026 23:33:53 -0700
+Message-ID: <20260420063422.324906-10-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420063422.324906-1-ebiggers@kernel.org>
 References: <20260420063422.324906-1-ebiggers@kernel.org>
@@ -47,244 +47,203 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Fold the contents of the inline functions crypto_drbg_get_bytes_addtl(),
-crypto_drbg_get_bytes_addtl_test(), and crypto_drbg_reset_test() into
-their only caller in drbg_cavs_test().  It ends up being much simpler.
+FIPS 140-2 required that a continuous test for repeated outputs be done
+on both "Approved RNGs" and "Non-Approved RNGs".
+
+That's apparently why crypto/drbg.c does such a test on the bytes it
+pulls from get_random_bytes(), despite get_random_bytes() being a
+"Non-Approved RNG" that is credited with zero entropy for FIPS purposes.
+(From FIPS's point of view, the "Approved RNG" is jitterentropy.)
+
+FIPS 140-3 "modernized" the continuous RNG test requirements.  They're
+now a bit more sophisticated, requiring both an "Adaptive Proportion
+Test" and a "Repetition Count Test".
+
+At the same time, FIPS 140-3 doesn't require continuous RNG tests on
+"Non-Approved RNGs" if a "vetted conditioning component" is used.  The
+SP800-90A DRBGs are exactly such a vetted conditioning component, by
+their design.  (In the case of HASH_DRBG and CTR_DRBG, the derivation
+function does have to be implemented.  But the kernel does that.)
+
+In other words: from FIPS 140-3's point of view, get_random_bytes()
+still produces zero entropy, but the way the DRBG combines those bytes
+with the jitterentropy bytes preserves all the "approved" entropy from
+jitterentropy.  Thus no test for get_random_bytes() is required.
+
+Seeing as FIPS 140-2 certificates stopped being issued in 2021 in favor
+of FIPS 140-3, this means this code is obsolete.  Remove it.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- crypto/drbg.c         | 15 +++------
- crypto/testmgr.c      | 34 ++++++-------------
- include/crypto/drbg.h | 76 -------------------------------------------
- 3 files changed, 15 insertions(+), 110 deletions(-)
+ crypto/drbg.c         | 78 ++-----------------------------------------
+ include/crypto/drbg.h |  2 --
+ 2 files changed, 2 insertions(+), 78 deletions(-)
 
 diff --git a/crypto/drbg.c b/crypto/drbg.c
-index bb8ddc090307..83cb6c1bbac0 100644
+index 83cb6c1bbac0..66d7739469c6 100644
 --- a/crypto/drbg.c
 +++ b/crypto/drbg.c
-@@ -53,44 +53,39 @@
-  * struct crypto_rng *drng;
-  * int err;
-  * char data[DATALEN];
-  *
-  * drng = crypto_alloc_rng(drng_name, 0, 0);
-- * err = crypto_rng_get_bytes(drng, &data, DATALEN);
-+ * err = crypto_rng_get_bytes(drng, data, DATALEN);
-  * crypto_free_rng(drng);
-  *
-  *
-  * Usage with personalization string during initialization
-  * -------------------------------------------------------
-  * struct crypto_rng *drng;
-  * int err;
-  * char data[DATALEN];
-- * struct drbg_string pers;
-  * char personalization[11] = "some-string";
-  *
-- * drbg_string_fill(&pers, personalization, strlen(personalization));
-  * drng = crypto_alloc_rng(drng_name, 0, 0);
-  * // The reset completely re-initializes the DRBG with the provided
-  * // personalization string
-- * err = crypto_rng_reset(drng, &personalization, strlen(personalization));
-- * err = crypto_rng_get_bytes(drng, &data, DATALEN);
-+ * err = crypto_rng_reset(drng, personalization, strlen(personalization));
-+ * err = crypto_rng_get_bytes(drng, data, DATALEN);
-  * crypto_free_rng(drng);
-  *
-  *
-  * Usage with additional information string during random number request
-  * ---------------------------------------------------------------------
-  * struct crypto_rng *drng;
-  * int err;
-  * char data[DATALEN];
-  * char addtl_string[11] = "some-string";
-- * string drbg_string addtl;
-  *
-- * drbg_string_fill(&addtl, addtl_string, strlen(addtl_string));
-  * drng = crypto_alloc_rng(drng_name, 0, 0);
-- * // The following call is a wrapper to crypto_rng_get_bytes() and returns
-- * // the same error codes.
-- * err = crypto_drbg_get_bytes_addtl(drng, &data, DATALEN, &addtl);
-+ * err = crypto_rng_generate(drng, addtl_string, strlen(addtl_string),
-+			     data, DATALEN);
-  * crypto_free_rng(drng);
-  *
-  *
-  * Usage with personalization and additional information strings
-  * -------------------------------------------------------------
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 4d86efae65b2..35ff2b50e3c2 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -3485,12 +3485,10 @@ static int alg_test_comp(const struct alg_test_desc *desc, const char *driver,
- static int drbg_cavs_test(const struct drbg_testvec *test, int pr,
- 			  const char *driver, u32 type, u32 mask)
- {
- 	int ret = -EAGAIN;
- 	struct crypto_rng *drng;
--	struct drbg_test_data test_data;
--	struct drbg_string addtl, pers, testentropy;
- 	unsigned char *buf = kzalloc(test->expectedlen, GFP_KERNEL);
- 
- 	if (!buf)
- 		return -ENOMEM;
- 
-@@ -3502,43 +3500,31 @@ static int drbg_cavs_test(const struct drbg_testvec *test, int pr,
- 		printk(KERN_ERR "alg: drbg: could not allocate DRNG handle for "
- 		       "%s\n", driver);
- 		return PTR_ERR(drng);
+@@ -203,59 +203,10 @@ static inline unsigned short drbg_sec_strength(drbg_flag_t flags)
+ 	default:
+ 		return 32;
  	}
- 
--	test_data.testentropy = &testentropy;
--	drbg_string_fill(&testentropy, test->entropy, test->entropylen);
--	drbg_string_fill(&pers, test->pers, test->perslen);
--	ret = crypto_drbg_reset_test(drng, &pers, &test_data);
-+	crypto_rng_set_entropy(drng, test->entropy, test->entropylen);
-+	ret = crypto_rng_reset(drng, test->pers, test->perslen);
- 	if (ret) {
- 		printk(KERN_ERR "alg: drbg: Failed to reset rng\n");
- 		goto outbuf;
- 	}
- 
--	drbg_string_fill(&addtl, test->addtla, test->addtllen);
--	if (pr) {
--		drbg_string_fill(&testentropy, test->entpra, test->entprlen);
--		ret = crypto_drbg_get_bytes_addtl_test(drng,
--			buf, test->expectedlen, &addtl,	&test_data);
--	} else {
--		ret = crypto_drbg_get_bytes_addtl(drng,
--			buf, test->expectedlen, &addtl);
--	}
-+	if (pr)
-+		crypto_rng_set_entropy(drng, test->entpra, test->entprlen);
-+	ret = crypto_rng_generate(drng, test->addtla, test->addtllen,
-+				  buf, test->expectedlen);
- 	if (ret < 0) {
- 		printk(KERN_ERR "alg: drbg: could not obtain random data for "
- 		       "driver %s\n", driver);
- 		goto outbuf;
- 	}
- 
--	drbg_string_fill(&addtl, test->addtlb, test->addtllen);
--	if (pr) {
--		drbg_string_fill(&testentropy, test->entprb, test->entprlen);
--		ret = crypto_drbg_get_bytes_addtl_test(drng,
--			buf, test->expectedlen, &addtl, &test_data);
--	} else {
--		ret = crypto_drbg_get_bytes_addtl(drng,
--			buf, test->expectedlen, &addtl);
--	}
-+	if (pr)
-+		crypto_rng_set_entropy(drng, test->entprb, test->entprlen);
-+	ret = crypto_rng_generate(drng, test->addtlb, test->addtllen,
-+				  buf, test->expectedlen);
- 	if (ret < 0) {
- 		printk(KERN_ERR "alg: drbg: could not obtain random data for "
- 		       "driver %s\n", driver);
- 		goto outbuf;
- 	}
-diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
-index c11eaf757ed0..486aa793688e 100644
---- a/include/crypto/drbg.h
-+++ b/include/crypto/drbg.h
-@@ -76,14 +76,10 @@ struct drbg_state_ops {
- 	int (*crypto_init)(struct drbg_state *drbg);
- 	int (*crypto_fini)(struct drbg_state *drbg);
- 
- };
- 
--struct drbg_test_data {
--	struct drbg_string *testentropy; /* TEST PARAMETER: test entropy */
--};
--
- enum drbg_seed_state {
- 	DRBG_SEED_STATE_UNSEEDED,
- 	DRBG_SEED_STATE_PARTIAL, /* Seeded with !rng_is_initialized() */
- 	DRBG_SEED_STATE_FULL,
- };
-@@ -163,82 +159,10 @@ static inline size_t drbg_max_requests(struct drbg_state *drbg)
- {
- 	/* SP800-90A requires 2**48 maximum requests before reseeding */
- 	return (1<<20);
  }
  
 -/*
-- * This is a wrapper to the kernel crypto API function of
-- * crypto_rng_generate() to allow the caller to provide additional data.
+- * FIPS 140-2 continuous self test for the noise source
+- * The test is performed on the noise source input data. Thus, the function
+- * implicitly knows the size of the buffer to be equal to the security
+- * strength.
 - *
-- * @drng DRBG handle -- see crypto_rng_get_bytes
-- * @outbuf output buffer -- see crypto_rng_get_bytes
-- * @outlen length of output buffer -- see crypto_rng_get_bytes
-- * @addtl_input additional information string input buffer
-- * @addtllen length of additional information string buffer
+- * Note, this function disregards the nonce trailing the entropy data during
+- * initial seeding.
 - *
-- * return
-- *	see crypto_rng_get_bytes
+- * drbg->drbg_mutex must have been taken.
+- *
+- * @drbg DRBG handle
+- * @entropy buffer of seed data to be checked
+- *
+- * return:
+- *	%true on success
+- *	%false when the CTRNG is not yet primed
 - */
--static inline int crypto_drbg_get_bytes_addtl(struct crypto_rng *drng,
--			unsigned char *outbuf, unsigned int outlen,
--			struct drbg_string *addtl)
+-static bool drbg_fips_continuous_test(struct drbg_state *drbg,
+-				      const unsigned char *entropy)
+-	__must_hold(&drbg->drbg_mutex)
 -{
--	return crypto_rng_generate(drng, addtl->buf, addtl->len,
--				   outbuf, outlen);
+-	unsigned short entropylen = drbg_sec_strength(drbg->core->flags);
+-
+-	if (!IS_ENABLED(CONFIG_CRYPTO_FIPS))
+-		return true;
+-
+-	/* skip test if we test the overall system */
+-	if (list_empty(&drbg->test_data.list))
+-		return true;
+-	/* only perform test in FIPS mode */
+-	if (!fips_enabled)
+-		return true;
+-
+-	if (!drbg->fips_primed) {
+-		/* Priming of FIPS test */
+-		memcpy(drbg->prev, entropy, entropylen);
+-		drbg->fips_primed = true;
+-		/* priming: another round is needed */
+-		return false;
+-	}
+-	if (!memcmp(drbg->prev, entropy, entropylen))
+-		panic("DRBG continuous self test failed\n");
+-	memcpy(drbg->prev, entropy, entropylen);
+-
+-	/* the test shall pass when the two values are not equal */
+-	return true;
 -}
 -
--/*
-- * TEST code
-- *
-- * This is a wrapper to the kernel crypto API function of
-- * crypto_rng_generate() to allow the caller to provide additional data and
-- * allow furnishing of test_data
-- *
-- * @drng DRBG handle -- see crypto_rng_get_bytes
-- * @outbuf output buffer -- see crypto_rng_get_bytes
-- * @outlen length of output buffer -- see crypto_rng_get_bytes
-- * @addtl_input additional information string input buffer
-- * @addtllen length of additional information string buffer
-- * @test_data filled test data
-- *
-- * return
-- *	see crypto_rng_get_bytes
-- */
--static inline int crypto_drbg_get_bytes_addtl_test(struct crypto_rng *drng,
--			unsigned char *outbuf, unsigned int outlen,
--			struct drbg_string *addtl,
--			struct drbg_test_data *test_data)
+ /******************************************************************
+  * CTR DRBG callback functions
+  ******************************************************************/
+ 
+ #ifdef CONFIG_CRYPTO_DRBG_CTR
+@@ -831,20 +782,10 @@ static inline int __drbg_seed(struct drbg_state *drbg, struct list_head *seed,
+ 	}
+ 
+ 	return ret;
+ }
+ 
+-static inline void drbg_get_random_bytes(struct drbg_state *drbg,
+-					 unsigned char *entropy,
+-					 unsigned int entropylen)
+-	__must_hold(&drbg->drbg_mutex)
 -{
--	crypto_rng_set_entropy(drng, test_data->testentropy->buf,
--			       test_data->testentropy->len);
--	return crypto_rng_generate(drng, addtl->buf, addtl->len,
--				   outbuf, outlen);
+-	do
+-		get_random_bytes(entropy, entropylen);
+-	while (!drbg_fips_continuous_test(drbg, entropy));
 -}
 -
--/*
-- * TEST code
-- *
-- * This is a wrapper to the kernel crypto API function of
-- * crypto_rng_reset() to allow the caller to provide test_data
-- *
-- * @drng DRBG handle -- see crypto_rng_reset
-- * @pers personalization string input buffer
-- * @perslen length of additional information string buffer
-- * @test_data filled test data
-- *
-- * return
-- *	see crypto_rng_reset
-- */
--static inline int crypto_drbg_reset_test(struct crypto_rng *drng,
--					 struct drbg_string *pers,
--					 struct drbg_test_data *test_data)
--{
--	crypto_rng_set_entropy(drng, test_data->testentropy->buf,
--			       test_data->testentropy->len);
--	return crypto_rng_reset(drng, pers->buf, pers->len);
--}
+ static int drbg_seed_from_random(struct drbg_state *drbg)
+ 	__must_hold(&drbg->drbg_mutex)
+ {
+ 	struct drbg_string data;
+ 	LIST_HEAD(seedlist);
+@@ -856,11 +797,11 @@ static int drbg_seed_from_random(struct drbg_state *drbg)
+ 	BUG_ON(entropylen > sizeof(entropy));
+ 
+ 	drbg_string_fill(&data, entropy, entropylen);
+ 	list_add_tail(&data.list, &seedlist);
+ 
+-	drbg_get_random_bytes(drbg, entropy, entropylen);
++	get_random_bytes(entropy, entropylen);
+ 
+ 	ret = __drbg_seed(drbg, &seedlist, true, DRBG_SEED_STATE_FULL);
+ 
+ 	memzero_explicit(entropy, entropylen);
+ 	return ret;
+@@ -935,11 +876,11 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
+ 
+ 		/* Get seed from in-kernel /dev/urandom */
+ 		if (!rng_is_initialized())
+ 			new_seed_state = DRBG_SEED_STATE_PARTIAL;
+ 
+-		drbg_get_random_bytes(drbg, entropy, entropylen);
++		get_random_bytes(entropy, entropylen);
+ 
+ 		if (!drbg->jent) {
+ 			drbg_string_fill(&data1, entropy, entropylen);
+ 			pr_devel("DRBG: (re)seeding with %u bytes of entropy\n",
+ 				 entropylen);
+@@ -1016,15 +957,10 @@ static inline void drbg_dealloc_state(struct drbg_state *drbg)
+ 	kfree_sensitive(drbg->scratchpadbuf);
+ 	drbg->scratchpadbuf = NULL;
+ 	drbg->reseed_ctr = 0;
+ 	drbg->d_ops = NULL;
+ 	drbg->core = NULL;
+-	if (IS_ENABLED(CONFIG_CRYPTO_FIPS)) {
+-		kfree_sensitive(drbg->prev);
+-		drbg->prev = NULL;
+-		drbg->fips_primed = false;
+-	}
+ }
+ 
+ /*
+  * Allocate all sub-structures for a DRBG state.
+  * The DRBG state structure must already be allocated.
+@@ -1086,20 +1022,10 @@ static inline int drbg_alloc_state(struct drbg_state *drbg)
+ 			goto fini;
+ 		}
+ 		drbg->scratchpad = PTR_ALIGN(drbg->scratchpadbuf, ret + 1);
+ 	}
+ 
+-	if (IS_ENABLED(CONFIG_CRYPTO_FIPS)) {
+-		drbg->prev = kzalloc(drbg_sec_strength(drbg->core->flags),
+-				     GFP_KERNEL);
+-		if (!drbg->prev) {
+-			ret = -ENOMEM;
+-			goto fini;
+-		}
+-		drbg->fips_primed = false;
+-	}
 -
- /* DRBG type flags */
- #define DRBG_CTR	((drbg_flag_t)1<<0)
- #define DRBG_HMAC	((drbg_flag_t)1<<1)
- #define DRBG_HASH	((drbg_flag_t)1<<2)
- #define DRBG_TYPE_MASK	(DRBG_CTR | DRBG_HMAC | DRBG_HASH)
+ 	return 0;
+ 
+ fini:
+ 	drbg->d_ops->crypto_fini(drbg);
+ err:
+diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
+index 486aa793688e..4fafc69a8ee6 100644
+--- a/include/crypto/drbg.h
++++ b/include/crypto/drbg.h
+@@ -107,12 +107,10 @@ struct drbg_state {
+ 	struct scatterlist sg_in, sg_out;	/* CTR mode SGLs */
+ 
+ 	enum drbg_seed_state seeded;		/* DRBG fully seeded? */
+ 	unsigned long last_seed_time;
+ 	bool pr;		/* Prediction resistance enabled? */
+-	bool fips_primed;	/* Continuous test primed? */
+-	unsigned char *prev;	/* FIPS 140-2 continuous test value */
+ 	struct crypto_rng *jent;
+ 	const struct drbg_state_ops *d_ops;
+ 	const struct drbg_core *core;
+ 	struct drbg_string test_data;
+ };
 -- 
 2.53.0
 
