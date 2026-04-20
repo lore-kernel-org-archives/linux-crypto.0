@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34A0438734E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80A4438737E;
 	Mon, 20 Apr 2026 06:37:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776667025; cv=none; b=qp1jJKmPDvXCBofDYzFBs4n49bdlYvQz4UWh5MNU4ByeRxvcR3ECjSfvRZNxaEYGIDP45n/CsM4zffjXvJRLUOLPFj64/qA+8JJ29MzjVBB1TTFmuAGZfyyalbREVhBC1Pu8OX6SI1qn9NY2KMwA0qpe6Ozf9RqYsg1qUcGn/cc=
+	t=1776667025; cv=none; b=XTDR6XElujOTjjn+/OtfGBnKzvvMiGcE86Bs257GiNkfsg6sRaYJtrHpdv2zEZaEVHgd+/91SB43O6IINo/h5dtwSyKAlSd6pcUM941NCRige6yOh93I4cRvAavHbbrim1bDMC9yLv63AMk3TBkGfVG0/4lmmvyDPHIVPzTM0JI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1776667025; c=relaxed/simple;
-	bh=/u+lRTImvLueD/+PSvEGy3iqrgX6BJzcHarFIttsMV8=;
+	bh=e0/wdAoJWFcZFuqkqc1p5usIC0haifOuj3ZtHG1edmE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lpHZYgz3+Qq0pDl4qtuK85/ijBahydJ43Uhs5NKqY3xJ7joyIDoJTko5/crjCphvpI/ZJ/LA+jbHlGhuXh7KSGkiZ4Vltex8gOXivsrxyIguLu7kk/MBMMjxcOL1OLE5gFuLNweBMGwbba6BceBAVSBjd+y8dSrVhfkfpK3ANIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n5BtpE2u; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=RgSYnYSxYjg1XSduK8bD70JoF756qBtJHhbiYm6HgP8eP6QTQbvu2WvlGP3d3JE2A28yGOsPj0uzRqtm3+c0tH6ol6SpUW/fcfzW035UhhKLjFnS787AxVXqIoOudhL1GRoTuD+Tig5tT5ejnxvLSLS8GMHNgyAtlDSdlBTA9pA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PlsvAmWo; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n5BtpE2u"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DECB0C2BCB9;
-	Mon, 20 Apr 2026 06:37:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PlsvAmWo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36751C2BCB7;
+	Mon, 20 Apr 2026 06:37:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1776667025;
-	bh=/u+lRTImvLueD/+PSvEGy3iqrgX6BJzcHarFIttsMV8=;
+	bh=e0/wdAoJWFcZFuqkqc1p5usIC0haifOuj3ZtHG1edmE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=n5BtpE2u8ubAw+5sN5HzYNJPxuntFInlg55edxdp9H5QeDA+re2ngA+aPlsbhNmLu
-	 Q8bo+kwPFTIkU7DhQLQfTIxj7jB9+IGmHT8+koF3QQXFWvg1upFrVmj/uwg4+EOWFP
-	 sEWTxCJY3qkiNDq2UwC66bUFr+isj6r5pxcT9w8rkF5uLdnm8Ev7TbCX9DoXeXmeH0
-	 fIDB0hN5k4enQ2zealLjH+TptK6pHgZC/fD8zBebVKUc/MazefRGiSvho3ziV2SPkd
-	 7mY8HDFUcY1JZMKM9Ll+Copbtpvv9+EgwIoUSQa2PVbeZia36GyptcQAm0EdfO1xJG
-	 JY7OzwCUOVlrw==
+	b=PlsvAmWoAv9Wxdlqa863PYiblDYyMszllVJq2YlTEgzi2/s145DjGztUQIlf4A+yI
+	 43gR7tw+x12h6M0AsJzSTufh/YrPvy8BTbUj3nZfrQBpu5pSseOY7PONmnhYH2auoy
+	 Sapf7jYkWAUHrMwfjwLHmL3gG87Cn2i97pwL2PYVLMBehfqR9KNlh7lNbODupo8b8z
+	 FBtS/zCIC40QmQ3zG/14qyK4HdGIFlQZv0XcRPjz2xj7Zkd62Zr19ByWBlYfizEEbv
+	 rVOf2Fm2z2KeysiPxr7uITo3s+Ye+EBFCnklIjXGjB392dcPkDds87m+PdSfN4SnG7
+	 DxyBhL0YAHi3w==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>
@@ -33,9 +33,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Stephan Mueller <smueller@chronox.de>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 18/38] crypto: drbg - Simplify algorithm registration
-Date: Sun, 19 Apr 2026 23:34:02 -0700
-Message-ID: <20260420063422.324906-19-ebiggers@kernel.org>
+Subject: [PATCH 19/38] crypto: drbg - De-virtualize drbg_state_ops
+Date: Sun, 19 Apr 2026 23:34:03 -0700
+Message-ID: <20260420063422.324906-20-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260420063422.324906-1-ebiggers@kernel.org>
 References: <20260420063422.324906-1-ebiggers@kernel.org>
@@ -47,146 +47,180 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Now that "drbg_pr_hmac_sha512" and "drbg_nopr_hmac_sha512" are the only
-crypto_rng algorithms left in crypto/drbg.c, simplify the algorithm
-registration logic to register these more directly without relying on
-the drbg_cores[] array (which will be removed).
+Now that there's only one set of state operations, use direct calls to
+those operations.
+
+No change in behavior.  In particular, drbg_alloc_state() doesn't change
+behavior, because the only remaining drbg_core uses HMAC_DRBG.
+drbg_uninstantiate() doesn't change behavior, because a NULL d_ops
+implied NULL priv_data which makes a drbg_fini_hash_kernel() a no-op.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- crypto/drbg.c | 100 ++++++++++++++++++--------------------------------
- 1 file changed, 35 insertions(+), 65 deletions(-)
+ crypto/drbg.c | 50 ++++++--------------------------------------------
+ 1 file changed, 6 insertions(+), 44 deletions(-)
 
 diff --git a/crypto/drbg.c b/crypto/drbg.c
-index 81bccacd3595..4a778d0d1fc4 100644
+index 4a778d0d1fc4..04c798d7a8b6 100644
 --- a/crypto/drbg.c
 +++ b/crypto/drbg.c
-@@ -1143,90 +1143,60 @@ static inline int __init drbg_healthcheck_sanity(void)
+@@ -109,21 +109,10 @@ struct drbg_core {
+ 	char cra_name[CRYPTO_MAX_ALG_NAME]; /* mapping to kernel crypto API */
+ 	 /* kernel crypto API backend cipher name */
+ 	char backend_cra_name[CRYPTO_MAX_ALG_NAME];
+ };
  
- 	kfree(drbg);
- 	return rc;
+-struct drbg_state_ops {
+-	int (*update)(struct drbg_state *drbg, struct list_head *seed,
+-		      int reseed);
+-	int (*generate)(struct drbg_state *drbg,
+-			unsigned char *buf, unsigned int buflen,
+-			struct list_head *addtl);
+-	int (*crypto_init)(struct drbg_state *drbg);
+-	int (*crypto_fini)(struct drbg_state *drbg);
+-
+-};
+-
+ enum drbg_seed_state {
+ 	DRBG_SEED_STATE_UNSEEDED,
+ 	DRBG_SEED_STATE_PARTIAL, /* Seeded with !rng_is_initialized() */
+ 	DRBG_SEED_STATE_FULL,
+ };
+@@ -141,11 +130,10 @@ struct drbg_state {
+ 
+ 	enum drbg_seed_state seeded;		/* DRBG fully seeded? */
+ 	unsigned long last_seed_time;
+ 	bool pr;		/* Prediction resistance enabled? */
+ 	struct crypto_rng *jent;
+-	const struct drbg_state_ops *d_ops;
+ 	const struct drbg_core *core;
+ 	struct drbg_string test_data;
+ };
+ 
+ static inline __u8 drbg_statelen(struct drbg_state *drbg)
+@@ -248,11 +236,11 @@ static inline unsigned short drbg_sec_strength(drbg_flag_t flags)
+ 		return 32;
+ 	}
  }
  
--static struct rng_alg drbg_algs[22];
--
--/*
-- * Fill the array drbg_algs used to register the different DRBGs
-- * with the kernel crypto API. To fill the array, the information
-- * from drbg_cores[] is used.
-- */
--static inline void __init drbg_fill_array(struct rng_alg *alg,
--					  const struct drbg_core *core, int pr)
--{
--	int pos = 0;
--	static int priority = 200;
--
--	memcpy(alg->base.cra_name, "stdrng", 6);
--	if (pr) {
--		memcpy(alg->base.cra_driver_name, "drbg_pr_", 8);
--		pos = 8;
--	} else {
--		memcpy(alg->base.cra_driver_name, "drbg_nopr_", 10);
--		pos = 10;
--	}
--	memcpy(alg->base.cra_driver_name + pos, core->cra_name,
--	       strlen(core->cra_name));
--
--	alg->base.cra_priority = priority;
--	priority++;
--	/*
--	 * If FIPS mode enabled, the selected DRBG shall have the
--	 * highest cra_priority over other stdrng instances to ensure
--	 * it is selected.
--	 */
--	if (fips_enabled)
--		alg->base.cra_priority += 2000;
--
--	alg->base.cra_ctxsize 	= sizeof(struct drbg_state);
--	alg->base.cra_module	= THIS_MODULE;
--	alg->base.cra_init	= drbg_kcapi_init;
--	alg->base.cra_exit	= drbg_kcapi_cleanup;
--	alg->generate		= drbg_kcapi_random;
--	alg->seed		= drbg_kcapi_seed;
--	alg->set_ent		= drbg_kcapi_set_entropy;
--	alg->seedsize		= 0;
--}
-+static struct rng_alg drbg_algs[] = {
-+	{
-+		.base.cra_name		= "stdrng",
-+		.base.cra_driver_name	= "drbg_pr_hmac_sha512",
-+		.base.cra_priority	= 200,
-+		.base.cra_ctxsize	= sizeof(struct drbg_state),
-+		.base.cra_module	= THIS_MODULE,
-+		.base.cra_init		= drbg_kcapi_init,
-+		.set_ent		= drbg_kcapi_set_entropy,
-+		.seed			= drbg_kcapi_seed,
-+		.generate		= drbg_kcapi_random,
-+		.base.cra_exit		= drbg_kcapi_cleanup,
-+	},
-+	{
-+		.base.cra_name		= "stdrng",
-+		.base.cra_driver_name	= "drbg_nopr_hmac_sha512",
-+		.base.cra_priority	= 201,
-+		.base.cra_ctxsize	= sizeof(struct drbg_state),
-+		.base.cra_module	= THIS_MODULE,
-+		.base.cra_init		= drbg_kcapi_init,
-+		.set_ent		= drbg_kcapi_set_entropy,
-+		.seed			= drbg_kcapi_seed,
-+		.generate		= drbg_kcapi_random,
-+		.base.cra_exit		= drbg_kcapi_cleanup,
-+	},
-+};
+ /******************************************************************
+- * HMAC DRBG callback functions
++ * HMAC DRBG functions
+  ******************************************************************/
  
- static int __init drbg_init(void)
+ static int drbg_kcapi_hash(struct drbg_state *drbg, unsigned char *outval,
+ 			   const struct list_head *in);
+ static void drbg_kcapi_hmacsetkey(struct drbg_state *drbg,
+@@ -358,25 +346,14 @@ static int drbg_hmac_generate(struct drbg_state *drbg,
+ 		return ret;
+ 
+ 	return len;
+ }
+ 
+-static const struct drbg_state_ops drbg_hmac_ops = {
+-	.update		= drbg_hmac_update,
+-	.generate	= drbg_hmac_generate,
+-	.crypto_init	= drbg_init_hash_kernel,
+-	.crypto_fini	= drbg_fini_hash_kernel,
+-};
+-
+-/******************************************************************
+- * Functions common for DRBG implementations
+- ******************************************************************/
+-
+ static inline int __drbg_seed(struct drbg_state *drbg, struct list_head *seed,
+ 			      int reseed, enum drbg_seed_state new_seed_state)
  {
--	unsigned int i = 0; /* pointer to drbg_algs */
--	unsigned int j = 0; /* pointer to drbg_cores */
- 	int ret;
+-	int ret = drbg->d_ops->update(drbg, seed, reseed);
++	int ret = drbg_hmac_update(drbg, seed, reseed);
  
- 	ret = drbg_healthcheck_sanity();
  	if (ret)
  		return ret;
  
--	if (ARRAY_SIZE(drbg_cores) * 2 > ARRAY_SIZE(drbg_algs)) {
--		pr_info("DRBG: Cannot register all DRBG types"
--			"(slots needed: %zu, slots available: %zu)\n",
--			ARRAY_SIZE(drbg_cores) * 2, ARRAY_SIZE(drbg_algs));
--		return -EFAULT;
+ 	drbg->seeded = new_seed_state;
+@@ -576,11 +553,10 @@ static inline void drbg_dealloc_state(struct drbg_state *drbg)
+ 	drbg->V = NULL;
+ 	kfree_sensitive(drbg->Cbuf);
+ 	drbg->Cbuf = NULL;
+ 	drbg->C = NULL;
+ 	drbg->reseed_ctr = 0;
+-	drbg->d_ops = NULL;
+ 	drbg->core = NULL;
+ }
+ 
+ /*
+  * Allocate all sub-structures for a DRBG state.
+@@ -588,20 +564,11 @@ static inline void drbg_dealloc_state(struct drbg_state *drbg)
+  */
+ static inline int drbg_alloc_state(struct drbg_state *drbg)
+ {
+ 	int ret = -ENOMEM;
+ 
+-	switch (drbg->core->flags & DRBG_TYPE_MASK) {
+-	case DRBG_HMAC:
+-		drbg->d_ops = &drbg_hmac_ops;
+-		break;
+-	default:
+-		ret = -EOPNOTSUPP;
+-		goto err;
 -	}
 -
- 	/*
--	 * each DRBG definition can be used with PR and without PR, thus
--	 * we instantiate each DRBG in drbg_cores[] twice.
--	 *
--	 * As the order of placing them into the drbg_algs array matters
--	 * (the later DRBGs receive a higher cra_priority) we register the
--	 * prediction resistance DRBGs first as the should not be too
--	 * interesting.
-+	 * In FIPS mode, boost the algorithm priorities to ensure that when
-+	 * users request "stdrng", they really get an algorithm from here.
- 	 */
--	for (j = 0; ARRAY_SIZE(drbg_cores) > j; j++, i++)
--		drbg_fill_array(&drbg_algs[i], &drbg_cores[j], 1);
--	for (j = 0; ARRAY_SIZE(drbg_cores) > j; j++, i++)
--		drbg_fill_array(&drbg_algs[i], &drbg_cores[j], 0);
--	return crypto_register_rngs(drbg_algs, (ARRAY_SIZE(drbg_cores) * 2));
-+	if (fips_enabled) {
-+		for (size_t i = 0; i < ARRAY_SIZE(drbg_algs); i++)
-+			drbg_algs[i].base.cra_priority += 2000;
-+	}
-+
-+	return crypto_register_rngs(drbg_algs, ARRAY_SIZE(drbg_algs));
+-	ret = drbg->d_ops->crypto_init(drbg);
++	ret = drbg_init_hash_kernel(drbg);
+ 	if (ret < 0)
+ 		goto err;
+ 
+ 	drbg->Vbuf = kmalloc(drbg_statelen(drbg) + ret, GFP_KERNEL);
+ 	if (!drbg->Vbuf) {
+@@ -617,20 +584,16 @@ static inline int drbg_alloc_state(struct drbg_state *drbg)
+ 	drbg->C = PTR_ALIGN(drbg->Cbuf, ret + 1);
+ 
+ 	return 0;
+ 
+ fini:
+-	drbg->d_ops->crypto_fini(drbg);
++	drbg_fini_hash_kernel(drbg);
+ err:
+ 	drbg_dealloc_state(drbg);
+ 	return ret;
  }
  
- static void __exit drbg_exit(void)
+-/*************************************************************************
+- * DRBG interface functions
+- *************************************************************************/
+-
+ /*
+  * DRBG generate function as required by SP800-90A - this function
+  * generates random numbers
+  *
+  * @drbg DRBG state handle
+@@ -712,11 +675,11 @@ static int drbg_generate(struct drbg_state *drbg,
+ 	}
+ 
+ 	if (addtl && 0 < addtl->len)
+ 		list_add_tail(&addtl->list, &addtllist);
+ 	/* 9.3.1 step 8 and 10 */
+-	len = drbg->d_ops->generate(drbg, buf, buflen, &addtllist);
++	len = drbg_hmac_generate(drbg, buf, buflen, &addtllist);
+ 
+ 	/* 10.1.2.5 step 7 */
+ 	drbg->reseed_ctr++;
+ 	if (0 >= len)
+ 		goto err;
+@@ -877,12 +840,11 @@ static int drbg_uninstantiate(struct drbg_state *drbg)
  {
--	crypto_unregister_rngs(drbg_algs, (ARRAY_SIZE(drbg_cores) * 2));
-+	crypto_unregister_rngs(drbg_algs, ARRAY_SIZE(drbg_algs));
+ 	if (!IS_ERR_OR_NULL(drbg->jent))
+ 		crypto_free_rng(drbg->jent);
+ 	drbg->jent = NULL;
+ 
+-	if (drbg->d_ops)
+-		drbg->d_ops->crypto_fini(drbg);
++	drbg_fini_hash_kernel(drbg);
+ 	drbg_dealloc_state(drbg);
+ 	/* no scrubbing of test_data -- this shall survive an uninstantiate */
+ 	return 0;
  }
  
- module_init(drbg_init);
- module_exit(drbg_exit);
- MODULE_LICENSE("GPL");
 -- 
 2.53.0
 
