@@ -1,67 +1,63 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E81EB34250D
-	for <linux-crypto@vger.kernel.org>; Tue, 21 Apr 2026 18:50:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4A1437269A;
+	Tue, 21 Apr 2026 18:51:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776797418; cv=none; b=jrJHGOL7pRRttLuQFA+vaoQIQyitaZFrSplLSacbhCU24hGIFDUAQw/0HvnduDG0NZPuSGj11X0rDA6JWm6Pq3QSlecWNoTe5ECk6MZR9gAecphrS6Sra7cd+lO1T3iCXqLLXfNYpt/yytQ/nxowAtEsYNCs1KcZVjnTj+LeWUk=
+	t=1776797477; cv=none; b=aqiLLWW3NjRygh/OcExn02T8R540QNANJV6xnJdU5+apmta8xVbcepas82prrJUTs4gK7v/ZwVT8WOCtG2ZrVVfzHNEFnbKq47ahy38w9Au7hynSMiq9FKS/TbwlcUYcscM1c/eAiyV0Y6uWPFI7VVNMrajq5ocgd4/EPQrCLXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776797418; c=relaxed/simple;
-	bh=EPo6FNNjcWhdG4KhP6UIdw5E5GxlSmAr1AfY3wZx2FE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=agI7DS3o1jDjBQX+9V803AwT77G6zjyQhU7ZaI8rafR2/9ElbhZDn7VXCw6uy80KkkeE81wY15FAt6Vr91MHqdtBXwz+pk4HJpPqqs9QMZ5eAo+44//WeVTWyPClohqKjz/OQZgUpYj/EoskiCYOkDOmnvq0KDJjSvdv1bBlock=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ujRXaX55; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776797477; c=relaxed/simple;
+	bh=HI6Uh/IPMyAfvettDpq+wb1qISlDb3hvqZtcmqjV5EU=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=obZEFSC7tThk07y5lmXQgAmNFTj/qtw4uM24/XAqy8XsX8gBI5s9MI9w+pZJGsbzo6DJB21b4AItu8J7Yw1oju/jO1rxjuWoP6TRF4VHZt+ZmWrPiU4iYOIxC6agl8wZ4AXMfo8TeGmahJIODNsAd+aTirSoWTA1Bdibv2CL8TM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fb5qShqo; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ujRXaX55"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40A2AC2BCB0;
-	Tue, 21 Apr 2026 18:50:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fb5qShqo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E1A2C2BCB0;
+	Tue, 21 Apr 2026 18:51:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776797417;
-	bh=EPo6FNNjcWhdG4KhP6UIdw5E5GxlSmAr1AfY3wZx2FE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ujRXaX55h+MMxB91Emu4iztTsXp8cUOUgmizRCyGw5mTdo0vOqlRUWFrxaBd0Dh8k
-	 PfnqXXV0bTVVemQJ6AFQ3ulkslcVYsU7tICnLNROqyN6Nbs+4LnpkWPHZkjy7sZ+X/
-	 j9a6SoZUUHZSyOEfYn+VUTg5vp1RgvlMUzjVYEhfhVQvhOGccCpEz3UyPH9u9QLFLN
-	 ZQQIRcMoRrEd/R+NI1HXveAbr15JzUdZQfQceVa0IDhegWqmNlCJfEIkI+NZkLFGVK
-	 46nXYnpBh9FXu73ok8ytTRHY7lRxfiidObBpwLeVNmLa+FG6f5JM57NbHHZ5Ay3jEP
-	 rhpLtzi73nq5Q==
-Date: Tue, 21 Apr 2026 11:50:15 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
-Subject: Re: [PATCH] crypto: Drop unused cipher_null crypto_alg
-Message-ID: <20260421185015.GB2202@quark>
-References: <20260420094120.5167-1-ardb@kernel.org>
+	s=k20201202; t=1776797477;
+	bh=HI6Uh/IPMyAfvettDpq+wb1qISlDb3hvqZtcmqjV5EU=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=fb5qShqoyWnjRVLa7gPVGBa0lApP4iObDOCRBl5iNTxsgGmA4wi7WXbZV5WnMuPzl
+	 OY9CMyDI9EZgnFbhI/2uz0aCqKffxgzGGA0hevYIe2wrDa+jSWLC5f3SAN/PQRY6lY
+	 hU23ZCXJDltHJuNfVP061soSnylEat6tmmamS2Dca29+lo7oF7khhfi4salncBC311
+	 CcTwStSYsmg6w71Nv0H58aWSy+May3O9uD0vLyR7QRMYAlNM/094oWhiRf6nELAn/L
+	 d72eO5HLtjL9z/s2ab5VTXAQat70bQofTNIgIEuu84xVr36pxLNVYaBlP6R/XDCJYU
+	 yAj8fwH/BEIqQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02E003930203;
+	Tue, 21 Apr 2026 18:50:42 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto library fix and documentation update for 7.1
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20260421183847.GA2202@quark>
+References: <20260421183847.GA2202@quark>
+X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20260421183847.GA2202@quark>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-for-linus
+X-PR-Tracked-Commit-Id: e9af4f47d4a036b4be67e4be361f62e05081f7bf
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: e2683c8868d03382da7e1ce8453b543a043066d1
+Message-Id: <177679744066.2956451.5936265352144185176.pr-tracker-bot@kernel.org>
+Date: Tue, 21 Apr 2026 18:50:40 +0000
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>, Herbert Xu <herbert@gondor.apana.org.au>, Ignat Korchagin <ignat@linux.win>, Jarkko Sakkinen <jarkko@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Lukas Wunner <lukas@wunner.de>, Randy Dunlap <rdunlap@infradead.org>, Yiming Qian <yimingqian591@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260420094120.5167-1-ardb@kernel.org>
 
-On Mon, Apr 20, 2026 at 11:41:20AM +0200, Ard Biesheuvel wrote:
-> The cipher_null crypto_alg cipher is never used in a meaningful way,
-> given that it is always wrapped in ecb(), which has its own dedicated
-> implementation. IOW, the cipher_null crypto_alg should never be used to
-> implement the ecb(cipher_null) skcipher, and using it for other things
-> is bogus.
-> 
-> However, it is accessible from user space, and due to the nature of the
-> AF_ALG interface, it may be wrapped in arbitrary ways, exposing issues
-> in template code that wasn't written with block ciphers with a block
-> size of '1' in mind.
-> 
-> So drop this code.
-> 
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> ---
->  crypto/crypto_null.c | 35 ++------------------
->  1 file changed, 2 insertions(+), 33 deletions(-)
+The pull request you sent on Tue, 21 Apr 2026 11:38:47 -0700:
 
-Reviewed-by: Eric Biggers <ebiggers@kernel.org>
+> https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-for-linus
 
-- Eric
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/e2683c8868d03382da7e1ce8453b543a043066d1
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
