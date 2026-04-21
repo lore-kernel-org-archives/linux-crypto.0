@@ -1,113 +1,118 @@
-Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com [209.85.217.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092B5383C8C
-	for <linux-crypto@vger.kernel.org>; Tue, 21 Apr 2026 07:22:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96CC238422F;
+	Tue, 21 Apr 2026 08:53:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776756130; cv=none; b=K1QtZNCVGLfNtCurfU10qoXEqD+XzOa2xseln8aH7AJk2vX/kLfzzAAMui/NmoLgISdlot0dxy+V60aNkw8db7ZFVzEdVRWdFZkVAirFGYyXVsTI2VSCoaqGU2UgtKuDb5YINHM+Te7zJ8vtNZdQeL22vxtfPqO3SddszT2OeEg=
+	t=1776761620; cv=none; b=MIZB4MiRk+jKDdMbqnBcqVobCfmThnwmtfZIFhERHyLOpbOzKuDKcPN9oqOdVHYeKPQ+VSfNlwbKt5xacmL0Ep9Gf7poVQvWw6eAzMws9cYP2pcLwATxEHhKGDB4pA68eFcC/mavKCoyWet/1CUpbsTnrcA7xWz6GcAz3peCaxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776756130; c=relaxed/simple;
-	bh=/nrp573DwhJpj1/k7R4DV/aIU3yMZMc0v6Gf7OiUohE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZD8WxRIj0o6bzu2XEu83QrtDxiNXqCDbdYSPPDYyE9JRU2Bgyd4A602Q3FlxfaXh2+0PZODftJZHgv4N3sMGQj/15AgQ8vuDGAgD632jP3VjvbnupcwM1MJfvISV3SMkynewtknjf/APswbiVuCMe2wigB3PfLcSJTztnaRdR0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.217.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f45.google.com with SMTP id ada2fe7eead31-6137374b106so2809647137.1
-        for <linux-crypto@vger.kernel.org>; Tue, 21 Apr 2026 00:22:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776756128; x=1777360928;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vef7/o+WmPKazCENtZbv6mCM1KijxBJaO+QSdIgH84s=;
-        b=F2Kswhm16leZMdodgyufefhwngdnHjiHpvtZzoy0Wxhp5u7ZbBSuBaTn2eZouNUWvr
-         gnmD/I7aBEw9z8oUqBFpQ1HZEawqiEMdj4PKApMmIdn2nrBkoDNucej3a+vaTPEtFiMJ
-         8vmrnxrDDG1nommL0sFW0zWbUWYuXWfAXGtwQLLFQXOBI2qd4RbDCgPkt4eXJ4/b9smg
-         c5XFvQiVDTOZYxNAbqD9PFjQf9YX0aK2knWueqlrjHX5gdrXL9nGgu44ghA7PvAc+6A3
-         mufNQXbA426ac1g6K3NUIV91BC8b4bdfsq7/iOiR2N3Ah86okMgJYiD68iJuENUfAHej
-         y8vg==
-X-Gm-Message-State: AOJu0YzgnhgJsV1dK3nIrb14YROZ2xIcpiV8UCTHpq8rfOcp+l0f4YgA
-	lc9Xlm9aomtgfdVdAdxKKGWgu79vp83Z62s95myaZtcPd6LQPEbOc/akHxHRemtwBsc=
-X-Gm-Gg: AeBDieuAFpweEOV4v9wVvOmkU+jAGqdUa7fFPGX4+AXM0q83r2TzDTnb0ACa/t1bFBu
-	ZoIaJpA0FjckMpUyAmaEpP/kcbEfGokaKdAKzexBxFGdzY7p7hevdzFC94oXiwFkPypQrbNMHRQ
-	0vCf3TlQf+j2AVZVh7JrZEwgnbnxarfRBlM9v6DumCR6hUM8+fZ7K6s0Ohcjgg52w4OuAStVtMF
-	Dou5M4r32+bpG8wJFl9PjTPNV0KN1t8gV6aRwG7jF1eHu4Ijtp8RZ+jgHS9d+0D7fHTHCLWC1+p
-	hyte8OlYFsEjbE+erVwf4mMhTn4WRp7MQpiSfP3euBLm25OBzkEmqm1Yx9t63Di2XjGD1dSMTxW
-	gEpiS0y17n2ybYmtuylT7aIUoAVCrIR1swlDiKV4D4KOOHIZKSVHaJSRmCRvZ0zjgru9kcmW7bO
-	7+0jpiXu8RCVxb92Q+kJntzmzoPFyloP1JYbvswUKRpQBIn5UYS6rw9vVbhuZzFSxUMBG8Flk=
-X-Received: by 2002:a05:6102:f8b:b0:607:b901:5d74 with SMTP id ada2fe7eead31-616f4d7d122mr8483188137.9.1776756127881;
-        Tue, 21 Apr 2026 00:22:07 -0700 (PDT)
-Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com. [209.85.217.43])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-61745c9e53esm6149941137.5.2026.04.21.00.22.07
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Apr 2026 00:22:07 -0700 (PDT)
-Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-60579b9c0ccso3125761137.3
-        for <linux-crypto@vger.kernel.org>; Tue, 21 Apr 2026 00:22:07 -0700 (PDT)
-X-Received: by 2002:a05:6102:dcd:b0:612:b3af:39f1 with SMTP id
- ada2fe7eead31-616f68d1bafmr8104656137.18.1776756127179; Tue, 21 Apr 2026
- 00:22:07 -0700 (PDT)
+	s=arc-20240116; t=1776761620; c=relaxed/simple;
+	bh=NG7Q+ecprAHHn9ZT3hiAeW4pf8zTiiEzaaQRfpJZhFo=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=QDu6hQ2w8p2jiRV+TlQMTDyndHAhxYyowDhIjk0h3fchfh7yCFtJUWswIdyByea2OuRJEMzoMIX3olhy5n2CtgwFrIhbySzOAfBJHD718lYA6WLenjKYf0FF4BywTTjH+8rTxYfhUN+hEuvdyjgcWPRDxyV4fp01yis4m5ncDxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Gfays5Y1; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Gfays5Y1"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=Content-Type:MIME-Version:Message-ID:Subject:
+	To:From:Date:cc:to:subject:message-id:date:from:content-type:in-reply-to:
+	references:reply-to; bh=szEtreKuGuHu/ZnlUQcNQc+mZbZS2uGko7eIPegFOM8=; b=Gfays
+	5Y1bZiqUpb+/UTy6G8lkb2WF1aDM8vKA4AFScjkqIlYVD6h0KLt9cyEcBZhSFuLTSVK2OdSDcQeVp
+	P4FMOndJDRCDxj6C+GARqzIeo1QvfeZMDwiWgCj6wstT1VvUv9vznpdqiX65fNM5hZ9CMfGKyTS3m
+	MqRBY/5feBislFkPMFsjzIonrj2Uy+m85NenqhaFr/5062kN/bea/hWVxUK84zV2ANXah0hL/oWK/
+	98LEDjo5fmtklqHrM55mva6SfDF+i8y1qxHekVYtoW3eE8pO3Tc1Zl3Kp6TuguuOAD8/sRR04SW7m
+	YXDswmIMwrjw60C5XNDDx+DPK85XA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1wF6rC-007epE-1Y;
+	Tue, 21 Apr 2026 16:53:23 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 21 Apr 2026 16:53:22 +0800
+Date: Tue, 21 Apr 2026 16:53:22 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT PULL] Crypto Fixes for 7.1
+Message-ID: <aec7Aj9lhK3YGZjF@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260420063422.324906-1-ebiggers@kernel.org> <20260420063422.324906-14-ebiggers@kernel.org>
-In-Reply-To: <20260420063422.324906-14-ebiggers@kernel.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 21 Apr 2026 09:21:56 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdW5AMOAKkEwG4NgtickBkDj6XjB7jjc1P18Te0tDK-a0w@mail.gmail.com>
-X-Gm-Features: AQROBzDFdwCHGPM4pzOjJj1bqtvcbOHmC7O1Nx1956DT_BRipwndIqjI6Hh26Os
-Message-ID: <CAMuHMdW5AMOAKkEwG4NgtickBkDj6XjB7jjc1P18Te0tDK-a0w@mail.gmail.com>
-Subject: Re: [PATCH 13/38] crypto: drbg - Remove support for HASH_DRBG
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, 
-	linux-kernel@vger.kernel.org, Stephan Mueller <smueller@chronox.de>, 
-	"Jason A . Donenfeld" <Jason@zx2c4.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Mon, 20 Apr 2026 at 19:29, Eric Biggers <ebiggers@kernel.org> wrote:
-> Remove the support for HASH_DRBG.  It's likely unused code, seeing as
-> HMAC_DRBG is always enabled and prioritized over it unless
-> NETLINK_CRYPTO is used to change the algorithm priorities.
->
-> There's also no compelling reason to support more than one of
-> [HMAC_DRBG, HASH_DRBG, CTR_DRBG].  By definition, callers cannot tell
-> any difference in their outputs.  And all are FIPS-certifiable, which is
-> the only point of the kernel's NIST DRBGs anyway.
->
-> Switching to HASH_DRBG doesn't seem all that compelling, either.  For
-> one, it's more complex than HMAC_DRBG.
->
-> Thus, let's just drop HASH_DRBG support and focus on HMAC_DRBG.
->
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+Hi Linus:
 
->  arch/m68k/configs/amiga_defconfig          |   1 -
->  arch/m68k/configs/apollo_defconfig         |   1 -
->  arch/m68k/configs/atari_defconfig          |   1 -
->  arch/m68k/configs/bvme6000_defconfig       |   1 -
->  arch/m68k/configs/hp300_defconfig          |   1 -
->  arch/m68k/configs/mac_defconfig            |   1 -
->  arch/m68k/configs/multi_defconfig          |   1 -
->  arch/m68k/configs/mvme147_defconfig        |   1 -
->  arch/m68k/configs/mvme16x_defconfig        |   1 -
->  arch/m68k/configs/q40_defconfig            |   1 -
->  arch/m68k/configs/sun3_defconfig           |   1 -
->  arch/m68k/configs/sun3x_defconfig          |   1 -
+The following changes since commit aec2f682d47c54ef434b2d440992626d80b1ebdc:
 
-Acked-by: Geert Uytterhoeven <geert@linux-m68k.org> # m68k
+  Merge tag 'v7.1-p1' of git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6 (2026-04-15 15:22:26 -0700)
 
-Gr{oetje,eeting}s,
+are available in the Git repository at:
 
-                        Geert
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6 tags/v7.1-p2
 
+for you to fetch changes up to 3bfbf5f0a99c991769ec562721285df7ab69240b:
+
+  crypto: krb5enc - fix async decrypt skipping hash verification (2026-04-20 16:18:58 +0800)
+
+----------------------------------------------------------------
+This push contains the following changes:
+
+- Fix IPsec ESN regression in authencesn.
+- Fix hmac setkey failure in eip93.
+- Guard against IV changing in algif_aead.
+- Fix async completion handling in krb5enc.
+- Fix fallback async completion in acomp.
+- Fix handling of MAY_BACKLOG requests in pcrypt.
+- Fix issues with firmware-returned values in ccp.
+----------------------------------------------------------------
+
+Aleksander Jan Bajkowski (1):
+      crypto: eip93 - fix hmac setkey algo selection
+
+Douya Le (1):
+      crypto: algif_aead - snapshot IV for async AEAD requests
+
+Dudu Lu (1):
+      crypto: krb5enc - fix async decrypt skipping hash verification
+
+Giovanni Cabiddu (1):
+      crypto: acomp - fix wrong pointer stored by acomp_save_req()
+
+Herbert Xu (2):
+      crypto: authencesn - Fix src offset when decrypting in-place
+      crypto: pcrypt - Fix handling of MAY_BACKLOG requests
+
+Paul Moses (1):
+      crypto: ccp - copy IV using skcipher ivsize
+
+Sean Christopherson (3):
+      crypto: ccp: Don't attempt to copy CSR to userspace if PSP command failed
+      crypto: ccp: Don't attempt to copy PDH cert to userspace if PSP command failed
+      crypto: ccp: Don't attempt to copy ID to userspace if PSP command failed
+
+T Pratham (1):
+      crypto: sa2ul - Fix AEAD fallback algorithm names
+
+ crypto/acompress.c                                |  8 ++--
+ crypto/algif_aead.c                               | 10 ++++-
+ crypto/authencesn.c                               |  6 ++-
+ crypto/krb5enc.c                                  | 52 ++++++++++++++---------
+ crypto/pcrypt.c                                   |  7 ++-
+ drivers/crypto/ccp/ccp-crypto-aes.c               |  7 ++-
+ drivers/crypto/ccp/sev-dev.c                      | 19 ++++++++-
+ drivers/crypto/inside-secure/eip93/eip93-common.c |  2 +-
+ drivers/crypto/sa2ul.c                            |  4 +-
+ 9 files changed, 76 insertions(+), 39 deletions(-)
+
+Thanks,
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
