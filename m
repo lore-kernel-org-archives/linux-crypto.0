@@ -1,175 +1,318 @@
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from luna.linkmauve.fr (82-65-109-163.subs.proxad.net [82.65.109.163])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A80203BE642
-	for <linux-crypto@vger.kernel.org>; Tue, 21 Apr 2026 11:22:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD0AA363093;
+	Tue, 21 Apr 2026 12:14:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.65.109.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776770576; cv=none; b=ARJANkFNeSYRRdqxjxpb9N3eaiysv01fSYMVQNngNPtX7N1gpeIoZoGcqZov/fsQeuPYdrSLk1QNEeG/SlPZsqCLLIDS6s8hqZ3QY3vmVARBmPG3sYF+DHM6YETpBKx6HtVWEysOds0GRBXKBOJB7MQrYtB5TjWoZ+6kHq3RLPc=
+	t=1776773682; cv=none; b=gMnu+daVJYaNtRUtLL/12L+WxVmIk/FigDzFjwmdu0k0YI9psnf4e9NspaffKT+cBsilCfNwU/X9yoMunrfcvOtLGPJc7fQ8iOCXrmnAebDowpwb7yX0No33vslZKZkIpvuVRHVLm62EtSo4MV/tp+RhbNPcHoAdn+Zb9Hd3m5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776770576; c=relaxed/simple;
-	bh=7J5sLUyTcEtZ5b/o54KJz2TjlXrWGH0W+oigsdVGJYY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qkAwih4ysMmyabH1mUakM68Sfs7EtZcIJFZ/xeIIFFBE4/c0ZVxKisXG9qTDiusO5uNhdZWvBqa9CMB+sPSm8Iyr72F/1UcDktnpb8aKlDiv4TevaOxe+XfLpQKBCuc7O03VSmEf3VPz8rNOHmRJbxoMPbrQB8OpLLPfezRvmUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lU9jm6kG; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lU9jm6kG"
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-82f33d28c1dso2248091b3a.3
-        for <linux-crypto@vger.kernel.org>; Tue, 21 Apr 2026 04:22:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776770574; x=1777375374; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pbepvZoiaQHnY8ojgGndHUN0tqRJnJo2KRx8HLgDgUI=;
-        b=lU9jm6kGqDjqxIjkWxGDeqDvr17UMQYeVNP9rS5P3UWd7+VE4cpTrRwlYKSpCHI1KD
-         zZA4+dsX0fyXlhWGoGhioT7GlAk6Cad2+kFgyXXf+ZkLjXgYuVSOk6W9JhbsksRhS+cn
-         JjoUEw79Nz86BTgOmxYEMCIS5sQKYiwZ5dfniI9hbARcbUXmygsWFT4/6ZYrU7er4B5b
-         AF39CTz+lEumwPTp8qh8DUlpS3e4Z+amiPfglYGt2PS3FjwfgzzvqXLqKOW/KsOHooqZ
-         aJdiZQCu+ux924UJHp8L48osT1cgJGdd6A/cCTA6wbL1kWXsoMldHo20OThek5XInH4F
-         NHfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776770574; x=1777375374;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pbepvZoiaQHnY8ojgGndHUN0tqRJnJo2KRx8HLgDgUI=;
-        b=VHnkdcH8c4ImyHPRmOEuul4mjJ8ovPx+mm8YizSCrhzcZf/hn8hYbZeY5pVwxz7ZBy
-         lOyyFfKak9A2Rb8pHzRAjvBUDPraDam1WUWADafkGrHdqCO5JxLpkUl/JrgpZZD8aG3f
-         35FAklPabb8eq6g/8saMiaPMM78dVKzr9W7BmxgqLKU4IrYpC8w0pus+GBamLVhYthtU
-         oHXTYqgGrSMnO99dA69EjTvFzfxjcHBa/fJ7xsf6xNCWRKTyxG+G8GjnwosH9P6viaw7
-         wRASismRZdHCAcIHMbU6ONkPqg9TyouxgSWjhQOMjNpyN0xTyXDNbXeuIPt4qpllz7Qt
-         jwRA==
-X-Forwarded-Encrypted: i=1; AFNElJ878D6tGEWcmER7Uhb1SwcRY0WKd66ojXqAItMM2g5ly9oSs+sEX09mqCBsJ/UEzc0KUk7/tlg2fZnQw+s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzyXezxogM22B2FQDYCyyxErxEJEjbUu9FLmlpgnXrbo2F96lHw
-	0TfCJ65PaIK8S+Eb16/p7Ro3l3sP0MsWeqkm4Zk4bC+9JxkiIumUl14R
-X-Gm-Gg: AeBDiesi0fJGMvEsE7Xw+NAWi+8sz7Dq4TkoRFkLj0PfCs2qVY1pxT/wVBUs99F/yGA
-	TGUsfMwk36KtEtNIM4buuK4V+fOuLHtUFDApJAf6nvFJCmVsliNq0MA50+UtiaDV9Sykci7F/wH
-	Ul+KYgKYBcxCTSGOf6x0rClkRrxUQAx1OJNSgDFyICgKBFM1nX4jLcdNpTW+FXg9sbS81AC30TG
-	HtMmV+ceGkyP7hzpvHNOShQ3IpvKyS+dqRG/9zyL8nCIPqtddQ9cN45pKWQk+lvByj0xveG013V
-	Yo6I0PgNYipEXQuo2hVMfkuxDHsvp14IeY2jfCXHDGlUU32jwdmcOcyxmg+XplG/RfeQPl23PRx
-	/PQwNHOv3Q7vk3C9y7f5MnZqwSQHkHICqUmcM5/ubN3QQmwZ+tWdrC6iNM78oytngs5dntQfn8m
-	JndCdEAz7iK8tgsp6fMRQBc7abM3XpFCReZ1WuScCznsYL5CKOtwC9EDjaSczCfyTxlsQfuNAZV
-	U65xg==
-X-Received: by 2002:a05:6a00:6988:b0:82f:aae5:c7a9 with SMTP id d2e1a72fcca58-82faae5d438mr7228492b3a.27.1776770573719;
-        Tue, 21 Apr 2026 04:22:53 -0700 (PDT)
-Received: from li-1a3e774c-28e4-11b2-a85c-acc9f2883e29.ibm.com ([129.41.58.4])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f8e981a0asm14155014b3a.3.2026.04.21.04.22.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2026 04:22:53 -0700 (PDT)
-Date: Tue, 21 Apr 2026 16:52:37 +0530
-From: Mukesh Kumar Chaurasiya <mkchauras@gmail.com>
-To: Thomas Gleixner <tglx@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, linuxppc-dev@lists.ozlabs.org, Arnd Bergmann <arnd@arndb.de>, 
-	x86@kernel.org, Lu Baolu <baolu.lu@linux.intel.com>, iommu@lists.linux.dev, 
-	Michael Grzeschik <m.grzeschik@pengutronix.de>, netdev@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	Herbert Xu <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org, 
-	Vlastimil Babka <vbabka@kernel.org>, linux-mm@kvack.org, David Woodhouse <dwmw2@infradead.org>, 
-	Bernie Thompson <bernie@plugable.com>, linux-fbdev@vger.kernel.org, Theodore Tso <tytso@mit.edu>, 
-	linux-ext4@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, 
-	Uladzislau Rezki <urezki@gmail.com>, Marco Elver <elver@google.com>, 
-	Dmitry Vyukov <dvyukov@google.com>, kasan-dev@googlegroups.com, 
-	Andrey Ryabinin <ryabinin.a.a@gmail.com>, Thomas Sailer <t.sailer@alumni.ethz.ch>, 
-	linux-hams@vger.kernel.org, "Jason A. Donenfeld" <Jason@zx2c4.com>, 
-	Richard Henderson <richard.henderson@linaro.org>, linux-alpha@vger.kernel.org, 
-	Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, 
-	Catalin Marinas <catalin.marinas@arm.com>, Huacai Chen <chenhuacai@kernel.org>, loongarch@lists.linux.dev, 
-	Geert Uytterhoeven <geert@linux-m68k.org>, linux-m68k@lists.linux-m68k.org, 
-	Dinh Nguyen <dinguyen@kernel.org>, Jonas Bonn <jonas@southpole.se>, linux-openrisc@vger.kernel.org, 
-	Helge Deller <deller@gmx.de>, linux-parisc@vger.kernel.org, Paul Walmsley <pjw@kernel.org>, 
-	linux-riscv@lists.infradead.org, Heiko Carstens <hca@linux.ibm.com>, linux-s390@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, sparclinux@vger.kernel.org
-Subject: Re: [patch 33/38] powerpc: Select ARCH_HAS_RANDOM_ENTROPY
-Message-ID: <aedc9UddBSYXzrAj@li-1a3e774c-28e4-11b2-a85c-acc9f2883e29.ibm.com>
-References: <20260410120044.031381086@kernel.org>
- <20260410120319.789114053@kernel.org>
+	s=arc-20240116; t=1776773682; c=relaxed/simple;
+	bh=o0pBiccSHaroojxfsDhXFaZzKgxpgndpVvvBsX4NVwI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TxUCEs98GvGo++eflHCWb+TjXKPCXvF1cp4gMZjoE4BBIOw9MklMupa0hTFWlD9DEEilIEKjYvLlcgqXwpiGEWCrmDQISPfgDs75DxzMygeYSJU/zqrdKKXcGsbZmGYcFHunk4VX51N5LoVwbw9sbSBrdER5ACha81ioBXvVZTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linkmauve.fr; spf=pass smtp.mailfrom=linkmauve.fr; arc=none smtp.client-ip=82.65.109.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linkmauve.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linkmauve.fr
+Received: by luna.linkmauve.fr (Postfix, from userid 1000)
+	id 73E83F40843; Tue, 21 Apr 2026 14:14:36 +0200 (CEST)
+From: Link Mauve <linkmauve@linkmauve.fr>
+To: linuxppc-dev@lists.ozlabs.org
+Cc: Link Mauve <linkmauve@linkmauve.fr>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Juergen Gross <jgross@suse.com>,
+	Ajay Kaher <ajay.kaher@broadcom.com>,
+	Alexey Makhalov <alexey.makhalov@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Geoff Levand <geoff@infradead.org>,
+	Mahesh J Salgaonkar <mahesh@linux.ibm.com>,
+	"Oliver O'Halloran" <oohall@gmail.com>,
+	Anatolij Gustschin <agust@denx.de>,
+	=?UTF-8?q?Breno=20Leit=C3=A3o?= <leitao@debian.org>,
+	Nayna Jain <nayna@linux.ibm.com>,
+	Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Thorsten Blum <thorsten.blum@linux.dev>,
+	Thomas Huth <thuth@redhat.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	David Hildenbrand <david@kernel.org>,
+	Alistair Popple <apopple@nvidia.com>,
+	"Ritesh Harjani (IBM)" <ritesh.list@gmail.com>,
+	Donet Tom <donettom@linux.ibm.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@rivosinc.com>,
+	Will Deacon <will@kernel.org>,
+	"Lorenzo Stoakes (Oracle)" <ljs@kernel.org>,
+	Paul Moore <paul@paul-moore.com>,
+	Nam Cao <namcao@linutronix.de>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Sourabh Jain <sourabhjain@linux.ibm.com>,
+	Hari Bathini <hbathini@linux.ibm.com>,
+	Srikar Dronamraju <srikar@linux.ibm.com>,
+	Shrikanth Hegde <sshegde@linux.ibm.com>,
+	Jiri Bohac <jbohac@suse.cz>,
+	"Mike Rapoport (Microsoft)" <rppt@kernel.org>,
+	"Jiri Slaby (SUSE)" <jirislaby@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	=?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Kees Cook <kees@kernel.org>,
+	Stephen Rothwell <sfr@cab.auug.org.au>,
+	Xichao Zhao <zhao.xichao@vivo.com>,
+	Gautam Menghani <gautam@linux.ibm.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	K Prateek Nayak <kprateek.nayak@amd.com>,
+	Guangshuo Li <lgs201920130244@gmail.com>,
+	Li Chen <chenl311@chinatelecom.cn>,
+	Aboorva Devarajan <aboorvad@linux.ibm.com>,
+	Petr Mladek <pmladek@suse.com>,
+	Feng Tang <feng.tang@linux.alibaba.com>,
+	"Nysal Jan K.A." <nysal@linux.ibm.com>,
+	Aditya Gupta <adityag@linux.ibm.com>,
+	Sayali Patil <sayalip@linux.ibm.com>,
+	Rohan McLure <rmclure@linux.ibm.com>,
+	Pasha Tatashin <pasha.tatashin@soleen.com>,
+	Yeoreum Yun <yeoreum.yun@arm.com>,
+	Kevin Brodsky <kevin.brodsky@arm.com>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Andrew Donnellan <andrew+kernel@donnellan.id.au>,
+	"Vishal Moola (Oracle)" <vishal.moola@gmail.com>,
+	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
+	Athira Rajeev <atrajeev@linux.ibm.com>,
+	Kajol Jain <kjain@linux.ibm.com>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Chen Ni <nichen@iscas.ac.cn>,
+	Haren Myneni <haren@linux.ibm.com>,
+	Jonathan Greental <yonatan02greental@gmail.com>,
+	Ingo Molnar <mingo@kernel.org>,
+	"Yury Norov (NVIDIA)" <yury.norov@gmail.com>,
+	Gaurav Batra <gbatra@linux.ibm.com>,
+	Nilay Shroff <nilay@linux.ibm.com>,
+	Vivian Wang <wangruikang@iscas.ac.cn>,
+	=?UTF-8?q?Adrian=20Barna=C5=9B?= <abarnas@google.com>,
+	"Rafael J. Wysocki (Intel)" <rafael@kernel.org>,
+	Thierry Reding <treding@nvidia.com>,
+	Yury Norov <ynorov@nvidia.com>,
+	"Mukesh Kumar Chaurasiya (IBM)" <mkchauras@gmail.com>,
+	Ruben Wauters <rubenru09@aol.com>,
+	linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	x86@kernel.org
+Subject: [PATCH 0/2] powerpc: Fix a whole bunch of spelling mistakes
+Date: Tue, 21 Apr 2026 14:14:12 +0200
+Message-ID: <20260421121420.26079-1-linkmauve@linkmauve.fr>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260410120319.789114053@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Apr 10, 2026 at 02:21:09PM +0200, Thomas Gleixner wrote:
-> The only remaining usage of get_cycles() is to provide random_get_entropy().
-> 
-> Switch powerpc over to the new scheme of selecting ARCH_HAS_RANDOM_ENTROPY
-> and providing random_get_entropy() in asm/random.h.
-> 
-> Remove asm/timex.h as it has no functionality anymore.
-> 
-> Signed-off-by: Thomas Gleixner <tglx@kernel.org>
-> Cc: Michael Ellerman <mpe@ellerman.id.au>
-> Cc: linuxppc-dev@lists.ozlabs.org
-> ---
->  arch/powerpc/Kconfig              |    1 +
->  arch/powerpc/include/asm/random.h |   13 +++++++++++++
->  arch/powerpc/include/asm/timex.h  |   21 ---------------------
->  3 files changed, 14 insertions(+), 21 deletions(-)
-> 
-> --- a/arch/powerpc/Kconfig
-> +++ b/arch/powerpc/Kconfig
-> @@ -150,6 +150,7 @@ config PPC
->  	select ARCH_HAS_PREEMPT_LAZY
->  	select ARCH_HAS_PTDUMP
->  	select ARCH_HAS_PTE_SPECIAL
-> +	select ARCH_HAS_RANDOM_ENTROPY
->  	select ARCH_HAS_SCALED_CPUTIME		if VIRT_CPU_ACCOUNTING_NATIVE && PPC_BOOK3S_64
->  	select ARCH_HAS_SET_MEMORY
->  	select ARCH_HAS_STRICT_KERNEL_RWX	if (PPC_BOOK3S || PPC_8xx) && !HIBERNATION
-> --- /dev/null
-> +++ b/arch/powerpc/include/asm/random.h
-> @@ -0,0 +1,13 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef _ASM_POWERPC_RANDOM_H
-> +#define _ASM_POWERPC_RANDOM_H
-> +
-> +#include <asm/cputable.h>
-> +#include <asm/vdso/timebase.h>
-> +
-> +static inline unsigned long random_get_entropy(void)
-> +{
-> +	return mftb();
-> +}
-> +
-> +#endif	/* _ASM_POWERPC_RANDOM_H */
-> --- a/arch/powerpc/include/asm/timex.h
-> +++ b/arch/powerpc/include/asm/timex.h
-> @@ -1,21 +0,0 @@
-> -/* SPDX-License-Identifier: GPL-2.0 */
-> -#ifndef _ASM_POWERPC_TIMEX_H
-> -#define _ASM_POWERPC_TIMEX_H
-> -
-> -#ifdef __KERNEL__
-> -
-> -/*
-> - * PowerPC architecture timex specifications
-> - */
-> -
-> -#include <asm/cputable.h>
-> -#include <asm/vdso/timebase.h>
-> -
-> -ostatic inline cycles_t get_cycles(void)
-> -{
-R> -	return mftb();
-> -}
-> -#define get_cycles get_cycles
-> -
-> -#endif	/* __KERNEL__ */
-> -#endif	/* _ASM_POWERPC_TIMEX_H */
-> 
-Build tested for this series with allmodconfig and allyesconfig on ppc64le
-machine for ppc64le.
-tree: git://git.kernel.org/pub/scm/linux/kernel/git/tglx/devel.git getcycles-v1
+I’ve done this using the typos tool[1].  It is a one-off as I don’t
+expect typos to accumulate too much, but maybe we could setup a periodic
+run of this tool?  Future versions will likely catch more mistakes for
+instance.
 
-Boot tested for this series on powernv9 qemu, powernv10 qemu and pSeries
-power11 hardware.
+I’ve manually reviewed every single one of these changes, but mistakes
+can obviously happen with these automated tools so it might be sensible
+to review them thoroughly anyway.
 
-Tested-by: Mukesh Kumar Chaurasiya (IBM) <mkchauras@gmail.com>
-Reviewed-by: Mukesh Kumar Chaurasiya (IBM) <mkchauras@gmail.com>
+I’ve also tested that this kernel builds and boots on a Wii.
+
+[1] https://github.com/crate-ci/typos
+
+Link Mauve (2):
+  powerpc: Add a typos.toml file
+  powerpc: Run typos -w
+
+ arch/powerpc/boot/crt0.S                      |   2 +-
+ arch/powerpc/boot/dts/fsl/ppa8548.dts         |   2 +-
+ arch/powerpc/boot/dts/kuroboxHD.dts           |   2 +-
+ arch/powerpc/boot/dts/kuroboxHG.dts           |   2 +-
+ arch/powerpc/boot/dts/mgcoge.dts              |   2 +-
+ arch/powerpc/boot/dts/mpc8308_p1m.dts         |   4 +-
+ arch/powerpc/boot/rs6000.h                    |   4 +-
+ arch/powerpc/crypto/aes-gcm-p10.S             |   6 +-
+ arch/powerpc/crypto/aes-spe-glue.c            |   2 +-
+ arch/powerpc/crypto/aesp10-ppc.pl             |   2 +-
+ arch/powerpc/crypto/ghashp10-ppc.pl           |   2 +-
+ arch/powerpc/include/asm/book3s/64/hash-64k.h |   6 +-
+ arch/powerpc/include/asm/book3s/64/mmu-hash.h |  12 +-
+ arch/powerpc/include/asm/book3s/64/radix.h    |   2 +-
+ arch/powerpc/include/asm/cpm1.h               |   2 +-
+ arch/powerpc/include/asm/cpm2.h               |   2 +-
+ arch/powerpc/include/asm/cputable.h           |   2 +-
+ arch/powerpc/include/asm/delay.h              |   2 +-
+ arch/powerpc/include/asm/epapr_hcalls.h       |   2 +-
+ arch/powerpc/include/asm/fsl_hcalls.h         |   4 +-
+ arch/powerpc/include/asm/head-64.h            |   4 +-
+ arch/powerpc/include/asm/heathrow.h           |   2 +-
+ arch/powerpc/include/asm/highmem.h            |   2 +-
+ arch/powerpc/include/asm/io.h                 |   4 +-
+ arch/powerpc/include/asm/kvm_booke.h          |   2 +-
+ arch/powerpc/include/asm/machdep.h            |   2 +-
+ arch/powerpc/include/asm/mediabay.h           |   2 +-
+ arch/powerpc/include/asm/mpic.h               |   2 +-
+ arch/powerpc/include/asm/mpic_msgr.h          |   2 +-
+ arch/powerpc/include/asm/nohash/32/mmu-8xx.h  |   2 +-
+ arch/powerpc/include/asm/nohash/32/pte-8xx.h  |   2 +-
+ arch/powerpc/include/asm/nohash/mmu-e500.h    |   2 +-
+ arch/powerpc/include/asm/page_64.h            |   2 +-
+ arch/powerpc/include/asm/paravirt.h           |   2 +-
+ arch/powerpc/include/asm/pci-bridge.h         |   4 +-
+ arch/powerpc/include/asm/pmac_feature.h       |   4 +-
+ arch/powerpc/include/asm/ppc_asm.h            |   2 +-
+ arch/powerpc/include/asm/prom.h               |   4 +-
+ arch/powerpc/include/asm/ps3.h                |   2 +-
+ arch/powerpc/include/asm/ps3av.h              |   2 +-
+ arch/powerpc/include/asm/reg.h                |   2 +-
+ arch/powerpc/include/asm/reg_booke.h          |   2 +-
+ arch/powerpc/include/asm/reg_fsl_emb.h        |   2 +-
+ arch/powerpc/include/asm/sfp-machine.h        |   4 +-
+ arch/powerpc/include/asm/smu.h                |  12 +-
+ arch/powerpc/include/asm/tce.h                |   2 +-
+ arch/powerpc/include/asm/thread_info.h        |   2 +-
+ arch/powerpc/include/asm/tsi108_irq.h         |   2 +-
+ arch/powerpc/include/asm/uninorth.h           |   4 +-
+ arch/powerpc/include/uapi/asm/bootx.h         |   2 +-
+ arch/powerpc/include/uapi/asm/sigcontext.h    |   2 +-
+ arch/powerpc/kernel/85xx_entry_mapping.S      |   2 +-
+ arch/powerpc/kernel/cputable.c                |   2 +-
+ arch/powerpc/kernel/eeh.c                     |   4 +-
+ arch/powerpc/kernel/eeh_driver.c              |   8 +-
+ arch/powerpc/kernel/eeh_event.c               |   2 +-
+ arch/powerpc/kernel/eeh_pe.c                  |   2 +-
+ arch/powerpc/kernel/entry_32.S                |   2 +-
+ arch/powerpc/kernel/exceptions-64e.S          |   4 +-
+ arch/powerpc/kernel/exceptions-64s.S          |   6 +-
+ arch/powerpc/kernel/fadump.c                  |   8 +-
+ arch/powerpc/kernel/head_44x.S                |  14 +--
+ arch/powerpc/kernel/head_85xx.S               |   6 +-
+ arch/powerpc/kernel/head_book3s_32.S          |   2 +-
+ arch/powerpc/kernel/hw_breakpoint.c           |   2 +-
+ arch/powerpc/kernel/idle_book3s.S             |   4 +-
+ arch/powerpc/kernel/interrupt.c               |   2 +-
+ arch/powerpc/kernel/irq_64.c                  |   2 +-
+ arch/powerpc/kernel/legacy_serial.c           |   2 +-
+ arch/powerpc/kernel/nvram_64.c                |   2 +-
+ arch/powerpc/kernel/paca.c                    |   2 +-
+ arch/powerpc/kernel/pci_dn.c                  |   2 +-
+ arch/powerpc/kernel/prom.c                    |   4 +-
+ arch/powerpc/kernel/prom_init_check.sh        |   2 +-
+ arch/powerpc/kernel/ptrace/ptrace-adv.c       |   2 +-
+ arch/powerpc/kernel/ptrace/ptrace-decl.h      |   2 +-
+ arch/powerpc/kernel/ptrace/ptrace-tm.c        |  10 +-
+ arch/powerpc/kernel/setup_64.c                |   4 +-
+ arch/powerpc/kernel/signal_32.c               |   2 +-
+ arch/powerpc/kernel/signal_64.c               |   2 +-
+ arch/powerpc/kernel/smp.c                     |   2 +-
+ arch/powerpc/kernel/switch.S                  |   2 +-
+ arch/powerpc/kernel/time.c                    |   2 +-
+ arch/powerpc/kernel/traps.c                   |   4 +-
+ arch/powerpc/kernel/watchdog.c                |   2 +-
+ arch/powerpc/kexec/core_64.c                  |   2 +-
+ arch/powerpc/kexec/file_load_64.c             |   4 +-
+ arch/powerpc/kvm/book3s_hv.c                  |   6 +-
+ arch/powerpc/kvm/book3s_hv_p9_entry.c         |   2 +-
+ arch/powerpc/kvm/book3s_hv_uvmem.c            |   4 +-
+ arch/powerpc/kvm/book3s_pr.c                  |   2 +-
+ arch/powerpc/kvm/book3s_xive.c                |  42 +++----
+ arch/powerpc/kvm/book3s_xive.h                |   4 +-
+ arch/powerpc/kvm/booke.h                      |   2 +-
+ arch/powerpc/kvm/bookehv_interrupts.S         |   4 +-
+ arch/powerpc/kvm/e500_mmu.c                   |   2 +-
+ arch/powerpc/kvm/e500mc.c                     |   2 +-
+ arch/powerpc/kvm/powerpc.c                    |   2 +-
+ arch/powerpc/lib/copyuser_power7.S            |   4 +-
+ arch/powerpc/lib/memcmp_64.S                  |   2 +-
+ arch/powerpc/lib/memcpy_power7.S              |   4 +-
+ arch/powerpc/lib/rheap.c                      |   4 +-
+ arch/powerpc/mm/book3s64/hash_native.c        |   6 +-
+ arch/powerpc/mm/book3s64/hash_pgtable.c       |   2 +-
+ arch/powerpc/mm/book3s64/hash_tlb.c           |   2 +-
+ arch/powerpc/mm/book3s64/hash_utils.c         |   8 +-
+ arch/powerpc/mm/book3s64/hugetlbpage.c        |   2 +-
+ arch/powerpc/mm/book3s64/radix_pgtable.c      |   2 +-
+ arch/powerpc/mm/book3s64/radix_tlb.c          |  10 +-
+ arch/powerpc/mm/book3s64/slb.c                |   2 +-
+ arch/powerpc/mm/ioremap.c                     |   2 +-
+ arch/powerpc/mm/mem.c                         |   2 +-
+ arch/powerpc/mm/nohash/kaslr_booke.c          |   2 +-
+ arch/powerpc/mm/nohash/tlb.c                  |   2 +-
+ arch/powerpc/mm/nohash/tlb_low_64e.S          |   4 +-
+ arch/powerpc/perf/hv-24x7.c                   |   2 +-
+ arch/powerpc/perf/hv-gpci-requests.h          |   2 +-
+ arch/powerpc/perf/hv-gpci.c                   |   2 +-
+ arch/powerpc/perf/imc-pmu.c                   |   4 +-
+ arch/powerpc/perf/isa207-common.h             |   4 +-
+ arch/powerpc/perf/vpa-dtl.c                   |   4 +-
+ arch/powerpc/platforms/44x/uic.c              |   2 +-
+ arch/powerpc/platforms/512x/clock-commonclk.c |   2 +-
+ arch/powerpc/platforms/512x/mpc512x_shared.c  |   2 +-
+ arch/powerpc/platforms/52xx/lite5200_pm.c     |   2 +-
+ arch/powerpc/platforms/52xx/mpc52xx_pci.c     |   4 +-
+ arch/powerpc/platforms/8xx/pic.c              |   4 +-
+ arch/powerpc/platforms/book3s/vas-api.c       |   4 +-
+ arch/powerpc/platforms/cell/spufs/context.c   |   4 +-
+ .../platforms/cell/spufs/spu_restore_crt0.S   |   2 +-
+ arch/powerpc/platforms/cell/spufs/switch.c    |   8 +-
+ arch/powerpc/platforms/powermac/bootx_init.c  |   2 +-
+ arch/powerpc/platforms/powermac/cache.S       |   2 +-
+ arch/powerpc/platforms/powermac/feature.c     |   2 +-
+ arch/powerpc/platforms/powermac/low_i2c.c     |   2 +-
+ arch/powerpc/platforms/powermac/pci.c         |   2 +-
+ arch/powerpc/platforms/powermac/pfunc_base.c  |   2 +-
+ arch/powerpc/platforms/powermac/setup.c       |   2 +-
+ arch/powerpc/platforms/powermac/sleep.S       |   2 +-
+ arch/powerpc/platforms/powernv/eeh-powernv.c  |   2 +-
+ arch/powerpc/platforms/powernv/opal-lpc.c     |   2 +-
+ .../platforms/powernv/opal-memory-errors.c    |   2 +-
+ arch/powerpc/platforms/powernv/opal.c         |   6 +-
+ arch/powerpc/platforms/powernv/pci-ioda.c     |   2 +-
+ arch/powerpc/platforms/powernv/pci-sriov.c    |   2 +-
+ arch/powerpc/platforms/powernv/vas-fault.c    |   2 +-
+ arch/powerpc/platforms/powernv/vas.h          |   4 +-
+ arch/powerpc/platforms/ps3/interrupt.c        |   4 +-
+ arch/powerpc/platforms/ps3/platform.h         |   4 +-
+ arch/powerpc/platforms/pseries/eeh_pseries.c  |   2 +-
+ arch/powerpc/platforms/pseries/iommu.c        |   8 +-
+ arch/powerpc/platforms/pseries/lpar.c         |   4 +-
+ arch/powerpc/platforms/pseries/msi.c          |   2 +-
+ arch/powerpc/platforms/pseries/papr-indices.c |   2 +-
+ arch/powerpc/platforms/pseries/papr_scm.c     |   2 +-
+ .../platforms/pseries/rtas-work-area.c        |   2 +-
+ arch/powerpc/platforms/pseries/suspend.c      |   2 +-
+ arch/powerpc/platforms/pseries/vas-sysfs.c    |   2 +-
+ arch/powerpc/platforms/pseries/vas.c          |   4 +-
+ arch/powerpc/platforms/pseries/vas.h          |   2 +-
+ arch/powerpc/sysdev/fsl_pci.c                 |   4 +-
+ arch/powerpc/sysdev/indirect_pci.c            |   2 +-
+ arch/powerpc/sysdev/xics/icp-native.c         |   2 +-
+ arch/powerpc/sysdev/xics/xics-common.c        |   2 +-
+ arch/powerpc/sysdev/xive/common.c             |   6 +-
+ arch/powerpc/tools/unrel_branch_check.sh      |   2 +-
+ arch/powerpc/typos.toml                       | 109 ++++++++++++++++++
+ arch/powerpc/xmon/ppc-opc.c                   |   6 +-
+ arch/powerpc/xmon/ppc.h                       |   2 +-
+ lib/crypto/powerpc/ghashp8-ppc.pl             |   2 +-
+ 170 files changed, 392 insertions(+), 283 deletions(-)
+ create mode 100644 arch/powerpc/typos.toml
+
+-- 
+2.54.0
 
