@@ -1,190 +1,153 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AD423A63EC
-	for <linux-crypto@vger.kernel.org>; Tue, 21 Apr 2026 09:38:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95B16274B46
+	for <linux-crypto@vger.kernel.org>; Tue, 21 Apr 2026 09:45:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776764338; cv=none; b=P6K2coG5OoIpb5/zjGXao1ZKwJFyLtbWuLJi7Q5Ws3P7qDKsPFiSUQFta/RCw1mlKjfVntQ1Bul8vJrqlyxIXm3+ZbGP+pSjh4DkTFVipegVMZ6Oa5YyqvVQ5SX72SazLRarCaVhzenSDPXYUEnTAuAnlHHALI0K7brw9LBwhU8=
+	t=1776764706; cv=none; b=R49iJF+BEE0hAbqjzhnhz5N9WtTpK3NFNgWR2FVXTQH8CyVwVeP5BZDwVW9cC9TI5Fp5XJcfnLUh8DZaUUu2bQioFk5pR0bC2E2S9RuB+rb9P+6DiKyIgNE64GK9gW4j+M7FfZ52R3whPiLD4h1EvA8KMn2bSuQHdv9bqEOlb38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776764338; c=relaxed/simple;
-	bh=u8DbJynolgW2SvOQbI/uVBWstmdlEgoOwuda/rhYsak=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H0DLGGsBTnfr/kKqxMEOYtwXOcaW2rQoiVh/6UTw9HA2GJ5Cm1S9RRikTYDMXunDchJBQ4I2j9omWbFNZzcjhsKBF9FtYOPjLaSkW0DOmuQemd1Z4nG594gVQNj/Fw6O8VHgk5kVQ3Ie8RdBcj6iXaxzCYrabchRm6GWRXIT944=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=nUAcNvzE; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Gr9wc/O4; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1776764706; c=relaxed/simple;
+	bh=wWRC36KWWwFbbnT4QloUdLOrZzDIPevpQj8nJ48WPek=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fK/LhmYGW2PeAa76J2Ys1UwZkgg5Gxeb5HDlWxjMYaJ9k6kMY4UDa5HucHrigaYu0SZt2sUuVl7uYTr5ZC5JDHg1dxvC1kJ1sLwMkDKy9iYa7GyoCp8Vdar2d3z82Sd1ItX4A+pUOJ0MzY8ETB9/teGHjKiuBJP5PU4B8QAloOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ma4xpiJG; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="nUAcNvzE";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Gr9wc/O4"
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63L74Cbn1538414
-	for <linux-crypto@vger.kernel.org>; Tue, 21 Apr 2026 09:38:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	kuKADIxglKVMIrQFwjDtiXbSvLedvlz6B84TW8OPMsc=; b=nUAcNvzEpKTjV782
-	cEUuOOhtE2u5bJayd978sNcQNtB12tl0+IjyDHVZ9XxpYaBaD70/NHBc5xvo/nmt
-	G8NaVwywC81Zhu+CE7U0WoJPhtz+RF+1hXYDgMh6eM24JP4P3FVXr0yR77PjDrH8
-	DDihjoakKxpSfdBoVDfEzC6j4J5b2+0LJADkkJUNzPARjtimi807YDgCCs68K1fn
-	kNyL2LiDEfSkWCss+j6Yor4PfJn3mMUPSf+BVw/7GczvhSnMXqQozCmKRDc2JZR9
-	MvKJh0vHjxFgnjhvcC0hb3Nn+wnhZeFWaKnA2s1tfXQnYkKQpuz7JD7ozrZOoQMG
-	nLO86Q==
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com [209.85.210.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4dp4hagkcn-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Tue, 21 Apr 2026 09:38:55 +0000 (GMT)
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-82f9429f49cso4608847b3a.3
-        for <linux-crypto@vger.kernel.org>; Tue, 21 Apr 2026 02:38:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ma4xpiJG"
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-82f8b60e485so1663706b3a.0
+        for <linux-crypto@vger.kernel.org>; Tue, 21 Apr 2026 02:45:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1776764335; x=1777369135; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kuKADIxglKVMIrQFwjDtiXbSvLedvlz6B84TW8OPMsc=;
-        b=Gr9wc/O4nOxGeSMuwBs8M4zTVfwN56jKYcY/gz3tY+SuBsYB2N0yJuTx7jYSjwtog5
-         8lfMUnmyQr0ZJ0mPQyn7o2mRjFs+EJna3DcdnIXLlOG0w1J8eMSQxEmTURy8wzgIvXEU
-         vqSonwn9Vj8IS2rh7Mu0hdt5rU1l/HBuZSir71DoiMqkkkWXk6KCCIfSPwA+HUMFCSE9
-         TpW8P5LP/0tgILERJJWuEMrclQ+N81cqfD2QJq99loBdFux22lL78Wgbgo+xTdxM+Gk4
-         pH+Z2geDK+Gsrtx8oMhp9WMmMDeVLF004OjBO1V6mb26ECy5vwvy6FHjKYgaBpMfqBXe
-         3IAQ==
+        d=gmail.com; s=20251104; t=1776764705; x=1777369505; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eVBypKJw+Ak0MJauOtJvmP4dIZgy02ZaGmQO+Q25Zt4=;
+        b=ma4xpiJG43I3hFkAf0AS1AVWGTqa5YFZbKXKZP6v+rCDRvxVdjxZgEF+4bm2HlvS/u
+         VR64tGugpOjsQVoiHm1S/1+HtBjpAjPqaKZ8kMpM35e9Xab6asQagfOBmzTALQpRq3Sv
+         W6ALSBw68HzkxG40upRvgyoFU17uZMcnBY6PnsgfsyI4FdqmFzA19uEMaJ8xOIVJGaLl
+         a5O30xWkRvMhqg1vzpg4D92VlQYd5O5qwK7H3W/QM0PVU4Jnsp6YPafpqR2JG6Bf/NJ7
+         1yc1Xb37qGf2uOyRPMrlYeyPoUq+gVG/5PaD2PJMlAWl6Wsc6cSqWlITXS8cvFmPfHat
+         Kd/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776764335; x=1777369135;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kuKADIxglKVMIrQFwjDtiXbSvLedvlz6B84TW8OPMsc=;
-        b=QDGNUMAHDDTkI8Z0nsYxXhSH68wfaaytWbnZqNn9CtElxCy//p/31+PwGUz8vZhtIA
-         8J94vfdJ7e/2SBpvGmpr+Yndi0+LDLv0Imc9Xhnn9e3KjzdyW4ZzmgoHHkN27GQVH9iT
-         7dobJZphNB0WR4srdWo/SdXlw5KtPR77CbLJ6fzl2hAIQTDjefIsa6z51wlS/VM+f2WG
-         lPDxCu+ctdua+2IbXFMagt4Fn33rpnkFtPOozkvIya3dW3d0Vn47KBTPfGuKkeaw7eNC
-         AsDD9fHnjzsSJSgGu1gR1FuE+hNPw/MiGKc/N0kC3T7rtZsDwgnTwhVVO2WoOzXHaCID
-         iXyA==
-X-Forwarded-Encrypted: i=1; AFNElJ8NnkyjNVOMmMh8WkeBxeaDniWTeNVJNYxUxUGOjyu56jp5AERlTtj9lsoieiH526uTtVYao3CAdgtvV5I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhFrVUkscfnHy7FHHNCP6Gb5ZBWrWaG6Qwz3KTlY7TytpdDXz9
-	DT10+3T+EaeSiCiUJMDGDGIXyn59QufKlOMb+g+WMw0kjcQkoUnjhkNpkO4c0NkxKatFk1Oz5LR
-	JkxOtEBLlrXaXInpNOieFhkjkzVQz5AAYg8uG441JYP8YtYcZw75NTbNfQjH5/dddMiA=
-X-Gm-Gg: AeBDietj4signBMzpbFMSqENDns5rkzsWF3KTztfjQ0Sugi286bfqx6+rc+p+XVJaNf
-	msDOBT+R35CcyYzYzeBoE8XnYUw+cZjUSrn14tOF3iM8b5yvhHu9xLpwcmcHGOTsy4Vxf5Doa7n
-	cwh/BGairojq8CgTgZkRmY+EzLeJ3m55adjKnLnOfAP8ATNDi2RVnMY9GY7WY+ynkxjzax0eOAr
-	M1ok6N/isKK60rr5TMuTAGRZt36GSewl+0y1B2X+9pEIZJsondHT4ysHY7wV92QVgH8Vk0CVNjk
-	8tbmiH3COiiTQCbQQQb7EhRsxVjYMKvl+3sxFLf5cAAynKT05+8I/83zUG2cebyuLc7YBO5GgYG
-	Gfv/97skFsoW5j2U2UWi/h67qKS9nd/66u3vifRd507eKp33JahSwDPhG81Kaqf8=
-X-Received: by 2002:a05:6a00:e1a:b0:82f:2a78:6302 with SMTP id d2e1a72fcca58-82f8c9027b0mr19301345b3a.26.1776764334975;
-        Tue, 21 Apr 2026 02:38:54 -0700 (PDT)
-X-Received: by 2002:a05:6a00:e1a:b0:82f:2a78:6302 with SMTP id d2e1a72fcca58-82f8c9027b0mr19301319b3a.26.1776764334499;
-        Tue, 21 Apr 2026 02:38:54 -0700 (PDT)
-Received: from [10.218.21.127] ([202.46.22.19])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f8ebcc9easm17161300b3a.39.2026.04.21.02.38.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Apr 2026 02:38:54 -0700 (PDT)
-Message-ID: <e9068e98-1d6e-4cb8-8885-aa5831407b3a@oss.qualcomm.com>
-Date: Tue, 21 Apr 2026 15:08:43 +0530
+        d=1e100.net; s=20251104; t=1776764705; x=1777369505;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eVBypKJw+Ak0MJauOtJvmP4dIZgy02ZaGmQO+Q25Zt4=;
+        b=JEzizF+dAfkhdCDRfMDy20gTiKnvJtUFTI0y3en3nQkPl/5yS14nu7AM80zOzn/xWU
+         4NQmor0jZDIHpT/lv3r/bbU67xcMNWs2GmScQJ7zbKJzmX2e8mZ33agyLNehjblnCqeh
+         wIzsI6PRNUAfO98WI0XJWIbQC2xGXjydNDWUcsxFS+hoeq8NctfavXsPwiwlCYvZdBln
+         3I3iBX4lECuYQN6qdC50xcAx74xgEyU1scYFvS594BmRpG+S3wSRJAzBQtz9PIN0TU1x
+         mJ1K4pG0RdfP9nfKNnJz3mDM1wF7yu9Tz+KaWjwKCFKzb/HDp4M6nsg0pv+i+++ffVcd
+         ecRw==
+X-Gm-Message-State: AOJu0YxGqj2GxJIioBqc5ZsFSJwZRC5s1l2mIiEERv9PLPY/MvB9GE7H
+	lKUqhrMnjtb3RRoIZK7VMWJQd7/L5yhPsXzxmlSBNJgHtM7ddEDP5UmS
+X-Gm-Gg: AeBDietf+jnhfC0k2F7ebeVADVZ574GuwSowXYHN3jGPQC2BHPrNuy1dqz47ELh94vr
+	81JKszPD2lMdZtY83k7K14LeA3DqYWincOmnAKrUVwHKQyfKrx5rWGOECdI5uP5wV4aJztZzm68
+	2YXQTYZ765gHmi5Yhg8USIKs6o/61/HN+bpyWMbypoT4qXAcgFjE/Qan0l3wCwd0ex1pbIeCfdw
+	7phrwEgrxTS9ath73vRuXlP5bpF0zCmngLC6QUvYjjo5KsujlzMM5cA4HmrLkGpgIP1ffNsAnwS
+	/QioaPZVtCEwvMfvKQNoAHaHzQPkaXE8ZhO/hHd7AcY2JGkPbi9pUq7lRBmG5Ysj4xconT23q4e
+	PfJhMdqNl4qu47rh2eb+v1DedRQDk6vUjQ+cKeplyuFvqi9LL/IvhOA/HIBjtBSDw9jU+R2iL10
+	Cxb0Vp+y9FGKz2+QXvPbuiPWuatCH4/kyGb/3was7KgalsVTiuKAdtvMNKRUU/2IU=
+X-Received: by 2002:a05:6a00:2d03:b0:829:9f46:280d with SMTP id d2e1a72fcca58-82f8c87db23mr17788188b3a.1.1776764704749;
+        Tue, 21 Apr 2026 02:45:04 -0700 (PDT)
+Received: from LAPTOP-CUCB24GH.tail9a93e7.ts.net ([175.159.176.252])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-82f8ebb3fa2sm13292215b3a.29.2026.04.21.02.45.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Apr 2026 02:45:04 -0700 (PDT)
+From: Ruoyu Wang <ruoyuw560@gmail.com>
+To: clabbe@baylibre.com,
+	linusw@kernel.org,
+	kaloz@openwrt.org,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Ruoyu Wang <ruoyuw560@gmail.com>
+Subject: [PATCH] crypto: ixp4xx: Fix null-pointer dereference in chainup_buffers()
+Date: Tue, 21 Apr 2026 17:39:17 +0800
+Message-ID: <20260421093917.1001688-1-ruoyuw560@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 13/13] arm64: dts: qcom: eliza: Add power-domain and
- iface clk for ice node
-To: Harshal Dev <harshal.dev@oss.qualcomm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
- <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Abel Vesa <abel.vesa@oss.qualcomm.com>,
-        Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>,
-        cros-qcom-dts-watchers@chromium.org,
-        Eric Biggers <ebiggers@google.com>,
-        Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
-        Jingyi Wang <jingyi.wang@oss.qualcomm.com>,
-        Tengfei Fan <tengfei.fan@oss.qualcomm.com>,
-        Bartosz Golaszewski <brgl@kernel.org>,
-        David Wronek <davidwronek@gmail.com>,
-        Luca Weiss <luca.weiss@fairphone.com>,
-        Neil Armstrong <neil.armstrong@linaro.org>,
-        Melody Olvera <quic_molvera@quicinc.com>,
-        Alexander Koskovich <akoskovich@pm.me>,
-        Abel Vesa <abelvesa@kernel.org>
-Cc: Brian Masney <bmasney@redhat.com>,
-        Neeraj Soni <neeraj.soni@oss.qualcomm.com>,
-        Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
-References: <20260416-qcom_ice_power_and_clk_vote-v5-0-5ccf5d7e2846@oss.qualcomm.com>
- <20260416-qcom_ice_power_and_clk_vote-v5-13-5ccf5d7e2846@oss.qualcomm.com>
-Content-Language: en-US
-From: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
-In-Reply-To: <20260416-qcom_ice_power_and_clk_vote-v5-13-5ccf5d7e2846@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Authority-Analysis: v=2.4 cv=bOQm5v+Z c=1 sm=1 tr=0 ts=69e745af cx=c_pps
- a=WW5sKcV1LcKqjgzy2JUPuA==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
- a=IkcTkHD0fZMA:10 a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=Um2Pa8k9VHT-vaBCBUpS:22
- a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8 a=oL6z003X9diVxq0giesA:9 a=3ZKOabzyN94A:10
- a=QEXdDO2ut3YA:10 a=OpyuDcXvxspvyRM73sMx:22
-X-Proofpoint-GUID: QqbQWSs_HdKe19e7KQ_0VIA8W3eVsJYr
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDIxMDA5NCBTYWx0ZWRfX74qG0VnX+jb8
- E8FD/GoN5oIn02SmzUexZrIqDh/OL4OyQNhrXn6UwbdXIWfFpjGSr1Zz8/cBS64w4DxDlUdR2pp
- FnXlqZ+rMeH+EJCad64uN5seRXp/MH5lwnSQHPbxjmJWDwLNcQ6nRETpzjnnTW5h2AppqO+Jd4i
- BrsxzFa/2PBrifpef7iX5TilkngqAhDBmuUgqJNC3IdcYth1uCVM5vluPxlJGmYucnJAMHEA+5n
- KxSFS1SQ3/LxxVrSBorwV0WdPbQW+Lu2Sej/Kcjx3bQsGYk3FbXse60k8MiPyaMz2ajFwQJPuZO
- oo5haflwb+LYEN883gbN3/KcKfBzcpMa+ljKFb5yJxbwEVat7YS0kTr9J2nFZDxIpt8ZIkQjMZo
- kknws4kga4Wv8L3SMb1q26NODu8/z5/w5a8IyakwpMpiJK+/c1sguqCAFNHAXfFOJFlWl/hjria
- Uonnl/rp9zPUOmNUHlQ==
-X-Proofpoint-ORIG-GUID: QqbQWSs_HdKe19e7KQ_0VIA8W3eVsJYr
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-21_02,2026-04-20_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 spamscore=0 malwarescore=0 bulkscore=0 priorityscore=1501
- clxscore=1015 impostorscore=0 lowpriorityscore=0 adultscore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2604070000 definitions=main-2604210094
 
-On 16-04-2026 17:29, Harshal Dev wrote:
-> Qualcomm in-line crypto engine (ICE) platform driver specifies and votes
-> for its own resources. Before accessing ICE hardware during probe, to
-> avoid potential unclocked register access issues (when clk_ignore_unused
-> is not passed on the kernel command line), in addition to the 'core' clock
-> the 'iface' clock should also be turned on by the driver. This can only be
-> done if the GCC_UFS_PHY_GDSC power domain is enabled. Specify both the
-> GCC_UFS_PHY_GDSC power domain and the 'iface' clock in the ICE node for
-> eliza.
-> 
-> Fixes: af20af39fc09b ("arm64: dts: qcom: Introduce Eliza Soc base dtsi")
+chainup_buffers() builds a linked list of buffer descriptors for a
+scatterlist. If dma_pool_alloc() fails while constructing the list, the
+current code sets buf to NULL and later dereferences it unconditionally
+at the end of the function:
 
-On thing I noticed in entire patchseries,
-https://docs.kernel.org/process/submitting-patches.html
-"""
-If your patch fixes a bug in a specific commit, e.g. you found an issue 
-using git bisect, please use the ‘Fixes:’ tag with at least the first 12 
-characters of the SHA-1 ID, and the one line summary. Do not split the 
-tag across multiple lines, tags are exempt from the “wrap at 75 columns” 
-rule in order to simplify parsing scripts. For example:
+  buf->next = NULL;
+  buf->phys_next = 0;
 
-Fixes: 54a4f0239f2e ("KVM: MMU: make kvm_mmu_zap_page() return the 
-number of pages it actually freed")
-"""
+This can lead to a null-pointer dereference on allocation failure.
 
-Fixes tag need atleast 12 chars and I see other submissions specifying 
-12 chars whereas this series specify 13 chars.
-Not sure if there's some hard rule on this.
+If the failure happens after part of the descriptor chain has already
+been allocated and DMA-mapped, the partially constructed chain also
+needs to be released.
 
-Other than that,
-Reviewed-by: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
+Fix this by unwinding the partially constructed chain, resetting the
+caller-provided hook descriptor, and returning NULL on allocation
+failure.
 
+Signed-off-by: Ruoyu Wang <ruoyuw560@gmail.com>
+---
+ drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c | 24 +++++++++++++++++----
+ 1 file changed, 20 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c b/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c
+index fcc0cf4df637..63ef28cd5766 100644
+--- a/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c
++++ b/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c
+@@ -874,6 +874,11 @@ static struct buffer_desc *chainup_buffers(struct device *dev,
+ 		struct buffer_desc *buf, gfp_t flags,
+ 		enum dma_data_direction dir)
+ {
++	struct buffer_desc *first = buf;
++
++	first->next = NULL;
++	first->phys_next = 0;
++
+ 	for (; nbytes > 0; sg = sg_next(sg)) {
+ 		unsigned int len = min(nbytes, sg->length);
+ 		struct buffer_desc *next_buf;
+@@ -883,10 +888,15 @@ static struct buffer_desc *chainup_buffers(struct device *dev,
+ 		nbytes -= len;
+ 		ptr = sg_virt(sg);
+ 		next_buf = dma_pool_alloc(buffer_pool, flags, &next_buf_phys);
+-		if (!next_buf) {
+-			buf = NULL;
+-			break;
+-		}
++		if (!next_buf)
++			goto err_unwind;
++
++		/*
++		 * Keep the chain well-formed even on partial construction,
++		 * so free_buf_chain() can safely unwind it on failure.
++		 */
++		next_buf->next = NULL;
++		next_buf->phys_next = 0;
+ 		sg_dma_address(sg) = dma_map_single(dev, ptr, len, dir);
+ 		buf->next = next_buf;
+ 		buf->phys_next = next_buf_phys;
+@@ -899,6 +909,12 @@ static struct buffer_desc *chainup_buffers(struct device *dev,
+ 	buf->next = NULL;
+ 	buf->phys_next = 0;
+ 	return buf;
++
++err_unwind:
++	free_buf_chain(dev, first->next, first->phys_next);
++	first->next = NULL;
++	first->phys_next = 0;
++	return NULL;
+ }
+ 
+ static int ablk_setkey(struct crypto_skcipher *tfm, const u8 *key,
 -- 
-Regards
-Kuldeep
-
+2.43.0
