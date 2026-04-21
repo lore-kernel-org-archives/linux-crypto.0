@@ -1,85 +1,87 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1654F359A90
-	for <linux-crypto@vger.kernel.org>; Tue, 21 Apr 2026 21:27:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FFB8259CB9;
+	Tue, 21 Apr 2026 23:11:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776806825; cv=none; b=HsHPuQoYOQU+PnDO0kIVj06yXhOM2kLD0DL8tOKreP+lJN7ewaxSVS7vr/Mi00q955WCS5FYNe7Etuugcnsit1CfJqvJaP+VS1mtZGSv9q0PHzq2TyfXt3HtHOTy+jWG8YfjAWnP3xhiDmnu4o6N3/97VAgds5njs28xomdyb24=
+	t=1776813065; cv=none; b=VdIkdTSDn/F1k4KrGNRE3+E+rPYK6gsJB17EA2M+EkAz9+vp6C4ChF9j+/LhKjA6ALblh+5Y9//FPZu9bbdeScko/8dnaczKeDGwQAWn94Lm8Y1+OANgzl7oiLSnbClHJEfL/c5YKNG/TbQtOC2CkNMXjew/SjlJ+wHrgFnTbtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776806825; c=relaxed/simple;
-	bh=g9tLlWXToaYb9ToizB8ZRA3waTp4yCz8Brvd7xZBe/M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LoYrL0+15+qtWq5SlehtHK81o4qW+TZXBBpzbnavTRZ37IcqrKurwoqsmadk9zBkjAhsI72KZjrsAQfbk9qHI3ESS4Kae3bkhJl/XskQXnJRFubBG3JNxEcEGjZ0nwAL6Nprc5YjrnlCASAqi1Rji4U7rTNomh5zxTVMXicuuOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kWi9sPJi; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1776813065; c=relaxed/simple;
+	bh=k1Y89x6vauq6r41+hR0VuphbGfZpf7XIWoDpwB7PiRQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=nhscntThRCm0ZbcAN+bdXLI1BNw8SSe4Y6dn3ZIl2sbyeurhPuEQihBztaYybWDhqzA8868tOuUKVBzmYSQemia8vj/Y80+5QAnJ7xAupfN1lG5bOM3gjRLKQm/oTK77Js3oNmZVqF30E1rf/8cR9l6Q8GFk0DLBFXNJ5A6+VrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PavNffL8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kWi9sPJi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF6B3C2BCB0;
-	Tue, 21 Apr 2026 21:27:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PavNffL8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA736C2BCB7;
+	Tue, 21 Apr 2026 23:11:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1776806824;
-	bh=g9tLlWXToaYb9ToizB8ZRA3waTp4yCz8Brvd7xZBe/M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kWi9sPJim4LGY520wI2aKUYmGG5I938y1TNnZWSqXbKQSTj8uEFZboCdBsGkgyRJ9
-	 r5ARqot0FnOUjS7FmKWGMFA87cyB5H5JnFxTzldDr5QlFEdOMJGS23FA9vhs5XKiTz
-	 akqch9PN745HmdTOu9Brt/QCV32kOWZAIgN0xjL/zIefXKIyEm8Q4fnlib5e+3pzUl
-	 HRKtEi65Wg30BBCV+jYwC9oFDIm1cjZg0+GQnrvU0veg6AEWlS09WQIn1dWUPvZwDH
-	 iV91gDS6vdxbRI/sA/RnaaB/hIRLIlNGuaME+RQnhSyhnhPicwKaGsiy183TpYCGbF
-	 3DXE4edb7IRrw==
-Date: Tue, 21 Apr 2026 14:27:01 -0700
+	s=k20201202; t=1776813065;
+	bh=k1Y89x6vauq6r41+hR0VuphbGfZpf7XIWoDpwB7PiRQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=PavNffL8zOfrSkzfPb2oq+6AJnonUdjxofiaNxgG9kGi67eSk6ON71RED/IE+jolD
+	 Vs+SrWzgctevxYMSxjg5/TX9mvJXtJSTj3u4wIoKn6OarJ1mB4YthokCv7LhUCte+B
+	 Cp4C8OwzR6DnedBnMjJLhCvgZV2yVgMaZSAxHrM4GT7raNtHyDCwvPB4PVuqDI2aG+
+	 LRKtGhh/jq4owKvA5z/mSDIxT6AfsVmZ039sOClAhWKbt3SlUCr3cW93nBimoVQmMT
+	 DBkBl7xWR2GzoEBWVPtdp8KQPQlEa0iEdwTnDrdIGr1mGxhMzZpsHwJT2PakvGrUk/
+	 eKHPqSga3qoHw==
 From: Eric Biggers <ebiggers@kernel.org>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: Ren Wei <n05ec@lzu.edu.cn>, linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
-	yuantan098@gmail.com, yifanwucs@gmail.com, tomapufckgml@gmail.com,
-	bird@lzu.edu.cn, z1652074432@gmail.com, kanolyc@gmail.com
-Subject: Re: [PATCH 1/1] crypto: authencesn: reject short ahash digests
- during instance creation
-Message-ID: <20260421212701.GA37143@quark>
-References: <cover.1775217403.git.kanolyc@gmail.com>
- <cb1188757edab9b056961d4d2441be009ac73ce8.1775217403.git.kanolyc@gmail.com>
- <fd3a1c5d-8ebf-48de-91a0-019b05f1dc41@app.fastmail.com>
+To: linux-bluetooth@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH v2 1/2] Bluetooth: Remove unneeded crypto kconfig selections
+Date: Tue, 21 Apr 2026 16:09:16 -0700
+Message-ID: <20260421230917.7057-2-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260421230917.7057-1-ebiggers@kernel.org>
+References: <20260421230917.7057-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fd3a1c5d-8ebf-48de-91a0-019b05f1dc41@app.fastmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Apr 20, 2026 at 11:21:54AM +0200, Ard Biesheuvel wrote:
-> > diff --git a/crypto/authencesn.c b/crypto/authencesn.c
-> > index 542a978663b9..bf44f035f7f8 100644
-> > --- a/crypto/authencesn.c
-> > +++ b/crypto/authencesn.c
-> > @@ -384,6 +384,11 @@ static int crypto_authenc_esn_create(struct 
-> > crypto_template *tmpl,
-> >  		goto err_free_inst;
-> >  	enc = crypto_spawn_skcipher_alg_common(&ctx->enc);
-> > 
-> > +	if (auth->digestsize > 0 && auth->digestsize < 4) {
-> > +		err = -EINVAL;
-> > +		goto err_free_inst;
-> > +	}
-> > +
-> 
-> Is this the best place for this check?
+Remove several kconfig selections that are no longer needed:
 
-I probably would have put it a few lines earlier, right after the line
-'auth_base = &auth->base;'.  But this works too.
+  - CRYPTO_SKCIPHER and CRYPTO_ECB have been unneeded since
+    commit a4770e1117f1 ("Bluetooth: Switch SMP to
+    crypto_cipher_encrypt_one()") in 2016.
 
-Reviewed-by: Eric Biggers <ebiggers@kernel.org>
+  - CRYPTO_SHA256 has been unneeded since
+    commit e7b02296fb40 ("Bluetooth: Remove BT_HS") in 2024.
 
-Of course, while this patch needs to be applied, this also doesn't go
-nearly far enough.
-https://lore.kernel.org/linux-crypto/20260420094120.5167-1-ardb@kernel.org/
-removes the so-called "cipher_null", which has no reason to exist.
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ net/bluetooth/Kconfig | 3 ---
+ 1 file changed, 3 deletions(-)
 
-But "authencesn" itself should not be exposed to AF_ALG, let alone exist
-in its current form at all.  The IPsec sequence numbers should just be
-handled internally in the IPsec code itself.  That would be simpler and
-more efficient, with much less UAPI surface as well.
+diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+index 6b2b65a66700..8bd0f2891161 100644
+--- a/net/bluetooth/Kconfig
++++ b/net/bluetooth/Kconfig
+@@ -7,16 +7,13 @@ menuconfig BT
+ 	tristate "Bluetooth subsystem support"
+ 	depends on !S390
+ 	depends on RFKILL || !RFKILL
+ 	select CRC16
+ 	select CRYPTO
+-	select CRYPTO_SKCIPHER
+ 	select CRYPTO_LIB_AES
+ 	imply CRYPTO_AES
+ 	select CRYPTO_CMAC
+-	select CRYPTO_ECB
+-	select CRYPTO_SHA256
+ 	select CRYPTO_ECDH
+ 	help
+ 	  Bluetooth is low-cost, low-power, short-range wireless technology.
+ 	  It was designed as a replacement for cables and other short-range
+ 	  technologies like IrDA.  Bluetooth operates in personal area range
+-- 
+2.53.0
 
-- Eric
