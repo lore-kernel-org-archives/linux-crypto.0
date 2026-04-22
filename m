@@ -1,146 +1,126 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 403123D1CC6;
-	Wed, 22 Apr 2026 12:49:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [4.193.249.245])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDADC21CC58
+	for <linux-crypto@vger.kernel.org>; Wed, 22 Apr 2026 13:52:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=4.193.249.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776862176; cv=none; b=E43IMzDGUqcxNaCTUpUSV7gf7kOpprHgnFmi42OvWl7KXj/kV/Wtvj3TFcwP3Dw3gsmw86+ZmfaCWpsIUesWnXA6kSyoqAwnRbjmIUMsgZYETvNaXSqXheTUOvdVeZKOszz29vLU+p7FW97yD+3hZNvdVHTY8LK1ktld/xcRW8I=
+	t=1776865952; cv=none; b=TTbnnBJaI+6xEx2TkBiWwulPpzdIvmwcH+a56RoZEBstUSsfg0pjlWcLxWT80ZS+M6tu6RfAdtDkrmu4ZZipLpawm10SD9VHmQzLXquBb0g3ROwKa5jlzNvVICG49RSGlZIbASKskIyaDsRDgDI5d3x2eCYB15NdE/LGe7+y9U0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776862176; c=relaxed/simple;
-	bh=U3O93oO267WN/RC/JB6fnOzeqtpjhZzlWVU5HnsJ69I=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=YEeSKI/Q+jxFjvRfMOa21soPDR6c8Q6bO0qsOY30KDgL8rcqd9ITPWDGM8cnILehThwbZ8Xs3MVGErcKgICKEdvFx/OodB9ClThlY8GQwIiA5RV0TdMPaQCvx9thcztLAc+5AECY2zqRnRNfMOhOd6zrvCOR4kXux0TisiOm7Ow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=O3RM0N6E; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="O3RM0N6E"
-Received: from [127.0.1.1] (unknown [52.179.129.152])
-	by linux.microsoft.com (Postfix) with ESMTPSA id DF16820B6F01;
-	Wed, 22 Apr 2026 05:49:33 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com DF16820B6F01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1776862175;
-	bh=p44cSbI9ojfU2tdH6qP4ry3HyO5ReEpQUeVPNbJdJzY=;
-	h=From:Date:Subject:To:Cc:From;
-	b=O3RM0N6EpJIHq08SQ89lMIFxMPMjNDBI+f5c6Upxdy5vjkd0JUY8+gHshTG9sw3GV
-	 nTCQROVqANQjZjmOjXZCGycVTFWArh78AM+/b39x8fhF8Ig8wv3QmT2WiLZLsbnaos
-	 Iuhfiairepl9YVg5XV7Zn3ojwiaWblA/XIhezySA=
-From: jeffbarnes@linux.microsoft.com
-Date: Wed, 22 Apr 2026 08:49:30 -0400
-Subject: [PATCH] crypto: testmgr - disallow RSA PKCS#1 SHA-1 sig algs in
- FIPS mode
+	s=arc-20240116; t=1776865952; c=relaxed/simple;
+	bh=EBQlPHkXBlahtLFyvcfHRJB5z3CutNGz99H++VVtZtI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=pxDdNSj4Jz4rv7cN86OsCxNbRfjWE1+E8VJSn1NB54Ce8lNTJxzkSATW/F235QlcnKHe/sqio24A17C/SEM5uNr0+6gZk6q7PSko/wTS2OFbHkgExyk44yAbS1O2SjQxsG5R8YD+NFeshIlNJCVzOVbuEkvzvBE8Tm55EpntHeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=4.193.249.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
+Received: from enjou-Legion-Y7000P-2019.coin-barley.ts.net (unknown [172.23.56.36])
+	by app1 (Coremail) with SMTP id ygmowABXzv6L0uhpOsvaAA--.16669S2;
+	Wed, 22 Apr 2026 21:52:12 +0800 (CST)
+From: Ren Wei <n05ec@lzu.edu.cn>
+To: linux-crypto@vger.kernel.org
+Cc: herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	ardb@kernel.org,
+	yifanwucs@gmail.com,
+	tomapufckgml@gmail.com,
+	yuantan098@gmail.com,
+	bird@lzu.edu.cn,
+	z1652074432@gmail.com,
+	ebiggers@kernel.org,
+	kanolyc@gmail.com,
+	n05ec@lzu.edu.cn
+Subject: [PATCH v2 1/1] crypto: authencesn: reject short ahash digests during instance creation
+Date: Wed, 22 Apr 2026 21:45:04 +0800
+Message-ID: <cb1188757edab9b056961d4d2441be009ac73ce8.1775217403.git.kanolyc@gmail.com>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <cover.1775217403.git.kanolyc@gmail.com>
+References: <cover.1775217403.git.kanolyc@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20260422-disallow_rsa_sha1_signing_in_fips_mode-v1-1-1359bc7d41be@microsoft.com>
-X-B4-Tracking: v=1; b=H4sIANnD6GkC/x3N0QrCMAxA0V8ZebawhTnUXxEJmU27wExHAyqM/
- bvFx/Ny7w4uVcXh1u1Q5a2uxRqGUwfPhS1L0NgM2OPUj4ghqvO6lg9VZ/KFB3LNppZJjZJuTq8
- SJVzSPE+IV47nEVpsq5L0+x/dH8fxA5f263x4AAAA
-To: Herbert Xu <herbert@gondor.apana.org.au>, 
- "David S. Miller" <davem@davemloft.net>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>
-Cc: linux-crypto@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- Jeff Barnes <jeffbarnes@microsoft.com>, 
- Jeff Barnes <jeffbarnes@linux.microsoft.com>
-X-Mailer: b4 0.13.0
+X-CM-TRANSID:ygmowABXzv6L0uhpOsvaAA--.16669S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxWFy5JrWftrWxXry7urWfXwb_yoW5Jw13pa
+	y3GrsFqrykJrWxGFykJw1IqF47JF4DJF13WFWv9w1Yv3WDZr1xtw42yFWIvF1UZFs5CFWj
+	yFWqvryUXw4DAaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBY1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+	IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2
+	z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcV
+	Aq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j
+	6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
+	vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0E
+	n4kS14v26r1q6r43MxkIecxEwVCm-wCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6c
+	x26r48MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCj
+	r7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6x
+	IIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAI
+	w20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x
+	0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
+X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQsFCWnoi2EEtwABsf
+Message-ID: <20260422134504.jNOSdsNJTKN7W220mOJdfsJnW6s9-m54TjzHROVM-28@z>
 
-From: Jeff Barnes <jeffbarnes@microsoft.com>
+From: Yucheng Lu <kanolyc@gmail.com>
 
-When booted with fips=1, RSA signature generation using SHA-1 must not be
-available.  However, pkcs1pad(rsa,sha1) can currently be instantiated
-because it is not present in alg_test_descs; alg_test() falls through the
-no_test path and succeeds, after which the algorithm appears in /proc/crypto
-as fips-capable. 【1-ebd9df】
+authencesn requires either a zero authsize or an authsize of at least
+4 bytes because the ESN encrypt/decrypt paths always move 4 bytes of
+high-order sequence number data at the end of the authenticated data.
 
-Add explicit alg_test_descs entries for pkcs1pad(rsa,sha1) and pkcs1(rsa,sha1)
-without marking them fips_allowed, so they are treated as not FIPS-allowed
-when fips=1 is enabled.
+While crypto_authenc_esn_setauthsize() already rejects explicit
+non-zero authsizes in the range 1..3, crypto_authenc_esn_create()
+still copied auth->digestsize into inst->alg.maxauthsize without
+validating it.  The AEAD core then initialized the tfm's default
+authsize from that value.
 
-Include both names to cover kernels where RSA sign/verify is provided via
-the pkcs1(...) signature template, while pkcs1pad(...) remains for the
-traditional wrapper naming and/or RSAES operations. 【2-17cc14】
+As a result, selecting an ahash with digest size 1..3, such as
+cbcmac(cipher_null), exposed authencesn instances whose default
+authsize was invalid even though setauthsize() would have rejected the
+same value.  AF_ALG could then trigger the ESN tail handling with a
+too-short tag and hit an out-of-bounds access.
 
-Signed-off-by: Jeff Barnes <jeffbarnes@linux.microsoft.com>
+Reject authencesn instances whose ahash digest size is in the invalid
+non-zero range 1..3 so that no tfm can inherit an unsupported default
+authsize.
+
+Fixes: f15f05b0a5de ("crypto: ccm - switch to separate cbcmac driver")
+Cc: stable@kernel.org
+Reported-by: Yifan Wu <yifanwucs@gmail.com>
+Reported-by: Juefei Pu <tomapufckgml@gmail.com>
+Co-developed-by: Yuan Tan <yuantan098@gmail.com>
+Signed-off-by: Yuan Tan <yuantan098@gmail.com>
+Suggested-by: Xin Liu <bird@lzu.edu.cn>
+Tested-by: Yuhang Zheng <z1652074432@gmail.com>
+Reviewed-by: Eric Biggers <ebiggers@kernel.org>
+Signed-off-by: Yucheng Lu <kanolyc@gmail.com>
+Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
 ---
-This series fixes an issue where SHA-1 RSA signature generation remains
-available when booted with fips=1.
+changes in v2:
+  - move the short digest size check to immediately after
+    auth_base = &auth->base;
+  - add Reviewed-by from Eric Biggers
+  - fix the stable@kernel.org address typo
+  - Link: https://lore.kernel.org/all/cb1188757edab9b056961d4d2441be009ac73ce8.1775217403.git.kanolyc@gmail.com/
 
-On a FIPS-enabled system, pkcs1pad(rsa,sha1) can be instantiated even
-though SHA-1 must not be available for signature generation. The reason
-is that the algorithm is not listed in crypto/testmgr.c's alg_test_descs,
-so alg_test() falls through the no_test path and succeeds. Once
-instantiated, /proc/crypto reports the algorithm as "fips: yes".
+ crypto/authencesn.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-This patch adds explicit alg_test_descs entries for:
-
-  - pkcs1pad(rsa,sha1)
-  - pkcs1(rsa,sha1)
-
-without setting fips=1, so they are treated as not FIPS-allowed in
-FIPS mode.
-
-Both names are covered to handle kernels where RSA signature operations
-are provided via the pkcs1(...) signature template, while pkcs1pad(...)
-remains for the historical wrapper naming and/or RSAES operations.
-
-Reproducer / evidence (current behavior):
-  1) Boot with fips=1 (confirm /proc/sys/crypto/fips_enabled == 1)
-  2) Allocate the transform:
-       crypto_alloc_akcipher("pkcs1pad(rsa,sha1)", 0, 0)
-  3) Observe that /proc/crypto now contains:
-       name   : pkcs1pad(rsa,sha1)
-       fips   : yes
-       selftest: passed
-  4) A simple in-kernel demo module can instantiate the transform and reach
-     the signing path in FIPS mode.
-
-With this change, attempts to instantiate these SHA-1 RSA signing
-templates in FIPS mode are rejected, preventing SHA-1 signature
-generation in approved mode.
-
-Thanks for taking a look.
-
-Signed-off-by: Jeff Barnes <jeffbarnes@microsoft.com>
----
- crypto/testmgr.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 30671e7bc349..e54d298a26c1 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -5306,6 +5306,9 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		.suite = {
- 			.sig = __VECS(pkcs1_rsa_none_tv_template)
- 		}
-+	}, {
-+		.alg = "pkcs1(rsa,sha1)",
-+		.test = alg_test_null,
- 	}, {
- 		.alg = "pkcs1(rsa,sha224)",
- 		.test = alg_test_null,
-@@ -5341,6 +5344,9 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		.alg = "pkcs1pad(rsa)",
- 		.test = alg_test_null,
- 		.fips_allowed = 1,
-+	}, {
-+		.alg = "pkcs1pad(rsa,sha1)",
-+		.test = alg_test_null,
- 	}, {
- 		.alg = "rfc3686(ctr(aes))",
- 		.generic_driver = "rfc3686(ctr(aes-lib))",
-
----
-base-commit: 8879a3c110cb8ca5a69c937643f226697aa551d9
-change-id: 20260422-disallow_rsa_sha1_signing_in_fips_mode-8fbb6229ad54
-
-Best regards,
+diff --git a/crypto/authencesn.c b/crypto/authencesn.c
+index 542a978663b9..f6ac9eefc7d9 100644
+--- a/crypto/authencesn.c
++++ b/crypto/authencesn.c
+@@ -378,6 +378,11 @@ static int crypto_authenc_esn_create(struct crypto_template *tmpl,
+ 	auth = crypto_spawn_ahash_alg(&ctx->auth);
+ 	auth_base = &auth->base;
+ 
++	if (auth->digestsize > 0 && auth->digestsize < 4) {
++		err = -EINVAL;
++		goto err_free_inst;
++	}
++
+ 	err = crypto_grab_skcipher(&ctx->enc, aead_crypto_instance(inst),
+ 				   crypto_attr_alg_name(tb[2]), 0, mask);
+ 	if (err)
 -- 
-Jeff Barnes <jeffbarnes@microsoft.com>
+2.47.3
 
