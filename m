@@ -1,72 +1,71 @@
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2319346E66
-	for <linux-crypto@vger.kernel.org>; Wed, 22 Apr 2026 18:16:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55DE437F75E
+	for <linux-crypto@vger.kernel.org>; Wed, 22 Apr 2026 18:19:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776881821; cv=none; b=CB1iusV6fIzwyuHiNM/VPKPrSNH1RALyY2HcsW1TXS3+YAIt/0z8aXlZ/sSUwc2KheMOzUgDPGhzHkaQaDFxNWl/F0W2pFngl83wAfoj692t3wlxrzh99gC4fLLeEIl9La7L8TKXQOKmwukRTiXHKKkKEOo7Shrz9f9tBWYQFeI=
+	t=1776881974; cv=none; b=bKUfCsitSotXED3UErq+oCtYJ3ssLvtMGOOiyr28bIxM6EYPE5pZpYteNdtEqU1tqwaR0JO8D+1BYphUI7jr4EeYtqjRi82Oy6t1bkgZvKUn44SKqjfKMn1OsakS4L5PcBwn9jasbYy4ZtX9a8ng8DNGmexLzkC4BQnjQwzBtAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776881821; c=relaxed/simple;
-	bh=UKlkHzICRJHH/6Jan3cAogPFr780ywC4cRf5Em855q4=;
+	s=arc-20240116; t=1776881974; c=relaxed/simple;
+	bh=+Sfz/TbuXN6WiyV2mcY8E9Mqa6jAyuKik5u4nGTPy9w=;
 	h=Date:From:To:CC:Subject:In-Reply-To:Message-ID:MIME-Version:
-	 Content-Type; b=bxw1V9WWsC/SVPmVYy0fbO/AtWNXZNGG1kBZKYb8fw8Kb94HnqtP/7ZmVLBKlPpqrZalYiIwosJ8EfTyLwhtX4MKXni0Pp5WoZ00b/WsNNqwCRJOgf/hQEnVNt1Lkr8z7U5jjnbHDQpjfIRSpi1ekdZ2ReEcPBFrPkrYuj2wPaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Au/LcE5i; arc=none smtp.client-ip=209.85.128.176
+	 Content-Type; b=uoLV2BeIqmwkQOh/IhytiH4IKYwgTX0H8iVaFSMU8JAvYlVlfmmfNzDoiPUDX4I2AstvM+87lnVZthPbb5MUmUtjLWH7Dcvh2IIjsroDfrdtHTtgmts+vJs410dQ4+/DRhHaA94wTUjUCECepKJISn5oqDw2TTO/TIHDjwf6wNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rZxMsqNE; arc=none smtp.client-ip=209.85.218.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Au/LcE5i"
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-7986e538decso58458437b3.1
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Apr 2026 11:16:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rZxMsqNE"
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-ba67b332bbaso611564766b.0
+        for <linux-crypto@vger.kernel.org>; Wed, 22 Apr 2026 11:19:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776881819; x=1777486619; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1776881972; x=1777486772; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:in-reply-to
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=k5olhXnIscd8Fz0fGU3E0klOq/HsiOUVkCzhktPLD2M=;
-        b=Au/LcE5iHKSZXioXjk7WemlgpSYbcYvBb85e/URaq2U4e9rIUoxFYW7NdTAVx8RqkD
-         U0VTEJp+10JFTCmKGYMTW5uljDlf5jRGC6zyvKt/QTUywhi0R47OTcJFhY0Hpy7jcASI
-         fcjEoVuRnNDk+CwEqcUbc+LXuhZyke7Uyzso8H8/RJ/TFt/junlhRyTx1urd1Yb3k2So
-         OaLo4O9zSjT0+Qd9h+kPmC+zK4Rb+z/eDo4SzNhXroUx+szKLJKvp1BuhkU6NEkDMjnh
-         /uqLKcNyseHrdf+Fynq0w2Zcv0vSK1qd3Hq2Vj3yeUsa1OF0gZC66FGXFMzAKTv1MPSm
-         V5AA==
+        bh=+Sfz/TbuXN6WiyV2mcY8E9Mqa6jAyuKik5u4nGTPy9w=;
+        b=rZxMsqNE6z1OgRiHD6JzksZcZDkCZ/k1u4V95DhMKLdiTrPDUi5j0IPFaT74pd2k3Y
+         DpxermbznGGG8wLa6cNTdRaAJ1Ta3/RuUySb+rJyxgeuthJvFMU72BIL1JWS2Ukfu6PD
+         tKaGLv436MUhKcNz46OTlZMBuGWUXIzZuMEoQ4/ERBR53ATsFMb6cJP8TjKI4+7HGVOh
+         LX8fVsVJdkAicjvkovCgzCDuo1efevWfHdJXas5zKVhcCBfg3ogaZcW0EwtoLHgP0U6K
+         lWA5AbKTtOJf6u+0vWOPkJemOIgga+ups25TkUdgnOzSwMWIe74q9X+L65Ub3NSiTiTp
+         ijOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776881819; x=1777486619;
+        d=1e100.net; s=20251104; t=1776881972; x=1777486772;
         h=content-transfer-encoding:mime-version:message-id:in-reply-to
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=k5olhXnIscd8Fz0fGU3E0klOq/HsiOUVkCzhktPLD2M=;
-        b=OXqVwrF0b0kKw1x5XQ82eGxrz1OZeJrXUpNF7rKN21bfDROvJKaN/yWu5m3m8E7qjF
-         Pj++KJ2Y6TbUmRq3SeqIyhsM/aMHfqysKuBgTwp+NaYzEgeLm1RvhWQZcOKpS5CGcySC
-         zCoWlS+cF1JXtSn98TPHx478muUQkUPbV7rTGWS4Y0IvCbXYUiS4durxFcfzKsF2jsQY
-         VJ6V1oWl7TJNSiV4i3+TyugLT+FlGBzQZwpPi+38cyjXjuYMiytNfIv4DJnXT6PzKwdC
-         9qcdvyc+6U4ZBYp9qJahGVw6fY4NSiQonbI7AZN1+ygLMowUb97jdm8jSZPQ8f8zbKEm
-         WHEA==
-X-Forwarded-Encrypted: i=1; AFNElJ8MTPZ94ldajmMpl+DNWb22xoGEQyhZTwVrf1WVUfzbcag2HTqtITKHfmAxTSIz/lk4QFJzBiFhLqU8krQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLs5upO724PWTZM8jbval8iQ1T2hj71W0JVxCt5ELmXywurhFy
-	3MW1SlQx79Eb4icexrOiVuu9e0DsF0XrcVQ9fXMrY99SuYJau/a9p9M0
-X-Gm-Gg: AeBDieuJcSIS9TjdoG1LCN/SlyEm1jQAZhnPHAwKmkiYoVH7WZeGWTKo3GEPIUW9qbU
-	CsVKIywBmdNik7NVwa56pj45lauLvfMCZ3VR9FoG/bK7hn3ohtpUXEyLDjSXo9W1SVONRkMQnTo
-	Lszrc4ls1d5vggXOsHAWdIpVr4rJPSPzUNJKiNa63vplIocZCXgSgqMOwLOrh3pR4U128mCZ3+2
-	DT1D0y24icIjEthmk5jg5pwQp1eJzcFpQXh4t3XI5Ye19GSq4WI5NPq5YW6XIgiSrTTMLLStZJk
-	N1K6ZugDtuB4aLuUozP9M6x+4PXLs9TovlKozm5DTcGQD1ys9++Rqwb1ptj+CPOMDghVmrGeiHH
-	Urxhc8IM/GmY+BJE5RO8tLBNNz6gPa3E1rvmlqAi6kWaotm3J/X/JslbphBl/dwPYPGW/8KNoMM
-	Ppzd/B4ZyqQlFzvO7ms4REkHSXqfBMwwV3E8k0
-X-Received: by 2002:a05:690c:348a:b0:7ba:f414:cd28 with SMTP id 00721157ae682-7baf414d250mr133922307b3.42.1776881818926;
-        Wed, 22 Apr 2026 11:16:58 -0700 (PDT)
+        bh=+Sfz/TbuXN6WiyV2mcY8E9Mqa6jAyuKik5u4nGTPy9w=;
+        b=QwsFV39eIQJop0vknsZv+fFUg0PFrWlvqmSUDiKLl48ofPcHEmVz/GJG3fOFDjfXz6
+         j8eKOvZ/cxn9uujDd08WBROlGfRIOXy2vAYGjLtVoFFGNMKHgibiP6V4W8bQ+TDn+Tn2
+         PuVbi9HN2AizhA4FbCyAmFlRp1RnTmZUAfVBgQ+B3Hxm4U9SaeazYQKl6CIoqEQiw2Og
+         Q4rX7+UR97LwlPLtyLk0B22x6UmGe6hQOs3PhsCG4AZYGCwWn9p2CX7ztsW5xpoF2fbf
+         O09EpOPmK6N9KNg8VAzadabH7x/ne02uVakUU6u3us4DSFyT4kbWnXGmwTXJuyY+BwGv
+         P7Yg==
+X-Forwarded-Encrypted: i=1; AFNElJ/S1s33EO8W0OmmkncgmAA2d7oWOiH0hJgwLPPlpXCIl9eS+NqA0Jlyn613fQMrDWha4IvPFu76IzeQ6Cg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBseKIQMjjedT94Cotljtw6fJM+39n0e5wqCbYOKridybkv0Rk
+	KeeTUYRTKPibNrtrZhMfqKilD39AfA6hAg/nqoKS5DKWA2eFoBQaJ/z1
+X-Gm-Gg: AeBDiesKuXS/jmivtnp6R9su7dR+J1xV225QlgHaJ7g7gZh1qQq38bGleeBrXWO0lwz
+	BzN0LktxwIV2GlfkvvkfaJeCc+32RZTeAzGm7DOtz1y3cnTxHwyweLacQXL9sf74lTalUFOVl8P
+	H94QwBb8kCUB+Z+Llgz9dlMnWIiAnf/7SWb4iVA3rs5qvKH5Q6i0r/vRbAPee1cyPLyJ2y29Xtq
+	c6VbsFPYGhJ96Ncbpf0Hu6SFQEw0k7f2jYOtsZz+Dz07cUmjB+S2Z/vmgzjxG9eT67gmpnjz96W
+	SjzQefj/1NOSt95bFvGZfmONZ/rdovpLRO/wP2xPYeo/4IL6bK5SI67PeUnVu5kxVwww+NNvg4x
+	WdVUosOFrgTbAjQlO94eM7EweO8x3XNhqbbojwodfdYIpjhYqXT4sMMrOUdlRyS4Bmjs142TYIj
+	vWTaA8LBw6bn+KUrmTlZnl3Smh8S9I7kpRqqSY
+X-Received: by 2002:a17:907:9308:b0:ba7:34cb:388b with SMTP id a640c23a62f3a-ba734cb3cd2mr794916766b.42.1776881971338;
+        Wed, 22 Apr 2026 11:19:31 -0700 (PDT)
 Received: from ehlo.thunderbird.net ([86.1.69.5])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7b9ee8be8e4sm74318757b3.14.2026.04.22.11.16.58
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ba45553980csm575137766b.58.2026.04.22.11.19.31
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Apr 2026 11:16:58 -0700 (PDT)
-Date: Wed, 22 Apr 2026 19:16:57 +0100
+        Wed, 22 Apr 2026 11:19:31 -0700 (PDT)
+Date: Wed, 22 Apr 2026 19:19:31 +0100
 From: Josh Law <joshlaw48@gmail.com>
 To: ardb+git@google.com
 CC: ardb@kernel.org, arnd@arndb.de, ebiggers@kernel.org, hch@lst.de,
  linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
  linux-raid@vger.kernel.org, linux@armlinux.org.uk
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_5/8=5D_lib/crc=3A_arm=3A_Enable_arm64?=
- =?US-ASCII?Q?=27s_NEON_intrinsics_implementation_of_crc64?=
-In-Reply-To: <20260422171655.3437334-15-ardb+git@google.com>
-Message-ID: <547D9EB2-4A67-49A9-8C8D-3ADD22123B1A@gmail.com>
+Subject: Re: [PATCH 6/8] crypto: aegis128 - Use neon-intrinsics.h on ARM too
+In-Reply-To: <20260422171655.3437334-16-ardb+git@google.com>
+Message-ID: <C4E4FF7A-8CCD-44CA-8AD9-5BA8D177E1DF@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -77,37 +76,17 @@ Content-Type: text/plain;
  charset=utf-8
 Content-Transfer-Encoding: 8bit
 
-Hi Ard,
+Hi ard, this is a good cleanup!
 
-Wow, 20x improvement is nuts.
+Being able to drop <arm_neon.h> and just using
+<asm/neon-intrinsics.h> across both architectures makes the C code much
+cleaner.
 
-I like how you handle this change *safely*
+-# Enable <arm_neon.h>
+-CFLAGS_aegis128-neon-inner.o += -isystem $(shell $(CC) -print-file-name=include)
 
-Like.
-
-+static inline u64 crc64_nvme_arch(u64 crc, const u8 *p, size_t len)
-+{
-+	if (len >= 128 && static_branch_likely(&have_pmull) &&
-+	    likely(may_use_simd())) {
-+		do {
-+			size_t chunk = min_t(size_t, len & ~15, SZ_4K);
-+
-+			scoped_ksimd()
-+				crc = crc64_nvme_neon(crc, p, chunk);
-+
-+			p += chunk;
-+			len -= chunk;
-+		} while (len >= 128);
-+	}
-
-chunking the SIMD work at SZ_4K to avoid hogging the CPU and allowing
-softirqs/preemption to process is a great detail. 
-
-It’s easy to just wing it and throw
-the entire buffer at the FPU, but respecting the kernel's latency
-requirements is better!
-
+Getting rid of the isystem is good. iirc that was a hack anyway, feel free
+to correct me on that
 
 Reviewed-by: Josh Law <joshlaw48@gmail.com>
 
-Thanks!
