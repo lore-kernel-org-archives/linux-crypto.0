@@ -1,53 +1,53 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00F0B347532
-	for <linux-crypto@vger.kernel.org>; Wed, 22 Apr 2026 17:17:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE42B2E62B3
+	for <linux-crypto@vger.kernel.org>; Wed, 22 Apr 2026 17:17:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776878244; cv=none; b=NRNnYfGtvK+HFfC8EsfTuB7kiYOcKlPQyJTyvmBvdhUd/E4fE+E62BUOjDrO82/Yzm+OMvaR9NdYA0VkI0MAeZYePBCfKAPBzxx7GlW/cewdXp0YzKwXmTLtD8lMEdzACQLTjd94f9xha1Rhi/Y3iX+ZvF2v3kRiMrjAdOBQ3bk=
+	t=1776878245; cv=none; b=ibfUjOzSTFntmQNDX8hm9eI/jTgmdCbJZG2V2TuOUVAhqp20F9beMo/0AK6dp9YprlJfP0QPaNVQA7+cj5hiyyOdovVjF4QN3IOGVci2QE/Ngv2VUtgI4TM9xJMoiH4REtKNyeDfmXncXhTdA7nY3X4oP0SEQLyNNbCeIhUMB/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776878244; c=relaxed/simple;
-	bh=hF3dHYxyJgYlp94GIvkLxwm/zVdatybx8AAETislGMA=;
+	s=arc-20240116; t=1776878245; c=relaxed/simple;
+	bh=S0jdlR98LVTH5mhAHN+BpHBYWm7+wEd/4hTcfzLpSI0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=a73ogXJG4c/SefdikokWeECXLgJi5/zzeljzbZb1jcXQ5HpohbujZcFY5WY411FynYMh0YwPW6FpBOFaoWDdIz3K/dRrdjo+yWeijEevwSb0jSZ8+tZwWjpojtn3EH6rBzkT83CzIBxjNwqPREQFfuMIyHZbaQ1Zmt41tCMP3oc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=v2ZFGnPd; arc=none smtp.client-ip=209.85.128.74
+	 To:Cc:Content-Type; b=Bwpm8zqJpKZYx7qQsGLfr0CRolVqslT0ciHGJlq6SAjCp+LXihkUk806sIagV9/1iXWjUsI1mrcYLdUOCtE8qe9QXpu+98KAQNh+5Hml4J85XlkJb7ZaA4DyanVEx9AtZ0fnudiIyz+aDH2vLT07USbYNxLqQ837hkDlYcwvGAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ky0N6idk; arc=none smtp.client-ip=209.85.221.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v2ZFGnPd"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-488d8deb75fso45845645e9.3
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Apr 2026 10:17:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ky0N6idk"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-4411a215f17so2745606f8f.1
+        for <linux-crypto@vger.kernel.org>; Wed, 22 Apr 2026 10:17:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1776878241; x=1777483041; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1776878242; x=1777483042; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NcINISGc0KST4+Nvm9mjXv44pjIWS9tTY4a9BkZBdcs=;
-        b=v2ZFGnPdtn+on3ZrjuVz0Y/XJy1TrmWrgrG2eMzIqN75XUq2zOshj7LPZnaGZJMCM1
-         h/vzOv2oetiqBV3XeYmXBQUbOK8z8vJ7u0eV8bJm3ZEX0t4Uk6sI2PRvD9fZDvgBAcv9
-         jYnbNY9jZiCQp1X2qBehk3DPf1cmZiR04kEDElkM9il5Y9/QSFyoWd9FGp7w3bj8uvy9
-         2XVYR3+k8NGtt9Pqk99kOhVsMF1KlpGpX5q1TFq2n1VOSg4YIUFQzVc16CYMkVJBKIKl
-         NVnO0Soo2QKM2UgJmm2j1OetL1DprKPZgFMg+KNe+gxzWpMtHG8/sU10sltju0fOF/WY
-         VHCA==
+        bh=38FJmf1CbLYI1AGt06YyNFECBDz7thiyI1GjGiYf7zE=;
+        b=ky0N6idkT4b3+k7+idVG0PaeBVedArb9ft67tAlBRCp4Ba9TuuzwaSHc3h+zfQZ5yD
+         d4rjnoXQvJUp4MInGo0Z+AGPw43wYZwKtZ5FUaYBLMXRbqI/eHz0oCdRvLctyS6OubOf
+         fXKWkQOX4u7xsxMb2xRHPOA6iilrRg8+/UqpUQOTei7A9CcTo4S4e6V7R3bWcKWcOELI
+         NMyn5i51crMf1zYeUCugReigj4hZjeprj7py3Z/S51xSQc0EWr3E6nnECGdeCHFKh16q
+         +IN3m1t+aP+E8Zs8spt8Cx6I2PK7EahBA9twj7Oy0M1w6u+3mMgcRwhnaYZborxu3yiI
+         SImw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776878241; x=1777483041;
+        d=1e100.net; s=20251104; t=1776878242; x=1777483042;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NcINISGc0KST4+Nvm9mjXv44pjIWS9tTY4a9BkZBdcs=;
-        b=ESjCxlhIA2zFfRVz0E2rY3KGFKArKrWwLP0YOqKYQwvaF7XD/eagUHyrqY6N0SpjZw
-         juiIHbIbpO7g8zleW/2CT5jsqLjcs/JbvMlmV+cMM2pYW5KHUTWMztSypPECQEUNB+a+
-         5DLVPC+/bNVR7HnwDKcnNJOeICdjJR8evqbtexuLhG66gcy7XM/SPpAbRhXvM2fnWS/z
-         6XclncxOLqudK2Gv+luixlnY64jMaqadM/+omKiRLyvXTCtizJQvn+VMy5+/rRbkpwFH
-         bFdyFlWF713Yuje7Bmbzzpa9GJaqeYybCxhMcLVqjDvUz+Ueog9y/hgHvWf00pivcBOo
-         W/ag==
-X-Gm-Message-State: AOJu0Yyguzy1yXYGOIRyrhs8O2jHE6qSGNPBUaE4BJuscbhMr98L0aiF
-	ARMQUn7fpxkkBssvbWq17t35S/zbbR+U5HhausUQcJfF+Wie/U6fXkg+KFHWQYHqBVE5C2TZ9Q=
+        bh=38FJmf1CbLYI1AGt06YyNFECBDz7thiyI1GjGiYf7zE=;
+        b=IoAtGspOceWlRKTgKdUAbE+NjO2rGxel2UkJzeEahJhUk38lXe3qwUcNrkyOT+Fhua
+         E0armmkNtErYkmUJTpfWcBBm/tNsI2/g6E61K6YGKsjU4zFca+2tYBNle5naskQQm/Y9
+         +WVf/uiJNvFGPmRL0e8TBUmi22MomUcNTVuxif6Ah8zHCLvtiJ2XKH53LQCJC5WviZFm
+         Vv0YeQI4OWDiUmFIbR3YKdDWIF0EygtH+nvh1uWwUde1TjAi7KRNLB+HbqFJJGhl37wR
+         alkaxqcLTgCyIUB4zI1E5dToyIk2kjuBA8qjcMUBsXy0L3NpVR46x66J3aGXgkKIqVUG
+         CSow==
+X-Gm-Message-State: AOJu0YzqK8OdVWVLeNxagIoRgFvp8dZkWDMT9lHIIYAXxbeU5NnT2uSN
+	bN8PAffq6pPQyGtjPhfX/g66Q1FeoaGU+hzqOhDyKtzVWSYN0YL+6Ob7/kT91pSvVpui7Zf3UA=
 	=
-X-Received: from wmbjq20.prod.google.com ([2002:a05:600c:55d4:b0:488:e127:ac83])
- (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:8587:b0:485:3f30:6250
- with SMTP id 5b1f17b1804b1-488fb7856b9mr255517905e9.20.1776878241449; Wed, 22
- Apr 2026 10:17:21 -0700 (PDT)
-Date: Wed, 22 Apr 2026 19:17:01 +0200
+X-Received: from wmtf4.prod.google.com ([2002:a05:600c:8b44:b0:489:1b01:386f])
+ (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:4e4f:b0:488:d6eb:e63c
+ with SMTP id 5b1f17b1804b1-488fb778703mr339429635e9.15.1776878242278; Wed, 22
+ Apr 2026 10:17:22 -0700 (PDT)
+Date: Wed, 22 Apr 2026 19:17:02 +0200
 In-Reply-To: <20260422171655.3437334-10-ardb+git@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -57,15 +57,14 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20260422171655.3437334-10-ardb+git@google.com>
 X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5409; i=ardb@kernel.org;
- h=from:subject; bh=ca3n2psIM2wJk1WPOo/STNIlxMD5Xef04Kw+2CG+jJ8=;
- b=owGbwMvMwCVmkMcZplerG8N4Wi2JIfMl04SqXWqv7RQbNd9bCZgty7y0/xw3a853fXV5vdD9g
- dtXTJPuKGVhEONikBVTZBGY/ffdztMTpWqdZ8nCzGFlAhnCwMUpABPRbGD4H3dZaT7P/CDj4jfh
- CRldKeuPCB5Un3qN69bHOhf2dVpnnRkZdjb8WFxtr7Z7rVfZ9Lt8PjNNnrf0by629J8/9a3xeae LrAA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2567; i=ardb@kernel.org;
+ h=from:subject; bh=GF0mnodrUh6rjEZUVMaX/cFwNwIG3vT9XIt19bfi9Io=;
+ b=owGbwMvMwCVmkMcZplerG8N4Wi2JIfMl08Sa4CSz5Jv/mx/0/gpfqP9q6tPUq9HJIn7vsjVO3
+ VUwqfDsKGVhEONikBVTZBGY/ffdztMTpWqdZ8nCzGFlAhnCwMUpABPJaGT4Zx9xW+Vp/vMfuczL
+ uusVThx9c/M7i7bmo+TM24XM08yK7jAyrF/ysc5vmkD96tril/ei7p7TFhMwfMptsfJnxvHau9u MWQA=
 X-Mailer: git-send-email 2.54.0.rc2.544.gc7ae2d5bb8-goog
-Message-ID: <20260422171655.3437334-15-ardb+git@google.com>
-Subject: [PATCH 5/8] lib/crc: arm: Enable arm64's NEON intrinsics
- implementation of crc64
+Message-ID: <20260422171655.3437334-16-ardb+git@google.com>
+Subject: [PATCH 6/8] crypto: aegis128 - Use neon-intrinsics.h on ARM too
 From: Ard Biesheuvel <ardb+git@google.com>
 To: linux-arm-kernel@lists.infradead.org
 Cc: linux-crypto@vger.kernel.org, linux-raid@vger.kernel.org, 
@@ -75,172 +74,70 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Ard Biesheuvel <ardb@kernel.org>
 
-Tweak the NEON intrinsics crc64 code written for arm64 so it can be
-built for 32-bit ARM as well. The only workaround needed is to provide
-alternatives for vmull_p64() and vmull_high_p64() on Clang, which only
-defines those when building for the AArch64 or arm64ec ISA. Use the same
-helpers for GCC too, to avoid doubling the size of the test/validation
-matrix.
+Use the asm/neon-intrinsics.h header on ARM as well as arm64, so that
+the calling code does not have to know the difference.
 
-KUnit benchmark results (Cortex-A53 @ 1 Ghz)
-
-Before:
-
-   # crc64_nvme_benchmark: len=1: 35 MB/s
-   # crc64_nvme_benchmark: len=16: 78 MB/s
-   # crc64_nvme_benchmark: len=64: 87 MB/s
-   # crc64_nvme_benchmark: len=127: 88 MB/s
-   # crc64_nvme_benchmark: len=128: 88 MB/s
-   # crc64_nvme_benchmark: len=200: 89 MB/s
-   # crc64_nvme_benchmark: len=256: 89 MB/s
-   # crc64_nvme_benchmark: len=511: 89 MB/s
-   # crc64_nvme_benchmark: len=512: 89 MB/s
-   # crc64_nvme_benchmark: len=1024: 90 MB/s
-   # crc64_nvme_benchmark: len=3173: 90 MB/s
-   # crc64_nvme_benchmark: len=4096: 90 MB/s
-   # crc64_nvme_benchmark: len=16384: 90 MB/s
-
-After:
-
-   # crc64_nvme_benchmark: len=1: 32 MB/s
-   # crc64_nvme_benchmark: len=16: 76 MB/s
-   # crc64_nvme_benchmark: len=64: 71 MB/s
-   # crc64_nvme_benchmark: len=127: 88 MB/s
-   # crc64_nvme_benchmark: len=128: 618 MB/s
-   # crc64_nvme_benchmark: len=200: 542 MB/s
-   # crc64_nvme_benchmark: len=256: 920 MB/s
-   # crc64_nvme_benchmark: len=511: 836 MB/s
-   # crc64_nvme_benchmark: len=512: 1261 MB/s
-   # crc64_nvme_benchmark: len=1024: 1531 MB/s
-   # crc64_nvme_benchmark: len=3173: 1731 MB/s
-   # crc64_nvme_benchmark: len=4096: 1851 MB/s
-   # crc64_nvme_benchmark: len=16384: 1858 MB/s
-
-Don't bother with big-endian, as it doesn't work correctly on Clang, and
-is barely used these days.
-
-Note that ARM disables preemption and softirq processing when using
-kernel mode SIMD, so take care not to hog the CPU for too long.
+Clean up the Makefile a bit while at it.
 
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- lib/crc/Kconfig          |  1 +
- lib/crc/Makefile         |  5 ++-
- lib/crc/arm/crc64-neon.h | 34 ++++++++++++++++++
- lib/crc/arm/crc64.h      | 36 ++++++++++++++++++++
- 4 files changed, 75 insertions(+), 1 deletion(-)
+ crypto/Makefile              | 10 ++++------
+ crypto/aegis128-neon-inner.c |  4 +---
+ 2 files changed, 5 insertions(+), 9 deletions(-)
 
-diff --git a/lib/crc/Kconfig b/lib/crc/Kconfig
-index 31038c8d111a..86a0e4bfec77 100644
---- a/lib/crc/Kconfig
-+++ b/lib/crc/Kconfig
-@@ -82,6 +82,7 @@ config CRC64
- config CRC64_ARCH
- 	bool
- 	depends on CRC64 && CRC_OPTIMIZATIONS
-+	default y if ARM && KERNEL_MODE_NEON && !CPU_BIG_ENDIAN
- 	default y if ARM64
- 	default y if RISCV && RISCV_ISA_ZBC && 64BIT
- 	default y if X86_64
-diff --git a/lib/crc/Makefile b/lib/crc/Makefile
-index 193257ae466f..386e9c175263 100644
---- a/lib/crc/Makefile
-+++ b/lib/crc/Makefile
-@@ -39,8 +39,11 @@ crc64-y := crc64-main.o
- ifeq ($(CONFIG_CRC64_ARCH),y)
- CFLAGS_crc64-main.o += -I$(src)/$(SRCARCH)
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 162242593c7c..69d1a18e8519 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -103,13 +103,14 @@ obj-$(CONFIG_CRYPTO_CHACHA20POLY1305) += chacha20poly1305.o
+ obj-$(CONFIG_CRYPTO_AEGIS128) += aegis128.o
+ aegis128-y := aegis128-core.o
  
-+crc64-cflags-$(CONFIG_ARM) += -march=armv8-a -mfpu=crypto-neon-fp-armv8
-+crc64-cflags-$(CONFIG_ARM64) += -march=armv8-a+crypto
- CFLAGS_REMOVE_crc64-neon.o += $(CC_FLAGS_NO_FPU)
--CFLAGS_crc64-neon.o += $(CC_FLAGS_FPU) -I$(src)/$(SRCARCH) -march=armv8-a+crypto
-+CFLAGS_crc64-neon.o += $(CC_FLAGS_FPU) -I$(src)/$(SRCARCH) $(crc64-cflags-y)
-+crc64-$(CONFIG_ARM) += crc64-neon.o
- crc64-$(CONFIG_ARM64) += crc64-neon.o
++CFLAGS_aegis128-neon-inner.o += $(CC_FLAGS_FPU)
++CFLAGS_REMOVE_aegis128-neon-inner.o += $(CC_FLAGS_NO_FPU)
+ ifeq ($(ARCH),arm)
+-CFLAGS_aegis128-neon-inner.o += -ffreestanding -march=armv8-a -mfloat-abi=softfp
+-CFLAGS_aegis128-neon-inner.o += -mfpu=crypto-neon-fp-armv8
++CFLAGS_aegis128-neon-inner.o += -march=armv8-a -mfpu=crypto-neon-fp-armv8
+ aegis128-$(CONFIG_CRYPTO_AEGIS128_SIMD) += aegis128-neon.o aegis128-neon-inner.o
+ endif
+ ifeq ($(ARCH),arm64)
+-aegis128-cflags-y := -ffreestanding -mcpu=generic+crypto
++aegis128-cflags-y := -mcpu=generic+crypto
+ aegis128-cflags-$(CONFIG_CC_IS_GCC) += -ffixed-q16 -ffixed-q17 -ffixed-q18 \
+ 				       -ffixed-q19 -ffixed-q20 -ffixed-q21 \
+ 				       -ffixed-q22 -ffixed-q23 -ffixed-q24 \
+@@ -117,11 +118,8 @@ aegis128-cflags-$(CONFIG_CC_IS_GCC) += -ffixed-q16 -ffixed-q17 -ffixed-q18 \
+ 				       -ffixed-q28 -ffixed-q29 -ffixed-q30 \
+ 				       -ffixed-q31
+ CFLAGS_aegis128-neon-inner.o += $(aegis128-cflags-y)
+-CFLAGS_REMOVE_aegis128-neon-inner.o += -mgeneral-regs-only
+ aegis128-$(CONFIG_CRYPTO_AEGIS128_SIMD) += aegis128-neon.o aegis128-neon-inner.o
+ endif
+-# Enable <arm_neon.h>
+-CFLAGS_aegis128-neon-inner.o += -isystem $(shell $(CC) -print-file-name=include)
  
- crc64-$(CONFIG_RISCV) += riscv/crc64_lsb.o riscv/crc64_msb.o
-diff --git a/lib/crc/arm/crc64-neon.h b/lib/crc/arm/crc64-neon.h
-new file mode 100644
-index 000000000000..645f553220ff
---- /dev/null
-+++ b/lib/crc/arm/crc64-neon.h
-@@ -0,0 +1,34 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+
-+static inline uint64x2_t pmull64(uint64x2_t a, uint64x2_t b)
-+{
-+	uint64_t l = vgetq_lane_u64(a, 0);
-+	uint64_t m = vgetq_lane_u64(b, 0);
-+	uint64x2_t result;
-+
-+	asm("vmull.p64	%q0, %P1, %P2" : "=w"(result) : "w"(l), "w"(m));
-+
-+	return result;
-+}
-+
-+static inline uint64x2_t pmull64_high(uint64x2_t a, uint64x2_t b)
-+{
-+	uint64_t l = vgetq_lane_u64(a, 1);
-+	uint64_t m = vgetq_lane_u64(b, 1);
-+	uint64x2_t result;
-+
-+	asm("vmull.p64	%q0, %P1, %P2" : "=w"(result) : "w"(l), "w"(m));
-+
-+	return result;
-+}
-+
-+static inline uint64x2_t pmull64_hi_lo(uint64x2_t a, uint64x2_t b)
-+{
-+	uint64_t l = vgetq_lane_u64(a, 1);
-+	uint64_t m = vgetq_lane_u64(b, 0);
-+	uint64x2_t result;
-+
-+	asm("vmull.p64	%q0, %P1, %P2" : "=w"(result) : "w"(l), "w"(m));
-+
-+	return result;
-+}
-diff --git a/lib/crc/arm/crc64.h b/lib/crc/arm/crc64.h
-new file mode 100644
-index 000000000000..de274288af61
---- /dev/null
-+++ b/lib/crc/arm/crc64.h
-@@ -0,0 +1,36 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * CRC64 using ARM PMULL instructions
-+ */
-+
-+#include <asm/simd.h>
-+
-+static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_pmull);
-+
-+u64 crc64_nvme_neon(u64 crc, const u8 *p, size_t len);
-+
-+#define crc64_be_arch crc64_be_generic
-+
-+static inline u64 crc64_nvme_arch(u64 crc, const u8 *p, size_t len)
-+{
-+	if (len >= 128 && static_branch_likely(&have_pmull) &&
-+	    likely(may_use_simd())) {
-+		do {
-+			size_t chunk = min_t(size_t, len & ~15, SZ_4K);
-+
-+			scoped_ksimd()
-+				crc = crc64_nvme_neon(crc, p, chunk);
-+
-+			p += chunk;
-+			len -= chunk;
-+		} while (len >= 128);
-+	}
-+	return crc64_nvme_generic(crc, p, len);
-+}
-+
-+#define crc64_mod_init_arch crc64_mod_init_arch
-+static void crc64_mod_init_arch(void)
-+{
-+	if (elf_hwcap2 & HWCAP2_PMULL)
-+		static_branch_enable(&have_pmull);
-+}
+ obj-$(CONFIG_CRYPTO_PCRYPT) += pcrypt.o
+ obj-$(CONFIG_CRYPTO_CRYPTD) += cryptd.o
+diff --git a/crypto/aegis128-neon-inner.c b/crypto/aegis128-neon-inner.c
+index b6a52a386b22..56b534eeb680 100644
+--- a/crypto/aegis128-neon-inner.c
++++ b/crypto/aegis128-neon-inner.c
+@@ -3,13 +3,11 @@
+  * Copyright (C) 2019 Linaro, Ltd. <ard.biesheuvel@linaro.org>
+  */
+ 
+-#ifdef CONFIG_ARM64
+ #include <asm/neon-intrinsics.h>
+ 
++#ifdef CONFIG_ARM64
+ #define AES_ROUND	"aese %0.16b, %1.16b \n\t aesmc %0.16b, %0.16b"
+ #else
+-#include <arm_neon.h>
+-
+ #define AES_ROUND	"aese.8 %q0, %q1 \n\t aesmc.8 %q0, %q0"
+ #endif
+ 
 -- 
 2.54.0.rc1.555.g9c883467ad-goog
 
