@@ -1,285 +1,159 @@
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE75374E40
-	for <linux-crypto@vger.kernel.org>; Wed, 22 Apr 2026 21:34:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DFF332B9BB
+	for <linux-crypto@vger.kernel.org>; Thu, 23 Apr 2026 01:16:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776893661; cv=none; b=DKmOlEkbCuw6eWXNANInxKSqomGOx7dcrff8S3GcbLUFfyNsOMQ+3WhvjyWMGpyXZWUh5MASnHOk1bu8k9Y/46GpiGB4Lzbg6PmVgpqZlUqEzHZDmPXjr0kdQMbAmM3MY7eeNgKCkp/CTCRi1fdjsdWdc2KzCcv7NZlYFGajOMg=
+	t=1776907003; cv=none; b=aAHlPTjc7VLcYIbrQkxJYJVVsDgdcod8AhM1TsawdwDZF7xVeVkIrCCyN1eNiJHSFFxJbY7Ak38oCM0UEsRmN/SJtMCZriMShuLRheFiiX5ns+sBDgf6Wy0N5XY7FgeRYZhEfHjCoaaoo2dBA9zlbv/5hExlLje7AWS6Y2aMlGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776893661; c=relaxed/simple;
-	bh=u03zceiMBD8ZhrGPsxTutINU5prgwCZvEu2eM4b8oAE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AIRP1AKfTzWBefjjmtkzRCQ5ToEDrprhGSlZbagvdvQ4XuBw+OyRAlDPXx6W2BouDuGhnIkBr+HnS5BgwQ7vlyJN8do2hf4Wzk1Ck4Z8RS7JvcFIuDLlD6uvAWFrOeUxlk8jwP89PdvVgepVWWOLJKaHHqxDP9PMnH9W4lyz2PI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q2RNvvoy; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1776907003; c=relaxed/simple;
+	bh=DxOf+L6yiotlxOV6augFzgLDWPsdWfK9kuJES/ulFPE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YPYp0r6qqOOcml4VdjPJtZWgTqkQM/LKh8BpPrVy+pxRdCAwcDecw0BIJ9l+oF2OingRLW1ruBfP3gr7Q6X0f0iBw33ZYhB/iY4dV2lYMhFjqy8eZKDBpaR9esPHCA5JAABfOwG5JHaOBcjBz8+6sPZPPlyUVRxAH7IbxDYV4W0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=YSdneA9P; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=czk/Mlhe; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q2RNvvoy"
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5a402b2d102so6826813e87.3
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Apr 2026 14:34:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="YSdneA9P";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="czk/Mlhe"
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63MG4kXu1587762
+	for <linux-crypto@vger.kernel.org>; Thu, 23 Apr 2026 01:16:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=doS0fD4+OOQ9XqikyXcImBcj
+	iIDXJMyeF1hsrvrQhrA=; b=YSdneA9P2bF/vTwIYiXmrPaBd9+RRK17sb7+CVcA
+	Gw9E3FF6HI01Tr5qwPOZ1/XbL8ne+F7VuA0wcShkO+pfeQD5VD11Op7nogFl3u1I
+	H22vCBzNnJiexi2nfWfRhK+zoOLylh0QHHE0N7SL2TVQSgwRf3I6GXoQ/8oerUzN
+	J/h4Yj3DB6uAreZHEs02zkKKzMJyQ1uVyWsUtLGjrz6dcmKqOod/7sSgnyTXAqjW
+	ayS8aK53nidzOKiuuMePQ8TGrbqN8iTD47mjQxc4RL713UQrRE1NPU3U+1S6sP2a
+	eDRBL1JJJ/Y1Y28NUZ0z+Ozazn4y3/5iNkbWmwP/njcoag==
+Received: from mail-dl1-f71.google.com (mail-dl1-f71.google.com [74.125.82.71])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4dq1hq1kfq-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Thu, 23 Apr 2026 01:16:41 +0000 (GMT)
+Received: by mail-dl1-f71.google.com with SMTP id a92af1059eb24-12c66fdd4aeso9236374c88.0
+        for <linux-crypto@vger.kernel.org>; Wed, 22 Apr 2026 18:16:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776893657; x=1777498457; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TzWMajBXvkLZjAEK67wsPjVPED1S/mYSZin3Li/Mn0k=;
-        b=Q2RNvvoynDSPvu8xOWL1R9w9Bm6o59Wq7rtZMzeUbUR+Old+QkaF5VStcPJfmfR9J8
-         dZ39ljZrTP9+Uc+qHjpqFAGw3izigxevglRbDRcsnDIUS9lLVLh9NkMhdbbnvq8tQZmK
-         9rEdRF22prPXlUZOjIxdfl6MeSp4kLRy1NFmy7Uyf8A+KIt9gDRApVMJHvuWp2OppWp6
-         2NL+56s8RAzwVqZlyF0heoHFs4slNR54StsIgaQPpkgmCQ7q0ixHJiFuk3AeDaEV37rb
-         T35r/J0vLIHce/w44Yil0pQn30E00yzQ3ykQFUS8LD8S6lc8ykWvJun3oLblHKZKGch7
-         YFjQ==
+        d=oss.qualcomm.com; s=google; t=1776907000; x=1777511800; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=doS0fD4+OOQ9XqikyXcImBcjiIDXJMyeF1hsrvrQhrA=;
+        b=czk/MlheuqK9du0/NAKhS+67a5sOXCh9Z39RTkYXMyBAypZE02zqjwGTENaMrzJf6p
+         RnXKFg2QeOuFfU2j2/8AUi3M3EGmAuzE19jy0LLiXfuU3g81yrac/UHq2Df/xibXl575
+         Z28a4cAjKjM8UHECwwK1/bjc0r+lgcaI1o3n8sMpPFjZPAry3uExTWgZPc5teHtFZwwM
+         u1tj51SyMSpVIkqNSvNprEYKuIySsku9CxLwxnpww2n1SolOkXMdasOa+jQBX1rYo2Sw
+         yF35R9pRP8Q0LUA4NZld7fvRve+Q8j150IDWZk6bua1+B+zry2MIZQNsNINCiP+yKwqg
+         I2+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776893657; x=1777498457;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=TzWMajBXvkLZjAEK67wsPjVPED1S/mYSZin3Li/Mn0k=;
-        b=Oh9Rs0ecsqXjzJULrZ7Nv8BpZrxAYl24Uy8nShuVa1aBirM9glTyUl33H+oTutn7PJ
-         foyiW5whb/sPSZj8cK1mU7v4eAt5CgeUVCwGQDzC+VMdZMh2buy/JMj8646hqbBbdgXm
-         LydTGvcGRTErsAvV8C3SZeruo4N0fvJduyzA5bxOEdIGYpvZhxnoOEEP7zimfMjHRFbe
-         JIQg9hDAJoJRm0b+c8aukhxC10W+gjcEBI0jG1+n1DQ54yOoE43Bc65CR0oyE8ceFWGK
-         SsIxTfvDDjS1I2P0jI8u3+k97JY+9wWLBtRPWsAKc6fGO28RyvDBAmUnK9ib4mNWVnE3
-         mSbg==
-X-Forwarded-Encrypted: i=1; AFNElJ9ZrYIlvKxCPrunDWe62OP1S1X6JIFEkpoMcAQW/QodowqBink+oDi+dGtFVQUKJ3ga1FBUbPl/irtUcQ4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+mDR5QTx4+SOgP3H+knAnGHtYNjljmotAs2zNOqklil7aXdPL
-	AmLrK1gp4jptvMLs3xKfRfP+jnj/BHKwjdNWyBmtpYB9HdxDYKmN8V9m
-X-Gm-Gg: AeBDietPrD+07fGmTUPafxIJVWtj51hwjMk6EtCpwxHzJyBiRPKuH6DLTeMzU/gg1hu
-	q/+3WitVYC942CsCe26OsKAsJlZk6R5AeAfS/bkJt6+gNiEVKm1dZdsmwyW94alwrjxziYzWARm
-	GjDg9Fa5c01asctBQASWM4Lh4Fr8dzR3DEBxxP7UlF4NcHGJ8IQuxhqB3Pqp7mCmesLVmsHUnDI
-	ZCoQXkFMBRb+NC6Y5Eah+eIr6CzbJYiHq3RZvROuecnmjygTIk6QtnEGI3RN3nceAnsu6kdiE/B
-	OGlRWYgla6iQV0dbDXbsxmZZ0ePHdGZOpuG8dPhCz2ybrfl3s2O4ZuSrl5ldUvAroXvCo3kvNxw
-	fPwoBKi4X4SU7WyZ0hKw9TR9qO2Zynw7qRA+j6lAj6jwBo0154nYfKuJhGNFMTH8HlxQ9GNOT0b
-	F/Kxdc5yV3NRG0pZww0WKlMkcESqjOmGd7sBVwiW4kxbL7
-X-Received: by 2002:a05:6512:40c3:b0:5a3:e5d7:e37f with SMTP id 2adb3069b0e04-5a4172ebe6cmr6504298e87.41.1776893656564;
-        Wed, 22 Apr 2026 14:34:16 -0700 (PDT)
-Received: from localhost ([188.234.148.119])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a4185ad343sm4697828e87.2.2026.04.22.14.34.13
+        d=1e100.net; s=20251104; t=1776907000; x=1777511800;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=doS0fD4+OOQ9XqikyXcImBcjiIDXJMyeF1hsrvrQhrA=;
+        b=dW8G4oXp7eJIXDFZlW1TOUTtNg1BbQ8t75tGt52P/aXG0QPXqMusV2PkWvjhRK/U0V
+         uCqm+yEZQm3ajgU3dql9FKK4hX1omkscUPEobKnRVnF36JZNOhi+rQFuLSZk1xUY6wY9
+         dF9EZ//cZZtHR4mwGoD8nKxOE6UeXblhpApYs10YxwV7PV1Row/lhpTADG2R1xHr9HaF
+         N8TUwa7oIsm3B7/aR+mqWAIR1jBDW6ZGbCHFLxwTwFhZRZq4xtAq46W1Elq2OSUS2zPY
+         q7oD/s/G/Tr54oxABYi+InC7mQIiHp+vFBs613Gg6T4tpZ/Mt23sJVK2CVRZuxyVydse
+         Kgpw==
+X-Forwarded-Encrypted: i=1; AFNElJ9iC8jCOj5wT9EabOh4235GQbXTRnvCR1Xpi2j8PL+0pUZQZAJht5zBmqDp2B9+R1yTLdeslqklIOMgsS4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxu06MQS5Ap9J46Gm33efzQAqU6UZuBBnTOl68QNTBdZ0+EPfRS
+	6itvW2khaaOt7b4AnUDfj2JZp4sX6yCFBgumoRl9qUyRPVjWPsOiqoljy336mPjVgmPvo9ViPdK
+	xblRLqeugPL42Ct9glA3WnT60UZ3/e4/TbzaKiAmhZ4KSFIYtIMeDjemaOXqnGZt1pzY=
+X-Gm-Gg: AeBDieuysTLZLfKQ1F04JoGJ2fzMeWk33chbEiEOJPbt2vIN1rj1DCODxMMDNQ3dIXh
+	IyvfmF1jYrWD7N0ba/qQvEccNMWtwWIBPG9Qff3lGGYK3hagJ3BEo6dNOByBfNrmm3ocZ67acYO
+	37mqtshZvsmMPplUIR6t4nE1KrE5jgzrG/ZQZxFDm5QYvbExqzzknyUuMsyaPoNbUdamDGxq4gb
+	fan5rHCmUY7JdOjLAkQgLSpoZHrHtmOjOcjgI4SqXWdxyZExccPQ2KIVcnZrCUvAPDVpAuI8eNj
+	eY4dfZTtwoy4I/CNIm7k+edqcBzffKisHz13HaanmyQ/uAK+ICsFxr0IUFHrAoG9CLf+WTfkpcu
+	CtMjXJjuraBPN9xbq+rSiQlIcR5LFdrSkqCHEb6k6vPLC4t7aT6vjxtnuJpKDmVozJ0m/6dCvnh
+	Q=
+X-Received: by 2002:a05:7022:793:b0:12c:8cd7:d438 with SMTP id a92af1059eb24-12c8cd7dd7cmr7691450c88.9.1776907000095;
+        Wed, 22 Apr 2026 18:16:40 -0700 (PDT)
+X-Received: by 2002:a05:7022:793:b0:12c:8cd7:d438 with SMTP id a92af1059eb24-12c8cd7dd7cmr7691432c88.9.1776906999499;
+        Wed, 22 Apr 2026 18:16:39 -0700 (PDT)
+Received: from QCOM-aGQu4IUr3Y (i-global052.qualcomm.com. [199.106.103.52])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12c749c422csm26381425c88.3.2026.04.22.18.16.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Apr 2026 14:34:15 -0700 (PDT)
-From: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
-To: Thomas Graf <tgraf@suug.ch>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Jan Kara <jack@suse.cz>,
-	"Darrick J . Wong" <djwong@kernel.org>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
-Subject: [PATCH 1/1] rhashtable: drop ht->mutex in rhashtable_free_and_destroy()
-Date: Thu, 23 Apr 2026 02:33:49 +0500
-Message-ID: <20260422213349.1345098-2-mikhail.v.gavrilov@gmail.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260422213349.1345098-1-mikhail.v.gavrilov@gmail.com>
-References: <20260422213349.1345098-1-mikhail.v.gavrilov@gmail.com>
+        Wed, 22 Apr 2026 18:16:39 -0700 (PDT)
+Date: Thu, 23 Apr 2026 09:16:33 +0800
+From: Shawn Guo <shengchao.guo@oss.qualcomm.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Dmitry Baryshkov <lumag@kernel.org>,
+        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
+        Deepti Jaggi <deepti.jaggi@oss.qualcomm.com>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] dt-bindings: crypto: qcom,prng: Document TRNG on Nord SoC
+Message-ID: <aely8W3Tve-fhMzz@QCOM-aGQu4IUr3Y>
+References: <20260420025732.1240525-1-shengchao.guo@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260420025732.1240525-1-shengchao.guo@oss.qualcomm.com>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDIzMDAwOSBTYWx0ZWRfX/zpFiHcAtWJA
+ t5PwGWVTuZVclw/TW3ss1P/0dYc2o1J0a1vjrZVaThxNQKweyWWItInulrD5So/x5F+VI3bL/Ij
+ 7G8v1w8RHBelUEssm0nRY7bAJWVMIRipLq651gqiupy5vl+4NZ4ux50EyvWG82l2vBO055j3SCR
+ KwauPJ6UyMT0j+mhYwaeTu+lajm3rV/0NJyHO/YwzDZIhxIfvPIdHd9Wcyejh3/io+LRDwLS29k
+ /Z1eD1fmw4gf4mkm784r+OugE0SwnLdUzbwJ3Gf/hVn5w8wycsIVycMKJLktHE0r/nDVFaFNZOn
+ LDRKXfR3oIbplZt9ZB/vg1kSfCn/U9xXL1AIUAnpgkp8iijSQytT5uGsDn+R+gg0bs87j6n1uRU
+ kIRPLSrO2rmk7+ifG2hJVxBdjt36gPBcHFoLPZVrHVnNc2o7zssCeYaN5ZXbFeTjTG7DuVayH9z
+ 7ZiSZFSsIExB8srBFLA==
+X-Proofpoint-ORIG-GUID: 8wiYXxNeiX6H7nyLJyKX_yKWw7ONI1_I
+X-Proofpoint-GUID: 8wiYXxNeiX6H7nyLJyKX_yKWw7ONI1_I
+X-Authority-Analysis: v=2.4 cv=TJt1jVla c=1 sm=1 tr=0 ts=69e972f9 cx=c_pps
+ a=JYo30EpNSr/tUYqK9jHPoA==:117 a=b9+bayejhc3NMeqCNyeLQQ==:17
+ a=kj9zAlcOel0A:10 a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=3WHJM1ZQz_JShphwDgj5:22
+ a=EUspDBNiAAAA:8 a=R-84wXamayB7cy0xVmkA:9 a=CjuIK1q_8ugA:10
+ a=Fk4IpSoW4aLDllm1B1p-:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-22_04,2026-04-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 spamscore=0 priorityscore=1501 phishscore=0 clxscore=1015
+ malwarescore=0 bulkscore=0 lowpriorityscore=0 impostorscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2604230009
 
-rhashtable_free_and_destroy() is a single-shot teardown routine:
-cancel_work_sync() has already quiesced the deferred rehash worker, and
-the function's documented contract requires the caller to guarantee no
-other concurrent access to the rhashtable. Under those conditions
-ht->mutex is not protecting anything -- taking it is a leftover from
-the original teardown path.
+On Mon, Apr 20, 2026 at 10:57:32AM +0800, Shawn Guo wrote:
+> From: Deepti Jaggi <deepti.jaggi@oss.qualcomm.com>
+> 
+> Add compatible for True Random Number Generator of Nord SoC with
+> a fallback on qcom,trng.
+> 
+> Signed-off-by: Deepti Jaggi <deepti.jaggi@oss.qualcomm.com>
 
-That leftover is actively harmful: it closes a circular lock-class
-dependency with fs_reclaim. The deferred rehash worker takes ht->mutex
-and then allocates GFP_KERNEL memory in bucket_table_alloc(),
-establishing
+Sorry for missing my SoB.  Will update.
 
-    &ht->mutex  ->  fs_reclaim
+Shawn
 
-After commit b32c4a213698 ("xattr: add rhashtable-based simple_xattr
-infrastructure") introduced simple_xattr_ht_free(), which calls
-rhashtable_free_and_destroy(), the simple_xattrs teardown became
-reachable from evict() under the dcache shrinker. The subsequent
-per-subsystem adaptations made the reverse edge concrete in three
-independent code paths:
-
-  * commit 52b364fed6e1 ("shmem: adapt to rhashtable-based simple_xattrs with lazy allocation")
-  * commit 5bd97f5c5f24 ("kernfs: adapt to rhashtable-based simple_xattrs with lazy allocation")
-  * commit 50704c391fbf ("pidfs: adapt to rhashtable-based simple_xattrs")
-
-Any of the three closes the cycle
-
-    fs_reclaim  ->  &ht->mutex
-
-which lockdep reports as follows. This particular splat was observed
-organically on a workstation kernel built from vfs-7.1-rc1.xattr at
-~35h uptime under normal mixed workload, with CONFIG_PROVE_LOCKING=y.
-The path happens to go through kernfs:
-
-  WARNING: possible circular locking dependency detected
-  7.0.0-faeab166167f-with-fixes-v1+ #191 Tainted: G     U
-  kswapd0/243 is trying to acquire lock:
-  ffff8882e475c0f8 (&ht->mutex){+.+.}-{4:4},
-    at: rhashtable_free_and_destroy+0x36/0x740
-  but task is already holding lock:
-  ffffffffa8ad1d00 (fs_reclaim){+.+.}-{0:0},
-    at: balance_pgdat+0x995/0x1600
-
-  the existing dependency chain (in reverse order) is:
-
-  -> #1 (fs_reclaim){+.+.}-{0:0}:
-         __lock_acquire+0x506/0xbf0
-         lock_acquire.part.0+0xc7/0x280
-         fs_reclaim_acquire+0xd9/0x130
-         __kvmalloc_node_noprof+0xcd/0xb40
-         bucket_table_alloc.isra.0+0x5a/0x440
-         rhashtable_rehash_alloc+0x4e/0xd0
-         rht_deferred_worker+0x14b/0x440
-         process_one_work+0x8fd/0x16a0
-         worker_thread+0x601/0xff0
-         kthread+0x36b/0x470
-         ret_from_fork+0x5bf/0x910
-         ret_from_fork_asm+0x1a/0x30
-
-  -> #0 (&ht->mutex){+.+.}-{4:4}:
-         check_prev_add+0xdb/0xce0
-         validate_chain+0x554/0x780
-         __lock_acquire+0x506/0xbf0
-         lock_acquire.part.0+0xc7/0x280
-         __mutex_lock+0x1b2/0x2550
-         rhashtable_free_and_destroy+0x36/0x740
-         kernfs_put.part.0+0x119/0x570
-         evict+0x3b6/0x9c0
-         __dentry_kill+0x181/0x540
-         shrink_dentry_list+0x135/0x440
-         prune_dcache_sb+0xdb/0x150
-         super_cache_scan+0x2ff/0x520
-         do_shrink_slab+0x35a/0xee0
-         shrink_slab_memcg+0x457/0x950
-         shrink_slab+0x43b/0x550
-         shrink_one+0x31a/0x6f0
-         shrink_many+0x31e/0xc80
-         shrink_node+0xeb3/0x14a0
-         balance_pgdat+0x8ed/0x1600
-         kswapd+0x2f3/0x530
-         kthread+0x36b/0x470
-         ret_from_fork+0x5bf/0x910
-         ret_from_fork_asm+0x1a/0x30
-
-   Possible unsafe locking scenario:
-
-         CPU0                    CPU1
-         ----                    ----
-    lock(fs_reclaim);
-                                 lock(&ht->mutex);
-                                 lock(fs_reclaim);
-    lock(&ht->mutex);
-
-Note that lockdep tracks lock classes, not instances: the two
-&ht->mutex sites are on different rhashtable objects (the deferred
-worker was triggered by some unrelated rhashtable growth), but because
-rhashtable_init() uses a single static lockdep key for all rhashtables,
-this is a real class-level cycle. Once reported, lockdep disables
-itself for the remainder of the boot, masking any subsequent locking
-bugs.
-
-Drop the mutex. After cancel_work_sync() the rehash worker is quiesced
-and, per this function's contract, no other concurrent access is
-possible; the tables are therefore owned exclusively by this function
-and can be walked without any lock held.
-
-Switch the table walks from rht_dereference() (which requires
-ht->mutex to be held under CONFIG_PROVE_RCU) to rcu_dereference_raw(),
-which has no lockdep annotation. rht_ptr_exclusive() already uses
-rcu_dereference_protected(p, 1) and needs no change.
-
-This is the only place in lib/rhashtable.c where &ht->mutex is
-acquired from a path reachable under fs_reclaim; the deferred worker
-is the only other site and it is the forward edge. Removing the
-acquisition here therefore eliminates the class cycle for all three
-subsystems that use simple_xattrs, not just the one in the splat
-above. No locking-semantics change is introduced for correct users;
-incorrect users would already be racing with rehash worker completion
-regardless of the mutex.
-
-Synthetic reproduction of the splat within a few-minute window was
-unsuccessful across several attempts (tmpfs and kernfs zombies via
-cgroupfs with open-fd-through-rmdir, with and without swap, up to
-~60k reclaim-path executions of simple_xattr_ht_free() in a single
-run), consistent with the rare coincidence-of-edges profile of the
-bug: the forward edge is already registered in /proc/lockdep on any
-idle system via rht_deferred_worker, but the reverse edge requires
-evict() to complete kernfs_put()'s final release inside the fs_reclaim
-critical section, which in my attempts was ordered against rather than
-interleaved with the worker.
-
-Fixes: b32c4a213698 ("xattr: add rhashtable-based simple_xattr infrastructure")
-Signed-off-by: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
----
- lib/rhashtable.c | 23 +++++++++++++++++------
- 1 file changed, 17 insertions(+), 6 deletions(-)
-
-diff --git a/lib/rhashtable.c b/lib/rhashtable.c
-index 6074ed5f66f3..81de7a274b43 100644
---- a/lib/rhashtable.c
-+++ b/lib/rhashtable.c
-@@ -1141,6 +1141,11 @@ static void rhashtable_free_one(struct rhashtable *ht, struct rhash_head *obj,
-  * This function will eventually sleep to wait for an async resize
-  * to complete. The caller is responsible that no further write operations
-  * occurs in parallel.
-+ *
-+ * After cancel_work_sync() has returned, the deferred rehash worker is
-+ * quiesced and, per the contract above, no other concurrent access to the
-+ * rhashtable is possible. The tables are therefore owned exclusively by
-+ * this function and can be walked without ht->mutex held.
-  */
- void rhashtable_free_and_destroy(struct rhashtable *ht,
- 				 void (*free_fn)(void *ptr, void *arg),
-@@ -1151,8 +1156,15 @@ void rhashtable_free_and_destroy(struct rhashtable *ht,
- 
- 	cancel_work_sync(&ht->run_work);
- 
--	mutex_lock(&ht->mutex);
--	tbl = rht_dereference(ht->tbl, ht);
-+	/*
-+	 * Do NOT take ht->mutex here. The rehash worker establishes
-+	 * ht->mutex -> fs_reclaim via GFP_KERNEL bucket allocation under
-+	 * the mutex; callers on the reclaim path (e.g. simple_xattr_ht_free()
-+	 * from evict() under the dcache shrinker for shmem/kernfs/pidfs
-+	 * inodes) would otherwise close a circular dependency
-+	 * fs_reclaim -> ht->mutex.
-+	 */
-+	tbl = rcu_dereference_raw(ht->tbl);
- restart:
- 	if (free_fn) {
- 		for (i = 0; i < tbl->size; i++) {
-@@ -1161,22 +1173,21 @@ void rhashtable_free_and_destroy(struct rhashtable *ht,
- 			cond_resched();
- 			for (pos = rht_ptr_exclusive(rht_bucket(tbl, i)),
- 			     next = !rht_is_a_nulls(pos) ?
--					rht_dereference(pos->next, ht) : NULL;
-+					rcu_dereference_raw(pos->next) : NULL;
- 			     !rht_is_a_nulls(pos);
- 			     pos = next,
- 			     next = !rht_is_a_nulls(pos) ?
--					rht_dereference(pos->next, ht) : NULL)
-+					rcu_dereference_raw(pos->next) : NULL)
- 				rhashtable_free_one(ht, pos, free_fn, arg);
- 		}
- 	}
- 
--	next_tbl = rht_dereference(tbl->future_tbl, ht);
-+	next_tbl = rcu_dereference_raw(tbl->future_tbl);
- 	bucket_table_free(tbl);
- 	if (next_tbl) {
- 		tbl = next_tbl;
- 		goto restart;
- 	}
--	mutex_unlock(&ht->mutex);
- }
- EXPORT_SYMBOL_GPL(rhashtable_free_and_destroy);
- 
--- 
-2.54.0
-
+> ---
+>  Documentation/devicetree/bindings/crypto/qcom,prng.yaml | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/crypto/qcom,prng.yaml b/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
+> index 41402599e9ab..1362a8b748a7 100644
+> --- a/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
+> +++ b/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
+> @@ -22,6 +22,7 @@ properties:
+>                - qcom,ipq9574-trng
+>                - qcom,kaanapali-trng
+>                - qcom,milos-trng
+> +              - qcom,nord-trng
+>                - qcom,qcs615-trng
+>                - qcom,qcs8300-trng
+>                - qcom,sa8255p-trng
+> -- 
+> 2.43.0
+> 
+> 
