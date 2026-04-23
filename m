@@ -1,170 +1,147 @@
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A229E364959
-	for <linux-crypto@vger.kernel.org>; Thu, 23 Apr 2026 11:20:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6483E342C88;
+	Thu, 23 Apr 2026 15:21:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1776943225; cv=none; b=Mu4n5JP8BIN9tBCF/ESXOtSjU/oxWfDQQL4PhmnL6scNXfanUd0LFQxWF3LlDhJP/hcpYikMufCzCycaXXZxQ85jRoWkfnTWz7PjSn1d8Sdlk2b49y3/THCiP+4xtOYzqPomKwPQz3kMWWVoISu2gt14GyKxYGCGKTzQ5pgIg1A=
+	t=1776957714; cv=none; b=PIjbSUhaRQdgPwWyOLCongeWmj7j2W5Hrl967JwOJui71nJE98u+kIFH/Up2l3bIJm01U5Y5fzEAW7q5b0dESkYLvDyw1pFs7OeCW3xqRBNlB9oBngNYr1A3FLZXR/rRnMbfERPf2GOuu4cLppYi0qyV6KPVyYlzWtlj969kiew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1776943225; c=relaxed/simple;
-	bh=+1XyvQRM0gBy3IMiyOE5RaAvDDzH4OZ8Vq8cH5BT8oE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uvE+c7tZ25VwkXh+q0aA3Irer5yhLfpf9TQdxEjfYcCFrzUxmr1lBDlv/LjRiBO6XCmURLoXXvez6d/79SaLTUVuHbEra5HOF7S8ynUmQZz3gJWrLQb0OiN9bm7SZ0JC3B5hZGB1rCnXjBSkdT962QfFWjcpRm4a8C5nhyXp1pU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SxfgClJ+; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1776957714; c=relaxed/simple;
+	bh=XIsNAoi30PsM0iJpdf2oChkKJsZYggPFxnfs0dZFUM4=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=F0/+DHXGgFCtEn40ZpWevXo/Z4AJx0l2BSftA5tzl2AtM1iVLL6Szme4YwTxKRo0jZ47YzEo/J/cjBx72vhHPKPNr8Vb+CPe5o0EesYR7RyiRtWrD1SlwJc3AMFzXonx9oz/J6hRbr0YJa85SaRySzsALTk3LuEo5dAkNwql894=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=UfD9SlG8; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SxfgClJ+"
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-35da2d35eccso4566006a91.0
-        for <linux-crypto@vger.kernel.org>; Thu, 23 Apr 2026 04:20:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1776943224; x=1777548024; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=RwuJIm7Dw5jp31ncEc1KOiDX7dt/dDt8uIoQj49sz9E=;
-        b=SxfgClJ+nu4PknWA/9Eycduk3SeUPlDKY/JUdeB0h45Gf2FHMEW7v7TlV9oVjIZSr7
-         AufSlZvVU61Ls1wOzAwZzghtifHBji7volmd99HL+7AUMl6l65fTahmrl9dp0uI9sl5q
-         5nh74crUhWSHCvG6QqCIfxUSOSgYhabY6XKmcnrQuJ3Ml5J1AGSkO7KGSLqCVHSBlpj2
-         LNMpS3m1qKs/bxDxZbTRGwJ8iXa2edVLQPKeA76+FKtfoCw9zMJmmb6r96R082N5CAZu
-         yD3ZGZFSfEgG01NIkXCUWcN1/J5c5XqXIda+uw5zZom0mYbQZqOWjHKOIWkG7gqT/n3Q
-         XAIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1776943224; x=1777548024;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RwuJIm7Dw5jp31ncEc1KOiDX7dt/dDt8uIoQj49sz9E=;
-        b=b9m1R83HjOPMBoj0dSiToY4hWmU8rpKyncIrZ3VB2SMoguKggNejnS/Ks8koWMbBR4
-         plUwBL37jm7JzIinwd530qRdN+xEX345hYWMz0X+OFJI9JJqi5R4QnUKHJLvzcEwEplP
-         bUfbGkxNC+Y/7es/xkYHzTuf1vRPrAI2iI4WeM2Uxhye9KPT8+rbvEziDwtdPINK6i4d
-         QMpUv61wTekAyzEQNPj9jcHl4/AIXPq//EoiajnbzVQUzRyZ2hx+mGNXE5cUnRFWVUmq
-         LT7muIuPiJT+gSdSaLv+6McCIhheMY8HP23pZn5fNt0oCQ4eIFpfsFE+T67csHFeZPxM
-         GYZA==
-X-Forwarded-Encrypted: i=1; AFNElJ96PnUipELBtmQVBXRxFCooPAiWg+yox8EAt2lc4yQO5K6oKnShLDbBsiqpfY2CBYP+Pbv04evfrX51QsQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwC6pOaxuJF8ntIdRAcxvuNRQ7tEM3nCzTLwnlqsjIIrmgQy1H8
-	s7IF4dQlPl3s7IVnKirJ1htzvnBEWorE+Im76Y2Ro6/GM12STWnC8p8b
-X-Gm-Gg: AeBDietMqZUn/9qqhajx7U6G6l4WZzHZXktZ3ypBbeRrGglubqn+8e/z++3Vekn7Mde
-	QsvwjMFFR78BhujU5Z7RpNriy+4EIG0LqYeZYngbxN88fM58binjFDvGox55SVFH6+r66OxLvnQ
-	joYFALb/C3GFDfROvVlZ2r3oLQdxNhNBR8hBjH9yl3stX5BUpmh+p5zpLobMxfQVINd4j1nFi90
-	FCBwxLE9zR8n0SGwzfEbYwHE+c/ZfdN0DsHxWZi73xx1fBWiJ92iSiiwwACVUGn9wfPXxzfHVPN
-	6MxHxkZ/hosRvdXz4PJD1qNeXOlC4M2dDsBpre2eExZpd+zfW4pJdeh50Q7RdHiORZi4OuU5vEn
-	lohTMF4y2a1Kpoy8gEHoI+UjFllsqEOPOn7YRL6rpbWgD6qphnAQZXDgT7IjHkQS/62F9n2Um+O
-	P+TR2gReVrTZjAMXhZ64YttKEYkwnjogVK91Mx72ggG3UresguPrRGldGNwTXN9k8=
-X-Received: by 2002:a17:90b:2243:b0:35f:bf4b:c396 with SMTP id 98e67ed59e1d1-361403ca5femr25738150a91.1.1776943223737;
-        Thu, 23 Apr 2026 04:20:23 -0700 (PDT)
-Received: from LAPTOP-CUCB24GH.tail9a93e7.ts.net ([175.159.176.252])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-36141973c57sm19456388a91.14.2026.04.23.04.20.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Apr 2026 04:20:23 -0700 (PDT)
-From: Ruoyu Wang <ruoyuw560@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Corentin Labbe <clabbe@baylibre.com>,
-	linux-crypto@vger.kernel.org
-Cc: Linus Walleij <linusw@kernel.org>,
-	Imre Kaloz <kaloz@openwrt.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Ruoyu Wang <ruoyuw560@gmail.com>
-Subject: [PATCH v2] crypto: ixp4xx - fix buffer chain unwind on allocation failure
-Date: Thu, 23 Apr 2026 19:19:56 +0800
-Message-ID: <20260423111956.185761-1-ruoyuw560@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="UfD9SlG8"
+Received: from [127.0.1.1] (unknown [52.177.6.131])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 5914F20B7165;
+	Thu, 23 Apr 2026 08:21:46 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5914F20B7165
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1776957707;
+	bh=2WGY0Xr4OWcuoDKIFjbEVHuS8imyUOJyUmF5Ad3Krqw=;
+	h=From:Date:Subject:To:Cc:From;
+	b=UfD9SlG8qmtSdJze3JZv8FkmAj1BKyxhCCKdbuCe+jgLX3FGKQkj3yQa5VtGB6Rj9
+	 YoBSzF0PhML3dQ/4N/1UGK5MGtA/q5K+Wbwr+AbM8fCoqq49QTpiqC37sw8FLZ60ZX
+	 rQgSpSOY/8vAOJJcH2ny2gClneX0b9jQmL3LdZzs=
+From: Jeff Barnes <jeffbarnes@linux.microsoft.com>
+Date: Thu, 23 Apr 2026 11:21:41 -0400
+Subject: [PATCH v2] crypto: testmgr - disallow RSA PKCS#1 SHA-1 sig algs in
+ FIPS mode
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260423-disallow_rsa_sha1_signing_in_fips_mode-v2-1-a5fe72dd8a71@linux.microsoft.com>
+X-B4-Tracking: v=1; b=H4sIAAQ56mkC/5WNSw6CMBRFt0I6toY+AcWR+zCk6RdeAi3pI6gh7
+ N3KDswdnTs4Z2PkEjpi92Jjya1IGEMGOBXMDCr0jqPNzKCEpqwAuEVS4xhfMpGSNCghCfuAoZc
+ YpMeZ5BSt4zevdQPQKltXLMvm5Dy+j9CzyzwgLTF9ju4qfu/fiVXwvEvdanO1ldDuMaFJkaJfz
+ iZOrNv3/Qt9rp+Z4AAAAA==
+To: Herbert Xu <herbert@gondor.apana.org.au>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>
+Cc: linux-crypto@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ Jeff Barnes <jeffbarnes@linux.microsoft.com>
+X-Mailer: b4 0.13.0
 
-chainup_buffers() builds a linked list of buffer descriptors for a
-scatterlist. If dma_pool_alloc() fails while constructing the list, the
-current code sets buf to NULL and later dereferences it unconditionally
-at the end of the function:
+When booted with fips=1, RSA signature generation using SHA-1 must not be
+available.  However, pkcs1pad(rsa,sha1) can currently be instantiated
+because it is not present in alg_test_descs; alg_test() falls through the
+no_test path and succeeds, after which the algorithm appears in
+/proc/crypto as fips-capable.
 
-  buf->next = NULL;
-  buf->phys_next = 0;
+Add explicit alg_test_descs entries for pkcs1pad(rsa,sha1) and
+pkcs1(rsa,sha1) without marking them fips_allowed, so they are treated as
+not FIPS-allowed when fips=1 is enabled.
 
-This can lead to a null-pointer dereference on allocation failure.
+Include both names to cover kernels where RSA sign/verify is provided via
+the pkcs1(...) signature template, while pkcs1pad(...) remains for the
+traditional wrapper naming and/or RSAES operations.
 
-If the failure happens after part of the descriptor chain has already
-been allocated and DMA-mapped, the partially constructed chain also
-needs to be released.
-
-Fix this by terminating the partially constructed chain on allocation
-failure and letting the callers unwind it via their existing cleanup
-paths. Also fix ablk_perform() to preserve the hook pointers before
-checking for failure, so partially built chains can be freed correctly.
-
-Signed-off-by: Ruoyu Wang <ruoyuw560@gmail.com>
+Signed-off-by: Jeff Barnes <jeffbarnes@linux.microsoft.com>
 ---
-v2:
-- Keep the unwind path in the callers, per Herbert Xu's feedback.
-- Terminate the partial chain before returning NULL on allocation failure.
-- Save the hook pointers in ablk_perform() before checking the return value.
-- Thanks to Herbert Xu for the review.
+This series fixes an issue where SHA-1 RSA signature generation remains
+available when booted with fips=1.
 
- drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c | 25 ++++++++++++---------
- 1 file changed, 14 insertions(+), 11 deletions(-)
+On a FIPS-enabled system, pkcs1pad(rsa,sha1) can be instantiated even
+though SHA-1 must not be available for signature generation. The reason
+is that the algorithm is not listed in crypto/testmgr.c's alg_test_descs,
+so alg_test() falls through the no_test path and succeeds. Once
+instantiated, /proc/crypto reports the algorithm as "fips: yes".
 
-diff --git a/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c b/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c
-index fcc0cf4df..5b90cf0fb 100644
---- a/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c
-+++ b/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c
-@@ -884,8 +884,9 @@ static struct buffer_desc *chainup_buffers(struct device *dev,
- 		ptr = sg_virt(sg);
- 		next_buf = dma_pool_alloc(buffer_pool, flags, &next_buf_phys);
- 		if (!next_buf) {
--			buf = NULL;
--			break;
-+			buf->next = NULL;
-+			buf->phys_next = 0;
-+			return NULL;
+This patch adds explicit alg_test_descs entries for:
+
+  - pkcs1pad(rsa,sha1)
+  - pkcs1(rsa,sha1)
+
+without setting fips=1, so they are treated as not FIPS-allowed in
+FIPS mode.
+
+Both names are covered to handle kernels where RSA signature operations
+are provided via the pkcs1(...) signature template, while pkcs1pad(...)
+remains for the historical wrapper naming and/or RSAES operations.
+
+Reproducer / evidence (current behavior):
+  1) Boot with fips=1 (confirm /proc/sys/crypto/fips_enabled == 1)
+  2) Allocate the transform:
+       crypto_alloc_akcipher("pkcs1pad(rsa,sha1)", 0, 0)
+  3) Observe that /proc/crypto now contains:
+       name   : pkcs1pad(rsa,sha1)
+       fips   : yes
+       selftest: passed
+  4) A simple in-kernel demo module can instantiate the transform and reach
+     the signing path in FIPS mode.
+
+With this change, attempts to instantiate these SHA-1 RSA signing
+templates in FIPS mode are rejected, preventing SHA-1 signature
+generation in approved mode.
+
+Thanks for taking a look.
+---
+Changes in v2:
+- Rewrap commit message body to conform to 75-column limit
+- Fix From/Signed-off-by address mismatch
+Link to v1: https://lore.kernel.org/r/20260422-disallow_rsa_sha1_signing_in_fips_mode-v1-1-1359bc7d41be@microsoft.com
+---
+ crypto/testmgr.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 30671e7bc349..e54d298a26c1 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -5306,6 +5306,9 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.suite = {
+ 			.sig = __VECS(pkcs1_rsa_none_tv_template)
  		}
- 		sg_dma_address(sg) = dma_map_single(dev, ptr, len, dir);
- 		buf->next = next_buf;
-@@ -983,7 +984,7 @@ static int ablk_perform(struct skcipher_request *req, int encrypt)
- 	unsigned int nbytes = req->cryptlen;
- 	enum dma_data_direction src_direction = DMA_BIDIRECTIONAL;
- 	struct ablk_ctx *req_ctx = skcipher_request_ctx(req);
--	struct buffer_desc src_hook;
-+	struct buffer_desc *buf, src_hook;
- 	struct device *dev = &pdev->dev;
- 	unsigned int offset;
- 	gfp_t flags = req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP ?
-@@ -1025,22 +1026,24 @@ static int ablk_perform(struct skcipher_request *req, int encrypt)
- 		/* This was never tested by Intel
- 		 * for more than one dst buffer, I think. */
- 		req_ctx->dst = NULL;
--		if (!chainup_buffers(dev, req->dst, nbytes, &dst_hook,
--				     flags, DMA_FROM_DEVICE))
--			goto free_buf_dest;
--		src_direction = DMA_TO_DEVICE;
-+		buf = chainup_buffers(dev, req->dst, nbytes, &dst_hook,
-+				      flags, DMA_FROM_DEVICE);
- 		req_ctx->dst = dst_hook.next;
- 		crypt->dst_buf = dst_hook.phys_next;
-+		if (!buf)
-+			goto free_buf_dest;
-+		src_direction = DMA_TO_DEVICE;
- 	} else {
- 		req_ctx->dst = NULL;
- 	}
- 	req_ctx->src = NULL;
--	if (!chainup_buffers(dev, req->src, nbytes, &src_hook, flags,
--			     src_direction))
--		goto free_buf_src;
--
-+	buf = chainup_buffers(dev, req->src, nbytes, &src_hook, flags,
-+			      src_direction);
- 	req_ctx->src = src_hook.next;
- 	crypt->src_buf = src_hook.phys_next;
-+	if (!buf)
-+		goto free_buf_src;
-+
- 	crypt->ctl_flags |= CTL_FLAG_PERFORM_ABLK;
- 	qmgr_put_entry(send_qid, crypt_virt2phys(crypt));
- 	BUG_ON(qmgr_stat_overflow(send_qid));
++	}, {
++		.alg = "pkcs1(rsa,sha1)",
++		.test = alg_test_null,
+ 	}, {
+ 		.alg = "pkcs1(rsa,sha224)",
+ 		.test = alg_test_null,
+@@ -5341,6 +5344,9 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.alg = "pkcs1pad(rsa)",
+ 		.test = alg_test_null,
+ 		.fips_allowed = 1,
++	}, {
++		.alg = "pkcs1pad(rsa,sha1)",
++		.test = alg_test_null,
+ 	}, {
+ 		.alg = "rfc3686(ctr(aes))",
+ 		.generic_driver = "rfc3686(ctr(aes-lib))",
+
+---
+base-commit: 8879a3c110cb8ca5a69c937643f226697aa551d9
+change-id: 20260422-disallow_rsa_sha1_signing_in_fips_mode-8fbb6229ad54
+
+Best regards,
 -- 
-2.43.0
+Jeff Barnes <jeffbarnes@linux.microsoft.com>
+
