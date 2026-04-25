@@ -1,330 +1,254 @@
-Received: from n169-114.mail.139.com (n169-114.mail.139.com [120.232.169.114])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E63F346E56;
-	Sat, 25 Apr 2026 08:14:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=120.232.169.114
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777104897; cv=none; b=QDAejMF6THYrKXdM20TblfOhZXdaaAxGvjmmfUQeWIuGZ3RVc7Hn3unjHyat4SU30NwU01lzy78P0/+NAnNhsQunSdz9fkztjAcg8YDAU2Wazl5KyD0EG9vdHSCF0qIoJKIa0h66bvTGlIuVjoyiukFPwNctWQ9bdfVj+fvbikU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777104897; c=relaxed/simple;
-	bh=kqmTSRgoAuNXllU0bu0bKbI7j5dTCeUCOXI/C1A1lvQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CZk3kEEIrVTQxncWECNKtZbfxSvzcNMi+3SBVCOvnfZw14wVf5HimQGtDidV8QNQsaLoV0oTvHGJFqQOZw6DerizmHgFxR0HQeorUnNs/TWNMcm3o7aemS//En5AivVDb4zPgRpfHb8fcIIQmYtnBYFj/C0GGVKLxHDh/2GU5lk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com; spf=pass smtp.mailfrom=139.com; dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b=IUD/5QEB; arc=none smtp.client-ip=120.232.169.114
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=139.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 499C81E2614
+	for <linux-crypto@vger.kernel.org>; Sat, 25 Apr 2026 13:34:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777124087; cv=pass; b=dS+jAwJue55vY1YQOZa6fMTOTSkF4aGZNaDb6d6sh4X4CC8/eEdOhf61ZJ+T1OtVak1/yAnKHrLx/LB1akiMxidiKfb/YLIWsU5QrOYzaIeEhvbwKAb2FHG0wzEL4rn517Zb9rtznbWqVEtjVVYf/msJL/Tmeru5PHCfrDZjIHs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777124087; c=relaxed/simple;
+	bh=6Eo8A5WAsAtwkceGaEZbfQ6JIDCw1JyUvM2PU9cxYd0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=S3suZ1GSVR+VSVwZWidAs4Q7qF1FsHTN9fD/N64AAxUpxNG0TNm/HV6ZMroGahG2C6xXqQk11krwDX2zCOqQSwl5dDlXdmQA+3mPtAYTKFHI1qquCdJgRPtonov0EFVy/icGT1t4KiCzN8Db+xxINkiZNAiMn2hE0qtft9j41z0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WBymSY8s; arc=pass smtp.client-ip=74.125.224.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b="IUD/5QEB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WBymSY8s"
+Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-6500f949a23so1028620d50.0
+        for <linux-crypto@vger.kernel.org>; Sat, 25 Apr 2026 06:34:44 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777124083; cv=none;
+        d=google.com; s=arc-20240605;
+        b=OLk0b77L8zI4gFOdqh1hlTOx7eO/yT1BXQlvW3qsO9L+lwsqJpsrW2QPb9GoCx6AYk
+         qTJ2mRIE43YdFARsgBLf/rY96yCEOSXJtnAYGkr77aT3tad2s9zvbzdapgKxbef/+kCH
+         vVaFDPJ0JQg0FlV6/1b7SS7zCYeGCpF2QHQ7FSsHuVLr8TiRcfqOZrw6U4gvuVRGaMHy
+         WMXaxPH6SLAdzyaEz9iPwUmU+r3WncT2shenoXGPt/eTTkS6c4vslJ9R16KQE+cIGEGB
+         NsIKC7RXcriSbgffdm7hRYOZDOUcQGGdDe5AF4xmNYZ3O0Z8erykyqnmkVEw5AsuFBQw
+         Lz1Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=aGQ1Nkb49nhA/wS/U7QyGOOaUJyCf1SaXvIle7aKzjQ=;
+        fh=w3J4wHsvX5QplIUi39bU1e2byyrstCCUUwgZWGfB7hg=;
+        b=C9EPxmx8++gZ+dlZa3PuB9aw/AMEAtPQQZ8ygMjN37NKd2lRFMqReYlGLr1p2BwweL
+         LmMNS4hNsoeJTsoqlhjGFEJVuWj3iSJQpkPM8qoYKt3SHMvYVv2b7L1y4tFbOXSEseR4
+         fyGJHZqaii1VMx9jx5ZsZz+avXUuu4/hafjsrVWTK8L2d/A7qHUHK65c7bisYbCtRPs5
+         JUP3O5jLmDaI66XAP9izJ1t1aUajerVlZDLI3MMItIROpXZ3tG7gd5IQXkiGqCDbjPuf
+         PsohVMY976dDMGFVesS6ABDktuoTYYYcGb3gntWSYrtJ92BHZ0CvhCLzG2rGCt8OVuLJ
+         hYaQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=139.com; s=dkim; l=0;
-	h=from:subject:message-id:to:cc:mime-version;
-	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
-	b=IUD/5QEBc9vblGgVkweIpE4UvM/Q3/od17Z9vLHO0yjry2UaY6f2LkRAwC9dA98JlA58+3R2Hj42M
-	 oyAjQ9fk8Ik6kY5hBByQnzGYIm8e3WGx/8HGc8z6JMAET4C0DWr/LIt5ad2hB9vinn5ky8GHKhkrlc
-	 WX+brSRvwSrGWqK8=
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM:                                                                                        
-X-RM-SPAM-FLAG:00000000
-Received:from  (unknown[183.241.55.34])
-	by rmsmtp-lg-appmail-42-12056 (RichMail) with SMTP id 2f1869ec77eaa3d-00a50;
-	Sat, 25 Apr 2026 16:14:41 +0800 (CST)
-X-RM-TRANSID:2f1869ec77eaa3d-00a50
-From: Bin Lan <lanbincn@139.com>
-To: gregkh@linuxfoundation.org,
-	sashal@kernel.org,
-	stable@vger.kernel.org
-Cc: steffen.klassert@secunet.com,
-	daniel.m.jordan@oracle.com,
-	linux-crypto@vger.kernel.org,
-	herbert@gondor.apana.org.au,
-	Bin Lan <lanbincn@139.com>
-Subject: [PATCH 6.12.y 1/2] padata: Fix pd UAF once and for all
-Date: Sat, 25 Apr 2026 16:14:29 +0800
-Message-ID: <20260425081433.2763-2-lanbincn@139.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260425081433.2763-1-lanbincn@139.com>
-References: <20260425081433.2763-1-lanbincn@139.com>
+        d=gmail.com; s=20251104; t=1777124083; x=1777728883; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aGQ1Nkb49nhA/wS/U7QyGOOaUJyCf1SaXvIle7aKzjQ=;
+        b=WBymSY8slZC2PPFxlwBuapv/aVSGyN7grFDPxpvYSmYWIvpEEWIh3T07CGXachox1W
+         pElSG8c9rr/2GkXpvR+rnGozLxnc4Isaky9T0Byxn9DbEFeTUvg6cE352OB8itEYwe10
+         a+WrUYfnrlbPvcnMZHUshflr9TshFi35rBPEKSS9+LLO+WJK0dPuHeUy7nJ6OoPRoQM2
+         Ouvoh2JCyQ7j0+zDCyb96OUqtIKtofQp/nHVEVukZDyxjlD/pHhQQDPVqT6/8tESL4eE
+         tzJG0Ve1f2U1OonLY+HZ4gRn6qPnp4YWUfiWZY/UGOSuydvXWWl/WXiLW6kwnQCgUY7x
+         6NXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777124083; x=1777728883;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=aGQ1Nkb49nhA/wS/U7QyGOOaUJyCf1SaXvIle7aKzjQ=;
+        b=mM+9J/RE21PCTuLqxTe68e13CqNSAYpzBbmU/r7hr4cslBye5EVeCC9JDrES71LFEs
+         mS43Yrw7Djbq/xCS9JMx7ntG3LXFl9gG0LI6G+ZQAh0tTqIEmcewJrs6l5Oo63mYayS8
+         mcMApmO77Ihh5o4GRA1tSwAQ2mdapOKF0lNykZsOuloCyMx+Y/76j0xvF8Fq1jGkXKKU
+         zHK9s6Bi0mFbDfu3lL9JGTCL98nLFq2mUxaqMvvtkhHarF2+QcdtXvpTw9v0t00eplBo
+         hZ2qLws0YNdjhaXErvvZcgTTiRevk6N8WK5Kq66/r8qHLfgbD+zAA75l/QsjO4dvYIzW
+         jl3Q==
+X-Forwarded-Encrypted: i=1; AFNElJ9I5lQ/n0irIa/xsbXL3MD0jdx55pWcea2k351x/LCcG3CPKM/0TJ+lk57aTSiRIcUz85lz3FpuQCBg6eo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCNguf1VSaUdhDfjOAlTWBIiO9Ve2ib8+qI0gh7bov2EE4M426
+	o1cr+Fxc6rdRuHfo87q56X5RAzo9Dv5TSwx42eQt5P/7iUJslz+xj+eZwoLBzYFat1P6LyCDj8E
+	kaaiE+g23fVQbUFEq/ISniZz3E5u/9V0=
+X-Gm-Gg: AeBDiesC/U0WhY7kmVSa+2xaYK0PA/0ER3RecYCGugFS76rpk2b5vVofimv/9emSBwT
+	LcRcrivt70TxJjHR7xfbd5paUiQkCi6M1HzAie1/zgmsNTcRoLXbFNGew+D6bea7qDuidQTkyrG
+	2BBrFmzGh4OX3acIxteJOOBNQXj9DfF0ZNJwDEb4NkMcsxf+FPnAZ0TM8cCYMWZOYhD47mGvivU
+	xpxK5yf0CQyQyW1gT+sTqzwf8Z40Ngc9619xeBRhMpGT/aGJ1L0j6JJ7478cN9W2y65xONpPGyw
+	Qr50Zqeij34KymBsat+3yFqhPA==
+X-Received: by 2002:a05:690c:6c91:b0:79e:631e:67b with SMTP id
+ 00721157ae682-7b9ecfc22a0mr233059967b3.4.1777124083091; Sat, 25 Apr 2026
+ 06:34:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260422210936.20095-1-l.rubusch@gmail.com> <a82278e5-9b5e-4fb9-9e7a-800ef2898ec5@app.fastmail.com>
+In-Reply-To: <a82278e5-9b5e-4fb9-9e7a-800ef2898ec5@app.fastmail.com>
+From: Lothar Rubusch <l.rubusch@gmail.com>
+Date: Sat, 25 Apr 2026 15:34:07 +0200
+X-Gm-Features: AQROBzCmsBuaXju-NqY78Bw0VoyzGEz_6XU6QAWYP44UpTkOPq9HD768Tc8rUWE
+Message-ID: <CAFXKEHbc74tB1pxuDmw9z-HWBQiktwwbo0ciN_rHQn2Y2D843A@mail.gmail.com>
+Subject: Re: [PATCH v3 0/3] crypto: atmel-sha204a - multiple RNG fixes
+To: Ard Biesheuvel <ardb@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, Thorsten Blum <thorsten.blum@linux.dev>, 
+	davem@davemloft.net, nicolas.ferre@microchip.com, 
+	alexandre.belloni@bootlin.com, claudiu.beznea@tuxon.dev, 
+	Linus Walleij <linusw@kernel.org>, linux-crypto@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
+Hi Ard and ML!
 
-[ Upstream commit 71203f68c7749609d7fc8ae6ad054bdedeb24f91 ]
+On Thu, Apr 23, 2026 at 11:25=E2=80=AFAM Ard Biesheuvel <ardb@kernel.org> w=
+rote:
+>
+> Hi Lothar,
+>
+> On Wed, 22 Apr 2026, at 23:09, Lothar Rubusch wrote:
+> > When testing the RNG functionality on the Atmel SHA204a hardware, I
+> > found the following issues: rngtest reported failures and hexdump
+> > reveiled only the first 8 bytes out of 32 provided actually entropy.
+> >
+> > Having a closer look into it, I found a (small) memory leak, missing
+> > to free work_data, miss-reading of the count field into the entropy
+> > fields and parts of the 32 random bytes staying 0 due to reading the
+> > slow i2c device.
+> >
+> > The series proposes fixes and how fixed functionality can be/was
+> > verified. Executing rngtest afterward showed a decent result, due
+> > to the i2c bus a bit slow.
+> >
+> > All setups require selecting the Atmel-sha204a as active RNG.
+> > $ cat /sys/class/misc/hw_random/rng_available
+> >     3f104000.rng 1-0064 none
+> >
+> > $ echo 1-0064 > /sys/class/misc/hw_random/rng_current
+> >
+> > $ cat /sys/class/misc/hw_random/rng_current
+> >     1-0064
+> >
+> > Testing RNG properties currently shows problematic results:
+> > $ rngtest < /dev/hwrng
+> >     rngtest 2.6
+> >     Copyright (c) 2004 by Henrique de Moraes Holschuh
+> >     This is free software; see the source for copying conditions.  Ther=
+e is NO
+> >     warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR =
+PURPOSE.
+> >
+> >     rngtest: starting FIPS tests...
+> >     rngtest: bits received from input: 1040032
+> >     rngtest: FIPS 140-2 successes: 0
+> >     rngtest: FIPS 140-2 failures: 52
+> >     rngtest: FIPS 140-2(2001-10-10) Monobit: 52
+> >     rngtest: FIPS 140-2(2001-10-10) Poker: 52
+> >     rngtest: FIPS 140-2(2001-10-10) Runs: 52
+> >     rngtest: FIPS 140-2(2001-10-10) Long run: 52
+> >     rngtest: FIPS 140-2(2001-10-10) Continuous run: 52
+> >     rngtest: input channel speed: (min=3D7.631; avg=3D7.804; max=3D7.82=
+7)Kibits/s
+> >     rngtest: FIPS tests speed: (min=3D32.273; avg=3D32.701; max=3D33.05=
+6)Mibits/s
+> >     rngtest: Program run time: 130177956 microseconds
+> >
+> > Signed-off-by: Lothar Rubusch <l.rubusch@gmail.com>
+> > ---
+> > v2 -> v3: Removal blank line, rebased
+> > v1 -> v2: Removal of C++ style comment (I saw it too late, sry for that=
+)
+> > ---
+> > Lothar Rubusch (3):
+> >   crypto: atmel-sha204a - fix memory leak at non-blocking RNG work_data
+> >   crypto: atmel-sha204a - fix truncated 32-byte blocking read
+> >   crypto: atmel-sha204a - fix non-blocking read logic
+> >
+> >  drivers/crypto/atmel-sha204a.c | 60 ++++++++++++++++++++++------------
+> >  1 file changed, 39 insertions(+), 21 deletions(-)
+> >
+>
+> Thanks for the report and the fixes. However, I'm not sure you are entire=
+ly
+> on the right track here. I managed to fix the rngtest issues that you rep=
+ort by
+> making the changes below. As I already replied, I think it would be bette=
+r to
+> propose this as a standalone patch, and backport it to stable.
+>
 
-There is a race condition/UAF in padata_reorder that goes back
-to the initial commit.  A reference count is taken at the start
-of the process in padata_do_parallel, and released at the end in
-padata_serial_worker.
+Thank you so much for taking the time and answering, I really appreciate!
 
-This reference count is (and only is) required for padata_replace
-to function correctly.  If padata_replace is never called then
-there is no issue.
+Like two months ago I started playing a bit more with these Atmel i2c
+devices. Actually I wanted to prepare something
+different (and still pretend doing so). Figuring out things here, I
+noticed this RNG feature did not work as I expected.
+Around that time I prepared this patch set.
+Probably, I was a bit too euphoric - I mean, it's a bit unlikely the
+driver was upstreamed and never really worked.
+I have to admit, I did not go thoroughly through the git history
+first, since the driver does not do significantly more than
+RNG, there must have happened a degradation. I'll keep this in mind:
+first to build up better understanding of the driver
+history. than to start digging into the code. Anyway, I wanted to get
+some feedback.
 
-In the function padata_reorder which serves as the core of padata,
-as soon as padata is added to queue->serial.list, and the associated
-spin lock released, that padata may be processed and the reference
-count on pd would go away.
+> The remaining changes are somewhat debatable IMO: the leak is not really =
+a leak,
+> so I'd like to understand better what you are fixing here. The command fi=
+eld
+> changes seems completely misguided (unless I am missing something)
+>
 
-Fix this by getting the next padata before the squeue->serial lock
-is released.
+So, firstly in the current RNG implementation I definitely see an
+issue. If that's ok, I'll to prepare a patch to re-init probably
+rather
+to what you proposed, since it makes more sense to me now. Thank you
+for pointing this out.
 
-In order to make this possible, simplify padata_reorder by only
-calling it once the next padata arrives.
+Secondly, I noticed the device is picky about its i2c communication
+timings. Yes, definitely. Nowadays, after having worked with
+it a bit more, I'd rather say generally reducing response time is
+probably not the solution. I still think I see some timing issue,
+which
+I wanted to better address in an upcoming patch set (but probably not
+related to this RNG thing). Currently the AtSHA204a and
+the AtECC508a (and related families) are sharing the same Atmel i2c
+driver. This core driver uses hardcoded max timings for
+its i2c command operations. Going over the datasheets of both chips,
+both have totally different max timings.
+Currently just having RNG for AtSHA204a and ECDH and related for AtECC
+- it probably doesn't matter too much. Anyway, also
+read and write command timings differ and mix up then in the Atmel i2c
+core driver. I guess, this was kind of a starting point for
+me to dig deeper. So, I probably will drop that i2c timing change from
+this RNG fix set.
 
-Fixes: 16295bec6398 ("padata: Generic parallelization/serialization interface")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-[ Adjust context of padata_find_next(). Replace
-cpumask_next_wrap(cpu, pd->cpumask.pcpu) with
-cpumask_next_wrap(cpu, pd->cpumask.pcpu, -1, false) in padata_reorder() in
-v6.12 according to dc5bb9b769c9 ("cpumask: deprecate cpumask_next_wrap()") and
-f954a2d37637 ("padata: switch padata_find_next() to using cpumask_next_wrap()")
-. ]
-Signed-off-by: Bin Lan <lanbincn@139.com>
----
- include/linux/padata.h |   3 -
- kernel/padata.c        | 136 +++++++++++------------------------------
- 2 files changed, 37 insertions(+), 102 deletions(-)
+Thirdly, the "leak" I think is probably rather a theoretic issue. I'll
+sepearate it out, think over it, and in case prepare something,
+let me then know what you think.
 
-diff --git a/include/linux/padata.h b/include/linux/padata.h
-index 0146daf34430..b486c7359de2 100644
---- a/include/linux/padata.h
-+++ b/include/linux/padata.h
-@@ -91,7 +91,6 @@ struct padata_cpumask {
-  * @cpu: Next CPU to be processed.
-  * @cpumask: The cpumasks in use for parallel and serial workers.
-  * @reorder_work: work struct for reordering.
-- * @lock: Reorder lock.
-  */
- struct parallel_data {
- 	struct padata_shell		*ps;
-@@ -102,8 +101,6 @@ struct parallel_data {
- 	unsigned int			processed;
- 	int				cpu;
- 	struct padata_cpumask		cpumask;
--	struct work_struct		reorder_work;
--	spinlock_t                      ____cacheline_aligned lock;
- };
- 
- /**
-diff --git a/kernel/padata.c b/kernel/padata.c
-index c3810f5bd715..e61bdc248551 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -261,20 +261,17 @@ EXPORT_SYMBOL(padata_do_parallel);
-  *   be parallel processed by another cpu and is not yet present in
-  *   the cpu's reorder queue.
-  */
--static struct padata_priv *padata_find_next(struct parallel_data *pd,
--					    bool remove_object)
-+static struct padata_priv *padata_find_next(struct parallel_data *pd, int cpu,
-+					    unsigned int processed)
- {
- 	struct padata_priv *padata;
- 	struct padata_list *reorder;
--	int cpu = pd->cpu;
- 
- 	reorder = per_cpu_ptr(pd->reorder_list, cpu);
- 
- 	spin_lock(&reorder->lock);
--	if (list_empty(&reorder->list)) {
--		spin_unlock(&reorder->lock);
--		return NULL;
--	}
-+	if (list_empty(&reorder->list))
-+		goto notfound;
- 
- 	padata = list_entry(reorder->list.next, struct padata_priv, list);
- 
-@@ -282,101 +279,52 @@ static struct padata_priv *padata_find_next(struct parallel_data *pd,
- 	 * Checks the rare case where two or more parallel jobs have hashed to
- 	 * the same CPU and one of the later ones finishes first.
- 	 */
--	if (padata->seq_nr != pd->processed) {
--		spin_unlock(&reorder->lock);
--		return NULL;
--	}
--
--	if (remove_object) {
--		list_del_init(&padata->list);
--		++pd->processed;
--		/* When sequence wraps around, reset to the first CPU. */
--		if (unlikely(pd->processed == 0))
--			pd->cpu = cpumask_first(pd->cpumask.pcpu);
--		else
--			pd->cpu = cpumask_next_wrap(cpu, pd->cpumask.pcpu, -1, false);
--	}
-+	if (padata->seq_nr != processed)
-+		goto notfound;
- 
-+	list_del_init(&padata->list);
- 	spin_unlock(&reorder->lock);
- 	return padata;
-+
-+notfound:
-+	pd->processed = processed;
-+	pd->cpu = cpu;
-+	spin_unlock(&reorder->lock);
-+	return NULL;
- }
- 
--static void padata_reorder(struct parallel_data *pd)
-+static void padata_reorder(struct padata_priv *padata)
- {
-+	struct parallel_data *pd = padata->pd;
- 	struct padata_instance *pinst = pd->ps->pinst;
--	int cb_cpu;
--	struct padata_priv *padata;
--	struct padata_serial_queue *squeue;
--	struct padata_list *reorder;
-+	unsigned int processed;
-+	int cpu;
- 
--	/*
--	 * We need to ensure that only one cpu can work on dequeueing of
--	 * the reorder queue the time. Calculating in which percpu reorder
--	 * queue the next object will arrive takes some time. A spinlock
--	 * would be highly contended. Also it is not clear in which order
--	 * the objects arrive to the reorder queues. So a cpu could wait to
--	 * get the lock just to notice that there is nothing to do at the
--	 * moment. Therefore we use a trylock and let the holder of the lock
--	 * care for all the objects enqueued during the holdtime of the lock.
--	 */
--	if (!spin_trylock_bh(&pd->lock))
--		return;
-+	processed = pd->processed;
-+	cpu = pd->cpu;
- 
--	while (1) {
--		padata = padata_find_next(pd, true);
-+	do {
-+		struct padata_serial_queue *squeue;
-+		int cb_cpu;
- 
--		/*
--		 * If the next object that needs serialization is parallel
--		 * processed by another cpu and is still on it's way to the
--		 * cpu's reorder queue, nothing to do for now.
--		 */
--		if (!padata)
--			break;
-+		cpu = cpumask_next_wrap(cpu, pd->cpumask.pcpu, -1, false);
-+		processed++;
- 
- 		cb_cpu = padata->cb_cpu;
- 		squeue = per_cpu_ptr(pd->squeue, cb_cpu);
- 
- 		spin_lock(&squeue->serial.lock);
- 		list_add_tail(&padata->list, &squeue->serial.list);
--		spin_unlock(&squeue->serial.lock);
--
- 		queue_work_on(cb_cpu, pinst->serial_wq, &squeue->work);
--	}
- 
--	spin_unlock_bh(&pd->lock);
--
--	/*
--	 * The next object that needs serialization might have arrived to
--	 * the reorder queues in the meantime.
--	 *
--	 * Ensure reorder queue is read after pd->lock is dropped so we see
--	 * new objects from another task in padata_do_serial.  Pairs with
--	 * smp_mb in padata_do_serial.
--	 */
--	smp_mb();
--
--	reorder = per_cpu_ptr(pd->reorder_list, pd->cpu);
--	if (!list_empty(&reorder->list) && padata_find_next(pd, false)) {
- 		/*
--		 * Other context(eg. the padata_serial_worker) can finish the request.
--		 * To avoid UAF issue, add pd ref here, and put pd ref after reorder_work finish.
-+		 * If the next object that needs serialization is parallel
-+		 * processed by another cpu and is still on it's way to the
-+		 * cpu's reorder queue, end the loop.
- 		 */
--		padata_get_pd(pd);
--		if (!queue_work(pinst->serial_wq, &pd->reorder_work))
--			padata_put_pd(pd);
--	}
--}
--
--static void invoke_padata_reorder(struct work_struct *work)
--{
--	struct parallel_data *pd;
--
--	local_bh_disable();
--	pd = container_of(work, struct parallel_data, reorder_work);
--	padata_reorder(pd);
--	local_bh_enable();
--	/* Pairs with putting the reorder_work in the serial_wq */
--	padata_put_pd(pd);
-+		padata = padata_find_next(pd, cpu, processed);
-+		spin_unlock(&squeue->serial.lock);
-+	} while (padata);
- }
- 
- static void padata_serial_worker(struct work_struct *serial_work)
-@@ -427,6 +375,7 @@ void padata_do_serial(struct padata_priv *padata)
- 	struct padata_list *reorder = per_cpu_ptr(pd->reorder_list, hashed_cpu);
- 	struct padata_priv *cur;
- 	struct list_head *pos;
-+	bool gotit = true;
- 
- 	spin_lock(&reorder->lock);
- 	/* Sort in ascending order of sequence number. */
-@@ -436,17 +385,14 @@ void padata_do_serial(struct padata_priv *padata)
- 		if ((signed int)(cur->seq_nr - padata->seq_nr) < 0)
- 			break;
- 	}
--	list_add(&padata->list, pos);
-+	if (padata->seq_nr != pd->processed) {
-+		gotit = false;
-+		list_add(&padata->list, pos);
-+	}
- 	spin_unlock(&reorder->lock);
- 
--	/*
--	 * Ensure the addition to the reorder list is ordered correctly
--	 * with the trylock of pd->lock in padata_reorder.  Pairs with smp_mb
--	 * in padata_reorder.
--	 */
--	smp_mb();
--
--	padata_reorder(pd);
-+	if (gotit)
-+		padata_reorder(padata);
- }
- EXPORT_SYMBOL(padata_do_serial);
- 
-@@ -643,9 +589,7 @@ static struct parallel_data *padata_alloc_pd(struct padata_shell *ps)
- 	padata_init_squeues(pd);
- 	pd->seq_nr = -1;
- 	refcount_set(&pd->refcnt, 1);
--	spin_lock_init(&pd->lock);
- 	pd->cpu = cpumask_first(pd->cpumask.pcpu);
--	INIT_WORK(&pd->reorder_work, invoke_padata_reorder);
- 
- 	return pd;
- 
-@@ -1155,12 +1099,6 @@ void padata_free_shell(struct padata_shell *ps)
- 	if (!ps)
- 		return;
- 
--	/*
--	 * Wait for all _do_serial calls to finish to avoid touching
--	 * freed pd's and ps's.
--	 */
--	synchronize_rcu();
--
- 	mutex_lock(&ps->pinst->lock);
- 	list_del(&ps->list);
- 	pd = rcu_dereference_protected(ps->pd, 1);
--- 
-2.43.0
-
-
+>
+>
+> --- a/drivers/crypto/atmel-sha204a.c
+> +++ b/drivers/crypto/atmel-sha204a.c
+> @@ -47,8 +47,8 @@
+>
+>         if (rng->priv) {
+>                 work_data =3D (struct atmel_i2c_work_data *)rng->priv;
+> -               max =3D min(sizeof(work_data->cmd.data), max);
+> -               memcpy(data, &work_data->cmd.data, max);
+> +               max =3D min(RANDOM_RSP_SIZE - CMD_OVERHEAD_SIZE, max);
+> +               memcpy(data, &work_data->cmd.data[1], max);
+>                 rng->priv =3D 0;
+>         } else {
+>                 work_data =3D kmalloc_obj(*work_data, GFP_ATOMIC);
+> @@ -86,8 +86,8 @@
+>         if (ret)
+>                 return ret;
+>
+> -       max =3D min(sizeof(cmd.data), max);
+> -       memcpy(data, cmd.data, max);
+> +       max =3D min(RANDOM_RSP_SIZE - CMD_OVERHEAD_SIZE, max);
+> +       memcpy(data, &cmd.data[1], max);
+>
+>         return max;
+>  }
