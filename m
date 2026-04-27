@@ -1,30 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA2DA3DA7ED;
-	Mon, 27 Apr 2026 17:27:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D68133E3D9E;
+	Mon, 27 Apr 2026 17:27:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777310867; cv=none; b=Q3NYmo05o5HZXqxISYJc+jmPWpkElQnqJxY2W/3sZ3XGicT0lxhkW5LaioIG2iy1COh4EUN6gpMLOfDKWiqDXd3lZ0I8YipIg6kwkQwETVEI59rtKY7cD1j7r1t1ywaS8hlhilTtNtybSgat1DXOufMdjvUviOX2/uRzuMW1p04=
+	t=1777310868; cv=none; b=bHGww4K5SnqzQQALvsOFI/h7qo42OkX8mc30FzjXSWSKWzQ5TD2O92CrjW92y6ilTgdZDWX/7jlHs3p72LN6AE7/ScrxdVlZRdcQXtn6WB6FHutjC4p3Qpuu3nUs8/lTvwxDAnmQqM+4lRflEAaKh1kDSszEKj63hqAI+GRhbr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777310867; c=relaxed/simple;
-	bh=lffQnEF2HxPa86nR073wmKFncHxsvNGQFc1fCjNgYos=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AzMGX48rsSKhknSHm15KeFY+0a5dsD9tnniJejq3fgxGEyyEXh+GS4ZMg5N7zbYkJ2qpfU20Ux3qrjHDbhBEVH7WkbQfgTXOg++aEdh9q3zYFqUo2UDo4BFBbHdeYpE/XcqH+LTK5J4Vr1iXeu3jXzq2fUgj/Z5iMJ/5kaCxl9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FQWh91jQ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777310868; c=relaxed/simple;
+	bh=NowSzIkajZVB4CAlNLelZV9Eiq/85JAIX736v3Hk6O0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=IEhcx5Z4k2eKfxdkOEcO+ZMzehCA2PFzwa7WJKO8xyNLvxqtln2Z0vG4IzpjTUHLx+iUlcumciKVFnJa+sJpB/N+b2zVpErY2ngErD+xWCVbygJM97B7t+kQNigp144+Nsw001/u4JKnNp3G+UzF3d37k3GRxizhBFmRtQ6hhrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h5iLeF0n; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FQWh91jQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89740C19425;
-	Mon, 27 Apr 2026 17:27:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h5iLeF0n"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD133C2BCB9;
+	Mon, 27 Apr 2026 17:27:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777310867;
-	bh=lffQnEF2HxPa86nR073wmKFncHxsvNGQFc1fCjNgYos=;
-	h=From:To:Cc:Subject:Date:From;
-	b=FQWh91jQO/zC/C+ji8OmIrTTTUN3CZckMtGiKZREDIZs+oHlCiYRnfeReTMhoBRFM
-	 ZA/EykxErVe9XfPJB2laIdM0V4eO1pWY7QImwz9cl9AzutYCb/m60MVWJ6ZOm1nrcd
-	 A0kduFH9/hKVNDewi7xjH4NuO+1y8zqlaeJxsUH8ouvlF7lPj2IbA8ISvS/+S3kjQp
-	 46WNoddh2xS/Gi5xZaEC35rCJUNFUMCDiwfWVfDp8xWGDHBEs9KJs3mNQp7AMtie4+
-	 +AmOFE4hzvrqn11sCbuO04tc0Z8OttaOt0/tWtgct38IN+9bmvU9fwSFKCGuPATRo/
-	 yZYZMj5HxFGuw==
+	s=k20201202; t=1777310868;
+	bh=NowSzIkajZVB4CAlNLelZV9Eiq/85JAIX736v3Hk6O0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=h5iLeF0n1teydM2x+7eRLXZBMCKEzAj7V6ZbqXPETRG1h3DWev3DijIQLUCB8CbIy
+	 S+BhaBLFm//Zrm1iRc2NaKDHqQGxJ96QXknE4QgPFV9Aay2bRvZiQYSSFDuFyqZ+G9
+	 +vNGLwUobrZ+03rtSIh+JT5yh0qrDucNggUk1aL+y6TOAfOYY+Xq4QkMrjwMSjyk8T
+	 m/HLqUp9lBbOz6MlfBobLzTCxUpGHnccYx0PO0dGcElioKml4FQdyzD08YT6wF66BX
+	 gmBitpzaW7FxjpJV/fsqmF+QPUMJqkdJh/OimU78lNOu9Yr1qzLxuxozZjbcsPxO1i
+	 zxv7LI8HhqZIg==
 From: Eric Biggers <ebiggers@kernel.org>
 To: netdev@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
@@ -42,10 +43,12 @@ Cc: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Dmitry Safonov <0x7f454c46@gmail.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH net-next v2 0/5] Reimplement TCP-AO using crypto library
-Date: Mon, 27 Apr 2026 10:27:22 -0700
-Message-ID: <20260427172727.9310-1-ebiggers@kernel.org>
+Subject: [PATCH net-next v2 1/5] net/tcp-ao: Drop support for most non-RFC-specified algorithms
+Date: Mon, 27 Apr 2026 10:27:23 -0700
+Message-ID: <20260427172727.9310-2-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260427172727.9310-1-ebiggers@kernel.org>
+References: <20260427172727.9310-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -54,84 +57,177 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series can also be retrieved from:
+RFC 5926 (https://datatracker.ietf.org/doc/html/rfc5926) specifies the
+use of AES-128-CMAC and HMAC-SHA1 with TCP-AO.  This includes a
+specification for how traffic keys shall be derived for each algorithm.
 
-    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tcp-ao-v2
+Support for any other algorithms with TCP-AO isn't standardized, though
+an expired Internet Draft (a work-in-progress document, not a standard)
+from 2019 does propose adding HMAC-SHA256 support:
+https://datatracker.ietf.org/doc/html/draft-nayak-tcp-sha2-03
 
-This series is targeting net-next for 7.2.  To make this series
-self-contained in the networking code, I dropped the patches that remove
-support for transformation cloning from the crypto API, which is a
-further negative 275-line cleanup and optimization this series enables.
-That will be done as a follow-up, either through the crypto tree for
-7.3, or still through net-next for 7.2 at maintainer preference.
+Since both documents specify the KDF for each algorithm individually, it
+isn't necessarily clear how any other algorithm should be integrated.
 
-This series refactors the TCP-AO (TCP Authentication Option) code to do
-MAC and KDF computations using lib/crypto/ instead of crypto_ahash.
-This greatly simplifies the code and makes it much more efficient.  The
-entire tcp_sigpool mechanism becomes unnecessary and is removed, as the
-problems it was designed to solve don't exist with the library APIs.
+Nevertheless, the Linux implementation of TCP-AO allows userspace to
+specify the MAC algorithm as a string tcp_ao_add::alg_name naming either
+"cmac(aes128)" or an arbitrary algorithm in the crypto_ahash API.  The
+set of valid strings is undocumented.  The implementation assumes that
+"cmac(aes128)" is the only algorithm that requires an entropy extraction
+step and that all algorithms accept keys with length equal to the
+untruncated MAC; thus, arbitrary HMAC algorithms probably do work, but
+some other MAC algorithms like AES-256-CMAC have never actually worked.
 
-The crypto API's support for crypto transformation cloning also becomes
-unnecessary and will be removed in follow-up patches.  Note that as part
-of that, we'll be able to roll back the addition of the reference count
-to crypto_tfm, which had regressed performance for all crypto API users.
+Unfortunately, this undocumented string allows many obsolete, insecure,
+or redundant algorithms.  For example, "hmac(md5)" and the
+non-cryptographic "crc32" are accepted.  It also ties the implementation
+to crypto_ahash and requires that most memory be dynamically allocated,
+making the implementation unnecessarily complex and inefficient.  Still
+furthermore, this implementation requires the crypto API to support
+"transformation cloning", whose only user is this feature.
 
-To make this simplification and optimization possible, this series also
-updates the TCP-AO code to support a specific set of algorithms, rather
-than arbitrary algorithms that don't make sense and are very likely not
-being used, e.g. CRC-32 and HMAC-MD5.
+Fortunately, it's very likely that only a few algorithms are actually
+used in practice.  Let's restrict the set of allowed algorithms to
+"cmac(aes128)" (or "cmac(aes)" with keylen=16), "hmac(sha1)", and
+"hmac(sha256)".  The first two are the actually standard ones, while
+HMAC-SHA256 seems like a reasonable algorithm to continue supporting as
+a Linux extension, considering the Internet Draft for it and the fact
+that SHA-256 is the usual choice of upgrade from the outdated SHA-1.
 
-Specifically, this series retains the support for AES-128-CMAC,
-HMAC-SHA1, and HMAC-SHA256.  AES-128-CMAC and HMAC-SHA1 are the only
-algorithms that are actually standardized for use in TCP-AO, while
-HMAC-SHA256 makes sense to continue supporting as a Linux extension.  Of
-course, other algorithms can still be (re-)added later if ever needed.
-It's worth noting that TCP-AO MACs are limited to 20 bytes by the TCP
-options space, which limits the benefit of further algorithm upgrades.
+If any other algorithm ever turns out to be needed, e.g. HMAC-SHA512, it
+can of course be (re-)added in library form.  However, note that the TCP
+options space limits TCP-AO MACs to 20 bytes (160 bits) anyway, which
+limits the potential benefit of any further upgrade to the algorithm.
 
-This series passes the tcp_ao selftests
-(sudo make -C tools/testing/selftests/net/tcp_ao/ run_tests).
+Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ net/ipv4/tcp_ao.c                             |  4 ++
+ tools/testing/selftests/net/tcp_ao/config     |  1 -
+ .../selftests/net/tcp_ao/key-management.c     | 41 ++-----------------
+ 3 files changed, 7 insertions(+), 39 deletions(-)
 
-To get a sense for how much more efficient this makes the TCP-AO code,
-here's a microbenchmark for tcp_ao_hash_skb() with skb->len == 128:
-
-        Algorithm       Avg cycles (before)     Avg cycles (after)
-        ---------       -------------------     ------------------
-        HMAC-SHA1       3319                    1256
-        HMAC-SHA256     3311                    1344
-        AES-128-CMAC    2720                    1107
-
-Changed in v2:
-    - Rebased onto v7.1-rc1.
-    - Added Ard's Reviewed-by.
-    - Dropped patches that clean up things in the crypto/ directory, as
-      mentioned above.  They'll be sent separately.
-    - Added some mentions of the MAC length being limited by the TCP
-      options space.
-    - Removed unnecessary explicit assignment of values to enums.
-
-Eric Biggers (5):
-  net/tcp-ao: Drop support for most non-RFC-specified algorithms
-  net/tcp-ao: Use crypto library API instead of crypto_ahash
-  net/tcp-ao: Use stack-allocated MAC and traffic_key buffers
-  net/tcp-ao: Return void from functions that can no longer fail
-  net/tcp: Remove tcp_sigpool
-
- include/net/tcp.h                             |  42 +-
- include/net/tcp_ao.h                          |  74 +-
- net/ipv4/Kconfig                              |   8 +-
- net/ipv4/Makefile                             |   1 -
- net/ipv4/tcp_ao.c                             | 677 +++++++++---------
- net/ipv4/tcp_output.c                         |  10 +-
- net/ipv4/tcp_sigpool.c                        | 366 ----------
- net/ipv6/tcp_ao.c                             | 139 ++--
- tools/testing/selftests/net/tcp_ao/config     |   4 -
- .../selftests/net/tcp_ao/key-management.c     |  41 +-
- 10 files changed, 440 insertions(+), 922 deletions(-)
- delete mode 100644 net/ipv4/tcp_sigpool.c
-
-
-base-commit: 254f49634ee16a731174d2ae34bc50bd5f45e731
+diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
+index a97cdf3e6af4..b21bd69b4e82 100644
+--- a/net/ipv4/tcp_ao.c
++++ b/net/ipv4/tcp_ao.c
+@@ -1561,10 +1561,14 @@ static struct tcp_ao_key *tcp_ao_key_alloc(struct sock *sk,
+ 	cmd->alg_name[ARRAY_SIZE(cmd->alg_name) - 1] = '\0';
+ 
+ 	/* RFC5926, 3.1.1.2. KDF_AES_128_CMAC */
+ 	if (!strcmp("cmac(aes128)", algo))
+ 		algo = "cmac(aes)";
++	else if (strcmp("hmac(sha1)", algo) &&
++		 strcmp("hmac(sha256)", algo) &&
++		 (strcmp("cmac(aes)", algo) || cmd->keylen != 16))
++		return ERR_PTR(-ENOENT);
+ 
+ 	/* Full TCP header (th->doff << 2) should fit into scratch area,
+ 	 * see tcp_ao_hash_header().
+ 	 */
+ 	pool_id = tcp_sigpool_alloc_ahash(algo, 60);
+diff --git a/tools/testing/selftests/net/tcp_ao/config b/tools/testing/selftests/net/tcp_ao/config
+index f22148512365..47228a7d0b90 100644
+--- a/tools/testing/selftests/net/tcp_ao/config
++++ b/tools/testing/selftests/net/tcp_ao/config
+@@ -1,8 +1,7 @@
+ CONFIG_CRYPTO_CMAC=y
+ CONFIG_CRYPTO_HMAC=y
+-CONFIG_CRYPTO_RMD160=y
+ CONFIG_CRYPTO_SHA1=y
+ CONFIG_IPV6=y
+ CONFIG_IPV6_MULTIPLE_TABLES=y
+ CONFIG_NET_L3_MASTER_DEV=y
+ CONFIG_NET_VRF=y
+diff --git a/tools/testing/selftests/net/tcp_ao/key-management.c b/tools/testing/selftests/net/tcp_ao/key-management.c
+index 69d9a7a05d5c..d86bb380b79f 100644
+--- a/tools/testing/selftests/net/tcp_ao/key-management.c
++++ b/tools/testing/selftests/net/tcp_ao/key-management.c
+@@ -378,35 +378,10 @@ static void check_listen_socket(void)
+ 				  this_ip_dest, DEFAULT_TEST_PREFIX,
+ 				  false, true, 20, 10, FAULT_CURRNEXT);
+ 	close(sk);
+ }
+ 
+-static const char *fips_fpath = "/proc/sys/crypto/fips_enabled";
+-static bool is_fips_enabled(void)
+-{
+-	static int fips_checked = -1;
+-	FILE *fenabled;
+-	int enabled;
+-
+-	if (fips_checked >= 0)
+-		return !!fips_checked;
+-	if (access(fips_fpath, R_OK)) {
+-		if (errno != ENOENT)
+-			test_error("Can't open %s", fips_fpath);
+-		fips_checked = 0;
+-		return false;
+-	}
+-	fenabled = fopen(fips_fpath, "r");
+-	if (!fenabled)
+-		test_error("Can't open %s", fips_fpath);
+-	if (fscanf(fenabled, "%d", &enabled) != 1)
+-		test_error("Can't read from %s", fips_fpath);
+-	fclose(fenabled);
+-	fips_checked = !!enabled;
+-	return !!fips_checked;
+-}
+-
+ struct test_key {
+ 	char password[TCP_AO_MAXKEYLEN];
+ 	const char *alg;
+ 	unsigned int len;
+ 	uint8_t client_keyid;
+@@ -428,18 +403,11 @@ struct key_collection {
+ };
+ 
+ static struct key_collection collection;
+ 
+ #define TEST_MAX_MACLEN		16
+-const char *test_algos[] = {
+-	"cmac(aes128)",
+-	"hmac(sha1)", "hmac(sha512)", "hmac(sha384)", "hmac(sha256)",
+-	"hmac(sha224)", "hmac(sha3-512)",
+-	/* only if !CONFIG_FIPS */
+-#define TEST_NON_FIPS_ALGOS	2
+-	"hmac(rmd160)", "hmac(md5)"
+-};
++const char *test_algos[] = { "cmac(aes128)", "hmac(sha1)", "hmac(sha256)" };
+ const unsigned int test_maclens[] = { 1, 4, 12, 16 };
+ #define MACLEN_SHIFT		2
+ #define ALGOS_SHIFT		4
+ 
+ static unsigned int make_mask(unsigned int shift, unsigned int prev_shift)
+@@ -450,11 +418,11 @@ static unsigned int make_mask(unsigned int shift, unsigned int prev_shift)
+ }
+ 
+ static void init_key_in_collection(unsigned int index, bool randomized)
+ {
+ 	struct test_key *key = &collection.keys[index];
+-	unsigned int algos_nr, algos_index;
++	unsigned int algos_index;
+ 
+ 	/* Same for randomized and non-randomized test flows */
+ 	key->client_keyid = index;
+ 	key->server_keyid = 127 + index;
+ 	key->matches_client = 1;
+@@ -472,14 +440,11 @@ static void init_key_in_collection(unsigned int index, bool randomized)
+ 		unsigned int shift = MACLEN_SHIFT;
+ 
+ 		key->maclen = test_maclens[index & make_mask(shift, 0)];
+ 		algos_index = index & make_mask(ALGOS_SHIFT, shift);
+ 	}
+-	algos_nr = ARRAY_SIZE(test_algos);
+-	if (is_fips_enabled())
+-		algos_nr -= TEST_NON_FIPS_ALGOS;
+-	key->alg = test_algos[algos_index % algos_nr];
++	key->alg = test_algos[algos_index % ARRAY_SIZE(test_algos)];
+ }
+ 
+ static int init_default_key_collection(unsigned int nr_keys, bool randomized)
+ {
+ 	size_t key_sz = sizeof(collection.keys[0]);
 -- 
 2.54.0
 
