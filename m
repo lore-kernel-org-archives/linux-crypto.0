@@ -1,82 +1,97 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 097F12FDC38
-	for <linux-crypto@vger.kernel.org>; Sun, 26 Apr 2026 21:29:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E89B1A683F
+	for <linux-crypto@vger.kernel.org>; Mon, 27 Apr 2026 01:05:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777238998; cv=none; b=s6AbUCwLOTR6YVs7ghRGU+YHsfcliIGLWZzTZaFSvHDmfjmRCmHTZJMq7BKz0inW5rgWDUpAb7x7EuzgQJ7T63c6eenfD+w66tsrQAu95zvhcHeDTAbyraBfSW4o8VG5mvdHV+zHs/T0aVSGUH4zQ8gGRVc7I9UaM4mbNIL2B8k=
+	t=1777251941; cv=none; b=REspQMWWeeu95EjTZrrat5+kI/iOYeCuiLEfn6FDfGpp+L2uGC9twHurgWTOHd9fyIj7GtrqcknLNgKh7GuiDpdtZkjFpU9jKUSfWag5lZJSsOhV64tloPJtpbDMD9WzFNDHci8X3HByGtrDEGZa66q7XusH8bhgKyz6HfGF/aA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777238998; c=relaxed/simple;
-	bh=4kDmO+Sn24u2AqLLrq+64jAFcR1LrxQW8BDS8JdjPGA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FQa7oRdF2hs3+d9YvQfB3xRjQ8FPeqUfGJ2lXlSaBwA5qZXUBsEZkzME6y1Fk8bMrPmyHbVXSHBIJQW7x25fMKXA3FvC0Hf1ofEZJI9xL6CVc9mX/3pryzQ4LyCuvzzsq8kM2YdS+FfyOGEACT7w+57m7joNRDhvLeESgIie0pY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M33xGM0F; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1777251941; c=relaxed/simple;
+	bh=271J0lZFHsgoJcX3dFlGjV17Kt4aHWOaGN8cZCfR5Ac=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VQCNl5eHm0PAdWVuZqx4yP6/MVvqN0kx/2uWiwErViDDla21u3X4ypZeUOQO/av6W+qcQeWSbo7LzG9Da4CZGjQ791/jcB95uS6yauczaOCCxFdsr3CeFD1kk7yCoL1yVdHmrhUshvBMaARfA8t+3CLB9rPx9J+slnSYermGOOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Qu3Rqlcy; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=DIuvU41r; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M33xGM0F"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4891c569cb1so11389705e9.2
-        for <linux-crypto@vger.kernel.org>; Sun, 26 Apr 2026 14:29:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Qu3Rqlcy";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="DIuvU41r"
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63QKPJU71353525
+	for <linux-crypto@vger.kernel.org>; Mon, 27 Apr 2026 01:05:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=s7PxwMFZQggX2AK6HZIzTeEsYKNAeZcrWBZ
+	TCXXOmCQ=; b=Qu3RqlcyHPELxHIxXjKFuxWyAr2utRwjrUyWbuZCgVWwBarCv1R
+	S0C4YZKgr8kbG9hv/4fEZalBjdr5jT6PQqjzkaUl0f4loZJgi5w6BgApTnmp8O16
+	Sbqi3MLOzDvBCuSsl9c4XTpGlZsYsBzlNlTGx3zVPVrcEj/HCWzowXg0+DWzkJaZ
+	4KWR4jaPhjzpcnY9C2Y0cAUPSLVzd0gC7djzqhwbyW6adINFiD0mHxcP7ZSFdrMK
+	Lp4bSDvc6QYPOPhMKc3chhCQJM67K867rkPoRUQ/Hna0/7LvYiIJa2EK7hwWPdVG
+	AyB4xxNE+QggmTnxUlFvsybkoVTB650kvWg==
+Received: from mail-dl1-f70.google.com (mail-dl1-f70.google.com [74.125.82.70])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4drnu2uutw-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Mon, 27 Apr 2026 01:05:39 +0000 (GMT)
+Received: by mail-dl1-f70.google.com with SMTP id a92af1059eb24-126e8ee6227so10170252c88.0
+        for <linux-crypto@vger.kernel.org>; Sun, 26 Apr 2026 18:05:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777238995; x=1777843795; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sqonbb4yOoprB7ZvKc0Cn/U848NJVsSj7hGA97TbfZ0=;
-        b=M33xGM0FqmPrXCDCeOUnEPAktif6s/NL/RChdVH9vRswOsLfO1kCJVA39DOcGJFQnW
-         cU6WvywBUImB8+6iyamMUSGOvmzPTDY8kbrUjjC+Nd3Sfo6rZSLrto+/2lCxSbLgoPLj
-         Ddo0KKPgU3dWnKXu95GSqXFZF94tfrtnf4ZBEEowZmP/DWRm956pVf3mGqPdt7mUVGDX
-         2R49oAMMO2sEWAzoHH2jqMR5auPXTS0RmVFWBA/CWz0+znm+9TnuvC21obpiJOTty72o
-         aYr0bf7evWBU9FbBjWhPM8+TsnU9SmnfRiFYFswbauBVDNvdkxJ1DMe4d1SB4akKX1t2
-         4vEw==
+        d=oss.qualcomm.com; s=google; t=1777251939; x=1777856739; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=s7PxwMFZQggX2AK6HZIzTeEsYKNAeZcrWBZTCXXOmCQ=;
+        b=DIuvU41rKdMlv4f0pen7j3esfmHNpKK3gbs0Pn8I/KqrAij3E9xdq1gvzlX01yfI5z
+         kKrCUdbk1TFX4zAONOObsBewk8cuasb/EKbFgxOswygDUvLleBSpMWejJujwg57qKejL
+         +wt8XcIo6O0CsfyBrquBt2C7DCyoDilpTL2BcPNqpe+TBETK53j0bn9foLseWQgEGbQy
+         xoTpSbxvgIFWp1uQsqkzZJBloSMZS4YOukL0EQ3Us+mETTMpPZhq0BXXTKGR6XIJ24XQ
+         dWnlzV+xGy39KvugLuCI+fbYdfEFj2PSlfj52IqS41ONDs42SulxDuQsjIe0idEtrdLD
+         Tyeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777238995; x=1777843795;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=sqonbb4yOoprB7ZvKc0Cn/U848NJVsSj7hGA97TbfZ0=;
-        b=YkzroYCn0nX2l2oENCeL8Mfr9BDje34GdM3gAqXuRpyb/ZN4YES0BuOhi9BBfGUode
-         i5gqSTXI6lmmXYYembjiAncG5UEVyAfwjsi1P4Dn+j+IhyTcHMvA/VlApYfto2hf9dRV
-         Au8xQRn69RCzDxiiPFvRsEVi1vtlG7OMMzGlgc63LW9jPjztO88peyNpRbtwBP6WdhKH
-         lBMOcrwfk1G0g5DDPMYeFEiXcbeUe+3ZbBsA/TtGUHdG7Z7+lib8S4JlNKmGhS07uiV3
-         DTUNLl48AzlgTBgQKXfScgnjjMtwC5i0v3e4hh/gyiQ9rKYuAUv96qT8A+Cqth6KJVc8
-         tKCw==
-X-Gm-Message-State: AOJu0Yz5T4GW1Mdzx97wQgzXkL8FZF7zN86GNQcCKVZtJmUK94ewyF6D
-	WQQqbwOZtVHK2nNEIgCJy7/iZKL7a/UxUx8n5wc9DRKEEce8uoGx3mHa
-X-Gm-Gg: AeBDietGLJYUgl4+qP6v05P7QAwbsl5Nh3z7mmnaY1PgkaPUoZ3FPW5i7kY/x/q/Ze2
-	D7SlvQ+O0n4ZKkoURqXfV8LaQ9eHMemDhqdxPouEq8ShaXuKSjr/2QtiPEIiZrnnKZhjsIXTxX+
-	5895T3LXQyrEhwT0sdLqyE+6YeUbbi8Ga3Nd4C4VUNOz5LuYmQe1QBOLg/fvm2u07Qf8lZV/kai
-	gmc2KjVceOYEWTbkCSpiM+go7KBAVlCftCIiJe5cqP1GiV1nhXoZgFrVh6RgkXek/enxvlNhIrp
-	cfrbZV/Hqj0gtjG9RsxwcRnyqnJeHAN15HO7kSqF0hdMbuWxK9db2ZHvPyIfoT0AYc9F3x21eOJ
-	BAUxnJz2pK+iEu49JHfNSRRH0lBpnsC+aFAyr8yYymlkkNYIG0Oh4NyXu+85Tn2mqTR7kA5y1me
-	HY26vAF+wzIIlo6O3uYC2scSoyzQmwV7HY20XGYZqy8X3LrUDZL5ZbqfFsuC1DVDXJAXqHz4zL6
-	g==
-X-Received: by 2002:a05:600c:154e:b0:487:17d:d0bf with SMTP id 5b1f17b1804b1-488fb769fb4mr257421595e9.6.1777238995346;
-        Sun, 26 Apr 2026 14:29:55 -0700 (PDT)
-Received: from menon.v.cablecom.net (84-74-0-139.dclient.hispeed.ch. [84.74.0.139])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43fe4e3a79esm79047320f8f.17.2026.04.26.14.29.53
+        d=1e100.net; s=20251104; t=1777251939; x=1777856739;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=s7PxwMFZQggX2AK6HZIzTeEsYKNAeZcrWBZTCXXOmCQ=;
+        b=V2PdQImg1InNO/dwD4ALGCMQVsBbzVd57No44gR9zwfiSyUBg1oSGH+GC4BAr6yuWn
+         w3A03bcdykC2nb4nfsdHGTFSD5Y+hexVso2RxRYzs1wNq1ovf1CTPWsETz+sXdKEW2Ni
+         TZuORExKq9gQAqYsaSuXLxq8esRtr3ZXoCWuXgXqVlckqyGSuFxvi7V58AydSTV85I2x
+         +tsDKwXtIIlvz+WnC2X7NFSsqFNEHcAwBYe6TV9wwjH+cLCFIsRoIhzEPnjsj2AgqhKt
+         rp66+FH6n5/Sz9fJt7YJUtOK1goATPZ736OGQuq9HaMFpcnBta2VTv+DCWD95ILTLIf2
+         1Z3g==
+X-Forwarded-Encrypted: i=1; AFNElJ+XLH7cG8bvqYURgkfVX8wgMYzU97pE4S59U+e4Q46BG2tVVCwIKWrq/WYirtnvvvoWbbYcsdt0ZAhC80k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFaqlg6u2iTtDhy2OGz5y0+VeKS3PfZ4ruY6bxgHpAsVbfcAcO
+	cyWvZKtbMFPrvrhkbkoOwkeI+jUM0V+DocXwaEJwGce7xrO01K2LTR0cGGDIwv9owpQixN4Ysw4
+	+ZfbmtyHO6KkF88TBVBEQn98UZ3x8TYNfqePMY9CTFtV9q9+mdHUhh7BIubZPRDi/Oow=
+X-Gm-Gg: AeBDiesZquH74ZByHQAcegU4xfQgl7MNmCS6+XIqcuAKki9uDpOpogkXwTeJSXAEuTD
+	9lpKHkPX5gYyT2Oz0sS4cVVW2MShzkig3D+99jOiB+JU2i5LpmwvDrTHUqG/i4xRNrjUrSMqSEE
+	c+GYnqmflP5F4K7o0RhxRBim3K/Wsln41dC1Eb9J+btdydeqpSH6sd8FN4hqPwcO04Zn4N3v2RN
+	A1TA44itukanb7tlEgRBKlF43nWhIuB9KlQYh7fLjXn9a9bQprCnuj1NanBC6qoOK9YcgnazItt
+	Sb3+l3XkCvC5TGUFSpip61ac7+oHNfl2+ALuD9+KW4TeA3vMWdqmrPzRb29vFy86bnPVOBAXeVH
+	ex+glo4/17dTNjZCcHBKXjFqUNd+Nms2fyC3IcsRqOKPMKaql/uL+lCtUAd3qGr5X0i9kzVaWZP
+	Uj0+KLVkJGK/enL1YU
+X-Received: by 2002:a05:7022:4596:b0:128:d450:bc76 with SMTP id a92af1059eb24-12c73f978fcmr20066386c88.26.1777251938709;
+        Sun, 26 Apr 2026 18:05:38 -0700 (PDT)
+X-Received: by 2002:a05:7022:4596:b0:128:d450:bc76 with SMTP id a92af1059eb24-12c73f978fcmr20066363c88.26.1777251938194;
+        Sun, 26 Apr 2026 18:05:38 -0700 (PDT)
+Received: from QCOM-aGQu4IUr3Y.qualcomm.com (i-global052.qualcomm.com. [199.106.103.52])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12c837f7feasm49985745c88.0.2026.04.26.18.05.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Apr 2026 14:29:55 -0700 (PDT)
-From: Lothar Rubusch <l.rubusch@gmail.com>
-To: herbert@gondor.apana.org.au,
-	thorsten.blum@linux.dev,
-	davem@davemloft.net,
-	nicolas.ferre@microchip.com,
-	alexandre.belloni@bootlin.com,
-	claudiu.beznea@tuxon.dev,
-	ardb@kernel.org,
-	linusw@kernel.org
-Cc: linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	l.rubusch@gmail.com
-Subject: [PATCH v5 1/1] crypto: atmel-sha204a - fix blocking and non-blocking rng logic
-Date: Sun, 26 Apr 2026 21:29:47 +0000
-Message-Id: <20260426212947.24757-2-l.rubusch@gmail.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20260426212947.24757-1-l.rubusch@gmail.com>
-References: <20260426212947.24757-1-l.rubusch@gmail.com>
+        Sun, 26 Apr 2026 18:05:37 -0700 (PDT)
+From: Shawn Guo <shengchao.guo@oss.qualcomm.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Dmitry Baryshkov <lumag@kernel.org>,
+        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
+        Deepti Jaggi <deepti.jaggi@oss.qualcomm.com>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Shawn Guo <shengchao.guo@oss.qualcomm.com>
+Subject: [PATCH v2] dt-bindings: crypto: qcom,inline-crypto-engine: Document Nord ICE
+Date: Mon, 27 Apr 2026 09:05:27 +0800
+Message-ID: <20260427010527.230473-1-shengchao.guo@oss.qualcomm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -84,58 +99,54 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Proofpoint-GUID: Z4Fg_GLilwtOOQcSbseSeL5fpGYLGhcJ
+X-Authority-Analysis: v=2.4 cv=cbriaHDM c=1 sm=1 tr=0 ts=69eeb663 cx=c_pps
+ a=SvEPeNj+VMjHSW//kvnxuw==:117 a=b9+bayejhc3NMeqCNyeLQQ==:17
+ a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=u7WPNUs3qKkmUXheDGA7:22 a=yOCtJkima9RkubShWh1s:22 a=VwQbUJbxAAAA:8
+ a=EUspDBNiAAAA:8 a=_7_cwL0RbDhQ0r_n38wA:9 a=Kq8ClHjjuc5pcCNDwlU0:22
+X-Proofpoint-ORIG-GUID: Z4Fg_GLilwtOOQcSbseSeL5fpGYLGhcJ
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI3MDAwOSBTYWx0ZWRfXwjjoMw05TFOe
+ t1EytLrMJuOFc47Apv8zW3vzodRrpiyFkqVsedhKSC1AQiZ9ZcW5hMHcFT1kasaLzhED7L0cGu9
+ hrQcq9Imv7+Y4Vao6aKTGRx/MUzliUVyTFxUo2ezTmTHJHVqaGVLhQ2wgO2NefBgn4wJLAe7L1A
+ HejNoH/GW6ABp57spkkK5/kKyNzw2wNnaGNCh+wes3a51x0WbTA6yJoE/7iyMH1+F3o7l5CheJj
+ cU9r75rVesIY40p26Z1QfPihAtyVW8uvXVHhbFXbreLN5MBcOrKoF308VKnHZ5CaZ3xfbtVEzP6
+ dmm3uqDnn5CNLCccg7XnKat7rldHmgb4MtjU1XvlXlIBhHCgBbPZtcF0g1aAzbCZd4U+QNfgO3i
+ HyBVxhCJd0O/7h0+b+OtZSWS2hXVqgyh2FWferd9wSdRfr6SA9XkOafh1n9oqGf/RQOd15edt41
+ x/JztVw9ecI1a2qu8zg==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-04-26_07,2026-04-21_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 phishscore=0 lowpriorityscore=0 clxscore=1015 impostorscore=0
+ priorityscore=1501 spamscore=0 malwarescore=0 bulkscore=0 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2604270009
 
-The blocking and non-blocking paths were failing to provide valid entropy
-due to improper buffer management. Reading the buffer starting from byte 1,
-only fetch the 32 bytes of random data from the return message.
+Document Inline Crypto Engine (ICE) on Qualcomm Nord SoC which is
+compatible with 'qcom,inline-crypto-engine'.
 
-Tested on an Atmel SHA204A device.
-
-Before (here for blocking), tests showed repeatedly reading reduced bytes.
-$ head -c 32 /dev/hwrng | hexdump -C
-00000000  02 28 85 b3 47 40 f2 ee  00 00 00 00 00 00 00 00  |.(..G@..........|
-00000010  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
-00000020
-
-After, the result will be similar to the following:
-$ head -c 32 /dev/hwrng | hexdump -C
-00000000  5a fc 3f 13 14 68 fe 06  68 0a bd 04 83 6e 09 69  |Z.?..h..h....n.i|
-00000010  75 ff cf 87 10 84 3b c9  c1 df ae eb 45 53 4c c3  |u.....;.....ESL.|
-00000020
-
-Fixes: da001fb651b0 ("crypto: atmel-i2c - add support for SHA204A random number generator")
-Suggested-by: Ard Biesheuvel <ardb@kernel.org>
-Signed-off-by: Lothar Rubusch <l.rubusch@gmail.com>
+Signed-off-by: Shawn Guo <shengchao.guo@oss.qualcomm.com>
 ---
- drivers/crypto/atmel-sha204a.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Changes in v2:
+ - Improve commit log to make the compatibility explicit
+ - Link to v1: https://lore.kernel.org/all/20260420073301.1250197-1-shengchao.guo@oss.qualcomm.com/
 
-diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha204a.c
-index dbb39ed0cea1..5699bb532325 100644
---- a/drivers/crypto/atmel-sha204a.c
-+++ b/drivers/crypto/atmel-sha204a.c
-@@ -48,8 +48,8 @@ static int atmel_sha204a_rng_read_nonblocking(struct hwrng *rng, void *data,
- 
- 	if (rng->priv) {
- 		work_data = (struct atmel_i2c_work_data *)rng->priv;
--		max = min(sizeof(work_data->cmd.data), max);
--		memcpy(data, &work_data->cmd.data, max);
-+		max = min(RANDOM_RSP_SIZE - CMD_OVERHEAD_SIZE, max);
-+		memcpy(data, &work_data->cmd.data[RSP_DATA_IDX], max);
- 		rng->priv = 0;
- 	} else {
- 		work_data = kmalloc_obj(*work_data, GFP_ATOMIC);
-@@ -87,8 +87,8 @@ static int atmel_sha204a_rng_read(struct hwrng *rng, void *data, size_t max,
- 	if (ret)
- 		return ret;
- 
--	max = min(sizeof(cmd.data), max);
--	memcpy(data, cmd.data, max);
-+	max = min(RANDOM_RSP_SIZE - CMD_OVERHEAD_SIZE, max);
-+	memcpy(data, &cmd.data[RSP_DATA_IDX], max);
- 
- 	return max;
- }
+ .../devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml    | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+index 876bf90ed96e..9251db2b8fcd 100644
+--- a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
++++ b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+@@ -16,6 +16,7 @@ properties:
+           - qcom,eliza-inline-crypto-engine
+           - qcom,kaanapali-inline-crypto-engine
+           - qcom,milos-inline-crypto-engine
++          - qcom,nord-inline-crypto-engine
+           - qcom,qcs8300-inline-crypto-engine
+           - qcom,sa8775p-inline-crypto-engine
+           - qcom,sc7180-inline-crypto-engine
 -- 
-2.53.0
+2.43.0
 
