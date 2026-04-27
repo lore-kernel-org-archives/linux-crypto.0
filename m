@@ -1,30 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E25BF38E12B;
-	Mon, 27 Apr 2026 20:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6955038E129;
+	Mon, 27 Apr 2026 20:50:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777323032; cv=none; b=WTl3S0lJPh8rfZQQCuktxv0FtKSptpALTRNBujNjJ/I4Tf1hYy8NcdfVcayvpNXi1KBJcQQT5xM6yGN1SjnmeMnUGj5p/kqKcF3aGxeKKsbjytv0vfYNrJjT9Es9VaRdj8YQcnjPKpGKImw8zf+LaGF5kRh2HGwls0fFJcymViM=
+	t=1777323037; cv=none; b=Vf26AFXaqtiP6Xq8/dCZ9wNl0sk0OOUu8LbHQtJFHGIdBav1gJI58paUBMMyhHKmKgscf1GfsXNGkexmddAtDBa7/xAXWGi5GvQ2DTIi9sLEegpV27Why18ArunMQ+g4PcaJwxqhYHUZ0LglSOs4A8ZoPhLEJgtGbI92BPZzYoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777323032; c=relaxed/simple;
-	bh=YcplgUGNh+6uS8l7gywBwx3+pe3RpQeIFHEmlCROLmQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oN0kOr0VDTqGX8vzzUGXBrjm+uTlo7Kd9w4w5scxSLMqMHWY9Igcu1d2gJyjel6Ta08GR5CcWXoLQvKLjX3o9WmLekN/+AJWxP+/+fgxt1VX1WrD82ZXayy9/3fkcadiy3/Q65jTdl9QgwoBcyyau6PckYME3F3/L1pbPjFCaIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AR5nK28r; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777323037; c=relaxed/simple;
+	bh=I1l9YPP/ComIPE00fpuZz1ejIB5bhQV2RMeVzSfSA8A=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=KzSCuy+fEiI2IN4zCxgnDTuEjzBloLnXFDpN1nFLvq9g73eH98+nyQekem0U9oLHybr1A6TziefoZQKjKMGjZ96Kr/BahDIECmtjjmohUZ6UraPl7V/ZzbJouKppJDd/junsJdOo4uU/nDzW4eMOVxBMKgBBD+IeRSDOJ2HsvtY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oW8fBl2p; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AR5nK28r"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86F32C2BCB6;
-	Mon, 27 Apr 2026 20:50:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oW8fBl2p"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C7CCC2BCB7;
+	Mon, 27 Apr 2026 20:50:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777323030;
-	bh=YcplgUGNh+6uS8l7gywBwx3+pe3RpQeIFHEmlCROLmQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=AR5nK28rneLZfiRZ/H81AA03VfzqOgBmqVslVQY6OlOQ7kr7/i5yfBuOzfvmc/xvH
-	 yDGuir2sbON9pXZ6Mf8w5mpnIGhGmj7515yZTHVEm2WAnbwVz1UKx27J3TT41rI6Hr
-	 j2komLlcXrSu153KET90JatLHBLSj/dQOyg/XiY+oRgmHlnlKSi/zOgDZGpwQ6XEn6
-	 PwgkqE7V6grOkuASdRqArsOnDHZt0Mr+OO2gqrHPr0c2dZfyHmAPpnmC1Y54ZgWBOI
-	 s2I3HQPGYRqNkqEDIuevJJpMoHTiU3hz4joLW7LdbEoyFCkJxLvdVEw3G6EsvL49SJ
-	 ZwSEcVTVCcNMQ==
+	s=k20201202; t=1777323035;
+	bh=I1l9YPP/ComIPE00fpuZz1ejIB5bhQV2RMeVzSfSA8A=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=oW8fBl2pQCUd/SMtbsCIN9u/gRCSHrn4tkurhXz+veaW68ZIOIRt1H9eXktvNXJew
+	 jDCO1x9y36KUTmMuJddOXGul1pj17MIUsv9rwdW6JOrRgCkdARyz5WF5eH93Gwjf8L
+	 cMrzGVDqIDm141XzaUNp0V/tlzK9K+QkP6hmc/IpecIIcA6xrkzB+XaQsWFxOx6kE/
+	 KgRzJfDt2OVlNOwlBdn7yHHgYv28UgfVBX7qCJDplogv/wE/0Q9NGhC5ifqXpX8K+P
+	 R7fSyiW1LT0r2fGoe/g/yN/jGwAfnAVPS2yIvIdKli1ssGXh4pNpD2Sh9wua2D9NoI
+	 L3Tm1A7c3nSdg==
 From: Tycho Andersen <tycho@kernel.org>
 To: Ashish Kalra <ashish.kalra@amd.com>,
 	Tom Lendacky <thomas.lendacky@amd.com>,
@@ -60,10 +61,12 @@ Cc: linux-crypto@vger.kernel.org,
 	linux-doc@vger.kernel.org,
 	kvm@vger.kernel.org,
 	linux-kselftest@vger.kernel.org
-Subject: [PATCH v2 0/4] Allow disabling RAPL during SNP initialization
-Date: Mon, 27 Apr 2026 14:48:43 -0600
-Message-ID: <20260427204847.112899-1-tycho@kernel.org>
+Subject: [PATCH v2 1/4] crypto/ccp: Pass init_args to __sev_snp_init_locked()
+Date: Mon, 27 Apr 2026 14:48:44 -0600
+Message-ID: <20260427204847.112899-2-tycho@kernel.org>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260427204847.112899-1-tycho@kernel.org>
+References: <20260427204847.112899-1-tycho@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -74,37 +77,89 @@ Content-Transfer-Encoding: 8bit
 
 From: "Tycho Andersen (AMD)" <tycho@kernel.org>
 
-The PLATYPUS (https://platypusattack.com/platypus.pdf) attack paper
-offers method for exfiltration via a low-resolution side channel using
-Running Average Power Limit. Newer versions of the SEV firmware offer a
-way to freeze these counters while initialized, so export this as an
-option.
+Rather than splitting this off, pass the whole struct so that
+__sev_snp_init_locked() will have access to any other structure members
+that are added in the future.
 
-Changes from v1:
-* add a blurb from the platypus attack paper about the side channel
-* move the kernel parameter from the ccp driver to kvm_amd to make it
-  more obvious
-* split off the SEV-ES feature detection into its own series:
-  https://lore.kernel.org/all/20260416232329.3408497-1-seanjc@google.com/
+No functional change intended.
 
-v1 is here: https://lore.kernel.org/all/20260223162900.772669-1-tycho@kernel.org/
+Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
+---
+ drivers/crypto/ccp/sev-dev.c | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
 
-Tycho Andersen (AMD) (4):
-  crypto/ccp: Pass init_args to __sev_snp_init_locked()
-  crypto/ccp: Support setting RAPL_DIS in SNP_INIT_EX
-  KVM: SEV: Add the kvm-amd.rapl_disable module parameter
-  KVM: selftests: Add a smoke test support for RAPL_DIS
-
- .../admin-guide/kernel-parameters.txt         |  5 +++
- arch/x86/kvm/svm/sev.c                        |  8 +++++
- drivers/crypto/ccp/sev-dev.c                  | 35 +++++++++++++------
- include/linux/psp-sev.h                       |  2 ++
- tools/testing/selftests/kvm/include/x86/sev.h |  1 +
- .../selftests/kvm/x86/sev_smoke_test.c        | 24 ++++++++++++-
- 6 files changed, 63 insertions(+), 12 deletions(-)
-
-
-base-commit: 39f1c201b93f4ff71631bac72cff6eb155f976a4
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index d1e9e0ac63b6..bf54a3fadb28 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -1351,7 +1351,7 @@ static int snp_filter_reserved_mem_regions(struct resource *rs, void *arg)
+ 	return 0;
+ }
+ 
+-static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
++static int __sev_snp_init_locked(struct sev_platform_init_args *args)
+ {
+ 	struct sev_data_range_list *snp_range_list __free(kfree) = NULL;
+ 	struct psp_device *psp = psp_master;
+@@ -1421,9 +1421,9 @@ static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
+ 
+ 		memset(&data, 0, sizeof(data));
+ 
+-		if (max_snp_asid) {
++		if (args->max_snp_asid) {
+ 			data.ciphertext_hiding_en = 1;
+-			data.max_snp_asid = max_snp_asid;
++			data.max_snp_asid = args->max_snp_asid;
+ 		}
+ 
+ 		data.init_rmp = 1;
+@@ -1458,20 +1458,20 @@ static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
+ 	 */
+ 	wbinvd_on_all_cpus();
+ 
+-	rc = __sev_do_cmd_locked(cmd, arg, error);
++	rc = __sev_do_cmd_locked(cmd, arg, &args->error);
+ 	if (rc) {
+ 		dev_err(sev->dev, "SEV-SNP: %s failed rc %d, error %#x\n",
+ 			cmd == SEV_CMD_SNP_INIT_EX ? "SNP_INIT_EX" : "SNP_INIT",
+-			rc, *error);
++			rc, args->error);
+ 		return rc;
+ 	}
+ 
+ 	/* Prepare for first SNP guest launch after INIT. */
+ 	wbinvd_on_all_cpus();
+-	rc = __sev_do_cmd_locked(SEV_CMD_SNP_DF_FLUSH, NULL, error);
++	rc = __sev_do_cmd_locked(SEV_CMD_SNP_DF_FLUSH, NULL, &args->error);
+ 	if (rc) {
+ 		dev_err(sev->dev, "SEV-SNP: SNP_DF_FLUSH failed rc %d, error %#x\n",
+-			rc, *error);
++			rc, args->error);
+ 		return rc;
+ 	}
+ 
+@@ -1651,7 +1651,7 @@ static int _sev_platform_init_locked(struct sev_platform_init_args *args)
+ 	if (sev->sev_plat_status.state == SEV_STATE_INIT)
+ 		return 0;
+ 
+-	rc = __sev_snp_init_locked(&args->error, args->max_snp_asid);
++	rc = __sev_snp_init_locked(args);
+ 	if (rc && rc != -ENODEV)
+ 		return rc;
+ 
+@@ -1732,9 +1732,10 @@ static int sev_move_to_init_state(struct sev_issue_cmd *argp, bool *shutdown_req
+ 
+ static int snp_move_to_init_state(struct sev_issue_cmd *argp, bool *shutdown_required)
+ {
+-	int error, rc;
++	struct sev_platform_init_args args = {};
++	int rc;
+ 
+-	rc = __sev_snp_init_locked(&error, 0);
++	rc = __sev_snp_init_locked(&args);
+ 	if (rc) {
+ 		argp->error = SEV_RET_INVALID_PLATFORM_STATE;
+ 		return rc;
 -- 
 2.53.0
 
