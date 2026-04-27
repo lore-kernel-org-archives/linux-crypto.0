@@ -1,203 +1,240 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B666A3B3890
-	for <linux-crypto@vger.kernel.org>; Mon, 27 Apr 2026 09:16:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54172383C92;
+	Mon, 27 Apr 2026 09:24:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777281389; cv=none; b=M6tiU2y7V4m5ZbywJY3zs/bKhDHP9WSuEQTyWByiILZKIHKGEyFq7vX+dft74mnn9hxbSEShTJ6/0D6angKIYkbm0ABqpiQrlc11wp5GMlgsdQPHNiF2rYtVl7+BvT51DIg8V5PlxBCiWHvmvEM8WhBnue36XO9P0gIj6MyVZ9M=
+	t=1777281878; cv=none; b=pwUcA7sy0HDn1fcStQaX4K3AbH8/CPSDbt15pwFyh/l8tNAx21Ks4b87e/utA8tDSmcALbQfTt504qwdGd2egOPFGonStuZ+NU5f3t4nkJJ+UkHv/wRpleRzyAJ5cXwdM+7AI2RBwMq9+rdSKhUCsJNbUX3IQScFrN7KckxBgCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777281389; c=relaxed/simple;
-	bh=diWgOzXY9pNpSKSKiyud1bbSlEDatQXeSQQjMy32SOc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=pRVqIBj185cA0sfSVDPAhLjRbD4hoH8oxhHTtwPttHqocUgmx7Q26bB2PUK5XVkLN5OO/sReHra6isfWQAVfjypw4w7GZJ+tuknjCi2typw6UV++JqajenGnFu0leNz3Ks3s2zXsDIGO/GbkguqvmDsq9QQJIdWfyIYs67D5Zc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Irdcl4My; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Zcn1llyN; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Irdcl4My";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Zcn1llyN"
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 63R8kFXP3961977
-	for <linux-crypto@vger.kernel.org>; Mon, 27 Apr 2026 09:16:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	JWPMLFyvcLV0IDQ/Od1mGhJtfWVit0lH/9qs4Y36Y8E=; b=Irdcl4Myjjif0Lx6
-	r8nD3wPzsNoSzlswmO9QdtaAWEniJ2GWLAj1BP2tidFAk/2W1S8LSxKNcvA7qxLV
-	4yyFGaBpYKtAD+z0YDjns3w5rc5T5mjI355IIccaVI1AQ2XtqW51C+2b86N0bZvG
-	2ppAR+oE3VGStscQfA6OanOp8PkCrHObICOu9F/pM65B7G5C3KN1tuoQhWzy4dbx
-	QTwC+12rKwLrhOzZW0gRMhGeKuSi+/c/XdrevVmTF3StXKWEvWqLMLPXgtLz3ZUg
-	XPd/QvfD9yLw5deyPyq/WPPw0Ca7qc5CoXXfyOk9OJddJkCtMNrZdi41WCqJ6pzP
-	Rs/jLg==
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com [209.85.160.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4dt4k309q4-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Mon, 27 Apr 2026 09:16:27 +0000 (GMT)
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-50da31af14cso264912281cf.1
-        for <linux-crypto@vger.kernel.org>; Mon, 27 Apr 2026 02:16:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1777281386; x=1777886186; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JWPMLFyvcLV0IDQ/Od1mGhJtfWVit0lH/9qs4Y36Y8E=;
-        b=Zcn1llyNaqtT8c0FtySmpziThAoswjPZ1zQDhhy/DanC71xsvR3Hp+AfM2NNMx6Y2z
-         TJb4S9+iIj10E30FSel9rfsvzd25a3e+7TJaRrhJOfOutMkfH3kirzhYnriNfBN8eBdb
-         w/ShOa+U/aKrikNjvnGrRKIPO+JjiCiQjBouWR4G2861gWlzCXb1D2FUEXlNFSfjN6Af
-         P4+QkdO1EXAwHwR5R4n0Q3426sI2MiQ7U6bVjOlEicd7zSLPzYwS5OU/gEvefu+TxHdZ
-         5PCKWDAV+qYIxC8qpcJIkWob199IGxeyelw0dhtsUkkzUDvm7tx7G44nIdPmmDtOUDb7
-         nmXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777281386; x=1777886186;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=JWPMLFyvcLV0IDQ/Od1mGhJtfWVit0lH/9qs4Y36Y8E=;
-        b=BoKG19HZua+2AXdJqqY51vu9NN0jojBEMtrLvwzSRZGgw0+gi0G/5wqlvMwqPgUt7N
-         44hM8W3NqygXKOp8jicUSSwoN3KeTETMBNEL+pwZ0Gg2Sdls9bq2ah6Wd4dNv/kxlNAd
-         n+fqIAT2mKgGegUYfn8W6guyJke+KSrY6bRXn8yRy/dRlBVnLe9rzLDZqce0GHXIhMEK
-         2LZP1EaCPHXldyGzuK2Pd3G+qoFWGgMrxM0huYeY/wt3QOMcrHa1H25ERZ2ikXttpWDH
-         4SekWWLre1OWb5Am8J0HQ/jX0oW0zZLLim/i2f+7u++KLMBwU9FJC+7Qg+aMOAPsZ1fw
-         /whw==
-X-Forwarded-Encrypted: i=1; AFNElJ+OmGK6clOt8WScw2AG3hYN8z/CgihDhDP2dCRCEQszBaDk0FTNsxSceiHlbiYoslabVkYhw81iFDV2f0s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzeU53g4FdYkpUf2HxwhVtYGs76MzPzrN0FX5Uormgk+yG1/QW/
-	XhnkKAW+FzBy8a5fK4dzch+HPXCppYMYjRb3EYsQYpsih5h77CDVJ1RLc8pI7icf7f7Ar/2Hx1R
-	XAD/leOmtRjFBx7T2toZPCtQpu48odw8ou2mLRRcf4/esvm1bJh5nrmu8g2NfUMOrzqY=
-X-Gm-Gg: AeBDieuFq4Ws7CbKEyJT4B1xBPrFU8xYPqN4buNUy0foURAzr0QJl5g8+enqlHNQLvY
-	Q6ZFMrmwwLBS5WK/BMC79HZQS1nc0kUtwT9RZcOAoaSewlctKPDmV9iDn3KATvXrKtYRBqsgj/W
-	QEdYWYOkbFUNcrgv+QlE2AxV9D+ZhrQXdcDL9UxXJw85lC3dF5Bzk3bTDq7sUqLvUip6//T8AgJ
-	/3FHRV9Q/cCTQXTghg9oxm4le9b4RAz/5Kbrkmg1NXvTiM3+OwaEnCizS2/DIwElmWtr+Do/oOn
-	KHHYuJcDo0I7jA6fma9tWaUGSRSl3ufpiMwOACRFxcKJUzMF0bz5o5fKTBCjd2DDftJesI5LlVc
-	4Vq/53JLPMHjXFJZRhR6YMqDSZWoKIy3juF3bxGhfO9EjF5Ir0uVxkQKl7tE/JQ==
-X-Received: by 2002:a05:622a:1903:b0:50f:b17d:7e4a with SMTP id d75a77b69052e-50fb17d8032mr427687601cf.57.1777281386204;
-        Mon, 27 Apr 2026 02:16:26 -0700 (PDT)
-X-Received: by 2002:a05:622a:1903:b0:50f:b17d:7e4a with SMTP id d75a77b69052e-50fb17d8032mr427687241cf.57.1777281385798;
-        Mon, 27 Apr 2026 02:16:25 -0700 (PDT)
-Received: from brgl-qcom.local ([2a01:cb1d:dc:7e00:5062:ae86:23aa:702c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48a6dbfd4b5sm40559365e9.28.2026.04.27.02.16.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Apr 2026 02:16:24 -0700 (PDT)
-From: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Date: Mon, 27 Apr 2026 11:15:45 +0200
-Subject: [PATCH v16 12/12] crypto: qce - Communicate the base physical
- address to the dmaengine
+	s=arc-20240116; t=1777281878; c=relaxed/simple;
+	bh=ejU20kMC+8BAnlCDWniGqmXSQ6puwuv1FGh5Gq1AD2w=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=bn/TBRJsaRBOxOYds3BylUpm/B0hNIy9XbGscF01boQ0aeOpcKig2j94BWtuK6ODNurdexvg8WJLprUIQ6JpA+rfa9+OxJvjf/7TveiCAUoIkYMrPVPRByxXs7DRZcuBbBF5fll7hytNLnKeqOvoLoZ6isD6dLLJfx35WdiF3uo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.164])
+	by gateway (Coremail) with SMTP id _____8Bxb+tRK+9pVVAEAA--.14427S3;
+	Mon, 27 Apr 2026 17:24:33 +0800 (CST)
+Received: from [10.20.42.164] (unknown [10.20.42.164])
+	by front1 (Coremail) with SMTP id qMiowJDxRMBNK+9pBaR1AA--.4895S2;
+	Mon, 27 Apr 2026 17:24:32 +0800 (CST)
+Subject: Re: [PATCH v2] mfd: loongson-se: Add multi-node support
+To: Huacai Chen <chenhuacai@kernel.org>
+Cc: lee@kernel.org, linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-crypto@vger.kernel.org
+References: <20260427165133.23350-1-zhaoqunqin@loongson.cn>
+ <CAAhV-H7cYTW+6aHHtA9c77XMOhnUrAC_rW25s9d6+xED2oGyAw@mail.gmail.com>
+From: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Message-ID: <586ee1d1-c1c4-06fe-992f-c8e43cd9c778@loongson.cn>
+Date: Mon, 27 Apr 2026 17:20:30 +0800
+User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260427-qcom-qce-cmd-descr-v16-12-945fd1cafbbc@oss.qualcomm.com>
-References: <20260427-qcom-qce-cmd-descr-v16-0-945fd1cafbbc@oss.qualcomm.com>
-In-Reply-To: <20260427-qcom-qce-cmd-descr-v16-0-945fd1cafbbc@oss.qualcomm.com>
-To: Vinod Koul <vkoul@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-        Thara Gopinath <thara.gopinath@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Udit Tiwari <quic_utiwari@quicinc.com>,
-        Md Sadre Alam <mdalam@qti.qualcomm.com>,
-        Dmitry Baryshkov <lumag@kernel.org>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Stephan Gerhold <stephan.gerhold@linaro.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Peter Ujfalusi <peter.ujfalusi@gmail.com>,
-        Michal Simek <michal.simek@amd.com>, Frank Li <Frank.Li@kernel.org>
-Cc: dmaengine@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        brgl@kernel.org, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1578;
- i=bartosz.golaszewski@oss.qualcomm.com; h=from:subject:message-id;
- bh=diWgOzXY9pNpSKSKiyud1bbSlEDatQXeSQQjMy32SOc=;
- b=owEBbQKS/ZANAwAKAQWdLsv/NoTDAcsmYgBp7ylHv6AL2efgKMqvcL9IoV/UKtMSrgAuH9OR+
- LBTlolfjkmJAjMEAAEKAB0WIQSR5RMt5bVGHXuiZfwFnS7L/zaEwwUCae8pRwAKCRAFnS7L/zaE
- w2G6D/9coL2vesfCzIDMS2JFC+5AeWfyDCs5DW5HkFIMcq2LOjDyUD9RJZLZ5RSVwA6M1bhF3c6
- Y2mrf4LY4+jQO7iOu1OfGb5Ra43Ty9bn2W14bk0d5hMbxwQvyy8jw7yJvSymuVGwiPpWWJiMW7A
- z+z8FK80p0Yj2HzUuqIuGmyD0+9/wGVJbgo/vqys8Q40ZsTMa50BsuSNr1vUEC5q2SoDEuw6eNO
- KaeNr5B4SJuVe+6VMMLh0l4G0BxuUQ5lXJ0dTLySmflmaCRVKLf9KkO6aWGhFREurcy/WifSP7z
- jBiLkHqp8PEdOH5EOru6eKIxBRuDvTvnqarh6eQAW4kKoyAfM1zVrwehRq1ZJNbtOJ7TTpwAnZB
- tICY+uT86nf2uUrKtQuKymmSse4JEijJCOM5J+h/WJGCQniK78amVXN2VI3oJnONIzggr0zawR7
- IEe7bORoBhRWsJe6RRXdl10HoHSSQ4KfyG196oK94ayr4HpLTyUTrj1j5DIU1ib/AeU9BINnb5G
- E6gkb6jW+AM8giG6S6sXqTwBhGQzvY8wdawFA99qVYHmo8RXGBcCfq8FCSv9xcVnRL/9azm8r03
- gwxN2zbZlHVmmRBjWw/xgilDZcESLcbKTC0Levny73M/q21PfHM0XJUQ649DQfb67uRH7JZmEhw
- znqXlDWLwOd61tQ==
-X-Developer-Key: i=bartosz.golaszewski@oss.qualcomm.com; a=openpgp;
- fpr=169DEB6C0BC3C46013D2C79F11A72EA01471D772
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNDI3MDA5OCBTYWx0ZWRfXyiqDKeoYOrUM
- 1zWOaGPfkEpePawHCZB295ykKW6yXQt34VzEGo9F+QuizQAl1zvacVlxCAEtmM3DqtzmaA4kq1L
- XCvPhxJ7pjvYvsjDM4DBqYKWilOdmouR7WMVpohoDSoZObgfB8sjxURHWGCeGpaUgfVeKhBXmuP
- o4CeEHLl89wJjTwZKAOu5C/cnc/FiJb4hz4dhMC0AGnV1Wd2hfYGPhB8F4JcEtrYdQMPsDC1w+M
- kYvRAJPSr3O59pEjY9ktbVCBCgiAJ/PslTY+3tt6cW1Bwv67OhKC5O3MxtJe4HIxLFJk4LCxeGd
- XuTGuCYQD2LA/2vJk2BsSTBmh4gH3wkaQfOAA3DpX8LDStXZBl6pQ5f+Z6KWdxm3u0ktbPTJoAb
- hTxOUUxINQmqt7bq0ebxNrToDcS/dz+jZxB0TCqne7aK6ldUkE+CA3YrU+JRFe0ODrhU+k9fnJp
- +BpdltVnSqv2n5UKvFA==
-X-Authority-Analysis: v=2.4 cv=a7QAM0SF c=1 sm=1 tr=0 ts=69ef296b cx=c_pps
- a=mPf7EqFMSY9/WdsSgAYMbA==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=A5OVakUREuEA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=Um2Pa8k9VHT-vaBCBUpS:22 a=EUspDBNiAAAA:8
- a=TFgmKHP77OfOvYwKDSoA:9 a=QEXdDO2ut3YA:10 a=dawVfQjAaf238kedN5IG:22
-X-Proofpoint-GUID: HBPclXgaZFbGFtcO9nj8PaZX7fIC4ElR
-X-Proofpoint-ORIG-GUID: HBPclXgaZFbGFtcO9nj8PaZX7fIC4ElR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-04-27_02,2026-04-21_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 malwarescore=0 spamscore=0 phishscore=0 impostorscore=0
- lowpriorityscore=0 suspectscore=0 bulkscore=0 priorityscore=1501 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2604270098
+In-Reply-To: <CAAhV-H7cYTW+6aHHtA9c77XMOhnUrAC_rW25s9d6+xED2oGyAw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID:qMiowJDxRMBNK+9pBaR1AA--.4895S2
+X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBj93XoW3Wry8Jr1DZw18KrWxtw4UKFX_yoW7uF17pr
+	W8Aa15CFWUtry8Cw4vqrn8Gry3Ar45t3y7GrsrtF1UAa4qqr10grW5XF1jgFnrArW8JF18
+	ZrWUGr48uF48JFgCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUv2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx
+	1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv
+	67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07
+	AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02
+	F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw
+	1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7Cj
+	xVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r
+	1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU1Ek
+	sDUUUUU==
 
-In order to communicate to the BAM DMA engine which address should be
-used as a scratchpad for dummy writes related to BAM pipe locking,
-fill out and attach the provided metadata struct to the descriptor.
 
-Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
----
- drivers/crypto/qce/dma.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+在 2026/4/27 下午5:02, Huacai Chen 写道:
+> Hi, Qunqin,
+>
+> On Mon, Apr 27, 2026 at 4:55 PM Qunqin Zhao <zhaoqunqin@loongson.cn> wrote:
+>> On the Loongson platform, each node is equipped with a security engine
+>> device. However, due to a hardware flaw, only the device on node 0 can
+>> trigger interrupts. Therefore, interrupts from other nodes are forwarded
+>> by node 0. We need to check in the interrupt handler of node 0 whether
+>> this interrupt is intended for other nodes.
+> Multi-node or multi-package? In my opinion SE has no relationship with
+> NUMA node, so maybe package?
 
-diff --git a/drivers/crypto/qce/dma.c b/drivers/crypto/qce/dma.c
-index 312a8664f87e63cb3a87804c52b8b2af612a47d0..44a237ccc7a4f6f9e2f19e43ad50c4c90f5effc8 100644
---- a/drivers/crypto/qce/dma.c
-+++ b/drivers/crypto/qce/dma.c
-@@ -11,6 +11,7 @@
- 
- #include "core.h"
- #include "dma.h"
-+#include "regs-v5.h"
- 
- #define QCE_IGNORE_BUF_SZ		(2 * QCE_BAM_BURST_SIZE)
- #define QCE_BAM_CMD_SGL_SIZE		128
-@@ -43,6 +44,10 @@ void qce_clear_bam_transaction(struct qce_device *qce)
- 
- int qce_submit_cmd_desc(struct qce_device *qce)
- {
-+	struct bam_desc_metadata meta = {
-+		.scratchpad_addr = qce->base_phys + REG_VERSION,
-+		.direction = DMA_MEM_TO_DEV,
-+	};
- 	struct qce_desc_info *qce_desc = qce->dma.bam_txn->desc;
- 	struct qce_bam_transaction *bam_txn = qce->dma.bam_txn;
- 	struct dma_async_tx_descriptor *dma_desc;
-@@ -64,6 +69,12 @@ int qce_submit_cmd_desc(struct qce_device *qce)
- 		return -ENOMEM;
- 	}
- 
-+	ret = dmaengine_desc_attach_metadata(dma_desc, &meta, 0);
-+	if (ret) {
-+		dma_unmap_sg(qce->dev, bam_txn->wr_sgl, bam_txn->wr_sgl_cnt, DMA_TO_DEVICE);
-+		return ret;
-+	}
-+
- 	qce_desc->dma_desc = dma_desc;
- 	cookie = dmaengine_submit(qce_desc->dma_desc);
- 
+Here is the output of lscpu from my machine:
 
--- 
-2.47.3
+[loongson@localhost ~]$ lscpu
+Architecture:          loongarch64
+   CPU op-mode(s):      32-bit, 64-bit
+   Address sizes:       48 bits physical, 48 bits virtual
+   Byte Order:          Little Endian
+CPU(s):                128
+   On-line CPU(s) list: 0-127
+Model name:            Loongson-3C6000/D
+   CPU family:          Loongson-64bit
+   Model:               0x11
+   Thread(s) per core:  2
+   Core(s) per socket:  32
+   Socket(s):           2
+   BogoMIPS:            4200.00
+   Flags:               cpucfg lam ual fpu lsx lasx crc32 complex crypto 
+lvz lbt_x86 lbt_arm lbt_mips
+Caches (sum of all):
+   L1d:                 4 MiB (64 instances)
+   L1i:                 4 MiB (64 instances)
+   L2:                  16 MiB (64 instances)
+   L3:                  128 MiB (4 instances)
+NUMA:
+   NUMA node(s):        4
+   NUMA node0 CPU(s):   0-31
+   NUMA node1 CPU(s):   32-63
+   NUMA node2 CPU(s):   64-95
+   NUMA node3 CPU(s):   96-127
+
+There are four SE devices in my system, one for each NUMA node.
+
+Qunqin,
+
+Thanks
+
+>
+> Huacai
+>
+>> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
+>> ---
+>> Changes in v2:
+>>          -Resending due to no feedback for one month.
+>>          -Rebased on top of latest mainline (7.1-rc1) to ensure the patch
+>>           applies cleanly.
+>>          -No functional changes since the previous submission.
+>>
+>> Link to v1:
+>> https://lore.kernel.org/all/20260226102225.19516-1-zhaoqunqin@loongson.cn/#t
+>>
+>>   drivers/mfd/loongson-se.c       | 38 +++++++++++++++++++++++++++------
+>>   include/linux/mfd/loongson-se.h |  3 +++
+>>   2 files changed, 35 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/drivers/mfd/loongson-se.c b/drivers/mfd/loongson-se.c
+>> index 3902ba377d6..40e18c21268 100644
+>> --- a/drivers/mfd/loongson-se.c
+>> +++ b/drivers/mfd/loongson-se.c
+>> @@ -37,6 +37,9 @@ struct loongson_se_controller_cmd {
+>>          u32 info[7];
+>>   };
+>>
+>> +static DECLARE_COMPLETION(node0);
+>> +static struct loongson_se *se_node[SE_MAX_NODES];
+>> +
+>>   static int loongson_se_poll(struct loongson_se *se, u32 int_bit)
+>>   {
+>>          u32 status;
+>> @@ -133,8 +136,8 @@ EXPORT_SYMBOL_GPL(loongson_se_init_engine);
+>>   static irqreturn_t se_irq_handler(int irq, void *dev_id)
+>>   {
+>>          struct loongson_se *se = dev_id;
+>> -       u32 int_status;
+>> -       int id;
+>> +       u32 int_status, node_irq = 0;
+>> +       int id, node;
+>>
+>>          spin_lock(&se->dev_lock);
+>>
+>> @@ -147,6 +150,11 @@ static irqreturn_t se_irq_handler(int irq, void *dev_id)
+>>                  writel(SE_INT_CONTROLLER, se->base + SE_S2LINT_CL);
+>>          }
+>>
+>> +       if (int_status & SE_INT_OTHER_NODE) {
+>> +               int_status &= ~SE_INT_OTHER_NODE;
+>> +               node_irq = 1;
+>> +       }
+>> +
+>>          /* For engines */
+>>          while (int_status) {
+>>                  id = __ffs(int_status);
+>> @@ -157,6 +165,14 @@ static irqreturn_t se_irq_handler(int irq, void *dev_id)
+>>
+>>          spin_unlock(&se->dev_lock);
+>>
+>> +       if (node_irq) {
+>> +               writel(SE_INT_OTHER_NODE, se->base + SE_S2LINT_CL);
+>> +               for (node = 1; node < SE_MAX_NODES; node++) {
+>> +                       if (se_node[node])
+>> +                               se_irq_handler(irq, se_node[node]);
+>> +               }
+>> +       }
+>> +
+>>          return IRQ_HANDLED;
+>>   }
+>>
+>> @@ -189,6 +205,7 @@ static int loongson_se_probe(struct platform_device *pdev)
+>>          struct loongson_se *se;
+>>          int nr_irq, irq, err, i;
+>>          dma_addr_t paddr;
+>> +       int node = dev_to_node(dev);
+>>
+>>          se = devm_kmalloc(dev, sizeof(*se), GFP_KERNEL);
+>>          if (!se)
+>> @@ -213,9 +230,16 @@ static int loongson_se_probe(struct platform_device *pdev)
+>>
+>>          writel(SE_INT_ALL, se->base + SE_S2LINT_EN);
+>>
+>> -       nr_irq = platform_irq_count(pdev);
+>> -       if (nr_irq <= 0)
+>> -               return -ENODEV;
+>> +       if (node == 0 || node == NUMA_NO_NODE) {
+>> +               nr_irq = platform_irq_count(pdev);
+>> +               if (nr_irq <= 0)
+>> +                       return -ENODEV;
+>> +       } else {
+>> +               /* Only the device on node 0 can trigger interrupts */
+>> +               nr_irq = 0;
+>> +               wait_for_completion_interruptible(&node0);
+>> +               se_node[node] = se;
+>> +       }
+>>
+>>          for (i = 0; i < nr_irq; i++) {
+>>                  irq = platform_get_irq(pdev, i);
+>> @@ -228,7 +252,9 @@ static int loongson_se_probe(struct platform_device *pdev)
+>>          if (err)
+>>                  return err;
+>>
+>> -       return devm_mfd_add_devices(dev, PLATFORM_DEVID_NONE, engines,
+>> +       complete_all(&node0);
+>> +
+>> +       return devm_mfd_add_devices(dev, PLATFORM_DEVID_AUTO, engines,
+>>                                      ARRAY_SIZE(engines), NULL, 0, NULL);
+>>   }
+>>
+>> diff --git a/include/linux/mfd/loongson-se.h b/include/linux/mfd/loongson-se.h
+>> index 07afa0c2524..a80e06eb017 100644
+>> --- a/include/linux/mfd/loongson-se.h
+>> +++ b/include/linux/mfd/loongson-se.h
+>> @@ -20,6 +20,9 @@
+>>
+>>   #define SE_INT_ALL                     0xffffffff
+>>   #define SE_INT_CONTROLLER              BIT(0)
+>> +#define SE_INT_OTHER_NODE              BIT(31)
+>> +
+>> +#define SE_MAX_NODES                   8
+>>
+>>   #define SE_ENGINE_MAX                  16
+>>   #define SE_ENGINE_RNG                  1
+>>
+>> base-commit: 254f49634ee16a731174d2ae34bc50bd5f45e731
+>> --
+>> 2.47.2
+>>
+>>
 
