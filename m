@@ -1,110 +1,110 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15DEB40DFA9;
-	Mon, 27 Apr 2026 20:01:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E25BF38E12B;
+	Mon, 27 Apr 2026 20:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777320079; cv=none; b=W5+qEO2xfGQzdvV/fpBxboPGWTYqdVYA5OulcYfM46JnT5XZPJ6ZJOg7fHcBsn9u2YHzbt0ck06TUdDCiK0AZM07I3HmnIT9xdylEBAtJUQVSAgoySHjwt97OZd3+kwoBkGI7BV0wpLCPx05hcOr9Ogii5H53PkD4XJmBoJah2c=
+	t=1777323032; cv=none; b=WTl3S0lJPh8rfZQQCuktxv0FtKSptpALTRNBujNjJ/I4Tf1hYy8NcdfVcayvpNXi1KBJcQQT5xM6yGN1SjnmeMnUGj5p/kqKcF3aGxeKKsbjytv0vfYNrJjT9Es9VaRdj8YQcnjPKpGKImw8zf+LaGF5kRh2HGwls0fFJcymViM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777320079; c=relaxed/simple;
-	bh=RIb0Aa6EpzNRg1J0aTaLhEFrZVgJgo6t/s8NvM+Us+k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mLfYsPci64iOx+DQn/drhfkQFa0tKITzSIvxluiB180SB9b+ZyduSJPRUr/Sayi9/hI4gntWOGkY98znQ/dxP1pGMLzzwoitSwxNJBKuaOOySHxlb+4UdqVLWUitRV+MmM7v3kCGmKWb2qH67yWoHgc0QlTu49Ho60zEoq1zlo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=te0mMZsf; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777323032; c=relaxed/simple;
+	bh=YcplgUGNh+6uS8l7gywBwx3+pe3RpQeIFHEmlCROLmQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oN0kOr0VDTqGX8vzzUGXBrjm+uTlo7Kd9w4w5scxSLMqMHWY9Igcu1d2gJyjel6Ta08GR5CcWXoLQvKLjX3o9WmLekN/+AJWxP+/+fgxt1VX1WrD82ZXayy9/3fkcadiy3/Q65jTdl9QgwoBcyyau6PckYME3F3/L1pbPjFCaIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AR5nK28r; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="te0mMZsf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B04AC19425;
-	Mon, 27 Apr 2026 20:01:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AR5nK28r"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86F32C2BCB6;
+	Mon, 27 Apr 2026 20:50:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777320078;
-	bh=RIb0Aa6EpzNRg1J0aTaLhEFrZVgJgo6t/s8NvM+Us+k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=te0mMZsfpyPjHwxfI2i1rV6e7UtQEbxyhCXcge+V5V30jFEwSSKvYj9wfC4FBlqQZ
-	 nh/L7WvLUuQuxR+p0Pq0IE5I1AdLM0D/z9UCr+CozJ7osX7cT3pgK08sp7h0TTIUEB
-	 001EAx86lplAyaWSwrYsF2Q6bOFm6PjyqqsD00oiLXfpq6xwoaPXyGj38btFYlsiJ/
-	 FY8XN1XjPT6YUkAyjeDBEyTTyatGKVb02kypS0IjNQ4qNIVN0R/QO8Eg1cQ3myr0lX
-	 06zznjZaWYVF4nPX0k3TmqCYX/ufTJrxneEB/wHDAvyMB4nSdSZWM/a8zilOAXDE15
-	 jvZgFCFS1Ffvw==
-Date: Mon, 27 Apr 2026 20:01:16 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Dmitry Safonov <0x7f454c46@gmail.com>
-Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	s=k20201202; t=1777323030;
+	bh=YcplgUGNh+6uS8l7gywBwx3+pe3RpQeIFHEmlCROLmQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=AR5nK28rneLZfiRZ/H81AA03VfzqOgBmqVslVQY6OlOQ7kr7/i5yfBuOzfvmc/xvH
+	 yDGuir2sbON9pXZ6Mf8w5mpnIGhGmj7515yZTHVEm2WAnbwVz1UKx27J3TT41rI6Hr
+	 j2komLlcXrSu153KET90JatLHBLSj/dQOyg/XiY+oRgmHlnlKSi/zOgDZGpwQ6XEn6
+	 PwgkqE7V6grOkuASdRqArsOnDHZt0Mr+OO2gqrHPr0c2dZfyHmAPpnmC1Y54ZgWBOI
+	 s2I3HQPGYRqNkqEDIuevJJpMoHTiU3hz4joLW7LdbEoyFCkJxLvdVEw3G6EsvL49SJ
+	 ZwSEcVTVCcNMQ==
+From: Tycho Andersen <tycho@kernel.org>
+To: Ashish Kalra <ashish.kalra@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	John Allen <john.allen@amd.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Dmitry Safonov <dima@arista.com>
-Subject: Re: [PATCH net-next v2 0/5] Reimplement TCP-AO using crypto library
-Message-ID: <20260427200116.GA3454259@google.com>
-References: <20260427172727.9310-1-ebiggers@kernel.org>
- <CAJwJo6Z9oJSMMBUL_pbYWN6ha3n4MRpKV_aVut8E+af3JUDFkw@mail.gmail.com>
+	"David S. Miller" <davem@davemloft.net>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Shuah Khan <shuah@kernel.org>
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Kim Phillips <kim.phillips@amd.com>,
+	Alexey Kardashevskiy <aik@amd.com>,
+	"Tycho Andersen (AMD)" <tycho@kernel.org>,
+	Nikunj A Dadhania <nikunj@amd.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>,
+	Kees Cook <kees@kernel.org>,
+	Marco Elver <elver@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Li RongQing <lirongqing@baidu.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	linux-doc@vger.kernel.org,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH v2 0/4] Allow disabling RAPL during SNP initialization
+Date: Mon, 27 Apr 2026 14:48:43 -0600
+Message-ID: <20260427204847.112899-1-tycho@kernel.org>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJwJo6Z9oJSMMBUL_pbYWN6ha3n4MRpKV_aVut8E+af3JUDFkw@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Apr 27, 2026 at 08:09:05PM +0100, Dmitry Safonov wrote:
-> > To get a sense for how much more efficient this makes the TCP-AO code,
-> > here's a microbenchmark for tcp_ao_hash_skb() with skb->len == 128:
-> >
-> >         Algorithm       Avg cycles (before)     Avg cycles (after)
-> >         ---------       -------------------     ------------------
-> >         HMAC-SHA1       3319                    1256
-> >         HMAC-SHA256     3311                    1344
-> >         AES-128-CMAC    2720                    1107
-> 
-> 
-> I do like these numbers quite much! Yet, as I mentioned in version 1,
-> removing a fallback for other algorithms' support does not sound good
-> to me. There are two reasons:
-> - Ronald P. Bonica (the original RFC5925 author), together with Tony
-> Li do have an active RFC draft to support the additional algorithms
-> [1], potentially in addition to TCP Extended Options [2]
-> - There is at least one open-source BGP implementation (BIRD) that
-> allows using the algorithms that you are removing [3]. Without a
-> deprecation period and communication with at least known open source
-> users, it implies intentionally breaking them, which I can't agree
-> with.
-> 
-> I don't feel like Naking as we don't have any customers using anything
-> other than the 3 algorithms above (and BGP implementation is
-> [unfortunately] closed-source, so that would not feel appropriate even
-> if we had such customers), yet I do feel like it's worth and
-> appropriate to express my thoughts/concerns.
-> 
-> [1] https://www.ietf.org/archive/id/draft-bonica-tcpm-tcp-ao-algs-00.html
-> [2] https://www.ietf.org/archive/id/draft-bonica-tcpm-extended-options-00.html
-> [3] https://github.com/CZ-NIC/bird/blob/master/sysdep/linux/sysio.h#L246
+From: "Tycho Andersen (AMD)" <tycho@kernel.org>
 
-I think the usual "it's not really broken if no one notices" is likely
-to apply here.  Indeed, there have been many cases where algorithms have
-been removed from the crypto API before, despite this theoretically
-impacting UAPI.  Just some of the removals from crypto_ahash over the
-years that come to mind are the Tiger hash algorithms, multiple variants
-of RIPEMD, multiple CRC variants, GHASH, Poly1305, NH, and POLYVAL.
+The PLATYPUS (https://platypusattack.com/platypus.pdf) attack paper
+offers method for exfiltration via a low-resolution side channel using
+Running Average Power Limit. Newer versions of the SEV firmware offer a
+way to freeze these counters while initialized, so export this as an
+option.
 
-The reality is that the crypto API's algorithm specification language
-provides way more "flexibility" than anyone knows what to do with or
-ever should have existed at all, let alone been exposed directly to
-userspace.
+Changes from v1:
+* add a blurb from the platypus attack paper about the side channel
+* move the kernel parameter from the ccp driver to kvm_amd to make it
+  more obvious
+* split off the SEV-ES feature detection into its own series:
+  https://lore.kernel.org/all/20260416232329.3408497-1-seanjc@google.com/
 
-We don't have a lot of choice but to clean up these old mistakes to keep
-Linux maintainable going forwards, reduce the chance for user error, and
-optimize for the things that actually matter.
+v1 is here: https://lore.kernel.org/all/20260223162900.772669-1-tycho@kernel.org/
 
-And again, as I said, if there is another algorithm that someone
-actually needs, we can add it back as a bug fix (or as a new feature,
-considering that some never worked in the first place).
+Tycho Andersen (AMD) (4):
+  crypto/ccp: Pass init_args to __sev_snp_init_locked()
+  crypto/ccp: Support setting RAPL_DIS in SNP_INIT_EX
+  KVM: SEV: Add the kvm-amd.rapl_disable module parameter
+  KVM: selftests: Add a smoke test support for RAPL_DIS
 
-- Eric
+ .../admin-guide/kernel-parameters.txt         |  5 +++
+ arch/x86/kvm/svm/sev.c                        |  8 +++++
+ drivers/crypto/ccp/sev-dev.c                  | 35 +++++++++++++------
+ include/linux/psp-sev.h                       |  2 ++
+ tools/testing/selftests/kvm/include/x86/sev.h |  1 +
+ .../selftests/kvm/x86/sev_smoke_test.c        | 24 ++++++++++++-
+ 6 files changed, 63 insertions(+), 12 deletions(-)
+
+
+base-commit: 39f1c201b93f4ff71631bac72cff6eb155f976a4
+-- 
+2.53.0
+
