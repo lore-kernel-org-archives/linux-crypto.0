@@ -1,531 +1,154 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f169.google.com (mail-dy1-f169.google.com [74.125.82.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F42D3E63B5;
-	Mon, 27 Apr 2026 17:27:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777310873; cv=none; b=OnHREuH5368nH5QLd5y6DYYvp7Bor0wHav31MEOuqSf4Eq0w3x05lhLDEcTLsBu7dCqluTzBAP8MAZZSV1MY9a9wKzUEs6nnEqSSRo6nB2l9rukMDt8omdRg/eOZwGcJEESLEUP8BGGuLpBGNOrnO/LLf3sHFDTbCxSZIYApqiU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777310873; c=relaxed/simple;
-	bh=+NrWvMgiVvlEudVsw7+IRDB0fGeSLZsPN3zldOZaqqo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hqfYkNe3yQKUc68tF98RwtR3JZ7jQPfMNyCyfFgNgVaUwhIchg6lR3zX0eW98G/3rHwP1dxQY3IS+qVhvG8M5tzpvlBCbSZcnQeQtnQD9EzaL2PoKzIdHk9fYoB7HjcT6zFSi/p6hzIdfsEqDrKDWODqL6rVJ6pjiW5E+8OgNNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YpP4LBmC; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CAA43EF0A8
+	for <linux-crypto@vger.kernel.org>; Mon, 27 Apr 2026 19:09:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.169
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777316958; cv=pass; b=YUnp75tThY9lPDN0waT7Bqwx2SaP+XpgYbOY3CO202sOi2NWjega7fDlPasL8oUsQmmhdoTmZD9YE7PSOmG5l9MHde05JA0nPvn9A77Pr4meFVnC5czADinK0Uj3T1fS+TySFpt0q4zeUDJN26ztNNxCMCPuqjgIo8dDllRYg5w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777316958; c=relaxed/simple;
+	bh=p/vF9FXJAY2FJjUaiQjVVoGdbPVUxh18dW+tUAsV5TI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Hpo37l/EXJXTbkxChDkSihhbQG3NPjAgczftG7rei40QRpRTuNbPzbIZIgE401Rd8IBDxqDybYfYlFNcEKipsuivguls96okFaUm2JIwF3ewDX8+731zu0OdpQwaEB/tetxfLeSoLyXOUo/+Ogvib16KOGd5mj65yaPMh1kO0Kw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VLZiLVWJ; arc=pass smtp.client-ip=74.125.82.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YpP4LBmC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C62AC2BCB9;
-	Mon, 27 Apr 2026 17:27:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777310872;
-	bh=+NrWvMgiVvlEudVsw7+IRDB0fGeSLZsPN3zldOZaqqo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YpP4LBmCGZHspJLD+2JNirRNPwOdffnXFVxWNXDIPBER45CMZ2UxWs8snY6g1jesw
-	 isScPYoccE6JSVmSmF8tz3fnY7TDSZFEpMfQSGMlAe6diHp1OD8OZUI/6f/kSU76Qp
-	 hkG15fppU8+75p5COCMAIBZ1ODj6YRNNY7dIWFbt4gwmjDeGSpzObx+jdlRgFko0A8
-	 xB24qm985vJTyal9g74Bbg8a0AKIZqUPRj0BEdhK/7yhZh6GXn3XX1J5XMLkhuduQG
-	 021P3oYePofglP6vRUsL3ZWqCwuBMiJ/o6Gz+mw+5ITcEmQ/V2b9xaLQGfz0zMf/MC
-	 eVopHRYOeqv4w==
-From: Eric Biggers <ebiggers@kernel.org>
-To: netdev@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Dmitry Safonov <0x7f454c46@gmail.com>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH net-next v2 5/5] net/tcp: Remove tcp_sigpool
-Date: Mon, 27 Apr 2026 10:27:27 -0700
-Message-ID: <20260427172727.9310-6-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260427172727.9310-1-ebiggers@kernel.org>
-References: <20260427172727.9310-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VLZiLVWJ"
+Received: by mail-dy1-f169.google.com with SMTP id 5a478bee46e88-2d8ffdc31d0so1626949eec.0
+        for <linux-crypto@vger.kernel.org>; Mon, 27 Apr 2026 12:09:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777316956; cv=none;
+        d=google.com; s=arc-20240605;
+        b=h1usBXcF+s8wa5k7hWN40jReYL6f8ssIW8sULx85qN7Y8UsAG7thumYq5RHUAdzFdA
+         bdMJDGrGHKKBfgjKko/DcSGTxT4T9H4T7IOTEYyI2GkMEopBRVX223jZdd8lSL5uTwgC
+         6ubwX49gaDEO1NBOl6cdGyoJdVs1lS+8w6lYbu26FNozax8BeqXMjO5NqfN4ay/C51b8
+         h5HnoIidoqUST9+YTYrW1CkKvUDeTlbhilzpIaX7JYN5YkwDQUv+NPWiQs+aVo8PTAdq
+         SjEN9K1iDl4xM+FRsdxJNE2Py/swKF4ahhGwbldw279mByZfu7g2B+1fWAUqyBnOToHR
+         j3Uw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=gh4OLudKU7A0KCBedauzIRRUsQHgWNMMPIUWXm1xatw=;
+        fh=gNRAfGZzjWijDZIC6rgTB+8LEm8os4+6aNkDDDUuvNg=;
+        b=EjE5S3usrLyed1e8LzKEht0BttTtCsG6ent2RUg9HmCWJcplOZFyW2j1SqVvbETemw
+         vtI8A9Jwq4cXexYqL2PTw3utICgskCQg4znxPgyjddUU3fMVi8Zx8pQvooxG40SsFG8R
+         rPgPTzN57Oe0EgBNCdGcEL5uSsZleiPFaqX+zj/J/x88dTQB1UOYa99xGDe+6goeuAQA
+         g7/JcxHOOnMWrDiWQmRR02IgyCIaQPqaVBps8SU4dTcts/lmEDXtaTtZjMvHxxcLm1d5
+         /kaZrYAINE2lpcPhA9QwqXRGpn1Aks2ufwXbMNtE0CTRa17UEzZZoq2+j8rTeIj3L/Wz
+         VVNw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777316956; x=1777921756; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=gh4OLudKU7A0KCBedauzIRRUsQHgWNMMPIUWXm1xatw=;
+        b=VLZiLVWJ9Uvn+JTdQghPX5qdyhD+36nGwrmTSgCAqHg24MOC6ku2+dngC2hU116Xrm
+         xeO0MHwg0ZIYhqSw/Hslcze1d3GgjTqnbff3D4omHQoZaxcRICJgPunj/5vtPFCgxmqo
+         fjfW31mtLwxxlfCocqf8SulgB0KcigHEbZ1W4jr3kTTnAlHWzeGimGVxQA5IZBTwiAIe
+         pAUwYyw8ar7dlPC/QlloD8K7VMQ+AxgGPbYH/jv82RZzQMfSTQAu2JWQDr2x8SLCfbKf
+         BeJQWpw8QOSo6naUTPa3hHtnj072lfDV/fu5WYbPaaQW3wx9vsWFOCApZrFASrjL0C0W
+         WwbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777316956; x=1777921756;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gh4OLudKU7A0KCBedauzIRRUsQHgWNMMPIUWXm1xatw=;
+        b=a1qRU4yJtpjpM9/V/IY5SycR9Pqg3CvT9zVa4XT9ijWW20KdseTkSf1KhKbfL4pBd2
+         DpkZnnxNUVVMAWQA69XYG/iTMPKRJXdJy6kOut0/otE6hcwEjGofKbo80tOpKuk7aeCC
+         eyAsKK9us375njXGgaDzhQb3J0QOTuHlWoju8B/DdFw0Al/ra0ZPE2ceiGgnt7JmzeQv
+         HW1NwsUMzCm4C9fbH5aRG65S497Qn/i7AzLm0ZaDW/izmygFFU3BGS4qns9IfX9Ov8Dv
+         U9e4iShsY6U9BPA04CK5WQxY5gzIgUrrRiCAmKmdSSY9la2xGHMAsFMPGnqYMhBa0wcT
+         FDDA==
+X-Forwarded-Encrypted: i=1; AFNElJ8bpOLIOjtCSTg/yiZu1KOyBHeSg3IrXLBdRyD0qv4yl4p0w12djeOAWg3VyfTDgyEIRZesF6TUoARcU80=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvZKP5bRg8ZOCGNHICjcNJK3lX134lGhsd+7Xmonmq4x2mItI4
+	SJLeauBtAQHcHhVSciX7JL5giwgg8tqLPy+p93w7Cmu95fUhNHoqu7nCe5GtFoL4OAkTVhlRRFw
+	oq22ItSvF/OUWTmPvyShjsvop4ej7WkQ=
+X-Gm-Gg: AeBDievUuS9Ueij/Lk6Q9VIrVnSzx6dtGJwjog2SMJR04NN6OOv6idimmx5FxReIu5q
+	xEgZoPtuY6e5VwBnZ9lME1g9YnsruelTKpaoK0po0QxyGFdO6f7I6DhRBgoA0d6bMA08jPezAYg
+	+WGl8fLl24VbOvRckDd4y5w/rTat3+h/1JicNg0SR8wO0mz9Wd4xzwXk4yALieRiCBqgPu7dqlQ
+	uIX9mbC7SxuhHs9wivVak/uKbUoB85BhbwrBCoMPBJzMM902Bdg7s9HdTJdq/6ch5CK82uD9tim
+	bDsGQYRTUW1yIooo6nA4YKZTYsLyzgqS9qdr2QR+GNSFWAMkykUs6l7CGvuIsdDpK9WDPcMOUH8
+	l7W/EIGSeJe6eI/ngLLY8e2vi5YwCk8U=
+X-Received: by 2002:a05:7300:6144:b0:2de:cc07:e99 with SMTP id
+ 5a478bee46e88-2ed0a013aacmr84460eec.7.1777316956086; Mon, 27 Apr 2026
+ 12:09:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260427172727.9310-1-ebiggers@kernel.org>
+In-Reply-To: <20260427172727.9310-1-ebiggers@kernel.org>
+From: Dmitry Safonov <0x7f454c46@gmail.com>
+Date: Mon, 27 Apr 2026 20:09:05 +0100
+X-Gm-Features: AVHnY4JJWvpg7bTU7jYNNN2GruZova4uBYsRbdJTLdmZD4F02zLyOKtxs4yCOJQ
+Message-ID: <CAJwJo6Z9oJSMMBUL_pbYWN6ha3n4MRpKV_aVut8E+af3JUDFkw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 0/5] Reimplement TCP-AO using crypto library
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
+	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	"David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Ard Biesheuvel <ardb@kernel.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Dmitry Safonov <dima@arista.com>
+Content-Type: text/plain; charset="UTF-8"
 
-tcp_sigpool is no longer used.  It existed only as a workaround for
-issues in the design of the crypto_ahash API, which have been avoided by
-switching to the much easier-to-use library APIs instead.  Remove it.
+Hi Eric,
 
-Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- include/net/tcp.h      |  34 ----
- net/ipv4/Kconfig       |   3 -
- net/ipv4/Makefile      |   1 -
- net/ipv4/tcp_sigpool.c | 366 -----------------------------------------
- 4 files changed, 404 deletions(-)
- delete mode 100644 net/ipv4/tcp_sigpool.c
+On Mon, 27 Apr 2026 at 18:27, Eric Biggers <ebiggers@kernel.org> wrote:
+[..]
+> To make this simplification and optimization possible, this series also
+> updates the TCP-AO code to support a specific set of algorithms, rather
+> than arbitrary algorithms that don't make sense and are very likely not
+> being used, e.g. CRC-32 and HMAC-MD5.
+>
+> Specifically, this series retains the support for AES-128-CMAC,
+> HMAC-SHA1, and HMAC-SHA256.  AES-128-CMAC and HMAC-SHA1 are the only
+> algorithms that are actually standardized for use in TCP-AO, while
+> HMAC-SHA256 makes sense to continue supporting as a Linux extension.  Of
+> course, other algorithms can still be (re-)added later if ever needed.
+> It's worth noting that TCP-AO MACs are limited to 20 bytes by the TCP
+> options space, which limits the benefit of further algorithm upgrades.
+>
+> This series passes the tcp_ao selftests
+> (sudo make -C tools/testing/selftests/net/tcp_ao/ run_tests).
+>
+> To get a sense for how much more efficient this makes the TCP-AO code,
+> here's a microbenchmark for tcp_ao_hash_skb() with skb->len == 128:
+>
+>         Algorithm       Avg cycles (before)     Avg cycles (after)
+>         ---------       -------------------     ------------------
+>         HMAC-SHA1       3319                    1256
+>         HMAC-SHA256     3311                    1344
+>         AES-128-CMAC    2720                    1107
 
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 8817e7b8cc67..660ad8c63395 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -2015,44 +2015,10 @@ struct tcp6_pseudohdr {
- 	struct in6_addr daddr;
- 	__be32		len;
- 	__be32		protocol;	/* including padding */
- };
- 
--/*
-- * struct tcp_sigpool - per-CPU pool of ahash_requests
-- * @scratch: per-CPU temporary area, that can be used between
-- *	     tcp_sigpool_start() and tcp_sigpool_end() to perform
-- *	     crypto request
-- * @req: pre-allocated ahash request
-- */
--struct tcp_sigpool {
--	void *scratch;
--	struct ahash_request *req;
--};
--
--int tcp_sigpool_alloc_ahash(const char *alg, size_t scratch_size);
--void tcp_sigpool_get(unsigned int id);
--void tcp_sigpool_release(unsigned int id);
--int tcp_sigpool_hash_skb_data(struct tcp_sigpool *hp,
--			      const struct sk_buff *skb,
--			      unsigned int header_len);
--
--/**
-- * tcp_sigpool_start - disable bh and start using tcp_sigpool_ahash
-- * @id: tcp_sigpool that was previously allocated by tcp_sigpool_alloc_ahash()
-- * @c: returned tcp_sigpool for usage (uninitialized on failure)
-- *
-- * Returns: 0 on success, error otherwise.
-- */
--int tcp_sigpool_start(unsigned int id, struct tcp_sigpool *c);
--/**
-- * tcp_sigpool_end - enable bh and stop using tcp_sigpool
-- * @c: tcp_sigpool context that was returned by tcp_sigpool_start()
-- */
--void tcp_sigpool_end(struct tcp_sigpool *c);
--size_t tcp_sigpool_algo(unsigned int id, char *buf, size_t buf_len);
--/* - functions */
- void tcp_v4_md5_hash_skb(char *md5_hash, const struct tcp_md5sig_key *key,
- 			 const struct sock *sk, const struct sk_buff *skb);
- int tcp_md5_do_add(struct sock *sk, const union tcp_md5_addr *addr,
- 		   int family, u8 prefixlen, int l3index, u8 flags,
- 		   const u8 *newkey, u8 newkeylen);
-diff --git a/net/ipv4/Kconfig b/net/ipv4/Kconfig
-index 77b053b445a0..301b47660305 100644
---- a/net/ipv4/Kconfig
-+++ b/net/ipv4/Kconfig
-@@ -739,13 +739,10 @@ config DEFAULT_TCP_CONG
- 	default "dctcp" if DEFAULT_DCTCP
- 	default "cdg" if DEFAULT_CDG
- 	default "bbr" if DEFAULT_BBR
- 	default "cubic"
- 
--config TCP_SIGPOOL
--	tristate
--
- config TCP_AO
- 	bool "TCP: Authentication Option (RFC5925)"
- 	select CRYPTO_LIB_AES_CBC_MACS
- 	select CRYPTO_LIB_SHA1
- 	select CRYPTO_LIB_SHA256
-diff --git a/net/ipv4/Makefile b/net/ipv4/Makefile
-index 7f9f98813986..7964234f0d08 100644
---- a/net/ipv4/Makefile
-+++ b/net/ipv4/Makefile
-@@ -58,11 +58,10 @@ obj-$(CONFIG_TCP_CONG_NV) += tcp_nv.o
- obj-$(CONFIG_TCP_CONG_VENO) += tcp_veno.o
- obj-$(CONFIG_TCP_CONG_SCALABLE) += tcp_scalable.o
- obj-$(CONFIG_TCP_CONG_LP) += tcp_lp.o
- obj-$(CONFIG_TCP_CONG_YEAH) += tcp_yeah.o
- obj-$(CONFIG_TCP_CONG_ILLINOIS) += tcp_illinois.o
--obj-$(CONFIG_TCP_SIGPOOL) += tcp_sigpool.o
- obj-$(CONFIG_NET_SOCK_MSG) += tcp_bpf.o
- obj-$(CONFIG_BPF_SYSCALL) += udp_bpf.o
- obj-$(CONFIG_NETLABEL) += cipso_ipv4.o
- 
- obj-$(CONFIG_XFRM) += xfrm4_policy.o xfrm4_state.o xfrm4_input.o \
-diff --git a/net/ipv4/tcp_sigpool.c b/net/ipv4/tcp_sigpool.c
-deleted file mode 100644
-index 10b2e5970c40..000000000000
---- a/net/ipv4/tcp_sigpool.c
-+++ /dev/null
-@@ -1,366 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-or-later
--
--#include <crypto/hash.h>
--#include <linux/cpu.h>
--#include <linux/kref.h>
--#include <linux/module.h>
--#include <linux/mutex.h>
--#include <linux/percpu.h>
--#include <linux/workqueue.h>
--#include <net/tcp.h>
--
--static size_t __scratch_size;
--struct sigpool_scratch {
--	local_lock_t bh_lock;
--	void __rcu *pad;
--};
--
--static DEFINE_PER_CPU(struct sigpool_scratch, sigpool_scratch) = {
--	.bh_lock = INIT_LOCAL_LOCK(bh_lock),
--};
--
--struct sigpool_entry {
--	struct crypto_ahash	*hash;
--	const char		*alg;
--	struct kref		kref;
--	uint16_t		needs_key:1,
--				reserved:15;
--};
--
--#define CPOOL_SIZE (PAGE_SIZE / sizeof(struct sigpool_entry))
--static struct sigpool_entry cpool[CPOOL_SIZE];
--static unsigned int cpool_populated;
--static DEFINE_MUTEX(cpool_mutex);
--
--/* Slow-path */
--struct scratches_to_free {
--	struct rcu_head rcu;
--	unsigned int cnt;
--	void *scratches[];
--};
--
--static void free_old_scratches(struct rcu_head *head)
--{
--	struct scratches_to_free *stf;
--
--	stf = container_of(head, struct scratches_to_free, rcu);
--	while (stf->cnt--)
--		kfree(stf->scratches[stf->cnt]);
--	kfree(stf);
--}
--
--/**
-- * sigpool_reserve_scratch - re-allocates scratch buffer, slow-path
-- * @size: request size for the scratch/temp buffer
-- */
--static int sigpool_reserve_scratch(size_t size)
--{
--	struct scratches_to_free *stf;
--	size_t stf_sz = struct_size(stf, scratches, num_possible_cpus());
--	int cpu, err = 0;
--
--	lockdep_assert_held(&cpool_mutex);
--	if (__scratch_size >= size)
--		return 0;
--
--	stf = kmalloc(stf_sz, GFP_KERNEL);
--	if (!stf)
--		return -ENOMEM;
--	stf->cnt = 0;
--
--	size = max(size, __scratch_size);
--	cpus_read_lock();
--	for_each_possible_cpu(cpu) {
--		void *scratch, *old_scratch;
--
--		scratch = kmalloc_node(size, GFP_KERNEL, cpu_to_node(cpu));
--		if (!scratch) {
--			err = -ENOMEM;
--			break;
--		}
--
--		old_scratch = rcu_replace_pointer(per_cpu(sigpool_scratch.pad, cpu),
--					scratch, lockdep_is_held(&cpool_mutex));
--		if (!cpu_online(cpu) || !old_scratch) {
--			kfree(old_scratch);
--			continue;
--		}
--		stf->scratches[stf->cnt++] = old_scratch;
--	}
--	cpus_read_unlock();
--	if (!err)
--		__scratch_size = size;
--
--	call_rcu(&stf->rcu, free_old_scratches);
--	return err;
--}
--
--static void sigpool_scratch_free(void)
--{
--	int cpu;
--
--	for_each_possible_cpu(cpu)
--		kfree(rcu_replace_pointer(per_cpu(sigpool_scratch.pad, cpu),
--					  NULL, lockdep_is_held(&cpool_mutex)));
--	__scratch_size = 0;
--}
--
--static int __cpool_try_clone(struct crypto_ahash *hash)
--{
--	struct crypto_ahash *tmp;
--
--	tmp = crypto_clone_ahash(hash);
--	if (IS_ERR(tmp))
--		return PTR_ERR(tmp);
--
--	crypto_free_ahash(tmp);
--	return 0;
--}
--
--static int __cpool_alloc_ahash(struct sigpool_entry *e, const char *alg)
--{
--	struct crypto_ahash *cpu0_hash;
--	int ret;
--
--	e->alg = kstrdup(alg, GFP_KERNEL);
--	if (!e->alg)
--		return -ENOMEM;
--
--	cpu0_hash = crypto_alloc_ahash(alg, 0, CRYPTO_ALG_ASYNC);
--	if (IS_ERR(cpu0_hash)) {
--		ret = PTR_ERR(cpu0_hash);
--		goto out_free_alg;
--	}
--
--	e->needs_key = crypto_ahash_get_flags(cpu0_hash) & CRYPTO_TFM_NEED_KEY;
--
--	ret = __cpool_try_clone(cpu0_hash);
--	if (ret)
--		goto out_free_cpu0_hash;
--	e->hash = cpu0_hash;
--	kref_init(&e->kref);
--	return 0;
--
--out_free_cpu0_hash:
--	crypto_free_ahash(cpu0_hash);
--out_free_alg:
--	kfree(e->alg);
--	e->alg = NULL;
--	return ret;
--}
--
--/**
-- * tcp_sigpool_alloc_ahash - allocates pool for ahash requests
-- * @alg: name of async hash algorithm
-- * @scratch_size: reserve a tcp_sigpool::scratch buffer of this size
-- */
--int tcp_sigpool_alloc_ahash(const char *alg, size_t scratch_size)
--{
--	int i, ret;
--
--	/* slow-path */
--	mutex_lock(&cpool_mutex);
--	ret = sigpool_reserve_scratch(scratch_size);
--	if (ret)
--		goto out;
--	for (i = 0; i < cpool_populated; i++) {
--		if (!cpool[i].alg)
--			continue;
--		if (strcmp(cpool[i].alg, alg))
--			continue;
--
--		/* pairs with tcp_sigpool_release() */
--		if (!kref_get_unless_zero(&cpool[i].kref))
--			kref_init(&cpool[i].kref);
--		ret = i;
--		goto out;
--	}
--
--	for (i = 0; i < cpool_populated; i++) {
--		if (!cpool[i].alg)
--			break;
--	}
--	if (i >= CPOOL_SIZE) {
--		ret = -ENOSPC;
--		goto out;
--	}
--
--	ret = __cpool_alloc_ahash(&cpool[i], alg);
--	if (!ret) {
--		ret = i;
--		if (i == cpool_populated)
--			cpool_populated++;
--	}
--out:
--	mutex_unlock(&cpool_mutex);
--	return ret;
--}
--EXPORT_SYMBOL_GPL(tcp_sigpool_alloc_ahash);
--
--static void __cpool_free_entry(struct sigpool_entry *e)
--{
--	crypto_free_ahash(e->hash);
--	kfree(e->alg);
--	memset(e, 0, sizeof(*e));
--}
--
--static void cpool_cleanup_work_cb(struct work_struct *work)
--{
--	bool free_scratch = true;
--	unsigned int i;
--
--	mutex_lock(&cpool_mutex);
--	for (i = 0; i < cpool_populated; i++) {
--		if (kref_read(&cpool[i].kref) > 0) {
--			free_scratch = false;
--			continue;
--		}
--		if (!cpool[i].alg)
--			continue;
--		__cpool_free_entry(&cpool[i]);
--	}
--	if (free_scratch)
--		sigpool_scratch_free();
--	mutex_unlock(&cpool_mutex);
--}
--
--static DECLARE_WORK(cpool_cleanup_work, cpool_cleanup_work_cb);
--static void cpool_schedule_cleanup(struct kref *kref)
--{
--	schedule_work(&cpool_cleanup_work);
--}
--
--/**
-- * tcp_sigpool_release - decreases number of users for a pool. If it was
-- * the last user of the pool, releases any memory that was consumed.
-- * @id: tcp_sigpool that was previously allocated by tcp_sigpool_alloc_ahash()
-- */
--void tcp_sigpool_release(unsigned int id)
--{
--	if (WARN_ON_ONCE(id >= cpool_populated || !cpool[id].alg))
--		return;
--
--	/* slow-path */
--	kref_put(&cpool[id].kref, cpool_schedule_cleanup);
--}
--EXPORT_SYMBOL_GPL(tcp_sigpool_release);
--
--/**
-- * tcp_sigpool_get - increases number of users (refcounter) for a pool
-- * @id: tcp_sigpool that was previously allocated by tcp_sigpool_alloc_ahash()
-- */
--void tcp_sigpool_get(unsigned int id)
--{
--	if (WARN_ON_ONCE(id >= cpool_populated || !cpool[id].alg))
--		return;
--	kref_get(&cpool[id].kref);
--}
--EXPORT_SYMBOL_GPL(tcp_sigpool_get);
--
--int tcp_sigpool_start(unsigned int id, struct tcp_sigpool *c) __cond_acquires(0, RCU_BH)
--{
--	struct crypto_ahash *hash;
--
--	rcu_read_lock_bh();
--	if (WARN_ON_ONCE(id >= cpool_populated || !cpool[id].alg)) {
--		rcu_read_unlock_bh();
--		return -EINVAL;
--	}
--
--	hash = crypto_clone_ahash(cpool[id].hash);
--	if (IS_ERR(hash)) {
--		rcu_read_unlock_bh();
--		return PTR_ERR(hash);
--	}
--
--	c->req = ahash_request_alloc(hash, GFP_ATOMIC);
--	if (!c->req) {
--		crypto_free_ahash(hash);
--		rcu_read_unlock_bh();
--		return -ENOMEM;
--	}
--	ahash_request_set_callback(c->req, 0, NULL, NULL);
--
--	/* Pairs with tcp_sigpool_reserve_scratch(), scratch area is
--	 * valid (allocated) until tcp_sigpool_end().
--	 */
--	local_lock_nested_bh(&sigpool_scratch.bh_lock);
--	c->scratch = rcu_dereference_bh(*this_cpu_ptr(&sigpool_scratch.pad));
--	return 0;
--}
--EXPORT_SYMBOL_GPL(tcp_sigpool_start);
--
--void tcp_sigpool_end(struct tcp_sigpool *c) __releases(RCU_BH)
--{
--	struct crypto_ahash *hash = crypto_ahash_reqtfm(c->req);
--
--	local_unlock_nested_bh(&sigpool_scratch.bh_lock);
--	rcu_read_unlock_bh();
--	ahash_request_free(c->req);
--	crypto_free_ahash(hash);
--}
--EXPORT_SYMBOL_GPL(tcp_sigpool_end);
--
--/**
-- * tcp_sigpool_algo - return algorithm of tcp_sigpool
-- * @id: tcp_sigpool that was previously allocated by tcp_sigpool_alloc_ahash()
-- * @buf: buffer to return name of algorithm
-- * @buf_len: size of @buf
-- */
--size_t tcp_sigpool_algo(unsigned int id, char *buf, size_t buf_len)
--{
--	if (WARN_ON_ONCE(id >= cpool_populated || !cpool[id].alg))
--		return -EINVAL;
--
--	return strscpy(buf, cpool[id].alg, buf_len);
--}
--EXPORT_SYMBOL_GPL(tcp_sigpool_algo);
--
--/**
-- * tcp_sigpool_hash_skb_data - hash data in skb with initialized tcp_sigpool
-- * @hp: tcp_sigpool pointer
-- * @skb: buffer to add sign for
-- * @header_len: TCP header length for this segment
-- */
--int tcp_sigpool_hash_skb_data(struct tcp_sigpool *hp,
--			      const struct sk_buff *skb,
--			      unsigned int header_len)
--{
--	const unsigned int head_data_len = skb_headlen(skb) > header_len ?
--					   skb_headlen(skb) - header_len : 0;
--	const struct skb_shared_info *shi = skb_shinfo(skb);
--	const struct tcphdr *tp = tcp_hdr(skb);
--	struct ahash_request *req = hp->req;
--	struct sk_buff *frag_iter;
--	struct scatterlist sg;
--	unsigned int i;
--
--	sg_init_table(&sg, 1);
--
--	sg_set_buf(&sg, ((u8 *)tp) + header_len, head_data_len);
--	ahash_request_set_crypt(req, &sg, NULL, head_data_len);
--	if (crypto_ahash_update(req))
--		return 1;
--
--	for (i = 0; i < shi->nr_frags; ++i) {
--		const skb_frag_t *f = &shi->frags[i];
--		unsigned int offset = skb_frag_off(f);
--		struct page *page;
--
--		page = skb_frag_page(f) + (offset >> PAGE_SHIFT);
--		sg_set_page(&sg, page, skb_frag_size(f), offset_in_page(offset));
--		ahash_request_set_crypt(req, &sg, NULL, skb_frag_size(f));
--		if (crypto_ahash_update(req))
--			return 1;
--	}
--
--	skb_walk_frags(skb, frag_iter)
--		if (tcp_sigpool_hash_skb_data(hp, frag_iter, 0))
--			return 1;
--
--	return 0;
--}
--EXPORT_SYMBOL(tcp_sigpool_hash_skb_data);
--
--MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("Per-CPU pool of crypto requests");
--- 
-2.54.0
 
+I do like these numbers quite much! Yet, as I mentioned in version 1,
+removing a fallback for other algorithms' support does not sound good
+to me. There are two reasons:
+- Ronald P. Bonica (the original RFC5925 author), together with Tony
+Li do have an active RFC draft to support the additional algorithms
+[1], potentially in addition to TCP Extended Options [2]
+- There is at least one open-source BGP implementation (BIRD) that
+allows using the algorithms that you are removing [3]. Without a
+deprecation period and communication with at least known open source
+users, it implies intentionally breaking them, which I can't agree
+with.
+
+I don't feel like Naking as we don't have any customers using anything
+other than the 3 algorithms above (and BGP implementation is
+[unfortunately] closed-source, so that would not feel appropriate even
+if we had such customers), yet I do feel like it's worth and
+appropriate to express my thoughts/concerns.
+
+[1] https://www.ietf.org/archive/id/draft-bonica-tcpm-tcp-ao-algs-00.html
+[2] https://www.ietf.org/archive/id/draft-bonica-tcpm-extended-options-00.html
+[3] https://github.com/CZ-NIC/bird/blob/master/sysdep/linux/sysio.h#L246
+
+Thanks,
+             Dmitry
