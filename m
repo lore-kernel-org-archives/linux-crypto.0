@@ -1,125 +1,118 @@
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A0F3D6494
-	for <linux-crypto@vger.kernel.org>; Mon, 27 Apr 2026 16:40:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E283DCD84
+	for <linux-crypto@vger.kernel.org>; Mon, 27 Apr 2026 17:20:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777308041; cv=none; b=u85Cf8mGHBw92bvs5WnV/7Tok9TwcxuiHUoSPfW/RBeXX+qnhrjVA1UnF5wIwMz+rZDMmf6pG1gLEIlcm2Lx0TSgBdHX7MaLaZ889+J8aigjwrkNIKGiKutpen/cpFbPLiYz82ovqh0mop/9FNZ8C8KJR24WtbjB6M7SYFK3yrY=
+	t=1777310446; cv=none; b=k4YSmshaQYKUT4npOdBgnkTgwNMwnTidvSvzWoI8aFIsSGKP3G56+kagE7sC22HrWy9fGHQizFh6wVvYkEqD9qHdWVBVIe0Z86B7aIqLym+CWtZ751/CLWVWU2T0f3TXOcbq+ZiRD3YmF2AY5MJwWN38qw0I0wA9fWpSYh2t4wU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777308041; c=relaxed/simple;
-	bh=tLfxGfZ8FK6o1WjyY8CrkwQT5BZ1HxjhnlCKtV2r3/Q=;
+	s=arc-20240116; t=1777310446; c=relaxed/simple;
+	bh=3xDUnocLIAIGKNms7t7GLlfn+0JKHNX3bctn6rowp1g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HRgVzD1cFHyB6yPzzy2o1O0ejR3AnMZvB5IKJ0ax2e/XIws0/ioPPOSkvtsg3WOo6Sq0cqln5X+fl7KPyoEpisEf8g3hkpnmMLkVa1IfYjSwRNdHoB4q4PU5R0GazVtjiVjWQ+2UDkxUWCRQmQdGGPP0MQHt5LX/qw/6ff9hdnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aPx3bjIm; arc=none smtp.client-ip=95.215.58.171
+	 MIME-Version; b=Kk0cYwNhWnRBsfGAcKHjOt6h9xo/SbPrM/TyfFvVghf8j8ZjynxAHBL0MhUgQohb2S5PoeD00wGBj/jlbsLXdJgCC98WLykzmRJqDAWoIOjayvafLycH88je+BvokbPxVa6yhoc2CZ7JE692YT4c9wpukGKlMasfHYiKaVBe/lM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=etEhaVYK; arc=none smtp.client-ip=91.218.175.183
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aPx3bjIm"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="etEhaVYK"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1777308036;
+	t=1777310443;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UL1kvB9Ji20YADD2O7j5GE++8RuOFTqcHyAxji8oAys=;
-	b=aPx3bjImo3cA3H6UxscWcOW3PLdy5JIH+u2p6iwAzkK2q7oPWgKLH9fyIPNwSH3vOs8lC3
-	SX/ZDFHugiVdUANi+npTH3fKPavHtTMuVqqhdv+mbTJVe53wvGuc+6jPJ1S4GlrexIn3Uc
-	cyCbfG2lk6jE7jDcC4lS9uag1Q4NnAg=
+	bh=aq/7s2IHv/9b/Uw/YEvItYMFIy4ZXJ6dZqzgRz4Q/Xo=;
+	b=etEhaVYK+QIwZ9PXzyBb1qtVCxGY6JzpKqIEYPE8KPvYykkR4tAGZxXzU/9DKjxGmC6Jjm
+	qeH3s6FG2JApcBKiprLnftVMT1YJ3vxgTkwrvMcflIX2nvW2FntyligZe86KUe7vjXMC7Y
+	JDCZrwQ5tBMfn018icn29du9DBMqy/g=
 From: Thorsten Blum <thorsten.blum@linux.dev>
-To: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-	Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Gaurav Jain <gaurav.jain@nxp.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>
 Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	stable@vger.kernel.org,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] crypto: caam - use print_hex_dump_devel to guard key hex dumps
-Date: Mon, 27 Apr 2026 18:39:39 +0200
-Message-ID: <20260427163937.337966-5-thorsten.blum@linux.dev>
-In-Reply-To: <20260427163937.337966-3-thorsten.blum@linux.dev>
-References: <20260427163937.337966-3-thorsten.blum@linux.dev>
+Subject: [PATCH 3/3] crypto: omap - add omap_sham_unregister_algs helper
+Date: Mon, 27 Apr 2026 19:20:20 +0200
+Message-ID: <20260427172018.416707-6-thorsten.blum@linux.dev>
+In-Reply-To: <20260427172018.416707-4-thorsten.blum@linux.dev>
+References: <20260427172018.416707-4-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2990; i=thorsten.blum@linux.dev; h=from:subject; bh=tLfxGfZ8FK6o1WjyY8CrkwQT5BZ1HxjhnlCKtV2r3/Q=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDJnvJwY++Lpt07fvtbJJH893fZN49/3X5m+1G8uX23GzN VjGrii41FHKwiDGxSArpsjyYNaPGb6lNZWbTCJ2wsxhZQIZwsDFKQATOfWA4Z/uDsagH6JpmX0T 712Z6xHrmBXxJv1KndWLoocv4p/yFDxiZLh5VnXSh62e33Nffbjt9vTvJnO29UVfJU493Rfesaj hwXZOAA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2244; i=thorsten.blum@linux.dev; h=from:subject; bh=3xDUnocLIAIGKNms7t7GLlfn+0JKHNX3bctn6rowp1g=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDJnvZ90IOHYh4P/Hol9XtU8rnZkcqtQgEub5N+5h8U8li T+/HRYEdJSyMIhxMciKKbI8mPVjhm9pTeUmk4idMHNYmUCGMHBxCsBEfrky/A/d90Az6seWzjPv zGfLKZz+3PBcxv0j7wEX7XevT7A/fTeT4X9IOkfol9+m+ptydiQ3OLwPFb65/dDkAweLPyR6xQV u0eYBAA==
 X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Use print_hex_dump_devel() for dumping sensitive key material in
-*_setkey() to avoid leaking secrets at runtime when CONFIG_DYNAMIC_DEBUG
-is enabled.
+Add a new helper omap_sham_unregister_algs() and replace two for loops
+in omap_sham_probe() and omap_sham_remove(), which also ensure
+->registered is reset to 0.
 
-Fixes: 8d818c105501 ("crypto: caam/qi2 - add DPAA2-CAAM driver")
-Fixes: 226853ac3ebe ("crypto: caam/qi2 - add skcipher algorithms")
-Cc: stable@vger.kernel.org
 Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 ---
- drivers/crypto/caam/caamalg_qi2.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ drivers/crypto/omap-sham.c | 27 ++++++++++++++++-----------
+ 1 file changed, 16 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
-index bf10c3dda745..6b47bcc16a50 100644
---- a/drivers/crypto/caam/caamalg_qi2.c
-+++ b/drivers/crypto/caam/caamalg_qi2.c
-@@ -301,7 +301,7 @@ static int aead_setkey(struct crypto_aead *aead, const u8 *key,
- 	dev_dbg(dev, "keylen %d enckeylen %d authkeylen %d\n",
- 		keys.authkeylen + keys.enckeylen, keys.enckeylen,
- 		keys.authkeylen);
--	print_hex_dump_debug("key in @" __stringify(__LINE__)": ",
-+	print_hex_dump_devel("key in @" __stringify(__LINE__)": ",
- 			     DUMP_PREFIX_ADDRESS, 16, 4, key, keylen, 1);
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index b8c416c5ee70..be1ac640ee59 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -2042,6 +2042,20 @@ static struct attribute *omap_sham_attrs[] = {
+ };
+ ATTRIBUTE_GROUPS(omap_sham);
  
- 	ctx->adata.keylen = keys.authkeylen;
-@@ -315,7 +315,7 @@ static int aead_setkey(struct crypto_aead *aead, const u8 *key,
- 	memcpy(ctx->key + ctx->adata.keylen_pad, keys.enckey, keys.enckeylen);
- 	dma_sync_single_for_device(dev, ctx->key_dma, ctx->adata.keylen_pad +
- 				   keys.enckeylen, ctx->dir);
--	print_hex_dump_debug("ctx.key@" __stringify(__LINE__)": ",
-+	print_hex_dump_devel("ctx.key@" __stringify(__LINE__)": ",
- 			     DUMP_PREFIX_ADDRESS, 16, 4, ctx->key,
- 			     ctx->adata.keylen_pad + keys.enckeylen, 1);
++static void omap_sham_unregister_algs(const struct omap_sham_pdata *pdata)
++{
++	struct omap_sham_algs_info *alg_info;
++	int i;
++
++	for (i = pdata->algs_info_size - 1; i >= 0; i--) {
++		alg_info = &pdata->algs_info[i];
++
++		crypto_engine_unregister_ahashes(alg_info->algs_list,
++						 alg_info->registered);
++		alg_info->registered = 0;
++	}
++}
++
+ static int omap_sham_probe(struct platform_device *pdev)
+ {
+ 	struct omap_sham_dev *dd;
+@@ -2158,10 +2172,7 @@ static int omap_sham_probe(struct platform_device *pdev)
+ 	return 0;
  
-@@ -732,7 +732,7 @@ static int gcm_setkey(struct crypto_aead *aead,
- 	ret = aes_check_keylen(keylen);
- 	if (ret)
- 		return ret;
--	print_hex_dump_debug("key in @" __stringify(__LINE__)": ",
-+	print_hex_dump_devel("key in @" __stringify(__LINE__)": ",
- 			     DUMP_PREFIX_ADDRESS, 16, 4, key, keylen, 1);
+ err_algs:
+-	for (i = dd->pdata->algs_info_size - 1; i >= 0; i--)
+-		for (j = dd->pdata->algs_info[i].registered - 1; j >= 0; j--)
+-			crypto_engine_unregister_ahash(
+-					&dd->pdata->algs_info[i].algs_list[j]);
++	omap_sham_unregister_algs(dd->pdata);
+ err_engine_start:
+ 	crypto_engine_exit(dd->engine);
+ err_engine:
+@@ -2182,19 +2193,13 @@ static int omap_sham_probe(struct platform_device *pdev)
+ static void omap_sham_remove(struct platform_device *pdev)
+ {
+ 	struct omap_sham_dev *dd;
+-	int i, j;
  
- 	memcpy(ctx->key, key, keylen);
-@@ -828,7 +828,7 @@ static int rfc4106_setkey(struct crypto_aead *aead,
- 	if (ret)
- 		return ret;
+ 	dd = platform_get_drvdata(pdev);
  
--	print_hex_dump_debug("key in @" __stringify(__LINE__)": ",
-+	print_hex_dump_devel("key in @" __stringify(__LINE__)": ",
- 			     DUMP_PREFIX_ADDRESS, 16, 4, key, keylen, 1);
- 
- 	memcpy(ctx->key, key, keylen);
-@@ -927,7 +927,7 @@ static int rfc4543_setkey(struct crypto_aead *aead,
- 	if (ret)
- 		return ret;
- 
--	print_hex_dump_debug("key in @" __stringify(__LINE__)": ",
-+	print_hex_dump_devel("key in @" __stringify(__LINE__)": ",
- 			     DUMP_PREFIX_ADDRESS, 16, 4, key, keylen, 1);
- 
- 	memcpy(ctx->key, key, keylen);
-@@ -955,7 +955,7 @@ static int skcipher_setkey(struct crypto_skcipher *skcipher, const u8 *key,
- 	u32 *desc;
- 	const bool is_rfc3686 = alg->caam.rfc3686;
- 
--	print_hex_dump_debug("key in @" __stringify(__LINE__)": ",
-+	print_hex_dump_devel("key in @" __stringify(__LINE__)": ",
- 			     DUMP_PREFIX_ADDRESS, 16, 4, key, keylen, 1);
- 
- 	ctx->cdata.keylen = keylen;
+ 	spin_lock_bh(&sham.lock);
+ 	list_del(&dd->list);
+ 	spin_unlock_bh(&sham.lock);
+-	for (i = dd->pdata->algs_info_size - 1; i >= 0; i--)
+-		for (j = dd->pdata->algs_info[i].registered - 1; j >= 0; j--) {
+-			crypto_engine_unregister_ahash(
+-					&dd->pdata->algs_info[i].algs_list[j]);
+-			dd->pdata->algs_info[i].registered--;
+-		}
++	omap_sham_unregister_algs(dd->pdata);
+ 	cancel_work_sync(&dd->done_task);
+ 	pm_runtime_dont_use_autosuspend(&pdev->dev);
+ 	pm_runtime_disable(&pdev->dev);
