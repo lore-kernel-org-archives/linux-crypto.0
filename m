@@ -1,87 +1,78 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B9DE30DEAC
-	for <linux-crypto@vger.kernel.org>; Mon, 27 Apr 2026 21:35:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D02612116F4;
+	Mon, 27 Apr 2026 22:55:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777325726; cv=none; b=EPAbMonNT3zHiQjSD+Ba+FdImCXg5I675qzwvnk7WksQz9Bf46QMiYb5WvfX2rY23JsEotEhHi5AbZT8BXLw2rn2iqqLhpagTEiAMWY3qwEgmHjsMNfoo2w+9ySm38nGvHserDoD9MKdSZ56ki7StrX5Jntp9TVZWG1sNsGb5To=
+	t=1777330540; cv=none; b=KkzH3I0kBWEwDW8NTSOXacVmMSCVYH3R7A4r2MoUVw4TjCd1gpme4Via++D8PkJblHsgyg8WGnK5vyHph+7Bk3BUOPfeqO2U3dsSAv2h/pbfvPp2jEDQh+qvHgX1P6bhlR5ij4ojZztJk/QRN6jd28A9syRu5c8f6Q6o9EZyyL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777325726; c=relaxed/simple;
-	bh=qgllXYA1bcpLBesDHMwFUEhsRnB93WJWpcDX9NlloQI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IBsZ4yCFiYRH6qk2A+64MPaY445wfmImU57s6TEGvIQFG/beJGCWmn0b+wCq9j9b6GTJwrGjBs5f+ZOzXNnTk+VKhxZ9J18DREdR/U3pCnRbRTXGEfpvpHCALZF1U1k8fJILPTCaHSaRTnf3lVuakgkdaNhFUhluH9Guscy8o0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uDqsTYm6; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1777330540; c=relaxed/simple;
+	bh=u4TmU67f5hhwJf1I4i/d/XWbjxi0EHQ0omutGz+1/+0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VL8h2r9/HKLAw81IZZxKzI30+2pOLwklXc1GgYmLhmDDZ2yMwoT4CUnH8wzEwLCIsYFPvM0SufX1RHb73bmRUmNepcW0HaioCvJofGquInB+e40CjLQmfKgF0mtksVtwK9cSdEI+Pxo/RUi2Xl30JpC4Ct7A0fhFZON17rzbiVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H3J/zqSU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uDqsTYm6"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1777325722;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=3FGIRSJ7hIXl4Oys064lCYYDG01CT2U3Bca8yeemABc=;
-	b=uDqsTYm636Z2C8hklYdb0bUCWNG2vSFXywuToYYVQVpdJ3vQpfoOj/n5Y4/bXcCf7nIlj1
-	OdII6zUXKCO7l/D1fKILeRJoi+QClEWQoaRTUQxZdXZltcc15RtK1YlsoPXuMX+WeCpWtH
-	PA1qPaXukIz2BmT38E409CmokqhxJ6Q=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Jia Jie Ho <jiajie.ho@starfivetech.com>,
-	William Qiu <william.qiu@starfivetech.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: starfive - use list_first_entry_or_null to simplify cryp_find_dev
-Date: Mon, 27 Apr 2026 23:35:06 +0200
-Message-ID: <20260427213504.420377-3-thorsten.blum@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H3J/zqSU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC1CDC19425;
+	Mon, 27 Apr 2026 22:55:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777330540;
+	bh=u4TmU67f5hhwJf1I4i/d/XWbjxi0EHQ0omutGz+1/+0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=H3J/zqSUWdQG+2g7LezoYT1Gqql7aJLVtVhJE+MpKGOj8nEeazSr6wWT1/TfIZr8B
+	 YyED+LEVseeNaCLB9x3bqnDlElbTjMCLoXh9XtNqIDPhI6bJYC9opsxPlEL8DgDpZQ
+	 UdjAx3dS6pyfI2GgQRbbBrNtGelK0bwqDRE3pQBqLFw2EfaRCA3MB6HiCngBbq66+X
+	 Nhn4Nzc4mDj2MOuKkc2uksSXoX35BmPtYCu/V6KcmuARBL8jQDD60HmqzB2uFT7JvI
+	 ouGeJIXeSI4w79oz+2A87q1CnnUojv4WE0VdOWm4shBv5aSWiuEfSadDcO8q4/UKb3
+	 p8y8PpIUSvnIw==
+Date: Mon, 27 Apr 2026 15:55:38 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Dmitry Safonov <0x7f454c46@gmail.com>
+Cc: Eric Biggers <ebiggers@kernel.org>, netdev@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, Eric Dumazet
+ <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, Kuniyuki
+ Iwashima <kuniyu@google.com>, "David S . Miller" <davem@davemloft.net>,
+ David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Ard Biesheuvel <ardb@kernel.org>, "Jason A .
+ Donenfeld" <Jason@zx2c4.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ Dmitry Safonov <dima@arista.com>
+Subject: Re: [PATCH net-next v2 0/5] Reimplement TCP-AO using crypto library
+Message-ID: <20260427155538.2e1b8488@kernel.org>
+In-Reply-To: <CAJwJo6Z9oJSMMBUL_pbYWN6ha3n4MRpKV_aVut8E+af3JUDFkw@mail.gmail.com>
+References: <20260427172727.9310-1-ebiggers@kernel.org>
+	<CAJwJo6Z9oJSMMBUL_pbYWN6ha3n4MRpKV_aVut8E+af3JUDFkw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1211; i=thorsten.blum@linux.dev; h=from:subject; bh=qgllXYA1bcpLBesDHMwFUEhsRnB93WJWpcDX9NlloQI=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDJnvr3W81uR99WJCl8vV3UbrpXzur3F8qiMrmxZwMixfa rJEZZttRykLgxgXg6yYIsuDWT9m+JbWVG4yidgJM4eVCWQIAxenAExEaSPDP41T834KdUSECtql ePt/CeVr0vBSqTBbJyK1OnrihuY7Vgz/7OfUbmiukjHTeLhsxy+9FIG5D1iNYsrOZ/3ymMYYMmM 3KwA=
-X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Use list_first_entry_or_null() to simplify starfive_cryp_find_dev() and
-remove the now-unused local variable 'struct starfive_cryp_dev *tmp'.
+On Mon, 27 Apr 2026 20:09:05 +0100 Dmitry Safonov wrote:
+> I do like these numbers quite much! Yet, as I mentioned in version 1,
+> removing a fallback for other algorithms' support does not sound good
+> to me. There are two reasons:
+> - Ronald P. Bonica (the original RFC5925 author), together with Tony
+> Li do have an active RFC draft to support the additional algorithms
+> [1], potentially in addition to TCP Extended Options [2]
+> - There is at least one open-source BGP implementation (BIRD) that
+> allows using the algorithms that you are removing [3]. Without a
+> deprecation period and communication with at least known open source
+> users, it implies intentionally breaking them, which I can't agree
+> with.
+> 
+> I don't feel like Naking as we don't have any customers using anything
+> other than the 3 algorithms above (and BGP implementation is
+> [unfortunately] closed-source, so that would not feel appropriate even
+> if we had such customers), yet I do feel like it's worth and
+> appropriate to express my thoughts/concerns.
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- drivers/crypto/starfive/jh7110-cryp.c | 17 ++++++-----------
- 1 file changed, 6 insertions(+), 11 deletions(-)
+What do you want to happen? You are the maintainer of this code,
+you don't get so say "i don't want to nack it but also no" :)
+Like Eric says if there are no real users code can be deleted.
 
-diff --git a/drivers/crypto/starfive/jh7110-cryp.c b/drivers/crypto/starfive/jh7110-cryp.c
-index 42114e9364f0..e19cd7945968 100644
---- a/drivers/crypto/starfive/jh7110-cryp.c
-+++ b/drivers/crypto/starfive/jh7110-cryp.c
-@@ -36,19 +36,14 @@ static struct starfive_dev_list dev_list = {
- 
- struct starfive_cryp_dev *starfive_cryp_find_dev(struct starfive_cryp_ctx *ctx)
- {
--	struct starfive_cryp_dev *cryp = NULL, *tmp;
-+	struct starfive_cryp_dev *cryp;
- 
- 	spin_lock_bh(&dev_list.lock);
--	if (!ctx->cryp) {
--		list_for_each_entry(tmp, &dev_list.dev_list, list) {
--			cryp = tmp;
--			break;
--		}
--		ctx->cryp = cryp;
--	} else {
--		cryp = ctx->cryp;
--	}
--
-+	if (!ctx->cryp)
-+		ctx->cryp = list_first_entry_or_null(&dev_list.dev_list,
-+						     struct starfive_cryp_dev,
-+						     list);
-+	cryp = ctx->cryp;
- 	spin_unlock_bh(&dev_list.lock);
- 
- 	return cryp;
+Adding deprecation warnings upstream is quite slow, IDK if injecting
+deprecation warnings to stable has been discussed..
