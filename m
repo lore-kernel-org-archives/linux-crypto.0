@@ -1,51 +1,32 @@
-Received: from n169-114.mail.139.com (n169-114.mail.139.com [120.232.169.114])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1F26397695;
-	Mon, 27 Apr 2026 07:48:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=120.232.169.114
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C59843537FF;
+	Mon, 27 Apr 2026 08:55:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777276110; cv=none; b=ed0vh63HO8qAhPGMBn6jvkfjEQm7ybvTgaHnmogUjgi3iVHhbECMcGb9m6rZDx9+whrmjt2/2hRje/Pb7CYHjMJGMR4dSLlPQi0OU+JBLudlfzbTdYD7omc0KjeSIRct9zo1Z6EHkziT2AsWuNPpXaP6GF694KQQgOQOvwEG1Fk=
+	t=1777280151; cv=none; b=WTyyYBuyEf4H3c9pjeXucxixE3p5B1NnhPf0R+yhSPfXmJ3nTxkxHMPfbSz+aA/FpNFe6PCwf6L6vvhqSO4uyQBo3fwEZsxaA0zOAnlhI+vV6vxJYxNKE17ov8PKfE7jreoJZB2VkUUvuGtvluP2xyNsCP/WKGX07N5m2+TZpzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777276110; c=relaxed/simple;
-	bh=/IrlzPa3FRfv1+C5YbZGMU+Ynuaslo7lzrPJ8DhObNU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=S0juV/9GJXjrDEg88Lo/Zjk7fGbJ6xmRpYkdUe6B664+DEg6xB5S+fGRIGMW7JSbLf97LpWRQ+JiwXbasfuNbKyliBx9/CQHo5kevYKkhtWIFc67/jGpJDnwywriILCcFzvVV4rYMFmDIIugXc1Ci1hvsaaXcqk9tyiIHfa1d34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com; spf=pass smtp.mailfrom=139.com; dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b=z/+2KfgK; arc=none smtp.client-ip=120.232.169.114
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=139.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b="z/+2KfgK"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=139.com; s=dkim; l=0;
-	h=from:subject:message-id:to:cc:mime-version;
-	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
-	b=z/+2KfgKcYGQpNlGccx1CCpgEgQSj4Ww7trt10zjrp6+NWgSprAfpQ3Iw1CdGTq94veXKFaiej5/M
-	 2QzP2w9d2+LOAXiqBZrry7KkovDorPlIOsk+Cn9bwAMs/+gd4JtO0h0rPYIdjlcu13zRTHO1figh4G
-	 GMFKhxVJVwls+7nI=
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM:                                                                                        
-X-RM-SPAM-FLAG:00000000
-Received:from  (unknown[60.247.85.88])
-	by rmsmtp-lg-appmail-44-12058 (RichMail) with SMTP id 2f1a69ef14bcfd3-06057;
-	Mon, 27 Apr 2026 15:48:20 +0800 (CST)
-X-RM-TRANSID:2f1a69ef14bcfd3-06057
-From: Bin Lan <lanbincn@139.com>
-To: gregkh@linuxfoundation.org,
-	sashal@kernel.org,
-	stable@vger.kernel.org
+	s=arc-20240116; t=1777280151; c=relaxed/simple;
+	bh=3h6KE49s5na7FVqF/JgPMHtxUXHsdU4YsryRRiVX8og=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sfp8/xikQvkqdddGzl9zlh1gVJYS5MlrRvy4Z6JyKoIP8DQ8FwjPgkNH/2nUKNamhCH/5JyUt3mMzgwLLUoF8eLkpF2WlyItc5N5X2BWXRXKA3ft9k1xghNsbRKUC/T5oxTO+m8VD21/8J7JLljhxDXFnWZ9f8SK8UB4UBwHiEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.40.54.15])
+	by gateway (Coremail) with SMTP id _____8BxzemSJO9plU0EAA--.12910S3;
+	Mon, 27 Apr 2026 16:55:46 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.40.54.15])
+	by front1 (Coremail) with SMTP id qMiowJCxHOGRJO9pmaB1AA--.26788S2;
+	Mon, 27 Apr 2026 16:55:45 +0800 (CST)
+From: Qunqin Zhao <zhaoqunqin@loongson.cn>
+To: lee@kernel.org
 Cc: linux-kernel@vger.kernel.org,
-	steffen.klassert@secunet.com,
-	daniel.m.jordan@oracle.com,
+	loongarch@lists.linux.dev,
 	linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Bin Lan <lanbincn@139.com>
-Subject: [PATCH 6.1.y 1/2] padata: Fix pd UAF once and for all
-Date: Mon, 27 Apr 2026 15:47:13 +0800
-Message-Id: <20260427074714.1569476-2-lanbincn@139.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260427074714.1569476-1-lanbincn@139.com>
-References: <20260427074714.1569476-1-lanbincn@139.com>
+	Qunqin Zhao <zhaoqunqin@loongson.cn>
+Subject: [PATCH v2] mfd: loongson-se: Add multi-node support
+Date: Tue, 28 Apr 2026 00:51:33 +0800
+Message-Id: <20260427165133.23350-1-zhaoqunqin@loongson.cn>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,279 +34,154 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJCxHOGRJO9pmaB1AA--.26788S2
+X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBj93XoWxXry5Jw4rAF4rWrWxZFWUtrc_yoWrGFy5pF
+	WDCayFvF4UCF47CwsYy398Cry3u3yrt39rGFZFgr4xAas8twn7WrWrKFyjgF45CFWUJF42
+	qrZ5GFW8CF48CabCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUvqb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M280x2IEY4vEnII2IxkI6r1a6r45M28lY4IE
+	w2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84
+	ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1U
+	M28EF7xvwVC2z280aVCY1x0267AKxVW8Jr0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr2
+	1l57IF6xkI12xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv2
+	0xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7
+	xvr2IYc2Ij64vIr41l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2Iq
+	xVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r
+	126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY
+	6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67
+	AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x
+	07jDsqAUUUUU=
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
+On the Loongson platform, each node is equipped with a security engine
+device. However, due to a hardware flaw, only the device on node 0 can
+trigger interrupts. Therefore, interrupts from other nodes are forwarded
+by node 0. We need to check in the interrupt handler of node 0 whether
+this interrupt is intended for other nodes.
 
-[ Upstream commit 71203f68c7749609d7fc8ae6ad054bdedeb24f91 ]
-
-There is a race condition/UAF in padata_reorder that goes back
-to the initial commit.  A reference count is taken at the start
-of the process in padata_do_parallel, and released at the end in
-padata_serial_worker.
-
-This reference count is (and only is) required for padata_replace
-to function correctly.  If padata_replace is never called then
-there is no issue.
-
-In the function padata_reorder which serves as the core of padata,
-as soon as padata is added to queue->serial.list, and the associated
-spin lock released, that padata may be processed and the reference
-count on pd would go away.
-
-Fix this by getting the next padata before the squeue->serial lock
-is released.
-
-In order to make this possible, simplify padata_reorder by only
-calling it once the next padata arrives.
-
-Fixes: 16295bec6398 ("padata: Generic parallelization/serialization interface")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-[ Adjust context of padata_find_next(). Replace
-cpumask_next_wrap(cpu, pd->cpumask.pcpu) with
-cpumask_next_wrap(cpu, pd->cpumask.pcpu, -1, false) in padata_reorder() in
-v6.1 according to dc5bb9b769c9 ("cpumask: deprecate cpumask_next_wrap()") and
-f954a2d37637 ("padata: switch padata_find_next() to using cpumask_next_wrap()")
-. ]
-Signed-off-by: Bin Lan <lanbincn@139.com>
+Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
 ---
- include/linux/padata.h |   3 -
- kernel/padata.c        | 136 +++++++++++------------------------------
- 2 files changed, 37 insertions(+), 102 deletions(-)
+Changes in v2:
+	-Resending due to no feedback for one month.
+	-Rebased on top of latest mainline (7.1-rc1) to ensure the patch
+	 applies cleanly.
+	-No functional changes since the previous submission.
 
-diff --git a/include/linux/padata.h b/include/linux/padata.h
-index 495b16b6b4d7..9ca779d7e310 100644
---- a/include/linux/padata.h
-+++ b/include/linux/padata.h
-@@ -91,7 +91,6 @@ struct padata_cpumask {
-  * @cpu: Next CPU to be processed.
-  * @cpumask: The cpumasks in use for parallel and serial workers.
-  * @reorder_work: work struct for reordering.
-- * @lock: Reorder lock.
-  */
- struct parallel_data {
- 	struct padata_shell		*ps;
-@@ -102,8 +101,6 @@ struct parallel_data {
- 	unsigned int			processed;
- 	int				cpu;
- 	struct padata_cpumask		cpumask;
--	struct work_struct		reorder_work;
--	spinlock_t                      ____cacheline_aligned lock;
+Link to v1:
+https://lore.kernel.org/all/20260226102225.19516-1-zhaoqunqin@loongson.cn/#t
+
+ drivers/mfd/loongson-se.c       | 38 +++++++++++++++++++++++++++------
+ include/linux/mfd/loongson-se.h |  3 +++
+ 2 files changed, 35 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/mfd/loongson-se.c b/drivers/mfd/loongson-se.c
+index 3902ba377d6..40e18c21268 100644
+--- a/drivers/mfd/loongson-se.c
++++ b/drivers/mfd/loongson-se.c
+@@ -37,6 +37,9 @@ struct loongson_se_controller_cmd {
+ 	u32 info[7];
  };
  
- /**
-diff --git a/kernel/padata.c b/kernel/padata.c
-index d49f97abe086..93e288dc373e 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -253,20 +253,17 @@ EXPORT_SYMBOL(padata_do_parallel);
-  *   be parallel processed by another cpu and is not yet present in
-  *   the cpu's reorder queue.
-  */
--static struct padata_priv *padata_find_next(struct parallel_data *pd,
--					    bool remove_object)
-+static struct padata_priv *padata_find_next(struct parallel_data *pd, int cpu,
-+					    unsigned int processed)
- {
- 	struct padata_priv *padata;
- 	struct padata_list *reorder;
--	int cpu = pd->cpu;
- 
- 	reorder = per_cpu_ptr(pd->reorder_list, cpu);
- 
- 	spin_lock(&reorder->lock);
--	if (list_empty(&reorder->list)) {
--		spin_unlock(&reorder->lock);
--		return NULL;
--	}
-+	if (list_empty(&reorder->list))
-+		goto notfound;
- 
- 	padata = list_entry(reorder->list.next, struct padata_priv, list);
- 
-@@ -274,101 +271,52 @@ static struct padata_priv *padata_find_next(struct parallel_data *pd,
- 	 * Checks the rare case where two or more parallel jobs have hashed to
- 	 * the same CPU and one of the later ones finishes first.
- 	 */
--	if (padata->seq_nr != pd->processed) {
--		spin_unlock(&reorder->lock);
--		return NULL;
--	}
--
--	if (remove_object) {
--		list_del_init(&padata->list);
--		++pd->processed;
--		/* When sequence wraps around, reset to the first CPU. */
--		if (unlikely(pd->processed == 0))
--			pd->cpu = cpumask_first(pd->cpumask.pcpu);
--		else
--			pd->cpu = cpumask_next_wrap(cpu, pd->cpumask.pcpu, -1, false);
--	}
-+	if (padata->seq_nr != processed)
-+		goto notfound;
- 
-+	list_del_init(&padata->list);
- 	spin_unlock(&reorder->lock);
- 	return padata;
++static DECLARE_COMPLETION(node0);
++static struct loongson_se *se_node[SE_MAX_NODES];
 +
-+notfound:
-+	pd->processed = processed;
-+	pd->cpu = cpu;
-+	spin_unlock(&reorder->lock);
-+	return NULL;
- }
- 
--static void padata_reorder(struct parallel_data *pd)
-+static void padata_reorder(struct padata_priv *padata)
+ static int loongson_se_poll(struct loongson_se *se, u32 int_bit)
  {
-+	struct parallel_data *pd = padata->pd;
- 	struct padata_instance *pinst = pd->ps->pinst;
--	int cb_cpu;
--	struct padata_priv *padata;
--	struct padata_serial_queue *squeue;
--	struct padata_list *reorder;
-+	unsigned int processed;
-+	int cpu;
+ 	u32 status;
+@@ -133,8 +136,8 @@ EXPORT_SYMBOL_GPL(loongson_se_init_engine);
+ static irqreturn_t se_irq_handler(int irq, void *dev_id)
+ {
+ 	struct loongson_se *se = dev_id;
+-	u32 int_status;
+-	int id;
++	u32 int_status, node_irq = 0;
++	int id, node;
  
--	/*
--	 * We need to ensure that only one cpu can work on dequeueing of
--	 * the reorder queue the time. Calculating in which percpu reorder
--	 * queue the next object will arrive takes some time. A spinlock
--	 * would be highly contended. Also it is not clear in which order
--	 * the objects arrive to the reorder queues. So a cpu could wait to
--	 * get the lock just to notice that there is nothing to do at the
--	 * moment. Therefore we use a trylock and let the holder of the lock
--	 * care for all the objects enqueued during the holdtime of the lock.
--	 */
--	if (!spin_trylock_bh(&pd->lock))
--		return;
-+	processed = pd->processed;
-+	cpu = pd->cpu;
+ 	spin_lock(&se->dev_lock);
  
--	while (1) {
--		padata = padata_find_next(pd, true);
-+	do {
-+		struct padata_serial_queue *squeue;
-+		int cb_cpu;
- 
--		/*
--		 * If the next object that needs serialization is parallel
--		 * processed by another cpu and is still on it's way to the
--		 * cpu's reorder queue, nothing to do for now.
--		 */
--		if (!padata)
--			break;
-+		cpu = cpumask_next_wrap(cpu, pd->cpumask.pcpu, -1, false);
-+		processed++;
- 
- 		cb_cpu = padata->cb_cpu;
- 		squeue = per_cpu_ptr(pd->squeue, cb_cpu);
- 
- 		spin_lock(&squeue->serial.lock);
- 		list_add_tail(&padata->list, &squeue->serial.list);
--		spin_unlock(&squeue->serial.lock);
--
- 		queue_work_on(cb_cpu, pinst->serial_wq, &squeue->work);
--	}
- 
--	spin_unlock_bh(&pd->lock);
--
--	/*
--	 * The next object that needs serialization might have arrived to
--	 * the reorder queues in the meantime.
--	 *
--	 * Ensure reorder queue is read after pd->lock is dropped so we see
--	 * new objects from another task in padata_do_serial.  Pairs with
--	 * smp_mb in padata_do_serial.
--	 */
--	smp_mb();
--
--	reorder = per_cpu_ptr(pd->reorder_list, pd->cpu);
--	if (!list_empty(&reorder->list) && padata_find_next(pd, false)) {
- 		/*
--		 * Other context(eg. the padata_serial_worker) can finish the request.
--		 * To avoid UAF issue, add pd ref here, and put pd ref after reorder_work finish.
-+		 * If the next object that needs serialization is parallel
-+		 * processed by another cpu and is still on it's way to the
-+		 * cpu's reorder queue, end the loop.
- 		 */
--		padata_get_pd(pd);
--		if (!queue_work(pinst->serial_wq, &pd->reorder_work))
--			padata_put_pd(pd);
--	}
--}
--
--static void invoke_padata_reorder(struct work_struct *work)
--{
--	struct parallel_data *pd;
--
--	local_bh_disable();
--	pd = container_of(work, struct parallel_data, reorder_work);
--	padata_reorder(pd);
--	local_bh_enable();
--	/* Pairs with putting the reorder_work in the serial_wq */
--	padata_put_pd(pd);
-+		padata = padata_find_next(pd, cpu, processed);
-+		spin_unlock(&squeue->serial.lock);
-+	} while (padata);
- }
- 
- static void padata_serial_worker(struct work_struct *serial_work)
-@@ -419,6 +367,7 @@ void padata_do_serial(struct padata_priv *padata)
- 	struct padata_list *reorder = per_cpu_ptr(pd->reorder_list, hashed_cpu);
- 	struct padata_priv *cur;
- 	struct list_head *pos;
-+	bool gotit = true;
- 
- 	spin_lock(&reorder->lock);
- 	/* Sort in ascending order of sequence number. */
-@@ -428,17 +377,14 @@ void padata_do_serial(struct padata_priv *padata)
- 		if ((signed int)(cur->seq_nr - padata->seq_nr) < 0)
- 			break;
+@@ -147,6 +150,11 @@ static irqreturn_t se_irq_handler(int irq, void *dev_id)
+ 		writel(SE_INT_CONTROLLER, se->base + SE_S2LINT_CL);
  	}
--	list_add(&padata->list, pos);
-+	if (padata->seq_nr != pd->processed) {
-+		gotit = false;
-+		list_add(&padata->list, pos);
+ 
++	if (int_status & SE_INT_OTHER_NODE) {
++		int_status &= ~SE_INT_OTHER_NODE;
++		node_irq = 1;
 +	}
- 	spin_unlock(&reorder->lock);
++
+ 	/* For engines */
+ 	while (int_status) {
+ 		id = __ffs(int_status);
+@@ -157,6 +165,14 @@ static irqreturn_t se_irq_handler(int irq, void *dev_id)
  
--	/*
--	 * Ensure the addition to the reorder list is ordered correctly
--	 * with the trylock of pd->lock in padata_reorder.  Pairs with smp_mb
--	 * in padata_reorder.
--	 */
--	smp_mb();
--
--	padata_reorder(pd);
-+	if (gotit)
-+		padata_reorder(padata);
+ 	spin_unlock(&se->dev_lock);
+ 
++	if (node_irq) {
++		writel(SE_INT_OTHER_NODE, se->base + SE_S2LINT_CL);
++		for (node = 1; node < SE_MAX_NODES; node++) {
++			if (se_node[node])
++				se_irq_handler(irq, se_node[node]);
++		}
++	}
++
+ 	return IRQ_HANDLED;
  }
- EXPORT_SYMBOL(padata_do_serial);
  
-@@ -625,9 +571,7 @@ static struct parallel_data *padata_alloc_pd(struct padata_shell *ps)
- 	padata_init_squeues(pd);
- 	pd->seq_nr = -1;
- 	refcount_set(&pd->refcnt, 1);
--	spin_lock_init(&pd->lock);
- 	pd->cpu = cpumask_first(pd->cpumask.pcpu);
--	INIT_WORK(&pd->reorder_work, invoke_padata_reorder);
+@@ -189,6 +205,7 @@ static int loongson_se_probe(struct platform_device *pdev)
+ 	struct loongson_se *se;
+ 	int nr_irq, irq, err, i;
+ 	dma_addr_t paddr;
++	int node = dev_to_node(dev);
  
- 	return pd;
+ 	se = devm_kmalloc(dev, sizeof(*se), GFP_KERNEL);
+ 	if (!se)
+@@ -213,9 +230,16 @@ static int loongson_se_probe(struct platform_device *pdev)
  
-@@ -1137,12 +1081,6 @@ void padata_free_shell(struct padata_shell *ps)
- 	if (!ps)
- 		return;
+ 	writel(SE_INT_ALL, se->base + SE_S2LINT_EN);
  
--	/*
--	 * Wait for all _do_serial calls to finish to avoid touching
--	 * freed pd's and ps's.
--	 */
--	synchronize_rcu();
--
- 	mutex_lock(&ps->pinst->lock);
- 	list_del(&ps->list);
- 	pd = rcu_dereference_protected(ps->pd, 1);
--- 
-2.43.0
+-	nr_irq = platform_irq_count(pdev);
+-	if (nr_irq <= 0)
+-		return -ENODEV;
++	if (node == 0 || node == NUMA_NO_NODE) {
++		nr_irq = platform_irq_count(pdev);
++		if (nr_irq <= 0)
++			return -ENODEV;
++	} else {
++		/* Only the device on node 0 can trigger interrupts */
++		nr_irq = 0;
++		wait_for_completion_interruptible(&node0);
++		se_node[node] = se;
++	}
+ 
+ 	for (i = 0; i < nr_irq; i++) {
+ 		irq = platform_get_irq(pdev, i);
+@@ -228,7 +252,9 @@ static int loongson_se_probe(struct platform_device *pdev)
+ 	if (err)
+ 		return err;
+ 
+-	return devm_mfd_add_devices(dev, PLATFORM_DEVID_NONE, engines,
++	complete_all(&node0);
++
++	return devm_mfd_add_devices(dev, PLATFORM_DEVID_AUTO, engines,
+ 				    ARRAY_SIZE(engines), NULL, 0, NULL);
+ }
+ 
+diff --git a/include/linux/mfd/loongson-se.h b/include/linux/mfd/loongson-se.h
+index 07afa0c2524..a80e06eb017 100644
+--- a/include/linux/mfd/loongson-se.h
++++ b/include/linux/mfd/loongson-se.h
+@@ -20,6 +20,9 @@
+ 
+ #define SE_INT_ALL			0xffffffff
+ #define SE_INT_CONTROLLER		BIT(0)
++#define SE_INT_OTHER_NODE		BIT(31)
++
++#define SE_MAX_NODES			8
+ 
+ #define SE_ENGINE_MAX			16
+ #define SE_ENGINE_RNG			1
 
+base-commit: 254f49634ee16a731174d2ae34bc50bd5f45e731
+-- 
+2.47.2
 
