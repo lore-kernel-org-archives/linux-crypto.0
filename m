@@ -1,130 +1,140 @@
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39EAE449EDF
-	for <linux-crypto@vger.kernel.org>; Tue, 28 Apr 2026 16:14:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B10828B40E
+	for <linux-crypto@vger.kernel.org>; Tue, 28 Apr 2026 16:26:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777392866; cv=none; b=H4L+b5/UHHNUDUhaCQDtwQpQjc5B5tZghDFQtzRywqCZRC6hU0og1aYllcirt8w8+32By32fCbLNxB+7diZJWbgYioNfVhm0HAx9MEDm6uL5XA5cLdDh9VblpFXkLcZD4LWQDQvFkiaoOgUdlamMwN/2kS/xEwsVltq4zMNpQ6U=
+	t=1777393611; cv=none; b=o2/TYoh8nw1tQKUfyZuIij68NFTQtXq+AX7k8uURQbgnNRH+46cG413QnhqfI5w622cKhOSCJZGi5iYN1F5k6vv+OGJjl4ywlqzmdTH3lfaCkDpnUEuciPDANAr8JUsSByY1kWvOspV+HF3+pvXdlatJQVSnSOa2RPSBCwxN7+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777392866; c=relaxed/simple;
-	bh=6kTZH/32p86XVcFzCtM+iCTAIlTdeH5SLSxO6RKsCew=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=M0GgGpu0bz5XbJB11QwslBb+XvcMqnc773K1UNX5dq5qUNESuwShrVACMWTr2P3DysChMnv2k76S62EL0Vgk5AHXt0KZVm25Md0a6gHEl/SiB91P30sMG7LoGh/m80H/7p0lF6AMQl5cvZZ2p+ebLBek49nias82ppR0buTUUvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=shKCUsb9; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1777393611; c=relaxed/simple;
+	bh=YOxrYOW2XiUYIkrw5Ws4BEeoJlv7piRCf57Qrembd30=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Tnl0Olf5i3u50vWC9zsz3QV37RVuPLyPFYgXxi76M6GX1fMspD7SLrWHv44V0hl3AlZvQpnyuuZjNCWp37zKFrsT3bY0oPJ+gtiaAQ+4I2hJuIqJGyDHGmasUZSeDRCa6Gamk4rTf4fMmPRXMEh+BXmSNwcMnfpITBlO4CkPPcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JYh+wyVH; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=GswFMkIv; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="shKCUsb9"
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-38ea6a5a0b3so115283961fa.3
-        for <linux-crypto@vger.kernel.org>; Tue, 28 Apr 2026 09:14:25 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JYh+wyVH";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="GswFMkIv"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777393609;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xrFHh+IXnC+/GYwS6dyvxdLC3SMZIfTMFwt74S3Tudw=;
+	b=JYh+wyVHyA0poGbEghbO0T6zKPF8c2X0vr+FdDH4QyGuIxJ/+XpJpaCpY5GCsAvS1WrGTz
+	+PUEPo14MRz4lDKYhL2BEoBXJtATpsPsOo2whlE3k41XzOY5QbG5QgQaXjrHmuottkeD7r
+	geNVfodFsy+a+3XoQqnjRQ/JRfXL7l8=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-18-Oh_AWcOnNI-EbRbLyJuGkw-1; Tue, 28 Apr 2026 12:26:48 -0400
+X-MC-Unique: Oh_AWcOnNI-EbRbLyJuGkw-1
+X-Mimecast-MFC-AGG-ID: Oh_AWcOnNI-EbRbLyJuGkw_1777393608
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-8d5107ec672so2827883985a.0
+        for <linux-crypto@vger.kernel.org>; Tue, 28 Apr 2026 09:26:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777392863; x=1777997663; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lgq6z5Z9dkQxQkYs8MZMof9rIQA2gGJwXIkdAa9GMr0=;
-        b=shKCUsb9lYVRVkv1BhyrEai4mumaHbtTbv0ompyo+0oZ7ilTgNRlXzLiS3D3ovJpfm
-         7p52sreXTbpO2uTufMvUvC5sH57iVllYBFBIYYHFBKoyvs4QJsAicdAdTGSDr7J8a+R3
-         4B2kR1al8tqFrV0PzjKLQhq7YboFjZDbGKEsOYM1MKTcUnnXW3bYWZn2hDM6R8g9t3jk
-         +u0J1q6168Zbc0QN3sicHHUCcE6ZC9v0U9nyJ6aD6jogb4/YflbMo3KTbHqgwkI3Bmi0
-         D37HDOjvoMWL407cIggQ/Adie88N8Hz3DNu0//bIdNHMuudkN+G2Fs/FMbCMj5Yp8RYY
-         C7Zw==
+        d=redhat.com; s=google; t=1777393608; x=1777998408; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:organization
+         :references:in-reply-to:date:cc:to:from:subject:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=xrFHh+IXnC+/GYwS6dyvxdLC3SMZIfTMFwt74S3Tudw=;
+        b=GswFMkIvYXD978xkY2uOlsE4scUqi8x2dBD8jSVxKtl54ackU0dVtRIC+fbSbomHMJ
+         jGZX2FwrVpnkRF+7NRtfP5J1oB2lx2mrhld1whT9VuoQff1qfMlYx89wqMB567ipvcSb
+         wGFx6+mSoILq5c0MHkLstzOvzdLV1yiQ/ZrT1YqaUrD3VCckIb2bvw7LwRmwJa2085BX
+         6GQ0BHGrGYS+axJ0ArCN6rkrJsKWqz8bQyqw/gK98t3F2KDLFjaJI32HpbyZU4T9jDFk
+         CMwwX0mo8CnH+L/ZbndeKtsiwYmu5wZpQg9MZG6IPhTvhAP0MHmc6+Vfk26r3vjbsIqR
+         qYfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777392863; x=1777997663;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=lgq6z5Z9dkQxQkYs8MZMof9rIQA2gGJwXIkdAa9GMr0=;
-        b=X9QrtflHPNzIIpGK8pnQ4/75ElF5QpJm2k/90p1LSLUMgqDG/AMnh9rjhqFHvZ+6nF
-         UDkMlMslBy+IpLhtnpJPYSHnk84JyjrvmofJLckaM2uPqZZlLcPY/+IwdTqpTMaT48LM
-         PRz1Ka9pcA+h4pAQnQ3I5Ze3a2bwwe42QtRroRql92kpqcKTXJTxXqmBCYkbawfODagI
-         QS6qke5Un4svRhDhIZroMW9eEbGYcU+BGX9WWeGOS7nQFIzH46zMcKkvVdC2rnuu75HE
-         ot4tGaI1aDo3Dmz0EJjLye8QBWUY+BgwGV6uaH1z5USUmsmipK4hgMAMdcLms9Yf/tqT
-         Xm7A==
-X-Forwarded-Encrypted: i=1; AFNElJ91/tbYn45Zd2F93JQk3W1OBtCIEeHXM/Qb8IvzjjBz8FtM93usvdOUHrHD84nx0mKmcrKR/PdU/XXf5ec=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4fJrzVsSog5oiQhV1va0QEh4oy4ODNRRQ3zduiJWUmZbKczX8
-	V+2MnpmdZ99At6oGrjOmj4qbADX1DndXDkgp4NmUhZnbM1XQUjfqsrWP
-X-Gm-Gg: AeBDiesG1AsWqnYiwrVat9odGHWKyBJDN3cZneqPF9brE0AukX6Xrmz1XPRVPPCIvBn
-	1e8gVUCTmSy31o+Clr5dIrt8bPSHdE8HcwY0Mos0fIWy5ddiNuGWLrFvu8GI0tROjX/qNCZDOY1
-	hvQhhsy4aEdb3pWXBbb3BvTSNFbnv/ySQY627w79wtZ1xQ7jDyMeF3BYsJ4LsYw9gIr47vT4jeV
-	JF1oASRdcdddp/QGYIvnKFdzvei+SMLolVDfwPC+mt95JxfjSkPEMbNNrDxNPXYaUrNG+k08SC7
-	t6eWfHcz8k4+wGakxg5VbJ2p2SZO7MmRCHnerl6fhI06GsnM82eQz8ra69s4CjukqZKwqTL7Vcb
-	GRDNN3dek33jdBu0l4umjouIMuX9N8GiSeikpNhvT/sTjoGz7brO5T8Li1K8Ort0+ZJTOg4Zpxi
-	iClZr3IS9k1/Gk9pQydWVN2mVcMg==
-X-Received: by 2002:a05:651c:4191:b0:38d:f31d:7ebd with SMTP id 38308e7fff4ca-39240cdd576mr12818711fa.7.1777392863295;
-        Tue, 28 Apr 2026 09:14:23 -0700 (PDT)
-Received: from localhost.localdomain ([2001:9b1:d5a0:a500::24b])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-3923f55f156sm8119671fa.32.2026.04.28.09.14.22
+        d=1e100.net; s=20251104; t=1777393608; x=1777998408;
+        h=mime-version:user-agent:content-transfer-encoding:organization
+         :references:in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xrFHh+IXnC+/GYwS6dyvxdLC3SMZIfTMFwt74S3Tudw=;
+        b=tAwEQNFIncIzpx09OLPrCo0rBQvyA5IqgoPnB5LXG37E5zU40vKruHa/18KuA28hz8
+         Sy8Tyov9kosme4cg6zqnuUkDyiFrDRIeRBJB8s/lww9isHycS3prGAL1NKjXP0ChETqc
+         2HO6AJiEck846M5xtRz/ktOwv1fD7lIDJ5/eEgnplgMUuz461lqcgSaRuBTh1HAO7id4
+         L7T0AOYfuuFlDGlg4oW5aH+znjoXAQlJoxc/V2JSLoUuUFJSv6D0gJ5WblMdCs+16Moc
+         BoLBVkWA/FLrTIhFMFn7dpQUFO5pdJj/i7u7pCb6Qn+8Nyk6cZBNuNoaWecnAtSlx0Xy
+         tUwg==
+X-Forwarded-Encrypted: i=1; AFNElJ+0ty+QbVAiEm6jtsDyAtknOKe1lWdOSpVNHdVBl0sWjXsHahDJR4sRRJaOvbTtl4SLtos0ElXa+fJsGlY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLt9pCrHU5g4q8Yg0vFD+vXzSWoRv4pZml6BRJuFjIv13vlCNp
+	PkDtaVtEZ6pKWl8r3vLPlLcDFTM6bcZbFjPwkfOtTQgX6110DhJVCMJSFrW/LAdpyyEKacqwhSG
+	toHEr2CSHbrFlgrYjD0hHwf248Sn+Stb7/vwVslgrlm0W8l+LfcdoVydloMRZTjxoLA==
+X-Gm-Gg: AeBDiesLnrTPnM1hvdvTTJLMdnnXtcDyccnI5nj6n//AhMvEikSyoWTjNDmso0M10AZ
+	xwpvzObwBUSgLgKynBld/g24AXOXysG5CBhmMeBQhnLhikRWPaEDIo6jyKG02TGDBR55gFzK5fQ
+	SvmjaOekjXShYye6QiLt1Cs2EIzpYlylNm5iJdtFFrl1/vcfqq/X7bNRkJTrouETfXUrlxFE0qK
+	VnXF7lEueIqhnfC/hscP+Xf6/A4qy458EDPkHs/XJigOEQCTWCDYoVL7VqoYYVTyiEN0ZjXEKc3
+	30tC2D0115cFQiwdjIeuGGhI0Ba7CswPt14K5HPR/X8yskd/N5Ub3nFk9p9joFuBkx3BqO4r9ON
+	7DNxMF2TykojTvO6J3D7xUkPY3NA=
+X-Received: by 2002:a05:620a:17ac:b0:8eb:f3c7:2248 with SMTP id af79cd13be357-8f7d98fdd73mr490616785a.42.1777393607763;
+        Tue, 28 Apr 2026 09:26:47 -0700 (PDT)
+X-Received: by 2002:a05:620a:17ac:b0:8eb:f3c7:2248 with SMTP id af79cd13be357-8f7d98fdd73mr490605285a.42.1777393606834;
+        Tue, 28 Apr 2026 09:26:46 -0700 (PDT)
+Received: from m8.users.ipa.redhat.com ([2603:7000:9400:fe80::fc6])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8f7c7cd2c68sm233679985a.22.2026.04.28.09.26.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Apr 2026 09:14:22 -0700 (PDT)
-From: "Uladzislau Rezki (Sony)" <urezki@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Uladzislau Rezki <urezki@gmail.com>
-Subject: [PATCH 2/2] rhashtable: Add bucket_table_free_atomic() helper
-Date: Tue, 28 Apr 2026 18:14:19 +0200
-Message-ID: <20260428161419.94695-2-urezki@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260428161419.94695-1-urezki@gmail.com>
-References: <20260428161419.94695-1-urezki@gmail.com>
+        Tue, 28 Apr 2026 09:26:45 -0700 (PDT)
+Message-ID: <33613b11328d830f8683fc6ec6900da2b479ae27.camel@redhat.com>
+Subject: Re: [PATCH net-next v2 0/5] Reimplement TCP-AO using crypto library
+From: Simo Sorce <simo@redhat.com>
+To: Eric Biggers <ebiggers@kernel.org>, Dmitry Safonov <0x7f454c46@gmail.com>
+Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>, Neal
+ Cardwell	 <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
+ "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,  "Jason A .
+ Donenfeld"	 <Jason@zx2c4.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ Dmitry Safonov	 <dima@arista.com>
+Date: Tue, 28 Apr 2026 12:26:44 -0400
+In-Reply-To: <20260427232054.GA2700@sol>
+References: <20260427172727.9310-1-ebiggers@kernel.org>
+	 <CAJwJo6Z9oJSMMBUL_pbYWN6ha3n4MRpKV_aVut8E+af3JUDFkw@mail.gmail.com>
+	 <20260427200116.GA3454259@google.com> <20260427232054.GA2700@sol>
+Organization: Red Hat
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-rhashtable_insert_rehash() allocates a new bucket table
-with GFP_ATOMIC, as it is called from an RCU read-side
-critical section.
+On Mon, 2026-04-27 at 16:20 -0700, Eric Biggers wrote:
+> On Mon, Apr 27, 2026 at 08:01:16PM +0000, Eric Biggers wrote:
+> > > - Ronald P. Bonica (the original RFC5925 author), together with Tony
+> > > Li do have an active RFC draft to support the additional algorithms
+> [...]
+> > > [1] https://www.ietf.org/archive/id/draft-bonica-tcpm-tcp-ao-algs-00.=
+html
+>=20
+> For what it's worth, that draft makes very little sense.  For example,
+> it proposes three variants of HMAC-SHA3, instead of just making the
+> modern choice of KMAC256.  And it proposes both HMAC-SHA384 and
+> HMAC-SHA512, despite them being redundant with each other after the
+> specified truncation to 128 bits.
 
-If rhashtable_rehash_attach() then fails, the new table
-is freed via kvfree(). This is unsafe, since kvfree() may
-fall back to vfree() for vmalloc-backed allocations, which
-can sleep and trigger:
+Which is bogus in itself without proper security considerations, the
+only considerations cited is an RFC from 1997 ... clearly the pinnacle
+of cryptography advice ...
 
-  BUG: sleeping function called from invalid context
+If they need a shorter hash they should make themselves a favor and use
+SHAKE and then define the desired output length and desired key size.
+That draft is just a disaster as written.
 
-Add bucket_table_free_atomic(), which uses kvfree_atomic()
-so the table can be freed safely from non-sleeping context.
+Specifically they should use KMAC128 as defined in NIST SP 800-185
+(which uses cSHAKE128 underneath).
 
-Signed-off-by: Uladzislau Rezki (Sony) <urezki@gmail.com>
----
- lib/rhashtable.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+Simo.
 
-diff --git a/lib/rhashtable.c b/lib/rhashtable.c
-index 6074ed5f66f3..4111aab8cee4 100644
---- a/lib/rhashtable.c
-+++ b/lib/rhashtable.c
-@@ -114,6 +114,14 @@ static void bucket_table_free(const struct bucket_table *tbl)
- 	kvfree(tbl);
- }
- 
-+static void bucket_table_free_atomic(const struct bucket_table *tbl)
-+{
-+	if (tbl->nest)
-+		nested_bucket_table_free(tbl);
-+
-+	kvfree_atomic(tbl);
-+}
-+
- static void bucket_table_free_rcu(struct rcu_head *head)
- {
- 	bucket_table_free(container_of(head, struct bucket_table, rcu));
-@@ -473,7 +481,7 @@ static int rhashtable_insert_rehash(struct rhashtable *ht,
- 
- 	err = rhashtable_rehash_attach(ht, tbl, new_tbl);
- 	if (err) {
--		bucket_table_free(new_tbl);
-+		bucket_table_free_atomic(new_tbl);
- 		if (err == -EEXIST)
- 			err = 0;
- 	} else
--- 
-2.47.3
+--=20
+Simo Sorce
+Distinguished Engineer
+RHEL Crypto Team
+Red Hat, Inc
 
