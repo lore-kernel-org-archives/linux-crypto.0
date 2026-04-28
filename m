@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59B5B3B0AD4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD6123B3C07;
 	Tue, 28 Apr 2026 02:47:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777344431; cv=none; b=axd97bzSN8HW1RYjjBHvT1Q45WClnqUcJZNUg9rMozxFR2YM7EW1Xw+jeAlrFlC9D5G7UEuolxD3xF/SdPmOAGKn4ObRGhb9uY3TUnPwlLEvN7fQ1bRAC5sjIxkZhaV8uQN9s7aAK+4AJ2CCtUqcoTpQFPHnRP8YqIY6UG79MfY=
+	t=1777344431; cv=none; b=D2ehBqA3Dy7EpqFxjjsJhNh8BG7jVO05LxoXkoPjXORIpAq9yhB2jMeN4OkNnjm8hbDCfeJXutRubbYcImGsmUQBgAEDCbfUC1d/I9gSaInrtfrOlXwPNeyp+E14x/Xz/y+wUCpH3oQRR4drYEH70HXTUl3JW5Hll+mytPkYyP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1777344431; c=relaxed/simple;
-	bh=BBwwD1i8iYEsGQrYrKessOkF7wXuFkob2WzjXMS8vI8=;
+	bh=Sx/tX6cA4rC2N8FBrENAKOiYumhtUZK/EEtiua1n8GY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bYCTVWTcKnkJM+cmtbKl/koq9kcoRDXRWtcJZi6XpHS2fuQ8xQ88s+xas6JfYFoEQK3/c8G+CvHp6PlaUx1zrpyk6m4RAodtxxOCUE+Z52e9Ntnvkg9psWnMxKGjsTo4ZS/MOkMzM+6J/L15j4Ey7CEkapv7yk1imvjsduth0Zc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gUSZHAgZ; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=n8St7LkT6hsY//IS5Vxmm2v/mLzLqC0NfvG1nfl+LACDA7RnpClMsqbZBqKSWqo5yxf2KdjGTTkOq1+SIHdcV1io380qFwNpA8JqCauMLbbCJKwUnTLlCXbcDtVQR/WhgGzZihxtrPYqDdkd1S1CSSI2SPZ6w+/abN4e3+y4doI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pRvlf58i; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gUSZHAgZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0FC6C2BCB7;
-	Tue, 28 Apr 2026 02:47:10 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pRvlf58i"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34A14C2BCB9;
+	Tue, 28 Apr 2026 02:47:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1777344431;
-	bh=BBwwD1i8iYEsGQrYrKessOkF7wXuFkob2WzjXMS8vI8=;
+	bh=Sx/tX6cA4rC2N8FBrENAKOiYumhtUZK/EEtiua1n8GY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gUSZHAgZmDMOTbvmtghZ5KJKtAwML/qIWnnOlV6GybfmkiZYUe8VArd0VUT9b0zSb
-	 EmVizKYGLJhQeiIy/m1b68BArV7cYP3K4JoyYEwHcX1ZGynjrBdwgft4NNz2mYJ5JT
-	 keEYcWMwFkKrPgPuwIP4IP77vbPMuk9R9UNDh8s5VzPZAFFfGhSMsw4WEjNJPanUHl
-	 kWQkirD3l9ZMZoG2VVcx7Lt70SCT+nkYRLdot6iXS8Hu3zPqB/C5c98WvAcLXGDs1H
-	 8944e1RMsRRnbKQEUh5YeW3+JuIG5fk26q8jJ2+NGw+6wen/vj4BfbNYJSez0WmtNM
-	 PnuDzfQUIGllw==
+	b=pRvlf58igeGEojcw1Q0QM2hkyCU5dPBE9NKT0xPpOs+ghIvibkEyw+kbO5hcBLQLY
+	 +4de1XvXVwaepiMxR5J75fUmTbIZpifgXVz+JJk6rx8zYzqz3IjNOEWJgTp35U1QZY
+	 YmEYqeZuk8HoKoFTj5nj/iwU+V3TnGRvq7GMqJzJB+FuTJQkGN/sioi6zUUBotTYKn
+	 Fv2KqEqu7QKqIg0JtN3zEgsczhLOdjRw/MVUZXteFHefr2WxYFaRRKVVt0S9BaXDDR
+	 84dh2+aob0A1vrYH8tC3FoofuKXPRC+HL44YVD1HEeof0EVyTx5h/geVdB9qhZ5AFr
+	 GJ1hu0ywJbOzQ==
 From: Eric Biggers <ebiggers@kernel.org>
 To: netdev@vger.kernel.org,
 	linux-afs@lists.infradead.org
@@ -39,9 +39,9 @@ Cc: David Howells <dhowells@redhat.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH net-next 4/5] crypto: fcrypt - Remove support for FCrypt block cipher
-Date: Mon, 27 Apr 2026 19:43:57 -0700
-Message-ID: <20260428024400.123337-5-ebiggers@kernel.org>
+Subject: [PATCH net-next 5/5] crypto: pcbc - Remove support for PCBC mode
+Date: Mon, 27 Apr 2026 19:43:58 -0700
+Message-ID: <20260428024400.123337-6-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260428024400.123337-1-ebiggers@kernel.org>
 References: <20260428024400.123337-1-ebiggers@kernel.org>
@@ -51,1178 +51,1729 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Remove the insecure FCrypt block cipher from the crypto API.  Its only
-user was net/rxrpc/, but now net/rxrpc/ implements it locally.  The
-crypto API implementation is no longer needed.
+The only user of PCBC mode (Propagating Cipher Block Chaining mode) was
+net/rxrpc/rxkad.c, which now uses local code instead.
 
-For some additional context: FCrypt was designed in 1988 and is
-essentially a weakened version of DES.  It has the same 56-bit key size
-as DES, which is easily brute forced.  Moreover, it's cryptographically
-weak and doesn't even provide the intended 56-bit security level.  Its
-author considers it to be a mistake, as well
-(https://lists.openafs.org/pipermail/openafs-devel/2000-December/005320.html).
+While PCBC was an interesting cryptographic experiment, it has largely
+been relegated to the history books and academic exercises.  It is
+non-parallelizable (i.e., very slow) and doesn't actually achieve the
+integrity properties it was apparently intended to achieve.
 
-But fortunately this 1980s-era homebrew block cipher was never adopted
-outside of net/rxrpc/.  So its code can just be kept there.
+Remove support for it from the crypto API.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- arch/arm/configs/pxa_defconfig              |   1 -
- arch/m68k/configs/amiga_defconfig           |   1 -
- arch/m68k/configs/apollo_defconfig          |   1 -
- arch/m68k/configs/atari_defconfig           |   1 -
- arch/m68k/configs/bvme6000_defconfig        |   1 -
- arch/m68k/configs/hp300_defconfig           |   1 -
- arch/m68k/configs/mac_defconfig             |   1 -
- arch/m68k/configs/multi_defconfig           |   1 -
- arch/m68k/configs/mvme147_defconfig         |   1 -
- arch/m68k/configs/mvme16x_defconfig         |   1 -
- arch/m68k/configs/q40_defconfig             |   1 -
- arch/m68k/configs/sun3_defconfig            |   1 -
- arch/m68k/configs/sun3x_defconfig           |   1 -
- arch/mips/configs/bigsur_defconfig          |   1 -
- arch/mips/configs/decstation_64_defconfig   |   1 -
- arch/mips/configs/decstation_defconfig      |   1 -
- arch/mips/configs/decstation_r4k_defconfig  |   1 -
- arch/mips/configs/ip22_defconfig            |   1 -
- arch/mips/configs/ip27_defconfig            |   1 -
- arch/mips/configs/ip30_defconfig            |   1 -
- arch/mips/configs/ip32_defconfig            |   1 -
- arch/mips/configs/lemote2f_defconfig        |   1 -
- arch/mips/configs/malta_defconfig           |   1 -
- arch/mips/configs/malta_kvm_defconfig       |   1 -
- arch/mips/configs/maltaup_xpa_defconfig     |   1 -
- arch/mips/configs/rm200_defconfig           |   1 -
- arch/mips/configs/sb1250_swarm_defconfig    |   1 -
- arch/parisc/configs/generic-64bit_defconfig |   1 -
- arch/powerpc/configs/ppc6xx_defconfig       |   1 -
- arch/s390/configs/debug_defconfig           |   1 -
- arch/s390/configs/defconfig                 |   1 -
- arch/sh/configs/sh2007_defconfig            |   1 -
- arch/sparc/configs/sparc64_defconfig        |   1 -
- crypto/Kconfig                              |   9 -
- crypto/Makefile                             |   1 -
- crypto/fcrypt.c                             | 420 --------------------
- crypto/tcrypt.c                             |   4 -
- crypto/testmgr.c                            |  15 -
- crypto/testmgr.h                            |  45 ---
- 39 files changed, 527 deletions(-)
- delete mode 100644 crypto/fcrypt.c
+ arch/arm/configs/am200epdkit_defconfig        |   1 -
+ arch/arm/configs/dove_defconfig               |   1 -
+ arch/arm/configs/multi_v5_defconfig           |   1 -
+ arch/arm/configs/mv78xx0_defconfig            |   1 -
+ arch/arm/configs/mvebu_v5_defconfig           |   1 -
+ arch/arm/configs/omap1_defconfig              |   1 -
+ arch/arm/configs/orion5x_defconfig            |   1 -
+ arch/arm/configs/pxa_defconfig                |   1 -
+ arch/arm/configs/wpcm450_defconfig            |   1 -
+ arch/m68k/configs/amiga_defconfig             |   1 -
+ arch/m68k/configs/apollo_defconfig            |   1 -
+ arch/m68k/configs/atari_defconfig             |   1 -
+ arch/m68k/configs/bvme6000_defconfig          |   1 -
+ arch/m68k/configs/hp300_defconfig             |   1 -
+ arch/m68k/configs/mac_defconfig               |   1 -
+ arch/m68k/configs/multi_defconfig             |   1 -
+ arch/m68k/configs/mvme147_defconfig           |   1 -
+ arch/m68k/configs/mvme16x_defconfig           |   1 -
+ arch/m68k/configs/q40_defconfig               |   1 -
+ arch/m68k/configs/sun3_defconfig              |   1 -
+ arch/m68k/configs/sun3x_defconfig             |   1 -
+ arch/mips/configs/bigsur_defconfig            |   1 -
+ arch/mips/configs/decstation_64_defconfig     |   1 -
+ arch/mips/configs/decstation_defconfig        |   1 -
+ arch/mips/configs/decstation_r4k_defconfig    |   1 -
+ arch/mips/configs/fuloong2e_defconfig         |   1 -
+ arch/mips/configs/gpr_defconfig               |   1 -
+ arch/mips/configs/ip22_defconfig              |   1 -
+ arch/mips/configs/ip27_defconfig              |   1 -
+ arch/mips/configs/ip30_defconfig              |   1 -
+ arch/mips/configs/ip32_defconfig              |   1 -
+ arch/mips/configs/lemote2f_defconfig          |   1 -
+ arch/mips/configs/malta_defconfig             |   1 -
+ arch/mips/configs/malta_kvm_defconfig         |   1 -
+ arch/mips/configs/malta_qemu_32r6_defconfig   |   1 -
+ arch/mips/configs/maltaaprp_defconfig         |   1 -
+ arch/mips/configs/maltasmvp_defconfig         |   1 -
+ arch/mips/configs/maltasmvp_eva_defconfig     |   1 -
+ arch/mips/configs/maltaup_defconfig           |   1 -
+ arch/mips/configs/maltaup_xpa_defconfig       |   1 -
+ arch/mips/configs/mtx1_defconfig              |   1 -
+ arch/mips/configs/rm200_defconfig             |   1 -
+ arch/mips/configs/sb1250_swarm_defconfig      |   1 -
+ arch/parisc/configs/generic-64bit_defconfig   |   1 -
+ arch/powerpc/configs/44x/akebono_defconfig    |   1 -
+ arch/powerpc/configs/44x/bamboo_defconfig     |   1 -
+ arch/powerpc/configs/44x/currituck_defconfig  |   1 -
+ arch/powerpc/configs/44x/ebony_defconfig      |   1 -
+ arch/powerpc/configs/44x/eiger_defconfig      |   1 -
+ arch/powerpc/configs/44x/fsp2_defconfig       |   1 -
+ arch/powerpc/configs/44x/icon_defconfig       |   1 -
+ arch/powerpc/configs/44x/iss476-smp_defconfig |   1 -
+ arch/powerpc/configs/44x/katmai_defconfig     |   1 -
+ arch/powerpc/configs/44x/rainier_defconfig    |   1 -
+ arch/powerpc/configs/44x/redwood_defconfig    |   1 -
+ arch/powerpc/configs/44x/sequoia_defconfig    |   1 -
+ arch/powerpc/configs/44x/taishan_defconfig    |   1 -
+ arch/powerpc/configs/52xx/cm5200_defconfig    |   1 -
+ arch/powerpc/configs/52xx/motionpro_defconfig |   1 -
+ arch/powerpc/configs/52xx/tqm5200_defconfig   |   1 -
+ arch/powerpc/configs/83xx/asp8347_defconfig   |   1 -
+ .../configs/83xx/mpc8313_rdb_defconfig        |   1 -
+ .../configs/83xx/mpc8315_rdb_defconfig        |   1 -
+ .../configs/83xx/mpc832x_rdb_defconfig        |   1 -
+ .../configs/83xx/mpc834x_itx_defconfig        |   1 -
+ .../configs/83xx/mpc834x_itxgp_defconfig      |   1 -
+ .../configs/83xx/mpc837x_rdb_defconfig        |   1 -
+ arch/powerpc/configs/amigaone_defconfig       |   1 -
+ arch/powerpc/configs/cell_defconfig           |   1 -
+ arch/powerpc/configs/chrp32_defconfig         |   1 -
+ arch/powerpc/configs/ep8248e_defconfig        |   1 -
+ arch/powerpc/configs/fsl-emb-nonhw.config     |   1 -
+ arch/powerpc/configs/g5_defconfig             |   1 -
+ arch/powerpc/configs/linkstation_defconfig    |   1 -
+ arch/powerpc/configs/mgcoge_defconfig         |   1 -
+ arch/powerpc/configs/mpc83xx_defconfig        |   1 -
+ arch/powerpc/configs/mvme5100_defconfig       |   1 -
+ arch/powerpc/configs/pmac32_defconfig         |   1 -
+ arch/powerpc/configs/powernv_defconfig        |   1 -
+ arch/powerpc/configs/ppc44x_defconfig         |   1 -
+ arch/powerpc/configs/ppc64_defconfig          |   1 -
+ arch/powerpc/configs/ppc64e_defconfig         |   1 -
+ arch/powerpc/configs/ppc6xx_defconfig         |   1 -
+ arch/powerpc/configs/ps3_defconfig            |   1 -
+ arch/s390/configs/debug_defconfig             |   1 -
+ arch/s390/configs/defconfig                   |   1 -
+ arch/sh/configs/hp6xx_defconfig               |   1 -
+ arch/sh/configs/r7780mp_defconfig             |   1 -
+ arch/sh/configs/r7785rp_defconfig             |   1 -
+ arch/sh/configs/se7712_defconfig              |   1 -
+ arch/sh/configs/sh2007_defconfig              |   1 -
+ arch/sparc/configs/sparc32_defconfig          |   1 -
+ arch/sparc/configs/sparc64_defconfig          |   1 -
+ crypto/Kconfig                                |   9 -
+ crypto/Makefile                               |   1 -
+ crypto/pcbc.c                                 | 195 ------------------
+ 96 files changed, 298 deletions(-)
+ delete mode 100644 crypto/pcbc.c
 
+diff --git a/arch/arm/configs/am200epdkit_defconfig b/arch/arm/configs/am200epdkit_defconfig
+index 2367b1685c1c..d8198592fe1b 100644
+--- a/arch/arm/configs/am200epdkit_defconfig
++++ b/arch/arm/configs/am200epdkit_defconfig
+@@ -84,10 +84,9 @@ CONFIG_NLS_ISO8859_1=y
+ CONFIG_DEBUG_KERNEL=y
+ # CONFIG_DETECT_SOFTLOCKUP is not set
+ CONFIG_CRYPTO=y
+ CONFIG_CRYPTO_CBC=m
+ CONFIG_CRYPTO_ECB=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_ARC4=m
+ # CONFIG_DEBUG_BUGVERBOSE is not set
+ # CONFIG_DEBUG_PREEMPT is not set
+ CONFIG_DEBUG_USER=y
+diff --git a/arch/arm/configs/dove_defconfig b/arch/arm/configs/dove_defconfig
+index e98c35df675e..9743b0b7ec61 100644
+--- a/arch/arm/configs/dove_defconfig
++++ b/arch/arm/configs/dove_defconfig
+@@ -116,11 +116,10 @@ CONFIG_TIMER_STATS=y
+ CONFIG_CRYPTO_NULL=y
+ CONFIG_CRYPTO_BLOWFISH=y
+ CONFIG_CRYPTO_TEA=y
+ CONFIG_CRYPTO_TWOFISH=y
+ CONFIG_CRYPTO_ECB=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_HMAC=y
+ CONFIG_CRYPTO_MD4=y
+ CONFIG_CRYPTO_SHA1=y
+ CONFIG_CRYPTO_SHA256=y
+ CONFIG_CRYPTO_SHA512=y
+diff --git a/arch/arm/configs/multi_v5_defconfig b/arch/arm/configs/multi_v5_defconfig
+index 59b020e66a0b..95afc972047e 100644
+--- a/arch/arm/configs/multi_v5_defconfig
++++ b/arch/arm/configs/multi_v5_defconfig
+@@ -284,11 +284,10 @@ CONFIG_NLS_CODEPAGE_437=y
+ CONFIG_NLS_CODEPAGE_850=y
+ CONFIG_NLS_ISO8859_1=y
+ CONFIG_NLS_ISO8859_2=y
+ CONFIG_NLS_UTF8=y
+ CONFIG_CRYPTO_CBC=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_DEV_MARVELL_CESA=y
+ CONFIG_DEBUG_KERNEL=y
+ CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
+ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DEBUG_FS=y
+diff --git a/arch/arm/configs/mv78xx0_defconfig b/arch/arm/configs/mv78xx0_defconfig
+index d3a26efe766c..a652ccd1358b 100644
+--- a/arch/arm/configs/mv78xx0_defconfig
++++ b/arch/arm/configs/mv78xx0_defconfig
+@@ -109,11 +109,10 @@ CONFIG_NLS_CODEPAGE_437=y
+ CONFIG_NLS_CODEPAGE_850=y
+ CONFIG_NLS_ISO8859_1=y
+ CONFIG_NLS_ISO8859_2=y
+ CONFIG_CRYPTO_CBC=m
+ CONFIG_CRYPTO_ECB=m
+-CONFIG_CRYPTO_PCBC=m
+ # CONFIG_DEBUG_BUGVERBOSE is not set
+ CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
+ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DEBUG_FS=y
+ CONFIG_DEBUG_KERNEL=y
+diff --git a/arch/arm/configs/mvebu_v5_defconfig b/arch/arm/configs/mvebu_v5_defconfig
+index d1742a7cae6a..4cf77df183b3 100644
+--- a/arch/arm/configs/mvebu_v5_defconfig
++++ b/arch/arm/configs/mvebu_v5_defconfig
+@@ -183,11 +183,10 @@ CONFIG_NLS_CODEPAGE_437=y
+ CONFIG_NLS_CODEPAGE_850=y
+ CONFIG_NLS_ISO8859_1=y
+ CONFIG_NLS_ISO8859_2=y
+ CONFIG_NLS_UTF8=y
+ CONFIG_CRYPTO_CBC=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_DEV_MARVELL_CESA=y
+ CONFIG_DEBUG_KERNEL=y
+ CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
+ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DEBUG_FS=y
+diff --git a/arch/arm/configs/omap1_defconfig b/arch/arm/configs/omap1_defconfig
+index c6155f101fc9..7bf58e8a5ab5 100644
+--- a/arch/arm/configs/omap1_defconfig
++++ b/arch/arm/configs/omap1_defconfig
+@@ -213,11 +213,10 @@ CONFIG_NLS_KOI8_R=y
+ CONFIG_NLS_UTF8=y
+ # CONFIG_ENABLE_MUST_CHECK is not set
+ CONFIG_DEBUG_KERNEL=y
+ CONFIG_SECURITY=y
+ CONFIG_CRYPTO_ECB=y
+-CONFIG_CRYPTO_PCBC=y
+ CONFIG_CRYPTO_DEFLATE=y
+ CONFIG_CRYPTO_LZO=y
+ CONFIG_FONTS=y
+ CONFIG_FONT_8x8=y
+ CONFIG_FONT_8x16=y
+diff --git a/arch/arm/configs/orion5x_defconfig b/arch/arm/configs/orion5x_defconfig
+index 002c9145026b..f5be2e26d9ae 100644
+--- a/arch/arm/configs/orion5x_defconfig
++++ b/arch/arm/configs/orion5x_defconfig
+@@ -132,11 +132,10 @@ CONFIG_NLS_CODEPAGE_437=y
+ CONFIG_NLS_CODEPAGE_850=y
+ CONFIG_NLS_ISO8859_1=y
+ CONFIG_NLS_ISO8859_2=y
+ CONFIG_CRYPTO_CBC=m
+ CONFIG_CRYPTO_ECB=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_DEV_MARVELL_CESA=y
+ # CONFIG_DEBUG_BUGVERBOSE is not set
+ CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
+ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DEBUG_FS=y
 diff --git a/arch/arm/configs/pxa_defconfig b/arch/arm/configs/pxa_defconfig
-index c51ae373ca88..53f1e5820c49 100644
+index 53f1e5820c49..83d1ed3a37f5 100644
 --- a/arch/arm/configs/pxa_defconfig
 +++ b/arch/arm/configs/pxa_defconfig
-@@ -638,11 +638,10 @@ CONFIG_CRYPTO_CRYPTD=m
- CONFIG_CRYPTO_AUTHENC=m
- CONFIG_CRYPTO_BENCHMARK=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
+@@ -644,11 +644,10 @@ CONFIG_CRYPTO_KHAZAD=m
  CONFIG_CRYPTO_SEED=m
  CONFIG_CRYPTO_SERPENT=m
  CONFIG_CRYPTO_TEA=m
  CONFIG_CRYPTO_TWOFISH=m
+ CONFIG_CRYPTO_LRW=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_XTS=m
+ CONFIG_CRYPTO_SHA512=m
+ CONFIG_CRYPTO_TGR192=m
+ CONFIG_CRYPTO_WP512=m
+ CONFIG_CRYPTO_ANUBIS=m
+diff --git a/arch/arm/configs/wpcm450_defconfig b/arch/arm/configs/wpcm450_defconfig
+index cd4b3e70ff68..67b64a378166 100644
+--- a/arch/arm/configs/wpcm450_defconfig
++++ b/arch/arm/configs/wpcm450_defconfig
+@@ -179,11 +179,10 @@ CONFIG_KEYS=y
+ CONFIG_HARDENED_USERCOPY=y
+ CONFIG_FORTIFY_SOURCE=y
+ CONFIG_CRYPTO_RSA=y
+ CONFIG_CRYPTO_AES=y
+ CONFIG_CRYPTO_CBC=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_CCM=y
+ CONFIG_CRYPTO_GCM=y
+ CONFIG_CRYPTO_CMAC=y
+ CONFIG_CRYPTO_SHA256=y
+ CONFIG_ASYMMETRIC_KEY_TYPE=y
 diff --git a/arch/m68k/configs/amiga_defconfig b/arch/m68k/configs/amiga_defconfig
-index 47e48c18e55c..ca45670a6af4 100644
+index ca45670a6af4..aadff466830f 100644
 --- a/arch/m68k/configs/amiga_defconfig
 +++ b/arch/m68k/configs/amiga_defconfig
-@@ -522,11 +522,10 @@ CONFIG_CRYPTO_ARIA=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
- CONFIG_CRYPTO_DES=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
- CONFIG_CRYPTO_SEED=m
- CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
+@@ -533,11 +533,10 @@ CONFIG_CRYPTO_TWOFISH=m
+ CONFIG_CRYPTO_ADIANTUM=m
+ CONFIG_CRYPTO_ARC4=m
+ CONFIG_CRYPTO_CTS=m
+ CONFIG_CRYPTO_HCTR2=m
+ CONFIG_CRYPTO_LRW=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_XTS=m
+ CONFIG_CRYPTO_AEGIS128=m
+ CONFIG_CRYPTO_MD4=m
+ CONFIG_CRYPTO_RMD160=m
+ CONFIG_CRYPTO_SHA1=m
 diff --git a/arch/m68k/configs/apollo_defconfig b/arch/m68k/configs/apollo_defconfig
-index 161586d611ab..2732a5b8b694 100644
+index 2732a5b8b694..ea9487a39884 100644
 --- a/arch/m68k/configs/apollo_defconfig
 +++ b/arch/m68k/configs/apollo_defconfig
-@@ -477,11 +477,10 @@ CONFIG_CRYPTO_ARIA=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
- CONFIG_CRYPTO_DES=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
- CONFIG_CRYPTO_SEED=m
- CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
+@@ -488,11 +488,10 @@ CONFIG_CRYPTO_TWOFISH=m
+ CONFIG_CRYPTO_ADIANTUM=m
+ CONFIG_CRYPTO_ARC4=m
+ CONFIG_CRYPTO_CTS=m
+ CONFIG_CRYPTO_HCTR2=m
+ CONFIG_CRYPTO_LRW=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_XTS=m
+ CONFIG_CRYPTO_AEGIS128=m
+ CONFIG_CRYPTO_MD4=m
+ CONFIG_CRYPTO_RMD160=m
+ CONFIG_CRYPTO_SHA1=m
 diff --git a/arch/m68k/configs/atari_defconfig b/arch/m68k/configs/atari_defconfig
-index c13c6deeac22..242882b05fa4 100644
+index 242882b05fa4..a70127ac7a2d 100644
 --- a/arch/m68k/configs/atari_defconfig
 +++ b/arch/m68k/configs/atari_defconfig
-@@ -499,11 +499,10 @@ CONFIG_CRYPTO_ARIA=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
- CONFIG_CRYPTO_DES=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
- CONFIG_CRYPTO_SEED=m
- CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
+@@ -510,11 +510,10 @@ CONFIG_CRYPTO_TWOFISH=m
+ CONFIG_CRYPTO_ADIANTUM=m
+ CONFIG_CRYPTO_ARC4=m
+ CONFIG_CRYPTO_CTS=m
+ CONFIG_CRYPTO_HCTR2=m
+ CONFIG_CRYPTO_LRW=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_XTS=m
+ CONFIG_CRYPTO_AEGIS128=m
+ CONFIG_CRYPTO_MD4=m
+ CONFIG_CRYPTO_RMD160=m
+ CONFIG_CRYPTO_SHA1=m
 diff --git a/arch/m68k/configs/bvme6000_defconfig b/arch/m68k/configs/bvme6000_defconfig
-index d4f3f94b61ff..07e73c78a9e2 100644
+index 07e73c78a9e2..83da79382538 100644
 --- a/arch/m68k/configs/bvme6000_defconfig
 +++ b/arch/m68k/configs/bvme6000_defconfig
-@@ -469,11 +469,10 @@ CONFIG_CRYPTO_ARIA=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
- CONFIG_CRYPTO_DES=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
- CONFIG_CRYPTO_SEED=m
- CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
+@@ -480,11 +480,10 @@ CONFIG_CRYPTO_TWOFISH=m
+ CONFIG_CRYPTO_ADIANTUM=m
+ CONFIG_CRYPTO_ARC4=m
+ CONFIG_CRYPTO_CTS=m
+ CONFIG_CRYPTO_HCTR2=m
+ CONFIG_CRYPTO_LRW=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_XTS=m
+ CONFIG_CRYPTO_AEGIS128=m
+ CONFIG_CRYPTO_MD4=m
+ CONFIG_CRYPTO_RMD160=m
+ CONFIG_CRYPTO_SHA1=m
 diff --git a/arch/m68k/configs/hp300_defconfig b/arch/m68k/configs/hp300_defconfig
-index 58288f83349d..7188948da864 100644
+index 7188948da864..cea5ab74b3b1 100644
 --- a/arch/m68k/configs/hp300_defconfig
 +++ b/arch/m68k/configs/hp300_defconfig
-@@ -479,11 +479,10 @@ CONFIG_CRYPTO_ARIA=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
- CONFIG_CRYPTO_DES=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
- CONFIG_CRYPTO_SEED=m
- CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
+@@ -490,11 +490,10 @@ CONFIG_CRYPTO_TWOFISH=m
+ CONFIG_CRYPTO_ADIANTUM=m
+ CONFIG_CRYPTO_ARC4=m
+ CONFIG_CRYPTO_CTS=m
+ CONFIG_CRYPTO_HCTR2=m
+ CONFIG_CRYPTO_LRW=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_XTS=m
+ CONFIG_CRYPTO_AEGIS128=m
+ CONFIG_CRYPTO_MD4=m
+ CONFIG_CRYPTO_RMD160=m
+ CONFIG_CRYPTO_SHA1=m
 diff --git a/arch/m68k/configs/mac_defconfig b/arch/m68k/configs/mac_defconfig
-index abb369fd1f55..fa5b04d59aa6 100644
+index fa5b04d59aa6..26406777376d 100644
 --- a/arch/m68k/configs/mac_defconfig
 +++ b/arch/m68k/configs/mac_defconfig
-@@ -498,11 +498,10 @@ CONFIG_CRYPTO_ARIA=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
- CONFIG_CRYPTO_DES=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
- CONFIG_CRYPTO_SEED=m
- CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
+@@ -509,11 +509,10 @@ CONFIG_CRYPTO_TWOFISH=m
+ CONFIG_CRYPTO_ADIANTUM=m
+ CONFIG_CRYPTO_ARC4=m
+ CONFIG_CRYPTO_CTS=m
+ CONFIG_CRYPTO_HCTR2=m
+ CONFIG_CRYPTO_LRW=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_XTS=m
+ CONFIG_CRYPTO_AEGIS128=m
+ CONFIG_CRYPTO_MD4=m
+ CONFIG_CRYPTO_RMD160=m
+ CONFIG_CRYPTO_SHA1=m
 diff --git a/arch/m68k/configs/multi_defconfig b/arch/m68k/configs/multi_defconfig
-index cb8de979700f..3bc9911549c0 100644
+index 3bc9911549c0..8357491645ad 100644
 --- a/arch/m68k/configs/multi_defconfig
 +++ b/arch/m68k/configs/multi_defconfig
-@@ -585,11 +585,10 @@ CONFIG_CRYPTO_ARIA=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
- CONFIG_CRYPTO_DES=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
- CONFIG_CRYPTO_SEED=m
- CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
+@@ -596,11 +596,10 @@ CONFIG_CRYPTO_TWOFISH=m
+ CONFIG_CRYPTO_ADIANTUM=m
+ CONFIG_CRYPTO_ARC4=m
+ CONFIG_CRYPTO_CTS=m
+ CONFIG_CRYPTO_HCTR2=m
+ CONFIG_CRYPTO_LRW=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_XTS=m
+ CONFIG_CRYPTO_AEGIS128=m
+ CONFIG_CRYPTO_MD4=m
+ CONFIG_CRYPTO_RMD160=m
+ CONFIG_CRYPTO_SHA1=m
 diff --git a/arch/m68k/configs/mvme147_defconfig b/arch/m68k/configs/mvme147_defconfig
-index 176540bd5074..9f5c8e0a07f3 100644
+index 9f5c8e0a07f3..fe94f95862e7 100644
 --- a/arch/m68k/configs/mvme147_defconfig
 +++ b/arch/m68k/configs/mvme147_defconfig
-@@ -469,11 +469,10 @@ CONFIG_CRYPTO_ARIA=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
- CONFIG_CRYPTO_DES=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
- CONFIG_CRYPTO_SEED=m
- CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
+@@ -480,11 +480,10 @@ CONFIG_CRYPTO_TWOFISH=m
+ CONFIG_CRYPTO_ADIANTUM=m
+ CONFIG_CRYPTO_ARC4=m
+ CONFIG_CRYPTO_CTS=m
+ CONFIG_CRYPTO_HCTR2=m
+ CONFIG_CRYPTO_LRW=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_XTS=m
+ CONFIG_CRYPTO_AEGIS128=m
+ CONFIG_CRYPTO_MD4=m
+ CONFIG_CRYPTO_RMD160=m
+ CONFIG_CRYPTO_SHA1=m
 diff --git a/arch/m68k/configs/mvme16x_defconfig b/arch/m68k/configs/mvme16x_defconfig
-index 8b2e5cf4d2f2..e5a6299aeae0 100644
+index e5a6299aeae0..ba67cacc079e 100644
 --- a/arch/m68k/configs/mvme16x_defconfig
 +++ b/arch/m68k/configs/mvme16x_defconfig
-@@ -470,11 +470,10 @@ CONFIG_CRYPTO_ARIA=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
- CONFIG_CRYPTO_DES=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
- CONFIG_CRYPTO_SEED=m
- CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
+@@ -481,11 +481,10 @@ CONFIG_CRYPTO_TWOFISH=m
+ CONFIG_CRYPTO_ADIANTUM=m
+ CONFIG_CRYPTO_ARC4=m
+ CONFIG_CRYPTO_CTS=m
+ CONFIG_CRYPTO_HCTR2=m
+ CONFIG_CRYPTO_LRW=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_XTS=m
+ CONFIG_CRYPTO_AEGIS128=m
+ CONFIG_CRYPTO_MD4=m
+ CONFIG_CRYPTO_RMD160=m
+ CONFIG_CRYPTO_SHA1=m
 diff --git a/arch/m68k/configs/q40_defconfig b/arch/m68k/configs/q40_defconfig
-index d48f3cf5285b..e79bbb397261 100644
+index e79bbb397261..552399979e4b 100644
 --- a/arch/m68k/configs/q40_defconfig
 +++ b/arch/m68k/configs/q40_defconfig
-@@ -488,11 +488,10 @@ CONFIG_CRYPTO_ARIA=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
- CONFIG_CRYPTO_DES=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
- CONFIG_CRYPTO_SEED=m
- CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
+@@ -499,11 +499,10 @@ CONFIG_CRYPTO_TWOFISH=m
+ CONFIG_CRYPTO_ADIANTUM=m
+ CONFIG_CRYPTO_ARC4=m
+ CONFIG_CRYPTO_CTS=m
+ CONFIG_CRYPTO_HCTR2=m
+ CONFIG_CRYPTO_LRW=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_XTS=m
+ CONFIG_CRYPTO_AEGIS128=m
+ CONFIG_CRYPTO_MD4=m
+ CONFIG_CRYPTO_RMD160=m
+ CONFIG_CRYPTO_SHA1=m
 diff --git a/arch/m68k/configs/sun3_defconfig b/arch/m68k/configs/sun3_defconfig
-index 0b96428f25d4..7aa76de5c472 100644
+index 7aa76de5c472..b4f3935d3d18 100644
 --- a/arch/m68k/configs/sun3_defconfig
 +++ b/arch/m68k/configs/sun3_defconfig
-@@ -467,11 +467,10 @@ CONFIG_CRYPTO_ARIA=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
- CONFIG_CRYPTO_DES=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
- CONFIG_CRYPTO_SEED=m
- CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
+@@ -478,11 +478,10 @@ CONFIG_CRYPTO_TWOFISH=m
+ CONFIG_CRYPTO_ADIANTUM=m
+ CONFIG_CRYPTO_ARC4=m
+ CONFIG_CRYPTO_CTS=m
+ CONFIG_CRYPTO_HCTR2=m
+ CONFIG_CRYPTO_LRW=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_XTS=m
+ CONFIG_CRYPTO_AEGIS128=m
+ CONFIG_CRYPTO_MD4=m
+ CONFIG_CRYPTO_RMD160=m
+ CONFIG_CRYPTO_SHA1=m
 diff --git a/arch/m68k/configs/sun3x_defconfig b/arch/m68k/configs/sun3x_defconfig
-index 6140e18244a1..2ecd8bd097ea 100644
+index 2ecd8bd097ea..bb519520ae6e 100644
 --- a/arch/m68k/configs/sun3x_defconfig
 +++ b/arch/m68k/configs/sun3x_defconfig
-@@ -467,11 +467,10 @@ CONFIG_CRYPTO_ARIA=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
- CONFIG_CRYPTO_DES=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
- CONFIG_CRYPTO_SEED=m
- CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
+@@ -478,11 +478,10 @@ CONFIG_CRYPTO_TWOFISH=m
+ CONFIG_CRYPTO_ADIANTUM=m
+ CONFIG_CRYPTO_ARC4=m
+ CONFIG_CRYPTO_CTS=m
+ CONFIG_CRYPTO_HCTR2=m
+ CONFIG_CRYPTO_LRW=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_XTS=m
+ CONFIG_CRYPTO_AEGIS128=m
+ CONFIG_CRYPTO_MD4=m
+ CONFIG_CRYPTO_RMD160=m
+ CONFIG_CRYPTO_SHA1=m
 diff --git a/arch/mips/configs/bigsur_defconfig b/arch/mips/configs/bigsur_defconfig
-index aa63ada62e28..74c6821e4c37 100644
+index 74c6821e4c37..611dc0dd392d 100644
 --- a/arch/mips/configs/bigsur_defconfig
 +++ b/arch/mips/configs/bigsur_defconfig
-@@ -217,11 +217,10 @@ CONFIG_CRYPTO_SHA512=m
+@@ -205,11 +205,10 @@ CONFIG_DEFAULT_SECURITY_DAC=y
+ CONFIG_CRYPTO_NULL=y
+ CONFIG_CRYPTO_CCM=m
+ CONFIG_CRYPTO_GCM=m
+ CONFIG_CRYPTO_CTS=m
+ CONFIG_CRYPTO_LRW=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_XTS=m
+ CONFIG_CRYPTO_HMAC=y
+ CONFIG_CRYPTO_XCBC=m
+ CONFIG_CRYPTO_MD4=m
+ CONFIG_CRYPTO_RMD160=m
+diff --git a/arch/mips/configs/decstation_64_defconfig b/arch/mips/configs/decstation_64_defconfig
+index e98d218ed4c1..0e8e4e827515 100644
+--- a/arch/mips/configs/decstation_64_defconfig
++++ b/arch/mips/configs/decstation_64_defconfig
+@@ -172,11 +172,10 @@ CONFIG_CRYPTO_CCM=m
+ CONFIG_CRYPTO_GCM=m
+ CONFIG_CRYPTO_CHACHA20POLY1305=m
+ CONFIG_CRYPTO_CTS=m
+ CONFIG_CRYPTO_LRW=m
+ CONFIG_CRYPTO_OFB=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_XTS=m
+ CONFIG_CRYPTO_CMAC=m
+ CONFIG_CRYPTO_XCBC=m
+ CONFIG_CRYPTO_CRC32=m
+ CONFIG_CRYPTO_MD4=m
+diff --git a/arch/mips/configs/decstation_defconfig b/arch/mips/configs/decstation_defconfig
+index 2b4e06cc238b..c664928efb9f 100644
+--- a/arch/mips/configs/decstation_defconfig
++++ b/arch/mips/configs/decstation_defconfig
+@@ -167,11 +167,10 @@ CONFIG_CRYPTO_CCM=m
+ CONFIG_CRYPTO_GCM=m
+ CONFIG_CRYPTO_CHACHA20POLY1305=m
+ CONFIG_CRYPTO_CTS=m
+ CONFIG_CRYPTO_LRW=m
+ CONFIG_CRYPTO_OFB=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_XTS=m
+ CONFIG_CRYPTO_CMAC=m
+ CONFIG_CRYPTO_XCBC=m
+ CONFIG_CRYPTO_CRC32=m
+ CONFIG_CRYPTO_MD4=m
+diff --git a/arch/mips/configs/decstation_r4k_defconfig b/arch/mips/configs/decstation_r4k_defconfig
+index 280553269156..402255ae09ec 100644
+--- a/arch/mips/configs/decstation_r4k_defconfig
++++ b/arch/mips/configs/decstation_r4k_defconfig
+@@ -167,11 +167,10 @@ CONFIG_CRYPTO_CCM=m
+ CONFIG_CRYPTO_GCM=m
+ CONFIG_CRYPTO_CHACHA20POLY1305=m
+ CONFIG_CRYPTO_CTS=m
+ CONFIG_CRYPTO_LRW=m
+ CONFIG_CRYPTO_OFB=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_XTS=m
+ CONFIG_CRYPTO_CMAC=m
+ CONFIG_CRYPTO_XCBC=m
+ CONFIG_CRYPTO_CRC32=m
+ CONFIG_CRYPTO_MD4=m
+diff --git a/arch/mips/configs/fuloong2e_defconfig b/arch/mips/configs/fuloong2e_defconfig
+index b6fe3c962464..405799a9ed2a 100644
+--- a/arch/mips/configs/fuloong2e_defconfig
++++ b/arch/mips/configs/fuloong2e_defconfig
+@@ -207,11 +207,10 @@ CONFIG_NLS_CODEPAGE_936=y
+ CONFIG_NLS_ISO8859_1=y
+ CONFIG_NLS_UTF8=y
+ CONFIG_CRYPTO_AUTHENC=m
+ CONFIG_CRYPTO_GCM=m
+ CONFIG_CRYPTO_CTS=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_XTS=m
+ CONFIG_CRYPTO_HMAC=y
+ CONFIG_CRYPTO_RMD160=m
+ CONFIG_CRYPTO_SEED=m
+ CONFIG_CRYPTO_DEFLATE=m
+diff --git a/arch/mips/configs/gpr_defconfig b/arch/mips/configs/gpr_defconfig
+index ed1a8f80f96e..47016655a089 100644
+--- a/arch/mips/configs/gpr_defconfig
++++ b/arch/mips/configs/gpr_defconfig
+@@ -247,11 +247,10 @@ CONFIG_ROOT_NFS=y
+ CONFIG_NLS_CODEPAGE_437=y
+ CONFIG_NLS_CODEPAGE_850=y
+ CONFIG_NLS_ISO8859_1=y
+ CONFIG_CRYPTO_AUTHENC=m
+ CONFIG_CRYPTO_BENCHMARK=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_MD4=m
+ CONFIG_CRYPTO_SHA512=m
  CONFIG_CRYPTO_WP512=m
  CONFIG_CRYPTO_ANUBIS=m
  CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST6=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
- CONFIG_CRYPTO_SEED=m
- CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_TEA=m
- CONFIG_CRYPTO_TWOFISH=m
-diff --git a/arch/mips/configs/decstation_64_defconfig b/arch/mips/configs/decstation_64_defconfig
-index 7c43352fac6b..e98d218ed4c1 100644
---- a/arch/mips/configs/decstation_64_defconfig
-+++ b/arch/mips/configs/decstation_64_defconfig
-@@ -187,11 +187,10 @@ CONFIG_CRYPTO_ANUBIS=m
- CONFIG_CRYPTO_ARC4=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
- CONFIG_CRYPTO_SEED=m
- CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_TEA=m
- CONFIG_CRYPTO_TWOFISH=m
-diff --git a/arch/mips/configs/decstation_defconfig b/arch/mips/configs/decstation_defconfig
-index aee10274f048..2b4e06cc238b 100644
---- a/arch/mips/configs/decstation_defconfig
-+++ b/arch/mips/configs/decstation_defconfig
-@@ -182,11 +182,10 @@ CONFIG_CRYPTO_ANUBIS=m
- CONFIG_CRYPTO_ARC4=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
- CONFIG_CRYPTO_SEED=m
- CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_TEA=m
- CONFIG_CRYPTO_TWOFISH=m
-diff --git a/arch/mips/configs/decstation_r4k_defconfig b/arch/mips/configs/decstation_r4k_defconfig
-index a1698049aa7a..280553269156 100644
---- a/arch/mips/configs/decstation_r4k_defconfig
-+++ b/arch/mips/configs/decstation_r4k_defconfig
-@@ -182,11 +182,10 @@ CONFIG_CRYPTO_ANUBIS=m
- CONFIG_CRYPTO_ARC4=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
- CONFIG_CRYPTO_SEED=m
- CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_TEA=m
- CONFIG_CRYPTO_TWOFISH=m
 diff --git a/arch/mips/configs/ip22_defconfig b/arch/mips/configs/ip22_defconfig
-index e123848f94ab..50895ed06592 100644
+index 50895ed06592..822cc1ed64c2 100644
 --- a/arch/mips/configs/ip22_defconfig
 +++ b/arch/mips/configs/ip22_defconfig
-@@ -315,11 +315,10 @@ CONFIG_CRYPTO_WP512=m
- CONFIG_CRYPTO_ANUBIS=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
- CONFIG_CRYPTO_SEED=m
- CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_TEA=m
- CONFIG_CRYPTO_TWOFISH=m
+@@ -304,11 +304,10 @@ CONFIG_NLS_UTF8=m
+ CONFIG_KEYS=y
+ CONFIG_CRYPTO_CRYPTD=m
+ CONFIG_CRYPTO_GCM=m
+ CONFIG_CRYPTO_CTS=m
+ CONFIG_CRYPTO_LRW=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_XTS=m
+ CONFIG_CRYPTO_HMAC=y
+ CONFIG_CRYPTO_XCBC=m
+ CONFIG_CRYPTO_RMD160=m
+ CONFIG_CRYPTO_WP512=m
 diff --git a/arch/mips/configs/ip27_defconfig b/arch/mips/configs/ip27_defconfig
-index fea0ccee6948..ff7e06b92f58 100644
+index ff7e06b92f58..d108fd7b752b 100644
 --- a/arch/mips/configs/ip27_defconfig
 +++ b/arch/mips/configs/ip27_defconfig
-@@ -307,11 +307,10 @@ CONFIG_CRYPTO_WP512=m
- CONFIG_CRYPTO_ANUBIS=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
- CONFIG_CRYPTO_SEED=m
- CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_TEA=m
- CONFIG_CRYPTO_TWOFISH=m
+@@ -294,11 +294,10 @@ CONFIG_OMFS_FS=m
+ CONFIG_NFS_FS=y
+ CONFIG_SECURITYFS=y
+ CONFIG_CRYPTO_CRYPTD=m
+ CONFIG_CRYPTO_CTS=m
+ CONFIG_CRYPTO_LRW=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_XTS=m
+ CONFIG_CRYPTO_HMAC=y
+ CONFIG_CRYPTO_XCBC=m
+ CONFIG_CRYPTO_MD4=m
+ CONFIG_CRYPTO_RMD160=m
 diff --git a/arch/mips/configs/ip30_defconfig b/arch/mips/configs/ip30_defconfig
-index 718f3060d9fa..d9f748f8cfaa 100644
+index d9f748f8cfaa..028286029877 100644
 --- a/arch/mips/configs/ip30_defconfig
 +++ b/arch/mips/configs/ip30_defconfig
-@@ -164,11 +164,10 @@ CONFIG_SECURITYFS=y
- CONFIG_CRYPTO_CRYPTD=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST5=m
+@@ -168,11 +168,10 @@ CONFIG_CRYPTO_CAST5=m
  CONFIG_CRYPTO_CAST6=m
--CONFIG_CRYPTO_FCRYPT=m
  CONFIG_CRYPTO_SERPENT=m
  CONFIG_CRYPTO_TWOFISH=m
  CONFIG_CRYPTO_CTS=m
  CONFIG_CRYPTO_LRW=m
- CONFIG_CRYPTO_PCBC=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_XTS=m
+ CONFIG_CRYPTO_HMAC=y
+ CONFIG_CRYPTO_MD4=m
+ CONFIG_CRYPTO_RMD160=m
+ CONFIG_CRYPTO_WP512=m
 diff --git a/arch/mips/configs/ip32_defconfig b/arch/mips/configs/ip32_defconfig
-index 9020c309dcda..4b15f895be63 100644
+index 4b15f895be63..5ddbaa0aafaf 100644
 --- a/arch/mips/configs/ip32_defconfig
 +++ b/arch/mips/configs/ip32_defconfig
-@@ -167,11 +167,10 @@ CONFIG_CRYPTO_ARC4=y
- CONFIG_CRYPTO_BLOWFISH=y
- CONFIG_CRYPTO_CAMELLIA=y
- CONFIG_CRYPTO_CAST5=y
- CONFIG_CRYPTO_CAST6=y
- CONFIG_CRYPTO_DES=y
--CONFIG_CRYPTO_FCRYPT=y
- CONFIG_CRYPTO_KHAZAD=y
- CONFIG_CRYPTO_SERPENT=y
- CONFIG_CRYPTO_TEA=y
- CONFIG_CRYPTO_TWOFISH=y
- CONFIG_CRYPTO_DEFLATE=y
+@@ -152,11 +152,10 @@ CONFIG_NLS_UTF8=m
+ CONFIG_KEYS=y
+ CONFIG_CRYPTO_NULL=y
+ CONFIG_CRYPTO_CBC=y
+ CONFIG_CRYPTO_ECB=y
+ CONFIG_CRYPTO_LRW=y
+-CONFIG_CRYPTO_PCBC=y
+ CONFIG_CRYPTO_HMAC=y
+ CONFIG_CRYPTO_XCBC=y
+ CONFIG_CRYPTO_MD4=y
+ CONFIG_CRYPTO_SHA1=y
+ CONFIG_CRYPTO_SHA256=y
 diff --git a/arch/mips/configs/lemote2f_defconfig b/arch/mips/configs/lemote2f_defconfig
-index b9f3e1641105..bbcdfc8134cb 100644
+index bbcdfc8134cb..326f30748030 100644
 --- a/arch/mips/configs/lemote2f_defconfig
 +++ b/arch/mips/configs/lemote2f_defconfig
-@@ -299,11 +299,10 @@ CONFIG_CRYPTO_CRYPTD=m
- CONFIG_CRYPTO_BENCHMARK=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
+@@ -302,11 +302,10 @@ CONFIG_CRYPTO_CAMELLIA=m
  CONFIG_CRYPTO_CAST5=m
  CONFIG_CRYPTO_CAST6=m
--CONFIG_CRYPTO_FCRYPT=m
  CONFIG_CRYPTO_SERPENT=m
  CONFIG_CRYPTO_TWOFISH=m
  CONFIG_CRYPTO_LRW=m
- CONFIG_CRYPTO_PCBC=m
+-CONFIG_CRYPTO_PCBC=m
  CONFIG_CRYPTO_XTS=m
+ CONFIG_CRYPTO_RMD160=m
+ CONFIG_CRYPTO_SHA1=m
+ CONFIG_CRYPTO_WP512=m
+ CONFIG_CRYPTO_XCBC=m
 diff --git a/arch/mips/configs/malta_defconfig b/arch/mips/configs/malta_defconfig
-index 81704ec67f09..85e781607299 100644
+index 85e781607299..61c9d5cd1a75 100644
 --- a/arch/mips/configs/malta_defconfig
 +++ b/arch/mips/configs/malta_defconfig
-@@ -397,10 +397,9 @@ CONFIG_CRYPTO_WP512=m
- CONFIG_CRYPTO_ANUBIS=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
- CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_TEA=m
- CONFIG_CRYPTO_TWOFISH=m
+@@ -386,11 +386,10 @@ CONFIG_NLS_ISO8859_14=m
+ CONFIG_NLS_ISO8859_15=m
+ CONFIG_NLS_KOI8_R=m
+ CONFIG_NLS_KOI8_U=m
+ CONFIG_CRYPTO_CRYPTD=m
+ CONFIG_CRYPTO_LRW=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_HMAC=y
+ CONFIG_CRYPTO_XCBC=m
+ CONFIG_CRYPTO_MD4=m
+ CONFIG_CRYPTO_SHA512=m
+ CONFIG_CRYPTO_WP512=m
 diff --git a/arch/mips/configs/malta_kvm_defconfig b/arch/mips/configs/malta_kvm_defconfig
-index 82a97f58bce1..2db5f50fed3b 100644
+index 2db5f50fed3b..f862fbc7fbb7 100644
 --- a/arch/mips/configs/malta_kvm_defconfig
 +++ b/arch/mips/configs/malta_kvm_defconfig
-@@ -404,11 +404,10 @@ CONFIG_CRYPTO_WP512=m
- CONFIG_CRYPTO_ANUBIS=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
- CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_TEA=m
- CONFIG_CRYPTO_TWOFISH=m
- CONFIG_RCU_CPU_STALL_TIMEOUT=60
-diff --git a/arch/mips/configs/maltaup_xpa_defconfig b/arch/mips/configs/maltaup_xpa_defconfig
-index 0f9ef20744f9..865ae23bf11d 100644
---- a/arch/mips/configs/maltaup_xpa_defconfig
-+++ b/arch/mips/configs/maltaup_xpa_defconfig
-@@ -403,10 +403,9 @@ CONFIG_CRYPTO_WP512=m
- CONFIG_CRYPTO_ANUBIS=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
- CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_TEA=m
- CONFIG_CRYPTO_TWOFISH=m
-diff --git a/arch/mips/configs/rm200_defconfig b/arch/mips/configs/rm200_defconfig
-index ad9fbd0cbb38..7e04a6b1b4eb 100644
---- a/arch/mips/configs/rm200_defconfig
-+++ b/arch/mips/configs/rm200_defconfig
-@@ -378,10 +378,9 @@ CONFIG_CRYPTO_XCBC=m
+@@ -393,11 +393,10 @@ CONFIG_NLS_ISO8859_14=m
+ CONFIG_NLS_ISO8859_15=m
+ CONFIG_NLS_KOI8_R=m
+ CONFIG_NLS_KOI8_U=m
+ CONFIG_CRYPTO_CRYPTD=m
+ CONFIG_CRYPTO_LRW=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_HMAC=y
+ CONFIG_CRYPTO_XCBC=m
+ CONFIG_CRYPTO_MD4=m
+ CONFIG_CRYPTO_SHA512=m
+ CONFIG_CRYPTO_WP512=m
+diff --git a/arch/mips/configs/malta_qemu_32r6_defconfig b/arch/mips/configs/malta_qemu_32r6_defconfig
+index 5687e10c1bc8..14cdd23f1acb 100644
+--- a/arch/mips/configs/malta_qemu_32r6_defconfig
++++ b/arch/mips/configs/malta_qemu_32r6_defconfig
+@@ -161,11 +161,10 @@ CONFIG_ROOT_NFS=y
+ CONFIG_CIFS=m
+ CONFIG_CIFS_XATTR=y
+ CONFIG_CIFS_POSIX=y
+ CONFIG_NLS_CODEPAGE_437=m
+ CONFIG_NLS_ISO8859_1=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_HMAC=y
  CONFIG_CRYPTO_WP512=m
  CONFIG_CRYPTO_ANUBIS=m
  CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST6=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
- CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_TEA=m
- CONFIG_CRYPTO_TWOFISH=m
+ CONFIG_CRYPTO_CAST5=m
+diff --git a/arch/mips/configs/maltaaprp_defconfig b/arch/mips/configs/maltaaprp_defconfig
+index abd22bff517b..2943593264b9 100644
+--- a/arch/mips/configs/maltaaprp_defconfig
++++ b/arch/mips/configs/maltaaprp_defconfig
+@@ -162,11 +162,10 @@ CONFIG_ROOT_NFS=y
+ CONFIG_CIFS=m
+ CONFIG_CIFS_XATTR=y
+ CONFIG_CIFS_POSIX=y
+ CONFIG_NLS_CODEPAGE_437=m
+ CONFIG_NLS_ISO8859_1=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_HMAC=y
+ CONFIG_CRYPTO_WP512=m
+ CONFIG_CRYPTO_ANUBIS=m
+ CONFIG_CRYPTO_BLOWFISH=m
+ CONFIG_CRYPTO_CAST5=m
+diff --git a/arch/mips/configs/maltasmvp_defconfig b/arch/mips/configs/maltasmvp_defconfig
+index 3fb3def8112d..47226fca0548 100644
+--- a/arch/mips/configs/maltasmvp_defconfig
++++ b/arch/mips/configs/maltasmvp_defconfig
+@@ -163,11 +163,10 @@ CONFIG_ROOT_NFS=y
+ CONFIG_CIFS=m
+ CONFIG_CIFS_XATTR=y
+ CONFIG_CIFS_POSIX=y
+ CONFIG_NLS_CODEPAGE_437=m
+ CONFIG_NLS_ISO8859_1=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_HMAC=y
+ CONFIG_CRYPTO_WP512=m
+ CONFIG_CRYPTO_ANUBIS=m
+ CONFIG_CRYPTO_BLOWFISH=m
+ CONFIG_CRYPTO_CAST5=m
+diff --git a/arch/mips/configs/maltasmvp_eva_defconfig b/arch/mips/configs/maltasmvp_eva_defconfig
+index 92e026912f68..09187a78409f 100644
+--- a/arch/mips/configs/maltasmvp_eva_defconfig
++++ b/arch/mips/configs/maltasmvp_eva_defconfig
+@@ -165,11 +165,10 @@ CONFIG_ROOT_NFS=y
+ CONFIG_CIFS=m
+ CONFIG_CIFS_XATTR=y
+ CONFIG_CIFS_POSIX=y
+ CONFIG_NLS_CODEPAGE_437=m
+ CONFIG_NLS_ISO8859_1=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_HMAC=y
+ CONFIG_CRYPTO_WP512=m
+ CONFIG_CRYPTO_ANUBIS=m
+ CONFIG_CRYPTO_BLOWFISH=m
+ CONFIG_CRYPTO_CAST5=m
+diff --git a/arch/mips/configs/maltaup_defconfig b/arch/mips/configs/maltaup_defconfig
+index 7a675fd3321f..a80783097c1e 100644
+--- a/arch/mips/configs/maltaup_defconfig
++++ b/arch/mips/configs/maltaup_defconfig
+@@ -161,11 +161,10 @@ CONFIG_ROOT_NFS=y
+ CONFIG_CIFS=m
+ CONFIG_CIFS_XATTR=y
+ CONFIG_CIFS_POSIX=y
+ CONFIG_NLS_CODEPAGE_437=m
+ CONFIG_NLS_ISO8859_1=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_HMAC=y
+ CONFIG_CRYPTO_WP512=m
+ CONFIG_CRYPTO_ANUBIS=m
+ CONFIG_CRYPTO_BLOWFISH=m
+ CONFIG_CRYPTO_CAST5=m
+diff --git a/arch/mips/configs/maltaup_xpa_defconfig b/arch/mips/configs/maltaup_xpa_defconfig
+index 865ae23bf11d..e660c503654e 100644
+--- a/arch/mips/configs/maltaup_xpa_defconfig
++++ b/arch/mips/configs/maltaup_xpa_defconfig
+@@ -392,11 +392,10 @@ CONFIG_NLS_ISO8859_14=m
+ CONFIG_NLS_ISO8859_15=m
+ CONFIG_NLS_KOI8_R=m
+ CONFIG_NLS_KOI8_U=m
+ CONFIG_CRYPTO_CRYPTD=m
+ CONFIG_CRYPTO_LRW=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_HMAC=y
+ CONFIG_CRYPTO_XCBC=m
+ CONFIG_CRYPTO_MD4=m
+ CONFIG_CRYPTO_SHA512=m
+ CONFIG_CRYPTO_WP512=m
+diff --git a/arch/mips/configs/mtx1_defconfig b/arch/mips/configs/mtx1_defconfig
+index 3629afbe5d75..42a0f4f70437 100644
+--- a/arch/mips/configs/mtx1_defconfig
++++ b/arch/mips/configs/mtx1_defconfig
+@@ -624,11 +624,10 @@ CONFIG_NLS_ISO8859_14=m
+ CONFIG_NLS_ISO8859_15=m
+ CONFIG_NLS_KOI8_R=m
+ CONFIG_NLS_KOI8_U=m
+ CONFIG_NLS_UTF8=m
+ CONFIG_CRYPTO_BENCHMARK=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_HMAC=y
+ CONFIG_CRYPTO_MD5=y
+ CONFIG_CRYPTO_WP512=m
+ CONFIG_CRYPTO_ANUBIS=m
+ CONFIG_CRYPTO_BLOWFISH=m
+diff --git a/arch/mips/configs/rm200_defconfig b/arch/mips/configs/rm200_defconfig
+index 7e04a6b1b4eb..291c6644035d 100644
+--- a/arch/mips/configs/rm200_defconfig
++++ b/arch/mips/configs/rm200_defconfig
+@@ -370,11 +370,10 @@ CONFIG_NLS_ISO8859_14=m
+ CONFIG_NLS_ISO8859_15=m
+ CONFIG_NLS_KOI8_R=m
+ CONFIG_NLS_KOI8_U=m
+ CONFIG_NLS_UTF8=m
+ CONFIG_CRYPTO_LRW=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_HMAC=y
+ CONFIG_CRYPTO_XCBC=m
+ CONFIG_CRYPTO_WP512=m
+ CONFIG_CRYPTO_ANUBIS=m
+ CONFIG_CRYPTO_BLOWFISH=m
 diff --git a/arch/mips/configs/sb1250_swarm_defconfig b/arch/mips/configs/sb1250_swarm_defconfig
-index 4a25b8d3e507..fe8a5a3ff328 100644
+index fe8a5a3ff328..a5b66b9f6d39 100644
 --- a/arch/mips/configs/sb1250_swarm_defconfig
 +++ b/arch/mips/configs/sb1250_swarm_defconfig
-@@ -90,11 +90,10 @@ CONFIG_CRYPTO_WP512=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
- CONFIG_CRYPTO_DES=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_TWOFISH=m
- CONFIG_CRYPTO_DEFLATE=m
- CONFIG_CRYPTO_LZO=m
- # CONFIG_CRYPTO_HW is not set
+@@ -78,11 +78,10 @@ CONFIG_NFS_FS=y
+ CONFIG_ROOT_NFS=y
+ CONFIG_CRYPTO_CRYPTD=m
+ CONFIG_CRYPTO_AUTHENC=m
+ CONFIG_CRYPTO_CBC=m
+ CONFIG_CRYPTO_LRW=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_XTS=m
+ CONFIG_CRYPTO_HMAC=y
+ CONFIG_CRYPTO_XCBC=m
+ CONFIG_CRYPTO_MD4=m
+ CONFIG_CRYPTO_SHA512=m
 diff --git a/arch/parisc/configs/generic-64bit_defconfig b/arch/parisc/configs/generic-64bit_defconfig
-index 0c4d54df9cf0..0503b4ef4c7a 100644
+index 0503b4ef4c7a..406f8174a1d2 100644
 --- a/arch/parisc/configs/generic-64bit_defconfig
 +++ b/arch/parisc/configs/generic-64bit_defconfig
-@@ -279,11 +279,10 @@ CONFIG_NLS_CODEPAGE_1250=m
- CONFIG_NLS_CODEPAGE_1251=m
+@@ -280,11 +280,10 @@ CONFIG_NLS_CODEPAGE_1251=m
  CONFIG_NLS_ASCII=m
  CONFIG_NLS_ISO8859_1=m
  CONFIG_NLS_ISO8859_2=m
  CONFIG_NLS_UTF8=m
--CONFIG_CRYPTO_FCRYPT=m
  CONFIG_CRYPTO_ECB=m
- CONFIG_CRYPTO_PCBC=m
+-CONFIG_CRYPTO_PCBC=m
  CONFIG_CRYPTO_MD4=m
  CONFIG_CRYPTO_MD5=y
  CONFIG_CRYPTO_DEFLATE=m
-diff --git a/arch/powerpc/configs/ppc6xx_defconfig b/arch/powerpc/configs/ppc6xx_defconfig
-index ccabc6e17168..7258ad903774 100644
---- a/arch/powerpc/configs/ppc6xx_defconfig
-+++ b/arch/powerpc/configs/ppc6xx_defconfig
-@@ -1061,11 +1061,10 @@ CONFIG_CRYPTO_SHA512=m
+ # CONFIG_CRYPTO_HW is not set
+ CONFIG_PRINTK_TIME=y
+diff --git a/arch/powerpc/configs/44x/akebono_defconfig b/arch/powerpc/configs/44x/akebono_defconfig
+index 11ad5ed3cc90..bdb0e6ece6ec 100644
+--- a/arch/powerpc/configs/44x/akebono_defconfig
++++ b/arch/powerpc/configs/44x/akebono_defconfig
+@@ -122,9 +122,8 @@ CONFIG_DETECT_HUNG_TASK=y
+ CONFIG_XMON=y
+ CONFIG_XMON_DEFAULT=y
+ CONFIG_PPC_EARLY_DEBUG=y
+ CONFIG_PPC_EARLY_DEBUG_44x_PHYSLOW=0x00010000
+ CONFIG_PPC_EARLY_DEBUG_44x_PHYSHIGH=0x33f
+-CONFIG_CRYPTO_PCBC=y
+ CONFIG_CRYPTO_MD5=y
+ CONFIG_CRYPTO_DES=y
+ # CONFIG_CRYPTO_HW is not set
+diff --git a/arch/powerpc/configs/44x/bamboo_defconfig b/arch/powerpc/configs/44x/bamboo_defconfig
+index acbce718eaa8..bfffea3a54b2 100644
+--- a/arch/powerpc/configs/44x/bamboo_defconfig
++++ b/arch/powerpc/configs/44x/bamboo_defconfig
+@@ -44,8 +44,7 @@ CONFIG_DEBUG_FS=y
+ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DETECT_HUNG_TASK=y
+ # CONFIG_DEBUG_BUGVERBOSE is not set
+ CONFIG_CRYPTO_CBC=y
+ CONFIG_CRYPTO_ECB=y
+-CONFIG_CRYPTO_PCBC=y
+ CONFIG_CRYPTO_MD5=y
+ CONFIG_CRYPTO_DES=y
+diff --git a/arch/powerpc/configs/44x/currituck_defconfig b/arch/powerpc/configs/44x/currituck_defconfig
+index 7283b7d4a1a5..6d6ec5d569b1 100644
+--- a/arch/powerpc/configs/44x/currituck_defconfig
++++ b/arch/powerpc/configs/44x/currituck_defconfig
+@@ -81,9 +81,8 @@ CONFIG_XMON_DEFAULT=y
+ CONFIG_PPC_EARLY_DEBUG=y
+ CONFIG_PPC_EARLY_DEBUG_44x_PHYSLOW=0x10000000
+ CONFIG_PPC_EARLY_DEBUG_44x_PHYSHIGH=0x200
+ CONFIG_CRYPTO_CBC=y
+ CONFIG_CRYPTO_ECB=y
+-CONFIG_CRYPTO_PCBC=y
+ CONFIG_CRYPTO_MD5=y
+ CONFIG_CRYPTO_DES=y
+ # CONFIG_CRYPTO_HW is not set
+diff --git a/arch/powerpc/configs/44x/ebony_defconfig b/arch/powerpc/configs/44x/ebony_defconfig
+index 93d2a4e64af9..0d6f9bdf8ad3 100644
+--- a/arch/powerpc/configs/44x/ebony_defconfig
++++ b/arch/powerpc/configs/44x/ebony_defconfig
+@@ -50,9 +50,8 @@ CONFIG_ROOT_NFS=y
+ CONFIG_DEBUG_FS=y
+ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DETECT_HUNG_TASK=y
+ CONFIG_CRYPTO_CBC=y
+ CONFIG_CRYPTO_ECB=y
+-CONFIG_CRYPTO_PCBC=y
+ CONFIG_CRYPTO_MD5=y
+ CONFIG_CRYPTO_DES=y
+ # CONFIG_CRYPTO_HW is not set
+diff --git a/arch/powerpc/configs/44x/eiger_defconfig b/arch/powerpc/configs/44x/eiger_defconfig
+index 509300f400e2..48ab405ab80b 100644
+--- a/arch/powerpc/configs/44x/eiger_defconfig
++++ b/arch/powerpc/configs/44x/eiger_defconfig
+@@ -77,11 +77,10 @@ CONFIG_CRYPTO_AUTHENC=y
+ CONFIG_CRYPTO_CCM=y
+ CONFIG_CRYPTO_GCM=y
+ CONFIG_CRYPTO_CBC=y
+ CONFIG_CRYPTO_CTS=y
+ CONFIG_CRYPTO_LRW=y
+-CONFIG_CRYPTO_PCBC=y
+ CONFIG_CRYPTO_XTS=y
+ CONFIG_CRYPTO_XCBC=y
+ CONFIG_CRYPTO_MD4=y
+ CONFIG_CRYPTO_MD5=y
+ CONFIG_CRYPTO_SHA1=y
+diff --git a/arch/powerpc/configs/44x/fsp2_defconfig b/arch/powerpc/configs/44x/fsp2_defconfig
+index 5492537f4c6c..b8b21fa15a07 100644
+--- a/arch/powerpc/configs/44x/fsp2_defconfig
++++ b/arch/powerpc/configs/44x/fsp2_defconfig
+@@ -113,9 +113,8 @@ CONFIG_DYNAMIC_DEBUG=y
+ CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
+ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DETECT_HUNG_TASK=y
+ CONFIG_CRYPTO_CBC=y
+ CONFIG_CRYPTO_ECB=y
+-CONFIG_CRYPTO_PCBC=y
+ CONFIG_CRYPTO_MD5=y
+ CONFIG_CRYPTO_DES=y
+ # CONFIG_CRYPTO_HW is not set
+diff --git a/arch/powerpc/configs/44x/icon_defconfig b/arch/powerpc/configs/44x/icon_defconfig
+index fb9a15573546..4f7cd127dc77 100644
+--- a/arch/powerpc/configs/44x/icon_defconfig
++++ b/arch/powerpc/configs/44x/icon_defconfig
+@@ -80,8 +80,7 @@ CONFIG_NLS_ISO8859_15=y
+ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DETECT_HUNG_TASK=y
+ # CONFIG_DEBUG_BUGVERBOSE is not set
+ CONFIG_CRYPTO_CBC=y
+ CONFIG_CRYPTO_ECB=y
+-CONFIG_CRYPTO_PCBC=y
+ CONFIG_CRYPTO_MD5=y
+ CONFIG_CRYPTO_DES=y
+diff --git a/arch/powerpc/configs/44x/iss476-smp_defconfig b/arch/powerpc/configs/44x/iss476-smp_defconfig
+index 0f6380e1e612..5188ec5406fd 100644
+--- a/arch/powerpc/configs/44x/iss476-smp_defconfig
++++ b/arch/powerpc/configs/44x/iss476-smp_defconfig
+@@ -60,9 +60,8 @@ CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
+ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DETECT_HUNG_TASK=y
+ CONFIG_PPC_EARLY_DEBUG=y
+ CONFIG_CRYPTO_CBC=y
+ CONFIG_CRYPTO_ECB=y
+-CONFIG_CRYPTO_PCBC=y
+ CONFIG_CRYPTO_MD5=y
+ CONFIG_CRYPTO_DES=y
+ # CONFIG_CRYPTO_HW is not set
+diff --git a/arch/powerpc/configs/44x/katmai_defconfig b/arch/powerpc/configs/44x/katmai_defconfig
+index 1a0f1c3e0ee9..59622bd1327d 100644
+--- a/arch/powerpc/configs/44x/katmai_defconfig
++++ b/arch/powerpc/configs/44x/katmai_defconfig
+@@ -49,8 +49,7 @@ CONFIG_ROOT_NFS=y
+ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DETECT_HUNG_TASK=y
+ # CONFIG_DEBUG_BUGVERBOSE is not set
+ CONFIG_CRYPTO_CBC=y
+ CONFIG_CRYPTO_ECB=y
+-CONFIG_CRYPTO_PCBC=y
+ CONFIG_CRYPTO_MD5=y
+ CONFIG_CRYPTO_DES=y
+diff --git a/arch/powerpc/configs/44x/rainier_defconfig b/arch/powerpc/configs/44x/rainier_defconfig
+index 6dd67de06a0b..22d10c33f374 100644
+--- a/arch/powerpc/configs/44x/rainier_defconfig
++++ b/arch/powerpc/configs/44x/rainier_defconfig
+@@ -55,8 +55,7 @@ CONFIG_DETECT_HUNG_TASK=y
+ # CONFIG_DEBUG_BUGVERBOSE is not set
+ CONFIG_PPC_EARLY_DEBUG=y
+ CONFIG_PPC_EARLY_DEBUG_44x_PHYSLOW=0xef600300
+ CONFIG_CRYPTO_CBC=y
+ CONFIG_CRYPTO_ECB=y
+-CONFIG_CRYPTO_PCBC=y
+ CONFIG_CRYPTO_MD5=y
+ CONFIG_CRYPTO_DES=y
+diff --git a/arch/powerpc/configs/44x/redwood_defconfig b/arch/powerpc/configs/44x/redwood_defconfig
+index e28d76416537..1e883938ca11 100644
+--- a/arch/powerpc/configs/44x/redwood_defconfig
++++ b/arch/powerpc/configs/44x/redwood_defconfig
+@@ -76,11 +76,10 @@ CONFIG_CRYPTO_AUTHENC=y
+ CONFIG_CRYPTO_CCM=y
+ CONFIG_CRYPTO_GCM=y
+ CONFIG_CRYPTO_CBC=y
+ CONFIG_CRYPTO_CTS=y
+ CONFIG_CRYPTO_LRW=y
+-CONFIG_CRYPTO_PCBC=y
+ CONFIG_CRYPTO_XTS=y
+ CONFIG_CRYPTO_XCBC=y
+ CONFIG_CRYPTO_MD4=y
+ CONFIG_CRYPTO_MD5=y
+ CONFIG_CRYPTO_SHA1=y
+diff --git a/arch/powerpc/configs/44x/sequoia_defconfig b/arch/powerpc/configs/44x/sequoia_defconfig
+index b4984eab43eb..ce8912b406eb 100644
+--- a/arch/powerpc/configs/44x/sequoia_defconfig
++++ b/arch/powerpc/configs/44x/sequoia_defconfig
+@@ -56,8 +56,7 @@ CONFIG_DEBUG_FS=y
+ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DETECT_HUNG_TASK=y
+ # CONFIG_DEBUG_BUGVERBOSE is not set
+ CONFIG_CRYPTO_CBC=y
+ CONFIG_CRYPTO_ECB=y
+-CONFIG_CRYPTO_PCBC=y
+ CONFIG_CRYPTO_MD5=y
+ CONFIG_CRYPTO_DES=y
+diff --git a/arch/powerpc/configs/44x/taishan_defconfig b/arch/powerpc/configs/44x/taishan_defconfig
+index 3ea5932ab852..8263b3b7d0a1 100644
+--- a/arch/powerpc/configs/44x/taishan_defconfig
++++ b/arch/powerpc/configs/44x/taishan_defconfig
+@@ -50,8 +50,7 @@ CONFIG_DEBUG_FS=y
+ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DETECT_HUNG_TASK=y
+ # CONFIG_DEBUG_BUGVERBOSE is not set
+ CONFIG_CRYPTO_CBC=y
+ CONFIG_CRYPTO_ECB=y
+-CONFIG_CRYPTO_PCBC=y
+ CONFIG_CRYPTO_MD5=y
+ CONFIG_CRYPTO_DES=y
+diff --git a/arch/powerpc/configs/52xx/cm5200_defconfig b/arch/powerpc/configs/52xx/cm5200_defconfig
+index 2412a6bf7ee6..ddf1280fe295 100644
+--- a/arch/powerpc/configs/52xx/cm5200_defconfig
++++ b/arch/powerpc/configs/52xx/cm5200_defconfig
+@@ -73,6 +73,5 @@ CONFIG_NLS_CODEPAGE_437=y
+ CONFIG_NLS_ISO8859_1=y
+ CONFIG_PRINTK_TIME=y
+ CONFIG_DETECT_HUNG_TASK=y
+ # CONFIG_DEBUG_BUGVERBOSE is not set
+ CONFIG_CRYPTO_ECB=y
+-CONFIG_CRYPTO_PCBC=y
+diff --git a/arch/powerpc/configs/52xx/motionpro_defconfig b/arch/powerpc/configs/52xx/motionpro_defconfig
+index 6186ead1e105..d7165dbed529 100644
+--- a/arch/powerpc/configs/52xx/motionpro_defconfig
++++ b/arch/powerpc/configs/52xx/motionpro_defconfig
+@@ -86,6 +86,5 @@ CONFIG_NLS_ISO8859_1=y
+ CONFIG_PRINTK_TIME=y
+ CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
+ CONFIG_DETECT_HUNG_TASK=y
+ # CONFIG_DEBUG_BUGVERBOSE is not set
+ CONFIG_CRYPTO_ECB=y
+-CONFIG_CRYPTO_PCBC=y
+diff --git a/arch/powerpc/configs/52xx/tqm5200_defconfig b/arch/powerpc/configs/52xx/tqm5200_defconfig
+index 688f703d8e22..1d2d68b0f137 100644
+--- a/arch/powerpc/configs/52xx/tqm5200_defconfig
++++ b/arch/powerpc/configs/52xx/tqm5200_defconfig
+@@ -87,6 +87,5 @@ CONFIG_NLS_ISO8859_1=y
+ CONFIG_PRINTK_TIME=y
+ CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
+ CONFIG_DETECT_HUNG_TASK=y
+ # CONFIG_DEBUG_BUGVERBOSE is not set
+ CONFIG_CRYPTO_ECB=y
+-CONFIG_CRYPTO_PCBC=y
+diff --git a/arch/powerpc/configs/83xx/asp8347_defconfig b/arch/powerpc/configs/83xx/asp8347_defconfig
+index 10192410b33c..07e00c8d6023 100644
+--- a/arch/powerpc/configs/83xx/asp8347_defconfig
++++ b/arch/powerpc/configs/83xx/asp8347_defconfig
+@@ -66,6 +66,5 @@ CONFIG_TMPFS=y
+ CONFIG_JFFS2_FS=y
+ CONFIG_NFS_FS=y
+ CONFIG_NFS_V4=y
+ CONFIG_ROOT_NFS=y
+ CONFIG_CRYPTO_ECB=m
+-CONFIG_CRYPTO_PCBC=m
+diff --git a/arch/powerpc/configs/83xx/mpc8313_rdb_defconfig b/arch/powerpc/configs/83xx/mpc8313_rdb_defconfig
+index 16a42e2267fb..140dd429278e 100644
+--- a/arch/powerpc/configs/83xx/mpc8313_rdb_defconfig
++++ b/arch/powerpc/configs/83xx/mpc8313_rdb_defconfig
+@@ -81,6 +81,5 @@ CONFIG_TMPFS=y
+ CONFIG_JFFS2_FS=y
+ CONFIG_NFS_FS=y
+ CONFIG_NFS_V4=y
+ CONFIG_ROOT_NFS=y
+ CONFIG_DETECT_HUNG_TASK=y
+-CONFIG_CRYPTO_PCBC=m
+diff --git a/arch/powerpc/configs/83xx/mpc8315_rdb_defconfig b/arch/powerpc/configs/83xx/mpc8315_rdb_defconfig
+index 80d40ae668eb..7616771f072c 100644
+--- a/arch/powerpc/configs/83xx/mpc8315_rdb_defconfig
++++ b/arch/powerpc/configs/83xx/mpc8315_rdb_defconfig
+@@ -80,6 +80,5 @@ CONFIG_TMPFS=y
+ CONFIG_JFFS2_FS=y
+ CONFIG_NFS_FS=y
+ CONFIG_NFS_V4=y
+ CONFIG_ROOT_NFS=y
+ CONFIG_DETECT_HUNG_TASK=y
+-CONFIG_CRYPTO_PCBC=m
+diff --git a/arch/powerpc/configs/83xx/mpc832x_rdb_defconfig b/arch/powerpc/configs/83xx/mpc832x_rdb_defconfig
+index b99caba8724a..e670d16e6fd7 100644
+--- a/arch/powerpc/configs/83xx/mpc832x_rdb_defconfig
++++ b/arch/powerpc/configs/83xx/mpc832x_rdb_defconfig
+@@ -72,6 +72,5 @@ CONFIG_ROOT_NFS=y
+ CONFIG_NLS_CODEPAGE_437=y
+ CONFIG_NLS_CODEPAGE_932=y
+ CONFIG_NLS_ISO8859_8=y
+ CONFIG_NLS_ISO8859_1=y
+ CONFIG_CRYPTO_ECB=m
+-CONFIG_CRYPTO_PCBC=m
+diff --git a/arch/powerpc/configs/83xx/mpc834x_itx_defconfig b/arch/powerpc/configs/83xx/mpc834x_itx_defconfig
+index 11163052fdba..fcf91b52af2d 100644
+--- a/arch/powerpc/configs/83xx/mpc834x_itx_defconfig
++++ b/arch/powerpc/configs/83xx/mpc834x_itx_defconfig
+@@ -78,6 +78,5 @@ CONFIG_VFAT_FS=y
+ CONFIG_PROC_KCORE=y
+ CONFIG_TMPFS=y
+ CONFIG_NFS_FS=y
+ CONFIG_NFS_V4=y
+ CONFIG_ROOT_NFS=y
+-CONFIG_CRYPTO_PCBC=m
+diff --git a/arch/powerpc/configs/83xx/mpc834x_itxgp_defconfig b/arch/powerpc/configs/83xx/mpc834x_itxgp_defconfig
+index 312d39e4242c..7d060b6f49ca 100644
+--- a/arch/powerpc/configs/83xx/mpc834x_itxgp_defconfig
++++ b/arch/powerpc/configs/83xx/mpc834x_itxgp_defconfig
+@@ -70,6 +70,5 @@ CONFIG_VFAT_FS=y
+ CONFIG_PROC_KCORE=y
+ CONFIG_TMPFS=y
+ CONFIG_NFS_FS=y
+ CONFIG_NFS_V4=y
+ CONFIG_ROOT_NFS=y
+-CONFIG_CRYPTO_PCBC=m
+diff --git a/arch/powerpc/configs/83xx/mpc837x_rdb_defconfig b/arch/powerpc/configs/83xx/mpc837x_rdb_defconfig
+index ac27f99faab8..4567345aea9a 100644
+--- a/arch/powerpc/configs/83xx/mpc837x_rdb_defconfig
++++ b/arch/powerpc/configs/83xx/mpc837x_rdb_defconfig
+@@ -74,6 +74,5 @@ CONFIG_PROC_KCORE=y
+ CONFIG_TMPFS=y
+ CONFIG_NFS_FS=y
+ CONFIG_NFS_V4=y
+ CONFIG_ROOT_NFS=y
+ CONFIG_CRYPTO_ECB=m
+-CONFIG_CRYPTO_PCBC=m
+diff --git a/arch/powerpc/configs/amigaone_defconfig b/arch/powerpc/configs/amigaone_defconfig
+index 69ef3dc31c4b..45d693f70371 100644
+--- a/arch/powerpc/configs/amigaone_defconfig
++++ b/arch/powerpc/configs/amigaone_defconfig
+@@ -110,7 +110,6 @@ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DEBUG_KERNEL=y
+ CONFIG_DEBUG_MUTEXES=y
+ CONFIG_XMON=y
+ CONFIG_XMON_DEFAULT=y
+ CONFIG_CRYPTO_CBC=m
+-CONFIG_CRYPTO_PCBC=m
+ # CONFIG_CRYPTO_HW is not set
+diff --git a/arch/powerpc/configs/cell_defconfig b/arch/powerpc/configs/cell_defconfig
+index 7a31b52e92e1..b5ed8945ec33 100644
+--- a/arch/powerpc/configs/cell_defconfig
++++ b/arch/powerpc/configs/cell_defconfig
+@@ -195,7 +195,6 @@ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DEBUG_KERNEL=y
+ CONFIG_DEBUG_MUTEXES=y
+ CONFIG_XMON=y
+ CONFIG_XMON_DEFAULT=y
+ CONFIG_CRYPTO_ECB=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_HMAC=y
+diff --git a/arch/powerpc/configs/chrp32_defconfig b/arch/powerpc/configs/chrp32_defconfig
+index b799c95480ae..71032b82f8a8 100644
+--- a/arch/powerpc/configs/chrp32_defconfig
++++ b/arch/powerpc/configs/chrp32_defconfig
+@@ -114,7 +114,6 @@ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DEBUG_KERNEL=y
+ CONFIG_DEBUG_MUTEXES=y
+ CONFIG_XMON=y
+ CONFIG_XMON_DEFAULT=y
+ CONFIG_CRYPTO_CBC=m
+-CONFIG_CRYPTO_PCBC=m
+ # CONFIG_CRYPTO_HW is not set
+diff --git a/arch/powerpc/configs/ep8248e_defconfig b/arch/powerpc/configs/ep8248e_defconfig
+index 0d8d3f41f194..c3167726706d 100644
+--- a/arch/powerpc/configs/ep8248e_defconfig
++++ b/arch/powerpc/configs/ep8248e_defconfig
+@@ -62,9 +62,8 @@ CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
+ CONFIG_MAGIC_SYSRQ=y
+ # CONFIG_SCHED_DEBUG is not set
+ CONFIG_BDI_SWITCH=y
+ CONFIG_CRYPTO_CBC=y
+ CONFIG_CRYPTO_ECB=y
+-CONFIG_CRYPTO_PCBC=y
+ CONFIG_CRYPTO_MD5=y
+ CONFIG_CRYPTO_DES=y
+ # CONFIG_CRYPTO_HW is not set
+diff --git a/arch/powerpc/configs/fsl-emb-nonhw.config b/arch/powerpc/configs/fsl-emb-nonhw.config
+index 2f81bc2d819e..391c99117ee0 100644
+--- a/arch/powerpc/configs/fsl-emb-nonhw.config
++++ b/arch/powerpc/configs/fsl-emb-nonhw.config
+@@ -17,11 +17,10 @@ CONFIG_CGROUPS=y
+ # CONFIG_CORE_DUMP_DEFAULT_ELF_HEADERS is not set
+ CONFIG_CPUSETS=y
+ CONFIG_CRAMFS=y
+ CONFIG_CRYPTO_MD4=y
+ CONFIG_CRYPTO_NULL=y
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_SHA256=y
+ CONFIG_CRYPTO_SHA512=y
+ CONFIG_DEBUG_FS=y
+ CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
+ CONFIG_DEBUG_KERNEL=y
+diff --git a/arch/powerpc/configs/g5_defconfig b/arch/powerpc/configs/g5_defconfig
+index 04bbb37f5978..50182b357973 100644
+--- a/arch/powerpc/configs/g5_defconfig
++++ b/arch/powerpc/configs/g5_defconfig
+@@ -232,11 +232,10 @@ CONFIG_NLS_UTF8=y
+ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DEBUG_KERNEL=y
+ CONFIG_DEBUG_MUTEXES=y
+ CONFIG_BOOTX_TEXT=y
+ CONFIG_CRYPTO_BENCHMARK=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_HMAC=y
+ CONFIG_CRYPTO_SHA512=m
  CONFIG_CRYPTO_WP512=m
  CONFIG_CRYPTO_ANUBIS=m
  CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST6=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
- CONFIG_CRYPTO_SEED=m
+diff --git a/arch/powerpc/configs/linkstation_defconfig b/arch/powerpc/configs/linkstation_defconfig
+index 31f84d08b6ef..e1c1b00b0c81 100644
+--- a/arch/powerpc/configs/linkstation_defconfig
++++ b/arch/powerpc/configs/linkstation_defconfig
+@@ -126,11 +126,10 @@ CONFIG_NLS_CODEPAGE_932=m
+ CONFIG_NLS_ISO8859_1=m
+ CONFIG_NLS_UTF8=m
+ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DEBUG_KERNEL=y
+ CONFIG_DETECT_HUNG_TASK=y
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_SHA1=m
+ CONFIG_CRYPTO_BLOWFISH=m
  CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_TEA=m
  CONFIG_CRYPTO_TWOFISH=m
-diff --git a/arch/s390/configs/debug_defconfig b/arch/s390/configs/debug_defconfig
-index c28f9a7d0bd8..b69f626b7cce 100644
---- a/arch/s390/configs/debug_defconfig
-+++ b/arch/s390/configs/debug_defconfig
-@@ -774,11 +774,10 @@ CONFIG_CRYPTO_ANUBIS=m
- CONFIG_CRYPTO_ARIA=m
+ CONFIG_CRYPTO_DEFLATE=m
+diff --git a/arch/powerpc/configs/mgcoge_defconfig b/arch/powerpc/configs/mgcoge_defconfig
+index f65001e7877f..a31e1184f912 100644
+--- a/arch/powerpc/configs/mgcoge_defconfig
++++ b/arch/powerpc/configs/mgcoge_defconfig
+@@ -76,7 +76,6 @@ CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
+ CONFIG_DEBUG_FS=y
+ CONFIG_MAGIC_SYSRQ=y
+ # CONFIG_SCHED_DEBUG is not set
+ CONFIG_BDI_SWITCH=y
+ CONFIG_CRYPTO_ECB=y
+-CONFIG_CRYPTO_PCBC=y
+ # CONFIG_CRYPTO_HW is not set
+diff --git a/arch/powerpc/configs/mpc83xx_defconfig b/arch/powerpc/configs/mpc83xx_defconfig
+index a815d9e5e3e8..d603d8e93958 100644
+--- a/arch/powerpc/configs/mpc83xx_defconfig
++++ b/arch/powerpc/configs/mpc83xx_defconfig
+@@ -96,8 +96,7 @@ CONFIG_PROC_KCORE=y
+ CONFIG_TMPFS=y
+ CONFIG_NFS_FS=y
+ CONFIG_NFS_V4=y
+ CONFIG_ROOT_NFS=y
+ CONFIG_CRYPTO_ECB=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_SHA512=y
+ CONFIG_CRYPTO_DEV_TALITOS=y
+diff --git a/arch/powerpc/configs/mvme5100_defconfig b/arch/powerpc/configs/mvme5100_defconfig
+index c82754c14e15..3918768d7cd2 100644
+--- a/arch/powerpc/configs/mvme5100_defconfig
++++ b/arch/powerpc/configs/mvme5100_defconfig
+@@ -111,11 +111,10 @@ CONFIG_XZ_DEC=y
+ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DEBUG_KERNEL=y
+ CONFIG_DETECT_HUNG_TASK=y
+ CONFIG_DEFAULT_HUNG_TASK_TIMEOUT=20
+ CONFIG_CRYPTO_CBC=y
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_MD5=y
+ CONFIG_CRYPTO_SHA1=m
  CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
- CONFIG_CRYPTO_DES=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
- CONFIG_CRYPTO_SEED=m
+ CONFIG_CRYPTO_DES=y
  CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
-diff --git a/arch/s390/configs/defconfig b/arch/s390/configs/defconfig
-index d89c988f33ea..9ea820882fdf 100644
---- a/arch/s390/configs/defconfig
-+++ b/arch/s390/configs/defconfig
-@@ -758,11 +758,10 @@ CONFIG_CRYPTO_ANUBIS=m
- CONFIG_CRYPTO_ARIA=m
- CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAST5=m
- CONFIG_CRYPTO_CAST6=m
- CONFIG_CRYPTO_DES=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
- CONFIG_CRYPTO_SEED=m
- CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_SM4_GENERIC=m
- CONFIG_CRYPTO_TEA=m
-diff --git a/arch/sh/configs/sh2007_defconfig b/arch/sh/configs/sh2007_defconfig
-index 5d9080499485..4a67f9c85806 100644
---- a/arch/sh/configs/sh2007_defconfig
-+++ b/arch/sh/configs/sh2007_defconfig
-@@ -180,11 +180,10 @@ CONFIG_CRYPTO_ANUBIS=y
- CONFIG_CRYPTO_ARC4=y
- CONFIG_CRYPTO_BLOWFISH=y
- CONFIG_CRYPTO_CAMELLIA=y
- CONFIG_CRYPTO_CAST5=y
- CONFIG_CRYPTO_CAST6=y
--CONFIG_CRYPTO_FCRYPT=y
- CONFIG_CRYPTO_KHAZAD=y
- CONFIG_CRYPTO_SEED=y
- CONFIG_CRYPTO_SERPENT=y
- CONFIG_CRYPTO_TEA=y
- CONFIG_CRYPTO_TWOFISH=y
-diff --git a/arch/sparc/configs/sparc64_defconfig b/arch/sparc/configs/sparc64_defconfig
-index 632081a262ba..c6009ebc806d 100644
---- a/arch/sparc/configs/sparc64_defconfig
-+++ b/arch/sparc/configs/sparc64_defconfig
-@@ -218,11 +218,10 @@ CONFIG_CRYPTO_AES=m
+diff --git a/arch/powerpc/configs/pmac32_defconfig b/arch/powerpc/configs/pmac32_defconfig
+index ae45f70b29f0..728c8cabfb83 100644
+--- a/arch/powerpc/configs/pmac32_defconfig
++++ b/arch/powerpc/configs/pmac32_defconfig
+@@ -279,11 +279,10 @@ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DEBUG_KERNEL=y
+ CONFIG_DETECT_HUNG_TASK=y
+ CONFIG_XMON=y
+ CONFIG_XMON_DEFAULT=y
+ CONFIG_BOOTX_TEXT=y
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_MD4=m
+ CONFIG_CRYPTO_SHA512=m
+ CONFIG_CRYPTO_WP512=m
  CONFIG_CRYPTO_ANUBIS=m
  CONFIG_CRYPTO_BLOWFISH=m
- CONFIG_CRYPTO_CAMELLIA=m
- CONFIG_CRYPTO_CAST5=m
+diff --git a/arch/powerpc/configs/powernv_defconfig b/arch/powerpc/configs/powernv_defconfig
+index cc9802420237..400ebb1d6da5 100644
+--- a/arch/powerpc/configs/powernv_defconfig
++++ b/arch/powerpc/configs/powernv_defconfig
+@@ -313,11 +313,10 @@ CONFIG_PPC_EMULATED_STATS=y
+ CONFIG_CODE_PATCHING_SELFTEST=y
+ CONFIG_FTR_FIXUP_SELFTEST=y
+ CONFIG_MSI_BITMAP_SELFTEST=y
+ CONFIG_XMON=y
+ CONFIG_CRYPTO_BENCHMARK=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_HMAC=y
+ CONFIG_CRYPTO_SHA256=y
+ CONFIG_CRYPTO_WP512=m
+ CONFIG_CRYPTO_ANUBIS=m
+ CONFIG_CRYPTO_BLOWFISH=m
+diff --git a/arch/powerpc/configs/ppc44x_defconfig b/arch/powerpc/configs/ppc44x_defconfig
+index 41c930f74ed4..0dc537f6aff3 100644
+--- a/arch/powerpc/configs/ppc44x_defconfig
++++ b/arch/powerpc/configs/ppc44x_defconfig
+@@ -91,8 +91,7 @@ CONFIG_ROOT_NFS=y
+ CONFIG_NLS_CODEPAGE_437=m
+ CONFIG_NLS_ISO8859_1=m
+ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DETECT_HUNG_TASK=y
+ CONFIG_CRYPTO_ECB=y
+-CONFIG_CRYPTO_PCBC=y
+ # CONFIG_CRYPTO_HW is not set
+ CONFIG_VIRTUALIZATION=y
+diff --git a/arch/powerpc/configs/ppc64_defconfig b/arch/powerpc/configs/ppc64_defconfig
+index 3bf518e3a573..56acedf390e7 100644
+--- a/arch/powerpc/configs/ppc64_defconfig
++++ b/arch/powerpc/configs/ppc64_defconfig
+@@ -377,11 +377,10 @@ CONFIG_IMA_APPRAISE_MODSIG=y
+ CONFIG_CRYPTO_BENCHMARK=m
+ CONFIG_CRYPTO_BLOWFISH=m
  CONFIG_CRYPTO_CAST6=m
--CONFIG_CRYPTO_FCRYPT=m
- CONFIG_CRYPTO_KHAZAD=m
- CONFIG_CRYPTO_SEED=m
  CONFIG_CRYPTO_SERPENT=m
- CONFIG_CRYPTO_TEA=m
  CONFIG_CRYPTO_TWOFISH=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_SHA256=y
+ CONFIG_CRYPTO_WP512=m
+ CONFIG_CRYPTO_LZO=m
+ CONFIG_CRYPTO_AES_GCM_P10=m
+ CONFIG_CRYPTO_DEV_NX=y
+diff --git a/arch/powerpc/configs/ppc64e_defconfig b/arch/powerpc/configs/ppc64e_defconfig
+index 0fd49f67331f..efd9b76c90bd 100644
+--- a/arch/powerpc/configs/ppc64e_defconfig
++++ b/arch/powerpc/configs/ppc64e_defconfig
+@@ -219,11 +219,10 @@ CONFIG_FTR_FIXUP_SELFTEST=y
+ CONFIG_MSI_BITMAP_SELFTEST=y
+ CONFIG_XMON=y
+ CONFIG_CRYPTO_BENCHMARK=m
+ CONFIG_CRYPTO_CCM=m
+ CONFIG_CRYPTO_GCM=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_HMAC=y
+ CONFIG_CRYPTO_SHA512=m
+ CONFIG_CRYPTO_WP512=m
+ CONFIG_CRYPTO_ANUBIS=m
+ CONFIG_CRYPTO_BLOWFISH=m
+diff --git a/arch/powerpc/configs/ppc6xx_defconfig b/arch/powerpc/configs/ppc6xx_defconfig
+index 7258ad903774..65f310bf7bc5 100644
+--- a/arch/powerpc/configs/ppc6xx_defconfig
++++ b/arch/powerpc/configs/ppc6xx_defconfig
+@@ -1049,11 +1049,10 @@ CONFIG_SECURITY_SELINUX=y
+ CONFIG_SECURITY_SELINUX_BOOTPARAM=y
+ CONFIG_SECURITY_SELINUX_DISABLE=y
+ CONFIG_CRYPTO_BENCHMARK=m
+ CONFIG_CRYPTO_CTS=m
+ CONFIG_CRYPTO_LRW=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_XTS=m
+ CONFIG_CRYPTO_HMAC=y
+ CONFIG_CRYPTO_XCBC=m
+ CONFIG_CRYPTO_RMD160=m
+ CONFIG_CRYPTO_SHA1=y
+diff --git a/arch/powerpc/configs/ps3_defconfig b/arch/powerpc/configs/ps3_defconfig
+index 7cfae0b7b2f3..22cfe85b7db7 100644
+--- a/arch/powerpc/configs/ps3_defconfig
++++ b/arch/powerpc/configs/ps3_defconfig
+@@ -143,11 +143,10 @@ CONFIG_NFS_SWAP=y
+ CONFIG_ROOT_NFS=y
+ CONFIG_CIFS=m
+ CONFIG_NLS=y
+ CONFIG_NLS_CODEPAGE_437=y
+ CONFIG_NLS_ISO8859_1=y
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_LZO=m
+ CONFIG_PRINTK_TIME=y
+ CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
+ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DEBUG_MEMORY_INIT=y
+diff --git a/arch/s390/configs/debug_defconfig b/arch/s390/configs/debug_defconfig
+index b69f626b7cce..12511bdb9579 100644
+--- a/arch/s390/configs/debug_defconfig
++++ b/arch/s390/configs/debug_defconfig
+@@ -784,11 +784,10 @@ CONFIG_CRYPTO_TEA=m
+ CONFIG_CRYPTO_TWOFISH=m
+ CONFIG_CRYPTO_ADIANTUM=m
+ CONFIG_CRYPTO_ARC4=m
+ CONFIG_CRYPTO_HCTR2=m
+ CONFIG_CRYPTO_LRW=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_AEGIS128=m
+ CONFIG_CRYPTO_GCM=y
+ CONFIG_CRYPTO_SEQIV=y
+ CONFIG_CRYPTO_MD4=m
+ CONFIG_CRYPTO_MD5=y
+diff --git a/arch/s390/configs/defconfig b/arch/s390/configs/defconfig
+index 9ea820882fdf..9d44dd968ecc 100644
+--- a/arch/s390/configs/defconfig
++++ b/arch/s390/configs/defconfig
+@@ -768,11 +768,10 @@ CONFIG_CRYPTO_TEA=m
+ CONFIG_CRYPTO_TWOFISH=m
+ CONFIG_CRYPTO_ADIANTUM=m
+ CONFIG_CRYPTO_ARC4=m
+ CONFIG_CRYPTO_HCTR2=m
+ CONFIG_CRYPTO_LRW=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_AEGIS128=m
+ CONFIG_CRYPTO_GCM=y
+ CONFIG_CRYPTO_SEQIV=y
+ CONFIG_CRYPTO_MD4=m
+ CONFIG_CRYPTO_MD5=y
+diff --git a/arch/sh/configs/hp6xx_defconfig b/arch/sh/configs/hp6xx_defconfig
+index b6116a203a27..bdc476dcfa43 100644
+--- a/arch/sh/configs/hp6xx_defconfig
++++ b/arch/sh/configs/hp6xx_defconfig
+@@ -49,8 +49,7 @@ CONFIG_VFAT_FS=y
+ CONFIG_PROC_KCORE=y
+ CONFIG_NLS_CODEPAGE_850=y
+ CONFIG_CRYPTO=y
+ CONFIG_CRYPTO_CBC=y
+ CONFIG_CRYPTO_ECB=y
+-CONFIG_CRYPTO_PCBC=y
+ CONFIG_CRYPTO_MD5=y
+ # CONFIG_CRYPTO_HW is not set
+diff --git a/arch/sh/configs/r7780mp_defconfig b/arch/sh/configs/r7780mp_defconfig
+index af954f75444b..7b46f62fe7db 100644
+--- a/arch/sh/configs/r7780mp_defconfig
++++ b/arch/sh/configs/r7780mp_defconfig
+@@ -99,7 +99,6 @@ CONFIG_DEBUG_FS=y
+ CONFIG_DEBUG_KERNEL=y
+ CONFIG_DETECT_HUNG_TASK=y
+ # CONFIG_DEBUG_PREEMPT is not set
+ CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
+ CONFIG_CRYPTO_ECB=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_HMAC=y
+diff --git a/arch/sh/configs/r7785rp_defconfig b/arch/sh/configs/r7785rp_defconfig
+index a66dd6d74cf1..6d2461a85f19 100644
+--- a/arch/sh/configs/r7785rp_defconfig
++++ b/arch/sh/configs/r7785rp_defconfig
+@@ -97,7 +97,6 @@ CONFIG_DEBUG_LOCKING_API_SELFTESTS=y
+ CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
+ CONFIG_SH_STANDARD_BIOS=y
+ CONFIG_DEBUG_STACK_USAGE=y
+ CONFIG_4KSTACKS=y
+ CONFIG_CRYPTO_ECB=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_HMAC=y
+diff --git a/arch/sh/configs/se7712_defconfig b/arch/sh/configs/se7712_defconfig
+index dee1d88f6a7d..8d8a311c60b1 100644
+--- a/arch/sh/configs/se7712_defconfig
++++ b/arch/sh/configs/se7712_defconfig
+@@ -91,6 +91,5 @@ CONFIG_NFS_FS=y
+ CONFIG_ROOT_NFS=y
+ CONFIG_DEBUG_KERNEL=y
+ CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
+ CONFIG_FRAME_POINTER=y
+ CONFIG_CRYPTO_ECB=m
+-CONFIG_CRYPTO_PCBC=m
+diff --git a/arch/sh/configs/sh2007_defconfig b/arch/sh/configs/sh2007_defconfig
+index 4a67f9c85806..3060bcd9cc5f 100644
+--- a/arch/sh/configs/sh2007_defconfig
++++ b/arch/sh/configs/sh2007_defconfig
+@@ -163,11 +163,10 @@ CONFIG_FRAME_POINTER=y
+ CONFIG_SH_STANDARD_BIOS=y
+ CONFIG_CRYPTO_NULL=y
+ CONFIG_CRYPTO_AUTHENC=y
+ CONFIG_CRYPTO_ECB=y
+ CONFIG_CRYPTO_LRW=y
+-CONFIG_CRYPTO_PCBC=y
+ CONFIG_CRYPTO_XTS=y
+ CONFIG_CRYPTO_HMAC=y
+ CONFIG_CRYPTO_XCBC=y
+ CONFIG_CRYPTO_MD4=y
+ CONFIG_CRYPTO_SHA1=y
+diff --git a/arch/sparc/configs/sparc32_defconfig b/arch/sparc/configs/sparc32_defconfig
+index 48d834acafb4..d5579217fb4c 100644
+--- a/arch/sparc/configs/sparc32_defconfig
++++ b/arch/sparc/configs/sparc32_defconfig
+@@ -78,11 +78,10 @@ CONFIG_DETECT_HUNG_TASK=y
+ # CONFIG_SCHED_DEBUG is not set
+ CONFIG_KGDB=y
+ CONFIG_KGDB_TESTS=y
+ CONFIG_CRYPTO_NULL=m
+ CONFIG_CRYPTO_ECB=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_MD4=y
+ CONFIG_CRYPTO_SHA256=m
+ CONFIG_CRYPTO_SHA512=m
+ CONFIG_CRYPTO_AES=m
+ CONFIG_CRYPTO_ARC4=m
+diff --git a/arch/sparc/configs/sparc64_defconfig b/arch/sparc/configs/sparc64_defconfig
+index c6009ebc806d..3763108c3bd4 100644
+--- a/arch/sparc/configs/sparc64_defconfig
++++ b/arch/sparc/configs/sparc64_defconfig
+@@ -204,11 +204,10 @@ CONFIG_BLK_DEV_IO_TRACE=y
+ CONFIG_UPROBE_EVENTS=y
+ CONFIG_KEYS=y
+ CONFIG_CRYPTO_NULL=m
+ CONFIG_CRYPTO_BENCHMARK=m
+ CONFIG_CRYPTO_LRW=m
+-CONFIG_CRYPTO_PCBC=m
+ CONFIG_CRYPTO_XTS=m
+ CONFIG_CRYPTO_XCBC=y
+ CONFIG_CRYPTO_MD4=y
+ CONFIG_CRYPTO_SHA256=m
+ CONFIG_CRYPTO_SHA512=m
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 103d1f58cb7c..0727cd5877da 100644
+index 0727cd5877da..f8d5801a4d5e 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -462,19 +462,10 @@ config CRYPTO_DES
- 	help
- 	  DES (Data Encryption Standard)(FIPS 46-2, ISO/IEC 18033-3) and
- 	  Triple DES EDE (Encrypt/Decrypt/Encrypt) (FIPS 46-3, ISO/IEC 18033-3)
- 	  cipher algorithms
+@@ -701,19 +701,10 @@ config CRYPTO_LRW
+ 	  The first 128, 192 or 256 bits in the key are used for AES and the
+ 	  rest is used to tie each cipher block to its logical position.
  
--config CRYPTO_FCRYPT
--	tristate "FCrypt"
--	select CRYPTO_ALGAPI
+ 	  See https://people.csail.mit.edu/rivest/pubs/LRW02.pdf
+ 
+-config CRYPTO_PCBC
+-	tristate "PCBC (Propagating Cipher Block Chaining)"
 -	select CRYPTO_SKCIPHER
+-	select CRYPTO_MANAGER
 -	help
--	  FCrypt algorithm used by RxRPC
+-	  PCBC (Propagating Cipher Block Chaining) mode
 -
--	  See https://ota.polyonymo.us/fcrypt-paper.txt
+-	  This block cipher mode is required for RxRPC.
 -
- config CRYPTO_KHAZAD
- 	tristate "Khazad"
- 	depends on CRYPTO_USER_API_ENABLE_OBSOLETE
- 	select CRYPTO_ALGAPI
+ config CRYPTO_XCTR
+ 	tristate
+ 	select CRYPTO_SKCIPHER
+ 	select CRYPTO_MANAGER
  	help
 diff --git a/crypto/Makefile b/crypto/Makefile
-index 162242593c7c..1827f84192e6 100644
+index 1827f84192e6..9081ed10ce61 100644
 --- a/crypto/Makefile
 +++ b/crypto/Makefile
-@@ -124,11 +124,10 @@ endif
- CFLAGS_aegis128-neon-inner.o += -isystem $(shell $(CC) -print-file-name=include)
- 
- obj-$(CONFIG_CRYPTO_PCRYPT) += pcrypt.o
- obj-$(CONFIG_CRYPTO_CRYPTD) += cryptd.o
- obj-$(CONFIG_CRYPTO_DES) += des_generic.o
--obj-$(CONFIG_CRYPTO_FCRYPT) += fcrypt.o
- obj-$(CONFIG_CRYPTO_BLOWFISH) += blowfish_generic.o
- obj-$(CONFIG_CRYPTO_BLOWFISH_COMMON) += blowfish_common.o
- obj-$(CONFIG_CRYPTO_TWOFISH) += twofish_generic.o
- obj-$(CONFIG_CRYPTO_TWOFISH_COMMON) += twofish_common.o
- obj-$(CONFIG_CRYPTO_SERPENT) += serpent_generic.o
-diff --git a/crypto/fcrypt.c b/crypto/fcrypt.c
+@@ -87,11 +87,10 @@ obj-$(CONFIG_CRYPTO_STREEBOG) += streebog_generic.o
+ obj-$(CONFIG_CRYPTO_WP512) += wp512.o
+ CFLAGS_wp512.o := $(call cc-option,-fno-schedule-insns)  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79149
+ obj-$(CONFIG_CRYPTO_BLAKE2B) += blake2b.o
+ obj-$(CONFIG_CRYPTO_ECB) += ecb.o
+ obj-$(CONFIG_CRYPTO_CBC) += cbc.o
+-obj-$(CONFIG_CRYPTO_PCBC) += pcbc.o
+ obj-$(CONFIG_CRYPTO_CTS) += cts.o
+ obj-$(CONFIG_CRYPTO_LRW) += lrw.o
+ obj-$(CONFIG_CRYPTO_XTS) += xts.o
+ obj-$(CONFIG_CRYPTO_CTR) += ctr.o
+ obj-$(CONFIG_CRYPTO_XCTR) += xctr.o
+diff --git a/crypto/pcbc.c b/crypto/pcbc.c
 deleted file mode 100644
-index 80036835cec5..000000000000
---- a/crypto/fcrypt.c
+index d092717ea4fc..000000000000
+--- a/crypto/pcbc.c
 +++ /dev/null
-@@ -1,420 +0,0 @@
--/* FCrypt encryption algorithm
+@@ -1,195 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-or-later
+-/*
+- * PCBC: Propagating Cipher Block Chaining mode
 - *
 - * Copyright (C) 2006 Red Hat, Inc. All Rights Reserved.
 - * Written by David Howells (dhowells@redhat.com)
 - *
-- * This program is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU General Public License
-- * as published by the Free Software Foundation; either version
-- * 2 of the License, or (at your option) any later version.
-- *
-- * Based on code:
-- *
-- * Copyright (c) 1995 - 2000 Kungliga Tekniska Högskolan
-- * (Royal Institute of Technology, Stockholm, Sweden).
-- * All rights reserved.
-- *
-- * Redistribution and use in source and binary forms, with or without
-- * modification, are permitted provided that the following conditions
-- * are met:
-- *
-- * 1. Redistributions of source code must retain the above copyright
-- *    notice, this list of conditions and the following disclaimer.
-- *
-- * 2. Redistributions in binary form must reproduce the above copyright
-- *    notice, this list of conditions and the following disclaimer in the
-- *    documentation and/or other materials provided with the distribution.
-- *
-- * 3. Neither the name of the Institute nor the names of its contributors
-- *    may be used to endorse or promote products derived from this software
-- *    without specific prior written permission.
-- *
-- * THIS SOFTWARE IS PROVIDED BY THE INSTITUTE AND CONTRIBUTORS ``AS IS'' AND
-- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-- * ARE DISCLAIMED.  IN NO EVENT SHALL THE INSTITUTE OR CONTRIBUTORS BE LIABLE
-- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-- * SUCH DAMAGE.
+- * Derived from cbc.c
+- * - Copyright (c) 2006 Herbert Xu <herbert@gondor.apana.org.au>
 - */
 -
--#include <asm/byteorder.h>
 -#include <crypto/algapi.h>
--#include <linux/bitops.h>
+-#include <crypto/internal/cipher.h>
+-#include <crypto/internal/skcipher.h>
+-#include <linux/err.h>
 -#include <linux/init.h>
+-#include <linux/kernel.h>
 -#include <linux/module.h>
 -
--#define ROUNDS 16
--
--struct fcrypt_ctx {
--	__be32 sched[ROUNDS];
--};
--
--/* Rotate right two 32 bit numbers as a 56 bit number */
--#define ror56(hi, lo, n)					\
--do {								\
--	u32 t = lo & ((1 << n) - 1);				\
--	lo = (lo >> n) | ((hi & ((1 << n) - 1)) << (32 - n));	\
--	hi = (hi >> n) | (t << (24-n));				\
--} while (0)
--
--/* Rotate right one 64 bit number as a 56 bit number */
--#define ror56_64(k, n) (k = (k >> n) | ((k & ((1 << n) - 1)) << (56 - n)))
--
--/*
-- * Sboxes for Feistel network derived from
-- * /afs/transarc.com/public/afsps/afs.rel31b.export-src/rxkad/sboxes.h
-- */
--#undef Z
--#define Z(x) cpu_to_be32(x << 3)
--static const __be32 sbox0[256] = {
--	Z(0xea), Z(0x7f), Z(0xb2), Z(0x64), Z(0x9d), Z(0xb0), Z(0xd9), Z(0x11),
--	Z(0xcd), Z(0x86), Z(0x86), Z(0x91), Z(0x0a), Z(0xb2), Z(0x93), Z(0x06),
--	Z(0x0e), Z(0x06), Z(0xd2), Z(0x65), Z(0x73), Z(0xc5), Z(0x28), Z(0x60),
--	Z(0xf2), Z(0x20), Z(0xb5), Z(0x38), Z(0x7e), Z(0xda), Z(0x9f), Z(0xe3),
--	Z(0xd2), Z(0xcf), Z(0xc4), Z(0x3c), Z(0x61), Z(0xff), Z(0x4a), Z(0x4a),
--	Z(0x35), Z(0xac), Z(0xaa), Z(0x5f), Z(0x2b), Z(0xbb), Z(0xbc), Z(0x53),
--	Z(0x4e), Z(0x9d), Z(0x78), Z(0xa3), Z(0xdc), Z(0x09), Z(0x32), Z(0x10),
--	Z(0xc6), Z(0x6f), Z(0x66), Z(0xd6), Z(0xab), Z(0xa9), Z(0xaf), Z(0xfd),
--	Z(0x3b), Z(0x95), Z(0xe8), Z(0x34), Z(0x9a), Z(0x81), Z(0x72), Z(0x80),
--	Z(0x9c), Z(0xf3), Z(0xec), Z(0xda), Z(0x9f), Z(0x26), Z(0x76), Z(0x15),
--	Z(0x3e), Z(0x55), Z(0x4d), Z(0xde), Z(0x84), Z(0xee), Z(0xad), Z(0xc7),
--	Z(0xf1), Z(0x6b), Z(0x3d), Z(0xd3), Z(0x04), Z(0x49), Z(0xaa), Z(0x24),
--	Z(0x0b), Z(0x8a), Z(0x83), Z(0xba), Z(0xfa), Z(0x85), Z(0xa0), Z(0xa8),
--	Z(0xb1), Z(0xd4), Z(0x01), Z(0xd8), Z(0x70), Z(0x64), Z(0xf0), Z(0x51),
--	Z(0xd2), Z(0xc3), Z(0xa7), Z(0x75), Z(0x8c), Z(0xa5), Z(0x64), Z(0xef),
--	Z(0x10), Z(0x4e), Z(0xb7), Z(0xc6), Z(0x61), Z(0x03), Z(0xeb), Z(0x44),
--	Z(0x3d), Z(0xe5), Z(0xb3), Z(0x5b), Z(0xae), Z(0xd5), Z(0xad), Z(0x1d),
--	Z(0xfa), Z(0x5a), Z(0x1e), Z(0x33), Z(0xab), Z(0x93), Z(0xa2), Z(0xb7),
--	Z(0xe7), Z(0xa8), Z(0x45), Z(0xa4), Z(0xcd), Z(0x29), Z(0x63), Z(0x44),
--	Z(0xb6), Z(0x69), Z(0x7e), Z(0x2e), Z(0x62), Z(0x03), Z(0xc8), Z(0xe0),
--	Z(0x17), Z(0xbb), Z(0xc7), Z(0xf3), Z(0x3f), Z(0x36), Z(0xba), Z(0x71),
--	Z(0x8e), Z(0x97), Z(0x65), Z(0x60), Z(0x69), Z(0xb6), Z(0xf6), Z(0xe6),
--	Z(0x6e), Z(0xe0), Z(0x81), Z(0x59), Z(0xe8), Z(0xaf), Z(0xdd), Z(0x95),
--	Z(0x22), Z(0x99), Z(0xfd), Z(0x63), Z(0x19), Z(0x74), Z(0x61), Z(0xb1),
--	Z(0xb6), Z(0x5b), Z(0xae), Z(0x54), Z(0xb3), Z(0x70), Z(0xff), Z(0xc6),
--	Z(0x3b), Z(0x3e), Z(0xc1), Z(0xd7), Z(0xe1), Z(0x0e), Z(0x76), Z(0xe5),
--	Z(0x36), Z(0x4f), Z(0x59), Z(0xc7), Z(0x08), Z(0x6e), Z(0x82), Z(0xa6),
--	Z(0x93), Z(0xc4), Z(0xaa), Z(0x26), Z(0x49), Z(0xe0), Z(0x21), Z(0x64),
--	Z(0x07), Z(0x9f), Z(0x64), Z(0x81), Z(0x9c), Z(0xbf), Z(0xf9), Z(0xd1),
--	Z(0x43), Z(0xf8), Z(0xb6), Z(0xb9), Z(0xf1), Z(0x24), Z(0x75), Z(0x03),
--	Z(0xe4), Z(0xb0), Z(0x99), Z(0x46), Z(0x3d), Z(0xf5), Z(0xd1), Z(0x39),
--	Z(0x72), Z(0x12), Z(0xf6), Z(0xba), Z(0x0c), Z(0x0d), Z(0x42), Z(0x2e)
--};
--
--#undef Z
--#define Z(x) cpu_to_be32(((x & 0x1f) << 27) | (x >> 5))
--static const __be32 sbox1[256] = {
--	Z(0x77), Z(0x14), Z(0xa6), Z(0xfe), Z(0xb2), Z(0x5e), Z(0x8c), Z(0x3e),
--	Z(0x67), Z(0x6c), Z(0xa1), Z(0x0d), Z(0xc2), Z(0xa2), Z(0xc1), Z(0x85),
--	Z(0x6c), Z(0x7b), Z(0x67), Z(0xc6), Z(0x23), Z(0xe3), Z(0xf2), Z(0x89),
--	Z(0x50), Z(0x9c), Z(0x03), Z(0xb7), Z(0x73), Z(0xe6), Z(0xe1), Z(0x39),
--	Z(0x31), Z(0x2c), Z(0x27), Z(0x9f), Z(0xa5), Z(0x69), Z(0x44), Z(0xd6),
--	Z(0x23), Z(0x83), Z(0x98), Z(0x7d), Z(0x3c), Z(0xb4), Z(0x2d), Z(0x99),
--	Z(0x1c), Z(0x1f), Z(0x8c), Z(0x20), Z(0x03), Z(0x7c), Z(0x5f), Z(0xad),
--	Z(0xf4), Z(0xfa), Z(0x95), Z(0xca), Z(0x76), Z(0x44), Z(0xcd), Z(0xb6),
--	Z(0xb8), Z(0xa1), Z(0xa1), Z(0xbe), Z(0x9e), Z(0x54), Z(0x8f), Z(0x0b),
--	Z(0x16), Z(0x74), Z(0x31), Z(0x8a), Z(0x23), Z(0x17), Z(0x04), Z(0xfa),
--	Z(0x79), Z(0x84), Z(0xb1), Z(0xf5), Z(0x13), Z(0xab), Z(0xb5), Z(0x2e),
--	Z(0xaa), Z(0x0c), Z(0x60), Z(0x6b), Z(0x5b), Z(0xc4), Z(0x4b), Z(0xbc),
--	Z(0xe2), Z(0xaf), Z(0x45), Z(0x73), Z(0xfa), Z(0xc9), Z(0x49), Z(0xcd),
--	Z(0x00), Z(0x92), Z(0x7d), Z(0x97), Z(0x7a), Z(0x18), Z(0x60), Z(0x3d),
--	Z(0xcf), Z(0x5b), Z(0xde), Z(0xc6), Z(0xe2), Z(0xe6), Z(0xbb), Z(0x8b),
--	Z(0x06), Z(0xda), Z(0x08), Z(0x15), Z(0x1b), Z(0x88), Z(0x6a), Z(0x17),
--	Z(0x89), Z(0xd0), Z(0xa9), Z(0xc1), Z(0xc9), Z(0x70), Z(0x6b), Z(0xe5),
--	Z(0x43), Z(0xf4), Z(0x68), Z(0xc8), Z(0xd3), Z(0x84), Z(0x28), Z(0x0a),
--	Z(0x52), Z(0x66), Z(0xa3), Z(0xca), Z(0xf2), Z(0xe3), Z(0x7f), Z(0x7a),
--	Z(0x31), Z(0xf7), Z(0x88), Z(0x94), Z(0x5e), Z(0x9c), Z(0x63), Z(0xd5),
--	Z(0x24), Z(0x66), Z(0xfc), Z(0xb3), Z(0x57), Z(0x25), Z(0xbe), Z(0x89),
--	Z(0x44), Z(0xc4), Z(0xe0), Z(0x8f), Z(0x23), Z(0x3c), Z(0x12), Z(0x52),
--	Z(0xf5), Z(0x1e), Z(0xf4), Z(0xcb), Z(0x18), Z(0x33), Z(0x1f), Z(0xf8),
--	Z(0x69), Z(0x10), Z(0x9d), Z(0xd3), Z(0xf7), Z(0x28), Z(0xf8), Z(0x30),
--	Z(0x05), Z(0x5e), Z(0x32), Z(0xc0), Z(0xd5), Z(0x19), Z(0xbd), Z(0x45),
--	Z(0x8b), Z(0x5b), Z(0xfd), Z(0xbc), Z(0xe2), Z(0x5c), Z(0xa9), Z(0x96),
--	Z(0xef), Z(0x70), Z(0xcf), Z(0xc2), Z(0x2a), Z(0xb3), Z(0x61), Z(0xad),
--	Z(0x80), Z(0x48), Z(0x81), Z(0xb7), Z(0x1d), Z(0x43), Z(0xd9), Z(0xd7),
--	Z(0x45), Z(0xf0), Z(0xd8), Z(0x8a), Z(0x59), Z(0x7c), Z(0x57), Z(0xc1),
--	Z(0x79), Z(0xc7), Z(0x34), Z(0xd6), Z(0x43), Z(0xdf), Z(0xe4), Z(0x78),
--	Z(0x16), Z(0x06), Z(0xda), Z(0x92), Z(0x76), Z(0x51), Z(0xe1), Z(0xd4),
--	Z(0x70), Z(0x03), Z(0xe0), Z(0x2f), Z(0x96), Z(0x91), Z(0x82), Z(0x80)
--};
--
--#undef Z
--#define Z(x) cpu_to_be32(x << 11)
--static const __be32 sbox2[256] = {
--	Z(0xf0), Z(0x37), Z(0x24), Z(0x53), Z(0x2a), Z(0x03), Z(0x83), Z(0x86),
--	Z(0xd1), Z(0xec), Z(0x50), Z(0xf0), Z(0x42), Z(0x78), Z(0x2f), Z(0x6d),
--	Z(0xbf), Z(0x80), Z(0x87), Z(0x27), Z(0x95), Z(0xe2), Z(0xc5), Z(0x5d),
--	Z(0xf9), Z(0x6f), Z(0xdb), Z(0xb4), Z(0x65), Z(0x6e), Z(0xe7), Z(0x24),
--	Z(0xc8), Z(0x1a), Z(0xbb), Z(0x49), Z(0xb5), Z(0x0a), Z(0x7d), Z(0xb9),
--	Z(0xe8), Z(0xdc), Z(0xb7), Z(0xd9), Z(0x45), Z(0x20), Z(0x1b), Z(0xce),
--	Z(0x59), Z(0x9d), Z(0x6b), Z(0xbd), Z(0x0e), Z(0x8f), Z(0xa3), Z(0xa9),
--	Z(0xbc), Z(0x74), Z(0xa6), Z(0xf6), Z(0x7f), Z(0x5f), Z(0xb1), Z(0x68),
--	Z(0x84), Z(0xbc), Z(0xa9), Z(0xfd), Z(0x55), Z(0x50), Z(0xe9), Z(0xb6),
--	Z(0x13), Z(0x5e), Z(0x07), Z(0xb8), Z(0x95), Z(0x02), Z(0xc0), Z(0xd0),
--	Z(0x6a), Z(0x1a), Z(0x85), Z(0xbd), Z(0xb6), Z(0xfd), Z(0xfe), Z(0x17),
--	Z(0x3f), Z(0x09), Z(0xa3), Z(0x8d), Z(0xfb), Z(0xed), Z(0xda), Z(0x1d),
--	Z(0x6d), Z(0x1c), Z(0x6c), Z(0x01), Z(0x5a), Z(0xe5), Z(0x71), Z(0x3e),
--	Z(0x8b), Z(0x6b), Z(0xbe), Z(0x29), Z(0xeb), Z(0x12), Z(0x19), Z(0x34),
--	Z(0xcd), Z(0xb3), Z(0xbd), Z(0x35), Z(0xea), Z(0x4b), Z(0xd5), Z(0xae),
--	Z(0x2a), Z(0x79), Z(0x5a), Z(0xa5), Z(0x32), Z(0x12), Z(0x7b), Z(0xdc),
--	Z(0x2c), Z(0xd0), Z(0x22), Z(0x4b), Z(0xb1), Z(0x85), Z(0x59), Z(0x80),
--	Z(0xc0), Z(0x30), Z(0x9f), Z(0x73), Z(0xd3), Z(0x14), Z(0x48), Z(0x40),
--	Z(0x07), Z(0x2d), Z(0x8f), Z(0x80), Z(0x0f), Z(0xce), Z(0x0b), Z(0x5e),
--	Z(0xb7), Z(0x5e), Z(0xac), Z(0x24), Z(0x94), Z(0x4a), Z(0x18), Z(0x15),
--	Z(0x05), Z(0xe8), Z(0x02), Z(0x77), Z(0xa9), Z(0xc7), Z(0x40), Z(0x45),
--	Z(0x89), Z(0xd1), Z(0xea), Z(0xde), Z(0x0c), Z(0x79), Z(0x2a), Z(0x99),
--	Z(0x6c), Z(0x3e), Z(0x95), Z(0xdd), Z(0x8c), Z(0x7d), Z(0xad), Z(0x6f),
--	Z(0xdc), Z(0xff), Z(0xfd), Z(0x62), Z(0x47), Z(0xb3), Z(0x21), Z(0x8a),
--	Z(0xec), Z(0x8e), Z(0x19), Z(0x18), Z(0xb4), Z(0x6e), Z(0x3d), Z(0xfd),
--	Z(0x74), Z(0x54), Z(0x1e), Z(0x04), Z(0x85), Z(0xd8), Z(0xbc), Z(0x1f),
--	Z(0x56), Z(0xe7), Z(0x3a), Z(0x56), Z(0x67), Z(0xd6), Z(0xc8), Z(0xa5),
--	Z(0xf3), Z(0x8e), Z(0xde), Z(0xae), Z(0x37), Z(0x49), Z(0xb7), Z(0xfa),
--	Z(0xc8), Z(0xf4), Z(0x1f), Z(0xe0), Z(0x2a), Z(0x9b), Z(0x15), Z(0xd1),
--	Z(0x34), Z(0x0e), Z(0xb5), Z(0xe0), Z(0x44), Z(0x78), Z(0x84), Z(0x59),
--	Z(0x56), Z(0x68), Z(0x77), Z(0xa5), Z(0x14), Z(0x06), Z(0xf5), Z(0x2f),
--	Z(0x8c), Z(0x8a), Z(0x73), Z(0x80), Z(0x76), Z(0xb4), Z(0x10), Z(0x86)
--};
--
--#undef Z
--#define Z(x) cpu_to_be32(x << 19)
--static const __be32 sbox3[256] = {
--	Z(0xa9), Z(0x2a), Z(0x48), Z(0x51), Z(0x84), Z(0x7e), Z(0x49), Z(0xe2),
--	Z(0xb5), Z(0xb7), Z(0x42), Z(0x33), Z(0x7d), Z(0x5d), Z(0xa6), Z(0x12),
--	Z(0x44), Z(0x48), Z(0x6d), Z(0x28), Z(0xaa), Z(0x20), Z(0x6d), Z(0x57),
--	Z(0xd6), Z(0x6b), Z(0x5d), Z(0x72), Z(0xf0), Z(0x92), Z(0x5a), Z(0x1b),
--	Z(0x53), Z(0x80), Z(0x24), Z(0x70), Z(0x9a), Z(0xcc), Z(0xa7), Z(0x66),
--	Z(0xa1), Z(0x01), Z(0xa5), Z(0x41), Z(0x97), Z(0x41), Z(0x31), Z(0x82),
--	Z(0xf1), Z(0x14), Z(0xcf), Z(0x53), Z(0x0d), Z(0xa0), Z(0x10), Z(0xcc),
--	Z(0x2a), Z(0x7d), Z(0xd2), Z(0xbf), Z(0x4b), Z(0x1a), Z(0xdb), Z(0x16),
--	Z(0x47), Z(0xf6), Z(0x51), Z(0x36), Z(0xed), Z(0xf3), Z(0xb9), Z(0x1a),
--	Z(0xa7), Z(0xdf), Z(0x29), Z(0x43), Z(0x01), Z(0x54), Z(0x70), Z(0xa4),
--	Z(0xbf), Z(0xd4), Z(0x0b), Z(0x53), Z(0x44), Z(0x60), Z(0x9e), Z(0x23),
--	Z(0xa1), Z(0x18), Z(0x68), Z(0x4f), Z(0xf0), Z(0x2f), Z(0x82), Z(0xc2),
--	Z(0x2a), Z(0x41), Z(0xb2), Z(0x42), Z(0x0c), Z(0xed), Z(0x0c), Z(0x1d),
--	Z(0x13), Z(0x3a), Z(0x3c), Z(0x6e), Z(0x35), Z(0xdc), Z(0x60), Z(0x65),
--	Z(0x85), Z(0xe9), Z(0x64), Z(0x02), Z(0x9a), Z(0x3f), Z(0x9f), Z(0x87),
--	Z(0x96), Z(0xdf), Z(0xbe), Z(0xf2), Z(0xcb), Z(0xe5), Z(0x6c), Z(0xd4),
--	Z(0x5a), Z(0x83), Z(0xbf), Z(0x92), Z(0x1b), Z(0x94), Z(0x00), Z(0x42),
--	Z(0xcf), Z(0x4b), Z(0x00), Z(0x75), Z(0xba), Z(0x8f), Z(0x76), Z(0x5f),
--	Z(0x5d), Z(0x3a), Z(0x4d), Z(0x09), Z(0x12), Z(0x08), Z(0x38), Z(0x95),
--	Z(0x17), Z(0xe4), Z(0x01), Z(0x1d), Z(0x4c), Z(0xa9), Z(0xcc), Z(0x85),
--	Z(0x82), Z(0x4c), Z(0x9d), Z(0x2f), Z(0x3b), Z(0x66), Z(0xa1), Z(0x34),
--	Z(0x10), Z(0xcd), Z(0x59), Z(0x89), Z(0xa5), Z(0x31), Z(0xcf), Z(0x05),
--	Z(0xc8), Z(0x84), Z(0xfa), Z(0xc7), Z(0xba), Z(0x4e), Z(0x8b), Z(0x1a),
--	Z(0x19), Z(0xf1), Z(0xa1), Z(0x3b), Z(0x18), Z(0x12), Z(0x17), Z(0xb0),
--	Z(0x98), Z(0x8d), Z(0x0b), Z(0x23), Z(0xc3), Z(0x3a), Z(0x2d), Z(0x20),
--	Z(0xdf), Z(0x13), Z(0xa0), Z(0xa8), Z(0x4c), Z(0x0d), Z(0x6c), Z(0x2f),
--	Z(0x47), Z(0x13), Z(0x13), Z(0x52), Z(0x1f), Z(0x2d), Z(0xf5), Z(0x79),
--	Z(0x3d), Z(0xa2), Z(0x54), Z(0xbd), Z(0x69), Z(0xc8), Z(0x6b), Z(0xf3),
--	Z(0x05), Z(0x28), Z(0xf1), Z(0x16), Z(0x46), Z(0x40), Z(0xb0), Z(0x11),
--	Z(0xd3), Z(0xb7), Z(0x95), Z(0x49), Z(0xcf), Z(0xc3), Z(0x1d), Z(0x8f),
--	Z(0xd8), Z(0xe1), Z(0x73), Z(0xdb), Z(0xad), Z(0xc8), Z(0xc9), Z(0xa9),
--	Z(0xa1), Z(0xc2), Z(0xc5), Z(0xe3), Z(0xba), Z(0xfc), Z(0x0e), Z(0x25)
--};
--
--/*
-- * This is a 16 round Feistel network with permutation F_ENCRYPT
-- */
--#define F_ENCRYPT(R, L, sched)						\
--do {									\
--	union lc4 { __be32 l; u8 c[4]; } u;				\
--	u.l = sched ^ R;						\
--	L ^= sbox0[u.c[0]] ^ sbox1[u.c[1]] ^ sbox2[u.c[2]] ^ sbox3[u.c[3]]; \
--} while (0)
--
--/*
-- * encryptor
-- */
--static void fcrypt_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+-static int crypto_pcbc_encrypt_segment(struct skcipher_request *req,
+-				       struct skcipher_walk *walk,
+-				       struct crypto_cipher *tfm)
 -{
--	const struct fcrypt_ctx *ctx = crypto_tfm_ctx(tfm);
--	struct {
--		__be32 l, r;
--	} X;
+-	int bsize = crypto_cipher_blocksize(tfm);
+-	const u8 *src = walk->src.virt.addr;
+-	unsigned int nbytes = walk->nbytes;
+-	u8 *dst = walk->dst.virt.addr;
+-	u8 * const iv = walk->iv;
 -
--	memcpy(&X, src, sizeof(X));
+-	do {
+-		crypto_xor(iv, src, bsize);
+-		crypto_cipher_encrypt_one(tfm, dst, iv);
+-		crypto_xor_cpy(iv, dst, src, bsize);
 -
--	F_ENCRYPT(X.r, X.l, ctx->sched[0x0]);
--	F_ENCRYPT(X.l, X.r, ctx->sched[0x1]);
--	F_ENCRYPT(X.r, X.l, ctx->sched[0x2]);
--	F_ENCRYPT(X.l, X.r, ctx->sched[0x3]);
--	F_ENCRYPT(X.r, X.l, ctx->sched[0x4]);
--	F_ENCRYPT(X.l, X.r, ctx->sched[0x5]);
--	F_ENCRYPT(X.r, X.l, ctx->sched[0x6]);
--	F_ENCRYPT(X.l, X.r, ctx->sched[0x7]);
--	F_ENCRYPT(X.r, X.l, ctx->sched[0x8]);
--	F_ENCRYPT(X.l, X.r, ctx->sched[0x9]);
--	F_ENCRYPT(X.r, X.l, ctx->sched[0xa]);
--	F_ENCRYPT(X.l, X.r, ctx->sched[0xb]);
--	F_ENCRYPT(X.r, X.l, ctx->sched[0xc]);
--	F_ENCRYPT(X.l, X.r, ctx->sched[0xd]);
--	F_ENCRYPT(X.r, X.l, ctx->sched[0xe]);
--	F_ENCRYPT(X.l, X.r, ctx->sched[0xf]);
+-		src += bsize;
+-		dst += bsize;
+-	} while ((nbytes -= bsize) >= bsize);
 -
--	memcpy(dst, &X, sizeof(X));
+-	return nbytes;
 -}
 -
--/*
-- * decryptor
-- */
--static void fcrypt_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+-static int crypto_pcbc_encrypt_inplace(struct skcipher_request *req,
+-				       struct skcipher_walk *walk,
+-				       struct crypto_cipher *tfm)
 -{
--	const struct fcrypt_ctx *ctx = crypto_tfm_ctx(tfm);
--	struct {
--		__be32 l, r;
--	} X;
+-	int bsize = crypto_cipher_blocksize(tfm);
+-	unsigned int nbytes = walk->nbytes;
+-	u8 *dst = walk->dst.virt.addr;
+-	u8 * const iv = walk->iv;
+-	u8 tmpbuf[MAX_CIPHER_BLOCKSIZE];
 -
--	memcpy(&X, src, sizeof(X));
+-	do {
+-		memcpy(tmpbuf, dst, bsize);
+-		crypto_xor(iv, dst, bsize);
+-		crypto_cipher_encrypt_one(tfm, dst, iv);
+-		crypto_xor_cpy(iv, tmpbuf, dst, bsize);
 -
--	F_ENCRYPT(X.l, X.r, ctx->sched[0xf]);
--	F_ENCRYPT(X.r, X.l, ctx->sched[0xe]);
--	F_ENCRYPT(X.l, X.r, ctx->sched[0xd]);
--	F_ENCRYPT(X.r, X.l, ctx->sched[0xc]);
--	F_ENCRYPT(X.l, X.r, ctx->sched[0xb]);
--	F_ENCRYPT(X.r, X.l, ctx->sched[0xa]);
--	F_ENCRYPT(X.l, X.r, ctx->sched[0x9]);
--	F_ENCRYPT(X.r, X.l, ctx->sched[0x8]);
--	F_ENCRYPT(X.l, X.r, ctx->sched[0x7]);
--	F_ENCRYPT(X.r, X.l, ctx->sched[0x6]);
--	F_ENCRYPT(X.l, X.r, ctx->sched[0x5]);
--	F_ENCRYPT(X.r, X.l, ctx->sched[0x4]);
--	F_ENCRYPT(X.l, X.r, ctx->sched[0x3]);
--	F_ENCRYPT(X.r, X.l, ctx->sched[0x2]);
--	F_ENCRYPT(X.l, X.r, ctx->sched[0x1]);
--	F_ENCRYPT(X.r, X.l, ctx->sched[0x0]);
+-		dst += bsize;
+-	} while ((nbytes -= bsize) >= bsize);
 -
--	memcpy(dst, &X, sizeof(X));
+-	return nbytes;
 -}
 -
--/*
-- * Generate a key schedule from key, the least significant bit in each key byte
-- * is parity and shall be ignored. This leaves 56 significant bits in the key
-- * to scatter over the 16 key schedules. For each schedule extract the low
-- * order 32 bits and use as schedule, then rotate right by 11 bits.
-- */
--static int fcrypt_setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int keylen)
+-static int crypto_pcbc_encrypt(struct skcipher_request *req)
 -{
--	struct fcrypt_ctx *ctx = crypto_tfm_ctx(tfm);
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	struct crypto_cipher *cipher = skcipher_cipher_simple(tfm);
+-	struct skcipher_walk walk;
+-	unsigned int nbytes;
+-	int err;
 -
--#if BITS_PER_LONG == 64  /* the 64-bit version can also be used for 32-bit
--			  * kernels - it seems to be faster but the code is
--			  * larger */
+-	err = skcipher_walk_virt(&walk, req, false);
 -
--	u64 k;	/* k holds all 56 non-parity bits */
--
--	/* discard the parity bits */
--	k = (*key++) >> 1;
--	k <<= 7;
--	k |= (*key++) >> 1;
--	k <<= 7;
--	k |= (*key++) >> 1;
--	k <<= 7;
--	k |= (*key++) >> 1;
--	k <<= 7;
--	k |= (*key++) >> 1;
--	k <<= 7;
--	k |= (*key++) >> 1;
--	k <<= 7;
--	k |= (*key++) >> 1;
--	k <<= 7;
--	k |= (*key) >> 1;
--
--	/* Use lower 32 bits for schedule, rotate by 11 each round (16 times) */
--	ctx->sched[0x0] = cpu_to_be32(k); ror56_64(k, 11);
--	ctx->sched[0x1] = cpu_to_be32(k); ror56_64(k, 11);
--	ctx->sched[0x2] = cpu_to_be32(k); ror56_64(k, 11);
--	ctx->sched[0x3] = cpu_to_be32(k); ror56_64(k, 11);
--	ctx->sched[0x4] = cpu_to_be32(k); ror56_64(k, 11);
--	ctx->sched[0x5] = cpu_to_be32(k); ror56_64(k, 11);
--	ctx->sched[0x6] = cpu_to_be32(k); ror56_64(k, 11);
--	ctx->sched[0x7] = cpu_to_be32(k); ror56_64(k, 11);
--	ctx->sched[0x8] = cpu_to_be32(k); ror56_64(k, 11);
--	ctx->sched[0x9] = cpu_to_be32(k); ror56_64(k, 11);
--	ctx->sched[0xa] = cpu_to_be32(k); ror56_64(k, 11);
--	ctx->sched[0xb] = cpu_to_be32(k); ror56_64(k, 11);
--	ctx->sched[0xc] = cpu_to_be32(k); ror56_64(k, 11);
--	ctx->sched[0xd] = cpu_to_be32(k); ror56_64(k, 11);
--	ctx->sched[0xe] = cpu_to_be32(k); ror56_64(k, 11);
--	ctx->sched[0xf] = cpu_to_be32(k);
--
--	return 0;
--#else
--	u32 hi, lo;		/* hi is upper 24 bits and lo lower 32, total 56 */
--
--	/* discard the parity bits */
--	lo = (*key++) >> 1;
--	lo <<= 7;
--	lo |= (*key++) >> 1;
--	lo <<= 7;
--	lo |= (*key++) >> 1;
--	lo <<= 7;
--	lo |= (*key++) >> 1;
--	hi = lo >> 4;
--	lo &= 0xf;
--	lo <<= 7;
--	lo |= (*key++) >> 1;
--	lo <<= 7;
--	lo |= (*key++) >> 1;
--	lo <<= 7;
--	lo |= (*key++) >> 1;
--	lo <<= 7;
--	lo |= (*key) >> 1;
--
--	/* Use lower 32 bits for schedule, rotate by 11 each round (16 times) */
--	ctx->sched[0x0] = cpu_to_be32(lo); ror56(hi, lo, 11);
--	ctx->sched[0x1] = cpu_to_be32(lo); ror56(hi, lo, 11);
--	ctx->sched[0x2] = cpu_to_be32(lo); ror56(hi, lo, 11);
--	ctx->sched[0x3] = cpu_to_be32(lo); ror56(hi, lo, 11);
--	ctx->sched[0x4] = cpu_to_be32(lo); ror56(hi, lo, 11);
--	ctx->sched[0x5] = cpu_to_be32(lo); ror56(hi, lo, 11);
--	ctx->sched[0x6] = cpu_to_be32(lo); ror56(hi, lo, 11);
--	ctx->sched[0x7] = cpu_to_be32(lo); ror56(hi, lo, 11);
--	ctx->sched[0x8] = cpu_to_be32(lo); ror56(hi, lo, 11);
--	ctx->sched[0x9] = cpu_to_be32(lo); ror56(hi, lo, 11);
--	ctx->sched[0xa] = cpu_to_be32(lo); ror56(hi, lo, 11);
--	ctx->sched[0xb] = cpu_to_be32(lo); ror56(hi, lo, 11);
--	ctx->sched[0xc] = cpu_to_be32(lo); ror56(hi, lo, 11);
--	ctx->sched[0xd] = cpu_to_be32(lo); ror56(hi, lo, 11);
--	ctx->sched[0xe] = cpu_to_be32(lo); ror56(hi, lo, 11);
--	ctx->sched[0xf] = cpu_to_be32(lo);
--	return 0;
--#endif
--}
--
--static struct crypto_alg fcrypt_alg = {
--	.cra_name		=	"fcrypt",
--	.cra_driver_name	=	"fcrypt-generic",
--	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
--	.cra_blocksize		=	8,
--	.cra_ctxsize		=	sizeof(struct fcrypt_ctx),
--	.cra_module		=	THIS_MODULE,
--	.cra_u			=	{ .cipher = {
--	.cia_min_keysize	=	8,
--	.cia_max_keysize	=	8,
--	.cia_setkey		=	fcrypt_setkey,
--	.cia_encrypt		=	fcrypt_encrypt,
--	.cia_decrypt		=	fcrypt_decrypt } }
--};
--
--static int __init fcrypt_mod_init(void)
--{
--	return crypto_register_alg(&fcrypt_alg);
--}
--
--static void __exit fcrypt_mod_fini(void)
--{
--	crypto_unregister_alg(&fcrypt_alg);
--}
--
--module_init(fcrypt_mod_init);
--module_exit(fcrypt_mod_fini);
--
--MODULE_LICENSE("Dual BSD/GPL");
--MODULE_DESCRIPTION("FCrypt Cipher Algorithm");
--MODULE_AUTHOR("David Howells <dhowells@redhat.com>");
--MODULE_ALIAS_CRYPTO("fcrypt");
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index e54517605f5f..61a2501bfe9b 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -1598,14 +1598,10 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
- 
- 	case 30:
- 		ret = min(ret, tcrypt_test("ecb(xeta)"));
- 		break;
- 
--	case 31:
--		ret = min(ret, tcrypt_test("pcbc(fcrypt)"));
--		break;
--
- 	case 32:
- 		ret = min(ret, tcrypt_test("ecb(camellia)"));
- 		ret = min(ret, tcrypt_test("cbc(camellia)"));
- 		ret = min(ret, tcrypt_test("ctr(camellia)"));
- 		ret = min(ret, tcrypt_test("lrw(camellia)"));
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 4d86efae65b2..f392d97fc469 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -4825,19 +4825,10 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		.alg = "ecb(des3_ede)",
- 		.test = alg_test_skcipher,
- 		.suite = {
- 			.cipher = __VECS(des3_ede_tv_template)
- 		}
--	}, {
--		.alg = "ecb(fcrypt)",
--		.test = alg_test_skcipher,
--		.suite = {
--			.cipher = {
--				.vecs = fcrypt_pcbc_tv_template,
--				.count = 1
--			}
--		}
- 	}, {
- 		.alg = "ecb(khazad)",
- 		.test = alg_test_skcipher,
- 		.suite = {
- 			.cipher = __VECS(khazad_tv_template)
-@@ -5252,16 +5243,10 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		.alg = "p1363(ecdsa-nist-p521)",
- 		.test = alg_test_null,
- 		.fips_allowed = 1,
- 	}, {
--		.alg = "pcbc(fcrypt)",
--		.test = alg_test_skcipher,
--		.suite = {
--			.cipher = __VECS(fcrypt_pcbc_tv_template)
--		}
--	}, {
- #if IS_ENABLED(CONFIG_CRYPTO_PHMAC_S390)
- 		.alg = "phmac(sha224)",
- 		.test = alg_test_hash,
- 		.fips_allowed = 1,
- 		.suite = {
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 9b4d7e11c9fd..3f0600bd9c05 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -25066,55 +25066,10 @@ static const struct cipher_testvec xeta_tv_template[] = {
- 			  "\xea\xa5\x6a\x85\xd1\xf4\xa8\xa5",
- 		.len	= 32,
- 	}
- };
- 
--/*
-- * FCrypt test vectors
-- */
--static const struct cipher_testvec fcrypt_pcbc_tv_template[] = {
--	{ /* http://www.openafs.org/pipermail/openafs-devel/2000-December/005320.html */
--		.key	= "\x00\x00\x00\x00\x00\x00\x00\x00",
--		.klen	= 8,
--		.iv	= "\x00\x00\x00\x00\x00\x00\x00\x00",
--		.ptext	= "\x00\x00\x00\x00\x00\x00\x00\x00",
--		.ctext	= "\x0E\x09\x00\xC7\x3E\xF7\xED\x41",
--		.len	= 8,
--	}, {
--		.key	= "\x11\x44\x77\xAA\xDD\x00\x33\x66",
--		.klen	= 8,
--		.iv	= "\x00\x00\x00\x00\x00\x00\x00\x00",
--		.ptext	= "\x12\x34\x56\x78\x9A\xBC\xDE\xF0",
--		.ctext	= "\xD8\xED\x78\x74\x77\xEC\x06\x80",
--		.len	= 8,
--	}, { /* From Arla */
--		.key	= "\xf0\xe1\xd2\xc3\xb4\xa5\x96\x87",
--		.klen	= 8,
--		.iv	= "\xfe\xdc\xba\x98\x76\x54\x32\x10",
--		.ptext	= "The quick brown fox jumps over the lazy dogs.\0\0",
--		.ctext	= "\x00\xf0\x0e\x11\x75\xe6\x23\x82"
--			  "\xee\xac\x98\x62\x44\x51\xe4\x84"
--			  "\xc3\x59\xd8\xaa\x64\x60\xae\xf7"
--			  "\xd2\xd9\x13\x79\x72\xa3\x45\x03"
--			  "\x23\xb5\x62\xd7\x0c\xf5\x27\xd1"
--			  "\xf8\x91\x3c\xac\x44\x22\x92\xef",
--		.len	= 48,
--	}, {
--		.key	= "\xfe\xdc\xba\x98\x76\x54\x32\x10",
--		.klen	= 8,
--		.iv	= "\xf0\xe1\xd2\xc3\xb4\xa5\x96\x87",
--		.ptext	= "The quick brown fox jumps over the lazy dogs.\0\0",
--		.ctext	= "\xca\x90\xf5\x9d\xcb\xd4\xd2\x3c"
--			  "\x01\x88\x7f\x3e\x31\x6e\x62\x9d"
--			  "\xd8\xe0\x57\xa3\x06\x3a\x42\x58"
--			  "\x2a\x28\xfe\x72\x52\x2f\xdd\xe0"
--			  "\x19\x89\x09\x1c\x2a\x8e\x8c\x94"
--			  "\xfc\xc7\x68\xe4\x88\xaa\xde\x0f",
--		.len	= 48,
+-	while (walk.nbytes) {
+-		if (walk.src.virt.addr == walk.dst.virt.addr)
+-			nbytes = crypto_pcbc_encrypt_inplace(req, &walk,
+-							     cipher);
+-		else
+-			nbytes = crypto_pcbc_encrypt_segment(req, &walk,
+-							     cipher);
+-		err = skcipher_walk_done(&walk, nbytes);
 -	}
+-
+-	return err;
+-}
+-
+-static int crypto_pcbc_decrypt_segment(struct skcipher_request *req,
+-				       struct skcipher_walk *walk,
+-				       struct crypto_cipher *tfm)
+-{
+-	int bsize = crypto_cipher_blocksize(tfm);
+-	const u8 *src = walk->src.virt.addr;
+-	unsigned int nbytes = walk->nbytes;
+-	u8 *dst = walk->dst.virt.addr;
+-	u8 * const iv = walk->iv;
+-
+-	do {
+-		crypto_cipher_decrypt_one(tfm, dst, src);
+-		crypto_xor(dst, iv, bsize);
+-		crypto_xor_cpy(iv, dst, src, bsize);
+-
+-		src += bsize;
+-		dst += bsize;
+-	} while ((nbytes -= bsize) >= bsize);
+-
+-	return nbytes;
+-}
+-
+-static int crypto_pcbc_decrypt_inplace(struct skcipher_request *req,
+-				       struct skcipher_walk *walk,
+-				       struct crypto_cipher *tfm)
+-{
+-	int bsize = crypto_cipher_blocksize(tfm);
+-	unsigned int nbytes = walk->nbytes;
+-	u8 *dst = walk->dst.virt.addr;
+-	u8 * const iv = walk->iv;
+-	u8 tmpbuf[MAX_CIPHER_BLOCKSIZE] __aligned(__alignof__(u32));
+-
+-	do {
+-		memcpy(tmpbuf, dst, bsize);
+-		crypto_cipher_decrypt_one(tfm, dst, dst);
+-		crypto_xor(dst, iv, bsize);
+-		crypto_xor_cpy(iv, dst, tmpbuf, bsize);
+-
+-		dst += bsize;
+-	} while ((nbytes -= bsize) >= bsize);
+-
+-	return nbytes;
+-}
+-
+-static int crypto_pcbc_decrypt(struct skcipher_request *req)
+-{
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	struct crypto_cipher *cipher = skcipher_cipher_simple(tfm);
+-	struct skcipher_walk walk;
+-	unsigned int nbytes;
+-	int err;
+-
+-	err = skcipher_walk_virt(&walk, req, false);
+-
+-	while (walk.nbytes) {
+-		if (walk.src.virt.addr == walk.dst.virt.addr)
+-			nbytes = crypto_pcbc_decrypt_inplace(req, &walk,
+-							     cipher);
+-		else
+-			nbytes = crypto_pcbc_decrypt_segment(req, &walk,
+-							     cipher);
+-		err = skcipher_walk_done(&walk, nbytes);
+-	}
+-
+-	return err;
+-}
+-
+-static int crypto_pcbc_create(struct crypto_template *tmpl, struct rtattr **tb)
+-{
+-	struct skcipher_instance *inst;
+-	int err;
+-
+-	inst = skcipher_alloc_instance_simple(tmpl, tb);
+-	if (IS_ERR(inst))
+-		return PTR_ERR(inst);
+-
+-	inst->alg.encrypt = crypto_pcbc_encrypt;
+-	inst->alg.decrypt = crypto_pcbc_decrypt;
+-
+-	err = skcipher_register_instance(tmpl, inst);
+-	if (err)
+-		inst->free(inst);
+-
+-	return err;
+-}
+-
+-static struct crypto_template crypto_pcbc_tmpl = {
+-	.name = "pcbc",
+-	.create = crypto_pcbc_create,
+-	.module = THIS_MODULE,
 -};
 -
- /*
-  * CAMELLIA test vectors.
-  */
- static const struct hash_testvec camellia_cmac128_tv_template[] = {
- 	{ /* From draft-kato-ipsec-camellia-cmac96and128-01 */
+-static int __init crypto_pcbc_module_init(void)
+-{
+-	return crypto_register_template(&crypto_pcbc_tmpl);
+-}
+-
+-static void __exit crypto_pcbc_module_exit(void)
+-{
+-	crypto_unregister_template(&crypto_pcbc_tmpl);
+-}
+-
+-module_init(crypto_pcbc_module_init);
+-module_exit(crypto_pcbc_module_exit);
+-
+-MODULE_LICENSE("GPL");
+-MODULE_DESCRIPTION("PCBC block cipher mode of operation");
+-MODULE_ALIAS_CRYPTO("pcbc");
+-MODULE_IMPORT_NS("CRYPTO_INTERNAL");
 -- 
 2.54.0
 
