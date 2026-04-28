@@ -1,128 +1,147 @@
-Received: from pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.246.77.92])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 459E53E4C99;
-	Tue, 28 Apr 2026 10:12:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.246.77.92
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84C073E0C5A
+	for <linux-crypto@vger.kernel.org>; Tue, 28 Apr 2026 10:15:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777371165; cv=none; b=B78CZ9YD21LxrLt1VsU9LEJyvm6U2UEdb+RAYoXTqtK8ibLIdlmjVzk0vg/bAyY/krEBjklGhl2oKZ59WeommXXr1Y39uNVZjdD8prvipxid6vK15eVKLVA6QD9AW7mHwQ9uBvBP3kKrGDmEudbndqd8/JhoTs3U/hfyOvPuFe4=
+	t=1777371340; cv=none; b=RrJ+cVqMAU9ystHAmoNo/jIopJWNqRijQY+VLBiCoWV5VONcBQuUfM8X4jM1iLQgmirvUbk1aLRAjdcnjfUBFM42ZI1qMtskAi0psZOTnEFv8rJi8ZGwrvwqPSFsNXrOjbVdGbMepT9CSULUOF+fIdhnrDFawqgPaDkbYQja9Ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777371165; c=relaxed/simple;
-	bh=x8MHJR14NUMf+Dk7BTmTdPYF2T9jgA2ZrdmxNB3DhBs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=McWsk1MydTgn8MiUu39dypYvnqvHDRi9srl8JX/L6itnRD/r0A9TIFrgV7B1O14yFWMNRmxsoobnjeR7g2ueFiKSKHl4tC37bse3aVkpXJWxmb1IwF2mTgUmxo60Bs1ifxGQRr4i00n0M7sGUW6vjsZGqOKFlCWf9Dh8KZflE1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=Opvm2aJk; arc=none smtp.client-ip=44.246.77.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1777371340; c=relaxed/simple;
+	bh=j1nd45mg4g3EXUjYAzfoYk5UWhyibVn267xhc4o9T+8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=spEqR29jpDCmKeGpWLFHev0wxcvg41WB9Q31RPzcftjylbF9Hl5xTG500ukb+3lSNJPncIkWF+x7N+tXWUObGXm72W8q0oprnWY4ZekZaSL7gODoJYdgWd6n3mQWxsTjqHNJSEg5BTFAYpBVWv3vvZzuOAb93DbvidIXKJs9Bqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pX/HKCiZ; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="Opvm2aJk"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1777371163; x=1808907163;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=XCQ9jRP1C08+hVdQUx1MjkUXFwnpA7R3hPnssiEViMo=;
-  b=Opvm2aJkRcdXwU+aAZ7Ha8F3JwbCcl910gZMS/heDihz+0B7LIjb9YJA
-   O8VcD1/F+vV9nWZPSm+aDL1l9F2i1/VmlvHbdiwv+WIwZs669bhuv1bCt
-   GIkcAdIZshwS4QoH6E/0E08VkKjD7ncrEJV/zRJMKXQEEk5D+T5CAWq21
-   zL+2NnukZcAEoHA+vSoQLJXEpJ/eiqOo0qlP6iFhyNfyoDcSzGM/gocJx
-   DWqPRKwt/x6AkUk2o3K6yO/ZPZcXPeWHBuYe4tjZoT4FoMz8tKRBUrmZb
-   6LINJrVUFz9jMniV6yW/UeNiR+prGGskQ7e505NCxwB5YhgpVC/6gf/Op
-   A==;
-X-CSE-ConnectionGUID: uMbKKZm5T32und9FXDDHmQ==
-X-CSE-MsgGUID: 203AID9vSdCGsrLKN5QOJw==
-X-IronPort-AV: E=Sophos;i="6.23,203,1770595200"; 
-   d="scan'208";a="18359833"
-Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
-  by internal-pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2026 10:12:39 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.111:13431]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.3.51:2525] with esmtp (Farcaster)
- id 336985de-8f78-4393-9f8b-4ae7c9de3770; Tue, 28 Apr 2026 10:12:39 +0000 (UTC)
-X-Farcaster-Flow-ID: 336985de-8f78-4393-9f8b-4ae7c9de3770
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Tue, 28 Apr 2026 10:12:38 +0000
-Received: from dev-dsk-lravich-1b-7405803b.eu-west-1.amazon.com (10.13.225.95)
- by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Tue, 28 Apr 2026 10:12:36 +0000
-From: Leonid Ravich <lravich@amazon.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-CC: "David S. Miller" <davem@davemloft.net>, Mike Snitzer
-	<snitzer@kernel.org>, Mikulas Patocka <mpatocka@redhat.com>, Alasdair Kergon
-	<agk@redhat.com>, Ard Biesheuvel <ardb@kernel.org>, Eric Biggers
-	<ebiggers@kernel.org>, Jens Axboe <axboe@kernel.dk>, Horia Geanta
-	<horia.geanta@nxp.com>, Gilad Ben-Yossef <gilad@benyossef.com>,
-	<linux-crypto@vger.kernel.org>, <dm-devel@lists.linux.dev>,
-	<linux-block@vger.kernel.org>
-Subject: Re: [RFC] crypto: skcipher multi-data-unit requests for dm-crypt
-Date: Tue, 28 Apr 2026 10:12:25 +0000
-Message-ID: <20260428101225.24316-1-lravich@amazon.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <ae9IUN0lOMkijDyw@gondor.apana.org.au>
-References: <ae9IUN0lOMkijDyw@gondor.apana.org.au>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pX/HKCiZ"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1777371326;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=xcy635DpKKoCVUN6XKiv2266UoWMk9NqTJ3mH2R1Q9g=;
+	b=pX/HKCiZvez7ezlxL+P09TKTq1bX23uyrhEP1GTt7e4+HtRS4vGbYfkhGlMpyn9E9YXADJ
+	ZlmVYW3uP/7V0fXEqXjzrMYSFt4JA4B8ERzYvVMVky2oY6jGEEwsokJ4oQTlD17TE6ydOP
+	dIisVQTOwHm6EoYRaL8f4SBby9PNP8c=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Thorsten Blum <thorsten.blum@linux.dev>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
+	Linus Walleij <linusw@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>
+Cc: stable@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] crypto: atmel-sha204a - drop hwrng quality reduction for ATSHA204A
+Date: Tue, 28 Apr 2026 12:14:32 +0200
+Message-ID: <20260428101430.514838-3-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3773; i=thorsten.blum@linux.dev; h=from:subject; bh=j1nd45mg4g3EXUjYAzfoYk5UWhyibVn267xhc4o9T+8=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDJkfOtpmOE333BNo027uvc7sukDnxj2T3k90Xs8dYXPtS 6HjpPVHO0pZGMS4GGTFFFkezPoxw7e0pnKTScROmDmsTCBDGLg4BWAi714y/I+3mbHCaWF3Q+oM h2bRG7OeuDiv83qfkHNfMsGxbNOL+MMM/11+ufdujdnVN7dsI+fXI0rRodPVbru/f2N7wO3a5st yt1gB
+X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D037UWB002.ant.amazon.com (10.13.138.121) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Apr 27, 2026, Herbert Xu wrote:
-> Yes I'm happy with this since it could also work for IPsec.
->
-> But before you invest too much energy in it it would be helpful
-> if you can get some proof-of-concept performance numbers so that
-> your effort is not wasted down the track.
+Commit 8006aff15516 ("crypto: atmel-sha204a - Set hwrng quality to
+lowest possible") reduced the hwrng quality to 1 based on a review by
+Bill Cox [1]. However, despite its title, the review only tested the
+ATSHA204, not the ATSHA204A.
 
-I ran a proof-of-concept benchmark on an XTS-AES-256 dm-crypt
-volume backed by a hardware crypto accelerator, comparing
-per-sector submission against multi-data-unit submission.
+In the same thread, Atmel engineer Landon Cox wrote "this behavior has
+been eliminated entirely"[2] in the ATSHA204A and "this problem does not
+affect the ATECC108 or the ATECC108A (or the ATSHA204A)"[3].
 
-Setup: single-core ARM64, fio 4K sequential writes, buffered IO
-with end_fsync (representative of filesystem-over-dm-crypt
-workloads). Two rounds per configuration, results were consistent
-(< 2% variance between rounds).
+According to the official ATSHA204A datasheet [4], the device contains a
+high-quality hardware RNG that combines its output with an internal seed
+value stored in EEPROM or SRAM to generate random numbers. The device
+also implements all security functions using SHA-256, and the driver
+uses the chip's Random command in seed-update mode.
 
-Throughput (averaged):
+Keep 'quality = 1' for ATSHA204, but drop the explicit hwrng quality
+reduction for ATSHA204A and fall back to the hwrng core default.
 
-  per-sector:       286 MB/s, 73K IOPS
-  multi-data-unit:  340 MB/s, 87K IOPS  (+19%)
+[1] https://www.metzdowd.com/pipermail/cryptography/2014-December/023858.html
+[2] https://www.metzdowd.com/pipermail/cryptography/2014-December/023852.html
+[3] https://www.metzdowd.com/pipermail/cryptography/2014-December/023886.html
+[4] https://ww1.microchip.com/downloads/en/DeviceDoc/ATSHA204A-Data-Sheet-40002025A.pdf
 
-CPU cycles (perf, 30s sample):
+Fixes: 8006aff15516 ("crypto: atmel-sha204a - Set hwrng quality to lowest possible")
+Cc: stable@vger.kernel.org
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+Changes in v2:
+- Drop the enum and dereference match data if needed as suggested by Ard
+- Keep the review comment
+- v1: https://lore.kernel.org/lkml/20260427124030.315590-3-thorsten.blum@linux.dev/
+---
+ drivers/crypto/atmel-sha204a.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
-  per-sector:       59.8 billion cycles
-  multi-data-unit:  36.0 billion cycles  (-40%)
-
-The baseline is partially CPU-bound. The perf profile shows
-dm-crypt and crypto API per-request overhead consuming roughly
-25% of CPU cycles in the per-sector case:
-
-  4.3%  crypto dispatch
-  4.1%  async completion callback
-  3.5%  completion collection
-  3.3%  kfree
-  2.9%  per-bio context lookup
-  2.8%  crypt_convert loop
-  1.6%  slab allocation
-  1.3%  mempool free
-
-With multi-data-unit, these functions drop out of the top
-profile. The bottleneck shifts to DMA mapping and page cache
-operations. CPU0 kernel time drops from 78% to 40%, with the
-freed cycles appearing as iowait.
-
-The 19% throughput gain (vs 40% CPU reduction) reflects that
-the system was partially IO-bound even in the baseline. The
-optimization removes the CPU bottleneck, allowing the system
-to fully saturate the IO path.
-
-I will prepare the patch series against mainline.
-
-Thanks,
-Leonid Ravich
+diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha204a.c
+index dbb39ed0cea1..a8c1b00b12f5 100644
+--- a/drivers/crypto/atmel-sha204a.c
++++ b/drivers/crypto/atmel-sha204a.c
+@@ -19,6 +19,12 @@
+ #include <linux/workqueue.h>
+ #include "atmel-i2c.h"
+ 
++/*
++ * According to review by Bill Cox [1], the ATSHA204 has very low entropy.
++ * [1] https://www.metzdowd.com/pipermail/cryptography/2014-December/023858.html
++ */
++static const unsigned short atsha204_quality = 1;
++
+ static void atmel_sha204a_rng_done(struct atmel_i2c_work_data *work_data,
+ 				   void *areq, int status)
+ {
+@@ -158,6 +164,7 @@ static const struct attribute_group atmel_sha204a_groups = {
+ static int atmel_sha204a_probe(struct i2c_client *client)
+ {
+ 	struct atmel_i2c_client_priv *i2c_priv;
++	const unsigned short *quality;
+ 	int ret;
+ 
+ 	ret = atmel_i2c_probe(client);
+@@ -171,11 +178,9 @@ static int atmel_sha204a_probe(struct i2c_client *client)
+ 	i2c_priv->hwrng.name = dev_name(&client->dev);
+ 	i2c_priv->hwrng.read = atmel_sha204a_rng_read;
+ 
+-	/*
+-	 * According to review by Bill Cox [1], this HWRNG has very low entropy.
+-	 * [1] https://www.metzdowd.com/pipermail/cryptography/2014-December/023858.html
+-	 */
+-	i2c_priv->hwrng.quality = 1;
++	quality = i2c_get_match_data(client);
++	if (quality)
++		i2c_priv->hwrng.quality = *quality;
+ 
+ 	ret = devm_hwrng_register(&client->dev, &i2c_priv->hwrng);
+ 	if (ret)
+@@ -203,14 +208,14 @@ static void atmel_sha204a_remove(struct i2c_client *client)
+ }
+ 
+ static const struct of_device_id atmel_sha204a_dt_ids[] __maybe_unused = {
+-	{ .compatible = "atmel,atsha204", },
++	{ .compatible = "atmel,atsha204", .data = &atsha204_quality },
+ 	{ .compatible = "atmel,atsha204a", },
+ 	{ /* sentinel */ }
+ };
+ MODULE_DEVICE_TABLE(of, atmel_sha204a_dt_ids);
+ 
+ static const struct i2c_device_id atmel_sha204a_id[] = {
+-	{ "atsha204" },
++	{ "atsha204", (kernel_ulong_t)&atsha204_quality },
+ 	{ "atsha204a" },
+ 	{ /* sentinel */ }
+ };
