@@ -1,221 +1,85 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE5493101A0
-	for <linux-crypto@vger.kernel.org>; Tue, 28 Apr 2026 05:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1559735898
+	for <linux-crypto@vger.kernel.org>; Tue, 28 Apr 2026 06:24:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777355950; cv=none; b=R6fABfhv1c5D3NTJBWP8IlajgyMAPklmh9tISCUqAcaRZdniAkI6wI3LOh63Y8Ro8coRlEfNpuZ+Sebw0E0wXqKLjZaqJZyzcfREXVF1OHyJuuAR9HzDhP7sZtloMjSa7gbdo53qvX/yQ8oAj0HJZsh/6urhMBP7Umkn0bSKll0=
+	t=1777357469; cv=none; b=aLP8mEE7u9lslbchoS5jX+/BkWNBfDh1/398zWuW2E2DHjTQrw+mGJdrT94wgtNmfW01szb6eG7oVXXp0lClms/aQFekcb4jVPm7Y86xDLrjHrdcgmgyQGFzsM+CLCjJqOcIJnWluthbUok55oM7EwiiQ07xIEv96qDyXZwh8X0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777355950; c=relaxed/simple;
-	bh=Z131pWvCBWP164teAh+JpB+9PtGkpkZGiO3EcZg8kQQ=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=K22+7906Qa9ATnhSD3ibtZuvCZ9CJU05ZAzsu2xuBj3pIjvw9Vza/ff9AZK3SDYB50N23oVWMYovqvbUvYnsc2x7h+WdVyiugVS6CbOgVdllmssybLiPvWw2bX7vEIC/zkcwbdsD7d/ScngvGWDtBc+Odc5UNSKvfa29sqfM0hI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Spzh9/hA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777357469; c=relaxed/simple;
+	bh=gpvaJa3EDIh4Rbzk+4FqyiGMM54LZx/wqMrcj8IPT2I=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=ZIIxcu5xoDrusW2zu+bjmVR3GJd9MzW3GKu/Rltw0FEAUR3VDeeO3zDa/xKqZ7XeD+sJTaZ4mbbE6j3jZUaUuTWDbX7NkvSQG4qd+JyiqK01WHO1/ag9pONmMNGEhm8/Gx8fP4NkQ7yBPQdl6oKeq+lyPPjDd9zP9mgB/Ph2CPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bw2pZlla; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Spzh9/hA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49369C2BCAF;
-	Tue, 28 Apr 2026 05:59:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777355950;
-	bh=Z131pWvCBWP164teAh+JpB+9PtGkpkZGiO3EcZg8kQQ=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=Spzh9/hAjSAOGFD5knYwVWy6QKd40o+Y0RRQA+hx0aEy1UPUWGoCnLWAdm2mAi3kq
-	 p+0bVyn3zhFv73SlnDPHJeDMozDvoqJr8qv41ChZc68NGzI48GYaH+6KYlPVtY+/IK
-	 g63RclO8V2p4IcgaLWzpb4ICUVHB9f0WGbmEnvAIxvrDx27BQo+6Fbz4kMncNMLhRW
-	 25DAP3dXtl7c7DBFSmjdMaMvd6dZQqdJ/80oe3/v8iLRopWTNZEhvyOCldUQrDpfy6
-	 1jWWlBsduBjWnf4Z9Knlzk+d++c2r+OFfVyvLnr1OfLMl4i3eGRRf7pjaU6PEk9TM7
-	 vc5eU8xXooY7w==
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 5C6D7F4007A;
-	Tue, 28 Apr 2026 01:59:09 -0400 (EDT)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-01.internal (MEProxy); Tue, 28 Apr 2026 01:59:09 -0400
-X-ME-Sender: <xms:rUzwaXFzuizy1XFX83i-oqJxB8BJXX68pyGUpyrctQp6qfZ2B1-oPQ>
-    <xme:rUzwafKA1dS2FEuYvzls3OBwYibCMi-MBuQifp7kk83w7UjXJrqFf7AtWlFjcnbYS
-    FaU9j0J_uZKQEast2WUbosP5sVWw9Rw8a61SrRpB26c4LAC_YavDi8U>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdektdejlecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefoggffhffvvefkjghfufgtgfesthejredtredttdenucfhrhhomhepfdetrhguuceu
-    ihgvshhhvghuvhgvlhdfuceorghruggssehkvghrnhgvlhdrohhrgheqnecuggftrfgrth
-    htvghrnhepkeevteduteehkeekteeugfdvvdekudevffejvddtueehuedvueegudfhtdet
-    hfdunecuffhomhgrihhnpehmvghtiiguohifugdrtghomhdpmhhitghrohgthhhiphdrtg
-    homhenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegr
-    rhguodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduieejtdehtddtjeelqd
-    effedvudeigeduhedqrghruggspeepkhgvrhhnvghlrdhorhhgseifohhrkhhofhgrrhgu
-    rdgtohhmpdhnsggprhgtphhtthhopeduvddpmhhouggvpehsmhhtphhouhhtpdhrtghpth
-    htoheprghlvgigrghnughrvgdrsggvlhhlohhnihessghoohhtlhhinhdrtghomhdprhgt
-    phhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohephhgvrh
-    gsvghrthesghhonhguohhrrdgrphgrnhgrrdhorhhgrdgruhdprhgtphhtthhopehkrggs
-    vghlsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhhsfieskhgvrhhnvghlrd
-    horhhgpdhrtghpthhtohepthhhohhrshhtvghnrdgslhhumheslhhinhhugidruggvvhdp
-    rhgtphhtthhopehlihhnuhigqdgrrhhmqdhkvghrnhgvlheslhhishhtshdrihhnfhhrrg
-    guvggrugdrohhrghdprhgtphhtthhopehnihgtohhlrghsrdhfvghrrhgvsehmihgtrhho
-    tghhihhprdgtohhmpdhrtghpthhtoheptghlrghuughiuhdrsggviihnvggrsehtuhigoh
-    hnrdguvghv
-X-ME-Proxy: <xmx:rUzwafU5KOBfn_KqisZuPK60_2neVLsLyi5eIGRZ7Y-o5NWpckPESA>
-    <xmx:rUzwabS-1Bbg_ktbOA-sEBgOhG01T9g4lzczZoj58yVwo1PbS6y2Rw>
-    <xmx:rUzwaUA4UonvYoYl2cPE3oDpFSLsKOAm3BwB7pmJdYm1UMUg9wQhUQ>
-    <xmx:rUzwabu6C-Imp5MeJ52Pgv8SC_Itk29uXFuHcY_H5WvvXcfwovxlYg>
-    <xmx:rUzwaa8LkTbS-zh_qwvjl71zU2TeG2I1A0SerHcptyy3yp9MFd7RxHMK>
-Feedback-ID: ice86485a:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 3275B700065; Tue, 28 Apr 2026 01:59:09 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bw2pZlla"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777357467;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dWxJ6iKAXxdVvuoeOB4go4oBPwLfaddH3kafQhnJCYU=;
+	b=bw2pZlla660MhaM0r/nA2QwE0EPJFULCVm5wF94CO6ll3VmgtpaEMZu4OOGPuYcizRQL4a
+	ESIOtFB/sk3H/j0718VR5EIiNgEkuZN8LvK06pCYIX3RMkokBtvixs+AU9RxuuApjHJtBY
+	aJWKhAuEEOeSSblumWFIdkU3ts6fo4A=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-682-2jG5OGQNPlC33gdxYcopeQ-1; Tue,
+ 28 Apr 2026 02:24:23 -0400
+X-MC-Unique: 2jG5OGQNPlC33gdxYcopeQ-1
+X-Mimecast-MFC-AGG-ID: 2jG5OGQNPlC33gdxYcopeQ_1777357462
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 706DB1956065;
+	Tue, 28 Apr 2026 06:24:21 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.44.32.126])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0217E30078C0;
+	Tue, 28 Apr 2026 06:24:16 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20260428024400.123337-2-ebiggers@kernel.org>
+References: <20260428024400.123337-2-ebiggers@kernel.org> <20260428024400.123337-1-ebiggers@kernel.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: dhowells@redhat.com, netdev@vger.kernel.org,
+    linux-afs@lists.infradead.org,
+    Marc Dionne <marc.dionne@auristor.com>, linux-crypto@vger.kernel.org,
+    linux-kernel@vger.kernel.org,
+    "David S . Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net-next 1/5] net/rxrpc: Add local FCrypt-PCBC implementation
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AW4IFdmKBNXF
-Date: Tue, 28 Apr 2026 07:58:39 +0200
-From: "Ard Biesheuvel" <ardb@kernel.org>
-To: "Thorsten Blum" <thorsten.blum@linux.dev>,
- "Herbert Xu" <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>,
- "Nicolas Ferre" <nicolas.ferre@microchip.com>,
- "Alexandre Belloni" <alexandre.belloni@bootlin.com>,
- "Claudiu Beznea" <claudiu.beznea@tuxon.dev>,
- =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
- "Linus Walleij" <linusw@kernel.org>
-Cc: stable@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Message-Id: <2d42b1fc-b5d5-4dcb-8dc8-62580502f586@app.fastmail.com>
-In-Reply-To: <20260427124030.315590-3-thorsten.blum@linux.dev>
-References: <20260427124030.315590-3-thorsten.blum@linux.dev>
-Subject: Re: [PATCH] crypto: atmel-sha204a - drop hwrng quality reduction for ATSHA204A
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <722879.1777357455.1@warthog.procyon.org.uk>
+Date: Tue, 28 Apr 2026 07:24:15 +0100
+Message-ID: <722882.1777357455@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Hi Thorsten,
+Eric Biggers <ebiggers@kernel.org> wrote:
 
-On Mon, 27 Apr 2026, at 14:40, Thorsten Blum wrote:
-> Commit 8006aff15516 ("crypto: atmel-sha204a - Set hwrng quality to
-> lowest possible") reduced the hwrng quality to 1 based on a review by
-> Bill Cox [1]. However, despite its title, the review only tested the
-> ATSHA204, not the ATSHA204A.
->
-> In the same thread, Atmel engineer Landon Cox wrote "this behavior has
-> been eliminated entirely"[2] in the ATSHA204A and "this problem does not
-> affect the ATECC108 or the ATECC108A (or the ATSHA204A)"[3].
->
-> According to the official ATSHA204A datasheet [4], the device contains a
-> high-quality hardware RNG that combines its output with an internal seed
-> value stored in EEPROM or SRAM to generate random numbers. The device
-> also implements all security functions using SHA-256, and the driver
-> uses the chip's Random command in seed-update mode.
->
-> Keep 'quality = 1' for ATSHA204, but drop the explicit hwrng quality
-> reduction for ATSHA204A and fall back to the hwrng core default.
->
+> +config AF_RXRPC_KUNIT_TEST
+> +	tristate "RxRPC KUnit test" if !KUNIT_ALL_TESTS
+> +	depends on KUNIT && RXKAD
+> +	default KUNIT_ALL_TESTS
+> +	help
+> +	  Enable the RxRPC KUnit test suite.
 
-Interesting! Thanks for digging this up.
+The description isn't really accurate.  It doesn't test rxrpc per se.  Can you
+change it to "fcrypt kunit test" or "RxRPC fcrypt KUnit test"?
 
-> [1] 
-> https://www.metzdowd.com/pipermail/cryptography/2014-December/023858.html
-> [2] 
-> https://www.metzdowd.com/pipermail/cryptography/2014-December/023852.html
-> [3] 
-> https://www.metzdowd.com/pipermail/cryptography/2014-December/023886.html
-> [4] 
-> https://ww1.microchip.com/downloads/en/DeviceDoc/ATSHA204A-Data-Sheet-40002025A.pdf
->
-> Fixes: 8006aff15516 ("crypto: atmel-sha204a - Set hwrng quality to 
-> lowest possible")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
-> ---
->  drivers/crypto/atmel-sha204a.c | 40 ++++++++++++++++++----------------
->  1 file changed, 21 insertions(+), 19 deletions(-)
->
-> diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha204a.c
-> index dbb39ed0cea1..df69fb190e52 100644
-> --- a/drivers/crypto/atmel-sha204a.c
-> +++ b/drivers/crypto/atmel-sha204a.c
-> @@ -19,6 +19,25 @@
->  #include <linux/workqueue.h>
->  #include "atmel-i2c.h"
-> 
-> +enum atmel_sha204a_variant {
-> +	ATSHA204 = 1,
-> +	ATSHA204A,
-> +};
-> +
+David
 
-I agree that setting quality to '1' is only appropriate for the ATSHA204
-but this looks a bit clunky to me.
-
-Can we retain the comment here that you deleted below, and add
-something like
-
-static const unsigned short atsha204_quality = 1;
-
-> +static const struct of_device_id atmel_sha204a_dt_ids[] __maybe_unused = {
-> +	{ .compatible = "atmel,atsha204",  .data = (void *)ATSHA204 },
-> +	{ .compatible = "atmel,atsha204a", .data = (void *)ATSHA204A },
-> +	{ /* sentinel */ }
-> +};
-> +MODULE_DEVICE_TABLE(of, atmel_sha204a_dt_ids);
-> +
-> +static const struct i2c_device_id atmel_sha204a_id[] = {
-> +	{ .name = "atsha204",  .driver_data = ATSHA204 },
-> +	{ .name = "atsha204a", .driver_data = ATSHA204A },
-> +	{ /* sentinel */ }
-> +};
-> +MODULE_DEVICE_TABLE(i2c, atmel_sha204a_id);
-> +
-
-Then, move these back to the old location, and point .data /
-.driver_data to &atsha204_quality for atsha204 only.
-
-
->  static void atmel_sha204a_rng_done(struct atmel_i2c_work_data *work_data,
->  				   void *areq, int status)
->  {
-> @@ -171,11 +190,8 @@ static int atmel_sha204a_probe(struct i2c_client *client)
->  	i2c_priv->hwrng.name = dev_name(&client->dev);
->  	i2c_priv->hwrng.read = atmel_sha204a_rng_read;
-> 
-> -	/*
-> -	 * According to review by Bill Cox [1], this HWRNG has very low 
-> entropy.
-> -	 * [1] 
-> https://www.metzdowd.com/pipermail/cryptography/2014-December/023858.html
-> -	 */
-> -	i2c_priv->hwrng.quality = 1;
-> +	if ((uintptr_t)i2c_get_match_data(client) == ATSHA204)
-> +		i2c_priv->hwrng.quality = 1;
-> 
-
-Here you can override the field by dereferencing the match data if it
-is non-NULL.
-
-Alternatively, you could store the quality in the device_id structs
-directly, but I think this is slightly more idiomatic.
-
-
->  	ret = devm_hwrng_register(&client->dev, &i2c_priv->hwrng);
->  	if (ret)
-> @@ -202,20 +218,6 @@ static void atmel_sha204a_remove(struct i2c_client *client)
->  	kfree((void *)i2c_priv->hwrng.priv);
->  }
-> 
-> -static const struct of_device_id atmel_sha204a_dt_ids[] __maybe_unused = {
-> -	{ .compatible = "atmel,atsha204", },
-> -	{ .compatible = "atmel,atsha204a", },
-> -	{ /* sentinel */ }
-> -};
-> -MODULE_DEVICE_TABLE(of, atmel_sha204a_dt_ids);
-> -
-> -static const struct i2c_device_id atmel_sha204a_id[] = {
-> -	{ "atsha204" },
-> -	{ "atsha204a" },
-> -	{ /* sentinel */ }
-> -};
-> -MODULE_DEVICE_TABLE(i2c, atmel_sha204a_id);
-> -
->  static struct i2c_driver atmel_sha204a_driver = {
->  	.probe			= atmel_sha204a_probe,
->  	.remove			= atmel_sha204a_remove,
