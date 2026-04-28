@@ -1,47 +1,55 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B23E42B720;
-	Tue, 28 Apr 2026 13:24:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 047142D879E;
+	Tue, 28 Apr 2026 14:56:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777382694; cv=none; b=g4BiCn9q6h14gVBxTpBfFx1VaElQ1fx8KyeiPQChCXhBW1CcCovLyUOo8eiEsdyZXUYy5k/Pu+leRVitVwTsy8m8RZLyMVT4ZwrDvIyTCcI3rnSkdzi7c/v80Rs3OKNZqESu5r2hE3uRN5RvT4SOtNEe6px0Wb8CpGGNYM179HE=
+	t=1777388200; cv=none; b=tSmZodgj2gAFV40Ur1ShldYgpq9XHqvKhTVMxplSksMCj7iTZpvupsdKwaUAkZ4d4htqFRYsa2DgaM9IO/26pA0htcAloX7JXnEKY40Qe4TQICZtkd+CjLle1k5e+MyUqlpJ51L6FTH6Zj47y8Yx0vGoHp5ryDtOAQdceWdapg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777382694; c=relaxed/simple;
-	bh=Mbk7GJhzzHEOvI4/qFSYDMc92u86YKebUsjdgehgAuA=;
+	s=arc-20240116; t=1777388200; c=relaxed/simple;
+	bh=es2ktWByvCTEm8JAXWWSGRiL26Au+GmCbQrFIu1jECI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c902Tt1ipplvLGHEpxbw1/WUbH0Jze0aw8sSFH4yJH4gnKo020nNqk/4B1RSpPlRDI/CLcTrstEnACDvezvyZBkiohKAAfTclF6SI5Ew+c1OhfFZyzMYrrqh3D2sxTlYEMemhEnW2JqGcUjJDjzMbdIz2/Qf6MTOjhwXjfIoXK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tlkFwXz0; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=L1ArEACOXzUMjd9xhfbYXVcG7m818pIGJAKGvguKvkxNtkawzwahpHU4Cqx9+Bn9/dk1uQmK3El5pjFv+cqViqbfvx9vaZCt58bwESm9zT1e+SdUDGJIgZxJ6ZpJPm0/SYrqZzv0UtGC8PN+WBxcKWKF6mV0MbExf/19M5JC9Gk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OrBeho8q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tlkFwXz0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40F96C2BCAF;
-	Tue, 28 Apr 2026 13:24:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OrBeho8q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2881BC2BCAF;
+	Tue, 28 Apr 2026 14:56:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777382694;
-	bh=Mbk7GJhzzHEOvI4/qFSYDMc92u86YKebUsjdgehgAuA=;
+	s=k20201202; t=1777388198;
+	bh=es2ktWByvCTEm8JAXWWSGRiL26Au+GmCbQrFIu1jECI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tlkFwXz0zkNo/cS4uLIzu8CJsJA+Gy7EPJmTOv8jt5oOyjTHBpxdBg+ZaeE9UJW95
-	 kedR9fTTgN57okQTaM4Gc8uQDIwuae5pRI41THfuXii83zd4ZVLFEn5m0mJVF/wx1u
-	 OrSWGzqHcpIgtX6u2SeJ2bvUOnBTjgRi/5ejvOR707E6dfieaBBIwSAbX2fRwVkJKM
-	 +eGjG0f1J/WooMr/yU+3UvUnNgeJn56Rj2h8JqMopfBiAYryhWKzBUWGhssSSbhaNI
-	 CzxgFSlNyfeaVsdXgnTgkN7Gdap15ZEOZarc9TcUkvhh1C5X/5RakRkAxFJHm0P5vX
-	 CO4oo/GbqRnmQ==
-Date: Tue, 28 Apr 2026 15:24:48 +0200
-From: Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>, 
-	Bill Cox <waywardgeek@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Nicolas Ferre <nicolas.ferre@microchip.com>, 
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
-	Linus Walleij <linusw@kernel.org>, Ard Biesheuvel <ardb@kernel.org>, stable@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] crypto: atmel-sha204a - drop hwrng quality reduction
- for ATSHA204A
-Message-ID: <cbk4ho3bpprjxvcywv4sudbmb2fhfsgaguoywv5mhtoql4vhd6@f7oisxcrvii4>
-References: <20260428101430.514838-3-thorsten.blum@linux.dev>
- <25ntssyy6t5uwxlwfpmrpzpcq6xv62l643hflf26hxi6lv5wqu@6vub6ysczjvd>
- <afCo9PbDpTYeqGd4@linux.dev>
+	b=OrBeho8qrQi/9XgDXvWHNrSclWLioISeFhDAoXfi9y9QY9B0DquqlIop9C0n7WACa
+	 VTbkBSIeVd4KCKTCSJ/kotlFMY1hlFJlWluSsxApnV/wBvU1IJZRKS8xgXZv7ZSHYB
+	 o2zRHrAvhFPu2VYUJmDBtAd0EMmUhGkwIj3s9tgU+4VjGZJKiIOnu0heq0p6IK8QSR
+	 ZjxxikfxYnAx35alfrYzrY5e6FI0WQ9aB+pQkiar82kHbxbOtWSYwdfQHkkypfaXcY
+	 tfy8wzjg138EA/IAMvP0BfnfVyNK7vbtCPQhsZITRKKkDZ57anXm4NtPt4uRDyHoJ8
+	 FEvOJEYmEWqQw==
+Date: Tue, 28 Apr 2026 08:56:33 -0600
+From: Tycho Andersen <tycho@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Ashish Kalra <ashish.kalra@amd.com>, 
+	Tom Lendacky <thomas.lendacky@amd.com>, John Allen <john.allen@amd.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@kernel.org>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, 
+	Shuah Khan <shuah@kernel.org>, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Kim Phillips <kim.phillips@amd.com>, Alexey Kardashevskiy <aik@amd.com>, 
+	Nikunj A Dadhania <nikunj@amd.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Randy Dunlap <rdunlap@infradead.org>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
+	Kees Cook <kees@kernel.org>, Marco Elver <elver@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Li RongQing <lirongqing@baidu.com>, Eric Biggers <ebiggers@kernel.org>, 
+	"Paul E. McKenney" <paulmck@kernel.org>, linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v2 3/4] KVM: SEV: Add the kvm-amd.rapl_disable module
+ parameter
+Message-ID: <afDJZQHNi-qdcEEe@tycho.pizza>
+References: <20260427204847.112899-1-tycho@kernel.org>
+ <20260427204847.112899-4-tycho@kernel.org>
+ <ae_TCofu4bHP_Ch-@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,43 +58,60 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <afCo9PbDpTYeqGd4@linux.dev>
+In-Reply-To: <ae_TCofu4bHP_Ch-@google.com>
 
-Hi Thorsten,
-
-Bill also wrote about ATSHA204A [1]
-
-  My best guess as to what's going on here is that the device has a
-  ring-oscillator based entropy source, but that it generates only a few bits
-  of entropy for each use.  It seems to be called before generating each
-  32-byte "random" value, which is why the second set of 32-bit values have
-  more possible values, and the 3rd has even more.  However, the number of
-  unique values in the final column of 32*N byte values is always equal to
-  the number of unique values of the entire string of bytes.
-
-If this is true that the device generates <256 true random bits and then
-mixes in non-volatile pseudorandom number generator to produce 256 bits,
-then the quality should not be set to full 1024.
-
-Marek
-
-[1] https://www.metzdowd.com/pipermail/cryptography/2014-December/023858.html
-
-On Tue, Apr 28, 2026 at 02:32:52PM +0200, Thorsten Blum wrote:
->
-> Bill wrote in his review:
+On Mon, Apr 27, 2026 at 02:20:10PM -0700, Sean Christopherson wrote:
+> On Mon, Apr 27, 2026, Tycho Andersen wrote:
+> > From: "Tycho Andersen (AMD)" <tycho@kernel.org>
+> > 
+> > Add a user-visible way to set the RAPL_DIS bit for SNP init.
+> > 
+> > Since setting RAPL_DIS affects the whole system, put the module parameter
+> > in kvm_amd instead of in the CCP driver to hopefully make it more obvious
+> > to admins.
+> > 
+> > Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
+> > ---
+> >  Documentation/admin-guide/kernel-parameters.txt | 5 +++++
+> >  arch/x86/kvm/svm/sev.c                          | 8 ++++++++
+> >  2 files changed, 13 insertions(+)
+> > 
+> > diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> > index 4d0f545fb3ec..2b50eed8664c 100644
+> > --- a/Documentation/admin-guide/kernel-parameters.txt
+> > +++ b/Documentation/admin-guide/kernel-parameters.txt
+> > @@ -3207,6 +3207,11 @@ Kernel parameters
+> >  			max_snp_asid == min_sev_asid-1, will effectively make
+> >  			SEV-ES unusable.
+> >  
+> > +	kvm-amd.rapl_disable=	[KVM,AMD] Whether to disable RAPL
+> > +			(Running Average Power Limit) when initializing the SNP
+> > +			firmware. This disables the counters for the entire system until an
+> > +			SNP shutdown command is issued.
 > 
->   "If I made no mistake (and I do make a lot), the "random" data from
->    the Atmel ATSHA204A is highly predictable when you disable the seed
->    update to EEPROM."
-> 
-> However, the atmel-sha204a driver doesn't operate the device in that
-> mode. It uses the Random command with seed updates enabled, which is
-> also what the datasheet recommends for highest security:
-> 
->   "Microchip recommends that the EEPROM seed always be updated."
-> 
-> So the reported behavior doesn't reflect how the driver uses the device.
-> 
-> Thanks,
-> Thorsten
+> I'm pretty sure I said this earlier: KVM absolutely should not be able to disable
+> RAPL for the entire system.  That needs to be a power management thing.
+
+You definitely noted "not CCP", I don't think I quite understood what
+that meant though:
+https://lore.kernel.org/all/aZ86BZWi-GLiHvmt@tycho.pizza/
+
+I'm a little worried that putting it in power management will generate
+some weird dependencies, or weakref symbols that can't change things
+if they are loaded independently of kvm_amd or something. But let me
+see what I can come up with.
+
+> KVM then needs to communicate (and enforce?) the policy to
+> userspace.
+
+KVM doesn't need to enforce anything, the SEV firmware will generate a
+launch error for policy violation if it's not supported.
+
+For communicating to userspace if it's not a kvm module parameter, one
+option is to mask it off in sev_get_snp_supported_policy() if it was
+initialized without the support. Then it'll be visible via
+KVM_X86_SNP_POLICY_BITS.
+
+Thanks,
+
+Tycho
