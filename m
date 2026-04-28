@@ -1,178 +1,152 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-dy1-f182.google.com (mail-dy1-f182.google.com [74.125.82.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 074D0125AA
-	for <linux-crypto@vger.kernel.org>; Tue, 28 Apr 2026 17:14:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777396484; cv=none; b=Qz4oWZ8/7NJkPhHV+6Pt9G2ovubU0AQxQNFp4PCIidy9oRwajR6rlaxhvHvvhCcXmcWivESWl8WMre90tYZR0Usprd8eC/vGEhYzgtRnEya1Y9PCfLeGEMRPFsXnR6M1S47mOYOOr5gPAgssjoDxIFtSlnCbMDtYoT2MvRPzMtc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777396484; c=relaxed/simple;
-	bh=LtvzAMKP8P4C7eT31W1TOmw6wHT+t3l0z1jVhu757RM=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dQcH5QZlHs1Utj23N3uj23Vx1ELRpDvCQxq6KH2xmitwOhEsNj/nIK0rGAORYfdGG5/FAePsI8F0NSky1TmyFojRgf3lTewmZvknteMHSfrcVm/ZV64MdamW6exjcMOVH1fu0QEAg29YkK5g6fDkaqJLBhcOR4BrLRQLC7EdeZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mol89KD+; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D8FA33A6E2
+	for <linux-crypto@vger.kernel.org>; Tue, 28 Apr 2026 17:15:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.182
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777396540; cv=pass; b=njB3CCwTHFlX0Vak6MuJPada+RVikwbCuvimW8Rd5j+kX7pbGo7vLMwzTx1/bCGfbbvmekVl8e+16gwQmQEIhcc6y3TBMjFprgRWQyFVTArcZyqlSuB5p0G/4EapoHLDMIBw84/uxf/YfdQLNTEP92xuB4wYt4glKG5nyrS6njQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777396540; c=relaxed/simple;
+	bh=Y4SInoJ+gQjLv2MpP5+ds4DYPfajGSs/Ku9vQ9VWKjE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UGBGaFdcl/gw08Bz25GspgVuFvvZCqQmSVDhVO2eA0IVJYPqGSrSfb4XjBDWNlP6nYINoIOhaFGIP4zgTU+PFiuacK0CmPB1MuZ79Ukn/q9M0uDgpRz7WPBiEMzFnopubztpDC1oHCE0OT50GIx38hQdAdEDwlWa6Ge8mYCW4A0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KX0pWs0E; arc=pass smtp.client-ip=74.125.82.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mol89KD+"
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-82f9f49e4beso6366513b3a.0
-        for <linux-crypto@vger.kernel.org>; Tue, 28 Apr 2026 10:14:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KX0pWs0E"
+Received: by mail-dy1-f182.google.com with SMTP id 5a478bee46e88-2bdcf5970cdso65226eec.0
+        for <linux-crypto@vger.kernel.org>; Tue, 28 Apr 2026 10:15:37 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777396536; cv=none;
+        d=google.com; s=arc-20240605;
+        b=J2Iq21JWvyJqlThPnzEEIQMOyyaqMfJoNytQlHOdbZp2UapEX2UClpR2ANAbqabvxx
+         7lR+MlRNN6ZNfPFguN70zhj5EpBDwASd1vNcwZxVG5okRkH9oa3XKgKgCjMFQuItHVwd
+         NTpudsAJQrdp8pp10MnbryI9invAacgAOV52DeUPYl5cycTUMsyYyAuSq0rZ8JMfKj8P
+         IbrSU78PEofpgwPinNQI0yaIW8UAWp0DNhr+Ng85C1qSmuVsNWA+1YsbP1BSentLeDL9
+         PHDEG0dlwnZ88MitBbGVuY7oW6taI7+LJ+FnN+bBmr3PJk1pDnjjPhKCKBDc/1TEQ8Jd
+         vtHA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=4mHkN2xwVkuWH/B1Z4Hbwt0I5/IXNGH1RdG0Zb8nsFM=;
+        fh=4Gb12TCGke7ilbhQdC5TaFVdyW0du5EDsO4sZWhna1Y=;
+        b=Mq09TjOsWnVD0PSxw46fea1cqGaG9A4RXb/Yb20C5rnfx9mXCvxBZEzHnJcqgfErPW
+         9SnGjYVcaMkGQXVJPLBFhb9hEsaSgRXVz2JgMl48Sk/+uDLp92MRxjGMgr4l7Y9CC66P
+         KC4jO9UTgGB+w1sAvgXNDCkU/s7coQXnhUD7dKvqtfjxl7MwkAuBpcnVyLlKm9jZLJ2F
+         8XPfn7+mDI4ulMwe6bf4dvUf9Bq1wqxkecTLL3tTHOECVlm4l0Z6Qena4b7OTq2OLrjK
+         hy7g/QNkM6C5wf1GSOW5cXM23Y8gFq0teM1Qf90ndGujrSL6o/1yABb7vwqLzh8h3/He
+         pFOQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777396482; x=1778001282; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1FTL1KInrBgDPjS8ez4nCUhnLyZ0q2rWH/o4QlF78bg=;
-        b=mol89KD+Qdfiw4ILw1PKeUdWyirWJNB1l0pJyOqU02iVBLQB4dSCgdoH3+BzVtvL/L
-         UT35+LTdMC5gE9T0Qmjv9BNgnybso1uqKuXfLeWpKSTLFN4V441lq5BXPRoY+wCKwThk
-         K6OxRQ6b5PtholQzhwePVJxucHxgfQ3dUuDKMsY+6Y35ktOzP5E9fltYLRrLWPmimVeu
-         l4ayHXQ+MU2kGJ7f9Egv84ZmjzBgTWaowebrvt7NyeZQRbVVXNKmH68TXV04m2dO5qiH
-         ijaI0sCJep0Icm0VSYo1a1QXEH9Jq5kSkdWVXAvnZTpZAKcGksGW4Pgb/arOIHMuX4jX
-         Z+bg==
+        d=gmail.com; s=20251104; t=1777396536; x=1778001336; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4mHkN2xwVkuWH/B1Z4Hbwt0I5/IXNGH1RdG0Zb8nsFM=;
+        b=KX0pWs0E79cOegLOBsHlIxrr/RczNRJeTALWToKti1T+ClE4VmEJm5XvQvla2Fpk+i
+         QAMatUs63Eye3CwEPJoUBjcgLFLoOrZJjGe4xBHE78FCozCCatKygev6OrYlvY77X/x2
+         jHSsgQwL7YukzyE6CZLRfnzwprWLBrdm+5ZO76B7GT2xArHMvrJAwd96XgP/N2fL3Qiy
+         h8RVlnWdoJnauY/WTrxYAV1DY4F7rx8tVzP3C8Aa5AO2shFf3cBJhFqTpRLePKdCx6ar
+         4uLOU6gCho6Zs3HVtwOigBYaj5KImMKUB4MD9UJiGmIRzJnpj07bPhAZzBccu/87+e3U
+         TWdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777396482; x=1778001282;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1FTL1KInrBgDPjS8ez4nCUhnLyZ0q2rWH/o4QlF78bg=;
-        b=Quk6fi/4DeIiY2tw+3I73SX+Qn2/PbLtcXQRD4x++UQBsYIVeQ24ay4AL77Hw3dBad
-         rxWUHrhboG1y4HG22u2MFw7CUYiABj9+bZ9IxfO1ik3YRoW3ti3C1x8RNszGKtYN8YNS
-         PfzuXVp8grtV85tpImmIPPFOVYczQtNib8swOT0BhUIqEJRt5QR8vdbYWto7l7NBDfqa
-         5/TZjveQKOuTE1pb0S17bKe3xAkmbL2+/R1lmkqxuS5Kgc79Fr+vUBitvRfkvT2kDgxK
-         z6zNmQaPKge+b3vUl0hFrDiu9aHDrxJ9OKHKEZOQj8ud4AlE1j3afUheFua+HsS9CRh8
-         7kVw==
-X-Forwarded-Encrypted: i=1; AFNElJ88zKVITOd3ZrKB4yH3Caib+0voXXFgdHGxyhMNtKbXJAct1hoSaVw8JKT+/5m1KvBymNAXTDkkFhWFpwk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxlHzLPMuolt39nb9sqiJBI0Igd9kE35uJNDA3VSmYc7fbDptty
-	GE4TMRAAwq/9Ls6sOkRsTAL7TRIURV8NPNyBo94cY1x0BdQOK927+Viih+aTzaNDdwbg5Kwzlk3
-	/5aGvog==
-X-Received: from pfbjs41.prod.google.com ([2002:a05:6a00:91a9:b0:82f:6c9a:6139])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:8a11:b0:834:e15a:19e4
- with SMTP id d2e1a72fcca58-834e15a2061mr2103778b3a.39.1777396482142; Tue, 28
- Apr 2026 10:14:42 -0700 (PDT)
-Date: Tue, 28 Apr 2026 10:14:40 -0700
-In-Reply-To: <afDnw8WYpr7TqEHS@tycho.pizza>
+        d=1e100.net; s=20251104; t=1777396536; x=1778001336;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=4mHkN2xwVkuWH/B1Z4Hbwt0I5/IXNGH1RdG0Zb8nsFM=;
+        b=fFnuM1Q8E4bKhgKedjfLLA5QX1K6ukRdwkzwWobbcsvq2Fuu1L9e3L1yj4MYXqUhv2
+         uYmATOFj/2s9ytXabuuDVI6v6jNCHp+gHt97dI25lMVJlUsFmucUhCB8ZvIr0RwKr8qJ
+         UpX16HgmAHCAc3wOAHarwaIJOwJjv5PxzA4H3ceMp5jTjtgIIXpMlxttJOMbwh7FWBRH
+         HwowbA9Dh2hPuR0YXlIeeGPTQKAbJ39XC1qTKh6xUUK4Sm5eZebJnN7Nhvo7n+avTWNd
+         aE+CdEhqA6hMpyIKVOS93nn99lDfNjE+BoST4FvL+G5Hia3SkvEnYxWU84GF2dqeSJpa
+         T/tQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/MY5L9vvMRDvjVOW7zWeJkW6iPlXbD6vK8gyWcamiJsFVlxvc5z9T7xzqxAnP9ax8c6gZkJfQ3vb6vID0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnLEoiMJe6a1OzdgI9USg/TA+4rbxMpHnkfmhNma/EhcTpjjzB
+	a/rttTQR0Bev+bYh56zgNnRLhrquQy4pKfmT9JS4Hz/eXTY5RQ7Yh1IWxeR7qSHyJF0IldJcaQp
+	uq84g+bdHdHPAS1U+ATxQZtb3f8pJi04=
+X-Gm-Gg: AeBDieuMyU185TugH7yaH+RuFCc+Isx6lGxCCPxK5u/4QIPuc99Zi9UfZLKMgH3OhhO
+	Bg7KjWT5C+WiSm04nLr1Let89fKGi35qUypN+7kGKPyKJYFUShGJIxQyXu4Iv1okIgNVbHk+uHm
+	BD+iE8Z4vfh7OtoqN8jsps+27cqWGLy9tcVbuOjhHaSVF7hB35B0tAC2Md4ysde3BDNf+dc1Hyk
+	mvXfWijs+VzJHblty36kzGRLdpPz2TuzRj9m9sU4Lfs9Hp+krFopuZ8qkFOWrN0Sr12RX324yak
+	TK9FaCBVXbFXOHna
+X-Received: by 2002:a05:7300:cd8d:b0:2e7:190:41d6 with SMTP id
+ 5a478bee46e88-2ed0e2e4725mr1026663eec.2.1777396535792; Tue, 28 Apr 2026
+ 10:15:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260427204847.112899-1-tycho@kernel.org> <20260427204847.112899-4-tycho@kernel.org>
- <ae_TCofu4bHP_Ch-@google.com> <afDJZQHNi-qdcEEe@tycho.pizza>
- <afDYCpbeT0HsXTMF@google.com> <20f94bed-2843-44ab-877c-3e68bd4314f8@amd.com>
- <afDkcpcQ5vPsjQkO@google.com> <afDnw8WYpr7TqEHS@tycho.pizza>
-Message-ID: <afDrAJPmCIm1HT8l@google.com>
-Subject: Re: [PATCH v2 3/4] KVM: SEV: Add the kvm-amd.rapl_disable module parameter
-From: Sean Christopherson <seanjc@google.com>
-To: Tycho Andersen <tycho@kernel.org>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>, Ashish Kalra <ashish.kalra@amd.com>, 
-	John Allen <john.allen@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>, 
-	Shuah Khan <skhan@linuxfoundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Kim Phillips <kim.phillips@amd.com>, 
-	Alexey Kardashevskiy <aik@amd.com>, Nikunj A Dadhania <nikunj@amd.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Randy Dunlap <rdunlap@infradead.org>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
-	Kees Cook <kees@kernel.org>, Marco Elver <elver@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Li RongQing <lirongqing@baidu.com>, Eric Biggers <ebiggers@kernel.org>, 
-	"Paul E. McKenney" <paulmck@kernel.org>, linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20260428024400.123337-1-ebiggers@kernel.org>
+In-Reply-To: <20260428024400.123337-1-ebiggers@kernel.org>
+From: Marc Dionne <marc.c.dionne@gmail.com>
+Date: Tue, 28 Apr 2026 14:15:23 -0300
+X-Gm-Features: AVHnY4K6RjnbJfMAlZVpH30RZ8jL2Td5aRSXV2MW-u6vf0Qmr0Jq_0ZDVqUO6Dk
+Message-ID: <CAB9dFdtCXMaavBB=NODcG5su8oTqgpYysSJ60bOj0Qivw1dG1Q@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/5] Consolidate FCrypt and PCBC code into net/rxrpc/
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: netdev@vger.kernel.org, linux-afs@lists.infradead.org, 
+	David Howells <dhowells@redhat.com>, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 28, 2026, Tycho Andersen wrote:
-> On Tue, Apr 28, 2026 at 09:46:42AM -0700, Sean Christopherson wrote:
-> > On Tue, Apr 28, 2026, Tom Lendacky wrote:
-> > > On 4/28/26 10:53, Sean Christopherson wrote:
-> > > > On Tue, Apr 28, 2026, Tycho Andersen wrote:
-> > > >> On Mon, Apr 27, 2026 at 02:20:10PM -0700, Sean Christopherson wrote:
-> > > >>> I'm pretty sure I said this earlier: KVM absolutely should not be able to disable
-> > > >>> RAPL for the entire system.  That needs to be a power management thing.
-> > > >>
-> > > >> You definitely noted "not CCP", I don't think I quite understood what
-> > > >> that meant though:
-> > > >> https://lore.kernel.org/all/aZ86BZWi-GLiHvmt@tycho.pizza/
-> > > >>
-> > > >> I'm a little worried that putting it in power management will generate
-> > > >> some weird dependencies, or weakref symbols that can't change things
-> > > >> if they are loaded independently of kvm_amd or something. But let me
-> > > >> see what I can come up with.
-> > > > 
-> > > > Ugh, and it's not even powerman per se, it's actually a module in perf.  Oof.
-> > > > 
-> > > > I 100% agree it'll be tricky, but I also stand by comments that neither the CCP
-> > > > driver or KVM should be allowed to silently pull the rug out from under the RAPL
-> > > > module.
-> > > 
-> > > Maybe something that can be added to the current sev= kernel command line
-> > > parameter, e.g. sev=norapl, or such?
-> > 
-> > Yeah.  The only question I have is if we expect end users to want to disable RAPL
-> > at runtime.  If so, then we probably want a sysfs knob or something.
-> > 
-> > However, letting RAPL be toggled on/off will introduce some amount of complexity,
-> > as the kernel would need to negotiate/coordinate with the RAPL perf module and
-> > with the CPP driver to ensure RAPL stays in the "correct" state.  E.g. if the
-> > perf module is loaded, then RAPL is effectively pinned "on".  And if SNP has been
-> > initialized with RAPL_DIS, then RAPL is effectively pinned "off".  Blech.
-> > 
-> > > Maybe even with a kernel config option for a default value?
-> > 
-> > Probably overkill?
-> > 
-> > > On SNP_SHUTDOWN it will be re-enabled if it was disabled.
-> > 
-> > Stating the obvious, if we do this, we open the can of worms I described above.
-> 
-> Unfortunately that's how the firmware works and since we do a shutdown
-> on module unload, if you have ccp=m this is the behavior.
+On Mon, Apr 27, 2026 at 11:47=E2=80=AFPM Eric Biggers <ebiggers@kernel.org>=
+ wrote:
+>
+> [This series applies to v7.1-rc1 and is intended to be taken via
+> net-next.  Patches 4-5 could be left for later if desired.]
+>
+> The FCrypt "block cipher" and the PCBC mode of operation are obsolete
+> and insecure.  Since their only user is net/rxrpc/, they belong there,
+> not in the crypto API.
+>
+> Therefore, this series removes these algorithms from the crypto API and
+> replaces them with local implementations in net/rxrpc/.
+>
+> The local implementations are simpler too, as they avoid the crypto API
+> boilerplate.
+>
+> I don't know how to test all the code in net/rxrpc/, but everything
+> should still work.  I added a KUnit test for the crypto functions.
 
-Right, but that's just at the hardware level.  The kernel can still leave RAPL
-"disabled" at a software level, i.e. can still disallow loading the RAPL perf
-module.
+Giving this is a spin with afs, I get this oops during xfstests generic/011=
+:
 
-> Maybe it makes sense to go the other way: have perf look for a ccp
-> symbol that's loaded that says whether RAPL is usable or not, and
-> refuse to allow access to the counters if it is?
+[   22.838773] kernel BUG at net/core/skbuff.c:2295!
+[   22.843470] Oops: invalid opcode: 0000 [#1] SMP NOPTI
+[   22.850243] CPU: 4 UID: 0 PID: 5869 Comm: fsstress Not tainted
+7.1.0-rc1.kafs+ #89 PREEMPT(full)
+[   22.853205] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
+BIOS 1.17.0-10.fc44 06/10/2025
+[   22.855185] RIP: 0010:pskb_expand_head+0x2d2/0x380
+...
+[   22.867340] Call Trace:
+[   22.867617]  <TASK>
+[   22.869409]  __pskb_pull_tail+0x67/0x510
+[   22.870719]  rxkad_verify_packet+0x297/0x3b0 [rxrpc]
+[   22.872550]  rxrpc_recvmsg_data+0x150/0x760 [rxrpc]
+[   22.875923]  rxrpc_kernel_recv_data+0x75/0x230 [rxrpc]
+[   22.878500]  afs_extract_data+0x65/0x250 [kafs]
+[   22.880238]  yfs_deliver_fs_fetch_data64+0x209/0x2f0 [kafs]
+[   22.882017]  afs_deliver_to_call+0x60/0x5a0 [kafs]
+[   22.882346]  afs_wait_for_call_to_complete+0x133/0x1f0 [kafs]
+[   22.883019]  ? __pfx_default_wake_function+0x10/0x10
+[   22.883445]  ? afs_wait_for_operation+0x2c/0x1c0 [kafs]
+[   22.883878]  afs_wait_for_operation+0x9f/0x1c0 [kafs]
+[   22.884342]  afs_do_sync_operation+0x1a/0x30 [kafs]
+[   22.884632]  netfs_unbuffered_read_iter_locked+0x30f/0x6c0 [netfs]
+[   22.884980]  netfs_unbuffered_read_iter+0x56/0x80 [netfs]
+[   22.885266]  vfs_read+0x2e1/0x410
 
-Yeah, this is what I suggesting.  Or rather, trying to suggest :-)
+From the stack this looks like a direct IO read, where the skb passed
+to skb_linearize() trips on BUG_ON(skb_shared(skb)) in
+pskb_expand_head.
 
-> But it looks like there are several UAPIs for this (perf, /dev/amd-hsmp-*,
-> sysfs), so it's not just one place, which is also ugly.
-> 
-> > > >>> KVM then needs to communicate (and enforce?) the policy to
-> > > >>> userspace.
-> > > >>
-> > > >> KVM doesn't need to enforce anything, the SEV firmware will generate a
-> > > >> launch error for policy violation if it's not supported.
-> > > >>
-> > > >> For communicating to userspace if it's not a kvm module parameter, one
-> > > >> option is to mask it off in sev_get_snp_supported_policy() if it was
-> > > 
-> > > Did you mean sev_get_snp_policy_bits() or were you referring to the KVM
-> > > ioctl() for retrieving them?
-> 
-> I was thinking of the ioctl() for retrieving them, but doing the
-> masking in sev_get_snp_policy_bits() since it would be able to
-> remember whether RAPL_DIS was set or not. Of course I merged the two
-> in my head when typing the sentence :)
-> 
-> > > >> initialized without the support. Then it'll be visible via
-> > > >> KVM_X86_SNP_POLICY_BITS.
-> > > > 
-> > > > Ya, this is what I was envisioning.
-> > > 
-> > > It's still a valid policy bit (if supported by the platform), so I don't
-> > > think masking it off is appropriate.
-> > 
-> > But it's not fully supported, no?  I.e. won't the VM fail if it requests RAPL_DIS?
-> > 
-> > Ooh, presumably the subtle difference is that on a platform without RAPL_DIS at
-> > all, the VM will successfully launch and thus could run with RAPL enabled even
-> > if the VM requested RAPL_DIS?
-> 
-> I haven't tested this, but I would hope what you describe an error. I
-> think Tom means it's supported by the architecture, it just needs to
-> be enabled via reconfiguration.
-> 
-> Tycho
+Marc
