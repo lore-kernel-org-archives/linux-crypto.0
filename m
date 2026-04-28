@@ -1,140 +1,136 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDF333C3BE2
-	for <linux-crypto@vger.kernel.org>; Tue, 28 Apr 2026 15:53:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C30E143DA5F
+	for <linux-crypto@vger.kernel.org>; Tue, 28 Apr 2026 16:14:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777391630; cv=none; b=VjazERyhCzJF7MNUbRFDwM/HXSxAO+vqbG94fmize2Jhf69+thhLiE3KdXBFGvGnygcmyWe2bzE/qOh6DoTkugXrJf5jQVN7jCEmqp1wsP4wxlzmwJDbY+d0rQ0ZaWmF4CHBBFmDtz3RNkpKPc9sf2FPyYQEm09aP08sKqoZhnM=
+	t=1777392866; cv=none; b=szmIjWpUW7sK+lCG0FgiiTEILwr7vqAfW3WLpvtPJsRQLuXw+XjRyOxWCjsHrVZGsUug/WhzSuCnmGzl+qFJ4o/VCjNxlZgPEasC6GS5BqIIGWnCllxUKjCcyFPNNynaIG3j0XwMt9MvvMl8sWfdQDYG84jEwXeWdQJSPr1/Yac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777391630; c=relaxed/simple;
-	bh=92040OvP7NphZOcgJ01LGqbNZOBjVXmSRgTtp03HPzs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=EAPppqc+bOVJhKQk1+PpsOkzaC/bRkfh6+i2CwBlMEp8d+54fhnSvljHsiBQS2cvHgfwgk7g+RF1nvygwgtu/xGkgtP4VNekiVZHYYpanUTw1de1K5J1ByK1F3x+VH+SfQ72v9o2dUhX6+/+xEb1y3a9H5Yav3aqUSg/RHiXqI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Fyy6wJXR; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1777392866; c=relaxed/simple;
+	bh=vtRBxFYDRtCIfbhvjAwrasnDVRUrslKT4nqT86kXZqE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mj1qZgRPthBDeeWUYOC0NVrryJD9LPidQvxVhXMoQSzeltRZAIyuX4vDwxR26Jt0L2im4rhoHS5j2A258JsyhjvHSf6/+7sPOVvY1nsczPiG1z7SNzM01yif5TUyWqSjZxfUJLjHMCG7Pqx2Px0STxGrWm36cJHRtyX5ZjbYOA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FSCd6U0W; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Fyy6wJXR"
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-82f5f48458eso6955069b3a.3
-        for <linux-crypto@vger.kernel.org>; Tue, 28 Apr 2026 08:53:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FSCd6U0W"
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5a74962749aso140068e87.3
+        for <linux-crypto@vger.kernel.org>; Tue, 28 Apr 2026 09:14:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777391628; x=1777996428; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kQTB8wCBT8LVtOg4OyEn9zyS1CPfIyYMGlnzm+b7XDs=;
-        b=Fyy6wJXRQvkfAUjbfUFVq01cLng/WvJZkQnaxFh0bUdGWj2lYl3Lft9IyZKoaOwIV/
-         naNf2u+1YuL01lOOadaPQheUrDlX91QDPTlUxN1PNacdE0O9NY9chU8qHMNwDyUiDQoz
-         Z2zKXSx1hnOrAo6NLTAoBaR3u6BFm9QFb0JDvjm/znah96wu008KrpnSYSlTew+cw9DD
-         qt1q9KATGTHpKVQ7Gn/AtguqEB6RrjB1eBvLyd1bUvwja9z4r8gJ/ierFH2KWEkk21T/
-         /B3nGvtkX9PNMnd20eOBtA/QRYJ2Mrk0lNq9H+IHWx7NDWGzERQZs7yFCGsjFJX78EDV
-         +8ew==
+        d=gmail.com; s=20251104; t=1777392863; x=1777997663; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fMi+2e+Rz5b/ze+8xxh3jzCKZiMtlYsCgR+SOJgoVEM=;
+        b=FSCd6U0W+kENNsrsret3jl4eKd9cf6qDz9aTUs+ld+XoAnaL+nOqBjWuhxraI0Insa
+         kqXlrUBHE3rdBWT0JH04k3rUudsKlfIeoPWp3c5REcP+Zd7PJJJJBG3/p44ckj/8c5vY
+         /oRHSUDQnQZdj5Dw2nqRe6tPj1ff8fsEe7WBtB8q3MGMesuEmM9wUfs2L+to9HKESHsz
+         VK3ks/0BRy/2T2vEN+AumCqwWdqKRkppmi5hBPdEz0cEpn5h7xSJML2nbuaqqm+xG5+j
+         94qNGAr3v4r2WuGawQSJddoibSofZyvs1gSzNyRk0Hs0Z0xACS9sr/wi5fG8sFsjCPlv
+         VS1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777391628; x=1777996428;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kQTB8wCBT8LVtOg4OyEn9zyS1CPfIyYMGlnzm+b7XDs=;
-        b=MNuil/U7KCNY90v3gSWx7/5ZUM59+5bmHSq2ZYHJ0/CMUkLRCy3cnPIko4kw2bFOVa
-         7fsaeATScXJNq9VyDp0iTEiIfSDM4/YDs5SUH7yShoNxVDpXD7KzJ1G3vc5tcdvDNEft
-         uylCJsG8XNioRboIV32PUvxfCzk1EC/Z9nmdXJ/lgemC7fTC35fRc+yFQm3yw2T661Zk
-         opZxSnGufQQwQk9nJqqHpf6SwRsoyWta1ws/04IxhqnUZt4Mb1QrwBZfXqq46cVm/u7w
-         8wnAGSDgNg7sNgCDCwCTuTxX8Ual5g5IgiePy20yvcJOzjsjWZjyV6EQcPuUIq5O1Q64
-         yQEQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/Wu7N5iVHGHyo86Q3HUrT737f2PQP42AbwAHluG8nDca8nDzb4qhCnHC3dHrLbnU9e5NQuY91WiRCfNKE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywp85afsdPvR2dBWePPoHORr6/ynPJrG8rnn94j9KVp4bY9rUYv
-	rvO/yIir6IdxF+65sJzPrV/8Orp8+RNavJQaZWht92sNsxVALwbuO9VQZJS+DOQfPop0d2YGYO+
-	AfTnghw==
-X-Received: from pfbem34.prod.google.com ([2002:a05:6a00:3762:b0:82f:7a66:cfb0])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:12c1:b0:829:8c08:d1f4
- with SMTP id d2e1a72fcca58-834ddbec0e6mr3804392b3a.39.1777391627873; Tue, 28
- Apr 2026 08:53:47 -0700 (PDT)
-Date: Tue, 28 Apr 2026 08:53:46 -0700
-In-Reply-To: <afDJZQHNi-qdcEEe@tycho.pizza>
+        d=1e100.net; s=20251104; t=1777392863; x=1777997663;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fMi+2e+Rz5b/ze+8xxh3jzCKZiMtlYsCgR+SOJgoVEM=;
+        b=L5MsawwUMV+Gns8KCaqGdkJ3VrGCA3S4G4jjFTg98PuygOSz7qMnGfIl+V9vxxwshh
+         T//WH1Urh4/6vQ8D8/ZiIU8c1rhK1FZyVMe2ahCq+A8Yo6YRstQdih69u7XBhPRVm2rk
+         Aa4FU0JkiCcq42nw4RiZn6JSwfAIHnIKI1uZ9/DwEnMokfBk6/kbOvPAJ1UGYsqNWHJZ
+         Eff1kD7C2f1wbpHYNhRAL9ukgJcq8WKIUF6nAoSuo7W2st4g+8+kt0CxJp7fXVL79rEr
+         la9RWseVt0sCNLyK+kvMbXHgYCmdfDkXJcK94bx0zAhs8DcSXfQ904QmLZlixd6pBsWO
+         x+zg==
+X-Forwarded-Encrypted: i=1; AFNElJ97D8TDHS73iPmFOImXXundaTgco4bKHVu8pNf+rieWpWE7yV+b1Vo6G3jDXbWSdlGp5TQnMHwv8voP62M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfeY5ZDyZic+1uP9zs8IVQKX/qMIYIwIjtjeCwb3nfvWAnyf7F
+	11aVA3d3caXEDKLcTApS5RLGKpEj/ods+ICZwHJFycQzkovfwpR7PawY
+X-Gm-Gg: AeBDieudIKLMpAsyuPIBvHxoYRuUltqF7ysIXdxPuB/VWPk3mpBtglovl7nRrdKv0Zr
+	NmahTAvS6diSqbRVpE/EIVpjTgTaDfAUCV+znD+VKnoGCD6mtXg6c94HaX565B9Dnl6QUV8RBKr
+	WUvIhE2l3aRJ7ST8XWyx1pv8y1+l18vu5ZXDpX+T1IkxBemYqF8tvkj4GkG9yTGEl7c8MwtcAP7
+	7W1hlazdVxD/bwvdbnuh1iJ+4Un8dKLK6aOytqk5RAOEES0QXtLuRdKLX10GYFgE11JqkFHr99V
+	W/jkxaQxnPTHPSk+CmBvjiQPijNYGBnhdqo/Xzld8x4Phhz92v8s/t7W1/f0uvFgH+SOk5qwkTN
+	u9R8cIuZHnbB+zIToZPjEYeol7gmeWGJEueZKqL23d4MLiuW7LUKS6d/HOjwtUJC3xF/yNNwWbt
+	/jtaN6bCB9FRPS1QNKQWpCKf03pg==
+X-Received: by 2002:a05:6512:3c97:b0:5a2:7ab9:e12c with SMTP id 2adb3069b0e04-5a746623476mr1767503e87.24.1777392862547;
+        Tue, 28 Apr 2026 09:14:22 -0700 (PDT)
+Received: from localhost.localdomain ([2001:9b1:d5a0:a500::24b])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-3923f55f156sm8119671fa.32.2026.04.28.09.14.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Apr 2026 09:14:22 -0700 (PDT)
+From: "Uladzislau Rezki (Sony)" <urezki@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Uladzislau Rezki <urezki@gmail.com>
+Subject: [PATCH 1/2] mm/slab: Add kvfree_atomic() helper
+Date: Tue, 28 Apr 2026 18:14:18 +0200
+Message-ID: <20260428161419.94695-1-urezki@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260427204847.112899-1-tycho@kernel.org> <20260427204847.112899-4-tycho@kernel.org>
- <ae_TCofu4bHP_Ch-@google.com> <afDJZQHNi-qdcEEe@tycho.pizza>
-Message-ID: <afDYCpbeT0HsXTMF@google.com>
-Subject: Re: [PATCH v2 3/4] KVM: SEV: Add the kvm-amd.rapl_disable module parameter
-From: Sean Christopherson <seanjc@google.com>
-To: Tycho Andersen <tycho@kernel.org>
-Cc: Ashish Kalra <ashish.kalra@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>, 
-	John Allen <john.allen@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>, 
-	Shuah Khan <skhan@linuxfoundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Kim Phillips <kim.phillips@amd.com>, 
-	Alexey Kardashevskiy <aik@amd.com>, Nikunj A Dadhania <nikunj@amd.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Randy Dunlap <rdunlap@infradead.org>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
-	Kees Cook <kees@kernel.org>, Marco Elver <elver@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Li RongQing <lirongqing@baidu.com>, Eric Biggers <ebiggers@kernel.org>, 
-	"Paul E. McKenney" <paulmck@kernel.org>, linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Tue, Apr 28, 2026, Tycho Andersen wrote:
-> On Mon, Apr 27, 2026 at 02:20:10PM -0700, Sean Christopherson wrote:
-> > On Mon, Apr 27, 2026, Tycho Andersen wrote:
-> > > From: "Tycho Andersen (AMD)" <tycho@kernel.org>
-> > > 
-> > > Add a user-visible way to set the RAPL_DIS bit for SNP init.
-> > > 
-> > > Since setting RAPL_DIS affects the whole system, put the module parameter
-> > > in kvm_amd instead of in the CCP driver to hopefully make it more obvious
-> > > to admins.
-> > > 
-> > > Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
-> > > ---
-> > >  Documentation/admin-guide/kernel-parameters.txt | 5 +++++
-> > >  arch/x86/kvm/svm/sev.c                          | 8 ++++++++
-> > >  2 files changed, 13 insertions(+)
-> > > 
-> > > diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-> > > index 4d0f545fb3ec..2b50eed8664c 100644
-> > > --- a/Documentation/admin-guide/kernel-parameters.txt
-> > > +++ b/Documentation/admin-guide/kernel-parameters.txt
-> > > @@ -3207,6 +3207,11 @@ Kernel parameters
-> > >  			max_snp_asid == min_sev_asid-1, will effectively make
-> > >  			SEV-ES unusable.
-> > >  
-> > > +	kvm-amd.rapl_disable=	[KVM,AMD] Whether to disable RAPL
-> > > +			(Running Average Power Limit) when initializing the SNP
-> > > +			firmware. This disables the counters for the entire system until an
-> > > +			SNP shutdown command is issued.
-> > 
-> > I'm pretty sure I said this earlier: KVM absolutely should not be able to disable
-> > RAPL for the entire system.  That needs to be a power management thing.
-> 
-> You definitely noted "not CCP", I don't think I quite understood what
-> that meant though:
-> https://lore.kernel.org/all/aZ86BZWi-GLiHvmt@tycho.pizza/
-> 
-> I'm a little worried that putting it in power management will generate
-> some weird dependencies, or weakref symbols that can't change things
-> if they are loaded independently of kvm_amd or something. But let me
-> see what I can come up with.
+kvmalloc() now supports non-sleeping GFP flags, including
+the vmalloc fallback path. This means it may return vmalloc
+memory even for GFP_ATOMIC and GFP_NOWAIT allocations.
 
-Ugh, and it's not even powerman per se, it's actually a module in perf.  Oof.
+Freeing such memory with kvfree() may then end up calling
+vfree(), which is not safe for non-sleeping contexts.
 
-I 100% agree it'll be tricky, but I also stand by comments that neither the CCP
-driver or KVM should be allowed to silently pull the rug out from under the RAPL
-module.
+Introduce kvfree_atomic() helper for such cases. It mirrors
+kvfree(), but uses vfree_atomic() for vmalloced memory.
 
-> > KVM then needs to communicate (and enforce?) the policy to
-> > userspace.
-> 
-> KVM doesn't need to enforce anything, the SEV firmware will generate a
-> launch error for policy violation if it's not supported.
-> 
-> For communicating to userspace if it's not a kvm module parameter, one
-> option is to mask it off in sev_get_snp_supported_policy() if it was
-> initialized without the support. Then it'll be visible via
-> KVM_X86_SNP_POLICY_BITS.
+Signed-off-by: Uladzislau Rezki (Sony) <urezki@gmail.com>
+---
+ include/linux/slab.h |  3 +++
+ mm/slub.c            | 16 ++++++++++++++++
+ 2 files changed, 19 insertions(+)
 
-Ya, this is what I was envisioning.
+diff --git a/include/linux/slab.h b/include/linux/slab.h
+index 15a60b501b95..2b5ab488e96b 100644
+--- a/include/linux/slab.h
++++ b/include/linux/slab.h
+@@ -1234,6 +1234,9 @@ void *kvrealloc_node_align_noprof(const void *p, size_t size, unsigned long alig
+ extern void kvfree(const void *addr);
+ DEFINE_FREE(kvfree, void *, if (!IS_ERR_OR_NULL(_T)) kvfree(_T))
+ 
++extern void kvfree_atomic(const void *addr);
++DEFINE_FREE(kvfree_atomic, void *, if (!IS_ERR_OR_NULL(_T)) kvfree_atomic(_T))
++
+ extern void kvfree_sensitive(const void *addr, size_t len);
+ 
+ unsigned int kmem_cache_size(struct kmem_cache *s);
+diff --git a/mm/slub.c b/mm/slub.c
+index 2b2d33cc735c..b096677c8152 100644
+--- a/mm/slub.c
++++ b/mm/slub.c
+@@ -6802,6 +6802,22 @@ void kvfree(const void *addr)
+ }
+ EXPORT_SYMBOL(kvfree);
+ 
++/**
++ * kvfree_atomic() - Free memory.
++ * @addr: Pointer to allocated memory.
++ *
++ * Same as kvfree(), but uses vfree_atomic() for vmalloc
++ * backed memory. Must not be called from NMI context.
++ */
++void kvfree_atomic(const void *addr)
++{
++	if (is_vmalloc_addr(addr))
++		vfree_atomic(addr);
++	else
++		kfree(addr);
++}
++EXPORT_SYMBOL(kvfree_atomic);
++
+ /**
+  * kvfree_sensitive - Free a data object containing sensitive information.
+  * @addr: address of the data object to be freed.
+-- 
+2.47.3
+
