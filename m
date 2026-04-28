@@ -1,87 +1,156 @@
-Received: from n169-112.mail.139.com (n169-112.mail.139.com [120.232.169.112])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD5792EAB6F;
-	Tue, 28 Apr 2026 05:08:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=120.232.169.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E9763115AF;
+	Tue, 28 Apr 2026 05:42:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777352931; cv=none; b=jyCXRgtdt0lWlLamvqRGpTz09CROhdWmT4qoucnl/y+denl2vE04zPCfv6orD7JnRPI83M3qAWyaVIKGHe7KplYhKRW6XOTVCFn9Lp7NOgmenyWnB92JBJYvhxaFsH64gqjKDmYU96rhLR7gplTp9k3CP6coi9vx0B+FhDBZoKc=
+	t=1777354939; cv=none; b=SMhZkW5/AQIQfCIF4D7QJz9jk+k/T4wYPflzxkCvdEMQkf3pnQejQNvjYHFVINWTLowSn1ihaRxwUw8fxiAsnsjC0vOdADi6K9VOJCDFy0k9aJP/HCrE3nei6NRkvMDQtQxLOHukDu53PP4B2AvUFmGoGuwvQHYIdGNfItIIPBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777352931; c=relaxed/simple;
-	bh=At8ZEZXEyl6/MPyg8ioxlqaVNvw99hDz7FkN8u7FKwQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=beGXGmE7URyVQy4ISb0D7dqIu8PnTxrEyyNlbeks1VuplEd5oGkdWYk41aKSnW6pGSTluAg7SxwevDRQkbLQDV36haL9XdXlD65u5QD4oGY6mGnI0M8dVxt+N2pOFS+OKeMj5oN70ob5DM/ZAMeR2cWZiSMjOpUveAn7Nc+WtM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com; spf=pass smtp.mailfrom=139.com; dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b=IJersduD; arc=none smtp.client-ip=120.232.169.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=139.com
+	s=arc-20240116; t=1777354939; c=relaxed/simple;
+	bh=qo5vRuAiZ5shJ6Ei1mLjY/jgzTrGIUBhYCvJ/yKzkJM=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=bM60vZcMBpwocIUgFtrSRMNOjVAa1Fur0IQNsvm771sjwCivlD0lmXdk2wHPlqGClcZ/r/W5T7J3QucHXDc83DSkYPi6E0KjGTgeUBAa0nNqZsU30yXtRQ/zv3hI5VWNeyypWgqdUWnZVhscshGphATntQQGq0/CSlUAWsJhveg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VE5Mdvf1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b="IJersduD"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=139.com; s=dkim; l=0;
-	h=from:subject:message-id:to:cc:mime-version;
-	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
-	b=IJersduDip7NEoZgwim79Kd4DUPffOpMwPsHy6d6A46GvZTfz1AxKqwP/CYOBio0mhGnFtpnkpn/O
-	 D0BUJkcobWqypuxRbRFOKP/zqH87n5Lls8m4YnAVQrWC3yAdk529vMW/7eemPyi9KqTN3D+xr1PUc7
-	 gXwMGhE+6INeJA8Q=
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM:                                                                                        
-X-RM-SPAM-FLAG:00000000
-Received:from  (unknown[47.95.114.252])
-	by rmsmtp-lg-appmail-20-12023 (RichMail) with SMTP id 2ef769f040bbf4e-00f7f;
-	Tue, 28 Apr 2026 13:08:45 +0800 (CST)
-X-RM-TRANSID:2ef769f040bbf4e-00f7f
-From: Bin Lan <lanbincn@139.com>
-To: gregkh@linuxfoundation.org,
-	sashal@kernel.org,
-	stable@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	steffen.klassert@secunet.com,
-	daniel.m.jordan@oracle.com,
-	linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
-	Bin Lan <lanbincn@139.com>
-Subject: [PATCH 5.15.y 2/2] padata: Remove comment for reorder_work
-Date: Tue, 28 Apr 2026 13:07:59 +0800
-Message-ID: <20260428050800.10488-3-lanbincn@139.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260428050800.10488-1-lanbincn@139.com>
-References: <20260428050800.10488-1-lanbincn@139.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VE5Mdvf1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54FA1C2BCB7;
+	Tue, 28 Apr 2026 05:42:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777354939;
+	bh=qo5vRuAiZ5shJ6Ei1mLjY/jgzTrGIUBhYCvJ/yKzkJM=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=VE5Mdvf1L11srgxqI0fu8IQkXAwHWJRquKsXN+oi0hvK30UU7v3HHJmRw6PGRCqU3
+	 R5wWGcSe9DwInoIakwEe1ZHe3vtDh7wj/aNCSveRQF65Zckd5Gw8b0SpRUN57KXaxs
+	 0ZDb1bz1kvVyTK9+ICt6zKKRDmCUTVsfwP35iJnEy+ZuJTqsgkM05HjT64eMiCr5Qb
+	 P0YbMw8rl3PIb4MKxabFEpw7PE1UaFSRWti3xbhQ8hrI+bqrDsCF3rRTa25yN+T6hQ
+	 t4Cq4rEUHn/r1R1Hd7q0U9WKuRCWVuIwbViYywY9Y1IGVk4eyYi+Rxw3XPYKLAJw39
+	 uBua1VHYTU7LQ==
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 47211F40068;
+	Tue, 28 Apr 2026 01:42:17 -0400 (EDT)
+Received: from phl-imap-02 ([10.202.2.81])
+  by phl-compute-01.internal (MEProxy); Tue, 28 Apr 2026 01:42:17 -0400
+X-ME-Sender: <xms:uUjwadNnbsIFPafuw-OVEQpwwRXHXq740CnTMLfTCXSFvdZm_u67IA>
+    <xme:uUjwaayaXIa0-S75f3xS9QxCKvCZNwbOUC2CUgriajprgyxNeJwTlSCZQ_A0ORk_t
+    MLQsPnSBhOy5Q-5It-ew2UCmORmBSBNaY2IwR0s_8wRo1PpDk0qBK4>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdektdejiecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefoggffhffvvefkjghfufgtgfesthejredtredttdenucfhrhhomhepfdetrhguuceu
+    ihgvshhhvghuvhgvlhdfuceorghruggssehkvghrnhgvlhdrohhrgheqnecuggftrfgrth
+    htvghrnhepvdeuheeitdevtdelkeduudetgffftdelteefteevjeevjeeiheefhfejieej
+    fedunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hrugdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudeijedthedttdejledq
+    feefvdduieegudehqdgrrhgusgeppehkvghrnhgvlhdrohhrghesfihorhhkohhfrghrug
+    drtghomhdpnhgspghrtghpthhtohepudeipdhmohguvgepshhmthhpohhuthdprhgtphht
+    thhopeguihhmrgesrghrihhsthgrrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvh
+    gvmhhlohhfthdrnhgvthdprhgtphhtthhopedtgiejfhegheegtgegieesghhmrghilhdr
+    tghomhdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdrohhrgh
+    drrghupdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphht
+    thhopehkuhhnihihuhesghhoohhglhgvrdgtohhmpdhrtghpthhtohepnhgtrghrugifvg
+    hllhesghhoohhglhgvrdgtohhmpdhrtghpthhtohepughsrghhvghrnheskhgvrhhnvghl
+    rdhorhhgpdhrtghpthhtohepvggsihhgghgvrhhssehkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:uUjwaUXMG2Lz-xrukyp70uaUwyl6jE_hKE-KwQZmMzOj9BKcG6n3gA>
+    <xmx:uUjwaZh1MCFSSEgYXvqDqzs6KhGm9NpyF1MHic5Guk_RvDV9reav-w>
+    <xmx:uUjwaYunFcLFyYjB8OiZPeST60NNFBHq7dI9msTG_LCZMDfFnnz2ew>
+    <xmx:uUjwaRwCZcMRJAAZ_YV8JezKoFHS5TQHwbpB6W99OjhSfSeZkHtCQg>
+    <xmx:uUjwaVawrOVkw_I8ZMGsX79oJKrBc27L0_3driL40KXRuiv5EXtHCiU8>
+Feedback-ID: ice86485a:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 222A6700065; Tue, 28 Apr 2026 01:42:17 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-
-From: Herbert Xu <herbert@gondor.apana.org.au>
-
-[ Upstream commit 82a0302e7167d0b7c6cde56613db3748f8dd806d ]
-
-Remove comment for reorder_work which no longer exists.
-
-Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-Fixes: 71203f68c774 ("padata: Fix pd UAF once and for all")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Bin Lan <lanbincn@139.com>
----
- include/linux/padata.h | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/include/linux/padata.h b/include/linux/padata.h
-index 9ca779d7e310..6f07e12a4381 100644
---- a/include/linux/padata.h
-+++ b/include/linux/padata.h
-@@ -90,7 +90,6 @@ struct padata_cpumask {
-  * @processed: Number of already processed objects.
-  * @cpu: Next CPU to be processed.
-  * @cpumask: The cpumasks in use for parallel and serial workers.
-- * @reorder_work: work struct for reordering.
-  */
- struct parallel_data {
- 	struct padata_shell		*ps;
--- 
-2.43.0
+X-ThreadId: A-XTvJNalJ4N
+Date: Tue, 28 Apr 2026 07:41:56 +0200
+From: "Ard Biesheuvel" <ardb@kernel.org>
+To: "Dmitry Safonov" <0x7f454c46@gmail.com>,
+ "Jakub Kicinski" <kuba@kernel.org>
+Cc: "Eric Biggers" <ebiggers@kernel.org>, netdev@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ "Eric Dumazet" <edumazet@google.com>, "Neal Cardwell" <ncardwell@google.com>,
+ "Kuniyuki Iwashima" <kuniyu@google.com>,
+ "David S . Miller" <davem@davemloft.net>, "David Ahern" <dsahern@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>,
+ "Jason A . Donenfeld" <Jason@zx2c4.com>,
+ "Herbert Xu" <herbert@gondor.apana.org.au>,
+ "Dmitry Safonov" <dima@arista.com>
+Message-Id: <c557c50d-95ea-4e72-bff4-587508a0273c@app.fastmail.com>
+In-Reply-To: 
+ <CAJwJo6Zh_1V009JSBGwAmR7GWj=2HdG6f=uBxK8krE4B1YrGkA@mail.gmail.com>
+References: <20260427172727.9310-1-ebiggers@kernel.org>
+ <CAJwJo6Z9oJSMMBUL_pbYWN6ha3n4MRpKV_aVut8E+af3JUDFkw@mail.gmail.com>
+ <20260427155538.2e1b8488@kernel.org>
+ <CAJwJo6Zh_1V009JSBGwAmR7GWj=2HdG6f=uBxK8krE4B1YrGkA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 0/5] Reimplement TCP-AO using crypto library
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
 
+
+On Tue, 28 Apr 2026, at 02:00, Dmitry Safonov wrote:
+> On Mon, 27 Apr 2026 at 23:55, Jakub Kicinski <kuba@kernel.org> wrote:
+>>
+>> On Mon, 27 Apr 2026 20:09:05 +0100 Dmitry Safonov wrote:
+>> > I do like these numbers quite much! Yet, as I mentioned in version
+>> > 1, removing a fallback for other algorithms' support does not sound
+>> > good to me. There are two reasons:
+>> > - Ronald P. Bonica (the original RFC5925 author), together with
+>> >   Tony Li do have an active RFC draft to support the additional
+>> >   algorithms
+>> > [1], potentially in addition to TCP Extended Options [2]
+>> > - There is at least one open-source BGP implementation (BIRD) that
+>> >   allows using the algorithms that you are removing [3]. Without a
+>> >   deprecation period and communication with at least known open
+>> >   source users, it implies intentionally breaking them, which I
+>> >   can't agree with.
+>> >
+>> > I don't feel like Naking as we don't have any customers using
+>> > anything other than the 3 algorithms above (and BGP implementation
+>> > is [unfortunately] closed-source, so that would not feel
+>> > appropriate even if we had such customers), yet I do feel like it's
+>> > worth and appropriate to express my thoughts/concerns.
+>>
+>> What do you want to happen? You are the maintainer of this code, you
+>> don't get so say "i don't want to nack it but also no" :)
+>
+> Yeah, that's not what I meant. I see value in Eric's contribution, and
+> I like getting rid of tcp-sigpool. So, anything but "nack" is not "no"
+> :-)
+>
+>> Like Eric says if there are no real users code can be deleted. Adding
+>> deprecation warnings upstream is quite slow, IDK if injecting
+>> deprecation warnings to stable has been discussed..
+>
+> FWIW, I've written to bird's mailing list inviting them to this
+> thread; in case if they need other algorithms to be supported,
+> hopefully that should avoid any breakages on their side. I'm aware
+> that ciena and fortinet use tcp-ao too, but I'm less concerned, as
+> they aren't open source.
+>
+
+Strongly agree with Eric here.
+
+We've been well aware for some time now that the LEGO brick model
+doesn't really work that well with crypto, and being able to combine
+arbitrary cryptographic primitives to construct your own algorithms from
+user space is not a feature, it's a bug.
+
+Sure, you can use HMAC to construct a MAC algorithm from any hash
+algorithm. But hashes are typically much more costly in terms of
+performance, due to the fact that they need to protect against
+collisions. MAC algorithms do not have this requirement, because they
+involve a secret key which is used symmetrically, i.e., both for signing
+and for authentication. IOW, forging a message to match a given MAC
+would require knowledge of the secret key, at which point an attacker
+can just use it to sign the message.
+
+This is the reason why more modern algorithms involving MACs use GHASH
+or Poly1305 instead (or KMAC256 as Eric suggested), which perform much
+better. Even AES-CMAC is not a great choice in this context. But these
+algorithms need to be constructed carefully, not just swapped in.
