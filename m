@@ -1,116 +1,113 @@
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from xry111.site (xry111.site [89.208.246.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFE3C41B349
-	for <linux-crypto@vger.kernel.org>; Tue, 28 Apr 2026 12:33:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 567E5402BBE;
+	Tue, 28 Apr 2026 12:56:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.208.246.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777379598; cv=none; b=Ic8f3GuUJsfgfAM9CZssuJyJe8LCJuZQK0GAqKYuJciYkthc4T7os65uNpFTw3u9jjfRKIdFJnV2WSsKHSowkbtW4/1S6Ixa7T2ZcPfI8f/+lMDvbJgyyagVouLNX3V7GfQdDB8RmGuabXI7syM2XfVDh+nUTmu+grl97NEVw2g=
+	t=1777380983; cv=none; b=DBGMJiYifr91HRRT82FhYrHooJrZ3ui+tw5hlYsNUGjILw9hRxN4w4KqwGFGmmzxvpyHb1Cs7RJGTHa36vdR6FfMiAOsG+nwJ5WU3bsBjITsLBCFCcNpIxPo5k2nBNkiPdDcxrjOWzZQXeE2e0GRjcE++BRKM6AO2L69dcuLv/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777379598; c=relaxed/simple;
-	bh=zPFMhT8JWttIp1liGDJ/ifYR9oX4Q/TrRaAfoDm1M4g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kQv1j4SwBxlY3G4Qy4IbBWL/svOM5ehfaUbWtHk9t+NiKX2UiFe1/POTr/68qpMkW/lPIpFBVjjd5XUxjsH/UT8tE1IA7A9hs/x5WoOOO89O9Mpw0q9qKCLMHJ+gc0WDnVkcygTWK5iMN09VsQdJxwsHnqo1aTrf8i1fJw7pWXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LLgqsbCy; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1777380983; c=relaxed/simple;
+	bh=3LZCtvQyQQ4G9qvBdWsxGvE48csnHu6g4bVvkSdatkg=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=tezeiIrwNO/KEAE6QakIR4MEPAwt8rLjcmFJiGkYKiUBYE7Vp2+0nwil3gmPV56Bq4Kjx8NMTYG9bOP/yqkDPprnVzenGuJEAHnzJjSP8+hxGDh9ODbgxUOniy7xObAswdh8cSQ0rnCg14uAx242n82PMYZzYSl0qs7E1HfXQgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site; spf=pass smtp.mailfrom=xry111.site; dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b=RH9Kh2bI; arc=none smtp.client-ip=89.208.246.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xry111.site
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LLgqsbCy"
-Date: Tue, 28 Apr 2026 14:32:52 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1777379579;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/1ATwxQzv3bF5ExhjGlAkFYLpgrDUAcbjVTMBpGbV2Y=;
-	b=LLgqsbCyD6VGWbuT5dDv3ZJJt1w6Dsy36SGj4v1eqG8CNz9mVhT4Z9b7+FBlAcQIAK6shv
-	/4TeF5Pze9BNdIEFsVI8x2dvjNlEByTQvl9jduj0s4gb3vQ0pY9A82JP5+m8qrYhP6Se43
-	jt3xvAsewskiFyGJoFHu9Ejbux7IzeY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>
-Cc: Bill Cox <waywardgeek@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Linus Walleij <linusw@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
-	stable@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] crypto: atmel-sha204a - drop hwrng quality reduction
- for ATSHA204A
-Message-ID: <afCo9PbDpTYeqGd4@linux.dev>
-References: <20260428101430.514838-3-thorsten.blum@linux.dev>
- <25ntssyy6t5uwxlwfpmrpzpcq6xv62l643hflf26hxi6lv5wqu@6vub6ysczjvd>
+	dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b="RH9Kh2bI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=xry111.site;
+	s=default; t=1777380959;
+	bh=3LZCtvQyQQ4G9qvBdWsxGvE48csnHu6g4bVvkSdatkg=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=RH9Kh2bIgrRUVjMbXmABLFO+Oasyqmsd+cuNpKkwPZYUql3B/uQYIrNt/2R0it3+l
+	 KczNBXtbIbn4L3wWejQuDnYB5pp+EjwA2uAyBG1E3DUZm387ZjO5EH4dsft8lVDfW6
+	 C044ohcZLZ0T6gjVLhnlmfcIqiyrB6e/YtQLElBA=
+Received: from [127.0.0.1] (2607-8700-5500-e873-0000-0000-0000-1001.16clouds.com [IPv6:2607:8700:5500:e873::1001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (secp384r1) server-digest SHA384)
+	(Client did not present a certificate)
+	(Authenticated sender: xry111@xry111.site)
+	by xry111.site (Postfix) with ESMTPSA id 60AB565992;
+	Tue, 28 Apr 2026 08:55:58 -0400 (EDT)
+Message-ID: <197d8afc8c6afe165e60c219b0a08ce6b6698ff9.camel@xry111.site>
+Subject: Re: [PATCH v2] mfd: loongson-se: Add multi-node support
+From: Xi Ruoyao <xry111@xry111.site>
+To: Huacai Chen <chenhuacai@kernel.org>, Qunqin Zhao <zhaoqunqin@loongson.cn>
+Cc: lee@kernel.org, linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
+ 	linux-crypto@vger.kernel.org
+Date: Tue, 28 Apr 2026 20:55:56 +0800
+In-Reply-To: <CAAhV-H7SYoN49ZoFi+4V=qyctdzJG0hD=WUBBozewkQzKYia5w@mail.gmail.com>
+References: <20260427165133.23350-1-zhaoqunqin@loongson.cn>
+	 <CAAhV-H7cYTW+6aHHtA9c77XMOhnUrAC_rW25s9d6+xED2oGyAw@mail.gmail.com>
+	 <586ee1d1-c1c4-06fe-992f-c8e43cd9c778@loongson.cn>
+	 <CAAhV-H7nbnLcYs=74pub6SXXrRRv-xPWTXN78wxaRPyGodUaxg@mail.gmail.com>
+	 <9fd34867-9b1d-e097-f800-875efc6c44bd@loongson.cn>
+	 <CAAhV-H7SYoN49ZoFi+4V=qyctdzJG0hD=WUBBozewkQzKYia5w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+User-Agent: Evolution 3.60.1 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <25ntssyy6t5uwxlwfpmrpzpcq6xv62l643hflf26hxi6lv5wqu@6vub6ysczjvd>
-X-Migadu-Flow: FLOW_OUT
 
-Hi Marek,
+T24gTW9uLCAyMDI2LTA0LTI3IGF0IDE4OjAyICswODAwLCBIdWFjYWkgQ2hlbiB3cm90ZToKPiBP
+biBNb24sIEFwciAyNywgMjAyNiBhdCA1OjUy4oCvUE0gUXVucWluIFpoYW8gPHpoYW9xdW5xaW5A
+bG9vbmdzb24uY24+IHdyb3RlOgo+ID4gCj4gPiAKPiA+IOWcqCAyMDI2LzQvMjcg5LiL5Y2INToz
+NywgSHVhY2FpIENoZW4g5YaZ6YGTOgo+ID4gPiBPbiBNb24sIEFwciAyNywgMjAyNiBhdCA1OjI0
+4oCvUE0gUXVucWluIFpoYW8gPHpoYW9xdW5xaW5AbG9vbmdzb24uY24+IHdyb3RlOgo+ID4gPiA+
+IAo+ID4gPiA+IOWcqCAyMDI2LzQvMjcg5LiL5Y2INTowMiwgSHVhY2FpIENoZW4g5YaZ6YGTOgo+
+ID4gPiA+ID4gSGksIFF1bnFpbiwKPiA+ID4gPiA+IAo+ID4gPiA+ID4gT24gTW9uLCBBcHIgMjcs
+IDIwMjYgYXQgNDo1NeKAr1BNIFF1bnFpbiBaaGFvCj4gPiA+ID4gPiA8emhhb3F1bnFpbkBsb29u
+Z3Nvbi5jbj4gd3JvdGU6Cj4gPiA+ID4gPiA+IE9uIHRoZSBMb29uZ3NvbiBwbGF0Zm9ybSwgZWFj
+aCBub2RlIGlzIGVxdWlwcGVkIHdpdGggYQo+ID4gPiA+ID4gPiBzZWN1cml0eSBlbmdpbmUKPiA+
+ID4gPiA+ID4gZGV2aWNlLiBIb3dldmVyLCBkdWUgdG8gYSBoYXJkd2FyZSBmbGF3LCBvbmx5IHRo
+ZSBkZXZpY2Ugb24KPiA+ID4gPiA+ID4gbm9kZSAwIGNhbgo+ID4gPiA+ID4gPiB0cmlnZ2VyIGlu
+dGVycnVwdHMuIFRoZXJlZm9yZSwgaW50ZXJydXB0cyBmcm9tIG90aGVyIG5vZGVzCj4gPiA+ID4g
+PiA+IGFyZSBmb3J3YXJkZWQKPiA+ID4gPiA+ID4gYnkgbm9kZSAwLiBXZSBuZWVkIHRvIGNoZWNr
+IGluIHRoZSBpbnRlcnJ1cHQgaGFuZGxlciBvZiBub2RlCj4gPiA+ID4gPiA+IDAgd2hldGhlcgo+
+ID4gPiA+ID4gPiB0aGlzIGludGVycnVwdCBpcyBpbnRlbmRlZCBmb3Igb3RoZXIgbm9kZXMuCj4g
+PiA+ID4gPiBNdWx0aS1ub2RlIG9yIG11bHRpLXBhY2thZ2U/IEluIG15IG9waW5pb24gU0UgaGFz
+IG5vCj4gPiA+ID4gPiByZWxhdGlvbnNoaXAgd2l0aAo+ID4gPiA+ID4gTlVNQSBub2RlLCBzbyBt
+YXliZSBwYWNrYWdlPwo+ID4gPiA+IEhlcmUgaXMgdGhlIG91dHB1dCBvZiBsc2NwdSBmcm9tIG15
+IG1hY2hpbmU6Cj4gPiA+ID4gCj4gPiA+ID4gW2xvb25nc29uQGxvY2FsaG9zdCB+XSQgbHNjcHUK
+PiA+ID4gPiBBcmNoaXRlY3R1cmU6wqDCoMKgwqDCoMKgwqDCoMKgIGxvb25nYXJjaDY0Cj4gPiA+
+ID4gwqDCoMKgIENQVSBvcC1tb2RlKHMpOsKgwqDCoMKgwqAgMzItYml0LCA2NC1iaXQKPiA+ID4g
+PiDCoMKgwqAgQWRkcmVzcyBzaXplczrCoMKgwqDCoMKgwqAgNDggYml0cyBwaHlzaWNhbCwgNDgg
+Yml0cyB2aXJ0dWFsCj4gPiA+ID4gwqDCoMKgIEJ5dGUgT3JkZXI6wqDCoMKgwqDCoMKgwqDCoMKg
+IExpdHRsZSBFbmRpYW4KPiA+ID4gPiBDUFUocyk6wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgIDEyOAo+ID4gPiA+IMKgwqDCoCBPbi1saW5lIENQVShzKSBsaXN0OiAwLTEyNwo+ID4gPiA+
+IE1vZGVsIG5hbWU6wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBMb29uZ3Nvbi0zQzYwMDAvRAo+ID4g
+PiA+IMKgwqDCoCBDUFUgZmFtaWx5OsKgwqDCoMKgwqDCoMKgwqDCoCBMb29uZ3Nvbi02NGJpdAo+
+ID4gPiA+IMKgwqDCoCBNb2RlbDrCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIDB4MTEKPiA+
+ID4gPiDCoMKgwqAgVGhyZWFkKHMpIHBlciBjb3JlOsKgIDIKPiA+ID4gPiDCoMKgwqAgQ29yZShz
+KSBwZXIgc29ja2V0OsKgIDMyCj4gPiA+ID4gwqDCoMKgIFNvY2tldChzKTrCoMKgwqDCoMKgwqDC
+oMKgwqDCoCAyCj4gPiA+ID4gwqDCoMKgIEJvZ29NSVBTOsKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
+NDIwMC4wMAo+ID4gPiA+IMKgwqDCoCBGbGFnczrCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+IGNwdWNmZyBsYW0gdWFsIGZwdSBsc3ggbGFzeCBjcmMzMgo+ID4gPiA+IGNvbXBsZXggY3J5cHRv
+Cj4gPiA+ID4gbHZ6IGxidF94ODYgbGJ0X2FybSBsYnRfbWlwcwo+ID4gPiA+IENhY2hlcyAoc3Vt
+IG9mIGFsbCk6Cj4gPiA+ID4gwqDCoMKgIEwxZDrCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoCA0IE1pQiAoNjQgaW5zdGFuY2VzKQo+ID4gPiA+IMKgwqDCoCBMMWk6wqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqAgNCBNaUIgKDY0IGluc3RhbmNlcykKPiA+ID4gPiDCoMKgwqAg
+TDI6wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAxNiBNaUIgKDY0IGluc3RhbmNl
+cykKPiA+ID4gPiDCoMKgwqAgTDM6wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAx
+MjggTWlCICg0IGluc3RhbmNlcykKPiA+ID4gPiBOVU1BOgo+ID4gPiA+IMKgwqDCoCBOVU1BIG5v
+ZGUocyk6wqDCoMKgwqDCoMKgwqAgNAo+ID4gPiA+IMKgwqDCoCBOVU1BIG5vZGUwIENQVShzKTrC
+oMKgIDAtMzEKPiA+ID4gPiDCoMKgwqAgTlVNQSBub2RlMSBDUFUocyk6wqDCoCAzMi02Mwo+ID4g
+PiA+IMKgwqDCoCBOVU1BIG5vZGUyIENQVShzKTrCoMKgIDY0LTk1Cj4gPiA+ID4gwqDCoMKgIE5V
+TUEgbm9kZTMgQ1BVKHMpOsKgwqAgOTYtMTI3Cj4gPiA+ID4gCj4gPiA+ID4gVGhlcmUgYXJlIGZv
+dXIgU0UgZGV2aWNlcyBpbiBteSBzeXN0ZW0sIG9uZSBmb3IgZWFjaCBOVU1BIG5vZGUuCj4gPiA+
+IEZvciBMb29uZ3Nvbi0zQzYwMDAgbm9kZSBpcyB0aGUgc2FtZSBhcyBwYWNrYWdlLiBZb3Ugc2hv
+dWxkCj4gPiA+IGNvbnNpZGVyCj4gPiA+IExvb25nc29uLTNDNTAwMEwsIG9uZSBwYWNrYWdlIGNv
+bnRhaW5zIGZvdXIgbm9kZXMuCj4gPiAKPiA+IEkgYW0gbm90IGZhbWlsaWFyIHdpdGggdGhlIFNF
+LXJlbGF0ZWQgY29tcG9uZW50cyBvbiB0aGUgM0M1MDAwTCwgYW5kCj4gPiB0aGlzIGRyaXZlciBp
+cyBub3QgY29tcGF0aWJsZSB3aXRoIHRoZSA1MDAwIHNlcmllcy4KPiBXaGV0aGVyIGl0IGlzIGNv
+bXBhdGlibGUgdG8gTG9vbmdzb24tM0M1MDAwTCBpcyBub3QgaW1wb3J0YW50LiBUaGUKPiBpbXBv
+cnRhbmNlIGlzIHBhY2thZ2UgaXMgbm90IGFsd2F5cyBlcXVhbCB0byBub2RlLCBhbmQgd2Ugc2hv
+dWxkCj4gY29uc2lkZXIgd2hldGhlciBTRSBpcyBwZXItbm9kZSBvciBwZXItcGFja2FnZS4KCkZv
+ciBhICJjb21wYXRpYmxlIiBleGFtcGxlLCAzQzYwMDAvRCBoYXMgdHdvIG5vZGVzIGluIGEgcGFj
+a2FnZS4KCi0tIApYaSBSdW95YW8gPHhyeTExMUB4cnkxMTEuc2l0ZT4K
 
-On Tue, Apr 28, 2026 at 01:18:08PM +0200, Marek Behún wrote:
-> Adding Bill Cox (waywardgeek) to the conversation.
-> 
-> In the meantime Nack from me on this patch.
-> 
-> From the original messages by Bill, it seems to me the part he was reviewing
-> was the ATSHA204A.
-> 
-> In subsequent reply [1] Bill states
-> 
->   While there is some evidence, there is still no convincing proof that there
->   is an entropy source in this device at all.  There is some evidence that
->   Atmel has inserted a back-door.  My advice is to avoid this line of parts
->   from Atmel for cryptographic use.
-> 
-> In another message Peter Gutmann asks about ATECC108 [2] and Bill replies [3]
-> 
->   This part uses the same language to describe the random number generator.
->   It is "high quality".  I think that's pretty funny.
->   I would be interested in seeing if the new part can generate random numbers
->   continuously, or if it fails after it's EEPROM wears out like their other
->   parts.  The use of an EEPROM seed is for PWN-ing your RNG, not making it
->   more secure.
-> 
-> IMO the comments from the actual reviewer are more relevant than those of the
-> engineer working for the company which was accused of creating low quality
-> / backdoored TRNG, at least until the Atmel engineer provides some evaluation
-> code for the device (which they suggested they might do [4], but never did as
-> far as I can find).
-> 
-> Maybe we can instead change the ATECC quality to something like 32? Does that
-> even make sense?
-> 
-> Marek
-> 
-> [1] https://www.metzdowd.com/pipermail/cryptography/2014-December/023857.html
-> [2] https://www.metzdowd.com/pipermail/cryptography/2014-December/023870.html
-> [3] https://www.metzdowd.com/pipermail/cryptography/2014-December/023879.html
-> [4] https://www.metzdowd.com/pipermail/cryptography/2014-December/023886.html
-
-Bill wrote in his review:
-
-  "If I made no mistake (and I do make a lot), the "random" data from
-   the Atmel ATSHA204A is highly predictable when you disable the seed
-   update to EEPROM."
-
-However, the atmel-sha204a driver doesn't operate the device in that
-mode. It uses the Random command with seed updates enabled, which is
-also what the datasheet recommends for highest security:
-
-  "Microchip recommends that the EEPROM seed always be updated."
-
-So the reported behavior doesn't reflect how the driver uses the device.
-
-Thanks,
-Thorsten
