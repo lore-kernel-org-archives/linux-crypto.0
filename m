@@ -1,106 +1,196 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F3AA22A4E9;
-	Tue, 28 Apr 2026 01:36:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 792041DF25C;
+	Tue, 28 Apr 2026 02:47:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777340202; cv=none; b=K8E0t+dXsLdXTJdbf3iBC/YeL64kjg02wELif38xAistlWeebBr3CHMv8B8wyRURBGDzz47RVGRzCMmunR9bSdW9WqqsjgPPWYli/oqfVqEOwcSKSdFxvH3mWwGexPU4Ev07ouALtM+AOtk5sgzeNV2jfxQUijT5Iu7Ajp+lkpA=
+	t=1777344429; cv=none; b=knv7cSaYrYf1yFHGGQ8k0/yvKWu6hOk/A4HblAZt8NrRkXGetU1HJBg+bAEly22b2XZla6WWFGMAoH8e3qLrbPEyUvDsinipeZMX7EKb49TkGGeQMEJSEJCTMx3fxFPw380wl4MBVRyvvWn9e1brSyfxkn/sC4eYlE/FFqWWnps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777340202; c=relaxed/simple;
-	bh=SxEnJ5lG7Z3dI9JA/sUF0K65BeJfFboQkDmohfpIDPA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CExG5A4dGRYGEWfy3QKAUKqD9agsrgOMRJz/KbMKt2Qkgz9u6DQQVcj7sPX4/EojSUTEpav26TQRflqh7pIJL8l0uSEUbjIbZaU/pzlaxfTud+vtzOhLV3koNb9dPBKAosi9K7VthYZqxHa8Z56JAB55RqeV97QyVpv923fAFds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gNoXSzz9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777344429; c=relaxed/simple;
+	bh=mVJSxfGuAiiALaqw6cebpSUplEdzz/52FbX/446Vss4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hkajIm4tJV3JcqVceR8GCQt71FYB4ZZ8UHwm1GBIq4bxCsKTlOgPBJLgMBnBe0W9ixVq69ZieOx784g/DDMKGNlrSMHhpMYCiM66iRdqUQc2lNc58O7QgtUWCpNqBUYTmPNlASI2kPXofEPF29Di4n+ooVZN9ecxwwfHCtZ6qFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aGLfRmXH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gNoXSzz9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C431CC19425;
-	Tue, 28 Apr 2026 01:36:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aGLfRmXH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACE52C19425;
+	Tue, 28 Apr 2026 02:47:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777340202;
-	bh=SxEnJ5lG7Z3dI9JA/sUF0K65BeJfFboQkDmohfpIDPA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gNoXSzz9njbbGSOq71tipeGEgjt4i+Nq2t1QmvP0O1uNKQMyq/2NLqswpkfsvTaDM
-	 fjQpokGjQG9lS67rzUV0Kqqyk7B93gRLgWMLcfzkn7r0SdMM9cJaN6wXblS9v2/I8J
-	 KjcxQbMmsXQHuqYq6i2MKu1bC6sPJ5q8fqDsQlFhGyIL5IaqYQ1FUlRDxptQeyUHSo
-	 5iwI7nPcWUWngIRs5suRvgYrpN4zWlMh3mnuL/frmthtO6D4sJbwqUGy3D64qmjimK
-	 FcsJXV+lSuMVjpaxxczEoX5DkGrmiNjTEzzjMxeYA3Rgs3prI6mbKNvBtCGOxNKV1O
-	 HXWcR/tufMzBw==
-Date: Mon, 27 Apr 2026 18:35:24 -0700
+	s=k20201202; t=1777344429;
+	bh=mVJSxfGuAiiALaqw6cebpSUplEdzz/52FbX/446Vss4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=aGLfRmXH0soAYiZ/0ex3mxiOOCHRykC6ohPg4bjVidPlq45DkA1CsFjMR2AkHlyle
+	 1iHcuCJ6Jhb/SR60K87Y4I2Yc3ejvTrk8v8yRaNMA/fQxUhOWRBRhr0X5Yeeou8GnR
+	 Z2HJv0RTpVlO3pEH5snvGhhyL+eqPnC86N1TzDfUMeMp6WDP7PW9M1oLgX4jGmb+VP
+	 bv0rNj+3wXQwXDF0d3zyW/E5oLiPoqdzRTrvQuGIpX4SsL9arl4oVTaBkWawK7yd63
+	 WbfOcwo0RbNhpg9/8FKfDU5JsSUNk0JX8KbyvmAKHX9HeBIaFGrLAKb4iG7qBXzaQo
+	 S+A1mU13I3lCA==
 From: Eric Biggers <ebiggers@kernel.org>
-To: David Laight <david.laight.linux@gmail.com>
-Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
+To: netdev@vger.kernel.org,
+	linux-afs@lists.infradead.org
+Cc: David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
 	"David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Dmitry Safonov <0x7f454c46@gmail.com>
-Subject: Re: [PATCH net-next v2 2/5] net/tcp-ao: Use crypto library API
- instead of crypto_ahash
-Message-ID: <20260428013524.GB2700@sol>
-References: <20260427172727.9310-1-ebiggers@kernel.org>
- <20260427172727.9310-3-ebiggers@kernel.org>
- <20260428022445.65e14a27@pumpkin>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH net-next 0/5] Consolidate FCrypt and PCBC code into net/rxrpc/
+Date: Mon, 27 Apr 2026 19:43:53 -0700
+Message-ID: <20260428024400.123337-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260428022445.65e14a27@pumpkin>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Apr 28, 2026 at 02:24:45AM +0100, David Laight wrote:
-> On Mon, 27 Apr 2026 10:27:24 -0700
-> Eric Biggers <ebiggers@kernel.org> wrote:
-> 
-> > Currently the kernel's TCP-AO implementation does the MAC and KDF
-> > computations using the crypto_ahash API.  This API is inefficient and
-> > difficult to use, and it has required extensive workarounds in the form
-> > of per-CPU preallocated objects (tcp_sigpool) to work at all.
-> > 
-> > Let's use lib/crypto/ instead.  This means switching to straightforward
-> > stack-allocated structures, virtually addressed buffers, and direct
-> > function calls.  It also means removing quite a bit of error handling.
-> > This makes TCP-AO quite a bit faster.
-> > 
-> > This also enables many additional cleanups, which later commits will
-> > handle: removing tcp-sigpool, removing support for crypto_tfm cloning,
-> > removing more error handling, and replacing more dynamically-allocated
-> > buffers with stack buffers based on the now-statically-known limits.
-> > 
-> > Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
-> > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ...
-> > @@ -344,33 +444,26 @@ static int tcp_v4_ao_calc_key(struct tcp_ao_key *mkt, u8 *key,
-> >  	struct kdf_input_block {
-> >  		u8                      counter;
-> >  		u8                      label[6];
-> >  		struct tcp4_ao_context	ctx;
-> >  		__be16                  outlen;
-> > -	} __packed * tmp;
-> 
-> That looks a bit horrid.
-> I also had a feeling that the compiler sometimes rejects non-packed structures
-> inside packed ones.
-> Perhaps nest the whole thing inside another structure that has an initial
-> u8 pad and is marked __packed __aligned(4).
-> Then the assignments to the fields of 'ctx' will be known to be aligned
-> even when tcp4_ao_context is also __packed.
-> 
-> 	David
+[This series applies to v7.1-rc1 and is intended to be taken via
+net-next.  Patches 4-5 could be left for later if desired.]
 
-This series doesn't change the definition of struct kdf_input_block.
-Could we defer changing it (if it makes sense to) to a later patch?
-Yes, there might be a way to get the be32 and be16 fields naturally
-aligned and get the compiler to understand that.  But that would be a
-pretty small micro-optimization compared to removing all the tcp_sigpool
-overhead from the same function (which this series does).
+The FCrypt "block cipher" and the PCBC mode of operation are obsolete
+and insecure.  Since their only user is net/rxrpc/, they belong there,
+not in the crypto API.
 
-- Eric
+Therefore, this series removes these algorithms from the crypto API and
+replaces them with local implementations in net/rxrpc/.
+
+The local implementations are simpler too, as they avoid the crypto API
+boilerplate.
+
+I don't know how to test all the code in net/rxrpc/, but everything
+should still work.  I added a KUnit test for the crypto functions.
+
+Eric Biggers (5):
+  net/rxrpc: Add local FCrypt-PCBC implementation
+  net/rxrpc: Use local FCrypt-PCBC implementation
+  net/rxrpc: Reimplement DES-PCBC using DES library
+  crypto: fcrypt - Remove support for FCrypt block cipher
+  crypto: pcbc - Remove support for PCBC mode
+
+ arch/arm/configs/am200epdkit_defconfig        |   1 -
+ arch/arm/configs/dove_defconfig               |   1 -
+ arch/arm/configs/multi_v5_defconfig           |   1 -
+ arch/arm/configs/mv78xx0_defconfig            |   1 -
+ arch/arm/configs/mvebu_v5_defconfig           |   1 -
+ arch/arm/configs/omap1_defconfig              |   1 -
+ arch/arm/configs/orion5x_defconfig            |   1 -
+ arch/arm/configs/pxa_defconfig                |   2 -
+ arch/arm/configs/wpcm450_defconfig            |   1 -
+ arch/m68k/configs/amiga_defconfig             |   2 -
+ arch/m68k/configs/apollo_defconfig            |   2 -
+ arch/m68k/configs/atari_defconfig             |   2 -
+ arch/m68k/configs/bvme6000_defconfig          |   2 -
+ arch/m68k/configs/hp300_defconfig             |   2 -
+ arch/m68k/configs/mac_defconfig               |   2 -
+ arch/m68k/configs/multi_defconfig             |   2 -
+ arch/m68k/configs/mvme147_defconfig           |   2 -
+ arch/m68k/configs/mvme16x_defconfig           |   2 -
+ arch/m68k/configs/q40_defconfig               |   2 -
+ arch/m68k/configs/sun3_defconfig              |   2 -
+ arch/m68k/configs/sun3x_defconfig             |   2 -
+ arch/mips/configs/bigsur_defconfig            |   2 -
+ arch/mips/configs/decstation_64_defconfig     |   2 -
+ arch/mips/configs/decstation_defconfig        |   2 -
+ arch/mips/configs/decstation_r4k_defconfig    |   2 -
+ arch/mips/configs/fuloong2e_defconfig         |   1 -
+ arch/mips/configs/gpr_defconfig               |   1 -
+ arch/mips/configs/ip22_defconfig              |   2 -
+ arch/mips/configs/ip27_defconfig              |   2 -
+ arch/mips/configs/ip30_defconfig              |   2 -
+ arch/mips/configs/ip32_defconfig              |   2 -
+ arch/mips/configs/lemote2f_defconfig          |   2 -
+ arch/mips/configs/malta_defconfig             |   2 -
+ arch/mips/configs/malta_kvm_defconfig         |   2 -
+ arch/mips/configs/malta_qemu_32r6_defconfig   |   1 -
+ arch/mips/configs/maltaaprp_defconfig         |   1 -
+ arch/mips/configs/maltasmvp_defconfig         |   1 -
+ arch/mips/configs/maltasmvp_eva_defconfig     |   1 -
+ arch/mips/configs/maltaup_defconfig           |   1 -
+ arch/mips/configs/maltaup_xpa_defconfig       |   2 -
+ arch/mips/configs/mtx1_defconfig              |   1 -
+ arch/mips/configs/rm200_defconfig             |   2 -
+ arch/mips/configs/sb1250_swarm_defconfig      |   2 -
+ arch/parisc/configs/generic-64bit_defconfig   |   2 -
+ arch/powerpc/configs/44x/akebono_defconfig    |   1 -
+ arch/powerpc/configs/44x/bamboo_defconfig     |   1 -
+ arch/powerpc/configs/44x/currituck_defconfig  |   1 -
+ arch/powerpc/configs/44x/ebony_defconfig      |   1 -
+ arch/powerpc/configs/44x/eiger_defconfig      |   1 -
+ arch/powerpc/configs/44x/fsp2_defconfig       |   1 -
+ arch/powerpc/configs/44x/icon_defconfig       |   1 -
+ arch/powerpc/configs/44x/iss476-smp_defconfig |   1 -
+ arch/powerpc/configs/44x/katmai_defconfig     |   1 -
+ arch/powerpc/configs/44x/rainier_defconfig    |   1 -
+ arch/powerpc/configs/44x/redwood_defconfig    |   1 -
+ arch/powerpc/configs/44x/sequoia_defconfig    |   1 -
+ arch/powerpc/configs/44x/taishan_defconfig    |   1 -
+ arch/powerpc/configs/52xx/cm5200_defconfig    |   1 -
+ arch/powerpc/configs/52xx/motionpro_defconfig |   1 -
+ arch/powerpc/configs/52xx/tqm5200_defconfig   |   1 -
+ arch/powerpc/configs/83xx/asp8347_defconfig   |   1 -
+ .../configs/83xx/mpc8313_rdb_defconfig        |   1 -
+ .../configs/83xx/mpc8315_rdb_defconfig        |   1 -
+ .../configs/83xx/mpc832x_rdb_defconfig        |   1 -
+ .../configs/83xx/mpc834x_itx_defconfig        |   1 -
+ .../configs/83xx/mpc834x_itxgp_defconfig      |   1 -
+ .../configs/83xx/mpc837x_rdb_defconfig        |   1 -
+ arch/powerpc/configs/amigaone_defconfig       |   1 -
+ arch/powerpc/configs/cell_defconfig           |   1 -
+ arch/powerpc/configs/chrp32_defconfig         |   1 -
+ arch/powerpc/configs/ep8248e_defconfig        |   1 -
+ arch/powerpc/configs/fsl-emb-nonhw.config     |   1 -
+ arch/powerpc/configs/g5_defconfig             |   1 -
+ arch/powerpc/configs/linkstation_defconfig    |   1 -
+ arch/powerpc/configs/mgcoge_defconfig         |   1 -
+ arch/powerpc/configs/mpc83xx_defconfig        |   1 -
+ arch/powerpc/configs/mvme5100_defconfig       |   1 -
+ arch/powerpc/configs/pmac32_defconfig         |   1 -
+ arch/powerpc/configs/powernv_defconfig        |   1 -
+ arch/powerpc/configs/ppc44x_defconfig         |   1 -
+ arch/powerpc/configs/ppc64_defconfig          |   1 -
+ arch/powerpc/configs/ppc64e_defconfig         |   1 -
+ arch/powerpc/configs/ppc6xx_defconfig         |   2 -
+ arch/powerpc/configs/ps3_defconfig            |   1 -
+ arch/s390/configs/debug_defconfig             |   2 -
+ arch/s390/configs/defconfig                   |   2 -
+ arch/sh/configs/hp6xx_defconfig               |   1 -
+ arch/sh/configs/r7780mp_defconfig             |   1 -
+ arch/sh/configs/r7785rp_defconfig             |   1 -
+ arch/sh/configs/se7712_defconfig              |   1 -
+ arch/sh/configs/sh2007_defconfig              |   2 -
+ arch/sparc/configs/sparc32_defconfig          |   1 -
+ arch/sparc/configs/sparc64_defconfig          |   2 -
+ crypto/Kconfig                                |  18 -
+ crypto/Makefile                               |   2 -
+ crypto/pcbc.c                                 | 195 -------
+ crypto/tcrypt.c                               |   4 -
+ crypto/testmgr.c                              |  15 -
+ crypto/testmgr.h                              |  45 --
+ net/rxrpc/.kunitconfig                        |   6 +
+ net/rxrpc/Kconfig                             |  13 +-
+ net/rxrpc/Makefile                            |   3 +-
+ net/rxrpc/ar-internal.h                       |  21 +-
+ {crypto => net/rxrpc}/fcrypt.c                | 329 +++++-------
+ net/rxrpc/key.c                               |   1 -
+ net/rxrpc/rxkad.c                             | 479 +++++-------------
+ net/rxrpc/server_key.c                        |   1 -
+ net/rxrpc/tests/Makefile                      |   3 +
+ net/rxrpc/tests/rxrpc_kunit.c                 | 140 +++++
+ 109 files changed, 445 insertions(+), 956 deletions(-)
+ delete mode 100644 crypto/pcbc.c
+ create mode 100644 net/rxrpc/.kunitconfig
+ rename {crypto => net/rxrpc}/fcrypt.c (65%)
+ create mode 100644 net/rxrpc/tests/Makefile
+ create mode 100644 net/rxrpc/tests/rxrpc_kunit.c
+
+
+base-commit: 254f49634ee16a731174d2ae34bc50bd5f45e731
+-- 
+2.54.0
+
