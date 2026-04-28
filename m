@@ -1,331 +1,118 @@
-Received: from n169-111.mail.139.com (n169-111.mail.139.com [120.232.169.111])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A82122857CC;
-	Tue, 28 Apr 2026 08:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=120.232.169.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C09013DA5B6
+	for <linux-crypto@vger.kernel.org>; Tue, 28 Apr 2026 10:03:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777366649; cv=none; b=LWdt/ElQPt26/ZuQmq/uC21JklX4YkjwLYAd9sNA7vxQ6EUhDxa+p6NxoYl6VRn6dLggfbuu3+gQ/wEuE0K2Nbga51Mz7cDOrcNImd9Pivrf0pLvQZweIdWDx8MtVOnpoP26oW/3ogFk5+bDodTPc44T8X3o7Ip0MDJ7NntyF6E=
+	t=1777370610; cv=none; b=uHeW6/MZgpnhYpdornfIZHZd/Ohd/ahkZTO6u69Wjp+VZ4lqjlPvCDnbyY6Tkpzk1UUWfW9hszei4EulcEZJSqazg9vDYd7wUwal6Bb/otA3mlP6EjHNpSfg5JHjKZ6pHk2y1a1RV1TfuugVxrbSs0dj9fOai0ypVanaVTDrLH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777366649; c=relaxed/simple;
-	bh=OS81tieotkBHx3GVy1XAnB/At7YlhCKuNUyf7b1/ais=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NqexaUwBGCK9/eds8cyB0rRcf5ho2HZcj/vvi4UeOaAZAQW+DC5nMthuliYY5BMmPahapDplUdcLPFeitCE2krD3iBHJIVB/CoiyApCYhA9u+G5OQnmgg5jhJ4Tb99V4BGc81e6pJZrLxpyL/jtZu1pJfnP3o2skCbTpTmleTLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com; spf=pass smtp.mailfrom=139.com; dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b=0XjalBxI; arc=none smtp.client-ip=120.232.169.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=139.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b="0XjalBxI"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=139.com; s=dkim; l=0;
-	h=from:subject:message-id:to:cc:mime-version;
-	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
-	b=0XjalBxIkhISQLDThKiforbDCtg6trqyNi/UCsA0cVCF53Emph3FOBtbqgXI/42zHN5HcOfhp0U0R
-	 2b5F9ZxkIZovAj0tntwrUr7SUFtm+bLFExalu9ur1IdD9UnOYJ/fbsOgc1O2WHeoKPsCBFhxM8kX1s
-	 utoKN8SE9GVtl9as=
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM:                                                                                        
-X-RM-SPAM-FLAG:00000000
-Received:from  (unknown[47.95.114.252])
-	by rmsmtp-lg-appmail-14-12003 (RichMail) with SMTP id 2ee369f07660cf4-01d20;
-	Tue, 28 Apr 2026 16:57:15 +0800 (CST)
-X-RM-TRANSID:2ee369f07660cf4-01d20
-From: Bin Lan <lanbincn@139.com>
-To: gregkh@linuxfoundation.org,
-	sashal@kernel.org,
-	stable@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	steffen.klassert@secunet.com,
-	daniel.m.jordan@oracle.com,
-	linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Bin Lan <lanbincn@139.com>
-Subject: [PATCH 5.10.y 1/2] padata: Fix pd UAF once and for all
-Date: Tue, 28 Apr 2026 16:57:00 +0800
-Message-ID: <20260428085701.1480-2-lanbincn@139.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260428085701.1480-1-lanbincn@139.com>
-References: <20260428085701.1480-1-lanbincn@139.com>
+	s=arc-20240116; t=1777370610; c=relaxed/simple;
+	bh=nE2kTc46EAtHp+hzkKm/fM0pnbhHAPrXksUwFRqrq6Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rFTrlqRDPiSDRJDg6ZIZ6sN6rnpLEhxEmd1pJOwOltp2vf9nzkFFfXL3kfj1Qt22VradaB0JMsWerh83X4KbSrFLgfrk7EhIQpYaRRnIB0sVfLet+Uwlfb+P9wjygQlLn7hXFi6BIBs8HZlK0n/wjFJNtoRbGwodqpPUHZoTwd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-56f8c77ca6aso7620719e0c.2
+        for <linux-crypto@vger.kernel.org>; Tue, 28 Apr 2026 03:03:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777370608; x=1777975408;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gRyHSlueZ2yIa5nhGJ3DTVlj1ZKdcYhWGe6E+g/f2HU=;
+        b=LN6v9e/hsc6q1R0lZaS9DtTeeru+r1xKkDXdnmJphXtCJOdzNa73NotZDhg4QR740+
+         YIG3erHTIQKU7ZtmBiuUz7mj1Jh9GpYoiSu2MMEgaoyvcEaaKJWPl560LsdOOAsMwr22
+         qb5tAaQA3z8pWjxJ2jsjM6X40TPcP61TQtN1EtiM1YRxh4VYr6yAFrm0wc7ABciYWj9L
+         fmxzwEnPseKKZnOnycRHEONFpyUp73yHadakym6qJGWuB3GT2SXZbkIxekBenAs2SKbv
+         KhDVSHL+nUc3sdA2sMKUnSLyNOdJ5rXhFOKx2Hz0aygU9Iw0krYgNNQ0Hmf9uxuDzqKr
+         8Rig==
+X-Forwarded-Encrypted: i=1; AFNElJ9jJp3ef9jZx8mn5jV0SbzLSEUWxUwYP6zuBAjggPQqfg3tGDcUM10DXv4N9ds1v1D8xe+nqhco2nX/LXI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8TymW0xxVrs3pd6NcUzLSU7Rs/mvhG9sUgQgPZ6mlDrf53/d+
+	cC7AINnaAO/BY1H2VfWLkZBO8FLu2tlMH24sNHkch7555Pwop8deuSy5us4o2YFUQI0=
+X-Gm-Gg: AeBDiesK4u6uXkDeBd7T8NtQvggTf4fAj2uyWWvZzy3SofgBzGgWrvH4/6rBbJ9U1uD
+	2IAsX1Hxv+EM2RJXu5RCc9HPr++dJyM/j0BCvk61s+ptIq5FPzJ3dvtwPhnaIU7rQ1Ks1YoVbVX
+	tYAd0Q7FO0EB02JVWevTpenOouWS11+G2HXgUznF+qLWfblWoBK1p6brumu05o7CJ1a9S7SvHLE
+	bn0wWK3ve/k6/SvIypSBRIeoAlU3Jnaoh+ruCPcNgqZ6+21ymqc5KCgNZOxKeM3yS6xJkVzveKu
+	FAJifYi1LLqZf8W+PrLZ7yX+fCyDktbd+xdDhyTS5Hs1Jevc37IZXcE9fY4FgjOWPLorV9rbph9
+	0s4q2DOfpJfaqyAy71x2skrILPL4EnV8WujjkmfiWvd/qMGLBj5WKZ9nfFsMTjOBnTCS2rFC/Zp
+	PlPrrRF8uXPmKw1zDHfUFahqsyvapkqYnByq9m2pMUvJz+HqkncAv/AozRnPEewgv+1I507Sg=
+X-Received: by 2002:a05:6122:4d1a:b0:56b:579c:82e with SMTP id 71dfb90a1353d-573a557ef07mr1079636e0c.5.1777370607706;
+        Tue, 28 Apr 2026 03:03:27 -0700 (PDT)
+Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com. [209.85.217.43])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-573a45d5075sm1304606e0c.9.2026.04.28.03.03.26
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Apr 2026 03:03:27 -0700 (PDT)
+Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-60fa13bde2dso7079278137.3
+        for <linux-crypto@vger.kernel.org>; Tue, 28 Apr 2026 03:03:26 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ8MKeaseyOXRGMzH+Ae5PhQNThY0Blqmjl/rNAWQSWvN4b4Cl/EJStf+iu48R8I8ZjZjktMm2XzihUn3RU=@vger.kernel.org
+X-Received: by 2002:a05:6102:8029:b0:609:444:eda3 with SMTP id
+ ada2fe7eead31-6280aab5390mr872346137.17.1777370606595; Tue, 28 Apr 2026
+ 03:03:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260428024400.123337-1-ebiggers@kernel.org> <20260428024400.123337-5-ebiggers@kernel.org>
+In-Reply-To: <20260428024400.123337-5-ebiggers@kernel.org>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 28 Apr 2026 12:03:15 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdVc4_1hfrX5_qTrNmz8dpe=H37i-N0xy9_M3ZkzUTO3Mg@mail.gmail.com>
+X-Gm-Features: AVHnY4IhVtJeI5bzqGCht8kP6KzDoM5sv9OtFI_ZUfpavb2rJ-ZtQSNVRJUngeM
+Message-ID: <CAMuHMdVc4_1hfrX5_qTrNmz8dpe=H37i-N0xy9_M3ZkzUTO3Mg@mail.gmail.com>
+Subject: Re: [PATCH net-next 4/5] crypto: fcrypt - Remove support for FCrypt
+ block cipher
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: netdev@vger.kernel.org, linux-afs@lists.infradead.org, 
+	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
+On Tue, 28 Apr 2026 at 04:49, Eric Biggers <ebiggers@kernel.org> wrote:
+> Remove the insecure FCrypt block cipher from the crypto API.  Its only
+> user was net/rxrpc/, but now net/rxrpc/ implements it locally.  The
+> crypto API implementation is no longer needed.
+>
+> For some additional context: FCrypt was designed in 1988 and is
+> essentially a weakened version of DES.  It has the same 56-bit key size
+> as DES, which is easily brute forced.  Moreover, it's cryptographically
+> weak and doesn't even provide the intended 56-bit security level.  Its
+> author considers it to be a mistake, as well
+> (https://lists.openafs.org/pipermail/openafs-devel/2000-December/005320.html).
+>
+> But fortunately this 1980s-era homebrew block cipher was never adopted
+> outside of net/rxrpc/.  So its code can just be kept there.
+>
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 
-[ Upstream commit 71203f68c7749609d7fc8ae6ad054bdedeb24f91 ]
+>  arch/m68k/configs/amiga_defconfig           |   1 -
+>  arch/m68k/configs/apollo_defconfig          |   1 -
+>  arch/m68k/configs/atari_defconfig           |   1 -
+>  arch/m68k/configs/bvme6000_defconfig        |   1 -
+>  arch/m68k/configs/hp300_defconfig           |   1 -
+>  arch/m68k/configs/mac_defconfig             |   1 -
+>  arch/m68k/configs/multi_defconfig           |   1 -
+>  arch/m68k/configs/mvme147_defconfig         |   1 -
+>  arch/m68k/configs/mvme16x_defconfig         |   1 -
+>  arch/m68k/configs/q40_defconfig             |   1 -
+>  arch/m68k/configs/sun3_defconfig            |   1 -
+>  arch/m68k/configs/sun3x_defconfig           |   1 -
 
-There is a race condition/UAF in padata_reorder that goes back
-to the initial commit.  A reference count is taken at the start
-of the process in padata_do_parallel, and released at the end in
-padata_serial_worker.
+Acked-by: Geert Uytterhoeven <geert@linux-m68k.org> # m68k
 
-This reference count is (and only is) required for padata_replace
-to function correctly.  If padata_replace is never called then
-there is no issue.
+Gr{oetje,eeting}s,
 
-In the function padata_reorder which serves as the core of padata,
-as soon as padata is added to queue->serial.list, and the associated
-spin lock released, that padata may be processed and the reference
-count on pd would go away.
+                        Geert
 
-Fix this by getting the next padata before the squeue->serial lock
-is released.
-
-In order to make this possible, simplify padata_reorder by only
-calling it once the next padata arrives.
-
-Fixes: 16295bec6398 ("padata: Generic parallelization/serialization interface")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-[ Adjust context of padata_find_next(). Replace
-cpumask_next_wrap(cpu, pd->cpumask.pcpu) with
-cpumask_next_wrap(cpu, pd->cpumask.pcpu, -1, false) in padata_reorder() in
-v5.10 according to dc5bb9b769c9 ("cpumask: deprecate cpumask_next_wrap()") and
-f954a2d37637 ("padata: switch padata_find_next() to using cpumask_next_wrap()")
-. ]
-Signed-off-by: Bin Lan <lanbincn@139.com>
----
- include/linux/padata.h |   3 -
- kernel/padata.c        | 136 +++++++++++------------------------------
- 2 files changed, 37 insertions(+), 102 deletions(-)
-
-diff --git a/include/linux/padata.h b/include/linux/padata.h
-index 495b16b6b4d7..9ca779d7e310 100644
---- a/include/linux/padata.h
-+++ b/include/linux/padata.h
-@@ -91,7 +91,6 @@ struct padata_cpumask {
-  * @cpu: Next CPU to be processed.
-  * @cpumask: The cpumasks in use for parallel and serial workers.
-  * @reorder_work: work struct for reordering.
-- * @lock: Reorder lock.
-  */
- struct parallel_data {
- 	struct padata_shell		*ps;
-@@ -102,8 +101,6 @@ struct parallel_data {
- 	unsigned int			processed;
- 	int				cpu;
- 	struct padata_cpumask		cpumask;
--	struct work_struct		reorder_work;
--	spinlock_t                      ____cacheline_aligned lock;
- };
- 
- /**
-diff --git a/kernel/padata.c b/kernel/padata.c
-index 6c8a141b5c4b..6d8af344498b 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -266,20 +266,17 @@ EXPORT_SYMBOL(padata_do_parallel);
-  *   be parallel processed by another cpu and is not yet present in
-  *   the cpu's reorder queue.
-  */
--static struct padata_priv *padata_find_next(struct parallel_data *pd,
--					    bool remove_object)
-+static struct padata_priv *padata_find_next(struct parallel_data *pd, int cpu,
-+					    unsigned int processed)
- {
- 	struct padata_priv *padata;
- 	struct padata_list *reorder;
--	int cpu = pd->cpu;
- 
- 	reorder = per_cpu_ptr(pd->reorder_list, cpu);
- 
- 	spin_lock(&reorder->lock);
--	if (list_empty(&reorder->list)) {
--		spin_unlock(&reorder->lock);
--		return NULL;
--	}
-+	if (list_empty(&reorder->list))
-+		goto notfound;
- 
- 	padata = list_entry(reorder->list.next, struct padata_priv, list);
- 
-@@ -287,101 +284,52 @@ static struct padata_priv *padata_find_next(struct parallel_data *pd,
- 	 * Checks the rare case where two or more parallel jobs have hashed to
- 	 * the same CPU and one of the later ones finishes first.
- 	 */
--	if (padata->seq_nr != pd->processed) {
--		spin_unlock(&reorder->lock);
--		return NULL;
--	}
--
--	if (remove_object) {
--		list_del_init(&padata->list);
--		++pd->processed;
--		/* When sequence wraps around, reset to the first CPU. */
--		if (unlikely(pd->processed == 0))
--			pd->cpu = cpumask_first(pd->cpumask.pcpu);
--		else
--			pd->cpu = cpumask_next_wrap(cpu, pd->cpumask.pcpu, -1, false);
--	}
-+	if (padata->seq_nr != processed)
-+		goto notfound;
- 
-+	list_del_init(&padata->list);
- 	spin_unlock(&reorder->lock);
- 	return padata;
-+
-+notfound:
-+	pd->processed = processed;
-+	pd->cpu = cpu;
-+	spin_unlock(&reorder->lock);
-+	return NULL;
- }
- 
--static void padata_reorder(struct parallel_data *pd)
-+static void padata_reorder(struct padata_priv *padata)
- {
-+	struct parallel_data *pd = padata->pd;
- 	struct padata_instance *pinst = pd->ps->pinst;
--	int cb_cpu;
--	struct padata_priv *padata;
--	struct padata_serial_queue *squeue;
--	struct padata_list *reorder;
-+	unsigned int processed;
-+	int cpu;
- 
--	/*
--	 * We need to ensure that only one cpu can work on dequeueing of
--	 * the reorder queue the time. Calculating in which percpu reorder
--	 * queue the next object will arrive takes some time. A spinlock
--	 * would be highly contended. Also it is not clear in which order
--	 * the objects arrive to the reorder queues. So a cpu could wait to
--	 * get the lock just to notice that there is nothing to do at the
--	 * moment. Therefore we use a trylock and let the holder of the lock
--	 * care for all the objects enqueued during the holdtime of the lock.
--	 */
--	if (!spin_trylock_bh(&pd->lock))
--		return;
-+	processed = pd->processed;
-+	cpu = pd->cpu;
- 
--	while (1) {
--		padata = padata_find_next(pd, true);
-+	do {
-+		struct padata_serial_queue *squeue;
-+		int cb_cpu;
- 
--		/*
--		 * If the next object that needs serialization is parallel
--		 * processed by another cpu and is still on it's way to the
--		 * cpu's reorder queue, nothing to do for now.
--		 */
--		if (!padata)
--			break;
-+		cpu = cpumask_next_wrap(cpu, pd->cpumask.pcpu, -1, false);
-+		processed++;
- 
- 		cb_cpu = padata->cb_cpu;
- 		squeue = per_cpu_ptr(pd->squeue, cb_cpu);
- 
- 		spin_lock(&squeue->serial.lock);
- 		list_add_tail(&padata->list, &squeue->serial.list);
--		spin_unlock(&squeue->serial.lock);
--
- 		queue_work_on(cb_cpu, pinst->serial_wq, &squeue->work);
--	}
- 
--	spin_unlock_bh(&pd->lock);
--
--	/*
--	 * The next object that needs serialization might have arrived to
--	 * the reorder queues in the meantime.
--	 *
--	 * Ensure reorder queue is read after pd->lock is dropped so we see
--	 * new objects from another task in padata_do_serial.  Pairs with
--	 * smp_mb in padata_do_serial.
--	 */
--	smp_mb();
--
--	reorder = per_cpu_ptr(pd->reorder_list, pd->cpu);
--	if (!list_empty(&reorder->list) && padata_find_next(pd, false)) {
- 		/*
--		 * Other context(eg. the padata_serial_worker) can finish the request.
--		 * To avoid UAF issue, add pd ref here, and put pd ref after reorder_work finish.
-+		 * If the next object that needs serialization is parallel
-+		 * processed by another cpu and is still on it's way to the
-+		 * cpu's reorder queue, end the loop.
- 		 */
--		padata_get_pd(pd);
--		if (!queue_work(pinst->serial_wq, &pd->reorder_work))
--			padata_put_pd(pd);
--	}
--}
--
--static void invoke_padata_reorder(struct work_struct *work)
--{
--	struct parallel_data *pd;
--
--	local_bh_disable();
--	pd = container_of(work, struct parallel_data, reorder_work);
--	padata_reorder(pd);
--	local_bh_enable();
--	/* Pairs with putting the reorder_work in the serial_wq */
--	padata_put_pd(pd);
-+		padata = padata_find_next(pd, cpu, processed);
-+		spin_unlock(&squeue->serial.lock);
-+	} while (padata);
- }
- 
- static void padata_serial_worker(struct work_struct *serial_work)
-@@ -432,6 +380,7 @@ void padata_do_serial(struct padata_priv *padata)
- 	struct padata_list *reorder = per_cpu_ptr(pd->reorder_list, hashed_cpu);
- 	struct padata_priv *cur;
- 	struct list_head *pos;
-+	bool gotit = true;
- 
- 	spin_lock(&reorder->lock);
- 	/* Sort in ascending order of sequence number. */
-@@ -441,17 +390,14 @@ void padata_do_serial(struct padata_priv *padata)
- 		if ((signed int)(cur->seq_nr - padata->seq_nr) < 0)
- 			break;
- 	}
--	list_add(&padata->list, pos);
-+	if (padata->seq_nr != pd->processed) {
-+		gotit = false;
-+		list_add(&padata->list, pos);
-+	}
- 	spin_unlock(&reorder->lock);
- 
--	/*
--	 * Ensure the addition to the reorder list is ordered correctly
--	 * with the trylock of pd->lock in padata_reorder.  Pairs with smp_mb
--	 * in padata_reorder.
--	 */
--	smp_mb();
--
--	padata_reorder(pd);
-+	if (gotit)
-+		padata_reorder(padata);
- }
- EXPORT_SYMBOL(padata_do_serial);
- 
-@@ -638,9 +584,7 @@ static struct parallel_data *padata_alloc_pd(struct padata_shell *ps)
- 	padata_init_squeues(pd);
- 	pd->seq_nr = -1;
- 	refcount_set(&pd->refcnt, 1);
--	spin_lock_init(&pd->lock);
- 	pd->cpu = cpumask_first(pd->cpumask.pcpu);
--	INIT_WORK(&pd->reorder_work, invoke_padata_reorder);
- 
- 	return pd;
- 
-@@ -1150,12 +1094,6 @@ void padata_free_shell(struct padata_shell *ps)
- 	if (!ps)
- 		return;
- 
--	/*
--	 * Wait for all _do_serial calls to finish to avoid touching
--	 * freed pd's and ps's.
--	 */
--	synchronize_rcu();
--
- 	mutex_lock(&ps->pinst->lock);
- 	list_del(&ps->list);
- 	pd = rcu_dereference_protected(ps->pd, 1);
 -- 
-2.43.0
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
