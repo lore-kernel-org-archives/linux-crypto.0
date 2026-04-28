@@ -1,100 +1,87 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from n169-111.mail.139.com (n169-111.mail.139.com [120.232.169.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FEB42D47E9
-	for <linux-crypto@vger.kernel.org>; Tue, 28 Apr 2026 07:53:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 334AF31E828;
+	Tue, 28 Apr 2026 08:57:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=120.232.169.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777362833; cv=none; b=VOiJsWIkErQw+HEGz21uWZINDWGQrBmzAH0cgBeWYbd0spn/8/VoBtU8sGEojRq1WQ2VcuUvGMi2Iff9D8+B6y/xL6Dj0UKbS62lduoBLvtrNfNljwylbqVnS6jJxV8YTvsWBDrFvXQNHADTVbCTdy0BJMhIxnsLty6tjrFKiTU=
+	t=1777366649; cv=none; b=PJz++l+CRCfRAYH0NrmqePeQv0JLXJuapPkD8yAf40pNkoUuf41nO7eAhuUdLH37YgbQEo2Q+DjxeUDXMJ56wQvqE2efX52c69qPORc0VU3tSkv/NPzdFEXWlHW6h3D1htfewBTVVF+vgmx5yQqcZVuT7m0Ja4a7q4CNj6zOO1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777362833; c=relaxed/simple;
-	bh=W2ux99vm/YR+fWjrnwRiZup/PYxG31SHUrlOrY3Sk+k=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=aSKW/a5DWRuGjRpBa81gyec3DdOu5ogvzTYVnRvwcvXj6fVqpWY+6HBTtzWY7KXc7PSqp6kTuP+st1T9p5/+yJTcMF8bU1lsx2hYoT0cfH+NCqUBpSiIZXPnrFc8EJd1wNbUYgl8nR//y8V9eyaXJeWCpW/oJkJhBynkaLCWlfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gIr6eZqa; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1777366649; c=relaxed/simple;
+	bh=At8ZEZXEyl6/MPyg8ioxlqaVNvw99hDz7FkN8u7FKwQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Qx01pJ2NYBfsG15U7zqKCavP29oxm2lIzFtHyilAwJrvX7Ssw5Mkb2BpXLGE0RuajVu//Xzr8MDyzzit4eBvADJrYpXma+HfUTkpq6azVQgAzZVfh9IpyoVxvcd+DFpt5za7K8qGYrfczUDEL931G9TbLcUsEucYvfVTqWgCVkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com; spf=pass smtp.mailfrom=139.com; dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b=ApX2LVCs; arc=none smtp.client-ip=120.232.169.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=139.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=139.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gIr6eZqa"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777362830;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2t/FQHBc4YwiSUDHUyxx0oj6pNb+ROc36MbcJMBmi8w=;
-	b=gIr6eZqaTDakBSI1tV/L9FJ8cHZvESjeMBobNcb0xbeONjQqeaH3rYyrTmL+JEFRc69nT8
-	tnhXCE/ADr/+w0GNepB+7KkkRgrFoXc5T2YfHZ4gUZcgGO20wTtTSP1Me0Ynm7ivNU+hxE
-	M82By7hWgNasWCupKi42JCnGBivxKrs=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-536-qsX_92UiPIah9O2Y47wL1A-1; Tue,
- 28 Apr 2026 03:53:49 -0400
-X-MC-Unique: qsX_92UiPIah9O2Y47wL1A-1
-X-Mimecast-MFC-AGG-ID: qsX_92UiPIah9O2Y47wL1A_1777362827
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 07E78195609F;
-	Tue, 28 Apr 2026 07:53:47 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.44.32.126])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 49B09195608E;
-	Tue, 28 Apr 2026 07:53:42 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20260428024400.123337-1-ebiggers@kernel.org>
-References: <20260428024400.123337-1-ebiggers@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: dhowells@redhat.com, netdev@vger.kernel.org,
-    linux-afs@lists.infradead.org,
-    Marc Dionne <marc.dionne@auristor.com>, linux-crypto@vger.kernel.org,
-    linux-kernel@vger.kernel.org,
-    "David S . Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next 0/5] Consolidate FCrypt and PCBC code into net/rxrpc/
+	dkim=pass (1024-bit key) header.d=139.com header.i=@139.com header.b="ApX2LVCs"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=139.com; s=dkim; l=0;
+	h=from:subject:message-id:to:cc:mime-version;
+	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+	b=ApX2LVCsdOP0Mj8BABzH38fFsK+QXZoXlpJ2EWo0DN2dOb5TTuvUY6W9T3d3oDt8tMZ8F25u07qs1
+	 +IpG3dLNrbo4zrZ5ycyYakqZAmAAhQNBHTzoa4buY/2P5YKaPySVgWNy8azGmaaH//7gqB39YlUEoF
+	 IZd5bVe4xhAedygE=
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM:                                                                                        
+X-RM-SPAM-FLAG:00000000
+Received:from  (unknown[47.95.114.252])
+	by rmsmtp-lg-appmail-14-12003 (RichMail) with SMTP id 2ee369f07660cf4-01d24;
+	Tue, 28 Apr 2026 16:57:19 +0800 (CST)
+X-RM-TRANSID:2ee369f07660cf4-01d24
+From: Bin Lan <lanbincn@139.com>
+To: gregkh@linuxfoundation.org,
+	sashal@kernel.org,
+	stable@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	steffen.klassert@secunet.com,
+	daniel.m.jordan@oracle.com,
+	linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	Bin Lan <lanbincn@139.com>
+Subject: [PATCH 5.10.y 2/2] padata: Remove comment for reorder_work
+Date: Tue, 28 Apr 2026 16:57:01 +0800
+Message-ID: <20260428085701.1480-3-lanbincn@139.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260428085701.1480-1-lanbincn@139.com>
+References: <20260428085701.1480-1-lanbincn@139.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <772373.1777362820.1@warthog.procyon.org.uk>
-Date: Tue, 28 Apr 2026 08:53:40 +0100
-Message-ID: <772374.1777362820@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Transfer-Encoding: 8bit
 
-Eric Biggers <ebiggers@kernel.org> wrote:
+From: Herbert Xu <herbert@gondor.apana.org.au>
 
-> [This series applies to v7.1-rc1 and is intended to be taken via
-> net-next.  Patches 4-5 could be left for later if desired.]
-> 
-> The FCrypt "block cipher" and the PCBC mode of operation are obsolete
-> and insecure.  Since their only user is net/rxrpc/, they belong there,
-> not in the crypto API.
-> 
-> Therefore, this series removes these algorithms from the crypto API and
-> replaces them with local implementations in net/rxrpc/.
-> 
-> The local implementations are simpler too, as they avoid the crypto API
-> boilerplate.
-> 
-> I don't know how to test all the code in net/rxrpc/, but everything
-> should still work.  I added a KUnit test for the crypto functions.
+[ Upstream commit 82a0302e7167d0b7c6cde56613db3748f8dd806d ]
 
-It seems to work, so apart from the two points I noted, you can add:
+Remove comment for reorder_work which no longer exists.
 
-	Acked-by: David Howells <dhowells@redhat.com>
+Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+Fixes: 71203f68c774 ("padata: Fix pd UAF once and for all")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Bin Lan <lanbincn@139.com>
+---
+ include/linux/padata.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-It looks like it might be slightly faster, but I think the overhead reduction
-is not that visible with all the other things the filesystem and protocol do
-plus I/O overhead.  RxGK is a lot faster and more secure, so we should be
-moving that way anyway.
+diff --git a/include/linux/padata.h b/include/linux/padata.h
+index 9ca779d7e310..6f07e12a4381 100644
+--- a/include/linux/padata.h
++++ b/include/linux/padata.h
+@@ -90,7 +90,6 @@ struct padata_cpumask {
+  * @processed: Number of already processed objects.
+  * @cpu: Next CPU to be processed.
+  * @cpumask: The cpumasks in use for parallel and serial workers.
+- * @reorder_work: work struct for reordering.
+  */
+ struct parallel_data {
+ 	struct padata_shell		*ps;
+-- 
+2.43.0
 
-David
 
