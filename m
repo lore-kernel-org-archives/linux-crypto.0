@@ -1,78 +1,54 @@
-Received: from mail-dl1-f49.google.com (mail-dl1-f49.google.com [74.125.82.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0DD841B36D
-	for <linux-crypto@vger.kernel.org>; Wed, 29 Apr 2026 18:17:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F38642C158E;
+	Wed, 29 Apr 2026 19:02:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777486623; cv=none; b=QzKqf29uQ+/2UJ0f7o6xAE2bhMSCLDma8UtPPi+vLkHz3n3S2/HkmKYAW4mpNWO5vmw2yz2mZuYnbsyZL3a+UD/HPFRhF0piEvAcavxAyADF2pTCfA8yv+ALdWoATGM8DVkywjksPTKq6IoJS98TxnfJab4NySa1OAgo/xEqPcA=
+	t=1777489349; cv=none; b=lisHuJxk1zXqgbFRDqIRaCGYIu9TM40t16zQODULDHts1aprjCVUo/oCnBZa9iG6NRRFg7jqRiPz4mDvUEDawIosd2n/nm3w9cf28Oqyxwz8FmwMCTCM2+fozHwJEZmTSUvrjZep+Mn4Mum6gVj4iDaoI4C1RfpP1e84cUq3jsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777486623; c=relaxed/simple;
-	bh=VOKbcR0YI+YuvmodCjPRijspSYgm7HYwS+yOVO9jSOU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cGtmD3SWUaZJFDQd5D1cvKUhoz03TNjKpVinBYU3QE5v8fhjGNj8BU4fTIgtQk7pUGxK11uWl4kVbDXO5RCSkcMkjXMKcC6mihiOnliTG9DrkCH3380h3jh85CULV7WH1Ulww/qy0/WDGOMI33fqw8nGPrUOOCxo9z+kLWy+A2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VMuJ7PoG; arc=none smtp.client-ip=74.125.82.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1777489349; c=relaxed/simple;
+	bh=mFdw1TM4+qBu81X7eO2RNL1zoe35xDBWXlgZyZZ3uVA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=RVwtYURz8jJ69zkjXpBATXZKQBMuQmISk5Ms+qD6iZ81/386Gry8U57tbezF7hDo2KzIwlb9eB0pLurkN5ZY61BJINqNzcB9RNWrKrx43/R+N9yh0On6f1EAbw9A2z+6culmYgKB8rUEeYHdJ8qAXWpfFMO5jM7o6Bs0/i8YbEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f7XEDseU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VMuJ7PoG"
-Received: by mail-dl1-f49.google.com with SMTP id a92af1059eb24-12de530cbf1so146979c88.0
-        for <linux-crypto@vger.kernel.org>; Wed, 29 Apr 2026 11:17:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777486620; x=1778091420; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=U3x1o891z7jO+x1WN2dbr172zqOri+EKzTP7TtRTF/o=;
-        b=VMuJ7PoG5bRnwdnaqUxgnUC2VN+YCaAqwOiELQtVa7Y+YeB7hnERR/y/ju7wczibRY
-         tWrfCtokWSlhX9m7IiyPbm0TVJlVoSMVOYD+82EY9YEP6gCjCOfUsKdeX6s10xjXLfpe
-         oh8lnu95Nx3iTyF8caZZYBfoQBpAQuGGzRtL59dWAAiJY+dcNu174r8W9rrvCGKICxvV
-         OAzfV5GFYzSkmb98v+4x7LHK2y/VCZRRbsK61BiyzEPmUYtnmM7z8iJHc1ieCCjk2Wcw
-         4cphZcrRHr8PHo+06eLZ7BepnbLryjFyzbckIl/nndByhTqhRKVQb8xI5rMrdeatpms/
-         pfUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777486620; x=1778091420;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=U3x1o891z7jO+x1WN2dbr172zqOri+EKzTP7TtRTF/o=;
-        b=H0HmQuNBwqbsMYGCag2bZqmc0RNlBg+iPQvi6GbswadjXz/5LHHkT95PPdJlTbpBKH
-         H+P668XCYOB47cBsVG4QDd4/FSBv4wIv5GCrAIW2wufxFT04hu+nn2/TcDEraesGWS9Z
-         lgB8SOn98xkU8WgUGwGowVuga0P6zW9BvQOve02rJAM5mtchdOobvYZVnTl0ijK2S8BK
-         ILFEWgdcnTCwLnoYi40bDJImm3WwPymU7M0qi9RsCiR1iQv2OwJqQxLqODBgs9JyWtJE
-         IJHOrV3IDOlI1/V/Xarm+q4H+QVyVVtB/JOEEufNcgmjMVkZ7OmY1SS3112imjpA3us/
-         pL7g==
-X-Forwarded-Encrypted: i=1; AFNElJ+C0K2Y+Y9CruuRGjGpVVo1lOzrx2DscIggbZH6QC5hwPCZNvanZqPTLb0uI2lacy+ylryoaAcGJDBjtVk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyr9J4nfV+6EGcorFdLdrS0B7+ENOdt/c/P8/UuLpPaB89Y7x04
-	aiudXWmfVVLFmtirqnuv+DZzcdfxFD67DP21NPve+N/EW+bDHogvR80C
-X-Gm-Gg: AeBDievWkMWH2wA5vUeJyukOMenoLO1Fy1gMhG8LxDFO+fiFDsg43nSHKUA95Z/PIkV
-	hxxftpbr9QqUwsiGkBX4c/o7CAXiAWie3rDPcfAFsXZUp1dAs/e2VkibF9fbj+QjYrYk7a31AWk
-	XdRLCVXyZc6B+0Kghl3jok8mSObHfq9mKuDThskY9Mc46XuSvCSH1LiWE03ume2Plo/qW+kjPpk
-	PIWkE0k0oo4dhzt7CyN2YOlPL+3CaspBPBFP04XvRJnWcpfT5qHynGczxCOvF64TF99x2dVQ8RV
-	49dHwYmNxr8hQQ965t8Q4WfiKXVFjEB3+rlMKqBmQy17vwIf1Ij9G7bfUP0fa+k+WnZcGlfDuuK
-	OuyFlS1M8u3EyqjZSm7lR6IqK97IOyHt3FqcSiQukpqU2VNKKHUP/A0daJons/0XvInfIuKm0u0
-	AfqaWnhI73uocAPlcFiL+rHnnmuZTYhBPPkVVl+1ZqszJDm9fV3NnHDAovmGNHxRQWQ1qnZxYBQ
-	LjOcHOZa8spkBM+6hU8I7yEuwpRHHY=
-X-Received: by 2002:a05:7022:6881:b0:128:dedf:f56d with SMTP id a92af1059eb24-12ddd991628mr4408396c88.24.1777486619386;
-        Wed, 29 Apr 2026 11:16:59 -0700 (PDT)
-Received: from efaec68ba852.tailc0aff1.ts.net ([206.206.192.132])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12de320f2a7sm4125005c88.1.2026.04.29.11.16.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Apr 2026 11:16:58 -0700 (PDT)
-From: Weiming Shi <bestswngs@gmail.com>
-To: David Howells <dhowells@redhat.com>,
-	Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@linux.win>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>
-Cc: Jarkko Sakkinen <jarkko@kernel.org>,
-	Andrew Zaborowski <andrew.zaborowski@intel.com>,
-	keyrings@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f7XEDseU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6D19C19425;
+	Wed, 29 Apr 2026 19:02:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777489348;
+	bh=mFdw1TM4+qBu81X7eO2RNL1zoe35xDBWXlgZyZZ3uVA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=f7XEDseUDcyaifOQfEVR25Rqyfxk51Jun+TDa2LXua57G7or+Dw5YX6MxM00/aCII
+	 8dxuuxi2KHk5KKGg9owrrXSVmWPav33CA4ZxzbGaQ+1QvrBWpH0aPKmG5IwoJSNAND
+	 tiD+eapPeiOD2AdU71VTlt1it6vIrmLxgYDydsZgP7FW1fNScdg17/n+/CsNjabW18
+	 M++1icSKCL5TZaRu2gPOO6fmj3amEfFP2Bu4J7f87zuSmRCJ2wG/jnUA31OUKln6xK
+	 sP5hS0UAy9fSN7BD9i/geDp/PCZb1qcGLyu4VGIlMgFFz3LwRnG9CNC0LQuMyc59V3
+	 tCKBpr/Yo7Rhw==
+From: Simon Horman <horms@kernel.org>
+To: ebiggers@kernel.org
+Cc: 'Simon Horman' <horms@kernel.org>,
+	netdev@vger.kernel.org,
 	linux-crypto@vger.kernel.org,
-	Xiang Mei <xmei5@asu.edu>,
-	Weiming Shi <bestswngs@gmail.com>
-Subject: [PATCH] asymmetric_keys: check asymmetric_key_ids() for NULL before dereference
-Date: Wed, 29 Apr 2026 11:16:30 -0700
-Message-ID: <20260429181629.110802-2-bestswngs@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	linux-kernel@vger.kernel.org,
+	edumazet@google.com,
+	ncardwell@google.com,
+	kuniyu@google.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	ardb@kernel.org,
+	Jason@zx2c4.com,
+	herbert@gondor.apana.org.au,
+	0x7f454c46@gmail.com
+Subject: Re: [PATCH net-next v2 1/5] net/tcp-ao: Drop support for most non-RFC-specified algorithms
+Date: Wed, 29 Apr 2026 19:58:29 +0100
+Message-ID: <20260429185828.1539480-2-horms@kernel.org>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260427172727.9310-2-ebiggers@kernel.org>
+References: <20260427172727.9310-2-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -81,83 +57,104 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-asymmetric_key_ids() returns key->payload.data[asym_key_ids], which can
-be NULL for keys parsed by the PKCS#8 parser (pkcs8_parser.c explicitly
-stores NULL in prep->payload.data[asym_key_ids]).
+From: 'Simon Horman' <horms@kernel.org>
 
-key_or_keyring_common() in restrict.c and find_asymmetric_key() in
-asymmetric_type.c both dereference this return value without checking
-for NULL. An unprivileged user can trigger a NULL pointer dereference
-in key_or_keyring_common() by creating a PKCS#8 key, restricting a
-keyring with key_or_keyring:<pkcs8_serial>, and adding an X.509 cert
-to the restricted keyring. CONFIG_PKCS8_PRIVATE_KEY_PARSER=y is
-required.
-
- Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000
- KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
- RIP: 0010:key_or_keyring_common (crypto/asymmetric_keys/restrict.c:205 crypto/asymmetric_keys/restrict.c:279)
- Call Trace:
-  <TASK>
-  __key_create_or_update (security/keys/key.c:884)
-  key_create_or_update (security/keys/key.c:1021)
-  __do_sys_add_key (security/keys/keyctl.c:134)
-  do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
-  entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
-  </TASK>
- Kernel panic - not syncing: Fatal exception
-
-Add a NULL check in find_asymmetric_key(), mirroring the existing
-pattern in asymmetric_match_key_ids() and asymmetric_key_describe().
-In key_or_keyring_common(), skip the trusted key matching when it
-has no key IDs and fall through to the check_dest path.
-
-Fixes: 7d30198ee24f ("keys: X.509 public key issuer lookup without AKID")
-Reported-by: Xiang Mei <xmei5@asu.edu>
-Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+This is an AI-generated review of your patch. The human sending this
+email has considered the AI review valid, or at least plausible.
+Full review at: https://sashiko.dev
 ---
- crypto/asymmetric_keys/asymmetric_type.c | 2 ++
- crypto/asymmetric_keys/restrict.c        | 9 ++++++---
- 2 files changed, 8 insertions(+), 3 deletions(-)
+Subject: net/tcp-ao: Drop support for most non-RFC-specified algorithms
 
-diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric_keys/asymmetric_type.c
---- a/crypto/asymmetric_keys/asymmetric_type.c
-+++ b/crypto/asymmetric_keys/asymmetric_type.c
-@@ -109,6 +109,8 @@ struct key *find_asymmetric_key(struct key *keyring,
- 	if (id_0 && id_1) {
- 		const struct asymmetric_key_ids *kids = asymmetric_key_ids(key);
+This change restricts the algorithms accepted by setsockopt(TCP_AO_ADD_KEY)
+to cmac(aes128)/cmac(aes)+keylen=16, hmac(sha1) and hmac(sha256), returning
+-ENOENT for anything else.  The selftest algorithm table and its Kconfig
+fragment are updated to drop FIPS detection and rmd160.
 
-+		if (!kids)
-+			goto reject;
- 		if (!kids->id[1]) {
- 			pr_debug("First ID matches, but second is missing\n");
- 			goto reject;
-diff --git a/crypto/asymmetric_keys/restrict.c b/crypto/asymmetric_keys/restrict.c
---- a/crypto/asymmetric_keys/restrict.c
-+++ b/crypto/asymmetric_keys/restrict.c
-@@ -243,10 +243,14 @@ static int key_or_keyring_common(struct key *dest_keyring,
- 			if (IS_ERR(key))
- 				key = NULL;
- 		} else if (trusted->type == &key_type_asymmetric) {
-+			const struct asymmetric_key_ids *kids;
- 			const struct asymmetric_key_id **signer_ids;
+A few questions inline below.
 
--			signer_ids = (const struct asymmetric_key_id **)
--				asymmetric_key_ids(trusted)->id;
-+			kids = asymmetric_key_ids(trusted);
-+			if (!kids)
-+				goto skip_trusted;
-+
-+			signer_ids = (const struct asymmetric_key_id **)kids->id;
+> diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
+> index a97cdf3e6af4..b21bd69b4e82 100644
+> --- a/net/ipv4/tcp_ao.c
+> +++ b/net/ipv4/tcp_ao.c
+> @@ -1563,6 +1563,10 @@ static struct tcp_ao_key *tcp_ao_key_alloc(struct sock *sk,
+>  	/* RFC5926, 3.1.1.2. KDF_AES_128_CMAC */
+>  	if (!strcmp("cmac(aes128)", algo))
+>  		algo = "cmac(aes)";
+> +	else if (strcmp("hmac(sha1)", algo) &&
+> +		 strcmp("hmac(sha256)", algo) &&
+> +		 (strcmp("cmac(aes)", algo) || cmd->keylen != 16))
+> +		return ERR_PTR(-ENOENT);
 
- 			/*
- 			 * The auth_ids come from the candidate key (the
-@@ -290,6 +294,7 @@ static int key_or_keyring_common(struct key *dest_keyring,
- 		}
- 	}
+Is this a uAPI regression for existing users of TCP_AO_ADD_KEY?
 
-+skip_trusted:
- 	if (check_dest && !key) {
- 		/* See if the destination has a key that signed this one. */
- 		key = find_asymmetric_key(dest_keyring, sig->auth_ids[0],
---
-2.39.0
+Before this change, tcp_ao_add::alg_name accepted any crypto_ahash
+algorithm name.  The commit message itself notes "arbitrary HMAC algorithms
+probably do work", and the selftest prior to this patch exercised
+hmac(sha512), hmac(sha384), hmac(sha224), hmac(sha3-512), hmac(rmd160) and
+hmac(md5), which demonstrates those configurations were functional in
+practice.
+
+A setsockopt call that previously succeeded with e.g. alg_name =
+"hmac(sha512)" now returns -ENOENT after a kernel upgrade, with no
+deprecation window, no Kconfig opt-in, and no runtime toggle.  HMAC-SHA512
+in particular seems like a plausible choice that a deployment may already
+rely on.
+
+Would it make sense to keep hmac(sha512) (and possibly hmac(sha384)) in the
+accepted list, or to gate the removal behind a Kconfig/sysctl while warning
+for a few releases?
+
+Also, -ENOENT is the same error returned when the crypto module for an
+otherwise-accepted algorithm is simply not built in.  Should a distinct
+errno (for example -EOPNOTSUPP) be used here so userspace can tell
+"algorithm rejected by policy" apart from "algorithm module missing"?
+
+> diff --git a/tools/testing/selftests/net/tcp_ao/config b/tools/testing/selftests/net/tcp_ao/config
+> index f22148512365..47228a7d0b90 100644
+> --- a/tools/testing/selftests/net/tcp_ao/config
+> +++ b/tools/testing/selftests/net/tcp_ao/config
+> @@ -1,6 +1,5 @@
+>  CONFIG_CRYPTO_CMAC=y
+>  CONFIG_CRYPTO_HMAC=y
+> -CONFIG_CRYPTO_RMD160=y
+>  CONFIG_CRYPTO_SHA1=y
+>  CONFIG_IPV6=y
+>  CONFIG_IPV6_MULTIPLE_TABLES=y
+
+Should CONFIG_CRYPTO_SHA256=y (and possibly CONFIG_CRYPTO_AES=y) be added
+here?
+
+> diff --git a/tools/testing/selftests/net/tcp_ao/key-management.c b/tools/testing/selftests/net/tcp_ao/key-management.c
+> index 69d9a7a05d5c..d86bb380b79f 100644
+> --- a/tools/testing/selftests/net/tcp_ao/key-management.c
+> +++ b/tools/testing/selftests/net/tcp_ao/key-management.c
+
+[ ... ]
+
+> -const char *test_algos[] = {
+> -	"cmac(aes128)",
+> -	"hmac(sha1)", "hmac(sha512)", "hmac(sha384)", "hmac(sha256)",
+> -	"hmac(sha224)", "hmac(sha3-512)",
+> -	/* only if !CONFIG_FIPS */
+> -#define TEST_NON_FIPS_ALGOS	2
+> -	"hmac(rmd160)", "hmac(md5)"
+> -};
+> +const char *test_algos[] = { "cmac(aes128)", "hmac(sha1)", "hmac(sha256)" };
+
+With the FIPS/algorithm-probing logic removed and roughly one third of
+generated keys now using hmac(sha256), and with the kernel side now
+returning -ENOENT for non-whitelisted algorithms, tcp_sigpool_alloc_ahash()
+will fail for every hmac(sha256) key on a kernel built from this config
+unless CRYPTO_SHA256 is selected.
+
+CRYPTO_SHA256 is not implied by CRYPTO_HMAC or TCP_AO, so on a kernel built
+strictly from tools/testing/selftests/net/tcp_ao/config the tests would
+appear to fail rather than be skipped.  Can the config fragment be updated
+to match the new required algorithm set?
+
+One more question, on the commit message and documentation rather than the
+diff: Documentation/networking/tcp_ao.rst still describes TCP-AO as "May
+support any hashing algorithm" and does not mention the newly enforced
+whitelist or the -ENOENT failure mode.  Should tcp_ao.rst be updated in
+this patch to list the accepted algorithm strings and the rationale (e.g.
+the 20-byte TCP option MAC cap), so userspace has a documented contract?
