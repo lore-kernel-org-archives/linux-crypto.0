@@ -1,39 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3A7E3EBF35;
-	Wed, 29 Apr 2026 11:19:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74BF33FCB06;
+	Wed, 29 Apr 2026 14:07:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777461546; cv=none; b=SJQTp+G03k7j61GZeit6ZZdIO8NJH9BrisH8yTW929vvsch1uoQZnVqI0HYb5t+zBuYENkUNkAiTET+X3LSG2jFUpodOBQw3QPokCrTwdo/dRdgxxaIpwYArrFAuiJ+Z38YSN5d1KJIdLqf7PnnfKaX+Rdks1Hc1zBC2q3jrJgo=
+	t=1777471659; cv=none; b=jRuzHSiW3CssUa5hxYiZNboJcxOTaCX0iVkFJdF1f83pY2pc//oxno3qwb92iMRAqSh/iGDlrPxdBmvrGhhD6adc2Cy+Y4HiIpmug9j0oDkfZonz9XJ4g3Gid8J88yly5vaXCQUW+l7oz5E80AC/7i3t1ccddDlzPm3NncIQxFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777461546; c=relaxed/simple;
-	bh=1v5mK1UjqVjyC5QYbgyYeV6o8ONrWI6PT0weCyXl12Y=;
+	s=arc-20240116; t=1777471659; c=relaxed/simple;
+	bh=t+CtLWscud7YleLPv0d4CqDcLOtNX/7MHLTrIWcs/Ns=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sdF1mADSK+8fNfSdtOy9+XwuvcjEOfrGLBWc5W15D4PR8urH64D+jJYEVJATvUpBlOSD7cA/pa0ZxG1WpelD9xPHRwjqmQHIHQmoc121uxECMetozZt1Bo5w/zogaKr8fNvj9Dth32d/fXPUQlc8Diq3N9D1psH46h1aKJKgcIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CnTM7In2; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=sO3kgBZUkAfJtI9BAZKP2Afe3vgtZpo5vSN19j+xVYvTDoC7WxR/9Gjs2ZBrXPf3I7H39o9Vde527At2eUytBQG1Oi4G0NuZO8tm0T+GUuIv0DlaGA9TWTWeEJVaLiiwxevK1O+Z0BTYu0N8u2IyVXtoYGOsgnmt7fnr+LPQqF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jzFWrbmh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CnTM7In2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 216E6C19425;
-	Wed, 29 Apr 2026 11:19:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jzFWrbmh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63DC8C2BCC4;
+	Wed, 29 Apr 2026 14:07:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777461545;
-	bh=1v5mK1UjqVjyC5QYbgyYeV6o8ONrWI6PT0weCyXl12Y=;
+	s=k20201202; t=1777471659;
+	bh=t+CtLWscud7YleLPv0d4CqDcLOtNX/7MHLTrIWcs/Ns=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CnTM7In2SJenzZQOhToLK0g8dO/gAAVBuPh7A4U+/HpGJOUN8/tyb6odZcqvwbvRT
-	 En3qvEg5K0W3GqoL73dOj6jWtAwMJ5lZGPEFplB9L0UZe65+6PoI5P/bb/6yo+Km3c
-	 ao3QQsrZJWPToQBjGgEOmqwCsWvmF7giFJj4kKrwbd/3GuwIOlDgv/umGMy/GkBHe2
-	 7c9ZO91yQiufTRZiT0FYv1NRY3vYAcWxRaj/zYQY7r2fRxigclRGcHeq0HmS4nCr/f
-	 fGbVgztJFhDp+9S9M5riodntFnMrUtnvSda6OhZGbqS4Hj6JJQ7pJb6DMcFEp5/Koo
-	 Cr3cw8D4SVZ+Q==
-Date: Wed, 29 Apr 2026 20:19:03 +0900
-From: "Harry Yoo (Oracle)" <harry@kernel.org>
-To: "Uladzislau Rezki (Sony)" <urezki@gmail.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org, 
-	LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH 1/2] mm/slab: Add kvfree_atomic() helper
-Message-ID: <rnunkscwmelmfz3sj3ttbcrrgmq3j77xyc3lzoatflyqpsvmul@3jzdw55vmjdo>
-References: <20260428161419.94695-1-urezki@gmail.com>
+	b=jzFWrbmh51edLTkDHtzDUCQZKNm37EC2tB9/rAxSQkX3EVdrWAZ84V2rrdWefQNsZ
+	 E5wdwgWpV2Fds6URB3r6o/97bCOfrpqJtiXXBdnBL9fL4oWSW6EWjZEKP536l96n+e
+	 z26yjtJjtK9P1SeRdsLcdrONTwp2nhtnSzQnUhJwK27AF0iJYlLd3I6Jq4Ou7v8AEm
+	 MWiI9860SoMsqAw/Ptxu/CHI9YB9UpFRhsdOrQv17TDyFxIkrzLYbQsZAXVsDIsUiM
+	 sGLLzwEZ/mt+v7rDzay93cpIqkCxOByfReeJo601C/rEaZXszU+RfyHFNj4BupPtu5
+	 nk7iq/dcpoDiQ==
+Date: Wed, 29 Apr 2026 08:07:36 -0600
+From: Tycho Andersen <tycho@kernel.org>
+To: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Ashish Kalra <ashish.kalra@amd.com>, John Allen <john.allen@amd.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH v1 1/4] crypto/ccp: Do not initialize SNP for SEV ioctls
+Message-ID: <afIPW6IYp3abgwB4@tycho.pizza>
+References: <20260427161507.32686-1-tycho@kernel.org>
+ <20260427161507.32686-2-tycho@kernel.org>
+ <26259583-bf58-439b-980b-76460e8ebece@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,30 +45,64 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260428161419.94695-1-urezki@gmail.com>
+In-Reply-To: <26259583-bf58-439b-980b-76460e8ebece@amd.com>
 
-On Tue, Apr 28, 2026 at 06:14:18PM +0200, Uladzislau Rezki (Sony) wrote:
-> kvmalloc() now supports non-sleeping GFP flags, including
-> the vmalloc fallback path. This means it may return vmalloc
-> memory even for GFP_ATOMIC and GFP_NOWAIT allocations.
+On Tue, Apr 28, 2026 at 04:56:36PM -0500, Tom Lendacky wrote:
+> On 4/27/26 11:15, Tycho Andersen wrote:
+> > From: "Tycho Andersen (AMD)" <tycho@kernel.org>
+> > 
+> > Sashiko notes:
+> > 
+> >> if SEV initialization fails and KVM is actively running normal VMs, could a
+> >> userspace process trigger this code path via /dev/sev ioctls (e.g.,
+> >> SEV_PDH_GEN) and zero out MSR_VM_HSAVE_PA globally? Would the next VMRUN
+> >> execution for an active VM trigger a general protection fault and crash the
+> >> host?
+> > 
+> > sev_move_to_init_state() is called for ioctls requiring only SEV firmware:
+> > SEV_PEK_GEN, SEV_PDH_GEN, SEV_PEK_CSR, SEV_PEK_CERT_IMPORT, and
+> > SEV_PDH_CERT_EXPORT. After the firmware command, it does SEV_SHUTDOWN on
+> > the SEV firmware. Since these commands do not require SNP to be
+> > initialized, skip it by calling __sev_platform_init_locked() which only
+> > initializes the SEV firmware. This way SNP is not Initialized at all, and
+> > HSAVE_PA is not cleared.
+> > 
+> > The previous code saved any SEV initialization firmware error to
+> > init_args.error and then threw it away and hardcoded the return value of
+> > INVALID_PLATFORM_STATE regardless of the real firmware error. This patch
+> > changes it to surface the underlying error, which is hopefully both more
+> > useful and doesn't cause any problems.
+> > 
+> > Note that it is still safe to call __sev_firmware_shutdown() directly: it
+> > calls __sev_snp_shutdown_locked(), which skips SNP shutdown if SNP was not
+> > initialized.
+> > 
+> > Fixes: ceac7fb89e8d ("crypto: ccp - Ensure implicit SEV/SNP init and shutdown in ioctls")
+> > Reported-by: Sashiko
+> > Assisted-by: Gemini:gemini-3.1-pro-preview
+> > Link: https://sashiko.dev/#/patchset/20260324161301.1353976-1-tycho%40kernel.org
+> > Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
 > 
-> Freeing such memory with kvfree() may then end up calling
-> vfree(), which is not safe for non-sleeping contexts.
+> I have a similar patch that I hadn't gotten out that added an argument to
+> _sev_platform_init_locked() to skip/prevent SNP initialization. I wonder
+> if adding something to sev_platform_init_args would be better? This could
+> then be expanded to prevent SNP initialization if the KVM sev_snp module
+> parameter was set to false.
+
+Yeah, I will also need additional params to init_args here:
+https://lore.kernel.org/all/20260427204847.112899-2-tycho@kernel.org/
+so I think adding it there makes sense.
+
+> But for a fix, this is probably simpler. It does skip some of the checks
+> that _sev_platform_init_locked() has, but I think all of the checks that
+> matter are performed for the paths that call sev_move_to_init_state().
 > 
-> Introduce kvfree_atomic() helper for such cases. It mirrors
-> kvfree(), but uses vfree_atomic() for vmalloced memory.
-> 
-> Signed-off-by: Uladzislau Rezki (Sony) <urezki@gmail.com>
-> ---
+> Should this go to stable?
 
-Oh, allowing k[v]free() to be called in interrupt context but not in
-non-sleepable context is confusing... but that's not new.
+Yes, they all should as you point out, I'll add that for v2.
 
-Looks good to me,
-Acked-by: Harry Yoo (Oracle) <harry@kernel.org>
+> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
 
-Thanks for fixing it, Ulad!
+Thanks,
 
--- 
-Cheers,
-Harry / Hyeonggon
+Tycho
