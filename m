@@ -1,283 +1,306 @@
-Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010029.outbound.protection.outlook.com [52.101.201.29])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F332F99B8;
-	Wed, 29 Apr 2026 23:08:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.29
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777504086; cv=fail; b=sKZA4aYYm6nUhdbH6hFXMQr+Dg9hIW9fmSYmD2nDpy4JbkiOwuH/LpsMaripzO26+QRK/7NsXejjc8M2nN3ESwtaMSeUvE2eb1e3jpHhdkz6PDULY1h44Yu0OXEqOXN+7w2FXtOqcC8xC/F4/gx4sUZa6Bgs7+LpPxqcHuu7JWA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777504086; c=relaxed/simple;
-	bh=K3PRnNmhxz3nbu5YtzBR8GOpsFdClQTcrLVMBW1f7co=;
-	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=AxKvWED8uJzSM59NUBIZHdRyjYagFdW2/E374+QhQTJLiGixq73LNF1m0eS3O5bk+Se9UNp3g7yygapne3AhEmpy2WsCNZYBqEvMZNydgKF+HCXP3iMCRm0jqhF/qlFHb8JnplRSzSWi3mn44m4tXuoihbEGwRMSr+f0ZqIUIcw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=OP9rwvlH; arc=fail smtp.client-ip=52.101.201.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 018E123EA8A;
+	Thu, 30 Apr 2026 01:19:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777511948; cv=none; b=cy4wgf0UZSwTrkwd3PJ20yM7QGPjfxJPUxGs4jLOlTyx+QmAwnRU4dJJ9E15QUU6l7yyOt5EFJWZqRnGIq+liEPBFtxCtvIPrM+EuA82WRlA9YCb5T9wNZHfP5kdzXtrqsYhh6DXi6KSdhbJGVmSTQbYjnf2Fbf/93V2DjgAk6E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777511948; c=relaxed/simple;
+	bh=6czsOlNriyalap6EeFnkX5tgFtke+HknraCqL0WxuNI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ROeIXqnQTLY1k7PEabB0fhvABV1FjhsC3FTz09Tfhjm8WTSU8phtiGttQMjYhE9SQB7esq3fo9zOFvLc1N+VlQgN6C+tBoixDrk4gzHZJ/rNWqyBbDak/k01kROkD6pXVa+ga0pJLNeyLxEugn4bOR3BJuk2fp84CQRQL0vtOTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZQV3aXAl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="OP9rwvlH"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=TxFoawJXLuxwWrspkGfwMYcHEJ8Sb4Y5Tc8qxKmsY99+AluKw04+fdpptAW5oiggbq4WNe4YE0pmpTjZVlwym78cm4hZXbNBwwuQ0wkCFGbNrhNyt2sBDsKsbvqk4Dw+0DGTMtN4kjJhAY6rUR3wi065oVPQ7qwUFPaq4Uvw7qG4IwMg6Pfibr26EpjqEaCKrE40vgi3TKRO0ZeECch1PnXhjlHYOpCMtIIYxqNmZFM6dm4Wk58/4XX68gK8vWn0rpKZhesB71k68A+Yomr5KLODWYXQV1L7GvHKj7FWJpr7KRZ93Eb+J3EA2A5P2rgH4WZLOben8mFlzIjx0sJ6yA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4ozRrtiBJoQOnMmU4yyrJ4g1J9Lw8Gaj9ZSLR3TSELw=;
- b=RYesUwTdf7mx8IGW2fsBw4cmiYQ/9ul9SwUdg11sWctDuGeGpz77cSIZxycSJAO9yhhH+OskfZFAhMJLwuUv+E4VKWoQQ1LF2ijhsxX3X4unYfRk7gIDnBA9zuRXQkokvICmVmhY1bnDN0YyM9ftnyqLrB28C4xmPD5iZg6QeyJGpLwA92oIxOJfzaSIgGhjAkhC3Q4czO9qUP1hUux2mL2N9yoU+NfXL2jWw4bDSfamrHKqv7cZ9TYaghqXMabEJnkQV0uBBRkCfIzObF0yU7pH3rY8/8kT30KhHqWIaI83Sy3fJ5tBUFQ+sC5Ju/qNc0v01i70hAgXa/q3Oy/dtA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4ozRrtiBJoQOnMmU4yyrJ4g1J9Lw8Gaj9ZSLR3TSELw=;
- b=OP9rwvlHR5Kjmc8a+zu9q0uVZfKxtLq7Vzl8iOpguFXS41iRTF/OY9PdIShqpC+b9vO30IJ+j7w0DbSXRihVQk6o7b5j7rBZdCFSMBsWJWM3aJxjqFYpANMUz4xgiaOpXQVMMtLhznhy1Uw5Z4h54NGeq94qcwIH3jkT4kq9o0I=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
- by CH3PR12MB9454.namprd12.prod.outlook.com (2603:10b6:610:1c7::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9870.20; Wed, 29 Apr
- 2026 23:07:45 +0000
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::ae6a:9bdd:af5b:e9ad]) by BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::ae6a:9bdd:af5b:e9ad%6]) with mapi id 15.20.9870.020; Wed, 29 Apr 2026
- 23:07:45 +0000
-Message-ID: <e8ceeb35-b300-4f7e-8b91-775b141a89c4@amd.com>
-Date: Wed, 29 Apr 2026 18:07:41 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 0/7] Add RMPOPT support.
-From: "Kalra, Ashish" <ashish.kalra@amd.com>
-To: tglx@kernel.org, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- seanjc@google.com, peterz@infradead.org, thomas.lendacky@amd.com,
- herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org
-Cc: pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
- KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com,
- jackyli@google.com, pgonda@google.com, rientjes@google.com,
- jacobhxu@google.com, xin@zytor.com, pawan.kumar.gupta@linux.intel.com,
- babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com, john.allen@amd.com,
- darwi@linutronix.de, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev
-References: <cover.1775874970.git.ashish.kalra@amd.com>
-Content-Language: en-US
-In-Reply-To: <cover.1775874970.git.ashish.kalra@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH2PR07CA0019.namprd07.prod.outlook.com
- (2603:10b6:610:20::32) To BL3PR12MB9049.namprd12.prod.outlook.com
- (2603:10b6:208:3b8::21)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZQV3aXAl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FCCCC19425;
+	Thu, 30 Apr 2026 01:19:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777511947;
+	bh=6czsOlNriyalap6EeFnkX5tgFtke+HknraCqL0WxuNI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ZQV3aXAlpikEuzoE2QSEIEEH7BanzAKa27C4vM6on6FOu/quvXe9632AMzF9wycOH
+	 oMKrBt9Fnz05dqtS0DBK5fMbiMiPZA0k4JIeFtjUhxB09W6h0Qqvrbw76k/5rJSOMU
+	 0GqSbldRfCnKjm8QCoBXEVf6MUegQFoAYtv8+assh9Y9GBZhNJDrBH24krekphJ4i5
+	 RopZpz7kAv/WKEX+7vbAs2jJPVEQnT2UQFmK7s4U+92GJMsuj7thb13GdxGq4awKvw
+	 1Wa0Via3K/6vG5gRxINYsAo9cNq/CDJBg+wxD5pMnNspYIeRldp6oFD75NdNb00Md5
+	 HRGylGPtLzX9w==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-doc@vger.kernel.org,
+	linux-api@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH] crypto: af_alg - Document the deprecation of AF_ALG
+Date: Wed, 29 Apr 2026 18:15:44 -0700
+Message-ID: <20260430011544.31823-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|CH3PR12MB9454:EE_
-X-MS-Office365-Filtering-Correlation-Id: ac10eb7a-609f-4919-d30e-08dea6441f98
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|7416014|376014|1800799024|921020|18002099003|56012099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	N9NbJxb3WtWGdPyHS8x6txoAbeSd59iB/+vlrJAa1GETi1i8BmBf9TTiGjT9fYa7q3/RFboYXY007dTEkbEVQ9cpGDM3lrRXbdtmEqiw7LiFRKdwlNM26WdSbUKXSlBhBKt8dtzA2qaN50xbTF2o864VMT5poLnaGMnYODyiyOqnsrX6G/drDk9bQ449KqeMduHik4orE8CM75LKnIyKTkM8kJZJ5CprXhUSIKmwSHPOzfI2YfS9QkDRB6pkDvQkK8DIZA1uI7ZA/msg80YEwvE52EG84rcSaBMw4N94ZXXVpOVFY4pBZ3hxp9Z6c50FMQKYq9MwFaglu3opJPHr/knxMkPMFWpmTUKo+H8nwLhlgHtvagrZmzFEysJTkRT9ceZGVAYhILddsQ++yyUXRUuEeKCEARp35hF+NIx1awuKqakt5YPXdHAy9A9oWetjs8sSQPuwKX+2pKV6ar9qU+Fvbrkizt2HLcSQhZQI3fFHXTYV0XZN43sNyNUHYWT7T5o09DlQP6rOWQXrHtLWGFL9HczoD4pA8N5uaPikX9TciRetwOlv5UFCVhSukxYIxVfHcxFcHxd3Bvpg+16mBea9rkynYe3HbdWDA5C87kDrkqNhjK96m8FI3ue0Tlk5W0RYw3mJVx7HTDbbDUdwkCjUEYvnLh43clV3+jNHqk6rrUbFlULXAzvb7gtWn9Ghv47Qx49y92rltBOwKdWjk/kWceFrkL3YF5UxHUHNGmCGAR3Bll+JLLAGv6znfknZKo1MV55mqk76ueVhW4ikqg==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(921020)(18002099003)(56012099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WWVUT3J4aHowL0lRZXpaZGpGV0pSZWVOQkw2b21HdHNHczR3SGdHUmlEajhh?=
- =?utf-8?B?TFNqNm81Slpjd3NuSjM5b0VJZVZmSnRCeVFqSzVQcGl2S2ZlbmRsNFBnQ0lX?=
- =?utf-8?B?VTVqQ0w5WERlWGRFdUVDZ0RmeVljMXR1V09CVkkvYXhQUW5SUlFKbmlWS1J0?=
- =?utf-8?B?cVB1UU0yRjA4bnh2VDRvWm1BSHdQdURveHZoNGxuVERXRGpIaDFHNlk1eXJ2?=
- =?utf-8?B?QWlmdUV1K29QR092b3VzYzlJTTJCWmxyQUdaQnllcUlaRXhmQVRNVlNnT0hM?=
- =?utf-8?B?WGlwaWxhTjc2Q3RoVzEwcGhsMWVTOVB5bUNodm1paGoydjV2ZkVNeVFtVnBO?=
- =?utf-8?B?THJxaWMzN21SL2FmaCtmeHpwUHE3OS9LUGczR3doNittRDV5RWJ0TmZQSFpj?=
- =?utf-8?B?dnMzby9GNE1mUkZtSURiaEdvY3R3ZkVVU2t2a1FYdmNkb2J6ckUya1VpajdS?=
- =?utf-8?B?UkZlSGhwK0JZeU1vS1YyREI2UnZQSFpOM3NRYkEwMDIxS2Fkd1MwTnZWSjhH?=
- =?utf-8?B?RTB4UHpjSDNOQ2xvOHllQStORU44M0p0TE8waWQybkdXdXBCMEhtUmEwajVN?=
- =?utf-8?B?K2hDNkwrYW5sdGhGa0FyalJHSjN4eVRwN1BibWZiczc1TUNjWm5XSHFzUEFj?=
- =?utf-8?B?aFdESktEL1Jydi8xNlQrY1R6WXNGZmJad1lVd0V1Zy94N0ZuUW1iQlVBUlA5?=
- =?utf-8?B?Nzcrdit6NDNWRVdhcTAyakt4dlUrK00xWGtXZHM3dS81b05ldUpzYlZpUGoy?=
- =?utf-8?B?ZGFmMFNWQUMvenZpbnRqMXQyb1g4Z1JCSllzaURIYU5XMEdvczFQOEJveklX?=
- =?utf-8?B?dmx4TVFLdTJrdnlTVERERGUyQXZtVURHR1JKczhvRndrMGhia21yTVhLcHh2?=
- =?utf-8?B?RWd4R1dBeW9YT1NGUTR2ekRYMXNnWFRRUXBTRWQrRVRkdE5FY2dKYjVLUEI3?=
- =?utf-8?B?QWtCT3llbmQ3Y1JDR2JSeWx2YTNkL1FseHJvNGxuWjZpWTE5ZU9HazlJZGNr?=
- =?utf-8?B?KzltOUhtSzE4Z1NJT3N1a2xYTERPb20yN0xudmE0OG5CTURlRXUzK0dWaWhG?=
- =?utf-8?B?aXgrd1pITDE4dW1uNFRMYzBjU0xrWm9sVXZHVEE2OXNOZnVlL241dXM2cXpE?=
- =?utf-8?B?L0JFNEFTcFBoTjQySXQ5YXkyallWN3NjdjdRcDdZOXJSZkl3NFdEMFdWc3Bp?=
- =?utf-8?B?b3duUldKUmVZNFBaSURWSjJHZk5hRWhDVmxDRG1YYUtOUzBmcFdqeHlnOFU4?=
- =?utf-8?B?YlNscG5HQXN2cFFiNWpyR0lJUStXNk1ON0d3Uys0RUdVY2RNenhkQjc4dmNV?=
- =?utf-8?B?emdjMktlcjdtYk1odU1CTFhyeDh6Y1BqOXpmcnJ0SUZrVTc3dTR5TFBRRTd1?=
- =?utf-8?B?TUlsRXBlUXE2MjdtNy83MForYnRLMlFSNDhKYUtwRnJ6UlY2cnVySFJNOXF3?=
- =?utf-8?B?bVIrenVTdCtBY2dMR29NSnFrTHF5eHorVENjRUJaT3JKUnpNL2h3MVNxSTFa?=
- =?utf-8?B?dlBGNnNFd3BOVnRTNVJnL1daVUptYit1MFVIbVQrRmM0OVd3RktTWDZlNFdI?=
- =?utf-8?B?MFJOOURTY0tveGdSY1JIdFRqSGRWY0pvay9ZMy9rNHpiU2E0K0EyTU9zc0to?=
- =?utf-8?B?YmwzUEZnZ3ZWYXoxaWxDVms5V1VaNDRRTFY4clg3TlJlYk83OWYwMUhNK3dt?=
- =?utf-8?B?YkRJbk9wcER1L0czekxVSzMvNjZkV2tRNEptQS8xZHVuK0VjM05GVEJoQW5J?=
- =?utf-8?B?OVhHZ0dJRytIRmZUdEJXSjd6L1VuMTNaQVlSVlR1a21UT3hJeXFyT0dXcWVt?=
- =?utf-8?B?NnY1VUFYL0dxbmhUVEpTVEtMbzQzRW1tdllIaE1tSkxwY2ZGUWVmNGM5bWhZ?=
- =?utf-8?B?TW10TFN6VTRxdDRTdWQ0ZGpva1NPWDZKaEdaSFVzbXhLZFR4SFZBeFAraEFG?=
- =?utf-8?B?VnFFajg5SWVuQ09VSm9Hay9JQS9JS2YyazhDdFp4MkJQQjFCczBpNklxaEJ0?=
- =?utf-8?B?c1pJRVlDRGp4M3NzTWkrR1U5ZkpIZjJ4VUMzUlIyaWphYisyMHA2WTN1d1Nx?=
- =?utf-8?B?WEt3V0pybUhPdjVHcjR6c3VKZS82NEhCYU8wRUJtUUhqVDUraEd5L1ZsK2hI?=
- =?utf-8?B?TkFXUmpFVHNybm9GZVBCMnNRQUcwOTZvamNJZlVhQll2VnNkeXBpb0M5cHJN?=
- =?utf-8?B?WGVDRVBKUGRnVkhrNEdDR1UzbVBTek9OZ1J1VEpITEJzZjgyM2tFNmxoUjBQ?=
- =?utf-8?B?WjdxNUNUbW5yVm05Rk5nYnVKS2dvTUwyaEFkZUw5bjlGQXNsbkNXUTd6anRZ?=
- =?utf-8?Q?oPb8DIf3YRDIAU0m5i?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ac10eb7a-609f-4919-d30e-08dea6441f98
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2026 23:07:45.3277
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rC0hsWTtmw4/n0pN4Ql/Z9HWS7Jw5u9BA+aPca03AzVusTTJg9gGpU2YUB8bpQZlok+DNFwGyL9aVaZMrIFztQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9454
+Content-Transfer-Encoding: 8bit
 
-Hello Dave, Sean,
+AF_ALG is almost completely unnecessary, and it exposes a massive attack
+surface that hasn't been standing up to modern vulnerability discovery
+tools.  The latest one even has its own website, providing a small
+Python script that reliably roots most Linux distros: https://copy.fail/
 
-Looking forward to your feedback, comments, thoughts on RMPOPT v4 patch series.
+This isn't sustainable, especially as LLMs have accelerated the rate the
+vulnerabilities are coming in.  The effort that is being put into this
+thing is vastly disproportional to the few programs that actually use
+it, and those programs would be better served by userspace code anyway.
 
-Thanks,
-Ashish
+These issues have been noted in many mailing list discussions already.
+But until now they haven't been reflected in the documentation or
+kconfig menu itself, and the vulnerabilities are still coming in.
 
-On 4/13/2026 2:42 PM, Ashish Kalra wrote:
-> From: Ashish Kalra <ashish.kalra@amd.com>
-> 
-> In the SEV-SNP architecture, hypervisor and non-SNP guests are subject
-> to RMP checks on writes to provide integrity of SEV-SNP guest memory.
-> 
-> The RMPOPT architecture enables optimizations whereby the RMP checks
-> can be skipped if 1GB regions of memory are known to not contain any
-> SNP guest memory.
-> 
-> RMPOPT is a new instruction designed to minimize the performance
-> overhead of RMP checks for the hypervisor and non-SNP guests.
-> 
-> RMPOPT instruction currently supports two functions. In case of the
-> verify and report status function the CPU will read the RMP contents,
-> verify the entire 1GB region starting at the provided SPA is HV-owned.
-> For the entire 1GB region it checks that all RMP entries in this region
-> are HV-owned (i.e, not in assigned state) and then accordingly updates
-> the RMPOPT table to indicate if optimization has been enabled and
-> provide indication to software if the optimization was successful.
-> 
-> In case of report status function, the CPU returns the optimization
-> status for the 1GB region.
-> 
-> The RMPOPT table is managed by a combination of software and hardware.
-> Software uses the RMPOPT instruction to set bits in the table,
-> indicating that regions of memory are entirely HV-owned.  Hardware
-> automatically clears bits in the RMPOPT table when RMP contents are
-> changed during RMPUPDATE instruction.
-> 
-> For more information on the RMPOPT instruction, see the AMD64 RMPOPT
-> technical documentation.
-> 
-> As SNP is enabled by default the hypervisor and non-SNP guests are
-> subject to RMP write checks to provide integrity of SNP guest memory.
-> 
-> This patch-series adds support to enable RMP optimizations for up to
-> 2TB of system RAM across the system and allow RMPUPDATE to disable
-> those optimizations as SNP guests are launched.
-> 
-> Support for RAM larger than 2 TB will be added in follow-on series.
-> 
-> This series also introduces support to re-enable RMP optimizations
-> during SNP guest termination, after guest pages have been converted
-> back to shared.
-> 
-> RMP optimizations are performed asynchronously by queuing work on a
-> dedicated workqueue after a 10 second delay.
-> 
-> Delaying work allows batching of multiple SNP guest terminations.
-> 
-> Once 1GB hugetlb guest_memfd support is merged, support for
-> re-enabling RMPOPT optimizations during 1GB page cleanup will be added
-> in follow-on series.
-> 
-> Additionally add debugfs interface to report per-CPU RMPOPT status
-> across all system RAM.
-> 
-> v4:
-> - Add new wrmsrq_on_cpus() helper to write same u64 value to a
->   per-CPU MSR across a cpumask without per-cpu struct allocation
->   overhead. 
-> - Rename configure_and_enable_rmpopt() to snp_setup_rmpopt().
-> - Use wrmsrq_on_cpus() instead of wrmsrq_on_cpu() loop for
->   programming RMPOPT_BASE MSRs.
-> - Add setup_clear_cpu_cap(X86_FEATURE_RMPOPT) if segmented RMP
->   setup fails or workqueue allocation fails.
-> - Add X86_FEATURE_RMPOPT feature clear logic in amd_cc_platform_clear()
->   for CC_ATTR_HOST_SEV_SNP.
-> - All of the above allow checking for only X86_FEATURE_RMPOPT for both
->   RMPOPT setup/enable and RMP re-optimizations.
-> - Rename snp_perform_rmp_optimization() to snp_rmpopt_all_physmem().
-> - Split rmpopt() into rmpopt() and rmpopt_smp() for SMP callback use.
-> - Introduce separate rmpopt_report_cpumask for debugfs reporting,
->   distinct from rmpopt_cpumask used for primary thread tracking.
-> - Remove snp_perform_rmp_optimization() call from __sev_snp_init_locked() 
->   and instead setup and enable RMPOPT after SNP is enabled and 
->   initialized.
-> 
-> v3:
-> - Drop all RMPOPT kthread support and introduce adding custom and
->   dedicated workqueue to schedule delayed and asynchronous RMPOPT work.
-> - Drop the guest_memfd inode cleanup interface and add support to
->   re-enable RMP optimizations during guest shutdown using the
->   asynchronous and delayed workqueue interface.
-> - Introduce new __rmpopt() helper and rmpopt() and
->   rmpopt_report_status() wrappers on top which use rax and rcx
->   parameters to closely match RMPOPT specs.
-> - Use new optimized RMPOPT loop to issue RMPOPT instructions on all
->   system RAM upto 2TB and all CPUs, by optimizing each range on one CPU
->   first, then let other CPUs execute RMPOPT in parallel so they can skip
->   most work as the range has already been optimized.
-> - Also add support for running the optimized RMPOPT loop only on
->   one thread per core.
-> - Replace all PUD_SIZE references with SZ_1G to conform to 1GB regions
->   as specified by RMPOPT specifications and not be dependent on PUD_SIZE
->   which makes the RMPOPT patch-set independent of x86 page table sizes.
-> - Use wrmsrq_on_cpu() to program the RMPOPT_BASE MSR registers on
->   all CPUs that removes all ugly casting to use on_each_cpu_mask().
-> - Fix inline commits and patch commit messages
-> 
-> 
-> v2:
-> - Drop all NUMA and Socket configuration and enablement support and
->   enable RMPOPT support for up to 2TB of system RAM.
-> - Drop get_cpumask_of_primary_threads() and enable per-core RMPOPT
->   base MSRs and issue RMPOPT instruction on all CPUs.
-> - Drop the configfs interface to manually re-enable RMP optimizations.
-> - Add new guest_memfd cleanup interface to automatically re-enable
->   RMP optimizations during guest shutdown.
-> - Include references to the public RMPOPT documentation.
-> - Move debugfs directory for RMPOPT under architecuture specific
->   parent directory.
-> 
-> Ashish Kalra (7):
->   x86/cpufeatures: Add X86_FEATURE_AMD_RMPOPT feature flag
->   x86/msr: add wrmsrq_on_cpus helper
->   x86/sev: Initialize RMPOPT configuration MSRs
->   x86/sev: Add support to perform RMP optimizations asynchronously
->   x86/sev: Add interface to re-enable RMP optimizations.
->   KVM: SEV: Perform RMP optimizations on SNP guest shutdown
->   x86/sev: Add debugfs support for RMPOPT
-> 
->  arch/x86/coco/core.c               |   1 +
->  arch/x86/include/asm/cpufeatures.h |   2 +-
->  arch/x86/include/asm/msr-index.h   |   3 +
->  arch/x86/include/asm/msr.h         |   5 +
->  arch/x86/include/asm/sev.h         |   4 +
->  arch/x86/kernel/cpu/scattered.c    |   1 +
->  arch/x86/kvm/svm/sev.c             |   2 +
->  arch/x86/lib/msr-smp.c             |  20 +++
->  arch/x86/virt/svm/sev.c            | 271 ++++++++++++++++++++++++++++-
->  drivers/crypto/ccp/sev-dev.c       |   3 +
->  10 files changed, 310 insertions(+), 2 deletions(-)
-> 
-> --
-> 2.43.0
-> 
-> 
+Let's go ahead and document the deprecation.
+
+This isn't intended to change anything overnight.  After all, most Linux
+distros won't be able to disable the kconfig options quite yet, mainly
+because of iwd.  But this should create a bit more impetus for these
+userspace programs to be fixed, and the documentation update should also
+help prevent more users from appearing.
+
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+
+This patch is targeting crypto/master
+
+ Documentation/crypto/userspace-if.rst | 82 ++++++++++++++++++++-------
+ crypto/Kconfig                        | 69 ++++++++++++++++------
+ 2 files changed, 113 insertions(+), 38 deletions(-)
+
+diff --git a/Documentation/crypto/userspace-if.rst b/Documentation/crypto/userspace-if.rst
+index 021759198fe7..c39f5c79a5b7 100644
+--- a/Documentation/crypto/userspace-if.rst
++++ b/Documentation/crypto/userspace-if.rst
+@@ -2,30 +2,72 @@ User Space Interface
+ ====================
+ 
+ Introduction
+ ------------
+ 
+-The concepts of the kernel crypto API visible to kernel space is fully
+-applicable to the user space interface as well. Therefore, the kernel
+-crypto API high level discussion for the in-kernel use cases applies
+-here as well.
+-
+-The major difference, however, is that user space can only act as a
+-consumer and never as a provider of a transformation or cipher
+-algorithm.
+-
+-The following covers the user space interface exported by the kernel
+-crypto API. A working example of this description is libkcapi that can
+-be obtained from [1]. That library can be used by user space
+-applications that require cryptographic services from the kernel.
+-
+-Some details of the in-kernel kernel crypto API aspects do not apply to
+-user space, however. This includes the difference between synchronous
+-and asynchronous invocations. The user space API call is fully
+-synchronous.
+-
+-[1] https://www.chronox.de/libkcapi/index.html
++AF_ALG provides unprivileged userspace programs access to arbitrary hash,
++symmetric cipher, AEAD, and RNG algorithms that are implemented in kernel-mode
++code.
++
++AF_ALG is insecure and is deprecated. Originally added to the kernel in 2010,
++most kernel developers now consider it to be a mistake.
++
++AF_ALG continues to be supported only for backwards compatibility. On systems
++where no programs using AF_ALG remain, the support for it should be disabled by
++disabling ``CONFIG_CRYPTO_USER_API_*``.
++
++Deprecation
++-----------
++
++AF_ALG was originally intended to provide userspace programs access to crypto
++accelerators that they wouldn't otherwise have access to.
++
++However, that capability turned out to not be useful on very many systems. More
++significantly, the actual implementation exposes a vastly greater amount of
++functionality than that. It actually provides access to all software algorithms.
++
++This includes arbitrary compositions of different algorithms created via a
++complex template system, as well as algorithms that only make sense as internal
++implementation details of other algorithms. It also includes full zero-copy
++support, which is difficult for the kernel to implement securely.
++
++Ultimately, these algorithms are just math computations. They use the same
++instructions that userspace programs already have access to, just accessed in a
++much more convoluted and less efficient way.
++
++Indeed, userspace code is nearly always what is being used anyway. These same
++algorithms are widely implemented in userspace crypto libraries.
++
++Meanwhile, AF_ALG hasn't been withstanding modern vulnerability discovery tools
++such as syzbot and large language models. It receives a steady stream of CVEs.
++Some of the examples include:
++
++- CVE-2026-31677
++- CVE-2026-31431 (https://copy.fail)
++- CVE-2025-38079
++- CVE-2025-37808
++- CVE-2024-26824
++- CVE-2022-48781
++- CVE-2019-8912
++- CVE-2018-14619
++- CVE-2017-18075
++- CVE-2017-17806
++- CVE-2017-17805
++- CVE-2016-10147
++- CVE-2015-8970
++- CVE-2015-3331
++- CVE-2014-9644
++- CVE-2013-7421
++- CVE-2011-4081
++
++It is recommended that, whenever possible, userspace programs be migrated to
++userspace crypto code (which again, is what is normally used anyway) and
++``CONFIG_CRYPTO_USER_API_*`` be disabled.  On systems that use SELinux, SELinux
++can also be used to restrict the use of AF_ALG to trusted programs.
++
++The remainder of this documentation provides the historical documentation for
++the deprecated AF_ALG interface.
+ 
+ User Space API General Remarks
+ ------------------------------
+ 
+ The kernel crypto API is accessible from user space. Currently, the
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 103d1f58cb7c..6cd1c478d4be 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1278,48 +1278,72 @@ config CRYPTO_DF80090A
+ 	tristate
+ 	select CRYPTO_AES
+ 	select CRYPTO_CTR
+ 
+ endmenu
+-menu "Userspace interface"
++menu "Userspace interface (deprecated)"
+ 
+ config CRYPTO_USER_API
+ 	tristate
+ 
+ config CRYPTO_USER_API_HASH
+-	tristate "Hash algorithms"
++	tristate "Hash algorithms (deprecated)"
+ 	depends on NET
+ 	select CRYPTO_HASH
+ 	select CRYPTO_USER_API
+ 	help
+-	  Enable the userspace interface for hash algorithms.
++	  Enable the AF_ALG userspace interface for hash algorithms.  This
++	  provides unprivileged userspace programs access to arbitrary hash
++	  algorithms implemented in the kernel's privileged execution context.
+ 
+-	  See Documentation/crypto/userspace-if.rst and
+-	  https://www.chronox.de/libkcapi/html/index.html
++	  This interface is deprecated and is supported only for backwards
++	  compatibility.  It regularly has vulnerabilities, and the capabilities
++	  it provides are redundant with userspace crypto libraries.
++
++	  Enable this only if needed for support for a program that hasn't yet
++	  been converted to userspace crypto, for example iwd.
++
++	  See also Documentation/crypto/userspace-if.rst
+ 
+ config CRYPTO_USER_API_SKCIPHER
+-	tristate "Symmetric key cipher algorithms"
++	tristate "Symmetric key cipher algorithms (deprecated)"
+ 	depends on NET
+ 	select CRYPTO_SKCIPHER
+ 	select CRYPTO_USER_API
+ 	help
+-	  Enable the userspace interface for symmetric key cipher algorithms.
++	  Enable the AF_ALG userspace interface for symmetric key algorithms.
++	  This provides unprivileged userspace programs access to arbitrary
++	  symmetric key algorithms implemented in the kernel's privileged
++	  execution context.
++
++	  This interface is deprecated and is supported only for backwards
++	  compatibility.  It regularly has vulnerabilities, and the capabilities
++	  it provides are redundant with userspace crypto libraries.
++
++	  Enable this only if needed for support for a program that hasn't yet
++	  been converted to userspace crypto, for example iwd, or cryptsetup
++	  with certain algorithms.
+ 
+-	  See Documentation/crypto/userspace-if.rst and
+-	  https://www.chronox.de/libkcapi/html/index.html
++	  See also Documentation/crypto/userspace-if.rst
+ 
+ config CRYPTO_USER_API_RNG
+-	tristate "RNG (random number generator) algorithms"
++	tristate "Random number generation algorithms (deprecated)"
+ 	depends on NET
+ 	select CRYPTO_RNG
+ 	select CRYPTO_USER_API
+ 	help
+-	  Enable the userspace interface for RNG (random number generator)
+-	  algorithms.
++	  Enable the AF_ALG userspace interface for random number generation
++	  (RNG) algorithms.  This provides unprivileged userspace programs
++	  access to arbitrary RNG algorithms implemented in the kernel's
++	  privileged execution context.
+ 
+-	  See Documentation/crypto/userspace-if.rst and
+-	  https://www.chronox.de/libkcapi/html/index.html
++	  This interface is deprecated and is supported only for backwards
++	  compatibility.  It regularly has vulnerabilities, and the capabilities
++	  it provides are redundant with userspace crypto libraries as well as
++	  the normal kernel RNG (e.g., /dev/urandom and getrandom(2)).
++
++	  See also Documentation/crypto/userspace-if.rst
+ 
+ config CRYPTO_USER_API_RNG_CAVP
+ 	bool "Enable CAVP testing of DRBG"
+ 	depends on CRYPTO_USER_API_RNG && CRYPTO_DRBG
+ 	help
+@@ -1330,20 +1354,29 @@ config CRYPTO_USER_API_RNG_CAVP
+ 
+ 	  This should only be enabled for CAVP testing. You should say
+ 	  no unless you know what this is.
+ 
+ config CRYPTO_USER_API_AEAD
+-	tristate "AEAD cipher algorithms"
++	tristate "AEAD cipher algorithms (deprecated)"
+ 	depends on NET
+ 	select CRYPTO_AEAD
+ 	select CRYPTO_SKCIPHER
+ 	select CRYPTO_USER_API
+ 	help
+-	  Enable the userspace interface for AEAD cipher algorithms.
++	  Enable the AF_ALG userspace interface for authenticated encryption
++	  with associated data (AEAD) algorithms.  This provides unprivileged
++	  userspace programs access to arbitrary AEAD algorithms implemented in
++	  the kernel's privileged execution context.
++
++	  This interface is deprecated and is supported only for backwards
++	  compatibility.  It regularly has vulnerabilities, and the capabilities
++	  it provides are redundant with userspace crypto libraries.
++
++	  Enable this only if needed for support for a program that hasn't yet
++	  been converted to userspace crypto, for example iwd.
+ 
+-	  See Documentation/crypto/userspace-if.rst and
+-	  https://www.chronox.de/libkcapi/html/index.html
++	  See also Documentation/crypto/userspace-if.rst
+ 
+ config CRYPTO_USER_API_ENABLE_OBSOLETE
+ 	bool "Obsolete cryptographic algorithms"
+ 	depends on CRYPTO_USER_API
+ 	default y
+
+base-commit: 57b8e2d666a31fa201432d58f5fe3469a0dd83ba
+-- 
+2.54.0
+
