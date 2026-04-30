@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAF1347278D;
-	Thu, 30 Apr 2026 16:08:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AACC5477983;
+	Thu, 30 Apr 2026 16:08:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777565286; cv=none; b=iCzvkLHGGnT7CZgR/ASl4C1yZMWttPTncuepUj52ZLayYrj/lvmz0GcIhkNvppm0q1Xw39ShbnRqhBr1fpBuhZi8IWjCnow3YWPXeHxVtlOEXeQoqS5nt3IfVO1GAAU9jD+VNdq5Y1/cBFDZTa+CN21HUM+xR9lSolU+somHaY4=
+	t=1777565287; cv=none; b=Zwz82/9qFNmqwGj13uOnJwwXzkE6QYdnsdZUnAVdn5WfCm7NnAoa7Hyipr6fTsUf2rxzXSvDBk1zn0nuSg+LpkELOW7eHXDoh4DO1XWxKlIo+SiMMEQeVyQY+WfsoWDlfOYAzto0n8kjXCKoeleuZ/dQUtKphRbPYUYFnyji03E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777565286; c=relaxed/simple;
-	bh=YzGD1DNsaiZ2gMNu0AtMCMF96uvzxD5DY9G8hcz0NQQ=;
+	s=arc-20240116; t=1777565287; c=relaxed/simple;
+	bh=ppqUBdHv5atY4swQeEtCHJ6NLY5UYUIHNSSBVG5oToY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mx4F1CSavMO3HyPx4wbAsJDVplOJqvME409nV9RsuFDC1SQj6CPFTK9E/CW/kx2SjlXaU4rwuGlUJJzqMkko0YatbESa1iyJyCawbrLVwykum3rOuuXRyuPx3T8PKK9fx3PRfpe1rKfvcVNOnx0uLWJ2+HrG/uR4XEcDOkDtjC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SBR3CLVE; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=hg0HD1wOdZdxFZYrFNdALerjSUD6A8PLk3UxSYYgJuXLBQ05WHUXvqn77132fZ5czfZstYpXfGnrU/IDMrThhrSYQktO0fLHG/4iejCVjwSvBLrGcyw+q3R9275WIu/OECobPbSZvB7Hbszyl4z4zOkTRzjwgaRFD+pKdg+HjT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oigEgUG3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SBR3CLVE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00FACC2BCB3;
-	Thu, 30 Apr 2026 16:08:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oigEgUG3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC925C2BCB8;
+	Thu, 30 Apr 2026 16:08:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777565285;
-	bh=YzGD1DNsaiZ2gMNu0AtMCMF96uvzxD5DY9G8hcz0NQQ=;
+	s=k20201202; t=1777565287;
+	bh=ppqUBdHv5atY4swQeEtCHJ6NLY5UYUIHNSSBVG5oToY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SBR3CLVEu/rbXXSc2FGNc3taISQaC2KoYuGCJvaXWGSfM3qTBq0RK9p0F+qBJuEqk
-	 IkzZ6TiqM0LsMTeKWgYgYvgOVdzB80Bt/QvuUj81Aj1brK5juZW86TePBY/ac0OJjg
-	 aG+4SHjFxXUUDMNnUm6gkgQUc22uuJweMiQw9IC1HXXGoHkvLDmSMaXRypXJwLcF+V
-	 LYn68nx/ghJPdSkbzVKehwkMHoJ14XN1Wh2FyNJoHOeZDGuvMe68TKw8UU5puuWAPh
-	 SrMtQBSB31yLK42nnVJUVWjnGsDyGVfkkIKNZewDngepPxcE9+5h2jJf4IJ0wzYxyv
-	 rY3pvsx3XpXCA==
+	b=oigEgUG3dWXwDwUJzUJgvzyzHnD0kM+7ALFEWEFlQGcWyH/ZV5+9KSlxB/llYkKxe
+	 LTX25P9KzqQ9NAR0SXMDTe2rSWmKtId79ViSnScmMWA3p6XE19lxDx6pHRejQLE/na
+	 1ykL2j7d8RXRKzQb73+gx7NPsqKAiLq5TdG5uzvnu3PCRT+tPtD7HofU0GpR8sZIac
+	 aQ8TNrP+l+jtnDi6S8FAA0miC6/zALd+G2GxWy0yUB/NGdzhPGeDYR6gQE+VbHL45P
+	 lZJHerGExYwdXLrBrwNh4KJjI7oAiyHajva00sqO92Ym9mBWzlaxF5tNawEwOLrplA
+	 3ZPu07rBpmaRA==
 From: Tycho Andersen <tycho@kernel.org>
 To: Ashish Kalra <ashish.kalra@amd.com>,
 	Tom Lendacky <thomas.lendacky@amd.com>,
@@ -41,9 +41,9 @@ Cc: linux-crypto@vger.kernel.org,
 	Nikunj A Dadhania <nikunj@amd.com>,
 	"Pratik R. Sampat" <prsampat@amd.com>,
 	Michael Roth <michael.roth@amd.com>
-Subject: [RFC v1 3/6] crypto/ccp: Add DOWNLOAD_FIRMWARE_EX message struct
-Date: Thu, 30 Apr 2026 10:07:13 -0600
-Message-ID: <20260430160716.1120553-4-tycho@kernel.org>
+Subject: [RFC v1 4/6] crypto/ccp: Reclaim command buffer when the PSP dies
+Date: Thu, 30 Apr 2026 10:07:14 -0600
+Message-ID: <20260430160716.1120553-5-tycho@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260430160716.1120553-1-tycho@kernel.org>
 References: <20260430160716.1120553-1-tycho@kernel.org>
@@ -57,59 +57,98 @@ Content-Transfer-Encoding: 8bit
 
 From: "Tycho Andersen (AMD)" <tycho@kernel.org>
 
-...and appropriate sizeof() in sev_cmd_buffer_len() for use in
-do_sev_cmd(). The message is documented in SEV-SNP firmware document id
-56860.
+When the PSP dies due to timeout the psp_dead flag is set, but the
+buffer-in-use flag was not unset, and the pages were not reclaimed for
+legacy commands.
+
+In preparation for a firmware quirk where updates time out but the
+situation is recoverable, move the reclamation before the error checking
+and handling. Be sure to only copy the output buffer when the command has
+not timed out, i.e. when there is sensible output in the buffer.
 
 Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
 ---
- drivers/crypto/ccp/sev-dev.c |  1 +
- include/linux/psp-sev.h      | 20 ++++++++++++++++++++
- 2 files changed, 21 insertions(+)
+ drivers/crypto/ccp/sev-dev.c | 60 +++++++++++++++++++-----------------
+ 1 file changed, 32 insertions(+), 28 deletions(-)
 
 diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 7ca29ccda0e7..defdc1bc226e 100644
+index defdc1bc226e..2df621b9f6e2 100644
 --- a/drivers/crypto/ccp/sev-dev.c
 +++ b/drivers/crypto/ccp/sev-dev.c
-@@ -252,6 +252,7 @@ static int sev_cmd_buffer_len(int cmd)
- 	case SEV_CMD_SNP_PLATFORM_STATUS:	return sizeof(struct sev_data_snp_addr);
- 	case SEV_CMD_SNP_GUEST_REQUEST:		return sizeof(struct sev_data_snp_guest_request);
- 	case SEV_CMD_SNP_CONFIG:		return sizeof(struct sev_user_data_snp_config);
-+	case SEV_CMD_SNP_DOWNLOAD_FIRMWARE_EX:	return sizeof(struct sev_data_download_firmware_ex);
- 	case SEV_CMD_SNP_COMMIT:		return sizeof(struct sev_data_snp_commit);
- 	case SEV_CMD_SNP_FEATURE_INFO:		return sizeof(struct sev_data_snp_feature_info);
- 	case SEV_CMD_SNP_VLEK_LOAD:		return sizeof(struct sev_user_data_snp_vlek_load);
-diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index d5099a2baca5..5227e901bff2 100644
---- a/include/linux/psp-sev.h
-+++ b/include/linux/psp-sev.h
-@@ -855,6 +855,26 @@ struct sev_platform_init_args {
- 	unsigned int max_snp_asid;
- };
+@@ -948,6 +948,38 @@ int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
  
-+/**
-+ * struct sev_data_download_firmware_ex
-+ *
-+ * @len: length of the command buffer read by the PSP
-+ * @rsvd0: reserved
-+ * @fw_paddr: physical address of the start of the firmware blob
-+ * @fw_len: length of the firmware blob
-+ * @commit: whether to immediately commit the firmware update. If set, this
-+ *  operation behaves like DOWNLOAD_FIRMWARE.
-+ * @rsvd1: reserved
-+ */
-+struct sev_data_download_firmware_ex {
-+	u32 len;		/* In */
-+	u32 rsvd0;
-+	u64 fw_paddr;		/* In */
-+	u32 fw_len;		/* In */
-+	u32 commit:1;		/* In */
-+	u32 rsvd1:31;
-+} __packed;
+ 	/* wait for command completion */
+ 	ret = sev_wait_cmd_ioc(sev, &reg, psp_timeout);
 +
- /**
-  * struct sev_data_snp_commit - SNP_COMMIT structure
-  *
++	/*
++	 * Copy potential output from the PSP back to data.  Do this even on
++	 * failure in case the caller wants to glean something from the error,
++	 * unless the operation timed out, in which case there is nothing to
++	 * copy back.
++	 */
++	if (data) {
++		int ret_reclaim;
++		/*
++		 * Restore the page state after the command completes.
++		 */
++		ret_reclaim = snp_reclaim_cmd_buf(cmd, cmd_buf);
++		if (ret_reclaim) {
++			dev_err(sev->dev,
++				"SEV: failed to reclaim buffer for legacy command %#x. Error: %d\n",
++				cmd, ret_reclaim);
++			return ret_reclaim;
++		}
++
++		if (ret != -ETIMEDOUT)
++			memcpy(data, cmd_buf, buf_len);
++
++		if (sev->cmd_buf_backup_active)
++			sev->cmd_buf_backup_active = false;
++		else
++			sev->cmd_buf_active = false;
++
++		if (snp_unmap_cmd_buf_desc_list(desc_list))
++			return -EFAULT;
++	}
++
+ 	if (ret) {
+ 		if (psp_ret)
+ 			*psp_ret = 0;
+@@ -984,34 +1016,6 @@ int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+ 		ret = sev_write_init_ex_file_if_required(cmd);
+ 	}
+ 
+-	/*
+-	 * Copy potential output from the PSP back to data.  Do this even on
+-	 * failure in case the caller wants to glean something from the error.
+-	 */
+-	if (data) {
+-		int ret_reclaim;
+-		/*
+-		 * Restore the page state after the command completes.
+-		 */
+-		ret_reclaim = snp_reclaim_cmd_buf(cmd, cmd_buf);
+-		if (ret_reclaim) {
+-			dev_err(sev->dev,
+-				"SEV: failed to reclaim buffer for legacy command %#x. Error: %d\n",
+-				cmd, ret_reclaim);
+-			return ret_reclaim;
+-		}
+-
+-		memcpy(data, cmd_buf, buf_len);
+-
+-		if (sev->cmd_buf_backup_active)
+-			sev->cmd_buf_backup_active = false;
+-		else
+-			sev->cmd_buf_active = false;
+-
+-		if (snp_unmap_cmd_buf_desc_list(desc_list))
+-			return -EFAULT;
+-	}
+-
+ 	print_hex_dump_debug("(out): ", DUMP_PREFIX_OFFSET, 16, 2, data,
+ 			     buf_len, false);
+ 
 -- 
 2.54.0
 
