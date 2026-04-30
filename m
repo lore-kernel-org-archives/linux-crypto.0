@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AACC5477983;
-	Thu, 30 Apr 2026 16:08:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 845124779B0;
+	Thu, 30 Apr 2026 16:08:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777565287; cv=none; b=Zwz82/9qFNmqwGj13uOnJwwXzkE6QYdnsdZUnAVdn5WfCm7NnAoa7Hyipr6fTsUf2rxzXSvDBk1zn0nuSg+LpkELOW7eHXDoh4DO1XWxKlIo+SiMMEQeVyQY+WfsoWDlfOYAzto0n8kjXCKoeleuZ/dQUtKphRbPYUYFnyji03E=
+	t=1777565289; cv=none; b=js4/Zu95bi1cjtMo5ppwmHSmd5wkV1Hc9PS0NLpW50lFHXQtJmCnoLZsVpkRFg3Lh7kX5TScCI8K0xEJbpRCd4tJo9hplkmPvRRmHGg3uWEz3PLBoUAmGgmvZFy+XbL96li/2P8WBlh8mQsEko2wPFP0FRgJgnJMcXiilxAxxhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777565287; c=relaxed/simple;
-	bh=ppqUBdHv5atY4swQeEtCHJ6NLY5UYUIHNSSBVG5oToY=;
+	s=arc-20240116; t=1777565289; c=relaxed/simple;
+	bh=pejxj9fzZ+77vwlzN5M73gcB3B9Ho8n9BQSAk7R+bfU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hg0HD1wOdZdxFZYrFNdALerjSUD6A8PLk3UxSYYgJuXLBQ05WHUXvqn77132fZ5czfZstYpXfGnrU/IDMrThhrSYQktO0fLHG/4iejCVjwSvBLrGcyw+q3R9275WIu/OECobPbSZvB7Hbszyl4z4zOkTRzjwgaRFD+pKdg+HjT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oigEgUG3; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=IX4ZolJ70+idrotXoLsmZXH2xegKEfv1tbMkY9BZPnl/5wieB5rSGkN1oq4mgp3IT9SrJ6iWzQza8nY5FUChu9pngAcIH6uMnw/IcJrVHBjHlotnWvnC8VHY9FeNE4SNuFLj45u97u3dGfodDlwo6e86cwAiPznGGBOyntjHwM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZGAb/QPn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oigEgUG3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC925C2BCB8;
-	Thu, 30 Apr 2026 16:08:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZGAb/QPn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F985C2BCB9;
+	Thu, 30 Apr 2026 16:08:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777565287;
-	bh=ppqUBdHv5atY4swQeEtCHJ6NLY5UYUIHNSSBVG5oToY=;
+	s=k20201202; t=1777565289;
+	bh=pejxj9fzZ+77vwlzN5M73gcB3B9Ho8n9BQSAk7R+bfU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=oigEgUG3dWXwDwUJzUJgvzyzHnD0kM+7ALFEWEFlQGcWyH/ZV5+9KSlxB/llYkKxe
-	 LTX25P9KzqQ9NAR0SXMDTe2rSWmKtId79ViSnScmMWA3p6XE19lxDx6pHRejQLE/na
-	 1ykL2j7d8RXRKzQb73+gx7NPsqKAiLq5TdG5uzvnu3PCRT+tPtD7HofU0GpR8sZIac
-	 aQ8TNrP+l+jtnDi6S8FAA0miC6/zALd+G2GxWy0yUB/NGdzhPGeDYR6gQE+VbHL45P
-	 lZJHerGExYwdXLrBrwNh4KJjI7oAiyHajva00sqO92Ym9mBWzlaxF5tNawEwOLrplA
-	 3ZPu07rBpmaRA==
+	b=ZGAb/QPnE3OmdOSIQSFLbmRe34WshOtfGRuV0ii0cHcyyNKrW6+akIf72dOXubo+B
+	 zdk/29PCNca8CqnDLaBDlyjiDblmOaJtBZBaPcfPyVXDaElI9HpxidPCziL/4YjHxY
+	 I74j38sVuwCJZpoBx96YBmQfoV1j/GzOKe/i4isbJNng3K7c8zJdu8XNWHr9exBdAG
+	 luEUPDzjnrpSCoxmfDw9CcvRWLa8V052EIDYYed/4Po0SPiLFMrV6Z+FE3x+PmQ7j9
+	 yMe9PBWsYOt1NzQkods7WOA3H3MlW31WjlmDF/MFK/uVFZx63E1+JhLVsNtzX84gzR
+	 OyCkyhyNsYhjw==
 From: Tycho Andersen <tycho@kernel.org>
 To: Ashish Kalra <ashish.kalra@amd.com>,
 	Tom Lendacky <thomas.lendacky@amd.com>,
@@ -41,9 +41,9 @@ Cc: linux-crypto@vger.kernel.org,
 	Nikunj A Dadhania <nikunj@amd.com>,
 	"Pratik R. Sampat" <prsampat@amd.com>,
 	Michael Roth <michael.roth@amd.com>
-Subject: [RFC v1 4/6] crypto/ccp: Reclaim command buffer when the PSP dies
-Date: Thu, 30 Apr 2026 10:07:14 -0600
-Message-ID: <20260430160716.1120553-5-tycho@kernel.org>
+Subject: [RFC v1 5/6] crypto/ccp: Register with fw_uploader and always fail
+Date: Thu, 30 Apr 2026 10:07:15 -0600
+Message-ID: <20260430160716.1120553-6-tycho@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260430160716.1120553-1-tycho@kernel.org>
 References: <20260430160716.1120553-1-tycho@kernel.org>
@@ -57,98 +57,110 @@ Content-Transfer-Encoding: 8bit
 
 From: "Tycho Andersen (AMD)" <tycho@kernel.org>
 
-When the PSP dies due to timeout the psp_dead flag is set, but the
-buffer-in-use flag was not unset, and the pages were not reclaimed for
-legacy commands.
-
-In preparation for a firmware quirk where updates time out but the
-situation is recoverable, move the reclamation before the error checking
-and handling. Be sure to only copy the output buffer when the command has
-not timed out, i.e. when there is sensible output in the buffer.
+In preparation for SNP live firmware downloading support, add an 'sev'
+firmware loader that always fails with EBUSY.
 
 Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
 ---
- drivers/crypto/ccp/sev-dev.c | 60 +++++++++++++++++++-----------------
- 1 file changed, 32 insertions(+), 28 deletions(-)
+ drivers/crypto/ccp/sev-dev.c | 51 ++++++++++++++++++++++++++++++++++++
+ drivers/crypto/ccp/sev-dev.h |  3 +++
+ 2 files changed, 54 insertions(+)
 
 diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index defdc1bc226e..2df621b9f6e2 100644
+index 2df621b9f6e2..b4711bf823e8 100644
 --- a/drivers/crypto/ccp/sev-dev.c
 +++ b/drivers/crypto/ccp/sev-dev.c
-@@ -948,6 +948,38 @@ int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+@@ -2040,6 +2040,53 @@ static int sev_update_firmware(struct device *dev)
+ 	return ret;
+ }
  
- 	/* wait for command completion */
- 	ret = sev_wait_cmd_ioc(sev, &reg, psp_timeout);
++static enum fw_upload_err sev_fw_upload_prepare(struct fw_upload *fw_upload,
++						const u8 *data, u32 size)
++{
++	return FW_UPLOAD_ERR_NONE;
++}
 +
-+	/*
-+	 * Copy potential output from the PSP back to data.  Do this even on
-+	 * failure in case the caller wants to glean something from the error,
-+	 * unless the operation timed out, in which case there is nothing to
-+	 * copy back.
-+	 */
-+	if (data) {
-+		int ret_reclaim;
-+		/*
-+		 * Restore the page state after the command completes.
-+		 */
-+		ret_reclaim = snp_reclaim_cmd_buf(cmd, cmd_buf);
-+		if (ret_reclaim) {
-+			dev_err(sev->dev,
-+				"SEV: failed to reclaim buffer for legacy command %#x. Error: %d\n",
-+				cmd, ret_reclaim);
-+			return ret_reclaim;
-+		}
++static enum fw_upload_err sev_fw_upload_write(struct fw_upload *fw_upload,
++					      const u8 *data, u32 offset,
++					      u32 size, u32 *written)
++{
++	return FW_UPLOAD_ERR_BUSY;
++}
 +
-+		if (ret != -ETIMEDOUT)
-+			memcpy(data, cmd_buf, buf_len);
++static enum fw_upload_err sev_fw_upload_poll_complete(struct fw_upload *fw_upload)
++{
++	return FW_UPLOAD_ERR_NONE;
++}
 +
-+		if (sev->cmd_buf_backup_active)
-+			sev->cmd_buf_backup_active = false;
-+		else
-+			sev->cmd_buf_active = false;
++static void sev_fw_upload_cancel(struct fw_upload *fw_upload)
++{
++	/* intentional no-op */
++}
 +
-+		if (snp_unmap_cmd_buf_desc_list(desc_list))
-+			return -EFAULT;
++static const struct fw_upload_ops sev_fw_upload_ops = {
++	.prepare = sev_fw_upload_prepare,
++	.write = sev_fw_upload_write,
++	.poll_complete = sev_fw_upload_poll_complete,
++	.cancel = sev_fw_upload_cancel,
++};
++
++static void register_sev_fw_uploader(struct sev_device *sev)
++{
++	struct fw_upload *fwl;
++
++	if (!IS_ENABLED(CONFIG_FW_UPLOAD))
++		return;
++
++	fwl = firmware_upload_register(THIS_MODULE, sev->dev, "sev",
++				       &sev_fw_upload_ops, sev);
++	if (IS_ERR(fwl)) {
++		dev_err(sev->dev, "SEV firmware upload registration failure: %ld\n", PTR_ERR(fwl));
++		return;
 +	}
 +
- 	if (ret) {
- 		if (psp_ret)
- 			*psp_ret = 0;
-@@ -984,34 +1016,6 @@ int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
- 		ret = sev_write_init_ex_file_if_required(cmd);
- 	}
++	sev->fwl = fwl;
++}
++
+ static int __sev_snp_shutdown_locked(int *error, bool panic)
+ {
+ 	struct psp_device *psp = psp_master;
+@@ -2953,6 +3000,7 @@ void sev_pci_init(void)
+ 			 api_major, api_minor, build,
+ 			 sev->api_major, sev->api_minor, sev->build);
  
--	/*
--	 * Copy potential output from the PSP back to data.  Do this even on
--	 * failure in case the caller wants to glean something from the error.
--	 */
--	if (data) {
--		int ret_reclaim;
--		/*
--		 * Restore the page state after the command completes.
--		 */
--		ret_reclaim = snp_reclaim_cmd_buf(cmd, cmd_buf);
--		if (ret_reclaim) {
--			dev_err(sev->dev,
--				"SEV: failed to reclaim buffer for legacy command %#x. Error: %d\n",
--				cmd, ret_reclaim);
--			return ret_reclaim;
--		}
--
--		memcpy(data, cmd_buf, buf_len);
--
--		if (sev->cmd_buf_backup_active)
--			sev->cmd_buf_backup_active = false;
--		else
--			sev->cmd_buf_active = false;
--
--		if (snp_unmap_cmd_buf_desc_list(desc_list))
--			return -EFAULT;
--	}
--
- 	print_hex_dump_debug("(out): ", DUMP_PREFIX_OFFSET, 16, 2, data,
- 			     buf_len, false);
++	register_sev_fw_uploader(sev);
+ 	return;
  
+ err:
+@@ -2969,4 +3017,7 @@ void sev_pci_exit(void)
+ 		return;
+ 
+ 	sev_firmware_shutdown(sev);
++
++	if (sev->fwl)
++		firmware_upload_unregister(sev->fwl);
+ }
+diff --git a/drivers/crypto/ccp/sev-dev.h b/drivers/crypto/ccp/sev-dev.h
+index b1cd556bbbf6..2f5781cb7bb1 100644
+--- a/drivers/crypto/ccp/sev-dev.h
++++ b/drivers/crypto/ccp/sev-dev.h
+@@ -24,6 +24,7 @@
+ #include <linux/psp-sev.h>
+ #include <linux/miscdevice.h>
+ #include <linux/capability.h>
++#include <linux/firmware.h>
+ 
+ #define SEV_CMDRESP_CMD			GENMASK(26, 16)
+ #define SEV_CMD_COMPLETE		BIT(1)
+@@ -66,6 +67,8 @@ struct sev_device {
+ 
+ 	struct tsm_dev *tsmdev;
+ 	struct sev_tio_status *tio_status;
++
++	struct fw_upload *fwl;
+ };
+ 
+ int sev_dev_init(struct psp_device *psp);
 -- 
 2.54.0
 
