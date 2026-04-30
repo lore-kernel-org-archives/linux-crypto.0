@@ -1,40 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C4E9377563;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C6033783B4;
 	Thu, 30 Apr 2026 06:37:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777531076; cv=none; b=oZslhWzYIMDHBqnLW3Iy1KZfDNdoWRZY2kjvAGF/6z3Vgyjv1FWQVyQjdynQnMdQIdHx6vFi9vFTR0eN2Bx9uRYmmNFmMCmEV3GJtLLK5ZcSk7qQJy5J560YpllwJUeqmAjKpJAJa1eXgQTq/LeLrza584P5XWKXPMpO1p8K/YQ=
+	t=1777531076; cv=none; b=ARad8XhDMwzpZrJLa6SOYADrNEg+AplM6TvE2aDhrWP2WUcK8/RNzlSCz6C3QoY1uV52TB/8Ep5nf5gCs7bPCv13aXrD/LbEAiR81Ub8MEEB2CEmgZr6XlPppNJU8rMU1wLrNKygj4zkgjyDkH8i/9sCq7o/Rqp2caat2rzDkRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1777531076; c=relaxed/simple;
-	bh=/aG2RjoBxFDZ0SdTU70+NOuBeXB62tQmvHbwJZY5BJ4=;
+	bh=MtdvDNBZf7D25wdl3A2GvDJjG3yRz7P/qNzSC7Cn+3U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KfdjsaRa3Rz14pYyMKXm71kEX/phP7o1RP+vVss174EeVRKnbiRzPuBsi2DtiuvGsqdkDXSzoi3gvMCqMXFzDBtAERfvEHnqrx5w+XYlmCpDtdmrjrwJ5/En0RJfBd42bT518n0+9BJdcqoDXfALtHoXnVQtKZOG/gQo9rrLUGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EhJbU1pr; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=EtvBNH8NkY+Wk4Ru5Tkh1RseLD2/HH7DYFw3kmtVAVX8QkVZUp3rmyVp8xReF/IceIs4qAo5FZY0yQtPlRSJ2tsP4VQvx4yc7SszeLLTHll8DH8Ef3pE4xQiTRfK+k4hSyWrgDF5iqt+KluBBcD43y2Cv9N9LEgub/30YzisKXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pJK1YTct; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EhJbU1pr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9956C4AF09;
-	Thu, 30 Apr 2026 06:37:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pJK1YTct"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C83BC2BCB8;
+	Thu, 30 Apr 2026 06:37:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1777531076;
-	bh=/aG2RjoBxFDZ0SdTU70+NOuBeXB62tQmvHbwJZY5BJ4=;
+	bh=MtdvDNBZf7D25wdl3A2GvDJjG3yRz7P/qNzSC7Cn+3U=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=EhJbU1pr9g4T+4yqujIeQyeZ7ZjsDPMWoy+dk1faenzFpk1+E5yDy3MRwA9akHFjw
-	 eropRSx8qfDtCZoaedHOtdgyvIVEsO3Q6P2PpdDrq9M5CLe6ifovea+YJqKEvOQ5mQ
-	 K2K+PftHFPtmEFko8LrtWZwtszGDsBn4eZBpwGw9H2Ce/EG8D0yYj4Akm3e/zJq6Lu
-	 XQUpoGaRcYBUDZGEoURpN518BPH8yAt0w81GV7SH+N65tlDMDEY74IIucQTOVmWKNR
-	 PZRFm6rx2xmU8UKB+CtqVbTTwnwkXQMfuqfJGZbd2QzamFH6D4tlJGVjv0C8oZgviZ
-	 HOiuN/zNJWdxQ==
+	b=pJK1YTcteWskA1mXD4iPYaxJ3YbJbrwXNZi6EZwpyDolNikzotScgCUJ/V2IHd5Io
+	 8N7hab8jmhobUeGMgYvfOOOw7MtptyQxM+Pei/iLzf7hc6sWzIwDjD1QwA1vxYdPzi
+	 nVc672+zs4ZN9k4M2rFsWDvXv8gfN/KDvMRUediWKdf8+92u9fuxE04FZ3EBtbKPBB
+	 jI/CQb1r6RpC8zf/W2+rFhbqNo44MNu1ap91Y5w9FOr2vPrFwnR+LeEFeUIRzwKS1P
+	 X4XIl6lTulG1gWnmMDbuTXJfCqeCCMuQhk4FVW3XwHQX76miWb6Cu+NnuttmOFJ58U
+	 M6vpimqs1IShQ==
 From: Eric Biggers <ebiggers@kernel.org>
 To: stable@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Wolfgang Walter <linux@stwm.de>,
+	syzbot+d23888375c2737c17ba5@syzkaller.appspotmail.com,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 5.15 7/9] crypto: authencesn - Fix src offset when decrypting in-place
-Date: Wed, 29 Apr 2026 23:36:02 -0700
-Message-ID: <20260430063604.173525-8-ebiggers@kernel.org>
+Subject: [PATCH 5.15 8/9] crypto: af_alg - Fix page reassignment overflow in af_alg_pull_tsgl
+Date: Wed, 29 Apr 2026 23:36:03 -0700
+Message-ID: <20260430063604.173525-9-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260430063604.173525-1-ebiggers@kernel.org>
 References: <20260430063604.173525-1-ebiggers@kernel.org>
@@ -48,41 +48,44 @@ Content-Transfer-Encoding: 8bit
 
 From: Herbert Xu <herbert@gondor.apana.org.au>
 
-commit 1f48ad3b19a9dfc947868edda0bb8e48e5b5a8fa upstream.
+commit 31d00156e50ecad37f2cb6cbf04aaa9a260505ef upstream.
 
-The src SG list offset wasn't set properly when decrypting in-place,
-fix it.
+When page reassignment was added to af_alg_pull_tsgl the original
+loop wasn't updated so it may try to reassign one more page than
+necessary.
 
-Reported-by: Wolfgang Walter <linux@stwm.de>
-Fixes: e02494114ebf ("crypto: authencesn - Do not place hiseq at end of dst for out-of-place decryption")
+Add the check to the reassignment so that this does not happen.
+
+Also update the comment which still refers to the obsolete offset
+argument.
+
+Reported-by: syzbot+d23888375c2737c17ba5@syzkaller.appspotmail.com
+Fixes: e870456d8e7c ("crypto: algif_skcipher - overhaul memory management")
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- crypto/authencesn.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ crypto/af_alg.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/authencesn.c b/crypto/authencesn.c
-index 5dc057cb0cdf..2154d4ab5c95 100644
---- a/crypto/authencesn.c
-+++ b/crypto/authencesn.c
-@@ -233,13 +233,15 @@ static int crypto_authenc_esn_decrypt_tail(struct aead_request *req,
- 	if (crypto_memneq(ihash, ohash, authsize))
- 		return -EBADMSG;
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index 4f667a503277..8f7cf57da8f6 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -595,12 +595,12 @@ void af_alg_pull_tsgl(struct sock *sk, size_t used, struct scatterlist *dst)
  
- decrypt:
+ 			/*
+ 			 * Assumption: caller created af_alg_count_tsgl(len)
+ 			 * SG entries in dst.
+ 			 */
+-			if (dst) {
+-				/* reassign page to dst after offset */
++			if (dst && plen) {
++				/* reassign page to dst */
+ 				get_page(page);
+ 				sg_set_page(dst + j, page, plen, sg[i].offset);
+ 				j++;
+ 			}
  
--	if (src != dst)
--		src = scatterwalk_ffwd(areq_ctx->src, src, assoclen);
- 	dst = scatterwalk_ffwd(areq_ctx->dst, dst, assoclen);
-+	if (req->src == req->dst)
-+		src = dst;
-+	else
-+		src = scatterwalk_ffwd(areq_ctx->src, src, assoclen);
- 
- 	skcipher_request_set_tfm(skreq, ctx->enc);
- 	skcipher_request_set_callback(skreq, flags,
- 				      req->base.complete, req->base.data);
- 	skcipher_request_set_crypt(skreq, src, dst, cryptlen, req->iv);
 -- 
 2.54.0
 
