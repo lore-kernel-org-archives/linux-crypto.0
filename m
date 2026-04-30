@@ -1,379 +1,124 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f178.google.com (mail-dy1-f178.google.com [74.125.82.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 192FA477E34;
-	Thu, 30 Apr 2026 16:08:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777565291; cv=none; b=GQXAqMkH/RRU8ok+CNHL70/fFqgR3k7pyERWkb8Ms077m2vaRK4V9skLplbVy598EsSdireCdj0Sw4k1qtJhTez8aBE9ak2Mbky9wTfyCSylW2H+jVrHOgYrcyUq30YgjjN5WiIhBI8tOBMWSRnNAsYtqDN4Q9Sx+UK+I0MlcDc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777565291; c=relaxed/simple;
-	bh=A218sexPB4Eoz81IHOSyS19fv9sHjGhguWb/ZRqThiA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nQzoYrCi4e/yZCHWDvm29oz7cqY4WXwzb7iVd2JqSSAYJPWgKyWcW3faDpgV7+FGTbCSWawwjaa+n+gz2yMERMnzW/W+nVhWkesSpniPUk5O6aKjvMh/ejR6lTCLiwqwFT517mWk0rjmhuJXM7/YnnEmN+gTojdzOZoKLJKvH1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nWPSJQ+4; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE583E929C
+	for <linux-crypto@vger.kernel.org>; Thu, 30 Apr 2026 17:02:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.178
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777568530; cv=pass; b=mzxW0ES+t9DbGnT6GWkqvZDwMpukdn3gAGeUe9M4+OO1FsIZCswnsHKCQHHKRyxoo+KNdd5SuK6tpBNG2koTxNOf+YsCif4I4Gklb+bsMuZ3hH4prxT2lTf0NQJ1McepyEQXqcnWJQScoq4c+dZeOJLUhrf3UYAUxMSziAInNIo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777568530; c=relaxed/simple;
+	bh=kdkWT7Lj4mppb7ePDWP0ZDTnqJdUNyj1JX4iVP8CiOQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DZBrAPtnPrNeuvr6ypjIY0ExwftPmw1sRgl4e9egRkN0xf3YZO+KZO8aNk4dHcNcZFKcHEaT2mHtJhfZXg0m6yIe04OGj9dDE/jQKap1KjvnTX44u2xD2davELX5ek4aQruDhEotw6Zcsej2ZWq4o6cE58fT00KrEcm4LRpLhg8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LfQJd0sC; arc=pass smtp.client-ip=74.125.82.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nWPSJQ+4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 747ABC2BCB8;
-	Thu, 30 Apr 2026 16:08:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777565291;
-	bh=A218sexPB4Eoz81IHOSyS19fv9sHjGhguWb/ZRqThiA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nWPSJQ+4hZNmF8Lb9iJd3RLMr0MOg9OLD3PLc7eDxya/ctA2YgbOb0vrgNog2m/EB
-	 0tW6frMkmaJKH8SNYUX3bpHA2qUzgYc2JUm4YZBniwSC4h52dyl1u8jvdqS0WwxE7z
-	 UdZucScD+bVuYBq0smM5mhIliP7RJCyYgFlAGviK6PSrjjRFLhoEW0Tls0H5V0p9pF
-	 /7PZC3PgqPS3W5ZtZnwvEapepu5tnt9AjkcRS/xAqG9w6Ne+3jIF5+6LSBY72HRpHO
-	 mpAMPor9ljJClfZ/dce9oz1hR2+2T82B2dsKRo6lhzxQA5hcUaykFjVIdEuSt4mrt+
-	 Ctpz7aZcgIb8w==
-From: Tycho Andersen <tycho@kernel.org>
-To: Ashish Kalra <ashish.kalra@amd.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	John Allen <john.allen@amd.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Sean Christopherson <seanjc@google.com>,
-	Kim Phillips <kim.phillips@amd.com>,
-	Alexey Kardashevskiy <aik@amd.com>,
-	"Tycho Andersen (AMD)" <tycho@kernel.org>,
-	Nikunj A Dadhania <nikunj@amd.com>,
-	"Pratik R. Sampat" <prsampat@amd.com>,
-	Michael Roth <michael.roth@amd.com>
-Subject: [RFC v1 6/6] crypto/ccp: Implement SNP firmware live update
-Date: Thu, 30 Apr 2026 10:07:16 -0600
-Message-ID: <20260430160716.1120553-7-tycho@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260430160716.1120553-1-tycho@kernel.org>
-References: <20260430160716.1120553-1-tycho@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LfQJd0sC"
+Received: by mail-dy1-f178.google.com with SMTP id 5a478bee46e88-2ba895adfeaso1493653eec.0
+        for <linux-crypto@vger.kernel.org>; Thu, 30 Apr 2026 10:02:08 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777568528; cv=none;
+        d=google.com; s=arc-20240605;
+        b=OVW/+ABF79DuQXgm+s57YrRPxBbQ1kec88ZPweb+aAdxSUZsPzwk5Q/PyY+siMJntQ
+         L9WZiH31vf9KQKG18bcH64JjcBnhmniYC+oeHLniX7zJ8misjobcL5by6vSUsnAJAAMM
+         /V7sQIsouBEwoLgDOOVL4DPTvxyVGwpZxijxJ2Fq+wGK93pqGEma5bmleGgB4casGvR8
+         BZUVqXWwO8drD3q/OBdS2okWGsIIQdlsHXSiP0KKDWKtnr1ok2Lb/m9l0xqbuRgX3AU7
+         jf7XlNIs8SwtcjGk5wX4Ty53B4IBGsWpMSBPK/T+5WiRY2rAHDRWuKEPxfPiZAMCl0Zo
+         rVrg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=Ysekql4Ul305BpiEGUXKj6pgyfyPE1wDivp5cN89gbM=;
+        fh=hAYHOt6+uvUywcXTL6cNkdpqJGKt+p3/gCDmxVpTM18=;
+        b=fFzjSQsp7yrHHMEvxFDfEt1eIvGVfTEITp9QwBBM+lpP4oxW3XffLRLq1R7xNmGMZz
+         xfVS+olWVkv76Tn8fksVzrftYdbwQUcEhfaEA06WuHL4LJwWJPTDTaEL0LmRN85HMgZD
+         27igSySwicLDKks8eZoc0Unl5g2ggkWuUknAswoRy0G/hdcWTI3TmHgpByWFaDMaTZW8
+         lyUqvosJ5ugdKBJF2MZQh04DOb7StUQiue8bNrbpyHObFzCbWz1gQmdZfSdhvXIradpl
+         RMDZtAQ1p5YIQgRgChd7gya0c07TkFLJ890FC5TFgaaOS0WrgYGzFI0wXNPZh+1aBY6p
+         azdw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777568528; x=1778173328; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ysekql4Ul305BpiEGUXKj6pgyfyPE1wDivp5cN89gbM=;
+        b=LfQJd0sCylnHBzkUGVjDl9tfbrEIw3KxBl75qZQkzHpaXc6C2gFwozk1l8JmfwrnVN
+         JN83oXeJL2Cu8nTx2BzFhrWBHuf6j01HJUQx29gtw7tMfetdoO94K1Jcm+rjK/r375bM
+         xoo4oIYtyOeWiPnPRJq5VVPWgWtUBpHP/5KRS3Bbnpyc1hVHOAngsHvldMPJuXNMy999
+         m6tveefExDjX6kbYn+LVsm5pqD2zBiNj+D6e+RWjnDaMlK0WkTLr7QtYJJ9hQFlAKpRG
+         yfDJM6R6wSnJFHfpU9Pv7XUTa3nlN2pe7GR3GjKHcHeQU/x4cJg61e4CCJX2oBwtUyJ8
+         0dBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777568528; x=1778173328;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ysekql4Ul305BpiEGUXKj6pgyfyPE1wDivp5cN89gbM=;
+        b=ldL1qyXRcPJUF3/xaAsjGqXqxfAXMHbdmWJT+TxYPKt3GaOO631PzPXP2+7F0GtJi7
+         Zu2q0PKVCHlMDtdu10zzTBPqUhyfYEK7qIYaKTyawl1tPagLWXpk9dlXIH1aYuZJHEWD
+         K3PzDJiMshqjpDqUXD142hbm1STlVKiCEN02LJ6qUltxPtIfRZzxNpCiVwCcrCqSmuIA
+         9vXOkEyLInt6d4mky3KH1ylIbeROoXSNlxVe9tP4YE9em/+e8VX8h1kL3+qfkTeeX44V
+         avp3nTnco6+Wyngjun4AMU9GqH6Fb5ic/E0XgxBZL+StxNLFmMogP+Z15GVDwC/DRSRr
+         Kwaw==
+X-Forwarded-Encrypted: i=1; AFNElJ+aH+6bG45c35mmiCpuh5aFAUl1UmbHlSg5Pqtj1rvfGHeHhJYwiq/XBgokgj/lrrKfuB8CgGG7aUF5i6g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUS4Lp5r0wQd5FujwNgnkTgEEWZwlgr5Mz0alVISvMIpjOxm01
+	njp+gbIXbvmC9+Jy1xAj0t6z00P4GSrqm2h/LXjWPa17j9ARtRvm2jCY77+PyKD8W1psAs1G97G
+	CuNuh7MdPkPYvsZhqVNhlP0TWEm34ayI=
+X-Gm-Gg: AeBDiesk1K5zFggBx587HJCkNdCb6LAQn+TmwjGB17YWwuxdqvup+RWS5HDM3BuPg4P
+	0B9r1TBXNcInXks9YKq6NRQgToMpyRDDLCy6i//eUbekLWCYtOx9H3itOGpcjQuQJYgcZG9g7Ez
+	tP29Nv/2zu5AxMMIISQ0K+kXK3LwWZSXo2XFN5chYrbGtwkVTngk1m9E/Nz1/EDaZGgjtOAR0zU
+	TW4lsg8GGOnIjTvyYOTHyipehw+8Bthk0caEOgg7zahw0ZR2lw8hUYQJLSzXk4aj1ex+qfNOkMF
+	RhXkNp09xAT9lL1bT4EJfOxnyLPX+F3T1JrF9cf89sMsmTuC52PyNGCjiLw/V1NuRaErL+GOecM
+	ltLRezUTkhcJ1orcPGZNnfq/6zeBJmn71R0Brf3d5Yqk=
+X-Received: by 2002:a05:7300:5411:b0:2d1:e92c:f7ff with SMTP id
+ 5a478bee46e88-2ed3c5c9e16mr1826579eec.1.1777568527441; Thu, 30 Apr 2026
+ 10:02:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260427172727.9310-1-ebiggers@kernel.org> <CAJwJo6Z9oJSMMBUL_pbYWN6ha3n4MRpKV_aVut8E+af3JUDFkw@mail.gmail.com>
+ <20260427155538.2e1b8488@kernel.org> <CAJwJo6Zh_1V009JSBGwAmR7GWj=2HdG6f=uBxK8krE4B1YrGkA@mail.gmail.com>
+ <a642b858-eea0-4b7a-aeb2-aa67c6cf0f64@redhat.com>
+In-Reply-To: <a642b858-eea0-4b7a-aeb2-aa67c6cf0f64@redhat.com>
+From: Dmitry Safonov <0x7f454c46@gmail.com>
+Date: Thu, 30 Apr 2026 18:01:55 +0100
+X-Gm-Features: AVHnY4J_afp8At_pOKi9BxqdfNCGc1QYGVwpMxIdJAzdWNmsjbxANmQ8MvQWChE
+Message-ID: <CAJwJo6YDJ1h7Ry15BDArx9dQbWMt3xFY28Ecy2rb7HsKi-f-yQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 0/5] Reimplement TCP-AO using crypto library
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Eric Biggers <ebiggers@kernel.org>, netdev@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, "David S . Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>, Ard Biesheuvel <ardb@kernel.org>, 
+	"Jason A . Donenfeld" <Jason@zx2c4.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Dmitry Safonov <dima@arista.com>
+Content-Type: text/plain; charset="UTF-8"
 
-From: "Tycho Andersen (AMD)" <tycho@kernel.org>
+On Thu, 30 Apr 2026 at 08:38, Paolo Abeni <pabeni@redhat.com> wrote:
+>
+> On 4/28/26 2:00 AM, Dmitry Safonov wrote:
+[..]
+> > Yeah, that's not what I meant. I see value in Eric's contribution, and
+> > I like getting rid of tcp-sigpool. So, anything but "nack" is not "no"
+> > :-)
+>
+> I read the above as: "If there isn't any additional feedback soon,
+> please apply".
 
-Put all the previous primitives together to implement SNP firmware
-live update via DOWNLOAD_FIRMWARE_EX.
+Thanks, Paolo, that's exactly what I meant.
 
-DOWNLOAD_FIRMWARE_EX can only be run while the legacy SEV firmware is the
-UNINIT state. If the legacy firmware is in the WORKING state running legacy
-guests, refuse to update. If the legacy firmware is in the INIT state,
-de-initialize it so that the update can be run.
+I think we addressed both concerns I had with the new RFC and BIRD
+daemon, and Eric did a good job optimising the crypto layer here, so
+we are better with his patches than with my sentimental attachment to
+extendability that so far is not really required by BGP. And if we
+need to extend the list of algorithms, we will be able to do it on top
+later.
 
-When the firmware is installed, it is only provisionally loaded. It relies
-on userspace to issue ioctl(/dev/sev, SNP_COMMIT, ...) when it is happy
-with the provisional firmware.
-
-To roll back, userspace should not do an SNP_COMMIT, and invoke the
-firmware loader in the same way but with the old firmware image. The
-firmware spec notes:
-
-    If a guest context page is updated to a provisional firmware version,
-    then updating the context page back to the committed version after a
-    rollback will always succeed.
-
-There are essentially four classes of errors during an update:
-
-1. kernel bugs that WARN_ON_ONCE()
-2. invalid firmware (bad image, bad signature, downgrade too far, etc.)
-3. UPDATE_FAILED, things can continue as normally
-4. HARDWARE_UNSAFE, declare the PSP dead, since the behavior of the SEV
-   firmware is undefined
-5. RESTORE_REQUIRED, the firmware can only successfully execute
-   DOWNLOAD_FIRMWARE_EX commands. The admin needs to load the old firmware
-   image.
-
-There is a firmware bug where upgrades across 1.58.03 time out, even though
-the upgrade actually succeeds. There is no documented way to determine what
-the input firmware version is, so there is no way to detect this case
-before trying a firmware update. Instead look for the timeout and try an
-SNP_PLATFORM_STATUS to see if the PSP is still alive.
-
-Finally, this differs from the previous implementation [1] in a couple of
-ways:
-
-1. guest context pages are no longer required to be updated as of 1.58 of
-   the SEV-SNP Firmware spec doc 56860.
-2. no WBINVD+DF_FLUSH is required after a firmware update, so it drops that
-   code
-
-[1]: https://lore.kernel.org/lkml/20241112232253.3379178-7-dionnaglaze@google.com/
-Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
----
- drivers/crypto/ccp/sev-dev.c | 244 ++++++++++++++++++++++++++++++++++-
- 1 file changed, 243 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index b4711bf823e8..e7fe6dbf69c2 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -90,6 +90,8 @@ MODULE_FIRMWARE("amd/amd_sev_fam19h_model1xh.sbin"); /* 4th gen EPYC */
- 
- static bool psp_dead;
- static int psp_timeout;
-+static bool dlfwex_wants_rollback;
-+static bool sev_firmware_needs_reinit;
- 
- enum snp_hv_fixed_pages_state {
- 	ALLOCATED,
-@@ -2046,11 +2048,251 @@ static enum fw_upload_err sev_fw_upload_prepare(struct fw_upload *fw_upload,
- 	return FW_UPLOAD_ERR_NONE;
- }
- 
-+static int sev_download_firmware_ex(struct sev_device *sev, const u8 *data,
-+				    u32 size)
-+{
-+	struct sev_data_download_firmware_ex sev_data = {0};
-+	int ret, error = 0, order;
-+	struct page *p;
-+	void *fw_blob;
-+
-+	order = get_order(size);
-+	p = alloc_pages(GFP_KERNEL, order);
-+	if (!p)
-+		return -ENOMEM;
-+
-+	fw_blob = page_address(p);
-+	memcpy(fw_blob, data, size);
-+
-+	sev_data.len = sizeof(sev_data);
-+	sev_data.fw_paddr = __psp_pa(fw_blob);
-+	sev_data.fw_len = size;
-+	sev_data.commit = 0;
-+
-+	ret = __sev_do_cmd_locked(SEV_CMD_SNP_DOWNLOAD_FIRMWARE_EX, &sev_data, &error);
-+
-+	/*
-+	 * Quirk: firmware upgrades across 1.58.03 give ETIMEDOUT for
-+	 * DLFWEX, even though the command actually succeeds. If we're
-+	 * in this case, test that we can do SNP_PLATFORM_STATUS, and
-+	 * if so, continue as normal.
-+	 */
-+	if (ret == -ETIMEDOUT) {
-+		struct sev_user_data_snp_status status;
-+
-+		dev_info(sev->dev, "Firmware update timed out, checking status for quirk...\n");
-+		psp_dead = false;
-+
-+		ret = __sev_do_snp_platform_status(&status, &error);
-+		if (ret) {
-+			dev_err(sev->dev, "SNP STATUS failed after firmware upgrade, ret = %d, error = %#x\n",
-+				ret, error);
-+			psp_dead = true;
-+			goto out;
-+		}
-+	}
-+
-+	if (ret < 0 && error != 0)
-+		ret = error;
-+
-+out:
-+	__free_pages(p, order);
-+	return ret;
-+}
-+
-+static int sev_firmware_shutdown_if_sev_initialized(struct sev_device *sev)
-+{
-+	int rc, error, sev_plat_state;
-+
-+	lockdep_assert_held(&sev_cmd_mutex);
-+
-+	error = 0;
-+	rc = sev_get_platform_state(&sev_plat_state, &error);
-+	if (rc < 0) {
-+		if (error)
-+			rc = error;
-+		dev_dbg(sev->dev, "SEV get platform state failed %d\n", rc);
-+		return rc;
-+	}
-+
-+	switch (sev_plat_state) {
-+	case SEV_STATE_UNINIT:
-+		return 0;
-+	case SEV_STATE_INIT:
-+		error = 0;
-+		rc = __sev_platform_shutdown_locked(&error);
-+		if (rc) {
-+			if (error)
-+				rc = error;
-+			dev_err(sev->dev, "SEV platform shutdown failed %d\n", rc);
-+			return rc;
-+		}
-+		sev_firmware_needs_reinit = true;
-+		return 0;
-+	case SEV_STATE_WORKING:
-+		return -EBUSY;
-+	default:
-+		dev_err(sev->dev, "Unknown SEV firmware state: %d\n", sev_plat_state);
-+		return -EINVAL;
-+	}
-+}
-+
-+static void sev_firmware_reinit_if_shutdown(struct sev_device *sev)
-+{
-+	int rc, error;
-+
-+	guard(mutex)(&sev_cmd_mutex);
-+
-+	if (!sev_firmware_needs_reinit)
-+		return;
-+
-+	sev_firmware_needs_reinit = false;
-+	error = 0;
-+	rc = __sev_platform_init_locked(&error);
-+	if (rc) {
-+		if (error)
-+			rc = error;
-+		dev_err(sev->dev, "SEV platform re-init failed %d\n", rc);
-+	}
-+}
-+
- static enum fw_upload_err sev_fw_upload_write(struct fw_upload *fw_upload,
- 					      const u8 *data, u32 offset,
- 					      u32 size, u32 *written)
- {
--	return FW_UPLOAD_ERR_BUSY;
-+	struct sev_device *sev = fw_upload->dd_handle;
-+	u8 old_major, old_minor, old_build;
-+	int rc, error = 0;
-+	enum fw_upload_err ret;
-+
-+	if (offset != 0)
-+		return FW_UPLOAD_ERR_INVALID_SIZE;
-+
-+	old_major = sev->api_major;
-+	old_minor = sev->api_minor;
-+	old_build = sev->build;
-+
-+	mutex_lock(&sev_cmd_mutex);
-+
-+	/*
-+	 * If the last firmware update returned RESTORE_REQUIRED, allow only
-+	 * this DLFWEX command so the admin can restore the previous FW
-+	 * version. If we are in this state the legacy firmware has previously
-+	 * been shut down, so no need to do it again.
-+	 */
-+	if (dlfwex_wants_rollback && psp_dead) {
-+		dlfwex_wants_rollback = false;
-+		psp_dead = false;
-+	} else {
-+		rc = sev_firmware_shutdown_if_sev_initialized(sev);
-+		if (rc) {
-+			ret = FW_UPLOAD_ERR_BUSY;
-+			goto unlock;
-+		}
-+	}
-+
-+	rc = sev_download_firmware_ex(sev, data, size);
-+	if (rc) {
-+		ret = FW_UPLOAD_ERR_FW_INVALID;
-+		switch (rc) {
-+		case SEV_RET_INVALID_PLATFORM_STATE:
-+			fallthrough;
-+		case SEV_RET_INVALID_ADDRESS:
-+			/* these are probably kernel bugs */
-+			WARN_ON_ONCE(true);
-+			ret = FW_UPLOAD_ERR_BUSY;
-+			goto unlock;
-+		case SEV_RET_INVALID_LEN:
-+			ret = FW_UPLOAD_ERR_INVALID_SIZE;
-+			goto unlock;
-+		case SEV_RET_INVALID_PARAM:
-+			dev_err(sev->dev, "SEV firmware image is not well formed\n");
-+			goto unlock;
-+		case SEV_RET_SHUTDOWN_REQUIRED:
-+			dev_err(sev->dev, "SEV firmware too far, shutdown required\n");
-+			goto unlock;
-+		case SEV_RET_INVALID_CONFIG:
-+			dev_err(sev->dev, "SEV firmware upgrade would rollback SVN\n");
-+			goto unlock;
-+		case SEV_RET_BAD_SIGNATURE:
-+			dev_err(sev->dev, "SEV firmware upgrade bad signature\n");
-+			goto unlock;
-+		case SEV_RET_BAD_VERSION:
-+			dev_err(sev->dev, "SEV firmware upgrade less than CommittedVersion\n");
-+			goto unlock;
-+		case SEV_RET_UNSUPPORTED:
-+			dev_err(sev->dev, "SEV firmware required feature not supported\n");
-+			goto unlock;
-+		case SEV_RET_UPDATE_FAILED:
-+			/*
-+			 * Update failed but fw rolled back on its own,
-+			 * operation can continue normally.
-+			 */
-+			dev_err(sev->dev, "SEV firmware update failed\n");
-+			ret = FW_UPLOAD_ERR_HW_ERROR;
-+			goto unlock;
-+		case SEV_RET_HWSEV_RET_UNSAFE:
-+			/*
-+			 * "Following a return of HARDWARE_UNSAFE, operation of
-+			 * the SEV firmware is indeterminate
-+			 * and the recommendation is to reboot the platform."
-+			 */
-+			dev_err(sev->dev, "SEV firmware no longer safe to operate\n");
-+			psp_dead = true;
-+			ret = FW_UPLOAD_ERR_HW_ERROR;
-+			goto unlock;
-+		case SEV_RET_RESTORE_REQUIRED:
-+			/*
-+			 * FW asked us to roll back; we don't hold onto the
-+			 * last FW image, so we can't. We can set a flag to
-+			 * allow the admin to rollback if they happen to have
-+			 * the old firmware image handy.
-+			 */
-+			dev_err(sev->dev, "SEV firmware update failed, please roll back\n");
-+			psp_dead = true;
-+			dlfwex_wants_rollback = true;
-+			ret = FW_UPLOAD_ERR_HW_ERROR;
-+			goto unlock;
-+		default:
-+			dev_err(sev->dev, "Unknown SEV firmware err %d\n", rc);
-+			ret = FW_UPLOAD_ERR_HW_ERROR;
-+			goto unlock;
-+		}
-+	}
-+
-+	*written = size;
-+	ret = FW_UPLOAD_ERR_NONE;
-+
-+unlock:
-+	mutex_unlock(&sev_cmd_mutex);
-+
-+	/*
-+	 * sev_get_api_version() updates the SEV and SNP statuses, SNP feature
-+	 * info if available, build numbers, etc. cached in struct sev_device.
-+	 * Update these if they may have changed for new firmware.
-+	 */
-+	if (ret == FW_UPLOAD_ERR_NONE) {
-+		error = 0;
-+
-+		rc = sev_get_api_version();
-+		if (rc) {
-+			dev_warn(sev->dev,
-+				 "SNP platform data refresh after firmware update failed %d\n",
-+				 rc);
-+		} else if (sev->api_major != old_major ||
-+			   sev->api_minor != old_minor ||
-+			   sev->build != old_build) {
-+			dev_info(sev->dev, "SEV firmware updated to %d.%d build %d\n",
-+				 sev->api_major, sev->api_minor, sev->build);
-+		} else {
-+			dev_info(sev->dev, "SEV firmware not updated\n");
-+		}
-+	}
-+
-+	if (!dlfwex_wants_rollback)
-+		sev_firmware_reinit_if_shutdown(sev);
-+
-+	return ret;
- }
- 
- static enum fw_upload_err sev_fw_upload_poll_complete(struct fw_upload *fw_upload)
--- 
-2.54.0
-
+Thanks again,
+             Dmitry
