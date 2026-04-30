@@ -1,40 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B831A39B4A9;
-	Thu, 30 Apr 2026 07:03:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2115739B974;
+	Thu, 30 Apr 2026 07:03:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777532613; cv=none; b=Fl1pDdrv7WW3Kg5HQUvj9d6VBQ79qAJ/pxE6+mgp+ZhWflfsfH1DS8EQjBMf3ZkCvTO8qVEmWHqTNLRJoTwhhOjZed/1lh/cWyVUP5xdpmflYqw0HpJF8bVvixfc/c8L0Y9G3xHjYt4SmrVcL7pnwStpLFvLwRXtaBFNltn8iWA=
+	t=1777532614; cv=none; b=ErrA9rLgLndq2HtB3un/mHmtYq6PtXGze8yT6KGSioABpeK14Lu1qEYk/g8SShDNZFqH0w6gnyLjUJab/Br11V6s2qj5fVpjzPRUVRhiRmHCiVYaY61/cDva+e8WH42PrzAEB7VfsOc3BBok+9a/7eBxhdMjlSugHSefS2EGWo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777532613; c=relaxed/simple;
-	bh=SscrE8l29M6LG4nvWw571I7MTKgwXoS3POvaHh7W6Q4=;
+	s=arc-20240116; t=1777532614; c=relaxed/simple;
+	bh=cUMrQAIr1rwOn7Nd+3RxgyIqxbRhhrPFoeZpH6q5AoE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XRf3aNKyTi4Xq1uIK2eLw9g9izwETT1/ofu5mKa3Ddwju9pHjjVcqHkWAFWeZeItQK5GgUWrdp/BeZ0CNiBfRucE7rsl3e8PjiLFQlU33qOQJ5dD3hixiOLdPVZlihkVvFpJ8WvXjr7Tj0VUepk8gy5qNUcyOZDIGeQ2ZDJHZiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gbsxfrjr; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=bAPxrcYPqBr8k8Hnstq1hGQ/tABOFnFwWD+TRBdSbSX4A/sWNF2LDE3SlX9WBaZBOs8zSgZiE5w44EmuXDv98XVKZW/8+MEfg6WVqlA5o5+gor6RMhYmvgMbSrq9XCwgDDeb/bYS69OCAkPMvRIltk/rXxZKYY+gziYc0hvzT6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZIPzLJ3E; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gbsxfrjr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A275C2BCB4;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZIPzLJ3E"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C09E8C2BCC4;
 	Thu, 30 Apr 2026 07:03:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777532613;
-	bh=SscrE8l29M6LG4nvWw571I7MTKgwXoS3POvaHh7W6Q4=;
+	s=k20201202; t=1777532614;
+	bh=cUMrQAIr1rwOn7Nd+3RxgyIqxbRhhrPFoeZpH6q5AoE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=GbsxfrjrLoA801dRV0OXzJUVxNIgDx5btbnq/HpAkqpJsw8Bvz9AcJ1kOFtJpPwwg
-	 Rl+pfyNHQxy1MYietMvxzm+2WmaLMyR3JcLVjs0l2Tn9COcrBSnyf3vc5+BfTfYMdL
-	 8k6SoUggFkVAelUcaNWBgqoDSxAj+Ok4nvkmGBT4BqamEpJtA8mtrTV2viKsbK3uYi
-	 0urs65l6ZLzzFeqn3NhMjSYxJ6qtVwHVOMby5RdJkG4cCvo6GTGjQIz7PkZ3I8IYpN
-	 dVi1jGKvjk2vCbpdRlDDoqBkBTxYpL0QI4gqziyOsCv8AsRKDb3/SdzW9S1RvlQAAD
-	 /L2SZR9G7ObEg==
+	b=ZIPzLJ3E/1fR8OxYHPgNfLSAdRZxqV3JhDLwH/wPayKerid4ZIHbKPuWMQJRCHlq5
+	 KP5qzGugVxlMPAxYACZPXf+Ob6vlUoTAy+goIeg3OK6m6vrgn6gcqsViJysBlasz5f
+	 cOWmJqwwBiUlgzHLMUZy4gQ68j+XV/9qu6iEnLXxW29rfR0k+g8LyZDi5PntNTZ2A5
+	 qnZ/yGmNsE9VnLU6nWlxVWWCM2+d7iHG7QlA8ORSwgFmmOE/GAOHj8ek018hJ113RY
+	 qN3WL8123M1+65bLI7D7/TU1l1c9PvE0rqbBjAhJlmEirQ0BmK1H/ewaW4q0XSlzvL
+	 AXfJRHSJJwGAA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: stable@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	syzbot+d23888375c2737c17ba5@syzkaller.appspotmail.com,
+	syzbot+aa11561819dc42ebbc7c@syzkaller.appspotmail.com,
+	Daniel Pouzzner <douzzer@mega.nu>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 5.10 09/10] crypto: af_alg - Fix page reassignment overflow in af_alg_pull_tsgl
-Date: Thu, 30 Apr 2026 00:01:27 -0700
-Message-ID: <20260430070128.219863-10-ebiggers@kernel.org>
+Subject: [PATCH 5.10 10/10] crypto: algif_aead - Fix minimum RX size check for decryption
+Date: Thu, 30 Apr 2026 00:01:28 -0700
+Message-ID: <20260430070128.219863-11-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260430070128.219863-1-ebiggers@kernel.org>
 References: <20260430070128.219863-1-ebiggers@kernel.org>
@@ -48,44 +49,38 @@ Content-Transfer-Encoding: 8bit
 
 From: Herbert Xu <herbert@gondor.apana.org.au>
 
-commit 31d00156e50ecad37f2cb6cbf04aaa9a260505ef upstream.
+commit 3d14bd48e3a77091cbce637a12c2ae31b4a1687c upstream.
 
-When page reassignment was added to af_alg_pull_tsgl the original
-loop wasn't updated so it may try to reassign one more page than
-necessary.
+The check for the minimum receive buffer size did not take the
+tag size into account during decryption.  Fix this by adding the
+required extra length.
 
-Add the check to the reassignment so that this does not happen.
-
-Also update the comment which still refers to the obsolete offset
-argument.
-
-Reported-by: syzbot+d23888375c2737c17ba5@syzkaller.appspotmail.com
-Fixes: e870456d8e7c ("crypto: algif_skcipher - overhaul memory management")
+Reported-by: syzbot+aa11561819dc42ebbc7c@syzkaller.appspotmail.com
+Reported-by: Daniel Pouzzner <douzzer@mega.nu>
+Fixes: d887c52d6ae4 ("crypto: algif_aead - overhaul memory management")
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- crypto/af_alg.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ crypto/algif_aead.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index f9bf3bb539c5..a6e8ce25ff10 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -595,12 +595,12 @@ void af_alg_pull_tsgl(struct sock *sk, size_t used, struct scatterlist *dst)
+diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
+index 24e77f4968a6..4a285994d106 100644
+--- a/crypto/algif_aead.c
++++ b/crypto/algif_aead.c
+@@ -148,11 +148,11 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	 * of the input data.
+ 	 */
+ 	if (usedpages < outlen) {
+ 		size_t less = outlen - usedpages;
  
- 			/*
- 			 * Assumption: caller created af_alg_count_tsgl(len)
- 			 * SG entries in dst.
- 			 */
--			if (dst) {
--				/* reassign page to dst after offset */
-+			if (dst && plen) {
-+				/* reassign page to dst */
- 				get_page(page);
- 				sg_set_page(dst + j, page, plen, sg[i].offset);
- 				j++;
- 			}
- 
+-		if (used < less) {
++		if (used < less + (ctx->enc ? 0 : as)) {
+ 			err = -EINVAL;
+ 			goto free;
+ 		}
+ 		used -= less;
+ 		outlen -= less;
 -- 
 2.54.0
 
