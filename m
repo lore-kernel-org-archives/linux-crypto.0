@@ -1,39 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B001B37757A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B5837757C;
 	Thu, 30 Apr 2026 06:29:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777530582; cv=none; b=bbAEBfsPg5IWE12FVHiSUn2msD3JkiQ52aa0iSRtpa2uh8BQlTs/mINWGt3XxqwB9TXGIOqsmyBt9D6Q40+s4HG93thruMcSxsjdlsmcEE/KiM7aEezH2h73kkpz4UWofsSfTHoMGw/ioxJXCy/N9QUCv4OTUDVxFiIUs/wJZMM=
+	t=1777530582; cv=none; b=CHP2XDh2ETGFBhDmrorVsBZBo+sYwBJxdAxnrwXwnk25gQvD5WeQ7yvFz5PcMoGW+Va8HpD+W+KuRoKZYIqDk4td2YxK7HAZlS0Gs4x7ya2JSec3o5lons1OH1iWD+vi1F3ICIKPMzQORC/V1dwJzTmWAddc6lwxIhtMxwvd6QI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1777530582; c=relaxed/simple;
-	bh=F+39f7/oLkprlIlCyai3ZYzfL09sOWhLTdLOzk0MTis=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=n1wmsPAY0fHApJnGp6l28N3SOX62PvYNuf0Cu7164K5gEOOAweCR351jCeeqO2HFdoziR23iUw14iiohYPeFj/VUqG3CoO0SE2CS05EX7U7LPfA1t7ZjTYc5pt3SbnEpXNg16obgHR8Qgu5+eSBm/zM6scEii+krPsWCxCR76u0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZAY0GBet; arc=none smtp.client-ip=10.30.226.201
+	bh=WFDSeKDtwHAeerXM2eie5KYtcJLmZpMLoBy6hp+awww=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=raJ0Z4UNFA+JaEIIwQVq088dEbLxvYhSY5haBi8JTtUcMFF47zcWD5/aDVE6w3jqg4Ryxx3NZCstt10WnvRbD1n/JjQ90itfVgZZoqeNG5nv7fmAMifT8I0RwIHRYsUK1BHqSZkS8yqfeRBec+tOrgQoYfsnOu+8lqUyGeYug+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aK8deVWL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZAY0GBet"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 184FBC2BCB8;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aK8deVWL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64B0DC2BCC6;
 	Thu, 30 Apr 2026 06:29:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1777530582;
-	bh=F+39f7/oLkprlIlCyai3ZYzfL09sOWhLTdLOzk0MTis=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ZAY0GBetU1aCCFMXuHvMhXifaooWZUNl5YDcLW23CAa/glgMnjApWWZG77PNoi4xQ
-	 GYbWNw368b4kecQPuaK+iE4+zTL4D22/GcZjw+vLFQowTvG3RbMK3lvXp03qIcNemn
-	 uPaxQmqVLqDXYvDATr815qDh52jUF83XnjXuCAlwCiK6yebPfBwrm3EgGtiOyfvLKS
-	 HexMo94R82zkFaG+FJul0M0Kct92MmaB0/8MwXiZIxb4uOzRuucO542vCaZT5pC2kB
-	 DixefJK1by9TIKLuUllIar5eZPN7aaTaD+s63gxKGcxYg69HX0VECzCmrLNHhqSaom
-	 a6gx2iehMyf0A==
+	bh=WFDSeKDtwHAeerXM2eie5KYtcJLmZpMLoBy6hp+awww=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=aK8deVWLzZ1fdvfkewN4Ehfh2t22ChRR9V45W+MebgZ3jO3rap71LnpqWlkOyr/el
+	 7MpWm+a6IEAwRsc7YXlNXhtqyApKilu2mx6yPWpHnDfE3+FcKlHN5Q6BvOhv3I9eOP
+	 L6y8g5AX+VC0Ln/lVIBZ9kSP/nzYYZUEoKqJJ9evEjxLPHP+j3TqHMY0WfHRVZN43Z
+	 QU30iMU5E2V4bAiaPVVnbVKcTaoiXeH6NXatG2tVg3NbTEDhA+GNMr+qj77T6rRT0u
+	 joMkNNHG1k6mvFu6BcKiAZOZZk0dCVdGl5nLKllVaEt+ToEAMRRDX/9idhSe1v18PK
+	 dkIJBtoKa2QSg==
 From: Eric Biggers <ebiggers@kernel.org>
 To: stable@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 6.1 0/9] AF_ALG fixes
-Date: Wed, 29 Apr 2026 23:27:22 -0700
-Message-ID: <20260430062731.140497-1-ebiggers@kernel.org>
+Subject: [PATCH 6.1 1/9] crypto: scatterwalk - Backport memcpy_sglist()
+Date: Wed, 29 Apr 2026 23:27:23 -0700
+Message-ID: <20260430062731.140497-2-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260430062731.140497-1-ebiggers@kernel.org>
+References: <20260430062731.140497-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,41 +45,185 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series backports recent AF_ALG fixes to 6.1.  First 8 commits are
-taken from the 6.12 / 6.6 backport
-(https://lore.kernel.org/linux-crypto/20260430060702.110091-1-ebiggers@kernel.org)
-rebased onto 6.1 with some conflicts resolved.  Commit 9 is another fix
-missing on 6.1.
+This backports the current implementation of memcpy_sglist() from
+upstream commit 4dffc9bbffb9ccfcda730d899c97c553599e7ca8.
 
-Douya Le (1):
-  crypto: algif_aead - snapshot IV for async AEAD requests
+This function was rewritten twice.  The earlier implementations had many
+prerequisite commits, while the latest implementation is standalone.
+It's much easier to just backport the latest code directly.
 
-Eric Biggers (3):
-  crypto: scatterwalk - Backport memcpy_sglist()
-  crypto: algif_aead - use memcpy_sglist() instead of null skcipher
-  crypto: authenc - use memcpy_sglist() instead of null skcipher
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ crypto/scatterwalk.c         | 94 ++++++++++++++++++++++++++++++++++++
+ include/crypto/scatterwalk.h | 31 ++++++++++++
+ 2 files changed, 125 insertions(+)
 
-Herbert Xu (5):
-  crypto: algif_aead - Revert to operating out-of-place
-  crypto: authencesn - Do not place hiseq at end of dst for out-of-place
-    decryption
-  crypto: authencesn - Fix src offset when decrypting in-place
-  crypto: af_alg - Fix page reassignment overflow in af_alg_pull_tsgl
-  crypto: algif_aead - Fix minimum RX size check for decryption
-
- crypto/Kconfig               |   2 -
- crypto/af_alg.c              |  51 ++-------
- crypto/algif_aead.c          | 203 ++++++++---------------------------
- crypto/algif_skcipher.c      |   6 +-
- crypto/authenc.c             |  32 +-----
- crypto/authencesn.c          |  84 ++++++---------
- crypto/scatterwalk.c         |  94 ++++++++++++++++
- include/crypto/if_alg.h      |   5 +-
- include/crypto/scatterwalk.h |  31 ++++++
- 9 files changed, 216 insertions(+), 292 deletions(-)
-
-
-base-commit: 7c87defbd336df289c8c0280f019647864ff70c6
+diff --git a/crypto/scatterwalk.c b/crypto/scatterwalk.c
+index 16f6ba896fb6..9f0b27005166 100644
+--- a/crypto/scatterwalk.c
++++ b/crypto/scatterwalk.c
+@@ -67,10 +67,104 @@ void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
+ 	scatterwalk_copychunks(buf, &walk, nbytes, out);
+ 	scatterwalk_done(&walk, out, 0);
+ }
+ EXPORT_SYMBOL_GPL(scatterwalk_map_and_copy);
+ 
++/**
++ * memcpy_sglist() - Copy data from one scatterlist to another
++ * @dst: The destination scatterlist.  Can be NULL if @nbytes == 0.
++ * @src: The source scatterlist.  Can be NULL if @nbytes == 0.
++ * @nbytes: Number of bytes to copy
++ *
++ * The scatterlists can describe exactly the same memory, in which case this
++ * function is a no-op.  No other overlaps are supported.
++ *
++ * Context: Any context
++ */
++void memcpy_sglist(struct scatterlist *dst, struct scatterlist *src,
++		   unsigned int nbytes)
++{
++	unsigned int src_offset, dst_offset;
++
++	if (unlikely(nbytes == 0)) /* in case src and/or dst is NULL */
++		return;
++
++	src_offset = src->offset;
++	dst_offset = dst->offset;
++	for (;;) {
++		/* Compute the length to copy this step. */
++		unsigned int len = min3(src->offset + src->length - src_offset,
++					dst->offset + dst->length - dst_offset,
++					nbytes);
++		struct page *src_page = sg_page(src);
++		struct page *dst_page = sg_page(dst);
++		const void *src_virt;
++		void *dst_virt;
++
++		if (IS_ENABLED(CONFIG_HIGHMEM)) {
++			/* HIGHMEM: we may have to actually map the pages. */
++			const unsigned int src_oip = offset_in_page(src_offset);
++			const unsigned int dst_oip = offset_in_page(dst_offset);
++			const unsigned int limit = PAGE_SIZE;
++
++			/* Further limit len to not cross a page boundary. */
++			len = min3(len, limit - src_oip, limit - dst_oip);
++
++			/* Compute the source and destination pages. */
++			src_page += src_offset / PAGE_SIZE;
++			dst_page += dst_offset / PAGE_SIZE;
++
++			if (src_page != dst_page) {
++				/* Copy between different pages. */
++				memcpy_page(dst_page, dst_oip,
++					    src_page, src_oip, len);
++				flush_dcache_page(dst_page);
++			} else if (src_oip != dst_oip) {
++				/* Copy between different parts of same page. */
++				dst_virt = kmap_local_page(dst_page);
++				memcpy(dst_virt + dst_oip, dst_virt + src_oip,
++				       len);
++				kunmap_local(dst_virt);
++				flush_dcache_page(dst_page);
++			} /* Else, it's the same memory.  No action needed. */
++		} else {
++			/*
++			 * !HIGHMEM: no mapping needed.  Just work in the linear
++			 * buffer of each sg entry.  Note that we can cross page
++			 * boundaries, as they are not significant in this case.
++			 */
++			src_virt = page_address(src_page) + src_offset;
++			dst_virt = page_address(dst_page) + dst_offset;
++			if (src_virt != dst_virt) {
++				memcpy(dst_virt, src_virt, len);
++				if (ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE)
++					__scatterwalk_flush_dcache_pages(
++						dst_page, dst_offset, len);
++			} /* Else, it's the same memory.  No action needed. */
++		}
++		nbytes -= len;
++		if (nbytes == 0) /* No more to copy? */
++			break;
++
++		/*
++		 * There's more to copy.  Advance the offsets by the length
++		 * copied this step, and advance the sg entries as needed.
++		 */
++		src_offset += len;
++		if (src_offset >= src->offset + src->length) {
++			src = sg_next(src);
++			src_offset = src->offset;
++		}
++		dst_offset += len;
++		if (dst_offset >= dst->offset + dst->length) {
++			dst = sg_next(dst);
++			dst_offset = dst->offset;
++		}
++	}
++}
++EXPORT_SYMBOL_GPL(memcpy_sglist);
++
+ struct scatterlist *scatterwalk_ffwd(struct scatterlist dst[2],
+ 				     struct scatterlist *src,
+ 				     unsigned int len)
+ {
+ 	for (;;) {
+diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
+index ccdb05f68a75..92ecd4ffbd07 100644
+--- a/include/crypto/scatterwalk.h
++++ b/include/crypto/scatterwalk.h
+@@ -81,10 +81,38 @@ static inline void scatterwalk_pagedone(struct scatter_walk *walk, int out,
+ 
+ 	if (more && walk->offset >= walk->sg->offset + walk->sg->length)
+ 		scatterwalk_start(walk, sg_next(walk->sg));
+ }
+ 
++/*
++ * Flush the dcache of any pages that overlap the region
++ * [offset, offset + nbytes) relative to base_page.
++ *
++ * This should be called only when ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE, to ensure
++ * that all relevant code (including the call to sg_page() in the caller, if
++ * applicable) gets fully optimized out when !ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE.
++ */
++static inline void __scatterwalk_flush_dcache_pages(struct page *base_page,
++						    unsigned int offset,
++						    unsigned int nbytes)
++{
++	unsigned int num_pages;
++
++	base_page += offset / PAGE_SIZE;
++	offset %= PAGE_SIZE;
++
++	/*
++	 * This is an overflow-safe version of
++	 * num_pages = DIV_ROUND_UP(offset + nbytes, PAGE_SIZE).
++	 */
++	num_pages = nbytes / PAGE_SIZE;
++	num_pages += DIV_ROUND_UP(offset + (nbytes % PAGE_SIZE), PAGE_SIZE);
++
++	for (unsigned int i = 0; i < num_pages; i++)
++		flush_dcache_page(base_page + i);
++}
++
+ static inline void scatterwalk_done(struct scatter_walk *walk, int out,
+ 				    int more)
+ {
+ 	if (!more || walk->offset >= walk->sg->offset + walk->sg->length ||
+ 	    !(walk->offset & (PAGE_SIZE - 1)))
+@@ -93,10 +121,13 @@ static inline void scatterwalk_done(struct scatter_walk *walk, int out,
+ 
+ void scatterwalk_copychunks(void *buf, struct scatter_walk *walk,
+ 			    size_t nbytes, int out);
+ void *scatterwalk_map(struct scatter_walk *walk);
+ 
++void memcpy_sglist(struct scatterlist *dst, struct scatterlist *src,
++		   unsigned int nbytes);
++
+ void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
+ 			      unsigned int start, unsigned int nbytes, int out);
+ 
+ struct scatterlist *scatterwalk_ffwd(struct scatterlist dst[2],
+ 				     struct scatterlist *src,
 -- 
 2.54.0
 
