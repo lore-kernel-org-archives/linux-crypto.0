@@ -1,124 +1,130 @@
-Received: from mail-dy1-f178.google.com (mail-dy1-f178.google.com [74.125.82.178])
+Received: from mail-dl1-f42.google.com (mail-dl1-f42.google.com [74.125.82.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE583E929C
-	for <linux-crypto@vger.kernel.org>; Thu, 30 Apr 2026 17:02:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.178
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777568530; cv=pass; b=mzxW0ES+t9DbGnT6GWkqvZDwMpukdn3gAGeUe9M4+OO1FsIZCswnsHKCQHHKRyxoo+KNdd5SuK6tpBNG2koTxNOf+YsCif4I4Gklb+bsMuZ3hH4prxT2lTf0NQJ1McepyEQXqcnWJQScoq4c+dZeOJLUhrf3UYAUxMSziAInNIo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777568530; c=relaxed/simple;
-	bh=kdkWT7Lj4mppb7ePDWP0ZDTnqJdUNyj1JX4iVP8CiOQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DZBrAPtnPrNeuvr6ypjIY0ExwftPmw1sRgl4e9egRkN0xf3YZO+KZO8aNk4dHcNcZFKcHEaT2mHtJhfZXg0m6yIe04OGj9dDE/jQKap1KjvnTX44u2xD2davELX5ek4aQruDhEotw6Zcsej2ZWq4o6cE58fT00KrEcm4LRpLhg8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LfQJd0sC; arc=pass smtp.client-ip=74.125.82.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A52EF2D7DC8
+	for <linux-crypto@vger.kernel.org>; Thu, 30 Apr 2026 17:37:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777570665; cv=none; b=HoVZ7N2kK0aPP1wuGAvAiw3ZMmiIQ35zgpu1BljBmvIpXfxzT9hXLGNkuIbIeguX21DjKc5UIG/iRMrHxs4ULx1UUhSzsFXH8aA23PwiD3tETjQOXN3EWVEJlFlGeczgAZx7s7EiJFr6VThfTG35dyd6DR5P/tM4OirCKCVsncM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777570665; c=relaxed/simple;
+	bh=g+RA+/B9ogh5Lr5VFnWAfVAqAy9aljo+8QIRWQwcF9c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WrfhzL3MBhT9STNyLa+FiZMDnljfPYOtUN4chKSIut3QejyFefjhsuXDhwEzshDUbG0KMrTKrjdpv9JgNW+jSR3nickOtRtEuyEjYKTgmoz61lrv8/fr9AqHUrDR00q0vJ+kZKcwxmxneAB7KoJhLIuEbKJoTNqpLTmd/aMyIGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aaPCe/gM; arc=none smtp.client-ip=74.125.82.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LfQJd0sC"
-Received: by mail-dy1-f178.google.com with SMTP id 5a478bee46e88-2ba895adfeaso1493653eec.0
-        for <linux-crypto@vger.kernel.org>; Thu, 30 Apr 2026 10:02:08 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777568528; cv=none;
-        d=google.com; s=arc-20240605;
-        b=OVW/+ABF79DuQXgm+s57YrRPxBbQ1kec88ZPweb+aAdxSUZsPzwk5Q/PyY+siMJntQ
-         L9WZiH31vf9KQKG18bcH64JjcBnhmniYC+oeHLniX7zJ8misjobcL5by6vSUsnAJAAMM
-         /V7sQIsouBEwoLgDOOVL4DPTvxyVGwpZxijxJ2Fq+wGK93pqGEma5bmleGgB4casGvR8
-         BZUVqXWwO8drD3q/OBdS2okWGsIIQdlsHXSiP0KKDWKtnr1ok2Lb/m9l0xqbuRgX3AU7
-         jf7XlNIs8SwtcjGk5wX4Ty53B4IBGsWpMSBPK/T+5WiRY2rAHDRWuKEPxfPiZAMCl0Zo
-         rVrg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=Ysekql4Ul305BpiEGUXKj6pgyfyPE1wDivp5cN89gbM=;
-        fh=hAYHOt6+uvUywcXTL6cNkdpqJGKt+p3/gCDmxVpTM18=;
-        b=fFzjSQsp7yrHHMEvxFDfEt1eIvGVfTEITp9QwBBM+lpP4oxW3XffLRLq1R7xNmGMZz
-         xfVS+olWVkv76Tn8fksVzrftYdbwQUcEhfaEA06WuHL4LJwWJPTDTaEL0LmRN85HMgZD
-         27igSySwicLDKks8eZoc0Unl5g2ggkWuUknAswoRy0G/hdcWTI3TmHgpByWFaDMaTZW8
-         lyUqvosJ5ugdKBJF2MZQh04DOb7StUQiue8bNrbpyHObFzCbWz1gQmdZfSdhvXIradpl
-         RMDZtAQ1p5YIQgRgChd7gya0c07TkFLJ890FC5TFgaaOS0WrgYGzFI0wXNPZh+1aBY6p
-         azdw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aaPCe/gM"
+Received: by mail-dl1-f42.google.com with SMTP id a92af1059eb24-12ddbe104ccso1303471c88.0
+        for <linux-crypto@vger.kernel.org>; Thu, 30 Apr 2026 10:37:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777568528; x=1778173328; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ysekql4Ul305BpiEGUXKj6pgyfyPE1wDivp5cN89gbM=;
-        b=LfQJd0sCylnHBzkUGVjDl9tfbrEIw3KxBl75qZQkzHpaXc6C2gFwozk1l8JmfwrnVN
-         JN83oXeJL2Cu8nTx2BzFhrWBHuf6j01HJUQx29gtw7tMfetdoO94K1Jcm+rjK/r375bM
-         xoo4oIYtyOeWiPnPRJq5VVPWgWtUBpHP/5KRS3Bbnpyc1hVHOAngsHvldMPJuXNMy999
-         m6tveefExDjX6kbYn+LVsm5pqD2zBiNj+D6e+RWjnDaMlK0WkTLr7QtYJJ9hQFlAKpRG
-         yfDJM6R6wSnJFHfpU9Pv7XUTa3nlN2pe7GR3GjKHcHeQU/x4cJg61e4CCJX2oBwtUyJ8
-         0dBQ==
+        d=gmail.com; s=20251104; t=1777570663; x=1778175463; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qWw6wa3QL95dIfuoX0OrurEDxczvWFjJooGa8i+ckkQ=;
+        b=aaPCe/gMAyeM2vWCwWN4RPacWpHlSwl9FCJMFRNMLx8u6VRnLPBjIkmdsIONHDdz3Z
+         cQLC3Z2mcsb/0sYA6Ao5SaMIpP533PHBF43uO/d7xZjeGMKk7DbGxufv6sQgDS5+KfpI
+         2zzyz4709e4NBJxJocBFaF2pvy4dIRce1TpT5VpQg3cy6lyhO+ZdPPnglflKxHfY+WM1
+         H1W0d7/xp66QUg9nBrsAdwg9FXOg84cjh7Ryw4L/3dhrUBR0ffTpaATFoPWD/clzQZHV
+         yFaH2cKOHnfpNzdWXOzjBin73ZiqWklnSpsJXTPkzIIGtzxjZtcWcDdsf8c0pYzW5r+7
+         cOkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777568528; x=1778173328;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1777570663; x=1778175463;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ysekql4Ul305BpiEGUXKj6pgyfyPE1wDivp5cN89gbM=;
-        b=ldL1qyXRcPJUF3/xaAsjGqXqxfAXMHbdmWJT+TxYPKt3GaOO631PzPXP2+7F0GtJi7
-         Zu2q0PKVCHlMDtdu10zzTBPqUhyfYEK7qIYaKTyawl1tPagLWXpk9dlXIH1aYuZJHEWD
-         K3PzDJiMshqjpDqUXD142hbm1STlVKiCEN02LJ6qUltxPtIfRZzxNpCiVwCcrCqSmuIA
-         9vXOkEyLInt6d4mky3KH1ylIbeROoXSNlxVe9tP4YE9em/+e8VX8h1kL3+qfkTeeX44V
-         avp3nTnco6+Wyngjun4AMU9GqH6Fb5ic/E0XgxBZL+StxNLFmMogP+Z15GVDwC/DRSRr
-         Kwaw==
-X-Forwarded-Encrypted: i=1; AFNElJ+aH+6bG45c35mmiCpuh5aFAUl1UmbHlSg5Pqtj1rvfGHeHhJYwiq/XBgokgj/lrrKfuB8CgGG7aUF5i6g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUS4Lp5r0wQd5FujwNgnkTgEEWZwlgr5Mz0alVISvMIpjOxm01
-	njp+gbIXbvmC9+Jy1xAj0t6z00P4GSrqm2h/LXjWPa17j9ARtRvm2jCY77+PyKD8W1psAs1G97G
-	CuNuh7MdPkPYvsZhqVNhlP0TWEm34ayI=
-X-Gm-Gg: AeBDiesk1K5zFggBx587HJCkNdCb6LAQn+TmwjGB17YWwuxdqvup+RWS5HDM3BuPg4P
-	0B9r1TBXNcInXks9YKq6NRQgToMpyRDDLCy6i//eUbekLWCYtOx9H3itOGpcjQuQJYgcZG9g7Ez
-	tP29Nv/2zu5AxMMIISQ0K+kXK3LwWZSXo2XFN5chYrbGtwkVTngk1m9E/Nz1/EDaZGgjtOAR0zU
-	TW4lsg8GGOnIjTvyYOTHyipehw+8Bthk0caEOgg7zahw0ZR2lw8hUYQJLSzXk4aj1ex+qfNOkMF
-	RhXkNp09xAT9lL1bT4EJfOxnyLPX+F3T1JrF9cf89sMsmTuC52PyNGCjiLw/V1NuRaErL+GOecM
-	ltLRezUTkhcJ1orcPGZNnfq/6zeBJmn71R0Brf3d5Yqk=
-X-Received: by 2002:a05:7300:5411:b0:2d1:e92c:f7ff with SMTP id
- 5a478bee46e88-2ed3c5c9e16mr1826579eec.1.1777568527441; Thu, 30 Apr 2026
- 10:02:07 -0700 (PDT)
+        bh=qWw6wa3QL95dIfuoX0OrurEDxczvWFjJooGa8i+ckkQ=;
+        b=V5VgfkSXyWrHilZjHXO1ljl256FP+s6XyzBEz/2ofyZbtUrGFy4qWBrf2JIIgbTdNq
+         BoRiH0KdkbBdfeizeWh1PPAjTT8/8AphcYXEPtvAYjgHQJn5zeLMUCkiQT35/Mnfu8a+
+         7SpUyjR/UMTFh0tFz7eGv7Ut4H+gdi9LbiPvDwubHn1JXtuBT8i8qZMfaMrlOEs/gon6
+         C4OhDVA0RDRl3qT5Q5qc4u/yL7Bwu0CDU1gq5+RkXvbq4WINFepIy+K0iAU4VjdcehqH
+         sdrSMnSbkhbEaiMW4ySLrXUDWgqxuzjQ0lMLTEOcNLdThB3n/Hj5dUR9+K6vt7B6sEVK
+         LUVA==
+X-Forwarded-Encrypted: i=1; AFNElJ+Jjd6vfXFBgS1Nk3MQS6w02ZxsRoGH6WsdvmPTCa1WASKA8IXcLZY5c3j8Wwb9mIG0t5m+YMD9CM2IeQs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw55lsmbmLcBS5YCrT3IY5lnNbP8gb+1+u/fYhnpEKDl6Pkv7SR
+	+AnxygheUMselhHI32gevSuRrtZ4Cw1gDNWDlSGzqQRh4954/f3o3sIg
+X-Gm-Gg: AeBDiets2YZnpkyCX22iGCBjBRoaMmbl0r/w8EkI9H8nh2kM8SxM2SeMk48dpLE0I3m
+	fZ+wGIaFaGZpd3d7Q2S208zTDjQZna41nDe33oyV7udw6xXewdrU0I0QJutAjYtkH0MABKcBgbS
+	fd1h6s3XcFUizMzZ9Neo04r9IC7XhTqROvrdH22/+H1e6H/0uSdeoqPmPJ3rcJa59F8r694yZCc
+	N42BDsujVoDuStvsFeV6krH666s/08fXhoXHOJVc/C7xIacqgSzV/LGs2uVorM+rG2eo6SRYfac
+	51uvEGGpsIImDEcDp6rRPJQZEqrY/CLgo2KiozxVw3wrjEFrd6L//H+U0OH/ZhVxifzf5No9jWJ
+	n6Trr/8ndPjsdVHg8FI6qHFPYeAkzg9GJe16+NmQIZjcmzC8YQzX3QOR9FtUGdkidiI1k9fe88q
+	TuHnsPgjo6XwJ8DtCbOxAu+wU5M5VJKozm/4qopU1ij1lW1gl08t9Zeixz66N7CC38Tqw6ilXhE
+	IMcIvqHBZHWdX2VNoel
+X-Received: by 2002:a05:7022:43:b0:12d:de3f:d853 with SMTP id a92af1059eb24-12dead675c2mr1724005c88.44.1777570662331;
+        Thu, 30 Apr 2026 10:37:42 -0700 (PDT)
+Received: from efaec68ba852.tailc0aff1.ts.net ([206.206.192.132])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2ee38e71ccesm1044942eec.10.2026.04.30.10.37.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Apr 2026 10:37:41 -0700 (PDT)
+From: Weiming Shi <bestswngs@gmail.com>
+To: David Howells <dhowells@redhat.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	Ignat Korchagin <ignat@linux.win>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>
+Cc: Vivek Goyal <vgoyal@redhat.com>,
+	Kees Cook <kees@kernel.org>,
+	keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	Xiang Mei <xmei5@asu.edu>,
+	Weiming Shi <bestswngs@gmail.com>
+Subject: [PATCH] crypto: fix OOB read in pefile_digest_pe_contents
+Date: Thu, 30 Apr 2026 10:36:34 -0700
+Message-ID: <20260430173632.277436-3-bestswngs@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260427172727.9310-1-ebiggers@kernel.org> <CAJwJo6Z9oJSMMBUL_pbYWN6ha3n4MRpKV_aVut8E+af3JUDFkw@mail.gmail.com>
- <20260427155538.2e1b8488@kernel.org> <CAJwJo6Zh_1V009JSBGwAmR7GWj=2HdG6f=uBxK8krE4B1YrGkA@mail.gmail.com>
- <a642b858-eea0-4b7a-aeb2-aa67c6cf0f64@redhat.com>
-In-Reply-To: <a642b858-eea0-4b7a-aeb2-aa67c6cf0f64@redhat.com>
-From: Dmitry Safonov <0x7f454c46@gmail.com>
-Date: Thu, 30 Apr 2026 18:01:55 +0100
-X-Gm-Features: AVHnY4J_afp8At_pOKi9BxqdfNCGc1QYGVwpMxIdJAzdWNmsjbxANmQ8MvQWChE
-Message-ID: <CAJwJo6YDJ1h7Ry15BDArx9dQbWMt3xFY28Ecy2rb7HsKi-f-yQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 0/5] Reimplement TCP-AO using crypto library
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Eric Biggers <ebiggers@kernel.org>, netdev@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>, Ard Biesheuvel <ardb@kernel.org>, 
-	"Jason A . Donenfeld" <Jason@zx2c4.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Dmitry Safonov <dima@arista.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Thu, 30 Apr 2026 at 08:38, Paolo Abeni <pabeni@redhat.com> wrote:
->
-> On 4/28/26 2:00 AM, Dmitry Safonov wrote:
-[..]
-> > Yeah, that's not what I meant. I see value in Eric's contribution, and
-> > I like getting rid of tcp-sigpool. So, anything but "nack" is not "no"
-> > :-)
->
-> I read the above as: "If there isn't any additional feedback soon,
-> please apply".
+pefile_digest_pe_contents() computes the trailing-data hash length as
+pelen - (hashed_bytes + certs_size). A crafted PE can make the addition
+exceed pelen, causing the unsigned subtraction to underflow to ~4 GiB.
+This is passed to crypto_shash_update() which reads out of bounds and
+panics on unmapped vmalloc guard pages.
 
-Thanks, Paolo, that's exactly what I meant.
+ BUG: unable to handle page fault for address: ffffc900038d8000
+ Oops: Oops: 0000 [#1] SMP KASAN NOPTI
+ RIP: 0010:sha256_blocks_generic (lib/crypto/sha256.c:152)
+ Call Trace:
+  <TASK>
+  __sha256_update (lib/crypto/sha256.c:208)
+  crypto_sha256_update (crypto/sha256.c:142)
+  verify_pefile_signature (crypto/asymmetric_keys/verify_pefile.c:436)
+  kexec_kernel_verify_pe_sig (kernel/kexec_file.c:151)
+  __do_sys_kexec_file_load (kernel/kexec_file.c:406)
+  do_syscall_64 (arch/x86/entry/syscall_64.c:94)
+  entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:121)
+  </TASK>
+ Kernel panic - not syncing: Fatal exception
 
-I think we addressed both concerns I had with the new RFC and BIRD
-daemon, and Eric did a good job optimising the crypto layer here, so
-we are better with his patches than with my sentimental attachment to
-extendability that so far is not really required by BGP. And if we
-need to extend the list of algorithms, we will be able to do it on top
-later.
+Validate that the addition does not overflow and the result does not
+exceed pelen before the subtraction. Return -ELIBBAD on failure.
 
-Thanks again,
-             Dmitry
+Fixes: af316fc442ef ("pefile: Digest the PE binary and compare to the PKCS#7 data")
+Reported-by: Xiang Mei <xmei5@asu.edu>
+Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+---
+ crypto/asymmetric_keys/verify_pefile.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/crypto/asymmetric_keys/verify_pefile.c b/crypto/asymmetric_keys/verify_pefile.c
+index 1f3b227ba7f2..cec99db14129 100644
+--- a/crypto/asymmetric_keys/verify_pefile.c
++++ b/crypto/asymmetric_keys/verify_pefile.c
+@@ -305,6 +305,8 @@ static int pefile_digest_pe_contents(const void *pebuf, unsigned int pelen,
+ 
+ 	if (pelen > hashed_bytes) {
+ 		tmp = hashed_bytes + ctx->certs_size;
++		if (tmp <= hashed_bytes || pelen < tmp)
++			return -ELIBBAD;
+ 		ret = crypto_shash_update(desc,
+ 					  pebuf + hashed_bytes,
+ 					  pelen - tmp);
+-- 
+2.43.0
+
