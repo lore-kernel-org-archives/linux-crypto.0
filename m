@@ -1,39 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D92A2BE7AB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74FC1375AC6;
 	Thu, 30 Apr 2026 06:37:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777531074; cv=none; b=ltDVBqJUd0kFf9OW1HCz0yPM6Pa31u/1eE/2QAkiHqUK1cqAyTAiSbxsfNga6QsVPDOaOuPJSq+xEmX4/m72EpqmHCUDDrzxn++/VjaMCyu+KzQoj8Cus3th3KiEnzFEtbWjvMMQiQSn0Yldbdq7FKnu4rI6fjELcAcZ73Mu5XY=
+	t=1777531074; cv=none; b=Cq/DsZOZcFw6aD2mocHO1qzO6cEvtuyouYzm+oJTbq6SNL3fid3Yezv52l/N/Yid08eO97Y44B6Fv92dH8rL5NW17v25S0uncSQ9E5sgfIHBc05o5ecRH9WASHp46ifwxbfWPjPN19N9KvE8uFRH3Uj1o411pZ5rj5HLpZtojBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1777531074; c=relaxed/simple;
-	bh=j5ejUsBHvRK1mLuGTFfQBdL5nlz102vlgTFY/vjdk5M=;
+	bh=JpyCLw1ruT1kJ4jIJQwxZ7t6Q6fp7dTjmshT/7yIxAE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KNHQyeYoOpnV1hRDzDn6QVWs9PYbCvgXDD2jP6+cD1DOcIahKwkgBLJ3gAu09b0sJILJ7lWeT2rk3aMzqo6GSWpQzVzVkILibyGNYZtxL1ot4C27jJG7QHKK2nujMsOOWxtVzgwh2+nNRgvcv/iovQDQE1O6wOXW5ysOwXYH+SM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I8koKur6; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=Wz73tC4REDolgJbro5n86+zgkILYqWRcuGD0dBPHmsHcNHqbvv7bHp9j1D2a0+s77zRA8bKWBWw9zYJ8q9zRbXzDF6UJRFq2B4LSdNan0RsxJJdPqse/OIcA+qErfxIwLxhDbvXqR5LPXNTMBGxa+Z1J3IM+k57Ta/iXgTIk6NI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o9FhZLLN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I8koKur6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E73B7C2BCC4;
-	Thu, 30 Apr 2026 06:37:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o9FhZLLN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 338CAC2BCC7;
+	Thu, 30 Apr 2026 06:37:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1777531074;
-	bh=j5ejUsBHvRK1mLuGTFfQBdL5nlz102vlgTFY/vjdk5M=;
+	bh=JpyCLw1ruT1kJ4jIJQwxZ7t6Q6fp7dTjmshT/7yIxAE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=I8koKur6XsmyHnQ65Evi87IwZql6TM676J/uWTk86RHfO+VAXBT9WGEgoh6XeqIo2
-	 UUJjzmvtQ/qsHE6moRRR3E1oGwLyiN6KMZ97eNb2ek99Dyy5u36vC6+PjUjDqNNNbx
-	 0rzNdncTxum77sPc1cTVvOlMaP1Zc+y4s8wEXn9vttNySE7RiwX+o9dFcDrgdcwkzn
-	 BGqQ4NB2gmNs0NFOJd8pH9Jz2KjdMhkhq8+TuJxgiBvwPwlN6Gmw9x8lXcmVGbeKOR
-	 VFkl8oUERtI4EqSNkqHFRyLViXtAx/StWFGi0Os70dfvL5UkIxn7Wp6QkR6QVCQCRZ
-	 RW5x4CR2L4AlQ==
+	b=o9FhZLLNp5zAtS2+FD4/PvoX4adg2gVsg25fNFr7Oc3/PXj3zLbQkqcUaGzCSzCEb
+	 HnjGurXkp4bGx3lMgFa0ZUt2Gma7UN1/V0wzreu/pT48PUfcGQ15hxWw2gruA7L06i
+	 VzmgIBwrvLE8hTJLoYoIpoDXsf0yhw5iaFQ5QlV2gpF3s9XlPLlgz9H2sY73Np6XBv
+	 To3vEDdtWP8QfdkrU2283mxQqhTYYHPrOeOfBbbK6U+kNyL3noSqq3AmUbmX9dKL/z
+	 imdZhFw2W2EPOcvZ+d6aYrH8oVRxNBVdtFWHTFPEiE4p8vDes74Hf4Rr/ZASGP5WXt
+	 YbJ2NRMWugJ/w==
 From: Eric Biggers <ebiggers@kernel.org>
 To: stable@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
+	Eric Biggers <ebiggers@google.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 5.15 1/9] crypto: scatterwalk - Backport memcpy_sglist()
-Date: Wed, 29 Apr 2026 23:35:56 -0700
-Message-ID: <20260430063604.173525-2-ebiggers@kernel.org>
+Subject: [PATCH 5.15 2/9] crypto: algif_aead - use memcpy_sglist() instead of null skcipher
+Date: Wed, 29 Apr 2026 23:35:57 -0700
+Message-ID: <20260430063604.173525-3-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260430063604.173525-1-ebiggers@kernel.org>
 References: <20260430063604.173525-1-ebiggers@kernel.org>
@@ -45,186 +46,287 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This backports the current implementation of memcpy_sglist() from
-upstream commit 4dffc9bbffb9ccfcda730d899c97c553599e7ca8.
+From: Eric Biggers <ebiggers@google.com>
 
-This function was rewritten twice.  The earlier implementations had many
-prerequisite commits, while the latest implementation is standalone.
-It's much easier to just backport the latest code directly.
+commit f2804d0eee8ddd57aa79d0b82872b74c21e1b69b upstream.
 
+For copying data between two scatterlists, just use memcpy_sglist()
+instead of the so-called "null skcipher".  This is much simpler.
+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- crypto/scatterwalk.c         | 94 ++++++++++++++++++++++++++++++++++++
- include/crypto/scatterwalk.h | 32 ++++++++++++
- 2 files changed, 126 insertions(+)
+ crypto/Kconfig      |  1 -
+ crypto/algif_aead.c | 98 ++++++++-------------------------------------
+ 2 files changed, 17 insertions(+), 82 deletions(-)
 
-diff --git a/crypto/scatterwalk.c b/crypto/scatterwalk.c
-index 16f6ba896fb6..9f0b27005166 100644
---- a/crypto/scatterwalk.c
-+++ b/crypto/scatterwalk.c
-@@ -67,10 +67,104 @@ void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
- 	scatterwalk_copychunks(buf, &walk, nbytes, out);
- 	scatterwalk_done(&walk, out, 0);
- }
- EXPORT_SYMBOL_GPL(scatterwalk_map_and_copy);
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index db260ccfba51..15994570627b 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1870,11 +1870,10 @@ config CRYPTO_USER_API_RNG_CAVP
+ config CRYPTO_USER_API_AEAD
+ 	tristate "User-space interface for AEAD cipher algorithms"
+ 	depends on NET
+ 	select CRYPTO_AEAD
+ 	select CRYPTO_SKCIPHER
+-	select CRYPTO_NULL
+ 	select CRYPTO_USER_API
+ 	help
+ 	  This option enables the user-spaces interface for AEAD
+ 	  cipher algorithms.
  
-+/**
-+ * memcpy_sglist() - Copy data from one scatterlist to another
-+ * @dst: The destination scatterlist.  Can be NULL if @nbytes == 0.
-+ * @src: The source scatterlist.  Can be NULL if @nbytes == 0.
-+ * @nbytes: Number of bytes to copy
-+ *
-+ * The scatterlists can describe exactly the same memory, in which case this
-+ * function is a no-op.  No other overlaps are supported.
-+ *
-+ * Context: Any context
-+ */
-+void memcpy_sglist(struct scatterlist *dst, struct scatterlist *src,
-+		   unsigned int nbytes)
-+{
-+	unsigned int src_offset, dst_offset;
-+
-+	if (unlikely(nbytes == 0)) /* in case src and/or dst is NULL */
-+		return;
-+
-+	src_offset = src->offset;
-+	dst_offset = dst->offset;
-+	for (;;) {
-+		/* Compute the length to copy this step. */
-+		unsigned int len = min3(src->offset + src->length - src_offset,
-+					dst->offset + dst->length - dst_offset,
-+					nbytes);
-+		struct page *src_page = sg_page(src);
-+		struct page *dst_page = sg_page(dst);
-+		const void *src_virt;
-+		void *dst_virt;
-+
-+		if (IS_ENABLED(CONFIG_HIGHMEM)) {
-+			/* HIGHMEM: we may have to actually map the pages. */
-+			const unsigned int src_oip = offset_in_page(src_offset);
-+			const unsigned int dst_oip = offset_in_page(dst_offset);
-+			const unsigned int limit = PAGE_SIZE;
-+
-+			/* Further limit len to not cross a page boundary. */
-+			len = min3(len, limit - src_oip, limit - dst_oip);
-+
-+			/* Compute the source and destination pages. */
-+			src_page += src_offset / PAGE_SIZE;
-+			dst_page += dst_offset / PAGE_SIZE;
-+
-+			if (src_page != dst_page) {
-+				/* Copy between different pages. */
-+				memcpy_page(dst_page, dst_oip,
-+					    src_page, src_oip, len);
-+				flush_dcache_page(dst_page);
-+			} else if (src_oip != dst_oip) {
-+				/* Copy between different parts of same page. */
-+				dst_virt = kmap_local_page(dst_page);
-+				memcpy(dst_virt + dst_oip, dst_virt + src_oip,
-+				       len);
-+				kunmap_local(dst_virt);
-+				flush_dcache_page(dst_page);
-+			} /* Else, it's the same memory.  No action needed. */
-+		} else {
-+			/*
-+			 * !HIGHMEM: no mapping needed.  Just work in the linear
-+			 * buffer of each sg entry.  Note that we can cross page
-+			 * boundaries, as they are not significant in this case.
-+			 */
-+			src_virt = page_address(src_page) + src_offset;
-+			dst_virt = page_address(dst_page) + dst_offset;
-+			if (src_virt != dst_virt) {
-+				memcpy(dst_virt, src_virt, len);
-+				if (ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE)
-+					__scatterwalk_flush_dcache_pages(
-+						dst_page, dst_offset, len);
-+			} /* Else, it's the same memory.  No action needed. */
-+		}
-+		nbytes -= len;
-+		if (nbytes == 0) /* No more to copy? */
-+			break;
-+
-+		/*
-+		 * There's more to copy.  Advance the offsets by the length
-+		 * copied this step, and advance the sg entries as needed.
-+		 */
-+		src_offset += len;
-+		if (src_offset >= src->offset + src->length) {
-+			src = sg_next(src);
-+			src_offset = src->offset;
-+		}
-+		dst_offset += len;
-+		if (dst_offset >= dst->offset + dst->length) {
-+			dst = sg_next(dst);
-+			dst_offset = dst->offset;
-+		}
-+	}
-+}
-+EXPORT_SYMBOL_GPL(memcpy_sglist);
-+
- struct scatterlist *scatterwalk_ffwd(struct scatterlist dst[2],
- 				     struct scatterlist *src,
- 				     unsigned int len)
+diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
+index 42493b4d8ce4..38a4ab8c90c7 100644
+--- a/crypto/algif_aead.c
++++ b/crypto/algif_aead.c
+@@ -25,32 +25,25 @@
+ 
+ #include <crypto/internal/aead.h>
+ #include <crypto/scatterwalk.h>
+ #include <crypto/if_alg.h>
+ #include <crypto/skcipher.h>
+-#include <crypto/null.h>
+ #include <linux/init.h>
+ #include <linux/list.h>
+ #include <linux/kernel.h>
+ #include <linux/mm.h>
+ #include <linux/module.h>
+ #include <linux/net.h>
+ #include <net/sock.h>
+ 
+-struct aead_tfm {
+-	struct crypto_aead *aead;
+-	struct crypto_sync_skcipher *null_tfm;
+-};
+-
+ static inline bool aead_sufficient_data(struct sock *sk)
  {
- 	for (;;) {
-diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
-index 7af08174a721..df9c1ba3bd5c 100644
---- a/include/crypto/scatterwalk.h
-+++ b/include/crypto/scatterwalk.h
-@@ -86,10 +86,39 @@ static inline void scatterwalk_pagedone(struct scatter_walk *walk, int out,
+ 	struct alg_sock *ask = alg_sk(sk);
+ 	struct sock *psk = ask->parent;
+ 	struct alg_sock *pask = alg_sk(psk);
+ 	struct af_alg_ctx *ctx = ask->private;
+-	struct aead_tfm *aeadc = pask->private;
+-	struct crypto_aead *tfm = aeadc->aead;
++	struct crypto_aead *tfm = pask->private;
+ 	unsigned int as = crypto_aead_authsize(tfm);
  
- 	if (more && walk->offset >= walk->sg->offset + walk->sg->length)
- 		scatterwalk_start(walk, sg_next(walk->sg));
+ 	/*
+ 	 * The minimum amount of memory needed for an AEAD cipher is
+ 	 * the AAD and in case of decryption the tag.
+@@ -62,42 +55,25 @@ static int aead_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
+ {
+ 	struct sock *sk = sock->sk;
+ 	struct alg_sock *ask = alg_sk(sk);
+ 	struct sock *psk = ask->parent;
+ 	struct alg_sock *pask = alg_sk(psk);
+-	struct aead_tfm *aeadc = pask->private;
+-	struct crypto_aead *tfm = aeadc->aead;
++	struct crypto_aead *tfm = pask->private;
+ 	unsigned int ivsize = crypto_aead_ivsize(tfm);
+ 
+ 	return af_alg_sendmsg(sock, msg, size, ivsize);
  }
  
-+/*
-+ * Flush the dcache of any pages that overlap the region
-+ * [offset, offset + nbytes) relative to base_page.
-+ *
-+ * This should be called only when ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE, to ensure
-+ * that all relevant code (including the call to sg_page() in the caller, if
-+ * applicable) gets fully optimized out when !ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE.
-+ */
-+static inline void __scatterwalk_flush_dcache_pages(struct page *base_page,
-+						    unsigned int offset,
-+						    unsigned int nbytes)
-+{
-+	unsigned int num_pages;
-+	unsigned int i;
-+
-+	base_page += offset / PAGE_SIZE;
-+	offset %= PAGE_SIZE;
-+
-+	/*
-+	 * This is an overflow-safe version of
-+	 * num_pages = DIV_ROUND_UP(offset + nbytes, PAGE_SIZE).
-+	 */
-+	num_pages = nbytes / PAGE_SIZE;
-+	num_pages += DIV_ROUND_UP(offset + (nbytes % PAGE_SIZE), PAGE_SIZE);
-+
-+	for (i = 0; i < num_pages; i++)
-+		flush_dcache_page(base_page + i);
-+}
-+
- static inline void scatterwalk_done(struct scatter_walk *walk, int out,
- 				    int more)
+-static int crypto_aead_copy_sgl(struct crypto_sync_skcipher *null_tfm,
+-				struct scatterlist *src,
+-				struct scatterlist *dst, unsigned int len)
+-{
+-	SYNC_SKCIPHER_REQUEST_ON_STACK(skreq, null_tfm);
+-
+-	skcipher_request_set_sync_tfm(skreq, null_tfm);
+-	skcipher_request_set_callback(skreq, CRYPTO_TFM_REQ_MAY_SLEEP,
+-				      NULL, NULL);
+-	skcipher_request_set_crypt(skreq, src, dst, len, NULL);
+-
+-	return crypto_skcipher_encrypt(skreq);
+-}
+-
+ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
+ 			 size_t ignored, int flags)
  {
- 	if (!more || walk->offset >= walk->sg->offset + walk->sg->length ||
- 	    !(walk->offset & (PAGE_SIZE - 1)))
-@@ -98,10 +127,13 @@ static inline void scatterwalk_done(struct scatter_walk *walk, int out,
+ 	struct sock *sk = sock->sk;
+ 	struct alg_sock *ask = alg_sk(sk);
+ 	struct sock *psk = ask->parent;
+ 	struct alg_sock *pask = alg_sk(psk);
+ 	struct af_alg_ctx *ctx = ask->private;
+-	struct aead_tfm *aeadc = pask->private;
+-	struct crypto_aead *tfm = aeadc->aead;
+-	struct crypto_sync_skcipher *null_tfm = aeadc->null_tfm;
++	struct crypto_aead *tfm = pask->private;
+ 	unsigned int i, as = crypto_aead_authsize(tfm);
+ 	struct af_alg_async_req *areq;
+ 	struct af_alg_tsgl *tsgl, *tmp;
+ 	struct scatterlist *rsgl_src, *tsgl_src = NULL;
+ 	int err = 0;
+@@ -221,14 +197,11 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
+ 		 *	    |	   |
+ 		 *	    | copy |
+ 		 *	    v	   v
+ 		 * RX SGL: AAD || PT || Tag
+ 		 */
+-		err = crypto_aead_copy_sgl(null_tfm, tsgl_src,
+-					   areq->first_rsgl.sgl.sg, processed);
+-		if (err)
+-			goto free;
++		memcpy_sglist(areq->first_rsgl.sgl.sg, tsgl_src, processed);
+ 		af_alg_pull_tsgl(sk, processed, NULL, 0);
+ 	} else {
+ 		/*
+ 		 * Decryption operation - To achieve an in-place cipher
+ 		 * operation, the following  SGL structure is used:
+@@ -238,15 +211,12 @@ static int _aead_recvmsg(struct socket *sock, struct msghdr *msg,
+ 		 *	    | copy |	 | Create SGL link.
+ 		 *	    v	   v	 |
+ 		 * RX SGL: AAD || CT ----+
+ 		 */
  
- void scatterwalk_copychunks(void *buf, struct scatter_walk *walk,
- 			    size_t nbytes, int out);
- void *scatterwalk_map(struct scatter_walk *walk);
+-		 /* Copy AAD || CT to RX SGL buffer for in-place operation. */
+-		err = crypto_aead_copy_sgl(null_tfm, tsgl_src,
+-					   areq->first_rsgl.sgl.sg, outlen);
+-		if (err)
+-			goto free;
++		/* Copy AAD || CT to RX SGL buffer for in-place operation. */
++		memcpy_sglist(areq->first_rsgl.sgl.sg, tsgl_src, outlen);
  
-+void memcpy_sglist(struct scatterlist *dst, struct scatterlist *src,
-+		   unsigned int nbytes);
-+
- void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
- 			      unsigned int start, unsigned int nbytes, int out);
+ 		/* Create TX SGL for tag and chain it to RX SGL. */
+ 		areq->tsgl_entries = af_alg_count_tsgl(sk, processed,
+ 						       processed - as);
+ 		if (!areq->tsgl_entries)
+@@ -376,11 +346,11 @@ static struct proto_ops algif_aead_ops = {
+ static int aead_check_key(struct socket *sock)
+ {
+ 	int err = 0;
+ 	struct sock *psk;
+ 	struct alg_sock *pask;
+-	struct aead_tfm *tfm;
++	struct crypto_aead *tfm;
+ 	struct sock *sk = sock->sk;
+ 	struct alg_sock *ask = alg_sk(sk);
  
- struct scatterlist *scatterwalk_ffwd(struct scatterlist dst[2],
- 				     struct scatterlist *src,
+ 	lock_sock(sk);
+ 	if (!atomic_read(&ask->nokey_refcnt))
+@@ -390,11 +360,11 @@ static int aead_check_key(struct socket *sock)
+ 	pask = alg_sk(ask->parent);
+ 	tfm = pask->private;
+ 
+ 	err = -ENOKEY;
+ 	lock_sock_nested(psk, SINGLE_DEPTH_NESTING);
+-	if (crypto_aead_get_flags(tfm->aead) & CRYPTO_TFM_NEED_KEY)
++	if (crypto_aead_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
+ 		goto unlock;
+ 
+ 	atomic_dec(&pask->nokey_refcnt);
+ 	atomic_set(&ask->nokey_refcnt, 0);
+ 
+@@ -464,68 +434,35 @@ static struct proto_ops algif_aead_ops_nokey = {
+ 	.poll		=	af_alg_poll,
+ };
+ 
+ static void *aead_bind(const char *name, u32 type, u32 mask)
+ {
+-	struct aead_tfm *tfm;
+-	struct crypto_aead *aead;
+-	struct crypto_sync_skcipher *null_tfm;
+-
+-	tfm = kzalloc(sizeof(*tfm), GFP_KERNEL);
+-	if (!tfm)
+-		return ERR_PTR(-ENOMEM);
+-
+-	aead = crypto_alloc_aead(name, type, mask);
+-	if (IS_ERR(aead)) {
+-		kfree(tfm);
+-		return ERR_CAST(aead);
+-	}
+-
+-	null_tfm = crypto_get_default_null_skcipher();
+-	if (IS_ERR(null_tfm)) {
+-		crypto_free_aead(aead);
+-		kfree(tfm);
+-		return ERR_CAST(null_tfm);
+-	}
+-
+-	tfm->aead = aead;
+-	tfm->null_tfm = null_tfm;
+-
+-	return tfm;
++	return crypto_alloc_aead(name, type, mask);
+ }
+ 
+ static void aead_release(void *private)
+ {
+-	struct aead_tfm *tfm = private;
+-
+-	crypto_free_aead(tfm->aead);
+-	crypto_put_default_null_skcipher();
+-	kfree(tfm);
++	crypto_free_aead(private);
+ }
+ 
+ static int aead_setauthsize(void *private, unsigned int authsize)
+ {
+-	struct aead_tfm *tfm = private;
+-
+-	return crypto_aead_setauthsize(tfm->aead, authsize);
++	return crypto_aead_setauthsize(private, authsize);
+ }
+ 
+ static int aead_setkey(void *private, const u8 *key, unsigned int keylen)
+ {
+-	struct aead_tfm *tfm = private;
+-
+-	return crypto_aead_setkey(tfm->aead, key, keylen);
++	return crypto_aead_setkey(private, key, keylen);
+ }
+ 
+ static void aead_sock_destruct(struct sock *sk)
+ {
+ 	struct alg_sock *ask = alg_sk(sk);
+ 	struct af_alg_ctx *ctx = ask->private;
+ 	struct sock *psk = ask->parent;
+ 	struct alg_sock *pask = alg_sk(psk);
+-	struct aead_tfm *aeadc = pask->private;
+-	struct crypto_aead *tfm = aeadc->aead;
++	struct crypto_aead *tfm = pask->private;
+ 	unsigned int ivlen = crypto_aead_ivsize(tfm);
+ 
+ 	af_alg_pull_tsgl(sk, ctx->used, NULL, 0);
+ 	sock_kzfree_s(sk, ctx->iv, ivlen);
+ 	sock_kfree_s(sk, ctx, ctx->len);
+@@ -534,14 +471,13 @@ static void aead_sock_destruct(struct sock *sk)
+ 
+ static int aead_accept_parent_nokey(void *private, struct sock *sk)
+ {
+ 	struct af_alg_ctx *ctx;
+ 	struct alg_sock *ask = alg_sk(sk);
+-	struct aead_tfm *tfm = private;
+-	struct crypto_aead *aead = tfm->aead;
++	struct crypto_aead *tfm = private;
+ 	unsigned int len = sizeof(*ctx);
+-	unsigned int ivlen = crypto_aead_ivsize(aead);
++	unsigned int ivlen = crypto_aead_ivsize(tfm);
+ 
+ 	ctx = sock_kmalloc(sk, len, GFP_KERNEL);
+ 	if (!ctx)
+ 		return -ENOMEM;
+ 	memset(ctx, 0, len);
+@@ -564,13 +500,13 @@ static int aead_accept_parent_nokey(void *private, struct sock *sk)
+ 	return 0;
+ }
+ 
+ static int aead_accept_parent(void *private, struct sock *sk)
+ {
+-	struct aead_tfm *tfm = private;
++	struct crypto_aead *tfm = private;
+ 
+-	if (crypto_aead_get_flags(tfm->aead) & CRYPTO_TFM_NEED_KEY)
++	if (crypto_aead_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
+ 		return -ENOKEY;
+ 
+ 	return aead_accept_parent_nokey(private, sk);
+ }
+ 
 -- 
 2.54.0
 
