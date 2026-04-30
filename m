@@ -1,60 +1,126 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4AC526A08F;
-	Thu, 30 Apr 2026 06:12:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D89D626A08F;
+	Thu, 30 Apr 2026 06:13:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777529557; cv=none; b=fpK6ujUYbAUF1vFbPbldLB7G6Q6Y/X5VAUSkheVHt568KbijbzQNr78Zi6iruqZLunidKwWp2PT6vW0CicXoeQzF/wDnrLp0PmXy5MBuwuOj02ALXL6sZriDxfFfbB5wLPoGKiI2gZGCEj/tUVHV62rWd2SXCfBVC5R0Pm1pHnA=
+	t=1777529606; cv=none; b=WaVVZcnuBy0KKIjQGcPegknx4QN3m4Xskz6RNAwRQoTIeboEhGfcpDsEpjkBOh8ite9Qfy5Q5m+tvouPzUg8MZeU9caCJgmARkFzUsY1S6MNWyojSbjB8S9V5diVyuEJ8g5UD6M134bVEWXJxWfVSeEnnLpqJly/FtGZhTY2494=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777529557; c=relaxed/simple;
-	bh=zPGdDQ+PrPyFerPmVm/Y5B5p/nKE873SF8qNvNEwDYg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FyG0DD1209zWF/qTMAg5l1CbpqCTs8BDpiQQAf6iqHs6voujVf2gyiK7yt2655WJONFgNql0shp1I9T+HVWbQHkQIvt1itbWIw26MZb+/i+i6DIoDXj1QEr0V0JpTdzYbyY1YuRXLLNN6psJjX+9+8qOjlZNuDB5F8qgMUZQNzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s129gl3E; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777529606; c=relaxed/simple;
+	bh=3yQS9h/dBdlPC70tOl28EeE9AaXjup31u0T+78x67z8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nY35tEjR7/usfyFqLt9d9Q0LXLVtGLCuLN5GcQWTeTBXkWrssxprVbnj1rGMA8p0uSirOHOEDdhaRa0UuV/ydyQAbpJih9QRmOl8J0X4Fl9bUfVUKCYKmeRFUUDDq1zn7xwoC/xsi8yNRRKiS0tHvnQDw9eQ1srkkLrACAwnriA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ek+YrALe; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s129gl3E"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E181C2BCB9;
-	Thu, 30 Apr 2026 06:12:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ek+YrALe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9B07C2BCB8;
+	Thu, 30 Apr 2026 06:13:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777529557;
-	bh=zPGdDQ+PrPyFerPmVm/Y5B5p/nKE873SF8qNvNEwDYg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=s129gl3E3a5L7DyBQbFFTfgW8bIV+NfD6/LPaJCM9A4SRed8fUPm/zSuW7uxMNV9+
-	 3x/EDqhCiC7NiEKkuRF/WjJURbS+CTyxulxHekM7ngICw7/pS0Eq6gf5ewB/DfCpYq
-	 YVk2vkxzR6SGIJQhP+vvd2mVp1ET7/Jpl+mhKv70XUijUkl3GLztrpOwoB8ujavYoP
-	 h0HzLZfYiCO82atEpfGJUmcRpzhMqNPngGKyLsZk7xjk+ajUhbS7ZkFg+aG90xndXD
-	 bX+kZwIZO/tVvVLOWRjLd1YY1V9T+nqRw1gZzkMneRmGSDIGlC+/4Bk+uY+nr78Sme
-	 5TeajdYJ60tSw==
-Date: Wed, 29 Apr 2026 23:11:20 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: stable@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 6.12 0/8] AF_ALG fixes
-Message-ID: <20260430061120.GA54208@sol>
-References: <20260430060702.110091-1-ebiggers@kernel.org>
+	s=k20201202; t=1777529605;
+	bh=3yQS9h/dBdlPC70tOl28EeE9AaXjup31u0T+78x67z8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Ek+YrALeejqZMqXuIhgwa+eR2+IAlDhbK62jqvynlNPF27maw0IFuPU6NNE0KjXkY
+	 m99VE9uZ2/eFLr5bHZCJo4KniTrJyQVI0CJnJpyej58tmsw9wa+ia/6FbFJnGm1sPC
+	 GnQpkaIOQ6eXjI37TTJXlcLrmOi/7IDWpYIOOFkslsQlZTFeJ2n/Sq4xMqdx17sgIh
+	 +MlLLGrOMja3EKh4+0w1HK3lfNqOhLVAR9ITgpQN/19YmjUb65yE5WxQjaoUYxYKCu
+	 Ke5wH17FFQesAXCeXcb4iePxiL6XNoBM7ZMf+3mYhnVTZ7+jbndwuq+5DaUWK9oyyw
+	 VZR6G4zEYylOQ==
+Message-ID: <41da4b77-4d0d-48bd-9578-2adefe5466af@kernel.org>
+Date: Thu, 30 Apr 2026 08:13:20 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260430060702.110091-1-ebiggers@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 1/3] dt-bindings: crypto: qcom,ice: Add sa8255p support
+To: Linlin Zhang <linlin.zhang@oss.qualcomm.com>,
+ linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, ebiggers@google.com
+Cc: neeraj.soni@oss.qualcomm.com, gaurav.kashyap@oss.qualcomm.com,
+ deepti.jaggi@oss.qualcomm.com, bjorn.andersson@oss.qualcomm.com,
+ quic_shazhuss@quicinc.com, trilok.soni@oss.qualcomm.com,
+ konrad.dybcio@oss.qualcomm.com
+References: <20260430032136.3058773-1-linlin.zhang@oss.qualcomm.com>
+ <20260430032136.3058773-2-linlin.zhang@oss.qualcomm.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20260430032136.3058773-2-linlin.zhang@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 29, 2026 at 11:06:54PM -0700, Eric Biggers wrote:
-> This series backports the recent AF_ALG fixes to 6.12.  These include
-> the fix for https://copy.fail/, fixes for that fix, and some other fixes
-> that went in at around the same time that seem related.
+On 30/04/2026 05:21, Linlin Zhang wrote:
+> On sa8255p, resources such as PHY, clocks, regulators, and resets are
+> managed by remote firmware via the SCMI power protocol. As a result, the
+> ICE driver cannot directly access clocks and must instead use power-domains
+> to request resource configuration.
 > 
-> To enable the 5 actual fix commits to cherry-pick cleanly, commit 1
-> copies the latest implementation of memcpy_sglist() from upstream, and
-> commits 2 and 5 cleanly cherry-pick a couple cleanup commits.
-> 
-> I didn't check older kernels yet, but this should be usable as a
-> starting point for them.
+> Add the qcom,sa8255p-inline-crypto-engine compatible string and make clocks
+> optional for platforms that use power-domains instead.
 
-It applies to 6.6 as well.  There's a conflict on 6.1.
 
-- Eric
+Please use scripts/get_maintainers.pl to get a list of necessary people
+and lists to CC. It might happen, that command when run on an older
+kernel, gives you outdated entries. Therefore please be sure you base
+your patches on recent Linux kernel.
+
+Tools like b4 or scripts/get_maintainer.pl provide you proper list of
+people, so fix your workflow. Tools might also fail if you work on some
+ancient tree (don't, instead use mainline) or work on fork of kernel
+(don't, instead use mainline). Just use b4 and everything should be
+fine, although remember about `b4 prep --auto-to-cc` if you added new
+patches to the patchset.
+
+You missed at least devicetree list (maybe more), so this won't be
+tested by automated tooling. Performing review on untested code might be
+a waste of time.
+
+Please kindly resend and include all necessary To/Cc entries.
+
+Best regards,
+Krzysztof
