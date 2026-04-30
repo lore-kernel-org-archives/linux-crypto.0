@@ -1,90 +1,82 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C9A03FD15C;
-	Thu, 30 Apr 2026 08:49:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F0FC3BA229
+	for <linux-crypto@vger.kernel.org>; Thu, 30 Apr 2026 11:02:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777538994; cv=none; b=WTghPVbHkYndyqYjNBsTLaRfr57a9TvvMNrgVM8tqPoOZFL4Gkjhm1HTtkSHx8Wl4R8p1WCx4x1o7H92F6ev9jKY6OdO21wKoKz/7KsSLPCKOiSct8Wkfq48lOEw5QcSj8M6Kh21rQCmyWwARILEnF40mrKTJtjfB4k2UaGCcXg=
+	t=1777546951; cv=none; b=RAPybUX1EQM23VxlUud9f+XpL25tf6opCGc0ysUkq1r85j1jgmjOFBecAV4hu2zPPKFl84AXtWsbnWtD0+698PcgzqyS0SOrlGNHtzkR6h8gXRfbESrMQULrsRXzeQV9/hs4zFQNA/vwi8k3RY3L6eI6s08sYXGbHUZmc2UFl7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777538994; c=relaxed/simple;
-	bh=Ig2KLrSxctNzfv91/Ob0md9MNjcSl3mUxpCXDK4oFKo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Nc6SoYGhuCytQVWzphtZSN2+NSZnPt8288m/+mKU2O+ETcLM3bgFo7Fx0WsUf34SeaIUCtyTsOcebGPFFSoLCGo/C6pjsZF7/+fWRs3ToLPa/ciQBgVRXBClGLGqtdaqb5ziZaWFB8HuAPyU7miSZg0wNSbJyxtrodrH3SMvyH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l1TkQH5D; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777546951; c=relaxed/simple;
+	bh=PsHu5iuEUHv/PDOb/SwRJjKuYuK/akECq1Vnh0LYFEQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=XUcZq9jliI+W5+hoB123+l70W8vMCRCYCSFskuhUTIFvnz4w+/Z0Orn6pf/N0m0InqPuXGOCmwqexBcCuD1Qfcs1Wb6u06QkqLnOuJ+n9d9qHFd+xhR5uY6nw04DFK8MEph4iCEdHmY1+F/5iaeKpTURpLoxh0GTnfTZLvq/KbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mnVivxBh; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l1TkQH5D"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBDD4C2BCB3;
-	Thu, 30 Apr 2026 08:49:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777538994;
-	bh=Ig2KLrSxctNzfv91/Ob0md9MNjcSl3mUxpCXDK4oFKo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=l1TkQH5Dn+sUZ3til3wuTYPRDB+JaNiKkdXyEkx0f6Hh6E1yu5YdhowBr0/KzN7Ma
-	 wQhxWNlRXB3zuGY8wsxlKj46yayeWaKAWRGSEnioEwjzfGYXbqYzdmjCnPI8Aulc7R
-	 TYRT1Ojwpx5QEUy4kZu9xjnyn5Jhfx/HsDENJ1o4zh2IPTJtQnif/8+Gk+MFJoEkGi
-	 DPAnWRnDuWGOk7dFK1khzNA0TnU+eDrwWnMQIRrPo/vjLEO23FKCOnGqhWQP8mos0i
-	 tb0PRSYeYiCAtufnBPi4eMA5i+h1h9E2u26Rbs25sS1u7iN3igzkbGi9SoZDWZ4Jow
-	 XbeyHY5usCwVQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 02FFF380A95A;
-	Thu, 30 Apr 2026 08:49:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mnVivxBh"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1777546946;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pG03wJvkCGREBkjpwEJLodaP0qZR8DF4vyX+48wV+CM=;
+	b=mnVivxBhvaGkiY6ENbCTcQ0f7rPdK5liS/nybPhsKTARU3o1cNWmeeTVTPjoU8ayi04FxL
+	Kx7A8qp+z/TXpFLBirl8tEYx2T9dXbfCWiDE/fGWG0BfbpHNWeevKHgPuMXPxUTlpydS4D
+	An0odNKLHY8avW44aMQOM507WKRnuyI=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Thorsten Blum <thorsten.blum@linux.dev>
+Subject: [PATCH 2/4] hwrng: core - use bool for wait parameter in rng_get_data
+Date: Thu, 30 Apr 2026 13:00:49 +0200
+Message-ID: <20260430110047.248825-6-thorsten.blum@linux.dev>
+In-Reply-To: <20260430110047.248825-5-thorsten.blum@linux.dev>
+References: <20260430110047.248825-5-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1094; i=thorsten.blum@linux.dev; h=from:subject; bh=PsHu5iuEUHv/PDOb/SwRJjKuYuK/akECq1Vnh0LYFEQ=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDJmfzeLXHr7wyG1i5Hzx+QIV27Rrf947durEXXHGyuQ/U +6sj5OM7yhlYRDjYpAVU2R5MOvHDN/SmspNJhE7YeawMoEMYeDiFICJ9HIyMuxJZHrmojbrk23n LoGPRYfEX0o7p987kz0l3n6NW/an9UIM/0MN5VbpZR0IX25+xsr5F5+E3+u1K+e93702WJh53/G 1G3kB
+X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/5] Reimplement TCP-AO using crypto library
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <177753894880.2417501.17222225356856785813.git-patchwork-notify@kernel.org>
-Date: Thu, 30 Apr 2026 08:49:08 +0000
-References: <20260427172727.9310-1-ebiggers@kernel.org>
-In-Reply-To: <20260427172727.9310-1-ebiggers@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, edumazet@google.com, ncardwell@google.com,
- kuniyu@google.com, davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, ardb@kernel.org, Jason@zx2c4.com,
- herbert@gondor.apana.org.au, 0x7f454c46@gmail.com
+X-Migadu-Flow: FLOW_OUT
 
-Hello:
+The 'wait' parameter in rng_get_data() is a boolean flag - use bool
+instead of int to better reflect its actual type.
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+ drivers/char/hw_random/core.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-On Mon, 27 Apr 2026 10:27:22 -0700 you wrote:
-> This series can also be retrieved from:
-> 
->     git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tcp-ao-v2
-> 
-> This series is targeting net-next for 7.2.  To make this series
-> self-contained in the networking code, I dropped the patches that remove
-> support for transformation cloning from the crypto API, which is a
-> further negative 275-line cleanup and optimization this series enables.
-> That will be done as a follow-up, either through the crypto tree for
-> 7.3, or still through net-next for 7.2 at maintainer preference.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v2,1/5] net/tcp-ao: Drop support for most non-RFC-specified algorithms
-    https://git.kernel.org/netdev/net-next/c/5eb0cfedb258
-  - [net-next,v2,2/5] net/tcp-ao: Use crypto library API instead of crypto_ahash
-    https://git.kernel.org/netdev/net-next/c/068f5a009556
-  - [net-next,v2,3/5] net/tcp-ao: Use stack-allocated MAC and traffic_key buffers
-    https://git.kernel.org/netdev/net-next/c/48168799896c
-  - [net-next,v2,4/5] net/tcp-ao: Return void from functions that can no longer fail
-    https://git.kernel.org/netdev/net-next/c/8e4f61e43163
-  - [net-next,v2,5/5] net/tcp: Remove tcp_sigpool
-    https://git.kernel.org/netdev/net-next/c/4baf2415992e
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index 68add1a97f31..905a63525831 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -211,7 +211,7 @@ static int rng_dev_open(struct inode *inode, struct file *filp)
+ }
+ 
+ static inline int rng_get_data(struct hwrng *rng, u8 *buffer, size_t size,
+-			int wait) {
++			bool wait) {
+ 	int present;
+ 
+ 	BUG_ON(!mutex_is_locked(&reading_mutex));
+@@ -534,8 +534,7 @@ static int hwrng_fillfn(void *unused)
+ 		}
+ 
+ 		mutex_lock(&reading_mutex);
+-		rc = rng_get_data(rng, rng_fillbuf,
+-				  rng_buffer_size(), 1);
++		rc = rng_get_data(rng, rng_fillbuf, rng_buffer_size(), true);
+ 		if (current_quality != rng->quality)
+ 			rng->quality = current_quality; /* obsolete */
+ 		quality = rng->quality;
