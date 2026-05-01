@@ -1,97 +1,97 @@
-Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
+Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8410840B6DC
-	for <linux-crypto@vger.kernel.org>; Fri,  1 May 2026 18:57:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B1AE35E940
+	for <linux-crypto@vger.kernel.org>; Fri,  1 May 2026 19:04:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.41
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777661870; cv=pass; b=H7hDDeAYYOOvhSi0HgVtVlYrdMG3cjaf3+4JorHaJ8tnSDtyNLO6KGULpc2L1WEL3dTjtbifVrOTskzlmFI/fC2hmpbiBHnzn4l2W3TaeTH2FtmoSOj37yEKsMUbfahZAS13uQ3lBQBdoYybz/k7t8JoVYABmpXiRz4elKna/x0=
+	t=1777662290; cv=pass; b=Z5I54PSmlPWdozE5Ur5Hve8bWYjgWyAc7po4OM5VsaNeLjh0Ez5Ds/SYFM6u3BQ3T5SKTBJHaUd/XmYX/T9b+7jf9hl2A4lxyaULvCmBKB0l0xaI/pVvwjs2aEyNBAC6F7iFmWn/X5QeB+KoDqCIwuR1CMKrpaamrh3z9niR+as=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777661870; c=relaxed/simple;
-	bh=Koi/x6eiTTEG0emLXyoyoxitRX8hdub1AnzYnT/nULQ=;
+	s=arc-20240116; t=1777662290; c=relaxed/simple;
+	bh=bebv1clrkuxRBvZuRjd20Nlr/TDaUWZ2u175JUHDsR4=;
 	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=K+nnoIOT4q3WCI0M4txh0clQRooYnfKsada9SwWiJA99k5YR09ahYo+V/d93TiHIlzXCSTaNUP+dsnoqr06tKDI+nXLphqCBS2P+kaAcqmpRB1gVb4xYZ30DgvpmNZHKDUBbXeDpwZwAsypovEP8Sesk1RJwWlqlCIsG9yOA1e0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OPQHP95r; arc=pass smtp.client-ip=209.85.222.42
+	 To:Cc:Content-Type; b=Nd6yM9Mv42/ol12axeIFdWDQZUbwnTSgFXlQjvV4EDFzvb2lmfP0jC6N2kHhDcojNCdGOdXPFNlNmQZBg9/syTazKMHW0yVlYSwp19YLSSHBxURkUMjUPia1YL4Ys2pWFyLyqi/Voxa3VrvnKFH6VucX0gIoPZZ1yUPisbAOV60=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J/JgOXN8; arc=pass smtp.client-ip=209.85.222.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OPQHP95r"
-Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-95ce0cf2d4bso722395241.0
-        for <linux-crypto@vger.kernel.org>; Fri, 01 May 2026 11:57:48 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1777661867; cv=none;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J/JgOXN8"
+Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-94de68feaf4so1311595241.0
+        for <linux-crypto@vger.kernel.org>; Fri, 01 May 2026 12:04:47 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777662286; cv=none;
         d=google.com; s=arc-20240605;
-        b=O+GTmW2ZnxelD6ZQb51WFz+sa3hnvFu89Vz7DMMntQXbp5eSS4IGE9i3OWBrLyOR24
-         08RqvR2szn5iLbgfISBLXF6cN93RWdiIr0gjAd8tDGKL1XX6/Dd6gekmafHiD4m1EuKv
-         SNyfEaeGkEMGH8wjdMSTiLMrM9b9IDdtb5T/2fsF39BWgTnH/eorapDtxQKTWyNTaMPi
-         ke9Ap1dpmlHG+lfzrRb46dJVKQzMZxDWzBZ4aBvmD6JUsrHGUnSVHDmFvtqTt0aikasZ
-         6yR7QTAjfIquE09NEfVnw0HFPTKVOwJB0u2o4wuP/L0uERNeigFyXwo6b9ivmsyfNCKZ
-         6HSw==
+        b=c3AlQ4ljJeP9Sr9D/m+an+stfFXvjj9at07w62BD3+561HQrRsx6Nuao6lssWk9AKa
+         GlJvywRSr4NvCDy+0cRmp8Y4R8igNRldZ15AZhJJjfx8eh0vWO0+H+YqIvUa6KP1D55v
+         8gByi+YEr3eLzwx98LkXMtIy0IQkHEH+tgLch9kAOzVyVMCLtcoRwnYt/euSRSv+Hyt1
+         o/ww4N+jDuiG8ZkfwsehHQ4A0DBq26+t4ogUnzQEleWAMKFpbyoWdna/3g6s2UOJ7Rjs
+         68qPNvlMiKAKc07y55xBpN6ELvvK7gsxKxM87BfHZztF7xRpZ4y2/L2RdgOpYsadbm37
+         OiTA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
          :from:dkim-signature;
-        bh=2wORHHkll15fgrTiDIYC4jYGmLh8OaJoz0awypHbtgE=;
-        fh=kebaDh5JZWtO57tlSHRbweYk62Jnk5YprArNLG48fLA=;
-        b=Ox0/dlcqCs5ujmAPnXTXJsXEI1pqkj4yB/N8D8sywxpC2ElGoD27+Tehwzz/cy4Lpp
-         ALtaTDZjXcvEujh1UMGPOWmuFYuZcg1gBGG9ry21YqVOuOHwn3IceBEh2ZMOfvm07WIf
-         vGP0EjunfbLTwQUig53+aDIVVru5fW7u4yMMj7lSnaYNdSWCBPfeIKNrTQlAtA2itT6p
-         YL4vQnACxWCDhJwijT6M2kufVHP81Jo1wAjO4IeciydcdbZmreXbRJ6awkTfuDv6Eb8w
-         TPj4PUHjpLCPfRTAyI+VzfOarAKlTeNO1oNBkZrX8u2gr5uFCIQQpDewtNOXMRd08UwA
-         7QFQ==;
+        bh=bebv1clrkuxRBvZuRjd20Nlr/TDaUWZ2u175JUHDsR4=;
+        fh=sVs2ZGmRNNbt5qF1DCJxIhWYs0WD/bl+8J7d2W6IYnA=;
+        b=TxImJIKyro0+9rDlYh16K3CQeOT1EcQxIwLTffDdg/xFbErunoXfIlYVh/wF/N69p3
+         DfP7Y7CGtnd6j+l0NBHU3gGXO0ZCgeKRW2f/PfOg2j1uBu4nU/6Fi2BJNyDu5yIqt5y3
+         rXx2iB+E1ssFXBK5JveSzwiRI2LLsTV/28xQ+fajPqVEZTFf8fuwuUMzT41Km2aL1794
+         61Q6MaRii8uZWRYDMtkCQ1fv5p7Uw8hhBrVveeBGt9O5UKLTKCCoRgySfq6smaJ5BTwX
+         j0QoxTD1IGK+d/ZT2KN/K/cAcltXAaY7YNAcaeUP+u8K6laj4LPPR4Kdnm9v2C6vdjOc
+         W3vw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1777661867; x=1778266667; darn=vger.kernel.org;
+        d=google.com; s=20251104; t=1777662286; x=1778267086; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=2wORHHkll15fgrTiDIYC4jYGmLh8OaJoz0awypHbtgE=;
-        b=OPQHP95rBZVAKwrRBlmV/VrHHhcGKVNK1mcUw8kkDXNtZ1dIb1cKv28bYJauXqR3oQ
-         4zLyYoxSZy72wLwklKl4SCmTcxPHf8y1J3KMGivpLACIOVNn3SsVGjEdksHVjGO0ffId
-         MmiXhCiZnQd7F/wrLESOnW09vdC5ubVhutLJghl6ovHY0LDjW9i6/QQtA7FbXP4QAqX+
-         qWWcBCcSMdt9xVRYY043ufTqcbt4IoFEVmJaLcWFYxItHcOnykZwYzkLBvO0QFel2/Yt
-         1DTk49l+YeJcUYhvFiNg+WQCtnCKPsrNoMnrBpKnvKODCE5GmI2U8bZls5oRjOp4eQpp
-         5dMg==
+        bh=bebv1clrkuxRBvZuRjd20Nlr/TDaUWZ2u175JUHDsR4=;
+        b=J/JgOXN88MlABpE97FGlOeUMQ+TdHEvjppvYJWV5S1sir30FGdOmJU27djaS2KaH7U
+         sTeop2sUDRwYVFi/hUaXk9Yg9bkxl63SE7++r/96IzOTUOEIa4gpa07GWkHUwoytERSj
+         m/qo+HvZt9HCZSmU/LLB3sb0Qi0pVTezhmSyQcNgwBXmqVaWtR3g0MgCzK4Wek/q7MqI
+         jwK9ROF8bF/WlT4uEUaubGn9CV0aLgN+k7nRXEpO5NbgcB12lHVAD4YnVUL86PZurl9y
+         X99YkWS9fFD0yjaGMQPnZOdDRzxCCCrvxesq99n/FYfgAkG/0+aRM4Dz8020v/ZED460
+         LEmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777661867; x=1778266667;
+        d=1e100.net; s=20251104; t=1777662286; x=1778267086;
         h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
          :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=2wORHHkll15fgrTiDIYC4jYGmLh8OaJoz0awypHbtgE=;
-        b=PC9fC0dgzuZNPIrER/CT6wicrF/2rognKvtiCiieOji2jRAcZ6kZiMt7BgkrmSN2Lv
-         MXqYfb5h47kP9lnq2637mPHD90weef93ly4s8u6a5TnW35QoIeMM/viV10JNHr/TKGzL
-         f3Aa2CHR9E+XN0c0dY7z7rhj1CaZRLwgaPODAdxzcEZFwzCWO24QRmUOmMIoQRxm6hJk
-         TVOGMDghmsKJvp4jLdhH/TQx0TyX3+0yrJ2aHN8sCyJ0MJB80awu2p2AjYHmmAk86bVo
-         sIDzwbwAHdPdKVcKyz4qO3y47VjV1bc6St7RNQVIiuET7LXnsYhVQSRFRJ4eiIBfDiUg
-         IQNg==
-X-Forwarded-Encrypted: i=1; AFNElJ+yX/NhGMzcPVYIrHJI+VvaHk54juXGsBXvoQu2uJhKM1fKo+86Ymwel9mqfFNg/48zBMZ89krN0J2y7hA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLNX2at9DdTpxtFZCYjBLha54u8VJG+tkpc2X+7JFbf7HPbxnd
-	aXRUs7sHZKmiRyXNKApeVfDE3KCkqR/z6pGD+xfWwkJhJP1RZw+32xM7PsB/MLOu0w2eixVOz7q
-	X2i5hzrbfjHIfs+dpQbeinQt3YJv4F7fYhFqU4XtH
-X-Gm-Gg: AeBDieucSqTuiGniSMqS7L1h3iaERE7fYQ+Es+YswgEaBHvn4xVGlUFk0HK7IZ7Y5lK
-	99esar1MAQzXVGorj8CJ3SJ7paeAhQCwYhG6IpVHCHc4AvpzaUMKmpcVHjHfOjA0PqxZ2fbyaAV
-	93clPb1z+e5bOy0/UPtKo8TCsZsKbXHww267rbI3IJpDp+7DhHH0W9mHgBIhVqEwR5ioFGuLZ5n
-	v8OovklWPLjZCZUQNvVy/74JDw4wR9mvYyromi7wTPmkjz4R+E7uSw/8HcgtXTh09fMxwGm7kVQ
-	bg37PRNH+kXtnsSl242E2YwqevBCcHlKIyjhncVAQWTr0VHxCji9EmPkLMfQnEtjTrh15vWRmi9
-	/ywT/zDzM/mpk7YuReWL/abZwWg==
-X-Received: by 2002:a05:6102:c8e:b0:608:cdd9:2bcd with SMTP id
- ada2fe7eead31-62afef0f7e0mr3530809137.15.1777661866644; Fri, 01 May 2026
- 11:57:46 -0700 (PDT)
+        bh=bebv1clrkuxRBvZuRjd20Nlr/TDaUWZ2u175JUHDsR4=;
+        b=mQZuAfzysKGHDBO+XxIflmOT7j6lvOE2SdDy/yII6fUBHZiJ2MbQPYpRVmLG6HTW+L
+         NoFkKaFGMvUUpEDCDtVyzc2kxK/rpKpsy753MXIvEHqVKTG/TM6rbUtPZuPeq2k4OPic
+         nZAE3alI+G2YSJEmy4wGPhrSYQgiE1VqKZZiS8XTSEUHDsTdtT+kemz9OlZ9NWrfdEVt
+         sXAAI5NCt6jGKSkAqkAu2Pq8yG8GmG+YJ9WORkuUuY3RkB74sC8aRFpodAXMb/XpXTPM
+         RY606nYQ9HKtVX4ULPa56Nr3R/1xL/jpJ/RK5Owlp8L6pSjOhNjlXIkRZ1VZjhVyrBg7
+         nqtg==
+X-Forwarded-Encrypted: i=1; AFNElJ9cwNx2IICG7dRHDvdSTAyPUV0d9bRvI9+XBPtVe8Tf/eHnAIlRnDa4slwafr4Gpn47AfZZwhE3Db5slm0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlezRp5FVmlv0Bxj648We5OCTjIB/K31zsI0abmP7x7yl5GHjH
+	9m3mIu4Ew65SSxBIrWRCz+AA+7AXTdUEXpriMCPWZzOkVbKTe1W1Ek+igakZAarRSNfSUC0yD0N
+	VCntzAWorvee0AKqi28mlt9Han07mQnYkZNSJk3h2
+X-Gm-Gg: AeBDietGtXJmPnqMJyGFD1pVt+Y4x3KjddgMhRwu8Eaij6gAK1dcUceFv10aZmUx2C5
+	e6GyMx27lwa2O/ulWBD2uM6yfbdr6h9nnDf6HzLJ+pHUIsSRWA8oRX//Rjz/K5ChxlX/YxTRWKA
+	wnjHs1nLeX5BYUhw/yo751SPp6xHXEg6y74GmljyvwLJHq03qIaWL+iPMGsVDIVx3t18usdU/15
+	l4LhT1fYqffMDAzSfSvQCnauq1pqH/PEIugmPao0gT28z4SZ5ZnofhrypcinP7b5g3hqW3Ct30X
+	U9uvCi8P+Zp4MaAFbV9/KsOAOfJWIuRCCZRFqD6z+RACpZh9EjzGEi0V3AzPmdF8sMFuaUtp3DR
+	FSADaVlk/lKjk348=
+X-Received: by 2002:a05:6102:808d:b0:618:3503:5659 with SMTP id
+ ada2fe7eead31-62d86a1cf6amr417508137.14.1777662286010; Fri, 01 May 2026
+ 12:04:46 -0700 (PDT)
 Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Fri, 1 May 2026 11:57:46 -0700
+ HTTPREST; Fri, 1 May 2026 12:04:45 -0700
 Received: from 176938342045 named unknown by gmailapi.google.com with
- HTTPREST; Fri, 1 May 2026 11:57:45 -0700
+ HTTPREST; Fri, 1 May 2026 12:04:45 -0700
 From: Ackerley Tng <ackerleytng@google.com>
-In-Reply-To: <ad924b3fbe4154466195e0668604afe8e0b825ca.1775874970.git.ashish.kalra@amd.com>
-References: <cover.1775874970.git.ashish.kalra@amd.com> <ad924b3fbe4154466195e0668604afe8e0b825ca.1775874970.git.ashish.kalra@amd.com>
+In-Reply-To: <112cc1213834de1ac97c71314a565ba7dc4af30b.1775874970.git.ashish.kalra@amd.com>
+References: <cover.1775874970.git.ashish.kalra@amd.com> <112cc1213834de1ac97c71314a565ba7dc4af30b.1775874970.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Fri, 1 May 2026 11:57:45 -0700
-X-Gm-Features: AVHnY4IvsBfXLUkyXbLpr28PPeYHc_4XXhzxQ2PbvYLXjabiP4YS4Oqwx2rdAxI
-Message-ID: <CAEvNRgFRJNRyUf3T9TTWr9-xt76E=Z28vSKsdZ46QK3UAEd8dA@mail.gmail.com>
-Subject: Re: [PATCH v4 4/7] x86/sev: Add support to perform RMP optimizations asynchronously
+Date: Fri, 1 May 2026 12:04:45 -0700
+X-Gm-Features: AVHnY4JWJ3U3t-qQAMoWKtwBg2sRUlPP1ctl-P2SiKHJIBgo7x_W8ikUl9ZrtSs
+Message-ID: <CAEvNRgFVB_-i86RTanqLEeJDHujRXnKo6OnQXduPCwKz8So_kQ@mail.gmail.com>
+Subject: Re: [PATCH v4 5/7] x86/sev: Add interface to re-enable RMP optimizations.
 To: Ashish Kalra <Ashish.Kalra@amd.com>, tglx@kernel.org, mingo@redhat.com, bp@alien8.de, 
 	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, seanjc@google.com, 
 	peterz@infradead.org, thomas.lendacky@amd.com, herbert@gondor.apana.org.au, 
@@ -109,143 +109,6 @@ Ashish Kalra <Ashish.Kalra@amd.com> writes:
 
 >
 > [...snip...]
->
-> +/*
-> + * 'val' is a system physical address.
-> + */
-> +static void rmpopt_smp(void *val)
-> +{
-> +	u64 rax = ALIGN_DOWN((u64)val, SZ_1G);
-> +	u64 rcx = RMPOPT_FUNC_VERIFY_AND_REPORT_STATUS;
-> +
-> +	__rmpopt(rax, rcx);
-> +}
-> +
-> +static void rmpopt(u64 pa)
-> +{
-> +	u64 rax = ALIGN_DOWN(pa, SZ_1G);
-> +	u64 rcx = RMPOPT_FUNC_VERIFY_AND_REPORT_STATUS;
-> +
-> +	__rmpopt(rax, rcx);
-> +}
-> +
-
-Could rmpopt_smp() call rmpopt() to remove duplicate code?
-
-> +/*
-> + * RMPOPT optimizations skip RMP checks at 1GB granularity if this
-> + * range of memory does not contain any SNP guest memory.
-> + */
-> +static void rmpopt_work_handler(struct work_struct *work)
-> +{
-> +	bool current_cpu_cleared = false;
-> +	phys_addr_t pa;
-> +
-> +	pr_info("Attempt RMP optimizations on physical address range @1GB alignment [0x%016llx - 0x%016llx]\n",
-> +		rmpopt_pa_start, rmpopt_pa_end);
-> +
-> +	/*
-> +	 * RMPOPT scans the RMP table, stores the result of the scan in the
-> +	 * reserved processor memory. The RMP scan is the most expensive
-> +	 * part. If a second RMPOPT occurs, it can skip the expensive scan
-> +	 * if they can see a cached result in the reserved processor memory.
-> +	 *
-> +	 * Do RMPOPT on one CPU alone. Then, follow that up with RMPOPT
-> +	 * on every other primary thread. This potentially allows the
-> +	 * followers to use the "cached" scan results to avoid repeating
-> +	 * full scans.
-
-Out of curiosity, how does this caching work? Is it possible to do it
-once and then synchronize the cache to the other CPUs?
-
-> +	 */
-> +
-> +	if (cpumask_test_cpu(smp_processor_id(), &rmpopt_cpumask)) {
-> +		cpumask_clear_cpu(smp_processor_id(), &rmpopt_cpumask);
-> +		current_cpu_cleared = true;
-> +	}
-> +
-> +	/* current CPU */
-> +	for (pa = rmpopt_pa_start; pa < rmpopt_pa_end; pa += SZ_1G)
-> +		rmpopt(pa);
-> +
-> +	for (pa = rmpopt_pa_start; pa < rmpopt_pa_end; pa += SZ_1G) {
-> +		on_each_cpu_mask(&rmpopt_cpumask, rmpopt_smp,
-> +				 (void *)pa, true);
-> +
-> +		 /* Give a chance for other threads to run */
-> +		cond_resched();
-> +
-> +	}
-> +
-> +	if (current_cpu_cleared)
-> +		cpumask_set_cpu(smp_processor_id(), &rmpopt_cpumask);
-
-Sashiko [1] pointed this out: after cond_resched(), this code might be
-on a different cpu so smp_processor_id() would return a different cpu,
-that would mess up the global cpumask.
-
-Perhaps it's better to store the id on a stack? Or actually, what if we
-give on_each_cpu_mask a copy of rmpopt_cpumask with the current cpu
-unset?
-
-[1] https://sashiko.dev/#/patchset/cover.1775874970.git.ashish.kalra%40amd.com
-
-> +}
-> +
->  void snp_setup_rmpopt(void)
->  {
->  	u64 rmpopt_base;
-> @@ -568,9 +656,20 @@ void snp_setup_rmpopt(void)
->  	if (!cpu_feature_enabled(X86_FEATURE_RMPOPT))
->  		return;
->
-> +	/*
-> +	 * Create an RMPOPT-specific workqueue to avoid scheduling
-> +	 * RMPOPT workitem on the global system workqueue.
-> +	 */
-> +	rmpopt_wq = alloc_workqueue("rmpopt_wq", WQ_UNBOUND, 1);
-> +	if (!rmpopt_wq) {
-> +		setup_clear_cpu_cap(X86_FEATURE_RMPOPT);
-> +		return;
-> +	}
-> +
->  	/*
->  	 * RMPOPT_BASE MSR is per-core, so only one thread per core needs to
-> -	 * setup RMPOPT_BASE MSR.
-> +	 * setup RMPOPT_BASE MSR. Additionally only one thread per core needs
-> +	 * to issue the RMPOPT instruction.
->  	 */
->
->  	for_each_online_cpu(cpu) {
-> @@ -590,6 +689,20 @@ void snp_setup_rmpopt(void)
->  	 * up to 2 TB of system RAM on all CPUs.
->  	 */
->  	wrmsrq_on_cpus(&rmpopt_cpumask, MSR_AMD64_RMPOPT_BASE, rmpopt_base);
-> +
-> +	INIT_DELAYED_WORK(&rmpopt_delayed_work, rmpopt_work_handler);
-> +
-> +	rmpopt_pa_end = ALIGN(PFN_PHYS(max_pfn), SZ_1G);
-> +
-> +	/* Limit memory scanning to the first 2 TB of RAM */
-
-I think this is better phrased as "limit memory scanning to 2TB",
-
-> +	if ((rmpopt_pa_end - rmpopt_pa_start) > SZ_2T)
-> +		rmpopt_pa_end = rmpopt_pa_start + SZ_2T;
-
-and then this could be
-
-    rmpopt_pa_end = min(rmpopt_pa_end, rmpopt_pa_start + SZ_2T);
-
-> +
-> +	/*
-> +	 * Once all per-CPU RMPOPT tables have been configured, enable RMPOPT
-> +	 * optimizations on all physical memory.
-> +	 */
-> +	queue_delayed_work(rmpopt_wq, &rmpopt_delayed_work, 0);
->  }
->  EXPORT_SYMBOL_FOR_MODULES(snp_setup_rmpopt, "ccp");
 >
 
 Reviewed-by: Ackerley Tng <ackerleytng@google.com>
