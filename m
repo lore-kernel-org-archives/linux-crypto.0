@@ -1,182 +1,55 @@
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27BA030F958
-	for <linux-crypto@vger.kernel.org>; Fri,  1 May 2026 05:37:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3203F2C21C7;
+	Fri,  1 May 2026 07:21:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777613852; cv=none; b=PnrfTAmJmumbo5p/1FWAF6Uk0icXbJzsQUMlUbbNuOjgfwEy6MJXchIK/p6pbh0PqE1yuOguSxhYzYPS6DI0024yXbQY7O1B3MjxVCovMzg9yNdnFy6D+Hzj85/SpiRhxretlOH+ELIYJdtBKRfZoS2FxGsD2Fk1ThssRHeD8VY=
+	t=1777620111; cv=none; b=bUHFhuTqkU/NM0Fm13U5mYGmbtSH0daR4j3c6hwjjs5WyAqTIknYsJMn55yPIynOrQChzEnV6g1ATgOSUXegL4gBt+y4LsmmgIbN5s5Bo3MGgeNOYvc4u2U9KJ7K7RHdqphTN6fjD7THGCZJEVFsDrQwcP/lYclRZnL4dafVZu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777613852; c=relaxed/simple;
-	bh=WKPABIsseylb3RUsTw0xvE9Pmu+sljz/nKUYmu18KhY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gO5sZlBMw+M6xpes8sacJd8BEqKknHt9ZWD7GWrsoxp8Anj4alyFuDVuA5tS8oewOhbt3xSYq7O5y3h0DrX9X4/o3MGQLNEb7KXMYYRoqMfGJn5BxlI7QWKdxewcasoxYP4srZgrJfgjo1cHiMCc+piF67ZQsU6F0iDpmhXG5WM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.win; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.win
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-67b32c695efso3328323a12.1
-        for <linux-crypto@vger.kernel.org>; Thu, 30 Apr 2026 22:37:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777613849; x=1778218649;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=dXMXzeJoapUPYGltuEcVDIPcO3Wjov50Tx6Z9qKY0P4=;
-        b=HKfOS4Jh8bjgcHi/xDNRDIlP+TWdks64z0bslAdfhfyXKjQc/CqY/PNZ57mMF6jjMI
-         pemJgNXafZ/+V/o0cpvMjZHfj5P5otWmr8M6z3j0mchPai1jjY2emLbeQ4UNV9IlBDNB
-         tqyrDb20Q7IWsuV1lwCFNq9ocUhXSoXgFWxkdNo930ymOi8k4/BEySkbahlZcJSnSLPN
-         BNlAYSLkdwYRJzTWrVO0n+571RlKNelA7C+D7Nz4OqcErRRW8pbqFLpzW/dIt5kwE0Hr
-         O50Ct+UG2jOApHF+ZO232Ws/EJ8iyP18pbxieOBQY7UsyS0qQu5enYzoyEqbVQKgFMnR
-         nLKg==
-X-Forwarded-Encrypted: i=1; AFNElJ/3f3k49eRk69/FQpZW50Y4rxGWENNH9ktaCn3akFxO/KrvBDFfaKIOaYK3XCVnX7awAvN8At+zw7gPehI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwzMw610FUwd956UBGttIG7nllpfs0iGW8/o6UBdfjexlkdqiNi
-	seQySYFmU24icWvrUiQv8qjhC2DAxXXjATFF1vdYpiWpwc/YmrACZU8AOa2lJBLdLHo=
-X-Gm-Gg: AeBDietH1wqJTkFdKgCNIIIA+edS8cKQrUaaT0nm8eT9HJv7jIV6Iz8QgWsoTHEWDBI
-	kzcuKbRHsouSsh2gcfupXqcc6zI3qsJMlmP9aK1F6XtrFFpMBw3weu16zROBJLlB7Xz1rJ4Uw4Y
-	d/J0jMMzQ8PE2/jN8KwdD6IvH+V94qraQcs1gDKSgZuGAVlCrW67JtV33DFTf3MTMovxtzfyKKc
-	wV8cxj/FsgRYe/PvBbSrCKE77hw3A5xZ/gpVq+p5tWcYWa8kJy+06hVWtQ9m16H/8AQg1fSV7Qh
-	zkTc6Z6RixaJ72UzfRCJzi1bSjyZgci3eHdSziPc2sEkk7/DUP9YcOuT+/ZcrcfYUD48Sflrg5F
-	OlSfnjysNWfCT6QUcpPkgj5+fcvTAfTyt8Lm3GefsnaILvRBIS04Xpcrvuwl+tYwvjl9vVBYjk2
-	4be+p3j0SzZbPviqcdMQ/i5Xdb9hK27UzHljwgMOSUNAWsZ/OP00CM1by5uAw32j3+
-X-Received: by 2002:a17:907:a088:b0:bba:6a98:c860 with SMTP id a640c23a62f3a-bbb98476c02mr319465766b.25.1777613849255;
-        Thu, 30 Apr 2026 22:37:29 -0700 (PDT)
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com. [209.85.208.50])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bbe6a64dabbsm73334766b.25.2026.04.30.22.37.28
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Apr 2026 22:37:28 -0700 (PDT)
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-67b6a6bd7b8so1507863a12.0
-        for <linux-crypto@vger.kernel.org>; Thu, 30 Apr 2026 22:37:28 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ8c/AZG0Ua3etx6ihIPzJDZTtXg0i1Doq8ZPwMRLPemecTK7Fu8yxchYbMl1oqS9EK0hUPix94cMlAaP18=@vger.kernel.org
-X-Received: by 2002:a05:6402:440a:b0:67b:7e67:7f5f with SMTP id
- 4fb4d7f45d1cf-67b7e6780f9mr1738106a12.9.1777613848314; Thu, 30 Apr 2026
- 22:37:28 -0700 (PDT)
+	s=arc-20240116; t=1777620111; c=relaxed/simple;
+	bh=4nsfTlE0H9cgOBtEYMh2mWEell9rpum5vewrFVLyZuA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hqk7k1S60ZTIqVmBAlOtLDAcbuNVUJUIAGOm0aTamQNUNYygntpmwDgOvfr3SMRiW6901Wmu3HTs0k6GInTuxTOWCZniTve3B891IhERBAbETOaCxvdbk5jbD8WvUkqrSmUi9OqB3VOyBJtO8pL/nz5aCst72cEB6wfauL+yXS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=hqU4Uvi3; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="hqU4Uvi3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA5C6C2BCB7;
+	Fri,  1 May 2026 07:21:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1777620111;
+	bh=4nsfTlE0H9cgOBtEYMh2mWEell9rpum5vewrFVLyZuA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hqU4Uvi3gLDjGq1w3FIesVOPvrT2RNX2VeG2XzfW4noTdGp+HAHJF4i1mlPVMyLEM
+	 P6dPfsshP7UDH0UCyBNhmKTSK6QULSX6sGwifynFl6EK/yIvL0P29M/Epmv71G3R4a
+	 2JLErsPdO8X+Bgc7r5OGxDSJZYc1QQR7L21Wch1Y=
+Date: Fri, 1 May 2026 09:21:48 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: stable@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: A couple more AF_ALG fixes to cherry-pick
+Message-ID: <2026050142-unknown-mushroom-809f@gregkh>
+References: <20260430222959.GB2275@sol>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260429181629.110802-2-bestswngs@gmail.com>
-In-Reply-To: <20260429181629.110802-2-bestswngs@gmail.com>
-From: Ignat Korchagin <ignat@linux.win>
-Date: Fri, 1 May 2026 06:37:16 +0100
-X-Gmail-Original-Message-ID: <CAOs+rJUiup_B1ve7UztJH4crzE+98ZObRc3jLRsqkhLekpDmxA@mail.gmail.com>
-X-Gm-Features: AVHnY4KFOllNfFhVUkq7YkiLdAqrH2_2sLf6kLFO07pHIa-YECyWylPj48Aai_M
-Message-ID: <CAOs+rJUiup_B1ve7UztJH4crzE+98ZObRc3jLRsqkhLekpDmxA@mail.gmail.com>
-Subject: Re: [PATCH] asymmetric_keys: check asymmetric_key_ids() for NULL
- before dereference
-To: Weiming Shi <bestswngs@gmail.com>
-Cc: David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Andrew Zaborowski <andrew.zaborowski@intel.com>, 
-	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	Xiang Mei <xmei5@asu.edu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260430222959.GB2275@sol>
 
-Hi,
+On Thu, Apr 30, 2026 at 03:29:59PM -0700, Eric Biggers wrote:
+> Please cherry-pick 5aa58c3a572b3e3 ("crypto: algif_aead - snapshot IV
+> for async AEAD requests") to 6.18.  The earlier branches have this now,
+> but it's missing on 6.18.
+> 
+> Please cherry-pick 915b692e6cb723a ("crypto: pcrypt - Fix handling of
+> MAY_BACKLOG requests") to all LTS kernels.
+> 
+> Note: these bugs seem to be separate from the "copy.fail" bug.
 
-Thanks for the report.
+All now queued up, thanks!
 
-On Wed, Apr 29, 2026 at 7:17=E2=80=AFPM Weiming Shi <bestswngs@gmail.com> w=
-rote:
->
-> asymmetric_key_ids() returns key->payload.data[asym_key_ids], which can
-> be NULL for keys parsed by the PKCS#8 parser (pkcs8_parser.c explicitly
-> stores NULL in prep->payload.data[asym_key_ids]).
->
-> key_or_keyring_common() in restrict.c and find_asymmetric_key() in
-> asymmetric_type.c both dereference this return value without checking
-> for NULL. An unprivileged user can trigger a NULL pointer dereference
-> in key_or_keyring_common() by creating a PKCS#8 key, restricting a
-> keyring with key_or_keyring:<pkcs8_serial>, and adding an X.509 cert
-> to the restricted keyring. CONFIG_PKCS8_PRIVATE_KEY_PARSER=3Dy is
-
-Could you add a simple bash script for this to the commit message?
-
-> required.
->
->  Oops: general protection fault, probably for non-canonical address 0xdff=
-ffc0000000000
->  KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
->  RIP: 0010:key_or_keyring_common (crypto/asymmetric_keys/restrict.c:205 c=
-rypto/asymmetric_keys/restrict.c:279)
->  Call Trace:
->   <TASK>
->   __key_create_or_update (security/keys/key.c:884)
->   key_create_or_update (security/keys/key.c:1021)
->   __do_sys_add_key (security/keys/keyctl.c:134)
->   do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
->   entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
->   </TASK>
->  Kernel panic - not syncing: Fatal exception
->
-> Add a NULL check in find_asymmetric_key(), mirroring the existing
-> pattern in asymmetric_match_key_ids() and asymmetric_key_describe().
-> In key_or_keyring_common(), skip the trusted key matching when it
-> has no key IDs and fall through to the check_dest path.
->
-> Fixes: 7d30198ee24f ("keys: X.509 public key issuer lookup without AKID")
-> Reported-by: Xiang Mei <xmei5@asu.edu>
-> Signed-off-by: Weiming Shi <bestswngs@gmail.com>
-> ---
->  crypto/asymmetric_keys/asymmetric_type.c | 2 ++
->  crypto/asymmetric_keys/restrict.c        | 9 ++++++---
->  2 files changed, 8 insertions(+), 3 deletions(-)
->
-> diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric=
-_keys/asymmetric_type.c
-> --- a/crypto/asymmetric_keys/asymmetric_type.c
-> +++ b/crypto/asymmetric_keys/asymmetric_type.c
-> @@ -109,6 +109,8 @@ struct key *find_asymmetric_key(struct key *keyring,
->         if (id_0 && id_1) {
->                 const struct asymmetric_key_ids *kids =3D asymmetric_key_=
-ids(key);
->
-> +               if (!kids)
-> +                       goto reject;
->                 if (!kids->id[1]) {
->                         pr_debug("First ID matches, but second is missing=
-\n");
->                         goto reject;
-> diff --git a/crypto/asymmetric_keys/restrict.c b/crypto/asymmetric_keys/r=
-estrict.c
-> --- a/crypto/asymmetric_keys/restrict.c
-> +++ b/crypto/asymmetric_keys/restrict.c
-> @@ -243,10 +243,14 @@ static int key_or_keyring_common(struct key *dest_k=
-eyring,
->                         if (IS_ERR(key))
->                                 key =3D NULL;
->                 } else if (trusted->type =3D=3D &key_type_asymmetric) {
-> +                       const struct asymmetric_key_ids *kids;
->                         const struct asymmetric_key_id **signer_ids;
->
-> -                       signer_ids =3D (const struct asymmetric_key_id **=
-)
-> -                               asymmetric_key_ids(trusted)->id;
-> +                       kids =3D asymmetric_key_ids(trusted);
-> +                       if (!kids)
-> +                               goto skip_trusted;
-> +
-> +                       signer_ids =3D (const struct asymmetric_key_id **=
-)kids->id;
->
->                         /*
->                          * The auth_ids come from the candidate key (the
-> @@ -290,6 +294,7 @@ static int key_or_keyring_common(struct key *dest_key=
-ring,
->                 }
->         }
->
-> +skip_trusted:
->         if (check_dest && !key) {
->                 /* See if the destination has a key that signed this one.=
- */
->                 key =3D find_asymmetric_key(dest_keyring, sig->auth_ids[0=
-],
-> --
-> 2.39.0
->
-
-Ignat
+greg k-h
