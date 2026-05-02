@@ -1,190 +1,230 @@
-Received: from psionic.psi5.com (psionic.psi5.com [185.187.169.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883ED2F362B;
-	Sat,  2 May 2026 08:19:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.187.169.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58A45209F43
+	for <linux-crypto@vger.kernel.org>; Sat,  2 May 2026 08:40:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777709974; cv=none; b=tQuQ0I3aWTibVjpf2CH7J3ZGR0X9or+bJjokJ+6GO/SW/GSRTmngNcwR7hjsOEAkLZc1/Wa0Hbr7TECOUwmXPhEIZVxmJ/wpnj9Z59Cl4R2u9EouT50Zfh5XsXG7EqF2uH6L4YwHvT9jVWsthjH/KxjobIdk3GdwHHPmxTNQ+rg=
+	t=1777711238; cv=none; b=IV+F1Jthb++faTEMLiuFhVVvaL0pzGnsAWjaJ1eV5M5JncithGAFeY2xNkIC3XckHetReb+cd98gFQurGUOPozoB64VnJvlihW9pTrMKvC/Aqc/qorTiR9YZuGhvg5W44144n3favoaj3ePK3qM/1lnECuSHZqtOw42j/7LrEis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777709974; c=relaxed/simple;
-	bh=NTsx/M31hlFH1cwqARJbbg0cfBQG+Jn+hgAhTdlKVZk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y3ZPEbqbmdFWsGq9wwU5ijkPsABzCf6EWHv7S93Pb3OAc0uYXHMV06ZXC8n814HLy8aHBVD9qOQAFUNGyJGS1v/s9V12nDkNYPRbboGw6p2Q9DoR10h96PXqpUSdXFqEx/WE6JevoRLaTyujXUr1RkduuXfIHJrw7eW7lS1FGtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de; spf=pass smtp.mailfrom=hogyros.de; arc=none smtp.client-ip=185.187.169.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hogyros.de
-Received: from [IPV6:2400:2410:b120:f200:9e5c:8eff:fec0:ee40] (unknown [IPv6:2400:2410:b120:f200:9e5c:8eff:fec0:ee40])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by psionic.psi5.com (Postfix) with ESMTPSA id A5F643F51E;
-	Sat,  2 May 2026 10:19:17 +0200 (CEST)
-Message-ID: <9f020da7-97c5-41cc-b0f1-d8aab1bb39ec@hogyros.de>
-Date: Sat, 2 May 2026 17:19:14 +0900
+	s=arc-20240116; t=1777711238; c=relaxed/simple;
+	bh=DNaJGk3nEfqkQ+ZfWCSHOlQwU+F4Bs4+WSTF6/fMIcM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=olYiDsi2N+IsbfUuSvZsMuu26E8t5YfwSc8EOKkAGqx5xMFNuSyHcHXbNxaP62+EVr6j1xMdkpvMKT3LGNjS9sLZKFvhi2/bVZBU1XU81KjBG15bqVkuSvtchLToivhhrUeHeQCciAvKuWS1of+Us+F0fhkugXwKXa/b1cskSEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.win; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.win
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-670ab084a39so4609319a12.3
+        for <linux-crypto@vger.kernel.org>; Sat, 02 May 2026 01:40:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777711235; x=1778316035;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=cJ6hjVJnVMdiF3idaO6wQZ9WKWpqRIj7dzC4FjRmPgg=;
+        b=pKXfaKU1JBPQhg9GlbFBJLjw92VxnelHnXEskF9+vz132Poee6ns4aVNjeeskbcuH3
+         TtnhONrGqr/QGzps7l2dwfAd66c6cERA0lsqrk70juTaybREIFPU4k5eGQCh7/5G5U0g
+         PXxL2VntesSndmClu/rmrdPP6BZ0qEVmK1jDXtANf2ApHtAkYbL9U69rJ7O1Ah1maSdH
+         Ozzokz9MdoXV4RQMSGuLTKOJvEcsg0iIM21VxWSig7PWcvnF2Vwnt4QU/NXwJflgRl28
+         MgJB3vaMrQUmnUaP3ZSrFqrkgxNpC5ytqkAZc57dAiISuQvkjCCMH7t/6MMG3CoqUuPm
+         x7UA==
+X-Forwarded-Encrypted: i=1; AFNElJ/pbOenPpZJprOzXe7ObtSsGUglryYxhXgxONIFoSd4IH3K+m+0tNuc+PZGbPfbqafqCR4k1tgcM6e7H0Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxj/bSBCi098iNJ7pLYLr7EjWW3nbPMFDACcJTezireOTlpAzC6
+	KPxZFaBEp5//mKFUulua6SHosvs4vPJtQ02zs3vIW81L0hT6RBSZh59B7cTFBT5SXZw=
+X-Gm-Gg: AeBDievMmss+8UXGQ/S9s3cO+vmiMIvG0Yjra7tPvMQUzMKbsazdTfSIJE/FerzfxNz
+	q3QVJlHmYBufmSNZnZXoa0tja8zx9pqbFix8qLIAVDEMWOM+MP3MXLpDaOi58oak3CNjpTnJyR/
+	ozo7pJ8kGyy0RfmC3E+wDGo5Iw5A8mEo/GuUPS8KnUVg7WJ8HmcA6Haw8+QtjtQqXAh9yja4n63
+	jAaq168KhGZLwM9Xl78Ke5lVMjaFyEAWQnTEYRx87SF5706G5GwpLxtTIRQytxQjxl/2ekMfWPi
+	mAh3u5FRaeOVrQw5hRQHyN1vP6vkzafLr9I41zmywPhoFrmgkiCN/et6y6lNwxOCy6SQO9ykubY
+	LKLybCIPTon+5XVOhzh9z4fqsun5J8UWiBV6QU8/7Hvn8Njyg0hNY5Z2mgBQDBCqGoKFs+RIklA
+	XnLE2fFLIoBAYDfNYmS2mbhe3bB54nrJahG+nIHS4tz6+hvkXwsW+V5rdI7uLXtgSm9fQFckWfl
+	7k=
+X-Received: by 2002:a05:6402:448f:b0:670:8d21:dcb with SMTP id 4fb4d7f45d1cf-67c1abac537mr739975a12.19.1777711235299;
+        Sat, 02 May 2026 01:40:35 -0700 (PDT)
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com. [209.85.218.46])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-67b85e28ef8sm1547216a12.2.2026.05.02.01.40.33
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 02 May 2026 01:40:34 -0700 (PDT)
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-ba7a1cc0380so427685666b.2
+        for <linux-crypto@vger.kernel.org>; Sat, 02 May 2026 01:40:33 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ9QjFThsrQoWoptFaIlBKUZs/H2PR7TFMYSL1V6wTA01ZfHHjNxm5N1ugjUDPF9r0t74bZb39vpjKRYVGM=@vger.kernel.org
+X-Received: by 2002:a17:907:3d8e:b0:b94:a1d4:ceff with SMTP id
+ a640c23a62f3a-bbffc47ead7mr110221566b.35.1777711233486; Sat, 02 May 2026
+ 01:40:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: AF_ALG hardening
-To: Demi Marie Obenour <demiobenour@gmail.com>,
- Eric Biggers <ebiggers@kernel.org>
-Cc: Jan Schaumann <jschauma@netmeister.org>, iwd@lists.linux.dev,
- Linux kernel mailing list <linux-kernel@vger.kernel.org>,
- linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
-References: <afJorKIje4O6dXbH@netmeister.org>
- <d6111caa-db61-498a-92cb-ea7a0aa0a5e2@ehuk.net> <87se8dgicq.fsf@gentoo.org>
- <afL-QhLfEKqHZqka@eldamar.lan> <20260430071917.GB54208@sol>
- <177abb5d-8ba9-4bb9-8b23-9fbc868ed3cd@gmail.com> <20260501180028.GA2260@sol>
- <19837ef5-e5b6-45f4-8336-3ce07423dfb1@gmail.com>
- <20260501201841.GA2540@quark>
- <c13dd3c5-ddc1-431e-bc7d-2de39c551f8e@gmail.com>
- <20260502033556.GA3872267@google.com>
- <3cc88b2d-fbd6-4e47-b82c-3c685fec0581@gmail.com>
-Content-Language: en-US
-From: Simon Richter <Simon.Richter@hogyros.de>
-In-Reply-To: <3cc88b2d-fbd6-4e47-b82c-3c685fec0581@gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------IAgX6DaXQhDJpK1phOpjNiIQ"
+References: <20260429181629.110802-2-bestswngs@gmail.com> <CAOs+rJUiup_B1ve7UztJH4crzE+98ZObRc3jLRsqkhLekpDmxA@mail.gmail.com>
+ <afRa0lc2A4kHk9at@Air.local>
+In-Reply-To: <afRa0lc2A4kHk9at@Air.local>
+From: Ignat Korchagin <ignat@linux.win>
+Date: Sat, 2 May 2026 09:40:21 +0100
+X-Gmail-Original-Message-ID: <CAOs+rJVbZ2dNiiUSzaeNsYRwxRS=VupDE+VW3zZgwSqcRwaUkA@mail.gmail.com>
+X-Gm-Features: AVHnY4LpgjUs8tmJ0FJ_9C1M8-3xq1XIXM16afDZyqPbnkONeOWebbWGGG3f4Ng
+Message-ID: <CAOs+rJVbZ2dNiiUSzaeNsYRwxRS=VupDE+VW3zZgwSqcRwaUkA@mail.gmail.com>
+Subject: Re: [PATCH] asymmetric_keys: check asymmetric_key_ids() for NULL
+ before dereference
+To: Weiming Shi <bestswngs@gmail.com>
+Cc: g@air.local, David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Andrew Zaborowski <andrew.zaborowski@intel.com>, 
+	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	Xiang Mei <xmei5@asu.edu>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------IAgX6DaXQhDJpK1phOpjNiIQ
-Content-Type: multipart/mixed; boundary="------------4KG0OAh5fKrDahONrZhGK9sd";
- protected-headers="v1"
-From: Simon Richter <Simon.Richter@hogyros.de>
-To: Demi Marie Obenour <demiobenour@gmail.com>,
- Eric Biggers <ebiggers@kernel.org>
-Cc: Jan Schaumann <jschauma@netmeister.org>, iwd@lists.linux.dev,
- Linux kernel mailing list <linux-kernel@vger.kernel.org>,
- linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
-Message-ID: <9f020da7-97c5-41cc-b0f1-d8aab1bb39ec@hogyros.de>
-Subject: Re: AF_ALG hardening
-References: <afJorKIje4O6dXbH@netmeister.org>
- <d6111caa-db61-498a-92cb-ea7a0aa0a5e2@ehuk.net> <87se8dgicq.fsf@gentoo.org>
- <afL-QhLfEKqHZqka@eldamar.lan> <20260430071917.GB54208@sol>
- <177abb5d-8ba9-4bb9-8b23-9fbc868ed3cd@gmail.com> <20260501180028.GA2260@sol>
- <19837ef5-e5b6-45f4-8336-3ce07423dfb1@gmail.com>
- <20260501201841.GA2540@quark>
- <c13dd3c5-ddc1-431e-bc7d-2de39c551f8e@gmail.com>
- <20260502033556.GA3872267@google.com>
- <3cc88b2d-fbd6-4e47-b82c-3c685fec0581@gmail.com>
-In-Reply-To: <3cc88b2d-fbd6-4e47-b82c-3c685fec0581@gmail.com>
+On Fri, May 1, 2026 at 8:48=E2=80=AFAM Weiming Shi <bestswngs@gmail.com> wr=
+ote:
+>
+> On 26-05-01 06:37, Ignat Korchagin wrote:
+> > Hi,
+> >
+> > Thanks for the report.
+> >
+> > On Wed, Apr 29, 2026 at 7:17=E2=80=AFPM Weiming Shi <bestswngs@gmail.co=
+m> wrote:
+> > >
+> > > asymmetric_key_ids() returns key->payload.data[asym_key_ids], which c=
+an
+> > > be NULL for keys parsed by the PKCS#8 parser (pkcs8_parser.c explicit=
+ly
+> > > stores NULL in prep->payload.data[asym_key_ids]).
+> > >
+> > > key_or_keyring_common() in restrict.c and find_asymmetric_key() in
+> > > asymmetric_type.c both dereference this return value without checking
+> > > for NULL. An unprivileged user can trigger a NULL pointer dereference
+> > > in key_or_keyring_common() by creating a PKCS#8 key, restricting a
+> > > keyring with key_or_keyring:<pkcs8_serial>, and adding an X.509 cert
+> > > to the restricted keyring. CONFIG_PKCS8_PRIVATE_KEY_PARSER=3Dy is
+> >
+> > Could you add a simple bash script for this to the commit message?
+> >
+>
+> Hi Ignat,
+>
+> Sure, here is a bash reproducer:
+>
+> ```
+> #!/bin/bash
+> modprobe pkcs8_key_parser 2>/dev/null
+> openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:1024 \
+>     -out /tmp/poc.pem 2>/dev/null
+> openssl pkcs8 -topk8 -nocrypt -in /tmp/poc.pem \
+>     -outform DER -out /tmp/poc.p8
+> openssl req -new -x509 -key /tmp/poc.pem -outform DER \
+>     -out /tmp/poc.der -days 365 -subj "/CN=3DTest" \
+>     -addext "subjectKeyIdentifier=3Dhash" \
+>     -addext "authorityKeyIdentifier=3Dkeyid:always" 2>/dev/null
+> PKCS8_ID=3D$(keyctl padd asymmetric pkcs8key @s < /tmp/poc.p8)
+> KR=3D$(keyctl newring test_kr @s)
+> keyctl restrict_keyring $KR asymmetric "key_or_keyring:$PKCS8_ID"
+> keyctl padd asymmetric trigger $KR < /tmp/poc.der
+> rm -f /tmp/poc.pem /tmp/poc.p8 /tmp/poc.der
+> ```
+> If you'd prefer it in the commit message I can send a v2.
 
---------------4KG0OAh5fKrDahONrZhGK9sd
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+Yes, please. So if anyone tries to "optimise" it later they would have
+a clear test case
 
-SGksDQoNCk9uIDUvMi8yNiAxMzo1MiwgRGVtaSBNYXJpZSBPYmVub3VyIHdyb3RlOg0KDQo+
-PiBPZiBjb3Vyc2UsIGl0J2xsIGFsc28gYmUgYSBmYWlyIGEgYml0IG9mIHdvcmssIGFuZCB1
-bmZvcnR1bmF0ZWx5IEkgYWxzbw0KPj4gZXhwZWN0IHB1c2hiYWNrIGZyb20gcGVvcGxlIHdo
-byAoaW5jb3JyZWN0bHkgSU1PKSB0aGluayB0aGF0IEFGX0FMRw0KPj4gcGVyZm9ybWFuY2Ug
-aXMgaW1wb3J0YW50LCBldmVuIG1vcmVzbyB0aGFuIHNlY3VyaXR5Lg0KDQpBRl9BTEcgcGVy
-Zm9ybWFuY2UgKHRpbWUvcG93ZXIpIGlzIGltcG9ydGFudCBpbiB0aGUgd2F5IHRoYXQgaXQn
-cyANCmxpdGVyYWxseSB0aGUgb25seSBwb2ludCB0byBpdHMgZXhpc3RlbmNlLiBJZiBhbGwg
-aXQgcHJvdmlkZXMgaXMgZXh0cmEgDQpvdmVyaGVhZCBvdmVyIGEgc29mdHdhcmUgaW1wbGVt
-ZW50YXRpb24sIHRoZW4gaXQgbWFrZXMgbm8gc2Vuc2UgdG8ga2VlcCBpdC4NCg0KPiBJZiBv
-bmUgY2FyZXMgYWJvdXQgY3J5cHRvIG9mZmxvYWQgcGVyZm9ybWFuY2UsIHRoZXkgd291bGQg
-YmUgYmV0dGVyDQo+IHNlcnZlZCBieSBjcmVhdGluZyBhIGJldHRlciBpbnRlcmZhY2UgdG8g
-aXQgdGhhbiBBRl9BTEcuICBBRl9BTEcgaXMNCj4gYSBob3JyaWJsZSBBUEkgd2l0aCAocHJl
-c3VtYWJseSkgdG9ucyBvZiBvdmVyaGVhZC4gIEkga25vdyB0aGUgUUFUDQo+IGRyaXZlciBh
-bmQgYW4gTnZpZGlhIEJsdWVGaWVsZCBEUFUgYWNjZWxlcmF0b3IgZHJpdmVyIGJvdGggYnlw
-YXNzIGl0Lg0KDQpUaGUgQVBJIGlzIGRlc2lnbmVkIHRvIGJlIHplcm9jb3B5LCB0aGF0J3Mg
-d2h5IGl0J3MgdGhpcyBob3JyaWJsZSANCmNvbWJpbmF0aW9uIG9mIHNvY2tldCBBUEkgYW5k
-IHNwbGljZSgpLiBUaGUgZ2VuZXJhbCBhc3N1bXB0aW9uIGhlcmUgaXMgDQp0aGF0IGl0IGRv
-ZXMgbm90IG1ha2Ugc2Vuc2UgdG8gb2ZmbG9hZCBzbWFsbCByZXF1ZXN0cyBpbiB0aGUgZmly
-c3QgDQpwbGFjZSwgYW5kIGFwcGxpY2F0aW9uIHByb2dyYW1tZXJzIGFyZSBhd2FyZSBvZiB0
-aGF0Lg0KDQpUaGUgdXNlIGNhc2UgaXMgIkkgaGF2ZSBhIGZpbGUgb3IgcGlwZSBmdWxsIG9m
-IGRhdGEgYW5kIGEgZGV2aWNlIHdpdGggYSANCmtlcm5lbCBkcml2ZXIgdGhhdCBzaG91bGQg
-cHJvY2VzcyBpdCwgY2FuIHdlIHNvbWVob3cgYXZvaWQgY29weWluZyB0aGUgDQpkYXRhIHRv
-IHVzZXJzcGFjZSBvbmx5IHRvIGltbWVkaWF0ZWx5IGNvcHkgaXQgYmFjayB0byBrZXJuZWxz
-cGFjZT8iDQoNClRoaXMgY29weWluZyBpcyBldmVuIG1vcmUgc2lsbHkgaWYgdGhlIGFjdHVh
-bCBxdWVzdGlvbiBJIGhhdmUgaW4gDQp1c2Vyc3BhY2UgaXMgIndoYXQgaXMgdGhlIFNIQTI1
-NiBjaGVja3N1bSBvZiB0aGlzIGZpbGU/IiBvciAid2hhdCBpcyB0aGUgDQpTSEEyNTYgY2hl
-Y2tzdW0gb2YgdGhlIHN0cmluZyAnYmxvYiA4Nzk0MzExNTI4XDAnIGZvbGxvd2VkIGJ5IHRo
-aXMgDQpmaWxlPyIgKHdoZXJlIHlvdSBjYW4gc2VlIHdoeSBhbnlvbmUgd291bGQgYXNrIHN1
-Y2ggYSBzaWxseSBxdWVzdGlvbiBhbmQgDQpwcmVmZXIgdG8gdXNlIHRoZSBkZWRpY2F0ZWQg
-aGFyZHdhcmUgdGhhdCBwcm9jZXNzZXMgMjQgR0IvcyBvdmVyIHRoZSBDUFUgDQphdCAxMDAg
-TUIvcykNCg0KPiBGdXJ0aGVybW9yZSwgQUZfQUxHIG9ubHkgc3VwcG9ydHMgc3ltbWV0cmlj
-IGFsZ29yaXRobXMuICBUaGVzZQ0KPiBhbGdvcml0aG1zIGFyZSBpbmV4cGVuc2l2ZSBpbiBz
-b2Z0d2FyZSwgc28gdGhlIGNvc3Qgb2YgZ29pbmcgdG8gYW4NCj4gYWNjZWxlcmF0b3IgYW5k
-IGJhY2sgaXMgZW5vcm1vdXMgY29tcGFyZWQgdG8gdGhlIGNvc3Qgb2YgYSBzaW5nbGUNCj4g
-b3BlcmF0aW9uLg0KDQpZZXMsIGluaXRpYWwgc2V0dXAgY29zdCBpcyBoaWdoLCBzbyB0aGlz
-IG9ubHkgbWFrZXMgc2Vuc2UgZm9yIGxhcmdlIA0KcmVxdWVzdHMgb3IgYmF0Y2hlcyAoc3Vi
-bWl0dGluZyBpbmRpdmlkdWFsIHJlcXVlc3RzIGlzIGdlbmVyYWxseSBjaGVhcCwgDQp0aGUg
-ZGlmZmljdWx0eSBpcyBlbnN1cmluZyB0aGUgZGF0YSBpcyBhY2Nlc3NpYmxlIHRvIHRoZSBo
-YXJkd2FyZSkuDQoNClRoYXQncyBhbHNvIHdoeSB0aGVyZSBhcmUgbm8gYXN5bW1ldHJpYyBh
-bGdvcml0aG1zOiB0aGVzZSBhcmVuJ3QgDQpnZW5lcmFsbHkgdXNlZCBvbiBsYXJnZSBhbW91
-bnRzIG9mIGRhdGEsIHNvIGl0J3MgbmV2ZXIgd29ydGggaXQgdG8gDQpvZmZsb2FkIHRoZXNl
-Lg0KDQpJdCB3b3VsZCBtYWtlIHNlbnNlIHRvIG9mZmxvYWQgYXN5bW1ldHJpYyBhbGdvcml0
-aG1zIGlmIHRoZXJlIHdhcyBhIA0Kc2VjdXJlIGtleSBzdG9yYWdlIGluc2lkZSB0aGUgZGV2
-aWNlLCBidXQgQUZBSUsgdGhlIEFQSSBkb2VzIG5vdCBzdXBwb3J0IA0KdGhhdCwgb3IgZXZl
-biB0aGUgbm90aW9uIG9mIG9uLWRldmljZSBjb250ZXh0cy4NCg0KSXQgaXMgbm90IGEgZ29v
-ZCBBUEksIGFuZCBpdCBzaXRzIG9uIHRvcCBvZiB0aGUgYWhhc2gvYWNvbXAvYWNyeXB0IA0K
-aW50ZXJmYWNlcyB3aGljaCBhcmUgYWxzbyB1bmZyaWVuZGx5IHRvIGFjY2VsZXJhdG9yIGhh
-cmR3YXJlLg0KDQo+IEZvciBvZmZsb2FkIHRvIGV2ZW4gYSB2ZXJ5IGZhc3QgYWNjZWxlcmF0
-b3IgdG8gbWFrZSBzZW5zZSwNCj4gb25lIG11c3QgYmUgYWJsZSB0byBkZWVwbHkgcGlwZWxp
-bmUgcmVxdWVzdHMuICBIb3dldmVyLCB0aGlzIGNyZWF0ZXMNCj4gYSBodWdlIGFtb3VudCBv
-ZiBhZGRpdGlvbmFsIGNvbXBsZXhpdHkgZm9yIHNvZnR3YXJlLg0KDQpTb2Z0d2FyZSB0aGF0
-IGhhcyByZXF1aXJlbWVudHMgbGlrZSB0aGF0IGlzIGFscmVhZHkgY29tcGxleCAtLSBpZiBJ
-IGhhdmUgDQphIGZldyB0aG91c2FuZCB3b3JrbG9hZCBwYWNrZXRzLCBJIG5lZWQgYSB3b3Jr
-ZXIgcG9vbC4NCg0KSWYgSSBkb24ndCBoYXZlIHRoZXNlIHJlcXVpcmVtZW50cywgdGhlbiBp
-bmRlZWQgSSBhbSBiZXR0ZXIgb2ZmIHdpdGggYSANCnNvZnR3YXJlLW9ubHkgc29sdXRpb24g
-aW4gdXNlcnNwYWNlLCBiZWNhdXNlIGl0IGlzIG5vdCByZWxldmFudCBmcm9tIGEgDQpwZXJm
-b3JtYW5jZSBzdGFuZHBvaW50Lg0KDQo+IEFzeW1tZXRyaWMgYWNjZWxlcmF0b3JzIGFsc28g
-ZG9uJ3QgaGF2ZSBhIGJldHRlciBhbHRlcm5hdGl2ZSBpbiB0aGUNCj4gZm9ybSBvZiBpbmxp
-bmUgZW5jcnlwdGlvbiBoYXJkd2FyZS4NCg0KUXVpdGUgYSBudW1iZXIgb2YgYXJjaGl0ZWN0
-dXJlcyBkbyBub3QgaGF2ZSBpbmxpbmUgZW5jcnlwdGlvbiBzdXBwb3J0LCANCmFuZCB0aGVz
-ZSBhcmUgbW9yZSBsaWtlbHkgdG8gdXNlIG9mZmxvYWQgaGFyZHdhcmUgZXZlbiBmb3Igc21h
-bGxlciANCnJlcXVlc3RzIChlLmcuIGZvciBwb3dlciBzYXZpbmcpLg0KDQo+IEkgdGhpbmsg
-YSBoaWdoIHBlcmZvcm1hbmNlIGludGVyZmFjZSB0byBoYXJkd2FyZSBjcnlwdG9ncmFwaHkg
-KGFuZCwNCj4gbW9yZSBpbXBvcnRhbnRseSwgY29tcHJlc3Npb24pIHdvdWxkIGxvb2sgbXVj
-aCBtb3JlIGxpa2UgUkRNQS4NCj4gVGhlcmUgd291bGQgYmUgYSBrZXJuZWwgZHJpdmVyIHRo
-YXQgZGlkIHRoZSBiYXJlIG1pbmltdW0gdG8gcHJvdmlkZQ0KPiBpc29sYXRpb24gYmV0d2Vl
-biB1c2Vyc3BhY2UgcHJvZ3JhbXMsIGFuZCBhIHVzZXJzcGFjZSBkcml2ZXIgdGhhdA0KPiB3
-YXMgcmVzcG9uc2libGUgZm9yIGFic3RyYWN0aW5nIG92ZXIgdGhlIGhhcmR3YXJlLg0KDQpP
-ZmZsb2FkIGhhcmR3YXJlIGNvbWVzIGluIHR3byBmbGF2b3VyczogdGhlIGhpZ2gtdGhyb3Vn
-aHB1dCBraW5kLCBidWlsdCANCmludG8gZGV2aWNlcyB3aGVyZSBubyBvbmUgY2FyZXMgYWJv
-dXQgcG93ZXIsIGFuZCB0aGUgDQpsb3dlci1wb3dlci10aGFuLXRoZS1DUFUtZG9pbmctaXQg
-a2luZC4NCg0KVGhlIGZvcm1lciBjYW4gZWFzaWx5IHByb3ZpZGUgdXNlciBjb250ZXh0cyBl
-dmVuIGluIHZpcnR1YWxpemVkIA0KZW52aXJvbm1lbnRzLCBidXQgdGhlIGxhdHRlciBpcyBn
-ZW5lcmFsbHkgZm91bmQgaW4gc3lzdGVtcyB0aGF0IGRvIG5vdCANCmV2ZW4gaGF2ZSBhbiBJ
-T01NVS4gRWl0aGVyIHdlIGhhdmUgdHdvIGRpc3RpbmN0IGludGVyZmFjZXMgZm9yIHRoZXNl
-LCBvciANCndlIG5lZWQgb25lIHRoYXQgY2FuIGhhbmRsZSBlaXRoZXIuDQoNCk15IGZlZWxp
-bmcgaXMgdGhhdCBubyBvbmUgaXMgaGFwcHkgd2l0aCBlaXRoZXIgQUZfQUxHIG9yIHRoZSAN
-CmFzeW5jaHJvbm91cyBpbnRlcmZhY2VzIGluIGdlbmVyYWwsIHNvIEkgdGhpbmsgdGhleSBz
-aG91bGQgYmUgcmVtb3ZlZCANCmNvbXBsZXRlbHksIGFuZCB0aGVyZSBzaG91bGQgYmUgYSBz
-ZXBhcmF0ZSAib2ZmbG9hZCIgU0lHIHRoYXQgY3JlYXRlcyANCm5ldyBpbnRlcmZhY2VzIHRo
-YXQgYXJlIGFjdHVhbGx5IHVzYWJsZSB3aXRoIGN1cnJlbnQgaGFyZHdhcmUuDQoNCiA+IDEu
-IEdldCByaWQgb2YgemVyby1jb3B5IHN1cHBvcnQgKHNwbGljZSgpKS4NCiA+IDIuIEdldCBy
-aWQgb2YgQUlPIHN1cHBvcnQuDQogPiAzLiBPbmx5IGFsbG93IHNvZnR3YXJlIGltcGxlbWVu
-dGF0aW9ucy4NCg0KVGhhdCBtYWtlcyBzZW5zZSBpZiB3ZSdyZSBmb3JjZWQgdG8ga2VlcCB0
-aGUgaW50ZXJmYWNlIGZvciBub3csIGJ1dCBpdCANCm1lYW5zIHRoYXQgb2ZmbG9hZCBzdXBw
-b3J0IHRocm91Z2ggdGhlIGNyeXB0byBzdWJzeXN0ZW0gaXMgY29tcGxldGVseSANCmRlYWQs
-IGFuZCBhbnlvbmUgd2FudGluZyB0byBzdXBwb3J0IG9mZmxvYWQgaGFyZHdhcmUgbmVlZHMg
-dG8gZ28gDQplbHNld2hlcmUuIENhbiB3ZSBnZXQgYSBkZWZpbml0aXZlIHN0YXRlbWVudCB0
-aGF0IHRoaXMgaXMgaW50ZW5kZWQ/DQoNCiAgICBTaW1vbg0K
+> Thanks,
+> Weiming Shi
 
---------------4KG0OAh5fKrDahONrZhGK9sd--
+Ignat
 
---------------IAgX6DaXQhDJpK1phOpjNiIQ
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEtjuqOJSXmNjSiX3Tfr04e7CZCBEFAmn1s4IACgkQfr04e7CZ
-CBEdjAf/aIEKDJWbLJOV9o8KZ+gGbALiDwqce8bvf2XYzY27fgA56AbOTCnyo5Vn
-m3PG1cTINe5ZT7nYPEBGeYoHQ1fU1LQFm2N+NdJdLCd0UM1WEswHBQtrYcPrZDuz
-Tjgw67SAMsEplS3LaF9h7ve9/WkUwlNqKeHIhRLUCOg4SJD3iVfAq1k3IhleaX18
-W7Tk/Fs+Ve1nnUOUUf+ci08d2Zn7S9Eh1SasgJIYUEjKrRS9kCytyP3X+vntyk+n
-q87U+vVN3Map19L5Ybmqf+s45QO5KTIMzPoohEgm3gY1yt5Tc1RVdQ1XMMgO1o7y
-UNDO9OnH7OQFM2wDS4Y3UzxtEjIPmg==
-=/x7G
------END PGP SIGNATURE-----
-
---------------IAgX6DaXQhDJpK1phOpjNiIQ--
+>
+> > > required.
+> > >
+> > >  Oops: general protection fault, probably for non-canonical address 0=
+xdffffc0000000000
+> > >  KASAN: null-ptr-deref in range [0x0000000000000000-0x000000000000000=
+7]
+> > >  RIP: 0010:key_or_keyring_common (crypto/asymmetric_keys/restrict.c:2=
+05 crypto/asymmetric_keys/restrict.c:279)
+> > >  Call Trace:
+> > >   <TASK>
+> > >   __key_create_or_update (security/keys/key.c:884)
+> > >   key_create_or_update (security/keys/key.c:1021)
+> > >   __do_sys_add_key (security/keys/keyctl.c:134)
+> > >   do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:8=
+3)
+> > >   entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+> > >   </TASK>
+> > >  Kernel panic - not syncing: Fatal exception
+> > >
+> > > Add a NULL check in find_asymmetric_key(), mirroring the existing
+> > > pattern in asymmetric_match_key_ids() and asymmetric_key_describe().
+> > > In key_or_keyring_common(), skip the trusted key matching when it
+> > > has no key IDs and fall through to the check_dest path.
+> > >
+> > > Fixes: 7d30198ee24f ("keys: X.509 public key issuer lookup without AK=
+ID")
+> > > Reported-by: Xiang Mei <xmei5@asu.edu>
+> > > Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+> > > ---
+> > >  crypto/asymmetric_keys/asymmetric_type.c | 2 ++
+> > >  crypto/asymmetric_keys/restrict.c        | 9 ++++++---
+> > >  2 files changed, 8 insertions(+), 3 deletions(-)
+> > >
+> > > diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymme=
+tric_keys/asymmetric_type.c
+> > > --- a/crypto/asymmetric_keys/asymmetric_type.c
+> > > +++ b/crypto/asymmetric_keys/asymmetric_type.c
+> > > @@ -109,6 +109,8 @@ struct key *find_asymmetric_key(struct key *keyri=
+ng,
+> > >         if (id_0 && id_1) {
+> > >                 const struct asymmetric_key_ids *kids =3D asymmetric_=
+key_ids(key);
+> > >
+> > > +               if (!kids)
+> > > +                       goto reject;
+> > >                 if (!kids->id[1]) {
+> > >                         pr_debug("First ID matches, but second is mis=
+sing\n");
+> > >                         goto reject;
+> > > diff --git a/crypto/asymmetric_keys/restrict.c b/crypto/asymmetric_ke=
+ys/restrict.c
+> > > --- a/crypto/asymmetric_keys/restrict.c
+> > > +++ b/crypto/asymmetric_keys/restrict.c
+> > > @@ -243,10 +243,14 @@ static int key_or_keyring_common(struct key *de=
+st_keyring,
+> > >                         if (IS_ERR(key))
+> > >                                 key =3D NULL;
+> > >                 } else if (trusted->type =3D=3D &key_type_asymmetric)=
+ {
+> > > +                       const struct asymmetric_key_ids *kids;
+> > >                         const struct asymmetric_key_id **signer_ids;
+> > >
+> > > -                       signer_ids =3D (const struct asymmetric_key_i=
+d **)
+> > > -                               asymmetric_key_ids(trusted)->id;
+> > > +                       kids =3D asymmetric_key_ids(trusted);
+> > > +                       if (!kids)
+> > > +                               goto skip_trusted;
+> > > +
+> > > +                       signer_ids =3D (const struct asymmetric_key_i=
+d **)kids->id;
+> > >
+> > >                         /*
+> > >                          * The auth_ids come from the candidate key (=
+the
+> > > @@ -290,6 +294,7 @@ static int key_or_keyring_common(struct key *dest=
+_keyring,
+> > >                 }
+> > >         }
+> > >
+> > > +skip_trusted:
+> > >         if (check_dest && !key) {
+> > >                 /* See if the destination has a key that signed this =
+one. */
+> > >                 key =3D find_asymmetric_key(dest_keyring, sig->auth_i=
+ds[0],
+> > > --
+> > > 2.39.0
+> > >
+> >
+> > Ignat
+>
