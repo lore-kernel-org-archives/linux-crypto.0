@@ -1,230 +1,271 @@
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58A45209F43
-	for <linux-crypto@vger.kernel.org>; Sat,  2 May 2026 08:40:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DAB4256C6D
+	for <linux-crypto@vger.kernel.org>; Sat,  2 May 2026 13:25:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777711238; cv=none; b=IV+F1Jthb++faTEMLiuFhVVvaL0pzGnsAWjaJ1eV5M5JncithGAFeY2xNkIC3XckHetReb+cd98gFQurGUOPozoB64VnJvlihW9pTrMKvC/Aqc/qorTiR9YZuGhvg5W44144n3favoaj3ePK3qM/1lnECuSHZqtOw42j/7LrEis=
+	t=1777728316; cv=none; b=PLr1w1zZzheLiiL3AznmGDYWhiYLISQaFfCKXiqHxb3yqa/9XB8LIM6t0cJ7VqqXMaMLfiPAOnn3CKSHVyvzmmGEb4eDavMpFv8ShB0WTeCSNmT8wfGtQFfbJ98IxjSL+CB2EZRcJqPSOxC3o/pvcEXXjTPHCKwdGWnR/ekrZls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777711238; c=relaxed/simple;
-	bh=DNaJGk3nEfqkQ+ZfWCSHOlQwU+F4Bs4+WSTF6/fMIcM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=olYiDsi2N+IsbfUuSvZsMuu26E8t5YfwSc8EOKkAGqx5xMFNuSyHcHXbNxaP62+EVr6j1xMdkpvMKT3LGNjS9sLZKFvhi2/bVZBU1XU81KjBG15bqVkuSvtchLToivhhrUeHeQCciAvKuWS1of+Us+F0fhkugXwKXa/b1cskSEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.win; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.win
+	s=arc-20240116; t=1777728316; c=relaxed/simple;
+	bh=kH62rsUaAss0NtHCfCwEnwUM3x0gdN/omUvzry1yAtw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=i78E6QP2hsuwJqZpWnRyxxCAW+XqyddxVJigGYCQ0ya9/nzuzo61sWSE/TqhcLiqSQMpYRZu9peYe6te9xdXyO8p4NMAtb8HCMnQ2hxPXtQsSHLjNQVoMtrmi1EbqOY6ULNldRae1AV/1n+o1FePWFu6NorXpSPWvcBJzp8VrXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hhQiepSO; arc=none smtp.client-ip=209.85.222.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-670ab084a39so4609319a12.3
-        for <linux-crypto@vger.kernel.org>; Sat, 02 May 2026 01:40:37 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hhQiepSO"
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-8d4f78fc9f6so299354085a.3
+        for <linux-crypto@vger.kernel.org>; Sat, 02 May 2026 06:25:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777728312; x=1778333112; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=TiHfmUTUQA6/Fcz5xp0cK2FWPU1oMzmHzKsF4Cf9JWQ=;
+        b=hhQiepSOK7cavYOEwZGlaprRwvuSVv+vsxVSCypNpJ7qU7v4mf9GwDNomw6X5VW66D
+         bZl6z0rXS1iysG89+4xFsXyuNM9radoeHaCX90827IpS8HibtGdVCCeZ6Pb0RTUT+Ppx
+         Wa/XNgSGpNSnp0dFr2sInL+um9w9AqPixZodiWnKxA18k8S5bH2ABs8d4FUlSdKS7GO8
+         /h/unIQVp2uz1mas1vRwN/QPuHiEYYYZNcOR76zmMgljxwrP0DdwIKORHE3JlJLVGaKV
+         nAm1zJ9uNtTg0zvtjwk1Q8tfaI8z2uVYMb1bYgLcZsnWlFcM1sZxfyqG7yN4TIRSnKlG
+         +Drw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777711235; x=1778316035;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=cJ6hjVJnVMdiF3idaO6wQZ9WKWpqRIj7dzC4FjRmPgg=;
-        b=pKXfaKU1JBPQhg9GlbFBJLjw92VxnelHnXEskF9+vz132Poee6ns4aVNjeeskbcuH3
-         TtnhONrGqr/QGzps7l2dwfAd66c6cERA0lsqrk70juTaybREIFPU4k5eGQCh7/5G5U0g
-         PXxL2VntesSndmClu/rmrdPP6BZ0qEVmK1jDXtANf2ApHtAkYbL9U69rJ7O1Ah1maSdH
-         Ozzokz9MdoXV4RQMSGuLTKOJvEcsg0iIM21VxWSig7PWcvnF2Vwnt4QU/NXwJflgRl28
-         MgJB3vaMrQUmnUaP3ZSrFqrkgxNpC5ytqkAZc57dAiISuQvkjCCMH7t/6MMG3CoqUuPm
-         x7UA==
-X-Forwarded-Encrypted: i=1; AFNElJ/pbOenPpZJprOzXe7ObtSsGUglryYxhXgxONIFoSd4IH3K+m+0tNuc+PZGbPfbqafqCR4k1tgcM6e7H0Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxj/bSBCi098iNJ7pLYLr7EjWW3nbPMFDACcJTezireOTlpAzC6
-	KPxZFaBEp5//mKFUulua6SHosvs4vPJtQ02zs3vIW81L0hT6RBSZh59B7cTFBT5SXZw=
-X-Gm-Gg: AeBDievMmss+8UXGQ/S9s3cO+vmiMIvG0Yjra7tPvMQUzMKbsazdTfSIJE/FerzfxNz
-	q3QVJlHmYBufmSNZnZXoa0tja8zx9pqbFix8qLIAVDEMWOM+MP3MXLpDaOi58oak3CNjpTnJyR/
-	ozo7pJ8kGyy0RfmC3E+wDGo5Iw5A8mEo/GuUPS8KnUVg7WJ8HmcA6Haw8+QtjtQqXAh9yja4n63
-	jAaq168KhGZLwM9Xl78Ke5lVMjaFyEAWQnTEYRx87SF5706G5GwpLxtTIRQytxQjxl/2ekMfWPi
-	mAh3u5FRaeOVrQw5hRQHyN1vP6vkzafLr9I41zmywPhoFrmgkiCN/et6y6lNwxOCy6SQO9ykubY
-	LKLybCIPTon+5XVOhzh9z4fqsun5J8UWiBV6QU8/7Hvn8Njyg0hNY5Z2mgBQDBCqGoKFs+RIklA
-	XnLE2fFLIoBAYDfNYmS2mbhe3bB54nrJahG+nIHS4tz6+hvkXwsW+V5rdI7uLXtgSm9fQFckWfl
-	7k=
-X-Received: by 2002:a05:6402:448f:b0:670:8d21:dcb with SMTP id 4fb4d7f45d1cf-67c1abac537mr739975a12.19.1777711235299;
-        Sat, 02 May 2026 01:40:35 -0700 (PDT)
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com. [209.85.218.46])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-67b85e28ef8sm1547216a12.2.2026.05.02.01.40.33
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 02 May 2026 01:40:34 -0700 (PDT)
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-ba7a1cc0380so427685666b.2
-        for <linux-crypto@vger.kernel.org>; Sat, 02 May 2026 01:40:33 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ9QjFThsrQoWoptFaIlBKUZs/H2PR7TFMYSL1V6wTA01ZfHHjNxm5N1ugjUDPF9r0t74bZb39vpjKRYVGM=@vger.kernel.org
-X-Received: by 2002:a17:907:3d8e:b0:b94:a1d4:ceff with SMTP id
- a640c23a62f3a-bbffc47ead7mr110221566b.35.1777711233486; Sat, 02 May 2026
- 01:40:33 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1777728312; x=1778333112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TiHfmUTUQA6/Fcz5xp0cK2FWPU1oMzmHzKsF4Cf9JWQ=;
+        b=Hi4BcJ8N3OsaOEZN30NySbpJpv12ivmi1lWBDZCynAHiyAV+7XnuduxMgYHOv1bN3X
+         1XcT137ea/R44z0esr0+3IDPCTxgCSws0RK0Nx1pJfqBRt1KcNJzp4cjYiLjOr+L+mzE
+         zMoQcJWG17BM4jW/dYxA42jW23ZPIQ6gSup7oNvaSEo5O1MvmnaSDUf1lpvpjbvAqNbn
+         wuaHplx327mLRC9xUT/K5cRP6kfakVVB9EYtGQJQF5A/s+4Z8oXPz+Ev35Ce/X5dfdL2
+         N0I8yMsoUHWX1bOG0c/boueGk3SYFfDNY07kVinoa54fFWtw0q0ZtLICq9tEUJEVekEH
+         +SDg==
+X-Forwarded-Encrypted: i=1; AFNElJ/FyR7vrTzLFBRDyHH4fpdYBVbTK2pTaJdgQbLSbp27oDzlKeGuV/jYjp+TG4gWu9CobqA8mYcGTm2TZfw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMoS+KQzbtMJcDI3Y3+T88Kf5xHMfTM2QL4O1LzuKuZ2/vBMaG
+	7/Um9WskMm8rMYDiVzBZpGbXdYpBQXrZg4DHhMKAZZHWlmiJk00r9goN
+X-Gm-Gg: AeBDiesLHVv9xwDGh3JcivE5ObQEE/ib8MsoF2hA2D+myAOWy/mxPVYALLS6OPKVrgH
+	Tj1s/Gkhu6DuDRvgjbONd6C4Tw2M6RSCbmrJUZ6ag11mo+vg3vueMp37asVNq5BndIzZin+BETK
+	96Gh5jNnrristz6Tjx9zzSql2F3YDSdpkYKjTARTKJfY5iR19ONvxtWgSysSTkZ52z+g2Iikhjh
+	7MlhU0rEET+9ie2z5f3lqDeBTWJaLmsvNGb5MkQN3p9EzkoR5fuJE2A98V+1BCqV9G/9NHNOwOh
+	BQGeouRKjXEi5T8/8NGmns15CgvNMh/lcim/dBlNX/6afhXpDYxekUuZKfscT5zoyN0Sc3DTFtD
+	h0kOVfPDog3h5L6pDDJ89dTM1dkPgxBQz+DSOLlXwGKY+W2iCi0FpHJgpfS2BiTb+B3zvc6AYk7
+	yKr+NNzeD7nvwa4PztQvpYECpD+eSq0YpHcMwGybYU0ffRgy5lo6aQ2/FBBb0KqHyQxDJr2J2Oq
+	ANOPsMaR6GriMQf2gimMGlt9vrdElw=
+X-Received: by 2002:a05:620a:4015:b0:8cf:d6f8:599f with SMTP id af79cd13be357-8fd1863dbfcmr491717085a.57.1777728312166;
+        Sat, 02 May 2026 06:25:12 -0700 (PDT)
+Received: from server1 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8fc2c91dd48sm491819285a.38.2026.05.02.06.25.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 02 May 2026 06:25:11 -0700 (PDT)
+From: Michael Bommarito <michael.bommarito@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	David Howells <dhowells@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+Cc: Eric Biggers <ebiggers@kernel.org>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	linux-afs@lists.infradead.org,
+	Ilya Dryomov <idryomov@gmail.com>,
+	Xiubo Li <xiubli@redhat.com>,
+	ceph-devel@vger.kernel.org,
+	stable@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: krb5 - wait for async aead completion before freeing buffer
+Date: Sat,  2 May 2026 09:25:06 -0400
+Message-ID: <20260502132506.1936358-1-michael.bommarito@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260429181629.110802-2-bestswngs@gmail.com> <CAOs+rJUiup_B1ve7UztJH4crzE+98ZObRc3jLRsqkhLekpDmxA@mail.gmail.com>
- <afRa0lc2A4kHk9at@Air.local>
-In-Reply-To: <afRa0lc2A4kHk9at@Air.local>
-From: Ignat Korchagin <ignat@linux.win>
-Date: Sat, 2 May 2026 09:40:21 +0100
-X-Gmail-Original-Message-ID: <CAOs+rJVbZ2dNiiUSzaeNsYRwxRS=VupDE+VW3zZgwSqcRwaUkA@mail.gmail.com>
-X-Gm-Features: AVHnY4LpgjUs8tmJ0FJ_9C1M8-3xq1XIXM16afDZyqPbnkONeOWebbWGGG3f4Ng
-Message-ID: <CAOs+rJVbZ2dNiiUSzaeNsYRwxRS=VupDE+VW3zZgwSqcRwaUkA@mail.gmail.com>
-Subject: Re: [PATCH] asymmetric_keys: check asymmetric_key_ids() for NULL
- before dereference
-To: Weiming Shi <bestswngs@gmail.com>
-Cc: g@air.local, David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Andrew Zaborowski <andrew.zaborowski@intel.com>, 
-	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	Xiang Mei <xmei5@asu.edu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, May 1, 2026 at 8:48=E2=80=AFAM Weiming Shi <bestswngs@gmail.com> wr=
-ote:
->
-> On 26-05-01 06:37, Ignat Korchagin wrote:
-> > Hi,
-> >
-> > Thanks for the report.
-> >
-> > On Wed, Apr 29, 2026 at 7:17=E2=80=AFPM Weiming Shi <bestswngs@gmail.co=
-m> wrote:
-> > >
-> > > asymmetric_key_ids() returns key->payload.data[asym_key_ids], which c=
-an
-> > > be NULL for keys parsed by the PKCS#8 parser (pkcs8_parser.c explicit=
-ly
-> > > stores NULL in prep->payload.data[asym_key_ids]).
-> > >
-> > > key_or_keyring_common() in restrict.c and find_asymmetric_key() in
-> > > asymmetric_type.c both dereference this return value without checking
-> > > for NULL. An unprivileged user can trigger a NULL pointer dereference
-> > > in key_or_keyring_common() by creating a PKCS#8 key, restricting a
-> > > keyring with key_or_keyring:<pkcs8_serial>, and adding an X.509 cert
-> > > to the restricted keyring. CONFIG_PKCS8_PRIVATE_KEY_PARSER=3Dy is
-> >
-> > Could you add a simple bash script for this to the commit message?
-> >
->
-> Hi Ignat,
->
-> Sure, here is a bash reproducer:
->
-> ```
-> #!/bin/bash
-> modprobe pkcs8_key_parser 2>/dev/null
-> openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:1024 \
->     -out /tmp/poc.pem 2>/dev/null
-> openssl pkcs8 -topk8 -nocrypt -in /tmp/poc.pem \
->     -outform DER -out /tmp/poc.p8
-> openssl req -new -x509 -key /tmp/poc.pem -outform DER \
->     -out /tmp/poc.der -days 365 -subj "/CN=3DTest" \
->     -addext "subjectKeyIdentifier=3Dhash" \
->     -addext "authorityKeyIdentifier=3Dkeyid:always" 2>/dev/null
-> PKCS8_ID=3D$(keyctl padd asymmetric pkcs8key @s < /tmp/poc.p8)
-> KR=3D$(keyctl newring test_kr @s)
-> keyctl restrict_keyring $KR asymmetric "key_or_keyring:$PKCS8_ID"
-> keyctl padd asymmetric trigger $KR < /tmp/poc.der
-> rm -f /tmp/poc.pem /tmp/poc.p8 /tmp/poc.der
-> ```
-> If you'd prefer it in the commit message I can send a v2.
+krb5_aead_encrypt(), krb5_aead_decrypt() in rfc3961_simplified.c and
+rfc8009_encrypt(), rfc8009_decrypt() in rfc8009_aes2.c set a NULL
+completion callback on the aead_request and treat any negative return
+from crypto_aead_{encrypt,decrypt}() as terminal, falling through to
+kfree_sensitive(buffer) where buffer == req.
 
-Yes, please. So if anyone tries to "optimise" it later they would have
-a clear test case
+The crypto API returns -EINPROGRESS when an asynchronous backend has
+accepted the request and queued it for completion by a worker, and
+-EBUSY when a backlog-capable backend has accepted it onto its
+backlog (with CRYPTO_TFM_REQ_MAY_BACKLOG set).  In both cases the
+operation will complete asynchronously and the request buffer must
+remain live until the backend's completion callback fires.  Without
+that flag set, -EBUSY instead means "rejected, try again later" and
+no completion will fire.  In the current code the callback is NULL
+and any negative return is treated as terminal, so when the
+encrypt_name composition resolves to an async instance (a hardware
+AEAD provider that registers an instance for the krb5 inner template,
+or any future code path that takes a cryptd-wrapped instance for the
+krb5 enctype name), -EINPROGRESS satisfies the "if (ret < 0)" check
+and the buffer is freed while the backend's worker still holds a
+pointer.  The worker subsequently dereferences req via
+aead_request_complete(), reading from freed slab.
 
-> Thanks,
-> Weiming Shi
+KASAN report under UML+SLUB with a faithful reproducer that drives
+crypto_krb5_decrypt() through the existing API, with an async aead
+backend bound to krb5->encrypt_name:
 
-Ignat
+  BUG: KASAN: slab-use-after-free in t5_stub_complete+0x7d/0xc7
+  Read of size 8 at addr 00000000619e9410 by task kworker/0:1/12
 
->
-> > > required.
-> > >
-> > >  Oops: general protection fault, probably for non-canonical address 0=
-xdffffc0000000000
-> > >  KASAN: null-ptr-deref in range [0x0000000000000000-0x000000000000000=
-7]
-> > >  RIP: 0010:key_or_keyring_common (crypto/asymmetric_keys/restrict.c:2=
-05 crypto/asymmetric_keys/restrict.c:279)
-> > >  Call Trace:
-> > >   <TASK>
-> > >   __key_create_or_update (security/keys/key.c:884)
-> > >   key_create_or_update (security/keys/key.c:1021)
-> > >   __do_sys_add_key (security/keys/keyctl.c:134)
-> > >   do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:8=
-3)
-> > >   entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
-> > >   </TASK>
-> > >  Kernel panic - not syncing: Fatal exception
-> > >
-> > > Add a NULL check in find_asymmetric_key(), mirroring the existing
-> > > pattern in asymmetric_match_key_ids() and asymmetric_key_describe().
-> > > In key_or_keyring_common(), skip the trusted key matching when it
-> > > has no key IDs and fall through to the check_dest path.
-> > >
-> > > Fixes: 7d30198ee24f ("keys: X.509 public key issuer lookup without AK=
-ID")
-> > > Reported-by: Xiang Mei <xmei5@asu.edu>
-> > > Signed-off-by: Weiming Shi <bestswngs@gmail.com>
-> > > ---
-> > >  crypto/asymmetric_keys/asymmetric_type.c | 2 ++
-> > >  crypto/asymmetric_keys/restrict.c        | 9 ++++++---
-> > >  2 files changed, 8 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymme=
-tric_keys/asymmetric_type.c
-> > > --- a/crypto/asymmetric_keys/asymmetric_type.c
-> > > +++ b/crypto/asymmetric_keys/asymmetric_type.c
-> > > @@ -109,6 +109,8 @@ struct key *find_asymmetric_key(struct key *keyri=
-ng,
-> > >         if (id_0 && id_1) {
-> > >                 const struct asymmetric_key_ids *kids =3D asymmetric_=
-key_ids(key);
-> > >
-> > > +               if (!kids)
-> > > +                       goto reject;
-> > >                 if (!kids->id[1]) {
-> > >                         pr_debug("First ID matches, but second is mis=
-sing\n");
-> > >                         goto reject;
-> > > diff --git a/crypto/asymmetric_keys/restrict.c b/crypto/asymmetric_ke=
-ys/restrict.c
-> > > --- a/crypto/asymmetric_keys/restrict.c
-> > > +++ b/crypto/asymmetric_keys/restrict.c
-> > > @@ -243,10 +243,14 @@ static int key_or_keyring_common(struct key *de=
-st_keyring,
-> > >                         if (IS_ERR(key))
-> > >                                 key =3D NULL;
-> > >                 } else if (trusted->type =3D=3D &key_type_asymmetric)=
+  Allocated by task 40:
+   __kmalloc_noprof+0x1df/0x1ee
+   kzalloc_noprof.constprop.0+0x19/0x1b [krb5]
+   rfc8009_decrypt+0x294/0x7c4 [krb5]
+   crypto_krb5_decrypt+0x93/0xa2 [krb5]
+
+  Freed by task 40:
+   kfree_sensitive+0x57/0x5c
+   rfc8009_decrypt+0x790/0x7c4 [krb5]
+   crypto_krb5_decrypt+0x93/0xa2 [krb5]
+
+  The buggy address belongs to the cache kmalloc-128 of size 128
+
+These helpers are reached today from net/rxrpc/rxgk.c and
+rxgk_common.h (AFS/RxRPC RxGK packet encrypt/decrypt),
+fs/afs/cm_security.c, and net/ceph/crypto.c (Linux kernel Ceph
+client cephx encrypt/decrypt).  The bug is triggerable when one of
+these paths uses a krb5 AEAD whose selected implementation is async
+(or inherits async completion from an async child/provider).
+
+Fix by following the standard kernel idiom for synchronous waiting on
+a potentially-asynchronous AEAD: install crypto_req_done() as the
+completion callback, set CRYPTO_TFM_REQ_MAY_BACKLOG so a backlogged
+backend's -EBUSY indicates a queued (not rejected) request, and wrap
+the crypto_aead_{encrypt,decrypt}() return through crypto_wait_req()
+so the function blocks on the worker's completion before falling
+through to kfree_sensitive().  This matches the crypto_wait_req()
+usage pattern in net/tls/, fs/ecryptfs/, fs/smb/server/auth.c, and
+other consumers that need a synchronous result over an arbitrarily-
+async backend; MAY_BACKLOG is required (not optional) so that
+crypto_wait_req() does not block waiting for a completion that will
+never fire from a rejected request.
+
+Regression coverage: the in-tree krb5 selftests
+(CONFIG_CRYPTO_KRB5_SELFTESTS=y) cover all four touched functions for
+all six supported enctypes (aes128/aes256-cts-hmac-sha1-96,
+aes128/aes256-cts-hmac-sha256/384, camellia128/256-cts-cmac) via the
+PRF, key-derivation, encrypt, decrypt and MIC paths; the patched
+kernel reports "krb5: Selftests succeeded" when those default sync
+backends are in use.  Additionally, on a separate boot of the
+patched kernel with CONFIG_CRYPTO_SELFTESTS_FULL=y and without the
+synthetic async-aead provider used to drive the reproducer loaded,
+the kernel's testmgr emits no "alg: ... self-test failed" lines for
+the authenc(hmac(sha256/sha384),cts(cbc(aes))) instances the krb5
+layer instantiates.  (The reproducer boot does carry an expected
+testmgr failure for that synthetic provider's algorithm name; that
+is not a regression of any in-tree algorithm.)  The faithful
+reproducer above no longer trips KASAN when an async backend is
+bound.
+
+Fixes: 00244da40f78 ("crypto/krb5: Implement the Kerberos5 rfc3961 encrypt and decrypt functions")
+Fixes: 6c3c0e86c2ac ("crypto/krb5: Implement the AES enctypes from rfc8009")
+Cc: stable@vger.kernel.org
+Assisted-by: Claude:claude-opus-4-7
+Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
+---
+ crypto/krb5/rfc3961_simplified.c | 12 ++++++++----
+ crypto/krb5/rfc8009_aes2.c       | 12 ++++++++----
+ 2 files changed, 16 insertions(+), 8 deletions(-)
+
+diff --git a/crypto/krb5/rfc3961_simplified.c b/crypto/krb5/rfc3961_simplified.c
+index e49cbdec7c40..c4b8e9b89c7b 100644
+--- a/crypto/krb5/rfc3961_simplified.c
++++ b/crypto/krb5/rfc3961_simplified.c
+@@ -543,6 +543,7 @@ ssize_t krb5_aead_encrypt(const struct krb5_enctype *krb5,
+ 			  size_t data_offset, size_t data_len,
+ 			  bool preconfounded)
  {
-> > > +                       const struct asymmetric_key_ids *kids;
-> > >                         const struct asymmetric_key_id **signer_ids;
-> > >
-> > > -                       signer_ids =3D (const struct asymmetric_key_i=
-d **)
-> > > -                               asymmetric_key_ids(trusted)->id;
-> > > +                       kids =3D asymmetric_key_ids(trusted);
-> > > +                       if (!kids)
-> > > +                               goto skip_trusted;
-> > > +
-> > > +                       signer_ids =3D (const struct asymmetric_key_i=
-d **)kids->id;
-> > >
-> > >                         /*
-> > >                          * The auth_ids come from the candidate key (=
-the
-> > > @@ -290,6 +294,7 @@ static int key_or_keyring_common(struct key *dest=
-_keyring,
-> > >                 }
-> > >         }
-> > >
-> > > +skip_trusted:
-> > >         if (check_dest && !key) {
-> > >                 /* See if the destination has a key that signed this =
-one. */
-> > >                 key =3D find_asymmetric_key(dest_keyring, sig->auth_i=
-ds[0],
-> > > --
-> > > 2.39.0
-> > >
-> >
-> > Ignat
->
++	DECLARE_CRYPTO_WAIT(wait);
+ 	struct aead_request *req;
+ 	ssize_t ret, done;
+ 	size_t bsize, base_len, secure_offset, secure_len, pad_len, cksum_offset;
+@@ -588,9 +589,10 @@ ssize_t krb5_aead_encrypt(const struct krb5_enctype *krb5,
+ 	iv = buffer + krb5_aead_size(aead);
+ 
+ 	aead_request_set_tfm(req, aead);
+-	aead_request_set_callback(req, 0, NULL, NULL);
++	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++				  crypto_req_done, &wait);
+ 	aead_request_set_crypt(req, sg, sg, secure_len, iv);
+-	ret = crypto_aead_encrypt(req);
++	ret = crypto_wait_req(crypto_aead_encrypt(req), &wait);
+ 	if (ret < 0)
+ 		goto error;
+ 
+@@ -610,6 +612,7 @@ int krb5_aead_decrypt(const struct krb5_enctype *krb5,
+ 		      struct scatterlist *sg, unsigned int nr_sg,
+ 		      size_t *_offset, size_t *_len)
+ {
++	DECLARE_CRYPTO_WAIT(wait);
+ 	struct aead_request *req;
+ 	size_t bsize;
+ 	void *buffer;
+@@ -633,9 +636,10 @@ int krb5_aead_decrypt(const struct krb5_enctype *krb5,
+ 	iv = buffer + krb5_aead_size(aead);
+ 
+ 	aead_request_set_tfm(req, aead);
+-	aead_request_set_callback(req, 0, NULL, NULL);
++	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++				  crypto_req_done, &wait);
+ 	aead_request_set_crypt(req, sg, sg, *_len, iv);
+-	ret = crypto_aead_decrypt(req);
++	ret = crypto_wait_req(crypto_aead_decrypt(req), &wait);
+ 	if (ret < 0)
+ 		goto error;
+ 
+diff --git a/crypto/krb5/rfc8009_aes2.c b/crypto/krb5/rfc8009_aes2.c
+index d39851fc3a4e..dda29f0bb700 100644
+--- a/crypto/krb5/rfc8009_aes2.c
++++ b/crypto/krb5/rfc8009_aes2.c
+@@ -175,6 +175,7 @@ static ssize_t rfc8009_encrypt(const struct krb5_enctype *krb5,
+ 			       size_t data_offset, size_t data_len,
+ 			       bool preconfounded)
+ {
++	DECLARE_CRYPTO_WAIT(wait);
+ 	struct aead_request *req;
+ 	struct scatterlist bsg[2];
+ 	ssize_t ret, done;
+@@ -227,10 +228,11 @@ static ssize_t rfc8009_encrypt(const struct krb5_enctype *krb5,
+ 
+ 	/* Hash and encrypt the message. */
+ 	aead_request_set_tfm(req, aead);
+-	aead_request_set_callback(req, 0, NULL, NULL);
++	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++				  crypto_req_done, &wait);
+ 	aead_request_set_ad(req, krb5_aead_ivsize(aead));
+ 	aead_request_set_crypt(req, bsg, bsg, secure_len, iv);
+-	ret = crypto_aead_encrypt(req);
++	ret = crypto_wait_req(crypto_aead_encrypt(req), &wait);
+ 	if (ret < 0)
+ 		goto error;
+ 
+@@ -253,6 +255,7 @@ static int rfc8009_decrypt(const struct krb5_enctype *krb5,
+ 			   struct scatterlist *sg, unsigned int nr_sg,
+ 			   size_t *_offset, size_t *_len)
+ {
++	DECLARE_CRYPTO_WAIT(wait);
+ 	struct aead_request *req;
+ 	struct scatterlist bsg[2];
+ 	size_t bsize;
+@@ -283,10 +286,11 @@ static int rfc8009_decrypt(const struct krb5_enctype *krb5,
+ 
+ 	/* Decrypt the message and verify its checksum. */
+ 	aead_request_set_tfm(req, aead);
+-	aead_request_set_callback(req, 0, NULL, NULL);
++	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++				  crypto_req_done, &wait);
+ 	aead_request_set_ad(req, krb5_aead_ivsize(aead));
+ 	aead_request_set_crypt(req, bsg, bsg, *_len, iv);
+-	ret = crypto_aead_decrypt(req);
++	ret = crypto_wait_req(crypto_aead_decrypt(req), &wait);
+ 	if (ret < 0)
+ 		goto error;
+ 
+-- 
+2.53.0
+
