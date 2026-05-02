@@ -1,84 +1,63 @@
-Received: from mailout1.hostsharing.net (mailout1.hostsharing.net [83.223.95.204])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E9B92D7DEF;
-	Sat,  2 May 2026 20:18:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A1A138AC8D;
+	Sat,  2 May 2026 20:28:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777753100; cv=none; b=F2ZwMDCgkH+awq+TUxA2nobTpVX6me2zdbLHYGWGU0FHb2GgfIpIruMWTXIKtYct2l4WkPLCFNkQElbPnWmKHyepwnQ1mliKR26pyfeGMRf74/N3FLDq4DO5nBOFf8yxf0N16uuxGoC2lYa6uFGqLLZkTPwy5UxpyeLQlS4+tKI=
+	t=1777753707; cv=none; b=LcBac0nwJtU4IqIzr4KH+u1kRg9081zf/sk+/C1f0SqZw6Pjh2HOjgtQOkGOiikHFhdb4vaHkpC5chi0XtWDqyuDRlZJDpfLeTF7kH/nAlRWXT2Ie1eaVbCaZ6VfWScrZGjDo7hob7XX6qyr2BBjHeAy1zXiw04wmadT76+ixZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777753100; c=relaxed/simple;
-	bh=Oc8JqvCsGcw3Cn8xm1DWHPB5ZvHWKHt4sXz5mP9fVDs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hxrd/7gcx7RsUU/9utYybCaAyEsLOmkkvO7Iqse3IIMg/QYHv1YFyCmDNg78bKn62YXxYiCXyMvbXb2fV2FqZvTsGSR8G5XivVSPzK8ElerpYrYhqRSm4xrsxz5Zzz8eutkRLw9pSalYRh/o0HFThG6v+/j9p5SMpgwuUN4Ega4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=83.223.95.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384
-	 client-signature ECDSA (secp384r1) client-digest SHA384)
-	(Client CN "*.hostsharing.net", Issuer "GlobalSign GCC R6 AlphaSSL CA 2025" (verified OK))
-	by mailout1.hostsharing.net (Postfix) with ESMTPS id C9AF135F;
-	Sat, 02 May 2026 22:08:12 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id B5841600D3A9; Sat,  2 May 2026 22:08:12 +0200 (CEST)
-Date: Sat, 2 May 2026 22:08:12 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: Ignat Korchagin <ignat@linux.win>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Vitaly Chikunov <vt@altlinux.org>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: ecrdsa - fix unknown OID check in
- ecrdsa_param_curve
-Message-ID: <afZZrCNmn3Bfwauf@wunner.de>
-References: <20260502190903.252061-3-thorsten.blum@linux.dev>
+	s=arc-20240116; t=1777753707; c=relaxed/simple;
+	bh=p96Hpc1f4VRm/Bm763Wx4ijW5oZFsgJrrn+D6Ed5WNo=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=aLv7wLBmrUeFaj2Acl7TBnrNlySGKYfBAOC+3Uh9NIIeTpZEHQO8yb7U1g6LYCSA7IkCOiQjunpZsUvoTmYbT6da4qZY/Wo5fh+YltNAG5py7Cz9kfzuz+r6+OCXQuweTEVDEqHCHICD9VNa8DxtnD/Vu2uv64onS/93ic/WlyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gFpcc9Eq; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gFpcc9Eq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44B74C2BCC7;
+	Sat,  2 May 2026 20:28:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777753707;
+	bh=p96Hpc1f4VRm/Bm763Wx4ijW5oZFsgJrrn+D6Ed5WNo=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=gFpcc9EqtCudfUYO69eZ+BYUHjrFs0H65cNwSZdvFrh2HK5X66uEJGSUdGd7zaq2b
+	 YJ30B/97o0rLIc7zsO/Jw5/jReu03sy2swKIIZbw1rOxtz3N0gF7yhlfBnUO0E0WaZ
+	 Arco41btcJW2O73b+lx6EVTyixQN+NMMBZyYI1GashcsoOEHb9OJ2gP6OHyxY7An5q
+	 YLgjOzy6s64zOw08y3X4x+KWZMi/DIn1noy12NeMMhdhp0BU/fgkgMgrlihC0/1tTL
+	 DMkEwphBc98NuADrj2yvRDmyj5TSWbOK0k/Zo8eAWCOACACwhqL6Fq8+7XwSDQX0FG
+	 1YuUmwnxcl+aA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B9E0F380CFDE;
+	Sat,  2 May 2026 20:27:40 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Fixes for 7.1
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <afWAJTyPunD79Bcd@gondor.apana.org.au>
+References: <afWAJTyPunD79Bcd@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <afWAJTyPunD79Bcd@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6 tags/v7.1-p3
+X-PR-Tracked-Commit-Id: 5db6ef9847717329f12c5ea8aba7e9f588a980c0
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 66edb901bf874d9e0787326ba12d3548b2da8700
+Message-Id: <177775365924.3928406.5133812754799678181.pr-tracker-bot@kernel.org>
+Date: Sat, 02 May 2026 20:27:39 +0000
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260502190903.252061-3-thorsten.blum@linux.dev>
 
-On Sat, May 02, 2026 at 09:09:04PM +0200, Thorsten Blum wrote:
-> The ->curve_oid check in ecrdsa_param_curve() rejects the valid enum
-> value 0 (OID_id_dsa_with_sha1), but look_up_OID() returns OID__NR on
-> lookup failure. Compare ->curve_oid with OID__NR instead to ensure that
-> only unknown OIDs return -EINVAL.
-> 
-> Fixes: 0d7a78643f69 ("crypto: ecrdsa - add EC-RDSA (GOST 34.10) algorithm")
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+The pull request you sent on Sat, 2 May 2026 12:40:05 +0800:
 
-Reviewed-by: Lukas Wunner <lukas@wunner.de>
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6 tags/v7.1-p3
 
-> +++ b/crypto/ecrdsa.c
-> @@ -145,7 +145,7 @@ int ecrdsa_param_curve(void *context, size_t hdrlen, unsigned char tag,
->  	struct ecrdsa_ctx *ctx = context;
->  
->  	ctx->curve_oid = look_up_OID(value, vlen);
-> -	if (!ctx->curve_oid)
-> +	if (ctx->curve_oid == OID__NR)
->  		return -EINVAL;
->  	ctx->curve = get_curve_by_oid(ctx->curve_oid);
->  	return 0;
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/66edb901bf874d9e0787326ba12d3548b2da8700
 
-This is a fairly harmless logic bug:  OID_id_dsa_with_sha1 is not
-a valid curve and so get_curve_by_oid() returns NULL, which is
-assigned to ctx->curve.
+Thank you!
 
-The function you're changing, ecrdsa_param_curve(), is called
-from the ecrdsa_params ASN.1 parser, which is invoked from
-ecrdsa_set_pub_key().  That function does perform a NULL pointer
-check for ctx->curve right after the ASN.1 parser returns.
-
-Your patch will change the return value for an unknown OID from
--ENOPKG to -EINVAL, but that probably doesn't matter much.
-
-Thanks,
-
-Lukas
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
