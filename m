@@ -1,142 +1,190 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from psionic.psi5.com (psionic.psi5.com [185.187.169.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E309A2DF13F
-	for <linux-crypto@vger.kernel.org>; Sat,  2 May 2026 04:53:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883ED2F362B;
+	Sat,  2 May 2026 08:19:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.187.169.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777697630; cv=none; b=S2qhD69Ms4DereHOm2XmbzXAtcUEZe4giygMswMIr6UH6hlEuYUA32vZbtnsL747tdPXOxqeCjpNSmoYcdizL5/qW+JW/1qLtZsonSkvWIDuxCRoUuvizCxHIieBL5EOs+r9iC2uKSV1NHmf6KsEzoSRUlcgl68T118ublCQ0zw=
+	t=1777709974; cv=none; b=tQuQ0I3aWTibVjpf2CH7J3ZGR0X9or+bJjokJ+6GO/SW/GSRTmngNcwR7hjsOEAkLZc1/Wa0Hbr7TECOUwmXPhEIZVxmJ/wpnj9Z59Cl4R2u9EouT50Zfh5XsXG7EqF2uH6L4YwHvT9jVWsthjH/KxjobIdk3GdwHHPmxTNQ+rg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777697630; c=relaxed/simple;
-	bh=VpHij7sYWAWN8urHzOdhSOIvoXtvC5qsBfyWrSkS0SY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZSw0nysmtz652xOK1dRdoCOmIhLJ288axaO/hWL73P0G4448By+iHhIypsfi5J7L3zlG/ylV5nZtsZXUGH9C+bEs/pq24Nbr3TDCJNedVKe9UYwFSEoQYq+lJbdU4uX3b6VB0ELRaLU3Fg4pt3Yyw92+WJyPCwn3qBewTXok0IU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=ctyyHQQc; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="ctyyHQQc"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=aPqzanSs5K1ZrIjFvVNpSTCpHhpSYlhWV8PkcvIsGwk=; 
-	b=ctyyHQQcYkJIBMEaGq1hrmlqDBhBlSxVRtN8HKqk7cyXmTqiFnW19byw12S0BG08yB/srcCQwrp
-	hnGlfhuj7/e2Fod5ElX6reWa0PCwwXU96alxEqZMynrdDb/D+ZUj1D3Z8/sSnnWGXUgQi/0cjYkSX
-	tAzpdG9d7aNoCifrp5TeOJFKPClsSxmSorqujjUdzVq5VE3Lx8heKko0d2Pn5cEI24vhh3/FUfd7e
-	mIzMnA7HI5F9v5bI1mqISRk0F02or5UQZX/1ymqNTJxvg3ND3MuphIlwmCUtvOD2G+Smla1Zq1k+D
-	LytPRwGD8UbdHtkpORm7AohSYzYHxOxhf7Aw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wJ2MI-00Ab61-15;
-	Sat, 02 May 2026 12:53:43 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 02 May 2026 12:53:42 +0800
-Date: Sat, 2 May 2026 12:53:42 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linus Torvalds <torvalds@linuxfoundation.org>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Eric Biggers <ebiggers@kernel.org>, Taeyang Lee <0wn@theori.io>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Greg KH <gregkh@linuxfoundation.org>, davem@davemloft.net,
-	Brian Pak <bpak@theori.io>, Juno Im <juno@theori.io>,
-	Jungwon Lim <setuid0@theori.io>
-Subject: [v2 PATCH] crypto: authencesn - Use memcpy_from/to_sglist
-Message-ID: <afWDVpH2ba-DVpkT@gondor.apana.org.au>
-References: <acOpDrnN3cVfiASk@gondor.apana.org.au>
- <CAHk-=wiEzzo=LQ4TasUqFDkSYYAXa3VT6PvLx+AS8asOEA6hng@mail.gmail.com>
- <acSzWm2bzRXTkhVH@gondor.apana.org.au>
- <acTWNAs0eBc9F-d0@gondor.apana.org.au>
+	s=arc-20240116; t=1777709974; c=relaxed/simple;
+	bh=NTsx/M31hlFH1cwqARJbbg0cfBQG+Jn+hgAhTdlKVZk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Y3ZPEbqbmdFWsGq9wwU5ijkPsABzCf6EWHv7S93Pb3OAc0uYXHMV06ZXC8n814HLy8aHBVD9qOQAFUNGyJGS1v/s9V12nDkNYPRbboGw6p2Q9DoR10h96PXqpUSdXFqEx/WE6JevoRLaTyujXUr1RkduuXfIHJrw7eW7lS1FGtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de; spf=pass smtp.mailfrom=hogyros.de; arc=none smtp.client-ip=185.187.169.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hogyros.de
+Received: from [IPV6:2400:2410:b120:f200:9e5c:8eff:fec0:ee40] (unknown [IPv6:2400:2410:b120:f200:9e5c:8eff:fec0:ee40])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by psionic.psi5.com (Postfix) with ESMTPSA id A5F643F51E;
+	Sat,  2 May 2026 10:19:17 +0200 (CEST)
+Message-ID: <9f020da7-97c5-41cc-b0f1-d8aab1bb39ec@hogyros.de>
+Date: Sat, 2 May 2026 17:19:14 +0900
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <acTWNAs0eBc9F-d0@gondor.apana.org.au>
+User-Agent: Mozilla Thunderbird
+Subject: Re: AF_ALG hardening
+To: Demi Marie Obenour <demiobenour@gmail.com>,
+ Eric Biggers <ebiggers@kernel.org>
+Cc: Jan Schaumann <jschauma@netmeister.org>, iwd@lists.linux.dev,
+ Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+ linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
+References: <afJorKIje4O6dXbH@netmeister.org>
+ <d6111caa-db61-498a-92cb-ea7a0aa0a5e2@ehuk.net> <87se8dgicq.fsf@gentoo.org>
+ <afL-QhLfEKqHZqka@eldamar.lan> <20260430071917.GB54208@sol>
+ <177abb5d-8ba9-4bb9-8b23-9fbc868ed3cd@gmail.com> <20260501180028.GA2260@sol>
+ <19837ef5-e5b6-45f4-8336-3ce07423dfb1@gmail.com>
+ <20260501201841.GA2540@quark>
+ <c13dd3c5-ddc1-431e-bc7d-2de39c551f8e@gmail.com>
+ <20260502033556.GA3872267@google.com>
+ <3cc88b2d-fbd6-4e47-b82c-3c685fec0581@gmail.com>
+Content-Language: en-US
+From: Simon Richter <Simon.Richter@hogyros.de>
+In-Reply-To: <3cc88b2d-fbd6-4e47-b82c-3c685fec0581@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------IAgX6DaXQhDJpK1phOpjNiIQ"
 
-v2 has been refreshed against current mainline.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------IAgX6DaXQhDJpK1phOpjNiIQ
+Content-Type: multipart/mixed; boundary="------------4KG0OAh5fKrDahONrZhGK9sd";
+ protected-headers="v1"
+From: Simon Richter <Simon.Richter@hogyros.de>
+To: Demi Marie Obenour <demiobenour@gmail.com>,
+ Eric Biggers <ebiggers@kernel.org>
+Cc: Jan Schaumann <jschauma@netmeister.org>, iwd@lists.linux.dev,
+ Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+ linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
+Message-ID: <9f020da7-97c5-41cc-b0f1-d8aab1bb39ec@hogyros.de>
+Subject: Re: AF_ALG hardening
+References: <afJorKIje4O6dXbH@netmeister.org>
+ <d6111caa-db61-498a-92cb-ea7a0aa0a5e2@ehuk.net> <87se8dgicq.fsf@gentoo.org>
+ <afL-QhLfEKqHZqka@eldamar.lan> <20260430071917.GB54208@sol>
+ <177abb5d-8ba9-4bb9-8b23-9fbc868ed3cd@gmail.com> <20260501180028.GA2260@sol>
+ <19837ef5-e5b6-45f4-8336-3ce07423dfb1@gmail.com>
+ <20260501201841.GA2540@quark>
+ <c13dd3c5-ddc1-431e-bc7d-2de39c551f8e@gmail.com>
+ <20260502033556.GA3872267@google.com>
+ <3cc88b2d-fbd6-4e47-b82c-3c685fec0581@gmail.com>
+In-Reply-To: <3cc88b2d-fbd6-4e47-b82c-3c685fec0581@gmail.com>
 
-Thanks,
+--------------4KG0OAh5fKrDahONrZhGK9sd
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
----8<---
-Convert scatterwalk_map_and_copy to memcpy_to/from_sglist as they
-are more readable and less error-prone.
+SGksDQoNCk9uIDUvMi8yNiAxMzo1MiwgRGVtaSBNYXJpZSBPYmVub3VyIHdyb3RlOg0KDQo+
+PiBPZiBjb3Vyc2UsIGl0J2xsIGFsc28gYmUgYSBmYWlyIGEgYml0IG9mIHdvcmssIGFuZCB1
+bmZvcnR1bmF0ZWx5IEkgYWxzbw0KPj4gZXhwZWN0IHB1c2hiYWNrIGZyb20gcGVvcGxlIHdo
+byAoaW5jb3JyZWN0bHkgSU1PKSB0aGluayB0aGF0IEFGX0FMRw0KPj4gcGVyZm9ybWFuY2Ug
+aXMgaW1wb3J0YW50LCBldmVuIG1vcmVzbyB0aGFuIHNlY3VyaXR5Lg0KDQpBRl9BTEcgcGVy
+Zm9ybWFuY2UgKHRpbWUvcG93ZXIpIGlzIGltcG9ydGFudCBpbiB0aGUgd2F5IHRoYXQgaXQn
+cyANCmxpdGVyYWxseSB0aGUgb25seSBwb2ludCB0byBpdHMgZXhpc3RlbmNlLiBJZiBhbGwg
+aXQgcHJvdmlkZXMgaXMgZXh0cmEgDQpvdmVyaGVhZCBvdmVyIGEgc29mdHdhcmUgaW1wbGVt
+ZW50YXRpb24sIHRoZW4gaXQgbWFrZXMgbm8gc2Vuc2UgdG8ga2VlcCBpdC4NCg0KPiBJZiBv
+bmUgY2FyZXMgYWJvdXQgY3J5cHRvIG9mZmxvYWQgcGVyZm9ybWFuY2UsIHRoZXkgd291bGQg
+YmUgYmV0dGVyDQo+IHNlcnZlZCBieSBjcmVhdGluZyBhIGJldHRlciBpbnRlcmZhY2UgdG8g
+aXQgdGhhbiBBRl9BTEcuICBBRl9BTEcgaXMNCj4gYSBob3JyaWJsZSBBUEkgd2l0aCAocHJl
+c3VtYWJseSkgdG9ucyBvZiBvdmVyaGVhZC4gIEkga25vdyB0aGUgUUFUDQo+IGRyaXZlciBh
+bmQgYW4gTnZpZGlhIEJsdWVGaWVsZCBEUFUgYWNjZWxlcmF0b3IgZHJpdmVyIGJvdGggYnlw
+YXNzIGl0Lg0KDQpUaGUgQVBJIGlzIGRlc2lnbmVkIHRvIGJlIHplcm9jb3B5LCB0aGF0J3Mg
+d2h5IGl0J3MgdGhpcyBob3JyaWJsZSANCmNvbWJpbmF0aW9uIG9mIHNvY2tldCBBUEkgYW5k
+IHNwbGljZSgpLiBUaGUgZ2VuZXJhbCBhc3N1bXB0aW9uIGhlcmUgaXMgDQp0aGF0IGl0IGRv
+ZXMgbm90IG1ha2Ugc2Vuc2UgdG8gb2ZmbG9hZCBzbWFsbCByZXF1ZXN0cyBpbiB0aGUgZmly
+c3QgDQpwbGFjZSwgYW5kIGFwcGxpY2F0aW9uIHByb2dyYW1tZXJzIGFyZSBhd2FyZSBvZiB0
+aGF0Lg0KDQpUaGUgdXNlIGNhc2UgaXMgIkkgaGF2ZSBhIGZpbGUgb3IgcGlwZSBmdWxsIG9m
+IGRhdGEgYW5kIGEgZGV2aWNlIHdpdGggYSANCmtlcm5lbCBkcml2ZXIgdGhhdCBzaG91bGQg
+cHJvY2VzcyBpdCwgY2FuIHdlIHNvbWVob3cgYXZvaWQgY29weWluZyB0aGUgDQpkYXRhIHRv
+IHVzZXJzcGFjZSBvbmx5IHRvIGltbWVkaWF0ZWx5IGNvcHkgaXQgYmFjayB0byBrZXJuZWxz
+cGFjZT8iDQoNClRoaXMgY29weWluZyBpcyBldmVuIG1vcmUgc2lsbHkgaWYgdGhlIGFjdHVh
+bCBxdWVzdGlvbiBJIGhhdmUgaW4gDQp1c2Vyc3BhY2UgaXMgIndoYXQgaXMgdGhlIFNIQTI1
+NiBjaGVja3N1bSBvZiB0aGlzIGZpbGU/IiBvciAid2hhdCBpcyB0aGUgDQpTSEEyNTYgY2hl
+Y2tzdW0gb2YgdGhlIHN0cmluZyAnYmxvYiA4Nzk0MzExNTI4XDAnIGZvbGxvd2VkIGJ5IHRo
+aXMgDQpmaWxlPyIgKHdoZXJlIHlvdSBjYW4gc2VlIHdoeSBhbnlvbmUgd291bGQgYXNrIHN1
+Y2ggYSBzaWxseSBxdWVzdGlvbiBhbmQgDQpwcmVmZXIgdG8gdXNlIHRoZSBkZWRpY2F0ZWQg
+aGFyZHdhcmUgdGhhdCBwcm9jZXNzZXMgMjQgR0IvcyBvdmVyIHRoZSBDUFUgDQphdCAxMDAg
+TUIvcykNCg0KPiBGdXJ0aGVybW9yZSwgQUZfQUxHIG9ubHkgc3VwcG9ydHMgc3ltbWV0cmlj
+IGFsZ29yaXRobXMuICBUaGVzZQ0KPiBhbGdvcml0aG1zIGFyZSBpbmV4cGVuc2l2ZSBpbiBz
+b2Z0d2FyZSwgc28gdGhlIGNvc3Qgb2YgZ29pbmcgdG8gYW4NCj4gYWNjZWxlcmF0b3IgYW5k
+IGJhY2sgaXMgZW5vcm1vdXMgY29tcGFyZWQgdG8gdGhlIGNvc3Qgb2YgYSBzaW5nbGUNCj4g
+b3BlcmF0aW9uLg0KDQpZZXMsIGluaXRpYWwgc2V0dXAgY29zdCBpcyBoaWdoLCBzbyB0aGlz
+IG9ubHkgbWFrZXMgc2Vuc2UgZm9yIGxhcmdlIA0KcmVxdWVzdHMgb3IgYmF0Y2hlcyAoc3Vi
+bWl0dGluZyBpbmRpdmlkdWFsIHJlcXVlc3RzIGlzIGdlbmVyYWxseSBjaGVhcCwgDQp0aGUg
+ZGlmZmljdWx0eSBpcyBlbnN1cmluZyB0aGUgZGF0YSBpcyBhY2Nlc3NpYmxlIHRvIHRoZSBo
+YXJkd2FyZSkuDQoNClRoYXQncyBhbHNvIHdoeSB0aGVyZSBhcmUgbm8gYXN5bW1ldHJpYyBh
+bGdvcml0aG1zOiB0aGVzZSBhcmVuJ3QgDQpnZW5lcmFsbHkgdXNlZCBvbiBsYXJnZSBhbW91
+bnRzIG9mIGRhdGEsIHNvIGl0J3MgbmV2ZXIgd29ydGggaXQgdG8gDQpvZmZsb2FkIHRoZXNl
+Lg0KDQpJdCB3b3VsZCBtYWtlIHNlbnNlIHRvIG9mZmxvYWQgYXN5bW1ldHJpYyBhbGdvcml0
+aG1zIGlmIHRoZXJlIHdhcyBhIA0Kc2VjdXJlIGtleSBzdG9yYWdlIGluc2lkZSB0aGUgZGV2
+aWNlLCBidXQgQUZBSUsgdGhlIEFQSSBkb2VzIG5vdCBzdXBwb3J0IA0KdGhhdCwgb3IgZXZl
+biB0aGUgbm90aW9uIG9mIG9uLWRldmljZSBjb250ZXh0cy4NCg0KSXQgaXMgbm90IGEgZ29v
+ZCBBUEksIGFuZCBpdCBzaXRzIG9uIHRvcCBvZiB0aGUgYWhhc2gvYWNvbXAvYWNyeXB0IA0K
+aW50ZXJmYWNlcyB3aGljaCBhcmUgYWxzbyB1bmZyaWVuZGx5IHRvIGFjY2VsZXJhdG9yIGhh
+cmR3YXJlLg0KDQo+IEZvciBvZmZsb2FkIHRvIGV2ZW4gYSB2ZXJ5IGZhc3QgYWNjZWxlcmF0
+b3IgdG8gbWFrZSBzZW5zZSwNCj4gb25lIG11c3QgYmUgYWJsZSB0byBkZWVwbHkgcGlwZWxp
+bmUgcmVxdWVzdHMuICBIb3dldmVyLCB0aGlzIGNyZWF0ZXMNCj4gYSBodWdlIGFtb3VudCBv
+ZiBhZGRpdGlvbmFsIGNvbXBsZXhpdHkgZm9yIHNvZnR3YXJlLg0KDQpTb2Z0d2FyZSB0aGF0
+IGhhcyByZXF1aXJlbWVudHMgbGlrZSB0aGF0IGlzIGFscmVhZHkgY29tcGxleCAtLSBpZiBJ
+IGhhdmUgDQphIGZldyB0aG91c2FuZCB3b3JrbG9hZCBwYWNrZXRzLCBJIG5lZWQgYSB3b3Jr
+ZXIgcG9vbC4NCg0KSWYgSSBkb24ndCBoYXZlIHRoZXNlIHJlcXVpcmVtZW50cywgdGhlbiBp
+bmRlZWQgSSBhbSBiZXR0ZXIgb2ZmIHdpdGggYSANCnNvZnR3YXJlLW9ubHkgc29sdXRpb24g
+aW4gdXNlcnNwYWNlLCBiZWNhdXNlIGl0IGlzIG5vdCByZWxldmFudCBmcm9tIGEgDQpwZXJm
+b3JtYW5jZSBzdGFuZHBvaW50Lg0KDQo+IEFzeW1tZXRyaWMgYWNjZWxlcmF0b3JzIGFsc28g
+ZG9uJ3QgaGF2ZSBhIGJldHRlciBhbHRlcm5hdGl2ZSBpbiB0aGUNCj4gZm9ybSBvZiBpbmxp
+bmUgZW5jcnlwdGlvbiBoYXJkd2FyZS4NCg0KUXVpdGUgYSBudW1iZXIgb2YgYXJjaGl0ZWN0
+dXJlcyBkbyBub3QgaGF2ZSBpbmxpbmUgZW5jcnlwdGlvbiBzdXBwb3J0LCANCmFuZCB0aGVz
+ZSBhcmUgbW9yZSBsaWtlbHkgdG8gdXNlIG9mZmxvYWQgaGFyZHdhcmUgZXZlbiBmb3Igc21h
+bGxlciANCnJlcXVlc3RzIChlLmcuIGZvciBwb3dlciBzYXZpbmcpLg0KDQo+IEkgdGhpbmsg
+YSBoaWdoIHBlcmZvcm1hbmNlIGludGVyZmFjZSB0byBoYXJkd2FyZSBjcnlwdG9ncmFwaHkg
+KGFuZCwNCj4gbW9yZSBpbXBvcnRhbnRseSwgY29tcHJlc3Npb24pIHdvdWxkIGxvb2sgbXVj
+aCBtb3JlIGxpa2UgUkRNQS4NCj4gVGhlcmUgd291bGQgYmUgYSBrZXJuZWwgZHJpdmVyIHRo
+YXQgZGlkIHRoZSBiYXJlIG1pbmltdW0gdG8gcHJvdmlkZQ0KPiBpc29sYXRpb24gYmV0d2Vl
+biB1c2Vyc3BhY2UgcHJvZ3JhbXMsIGFuZCBhIHVzZXJzcGFjZSBkcml2ZXIgdGhhdA0KPiB3
+YXMgcmVzcG9uc2libGUgZm9yIGFic3RyYWN0aW5nIG92ZXIgdGhlIGhhcmR3YXJlLg0KDQpP
+ZmZsb2FkIGhhcmR3YXJlIGNvbWVzIGluIHR3byBmbGF2b3VyczogdGhlIGhpZ2gtdGhyb3Vn
+aHB1dCBraW5kLCBidWlsdCANCmludG8gZGV2aWNlcyB3aGVyZSBubyBvbmUgY2FyZXMgYWJv
+dXQgcG93ZXIsIGFuZCB0aGUgDQpsb3dlci1wb3dlci10aGFuLXRoZS1DUFUtZG9pbmctaXQg
+a2luZC4NCg0KVGhlIGZvcm1lciBjYW4gZWFzaWx5IHByb3ZpZGUgdXNlciBjb250ZXh0cyBl
+dmVuIGluIHZpcnR1YWxpemVkIA0KZW52aXJvbm1lbnRzLCBidXQgdGhlIGxhdHRlciBpcyBn
+ZW5lcmFsbHkgZm91bmQgaW4gc3lzdGVtcyB0aGF0IGRvIG5vdCANCmV2ZW4gaGF2ZSBhbiBJ
+T01NVS4gRWl0aGVyIHdlIGhhdmUgdHdvIGRpc3RpbmN0IGludGVyZmFjZXMgZm9yIHRoZXNl
+LCBvciANCndlIG5lZWQgb25lIHRoYXQgY2FuIGhhbmRsZSBlaXRoZXIuDQoNCk15IGZlZWxp
+bmcgaXMgdGhhdCBubyBvbmUgaXMgaGFwcHkgd2l0aCBlaXRoZXIgQUZfQUxHIG9yIHRoZSAN
+CmFzeW5jaHJvbm91cyBpbnRlcmZhY2VzIGluIGdlbmVyYWwsIHNvIEkgdGhpbmsgdGhleSBz
+aG91bGQgYmUgcmVtb3ZlZCANCmNvbXBsZXRlbHksIGFuZCB0aGVyZSBzaG91bGQgYmUgYSBz
+ZXBhcmF0ZSAib2ZmbG9hZCIgU0lHIHRoYXQgY3JlYXRlcyANCm5ldyBpbnRlcmZhY2VzIHRo
+YXQgYXJlIGFjdHVhbGx5IHVzYWJsZSB3aXRoIGN1cnJlbnQgaGFyZHdhcmUuDQoNCiA+IDEu
+IEdldCByaWQgb2YgemVyby1jb3B5IHN1cHBvcnQgKHNwbGljZSgpKS4NCiA+IDIuIEdldCBy
+aWQgb2YgQUlPIHN1cHBvcnQuDQogPiAzLiBPbmx5IGFsbG93IHNvZnR3YXJlIGltcGxlbWVu
+dGF0aW9ucy4NCg0KVGhhdCBtYWtlcyBzZW5zZSBpZiB3ZSdyZSBmb3JjZWQgdG8ga2VlcCB0
+aGUgaW50ZXJmYWNlIGZvciBub3csIGJ1dCBpdCANCm1lYW5zIHRoYXQgb2ZmbG9hZCBzdXBw
+b3J0IHRocm91Z2ggdGhlIGNyeXB0byBzdWJzeXN0ZW0gaXMgY29tcGxldGVseSANCmRlYWQs
+IGFuZCBhbnlvbmUgd2FudGluZyB0byBzdXBwb3J0IG9mZmxvYWQgaGFyZHdhcmUgbmVlZHMg
+dG8gZ28gDQplbHNld2hlcmUuIENhbiB3ZSBnZXQgYSBkZWZpbml0aXZlIHN0YXRlbWVudCB0
+aGF0IHRoaXMgaXMgaW50ZW5kZWQ/DQoNCiAgICBTaW1vbg0K
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+--------------4KG0OAh5fKrDahONrZhGK9sd--
 
-diff --git a/crypto/authencesn.c b/crypto/authencesn.c
-index 522df41365d8..ca063576f670 100644
---- a/crypto/authencesn.c
-+++ b/crypto/authencesn.c
-@@ -94,11 +94,11 @@ static int crypto_authenc_esn_genicv_tail(struct aead_request *req,
- 	u32 tmp[2];
- 
- 	/* Move high-order bits of sequence number back. */
--	scatterwalk_map_and_copy(tmp, dst, 4, 4, 0);
--	scatterwalk_map_and_copy(tmp + 1, dst, assoclen + cryptlen, 4, 0);
--	scatterwalk_map_and_copy(tmp, dst, 0, 8, 1);
-+	memcpy_from_sglist(tmp, dst, 4, 4);
-+	memcpy_from_sglist(tmp + 1, dst, assoclen + cryptlen, 4);
-+	memcpy_to_sglist(dst, 0, tmp, 8);
- 
--	scatterwalk_map_and_copy(hash, dst, assoclen + cryptlen, authsize, 1);
-+	memcpy_to_sglist(dst, assoclen + cryptlen, hash, authsize);
- 	return 0;
- }
- 
-@@ -129,9 +129,9 @@ static int crypto_authenc_esn_genicv(struct aead_request *req,
- 		return 0;
- 
- 	/* Move high-order bits of sequence number to the end. */
--	scatterwalk_map_and_copy(tmp, dst, 0, 8, 0);
--	scatterwalk_map_and_copy(tmp, dst, 4, 4, 1);
--	scatterwalk_map_and_copy(tmp + 1, dst, assoclen + cryptlen, 4, 1);
-+	memcpy_from_sglist(tmp, dst, 0, 8);
-+	memcpy_to_sglist(dst, 4, tmp, 4);
-+	memcpy_to_sglist(dst, assoclen + cryptlen, tmp + 1, 4);
- 
- 	sg_init_table(areq_ctx->dst, 2);
- 	dst = scatterwalk_ffwd(areq_ctx->dst, dst, 4);
-@@ -217,9 +217,9 @@ static int crypto_authenc_esn_decrypt_tail(struct aead_request *req,
- 
- 	if (src == dst) {
- 		/* Move high-order bits of sequence number back. */
--		scatterwalk_map_and_copy(tmp, dst, 4, 4, 0);
--		scatterwalk_map_and_copy(tmp + 1, dst, assoclen + cryptlen, 4, 0);
--		scatterwalk_map_and_copy(tmp, dst, 0, 8, 1);
-+		memcpy_from_sglist(tmp, dst, 4, 4);
-+		memcpy_from_sglist(tmp + 1, dst, assoclen + cryptlen, 4);
-+		memcpy_to_sglist(dst, 0, tmp, 8);
- 	} else
- 		memcpy_sglist(dst, src, assoclen);
- 
-@@ -274,18 +274,17 @@ static int crypto_authenc_esn_decrypt(struct aead_request *req)
- 		goto tail;
- 
- 	cryptlen -= authsize;
--	scatterwalk_map_and_copy(ihash, req->src, assoclen + cryptlen,
--				 authsize, 0);
-+	memcpy_from_sglist(ihash, req->src, assoclen + cryptlen, authsize);
- 
- 	/* Move high-order bits of sequence number to the end. */
--	scatterwalk_map_and_copy(tmp, src, 0, 8, 0);
-+	memcpy_from_sglist(tmp, src, 0, 8);
- 	if (src == dst) {
--		scatterwalk_map_and_copy(tmp, dst, 4, 4, 1);
--		scatterwalk_map_and_copy(tmp + 1, dst, assoclen + cryptlen, 4, 1);
-+		memcpy_to_sglist(dst, 4, tmp, 4);
-+		memcpy_to_sglist(dst, assoclen + cryptlen, tmp + 1, 4);
- 		dst = scatterwalk_ffwd(areq_ctx->dst, dst, 4);
- 	} else {
--		scatterwalk_map_and_copy(tmp, dst, 0, 4, 1);
--		scatterwalk_map_and_copy(tmp + 1, dst, assoclen + cryptlen - 4, 4, 1);
-+		memcpy_to_sglist(dst, 0, tmp, 4);
-+		memcpy_to_sglist(dst, assoclen + cryptlen - 4, tmp + 1, 4);
- 
- 		src = scatterwalk_ffwd(areq_ctx->src, src, 8);
- 		dst = scatterwalk_ffwd(areq_ctx->dst, dst, 4);
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--------------IAgX6DaXQhDJpK1phOpjNiIQ
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEtjuqOJSXmNjSiX3Tfr04e7CZCBEFAmn1s4IACgkQfr04e7CZ
+CBEdjAf/aIEKDJWbLJOV9o8KZ+gGbALiDwqce8bvf2XYzY27fgA56AbOTCnyo5Vn
+m3PG1cTINe5ZT7nYPEBGeYoHQ1fU1LQFm2N+NdJdLCd0UM1WEswHBQtrYcPrZDuz
+Tjgw67SAMsEplS3LaF9h7ve9/WkUwlNqKeHIhRLUCOg4SJD3iVfAq1k3IhleaX18
+W7Tk/Fs+Ve1nnUOUUf+ci08d2Zn7S9Eh1SasgJIYUEjKrRS9kCytyP3X+vntyk+n
+q87U+vVN3Map19L5Ybmqf+s45QO5KTIMzPoohEgm3gY1yt5Tc1RVdQ1XMMgO1o7y
+UNDO9OnH7OQFM2wDS4Y3UzxtEjIPmg==
+=/x7G
+-----END PGP SIGNATURE-----
+
+--------------IAgX6DaXQhDJpK1phOpjNiIQ--
