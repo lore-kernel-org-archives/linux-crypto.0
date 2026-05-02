@@ -1,66 +1,66 @@
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3BB8263C9F
-	for <linux-crypto@vger.kernel.org>; Sat,  2 May 2026 20:42:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0086CA52
+	for <linux-crypto@vger.kernel.org>; Sat,  2 May 2026 22:32:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777754542; cv=none; b=ChNHHBn4pG/mj6ePMJFq+WemhW7kkPDFhWqLVo5+Qgic8oI9NKLs6udIlVkkg9X05y3QRyci1KcdJHJkPbnhNATHT2XCTPnEmcCi9cFNkP16bhGxpzRZeEPKKWVnH1vF0ME6xML9V4vMMK5OudQTpZL9K4C+/M8jj78sG6NmfYg=
+	t=1777761151; cv=none; b=c71rY+JWbVeP7POcvGl76it2MXfCUdqYY74JaAvybkqT0n/HwwVHQ3WsGgeADPHWN26QILrP7fG+F8LDZT47vsTnCwi4O2ZcguEV/Cr7vwj+wgB/tK8IxolLUeWFnaEb/WIMsuAYIl3EkV9gi3xmfRX3VSjnd4IOO7ubxwFnC14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777754542; c=relaxed/simple;
-	bh=rzCuw4KubAEBoo5OPUJZ1rLUpMwWAr4ksYeDuDUG9sg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Kl3x3X8+ddhsmPhTURW4MFEzP5mLp4el2K8hnLcsUeC72JT7fwDVQ177ZeWyyDr32Yf1Wls87MY2PnPjY44PNyjj9lhtUs1nGxdhtVVT51diD8NsDjhzxMVWl+96+7/jeXXOUT9RyQH8QEBjkyir5qq+/hAZpdBROZRxInAsAWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oenQ7+lc; arc=none smtp.client-ip=209.85.128.180
+	s=arc-20240116; t=1777761151; c=relaxed/simple;
+	bh=UNN2ZW+DkuQu1tXoLP3q7k4L0pj/fCLAOCBAmEjCyH4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=WfTBziqrlpA1d0K3mrzF4tPeTBSz8tFQ4z8Xbd0PeyetyEJDPlsJJij+fW42+A12+Hm42BUBC+/GSd4qaz3tKVSyfqu+Q42/LbIgtfG2blByW8U2OzJNigaXeYkoVPQIVqpOuR1DxxAAXd2LMl7qVjksmoJmWQHyEk0HNczBi5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RvkPVMny; arc=none smtp.client-ip=74.125.224.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oenQ7+lc"
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-79a46260385so37058867b3.3
-        for <linux-crypto@vger.kernel.org>; Sat, 02 May 2026 13:42:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RvkPVMny"
+Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-651c5d525f6so2634938d50.3
+        for <linux-crypto@vger.kernel.org>; Sat, 02 May 2026 15:32:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777754540; x=1778359340; darn=vger.kernel.org;
-        h=in-reply-to:autocrypt:from:content-language:references:cc:to
-         :subject:user-agent:mime-version:date:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=fmUEYuw8u4LFnKQA/NeB79TolKqpNXTvZCl8uTW1eC4=;
-        b=oenQ7+lcnabKECy8NzCm9x7CpZqzO4W7Hb+//cU6OakM+Eg1V8YMRubdxzYXP5juKh
-         YuIIKARIY24cgzrV7Zx3mozLza+3fNxy44qVKnLIKl2eeX/Ki3KrG2BCijtCDRJrtFOJ
-         DM9ZR7jkPNsfhvyZPpbx+Q5nJPP96A/83sPWglH8JILUs8ISNk9F+x5Z0RnBAraaU9/B
-         cd/9gbW+gJzSHHKD8J/JuppPk4e0L+vNVJQI31QQgVLbZnUjnwrhLwvrV9nxg29LSVUk
-         EX5EOwWJJ/U8nNAN0KDrMGZ8nSj2gWpJ5UNpIT9f487iPs1kBuL+sMxLbiHuVEMmnxB0
-         8Sug==
+        d=gmail.com; s=20251104; t=1777761149; x=1778365949; darn=vger.kernel.org;
+        h=in-reply-to:autocrypt:from:content-language:references:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EpW2ttmPDGVevpAZzbqp40iMi/VIj+CW6c+DBUN+6V8=;
+        b=RvkPVMnyFRjd3nEpI3sEuUiUwcpg5oGqxk2lV1lI6Wz7Zq5SD4mAvh/zWXPciu44Jr
+         jqA5hlovT1jOIf4rzM50gLDPGA8Wx1TfSOL5GRKtRa9FlfaFDqTIPMphY6azCXONk/2d
+         iGYduOy1BPmS7RWg910VM3hPyOpUqvS4Fu+YaSjNCBqj1d7rZpCd0+EKCRolbCYypuNl
+         Ssg5wvJ0auu047PwdcIGnMNRpjY/vldaLj+YHPqwWmUa6Bk/5uN9eh5xMQe/juqDm10A
+         Aq4HP5vE50YZCeW5DbSn7YyTzJ4PmkBAE8bKT1rN/Z837o11ludp2IbubvIrJyYb0Yv4
+         TV6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777754540; x=1778359340;
-        h=in-reply-to:autocrypt:from:content-language:references:cc:to
-         :subject:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fmUEYuw8u4LFnKQA/NeB79TolKqpNXTvZCl8uTW1eC4=;
-        b=ACgax49xx6oGTY78SuSqDeDhBXEk0JXvb4DCl8dFi1j1OAni59sJTvVf4XS/9zQr+o
-         pxkE9O8E5dUpNgse7aZ9vqzvCFSqb2wZHea5pv8UUptBSvnhTUMaXjGR1Qh8Jq6cYFMm
-         sQ6O+srTfX+3zJcCLdqqzpWC/h73GROES0OJHwDScU0satpUkqHop8PjpGI8ktv+ISZ4
-         +NAJum4Zp83zQhZrKviivWuFPsoyGbHekz2w+RQHDWFsiw3IH0VFICLOfXcWs7mC81lF
-         945SkxhgOFVL+kgB8FxeQPtv6EP65qdfIarpRD3/cn73t1d29jgSHFctij2831Wj2Fpp
-         FOXg==
-X-Forwarded-Encrypted: i=1; AFNElJ9X3m0GI5p9AvP1fd1ryeWjnmkDuwdA+JhZ3CcLeb9OKArEjA5icm2U1YY9shHuy8VtVE/AShlz82SLdww=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1y+9mvUc0C5WLMScn6a078h+WbfCrkejt7MPCEmo4wRcmwJqY
-	o1zrrnJNKHeBNyjUojKppalBgB5ip83QmIu09yGOIMuGJmixgyiZrdZrmNoaF39K
-X-Gm-Gg: AeBDievmkxuNUSoqHUKiAbwbgrQqw3QLHLpNL+Ui62tBvEsJSXR7yb3yW0WE/VxXl+a
-	168uxKFiIhLg47Yb9v6O0yxj2T/GduBCa4VjgJlb9kTvn1tMjakmJOQqAvjFxmLBuHgIXiU5atC
-	fDkJ8kE2Gcq68AbpTbNL1wi/tCbXGkmC+jZW8GviJEVbIpk2ERLldtds6gVhchprlZ93MgUGPrl
-	v2STm58Z9IdmMGgg0q8a/F2Imz8GHglP7pjELvxOD36AJ3P2o9e+4i0bSMzfuX1TiI8KepjHfbu
-	j8KzGnXJKnWTirSJsvzdLmLEh4MFQR/bd4pz1r+ZqwIqRGxP52sIZKc+qJVYcnnUvKxcPtFIqGc
-	DdA0kdYKEhFvx+rXT5s0SVy79kwI+KNzVEa2wqI2mi1EXq6FO54iIm7M19o8tRLt9ayNkMExwkp
-	S2K2Zu3jMX5yFLbPrQ3N2cJsCQxrYCMyBsj9uecUPulM0BdPGZvQNPMFNnmEuJTJDtyiHv6hY5c
-	33vF0PLbgfBsGVdnldFe5qVmcZkRhybjdlJywVg/HH8vQdImJJz
-X-Received: by 2002:a05:690c:e566:b0:7b4:53df:b02 with SMTP id 00721157ae682-7bd770b45bcmr36217877b3.28.1777754539651;
-        Sat, 02 May 2026 13:42:19 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1777761149; x=1778365949;
+        h=in-reply-to:autocrypt:from:content-language:references:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EpW2ttmPDGVevpAZzbqp40iMi/VIj+CW6c+DBUN+6V8=;
+        b=fatHSvDKZpfH/BVI1PHklWR2EzDs7ZqBa7xsJSm8IEh69XC73CLmW6VP0CMG8es0LX
+         BzmOn4fuD9bMEhIUg3s96MusMcGKGQh3OYxExzhoFQ5XVgIgYA3XnDkF41Kt7Zf645/4
+         RoH6OYzPsMBPowv9xf3s/E7nElAImI1IkcQ2y78gxlwtP1xDOerrN3w/im/Kg5wufJ7w
+         Ql1G85chLGaubnpn/cu3fcZxfBuj8aEmnq6Ci9mpfgWN2NF7z/X26UNp/R2cX6eZZTRQ
+         SapmflOkv1pxP+LbyKNq5bnF3bBeqokHsVzsIq1jo2X1mr9TuIBYOo2dXJD3uir3oPz6
+         MElQ==
+X-Forwarded-Encrypted: i=1; AFNElJ83all0OLmJFVsxt0n+IcRZKy40nm3nhE8ajb77nosX5FBGAGnkDlBqZGAou77ycjO9grkBUnGz9vMVtCA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyz2I0YgL6RFEQFXYZ2Pn7FalC5b/fzfBVITjxsn2kUQkGJbCzz
+	H3MRlOaiba0gmmGLh27eLjHk+KrHgvOA2krdb2X18EjeliXgwJXQMm1o
+X-Gm-Gg: AeBDieuxIYcoA9jdfixK3DpXn2PhSameUeyV5CFsyXlrANcAe1nCt5unqfQQ5aY5fUs
+	N88Ra1hfiLpf+59Y7b/jh/SDf5I+Lh7YnGGU/mDIh8xdgbj6EmYZRvS0BqJo/9b+ZvnXtkOXzL7
+	/hT18iSa8QyGKl41l7LPHZ4+5B7RHh9H9+iMABvb9KIEo/DkJCYcmVIIWb4VSkDvVB7lOocIWtE
+	EJWvDzn+xmdao4RFX5guLwUDFAFbiBoenx3t77nFAa6GdMQcB2itlwXFz96W3zjzVpegddp9ZgP
+	DaXfkXIG1OfXXOqE4fKumOjxSKUqSSoIAGc+IHa8mO2l0a9AWzbolM0lrFwYHmAQeYYdWzNWVj+
+	XQM/EuLafD75A+8GdSOTRavqonNUW0vRxg23usbQ12zV+wh3BDxRTLTyQqXeCDDeQEIVkIZQEsc
+	QYbykqWgQCUXP14XfK9UqXUhDNfnilgqyiYyynu/WutemRMhPFXkPllbBKczgpyVt0vQI3FCGtd
+	d2uv5vMpLFH5nWMN/WjHxyaOtkwSgb4A32I6lVKjvMcg+O2EpwI
+X-Received: by 2002:a05:690e:1282:b0:650:1d21:d6af with SMTP id 956f58d0204a3-65c3dae7564mr4079179d50.40.1777761148707;
+        Sat, 02 May 2026 15:32:28 -0700 (PDT)
 Received: from [10.138.34.110] (h69-131-150-190.cncrtn.broadband.dynamic.tds.net. [69.131.150.190])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7bd66525651sm28182957b3.3.2026.05.02.13.42.18
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-65c2e85f390sm3191128d50.15.2026.05.02.15.32.27
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 02 May 2026 13:42:18 -0700 (PDT)
-Message-ID: <066d6e56-3b54-40a6-962c-932fedcdc489@gmail.com>
-Date: Sat, 2 May 2026 16:42:01 -0400
+        Sat, 02 May 2026 15:32:27 -0700 (PDT)
+Message-ID: <3a52a111-e961-4ac6-830c-31465a7d14de@gmail.com>
+Date: Sat, 2 May 2026 18:32:22 -0400
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -68,22 +68,17 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: AF_ALG hardening
-To: Simon Richter <Simon.Richter@hogyros.de>,
- Eric Biggers <ebiggers@kernel.org>
-Cc: Jan Schaumann <jschauma@netmeister.org>, iwd@lists.linux.dev,
+Subject: Re: [oss-security] CVE-2026-31431: CopyFail: linux local privilege
+ scalation
+To: oss-security@lists.openwall.com, Richard Kettlewell <rjk@terraraq.uk>,
+ Eric Biggers <ebiggers@kernel.org>,
  Linux kernel mailing list <linux-kernel@vger.kernel.org>,
- linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
+ linux-crypto@vger.kernel.org
 References: <afJorKIje4O6dXbH@netmeister.org>
  <d6111caa-db61-498a-92cb-ea7a0aa0a5e2@ehuk.net> <87se8dgicq.fsf@gentoo.org>
  <afL-QhLfEKqHZqka@eldamar.lan> <20260430071917.GB54208@sol>
- <177abb5d-8ba9-4bb9-8b23-9fbc868ed3cd@gmail.com> <20260501180028.GA2260@sol>
- <19837ef5-e5b6-45f4-8336-3ce07423dfb1@gmail.com>
- <20260501201841.GA2540@quark>
- <c13dd3c5-ddc1-431e-bc7d-2de39c551f8e@gmail.com>
- <20260502033556.GA3872267@google.com>
- <3cc88b2d-fbd6-4e47-b82c-3c685fec0581@gmail.com>
- <9f020da7-97c5-41cc-b0f1-d8aab1bb39ec@hogyros.de>
+ <177abb5d-8ba9-4bb9-8b23-9fbc868ed3cd@gmail.com>
+ <cfe5a1f5-f7fe-44a5-8af9-8e4c8d68b3d7@terraraq.uk>
 Content-Language: en-US
 From: Demi Marie Obenour <demiobenour@gmail.com>
 Autocrypt: addr=demiobenour@gmail.com; keydata=
@@ -129,35 +124,30 @@ Autocrypt: addr=demiobenour@gmail.com; keydata=
  vUSQHSrmfOzX3cV4yfmjM5lewgSstoxGyTx2M8enslgdXhPthZlDnTnOT+C+OTsh8+m5tos8
  HQjaPM01MKBiAqdPgksm1wu2DrrwUi6ChRVTUBcj6+/9IJ81H2P2gJk3Ls3AVIxIffLoY34E
  +MYSfkEjBz0E8CLOcAw7JIwAaeBT
-In-Reply-To: <9f020da7-97c5-41cc-b0f1-d8aab1bb39ec@hogyros.de>
+In-Reply-To: <cfe5a1f5-f7fe-44a5-8af9-8e4c8d68b3d7@terraraq.uk>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="------------niMEkCTt5ax09ch5y2go3Q8L"
+ boundary="------------umJN2ZB5az8GQTZQH6rYaiEG"
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------niMEkCTt5ax09ch5y2go3Q8L
-Content-Type: multipart/mixed; boundary="------------7u0qb8fUCMQJnhdIuMBgcjYR";
+--------------umJN2ZB5az8GQTZQH6rYaiEG
+Content-Type: multipart/mixed; boundary="------------XowwdLQaJouTR9xJBwJ7qYaz";
  protected-headers="v1"
-Message-ID: <066d6e56-3b54-40a6-962c-932fedcdc489@gmail.com>
-Date: Sat, 2 May 2026 16:42:01 -0400
+Message-ID: <3a52a111-e961-4ac6-830c-31465a7d14de@gmail.com>
+Date: Sat, 2 May 2026 18:32:22 -0400
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: AF_ALG hardening
-To: Simon Richter <Simon.Richter@hogyros.de>,
- Eric Biggers <ebiggers@kernel.org>
-Cc: Jan Schaumann <jschauma@netmeister.org>, iwd@lists.linux.dev,
+Subject: Re: [oss-security] CVE-2026-31431: CopyFail: linux local privilege
+ scalation
+To: oss-security@lists.openwall.com, Richard Kettlewell <rjk@terraraq.uk>,
+ Eric Biggers <ebiggers@kernel.org>,
  Linux kernel mailing list <linux-kernel@vger.kernel.org>,
- linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
+ linux-crypto@vger.kernel.org
 References: <afJorKIje4O6dXbH@netmeister.org>
  <d6111caa-db61-498a-92cb-ea7a0aa0a5e2@ehuk.net> <87se8dgicq.fsf@gentoo.org>
  <afL-QhLfEKqHZqka@eldamar.lan> <20260430071917.GB54208@sol>
- <177abb5d-8ba9-4bb9-8b23-9fbc868ed3cd@gmail.com> <20260501180028.GA2260@sol>
- <19837ef5-e5b6-45f4-8336-3ce07423dfb1@gmail.com>
- <20260501201841.GA2540@quark>
- <c13dd3c5-ddc1-431e-bc7d-2de39c551f8e@gmail.com>
- <20260502033556.GA3872267@google.com>
- <3cc88b2d-fbd6-4e47-b82c-3c685fec0581@gmail.com>
- <9f020da7-97c5-41cc-b0f1-d8aab1bb39ec@hogyros.de>
+ <177abb5d-8ba9-4bb9-8b23-9fbc868ed3cd@gmail.com>
+ <cfe5a1f5-f7fe-44a5-8af9-8e4c8d68b3d7@terraraq.uk>
 Content-Language: en-US
 From: Demi Marie Obenour <demiobenour@gmail.com>
 Autocrypt: addr=demiobenour@gmail.com; keydata=
@@ -203,190 +193,55 @@ Autocrypt: addr=demiobenour@gmail.com; keydata=
  vUSQHSrmfOzX3cV4yfmjM5lewgSstoxGyTx2M8enslgdXhPthZlDnTnOT+C+OTsh8+m5tos8
  HQjaPM01MKBiAqdPgksm1wu2DrrwUi6ChRVTUBcj6+/9IJ81H2P2gJk3Ls3AVIxIffLoY34E
  +MYSfkEjBz0E8CLOcAw7JIwAaeBT
-In-Reply-To: <9f020da7-97c5-41cc-b0f1-d8aab1bb39ec@hogyros.de>
+In-Reply-To: <cfe5a1f5-f7fe-44a5-8af9-8e4c8d68b3d7@terraraq.uk>
 
---------------7u0qb8fUCMQJnhdIuMBgcjYR
-Content-Type: multipart/mixed; boundary="------------hu1RKiH9X1kKYgZXYrkdFbVM"
+--------------XowwdLQaJouTR9xJBwJ7qYaz
+Content-Type: multipart/mixed; boundary="------------40Qs3ILp0pnu9ERxc0uz7tBn"
 
---------------hu1RKiH9X1kKYgZXYrkdFbVM
+--------------40Qs3ILp0pnu9ERxc0uz7tBn
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On 5/2/26 04:19, Simon Richter wrote:
-> Hi,
+On 5/2/26 15:13, Richard Kettlewell wrote:
+> On 01/05/2026 16:30, Demi Marie Obenour wrote:
+>> On 4/30/26 03:19, Eric Biggers wrote:
+>>> But I also hope this finally provides some more impetus for AF_ALG to=
+ be
+>>> deprecated and removed.  It's a massive, largely pointless attack
+>>> surface which has been causing problems, including regular CVEs, ever=
+
+>>> since it was added to the kernel in 2010.  And of course it's gotten
+>>> even worse lately, with LLMs now being able to find the bugs.
+>>>
+>>> Userspace crypto libraries exist.  There's no need to escalate to ker=
+nel
+>>> mode just to do some math.
+>>
+>> The only reason I can think of to keep it is for embedded systems
+>> with weak CPUs and crypto accelerators that are actually worth using.
+>> However, those seem to be very rare outside of things like routers,
+>> which run specialized distros like OpenWRT.  Even when the accelerator=
+
+>> exists and is worth using, AF_ALG is certainly not an efficient way
+>> to access it.
 >=20
-> On 5/2/26 13:52, Demi Marie Obenour wrote:
+> I have that use case, although fortunately it's in a context where=20
+> splice() is disabled. But the requirement is for access to the SoC's=20
+> accelerator - the interface doesn't need to be via AF_ALG in particular=
+,=20
+> it doesn't have to offer software crypto (and it might be better if it =
+
+> didn't), and it needn't be independent of the specific hardware=20
+> (although in the bigger picture it'd be a shame if it wasn't).
 >=20
->>> Of course, it'll also be a fair a bit of work, and unfortunately I al=
-so
->>> expect pushback from people who (incorrectly IMO) think that AF_ALG
->>> performance is important, even moreso than security.
->=20
-> AF_ALG performance (time/power) is important in the way that it's=20
-> literally the only point to its existence. If all it provides is extra =
+> ttfn/rjk
 
-> overhead over a software implementation, then it makes no sense to keep=
- it.
-
-The only reason for keeping it is for compatibility with existing
-userspace.
-
->> If one cares about crypto offload performance, they would be better
->> served by creating a better interface to it than AF_ALG.  AF_ALG is
->> a horrible API with (presumably) tons of overhead.  I know the QAT
->> driver and an Nvidia BlueField DPU accelerator driver both bypass it.
->=20
-> The API is designed to be zerocopy, that's why it's this horrible=20
-> combination of socket API and splice(). The general assumption here is =
-
-> that it does not make sense to offload small requests in the first=20
-> place, and application programmers are aware of that.
->=20
-> The use case is "I have a file or pipe full of data and a device with a=
-=20
-> kernel driver that should process it, can we somehow avoid copying the =
-
-> data to userspace only to immediately copy it back to kernelspace?"
->=20
-> This copying is even more silly if the actual question I have in=20
-> userspace is "what is the SHA256 checksum of this file?" or "what is th=
-e=20
-> SHA256 checksum of the string 'blob 8794311528\0' followed by this=20
-> file?" (where you can see why anyone would ask such a silly question an=
-d=20
-> prefer to use the dedicated hardware that processes 24 GB/s over the CP=
-U=20
-> at 100 MB/s)
-
-Do you have a specific device that has such hardware and can use an
-upstream kernel?  I have yet to see any concrete examples.
-
->> Furthermore, AF_ALG only supports symmetric algorithms.  These
->> algorithms are inexpensive in software, so the cost of going to an
->> accelerator and back is enormous compared to the cost of a single
->> operation.
->=20
-> Yes, initial setup cost is high, so this only makes sense for large=20
-> requests or batches (submitting individual requests is generally cheap,=
-=20
-> the difficulty is ensuring the data is accessible to the hardware).
->=20
-> That's also why there are no asymmetric algorithms: these aren't=20
-> generally used on large amounts of data, so it's never worth it to=20
-> offload these.
-
-Asymmetric cryptography is far more expensive than symmetric
-cryptography.  Tens of microseconds or more on a high-end CPU
-I believe.
-
-That is more than enough time to justify going to an accelerator and
-back, if the accelerator can do the job significantly faster.
-
-> It would make sense to offload asymmetric algorithms if there was a=20
-> secure key storage inside the device, but AFAIK the API does not suppor=
-t=20
-> that, or even the notion of on-device contexts.
->=20
-> It is not a good API, and it sits on top of the ahash/acomp/acrypt=20
-> interfaces which are also unfriendly to accelerator hardware.
-
-Not surprised.
-
->> For offload to even a very fast accelerator to make sense,
->> one must be able to deeply pipeline requests.  However, this creates
->> a huge amount of additional complexity for software.
->=20
-> Software that has requirements like that is already complex -- if I hav=
-e=20
-> a few thousand workload packets, I need a worker pool.
-
-Or a thread-per-core architecture.
-
-> If I don't have these requirements, then indeed I am better off with a =
-
-> software-only solution in userspace, because it is not relevant from a =
-
-> performance standpoint.
->=20
->> Asymmetric accelerators also don't have a better alternative in the
->> form of inline encryption hardware.
->=20
-> Quite a number of architectures do not have inline encryption support, =
-
-> and these are more likely to use offload hardware even for smaller=20
-> requests (e.g. for power saving).
-
-Please provide a real-world example where that using the accelerator
-really does save power compared to running the cryptography on the CPU.
-
->> I think a high performance interface to hardware cryptography (and,
->> more importantly, compression) would look much more like RDMA.
->> There would be a kernel driver that did the bare minimum to provide
->> isolation between userspace programs, and a userspace driver that
->> was responsible for abstracting over the hardware.
->=20
-> Offload hardware comes in two flavours: the high-throughput kind, built=
-=20
-> into devices where no one cares about power, and the=20
-> lower-power-than-the-CPU-doing-it kind.
-
-Again, please provide benchmarks.  I have yet to see a real-world
-example where the accelerator is faster for short (read: realistic)
-message sizes.  Eric Biggers has provided many where it is far slower,
-and didn't find any situation where it saved power.
-
-For very long messages, yes, it can be faster.  But I have yet to
-see a situation where (a) performance for large files matters and (b)
-there is an accelerator worth using.
-
-Network and storage encryption is obviously performance-critical,
-but it uses small messages.  Furthermore, both of them are well-suited
-to inline cryptographic engines, which are much more efficient.
-
-I mostly associate large file encryption and hashing with things
-like verifying software updates.  On large systems, this matters
-because a human is waiting.  However, these systems are also ones
-for which software cryptography is very fast.  On small systems,
-I expect update validation to be much less performance-critical.
-
-> The former can easily provide user contexts even in virtualized=20
-> environments, but the latter is generally found in systems that do not =
-
-> even have an IOMMU. Either we have two distinct interfaces for these, o=
-r=20
-> we need one that can handle either.
->=20
-> My feeling is that no one is happy with either AF_ALG or the=20
-> asynchronous interfaces in general, so I think they should be removed=20
-> completely, and there should be a separate "offload" SIG that creates=20
-> new interfaces that are actually usable with current hardware.
->=20
->  > 1. Get rid of zero-copy support (splice()).
->  > 2. Get rid of AIO support.
->  > 3. Only allow software implementations.
->=20
-> That makes sense if we're forced to keep the interface for now, but it =
-
-> means that offload support through the crypto subsystem is completely=20
-> dead, and anyone wanting to support offload hardware needs to go=20
-> elsewhere. Can we get a definitive statement that this is intended?
-
-AF_ALG is dead.  Much of the rest of the kernel is moving from the
-crypto API to the software-only crypto library.
-
-Offload is far more complex than software cryptography, so there needs
-to be a substantial benefit to justify using it.  Have you seen any
-real-world cases of this?  Inline encryption hardware (both in storage
-controllers and in NICs) is definitely a win, but it doesn't use the
-crypto API at all.
-
-It's easy to provide synthetic benchmarks where offload is a win, but
-synthetic benchmarks don't justify a giant CVE magnet.  If offload is a
-win in the real world, then it should be possible to demonstrate this.
+Can you provide benchmarks showing that the accelerator is faster
+than the CPU on realistic workloads?
 --=20
 Sincerely,
 Demi Marie Obenour (she/her/hers)
---------------hu1RKiH9X1kKYgZXYrkdFbVM
+--------------40Qs3ILp0pnu9ERxc0uz7tBn
 Content-Type: application/pgp-keys; name="OpenPGP_0xB288B55FFF9C22C1.asc"
 Content-Disposition: attachment; filename="OpenPGP_0xB288B55FFF9C22C1.asc"
 Content-Description: OpenPGP public key
@@ -506,30 +361,30 @@ EtJuZYM5blWncBOJCoWMnBEcTEo/viU3GgcVRw=3D=3D
 =3Dx94R
 -----END PGP PUBLIC KEY BLOCK-----
 
---------------hu1RKiH9X1kKYgZXYrkdFbVM--
+--------------40Qs3ILp0pnu9ERxc0uz7tBn--
 
---------------7u0qb8fUCMQJnhdIuMBgcjYR--
+--------------XowwdLQaJouTR9xJBwJ7qYaz--
 
---------------niMEkCTt5ax09ch5y2go3Q8L
+--------------umJN2ZB5az8GQTZQH6rYaiEG
 Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEopQtqVJW1aeuo9/sszaHOrMp8lMFAmn2YaMACgkQszaHOrMp
-8lPGKRAAiEY2SlNX1XOiA0OMpWM6dJQIEBe/I9Uf3HFWT8JwoiXfbBunjN06+Z9r
-zQHdKdiYjrQTJNlryBsOVgHqvE8sfFBeln/RAqixOHwg16ForlGRLvYeggR8R61A
-L7PYSGCyPrd2QpJUuFBdbbMRl6oy40MW8PNUKSMZ9NzsD/yMy0Ov5s5me4g/BROf
-evq2xcvXUqU2wgVaN90XwYJN11JvwWK/t1fgPAOJrRBI1xfW0WhJjn/OJfN3Oakh
-UrDgzLXmgeoTd4103zR5B2O8yWFrrUwb0QBDeQw27LMif5HZZSza3au9P4J3TNx/
-QWuPjCI422CY1Ciep5dhdFJ1tk2qi0UVxN2UygoR0NCESWSTQ5zHodT24RNosAWN
-+K5aEHPJYlCD4meaKKqQssXRs64e88Ug69K4pft2ABdWLaD0rTfMOAEmSLh0Uyk/
-vqPbdH00FmGqvTbZ3+Ul+4iGxiAr394bxHbWdIBW5u/sgUMz7CaNxH80CXFTgfSl
-d5/4Qnbm4zGQJ46Xl7K9dA44/2m2X1GxBRaggh4QfiPn1MiNYsQqj3n3JxvMe8jW
-xlV7Ad9BgNqE9cTU1iQ5eZqN5VA4GTMZrdg6ANnV+cSwmbTG9PlWlA48jztEnE+7
-Jh/6FbToQgP1gc3T0Shp0arQvEBWXzpS7zHXE+dPs297m6gb4EU=
-=NhiF
+iQIzBAEBCgAdFiEEopQtqVJW1aeuo9/sszaHOrMp8lMFAmn2e3cACgkQszaHOrMp
+8lO9jw//YnzdUkzriJojnmtabImyCreHNEwk7lc83mxFLaze3F/0gjTN5u08PRV0
+L1ShlSsqnwY37xodC5ePjKRzFlxwUC8EOpMqqJ1mp8c35PpDE/hXIA5tyTGKxajH
+YcUGyFufHm5ZduViDUpeEPsXYeqe5BU7y2G92hWj/9/gBm8dn2boyYG9GoprqLpy
+9ESQ+sprYqFdE0w1YYgsjjM1q/reEecKXb4t6z2pfKYyvpIS81Nr5RhstOHIhLsj
+FxOue5Vsob1quf5yGJHLg7IULoLqVzTiT8Y2nyHsHmT/zCj5g/2Wn0gZkrSce5Fp
+dNV4lRatgfHnvNgJ+a/eAtRQRg7fjOSO3oR03MypSxA7B5rRvqDrWBorAxqIp+M9
+Vm/dCdec88K/iQ2NmAeS4woIbhtRESkmRWXjwCoD2cxmEIDqvhwAYzF0fKkL+MR6
+BYZoV6ajuncrSsTbK4NB24PcuiCLndccrdRtsmKbzpxXqj6oohbGPqdhCDN9C7YJ
+B9rY1M+SodXbvNnrSNf+IhN3vgl5JOTMlr1g4CudVkt35EvZzpFirCaL2qVXZ1VS
+AC4Z549NuoBRzNJQsLRA4zJ2/Q82VgnMlw9D5DvEJNLbFqgp23qK8gSpXbn5eFAI
++aNF6DqcN/EdlE6mw0rMn00JR79e2Vi/6aYsVKNagsZ7dhl/xX8=
+=tpFH
 -----END PGP SIGNATURE-----
 
---------------niMEkCTt5ax09ch5y2go3Q8L--
+--------------umJN2ZB5az8GQTZQH6rYaiEG--
