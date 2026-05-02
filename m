@@ -1,271 +1,212 @@
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-07.mail-europe.com (mail-07.mail-europe.com [188.165.51.139])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DAB4256C6D
-	for <linux-crypto@vger.kernel.org>; Sat,  2 May 2026 13:25:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071FE223DE5
+	for <linux-crypto@vger.kernel.org>; Sat,  2 May 2026 15:47:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.165.51.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777728316; cv=none; b=PLr1w1zZzheLiiL3AznmGDYWhiYLISQaFfCKXiqHxb3yqa/9XB8LIM6t0cJ7VqqXMaMLfiPAOnn3CKSHVyvzmmGEb4eDavMpFv8ShB0WTeCSNmT8wfGtQFfbJ98IxjSL+CB2EZRcJqPSOxC3o/pvcEXXjTPHCKwdGWnR/ekrZls=
+	t=1777736844; cv=none; b=fFtypgbndsHhxCVnvNtGsbKIimrbPuDRlmn0TE3SZECNZCOMkT9eZoldE8nArPC7ZMAEnBYxi6qnsvXG9JZp07BY4/DDE9USaqynB9cLz9Ae/760+kWrXC6w1702e5iPYhozGv782urat292o3K68DJIrs7YzLXM0eXAbNgOoSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777728316; c=relaxed/simple;
-	bh=kH62rsUaAss0NtHCfCwEnwUM3x0gdN/omUvzry1yAtw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=i78E6QP2hsuwJqZpWnRyxxCAW+XqyddxVJigGYCQ0ya9/nzuzo61sWSE/TqhcLiqSQMpYRZu9peYe6te9xdXyO8p4NMAtb8HCMnQ2hxPXtQsSHLjNQVoMtrmi1EbqOY6ULNldRae1AV/1n+o1FePWFu6NorXpSPWvcBJzp8VrXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hhQiepSO; arc=none smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1777736844; c=relaxed/simple;
+	bh=npaTwN3bFqF9dc7RiHO4BAyb+tm0OGhOHy7zaPgFTyw=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=IdRZV+uMieuoglVVO6iSW8Il31nwUTgNNtv64/PZ1qPkEhiu0sXGA1Yaijj9i2ZICUg7Z2XP8M9ZU7YgvAobaWSOCToc3JRGULkKf+bSk1sSI70KRTN0AfgHtkABoz6ubQzrHSVN+4M8IoWbVZpK7f6Zg85VVI3N4mmumdrHH/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=innora.ai; spf=pass smtp.mailfrom=innora.ai; dkim=pass (2048-bit key) header.d=innora.ai header.i=@innora.ai header.b=oZ1SGUsC; arc=none smtp.client-ip=188.165.51.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=innora.ai
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=innora.ai
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hhQiepSO"
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-8d4f78fc9f6so299354085a.3
-        for <linux-crypto@vger.kernel.org>; Sat, 02 May 2026 06:25:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777728312; x=1778333112; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=TiHfmUTUQA6/Fcz5xp0cK2FWPU1oMzmHzKsF4Cf9JWQ=;
-        b=hhQiepSOK7cavYOEwZGlaprRwvuSVv+vsxVSCypNpJ7qU7v4mf9GwDNomw6X5VW66D
-         bZl6z0rXS1iysG89+4xFsXyuNM9radoeHaCX90827IpS8HibtGdVCCeZ6Pb0RTUT+Ppx
-         Wa/XNgSGpNSnp0dFr2sInL+um9w9AqPixZodiWnKxA18k8S5bH2ABs8d4FUlSdKS7GO8
-         /h/unIQVp2uz1mas1vRwN/QPuHiEYYYZNcOR76zmMgljxwrP0DdwIKORHE3JlJLVGaKV
-         nAm1zJ9uNtTg0zvtjwk1Q8tfaI8z2uVYMb1bYgLcZsnWlFcM1sZxfyqG7yN4TIRSnKlG
-         +Drw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777728312; x=1778333112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TiHfmUTUQA6/Fcz5xp0cK2FWPU1oMzmHzKsF4Cf9JWQ=;
-        b=Hi4BcJ8N3OsaOEZN30NySbpJpv12ivmi1lWBDZCynAHiyAV+7XnuduxMgYHOv1bN3X
-         1XcT137ea/R44z0esr0+3IDPCTxgCSws0RK0Nx1pJfqBRt1KcNJzp4cjYiLjOr+L+mzE
-         zMoQcJWG17BM4jW/dYxA42jW23ZPIQ6gSup7oNvaSEo5O1MvmnaSDUf1lpvpjbvAqNbn
-         wuaHplx327mLRC9xUT/K5cRP6kfakVVB9EYtGQJQF5A/s+4Z8oXPz+Ev35Ce/X5dfdL2
-         N0I8yMsoUHWX1bOG0c/boueGk3SYFfDNY07kVinoa54fFWtw0q0ZtLICq9tEUJEVekEH
-         +SDg==
-X-Forwarded-Encrypted: i=1; AFNElJ/FyR7vrTzLFBRDyHH4fpdYBVbTK2pTaJdgQbLSbp27oDzlKeGuV/jYjp+TG4gWu9CobqA8mYcGTm2TZfw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMoS+KQzbtMJcDI3Y3+T88Kf5xHMfTM2QL4O1LzuKuZ2/vBMaG
-	7/Um9WskMm8rMYDiVzBZpGbXdYpBQXrZg4DHhMKAZZHWlmiJk00r9goN
-X-Gm-Gg: AeBDiesLHVv9xwDGh3JcivE5ObQEE/ib8MsoF2hA2D+myAOWy/mxPVYALLS6OPKVrgH
-	Tj1s/Gkhu6DuDRvgjbONd6C4Tw2M6RSCbmrJUZ6ag11mo+vg3vueMp37asVNq5BndIzZin+BETK
-	96Gh5jNnrristz6Tjx9zzSql2F3YDSdpkYKjTARTKJfY5iR19ONvxtWgSysSTkZ52z+g2Iikhjh
-	7MlhU0rEET+9ie2z5f3lqDeBTWJaLmsvNGb5MkQN3p9EzkoR5fuJE2A98V+1BCqV9G/9NHNOwOh
-	BQGeouRKjXEi5T8/8NGmns15CgvNMh/lcim/dBlNX/6afhXpDYxekUuZKfscT5zoyN0Sc3DTFtD
-	h0kOVfPDog3h5L6pDDJ89dTM1dkPgxBQz+DSOLlXwGKY+W2iCi0FpHJgpfS2BiTb+B3zvc6AYk7
-	yKr+NNzeD7nvwa4PztQvpYECpD+eSq0YpHcMwGybYU0ffRgy5lo6aQ2/FBBb0KqHyQxDJr2J2Oq
-	ANOPsMaR6GriMQf2gimMGlt9vrdElw=
-X-Received: by 2002:a05:620a:4015:b0:8cf:d6f8:599f with SMTP id af79cd13be357-8fd1863dbfcmr491717085a.57.1777728312166;
-        Sat, 02 May 2026 06:25:12 -0700 (PDT)
-Received: from server1 (c-68-48-65-54.hsd1.mi.comcast.net. [68.48.65.54])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8fc2c91dd48sm491819285a.38.2026.05.02.06.25.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 May 2026 06:25:11 -0700 (PDT)
-From: Michael Bommarito <michael.bommarito@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	David Howells <dhowells@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-Cc: Eric Biggers <ebiggers@kernel.org>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	linux-afs@lists.infradead.org,
-	Ilya Dryomov <idryomov@gmail.com>,
-	Xiubo Li <xiubli@redhat.com>,
-	ceph-devel@vger.kernel.org,
-	stable@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: krb5 - wait for async aead completion before freeing buffer
-Date: Sat,  2 May 2026 09:25:06 -0400
-Message-ID: <20260502132506.1936358-1-michael.bommarito@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key) header.d=innora.ai header.i=@innora.ai header.b="oZ1SGUsC"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=innora.ai;
+	s=protonmail2; t=1777736830; x=1777996030;
+	bh=kg4nJMAp540uyd1Y/WiQhbZcKSX89OHO+bWSr/VEe3E=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=oZ1SGUsCib7W9foQhx+pDTNYPOaRNPOETY0k+q8Jrhj7rwJi0yPbymRXL/PXlWWXw
+	 nKYCxQ3i9yqPKSr5XBIW6/3iwTofkved8+6UiVkSqlV9mXuHtZfPpLKndCzQ80Sj0j
+	 6XYnIeVbO70iarIoHZEvg0rD7usAMQ2xc5PN3lKfRxXn4zYqT1sKj5RYGaoyYgrpLW
+	 SoIx9TYLIRUYDup2hbkCVDgKFM9kFFuIFFKLZ0Cukgm88MdmLwk4BCBuySORs8TUh2
+	 WoNZfvzOOLLJnyTiavjkv4n5ykBFO4J04Js/R7XTIxn1cFWE++bMoStNnmVKo3EyQW
+	 5U9KZUrpxlA4g==
+Date: Sat, 02 May 2026 15:47:03 +0000
+To: linux-crypto@vger.kernel.org
+From: Feng Ning <feng@innora.ai>
+Cc: herbert@gondor.apana.org.au
+Subject: [Possible vulnerability] crypto/af_alg: extract_bvec_to_sg() retains spliced pipe pages in TX SGL without sendpage_ok() check
+Message-ID: <afYcc-tZFwvZZo76@ans-MacBook-Pro.local>
+Feedback-ID: 140578448:user:proton
+X-Pm-Message-ID: 2979b44d91a4053fdb80aa8d0c2fb98096a19678
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/mixed;
+ boundary="b1=_YfktIp7CAqY3dotbWLZadBpCS7y7MGd4Y8aoE0g"
 
-krb5_aead_encrypt(), krb5_aead_decrypt() in rfc3961_simplified.c and
-rfc8009_encrypt(), rfc8009_decrypt() in rfc8009_aes2.c set a NULL
-completion callback on the aead_request and treat any negative return
-from crypto_aead_{encrypt,decrypt}() as terminal, falling through to
-kfree_sensitive(buffer) where buffer == req.
+--b1=_YfktIp7CAqY3dotbWLZadBpCS7y7MGd4Y8aoE0g
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The crypto API returns -EINPROGRESS when an asynchronous backend has
-accepted the request and queued it for completion by a worker, and
--EBUSY when a backlog-capable backend has accepted it onto its
-backlog (with CRYPTO_TFM_REQ_MAY_BACKLOG set).  In both cases the
-operation will complete asynchronously and the request buffer must
-remain live until the backend's completion callback fires.  Without
-that flag set, -EBUSY instead means "rejected, try again later" and
-no completion will fire.  In the current code the callback is NULL
-and any negative return is treated as terminal, so when the
-encrypt_name composition resolves to an async instance (a hardware
-AEAD provider that registers an instance for the krb5 inner template,
-or any future code path that takes a cryptd-wrapped instance for the
-krb5 enctype name), -EINPROGRESS satisfies the "if (ret < 0)" check
-and the buffer is freed while the backend's worker still holds a
-pointer.  The worker subsequently dereferences req via
-aead_request_complete(), reading from freed slab.
+[Possible vulnerability] crypto/af_alg: extract_bvec_to_sg() retains splice=
+d pipe pages in TX SGL without sendpage_ok() check
 
-KASAN report under UML+SLUB with a faithful reproducer that drives
-crypto_krb5_decrypt() through the existing API, with an async aead
-backend bound to krb5->encrypt_name:
+Hello kernel security team & linux-crypto,
 
-  BUG: KASAN: slab-use-after-free in t5_stub_complete+0x7d/0xc7
-  Read of size 8 at addr 00000000619e9410 by task kworker/0:1/12
+This is a follow-up to CVE-2026-31431 ("Copy Fail") fixed by
 
-  Allocated by task 40:
-   __kmalloc_noprof+0x1df/0x1ee
-   kzalloc_noprof.constprop.0+0x19/0x1b [krb5]
-   rfc8009_decrypt+0x294/0x7c4 [krb5]
-   crypto_krb5_decrypt+0x93/0xa2 [krb5]
+    a664bf3d603d crypto: algif_aead - Revert to operating out-of-place
 
-  Freed by task 40:
-   kfree_sensitive+0x57/0x5c
-   rfc8009_decrypt+0x790/0x7c4 [krb5]
-   crypto_krb5_decrypt+0x93/0xa2 [krb5]
+We have identified that the underlying primitive =E2=80=94 extract_iter_to_=
+sg()
+with ITER_BVEC backend in lib/scatterlist.c =E2=80=94 does not perform a
+sendpage_ok() / page->mapping filter when transferring pipe pages
+into a permanent scatterlist. This makes the AF_ALG path
+(crypto/af_alg.c MSG_SPLICE_PAGES branch) retain attacker-controlled
+pipe pages in the TX SGL until recvmsg(), creating a TOCTOU race window
+during which crypto subsystem reads of the SGL observe attacker-mutated
+page content.
 
-  The buggy address belongs to the cache kmalloc-128 of size 128
+In contrast, skb_splice_from_iter() (net/core/skbuff.c) does include a
+WARN_ON_ONCE(!sendpage_ok(page)) check before persisting the page.
 
-These helpers are reached today from net/rxrpc/rxgk.c and
-rxgk_common.h (AFS/RxRPC RxGK packet encrypt/decrypt),
-fs/afs/cm_security.c, and net/ceph/crypto.c (Linux kernel Ceph
-client cephx encrypt/decrypt).  The bug is triggerable when one of
-these paths uses a krb5 AEAD whose selected implementation is async
-(or inherits async completion from an async child/provider).
+Source anchors (verified against mainline HEAD 08d0d3466664):
+  - lib/scatterlist.c: extract_bvec_to_sg() at lines 1166-1205
+  - crypto/af_alg.c: MSG_SPLICE_PAGES branch at lines 1020-1040
+  - crypto/algif_skcipher.c: skcipher_request_set_crypt() at line 161
 
-Fix by following the standard kernel idiom for synchronous waiting on
-a potentially-asynchronous AEAD: install crypto_req_done() as the
-completion callback, set CRYPTO_TFM_REQ_MAY_BACKLOG so a backlogged
-backend's -EBUSY indicates a queued (not rejected) request, and wrap
-the crypto_aead_{encrypt,decrypt}() return through crypto_wait_req()
-so the function blocks on the worker's completion before falling
-through to kfree_sensitive().  This matches the crypto_wait_req()
-usage pattern in net/tls/, fs/ecryptfs/, fs/smb/server/auth.c, and
-other consumers that need a synchronous result over an arbitrarily-
-async backend; MAY_BACKLOG is required (not optional) so that
-crypto_wait_req() does not block waiting for a completion that will
-never fire from a rejected request.
+PoC results (lab-only, attached as poc-k02-splice-afalg.c):
+  - Tested kernel: Linux 6.8.0-110-generic (Ubuntu 24.04, x86_64)
+  - Algorithm: skcipher / "ecb(aes)"
+  - Race: vmsplice(SPLICE_F_GIFT) -> splice -> AF_ALG opfd; race writer
+    XOR-flips page bytes between splice() and recvmsg()
+  - Result: 5 stable runs, mean 5.6 race-affected ciphertexts per
+    500 rounds (1.1% race hit rate)
+  - Build: gcc -pthread -o poc poc-k02-splice-afalg.c
+  - Run:   ./poc
 
-Regression coverage: the in-tree krb5 selftests
-(CONFIG_CRYPTO_KRB5_SELFTESTS=y) cover all four touched functions for
-all six supported enctypes (aes128/aes256-cts-hmac-sha1-96,
-aes128/aes256-cts-hmac-sha256/384, camellia128/256-cts-cmac) via the
-PRF, key-derivation, encrypt, decrypt and MIC paths; the patched
-kernel reports "krb5: Selftests succeeded" when those default sync
-backends are in use.  Additionally, on a separate boot of the
-patched kernel with CONFIG_CRYPTO_SELFTESTS_FULL=y and without the
-synthetic async-aead provider used to drive the reproducer loaded,
-the kernel's testmgr emits no "alg: ... self-test failed" lines for
-the authenc(hmac(sha256/sha384),cts(cbc(aes))) instances the krb5
-layer instantiates.  (The reproducer boot does carry an expected
-testmgr failure for that synthetic provider's algorithm name; that
-is not a regression of any in-tree algorithm.)  The faithful
-reproducer above no longer trips KASAN when an async backend is
-bound.
+Independent inner-template audit (44 crypto/*.c templates and
+drivers/crypto/) confirms that under the post-a664bf3d603d state, no
+inner template sub-path writes back to req->src in user-space flows.
+Severity is therefore confined to ciphertext integrity (race window)
+under default software crypto. Hardware crypto offload paths
+(CAAM/OMAP/Atmel/CAAM) gate in-place on req->src =3D=3D req->dst, which
+the current algif_* surface no longer satisfies. Privilege escalation
+under the software path was not demonstrated.
 
-Fixes: 00244da40f78 ("crypto/krb5: Implement the Kerberos5 rfc3961 encrypt and decrypt functions")
-Fixes: 6c3c0e86c2ac ("crypto/krb5: Implement the AES enctypes from rfc8009")
-Cc: stable@vger.kernel.org
-Assisted-by: Claude:claude-opus-4-7
-Signed-off-by: Michael Bommarito <michael.bommarito@gmail.com>
----
- crypto/krb5/rfc3961_simplified.c | 12 ++++++++----
- crypto/krb5/rfc8009_aes2.c       | 12 ++++++++----
- 2 files changed, 16 insertions(+), 8 deletions(-)
+Suggested mitigation:
+  - Add sendpage_ok() check (or stronger: page->mapping =3D=3D NULL ||
+    PageAnon(page)) inside extract_bvec_to_sg() in lib/scatterlist.c,
+    optionally behind an iov_iter_extraction_t flag if performance
+    sensitive.
+  - Alternative: copy pipe pages instead of retaining via get_page()
+    for the AF_ALG callsites specifically.
 
-diff --git a/crypto/krb5/rfc3961_simplified.c b/crypto/krb5/rfc3961_simplified.c
-index e49cbdec7c40..c4b8e9b89c7b 100644
---- a/crypto/krb5/rfc3961_simplified.c
-+++ b/crypto/krb5/rfc3961_simplified.c
-@@ -543,6 +543,7 @@ ssize_t krb5_aead_encrypt(const struct krb5_enctype *krb5,
- 			  size_t data_offset, size_t data_len,
- 			  bool preconfounded)
- {
-+	DECLARE_CRYPTO_WAIT(wait);
- 	struct aead_request *req;
- 	ssize_t ret, done;
- 	size_t bsize, base_len, secure_offset, secure_len, pad_len, cksum_offset;
-@@ -588,9 +589,10 @@ ssize_t krb5_aead_encrypt(const struct krb5_enctype *krb5,
- 	iv = buffer + krb5_aead_size(aead);
- 
- 	aead_request_set_tfm(req, aead);
--	aead_request_set_callback(req, 0, NULL, NULL);
-+	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-+				  crypto_req_done, &wait);
- 	aead_request_set_crypt(req, sg, sg, secure_len, iv);
--	ret = crypto_aead_encrypt(req);
-+	ret = crypto_wait_req(crypto_aead_encrypt(req), &wait);
- 	if (ret < 0)
- 		goto error;
- 
-@@ -610,6 +612,7 @@ int krb5_aead_decrypt(const struct krb5_enctype *krb5,
- 		      struct scatterlist *sg, unsigned int nr_sg,
- 		      size_t *_offset, size_t *_len)
- {
-+	DECLARE_CRYPTO_WAIT(wait);
- 	struct aead_request *req;
- 	size_t bsize;
- 	void *buffer;
-@@ -633,9 +636,10 @@ int krb5_aead_decrypt(const struct krb5_enctype *krb5,
- 	iv = buffer + krb5_aead_size(aead);
- 
- 	aead_request_set_tfm(req, aead);
--	aead_request_set_callback(req, 0, NULL, NULL);
-+	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-+				  crypto_req_done, &wait);
- 	aead_request_set_crypt(req, sg, sg, *_len, iv);
--	ret = crypto_aead_decrypt(req);
-+	ret = crypto_wait_req(crypto_aead_decrypt(req), &wait);
- 	if (ret < 0)
- 		goto error;
- 
-diff --git a/crypto/krb5/rfc8009_aes2.c b/crypto/krb5/rfc8009_aes2.c
-index d39851fc3a4e..dda29f0bb700 100644
---- a/crypto/krb5/rfc8009_aes2.c
-+++ b/crypto/krb5/rfc8009_aes2.c
-@@ -175,6 +175,7 @@ static ssize_t rfc8009_encrypt(const struct krb5_enctype *krb5,
- 			       size_t data_offset, size_t data_len,
- 			       bool preconfounded)
- {
-+	DECLARE_CRYPTO_WAIT(wait);
- 	struct aead_request *req;
- 	struct scatterlist bsg[2];
- 	ssize_t ret, done;
-@@ -227,10 +228,11 @@ static ssize_t rfc8009_encrypt(const struct krb5_enctype *krb5,
- 
- 	/* Hash and encrypt the message. */
- 	aead_request_set_tfm(req, aead);
--	aead_request_set_callback(req, 0, NULL, NULL);
-+	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-+				  crypto_req_done, &wait);
- 	aead_request_set_ad(req, krb5_aead_ivsize(aead));
- 	aead_request_set_crypt(req, bsg, bsg, secure_len, iv);
--	ret = crypto_aead_encrypt(req);
-+	ret = crypto_wait_req(crypto_aead_encrypt(req), &wait);
- 	if (ret < 0)
- 		goto error;
- 
-@@ -253,6 +255,7 @@ static int rfc8009_decrypt(const struct krb5_enctype *krb5,
- 			   struct scatterlist *sg, unsigned int nr_sg,
- 			   size_t *_offset, size_t *_len)
- {
-+	DECLARE_CRYPTO_WAIT(wait);
- 	struct aead_request *req;
- 	struct scatterlist bsg[2];
- 	size_t bsize;
-@@ -283,10 +286,11 @@ static int rfc8009_decrypt(const struct krb5_enctype *krb5,
- 
- 	/* Decrypt the message and verify its checksum. */
- 	aead_request_set_tfm(req, aead);
--	aead_request_set_callback(req, 0, NULL, NULL);
-+	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-+				  crypto_req_done, &wait);
- 	aead_request_set_ad(req, krb5_aead_ivsize(aead));
- 	aead_request_set_crypt(req, bsg, bsg, *_len, iv);
--	ret = crypto_aead_decrypt(req);
-+	ret = crypto_wait_req(crypto_aead_decrypt(req), &wait);
- 	if (ret < 0)
- 		goto error;
- 
--- 
-2.53.0
+We are not requesting a CVE for this report at this time and welcome
+your assessment of severity.
+
+Reporter:
+  Feng Ning <feng@innora.ai>
+  PGP fingerprint: 7D1A285EF3FE907C1594FA292E73300F628AE89E
+  (please encrypt any sensitive reply against this key)
+
+Best regards,
+Feng Ning
+
+--b1=_YfktIp7CAqY3dotbWLZadBpCS7y7MGd4Y8aoE0g
+Content-Type: text/plain; charset=utf-8; name=poc-k02-splice-afalg.c
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=poc-k02-splice-afalg.c
+
+LyoNCiAqIEstMDIgUG9DIHYyOiBBRl9BTEcgc3BsaWNlIFRPQ1RPVSDigJQgc2ltcGxpZmllZCwg
+c2luZ2xlLW9wZmQNCiAqDQogKiBUaGVvcnk6IHZtc3BsaWNlKFNQTElDRV9GX0dJRlQpIHB1dHMg
+dXNlciBwYWdlIGludG8gcGlwZS4NCiAqICAgICAgICAgc3BsaWNlKHBpcGUgLT4gQUZfQUxHIG9w
+ZmQpIGV4dHJhY3RzIHBpcGUgcGFnZSBpbnRvIFNHTA0KICogICAgICAgICB2aWEgZXh0cmFjdF9p
+dGVyX3RvX3NnKCkgLT4gZ2V0X3BhZ2UoKS4NCiAqICAgICAgICAgSWYgcGFnZSBpcyByZXRhaW5l
+ZCAobm90IGNvcGllZCksIHJhY2Ugd3JpdGVyIG1vZGlmeWluZw0KICogICAgICAgICB0aGUgcGFn
+ZSBiZXR3ZWVuIHNwbGljZSgpIGFuZCByZWN2bXNnKCkgY2hhbmdlcyBjaXBoZXJ0ZXh0Lg0KICov
+DQojZGVmaW5lIF9HTlVfU09VUkNFDQojaW5jbHVkZSA8c3RkaW8uaD4NCiNpbmNsdWRlIDxzdGRs
+aWIuaD4NCiNpbmNsdWRlIDxzdHJpbmcuaD4NCiNpbmNsdWRlIDx1bmlzdGQuaD4NCiNpbmNsdWRl
+IDxmY250bC5oPg0KI2luY2x1ZGUgPHN5cy9zb2NrZXQuaD4NCiNpbmNsdWRlIDxzeXMvdWlvLmg+
+DQojaW5jbHVkZSA8c3lzL21tYW4uaD4NCiNpbmNsdWRlIDxsaW51eC9pZl9hbGcuaD4NCiNpbmNs
+dWRlIDxwdGhyZWFkLmg+DQojaW5jbHVkZSA8c3RkaW50Lmg+DQoNCiNkZWZpbmUgQkxPQ0sgMTYN
+Cg0Kc3RhdGljIGludCBhZmFsZ19zZXR1cChjb25zdCBjaGFyICpuYW1lLCBjb25zdCB1bnNpZ25l
+ZCBjaGFyICprZXksIGludCBrbGVuKQ0Kew0KICAgIGludCB0Zm0gPSBzb2NrZXQoQUZfQUxHLCBT
+T0NLX1NFUVBBQ0tFVCwgMCk7DQogICAgaWYgKHRmbSA8IDApIHsgcGVycm9yKCJzb2NrZXQiKTsg
+cmV0dXJuIC0xOyB9DQoNCiAgICBzdHJ1Y3Qgc29ja2FkZHJfYWxnIHNhID0geyAuc2FsZ19mYW1p
+bHkgPSBBRl9BTEcsIC5zYWxnX3R5cGUgPSAic2tjaXBoZXIiIH07DQogICAgc3RybmNweSgoY2hh
+ciopc2Euc2FsZ19uYW1lLCBuYW1lLCBzaXplb2Yoc2Euc2FsZ19uYW1lKS0xKTsNCiAgICBpZiAo
+YmluZCh0Zm0sIChzdHJ1Y3Qgc29ja2FkZHIgKikmc2EsIHNpemVvZihzYSkpIDwgMCkgew0KICAg
+ICAgICBwZXJyb3IoImJpbmQiKTsgY2xvc2UodGZtKTsgcmV0dXJuIC0xOw0KICAgIH0NCiAgICBp
+ZiAoc2V0c29ja29wdCh0Zm0sIFNPTF9BTEcsIEFMR19TRVRfS0VZLCBrZXksIGtsZW4pIDwgMCkg
+ew0KICAgICAgICBwZXJyb3IoInNldHNvY2tvcHQgS0VZIik7IGNsb3NlKHRmbSk7IHJldHVybiAt
+MTsNCiAgICB9DQogICAgcmV0dXJuIHRmbTsNCn0NCg0Kc3RhdGljIHZvaWQgZW5jcnlwdF9yZWYo
+aW50IG9wZmQsIGNvbnN0IHVuc2lnbmVkIGNoYXIgKmluLA0KICAgICAgICAgICAgICAgICAgICAg
+ICAgdW5zaWduZWQgY2hhciAqb3V0LCBzaXplX3QgbGVuKQ0Kew0KICAgIHN0cnVjdCBpb3ZlYyBp
+b3YgPSB7ICh2b2lkKilpbiwgbGVuIH07DQogICAgc3RydWN0IG1zZ2hkciBtc2cgPSB7IC5tc2df
+aW92ID0gJmlvdiwgLm1zZ19pb3ZsZW4gPSAxIH07DQogICAgaWYgKHNlbmRtc2cob3BmZCwgJm1z
+ZywgMCkgIT0gKHNzaXplX3QpbGVuKSB7IHBlcnJvcigic2VuZG1zZyByZWYiKTsgcmV0dXJuOyB9
+DQogICAgaW92Lmlvdl9iYXNlID0gb3V0OyBpb3YuaW92X2xlbiA9IGxlbjsNCiAgICBpZiAocmVj
+dm1zZyhvcGZkLCAmbXNnLCAwKSAhPSAoc3NpemVfdClsZW4pIHsgcGVycm9yKCJyZWN2bXNnIHJl
+ZiIpOyB9DQp9DQoNCnN0YXRpYyB2b2xhdGlsZSBpbnQgcmFjZV9nbzsNCg0Kc3RhdGljIHZvaWQg
+KnJhY2VfdGhyZWFkKHZvaWQgKmFyZykNCnsNCiAgICB1bnNpZ25lZCBjaGFyICpwYWdlID0gYXJn
+Ow0KICAgIHdoaWxlICghcmFjZV9nbykgX19zeW5jX3N5bmNocm9uaXplKCk7DQogICAgZm9yIChp
+bnQgaSA9IDA7IGkgPCA1MDAwMDsgaSsrKSB7DQogICAgICAgIHBhZ2VbMF0gXj0gMHhGRjsNCiAg
+ICAgICAgX19zeW5jX3N5bmNocm9uaXplKCk7DQogICAgfQ0KICAgIHJldHVybiBOVUxMOw0KfQ0K
+DQppbnQgbWFpbih2b2lkKQ0Kew0KICAgIHVuc2lnbmVkIGNoYXIga2V5W0JMT0NLXSA9IHsweDAs
+MHgxLDB4MiwweDMsMHg0LDB4NSwweDYsMHg3LA0KICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAweDgsMHg5LDB4QSwweEIsMHhDLDB4RCwweEUsMHhGfTsNCiAgICB1bnNpZ25lZCBjaGFy
+IHB0W0JMT0NLXSAgPSB7MHgwMCwweDExLDB4MjIsMHgzMywweDQ0LDB4NTUsMHg2NiwweDc3LA0K
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAweDg4LDB4OTksMHhBQSwweEJCLDB4Q0Ms
+MHhERCwweEVFLDB4RkZ9Ow0KICAgIHVuc2lnbmVkIGNoYXIgcmVmW0JMT0NLXSwgYnVmW0JMT0NL
+XTsNCiAgICBpbnQgdGZtLCBvcGZkLCBwaXBlZmRbMl07DQoNCiAgICBwcmludGYoIlsrXSBLLTAy
+IFBvQzogQUZfQUxHIHNwbGljZSBUT0NUT1VcbiIpOw0KDQogICAgdGZtID0gYWZhbGdfc2V0dXAo
+ImVjYihhZXMpIiwga2V5LCBCTE9DSyk7DQogICAgaWYgKHRmbSA8IDApIHJldHVybiAxOw0KDQog
+ICAgLyogcmVmZXJlbmNlIGNpcGhlcnRleHQgdmlhIG5vcm1hbCBzZW5kbXNnL3JlY3Ztc2cgKi8N
+CiAgICBvcGZkID0gYWNjZXB0KHRmbSwgTlVMTCwgMCk7DQogICAgaWYgKG9wZmQgPCAwKSB7IHBl
+cnJvcigiYWNjZXB0Iik7IHJldHVybiAxOyB9DQogICAgZW5jcnlwdF9yZWYob3BmZCwgcHQsIHJl
+ZiwgQkxPQ0spOw0KICAgIHByaW50ZigiWytdIFJlZmVyZW5jZSBjaXBoZXJ0ZXh0IGNvbXB1dGVk
+XG4iKTsNCiAgICBjbG9zZShvcGZkKTsNCg0KICAgIC8qIGFsbG9jYXRlIHBhZ2UtYWxpZ25lZCBi
+dWZmZXIgKi8NCiAgICB1bnNpZ25lZCBjaGFyICpwYWdlID0gbW1hcChOVUxMLCA0MDk2LCBQUk9U
+X1JFQUR8UFJPVF9XUklURSwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBNQVBfUFJJ
+VkFURXxNQVBfQU5PTllNT1VTLCAtMSwgMCk7DQogICAgaWYgKHBhZ2UgPT0gTUFQX0ZBSUxFRCkg
+eyBwZXJyb3IoIm1tYXAiKTsgcmV0dXJuIDE7IH0NCg0KICAgIGlmIChwaXBlKHBpcGVmZCkgPCAw
+KSB7IHBlcnJvcigicGlwZSIpOyByZXR1cm4gMTsgfQ0KDQogICAgaW50IGhpdHMgPSAwLCByb3Vu
+ZHMgPSA1MDA7DQogICAgZm9yIChpbnQgciA9IDA7IHIgPCByb3VuZHM7IHIrKykgew0KICAgICAg
+ICBtZW1jcHkocGFnZSwgcHQsIEJMT0NLKTsNCg0KICAgICAgICBvcGZkID0gYWNjZXB0KHRmbSwg
+TlVMTCwgMCk7DQogICAgICAgIGlmIChvcGZkIDwgMCkgY29udGludWU7DQoNCiAgICAgICAgLyog
+dm1zcGxpY2U6IHVzZXIgcGFnZSAtPiBwaXBlICh6ZXJvLWNvcHkgd2l0aCBTUExJQ0VfRl9HSUZU
+KSAqLw0KICAgICAgICBzdHJ1Y3QgaW92ZWMgaW92ID0geyBwYWdlLCBCTE9DSyB9Ow0KICAgICAg
+ICBpZiAodm1zcGxpY2UocGlwZWZkWzFdLCAmaW92LCAxLCBTUExJQ0VfRl9HSUZUKSA8IDApIHsN
+CiAgICAgICAgICAgIC8qIEdpZnQgZmFpbGVkIChwYWdlIG5vdCBzdWl0YWJsZSksIGRvIGNvcHkg
+Ki8NCiAgICAgICAgICAgIGlmICh2bXNwbGljZShwaXBlZmRbMV0sICZpb3YsIDEsIDApIDwgMCkg
+ew0KICAgICAgICAgICAgICAgIHBlcnJvcigidm1zcGxpY2UiKTsgY2xvc2Uob3BmZCk7IGNvbnRp
+bnVlOw0KICAgICAgICAgICAgfQ0KICAgICAgICB9DQoNCiAgICAgICAgLyogc3BsaWNlOiBwaXBl
+IC0+IEFGX0FMRyAoc2VuZG1zZyBlcXVpdmFsZW50KSAqLw0KICAgICAgICBpZiAoc3BsaWNlKHBp
+cGVmZFswXSwgTlVMTCwgb3BmZCwgTlVMTCwgQkxPQ0ssDQogICAgICAgICAgICAgICAgICAgU1BM
+SUNFX0ZfTU9WRSB8IFNQTElDRV9GX01PUkUpIDwgMCkgew0KICAgICAgICAgICAgcGVycm9yKCJz
+cGxpY2UiKTsgY2xvc2Uob3BmZCk7IGNvbnRpbnVlOw0KICAgICAgICB9DQoNCiAgICAgICAgLyog
+U3RhcnQgcmFjZSB3cml0ZXIgKi8NCiAgICAgICAgcmFjZV9nbyA9IDA7DQogICAgICAgIHB0aHJl
+YWRfdCB0aHI7DQogICAgICAgIHB0aHJlYWRfY3JlYXRlKCZ0aHIsIE5VTEwsIHJhY2VfdGhyZWFk
+LCBwYWdlKTsNCiAgICAgICAgcmFjZV9nbyA9IDE7ICAvKiBsZXQgd3JpdGVyIHN0YXJ0IGFmdGVy
+IHNwbGljZSwgYmVmb3JlIHJlY3Ztc2cgKi8NCg0KICAgICAgICAvKiByZWN2bXNnOiByZWFkIGNp
+cGhlcnRleHQgKi8NCiAgICAgICAgc3RydWN0IGlvdmVjIGlvdl9yeCA9IHsgYnVmLCBCTE9DSyB9
+Ow0KICAgICAgICBzdHJ1Y3QgbXNnaGRyIG1zZyA9IHsgLm1zZ19pb3YgPSAmaW92X3J4LCAubXNn
+X2lvdmxlbiA9IDEgfTsNCiAgICAgICAgc3NpemVfdCBuID0gcmVjdm1zZyhvcGZkLCAmbXNnLCAw
+KTsNCg0KICAgICAgICBwdGhyZWFkX2pvaW4odGhyLCBOVUxMKTsNCiAgICAgICAgY2xvc2Uob3Bm
+ZCk7DQoNCiAgICAgICAgaWYgKG4gPT0gQkxPQ0sgJiYgbWVtY21wKGJ1ZiwgcmVmLCBCTE9DSykg
+IT0gMCkgew0KICAgICAgICAgICAgaGl0cysrOw0KICAgICAgICAgICAgaWYgKGhpdHMgPD0gMykg
+ew0KICAgICAgICAgICAgICAgIHByaW50ZigiWyFdIFJPVU5EICVkOiBNSVNNQVRDSCFcbiIsIHIp
+Ow0KICAgICAgICAgICAgICAgIHByaW50ZigiICByZWY6ICIpOyBmb3IoaW50IGk9MDtpPEJMT0NL
+O2krKykgcHJpbnRmKCIlMDJ4IixyZWZbaV0pOyBwcmludGYoIlxuIik7DQogICAgICAgICAgICAg
+ICAgcHJpbnRmKCIgIGdvdDogIik7IGZvcihpbnQgaT0wO2k8QkxPQ0s7aSsrKSBwcmludGYoIiUw
+MngiLGJ1ZltpXSk7IHByaW50ZigiXG4iKTsNCiAgICAgICAgICAgIH0NCiAgICAgICAgfQ0KICAg
+IH0NCg0KICAgIHByaW50ZigiWytdICVkLyVkIHJvdW5kcywgJWQgVE9DVE9VIGhpdHNcbiIsIHJv
+dW5kcywgcm91bmRzLCBoaXRzKTsNCiAgICBwcmludGYoIlsrXSBWZXJkaWN0OiAlc1xuIiwgaGl0
+cyA+IDANCiAgICAgICAgICAgPyAiVlVMTkVSQUJMRSDigJQgc3BsaWNlIHBpcGUgcGFnZSByZXRh
+aW5lZCBpbiBBRl9BTEcgU0dMIg0KICAgICAgICAgICA6ICJObyBUT0NUT1UgaW4gdGhpcyBydW4g
+KG1heSBuZWVkIEtBU0FOIGtlcm5lbCArIHBhZ2VjYWNoZSBwYWdlKSIpOw0KDQogICAgbXVubWFw
+KHBhZ2UsIDQwOTYpOw0KICAgIGNsb3NlKHBpcGVmZFswXSk7IGNsb3NlKHBpcGVmZFsxXSk7IGNs
+b3NlKHRmbSk7DQogICAgcmV0dXJuIChoaXRzID4gMCkgPyAwIDogMTsNCn0NCg==
+
+--b1=_YfktIp7CAqY3dotbWLZadBpCS7y7MGd4Y8aoE0g--
 
