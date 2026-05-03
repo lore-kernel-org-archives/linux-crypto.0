@@ -1,390 +1,159 @@
-Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
+Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0086CA52
-	for <linux-crypto@vger.kernel.org>; Sat,  2 May 2026 22:32:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42077279DC9
+	for <linux-crypto@vger.kernel.org>; Sun,  3 May 2026 03:18:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777761151; cv=none; b=c71rY+JWbVeP7POcvGl76it2MXfCUdqYY74JaAvybkqT0n/HwwVHQ3WsGgeADPHWN26QILrP7fG+F8LDZT47vsTnCwi4O2ZcguEV/Cr7vwj+wgB/tK8IxolLUeWFnaEb/WIMsuAYIl3EkV9gi3xmfRX3VSjnd4IOO7ubxwFnC14=
+	t=1777778326; cv=none; b=jkqA3yNE8OxXJEZXz5BNl6mAaqUyWfJq7TJfQqZA0X73wdvEY00yd5C5auUJBNBLUhbrwC36eUum9xSCaMWjd3IrIuM0FWXblHY4oYJnRmUPNQevARK96hAcn6mpBOykvN4qCQNAMHqgki9poeRzqn+hszXZqloXfyikfSk5yg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777761151; c=relaxed/simple;
-	bh=UNN2ZW+DkuQu1tXoLP3q7k4L0pj/fCLAOCBAmEjCyH4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=WfTBziqrlpA1d0K3mrzF4tPeTBSz8tFQ4z8Xbd0PeyetyEJDPlsJJij+fW42+A12+Hm42BUBC+/GSd4qaz3tKVSyfqu+Q42/LbIgtfG2blByW8U2OzJNigaXeYkoVPQIVqpOuR1DxxAAXd2LMl7qVjksmoJmWQHyEk0HNczBi5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RvkPVMny; arc=none smtp.client-ip=74.125.224.42
+	s=arc-20240116; t=1777778326; c=relaxed/simple;
+	bh=nmCIRQtmzPaozAao7hOSorsx6A6W5yoKwH9m55zMD7c=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
+	 References:In-Reply-To; b=MKwEwliwFV+i2sVGWvBcNjsqUBRvJ2DCHA03WwMQzJARc5KXlB2kWWEi4tYpJ1QZpnWJXIwPTr+/IY7syo8KMhM/kwgodf4SbjcT9YC3SSQ83hXGE8RSvluaO/+9KiqkeDB8diCtHIO7Du7W8SeFk2zExFlTrqq8jND1SG542Q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ExJ3t0EQ; arc=none smtp.client-ip=209.85.210.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RvkPVMny"
-Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-651c5d525f6so2634938d50.3
-        for <linux-crypto@vger.kernel.org>; Sat, 02 May 2026 15:32:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ExJ3t0EQ"
+Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-7dcdd1b492eso3268107a34.1
+        for <linux-crypto@vger.kernel.org>; Sat, 02 May 2026 20:18:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777761149; x=1778365949; darn=vger.kernel.org;
-        h=in-reply-to:autocrypt:from:content-language:references:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1777778323; x=1778383123; darn=vger.kernel.org;
+        h=in-reply-to:references:subject:cc:to:from:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EpW2ttmPDGVevpAZzbqp40iMi/VIj+CW6c+DBUN+6V8=;
-        b=RvkPVMnyFRjd3nEpI3sEuUiUwcpg5oGqxk2lV1lI6Wz7Zq5SD4mAvh/zWXPciu44Jr
-         jqA5hlovT1jOIf4rzM50gLDPGA8Wx1TfSOL5GRKtRa9FlfaFDqTIPMphY6azCXONk/2d
-         iGYduOy1BPmS7RWg910VM3hPyOpUqvS4Fu+YaSjNCBqj1d7rZpCd0+EKCRolbCYypuNl
-         Ssg5wvJ0auu047PwdcIGnMNRpjY/vldaLj+YHPqwWmUa6Bk/5uN9eh5xMQe/juqDm10A
-         Aq4HP5vE50YZCeW5DbSn7YyTzJ4PmkBAE8bKT1rN/Z837o11ludp2IbubvIrJyYb0Yv4
-         TV6g==
+        bh=XqUhwWS39NFCpywsYbpQsNKLdN9sC3fxSRnSGZPBknY=;
+        b=ExJ3t0EQgY0Kc8l/vNira3IVihmNCwOVYTfRlPa3Ij4AzWIPQFfJQQq3tf6VYAwdJI
+         A3o14Hpp61OSS7MKx+PEm6n7QcZDmJYMzd6TPHtzR9SmjutPF6xvQe1XxYE074yheuPO
+         CStfCaDB+GQRZGXMv6nT9y57fgUxzn9k6dbyifB2+bgpgVfS5ZS3/xv6fk8+qmg/Fidu
+         qwVJqwDZUc+Ia/UfljICkrm4voRJwJeuWFxurItleMzA8XkdCZYaqhGfMBDf6pi5fhK7
+         Tl0VCBJfOKD430ViNjg9n+eJubuodZhsoZb2fk/sBXGHlOxIGvvvF5VAhD554gHs8IVG
+         8RMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777761149; x=1778365949;
-        h=in-reply-to:autocrypt:from:content-language:references:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+        d=1e100.net; s=20251104; t=1777778323; x=1778383123;
+        h=in-reply-to:references:subject:cc:to:from:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=EpW2ttmPDGVevpAZzbqp40iMi/VIj+CW6c+DBUN+6V8=;
-        b=fatHSvDKZpfH/BVI1PHklWR2EzDs7ZqBa7xsJSm8IEh69XC73CLmW6VP0CMG8es0LX
-         BzmOn4fuD9bMEhIUg3s96MusMcGKGQh3OYxExzhoFQ5XVgIgYA3XnDkF41Kt7Zf645/4
-         RoH6OYzPsMBPowv9xf3s/E7nElAImI1IkcQ2y78gxlwtP1xDOerrN3w/im/Kg5wufJ7w
-         Ql1G85chLGaubnpn/cu3fcZxfBuj8aEmnq6Ci9mpfgWN2NF7z/X26UNp/R2cX6eZZTRQ
-         SapmflOkv1pxP+LbyKNq5bnF3bBeqokHsVzsIq1jo2X1mr9TuIBYOo2dXJD3uir3oPz6
-         MElQ==
-X-Forwarded-Encrypted: i=1; AFNElJ83all0OLmJFVsxt0n+IcRZKy40nm3nhE8ajb77nosX5FBGAGnkDlBqZGAou77ycjO9grkBUnGz9vMVtCA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyz2I0YgL6RFEQFXYZ2Pn7FalC5b/fzfBVITjxsn2kUQkGJbCzz
-	H3MRlOaiba0gmmGLh27eLjHk+KrHgvOA2krdb2X18EjeliXgwJXQMm1o
-X-Gm-Gg: AeBDieuxIYcoA9jdfixK3DpXn2PhSameUeyV5CFsyXlrANcAe1nCt5unqfQQ5aY5fUs
-	N88Ra1hfiLpf+59Y7b/jh/SDf5I+Lh7YnGGU/mDIh8xdgbj6EmYZRvS0BqJo/9b+ZvnXtkOXzL7
-	/hT18iSa8QyGKl41l7LPHZ4+5B7RHh9H9+iMABvb9KIEo/DkJCYcmVIIWb4VSkDvVB7lOocIWtE
-	EJWvDzn+xmdao4RFX5guLwUDFAFbiBoenx3t77nFAa6GdMQcB2itlwXFz96W3zjzVpegddp9ZgP
-	DaXfkXIG1OfXXOqE4fKumOjxSKUqSSoIAGc+IHa8mO2l0a9AWzbolM0lrFwYHmAQeYYdWzNWVj+
-	XQM/EuLafD75A+8GdSOTRavqonNUW0vRxg23usbQ12zV+wh3BDxRTLTyQqXeCDDeQEIVkIZQEsc
-	QYbykqWgQCUXP14XfK9UqXUhDNfnilgqyiYyynu/WutemRMhPFXkPllbBKczgpyVt0vQI3FCGtd
-	d2uv5vMpLFH5nWMN/WjHxyaOtkwSgb4A32I6lVKjvMcg+O2EpwI
-X-Received: by 2002:a05:690e:1282:b0:650:1d21:d6af with SMTP id 956f58d0204a3-65c3dae7564mr4079179d50.40.1777761148707;
-        Sat, 02 May 2026 15:32:28 -0700 (PDT)
-Received: from [10.138.34.110] (h69-131-150-190.cncrtn.broadband.dynamic.tds.net. [69.131.150.190])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-65c2e85f390sm3191128d50.15.2026.05.02.15.32.27
+        bh=XqUhwWS39NFCpywsYbpQsNKLdN9sC3fxSRnSGZPBknY=;
+        b=sN7nihsZYkbgvPDRN/fC3QTLzlGqCmwEbS/UoIfnIh0kF3Ur9/AmOuqn8ZfjYE/F/i
+         JxkKEaoUyqZ1+zbUScIkg3j/lAMJuFhFw0m8jtk69DWw5yYLZ0faldkqBzdvKPrd8vny
+         e09Ik7Bg0LMuLIh/+bIJw1llpq+Zw06bsekf8nkq1R6rNyuUSF7CnlNCyYbJcfZtczwy
+         G5S84WAhbxtr3X7rOfp4Z6XM4XPxGXlIbZjEFzcPpbbz5VXmL5K5b6vXsx3FgA0K/E4/
+         w7rpGjD8PNuMXzOafTmqhaornf561EbFc/D/jIMUcNgr3lwnQup3KweCeUMrwSvKjduk
+         EEnw==
+X-Gm-Message-State: AOJu0YwpKuwW0gVg6AI+Nny1USl+j112I/ZMSLp9WWaccWc8PcsGAu7/
+	EwYwdgxi1BYcFn3TARjXKT0qXnDdEVqV7q/zVrQVqQhkonGLarAxrnYF
+X-Gm-Gg: AeBDieuDHIE5hn3X1SnzGJPbZQzcUQIRVE/a6FwH0ON+b7fMkwu0NlQiK5wy0hz0tWN
+	uXVBaXwwL3T0GlZGtVfYhycYHxona7RDV1K1ghECt+MyP+EwAbDxITsXiA3snXxpq3E5U3Ov8n/
+	PgOB+b+GiE40LuYilMoTsYtWlz5ggmLoAiYJne2QFf7o56VMfeIQGZs3s5FQVFoEkITUG8ai4HG
+	TM1DHkjoSQX3KidAEAw5ic86bdV5JNTjpClvtHkVB+C3JUz9NuhJQ9NwsrPbV3AQiiHDo3KMO88
+	ESF6VufV3dP6zlzhGdVzfd4J/R4SM7kqO4lc3VTJI0jqEjofLvn0jS126uS4Gidy4+EgEC0WnKD
+	ZfuhW80QjeWPIeLRlDm3HBedW6C3vwq4FXPaJAjtziY/CPGcwpvIZiyN+EhMkPoSGro74DidXpS
+	Ru+U3huXmy7xdumRPzbtlCXWh8/khwE03aC12GEYpWv0KYxjnZnb/Ve3OVb5/+
+X-Received: by 2002:a05:6830:1186:b0:7dc:e2ae:c15c with SMTP id 46e09a7af769-7debe39de18mr4210891a34.16.1777778323221;
+        Sat, 02 May 2026 20:18:43 -0700 (PDT)
+Received: from localhost (23-88-128-2.fttp.usinternet.com. [23.88.128.2])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7deca80d5b7sm5278512a34.9.2026.05.02.20.18.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 02 May 2026 15:32:27 -0700 (PDT)
-Message-ID: <3a52a111-e961-4ac6-830c-31465a7d14de@gmail.com>
-Date: Sat, 2 May 2026 18:32:22 -0400
+        Sat, 02 May 2026 20:18:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [oss-security] CVE-2026-31431: CopyFail: linux local privilege
- scalation
-To: oss-security@lists.openwall.com, Richard Kettlewell <rjk@terraraq.uk>,
- Eric Biggers <ebiggers@kernel.org>,
- Linux kernel mailing list <linux-kernel@vger.kernel.org>,
- linux-crypto@vger.kernel.org
-References: <afJorKIje4O6dXbH@netmeister.org>
- <d6111caa-db61-498a-92cb-ea7a0aa0a5e2@ehuk.net> <87se8dgicq.fsf@gentoo.org>
- <afL-QhLfEKqHZqka@eldamar.lan> <20260430071917.GB54208@sol>
- <177abb5d-8ba9-4bb9-8b23-9fbc868ed3cd@gmail.com>
- <cfe5a1f5-f7fe-44a5-8af9-8e4c8d68b3d7@terraraq.uk>
-Content-Language: en-US
-From: Demi Marie Obenour <demiobenour@gmail.com>
-Autocrypt: addr=demiobenour@gmail.com; keydata=
- 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
- +MYSfkEjBz0E8CLOcAw7JIwAaeBT
-In-Reply-To: <cfe5a1f5-f7fe-44a5-8af9-8e4c8d68b3d7@terraraq.uk>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------umJN2ZB5az8GQTZQH6rYaiEG"
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------umJN2ZB5az8GQTZQH6rYaiEG
-Content-Type: multipart/mixed; boundary="------------XowwdLQaJouTR9xJBwJ7qYaz";
- protected-headers="v1"
-Message-ID: <3a52a111-e961-4ac6-830c-31465a7d14de@gmail.com>
-Date: Sat, 2 May 2026 18:32:22 -0400
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [oss-security] CVE-2026-31431: CopyFail: linux local privilege
- scalation
-To: oss-security@lists.openwall.com, Richard Kettlewell <rjk@terraraq.uk>,
- Eric Biggers <ebiggers@kernel.org>,
- Linux kernel mailing list <linux-kernel@vger.kernel.org>,
- linux-crypto@vger.kernel.org
-References: <afJorKIje4O6dXbH@netmeister.org>
- <d6111caa-db61-498a-92cb-ea7a0aa0a5e2@ehuk.net> <87se8dgicq.fsf@gentoo.org>
- <afL-QhLfEKqHZqka@eldamar.lan> <20260430071917.GB54208@sol>
- <177abb5d-8ba9-4bb9-8b23-9fbc868ed3cd@gmail.com>
- <cfe5a1f5-f7fe-44a5-8af9-8e4c8d68b3d7@terraraq.uk>
-Content-Language: en-US
-From: Demi Marie Obenour <demiobenour@gmail.com>
-Autocrypt: addr=demiobenour@gmail.com; keydata=
- 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
- +MYSfkEjBz0E8CLOcAw7JIwAaeBT
-In-Reply-To: <cfe5a1f5-f7fe-44a5-8af9-8e4c8d68b3d7@terraraq.uk>
-
---------------XowwdLQaJouTR9xJBwJ7qYaz
-Content-Type: multipart/mixed; boundary="------------40Qs3ILp0pnu9ERxc0uz7tBn"
-
---------------40Qs3ILp0pnu9ERxc0uz7tBn
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Date: Sat, 02 May 2026 22:18:42 -0500
+Message-Id: <DI8PTIGP3I43.JOF10O9FPOMF@gmail.com>
+From: "Maxwell Doose" <m32285159@gmail.com>
+To: "Tycho Andersen" <tycho@kernel.org>, "Ashish Kalra"
+ <ashish.kalra@amd.com>, "Tom Lendacky" <thomas.lendacky@amd.com>, "John
+ Allen" <john.allen@amd.com>, "Herbert Xu" <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>
+Cc: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Sean
+ Christopherson" <seanjc@google.com>, "Kim Phillips" <kim.phillips@amd.com>,
+ "Alexey Kardashevskiy" <aik@amd.com>, "Nikunj A Dadhania" <nikunj@amd.com>,
+ "Pratik R. Sampat" <prsampat@amd.com>, "Michael Roth"
+ <michael.roth@amd.com>
+Subject: Re: [RFC v1 6/6] crypto/ccp: Implement SNP firmware live update
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260430160716.1120553-1-tycho@kernel.org>
+ <20260430160716.1120553-7-tycho@kernel.org>
+In-Reply-To: <20260430160716.1120553-7-tycho@kernel.org>
 
-On 5/2/26 15:13, Richard Kettlewell wrote:
-> On 01/05/2026 16:30, Demi Marie Obenour wrote:
->> On 4/30/26 03:19, Eric Biggers wrote:
->>> But I also hope this finally provides some more impetus for AF_ALG to=
- be
->>> deprecated and removed.  It's a massive, largely pointless attack
->>> surface which has been causing problems, including regular CVEs, ever=
+On Thu Apr 30, 2026 at 11:07 AM CDT, Tycho Andersen wrote:
+> From: "Tycho Andersen (AMD)" <tycho@kernel.org>
+>
+> Put all the previous primitives together to implement SNP firmware
+> live update via DOWNLOAD_FIRMWARE_EX.
+>
 
->>> since it was added to the kernel in 2010.  And of course it's gotten
->>> even worse lately, with LLMs now being able to find the bugs.
->>>
->>> Userspace crypto libraries exist.  There's no need to escalate to ker=
-nel
->>> mode just to do some math.
->>
->> The only reason I can think of to keep it is for embedded systems
->> with weak CPUs and crypto accelerators that are actually worth using.
->> However, those seem to be very rare outside of things like routers,
->> which run specialized distros like OpenWRT.  Even when the accelerator=
+[snip]
 
->> exists and is worth using, AF_ALG is certainly not an efficient way
->> to access it.
->=20
-> I have that use case, although fortunately it's in a context where=20
-> splice() is disabled. But the requirement is for access to the SoC's=20
-> accelerator - the interface doesn't need to be via AF_ALG in particular=
-,=20
-> it doesn't have to offer software crypto (and it might be better if it =
+>
+> [1]: https://lore.kernel.org/lkml/20241112232253.3379178-7-dionnaglaze@go=
+ogle.com/
+> Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
+> ---
+>  drivers/crypto/ccp/sev-dev.c | 244 ++++++++++++++++++++++++++++++++++-
+>  1 file changed, 243 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index b4711bf823e8..e7fe6dbf69c2 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> +static int sev_download_firmware_ex(struct sev_device *sev, const u8 *da=
+ta,
+> +				    u32 size)
+> +{
+> +	struct sev_data_download_firmware_ex sev_data =3D {0};
+> +	int ret, error =3D 0, order;
+>
 
-> didn't), and it needn't be independent of the specific hardware=20
-> (although in the bigger picture it'd be a shame if it wasn't).
->=20
-> ttfn/rjk
+Why not assign across multiple lines? How about something like:
 
-Can you provide benchmarks showing that the accelerator is faster
-than the CPU on realistic workloads?
---=20
-Sincerely,
-Demi Marie Obenour (she/her/hers)
---------------40Qs3ILp0pnu9ERxc0uz7tBn
-Content-Type: application/pgp-keys; name="OpenPGP_0xB288B55FFF9C22C1.asc"
-Content-Disposition: attachment; filename="OpenPGP_0xB288B55FFF9C22C1.asc"
-Content-Description: OpenPGP public key
-Content-Transfer-Encoding: quoted-printable
+int ret, order;
+int error =3D 0;
 
------BEGIN PGP PUBLIC KEY BLOCK-----
+or:
 
-xsFNBFp+A0oBEADffj6anl9/BHhUSxGTICeVl2tob7hPDdhHNgPR4C8xlYt5q49y
-B+l2nipdaq+4Gk6FZfqC825TKl7eRpUjMriwle4r3R0ydSIGcy4M6eb0IcxmuPYf
-bWpr/si88QKgyGSVZ7GeNW1UnzTdhYHuFlk8dBSmB1fzhEYEk0RcJqg4AKoq6/3/
-UorR+FaSuVwT7rqzGrTlscnTDlPWgRzrQ3jssesI7sZLm82E3pJSgaUoCdCOlL7M
-MPCJwI8JpPlBedRpe9tfVyfu3euTPLPxwcV3L/cfWPGSL4PofBtB8NUU6QwYiQ9H
-zx4xOyn67zW73/G0Q2vPPRst8LBDqlxLjbtx/WLR6h3nBc3eyuZ+q62HS1pJ5EvU
-T1vjyJ1ySrqtUXWQ4XlZyoEFUfpJxJoN0A9HCxmHGVckzTRl5FMWo8TCniHynNXs
-BtDQbabt7aNEOaAJdE7to0AH3T/Bvwzcp0ZJtBk0EM6YeMLtotUut7h2Bkg1b//r
-6bTBswMBXVJ5H44Qf0+eKeUg7whSC9qpYOzzrm7+0r9F5u3qF8ZTx55TJc2g656C
-9a1P1MYVysLvkLvS4H+crmxA/i08Tc1h+x9RRvqba4lSzZ6/Tmt60DPM5Sc4R0nS
-m9BBff0Nm0bSNRS8InXdO1Aq3362QKX2NOwcL5YaStwODNyZUqF7izjK4QARAQAB
-zTxEZW1pIE9iZW5vdXIgKElUTCBFbWFpbCBLZXkpIDxhdGhlbmFAaW52aXNpYmxl
-dGhpbmdzbGFiLmNvbT7CwY4EEwEIADgWIQR2h02fEza6IlkHHHGyiLVf/5wiwQUC
-X6YJvQIbAwULCQgHAgYVCgkICwIEFgIDAQIeAQIXgAAKCRCyiLVf/5wiwWRhD/0Y
-R+YYC5Kduv/2LBgQJIygMsFiRHbR4+tWXuTFqgrxxFSlMktZ6gQrQCWe38WnOXkB
-oY6n/5lSJdfnuGd2UagZ/9dkaGMUkqt+5WshLFly4BnP7pSsWReKgMP7etRTwn3S
-zk1OwFx2lzY1EnnconPLfPBc6rWG2moA6l0WX+3WNR1B1ndqpl2hPSjT2jUCBWDV
-rGOUSX7r5f1WgtBeNYnEXPBCUUM51pFGESmfHIXQrqFDA7nBNiIVFDJTmQzuEqIy
-Jl67pKNgooij5mKzRhFKHfjLRAH4mmWZlB9UjDStAfFBAoDFHwd1HL5VQCNQdqEc
-/9lZDApqWuCPadZN+pGouqLysesIYsNxUhJ7dtWOWHl0vs7/3qkWmWun/2uOJMQh
-ra2u8nA9g91FbOobWqjrDd6x3ZJoGQf4zLqjmn/P514gb697788e573WN/MpQ5XI
-Fl7aM2d6/GJiq6LC9T2gSUW4rbPBiqOCeiUx7Kd/sVm41p9TOA7fEG4bYddCfDsN
-xaQJH6VRK3NOuBUGeL+iQEVF5Xs6Yp+U+jwvv2M5Lel3EqAYo5xXTx4ls0xaxDCu
-fudcAh8CMMqx3fguSb7Mi31WlnZpk0fDuWQVNKyDP7lYpwc4nCCGNKCj622ZSocH
-AcQmX28L8pJdLYacv9pU3jPy4fHcQYvmTavTqowGnM08RGVtaSBNYXJpZSBPYmVu
-b3VyIChsb3ZlciBvZiBjb2RpbmcpIDxkZW1pb2Jlbm91ckBnbWFpbC5jb20+wsF4
-BBMBAgAiBQJafgNKAhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIXgAAKCRCyiLVf
-/5wiwYa/EACv8a2+MMou9cSCNoZBQaU+fTmyzft9hUE+0d5W2UY1RY3OsjFIzm9R
-/4SVccfsqOYLEo+S0vQMIIIqFEq3FCpXXwPzyimotps05VA8U3Bd7yseojFygOgK
-sAMOAee2RCaDDOnoJue01dfZMzzHPO/TVdp3OvnpWipfv5G1Xg96rwbhMLE3tg6N
-xwAHa31Bv4/Xq8CJOoIWvx6fcmZQpz01/lSvsYn0KrfEbTKkuUf0vM9JrCTCP2oz
-VNN5BYzqaq2M4r+jmSyeXLim922VOWqGkUEQ85BSEemqrRS06IU6NtEMsF8EWt/b
-hWjk/9GDKTcnpdJHTrMxTspExBiNrvpI2t+YPU5B/dJJAUxvmhFrbSIbdB8umBZs
-I3AMYrEmpAbh5x7jEjoskUC7uN3o9vpg1oCLS2ePDLtAtyBtbHnkA4xGD7ar8mem
-xpH9lY/i+sC6CyyIUWcUDnnagKyJP0m9ks0GLsTeOCA0bft2XA6rD6aaCnMUsndT
-ctrab42CV5XypjmC4U1rPJ8JQJUh1/3P48/8sMH+3krxpJ06KNWNFaUbaMTGiltZ
-7x9DngklSYrX0T+2G4kVXNmjaljwkoLahwLla2gUWwBSyofXdqyhQdwZsp01KXNQ
-UCyT/Pg+aDcm/E7OMV3d4lf7g/CSxiX2GSEe6BlhSz+Lmd7ZJ3g32M1ARGVtaSBN
-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
-EtJuZYM5blWncBOJCoWMnBEcTEo/viU3GgcVRw=3D=3D
-=3Dx94R
------END PGP PUBLIC KEY BLOCK-----
+int ret;
+int order;
+int error =3D 0;
 
---------------40Qs3ILp0pnu9ERxc0uz7tBn--
+Would be better for readability and git blame.
 
---------------XowwdLQaJouTR9xJBwJ7qYaz--
+>  static enum fw_upload_err sev_fw_upload_write(struct fw_upload *fw_uploa=
+d,
+>  					      const u8 *data, u32 offset,
+>  					      u32 size, u32 *written)
+> {
+>
 
---------------umJN2ZB5az8GQTZQH6rYaiEG
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+[snip]
 
------BEGIN PGP SIGNATURE-----
+>
+> +	old_major =3D sev->api_major;
+> +	old_minor =3D sev->api_minor;
+> +	old_build =3D sev->build;
+> +
+> +	mutex_lock(&sev_cmd_mutex);
+>
 
-iQIzBAEBCgAdFiEEopQtqVJW1aeuo9/sszaHOrMp8lMFAmn2e3cACgkQszaHOrMp
-8lO9jw//YnzdUkzriJojnmtabImyCreHNEwk7lc83mxFLaze3F/0gjTN5u08PRV0
-L1ShlSsqnwY37xodC5ePjKRzFlxwUC8EOpMqqJ1mp8c35PpDE/hXIA5tyTGKxajH
-YcUGyFufHm5ZduViDUpeEPsXYeqe5BU7y2G92hWj/9/gBm8dn2boyYG9GoprqLpy
-9ESQ+sprYqFdE0w1YYgsjjM1q/reEecKXb4t6z2pfKYyvpIS81Nr5RhstOHIhLsj
-FxOue5Vsob1quf5yGJHLg7IULoLqVzTiT8Y2nyHsHmT/zCj5g/2Wn0gZkrSce5Fp
-dNV4lRatgfHnvNgJ+a/eAtRQRg7fjOSO3oR03MypSxA7B5rRvqDrWBorAxqIp+M9
-Vm/dCdec88K/iQ2NmAeS4woIbhtRESkmRWXjwCoD2cxmEIDqvhwAYzF0fKkL+MR6
-BYZoV6ajuncrSsTbK4NB24PcuiCLndccrdRtsmKbzpxXqj6oohbGPqdhCDN9C7YJ
-B9rY1M+SodXbvNnrSNf+IhN3vgl5JOTMlr1g4CudVkt35EvZzpFirCaL2qVXZ1VS
-AC4Z549NuoBRzNJQsLRA4zJ2/Q82VgnMlw9D5DvEJNLbFqgp23qK8gSpXbn5eFAI
-+aNF6DqcN/EdlE6mw0rMn00JR79e2Vi/6aYsVKNagsZ7dhl/xX8=
-=tpFH
------END PGP SIGNATURE-----
+Why not guard(mutex)()? You used it earlier in
+sev_firmware_reinit_if_shutdown().
 
---------------umJN2ZB5az8GQTZQH6rYaiEG--
+>
+> +	*written =3D size;
+> +	ret =3D FW_UPLOAD_ERR_NONE;
+> +
+> +unlock:
+> +	mutex_unlock(&sev_cmd_mutex);
+>
+
+See above comment.
+
+best regards,
+maxwell
