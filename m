@@ -1,279 +1,70 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 805314C97;
-	Mon,  4 May 2026 07:13:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C66A3290BA
+	for <linux-crypto@vger.kernel.org>; Mon,  4 May 2026 08:29:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777878823; cv=none; b=b9i1VTw8PyJxJfRubnjSs0MgvTJj03FS1LeDVATwSO+LYx1bjiBU0Gq8VlNyaMsLJniUo7CKoiKLnv59AaioYRtISJQAf3jQb2UkcFfaK0gwHaZweGx0TiqqAmemTcIHROSX87PmidTr8N4Ihp1wU1hI7tLR7WS8b1+usHLQOCg=
+	t=1777883365; cv=none; b=HvQchBwuvQq8Oew2D9N/pwet3cWPDR5X07LxaGldFJMVwxDgRk5bIfEiRBXVIzTkngboVR4XEhYGsTYNFUh5UzH6YezpZ7IzupMkdEcCk2iHWVVT/Y+QTV1q/4DyXQHoGKgYKWZhyIJiUxhM5Qy0pA+dy7P7kfASXYuqA7ER/rU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777878823; c=relaxed/simple;
-	bh=8nNjo6NtiO8TiRvxGn5ZegTCsBknx+MOnUGPsTEfwqc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=I7I8nYzJFbVumlO1OwZOVXCHvLFg4DK9Qvkz3QElP+vCTYmpmOjC6gpmKbjgBmFUFpAf8ns6fe8WViZ45YA5nT4QGhg9gMNwIICNSGJaS/sK1MD1yxWRV1Cqeb5FnNjZMbUT+HXCw0WtF8d0lOgK4vtgKhRWiwVxCsctmjNoLkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gpQXJdM2; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777883365; c=relaxed/simple;
+	bh=+JorqP2Lq/9aXPbupTcYSWyOwB1aJPCl1fjDcv45u/o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q3w4EiV1b87PYTfvufzo52ovAD3kq+RlnzMVx5XPW4dgpTTDlHm3jDPDPEowwhFqb62fsR+vqvF9KuP6DBnnzOosOeFZJjIubS5imgU4nTaVdMfM0E9HewhQxuUDUVxML3K1tHNw8TGuhkz4bjxPX2xKUygreHHq458utpaxSEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lhWjPGh9; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gpQXJdM2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0D5AC2BCB8;
-	Mon,  4 May 2026 07:13:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777878823;
-	bh=8nNjo6NtiO8TiRvxGn5ZegTCsBknx+MOnUGPsTEfwqc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gpQXJdM2bNH+ddDq1qFGZ4Zt9qjcIwam/DLeC8fT84bbFQXgOZ//z+VCBo2CC0NJ1
-	 WalvQU0AIGYmlDEdEjL7ShkJeMG6yD5RQoeitPlfsfIx9ctnLkMoxGRmaXuRxPokV2
-	 CpuZ/Q1eKwH1bHYcF03nK5SFs+IMgKS+77OxgVjoCOZI92yOvGoOl1OsxcdnzC9aWz
-	 pX9DUXP2qzblkB7YOOj3eQTaFG9zNtW31dd1ayJcQCuU+e07LBEWTe8wt2lUAS6TRh
-	 gMapoDeKj7AFdLNgesW8fvlSecC5QZr9j8WqNGmPe9q+mdbo0j9MjewabcRZQ2SSH3
-	 VZo4eu3+/N1/g==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	Taeyang Lee <0wn@theori.io>,
-	Brian Pak <bpak@theori.io>,
-	Juno Im <juno@theori.io>,
-	Jungwon Lim <setuid0@theori.io>,
-	Tim Becker <tjbecker@theori.io>,
-	Demi Marie Obenour <demiobenour@gmail.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Feng Ning <feng@innora.ai>,
-	stable@vger.kernel.org
-Subject: [PATCH v2] crypto: af_alg - Remove zero-copy support from AF_ALG
-Date: Mon,  4 May 2026 00:10:25 -0700
-Message-ID: <20260504071025.180058-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260504070724.GC112568@sol>
-References: <20260504070724.GC112568@sol>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lhWjPGh9"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1777883362;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+3b5RnSW+SjCZL46j/qT6swLjiJZ7dosDu8SrdksmoI=;
+	b=lhWjPGh98mlxlLpnWOin1LWIfRbmORUvPncj+bb+A7/y33WUQM/gxNyRf6rIIbDcReixN/
+	bLPgqi4mfot+SVbLbOm1ugmNKJ8Bhe7ssZWGK79I+DJUQMAKfYkq6P403zeVGpRahxvMdC
+	xPK4+7SqeC0zmrIWpldslQXsg3u6VX4=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Stephan Mueller <smueller@chronox.de>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/2] crypto: jitterentropy - drop redundant delta check in jent_entropy_init
+Date: Mon,  4 May 2026 10:28:50 +0200
+Message-ID: <20260504082848.7194-4-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=794; i=thorsten.blum@linux.dev; h=from:subject; bh=+JorqP2Lq/9aXPbupTcYSWyOwB1aJPCl1fjDcv45u/o=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDJk/Ig6wcvM8OPRz4aG2L958qbar+QXEuxK3Nn7fpTRTR rvlksLhjlIWBjEuBlkxRZYHs37M8C2tqdxkErETZg4rE8gQBi5OAZiIoh8jw6kHr5druXkF9h5c sSH6w3zpB0VMK1/ea+Z0cMmasC7KxJ7hvwtP+OqilUxvPXwVj8S4bPyya+17wyLh6vYNNnGFa1y ncAAA
+X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-The zero-copy support is one of the riskiest aspects of AF_ALG.  It
-allows userspace to request cryptographic operations directly on
-pagecache pages of files like the 'su' binary.  It also allows userspace
-to concurrently modify the memory which is being operated on, a huge
-recipe for TOCTOU vulnerabilities.
+Since start_time = end_time - delta, start_time can only equal end_time
+when delta is 0, making the explicit end_time == start_time check
+redundant. Remove it.
 
-While zero-copy support is more valuable in other areas of the kernel
-like the frequently used networking and file I/O code, it has far less
-value in AF_ALG, which is a niche UAPI.  AF_ALG primarily just exists
-for backwards compatibility with a small set of userspace programs such
-as 'iwd' that haven't yet been fixed to use userspace crypto code.
-
-Originally AF_ALG was intended to be used to access hardware crypto
-accelerators.  However, it isn't an efficient interface for that anyway,
-and it turned out to be rarely used in this way in practice.
-
-Thus, the risks of the zero-copy support in AF_ALG vastly outweigh its
-benefits.  Just remove it.
-
-Note that this isn't a hard break, since the splice syscall is still
-supported.  The data is just now copied instead.  So it still works,
-just a bit slower in some cases.
-
-Tested with libkcapi/test.sh.  All its test cases still pass.  I also
-verified that this would have prevented the copy.fail exploit as well.
-
-Fixes: 8ff590903d5f ("crypto: algif_skcipher - User-space interface for skcipher operations")
-Fixes: 400c40cf78da ("crypto: algif - add AEAD support")
-Reported-by: Taeyang Lee <0wn@theori.io>
-Link: https://copy.fail/
-Reported-by: Feng Ning <feng@innora.ai>
-Closes: https://lore.kernel.org/r/afYcc-tZFwvZZo76@ans-MacBook-Pro.local
-Reviewed-by: Demi Marie Obenour <demiobenour@gmail.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 ---
+ crypto/jitterentropy.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-v2: added tags
-
- Documentation/crypto/userspace-if.rst | 30 ++---------
- crypto/af_alg.c                       | 73 +++++++++------------------
- crypto/algif_aead.c                   |  8 +--
- 3 files changed, 32 insertions(+), 79 deletions(-)
-
-diff --git a/Documentation/crypto/userspace-if.rst b/Documentation/crypto/userspace-if.rst
-index 021759198fe7..80eb2819901a 100644
---- a/Documentation/crypto/userspace-if.rst
-+++ b/Documentation/crypto/userspace-if.rst
-@@ -325,37 +325,13 @@ CRYPTO_USER_API_RNG_CAVP option:
-    but only after the entropy has been set.
- 
- Zero-Copy Interface
- -------------------
- 
--In addition to the send/write/read/recv system call family, the AF_ALG
--interface can be accessed with the zero-copy interface of
--splice/vmsplice. As the name indicates, the kernel tries to avoid a copy
--operation into kernel space.
--
--The zero-copy operation requires data to be aligned at the page
--boundary. Non-aligned data can be used as well, but may require more
--operations of the kernel which would defeat the speed gains obtained
--from the zero-copy interface.
--
--The system-inherent limit for the size of one zero-copy operation is 16
--pages. If more data is to be sent to AF_ALG, user space must slice the
--input into segments with a maximum size of 16 pages.
--
--Zero-copy can be used with the following code example (a complete
--working example is provided with libkcapi):
--
--::
--
--    int pipes[2];
--
--    pipe(pipes);
--    /* input data in iov */
--    vmsplice(pipes[1], iov, iovlen, SPLICE_F_GIFT);
--    /* opfd is the file descriptor returned from accept() system call */
--    splice(pipes[0], NULL, opfd, NULL, ret, 0);
--    read(opfd, out, outlen);
-+AF_ALG used to have zero-copy support, but it was removed due to it being a
-+frequent source of vulnerabilities.  For backwards compatibility the splice
-+system call is still supported, but the data will simply be copied.
- 
- 
- Setsockopt Interface
- --------------------
- 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 5a00c18eb145..fce0b87c2b65 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -971,11 +971,11 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
- 		struct scatterlist *sg;
- 		size_t len = size;
- 		ssize_t plen;
- 
- 		/* use the existing memory in an allocated page */
--		if (ctx->merge && !(msg->msg_flags & MSG_SPLICE_PAGES)) {
-+		if (ctx->merge) {
- 			sgl = list_entry(ctx->tsgl_list.prev,
- 					 struct af_alg_tsgl, list);
- 			sg = sgl->sg + sgl->cur - 1;
- 			len = min_t(size_t, len,
- 				    PAGE_SIZE - sg->offset - sg->length);
-@@ -1015,64 +1015,41 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
- 				 list);
- 		sg = sgl->sg;
- 		if (sgl->cur)
- 			sg_unmark_end(sg + sgl->cur - 1);
- 
--		if (msg->msg_flags & MSG_SPLICE_PAGES) {
--			struct sg_table sgtable = {
--				.sgl		= sg,
--				.nents		= sgl->cur,
--				.orig_nents	= sgl->cur,
--			};
--
--			plen = extract_iter_to_sg(&msg->msg_iter, len, &sgtable,
--						  MAX_SGL_ENTS - sgl->cur, 0);
--			if (plen < 0) {
--				err = plen;
-+		do {
-+			struct page *pg;
-+			unsigned int i = sgl->cur;
-+
-+			plen = min_t(size_t, len, PAGE_SIZE);
-+
-+			pg = alloc_page(GFP_KERNEL);
-+			if (!pg) {
-+				err = -ENOMEM;
- 				goto unlock;
- 			}
- 
--			for (; sgl->cur < sgtable.nents; sgl->cur++)
--				get_page(sg_page(&sg[sgl->cur]));
-+			sg_assign_page(sg + i, pg);
-+
-+			err = memcpy_from_msg(page_address(sg_page(sg + i)),
-+					      msg, plen);
-+			if (err) {
-+				__free_page(sg_page(sg + i));
-+				sg_assign_page(sg + i, NULL);
-+				goto unlock;
-+			}
-+
-+			sg[i].length = plen;
- 			len -= plen;
- 			ctx->used += plen;
- 			copied += plen;
- 			size -= plen;
--		} else {
--			do {
--				struct page *pg;
--				unsigned int i = sgl->cur;
--
--				plen = min_t(size_t, len, PAGE_SIZE);
--
--				pg = alloc_page(GFP_KERNEL);
--				if (!pg) {
--					err = -ENOMEM;
--					goto unlock;
--				}
--
--				sg_assign_page(sg + i, pg);
--
--				err = memcpy_from_msg(
--					page_address(sg_page(sg + i)),
--					msg, plen);
--				if (err) {
--					__free_page(sg_page(sg + i));
--					sg_assign_page(sg + i, NULL);
--					goto unlock;
--				}
--
--				sg[i].length = plen;
--				len -= plen;
--				ctx->used += plen;
--				copied += plen;
--				size -= plen;
--				sgl->cur++;
--			} while (len && sgl->cur < MAX_SGL_ENTS);
--
--			ctx->merge = plen & (PAGE_SIZE - 1);
--		}
-+			sgl->cur++;
-+		} while (len && sgl->cur < MAX_SGL_ENTS);
-+
-+		ctx->merge = plen & (PAGE_SIZE - 1);
- 
- 		if (!size)
- 			sg_mark_end(sg + sgl->cur - 1);
- 	}
- 
-diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
-index cb651ab58d62..c6c2ce21895d 100644
---- a/crypto/algif_aead.c
-+++ b/crypto/algif_aead.c
-@@ -7,14 +7,14 @@
-  * This file provides the user-space API for AEAD ciphers.
-  *
-  * The following concept of the memory management is used:
-  *
-  * The kernel maintains two SGLs, the TX SGL and the RX SGL. The TX SGL is
-- * filled by user space with the data submitted via sendmsg (maybe with
-- * MSG_SPLICE_PAGES).  Filling up the TX SGL does not cause a crypto operation
-- * -- the data will only be tracked by the kernel. Upon receipt of one recvmsg
-- * call, the caller must provide a buffer which is tracked with the RX SGL.
-+ * filled by user space with the data submitted via sendmsg.  Filling up the TX
-+ * SGL does not cause a crypto operation -- the data will only be tracked by the
-+ * kernel. Upon receipt of one recvmsg call, the caller must provide a buffer
-+ * which is tracked with the RX SGL.
-  *
-  * During the processing of the recvmsg operation, the cipher request is
-  * allocated and prepared. As part of the recvmsg operation, the processed
-  * TX buffers are extracted from the TX SGL into a separate SGL.
-  *
-
-base-commit: 6d35786de28116ecf78797a62b84e6bf3c45aa5a
--- 
-2.54.0
-
+diff --git a/crypto/jitterentropy.c b/crypto/jitterentropy.c
+index d5832caa8ab3..6ac0257e8e0a 100644
+--- a/crypto/jitterentropy.c
++++ b/crypto/jitterentropy.c
+@@ -775,7 +775,7 @@ int jent_entropy_init(unsigned int osr, unsigned int flags,
+ 		 * delta even when called shortly after each other -- this
+ 		 * implies that we also have a high resolution timer
+ 		 */
+-		if (!delta || (end_time == start_time)) {
++		if (!delta) {
+ 			ret = JENT_ECOARSETIME;
+ 			goto out;
+ 		}
