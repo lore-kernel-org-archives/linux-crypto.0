@@ -1,161 +1,183 @@
-Received: from mail-4317.protonmail.ch (mail-4317.protonmail.ch [185.70.43.17])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38D5B3E5599;
-	Mon,  4 May 2026 18:26:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA0AA2D8DDF
+	for <linux-crypto@vger.kernel.org>; Mon,  4 May 2026 18:27:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777919181; cv=none; b=qwrJ2ugeEVJIU9SWeswXGu5kH3T12iE7Hi5UsGTbpXVDv0wBYeBU4Rh6R8HfIT6+JD+J7poZ9LVN6FdvVzyY66MNdK5sEdpPXXhqofTNiw5g1GLURia8WPm8RnKlKFMlxE8YHMHQO9fNRfDgITIt6LC7BZ7ivzlbS7KHmWEj7HI=
+	t=1777919243; cv=none; b=LUw6QG084CANQWyOWr4EDPuejvavqqZ9O4a8XE8W0z6CwREPSzJMCfWsXZ35ItFwmEMGL3rj2OtmsvAlkQoEMPV8qTWb45S57PymKvCDrf8BbVMsk2j+405EqT70uGfN9O3S8PNG1qvRIJlVemFGAgkVZDf0cf/F1M4vGkoOj8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777919181; c=relaxed/simple;
-	bh=UaOnLB4kzFhagkSo1mRsv03uIvRALpIaTJO2y/9URNc=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=B/pfxwxoBV/Fd4zNKK1zvtdAfPXaArAGGAgPKQm4BfAN2fDiShp8diJOl3IqSVCqHCUX0ZKImH49xQsl51ME+WyzmFS/WsC7q/AAsUJw/WTCruCRGZ7HgYFA3qKDgDEc/Atij2vdOw3sIfTNtvD6ZuboEveN/qzh6zaANg3pykw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chesswob.org; spf=pass smtp.mailfrom=chesswob.org; dkim=pass (2048-bit key) header.d=chesswob.org header.i=@chesswob.org header.b=IlH8FO8n; arc=none smtp.client-ip=185.70.43.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=chesswob.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chesswob.org
+	s=arc-20240116; t=1777919243; c=relaxed/simple;
+	bh=y/kTyLZ+HlrQ86LL8qEx3AHdGjyMN0oqqtY2orbYvNk=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=t7/7MlpFO2sPOar5w3qymA8FZsm845PGTmG8qC7L1iPgq0BDJN4STtZ5MLJfw8mOhzCo7J0mQwaKg1pCfCpc5iGx33BxuQ1pYEknIqmc/CEvcudTsCe6m6wgl/qCfR7lGRuuXL0ZoqEzT4W23tpJEL46rjQ/UbeJ5ZJkXxekvys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ajFqOG7n; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=X0TACS4X; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chesswob.org header.i=@chesswob.org header.b="IlH8FO8n"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chesswob.org;
-	s=protonmail; t=1777919175; x=1778178375;
-	bh=PR/X6lI251CoSCFQrPjdszYhdQtxyE+I9d8XZnIz22c=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=IlH8FO8nNRxMDkS/MOeqT85jDT0d18WjtJn1QiHbWwYgoqUH2UEduRf5FE+DnCuYl
-	 f47MkJYeGe0fGdQaDIJKlkT73v2gXMbOV6qNi51kx5a9pYOrtLrejk9hkJ9UMPfqGH
-	 VyMYrfxA/W2Y0152EXCZ7HH0cpw9iS1SSKZR0NWPs3MYFrOIDBVKltQ0vyCZ8p5yX8
-	 +FciicrpHKTOv8ZOz93BA5K0wAwtTcqL8J3Sh83eETmwSXJCvVWp2csKVUykDYDsQ8
-	 I9/uZwuss27Nnn/+Fc39MlJZeO1lekeKODBtfgokyN+oevtMBS9VVOfKR1ijrQhT0i
-	 Md2yvIMA4dFRw==
-Date: Mon, 04 May 2026 18:26:10 +0000
-To: Eric Biggers <ebiggers@kernel.org>
-From: =?utf-8?B?4pK2bMOvIFDimK5sYXRlbA==?= <alip@chesswob.org>
-Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, Taeyang Lee <0wn@theori.io>, Brian Pak <bpak@theori.io>, Juno Im <juno@theori.io>, Jungwon Lim <setuid0@theori.io>, Tim Becker <tjbecker@theori.io>, Demi Marie Obenour <demiobenour@gmail.com>, Feng Ning <feng@innora.ai>, stable@vger.kernel.org
-Subject: Re: [PATCH] crypto: af_alg - Remove zero-copy support from AF_ALG
-Message-ID: <xxEJMG_wLMObY-emZXfETJ6HxxJQCY3OnYiBIUTyAWEMiAcr8QQd2t7c8O-Qj43zBGRv64st0_IrW9ABgaVwco9-puLVlIDh3ijeJ-cxXaE=@chesswob.org>
-In-Reply-To: <20260504174733.GB2291@sol>
-References: <20260504061532.172013-1-ebiggers@kernel.org> <mCm5pwZUNYtOVDph2baJg3eAzArddjvFpx3Wwh2qiZfZXYtv-aUjlISuRg5HjuIMzGo51hxCazaH47gp9B_q7I4R4LVePKGkvhO9D0P4nCY=@chesswob.org> <20260504174733.GB2291@sol>
-Feedback-ID: 36787097:user:proton
-X-Pm-Message-ID: 1afb90c6cdb9a12d85494210882da516a8ac3d32
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ajFqOG7n";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="X0TACS4X"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1777919241;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QcIoIPVGpy+t+hQB2IAxs25ATlafdN5syK1oi+kQ6lo=;
+	b=ajFqOG7npDB9cr38r1KHbO6t0tbncY2+MTX6CEOyHqNrMpqCftF7ObSow3Ut8ncyHv12BB
+	gqQfWPUwReD6wAmbyb8TgXUTdwQne+EZ2KeY/ojPRawQFyXNwi8av0Nc2q1xpzfVBfBSHx
+	k6EfqxfFdRJOoTRLxmaDy3l43OEEipQ=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-621-K76z_r-WNsOz3EczvvlAzg-1; Mon, 04 May 2026 14:27:19 -0400
+X-MC-Unique: K76z_r-WNsOz3EczvvlAzg-1
+X-Mimecast-MFC-AGG-ID: K76z_r-WNsOz3EczvvlAzg_1777919239
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-50edf01172bso123511091cf.2
+        for <linux-crypto@vger.kernel.org>; Mon, 04 May 2026 11:27:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1777919239; x=1778524039; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:organization
+         :references:in-reply-to:date:cc:to:from:subject:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=QcIoIPVGpy+t+hQB2IAxs25ATlafdN5syK1oi+kQ6lo=;
+        b=X0TACS4XXf3YLMC+ZSqUzPgih6j7BGfb0qvSALIdbFSgXDcnSq2D+/roChPmKAB2i/
+         I9xJTYPXRGwYI9krqrt4HBBkZt1iTt2kuy7+n5nE4y7RW48VgHJC5RRCpBnEFGgGW6Jw
+         qvYJ3XN/yC6htjdvm+27ZEePZy/0sx6u4mZGt8KF9dj72Bjip+70Ps1XFczIH7jQHNdu
+         rXLWE4L6lKh8kKrA5Fm4OQajZjqFBqOU6/iPZLvmzB3Exzjo19dsWjDQtBpGJ4czXSQX
+         uOapTF9697atNxMLgyuiRMPiUj6qJMg5X7WofJaEKn1wx3ZOtGJ5TvtomBXLoUHifK0M
+         8cvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1777919239; x=1778524039;
+        h=mime-version:user-agent:content-transfer-encoding:organization
+         :references:in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QcIoIPVGpy+t+hQB2IAxs25ATlafdN5syK1oi+kQ6lo=;
+        b=rfPIGxvwXlSMbjJGNOPnkK57R/Lml2IwUV3dJDIq8n/Nx51ZuY8dVzkl4mNPbqaP1f
+         tmhFF+XFk/awFGDnGoiVK1neOielxyCbz1yDpYWRjHf2zRzewtLf/yx471YiobGPgYOJ
+         KxzK4ZPSC93/jHf85vks+5cjwbv33EEQ8TxdnRXiL1XHP1BrKAT3HHWtpgAgAZ2/2vDl
+         dJF3Uy9JNzhQjdHhqIGmmnTg+QsCE5XSVze9xxJAQa/A7SyRv82sTzgBk0PIyGgAwV0a
+         yxNiLMinl7yBv5zv6vtPuUG1M1P+ZXt7YjmK+gJtiIzoje6eRvFKs7bY0MsttK8zhuhd
+         0ujQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+WMxVcIxOPATtjOvlSXuANQNntOJLU2dzncSDPxqYM0QEaj27dIjlGvbKPvp1IGybsRqaXDTT2OiDx6xg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyg9EY1ZIN+0Wy8Oin+G3eWu7ifBkMnThpxJxEH8fhwlWBdMNEq
+	R+bymhzw2PtmgXxUDzfRtYjBky9XbI2Kp9vEwP9Tf/VMGG5xCK45xhb02d8/kFmnDdJQvmqr6WW
+	lIxVzwMl1NFa3h8sy0TPodtPelM8YrIV/HG6tASd4S6S+mGtmNV95YBTOkU4T/Jr7zA==
+X-Gm-Gg: AeBDiesWOhTka1uRev2o2AWZrvPxKJS8y5QqUG00OEtylHIX5mHbAF3Qb3H0DYn6VE3
+	ds6p+uu7rftdsk37oGce54EiTAQ6Mky1m/lJeSLTl3BEh2lA8V6kiMAKmD9zYbXhbyxLCD16uXu
+	04hLVW0MfdTcXl8rDP0+6Ep3jtSBm0X4Lm3nwUHHOCCmNCVEDlxmjRM3JCKcXfaKih4pwgKWWXq
+	Glsimq9y0a5qgftK1LZ6FzNDsZWSDMsIQ5m3tMwYoaGBpbCxR1RXXMAmuRymFBehde56ti5rKDR
+	hQy9yBUElei0hI+SklAw1D4V/3cx7Zw0GrRIL2yTdtV+yUo7pNciS/o6fNapy6qS4xrxZD1qeUb
+	Ep2AHoa7SEJszQg+37R+F+sc8IwQ=
+X-Received: by 2002:a05:622a:5c09:b0:509:26f4:64e9 with SMTP id d75a77b69052e-5104bfa3385mr199674321cf.51.1777919239174;
+        Mon, 04 May 2026 11:27:19 -0700 (PDT)
+X-Received: by 2002:a05:622a:5c09:b0:509:26f4:64e9 with SMTP id d75a77b69052e-5104bfa3385mr199673581cf.51.1777919238563;
+        Mon, 04 May 2026 11:27:18 -0700 (PDT)
+Received: from m8.users.ipa.redhat.com ([2603:7000:9400:fe80::fc6])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b53ca982a1sm142199276d6.38.2026.05.04.11.27.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 May 2026 11:27:18 -0700 (PDT)
+Message-ID: <2890ba9558b503c5316f04aed958337455b8f7ad.camel@redhat.com>
+Subject: Re: [PATCH] crypto: af_alg - Document the deprecation of AF_ALG
+From: Simo Sorce <simo@redhat.com>
+To: Jeff Barnes <jeffbarnes@linux.microsoft.com>, Eric Biggers
+	 <ebiggers@kernel.org>
+Cc: Jon Kohler <jon@nutanix.com>, "linux-crypto@vger.kernel.org"
+	 <linux-crypto@vger.kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
+ "linux-doc@vger.kernel.org"
+	 <linux-doc@vger.kernel.org>, "linux-api@vger.kernel.org"
+	 <linux-api@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	 <linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
+	 <netdev@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>
+Date: Mon, 04 May 2026 14:27:16 -0400
+In-Reply-To: <F100C726-F841-461B-BE2F-C2018C122426@getmailspring.com>
+References: <20260504173952.GA2291@sol>
+	 <F100C726-F841-461B-BE2F-C2018C122426@getmailspring.com>
+Organization: Red Hat
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature"; micalg=pgp-sha512; boundary="------53ee95e391c4beb67b725744ebc23dbf7c3afdadd1f8e30ba44010d800038c0b"; charset=utf-8
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------53ee95e391c4beb67b725744ebc23dbf7c3afdadd1f8e30ba44010d800038c0b
-Content-Type: multipart/mixed;boundary=---------------------ee818561bc99d6503c9bebfbccd26cf0
+On Mon, 2026-05-04 at 14:12 -0400, Jeff Barnes wrote:
+>=20
+> On May 4 2026, at 1:39 pm, Eric Biggers <ebiggers@kernel.org> wrote:
+> > =20
+> > That seems to be an implementation of FIPS 140-3's integrity self-check=
+.
+> > A few observations:
+> > =20
+> > - It could easily use userspace SHA-512 code instead.  If including
+> >  libcrypto.so in the "FIPS cryptographic boundary" would cause
+> >  certification difficulties, then a sha512.c file could simply be added
+> >  to 'libkcapi-hmaccalc' which is already in it.
+>=20
+> Indeed expanding the crypto boundary to include libcrypto.so would cause
+> certification difficulties, it would mean certifying all of libcrypto.so
+> with the kernel. There *may* be a case for saying that it is outside the
+> module boundary but only if:
+>=20
+>     * The integrity mechanism is clearly external
+>     * The cryptographic module refuses to operate unless integrity is con=
+firmed
+>     * The trust relationship is clearly documented
+>=20
+> I don't see how this could be justified cleanly without significant pushb=
+ack.
+>=20
+> > =20
+> > - It's compatible with all of the proposed hardening.  It doesn't
+> >  require zero-copy performance.  It runs as root, so it would be
+> >  compatible with a capability check.  "hmac(sha512)" will need to be on
+> >  the algorithm allowlist anyway for iwd.
+> > =20
+> > - FIPS 140-3 might also allow it to be simplified to use a plain hash
+> >  instead of pointlessly using HMAC with a fixed key.
+>=20
+> FIPS 140=E2=80=913 (via ISO/IEC 19790) draws a hard distinction between:
+>     * Integrity checking (cryptographic protection)
+>     * Integrity measurement (detection only)
+>=20
+> A plain hash provides no protection against an attacker who can modify
+> both the object and its reference hash.
 
------------------------ee818561bc99d6503c9bebfbccd26cf0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;charset=utf-8
+The integrity mechanism is not build to detect adversarial tampering
+(at least at level 1), that is not its purpose.
 
-On Monday, 4 May 2026 at 19:51, Eric Biggers <ebiggers@kernel.org> wrote:
+That said a HMAC is just a hash with a secret key in the mix, it does
+not change the conditions wrt Hash if the key is known.
 
-> On Mon, May 04, 2026 at 04:07:45PM +0000, =E2=92=B6l=C3=AF P=E2=98=AElat=
-el wrote:
-> > Syd sandbox uses AF_ALG zero-copy for its Force Sandboxing[1] and Cryp=
-t Sandboxing[1].
-> > Zero-copy means Syd does not have to copy sandbox process data into it=
-s own address
-> > space providing safety and security. Switching to read/write rather th=
-an pipes and
-> > splice breaks a fundamental safety guarantee for the sandbox. Please d=
-o not break
-> > userspace.
-> >
-> > Will sendfile(2) continue to work?
-> >
-> > [1]: https://man.exherbo.org/syd.7.html#Force_Sandboxing
-> > [2]: https://man.exherbo.org/syd.7.html#Crypt_Sandboxing
-> =
+=20
+> > By the way, also on the topic of FIPS 140-3, some people do use AF_ALG
+> > for ACVP (even though it's not all that great for that purpose, either)=
+.
+> > But ACVP is a testing thing, not something that is needed on production
+> > systems.  ACVP can just be run as root on a testing build; there's no
+> > need to enable support for it in the actual production build.
+>=20
+> Agreed it's not a good use case. Unless/until pkcs1 is supported, I
+> don't see how you can use it for all of the test cases. Plus as
+> evidenced by Ubuntu's new cert, it requires validating the library.
 
+Of course it requires validating the library, validating the
+cryptography implementation is what FIPS is for. libcrypto.so can never
+be outside the boundary, unless you turn it off at runtime ...
 
-> It's very unclear what that feature (which I don't think anyone knew
-> even existed) is trying to accomplish.  Regardless, this patch doesn't
-> break the splice or sendfile syscalls.  It just makes them run a bit
-> more slowly since the kernel will copy the data internally.  So I think
-> your concern isn't justified.
-> =
+The problems are rather that libcrypto is not instrumented to enforce
+KAT tests are executed before it allows operation (crypto-API did this
+via test manager) and does not provide an indicator (or blocks)
+unapproved algorithms ...
 
+Simo.
 
-> > How can i test? Please help me.
-> =
-
-
-> If this is a feature you care about, perhaps you know how to test it?
-
-Thank you very much for the explanation and excuse me I panicked.
-
-> - Eric
-> =
-
-
-
-Best,
-Ali
------------------------ee818561bc99d6503c9bebfbccd26cf0
-Content-Type: application/pgp-keys; filename="publickey - alip@chesswob.org - 0x55838BF3.asc"; name="publickey - alip@chesswob.org - 0x55838BF3.asc"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="publickey - alip@chesswob.org - 0x55838BF3.asc"; name="publickey - alip@chesswob.org - 0x55838BF3.asc"
-
-LS0tLS1CRUdJTiBQR1AgUFVCTElDIEtFWSBCTE9DSy0tLS0tCgp4c0JOQkdFWGppUUJDQUNvakdh
-OTlKTnVENVFVQUxFeWNsd2Uxd01MVjVySmN5ZUhrM3NIOEVZTExsS2sKNm9wNlJ1bGhjUHdvMW5O
-UmdXRkM4ZVBRaVNqMUpFRHFlRjQ3eXU5Y0xDU3BLeDRJWUVCZmxiSkwwcEI4CkpZdUk4NSs1OVE1
-MXZaeUJuU3pTclBkcUdjSDM2d05wZ2d0N2lTcHVCVjk3clRWeE1ndHU4S0RtUisvSgpXQWQ2aWJl
-UE93b3pnd1ZQV0VJY1NQd0FaUFlrcHJ5YnVCQkNWb2dmbUxLN09FWTNGMlozTzEyeGFHYVUKOGF6
-RU5XZkI2YWJPVXM1ajlOaXJFMW5OV1h2V3FPSEVVa3grVmdFTUlkR2JTWWc5Y0dicDljUjZZZUFS
-CnlpK0Y0MGJYMWZCS2ZVNFI3ZDVJQXY0Y2g2OTUxMDdrMW9qYmJCRjZDWFZ3V0tSSzBlRng1Tit6
-QUJFQgpBQUhOSldGc2FYQkFZMmhsYzNOM2IySXViM0puSUR4aGJHbHdRR05vWlhOemQyOWlMbTl5
-Wno3Q3dJMEUKRUFFSUFDQUZBbUVYamlRR0N3a0hDQU1DQkJVSUNnSUVGZ0lCQUFJWkFRSWJBd0ll
-QVFBaENSRE81K2JkClErS2JzQlloQkZXRGkvTXNPNG9Ja28wR1NzN241dDFENHB1d2ZRRUgvaXpy
-ekJkbzFGMHhYRjdNdjkzVgpkS2xFbWxlVk8rYnVjdU5hb2huNzFCNnl1SW5EM1NLYUM1SHF0dENK
-MFlnNEYvQmIwdDlVYjBrWGkxOFUKRnRKU0V0TmxpUXJRTVJLZno3cFVqTHAwWkR1Y2xlaDVKUURs
-ZHVZYlBVWEdGRDdnNVN6M3M4OXJuYWdXCnFKZkdxcWVlMWRDcXJYN0l2N0xwU2ZVbDlLdzhwSmRG
-aFlsby95RW9SLzVnM2k1Yy8wOWtyaDdSUmk0agpPdVBteFMzWHN0aTVRT0x1U2JFUFlhWmhpZnZn
-R3JOcVRyUTY0QUxDSjQ2Q3ZrQVQ0UGptWnpncE03cHcKeURQNEFJM25WRDNSQ0U4SHY3SjR2TmdC
-Z1dvL1hKRlcyd0EydUFJV2xzbTd1eFNjMWh5OFVLVzFnTVl4Cm9PM1daeGl0TWQrMk81L1VuakRB
-MHovT3dFMEVZUmVPSkFFSUFLOVF1b1pvNnloYlAvTVpvNDZnZjY0ZAo3Nmc5NE84VnJ1amxwazVE
-cjg3T0wvVGY1dS9XMVRiZWhCYWppN0s5Z0NLczlVZUtUYldyanVlRnltSSsKY1lGMzZiclIrVFgw
-cjFyMGRRbjl4Y0M2UnRDNDArV3lOdER3dTk5Ym1VZkF1dnJ5QmdOOW9aVHF1azlFClUydEUydjBh
-ZTQ4MzU1L3AwQmR4c3Z6SmNPTW1FWENDZUpYcUdQa0Nrd3Fnc3JxazRTVHFQS2VRWTZXcgpOU0NX
-cnE3WTVVYWVJWXZaUm5kMFRjV0ZLWVJLbk5XNkI2TnplZFdjRGJRazV1OUs2RzN5SS9vTy9EdzQK
-a25PanVCWUNBa1Vodzk0M1ZwSi81N3RwMDFzd2hjdjVlcHFCYUhLNVNSYTg4TytOWUlRODdNNE5m
-Z3lFCkg3Z0lDY0RTT1lMVURUM0ZmN1VBRVFFQUFjTEFkZ1FZQVFnQUNRVUNZUmVPSkFJYkRBQWhD
-UkRPNStiZApRK0tic0JZaEJGV0RpL01zTzRvSWtvMEdTczduNXQxRDRwdXdiNmdILzNsaE8wdFJm
-NTZrOG5Lc0hQZ0wKWHlVTUVQZWtoVFVMdG04RXFkekozSkhMUTJlNFBxWTQydlJhNEdEUzY5aVNL
-UVR6UlhvdWhQWnBId2tCCnpKTk4xK3AxQ2V0LzNiRzJza0hlMkxwV2tGVVBad256MEE4SkZFMEhr
-RmpZcUVLYXk3ZUs0LzIxTGhKUQpCZEZUSDMwbVBOMytiMVU5dmtOblBPY0ZQbHhmbmNzekk2Rk1j
-NnU4dnYxNDc3SkFJcE0yV0pQcXRkUWMKSncvT2dHcjFaRW5OWi9icktWK3RQeHlEdmxtUklsQTNI
-TnlyN0Q5NWN2bFlkVHl5emcyb3dFZHRMa3dlCjI0eUNUbWdHNnVoL29SazFsenFYcWZHaEpDYVpD
-Zi83MlhpcWxSaDFRUko1ejdIM1NMcHF3MUszVXlQbApaNHg4NTliSFJMODNXeGpiR1FLMU8vMD0K
-PXNtSUEKLS0tLS1FTkQgUEdQIFBVQkxJQyBLRVkgQkxPQ0stLS0tLQo=
------------------------ee818561bc99d6503c9bebfbccd26cf0--
-
---------53ee95e391c4beb67b725744ebc23dbf7c3afdadd1f8e30ba44010d800038c0b
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: ProtonMail
-
-wsC5BAEBCgBtBYJp+OSrCRDO5+bdQ+KbsEUUAAAAAAAcACBzYWx0QG5vdGF0
-aW9ucy5vcGVucGdwanMub3JnrosanUaATdxv1zvo0qqMcwbspCcHHKdd4kfq
-6DeKiE0WIQRVg4vzLDuKCJKNBkrO5+bdQ+KbsAAAIHEH/3/LRUM9YzeL2cmV
-rZsH7dsmYchx1e1fn/MJqKGBohTKLslPS5VUPN5sTBTd8ZvRNrBZkvSNlLDJ
-18YxPbLJGFtwHYOx/SPTrh85Cr18gas+fKOwqETAnHQ/liBnLUcW2q8si/qs
-KVDr2DZ2qhOarTdC/Eu/zqJplyJTonWebmLbZ9VA/RcL/SWlwRNO9gaf9yjp
-aCDVwAmkuqUP5BoR5JvgsZlDIgybAH9DppF7JK7xM1iU102DbHMNHP5W72VN
-RLCBGzeutWa9HWCcHgkCizSoRE8B3+ls9w/QB8y9SDHSDvk6Ewd9c4VAdw5v
-a/IxiVHzooDo2ip0tHT8XfZKHjk=
-=wfTi
------END PGP SIGNATURE-----
-
-
---------53ee95e391c4beb67b725744ebc23dbf7c3afdadd1f8e30ba44010d800038c0b--
+--=20
+Simo Sorce
+Distinguished Engineer
+RHEL Crypto Team
+Red Hat, Inc
 
