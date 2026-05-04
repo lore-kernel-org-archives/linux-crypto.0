@@ -1,141 +1,103 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B719012D1F1;
-	Mon,  4 May 2026 02:52:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF01A175A87;
+	Mon,  4 May 2026 03:40:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777863174; cv=none; b=LA1uFT8IB9w/kaC9aXJS18Rzc+2rbXYXANj4ViVgNkxpUE00XUQ71uXq2mOx5ATC5FR17rW+naE4AjloLQQSGa7TvY2EQW587XwzJMrrKkcEy4NTnIq4bLfHcTjTEKA6CrguVf+79usmK/M5wmj7MAJLc/aqhdP5mi9uwJGzLeI=
+	t=1777866030; cv=none; b=GQbpZT3WVYKYzeAdXXP32oknVZHPgsBHiPyV4wIrzUiOE0TfzIsnLdLY8gmaXYzMl0/bbc46aP5SfLFvkeawEEyO/bSHQd/adeZ9r3staAgp3jIbKvmaW8Jb5CmWJH50CaL3kchAgBe72ouy1AcDf3hqtRAVaVVkJouTn8R3xhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777863174; c=relaxed/simple;
-	bh=dhMUW/4dPGc7ZNK+x+vHTf1RFPd1mHnQyh5kmDAgevA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZKhQeMdT1xC2MRFPtxLmHVlzAdZnMQLU8+zuNzQcop5tMasfNWd6CTYgd0tilSDaermAB5dqiCbPTm4WrJ+e4BIyIVjN6bzbRnLmNIgO2PLFBdg9ksNKDb/apN/C5M7F+Z7rhudIvcSBNi8qe/BY0uDpN/Lxv3bqnfzZIDZoSLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=fea8MkRd; arc=none smtp.client-ip=220.197.31.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1777866030; c=relaxed/simple;
+	bh=L/5hYeq42nefPoLmdSTevU3TzEJu+VM/m5h4DsTIocU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XldVogpW2puqFdZhS4o9lmeA+vczN98bOIlyIG6CYrP5134DK4GAzBKGe3wk4BY3JF8JntA7ZrodnPTBYXAnnNL+KxgoxgwZcnZEaV9Tak1RvQOAg6v8H1K9UIrAGx+1rXLxia/WWu4uapMJ+ancFHPVrIrKi4SsYJMqERoJIOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=TvhnYT/0; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="fea8MkRd"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=HV
-	mXrEqYABaL7NbZLSGM8MpsfNkjWapIsMc8tgbACx0=; b=fea8MkRdGmDZWaWkTe
-	GUY12mS7pQSug5Wfpo4trcdvGgY42gnzJ+7H7mKJ8IV+a0z0U/XGm21KDrngw8eZ
-	JHcqDzvdQ+/JUskKATS9pLQTEcCcPI+x3ZNXCtQjQgdATxZZ1mYUBT4bAoljcWf5
-	TCQ89aRPp6Iz4nwrXV7c99bI0=
-Received: from wmy.localdomain (unknown [])
-	by gzsmtp4 (Coremail) with SMTP id PygvCgAX2S2qCfhplHaqCQ--.283S2;
-	Mon, 04 May 2026 10:51:35 +0800 (CST)
-From: w15303746062@163.com
-To: giovanni.cabiddu@intel.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Cc: qat-linux@intel.com,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Mingyu Wang <25181214217@stu.xidian.edu.cn>
-Subject: [PATCH] crypto: qat - fix use-after-free during concurrent device start and removal
-Date: Mon,  4 May 2026 10:51:20 +0800
-Message-Id: <20260504025120.98242-1-w15303746062@163.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="TvhnYT/0"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=D7J5eN2Qkz3LgzL7cSDsCUuLaMs1LZ9q7TSbPaSdqsA=; 
+	b=TvhnYT/0CfnQyVut5gPwpNVqNRMhR6G7iB2FdA8jzZxkEsQWQabFiPuVMzi2rHjpi3PR77FXcCx
+	l21MJ0pP1n/GRFFJy+Uec4BClGgLMxk4z0syBQ+dMfQy0aKu5C7GX9vJXArxFCxTjtFxO8hmGMZg8
+	CRa8BO35lvE4W79FiY/cQSgB8mVohyF1PQYrLaubGH0DXu6RqzLdt5oTL5vqzJjYlzhNNRfPHBEpT
+	qnbmofQk5t/byg9SiAJG3NF0eKd5ik73TJql0mZX6kl2rPBipnGW5wTR23qLhU0/UDJLr+zEXv1ZV
+	9R2Na+EEFJ7GSjFGsb6X5lYzxILLsbswLfCg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1wJkAI-00AyPE-38;
+	Mon, 04 May 2026 11:40:16 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 04 May 2026 11:40:14 +0800
+Date: Mon, 4 May 2026 11:40:14 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Wesley Atwell <atwellwea@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Nick Terrell <terrelln@fb.com>,
+	David Sterba <dsterba@suse.com>,
+	Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] crypto: zstd - fix segmented acomp streaming paths
+Message-ID: <afgVHnFH9WCNXKvO@gondor.apana.org.au>
+References: <20260320215124.389938-1-atwellwea@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PygvCgAX2S2qCfhplHaqCQ--.283S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxZFy3Cr1xKFWUCFW5AFW5Wrg_yoWrAr45pr
-	s5Way5tryDtrsrGryqy3yrZa4Yv3Wvv34fC343Gwnakw43tFyrC34Yg34UXrZ5CFykCFyD
-	ZF4j93y29ryUXrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jcuc_UUUUU=
-X-CM-SenderInfo: jzrvjiatxuliiws6il2tof0z/xtbC4xgJ7Gn4CbjHUgAA3r
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260320215124.389938-1-atwellwea@gmail.com>
 
-From: Mingyu Wang <25181214217@stu.xidian.edu.cn>
+On Fri, Mar 20, 2026 at 03:51:24PM -0600, Wesley Atwell wrote:
+> The zstd acomp implementation does not correctly handle segmented
+> source and destination walks.
+> 
+> The compression path advances the destination walk by the full
+> segment length rather than the bytes actually produced, and it only
+> calls zstd_end_stream() once even though the streaming API requires it
+> to be called until it returns 0. With segmented destinations this can
+> leave buffered output behind and misaccount the walk progress.
+> 
+> The decompression path has the same destination accounting issue, and
+> it stops when the source walk is exhausted even if
+> zstd_decompress_stream() has not yet reported that the frame is fully
+> decoded and flushed. That can report success too early for segmented
+> requests and incomplete frames.
+> 
+> Fix both streaming paths by advancing destination segments by actual
+> output bytes, refilling destination segments as needed, draining
+> zstd_end_stream() until completion, and continuing to flush buffered
+> decompression output after the source walk is exhausted. Return
+> -EINVAL if decompression cannot finish once the input has been fully
+> consumed.
+> 
+> Fixes: f5ad93ffb541 ("crypto: zstd - convert to acomp")
+> Assisted-by: Codex:GPT-5
+> Signed-off-by: Wesley Atwell <atwellwea@gmail.com>
+> ---
+> Changes in v2:
+> - always finalize acomp walk mappings in the direct one-shot paths
+> - add mapped src/dst cleanup on streaming error exits
+> - reacquire a destination segment in decompression before resuming after a
+>   full output-chunk completion
+> 
+> Local validation:
+> - built bzImage with CONFIG_CRYPTO_SELFTESTS=y and
+>   CONFIG_CRYPTO_SELFTESTS_FULL=y
+> - exercised segmented zstd acomp requests using temporary local testmgr
+>   scaffolding
+> - booted under virtme and verified zstd-generic selftest passed in
+>   /proc/crypto
 
-A Use-After-Free (UAF) vulnerability was identified in the QAT driver's ioctl path. When handling commands like IOCTL_START_ACCEL_DEV, `adf_ctl_ioctl_dev_start()` retrieves the acceleration device using `adf_devmgr_get_dev_by_id()`.
+Thanks for the patch.  But please redo this as a series of incremental
+patches, each of which fixing a specific problem so that it is
+more amenable to review.
 
-Previously, this lookup function iterated over the `accel_table` under the `table_lock`. However, once the target device was found, the lock was dropped and a bare pointer was returned without incrementing the device's reference count.
-
-This creates a critical race condition. If a concurrent thread removes the device (e.g., via device stop operations or PCIe hotplug) by calling `adf_devmgr_rm_dev()`, the device is removed from the list and its memory is subsequently freed. When the original ioctl thread resumes and attempts to acquire `accel_dev->state_lock` inside `adf_dev_up()`, it triggers a KASAN slab-out-of-bounds panic.
-
-Fix this by properly leveraging the existing `ref_count`. Increment the device's `ref_count` via `atomic_inc()` inside `adf_devmgr_get_dev_by_id()` while the `table_lock` is still held. All callers of `adf_devmgr_get_dev_by_id()` are then updated to safely release this reference using `atomic_dec(&accel_dev->ref_count)` once they are done interacting with the device.
-
-Signed-off-by: Mingyu Wang <25181214217@stu.xidian.edu.cn>
----
- drivers/crypto/intel/qat/qat_common/adf_ctl_drv.c | 10 ++++++++++
- drivers/crypto/intel/qat/qat_common/adf_dev_mgr.c | 12 ++++++++++--
- 2 files changed, 20 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_ctl_drv.c b/drivers/crypto/intel/qat/qat_common/adf_ctl_drv.c
-index c2e6f0cb7480..4924b2bbb412 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_ctl_drv.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_ctl_drv.c
-@@ -201,6 +201,9 @@ static int adf_ctl_ioctl_dev_config(struct file *fp, unsigned int cmd,
- 	}
- 	set_bit(ADF_STATUS_CONFIGURED, &accel_dev->status);
- out:
-+	/* Release the reference acquired by adf_devmgr_get_dev_by_id() */
-+	if (accel_dev)
-+		atomic_dec(&accel_dev->ref_count);
- 	kfree(ctl_data);
- 	return ret;
- }
-@@ -310,6 +313,9 @@ static int adf_ctl_ioctl_dev_start(struct file *fp, unsigned int cmd,
- 		adf_dev_down(accel_dev);
- 	}
- out:
-+	/* Release the reference acquired by adf_devmgr_get_dev_by_id() */
-+	if (accel_dev)
-+		atomic_dec(&accel_dev->ref_count);
- 	kfree(ctl_data);
- 	return ret;
- }
-@@ -360,8 +366,12 @@ static int adf_ctl_ioctl_get_status(struct file *fp, unsigned int cmd,
- 	if (copy_to_user((void __user *)arg, &dev_info,
- 			 sizeof(struct adf_dev_status_info))) {
- 		dev_err(&GET_DEV(accel_dev), "failed to copy status.\n");
-+		atomic_dec(&accel_dev->ref_count);
- 		return -EFAULT;
- 	}
-+	
-+	/* Release the reference acquired by adf_devmgr_get_dev_by_id() */
-+	atomic_dec(&accel_dev->ref_count);
- 	return 0;
- }
- 
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_dev_mgr.c b/drivers/crypto/intel/qat/qat_common/adf_dev_mgr.c
-index e050de16ab5d..321bea3cefce 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_dev_mgr.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_dev_mgr.c
-@@ -320,6 +320,8 @@ struct adf_accel_dev *adf_devmgr_get_dev_by_id(u32 id)
- 		struct adf_accel_dev *ptr =
- 				list_entry(itr, struct adf_accel_dev, list);
- 		if (ptr->accel_id == id) {
-+			/* Increment ref_count to prevent UAF during concurrent removal */
-+			atomic_inc(&ptr->ref_count);
- 			mutex_unlock(&table_lock);
- 			return ptr;
- 		}
-@@ -331,11 +333,17 @@ struct adf_accel_dev *adf_devmgr_get_dev_by_id(u32 id)
- 
- int adf_devmgr_verify_id(u32 id)
- {
-+	struct adf_accel_dev *accel_dev;
-+	
- 	if (id == ADF_CFG_ALL_DEVICES)
- 		return 0;
- 
--	if (adf_devmgr_get_dev_by_id(id))
--		return 0;
-+	accel_dev = adf_devmgr_get_dev_by_id(id);
-+	if (accel_dev) {
-+		/* Release the reference immediately as we only verify existence */
-+		atomic_dec(&accel_dev->ref_count);
-+ 		return 0;
-+	}
- 
- 	return -ENODEV;
- }
+Cheers,
 -- 
-2.34.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
