@@ -1,112 +1,127 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mo4-p00-ob.smtp.rzone.de (mo4-p00-ob.smtp.rzone.de [85.215.255.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1196D3A6B6A
-	for <linux-crypto@vger.kernel.org>; Mon,  4 May 2026 11:43:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777895022; cv=none; b=S/p7kDreEbv1s8sQaOdCLc3EnesmHHM3thR6oNoXVa0FWd47TRgr7AlvFcJ6mDXlBHHR66oW4BNZ0U7G39uOpnUipxBupEbfyZHHo4LFi8mOmUYSX/z0h2/wTSUFA7plgGypY1ii8XHvOLbAb56fnAl55GplOBB3SQ88gtTF3nU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777895022; c=relaxed/simple;
-	bh=vqtPq34eTX5fZopa1Zag6rnbLG2P5/lfyqob6OhB+EQ=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=IUrgDlcBDZEqp8h3P4ZjU5IwczCERGxZjuJa++HbmqA4pG7cFShxwVY+1NaaY1ENBlaj4HR9zSgE9EFxwOzKjgyq+2vB4PpyKO/noR3kgbAoEO256jqwFHYVClsLlb72bpSKawtmEMFqdQFw7cG1JDN6I7Jfm2yVsHlYWpfsV4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TRzwcGv1; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A5E83C0634;
+	Mon,  4 May 2026 11:47:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.25
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777895257; cv=pass; b=BM+pG9GeA+jUlnBgZvx+1jiIFHVnK1AZxp0MEoirBKwtVLfJNH/S/a++nmiEPE7loSSutQdYqJ52Ul7+vQoKApt0RZj8Q4WVLvsJSeJjiyAojwvDytZu24B4r4yRj0FqadHHWAxnjzMfqGN5uPlEtPRaug1xF2fiJx2DmjCYsrw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777895257; c=relaxed/simple;
+	bh=kLuwym4G4GXQ25ZqYuzQ4E2vgF+Oq72gMF45cEw3pn4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Y4sZ2GvhGOX1KwmmwjqHeDoUEslT6oQDG/otQw+bEt5lwDu/rbO7vG/Dxlcc6RchOqi4F9lIKJnXW4CtUCNp0fju2cq+RqhoiKV6RjLruhwIr9daJSbEuXy1pR/dvi2I4AwdbEcI6729rxqvrgylyJq2arRt9EwM8yuEmKcscCo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chronox.de; spf=none smtp.mailfrom=chronox.de; dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b=am0cYw1q; dkim=permerror (0-bit key) header.d=chronox.de header.i=@chronox.de header.b=cTCY3I2G; arc=pass smtp.client-ip=85.215.255.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chronox.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=chronox.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TRzwcGv1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95B44C2BCF5;
-	Mon,  4 May 2026 11:43:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777895021;
-	bh=vqtPq34eTX5fZopa1Zag6rnbLG2P5/lfyqob6OhB+EQ=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=TRzwcGv1Ajx5T7hnntSSiIUBzvABTGKblO2p7jQR3Cc8yBBcjXHcp/3DLaT+bRVs/
-	 EpBqhOfGm2vgoUdOlPbCMx5hQaswCCKcogkzuZj1VwF2QJdpUEzamlx06tlPJc7huk
-	 UMKadcwuRmFHY9ew9xMM8dZiBOFoh/xFQnOH/Sg3GCN67eb3TXCBtgHgBz3OuBJSnr
-	 VXwSF2SioysV0Fklh6ke/TkVq2x/5D9ngEoe47uCkcogYMMYZ3vne01k2F2LsdNjZI
-	 ab7vKqS9YoRSrsrOMEdJoVWQgX4YNBHJ0Kf0H/XxBSCBZX1P/jSNOMalWpJSagJjo1
-	 HjOan3D+dAhNQ==
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 810D5F40076;
-	Mon,  4 May 2026 07:43:40 -0400 (EDT)
-Received: from phl-imap-02 ([10.202.2.81])
-  by phl-compute-01.internal (MEProxy); Mon, 04 May 2026 07:43:40 -0400
-X-ME-Sender: <xms:bIb4aWyG5Uegze_yqOlM-EzjzyFDhC2-5C9ORwUDjrIcyVXxLlQCcw>
-    <xme:bIb4adEXnkI6Ft2knI1j7d8i_b248eBkZ5wh-uo96SSHDVcGd5LDa7XrweqhTOJt4
-    P_SycdmcBn0vBkm75s6HIlpntyWno3y0D-1Q2RLhWcrsxjcssxAkGM>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdelkeejhecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefoggffhffvvefkjghfufgtgfesthejredtredttdenucfhrhhomhepfdetrhguuceu
-    ihgvshhhvghuvhgvlhdfuceorghruggssehkvghrnhgvlhdrohhrgheqnecuggftrfgrth
-    htvghrnhepkedvffekhffggeevkeeftdeifffhleegteeivdeifffhkeefieekteeugeet
-    teetnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpe
-    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhguodhmvghsmhhtphgruhhthhhpvghr
-    shhonhgrlhhithihqdduieejtdehtddtjeelqdeffedvudeigeduhedqrghruggspeepkh
-    gvrhhnvghlrdhorhhgseifohhrkhhofhgrrhgurdgtohhmpdhnsggprhgtphhtthhopedu
-    tddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepmhhpvgesvghllhgvrhhmrghnrd
-    hiugdrrghupdhrtghpthhtohepnhhpihhgghhinhesghhmrghilhdrtghomhdprhgtphht
-    thhopehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdrohhrghdrrghupdhrtghpth
-    htoheptghhlhgvrhhohieskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvggsihhgghgv
-    rhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehmrgguugihsehlihhnuhigrdhisg
-    hmrdgtohhmpdhrtghpthhtoheplhhinhhugihpphgtqdguvghvsehlihhsthhsrdhoiihl
-    rggsshdrohhrghdprhgtphhtthhopehlihhnuhigqdgtrhihphhtohesvhhgvghrrdhkvg
-    hrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhk
-    vghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:bIb4abXzzI1UfrhrPlxN9md_Jz-fcbJQUBjcbSj-IYkS7HFjccAqdA>
-    <xmx:bIb4aVKfwlYJqT3UyrS2cf8V1ATnVsvKa-V_S_xYMmyAHegfXA1baw>
-    <xmx:bIb4aWoYJA5MWKXForks4dPpx0Ax7QOapWp7ep4m8sKkelYtKyUdWg>
-    <xmx:bIb4acxyBAwqoVbOzu2RtzjfLsuU_qgLJuoBkSY0e7le6s4NoPLhjQ>
-    <xmx:bIb4aas2saJ82QEA7kBUOGWVkc8PHr4fbXPkJ9y5edAHm_o55ehfbmyD>
-Feedback-ID: ice86485a:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 5F56C700069; Mon,  4 May 2026 07:43:40 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="am0cYw1q";
+	dkim=permerror (0-bit key) header.d=chronox.de header.i=@chronox.de header.b="cTCY3I2G"
+ARC-Seal: i=1; a=rsa-sha256; t=1777895253; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=TfPvYyyymvOIlT2+d5czux9gVx88Z94hsh1UMquzqMkIeD5DaiND14dsULtTFVtsQI
+    twT7t/K3uMsURryGLuRipwuk5JRZQPo8CxLw4cKTxCCBKTf+t5LL2vE3r5lsBl1oOcVg
+    T2r41HSS9Zu10Qjh1xlu4Yxh8Uh3n158RP020DchluijSzJ9Py7mSH+bwE1m/oPN2Uvh
+    sO55m7zUcmulXqq9NToW2yvOHiShK+VBk1vQ8bPbc26ofiZvHExoT4qdc3BgGUQkjmu1
+    vNHV/MzsRaXFe98++Lg78N60HgWRxLz3QvigN17mJ2RgnRO8lCH1tHut6FklvQ0eKvFt
+    u+/Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1777895253;
+    s=strato-dkim-0002; d=strato.com;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=kLuwym4G4GXQ25ZqYuzQ4E2vgF+Oq72gMF45cEw3pn4=;
+    b=BPMT9iCsX+5AcBPMDPpMhqct8Zpvv8WlJ04pqu3BzmMT2JojZBdb2krnJE4Dx36Yqc
+    ATQI6VJ47aK+W0KBdYJ4cFIF5D/Gd9gggsZATzEr2RPBstpFrIL2VnZXzXO2kuZ3fxcb
+    XqPGl8wUkoIUaFb/eQX5ezH57ja1R3554Q7u+bAJnYJFecR8gqbwFfd0erbdlVjwIbaF
+    m4chO2B9O9ied5mYc616DoA6cqAH16jJFqzMvWQiOaD8d28jSy/tNsOGhBf+6d2dmJS4
+    IjhfyaMnpVBvMjOIKEdjUypJeI9H3UPdj6gFgTZ9qpklWR4BIY2LxyfJSaD+3jBXa3xn
+    Er+Q==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo00
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1777895253;
+    s=strato-dkim-0002; d=chronox.de;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=kLuwym4G4GXQ25ZqYuzQ4E2vgF+Oq72gMF45cEw3pn4=;
+    b=am0cYw1q11OIDy/YaPOrhjVsH+9qHx4hKu7DBGLtYvOCwsWMSQ7aTvUp2H4qBLWUnE
+    QQCdGCrZbskz3dyHeEOuXyLU76pdi8H576rDi0XdAmCSGdpvquEBwAna7SFlG39A/Dx9
+    qVK07zRrNp8WY067pauFpjSxKfE4u3cE2PjcJIc7fPoqkn/2Y2NABoXzidahuRJYibXW
+    KHRDG+In4j6hO5FEjesRg64+dHESNaimNiFwPMyqGrZaK6fMhSMzevPSzaU91Op3YedJ
+    8aJf5Zx4mb2Gs4JoLFgX679cnAVEg9KvnbTTgcXW1Rj9m3+Z/yECVsUUjoJSR4k0nUA1
+    1tDg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1777895253;
+    s=strato-dkim-0003; d=chronox.de;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=kLuwym4G4GXQ25ZqYuzQ4E2vgF+Oq72gMF45cEw3pn4=;
+    b=cTCY3I2GCKdQaIUKLNMKhi+9NggLaUrRK6pNyKIS7JwqVqfOC+fTt1YPPA5NMV6SF5
+    zHhxKtS0U0LKUef8aVAQ==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9zmwdP57PWmc+BP1jdA=="
+Received: from graviton.chronox.de
+    by smtp.strato.de (RZmta 55.0.1 AUTH)
+    with ESMTPSA id f77920244BlWqtD
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Mon, 4 May 2026 13:47:32 +0200 (CEST)
+From: Stephan =?UTF-8?B?TcO8bGxlcg==?= <smueller@chronox.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>,
+ Thorsten Blum <thorsten.blum@linux.dev>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] crypto: jitterentropy - fix URL
+Date: Mon, 04 May 2026 13:47:30 +0200
+Message-ID: <JlENoyPaTHK11Dr0AwpSZw@chronox.de>
+In-Reply-To: <20260504082848.7194-5-thorsten.blum@linux.dev>
+References:
+ <20260504082848.7194-4-thorsten.blum@linux.dev>
+ <20260504082848.7194-5-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Mon, 04 May 2026 13:43:20 +0200
-From: "Ard Biesheuvel" <ardb@kernel.org>
-To: "Eric Biggers" <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, "Jason A . Donenfeld" <Jason@zx2c4.com>,
- "Herbert Xu" <herbert@gondor.apana.org.au>, linuxppc-dev@lists.ozlabs.org,
- "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
- "Nicholas Piggin" <npiggin@gmail.com>,
- "Michael Ellerman" <mpe@ellerman.id.au>,
- "Madhavan Srinivasan" <maddy@linux.ibm.com>
-Message-Id: <b895db29-e738-4d1e-87fe-d5a569902ebe@app.fastmail.com>
-In-Reply-To: <20260504041448.15820-1-ebiggers@kernel.org>
-References: <20260504041448.15820-1-ebiggers@kernel.org>
-Subject: Re: [PATCH] lib/crypto: powerpc/md5: Drop powerpc optimized MD5 code
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Autocrypt: addr=smueller@chronox.de;
+ keydata=
+ mFIEZZK4/xMIKoZIzj0DAQcCAwTDaDnchhDYEXH6dbfhyHMkiZ0HPYDF5xwHuMB8Z24SuXYdMfh
+ pnovdsgwpi6LNAvnI/lGPrvDc/Mv0GQvHDxN0tCVTdGVwaGFuIE3DvGxsZXIgPHNtdWVsbGVyQG
+ Nocm9ub3guZGU+iJYEExMIAD4CGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AWIQQ0LE46O
+ epfGZCb44quXQ2j/QkjUwUCZZK6YwIZAQAKCRCuXQ2j/QkjU/bVAP9CVqPG0Pu6L0GxryzpRkvj
+ uifi4IzEoACd5oUIGmUX7AD8DxesdicM2ugqAxHgEZKl9xhi36Eq7usa/A6c6kFmyHK0HVN0ZXB
+ oYW4gTcO8bGxlciA8c21AZXBlcm0uZGU+iJMEExMIADsWIQQ0LE46OepfGZCb44quXQ2j/QkjUw
+ UCZZK6QgIbAwULCQgHAgIiAgYVCgkICwIEFgIDAQIeBwIXgAAKCRCuXQ2j/QkjU8HNAQDdTmzs+
+ Cls6FMoFrzoWdYtOGCW5im7x1G5M/L0L3VOvgEA6m9edpqCc0irbdNXVjoZwTXkSsLOxs2t7aDX
+ 2vFX54m0KVN0ZXBoYW4gTcO8bGxlciA8c211ZWxsZXJAbGVhbmNyeXB0by5vcmc+iJMEExMIADs
+ WIQQ0LE46OepfGZCb44quXQ2j/QkjUwUCZb+zewIbAwULCQgHAgIiAgYVCgkICwIEFgIDAQIeBw
+ IXgAAKCRCuXQ2j/QkjU1pIAQDemuxTaZdMGsJp/7ghbB7gHwV5Rh5d1wghKypI0z/iYgEAxdR7t
+ 6KrazO07Ia9urxEAQWqi0nf6yKluD0+gmOCmsW4UgRlkrj/EwgqhkjOPQMBBwIDBBo6QjEMU/1V
+ DD+tVj9qJ39qtZe5SZKFetDzXtyqRpwL+u8IbdIjv0Pvz/StziFMeomh8chRB7V/Hjz19jajK3C
+ IeAQYEwgAIBYhBDQsTjo56l8ZkJvjiq5dDaP9CSNTBQJlkrj/AhsgAAoJEK5dDaP9CSNTLQwA/1
+ WxGz4NvAj/icSJu144cMWOhyeIvHfgAkG9sg9HZXGdAPsGzKo4SezAYCwqgFKnyUIAjKYl1EW79
+ pSCOFS36heQvbhWBGWSuP8SCCqGSM49AwEHAgMEiEhJatNBgxidg8XJFTy8Ir7EsTCeoVY2vJAN
+ rysZeAAmSaUWFD4pvXE5RYQFeCYTWTG419H7ocNGUz5u1dgKhAMBCAeIeAQYEwgAIBYhBDQsTjo
+ 56l8ZkJvjiq5dDaP9CSNTBQJlkrj/AhsMAAoJEK5dDaP9CSNTGCAA/A2i1CxhQJmYh2MwfeM5Hy
+ Wk6EeWruSA1OgSWmaJaoGaAP4mARD2CviJgz8s3Gw07ZTk8SYHOTnv70hUbaziZ3/tjA==
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+
+Am Montag, 4. Mai 2026, 10:28:51 Mitteleurop=C3=A4ische Sommerzeit schrieb =
+Thorsten=20
+Blum:
+
+Hi Thorsten,
+
+> The URL https://www.chronox.de/jent.html resolves to a 404 Not Found.
+> Use https://www.chronox.de/jent/ instead.
+>=20
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+
+Reviewed-by: Stephan Mueller <smueller@chronox.de>
+
+Ciao
+Stephan
 
 
-On Mon, 4 May 2026, at 06:14, Eric Biggers wrote:
-> Earlier the decision was made to keep this code for a while, despite no
-> other architectures having optimized MD5 code anymore, because of
-> someone using it via AF_ALG via libkcapi-hasher
-> (https://lore.kernel.org/r/f0d771d5-ed70-444c-957a-ad4c16f6c115@csgroup.eu/)
->
-> However, with AF_ALG itself now being on its way out due to its
-> continuous stream of security vulnerabilities
-> (https://lore.kernel.org/r/20260430011544.31823-1-ebiggers@kernel.org/),
-> it's time to be a bit more forceful with nudging people towards
-> userspace crypto code.  It's always been the better solution anyway, and
-> it's much more efficient if properly optimized code is used.
->
-> Thus, drop the PowerPC optimized MD5 code.  Note that this code contains
-> no privileged instructions and could be run in userspace just fine.
->
-> MD5 is still supported, just with the generic code only.  I.e., this
-> commit only changes performance; it isn't a hard break.
->
-> This also has no effect on implementations of md5sum that already just
-> use userspace code (as they should), for example the coreutils one.
->
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
