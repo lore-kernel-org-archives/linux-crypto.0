@@ -1,183 +1,141 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA0AA2D8DDF
-	for <linux-crypto@vger.kernel.org>; Mon,  4 May 2026 18:27:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777919243; cv=none; b=LUw6QG084CANQWyOWr4EDPuejvavqqZ9O4a8XE8W0z6CwREPSzJMCfWsXZ35ItFwmEMGL3rj2OtmsvAlkQoEMPV8qTWb45S57PymKvCDrf8BbVMsk2j+405EqT70uGfN9O3S8PNG1qvRIJlVemFGAgkVZDf0cf/F1M4vGkoOj8w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777919243; c=relaxed/simple;
-	bh=y/kTyLZ+HlrQ86LL8qEx3AHdGjyMN0oqqtY2orbYvNk=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=t7/7MlpFO2sPOar5w3qymA8FZsm845PGTmG8qC7L1iPgq0BDJN4STtZ5MLJfw8mOhzCo7J0mQwaKg1pCfCpc5iGx33BxuQ1pYEknIqmc/CEvcudTsCe6m6wgl/qCfR7lGRuuXL0ZoqEzT4W23tpJEL46rjQ/UbeJ5ZJkXxekvys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ajFqOG7n; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=X0TACS4X; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F7053E5564
+	for <linux-crypto@vger.kernel.org>; Mon,  4 May 2026 18:43:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.169
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1777920210; cv=pass; b=gJtnyucAkoBQj6lGvSPVEltzMMsw7T0CsmeJM0YevMucf2mXmUrHqkr6CIN4RE3Yv993hjPq15c73mznzvSUJ2SmqgcZzywwujtBqNcXajJNwDSVg6m+TFKH6MigppML+45dENMN93uW/3cu5YKrkJX1quZG/R85z8Hs8wwnnRc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1777920210; c=relaxed/simple;
+	bh=dXuLmTysTXnNcBJUB7/WoKpKfGSuJHrE2RPV2+O1F4s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pgs7ZYeONog0LMH3pyY+LBGWKDe5qKh/6m+u4xtY3+FrPKlNXuSSYKStm2MFmycA/H8rvM7xfaB7Sr+0t0sosXqyZ0QZSZ856PI3lj5ZfKSVAgczjkslvpU/IYe0ma9QCDtttC7MeycUHOeK5K7Ouqel9q9Ao2qgH74/85cdLA0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UHiqy1MJ; arc=pass smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ajFqOG7n";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="X0TACS4X"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1777919241;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QcIoIPVGpy+t+hQB2IAxs25ATlafdN5syK1oi+kQ6lo=;
-	b=ajFqOG7npDB9cr38r1KHbO6t0tbncY2+MTX6CEOyHqNrMpqCftF7ObSow3Ut8ncyHv12BB
-	gqQfWPUwReD6wAmbyb8TgXUTdwQne+EZ2KeY/ojPRawQFyXNwi8av0Nc2q1xpzfVBfBSHx
-	k6EfqxfFdRJOoTRLxmaDy3l43OEEipQ=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-621-K76z_r-WNsOz3EczvvlAzg-1; Mon, 04 May 2026 14:27:19 -0400
-X-MC-Unique: K76z_r-WNsOz3EczvvlAzg-1
-X-Mimecast-MFC-AGG-ID: K76z_r-WNsOz3EczvvlAzg_1777919239
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-50edf01172bso123511091cf.2
-        for <linux-crypto@vger.kernel.org>; Mon, 04 May 2026 11:27:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UHiqy1MJ"
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-79827d28fc4so38935567b3.1
+        for <linux-crypto@vger.kernel.org>; Mon, 04 May 2026 11:43:28 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1777920208; cv=none;
+        d=google.com; s=arc-20240605;
+        b=k1Yc6XUaHJ/xUgckjFNsBJc9dRN8IQGMJ4D7EhM4I4PbE+Fm9kYQPNVzt7A932DVAW
+         EhZLiOHcpLzAzjeGBUXVSRecpjfKQsPML9UGoo/UfrzYBvtRd0bKH1NvKWpy62PtSDTp
+         yt3weR6C31IqKWrqknxc8FeL26xXjjHWpwvv8K4Us35zFHY3UbWr+FyfRHDwbZarkHDd
+         QmF6R/K2pOnMLYcAsArm4ljHMAyxtrm+eeJCjQQJ9ff/w0+gjzhiMa0ameXijrUROlfi
+         J2x0uW4lAjIwpqQnOGga838t5/cA4Mpi8nWN3sdbRYV0J4a77mep86w66/2BKW2ZPEf9
+         SE4Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=IuIPgS6r0rifEnGxaeEcCc2SLRMUTeJLBlOhRgV//es=;
+        fh=VSVgfuQ1jgaZDwmweStEMo3kgDA2zoKHZ+q1RHyDXzc=;
+        b=Xmm+m676F1pdeMFs6dt6HB8wL9g5vyQlch5t7Jisz9Z0SVvNPlbEN+C1bRYmpAlntO
+         Wu9PSUL6LOQafrL5KjmsV52q+CSiKG5wKhyY4NNdJC0znGpTWdRBvbEtpbjmwV+rCwB2
+         CVqciQmrvwIKYKW4z3kgd7LJTsk6otFIK9JIDQGj0NlpWxDy8x0tCAO8/Whz9YNky8MP
+         ax5x/C80PBACx/KsLOPZZ6dUAeftc+XQmpN32VCznT37xgU9gYtDC8FkfEDlYfOiICkl
+         j5AFuPIvFNTc83QZMV7ncUdRMCYjX/4Sd3zNmbbIrP8VpkXbVG2hexuLqPbk42GgZdvY
+         hpiQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1777919239; x=1778524039; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:organization
-         :references:in-reply-to:date:cc:to:from:subject:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=QcIoIPVGpy+t+hQB2IAxs25ATlafdN5syK1oi+kQ6lo=;
-        b=X0TACS4XXf3YLMC+ZSqUzPgih6j7BGfb0qvSALIdbFSgXDcnSq2D+/roChPmKAB2i/
-         I9xJTYPXRGwYI9krqrt4HBBkZt1iTt2kuy7+n5nE4y7RW48VgHJC5RRCpBnEFGgGW6Jw
-         qvYJ3XN/yC6htjdvm+27ZEePZy/0sx6u4mZGt8KF9dj72Bjip+70Ps1XFczIH7jQHNdu
-         rXLWE4L6lKh8kKrA5Fm4OQajZjqFBqOU6/iPZLvmzB3Exzjo19dsWjDQtBpGJ4czXSQX
-         uOapTF9697atNxMLgyuiRMPiUj6qJMg5X7WofJaEKn1wx3ZOtGJ5TvtomBXLoUHifK0M
-         8cvg==
+        d=gmail.com; s=20251104; t=1777920208; x=1778525008; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IuIPgS6r0rifEnGxaeEcCc2SLRMUTeJLBlOhRgV//es=;
+        b=UHiqy1MJXET1Ny/it4zuf+mpXnfLUBxHxA7erRXE3stZUlrz+iriXC+FA+Rh4/eWYc
+         7mv9JTHBWdASIiVgUufCGVoDnq5RdDGTpBm7gIczfgAZAGwJTwl0hni2Mvzq3XVrGKVO
+         eAHmjJeQ/ZP7gBNM0YgNRrRm4q20ZlJEifoh8qfiVu27IavW1jZ3ffaJ6X9Ius6beynR
+         MnhA3vJyCOzSDCP9dQ/X9yKFDIsJewBrXUwjOUJxhWRoj3+DsaJxADGRpx1saBCVYC4x
+         TeMtNsbc2jXHckw3UFro1Ycmijs0Ood8ZcQmd5uEkdqSsOj6a9u/v7W+tlHNQCfi6Pgc
+         75wA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777919239; x=1778524039;
-        h=mime-version:user-agent:content-transfer-encoding:organization
-         :references:in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QcIoIPVGpy+t+hQB2IAxs25ATlafdN5syK1oi+kQ6lo=;
-        b=rfPIGxvwXlSMbjJGNOPnkK57R/Lml2IwUV3dJDIq8n/Nx51ZuY8dVzkl4mNPbqaP1f
-         tmhFF+XFk/awFGDnGoiVK1neOielxyCbz1yDpYWRjHf2zRzewtLf/yx471YiobGPgYOJ
-         KxzK4ZPSC93/jHf85vks+5cjwbv33EEQ8TxdnRXiL1XHP1BrKAT3HHWtpgAgAZ2/2vDl
-         dJF3Uy9JNzhQjdHhqIGmmnTg+QsCE5XSVze9xxJAQa/A7SyRv82sTzgBk0PIyGgAwV0a
-         yxNiLMinl7yBv5zv6vtPuUG1M1P+ZXt7YjmK+gJtiIzoje6eRvFKs7bY0MsttK8zhuhd
-         0ujQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+WMxVcIxOPATtjOvlSXuANQNntOJLU2dzncSDPxqYM0QEaj27dIjlGvbKPvp1IGybsRqaXDTT2OiDx6xg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyg9EY1ZIN+0Wy8Oin+G3eWu7ifBkMnThpxJxEH8fhwlWBdMNEq
-	R+bymhzw2PtmgXxUDzfRtYjBky9XbI2Kp9vEwP9Tf/VMGG5xCK45xhb02d8/kFmnDdJQvmqr6WW
-	lIxVzwMl1NFa3h8sy0TPodtPelM8YrIV/HG6tASd4S6S+mGtmNV95YBTOkU4T/Jr7zA==
-X-Gm-Gg: AeBDiesWOhTka1uRev2o2AWZrvPxKJS8y5QqUG00OEtylHIX5mHbAF3Qb3H0DYn6VE3
-	ds6p+uu7rftdsk37oGce54EiTAQ6Mky1m/lJeSLTl3BEh2lA8V6kiMAKmD9zYbXhbyxLCD16uXu
-	04hLVW0MfdTcXl8rDP0+6Ep3jtSBm0X4Lm3nwUHHOCCmNCVEDlxmjRM3JCKcXfaKih4pwgKWWXq
-	Glsimq9y0a5qgftK1LZ6FzNDsZWSDMsIQ5m3tMwYoaGBpbCxR1RXXMAmuRymFBehde56ti5rKDR
-	hQy9yBUElei0hI+SklAw1D4V/3cx7Zw0GrRIL2yTdtV+yUo7pNciS/o6fNapy6qS4xrxZD1qeUb
-	Ep2AHoa7SEJszQg+37R+F+sc8IwQ=
-X-Received: by 2002:a05:622a:5c09:b0:509:26f4:64e9 with SMTP id d75a77b69052e-5104bfa3385mr199674321cf.51.1777919239174;
-        Mon, 04 May 2026 11:27:19 -0700 (PDT)
-X-Received: by 2002:a05:622a:5c09:b0:509:26f4:64e9 with SMTP id d75a77b69052e-5104bfa3385mr199673581cf.51.1777919238563;
-        Mon, 04 May 2026 11:27:18 -0700 (PDT)
-Received: from m8.users.ipa.redhat.com ([2603:7000:9400:fe80::fc6])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8b53ca982a1sm142199276d6.38.2026.05.04.11.27.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 May 2026 11:27:18 -0700 (PDT)
-Message-ID: <2890ba9558b503c5316f04aed958337455b8f7ad.camel@redhat.com>
-Subject: Re: [PATCH] crypto: af_alg - Document the deprecation of AF_ALG
-From: Simo Sorce <simo@redhat.com>
-To: Jeff Barnes <jeffbarnes@linux.microsoft.com>, Eric Biggers
-	 <ebiggers@kernel.org>
-Cc: Jon Kohler <jon@nutanix.com>, "linux-crypto@vger.kernel.org"
-	 <linux-crypto@vger.kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
- "linux-doc@vger.kernel.org"
-	 <linux-doc@vger.kernel.org>, "linux-api@vger.kernel.org"
-	 <linux-api@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	 <linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
-	 <netdev@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>
-Date: Mon, 04 May 2026 14:27:16 -0400
-In-Reply-To: <F100C726-F841-461B-BE2F-C2018C122426@getmailspring.com>
-References: <20260504173952.GA2291@sol>
-	 <F100C726-F841-461B-BE2F-C2018C122426@getmailspring.com>
-Organization: Red Hat
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.3 (3.58.3-1.fc43) 
+        d=1e100.net; s=20251104; t=1777920208; x=1778525008;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=IuIPgS6r0rifEnGxaeEcCc2SLRMUTeJLBlOhRgV//es=;
+        b=msbXyzKdaVJYyXqgKJ3/XBaH0zPiCAkWEBdDInw4AuatZ43tmbwp2cjCsCHAYbCevG
+         GcyFl2+BxZHjfodwo1c3o+LK3UaF/17Hgw2HeiNGTIBag3g+SZajBXqdOK0I2mFBco5v
+         AwcpV/4FUi2bzgnYohurQ+n6c8l3Q8EgCSVL+R0VUht50SANjIzAwCadz9YJFJXFTSv7
+         5CXIIBX0SfnOp2ag9q9H/6KcM6d/am7+FU/WIsN8CdG7XsRAVGavIFwxTsn8xz+cPZfl
+         Ejjd3tFQ2xuti/OVUYfF+lN38P41P0+LwucyYsX6CSxHbG+diwz0ZoPobuce+vMD+llr
+         k2ng==
+X-Forwarded-Encrypted: i=1; AFNElJ9vqit5G+w4lIDSRMElxblNkK5rSueiDN3+9zdgA7lY5FnTzXUA0Whh9V97sppsVb8tJb6mb+LL7hKx9yE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2xlPjIlQ6pVuA/z3ip0ERKW9LroILCN+ieiq+OprqedXjdj5a
+	jd7EUjzQjX58239pij3P1H9zlvFTmdHwFib8kUhsUwLHHNkcFsZxUqChzLFKJRXPNVPsXgIgIBj
+	238R/1SwGX8NivudK80wolMdJzBPFH9A=
+X-Gm-Gg: AeBDiev2J0c7bjL5v21SuP/WnJNUS7wnGW5A2TSyWXqNwQA77YnxQf2wAGt3R9EKhXi
+	e+r50p9k3gE5x26qGYQOMDDo7I+xWclIOTlLvv0iNHe+q80YcD6NvfPD+RyLfLFTvmr3li63b0Z
+	gz6jrpn2jAO8RmAnM8R3C1jeS1IvDgAjZBrPtkqGGIqBh73wZaPwEE11Su1mTSoJ/xhA3H93nNi
+	fOiDDnwoMkbMug/G4Bl1cp5KEgt20y28ZobBlqcpa2CGoKWbzqPVDXR4wRdnDj/wKY7KpHnmyiW
+	gcOLXd2N9enjvzHmWrys5rAj+ZLHz1Y=
+X-Received: by 2002:a05:690c:f09:b0:7ba:f2f1:86b5 with SMTP id
+ 00721157ae682-7bd76fa52f8mr115261967b3.14.1777920207396; Mon, 04 May 2026
+ 11:43:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20260430160716.1120553-1-tycho@kernel.org> <20260430160716.1120553-7-tycho@kernel.org>
+ <DI8PTIGP3I43.JOF10O9FPOMF@gmail.com> <afijY2Q0tEK5BnPs@tycho.pizza>
+In-Reply-To: <afijY2Q0tEK5BnPs@tycho.pizza>
+From: Maxwell Doose <m32285159@gmail.com>
+Date: Mon, 4 May 2026 13:43:16 -0500
+X-Gm-Features: AVHnY4LJHvTwYWiJOTHE9vu-AjRcgCN2U31eoyP4_tx7L96iB0QTz9jux9PeDeQ
+Message-ID: <CAKqfh0G3=ABoaLWrGvKBWvxZ31dHwfYjhogQrbxhebNqxYfCTw@mail.gmail.com>
+Subject: Re: [RFC v1 6/6] crypto/ccp: Implement SNP firmware live update
+To: Tycho Andersen <tycho@kernel.org>
+Cc: Ashish Kalra <ashish.kalra@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>, 
+	John Allen <john.allen@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Sean Christopherson <seanjc@google.com>, 
+	Kim Phillips <kim.phillips@amd.com>, Alexey Kardashevskiy <aik@amd.com>, Nikunj A Dadhania <nikunj@amd.com>, 
+	"Pratik R. Sampat" <prsampat@amd.com>, Michael Roth <michael.roth@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2026-05-04 at 14:12 -0400, Jeff Barnes wrote:
->=20
-> On May 4 2026, at 1:39 pm, Eric Biggers <ebiggers@kernel.org> wrote:
-> > =20
-> > That seems to be an implementation of FIPS 140-3's integrity self-check=
-.
-> > A few observations:
-> > =20
-> > - It could easily use userspace SHA-512 code instead.  If including
-> >  libcrypto.so in the "FIPS cryptographic boundary" would cause
-> >  certification difficulties, then a sha512.c file could simply be added
-> >  to 'libkcapi-hmaccalc' which is already in it.
->=20
-> Indeed expanding the crypto boundary to include libcrypto.so would cause
-> certification difficulties, it would mean certifying all of libcrypto.so
-> with the kernel. There *may* be a case for saying that it is outside the
-> module boundary but only if:
->=20
->     * The integrity mechanism is clearly external
->     * The cryptographic module refuses to operate unless integrity is con=
-firmed
->     * The trust relationship is clearly documented
->=20
-> I don't see how this could be justified cleanly without significant pushb=
-ack.
->=20
-> > =20
-> > - It's compatible with all of the proposed hardening.  It doesn't
-> >  require zero-copy performance.  It runs as root, so it would be
-> >  compatible with a capability check.  "hmac(sha512)" will need to be on
-> >  the algorithm allowlist anyway for iwd.
-> > =20
-> > - FIPS 140-3 might also allow it to be simplified to use a plain hash
-> >  instead of pointlessly using HMAC with a fixed key.
->=20
-> FIPS 140=E2=80=913 (via ISO/IEC 19790) draws a hard distinction between:
->     * Integrity checking (cryptographic protection)
->     * Integrity measurement (detection only)
->=20
-> A plain hash provides no protection against an attacker who can modify
-> both the object and its reference hash.
+On Mon, May 4, 2026 at 8:57=E2=80=AFAM Tycho Andersen <tycho@kernel.org> wr=
+ote:
+> On Sat, May 02, 2026 at 10:18:42PM -0500, Maxwell Doose wrote:
+> > On Thu Apr 30, 2026 at 11:07 AM CDT, Tycho Andersen wrote:
+[snip]
+> > > +   old_major =3D sev->api_major;
+> > > +   old_minor =3D sev->api_minor;
+> > > +   old_build =3D sev->build;
+> > > +
+> > > +   mutex_lock(&sev_cmd_mutex);
+> > >
+> >
+> > Why not guard(mutex)()? You used it earlier in
+> > sev_firmware_reinit_if_shutdown().
+>
+> Because this code calls some functions, including
+> sev_firmware_reinit_if_shutdown(), that take the lock again. We could
+> use scoped_guard() I suppose, I can look at that for v2.
+>
 
-The integrity mechanism is not build to detect adversarial tampering
-(at least at level 1), that is not its purpose.
+Sorry, I should've clarified in my email, I meant why not use the RAII
+patterns in cleanup.h like before. Like you said, scoped_guard() is
+likely the logical way forward if there's some functions that acquire
+the same lock.
 
-That said a HMAC is just a hash with a secret key in the mix, it does
-not change the conditions wrt Hash if the key is known.
+> It may be useful to do a larger series where we re-think when the
+> locks are acquired here. It seems like only grabbing them at the top
+> level entrypoints: ioctl, platform init, firmware update, etc. and
+> putting lockdep asserts in all the helpers in the file might be
+> cleaner generally.
 
-=20
-> > By the way, also on the topic of FIPS 140-3, some people do use AF_ALG
-> > for ACVP (even though it's not all that great for that purpose, either)=
-.
-> > But ACVP is a testing thing, not something that is needed on production
-> > systems.  ACVP can just be run as root on a testing build; there's no
-> > need to enable support for it in the actual production build.
->=20
-> Agreed it's not a good use case. Unless/until pkcs1 is supported, I
-> don't see how you can use it for all of the test cases. Plus as
-> evidenced by Ubuntu's new cert, it requires validating the library.
+That's also probably a good idea.
 
-Of course it requires validating the library, validating the
-cryptography implementation is what FIPS is for. libcrypto.so can never
-be outside the boundary, unless you turn it off at runtime ...
+best regards,
+maxwell
 
-The problems are rather that libcrypto is not instrumented to enforce
-KAT tests are executed before it allows operation (crypto-API did this
-via test manager) and does not provide an indicator (or blocks)
-unapproved algorithms ...
 
-Simo.
 
---=20
-Simo Sorce
-Distinguished Engineer
-RHEL Crypto Team
-Red Hat, Inc
-
+>
+> Tycho
