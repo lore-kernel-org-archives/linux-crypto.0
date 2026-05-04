@@ -1,130 +1,105 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 540873E5EC1;
-	Mon,  4 May 2026 17:41:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0FD11862;
+	Mon,  4 May 2026 17:41:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777916472; cv=none; b=cyjTDqv/ZixkWVDRM045tFFDg1zF9H6fMpXFK8sczxHvojGzqVV08KFirMNuknIOx08xFwprDkSAeuRncSE5NvIzCqGTOkF+mr4/mK6AZ5AyHVG89QiJ4Tp4LS1zXB+sUe2pNkQGvm6tJQL+r33SkchKWQRjS9iw2/TG23+OTCc=
+	t=1777916501; cv=none; b=WqeiqAFw/M16lS+ACZBYIqsLNP7ef0F2G6CFDQjDcEBrTEalmhLOzOPtZeAzWTd00PXV6pK793hn0kRnOESGSctRtDnevRHpzrIEHlA5TK/VM/tpkcUMyDeOfJ/5sF54jUHwL1w4FQbxVCJ6kppl4RllT2gnQe2dVIKGJl857m4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777916472; c=relaxed/simple;
-	bh=gXCIxglj6nEmYjf0Vl9jKj/cd7xazV9XVYCGS2F8+kA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QTQnzSSlYFgLF2Esa9jqu94jubR4H9NJLlDfvk8x9F+qXhVG6yEeIfCvLvS7fe4srDXpRCBEB2j6nx8rYTVPWkt1c95VEdmrqoOLwdrC4DCm8Vc8h4tg4eoMesTWltETccH1DybP1i75XY1zw5WfL74eGIFtJAMQr0Ai9F1rlt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hf6SWaca; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777916501; c=relaxed/simple;
+	bh=Dju5V9WI247b+gw5Gxnh3v0/NH6IZ1jQn/OQVxY+c9I=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type:Content-Disposition; b=hb2xIhb1fQQCtnFZadeSUKeBFClwN+rsRtW6hqcPHbqFJ9n5fYsRODrwLpYcYBYmy+R+opK2oY3H+PO+Om7YJAGjQvDnxgboYJnMnB+dSgO5HReg7D4Gbaxc3Qj/HXhcou5GHSXkt1wsS8x7xhju9uCJOygPK7lfQok2e7O4TBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=ja8k4e+h; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hf6SWaca"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF928C2BCB8;
-	Mon,  4 May 2026 17:41:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777916472;
-	bh=gXCIxglj6nEmYjf0Vl9jKj/cd7xazV9XVYCGS2F8+kA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hf6SWaca7SqxrkrXkC7kijSGnxlJ6IYOITp4mg4SlDVSk6WB76juKkXB9eXxGVVP6
-	 51OuFI7tAv+j1NpcB1ag6Hpra2YCUWwqVrS8ktRkOMNn19p+rxYDYOT+vexdVqa1iL
-	 weSTW0LQR0xmiQdVVaNyceaYslwrMNz4Fw4KAp6ryTGtdbsk2CRod4s11pkAnGVSW+
-	 9p0Fbw4+hl+PYYLsB91RO1PJuy1/AIt9iU8yBpFkwTKQQTz6lYKuHcqn8cgEGOSxQG
-	 +yPdwW/XUhb5f7g3l8FLe+Jk7YFfK7PC99SiU8057/Hsit7pVmrGlHiOGjS1S9XZvw
-	 kUG+syil/wG/g==
-Date: Mon, 4 May 2026 10:39:52 -0700
-From: Eric Biggers <ebiggers@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="ja8k4e+h"
+Received: from jeffbarnes-ThinkPad-P14s-Gen-2i (unknown [52.177.6.131])
+	by linux.microsoft.com (Postfix) with ESMTPSA id C871A20B7169;
+	Mon,  4 May 2026 10:41:36 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com C871A20B7169
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1777916497;
+	bh=f+1Y5EUYXPSxAF/znLYyDNUbOTcdHMnI7MLeAMmAaPE=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=ja8k4e+hHrAMRcxYCgXNUexidzSdZliw2fZEgTBHaD77ph7Q84MPBiJJSYnlZLhsM
+	 NilPwYVgfkoU+81wpXZsJPiTNAD6mDZv3RDJ2F3/gHwk1wUSS5kkdR7BZAwHaPOx6T
+	 u/WHCHHu4a+cU/x2an1SFDUm5fq6j0ldEjijM5xM=
+Date: Mon, 4 May 2026 13:41:37 -0400
+From: Jeff Barnes <jeffbarnes@linux.microsoft.com>
 To: Jon Kohler <jon@nutanix.com>
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Eric Biggers <ebiggers@kernel.org>, 
+ "=?utf-8?Q?linux-crypto=40vger.kernel.org?="
+ <linux-crypto@vger.kernel.org>, Herbert Xu
+ <herbert@gondor.apana.org.au>, "=?utf-8?Q?linux-doc=40vger.kernel.org?="
+ <linux-doc@vger.kernel.org>, "=?utf-8?Q?linux-api=40vger.kernel.org?="
+ <linux-api@vger.kernel.org>, 
+ "=?utf-8?Q?linux-kernel=40vger.kernel.org?="
+ <linux-kernel@vger.kernel.org>, "=?utf-8?Q?netdev=40vger.kernel.org?="
+ <netdev@vger.kernel.org>, Linus Torvalds
+ <torvalds@linux-foundation.org>
+Message-ID: <0D4B157F-AEDE-4470-BDBE-E6467CA19089@getmailspring.com>
+In-Reply-To: <4D424F50-7E9F-4B1F-AE9C-86D8526284E6@nutanix.com>
+References: <4D424F50-7E9F-4B1F-AE9C-86D8526284E6@nutanix.com>
 Subject: Re: [PATCH] crypto: af_alg - Document the deprecation of AF_ALG
-Message-ID: <20260504173952.GA2291@sol>
-References: <20260430011544.31823-1-ebiggers@kernel.org>
- <4D424F50-7E9F-4B1F-AE9C-86D8526284E6@nutanix.com>
+X-Mailer: Mailspring
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4D424F50-7E9F-4B1F-AE9C-86D8526284E6@nutanix.com>
 
-On Mon, May 04, 2026 at 02:39:12PM +0000, Jon Kohler wrote:
-> > On Apr 29, 2026, at 9:15 PM, Eric Biggers <ebiggers@kernel.org> wrote:
-> > 
-> > AF_ALG is almost completely unnecessary, and it exposes a massive attack
-> > surface that hasn't been standing up to modern vulnerability discovery
-> > tools.  The latest one even has its own website, providing a small
-> > Python script that reliably roots most Linux distros: https://copy.fail/
-> > 
-> > This isn't sustainable, especially as LLMs have accelerated the rate the
-> > vulnerabilities are coming in.  The effort that is being put into this
-> > thing is vastly disproportional to the few programs that actually use
-> > it, and those programs would be better served by userspace code anyway.
-> > 
-> > These issues have been noted in many mailing list discussions already.
-> > But until now they haven't been reflected in the documentation or
-> > kconfig menu itself, and the vulnerabilities are still coming in.
-> > 
-> > Let's go ahead and document the deprecation.
-> > 
-> > This isn't intended to change anything overnight.  After all, most Linux
-> > distros won't be able to disable the kconfig options quite yet, mainly
-> > because of iwd.  But this should create a bit more impetus for these
-> > userspace programs to be fixed, and the documentation update should also
-> > help prevent more users from appearing.
-> > 
-> > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> > ---
-> 
+
+
+On May 4 2026, at 10:39 am, Jon Kohler <jon=40nutanix.com> wrote:
+
+> =20
 > Quick passing observation
-> I noticed that when attempting to completely disable these Crypto APIs,
-> I was experiencing boot failures with fips=1 enabled systems.
-> 
+> I noticed that when attempting to completely disable these Crypto APIs,=
+
+> I was experiencing boot failures with fips=3D1 enabled systems.
+> =20
 > Using 6.18-based kernel with an el9-based user space, I see the
 > following hang in the early boot console from dracut-pre-pivot:
->   Check integrity of kernel
->   libkcapi - Error: AF_ALG: socket syscall failed (errno: -97)
->   Allocation of hmac(sha512) cipher failed (-97)
-> 
+>  Check integrity of kernel
+>  libkcapi - Error: A=46=5FALG: socket syscall failed (errno: -97)
+>  Allocation of hmac(sha512) cipher failed (-97)
+
+One thing that for certain that would cause this panic is the sha512hmac
+binary that does the fips integrity check. On many distros this check is
+called, for example by dracut among others, during initramfs to check
+the integrity of the kernel before any crypto is used. On failure, the
+kernel won't finish boot.
+
+sha512hmac is a binary shipped with kcapitools. It uses libkcapi.
+
+sha512hmac -> libkcapi -> A=46=5FALG.
+
+Is there a planned replacement for this integrity check=3F I don't know o=
+f
+anybody doing this for =46IPS yet, but is there a case where IMA / EVM
+could be a workaround=3F
+
+Regards,
+Jeff
+
+> =20
 > I haven't looked at every elX version, but at least in el9 and el10,
-> they use libkcapi-hmaccalc to provide sha512hmac, which dracut [1]
-> uses to calculate the HMAC value in do_fips().
-> 
+> they use libkcapi-hmaccalc to provide sha512hmac, which dracut =5B1=5D
+> uses to calculate the HMAC value in do=5Ffips().
+> =20
 > Digging further, I was only able to disable RNG and AEAD APIs, but
-> not HASH and SKCIPHER APIs when FIPS was in the picture with el9++.
-> 
-> I’m not sure how other distros do the same, but this could be problematic
+> not HASH and SKCIPHER APIs when =46IPS was in the picture with el9++.
+> =20
+> I=E2=80=99m not sure how other distros do the same, but this could be p=
+roblematic
 > elsehwere if other distros went down the libkcapi route.
+> =20
+> =5B1=5D https://github.com/dracutdevs/dracut/blob/059/modules.d/01fips/=
+fips.sh=23L167
+> =20
 > 
-> [1] https://github.com/dracutdevs/dracut/blob/059/modules.d/01fips/fips.sh#L167
-
-That seems to be an implementation of FIPS 140-3's integrity self-check.
-A few observations:
-
-- It could easily use userspace SHA-512 code instead.  If including
-  libcrypto.so in the "FIPS cryptographic boundary" would cause
-  certification difficulties, then a sha512.c file could simply be added
-  to 'libkcapi-hmaccalc' which is already in it.
-
-- It's compatible with all of the proposed hardening.  It doesn't
-  require zero-copy performance.  It runs as root, so it would be
-  compatible with a capability check.  "hmac(sha512)" will need to be on
-  the algorithm allowlist anyway for iwd.
-
-- FIPS 140-3 might also allow it to be simplified to use a plain hash
-  instead of pointlessly using HMAC with a fixed key.
-
-Anyway, just another one of the long tail of odd users that could have
-solved their problem in a better way.  This one is at least compatible
-with the hardening that's being considered.
-
-By the way, also on the topic of FIPS 140-3, some people do use AF_ALG
-for ACVP (even though it's not all that great for that purpose, either).
-But ACVP is a testing thing, not something that is needed on production
-systems.  ACVP can just be run as root on a testing build; there's no
-need to enable support for it in the actual production build.
-
-- Eric
