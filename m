@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC7063E3D9C;
-	Mon,  4 May 2026 16:52:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E9D93E3C69;
+	Mon,  4 May 2026 16:52:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777913537; cv=none; b=oUeIdT4DTPtdiPmjaWeRSxM1mAb12Jk5uyHZO4a7gz4XGlZzDoey9BbB7KWCqUirBL3syx5supoRIgmhPY3ggwYRwj5GGF37Jd2I9dpUFYq48TQ8Z1oZCJUPcKyxk+t0SJ7ozsgB6TuKUs+fTJ+oqXqQ/AGGdNXdzCkdo3/hmQY=
+	t=1777913538; cv=none; b=brm1pGoWvAJhe397SIVPugQ5E4A3X8xZ8cOuzEu6M9fENZmPPi2fWBzhrxUhaVKFO5joMGdaA8AlVsYD2cLTCEG6p7Kh6TGuoU47nLGGDZknyMpdst25aCL9gMyiOUZ8KhQmkozLmZYxuL4GBtKIR3k0HBV9FOaQzJW2xOSYfwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777913537; c=relaxed/simple;
-	bh=YgNEz2GgxfbZjC06CdBKMrFbR54U7WwWhBedkxltfjk=;
+	s=arc-20240116; t=1777913538; c=relaxed/simple;
+	bh=Fw7svH/liofO4kK7H0XxtvP07i4I2IoOHIbSEEO2pUE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fbLsSjs4AkdbS/Cb8Boaqkw0rJYkh8YWFkrLCVVSNJ8abCCDjYT9Rb3L/LEaJvsaIz6M89PMbjKj0MH85arKzX8iGWia4lQG0nq6RXq/fJH/7LljdWLPDi2KuYQU3S62czHClRf56xVtlrhV3f20b9UYMW2tWfvVKYgl1JvBoLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kK0P+s/l; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=Yx1DYlVd3RdRy9txe5JDFTGqLLx+mv2cN/hAeDbYnpNiKFSIIDvNkVXViShU7MF7eEqyQKjMIps2pZCoKyeeXyIIDHiCI+Rl5i5POhUazpfGh8FRBBn6xE73qnivApepYzjXZA9qx11cyBmEyAjZYBDYHDojfcYUrrbAgjuzWQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YIC7msaE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kK0P+s/l"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4DD9C2BCB8;
-	Mon,  4 May 2026 16:52:13 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YIC7msaE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 970AEC2BCC4;
+	Mon,  4 May 2026 16:52:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777913535;
-	bh=YgNEz2GgxfbZjC06CdBKMrFbR54U7WwWhBedkxltfjk=;
+	s=k20201202; t=1777913537;
+	bh=Fw7svH/liofO4kK7H0XxtvP07i4I2IoOHIbSEEO2pUE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kK0P+s/luF5NmD6qMIJgQBr6wP4XN/hxoq4VOSBObtkUEqiUiivmMBOMpo/6pfulF
-	 jw4mmZfQ6VyGkoBsFlinKUz1Izxy80OdUd6CyWlFCRYDbhuO0Cp3DImd1Ur0R6ivjk
-	 bwdeFAo2wi9dQoPiELiz96IjCD3+KEN/FelQv11+XsW6yacuFLcXoCrOKtQy1q2Xnn
-	 aaFdONApOJ+H/Hp5TICMnmvzSJmGYy/cT6qRgMz60qE/UwoFztYyM6BIoPdW3ZV3qH
-	 t7LDDz/fELPmqmryXh73DyZwtur6h6HUlY2BHsFRpycfgoXqWqXwMjWTzBCEvU+96B
-	 Ml5eWb68j8A7Q==
+	b=YIC7msaEJqzjuUdGOvWonpjck6LcAUPwDpqJWnKoYPnAbQOUNyK80/4bRbAXFhpND
+	 0gbhYkeZOH6sWURLwUEVd5yUnEfV73sobDXdIgNZ0bcxFEmoCVaQuei0gr9eZKF32Z
+	 Th6kiYIwYPW/jVLI+meNn5K09EjMxzkOarXvuS2uZr1fYnyL6TihgZivmiYmW+bc/o
+	 bdWYllnEpgiiPBHb5X2vI3hzSJzvf4HVq4V1Y4G03Ne+iw2WUpgBy5O7g/M/EECt1S
+	 ZFTtqUEvFXVYGhIredWFkyEJ+q1WRD6cFqR/iKgyXubGTCjpi0yhF2vRL+0cE2K6pI
+	 9zfWur7PNCazA==
 From: Tycho Andersen <tycho@kernel.org>
 To: Tom Lendacky <thomas.lendacky@amd.com>,
 	John Allen <john.allen@amd.com>,
@@ -41,9 +41,9 @@ Cc: "Borislav Petkov (AMD)" <bp@alien8.de>,
 	Dan Williams <dan.j.williams@intel.com>,
 	"Tycho Andersen (AMD)" <tycho@kernel.org>,
 	stable@vger.kernel.org
-Subject: [PATCH v2 3/4] crypto/ccp: Do not initialize SNP for ioctl(SNP_VLEK_LOAD)
-Date: Mon,  4 May 2026 10:51:46 -0600
-Message-ID: <20260504165147.1615643-4-tycho@kernel.org>
+Subject: [PATCH v2 4/4] crypto/ccp: Do not initialize SNP for ioctl(SNP_CONFIG)
+Date: Mon,  4 May 2026 10:51:47 -0600
+Message-ID: <20260504165147.1615643-5-tycho@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260504165147.1615643-1-tycho@kernel.org>
 References: <20260504165147.1615643-1-tycho@kernel.org>
@@ -65,17 +65,19 @@ Sashiko notes:
 > execution for an active VM trigger a general protection fault and crash the
 > host?
 
-The SEV firmware docs for SNP_VLEK_LOAD note:
+Refuse to re-try initialization if SNP is not already initialized for
+SNP_CONFIG.
 
-> On SNP_SHUTDOWN, the VLEK is deleted.
+This is technically an ABI break: before if SNP initialization failed it
+could be transparently retriggered by this ioctl, and if no VMs were
+running, everything worked fine. Hopefully this is enough of a corner case
+that nobody will notice, but someone does, there are a few options:
 
-That is, the initialization/shutdown wrapper here is pointless, because the
-firmware immediately throws away the key anyway. Instead, refuse to do
-anything if SNP has not been previously initialized.
-
-This is an ABI break: before, this was a no-op and almost certainly a
-mistake by userspace, and now it returns -ENODEV. ABI compatibility could be
-maintained here by simply returning 0 in the check instead.
+* do something like symbol_get() for kvm and refuse to initialize if KVM is
+  loaded
+* check each cpu's HSAVE_PA for non-zero data before re-initializing
+* once initialization has failed, continue to refuse to initialize until
+  the ccp module is unloaded
 
 Fixes: ceac7fb89e8d ("crypto: ccp - Ensure implicit SEV/SNP init and shutdown in ioctls")
 Reported-by: Sashiko
@@ -84,53 +86,70 @@ Link: https://sashiko.dev/#/patchset/20260324161301.1353976-1-tycho%40kernel.org
 CC: <stable@vger.kernel.org>
 Signed-off-by: Tycho Andersen (AMD) <tycho@kernel.org>
 ---
- drivers/crypto/ccp/sev-dev.c | 17 ++++-------------
- 1 file changed, 4 insertions(+), 13 deletions(-)
+ drivers/crypto/ccp/sev-dev.c | 33 ++++-----------------------------
+ 1 file changed, 4 insertions(+), 29 deletions(-)
 
 diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 572f06368d4b..ad6c2525a305 100644
+index ad6c2525a305..7c4dd57fabb9 100644
 --- a/drivers/crypto/ccp/sev-dev.c
 +++ b/drivers/crypto/ccp/sev-dev.c
-@@ -2481,9 +2481,8 @@ static int sev_ioctl_do_snp_vlek_load(struct sev_issue_cmd *argp, bool writable)
+@@ -1727,21 +1727,6 @@ static int sev_move_to_init_state(struct sev_issue_cmd *argp, bool *shutdown_req
+ 	return 0;
+ }
+ 
+-static int snp_move_to_init_state(struct sev_issue_cmd *argp, bool *shutdown_required)
+-{
+-	int error, rc;
+-
+-	rc = __sev_snp_init_locked(&error, 0);
+-	if (rc) {
+-		argp->error = SEV_RET_INVALID_PLATFORM_STATE;
+-		return rc;
+-	}
+-
+-	*shutdown_required = true;
+-
+-	return 0;
+-}
+-
+ static int sev_ioctl_do_reset(struct sev_issue_cmd *argp, bool writable)
+ {
+ 	int state, rc;
+@@ -2451,8 +2436,6 @@ static int sev_ioctl_do_snp_set_config(struct sev_issue_cmd *argp, bool writable
  {
  	struct sev_device *sev = psp_master->sev_data;
- 	struct sev_user_data_snp_vlek_load input;
+ 	struct sev_user_data_snp_config config;
 -	bool shutdown_required = false;
 -	int ret, error;
- 	void *blob;
-+	int ret;
  
  	if (!argp->data)
  		return -EINVAL;
-@@ -2491,6 +2490,9 @@ static int sev_ioctl_do_snp_vlek_load(struct sev_issue_cmd *argp, bool writable)
+@@ -2460,21 +2443,13 @@ static int sev_ioctl_do_snp_set_config(struct sev_issue_cmd *argp, bool writable
  	if (!writable)
  		return -EPERM;
  
 +	if (!sev->snp_initialized)
 +		return -ENODEV;
 +
- 	if (copy_from_user(&input, u64_to_user_ptr(argp->data), sizeof(input)))
+ 	if (copy_from_user(&config, (void __user *)argp->data, sizeof(config)))
  		return -EFAULT;
- 
-@@ -2504,18 +2506,7 @@ static int sev_ioctl_do_snp_vlek_load(struct sev_issue_cmd *argp, bool writable)
- 
- 	input.vlek_wrapped_address = __psp_pa(blob);
  
 -	if (!sev->snp_initialized) {
 -		ret = snp_move_to_init_state(argp, &shutdown_required);
 -		if (ret)
--			goto cleanup;
+-			return ret;
 -	}
 -
- 	ret = __sev_do_cmd_locked(SEV_CMD_SNP_VLEK_LOAD, &input, &argp->error);
+-	ret = __sev_do_cmd_locked(SEV_CMD_SNP_CONFIG, &config, &argp->error);
 -
 -	if (shutdown_required)
 -		__sev_snp_shutdown_locked(&error, false);
 -
--cleanup:
- 	kfree(blob);
+-	return ret;
++	return __sev_do_cmd_locked(SEV_CMD_SNP_CONFIG, &config, &argp->error);
+ }
  
- 	return ret;
+ static int sev_ioctl_do_snp_vlek_load(struct sev_issue_cmd *argp, bool writable)
 -- 
 2.54.0
 
