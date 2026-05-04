@@ -1,40 +1,43 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FD4A1C68F;
-	Mon,  4 May 2026 14:32:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73D143DE459
+	for <linux-crypto@vger.kernel.org>; Mon,  4 May 2026 14:37:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777905176; cv=none; b=kiURkDum1ZifHbsBYJPbAgZW6YnJjJcfexL8QgJU2IUF/eIIgFKRI1yJJ8yzmalV24RA6JrG0O4mh13uSPYBZKQ6ge85p8CuXzFDY4ABOTRREuQ0eiToLa5+aM6mDQ6SMv5crzZuBC90/7ucI8qLfCNpexHKpqctvru4VR6gkd4=
+	t=1777905448; cv=none; b=LYCPw0kdIseaLfuQUDH9uGHZVpXN8zmD88EReyOuiYTpUnl0h1QJtqt/GY3sulESxT5ML6l8SFMBfwQ9nmLss0CMTxZB5hylq6zIfM4965fcD88cpSQ4xtoZ+Gggccsxvsb3Q4qvRPq9PuAgBq0o7EaczBLVBJ9bpbJ8p6D1XHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777905176; c=relaxed/simple;
-	bh=TnJP/izr7dE1Z7AMSQjNxeTgP5zcgPXsdrR5ISmWgfo=;
+	s=arc-20240116; t=1777905448; c=relaxed/simple;
+	bh=zrzEItvI7wQsj7VV6oxbb2bq9vyhQ+Qb+IZ2obak6Us=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZN/PrFbMN0Pw90ememeE0fdOxUd0qWKTEZ7LckZX+6cZoXbGckofpJhYz+8fzYItMl0wDSITatiNFHrDgIYD5ytgcLWEZEK+p+qbjffzeWkF0gPUwYDErazkzUPVF6EpC8qaR0wwX6P5UEFOmSxoMOzMN2JS3OZAETJmoj2A9Eo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ESgWLJrN; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=N/Z1R+A8Vhmwb7g189OaxgWF/d9v+eJdBo/jucY9n2rFiGIgjZKn1D4BOo+jHZ4DcuSYmywzFrLunqWH3A4BE1uXxqiw+Lk895u3icxFuRnAfGdKAtwE5FH0y1MTud/i3Jn+YAzEnvNkLdxhfP18njgtXbnGRJ80hKhVReruomY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Iogc645m; arc=none smtp.client-ip=91.218.175.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ESgWLJrN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1ABFC2BCB8;
-	Mon,  4 May 2026 14:32:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777905175;
-	bh=TnJP/izr7dE1Z7AMSQjNxeTgP5zcgPXsdrR5ISmWgfo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ESgWLJrNBP2tcgnLjHKA6WPh1it/zjbFLiXklCc6OJ6PvtmewljilJ/r3o7qrQHqf
-	 aXEOowWI+S++pPvwf47/r6U7BZ9qR0OLU+uJ33PceO8v7sveOTPz4zMHTeX9y0/LzA
-	 AnjL2ri/YPImcUc5poKdjFyyo1SCa+LY6JbqhKesLDFwWMTOWV01OrysfSZDtxhlao
-	 hV/pAcy6pgF/OJmbTJc4I2dusLvEb2EahfrE4PJAkeVqz5NaCTKWOzotZHmSlUkQ0M
-	 u1IpCMqPq9TroozxUPJZRXfDFJTanLjDEPkjADcy1b6Dp9Ioia4zvOvWbACN+wWQfX
-	 GTSf4SjjjOWvQ==
-Date: Mon, 4 May 2026 08:32:53 -0600
-From: Tycho Andersen <tycho@kernel.org>
-To: "Pratik R. Sampat" <prsampat@amd.com>
-Cc: ashish.kalra@amd.com, thomas.lendacky@amd.com, john.allen@amd.com, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, aik@amd.com, nikunj@amd.com, michael.roth@amd.com
-Subject: Re: [RFC v2] crypto/ccp: Introduce SNP_VERIFY_MITIGATION command
-Message-ID: <afitM-Ub50JsTCHz@tycho.pizza>
-References: <20260501152051.17469-1-prsampat@amd.com>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Iogc645m"
+Date: Mon, 4 May 2026 16:37:17 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1777905441;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TAGJTouWHe3Gioqsz3YMSQxBMTpanXbhgaHt14I0wls=;
+	b=Iogc645mOlS0Q/AcdFW+OfjhF2ooCTHU5uuvG8G2rDU9YUsSrYpdswl2EzkIyfdoyFgg7e
+	9viVS6LwX48fNQO8oklbh7G1I2AFrC/AcpyS48K7Hl5ojv6jcfzMdE3xwFWpu4wm7MVFOR
+	JjrwnAvkc305nacIIkVXvVcY7y1adnw=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Andy Shevchenko <andriy.shevchenko@intel.com>
+Cc: Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/4] hwrng: core - use bool for wait parameter in
+ rng_get_data
+Message-ID: <afivHbWdCprHpJSB@linux.dev>
+References: <20260430110047.248825-5-thorsten.blum@linux.dev>
+ <20260430110047.248825-6-thorsten.blum@linux.dev>
+ <afilBnLk4lapbAj4@black.igk.intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -43,23 +46,38 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260501152051.17469-1-prsampat@amd.com>
+In-Reply-To: <afilBnLk4lapbAj4@black.igk.intel.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, May 01, 2026 at 11:20:51AM -0400, Pratik R. Sampat wrote:
->   - failed_status (read-only): firmware-reported failure status from the
->     last operation, as returned alongside the status vectors
+On Mon, May 04, 2026 at 03:54:14PM +0200, Andy Shevchenko wrote:
+> On Thu, Apr 30, 2026 at 01:00:49PM +0200, Thorsten Blum wrote:
+> > The 'wait' parameter in rng_get_data() is a boolean flag - use bool
+> > instead of int to better reflect its actual type.
+> 
+> ...
+> 
+> >  static inline int rng_get_data(struct hwrng *rng, u8 *buffer, size_t size,
+> > -			int wait) {
+> > +			bool wait) {
+> 
+> You want to fix the checkpatch warnings while at it and indentation.
 
-"from the last operation" is not quite right here, it looks like it
-re-runs the STATUS command and reports that error?
+I just checked again, but I don't get any checkpatch warnings.
 
-> +		failed_status: Read only interface that reports the status of
-> +			       the verification operation.
+> static inline int rng_get_data(struct hwrng *rng, u8 *buffer, size_t size,
+> 			       bool wait)
+> {
+> 
+> ...
+> 
+> > -		rc = rng_get_data(rng, rng_fillbuf,
+> > -				  rng_buffer_size(), 1);
+> > +		rc = rng_get_data(rng, rng_fillbuf, rng_buffer_size(), true);
+> 
+> Is it the only user? Why parameter is needed at all?
 
-This should probably also note that it runs a fresh operation.
+The other one in rng_dev_read() already uses a boolean expression, hence
+no changes.
 
-I was trying to think of a nice way to report the status of the last
-operation short of caching it, but I didn't come up with anything
-good. I don't think it's important enough to cache, the failure codes
-right now are all for things that would persist across runs.
-
-Tycho
+Thanks,
+Thorsten
