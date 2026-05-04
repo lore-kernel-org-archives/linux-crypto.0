@@ -1,80 +1,142 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A92D20DD51;
-	Mon,  4 May 2026 13:56:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14F992E2F0E
+	for <linux-crypto@vger.kernel.org>; Mon,  4 May 2026 13:57:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777903002; cv=none; b=P3QQ3+drHrdudV7crOOxc8aFzKnRRwp1D4gQQ0KKeqqC9zhYWP11+x9H3DniWV53TYc2LyZEHD0JDUyQJRVwPUb89PtOSxuDcxEj0MaEeSNaxB1Fa1zILBngggr5MicaY8Tz2F08ci2R5AzAYQN+VvI12jrnMJGwicgqZOHNOJM=
+	t=1777903034; cv=none; b=U8xpSDUsAWxjXf/bV/7ForAsrLDCLHNeDUJhfZicjf7u5WeSYx8n72zlTLDIRi45fJSTFOqWZmCMicigI2r+MQt1ysaz6zThFZL+kdYpOdMPH/YgwhldxtCTCZrsLL7tIBvZa0iEa5dPdEFU4apTi4RCHXpr8FP7KaNaZfA8YO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777903002; c=relaxed/simple;
-	bh=nHyGMukKa/aeCIQK+8Djjqek/gwXo0Hm9P2kwKVLVcA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JNHAEhCtuoYvm/SltKlzKfXMBH52R0D1B4/up8SNQqaLhu0rt5g206U0Fo7iJdOOjfsoH3RSrNOBUdEzRkmqvJrf2MnQmHv1My8Iwqpsane9IUQLdigakfNIRPpf8PCzapQp+MtpdY1r33/aspg1pMwDPA/eNLRaVG9LPbV4D7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Mnble04x; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1777903034; c=relaxed/simple;
+	bh=YWPDXoMAmmrhqB96B1dvHxpf3zUskuMZ18eGdn0GY2w=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=Grqv4ZJbKxxiWKvVSdTvirNKBQs59Ewz7OKlNESM5CC+WYxL0UBK6zdVjEx1J3IaHbAiAzaKShiLQwLdQBPoY6IPTrBflqVFxohdB5LTmY4f70zcD9fm2nAHsI3AKf06Y3rllGUpKPuo7VSqEmj5KrWzHMbDhkcTevSzCDK2Tlo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A7d9YHlx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Mnble04x"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1777903001; x=1809439001;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=nHyGMukKa/aeCIQK+8Djjqek/gwXo0Hm9P2kwKVLVcA=;
-  b=Mnble04xEK+j4zvEspObuxiKDXpauRuVKuWss7h5ymBPTCkHR5lfOhLc
-   xar0iKBLNu9bwJd2iVoP2gxe/mOyvzx/ur7iLp0B5UjX/3w+0/QYLqqZ5
-   CYL4+aVX9+ZltIriOGFOmxwep/6ubUiYJfNItNRekWskN+zpBx5eWOYwX
-   YehUfbOxrYO+pTTmLJjqhTJnnnx875z9Shy+QkGXueMFTZo7qmbBYfnTj
-   HZbMZHDBHnusO+is6v6SGhp+j17RY/cZFtPHTL/5rHo46F+KTlYb0Mheb
-   VpU/Nkgb196F8BVkpJ34U7mZ5hOawQgsvh1oNFl0guwJnuNxLdyeocING
-   A==;
-X-CSE-ConnectionGUID: bMCgukcWSHuFytnnfKS56A==
-X-CSE-MsgGUID: sJBkSUz2SdqlPublUAeBnw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11776"; a="90216768"
-X-IronPort-AV: E=Sophos;i="6.23,215,1770624000"; 
-   d="scan'208";a="90216768"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2026 06:56:41 -0700
-X-CSE-ConnectionGUID: /Ya7LkBfSl2CfdHF1899Xw==
-X-CSE-MsgGUID: AuR+nXGDSJ+u4VDQY8w3FA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,215,1770624000"; 
-   d="scan'208";a="232369344"
-Received: from black.igk.intel.com ([10.91.253.5])
-  by fmviesa007.fm.intel.com with ESMTP; 04 May 2026 06:56:39 -0700
-Received: by black.igk.intel.com (Postfix, from userid 1003)
-	id 2DF4D98; Mon, 04 May 2026 15:56:38 +0200 (CEST)
-Date: Mon, 4 May 2026 15:56:38 +0200
-From: Andy Shevchenko <andriy.shevchenko@intel.com>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/4] hwrng: core - use MAX to simplify RNG_BUFFER_SIZE
-Message-ID: <afillkDh49TLjSar@black.igk.intel.com>
-References: <20260430110047.248825-5-thorsten.blum@linux.dev>
- <20260430110047.248825-7-thorsten.blum@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A7d9YHlx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C656C2BCC4;
+	Mon,  4 May 2026 13:57:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777903033;
+	bh=YWPDXoMAmmrhqB96B1dvHxpf3zUskuMZ18eGdn0GY2w=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=A7d9YHlxL8RwDhoxwt4Iw6XstHAIoL8BHcBprllbR4LeOz/uHRYoU7rM5aeyJ2YLD
+	 96NzCC/dtcdp5zSDnqDs8teHwkaHYXFMHICWXlIdWLhPMezBo3StSh//nZZlHoJCpz
+	 ocnrd/HwAOiMgS2gkTs5cAMd9l1VD+fqqQrLfmbHBEBkteh4J85a0uo2MXji8UccHu
+	 RY2Nv3LnBJCrM2Au9IOk84tZDMxzOQo1yeRGrbYUrmCuFkTlgvL/ZOFOrga9nmiZow
+	 /2QKuym9p+/nqf58O75q90t0zOKi2ZYG+CAdZAw7VAPaK91jGdZLrMEzeRWEPK9Qgf
+	 4eTiwvrtaRvMQ==
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 9F3C8F40076;
+	Mon,  4 May 2026 09:57:12 -0400 (EDT)
+Received: from phl-imap-02 ([10.202.2.81])
+  by phl-compute-01.internal (MEProxy); Mon, 04 May 2026 09:57:12 -0400
+X-ME-Sender: <xms:uKX4aVbphX3bueqjHkPzAnjJsUjan9XSSjyQS3V9aPfIRJlcKabw7w>
+    <xme:uKX4aXNxfkwx7RRmuabgb9rsjcSAO-p0sBS6oxizJpTzOjXVLRu28k92kKIwdKtbz
+    xwhxpHn8UZgeNdBjLKe-rBHnL0xiwsD6ZhE64AiC0d5X8KBfmtuwFBj>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefhedrtddtgdelledtudcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefoggffhffvvefkjghfufgtgfesthejredtredttdenucfhrhhomhepfdetrhguuceu
+    ihgvshhhvghuvhgvlhdfuceorghruggssehkvghrnhgvlhdrohhrgheqnecuggftrfgrth
+    htvghrnhepvdeuheeitdevtdelkeduudetgffftdelteefteevjeevjeeiheefhfejieej
+    fedunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hrugdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudeijedthedttdejledq
+    feefvdduieegudehqdgrrhgusgeppehkvghrnhgvlhdrohhrghesfihorhhkohhfrghrug
+    drtghomhdpnhgspghrtghpthhtohepuddtpdhmohguvgepshhmthhpohhuthdprhgtphht
+    thhopehmphgvsegvlhhlvghrmhgrnhdrihgurdgruhdprhgtphhtthhopehnphhighhgih
+    hnsehgmhgrihhlrdgtohhmpdhrtghpthhtohephhgvrhgsvghrthesghhonhguohhrrdgr
+    phgrnhgrrdhorhhgrdgruhdprhgtphhtthhopegthhhlvghrohihsehkvghrnhgvlhdroh
+    hrghdprhgtphhtthhopegvsghighhgvghrsheskhgvrhhnvghlrdhorhhgpdhrtghpthht
+    ohepmhgrugguhieslhhinhhugidrihgsmhdrtghomhdprhgtphhtthhopehlihhnuhigph
+    hptgdquggvvheslhhishhtshdrohiilhgrsghsrdhorhhgpdhrtghpthhtoheplhhinhhu
+    gidqtghrhihpthhosehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinh
+    hugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:uKX4aX_cimOx7Q9XHUcgFEd8VLiR8vx7N6o9gVSTY3BkmhJWrPe2og>
+    <xmx:uKX4aVQ5_L1TE5H6yJohvsN8whHw4sLH7pjUy0xfKntjxtMMbf-9xw>
+    <xmx:uKX4aUR34HetQYP-eIxmRSv64rGgH4Ld9LGkkkMGDQ_cf5Com123qA>
+    <xmx:uKX4aZ6xaMtnXeCsVfBguusB1Zeu-ghp94nEB2f2jTw-t6rxdgnW-Q>
+    <xmx:uKX4aRWiaDaOizpsFO6nXnv69b-g0dtwA4-uwADuwGXeUKsEGB1uKqC2>
+Feedback-ID: ice86485a:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 7DAAE700065; Mon,  4 May 2026 09:57:12 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260430110047.248825-7-thorsten.blum@linux.dev>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Date: Mon, 04 May 2026 15:56:52 +0200
+From: "Ard Biesheuvel" <ardb@kernel.org>
+To: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+ "Eric Biggers" <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, "Jason A . Donenfeld" <Jason@zx2c4.com>,
+ "Herbert Xu" <herbert@gondor.apana.org.au>, linuxppc-dev@lists.ozlabs.org,
+ "Nicholas Piggin" <npiggin@gmail.com>,
+ "Michael Ellerman" <mpe@ellerman.id.au>,
+ "Madhavan Srinivasan" <maddy@linux.ibm.com>
+Message-Id: <112bf0af-1551-4d3e-ab15-e5dea3fc2435@app.fastmail.com>
+In-Reply-To: <111ea924-fef5-441e-9849-83f938c913a7@kernel.org>
+References: <20260504041448.15820-1-ebiggers@kernel.org>
+ <111ea924-fef5-441e-9849-83f938c913a7@kernel.org>
+Subject: Re: [PATCH] lib/crypto: powerpc/md5: Drop powerpc optimized MD5 code
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 30, 2026 at 01:00:50PM +0200, Thorsten Blum wrote:
-> Replace the open-coded variant with MAX().
+Hello Christophe,
 
-Hmm... While this patch is correct the very similar is being used
-outside of hwrng. Can we perhaps have a common definition somewhere
-near to SMP_CACHE_BYTES?
+On Mon, 4 May 2026, at 15:28, Christophe Leroy (CS GROUP) wrote:
+...
+> I'm really concerned with the optimised MD5 going away now, and I'm also 
+> wondering what will be the way to splice a file into the kernel and get 
+> it's MD-5 hash from the TALITOS if AF_ALG goes away in medium-term.
+>
+> What is the way forward ? I'm open to any suggestion as I really can't 
+> see where to go for now.
+>
 
--- 
-With Best Regards,
-Andy Shevchenko
+AF_ALG was created to give user space access to crypto accelerators that
+require privileged execution, for sharing between clients, and for managing
+DMA etc.
+
+The fact that kernel crypto code that does not have this requirement was
+exposed via AF_ALG too is a historical accident, and this is causing the
+pain that Eric describes wrt attack surface etc.
+
+It sounds like you have constructed a vertically integrated system where
+the kernel provides the fallback when the Talitos engine is not available
+via AF_ALG.
+
+This fallback does not need to live in the kernel, and it would be much
+better (as well as more efficient) if user space would implemented MD5
+itself if the Talitos cannot be accessed via AF_ALG. In user space, you
+can use any implementation you like, generic or asm accelerated. This is
+what all other architectures already implement, in OpenSSL etc.
+
+Claiming that your user space software must only implement one code path,
+and that punting this to the kernel is therefore required is not a
+technical argument: this is just policy on your part that the community
+is not bound to.
+
+However, deprecating AF_ALG does not mean that we will ever be able to
+remove it entirely. Especially the crypto accelerators that cannot be
+accessed by user space in any other way will remain supported as long
+as needed for legacy use cases.
+
+But I think we should consider libkcapi as a general purpose crypto
+library deprecated too, as well as any other use of AF_ALG in lieu of
+user space libraries. It is not the kernel's job to execute user space
+code that can easily execute non-privileged as well.
+
+I suppose there will be more discussion soon about AF_ALG deprecation
+for software crypto. It is likely that we will need to come up with
+an allowlist of algorithms, in order to limit the attack surface to those
+algorithms (such as your MD5) that are known to be relied upon by user space,
+rather than any random combination of all the buggy template code and
+null_ciphers etc.
+
+Do you have any use cases where MD5 is a bottle neck, and the generic
+implementation is too slow?
 
 
