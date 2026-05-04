@@ -1,77 +1,130 @@
-Received: from mx4.wp.pl (mx4.wp.pl [212.77.101.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBCA03DEFE3
-	for <linux-crypto@vger.kernel.org>; Mon,  4 May 2026 17:32:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 540873E5EC1;
+	Mon,  4 May 2026 17:41:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777915978; cv=none; b=nIoPhg5iqdBiu44hQp2goJoWvjPBw/FCta8UodRT0Mudd6WjZmVnIedq1UJM5n2PyaxFCzYhr4JaZxPXpYZZyvD5l5UfAfLAm/MDjIGhDAWZuvd4pMF7mTWlQ+wtsU89oRX+kSPONUnCyPcgsANH2UdXscBCEjqoaOp1BONobj0=
+	t=1777916472; cv=none; b=cyjTDqv/ZixkWVDRM045tFFDg1zF9H6fMpXFK8sczxHvojGzqVV08KFirMNuknIOx08xFwprDkSAeuRncSE5NvIzCqGTOkF+mr4/mK6AZ5AyHVG89QiJ4Tp4LS1zXB+sUe2pNkQGvm6tJQL+r33SkchKWQRjS9iw2/TG23+OTCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777915978; c=relaxed/simple;
-	bh=3Jok8q8QyN+e9TXy87Zy1aWVCgljgmuc8JMyRL0KtHI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p05hP58iKEa3yJgYeioBJ5VKDFAXgIs7CHhyJztA82bWzOug0TA5IcznmDBQoceizNt+IfqR+xNrqRHufjIPj9kcSeibIVien3FnxV683fBO9hdNLl8CuaRKXp0pQnfESgTaauI6TQvbn/z+clHcvxQ+ONHDvI4I/JemmSs0uO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=nlrWq3IH; arc=none smtp.client-ip=212.77.101.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
+	s=arc-20240116; t=1777916472; c=relaxed/simple;
+	bh=gXCIxglj6nEmYjf0Vl9jKj/cd7xazV9XVYCGS2F8+kA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QTQnzSSlYFgLF2Esa9jqu94jubR4H9NJLlDfvk8x9F+qXhVG6yEeIfCvLvS7fe4srDXpRCBEB2j6nx8rYTVPWkt1c95VEdmrqoOLwdrC4DCm8Vc8h4tg4eoMesTWltETccH1DybP1i75XY1zw5WfL74eGIFtJAMQr0Ai9F1rlt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hf6SWaca; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="nlrWq3IH"
-Received: (wp-smtpd smtp.wp.pl 41022 invoked from network); 4 May 2026 19:32:52 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
-          t=1777915972; bh=KUEXNJLvIJk8jijKoABN1Dz9wy2jS8qSqqvI/9Uuvd0=;
-          h=From:To:Cc:Subject;
-          b=nlrWq3IHiGngMmlPN0nWusqfBCvYnyHl3yS/7r1jvynevHDHjHLVwP7t+M4t26Ufc
-           mbZneGbJIMLyzGKsU/+SmkFSYwmwfTjVeh4gZfLE2PYmoYp1LLAYe+E8Zq/O7B1XKh
-           8ChJXGyXmm44x8onKtbYmSBJXYyc+c8MLA5qKlMCvSieuVAdvEdTU4ATYoDX0cKI7j
-           QcZkISp0Fqadk2YJKrpA5pQ76MRb+R+zgOrTW4TLt24t8CQ3bEWEWUv+tdX57eCnNO
-           OrSEYfy8e7O93FF9L+/ej273NMjM9el06UZnH/o/a2Go7JC881MCMZ2mRJGIuFrvAk
-           JJIyTB6QnXYNg==
-Received: from 83.24.138.167.ipv4.supernova.orange.pl (HELO abajkowski.lan) (olek2@wp.pl@[83.24.138.167])
-          (envelope-sender <olek2@wp.pl>)
-          by smtp.wp.pl (WP-SMTPD) with TLS_AES_256_GCM_SHA384 encrypted SMTP
-          for <atenart@kernel.org>; 4 May 2026 19:32:52 +0200
-From: Aleksander Jan Bajkowski <olek2@wp.pl>
-To: atenart@kernel.org,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
-Subject: [PATCH] crypto: safexcel - Remove repeated plus
-Date: Mon,  4 May 2026 19:32:47 +0200
-Message-ID: <20260504173250.751589-1-olek2@wp.pl>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hf6SWaca"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF928C2BCB8;
+	Mon,  4 May 2026 17:41:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777916472;
+	bh=gXCIxglj6nEmYjf0Vl9jKj/cd7xazV9XVYCGS2F8+kA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hf6SWaca7SqxrkrXkC7kijSGnxlJ6IYOITp4mg4SlDVSk6WB76juKkXB9eXxGVVP6
+	 51OuFI7tAv+j1NpcB1ag6Hpra2YCUWwqVrS8ktRkOMNn19p+rxYDYOT+vexdVqa1iL
+	 weSTW0LQR0xmiQdVVaNyceaYslwrMNz4Fw4KAp6ryTGtdbsk2CRod4s11pkAnGVSW+
+	 9p0Fbw4+hl+PYYLsB91RO1PJuy1/AIt9iU8yBpFkwTKQQTz6lYKuHcqn8cgEGOSxQG
+	 +yPdwW/XUhb5f7g3l8FLe+Jk7YFfK7PC99SiU8057/Hsit7pVmrGlHiOGjS1S9XZvw
+	 kUG+syil/wG/g==
+Date: Mon, 4 May 2026 10:39:52 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Jon Kohler <jon@nutanix.com>
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH] crypto: af_alg - Document the deprecation of AF_ALG
+Message-ID: <20260504173952.GA2291@sol>
+References: <20260430011544.31823-1-ebiggers@kernel.org>
+ <4D424F50-7E9F-4B1F-AE9C-86D8526284E6@nutanix.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-WP-DKIM-Status: good (id: wp.pl)                                                      
-X-WP-MailID: 73df963624777a41d6e116521ddcc879
-X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
-X-WP-SPAM: NO 0000008 [8Uv2]                               
+In-Reply-To: <4D424F50-7E9F-4B1F-AE9C-86D8526284E6@nutanix.com>
 
-Remove repeated "+".
+On Mon, May 04, 2026 at 02:39:12PM +0000, Jon Kohler wrote:
+> > On Apr 29, 2026, at 9:15 PM, Eric Biggers <ebiggers@kernel.org> wrote:
+> > 
+> > AF_ALG is almost completely unnecessary, and it exposes a massive attack
+> > surface that hasn't been standing up to modern vulnerability discovery
+> > tools.  The latest one even has its own website, providing a small
+> > Python script that reliably roots most Linux distros: https://copy.fail/
+> > 
+> > This isn't sustainable, especially as LLMs have accelerated the rate the
+> > vulnerabilities are coming in.  The effort that is being put into this
+> > thing is vastly disproportional to the few programs that actually use
+> > it, and those programs would be better served by userspace code anyway.
+> > 
+> > These issues have been noted in many mailing list discussions already.
+> > But until now they haven't been reflected in the documentation or
+> > kconfig menu itself, and the vulnerabilities are still coming in.
+> > 
+> > Let's go ahead and document the deprecation.
+> > 
+> > This isn't intended to change anything overnight.  After all, most Linux
+> > distros won't be able to disable the kconfig options quite yet, mainly
+> > because of iwd.  But this should create a bit more impetus for these
+> > userspace programs to be fixed, and the documentation update should also
+> > help prevent more users from appearing.
+> > 
+> > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> > ---
+> 
+> Quick passing observation
+> I noticed that when attempting to completely disable these Crypto APIs,
+> I was experiencing boot failures with fips=1 enabled systems.
+> 
+> Using 6.18-based kernel with an el9-based user space, I see the
+> following hang in the early boot console from dracut-pre-pivot:
+>   Check integrity of kernel
+>   libkcapi - Error: AF_ALG: socket syscall failed (errno: -97)
+>   Allocation of hmac(sha512) cipher failed (-97)
+> 
+> I haven't looked at every elX version, but at least in el9 and el10,
+> they use libkcapi-hmaccalc to provide sha512hmac, which dracut [1]
+> uses to calculate the HMAC value in do_fips().
+> 
+> Digging further, I was only able to disable RNG and AEAD APIs, but
+> not HASH and SKCIPHER APIs when FIPS was in the picture with el9++.
+> 
+> I’m not sure how other distros do the same, but this could be problematic
+> elsehwere if other distros went down the libkcapi route.
+> 
+> [1] https://github.com/dracutdevs/dracut/blob/059/modules.d/01fips/fips.sh#L167
 
-Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
----
- drivers/crypto/inside-secure/safexcel.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+That seems to be an implementation of FIPS 140-3's integrity self-check.
+A few observations:
 
-diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index fb4936e7afa2..812ebabd1309 100644
---- a/drivers/crypto/inside-secure/safexcel.c
-+++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -1475,7 +1475,7 @@ static int safexcel_probe_generic(void *pdev,
- 	peid = version & 255;
- 
- 	/* Detect EIP206 processing pipe */
--	version = readl(EIP197_PE(priv) + + EIP197_PE_VERSION(0));
-+	version = readl(EIP197_PE(priv) + EIP197_PE_VERSION(0));
- 	if (EIP197_REG_LO16(version) != EIP206_VERSION_LE) {
- 		dev_err(priv->dev, "EIP%d: EIP206 not detected\n", peid);
- 		return -ENODEV;
--- 
-2.53.0
+- It could easily use userspace SHA-512 code instead.  If including
+  libcrypto.so in the "FIPS cryptographic boundary" would cause
+  certification difficulties, then a sha512.c file could simply be added
+  to 'libkcapi-hmaccalc' which is already in it.
 
+- It's compatible with all of the proposed hardening.  It doesn't
+  require zero-copy performance.  It runs as root, so it would be
+  compatible with a capability check.  "hmac(sha512)" will need to be on
+  the algorithm allowlist anyway for iwd.
+
+- FIPS 140-3 might also allow it to be simplified to use a plain hash
+  instead of pointlessly using HMAC with a fixed key.
+
+Anyway, just another one of the long tail of odd users that could have
+solved their problem in a better way.  This one is at least compatible
+with the hardening that's being considered.
+
+By the way, also on the topic of FIPS 140-3, some people do use AF_ALG
+for ACVP (even though it's not all that great for that purpose, either).
+But ACVP is a testing thing, not something that is needed on production
+systems.  ACVP can just be run as root on a testing build; there's no
+need to enable support for it in the actual production build.
+
+- Eric
