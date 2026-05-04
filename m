@@ -1,120 +1,118 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12BD6383C85;
-	Mon,  4 May 2026 18:02:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6701412E1E9;
+	Mon,  4 May 2026 18:12:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777917724; cv=none; b=Fvd8OarshJRVAMzsdMze/GDzICBELy+YQnYVJ3DH2LpGhfFpinIr8er/H4880vC4opnIbn/gXCCWLMHTHB67CumeCCJCUEg+mJGSM15cWzsCIPosLJnXHjgXGJokjj8OI7qq1cOlGjGPzxEWDes1qWy4sBd1B9bKO9xkpjLuHtg=
+	t=1777918336; cv=none; b=TdSBHpQoXTangR1yVSnnWFpd8nTiIRkPn7r5wcF14FnIRerlNAVU6JyMxBS6kYLreOg13F4vOkaTut5Ve1fm2AKxZAQTQkfbfELwKSiSutqKknL+gX3TIwjAG/iRkheIGesn1+rM03cT9+1exAVG4/tnixEcxqzgkJ50ffbUbeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777917724; c=relaxed/simple;
-	bh=szpkNhMXI62ZGJn42+LaItfXpXq/gaSIIeijRGwBhNo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HqPnEMYQckQPovj6wB5TIG9c7LtE5HndyEvIswoYqXs1v4gvu7JBnx+jTalqfU+gkVBYDuxU9QsxU+wyn3mYDNebfZW/U9YuUraFfSxT8ZTHy3nVO/TmCLXvMIg9wyDo4yboGmjiKU1y8iB0wLM+li/Uah1xCaQdQm/j8VLVDsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ml1/qumi; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777918336; c=relaxed/simple;
+	bh=+sk3GTBgJ0OpZC2sOvfB7jA5ioLT4Ah6k/GnB7L9h1g=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type:Content-Disposition; b=t1GEY3+uFgDk/m7O049AR4dQc5GGYrEwQBKIGffW7bdNpIsqFvZfLxc0VgWEhUQAGXVXiGW1h+nI4shtr2jJZhb7aa5XdlT2jqHlF7hOE22qvgjBfZtjcNMEJSm+PDkIW4JvutLkIEYm0Ze0K5OmImsR4eJBGABXAOUGwQAN1kc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=A5ZD7In8; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ml1/qumi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E6F1C2BCB8;
-	Mon,  4 May 2026 18:02:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777917723;
-	bh=szpkNhMXI62ZGJn42+LaItfXpXq/gaSIIeijRGwBhNo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ml1/qumiMS+QpbPL+4qP9mrMlLyrmiU97zBcGe+r3Fx8DB9frOllVIwaxRKuEQd7C
-	 nCNQL67pWujcN2BskEgyOmaPI2uCI8VMR/nWFR2LeYcZrbcsCIQr4Rs4lYSpY22rU2
-	 uMFr4M4tBqqVjKsDkqpEMdDJK/6UDXC6pJ5SsumUze6z88qpDyt9XppA707CvJ8r26
-	 IZl79/rvbGSH20RceZGzdldGVU5bN3GgrRdT/jJBmuDXp/ko3+DgVUmJbMx4OUghpP
-	 zKqW6Us2fz+pacR6exjt7BUuzXW567t9ByMJq/mf4MBZ2BhMicFK4Ck9uEyawKIN15
-	 zoUxh2z1o51IQ==
-Date: Mon, 4 May 2026 11:00:44 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linuxppc-dev@lists.ozlabs.org, Nicholas Piggin <npiggin@gmail.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>
-Subject: Re: [PATCH] lib/crypto: powerpc/md5: Drop powerpc optimized MD5 code
-Message-ID: <20260504180044.GC2291@sol>
-References: <20260504041448.15820-1-ebiggers@kernel.org>
- <111ea924-fef5-441e-9849-83f938c913a7@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="A5ZD7In8"
+Received: from jeffbarnes-ThinkPad-P14s-Gen-2i (unknown [52.167.115.14])
+	by linux.microsoft.com (Postfix) with ESMTPSA id F3B4720B7168;
+	Mon,  4 May 2026 11:12:11 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com F3B4720B7168
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1777918333;
+	bh=n7bmLzV45MCFR32DECncWc88xFMFDAuCejDyl9htYrM=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=A5ZD7In81slYhgBMBZnHjbosHvK2nRllucKahLg4ReJUn+f2oS5lQriTrQhEWAbwq
+	 14JxWEIVUDVJdL3eeWRkaYeTBZ83YSuSYM7l8dqHVHXGEE0zgbAkCaY3HzCIFYbFaq
+	 R/wTmAS0vy4XInjcJEwOfyfJ2YOKiNNhrKwkM1rk=
+Date: Mon, 4 May 2026 14:12:11 -0400
+From: Jeff Barnes <jeffbarnes@linux.microsoft.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Jon Kohler <jon@nutanix.com>, 
+ "=?utf-8?Q?linux-crypto=40vger.kernel.org?="
+ <linux-crypto@vger.kernel.org>, Herbert Xu
+ <herbert@gondor.apana.org.au>, "=?utf-8?Q?linux-doc=40vger.kernel.org?="
+ <linux-doc@vger.kernel.org>, "=?utf-8?Q?linux-api=40vger.kernel.org?="
+ <linux-api@vger.kernel.org>, 
+ "=?utf-8?Q?linux-kernel=40vger.kernel.org?="
+ <linux-kernel@vger.kernel.org>, "=?utf-8?Q?netdev=40vger.kernel.org?="
+ <netdev@vger.kernel.org>, Linus Torvalds
+ <torvalds@linux-foundation.org>
+Message-ID: <F100C726-F841-461B-BE2F-C2018C122426@getmailspring.com>
+In-Reply-To: <20260504173952.GA2291@sol>
+References: <20260504173952.GA2291@sol>
+Subject: Re: [PATCH] crypto: af_alg - Document the deprecation of AF_ALG
+X-Mailer: Mailspring
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <111ea924-fef5-441e-9849-83f938c913a7@kernel.org>
 
-On Mon, May 04, 2026 at 03:28:24PM +0200, Christophe Leroy (CS GROUP) wrote:
-> Hi Eric,
-> 
-> Le 04/05/2026 à 06:14, Eric Biggers a écrit :
-> > Earlier the decision was made to keep this code for a while, despite no
-> > other architectures having optimized MD5 code anymore, because of
-> > someone using it via AF_ALG via libkcapi-hasher
-> > (https://lore.kernel.org/r/f0d771d5-ed70-444c-957a-ad4c16f6c115@csgroup.eu/)
-> > 
-> > However, with AF_ALG itself now being on its way out due to its
-> > continuous stream of security vulnerabilities
-> > (https://lore.kernel.org/r/20260430011544.31823-1-ebiggers@kernel.org/),
-> > it's time to be a bit more forceful with nudging people towards
-> > userspace crypto code.  It's always been the better solution anyway, and
-> > it's much more efficient if properly optimized code is used.
-> 
-> Ok, why not, but what do you propose as an alternative ? Let me explain the
-> situation.
-> 
-> We have two versions of boards:
-> - One with powerpc MPC885E, which embeds a SECURITY Engine called TALITOS
-> for offloading crypto operations
-> - One with powerpc MPC866, which doesn't have the security engine.
-> 
-> To use the security engine, our software use the AF_ALG interface (via
-> libkcapi).
-> 
-> Our software has to run on both boards, we can't afford two different
-> versions of the software and the software shall have no dead code. Therefore
-> we rely on the capability of the kernel to do the hash by itself when the
-> TALITOS in not available.
-> 
-> The kernel has always been the place where we do board specific stuff, not
-> the application. I can't see why the application would have to ask the
-> kernel when the Talitos is there and have to do the hashing by itself when
-> the Talitos is not there.
-> 
-> I'm really concerned with the optimised MD5 going away now, and I'm also
-> wondering what will be the way to splice a file into the kernel and get it's
-> MD-5 hash from the TALITOS if AF_ALG goes away in medium-term.
-> 
-> What is the way forward ? I'm open to any suggestion as I really can't see
-> where to go for now.
-> 
-> But please don't remove powerpc MD5 before we find an alternative solution.
-> 
-> Thanks
-> Christophe
 
-I think I gave the solution in the commit message already, no?  Take the
-same MD5 code and run it in userspace.  It will be even faster than
-invoking that code via AF_ALG.
 
-Yes, the selection of software vs "security" engine (if you actually
-still need the latter, which in reality you probably don't) would then
-occur in userspace.  But selecting an implementation in userspace isn't
-unusual.  It's no different from how different CPU features are handled
-in userspace.
+On May 4 2026, at 1:39 pm, Eric Biggers <ebiggers=40kernel.org> wrote:
+> =20
+> That seems to be an implementation of =46IPS 140-3's integrity self-che=
+ck.
+> A few observations:
+> =20
+> - It could easily use userspace SHA-512 code instead.  If including
+>  libcrypto.so in the =22=46IPS cryptographic boundary=22 would cause
+>  certification difficulties, then a sha512.c file could simply be added=
 
-Anyway, please don't confuse this patch (which only affects performance)
-with full removal of AF_ALG (which would be a hard break, and won't
-occur until quite far in the future).  This patch is just a nudge in the
-right direction, and a cleanup of the kernel's powerpc support to be
-aligned with all the other architectures.  So I do believe we should
-proceed with this patch.
+>  to 'libkcapi-hmaccalc' which is already in it.
 
-- Eric
+Indeed expanding the crypto boundary to include libcrypto.so would cause
+certification difficulties, it would mean certifying all of libcrypto.so
+with the kernel. There *may* be a case for saying that it is outside the
+module boundary but only if:
+
+    * The integrity mechanism is clearly external
+    * The cryptographic module refuses to operate unless integrity is con=
+firmed
+    * The trust relationship is clearly documented
+
+I don't see how this could be justified cleanly without significant pushb=
+ack.
+
+> =20
+> - It's compatible with all of the proposed hardening.  It doesn't
+>  require zero-copy performance.  It runs as root, so it would be
+>  compatible with a capability check.  =22hmac(sha512)=22 will need to b=
+e on
+>  the algorithm allowlist anyway for iwd.
+> =20
+> - =46IPS 140-3 might also allow it to be simplified to use a plain hash=
+
+>  instead of pointlessly using HMAC with a fixed key.
+
+=46IPS 140=E2=80=913 (via ISO/IEC 19790) draws a hard distinction between=
+:
+    * Integrity checking (cryptographic protection)
+    * Integrity measurement (detection only)
+
+A plain hash provides no protection against an attacker who can modify
+both the object and its reference hash.
+
+> =20
+> By the way, also on the topic of =46IPS 140-3, some people do use A=46=5F=
+ALG
+> for ACVP (even though it's not all that great for that purpose, either)=
+.
+> But ACVP is a testing thing, not something that is needed on production=
+
+> systems.  ACVP can just be run as root on a testing build; there's no
+> need to enable support for it in the actual production build.
+
+Agreed it's not a good use case. Unless/until pkcs1 is supported, I
+don't see how you can use it for all of the test cases. Plus as
+evidenced by Ubuntu's new cert, it requires validating the library.
+
+> =20
+> - Eric
+> 
