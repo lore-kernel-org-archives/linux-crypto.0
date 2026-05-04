@@ -1,105 +1,76 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0FD11862;
-	Mon,  4 May 2026 17:41:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB94F3E3DAA;
+	Mon,  4 May 2026 17:48:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777916501; cv=none; b=WqeiqAFw/M16lS+ACZBYIqsLNP7ef0F2G6CFDQjDcEBrTEalmhLOzOPtZeAzWTd00PXV6pK793hn0kRnOESGSctRtDnevRHpzrIEHlA5TK/VM/tpkcUMyDeOfJ/5sF54jUHwL1w4FQbxVCJ6kppl4RllT2gnQe2dVIKGJl857m4=
+	t=1777916933; cv=none; b=Mqzu7eBeoB0PErT29CCyCDWlCV0aak0maRgbq7EEu7OG1a0XKbfUbtEQActGXc3S75GKRxvYeO+ouK2VxGxKsFxLiJvBhYtKxz8C6SC2Dw1w8dzrIvM3RKb5/1NfFWyfezhWktLyrgw4pl4mT5QlUeCrRkbZM8m1EGjcPcwb+wg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777916501; c=relaxed/simple;
-	bh=Dju5V9WI247b+gw5Gxnh3v0/NH6IZ1jQn/OQVxY+c9I=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type:Content-Disposition; b=hb2xIhb1fQQCtnFZadeSUKeBFClwN+rsRtW6hqcPHbqFJ9n5fYsRODrwLpYcYBYmy+R+opK2oY3H+PO+Om7YJAGjQvDnxgboYJnMnB+dSgO5HReg7D4Gbaxc3Qj/HXhcou5GHSXkt1wsS8x7xhju9uCJOygPK7lfQok2e7O4TBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=ja8k4e+h; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1777916933; c=relaxed/simple;
+	bh=HBm2VfYhCqoM+ORUtihoa//7kAyARXAwfAerXmia3lE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lNP3Lghwhy+h8ErO4C7opUsarRwywVRMn/ICXPFi1mogXeSuGC9om9v+0gJd6VYYM3CkvsCEcVXyFCHNFwmbXSqxa6HgD1E3R3UOb0taG/t+3Ci7hZVHfQkiZHUcrcxnHBc8q5tp1e9FpotlfOqfcbrUoUFHxVcmIChjgX3T3Rw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PAyW4P3k; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="ja8k4e+h"
-Received: from jeffbarnes-ThinkPad-P14s-Gen-2i (unknown [52.177.6.131])
-	by linux.microsoft.com (Postfix) with ESMTPSA id C871A20B7169;
-	Mon,  4 May 2026 10:41:36 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com C871A20B7169
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1777916497;
-	bh=f+1Y5EUYXPSxAF/znLYyDNUbOTcdHMnI7MLeAMmAaPE=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=ja8k4e+hHrAMRcxYCgXNUexidzSdZliw2fZEgTBHaD77ph7Q84MPBiJJSYnlZLhsM
-	 NilPwYVgfkoU+81wpXZsJPiTNAD6mDZv3RDJ2F3/gHwk1wUSS5kkdR7BZAwHaPOx6T
-	 u/WHCHHu4a+cU/x2an1SFDUm5fq6j0ldEjijM5xM=
-Date: Mon, 4 May 2026 13:41:37 -0400
-From: Jeff Barnes <jeffbarnes@linux.microsoft.com>
-To: Jon Kohler <jon@nutanix.com>
-Cc: Eric Biggers <ebiggers@kernel.org>, 
- "=?utf-8?Q?linux-crypto=40vger.kernel.org?="
- <linux-crypto@vger.kernel.org>, Herbert Xu
- <herbert@gondor.apana.org.au>, "=?utf-8?Q?linux-doc=40vger.kernel.org?="
- <linux-doc@vger.kernel.org>, "=?utf-8?Q?linux-api=40vger.kernel.org?="
- <linux-api@vger.kernel.org>, 
- "=?utf-8?Q?linux-kernel=40vger.kernel.org?="
- <linux-kernel@vger.kernel.org>, "=?utf-8?Q?netdev=40vger.kernel.org?="
- <netdev@vger.kernel.org>, Linus Torvalds
- <torvalds@linux-foundation.org>
-Message-ID: <0D4B157F-AEDE-4470-BDBE-E6467CA19089@getmailspring.com>
-In-Reply-To: <4D424F50-7E9F-4B1F-AE9C-86D8526284E6@nutanix.com>
-References: <4D424F50-7E9F-4B1F-AE9C-86D8526284E6@nutanix.com>
-Subject: Re: [PATCH] crypto: af_alg - Document the deprecation of AF_ALG
-X-Mailer: Mailspring
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PAyW4P3k"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13EE6C2BCB8;
+	Mon,  4 May 2026 17:48:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777916933;
+	bh=HBm2VfYhCqoM+ORUtihoa//7kAyARXAwfAerXmia3lE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PAyW4P3kOztDaDUVLckYcoAzPXGAP33jHS5um0+VVvDfHhFwpcjezAacfX6/8z7Ul
+	 7PkAZ+Dvc793T9B/Mi9KcHxvJng40THWFKe2OvBrti9s6XuY9yOF8Z1AdU3tI74FJ5
+	 CeILmQ+0D+InEzyneWGOiJtdGjR7x7HmQx0oGHbxBM2+vvuMZ7eQH2OInoeOY+8kA6
+	 dYNDgXrOIG85CmIFbSPhVVrjTokDBCcp2HIYuJiYVoRWvjfx8KGOuwxe/AWkKb2a22
+	 jNQbhZ4jlu+DlObq3eLWWa4dqm2G4xxVo0KN6c4c1YRu3gMwO6YLdI8oaom0k3K4JD
+	 wW66v0zrwA7+w==
+Date: Mon, 4 May 2026 10:47:33 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: =?utf-8?B?4pK2bMOvIFDimK5sYXRlbA==?= <alip@chesswob.org>
+Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+	Taeyang Lee <0wn@theori.io>, Brian Pak <bpak@theori.io>,
+	Juno Im <juno@theori.io>, Jungwon Lim <setuid0@theori.io>,
+	Tim Becker <tjbecker@theori.io>,
+	Demi Marie Obenour <demiobenour@gmail.com>,
+	Feng Ning <feng@innora.ai>, stable@vger.kernel.org
+Subject: Re: [PATCH] crypto: af_alg - Remove zero-copy support from AF_ALG
+Message-ID: <20260504174733.GB2291@sol>
+References: <20260504061532.172013-1-ebiggers@kernel.org>
+ <mCm5pwZUNYtOVDph2baJg3eAzArddjvFpx3Wwh2qiZfZXYtv-aUjlISuRg5HjuIMzGo51hxCazaH47gp9B_q7I4R4LVePKGkvhO9D0P4nCY=@chesswob.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <mCm5pwZUNYtOVDph2baJg3eAzArddjvFpx3Wwh2qiZfZXYtv-aUjlISuRg5HjuIMzGo51hxCazaH47gp9B_q7I4R4LVePKGkvhO9D0P4nCY=@chesswob.org>
 
-
-
-On May 4 2026, at 10:39 am, Jon Kohler <jon=40nutanix.com> wrote:
-
-> =20
-> Quick passing observation
-> I noticed that when attempting to completely disable these Crypto APIs,=
-
-> I was experiencing boot failures with fips=3D1 enabled systems.
-> =20
-> Using 6.18-based kernel with an el9-based user space, I see the
-> following hang in the early boot console from dracut-pre-pivot:
->  Check integrity of kernel
->  libkcapi - Error: A=46=5FALG: socket syscall failed (errno: -97)
->  Allocation of hmac(sha512) cipher failed (-97)
-
-One thing that for certain that would cause this panic is the sha512hmac
-binary that does the fips integrity check. On many distros this check is
-called, for example by dracut among others, during initramfs to check
-the integrity of the kernel before any crypto is used. On failure, the
-kernel won't finish boot.
-
-sha512hmac is a binary shipped with kcapitools. It uses libkcapi.
-
-sha512hmac -> libkcapi -> A=46=5FALG.
-
-Is there a planned replacement for this integrity check=3F I don't know o=
-f
-anybody doing this for =46IPS yet, but is there a case where IMA / EVM
-could be a workaround=3F
-
-Regards,
-Jeff
-
-> =20
-> I haven't looked at every elX version, but at least in el9 and el10,
-> they use libkcapi-hmaccalc to provide sha512hmac, which dracut =5B1=5D
-> uses to calculate the HMAC value in do=5Ffips().
-> =20
-> Digging further, I was only able to disable RNG and AEAD APIs, but
-> not HASH and SKCIPHER APIs when =46IPS was in the picture with el9++.
-> =20
-> I=E2=80=99m not sure how other distros do the same, but this could be p=
-roblematic
-> elsehwere if other distros went down the libkcapi route.
-> =20
-> =5B1=5D https://github.com/dracutdevs/dracut/blob/059/modules.d/01fips/=
-fips.sh=23L167
-> =20
+On Mon, May 04, 2026 at 04:07:45PM +0000, Ⓐlï P☮latel wrote:
+> Syd sandbox uses AF_ALG zero-copy for its Force Sandboxing[1] and Crypt Sandboxing[1].
+> Zero-copy means Syd does not have to copy sandbox process data into its own address
+> space providing safety and security. Switching to read/write rather than pipes and
+> splice breaks a fundamental safety guarantee for the sandbox. Please do not break
+> userspace.
 > 
+> Will sendfile(2) continue to work? 
+> 
+> [1]: https://man.exherbo.org/syd.7.html#Force_Sandboxing
+> [2]: https://man.exherbo.org/syd.7.html#Crypt_Sandboxing
+
+It's very unclear what that feature (which I don't think anyone knew
+even existed) is trying to accomplish.  Regardless, this patch doesn't
+break the splice or sendfile syscalls.  It just makes them run a bit
+more slowly since the kernel will copy the data internally.  So I think
+your concern isn't justified.
+
+> How can i test? Please help me.
+
+If this is a feature you care about, perhaps you know how to test it?
+
+- Eric
