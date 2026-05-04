@@ -1,164 +1,270 @@
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AFC3221275
-	for <linux-crypto@vger.kernel.org>; Mon,  4 May 2026 06:08:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FD67E56A;
+	Mon,  4 May 2026 06:17:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777874894; cv=none; b=V0bpIgg/k2Td+2NO/TkI6pF7GsG8wyMfS9O7zwZWzs2Twb+tlM1+B46lRemnGxDYcqTf0v1plg0Agn6J/SrlRNYMNwMNE2aTnByyFtkTLn46RxhDMU488pDLCcVekIoRCXIDSEe+QJfLueu1VeLpG/JDQPeHUHLvKqktldh1Btc=
+	t=1777875444; cv=none; b=Q8/zjx7gOtLGimyDJ+4P3fRIDgrTXtjlAycrnwC9x+Om70Gsq8Fkttxu3kr6wW7JH8sXAGnVA46mewRLGPGIXLHNfljWmyZmI9yHA207PTXbugytsi1Juj1JZynekHqQSa0qpjO8bu00vpXEGbqH9GsCYieGDXq2mEAam2K7c8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777874894; c=relaxed/simple;
-	bh=TOca50pS01td/jUU/FwvS94h/ZEqq56G62bJ29EsyTM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ERbGLbNHeZxwZXxL4nW/rpCH4tW2/6hXN8dFMp1Od0OXineF1G6re+KvUbR0fmX84v0z5Erl8Kgoxx0GwwGnY5tMJVCgG1/mBCVkc/tb4Cm5VjdgZaKR8Mdw8VU5Jbiy+W1LNt3NOYuhsOe6EPuXeGWpmqr4xEfEW8WcBBiViyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QhCH+wW3; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1777875444; c=relaxed/simple;
+	bh=obD0iH84tW/+pzwZKDlX11jbGOFk77pketOtW3wIkHI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jKz4taachmzBajx+CCrWRy30sNeMRsbrhNeXnUH5UfkIVNKvs8O2CCWvBkz57P+O00nZPDyGYKbt346slRjoRImqTpBa0m5IGRt2JtmrNOMWi8GdYard7EoMOIAnN7O5g3/mx3FUT3hDkGmVkenzJ1WhdBxgRTYEzm4Iv7d2EHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uG9s/ND5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QhCH+wW3"
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-43fe3e22e33so1933072f8f.0
-        for <linux-crypto@vger.kernel.org>; Sun, 03 May 2026 23:08:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1777874892; x=1778479692; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=FaZbHH/IOIhjmW6XYALmsYnEPoCz+hdT8OiAn2Buu0Q=;
-        b=QhCH+wW3fF3bQzGoEUdD59gxzQOG4IEs93UltD8/sUoe5+Q2gkLcAtI/DJHBtaxj8r
-         u2wemYayLdl9YODLjbBrzcG2aV8f+TBxHyw6wSN8ep3xM9CwfDKEfbXro6a6eBtfEhOi
-         KZ7iISrUtQSl5mRKG5jQU0I0cwVyAmZn7u37YnGoFKwS6ODPU1GC66OLs8sp7UKNhRnX
-         otglfgrA6U1QeCDIhyhhw9c/b4kZ7WqkBip9vvfyK+mjp4xxY8cvNrrWhtRCW1RV1YRU
-         64C69e4p4ku+951Swm78hukPeDWiS+HcBl/xIJCGW3Fmk11i8QdOJj5L7gOtkRCBPzmf
-         6AhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1777874892; x=1778479692;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FaZbHH/IOIhjmW6XYALmsYnEPoCz+hdT8OiAn2Buu0Q=;
-        b=jsSQkFfA1RNgwr90JgwMAZwE0E/LKXNPvT+2F64pIuqpsjo9SvG2a+TdmouIDCraUi
-         yFv+zA0zYaoIci9sUa8HlXcM0g6G/n0LIkvgbYW0aD9rSH86roK1rXvl82xYeomFa74p
-         IwxQOh1m0IIJLQR/9yCCwGTcrxIwLgmnH0Oc9NzL56ASKnXvePsoS3wOJVGguU1JH/X3
-         1pA2FhDsxuVevniZMhu/UsDywPvDZCkMhUOCOddlbhgr6UP4AS0J7cVWlvdxx2VVfksF
-         T/K4nrK21ubvRRZ3hSTPcalqQO1TaSxZuyCJcwRIhPnRe1wwavkW8VkqgBTKcEfLdCWn
-         F5qQ==
-X-Gm-Message-State: AOJu0YxfsJtQOD03XvbBxUq5RlIEU+mlLxGRpcP7Je/hyUypk+53Xfo3
-	Ab8Jokg7CcpEIwffigto7BBYgU2cm4BDasOYeAvVNSVNgrm1NyanC3JSJTmExIG7
-X-Gm-Gg: AeBDieueT75TsB6vOE1dBeN+McFh99z8zJMD7hKNoEZejchtYM55MlzWeYQbeVpdXH6
-	MZzSHe3KwCBsxDk7bMmlK6/uAQpHNKORR2MnY/LBpv7XOpypOWuM5F8nUJZnDaYD/Bp1kjcqubM
-	jjNVo+j1xrSEa/BIxZvnH/a1Bp0o7vZR4anE8GSUb35muSpPw+oorSZEOZIXYs++VKobHP8ep48
-	5i05QhHuvWMEqfk1PM0Gsa9lNczTOfatRU1kpsQaQv6UW++zcUUf1rFcRKRxfOJcI0qE7HWVdmP
-	CYmCjs9+t4EcEGzDQpXLbQtG7gUMnohSMgvRjuouiCpQ8aIxHYUIfTlW9MSbhySzBy1/KW8Ayui
-	U6oObxuB/qNMP6L+CNzDJSQtAVsPXE4vonoJ7PlVXcIbSjqhh87uaAST21VrEC30IY9ADH9KUwa
-	I/Q177vxa88HZn7Vmz3/zhY7ul7Wx5FO2kZRrJYwCL+npjYVZ5a7OjbhPNtjo=
-X-Received: by 2002:a05:6000:2407:b0:43c:fb48:6856 with SMTP id ffacd0b85a97d-44bb34e71cdmr13957607f8f.13.1777874891529;
-        Sun, 03 May 2026 23:08:11 -0700 (PDT)
-Received: from [192.168.2.14] (85-70-151-113.rcd.o2.cz. [85.70.151.113])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-44a8ea7cf97sm27118213f8f.6.2026.05.03.23.08.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 03 May 2026 23:08:11 -0700 (PDT)
-Message-ID: <5dd3be22-13fb-41fb-b469-1ae6472200b1@gmail.com>
-Date: Mon, 4 May 2026 08:08:10 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uG9s/ND5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3FD2C2BCB8;
+	Mon,  4 May 2026 06:17:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777875444;
+	bh=obD0iH84tW/+pzwZKDlX11jbGOFk77pketOtW3wIkHI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=uG9s/ND57OtwTsDjbVOx8GeWrKgUeAkpyBMvX3uQz96lQvM3lDTwSRQnyvE2+doOV
+	 2Lgb7ULxvS5H1LFRHjV30fyfiDeUl2FY5RuJTGn+c+N7XoltvFcl3z9Ynrh3TT/537
+	 cGD1+4IRy2wHDlpDZtlrUKPvU7hefG+La+0UqAWIgylGf3bzveGIaBhBmYQtzOOQ5f
+	 HBdhVFge7G0FLzETRQaxiquwVw5xlaKWf3DVWRH78bYPe8I1T5CazbcIqRs7yrPG2K
+	 8Ndu14Pn5XwCO+gLOhuRphjSZnd1qpNDuI/tV1s5geDyAWv75oJ+GjlWaiNGtLbOjs
+	 CSW5q3Y3/8UAQ==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org,
+	Taeyang Lee <0wn@theori.io>,
+	Brian Pak <bpak@theori.io>,
+	Juno Im <juno@theori.io>,
+	Jungwon Lim <setuid0@theori.io>,
+	Tim Becker <tjbecker@theori.io>,
+	Demi Marie Obenour <demiobenour@gmail.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Feng Ning <feng@innora.ai>,
+	stable@vger.kernel.org
+Subject: [PATCH] crypto: af_alg - Remove zero-copy support from AF_ALG
+Date: Sun,  3 May 2026 23:15:32 -0700
+Message-ID: <20260504061532.172013-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: AF_ALG algorithms required by cryptsetup
-To: Eric Biggers <ebiggers@kernel.org>,
- cryptsetup development <cryptsetup@lists.linux.dev>
-Cc: linux-crypto@vger.kernel.org, dm-devel@lists.linux.dev,
- linux-kernel@vger.kernel.org, Demi Marie Obenour <demiobenour@gmail.com>
-References: <20260504052400.GB2289@sol>
-Content-Language: en-US
-From: Milan Broz <gmazyland@gmail.com>
-Autocrypt: addr=gmazyland@gmail.com; keydata=
- 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
-In-Reply-To: <20260504052400.GB2289@sol>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 5/4/26 7:24 AM, Eric Biggers wrote:
-> Hi Milan,
-> 
-> AF_ALG is going to have to go away eventually, due to its frequent
-> vulnerabilities which vastly outweigh its benefits.  Userspace crypto
-> code can be, should be, and generally already is used instead.
+The zero-copy support is one of the riskiest aspects of AF_ALG.  It
+allows userspace to request cryptographic operations directly on
+pagecache pages of files like the 'su' binary.  It also allows userspace
+to concurrently modify the memory which is being operated on, a huge
+recipe for TOCTOU vulnerabilities.
 
-Heh, I just send reply to the thread on security list. I know about this.
-(It is probably waiting for moderation, cannot find link to paste here yet.)
+While zero-copy support is more valuable in other areas of the kernel
+like the frequently used networking and file I/O code, it has far less
+value in AF_ALG, which is a niche UAPI.  AF_ALG primarily just exists
+for backwards compatibility with a small set of userspace programs such
+as 'iwd' that haven't yet been fixed to use userspace crypto code.
 
-In general, it is more complicated and need some time, but it can be done.
+Originally AF_ALG was intended to be used to access hardware crypto
+accelerators.  However, it isn't an efficient interface for that anyway,
+and it turned out to be rarely used in this way in practice.
 
-> Is a reasonably definitive list of the algorithms cryptsetup needs from
-> AF_ALG available anywhere, so that an allowlist can be implemented on
-> the kernel side?
+Thus, the risks of the zero-copy support in AF_ALG vastly outweigh its
+benefits.  Just remove it.
 
-For Veracrypt support, it would be easy to create list.
-But maybe we can do it differently completely without AF_ALG.
+Note that this isn't a hard break, since the splice syscall is still
+supported.  The data is just now copied instead.  So it still works,
+just a bit slower in some cases.
 
-> (It would need to be unioned with what iwd uses as well.)
-> 
-> Also, what are the biggest blockers to removing the AF_ALG dependency
-> from cryptsetup, in your view?
-> 
-> Finally, how well would a CAP_SYS_ADMIN or CAP_NET_ADMIN restriction
-> work for cryptsetup?  IIUC, volume formatting and opening require root
-> anyway, and all the device-mapper ioctls already require CAP_SYS_ADMIN.
-> I know 'cryptsetup benchmark' would be affected, but that tends to be a
-> one-off manually-run thing, which people could add 'sudo' to.
+Tested with libkcapi/test.sh.  All its test cases still pass.  I also
+verified that this would have prevented the copy.fail exploit as well.
 
-Formatting does not require root, basically only device-mapper interaction
-requires it now.
+Fixes: 8ff590903d5f ("crypto: algif_skcipher - User-space interface for skcipher operations")
+Fixes: 400c40cf78da ("crypto: algif - add AEAD support")
+Reported-by: Taeyang Lee <0wn@theori.io>
+Reported-by: Feng Ning <feng@innora.ai>
+Cc: stable@vger.kernel.org
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ Documentation/crypto/userspace-if.rst | 30 ++---------
+ crypto/af_alg.c                       | 73 +++++++++------------------
+ crypto/algif_aead.c                   |  8 +--
+ 3 files changed, 32 insertions(+), 79 deletions(-)
 
-LUKS should be completely OK without AF_ALG (it calls userspace backend),
-it is about other formats.
+diff --git a/Documentation/crypto/userspace-if.rst b/Documentation/crypto/userspace-if.rst
+index 021759198fe7..80eb2819901a 100644
+--- a/Documentation/crypto/userspace-if.rst
++++ b/Documentation/crypto/userspace-if.rst
+@@ -325,37 +325,13 @@ CRYPTO_USER_API_RNG_CAVP option:
+    but only after the entropy has been set.
+ 
+ Zero-Copy Interface
+ -------------------
+ 
+-In addition to the send/write/read/recv system call family, the AF_ALG
+-interface can be accessed with the zero-copy interface of
+-splice/vmsplice. As the name indicates, the kernel tries to avoid a copy
+-operation into kernel space.
+-
+-The zero-copy operation requires data to be aligned at the page
+-boundary. Non-aligned data can be used as well, but may require more
+-operations of the kernel which would defeat the speed gains obtained
+-from the zero-copy interface.
+-
+-The system-inherent limit for the size of one zero-copy operation is 16
+-pages. If more data is to be sent to AF_ALG, user space must slice the
+-input into segments with a maximum size of 16 pages.
+-
+-Zero-copy can be used with the following code example (a complete
+-working example is provided with libkcapi):
+-
+-::
+-
+-    int pipes[2];
+-
+-    pipe(pipes);
+-    /* input data in iov */
+-    vmsplice(pipes[1], iov, iovlen, SPLICE_F_GIFT);
+-    /* opfd is the file descriptor returned from accept() system call */
+-    splice(pipes[0], NULL, opfd, NULL, ret, 0);
+-    read(opfd, out, outlen);
++AF_ALG used to have zero-copy support, but it was removed due to it being a
++frequent source of vulnerabilities.  For backwards compatibility the splice
++system call is still supported, but the data will simply be copied.
+ 
+ 
+ Setsockopt Interface
+ --------------------
+ 
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index 5a00c18eb145..fce0b87c2b65 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -971,11 +971,11 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
+ 		struct scatterlist *sg;
+ 		size_t len = size;
+ 		ssize_t plen;
+ 
+ 		/* use the existing memory in an allocated page */
+-		if (ctx->merge && !(msg->msg_flags & MSG_SPLICE_PAGES)) {
++		if (ctx->merge) {
+ 			sgl = list_entry(ctx->tsgl_list.prev,
+ 					 struct af_alg_tsgl, list);
+ 			sg = sgl->sg + sgl->cur - 1;
+ 			len = min_t(size_t, len,
+ 				    PAGE_SIZE - sg->offset - sg->length);
+@@ -1015,64 +1015,41 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
+ 				 list);
+ 		sg = sgl->sg;
+ 		if (sgl->cur)
+ 			sg_unmark_end(sg + sgl->cur - 1);
+ 
+-		if (msg->msg_flags & MSG_SPLICE_PAGES) {
+-			struct sg_table sgtable = {
+-				.sgl		= sg,
+-				.nents		= sgl->cur,
+-				.orig_nents	= sgl->cur,
+-			};
+-
+-			plen = extract_iter_to_sg(&msg->msg_iter, len, &sgtable,
+-						  MAX_SGL_ENTS - sgl->cur, 0);
+-			if (plen < 0) {
+-				err = plen;
++		do {
++			struct page *pg;
++			unsigned int i = sgl->cur;
++
++			plen = min_t(size_t, len, PAGE_SIZE);
++
++			pg = alloc_page(GFP_KERNEL);
++			if (!pg) {
++				err = -ENOMEM;
+ 				goto unlock;
+ 			}
+ 
+-			for (; sgl->cur < sgtable.nents; sgl->cur++)
+-				get_page(sg_page(&sg[sgl->cur]));
++			sg_assign_page(sg + i, pg);
++
++			err = memcpy_from_msg(page_address(sg_page(sg + i)),
++					      msg, plen);
++			if (err) {
++				__free_page(sg_page(sg + i));
++				sg_assign_page(sg + i, NULL);
++				goto unlock;
++			}
++
++			sg[i].length = plen;
+ 			len -= plen;
+ 			ctx->used += plen;
+ 			copied += plen;
+ 			size -= plen;
+-		} else {
+-			do {
+-				struct page *pg;
+-				unsigned int i = sgl->cur;
+-
+-				plen = min_t(size_t, len, PAGE_SIZE);
+-
+-				pg = alloc_page(GFP_KERNEL);
+-				if (!pg) {
+-					err = -ENOMEM;
+-					goto unlock;
+-				}
+-
+-				sg_assign_page(sg + i, pg);
+-
+-				err = memcpy_from_msg(
+-					page_address(sg_page(sg + i)),
+-					msg, plen);
+-				if (err) {
+-					__free_page(sg_page(sg + i));
+-					sg_assign_page(sg + i, NULL);
+-					goto unlock;
+-				}
+-
+-				sg[i].length = plen;
+-				len -= plen;
+-				ctx->used += plen;
+-				copied += plen;
+-				size -= plen;
+-				sgl->cur++;
+-			} while (len && sgl->cur < MAX_SGL_ENTS);
+-
+-			ctx->merge = plen & (PAGE_SIZE - 1);
+-		}
++			sgl->cur++;
++		} while (len && sgl->cur < MAX_SGL_ENTS);
++
++		ctx->merge = plen & (PAGE_SIZE - 1);
+ 
+ 		if (!size)
+ 			sg_mark_end(sg + sgl->cur - 1);
+ 	}
+ 
+diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
+index cb651ab58d62..c6c2ce21895d 100644
+--- a/crypto/algif_aead.c
++++ b/crypto/algif_aead.c
+@@ -7,14 +7,14 @@
+  * This file provides the user-space API for AEAD ciphers.
+  *
+  * The following concept of the memory management is used:
+  *
+  * The kernel maintains two SGLs, the TX SGL and the RX SGL. The TX SGL is
+- * filled by user space with the data submitted via sendmsg (maybe with
+- * MSG_SPLICE_PAGES).  Filling up the TX SGL does not cause a crypto operation
+- * -- the data will only be tracked by the kernel. Upon receipt of one recvmsg
+- * call, the caller must provide a buffer which is tracked with the RX SGL.
++ * filled by user space with the data submitted via sendmsg.  Filling up the TX
++ * SGL does not cause a crypto operation -- the data will only be tracked by the
++ * kernel. Upon receipt of one recvmsg call, the caller must provide a buffer
++ * which is tracked with the RX SGL.
+  *
+  * During the processing of the recvmsg operation, the cipher request is
+  * allocated and prepared. As part of the recvmsg operation, the processed
+  * TX buffers are extracted from the TX SGL into a separate SGL.
+  *
 
-I'll reply later.
-
-Milan
+base-commit: 6d35786de28116ecf78797a62b84e6bf3c45aa5a
+-- 
+2.54.0
 
