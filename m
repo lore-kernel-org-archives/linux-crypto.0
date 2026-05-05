@@ -1,49 +1,46 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00AA83B4EB0;
-	Tue,  5 May 2026 05:47:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3E903BD654;
+	Tue,  5 May 2026 05:50:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777960035; cv=none; b=PXbeXe04eNQmdf5OlMR+nOgU5feMuv4X0uTOWKfUnsdHfrjDu27VduACl0n1VBym4Qjg3QI6xFMy+sH+DuUFmJPw+z0SHH6JQStpjRPaBpzdIkEhS22Ty7BIrp9C+fSS/tRdu16Aan+d4+7/fsRs4a+3vduvCY+akNPyQvPeZRY=
+	t=1777960241; cv=none; b=dlbtl/3eM3I52BAInIuptIbfaWc6CtFqSYUhrgh271s97u2xiZEd0OPENSj309zUUgIFydsmWLytbhdeGllhMBjfH6qaWtzyGVPQZK3Dr/wLshpemzH9jt58iUN4+TwgTYZT8u9ALDFS1YXtugvwL1Esjc4nMGU4xhr1FKoZVYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777960035; c=relaxed/simple;
-	bh=GFraPeWSHBeBTBKCHbqMZZ0RI743i2GrkYooIVfmUgA=;
+	s=arc-20240116; t=1777960241; c=relaxed/simple;
+	bh=OfrV6+RJWoZMQILdTtVAw8sCC8csn93eRDN+xzU7/Ak=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TrDyiHhZbK0ZLaqGij91n3VKoYbXoR/NLKtyMyIj/CqeT0XLN+gvZ0AY4RIEB22SbM9P4xUI9jiI96/0MGX2j6icGzfZsg2dgxB8m2icNunJcFZlRayhNzGRW4Sn6fKZ+fcFuJVpqYEqIAaWB6wTOmddlXUbcqM2XxVk4ux5Xbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=THdNyWbQ; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZB8RZt0/dR3u0bsMzT+r47R13/Yky/7S+FPVXVjXaAOG9zpyOrJ9QYO8uJ1eRMZoVqerfzkrbtrRiA9bthRZcSe/xPK236BLeBi5gZUYV3zNz6mydrwU0QYcBW0FWrSf/eVt5PotbSY/69vxb3Ejk/Y8jrBh1EHXbpBCzB6rbMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=dl9GGNBf; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="THdNyWbQ"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="dl9GGNBf"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=b3O989lIV/7AhzyUAfm0eiu3LCgeXU7IX5L5ttzSu/Y=; 
-	b=THdNyWbQAKbe5cfM/fzIO0A9naeL2J+WRJZZ/NNwDciTqcvUGjpZuK0vvXOcMGhdURkS397sUcj
-	62JoXmWLzDi2vaYAECbgJUEnkSfamHa7EixXQYTaD95Ni6ZqDHjR41HTRrzwsBnPsz5Vx4PwHIfas
-	sRjvhbIcn9fXYPqunhReiCglPIQXR64f7xd2hRFfBZcrkkUEALrIv260/ZmSd4bffQQsnSJxV6gaf
-	KZrYtCfA3NDGb53h+DHYvgFy2CW0SLplLJ9+vNyesVYvYnX0knj3sboieAVAps8iQJ7BDQbbFREPm
-	qCH0aH90LKKmcqQmfYvfMjriufP9ouD7BJTw==;
+	from:content-type:reply-to; bh=wAejJCOWGhS6ahmi7F3Y7ihhgKOa0pYIpSX1RnrC5kA=; 
+	b=dl9GGNBfTI7IKWghAe2oVvSt5kRLD04G9uhCGVeopEr5k7HGwGwI0SV9d5JbwJxDVm2dpX4+Ho4
+	UZmqqHXQPO4q6N0B3y3a9soTw+ZML/fvrkSb8PCsqhlKKWHe9TPwX+oitFqtGncS0xrBvLHqe3ke0
+	oWLHd9GQDtx5tr4Nl7Zq70ayLT0OTniNwDGuDVYzYDDrpXAuaX7OBduXC4Ai146unnwukeEsDCNtk
+	XEVa8RZ5SOiLDhPQHcbn9zYFV2MIsZ2rNY44CX9bla0e5gpD8EHrE/CWN4yU51gJTabyDna5dxXdE
+	EpABqVuv1g0GyD53j4PDa21e4Z48L4GoH/2g==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wK8cF-00BKaw-1z;
-	Tue, 05 May 2026 13:46:44 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 05 May 2026 13:46:43 +0800
-Date: Tue, 5 May 2026 13:46:43 +0800
+	id 1wK8fx-00BKda-2i;
+	Tue, 05 May 2026 13:50:34 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 05 May 2026 13:50:33 +0800
+Date: Tue, 5 May 2026 13:50:33 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Weiming Shi <bestswngs@gmail.com>
-Cc: David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@linux.win>,
-	"David S . Miller" <davem@davemloft.net>,
-	Vivek Goyal <vgoyal@redhat.com>, Kees Cook <kees@kernel.org>,
-	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Xiang Mei <xmei5@asu.edu>, Jarkko Sakkinen <jarkko@kernel.org>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Mimi Zohar <zohar@linux.ibm.com>
-Subject: Re: [PATCH] crypto: fix OOB read in pefile_digest_pe_contents
-Message-ID: <afmEQ5ove_8fqEhH@gondor.apana.org.au>
-References: <20260430173632.277436-3-bestswngs@gmail.com>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: linux-crypto@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:KERNEL HARDENING (not covered by other areas):Keyword:b__counted_by(_le|_be)?b" <linux-hardening@vger.kernel.org>
+Subject: Re: [PATCH] talitos: allocate channels with main struct
+Message-ID: <afmFKQjJQUHeQO2O@gondor.apana.org.au>
+References: <20260430214340.59588-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,23 +49,18 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260430173632.277436-3-bestswngs@gmail.com>
+In-Reply-To: <20260430214340.59588-1-rosenp@gmail.com>
 
-> 
-> diff --git a/crypto/asymmetric_keys/verify_pefile.c b/crypto/asymmetric_keys/verify_pefile.c
-> index 1f3b227ba7f2..cec99db14129 100644
-> --- a/crypto/asymmetric_keys/verify_pefile.c
-> +++ b/crypto/asymmetric_keys/verify_pefile.c
-> @@ -305,6 +305,8 @@ static int pefile_digest_pe_contents(const void *pebuf, unsigned int pelen,
->  
->  	if (pelen > hashed_bytes) {
->  		tmp = hashed_bytes + ctx->certs_size;
-> +		if (tmp <= hashed_bytes || pelen < tmp)
-> +			return -ELIBBAD;
+On Thu, Apr 30, 2026 at 02:43:40PM -0700, Rosen Penev wrote:
+>
+> -	priv = devm_kzalloc(dev, sizeof(struct talitos_private), GFP_KERNEL);
+> +	of_property_read_u32(np, "fsl,num-channels", &num_channels);
 
-I know nothing about this but why should pelen == tmp fail?
+Sashiko suggests that you check the return value of this call:
 
-Cheers,
+https://sashiko.dev/#/patchset/20260430214340.59588-1-rosenp%40gmail.com
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
