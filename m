@@ -1,70 +1,89 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F8E13290D0;
-	Tue,  5 May 2026 09:34:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4748D29E116
+	for <linux-crypto@vger.kernel.org>; Tue,  5 May 2026 09:46:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777973686; cv=none; b=b/f1ReSYqHT5iBGLcvg6iPflBxno/d+CseUUmpA6UDM2lAu4DzaK3pikDGhfHiQf3RmlgeSdcs7grhWyTYXfesQXTo2eB8m0HPgrlzq/LfEsqqYKaQLyDewyosCYrQYIj3rWxuk7AOWSIuGPP0EGWZxS6IRe9fLsagCtQ7Y7QJ0=
+	t=1777974405; cv=none; b=YPHxkU5uE1HW+Wbm2CE1UJoDehX6/OSINLqJLTazaJZLPzpdJwhsfE3AcfNCyKxrrmM33iWilzotHmNaO7P+eKcSXWja0z9ZHX6qCETNlYERkCPg6QQoEI/Iaf/8vAQRjLpJWTiqqvBomWkOPcDHpJn0+ZInI/PS9QuMNNlU1LE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777973686; c=relaxed/simple;
-	bh=w31Yk0407YjHr10KjUzcroT98Lcz4kj5ZgA26+MOkLo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XnlTJsfNzY51CD5H4QZGyJ3yjs5j7mh7kNj9JqPNEgIIjj+igaIA6+6WRX9IMG+5obCsUZF1t30qtZLTDBIOHRlMkErimJu+7uo9gvFsam7GWBgGtSWnQa7+ZKHcb6aRy9ysUBOsGHJ7p51vCBGykQBFD9ajk5H04P7loNdcv+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=qqbfjqEc; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1777974405; c=relaxed/simple;
+	bh=t30JCyaSXq4YKIbL5WlJdz49ww4bKSi3lB2KR9wRAnU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=M1S9RVcmKQDB2kkzJ1wet/mss/iYq18PX/PaZVMlEGBUvJD1w2jkmrozUMtZaSeds4GNXDch1zMQNwioJWXw+92FZMFoBDxf/l1X8WdT6LND1Mjkwhix4eX09WT+Kqk+TgmBUppTYy/ASiQ1m7uOkBEXDSqhjzU9iB63Ok74Rrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=diR2ww0R; arc=none smtp.client-ip=95.215.58.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="qqbfjqEc"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=KtC1pSYLnRwEjuDnHg5iLuol5nAgQy/1Km+lTvxTC60=; 
-	b=qqbfjqEc/uorYE7VTx89kXqX9GAIlP/xRyfT5HGfGs1rhDMBb9qnswtLxxlRwADtDwqawLChSrh
-	UaN8jbHm8WI5/5pi5Uv4uMSxtZmCVm1HgMaURGH52wvpYV4Y923CqD60XjmWzXkcIXdq2mFyfyL9U
-	ea7I6A3gSi7sdyMGu+WBP5/DpwdW4n/MFznZFqp+nWVm/hOx4M17KCKMbhOX4Ym0qEEb0mhiu2LZY
-	DYKBvqQ0cEBhTdqWOYZgY85JWrv5XjFNmYRiuc5ffm37kUXoqPa7ug+Lvzsl7n173Tth/m9qPdnFM
-	E+OIgvtu21O6M59wUqZCzKf2t/a6Xa3gd0Ew==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wKCAX-00BOB0-0u;
-	Tue, 05 May 2026 17:34:22 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 05 May 2026 17:34:21 +0800
-Date: Tue, 5 May 2026 17:34:21 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: Lukas Wunner <lukas@wunner.de>, Ignat Korchagin <ignat@linux.win>,
-	"David S. Miller" <davem@davemloft.net>,
-	Vitaly Chikunov <vt@altlinux.org>, linux-crypto@vger.kernel.org,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="diR2ww0R"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1777974401;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CnEKYp/mhi2DaqqIXdAVLLXGwYDnunrVEDqtP5gWYGc=;
+	b=diR2ww0RygvUDwBFd1r9VWIBsIVHkHyzvvztpGCroWGNR0f7pyS2QtcPY+OMTvEUZhqh3C
+	EMX5whBRAFzkzNxbGwA552lCfytVkd0OX0NMur3hh6qSKKtHEIKv6Gx4QKLhgIHWdu1v2q
+	CYb6eAWUZAW/oyl1TL2PsVN1K2IMJPE=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David Laight <david.laight.linux@gmail.com>,
+	Jonathan McDowell <noodles@meta.com>,
+	Lianjie Wang <karin0.zst@gmail.com>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: ecrdsa - fix unknown OID check in
- ecrdsa_param_curve
-Message-ID: <afm5nQs34VB3FA24@gondor.apana.org.au>
-References: <20260502190903.252061-3-thorsten.blum@linux.dev>
+Subject: [PATCH v2 2/4] hwrng: core - use bool for wait parameter in rng_get_data
+Date: Tue,  5 May 2026 11:45:56 +0200
+Message-ID: <20260505094555.158017-7-thorsten.blum@linux.dev>
+In-Reply-To: <20260505094555.158017-6-thorsten.blum@linux.dev>
+References: <20260505094555.158017-6-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260502190903.252061-3-thorsten.blum@linux.dev>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1233; i=thorsten.blum@linux.dev; h=from:subject; bh=t30JCyaSXq4YKIbL5WlJdz49ww4bKSi3lB2KR9wRAnU=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDJk/90QeruO9YGDZ887oQchS6b8HxLbYnF/FcvggzyGuE tdHO8NDO0pZGMS4GGTFFFkezPoxw7e0pnKTScROmDmsTCBDGLg4BWAix18zMuxdMOv4NcODYWrB milyVdqCfpEpt7Z37r/9/o3ayZtatZ8YGbYuVdz0Q3jGvqP2vu9SlvxfvFVQc9UtWT/Gm523mLS PLOAHAA==
+X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Sat, May 02, 2026 at 09:09:04PM +0200, Thorsten Blum wrote:
-> The ->curve_oid check in ecrdsa_param_curve() rejects the valid enum
-> value 0 (OID_id_dsa_with_sha1), but look_up_OID() returns OID__NR on
-> lookup failure. Compare ->curve_oid with OID__NR instead to ensure that
-> only unknown OIDs return -EINVAL.
-> 
-> Fixes: 0d7a78643f69 ("crypto: ecrdsa - add EC-RDSA (GOST 34.10) algorithm")
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
-> ---
->  crypto/ecrdsa.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+The wait parameter in rng_get_data() is a boolean flag - use bool
+instead of int to better reflect its actual type.
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+Formatting changes only as suggested by Andy.
+---
+ drivers/char/hw_random/core.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index 68add1a97f31..870e77c9ec20 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -210,8 +210,8 @@ static int rng_dev_open(struct inode *inode, struct file *filp)
+ 	return 0;
+ }
+ 
+-static inline int rng_get_data(struct hwrng *rng, u8 *buffer, size_t size,
+-			int wait) {
++static inline int rng_get_data(struct hwrng *rng, u8 *buffer, size_t size, bool wait)
++{
+ 	int present;
+ 
+ 	BUG_ON(!mutex_is_locked(&reading_mutex));
+@@ -534,8 +534,7 @@ static int hwrng_fillfn(void *unused)
+ 		}
+ 
+ 		mutex_lock(&reading_mutex);
+-		rc = rng_get_data(rng, rng_fillbuf,
+-				  rng_buffer_size(), 1);
++		rc = rng_get_data(rng, rng_fillbuf, rng_buffer_size(), true);
+ 		if (current_quality != rng->quality)
+ 			rng->quality = current_quality; /* obsolete */
+ 		quality = rng->quality;
