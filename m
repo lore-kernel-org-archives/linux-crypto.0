@@ -1,40 +1,33 @@
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DECA481FAF;
-	Tue,  5 May 2026 15:24:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C94848C8CC;
+	Tue,  5 May 2026 16:34:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777994667; cv=none; b=BuC1WlFlxIAzWUGvl+MQ+knOsq5WZPyDAS7NPPfJnUoelNiIOBSRoGJvsBw1Z0w4xXS9muixXR4wORY1f2sGWNLygD9PaHd2CuuIp9L8jo5TMiAZpND70K3dUsN8kjEU4PiFTz8mHIRl/YkWLp9txQM9Dd3yB4iwtYmzYe11TO8=
+	t=1777998845; cv=none; b=i04Kbqq5gpdyr2ooZAI5qD+eJDmdkI/KUcGb2dwYpiqlmmOiuQ4cxryVJq6HwzEvRQoGRgy2mSyJjw0qj2ap589e6CWLr31FSjIiSDQN0lox92KX5EwDtqlJMA//pZqBoFitHxzLAfFm4axtWFmMChFUOkkIHtfLUUftOGFxEXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777994667; c=relaxed/simple;
-	bh=TYLJCUs11De+IxnARIgVbv0RY+n0qr9eToShT4iy/W0=;
+	s=arc-20240116; t=1777998845; c=relaxed/simple;
+	bh=tN7fwzB7Rvm/u6+2EX9tISVHc7XTHrTV+kwSA1Ez0Zg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ImBFyki5iqKCt1P0HvdDW+naPLIn2DSgh3Z6jcuXEHuXmnWZMLuwWE8gqeTiy4es8ImMQ2uF17+5nsLyzEuvxwkocnTfyDvYB3L7TDPcJfWiTUabb1VdtAIQFUldUJ/bNSx1zQLLoj2Qlp4HaO97UIGTQXMOCxkzs5II2XB/7bI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=WczCGkuC; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	 In-Reply-To:Content-Type; b=rL9Xfhq/UpSl71xG8UGoRdA6dQ5nWA4CkqQ4u8vJbilJtGTYUa110rSNyq01bVGL2RBxFQhY0Jf5jnW+JVOWyGsutLiJDWKP1bKVsoafiOO6+GtwAO6uRPPkAqLMzbGDt9/IZP26xcAM3fn2hVGCmHQab6CNfaGF5piRBW+L33I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jMBNax/a; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="WczCGkuC"
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id A05AC4E42BB3;
-	Tue,  5 May 2026 15:24:23 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 6DC746053C;
-	Tue,  5 May 2026 15:24:23 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5BA5A11AD02D2;
-	Tue,  5 May 2026 17:24:17 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1777994662; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=O/ciYmWMR3lYydMKF5D/rPiOnaz1y6FpcPAyfKnu/BA=;
-	b=WczCGkuCy+Lr/nF9CAOPe6GeQgO5iKst4gdF7DDgz26d97sBc/ZcM5lGIMy1yBzL5irBd8
-	cQ1EvVrdKZq/scqZy7hVlFHZommT8mn84/NRDSOxjJnCqecOb6AaDX/Tz+y7OArbFJjajZ
-	5x8hECe5zbchkJdUZELqPJG94ZhfOm5XLqXx7UKDfZtIaifM4FJc8WjiaqOeflD8qEMJmE
-	Hr9L8IH7vT768b98A7rTKe80aE0ISsY1VSafwGzZ0ytENbUKzpvHwt7mNy6INH0U66pwAZ
-	cVqTE/SYnEn5TLnlpN0x+SBu2RoHrFjV/Gi4v67whQMMjiwm3yH4jaWxyrzarw==
-Message-ID: <60f67268-de8a-4e83-9038-c9fa55d1a25b@bootlin.com>
-Date: Tue, 5 May 2026 17:24:24 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jMBNax/a"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FEE9C2BCB4;
+	Tue,  5 May 2026 16:34:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1777998844;
+	bh=tN7fwzB7Rvm/u6+2EX9tISVHc7XTHrTV+kwSA1Ez0Zg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=jMBNax/aPk18eo9Bc84j49KRsEELtbPxD7pgo0d1OndSJao+LiWjXdqk1gtXhPuT1
+	 kuOJhYkMOUktGdjR2E3YJcXUnlpTUhmAW76ndOr7z8+hG68ZJ6+cS1n5q4ENRhocXW
+	 dKAUX/49J6bYEQaXJtvzkmzXbLwHuWxyLnoKMCq9dFepj7F5ny0kkFOOwsZp88NLWg
+	 D2EROoMRaX31/P7PrLsz/8lCYnV41868FvkpN7+3h8iXeCKwyEFQ+W9G3UMv0ECYza
+	 O+jlzCOvjHi7K/N1eVD00eLLDtZaYnTDpjGaSxZK7c79btkRt7HuGjc8hZkSgNiq5r
+	 yKV4u/mrV67Xg==
+Message-ID: <ac6b9bcf-0106-49fd-82ff-20ccc5612fa1@kernel.org>
+Date: Tue, 5 May 2026 18:34:00 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,78 +35,143 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/4] crypto: talitos - fix several issues in the Freescale
- talitos crypto driver
-To: Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- David Howells <dhowells@redhat.com>,
- Kim Phillips <kim.phillips@freescale.com>
+Subject: Re: [PATCH] lib/crypto: powerpc/md5: Drop powerpc optimized MD5 code
+To: Eric Biggers <ebiggers@kernel.org>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- Herve Codina <herve.codina@bootlin.com>,
- Christophe Leroy <chleroy@kernel.org>, stable@vger.kernel.org
-References: <20260504-bootlin_test-7-1-rc1_sec_bugfix-v1-0-c97c641976f5@bootlin.com>
-Content-Language: en-US
-From: Paul Louvel <paul.louvel@bootlin.com>
-In-Reply-To: <20260504-bootlin_test-7-1-rc1_sec_bugfix-v1-0-c97c641976f5@bootlin.com>
+ Ard Biesheuvel <ardb@kernel.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, linuxppc-dev@lists.ozlabs.org,
+ Nicholas Piggin <npiggin@gmail.com>, Michael Ellerman <mpe@ellerman.id.au>,
+ Madhavan Srinivasan <maddy@linux.ibm.com>
+References: <20260504041448.15820-1-ebiggers@kernel.org>
+ <111ea924-fef5-441e-9849-83f938c913a7@kernel.org> <20260504180044.GC2291@sol>
+Content-Language: fr-FR
+From: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
+In-Reply-To: <20260504180044.GC2291@sol>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
 
-Upon reviewing Sashiko’s feedback this morning, some interesting reviews has 
-been made.
-Please disregard the current series and wait for a v2.
 
-Thanks,
-Paul.
 
-On 5/4/26 5:38 PM, Paul Louvel wrote:
-> This series fixes several issues in the Freescale talitos crypto driver.
->
-> The first patch replaces the software workqueue approach introduced by
-> commit 655ef638a2bc ("crypto: talitos - fix SEC1 32k ahash request
-> limitation") to handle large requests. Depending on the SEC hardware
-> version, replace this approach by using facilities provided by the
-> hardware itself:
->
-> - On SEC1, descriptors can be chained with the Next Descriptor field.
->
-> - On SEC2, the per-channel fetch FIFO is used to submit multiple
->    descriptors.
->
-> This removes the workqueue-based splitting entirely and fix the (64k -
-> 1) byte ahash request limit on SEC2.
->
-> Patches 2-3 are cleanups that follow the first patch: a field rename for
-> clarity and folding a trivial wrapper function.
->
-> Patch 4 fixes an off-by-one in the submit_count initialisation that
-> wastes one FIFO slot.
->
-> Tested on an MPC885 SoC (SEC1 Lite), and on an MPC8321EMP SoC (SEC2).
->
-> Signed-off-by: Paul Louvel <paul.louvel@bootlin.com>
-> ---
-> Paul Louvel (4):
->        crypto: talitos - use hardware facilities for large ahash requests
->        crypto: talitos - rename first_desc/last_desc to first_request/last_request
->        crypto: talitos - remove useless wrapper
->        crypto: talitos - fix invalid submit_count initial value
->
->   drivers/crypto/talitos.c | 583 +++++++++++++++++++++++++----------------------
->   drivers/crypto/talitos.h |  14 ++
->   2 files changed, 322 insertions(+), 275 deletions(-)
-> ---
-> base-commit: db8b9f227833e729faf44a512aa1e88a625b5ad8
-> change-id: 20260504-bootlin_test-7-1-rc1_sec_bugfix-13169ed07ddc
->
-> Best regards,
-> --
-> Paul Louvel <paul.louvel@bootlin.com>
->
->
--- 
-Paul Louvel, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+Le 04/05/2026 à 20:00, Eric Biggers a écrit :
+> On Mon, May 04, 2026 at 03:28:24PM +0200, Christophe Leroy (CS GROUP) wrote:
+>> Hi Eric,
+>>
+>> Le 04/05/2026 à 06:14, Eric Biggers a écrit :
+>>> Earlier the decision was made to keep this code for a while, despite no
+>>> other architectures having optimized MD5 code anymore, because of
+>>> someone using it via AF_ALG via libkcapi-hasher
+>>> (https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fr%2Ff0d771d5-ed70-444c-957a-ad4c16f6c115%40csgroup.eu%2F&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7C8fce00ee4e5a497f0d8808deaa074073%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C639135145289986833%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=cS5krthqFluqLlSXBy4Dv0h34gms0bIYRUVfWetoAdg%3D&reserved=0)
+>>>
+>>> However, with AF_ALG itself now being on its way out due to its
+>>> continuous stream of security vulnerabilities
+>>> (https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fr%2F20260430011544.31823-1-ebiggers%40kernel.org%2F&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7C8fce00ee4e5a497f0d8808deaa074073%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C639135145290017177%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=bMbQdEM%2FQYmgz7lelwXuKepC2dZCvKz6Pa6ixwlGtrk%3D&reserved=0),
+>>> it's time to be a bit more forceful with nudging people towards
+>>> userspace crypto code.  It's always been the better solution anyway, and
+>>> it's much more efficient if properly optimized code is used.
+>>
+>> Ok, why not, but what do you propose as an alternative ? Let me explain the
+>> situation.
+>>
+>> We have two versions of boards:
+>> - One with powerpc MPC885E, which embeds a SECURITY Engine called TALITOS
+>> for offloading crypto operations
+>> - One with powerpc MPC866, which doesn't have the security engine.
+>>
+>> To use the security engine, our software use the AF_ALG interface (via
+>> libkcapi).
+>>
+>> Our software has to run on both boards, we can't afford two different
+>> versions of the software and the software shall have no dead code. Therefore
+>> we rely on the capability of the kernel to do the hash by itself when the
+>> TALITOS in not available.
+>>
+>> The kernel has always been the place where we do board specific stuff, not
+>> the application. I can't see why the application would have to ask the
+>> kernel when the Talitos is there and have to do the hashing by itself when
+>> the Talitos is not there.
+>>
+>> I'm really concerned with the optimised MD5 going away now, and I'm also
+>> wondering what will be the way to splice a file into the kernel and get it's
+>> MD-5 hash from the TALITOS if AF_ALG goes away in medium-term.
+>>
+>> What is the way forward ? I'm open to any suggestion as I really can't see
+>> where to go for now.
+>>
+>> But please don't remove powerpc MD5 before we find an alternative solution.
+>>
+>> Thanks
+>> Christophe
+> 
+> I think I gave the solution in the commit message already, no?  Take the
+> same MD5 code and run it in userspace.  It will be even faster than
+> invoking that code via AF_ALG.
+> 
+> Yes, the selection of software vs "security" engine (if you actually
+> still need the latter, which in reality you probably don't) would then
+> occur in userspace.  But selecting an implementation in userspace isn't
+> unusual.  It's no different from how different CPU features are handled
+> in userspace.
+> 
+> Anyway, please don't confuse this patch (which only affects performance)
+> with full removal of AF_ALG (which would be a hard break, and won't
+> occur until quite far in the future).  This patch is just a nudge in the
+> right direction, and a cleanup of the kernel's powerpc support to be
+> aligned with all the other architectures.  So I do believe we should
+> proceed with this patch.
 
+But this cleanup is a huge performance regression. If it had been a few 
+% why not, but here we are talking about 30% more time. And userspace is 
+even worse, see below. I really doubt that porting the ASM 
+implementation into userspace will make the regression disappear.
+
+Lets give a summary on performance:
+
+With the TALITOS security engine embedded on powerpc 885:
+
+root@miae:~# time md5sum avion.au
+6513851d6109d42477b20cd56bf57f28  avion.au
+real    0m 0.71s
+user    0m 0.00s
+sys     0m 0.38s
+
+With kernel PPC MD5:
+
+root@miae:~# time md5sum avion.au
+6513851d6109d42477b20cd56bf57f28  avion.au
+real    0m 1.01s
+user    0m 0.01s
+sys     0m 1.00s
+
+With kernel generic MD5:
+
+root@miae:~# time md5sum avion.au
+6513851d6109d42477b20cd56bf57f28  avion.au
+real    0m 1.31s
+user    0m 0.01s
+sys     0m 1.30s
+
+With userspace MD5:
+
+root@miae:~# time ./busybox md5sum avion.au
+6513851d6109d42477b20cd56bf57f28  avion.au
+real    0m 2.38s
+user    0m 1.99s
+sys     0m 0.38s
+
+
+Now, we are talking about MD5 which is obsolete and being replaced in 
+our systems by SHA256. So a commit message ressembling to the one in 
+commit 23e5c306a207 ("lib/crypto: sparc: Drop optimized MD5 code") would 
+be better as a justification for the removal.
+
+With the commit message modified to explain that MD5 is obsolete and 
+using it is risky as you explained in the Sparc commit message, you can 
+add Acked-by: Christophe Leroy (CS GROUP) <chleroy@kernel.org>
+
+But please consider the above performance comparison when addressing the 
+AF_ALG removal.
+
+By the way, what are your plans for SHA1 ? I think SHA1 should likely go 
+away as well for the same reason.
+
+Christophe
