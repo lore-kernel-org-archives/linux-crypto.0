@@ -1,288 +1,99 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21BC036495F;
-	Mon,  4 May 2026 22:53:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7032C1C84CB;
+	Tue,  5 May 2026 03:31:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777935237; cv=none; b=oT8xS4SD7dAZu3MokHL0hx2480dH7p6n2M20xFXc8InR9QZI23K5SZ7WiB2hz32uMgquaZYwq81ayTVfFA1JtJ6OjSOElBuCz4HxiTzPv4/8cSQUrCWUwL1BgAm9j1Avcdq8xqt6nsw2A+8xXETSTjqyvDkSeVd6/xeR2o9fjcA=
+	t=1777951908; cv=none; b=H4nhxpCWNNA79O1nXZvCoyjtk3cCmr46wWih2h5vqziI5nQ+dEJK8+thyijXu7R/SUIJJZnQAL5WQ0r1NnJB/8x8bk7vi7PxeV40F+xeVKeZdoXLbqsfhyVHyN/VR8rNImlET2SfLTQFwKc6ziDY7m1SHfLUBkraPRwCaWTqqf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777935237; c=relaxed/simple;
-	bh=i2fPoHqb8xx58hB925XeINZ1xXUggfULPyDbIosH0Lg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dDlGExiyyDAqqNCGw918rQIchCjT45KKWQFs+aSdJfwkGDXrDXLkAhGUPXWGZoh/ptzXP77g7xyufvwPvmsHH+YVIYarK8bQ29RD4O/D6Pl9RKPqs+hmLewjf5dawmlKzK7Mq7xvYGtYNG0ap9qZGktclCgkgMSdsGC0N5t+tMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Es82fauC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1777951908; c=relaxed/simple;
+	bh=iiqHOsAFsazNL57u8bihoo1YRGGwHorFLAbaNqpNYnc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D8TtRVO0dilihBtOizasv2T9Q6K8uIInEaFMPTf9ha1H7AcOq7zBfmO+iDupwGb/akBTGyylUtqDWgq2WgOIUBD5IGyQpgTSDnyqNXUWWTFldU0fsHdSX7PfbfLzr2jykuJX20M/s4J54hlNN0ym+JLktTDTkQhlB/Kn38tp7nU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=E/X/hK+8; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Es82fauC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E612C2BCB8;
-	Mon,  4 May 2026 22:53:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1777935236;
-	bh=i2fPoHqb8xx58hB925XeINZ1xXUggfULPyDbIosH0Lg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Es82fauCn2gm1BNzPMKFu4D/4fDab1uEpE48DXZvZ+mRHGMTWATBvYsl1yIpnA1CS
-	 Mf9hYt2AoMZSCdnuBmwGGSzZTnh3pgMLUEfBaFgseiUmCwqKpavwyxTi4ROvd3fXGh
-	 NtlVFUMJL8Gk8LcsoS4XU2IeqeMTa4gemISG9ffd1c1B20FIRhY6OZchyXzq33Uad4
-	 KavXcdDkUYb/2aPJv7xl0Ri7rGoQ3/hy13SQFtc2l0isaStJzQRC/9cd4wxhou2Dtn
-	 YbzFBzBau/lQSxbfS4/CqOWmfoURgu4O2e79RIdewk392cdr+mxPy6Wzq2hbbKCnxs
-	 rtdbpBT0sTh9Q==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	Taeyang Lee <0wn@theori.io>,
-	Brian Pak <bpak@theori.io>,
-	Juno Im <juno@theori.io>,
-	Jungwon Lim <setuid0@theori.io>,
-	Tim Becker <tjbecker@theori.io>,
-	Demi Marie Obenour <demiobenour@gmail.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Feng Ning <feng@innora.ai>,
-	stable@vger.kernel.org
-Subject: [PATCH v3] crypto: af_alg - Remove zero-copy support from skcipher and aead
-Date: Mon,  4 May 2026 15:53:28 -0700
-Message-ID: <20260504225328.25356-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260504092442.GA2486@quark>
-References: <20260504092442.GA2486@quark>
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="E/X/hK+8"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=BDIZaj9sKUzVIvKQBjt+PPO4Po68FG/I9lR6Wy4i0VU=; 
+	b=E/X/hK+8uEptNJfGnO8wdcEaufyEtRun1JDFUwkNIAHIs+I3ZelzX04MB2BFB6IyYpgaFFp6ed1
+	eVEroN9nSlhx7E3JQz0yFRfQLy4cnxnY4wIVRUbpaRi70u6ofU6iMz9aotHM089oyHnKu4nNUXa17
+	wX5uxHbyS93FL5elTjmecCJOjKq6v1Nxq4/ylmoROIzkm/CE05bFevfkHPsdFiQxDxrV7BfM9AC4g
+	nzUavhNkd1r+wl33O1+tjLLpk9VXkcIeDagdAoCkKWcgsh/nVyPN3uy71hQ/1xSIEp42Lzs72T1ww
+	IMv/kCEGWy3Ns/NXIlRbrQq+461TLG4XjRrA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1wK6VQ-00BJBl-2k;
+	Tue, 05 May 2026 11:31:33 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 05 May 2026 11:31:32 +0800
+Date: Tue, 5 May 2026 11:31:32 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, robh@kernel.org, conor+dt@kernel.org,
+	Ruud.Derwig@synopsys.com, manjunath.hadli@vayavyalabs.com,
+	adityak@vayavyalabs.com, navami.telsang@vayavyalabs.com,
+	bhoomikak@vayavyalabs.com
+Subject: Re: [PATCH v12 2/4] crypto: spacc - Add SPAcc ahash support
+Message-ID: <aflklGva2ZoAz-A9@gondor.apana.org.au>
+References: <20260416064451.99886-1-pavitrakumarm@vayavyalabs.com>
+ <20260416064451.99886-3-pavitrakumarm@vayavyalabs.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260416064451.99886-3-pavitrakumarm@vayavyalabs.com>
 
-The zero-copy support is one of the riskiest aspects of AF_ALG.  It
-allows userspace to request cryptographic operations directly on
-pagecache pages of files like the 'su' binary.  It also allows userspace
-to concurrently modify the memory which is being operated on, a recipe
-for TOCTOU vulnerabilities.
+On Thu, Apr 16, 2026 at 12:14:49PM +0530, Pavitrakumar Managutte wrote:
+>
+> +/*
+> + * Allocate a job for spacc module context and initialize
+> + * it with an appropriate type.
+> + */
+> +int spacc_open(struct spacc_device *spacc, int enc, int hash, int ctxid,
+> +	       int secure_mode, spacc_callback cb, void *cbdata)
+> +{
+> +	size_t i;
+> +	int ret = 0;
+> +	u32 ctrl = 0;
+> +	int job_idx = 0;
+> +	bool ctx_reused = false;
+> +	struct spacc_job *job = NULL;
+> +	const struct enc_config *enc_cfg = NULL;
+> +	const struct hash_config *hash_cfg = NULL;
+> +	unsigned long flags;
+> +
+> +	/*
+> +	 * Acquire the semaphore. This will decrement the count. If the count
+> +	 * is already zero (meaning all HW contexts are in use), this call
+> +	 * will sleep interruptibly until another thread calls up().
+> +	 */
+> +	if (down_interruptible(&spacc->ctx_sem)) {
+> +		dev_dbg(spacc->dptr, "ERR: Interrupted by signal\n");
+> +		return -ERESTARTSYS; /* Woken by a signal */
+> +	}
 
-While zero-copy support is more valuable in other areas of the kernel
-like the frequently used networking and file I/O code, it has far less
-value in AF_ALG, which is a niche UAPI.  AF_ALG primarily just exists
-for backwards compatibility with a small set of userspace programs such
-as 'iwd' that haven't yet been fixed to use userspace crypto code.
+This may sleep.  While we used to allow sleeping in setkey, this
+is being phased out so new drivers should not do that.
 
-Originally AF_ALG was intended to be used to access hardware crypto
-accelerators.  However, it isn't an efficient interface for that anyway,
-and it turned out to be rarely used in this way in practice.
+This also raises the question of whether spacc_open should even
+be called from setkey.  The setkey call could be very far away
+from the actual hash processing, so allocating a handle in setkey
+seems to be a waste.
 
-Thus, the risks of the zero-copy support in AF_ALG vastly outweigh its
-benefits.  Let's just remove it.
+As you can allocate handles from do_one_request, why not just do
+that always?
 
-This commit removes it from the "skcipher" and "aead" algorithm types.
-"hash" will be handled separately.
-
-This is a soft break, not a hard break.  Even after this commit, it
-still works to use splice() or sendfile() to transfer data to an AF_ALG
-request socket from a pipe or any file, respectively.  What changes is
-just that the kernel now makes an internal, stable copy of the data
-before doing the crypto operation.  So performance is slightly reduced,
-but the UAPI isn't broken.  And, very importantly, it's much safer.
-
-Tested with libkcapi/test.sh.  All its test cases still pass.  I also
-verified that this would have prevented the copy.fail exploit as well.
-I also used a custom test program to verify that sendfile() still works.
-
-Fixes: 8ff590903d5f ("crypto: algif_skcipher - User-space interface for skcipher operations")
-Fixes: 400c40cf78da ("crypto: algif - add AEAD support")
-Reported-by: Taeyang Lee <0wn@theori.io>
-Link: https://copy.fail/
-Reported-by: Feng Ning <feng@innora.ai>
-Closes: https://lore.kernel.org/r/afYcc-tZFwvZZo76@ans-MacBook-Pro.local
-Reviewed-by: Demi Marie Obenour <demiobenour@gmail.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
-
-v3: improved explanation
-v2: added tags
-
- Documentation/crypto/userspace-if.rst | 31 ++----------
- crypto/af_alg.c                       | 73 +++++++++------------------
- crypto/algif_aead.c                   |  8 +--
- 3 files changed, 33 insertions(+), 79 deletions(-)
-
-diff --git a/Documentation/crypto/userspace-if.rst b/Documentation/crypto/userspace-if.rst
-index 021759198fe7..d220e266b8de 100644
---- a/Documentation/crypto/userspace-if.rst
-+++ b/Documentation/crypto/userspace-if.rst
-@@ -325,37 +325,14 @@ CRYPTO_USER_API_RNG_CAVP option:
-    but only after the entropy has been set.
- 
- Zero-Copy Interface
- -------------------
- 
--In addition to the send/write/read/recv system call family, the AF_ALG
--interface can be accessed with the zero-copy interface of
--splice/vmsplice. As the name indicates, the kernel tries to avoid a copy
--operation into kernel space.
--
--The zero-copy operation requires data to be aligned at the page
--boundary. Non-aligned data can be used as well, but may require more
--operations of the kernel which would defeat the speed gains obtained
--from the zero-copy interface.
--
--The system-inherent limit for the size of one zero-copy operation is 16
--pages. If more data is to be sent to AF_ALG, user space must slice the
--input into segments with a maximum size of 16 pages.
--
--Zero-copy can be used with the following code example (a complete
--working example is provided with libkcapi):
--
--::
--
--    int pipes[2];
--
--    pipe(pipes);
--    /* input data in iov */
--    vmsplice(pipes[1], iov, iovlen, SPLICE_F_GIFT);
--    /* opfd is the file descriptor returned from accept() system call */
--    splice(pipes[0], NULL, opfd, NULL, ret, 0);
--    read(opfd, out, outlen);
-+AF_ALG used to have zero-copy support, but it was removed due to it being a
-+frequent source of vulnerabilities.  For backwards compatibility the splice()
-+and sendfile() system calls are still supported, but the kernel will make an
-+internal copy of the data before passing it to the crypto code.
- 
- 
- Setsockopt Interface
- --------------------
- 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 5a00c18eb145..fce0b87c2b65 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -971,11 +971,11 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
- 		struct scatterlist *sg;
- 		size_t len = size;
- 		ssize_t plen;
- 
- 		/* use the existing memory in an allocated page */
--		if (ctx->merge && !(msg->msg_flags & MSG_SPLICE_PAGES)) {
-+		if (ctx->merge) {
- 			sgl = list_entry(ctx->tsgl_list.prev,
- 					 struct af_alg_tsgl, list);
- 			sg = sgl->sg + sgl->cur - 1;
- 			len = min_t(size_t, len,
- 				    PAGE_SIZE - sg->offset - sg->length);
-@@ -1015,64 +1015,41 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
- 				 list);
- 		sg = sgl->sg;
- 		if (sgl->cur)
- 			sg_unmark_end(sg + sgl->cur - 1);
- 
--		if (msg->msg_flags & MSG_SPLICE_PAGES) {
--			struct sg_table sgtable = {
--				.sgl		= sg,
--				.nents		= sgl->cur,
--				.orig_nents	= sgl->cur,
--			};
--
--			plen = extract_iter_to_sg(&msg->msg_iter, len, &sgtable,
--						  MAX_SGL_ENTS - sgl->cur, 0);
--			if (plen < 0) {
--				err = plen;
-+		do {
-+			struct page *pg;
-+			unsigned int i = sgl->cur;
-+
-+			plen = min_t(size_t, len, PAGE_SIZE);
-+
-+			pg = alloc_page(GFP_KERNEL);
-+			if (!pg) {
-+				err = -ENOMEM;
- 				goto unlock;
- 			}
- 
--			for (; sgl->cur < sgtable.nents; sgl->cur++)
--				get_page(sg_page(&sg[sgl->cur]));
-+			sg_assign_page(sg + i, pg);
-+
-+			err = memcpy_from_msg(page_address(sg_page(sg + i)),
-+					      msg, plen);
-+			if (err) {
-+				__free_page(sg_page(sg + i));
-+				sg_assign_page(sg + i, NULL);
-+				goto unlock;
-+			}
-+
-+			sg[i].length = plen;
- 			len -= plen;
- 			ctx->used += plen;
- 			copied += plen;
- 			size -= plen;
--		} else {
--			do {
--				struct page *pg;
--				unsigned int i = sgl->cur;
--
--				plen = min_t(size_t, len, PAGE_SIZE);
--
--				pg = alloc_page(GFP_KERNEL);
--				if (!pg) {
--					err = -ENOMEM;
--					goto unlock;
--				}
--
--				sg_assign_page(sg + i, pg);
--
--				err = memcpy_from_msg(
--					page_address(sg_page(sg + i)),
--					msg, plen);
--				if (err) {
--					__free_page(sg_page(sg + i));
--					sg_assign_page(sg + i, NULL);
--					goto unlock;
--				}
--
--				sg[i].length = plen;
--				len -= plen;
--				ctx->used += plen;
--				copied += plen;
--				size -= plen;
--				sgl->cur++;
--			} while (len && sgl->cur < MAX_SGL_ENTS);
--
--			ctx->merge = plen & (PAGE_SIZE - 1);
--		}
-+			sgl->cur++;
-+		} while (len && sgl->cur < MAX_SGL_ENTS);
-+
-+		ctx->merge = plen & (PAGE_SIZE - 1);
- 
- 		if (!size)
- 			sg_mark_end(sg + sgl->cur - 1);
- 	}
- 
-diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
-index cb651ab58d62..c6c2ce21895d 100644
---- a/crypto/algif_aead.c
-+++ b/crypto/algif_aead.c
-@@ -7,14 +7,14 @@
-  * This file provides the user-space API for AEAD ciphers.
-  *
-  * The following concept of the memory management is used:
-  *
-  * The kernel maintains two SGLs, the TX SGL and the RX SGL. The TX SGL is
-- * filled by user space with the data submitted via sendmsg (maybe with
-- * MSG_SPLICE_PAGES).  Filling up the TX SGL does not cause a crypto operation
-- * -- the data will only be tracked by the kernel. Upon receipt of one recvmsg
-- * call, the caller must provide a buffer which is tracked with the RX SGL.
-+ * filled by user space with the data submitted via sendmsg.  Filling up the TX
-+ * SGL does not cause a crypto operation -- the data will only be tracked by the
-+ * kernel. Upon receipt of one recvmsg call, the caller must provide a buffer
-+ * which is tracked with the RX SGL.
-  *
-  * During the processing of the recvmsg operation, the cipher request is
-  * allocated and prepared. As part of the recvmsg operation, the processed
-  * TX buffers are extracted from the TX SGL into a separate SGL.
-  *
-
-base-commit: c7e4e4d5f7dc2daa439303d1b5bf6bdfaa249f49
+Thanks,
 -- 
-2.54.0
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
