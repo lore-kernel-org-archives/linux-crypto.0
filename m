@@ -1,42 +1,42 @@
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 073184A2E35;
-	Tue,  5 May 2026 17:53:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BEC24963B6
+	for <linux-crypto@vger.kernel.org>; Tue,  5 May 2026 17:53:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778003637; cv=none; b=U6UQlHhqwNticpv+q9UQB539Krpjlj9jHXGPUWxpBwebScIQ06G56cULsKV61Z6mrHzi6m4mbTPv+yJCQS1roXhu7ZaWlBh347nsLUFC9d8ZQBO52kV/1aRH4+5wQU33ztJ0bgBj7spWs7x3wutiBSfu2/mOvtAWRKhBxalGygs=
+	t=1778003639; cv=none; b=rHRJ0CuHU60eH+pROniXO6njwlGAW0Nu42XP/6pyXC8EJvLoIR2MOWML0XZQcvqgvj1kpPPGmskZtN6n5dwueXveaH3Lg2oh3vAYW4MFVGqW+6QrlzLEccE6C0nhbSQz6+l3GSICvPgwLw+6guhRQ/Ko1cIa8nbHkhHMvKyeLJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778003637; c=relaxed/simple;
-	bh=NISdsgI9JatB76MR09v/Eb2pVygURjKaC3Ap2XbahlI=;
+	s=arc-20240116; t=1778003639; c=relaxed/simple;
+	bh=2HprfiJ0pisWR//NJMpSah5IqgwIGz1YNJLlOWkvG9M=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=XzSBJXcEY5haO53uF8QLGLXLoeMjaQUYjXP5/br2acGNQScb486NmBBIORq8h5L4MRz4/G1XG7/+qfGOzC4Etr0XkC+6xe5qrlDaH/CkhDnIoMuWsWaGvBqc/nj/MLIXwZOw3u6Ahv1LIDgto/hugXT+fLa7Jl+EqFlpUqpSCc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=E/RnGFnB; arc=none smtp.client-ip=185.171.202.116
+	 In-Reply-To:To:Cc; b=jyQ/u6tv52rNOwqKgbsEhPnmFTyawNJisJyQJtsDnFgRDiHa61b7Z6uRidsWB1VJg8JtIm6MA1D1mBJjFxTcNadwQl+2r/s4SL0IVGsWVhgA7Dg5flMlVfN4UXTTyBdnTwuDdH2So2JJsZ4hbN0IwTRU3brbJHLv9C7kmCKx3xs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=j7mcfpQN; arc=none smtp.client-ip=185.246.85.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="E/RnGFnB"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="j7mcfpQN"
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 93726C5CD45;
-	Tue,  5 May 2026 17:54:40 +0000 (UTC)
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 80BCB4E42BD6;
+	Tue,  5 May 2026 17:53:55 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id A92736053C;
-	Tue,  5 May 2026 17:53:53 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A8FEB11AD03AB;
-	Tue,  5 May 2026 19:53:51 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 573F26053C;
+	Tue,  5 May 2026 17:53:55 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 22BE811AD040F;
+	Tue,  5 May 2026 19:53:53 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1778003632; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1778003634; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=MEZqsuDQbbQ+QfwiLanmP4l2UhzdbO4iCh1W8/Tkplk=;
-	b=E/RnGFnBZLpT+QccyXYtjr49gYXW3a+EeqNzNC5JQSgrbKCmmiGGXMQkB7J0Bajylo8vEw
-	Zk9ZGpBPMBIwJ6dToOKwTpt1McxfsoBQfOwQzc07PAmfeoeWvDr/nqM3KMKF8iHVOJoW1e
-	yS9ca2sJrlu2NX1fJhiZJfSm813Ht3VFieJfOXjrrDxt4WZH+xl01GL/hp6xX87n4yaenk
-	2N7qGUE43hN0R1riDVX4xkdXxuMunn6LbKncBJ4jHHgcLfYCaYUrRcFjteNp/wnRmF1ps1
-	r0KwwQv4A5vhk9zGKEOifjQsQCN+3m+Qi4gsP3ZD6pbaaA/2+vESDUZLqzH2Dg==
+	bh=FoC8tR9VPR8Ki1XrtOVKBVTKCTXbNjL0c7/3kI3kmHU=;
+	b=j7mcfpQN7jZHrLFx98oEP4uvPoHlaVcyTxVKro8fIBlnD2yWSjHoykGJ9w1K4qaI2BOCbA
+	6Xa5QJXvMsnC8NeIyzwmy2+E6DkRy/JCJ84odm6KzFtjfgcYzveKIc7CDakyJe+MSYcw0G
+	6bJ5yFArVtJH+ewYR12n06XyjalO5oH61QR87cn0zCrvhV6YIskUDzb5g5OC/4e1ZZ86AY
+	d9tiegsuJpTdS1WvRd0VhY0XhMiSlZslIOpNeRTmT/AwQTr4LYdvw+9mPllXJ2jxC18zdF
+	/FV4dzIDNyTmVwhHu4QaCp0U+WXzNiWtw/i8furnU0hJAYOuC/RdzPtG9m8Hqw==
 From: Paul Louvel <paul.louvel@bootlin.com>
-Date: Tue, 05 May 2026 19:53:04 +0200
-Subject: [PATCH v2 03/12] crypto: talitos - move dma unmapping code in
- flush_channel() into a standalone dma_unmap_request() function
+Date: Tue, 05 May 2026 19:53:05 +0200
+Subject: [PATCH v2 04/12] crypto: talitos - move dma mapping code in
+ talitos_submit() into a standalone dma_map_request() function
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -45,7 +45,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260505-bootlin_test-7-1-rc1_sec_bugfix-v2-3-5818064bd190@bootlin.com>
+Message-Id: <20260505-bootlin_test-7-1-rc1_sec_bugfix-v2-4-5818064bd190@bootlin.com>
 References: <20260505-bootlin_test-7-1-rc1_sec_bugfix-v2-0-5818064bd190@bootlin.com>
 In-Reply-To: <20260505-bootlin_test-7-1-rc1_sec_bugfix-v2-0-5818064bd190@bootlin.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>, 
@@ -58,93 +58,131 @@ Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
  Herve Codina <herve.codina@bootlin.com>, 
  Paul Louvel <paul.louvel@bootlin.com>, stable@vger.kernel.org
 X-Mailer: b4 0.15.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1778003630; l=2441;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1778003630; l=3486;
  i=paul.louvel@bootlin.com; s=20260313; h=from:subject:message-id;
- bh=NISdsgI9JatB76MR09v/Eb2pVygURjKaC3Ap2XbahlI=;
- b=gWTReQzsiTHShjmnIc/8JG4TZyFn0Ry0yzeg4yA0e9AAd30XDQJWGab9hPxaPUT83+ASCuRyJ
- JRx2+evlQb7CLVBVKj9PY38Jh3Hv7pfN9vQ+qhwtbRZGLKBXfiuVDr4
+ bh=2HprfiJ0pisWR//NJMpSah5IqgwIGz1YNJLlOWkvG9M=;
+ b=29CIUBYQOQVX8MDt1numu7iV8eo+NfAQ71iNLQU0uuq+jrpS57+wumhSmgKX7I8LKvi/BHqeA
+ 4WXDaxIQ+RPBzvvmz2e9iIW72LJwumd9oYJRtaqoUedDyN6b4NKMoS9
 X-Developer-Key: i=paul.louvel@bootlin.com; a=ed25519;
  pk=eLW50NT18UAvUT5cAcYf88zNbBCZDLFXuptpyLVhVIU=
 X-Last-TLS-Session-Version: TLSv1.3
 
-Previously added code to flush_channel() in order to unmap an entire
-descriptor.
+Previously added code to talitos_submit() in order to map an entire
+descriptor chain.
 
 Move that code into a standalone function to improve readability.
 
 Cc: stable@vger.kernel.org
 Signed-off-by: Paul Louvel <paul.louvel@bootlin.com>
 ---
- drivers/crypto/talitos.c | 42 ++++++++++++++++++++++++------------------
- 1 file changed, 24 insertions(+), 18 deletions(-)
+ drivers/crypto/talitos.c | 79 ++++++++++++++++++++++++++----------------------
+ 1 file changed, 43 insertions(+), 36 deletions(-)
 
 diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index d68d307c54f7..e26689bf7c9d 100644
+index e26689bf7c9d..3b1d8e34e86e 100644
 --- a/drivers/crypto/talitos.c
 +++ b/drivers/crypto/talitos.c
-@@ -380,6 +380,29 @@ static __be32 get_request_hdr(struct device *dev, struct talitos_request *reques
- 	return desc->hdr1;
+@@ -256,6 +256,48 @@ static int init_device(struct device *dev)
+ 	return 0;
  }
  
-+static void dma_unmap_request(struct device *dev,
-+			      struct talitos_request *request, bool is_sec1)
++static void dma_map_request(struct device *dev, struct talitos_request *request,
++			    struct talitos_desc *desc, bool is_sec1)
 +{
-+	struct talitos_edesc *edesc;
++	struct talitos_edesc *edesc =
++		container_of(desc, struct talitos_edesc, desc);
++	dma_addr_t dma_desc, prev_dma_desc;
++	struct talitos_edesc *prev_edesc = NULL;
 +
 +	if (is_sec1) {
-+		dma_unmap_single(dev, request->dma_desc, TALITOS_DESC_SIZE,
-+				 DMA_BIDIRECTIONAL);
++		request->desc_chain = edesc->node.prev;
 +
 +		list_for_each_entry(edesc, request->desc_chain, node) {
-+			if (!edesc->desc.next_desc)
-+				break;
++			edesc->desc.hdr1 = edesc->desc.hdr;
 +
-+			dma_unmap_single(dev,
-+					 be32_to_cpu(edesc->desc.next_desc),
-+					 TALITOS_DESC_SIZE, DMA_BIDIRECTIONAL);
++			dma_desc = dma_map_single(dev, &edesc->desc.hdr1,
++						  TALITOS_DESC_SIZE,
++						  DMA_BIDIRECTIONAL);
++
++			if (!prev_edesc) {
++				request->dma_desc = dma_desc;
++				goto next;
++			}
++
++			/* Chain in any previous descriptors. */
++
++			prev_edesc->desc.next_desc = cpu_to_be32(dma_desc);
++
++			dma_sync_single_for_device(dev, prev_dma_desc,
++						   TALITOS_DESC_SIZE,
++						   DMA_TO_DEVICE);
++
++next:
++			prev_edesc = edesc;
++			prev_dma_desc = dma_desc;
 +		}
 +	} else {
-+		dma_unmap_single(dev, request->dma_desc, TALITOS_DESC_SIZE,
-+				 DMA_BIDIRECTIONAL);
++		request->dma_desc = dma_map_single(dev, desc, TALITOS_DESC_SIZE,
++						   DMA_BIDIRECTIONAL);
++		request->desc_chain = NULL;
 +	}
 +}
 +
- /*
-  * process what was done, notify callback of error if not
-  */
-@@ -387,7 +410,6 @@ static void flush_channel(struct device *dev, int ch, int error, int reset_ch)
+ /**
+  * talitos_submit - submits a descriptor to the device for processing
+  * @dev:	the SEC device to be used
+@@ -274,10 +316,7 @@ static int talitos_submit(struct device *dev, int ch, struct talitos_desc *desc,
+ 					   void *context, int error),
+ 			  void *context)
  {
+-	struct talitos_edesc *edesc = container_of(desc, struct talitos_edesc, desc);
  	struct talitos_private *priv = dev_get_drvdata(dev);
- 	struct talitos_request *request, saved_req;
--	struct talitos_edesc *edesc;
+-	dma_addr_t dma_desc, prev_dma_desc;
+-	struct talitos_edesc *prev_edesc = NULL;
+ 	struct talitos_request *request;
  	unsigned long flags;
- 	int tail, status;
- 	bool is_sec1 = has_ftr_sec1(priv);
-@@ -412,23 +434,7 @@ static void flush_channel(struct device *dev, int ch, int error, int reset_ch)
- 			else
- 				status = error;
+ 	int head;
+@@ -295,39 +334,7 @@ static int talitos_submit(struct device *dev, int ch, struct talitos_desc *desc,
+ 	request = &priv->chan[ch].fifo[head];
  
--		if (is_sec1) {
--			dma_unmap_single(dev, request->dma_desc,
--					 TALITOS_DESC_SIZE, DMA_BIDIRECTIONAL);
+ 	/* map descriptor and save caller data */
+-	if (is_sec1) {
+-		request->desc_chain = edesc->node.prev;
 -
--			list_for_each_entry(edesc, request->desc_chain, node) {
--				if (!edesc->desc.next_desc)
--					break;
+-		list_for_each_entry(edesc, request->desc_chain, node) {
+-			edesc->desc.hdr1 = edesc->desc.hdr;
 -
--				dma_unmap_single(
--					dev, be32_to_cpu(edesc->desc.next_desc),
--					TALITOS_DESC_SIZE, DMA_BIDIRECTIONAL);
+-			dma_desc = dma_map_single(dev, &edesc->desc.hdr1,
+-						  TALITOS_DESC_SIZE,
+-						  DMA_BIDIRECTIONAL);
+-
+-			if (!prev_edesc) {
+-				request->dma_desc = dma_desc;
+-				goto next;
 -			}
--		} else {
--			dma_unmap_single(dev, request->dma_desc,
--					TALITOS_DESC_SIZE,
--					DMA_BIDIRECTIONAL);
+-
+-			/* Chain in any previous descriptors. */
+-
+-			prev_edesc->desc.next_desc = cpu_to_be32(dma_desc);
+-
+-			dma_sync_single_for_device(dev, prev_dma_desc,
+-						   TALITOS_DESC_SIZE,
+-						   DMA_TO_DEVICE);
+-
+-next:
+-			prev_edesc = edesc;
+-			prev_dma_desc = dma_desc;
 -		}
-+		dma_unmap_request(dev, request, is_sec1);
+-	} else {
+-		request->dma_desc = dma_map_single(dev, desc,
+-						   TALITOS_DESC_SIZE,
+-						   DMA_BIDIRECTIONAL);
+-		request->desc_chain = NULL;
+-	}
++	dma_map_request(dev, request, desc, is_sec1);
+ 	request->callback = callback;
+ 	request->context = context;
  
- 		/* copy entries so we can call callback outside lock */
- 		saved_req.desc = request->desc;
 
 -- 
 2.53.0
