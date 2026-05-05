@@ -1,47 +1,44 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7032C1C84CB;
-	Tue,  5 May 2026 03:31:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBE523B2FCC;
+	Tue,  5 May 2026 05:34:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777951908; cv=none; b=H4nhxpCWNNA79O1nXZvCoyjtk3cCmr46wWih2h5vqziI5nQ+dEJK8+thyijXu7R/SUIJJZnQAL5WQ0r1NnJB/8x8bk7vi7PxeV40F+xeVKeZdoXLbqsfhyVHyN/VR8rNImlET2SfLTQFwKc6ziDY7m1SHfLUBkraPRwCaWTqqf4=
+	t=1777959250; cv=none; b=rQtMMRnecG8vx+r6AdPJbpBTPQ8qlrAOpoweVEKXEIDDUYlk0zQ0YWE+OZktBCSkfrpTw/kJjIig3Kj2VFeshMlHpVDEglhpEp2vToVefZTpf5Z07zyXXGuszYl0BVe+JRsIRvDVnkHs2Dg7cTCHxzShCKvWoR+6MqzhVMta++g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777951908; c=relaxed/simple;
-	bh=iiqHOsAFsazNL57u8bihoo1YRGGwHorFLAbaNqpNYnc=;
+	s=arc-20240116; t=1777959250; c=relaxed/simple;
+	bh=SgD0sbxmJkxk063EDpeWAgwvCybKLAiSda4Z36o+fJ8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D8TtRVO0dilihBtOizasv2T9Q6K8uIInEaFMPTf9ha1H7AcOq7zBfmO+iDupwGb/akBTGyylUtqDWgq2WgOIUBD5IGyQpgTSDnyqNXUWWTFldU0fsHdSX7PfbfLzr2jykuJX20M/s4J54hlNN0ym+JLktTDTkQhlB/Kn38tp7nU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=E/X/hK+8; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=DK9sP5rxCBrBjXJnqfIm9pM2IVk5UhajaHLTQGIAwuo0hVwjzYCUST4KsLoWdlliIC2CCCaywL12w/CAMMDZpLJJAm/4CvUNEY/N2X/ZhfQ4vf2aL59BDWppOaNfQQAMfnpJZjJjiO3m7xpfBgzPTw5uJ3tqWyOpZ7ia3atjrx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=YS1Yspqc; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="E/X/hK+8"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="YS1Yspqc"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=BDIZaj9sKUzVIvKQBjt+PPO4Po68FG/I9lR6Wy4i0VU=; 
-	b=E/X/hK+8uEptNJfGnO8wdcEaufyEtRun1JDFUwkNIAHIs+I3ZelzX04MB2BFB6IyYpgaFFp6ed1
-	eVEroN9nSlhx7E3JQz0yFRfQLy4cnxnY4wIVRUbpaRi70u6ofU6iMz9aotHM089oyHnKu4nNUXa17
-	wX5uxHbyS93FL5elTjmecCJOjKq6v1Nxq4/ylmoROIzkm/CE05bFevfkHPsdFiQxDxrV7BfM9AC4g
-	nzUavhNkd1r+wl33O1+tjLLpk9VXkcIeDagdAoCkKWcgsh/nVyPN3uy71hQ/1xSIEp42Lzs72T1ww
-	IMv/kCEGWy3Ns/NXIlRbrQq+461TLG4XjRrA==;
+	from:content-type:reply-to; bh=AfnUNetPugawbZx5ZF2U9vOuyACvllb7nbme+lljnGg=; 
+	b=YS1YspqcYaCJNeZzbWWzQ3+1GBUtxV8eoDywcZvHhKzsvuS5Jv8Bpcmd7IqmG8yvNhgs5KdJ7YP
+	pmhwW5Uvau259DfabDYMQBQq/5rlVvScFRxubbiK3XZrsXy3rfA5jqvFZ5hXl8om8Qwj2GwQmG+z3
+	DdJCYDDbhV+EnGRt0GOY0irIVCvv8I9HWaUUX5nIQXjMJG+LKYn12ZJo7wfQmEzroLVflAMM9HWTE
+	N/mOS0LvibXGZq9mFj9c8ueeaB7f4orDe+0d4qCv1ZNUBXACOZDTXzGBVeX1tnnOnJ6eVjTT6P/3e
+	4kVDfxadBuvYPJJ02BYb6JflK0fS/HAMRUqw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wK6VQ-00BJBl-2k;
-	Tue, 05 May 2026 11:31:33 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 05 May 2026 11:31:32 +0800
-Date: Tue, 5 May 2026 11:31:32 +0800
+	id 1wK8Ps-00BKSI-1Q;
+	Tue, 05 May 2026 13:33:57 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 05 May 2026 13:33:56 +0800
+Date: Tue, 5 May 2026 13:33:56 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org, robh@kernel.org, conor+dt@kernel.org,
-	Ruud.Derwig@synopsys.com, manjunath.hadli@vayavyalabs.com,
-	adityak@vayavyalabs.com, navami.telsang@vayavyalabs.com,
-	bhoomikak@vayavyalabs.com
-Subject: Re: [PATCH v12 2/4] crypto: spacc - Add SPAcc ahash support
-Message-ID: <aflklGva2ZoAz-A9@gondor.apana.org.au>
-References: <20260416064451.99886-1-pavitrakumarm@vayavyalabs.com>
- <20260416064451.99886-3-pavitrakumarm@vayavyalabs.com>
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: Olivia Mackall <olivia@selenic.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/4] hwrng: core - use MAX to simplify RNG_BUFFER_SIZE
+Message-ID: <afmBRDCDqwJW_Ttg@gondor.apana.org.au>
+References: <20260430110047.248825-5-thorsten.blum@linux.dev>
+ <20260430110047.248825-7-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,47 +47,27 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260416064451.99886-3-pavitrakumarm@vayavyalabs.com>
+In-Reply-To: <20260430110047.248825-7-thorsten.blum@linux.dev>
 
-On Thu, Apr 16, 2026 at 12:14:49PM +0530, Pavitrakumar Managutte wrote:
->
-> +/*
-> + * Allocate a job for spacc module context and initialize
-> + * it with an appropriate type.
-> + */
-> +int spacc_open(struct spacc_device *spacc, int enc, int hash, int ctxid,
-> +	       int secure_mode, spacc_callback cb, void *cbdata)
-> +{
-> +	size_t i;
-> +	int ret = 0;
-> +	u32 ctrl = 0;
-> +	int job_idx = 0;
-> +	bool ctx_reused = false;
-> +	struct spacc_job *job = NULL;
-> +	const struct enc_config *enc_cfg = NULL;
-> +	const struct hash_config *hash_cfg = NULL;
-> +	unsigned long flags;
-> +
-> +	/*
-> +	 * Acquire the semaphore. This will decrement the count. If the count
-> +	 * is already zero (meaning all HW contexts are in use), this call
-> +	 * will sleep interruptibly until another thread calls up().
-> +	 */
-> +	if (down_interruptible(&spacc->ctx_sem)) {
-> +		dev_dbg(spacc->dptr, "ERR: Interrupted by signal\n");
-> +		return -ERESTARTSYS; /* Woken by a signal */
-> +	}
+On Thu, Apr 30, 2026 at 01:00:50PM +0200, Thorsten Blum wrote:
+> Replace the open-coded variant with MAX().
+> 
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> ---
+>  drivers/char/hw_random/core.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+> index 905a63525831..f8f7a2ee73c1 100644
+> --- a/drivers/char/hw_random/core.c
+> +++ b/drivers/char/hw_random/core.c
+> @@ -17,6 +17,7 @@
+>  #include <linux/hw_random.h>
+>  #include <linux/kernel.h>
+>  #include <linux/kthread.h>
+> +#include <linux/minmax.h>
 
-This may sleep.  While we used to allow sleeping in setkey, this
-is being phased out so new drivers should not do that.
-
-This also raises the question of whether spacc_open should even
-be called from setkey.  The setkey call could be very far away
-from the actual hash processing, so allocating a handle in setkey
-seems to be a waste.
-
-As you can allocate handles from do_one_request, why not just do
-that always?
+No need for minmax.h because kernel.h already includes it.
 
 Thanks,
 -- 
