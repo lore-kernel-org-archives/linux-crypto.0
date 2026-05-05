@@ -1,47 +1,46 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0C5530BB91;
-	Tue,  5 May 2026 09:34:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F8E13290D0;
+	Tue,  5 May 2026 09:34:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1777973666; cv=none; b=tERxmXAGguEq0GV3QQ97TMoB2/vdm+qXgX6GG/4FxSwBXSatvTiM3JfAuXStnHOtdq10I984CQ8HDiNL02TtpqmitFgvnrrdmVLdMIwM/ENPnj8U0u+bOgw+Xq3XqkVBoKs7qNhEYJr5ZmqJxUuVCaZgEeq7RT6Uphpy4dahXhI=
+	t=1777973686; cv=none; b=b/f1ReSYqHT5iBGLcvg6iPflBxno/d+CseUUmpA6UDM2lAu4DzaK3pikDGhfHiQf3RmlgeSdcs7grhWyTYXfesQXTo2eB8m0HPgrlzq/LfEsqqYKaQLyDewyosCYrQYIj3rWxuk7AOWSIuGPP0EGWZxS6IRe9fLsagCtQ7Y7QJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1777973666; c=relaxed/simple;
-	bh=m3xuei7QEO3BdWh2AVG4O5jLXHx0ii9UR2cx9wz5MaE=;
+	s=arc-20240116; t=1777973686; c=relaxed/simple;
+	bh=w31Yk0407YjHr10KjUzcroT98Lcz4kj5ZgA26+MOkLo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mtoKXU7En8Jq74vweR6IIVvxGADN548wWrwnnS/+K8oAoL3TCRoqvU27crEAbZnR3hxZbQfLYsHB4inAv3YBxLJlrtKSFf2sNqej7XXO6cQpxFiqz0FlzmfC+wQSgC6TKUNno/SbWWjRz/bdfaMfgofenCYCQTOGJd+VvbBwFFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=H1Bi44I0; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=XnlTJsfNzY51CD5H4QZGyJ3yjs5j7mh7kNj9JqPNEgIIjj+igaIA6+6WRX9IMG+5obCsUZF1t30qtZLTDBIOHRlMkErimJu+7uo9gvFsam7GWBgGtSWnQa7+ZKHcb6aRy9ysUBOsGHJ7p51vCBGykQBFD9ajk5H04P7loNdcv+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=qqbfjqEc; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="H1Bi44I0"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="qqbfjqEc"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=19oxxEfEgeVcmULINNrHzCxUZfxu7gYS2kOyozmBmVw=; 
-	b=H1Bi44I0OMMUu6iU0to92pgaU+40XB5tcoTmZDDnhajeE5VA6Sl1tAyEGD06Pnzoxf0Pw7yvODV
-	/QbYAxhbAjRQskcG9NaSyVgPLJJ3Ggxku78IcqvMjtRgvGRZxU3T4tT5So9MeV++AeWmdlfHkGnDA
-	RStOgXeqx+XesZxYm5y05/tB2Ov7fQ3gHScYRUuNhk0R6Gj1Bz83+wE1Zwkd9EH1ZEVQbRWW5XOIm
-	1xFXcLuybgyzg5SUAFv1G6CyzfRq6c2Uk2ntEm4EeJ0bVUdvGNOp34cL0TDPJ1Dz5Ft1YdhmBEksC
-	+vpuEh3u4dPJ2jPYHU9mHTz64ydxQ8Sm3v3g==;
+	from:content-type:reply-to; bh=KtC1pSYLnRwEjuDnHg5iLuol5nAgQy/1Km+lTvxTC60=; 
+	b=qqbfjqEc/uorYE7VTx89kXqX9GAIlP/xRyfT5HGfGs1rhDMBb9qnswtLxxlRwADtDwqawLChSrh
+	UaN8jbHm8WI5/5pi5Uv4uMSxtZmCVm1HgMaURGH52wvpYV4Y923CqD60XjmWzXkcIXdq2mFyfyL9U
+	ea7I6A3gSi7sdyMGu+WBP5/DpwdW4n/MFznZFqp+nWVm/hOx4M17KCKMbhOX4Ym0qEEb0mhiu2LZY
+	DYKBvqQ0cEBhTdqWOYZgY85JWrv5XjFNmYRiuc5ffm37kUXoqPa7ug+Lvzsl7n173Tth/m9qPdnFM
+	E+OIgvtu21O6M59wUqZCzKf2t/a6Xa3gd0Ew==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wKCAJ-00BO8c-0I;
-	Tue, 05 May 2026 17:34:08 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 05 May 2026 17:34:07 +0800
-Date: Tue, 5 May 2026 17:34:07 +0800
+	id 1wKCAX-00BOB0-0u;
+	Tue, 05 May 2026 17:34:22 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 05 May 2026 17:34:21 +0800
+Date: Tue, 5 May 2026 17:34:21 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Weiming Shi <bestswngs@gmail.com>
-Cc: David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@linux.win>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org, Xiang Mei <xmei5@asu.edu>
-Subject: Re: [PATCH v2] asymmetric_keys: check asymmetric_key_ids() for NULL
- before dereference
-Message-ID: <afm5jwh7jzm-5mI2@gondor.apana.org.au>
-References: <20260502163328.696098-2-bestswngs@gmail.com>
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: Lukas Wunner <lukas@wunner.de>, Ignat Korchagin <ignat@linux.win>,
+	"David S. Miller" <davem@davemloft.net>,
+	Vitaly Chikunov <vt@altlinux.org>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: ecrdsa - fix unknown OID check in
+ ecrdsa_param_curve
+Message-ID: <afm5nQs34VB3FA24@gondor.apana.org.au>
+References: <20260502190903.252061-3-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,66 +49,19 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260502163328.696098-2-bestswngs@gmail.com>
+In-Reply-To: <20260502190903.252061-3-thorsten.blum@linux.dev>
 
-On Sat, May 02, 2026 at 09:33:29AM -0700, Weiming Shi wrote:
-> asymmetric_key_ids() returns key->payload.data[asym_key_ids], which can
-> be NULL for keys parsed by the PKCS#8 parser (pkcs8_parser.c explicitly
-> stores NULL in prep->payload.data[asym_key_ids]).
+On Sat, May 02, 2026 at 09:09:04PM +0200, Thorsten Blum wrote:
+> The ->curve_oid check in ecrdsa_param_curve() rejects the valid enum
+> value 0 (OID_id_dsa_with_sha1), but look_up_OID() returns OID__NR on
+> lookup failure. Compare ->curve_oid with OID__NR instead to ensure that
+> only unknown OIDs return -EINVAL.
 > 
-> key_or_keyring_common() in restrict.c and find_asymmetric_key() in
-> asymmetric_type.c both dereference this return value without checking
-> for NULL. An unprivileged user can trigger a NULL pointer dereference
-> in key_or_keyring_common() by creating a PKCS#8 key, restricting a
-> keyring with key_or_keyring:<pkcs8_serial>, and adding an X.509 cert
-> to the restricted keyring. CONFIG_PKCS8_PRIVATE_KEY_PARSER=y is
-> required.
-> 
-> The following bash script can reproduce the issue:
-> 
->   #!/bin/bash
->   modprobe pkcs8_key_parser 2>/dev/null
->   openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:1024 \
->       -out /tmp/poc.pem 2>/dev/null
->   openssl pkcs8 -topk8 -nocrypt -in /tmp/poc.pem \
->       -outform DER -out /tmp/poc.p8
->   openssl req -new -x509 -key /tmp/poc.pem -outform DER \
->       -out /tmp/poc.der -days 365 -subj "/CN=Test" \
->       -addext "subjectKeyIdentifier=hash" \
->       -addext "authorityKeyIdentifier=keyid:always" 2>/dev/null
->   PKCS8_ID=$(keyctl padd asymmetric pkcs8key @s < /tmp/poc.p8)
->   KR=$(keyctl newring test_kr @s)
->   keyctl restrict_keyring $KR asymmetric "key_or_keyring:$PKCS8_ID"
->   keyctl padd asymmetric trigger $KR < /tmp/poc.der
->   rm -f /tmp/poc.pem /tmp/poc.p8 /tmp/poc.der
-> 
->  Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000
->  KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
->  RIP: 0010:key_or_keyring_common (crypto/asymmetric_keys/restrict.c:205 crypto/asymmetric_keys/restrict.c:279)
->  Call Trace:
->   <TASK>
->   __key_create_or_update (security/keys/key.c:884)
->   key_create_or_update (security/keys/key.c:1021)
->   __do_sys_add_key (security/keys/keyctl.c:134)
->   do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
->   entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
->   </TASK>
->  Kernel panic - not syncing: Fatal exception
-> 
-> Add a NULL check in find_asymmetric_key(), mirroring the existing
-> pattern in asymmetric_match_key_ids() and asymmetric_key_describe().
-> In key_or_keyring_common(), skip the trusted key matching when it
-> has no key IDs and fall through to the check_dest path.
-> 
-> Fixes: 7d30198ee24f ("keys: X.509 public key issuer lookup without AKID")
-> Reported-by: Xiang Mei <xmei5@asu.edu>
-> Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+> Fixes: 0d7a78643f69 ("crypto: ecrdsa - add EC-RDSA (GOST 34.10) algorithm")
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 > ---
-> v2: add bash reproducer to commit message (Ignat)
-> 
->  crypto/asymmetric_keys/asymmetric_type.c | 2 ++
->  crypto/asymmetric_keys/restrict.c        | 9 +++++++--
->  2 files changed, 9 insertions(+), 2 deletions(-)
+>  crypto/ecrdsa.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
