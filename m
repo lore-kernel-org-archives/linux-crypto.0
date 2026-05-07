@@ -1,36 +1,36 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 577FB2877F6;
-	Thu,  7 May 2026 04:26:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB233368A0;
+	Thu,  7 May 2026 08:11:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778127997; cv=none; b=JfWwYou4LAwLWvZc2VQBlbd68In0r3zcQtOlstUBfUB+pj/1uwq3rFehyIrSf18y0zjZ3/pMYDE4SBs4uZJlPnlv8IOCA8Mjj2jRL9xa7LwGJIJZOGVHFYgPTYBU6RRtMjvEvpSLdpjpVrNYRrjeYfywCvExJHX85cWvoZ1eCsM=
+	t=1778141492; cv=none; b=tnbNitcYBrlGpeTwjWfUL2BJFfdwbKpNkQWas9eOt4dJibSAyrgTKrasAvKSAgWw4CJ+KT+hK+AEMqsPo1L4a7/S06YX7U0H6JDl4g8QWnA24mbuJmocHC75NvvhyNi55wAzRmCGk/F1wo9wy6O4PBQOXA6uigCmAChT+jWalV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778127997; c=relaxed/simple;
-	bh=2ZU09yoIoeCOjqOtJbUSCJYDA1Z0M2qXXcDYU3w3YQg=;
+	s=arc-20240116; t=1778141492; c=relaxed/simple;
+	bh=LJXzJLslmiA+IdxAQYdNVM8kdYvI7bAUo2IuKVryaZE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cY8bO8GSfMkTEeKBi6GbFOECaSCgDoHfwkGK6tJCXg/nQdGDZHHXZ8nrXPWr2rtc8A+//g34c9V4jdDcw0y6S/VLLqMV8M8R0+iKEgQT7X6D3QHvG1ALLNCPCwY+YPEs2K3dV+RTi5On7HPPth6BppOJyU2JXFwW9WwIIe97diY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=UQYv+lu4; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=LkAJfA5fhSwSwxobduvFniNANX7MbzKgcNkLMAgRfYhOf4OjLH9F1ta3G0J0PMjwUlMxEodDNMLeLN3+Jsg7TXyYeK2uqwhYoN2L4kO7KeHMUNzhVOfty3WC6WFk57pXo7AMo6ZOFuXGda2qW5wmzTTTC4WqtzFoLagmHAkknaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=ejD0edD0; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="UQYv+lu4"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="ejD0edD0"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=MvPzzsvHctHnMtYRG2OKSFYZZHjdxckNh62GwVYaH0g=; 
-	b=UQYv+lu4IUSZsaIQ7A77oSV41DQAhleQpfOACrswFTdKGtYqAJXZI8JWhpJhlvtCauWG4bI+df9
-	qiiBnqDG4cxMHSRK9Xx4b4kpaDVV68XDZeh6llvHBq0yC44r1kr9W5TxPB016DuvQatBoWdpmp8U/
-	EKxtoxQvhgZINeTpYqFRXOOuivxY7ORqdRO6Bb4FWz+IDEE1ELek6ftV8DmJQqklEzRmEZphHXm36
-	VO5/JSdOQ5hTpPU5mS6dPSFaaXmy3C6IawTQehq7AS2mUjPwHT5rfU4Tufm1zn8+505ibtN4yp4cx
-	rr3Z6renCgqgMUtRONddRRPGS9IKA+h4dJrg==;
+	from:content-type:reply-to; bh=4ZnC8Ta9QoHgs1aqP+fxojktVLYVG6sApCSeqyX6nR8=; 
+	b=ejD0edD00oFdsLjY0Gfbk3ayxsAyNtAkZVJJsccgqIm9fPi3ubCEb+guqliWX1owUgAv00FWOGU
+	WnMI1LsenQ7t7S59WBBhxD/3bfncFJ9NhOvfqOk248NvcEpMXp+PPuI9q/h+9DfpiJcQcnYSZl1h0
+	14V6/fq/D/igDwCjsLcyR0e5XgNYofCiT5/cU5rGLgagU9O5JU/aU86eoN4eMUSpqxAPiYLjwgx1S
+	McJFIcrX00SGhYf+Rz7uoCpgSAa1jXjkICWLH231qmaSM9iDux+AbALUqWFuEL1A3fLqndYg85KQy
+	XvNdvEjY7cLswKmWHX7SFkyJs+G0le0LBcmA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wKqJO-00Bycj-0Y;
-	Thu, 07 May 2026 12:26:11 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 07 May 2026 12:26:10 +0800
-Date: Thu, 7 May 2026 12:26:10 +0800
+	id 1wKtoz-00C0tD-13;
+	Thu, 07 May 2026 16:11:02 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 07 May 2026 16:11:01 +0800
+Date: Thu, 7 May 2026 16:11:01 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: Lukas Wunner <lukas@wunner.de>
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -44,16 +44,13 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Andrey Konovalov <andreyknvl@gmail.com>,
 	Dmitry Vyukov <dvyukov@google.com>,
 	Vincenzo Frascino <vincenzo.frascino@arm.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	David Laight <david.laight.linux@gmail.com>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH v2] crypto: ecc - Unbreak the build on arm with
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: Re: [PATCH] crypto: ecc - Unbreak the build on arm with
  CONFIG_KASAN_STACK=y
-Message-ID: <afwUYlGYZH5cSbg3@gondor.apana.org.au>
-References: <7e3d64a53efb28740b32d1f934e78c10086208ab.1778073318.git.lukas@wunner.de>
+Message-ID: <afxJFVww58btgxIS@gondor.apana.org.au>
+References: <abfaede9ab2e963d784fb70598ed74935f7f8d93.1775628469.git.lukas@wunner.de>
+ <afms-fn-mpwJPfa-@gondor.apana.org.au>
+ <aftFAexDFrYbIeBM@wunner.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -62,25 +59,21 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7e3d64a53efb28740b32d1f934e78c10086208ab.1778073318.git.lukas@wunner.de>
+In-Reply-To: <aftFAexDFrYbIeBM@wunner.de>
 
-On Wed, May 06, 2026 at 03:27:49PM +0200, Lukas Wunner wrote:
+On Wed, May 06, 2026 at 03:41:21PM +0200, Lukas Wunner wrote:
 >
-> Changes v1 -> v2:
-> * s/ARCH/CONFIG_ARM/, s/LLVM/CONFIG_CC_IS_GCC/ (Nathan)
-> * Add link to gcc bugzilla entry
-> * Rewrite commit message to include feedback provided by gcc maintainers
->   and explain high stack usage with algorithm choice
+> My apologies Herbert, I was working on a v2 for this patch
+> but unfortunately didn't finish it until today:
 > 
-> Link to v1:
-> https://lore.kernel.org/r/abfaede9ab2e963d784fb70598ed74935f7f8d93.1775628469.git.lukas@wunner.de/
+> https://lore.kernel.org/r/7e3d64a53efb28740b32d1f934e78c10086208ab.1778073318.git.lukas@wunner.de/
 > 
->  crypto/Makefile | 5 +++++
->  1 file changed, 5 insertions(+)
+> Would it be possible for you to replace the patch you've already applied
+> with the new one?  I am very sorry for the hassle.
 
-Sorry but v1 has already been applied.
+OK I've backed it out for now.
 
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
