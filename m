@@ -1,39 +1,52 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB233368A0;
-	Thu,  7 May 2026 08:11:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39B053C1995;
+	Thu,  7 May 2026 09:27:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778141492; cv=none; b=tnbNitcYBrlGpeTwjWfUL2BJFfdwbKpNkQWas9eOt4dJibSAyrgTKrasAvKSAgWw4CJ+KT+hK+AEMqsPo1L4a7/S06YX7U0H6JDl4g8QWnA24mbuJmocHC75NvvhyNi55wAzRmCGk/F1wo9wy6O4PBQOXA6uigCmAChT+jWalV4=
+	t=1778146028; cv=none; b=ZJ6v9gi+XSjHtCcjcW9hEsUadKuAmVW3zcECWEINP0jhaLP4bp4F86FY9C+NW3yNBSW85/wSC20xve+EjtbygSgv3M/3glSkBlSVr5I33Ekz+LGMk6s4T7o+RGaztmdaPgvZG+cgvNi2oQh6SRskhtOoDseGqZiZfZ9DquyZBTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778141492; c=relaxed/simple;
-	bh=LJXzJLslmiA+IdxAQYdNVM8kdYvI7bAUo2IuKVryaZE=;
+	s=arc-20240116; t=1778146028; c=relaxed/simple;
+	bh=H1j3rZjckUfWY1oU8ov27ak1n4fQcf7tTaqPvuxAc7g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LkAJfA5fhSwSwxobduvFniNANX7MbzKgcNkLMAgRfYhOf4OjLH9F1ta3G0J0PMjwUlMxEodDNMLeLN3+Jsg7TXyYeK2uqwhYoN2L4kO7KeHMUNzhVOfty3WC6WFk57pXo7AMo6ZOFuXGda2qW5wmzTTTC4WqtzFoLagmHAkknaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=ejD0edD0; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jc2vZsgQA3sO3/njW9ysM/AOxTSiWYPZMRA9aOpHX/AhAx9Q9/SpMlW0C8GsnrbkwLN5Ydsbhhq3OW4yntw5zjcY1yOP9nxKNXd5B/OEOI4QsXkE3oGN+vR8AHVzifrg33qDfGKukDEukiWIVcOZ6MhSpmgUJ/xWl5cgeHxHcwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KtaScGdk; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="ejD0edD0"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=4ZnC8Ta9QoHgs1aqP+fxojktVLYVG6sApCSeqyX6nR8=; 
-	b=ejD0edD00oFdsLjY0Gfbk3ayxsAyNtAkZVJJsccgqIm9fPi3ubCEb+guqliWX1owUgAv00FWOGU
-	WnMI1LsenQ7t7S59WBBhxD/3bfncFJ9NhOvfqOk248NvcEpMXp+PPuI9q/h+9DfpiJcQcnYSZl1h0
-	14V6/fq/D/igDwCjsLcyR0e5XgNYofCiT5/cU5rGLgagU9O5JU/aU86eoN4eMUSpqxAPiYLjwgx1S
-	McJFIcrX00SGhYf+Rz7uoCpgSAa1jXjkICWLH231qmaSM9iDux+AbALUqWFuEL1A3fLqndYg85KQy
-	XvNdvEjY7cLswKmWHX7SFkyJs+G0le0LBcmA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wKtoz-00C0tD-13;
-	Thu, 07 May 2026 16:11:02 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 07 May 2026 16:11:01 +0800
-Date: Thu, 7 May 2026 16:11:01 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Lukas Wunner <lukas@wunner.de>
-Cc: "David S. Miller" <davem@davemloft.net>,
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KtaScGdk"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1778146026; x=1809682026;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=H1j3rZjckUfWY1oU8ov27ak1n4fQcf7tTaqPvuxAc7g=;
+  b=KtaScGdkSFiILHYB7rhPT7y+YQZDGSnYhl2oHqXvQ+ap7V6Uu60SA1E+
+   pHoSJAugGFpDImcTBno9vUtYv1TcjSmw4245qhTlogMsIF7x07f3548a/
+   55jj2SBCK7eiwu9Ne9cKKFk0wUxVZW5sCgZa0Vxy4T8gb3GQ0nd9ZtIB1
+   yVn4JJQoNCTu9DWMtTft3YTG6q9FYC47sidN0uLG9n3KNHnnJjTxFY4wJ
+   aIflaxxkozHcWKHGj/kUVA5GqN2ybfEcY4AOnxwkfMxhi0d4KHuKe73KM
+   g7Gj2e65/c2gVy9uzXeHS7JfKwS9NynkUd79IPb/6g7vn15dJIfRPMgDO
+   w==;
+X-CSE-ConnectionGUID: 4v2UArn+SbOXZQhUiptcNg==
+X-CSE-MsgGUID: joJwltodQD6sGe9V6DrhEg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11778"; a="90547362"
+X-IronPort-AV: E=Sophos;i="6.23,221,1770624000"; 
+   d="scan'208";a="90547362"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2026 02:27:06 -0700
+X-CSE-ConnectionGUID: UnWxH9i8SvSZpuW58v9Ccw==
+X-CSE-MsgGUID: 8rbZim2dSkutdIKs2aRo6Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,221,1770624000"; 
+   d="scan'208";a="236675054"
+Received: from vpanait-mobl.ger.corp.intel.com (HELO localhost) ([10.245.245.149])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2026 02:27:01 -0700
+Date: Thu, 7 May 2026 12:26:58 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Lukas Wunner <lukas@wunner.de>, "David S. Miller" <davem@davemloft.net>,
 	Andrew Morton <akpm@linux-foundation.org>,
 	Arnd Bergmann <arnd@arndb.de>,
 	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
@@ -44,13 +57,16 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Andrey Konovalov <andreyknvl@gmail.com>,
 	Dmitry Vyukov <dvyukov@google.com>,
 	Vincenzo Frascino <vincenzo.frascino@arm.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: Re: [PATCH] crypto: ecc - Unbreak the build on arm with
+	Eric Biggers <ebiggers@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	David Laight <david.laight.linux@gmail.com>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH v2] crypto: ecc - Unbreak the build on arm with
  CONFIG_KASAN_STACK=y
-Message-ID: <afxJFVww58btgxIS@gondor.apana.org.au>
-References: <abfaede9ab2e963d784fb70598ed74935f7f8d93.1775628469.git.lukas@wunner.de>
- <afms-fn-mpwJPfa-@gondor.apana.org.au>
- <aftFAexDFrYbIeBM@wunner.de>
+Message-ID: <afxa4sDNoWmCHD-a@ashevche-desk.local>
+References: <7e3d64a53efb28740b32d1f934e78c10086208ab.1778073318.git.lukas@wunner.de>
+ <afwUYlGYZH5cSbg3@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -59,22 +75,31 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aftFAexDFrYbIeBM@wunner.de>
+In-Reply-To: <afwUYlGYZH5cSbg3@gondor.apana.org.au>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-On Wed, May 06, 2026 at 03:41:21PM +0200, Lukas Wunner wrote:
->
-> My apologies Herbert, I was working on a v2 for this patch
-> but unfortunately didn't finish it until today:
+On Thu, May 07, 2026 at 12:26:10PM +0800, Herbert Xu wrote:
+> On Wed, May 06, 2026 at 03:27:49PM +0200, Lukas Wunner wrote:
+> >
+> > Changes v1 -> v2:
+> > * s/ARCH/CONFIG_ARM/, s/LLVM/CONFIG_CC_IS_GCC/ (Nathan)
+> > * Add link to gcc bugzilla entry
+> > * Rewrite commit message to include feedback provided by gcc maintainers
+> >   and explain high stack usage with algorithm choice
+> > 
+> > Link to v1:
+> > https://lore.kernel.org/r/abfaede9ab2e963d784fb70598ed74935f7f8d93.1775628469.git.lukas@wunner.de/
+> > 
+> >  crypto/Makefile | 5 +++++
+> >  1 file changed, 5 insertions(+)
 > 
-> https://lore.kernel.org/r/7e3d64a53efb28740b32d1f934e78c10086208ab.1778073318.git.lukas@wunner.de/
-> 
-> Would it be possible for you to replace the patch you've already applied
-> with the new one?  I am very sorry for the hassle.
+> Sorry but v1 has already been applied.
 
-OK I've backed it out for now.
+Does it make sense to revert and apply v2?
 
-Thanks,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+With Best Regards,
+Andy Shevchenko
+
+
