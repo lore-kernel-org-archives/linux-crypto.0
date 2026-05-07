@@ -1,87 +1,86 @@
 Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B088345CC9
-	for <linux-crypto@vger.kernel.org>; Thu,  7 May 2026 10:00:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 438013CAE92
+	for <linux-crypto@vger.kernel.org>; Thu,  7 May 2026 10:20:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778148004; cv=none; b=fcH2lu5x4+o1vSdlfo9Csd8nxQVc6/vSubFYhHCGbEQROqx5kviOX+qUG3IFAMp7Lzgj1LypjWwCyoihcSKgXSOYM8AvjxdPlKHn5gNX1ypefweO5/MuW3W3Xdia6js1DIHHCzgA2RdXPzubbjfbY0n5xkaFGa6ONwmqEhq1/1g=
+	t=1778149235; cv=none; b=TLP1WyWtVlWYN6FifloBa7iFdOyQLBV4O/xbTnwq7Gw3IpzGlL03uksu4d5qFhCwx2yDRBmsRJLvDdNUQ5OE8dwoQCC70swgT72Fr8KO1CbP7OodfSi7HbKNC2wv5llBGTc8vmBVtE3zw5nVQqNxcnJ4+uZLz9durReVfnekdnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778148004; c=relaxed/simple;
-	bh=yOCUHpotWozcC1m7TJw1/KIAyIx03i4Pj0MEjLVgVDk=;
+	s=arc-20240116; t=1778149235; c=relaxed/simple;
+	bh=2avxSsvk1as1FMY6RZX9B99PtZTW8XOT31jV6eVZ6xg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=exZ0tOvnIeYbjSpdQSHENYYNjSuFD0L0EUDU8zrLb57dJQMn6q19xESFufpf4vIZECs6+6siw9gsF5DWpFTULq+lTrnCBeNYTM9bwkLmIhCWdrLcpN9LgNK08XRP/0N0H8ak008hdk1BHVD8OogH2iAE02kzfkRxMAO6MKQj9E4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=pf26NcSl; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=fMjgTAxs; arc=none smtp.client-ip=205.220.180.131
+	 In-Reply-To:Content-Type; b=J1l5ecTWfSoUycQugZZoRx/zxUfFdXnWd6UeqnAuYpTK7APdUDHiy6T3sI1YACAPLHXidC9aTDNwyzm/XjnLDeSmhAcSNJATmQoB2t7HJR1gdjopJh8JkwBmVYaD8iFCVw4osNchfD7tXBN5pqKzcE0cwDWRyJZic7bvV0xteHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=SIuYQE42; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=a3klX9YQ; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="pf26NcSl";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="fMjgTAxs"
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6479mKgA026622
-	for <linux-crypto@vger.kernel.org>; Thu, 7 May 2026 09:59:58 GMT
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="SIuYQE42";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="a3klX9YQ"
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6475MPC03157830
+	for <linux-crypto@vger.kernel.org>; Thu, 7 May 2026 10:20:33 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	678j4tCJM5XWKuhF7X7zIK6Yx6XfJebqnO6Op1WlavE=; b=pf26NcSlIBQRQfYZ
-	yypeuQoNB2UyUWLAnLAz3pSHHAs9SJ98t4o9nAEKtlqZT8CAdA2cDkJZ377bCTfO
-	h9SzFdlWGWZJEOVfYQi4Vx5G4Vn0IBb9k5WBIWWpoplx8BatcYr4KNs3xFoLbSXi
-	TRR2EBDERTM9GEWW0zAlNuSMrtIljE936x17XiWn2mYI0qynZMVj1dGtW+CC8a9+
-	MUed0V7YwCcoOpoeIFU41KNu8jeoknrv7rs8/uOeJ4Bi3UAFz1Z00qDUTmuos2/y
-	pFH78DTbnhP/TdGNcTuFecODHOrIeYmQvweD7sJHKjIyywBtHPvkrfjDgf7C+TVt
-	wz+iMA==
-Received: from mail-dy1-f197.google.com (mail-dy1-f197.google.com [74.125.82.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4e0k1t1bbe-1
+	/5khHSPAj9LWxns39r4VokImHha4yMAwLlWdMzY6C+E=; b=SIuYQE42z6i9X7IE
+	qd1RPC+RB7OGD1KAd9WbNTvlFgF6j+gF1bnLfGmPzCWi1DlC97FXwcL/3aebILz9
+	fBurTT4pMlR0tiji3AsPG3GyTM1PstZWk/uAhvNUtnnE1XJeVE06eTKift4tN5iP
+	LOrU7PWK/oWztzxL3Gql+YNg9f78klXntPo7aTvv5rlExtIbs2ze8Ij6ZP64pow7
+	PW+6russqldCZ+wQX8++Ej1gV79ILQegULNwUt9DyGDTIkRXZ5QxSUyUFoQinFH+
+	TlfWLs16veUtpHQTE0jaQQFVQTkI2YSC3X193c+pFi4aYSTJqh3kRPkxe4MVrUiO
+	8AYzDA==
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4e0mhf14m0-1
 	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Thu, 07 May 2026 09:59:58 +0000 (GMT)
-Received: by mail-dy1-f197.google.com with SMTP id 5a478bee46e88-2b81ff82e3cso1044894eec.0
-        for <linux-crypto@vger.kernel.org>; Thu, 07 May 2026 02:59:57 -0700 (PDT)
+	for <linux-crypto@vger.kernel.org>; Thu, 07 May 2026 10:20:33 +0000 (GMT)
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2ba603a7d2cso8083945ad.1
+        for <linux-crypto@vger.kernel.org>; Thu, 07 May 2026 03:20:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1778147997; x=1778752797; darn=vger.kernel.org;
+        d=oss.qualcomm.com; s=google; t=1778149232; x=1778754032; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=678j4tCJM5XWKuhF7X7zIK6Yx6XfJebqnO6Op1WlavE=;
-        b=fMjgTAxsWD4BO0a7SpBE592cg6IEXflLeXfjKzsz4dnMiZj9WEgknKRanU7CuHs1b5
-         9XFzt/WGFx42lYLmeByCOGw3pq9oObLR0f3s6C+uf2KBzYV1H2tLWH/PzWBOFmGd6r10
-         CuqFEsMkiOqiPESAPAC3qa1LKDe6/raAEm7s1iM1jPDvQPDejbg5w/dAvd2yiSGm+uL9
-         Xyxrpo9gqv8ilPp3tbeBH2EpPnroUHlptIwVAY+6Lyst/aXybrB56Z8rHfgRwpC+2LCX
-         qvG6Jt4xAgmLuhLBUUJV+/W8jtMWdWClMRPTVYwmWaXKp7bSQA+eG6SZHGLkT3z2bF15
-         iC2w==
+        bh=/5khHSPAj9LWxns39r4VokImHha4yMAwLlWdMzY6C+E=;
+        b=a3klX9YQwsQxBrxiS7TYWH6VUWhMNXfZve67ATRHutpSElJlwnN9uWhvX9zpc5vK2Z
+         hADkAvg9hO7ntG5V2t0TC09WYsF+TuqVPdT2Wyj4LSd6uzmNn0J3xpbN83z1YMHvUOnH
+         F4VHeTOUgy/CjCPpwexe/WF3TXiJChdzyI5EBN3qx/vN7UKdMS1p5cx7gwY9ZrH0lJl8
+         5x4BL5uiSGff6KsryeGkfDoI3NdH440ODnHsqxMzA/INlvxYe57YMPj0SnOxR35qw5WH
+         ja3+dC7SJsvi+8olBHpqbmbgX5wq44U1lTqlJhTLtVsDI4aZPc2Q5fTwAoSBri5Mmg1s
+         Nxqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778147997; x=1778752797;
+        d=1e100.net; s=20251104; t=1778149232; x=1778754032;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=678j4tCJM5XWKuhF7X7zIK6Yx6XfJebqnO6Op1WlavE=;
-        b=BfbeO8udP7a4i1k1dDMU3IbGsxAIuCKvNKVqIwReC+Yx7mCqymKgJEUx13T41ym4Me
-         BBhVaw7CDirja1wy/s4SkokxfogpKM7KkS2g32/wADmG+Wn47LtOTMDwLX//bPSGbGtX
-         jAgqF0G3+KnyRr7ydez6CLA4Zig7V0xloVb6sMwjeIjCZf+Sg3EvhFNKGzisXyAtmaKJ
-         4Cpf85kVw7frRLLfoQivelKX7g7Gd0pg3qaTYWa121BZAo7lEz+W7UU9gDYgkXn1Zku9
-         bdzMJgNPnDheTaPsX8ihAgr7rLpnk/viwsMy05YDr/GeQ0PwbujwxowS+SqpHTWAE31k
-         +dIg==
-X-Forwarded-Encrypted: i=1; AFNElJ+qW+LHxHcQsV8FsWibhEHfOQ4VN9Cck90oUFtBuFZcjexZGi30q/XsmywiiOPLqEA5cxCtczVCJk2V7E4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHjKmLjQVXKY8iMo8Y9li4IE9Lxl/GPheztnLOYi8BiQqPbWZc
-	rWZb5ajshNU5Iurj+V0wJ8a2FnktnyTIiVFp+0JFH82VLNCHnUrqk7uvItCq2f8XxCyI8BYhA5R
-	ceqWYXSufQpPKNP1ZBjZ3UkMEjtqu9+flH/yUKVw4DhItl+4Yy8IG6Nloypxrsv4q6Qc=
-X-Gm-Gg: AeBDietH2Y36jYUQnnocmO8nG5Tnp/1dgbzFV7p9tmGOYoawWo7oYrx19KQ4JZCUdAk
-	5tZoiN7xAOtrz+bmdtPZR54ICrWNueXIHhxV3ZNIqVBNYMwbgKPR79ro1U9mX3DpQPQ/n5cGVIi
-	dlsyA/G3cHQlyG/LbD+5zB+W4r26C5WaS34jOyPu0rc4T/j8XZGl88E3V15bdZ0lFIb7M5JMcYR
-	eQOSCOV06Co3gtSkh0BEi7tcsWmXRT6D61RXJBtSWsaQj6zVG8hOC98uj72le7jiuNSPFD632tI
-	UoKVKDlm781n/Vlf+DXTGy7Bs9ik8+MVfvDu2fuVW6cAX1XioUV5SzFL1+eeYjJX4Fk/8SnHWTn
-	A1ca9RgWucp/c0TZw2EkVdFpVjmp4DSuiMw4VSzetECupl3NC7ICKcvL9iTCuoIFNa2MSh5rk9c
-	YILeQWZJq0EaP6DQ==
-X-Received: by 2002:a05:7301:1006:b0:2d9:db50:c6ce with SMTP id 5a478bee46e88-2f6e1e3166bmr905286eec.3.1778147997097;
-        Thu, 07 May 2026 02:59:57 -0700 (PDT)
-X-Received: by 2002:a05:7301:1006:b0:2d9:db50:c6ce with SMTP id 5a478bee46e88-2f6e1e3166bmr905276eec.3.1778147996489;
-        Thu, 07 May 2026 02:59:56 -0700 (PDT)
-Received: from [10.110.10.111] (i-global254.qualcomm.com. [199.106.103.254])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2f56fd92780sm8102758eec.23.2026.05.07.02.59.53
+        bh=/5khHSPAj9LWxns39r4VokImHha4yMAwLlWdMzY6C+E=;
+        b=pKvdGwmQVembEBKq7p0hVEmh9CUW5q1rWqq2CvEJDfLXMH4hAPQI5mHTL25KY6oJCe
+         9AIu6T26nZ/44whhVDEJIzK7D6F11mTOlyumbh/KRP+dwcEFVRaJG9wXGOPxGqmr/lUS
+         zMu2GC+4UeZT/Ae956cJR47hbfp8UM2YshASuuQXCoFI7v82Lk+9CjLxl2mwQYeAXgh0
+         BwHWvwZhCpQ48AQIWlJBm5ikAST72+CHfnDwK+Q5d8YV78p36yZJgv98XYYmhwT/K2WQ
+         bZUvCnqdACSG3eGndDMdSTIBp7QDhC2fNyQZhZhMHF7BJBecEh13lzooh3ndvxegX9A5
+         Vs8A==
+X-Forwarded-Encrypted: i=1; AFNElJ+RGgjv7wZZ2pOgZ3NUq2gWW3vmUET5UR7GvM8CrB00Zqx+KuIgC21/HrfpPNy4tXP1TiJtd87ide1AutE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNTjCZwTXkU+hU3kAhyqiU4w/kpnJe7JWlrkf38pzC0BDC4XiJ
+	pTBIFdOJpc6TYU5voRwMJyGCXDdpPdWidokGWtlFzI/3Q5myHw8/RgB8JsN7jj/yhIt8oDy+xGH
+	HK1sMVw/tBGBVDflrCAwAM54gGZW3YL1Fbo2qjauh85DKLhJBboEgHgkVzKVa82xsLXk=
+X-Gm-Gg: AeBDiesaG8NFIGGBVeqQH/gEJV6UsiVn6FLzllzHHFyQtvSxCgvp528Pg0IdGe3B6bK
+	CzZeqMQBP3HnpYMFC2IkWCl5x8xqfJQvjMHS6y9pzxxRuiUQP3Xuu+pK80SLIZfgq4yeC8yhcK/
+	6wHrBNunmGKNfPNMCndl5pAEi2+zR7kD0EFXEqCC4PX8kuPK0Hmm8W/u+CdcLh55cAecd+ZJfgP
+	elBtG97mD+S1tY8UMz0qN2Ir1A15ccU5Hla3lPfScinMc/cQ2814bTV1ljyjmqzv/5ifvFoZsuH
+	k6g9fpBSp12O5ruuRMANMtomWMXxTZ5wWCMNJDi90tv5VPYf+Iq7q1EGGOnHo55RnHeDDc3GPqB
+	0hX5UmL2GvxoZZVtHDaAlogSqsY6unwmfvbQHSuumU0u7KiCEt+/GciB1Nm0kXA==
+X-Received: by 2002:a17:903:4b03:b0:2ba:21c2:d6cb with SMTP id d9443c01a7336-2babd4bdb6dmr19838095ad.16.1778149232135;
+        Thu, 07 May 2026 03:20:32 -0700 (PDT)
+X-Received: by 2002:a17:903:4b03:b0:2ba:21c2:d6cb with SMTP id d9443c01a7336-2babd4bdb6dmr19837785ad.16.1778149231620;
+        Thu, 07 May 2026 03:20:31 -0700 (PDT)
+Received: from [10.217.223.121] ([202.46.22.19])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2babadef254sm20528445ad.61.2026.05.07.03.20.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 May 2026 02:59:56 -0700 (PDT)
-Message-ID: <4fe79c7d-42f3-4001-a5ad-a61c491ae29e@oss.qualcomm.com>
-Date: Thu, 7 May 2026 17:59:51 +0800
+        Thu, 07 May 2026 03:20:30 -0700 (PDT)
+Message-ID: <b8805117-d54f-4e42-a7d4-6fa18af63e69@oss.qualcomm.com>
+Date: Thu, 7 May 2026 15:50:21 +0530
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -89,84 +88,105 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 1/3] dt-bindings: crypto: qcom,ice: Add sa8255p support
-To: Krzysztof Kozlowski <krzk@kernel.org>, linux-arm-msm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ebiggers@google.com
-Cc: neeraj.soni@oss.qualcomm.com, gaurav.kashyap@oss.qualcomm.com,
-        deepti.jaggi@oss.qualcomm.com, bjorn.andersson@oss.qualcomm.com,
-        quic_shazhuss@quicinc.com, trilok.soni@oss.qualcomm.com,
-        konrad.dybcio@oss.qualcomm.com
-References: <20260430032136.3058773-1-linlin.zhang@oss.qualcomm.com>
- <20260430032136.3058773-2-linlin.zhang@oss.qualcomm.com>
- <41da4b77-4d0d-48bd-9578-2adefe5466af@kernel.org>
+Subject: Re: [PATCH v5 01/13] dt-bindings: crypto: qcom,ice: Fix missing
+ power-domain and iface clk
+To: Bjorn Andersson <andersson@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Abel Vesa <abel.vesa@oss.qualcomm.com>,
+        Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>,
+        cros-qcom-dts-watchers@chromium.org,
+        Eric Biggers <ebiggers@google.com>,
+        Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+        Jingyi Wang <jingyi.wang@oss.qualcomm.com>,
+        Tengfei Fan <tengfei.fan@oss.qualcomm.com>,
+        Bartosz Golaszewski <brgl@kernel.org>,
+        David Wronek <davidwronek@gmail.com>,
+        Luca Weiss <luca.weiss@fairphone.com>,
+        Neil Armstrong <neil.armstrong@linaro.org>,
+        Melody Olvera <quic_molvera@quicinc.com>,
+        Alexander Koskovich <akoskovich@pm.me>,
+        Abel Vesa <abelvesa@kernel.org>, Brian Masney <bmasney@redhat.com>,
+        Neeraj Soni
+ <neeraj.soni@oss.qualcomm.com>,
+        Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+        Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+References: <20260416-qcom_ice_power_and_clk_vote-v5-0-5ccf5d7e2846@oss.qualcomm.com>
+ <20260416-qcom_ice_power_and_clk_vote-v5-1-5ccf5d7e2846@oss.qualcomm.com>
+ <afmuncmBrrvddHTU@gondor.apana.org.au>
 Content-Language: en-US
-From: Linlin Zhang <linlin.zhang@oss.qualcomm.com>
-In-Reply-To: <41da4b77-4d0d-48bd-9578-2adefe5466af@kernel.org>
+From: Harshal Dev <harshal.dev@oss.qualcomm.com>
+In-Reply-To: <afmuncmBrrvddHTU@gondor.apana.org.au>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Authority-Analysis: v=2.4 cv=EoPiaycA c=1 sm=1 tr=0 ts=69fc629e cx=c_pps
- a=Uww141gWH0fZj/3QKPojxA==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTA3MDEwMyBTYWx0ZWRfXx3EOPuIjbRuc
+ UvwE0tmwnlNPkO4DZamDRfA9GK30Szw2EzFzCauAPuwi0WO7LlMnjoIv8o8OKCEbVQdaST2VoLE
+ gW2C8jXOkxASjvqKKjpJOyup219kJdOEy+mEeaupodyMCGONMd9km8wSAfaqXHFErpqsXwMbKYw
+ xFtFczqwjwr+ol90hx9VayGgkhuJQnDaG7tfFI75g/hiOV+McXwu0t8/XNiWksbDKZ5lWPS4nTw
+ N33TxE9DklEyIvRT3066kTEPJPahXxNRwiddDOu4UI3+XoyrXcdBCLG/D+ZkAUz00cTFf31Ub8V
+ QAVXeuVJqqMcUVEPzChUH8WtV9aGXdgrEvEb3GilV78CPAFMiioz6vnfxHGVPXXWDkMLYoXhMac
+ +dw/KSOcltUvElek1W8Wc3bcpWwr29j5SxH50qJw01JS8UESFkf7GFvXM+XltkuuiFIdK88GR8E
+ MKEDT4+bsTOiyaoQljg==
+X-Proofpoint-ORIG-GUID: cNwHvh9n9h1gN9-tRgwoiR_JrTeWY8Z1
+X-Authority-Analysis: v=2.4 cv=SuagLvO0 c=1 sm=1 tr=0 ts=69fc6771 cx=c_pps
+ a=MTSHoo12Qbhz2p7MsH1ifg==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
  a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=gowsoOTTUOVcmtlkKump:22
- a=DO7WzgAb8V_MQCx-KrYA:9 a=QEXdDO2ut3YA:10 a=PxkB5W3o20Ba91AHUih5:22
-X-Proofpoint-ORIG-GUID: YURlEfZTWPq4y-ucHhEWCdgGZNeg2AMS
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTA3MDA5OCBTYWx0ZWRfX6edf3wbhwGJM
- EyaHakHY2AYVy8vzra5Dw5Tkw/6C1F43G2W73X/ntkmueMZkVHklK5IJRNU1H3Sz+YzGrAfvlFd
- KnM/z97UIVh/FDEkDbLafUvcXiMFkPfqdOAyX2c3U2oZ9p9VXb7eVlqmouDCVdLUYRsWY7LnPeV
- SKf9+w6R/BZt1Cu6FCMHzMM6aubVcjBDvrAvSsECnzF2HEXOVLLnmCvLik5y//ydNe2JC6yA0z8
- mCJF7m9ObC3hFMjLJMt4WXXTDmrnCe/ccK9iEK6zfAE251i51n/nyQGgvCxOS3hYPAT90Yg5PXM
- Y/MeZ83OYmCY+DYiRhTN2XechbNDk/jLFIVA/IICQEM1qxqa2HHsaIMLqpL+Ia/nH7d5Jc2Sudt
- Cxga510lShkPa0bw0EjiuZAfqocOx8F1JfhLmd9HH3UJz7qyGn77Ng3KtCqtYTt73xSFp29peIG
- DNH5B5S4FoxDlXOzxhA==
-X-Proofpoint-GUID: YURlEfZTWPq4y-ucHhEWCdgGZNeg2AMS
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=_glEPmIy2e8OvE2BGh3C:22
+ a=EUspDBNiAAAA:8 a=CMx50Ybjb1gtcuyIV48A:9 a=QEXdDO2ut3YA:10
+ a=GvdueXVYPmCkWapjIL-Q:22
+X-Proofpoint-GUID: cNwHvh9n9h1gN9-tRgwoiR_JrTeWY8Z1
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
  definitions=2026-05-06_02,2026-05-06_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 spamscore=0 bulkscore=0 impostorscore=0 lowpriorityscore=0
- phishscore=0 malwarescore=0 priorityscore=1501 clxscore=1015 adultscore=0
+ clxscore=1015 malwarescore=0 suspectscore=0 bulkscore=0 lowpriorityscore=0
+ impostorscore=0 spamscore=0 adultscore=0 phishscore=0 priorityscore=1501
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2605070098
+ reason=mlx scancount=1 engine=8.22.0-2604200000 definitions=main-2605070103
 
+Hi Bjorn,
 
-
-On 4/30/2026 2:13 PM, Krzysztof Kozlowski wrote:
-> On 30/04/2026 05:21, Linlin Zhang wrote:
->> On sa8255p, resources such as PHY, clocks, regulators, and resets are
->> managed by remote firmware via the SCMI power protocol. As a result, the
->> ICE driver cannot directly access clocks and must instead use power-domains
->> to request resource configuration.
+On 5/5/2026 2:17 PM, Herbert Xu wrote:
+> On Thu, Apr 16, 2026 at 05:29:18PM +0530, Harshal Dev wrote:
+>> The DT bindings for inline-crypto engine do not specify the UFS_PHY_GDSC
+>> power-domain and iface clock. Without enabling the iface clock and the
+>> associated power-domain the ICE hardware cannot function correctly and
+>> leads to unclocked hardware accesses being observed during probe.
 >>
->> Add the qcom,sa8255p-inline-crypto-engine compatible string and make clocks
->> optional for platforms that use power-domains instead.
+>> Fix the DT bindings for inline-crypto engine to require the UFS_PHY_GDSC
+>> power-domain and iface clock for new devices (Eliza and Milos) introduced
+>> in the current release (7.1) with yet-to-stabilize ABI, while preserving
+>> backward compatibility for older devices.
+>>
+>> Fixes: 618195a7ac3df ("dt-bindings: crypto: qcom,inline-crypto-engine: Document the Eliza ICE")
+>> Fixes: 85faec1e85555 ("dt-bindings: crypto: qcom,inline-crypto-engine: document the Milos ICE")
+>> Reviewed-by: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
+>> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+>> Signed-off-by: Harshal Dev <harshal.dev@oss.qualcomm.com>
+>> ---
+>>  .../bindings/crypto/qcom,inline-crypto-engine.yaml | 35 +++++++++++++++++++++-
+>>  1 file changed, 34 insertions(+), 1 deletion(-)
 > 
-> 
-> Please use scripts/get_maintainers.pl to get a list of necessary people
-> and lists to CC. It might happen, that command when run on an older
-> kernel, gives you outdated entries. Therefore please be sure you base
-> your patches on recent Linux kernel.
-> 
-> Tools like b4 or scripts/get_maintainer.pl provide you proper list of
-> people, so fix your workflow. Tools might also fail if you work on some
-> ancient tree (don't, instead use mainline) or work on fork of kernel
-> (don't, instead use mainline). Just use b4 and everything should be
-> fine, although remember about `b4 prep --auto-to-cc` if you added new
-> patches to the patchset.
-> 
-> You missed at least devicetree list (maybe more), so this won't be
-> tested by automated tooling. Performing review on untested code might be
-> a waste of time.
-> 
-> Please kindly resend and include all necessary To/Cc entries.
+> Patch applied.  Thanks.
 
-Thanks for your guide!
+Herbert has pulled out of picking this patch from his tree.
+As discussed, since this DT binding update relies on DTS changes in commits 12 and 13
+of these series, they should all go through the same tree.
 
-I'll send a new patchset on top of the latest kernel version
-(branch: next-20260506) and update the to/cc list based on the list of
-scripts/get_maintainer.pl output.
+Can we aim to pick this series via the qcom-soc tree to ensure the binding and DTS changes
+are applied together? Since the 7.1 fixes window is open, I am hoping for this to be
+picked up this week or the next.
 
-> 
-> Best regards,
-> Krzysztof
+Regards,
+Harshal
 
