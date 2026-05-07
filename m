@@ -1,42 +1,42 @@
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9032141325B
-	for <linux-crypto@vger.kernel.org>; Thu,  7 May 2026 14:42:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE045428834
+	for <linux-crypto@vger.kernel.org>; Thu,  7 May 2026 14:42:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778164943; cv=none; b=dZa4X6NIUg0cf1VURglbxjrALdxA4yb1D8tQPM+iDYGCpy3O1dCzNVLTba+xPmbDYUt/9DYc8w1fixUhriqdGcoGFi+agYLku+iiRxg9wzHOU43rV/FmZSTsL6ao59dmjUExi8/UMvUpgdF5uMdRX0Ahi9sPUDMCJ0oClHscNa4=
+	t=1778164945; cv=none; b=U0Q86EojSqpiG52sUuVQbgfMqumVDLwi0afrs2ihhTWaLJWwHZcSBuHoSDig4/4zMk+OXfWJojPEe9ZPFD+nlz9T0rdlW/BFpMI+Dar0S66ZZXB7Afhr/Mas8mXbwMM+YE6JE3slLil2sHJ18XE07gPtwSWPtsBxSUEWpUhEJrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778164943; c=relaxed/simple;
-	bh=j+6PCvRTp7SKVC0FT4iIhWmOSLwnJZVWRVkYosMNe5g=;
+	s=arc-20240116; t=1778164945; c=relaxed/simple;
+	bh=hSkB/ToOSucAybkXhmloG2Iy73IAWltint0+kMWv33M=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=hrtW1TrGlQTlg0YdiWa6RA2rwEEskrxd2rQg6gp+H+SOExI7fGMqSv5yfjQR5RloKmqAUEdm/XsAvVSpfrjG+K8xwGWf/v4V/t9Z2AkrydL2lTY3v5GzH+rX5oH8+T11WnolngPOlQBHlOcF8DDKRx2815hOT4gsQNQzqaQWDro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fV0dpV/t; arc=none smtp.client-ip=185.246.84.56
+	 In-Reply-To:To:Cc; b=K0+19pQMSXpm8f3qwYnnbM8gKktkDvEda1/c5nkf4RazwqpDgtm1bMjqFMkMk2LTxgwuEdhKFy+fRhYT5PEZZQ1F5PGcS1Qatp3apb9XQ/UkM55gw5iJr1npZe195L15EQopVEk9u6ThTPCF2XUn0EFtXV3cjpoR+x/czZFYlkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=K9REKb0N; arc=none smtp.client-ip=185.246.85.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fV0dpV/t"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="K9REKb0N"
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 5339C1A3566;
-	Thu,  7 May 2026 14:42:20 +0000 (UTC)
+	by smtpout-03.galae.net (Postfix) with ESMTPS id B201B4E42C2D;
+	Thu,  7 May 2026 14:42:21 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 2929960644;
-	Thu,  7 May 2026 14:42:20 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 0E01A108194EB;
-	Thu,  7 May 2026 16:42:17 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 873C660646;
+	Thu,  7 May 2026 14:42:21 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 89833108194EC;
+	Thu,  7 May 2026 16:42:19 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1778164939; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1778164940; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=EPpVeeYRNfJpuG0W8Z2Qz9u0mF8TkZfJzfXE8v1oTgw=;
-	b=fV0dpV/t1N5DHZemuQr8eEbAuT23/nNXS6tHJjFA9cjW4l8cXeNo1yVJ9NMiKOPhMtpJdM
-	4sQiEL1UzjEot5pwG+MdHRk30V9t8vxZ16iCjJOY1G/0eEay9pEVLm9r0PRvL6FIgj1vbi
-	rq9HF61xYb+4at1sOWV1VQlUHdardBdWrPonPa2ZfKP+tTFOMd/NReRyNKm/FiUDF596ai
-	cAN6NJmH6EMw8MtpkR6Y+cQHIzNK5Bw045p1Pcimg4ivQL3UKNoXeLWXUcpK7gYW0JAMCJ
-	ZPOAnRsOtuSKxHInnQQnjC/un4L+bthbDgT3+LEr0ykAuXZNRdfJTAtvmivoKA==
+	bh=uGyL4NeIjSoNBGK/yQ5ULcrXkbDaktVYoKhNYCw/tzs=;
+	b=K9REKb0NCFbqeAuaBmO+Q3RGW/7+tbgpqSb39+dVVT9+gQVFByet5DcfvdyDXsFxG0iB9v
+	Dyizg+mmogJQvZ+kE5UgcGLUi+dMUfrHQ7DLJX/fXfNj59hsgJy1Ye/zpKsXkGRiGLruEU
+	xe30mLVcl1fW34ctMXk56Qojp1Rqo1XwRqvvmD2o2b/LKjlM6TbKyAYZX69ivJ2+kMpfOw
+	c37xZM1K8DIXnD0HLK/AdEyesqkefSlEgeiDbJrG1pvcKggJpRztgZQthhEhQCzGHWbKyL
+	Pwb825zfjrUD6Mzlbi8qT0EO+Qo1l7ybWNv7/PNY98pxNAW+qKTBc7bNpgFmpg==
 From: Paul Louvel <paul.louvel@bootlin.com>
-Date: Thu, 07 May 2026 16:41:54 +0200
-Subject: [PATCH v3 08/11] crypto: talitos/hash - drop workqueue mechanism
- for SEC1
+Date: Thu, 07 May 2026 16:41:55 +0200
+Subject: [PATCH v3 09/11] crypto: talitos/hash - rename
+ first_desc/last_desc to first_request/last_request
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -45,7 +45,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260507-bootlin_test-7-1-rc1_sec_bugfix-v3-8-c98d7589b942@bootlin.com>
+Message-Id: <20260507-bootlin_test-7-1-rc1_sec_bugfix-v3-9-c98d7589b942@bootlin.com>
 References: <20260507-bootlin_test-7-1-rc1_sec_bugfix-v3-0-c98d7589b942@bootlin.com>
 In-Reply-To: <20260507-bootlin_test-7-1-rc1_sec_bugfix-v3-0-c98d7589b942@bootlin.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>, 
@@ -58,179 +58,135 @@ Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
  Herve Codina <herve.codina@bootlin.com>, 
  Paul Louvel <paul.louvel@bootlin.com>, stable@vger.kernel.org
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1778164923; l=5598;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1778164923; l=4902;
  i=paul.louvel@bootlin.com; s=20260313; h=from:subject:message-id;
- bh=j+6PCvRTp7SKVC0FT4iIhWmOSLwnJZVWRVkYosMNe5g=;
- b=icD8Uu9DauD9AuKCQw2a7OKmDOvXnJSFZ5ut44g5/7pqJHeCefetRTAt1H9Bfm10qdlUx+MDJ
- cLfQCGPxadKARw89Mq0Hdt+MMU+xqzk+9BvIYEwbhtpMHThW6GLj8Je
+ bh=hSkB/ToOSucAybkXhmloG2Iy73IAWltint0+kMWv33M=;
+ b=xHTyZu7Ps6N9uU+Deb4Rf7dXYFRZEgs2on+Ulii1Hem62k/P4Dxlo5LDbEhXUexu6RQvYUDbm
+ gvsemm51tHJBNE/u5DpNUPPc/Nbqypl/VNB+kc7TSg0uqHzcBxzKoSG
 X-Developer-Key: i=paul.louvel@bootlin.com; a=ed25519;
  pk=eLW50NT18UAvUT5cAcYf88zNbBCZDLFXuptpyLVhVIU=
 X-Last-TLS-Session-Version: TLSv1.3
 
-Now that SEC1 hash uses hardware descriptor chaining instead of a
-workqueue to process requests exceeding TALITOS1_MAX_DATA_LEN, the
-workqueue code is no longer needed.
-
-Remove sec1_ahash_process_remaining(), the related fields from
-talitos_ahash_req_ctx (request_bufsl, areq, request_sl,
-remaining_ahash_request_bytes, current_ahash_request_bytes,
-sec1_ahash_process_remaining), the dead code in ahash_done(), and
-simplify ahash_process_req() to call ahash_process_req_one() directly
-with the original areq->src and areq->nbytes.
+In talitos_ahash_req_ctx and talitos_export_state, the fields
+first_desc and last_desc describe request-level (not descriptor-level)
+state.  Rename them to first_request and last_request for clarity.
+last_desc is also removed from talitos_ahash_req_ctx as it is no
+longer used.
 
 Cc: stable@vger.kernel.org
 Signed-off-by: Paul Louvel <paul.louvel@bootlin.com>
 ---
- drivers/crypto/talitos.c | 80 +++++-------------------------------------------
- 1 file changed, 7 insertions(+), 73 deletions(-)
+ drivers/crypto/talitos.c | 29 +++++++++++++----------------
+ 1 file changed, 13 insertions(+), 16 deletions(-)
 
 diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 883115d66fc4..1f497930800b 100644
+index 1f497930800b..6be42935068a 100644
 --- a/drivers/crypto/talitos.c
 +++ b/drivers/crypto/talitos.c
-@@ -12,7 +12,6 @@
-  * All rights reserved.
-  */
- 
--#include <linux/workqueue.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/mod_devicetable.h>
-@@ -952,13 +951,6 @@ struct talitos_ahash_req_ctx {
+@@ -944,8 +944,7 @@ struct talitos_ahash_req_ctx {
+ 	u8 buf[2][HASH_MAX_BLOCK_SIZE];
+ 	int buf_idx;
+ 	unsigned int swinit;
+-	unsigned int first_desc;
+-	unsigned int last_desc;
++	unsigned int first_request;
+ 	unsigned int last_request;
+ 	unsigned int to_hash_later;
  	unsigned int nbuf;
- 	struct scatterlist bufsl[2];
- 	struct scatterlist *psrc;
--
--	struct scatterlist request_bufsl[2];
--	struct ahash_request *areq;
--	struct scatterlist *request_sl;
--	unsigned int remaining_ahash_request_bytes;
--	unsigned int current_ahash_request_bytes;
--	struct work_struct sec1_ahash_process_remaining;
+@@ -957,8 +956,8 @@ struct talitos_export_state {
+ 	u32 hw_context[TALITOS_MDEU_MAX_CONTEXT_SIZE / sizeof(u32)];
+ 	u8 buf[HASH_MAX_BLOCK_SIZE];
+ 	unsigned int swinit;
+-	unsigned int first_desc;
+-	unsigned int last_desc;
++	unsigned int first_request;
++	unsigned int last_request;
+ 	unsigned int to_hash_later;
+ 	unsigned int nbuf;
  };
+@@ -1822,8 +1821,7 @@ static void ahash_done(struct device *dev,
+ 		 container_of(desc, struct talitos_edesc, desc);
+ 	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
  
- struct talitos_export_state {
-@@ -1840,18 +1832,6 @@ static void ahash_done(struct device *dev,
- 	free_edesc_list_from(areq, edesc);
+-
+-	if (!req_ctx->last_desc && req_ctx->to_hash_later) {
++	if (!req_ctx->last_request && req_ctx->to_hash_later) {
+ 		/* Position any partial block for next update/final/finup */
+ 		req_ctx->buf_idx = (req_ctx->buf_idx + 1) & 1;
+ 		req_ctx->nbuf = req_ctx->to_hash_later;
+@@ -1872,7 +1870,7 @@ static void common_nonsnoop_hash(struct talitos_edesc *edesc,
+ 	/* first DWORD empty */
  
- 	ahash_request_complete(areq, err);
--
--	return;
--
--	req_ctx->remaining_ahash_request_bytes -=
--		req_ctx->current_ahash_request_bytes;
--
--	if (!req_ctx->remaining_ahash_request_bytes) {
--		ahash_request_complete(areq, 0);
--		return;
--	}
--
--	schedule_work(&req_ctx->sec1_ahash_process_remaining);
- }
+ 	/* hash context in */
+-	if (!edesc->first || !req_ctx->first_desc || req_ctx->swinit) {
++	if (!edesc->first || !req_ctx->first_request || req_ctx->swinit) {
+ 		map_single_talitos_ptr_nosync(dev, &desc->ptr[1],
+ 					      req_ctx->hw_context_size,
+ 					      req_ctx->hw_context,
+@@ -1880,7 +1878,7 @@ static void common_nonsnoop_hash(struct talitos_edesc *edesc,
+ 		req_ctx->swinit = 0;
+ 	}
+ 	/* Indicate next op is not the first. */
+-	req_ctx->first_desc = 0;
++	req_ctx->first_request = 0;
  
- /*
-@@ -2044,12 +2024,12 @@ static int ahash_process_req_one(struct ahash_request *areq, unsigned int nbytes
+ 	/* HMAC key */
+ 	if (ctx->keylen)
+@@ -1975,14 +1973,14 @@ ahash_process_req_prepare(struct ahash_request *areq, unsigned int nbytes,
+ 			edesc->desc.hdr |= DESC_HDR_MODE0_MDEU_CONT;
  
- 	if (!req_ctx->last_request && (nbytes + req_ctx->nbuf <= blocksize)) {
- 		/* Buffer up to one whole block */
--		nents = sg_nents_for_len(req_ctx->request_sl, nbytes);
-+		nents = sg_nents_for_len(areq->src, nbytes);
- 		if (nents < 0) {
- 			dev_err(dev, "Invalid number of src SG.\n");
- 			return nents;
- 		}
--		sg_copy_to_buffer(req_ctx->request_sl, nents,
-+		sg_copy_to_buffer(areq->src, nents,
- 				  ctx_buf + req_ctx->nbuf, nbytes);
- 		req_ctx->nbuf += nbytes;
- 		return 0;
-@@ -2076,18 +2056,18 @@ static int ahash_process_req_one(struct ahash_request *areq, unsigned int nbytes
- 		sg_init_table(req_ctx->bufsl, nsg);
- 		sg_set_buf(req_ctx->bufsl, ctx_buf, req_ctx->nbuf);
- 		if (nsg > 1)
--			sg_chain(req_ctx->bufsl, 2, req_ctx->request_sl);
-+			sg_chain(req_ctx->bufsl, 2, areq->src);
- 		req_ctx->psrc = req_ctx->bufsl;
- 	} else
--		req_ctx->psrc = req_ctx->request_sl;
-+		req_ctx->psrc = areq->src;
+ 		/* request SEC to INIT hash. */
+-		if (req_ctx->first_desc && edesc->first && !req_ctx->swinit)
++		if (req_ctx->first_request && edesc->first && !req_ctx->swinit)
+ 			edesc->desc.hdr |= DESC_HDR_MODE0_MDEU_INIT;
  
- 	if (to_hash_later) {
--		nents = sg_nents_for_len(req_ctx->request_sl, nbytes);
-+		nents = sg_nents_for_len(areq->src, nbytes);
- 		if (nents < 0) {
- 			dev_err(dev, "Invalid number of src SG.\n");
- 			return nents;
- 		}
--		sg_pcopy_to_buffer(req_ctx->request_sl, nents,
-+		sg_pcopy_to_buffer(areq->src, nents,
- 				   req_ctx->buf[(req_ctx->buf_idx + 1) & 1],
- 				      to_hash_later,
- 				      nbytes - to_hash_later);
-@@ -2106,54 +2086,9 @@ static int ahash_process_req_one(struct ahash_request *areq, unsigned int nbytes
- 	return ret;
- }
+ 		/*
+ 		 * When the tfm context has a keylen, it's an HMAC.
+ 		 * A first or last (ie. not middle) descriptor must request HMAC.
+ 		 */
+-		if (ctx->keylen && ((req_ctx->first_desc && edesc->first) ||
++		if (ctx->keylen && ((req_ctx->first_request && edesc->first) ||
+ 				    (req_ctx->last_request && edesc->last)))
+ 			edesc->desc.hdr |= DESC_HDR_MODE0_MDEU_HMAC;
  
--static void sec1_ahash_process_remaining(struct work_struct *work)
--{
--	struct talitos_ahash_req_ctx *req_ctx =
--		container_of(work, struct talitos_ahash_req_ctx,
--			     sec1_ahash_process_remaining);
--	int err = 0;
--
--	req_ctx->request_sl = scatterwalk_ffwd(req_ctx->request_bufsl,
--					       req_ctx->request_sl, TALITOS1_MAX_DATA_LEN);
--
--	if (req_ctx->remaining_ahash_request_bytes > TALITOS1_MAX_DATA_LEN)
--		req_ctx->current_ahash_request_bytes = TALITOS1_MAX_DATA_LEN;
--	else {
--		req_ctx->current_ahash_request_bytes =
--			req_ctx->remaining_ahash_request_bytes;
--
--		if (req_ctx->last_request)
--			req_ctx->last_desc = 1;
--	}
--
--	err = ahash_process_req_one(req_ctx->areq,
--				    req_ctx->current_ahash_request_bytes);
--
--	if (err != -EINPROGRESS)
--		ahash_request_complete(req_ctx->areq, err);
--}
--
- static int ahash_process_req(struct ahash_request *areq, unsigned int nbytes)
- {
--	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
--	struct talitos_ctx *ctx = crypto_ahash_ctx(tfm);
--	struct device *dev = ctx->dev;
--	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
--	struct talitos_private *priv = dev_get_drvdata(dev);
--	bool is_sec1 = has_ftr_sec1(priv);
--
--	req_ctx->areq = areq;
--	req_ctx->request_sl = areq->src;
--	req_ctx->remaining_ahash_request_bytes = nbytes;
--
--	if (is_sec1) {
--		if (req_ctx->last_request)
--			req_ctx->last_desc = 1;
--	}
--
--	req_ctx->current_ahash_request_bytes = nbytes;
--
--	return ahash_process_req_one(req_ctx->areq, nbytes);
-+	return ahash_process_req_one(areq, nbytes);
- }
- 
- static int ahash_init(struct ahash_request *areq)
-@@ -2176,7 +2111,6 @@ static int ahash_init(struct ahash_request *areq)
+@@ -2103,14 +2101,13 @@ static int ahash_init(struct ahash_request *areq)
+ 	/* Initialize the context */
+ 	req_ctx->buf_idx = 0;
+ 	req_ctx->nbuf = 0;
+-	req_ctx->first_desc = 1; /* first_desc indicates h/w must init its context */
++	req_ctx->first_request = 1;
+ 	req_ctx->swinit = 0; /* assume h/w init of context */
+ 	size =	(crypto_ahash_digestsize(tfm) <= SHA256_DIGEST_SIZE)
+ 			? TALITOS_MDEU_CONTEXT_SIZE_MD5_SHA1_SHA256
+ 			: TALITOS_MDEU_CONTEXT_SIZE_SHA384_SHA512;
  	req_ctx->hw_context_size = size;
  	req_ctx->last_request = 0;
- 	req_ctx->last_desc = 0;
--	INIT_WORK(&req_ctx->sec1_ahash_process_remaining, sec1_ahash_process_remaining);
+-	req_ctx->last_desc = 0;
  
  	dma = dma_map_single(dev, req_ctx->hw_context, req_ctx->hw_context_size,
  			     DMA_TO_DEVICE);
+@@ -2202,8 +2199,8 @@ static int ahash_export(struct ahash_request *areq, void *out)
+ 	       req_ctx->hw_context_size);
+ 	memcpy(export->buf, req_ctx->buf[req_ctx->buf_idx], req_ctx->nbuf);
+ 	export->swinit = req_ctx->swinit;
+-	export->first_desc = req_ctx->first_desc;
+-	export->last_desc = req_ctx->last_desc;
++	export->first_request = req_ctx->first_request;
++	export->last_request = req_ctx->last_request;
+ 	export->to_hash_later = req_ctx->to_hash_later;
+ 	export->nbuf = req_ctx->nbuf;
+ 
+@@ -2228,8 +2225,8 @@ static int ahash_import(struct ahash_request *areq, const void *in)
+ 	memcpy(req_ctx->hw_context, export->hw_context, size);
+ 	memcpy(req_ctx->buf[0], export->buf, export->nbuf);
+ 	req_ctx->swinit = export->swinit;
+-	req_ctx->first_desc = export->first_desc;
+-	req_ctx->last_desc = export->last_desc;
++	req_ctx->first_request = export->first_request;
++	req_ctx->last_request = export->last_request;
+ 	req_ctx->to_hash_later = export->to_hash_later;
+ 	req_ctx->nbuf = export->nbuf;
+ 
 
 -- 
 2.54.0
