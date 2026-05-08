@@ -1,69 +1,140 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8868925A357;
-	Fri,  8 May 2026 02:51:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 889CA155757;
+	Fri,  8 May 2026 03:49:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778208678; cv=none; b=MsY89VQsDvQPCDM9TLeToR/H4LQw0ZeD32q5Q3orchz/drWrr0T+hN3XgWzRufKWoLjh+0bDY1WaenrWSSKyhaPC353rNTZBengzGmS5EQgNR2ndNut89TYOy2Tv7WVzFbN00m6pnrSW5p4QpXVw+W6L+SEp0JtTRjshtlFvNgU=
+	t=1778212182; cv=none; b=uj2YSwm1SbTDUmH4Poef2GmJHNz34EqmkWsDC3kcj99YXC0U65ft/dGw8gsHcAPElM+GB8cIFIwzvxPkGJINr/1Zu+7btrNNTjEh1Uwl0g0H3gLX1UrM333nTD03uhoYvZ/Z7z/iGq4QzSBQ+rpsAnIhtFhK6f6e2xODYW/Vh8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778208678; c=relaxed/simple;
-	bh=gxhOubjutu2qe+ybX9CTsnHGgiAQmJApdp08in3zORQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UKxEWtZNeZRGTCX+jKlSp7rnbR4Du5m4mWdLdQO7o9DEGT/UIEXXZIN1jHWtTQtA/88CLBpOI7z67YUznEuF4cD1xgOjq47ra7u7WK1i+8sEiKhjrfmr662WhALAugFAotgY9Y1+TuhvWVXsRqwyRQZHcOXBfoS0PK3iCKaoP00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Dmu+Z378; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1778212182; c=relaxed/simple;
+	bh=GNiaMGYE4dBVY4/4xbXo67oxqDypq66Fiv8HnCVyQYM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MgXOTshUQwuCjXwO8lVX5C1Ejcthx2a8WeRKzrQ/YNu7QIFGqLoyFtTZ+Jox1uFfi9WP2jR3R0jm5EDcAdOVBxueQZDXMA+XI7IrgbpqbWUPjfeGqa70YetLTxst7hNEU/H8aPz7+31lKeVRCIPbZTTTDdJlS2AaQTbAZWdb05Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=GUryWDoq; arc=none smtp.client-ip=117.135.210.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Dmu+Z378"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=LyxaTfhQHkEjXWt/Y3rNuARMEz7W4m5Qml3h+IJzcDM=; 
-	b=Dmu+Z3789Xx2rJ1QOF+gd0iW+agfw6Sde4tk0qE4Y65cSaQuUvz/BrjoV8Vm35Tnvry6jE5mWtM
-	uv3VnoOlIhEI8uwqyoH/UIS42Asvb/RFhKqEda6r4LpRQOZDzER19+JP9EL6UpFXnehbyV1vctxIU
-	mhYaGX4W74JzBXkXGqYWKRoI0mYCJ6+en3OKrzRa8hn7J8oSXSzdipgHrZd4IJQJhkrYTKKzFhlnF
-	qU63KQuIFuag7/VGxh6HAKW9ETzUgfXQsyqZc5saMWTfUAzFxiRP+9FoxTtC24wdvmXmYZYkXpxqB
-	pi0emhlgYSIRlRddPmfEIP02VBEQ0sIFgrPw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wLBJ1-00CHNP-2Z;
-	Fri, 08 May 2026 10:51:12 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 08 May 2026 10:51:11 +0800
-Date: Fri, 8 May 2026 10:51:11 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Aaron Esau <aaron1esau@gmail.com>
-Cc: linux-crypto@vger.kernel.org, davem@davemloft.net,
-	stable@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: acomp - fix dst-folio branch setting src instead
- of dst in acomp_virt_to_sg
-Message-ID: <af1Pn-IzTMu85dXH@gondor.apana.org.au>
-References: <20260507233748.327004-1-aaron1esau@gmail.com>
- <af1K4d8cxGOvlJxY@gondor.apana.org.au>
- <CADucPGTSNG3m=v9HuyZ=qr_-Qycccc9jjKU5K7O3LrHdEXgRaA@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="GUryWDoq"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=hJ
+	YJHhnbM9+n6PfPUg9Pab7ckJ84rm0ujgzU6aJxi/M=; b=GUryWDoqBRIDwLjH+1
+	xgNc4LTGR906jMREFFprUYQe0U/tTVewejXbrE9ogV2boWqwToRvgkup7yFuwhTw
+	/FIrjZGXMtG1a1Xnmr8UyJ4LRcF66TLPSsKlRzwpJlIcrvObY9NAH66wbHjxtVaf
+	m/61x2dXBOdEpY0lUeCirVJvk=
+Received: from wmy.localdomain (unknown [])
+	by gzsmtp1 (Coremail) with SMTP id PCgvCgDHNvYdXf1p1mxHCw--.12153S2;
+	Fri, 08 May 2026 11:48:56 +0800 (CST)
+From: w15303746062@163.com
+To: giovanni.cabiddu@intel.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: thorsten.blum@linux.dev,
+	qat-linux@intel.com,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Mingyu Wang <25181214217@stu.xidian.edu.cn>
+Subject: [PATCH] crypto: qat - remove noisy error prints in ioctl paths to prevent DoS
+Date: Fri,  8 May 2026 11:48:41 +0800
+Message-Id: <20260508034841.256794-1-w15303746062@163.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CADucPGTSNG3m=v9HuyZ=qr_-Qycccc9jjKU5K7O3LrHdEXgRaA@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:PCgvCgDHNvYdXf1p1mxHCw--.12153S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxAF1rAr1rJw43Zr18uw47CFg_yoW5Kw43pr
+	yrK34xtryDJwsrK3Wq93y8Za4F934qg3yYkF9rGa4fu3ZFgry8Ca13Ka4ayFW8CFyxuFW2
+	qa4jvry2ga1DK37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j718PUUUUU=
+X-CM-SenderInfo: jzrvjiatxuliiws6il2tof0z/xtbC4wg7H2n9XShVOgAA3B
 
-On Thu, May 07, 2026 at 09:49:08PM -0500, Aaron Esau wrote:
-> 
-> The patch was generated against v6.15-rc6 (82f2b0b97). The buggy line
-> is at crypto/acompress.c:240 in that tag, and the index hash
-> f7a3fbe54 matched (I just checked again).
-> 
-> Could you double-check?
+From: Mingyu Wang <25181214217@stu.xidian.edu.cn>
 
-We're currently at v7.0 heading towards v7.1.  The bug that you're
-reporting does not exist in v7.0.
+A Local Denial of Service (DoS) vulnerability was observed in the QAT
+driver. A malicious user or a fuzzing tool can repeatedly issue various
+QAT ioctls with invalid user-space pointers or unknown commands.
 
-Cheers,
+Currently, failures in memdup_user() and copy_from_user() trigger
+unconditional pr_err() and dev_err() messages. Similarly, invalid
+ioctl commands trigger an unconditional print. In environments
+with slow serial consoles (e.g., console=ttyS0), this creates a massive
+printk storm. This forces the CPU into a lengthy spin with interrupts
+disabled, leading to RCU stalls, multi-core soft lockups, and ultimately
+triggering the system watchdog panic.
+
+It is a well-known kernel anti-pattern to allow user-space to spam the
+kernel log buffer simply by passing invalid arguments to an ioctl.
+
+Fix this by removing these useless error prints from the user-copy
+failure paths and the default ioctl switch case. The kernel correctly
+returns -EFAULT or -ENOTTY, which is entirely sufficient for user-space
+to understand the failure, without exhausting kernel logging resources.
+
+Signed-off-by: Mingyu Wang <25181214217@stu.xidian.edu.cn>
+---
+ drivers/crypto/intel/qat/qat_common/adf_ctl_drv.c | 11 +----------
+ 1 file changed, 1 insertion(+), 10 deletions(-)
+
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_ctl_drv.c b/drivers/crypto/intel/qat/qat_common/adf_ctl_drv.c
+index c2e6f0cb7480..546ef1ac82dc 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_ctl_drv.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_ctl_drv.c
+@@ -94,8 +94,6 @@ static struct adf_user_cfg_ctl_data *adf_ctl_alloc_resources(unsigned long arg)
+ 	struct adf_user_cfg_ctl_data *cfg_data;
+ 
+ 	cfg_data = memdup_user((void __user *)arg, sizeof(*cfg_data));
+-	if (IS_ERR(cfg_data))
+-		pr_err("QAT: failed to copy from user cfg_data.\n");
+ 	return cfg_data;
+ }
+ 
+@@ -139,8 +137,6 @@ static int adf_copy_key_value_data(struct adf_accel_dev *accel_dev,
+ 	for (i = 0; section_head && i < ADF_CFG_MAX_SECTION; i++) {
+ 		if (copy_from_user(&section, (void __user *)section_head,
+ 				   sizeof(*section_head))) {
+-			dev_err(&GET_DEV(accel_dev),
+-				"failed to copy section info\n");
+ 			goto out_err;
+ 		}
+ 
+@@ -155,8 +151,6 @@ static int adf_copy_key_value_data(struct adf_accel_dev *accel_dev,
+ 		for (j = 0; params_head && j < ADF_CFG_MAX_KEY_VAL; j++) {
+ 			if (copy_from_user(&key_val, (void __user *)params_head,
+ 					   sizeof(key_val))) {
+-				dev_err(&GET_DEV(accel_dev),
+-					"Failed to copy keyvalue.\n");
+ 				goto out_err;
+ 			}
+ 			if (adf_add_key_value_data(accel_dev, section.name,
+@@ -335,7 +329,6 @@ static int adf_ctl_ioctl_get_status(struct file *fp, unsigned int cmd,
+ 
+ 	if (copy_from_user(&dev_info, (void __user *)arg,
+ 			   sizeof(struct adf_dev_status_info))) {
+-		pr_err("QAT: failed to copy from user.\n");
+ 		return -EFAULT;
+ 	}
+ 
+@@ -359,7 +352,6 @@ static int adf_ctl_ioctl_get_status(struct file *fp, unsigned int cmd,
+ 
+ 	if (copy_to_user((void __user *)arg, &dev_info,
+ 			 sizeof(struct adf_dev_status_info))) {
+-		dev_err(&GET_DEV(accel_dev), "failed to copy status.\n");
+ 		return -EFAULT;
+ 	}
+ 	return 0;
+@@ -393,8 +385,7 @@ static long adf_ctl_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
+ 		ret = adf_ctl_ioctl_get_status(fp, cmd, arg);
+ 		break;
+ 	default:
+-		pr_err_ratelimited("QAT: Invalid ioctl %d\n", cmd);
+-		ret = -EFAULT;
++		ret = -ENOTTY; /* ENOTTY is the standard POSIX error for invalid ioctls */
+ 		break;
+ 	}
+ 	mutex_unlock(&adf_ctl_lock);
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.34.1
+
