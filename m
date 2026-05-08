@@ -1,178 +1,105 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDED526A1AF;
-	Fri,  8 May 2026 02:36:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778207813; cv=none; b=TNw8oZzh+md0FR3CCBGPGPGTEZYwhNFDfCO8r/JP9SULaqgfTXdLIxuz9nsUtHPaIG8dvdvQW0dcnrqOF6V4PKZ0RoMt62LWVHbJXxCXZCp4QvnxGfdx4sOLEoijatkEydBL++gEWKu+xY3POONq1LMURONzrpHsT7FdpIjl9s0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778207813; c=relaxed/simple;
-	bh=1cr3uwDCOLe2xAzmh05qeoQ9WTC8kgnA7SfASHugnZo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oQwvya82B0S0fsz7kVlelAosJvZekfikyyfdvxVETktiEmUqS/kreFuy2BTgARSA0YypCFMT7838WCBmzhDR9c1kYjyJ0jI2r7oxylkEtyZQaE8nbL7sqqu7uRxnjqvNbAe75fSCB9GHyepSzv6NXuJrtOo4FuRkC2QFzxsr9L4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=MY8CLf3C; arc=none smtp.client-ip=220.197.31.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AEEE2BDC1C
+	for <linux-crypto@vger.kernel.org>; Fri,  8 May 2026 02:49:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1778208563; cv=pass; b=SfZa5uK+rZiouhiosHdStEDYCcZKduetSrGm3Gs6HsC+9tuwwMEjyF7aD1c/YsoNO3YI8aHK1M4H7SlnV5cJrxp0Yo+GFj/jd7jG4Nh1MMQSyE6n1T1EutpVpH0xr5lfZFJ4M3iJmvtrG436X2DI+zbclbpydlFra/0BZOsZmUw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1778208563; c=relaxed/simple;
+	bh=R7N4yyfJb/a6KstxZcHf9OEwA9PiX53CJe03YotniMU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UdoOYQZTgkI5od0LlrPf/zUv/4IDZ0eQZpjyHjpoeVN4l4VikrGgmh5C/0FHuP8RA7RVu01hP4eUTanw4B7isRW/3AinCSXCXpOXvaW0r9dirEWa6Xj46ASNd1EGutDjI+M96Bn27ScWpPs61VaSbZmKvRH40rY1gpnC1MIERfo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YDIPWXri; arc=pass smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="MY8CLf3C"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=lF
-	7Yb+cpLPx9xSLiXZvacb2sR9rjLv9VLJIsXkcXyDM=; b=MY8CLf3C847vzjHn+S
-	SDjgH5JwV/RYgWEynApgpgRSf1jyFkDeXBxOKMVPMCuQxhKt+Qmw3KrbUNLSdhXc
-	MOmQ+9ITjK28opkxYfXIh7grSilzNBOJA2lr4eamvRSOdFSTKmMeWMbCrhlvA+wZ
-	L9/iGerFZKpK/b35OTGRXL/Gk=
-Received: from wmy.localdomain (unknown [])
-	by gzsmtp1 (Coremail) with SMTP id PCgvCgDH6qIATP1p20ZACw--.1139S2;
-	Fri, 08 May 2026 10:35:53 +0800 (CST)
-From: w15303746062@163.com
-To: giovanni.cabiddu@intel.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Cc: thorsten.blum@linux.dev,
-	kees@kernel.org,
-	qat-linux@intel.com,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Mingyu Wang <25181214217@stu.xidian.edu.cn>
-Subject: [PATCH] crypto: qat - fix Use-After-Free in adf_ctl_ioctl_dev_start()
-Date: Fri,  8 May 2026 10:35:42 +0800
-Message-Id: <20260508023542.256299-1-w15303746062@163.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YDIPWXri"
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-8bc379fcb51so798316d6.0
+        for <linux-crypto@vger.kernel.org>; Thu, 07 May 2026 19:49:20 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1778208559; cv=none;
+        d=google.com; s=arc-20240605;
+        b=X5n2OnIoD1KXQGVplM0HGxzGlBOPJUIx3MjF+3AfyaePXLVaTldhWgbL/a+TYMSb/o
+         U2wkBYKZd5j2+N2EENA2lq5N/PaS0lR9Rs6u7KSYYhWBeicx//5yvwrEzkuYkuM8jiz0
+         pnVHDm6Nz7M0etc4lTtRq0RR47XPO4Evk/jSOfyU7lFRJvRJX/2UYPKIAiFGj7yGcuII
+         L10mLptAYdz5hMw5xLPQ6Gvdai+SVFd4dN6l+Kxh4OYWSaI4+nueZO7Q1a978ohdKmIs
+         gntQPBcNk9oLHdo4hMOtyVjcCLfZkA4HHwa1050lvap+3ru6nty8cISbA7lGWq6NFp1U
+         p2uA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=R7N4yyfJb/a6KstxZcHf9OEwA9PiX53CJe03YotniMU=;
+        fh=Bchi/oEUDDtfooq5ip/o4h6xh/qQrz5WlP+htOYaHnc=;
+        b=LT2+h12EazLzAs1JWoZaQtA44zFn0ylXd41gf6WuFw7EzTBvJFlS1/EcLYxn3hHK1n
+         eDKZ/zCzkf8HlIlCRC93G/lzhgaGMkhWe+KriUxMo9miCHOCLKaPNow6uot52/GXuzlz
+         X1PzUrTOZV7CJs4F5XuNKYyw4NCfG3pLAmfi6I3lD30yIVfLryEyNTgpdWLXyHv7/sp0
+         1Wkfsz+XuOoEKv+l+JJsTNOf4YlqkR+zjnOCqwPQlZiw6sjLPeDILDgbXZaBRc9W/eyK
+         j07eUOgM1CQY+Zv79zfe96b/qjGqLECC8Q+gCfC4LQsbZ0uNLD7mgLlT/+avboWwtsvn
+         Lb0w==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778208559; x=1778813359; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=R7N4yyfJb/a6KstxZcHf9OEwA9PiX53CJe03YotniMU=;
+        b=YDIPWXriG5BzJ7Qs+RDR3hpC3vGMiQoVNZupWRSm1RIMM090/b/mXE+9YeASWD0KC0
+         M64hjX0TpSCkf54hRp3mWqcQaJkGUkLqrBEfxwan8Ao/dWNI/fEEYnMK4vU4NiMfzMzs
+         HpmaO99kk4pv1vVBqm9diAuZFhmIpEKCR/fuh+gp3WonJe8C2BDHVwPGaUg1WO6kPpse
+         M6s0ai0AoJlx8RdrGd34ZWrxqadb/hx+Ju6vtM3KTgRM4S30c5PONsq5iiQx0fxKmXYi
+         IEzh5MKuzsp6NrRNUsHM29lLsvqUnj2tPbQqYlzKZch4V+6m+i+hWpIebMG0nDqv07mA
+         mN6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778208559; x=1778813359;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R7N4yyfJb/a6KstxZcHf9OEwA9PiX53CJe03YotniMU=;
+        b=SlRENcKJvN/1HFXrfZwAZnvLjDhY/jkse1xGIFdxfFI6/g95j9zpN6CHqGVbg2HYP0
+         ataBW93OBGNEp/gFFefQLdUNoG9wcGJtjQaYUxCUjuAMaFTUoBFZjIA160iEqAIOnnVv
+         PAWLmAnDyHBrGW5goAOTIgiwMoIJRk+g09oXV6B2gyXzadgbLySw1a9bPmFvhr9zGmcU
+         MDYe0v6+3XA7Bz29YumtvB0aQ85pTX4HrrNVvwNVAmnJ4PqQyugCTefc/pLu5E/1OXYC
+         zmOL3TQk91wbhz2X0JMbqhDLjLYgcu89GRvHx0uSSVOxG/dG80helzMEgoyzmJJI5Pbq
+         OFng==
+X-Gm-Message-State: AOJu0YyZuGBzHqXnwXm0/weIkEzCeOUeK64tGu/r1bF+opuhmQuzoEy1
+	CgWNud44q8Fy7ffwL0k/K/HpsEuUpCW9p5nOzOT64jgWlbRl+aHu3U47Hpbx1wnxb6pzt7jI3H7
+	9aEPU2Hwu7q8EGETEguHZpPeWDvuw2Bg=
+X-Gm-Gg: Acq92OHs7uz5skvn2/zdckMXvZx64SCHFsAV8blzk5MrhrwT6a1sbkbVVKpsbzJ4Bfr
+	mWDui591tTEoli02u6+ViYV4sDJpa+42WB3yO8Tx4zVb4ShEL0eb+9gf5JvxhqgqM1IKOgSGUCH
+	U3/Hcmxnmt9S5RQGuSZ5I6KkdA6Jt8v5vRG65DoSLbf81DZH7xx+Mw4S656PJsWuYdOYgTnOT2L
+	fXBINWsPTY1hOZofiipbRUf+d9tYvgnkv/u1t+W+InblhMyj/Sxek/bj82pkBT0Uo+cNiKCmu1/
+	Y3ubIozOipSzjGBiJBmlF/M31Tt1vRthyv6p9vB/vo6VZfvRQeX3YYbT4CBmTMmoqxpmeSm9w4u
+	rgwpISnI=
+X-Received: by 2002:a05:6214:19c5:b0:8ac:a205:f118 with SMTP id
+ 6a1803df08f44-8bc462028c9mr117592396d6.8.1778208559255; Thu, 07 May 2026
+ 19:49:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PCgvCgDH6qIATP1p20ZACw--.1139S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxAF1DKFW8urWrKrWftF1UZFb_yoWrZw13pr
-	W8WayrtryDtrsruryjkrWru3WF9wn2v343CFyxGw1Ikw4UXFyrC34YgFyUGr1rCFWkuFyD
-	XF4DZa129ryUJrUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UlLv_UUUUU=
-X-CM-SenderInfo: jzrvjiatxuliiws6il2tof0z/xtbC4wnu0mn9TAmJjgAA3A
+References: <20260507233748.327004-1-aaron1esau@gmail.com> <af1K4d8cxGOvlJxY@gondor.apana.org.au>
+In-Reply-To: <af1K4d8cxGOvlJxY@gondor.apana.org.au>
+From: Aaron Esau <aaron1esau@gmail.com>
+Date: Thu, 7 May 2026 21:49:08 -0500
+X-Gm-Features: AVHnY4LhR7RMGGpnWHlWBULBtuXHcvG_1OCmZcim96NpoSF4yVzYSeKu9cq309g
+Message-ID: <CADucPGTSNG3m=v9HuyZ=qr_-Qycccc9jjKU5K7O3LrHdEXgRaA@mail.gmail.com>
+Subject: Re: [PATCH] crypto: acomp - fix dst-folio branch setting src instead
+ of dst in acomp_virt_to_sg
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, davem@davemloft.net, stable@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-From: Mingyu Wang <25181214217@stu.xidian.edu.cn>
+Hi Herbert,
 
-A severe Use-After-Free (UAF) vulnerability, which KASAN detects as a
-slab-out-of-bounds access, was identified in the QAT driver's ioctl path.
+The patch was generated against v6.15-rc6 (82f2b0b97). The buggy line
+is at crypto/acompress.c:240 in that tag, and the index hash
+f7a3fbe54 matched (I just checked again).
 
-When handling commands like IOCTL_START_ACCEL_DEV, various functions
-retrieve the acceleration device using adf_devmgr_get_dev_by_id().
-Currently, this lookup function iterates over the accel_table under
-the table_lock. However, once the target device is found, the lock is
-dropped and a bare pointer is returned without bumping the device's
-reference count.
+Could you double-check?
 
-This creates a critical race condition. If a concurrent thread removes
-the device (e.g., via device stop operations or PCIe hotplug) by calling
-adf_devmgr_rm_dev(), the device is removed from the list and its memory
-is subsequently freed. When the original ioctl thread resumes and attempts
-to acquire accel_dev->state_lock inside adf_dev_up(), it triggers a
-KASAN panic.
-
-Fix this by acquiring the reference count inside adf_devmgr_get_dev_by_id()
-via adf_dev_get() while the table_lock is still held. If adf_dev_get()
-fails (e.g., the module is unloading), we safely break the loop and treat
-the device as not found. All callers of adf_devmgr_get_dev_by_id() are then
-updated to properly release the reference using adf_dev_put() when done.
-
-Signed-off-by: Mingyu Wang <25181214217@stu.xidian.edu.cn>
----
- .../crypto/intel/qat/qat_common/adf_ctl_drv.c  | 16 ++++++++++++++++
- .../crypto/intel/qat/qat_common/adf_dev_mgr.c  | 18 +++++++++++++++---
- 2 files changed, 31 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_ctl_drv.c b/drivers/crypto/intel/qat/qat_common/adf_ctl_drv.c
-index c2e6f0cb7480..0519cc02e634 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_ctl_drv.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_ctl_drv.c
-@@ -201,6 +201,10 @@ static int adf_ctl_ioctl_dev_config(struct file *fp, unsigned int cmd,
- 	}
- 	set_bit(ADF_STATUS_CONFIGURED, &accel_dev->status);
- out:
-+	/* Release the reference acquired by adf_devmgr_get_dev_by_id() */
-+	if (accel_dev)
-+		adf_dev_put(accel_dev);
-+
- 	kfree(ctl_data);
- 	return ret;
- }
-@@ -278,6 +282,10 @@ static int adf_ctl_ioctl_dev_stop(struct file *fp, unsigned int cmd,
- 	adf_ctl_stop_devices(ctl_data->device_id);
- 
- out:
-+	/* Release the reference acquired by adf_devmgr_get_dev_by_id() */
-+	if (accel_dev)
-+		adf_dev_put(accel_dev);
-+
- 	kfree(ctl_data);
- 	return ret;
- }
-@@ -310,6 +318,10 @@ static int adf_ctl_ioctl_dev_start(struct file *fp, unsigned int cmd,
- 		adf_dev_down(accel_dev);
- 	}
- out:
-+	/* Release the reference acquired by adf_devmgr_get_dev_by_id() */
-+	if (accel_dev)
-+		adf_dev_put(accel_dev);
-+
- 	kfree(ctl_data);
- 	return ret;
- }
-@@ -360,8 +372,12 @@ static int adf_ctl_ioctl_get_status(struct file *fp, unsigned int cmd,
- 	if (copy_to_user((void __user *)arg, &dev_info,
- 			 sizeof(struct adf_dev_status_info))) {
- 		dev_err(&GET_DEV(accel_dev), "failed to copy status.\n");
-+		adf_dev_put(accel_dev);
- 		return -EFAULT;
- 	}
-+	/* Release the reference acquired by adf_devmgr_get_dev_by_id() */
-+	adf_dev_put(accel_dev);
-+
- 	return 0;
- }
- 
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_dev_mgr.c b/drivers/crypto/intel/qat/qat_common/adf_dev_mgr.c
-index e050de16ab5d..5e9313d8bacf 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_dev_mgr.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_dev_mgr.c
-@@ -320,8 +320,14 @@ struct adf_accel_dev *adf_devmgr_get_dev_by_id(u32 id)
- 		struct adf_accel_dev *ptr =
- 				list_entry(itr, struct adf_accel_dev, list);
- 		if (ptr->accel_id == id) {
--			mutex_unlock(&table_lock);
--			return ptr;
-+			/* Increment refcount to prevent UAF during removal.
-+			 * If adf_dev_get() fails, the module is unloading.
-+			 */
-+			if (adf_dev_get(ptr) == 0) {
-+				mutex_unlock(&table_lock);
-+				return ptr;
-+			}
-+			break;
- 		}
- 	}
- unlock:
-@@ -331,11 +337,17 @@ struct adf_accel_dev *adf_devmgr_get_dev_by_id(u32 id)
- 
- int adf_devmgr_verify_id(u32 id)
- {
-+	struct adf_accel_dev *accel_dev;
-+
- 	if (id == ADF_CFG_ALL_DEVICES)
- 		return 0;
- 
--	if (adf_devmgr_get_dev_by_id(id))
-+	accel_dev = adf_devmgr_get_dev_by_id(id);
-+	if (accel_dev) {
-+		/* Release the reference immediately as we only verify existence */
-+		adf_dev_put(accel_dev);
- 		return 0;
-+	}
- 
- 	return -ENODEV;
- }
--- 
-2.34.1
-
+Thanks,
+Aaron
