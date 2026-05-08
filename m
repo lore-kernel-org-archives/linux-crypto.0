@@ -1,107 +1,102 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED4F386C28
-	for <linux-crypto@vger.kernel.org>; Fri,  8 May 2026 09:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53B17391841
+	for <linux-crypto@vger.kernel.org>; Fri,  8 May 2026 09:19:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778231050; cv=none; b=FYDEhl6WH61fDD+2nrKxdzl1qjtfIQPOpyi/X3MhL6wI7OFpswUg26V/tHZ0rJnhRBGRcII8PguB985HjnmJ9B+ZvUOgo5YhwZ82/GV79Poqp/0UteWUmjoeoeNRZtLXzK8wCST8Nqs23RRF+pJgpo1wDnBW6RpjwTBBmfjzmSg=
+	t=1778231960; cv=none; b=L3wLpL85Z15Y8bKDsGgCyTmSjBvJEsyigFSnNG//siyocCACqu732EaLY69mZVhRl1GbTo3qV1s1hJSi/PaaOVQqvZbqOhgaSdVazDzqCA40JukBoeoy3AlSWmyuxA+7EqNQl12jlp2frRClU17G6Cb8f8NE75yryAdFwOlawfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778231050; c=relaxed/simple;
-	bh=zajsfd6Zx0r+0jFiouMsfLQHH3EpQd4NklNufX7L6ZA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Af8HMuIaTYujon7+Sc/0a4kDoneFDng0AwYk/MATUj5OADPUdpWB+FGOR2jVcLivlMgluP67F5UFsEv3B3iNnLhN7uSUJ3cNVNp+b7fxuz6epBHQvIjBTynmw40EDQUPEnvKplete7eGJvCl+QNJ6GjDDcDMNpxditufXjIKbg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cse.iitm.ac.in; spf=pass smtp.mailfrom=cse.iitm.ac.in; dkim=pass (2048-bit key) header.d=cse-iitm-ac-in.20251104.gappssmtp.com header.i=@cse-iitm-ac-in.20251104.gappssmtp.com header.b=Pszw1Oin; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cse.iitm.ac.in
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cse.iitm.ac.in
+	s=arc-20240116; t=1778231960; c=relaxed/simple;
+	bh=VY+hF2GB4PYTwHtJtktYHKfdj/kbNHWf9kBvXuFRvi4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RdlXViVRGa/o5K20Wkn1DA1dvI03rmpYzWdgJRPw/CfFnR8Ztz7O8NcQ6AS/2bgcMNhZqNpOc1R8jY32Y+4njD76rzqvAPN+6WhgwHZUDtOlyH8ke7XFy2xSWCLaR1yTFObmgK18rCZ3iHTcdvYomstmrO4X5y/l3CxhDagFxPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jQCCV+US; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cse-iitm-ac-in.20251104.gappssmtp.com header.i=@cse-iitm-ac-in.20251104.gappssmtp.com header.b="Pszw1Oin"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2b9fcf7c91bso17085255ad.0
-        for <linux-crypto@vger.kernel.org>; Fri, 08 May 2026 02:04:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cse-iitm-ac-in.20251104.gappssmtp.com; s=20251104; t=1778231049; x=1778835849; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jPkAvC6+8Qgyj82iA24dzkSdXJ8Nbp5ATROfqKNJE9U=;
-        b=Pszw1OinQ0er7PYgofMfkf4am8zuXx1++Oev4YtaGiBDa7/88b1uVNgDpiaaLBGRqN
-         kX31CHkjgsp14yf41FkqW6oSAGn1jqF0fkSxU9pbWAGpbaOWnuQ8G4EASJH6EsuqvV7r
-         q4HMr6Kx6hMCYvDcaS2u2rBPwcZM3SgPSrGowi+uLa7c9DXpsd/K6pKO1TOZUbUGgL66
-         ZK8M9O2daVshz//FLRV/xfhcIPpzzwD6VturmItMo8DblVPjzHtFkg/GVD/dKHXPzAzc
-         yN94zVXvZ1nQDFyB9+InG3YTYix1XynlV40rislw6/8LJhb8sDJmOIBPZQIzrGTADuqM
-         jhhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778231049; x=1778835849;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jPkAvC6+8Qgyj82iA24dzkSdXJ8Nbp5ATROfqKNJE9U=;
-        b=OakT5gZprL9oEn5ooBvNWK/z9nDyGz8sqZbY2qxMOYc1LVTq4tJqKlp6tiPfVl7R5l
-         EZF2jQIa6tIPvnyxCZo/aAQyGkueDOWrlu2rzYbL1FpewIB5h+QfPBm+sMsvGaK9IPJa
-         yzsJb6RTKW7rGGPuF5mcAah9I5KmIKHa1Hku3Nm18gFUtTK4CtauFMsGyhR0qPjo8S2L
-         frpibl2lb/7JmO3HJTv9EjT9RZHz6uBw0sg6OfmBQ/++a7NNi83CVjuoZMUAi+EcXE9T
-         zyXkhoQAMKYekd7btnjUm0TWGFVFQcGdFOkF4WFOmZ/oXDHlpmKn5Z+GHcWI5PEMW5vi
-         8xng==
-X-Forwarded-Encrypted: i=1; AFNElJ/4ER0zj1jzKXJjwQdmKDVT/JleNQ3C9MPuPhuBY19J6+B2UKXRkU9/gNAHu0zcR2kInisNOGZC3TG0CJo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YweXz326cBVsjudzjl6+vd2+Dsh8CmJ+p1w6i6S3RqQJDcVoTCI
-	/tTFYIFTjc4LkpCGO6/vtAKlXju5tw2c0+UVbz7K5sY2M2aKaCI2tTywxyYh0pwNoOg=
-X-Gm-Gg: Acq92OEHCpVz0WUuQmqinA7isCLvFwEvK69MusFG1HN/mgLrurCAzw8SsPkgNs0U5Jd
-	zbFIvrdMde/re9fq1s03uzI668bnLZX62+dHmyP+iLRCMbZehUboEgAdTEt+/srM5RuNRw1D6Bz
-	Vkp0qhZV3+saHUtH9hIu1F5i0Qr9chyNChxcsKEJQ5P5iuwEuksNmCqzzQulvexX0Nx6LXkL4rp
-	db6T7waTvT2PdOj7WVzDEjkkGroyw5fsBQzbVi53m2WNHxEsTnzDaPzlzJsE/VtwXN9K+V8Er8X
-	A5+QtEbz1qtRYc74z4aByUtqc0FGsC43u0TgoHn3KlAfP7SIz+zlgudRblM+CRbzpHc1yB4v5me
-	rJFKBMmKAR5tZahSPnrnD22QRSaJyPQ1axA0L3IGJAT7yxKorJDEuOU52ElxFv9BUlQs0WTVOWq
-	AEgz3Jphi1SL+fu7oHG/rINNb6I7dIGII6ex2ODJTExcyW2tvgD6w7+UOgapmlx8ZAAb/ffppb6
-	nD14mT3+lQH1lQ9661OlMfJ5ordQr4wBSR9TN+21pjYuTGhM0n8ANQ6Bw==
-X-Received: by 2002:a17:903:350d:b0:2b0:6f21:8289 with SMTP id d9443c01a7336-2ba79c2232amr113703265ad.25.1778231048621;
-        Fri, 08 May 2026 02:04:08 -0700 (PDT)
-Received: from localhost.localdomain ([103.158.43.41])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-2baf1e3571dsm14056585ad.42.2026.05.08.02.04.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 May 2026 02:04:07 -0700 (PDT)
-From: Abdun Nihaal <nihaal@cse.iitm.ac.in>
-To: atenart@kernel.org
-Cc: Abdun Nihaal <nihaal@cse.iitm.ac.in>,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	pvanleeuwen@insidesecure.com
-Subject: [PATCH] crypto: safexcel - Fix potential memory leak in safexcel_pci_probe()
-Date: Fri,  8 May 2026 14:33:45 +0530
-Message-ID: <20260508090347.74176-1-nihaal@cse.iitm.ac.in>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jQCCV+US"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1778231957; x=1809767957;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=VY+hF2GB4PYTwHtJtktYHKfdj/kbNHWf9kBvXuFRvi4=;
+  b=jQCCV+USg/o09X+H0bK2PMZM21sJqiCSLJzXma84L1Ei7jJGcj2iyLmR
+   XKV9UaPY5/uQhnxM3+Yzb+DqkKuPkyJqaBGvwlaOdmIjaRmwAZcciQ77e
+   d+97cLPwsHK2P6+ab5nIyeBa/+yL+KvfDTPjWPATWb2kP4EfJhb7z/Mx8
+   oJ7ao57rAxsMvR5NPwOYB5UGUoMy2eFi51LtH6KtBCjuSH4d7wHU8EyM3
+   tBfSe9fSz1XAsli+Mo06GwqcnslX4mEC+rusmnPDxRfFcCB8JKCOvuTgW
+   J+jQwiiW+cTV8broK3zeHzWZNwaquZmG/GApviOrMf0MtM1DF94TbqFm6
+   w==;
+X-CSE-ConnectionGUID: aFZ6euawRf+okBo/OIxj0Q==
+X-CSE-MsgGUID: S/Ku4gjjSAqe+qTuOwvquQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11779"; a="79238666"
+X-IronPort-AV: E=Sophos;i="6.23,223,1770624000"; 
+   d="scan'208";a="79238666"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2026 02:19:17 -0700
+X-CSE-ConnectionGUID: 9JS9xCcPQhCjlMFWsbT9sA==
+X-CSE-MsgGUID: EwOBn+m0SkOrnD+IbalweQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,223,1770624000"; 
+   d="scan'208";a="240712885"
+Received: from silpixa00401971.ir.intel.com ([10.20.226.106])
+  by orviesa003.jf.intel.com with ESMTP; 08 May 2026 02:19:15 -0700
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To: herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org,
+	qat-linux@intel.com,
+	wangzhi@stu.xidian.edu.cn,
+	byu@xidian.edu.cn,
+	w15303746062@163.com,
+	vdronov@redhat.com,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH 0/2] crypto: qat - remove unused ioctl interface
+Date: Fri,  8 May 2026 10:18:22 +0100
+Message-ID: <20260508091912.206913-1-giovanni.cabiddu@intel.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Content-Transfer-Encoding: 8bit
 
-The memory allocated for priv in safexcel_pci_probe() is not freed in the
-error paths, as well as in the PCI remove function. Fix this by using
-device managed allocation.
+The QAT driver exposes a character device (qat_adf_ctl) with IOCTLs for
+device configuration, start, stop, status query and enumeration. These
+IOCTLs are not part of any public uAPI header and have no known in-tree
+or out-of-tree users.
 
-Fixes: 625f269a5a7a ("crypto: inside-secure - add support for PCI based FPGA development board")
-Signed-off-by: Abdun Nihaal <nihaal@cse.iitm.ac.in>
----
-Compile tested only. Issue found using static analysis.
+This ioctl interface increases the attack surface and is the subject of a
+number of bug reports. Remove it entirely.
 
- drivers/crypto/inside-secure/safexcel.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Patch 1 removes the character device, the IOCTL definitions, the related
+data structures and headers. It strips adf_ctl_drv.c down to the
+minimal module_init/module_exit hooks. This is marked for stable.
 
-diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index fb4936e7afa2..2bd8641a07b3 100644
---- a/drivers/crypto/inside-secure/safexcel.c
-+++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -1893,7 +1893,7 @@ static int safexcel_pci_probe(struct pci_dev *pdev,
- 		ent->vendor, ent->device, ent->subvendor,
- 		ent->subdevice, ent->driver_data);
- 
--	priv = kzalloc_obj(*priv);
-+	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
- 	if (!priv)
- 		return -ENOMEM;
- 
+Patch 2 renames the now-minimal adf_ctl_drv.c to adf_module.c and
+adjusts function names to match the new file name. This is not marked
+for stable as it is a pure rename.
+
+Giovanni Cabiddu (2):
+  crypto: qat - remove unused character device and IOCTLs
+  crypto: qat - rename adf_ctl_drv.c to adf_module.c
+
+ .../userspace-api/ioctl/ioctl-number.rst      |   1 -
+ drivers/crypto/intel/qat/qat_common/Makefile  |   2 +-
+ .../intel/qat/qat_common/adf_cfg_common.h     |  27 -
+ .../intel/qat/qat_common/adf_cfg_user.h       |  38 --
+ .../crypto/intel/qat/qat_common/adf_ctl_drv.c | 466 ------------------
+ .../crypto/intel/qat/qat_common/adf_module.c  |  64 +++
+ 6 files changed, 65 insertions(+), 533 deletions(-)
+ delete mode 100644 drivers/crypto/intel/qat/qat_common/adf_cfg_user.h
+ delete mode 100644 drivers/crypto/intel/qat/qat_common/adf_ctl_drv.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_module.c
+
+
+base-commit: c9e14a7f54e4552968e3103fa871b1380ca23208
 -- 
-2.43.0
+2.54.0
 
