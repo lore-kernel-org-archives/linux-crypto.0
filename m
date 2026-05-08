@@ -1,307 +1,126 @@
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A89823128CA
-	for <linux-crypto@vger.kernel.org>; Fri,  8 May 2026 10:57:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D5ED36D51E
+	for <linux-crypto@vger.kernel.org>; Fri,  8 May 2026 11:49:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778237873; cv=none; b=S/0MMIhtg1o6WaatDTrDnu2GsCtZkF9zYg1sKJt6DDtTP1BIZ3MmW2goevyFwWRWIh41YPJnZmLBmgUbAjZVc+cU9sI7jDVDd84oTRUOzaEImCb62NTG3g8oV3AbZSaaLm2WScemsWiNbwFfjPghwS8fMZTMjsbF03RHnl8oFKA=
+	t=1778240972; cv=none; b=HfqaMcAO0YSGA91PQv4ACdfQBHNe9Vf/p0c3wdwKDUGf7CVF9m27NJW7Ic2s5Kvdn0fB0jYKidcpMwGbm6i3IKLXr7xM1X/cx8Gf86DcBuye7slPp/jFeKYPgGMpRuhYUMpQqfqXHb4Lth/v/rxdDO9xlkVHdVIdIk4YzoOX9cI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778237873; c=relaxed/simple;
-	bh=osTpXZEqTNoUgKMmpt6GTU6Dt44cvUtUMVwtcbgXOo0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Dbiiyxi0M0HUu2VuYUpnO1bZbX8Gi99eZcB5gMf6M0ZLfy/rdCR5f0q7mG6hU9VHBqwoIFh3zjpVRhZt9Bx2ycIWRaohevdOIz6UWD7l3bXdnEN9IcEVpyVRQh28ZQc5hMZ79CBL7pKoHh+OQp5Q+28jEl5oTIolnbwqq6IhdE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; arc=none smtp.client-ip=91.218.175.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: use designated initializers for report structs
-Date: Fri,  8 May 2026 12:57:17 +0200
-Message-ID: <20260508105717.472043-3-thorsten.blum@linux.dev>
+	s=arc-20240116; t=1778240972; c=relaxed/simple;
+	bh=Z+dOeoUVh4GN7xXwfzT4PipGR2w1MslUMmBn4kUlQuQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=q1dAiTQMcaGXpxME7IYJolpw68zBXD2GJ/MJM9eIm7yePVXFQcvfx5hcgj4NkPGRxhvcHw1TGYGDh7IAUKHYxfm9jMQNdv0XzuqkIhD/P2GbKsDyMlzhbMYVn4aEwXt172w2x8hXn8Tp0eL6ZI0TXw/axBXMaWpYGfkqmX3T1sQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LYMVzKeC; arc=none smtp.client-ip=209.85.208.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LYMVzKeC"
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-393da8f389bso16655401fa.1
+        for <linux-crypto@vger.kernel.org>; Fri, 08 May 2026 04:49:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778240969; x=1778845769; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wBVIuGPalW20UUvV7tEQr4ZoKlf0MwtNwF5pPYAVLWw=;
+        b=LYMVzKeCtp0qdzrKtavtxK/E2AutnNAVM8yELSC8GyQTYF8KNVYDxsT6qaexs9qNOz
+         b/lsJg9MQVYsf7juaoYmzCys7kjLWBBoEPGouAbFWTpxzD2pFmkOGzuPpZ86OdFTKSda
+         CviXUPMtjmWp+UkrBJqqRxZ9IOGBOdgC6b5VdY1LYhqBf+dabi/agKWQeUFYNA1d+sAD
+         iLXXPDUC5/+ahqDViyRq4kcT7H5ZQG+WDQz3EOYj8OfEOnM5PeQqHyqa3Tv610EnGFDf
+         NMYjgqcNnsHzoxv2QPqHexp6o8UAInWVXJJjy9LLKfrJEEg8Pb7VTIUoQW2NSNcDFIXI
+         79gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778240969; x=1778845769;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wBVIuGPalW20UUvV7tEQr4ZoKlf0MwtNwF5pPYAVLWw=;
+        b=o9dIOe8A26mU35YVZV83FJAfdbbScrb5ARuT2IdYVFxtGNL3j+BGHKu16iy2pmoHjh
+         b1RoNZOlVziMOplX32QOhK8cXdj/4Qbkg+NT9gZhIyaW+gJCyVoQpbkZ3U8fhRFK6h/t
+         AjJdfOzwzhtOgb0RHtXHW2BW+sK0Mlqgwk/KOommYve8XMNQlBW4YXAbzqWUbLd+E6lW
+         RHkHWadJZxKwsBiZpgnTg4b6aosB7/jvGCVUGhCtRAl7Ol68O9GTaky8uRbCxGyhfiWj
+         Sh79dSR5aP59w6Cze49c9YINo4G/eTgeDX5K77YiKfrizEhJtZPy00Qu8WJjp9uby2fi
+         WGmA==
+X-Gm-Message-State: AOJu0YxBGMZ9IbpVHpjHd0xA1YQI+xGK0IbD20PJ2Ru1FaxkVlkWiNeQ
+	ELEaP5P83tbpAM/8qdge1cjSqTnYxMgCeABbGgoGm9j5FB1l6f1OSBRH
+X-Gm-Gg: Acq92OFFgMDMgpi91rkCvDZ1qrQ6EPMOWSss11mAjmBl5J1uW15fdXBFdIgm8BcjAvk
+	ny/eUwu7Jivd5AyUEAdhsa/geNwWJjbGCac7qnyuv73sVI/3XfJqo0cqtf5xK2Kk9RGK5X2WrA/
+	vgNfepJakxpn5MNN2WRU3+/5O09xhUIGdV99nMYqX6q5MaO/kdRv9Ck86NVNuYMCvUFNW0PhV/l
+	/x6sNFBkJF17vdprmA7zEN7v5zh5CsOTicOXtBHuFk4fam9ptngYMZYh0WQMdrw5w/LYN8XXI5V
+	aONtZdcw8lw/7eT4uDusULCqKTNW2CqIYRx/9VWqmtg6K+5Xr6pXkCsMs1wh1EYh0GKmIIjsxiB
+	cMEHOMEqAK9i1wYQNQ7Nz18VDe5c4DyvMpETZLQHWMz/MAaN5EdanrfxpbSw1L3Hh1xrMJCN/gT
+	a3ZaS7Hg3Kohr3j9x7B/jaWTJTGFyrLih5CC+GqlNRuYi1ag==
+X-Received: by 2002:a05:6512:1304:b0:5a2:b3dd:7a74 with SMTP id 2adb3069b0e04-5a887ceafc7mr4536300e87.33.1778240969424;
+        Fri, 08 May 2026 04:49:29 -0700 (PDT)
+Received: from svery.. (109-252-11-240.nat.spd-mgts.ru. [109.252.11.240])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5a8a956bd58sm449992e87.84.2026.05.08.04.49.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 May 2026 04:49:28 -0700 (PDT)
+From: Anastasia Tishchenko <sv3iry@gmail.com>
+To: Lukas Wunner <lukas@wunner.de>,
+	Ignat Korchagin <ignat@linux.win>,
+	Stefan Berger <stefanb@linux.ibm.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Anastasia Tishchenko <sv3iry@gmail.com>
+Subject: [PATCH] crypto : ecc - Fix carry overflow in vli multiplication
+Date: Fri,  8 May 2026 14:48:44 +0300
+Message-ID: <20260508114844.29694-1-sv3iry@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=9056; i=thorsten.blum@linux.dev; h=from:subject; bh=osTpXZEqTNoUgKMmpt6GTU6Dt44cvUtUMVwtcbgXOo0=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDJl/D/YuNXIXZneVecwaeEfHxda+ODKVI/ZWiPiV/b+zt gof683qKGVhEONikBVTZHkw68cM39Kayk0mETth5rAygQxh4OIUgIn0cDD84Vj9dOGrzYuZJs28 1lbNeK7J5Wrext9tEy1lqrod/Xcef8rIcP2011lG7nMxRbPEXItD9wYvPSkvztx/NcHnf3nIJ6U T/AA=
-X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-Use designated initializers for the report structs instead of clearing
-the struct with memset() and then copying fixed strings with strscpy()
-at runtime.
+The carry flag calculation fails when r01.m_high is saturated
+(0xFFFFFFFFFFFFFFFF) and addition of lower bits overflows.
 
-This keeps the structs zero-initialized, lets the compiler diagnose
-oversized string literals, and makes the code easier to read.
+The condition (r01.m_high < product.m_high) doesn't handle the case
+where r01.m_high == product.m_high and an additional carry exists
+from lower-bit overflow.
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+Add proper handling for this boundary by accounting for the carry
+from the lower addition.
+
+This issue was discovered during formal verification of ECC functions.
+
+Signed-off-by: Anastasia Tishchenko <sv3iry@gmail.com>
 ---
- crypto/acompress.c   |  8 +++-----
- crypto/aead.c        | 10 ++++------
- crypto/ahash.c       |  8 +++-----
- crypto/akcipher.c    |  8 +++-----
- crypto/crypto_user.c | 14 ++++++--------
- crypto/kpp.c         |  8 +++-----
- crypto/lskcipher.c   | 10 ++++------
- crypto/rng.c         |  8 +++-----
- crypto/scompress.c   |  8 +++-----
- crypto/shash.c       |  8 +++-----
- crypto/sig.c         |  6 +++---
- crypto/skcipher.c    | 10 ++++------
- 12 files changed, 42 insertions(+), 64 deletions(-)
+ crypto/ecc.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/acompress.c b/crypto/acompress.c
-index 6025c1acce49..032de704eb2c 100644
---- a/crypto/acompress.c
-+++ b/crypto/acompress.c
-@@ -51,11 +51,9 @@ static inline struct acomp_alg *crypto_acomp_alg(struct crypto_acomp *tfm)
- static int __maybe_unused crypto_acomp_report(
- 	struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_report_acomp racomp;
--
--	memset(&racomp, 0, sizeof(racomp));
--
--	strscpy(racomp.type, "acomp", sizeof(racomp.type));
-+	struct crypto_report_acomp racomp = {
-+		.type = "acomp",
-+	};
+diff --git a/crypto/ecc.c b/crypto/ecc.c
+index 43b0def3a225..dfe96471407c 100644
+--- a/crypto/ecc.c
++++ b/crypto/ecc.c
+@@ -427,7 +427,10 @@ static void vli_mult(u64 *result, const u64 *left, const u64 *right,
+ 			product = mul_64_64(left[i], right[k - i]);
  
- 	return nla_put(skb, CRYPTOCFGA_REPORT_ACOMP, sizeof(racomp), &racomp);
- }
-diff --git a/crypto/aead.c b/crypto/aead.c
-index e009937bf3a5..045b74c3779f 100644
---- a/crypto/aead.c
-+++ b/crypto/aead.c
-@@ -136,13 +136,11 @@ static int crypto_aead_init_tfm(struct crypto_tfm *tfm)
- static int __maybe_unused crypto_aead_report(
- 	struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_report_aead raead;
- 	struct aead_alg *aead = container_of(alg, struct aead_alg, base);
--
--	memset(&raead, 0, sizeof(raead));
--
--	strscpy(raead.type, "aead", sizeof(raead.type));
--	strscpy(raead.geniv, "<none>", sizeof(raead.geniv));
-+	struct crypto_report_aead raead = {
-+		.type = "aead",
-+		.geniv = "<none>",
-+	};
+ 			r01 = add_128_128(r01, product);
+-			r2 += (r01.m_high < product.m_high);
++			if (r01.m_high != product.m_high)
++				r2 += (r01.m_high < product.m_high);
++			else
++				r2 += (r01.m_low < product.m_low);
+ 		}
  
- 	raead.blocksize = alg->cra_blocksize;
- 	raead.maxauthsize = aead->maxauthsize;
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index 7a730324c50e..dd56b0e45c0d 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -789,11 +789,9 @@ static void crypto_ahash_free_instance(struct crypto_instance *inst)
- static int __maybe_unused crypto_ahash_report(
- 	struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_report_hash rhash;
--
--	memset(&rhash, 0, sizeof(rhash));
--
--	strscpy(rhash.type, "ahash", sizeof(rhash.type));
-+	struct crypto_report_hash rhash = {
-+		.type = "ahash",
-+	};
+ 		result[k] = r01.m_low;
+@@ -488,7 +491,10 @@ static void vli_square(u64 *result, const u64 *left, unsigned int ndigits)
+ 			}
  
- 	rhash.blocksize = alg->cra_blocksize;
- 	rhash.digestsize = __crypto_hash_alg_common(alg)->digestsize;
-diff --git a/crypto/akcipher.c b/crypto/akcipher.c
-index dfe87b3ce183..630bb19738be 100644
---- a/crypto/akcipher.c
-+++ b/crypto/akcipher.c
-@@ -36,11 +36,9 @@ struct crypto_akcipher_sync_data {
- static int __maybe_unused crypto_akcipher_report(
- 	struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_report_akcipher rakcipher;
--
--	memset(&rakcipher, 0, sizeof(rakcipher));
--
--	strscpy(rakcipher.type, "akcipher", sizeof(rakcipher.type));
-+	struct crypto_report_akcipher rakcipher = {
-+		.type = "akcipher",
-+	};
+ 			r01 = add_128_128(r01, product);
+-			r2 += (r01.m_high < product.m_high);
++			if (r01.m_high != product.m_high)
++				r2 += (r01.m_high < product.m_high);
++			else
++				r2 += (r01.m_low < product.m_low);
+ 		}
  
- 	return nla_put(skb, CRYPTOCFGA_REPORT_AKCIPHER,
- 		       sizeof(rakcipher), &rakcipher);
-diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
-index 3187e0d276f9..e8b6ae75f31f 100644
---- a/crypto/crypto_user.c
-+++ b/crypto/crypto_user.c
-@@ -70,11 +70,9 @@ static struct crypto_alg *crypto_alg_match(struct crypto_user_alg *p, int exact)
- 
- static int crypto_report_cipher(struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_report_cipher rcipher;
--
--	memset(&rcipher, 0, sizeof(rcipher));
--
--	strscpy(rcipher.type, "cipher", sizeof(rcipher.type));
-+	struct crypto_report_cipher rcipher = {
-+		.type = "cipher",
-+	};
- 
- 	rcipher.blocksize = alg->cra_blocksize;
- 	rcipher.min_keysize = alg->cra_cipher.cia_min_keysize;
-@@ -103,10 +101,10 @@ static int crypto_report_one(struct crypto_alg *alg,
- 	if (nla_put_u32(skb, CRYPTOCFGA_PRIORITY_VAL, alg->cra_priority))
- 		goto nla_put_failure;
- 	if (alg->cra_flags & CRYPTO_ALG_LARVAL) {
--		struct crypto_report_larval rl;
-+		struct crypto_report_larval rl = {
-+			.type = "larval",
-+		};
- 
--		memset(&rl, 0, sizeof(rl));
--		strscpy(rl.type, "larval", sizeof(rl.type));
- 		if (nla_put(skb, CRYPTOCFGA_REPORT_LARVAL, sizeof(rl), &rl))
- 			goto nla_put_failure;
- 		goto out;
-diff --git a/crypto/kpp.c b/crypto/kpp.c
-index 7451d39a7ad8..522c352a03af 100644
---- a/crypto/kpp.c
-+++ b/crypto/kpp.c
-@@ -20,11 +20,9 @@
- static int __maybe_unused crypto_kpp_report(
- 	struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_report_kpp rkpp;
--
--	memset(&rkpp, 0, sizeof(rkpp));
--
--	strscpy(rkpp.type, "kpp", sizeof(rkpp.type));
-+	struct crypto_report_kpp rkpp = {
-+		.type = "kpp",
-+	};
- 
- 	return nla_put(skb, CRYPTOCFGA_REPORT_KPP, sizeof(rkpp), &rkpp);
- }
-diff --git a/crypto/lskcipher.c b/crypto/lskcipher.c
-index bb166250b732..e4328df6e26c 100644
---- a/crypto/lskcipher.c
-+++ b/crypto/lskcipher.c
-@@ -264,12 +264,10 @@ static int __maybe_unused crypto_lskcipher_report(
- 	struct sk_buff *skb, struct crypto_alg *alg)
- {
- 	struct lskcipher_alg *skcipher = __crypto_lskcipher_alg(alg);
--	struct crypto_report_blkcipher rblkcipher;
--
--	memset(&rblkcipher, 0, sizeof(rblkcipher));
--
--	strscpy(rblkcipher.type, "lskcipher", sizeof(rblkcipher.type));
--	strscpy(rblkcipher.geniv, "<none>", sizeof(rblkcipher.geniv));
-+	struct crypto_report_blkcipher rblkcipher = {
-+		.type = "lskcipher",
-+		.geniv = "<none>",
-+	};
- 
- 	rblkcipher.blocksize = alg->cra_blocksize;
- 	rblkcipher.min_keysize = skcipher->co.min_keysize;
-diff --git a/crypto/rng.c b/crypto/rng.c
-index 1d4b9177bad4..eec786c45bdd 100644
---- a/crypto/rng.c
-+++ b/crypto/rng.c
-@@ -65,11 +65,9 @@ static unsigned int seedsize(struct crypto_alg *alg)
- static int __maybe_unused crypto_rng_report(
- 	struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_report_rng rrng;
--
--	memset(&rrng, 0, sizeof(rrng));
--
--	strscpy(rrng.type, "rng", sizeof(rrng.type));
-+	struct crypto_report_rng rrng = {
-+		.type = "rng",
-+	};
- 
- 	rrng.seedsize = seedsize(alg);
- 
-diff --git a/crypto/scompress.c b/crypto/scompress.c
-index 253655ece83f..de54227203ce 100644
---- a/crypto/scompress.c
-+++ b/crypto/scompress.c
-@@ -48,11 +48,9 @@ static DECLARE_WORK(scomp_scratch_work, scomp_scratch_workfn);
- static int __maybe_unused crypto_scomp_report(
- 	struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_report_comp rscomp;
--
--	memset(&rscomp, 0, sizeof(rscomp));
--
--	strscpy(rscomp.type, "scomp", sizeof(rscomp.type));
-+	struct crypto_report_comp rscomp = {
-+		.type = "scomp",
-+	};
- 
- 	return nla_put(skb, CRYPTOCFGA_REPORT_COMPRESS,
- 		       sizeof(rscomp), &rscomp);
-diff --git a/crypto/shash.c b/crypto/shash.c
-index 2f07d0bd1f61..d31a65570f69 100644
---- a/crypto/shash.c
-+++ b/crypto/shash.c
-@@ -333,12 +333,10 @@ static void crypto_shash_free_instance(struct crypto_instance *inst)
- static int __maybe_unused crypto_shash_report(
- 	struct sk_buff *skb, struct crypto_alg *alg)
- {
--	struct crypto_report_hash rhash;
- 	struct shash_alg *salg = __crypto_shash_alg(alg);
--
--	memset(&rhash, 0, sizeof(rhash));
--
--	strscpy(rhash.type, "shash", sizeof(rhash.type));
-+	struct crypto_report_hash rhash = {
-+		.type = "shash",
-+	};
- 
- 	rhash.blocksize = alg->cra_blocksize;
- 	rhash.digestsize = salg->digestsize;
-diff --git a/crypto/sig.c b/crypto/sig.c
-index beba745b6405..7d2048da5c3a 100644
---- a/crypto/sig.c
-+++ b/crypto/sig.c
-@@ -53,9 +53,9 @@ static void __maybe_unused crypto_sig_show(struct seq_file *m,
- static int __maybe_unused crypto_sig_report(struct sk_buff *skb,
- 					    struct crypto_alg *alg)
- {
--	struct crypto_report_sig rsig = {};
--
--	strscpy(rsig.type, "sig", sizeof(rsig.type));
-+	struct crypto_report_sig rsig = {
-+		.type = "sig",
-+	};
- 
- 	return nla_put(skb, CRYPTOCFGA_REPORT_SIG, sizeof(rsig), &rsig);
- }
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index 2b31d1d5d268..617e840432b1 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -591,12 +591,10 @@ static int __maybe_unused crypto_skcipher_report(
- 	struct sk_buff *skb, struct crypto_alg *alg)
- {
- 	struct skcipher_alg *skcipher = __crypto_skcipher_alg(alg);
--	struct crypto_report_blkcipher rblkcipher;
--
--	memset(&rblkcipher, 0, sizeof(rblkcipher));
--
--	strscpy(rblkcipher.type, "skcipher", sizeof(rblkcipher.type));
--	strscpy(rblkcipher.geniv, "<none>", sizeof(rblkcipher.geniv));
-+	struct crypto_report_blkcipher rblkcipher = {
-+		.type = "skcipher",
-+		.geniv = "<none>",
-+	};
- 
- 	rblkcipher.blocksize = alg->cra_blocksize;
- 	rblkcipher.min_keysize = skcipher->min_keysize;
+ 		result[k] = r01.m_low;
+-- 
+2.43.0
+
