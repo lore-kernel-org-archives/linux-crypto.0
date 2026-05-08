@@ -1,38 +1,74 @@
-Received: from mail-m1086.netease.com (mail-m1086.netease.com [154.81.10.86])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DBED17BCA;
-	Fri,  8 May 2026 04:25:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=154.81.10.86
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED4F386C28
+	for <linux-crypto@vger.kernel.org>; Fri,  8 May 2026 09:04:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778214336; cv=none; b=jwjhgF+5Boy9qlzh9ilvGkTo0Wj3HB7QzXuiXbyf4HLw2fZxf+oMw3waSzmRgruUSvj5PlufrW86os6d1Qli7xoDMNwN63BMLz8LPqkkbNbX3WSmxCENXvL+TWO3qPzOq5vAOBhRjdAvVUPtoIiKzz3ygRYXpGAT1B4dWyLYh3o=
+	t=1778231050; cv=none; b=FYDEhl6WH61fDD+2nrKxdzl1qjtfIQPOpyi/X3MhL6wI7OFpswUg26V/tHZ0rJnhRBGRcII8PguB985HjnmJ9B+ZvUOgo5YhwZ82/GV79Poqp/0UteWUmjoeoeNRZtLXzK8wCST8Nqs23RRF+pJgpo1wDnBW6RpjwTBBmfjzmSg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778214336; c=relaxed/simple;
-	bh=imbmKA8/GIt1wbg+bEhZxp7IN9IP12IyqA4aYzLJD+o=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=e4dzl6XII9k9O1D6vM/gMnOZr4N4lRRzWWXREGRfkjb+jPeNO5VJLfPETe655WwKk83m0Yu4z+PnjBXw0BDRfFfnDCSTcn+k0nelQpFUIGNozLVO/+3fhb8yBsU2X9IoN7JE9VwtCkqVHHOKZocm+FvqOWf9gisF6m3dXHXjBig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=RwZmqKMW; arc=none smtp.client-ip=154.81.10.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
+	s=arc-20240116; t=1778231050; c=relaxed/simple;
+	bh=zajsfd6Zx0r+0jFiouMsfLQHH3EpQd4NklNufX7L6ZA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Af8HMuIaTYujon7+Sc/0a4kDoneFDng0AwYk/MATUj5OADPUdpWB+FGOR2jVcLivlMgluP67F5UFsEv3B3iNnLhN7uSUJ3cNVNp+b7fxuz6epBHQvIjBTynmw40EDQUPEnvKplete7eGJvCl+QNJ6GjDDcDMNpxditufXjIKbg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cse.iitm.ac.in; spf=pass smtp.mailfrom=cse.iitm.ac.in; dkim=pass (2048-bit key) header.d=cse-iitm-ac-in.20251104.gappssmtp.com header.i=@cse-iitm-ac-in.20251104.gappssmtp.com header.b=Pszw1Oin; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cse.iitm.ac.in
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cse.iitm.ac.in
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="RwZmqKMW"
-Received: from DESKTOP-SUEFNF9.taila7e912.ts.net (unknown [221.228.238.82])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 3d94c5089;
-	Fri, 8 May 2026 12:25:27 +0800 (GMT+08:00)
-From: Dawei Feng <dawei.feng@seu.edu.cn>
-To: clabbe@baylibre.com
-Cc: herbert@gondor.apana.org.au,
+	dkim=pass (2048-bit key) header.d=cse-iitm-ac-in.20251104.gappssmtp.com header.i=@cse-iitm-ac-in.20251104.gappssmtp.com header.b="Pszw1Oin"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2b9fcf7c91bso17085255ad.0
+        for <linux-crypto@vger.kernel.org>; Fri, 08 May 2026 02:04:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cse-iitm-ac-in.20251104.gappssmtp.com; s=20251104; t=1778231049; x=1778835849; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jPkAvC6+8Qgyj82iA24dzkSdXJ8Nbp5ATROfqKNJE9U=;
+        b=Pszw1OinQ0er7PYgofMfkf4am8zuXx1++Oev4YtaGiBDa7/88b1uVNgDpiaaLBGRqN
+         kX31CHkjgsp14yf41FkqW6oSAGn1jqF0fkSxU9pbWAGpbaOWnuQ8G4EASJH6EsuqvV7r
+         q4HMr6Kx6hMCYvDcaS2u2rBPwcZM3SgPSrGowi+uLa7c9DXpsd/K6pKO1TOZUbUGgL66
+         ZK8M9O2daVshz//FLRV/xfhcIPpzzwD6VturmItMo8DblVPjzHtFkg/GVD/dKHXPzAzc
+         yN94zVXvZ1nQDFyB9+InG3YTYix1XynlV40rislw6/8LJhb8sDJmOIBPZQIzrGTADuqM
+         jhhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778231049; x=1778835849;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jPkAvC6+8Qgyj82iA24dzkSdXJ8Nbp5ATROfqKNJE9U=;
+        b=OakT5gZprL9oEn5ooBvNWK/z9nDyGz8sqZbY2qxMOYc1LVTq4tJqKlp6tiPfVl7R5l
+         EZF2jQIa6tIPvnyxCZo/aAQyGkueDOWrlu2rzYbL1FpewIB5h+QfPBm+sMsvGaK9IPJa
+         yzsJb6RTKW7rGGPuF5mcAah9I5KmIKHa1Hku3Nm18gFUtTK4CtauFMsGyhR0qPjo8S2L
+         frpibl2lb/7JmO3HJTv9EjT9RZHz6uBw0sg6OfmBQ/++a7NNi83CVjuoZMUAi+EcXE9T
+         zyXkhoQAMKYekd7btnjUm0TWGFVFQcGdFOkF4WFOmZ/oXDHlpmKn5Z+GHcWI5PEMW5vi
+         8xng==
+X-Forwarded-Encrypted: i=1; AFNElJ/4ER0zj1jzKXJjwQdmKDVT/JleNQ3C9MPuPhuBY19J6+B2UKXRkU9/gNAHu0zcR2kInisNOGZC3TG0CJo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YweXz326cBVsjudzjl6+vd2+Dsh8CmJ+p1w6i6S3RqQJDcVoTCI
+	/tTFYIFTjc4LkpCGO6/vtAKlXju5tw2c0+UVbz7K5sY2M2aKaCI2tTywxyYh0pwNoOg=
+X-Gm-Gg: Acq92OEHCpVz0WUuQmqinA7isCLvFwEvK69MusFG1HN/mgLrurCAzw8SsPkgNs0U5Jd
+	zbFIvrdMde/re9fq1s03uzI668bnLZX62+dHmyP+iLRCMbZehUboEgAdTEt+/srM5RuNRw1D6Bz
+	Vkp0qhZV3+saHUtH9hIu1F5i0Qr9chyNChxcsKEJQ5P5iuwEuksNmCqzzQulvexX0Nx6LXkL4rp
+	db6T7waTvT2PdOj7WVzDEjkkGroyw5fsBQzbVi53m2WNHxEsTnzDaPzlzJsE/VtwXN9K+V8Er8X
+	A5+QtEbz1qtRYc74z4aByUtqc0FGsC43u0TgoHn3KlAfP7SIz+zlgudRblM+CRbzpHc1yB4v5me
+	rJFKBMmKAR5tZahSPnrnD22QRSaJyPQ1axA0L3IGJAT7yxKorJDEuOU52ElxFv9BUlQs0WTVOWq
+	AEgz3Jphi1SL+fu7oHG/rINNb6I7dIGII6ex2ODJTExcyW2tvgD6w7+UOgapmlx8ZAAb/ffppb6
+	nD14mT3+lQH1lQ9661OlMfJ5ordQr4wBSR9TN+21pjYuTGhM0n8ANQ6Bw==
+X-Received: by 2002:a17:903:350d:b0:2b0:6f21:8289 with SMTP id d9443c01a7336-2ba79c2232amr113703265ad.25.1778231048621;
+        Fri, 08 May 2026 02:04:08 -0700 (PDT)
+Received: from localhost.localdomain ([103.158.43.41])
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-2baf1e3571dsm14056585ad.42.2026.05.08.02.04.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 May 2026 02:04:07 -0700 (PDT)
+From: Abdun Nihaal <nihaal@cse.iitm.ac.in>
+To: atenart@kernel.org
+Cc: Abdun Nihaal <nihaal@cse.iitm.ac.in>,
+	herbert@gondor.apana.org.au,
 	davem@davemloft.net,
 	linux-crypto@vger.kernel.org,
-	linux-amlogic@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
-	jianhao.xu@seu.edu.cn,
-	Dawei Feng <dawei.feng@seu.edu.cn>,
-	stable@vger.kernel.org,
-	Zilin Guan <zilin@seu.edu.cn>
-Subject: [PATCH] crypto: amlogic - avoid double cleanup in meson_crypto_probe()
-Date: Fri,  8 May 2026 12:24:16 +0800
-Message-Id: <20260508042416.419216-1-dawei.feng@seu.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	pvanleeuwen@insidesecure.com
+Subject: [PATCH] crypto: safexcel - Fix potential memory leak in safexcel_pci_probe()
+Date: Fri,  8 May 2026 14:33:45 +0530
+Message-ID: <20260508090347.74176-1-nihaal@cse.iitm.ac.in>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -40,145 +76,32 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a9e05d5551b03a2kunm37bde91c1c4a92
-X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVlCSxlOVk5MT0IZQ0JPT0NDTFYeHw
-	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlJSUpVSUlDVUlIQ1VDSVlXWRYaDxIVHRRZQVlPS0hVSktJSE
-	5DQ1VKS0tVS1kG
-DKIM-Signature: a=rsa-sha256;
-	b=RwZmqKMWXSvafifpiB3lnaIkS/Ws2hOXUbtyBstRe+r09wGDe1p0qCRphGqU114LaSTlC11y6DthlTeD0cs89CFTfYy8DZ5moo0XraSfWDk3M5HSsYYKEkWFB2C6equZR6QfftJoGs4vJwMrZGNT6luBSP/LnUpsl/MFaOdMo9o=; c=relaxed/relaxed; s=default; d=seu.edu.cn; v=1;
-	bh=mHVqsCvb98Lei5CXFJf/akKsThFt9Vc2evrRIiE7DqE=;
-	h=date:mime-version:subject:message-id:from;
 
-When meson_allocate_chanlist() fails after a partial allocation, it already
-unwinds the allocated chanlist state through its local error path.
-meson_crypto_probe() then jump to error_flow and calls
-meson_free_chanlist() again, causing the same per-flow resources to be torn
-down twice. In the reproduced failure path, the second teardown
-re-entered crypto_engine_exit() on an already destroyed worker and KASAN
-reported a slab-use-after-free in kthread_destroy_worker().
+The memory allocated for priv in safexcel_pci_probe() is not freed in the
+error paths, as well as in the PCI remove function. Fix this by using
+device managed allocation.
 
-Prevent double-free by handling partial allocation failures locally within
-meson_allocate_chanlist() and skipping the outer cleanup path.
-
-The bug was first flagged by an experimental analysis tool we are
-developing for kernel memory-management bugs while analyzing
-v6.13-rc1. The tool is still under development and is not yet publicly
-available.
-
-The bug was reproduced in a QEMU x86_64 guest booted with KASAN on v7.1,
-using the reproducer under tools/testing/meson_crypto_probe. The reproducer
-forces the second dma_alloc_attrs() call in the gxl-crypto probe path to
-return NULL, making meson_allocate_chanlist() fail after partial
-initialization. On the unpatched kernel this reliably triggered a
-slab-use-after-free. With this fix applied, the same reproducer no longer
-emits any KASAN report and the probe fails cleanly with -ENOMEM.
-
-    ==================================================================
-    BUG: KASAN: slab-use-after-free in kthread_destroy_worker+0xb2/0xd0
-    Read of size 8 at addr ff1100010c057a68 by task insmod/265
-
-    CPU: 1 UID: 0 PID: 265 Comm: insmod Tainted: G           O        7.1.0-rc2-00376-g810af9adc907-dirty #10 PREEMPT(lazy)
-    Tainted: [O]=OOT_MODULE
-    Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
-    Call Trace:
-     <TASK>
-     dump_stack_lvl+0x68/0xa0
-     print_report+0xcb/0x5e0
-     ? __virt_addr_valid+0x21d/0x3f0
-     ? kthread_destroy_worker+0xb2/0xd0
-     ? kthread_destroy_worker+0xb2/0xd0
-     kasan_report+0xca/0x100
-     ? kthread_destroy_worker+0xb2/0xd0
-     kthread_destroy_worker+0xb2/0xd0
-     meson_crypto_probe+0x4d0/0xc10 [amlogic_gxl_crypto]
-     platform_probe+0x99/0x140
-     really_probe+0x1c6/0x6a0
-     ? __pfx___device_attach_driver+0x10/0x10
-     __driver_probe_device+0x248/0x310
-     ? acpi_driver_match_device+0xb0/0x100
-     driver_probe_device+0x48/0x210
-     ? __pfx___device_attach_driver+0x10/0x10
-     __device_attach_driver+0x160/0x320
-     bus_for_each_drv+0x104/0x190
-     ? __pfx_bus_for_each_drv+0x10/0x10
-     ? _raw_spin_unlock_irqrestore+0x2c/0x50
-     __device_attach+0x19d/0x3b0
-     ? __pfx___device_attach+0x10/0x10
-     ? do_raw_spin_unlock+0x53/0x220
-     device_initial_probe+0x78/0xa0
-     bus_probe_device+0x5b/0x130
-     device_add+0xcfd/0x1430
-     ? __pfx_device_add+0x10/0x10
-     ? insert_resource+0x34/0x50
-     ? lock_release+0xc9/0x290
-     platform_device_add+0x24e/0x590
-     ? __pfx_meson_crypto_probe_repro_init+0x10/0x10 [meson_crypto_probe_repro]
-     meson_crypto_probe_repro_init+0x330/0xff0 [meson_crypto_probe_repro]
-     do_one_initcall+0xc0/0x450
-     ? __pfx_do_one_initcall+0x10/0x10
-     ? _raw_spin_unlock_irqrestore+0x2c/0x50
-     ? __create_object+0x59/0x80
-     ? kasan_unpoison+0x27/0x60
-     do_init_module+0x27b/0x7d0
-     ? __pfx_do_init_module+0x10/0x10
-     ? kasan_quarantine_put+0x84/0x1d0
-     ? kfree+0x32c/0x510
-     ? load_module+0x561e/0x5ff0
-     load_module+0x54fe/0x5ff0
-     ? __pfx_load_module+0x10/0x10
-     ? security_file_permission+0x20/0x40
-     ? kernel_read_file+0x23d/0x6e0
-     ? mmap_region+0x235/0x4a0
-     ? __pfx_kernel_read_file+0x10/0x10
-     ? __file_has_perm+0x2c0/0x3e0
-     init_module_from_file+0x158/0x180
-     ? __pfx_init_module_from_file+0x10/0x10
-     ? __lock_acquire+0x45a/0x1ba0
-     ? idempotent_init_module+0x315/0x610
-     ? lock_release+0xc9/0x290
-     ? lockdep_init_map_type+0x4b/0x220
-     ? do_raw_spin_unlock+0x53/0x220
-     idempotent_init_module+0x330/0x610
-     ? __pfx_idempotent_init_module+0x10/0x10
-     ? __pfx_cred_has_capability.isra.0+0x10/0x10
-     ? ksys_mmap_pgoff+0x385/0x520
-     __x64_sys_finit_module+0xbe/0x120
-     do_syscall_64+0x115/0x690
-     entry_SYSCALL_64_after_hwframe+0x77/0x7f
-    RIP: 0033:0x7f7d6d31690d
-    Code: 5b 41 5c c3 66 0f 1f 84 00 00 00 00 00 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d f3 b4 0f 00 f7 d8 >
-    RSP: 002b:00007fffc027ac68 EFLAGS: 00000246 ORIG_RAX: 0000000000000139
-    RAX: ffffffffffffffda RBX: 000055f7b81967c0 RCX: 00007f7d6d31690d
-    RDX: 0000000000000000 RSI: 000055f79a0d6cd2 RDI: 0000000000000003
-    RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-    R10: 0000000000000003 R11: 0000000000000246 R12: 000055f79a0d6cd2
-    R13: 000055f7b8196790 R14: 000055f79a0d5888 R15: 000055f7b81968e0
-     </TASK>
-
-Fixes: 48fe583fe541 ("crypto: amlogic - Add crypto accelerator for amlogic GXL")
-Cc: stable@vger.kernel.org
-Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
-Signed-off-by: Dawei Feng <dawei.feng@seu.edu.cn>
+Fixes: 625f269a5a7a ("crypto: inside-secure - add support for PCI based FPGA development board")
+Signed-off-by: Abdun Nihaal <nihaal@cse.iitm.ac.in>
 ---
- drivers/crypto/amlogic/amlogic-gxl-core.c | 2 +-
+Compile tested only. Issue found using static analysis.
+
+ drivers/crypto/inside-secure/safexcel.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/amlogic/amlogic-gxl-core.c
-index 1c18a5b8470e..6cb33949915f 100644
---- a/drivers/crypto/amlogic/amlogic-gxl-core.c
-+++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
-@@ -291,8 +291,8 @@ static int meson_crypto_probe(struct platform_device *pdev)
- 	return 0;
- error_alg:
- 	meson_unregister_algs(mc);
--error_flow:
- 	meson_free_chanlist(mc, MAXFLOW - 1);
-+error_flow:
- 	clk_disable_unprepare(mc->busclk);
- 	return err;
- }
+diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+index fb4936e7afa2..2bd8641a07b3 100644
+--- a/drivers/crypto/inside-secure/safexcel.c
++++ b/drivers/crypto/inside-secure/safexcel.c
+@@ -1893,7 +1893,7 @@ static int safexcel_pci_probe(struct pci_dev *pdev,
+ 		ent->vendor, ent->device, ent->subvendor,
+ 		ent->subdevice, ent->driver_data);
+ 
+-	priv = kzalloc_obj(*priv);
++	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
+ 	if (!priv)
+ 		return -ENOMEM;
+ 
 -- 
-2.34.1
+2.43.0
 
