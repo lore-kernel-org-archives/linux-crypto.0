@@ -1,94 +1,147 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C1822B2D7;
-	Sat,  9 May 2026 01:24:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D74BA32C923;
+	Sat,  9 May 2026 06:40:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778289867; cv=none; b=c8bFk45qYf4c0kFsE7prxSPPxVywKhQEGKo8LZqMmN3/nGTH05gYlSsfRF9qfUg8dS0jqA2JjNDAuD02P85zdy0RZxIQcc8akrwgRbhLuCGTBJPtpJVA6l0Q520awq+NRpCH5tnORNMzHEHinVXULvnKaiQI20uxfuXY6rfyKeM=
+	t=1778308839; cv=none; b=b+cI/8BHoyOTWBSXypmNWd91q9OHraXsa2GPKzjFookigFKIvTueNZRnTnuP4azCMWVZhPilYQvlTY/euMTWrhg9Wql1JIEJeZmqH+XWGwPilJ5e6O8dBti7F/IohU/KPT9mf3IIIjnS7z/vSzIUoAn5zXNs0TT0RnkLyMkxgrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778289867; c=relaxed/simple;
-	bh=bGvLkQAWUeluJwFLbkrFRYlfbhdNC9Zv8QpnEgZde50=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jNQKu6dKFMXDK32H0HmD2WobnjjqrpB9Yxw0nmYQkzRUCLBqP2nwE23UGNhaavbrrPqN8lHa+E+F4vc4txPWNqSTe8ft9+aynhAOJpbfexGBhH/VfUSro4MZQcKfaUT5DDLKX0xrPMNUtJQ7Ye077gVULQcavWBu3vKa2oS7chU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=fwhziwnS; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1778308839; c=relaxed/simple;
+	bh=F8je7O80p2IuzHyfogBMsQXotHXwYXwhmSmmrVZqpuE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=Uezojnl2dPF5tjZoMDeVpX1HDGHBmZmWKmrej5MBymmH7nSEXxm/vJLGRqH8dMY0pPmDVlKfK54eTQ4jxXyZ7G60GDaWSDaehOvNuizy/iIYWJmBgzwwf4u8le8icLhF1uAEMlYSpiPGlfWeeygnrC7qH47RFfQgUZ4bdA2Em38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=lPIqVYDb; arc=none smtp.client-ip=117.135.210.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="fwhziwnS"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=5ACAHlhc8wdXure4xEmTXBco8HgiMQSDTZo02rH24uU=; 
-	b=fwhziwnSs6sG6Dm2WKW84kRRlol7+ZTOu5Cgz/6B1QDDRvu3GcyhONDGgPRwFZiP/9DMW+kHDw9
-	6hc6vjLDNBMrgrjhp9dYp/YEQOFmloRfxACvRZJC8R9V2qH2OEa7W0/NfuZCgUYpIUpqBRJ9N8Ifz
-	fYQWnEPA/9wMKV0AsOlsn3DnvZejO3b3aXpnWgCW+5fG4NfbcJ8e4Cap9TfWxiDVKCFG89A8iNJe5
-	khLU2bNsIZvLxNyN7H7TgaeDExp84jt84Nct59L4kzu4jGTs0IGfAh/9emRS9R5oeUXnPwvS4Ts+Z
-	04mbZNYsOhAtBMh0zoFYtxV8kdv4x3MHc0LA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wLWQC-00CZXK-09;
-	Sat, 09 May 2026 09:24:01 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 09 May 2026 09:24:00 +0800
-Date: Sat, 9 May 2026 09:24:00 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Harshal Dev <harshal.dev@oss.qualcomm.com>
-Cc: Bjorn Andersson <andersson@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Abel Vesa <abel.vesa@oss.qualcomm.com>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>,
-	cros-qcom-dts-watchers@chromium.org,
-	Eric Biggers <ebiggers@google.com>,
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
-	Jingyi Wang <jingyi.wang@oss.qualcomm.com>,
-	Tengfei Fan <tengfei.fan@oss.qualcomm.com>,
-	Bartosz Golaszewski <brgl@kernel.org>,
-	David Wronek <davidwronek@gmail.com>,
-	Luca Weiss <luca.weiss@fairphone.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Melody Olvera <quic_molvera@quicinc.com>,
-	Alexander Koskovich <akoskovich@pm.me>,
-	Abel Vesa <abelvesa@kernel.org>, Brian Masney <bmasney@redhat.com>,
-	Neeraj Soni <neeraj.soni@oss.qualcomm.com>,
-	Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>,
-	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-	Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
-Subject: Re: [PATCH v5 01/13] dt-bindings: crypto: qcom,ice: Fix missing
- power-domain and iface clk
-Message-ID: <af6MsD1wDs9EZl5q@gondor.apana.org.au>
-References: <20260416-qcom_ice_power_and_clk_vote-v5-0-5ccf5d7e2846@oss.qualcomm.com>
- <20260416-qcom_ice_power_and_clk_vote-v5-1-5ccf5d7e2846@oss.qualcomm.com>
- <afmuncmBrrvddHTU@gondor.apana.org.au>
- <b8805117-d54f-4e42-a7d4-6fa18af63e69@oss.qualcomm.com>
- <CC0E438D-5544-4BB8-8512-7F93A7FA4DC1@oss.qualcomm.com>
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="lPIqVYDb"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
+	Message-ID; bh=F8je7O80p2IuzHyfogBMsQXotHXwYXwhmSmmrVZqpuE=; b=l
+	PIqVYDbcbLnMw7/1zfwyrN1lwSfTzeVqAisbbiPjwYT8rVguxELedi8KDTA0MM0b
+	Cv2m7qaO27+Ko1UjJZqiEkPJi0AJizAdLtl0OT2pab2RzBB1LMhI3jUd9zh5groo
+	b/DPQGcq8UT7sK2QJMWwsLL0waojsFUUdmjxIUp0A4=
+Received: from w15303746062$163.com ( [113.200.174.80] ) by
+ ajax-webmail-wmsvr-40-139 (Coremail) ; Sat, 9 May 2026 14:40:08 +0800 (CST)
+Date: Sat, 9 May 2026 14:40:08 +0800 (CST)
+From: w15303746062  <w15303746062@163.com>
+To: "Giovanni Cabiddu" <giovanni.cabiddu@intel.com>
+Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	qat-linux <qat-linux@intel.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"Mingyu Wang" <25181214217@stu.xidian.edu.cn>
+Subject: Re:Re: [PATCH] crypto: qat - fix use-after-free during concurrent
+ device start and removal
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
+ 20260403(27802f6d) Copyright (c) 2002-2026 www.mailtech.cn 163com
+In-Reply-To: <af2r0f/20watHiCX@gcabiddu-mobl.ger.corp.intel.com>
+References: <20260504025120.98242-1-w15303746062@163.com>
+ <af2r0f/20watHiCX@gcabiddu-mobl.ger.corp.intel.com>
+X-NTES-SC: AL_Qu2cCv+bt0Ar7iOcYOkfmU0Qguw9Xcq5uPkj34FWN5t8jBHo0SwPfmFdOnTL382sMD60siGSbgJ30/VkeYt2Y7854aWLKjjyECclvg2YHKhPMA==
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=GBK
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CC0E438D-5544-4BB8-8512-7F93A7FA4DC1@oss.qualcomm.com>
+Message-ID: <73aada77.4e38.19e0b76fea5.Coremail.w15303746062@163.com>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:iygvCgD335TI1v5pStqfAA--.17139W
+X-CM-SenderInfo: jzrvjiatxuliiws6il2tof0z/xtbC4wgC5Wn+1siKDQAA3C
+X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
 
-On Fri, May 08, 2026 at 08:11:45PM +0530, Harshal Dev wrote:
->
-> Can you please confirm for Bjorn once
-> that you're not picking this up and he
-> can pick it from his tree? 
-
-Bjorn, please feel free to pick this patch up.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+CgpGcm9tOiBNaW5neXUgV2FuZyA8MjUxODEyMTQyMTdAc3R1LnhpZGlhbi5lZHUuY24+CgpIaSBH
+aW92YW5uaSwKClRoYW5rIHlvdSBmb3IgdGhlIHVwZGF0ZS4gUmVtb3ZpbmcgdGhlIHVudXNlZCBJ
+T0NUTCBpbnRlcmZhY2UgaXMgaW5kZWVkIHRoZSBjbGVhbmVzdCBhbmQgbW9zdCBlZmZlY3RpdmUg
+d2F5IHRvIGVsaW1pbmF0ZSB0aGVzZSBhdHRhY2sgc3VyZmFjZXMuIEkgY29tcGxldGVseSBhZ3Jl
+ZSB3aXRoIHRoaXMgYXBwcm9hY2guCgpUaGFua3MgZm9yIENDJ2luZyBhbmQgYWNrbm93bGVkZ2lu
+ZyB0aGUgcmVwb3J0IQoKQmVzdCByZWdhcmRzLApNaW5neXUKCgoKCgoKCgoKCgoKCkF0IDIwMjYt
+MDUtMDggMTc6MjQ6MzMsICJHaW92YW5uaSBDYWJpZGR1IiA8Z2lvdmFubmkuY2FiaWRkdUBpbnRl
+bC5jb20+IHdyb3RlOgo+SGkgTWluZ3l1LAo+Cj5UaGFua3MgZm9yIHlvdXIgcGF0Y2hlcy4KPgo+
+VGhlIGlvY3RsIGludGVyZmFjZSBleHBvc2VkIGJ5IHRoZSBRQVQgZHJpdmVyIGlzIG5vdCBwYXJ0
+IG9mIGFueSBwdWJsaWMKPnVBUEkgaGVhZGVyIGFuZCBoYXMgbm8ga25vd24gdXNlcnMuIEkganVz
+dCBzZW50IGEgc2VyaWVzIHRoYXQgcmVtb3ZlcyBpdAo+ZW50aXJlbHkgWzFdLCB3aGljaCBhbHNv
+IGVsaW1pbmF0ZXMgdGhpcyBpc3N1ZS4KPgo+WzFdIGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2Fs
+bC8yMDI2MDUwODA5MTkxMi4yMDY5MTMtMS1naW92YW5uaS5jYWJpZGR1QGludGVsLmNvbS8KPgo+
+UmVnYXJkcywKPgo+LS0gCj5HaW92YW5uaQo+Cj5PbiBNb24sIE1heSAwNCwgMjAyNiBhdCAwMzo1
+MToyMEFNICswMTAwLCB3MTUzMDM3NDYwNjJAMTYzLmNvbSB3cm90ZToKPj4gRnJvbTogTWluZ3l1
+IFdhbmcgPDI1MTgxMjE0MjE3QHN0dS54aWRpYW4uZWR1LmNuPgo+PiAKPj4gQSBVc2UtQWZ0ZXIt
+RnJlZSAoVUFGKSB2dWxuZXJhYmlsaXR5IHdhcyBpZGVudGlmaWVkIGluIHRoZSBRQVQgZHJpdmVy
+J3MgaW9jdGwgcGF0aC4gV2hlbiBoYW5kbGluZyBjb21tYW5kcyBsaWtlIElPQ1RMX1NUQVJUX0FD
+Q0VMX0RFViwgYGFkZl9jdGxfaW9jdGxfZGV2X3N0YXJ0KClgIHJldHJpZXZlcyB0aGUgYWNjZWxl
+cmF0aW9uIGRldmljZSB1c2luZyBgYWRmX2Rldm1ncl9nZXRfZGV2X2J5X2lkKClgLgo+PiAKPj4g
+UHJldmlvdXNseSwgdGhpcyBsb29rdXAgZnVuY3Rpb24gaXRlcmF0ZWQgb3ZlciB0aGUgYGFjY2Vs
+X3RhYmxlYCB1bmRlciB0aGUgYHRhYmxlX2xvY2tgLiBIb3dldmVyLCBvbmNlIHRoZSB0YXJnZXQg
+ZGV2aWNlIHdhcyBmb3VuZCwgdGhlIGxvY2sgd2FzIGRyb3BwZWQgYW5kIGEgYmFyZSBwb2ludGVy
+IHdhcyByZXR1cm5lZCB3aXRob3V0IGluY3JlbWVudGluZyB0aGUgZGV2aWNlJ3MgcmVmZXJlbmNl
+IGNvdW50Lgo+PiAKPj4gVGhpcyBjcmVhdGVzIGEgY3JpdGljYWwgcmFjZSBjb25kaXRpb24uIElm
+IGEgY29uY3VycmVudCB0aHJlYWQgcmVtb3ZlcyB0aGUgZGV2aWNlIChlLmcuLCB2aWEgZGV2aWNl
+IHN0b3Agb3BlcmF0aW9ucyBvciBQQ0llIGhvdHBsdWcpIGJ5IGNhbGxpbmcgYGFkZl9kZXZtZ3Jf
+cm1fZGV2KClgLCB0aGUgZGV2aWNlIGlzIHJlbW92ZWQgZnJvbSB0aGUgbGlzdCBhbmQgaXRzIG1l
+bW9yeSBpcyBzdWJzZXF1ZW50bHkgZnJlZWQuIFdoZW4gdGhlIG9yaWdpbmFsIGlvY3RsIHRocmVh
+ZCByZXN1bWVzIGFuZCBhdHRlbXB0cyB0byBhY3F1aXJlIGBhY2NlbF9kZXYtPnN0YXRlX2xvY2tg
+IGluc2lkZSBgYWRmX2Rldl91cCgpYCwgaXQgdHJpZ2dlcnMgYSBLQVNBTiBzbGFiLW91dC1vZi1i
+b3VuZHMgcGFuaWMuCj4+IAo+PiBGaXggdGhpcyBieSBwcm9wZXJseSBsZXZlcmFnaW5nIHRoZSBl
+eGlzdGluZyBgcmVmX2NvdW50YC4gSW5jcmVtZW50IHRoZSBkZXZpY2UncyBgcmVmX2NvdW50YCB2
+aWEgYGF0b21pY19pbmMoKWAgaW5zaWRlIGBhZGZfZGV2bWdyX2dldF9kZXZfYnlfaWQoKWAgd2hp
+bGUgdGhlIGB0YWJsZV9sb2NrYCBpcyBzdGlsbCBoZWxkLiBBbGwgY2FsbGVycyBvZiBgYWRmX2Rl
+dm1ncl9nZXRfZGV2X2J5X2lkKClgIGFyZSB0aGVuIHVwZGF0ZWQgdG8gc2FmZWx5IHJlbGVhc2Ug
+dGhpcyByZWZlcmVuY2UgdXNpbmcgYGF0b21pY19kZWMoJmFjY2VsX2Rldi0+cmVmX2NvdW50KWAg
+b25jZSB0aGV5IGFyZSBkb25lIGludGVyYWN0aW5nIHdpdGggdGhlIGRldmljZS4KPj4gCj4+IFNp
+Z25lZC1vZmYtYnk6IE1pbmd5dSBXYW5nIDwyNTE4MTIxNDIxN0BzdHUueGlkaWFuLmVkdS5jbj4K
+Pj4gLS0tCj4+ICBkcml2ZXJzL2NyeXB0by9pbnRlbC9xYXQvcWF0X2NvbW1vbi9hZGZfY3RsX2Ry
+di5jIHwgMTAgKysrKysrKysrKwo+PiAgZHJpdmVycy9jcnlwdG8vaW50ZWwvcWF0L3FhdF9jb21t
+b24vYWRmX2Rldl9tZ3IuYyB8IDEyICsrKysrKysrKystLQo+PiAgMiBmaWxlcyBjaGFuZ2VkLCAy
+MCBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQo+PiAKPj4gZGlmZiAtLWdpdCBhL2RyaXZl
+cnMvY3J5cHRvL2ludGVsL3FhdC9xYXRfY29tbW9uL2FkZl9jdGxfZHJ2LmMgYi9kcml2ZXJzL2Ny
+eXB0by9pbnRlbC9xYXQvcWF0X2NvbW1vbi9hZGZfY3RsX2Rydi5jCj4+IGluZGV4IGMyZTZmMGNi
+NzQ4MC4uNDkyNGIyYmJiNDEyIDEwMDY0NAo+PiAtLS0gYS9kcml2ZXJzL2NyeXB0by9pbnRlbC9x
+YXQvcWF0X2NvbW1vbi9hZGZfY3RsX2Rydi5jCj4+ICsrKyBiL2RyaXZlcnMvY3J5cHRvL2ludGVs
+L3FhdC9xYXRfY29tbW9uL2FkZl9jdGxfZHJ2LmMKPj4gQEAgLTIwMSw2ICsyMDEsOSBAQCBzdGF0
+aWMgaW50IGFkZl9jdGxfaW9jdGxfZGV2X2NvbmZpZyhzdHJ1Y3QgZmlsZSAqZnAsIHVuc2lnbmVk
+IGludCBjbWQsCj4+ICAJfQo+PiAgCXNldF9iaXQoQURGX1NUQVRVU19DT05GSUdVUkVELCAmYWNj
+ZWxfZGV2LT5zdGF0dXMpOwo+PiAgb3V0Ogo+PiArCS8qIFJlbGVhc2UgdGhlIHJlZmVyZW5jZSBh
+Y3F1aXJlZCBieSBhZGZfZGV2bWdyX2dldF9kZXZfYnlfaWQoKSAqLwo+PiArCWlmIChhY2NlbF9k
+ZXYpCj4+ICsJCWF0b21pY19kZWMoJmFjY2VsX2Rldi0+cmVmX2NvdW50KTsKPj4gIAlrZnJlZShj
+dGxfZGF0YSk7Cj4+ICAJcmV0dXJuIHJldDsKPj4gIH0KPj4gQEAgLTMxMCw2ICszMTMsOSBAQCBz
+dGF0aWMgaW50IGFkZl9jdGxfaW9jdGxfZGV2X3N0YXJ0KHN0cnVjdCBmaWxlICpmcCwgdW5zaWdu
+ZWQgaW50IGNtZCwKPj4gIAkJYWRmX2Rldl9kb3duKGFjY2VsX2Rldik7Cj4+ICAJfQo+PiAgb3V0
+Ogo+PiArCS8qIFJlbGVhc2UgdGhlIHJlZmVyZW5jZSBhY3F1aXJlZCBieSBhZGZfZGV2bWdyX2dl
+dF9kZXZfYnlfaWQoKSAqLwo+PiArCWlmIChhY2NlbF9kZXYpCj4+ICsJCWF0b21pY19kZWMoJmFj
+Y2VsX2Rldi0+cmVmX2NvdW50KTsKPj4gIAlrZnJlZShjdGxfZGF0YSk7Cj4+ICAJcmV0dXJuIHJl
+dDsKPj4gIH0KPj4gQEAgLTM2MCw4ICszNjYsMTIgQEAgc3RhdGljIGludCBhZGZfY3RsX2lvY3Rs
+X2dldF9zdGF0dXMoc3RydWN0IGZpbGUgKmZwLCB1bnNpZ25lZCBpbnQgY21kLAo+PiAgCWlmIChj
+b3B5X3RvX3VzZXIoKHZvaWQgX191c2VyICopYXJnLCAmZGV2X2luZm8sCj4+ICAJCQkgc2l6ZW9m
+KHN0cnVjdCBhZGZfZGV2X3N0YXR1c19pbmZvKSkpIHsKPj4gIAkJZGV2X2VycigmR0VUX0RFVihh
+Y2NlbF9kZXYpLCAiZmFpbGVkIHRvIGNvcHkgc3RhdHVzLlxuIik7Cj4+ICsJCWF0b21pY19kZWMo
+JmFjY2VsX2Rldi0+cmVmX2NvdW50KTsKPj4gIAkJcmV0dXJuIC1FRkFVTFQ7Cj4+ICAJfQo+PiAr
+CQo+PiArCS8qIFJlbGVhc2UgdGhlIHJlZmVyZW5jZSBhY3F1aXJlZCBieSBhZGZfZGV2bWdyX2dl
+dF9kZXZfYnlfaWQoKSAqLwo+PiArCWF0b21pY19kZWMoJmFjY2VsX2Rldi0+cmVmX2NvdW50KTsK
+Pj4gIAlyZXR1cm4gMDsKPj4gIH0KPj4gIAo+PiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9jcnlwdG8v
+aW50ZWwvcWF0L3FhdF9jb21tb24vYWRmX2Rldl9tZ3IuYyBiL2RyaXZlcnMvY3J5cHRvL2ludGVs
+L3FhdC9xYXRfY29tbW9uL2FkZl9kZXZfbWdyLmMKPj4gaW5kZXggZTA1MGRlMTZhYjVkLi4zMjFi
+ZWEzY2VmY2UgMTAwNjQ0Cj4+IC0tLSBhL2RyaXZlcnMvY3J5cHRvL2ludGVsL3FhdC9xYXRfY29t
+bW9uL2FkZl9kZXZfbWdyLmMKPj4gKysrIGIvZHJpdmVycy9jcnlwdG8vaW50ZWwvcWF0L3FhdF9j
+b21tb24vYWRmX2Rldl9tZ3IuYwo+PiBAQCAtMzIwLDYgKzMyMCw4IEBAIHN0cnVjdCBhZGZfYWNj
+ZWxfZGV2ICphZGZfZGV2bWdyX2dldF9kZXZfYnlfaWQodTMyIGlkKQo+PiAgCQlzdHJ1Y3QgYWRm
+X2FjY2VsX2RldiAqcHRyID0KPj4gIAkJCQlsaXN0X2VudHJ5KGl0ciwgc3RydWN0IGFkZl9hY2Nl
+bF9kZXYsIGxpc3QpOwo+PiAgCQlpZiAocHRyLT5hY2NlbF9pZCA9PSBpZCkgewo+PiArCQkJLyog
+SW5jcmVtZW50IHJlZl9jb3VudCB0byBwcmV2ZW50IFVBRiBkdXJpbmcgY29uY3VycmVudCByZW1v
+dmFsICovCj4+ICsJCQlhdG9taWNfaW5jKCZwdHItPnJlZl9jb3VudCk7Cj4+ICAJCQltdXRleF91
+bmxvY2soJnRhYmxlX2xvY2spOwo+PiAgCQkJcmV0dXJuIHB0cjsKPj4gIAkJfQo+PiBAQCAtMzMx
+LDExICszMzMsMTcgQEAgc3RydWN0IGFkZl9hY2NlbF9kZXYgKmFkZl9kZXZtZ3JfZ2V0X2Rldl9i
+eV9pZCh1MzIgaWQpCj4+ICAKPj4gIGludCBhZGZfZGV2bWdyX3ZlcmlmeV9pZCh1MzIgaWQpCj4+
+ICB7Cj4+ICsJc3RydWN0IGFkZl9hY2NlbF9kZXYgKmFjY2VsX2RldjsKPj4gKwkKPj4gIAlpZiAo
+aWQgPT0gQURGX0NGR19BTExfREVWSUNFUykKPj4gIAkJcmV0dXJuIDA7Cj4+ICAKPj4gLQlpZiAo
+YWRmX2Rldm1ncl9nZXRfZGV2X2J5X2lkKGlkKSkKPj4gLQkJcmV0dXJuIDA7Cj4+ICsJYWNjZWxf
+ZGV2ID0gYWRmX2Rldm1ncl9nZXRfZGV2X2J5X2lkKGlkKTsKPj4gKwlpZiAoYWNjZWxfZGV2KSB7
+Cj4+ICsJCS8qIFJlbGVhc2UgdGhlIHJlZmVyZW5jZSBpbW1lZGlhdGVseSBhcyB3ZSBvbmx5IHZl
+cmlmeSBleGlzdGVuY2UgKi8KPj4gKwkJYXRvbWljX2RlYygmYWNjZWxfZGV2LT5yZWZfY291bnQp
+Owo+PiArIAkJcmV0dXJuIDA7Cj4+ICsJfQo+PiAgCj4+ICAJcmV0dXJuIC1FTk9ERVY7Cj4+ICB9
+Cj4+IC0tIAo+PiAyLjM0LjEKPj4gCg==
