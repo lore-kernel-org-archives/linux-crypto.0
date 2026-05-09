@@ -1,151 +1,92 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53D0F15B0EC;
-	Sat,  9 May 2026 15:18:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 309EB25A642;
+	Sat,  9 May 2026 18:41:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778339909; cv=none; b=o8gaIDBGt1MVcAXZsvpyoKEiUdwEcItPkqOfS7w7rsaDis2yMvbM3PdKccEW6kjgoFrv0SuqkTD3FLHhrx5CFgkklmQ3Kcsm965j2I6bkbxcMHHSdgffpkUq3MTaEvEe+439K9rlDH3jWvLPnhhjyQgNmUe9ZEp4pAlWFTiOT7o=
+	t=1778352113; cv=none; b=XwkXRDXLamyE5GDvnqd26dMdJyXnpTeg4EnRVpYJimhC9RSFDEN+Kv8lcucr3V3175PyhzknfuW/zkud7ncsM7eQYm9yryCAGtum9nmu4Bvt6pKIJNqPznuy9jxQ8VO4ENDRm9r7aaU4yyGCSHiTn/6Za9XuCFotVXXN3W9yVwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778339909; c=relaxed/simple;
-	bh=/ACUJvZGGTfgk7qwE+CEQ+Q/6FZhULEY3LJDvaunTIY=;
+	s=arc-20240116; t=1778352113; c=relaxed/simple;
+	bh=5x6vMZJIgP2JV5U0sf4/3UHVPYatudGhzTthPLFbE1o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gY8018dtC5o263xn7D2yyKysc8HdsND7Z+wopoKfnPXI+u0xZtopxyjK1e1/i9yPR+Xv2qJZu5apQwfnTiDfXc/yoRM0psqN0nF7PyBK2P/wznyaliCRlaSkrEtaNhMEQMd2oiqKgvV3Br0EQnaqlquq6vXB8ACmzynbLljMoTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ak4zh1Ya; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=dsjT+N+pTcUsXzF/1YmrJw4rYLJs1ue3KX95VLlK9OpwU6zlcsTGl9+hArlzQKxPxUwMwrxnoTDhaosoIEjkC9/K42Zd1SWSvtcTfeUek/WlEoJV3b7QUYKnP0Yt5haTkDBbNvXf409tkvuXf5g+g4xtadWf90X5p8yZknxbPKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AyJ5rWZI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ak4zh1Ya"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90BD6C2BCB2;
-	Sat,  9 May 2026 15:18:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AyJ5rWZI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 626DCC2BCB2;
+	Sat,  9 May 2026 18:41:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778339908;
-	bh=/ACUJvZGGTfgk7qwE+CEQ+Q/6FZhULEY3LJDvaunTIY=;
+	s=k20201202; t=1778352112;
+	bh=5x6vMZJIgP2JV5U0sf4/3UHVPYatudGhzTthPLFbE1o=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ak4zh1YayxVoIa7LXt8iqHF5BoUHQisuRChzVwMaiNo750MwM4+MdtjKC58dGPpfj
-	 BM+SXNBsRIbdtlMRj/b9xSpkhIIYTaT2XAWyY5tmD+P60x86PkKLPCUde2AVghaYji
-	 vffaYs1tLvqjPhTvoVMrtmwiJLY2vNKLWD8i/CVHp0sF+IxgwpbkjfFS7AlLzVRmbq
-	 c0AYDKFVA0/8Rd6bCSRmjK02fkUi1y8APdtOrxSXIRQ+ydOauosFvg1R4044fFzSht
-	 rf/nlbGGILgZevQ4WWI3/his1uW6ky7job4ba4A6Dbtk+cS36NEFWR1J/BjRx0Z6+p
-	 4rb67D4aAkLjQ==
-Date: Sat, 9 May 2026 18:18:25 +0300
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: "Niedermayr, BENEDIKT" <benedikt.niedermayr@siemens.com>
-Cc: "Kiszka, Jan" <jan.kiszka@siemens.com>, Peter Huewe <peterhuewe@gmx.de>,
-	"linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Jens Wiklander <jens.wiklander@linaro.org>,
-	OP-TEE TrustedFirmware <op-tee@lists.trustedfirmware.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"Bauer, Sven" <svenbauer@siemens.com>,
-	"Zeschg, Thomas" <thomas.zeschg@siemens.com>,
-	"Gylstorff, Quirin" <quirin.gylstorff@siemens.com>
-Subject: Re: [PATCH] hwrng: tpm: Do not enable by default
-Message-ID: <af9QQah4QN5VD-4P@kernel.org>
-References: <bbc41534-a2d9-42dc-ac8a-ff8a0b4fd41f@siemens.com>
- <aP_NN3HwO4Hp0-9T@kernel.org>
- <96df7b4d-cf1b-471d-9b4b-8741a80fbcc3@siemens.com>
+	b=AyJ5rWZIJlvuab7tohPZ8gd7mvCmDxDNq/R998ABZKL2siI3NOIG5fVudgG+OtgJY
+	 hNTUVyvIvpVN/IQQdxRB0+xP/TMJRVoi4EUtUA9zmVEOnLlC+vDDBS5mNaY7+I/dwr
+	 hznqQ4FgC5RYcm8MWrDvOtf/Pkv/CkE/xcb+X86Cdtdz9lUKt4BxTT5TVtiwSMORdC
+	 ICxc/QlGkB2kaXTTOyXicZiiO/mwafgH6knNICANk6kNsvg+SIaNU+HmB0pF1Ii/hd
+	 e1njZm9xgEXduDH3ASCwWoCuo+GNQ7ZjjCl57klRJMYkkNb3TMaHVz2azJGCgvPWl9
+	 6IvHRup/FfYXQ==
+Date: Sat, 9 May 2026 11:41:44 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linuxppc-dev@lists.ozlabs.org,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <chleroy@kernel.org>
+Subject: Re: [PATCH v2] lib/crypto: powerpc/md5: Drop powerpc optimized MD5
+ code
+Message-ID: <20260509184144.GB11883@quark>
+References: <20260506030005.9698-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <96df7b4d-cf1b-471d-9b4b-8741a80fbcc3@siemens.com>
+In-Reply-To: <20260506030005.9698-1-ebiggers@kernel.org>
 
-On Wed, Apr 29, 2026 at 02:33:20PM +0000, Niedermayr, BENEDIKT wrote:
-> On 10/27/25 20:51, Jarkko Sakkinen wrote:
-> > On Tue, Oct 21, 2025 at 02:46:15PM +0200, Jan Kiszka wrote:
-> >> From: Jan Kiszka <jan.kiszka@siemens.com>
-> >>
-> >> As seen with optee_ftpm, which uses ms-tpm-20-ref [1], a TPM may write
-> >> the current time epoch to its NV storage every 4 seconds if there are
-> >> commands sent to it. The 60 seconds periodic update of the entropy pool
-> >> that the hwrng kthread does triggers this, causing about 4 writes per
-> >> requests. Makes 2 millions per year for a 24/7 device, and that is a lot
-> >> for its backing NV storage.
-> >>
-> >> It is therefore better to make the user intentionally enable this,
-> >> providing a chance to read the warning.
-> >>
-> >> [1] https://github.com/Microsoft/ms-tpm-20-ref
-> >>
-> >> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
-> > 
-> > Looking at DRBG_* from [1] I don't see anything you describe. If OPTEE
-> > writes NVRAM,  then the implementation is broken.
-> > 
-> > Also AFAIK, it is pre-seeded per power cycle. There's nothing that even
-> > distantly relates on using NVRAM.
-> > 
-> > [1] https://trustedcomputinggroup.org/wp-content/uploads/TPM-2.0-1.83-Part-4-Supporting-Routines-Code.pdf
+On Tue, May 05, 2026 at 08:00:05PM -0700, Eric Biggers wrote:
+> MD5 is obsolete, is vulnerable to collision attacks, and is being
+> replaced by SHA-256 in new systems.  It doesn't make sense to continue
+> to maintain architecture-optimized implementations of MD5.  Effort
+> should be spent on modern algorithms.
 > 
-> Hi all,
+> Indeed, architecture-optimized MD5 code remains only for powerpc.  It
+> was already removed from mips and sparc, and it never existed for any
+> other architecture (e.g. x86, arm, or arm64) in the first place.
+> Earlier the decision was made to keep the powerpc MD5 code for a while
+> anyway because of someone using it via AF_ALG via libkcapi-hasher
+> (https://lore.kernel.org/r/f0d771d5-ed70-444c-957a-ad4c16f6c115@csgroup.eu/)
 > 
-> we recently also stumbled over this issue which led me here to this 
-> thread and maybe adding our observations helps to clarify things here a 
-> bit (hopefully) or at least augments the information related to firmware 
-> TPM based implementation based on ms-tpm-20-ref.
+> However, with AF_ALG itself now being on its way out due to its
+> continuous stream of security vulnerabilities
+> (https://lore.kernel.org/r/20260430011544.31823-1-ebiggers@kernel.org/),
+> it's also time to be a bit more forceful with nudging people towards
+> userspace crypto code.  It's always been the better solution anyway, and
+> it's much more efficient if properly optimized code is used.
 > 
-> Based on the optee_ftpm repo, as Jan already described, which currently 
-> references commit 98b60a44aba7 of [1] suffers this exact issue because 
-> of the NV_CLOCK_UPDATE_INTERVAL [2] which is set to "12" and issues a 
-> write for each command after ~4 seconds have passed.
+> Note that the md5-asm.S file contains no privileged instructions and
+> could be run in userspace just fine.
 > 
-> This config has been changed to "22" (on current master branch [3]) 
-> which is the allowed maximum when following the TPM spec (chapter 36.3.2 
-> in [4]) which leads to round about 70 minutes, but optee_ftpm didn't 
-> move ahead to this commit, yet.
-> This config exists for being able to adapt the write cycles to the 
-> specific wear conditions of the hardware.
+> Thus, we now have two factors going against keeping the powerpc MD5
+> code.  Different people might weigh these two factors differently, but I
+> think the two of them together make the removal the clear choice.
 > 
-> Moreover the ms-tpm-20-ref repo seems to not be maintained anymore and 
-> one should rather switch to [6].
+> Let's remove it.
 > 
-> So there are currently firmware TPM implementations out there that lead 
-> to these frequent writes.
+> Acked-by: Christophe Leroy (CS GROUP) <chleroy@kernel.org>
+> Acked-by: Ard Biesheuvel <ardb@kernel.org>
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
+> 
+> This patch is intended to be taken via libcrypto-next
 
-Really this would need a product and official bug bulletin for it to
-even consider a workaround. Speculation does not count.
+Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
 
-> 
-> AFAIK since the tpm-20-ref implementation basically only supports a file 
-> on disk or RAM backing storage, the optee_ftpm repo [5] provides it's 
-> own _plat_NV* implementations that replace the default ones and finally 
-> call OP-TEE's TEE_* secure storage API, which then routes to whatever 
-> backend OP-TEE is configured with (REE-FS or RPMB) – In our case the RPMB.
-> 
-> Because there are currently implementations out there (e.g. start using 
-> optee_ftpm) it may make sense to add this information to the kernel 
-> config's help text at least?
-
-Your first forum to report such issues is the TPM vendor.
-
-> 
-> We are currently trying to bump optee_ftpm to use the more recent v1.84, 
-> but since we're no TCG member the PRs on github could get a bit 
-> adventurous (PR's not upstream, yet).
-> Until then this is a valid issue that exists...
-> 
-> 
-> [2] 
-> https://github.com/microsoft/ms-tpm-20-ref/blob/98b60a44aba79b15fcce1c0d1e46cf5918400f6a/TPMCmd/tpm/include/TpmProfile.h#L199 
-> 
-> 
-> [3] 
-> https://github.com/microsoft/ms-tpm-20-ref/blob/98b60a44aba79b15fcce1c0d1e46cf5918400f6a/TPMCmd/tpm/include/TpmProfile.h#L200
-> 
-> [4] 
-> https://trustedcomputinggroup.org/wp-content/uploads/TPM-2.0-1.83-Part-1-Architecture.pdf
-> 
-> [5] https://github.com/OP-TEE/optee_ftpm
-> 
-> [6] https://github.com/TrustedComputingGroup/TPM
-> 
-> BR,
-> Benedikt
-> 
-
-BR, Jarkko
+- Eric
