@@ -1,42 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22D783AC00;
-	Sat,  9 May 2026 20:05:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8298C1F;
+	Sat,  9 May 2026 20:24:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778357128; cv=none; b=ZRnLPqcZLkIThyLNhYadf1lLJziyom6bxw/PW2EaE++zXmOhVu9eg3CIgjvEnIT7cMtqaBV8DJ9EIi7VFPnYCJc/7mS787bkxNLVbeXoilRh2gBERYxJwBMphbjUpw1dSo+zUjIs9nyGq+qlGh8oKL8TUvmKlpReaGEyzrA7f+4=
+	t=1778358281; cv=none; b=H2jkkgC+XbOQLnZvqnyXx7Nc2IENuP0cgQhnWB/Tr4JBzRl7XpbG62HQgqGK++lvz9j7amnBSBsfOHA6aRD4YPoR/Til9Yg6sWbdgQLZSS7OyPLZ8x4PV3W1bL6PL1uw1K3yeBgyYjJVEZjV8oiWA04/4eAvcJKwVFT+gWWSj1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778357128; c=relaxed/simple;
-	bh=gvCfoipjvFSyuB+Z6RDe06egz90snb/tb6jiKwmbmKk=;
+	s=arc-20240116; t=1778358281; c=relaxed/simple;
+	bh=kKWh3Ax64/du+5vhX0vAjVHPv0l4sBuI+ks7VTd/Lkw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D/sFpuJVEChj1c8J/j6nSEA+DoFXjd/SrKk7yljuPv0W/0afb5auFToEB+AHF7b/W9eZtDv/oVQwoYknFCqkqRA1CDQCUnlkxj7u02pjgb+b2KKcW6pDd6BPhSA7QFXfE2Vo2Hiv2bnOJNFsHiUevOn9+p5FRNE/Ju9iZnpz/QA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dL+hgRhy; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=sHMlZVRcgVjdAFCmYnlbXBPNKNfx9fTEJq6jNxKVjf+x1Y5ePQr1ll7r2YuNStvn17bDdeCylWlsS5V8RnEu25jHnCH9VlIoOGnCiDIJu/TnfccgaIxe1JrmkBzMCfXZ6xdk8QFuEImd3m8B08MP/86Ps/Y3dCZ6A18nSpiAvhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=shZOE2pV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dL+hgRhy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B6A4C2BCC4;
-	Sat,  9 May 2026 20:05:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="shZOE2pV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F57EC2BCB2;
+	Sat,  9 May 2026 20:24:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778357128;
-	bh=gvCfoipjvFSyuB+Z6RDe06egz90snb/tb6jiKwmbmKk=;
+	s=k20201202; t=1778358280;
+	bh=kKWh3Ax64/du+5vhX0vAjVHPv0l4sBuI+ks7VTd/Lkw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dL+hgRhySxvqBvd+CeLOETC9BXBE66RyuUS1bGENnBgeC4+xBbGhzL0VAy5fkUXKs
-	 wkWg3HHJlGUUXAegTxBYQTJpmhlIEs796fBoARee4ClWIx61D2SegbFrL7eD9mfFsV
-	 Cr6CmpBZ++mgxVGSco7m+zemEbpOPw4QzL/9fnRfYSv66sbI2Urx+pAXp6aDTIFPUE
-	 C017ypxymB8L9MxDL/b6rHRtgIU20gJHDG1Jd3VKu7PHa+0j4glxGz/SPDS18CgYiP
-	 sEw3VAzmGfA9UPVoYMMgl8Uvpbgp5e5ir3Wdp2biSQOQfrNgTOVNMQgW4ZjB3tvHWe
-	 bTX7P0/myIb5g==
-Date: Sat, 9 May 2026 13:05:03 -0700
+	b=shZOE2pVpx5LAwKbDSqYjkqU3e5ZgIBDTpaNBPpdxKFnn7hy81myAkpSA+zI1NOjy
+	 +lCtIM2W21mDt+l3OF+B+pL6zjn3w28574nppg08u0KqlgRXdvAkRbO0G0oWB1uOto
+	 jurZzH1+Cd/vfNOQTM9pKWMYYNG4HiO8Sh0B55lhaS4+rgi07zTcEBESprQlU41IE4
+	 vFiUSg49UFiqrg3tyQkj6J+wmzNc6SyfV+8nCiAnTOkcEi8iLsgzKaJMAahzCtfg77
+	 2MaiR67kIZf0F5sTVlTruJXAgamxbEsnq9e5QVxG+RGOtuUl5FVZyf2t/vtmBZqubE
+	 M9kJNzwTG944g==
+Date: Sat, 9 May 2026 13:23:54 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: Ard Biesheuvel <ardb+git@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+To: Christoph Hellwig <hch@lst.de>
+Cc: Ard Biesheuvel <ardb+git@google.com>,
+	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
 	linux-raid@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
 	Russell King <linux@armlinux.org.uk>, Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH 8/8] ARM: Remove hacked-up asm/types.h header
-Message-ID: <20260509200503.GC11883@quark>
+Subject: Re: [PATCH 7/8] lib/raid6: Include asm/neon-intrinsics.h rather than
+ arm_neon.h
+Message-ID: <20260509202354.GD11883@quark>
 References: <20260422171655.3437334-10-ardb+git@google.com>
- <20260422171655.3437334-18-ardb+git@google.com>
+ <20260422171655.3437334-17-ardb+git@google.com>
+ <20260423074712.GC31018@lst.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -45,28 +47,27 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260422171655.3437334-18-ardb+git@google.com>
+In-Reply-To: <20260423074712.GC31018@lst.de>
 
-On Wed, Apr 22, 2026 at 07:17:04PM +0200, Ard Biesheuvel wrote:
-> From: Ard Biesheuvel <ardb@kernel.org>
+On Thu, Apr 23, 2026 at 09:47:12AM +0200, Christoph Hellwig wrote:
+> On Wed, Apr 22, 2026 at 07:17:03PM +0200, Ard Biesheuvel wrote:
+> > From: Ard Biesheuvel <ardb@kernel.org>
+> > 
+> > arm_neon.h is a compiler header which needs some scaffolding to work
+> > correctly in the linux context, and so it is better not to include it
+> > directly. Both ARM and arm64 now provide asm/neon-intrinsics.h which
+> > takes care of this.
 > 
-> ARM has a special version of asm/types.h which contains overrides for
-> certain #define's related to the C types used to back C99 types such as
-> uint32_t and uintptr_t.
 > 
-> This is only needed when pulling in system headers such as stdint.h
-> during the build, and this only happens when using NEON intrinsics,
-> for which there is now a dedicated header file.
-> 
-> So drop this header entirely, and revert to the asm-generic one.
-> 
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> ---
->  arch/arm/include/uapi/asm/types.h | 41 --------------------
->  1 file changed, 41 deletions(-)
+> This could potentially clash with the raid6 library rework I'm doing
+> for 7.2. Although git has become pretty good about renamed files, so
+> maybe it won't be so bad.
 > 
 
-This is actually a UAPI header.  I guess it got put there accidentally
-and isn't actually needed there?
+I think this patch also breaks the userspace build of lib/raid6/.  Which
+is going away in Christoph's series anyway, but maybe it would make
+sense to drop this patch (and patch 8 which depends on this, I think)
+from this series for now?  That would make it a bit easier to take the
+rest through crc-next.
 
 - Eric
