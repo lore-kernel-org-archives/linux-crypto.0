@@ -1,147 +1,110 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D74BA32C923;
-	Sat,  9 May 2026 06:40:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 406A2276041
+	for <linux-crypto@vger.kernel.org>; Sat,  9 May 2026 07:03:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778308839; cv=none; b=b+cI/8BHoyOTWBSXypmNWd91q9OHraXsa2GPKzjFookigFKIvTueNZRnTnuP4azCMWVZhPilYQvlTY/euMTWrhg9Wql1JIEJeZmqH+XWGwPilJ5e6O8dBti7F/IohU/KPT9mf3IIIjnS7z/vSzIUoAn5zXNs0TT0RnkLyMkxgrw=
+	t=1778310236; cv=none; b=eknS+zRNC2dYlV7Uor7X7odSWMSwZxaQKVhZ5ZlKtl0v1nhZ6vgYDG0VJzMn0WK2zvNvcQ/FPz2EZrHvQBMkCeDZCocO0l4IioYuQ7ojU7xuPZ54cgo83Mf+RLoblRx16FTzyzTp6Q7vZGMv36L2OZlgcqezoMQPhfBWScw0P0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778308839; c=relaxed/simple;
-	bh=F8je7O80p2IuzHyfogBMsQXotHXwYXwhmSmmrVZqpuE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=Uezojnl2dPF5tjZoMDeVpX1HDGHBmZmWKmrej5MBymmH7nSEXxm/vJLGRqH8dMY0pPmDVlKfK54eTQ4jxXyZ7G60GDaWSDaehOvNuizy/iIYWJmBgzwwf4u8le8icLhF1uAEMlYSpiPGlfWeeygnrC7qH47RFfQgUZ4bdA2Em38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=lPIqVYDb; arc=none smtp.client-ip=117.135.210.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1778310236; c=relaxed/simple;
+	bh=Df0jM4ti0Gmt+9VNfP3vmGu1/E/Hn8XS62U7guWKBeQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q7O6oySUz4kIanbxIzPIxVn+L/lM6P2jnI64BM9vJMwM05TTBUGbp3guCg3rG+iBPUr7p28Ezrxr9PC+bYTSQ6+/21UvFYB5XoaFWADNLrEZ92r7wvVyt8GpYAiZ8kjGEOyCcD2uK+s7Xyidm6YsHfwvnMuM7CpYE54fF/71e3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kZqBUOBQ; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="lPIqVYDb"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=F8je7O80p2IuzHyfogBMsQXotHXwYXwhmSmmrVZqpuE=; b=l
-	PIqVYDbcbLnMw7/1zfwyrN1lwSfTzeVqAisbbiPjwYT8rVguxELedi8KDTA0MM0b
-	Cv2m7qaO27+Ko1UjJZqiEkPJi0AJizAdLtl0OT2pab2RzBB1LMhI3jUd9zh5groo
-	b/DPQGcq8UT7sK2QJMWwsLL0waojsFUUdmjxIUp0A4=
-Received: from w15303746062$163.com ( [113.200.174.80] ) by
- ajax-webmail-wmsvr-40-139 (Coremail) ; Sat, 9 May 2026 14:40:08 +0800 (CST)
-Date: Sat, 9 May 2026 14:40:08 +0800 (CST)
-From: w15303746062  <w15303746062@163.com>
-To: "Giovanni Cabiddu" <giovanni.cabiddu@intel.com>
-Cc: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	qat-linux <qat-linux@intel.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Mingyu Wang" <25181214217@stu.xidian.edu.cn>
-Subject: Re:Re: [PATCH] crypto: qat - fix use-after-free during concurrent
- device start and removal
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
- 20260403(27802f6d) Copyright (c) 2002-2026 www.mailtech.cn 163com
-In-Reply-To: <af2r0f/20watHiCX@gcabiddu-mobl.ger.corp.intel.com>
-References: <20260504025120.98242-1-w15303746062@163.com>
- <af2r0f/20watHiCX@gcabiddu-mobl.ger.corp.intel.com>
-X-NTES-SC: AL_Qu2cCv+bt0Ar7iOcYOkfmU0Qguw9Xcq5uPkj34FWN5t8jBHo0SwPfmFdOnTL382sMD60siGSbgJ30/VkeYt2Y7854aWLKjjyECclvg2YHKhPMA==
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=GBK
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kZqBUOBQ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1778310235; x=1809846235;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Df0jM4ti0Gmt+9VNfP3vmGu1/E/Hn8XS62U7guWKBeQ=;
+  b=kZqBUOBQSFTM4tu+diT+pnB8HG6a/1w3bll8UhTn4tsOl5dbpUyRvWFW
+   bMH7piI9XiQmQSIL/rLhMgVov/oCHcjGgfQhwRaQ6Z76un/x2U9Fmh+Aa
+   Bh9dkZGlDc6isQGnVLUKDjAidrbMaUcTfHYuAuJSjWzj9gYnjDns8q2Dg
+   Pjt753trYsOx/Cl8jQskc9V2hQ5PbpIp7utk3KyNTg6tHwfFxvr2AS4av
+   y2sNjDiBfJZJWdHMD0/pfWV8Ov9C3jYa6K08tiN8b1+u9q/luHlDCoy16
+   AzRkUYEO00e5jzwSwzrV1fuLhijKZoYuQJv7rlmkD3xcb2tpYLVELcX+Q
+   A==;
+X-CSE-ConnectionGUID: xDiqvriVRAebmLOPBfHCGA==
+X-CSE-MsgGUID: syRtcgv8TJ2X++ybfS5Kxw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11780"; a="90660184"
+X-IronPort-AV: E=Sophos;i="6.23,225,1770624000"; 
+   d="scan'208";a="90660184"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2026 00:03:54 -0700
+X-CSE-ConnectionGUID: hX7f7uXsQYqqCPVCeIpe1Q==
+X-CSE-MsgGUID: RXURSub2Toa3K79ANhpG4Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,225,1770624000"; 
+   d="scan'208";a="234304141"
+Received: from unknown (HELO fedora.iind.intel.com) ([10.49.0.89])
+  by fmviesa008.fm.intel.com with ESMTP; 09 May 2026 00:03:52 -0700
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To: herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org,
+	qat-linux@intel.com,
+	wangzhi@stu.xidian.edu.cn,
+	byu@xidian.edu.cn,
+	w15303746062@163.com,
+	vdronov@redhat.com,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH v2 0/2] crypto: qat - remove unused ioctl interface
+Date: Sat,  9 May 2026 08:00:11 +0100
+Message-ID: <20260509070340.12201-1-giovanni.cabiddu@intel.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <73aada77.4e38.19e0b76fea5.Coremail.w15303746062@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:iygvCgD335TI1v5pStqfAA--.17139W
-X-CM-SenderInfo: jzrvjiatxuliiws6il2tof0z/xtbC4wgC5Wn+1siKDQAA3C
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Transfer-Encoding: 8bit
 
-CgpGcm9tOiBNaW5neXUgV2FuZyA8MjUxODEyMTQyMTdAc3R1LnhpZGlhbi5lZHUuY24+CgpIaSBH
-aW92YW5uaSwKClRoYW5rIHlvdSBmb3IgdGhlIHVwZGF0ZS4gUmVtb3ZpbmcgdGhlIHVudXNlZCBJ
-T0NUTCBpbnRlcmZhY2UgaXMgaW5kZWVkIHRoZSBjbGVhbmVzdCBhbmQgbW9zdCBlZmZlY3RpdmUg
-d2F5IHRvIGVsaW1pbmF0ZSB0aGVzZSBhdHRhY2sgc3VyZmFjZXMuIEkgY29tcGxldGVseSBhZ3Jl
-ZSB3aXRoIHRoaXMgYXBwcm9hY2guCgpUaGFua3MgZm9yIENDJ2luZyBhbmQgYWNrbm93bGVkZ2lu
-ZyB0aGUgcmVwb3J0IQoKQmVzdCByZWdhcmRzLApNaW5neXUKCgoKCgoKCgoKCgoKCkF0IDIwMjYt
-MDUtMDggMTc6MjQ6MzMsICJHaW92YW5uaSBDYWJpZGR1IiA8Z2lvdmFubmkuY2FiaWRkdUBpbnRl
-bC5jb20+IHdyb3RlOgo+SGkgTWluZ3l1LAo+Cj5UaGFua3MgZm9yIHlvdXIgcGF0Y2hlcy4KPgo+
-VGhlIGlvY3RsIGludGVyZmFjZSBleHBvc2VkIGJ5IHRoZSBRQVQgZHJpdmVyIGlzIG5vdCBwYXJ0
-IG9mIGFueSBwdWJsaWMKPnVBUEkgaGVhZGVyIGFuZCBoYXMgbm8ga25vd24gdXNlcnMuIEkganVz
-dCBzZW50IGEgc2VyaWVzIHRoYXQgcmVtb3ZlcyBpdAo+ZW50aXJlbHkgWzFdLCB3aGljaCBhbHNv
-IGVsaW1pbmF0ZXMgdGhpcyBpc3N1ZS4KPgo+WzFdIGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2Fs
-bC8yMDI2MDUwODA5MTkxMi4yMDY5MTMtMS1naW92YW5uaS5jYWJpZGR1QGludGVsLmNvbS8KPgo+
-UmVnYXJkcywKPgo+LS0gCj5HaW92YW5uaQo+Cj5PbiBNb24sIE1heSAwNCwgMjAyNiBhdCAwMzo1
-MToyMEFNICswMTAwLCB3MTUzMDM3NDYwNjJAMTYzLmNvbSB3cm90ZToKPj4gRnJvbTogTWluZ3l1
-IFdhbmcgPDI1MTgxMjE0MjE3QHN0dS54aWRpYW4uZWR1LmNuPgo+PiAKPj4gQSBVc2UtQWZ0ZXIt
-RnJlZSAoVUFGKSB2dWxuZXJhYmlsaXR5IHdhcyBpZGVudGlmaWVkIGluIHRoZSBRQVQgZHJpdmVy
-J3MgaW9jdGwgcGF0aC4gV2hlbiBoYW5kbGluZyBjb21tYW5kcyBsaWtlIElPQ1RMX1NUQVJUX0FD
-Q0VMX0RFViwgYGFkZl9jdGxfaW9jdGxfZGV2X3N0YXJ0KClgIHJldHJpZXZlcyB0aGUgYWNjZWxl
-cmF0aW9uIGRldmljZSB1c2luZyBgYWRmX2Rldm1ncl9nZXRfZGV2X2J5X2lkKClgLgo+PiAKPj4g
-UHJldmlvdXNseSwgdGhpcyBsb29rdXAgZnVuY3Rpb24gaXRlcmF0ZWQgb3ZlciB0aGUgYGFjY2Vs
-X3RhYmxlYCB1bmRlciB0aGUgYHRhYmxlX2xvY2tgLiBIb3dldmVyLCBvbmNlIHRoZSB0YXJnZXQg
-ZGV2aWNlIHdhcyBmb3VuZCwgdGhlIGxvY2sgd2FzIGRyb3BwZWQgYW5kIGEgYmFyZSBwb2ludGVy
-IHdhcyByZXR1cm5lZCB3aXRob3V0IGluY3JlbWVudGluZyB0aGUgZGV2aWNlJ3MgcmVmZXJlbmNl
-IGNvdW50Lgo+PiAKPj4gVGhpcyBjcmVhdGVzIGEgY3JpdGljYWwgcmFjZSBjb25kaXRpb24uIElm
-IGEgY29uY3VycmVudCB0aHJlYWQgcmVtb3ZlcyB0aGUgZGV2aWNlIChlLmcuLCB2aWEgZGV2aWNl
-IHN0b3Agb3BlcmF0aW9ucyBvciBQQ0llIGhvdHBsdWcpIGJ5IGNhbGxpbmcgYGFkZl9kZXZtZ3Jf
-cm1fZGV2KClgLCB0aGUgZGV2aWNlIGlzIHJlbW92ZWQgZnJvbSB0aGUgbGlzdCBhbmQgaXRzIG1l
-bW9yeSBpcyBzdWJzZXF1ZW50bHkgZnJlZWQuIFdoZW4gdGhlIG9yaWdpbmFsIGlvY3RsIHRocmVh
-ZCByZXN1bWVzIGFuZCBhdHRlbXB0cyB0byBhY3F1aXJlIGBhY2NlbF9kZXYtPnN0YXRlX2xvY2tg
-IGluc2lkZSBgYWRmX2Rldl91cCgpYCwgaXQgdHJpZ2dlcnMgYSBLQVNBTiBzbGFiLW91dC1vZi1i
-b3VuZHMgcGFuaWMuCj4+IAo+PiBGaXggdGhpcyBieSBwcm9wZXJseSBsZXZlcmFnaW5nIHRoZSBl
-eGlzdGluZyBgcmVmX2NvdW50YC4gSW5jcmVtZW50IHRoZSBkZXZpY2UncyBgcmVmX2NvdW50YCB2
-aWEgYGF0b21pY19pbmMoKWAgaW5zaWRlIGBhZGZfZGV2bWdyX2dldF9kZXZfYnlfaWQoKWAgd2hp
-bGUgdGhlIGB0YWJsZV9sb2NrYCBpcyBzdGlsbCBoZWxkLiBBbGwgY2FsbGVycyBvZiBgYWRmX2Rl
-dm1ncl9nZXRfZGV2X2J5X2lkKClgIGFyZSB0aGVuIHVwZGF0ZWQgdG8gc2FmZWx5IHJlbGVhc2Ug
-dGhpcyByZWZlcmVuY2UgdXNpbmcgYGF0b21pY19kZWMoJmFjY2VsX2Rldi0+cmVmX2NvdW50KWAg
-b25jZSB0aGV5IGFyZSBkb25lIGludGVyYWN0aW5nIHdpdGggdGhlIGRldmljZS4KPj4gCj4+IFNp
-Z25lZC1vZmYtYnk6IE1pbmd5dSBXYW5nIDwyNTE4MTIxNDIxN0BzdHUueGlkaWFuLmVkdS5jbj4K
-Pj4gLS0tCj4+ICBkcml2ZXJzL2NyeXB0by9pbnRlbC9xYXQvcWF0X2NvbW1vbi9hZGZfY3RsX2Ry
-di5jIHwgMTAgKysrKysrKysrKwo+PiAgZHJpdmVycy9jcnlwdG8vaW50ZWwvcWF0L3FhdF9jb21t
-b24vYWRmX2Rldl9tZ3IuYyB8IDEyICsrKysrKysrKystLQo+PiAgMiBmaWxlcyBjaGFuZ2VkLCAy
-MCBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQo+PiAKPj4gZGlmZiAtLWdpdCBhL2RyaXZl
-cnMvY3J5cHRvL2ludGVsL3FhdC9xYXRfY29tbW9uL2FkZl9jdGxfZHJ2LmMgYi9kcml2ZXJzL2Ny
-eXB0by9pbnRlbC9xYXQvcWF0X2NvbW1vbi9hZGZfY3RsX2Rydi5jCj4+IGluZGV4IGMyZTZmMGNi
-NzQ4MC4uNDkyNGIyYmJiNDEyIDEwMDY0NAo+PiAtLS0gYS9kcml2ZXJzL2NyeXB0by9pbnRlbC9x
-YXQvcWF0X2NvbW1vbi9hZGZfY3RsX2Rydi5jCj4+ICsrKyBiL2RyaXZlcnMvY3J5cHRvL2ludGVs
-L3FhdC9xYXRfY29tbW9uL2FkZl9jdGxfZHJ2LmMKPj4gQEAgLTIwMSw2ICsyMDEsOSBAQCBzdGF0
-aWMgaW50IGFkZl9jdGxfaW9jdGxfZGV2X2NvbmZpZyhzdHJ1Y3QgZmlsZSAqZnAsIHVuc2lnbmVk
-IGludCBjbWQsCj4+ICAJfQo+PiAgCXNldF9iaXQoQURGX1NUQVRVU19DT05GSUdVUkVELCAmYWNj
-ZWxfZGV2LT5zdGF0dXMpOwo+PiAgb3V0Ogo+PiArCS8qIFJlbGVhc2UgdGhlIHJlZmVyZW5jZSBh
-Y3F1aXJlZCBieSBhZGZfZGV2bWdyX2dldF9kZXZfYnlfaWQoKSAqLwo+PiArCWlmIChhY2NlbF9k
-ZXYpCj4+ICsJCWF0b21pY19kZWMoJmFjY2VsX2Rldi0+cmVmX2NvdW50KTsKPj4gIAlrZnJlZShj
-dGxfZGF0YSk7Cj4+ICAJcmV0dXJuIHJldDsKPj4gIH0KPj4gQEAgLTMxMCw2ICszMTMsOSBAQCBz
-dGF0aWMgaW50IGFkZl9jdGxfaW9jdGxfZGV2X3N0YXJ0KHN0cnVjdCBmaWxlICpmcCwgdW5zaWdu
-ZWQgaW50IGNtZCwKPj4gIAkJYWRmX2Rldl9kb3duKGFjY2VsX2Rldik7Cj4+ICAJfQo+PiAgb3V0
-Ogo+PiArCS8qIFJlbGVhc2UgdGhlIHJlZmVyZW5jZSBhY3F1aXJlZCBieSBhZGZfZGV2bWdyX2dl
-dF9kZXZfYnlfaWQoKSAqLwo+PiArCWlmIChhY2NlbF9kZXYpCj4+ICsJCWF0b21pY19kZWMoJmFj
-Y2VsX2Rldi0+cmVmX2NvdW50KTsKPj4gIAlrZnJlZShjdGxfZGF0YSk7Cj4+ICAJcmV0dXJuIHJl
-dDsKPj4gIH0KPj4gQEAgLTM2MCw4ICszNjYsMTIgQEAgc3RhdGljIGludCBhZGZfY3RsX2lvY3Rs
-X2dldF9zdGF0dXMoc3RydWN0IGZpbGUgKmZwLCB1bnNpZ25lZCBpbnQgY21kLAo+PiAgCWlmIChj
-b3B5X3RvX3VzZXIoKHZvaWQgX191c2VyICopYXJnLCAmZGV2X2luZm8sCj4+ICAJCQkgc2l6ZW9m
-KHN0cnVjdCBhZGZfZGV2X3N0YXR1c19pbmZvKSkpIHsKPj4gIAkJZGV2X2VycigmR0VUX0RFVihh
-Y2NlbF9kZXYpLCAiZmFpbGVkIHRvIGNvcHkgc3RhdHVzLlxuIik7Cj4+ICsJCWF0b21pY19kZWMo
-JmFjY2VsX2Rldi0+cmVmX2NvdW50KTsKPj4gIAkJcmV0dXJuIC1FRkFVTFQ7Cj4+ICAJfQo+PiAr
-CQo+PiArCS8qIFJlbGVhc2UgdGhlIHJlZmVyZW5jZSBhY3F1aXJlZCBieSBhZGZfZGV2bWdyX2dl
-dF9kZXZfYnlfaWQoKSAqLwo+PiArCWF0b21pY19kZWMoJmFjY2VsX2Rldi0+cmVmX2NvdW50KTsK
-Pj4gIAlyZXR1cm4gMDsKPj4gIH0KPj4gIAo+PiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9jcnlwdG8v
-aW50ZWwvcWF0L3FhdF9jb21tb24vYWRmX2Rldl9tZ3IuYyBiL2RyaXZlcnMvY3J5cHRvL2ludGVs
-L3FhdC9xYXRfY29tbW9uL2FkZl9kZXZfbWdyLmMKPj4gaW5kZXggZTA1MGRlMTZhYjVkLi4zMjFi
-ZWEzY2VmY2UgMTAwNjQ0Cj4+IC0tLSBhL2RyaXZlcnMvY3J5cHRvL2ludGVsL3FhdC9xYXRfY29t
-bW9uL2FkZl9kZXZfbWdyLmMKPj4gKysrIGIvZHJpdmVycy9jcnlwdG8vaW50ZWwvcWF0L3FhdF9j
-b21tb24vYWRmX2Rldl9tZ3IuYwo+PiBAQCAtMzIwLDYgKzMyMCw4IEBAIHN0cnVjdCBhZGZfYWNj
-ZWxfZGV2ICphZGZfZGV2bWdyX2dldF9kZXZfYnlfaWQodTMyIGlkKQo+PiAgCQlzdHJ1Y3QgYWRm
-X2FjY2VsX2RldiAqcHRyID0KPj4gIAkJCQlsaXN0X2VudHJ5KGl0ciwgc3RydWN0IGFkZl9hY2Nl
-bF9kZXYsIGxpc3QpOwo+PiAgCQlpZiAocHRyLT5hY2NlbF9pZCA9PSBpZCkgewo+PiArCQkJLyog
-SW5jcmVtZW50IHJlZl9jb3VudCB0byBwcmV2ZW50IFVBRiBkdXJpbmcgY29uY3VycmVudCByZW1v
-dmFsICovCj4+ICsJCQlhdG9taWNfaW5jKCZwdHItPnJlZl9jb3VudCk7Cj4+ICAJCQltdXRleF91
-bmxvY2soJnRhYmxlX2xvY2spOwo+PiAgCQkJcmV0dXJuIHB0cjsKPj4gIAkJfQo+PiBAQCAtMzMx
-LDExICszMzMsMTcgQEAgc3RydWN0IGFkZl9hY2NlbF9kZXYgKmFkZl9kZXZtZ3JfZ2V0X2Rldl9i
-eV9pZCh1MzIgaWQpCj4+ICAKPj4gIGludCBhZGZfZGV2bWdyX3ZlcmlmeV9pZCh1MzIgaWQpCj4+
-ICB7Cj4+ICsJc3RydWN0IGFkZl9hY2NlbF9kZXYgKmFjY2VsX2RldjsKPj4gKwkKPj4gIAlpZiAo
-aWQgPT0gQURGX0NGR19BTExfREVWSUNFUykKPj4gIAkJcmV0dXJuIDA7Cj4+ICAKPj4gLQlpZiAo
-YWRmX2Rldm1ncl9nZXRfZGV2X2J5X2lkKGlkKSkKPj4gLQkJcmV0dXJuIDA7Cj4+ICsJYWNjZWxf
-ZGV2ID0gYWRmX2Rldm1ncl9nZXRfZGV2X2J5X2lkKGlkKTsKPj4gKwlpZiAoYWNjZWxfZGV2KSB7
-Cj4+ICsJCS8qIFJlbGVhc2UgdGhlIHJlZmVyZW5jZSBpbW1lZGlhdGVseSBhcyB3ZSBvbmx5IHZl
-cmlmeSBleGlzdGVuY2UgKi8KPj4gKwkJYXRvbWljX2RlYygmYWNjZWxfZGV2LT5yZWZfY291bnQp
-Owo+PiArIAkJcmV0dXJuIDA7Cj4+ICsJfQo+PiAgCj4+ICAJcmV0dXJuIC1FTk9ERVY7Cj4+ICB9
-Cj4+IC0tIAo+PiAyLjM0LjEKPj4gCg==
+The QAT driver exposes a character device (qat_adf_ctl) with IOCTLs for
+device configuration, start, stop, status query and enumeration. These
+IOCTLs are not part of any public uAPI header and have no known in-tree
+or out-of-tree users.
+
+This ioctl interface increases the attack surface and is the subject of a
+number of bug reports. Remove it entirely.
+
+Patch 1 removes the character device, the IOCTL definitions, the related
+data structures and headers. It strips adf_ctl_drv.c down to the
+minimal module_init/module_exit hooks. This is marked for stable.
+
+Patch 2 renames the now-minimal adf_ctl_drv.c to adf_module.c and
+adjusts function names to match the new file name. This is not marked
+for stable as it is a pure rename.
+
+Changes since v1:
+- Addressed comments from Sashiko: cleaned up leftover dead code
+  https://sashiko.dev/#/patchset/20260508091912.206913-1-giovanni.cabiddu%40intel.com
+
+Giovanni Cabiddu (2):
+  crypto: qat - remove unused character device and IOCTLs
+  crypto: qat - rename adf_ctl_drv.c to adf_module.c
+
+ .../userspace-api/ioctl/ioctl-number.rst      |   1 -
+ drivers/crypto/intel/qat/qat_common/Makefile  |   2 +-
+ drivers/crypto/intel/qat/qat_common/adf_cfg.c |  10 -
+ drivers/crypto/intel/qat/qat_common/adf_cfg.h |   1 -
+ .../intel/qat/qat_common/adf_cfg_common.h     |  29 --
+ .../intel/qat/qat_common/adf_cfg_user.h       |  38 --
+ .../intel/qat/qat_common/adf_common_drv.h     |   2 -
+ .../crypto/intel/qat/qat_common/adf_ctl_drv.c | 466 ------------------
+ .../crypto/intel/qat/qat_common/adf_dev_mgr.c |  32 --
+ .../crypto/intel/qat/qat_common/adf_module.c  |  64 +++
+ 10 files changed, 65 insertions(+), 580 deletions(-)
+ delete mode 100644 drivers/crypto/intel/qat/qat_common/adf_cfg_user.h
+ delete mode 100644 drivers/crypto/intel/qat/qat_common/adf_ctl_drv.c
+ create mode 100644 drivers/crypto/intel/qat/qat_common/adf_module.c
+
+
+base-commit: f7dd32c5179d7755de18e21d5674b08f9e5cb180
+-- 
+2.54.0
+
