@@ -1,59 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AFA83F20F0;
-	Mon, 11 May 2026 14:17:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77089370D4D;
+	Mon, 11 May 2026 14:25:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778509055; cv=none; b=fwSkOLY1hDxORjyPPeh587LcfRTKLFiydVELwslrvUcLFQ+KoV45EQt5nTGZXBsU9X0yl/aYUhhVSKCY5lRxMP3LzTmBUpOWvf9jY2y27uVll445a5+YVQXbuel9TK8v5U+KwEAf7mWPO8ebT5DLB7yK6Rohk9tr3zbL/s4ccTI=
+	t=1778509553; cv=none; b=K0V/U0NOHiBap0QEEekLLMPirgz3CaplemB6cVaQ6/+SV4iNK0xCHIhBJKfsreW0g5UJVrnOxLAr+2/SX3KjK+XeTGnzx8qTfU35QpGlS1ws+KrrIZvRey1cw4JDGc9uDYHrhdfIPpqcXg53Aasopue3Bbd5VK1NxZmCpIg/rDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778509055; c=relaxed/simple;
-	bh=TZVIkTWypVnbl2R7t67+UGjLujcG3Pr5gHQWQnJ0BJ0=;
+	s=arc-20240116; t=1778509553; c=relaxed/simple;
+	bh=mexmImOY5fBW1qxWFhDOoLaRXOky5Sdge7hTZ/K6IIU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Cw4PMbvQm63Xurm2KxwMHyAXktONEU68FJPE7h1WwsDpnnvJ48SFAlhs282mQJVsVlbPo4u9IQW5dClhK1pqiOccEwMuHxvvsAfhjBE6MGLm8xOUbP/45k818g2Cfma/3Qnt43gRbPqoatPX2oNMoH2ERFYRNfztIrZ/lpP98W8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oVtudW/f; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=BSFsVt4fHPJDdO3MWQNnh72WxtrFsC83LxwTdRoNHiLirBPNhtBHq5YasRAD9yR0oqUB3OxMAk0h4MueHnxqG2EjnqmXDuKO/INPNZDrVKz4OI4lJLMDlxLOkkehk+5jOI6bEdBSUCXFewAByEvY9e7irKngWZncgJTJQgVI3HM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dWG5BRtQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oVtudW/f"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66A35C2BCB0;
-	Mon, 11 May 2026 14:17:32 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dWG5BRtQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B30E2C2BCC9;
+	Mon, 11 May 2026 14:25:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778509055;
-	bh=TZVIkTWypVnbl2R7t67+UGjLujcG3Pr5gHQWQnJ0BJ0=;
+	s=k20201202; t=1778509553;
+	bh=mexmImOY5fBW1qxWFhDOoLaRXOky5Sdge7hTZ/K6IIU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oVtudW/fwYikiLYs7HmKWu48phxkvVJQkmMlCEMR9RWbC36Zlyqy19bcbOFLHyS30
-	 GLeYoJ5kVZYPDwWT+Zz/WC9Yv2ggVFWSdNr7fXh3IalrySG22DN/0tEsuB2YPvpiTW
-	 8tTb81yPUHIIDcV/u7PEz4x8WCGXD/n+cX1E7/XZJ8HkQ/c4PFeTx4PfC2/BlhBZab
-	 /qWm5/eQ1WWRS/621tHHH5b0USM0jWa6vjip88NHS+6j//shqNlKjVE3iJ/vdj19TH
-	 VWjsY5T1imeCfVMxzT5VJRz93ZvGu93o//NeB/6pdrba5yrNAshG013705Azb7GA/o
-	 ibYiy4JwSpU2g==
-Date: Mon, 11 May 2026 09:17:28 -0500
-From: Bjorn Andersson <andersson@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Harshal Dev <harshal.dev@oss.qualcomm.com>, 
-	"David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Konrad Dybcio <konradybcio@kernel.org>, Abel Vesa <abel.vesa@oss.qualcomm.com>, 
-	Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>, cros-qcom-dts-watchers@chromium.org, 
-	Eric Biggers <ebiggers@google.com>, Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
-	Jingyi Wang <jingyi.wang@oss.qualcomm.com>, Tengfei Fan <tengfei.fan@oss.qualcomm.com>, 
-	Bartosz Golaszewski <brgl@kernel.org>, David Wronek <davidwronek@gmail.com>, 
-	Luca Weiss <luca.weiss@fairphone.com>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	Melody Olvera <quic_molvera@quicinc.com>, Alexander Koskovich <akoskovich@pm.me>, 
-	Abel Vesa <abelvesa@kernel.org>, Brian Masney <bmasney@redhat.com>, 
-	Neeraj Soni <neeraj.soni@oss.qualcomm.com>, Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>, 
-	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Krzysztof Kozlowski <krzk@kernel.org>, 
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
-Subject: Re: [PATCH v5 01/13] dt-bindings: crypto: qcom,ice: Fix missing
- power-domain and iface clk
-Message-ID: <agHkmKq-q7_6m4nl@baldur>
-References: <20260416-qcom_ice_power_and_clk_vote-v5-0-5ccf5d7e2846@oss.qualcomm.com>
- <20260416-qcom_ice_power_and_clk_vote-v5-1-5ccf5d7e2846@oss.qualcomm.com>
- <afmuncmBrrvddHTU@gondor.apana.org.au>
- <b8805117-d54f-4e42-a7d4-6fa18af63e69@oss.qualcomm.com>
- <CC0E438D-5544-4BB8-8512-7F93A7FA4DC1@oss.qualcomm.com>
- <af6MsD1wDs9EZl5q@gondor.apana.org.au>
+	b=dWG5BRtQPrksKZtjKHD4FHH+i/KiRKgXSio8Eegb0cMqpMrM2vEDXylujvtqk+bg0
+	 KTCQxRFVmOImlY8EgjIy9c6+8HqyGWPhifsXjo2zxK5IeFqOTuUr4XuI/RNMqIjQKa
+	 nL05N3MaJV/VwD3L/z9AdZJB7x4f68ABTYlGmw3W02pOOCtF2A19OvPCIhBLoECph+
+	 2yUpdyu4EPWxanzv5IJEdJYk3nmtyiYH+VBbpiGvYS7F2WjRRrdJHLH59Wz6v/98c0
+	 Ec0tMTrUO0zT5KNpTbA/5ZM+c72+5+60F5ffcFM9hOLlNkYqMgr24zflIWfIznaec1
+	 ji4TAN74Op8Gg==
+Date: Mon, 11 May 2026 08:25:50 -0600
+From: Tycho Andersen <tycho@kernel.org>
+To: "Pratik R. Sampat" <prsampat@amd.com>
+Cc: ashish.kalra@amd.com, thomas.lendacky@amd.com, john.allen@amd.com, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, aik@amd.com, nikunj@amd.com, michael.roth@amd.com
+Subject: Re: [RFC v2] crypto/ccp: Introduce SNP_VERIFY_MITIGATION command
+Message-ID: <agHl3ow90IdKTS72@tycho.pizza>
+References: <20260501152051.17469-1-prsampat@amd.com>
+ <afitM-Ub50JsTCHz@tycho.pizza>
+ <673592c4-8eca-4b84-9f60-7020327d1afd@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -62,28 +45,40 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <af6MsD1wDs9EZl5q@gondor.apana.org.au>
+In-Reply-To: <673592c4-8eca-4b84-9f60-7020327d1afd@amd.com>
 
-On Sat, May 09, 2026 at 09:24:00AM +0800, Herbert Xu wrote:
-> On Fri, May 08, 2026 at 08:11:45PM +0530, Harshal Dev wrote:
-> >
-> > Can you please confirm for Bjorn once
-> > that you're not picking this up and he
-> > can pick it from his tree? 
+On Fri, May 08, 2026 at 05:10:52PM -0400, Pratik R. Sampat wrote:
+> Hi Tycho,
 > 
-> Bjorn, please feel free to pick this patch up.
+> Missed this one in my mailbox. Thanks for the review!
 > 
+> On 5/4/26 10:32 AM, Tycho Andersen wrote:
+> > On Fri, May 01, 2026 at 11:20:51AM -0400, Pratik R. Sampat wrote:
+> >>   - failed_status (read-only): firmware-reported failure status from the
+> >>     last operation, as returned alongside the status vectors
+> > 
+> > "from the last operation" is not quite right here, it looks like it
+> > re-runs the STATUS command and reports that error?
+> 
+> That is correct. It runs the STATUS command and reports the status of the
+> verification operation. Probably better to phrase it as the "last verification
+> operation" instead?
 
-Thanks Herbert, I've picked the binding up.
-If you need it, you can find it at:
+Hmm, I'm not sure what you mean here. The FW spec 1.58 table 132 says:
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/qcom/linux.git 20260416-qcom_ice_power_and_clk_vote-v5-1-5ccf5d7e2846@oss.qualcomm.com
+    Command to request the firmware to return information regarding the
+    currently supported (available) mitigations, and then the verified
+    (processed and completed) mitigations. If DST_PADDR_EN is set,
+    DST_PADDR will be populated with the SNP_VERIFY_MITIGATION_DST_PADDR
+    structure.
 
-Regards,
-Bjorn
+so I don't think it has anything to do with the last VERIFY operation?
 
-> Thanks,
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+The spec is a bit messy here, though. Table 131 mentions a
+MIT_REQ_CHECK operation, which I assume should really be _STATUS. It
+describes what the output VECTOR should be for VERIFY in table 131,
+but not what it is for STATUS. Table 132 suggests the output VECTOR is
+the list of supported mitigations, which matches what I was seeing
+when I played with this.
+
+Tycho
