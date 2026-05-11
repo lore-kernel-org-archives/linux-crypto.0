@@ -1,117 +1,88 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from canpmsgout09.his.huawei.com (canpmsgout09.his.huawei.com [113.46.200.224])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 749982032D;
-	Mon, 11 May 2026 00:19:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2ED92032D;
+	Mon, 11 May 2026 00:49:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.224
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778458777; cv=none; b=NpIoDxzPicymo9OUK2m0i1j4vOujhBSJThxneG5hCySJpMSfF+wzHZh0i87j2UXVcx4fvF1Uv/g0xn4fCJI1Myynh7+LfZ1Ap+JI+MznIipbuyvLZrkDJqscKim/9riRlEouwrTdHuQCwwYze/OHxCwkCysrR2AehfVr53DOORc=
+	t=1778460581; cv=none; b=ow5KsccJfFVoAhC6z3kQz9OLFuf15HdIUwBgUusgFkGMW6YdrK77+Kdp1xEXMLnmcj10KB82yyozaJPWs7pN6T+0N2Dq9iKQsJWGPtXmjLklu9DOBKgRloDO/TLDbgb61R+dHSpUSyZ5XYKMBiSfRXrRJKlmAfZzDDUnJ/crBaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778458777; c=relaxed/simple;
-	bh=FFfWSJIN0M+XWQkxkgqga0wg4IDSRJ3nMfsMlZRCX7Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HciQ/W+A3QEoSOFUlgyEi2/dUT4MZUfrgorWbE+vIRdxs/6XsBvwHaYiLGjWuBaav3cLGpDRziAJNdlNdZhdtmgu42HPxUYnQFXhi0ZnsEcx3oWdY854tDpNurt+VgtAsGqPUuO0e5t20oQD5AoVH4A7Ruw7SDrYZxH5za7pcx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ck+FJQPq; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1778460581; c=relaxed/simple;
+	bh=gs1HB7emQNi8Q66rLB/GEImFaxeNp14wWV3c6AhIvgA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TzzrcrXl9d3K+3dp6Ax7YUwIVfCzjqF8tJ58iWAPXKm5F4UO6bQZ7JZgpP5rwo5uTkEFcoKBaPY1OBh+ArFZ1Lei4HNScGaq6mg9xZXP3a8PR7hxRcLk7xNwzEtdjFEQ9BwfErboJpXbLKExkdzikTmna1YjsGJFuOy7lM863hs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=sLjnjzAr; arc=none smtp.client-ip=113.46.200.224
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ck+FJQPq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6751C2BCB8;
-	Mon, 11 May 2026 00:19:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778458777;
-	bh=FFfWSJIN0M+XWQkxkgqga0wg4IDSRJ3nMfsMlZRCX7Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ck+FJQPq+e7LVoFAOxQkWeNApMWQ4GyR8ZIxl/CH9iC9aF6qCB5jQ/t2JGgYJ/+BJ
-	 IYoFzImONvAeWuM3T/vOmaGUXPkEVmpi2DKGac13+BG6y4h3PtNI4u0an7palTJD7+
-	 LJI696C142WbaCaokHzC1Fkp5RLHKVZa8jKD+iN2TSb9FpWMXCiYjbWF2C8C95kYDz
-	 d8CxtJISJ+ziDqwPhg6NgzvTaCSHhiYMvF7dC6HDCSOWbT0Xb4Mjoex6Zz723BkT3F
-	 GaM1G9z/jf8AU8HwWEMHTDSrbCMiDYet0sBVTqhsd2lawrvjtVY3sRpNq45PKgEoZ4
-	 JOeCLpUlEOU4w==
-Date: Sun, 10 May 2026 17:19:35 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Alexandre Knecht <knecht.alexandre@gmail.com>
-Cc: herbert@gondor.apana.org.au, "David S . Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH] crypto: ctr - Convert from skcipher to lskcipher
-Message-ID: <20260511001935.GC60510@quark>
-References: <20260510230901.1772949-1-knecht.alexandre@gmail.com>
- <20260510233237.GA60510@quark>
- <20260510234452.GB60510@quark>
- <CAHAB8Wy1APeCcm7_OfrNYeZFcMXfZ5rUSeDX7-c7WO_rGg2Zig@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="sLjnjzAr"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=z50qWErVEo77SkfGAkAgWi+on+P5jOv4G7LhP+/oeR0=;
+	b=sLjnjzAr+0KToQu2Tl6n80uTa47dSnkjxaNXYSA+mjfUR/vuF56BptgQYXrBGM6GmcKrZzPrk
+	lKjwROyQVMa3VwRYlFrYA3N7Uw6rXYG0MmhZOibYuBN9UhEe7+gTRoIq5RhKfQxM5EjDrCQixKf
+	1StVtvwZ6HwWHoFkM8bntsE=
+Received: from mail.maildlp.com (unknown [172.19.163.200])
+	by canpmsgout09.his.huawei.com (SkyGuard) with ESMTPS id 4gDLX36fHtz1cyPg;
+	Mon, 11 May 2026 08:41:55 +0800 (CST)
+Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 50C294055B;
+	Mon, 11 May 2026 08:49:30 +0800 (CST)
+Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
+ dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 11 May 2026 08:49:29 +0800
+Received: from localhost.huawei.com (10.90.31.46) by
+ kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 11 May 2026 08:49:29 +0800
+From: Chenghai Huang <huangchenghai2@huawei.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<fanghao11@huawei.com>, <liulongfang@huawei.com>, <qianweili@huawei.com>,
+	<wangzhou1@hisilicon.com>
+Subject: [PATCH] crypto: hisilicon/sec2 - lower priority for hisilicon crypto implementations
+Date: Mon, 11 May 2026 08:49:27 +0800
+Message-ID: <20260511004927.3469951-1-huangchenghai2@huawei.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHAB8Wy1APeCcm7_OfrNYeZFcMXfZ5rUSeDX7-c7WO_rGg2Zig@mail.gmail.com>
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemq200001.china.huawei.com (7.202.195.16)
 
-On Mon, May 11, 2026 at 02:02:22AM +0200, Alexandre Knecht wrote:
-> Le lun. 11 mai 2026 à 01:44, Eric Biggers <ebiggers@kernel.org> a écrit :
-> > Also note that lskcipher doesn't provide access to the accelerated AES
-> > mode implementations.  Indeed, almost nothing is supported by lskcipher.
-> > The fact that you found something to be missing isn't surprising.
-> >
-> > I think "lskcipher" is kind of a dead end, to be honest.  It's not clear
-> > why it got added.  The path forwards is to get the AES encryption modes
-> > added to lib/crypto/ and to just use that instead.
-> >
-> > - Eric
-> 
-> Hi Eric,
-> 
-> Thanks for the review — you're asking the right questions.
-> 
-> I'm developing a VXLAN/EVPN-based CNI for Kubernetes (releasing in the
-> coming months), and the goal is to implement datapath encryption for
-> overlay traffic in a zero-trust datacenter model. The encryption
-> happens in BPF programs attached via TC on the VXLAN device (encrypt
-> inner frames on egress, decrypt on ingress).
-> 
-> The algorithm I actually need is AES-GCM (authenticated encryption of
-> VXLAN inner frames, with the outer headers as AAD). When I looked at
-> bpf_crypto, I found that:
-> 
-> 1. Only lskcipher ("skcipher" type) was implemented
-> 2. ecb(aes) was the only usable algorithm
-> 3. AEAD support was designed for (authsize field exists in
->  bpf_crypto_params, setauthsize in bpf_crypto_type) but never
->  implemented
-> 4. ctr(aes) wasn't available as lskcipher either
-> 
-> I looked at Herbert's history converting ECB and CBC to lskcipher and
-> assumed that was the path forward for CTR. But you're right, the
-> real goal is AEAD, not CTR. CTR alone doesn't give me integrity.
-> 
-> Your point about lib/crypto/ is interesting. If there's a path to
-> expose AES-GCM (or the building blocks) as direct library calls that
-> BPF programs in TC/XDP could use (avoiding the template/instance
-> machinery and getting hardware acceleration) that would be ideal for
-> this use case.
-> 
-> What would that look like? Is there existing lib/crypto/ work for
-> AES-GCM that could be wired up to BPF, or would that need to be
-> built?
+From: lizhi <lizhi206@huawei.com>
 
-Sure, it makes sense that AES-GCM is what you actually need.  There's
-actually a lot of demand for AES-GCM in lib/crypto/, and I've been
-working on it.
+Lower the priority of HiSilicon's crypto implementations to allow more
+suitable alternatives to be selected. For example, certain kernel
+use-cases do not benefit from HiSilicon's symmetric crypto algorithms.
+This change ensures that more appropriate options are chosen first while
+retaining HiSilicon's implementations as alternatives.
 
-There's already an existing AES-GCM lib/crypto/ API (see
-include/crypto/gcm.h), and I optimized it a bit in 7.0 and 7.1.  For
-example, it now uses the architecture-optimized single-block AES code.
+Signed-off-by: lizhi <lizhi206@huawei.com>
+Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
+---
+ drivers/crypto/hisilicon/sec2/sec_crypto.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-You might be able to go ahead and use that right now.
+diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+index 2471a4dd0b50..77e0e03cbcab 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+@@ -20,7 +20,7 @@
+ #include "sec.h"
+ #include "sec_crypto.h"
+ 
+-#define SEC_PRIORITY		4001
++#define SEC_PRIORITY		80
+ #define SEC_XTS_MIN_KEY_SIZE	(2 * AES_MIN_KEY_SIZE)
+ #define SEC_XTS_MID_KEY_SIZE	(3 * AES_MIN_KEY_SIZE)
+ #define SEC_XTS_MAX_KEY_SIZE	(2 * AES_MAX_KEY_SIZE)
+-- 
+2.33.0
 
-However, it currently supports only one-shot computation, and it doesn't
-yet take advantage of the fully optimized AES-GCM assembly code that
-interleaves the AES and GHASH computations.  I'm planning to address
-both of those limitations soon.
-
-Anyway, that seems like the clear way forward.  The lskcipher thing
-seems like a dead end to me.
-
-- Eric
