@@ -1,39 +1,44 @@
-Received: from mailout1.hostsharing.net (mailout1.hostsharing.net [83.223.95.204])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 067462727FD;
-	Mon, 11 May 2026 05:31:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A40C125A0;
+	Mon, 11 May 2026 05:32:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778477471; cv=none; b=VIRUJfAn5ab96fAjrNWm9yQDRK8zereTUKhDLl8NF0IhqoRiSXZhccZtOnJk3+qof/2+ITrf3hnwgZaeVXBQbkjCcscL9f3Fj3rvEtROYxqC+ug3kXjbzaz6h2XFplmRc1BHp6wOz6+DSyPbhf2ktRpHpzA8KYajvoZjmyrmYJ8=
+	t=1778477558; cv=none; b=YFU5gvRrdp2Wo1gRglnFdtY8TTCv9lPPG5Pv3YkApbWik3JZIqxWspjHERXTX/AbpJ3rMn4+KITVqFo1NlEpoAzwOWOhparTXeB/6HeK2fYj/EFJ66MM0vkMmBRA1OPzsXWCu1rRY2B9GdlPO62ichuwrZ9XlYR8iRu/NJ6biQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778477471; c=relaxed/simple;
-	bh=h1DhVC/QqsZKK/KVgdS4+aNFest26/KYjvR8P+YJL9s=;
+	s=arc-20240116; t=1778477558; c=relaxed/simple;
+	bh=whJ0tzdATyn6xQuQyHvlEb9y9KQ1uSP2Oz8XEIvlZGQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=memV7NTLVz0bf47JUt8WvsLpS/ykMuU6ha4YR5ZAh9LIZlt7uHxB0W+G7nYpKMKKGoffE1snTZjJfKCqRTS6sKPVw4kfn5mshMqtq1t38m51Vd9SbwEkLMBhS0cu+gEnj3kiK7FXM8IsXDSSQwlWsFUWiC2TNwQXXX0qpi/JqUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=83.223.95.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
-Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384
-	 client-signature ECDSA (secp384r1) client-digest SHA384)
-	(Client CN "*.hostsharing.net", Issuer "GlobalSign GCC R6 AlphaSSL CA 2025" (verified OK))
-	by mailout1.hostsharing.net (Postfix) with ESMTPS id 50C24380;
-	Mon, 11 May 2026 07:30:59 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 3BFC5600CDB5; Mon, 11 May 2026 07:30:59 +0200 (CEST)
-Date: Mon, 11 May 2026 07:30:59 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: Anastasia Tishchenko <sv3iry@gmail.com>
-Cc: Ignat Korchagin <ignat@linux.win>,
-	Stefan Berger <stefanb@linux.ibm.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto : ecc - Fix carry overflow in vli multiplication
-Message-ID: <agFpkxrqtPVA6PrR@wunner.de>
-References: <20260508114844.29694-1-sv3iry@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=VIfqEeOXPUTeDvnSgsmTfKWR0oxJCbM9BmJbaJw1Z5BWW0t5xIWUTt74W2RIBK/iD2F9ocKntRcWNIB4RKsROiVi2BaJbZj3v/xzIwXYYeJtiozFEC/t205JReY2D2PGGas75zmL1FBwpkIyu1WiSFH/lUV567xS1JT+SPe4zVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=FR10EpZA; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="FR10EpZA"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=nW6FlOEz1fqqM4k+MzHjMp0VrqCe99NnSBZ4ciCEffo=; 
+	b=FR10EpZAJvY/ftuo1JWnHtzeh5k3liBWyjUdMybPYwqXxzplyBwTh2sDbtxGJv5cBzs4c/uAatK
+	/0dRMFY4j/bjnAQcOKD0wMH0YpZ5LQ4mRsVSrpTf1qfpQThfBJt+UTWEnh3d3jm6qCMgGnhinKLEP
+	W5J1lxaNGEg/hWweE++Zt+cLryUavTKgnfvP8hvt6SlB3lJsaRJKE/fblPD3jHqOYYGSs3Jel/ZwL
+	PL4vL2VoSLXe++7bH5uEnE9FrD9FI+QTvPoHJwqknBC2nRDKhntY2fboluPfgTojy55h38g3KvF4C
+	rSZGBCpZ2wMlgk6vl7YKHfFZSE4z6YiRlg4A==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1wMJFg-00CzqX-1K;
+	Mon, 11 May 2026 13:32:25 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 11 May 2026 13:32:24 +0800
+Date: Mon, 11 May 2026 13:32:24 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: yuri08 <nvt031@gmail.com>
+Cc: davem@davemloft.net, w@1wt.eu, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: algif_aead - Prevent async UAF on early socket
+ close
+Message-ID: <agFp6PwyWsnvr5Gk@gondor.apana.org.au>
+References: <CAFpG_BHU49CKUpak795wkiczROiKUX8CsN2dp_94s4P5M9rr4Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,76 +47,58 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260508114844.29694-1-sv3iry@gmail.com>
+In-Reply-To: <CAFpG_BHU49CKUpak795wkiczROiKUX8CsN2dp_94s4P5M9rr4Q@mail.gmail.com>
 
-On Fri, May 08, 2026 at 02:48:44PM +0300, Anastasia Tishchenko wrote:
-> The carry flag calculation fails when r01.m_high is saturated
-> (0xFFFFFFFFFFFFFFFF) and addition of lower bits overflows.
+On Sun, May 10, 2026 at 09:05:57PM +0700, yuri08 wrote:
+> When an AEAD request falls back to the asynchronous software path (e.g.,
+> cryptd), the Crypto API returns -EINPROGRESS and control returns to
+> user-space. If user-space immediately closes the socket fd, the memory
+> mapping for the RX SGL (req->dst) provided via recvmsg is torn down
+> while the cryptd workqueue is still actively writing to it (e.g., during
+> authenc_esn_decrypt ESN scratch writes).
 > 
-> The condition (r01.m_high < product.m_high) doesn't handle the case
-> where r01.m_high == product.m_high and an additional carry exists
-> from lower-bit overflow.
+> To mitigate this race condition without adding complex pinning mechanisms,
+> we utilize the crypto backlog capability. By adding
+> CRYPTO_TFM_REQ_MAY_BACKLOG to the async callback flags, we ensure that
+> the crypto core properly serializes the request completion, preventing
+> the socket resources from being released by af_alg_release() while the
+> workqueue is still processing the destination buffers.
 > 
-> Add proper handling for this boundary by accounting for the carry
-> from the lower addition.
-[...]
-> +++ b/crypto/ecc.c
-> @@ -427,7 +427,10 @@ static void vli_mult(u64 *result, const u64 *left, const u64 *right,
->  			product = mul_64_64(left[i], right[k - i]);
->  
->  			r01 = add_128_128(r01, product);
-> -			r2 += (r01.m_high < product.m_high);
-> +			if (r01.m_high != product.m_high)
-> +				r2 += (r01.m_high < product.m_high);
-> +			else
-> +				r2 += (r01.m_low < product.m_low);
->  		}
->  
->  		result[k] = r01.m_low;
+> Fixes: a664bf3d603d ("crypto: algif_aead - Revert to operating
+> out-of-place")
+> Signed-off-by: NGUYEN TUAN <nvt031@gmail.com>
+> ---
+>  crypto/algif_aead.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
+> index cb651ab58d62..123456789abcd 100644
+> --- a/crypto/algif_aead.c
+> +++ b/crypto/algif_aead.c
+> @@ -229,7 +229,8 @@ static int _aead_recvmsg(struct socket *sock, struct
+> msghdr *msg,
+>          areq->outlen = outlen;
+> 
+>          aead_request_set_callback(&areq->cra_u.aead_req,
+> -  CRYPTO_TFM_REQ_MAY_SLEEP,
+> +  CRYPTO_TFM_REQ_MAY_SLEEP |
+> +  CRYPTO_TFM_REQ_MAY_BACKLOG,
 
-Thanks for spotting this.
+This patch makes no sense.  We got rid of MAY_BACKLOG back in 2020
+specifically because it causes the kind of problems that you're
+reporting.
 
-crypto/ecc.c is derived from Ken MacKay's micro-ecc library and
-that library has always had the check that you're adding here:
+On a modern kernel, the socket reference is meant to keep the socket
+from releasing its data prematurely.  The socket reference is only
+dropped after completion.
 
-https://github.com/kmackay/micro-ecc/blob/master/uECC.c#L403
+Is it possible that you're using some ancient kernel dating from
+the 2010's? Because from the context of the patch that you sent
+in private, it appears to indicate that MAY_BACKLOG was still
+being used.
 
-When commit 3c4b23901a0c ("crypto: ecdh - Add ECDH software support")
-introduced crypto/ecc.c, it split the muladd() function in the
-micro-ecc library into separate mul_64_64() and add_128_128() helpers.
-The function names suggest that this was probably done to allow
-moving them to include/linux/math64.h and/or lib/math/div64.c
-in case they're needed elsewhere in the kernel later.
-
-It seems the check got lost in translation.
-
-However while your patch looks correct to me, I think the overflow
-check isn't very obvious or readable.  And I don't like how it leaks
-outside the add_128_128() helper.
-
-The kernel gained a check_add_overflow() helper relatively recently
-in include/linux/overflow.h.  What I'd prefer is if you could rename
-add_128_128() to check_add_128_128_overflow() and let it return a bool
-indicating whether an overflow occurred.  Then r2 is simply incremented
-if the return value is true.  Optionally you could add a third parameter
-for the result (like check_add_overflow() does), but that's not strictly
-needed for the callers in crypto/ecc.c and would merely be in preparation
-for reuse of the function by other code in the kernel.
-Does that make sense?
-
-Please add these tags if/when respinning:
-
-Fixes: 3c4b23901a0c ("crypto: ecdh - Add ECDH software support")
-Cc: stable@vger.kernel.org # v4.8+
-
-Personally I order tags according to Bjorn's preference:
-
-https://lore.kernel.org/r/20171026223701.GA25649@bhelgaas-glaptop.roam.corp.google.com/
-
-It would also be good if you could include the backstory I've outlined
-above in the commit message so that it's recorded in the git history
-and doesn't have to be dug out from mailing list archives.
-
-Thanks!
-
-Lukas
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
