@@ -1,104 +1,194 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A40C125A0;
-	Mon, 11 May 2026 05:32:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23812285061;
+	Mon, 11 May 2026 07:01:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778477558; cv=none; b=YFU5gvRrdp2Wo1gRglnFdtY8TTCv9lPPG5Pv3YkApbWik3JZIqxWspjHERXTX/AbpJ3rMn4+KITVqFo1NlEpoAzwOWOhparTXeB/6HeK2fYj/EFJ66MM0vkMmBRA1OPzsXWCu1rRY2B9GdlPO62ichuwrZ9XlYR8iRu/NJ6biQ4=
+	t=1778482913; cv=none; b=R7hnIr6Xo//47/00KiHcFzPW4OkmBZl9MiVHnVK4GcXzt1GYcBye/klmfbGz2j1RHVMYOlMAKYEGS4VgQ2oXFxVCfFcib9TsAaLbeDf6lGkOBA7Unux4vNKoImZF4r91Su3Uq+cARtoPThToTt246fPoXyvGhTuKhpYr1udINRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778477558; c=relaxed/simple;
-	bh=whJ0tzdATyn6xQuQyHvlEb9y9KQ1uSP2Oz8XEIvlZGQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VIfqEeOXPUTeDvnSgsmTfKWR0oxJCbM9BmJbaJw1Z5BWW0t5xIWUTt74W2RIBK/iD2F9ocKntRcWNIB4RKsROiVi2BaJbZj3v/xzIwXYYeJtiozFEC/t205JReY2D2PGGas75zmL1FBwpkIyu1WiSFH/lUV567xS1JT+SPe4zVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=FR10EpZA; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="FR10EpZA"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=nW6FlOEz1fqqM4k+MzHjMp0VrqCe99NnSBZ4ciCEffo=; 
-	b=FR10EpZAJvY/ftuo1JWnHtzeh5k3liBWyjUdMybPYwqXxzplyBwTh2sDbtxGJv5cBzs4c/uAatK
-	/0dRMFY4j/bjnAQcOKD0wMH0YpZ5LQ4mRsVSrpTf1qfpQThfBJt+UTWEnh3d3jm6qCMgGnhinKLEP
-	W5J1lxaNGEg/hWweE++Zt+cLryUavTKgnfvP8hvt6SlB3lJsaRJKE/fblPD3jHqOYYGSs3Jel/ZwL
-	PL4vL2VoSLXe++7bH5uEnE9FrD9FI+QTvPoHJwqknBC2nRDKhntY2fboluPfgTojy55h38g3KvF4C
-	rSZGBCpZ2wMlgk6vl7YKHfFZSE4z6YiRlg4A==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wMJFg-00CzqX-1K;
-	Mon, 11 May 2026 13:32:25 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 11 May 2026 13:32:24 +0800
-Date: Mon, 11 May 2026 13:32:24 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: yuri08 <nvt031@gmail.com>
-Cc: davem@davemloft.net, w@1wt.eu, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: algif_aead - Prevent async UAF on early socket
- close
-Message-ID: <agFp6PwyWsnvr5Gk@gondor.apana.org.au>
-References: <CAFpG_BHU49CKUpak795wkiczROiKUX8CsN2dp_94s4P5M9rr4Q@mail.gmail.com>
+	s=arc-20240116; t=1778482913; c=relaxed/simple;
+	bh=kCWqavL0KzIwMx7UPaJpEm75Ovvb2w7eDqxSVOyJGKo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MQ/33oNEqdrztQt3HEft+DsFqFe7yRrZmwAOzK6T2iB336jZAdDYGayWAk97AjY+R0xMq7yIfIOLKWR9iJHyj85FZXlTTTHxi8t+9uXnmVH/LyeoDi4UblpeqZISzSqFz4IL+/psbILNB2cW892pwSXkelsrJlyD6FQvAAI79j8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.2.229] (p5b13a79d.dip0.t-ipconnect.de [91.19.167.157])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id B76ED4C1511A0A;
+	Mon, 11 May 2026 09:00:56 +0200 (CEST)
+Message-ID: <6f58b950-a997-4dd6-a1a2-95eb72009151@molgen.mpg.de>
+Date: Mon, 11 May 2026 09:00:55 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFpG_BHU49CKUpak795wkiczROiKUX8CsN2dp_94s4P5M9rr4Q@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: powernv_rng_read: Oops: Kernel access of bad area, sig: 11 [#1]
+To: Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Olivia Mackall <olivia@selenic.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>, Michael Ellerman <mpe@ellerman.id.au>
+Cc: linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ LKML <linux-kernel@vger.kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>
+References: <a159e81a-ccfd-440f-af68-6a56cca09cb2@molgen.mpg.de>
+ <0c06bc14-9459-44d5-9e28-b0b78c0fbe36@linux.ibm.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <0c06bc14-9459-44d5-9e28-b0b78c0fbe36@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Sun, May 10, 2026 at 09:05:57PM +0700, yuri08 wrote:
-> When an AEAD request falls back to the asynchronous software path (e.g.,
-> cryptd), the Crypto API returns -EINPROGRESS and control returns to
-> user-space. If user-space immediately closes the socket fd, the memory
-> mapping for the RX SGL (req->dst) provided via recvmsg is torn down
-> while the cryptd workqueue is still actively writing to it (e.g., during
-> authenc_esn_decrypt ESN scratch writes).
+[Cc: +Jason]
+
+Dear Madhavan,
+
+
+Am 07.05.26 um 04:40 schrieb Madhavan Srinivasan:
 > 
-> To mitigate this race condition without adding complex pinning mechanisms,
-> we utilize the crypto backlog capability. By adding
-> CRYPTO_TFM_REQ_MAY_BACKLOG to the async callback flags, we ensure that
-> the crypto core properly serializes the request completion, preventing
-> the socket resources from being released by af_alg_release() while the
-> workqueue is still processing the destination buffers.
+> On 5/6/26 7:31 PM, Paul Menzel wrote:
+
+>> After a long while, on the 8335-GCA POWER8 (raw) 0x4d0200 
+>> opal:skiboot-5.4.8-5787ad3 PowerNV, I built Linux from Linus’ master 
+>> branch and rebooted via kexec.
+>>
+>> ```
+>> [    0.000000] Linux version 7.1.0-rc2+ (pmenzel@flughafenberlinbrandenburgwillybrandt.molgen.mpg.de) (gcc (Ubuntu 11.2.0-7ubuntu2) 11.2.0, GNU ld (GNU Binutils for Ubuntu) 2.37) #3 SMP PREEMPT Wed May  6 08:50:58 CEST 2026
+>> […]
+>> [   17.901992] Kernel attempted to read user page (0) - exploit attempt? (uid: 0)
+>> [   17.902011] BUG: Kernel NULL pointer dereference on read at 0x00000000
+>> [   17.902018] Faulting instruction address: 0xc0000000000e7138
+>> [   17.902027] Oops: Kernel access of bad area, sig: 11 [#1]
+>> [   17.902034] LE PAGE_SIZE=64K MMU=Hash  SMP NR_CPUS=2048 NUMA PowerNV
+>> [   17.902045] Modules linked in: powernv_rng(+) bnx2x ofpart ibmpowernv bfq mdio cmdlinepart powernv_flash ipmi_powernv ipmi_devintf mtd ipmi_msghandler at24(+) vmx_crypto opal_prd sch_fq_codel nfsd parport_pc ppdev auth_rpcgss nfs_acl lp lockd grace parport sunrpc autofs4 btrfs xor libblake2b raid6_pq ast drm_shmem_helper drm_client_lib i2c_algo_bit drm_kms_helper drm ahci drm_panel_orientation_quirks libahci
+>> [   17.902185] CPU: 147 UID: 0 PID: 2626 Comm: hwrng Not tainted 7.1.0-rc2+ #3 PREEMPTLAZY
+>> [   17.902197] Hardware name: 8335-GCA POWER8 (raw) 0x4d0200 opal:skiboot-5.4.8-5787ad3 PowerNV
+>> [   17.902204] NIP:  c0000000000e7138 LR: c00800001ec8013c CTR: c0000000000e70fc
+>> [   17.902212] REGS: c000000092913c50 TRAP: 0300   Not tainted (7.1.0-rc2+)
+>> [   17.902222] MSR:  900000000280b033 <SF,HV,VEC,VSX,EE,FP,ME,IR,DR,RI,LE>  CR: 44420220  XER: 20000000
+>> [   17.902269] CFAR: c00800001ec8026c DAR: 0000000000000000 DSISR: 40000000 IRQMASK: 0
+>>                GPR00: c00800001ec8013c c000000092913ef0 c000000001c18100 c00000002222d900
+>>                GPR04: c00000002222d900 0000000000000080 0000000000000001 0000000000000000
+>>                GPR08: 0000000000000000 c000000002212000 c0000000951e1780 c00800001ec80258
+>>                GPR12: c0000000000e70fc c00000ffff6fd700 c0000000001d11c0 c00000001b99b9c0
+>>                GPR16: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+>>                GPR20: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
+>>                GPR24: 0000000000000000 c000000002fe6a58 0000000000000000 0000000000000000
+>>                GPR28: c000000002fe6a20 0000000000000010 000000000000000f c00000002222d900
+>> [   17.902406] NIP [c0000000000e7138] pnv_get_random_long+0x3c/0x114
+>> [   17.902426] LR [c00800001ec8013c] powernv_rng_read+0x78/0xc4 [powernv_rng]
+>> [   17.902444] Call Trace:
+>> [   17.902448] [c000000092913ef0] [c000000092913f30] 0xc000000092913f30 (unreliable)
+>> [   17.902463] [c000000092913f30] [c000000000decd58] hwrng_fillfn+0xd4/0x3dc
+>> [   17.902484] [c000000092913f90] [c0000000001d1328] kthread+0x170/0x1a4
+>> [   17.902498] [c000000092913fe0] [c00000000000d030] start_kernel_thread+0x14/0x18
+>> [   17.902513] Code: 60000000 7d2000a6 71290010 418200bc e94d0908 812a0000 39290001 912a0000 e90d0030 3d220060 39299f00 7d08482a <e9280000> 7c0004ac e8e90000 0c070000
+>> [   17.902569] ---[ end trace 0000000000000000 ]---
+>> [   18.008801] pstore: backend (nvram) writing error (-1)
+>>
+>> [   18.015458] note: hwrng[2626] exited with irqs disabled
+>> [   18.015483] note: hwrng[2626] exited with preempt_count 1
+>> ```
+>>
+>> Please find the output of `dmesg` attached.
 > 
-> Fixes: a664bf3d603d ("crypto: algif_aead - Revert to operating
-> out-of-place")
-> Signed-off-by: NGUYEN TUAN <nvt031@gmail.com>
-> ---
->  crypto/algif_aead.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> This is from my yesterday's boot test log in my P8, did not see this fail.
 > 
-> diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
-> index cb651ab58d62..123456789abcd 100644
-> --- a/crypto/algif_aead.c
-> +++ b/crypto/algif_aead.c
-> @@ -229,7 +229,8 @@ static int _aead_recvmsg(struct socket *sock, struct
-> msghdr *msg,
->          areq->outlen = outlen;
+> root@ltcppm1:~# uname -a
+> Linux ltcppm1.ltc.tadn.ibm.com 7.1.0-rc2-00021-gf583bd5f64d4 #1 SMP PREEMPT Wed May  6 00:55:45 EDT 2026 ppc64le GNU/Linux
+> root@ltcppm1:~# dmesg
+> [    0.000000] [      T0] random: crng init done
+> [    0.000000] [      T0] hash-mmu: Page sizes from device-tree:
+> [    0.000000] [      T0] hash-mmu: base_shift=12: shift=12, sllp=0x0000, avpnm=0x00000000, tlbiel=1, penc=0
+> [    0.000000] [      T0] hash-mmu: base_shift=12: shift=16, sllp=0x0000, avpnm=0x00000000, tlbiel=1, penc=7
+> [    0.000000] [      T0] hash-mmu: base_shift=12: shift=24, sllp=0x0000, avpnm=0x00000000, tlbiel=1, penc=56
+> [    0.000000] [      T0] hash-mmu: base_shift=16: shift=16, sllp=0x0110, avpnm=0x00000000, tlbiel=1, penc=1
+> [    0.000000] [      T0] hash-mmu: base_shift=16: shift=24, sllp=0x0110, avpnm=0x00000000, tlbiel=1, penc=8
+> [    0.000000] [      T0] hash-mmu: base_shift=24: shift=24, sllp=0x0100, avpnm=0x00000001, tlbiel=0, penc=0
+> [    0.000000] [      T0] hash-mmu: base_shift=34: shift=34, sllp=0x0120, avpnm=0x000007ff, tlbiel=0, penc=3
+> [    0.000000] [      T0] Enabling pkeys with max key count 32
+> [    0.000000] [      T0] Activating Kernel Userspace Access Prevention
+> [    0.000000] [      T0] Activating Kernel Userspace Execution Prevention
+> [    0.000000] [      T0] hash-mmu: Page orders: linear mapping = 24, virtual = 16, io = 16, vmemmap = 24
+> [    0.000000] [      T0] hash-mmu: Using 1TB segments
+> [    0.000000] [      T0] hash-mmu: Initializing hash mmu with SLB
+> [    0.000000] [      T0] Linux version 7.1.0-rc2-00021-gf583bd5f64d4 
+> (root@ltcppm1.ltc.tadn.ibm.com) (gcc (GCC) 16.1.1 20260501 (Red Hat 16.1.1-1), GNU ld version 2.46-1.fc44) #1 SMP PREEMPT Wed May  6 00:55:45 EDT 2026
+> [    0.000000] [      T0] OF: reserved mem: 0x0000000039c00000..0x000000003b6801ff (27136 KiB) map non-reusable ibm,firmware-allocs-memory@39c00000
+> [    0.000000] [      T0] OF: reserved mem: 0x0000000800000000..0x0000000800e801ff (14848 KiB) map non-reusable ibm,firmware-allocs-memory@800000000
+> [    0.000000] [      T0] OF: reserved mem: 0x0000001000000000..0x0000001000dc01ff (14080 KiB) map non-reusable ibm,firmware-allocs-memory@1000000000
+> [    0.000000] [      T0] OF: reserved mem: 0x0000001800000000..0x0000001800e801ff (14848 KiB) map non-reusable ibm,firmware-allocs-memory@1800000000
+> [    0.000000] [      T0] OF: reserved mem: 0x0000000030000000..0x00000000302fffff (3072 KiB) map non-reusable ibm,firmware-code@30000000
+> [    0.000000] [      T0] OF: reserved mem: 0x0000000031000000..0x0000000031bfffff (12288 KiB) map non-reusable ibm,firmware-data@31000000
+> [    0.000000] [      T0] OF: reserved mem: 0x0000000030300000..0x0000000030ffffff (13312 KiB) map non-reusable ibm,firmware-heap@30300000
+> [    0.000000] [      T0] OF: reserved mem: 0x0000000031c00000..0x0000000033fdffff (36736 KiB) map non-reusable ibm,firmware-stacks@31c00000
+> [    0.000000] [      T0] OF: reserved mem: 0x0000001ffd510000..0x0000001ffd69ffff (1600 KiB) map non-reusable ibm,hbrt-code-image@1ffd510000
+> [    0.000000] [      T0] OF: reserved mem: 0x0000001ffd6a0000..0x0000001ffd6fffff (384 KiB) map non-reusable ibm,hbrt-target-image@1ffd6a0000
+> [    0.000000] [      T0] OF: reserved mem: 0x0000001ffd700000..0x0000001ffd7fffff (1024 KiB) map non-reusable ibm,hbrt-vpd-image@1ffd700000
+> [    0.000000] [      T0] OF: reserved mem: 0x0000001ffda00000..0x0000001ffdafffff (1024 KiB) map non-reusable ibm,slw-image@1ffda00000
+> [    0.000000] [      T0] OF: reserved mem: 0x0000001ffde00000..0x0000001ffdefffff (1024 KiB) map non-reusable ibm,slw-image@1ffde00000
+> [    0.000000] [      T0] OF: reserved mem: 0x0000001ffe200000..0x0000001ffe2fffff (1024 KiB) map non-reusable ibm,slw-image@1ffe200000
+> [    0.000000] [      T0] OF: reserved mem: 0x0000001ffe600000..0x0000001ffe6fffff (1024 KiB) map non-reusable ibm,slw-image@1ffe600000
+> [    0.000000] [      T0] Found initrd at 0xc000000006a40000:0xc00000000815ae9e
+> [    0.000000] [      T0] Hardware name: 8247-22L POWER8E (raw) 0x4b0201 opal:skiboot-v5.4.12 PowerNV
+> [    0.000000] [      T0] printk: legacy bootconsole [udbg0] enabled
+> [    0.000000] [      T0] CPU maps initialized for 8 threads per core
+> [    0.000000] [      T0]  (thread shift is 3)But I my opal version 5.4.12.
 > 
->          aead_request_set_callback(&areq->cra_u.aead_req,
-> -  CRYPTO_TFM_REQ_MAY_SLEEP,
-> +  CRYPTO_TFM_REQ_MAY_SLEEP |
-> +  CRYPTO_TFM_REQ_MAY_BACKLOG,
+> Thanks for reporting the issue, will have an look at it.
 
-This patch makes no sense.  We got rid of MAY_BACKLOG back in 2020
-specifically because it causes the kind of problems that you're
-reporting.
+I bisected it to a change between 5.19-rc3 and 5.19-rc4, and merge 
+commit 8100775d59a6 (Merge tag 'powerpc-5.19-3' of 
+git://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux) [1] indeed 
+has rng related changes
 
-On a modern kernel, the socket reference is meant to keep the socket
-from releasing its data prematurely.  The socket reference is only
-dropped after completion.
+>  - Three fixes to wire up our various RNGs earlier in boot so they're
+>    available for use in the initial seeding in random_init().
 
-Is it possible that you're using some ancient kernel dating from
-the 2010's? Because from the context of the patch that you sent
-in private, it appears to indicate that MAY_BACKLOG was still
-being used.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> [    0.000000] [      T0] Allocated 4608 bytes for 160 pacas
+> [    0.000000] [      T0] 
+> -----------------------------------------------------
+> 
+> .......
+> 
+> [   37.407674] [    T900] audit: type=1130 audit(1778043621.931:10): pid=1 uid=0 auid=4294967295 ses=4294967295 msg='unit=lvm2-monitor comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+> [   37.413015] [    T900] audit: type=1130 audit(1778043621.937:11): pid=1 uid=0 auid=4294967295 ses=4294967295 msg='unit=systemd-sysctl comm="systemd" exe="/usr/lib/systemd/systemd" hostname=? addr=? terminal=? res=success'
+> [   38.448156] [   T2286] powernv_rng: Registered powernv hwrng.
+> [   38.575227] [   T2264] tg3 0005:09:00.1 enP5p9s0f1: renamed from eth1
+> [   38.582176] [   T2223] tg3 0005:09:00.2 enP5p9s0f2: renamed from eth2
+> ........
+> 
+> ////cpuinfo output
+> 
+> processor    : 159
+> 
+> cpu        : POWER8E (raw), altivec supported
+> clock        : 2061.000000MHz
+> revision    : 2.1 (pvr 004b 0201)
+> 
+> timebase    : 512000000
+> platform    : PowerNV
+> model        : 8247-22L
+> machine        : PowerNV 8247-22L
+> firmware    : OPAL
+> MMU        : Hash
+> 
+> 
+> But my system opal version 5.4.12.
+> Thanks for reporting the issue, will have an look at it.
+Thank you.
+
+
+Kind regards,
+
+Paul
+
+
+[1]: 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=8100775d59a6789c3c6c309de26fac52f129cba8
