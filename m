@@ -1,155 +1,143 @@
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA64526ED46
-	for <linux-crypto@vger.kernel.org>; Tue, 12 May 2026 21:18:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 104023A16BE
+	for <linux-crypto@vger.kernel.org>; Tue, 12 May 2026 22:44:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778620737; cv=none; b=L+a2CPOLjEOrdr4bRBslCIXSn91m20F4dNLZIFSKX9FfUreOa4LIjMeb7rsIu96kIqpl130Ol4/2Ljc704OMbbPwwRUWypbvvcf85NQiQwuxfy/LTbXipU+WP4pWo/LbxVS7257nbDqW65DWgakolFokq8VWsKk1uLqHupCOFsE=
+	t=1778625852; cv=none; b=mJbu4Mx1gcmyYfv7BaIjP191My2sw3j4cr7BXu4/XzvxBqJhL8jII87zi4xFfYDPxMOMbzYcRYc+mI4DNQjGqpRfByxT9aSIJEQEMxfPDwZKXTuJe6YXcg8qeRowYvG1WVZQbLiHODX1L7MyzUo8EvG1hG04Srv+ZrbW297IjvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778620737; c=relaxed/simple;
-	bh=ZF+m+ZjVtnGgRZxs8fykE/7UK37XkDux4yfRZUGOw5Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EoQR3iJ+3T8gg+6Fiz0Qow22mn/bKi593aeem1/Ph29SC/5IWY6dKQKSJuiGNnbtZqOzEGro6HfDo43QFT63CVoEjuVwCqjFPTDRqE+z+atPI0qZPthYr5mdnp3IyjcOeU8DPC3vdou57QMMJ8Uqqv5+tU0smRw1f1txfw4jbPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.win; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.win
+	s=arc-20240116; t=1778625852; c=relaxed/simple;
+	bh=Iygz6kxtjgTJhJ/FVqNj8TG+65E7r4WPqcUg1cz3yPo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sJ1+Rc1DnN6pJjfHeC1boTIdeiJgMZF3ieCGZB+9FPpZd0YgS4AfCbRbNLlA6nvjjh6VhHui3m69b+3+b4Jo/nhtophgc1HL+vZ7spMy0QuhC7OUgVHMlzBZYAcjlgS6RvFG/EjecoKc28N2kItYe80e8DTTVGIGMlzDRaEi2kc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yuzmrjs6; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-bd24f466598so272302266b.3
-        for <linux-crypto@vger.kernel.org>; Tue, 12 May 2026 14:18:55 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yuzmrjs6"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-48910865133so5132055e9.2
+        for <linux-crypto@vger.kernel.org>; Tue, 12 May 2026 15:44:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778625847; x=1779230647; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cPxmplJASoE7i3DAWTstEUF/mwjYvLDna7DGnqxuUrc=;
+        b=Yuzmrjs6S4iY60MHmjV3pbA+KA+ZqS6qzmqdgTm+tTJkcNIKUV6ACY7sH0zUX/A65F
+         QWt1bodBI46dWhjssWSHomeBi8j8r9PaTHnkkSDDjliEpVLKnLwUsecdP4IFv4vA9mxg
+         YPZu5t5j9M3GzRtBrPFVmzBddmrvwt13o0fxLat9Vl+AgJr6j/xTwI76ZINScRMjd7Ge
+         KPUrJECgYyRg6YJTkvrGnhGHGkHMi8+OP36qgnRiWxF2m9YhfBYZQC8zfPI+bUYKRjaF
+         PyBmspTOIgL3RJCk9J0Djv+O4AZBIruLRDB7BMU9h8+i/n6W+XffLpenSUvIH3HBiaq+
+         LeLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778620734; x=1779225534;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ULDGSLAty8SEh/aPzQ3wMjjybANkPqfntQTcejrtbks=;
-        b=AH3QeYChz9Vr16/LLbVB2odZE2SMvuLehcDQVANLul4IJ6Iw6+D8cqEDcYO8Sl/0hY
-         nuEIfds9AUNmzy2zREY6NTenQ9mQTxWRBsEG3/0rKnyDjKCocqVxDyqwnfBXTIjKjtXW
-         pnk4M7Ku5LWqfkEEfHlbc36hCHacJpA3VMiby7dcfeoep4yUVDyvSEnuU/4EhzQ3J9lO
-         IYDi65LgFBjOruQDHdXJsI2a+ME6bMoYZURUBi36696OtZEB2ppTBsoDTv7g69zfSDig
-         nZmsIrEKyqg1TyPSPI+42ibucLkxgaZdJ0gCC0qq3rOzvYFJGtFDgzvv7tdGWPolygaF
-         o3Lw==
-X-Forwarded-Encrypted: i=1; AFNElJ9GawGyWcwAMHuoDeu257kwcnjGBd8zNtz/kxC5bZ+dIBSVTDWS8iJkUmPog2c1TlGng30tInCdlQ6zLTk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHdzOU/HpQBZTwunr9XEQhTdeFRk0IOVa+O0VbKRlMo/yuUIrZ
-	uEUZ0XQNAqS4+Lm9dtCwSGgtO67jYhpYMFWihFHmP12IrBKJVJ1U2NNqX2cRjFo6rik=
-X-Gm-Gg: Acq92OEMpeS8AfE/idG0Qs2I/iJe8CC2dWkuM1z1FYWrS4oX33KOCXiNJntIKVc4Dyu
-	GKQPj0WcSFS//Xerl0tPmtMmHhmYo+XS4FwExgmbYgdyyzWKp4r5DnFa4ct2AiKjfB4s4bmt8N+
-	mmuiTG7HibpsSXJ+cYVA2WZz6kIWNU6rjDMDjkwCXYN73gxrPP0Lpz45fgE0OIHGuw3AGLkYWIV
-	BcHOMWP447YaAgQ/JIlB3gJrsEuGLvICQZKejO4BjoS8TeUZG1ef+q+ylyVP1hpqiH9AC9r/Kqc
-	V/eCF7uM+qTdXYySCsPNmXlV5XODkM/t7yGlGl2U3nBuMPPoy7n/7PiiS6VunOOYQV3J5wOqyjn
-	jM81tuMn9aWtP2c0kXbZPOeIJmd2ykEE/GZ0Abqy2vI6S1P/Qmldnt63bU+N42c5xqLD3FxwS87
-	foHLNgQAly8yoIIFrUBHk8TaFcvWKN+7TgYh5EqtGUfzYmih3OwWYXPQ==
-X-Received: by 2002:a17:907:6d29:b0:bc5:d77e:c0bc with SMTP id a640c23a62f3a-bd3bf987f9cmr31784766b.13.1778620733774;
-        Tue, 12 May 2026 14:18:53 -0700 (PDT)
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com. [209.85.218.43])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bcf3226d77csm425043166b.26.2026.05.12.14.18.53
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 May 2026 14:18:53 -0700 (PDT)
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-bcd3c190f71so504588066b.0
-        for <linux-crypto@vger.kernel.org>; Tue, 12 May 2026 14:18:53 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ8nWYozSwGq64gYp9BRTZ3Ku/no0kShHssQ2xvdpzdg85cT/vkLjQ5ac6e/Di6btZ2OqjoAbOzfuBtj0Y0=@vger.kernel.org
-X-Received: by 2002:a17:907:80a:b0:bd1:e36f:1ad7 with SMTP id
- a640c23a62f3a-bd3bf484689mr27989066b.9.1778620733204; Tue, 12 May 2026
- 14:18:53 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1778625847; x=1779230647;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cPxmplJASoE7i3DAWTstEUF/mwjYvLDna7DGnqxuUrc=;
+        b=J9UrFwhZqbmOKWQZbp73PvvQeX5dggjzDIfO8A/uvNZ/OA7wu1nOZqv3GTQ0rf7w/3
+         fRw/jFatIvwCkg7fzMmRDsxbjYVlT5ZzlmVS8kAzuJruaG2wjj8/Wd14uUoxk0I3xjgZ
+         2yt2m9eg4hFfU9OM7h0ELvFnvwogz0pnBUgHCBGX0XYKqTB1TLfBLsUS8phZiq2n4zU3
+         Lfob/td4IbptRcAvUAxlvA9XaNIE9bz7iFsM7M7bMiMte0txGD1tCbU1flIS3Uqv4jM4
+         9OR/00ruotLoEBF34IwKO3Dm7Dl5g/blAz3BVPCBqMfOSQDLs8M5m3ExjIHWZYh9n2vl
+         Zy6A==
+X-Gm-Message-State: AOJu0YwJS7NneWDMfeuP47vb8/V5vgs0951y6qv2hmsnKOkoEm5DF0T1
+	Y99PH8eB+Lpsi27qAwExseHjTbQ4UJnwfCLM6GB/DZPnYeW8+yMXbeE2
+X-Gm-Gg: Acq92OHfUr7bsDKxBFX1Tnqegdl427RWne2U3OieayCw6DoSJ+Z2JKrWHlXtNb2949w
+	069wPZavjU/4O/Wx+fB3/9EbcWhHYcHnNg28LMrOadgFAVUAa3FN2XY6P359VShmKy9uSDZkw9g
+	Nldf3HR+T5/vJtEBFiqOoOoZxebl+JsRlgdXpUrONdGJKImAN3h1M8qwe+clLCMbFLpW0OHeMXw
+	ZnPq20z3bWevv9/Iq4gQ27+DTMcjgNp0YxMLBKgSnIhrDyzegcNdVL7eNwkajJwa7D1ix23j3/J
+	5NW8tGBZnCIA7j4lA00/UWEAPzK6lJ5slFAdZvbFGVruBpfWqjWHdRFbXjcyKbF197eCzZXwHeG
+	2MniAE/vwegqW6aTlFvmIKQa14QJ9/JoYLZC5pCWNaoooGXZx8o9Vq0LdVkEoffs7fBAOAKymiY
+	al3Q+R9VJ+foXOtA9VPmKJkOZolEcm+VLLyPTWYr+ueWNH4S8ivvU9uoa/k8PjXwc=
+X-Received: by 2002:a05:600c:c4b7:b0:48a:6848:527 with SMTP id 5b1f17b1804b1-48fc9a4e9f5mr4178665e9.7.1778625847438;
+        Tue, 12 May 2026 15:44:07 -0700 (PDT)
+Received: from menon.v.cablecom.net (84-74-0-139.dclient.hispeed.ch. [84.74.0.139])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fce385ea5sm3194025e9.14.2026.05.12.15.44.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 May 2026 15:44:07 -0700 (PDT)
+From: Lothar Rubusch <l.rubusch@gmail.com>
+To: thorsten.blum@linux.dev,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	nicolas.ferre@microchip.com,
+	alexandre.belloni@bootlin.com,
+	claudiu.beznea@tuxon.dev
+Cc: linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	l.rubusch@gmail.com
+Subject: [PATCH 00/12] crypto: atmel - refactor common i2c support and add SHA256 ahash support
+Date: Tue, 12 May 2026 22:43:37 +0000
+Message-Id: <20260512224349.64621-1-l.rubusch@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CALCETrVqG+1yErRJjkxvJrf=A+Vu84HTR4Bx1Pcd8G1C0PJcMA@mail.gmail.com>
- <14A441D8-5370-44BE-8732-99BF8107C3FD@getmailspring.com> <0b8bba44-f6bb-4d69-b9d4-5787c276d41a@inspirated.com>
- <20260510163204.GA2279@sol> <3bfcf406-fdde-4303-9bd6-0d8d21ddba37@linux.win> <20260511213829.GA316710@google.com>
-In-Reply-To: <20260511213829.GA316710@google.com>
-From: Ignat Korchagin <ignat@linux.win>
-Date: Tue, 12 May 2026 22:18:42 +0100
-X-Gmail-Original-Message-ID: <CAOs+rJUA+bz6Y2GKioHnFGFKX_uAP+4LaPRs=ZDgRQoUi4mWkg@mail.gmail.com>
-X-Gm-Features: AVHnY4IXFsTsREC72LukcHqvk6gC-iS5eeOIEbsMsX37ajVDHN0xSqZ-iDLXxGU
-Message-ID: <CAOs+rJUA+bz6Y2GKioHnFGFKX_uAP+4LaPRs=ZDgRQoUi4mWkg@mail.gmail.com>
-Subject: Re: [PATCH] crypto: af_alg - Document the deprecation of AF_ALG
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Kamran Khan <kz@inspirated.com>, Jeff Barnes <jeffbarnes@linux.microsoft.com>, 
-	Andy Lutomirski <luto@amacapital.net>, 
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
-	"linux-api@vger.kernel.org" <linux-api@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, May 11, 2026 at 10:38=E2=80=AFPM Eric Biggers <ebiggers@kernel.org>=
- wrote:
->
-> On Mon, May 11, 2026 at 10:03:21PM +0100, Ignat Korchagin wrote:
-> > I don't think fully discounting hardware offloading is beneficial here.=
- HW
-> > accelerators will be produced and without a common interface vendors wo=
-uld
-> > start implementing their own "bespoke" drivers with bespoke userspace
-> > interfaces (we already had such proposals), which in turn may introduce=
- more
-> > attack surface. Yes, AF_ALG needs substantial improvement, but at least=
- it
-> > can be a standardisation point.
->
-> That isn't the best way to accelerate symmetric crypto anymore though,
-> if it ever was.  This has been known for a long time.
->
-> > > In any case, any hypothetical security benefit provided by AF_ALG wou=
-ld
-> > > have to be *very high* to outweigh the continuous stream of
-> > > vulnerabilities in it.  I understand that people using AF_ALG might n=
-ot
-> > > be familiar with that continuous stream of vulnerabilities, but it wo=
-uld
-> >
-> >
-> > Is it actually that much compared to other features/subsystems, like eB=
-PF or
-> > user namespaces? But we don't rush to deprecate those - instead trying =
-to
-> > harden them and come up with better design.
->
-> There are plenty of other kernel features with a large attack surface,
-> of course.  But they tend to be much more useful than AF_ALG.  It's all
-> about weighing benefits vs. risks.
+This series restructures the Atmel secure element drivers around a
+shared atmel-i2c core and adds SHA256 ahash support for ATSHA204A and
+ECC based devices.
 
-If divide number of CVEs in such systems on imaginary units of
-usefulness, I think the ratio is similar.
+The existing drivers duplicated substantial parts of the transport,
+RNG, EEPROM and device management logic. This series consolidates the
+common functionality into the shared i2c core and converts the client
+drivers to capability based allocation.
 
-> When we get the point where a large number of Linux users *had* to
-> disable AF_ALG as an emergency vulnerability response, and at the same
-> time their systems weren't even using AF_ALG so nothing even broke and
-> they could have just done that to begin with, I think we get a very
+The series also introduces per-device timing configuration through
+match data, moves sanity checks and RNG handling into the core driver,
+updates workqueue handling and cleans up internal constants and helper
+definitions.
 
-Well, there were: cryptsetup, RHEL fips check, so there are some...
+The final patch adds SHA256 ahash support using the hardware SHA engine
+provided by the devices.
 
-> clear idea of which side is heavier for AF_ALG in the real world.
+ATSHA204A devices require software-side SHA256 padding according to
+FIPS 180-4, while newer ECC devices provide a dedicated SHA final
+command and perform padding internally in hardware.
 
-Same thing could be said for unprivileged user namespaces - distros
-even put a custom sysctl to restrict it and no-one noticed.
+Supporting the SHA engine also requires changes to the command
+transport path. SHA operations must execute as a strict uninterrupted
+sequence consisting of SHA INIT, one or more SHA COMPUTE commands and,
+for ECC devices, a terminating SHA FINAL command. The device loses its
+internal SHA state if it enters sleep mode or if unrelated commands
+are interleaved during the transaction.
 
-> The main relevance of AF_ALG to the Linux community is that it allows
-> their systems to be exploited.
+To satisfy these hardware requirements, the send/receive path is split
+into a low-level transfer helper and a higher-level wrapper managing
+wakeup, sleep and locking. SHA operations keep the device awake and
+hold the i2c lock for the full duration of the hashing transaction.
 
-To be clear I'm not arguing for the current AF_ALG implementation. I
-agree, the splice zero-copy is... suboptimal (to be soft) and is
-actually not-so-zero copy. But I think it was just added before we had
-more modern approaches like io_uring (have their own can of worms, but
-hey - people adopt it fast).
+The series has been tested on ATSHA204A and ATECC508A devices.
+Tests are ongoing/pending on ATECC608A and ATECC608B.
+---
+Lothar Rubusch (12):
+  crypto: atmel - introduce shared I2C client management
+  crypto: atmel - move capability-based client allocation into i2c core
+  crypto: atmel - remove obsolete CONFIG_OF guard
+  crypto: atmel - add per-device timing and match-data driven
+    configuration
+  crypto: atmel - move RNG support into common i2c core
+  crypto: atmel - move EEPROM access support into common i2c core
+  crypto: atmel - expose CONFIG zone through sysfs
+  crypto: atmel - move device sanity check to core driver
+  crypto: atmel - check client data in remove callbacks
+  crypto: atmel - update workqueue flags and add flush on exit
+  crypto: atmel - refactor and localize driver constants
+  crypto: atmel - add SHA256 ahash support
 
-But I advocate for the usefulness of the concept itself - kernel/OS
-providing crypto services to userspace. As mentioned in other threads,
-other operating systems have it and Linux lags behind. There are use
-cases: common interface for HW accelerators, embedded systems, which
-don't have the space to bring a userspace lib etc. Even non-technical:
-there are environments that just don't want to rely on third-party
-userspace libraries like OpenSSL purely for licensing reasons. And I
-agree, that it is hard to do it right, but we can piggy-back on other
-subsystems (such as io_uring mentioned or other ideas).
+ drivers/crypto/atmel-ecc.c     | 252 +++++++-----
+ drivers/crypto/atmel-i2c.c     | 679 +++++++++++++++++++++++++++++----
+ drivers/crypto/atmel-i2c.h     | 180 +++++----
+ drivers/crypto/atmel-sha204a.c | 284 +++++++-------
+ 4 files changed, 1010 insertions(+), 385 deletions(-)
 
-> - Eric
->
+Signed-off-by: Lothar Rubusch <l.rubusch@gmail.com>
 
-Ignat
+base-commit: f7dd32c5179d7755de18e21d5674b08f9e5cb180
+-- 
+2.53.0
+
