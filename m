@@ -1,63 +1,62 @@
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBBE13A9637
-	for <linux-crypto@vger.kernel.org>; Tue, 12 May 2026 22:44:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6BA23AA4E3
+	for <linux-crypto@vger.kernel.org>; Tue, 12 May 2026 22:44:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778625863; cv=none; b=hU1DmFhvuCIyu7/n7BxVSq4Uj2398rck9cxmHBk2gYWV5E+l9N+ZWQ36y7jTYtlDrhJZMngh7J279X5zas/b1NzMttLysisVgbIeFGONqwMlOi1nw7TlDl5qEsXKan6KZY5jlwR5MeWpxABxOQuqAB8BPkcTONwmYB1Xpf8TXDs=
+	t=1778625865; cv=none; b=sgerC9sONc6gOO4ZxFGkoVxtuC8mSJubBJpG5YrYkzgi+Hzq4ZrbPYRGurFTaRT53+82/oo+yeRZPZC0GLGzPftq2erlOZINumFryQp2K3qEGpcMxaptZwyJh7ud68kLvhpUQjTvjB2PuKwoRC8jB9m53ydDWeDcHc/iujSoERY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778625863; c=relaxed/simple;
-	bh=ceyEeOtngEw+ZbyYquQDBLoFGjfTeN3o0bWOHhDN1IY=;
+	s=arc-20240116; t=1778625865; c=relaxed/simple;
+	bh=eJKjVKHt8qyfrn8BR6FKrg/GzhN3MUN2y8T19uNxbS4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nTqMWqFWtUdVVL+xxyuDeHRf2oXLvrrnDRgGc2DVmSQfsnQzdruM7oAZ7o4GqvcQc2twM4il3RUu0sLzX3G5JkjFl6m3JKnTLVwoD+vXetURdq1Rig+fOAdTCpPPqigwXq3KV1iLin7cb6/ELQNYfwlozR0X6I17U1SFwmJeex8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hUCcAmyT; arc=none smtp.client-ip=209.85.221.44
+	 MIME-Version; b=bg1OIhHXXmn44CznxT2Jv8Ps7L2Q8iC0+/+ZkEvI34B+gqrJEuom9PAMTEyFt5CedfwC1CuQcJIIJR4mYsxMo7udtUJug9Zo5Q+GuDMDGpB5iYPh5ktInIm/TFDzRckNWuudHvDGF330K7ACVdDO62wzvM2HOZuCqmb6YbBW4wM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mbepZS4Q; arc=none smtp.client-ip=209.85.221.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hUCcAmyT"
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-4462f8d2488so334723f8f.0
-        for <linux-crypto@vger.kernel.org>; Tue, 12 May 2026 15:44:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mbepZS4Q"
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-4493cf2f982so373949f8f.2
+        for <linux-crypto@vger.kernel.org>; Tue, 12 May 2026 15:44:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778625859; x=1779230659; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778625860; x=1779230660; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UPGTYowpPc1Ox/XtvXiBTJJQvGISnFodKgzhMsesERc=;
-        b=hUCcAmyTQ/q9aDshH3jLvt+7FuNe0lEW7rcHLq9GJ4n+baGJ6ZknkYPAdKAt9tHETV
-         GDId5KToBJxfds+YZwb9cwT+87oVdqi2Qf+/0XcTeAp9/p+Pp43zcc9dEgWV/yEFuLPP
-         Cv+5Sc2EkV21Z9SFsWa0y/oYJaurvhi1GefI2SWIhN+xe6jz3kJyJTxBUZDxtl73t84x
-         BnjVLtwRLWVS+2es9ftCjig2QNwhdBbkGs9UIR8TP/3iK0+ZquhSNzUTYXtCqTuG3Mkm
-         NOEbqzgETHsYXoS2HH5UsjPQKyIBeQnBWFJdSPPsfLM1ym7jsRCi6p9C87QY/6W9hAjZ
-         5fJw==
+        bh=XN/bCwjdleUaVQ6snEpRjLv37bWsbUXevhTIRdq6VYs=;
+        b=mbepZS4QYTNkIIphnrCKV0FPRCXHcBChdvaehUdaYnnX30Ic5y57d1pardALy9ln/2
+         CIUwIDmLyMFqnhSVJrd8QTCWkVpasxFIG3RjYPd+aaoobcgz6pNzpP1tUVaZjkSG5CmI
+         4DLLd+ztuJpXIV2w+lSChS8w+XtAeYeMVudPDO2oyKioggg8oA5NrO2ZmTEeGzX14XKT
+         cZzXKbmpvMOWnVQPHuVjkxERU9syRSoMMqLO/1xGYAKnwOlxhAl+01+0pQ8EcFmVKDOp
+         iUHJUX1OJamV1z26ZrbdHSQa3YypXr7Sz39S6bQCmkX0MpJxxe1LPLHZo5zhde8+LAvD
+         DlHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778625859; x=1779230659;
+        d=1e100.net; s=20251104; t=1778625860; x=1779230660;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=UPGTYowpPc1Ox/XtvXiBTJJQvGISnFodKgzhMsesERc=;
-        b=F3KM3t3I70z8/gEIMgC2iZUDivmTudEJ/kKxdtC1MrWow+TQOsze7VhJ4UO2Fb0OFj
-         8lkyR7g6pLTJKtpIAeKTAqYZsJvsgnqpzXCPZVyc163gBmDpBIseCGJHpiyNz9aaWno2
-         W3h+bYBctzp2YJcnYCWPpywbz8MyhsT4MKa+tV9AZ9oBCf7I/vE6p7SFtk8Ly+/Raltc
-         C5o6LF6a0dSrMuGqdMwNkcaX29IgvD4a0n80sraMq1C3uRqBnJ5mBW8GXN4OBKFSkcUJ
-         MsRQXAMWhsvYe5SrCGBybZ6vo7AP0bH67VtgwImC51RPC8k0iSZTNQ7kaQRpEJ9lTS2K
-         hKVA==
-X-Gm-Message-State: AOJu0YxMwZnxOeqCofqOtUNSkkIutFPx47v30alLj6JyBifEcYHhVgUG
-	6K8c6vz4DqhTQ00WkjXoKaT9IWHHn2vmou0PUSKyQiYB0XGNiL8apZqc
-X-Gm-Gg: Acq92OHAbjFiwcttCEZtO8DAUibL+VvWd+DpbjkPmS4NMrzWntYrFmTnoSloJZWQ36c
-	bnJC6iZVd6ntmNw/uTEzoGTfbWZjO0B+wl+RgH3hlzVVozlMdhTKw6lD7HltBBvxGYH+nLlSzrU
-	tQ3T0YkAJiXSxahbYPVR4JIy8xFd49izyIAVehktF4QvXjK57APBbRjP3lyoiHApq0g5qU+LDpD
-	f/79KLuUDyKMgPMJxfwikLVKVUToMGO1r5yEmqbI3QjFPUeDV/CCNuv4xYBsywTqWmCgA8eXnhy
-	nJ3fsAYM7PgQwz2fUFu7tRiNS25/rliAbsFepcp8nR62gzAH4YCkYTcx23wrXbNNEiBATWbJkqG
-	C/fPA8vYYjWb1SxXKdQ+2H9QVgr9ApzXOJKq2IUUJ4hcUbk/0+Io9+s9oitzATN+ojuz3LDVs3/
-	Bv+SbwAl8k3IsNKTfXnjA9n3MZJs84CqP1rBxdX1tlTM08l602gQ+xakm866nRpx4QAZR6mYxcg
-	A==
-X-Received: by 2002:a05:600c:c4b7:b0:48f:c8dd:f91 with SMTP id 5b1f17b1804b1-48fc9a493a1mr3694165e9.6.1778625859137;
-        Tue, 12 May 2026 15:44:19 -0700 (PDT)
+        bh=XN/bCwjdleUaVQ6snEpRjLv37bWsbUXevhTIRdq6VYs=;
+        b=X0tR/eVtEPems4ECqOdr9Ulnrif+M4jYuXPOEB2sn/UbJSZI+bGznPfXEXBRN8Muh5
+         8UPTEE4BcVSWUcuWninj4v5+h94bMVDkfnmMGnwHw1SPZ6AipK0BaD2rv8W0AYO93TEY
+         ZRXmvbmFqfrTQlOXVlTS+RzMqQunsgLiuNkkS/2RD6rgbl7RXLRKzDibNYv51U6fxzI4
+         Y33Lf7ZBmOSBlRo0ArGaW61JDb2JlrGyvXrp2cefbVcCT6vP3WSx6YNzYJdNJ4eM+kGd
+         di29qEbP+awV7HrSNoUpaC7XxeyD3IP0zFMZhjDeI1WSRsIeVpAXRKaXmmaU+dglsarW
+         ti4A==
+X-Gm-Message-State: AOJu0YzuPRLz9W8hlhJPGXK+S3PA1tfLROawGwhMkRhCBgE5CXhZdNom
+	pHKytqmG1rUE05cxITf5aq/iOOSmn8rg5pH6G7alD0nSmCE0AIu38lGz
+X-Gm-Gg: Acq92OGlowwhpHxl0sA1Qu48Liynbn42mukmM1Ak4otmIWSlSiQ7EY9DedNyldlPVJv
+	PEx1Jc/ntB4yFXn2fscT3TLqDdULnOiXuks9kmg4lHL7D47gozitln19rBTwxszvUJEIoobsaD0
+	haDaWEfl5mnRVIIZcuLgRuI7nfIrFfzPkQAcgPzbyGPH0u5fIfONm4c/WIddwbrLATlfX1aCL5B
+	PIrXwqZM0W+EeTza4bKjfOWNKTdEisXxBd3FmlH7a7MTNt/DnLXDfo8WMpeU2TELLeve1/6DWhE
+	u8z5onzN+6p47YxA6smrSdRbbO9gFVMO7Hz7NDNxnNi/RD/BzzvtUqW2Ox/Ub8rkSr8iSDf6Fyj
+	5RBcQay9LWhA+4ZVmU7wUHOJ2U3uQJbexAkNpdS2rCnPrXE02563+kQNDZVJQK+lS6GgVwAwfRi
+	iNqm/QGMimI83Dch/3NsUr0fdB8AgXCgIEY1gr2aFR/bZWPOrOIN2YUj9+zaqWBnQ=
+X-Received: by 2002:a05:600c:19ce:b0:48a:58e1:6cf7 with SMTP id 5b1f17b1804b1-48fc9a362f9mr4060715e9.4.1778625860150;
+        Tue, 12 May 2026 15:44:20 -0700 (PDT)
 Received: from menon.v.cablecom.net (84-74-0-139.dclient.hispeed.ch. [84.74.0.139])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fce385ea5sm3194025e9.14.2026.05.12.15.44.18
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fce385ea5sm3194025e9.14.2026.05.12.15.44.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 May 2026 15:44:18 -0700 (PDT)
+        Tue, 12 May 2026 15:44:19 -0700 (PDT)
 From: Lothar Rubusch <l.rubusch@gmail.com>
 To: thorsten.blum@linux.dev,
 	herbert@gondor.apana.org.au,
@@ -69,9 +68,9 @@ Cc: linux-crypto@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	l.rubusch@gmail.com
-Subject: [PATCH 11/12] crypto: atmel - refactor and localize driver constants
-Date: Tue, 12 May 2026 22:43:48 +0000
-Message-Id: <20260512224349.64621-12-l.rubusch@gmail.com>
+Subject: [PATCH 12/12] crypto: atmel - add SHA256 ahash support
+Date: Tue, 12 May 2026 22:43:49 +0000
+Message-Id: <20260512224349.64621-13-l.rubusch@gmail.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20260512224349.64621-1-l.rubusch@gmail.com>
 References: <20260512224349.64621-1-l.rubusch@gmail.com>
@@ -83,416 +82,667 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-After refactoring the client drivers to use the shared atmel-i2c core,
-many constants and definitions no longer need global visibility.
+Add SHA256 ahash support for ATSHA204A and ECC based devices using
+the hardware SHA engine provided by the Atmel secure element devices.
 
-Move command definitions, timing constants, status codes and related
-helpers from the public header into the local compile unit of the core
-driver where possible.
+Implement common SHA256 request handling in the atmel-i2c core driver,
+including init, update, final, finup, digest, export and import
+operations. Scatterlist input is processed using the crypto hash
+walker.
 
-As part of this cleanup, rename macros and constants to use consistent
-ATMEL_I2C_* naming and align them with common kernel driver conventions.
-Also replace remaining hardcoded values with named constants throughout
-the driver.
+ATSHA204A devices require software-side SHA256 padding according to
+FIPS 180-4 before submitting the final data blocks to the device.
+Newer ECC devices instead support a dedicated SHA final command which
+performs padding internally in hardware. For these devices, the final
+block length is passed through the command parameter field.
 
-This is a preparatory cleanup and does not change functionality.
+The SHA engine requires a strict multi-command transaction sequence:
+SHA INIT, followed by one or more SHA COMPUTE operations and, on ECC
+devices, a terminating SHA FINAL operation. The device SHA context is
+lost if the device enters sleep mode or if unrelated commands are
+interleaved during the sequence.
+
+To support these hardware requirements, split the existing
+send/receive helper into a low-level transfer helper and a higher
+level wrapper handling wakeup, sleep and locking. SHA operations keep
+the device awake and hold the i2c client lock across the complete hash
+transaction until the final digest has been retrieved.
+
+Register the SHA256 ahash algorithm in both atmel-sha204a and
+atmel-ecc drivers and add capability based client allocation for SHA
+operations.
 
 Signed-off-by: Lothar Rubusch <l.rubusch@gmail.com>
 ---
- drivers/crypto/atmel-ecc.c |   4 +-
- drivers/crypto/atmel-i2c.c | 115 +++++++++++++++++++++++++------------
- drivers/crypto/atmel-i2c.h |  76 +++++++++---------------
- 3 files changed, 108 insertions(+), 87 deletions(-)
+ drivers/crypto/atmel-ecc.c     |  50 +++++-
+ drivers/crypto/atmel-i2c.c     | 273 +++++++++++++++++++++++++++++++--
+ drivers/crypto/atmel-i2c.h     |  40 +++++
+ drivers/crypto/atmel-sha204a.c |  55 ++++++-
+ 4 files changed, 407 insertions(+), 11 deletions(-)
 
 diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
-index 9ad6d42b6eef..ed8c0ce5562b 100644
+index ed8c0ce5562b..aacf9e8add7a 100644
 --- a/drivers/crypto/atmel-ecc.c
 +++ b/drivers/crypto/atmel-ecc.c
-@@ -137,7 +137,7 @@ static int atmel_ecdh_set_secret(struct crypto_kpp *tfm, const void *buf,
- 
- 	ctx->do_fallback = false;
- 
--	atmel_i2c_init_genkey_cmd(cmd, DATA_SLOT_2, &data->timings);
-+	atmel_i2c_init_genkey_cmd(cmd, ATMEL_I2C_ECDH_SLOT_DEFAULT, &data->timings);
- 
- 	ret = atmel_i2c_send_receive(ctx->client, cmd);
- 	if (ret)
-@@ -296,7 +296,7 @@ static struct kpp_alg atmel_ecdh_nist_p256 = {
- 		.cra_flags = CRYPTO_ALG_NEED_FALLBACK,
- 		.cra_name = "ecdh-nist-p256",
- 		.cra_driver_name = "atmel-ecdh",
--		.cra_priority = ATMEL_ECC_PRIORITY,
-+		.cra_priority = ATMEL_I2C_PRIORITY,
- 		.cra_module = THIS_MODULE,
- 		.cra_ctxsize = sizeof(struct atmel_ecdh_ctx),
- 	},
-diff --git a/drivers/crypto/atmel-i2c.c b/drivers/crypto/atmel-i2c.c
-index 0ec2d768a763..53aba2f4bedb 100644
---- a/drivers/crypto/atmel-i2c.c
-+++ b/drivers/crypto/atmel-i2c.c
-@@ -21,19 +21,62 @@
+@@ -19,10 +19,50 @@
+ #include <linux/slab.h>
  #include <linux/workqueue.h>
+ #include <crypto/internal/kpp.h>
++#include <crypto/internal/hash.h>
+ #include <crypto/ecdh.h>
+ #include <crypto/kpp.h>
++#include <crypto/sha2.h>
  #include "atmel-i2c.h"
  
--#define ATMEL_I2C_COMMAND			0x03 /* packet function */
-+#define ATMEL_I2C_COMMAND		0x03 /* packet function */
-+#define ATMEL_I2C_SLEEP_TOKEN		0x01
- 
- /* Definitions for the device lock state */
--#define ATMEL_I2C_DEVICE_LOCK_ADDR		0x15
--#define ATMEL_I2C_LOCK_VALUE_IDX		(ATMEL_I2C_RSP_DATA_IDX + 2)
--#define ATMEL_I2C_LOCK_CONFIG_IDX		(ATMEL_I2C_RSP_DATA_IDX + 3)
-+#define ATMEL_I2C_DEVICE_LOCK_ADDR	0x15
-+#define ATMEL_I2C_LOCK_VALUE_IDX	(ATMEL_I2C_RSP_DATA_IDX + 2)
-+#define ATMEL_I2C_LOCK_CONFIG_IDX	(ATMEL_I2C_RSP_DATA_IDX + 3)
++static int atmel_ecc_sha_init_tfm(struct crypto_tfm *tfm)
++{
++	struct atmel_i2c_sha_ctx *ctx = crypto_tfm_ctx(tfm);
 +
-+/* Definitions for the READ Command */
-+#define ATMEL_I2C_READ_COUNT		ATMEL_I2C_COUNT_OVERHEAD_SIZE
-+#define ATMEL_I2C_READ_RSP_SIZE		(4 + ATMEL_I2C_RSP_OVERHEAD_SIZE)
++	ctx->client = atmel_i2c_client_alloc(ATMEL_CAP_SHA);
++	if (IS_ERR(ctx->client)) {
++		pr_err("tfm - i2c_client binding failed\n");
++		return PTR_ERR(ctx->client);
++	}
 +
-+/* Definitions for the RANDOM Command */
-+#define ATMEL_I2C_RANDOM_COUNT		ATMEL_I2C_COUNT_OVERHEAD_SIZE
-+#define ATMEL_I2C_RNG_BLOCK_SIZE	32
-+#define ATMEL_I2C_RANDOM_RSP_SIZE	(ATMEL_I2C_RNG_BLOCK_SIZE + \
-+					ATMEL_I2C_RSP_OVERHEAD_SIZE)
-+#define ATMEL_I2C_RANDOM_COUNT		ATMEL_I2C_COUNT_OVERHEAD_SIZE
++	return 0;
++}
 +
-+/* Definitions for the GenKey Command */
-+#define ATMEL_I2C_GENKEY_COUNT		ATMEL_I2C_COUNT_OVERHEAD_SIZE
-+#define ATMEL_I2C_GENKEY_MODE_PRIVATE	0x04
-+
-+/* Definitions for the ECDH Command */
-+#define ATMEL_I2C_ECDH_COUNT		71
-+#define ATMEL_I2C_ECDH_RSP_SIZE		(32 + ATMEL_I2C_RSP_OVERHEAD_SIZE)
-+#define ATMEL_I2C_ECDH_PREFIX_MODE	0x00
- 
- /* Command opcode */
--#define ATMEL_I2C_OPCODE_ECDH			0x43
--#define ATMEL_I2C_OPCODE_GENKEY			0x40
--#define ATMEL_I2C_OPCODE_READ			0x02
--#define ATMEL_I2C_OPCODE_RANDOM			0x1b
--#define ATMEL_I2C_OPCODE_WRITE			0x12
-+#define ATMEL_I2C_OPCODE_ECDH		0x43
-+#define ATMEL_I2C_OPCODE_GENKEY		0x40
-+#define ATMEL_I2C_OPCODE_READ		0x02
-+#define ATMEL_I2C_OPCODE_RANDOM		0x1b
-+#define ATMEL_I2C_OPCODE_WRITE		0x12
-+
-+/*
-+ * Wake High delay to data communication (microseconds). SDA should be stable
-+ * high for this entire duration.
-+ */
-+#define ATMEL_I2C_TWHI_MIN		1500
-+#define ATMEL_I2C_TWHI_MAX		1550
-+
-+/* Wake Low duration */
-+#define ATMEL_I2C_TWLO_USEC		60
-+
-+/* Status/Error codes */
-+enum atmel_i2c_error_codes {
-+	ATMEL_STATUS_OK_NOERR = 0x00,            /* success */
-+	ATMEL_STATUS_CHECKMAC_OR_VERIFY_MISCOMPARE = 0x01,
-+	ATMEL_STATUS_PARSE_ERROR = 0x03,
-+	ATMEL_STATUS_ECC_FAULT = 0x05,
-+	ATMEL_STATUS_EXECUTION_FAULT = 0x0F,
-+	ATMEL_STATUS_OK_WAKE_SUCCESSFULL = 0x11, /* success */
-+	ATMEL_STATUS_WATCHDOG_EXPIRE = 0xEE,
-+	ATMEL_STATUS_CRC_ERROR = 0xFF,
++static struct ahash_alg atmel_ecc_sha = {
++	.init = atmel_i2c_sha_init,
++	.update	= atmel_i2c_sha_update,
++	.final = atmel_i2c_sha_final,
++	.finup = atmel_i2c_sha_finup,
++	.digest	= atmel_i2c_sha_digest,
++	.export = atmel_i2c_sha_export,
++	.import = atmel_i2c_sha_import,
++	.halg = {
++		.digestsize = SHA256_DIGEST_SIZE,
++		.statesize = sizeof(struct atmel_i2c_sha_reqctx),
++		.base = {
++			.cra_name		= "sha256",
++			.cra_driver_name	= "atmel-sha256",
++			.cra_init		= atmel_ecc_sha_init_tfm,
++			.cra_priority		= ATMEL_I2C_PRIORITY,
++			.cra_flags		= CRYPTO_ALG_TYPE_AHASH,
++			.cra_blocksize		= SHA256_BLOCK_SIZE,
++			.cra_ctxsize		= sizeof(struct atmel_i2c_sha_ctx),
++			.cra_reqsize		= sizeof(struct atmel_i2c_sha_reqctx),
++			.cra_module		= THIS_MODULE,
++		}
++	}
 +};
- 
- struct atmel_i2c_client_mgmt atmel_i2c_mgmt = {
- 	.i2c_list_lock = __SPIN_LOCK_UNLOCKED(atmel_i2c_mgmt.i2c_list_lock),
-@@ -45,12 +88,12 @@ static const struct {
- 	u8 value;
- 	const char *error_text;
- } error_list[] = {
--	{ 0x01, "CheckMac or Verify miscompare" },
--	{ 0x03, "Parse Error" },
--	{ 0x05, "ECC Fault" },
--	{ 0x0F, "Execution Error" },
--	{ 0xEE, "Watchdog about to expire" },
--	{ 0xFF, "CRC or other communication error" },
-+	{ ATMEL_STATUS_CHECKMAC_OR_VERIFY_MISCOMPARE, "CheckMac or Verify miscompare" },
-+	{ ATMEL_STATUS_PARSE_ERROR, "Parse Error" },
-+	{ ATMEL_STATUS_ECC_FAULT, "ECC Fault" },
-+	{ ATMEL_STATUS_EXECUTION_FAULT, "Execution Error" },
-+	{ ATMEL_STATUS_WATCHDOG_EXPIRE, "Watchdog about to expire" },
-+	{ ATMEL_STATUS_CRC_ERROR, "CRC or other communication error" },
- };
- 
- /**
-@@ -65,7 +108,7 @@ static const struct {
- static void atmel_i2c_checksum(struct atmel_i2c_cmd *cmd)
++
+ static ssize_t config_show(struct device *dev, struct device_attribute *attr, char *buf)
  {
- 	u8 *data = &cmd->count;
--	size_t len = cmd->count - CRC_SIZE;
-+	size_t len = cmd->count - ATMEL_I2C_CRC_SIZE;
- 	__le16 *__crc16 = (__le16 *)(data + len);
+ 	return atmel_i2c_eeprom_display(dev, attr, buf, ATMEL_EEPROM_CONFIG_ZONE);
+@@ -321,7 +361,7 @@ static int atmel_ecc_probe(struct i2c_client *client)
  
- 	*__crc16 = cpu_to_le16(bitrev16(crc16(0, data, len)));
-@@ -141,12 +184,12 @@ void atmel_i2c_init_random_cmd(struct atmel_i2c_cmd *cmd,
- 	cmd->opcode = ATMEL_I2C_OPCODE_RANDOM;
- 	cmd->param1 = 0;
- 	cmd->param2 = 0;
--	cmd->count = RANDOM_COUNT;
-+	cmd->count = ATMEL_I2C_RANDOM_COUNT;
+ 	i2c_priv = i2c_get_clientdata(client);
+ 	i2c_priv->data = data;
+-	i2c_priv->caps = BIT(ATMEL_CAP_ECDH);
++	i2c_priv->caps = BIT(ATMEL_CAP_ECDH) | BIT(ATMEL_CAP_SHA);
  
- 	atmel_i2c_checksum(cmd);
- 
- 	cmd->msecs = timings->max_exec_time_random;
--	cmd->rxsize = RANDOM_RSP_SIZE;
-+	cmd->rxsize = ATMEL_I2C_RANDOM_RSP_SIZE;
- }
- EXPORT_SYMBOL(atmel_i2c_init_random_cmd);
- 
-@@ -154,16 +197,16 @@ void atmel_i2c_init_genkey_cmd(struct atmel_i2c_cmd *cmd, u16 keyid,
- 			       const struct atmel_i2c_max_exec_timings *timings)
- {
- 	cmd->word_addr = ATMEL_I2C_COMMAND;
--	cmd->count = GENKEY_COUNT;
-+	cmd->count = ATMEL_I2C_GENKEY_COUNT;
- 	cmd->opcode = ATMEL_I2C_OPCODE_GENKEY;
--	cmd->param1 = GENKEY_MODE_PRIVATE;
-+	cmd->param1 = ATMEL_I2C_GENKEY_MODE_PRIVATE;
- 	/* a random private key will be generated and stored in slot keyID */
- 	cmd->param2 = cpu_to_le16(keyid);
- 
- 	atmel_i2c_checksum(cmd);
- 
- 	cmd->msecs = timings->max_exec_time_genkey;
--	cmd->rxsize = GENKEY_RSP_SIZE;
-+	cmd->rxsize = ATMEL_I2C_GENKEY_RSP_SIZE;
- }
- EXPORT_SYMBOL(atmel_i2c_init_genkey_cmd);
- 
-@@ -174,11 +217,11 @@ int atmel_i2c_init_ecdh_cmd(struct atmel_i2c_cmd *cmd,
- 	size_t copied;
- 
- 	cmd->word_addr = ATMEL_I2C_COMMAND;
--	cmd->count = ECDH_COUNT;
-+	cmd->count = ATMEL_I2C_ECDH_COUNT;
- 	cmd->opcode = ATMEL_I2C_OPCODE_ECDH;
--	cmd->param1 = ECDH_PREFIX_MODE;
-+	cmd->param1 = ATMEL_I2C_ECDH_PREFIX_MODE;
- 	/* private key slot */
--	cmd->param2 = cpu_to_le16(DATA_SLOT_2);
-+	cmd->param2 = cpu_to_le16(ATMEL_I2C_ECDH_SLOT_DEFAULT);
- 
- 	/*
- 	 * The device only supports NIST P256 ECC keys. The public key size will
-@@ -195,7 +238,7 @@ int atmel_i2c_init_ecdh_cmd(struct atmel_i2c_cmd *cmd,
- 	atmel_i2c_checksum(cmd);
- 
- 	cmd->msecs = timings->max_exec_time_ecdh;
--	cmd->rxsize = ECDH_RSP_SIZE;
-+	cmd->rxsize = ATMEL_I2C_ECDH_RSP_SIZE;
- 
- 	return 0;
- }
-@@ -231,7 +274,7 @@ static int atmel_i2c_rng_read_nonblocking(struct hwrng *rng, void *buf,
- 
- 	if (rng->priv) {
- 		work_data = (struct atmel_i2c_work_data *)rng->priv;
--		max = min(RANDOM_RSP_SIZE - CMD_OVERHEAD_SIZE, max);
-+		max = min(ATMEL_I2C_RANDOM_RSP_SIZE - ATMEL_I2C_RSP_OVERHEAD_SIZE, max);
- 		memcpy(buf, &work_data->cmd.data[ATMEL_I2C_RSP_DATA_IDX], max);
- 		rng->priv = 0;
- 	} else {
-@@ -271,7 +314,7 @@ static int atmel_i2c_rng_read(struct hwrng *rng, void *buf, size_t max,
- 	if (ret)
- 		return ret;
- 
--	max = min(RANDOM_RSP_SIZE - CMD_OVERHEAD_SIZE, max);
-+	max = min(ATMEL_I2C_RANDOM_RSP_SIZE - ATMEL_I2C_RSP_OVERHEAD_SIZE, max);
- 	memcpy(buf, &cmd.data[ATMEL_I2C_RSP_DATA_IDX], max);
- 
- 	return max;
-@@ -323,7 +366,7 @@ static int atmel_i2c_eeprom_read(struct i2c_client *client, u16 addr,
- 		goto err;
+ 	ret = atmel_i2c_device_sanity_check(client);
+ 	if (ret) {
+@@ -364,6 +404,12 @@ static int atmel_ecc_probe(struct i2c_client *client)
+ 		dev_info(&client->dev, "atmel ecc algorithms registered in /proc/crypto\n");
  	}
  
--	memcpy(buf, cmd->data + ATMEL_I2C_RSP_DATA_IDX, 4);
-+	memcpy(buf, cmd->data + ATMEL_I2C_RSP_DATA_IDX, ATMEL_I2C_STATUS_RSP_SIZE);
++	ret = crypto_register_ahash(&atmel_ecc_sha);
++	if (ret) {
++		dev_err(&client->dev, "SHA256 registration failed\n");
++		goto err_list_del;
++	}
++
+ 	goto done;
  
- err:
- 	kfree(cmd);
-@@ -381,10 +424,10 @@ static int atmel_i2c_status(struct device *dev, u8 *status)
- 	int i;
- 	u8 err_id = status[1];
+ err_list_del:
+@@ -392,6 +438,7 @@ static void atmel_ecc_remove(struct i2c_client *client)
+ 	atmel_i2c_flush_queue();
  
--	if (*status != STATUS_SIZE)
-+	if (*status != ATMEL_I2C_STATUS_RSP_SIZE)
- 		return 0;
+ 	crypto_unregister_kpp(&atmel_ecdh_nist_p256);
++	crypto_unregister_ahash(&atmel_ecc_sha);
  
--	if (err_id == STATUS_WAKE_SUCCESSFUL || err_id == STATUS_NOERR)
-+	if (err_id == ATMEL_STATUS_OK_WAKE_SUCCESSFULL || err_id == ATMEL_STATUS_OK_NOERR)
- 		return 0;
+ 	if (i2c_priv->hwrng.priv) {
+ 		kfree((void *)i2c_priv->hwrng.priv);
+@@ -405,6 +452,7 @@ static const struct atmel_i2c_of_match_data atecc508a_match_data = {
+ 		.max_exec_time_genkey = 115,
+ 		.max_exec_time_random = 23,
+ 		.max_exec_time_read = 1,
++		.max_exec_time_sha = 9,
+ 		.max_exec_time_write = 42,
+ 	},
+ 	.eeprom_zone_size = {
+diff --git a/drivers/crypto/atmel-i2c.c b/drivers/crypto/atmel-i2c.c
+index 53aba2f4bedb..cbdc8c0e5aca 100644
+--- a/drivers/crypto/atmel-i2c.c
++++ b/drivers/crypto/atmel-i2c.c
+@@ -19,6 +19,10 @@
+ #include <linux/scatterlist.h>
+ #include <linux/slab.h>
+ #include <linux/workqueue.h>
++#include <crypto/hash.h>
++#include <crypto/sha2.h>
++#include <crypto/internal/hash.h>
++
+ #include "atmel-i2c.h"
  
- 	for (i = 0; i < err_list_len; i++)
-@@ -403,7 +446,7 @@ static int atmel_i2c_status(struct device *dev, u8 *status)
- static int atmel_i2c_wakeup(struct i2c_client *client)
+ #define ATMEL_I2C_COMMAND		0x03 /* packet function */
+@@ -49,12 +53,17 @@
+ #define ATMEL_I2C_ECDH_RSP_SIZE		(32 + ATMEL_I2C_RSP_OVERHEAD_SIZE)
+ #define ATMEL_I2C_ECDH_PREFIX_MODE	0x00
+ 
++/* Definitions for the SHA Command */
++#define ATMEL_I2C_SHA_RSP_SIZE		(ATMEL_I2C_RSP_OVERHEAD_SIZE + \
++					SHA256_DIGEST_SIZE)
++
+ /* Command opcode */
+ #define ATMEL_I2C_OPCODE_ECDH		0x43
+ #define ATMEL_I2C_OPCODE_GENKEY		0x40
+ #define ATMEL_I2C_OPCODE_READ		0x02
+ #define ATMEL_I2C_OPCODE_RANDOM		0x1b
+ #define ATMEL_I2C_OPCODE_WRITE		0x12
++#define ATMEL_I2C_OPCODE_SHA		0x47
+ 
+ /*
+  * Wake High delay to data communication (microseconds). SDA should be stable
+@@ -244,6 +253,43 @@ int atmel_i2c_init_ecdh_cmd(struct atmel_i2c_cmd *cmd,
+ }
+ EXPORT_SYMBOL(atmel_i2c_init_ecdh_cmd);
+ 
++int atmel_i2c_init_sha_cmd(struct atmel_i2c_cmd *cmd,
++			   u8 *challenge, size_t len,
++			   enum atmel_i2c_sha_engine_cmd sha_engine_cmd,
++			   const struct atmel_i2c_max_exec_timings *timings)
++{
++	cmd->word_addr = ATMEL_I2C_COMMAND;
++	cmd->opcode = ATMEL_I2C_OPCODE_SHA;
++	cmd->param1 = sha_engine_cmd;
++
++	cmd->param2 = cpu_to_le16(0);
++	/*
++	 * Starting with the bigger ECCs, the device learned how to do SHA256
++	 * padding (FIPS 180-4). Since SHA UPDATE always consumes 64B (SHA256
++	 * block size), the only length needed to communicate is the number of
++	 * used bytes in the final block. For the Atmel ECC series, this is
++	 * passed in the param2.
++	 */
++	if (sha_engine_cmd == atmel_sha_ecc_end)
++		cmd->param2 = cpu_to_le16(len);
++
++	cmd->count = ATMEL_I2C_COUNT_OVERHEAD_SIZE;
++	if (sha_engine_cmd == atmel_sha_init) {
++		memset(cmd->data, 0, sizeof(cmd->data));
++	} else {
++		memcpy(cmd->data, challenge, len);
++		cmd->count += len;
++	}
++
++	atmel_i2c_checksum(cmd);
++
++	cmd->msecs = timings->max_exec_time_sha;
++	cmd->rxsize = atmel_i2c_sha_rsp_size[sha_engine_cmd];
++
++	return 0;
++}
++EXPORT_SYMBOL(atmel_i2c_init_sha_cmd);
++
+ static void atmel_i2c_rng_done(struct atmel_i2c_work_data *work_data,
+ 			       void *areq, int status)
  {
- 	struct atmel_i2c_client_priv *i2c_priv = i2c_get_clientdata(client);
--	u8 status[STATUS_RSP_SIZE];
-+	u8 status[ATMEL_I2C_STATUS_RSP_SIZE];
+@@ -492,21 +538,15 @@ static int atmel_i2c_sleep(struct i2c_client *client)
+  * counter other than to put the device into sleep or idle mode and then
+  * wake it up again.
+  */
+-int atmel_i2c_send_receive(struct i2c_client *client, struct atmel_i2c_cmd *cmd)
++static int _atmel_i2c_send_receive(struct i2c_client *client,
++				   struct atmel_i2c_cmd *cmd)
+ {
+-	struct atmel_i2c_client_priv *i2c_priv = i2c_get_clientdata(client);
  	int ret;
  
- 	/*
-@@ -418,9 +461,9 @@ static int atmel_i2c_wakeup(struct i2c_client *client)
- 	 * Wait to wake the device. Typical execution times for ecdh and genkey
- 	 * are around tens of milliseconds. Delta is chosen to 50 microseconds.
- 	 */
--	usleep_range(TWHI_MIN, TWHI_MAX);
-+	usleep_range(ATMEL_I2C_TWHI_MIN, ATMEL_I2C_TWHI_MAX);
- 
--	ret = i2c_master_recv(client, status, STATUS_SIZE);
-+	ret = i2c_master_recv(client, status, ATMEL_I2C_STATUS_RSP_SIZE);
- 	if (ret < 0)
- 		return ret;
- 
-@@ -429,7 +472,7 @@ static int atmel_i2c_wakeup(struct i2c_client *client)
- 
- static int atmel_i2c_sleep(struct i2c_client *client)
- {
--	u8 sleep = SLEEP_TOKEN;
-+	u8 sleep = ATMEL_I2C_SLEEP_TOKEN;
- 
- 	return i2c_master_send(client, &sleep, 1);
- }
-@@ -461,7 +504,7 @@ int atmel_i2c_send_receive(struct i2c_client *client, struct atmel_i2c_cmd *cmd)
- 		goto err;
- 
+-	mutex_lock(&i2c_priv->lock);
+-
+-	ret = atmel_i2c_wakeup(client);
+-	if (ret)
+-		goto err;
+-
  	/* send the command */
--	ret = i2c_master_send(client, (u8 *)cmd, cmd->count + WORD_ADDR_SIZE);
-+	ret = i2c_master_send(client, (u8 *)cmd, cmd->count + ATMEL_I2C_ADDR_SIZE);
+ 	ret = i2c_master_send(client, (u8 *)cmd, cmd->count + ATMEL_I2C_ADDR_SIZE);
  	if (ret < 0)
+-		goto err;
++		return ret;
+ 
+ 	/* delay the appropriate amount of time for command to execute */
+ 	msleep(cmd->msecs);
+@@ -514,6 +554,24 @@ int atmel_i2c_send_receive(struct i2c_client *client, struct atmel_i2c_cmd *cmd)
+ 	/* receive the response */
+ 	ret = i2c_master_recv(client, cmd->data, cmd->rxsize);
+ 	if (ret < 0)
++		return ret;
++
++	return 0;
++}
++
++int atmel_i2c_send_receive(struct i2c_client *client, struct atmel_i2c_cmd *cmd)
++{
++	struct atmel_i2c_client_priv *i2c_priv = i2c_get_clientdata(client);
++	int ret;
++
++	mutex_lock(&i2c_priv->lock);
++
++	ret = atmel_i2c_wakeup(client);
++	if (ret)
++		goto err;
++
++	ret = _atmel_i2c_send_receive(client, cmd);
++	if (ret)
  		goto err;
  
-@@ -521,7 +564,7 @@ EXPORT_SYMBOL(atmel_i2c_flush_queue);
+ 	/* put the device into low-power mode */
+@@ -529,6 +587,203 @@ int atmel_i2c_send_receive(struct i2c_client *client, struct atmel_i2c_cmd *cmd)
+ }
+ EXPORT_SYMBOL(atmel_i2c_send_receive);
  
- static inline size_t atmel_i2c_wake_token_sz(u32 bus_clk_rate)
++int atmel_i2c_sha_init(struct ahash_request *req)
++{
++	struct atmel_i2c_sha_reqctx *rctx = ahash_request_ctx(req);
++	struct atmel_i2c_sha_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
++	struct atmel_i2c_client_priv *i2c_priv = i2c_get_clientdata(ctx->client);
++	const struct atmel_i2c_of_match_data *data = i2c_priv->data;
++	struct atmel_i2c_cmd *cmd;
++	int ret;
++
++	rctx->bufcnt = 0;
++	rctx->total = 0;
++	rctx->ctx = i2c_get_clientdata(ctx->client);
++
++	cmd = kmalloc_obj(*cmd);
++	if (!cmd)
++		return -ENOMEM;
++
++	/* SHA init */
++	ret = atmel_i2c_init_sha_cmd(cmd, NULL, 0, atmel_sha_init, &data->timings);
++	if (ret)
++		goto err_free;
++
++	mutex_lock(&i2c_priv->lock);
++
++	ret = atmel_i2c_wakeup(ctx->client);
++	if (ret)
++		goto err;
++
++	ret = _atmel_i2c_send_receive(ctx->client, cmd);
++	if (ret)
++		goto err;
++
++	/* we keep the lock hold until error out or _sha_final() is called */
++	return 0;
++err:
++	mutex_unlock(&i2c_priv->lock);
++err_free:
++	kfree_sensitive(cmd);
++	return ret;
++}
++EXPORT_SYMBOL(atmel_i2c_sha_init);
++
++int atmel_i2c_sha_update(struct ahash_request *req)
++{
++	struct atmel_i2c_sha_reqctx *rctx = ahash_request_ctx(req);
++	struct atmel_i2c_sha_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
++	struct atmel_i2c_client_priv *i2c_priv = i2c_get_clientdata(ctx->client);
++	const struct atmel_i2c_of_match_data *data = i2c_priv->data;
++	struct atmel_i2c_cmd *cmd;
++	struct crypto_hash_walk walk;
++	int nbytes, take, copied = 0;
++	const u8 *pdata;
++	int ret;
++
++	rctx->total += req->nbytes;
++
++	cmd = kmalloc_obj(*cmd);
++	if (!cmd) {
++		ret = -ENOMEM;
++		goto err_nomem;
++	}
++
++	/*
++	 * Note, we are actively holding the i2c_priv->lock while the SHA engine
++	 * operates. This covers init, update and final steps.
++	 */
++	nbytes = crypto_hash_walk_first(req, &walk);
++	for (; nbytes > 0; nbytes = crypto_hash_walk_done(&walk, copied)) {
++		copied = nbytes;
++		pdata = walk.data;
++		while (copied > 0) {
++			take = min(copied, SHA256_BLOCK_SIZE - rctx->bufcnt);
++
++			memcpy(rctx->buffer + rctx->bufcnt, pdata, take);
++			pdata += take;
++			copied -= take;
++			rctx->bufcnt += take;
++			if (rctx->bufcnt == SHA256_BLOCK_SIZE) {
++				ret = atmel_i2c_init_sha_cmd(cmd, rctx->buffer,
++							     SHA256_BLOCK_SIZE,
++							     atmel_sha_compute,
++							     &data->timings);
++				if (ret)
++					goto err;
++
++				ret = _atmel_i2c_send_receive(ctx->client, cmd);
++				if (ret)
++					goto err;
++
++				rctx->bufcnt = 0;
++			}
++		}
++	}
++
++	kfree_sensitive(cmd);
++	return 0;
++err:
++	kfree_sensitive(cmd);
++err_nomem:
++	mutex_unlock(&i2c_priv->lock);
++	return ret;
++}
++EXPORT_SYMBOL(atmel_i2c_sha_update);
++
++int atmel_i2c_sha_final(struct ahash_request *req)
++{
++	struct atmel_i2c_sha_reqctx *rctx = ahash_request_ctx(req);
++	struct atmel_i2c_sha_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
++	struct atmel_i2c_client_priv *i2c_priv = i2c_get_clientdata(ctx->client);
++	const struct atmel_i2c_of_match_data *data = i2c_priv->data;
++	struct atmel_i2c_cmd *cmd;
++	u8 final_blocks[2 * SHA256_BLOCK_SIZE];
++	u32 total_pad;
++	__be64 bits;
++	int i, ret = 0;
++
++	cmd = kmalloc_obj(*cmd);
++	if (!cmd) {
++		ret = -ENOMEM;
++		goto err_nomem;
++	}
++
++	if (data->needs_sha_padding) {
++		/*
++		 * Determine if padding fits in current block or needs another,
++		 * SHA256 needs 8 bytes for length at the end of a 64-byte block.
++		 */
++		memset(final_blocks, 0, sizeof(final_blocks));
++		memcpy(final_blocks, rctx->buffer, rctx->bufcnt);
++		final_blocks[rctx->bufcnt] = 0x80; /* pad bit */
++		total_pad = SHA256_BLOCK_SIZE * (rctx->bufcnt < 56 ? 1 : 2);
++		bits = cpu_to_be64((u64)rctx->total << 3); /* needs num of bits */
++		memcpy(final_blocks + total_pad - 8, &bits, 8);
++		for (i = 0; i < total_pad; i += SHA256_BLOCK_SIZE) {
++			ret = atmel_i2c_init_sha_cmd(cmd, final_blocks + i,
++						     SHA256_BLOCK_SIZE,
++						     atmel_sha_compute, &data->timings);
++			if (ret)
++				goto err_or_done;
++
++			ret = _atmel_i2c_send_receive(ctx->client, cmd);
++			if (ret)
++				goto err_or_done;
++		}
++	} else {
++		ret = atmel_i2c_init_sha_cmd(cmd, rctx->buffer, rctx->bufcnt,
++					     atmel_sha_ecc_end, &data->timings);
++		if (ret)
++			goto err_or_done;
++
++		ret = _atmel_i2c_send_receive(ctx->client, cmd);
++		if (ret)
++			goto err_or_done;
++	}
++
++	memcpy(req->result, &cmd->data[ATMEL_I2C_RSP_DATA_IDX],
++	       SHA256_DIGEST_SIZE);
++
++	/* Sleep returns a positive int on success, API requires 0 on success */
++	ret = atmel_i2c_sleep(ctx->client);
++	if (ret < 0)
++		goto err_or_done;
++	ret = 0;
++err_or_done:
++	kfree_sensitive(cmd);
++err_nomem:
++	mutex_unlock(&i2c_priv->lock);
++	return ret;
++}
++EXPORT_SYMBOL(atmel_i2c_sha_final);
++
++int atmel_i2c_sha_finup(struct ahash_request *req)
++{
++	return atmel_i2c_sha_update(req) ? : atmel_i2c_sha_final(req);
++}
++EXPORT_SYMBOL(atmel_i2c_sha_finup);
++
++int atmel_i2c_sha_digest(struct ahash_request *req)
++{
++	return atmel_i2c_sha_init(req) ? : atmel_i2c_sha_finup(req);
++}
++EXPORT_SYMBOL(atmel_i2c_sha_digest);
++
++int atmel_i2c_sha_export(struct ahash_request *req, void *out)
++{
++	memcpy(out, ahash_request_ctx(req), sizeof(struct atmel_i2c_sha_reqctx));
++	return 0;
++}
++EXPORT_SYMBOL(atmel_i2c_sha_export);
++
++int atmel_i2c_sha_import(struct ahash_request *req, const void *in)
++{
++	memcpy(ahash_request_ctx(req), in, sizeof(struct atmel_i2c_sha_reqctx));
++	return 0;
++}
++EXPORT_SYMBOL(atmel_i2c_sha_import);
++
+ static void atmel_i2c_work_handler(struct work_struct *work)
  {
--	u32 no_of_bits = DIV_ROUND_UP(TWLO_USEC * bus_clk_rate, USEC_PER_SEC);
-+	u32 no_of_bits = DIV_ROUND_UP(ATMEL_I2C_TWLO_USEC * bus_clk_rate, USEC_PER_SEC);
- 
- 	/* return the size of the wake_token in bytes */
- 	return DIV_ROUND_UP(no_of_bits, 8);
+ 	struct atmel_i2c_work_data *work_data =
 diff --git a/drivers/crypto/atmel-i2c.h b/drivers/crypto/atmel-i2c.h
-index 2f76e107340e..20afe2da4f8d 100644
+index 20afe2da4f8d..e0021d4ea686 100644
 --- a/drivers/crypto/atmel-i2c.h
 +++ b/drivers/crypto/atmel-i2c.h
-@@ -10,28 +10,39 @@
+@@ -7,8 +7,11 @@
+ #ifndef __ATMEL_I2C_H__
+ #define __ATMEL_I2C_H__
+ 
++#include <linux/device.h>
++#include <crypto/internal/hash.h>
  #include <linux/hw_random.h>
  #include <linux/types.h>
++#include <crypto/sha2.h>
  
--#define ATMEL_ECC_PRIORITY		300
-+#define ATMEL_I2C_PRIORITY		300
+ #define ATMEL_I2C_PRIORITY		300
  
--#define SLEEP_TOKEN			0x01
--#define WAKE_TOKEN_MAX_SIZE		8
-+#define ATMEL_I2C_WAKE_TOKEN_MAX_SIZE	8
- 
- /* Definitions of Data and Command sizes */
--#define WORD_ADDR_SIZE			1
--#define COUNT_SIZE			1
--#define CRC_SIZE			2
--#define CMD_OVERHEAD_SIZE		(COUNT_SIZE + CRC_SIZE)
-+#define ATMEL_I2C_ADDR_SIZE		1
-+#define ATMEL_I2C_OPCODE_SIZE		1
-+#define ATMEL_I2C_COUNT_SIZE		1
-+#define ATMEL_I2C_PARAM1_SIZE		1
-+#define ATMEL_I2C_PARAM2_SIZE		2
-+#define ATMEL_I2C_CRC_SIZE		2
-+
-+#define ATMEL_I2C_RSP_OVERHEAD_SIZE	(ATMEL_I2C_COUNT_SIZE + \
-+					ATMEL_I2C_CRC_SIZE)
-+#define ATMEL_I2C_COUNT_OVERHEAD_SIZE	(ATMEL_I2C_OPCODE_SIZE + \
-+					ATMEL_I2C_COUNT_SIZE + \
-+					ATMEL_I2C_PARAM1_SIZE + \
-+					ATMEL_I2C_PARAM2_SIZE + \
-+					ATMEL_I2C_CRC_SIZE)
-+
-+/* Definitions for the status Command */
-+#define ATMEL_I2C_STATUS_RSP_SIZE	4
- 
- /* size in bytes of the n prime */
- #define ATMEL_ECC_NIST_P256_N_SIZE	32
- #define ATMEL_ECC_PUBKEY_SIZE		(2 * ATMEL_ECC_NIST_P256_N_SIZE)
-+#define ATMEL_I2C_GENKEY_RSP_SIZE	(ATMEL_ECC_PUBKEY_SIZE + \
-+					 ATMEL_I2C_RSP_OVERHEAD_SIZE)
-+#define ATMEL_I2C_MAX_RSP_SIZE		ATMEL_I2C_GENKEY_RSP_SIZE
- 
--#define STATUS_RSP_SIZE			4
--#define ECDH_RSP_SIZE			(32 + CMD_OVERHEAD_SIZE)
--#define GENKEY_RSP_SIZE			(ATMEL_ECC_PUBKEY_SIZE + \
--					 CMD_OVERHEAD_SIZE)
--#define ATMEL_I2C_READ_RSP_SIZE		(4 + CMD_OVERHEAD_SIZE)
--#define RANDOM_RSP_SIZE			(32 + CMD_OVERHEAD_SIZE)
--#define MAX_RSP_SIZE			GENKEY_RSP_SIZE
-+/* Definitions for Indexes common to all commands */
-+#define ATMEL_I2C_RSP_DATA_IDX		1 /* buffer index of data in response */
-+#define ATMEL_I2C_ECDH_SLOT_DEFAULT	2
- 
- /**
-  * atmel_i2c_cmd - structure used for communicating with the device.
-@@ -51,7 +62,7 @@ struct atmel_i2c_cmd {
- 	u8 opcode;
- 	u8 param1;
- 	__le16 param2;
--	u8 data[MAX_RSP_SIZE];
-+	u8 data[ATMEL_I2C_MAX_RSP_SIZE];
- 	u8 msecs;
- 	u16 rxsize;
- } __packed;
-@@ -77,39 +88,6 @@ struct atmel_i2c_of_match_data {
- 	size_t eeprom_zone_size[3]; /* all atmel devices have three zones */
+@@ -79,11 +82,13 @@ struct atmel_i2c_max_exec_timings {
+ 	unsigned int max_exec_time_ecdh;
+ 	unsigned int max_exec_time_random;
+ 	unsigned int max_exec_time_read;
++	unsigned int max_exec_time_sha;
+ 	unsigned int max_exec_time_write;
  };
  
--/* Status/Error codes */
--#define STATUS_SIZE			0x04
--#define STATUS_NOERR			0x00
--#define STATUS_WAKE_SUCCESSFUL		0x11
--
--/* Definitions for Indexes common to all commands */
--#define ATMEL_I2C_RSP_DATA_IDX		1 /* buffer index of data in response */
--#define DATA_SLOT_2			2 /* used for ECDH private key */
--
--/*
-- * Wake High delay to data communication (microseconds). SDA should be stable
-- * high for this entire duration.
-- */
--#define TWHI_MIN			1500
--#define TWHI_MAX			1550
--
--/* Wake Low duration */
--#define TWLO_USEC			60
--
--/* Definitions for the READ Command */
--#define ATMEL_I2C_READ_COUNT		7
--
--/* Definitions for the RANDOM Command */
--#define RANDOM_COUNT			7
--
--/* Definitions for the GenKey Command */
--#define GENKEY_COUNT			7
--#define GENKEY_MODE_PRIVATE		0x04
--
--/* Definitions for the ECDH Command */
--#define ECDH_COUNT			71
--#define ECDH_PREFIX_MODE		0x00
--
+ struct atmel_i2c_of_match_data {
+ 	const unsigned short needs_legacy_hwrng;
++	const unsigned short needs_sha_padding;
+ 	struct atmel_i2c_max_exec_timings timings;
+ 	size_t eeprom_zone_size[3]; /* all atmel devices have three zones */
+ };
+@@ -91,6 +96,30 @@ struct atmel_i2c_of_match_data {
  /* Used for binding tfm objects to i2c clients. */
  enum atmel_i2c_capability {
  	ATMEL_CAP_ECDH = 0,
-@@ -144,7 +122,7 @@ struct atmel_i2c_client_priv {
- 	struct i2c_client *client;
- 	struct list_head i2c_client_list_node;
- 	struct mutex lock;
--	u8 wake_token[WAKE_TOKEN_MAX_SIZE];
-+	u8 wake_token[ATMEL_I2C_WAKE_TOKEN_MAX_SIZE];
- 	size_t wake_token_sz;
- 	atomic_t tfm_count ____cacheline_aligned;
- 	struct hwrng hwrng;
++	ATMEL_CAP_SHA,
++};
++
++enum atmel_i2c_sha_engine_cmd {
++	atmel_sha_init = 0,
++	atmel_sha_compute,
++	atmel_sha_ecc_end,
++};
++
++size_t atmel_i2c_sha_rsp_size[] = {
++	[atmel_sha_init] = ATMEL_I2C_STATUS_RSP_SIZE,
++	[atmel_sha_compute] = SHA256_DIGEST_SIZE + ATMEL_I2C_RSP_OVERHEAD_SIZE,
++	[atmel_sha_ecc_end] = SHA256_DIGEST_SIZE + ATMEL_I2C_RSP_OVERHEAD_SIZE,
++};
++
++struct atmel_i2c_sha_ctx {
++	struct i2c_client *client;
++};
++
++struct atmel_i2c_sha_reqctx {
++	u8 buffer[SHA256_BLOCK_SIZE];
++	size_t bufcnt;
++	size_t total; /* size of full input, needed for padding */
++	struct atmel_i2c_client_priv *ctx;
+ };
+ 
+ struct atmel_i2c_client_mgmt {
+@@ -172,9 +201,20 @@ void atmel_i2c_init_genkey_cmd(struct atmel_i2c_cmd *cmd, u16 keyid,
+ int atmel_i2c_init_ecdh_cmd(struct atmel_i2c_cmd *cmd,
+ 			    struct scatterlist *pubkey,
+ 			    const struct atmel_i2c_max_exec_timings *timings);
++int atmel_i2c_init_sha_cmd(struct atmel_i2c_cmd *cmd, u8 *challenge, size_t len,
++			   enum atmel_i2c_sha_engine_cmd sha_engine_cmd,
++			   const struct atmel_i2c_max_exec_timings *timings);
+ int atmel_i2c_register_rng(struct atmel_i2c_client_priv *i2c_priv,
+ 			   struct device *dev);
+ 
++int atmel_i2c_sha_init(struct ahash_request *req);
++int atmel_i2c_sha_update(struct ahash_request *req);
++int atmel_i2c_sha_final(struct ahash_request *req);
++int atmel_i2c_sha_finup(struct ahash_request *req);
++int atmel_i2c_sha_digest(struct ahash_request *req);
++int atmel_i2c_sha_export(struct ahash_request *req, void *out);
++int atmel_i2c_sha_import(struct ahash_request *req, const void *in);
++
+ int atmel_i2c_device_sanity_check(struct i2c_client *client);
+ 
+ ssize_t atmel_i2c_eeprom_display(struct device *dev,
+diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha204a.c
+index 6a41024ae40d..74535480edeb 100644
+--- a/drivers/crypto/atmel-sha204a.c
++++ b/drivers/crypto/atmel-sha204a.c
+@@ -17,8 +17,48 @@
+ #include <linux/slab.h>
+ #include <linux/sysfs.h>
+ #include <linux/workqueue.h>
++#include <crypto/sha2.h>
++
+ #include "atmel-i2c.h"
+ 
++static int atmel_sha204a_sha_init_tfm(struct crypto_tfm *tfm)
++{
++	struct atmel_i2c_sha_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	ctx->client = atmel_i2c_client_alloc(ATMEL_CAP_SHA);
++	if (IS_ERR(ctx->client)) {
++		pr_err("tfm - i2c_client binding failed\n");
++		return PTR_ERR(ctx->client);
++	}
++
++	return 0;
++}
++
++static struct ahash_alg atmel_sha204a_sha = {
++	.init = atmel_i2c_sha_init,
++	.update	= atmel_i2c_sha_update,
++	.final = atmel_i2c_sha_final,
++	.finup = atmel_i2c_sha_finup,
++	.digest	= atmel_i2c_sha_digest,
++	.export = atmel_i2c_sha_export,
++	.import = atmel_i2c_sha_import,
++	.halg = {
++		.digestsize = SHA256_DIGEST_SIZE,
++		.statesize = sizeof(struct atmel_i2c_sha_reqctx),
++		.base = {
++			.cra_name		= "sha256",
++			.cra_driver_name	= "atmel-sha256",
++			.cra_init		= atmel_sha204a_sha_init_tfm,
++			.cra_priority		= ATMEL_I2C_PRIORITY,
++			.cra_flags		= CRYPTO_ALG_TYPE_AHASH,
++			.cra_blocksize		= SHA256_BLOCK_SIZE,
++			.cra_ctxsize		= sizeof(struct atmel_i2c_sha_ctx),
++			.cra_reqsize		= sizeof(struct atmel_i2c_sha_reqctx),
++			.cra_module		= THIS_MODULE,
++		}
++	}
++};
++
+ static ssize_t config_show(struct device *dev, struct device_attribute *attr, char *buf)
+ {
+ 	return atmel_i2c_eeprom_display(dev, attr, buf, ATMEL_EEPROM_CONFIG_ZONE);
+@@ -62,7 +102,7 @@ static int atmel_sha204a_probe(struct i2c_client *client)
+ 
+ 	i2c_priv = i2c_get_clientdata(client);
+ 	i2c_priv->data = data;
+-	i2c_priv->caps = 0;
++	i2c_priv->caps = BIT(ATMEL_CAP_SHA);
+ 
+ 	ret = atmel_i2c_device_sanity_check(client);
+ 	if (ret) {
+@@ -95,6 +135,13 @@ static int atmel_sha204a_probe(struct i2c_client *client)
+ 		goto err_list_del;
+ 	}
+ 
++	/* register algorithms */
++	ret = crypto_register_ahash(&atmel_sha204a_sha);
++	if (ret) {
++		dev_err(&client->dev, "SHA256 registration failed\n");
++		goto err_list_del;
++	}
++
+ 	goto done;
+ 
+ err_list_del:
+@@ -119,6 +166,8 @@ static void atmel_sha204a_remove(struct i2c_client *client)
+ 	devm_hwrng_unregister(&client->dev, &i2c_priv->hwrng);
+ 	atmel_i2c_flush_queue();
+ 
++	crypto_unregister_ahash(&atmel_sha204a_sha);
++
+ 	if (i2c_priv->hwrng.priv) {
+ 		kfree((void *)i2c_priv->hwrng.priv);
+ 		i2c_priv->hwrng.priv = 0;
+@@ -130,6 +179,7 @@ static const struct atmel_i2c_of_match_data atsha204_match_data = {
+ 		.max_exec_time_genkey = 43,
+ 		.max_exec_time_random = 50,
+ 		.max_exec_time_read = 4,
++		.max_exec_time_sha = 22,
+ 		.max_exec_time_write = 42,
+ 	},
+ 	.eeprom_zone_size = {
+@@ -142,6 +192,7 @@ static const struct atmel_i2c_of_match_data atsha204_match_data = {
+ 	 * [1] https://www.metzdowd.com/pipermail/cryptography/2014-December/023858.html
+ 	 */
+ 	.needs_legacy_hwrng = 1,
++	.needs_sha_padding = 1,
+ };
+ 
+ static const struct atmel_i2c_of_match_data atsha204a_match_data = {
+@@ -149,6 +200,7 @@ static const struct atmel_i2c_of_match_data atsha204a_match_data = {
+ 		.max_exec_time_genkey = 43,
+ 		.max_exec_time_random = 50,
+ 		.max_exec_time_read = 4,
++		.max_exec_time_sha = 22,
+ 		.max_exec_time_write = 42,
+ 	},
+ 	.eeprom_zone_size = {
+@@ -156,6 +208,7 @@ static const struct atmel_i2c_of_match_data atsha204a_match_data = {
+ 		[ATMEL_EEPROM_OTP_ZONE] = 64,
+ 		[ATMEL_EEPROM_DATA_ZONE] = 512
+ 	},
++	.needs_sha_padding = 1,
+ };
+ 
+ static const struct of_device_id atmel_sha204a_dt_ids[] __maybe_unused = {
 -- 
 2.53.0
 
