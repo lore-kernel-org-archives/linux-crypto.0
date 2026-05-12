@@ -1,167 +1,82 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7E1360ED0
-	for <linux-crypto@vger.kernel.org>; Tue, 12 May 2026 11:42:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4E373911A9;
+	Tue, 12 May 2026 13:34:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778586165; cv=none; b=nJ678WowNJmONZKO1c9yoCc+N8MwopUWgPaCGVdZfL3Ya1wWMX24L6oM4kOsTtoHxvkt/c7bdarasn04u70gIj7TbSijH75SfbLpkUaVVbf73zZbhKqtrdelWCzAewBbv53cIdU4Gcb4rGPFh1JFHYzC1g24dFB46WDgOqIxj/8=
+	t=1778592898; cv=none; b=GjS0bH9l7SAFwjU5ijAVY3JT/kgnPtSYSxNrzDRaOr8/vk4ZcoDzMd4RETjX2sqiBPm9mwMIFEZhwbZ367Mcax6PD0VHaAyOeXcDDlJcnVCk6jqDzlGg3hsCVAfBISzjDF7/gtfq8eMKylK6vi2iO8m6O9PnlGOxSKJxqrWQKxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778586165; c=relaxed/simple;
-	bh=HOKkDeeqlSpCzlTTBisOlKHbEWYFncII5EuW97xNlKc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ATACWRPxDHxKyPBE87bNbk/d1LNzYdvLfOmJXyhSOyvZhpBll1zdEWCex5+SLn3HioDzBeyRJ0v9hKbyFN91A05ECRZ1TneAfLnGnXPjfsSgdtRu17Tx1iJfp53aOznKYkn/djz99jMxmNdNt5PNFEDkh6vuYhoTriHgGm5lYjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=KEweNcFX; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=0J342uiq; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=KEweNcFX; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=0J342uiq; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	s=arc-20240116; t=1778592898; c=relaxed/simple;
+	bh=TSg+xn4IusJGqvTX/t6/8iMnzbosJnJX4Tp/s6TBZ5o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YYTve2hyRM7hVOc+u3xIgleXFA5bFPUyKZ06Dpu+t+NbO1bUILlhssOGeJrdC6DeFVhLn21bbvGODgtazb/o5SeMmv1if1RB2ecS44FKmOjiGHY6bcc/MnEs8Gpa9o99/pO8NBRqrkz2rPVw7eVNG55HlJ9YGDjMpLzCOTK1/FQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=O9jXPSSs; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="KEweNcFX";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="0J342uiq";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="KEweNcFX";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="0J342uiq"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 34B7376120;
-	Tue, 12 May 2026 11:42:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1778586161;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QLgB5RUZcid9XLsWsmXqzit5YR0tRKGHMrKjGe72tnI=;
-	b=KEweNcFXbI/4awwwikZwQpLsJhqdcKP/ND/eEIHZpMVZYswHjsmnrwZiU2bxaD8n1OK0IS
-	Kc6YjC0sw7nAn6qO/p47INirDH4cevpavEC2j0COzrDVxJtWpDOoi9k2FZAGtUc4QSsWyH
-	YY7KnSMmVLtonjV5smZq449Ls/XSOCc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1778586161;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QLgB5RUZcid9XLsWsmXqzit5YR0tRKGHMrKjGe72tnI=;
-	b=0J342uiqkSfyW8DZyH8r4hsv6i4foe07KIq12qtoXRLRS5m/d+XbyypVqVX3QbmZPnqRJi
-	sxhM5qcbrx7pPCAQ==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1778586161;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QLgB5RUZcid9XLsWsmXqzit5YR0tRKGHMrKjGe72tnI=;
-	b=KEweNcFXbI/4awwwikZwQpLsJhqdcKP/ND/eEIHZpMVZYswHjsmnrwZiU2bxaD8n1OK0IS
-	Kc6YjC0sw7nAn6qO/p47INirDH4cevpavEC2j0COzrDVxJtWpDOoi9k2FZAGtUc4QSsWyH
-	YY7KnSMmVLtonjV5smZq449Ls/XSOCc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1778586161;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QLgB5RUZcid9XLsWsmXqzit5YR0tRKGHMrKjGe72tnI=;
-	b=0J342uiqkSfyW8DZyH8r4hsv6i4foe07KIq12qtoXRLRS5m/d+XbyypVqVX3QbmZPnqRJi
-	sxhM5qcbrx7pPCAQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 08727593A9;
-	Tue, 12 May 2026 11:42:41 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id rkjQATESA2rLPQAAD6G6ig
-	(envelope-from <dsterba@suse.cz>); Tue, 12 May 2026 11:42:41 +0000
-Date: Tue, 12 May 2026 13:42:31 +0200
-From: David Sterba <dsterba@suse.cz>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="O9jXPSSs"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1778592893;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Z+9bToHXc6fEE/aOZjxNRhmQh3cOPeQjTx2UGkUmTTw=;
+	b=O9jXPSSs/2blaH+c3xl+dQ9phvCPEHbsOLHmh34UQCsg9QUK1gTnLl6VYzjxeznGkwYYFo
+	3FKfXB5dSLTOUCpAsP9Eaqc+TKtEfTsDlMZGKaR8Wpn17QHbaJ27dPzTBvTtNDIy1Jtli7
+	QhjJDcuTErAgRr270JKo/qsyIjlqe7Q=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Srujana Challa <schalla@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Dan Williams <dan.j.williams@intel.com>, Chris Mason <clm@fb.com>,
-	David Sterba <dsterba@suse.com>, Arnd Bergmann <arnd@arndb.de>,
-	Song Liu <song@kernel.org>, Yu Kuai <yukuai@fnnas.com>,
-	Li Nan <linan122@huawei.com>, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
-	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-raid@vger.kernel.org
-Subject: Re: [PATCH 01/19] btrfs: require at least 4 devices for RAID 6
-Message-ID: <20260512114231.GG2558453@suse.cz>
-Reply-To: dsterba@suse.cz
-References: <20260512052230.2947683-1-hch@lst.de>
- <20260512052230.2947683-2-hch@lst.de>
+	"David S. Miller" <davem@davemloft.net>,
+	Rosen Penev <rosenp@gmail.com>,
+	Thorsten Blum <thorsten.blum@linux.dev>,
+	Krzysztof Kozlowski <krzk@kernel.org>
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: cesa - use max to simplify mv_cesa_probe
+Date: Tue, 12 May 2026 15:34:15 +0200
+Message-ID: <20260512133415.302370-3-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260512052230.2947683-2-hch@lst.de>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
-X-Spam-Flag: NO
-X-Spam-Score: -8.00
-X-Spamd-Result: default: False [-8.00 / 50.00];
-	REPLY(-4.00)[];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	HAS_REPLYTO(0.30)[dsterba@suse.cz];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MIME_TRACE(0.00)[0:+];
-	R_RATELIMIT(0.00)[to_ip_from(RLj13sa47em33kcomko4xd63ai)];
-	RCPT_COUNT_TWELVE(0.00)[44];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[linux-foundation.org,arm.com,kernel.org,xen0n.name,linux.ibm.com,ellerman.id.au,gmail.com,dabbelt.com,eecs.berkeley.edu,ghiti.fr,redhat.com,alien8.de,linux.intel.com,zytor.com,gondor.apana.org.au,intel.com,fb.com,suse.com,arndb.de,fnnas.com,huawei.com,vger.kernel.org,lists.infradead.org,lists.linux.dev,lists.ozlabs.org];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.cz:mid,suse.cz:replyto];
-	RCVD_COUNT_TWO(0.00)[2];
-	REPLYTO_ADDR_EQ_FROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	REPLYTO_DOM_NEQ_TO_DOM(0.00)[]
-X-Spam-Level: 
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1091; i=thorsten.blum@linux.dev; h=from:subject; bh=TSg+xn4IusJGqvTX/t6/8iMnzbosJnJX4Tp/s6TBZ5o=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFnMOuFNPv9OCf/606Unvtb90cw/TjIBZUHp0z9/ndb5J izi4SPPjlIWBjEuBlkxRZYHs37M8C2tqdxkErETZg4rE8gQBi5OAZhIYzIjw/xc4Tjuvy/ySvkl 39hYbo+vfLFGujlS5NueY2F2ht6+rgx/pX/f+ikf7svj2fVErcapb9fBCWUXtuz/x85qW771Qut lTgA=
+X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, May 12, 2026 at 07:20:41AM +0200, Christoph Hellwig wrote:
-> While the RAID6 algorithm could in theory support 3 devices by just
-> copying the data disk to the two parity disks, this version is not only
-> useless because it is a suboptimal version of 3-way mirroring, but also
-> broken with various crashes and incorrect parity generation in various
-> architecture-optimized implementations.  Disallow it similar to mdraid
-> which requires at least 4 devices for RAID 6.
-> 
-> Fixes: 53b381b3abeb ("Btrfs: RAID5 and RAID6")
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+Use max() to simplify mv_cesa_probe() and improve its readability.
 
-This patch should have been sent separately as it has user visible
-impact and can potentially break some setups. The degenerate modes of
-raid0, 5, or 6 are explicit as a possible middle step when converting
-profiles.  We can use a fallback implementation for this case if the
-accelerated implementations cannot do it.
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+ drivers/crypto/marvell/cesa/cesa.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/crypto/marvell/cesa/cesa.c b/drivers/crypto/marvell/cesa/cesa.c
+index 687ed730174d..75d8ba23d9a2 100644
+--- a/drivers/crypto/marvell/cesa/cesa.c
++++ b/drivers/crypto/marvell/cesa/cesa.c
+@@ -18,6 +18,7 @@
+ #include <linux/io.h>
+ #include <linux/kthread.h>
+ #include <linux/mbus.h>
++#include <linux/minmax.h>
+ #include <linux/platform_device.h>
+ #include <linux/scatterlist.h>
+ #include <linux/slab.h>
+@@ -442,10 +443,8 @@ static int mv_cesa_probe(struct platform_device *pdev)
+ 	sram_size = CESA_SA_DEFAULT_SRAM_SIZE;
+ 	of_property_read_u32(cesa->dev->of_node, "marvell,crypto-sram-size",
+ 			     &sram_size);
+-	if (sram_size < CESA_SA_MIN_SRAM_SIZE)
+-		sram_size = CESA_SA_MIN_SRAM_SIZE;
+ 
+-	cesa->sram_size = sram_size;
++	cesa->sram_size = max(sram_size, CESA_SA_MIN_SRAM_SIZE);
+ 
+ 	spin_lock_init(&cesa->lock);
+ 
