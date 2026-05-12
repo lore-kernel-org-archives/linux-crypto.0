@@ -1,55 +1,71 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79CD63CAA51;
-	Tue, 12 May 2026 20:23:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5FF13C276D;
+	Tue, 12 May 2026 20:23:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778617415; cv=none; b=SC7qgA3YQ2JkR0I3Ojx9svz1kVsWi3z6/DOZUjvS3eIW/aY1BIdgnJitXBgg7eG+rHe+wwpv0OssRgXtpkjAqpL07hblFEzEr3PM+7K+4gH9xFdIaNgINRAt6OSihC5SsYW3FMC1qYsvQX/T+3peH6AVqhOSyYVPoGGiCmyMVt8=
+	t=1778617417; cv=none; b=fl+C88RCm/3pIVt1MjpsYQZNBaTZfZpVGwU5oWAnmHXUQGiYCUPQLE8SPOpdd4g+UuyYY0HpTmG2CSX7iQZFkikcYG5uluGR0+g2+70Q7FpoFnsFTcH7RJcWdB8KetQdh0L9cT651UdPs16Bv+QUzTtwZqkRst28P7DDOFQziw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778617415; c=relaxed/simple;
-	bh=Ziiq1lQIaRMTdSAD5F7GQogjzHQoMWPR8kOGGdizVt0=;
+	s=arc-20240116; t=1778617417; c=relaxed/simple;
+	bh=Ln2gI1hcndZSho8Ih8uFJiVbv3RJPUjem9kyui/66G4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Uy4QizP//z8LuhycDD4M4i0wBQ5W405IwjH6vQf2eEpycjSdXT+ELPLPfxnF9PELK6vSl1M/ZUUycKv+l5RrpB8eVZ6tdoeeThMqDu2Jd2Tf3TEOwia+on13HYMEG97TxhHyBrRFreiy5ENuDiJ5qTkCEpvzlmag/9xy9Y6KSmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YrhOpK/U; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=oH43aCgjujk1e9km5DbF/R2Ol/Mego2r2jQPo9hJBHs06dldasECakABFyQ+70pAdkFRFZcglW2Ofp4ql4ApU3pFNjP5NajGcmTc56Kf6kAylm4kQJK4Nj1De6F0LkN49gDmhKaBa5o5t9tqeaykYMrFGWSudJT1VA0nShNZgRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e0NvnRhQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YrhOpK/U"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0453C2BCFA;
-	Tue, 12 May 2026 20:23:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e0NvnRhQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57B3AC2BCC7;
+	Tue, 12 May 2026 20:23:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778617415;
-	bh=Ziiq1lQIaRMTdSAD5F7GQogjzHQoMWPR8kOGGdizVt0=;
+	s=k20201202; t=1778617417;
+	bh=Ln2gI1hcndZSho8Ih8uFJiVbv3RJPUjem9kyui/66G4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YrhOpK/U6AGh1ueawrEZm/YFdXeXSFjFq3VI1QJ29XEnH8AaFGP6NLtiGlWEwzU04
-	 qs/tjbzVHNCcBxgeVt8P1PMW591/58boXhQzOBOvBUo4prTDv52nn2ruGe6e6tT3BM
-	 oVwKojiMA0YK6bcJ/SxPWoSqJfbghS6PEN/kii3ErMbktOo47T5VyvVeOhTIvGyMJ6
-	 NvgLQwmF9uVECYk6mcSya8lI3IfllcpE4CqKwkrELlvVj4gRjRD+znzeGJJzHHDgGn
-	 uFEOK/6IooQ/OjnQGXfvDLFOSx/t+3a0bbyBSgQXXLQJLV9+7F34oopTf0nH8NZG1S
-	 4Jml0eGCyLGQg==
+	b=e0NvnRhQp10LujODCHxZGIl0R9PMRA+MZ/qwuVIcZ5SfmLM4ehrCP0oHhxa4HWuZh
+	 Gtvl6ajmj7vN4023nTkKG6SIfNUTFsxtV10D3/7Re1AFEEFKnmW+U7CPg6xJTyGSrQ
+	 wpN8jFueoSbh3sSAFtfW1+CNOigeeerBuyewnSBSIqdf6UjlSMkuzrv8J0MFssbxAK
+	 JSHGNJBsmeXlmWRirbVkhK5zFEuIZ0zLBxgfCO8ehrhSN9mIsA60BbduOmxGZ6Rd9h
+	 rrx+MRdHbvkLPHi2iJmSkvzJ0DDa9FGU8aws5Vc+YEUgQDv6nHvOr5Uz/IReBDvUXm
+	 koRYUZQ5nMv1g==
 From: Bjorn Andersson <andersson@kernel.org>
-To: Thara Gopinath <thara.gopinath@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
 	Konrad Dybcio <konradybcio@kernel.org>,
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
-	Harshal Dev <harshal.dev@oss.qualcomm.com>
-Cc: Neeraj Soni <neeraj.soni@oss.qualcomm.com>,
-	Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
 	Abel Vesa <abel.vesa@oss.qualcomm.com>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>,
+	cros-qcom-dts-watchers@chromium.org,
+	Eric Biggers <ebiggers@google.com>,
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+	Jingyi Wang <jingyi.wang@oss.qualcomm.com>,
+	Tengfei Fan <tengfei.fan@oss.qualcomm.com>,
+	Bartosz Golaszewski <brgl@kernel.org>,
+	David Wronek <davidwronek@gmail.com>,
+	Luca Weiss <luca.weiss@fairphone.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Melody Olvera <quic_molvera@quicinc.com>,
+	Alexander Koskovich <akoskovich@pm.me>,
+	Abel Vesa <abelvesa@kernel.org>,
+	Harshal Dev <harshal.dev@oss.qualcomm.com>
+Cc: Brian Masney <bmasney@redhat.com>,
+	Neeraj Soni <neeraj.soni@oss.qualcomm.com>,
+	Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>,
 	linux-arm-msm@vger.kernel.org,
 	linux-crypto@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
-Subject: Re: (subset) [PATCH v2 0/2] Add Crypto Engine support for the Glymur SoC
-Date: Tue, 12 May 2026 15:22:46 -0500
-Message-ID: <177861739350.1242344.1525682685379618223.b4-ty@kernel.org>
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+	Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>,
+	Manivannan Sadhasivam <mani@kernel.org>
+Subject: Re: (subset) [PATCH v5 00/13] Add explicit clock vote and enable power-domain for QCOM-ICE
+Date: Tue, 12 May 2026 15:22:47 -0500
+Message-ID: <177861739384.1242344.560063660272912565.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260505-glymur_crypto_enablement-v2-0-bf115aeb1459@oss.qualcomm.com>
-References: <20260505-glymur_crypto_enablement-v2-0-bf115aeb1459@oss.qualcomm.com>
+In-Reply-To: <20260416-qcom_ice_power_and_clk_vote-v5-0-5ccf5d7e2846@oss.qualcomm.com>
+References: <20260416-qcom_ice_power_and_clk_vote-v5-0-5ccf5d7e2846@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -60,16 +76,23 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
 
-On Tue, 05 May 2026 13:10:02 +0530, Harshal Dev wrote:
-> Document and add the device-tree nodes to enable the Crypto Engine
-> and its BAM for Glymur.
+On Thu, 16 Apr 2026 17:29:17 +0530, Harshal Dev wrote:
+> When the kernel is booted without the 'clk_ignore_unused' and
+> 'pd_ignore_unused' command‑line flags, votes for unused clocks and power
+> domains are dropped by the kernel post late_init and deferred probe
+> timeout. Depending on the relative timing between the ICE probe and the
+> kernel disabling the unused clocks and power domains occasional unclocked
+> register accesses or 'stuck' clocks are observed during QCOM‑ICE probe.
+> When the 'iface' clock is not voted on, unclocked register access would
+> be observed. On the other hand, if the associated power-domain for ICE
+> is not enabled, a 'stuck' clock is observed.
 > 
-> 
+> [...]
 
 Applied, thanks!
 
-[2/2] arm64: dts: qcom: glymur: Add crypto engine and BAM
-      commit: 93e08fdc55f227847dc9b249fd5eb43403e7e8b9
+[02/13] soc: qcom: ice: Allow explicit votes on 'iface' clock for ICE
+        commit: 0d5dc5818191b55e4364d04b1b898a14a2ccac38
 
 Best regards,
 -- 
