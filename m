@@ -1,48 +1,48 @@
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9E0238CFE1;
-	Wed, 13 May 2026 15:20:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B92447ECC0;
+	Wed, 13 May 2026 15:20:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778685615; cv=none; b=OJjKuI4+qlgeIe6g3+BqJK0cBpFX5lfqNDdIpyHPb9WT8x28HZRUehU570ni1eJlF/XVFc/lWz1gqrPBUjFlnKeMtBM+3uoT/t546BzBAenpBnzDnJNKHOcOWlqDBMLZcWQy8/VRoLZ/vkjZ7I/2C9PEyhO3CcJJzTBF/jkZpBE=
+	t=1778685617; cv=none; b=nSd9P6rFz5n0GTq4ztO8U5Zmu9SFGjOvs3sjdx7xpbsxxfRhN/F5pbjeJApPPpelRRq2N0Wfo6+DccHQ/QoMSF4iQwtA149cZRe8wiCWQ32VgeSjDv/agjQ+Tl+mfrt32LFzFgtb0RJdRgWeH3H6wobkL2ZqLR9bhs9s4YQg0Ec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778685615; c=relaxed/simple;
-	bh=6/g+eI8H7stfXfONoavIPrIxIl64ue63MJvRQtnqoSQ=;
+	s=arc-20240116; t=1778685617; c=relaxed/simple;
+	bh=yqinmu94UbdkYQgRj9MCDz5c6c1I8xVwaZDzBAhNnUk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hKTu/zmnYDu3wU9dxoQ1RfNLkVF7Okc5GKAcsdw0sLv/1UHoa2VVhAT1LxwE+fyqx1qNfZJooofgqEcVlxltEd+8R06P6CG5DbCkhd/8fbcYGxLazWUUhAwnYojQ/irb3b5eGpWGFcaVfpTcKfhyE61ieOJL04KllD5iHYvOWKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O0h5irgE; arc=none smtp.client-ip=198.175.65.14
+	 MIME-Version:Content-Type; b=K8CVWcP6LA/+4Hjf1V45ZGdmluL5NDG0gZEAw1lNGbWUKlToyRKB9LBucoyjMA3PjTtSsPCo3z32Lny0+FFvJRoGTh/NfuIPE7/fNYU+oXHXVLKhv4Kj1MW9NtLWc4raqyJpjeHojKLx/2nWGh/mWuJlwiDSmEsIFlxXdH3F4z4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bBsgLG4g; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O0h5irgE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bBsgLG4g"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1778685614; x=1810221614;
+  t=1778685616; x=1810221616;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=6/g+eI8H7stfXfONoavIPrIxIl64ue63MJvRQtnqoSQ=;
-  b=O0h5irgEWhZzvfVQdLGD8j/Tn/shKIuVx9yxUFE+xO81/IBgV1kC/DCd
-   wADk2NSTpf88wvv1YdiVGFq83uAC2NFqdWe6INYeaezMmf6Ia77QNgsCf
-   yjvR7rSYBsvNwp1r6h8B+R6nrZ7UrowOPAaZj8vSjTRfsliQvuq+cQI0I
-   MDsabqzmAzA+3VjyW3O7DxCLqeLzFPDddYaX9sjoYGz9piRrWIz1NjyS4
-   0I4EsfgBBJgEb2rSWXaDiAMcqZs3TdFOKTrahuOfRuiNjyontgXCDnP9g
-   dBn0wZaz+pIY468gUWbs8wVMZLa9bN6GySfJWpUIMuZQc69qAduA5VCgq
-   w==;
-X-CSE-ConnectionGUID: BELmSeumRJGtg0y9tT2pvg==
-X-CSE-MsgGUID: 5EAGqTYXTAOemsyP7CPlwA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11785"; a="83489453"
+  bh=yqinmu94UbdkYQgRj9MCDz5c6c1I8xVwaZDzBAhNnUk=;
+  b=bBsgLG4gMITOQ9/TzSmcDUThiLnXJnvtdI86gIBBLQJwtBkEasyJ2wRe
+   UmiGP9x1WAgM2pmdhSMreI1wZQPP+O6f/NuM4v9SEOf8sFgf+dlYoEAA4
+   priA3AGQX2hgSKmkirakVFtsEQ1KvukQ9kWDvVlz8veGwAps8xwY7Pim+
+   JbbikO8HTtzYr524WhI3cvxuD9r4s9Ru+RZEQZw9gu56ZjyHS8u4m5lQU
+   Rr7nFjrxk5TfNBFR2Vx1/qx0zT1VeFvXWvXV2GNwLi/FEfn7ZSpIBu6un
+   Mnc0HwoD2zYXTCPeVOpzQGnOHzHGRE/DZrUNg2OhWbV3o7q6UP6X8ZDI0
+   Q==;
+X-CSE-ConnectionGUID: 7QMWm1ocTCeocHihfaavAg==
+X-CSE-MsgGUID: e1p91SKaSHqRe14WCFAWZg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11785"; a="83489474"
 X-IronPort-AV: E=Sophos;i="6.23,232,1770624000"; 
-   d="scan'208";a="83489453"
+   d="scan'208";a="83489474"
 Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2026 08:20:13 -0700
-X-CSE-ConnectionGUID: k7n3W4sxTmqRe04v2+RcZA==
-X-CSE-MsgGUID: 9FyglI90Qsae5tJ1S1hRmg==
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2026 08:20:16 -0700
+X-CSE-ConnectionGUID: XIIdr664QbOaeJUMBPikrg==
+X-CSE-MsgGUID: a4K4HBDxTfWRTIMTXunxAA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,232,1770624000"; 
-   d="scan'208";a="239931463"
+   d="scan'208";a="239931484"
 Received: from zp3110c001s1504.deacluster.intel.com ([10.219.161.39])
-  by fmviesa004.fm.intel.com with ESMTP; 13 May 2026 08:20:12 -0700
+  by fmviesa004.fm.intel.com with ESMTP; 13 May 2026 08:20:15 -0700
 From: Ahsan Atta <ahsan.atta@intel.com>
 To: herbert@gondor.apana.org.au
 Cc: linux-crypto@vger.kernel.org,
@@ -51,9 +51,9 @@ Cc: linux-crypto@vger.kernel.org,
 	stable@vger.kernel.org,
 	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
 	Damian Muszynski <damian.muszynski@intel.com>
-Subject: [PATCH 1/6] crypto: qat - keep VFs enabled during reset
-Date: Wed, 13 May 2026 17:16:54 +0200
-Message-ID: <9d9faa95f1cea5e77afc7f570e478ff0cb9cdc98.1778685152.git.ahsan.atta@intel.com>
+Subject: [PATCH 2/6] crypto: qat - notify fatal error before AER reset preparation
+Date: Wed, 13 May 2026 17:16:55 +0200
+Message-ID: <cea1e040db261ea1a9d6a33d0715d356ac508597.1778685152.git.ahsan.atta@intel.com>
 X-Mailer: git-send-email 2.45.0
 In-Reply-To: <cover.1778685152.git.ahsan.atta@intel.com>
 References: <cover.1778685152.git.ahsan.atta@intel.com>
@@ -67,65 +67,42 @@ Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Co
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 
-When a reset is triggered via sysfs, the PCI core invokes the
-reset_prepare() callback while holding pci_dev_lock(), which includes
-the PCI configuration space access semaphore. If reset_prepare() calls
-adf_dev_down(), the call chain adf_dev_stop() -> adf_disable_sriov()
--> pci_disable_sriov() attempts to acquire the same semaphore,
-resulting in a deadlock.
+Send fatal error notifications to subsystems and VFs as soon as
+AER error detection starts, before entering the reset preparation
+shutdown sequence.
 
-Avoid this by skipping pci_disable_sriov() when ADF_STATUS_RESTARTING
-is set. During reset the PCI topology is preserved, so VF devices
-remain valid and enumerated across the reset. VF notification and the
-quiesce handshake via adf_pf2vf_notify_restarting() are still
-performed unconditionally so that VFs stop submitting work before the
-PF shuts down.
-
-Correspondingly, skip pci_enable_sriov() in adf_enable_sriov() when
-VFs are already present, since their PCI devices were preserved from
-before the restart.
-
-This is in preparation for adding reset_prepare() and reset_done()
-callbacks in adf_aer.c.
+This reduces notification latency and ensures peers are informed
+immediately on fatal detection, rather than after restart-state setup
+and arbitration teardown.
 
 Cc: stable@vger.kernel.org
 Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
 Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Reviewed-by: Damian Muszynski <damian.muszynski@intel.com>
 ---
- drivers/crypto/intel/qat/qat_common/adf_sriov.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ drivers/crypto/intel/qat/qat_common/adf_aer.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_sriov.c b/drivers/crypto/intel/qat/qat_common/adf_sriov.c
-index 96939572109e..f2011300a929 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_sriov.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_sriov.c
-@@ -91,6 +91,10 @@ static int adf_enable_sriov(struct adf_accel_dev *accel_dev)
- 	/* Enable VF to PF interrupts for all VFs */
- 	adf_enable_all_vf2pf_interrupts(accel_dev, totalvfs);
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_aer.c b/drivers/crypto/intel/qat/qat_common/adf_aer.c
+index ed01fb9ad74e..9c6bfb9fef80 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_aer.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_aer.c
+@@ -33,13 +33,13 @@ static pci_ers_result_t adf_error_detected(struct pci_dev *pdev,
+ 		return PCI_ERS_RESULT_DISCONNECT;
+ 	}
  
-+	/* Do not enable SR-IOV if already enabled */
-+	if (pci_num_vf(pdev))
-+		return 0;
-+
- 	/*
- 	 * Due to the hardware design, when SR-IOV and the ring arbiter
- 	 * are enabled all the VFs supported in hardware must be enabled in
-@@ -260,7 +264,13 @@ void adf_disable_sriov(struct adf_accel_dev *accel_dev)
- 
- 	adf_pf2vf_notify_restarting(accel_dev);
- 	adf_pf2vf_wait_for_restarting_complete(accel_dev);
--	pci_disable_sriov(accel_to_pci_dev(accel_dev));
-+	/*
-+	 * When the device is restarting, preserve VF PCI devices across
-+	 * the reset by skipping pci_disable_sriov(). VFs are notified to
-+	 * quiesce regardless so the PF can safely shut down.
-+	 */
-+	if (!test_bit(ADF_STATUS_RESTARTING, &accel_dev->status))
-+		pci_disable_sriov(accel_to_pci_dev(accel_dev));
- 
- 	/* Block VF2PF work and disable VF to PF interrupts */
- 	adf_disable_all_vf2pf_interrupts(accel_dev);
++	adf_error_notifier(accel_dev);
++	adf_pf2vf_notify_fatal_error(accel_dev);
+ 	set_bit(ADF_STATUS_RESTARTING, &accel_dev->status);
+ 	if (accel_dev->hw_device->exit_arb) {
+ 		dev_dbg(&pdev->dev, "Disabling arbitration\n");
+ 		accel_dev->hw_device->exit_arb(accel_dev);
+ 	}
+-	adf_error_notifier(accel_dev);
+-	adf_pf2vf_notify_fatal_error(accel_dev);
+ 	adf_dev_restarting_notify(accel_dev);
+ 	pci_clear_master(pdev);
+ 	adf_dev_down(accel_dev);
 -- 
 2.45.0
 
