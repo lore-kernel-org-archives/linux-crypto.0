@@ -1,62 +1,58 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D3D13321B1;
-	Wed, 13 May 2026 15:20:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DD6827442
+	for <linux-crypto@vger.kernel.org>; Wed, 13 May 2026 15:33:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778685627; cv=none; b=qSKPWavUraJdAdKmbkAcrncxAB9yYnEHGa70WeSQPjE+rfzSRUDf4hcuntdJGNUXKrJMN0L7hdbJwtC9/izMzc0Oa1cFKw5XHePN2Fp5mXnGabsCuw+TIqPiJDEk7Fh4hgvVJjXpwRT/K0XhgY1+SZIr+ltbeIuKJRHU7R2C5yo=
+	t=1778686412; cv=none; b=QRRdnAPho/zih6acLLdGGGPdh1VUGmqJakKbtEU/1unl5l9/xyE3Eq3qUZ2bC9lp+zYeQ7/Eym5jXPppu7XuAhzsOb7FxdNV2tCOB7JtOcFXxh0TZivn8zDtS/livFvEAKrGOIjkzWVPhVJ1IXgKugYYYvkbF/dOn26A76vNgW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778685627; c=relaxed/simple;
-	bh=wn/mjkuuLW+DWToBm1KYcumvzh96coldrZOHO3ezGmE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=W5mBSW/8TcQ74uG5lAMCg5i++m1AzxphDmi3xyWXsrbpElJp57IAzFCrId9GzKWHHDDo5KbRZbnb3eliAZIYzoGSFN+6sJGf5S9049YdXiOYjyTSQTtDUg5uNsjB4pLua6Lpc7Akmqj6FjJwEvCHP+Cggujj+HXUZ6O52fpC00A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Fap7XRwG; arc=none smtp.client-ip=198.175.65.14
+	s=arc-20240116; t=1778686412; c=relaxed/simple;
+	bh=WjTG+hED0D3CSbUxzhIJGLKkhosJqIXmDoTFHofVXio=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iXs32ZwaziQq7ot2InvbjxsFYqjmpjZ3NWQ8xsIzV2RK+jKvuSiTtcH6uSr6vL/M/5OAcLLHM2YZhY73b23YbSQRkZE/RHyv2HJxwvYmRv0Poj0jYW/0Z2+fPVha6mDkYA3GxbcvFIstbBNLSqYpOdId2jueIcjbpjxck1tJBgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dtXKzVHI; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Fap7XRwG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dtXKzVHI"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1778685625; x=1810221625;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=wn/mjkuuLW+DWToBm1KYcumvzh96coldrZOHO3ezGmE=;
-  b=Fap7XRwG5ljjdhLTcxGMFP+mCzap2MHJKZqeYlwO1/F++XAuO1Lwn3/5
-   euLJZ+C3GMZtyxwGDhCl/n6Kr/YkTT3JIFwSpn+dkSuk+eu0AhAyXqoj3
-   BwSfqAWKbDG3jRNFgXEnrSpcPeP3otQSdY9OoPiVF5lVP6L97ozKHVF92
-   KmQKEBSRyd2N0dH1zLi0/EsXn2bIBc2bIUXZY6jn6RCyRZoaUH8/olFXE
-   IJzlEDKwBu+tG39+PfPIPqUBfBqrdG6Rx54VizwIhmRTENPyjDf4yr+V6
-   BMcbAJGqDMJcmdTxdB3xABfGBTQav7G0WXY7VPdOzQv+ynpy8SqJF4wVq
-   g==;
-X-CSE-ConnectionGUID: UfUs7f6CQvK1g+mkwNJ5MQ==
-X-CSE-MsgGUID: URMamPSfTLaW10piGVFTDQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11785"; a="83489532"
-X-IronPort-AV: E=Sophos;i="6.23,232,1770624000"; 
-   d="scan'208";a="83489532"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2026 08:20:25 -0700
-X-CSE-ConnectionGUID: /Sv31jP7SjaGJAof2d1bWQ==
-X-CSE-MsgGUID: id/gk2/TS7SDUs/D/9GxeA==
+  t=1778686411; x=1810222411;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=WjTG+hED0D3CSbUxzhIJGLKkhosJqIXmDoTFHofVXio=;
+  b=dtXKzVHIkmmaUI4bOlBL8YqXiFdP7yiCEgBoGKzNBOVcF0i2b7Te6qtc
+   vNnAG2bdD2icVWELumH9VtYcKYRv6l/yPBcWp7AxiRzcKCmZqY2xbN6YK
+   EYsg1QcOruh+Tjya5abQYVgdmy5eLvd1eiaJ7XVtum5CTuzIrS/TxPtDL
+   vHke6v0fQf7ZwGuhE3dvWTYPoIV+IBH/pHhRdcFMEKMs67av9kGPIWcR5
+   /4PbSzf/PIN1ZbaEUt0Z6JuDUJBXK1XtqUAfWi0yDN95cXDV5DJZOjmyI
+   LI97Eudu4Igud1hBL/N8uZOHVhbgNzAq9TuIG51EoEK1fEtF4w3C0znzj
+   w==;
+X-CSE-ConnectionGUID: CI2poggTQliooIbfYzcDgA==
+X-CSE-MsgGUID: BE8857MuROC5yykbb6+wGQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11785"; a="83230752"
+X-IronPort-AV: E=Sophos;i="6.23,233,1770624000"; 
+   d="scan'208";a="83230752"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2026 08:33:31 -0700
+X-CSE-ConnectionGUID: KX6ULEJyTIm4HXZvAoJlwQ==
+X-CSE-MsgGUID: KpojcKaZTc6MhwLtqjX4bA==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,232,1770624000"; 
-   d="scan'208";a="239931574"
-Received: from zp3110c001s1504.deacluster.intel.com ([10.219.161.39])
-  by fmviesa004.fm.intel.com with ESMTP; 13 May 2026 08:20:24 -0700
-From: Ahsan Atta <ahsan.atta@intel.com>
+X-IronPort-AV: E=Sophos;i="6.23,233,1770624000"; 
+   d="scan'208";a="242120640"
+Received: from unknown (HELO fedora.iind.intel.com) ([10.49.0.89])
+  by orviesa003.jf.intel.com with ESMTP; 13 May 2026 08:33:29 -0700
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 To: herbert@gondor.apana.org.au
 Cc: linux-crypto@vger.kernel.org,
 	qat-linux@intel.com,
+	Fiona Trahe <fiona.trahe@intel.com>,
 	Ahsan Atta <ahsan.atta@intel.com>,
-	stable@vger.kernel.org,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Damian Muszynski <damian.muszynski@intel.com>
-Subject: [PATCH 6/6] crypto: qat - handle sysfs-triggered reset callbacks
-Date: Wed, 13 May 2026 17:16:59 +0200
-Message-ID: <b1229b6e45cb61aecd5df50cb99b4b8b16fb3126.1778685152.git.ahsan.atta@intel.com>
-X-Mailer: git-send-email 2.45.0
-In-Reply-To: <cover.1778685152.git.ahsan.atta@intel.com>
-References: <cover.1778685152.git.ahsan.atta@intel.com>
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH] Documentation: qat_rl: make rate limiting wording clearer
+Date: Wed, 13 May 2026 16:33:08 +0100
+Message-ID: <20260513153317.32355-1-giovanni.cabiddu@intel.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -64,66 +60,38 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-A reset requested through /sys/bus/pci/devices/.../reset invokes the
-driver reset_prepare() and reset_done() callbacks. The QAT driver does
-not implement those callbacks today, so the reset proceeds without
-quiescing the device or bringing it back up afterward, which leaves
-the device unusable.
+From: Fiona Trahe <fiona.trahe@intel.com>
 
-Hook reset_prepare() and reset_done() into adf_err_handler so the
-common shutdown and recovery flow also runs for reset. Skip device
-quiesce if the device is already in a down state.
+The term "capability" typically refers to an ability to perform an
+action, whereas "capacity" denotes a measurable amount of resources.
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Damian Muszynski <damian.muszynski@intel.com>
+Since the sysfs-driver-qat_rl document describes remaining resources
+available to perform work, "capacity" is the more accurate term.
+
+Replace "capability" with "capacity" in the document.
+
+Signed-off-by: Fiona Trahe <fiona.trahe@intel.com>
+Reviewed-by: Ahsan Atta <ahsan.atta@intel.com>
+Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- drivers/crypto/intel/qat/qat_common/adf_aer.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ Documentation/ABI/testing/sysfs-driver-qat_rl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_aer.c b/drivers/crypto/intel/qat/qat_common/adf_aer.c
-index d29f70eb84b8..af028488e660 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_aer.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_aer.c
-@@ -250,10 +250,22 @@ static void adf_resume(struct pci_dev *pdev)
- 	dev_info(&pdev->dev, "Device is up and running\n");
- }
- 
-+static void adf_reset_prepare(struct pci_dev *pdev)
-+{
-+	reset_prepare(pdev);
-+}
-+
-+static void adf_reset_done(struct pci_dev *pdev)
-+{
-+	reset_done(pdev);
-+}
-+
- const struct pci_error_handlers adf_err_handler = {
- 	.error_detected = adf_error_detected,
- 	.slot_reset = adf_slot_reset,
- 	.resume = adf_resume,
-+	.reset_prepare = adf_reset_prepare,
-+	.reset_done = adf_reset_done,
- };
- EXPORT_SYMBOL_GPL(adf_err_handler);
+diff --git a/Documentation/ABI/testing/sysfs-driver-qat_rl b/Documentation/ABI/testing/sysfs-driver-qat_rl
+index d534f89b4971..422333a0eb69 100644
+--- a/Documentation/ABI/testing/sysfs-driver-qat_rl
++++ b/Documentation/ABI/testing/sysfs-driver-qat_rl
+@@ -209,7 +209,7 @@ Date:		January 2024
+ KernelVersion:	6.7
+ Contact:	qat-linux@intel.com
+ Description:
+-		(RW) This file will return the remaining capability for a
++		(RW) This file will return the remaining capacity for a
+ 		particular service/sla. This is the remaining value that a new
+ 		SLA can be set to or a current SLA can be increased with.
  
 -- 
-2.45.0
-
---------------------------------------------------------------
-Intel Research and Development Ireland Limited
-Registered in Ireland
-Registered Office: Collinstown Industrial Park, Leixlip, County Kildare
-Registered Number: 308263
-
-
-This e-mail and any attachments may contain confidential material for the sole
-use of the intended recipient(s). Any review or distribution by others is
-strictly prohibited. If you are not the intended recipient, please contact the
-sender and delete all copies.
+2.54.0
 
