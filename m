@@ -1,103 +1,159 @@
-Received: from mailout1.hostsharing.net (mailout1.hostsharing.net [83.223.95.204])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4AD224AF7;
-	Wed, 13 May 2026 14:09:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.204
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA66B27FB2E;
+	Wed, 13 May 2026 14:29:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778681356; cv=none; b=YfI+nQpYuvh5cc/eJm4LZjp72/2ufFajgS61tjOcoLTADWxfpb+ReB3ozgMPUed2IQuQrp21IE5Apu2c1A9Gs5vrT5hKYbPTSRzxFRjpGbz31xyisO7Jb8lf7i7CBOfa6SkpwcywTOZNSmm1RJBXO7Jh71OxYJf37oEBrnqzehg=
+	t=1778682592; cv=none; b=pUgNH4SkAng8gE6j0ojlpxQ3Y0adGXMV226D1OYmDs10pT4KM22B0/yBozYohnTNpv24a5OzV0VWr3f4FnfaWbbAjSdmY7xSnPmgfB1fQKvwIX+kaMPn37aiF30JUUD5dTKgctCy7D/9VDbof4+NXQ++ngzTGPkUuhKcG+xYYUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778681356; c=relaxed/simple;
-	bh=NUhZ34fNkOd0L2mNb0uN3WZEPb0BkQiMpixwaAv7GVM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZM6TYPc+7ZxQAzfhAj1TjocyChoMYWZ5rKUWNbLRfc/6Zcj+UT+3YTz3v3SablIhgIrbo1biOdJHQlWaym+EH6+z9UpOueqc3SZotCWEB0HseIP745nhPpYd/tTkm7no9aAnaXx4P9h/9iBeXRCWJIyAsePDfxeSzsfzeUFi24c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=83.223.95.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384
-	 client-signature ECDSA (secp384r1) client-digest SHA384)
-	(Client CN "*.hostsharing.net", Issuer "GlobalSign GCC R6 AlphaSSL CA 2025" (verified OK))
-	by mailout1.hostsharing.net (Postfix) with ESMTPS id B4D05371;
-	Wed, 13 May 2026 16:09:11 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 912B16016B8F; Wed, 13 May 2026 16:09:11 +0200 (CEST)
-Date: Wed, 13 May 2026 16:09:11 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: Qingfang Deng <qingfang.deng@linux.dev>
-Cc: Anastasia Tishchenko <sv3iry@gmail.com>,
-	Stefan Berger <stefanb@linux.ibm.com>,
-	Ignat Korchagin <ignat@linux.win>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v2] crypto: ecc - Fix carry overflow in vli multiplication
-Message-ID: <agSGB39WGpsiv1ep@wunner.de>
-References: <20260513105741.55534-1-sv3iry@gmail.com>
- <20260513123948.842-1-qingfang.deng@linux.dev>
+	s=arc-20240116; t=1778682592; c=relaxed/simple;
+	bh=Q2HJgZxARD1A17cdhd0ukskQlCZlw3cCWkjA/E7sjHs=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type:Content-Disposition; b=HW9nrBqRY1aJuq6R6CQ2Uv6LXfZrF/Oq12evddRj5/jHX9VKnrrpXH/LXaTUSs+KWRij1GPXDZBq8/QPV3i+xj7DPLMmjBmqBYGvREE018IkHCoJosMlFwJJVPqhCwXHSatwyn+N/3lgweM6maAEdFaCU9JvUzJC7HKsU/ME0IM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=NuHA1dvN; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="NuHA1dvN"
+Received: from jeffbarnes-ThinkPad-P14s-Gen-2i (unknown [52.177.6.131])
+	by linux.microsoft.com (Postfix) with ESMTPSA id CA1E220B7167;
+	Wed, 13 May 2026 07:29:45 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com CA1E220B7167
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1778682587;
+	bh=eZUWYylCZ6/qLuaWw0TNaPlDo9Vps8c+zZrYEZIahBI=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=NuHA1dvNsJW6xH4Usgxh7/uhFA6MBaY2RPcQJKvrC11Vr2cEKeAWOaRfxbnUR6UFB
+	 oiBmXSLXNdiNcWXGKcvbHKFQpA1okMHlruWzycMXJMU40BncG0GrjZSQjwF1Yq9/bf
+	 piOc9Fnm3JSaKCImUERP723aMBRnMkarncJ+c4lM=
+Date: Wed, 13 May 2026 10:29:46 -0400
+From: Jeff Barnes <jeffbarnes@linux.microsoft.com>
+To: Ignat Korchagin <ignat@linux.win>
+Cc: Eric Biggers <ebiggers@kernel.org>, Kamran Khan <kz@inspirated.com>, 
+ Andy Lutomirski <luto@amacapital.net>, 
+ "=?utf-8?Q?linux-crypto=40vger.kernel.org?="
+ <linux-crypto@vger.kernel.org>, Herbert Xu
+ <herbert@gondor.apana.org.au>, "=?utf-8?Q?linux-doc=40vger.kernel.org?="
+ <linux-doc@vger.kernel.org>, "=?utf-8?Q?linux-api=40vger.kernel.org?="
+ <linux-api@vger.kernel.org>, 
+ "=?utf-8?Q?linux-kernel=40vger.kernel.org?="
+ <linux-kernel@vger.kernel.org>, "=?utf-8?Q?netdev=40vger.kernel.org?="
+ <netdev@vger.kernel.org>, Linus Torvalds
+ <torvalds@linux-foundation.org>
+Message-ID: <C4F28324-E357-483B-B5BF-DA2D00A4D272@getmailspring.com>
+In-Reply-To: <CAOs+rJUA+bz6Y2GKioHnFGFKX_uAP+4LaPRs=ZDgRQoUi4mWkg@mail.gmail.com>
+References: <CAOs+rJUA+bz6Y2GKioHnFGFKX_uAP+4LaPRs=ZDgRQoUi4mWkg@mail.gmail.com>
+Subject: Re: [PATCH] crypto: af_alg - Document the deprecation of AF_ALG
+X-Mailer: Mailspring
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
-In-Reply-To: <20260513123948.842-1-qingfang.deng@linux.dev>
 
-On Wed, May 13, 2026 at 08:39:48PM +0800, Qingfang Deng wrote:
-> On Wed, 13 May 2026 at 13:57:40 +0300, Anastasia Tishchenko wrote:
-> > +++ b/crypto/ecc.c
-> > @@ -393,14 +393,26 @@ static uint128_t mul_64_64(u64 left, u64 right)
-> >  	return result;
-> >  }
-> >  
-> > -static uint128_t add_128_128(uint128_t a, uint128_t b)
-> > +/* Calculate addition with overflow checking. Returns true on wrap-around,
-> > + * false otherwise.
-> > + */
-> > +static bool check_add_128_128_overflow(uint128_t *result, uint128_t a,
-> > +				       uint128_t b)
-> >  {
-> > -	uint128_t result;
-> > +	bool carry;
-> >  
-> > -	result.m_low = a.m_low + b.m_low;
-> > -	result.m_high = a.m_high + b.m_high + (result.m_low < a.m_low);
-> > +	result->m_low = a.m_low + b.m_low;
-> > +	carry = (result->m_low < a.m_low);
-> >  
-> > -	return result;
-> > +	result->m_high = a.m_high + b.m_high + carry;
-> 
-> If CONFIG_ARCH_SUPPORTS_INT128 is defined, you can convert them to
-> "unsigned __int128" as done in mul_64_64(), and use check_add_overflow()
-> to get the carry.
 
-Okay, but that would be a separate feature on top of this fix.
-This fix applies to *all* architectures whereas using native
-128-bit integers would only solve the problem on arches which
-support such integers.
 
-ARCH_SUPPORTS_INT128 actually depends on CC_HAS_INT128 on all arches
-that support it (arm64, loongarch, riscv, s390, x86).  Interestingly,
-s390 additionally requires CC_IS_CLANG.  Commit fbac266f095d ("s390:
-select ARCH_SUPPORTS_INT128") explains that "gcc generates inefficient
-code, which may lead to stack overflows" when handling 128-bit integers.
-It goes on to say: "The gcc generated functions have 6kb stack frames,
-compared to only 1kb of the code generated with clang."
+On May 12 2026, at 5:18 pm, Ignat Korchagin <ignat=40linux.win> wrote:
 
-That reminds me of the high stack usage issue we're seeing when compiling
-crypto/ecc.c on arm 32-bit:
+> On Mon, May 11, 2026 at 10:38=E2=80=AFPM Eric Biggers <ebiggers=40kerne=
+l.org> wrote:
+>> =20
+>> On Mon, May 11, 2026 at 10:03:21PM +0100, Ignat Korchagin wrote:
+>> > I don't think fully discounting hardware offloading is beneficial
+>> here. HW
+>> > accelerators will be produced and without a common interface
+>> vendors would
+>> > start implementing their own =22bespoke=22 drivers with bespoke user=
+space
+>> > interfaces (we already had such proposals), which in turn may
+>> introduce more
+>> > attack surface. Yes, A=46=5FALG needs substantial improvement, but a=
+t
+>> least it
+>> > can be a standardisation point.
+>> =20
+>> That isn't the best way to accelerate symmetric crypto anymore though,=
 
-https://lore.kernel.org/r/7e3d64a53efb28740b32d1f934e78c10086208ab.1778073318.git.lukas@wunner.de/
+>> if it ever was.  This has been known for a long time.
+>> =20
+>> > > In any case, any hypothetical security benefit provided by A=46=5F=
+ALG would
+>> > > have to be *very high* to outweigh the continuous stream of
+>> > > vulnerabilities in it.  I understand that people using A=46=5FALG
+>> might not
+>> > > be familiar with that continuous stream of vulnerabilities, but
+>> it would
+>> >
+>> >
+>> > Is it actually that much compared to other features/subsystems,
+>> like eBP=46 or
+>> > user namespaces=3F But we don't rush to deprecate those - instead
+>> trying to
+>> > harden them and come up with better design.
+>> =20
+>> There are plenty of other kernel features with a large attack surface,=
 
-I'm fine with adding native 128-bit usage to check_add_128_128_overflow()
-on top of this fix if somebody wants to submit a patch.  But I suspect
-it might only actually be useful on s390 with clang.
+>> of course.  But they tend to be much more useful than A=46=5FALG.  It'=
+s all
+>> about weighing benefits vs. risks.
+> =20
+> If divide number of CVEs in such systems on imaginary units of
+> usefulness, I think the ratio is similar.
+> =20
+>> When we get the point where a large number of Linux users *had* to
+>> disable A=46=5FALG as an emergency vulnerability response, and at the =
+same
+>> time their systems weren't even using A=46=5FALG so nothing even broke=
+ and
+>> they could have just done that to begin with, I think we get a very
+> =20
+> Well, there were: cryptsetup, RHEL fips check, so there are some...
 
-Thanks,
+cryptsetup does not have a hard dependency on A=46=5FALG.
+It is a potential consumer via A=46=5FALG.
 
-Lukas
+A=46=5FALG provides a broad, hard-to-control interface
+cryptsetup (and similar tools) are not blockers
+
+A=46=5FALG removal does not necessarily break cryptsetup usage. Removal d=
+oes
+improve =46IPS boundary clarity.
+
+
+> =20
+>> clear idea of which side is heavier for A=46=5FALG in the real world.
+> =20
+> Same thing could be said for unprivileged user namespaces - distros
+> even put a custom sysctl to restrict it and no-one noticed.
+> =20
+>> The main relevance of A=46=5FALG to the Linux community is that it all=
+ows
+>> their systems to be exploited.
+> =20
+> To be clear I'm not arguing for the current A=46=5FALG implementation. =
+I
+> agree, the splice zero-copy is... suboptimal (to be soft) and is
+> actually not-so-zero copy. But I think it was just added before we had
+> more modern approaches like io=5Furing (have their own can of worms, bu=
+t
+> hey - people adopt it fast).
+> =20
+> But I advocate for the usefulness of the concept itself - kernel/OS
+> providing crypto services to userspace. As mentioned in other threads,
+> other operating systems have it and Linux lags behind. There are use
+> cases: common interface for HW accelerators, embedded systems, which
+> don't have the space to bring a userspace lib etc. Even non-technical:
+> there are environments that just don't want to rely on third-party
+> userspace libraries like OpenSSL purely for licensing reasons. And I
+> agree, that it is hard to do it right, but we can piggy-back on other
+> subsystems (such as io=5Furing mentioned or other ideas).
+> =20
+>> - Eric
+>> =20
+> =20
+> Ignat
+> =20
+Jeff
