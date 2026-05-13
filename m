@@ -1,58 +1,41 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from mailout1.hostsharing.net (mailout1.hostsharing.net [83.223.95.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5CB8384CE0;
-	Wed, 13 May 2026 05:47:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E93D2C027B;
+	Wed, 13 May 2026 08:32:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778651272; cv=none; b=jI8qyoHu/2GuGAfG8M7jcUPVCHop4VH80gplVQqW78DQgPiV0xn2xZgUImTTeeAKUTp4O7LTpbJ8iLHXNReJVQYqemBkoMGuIEp2pRHIY4qATK9xHlZTeNxhedQqETdBjyAKbvS8r747ufDwpnCRiynFMPy5BDVmLIBJwmp/Xpg=
+	t=1778661181; cv=none; b=LP46JZwGH8fsbjVpb2MGxACAuxkaXRsgaVCLD1kkeGUFC2ZNmsqtNCgjHd4wBKclz/Hi5DuLfeX03GukrqzqcgyN278zhiPR2ognvUIYxuQrbQWsTAyZSATyDwLqiLLfMFSrbDhPOxadgjwO/26vE6ERvmDCAMAj//uHbGPAPwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778651272; c=relaxed/simple;
-	bh=gLgo4WQ3hzDs13tL91Gp16GFz3W0lr9TsHhf12nzTgo=;
+	s=arc-20240116; t=1778661181; c=relaxed/simple;
+	bh=fD89QneNtlgWMvxQLZaiuxVzs/7YD1JOaiDFtR6vW7w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gWWqtE3oERaGl7wV8Z2+x/NZBOSBtbiR91Gz2yyzz3T1Tn/sYgYC/eYW9WDcKlZywJt7uYcTPD6/3UEHhIP9oPxryc2+IqZhjTP5T1WuEDrK+lxUEAV5tW8CyOI1WQdn6GWg5MylbT30u1P6gbRrz5n8RKJJp+9k0RlxuOxM9M4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id B404568B05; Wed, 13 May 2026 07:47:42 +0200 (CEST)
-Date: Wed, 13 May 2026 07:47:42 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: David Sterba <dsterba@suse.cz>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=O5AWimqep3BT1dHK4FsxfwGCx67EhcHNLEJ5R/Yzb2dPZS+YFWccESK6N2gwzYywSEduTz8cOiM66zbvRnOQpC4RDDAgZMQdkTw2Rrxf9aLDg3/H676Nm1NyqeY5/ifh7w8XMZKzZ2r7l6lE2MFxKVrjlRN43r7aOOo8HxhqoNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=83.223.95.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
+Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384
+	 client-signature ECDSA (secp384r1) client-digest SHA384)
+	(Client CN "*.hostsharing.net", Issuer "GlobalSign GCC R6 AlphaSSL CA 2025" (verified OK))
+	by mailout1.hostsharing.net (Postfix) with ESMTPS id 9FA82249B;
+	Wed, 13 May 2026 10:32:31 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 8C58A601BF85; Wed, 13 May 2026 10:32:31 +0200 (CEST)
+Date: Wed, 13 May 2026 10:32:31 +0200
+From: Lukas Wunner <lukas@wunner.de>
+To: Anastasia <sv3iry@gmail.com>
+Cc: Ignat Korchagin <ignat@linux.win>,
+	Stefan Berger <stefanb@linux.ibm.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Dan Williams <dan.j.williams@intel.com>, Chris Mason <clm@fb.com>,
-	David Sterba <dsterba@suse.com>, Arnd Bergmann <arnd@arndb.de>,
-	Song Liu <song@kernel.org>, Yu Kuai <yukuai@fnnas.com>,
-	Li Nan <linan122@huawei.com>, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
-	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-raid@vger.kernel.org
-Subject: Re: [PATCH 01/19] btrfs: require at least 4 devices for RAID 6
-Message-ID: <20260513054742.GA1018@lst.de>
-References: <20260512052230.2947683-1-hch@lst.de> <20260512052230.2947683-2-hch@lst.de> <20260512114231.GG2558453@suse.cz>
+	"David S . Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto : ecc - Fix carry overflow in vli multiplication
+Message-ID: <agQ3H3562zUgGA5p@wunner.de>
+References: <20260508114844.29694-1-sv3iry@gmail.com>
+ <agMvm_bA-OcDWhbc@wunner.de>
+ <CAMtNSrhkfsGL04DtOb9M9fijHK=Xy0D-pBahiCqV+zPuJyRSLw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -61,32 +44,44 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260512114231.GG2558453@suse.cz>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <CAMtNSrhkfsGL04DtOb9M9fijHK=Xy0D-pBahiCqV+zPuJyRSLw@mail.gmail.com>
 
-On Tue, May 12, 2026 at 01:42:31PM +0200, David Sterba wrote:
-> On Tue, May 12, 2026 at 07:20:41AM +0200, Christoph Hellwig wrote:
-> > While the RAID6 algorithm could in theory support 3 devices by just
-> > copying the data disk to the two parity disks, this version is not only
-> > useless because it is a suboptimal version of 3-way mirroring, but also
-> > broken with various crashes and incorrect parity generation in various
-> > architecture-optimized implementations.  Disallow it similar to mdraid
-> > which requires at least 4 devices for RAID 6.
-> > 
-> > Fixes: 53b381b3abeb ("Btrfs: RAID5 and RAID6")
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+On Tue, May 12, 2026 at 06:20:14PM +0300, Anastasia wrote:
+> However, I have a few questions regarding the proposed
+> check_add_128_128_overflow():
 > 
-> This patch should have been sent separately as it has user visible
-> impact and can potentially break some setups.
+> Should this function return u64 (carry flag) instead of bool to be
+> consistent with existing overflow-checking functions like vli_add()?
 
-It _is_ sent out separate.
+I think if the return value can only be 1 or 0 (carry or no carry),
+then bool is clearer.  If the carry can be > 1 then u64 would be
+merited.
 
-> The degenerate modes of
-> raid0, 5, or 6 are explicit as a possible middle step when converting
-> profiles.  We can use a fallback implementation for this case if the
-> accelerated implementations cannot do it.
+I think it's confusing that vli_add() returns u64, but this was just
+copy-pasted from the micro-ecc library, whose uECC_vli_add() returns
+uECC_word_t:
 
-This is not about a degenerated mode.  For a degenerated RAID 6, parity
-generation uses the RAID 5 XOR routines as the second parity will be
-missing.  This is about generating two parities for a single data disk,
-which must be explicitly selected.
+https://github.com/kmackay/micro-ecc/blob/master/uECC.c#L333
+
+> Regarding argument order: if the function returns a result, shouldn't it be
+> the first argument rather than the third (like vli_add())?
+
+I think by convention, the result or destination is the first argument,
+as e.g. in memcpy().  I don't know why check_add_overflow() doesn't
+adhere to that convention but suspect there's probably no good reason.
+
+> And replace:
+> r01 = add_128_128(r01, product);
+> r2 += (r01.m_high < product.m_high);
+> with:
+> r2 += check_add_128_128_overflow(&r01, r01, product);
+> in functions vli_mult, vli_umult and vli_square
+
+LGTM.
+
+BTW a small nit, the commit subject contains a superfluous blank
+in-between "crypto" and the succeeding colon.
+
+Thanks,
+
+Lukas
