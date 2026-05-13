@@ -1,48 +1,48 @@
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD7ED48BD42;
-	Wed, 13 May 2026 15:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D3D13321B1;
+	Wed, 13 May 2026 15:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778685625; cv=none; b=CmzAsnW4qDJmmTAdAoh7boHjV9/NO5YWYovc2gIzCGsauWoOUVrMZm2vBVQxfPNnsF9+eSkJMHFDDGIlZg33JqhcVWd/5Uun8Fuz8dfIhdYD4HQDK/i02wTKpjHEldlLXrAwTcUxK4S11uGmZzz/PInUZQYfG0FgpC/Fumxt27w=
+	t=1778685627; cv=none; b=qSKPWavUraJdAdKmbkAcrncxAB9yYnEHGa70WeSQPjE+rfzSRUDf4hcuntdJGNUXKrJMN0L7hdbJwtC9/izMzc0Oa1cFKw5XHePN2Fp5mXnGabsCuw+TIqPiJDEk7Fh4hgvVJjXpwRT/K0XhgY1+SZIr+ltbeIuKJRHU7R2C5yo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778685625; c=relaxed/simple;
-	bh=Q6nex70dcnY0HfbinXTMpTi/fiqOknMGSQqY3TjcJ1k=;
+	s=arc-20240116; t=1778685627; c=relaxed/simple;
+	bh=wn/mjkuuLW+DWToBm1KYcumvzh96coldrZOHO3ezGmE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=INfVDenuHoFzI2nbRF6vxmyExeAp5GE7pzBO7nsxOiEO59LhT8xOY81bzz/FjnEjuFw996aeIbggAmJ1cVxlYHq9Op3lfcmttVUmMaJrt5Qm4K1FbKt2AZXwdZerefMKBgqZCzP3gZe+kFAz2Fu9OnqcWXEwav+z/Rib69w5fUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fiuoJB6u; arc=none smtp.client-ip=198.175.65.14
+	 MIME-Version:Content-Type; b=W5mBSW/8TcQ74uG5lAMCg5i++m1AzxphDmi3xyWXsrbpElJp57IAzFCrId9GzKWHHDDo5KbRZbnb3eliAZIYzoGSFN+6sJGf5S9049YdXiOYjyTSQTtDUg5uNsjB4pLua6Lpc7Akmqj6FjJwEvCHP+Cggujj+HXUZ6O52fpC00A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Fap7XRwG; arc=none smtp.client-ip=198.175.65.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fiuoJB6u"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Fap7XRwG"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1778685623; x=1810221623;
+  t=1778685625; x=1810221625;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Q6nex70dcnY0HfbinXTMpTi/fiqOknMGSQqY3TjcJ1k=;
-  b=fiuoJB6uc63PKapCqWDvS5YQpvVVEJcG+BFmwfzs74+lmzt0aL6jHbKy
-   n+3f0XAHPXJbBhp/2jShX0ObhhqELvlV7nKygAhvl184He3x+gZDdXugy
-   OtKRmzkSwPwhmSq+UoMtBh9l3yE6bbFfRifeJwA5T61LnZ17uwlxQl42Z
-   AGRoIYm7b+m3VdezKkHr7Rhx/VkoDWc25z+EgnYOK1wL7ZBB2LCMEX71p
-   injK8h2KLdUjA9bbJDZ4uv2IL1+oGPvTIGo3jX7/H6W7xSxGK0ur7+vu2
-   B6wrQPC4oSxX9b1BKlrFA5efxW294fm0TmLYiK/hrfiKBUA6/W9aB2guL
-   A==;
-X-CSE-ConnectionGUID: X3j3I1GcSaKA1b4CwpBRPg==
-X-CSE-MsgGUID: bZhO+GddTBSv3c9XoHTuYA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11785"; a="83489521"
+  bh=wn/mjkuuLW+DWToBm1KYcumvzh96coldrZOHO3ezGmE=;
+  b=Fap7XRwG5ljjdhLTcxGMFP+mCzap2MHJKZqeYlwO1/F++XAuO1Lwn3/5
+   euLJZ+C3GMZtyxwGDhCl/n6Kr/YkTT3JIFwSpn+dkSuk+eu0AhAyXqoj3
+   BwSfqAWKbDG3jRNFgXEnrSpcPeP3otQSdY9OoPiVF5lVP6L97ozKHVF92
+   KmQKEBSRyd2N0dH1zLi0/EsXn2bIBc2bIUXZY6jn6RCyRZoaUH8/olFXE
+   IJzlEDKwBu+tG39+PfPIPqUBfBqrdG6Rx54VizwIhmRTENPyjDf4yr+V6
+   BMcbAJGqDMJcmdTxdB3xABfGBTQav7G0WXY7VPdOzQv+ynpy8SqJF4wVq
+   g==;
+X-CSE-ConnectionGUID: UfUs7f6CQvK1g+mkwNJ5MQ==
+X-CSE-MsgGUID: URMamPSfTLaW10piGVFTDQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11785"; a="83489532"
 X-IronPort-AV: E=Sophos;i="6.23,232,1770624000"; 
-   d="scan'208";a="83489521"
+   d="scan'208";a="83489532"
 Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2026 08:20:23 -0700
-X-CSE-ConnectionGUID: wS6QLEr3TYGZEnj002J8yw==
-X-CSE-MsgGUID: lCZ897FvTy2ICpafrrIe2Q==
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2026 08:20:25 -0700
+X-CSE-ConnectionGUID: /Sv31jP7SjaGJAof2d1bWQ==
+X-CSE-MsgGUID: id/gk2/TS7SDUs/D/9GxeA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,232,1770624000"; 
-   d="scan'208";a="239931548"
+   d="scan'208";a="239931574"
 Received: from zp3110c001s1504.deacluster.intel.com ([10.219.161.39])
-  by fmviesa004.fm.intel.com with ESMTP; 13 May 2026 08:20:22 -0700
+  by fmviesa004.fm.intel.com with ESMTP; 13 May 2026 08:20:24 -0700
 From: Ahsan Atta <ahsan.atta@intel.com>
 To: herbert@gondor.apana.org.au
 Cc: linux-crypto@vger.kernel.org,
@@ -51,9 +51,9 @@ Cc: linux-crypto@vger.kernel.org,
 	stable@vger.kernel.org,
 	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
 	Damian Muszynski <damian.muszynski@intel.com>
-Subject: [PATCH 5/6] crypto: qat - factor out AER reset helpers
-Date: Wed, 13 May 2026 17:16:58 +0200
-Message-ID: <eb512c747dba60ce335e06da685ae82232d29ece.1778685152.git.ahsan.atta@intel.com>
+Subject: [PATCH 6/6] crypto: qat - handle sysfs-triggered reset callbacks
+Date: Wed, 13 May 2026 17:16:59 +0200
+Message-ID: <b1229b6e45cb61aecd5df50cb99b4b8b16fb3126.1778685152.git.ahsan.atta@intel.com>
 X-Mailer: git-send-email 2.45.0
 In-Reply-To: <cover.1778685152.git.ahsan.atta@intel.com>
 References: <cover.1778685152.git.ahsan.atta@intel.com>
@@ -67,145 +67,51 @@ Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Co
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 
-Move the shutdown and recovery sequences out of adf_error_detected()
-and adf_slot_reset() into reset_prepare() and reset_done() helpers.
+A reset requested through /sys/bus/pci/devices/.../reset invokes the
+driver reset_prepare() and reset_done() callbacks. The QAT driver does
+not implement those callbacks today, so the reset proceeds without
+quiescing the device or bringing it back up afterward, which leaves
+the device unusable.
 
-This makes the AER recovery path easier to follow and prepares the
-common reset flow for reuse by additional PCI reset callbacks without
-duplicating the logic.
-
-No functional change intended.
+Hook reset_prepare() and reset_done() into adf_err_handler so the
+common shutdown and recovery flow also runs for reset. Skip device
+quiesce if the device is already in a down state.
 
 Cc: stable@vger.kernel.org
 Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
 Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Reviewed-by: Damian Muszynski <damian.muszynski@intel.com>
 ---
- drivers/crypto/intel/qat/qat_common/adf_aer.c | 86 ++++++++++++-------
- 1 file changed, 53 insertions(+), 33 deletions(-)
+ drivers/crypto/intel/qat/qat_common/adf_aer.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
 diff --git a/drivers/crypto/intel/qat/qat_common/adf_aer.c b/drivers/crypto/intel/qat/qat_common/adf_aer.c
-index 7255cac5aaa6..d29f70eb84b8 100644
+index d29f70eb84b8..af028488e660 100644
 --- a/drivers/crypto/intel/qat/qat_common/adf_aer.c
 +++ b/drivers/crypto/intel/qat/qat_common/adf_aer.c
-@@ -17,27 +17,18 @@ struct adf_fatal_error_data {
- static struct workqueue_struct *device_reset_wq;
- static struct workqueue_struct *device_sriov_wq;
- 
--static pci_ers_result_t adf_error_detected(struct pci_dev *pdev,
--					   pci_channel_state_t state)
-+static pci_ers_result_t reset_prepare(struct pci_dev *pdev)
- {
- 	struct adf_accel_dev *accel_dev = adf_devmgr_pci_to_accel_dev(pdev);
- 
--	dev_info(&pdev->dev, "Acceleration driver hardware error detected.\n");
- 	if (!accel_dev) {
- 		dev_err(&pdev->dev, "Can't find acceleration device\n");
- 		return PCI_ERS_RESULT_DISCONNECT;
- 	}
- 
--	if (state == pci_channel_io_perm_failure) {
--		dev_err(&pdev->dev, "Can't recover from device error\n");
--		return PCI_ERS_RESULT_DISCONNECT;
--	}
--
- 	if (!adf_dev_started(accel_dev))
- 		return PCI_ERS_RESULT_CAN_RECOVER;
- 
--	adf_error_notifier(accel_dev);
--	adf_pf2vf_notify_fatal_error(accel_dev);
- 	set_bit(ADF_STATUS_RESTARTING, &accel_dev->status);
- 	if (accel_dev->hw_device->exit_arb) {
- 		dev_dbg(&pdev->dev, "Disabling arbitration\n");
-@@ -49,6 +40,57 @@ static pci_ers_result_t adf_error_detected(struct pci_dev *pdev,
- 	return PCI_ERS_RESULT_NEED_RESET;
+@@ -250,10 +250,22 @@ static void adf_resume(struct pci_dev *pdev)
+ 	dev_info(&pdev->dev, "Device is up and running\n");
  }
  
-+static pci_ers_result_t reset_done(struct pci_dev *pdev)
++static void adf_reset_prepare(struct pci_dev *pdev)
 +{
-+	struct adf_accel_dev *accel_dev = adf_devmgr_pci_to_accel_dev(pdev);
-+	int res;
-+
-+	if (!accel_dev) {
-+		dev_err(&pdev->dev, "Can't find acceleration device\n");
-+		return PCI_ERS_RESULT_DISCONNECT;
-+	}
-+
-+	if (!adf_devmgr_in_reset(accel_dev))
-+		goto reset_complete;
-+
-+	pci_restore_state(pdev);
-+	res = adf_dev_up(accel_dev, false);
-+	if (res && res != -EALREADY)
-+		return PCI_ERS_RESULT_DISCONNECT;
-+
-+	adf_reenable_sriov(accel_dev);
-+	adf_pf2vf_notify_restarted(accel_dev);
-+	adf_dev_restarted_notify(accel_dev);
-+	clear_bit(ADF_STATUS_RESTARTING, &accel_dev->status);
-+
-+reset_complete:
-+	dev_info(&pdev->dev, "Device reset completed successfully\n");
-+
-+	return PCI_ERS_RESULT_RECOVERED;
++	reset_prepare(pdev);
 +}
 +
-+static pci_ers_result_t adf_error_detected(struct pci_dev *pdev,
-+					   pci_channel_state_t state)
++static void adf_reset_done(struct pci_dev *pdev)
 +{
-+	struct adf_accel_dev *accel_dev = adf_devmgr_pci_to_accel_dev(pdev);
-+
-+	dev_info(&pdev->dev, "Acceleration driver hardware error detected.\n");
-+	if (!accel_dev) {
-+		dev_err(&pdev->dev, "Can't find acceleration device\n");
-+		return PCI_ERS_RESULT_DISCONNECT;
-+	}
-+
-+	if (state == pci_channel_io_perm_failure) {
-+		dev_err(&pdev->dev, "Can't recover from device error\n");
-+		return PCI_ERS_RESULT_DISCONNECT;
-+	}
-+
-+	adf_error_notifier(accel_dev);
-+	adf_pf2vf_notify_fatal_error(accel_dev);
-+
-+	return reset_prepare(pdev);
++	reset_done(pdev);
 +}
 +
- /* reset dev data */
- struct adf_reset_dev_data {
- 	int mode;
-@@ -199,29 +241,7 @@ static int adf_dev_aer_schedule_reset(struct adf_accel_dev *accel_dev,
+ const struct pci_error_handlers adf_err_handler = {
+ 	.error_detected = adf_error_detected,
+ 	.slot_reset = adf_slot_reset,
+ 	.resume = adf_resume,
++	.reset_prepare = adf_reset_prepare,
++	.reset_done = adf_reset_done,
+ };
+ EXPORT_SYMBOL_GPL(adf_err_handler);
  
- static pci_ers_result_t adf_slot_reset(struct pci_dev *pdev)
- {
--	struct adf_accel_dev *accel_dev = adf_devmgr_pci_to_accel_dev(pdev);
--	int res = 0;
--
--	if (!accel_dev) {
--		pr_err("QAT: Can't find acceleration device\n");
--		return PCI_ERS_RESULT_DISCONNECT;
--	}
--
--	if (!adf_devmgr_in_reset(accel_dev))
--		goto reset_complete;
--
--	pci_restore_state(pdev);
--	res = adf_dev_up(accel_dev, false);
--	if (res && res != -EALREADY)
--		return PCI_ERS_RESULT_DISCONNECT;
--
--	adf_reenable_sriov(accel_dev);
--	adf_pf2vf_notify_restarted(accel_dev);
--	adf_dev_restarted_notify(accel_dev);
--	clear_bit(ADF_STATUS_RESTARTING, &accel_dev->status);
--
--reset_complete:
--	return PCI_ERS_RESULT_RECOVERED;
-+	return reset_done(pdev);
- }
- 
- static void adf_resume(struct pci_dev *pdev)
 -- 
 2.45.0
 
