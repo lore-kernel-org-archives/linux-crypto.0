@@ -1,44 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 090BB372067;
-	Wed, 13 May 2026 22:59:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F9C2989B5;
+	Thu, 14 May 2026 03:54:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778713177; cv=none; b=JxdHsEI+jtdPveLLKjwFyAc5iNCf3CbJ9lKsKm4XzX2ixnQ+xg5/E8K7tnX09YhDFTenQvZQw0XZMH7d2feFZ+OODjG4u66wGgALyIRTnW5i9i/ZBcjFNyXSqcAFeC348e0zSfsmrQpKXkasumJSlFImZU6S05nvEbh1U+Zkkd8=
+	t=1778730852; cv=none; b=PKwmug7fSuCI5yx9qIRNNtlgQOnidRUZM26lIO7VTZm0Buhr2LqeUwS/zVOM0A7Z/21dCa7TV7573LpVKY54gpMihkl4UpUZvvajPDuZH83eBXmR5aZqyB03n7UfW5RpBBbybA8vSWu56K8ayRaRDCNK7DNJEv91Ky8wwMW1+dc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778713177; c=relaxed/simple;
-	bh=SGGsNBa+FkvkfkdmD9n+Zm+wcVxWckVqaHO09K4J/jQ=;
+	s=arc-20240116; t=1778730852; c=relaxed/simple;
+	bh=8PtDRdXMVSbjnST+Cs0Dn1Z2/E315hAZtklcn942KsE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gFXAxCA9xBtPmuscqu16s2I8VV5OuB4VnDihZDagDLPGM+T6ZwniHzujMvBz58DYYdSHYmwtxDYav+2GrTkT17HdZZj389Jx4Nv/9Qi7atIPF10U6Ver0Oy51kS+qJt6uUQJABS6if5wqi4stiFDbtYZf4ZfZnJ+kiTGKSAV/YI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eemScf5r; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=H/1QYSGmKfPlgdhenqZf7kBhRnBNqAzQlF1gtN5dv0XBNGuvHnrLSjn4Xba6lSx18nVJQfyUeh4SCbc5XM0Hl+G8lODLwJH6pHtbdKHSFE/5KP+/sxBr8loJ6MJH7wot5LEFVIZMzRYPozqbYLsHX4jN3L2XzdTsHcMFft0k0wA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gFobv/Al; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eemScf5r"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F13FC19425;
-	Wed, 13 May 2026 22:59:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gFobv/Al"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 710ABC2BCB7;
+	Thu, 14 May 2026 03:54:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778713176;
-	bh=SGGsNBa+FkvkfkdmD9n+Zm+wcVxWckVqaHO09K4J/jQ=;
+	s=k20201202; t=1778730851;
+	bh=8PtDRdXMVSbjnST+Cs0Dn1Z2/E315hAZtklcn942KsE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eemScf5rEyYvIuw58xNli19jazjfwVZpKVn34D8nYkM9reWs/H9O5KMJ0yaEbMdCJ
-	 0YoWf60XADHTYU8dvwJExh0VYTSeuyuNJ0H+XlwpU2rMckylf5SEobebiKrv/LGi6W
-	 wz8HBG+EBdCNqpncF9ZPtx/Z9s6tS8WJWn0Aw2fqmImZXZwVra85Ss0ewIDYcCXFQs
-	 WZ92XlmGWBOBk03U9Omj3q16JvX676glkBBGwwLmcBbVwbNJG2AKpBq+H+d8EMFCU5
-	 8MNXAIsaG0ERjwA/4aiZgQrOrq/TVOEBf7BML2wsK5wiiu9JJ7Q3iN59W8tPkCSiAC
-	 tYQuhjaTCvJIQ==
-Date: Wed, 13 May 2026 22:59:34 +0000
+	b=gFobv/AlwQ+0/2J67Xr5lnaYxSS5tAqfjty33eet0pXkhE4YYHYHjCFpo01D6bYJ0
+	 sO0j1vr2yoIuVWJHltZr9e2ZGMa975F9kLQria7yQSJVoa/CD/x40T8p0jj42aBNUG
+	 L6XSeG8Lyu9vMCwrwDviN5fWORWofdsDLOMJQJ0YZngy9KcNhAwrdIhMmSE3ubRxbq
+	 mwRKUj41Y7F4jiLmMdwrdd0Yhfbd4P5jcLs4UB4MtmEEnMSTkYuyopJpUwJKHQVEUK
+	 orSGmH1V3xQ3hChhF+yywzPs/zkMuYVdsxXfVkE/BlSi4CShiNQMvwhDKtBs+rKVuZ
+	 1s9dMSYRich6Q==
+Date: Wed, 13 May 2026 20:52:48 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: lukas@wunner.de, ignat@linux.win, jarkko@kernel.org,
-	yimingqian591@gmail.com, stable@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: FAILED: patch "[PATCH] lib/crypto: mpi: Fix integer underflow
- in" failed to apply to 6.1-stable tree
-Message-ID: <20260513225934.GA501859@google.com>
-References: <2026051223-undercoat-reps-6626@gregkh>
- <20260513025130.GA3110@sol>
- <2026051334-showgirl-hurdle-22eb@gregkh>
- <20260513170445.GA2128@quark>
+To: Baokun Li <libaokun@linux.alibaba.com>
+Cc: linux-ext4@vger.kernel.org, linux-crypto@vger.kernel.org,
+	ardb@kernel.org, tytso@mit.edu, adilger.kernel@dilger.ca,
+	jack@suse.cz, yi.zhang@huawei.com, ojaswin@linux.ibm.com,
+	ritesh.list@gmail.com
+Subject: Re: [PATCH RFC 01/17] lib/crc: add crc32c_flip_range() for
+ incremental CRC update
+Message-ID: <20260514035248.GA2816@sol>
+References: <20260508121539.4174601-1-libaokun@linux.alibaba.com>
+ <20260508121539.4174601-2-libaokun@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,57 +46,41 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260513170445.GA2128@quark>
+In-Reply-To: <20260508121539.4174601-2-libaokun@linux.alibaba.com>
 
-On Wed, May 13, 2026 at 10:04:47AM -0700, Eric Biggers wrote:
-> > > A couple issues.  First, this email wasn't sent to the subsystem's
-> > > mailing list (linux-crypto@vger.kernel.org in this case).  That greatly
-> > > reduces the number of people who are made aware that this didn't get
-> > > automatically backported.
-> > 
-> > We never send out these FAILED emails to the mailing lists, as that
-> > would make just even more noise.  It's always been this way, sorry.
+On Fri, May 08, 2026 at 08:15:23PM +0800, Baokun Li wrote:
+> When a contiguous range of bits in a buffer is flipped, the CRC32c
+> checksum can be updated incrementally without re-scanning the entire
+> buffer, by exploiting the linearity of CRCs over GF(2):
 > 
-> Yes, this has been a problem for a long time, resulting in lots of
-> missed backports including the copy.fail ones.  It's time for you to fix
-> your process.
+>   New_CRC = Old_CRC ^ CRC(flip_mask << trailing_bits)
 > 
-> > > Second, the upstream commit cherry-picks to 6.1, 5.15, and 5.10 without
-> > > conflict.  (The file being changed was renamed between 6.1 and 6.6, but
-> > > 'git cherry-pick' handles that automatically.)
-> > > 
-> > > I don't know what you're doing exactly that caused it to be
-> > > unnecessarily marked as FAILED.  But whatever it is, it's not working,
-> > > and it is causing backports to be missed.
-> > 
-> > We don't use git for cherry-picking as we have a patch queue, so renames
-> > will often times fail, like it did here.  This has always been the case
-> > in the decades we have been running the stable kernels :)
+> Introduce crc32c_flip_range() which computes this delta using
+> precomputed GF(2) shift matrices and nibble-indexed lookup tables.
+> The implementation decomposes nbits and trailing_bits into
+> power-of-2 components and combines them via the CRC concatenation
+> property:
 > 
-> Again, this has been a problem for a long time, and it's time for you to
-> fix your process.  You can still have the patch queue; just use git for
-> the actual cherry-pick.
+>   CRC(A || B) = shift(CRC(A), len(B)) ^ CRC(B)
+> 
+> This gives O(log N) complexity with only ~9.8KB of static tables
+> (fits in L1 cache).  The current maximum supported buffer size is
+> 64KB (INCR_MAX_ORDER = 19, i.e. 2^19 bits = 524288 bits = 64KB).
 
-Also I should mention that your own instructions for "reproducing" the
-conflict use 'git cherry-pick':
+It will be a little while before I can do a full review of this, but
+just a high-level comment: "only ~9.8KB of static tables (fits in L1
+cache)" isn't ideal.  Large tables tend to microbenchmark well, then
+have worse real-world performance due to lots of other things contending
+for the L1 cache.
 
-    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/ linux-6.1.y
-    git checkout FETCH_HEAD
-    git cherry-pick -x 8c2f1288250a90a4b5cabed5d888d7e3aeed4035
-    # <resolve conflicts, build, test, etc.>
-    git commit -s
-    git send-email --to '<stable@vger.kernel.org>' --in-reply-to '2026051223-undercoat-reps-6626@gregkh' --subject-prefix 'PATCH 6.1.y' HEAD^..
+Another consideration is that basically every Linux kernel has
+CONFIG_CRC32 enabled, regardless of whether they would actually find
+this new functionality useful.
 
-When these instructions are followed, there is no conflict.  The
-"conflict" is purely because you didn't use 'git cherry-pick' yourself.
+I'm not necessarily saying this should be its own option, especially if
+it's useful for ext4 even in the non-LBS case.  But I do think it would
+be nice if it could be a bit smaller and more memory-optimized.
 
-So just start using 'git cherry-pick', and stop asking other people to
-do it for you when there are no conflicts, please.
-
-And please start Cc'ing the mailing lists.  Linux kernel development
-isn't done in private email.  I would have backported the copy.fail
-fixes earlier, but I never received the FAILED emails (which I'm
-guessing you sent, but only in private email to other people), so I
-didn't know they weren't being backported...
+Anyway, I'll look into the algorithm more when I have time.
 
 - Eric
