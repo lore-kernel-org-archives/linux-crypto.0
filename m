@@ -1,284 +1,82 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CB5D2E8DEA
-	for <linux-crypto@vger.kernel.org>; Thu, 14 May 2026 15:53:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55E97344D9A
+	for <linux-crypto@vger.kernel.org>; Thu, 14 May 2026 16:55:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778774015; cv=none; b=Ytx4nR+zpVQFGgf9hIh1hf12U9sz3vha0GN0tYsum+rCirQJqOyECQqfihQS+juep4keBwSLvhz79MQTuJ02K++j+1vCRZSOhB+82ofRDeaYReSkcgMA2Mix58/SVBHO0vDBajHA6UvHqgGXcNDKxJZvOaNlSU2tuYhklP3NYqo=
+	t=1778777719; cv=none; b=pLXYFbZVwGhLPiDhntcSn1BccgaK5mEwWGSagDYGWJ1YSlXKDDNnz8O3k5xBSdHsvl+/y5HiRA4dMSbWNm2xq5MwDfvQnTtKnr5ObDmM5GHX/Jx0YuzsGPyFqLvw6voVJWKpAjrjK97mtm29enMt/1x09tjSPgFYCVvwCFk1rY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778774015; c=relaxed/simple;
-	bh=ZGqAIeAFv2wbXEhJRKsEf83Crcr7POgSScN7/cHLKAA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ooC/5Sk/qDAL1ECEmXWcLFVM9nzTAf7nvOJjWfqMOwVtOFQmQZRxqt6Ki52nlx/Ko1EgZbcTgKLXXONhajjxPKuzeM28++ZY3z3/Y93jvRXViRTqhU/2UsG3/DTDPEOuLVrQarOPqzxoxgJ5eqvWiI5qgVel0ioUde24TSq3jSY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UTLsZCeC; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1778777719; c=relaxed/simple;
+	bh=v7o5JznVlPNo7AD+88VwjdqH7OaDNTvDjI3KRzcUXw0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EpNy+gA2jDIwOA8kEchUznXjP3wLTr1u7msnK7BmkuiZMPyzeXmwmnqizWpfzkKuUUl3aWaCeBqRFypN9WBtt4kJj2A+ob4ywo91PkIBFjWYhW8TkF9gHkeDHxXfCVTPM26B/KAHkN77QKtZuxp+DxE9AsYFUY1AaFx7E/nVnCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fSUXlmMw; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UTLsZCeC"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778774012;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fSUXlmMw"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1778777715;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8642cbHOUysxzVtcvqLZZF0bEcZh2vOvPZl6xKmvN60=;
-	b=UTLsZCeC1BMCPIs2HohZwHxostRWDTViCizE0R5yu+P7VwQgX4/6+Y8kjDUQj1l8N6QVBJ
-	cGYwm2LLNxVCWe0d3/qv569oaWOm5DftMgBO+UHIKV4Y6fIJQHL3RKp/CTIZooMIWI5AI0
-	B7X+kHsbQHqrQIFgmKtl/OUse/vmy1E=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-628-u9m08AgGNxGFKeY0qqvjiQ-1; Thu,
- 14 May 2026 11:53:29 -0400
-X-MC-Unique: u9m08AgGNxGFKeY0qqvjiQ-1
-X-Mimecast-MFC-AGG-ID: u9m08AgGNxGFKeY0qqvjiQ_1778774005
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BE18619560B3;
-	Thu, 14 May 2026 15:53:24 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.44.48.83])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5F5D11800347;
-	Thu, 14 May 2026 15:53:19 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: netdev@vger.kernel.org
-Cc: David Howells <dhowells@redhat.com>,
-	Hyunwoo Kim <imv4bel@gmail.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=rhs4rPnXJOnQ0TMkpeTOhKZgfpfxJZD8kt9kby3x2Ic=;
+	b=fSUXlmMwCdhNDt00FA+dopT9YjAk8uWWdF4LImcZAEuaHI3dKCRNmtztsJlmWZSUraLtEc
+	kaW84RLkrlaZdKcevJ1Sn9b5ITooevsWxZ+pVLnuevJtm1nPmA5sYXHWU4dq7CW/rsnrMB
+	pOAjq4MYGzV8d87vrf+Dkob67/v2k9I=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-afs@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Jeffrey Altman <jaltman@auristor.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	linux-nfs@vger.kernel.org,
+	Paul Walmsley <pjw@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexandre Ghiti <alex@ghiti.fr>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
 	linux-crypto@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH net v3 2/4] crypto/krb5, rxrpc: Fix lack of pre-decrypt/pre-verify length checks
-Date: Thu, 14 May 2026 16:53:00 +0100
-Message-ID: <20260514155304.2249591-3-dhowells@redhat.com>
-In-Reply-To: <20260514155304.2249591-1-dhowells@redhat.com>
-References: <20260514155304.2249591-1-dhowells@redhat.com>
+	linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: riscv - replace min_t with min in riscv64_aes_ctr_crypt
+Date: Thu, 14 May 2026 18:55:10 +0200
+Message-ID: <20260514165509.527721-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1194; i=thorsten.blum@linux.dev; h=from:subject; bh=v7o5JznVlPNo7AD+88VwjdqH7OaDNTvDjI3KRzcUXw0=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFms//Ke3XPp1V5QG+v/tPrUyZJu6y/ed/v7X4rZzPY3f y+6yZmjo5SFQYyLQVZMkeXBrB8zfEtrKjeZROyEmcPKBDKEgYtTACbS5sjwT8HTfOFK9gPTr3/f rlr23DHw4bufvxLeLD73b1mHuKOdrjwjw5XdLU4LPkodMLrcd2bL/8XTPtRGb/30p4Xnm/m657e /iTADAA==
+X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-Migadu-Flow: FLOW_OUT
 
-Change the krb5 crypto library to provide facilities to precheck the length
-of the message about to be decrypted or verified.
+Use the simpler min() macro since the values are unsigned and
+compatible.
 
-Fix AF_RXRPC to make use of this to validate DATA packets secured with
-RxGK.
-
-Fixes: 9d1d2b59341f ("rxrpc: rxgk: Implement the yfs-rxgk security class (GSSAPI)")
-Closes: https://sashiko.dev/#/patchset/20260511160753.607296-1-dhowells%40redhat.com
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: Jeffrey Altman <jaltman@auristor.com>
-cc: Herbert Xu <herbert@gondor.apana.org.au>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: Simon Horman <horms@kernel.org>
-cc: Chuck Lever <chuck.lever@oracle.com>
-cc: netdev@vger.kernel.org
-cc: linux-afs@lists.infradead.org
-cc: linux-nfs@vger.kernel.org
-cc: linux-crypto@vger.kernel.org
-cc: stable@vger.kernel.org
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 ---
- Documentation/crypto/krb5.rst | 17 ++++++++---
- crypto/krb5/krb5_api.c        | 54 +++++++++++++++++++++++++++++++----
- include/crypto/krb5.h         |  9 ++++--
- include/trace/events/rxrpc.h  |  1 +
- net/rxrpc/rxgk.c              | 15 ++++++++--
- 5 files changed, 81 insertions(+), 15 deletions(-)
+ arch/riscv/crypto/aes-riscv64-glue.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/crypto/krb5.rst b/Documentation/crypto/krb5.rst
-index beffa0133446..f62e07ac6811 100644
---- a/Documentation/crypto/krb5.rst
-+++ b/Documentation/crypto/krb5.rst
-@@ -158,13 +158,22 @@ returned.
- When a message has been received, the location and size of the data with the
- message can be determined by calling::
+diff --git a/arch/riscv/crypto/aes-riscv64-glue.c b/arch/riscv/crypto/aes-riscv64-glue.c
+index 8bbf7f348c23..bbd920c9e29d 100644
+--- a/arch/riscv/crypto/aes-riscv64-glue.c
++++ b/arch/riscv/crypto/aes-riscv64-glue.c
+@@ -19,6 +19,7 @@
+ #include <crypto/scatterwalk.h>
+ #include <crypto/xts.h>
+ #include <linux/linkage.h>
++#include <linux/minmax.h>
+ #include <linux/module.h>
  
--	void crypto_krb5_where_is_the_data(const struct krb5_enctype *krb5,
--					   enum krb5_crypto_mode mode,
--					   size_t *_offset, size_t *_len);
-+	int crypto_krb5_where_is_the_data(const struct krb5_enctype *krb5,
-+					  enum krb5_crypto_mode mode,
-+					  size_t *_offset, size_t *_len);
- 
- The caller provides the offset and length of the message to the function, which
- then alters those values to indicate the region containing the data (plus any
--padding).  It is up to the caller to determine how much padding there is.
-+padding).  It is up to the caller to determine how much padding there is.  The
-+function returns an error if the length is too small or if the mode is
-+unsupported.  An additional function::
-+
-+	int crypto_krb5_check_data_len(const struct krb5_enctype *krb5,
-+				       enum krb5_crypto_mode mode,
-+				       size_t len, size_t min_content);
-+
-+is provided to just do a basic check that the decrypted/verified message would
-+have a sufficient minimum payload.
- 
- Preparation Functions
- ---------------------
-diff --git a/crypto/krb5/krb5_api.c b/crypto/krb5/krb5_api.c
-index 23026d4206c8..c7ea40f900a7 100644
---- a/crypto/krb5/krb5_api.c
-+++ b/crypto/krb5/krb5_api.c
-@@ -134,27 +134,69 @@ EXPORT_SYMBOL(crypto_krb5_how_much_data);
-  * Find the offset and size of the data in a secure message so that this
-  * information can be used in the metadata buffer which will get added to the
-  * digest by crypto_krb5_verify_mic().
-+ *
-+ * Return: 0 if successful, -EBADMSG if the message is too short or -EINVAL if
-+ * the mode is unsupported.
-  */
--void crypto_krb5_where_is_the_data(const struct krb5_enctype *krb5,
--				   enum krb5_crypto_mode mode,
--				   size_t *_offset, size_t *_len)
-+int crypto_krb5_where_is_the_data(const struct krb5_enctype *krb5,
-+				  enum krb5_crypto_mode mode,
-+				  size_t *_offset, size_t *_len)
- {
- 	switch (mode) {
- 	case KRB5_CHECKSUM_MODE:
-+		if (*_len < krb5->cksum_len)
-+			return -EBADMSG;
- 		*_offset += krb5->cksum_len;
- 		*_len -= krb5->cksum_len;
--		return;
-+		return 0;
- 	case KRB5_ENCRYPT_MODE:
-+		if (*_len < krb5->conf_len + krb5->cksum_len)
-+			return -EBADMSG;
- 		*_offset += krb5->conf_len;
- 		*_len -= krb5->conf_len + krb5->cksum_len;
--		return;
-+		return 0;
- 	default:
- 		WARN_ON_ONCE(1);
--		return;
-+		return -EINVAL;
- 	}
- }
- EXPORT_SYMBOL(crypto_krb5_where_is_the_data);
- 
-+/**
-+ * crypto_krb5_check_data_len - Check a message is big enough
-+ * @krb5: The encoding to use.
-+ * @mode: Mode of operation.
-+ * @len: The length of the secure blob.
-+ * @min_content: Minimum length of the content inside the blob.
-+ *
-+ * Check that a message is large enough to hold whatever bits the encryption
-+ * type wants to glue on (nonce, checksum) plus a minimum amount of content.
-+ *
-+ * Return: 0 if successful, -EBADMSG if the message is too short or -EINVAL if
-+ * the mode is unsupported.
-+ */
-+int crypto_krb5_check_data_len(const struct krb5_enctype *krb5,
-+			       enum krb5_crypto_mode mode,
-+			       size_t len, size_t min_content)
-+{
-+	switch (mode) {
-+	case KRB5_CHECKSUM_MODE:
-+		if (len < krb5->cksum_len ||
-+		    len - krb5->cksum_len < min_content)
-+			return -EBADMSG;
-+		return 0;
-+	case KRB5_ENCRYPT_MODE:
-+		if (len < krb5->conf_len + krb5->cksum_len ||
-+		    len - (krb5->conf_len + krb5->cksum_len) < min_content)
-+			return -EBADMSG;
-+		return 0;
-+	default:
-+		WARN_ON_ONCE(1);
-+		return -EINVAL;
-+	}
-+}
-+EXPORT_SYMBOL(crypto_krb5_check_data_len);
-+
- /*
-  * Prepare the encryption with derived key data.
-  */
-diff --git a/include/crypto/krb5.h b/include/crypto/krb5.h
-index 71dd38f59be1..aac3ecf88467 100644
---- a/include/crypto/krb5.h
-+++ b/include/crypto/krb5.h
-@@ -121,9 +121,12 @@ size_t crypto_krb5_how_much_buffer(const struct krb5_enctype *krb5,
- size_t crypto_krb5_how_much_data(const struct krb5_enctype *krb5,
- 				 enum krb5_crypto_mode mode,
- 				 size_t *_buffer_size, size_t *_offset);
--void crypto_krb5_where_is_the_data(const struct krb5_enctype *krb5,
--				   enum krb5_crypto_mode mode,
--				   size_t *_offset, size_t *_len);
-+int crypto_krb5_where_is_the_data(const struct krb5_enctype *krb5,
-+				  enum krb5_crypto_mode mode,
-+				  size_t *_offset, size_t *_len);
-+int crypto_krb5_check_data_len(const struct krb5_enctype *krb5,
-+			       enum krb5_crypto_mode mode,
-+			       size_t len, size_t min_content);
- struct crypto_aead *crypto_krb5_prepare_encryption(const struct krb5_enctype *krb5,
- 						   const struct krb5_buffer *TK,
- 						   u32 usage, gfp_t gfp);
-diff --git a/include/trace/events/rxrpc.h b/include/trace/events/rxrpc.h
-index 573f2df3a2c9..704a10de6670 100644
---- a/include/trace/events/rxrpc.h
-+++ b/include/trace/events/rxrpc.h
-@@ -71,6 +71,7 @@
- 	EM(rxkad_abort_resp_unknown_tkt,	"rxkad-resp-unknown-tkt") \
- 	EM(rxkad_abort_resp_version,		"rxkad-resp-version")	\
- 	/* RxGK security errors */					\
-+	EM(rxgk_abort_1_short_header,		"rxgk1-short-hdr")	\
- 	EM(rxgk_abort_1_verify_mic_eproto,	"rxgk1-vfy-mic-eproto")	\
- 	EM(rxgk_abort_2_decrypt_eproto,		"rxgk2-dec-eproto")	\
- 	EM(rxgk_abort_2_short_data,		"rxgk2-short-data")	\
-diff --git a/net/rxrpc/rxgk.c b/net/rxrpc/rxgk.c
-index 0d5e654da918..26e723052a37 100644
---- a/net/rxrpc/rxgk.c
-+++ b/net/rxrpc/rxgk.c
-@@ -480,8 +480,12 @@ static int rxgk_verify_packet_integrity(struct rxrpc_call *call,
- 
- 	_enter("");
- 
--	crypto_krb5_where_is_the_data(gk->krb5, KRB5_CHECKSUM_MODE,
--				      &data_offset, &data_len);
-+	if (crypto_krb5_where_is_the_data(gk->krb5, KRB5_CHECKSUM_MODE,
-+					  &data_offset, &data_len) < 0) {
-+		ret = rxrpc_abort_eproto(call, skb, RXGK_PACKETSHORT,
-+					 rxgk_abort_1_short_header);
-+		goto put_gk;
-+	}
- 
- 	hdr = kzalloc_obj(*hdr, GFP_NOFS);
- 	if (!hdr)
-@@ -529,6 +533,13 @@ static int rxgk_verify_packet_encrypted(struct rxrpc_call *call,
- 
- 	_enter("");
- 
-+	if (crypto_krb5_check_data_len(gk->krb5, KRB5_ENCRYPT_MODE,
-+				       len, sizeof(hdr)) < 0) {
-+		ret = rxrpc_abort_eproto(call, skb, RXGK_PACKETSHORT,
-+					 rxgk_abort_2_short_header);
-+		goto error;
-+	}
-+
- 	ret = rxgk_decrypt_skb(gk->krb5, gk->rx_enc, skb, &offset, &len, &ac);
- 	if (ret < 0) {
- 		if (ret != -ENOMEM)
-
+ asmlinkage void aes_ecb_encrypt_zvkned(const struct crypto_aes_ctx *key,
+@@ -266,8 +267,7 @@ static int riscv64_aes_ctr_crypt(struct skcipher_request *req)
+ 			 * operation into two at the point where the overflow
+ 			 * will occur.  After the first part, add the carry bit.
+ 			 */
+-			p1_nbytes = min_t(unsigned int, nbytes,
+-					  (nblocks - ctr32) * AES_BLOCK_SIZE);
++			p1_nbytes = min(nbytes, (nblocks - ctr32) * AES_BLOCK_SIZE);
+ 			aes_ctr32_crypt_zvkned_zvkb(ctx, walk.src.virt.addr,
+ 						    walk.dst.virt.addr,
+ 						    p1_nbytes, req->iv);
