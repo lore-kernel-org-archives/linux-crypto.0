@@ -1,86 +1,68 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailout1.hostsharing.net (mailout1.hostsharing.net [83.223.95.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F9C2989B5;
-	Thu, 14 May 2026 03:54:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 606B42E173D;
+	Thu, 14 May 2026 06:55:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778730852; cv=none; b=PKwmug7fSuCI5yx9qIRNNtlgQOnidRUZM26lIO7VTZm0Buhr2LqeUwS/zVOM0A7Z/21dCa7TV7573LpVKY54gpMihkl4UpUZvvajPDuZH83eBXmR5aZqyB03n7UfW5RpBBbybA8vSWu56K8ayRaRDCNK7DNJEv91Ky8wwMW1+dc=
+	t=1778741756; cv=none; b=MkiocI5f2TtE7AGc5BUB54V9sRxiHakPETa8jSWYgMkzhYlnUc//0GZ88KgJ7uIna9PrlxYZgZK6dxf2gJS2V0GLCO+8dbq0iFoB5ChptX9w0TIAiQaAQSw9zh4JugfLF2d2j1qo2auSNkeglmF1cT6ewgNtgjr3e3ULsu7piWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778730852; c=relaxed/simple;
-	bh=8PtDRdXMVSbjnST+Cs0Dn1Z2/E315hAZtklcn942KsE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H/1QYSGmKfPlgdhenqZf7kBhRnBNqAzQlF1gtN5dv0XBNGuvHnrLSjn4Xba6lSx18nVJQfyUeh4SCbc5XM0Hl+G8lODLwJH6pHtbdKHSFE/5KP+/sxBr8loJ6MJH7wot5LEFVIZMzRYPozqbYLsHX4jN3L2XzdTsHcMFft0k0wA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gFobv/Al; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gFobv/Al"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 710ABC2BCB7;
-	Thu, 14 May 2026 03:54:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778730851;
-	bh=8PtDRdXMVSbjnST+Cs0Dn1Z2/E315hAZtklcn942KsE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gFobv/AlwQ+0/2J67Xr5lnaYxSS5tAqfjty33eet0pXkhE4YYHYHjCFpo01D6bYJ0
-	 sO0j1vr2yoIuVWJHltZr9e2ZGMa975F9kLQria7yQSJVoa/CD/x40T8p0jj42aBNUG
-	 L6XSeG8Lyu9vMCwrwDviN5fWORWofdsDLOMJQJ0YZngy9KcNhAwrdIhMmSE3ubRxbq
-	 mwRKUj41Y7F4jiLmMdwrdd0Yhfbd4P5jcLs4UB4MtmEEnMSTkYuyopJpUwJKHQVEUK
-	 orSGmH1V3xQ3hChhF+yywzPs/zkMuYVdsxXfVkE/BlSi4CShiNQMvwhDKtBs+rKVuZ
-	 1s9dMSYRich6Q==
-Date: Wed, 13 May 2026 20:52:48 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Baokun Li <libaokun@linux.alibaba.com>
-Cc: linux-ext4@vger.kernel.org, linux-crypto@vger.kernel.org,
-	ardb@kernel.org, tytso@mit.edu, adilger.kernel@dilger.ca,
-	jack@suse.cz, yi.zhang@huawei.com, ojaswin@linux.ibm.com,
-	ritesh.list@gmail.com
-Subject: Re: [PATCH RFC 01/17] lib/crc: add crc32c_flip_range() for
- incremental CRC update
-Message-ID: <20260514035248.GA2816@sol>
-References: <20260508121539.4174601-1-libaokun@linux.alibaba.com>
- <20260508121539.4174601-2-libaokun@linux.alibaba.com>
+	s=arc-20240116; t=1778741756; c=relaxed/simple;
+	bh=WRKGGG1IukHpGp2EPP6UzQrMrG/RZ6y7mA8nQ5JMWuc=;
+	h=Message-Id:From:Date:Subject:To:Cc; b=lBcWeZwEktLeL98msrnJBMHfOhZZwx3LYOb85Af8e/BYo20IL2LkGDMhLVvq2Ifu4JMcE7IBN1u/pjz250Pwo+jMVImemPnKVR3qNxdrp0WSb0QYtK6onZLHMDBJDhdVl2IGe08pLbkcieqni6sdfjyjdUujTJ9445YEosrCYX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=83.223.95.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384
+	 client-signature ECDSA (secp384r1) client-digest SHA384)
+	(Client CN "*.hostsharing.net", Issuer "GlobalSign GCC R6 AlphaSSL CA 2025" (verified OK))
+	by mailout1.hostsharing.net (Postfix) with ESMTPS id 7A234366;
+	Thu, 14 May 2026 08:55:50 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 634D7601804E; Thu, 14 May 2026 08:55:50 +0200 (CEST)
+Message-Id: <782bc59d5939aa69b58cad42f71946f1c0a6dccb.1778741457.git.lukas@wunner.de>
+From: Lukas Wunner <lukas@wunner.de>
+Date: Thu, 14 May 2026 08:55:58 +0200
+Subject: [PATCH] X.509: Fix validation of ASN.1 certificate header
+To: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, David Howells <dhowells@redhat.com>, Ignat Korchagin <ignat@linux.win>
+Cc: keyrings@vger.kernel.org, linux-crypto@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260508121539.4174601-2-libaokun@linux.alibaba.com>
 
-On Fri, May 08, 2026 at 08:15:23PM +0800, Baokun Li wrote:
-> When a contiguous range of bits in a buffer is flipped, the CRC32c
-> checksum can be updated incrementally without re-scanning the entire
-> buffer, by exploiting the linearity of CRCs over GF(2):
-> 
->   New_CRC = Old_CRC ^ CRC(flip_mask << trailing_bits)
-> 
-> Introduce crc32c_flip_range() which computes this delta using
-> precomputed GF(2) shift matrices and nibble-indexed lookup tables.
-> The implementation decomposes nbits and trailing_bits into
-> power-of-2 components and combines them via the CRC concatenation
-> property:
-> 
->   CRC(A || B) = shift(CRC(A), len(B)) ^ CRC(B)
-> 
-> This gives O(log N) complexity with only ~9.8KB of static tables
-> (fits in L1 cache).  The current maximum supported buffer size is
-> 64KB (INCR_MAX_ORDER = 19, i.e. 2^19 bits = 524288 bits = 64KB).
+x509_load_certificate_list() seeks to enforce that a certificate starts
+with 0x30 0x82 (ASN.1 SEQUENCE tag followed by a length of more than 256
+and less than 65535 bytes).
 
-It will be a little while before I can do a full review of this, but
-just a high-level comment: "only ~9.8KB of static tables (fits in L1
-cache)" isn't ideal.  Large tables tend to microbenchmark well, then
-have worse real-world performance due to lots of other things contending
-for the L1 cache.
+But it only enforces that *either* of those two byte values are present,
+instead of checking for the *conjunction* of the two values.  Fix it.
 
-Another consideration is that basically every Linux kernel has
-CONFIG_CRC32 enabled, regardless of whether they would actually find
-this new functionality useful.
+Fixes: 631cc66eb9ea ("MODSIGN: Provide module signing public keys to the kernel")
+Reported-by: Sashiko <sashiko-bot@kernel.org>
+Closes: https://lore.kernel.org/r/20260508033917.B5873C2BCB0@smtp.kernel.org/
+Signed-off-by: Lukas Wunner <lukas@wunner.de>
+Cc: stable@vger.kernel.org # v3.7+
+---
+ crypto/asymmetric_keys/x509_loader.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I'm not necessarily saying this should be its own option, especially if
-it's useful for ext4 even in the non-LBS case.  But I do think it would
-be nice if it could be a bit smaller and more memory-optimized.
+diff --git a/crypto/asymmetric_keys/x509_loader.c b/crypto/asymmetric_keys/x509_loader.c
+index a417413..0d516c7 100644
+--- a/crypto/asymmetric_keys/x509_loader.c
++++ b/crypto/asymmetric_keys/x509_loader.c
+@@ -20,7 +20,7 @@ int x509_load_certificate_list(const u8 cert_list[],
+ 		 */
+ 		if (end - p < 4)
+ 			goto dodgy_cert;
+-		if (p[0] != 0x30 &&
++		if (p[0] != 0x30 ||
+ 		    p[1] != 0x82)
+ 			goto dodgy_cert;
+ 		plen = (p[2] << 8) | p[3];
+-- 
+2.51.0
 
-Anyway, I'll look into the algorithm more when I have time.
-
-- Eric
