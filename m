@@ -1,110 +1,155 @@
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFF1733F58A;
-	Thu, 14 May 2026 20:11:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9C49235BE2
+	for <linux-crypto@vger.kernel.org>; Thu, 14 May 2026 20:30:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778789472; cv=none; b=peha03Flm9iib//ALo9YG6nnppW6lQWTSEsvmdoS/aLkYJAxeOzZsl2mGy9nvVZJPzJLlqJwaE76H1ga+Q1/NbmkphQxOP/SUbMQ/GyeSw6pjRdlyXSPoq+ZlnlAaxiYxIgw/JVviYKfhDSz2jy6zZrCPGWOvmUxOsCsD8TduZg=
+	t=1778790627; cv=none; b=PzER3KOn+s16GB9TJvXrlBP/HFXUHq2NYWJHNHzCvSHSDOYxZZ7XqHD4wmvKxI0QP2Ose/6V7ZVl6l/339RnR1CM+HCa7LozhevoH2Ge2RrTy1asjyEDTch3e04XTH34PcIt0zRvFJNbCr993EwMF2xKvI+W0RrI/RXLh+Qw+9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778789472; c=relaxed/simple;
-	bh=JJUyJ3nN1jAla23wfkD6/9LaCidK8nPRv54si1Hc+Ko=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=qmAR+NwuMsW8G4MzjnqvcjtVp+xLbQhgQdCBpcJ6Ki38velK+tBouYP2yb3EtvdJ9dWiFDz2B9LMCuZtvHjG5sUlpagJSXOe94gUpKK1Y4nrx5y1uN0APWrxtrqnKRUU/5c6u2c1RchrpaV25Nz/F4QCbhE/WFJu+3idYE0Shnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=TMJRrv8q; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+	s=arc-20240116; t=1778790627; c=relaxed/simple;
+	bh=hBUEdU4gtKk6cuED59MJsN9YQuh0ekZNAnrR3Vh+OK4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Q2TjV1uGroOPsnmAIT2NXye7Mabh4wTiOsCtul0Tw+6VINK0GNPAvge+Fj0oDjouYLg9CAa5qcumey/E2tpYcCuE8z2hIIFkPCC3YySKiTvTc1hBEBK8bK9+9w+of6n4uGOGtj2zv+nnKq4SX+Dsn7WIPdJNSY7lxEVpqjSsFeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=VOSGp+Sb; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=QW8b9F5V; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="TMJRrv8q"
-Received: from ehlo.thunderbird.net (c-76-133-66-138.hsd1.ca.comcast.net [76.133.66.138])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 64EJvxqM1443783
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Thu, 14 May 2026 12:58:00 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 64EJvxqM1443783
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2026042601; t=1778788682;
-	bh=xeBHge+llXOwbb4JcAn9Da3zKsJCWrqg8YV6SgfLoXo=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=TMJRrv8qsGR2DCztL/jIBPGQO28wsQqHTK/NveRi2zk0+LzcLKFnn8Iviy502ok9i
-	 5OPdaLnKd7D98poTZNiOmU0cpqecXLRAlMLlzcNAcqmYAOBC161NH9p9vqagHz1Xzp
-	 BPHAozGQd8pC11kLXAzXk4hpCEC4Qm5nr3r8fLBpDaXFU6ItVDJJC6CoKBpExDsJpx
-	 SBUnV+538SZRyCwQ4LxXbvqDNKSQfPPT+pqoR4zWD30U5xD3yvUXZOrx9md0+xwCLQ
-	 k9df5Yhe3oajwADOBTxx2BUJt+DFl3mJhhVx9sGvHpXM1M36RT8sI9kIAAkr7iTx6O
-	 TigG32CPWMUsQ==
-Date: Thu, 14 May 2026 12:57:53 -0700
-From: "H. Peter Anvin" <hpa@zytor.com>
-To: kreijack@inwind.it, Goffredo Baroncelli <kreijack@libero.it>,
-        Christoph Hellwig <hch@lst.de>, David Sterba <dsterba@suse.cz>
-CC: Andrew Morton <akpm@linux-foundation.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
-        Madhavan Srinivasan <maddy@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-        Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Thomas Gleixner <tglx@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Dan Williams <dan.j.williams@intel.com>, Chris Mason <clm@fb.com>,
-        David Sterba <dsterba@suse.com>, Arnd Bergmann <arnd@arndb.de>,
-        Song Liu <song@kernel.org>,
-        Yu Kuai <yukuai@alb-78bjiv52429oh8qptp.cn-shenzhen.alb.aliyuncs.com>,
-        Li Nan <linan122@huawei.com>, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
-        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-        linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-raid@vger.kernel.org
-Subject: Re: [PATCH 01/19] btrfs: require at least 4 devices for RAID 6
-User-Agent: K-9 Mail for Android
-In-Reply-To: <0a8d1ff4-f5a2-49e9-aa45-d25dbe4ded40@libero.it>
-References: <20260512052230.2947683-1-hch@lst.de> <20260512052230.2947683-2-hch@lst.de> <20260512114231.GG2558453@suse.cz> <20260513054742.GA1018@lst.de> <0a8d1ff4-f5a2-49e9-aa45-d25dbe4ded40@libero.it>
-Message-ID: <0507CCEF-0548-442F-8703-1D006B5E068B@zytor.com>
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="VOSGp+Sb";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="QW8b9F5V"
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64EIpFXp3197593
+	for <linux-crypto@vger.kernel.org>; Thu, 14 May 2026 20:30:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=Vy4HqHBCl3ieq4x5BJeO/r
+	Gc0+4lnXTUCuMn6y7ah8M=; b=VOSGp+SbOMvsBs+w9+tYr4c5v0kN3YZkG/J1nx
+	LSxwWVNuoRP9trDM2Rdq+Q8WfyogGYHnAYsvFmr1lQTsKMgSTMR7nznXj0L6wije
+	Giau2uoI7ZL9Oerd+FJah4y1Qr6VMv3f6lu5luf1Bc8qnnj7Tf52To4kLvj/B5Ls
+	mis9M8J9Tbx+X7SUQdg3YdGZB7amAfGk7UPDnEXLJMP+vb0YL91b23Q9pQW8vskc
+	SmLCuYSkijL1GgaWk+c+4NpQRJ7rSh+6sEB4JhAGKZDu+LsE4LAsH8jm3irfliMx
+	Id8K4W21xkFknukfSpL4Z68JJJzm8q5bhYvkh+uPqpy+TuRg==
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com [209.85.210.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4e5m1q8a8q-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Thu, 14 May 2026 20:30:23 +0000 (GMT)
+Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-8353fbc7ad5so4961305b3a.3
+        for <linux-crypto@vger.kernel.org>; Thu, 14 May 2026 13:30:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1778790623; x=1779395423; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vy4HqHBCl3ieq4x5BJeO/rGc0+4lnXTUCuMn6y7ah8M=;
+        b=QW8b9F5V7Xdwe23X3rFoDXtLzJPqCGz8NQ8mivsdZiepK/NAdj2YkuVmxncUNyYFOv
+         ej2rvvetbUprh90vzPErlDi/GRxnO6+I5x7iQsYDrzFYIO8ffEYuTmhuTcRJGRNFsc8C
+         yYKWsGvnbvyyT19WyzflsjNKOkWb3hmxumP7fsQADMi2iKELih4XNPROPQHL8FqVDb+S
+         RdxiphLOVHNC1/plu6nZCK9yB7tB8nrKatCVR27KW/dnlcFKxq5pFhnNf7XZrLMDTkfH
+         F6XXLpd2SlyjjgD1Gm3G8+3fWjYoMt0nWgcco4UsaKKqBQuaFLHEsgQjLrsx1hcS1Afp
+         TJww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778790623; x=1779395423;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Vy4HqHBCl3ieq4x5BJeO/rGc0+4lnXTUCuMn6y7ah8M=;
+        b=FyaVDhYkkcwVOV6KnB6ReU3Q0gn1h0uCtLmkzr38SI3NEbVakYh7LTfiFVR3M3Cv8S
+         zCkd7pCN4cH3RM4wtEbof8zNAYx1Co1oH7/s5OcpmPxNcWLfVin74ZfxHX8dprsmULYh
+         949HpG8jE/TdmTm1AILvp4/qePhHQupwniwCSRi1LfgM9aJDNx1c7PPX61MEgRVMNHvK
+         KBs+a5C12vlx20o6yF+5j7Mw98lEGI+guC/9AIdZPPmrb/t4bZZB057swyxfnuV9fHVp
+         FCk/dovadGisJrTKJLictrJ/7GZHwpBHBRDiMkrZk2ya178qo5SB9J0Lxjv38PhZwzDz
+         g2fw==
+X-Forwarded-Encrypted: i=1; AFNElJ+ExBaVs8K41a87iLTFNXtCiOobp0/rcu5OyLSicOafiFrSKm9DaSNwJBJLdwnqZDR5E7cHDmCjV49J1c0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxhcUs77xRztrN4Ij0uWNaGFECEOy9gpqcMG0wbrBEmJQ+CszB
+	ClOpOpt0zZaSqIa1ZoHdmqMF10zP64hpqHYZRrRxlEqodH5TvBqu5pr1Kzp1SKUSgNWPQXpcM/L
+	yeF4taoqeBn8p3fjbDqH36qo2sa646jQ9RHUqPpqEYpjNB4FKYYo+ou2S9oNXTj3mFY8=
+X-Gm-Gg: Acq92OGHX+ZiAhMbOf0y3BXhJqi0TytMoo0xDodAHaYa1N8AAPXBiWMRTPEkGUcHYk3
+	WaY4hWw17gXOtB/kRmRATX84UbAX1TUWALyPJWMzns31hs2ACchdMT/JpcY+A3HXRdo0h5kdX2m
+	w6Xx6uVcutA7kOpdmqSPmrM9n5XShstTDw6V6GUOK0avTYPbP8bbfHnROdbBeoa4Yz4WUkYJskg
+	5auHdWrUGA1P/GuSHib2gYcckjZGiEd3XED/6KWOdqnlvn2PWv6vei963HgTeVfD2spXd9bo0FD
+	psoTQfA4s2kjdgEFIR/ZPIAi25rlON8HNxd8hH36plh2kTCPV/UwiLScAB18TaQgRXHlBqFXGTV
+	BSca247ZMxjNyyRDhOg45tvv8VSg0arXVB+G4Ed7WpMpNOA4rItum9dY=
+X-Received: by 2002:a05:6a00:a214:b0:82f:7ba2:e120 with SMTP id d2e1a72fcca58-83f33cf0be8mr1091874b3a.28.1778790622715;
+        Thu, 14 May 2026 13:30:22 -0700 (PDT)
+X-Received: by 2002:a05:6a00:a214:b0:82f:7ba2:e120 with SMTP id d2e1a72fcca58-83f33cf0be8mr1091839b3a.28.1778790622172;
+        Thu, 14 May 2026 13:30:22 -0700 (PDT)
+Received: from hu-kuldsing-hyd.qualcomm.com ([202.46.23.25])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-83f19664a59sm3666952b3a.1.2026.05.14.13.30.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 May 2026 13:30:21 -0700 (PDT)
+From: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
+Subject: [PATCH 0/2] Add support for ice ufs on shikra
+Date: Fri, 15 May 2026 02:00:07 +0530
+Message-Id: <20260515-shikra_ice_ufs-v1-0-b1b6ced70559@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAM8wBmoC/yXMTQ5AMBBA4avIrDWp+gmuIiJVgyFBOioScXfF8
+ lu8dwGjJWQogwssHsS0Lh5RGIAZ9TKgoM4blFSZTKNY8Eiz1Q0ZbFzPIi06qROFcZIr8NFmsaf
+ zG1b1b3bthGZ/L3DfDy+FWL1yAAAA
+X-Change-ID: 20260513-shikra_ice_ufs-59d0a42e3482
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
+X-Mailer: b4 0.15.1
+X-Proofpoint-GUID: NwkQ0AmjPaM-oyZ7_HvnUWVXNOm2icRx
+X-Authority-Analysis: v=2.4 cv=GulyPE1C c=1 sm=1 tr=0 ts=6a0630df cx=c_pps
+ a=mDZGXZTwRPZaeRUbqKGCBw==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+ a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=rJkE3RaqiGZ5pbrm-msn:22
+ a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8 a=OYeRMZJyD6lClM-JVRUA:9 a=QEXdDO2ut3YA:10
+ a=ZXulRonScM0A:10 a=zZCYzV9kfG8A:10 a=zc0IvFSfCIW2DFIPzwfm:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTE0MDIwMiBTYWx0ZWRfX8egc78NaEmy+
+ wA9gkivq3QDlBW+Wio5hIWCxilXOLrcJFzOaSKxOthqsvF1rIOxzsH9n0v6zl7I7BODyzEpH45p
+ mZLZwx2g+xT8O/J76KNStwv+BXzZ2q3MMLqvO/9M9j4b/JyV6I4JH5KGLrPGzNbsioJKLOCBqiR
+ dMCHAw9KSLCUzjjUaMXZdr+p2FHKBGoo2psNwFqvASUEZYuoq5DWV+Y2z6iJ1vHoE8lzsov/CA6
+ eah+xZpIfTaOwxHe/p12CR5KkZtr16W0lEYHe26jdn3LkpYf6Zg9dQN8cnxH2BY5A2DAzjTRJyX
+ K/EHKc0d8pZpXKtxo+W07cVSGX2mSDSjXugifRgduS/wDxfFiMU5//ca6iL4HHPjKRa4sDIAk3y
+ 36CXE8Ih/vS7yyrFWijz4T7XHtoIYdA5r69NU9pd+KheGsX/RmkVB8/AzSxYaiKheFazAwPs6p2
+ qHG5ClbMMJ3jmS2ejfg==
+X-Proofpoint-ORIG-GUID: NwkQ0AmjPaM-oyZ7_HvnUWVXNOm2icRx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-14_05,2026-05-13_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 malwarescore=0 clxscore=1015 impostorscore=0 bulkscore=0
+ lowpriorityscore=0 phishscore=0 suspectscore=0 priorityscore=1501 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2605130000 definitions=main-2605140202
 
-On May 14, 2026 12:51:59 PM PDT, Goffredo Baroncelli <kreijack@libero=2Eit>=
- wrote:
->On 13/05/2026 07=2E47, Christoph Hellwig wrote:
->> On Tue, May 12, 2026 at 01:42:31PM +0200, David Sterba wrote:
->
->>=20
->>> The degenerate modes of
->>> raid0, 5, or 6 are explicit as a possible middle step when converting
->>> profiles=2E  We can use a fallback implementation for this case if the
->>> accelerated implementations cannot do it=2E
->>=20
->> This is not about a degenerated mode=2E  For a degenerated RAID 6, pari=
-ty
->> generation uses the RAID 5 XOR routines as the second parity will be
->> missing=2E  This is about generating two parities for a single data dis=
-k,
->> which must be explicitly selected=2E
->>=20
->
->I think that the David concern is : "what happens for an already
->existing btrfs raid6 3 disks filesystem when the user upgrade the kernel =
-?"
->(I am thinking when a new BG needs to be allocated)=2E=2E=2E
->
->BR
->GB
->
+This patchseries attempt to enable ice ufs on shikra similar to other
+platforms.
 
-That's what I'm saying =E2=80=93 it should invoke the RAID-1 code under th=
-e cover (as with 3 disks, D =3D P =3D Q=2E)
+Validations: 
+- Driver probe on bootup.
+
+Dependency on:
+- https://lore.kernel.org/all/20260512-shikra-dt-v1-0-716438330dd0@oss.qualcomm.com/
+- https://lore.kernel.org/linux-arm-msm/20260416-qcom_ice_power_and_clk_vote-v5-0-5ccf5d7e2846@oss.qualcomm.com/
+
+Signed-off-by: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
+---
+Kuldeep Singh (2):
+      dt-bindings: crypto: qcom,inline-crypto-engine: Document Shikra ICE
+      arm64: dts: qcom: shikra: Enable ice support
+
+ .../bindings/crypto/qcom,inline-crypto-engine.yaml           |  1 +
+ arch/arm64/boot/dts/qcom/shikra.dtsi                         | 12 ++++++++++++
+ 2 files changed, 13 insertions(+)
+---
+base-commit: 7e247866bbe72314f68036d5171c1af354ccdbe8
+change-id: 20260513-shikra_ice_ufs-59d0a42e3482
+
+Best regards,
+--  
+Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
+
