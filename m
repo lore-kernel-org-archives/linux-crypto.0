@@ -1,63 +1,63 @@
-Received: from mail-dy1-f175.google.com (mail-dy1-f175.google.com [74.125.82.175])
+Received: from mail-dy1-f174.google.com (mail-dy1-f174.google.com [74.125.82.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A686A4CA292
-	for <linux-crypto@vger.kernel.org>; Fri, 15 May 2026 21:15:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7771A3F5BC7
+	for <linux-crypto@vger.kernel.org>; Fri, 15 May 2026 21:15:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778879720; cv=none; b=ljry9Erqst0c6OFfiV5vAqYbiNlU7ZLSVZct28Bb2+viZT8VQOFcZf65UZ/BFNQGduyjVQvFi5J8PGMPCoQrvNDHuI76emf//qwSBCxqAkFCmP1GBfuysbDei3x+Dpo/oifLDoxtMZe/LjTQWpEl8Dd4UfI9P6ISAR+aDIPhWek=
+	t=1778879722; cv=none; b=gKM0mMSTJgiTMg12xSzSfXM/vMC+xOv0PzvjMsxyKxp+yt5vzlhptLwYyfeWpyfwvjequM/LhnwuiFCOk85hC7SHrSC49JuCubxt5E9BIQQ4kdOYyh0O1ENv6g23EiQuL+3IZe9yphXO5ZZj8z5ghnahElmkQNAn8m9sxOMarAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778879720; c=relaxed/simple;
-	bh=Zcwz++VNrXh9y6soBYCC7hxdmV5RO3C0KhJ6H3w36Z4=;
+	s=arc-20240116; t=1778879722; c=relaxed/simple;
+	bh=EYoiytDPHAwrp//ZCSS8x2mbpMMq39lmGS1yWEcEk0Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IwhSXwa6UekuEqDk09j9LL/7TnSH4IMedKgx2olbsQ6HNzhxRxGo9zkidAK9b/HgrPD4G0gb8v1S5wGKn548kM4UxJBvksJ2ZOaSnQFOF0Wi2jlZmFnvzC5cefK1Pt5UgB19C7rKpYLAZcm67ggIsZBf6AqKPklt4cxWlXFY6k8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pS456OJH; arc=none smtp.client-ip=74.125.82.175
+	 MIME-Version; b=a4ZteSkf4XrWP+zGTS0wLWYs5vs/ZKi2RhN6PkD9WFJ5mYvCSKtCfInULxWhMRBdk5O0x5AreH5/1p7i2mnIljvO/2VDlt0rPzRR6NDbiQ4RtmsNuhidzfVobdPwrgoCGSQARfmx7RGKdrX/OUei2C7mPRsRycKlXcxBqIJD1pw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F1qUkByA; arc=none smtp.client-ip=74.125.82.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pS456OJH"
-Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-2f0d3e07e30so1352951eec.0
-        for <linux-crypto@vger.kernel.org>; Fri, 15 May 2026 14:15:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F1qUkByA"
+Received: by mail-dy1-f174.google.com with SMTP id 5a478bee46e88-2ee1054627bso1072017eec.1
+        for <linux-crypto@vger.kernel.org>; Fri, 15 May 2026 14:15:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778879718; x=1779484518; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778879721; x=1779484521; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=h8RkPwRSQGNgtwFGhMa45mhqNtBX9nLmlB3IzWi1i0E=;
-        b=pS456OJH1AEeHSLqDqw4ui/jbQksci7GOMA5UlZbGUKa3b3cKwqxQ6MWm5xwlX57PI
-         IZDJIMG8QqVi0ayPNo4/ypRXZdgRlhu+XjkAk73EqC7nB0IRpSRqGXxoy8vQd8Bgt0CQ
-         WzXiDAw6KrRaOGBb/z0v7a61im0dlEScKq/wb4E9/cTIbcx67pmRYk290CD9S+K1KRL/
-         l6Fry/b26nnViZfxl9z6fED8dgvP5m7O9o1LjTQeMg92Ky/sK7+4svsAdj3UWxQlrHwX
-         SF0UYmimTDOTR1kBR9t4IKWksrJIgXR9XanS7ZoycxoKXpmFEuhgVKLoq5LCGKnBYZTA
-         SWvw==
+        bh=bjgxy9jrMUn+tA5MZsUkk9qLfIPrTHgv6m9jj+0YWR4=;
+        b=F1qUkByArkNhkX8Vb784ExX/rl6QJS4DBW18WWjmqir3frGenB8qERsSXnGvklGLAv
+         P95lUGWZ/GjM5Y8NDhtwk+h7BAZdVVuhvyz3q5hRMQNdOwOddJhcvGUoFa/vXVClvFKe
+         wqjcw/pK5nDmkWn+eoT576g/DS1UOQF6lw1/oFI5+Mv5RZ6s3bdSJPul7HgcuiSoNehY
+         aqCyhEYdbq1d7DY9fGbSDrwyFgxPSFLNb2nXjUjBvJQ/+WY7nO+CLHiKS8na6SFKYbbN
+         kICn8lsE/ST/LYMxnVpC+KaX+OIkFBQXRIJmARETvIikWBupy+rK2Nc8yIpJ4zTTneK/
+         i97Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778879718; x=1779484518;
+        d=1e100.net; s=20251104; t=1778879721; x=1779484521;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=h8RkPwRSQGNgtwFGhMa45mhqNtBX9nLmlB3IzWi1i0E=;
-        b=TYHF2PoEhqLF69ipMpBI0Sy14PBx5cU8nw3Xzolec5ia0d2w0bsSkNQcCLGcSKwnYd
-         teijS94DYiw56V5t11Wuq0KpB9tU6eJoLxUezx5rF0iAIK42HKFUzuXUjbBDfZH0ZgRM
-         vjxEb0a7pqzyjzMvPDIa3RlVPR3r9BI1sJhxxJjwY1cPj0lMH+b+zrjJWgg1q8FflyCM
-         bkHkTHj0qCfvYFqZ2hp9ZbaTOwS5O9yQCEa8ULSu/FYm7AArjn5ajCKKmRJay2Mo+lEn
-         MPoLHof4z55gjvA1hNDZa0fO5zjp4nSQtuBZWdqqCKtFb+12El8ghLxmBaM2pqxLI6KY
-         ZojQ==
-X-Forwarded-Encrypted: i=1; AFNElJ/r1PAWY525SBUxG5eaPPhRqkPj1LA1De1igIkx804bkYrwQ25F9cH7OQE9N+wErXmEwMYsyUAo6GYHeaw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzilzVb/HvGKlPDLRWK1cRzrWIbrUHQ6Wu8ZOuTaZQgDq2OYO0c
-	x/PmMg/L/YU7p7gMfKLTLxto+oFxbpxwnot4N9mGOHFDsVDF99QuzP+W
-X-Gm-Gg: Acq92OFmIPPakK94ykf1usX+WxLfWngEMpk1w/fuevDWXATsXOJZLSxcG5iiLPOWanY
-	NHEzOEDCHQYdBAD2eH7rKBfsIKVnTJET5YbrnQ2T2hkh63oUZnqsk8RjL9C0+FePgA6+Lg7UgGS
-	jiJDqEXQf8H2esS1lAYrIfmkKLzh/2NPEE/bpYfOuaXcDRTRYNI9UV3BdxlNsdT+Uo5fYRbmbYR
-	4aSvJSicL28hvczk8cmTTGQmQ3xfaOaU6QLDZJc27NXqgCwKdxXzOkIiR9GQUgETBHu5bjOpdiG
-	pooIwCKMrkyDAMbfXGJxHsgz6CR5/UN8hczm8A7WseJaIzfmyIh0HyDWDY1kgVv52qUfh/gPnHi
-	WWM7JZek+OjdgbD2sI0zMI7sfkB1R1GvhYFvy6hF9fsJGTgbPWfKtP/P8c1Vtp7z6zksTVIMSuy
-	jKwinP3oIsP9Zp/Oe4vs5Gqx44kn/RrzY=
-X-Received: by 2002:a05:7300:ad30:b0:2e7:5737:8364 with SMTP id 5a478bee46e88-303984e17ffmr3028118eec.15.1778879717789;
-        Fri, 15 May 2026 14:15:17 -0700 (PDT)
+        bh=bjgxy9jrMUn+tA5MZsUkk9qLfIPrTHgv6m9jj+0YWR4=;
+        b=VdgV1ltO52Mr3E5mQe2Y3mJz8pRrtywfCcesHHeTLRbpmUqq4HR4lWUvxgOIpVV/0j
+         nPnhioKVQbIFJL/y/mJqBa5/m5U8LUxTDacgYlzzjYq53RykRwo5Bk9QfvR8II9jysDi
+         /Ny06ClYxrZxdQ/AXzM3B86C3EhoQFM1iVll1J5vcQhEb8TeTnnP+T9rqh2CilES0xUF
+         1T39mRbGbbILlsT4EfcY72Tf9psP17U9t7HCnBAEEXK53A56VkDNp4KdpR3ASCe93l6+
+         BY2mEJ0Itgc0/16tnj7yIRRGlSmTh2A+/2b3ZZK6XenmLbrrBxDHOi50qTJpY7VH1Oju
+         83XA==
+X-Forwarded-Encrypted: i=1; AFNElJ9yq2Um8a6JJmRn3DCDCYO3dkWMZOPgt/joDQy6j2v3WWLh77M8ofx9mqCGUFDPiP5hxy0NlhwzvaL+I/c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKz51e47K1dSrKbj716nqW853XeAS1/wAluFqb+9+gF0FFRUCx
+	zJ2l87cd0vKdi343Bys3diz7E/Hj3gyvgxY8T/JUX0gofBnfMPERAwgU
+X-Gm-Gg: Acq92OHdiWHCfACv7iwhwILLMrN808J5aAVZmM9NFo+LramUbmlSpYQG5qnM05wLSx3
+	EGrRahBZjted0P03lna8V3RvVxrgqJObzd6h+a09U5IB9oBMDxTVXVqg16JXgR8kjb2fxkuLXkk
+	JsqjKfV4Gl70zEnPjJjkM7ibQ4DdxnJ78/YBvUSgXJpj05MLHgt+sl+rpP2LdUdaKvoLVFshoAX
+	Xm2nAKA9NwtEmn+S1XGe9tt76AlBW86EpnopHWJALBaocglS0jB7wFy+3Ieh0Omo9lyxcNn7nMy
+	oaduYLTc8S9n+zCLEHiXfid38Bg3ugcCFTuaYVxPOPCTcgcmgL4gYSupsZ6XYJBNgSNpQFxOdjM
+	aL4n1FKJu7Y7jXyU5L1GvawB6l0AIkL8kSCimhVoWksIDFJDBxUeWRLBcuriD+Sy+JZ7o2t7UPq
+	8omfDG0rVYE31Ns/gmJy/e7pOBroV9eio=
+X-Received: by 2002:a05:7300:2316:b0:2f3:5d44:eeba with SMTP id 5a478bee46e88-3025fa54325mr4525827eec.6.1778879720563;
+        Fri, 15 May 2026 14:15:20 -0700 (PDT)
 Received: from mimas.lan ([2603:8000:df01:38f7:a6bb:6dff:fecf:e71a])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-302947e917dsm8005268eec.12.2026.05.15.14.15.16
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30293e2e3c0sm9975127eec.3.2026.05.15.14.15.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 May 2026 14:15:17 -0700 (PDT)
+        Fri, 15 May 2026 14:15:20 -0700 (PDT)
 From: Ross Philipson <ross.philipson@gmail.com>
 To: linux-kernel@vger.kernel.org,
 	x86@kernel.org,
@@ -92,9 +92,9 @@ Cc: ross.philipson@gmail.com,
 	daniel.kiper@oracle.com,
 	andrew.cooper3@citrix.com,
 	trenchboot-devel@googlegroups.com
-Subject: [PATCH v16 23/38] x86: Allow WARN_trap() macro to be included in pre-boot environments
-Date: Fri, 15 May 2026 14:13:55 -0700
-Message-ID: <20260515211410.31440-24-ross.philipson@gmail.com>
+Subject: [PATCH v16 24/38] x86/msr: Add variable MTRR base/mask and x2apic ID registers
+Date: Fri, 15 May 2026 14:13:56 -0700
+Message-ID: <20260515211410.31440-25-ross.philipson@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260515211410.31440-1-ross.philipson@gmail.com>
 References: <20260515211410.31440-1-ross.philipson@gmail.com>
@@ -106,43 +106,38 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-For pre-boot environments, do not use the static call definition of the
-WARN_trap() macro.
+Add the MSR values required by Secure Launch to locate particular CPU cores
+during application processor (AP) startup, and restore the MTRR state after
+an Intel TXT launch.
 
-Suggested-by: Peter Zijlstra <peterz@infradead.org>
 Signed-off-by: Ross Philipson <ross.philipson@gmail.com>
 ---
- arch/x86/include/asm/bug.h | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/msr-index.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/arch/x86/include/asm/bug.h b/arch/x86/include/asm/bug.h
-index 80c1696d8d59..7899768ae644 100644
---- a/arch/x86/include/asm/bug.h
-+++ b/arch/x86/include/asm/bug.h
-@@ -138,8 +138,14 @@ do {									\
- #ifdef HAVE_ARCH_BUG_FORMAT_ARGS
+diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+index 6673601246b3..2a95e3389622 100644
+--- a/arch/x86/include/asm/msr-index.h
++++ b/arch/x86/include/asm/msr-index.h
+@@ -408,6 +408,9 @@
+ #define MSR_IA32_RTIT_OUTPUT_BASE	0x00000560
+ #define MSR_IA32_RTIT_OUTPUT_MASK	0x00000561
  
- #ifndef __ASSEMBLER__
++#define MSR_MTRRphysBase0		0x00000200
++#define MSR_MTRRphysMask0		0x00000201
 +
-+#ifndef __DISABLE_EXPORTS
- #include <linux/static_call_types.h>
- DECLARE_STATIC_CALL(WARN_trap, __WARN_trap);
-+#define WARN_trap(...)	static_call_mod(WARN_trap)(__VA_ARGS__)
-+#else /* __DISABLE_EXPORTS */
-+#define WARN_trap(...)	__WARN_trap(__VA_ARGS__)
-+#endif /* __DISABLE_EXPORTS */
+ #define MSR_MTRRfix64K_00000		0x00000250
+ #define MSR_MTRRfix16K_80000		0x00000258
+ #define MSR_MTRRfix16K_A0000		0x00000259
+@@ -960,6 +963,8 @@
+ #define MSR_IA32_APICBASE_ENABLE	(1<<11)
+ #define MSR_IA32_APICBASE_BASE		(0xfffff<<12)
  
- struct pt_regs;
- struct sysv_va_list { /* from AMD64 System V ABI */
-@@ -172,7 +178,7 @@ extern void *__warn_args(struct arch_va_list *args, struct pt_regs *regs);
- #define __WARN_print_arg(flags, format, arg...)				\
- do {									\
- 	int __flags = (flags) | BUGFLAG_WARNING | BUGFLAG_ARGS ;	\
--	static_call_mod(WARN_trap)(__WARN_bug_entry(__flags, format), ## arg); \
-+	WARN_trap(__WARN_bug_entry(__flags, format), ## arg);		\
- 	asm (""); /* inhibit tail-call optimization */			\
- } while (0)
++#define MSR_IA32_X2APIC_APICID		0x00000802
++
+ #define MSR_IA32_UCODE_WRITE		0x00000079
  
+ #define MSR_IA32_MCU_ENUMERATION	0x0000007b
 -- 
 2.47.3
 
