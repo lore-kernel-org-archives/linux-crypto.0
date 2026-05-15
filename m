@@ -1,172 +1,130 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26DA63B635C;
-	Fri, 15 May 2026 14:49:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 472083C1418
+	for <linux-crypto@vger.kernel.org>; Fri, 15 May 2026 14:52:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778856552; cv=none; b=PcjPWUuO+K3SAdeAfj3aIumZnC0fMV9tQ2Rp0zi7z3uvhMisJBxWJPNozPTFBLDTbN5tRF1EZBxn479rri/rxCJPsiz812ptwXFzzetvNP6l1VGryxsmAxf/4xvfk0c6AkL7v86WeDGl/MjF627taz3AG60X5/aveMXuYr7wujM=
+	t=1778856725; cv=none; b=Tm+1DBe3bbvyKwiupwq1cSYiKxzpjKztuzVsUB9gi0BLSFNfTDOjP03mvHWMtpsJJVB41JiTYesdXxeyL39eQB0xCGIAmwjdfOEZfvuLTD91RyrcCUDnjj+iEXmMMLuqdE5+7EPU8I1J289m0h2bv3wmfD4dMD2lch6CjBHikNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778856552; c=relaxed/simple;
-	bh=7Efh39U7zam83NpZlm0NrspDnrXTMdCamEod7Wx5cL8=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=BaH/VZhHav0FG/OxMTpgtlAxMdTWwoQMwv0onxFePBrt99F2hvxDC+6so2ob//B45Qy1OvNeAHLCvmysrkLxC6YukmTwgy4762R8D5onH3aBifIB+LvXQd/fe8exbr6lZWv8Wr1VxC/H4XKnQUucLkmQU2gzvma+7toAaJALEX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hpQb3J/U; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hpQb3J/U"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6A4FC2BCB7;
-	Fri, 15 May 2026 14:49:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778856551;
-	bh=7Efh39U7zam83NpZlm0NrspDnrXTMdCamEod7Wx5cL8=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=hpQb3J/UMbxqj//6/864i9iGoJs9uyR/30qaHtaSfCGmKtn8vSHrIGF03Jr6pZDbe
-	 FPLZ/zSOb3R97vl1aN7jfKhPJzmSo6ayOwUA8u4JgdrG7mvTKN/1YxbQLIw/yhpGSk
-	 As02qxRgz0zMEzsK6IVrY5met6ZHE9tebVH9Q4s+Ls0KoEj65xvJROJ8eeuw9VBoGP
-	 jNQrjDVQztCUiKXQZQLE1YYyallgX6deqPBNVqrN/2Iy42GV7ijhHMPYWDAVU3f1cP
-	 7QiyJReyP0QCOCSSsZwv0y+A1rcjIhrAL99vFdJRllqJNCbh1upAIbmwkjtxv2C9Yk
-	 3AxIESnx68DwA==
-Message-ID: <840bb2f7-62f7-4319-9bff-9ec1fcd7c4e7@kernel.org>
-Date: Fri, 15 May 2026 16:49:07 +0200
+	s=arc-20240116; t=1778856725; c=relaxed/simple;
+	bh=/+b/V5bDHHWru7Bz5kIaZTKrsXrjFN3haRDJFBMCoeU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TYs2T/Rbay7xLNpmnISU76LQXbNSbNxZrlP+fyr1Puz0B/OgGwyuwQRVGXvAIxF3cbrQ334L1iqrIShA1ZXJ2VWvia7nm1o3sHteRLe0dkTResoQGjCLmnuG2rmPMp1E8YoN+LYeUgo7PenzsQybxsyH0gVMn553sR9pzh5hNpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 4B04666D5C;
+	Fri, 15 May 2026 14:52:00 +0000 (UTC)
+Authentication-Results: smtp-out2.suse.de;
+	none
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 041E0593A9;
+	Fri, 15 May 2026 14:52:00 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id BdG/ABAzB2onPgAAD6G6ig
+	(envelope-from <dsterba@suse.cz>); Fri, 15 May 2026 14:52:00 +0000
+Date: Fri, 15 May 2026 16:51:58 +0200
+From: David Sterba <dsterba@suse.cz>
+To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: kreijack@inwind.it, Goffredo Baroncelli <kreijack@libero.it>,
+	Christoph Hellwig <hch@lst.de>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Dan Williams <dan.j.williams@intel.com>, Chris Mason <clm@fb.com>,
+	David Sterba <dsterba@suse.com>, Arnd Bergmann <arnd@arndb.de>,
+	Song Liu <song@kernel.org>,
+	Yu Kuai <yukuai@alb-78bjiv52429oh8qptp.cn-shenzhen.alb.aliyuncs.com>,
+	Li Nan <linan122@huawei.com>, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
+	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-btrfs@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-raid@vger.kernel.org
+Subject: Re: [PATCH 01/19] btrfs: require at least 4 devices for RAID 6
+Message-ID: <20260515145158.GP2558453@suse.cz>
+Reply-To: dsterba@suse.cz
+References: <20260512052230.2947683-1-hch@lst.de>
+ <20260512052230.2947683-2-hch@lst.de>
+ <20260512114231.GG2558453@suse.cz>
+ <20260513054742.GA1018@lst.de>
+ <0a8d1ff4-f5a2-49e9-aa45-d25dbe4ded40@libero.it>
+ <0507CCEF-0548-442F-8703-1D006B5E068B@zytor.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/3] soc: qcom: ice: Enable PM runtime for ICE driver
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Linlin Zhang <linlin.zhang@oss.qualcomm.com>,
- Rob Herring <robh@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
- "David S . Miller" <davem@davemloft.net>, devicetree@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-kernel@vger.kernel.org, Neeraj Soni <neeraj.soni@oss.qualcomm.com>,
- Deepti Jaggi <deepti.jaggi@oss.qualcomm.com>,
- bjorn.andersson@oss.qualcomm.com
-References: <20260512033750.3393050-1-linlin.zhang@oss.qualcomm.com>
- <20260512033750.3393050-3-linlin.zhang@oss.qualcomm.com>
- <b07a3634-a7a6-4f28-994b-fc900be26879@kernel.org>
- <01578e6a-d10a-46df-bb32-fd45ecb365d7@oss.qualcomm.com>
- <f0b90edc-6584-4b30-a2d1-e72139983fdb@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <f0b90edc-6584-4b30-a2d1-e72139983fdb@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <0507CCEF-0548-442F-8703-1D006B5E068B@zytor.com>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Spamd-Result: default: False [-4.00 / 50.00];
+	REPLY(-4.00)[]
+X-Rspamd-Queue-Id: 4B04666D5C
+X-Spam-Score: -4.00
+X-Rspamd-Pre-Result: action=no action;
+	module=replies;
+	Message is reply to one we originated
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-On 15/05/2026 16:48, Krzysztof Kozlowski wrote:
-> On 15/05/2026 16:22, Linlin Zhang wrote:
->>
->> Hi Krzysztof,
->>
->> Thanks for the review.
->>
->> For the SCMI-based platforms (e.g. sa8255p), the ICE resources such as
->> clocks are not controlled directly by the ICE driver. Instead, they are
->> managed by remote firmware and exposed to Linux via power domains. As a
->> result, the ICE driver cannot use clk_prepare_enable() directly to
->> control the hardware clock.
->>
->> The intention of moving the clock handling into runtime PM callbacks is
->> to align the ICE driver with the power domain framework used on these
->> platforms. When the ICE device is attached to a power domain, invoking
->> pm_runtime_resume_and_get() will trigger the provider (remote firmware
->> via SCMI) to power up the device, which in turn enables the underlying
->> clock and other resources.
->>
->> This design follows the guidance where the runtime PM framework is
->> used as the common mechanism to abstract both:
->>   - direct clock control on non-SCMI platforms, and
->>   - firmware-controlled resources via power domains on SCMI platforms.
->>
->> In both cases, the runtime PM callbacks are responsible for performing
->> the actual resource enable/disable:
->>   - for legacy platforms: clk_prepare_enable()/disable_unprepare()
->>   - for SCMI platforms: power domain on/off handled by firmware
->>
->> So while it may look like an additional layer on legacy platforms, this
->> approach provides a unified mechanism without requiring separate driver
->> entry points or special handling in the upper layers (e.g. UFS driver).
->>
->> That said, I understand your concern that introducing runtime PM solely
->> for clock gating can be seen as unnecessary overhead on existing
->> platforms. I will revisit the implementation to ensure that:
->>   - the runtime PM integration does not introduce regressions for legacy
->>     platforms, and
->>   - the design clearly justifies the common abstraction for both SCMI
->>     and non-SCMI cases.
->>
->> In addition, I rewrite the commit message as the following to make the
->> intention more clear.
->>
->>   On some platforms the ICE device is placed in a firmware-managed power
->>   domain. In those cases the ICE core resources (including the clock) are
->>   not directly controllable by Linux and are instead toggled by the power
->>   domain provider (e.g. remote firmware via SCMI).
->>
->>   Wire the ICE device into runtime PM so that a single pm_runtime
->>   transition is used to bring the ICE device up/down. When the device is
->>   attached to a PM domain, pm_runtime_resume_and_get()/pm_runtime_put_sync()
->>   will invoke the PM domain callbacks and let the provider manage the
->>   resources. On platforms without a PM domain the runtime PM callbacks
->>   continue to perform the existing clock enable/disable locally.
->>
->>   No functional change is intended for non-firmware-managed platforms; the
->>   change provides a common control point that allows ICE to operate when
->>   resources are owned by a PM domain provider.
->>
+On Thu, May 14, 2026 at 12:57:53PM -0700, H. Peter Anvin wrote:
+> On May 14, 2026 12:51:59 PM PDT, Goffredo Baroncelli <kreijack@libero.it> wrote:
+> >On 13/05/2026 07.47, Christoph Hellwig wrote:
+> >> On Tue, May 12, 2026 at 01:42:31PM +0200, David Sterba wrote:
+> >
+> >> 
+> >>> The degenerate modes of
+> >>> raid0, 5, or 6 are explicit as a possible middle step when converting
+> >>> profiles.  We can use a fallback implementation for this case if the
+> >>> accelerated implementations cannot do it.
+> >> 
+> >> This is not about a degenerated mode.  For a degenerated RAID 6, parity
+> >> generation uses the RAID 5 XOR routines as the second parity will be
+> >> missing.  This is about generating two parities for a single data disk,
+> >> which must be explicitly selected.
+> >> 
+> >
+> >I think that the David concern is : "what happens for an already
+> >existing btrfs raid6 3 disks filesystem when the user upgrade the kernel ?"
+> >(I am thinking when a new BG needs to be allocated)...
 > 
-> 
-> Nothing here resolves the comments. Also, it's top posted. Honestly, I
-> won't be talking through you with LLM, so consider patch NAKed.
+> That's what I'm saying – it should invoke the RAID-1 code under the cover (as with 3 disks, D = P = Q.)
 
-Plus you completely ignored all the comments I posted in review. Great.
-
-Best regards,
-Krzysztof
+Thanks, it was not clear to me what you meant. For the two edge cases
+the code should do simple memcpy for both calculations of parity and
+recovery.
