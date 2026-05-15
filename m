@@ -1,104 +1,86 @@
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D576837B3F2;
-	Fri, 15 May 2026 20:44:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFFB13A961B
+	for <linux-crypto@vger.kernel.org>; Fri, 15 May 2026 20:58:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778877877; cv=none; b=GIse8AIZxvQ2dIvzBBOlXUhU1i9BP8SRDT7dYWRHv4LQNwaA2wjdygOzcRHe8xs16XFKaXfZNjgNu0pu5GYTo+bijWpQA2fMqBP1UkUceMOIQx6QCDTGcCNKIT/8eudJOJLxsyM8vEdFXi3tE2dIarGteO9Bo5iOebbNSEr36lM=
+	t=1778878700; cv=none; b=ICQQMT4u52LXYQFPhWLvOtLLW7FnuXkxylEwRQWQbJI2TbyUiI0FXkBF2RHdNDnd1qFmkVJXn66lQZZZyTTo1X7PGIj5eO2qfGG+f/1qw90ShO0ADPpXmlIE+U9eCIqHMTMsw9oDc3+06ug2KPoSBhPnsSqqdwfsrZh7KksYxhw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778877877; c=relaxed/simple;
-	bh=E1+eWqDxv6j99dZMDhlO+NNDH9oYnsJmpH6o+qF/hR0=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=eDo4fU69+2vwDwBTZ97muihXaLNI6OKn1n/sVAzdNxrrD6+3fsQcgFkaLbV3wMLPNjrTxRvy0QQG5gCJDjV72qY35hBbXU65eCsmMMyFnXRr3IQJIlv1aa92e17KhGWEi7wyG3XZ8GnXnGMCgSM4/ivpSoEc9POhwS/oyXc90Ro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=HvwBqnLT; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+	s=arc-20240116; t=1778878700; c=relaxed/simple;
+	bh=qoIdKi3EBZW/eOldO5hee96vIJOQaNLXmYonDVJE700=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=mXCBglrMoQ+nTRhS7K0oFuDAficEw2Qw72vyhUcNmXaR5+RPstdOhmv4TPnwmjKQLHnafCajzBf8lz83hiT+AgLOvrFdGKN2tQ1VoU2NX5tzyyNJnN15jyge1VstdFBBKMPZkEmeorGK4TS+ByNUZy7R3E/xAbq7kIn/HBRiYR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B+viHLWg; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="HvwBqnLT"
-Received: from ehlo.thunderbird.net (c-76-133-66-138.hsd1.ca.comcast.net [76.133.66.138])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 64FJxdt93762934
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Fri, 15 May 2026 12:59:40 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 64FJxdt93762934
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2026042601; t=1778875185;
-	bh=yOPbK2OFF6IcrfoJraZaWua7RTa6T7n9+bq8VLS6qCY=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=HvwBqnLT38+P8wOr09I0oo/MRbA0gltt1BvxpDB/CXoHAI/p9iMtZP4Acni9CBE8i
-	 UuQANyZJcLZO9XcaPLGm0i1Xg+soCjS4z5NjIoUETnDDa930DiHBVRAOT/MRlLb9jY
-	 QYrQ9QMS7lPYMHGvM8plKfNxe30Gl9az6f+vOCv0hNim3O4/Bdo2qSTnUxGO9V7Nx4
-	 F46aEk0Mx5DZE0TAlF3l22P0Yw61+alulS+V4O2YtDdYTlzt2T6qIuwD2KE0nXfR9T
-	 jNDuDCJ8yXY/CId0JmSkw1Ar6+GJQTs5O0RqwrWv5l7cMbOBEgdh93GvzIYQG1gbNB
-	 I9HJmsdG2PKng==
-Date: Fri, 15 May 2026 12:59:34 -0700
-From: "H. Peter Anvin" <hpa@zytor.com>
-To: Christoph Hellwig <hch@lst.de>, kreijack@inwind.it
-CC: David Sterba <dsterba@suse.cz>, Andrew Morton <akpm@linux-foundation.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
-        Madhavan Srinivasan <maddy@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-        Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Thomas Gleixner <tglx@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Dan Williams <dan.j.williams@intel.com>, Chris Mason <clm@fb.com>,
-        David Sterba <dsterba@suse.com>, Arnd Bergmann <arnd@arndb.de>,
-        Song Liu <song@kernel.org>,
-        Yu Kuai <yukuai@alb-78bjiv52429oh8qptp.cn-shenzhen.alb.aliyuncs.com>,
-        Li Nan <linan122@huawei.com>, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
-        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-        linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-raid@vger.kernel.org
-Subject: Re: [PATCH 01/19] btrfs: require at least 4 devices for RAID 6
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20260515043705.GA3855@lst.de>
-References: <20260512052230.2947683-1-hch@lst.de> <20260512052230.2947683-2-hch@lst.de> <20260512114231.GG2558453@suse.cz> <20260513054742.GA1018@lst.de> <0a8d1ff4-f5a2-49e9-aa45-d25dbe4ded40@libero.it> <20260515043705.GA3855@lst.de>
-Message-ID: <34C16854-1065-4542-8836-DDED58EC1844@zytor.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B+viHLWg"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778878698;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zNN6VmRPbN6JATFiof7VWl17ex7Nku19+5A2NoErxNY=;
+	b=B+viHLWgAcw9byIItevthIiVUXeK9tMKmvpH6gHv+a2RP1Z2dIU2jwNb/A4YoF3Orb4PX9
+	DD70kAPHswMJZEcZcf3IIXQs6HtCNo1xztSSqr5gjWrgAmbVQmJ4fTz9WjJYrf2ZE1fVsK
+	VwZMGcNAayFakYlNSdpvX80vJJxKuOc=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-398-KV87kLXOOwyAAvK4XRLgAQ-1; Fri,
+ 15 May 2026 16:58:12 -0400
+X-MC-Unique: KV87kLXOOwyAAvK4XRLgAQ-1
+X-Mimecast-MFC-AGG-ID: KV87kLXOOwyAAvK4XRLgAQ_1778878691
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6BB991956060;
+	Fri, 15 May 2026 20:58:10 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.44.48.83])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7EE371956053;
+	Fri, 15 May 2026 20:58:06 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20260515201416.GA3484095@google.com>
+References: <20260515201416.GA3484095@google.com> <20260508182318.GA4145640@google.com> <20260428024400.123337-3-ebiggers@kernel.org> <20260428024400.123337-1-ebiggers@kernel.org> <286248.1778263325@warthog.procyon.org.uk> <287476.1778266603@warthog.procyon.org.uk>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: dhowells@redhat.com, netdev@vger.kernel.org,
+    linux-afs@lists.infradead.org,
+    Marc Dionne <marc.dionne@auristor.com>, linux-crypto@vger.kernel.org,
+    linux-kernel@vger.kernel.org,
+    "David S . Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net-next 2/5] net/rxrpc: Use local FCrypt-PCBC implementation
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2658458.1778878685.1@warthog.procyon.org.uk>
+Date: Fri, 15 May 2026 21:58:05 +0100
+Message-ID: <2658459.1778878685@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On May 14, 2026 9:37:05 PM PDT, Christoph Hellwig <hch@lst=2Ede> wrote:
->On Thu, May 14, 2026 at 09:51:59PM +0200, Goffredo Baroncelli wrote:
->> I think that the David concern is : "what happens for an already
->> existing btrfs raid6 3 disks filesystem when the user upgrade the kerne=
-l ?"
->> (I am thinking when a new BG needs to be allocated)=2E=2E=2E
->
->Then it will cleanly fail to mount instead of constantly corrupting data
->and memory with every write, yes=2E  Which clearly suggest that such
->file systems don't exist in the wild=2E
->
->But if btrfs wants to keep supporting this I'll just add a _unsafe
->version without the check in the core library=2E
+Eric Biggers <ebiggers@kernel.org> wrote:
 
-I don't think this is a good idea=2E Error out; it is the btrfs maintainer=
-s' job to ensure user data isn't lost=2E=20
+> Seems that the latest is now
+> https://lore.kernel.org/netdev/20260514155304.2249591-4-dhowells@redhat.com/
+> which is back to just using a linear buffer unconditionally.  I'll
+> resend this series after that goes in.
 
-The RAID-6 code has *never* supported only 3 units, and if it ever worked =
-for *any* of the implementations it was purely by accident=2E Speaking as t=
-he original author I should know; this was deliberate as in some cases the =
-degenerate case (3) would have required extra trays in the code to no user =
-benefit=2E=20
+Sounds good.  It turned out to be a bit faster just extracting the data into a
+flat buffer in recvmsg.
 
-I would not be surprised if the kernel crashed or corrupted the page cache=
- in that case=2E
+I wonder about modifying the crypto/krb5/ code to use lib/crypto/ instead, but
+that might be a little trickier as Chuck has patches to make NFS use it.
+
+David
+
