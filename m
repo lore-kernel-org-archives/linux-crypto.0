@@ -1,136 +1,63 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 082E53806CE
-	for <linux-crypto@vger.kernel.org>; Fri, 15 May 2026 19:02:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E0A391E45;
+	Fri, 15 May 2026 20:09:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778871768; cv=none; b=RIw0imX/7JvzvD834VfQQvAPgJ8a4NK+MDf2jIhG/Olv9lXU5wLzBlmh4oRjRo1jcVWH2lnbkyVrSwQtRn1rjDFmB0yBODIwhD9420hY4sWHRl9Hmbo91KmRgakj5p+0bj416IXiO/H8LvCr97JQkf5PrtLxwLTX+dZIkKU7Fmk=
+	t=1778875789; cv=none; b=q5SZ6tSpxono5HLjQzPmH90NuEHKtN11HFbIKHcd692dQvYOIi8TWTBIUZxdzUTV0LwhO7jb/p3tE2lrGPHy9cPFOD5hMT4vM9zIawy1GNczOJjRmU3RDZ/4mM8BFz00sSvmWni9fv+sK0wOAWLh1uXvSeQHX72kBMZIuo+cLxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778871768; c=relaxed/simple;
-	bh=y8b4zzudyE397marBViAbV8N111gNUULioianPD4kNI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mHpf8S/qA2Spy6O1ntpkOXxtau4iuOOGNUskw7LboSulKJtz8mCkhUwfdfLIQ+LAWl0s8DBqlKjMZrT6n72mwe52Jwc55fmQQDGIxKB/pfCPnvpTiK9BKjGiaLYxgFy3QLu1Mkxo8hLeY9MHTivNV/8cLdp6NhUAVDTZB72pmLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KVNwdMYm; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=EWd8NWLr; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1778875789; c=relaxed/simple;
+	bh=c8XHB0Oq8UYbKuxHkZjMi+25hnVnLFmgVdYqTGnZ3kQ=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=D+zKf94T7S6Xx/L3I3n1A6V6sj5141nl+iIw6/Fex60ok2FP0Zy5no1bRaVrUkqCvvvsfw6dCsW3PJFUgWVR8JsRT8cYpzezzuVbzjLFMDrvf1wfa7dW1qGezIJpfzSV79XDDc98f32PAnQqRWPDkcR1RbaZ0NmquOhrzTQ6xzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sN9srSQn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KVNwdMYm";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="EWd8NWLr"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778871766;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=tYElUD/qqoaFAUdogkyA9QDrRQvEojGIyiuybZX26ZU=;
-	b=KVNwdMYm1kRbuCwfL/HiuN59Fh2iDM9zMFfDgQEYu4aNb2je/8JGN52bbzTC+/AjzbDeMv
-	YotG99WETgoMtAEYAXApLUucHjXmTC0Z6SiqPwprX3IKhDYs46fsCyCNxrpPNIfFuDJlrL
-	x1w9zoT88yJGnvJr8I9qdo5hqhffPCA=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-609-rlmFOgfdPoC-IaVaXVk1dA-1; Fri, 15 May 2026 15:02:44 -0400
-X-MC-Unique: rlmFOgfdPoC-IaVaXVk1dA-1
-X-Mimecast-MFC-AGG-ID: rlmFOgfdPoC-IaVaXVk1dA_1778871763
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-488d3eec9bcso700355e9.3
-        for <linux-crypto@vger.kernel.org>; Fri, 15 May 2026 12:02:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1778871763; x=1779476563; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=tYElUD/qqoaFAUdogkyA9QDrRQvEojGIyiuybZX26ZU=;
-        b=EWd8NWLra0H3tSmn0IdzHPJroqSTGc3c3yJFetjyKuK017ZAY4ys6bRCgmuBFpAEwT
-         30H0KRapHnMWGVAlacrT149WHyKkEl5Ob2QSOCnP6ou7PK86WVrz5PqBuPiwgPviLqJr
-         3HKkTGhDpCls9dbx63zjzhmGCtYorOPkjVUiOTHR2XHzfDJX+S/kWNOgm8ZYUWm/8r35
-         quIp2poxwIRFZaDnH0lw50xzjEHvyAiIgKQi5Mu/iNQA72fk3HI5GdS/pT02ZyFxtL9i
-         sDsQSe6Y71WF4xxKakeJujpH23Rr/D7jrgsyln2nbaZ47ep42186xmiiwJ+1O3FrdZ8O
-         bgSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778871763; x=1779476563;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tYElUD/qqoaFAUdogkyA9QDrRQvEojGIyiuybZX26ZU=;
-        b=psJYL0fhXu+sQ7TRTkqZKTny431o3NAE/rTIvSc6qkoRU/6Nej+duZx1RouiwY/cH2
-         DblYZktNPt03B931j8ky94q93fc5mNbzD8McWLt9OZe2ACDEhzvgPbilIXHWgeGVkWQl
-         JiIMGDMSTHZibgoFec3LkoRqXSCo3iLDmeBuTzs4Yku2BUGQzWjjD9i9aCIcH3YF+hd6
-         4OpPBggb3ha5atMpp77O5UmKeqepZbps9kptPQo3WeII2b1KbJTcRLu67pSz8W2ucukz
-         SHMnLu4Y/uZooktCmpRktTphOWK32gv8B28saN/Xy4rQuzoReJY79muRJ/RFvE0UhCVu
-         tU+w==
-X-Gm-Message-State: AOJu0Yy9RN5guPJwoSx4YliKilYSWMQouFv9O9eXmvL+PDqSaJ2bNYJB
-	fw02QiGYzoObSco+hiC2O3MFhN8JUMvsl7y+IcW1WHo6xjf+GYzmC42eVmY5FIpFzaSJOQVMTiS
-	m7SWOiIMDqLkukL4Iitbtg4fN5vV2JDHn+U5fN9XArp4WteMaxIar7qtBaA4k96k41yNsN9HCUG
-	Hm
-X-Gm-Gg: Acq92OEymHkCWvzIrDWiNejOItBBs/dGCyD3nE2RK+LVHI3xqt0jbHIojdI06DadcfA
-	FIsnycDt1Lrql8GP//bAxUVSH1gGrSaX6swzg8VGTUxKDxC2xCwSiZCWS0ZdQ69xMO1duD1bRae
-	ojlS7K+gry9tYt3xzmMjdxoWYkFieY9OGcsCuJy5g4gQSDt+goBNxkQrmA6I5ge7aveB3aDHtbq
-	V2m6TWTFK1Aebax+2UzsAVVa2yHxac0rQaOXDZKsOr5764gYY7GLXTxrAZNOG/kvSlUpmE3OBCB
-	8etpk289RFQzRfxJLp50plEkqd02OvFG7eaj6NSbNfPG5Z1BHMnj7iFedA268SwEBKd9iY4PhWc
-	1mY4hqEr53dSoeFgItArmcczGDVJbhvE58Is=
-X-Received: by 2002:a05:600c:3492:b0:48a:52ee:5776 with SMTP id 5b1f17b1804b1-48fe60e79eemr80824635e9.11.1778871763091;
-        Fri, 15 May 2026 12:02:43 -0700 (PDT)
-X-Received: by 2002:a05:600c:3492:b0:48a:52ee:5776 with SMTP id 5b1f17b1804b1-48fe60e79eemr80824055e9.11.1778871762661;
-        Fri, 15 May 2026 12:02:42 -0700 (PDT)
-Received: from costa-tp.bos2.lab ([2a00:a041:e223:1b00:fe51:8bb:7986:c897])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fe4c88495sm81843535e9.4.2026.05.15.12.02.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 May 2026 12:02:41 -0700 (PDT)
-From: Costa Shulyupin <costa.shul@redhat.com>
-To: Linus Walleij <linus.walleij@linaro.org>,
-	linux-kernel@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org,
-	Costa Shulyupin <costa.shul@redhat.com>
-Subject: [PATCH v1] include: Remove unused crypto-ux500.h
-Date: Fri, 15 May 2026 22:02:14 +0300
-Message-ID: <20260515190220.1534187-1-costa.shul@redhat.com>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sN9srSQn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBB63C2BCB3;
+	Fri, 15 May 2026 20:09:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1778875788;
+	bh=c8XHB0Oq8UYbKuxHkZjMi+25hnVnLFmgVdYqTGnZ3kQ=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=sN9srSQnVYY+G9TMwABdIacWaKqrMEbZdQyQNmij5Z0+CcJ6z9jCmP5KZaJ+Zl/AY
+	 Qu8VFx9exxyT64CDYqQkO+WTiIBrHKgzhmkzS0pKlfF+g0p9jgDbIx43hZFliZLl9W
+	 3sMlrcqJG6RAwcNq8w8mLhPrtjau4+Zq1Mf1zLk9XztitpNWBQisyxJm5bebdrgLSl
+	 fcwODK49Ai2fJ2Tl+rOTY37lxU94FJGKaGCiByHTiOgEcRwWSQqE6Gzv7glRECmSat
+	 qqOAfBlx2LeK0pnyJF4Bt8CR1HiaLoZpe1xfkmphIyZ7BideuzrLPPgDVxy8jILUk+
+	 QDyaI1lB+otAg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 579DD3930A09;
+	Fri, 15 May 2026 20:10:03 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Fixes for 7.1
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <agbpRZ1OdUC-orcg@gondor.apana.org.au>
+References: <agbpRZ1OdUC-orcg@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
+X-PR-Tracked-Message-Id: <agbpRZ1OdUC-orcg@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6 tags/v7.1-p4
+X-PR-Tracked-Commit-Id: d1fa83ecac31093a550534a79a33bc7f4ba8fc10
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: fd6b56615696c2addca7b43c862b21a9a386c116
+Message-Id: <177887580256.138500.3259603774070079201.pr-tracker-bot@kernel.org>
+Date: Fri, 15 May 2026 20:10:02 +0000
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-The UX500 crypto drivers were removed in commit 453de3eb08c4
-("crypto: ux500/cryp - delete driver") and commit dd7b7972cb89
-("crypto: ux500/hash - delete driver"). No file includes
-this header.
+The pull request you sent on Fri, 15 May 2026 17:37:09 +0800:
 
-Assisted-by: Claude:claude-opus-4-6
-Signed-off-by: Costa Shulyupin <costa.shul@redhat.com>
----
- include/linux/platform_data/crypto-ux500.h | 22 ----------------------
- 1 file changed, 22 deletions(-)
- delete mode 100644 include/linux/platform_data/crypto-ux500.h
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6 tags/v7.1-p4
 
-diff --git a/include/linux/platform_data/crypto-ux500.h b/include/linux/platform_data/crypto-ux500.h
-deleted file mode 100644
-index 5d43350e32cc..000000000000
---- a/include/linux/platform_data/crypto-ux500.h
-+++ /dev/null
-@@ -1,22 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0-only */
--/*
-- * Copyright (C) ST-Ericsson SA 2011
-- *
-- * Author: Joakim Bech <joakim.xx.bech@stericsson.com> for ST-Ericsson
-- */
--#ifndef _CRYPTO_UX500_H
--#define _CRYPTO_UX500_H
--#include <linux/dmaengine.h>
--#include <linux/platform_data/dma-ste-dma40.h>
--
--struct hash_platform_data {
--	void *mem_to_engine;
--	bool (*dma_filter)(struct dma_chan *chan, void *filter_param);
--};
--
--struct cryp_platform_data {
--	struct stedma40_chan_cfg mem_to_engine;
--	struct stedma40_chan_cfg engine_to_mem;
--};
--
--#endif
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/fd6b56615696c2addca7b43c862b21a9a386c116
+
+Thank you!
+
 -- 
-2.53.0
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
