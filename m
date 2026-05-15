@@ -1,204 +1,136 @@
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D12E83FDBF6
-	for <linux-crypto@vger.kernel.org>; Fri, 15 May 2026 18:08:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 082E53806CE
+	for <linux-crypto@vger.kernel.org>; Fri, 15 May 2026 19:02:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778868510; cv=none; b=dqrKRBzIzSQyszLDkeI2z4nljnZUaU7fgxX+gKnd+qJgg/aCOrSrU8qYwp94NyqHxYgdh56IKPVmlyCaOQT7CQzSinD19qIjUKgC7HQQ9HPt4H9GyAlf6P6MZguHGBi2gKAz1jzGg1Bc1BjjifhExHUGQOcGnxWgFcNWHWX+LzM=
+	t=1778871768; cv=none; b=RIw0imX/7JvzvD834VfQQvAPgJ8a4NK+MDf2jIhG/Olv9lXU5wLzBlmh4oRjRo1jcVWH2lnbkyVrSwQtRn1rjDFmB0yBODIwhD9420hY4sWHRl9Hmbo91KmRgakj5p+0bj416IXiO/H8LvCr97JQkf5PrtLxwLTX+dZIkKU7Fmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778868510; c=relaxed/simple;
-	bh=uZ7ygsnr96oe6CK9wJ9zGBwa1AUV6F/q7+OBvaywCn0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WNgePW5Ia/ITkWBhZzBPwvW9OD4GnuoAmOmSN2jlxY94QOgDXcwFiTqQC3/wIFhV6jjx5N3xkAHiZxsjkf5Hmplqwi1cHq54rSDAauKDPjGLpYKTqBQcMLvvHJTTtkDLDLkd8Todhw2o77ZrZoON6sjH0cwZlP0avvXoESXkuKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U0iYix8s; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1778871768; c=relaxed/simple;
+	bh=y8b4zzudyE397marBViAbV8N111gNUULioianPD4kNI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mHpf8S/qA2Spy6O1ntpkOXxtau4iuOOGNUskw7LboSulKJtz8mCkhUwfdfLIQ+LAWl0s8DBqlKjMZrT6n72mwe52Jwc55fmQQDGIxKB/pfCPnvpTiK9BKjGiaLYxgFy3QLu1Mkxo8hLeY9MHTivNV/8cLdp6NhUAVDTZB72pmLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KVNwdMYm; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=EWd8NWLr; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U0iYix8s"
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-bd4f81505ccso6374566b.1
-        for <linux-crypto@vger.kernel.org>; Fri, 15 May 2026 11:08:28 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KVNwdMYm";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="EWd8NWLr"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1778871766;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=tYElUD/qqoaFAUdogkyA9QDrRQvEojGIyiuybZX26ZU=;
+	b=KVNwdMYm1kRbuCwfL/HiuN59Fh2iDM9zMFfDgQEYu4aNb2je/8JGN52bbzTC+/AjzbDeMv
+	YotG99WETgoMtAEYAXApLUucHjXmTC0Z6SiqPwprX3IKhDYs46fsCyCNxrpPNIfFuDJlrL
+	x1w9zoT88yJGnvJr8I9qdo5hqhffPCA=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-609-rlmFOgfdPoC-IaVaXVk1dA-1; Fri, 15 May 2026 15:02:44 -0400
+X-MC-Unique: rlmFOgfdPoC-IaVaXVk1dA-1
+X-Mimecast-MFC-AGG-ID: rlmFOgfdPoC-IaVaXVk1dA_1778871763
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-488d3eec9bcso700355e9.3
+        for <linux-crypto@vger.kernel.org>; Fri, 15 May 2026 12:02:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778868507; x=1779473307; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1778871763; x=1779476563; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=la+O/bFtpnyaY0c5pxjy6SLIjk1Ilk22rZ0fIeKn2mA=;
-        b=U0iYix8s4BlXPNZghhnrG2fXfB2g4UqzAjTJFPYT82FOcQ5WbjPVrMPQKmb1L9SjrK
-         EO4omDBZ9OdpRa+vNTJfqWl1UXepKYlPSxTOJxeswmSu732E/5yzPGWzEfk2frDFmHVk
-         p+C15GIfwSJcNevKfX+lUcUUzZkGWcQbfsfUeNNag0mom4c80kxLIIob/O5/twwQArpj
-         J2ez2w9Kqh5PqYhcP22X0A9YX9+pWAK2gbat9rrFdbGgGqFR2gH9fyd7LNqBxwEix36H
-         vnGo7CiMYVfgwKcOdWnJLxvxs4Gwg8UQRX6Ic06KonTylMPsFMpHf3T0vqJAD42DMMeA
-         V2iQ==
+        bh=tYElUD/qqoaFAUdogkyA9QDrRQvEojGIyiuybZX26ZU=;
+        b=EWd8NWLra0H3tSmn0IdzHPJroqSTGc3c3yJFetjyKuK017ZAY4ys6bRCgmuBFpAEwT
+         30H0KRapHnMWGVAlacrT149WHyKkEl5Ob2QSOCnP6ou7PK86WVrz5PqBuPiwgPviLqJr
+         3HKkTGhDpCls9dbx63zjzhmGCtYorOPkjVUiOTHR2XHzfDJX+S/kWNOgm8ZYUWm/8r35
+         quIp2poxwIRFZaDnH0lw50xzjEHvyAiIgKQi5Mu/iNQA72fk3HI5GdS/pT02ZyFxtL9i
+         sDsQSe6Y71WF4xxKakeJujpH23Rr/D7jrgsyln2nbaZ47ep42186xmiiwJ+1O3FrdZ8O
+         bgSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778868507; x=1779473307;
+        d=1e100.net; s=20251104; t=1778871763; x=1779476563;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=la+O/bFtpnyaY0c5pxjy6SLIjk1Ilk22rZ0fIeKn2mA=;
-        b=SORjxCByZCYnKrrM/zfE4K5RY+HpCiK64kSHEF117Cj5tmx3pPQaL4xyihzLmexjV8
-         Wh58XovJle/GR3PpvUcXcIvwtw8pursUko9s7OTFplCpgEBvL4hMiHgigZXUNBVaJ+4F
-         y0ZbaLgpbZuluzOhDGRkJ2gUYxXWT2NXs55joCAiJ0m15VvFfdQnmG5v50uulEqOkBkA
-         xSb/o8akcuHfmhL+Oir00uMXsXJ0kbWufcA9FpJVztgo9u309GhqYz8fDUdPZK9nmAq1
-         mrc2tZJWczmO9U0liY9tU29N383fj3jAi6a0gvv/cKb/9V4uxq6cFDkNyWPD3y0eW5Vr
-         LNrg==
-X-Forwarded-Encrypted: i=1; AFNElJ95nwBVVJyBZrAdx3Klp1rc7U76HFjB6NJjLgO1+sNl++MHzLPqLFQ2yGY1VGV8Kp3lCVGe3LtKOgyXxzk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8yknb5IUhsnxGTrl5JRTal4UqmhD4a/jN8Wf3IPIhLsMSv6zZ
-	hcoGv1/SekkTvBEBnT2rWA6dzZK3tEhaUUrBusN3/w0/1WoxoF2diewD
-X-Gm-Gg: Acq92OGxXS3hDqSGQJyudSKi46TqEzSLwfpTU0PfLBrYzWCujOvP5uyzgvEY9ZybCVX
-	HdBD28h4hrhq/o34d01wqzoI1XZA+PHLID7I1++SqK09pm5wstwjPoZyEcVwrCvKtnQWNJwgyXC
-	fM/FYabQndAM/1tTQMg7Clb90G3iu9mryYoD8ae1DnhiFGwW0S1E+CCvYpd/IHT9VaGWJAzecSa
-	P+WKm3DeLZXDLwgVIB28qoG7clfkcD+ZPkQX8PYgCDr+5bsVWzLKwXo3h8c857COiks4nWdXvJw
-	5nNkRZepyLGJR09eMhUcEVQ0PdoGrDKSKw9qiJw5sO64xdkFEuSgWqpih3c5l6FH1GO7qHfidPb
-	WGj9ir0S9dqLHGa4Nw7a3nzbGkSaMqpM3WvOjMLXlbwNqoTqqkN0pmdXT4MmA357yK7vIULDgCt
-	U2rcMrgNNkkFBuwaMzqLS+YNIrKm6aRvqF
-X-Received: by 2002:a17:906:6185:b0:bd0:6dbe:22b1 with SMTP id a640c23a62f3a-bd5177ec5dfmr278321866b.12.1778868506983;
-        Fri, 15 May 2026 11:08:26 -0700 (PDT)
-Received: from pc-oliwiera ([2a02:2a40:4bf0:bd00:6130:de6:bb7:addf])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bd4f4bd1bc9sm263471566b.9.2026.05.15.11.08.25
+        bh=tYElUD/qqoaFAUdogkyA9QDrRQvEojGIyiuybZX26ZU=;
+        b=psJYL0fhXu+sQ7TRTkqZKTny431o3NAE/rTIvSc6qkoRU/6Nej+duZx1RouiwY/cH2
+         DblYZktNPt03B931j8ky94q93fc5mNbzD8McWLt9OZe2ACDEhzvgPbilIXHWgeGVkWQl
+         JiIMGDMSTHZibgoFec3LkoRqXSCo3iLDmeBuTzs4Yku2BUGQzWjjD9i9aCIcH3YF+hd6
+         4OpPBggb3ha5atMpp77O5UmKeqepZbps9kptPQo3WeII2b1KbJTcRLu67pSz8W2ucukz
+         SHMnLu4Y/uZooktCmpRktTphOWK32gv8B28saN/Xy4rQuzoReJY79muRJ/RFvE0UhCVu
+         tU+w==
+X-Gm-Message-State: AOJu0Yy9RN5guPJwoSx4YliKilYSWMQouFv9O9eXmvL+PDqSaJ2bNYJB
+	fw02QiGYzoObSco+hiC2O3MFhN8JUMvsl7y+IcW1WHo6xjf+GYzmC42eVmY5FIpFzaSJOQVMTiS
+	m7SWOiIMDqLkukL4Iitbtg4fN5vV2JDHn+U5fN9XArp4WteMaxIar7qtBaA4k96k41yNsN9HCUG
+	Hm
+X-Gm-Gg: Acq92OEymHkCWvzIrDWiNejOItBBs/dGCyD3nE2RK+LVHI3xqt0jbHIojdI06DadcfA
+	FIsnycDt1Lrql8GP//bAxUVSH1gGrSaX6swzg8VGTUxKDxC2xCwSiZCWS0ZdQ69xMO1duD1bRae
+	ojlS7K+gry9tYt3xzmMjdxoWYkFieY9OGcsCuJy5g4gQSDt+goBNxkQrmA6I5ge7aveB3aDHtbq
+	V2m6TWTFK1Aebax+2UzsAVVa2yHxac0rQaOXDZKsOr5764gYY7GLXTxrAZNOG/kvSlUpmE3OBCB
+	8etpk289RFQzRfxJLp50plEkqd02OvFG7eaj6NSbNfPG5Z1BHMnj7iFedA268SwEBKd9iY4PhWc
+	1mY4hqEr53dSoeFgItArmcczGDVJbhvE58Is=
+X-Received: by 2002:a05:600c:3492:b0:48a:52ee:5776 with SMTP id 5b1f17b1804b1-48fe60e79eemr80824635e9.11.1778871763091;
+        Fri, 15 May 2026 12:02:43 -0700 (PDT)
+X-Received: by 2002:a05:600c:3492:b0:48a:52ee:5776 with SMTP id 5b1f17b1804b1-48fe60e79eemr80824055e9.11.1778871762661;
+        Fri, 15 May 2026 12:02:42 -0700 (PDT)
+Received: from costa-tp.bos2.lab ([2a00:a041:e223:1b00:fe51:8bb:7986:c897])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fe4c88495sm81843535e9.4.2026.05.15.12.02.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 May 2026 11:08:26 -0700 (PDT)
-From: Oli R <sigmatwojastara@gmail.com>
-To: Rob Clark <robin.clark@oss.qualcomm.com>,
-	Dmitry Baryshkov <lumag@kernel.org>,
-	Abhinav Kumar <abhinav.kumar@linux.dev>,
-	Jessica Zhang <jesszhan0024@gmail.com>,
-	Sean Paul <sean@poorly.run>,
-	Marijn Suijten <marijn.suijten@somainline.org>,
-	David Airlie <airlied@gmail.com>,
-	Simona Vetter <simona@ffwll.ch>,
-	Mario Limonciello <mario.limonciello@amd.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	James Clark <james.clark@linaro.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Boqun Feng <boqun@kernel.org>,
-	linux-arm-msm@vger.kernel.org (open list:DRM DRIVER for Qualcomm display hardware),
-	dri-devel@lists.freedesktop.org (open list:DRM DRIVER for Qualcomm display hardware),
-	freedreno@lists.freedesktop.org (open list:DRM DRIVER for Qualcomm display hardware),
-	linux-kernel@vger.kernel.org (open list),
-	linux-crypto@vger.kernel.org (open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER - DB...),
-	linux-perf-users@vger.kernel.org (open list:PERFORMANCE EVENTS SUBSYSTEM),
-	linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK)
-Cc: Oli R <sigmatwojastara@gmail.com>
-Subject: [PATCH] treewide: replace /usr/bin/python3 shebangs with env python3
-Date: Fri, 15 May 2026 20:07:59 +0200
-Message-ID: <20260515180806.246914-1-sigmatwojastara@gmail.com>
-X-Mailer: git-send-email 2.54.0
+        Fri, 15 May 2026 12:02:41 -0700 (PDT)
+From: Costa Shulyupin <costa.shul@redhat.com>
+To: Linus Walleij <linus.walleij@linaro.org>,
+	linux-kernel@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	Costa Shulyupin <costa.shul@redhat.com>
+Subject: [PATCH v1] include: Remove unused crypto-ux500.h
+Date: Fri, 15 May 2026 22:02:14 +0300
+Message-ID: <20260515190220.1534187-1-costa.shul@redhat.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Use /usr/bin/env python3 instead of hardcoded interpreter paths
-to improve portability across environments where python3 is not
-installed in /usr/bin.
+The UX500 crypto drivers were removed in commit 453de3eb08c4
+("crypto: ux500/cryp - delete driver") and commit dd7b7972cb89
+("crypto: ux500/hash - delete driver"). No file includes
+this header.
 
-No functional changes intended.
-
-Signed-off-by: Oli R <sigmatwojastara@gmail.com>
+Assisted-by: Claude:claude-opus-4-6
+Signed-off-by: Costa Shulyupin <costa.shul@redhat.com>
 ---
- drivers/gpu/drm/msm/registers/gen_header.py                     | 2 +-
- scripts/macro_checker.py                                        | 2 +-
- tools/crypto/ccp/dbc.py                                         | 2 +-
- tools/crypto/ccp/dbc_cli.py                                     | 2 +-
- tools/crypto/ccp/test_dbc.py                                    | 2 +-
- tools/perf/tests/shell/lib/perf_json_output_lint.py             | 2 +-
- .../selftests/devices/probe/test_discoverable_devices.py        | 2 +-
- tools/testing/selftests/rseq/rseq-slice-hist.py                 | 2 +-
- 8 files changed, 8 insertions(+), 8 deletions(-)
+ include/linux/platform_data/crypto-ux500.h | 22 ----------------------
+ 1 file changed, 22 deletions(-)
+ delete mode 100644 include/linux/platform_data/crypto-ux500.h
 
-diff --git a/drivers/gpu/drm/msm/registers/gen_header.py b/drivers/gpu/drm/msm/registers/gen_header.py
-index 2acad951f1e2..10316f517a7d 100644
---- a/drivers/gpu/drm/msm/registers/gen_header.py
-+++ b/drivers/gpu/drm/msm/registers/gen_header.py
-@@ -1,4 +1,4 @@
--#!/usr/bin/python3
-+#!/usr/bin/env python3
- #
- # Copyright © 2019-2024 Google, Inc.
- #
-diff --git a/scripts/macro_checker.py b/scripts/macro_checker.py
-index ba550982e98f..7dbb114a57d5 100755
---- a/scripts/macro_checker.py
-+++ b/scripts/macro_checker.py
-@@ -1,4 +1,4 @@
--#!/usr/bin/python3
-+#!/usr/bin/env python3
- # SPDX-License-Identifier: GPL-2.0
- # Author: Julian Sun <sunjunchao2870@gmail.com>
- 
-diff --git a/tools/crypto/ccp/dbc.py b/tools/crypto/ccp/dbc.py
-index 2b91415b1940..cd56a63aa8ce 100644
---- a/tools/crypto/ccp/dbc.py
-+++ b/tools/crypto/ccp/dbc.py
-@@ -1,4 +1,4 @@
--#!/usr/bin/python3
-+#!/usr/bin/env python3
- # SPDX-License-Identifier: GPL-2.0
- 
- import ctypes
-diff --git a/tools/crypto/ccp/dbc_cli.py b/tools/crypto/ccp/dbc_cli.py
-index bf52233fd038..bfe34f01e619 100755
---- a/tools/crypto/ccp/dbc_cli.py
-+++ b/tools/crypto/ccp/dbc_cli.py
-@@ -1,4 +1,4 @@
--#!/usr/bin/python3
-+#!/usr/bin/env python3
- # SPDX-License-Identifier: GPL-2.0
- import argparse
- import binascii
-diff --git a/tools/crypto/ccp/test_dbc.py b/tools/crypto/ccp/test_dbc.py
-index bb0e671be96d..0ee3da6c6be7 100755
---- a/tools/crypto/ccp/test_dbc.py
-+++ b/tools/crypto/ccp/test_dbc.py
-@@ -1,4 +1,4 @@
--#!/usr/bin/python3
-+#!/usr/bin/env python3
- # SPDX-License-Identifier: GPL-2.0
- import unittest
- import os
-diff --git a/tools/perf/tests/shell/lib/perf_json_output_lint.py b/tools/perf/tests/shell/lib/perf_json_output_lint.py
-index dafbde56cc76..dccafd507bb7 100644
---- a/tools/perf/tests/shell/lib/perf_json_output_lint.py
-+++ b/tools/perf/tests/shell/lib/perf_json_output_lint.py
-@@ -1,4 +1,4 @@
--#!/usr/bin/python
-+#!/usr/bin/env python3
- # SPDX-License-Identifier: (LGPL-2.1 OR BSD-2-Clause)
- # Basic sanity check of perf JSON output as specified in the man page.
- 
-diff --git a/tools/testing/selftests/devices/probe/test_discoverable_devices.py b/tools/testing/selftests/devices/probe/test_discoverable_devices.py
-index d7a2bb91c807..72a94bbfbc7b 100755
---- a/tools/testing/selftests/devices/probe/test_discoverable_devices.py
-+++ b/tools/testing/selftests/devices/probe/test_discoverable_devices.py
-@@ -1,4 +1,4 @@
--#!/usr/bin/python3
-+#!/usr/bin/env python3
- # SPDX-License-Identifier: GPL-2.0
- #
- # Copyright (c) 2023 Collabora Ltd
-diff --git a/tools/testing/selftests/rseq/rseq-slice-hist.py b/tools/testing/selftests/rseq/rseq-slice-hist.py
-index b7933eeaefb9..2c43b2e2bf0d 100644
---- a/tools/testing/selftests/rseq/rseq-slice-hist.py
-+++ b/tools/testing/selftests/rseq/rseq-slice-hist.py
-@@ -1,4 +1,4 @@
--#!/usr/bin/python3
-+#!/usr/bin/env python3
- 
- #
- # trace-cmd record -e hrtimer_start -e hrtimer_cancel -e hrtimer_expire_entry -- $cmd
+diff --git a/include/linux/platform_data/crypto-ux500.h b/include/linux/platform_data/crypto-ux500.h
+deleted file mode 100644
+index 5d43350e32cc..000000000000
+--- a/include/linux/platform_data/crypto-ux500.h
++++ /dev/null
+@@ -1,22 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-only */
+-/*
+- * Copyright (C) ST-Ericsson SA 2011
+- *
+- * Author: Joakim Bech <joakim.xx.bech@stericsson.com> for ST-Ericsson
+- */
+-#ifndef _CRYPTO_UX500_H
+-#define _CRYPTO_UX500_H
+-#include <linux/dmaengine.h>
+-#include <linux/platform_data/dma-ste-dma40.h>
+-
+-struct hash_platform_data {
+-	void *mem_to_engine;
+-	bool (*dma_filter)(struct dma_chan *chan, void *filter_param);
+-};
+-
+-struct cryp_platform_data {
+-	struct stedma40_chan_cfg mem_to_engine;
+-	struct stedma40_chan_cfg engine_to_mem;
+-};
+-
+-#endif
 -- 
-2.54.0
+2.53.0
 
