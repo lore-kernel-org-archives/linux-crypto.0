@@ -1,63 +1,63 @@
-Received: from mail-dy1-f171.google.com (mail-dy1-f171.google.com [74.125.82.171])
+Received: from mail-dy1-f175.google.com (mail-dy1-f175.google.com [74.125.82.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D70EE4C77CD
-	for <linux-crypto@vger.kernel.org>; Fri, 15 May 2026 21:15:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A686A4CA292
+	for <linux-crypto@vger.kernel.org>; Fri, 15 May 2026 21:15:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778879717; cv=none; b=NltfycONcGHmGpZfIRVmRKRbZOk2i1cbDuSmdG4H/MWwvNMc2e1fnCl+QLzvTUTYvwt9qyzCyKqWhAS8inKtddXAsCWVF0mJgVMYTJ2VEeOCbTZTUPYzfzF3TdIeNuKjS1bzx3SJGPqOC9/67bDStKpYSsuQegYve2/wlhxSUY4=
+	t=1778879720; cv=none; b=ljry9Erqst0c6OFfiV5vAqYbiNlU7ZLSVZct28Bb2+viZT8VQOFcZf65UZ/BFNQGduyjVQvFi5J8PGMPCoQrvNDHuI76emf//qwSBCxqAkFCmP1GBfuysbDei3x+Dpo/oifLDoxtMZe/LjTQWpEl8Dd4UfI9P6ISAR+aDIPhWek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778879717; c=relaxed/simple;
-	bh=7BAv62SCJAZd+nbTYMXdF5QJlgc01qXtbND56r+tijw=;
+	s=arc-20240116; t=1778879720; c=relaxed/simple;
+	bh=Zcwz++VNrXh9y6soBYCC7hxdmV5RO3C0KhJ6H3w36Z4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lNJcCsdun2MRF/kjlkExLmXWh891G0pHUTbK6GIWxW2ssQvnEt8eVF2rcjH+z/e+rtl7+P7t0yE5H6H8sjfM36/knTmUAuu3/bYde55QwnSES0x6TJUbeXDeetMgVls8JdYm0FtQrNKsMrqnmrmXRYS7nOgNQJnDm2FuD3SV9fA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NNLKh2Ja; arc=none smtp.client-ip=74.125.82.171
+	 MIME-Version; b=IwhSXwa6UekuEqDk09j9LL/7TnSH4IMedKgx2olbsQ6HNzhxRxGo9zkidAK9b/HgrPD4G0gb8v1S5wGKn548kM4UxJBvksJ2ZOaSnQFOF0Wi2jlZmFnvzC5cefK1Pt5UgB19C7rKpYLAZcm67ggIsZBf6AqKPklt4cxWlXFY6k8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=pS456OJH; arc=none smtp.client-ip=74.125.82.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NNLKh2Ja"
-Received: by mail-dy1-f171.google.com with SMTP id 5a478bee46e88-30246cfd41aso1512869eec.1
-        for <linux-crypto@vger.kernel.org>; Fri, 15 May 2026 14:15:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pS456OJH"
+Received: by mail-dy1-f175.google.com with SMTP id 5a478bee46e88-2f0d3e07e30so1352951eec.0
+        for <linux-crypto@vger.kernel.org>; Fri, 15 May 2026 14:15:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778879715; x=1779484515; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1778879718; x=1779484518; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RpW1a/fScKIJOJjIsuP4+bGqNlbA4fQX64i8+rdO0zg=;
-        b=NNLKh2Ja78Xg7YtTOJnXXrJO3+1web4zIBvPZyZZjN3nXzCs5iNssEUVficdqe3NQq
-         2Ch+FsviA0JHGUNEUHj+op4que+AYQY/kcO4XMy8ivf7STGAi/zNN7UAI1WDYx2IpkP+
-         1zR5mNKwxB8V3nOiJEX9J+BtjNGEaIHEG61Dx+niQlhjaLnEuIvtCbpsgAKmOhjjN0IG
-         D6TQMwFOq+D1z/OZiCdR6jvuxrrutyZQw+tIvLXkxIG4SMJSnB6TDS+xa4qiKGC36DCW
-         oFs+Vt1gpdouFFwNzklH2Q1Dw2UlB/cUvflsjn2gEjePUqb2JIt1EPxSjNxsOp3LTwGZ
-         IU2g==
+        bh=h8RkPwRSQGNgtwFGhMa45mhqNtBX9nLmlB3IzWi1i0E=;
+        b=pS456OJH1AEeHSLqDqw4ui/jbQksci7GOMA5UlZbGUKa3b3cKwqxQ6MWm5xwlX57PI
+         IZDJIMG8QqVi0ayPNo4/ypRXZdgRlhu+XjkAk73EqC7nB0IRpSRqGXxoy8vQd8Bgt0CQ
+         WzXiDAw6KrRaOGBb/z0v7a61im0dlEScKq/wb4E9/cTIbcx67pmRYk290CD9S+K1KRL/
+         l6Fry/b26nnViZfxl9z6fED8dgvP5m7O9o1LjTQeMg92Ky/sK7+4svsAdj3UWxQlrHwX
+         SF0UYmimTDOTR1kBR9t4IKWksrJIgXR9XanS7ZoycxoKXpmFEuhgVKLoq5LCGKnBYZTA
+         SWvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778879715; x=1779484515;
+        d=1e100.net; s=20251104; t=1778879718; x=1779484518;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=RpW1a/fScKIJOJjIsuP4+bGqNlbA4fQX64i8+rdO0zg=;
-        b=EjYawriTNM67XuWU63XN+pFTMFIsa6304MfDR9OcTPLXLYkpglRp0tbKsiO6lxcJ+j
-         nIwObtYuQqEcnLeVsXVDOZp3cfypEkS2Kf1oiKK3OLQoXsQV72MPVY8xeHuyZVnCEQQV
-         W2wc/PG/G9KXaNP/Rof89/QHcSTfN5ks2ePsfV0UVkh+X+qF6dmJyQ1XazRdpckUlg1G
-         awUa5le1hF00agaO4K9Emamwd6bllzm06tuj/ehwlNz8t+WKac3dO1D+TnnCpY0vGngA
-         GoJDKUwz0q1GxlHRGiIsBqTznbbcj6Fj9PN0ZKBQ9fM+VyOUCgSbbJAMQawE/wnEVJVg
-         UwCg==
-X-Forwarded-Encrypted: i=1; AFNElJ9gBUshbXSkCue+1Ap7xyoMBYOIAHNlQP+e7zrFPU2e8EhUFztheJAe3G7dmVp+nmTShe+GTRwF9MDd8J0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8oQO54eZLNxxlOAZDosPqm50Usn6FyI9VY8IFfgXhL/XbacDR
-	65TPUj3+N25j8EclaZ8uJdyyRUsKWFdT9IKHGBssBQJdb05Kv314FKtp
-X-Gm-Gg: Acq92OGLTmNX8fhEw2gaMWaE7DenKh0FeDbrEaJZmq0Zyei6Tnb7tDCk+1/oRmN2NqY
-	moXzDlT1cVWcoxfc5ICfqLW4Jky4pfmwwxu45+PyE8iEcXdYYnN4jCL5HA12y9vOyS3DE2MIm7W
-	04P0N4Hu2P3lJJhjfNOg19WZMEimj2mYRlSDJdpqLHdQEpzERNS4EQElXysGsFflxbZg9bQRnCj
-	n1arHrOYIrRspiU/A2jRU5p6gCdZh7qvv5BTTYixMQub4ZI01lkQyuvd4/bFlyiDp4oTYuCnK1w
-	mWcmxRTWEzFUmRqHFb0G+wdUFHvUaBUCCqIi52Vj5feVnUlxDHklY/i+9e5pYvCT75A7Xaul8Go
-	7TZjMA/4L73vDHgkuj8lj8cQEpgo30EaG79KfaaMfuqG3NYQmwJ7/HFZS7PTqRE97PFTp5ZGSui
-	SWrq+9WDgggynCRIGWF2yeojhVxPfOopE=
-X-Received: by 2002:a05:7300:a94b:b0:2be:142f:d499 with SMTP id 5a478bee46e88-30398678a39mr2873251eec.16.1778879715061;
-        Fri, 15 May 2026 14:15:15 -0700 (PDT)
+        bh=h8RkPwRSQGNgtwFGhMa45mhqNtBX9nLmlB3IzWi1i0E=;
+        b=TYHF2PoEhqLF69ipMpBI0Sy14PBx5cU8nw3Xzolec5ia0d2w0bsSkNQcCLGcSKwnYd
+         teijS94DYiw56V5t11Wuq0KpB9tU6eJoLxUezx5rF0iAIK42HKFUzuXUjbBDfZH0ZgRM
+         vjxEb0a7pqzyjzMvPDIa3RlVPR3r9BI1sJhxxJjwY1cPj0lMH+b+zrjJWgg1q8FflyCM
+         bkHkTHj0qCfvYFqZ2hp9ZbaTOwS5O9yQCEa8ULSu/FYm7AArjn5ajCKKmRJay2Mo+lEn
+         MPoLHof4z55gjvA1hNDZa0fO5zjp4nSQtuBZWdqqCKtFb+12El8ghLxmBaM2pqxLI6KY
+         ZojQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/r1PAWY525SBUxG5eaPPhRqkPj1LA1De1igIkx804bkYrwQ25F9cH7OQE9N+wErXmEwMYsyUAo6GYHeaw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzilzVb/HvGKlPDLRWK1cRzrWIbrUHQ6Wu8ZOuTaZQgDq2OYO0c
+	x/PmMg/L/YU7p7gMfKLTLxto+oFxbpxwnot4N9mGOHFDsVDF99QuzP+W
+X-Gm-Gg: Acq92OFmIPPakK94ykf1usX+WxLfWngEMpk1w/fuevDWXATsXOJZLSxcG5iiLPOWanY
+	NHEzOEDCHQYdBAD2eH7rKBfsIKVnTJET5YbrnQ2T2hkh63oUZnqsk8RjL9C0+FePgA6+Lg7UgGS
+	jiJDqEXQf8H2esS1lAYrIfmkKLzh/2NPEE/bpYfOuaXcDRTRYNI9UV3BdxlNsdT+Uo5fYRbmbYR
+	4aSvJSicL28hvczk8cmTTGQmQ3xfaOaU6QLDZJc27NXqgCwKdxXzOkIiR9GQUgETBHu5bjOpdiG
+	pooIwCKMrkyDAMbfXGJxHsgz6CR5/UN8hczm8A7WseJaIzfmyIh0HyDWDY1kgVv52qUfh/gPnHi
+	WWM7JZek+OjdgbD2sI0zMI7sfkB1R1GvhYFvy6hF9fsJGTgbPWfKtP/P8c1Vtp7z6zksTVIMSuy
+	jKwinP3oIsP9Zp/Oe4vs5Gqx44kn/RrzY=
+X-Received: by 2002:a05:7300:ad30:b0:2e7:5737:8364 with SMTP id 5a478bee46e88-303984e17ffmr3028118eec.15.1778879717789;
+        Fri, 15 May 2026 14:15:17 -0700 (PDT)
 Received: from mimas.lan ([2603:8000:df01:38f7:a6bb:6dff:fecf:e71a])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-302978ad18asm8003208eec.26.2026.05.15.14.15.13
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-302947e917dsm8005268eec.12.2026.05.15.14.15.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 May 2026 14:15:14 -0700 (PDT)
+        Fri, 15 May 2026 14:15:17 -0700 (PDT)
 From: Ross Philipson <ross.philipson@gmail.com>
 To: linux-kernel@vger.kernel.org,
 	x86@kernel.org,
@@ -92,9 +92,9 @@ Cc: ross.philipson@gmail.com,
 	daniel.kiper@oracle.com,
 	andrew.cooper3@citrix.com,
 	trenchboot-devel@googlegroups.com
-Subject: [PATCH v16 22/38] lib/crypto: Add SHA512 support for pre-boot environments
-Date: Fri, 15 May 2026 14:13:54 -0700
-Message-ID: <20260515211410.31440-23-ross.philipson@gmail.com>
+Subject: [PATCH v16 23/38] x86: Allow WARN_trap() macro to be included in pre-boot environments
+Date: Fri, 15 May 2026 14:13:55 -0700
+Message-ID: <20260515211410.31440-24-ross.philipson@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260515211410.31440-1-ross.philipson@gmail.com>
 References: <20260515211410.31440-1-ross.philipson@gmail.com>
@@ -106,51 +106,43 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Allow the SHA512 library code in lib/crypto/sha512.c to be used in
-pre-boot environments. Use the __DISABLE_EXPORTS macro to disable
-function exports and define the proper values for that environment
-as was done earlier for SHA256.
+For pre-boot environments, do not use the static call definition of the
+WARN_trap() macro.
 
+Suggested-by: Peter Zijlstra <peterz@infradead.org>
 Signed-off-by: Ross Philipson <ross.philipson@gmail.com>
 ---
- lib/crypto/sha512.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ arch/x86/include/asm/bug.h | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/lib/crypto/sha512.c b/lib/crypto/sha512.c
-index 605eab51aabd..160e81d86da6 100644
---- a/lib/crypto/sha512.c
-+++ b/lib/crypto/sha512.c
-@@ -133,7 +133,7 @@ sha512_blocks_generic(struct sha512_block_state *state,
- 	} while (--nblocks);
- }
+diff --git a/arch/x86/include/asm/bug.h b/arch/x86/include/asm/bug.h
+index 80c1696d8d59..7899768ae644 100644
+--- a/arch/x86/include/asm/bug.h
++++ b/arch/x86/include/asm/bug.h
+@@ -138,8 +138,14 @@ do {									\
+ #ifdef HAVE_ARCH_BUG_FORMAT_ARGS
  
--#ifdef CONFIG_CRYPTO_LIB_SHA512_ARCH
-+#if defined(CONFIG_CRYPTO_LIB_SHA512_ARCH) && !defined(__DISABLE_EXPORTS)
- #include "sha512.h" /* $(SRCARCH)/sha512.h */
- #else
- #define sha512_blocks sha512_blocks_generic
-@@ -250,6 +250,12 @@ void sha512(const u8 *data, size_t len, u8 out[SHA512_DIGEST_SIZE])
- }
- EXPORT_SYMBOL_GPL(sha512);
- 
-+/*
-+ * Pre-boot environments (as indicated by __DISABLE_EXPORTS being defined)
-+ * don't need the SHA2 HMAC support code.
-+ */
+ #ifndef __ASSEMBLER__
++
 +#ifndef __DISABLE_EXPORTS
-+
- static void __hmac_sha512_preparekey(struct sha512_block_state *istate,
- 				     struct sha512_block_state *ostate,
- 				     const u8 *raw_key, size_t raw_key_len,
-@@ -406,6 +412,8 @@ void hmac_sha512_usingrawkey(const u8 *raw_key, size_t raw_key_len,
- }
- EXPORT_SYMBOL_GPL(hmac_sha512_usingrawkey);
+ #include <linux/static_call_types.h>
+ DECLARE_STATIC_CALL(WARN_trap, __WARN_trap);
++#define WARN_trap(...)	static_call_mod(WARN_trap)(__VA_ARGS__)
++#else /* __DISABLE_EXPORTS */
++#define WARN_trap(...)	__WARN_trap(__VA_ARGS__)
++#endif /* __DISABLE_EXPORTS */
  
-+#endif /* !__DISABLE_EXPORTS */
-+
- #if defined(sha512_mod_init_arch) || defined(CONFIG_CRYPTO_FIPS)
- static int __init sha512_mod_init(void)
- {
+ struct pt_regs;
+ struct sysv_va_list { /* from AMD64 System V ABI */
+@@ -172,7 +178,7 @@ extern void *__warn_args(struct arch_va_list *args, struct pt_regs *regs);
+ #define __WARN_print_arg(flags, format, arg...)				\
+ do {									\
+ 	int __flags = (flags) | BUGFLAG_WARNING | BUGFLAG_ARGS ;	\
+-	static_call_mod(WARN_trap)(__WARN_bug_entry(__flags, format), ## arg); \
++	WARN_trap(__WARN_bug_entry(__flags, format), ## arg);		\
+ 	asm (""); /* inhibit tail-call optimization */			\
+ } while (0)
+ 
 -- 
 2.47.3
 
