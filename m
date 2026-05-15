@@ -1,50 +1,46 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFA413CF04C;
-	Fri, 15 May 2026 10:23:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E40A3CEB8C;
+	Fri, 15 May 2026 10:24:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778840620; cv=none; b=T4f4XPOCccqSv9VK4J/GcxWIyeBg6XEqevXbEfIqMmqDN4HuvDKlScxLX5b8k/pIRIq3RzLtaGv/smrAodg5vo8teSGyowoDOtJRPjf1JT5/jYleLFnFer6NMqDHQcfQjHquNeFqU2StTWOjo5mM9awWXlgtzjVxohr6sp39L8A=
+	t=1778840643; cv=none; b=naeenfG5IHU2HmB0yGknbTehsS23nIZ252LSp92+DEHu9PznLZYOEij2qq7vzBchSb/buGsuIyhZ7vtHutMEih/7XwI7QekG5aQ0a6EJN5nK2hLKSEJuEs0WPnRtxJoOpQuePP1WhOf26Y26hEtSpmT/F0rk/RW/UEFpcQ2r3fE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778840620; c=relaxed/simple;
-	bh=9YL70ocQPapy8m9Vwt9xSZRBqRiLTDSfWdZHGMUCyOI=;
+	s=arc-20240116; t=1778840643; c=relaxed/simple;
+	bh=ZYdDzaC3vjnJNv62mamD5fYZBrcktHHp38b0OhWQHHU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AP5KI9HpQYuzZGDXa/4zFa4/A45z4G8IXGQIm2r4qxDpUjTihSYzcdZCml8UTb8sxu+hAwy8qpQTy5iruRUlAxnIlUw6d4NdJkOQ42Zo580YqG3Q//3cmU32FYJNN01OpaQdugkJpB7YZibn988v1CR4OnZEHzoye0q1ro1NnI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=p5w5J1px; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=DLHeNt1nXP7ZZTMroKqTI8IS0FWy0a+QTF4bad3xFPNR6YyMO5+foWW4R5S3ic/jO16bSfAloJMuXTnU5lZ2PpbAOMGSfBC7TCfIkdnQhhT0Ic16hZHvnvfoClX+TLbs603D3MnrTVzbFv27LO8I3O0dNO+w8iGmO+tsh0fTIFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=gcmEkcGF; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="p5w5J1px"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="gcmEkcGF"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=ykRodeBhF0cXfcSqXz2szUw5McJKqpEFePe6cFI1Rto=; 
-	b=p5w5J1pxzXQ6m6chUdkvsFtXcPJ8hZUpF31FPKK3GAAjkl9mRHduEy8nCxpg7bgogLSX2Vo2HB7
-	RrlMV0MuzOdtbluF9f1Uf+YqHK/QHbAB3CKGzZpBq0cukWbTO3IpGOiLjiu8o+JYPYfZ+uDIpwG+4
-	ofiKKg/MHeM+WlwJVdkRVjDUNHBhYEmJhts2oI9KqlewTJXU/ZeC8aPd7TC4kQVKWTRmg/PWFREsV
-	DvsdT3VKrO6cpQFCDf3SutjDP0EXnPSk/bGTnyF2Aumvj8s6vK2KtmT3MVUrq3Kw3PJ+nSBZhKxpQ
-	O4UgphF8lsuMkfwQWG5402xx4VzH88bcTz0g==;
+	from:content-type:reply-to; bh=PvbSSysDoVrZemjFZZG7ax47szEisjMVuslblnZ/F/M=; 
+	b=gcmEkcGF5jhn2B7c1fNZVcM97LSD2U5nM7S8l4g58eR+wlqh0pUnoVqCYPfh/paOUM6xhr4/3Pe
+	KAXvKYJR5XJScRPqMZaEUquKn6IJa+U9/gwjBV94K/dgqi31GWdJ79qIfM6Iw+92+5s9jSWdGEiBT
+	M6aAac4HBJi2FbMpQHKDEimGF8kqSBirSG4gVFiNBtIA4tmRsKpMWLx5fHAMEZvRveRN8csmaCqlf
+	mWsT2shBnFlFHo3xRPaTEfpG2AAs+B+nmA2waPVtojKAn7hNhoWzxOZeP8zzOxerStpWsgwBmU0K8
+	ApDzJjptSBH6rFqpAU6KNMibhAOW8zGsLIZA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wNphS-00EOY0-39;
-	Fri, 15 May 2026 18:23:24 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 15 May 2026 18:23:22 +0800
-Date: Fri, 15 May 2026 18:23:22 +0800
+	id 1wNphz-00EOYM-2R;
+	Fri, 15 May 2026 18:23:56 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 15 May 2026 18:23:55 +0800
+Date: Fri, 15 May 2026 18:23:55 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Paul Louvel <paul.louvel@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	David Howells <dhowells@redhat.com>,
-	Kim Phillips <kim.phillips@freescale.com>,
-	Christophe Leroy <chleroy@kernel.org>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	Herve Codina <herve.codina@bootlin.com>, stable@vger.kernel.org
-Subject: Re: [PATCH v3 00/11] crypto: talitos - fix several issues in the
- Freescale talitos crypto driver
-Message-ID: <agb0Gry9gqmYHPdn@gondor.apana.org.au>
-References: <20260507-bootlin_test-7-1-rc1_sec_bugfix-v3-0-c98d7589b942@bootlin.com>
+To: Dawei Feng <dawei.feng@seu.edu.cn>
+Cc: clabbe@baylibre.com, davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org,
+	jianhao.xu@seu.edu.cn, stable@vger.kernel.org,
+	Zilin Guan <zilin@seu.edu.cn>
+Subject: Re: [PATCH] crypto: amlogic - avoid double cleanup in
+ meson_crypto_probe()
+Message-ID: <agb0O_i_QJCTuKPU@gondor.apana.org.au>
+References: <20260508042416.419216-1-dawei.feng@seu.edu.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,109 +49,124 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260507-bootlin_test-7-1-rc1_sec_bugfix-v3-0-c98d7589b942@bootlin.com>
+In-Reply-To: <20260508042416.419216-1-dawei.feng@seu.edu.cn>
 
-On Thu, May 07, 2026 at 04:41:46PM +0200, Paul Louvel wrote:
-> This series fixes several issues in the Freescale talitos crypto driver.
+On Fri, May 08, 2026 at 12:24:16PM +0800, Dawei Feng wrote:
+> When meson_allocate_chanlist() fails after a partial allocation, it already
+> unwinds the allocated chanlist state through its local error path.
+> meson_crypto_probe() then jump to error_flow and calls
+> meson_free_chanlist() again, causing the same per-flow resources to be torn
+> down twice. In the reproduced failure path, the second teardown
+> re-entered crypto_engine_exit() on an already destroyed worker and KASAN
+> reported a slab-use-after-free in kthread_destroy_worker().
 > 
-> Patch 1 fixes a missing dma_sync_single_for_cpu() before reading a
-> descriptor header.
+> Prevent double-free by handling partial allocation failures locally within
+> meson_allocate_chanlist() and skipping the outer cleanup path.
 > 
-> Patches 2-5 add support for chaining an arbitrary number of descriptors
-> in the driver for the SEC1 hardware.
+> The bug was first flagged by an experimental analysis tool we are
+> developing for kernel memory-management bugs while analyzing
+> v6.13-rc1. The tool is still under development and is not yet publicly
+> available.
 > 
-> Patches 6-8 rework the SEC1 hash implementation to build descriptor
-> chains instead of submitting one descriptor at a time via a workqueue.
+> The bug was reproduced in a QEMU x86_64 guest booted with KASAN on v7.1,
+> using the reproducer under tools/testing/meson_crypto_probe. The reproducer
+> forces the second dma_alloc_attrs() call in the gxl-crypto probe path to
+> return NULL, making meson_allocate_chanlist() fail after partial
+> initialization. On the unpatched kernel this reliably triggered a
+> slab-use-after-free. With this fix applied, the same reproducer no longer
+> emits any KASAN report and the probe fails cleanly with -ENOMEM.
 > 
-> Patches 9-10 are cleanups: rename first_desc/last_desc to
-> first_request/last_request, and remove a useless wrapper function.
+>     ==================================================================
+>     BUG: KASAN: slab-use-after-free in kthread_destroy_worker+0xb2/0xd0
+>     Read of size 8 at addr ff1100010c057a68 by task insmod/265
 > 
-> Patch 11 fixes the same ahash request size limitation on SEC2 (64k - 1
-> bytes), by splitting ahash_done() into SEC1 and SEC2 paths so that SEC2
-> iterates through descriptors sequentially.
+>     CPU: 1 UID: 0 PID: 265 Comm: insmod Tainted: G           O        7.1.0-rc2-00376-g810af9adc907-dirty #10 PREEMPT(lazy)
+>     Tainted: [O]=OOT_MODULE
+>     Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
+>     Call Trace:
+>      <TASK>
+>      dump_stack_lvl+0x68/0xa0
+>      print_report+0xcb/0x5e0
+>      ? __virt_addr_valid+0x21d/0x3f0
+>      ? kthread_destroy_worker+0xb2/0xd0
+>      ? kthread_destroy_worker+0xb2/0xd0
+>      kasan_report+0xca/0x100
+>      ? kthread_destroy_worker+0xb2/0xd0
+>      kthread_destroy_worker+0xb2/0xd0
+>      meson_crypto_probe+0x4d0/0xc10 [amlogic_gxl_crypto]
+>      platform_probe+0x99/0x140
+>      really_probe+0x1c6/0x6a0
+>      ? __pfx___device_attach_driver+0x10/0x10
+>      __driver_probe_device+0x248/0x310
+>      ? acpi_driver_match_device+0xb0/0x100
+>      driver_probe_device+0x48/0x210
+>      ? __pfx___device_attach_driver+0x10/0x10
+>      __device_attach_driver+0x160/0x320
+>      bus_for_each_drv+0x104/0x190
+>      ? __pfx_bus_for_each_drv+0x10/0x10
+>      ? _raw_spin_unlock_irqrestore+0x2c/0x50
+>      __device_attach+0x19d/0x3b0
+>      ? __pfx___device_attach+0x10/0x10
+>      ? do_raw_spin_unlock+0x53/0x220
+>      device_initial_probe+0x78/0xa0
+>      bus_probe_device+0x5b/0x130
+>      device_add+0xcfd/0x1430
+>      ? __pfx_device_add+0x10/0x10
+>      ? insert_resource+0x34/0x50
+>      ? lock_release+0xc9/0x290
+>      platform_device_add+0x24e/0x590
+>      ? __pfx_meson_crypto_probe_repro_init+0x10/0x10 [meson_crypto_probe_repro]
+>      meson_crypto_probe_repro_init+0x330/0xff0 [meson_crypto_probe_repro]
+>      do_one_initcall+0xc0/0x450
+>      ? __pfx_do_one_initcall+0x10/0x10
+>      ? _raw_spin_unlock_irqrestore+0x2c/0x50
+>      ? __create_object+0x59/0x80
+>      ? kasan_unpoison+0x27/0x60
+>      do_init_module+0x27b/0x7d0
+>      ? __pfx_do_init_module+0x10/0x10
+>      ? kasan_quarantine_put+0x84/0x1d0
+>      ? kfree+0x32c/0x510
+>      ? load_module+0x561e/0x5ff0
+>      load_module+0x54fe/0x5ff0
+>      ? __pfx_load_module+0x10/0x10
+>      ? security_file_permission+0x20/0x40
+>      ? kernel_read_file+0x23d/0x6e0
+>      ? mmap_region+0x235/0x4a0
+>      ? __pfx_kernel_read_file+0x10/0x10
+>      ? __file_has_perm+0x2c0/0x3e0
+>      init_module_from_file+0x158/0x180
+>      ? __pfx_init_module_from_file+0x10/0x10
+>      ? __lock_acquire+0x45a/0x1ba0
+>      ? idempotent_init_module+0x315/0x610
+>      ? lock_release+0xc9/0x290
+>      ? lockdep_init_map_type+0x4b/0x220
+>      ? do_raw_spin_unlock+0x53/0x220
+>      idempotent_init_module+0x330/0x610
+>      ? __pfx_idempotent_init_module+0x10/0x10
+>      ? __pfx_cred_has_capability.isra.0+0x10/0x10
+>      ? ksys_mmap_pgoff+0x385/0x520
+>      __x64_sys_finit_module+0xbe/0x120
+>      do_syscall_64+0x115/0x690
+>      entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>     RIP: 0033:0x7f7d6d31690d
+>     Code: 5b 41 5c c3 66 0f 1f 84 00 00 00 00 00 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d f3 b4 0f 00 f7 d8 >
+>     RSP: 002b:00007fffc027ac68 EFLAGS: 00000246 ORIG_RAX: 0000000000000139
+>     RAX: ffffffffffffffda RBX: 000055f7b81967c0 RCX: 00007f7d6d31690d
+>     RDX: 0000000000000000 RSI: 000055f79a0d6cd2 RDI: 0000000000000003
+>     RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+>     R10: 0000000000000003 R11: 0000000000000246 R12: 000055f79a0d6cd2
+>     R13: 000055f7b8196790 R14: 000055f79a0d5888 R15: 000055f7b81968e0
+>      </TASK>
 > 
-> Tested on an MPC885 SoC (SEC1 Lite), and on an MPC8321EMP SoC (SEC2)
-> with CRYPTO_SELFTESTS_FULL=y.
-> For the SEC1 Lite, some tests are failing due to a timeout waiting for
-> request completion. These failed tests existed prior to this series.
-> On SEC2, there is no failed tests.
-> 
-> Signed-off-by: Paul Louvel <paul.louvel@bootlin.com>
+> Fixes: 48fe583fe541 ("crypto: amlogic - Add crypto accelerator for amlogic GXL")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
+> Signed-off-by: Dawei Feng <dawei.feng@seu.edu.cn>
 > ---
-> Changes in v3:
-> - Patch 1 was reading the next chained descriptor header
->   unconditionally. Fixed it by checking if a request actually contained
->   a chained descriptor before deferencing it.
-> - For descriptor chaining introduced in patch 2, use a next pointer
->   embedded inside struct talitos_edesc instead of the kernel's struct
->   list_node. This removes the necessity for a desc_chain member in
->   struct talitos_request. A dirty hack was previously used to assign a
->   request->desc_chain to the current request by taking edesc->prev,
->   assuming that the descriptor was added to a list before calling
->   talitos_submit(). Not only was this non-idiomatic, but it also broke
->   the skcipher and aead implementations because they do not use the
->   descriptor chaining feature at all. The descriptor chaining mechanism
->   does not need a doubly circular linked list; this change makes the
->   code more readable than sticking with the kernel linked list
->   implementation.
-> - Updated the performance measurement in patch 6.
-> - Drop patch 12, which was a revert of commit 4b24ea971a93 ("crypto:
->   talitos - Preempt overflow interrupts off-by-one fix"). This patch was
->   primarily motivated because the SEC1 has a Fetch Register rather than
->   a Fetch FIFO per channel. As a result, having a value of 24 in the
->   device tree node for the channel-fifo-len property does not make
->   sense, as the hardware does not have a Fetch FIFO. Setting this value
->   to 1 (which should be the correct value for SoCs featuring the SEC1
->   engine family) breaks the driver because no descriptor can be
->   submitted due to commit 4b24ea971a93, and the patch was primarily
->   intended to fix this issue. As this issue is too deep to be addressed
->   in this patch series, it has been dropped.
-> - Link to v2: https://patch.msgid.link/20260505-bootlin_test-7-1-rc1_sec_bugfix-v2-0-5818064bd190@bootlin.com
-> 
-> Changes in v2:
-> - Split the first patch into smaller, logically separated patches for
->   easier review.
-> - Added more context on testing on the cover letter.
-> - Introduce a fix to correctly read hardware descriptor header. This fix
->   was motivated by a remark of Sashiko on the v1:
->   https://sashiko.dev/#/patchset/20260504-bootlin_test-7-1-rc1_sec_bugfix-v1-0-c97c641976f5%40bootlin.com
-> - Separate SEC2 64k-1 ahash limitation fix into its own patch.
-> - Link to v1: https://patch.msgid.link/20260504-bootlin_test-7-1-rc1_sec_bugfix-v1-0-c97c641976f5@bootlin.com
-> 
-> To: Herbert Xu <herbert@gondor.apana.org.au>
-> To: "David S. Miller" <davem@davemloft.net>
-> To: Christophe Leroy <chleroy@kernel.org>
-> To: Paolo Abeni <pabeni@redhat.com>
-> To: David Howells <dhowells@redhat.com>
-> Cc: linux-crypto@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> 
-> ---
-> Paul Louvel (11):
->       crypto: talitos - use dma_sync_single_for_cpu() before reading descriptor header
->       crypto: talitos - add chaining of arbitrary number of descriptor for the SEC1
->       crypto: talitos - move dma unmapping code in flush_channel() into a standalone dma_unmap_request() function
->       crypto: talitos - move dma mapping code in talitos_submit() into a standalone dma_map_request() function
->       crypto: talitos - move code in current_desc_hdr() into a standalone function
->       crypto: talitos/hash - prepare SEC1 descriptor chaining, remove additional descriptor
->       crypto: talitos/hash - use descriptor chaining for SEC1 instead of workqueue
->       crypto: talitos/hash - drop workqueue mechanism for SEC1
->       crypto: talitos/hash - rename first_desc/last_desc to first_request/last_request
->       crypto: talitos/hash - remove useless wrapper
->       crypto: talitos/hash - fix SEC2 64k - 1 ahash request limitation
-> 
->  drivers/crypto/talitos.c | 549 ++++++++++++++++++++++++-----------------------
->  drivers/crypto/talitos.h |  12 ++
->  2 files changed, 287 insertions(+), 274 deletions(-)
-> ---
-> base-commit: db8b9f227833e729faf44a512aa1e88a625b5ad8
-> change-id: 20260504-bootlin_test-7-1-rc1_sec_bugfix-13169ed07ddc
-> 
-> Best regards,
-> --  
-> Paul Louvel <paul.louvel@bootlin.com>
+>  drivers/crypto/amlogic/amlogic-gxl-core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
