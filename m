@@ -1,135 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailout3.hostsharing.net (mailout3.hostsharing.net [144.76.133.104])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF7D393DC0;
-	Fri, 15 May 2026 13:26:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9C1F47B401;
+	Fri, 15 May 2026 14:04:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.133.104
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778851578; cv=none; b=aiA5YMR5vTB7pkiynDvFYRK//VrlpVoawMJp9uzAoirw6iu06bR7mSunmoh0idLLH3noSNJ0cyFJJZzQNxdFt90EmeGv1uYvgN9xh+C6VSK8dZeWUtei6GyFKYAde9LqSUmPHqUl650kbPEJ8v0q2leeK2o4iPQ1ZwR8fnt7GF0=
+	t=1778853888; cv=none; b=LN3GbqTgtoUNY76GVT9f5IHm9fxN5mAQKNP4lTk4RKnExmnj227G+TFIHqbWMWPw4MIC4g6Q24nL1BiFAD+AGAQzPAahwceB8BGJ0d+to6LPB89w8BaPZvd+FoiKibRsa9nVTFkiy0o9f94nellV9LqK1IGwIfbOLtfkSOMmpGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778851578; c=relaxed/simple;
-	bh=J5lm9pulfHscWp7wS/oyBI84lhc1OfQju4Pw4EjpeXA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WjxL9Hc1F9CM0c98/Yj+en1Sp/vDeeryQZTyaL7r7EwP7xLUQaqLUfjNcJOj8UBY2orrdc9o3w5gMB50aNd2L7UtgLWII7tLYwXhnumMPXb9mqZjV6ZdYz0Xfh/sQDXzAnTaOjQAJ6/eWPYr/m/9UgUwRxiwSj3KrSVAUuwta9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nBx4z5Gu; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nBx4z5Gu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 974C3C2BCB8;
-	Fri, 15 May 2026 13:26:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1778851578;
-	bh=J5lm9pulfHscWp7wS/oyBI84lhc1OfQju4Pw4EjpeXA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=nBx4z5Gukl0wXO+0nznaq7XNF3S0CQWa6BJ6WklxVwadiGxYRL41LlZ9qfqXEoAPr
-	 sZAVHwK+TD2AwsalPeVbYHay/xolzkRrGjBWc3So72/hjOCGnOvpNj0vw8FudLrUut
-	 zcFAhNyleexLX82idIzvbf+s8nNNaJhw0rja5IYNTtd4womwV3PnTstPb5efqHNWDn
-	 07TrEM1fasfIvsPkLv0AaH3eP6+eyWkJTECZmqxifIYxFBeWbAllbIjsJ6UMUTbqBO
-	 EWon+538UsTkaot7ff6V4Fo7YL33GrIWiAi8WE4fDNLVu+vIGCoBU9HMQMVkLz0BpF
-	 73LIn9dqxJ3FQ==
-Message-ID: <83b900f3-ac6e-4342-93de-bba0a7f0ad7c@kernel.org>
-Date: Fri, 15 May 2026 15:26:13 +0200
+	s=arc-20240116; t=1778853888; c=relaxed/simple;
+	bh=G7X4JCRz268Rl2Qhi1tq+hbnRYpNYtxE67LEFk1e7bU=;
+	h=From:Date:Subject:To:Cc:Message-Id; b=Sf65Jv1Y2KgcCSxgk5iPEop87LQPySPddS+aBnLhcacvjQnAdbQHC59IJxpcwBUzWZXuI3c6PF925SNIIMhghjg6kfy8oVqPqm+8pKWZfYsn4pNKIvUX+jQjP2gX3eY+88a0K0e1UvVQP/utlsPwMskto+MXIl3AYApFYQmMRO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=144.76.133.104
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384
+	 client-signature ECDSA (secp384r1) client-digest SHA384)
+	(Client CN "*.hostsharing.net", Issuer "GlobalSign GCC R6 AlphaSSL CA 2025" (verified OK))
+	by mailout3.hostsharing.net (Postfix) with ESMTPS id C2564C2D;
+	Fri, 15 May 2026 16:04:38 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 90EAF602DFAC; Fri, 15 May 2026 16:04:38 +0200 (CEST)
+From: Lukas Wunner <lukas@wunner.de>
+Date: Fri, 15 May 2026 16:04:40 +0200
+Subject: [PATCH 6.1-stable] lib/crypto: mpi: Fix integer underflow in
+ mpi_read_raw_from_sgl()
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Sasha Levin <sashal@kernel.org>
+Cc: stable@vger.kernel.org, linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>, Ignat Korchagin <ignat@linux.win>, Jarkko Sakkinen <jarkko@kernel.org>, Yiming Qian <yimingqian591@gmail.com>
+Message-Id: <20260515140438.90EAF602DFAC@h08.hostsharing.net>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/3] dt-bindings: crypto: qcom,ice: Add sa8255p support
-To: Linlin Zhang <linlin.zhang@oss.qualcomm.com>
-Cc: Rob Herring <robh@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
- Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S . Miller" <davem@davemloft.net>, devicetree@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260512033750.3393050-1-linlin.zhang@oss.qualcomm.com>
- <20260512033750.3393050-2-linlin.zhang@oss.qualcomm.com>
- <20260514-clever-apricot-goose-acc827@quoll>
- <56f5e73b-5f40-4bfb-9796-dadfcb4f9085@oss.qualcomm.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <56f5e73b-5f40-4bfb-9796-dadfcb4f9085@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 15/05/2026 15:23, Linlin Zhang wrote:
-> 
-> 
-> On 5/14/2026 8:55 PM, Krzysztof Kozlowski wrote:
->> On Mon, May 11, 2026 at 08:37:48PM -0700, Linlin Zhang wrote:
->>> On sa8255p, resources such as PHY, clocks, regulators, and resets are
->>> managed by remote firmware via the SCMI power protocol. As a result, the
->>> ICE driver cannot directly access clocks and must instead use power-domains
->>> to request resource configuration.
->>
->> Then how can it be compatible with qcom,inline-crypto-engine?
-> 
-> Thanks for the review.
-> 
-> You are right that the SCMI-based implementation differs from the
-> traditional inline crypto engine in terms of resource control. On
-> sa8255p, clocks and other resources are managed by remote firmware
-> via SCMI, so the driver does not directly control these resources
-> and instead relies on power domains.
-> 
-> Given this difference, the SCMI variant does not match the same
-> programming model as the existing qcom,inline-crypto-engine
-> implementation. Using it as a generic fallback is therefore not
-> appropriate, as the generic compatible implies that the device can
-> be handled equivalently by the same driver assumptions, which is
-> not the case here.
+commit 8c2f1288250a90a4b5cabed5d888d7e3aeed4035 upstream.
 
-Are you pasting here LLM responses? Two long paragraphs, written in over
-formal English with no grammar errors and repeating standard AI slop
-answer - "You are right".
+Yiming reports an integer underflow in mpi_read_raw_from_sgl() when
+subtracting "lzeros" from the unsigned "nbytes".
 
-Sending me LLM responses or LLM patches is unfortunately straight way to
-get ignored.
+For this to happen, the scatterlist "sgl" needs to occupy more bytes
+than the "nbytes" parameter and the first "nbytes + 1" bytes of the
+scatterlist must be zero.  Under these conditions, the while loop
+iterating over the scatterlist will count more zeroes than "nbytes",
+subtract the number of zeroes from "nbytes" and cause the underflow.
 
-Best regards,
-Krzysztof
+When commit 2d4d1eea540b ("lib/mpi: Add mpi sgl helpers") originally
+introduced the bug, it couldn't be triggered because all callers of
+mpi_read_raw_from_sgl() passed a scatterlist whose length was equal to
+"nbytes".
+
+However since commit 63ba4d67594a ("KEYS: asymmetric: Use new crypto
+interface without scatterlists"), the underflow can now actually be
+triggered.  When invoking a KEYCTL_PKEY_ENCRYPT system call with a
+larger "out_len" than "in_len" and filling the "in" buffer with zeroes,
+crypto_akcipher_sync_prep() will create an all-zero scatterlist used for
+both the "src" and "dst" member of struct akcipher_request and thereby
+fulfil the conditions to trigger the bug:
+
+  sys_keyctl()
+    keyctl_pkey_e_d_s()
+      asymmetric_key_eds_op()
+        software_key_eds_op()
+          crypto_akcipher_sync_encrypt()
+            crypto_akcipher_sync_prep()
+              crypto_akcipher_encrypt()
+                rsa_enc()
+                  mpi_read_raw_from_sgl()
+
+To the user this will be visible as a DoS as the kernel spins forever,
+causing soft lockup splats as a side effect.
+
+Fix it.
+
+Reported-by: Yiming Qian <yimingqian591@gmail.com> # off-list
+Fixes: 2d4d1eea540b ("lib/mpi: Add mpi sgl helpers")
+Signed-off-by: Lukas Wunner <lukas@wunner.de>
+Cc: stable@vger.kernel.org # v4.4+
+Reviewed-by: Ignat Korchagin <ignat@linux.win>
+Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+Link: https://lore.kernel.org/r/59eca92ff4f87e2081777f1423a0efaaadcfdb39.1776003111.git.lukas@wunner.de
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ lib/mpi/mpicoder.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/mpi/mpicoder.c b/lib/mpi/mpicoder.c
+index 3cb6bd148fa9..b6efe618e614 100644
+--- a/lib/mpi/mpicoder.c
++++ b/lib/mpi/mpicoder.c
+@@ -453,7 +453,7 @@ MPI mpi_read_raw_from_sgl(struct scatterlist *sgl, unsigned int nbytes)
+ 	lzeros = 0;
+ 	len = 0;
+ 	while (nbytes > 0) {
+-		while (len && !*buff) {
++		while (len && !*buff && lzeros < nbytes) {
+ 			lzeros++;
+ 			len--;
+ 			buff++;
+-- 
+2.51.0
+
