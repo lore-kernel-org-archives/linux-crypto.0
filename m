@@ -1,284 +1,111 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6991366806
-	for <linux-crypto@vger.kernel.org>; Fri, 15 May 2026 23:05:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A7BA3F6C35
+	for <linux-crypto@vger.kernel.org>; Fri, 15 May 2026 23:05:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778886342; cv=none; b=go0sMTJUTHcFDsPvRzjm6kjzhD8DbPyzZapDBr5t2b9vClL7coJU8QJJ6iCQphtvS+xYXG8eJR2lfKzuNoQQEHAGK6U8djrn801oyUfkAEF7HZwFhUWB/Scesb3kmARsj0suy7312vIwFvE3Izad5SaY3OCJGPQv5XP24oNZXkc=
+	t=1778886356; cv=none; b=d+RY9yUIPrpJVvLs3mNpFAY1nwq7NtKqWXI0qWJ4uGLsR5nQ9L2Ghw3L33WxpC1KsBDV9srCrHd1t6PEOlvG0NBcondEG/2qA0g1qc+XXf2zK1N8lFQiBpfux/FXgsSoGf8zNwjYX1oHikEk3ddRNoGBQdEUd5T6l+ycudMTm3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778886342; c=relaxed/simple;
-	bh=ZGqAIeAFv2wbXEhJRKsEf83Crcr7POgSScN7/cHLKAA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HcCeFORwu4hfKqUhumD9sgTNwD1PKisgUm0mDhhQJm6fJSZfQ7ChJIc84xfvPjy5k/Zj8K80a64LFGem4bcqchxN5JciH/BZTyJXCg1nmNKKShDF+6O9IurdO+tjUKG1cBWKYDYFSQev6IScjL0l2uPodkoDh07fskp3EvwWZeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EDAEztiD; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1778886356; c=relaxed/simple;
+	bh=Efl9eGRUvRUSMKgeJbT5viBCvrEY9UH6Bmru0k/SItc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qqo0jC0Qw4nGsfa7zO+ia/Ylgcc+jxD5ZQpNmQin+5O+hqhu/ObieWZ4LURM4pDL+Ob+qNlPJGGQvY1NXykmxisBb/6ns0/bq8+aWTsnEXWY4vsetdawpXLVIQopS6HB87nMTL3mET8lnUrnbFdBuSEJPLEvezyP1t95zvJ8zf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=VjGrlCzq; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EDAEztiD"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778886339;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8642cbHOUysxzVtcvqLZZF0bEcZh2vOvPZl6xKmvN60=;
-	b=EDAEztiD3kNu7c69btIqlcd38ozaF/nzKGby8BloFTNZCbMD08bLCAphuneC0eqbsK6e+V
-	EpEtPauBye5sUvGfL7ZJVbShv1pZ/b1P+jaBG5g8a26y69m0Wry+3z4AXL89d43pMGOedK
-	Mi1WbQG3vRtQlQCLqkAGBu87jWt4pS4=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-623-JgjggxVOMluWBV7oN_fmgg-1; Fri,
- 15 May 2026 19:05:33 -0400
-X-MC-Unique: JgjggxVOMluWBV7oN_fmgg-1
-X-Mimecast-MFC-AGG-ID: JgjggxVOMluWBV7oN_fmgg_1778886331
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0807D1956094;
-	Fri, 15 May 2026 23:05:31 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.44.48.83])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EBEC51800465;
-	Fri, 15 May 2026 23:05:25 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: netdev@vger.kernel.org
-Cc: David Howells <dhowells@redhat.com>,
-	Hyunwoo Kim <imv4bel@gmail.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-afs@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Jeffrey Altman <jaltman@auristor.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	linux-nfs@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH net v4 1/3] crypto/krb5, rxrpc: Fix lack of pre-decrypt/pre-verify length checks
-Date: Sat, 16 May 2026 00:05:13 +0100
-Message-ID: <20260515230516.2718212-2-dhowells@redhat.com>
-In-Reply-To: <20260515230516.2718212-1-dhowells@redhat.com>
-References: <20260515230516.2718212-1-dhowells@redhat.com>
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="VjGrlCzq"
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-8b62ca1d28eso5086986d6.2
+        for <linux-crypto@vger.kernel.org>; Fri, 15 May 2026 16:05:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1778886354; x=1779491154; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=D7nklUCScqv2NitQOcHmOlp1LpHmTXVfX8MzcU0yUSA=;
+        b=VjGrlCzqH+mUAoPngtAUQe7YHCLoMhJG1fiIHQCxDz32VqGSoi3tCJsSFgtxVM188x
+         B1I46C1Bx8QQzngPeK7/vA6iCd3CpAt8owSY3Qk2nCELXf16tY5ju7NULVy1Bs7iU46b
+         28cIKMzc8eLyongezBRMR3VmA7o08PT5Z7liMeIlm/EM5roeQ11TGTFe8o8pwEKpBde2
+         Fsx6ppNY5QSyuK/iYmvX45MZQEdYg6mnwLgbubPjDSn55db4gxyjHGOWFH4aH1iAqKvc
+         eCuseZOZeg7y7OGNf1zOhuZ+/BsETUblnI4pCL/GGB+CYb73uPazR/wccxYK74Yh0spW
+         gQQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778886354; x=1779491154;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=D7nklUCScqv2NitQOcHmOlp1LpHmTXVfX8MzcU0yUSA=;
+        b=qS2HDFn0X1/i2jtD77AfiLk2pd+uv0vXsS8jC0Z07HRMlr2zce/o5iBHHF3kfONHqN
+         Wb9IUQ8zKrZlvvU6+K6Svuz+nb1XBogMbd4lpVx2bAFxqguu0vWmN9tT0VKQvfFF3qqt
+         FCtuEBzFnGF0VIhEX4HzH1htGsEx8wk7KYiydguKhHHM469GYDe1xPv4ZCf88XnJiV+s
+         Xg0J6HalDnNMTvZXau71lW/+yzWVlat9AQ5GBRof5cCslB5w3kuvF5Q+DfDAmPqL/BOz
+         syyYg8xP1Pl+PDSKjwsczDx1Qyx4hX/DhiwFtf2MQAfBRX779EH2QMsFyWme3EtpDNVw
+         B8jQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+Nghi4IPWykoYYsmwk20dqjm1ET1wjN4i4DxYCi+JJvrzP1jPjf9ot9w4HeLJZaPKtlfw5mcilLTHOp6A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQIIriIDuuk4f+XPxRm9c7CphecEgCDICPscAwDWeRy6PaSccs
+	HQ+isrvY0+uyDrbA2nK21WPCAWkv1XBMpMs1GnUNIlaYZjOzFHBJJcNR+tjdBfQxVLo=
+X-Gm-Gg: Acq92OHQ0PwWWQskZ2e2vt9W2Ll02encfWYSpdXD54KYWlinAQEc4GRoLGGgB8jo1P+
+	7Ni8iIQ23m5H4JrMSmd5EFsp6jdugGsuV4YzPg0gkTNLcZg2g74ImSoY6AnhcyhCrp3M5pvU1Tx
+	bR2hiEoEyUhojlXk2e46SQNf6HcAgp8K/pTcUaMyMb7QYZru2r9CxCrh3f708E5askAl94L5wUI
+	bUK37raldE+aMA/zzcfz8VF9Z9hX3B8VwFjWN5SclbM1rtAI16mDBm2NeNKf+qowvFZmIuFQH03
+	P7T0RMs9DETi15cvObLd2v3lh7PJgBCCOmHAZwzLQOT2GqBJ/pQf55UEbAySzgEzkNB+Iv+N5gl
+	QE8uZozni+hjFwnHiAjMUTWUmCNM3ICUPZ05YO1P7Ete+Fvm1sgkQkljgkxcdVtgkObtsTVpv8i
+	FgZEn4x4+WhnBqoYVxSkNkLg/+ObfCdcWRAbNK99f9V0zXP/m9GSg47cAh9JpOHfPz7kKBRTI54
+	s1D9A==
+X-Received: by 2002:a05:6214:1c82:b0:8c2:b36d:4fc1 with SMTP id 6a1803df08f44-8ca0f66afc4mr87385476d6.14.1778886354080;
+        Fri, 15 May 2026 16:05:54 -0700 (PDT)
+Received: from ziepe.ca (crbknf0213w-47-54-130-67.pppoe-dynamic.high-speed.nl.bellaliant.net. [47.54.130.67])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8c90c374469sm64030376d6.49.2026.05.15.16.05.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 May 2026 16:05:53 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1wO1bN-00000008GrB-0jOE;
+	Fri, 15 May 2026 20:05:53 -0300
+Date: Fri, 15 May 2026 20:05:53 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Jarkko Sakkinen <jarkko@kernel.org>
+Cc: Ross Philipson <ross.philipson@gmail.com>, linux-kernel@vger.kernel.org,
+	x86@kernel.org, linux-integrity@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org,
+	kexec@lists.infradead.org, linux-efi@vger.kernel.org,
+	iommu@lists.linux.dev, dpsmith@apertussolutions.com,
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+	dave.hansen@linux.intel.com, ardb@kernel.org, mjg59@srcf.ucam.org,
+	James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de,
+	luto@amacapital.net, nivedita@alum.mit.edu,
+	herbert@gondor.apana.org.au, davem@davemloft.net, corbet@lwn.net,
+	ebiederm@xmission.com, dwmw2@infradead.org,
+	baolu.lu@linux.intel.com, kanth.ghatraju@oracle.com,
+	daniel.kiper@oracle.com, andrew.cooper3@citrix.com,
+	trenchboot-devel@googlegroups.com
+Subject: Re: [PATCH v16 01/38] tpm: Initial step to reorganize TPM public
+ headers
+Message-ID: <20260515230553.GO7702@ziepe.ca>
+References: <20260515211410.31440-1-ross.philipson@gmail.com>
+ <20260515211410.31440-2-ross.philipson@gmail.com>
+ <agemXwxVb9jvAbYM@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <agemXwxVb9jvAbYM@kernel.org>
 
-Change the krb5 crypto library to provide facilities to precheck the length
-of the message about to be decrypted or verified.
+On Sat, May 16, 2026 at 02:03:59AM +0300, Jarkko Sakkinen wrote:
 
-Fix AF_RXRPC to make use of this to validate DATA packets secured with
-RxGK.
+> LGTM
+> 
+> I'll hold on from actual tags up until there is some consensus with the
+> patch set.
 
-Fixes: 9d1d2b59341f ("rxrpc: rxgk: Implement the yfs-rxgk security class (GSSAPI)")
-Closes: https://sashiko.dev/#/patchset/20260511160753.607296-1-dhowells%40redhat.com
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: Jeffrey Altman <jaltman@auristor.com>
-cc: Herbert Xu <herbert@gondor.apana.org.au>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: Simon Horman <horms@kernel.org>
-cc: Chuck Lever <chuck.lever@oracle.com>
-cc: netdev@vger.kernel.org
-cc: linux-afs@lists.infradead.org
-cc: linux-nfs@vger.kernel.org
-cc: linux-crypto@vger.kernel.org
-cc: stable@vger.kernel.org
----
- Documentation/crypto/krb5.rst | 17 ++++++++---
- crypto/krb5/krb5_api.c        | 54 +++++++++++++++++++++++++++++++----
- include/crypto/krb5.h         |  9 ++++--
- include/trace/events/rxrpc.h  |  1 +
- net/rxrpc/rxgk.c              | 15 ++++++++--
- 5 files changed, 81 insertions(+), 15 deletions(-)
+This patch set is huge, and I know there is alot of interest now in
+DRTM.
 
-diff --git a/Documentation/crypto/krb5.rst b/Documentation/crypto/krb5.rst
-index beffa0133446..f62e07ac6811 100644
---- a/Documentation/crypto/krb5.rst
-+++ b/Documentation/crypto/krb5.rst
-@@ -158,13 +158,22 @@ returned.
- When a message has been received, the location and size of the data with the
- message can be determined by calling::
- 
--	void crypto_krb5_where_is_the_data(const struct krb5_enctype *krb5,
--					   enum krb5_crypto_mode mode,
--					   size_t *_offset, size_t *_len);
-+	int crypto_krb5_where_is_the_data(const struct krb5_enctype *krb5,
-+					  enum krb5_crypto_mode mode,
-+					  size_t *_offset, size_t *_len);
- 
- The caller provides the offset and length of the message to the function, which
- then alters those values to indicate the region containing the data (plus any
--padding).  It is up to the caller to determine how much padding there is.
-+padding).  It is up to the caller to determine how much padding there is.  The
-+function returns an error if the length is too small or if the mode is
-+unsupported.  An additional function::
-+
-+	int crypto_krb5_check_data_len(const struct krb5_enctype *krb5,
-+				       enum krb5_crypto_mode mode,
-+				       size_t len, size_t min_content);
-+
-+is provided to just do a basic check that the decrypted/verified message would
-+have a sufficient minimum payload.
- 
- Preparation Functions
- ---------------------
-diff --git a/crypto/krb5/krb5_api.c b/crypto/krb5/krb5_api.c
-index 23026d4206c8..c7ea40f900a7 100644
---- a/crypto/krb5/krb5_api.c
-+++ b/crypto/krb5/krb5_api.c
-@@ -134,27 +134,69 @@ EXPORT_SYMBOL(crypto_krb5_how_much_data);
-  * Find the offset and size of the data in a secure message so that this
-  * information can be used in the metadata buffer which will get added to the
-  * digest by crypto_krb5_verify_mic().
-+ *
-+ * Return: 0 if successful, -EBADMSG if the message is too short or -EINVAL if
-+ * the mode is unsupported.
-  */
--void crypto_krb5_where_is_the_data(const struct krb5_enctype *krb5,
--				   enum krb5_crypto_mode mode,
--				   size_t *_offset, size_t *_len)
-+int crypto_krb5_where_is_the_data(const struct krb5_enctype *krb5,
-+				  enum krb5_crypto_mode mode,
-+				  size_t *_offset, size_t *_len)
- {
- 	switch (mode) {
- 	case KRB5_CHECKSUM_MODE:
-+		if (*_len < krb5->cksum_len)
-+			return -EBADMSG;
- 		*_offset += krb5->cksum_len;
- 		*_len -= krb5->cksum_len;
--		return;
-+		return 0;
- 	case KRB5_ENCRYPT_MODE:
-+		if (*_len < krb5->conf_len + krb5->cksum_len)
-+			return -EBADMSG;
- 		*_offset += krb5->conf_len;
- 		*_len -= krb5->conf_len + krb5->cksum_len;
--		return;
-+		return 0;
- 	default:
- 		WARN_ON_ONCE(1);
--		return;
-+		return -EINVAL;
- 	}
- }
- EXPORT_SYMBOL(crypto_krb5_where_is_the_data);
- 
-+/**
-+ * crypto_krb5_check_data_len - Check a message is big enough
-+ * @krb5: The encoding to use.
-+ * @mode: Mode of operation.
-+ * @len: The length of the secure blob.
-+ * @min_content: Minimum length of the content inside the blob.
-+ *
-+ * Check that a message is large enough to hold whatever bits the encryption
-+ * type wants to glue on (nonce, checksum) plus a minimum amount of content.
-+ *
-+ * Return: 0 if successful, -EBADMSG if the message is too short or -EINVAL if
-+ * the mode is unsupported.
-+ */
-+int crypto_krb5_check_data_len(const struct krb5_enctype *krb5,
-+			       enum krb5_crypto_mode mode,
-+			       size_t len, size_t min_content)
-+{
-+	switch (mode) {
-+	case KRB5_CHECKSUM_MODE:
-+		if (len < krb5->cksum_len ||
-+		    len - krb5->cksum_len < min_content)
-+			return -EBADMSG;
-+		return 0;
-+	case KRB5_ENCRYPT_MODE:
-+		if (len < krb5->conf_len + krb5->cksum_len ||
-+		    len - (krb5->conf_len + krb5->cksum_len) < min_content)
-+			return -EBADMSG;
-+		return 0;
-+	default:
-+		WARN_ON_ONCE(1);
-+		return -EINVAL;
-+	}
-+}
-+EXPORT_SYMBOL(crypto_krb5_check_data_len);
-+
- /*
-  * Prepare the encryption with derived key data.
-  */
-diff --git a/include/crypto/krb5.h b/include/crypto/krb5.h
-index 71dd38f59be1..aac3ecf88467 100644
---- a/include/crypto/krb5.h
-+++ b/include/crypto/krb5.h
-@@ -121,9 +121,12 @@ size_t crypto_krb5_how_much_buffer(const struct krb5_enctype *krb5,
- size_t crypto_krb5_how_much_data(const struct krb5_enctype *krb5,
- 				 enum krb5_crypto_mode mode,
- 				 size_t *_buffer_size, size_t *_offset);
--void crypto_krb5_where_is_the_data(const struct krb5_enctype *krb5,
--				   enum krb5_crypto_mode mode,
--				   size_t *_offset, size_t *_len);
-+int crypto_krb5_where_is_the_data(const struct krb5_enctype *krb5,
-+				  enum krb5_crypto_mode mode,
-+				  size_t *_offset, size_t *_len);
-+int crypto_krb5_check_data_len(const struct krb5_enctype *krb5,
-+			       enum krb5_crypto_mode mode,
-+			       size_t len, size_t min_content);
- struct crypto_aead *crypto_krb5_prepare_encryption(const struct krb5_enctype *krb5,
- 						   const struct krb5_buffer *TK,
- 						   u32 usage, gfp_t gfp);
-diff --git a/include/trace/events/rxrpc.h b/include/trace/events/rxrpc.h
-index 573f2df3a2c9..704a10de6670 100644
---- a/include/trace/events/rxrpc.h
-+++ b/include/trace/events/rxrpc.h
-@@ -71,6 +71,7 @@
- 	EM(rxkad_abort_resp_unknown_tkt,	"rxkad-resp-unknown-tkt") \
- 	EM(rxkad_abort_resp_version,		"rxkad-resp-version")	\
- 	/* RxGK security errors */					\
-+	EM(rxgk_abort_1_short_header,		"rxgk1-short-hdr")	\
- 	EM(rxgk_abort_1_verify_mic_eproto,	"rxgk1-vfy-mic-eproto")	\
- 	EM(rxgk_abort_2_decrypt_eproto,		"rxgk2-dec-eproto")	\
- 	EM(rxgk_abort_2_short_data,		"rxgk2-short-data")	\
-diff --git a/net/rxrpc/rxgk.c b/net/rxrpc/rxgk.c
-index 0d5e654da918..26e723052a37 100644
---- a/net/rxrpc/rxgk.c
-+++ b/net/rxrpc/rxgk.c
-@@ -480,8 +480,12 @@ static int rxgk_verify_packet_integrity(struct rxrpc_call *call,
- 
- 	_enter("");
- 
--	crypto_krb5_where_is_the_data(gk->krb5, KRB5_CHECKSUM_MODE,
--				      &data_offset, &data_len);
-+	if (crypto_krb5_where_is_the_data(gk->krb5, KRB5_CHECKSUM_MODE,
-+					  &data_offset, &data_len) < 0) {
-+		ret = rxrpc_abort_eproto(call, skb, RXGK_PACKETSHORT,
-+					 rxgk_abort_1_short_header);
-+		goto put_gk;
-+	}
- 
- 	hdr = kzalloc_obj(*hdr, GFP_NOFS);
- 	if (!hdr)
-@@ -529,6 +533,13 @@ static int rxgk_verify_packet_encrypted(struct rxrpc_call *call,
- 
- 	_enter("");
- 
-+	if (crypto_krb5_check_data_len(gk->krb5, KRB5_ENCRYPT_MODE,
-+				       len, sizeof(hdr)) < 0) {
-+		ret = rxrpc_abort_eproto(call, skb, RXGK_PACKETSHORT,
-+					 rxgk_abort_2_short_header);
-+		goto error;
-+	}
-+
- 	ret = rxgk_decrypt_skb(gk->krb5, gk->rx_enc, skb, &offset, &len, &ac);
- 	if (ret < 0) {
- 		if (ret != -ENOMEM)
+Can we please split out and progress the TPM reorg mini-series at the
+front?
 
+Jason
