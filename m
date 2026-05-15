@@ -1,89 +1,86 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05B7B480345
-	for <linux-crypto@vger.kernel.org>; Fri, 15 May 2026 11:47:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 643DF47D95C;
+	Fri, 15 May 2026 11:47:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778845645; cv=none; b=ENH2DwmG/8ujo5hhpdfQefMqtCmO+60gGCjliRn3rP6oNY/qggY/fY4toaYGDwAmGK/hjyMmxhLmcdIijG2qpoBgnkqEb+P4RX0K+LFIKBKx+2MXWBuWxnvJCNARPwArhSzr1+TkHShHVSycD1Y9cT1Pesfee5I8d43FbZAZkrY=
+	t=1778845654; cv=none; b=j1PvqMMawSM/AApF+KPuXXgww+DfHke9wFuz0ifQhtYhSVibrF6GQ6/iVzvkF7kCoF6FW8M9YA6vay39J5NZhOye38RTYreDDey48XjBfWeJ8hHjo9DI6un2WaxGHLhDJhuH0kjOnRfUTXHiZRrJ5VBTKArZtCALq8s9SqKQvtQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778845645; c=relaxed/simple;
-	bh=GVzpf8DHrtIE2e0iLrgK05eawGI15jKhZ0DshiAXIe8=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=n99WR7sFcg55RNZVURFMcK2xXp+jkw4aflHq08AG0H30j5lSW1+KhmuEyXiPTOg7QAnXeMm5U/v+qTr09+/3pzAPTdfnYbFSm4x9wGlwYeG9NYjpWfc0UFWl1w3nHidJL1BB1w7RWgbN9JWy6dX8v/IMhPRZg6poQt9Fa9sltNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bA4Zedlz; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1778845654; c=relaxed/simple;
+	bh=M6xjZTrvGZyJ27gJgmWGvYtGS17h8GVu6LgrtVBmXgQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NiijZh889mGYhEYTVPwYGCpkF3cwbuk9Zr6O2VeV1nRlR+rxVUr0le6x7g/n+lP1lYNMWClqA+WAKPPrYXvdx7VWzQM1NGlmeilb0BBWvkJN+sNlaEc4Tpj7Od2n+TbvUZTB+Oit4xYYeLg+LOVw/J7adN8yegXqaRBdOt2GriA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=rt2kj0Rx; arc=none smtp.client-ip=113.46.200.221
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bA4Zedlz"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1778845639;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lDpsJ9vTI5/XpFdT7cxzYBQrIqR/7gB5JKH/whriB4o=;
-	b=bA4Zedlzw2E19x2KoCp1eOrIzYUTj/slIO7GpDxUYhVwINRfIPTiqDDuZ5rD+gTcLd1c8o
-	/uFaDBULLxm8IbBNtzd5oGSLO7Lg9qm27vX5uN6RtLSS1K5G/8lgJSaw8jXvlYgET62V/c
-	4OtPvlBADZWCK88o7g7t90m7Db+UpXU=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-576-UAqYTvpgM-SMWa-X9yYaYQ-1; Fri,
- 15 May 2026 07:47:14 -0400
-X-MC-Unique: UAqYTvpgM-SMWa-X9yYaYQ-1
-X-Mimecast-MFC-AGG-ID: UAqYTvpgM-SMWa-X9yYaYQ_1778845632
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 575081800451;
-	Fri, 15 May 2026 11:47:11 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.44.48.83])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2C0B419560A2;
-	Fri, 15 May 2026 11:47:06 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20260510232455.2245650-1-michael.bommarito@gmail.com>
-References: <20260510232455.2245650-1-michael.bommarito@gmail.com> <20260502132506.1936358-1-michael.bommarito@gmail.com>
-To: Michael Bommarito <michael.bommarito@gmail.com>
-Cc: dhowells@redhat.com, Herbert Xu <herbert@gondor.apana.org.au>,
-    "David S. Miller" <davem@davemloft.net>,
-    linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    linux-afs@lists.infradead.org, Ilya Dryomov <idryomov@gmail.com>,
-    Xiubo Li <xiubli@redhat.com>, ceph-devel@vger.kernel.org,
-    stable@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] crypto: krb5 - filter out async aead implementations at alloc
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="rt2kj0Rx"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=uVVeZYKktBUn0kyfdPJ1iLoyXoJIz7xRo8HlOTQ5K+g=;
+	b=rt2kj0RxQGKKCGxOJKY1erc7f8F2Q9xhl5d3pKsz+8UTIsW9D0KAg07ZAFOVzLt34JH/l/Bur
+	Yl4eXVeFTTJWpXd2pcWRs6kNLTDGoUJ+gdnTmxiUWyC1n1zBhbaHY9F3K0S/FoKB8MIOGpSRKy9
+	RBBjVMxTGx/o3vVKGovpLCI=
+Received: from mail.maildlp.com (unknown [172.19.162.223])
+	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4gH4xG43xzzRhQy;
+	Fri, 15 May 2026 19:39:46 +0800 (CST)
+Received: from kwepemr100008.china.huawei.com (unknown [7.202.195.119])
+	by mail.maildlp.com (Postfix) with ESMTPS id 96FDD40571;
+	Fri, 15 May 2026 19:47:24 +0800 (CST)
+Received: from localhost.localdomain (10.50.163.32) by
+ kwepemr100008.china.huawei.com (7.202.195.119) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Fri, 15 May 2026 19:47:24 +0800
+From: ZongYu Wu <wuzongyu1@huawei.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<fanghao11@huawei.com>, <liulongfang@huawei.com>, <qianweili@huawei.com>,
+	<wangzhou1@hisilicon.com>
+Subject: [PATCH 0/3] crypto: hisilicon - improve backlog handling
+Date: Fri, 15 May 2026 19:45:58 +0800
+Message-ID: <20260515114601.2492524-1-wuzongyu1@huawei.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2632014.1778845625.1@warthog.procyon.org.uk>
-Date: Fri, 15 May 2026 12:47:05 +0100
-Message-ID: <2632015.1778845625@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+ kwepemr100008.china.huawei.com (7.202.195.119)
 
-Michael Bommarito <michael.bommarito@gmail.com> wrote:
+From: Chenghai Huang <huangchenghai2@huawei.com>
 
-> -	ci = crypto_alloc_aead(krb5->encrypt_name, 0, 0);
-> +	ci = crypto_alloc_aead(krb5->encrypt_name, 0, CRYPTO_ALG_ASYNC);
+This series improves backlog handling for HiSilicon crypto drivers.
+The ZIP and HPRE drivers are extended to support backlog queuing when
+the hardware queue is temporarily busy. Instead of failing requests
+immediately under hardware congestion, requests can now be queued and
+resubmitted when previous requests complete.
 
-Apologies, but doesn't that do the opposite of what we want?
+The series also fixes a use-after-free issue in the SEC2 backlog path.
+The crypto core may release the request and its tfm context immediately
+after crypto_request_complete() returns. The SEC2 driver must therefore
+avoid accessing context memory that may already have been freed while
+processing backlog requests.
 
-Documentation/crypto/architecture.rst says:
+Chenghai Huang (1):
+  crypto: hisilicon/zip - add backlog support for zip
 
-	The mask flag restricts the type of cipher. The only allowed flag is
-	CRYPTO_ALG_ASYNC to restrict the cipher lookup function to
-	asynchronous ciphers. Usually, a caller provides a 0 for the mask
-	flag.
+Wenkai Lin (1):
+  crypto: hisilicon/sec2 - fix UAF in sec_alg_send_backlog
 
-Don't we want only synchronous ciphers?
+lizhi (1):
+  crypto: hisilicon/hpre - implement full backlog support for hpre
+    driver
 
-David
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c | 223 +++++++++++----
+ drivers/crypto/hisilicon/sec2/sec_crypto.c  |  23 +-
+ drivers/crypto/hisilicon/zip/zip_crypto.c   | 286 +++++++++++++-------
+ 3 files changed, 359 insertions(+), 173 deletions(-)
+
+-- 
+2.43.0
 
