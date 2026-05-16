@@ -1,94 +1,73 @@
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F8931F993
-	for <linux-crypto@vger.kernel.org>; Sat, 16 May 2026 18:26:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A54931E841
+	for <linux-crypto@vger.kernel.org>; Sat, 16 May 2026 23:42:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778956007; cv=none; b=H7qWA5WhpR6bZzQEX6gnWxvnN/L5J8i/3ywsBMXuad0EJQ7PchZ0KOnxmQNUz4y2ldpbvYnrbDRKGyfmgX0sNPHazt4VMNBiX2wjWYwlxAeuGmRcuijy6MRvkh1w4kC9ODbQqISecyquFa6tZDcWo4yiVoCb1szFxMD/AxVHuKk=
+	t=1778974964; cv=none; b=Xvvynn7ejiY089vvXwGBNs8uVzcraKNwqBiMZzXPlbcyE9r0GHlYkBAMWytaFHWz1xOs2fttF2+fgoRuZr3gGP7hoS44CGoIcTOuvmnAxoD5yvayakYifcq+XeS4aOQ0buwUbbKwz/QLMbCsV8HvRaInC+miV9AAHORQ5Nd3xfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778956007; c=relaxed/simple;
-	bh=5NRjr8zzHkUcqAAMbm7x3LPu9+T/wt4SCXaf51TXES0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Lt05KNkRgPpRqq6HNFGpwy/5MDk6h0Sdcl9/LXFG7W9Ft5YEd5aibYohWmAt3AD2EsBWarLaEZ2gccP3/noQqIHQZzjakBolfwwfWrkEem9cF9nrzGHfyzg3SO4QVyTSdHQnFIJLDYfhc+6bEBgnLq+D1hUHIwOckOr0+CZWs3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=u7zLm/Sv; arc=none smtp.client-ip=95.215.58.171
+	s=arc-20240116; t=1778974964; c=relaxed/simple;
+	bh=HWgEXqdF6aYXWTxdFkGRqPYwNVxZP11iFJK7joXrAao=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PbugLmhKb4/0foaOLO5HIU8Q0dkUjNHlkLKoe/Q+fbZqCm0A1Dnw5JS8bd1EqrMdLgW6CotlhnL6obd6IkK6C0DRK0t70/bRlXQC4Zia+t2N1281wg3AInppgQZLDh7ht2QYNkU7oPUo9yCgObrZVjv5Rclmv4pP6BniA6gDPEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EhiIEw+6; arc=none smtp.client-ip=91.218.175.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="u7zLm/Sv"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EhiIEw+6"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1778956002;
+	t=1778974960;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=XPNmsPEY/N3T861BKhzCvLefPxnkkzhoF4rkecCN/kc=;
-	b=u7zLm/SvcUJhO8FwJdzSEdx7tQP9dmfrqyvieZTwi1uHBHCdPJFVKAKP1qWAfYBFXmaRzW
-	BhnXslUGf+1trAb5F7ERw/lx79jB8CR/m2yR1Q+82lfvrzlcUUIrJAS7fbNqNWLD4ju97V
-	O8Wwqb039zoRcExDr/8YB2Tm9rl8BMw=
+	bh=uWVGWR9P+fisLqZv1EK+PltibUkbLcactFYAeNMlwf4=;
+	b=EhiIEw+6YRlo7L/FrKufECtfndt7JZ73ZWWheOiWzMQDt/MMVPdJgyJK5i3l8wldIdMRvo
+	tGqseuTVwdxny+BUkFO6eTxYWyYr5LC2GT6fqkO7sKqd09SKHfAWGzCe7sczgRnKpxkmgq
+	ga2GQCXrGftFZrgr7JAiXfmXwhgso6c=
 From: Thorsten Blum <thorsten.blum@linux.dev>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Kees Cook <kees@kernel.org>
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>
 Cc: Thorsten Blum <thorsten.blum@linux.dev>,
 	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org
-Subject: [PATCH v2] crypto: drivers - remove of_match_ptr from OF match tables
-Date: Sat, 16 May 2026 20:23:36 +0200
-Message-ID: <20260516182337.874311-3-thorsten.blum@linux.dev>
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: atmel-sha - use memcpy_and_pad to simplify hmac_setup
+Date: Sun, 17 May 2026 01:42:12 +0200
+Message-ID: <20260516234211.1131137-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1579; i=thorsten.blum@linux.dev; h=from:subject; bh=5NRjr8zzHkUcqAAMbm7x3LPu9+T/wt4SCXaf51TXES0=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFkc27Q4jQ3T2drOJcjPvbFt2eVFqUnWlx6vXTHrr1mUZ Mz36fuudJSyMIhxMciKKbI8mPVjhm9pTeUmk4idMHNYmUCGMHBxCsBEljMz/BVdp3zkeWOVAFfM 7moe6TsbXFMvXazsKMtIvjG3xtNy0TdGhrsH+ToYeR4Zqh5Jc0l6voFBelfsKtcjdV7hB9rOTFb ZzAYA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=795; i=thorsten.blum@linux.dev; h=from:subject; bh=HWgEXqdF6aYXWTxdFkGRqPYwNVxZP11iFJK7joXrAao=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFmcDJcTo4/NWVN/RV3jSrvmzvcnT9af4jjTKzM3V/MLn 0Ftg0NVRykLgxgXg6yYIsuDWT9m+JbWVG4yidgJM4eVCWQIAxenAEwk6zUjw5NXMzu8F/G1vFHq 3H2l9rRfWIEUS0RSVsoleyZl2/pL9xj+J1lZH2n5EFZSsvif0aTay05bTllFrdddrCJW4l1Qtbq eFwA=
 X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Drop of_match_ptr() because OF matching is stubbed out when CONFIG_OF=n.
-
-Indent bcm_spu_pdriver.driver and its members while at it.
+Use memcpy_and_pad() instead of memcpy() followed by memset() to
+simplify atmel_sha_hmac_setup().
 
 Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 ---
-Changes in v2:
-- Drop omap-des.c because it doesn't compile with CONFIG=n and requires
-  other fixes first
-- v1: https://lore.kernel.org/lkml/20260516114941.741140-2-thorsten.blum@linux.dev/
----
- drivers/crypto/bcm/cipher.c | 6 +++---
- drivers/crypto/qcom-rng.c   | 2 +-
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ drivers/crypto/atmel-sha.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
-index 2bce15dc0aa8..240b40ae9cd6 100644
---- a/drivers/crypto/bcm/cipher.c
-+++ b/drivers/crypto/bcm/cipher.c
-@@ -4698,9 +4698,9 @@ static void bcm_spu_remove(struct platform_device *pdev)
+diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
+index 1f1341a16c42..f60c7c8cf912 100644
+--- a/drivers/crypto/atmel-sha.c
++++ b/drivers/crypto/atmel-sha.c
+@@ -1731,8 +1731,7 @@ static int atmel_sha_hmac_setup(struct atmel_sha_dev *dd,
+ 		return atmel_sha_hmac_prehash_key(dd, key, keylen);
  
- static struct platform_driver bcm_spu_pdriver = {
- 	.driver = {
--		   .name = "brcm-spu-crypto",
--		   .of_match_table = of_match_ptr(bcm_spu_dt_ids),
--		   },
-+		.name = "brcm-spu-crypto",
-+		.of_match_table = bcm_spu_dt_ids,
-+	},
- 	.probe = bcm_spu_probe,
- 	.remove = bcm_spu_remove,
- };
-diff --git a/drivers/crypto/qcom-rng.c b/drivers/crypto/qcom-rng.c
-index 0685ba122e8a..150e5802e351 100644
---- a/drivers/crypto/qcom-rng.c
-+++ b/drivers/crypto/qcom-rng.c
-@@ -265,7 +265,7 @@ static struct platform_driver qcom_rng_driver = {
- 	.remove =  qcom_rng_remove,
- 	.driver = {
- 		.name = KBUILD_MODNAME,
--		.of_match_table = of_match_ptr(qcom_rng_of_match),
-+		.of_match_table = qcom_rng_of_match,
- 		.acpi_match_table = ACPI_PTR(qcom_rng_acpi_match),
- 	}
- };
+ 	/* Prepare ipad. */
+-	memcpy((u8 *)hmac->ipad, key, keylen);
+-	memset((u8 *)hmac->ipad + keylen, 0, bs - keylen);
++	memcpy_and_pad(hmac->ipad, bs, key, keylen, 0);
+ 	return atmel_sha_hmac_compute_ipad_hash(dd);
+ }
+ 
