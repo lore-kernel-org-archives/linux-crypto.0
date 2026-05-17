@@ -1,73 +1,146 @@
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f193.google.com (mail-dy1-f193.google.com [74.125.82.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A54931E841
-	for <linux-crypto@vger.kernel.org>; Sat, 16 May 2026 23:42:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E11E73290DC
+	for <linux-crypto@vger.kernel.org>; Sun, 17 May 2026 03:14:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778974964; cv=none; b=Xvvynn7ejiY089vvXwGBNs8uVzcraKNwqBiMZzXPlbcyE9r0GHlYkBAMWytaFHWz1xOs2fttF2+fgoRuZr3gGP7hoS44CGoIcTOuvmnAxoD5yvayakYifcq+XeS4aOQ0buwUbbKwz/QLMbCsV8HvRaInC+miV9AAHORQ5Nd3xfs=
+	t=1778987691; cv=none; b=QusoEhYVV+Z4DmoueRGFmJVWysfQ50lkTXwdmcFB17qM+ARBQZeNgIwATVLNT58dqM3qwA24YE55AoHmYMNvw8JJs1FCKyvwCsf+CMoYIHQq2s/lQeyXIGywNHOr2AmfRODITAL7jeDIK+yuTUqPHB1ib98mFSpdkD78Q2E+nX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778974964; c=relaxed/simple;
-	bh=HWgEXqdF6aYXWTxdFkGRqPYwNVxZP11iFJK7joXrAao=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PbugLmhKb4/0foaOLO5HIU8Q0dkUjNHlkLKoe/Q+fbZqCm0A1Dnw5JS8bd1EqrMdLgW6CotlhnL6obd6IkK6C0DRK0t70/bRlXQC4Zia+t2N1281wg3AInppgQZLDh7ht2QYNkU7oPUo9yCgObrZVjv5Rclmv4pP6BniA6gDPEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EhiIEw+6; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1778987691; c=relaxed/simple;
+	bh=ri/eJlHC7UN2zyssXhADK+SFuDdKeaElhRa8H7tTz+8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KovDDqkj4GEVfTFI1koLgzzbumY7jLxya7w9z4weUvRc8CaEdd4HgmtQ9sJywQKzwOB8R/D1VlDB+AOjFrLdyxkibmDlsfCuWZKjGzx9po5ONKLT3Ph6i3UGNSELRmIwjsjGkmZzDua7M/JEfPRqTgHg3P+aRVUnBSgZX0Qdszg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jIqT1B0W; arc=none smtp.client-ip=74.125.82.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EhiIEw+6"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1778974960;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=uWVGWR9P+fisLqZv1EK+PltibUkbLcactFYAeNMlwf4=;
-	b=EhiIEw+6YRlo7L/FrKufECtfndt7JZ73ZWWheOiWzMQDt/MMVPdJgyJK5i3l8wldIdMRvo
-	tGqseuTVwdxny+BUkFO6eTxYWyYr5LC2GT6fqkO7sKqd09SKHfAWGzCe7sczgRnKpxkmgq
-	ga2GQCXrGftFZrgr7JAiXfmXwhgso6c=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: atmel-sha - use memcpy_and_pad to simplify hmac_setup
-Date: Sun, 17 May 2026 01:42:12 +0200
-Message-ID: <20260516234211.1131137-2-thorsten.blum@linux.dev>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jIqT1B0W"
+Received: by mail-dy1-f193.google.com with SMTP id 5a478bee46e88-2f7020a928eso1519052eec.1
+        for <linux-crypto@vger.kernel.org>; Sat, 16 May 2026 20:14:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1778987689; x=1779592489; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Hfq3wqL8gmrW8nePp5k7jramHiXYMDBLkPO5KDqKpBo=;
+        b=jIqT1B0WC6evdq4WRH8/94LfO9WHV4hbBwn2lVblSwnfMZHIo+xncDy5WKSwat7JfR
+         +4eM5sfL9NZSUjcNBVkrKDT0aeQ1Vb68+Zi+43ECbivoBOPqNHVnDuzP95SYs8szVQh1
+         8tRd9uak99VmHBlr/2MDeHWssZ5laz4gv3oDHykWoJNnEOykv2aikcYj5KSTgpJ8PmR3
+         38s7jS2rhCkrJSBm5WOSKJ0wFIQKSfSh3Yk9brk6eGcqGPtmGkzE7U6GayM2fGoBgE7n
+         s3OBRhW4Ee75P1UMz4niCvD+cS7NwWOYf9WKiNbBVlVaAfHuE1opB3WZnZi3ylvDydPU
+         rGoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1778987689; x=1779592489;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Hfq3wqL8gmrW8nePp5k7jramHiXYMDBLkPO5KDqKpBo=;
+        b=ImnKx9yVvCnsT9qLpEOJ4Gb7oV7e4KQwVt13aeKrkLgn23HfLQHdZ6KLRKYqZej6kS
+         uDA3nSptm8sMln/edjqFxlBENQHQQl1EcamwBb3UtlAnsrIoiHTx+126N8BTgNDUCFe1
+         vnbwHgk8K0cEZ88lYV9QQAsL0sYi7+LslnWa1gpXchBNLX3seuHIoLi2K7vQzV2Qch85
+         z+NlRefMzSOEhgmfZxGWdZkHsNDywXvyNiG11zYIw8DSStsY5k3yUh2MxYxmyKS/NoFW
+         zLFjVnIMQFw5EVR8ipBQIFm8n/FcOU7azozdTzqJvdu+adAjNl/xI3vvdxTN+vce5AJs
+         YRBQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/MvbHZFJ3lXSOYMSJJzpF3wteIatKne6fvWE5QWkJzcJJjnYkXDV/2iWLHrtMl2ify53BoXj3qUqwEPeE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1gG5WCjhnrZ8Xgsz3YUg3bC+w/3XJsATfPNduZSNOYzLdu6Jo
+	1VY3nIJS6uC5oNJxHoAS59J4aixgHbF7u8nWoc8W7DevqfuXT+zq8DYt
+X-Gm-Gg: Acq92OHiu+LdlYl1KM4rNa9YPTnQicg3KOPDkBR2CySKRRKiHDBmk8VR3clcYQ/7uYY
+	S0Gl32McTQW7L3uxTy97zPhgmhuuIwuLGtfV0sIaBc5pJjXdHEy651XHLrBT9CVzzVTGdFWwUCu
+	cG1oIOih2sQrmsf/HPfcZuKKO5TynkFIkcn8tD/ML8CALE786UMRD5nV+HjTFmlUMZtMZ2ktI0m
+	7NcPfdZ0mt8s/J5VoSCXIYfkcd+msWzGR/4pdRkRKogSJv/PuYAnYxTEDuRgit+6isWC3sXRno+
+	P4aiM6JWPYfBvYQblTWeAycjNRQ5n5pRzqCc4G9L+2BzRjxsncHQezbHbhaqVvygrhxWYMggL7R
+	cV77/jEPg5D2WFIP7u4ftXt+UcabJ0EWyoa4/tsHrs7Snt+59R2iZuVXtEOSldMUmHUSomEsps9
+	kMswqv7EdscYyNqsqRSBE/EpD5EojuvIpzKK7TYk0U4w4CVIXRwm+0z7akauqSiqe5WuLiGKB9j
+	iUo32Hy3R5gsxoF8xjxTWX4qfgqNNW7p7ZajW+FbFs5kobFOWQ/Hnq6djd5/5+faIsy6V+U+lBF
+	nlJywOyHcN9HVtW4bw==
+X-Received: by 2002:a05:7300:fb83:b0:2de:cc07:e8b with SMTP id 5a478bee46e88-3039818afa7mr4753610eec.1.1778987688926;
+        Sat, 16 May 2026 20:14:48 -0700 (PDT)
+Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30293e2ea78sm10868372eec.6.2026.05.16.20.14.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 16 May 2026 20:14:48 -0700 (PDT)
+From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+To: loongarch@lists.linux.dev,
+	linux-crypto@vger.kernel.org
+Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: [PATCH] LoongArch: Remove unused arch/loongarch/crypto directory
+Date: Sat, 16 May 2026 20:14:26 -0700
+Message-ID: <20260517031430.102984-1-enelsonmoore@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=795; i=thorsten.blum@linux.dev; h=from:subject; bh=HWgEXqdF6aYXWTxdFkGRqPYwNVxZP11iFJK7joXrAao=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFmcDJcTo4/NWVN/RV3jSrvmzvcnT9af4jjTKzM3V/MLn 0Ftg0NVRykLgxgXg6yYIsuDWT9m+JbWVG4yidgJM4eVCWQIAxenAEwk6zUjw5NXMzu8F/G1vFHq 3H2l9rRfWIEUS0RSVsoleyZl2/pL9xj+J1lZH2n5EFZSsvif0aTay05bTllFrdddrCJW4l1Qtbq eFwA=
-X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-Use memcpy_and_pad() instead of memcpy() followed by memset() to
-simplify atmel_sha_hmac_setup().
+All LoongArch crypto code was moved to arch/loongarch/lib in
+commit 72f51a4f4b07 ("loongarch/crc32: expose CRC32 functions through
+lib"). However, arch/loongarch/crypto still contains stub Kconfig and
+Makefile files. Remove these unnecessary files.
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
 ---
- drivers/crypto/atmel-sha.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ arch/loongarch/Makefile        | 2 --
+ arch/loongarch/crypto/Kconfig  | 5 -----
+ arch/loongarch/crypto/Makefile | 4 ----
+ crypto/Kconfig                 | 3 ---
+ 4 files changed, 14 deletions(-)
+ delete mode 100644 arch/loongarch/crypto/Kconfig
+ delete mode 100644 arch/loongarch/crypto/Makefile
 
-diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index 1f1341a16c42..f60c7c8cf912 100644
---- a/drivers/crypto/atmel-sha.c
-+++ b/drivers/crypto/atmel-sha.c
-@@ -1731,8 +1731,7 @@ static int atmel_sha_hmac_setup(struct atmel_sha_dev *dd,
- 		return atmel_sha_hmac_prehash_key(dd, key, keylen);
+diff --git a/arch/loongarch/Makefile b/arch/loongarch/Makefile
+index 54fcfa1eac1f..4b22f95aaafb 100644
+--- a/arch/loongarch/Makefile
++++ b/arch/loongarch/Makefile
+@@ -197,8 +197,6 @@ endif
+ libs-y += arch/loongarch/lib/
+ libs-$(CONFIG_EFI_STUB) += $(objtree)/drivers/firmware/efi/libstub/lib.a
  
- 	/* Prepare ipad. */
--	memcpy((u8 *)hmac->ipad, key, keylen);
--	memset((u8 *)hmac->ipad + keylen, 0, bs - keylen);
-+	memcpy_and_pad(hmac->ipad, bs, key, keylen, 0);
- 	return atmel_sha_hmac_compute_ipad_hash(dd);
- }
+-drivers-y		+= arch/loongarch/crypto/
+-
+ # suspend and hibernation support
+ drivers-$(CONFIG_PM)	+= arch/loongarch/power/
  
+diff --git a/arch/loongarch/crypto/Kconfig b/arch/loongarch/crypto/Kconfig
+deleted file mode 100644
+index a0270b3e5b30..000000000000
+--- a/arch/loongarch/crypto/Kconfig
++++ /dev/null
+@@ -1,5 +0,0 @@
+-# SPDX-License-Identifier: GPL-2.0
+-
+-menu "Accelerated Cryptographic Algorithms for CPU (loongarch)"
+-
+-endmenu
+diff --git a/arch/loongarch/crypto/Makefile b/arch/loongarch/crypto/Makefile
+deleted file mode 100644
+index ba83755dde2b..000000000000
+--- a/arch/loongarch/crypto/Makefile
++++ /dev/null
+@@ -1,4 +0,0 @@
+-# SPDX-License-Identifier: GPL-2.0
+-#
+-# Makefile for LoongArch crypto files..
+-#
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 103d1f58cb7c..62221507f2b9 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1361,9 +1361,6 @@ endif
+ if ARM64
+ source "arch/arm64/crypto/Kconfig"
+ endif
+-if LOONGARCH
+-source "arch/loongarch/crypto/Kconfig"
+-endif
+ if MIPS
+ source "arch/mips/crypto/Kconfig"
+ endif
+-- 
+2.43.0
+
