@@ -1,91 +1,133 @@
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40F1630AD0A
-	for <linux-crypto@vger.kernel.org>; Sun, 17 May 2026 16:28:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42AEC3C65E0
+	for <linux-crypto@vger.kernel.org>; Sun, 17 May 2026 18:06:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779035298; cv=none; b=VFRLxUUh431nDHxWzL/SWdAUzXPLOCzAHOU5fpOL4ktwbSF7PTbKL1PITsAqLT7bmS14IT/H9kPkZoOlKIkm2Zt/oN4PqOlgZal3CR9IaNAOnixxP+0OF+ErK8OaeK/G3iSXCAO3R+/N/yTP42ilF20GCiNICDot8FuIeCDx6Ks=
+	t=1779041209; cv=none; b=LHYatiq4jt1PxUkpcA/+e45fmJ7mEIiPyI6Nmpj8ekE4UOAspnuoVKt03K7USMEDQ/z+rzjvxZcVpGPm/amA56ujPkA1f40JYq24G8fhbXnLoJeVb/BHSpUCQlOZA8YzmqJAtuSBwekPrDWJ34QrzvHgakOGssd6EmoT3bHjA+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779035298; c=relaxed/simple;
-	bh=edBBxxv1poLSjMB8ohIHerWYeMF+vu/6TSkucKR5d08=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mpRvi/xvr1DT1mjZtSWr2mDgrr6KRxgJrkydKYzaC0mtu4MJ/WYY5JkgE6RLjfbdH8Cywvy9EY6B69vyJ2Iglaz77O2GpXuCXsgwE24B1cvtOmtiu0H/gfdveCtoGsl7dXNg6FwOuKpClPZhbWyNGykj+RpSrb0NHB4qPfQyeWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rXy10ZkO; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1779041209; c=relaxed/simple;
+	bh=h/vtjMHzD4t+FG2j/4bmopuwuQgvFiTTjWjTuMoE22U=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cL3p81+j8K5kmK4z7mkJyThfTi9z5V5IxinkuxkKWIjtaMh5BMiy4aHMCym1zBTaH+0cKp+NsIcVkBH946c0/MAbhf1m3CEo0gAvCRIfZWu3tY12fOZqcktCUIw0AixSI/nug/K+7p9m7dBxNwxDyYFSQeBHO1Z1sl74bJ8AkFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kU+FsNGx; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rXy10ZkO"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1779035285;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=OwzbtTTYqiL4pShWiGkQxPeTW1obh95IMjB2QL15Rp8=;
-	b=rXy10ZkOEqCQDYX2v8Vi3hfLe+jx5GNQok4yZq5qUYzdaeep1y4+Q7Ep9NGDf/bArE32ce
-	G2CAhgid36ysZoaD6yqSOrtT7vKyZrCkFnCW9Gc6ouu7LEv7yu5kvQrC14DuH4gbtWpxcv
-	XUX1NMWAuzRTsfkJClUhs7bjH5gfigc=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Thorsten Blum <thorsten.blum@linux.dev>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Lothar Rubusch <l.rubusch@gmail.com>
-Cc: stable@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kU+FsNGx"
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-44b7e8b65faso30295f8f.1
+        for <linux-crypto@vger.kernel.org>; Sun, 17 May 2026 11:06:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779041206; x=1779646006; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7qtD1lVmPgyK77uEJjECTLE482mHgEl/XesnKafKF8U=;
+        b=kU+FsNGx3cVHfMPry3feE1weOpKP74BJlwIi0Fc0xa4ZA7LKoDRinsZSJmc2H1FR1I
+         hY2Fq1xw5lce2/Qtg2jtBjRAAJ2l66pKM37bkPQh2JLP2G2NEEut/+1bQTpsG39KzVE3
+         Ulz2AA2HJ5xo5uXhS0tgj4mqGz7J4spr2OSXC8LBGp49lBVUJpLt++204+/YWKVzekLx
+         feX2NMyUaj9TWn5aLQHdu1o+vTZOM4D1deFMgjbBklYPwFCwrt1W5cVd0Ft+3lXj/30D
+         pKeW80Dbg9d6hmsdrki26kQ5OxrIQYkvE8KdWNAxGN+xRXK5z7V85Eh5Z8lmv9YKkQ36
+         dvHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779041206; x=1779646006;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7qtD1lVmPgyK77uEJjECTLE482mHgEl/XesnKafKF8U=;
+        b=KUndh4u6PEKSUsNtUqjJOCLu2OQWbxhejLZmQRJ5vHgNJSyFZqCC94w3aPx8sWjsJW
+         PG1ub0rKTjd8O+GQ2qWk/E436MYGSWG1lVOrL38Uj7YHWAZJRqlkQhLrJGrzkvVDsmGB
+         6Bvmfk1QyOtUmgyu8cRugrYhJMWyR0d9Qw2Uy7kllP+bn4/N2JkRHktundB31BkEhylg
+         aLzdUL260U/CdycMy8bleZKLtDJH++eC6PAwTSPzSwVYQm70Lde8HhGb8Iv+ErMpDbPG
+         Kzay3L7bvdwwU+BN4xs3vKWBP4yEkxrEhrIDZJBIN0U33xxFmdLeGiVlTMLOpMTEnbah
+         85fw==
+X-Gm-Message-State: AOJu0Yxjk+rwecoR2ja2vzibVCnePHcGoI4Z1+7xiJvyt+7kROQdAWuX
+	+FcaAlPoitMtB5uNvk850HkVK/uq0TRNOL7BU1dQ3cPkw6zgYypZN8eo
+X-Gm-Gg: Acq92OF+zOLMYX+y4WTPXb23qsNKUjrPbaiZiS2wi1PY9Axv3z4xUrlq6z+AFP0Ejdq
+	bUtDUjNIg1rIWw6D9+mIwtZRhjfzcA3MlxZqluHVUhAR792PLwdPrXh6UGZ0hoM5LIahiM7qT08
+	bKwziMFN3Kj33TaYM2PJZVbdchRDvmvA1XDZMfTS+HYfMlz+uHtIGh558rw9qlzlHoOPtJPDY5e
+	T55afy0qkc/kTi0+Xk2Fn8XxqktxxKwHAK5FdUAbZ8OZDws9Y0rZ4OuGL0Alk83fPuU1cxqpI+Z
+	aQakqBoH+kkd7MIexmywElhzIX6FI6KvyQAmtlekH+GLBUH7olXX/ariA54VrqT4efGAUKpVVmH
+	9Au57ahDF5gQWLqrvJbjBrTcsMdykIYwuZIVNS2gvkZzdE+/bSGMjh1KJJolqOG1pCThjUE1ZJl
+	/r26FKkkNTVFEZT6nbJd1vjhc38I9VLXNkuoZVjkhmEfgoW9AvUwfM/lnWB8OMpiY=
+X-Received: by 2002:a05:6000:2709:b0:44a:ba79:f039 with SMTP id ffacd0b85a97d-45e5c613c1cmr5692426f8f.8.1779041205587;
+        Sun, 17 May 2026 11:06:45 -0700 (PDT)
+Received: from menon.v.cablecom.net (84-74-0-139.dclient.hispeed.ch. [84.74.0.139])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45da15a6454sm31766775f8f.34.2026.05.17.11.06.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 May 2026 11:06:45 -0700 (PDT)
+From: Lothar Rubusch <l.rubusch@gmail.com>
+To: thorsten.blum@linux.dev,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	nicolas.ferre@microchip.com,
+	alexandre.belloni@bootlin.com,
+	claudiu.beznea@tuxon.dev
+Cc: linux-crypto@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: atmel-sha204a - fail on hwrng registration error in probe path
-Date: Sun, 17 May 2026 18:27:40 +0200
-Message-ID: <20260517162740.1250-2-thorsten.blum@linux.dev>
+	linux-kernel@vger.kernel.org,
+	l.rubusch@gmail.com
+Subject: [PATCH 00/12] crypto: atmel - introduce shared i2c core client management and capability-based selection framework
+Date: Sun, 17 May 2026 18:06:26 +0000
+Message-Id: <20260517180639.9657-1-l.rubusch@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1483; i=thorsten.blum@linux.dev; h=from:subject; bh=edBBxxv1poLSjMB8ohIHerWYeMF+vu/6TSkucKR5d08=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFmcb2rUm7NZGP7IlMtLr1APUWjtXP1c6NmBjnqx8zz5E zZ3rcnrKGVhEONikBVTZHkw68cM39Kayk0mETth5rAygQxh4OIUgIk4T2dkuMFke3GuyFuBVvew dtH9z7VfLg8Sjb4nJXKpY3LUF/OGNwx/hVWXbenaNdtQ/uzsyH96vVPevG4ICGk/4OB+3VYuXDm YAQA=
-X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-Commit 13909a0c8897 ("crypto: atmel-sha204a - provide the otp content")
-overwrote the hwrng registration return value when creating the sysfs
-group, which allowed atmel_sha204a_probe() to succeed even if
-devm_hwrng_register() failed.
+This patch series introduces a staged refactoring of the Atmel crypto I2C
+drivers in preparation for a shared core-based architecture. The goal is to
+consolidate I2C client management and selection logic into a common
+atmel-i2c core driver while keeping ECC (ECDH) and SHA204A client drivers
+functionally separate but interoperating through shared infrastructure.
 
-Return immediately when devm_hwrng_register() fails, and report both
-hwrng and sysfs registration errors with dev_err(). Adjust the sysfs
-error log message for consistency.
+The series moves existing ECC-specific client tracking into a shared
+management structure, relocates allocation and selection logic, and
+introduces capability-based filtering for hardware selection. This allows
+individual crypto drivers to request hardware clients based on supported
+features while still benefiting from a unified least-loaded selection
+strategy.
 
-Fixes: 13909a0c8897 ("crypto: atmel-sha204a - provide the otp content")
-Cc: stable@vger.kernel.org
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+Subsequent patches extend this base by:
+- migrating client management fully into the core driver,
+- introducing explicit capability advertisement by each hardware client,
+- updating ECC and SHA204A drivers to participate in capability-aware allocation,
+- and cleaning up probe/remove paths to ensure consistent lifecycle handling.
+
+No functional behavioral changes are intended at this stage beyond internal
+refactoring and preparation for future feature expansion. The series is
+designed to preserve existing crypto functionality while gradually
+centralizing shared logic in the atmel-i2c core layer, reducing duplication
+and improving maintainability across all Atmel crypto drivers.
+
+Signed-off-by: Lothar Rubusch <l.rubusch@gmail.com>
 ---
- drivers/crypto/atmel-sha204a.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+Lothar Rubusch (12):
+  crypto: atmel-ecc - rename driver_data before moving it into atmel-i2c
+  crypto: atmel - rename atmel_ecc_driver_data to atmel_i2c_client_mgmt
+  crypto: atmel - move i2c client management instance into core driver
+  crypto: atmel-ecc - simplify probe error handling
+  crypto: atmel - factor out i2c client unregistration helper
+  crypto: atmel-sha204a - add i2c hw client list and improve probe error
+    handling
+  crypto: atmel-sha204a - switch to module_i2c_driver
+  crypto: atmel-ecc - switch to module_i2c_driver
+  crypto: atmel-ecc - simplify remove path and relax busy handling
+  crypto: atmel-sha204a - guard remove path against missing client data
+  crypto: atmel - move i2c client selection to core driver
+  crypto: atmel - add capability-based I2C client selection
 
-diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha204a.c
-index 37538b0fd7c2..12eb85b57380 100644
---- a/drivers/crypto/atmel-sha204a.c
-+++ b/drivers/crypto/atmel-sha204a.c
-@@ -183,12 +183,14 @@ static int atmel_sha204a_probe(struct i2c_client *client)
- 		i2c_priv->hwrng.quality = *quality;
- 
- 	ret = devm_hwrng_register(&client->dev, &i2c_priv->hwrng);
--	if (ret)
--		dev_warn(&client->dev, "failed to register RNG (%d)\n", ret);
-+	if (ret) {
-+		dev_err(&client->dev, "failed to register RNG (%d)\n", ret);
-+		return ret;
-+	}
- 
- 	ret = sysfs_create_group(&client->dev.kobj, &atmel_sha204a_groups);
- 	if (ret) {
--		dev_err(&client->dev, "failed to register sysfs entry\n");
-+		dev_err(&client->dev, "failed to create sysfs group (%d)\n", ret);
- 		return ret;
- 	}
- 
+ drivers/crypto/atmel-ecc.c     | 98 ++++++++--------------------------
+ drivers/crypto/atmel-i2c.c     | 54 +++++++++++++++++++
+ drivers/crypto/atmel-i2c.h     | 12 ++++-
+ drivers/crypto/atmel-sha204a.c | 44 +++++++++------
+ 4 files changed, 115 insertions(+), 93 deletions(-)
+
+
+base-commit: 6c9dddeb582fde005360f4fe02c760d45ca05fb5
+-- 
+2.53.0
+
