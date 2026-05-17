@@ -1,156 +1,239 @@
-Received: from mail-dl1-f65.google.com (mail-dl1-f65.google.com [74.125.82.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD5EA31A065
-	for <linux-crypto@vger.kernel.org>; Sun, 17 May 2026 03:21:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1A37405C20;
+	Sun, 17 May 2026 04:19:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1778988085; cv=none; b=cI1ptEMgVJGOEdmJAM7d/Q0xncKknh6uDO3S01BRfaBUeI0wyiP+PCpCWhzkM4wl4fNnugG4Oz60lk09VSycod4T1RLsrrpcCJXbIhvzfaKgeucnvDxrIQWyoPHmY5otYRCYzVvn8mMdtIaSGso2Kiy2QvBulKI3h/Q5IS0Tnvc=
+	t=1778991549; cv=none; b=scil4BvBr7M1UkE7EBkeYqoFI7jRrqJJj4hyXKeZLLJQFxLgRo9dHOQukr05Ygmi634wtkGTfwp7WSSyIbP7f2/6waUiBs21aWk3beMhgXmGmVhcrHug/fB6Bm+bWDtsBYm4fGvKC3glL+VCOz8J/VDGq1TFGpi16nMrdw47jf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1778988085; c=relaxed/simple;
-	bh=bS7gzSgOira/C5sbFJAKIYmQiAqnWKcfuDov3bfUrU4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BGIaxrwG7/lUyhwFcHxQix/IYNOgTMFY4BDNMkZ3zFTW2zMj/g7e7VdyBTyJW+Ea8e9hrz34DE3NKdsrCDiq0w33B39VaG36nab71AHD+QnbwxQ7aAGuKwyqPd8ksCO31qzLcajdmGpvejQQQa82elyKKONDjeedu7qBozFlASE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iyp8FK7X; arc=none smtp.client-ip=74.125.82.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1778991549; c=relaxed/simple;
+	bh=PKiX7TvV5FDEd/JOe6jxczPE3hpoLrn2zUTSjwTY/sw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OT1VmCI6f5af8lLJORvAbtduditG68FNG9Re1g5DDKsf1GrvsZmEvvYHZ3VDVK7ZEIEtQTeQCqMVW0ZzePJgZB1O3/Ts3Jbuj445RvB8f6rCO4HnnlkwcO0cqIUPwwbvYx4FAvmCYLYOZi3HKAn74lrG04xVHrRhP0i06TJBTLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=UkRM6+sg; arc=none smtp.client-ip=115.124.30.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iyp8FK7X"
-Received: by mail-dl1-f65.google.com with SMTP id a92af1059eb24-12c8f9846c8so1245974c88.0
-        for <linux-crypto@vger.kernel.org>; Sat, 16 May 2026 20:21:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1778988083; x=1779592883; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Hwh+PfOT0kULc5coYuuwJFV2+WW9k6F0JFqDvwSNOgw=;
-        b=iyp8FK7Xv/UexefOdsGqpRoejwOBU8cDjCEHIV1rbLFi40vd52WQhQQCxcdYVnBU2W
-         4Na0XaFLwo0eGIu6DiBmnmE6Q5hn8sifiKxDrksZVZjJrD/T2mSiElOfwwg9KVCS26K+
-         pEAGj7Ala1iMlUBGkXEhpSxHmLUP/qU8ZK9vr8zZVqK+MfGuGM8k8ORUsPK97uIEH7oz
-         /mIS7FbfCsm5aBnxm7s3qQASgLy5hDb6rSBmO/gNwh7vDIP8pOW8OvdrgNXXt56cCaec
-         LBCQpdzun14Q0CP9zxx7jzkGOzcDGwVSKp1OoRzywiF+gVKTDp/FsUPwSA1508Krqxmi
-         9Zdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1778988083; x=1779592883;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Hwh+PfOT0kULc5coYuuwJFV2+WW9k6F0JFqDvwSNOgw=;
-        b=Ifwq6aef0kYoCuyZ4i0Wlie91moQELMtpvy5nFXrO+VkO4x+IUsG+IHhKOZEvQte55
-         kP0TxsL/spyjcJQ3bLGslq1ig+aE+RWt07n1pRfWJBTpsoAUnNT5Z9xIciko5ivItt2U
-         nIbDxWVvcvdsC+f1NdzDe80yM264rgVnclpW9KHUb/dDnNSZXl01D08aA+XaZ8wUJix+
-         hk6Y2aBtod2bMBw35fSfvsk+5qvBEEH0uV7aI0a3rt7kz7LbCxc+o1wMlzSbN68RjzHq
-         RTROscP//qVZ4R0joKfwomU6MuzOX28lzZNoxa7SiP4pkAu7ysp1FewIllmAk/TwJzuV
-         vN8w==
-X-Forwarded-Encrypted: i=1; AFNElJ834mXvw6ixOaLSLh9tmKMP4RPMwhHrB/DI8O5v3glcyXSWUTT2UTb2XIUoZqrJBprsP5rDX4unVCsoiYg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqPBjErnOLiE1ZrRGybE3G52g1ujie7NBXJCL2SYHsKKBw6Eln
-	RsXVI1QME0XIx9ckFX0gr2/K7ksfRkQ0DQoRll/pHeNwlBnG59I9A9Qe
-X-Gm-Gg: Acq92OFDSB+SPi0VE+3bFLaFxDMlGBWdi/JFVcLIW7+PTSdXC5L8h3DP5Vtnmqj+srJ
-	IzOt3EYx6VmavrMKlmTxjEJ+Wccu7jl8neZnF1B4TvWJtI1KSyrIeRpeotp/fY8rBxWQNujmHTI
-	992gOrZ/y1paFaY9z/omUvF9oD5h7t6J3IooRKS9/d978YvtxoqvF0T9SoJidtsHmswKKJu3awC
-	nk4gyGxhGRvq2yqeI+342q/qUbHn1BvhBrhcvHGbvZ/McJ2cHcCXYkI0WvMEXN1sZV8xxAPFkO7
-	K17CYuhDemuIrPeuGs1s5DSjjOP6NlIL5QDZD1t4QNu8fblBjG6K39U1Dq43ZKQ44YxlLPbu9qo
-	HXPkz7BI5RdH2l6JQYEow12xXa0KTsv8LjImDQQot1MZOdGhDkhnhQ5Np4csU7TrWyNnQ22EJN1
-	Jo5VLvvdJuk+IKkd1jBVQVD2pvoNinuEpiZ1QHo16jPAgOggIcvsHcOb8BhnGYixoSBDM6fw0VH
-	bGkDW7F1bXwzJyqnfQgUq5JUxNlD3eh1Ua0ZyWgYBPIkr24P7mzclEofm83vO7bFlweE/I3z8Rd
-	1ECig3C5b17UEgmYhXweiaVN9bac
-X-Received: by 2002:a05:7022:688c:b0:12d:ce60:cb52 with SMTP id a92af1059eb24-135045177e8mr4497724c88.18.1778988082694;
-        Sat, 16 May 2026 20:21:22 -0700 (PDT)
-Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-134cbed531esm15138016c88.8.2026.05.16.20.21.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 May 2026 20:21:22 -0700 (PDT)
-From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-To: linux-mips@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Subject: [PATCH] MIPS: Remove unused arch/mips/crypto directory
-Date: Sat, 16 May 2026 20:20:56 -0700
-Message-ID: <20260517032100.105696-1-enelsonmoore@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="UkRM6+sg"
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1778991535; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=OSqeOOUOQ+VkyTH+cZdlWetnvyhe0cxE+rJFx9fBDbM=;
+	b=UkRM6+sgqNNCpJyRB9CF6S188edA79G+tvJSVIiXVC5HlhdEvoGosDUo49OcH3P1FevFbfe/kTGBb7LErvpqmYIcO5hDWjOUyHjZQlkpaqK7I+gg6fzJHCfzKc8OgvO5MCwiI0GbDVd6sEUnvrVJCY708eQEbIivkHUc5aXivbU=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032089153;MF=libaokun@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0X311wvF_1778991534;
+Received: from 30.170.87.193(mailfrom:libaokun@linux.alibaba.com fp:SMTPD_---0X311wvF_1778991534 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Sun, 17 May 2026 12:18:55 +0800
+Message-ID: <10c17d97-e6c9-4bb7-94a8-f4ed8fcad910@linux.alibaba.com>
+Date: Sun, 17 May 2026 12:18:53 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 01/17] lib/crc: add crc32c_flip_range() for
+ incremental CRC update
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-ext4@vger.kernel.org, linux-crypto@vger.kernel.org,
+ ardb@kernel.org, tytso@mit.edu, adilger.kernel@dilger.ca, jack@suse.cz,
+ yi.zhang@huawei.com, ojaswin@linux.ibm.com, ritesh.list@gmail.com
+References: <20260508121539.4174601-1-libaokun@linux.alibaba.com>
+ <20260508121539.4174601-2-libaokun@linux.alibaba.com>
+ <20260514035248.GA2816@sol>
+From: Baokun Li <libaokun@linux.alibaba.com>
+In-Reply-To: <20260514035248.GA2816@sol>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The last MIPS crypto code was moved to lib/crypto/mips in
-commit c9e5ac0ab9d1 ("lib/crypto: mips/md5: Migrate optimized code into
-library"). However, arch/mips/crypto still contains stub Kconfig,
-Makefile, and .gitignore files. Remove these unnecessary files.
+Hi Eric,
+Thanks for the feedback!
 
-Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
----
- arch/mips/Makefile          | 2 --
- arch/mips/crypto/.gitignore | 2 --
- arch/mips/crypto/Kconfig    | 5 -----
- arch/mips/crypto/Makefile   | 5 -----
- crypto/Kconfig              | 3 ---
- 5 files changed, 17 deletions(-)
- delete mode 100644 arch/mips/crypto/.gitignore
- delete mode 100644 arch/mips/crypto/Kconfig
- delete mode 100644 arch/mips/crypto/Makefile
 
-diff --git a/arch/mips/Makefile b/arch/mips/Makefile
-index 6705fa5d9211..cff1a9a43b89 100644
---- a/arch/mips/Makefile
-+++ b/arch/mips/Makefile
-@@ -350,8 +350,6 @@ OBJCOPYFLAGS		+= --remove-section=.reginfo
- libs-y			+= arch/mips/lib/
- libs-$(CONFIG_MIPS_FP_SUPPORT) += arch/mips/math-emu/
- 
--drivers-y			+= arch/mips/crypto/
--
- # suspend and hibernation support
- drivers-$(CONFIG_PM)	+= arch/mips/power/
- 
-diff --git a/arch/mips/crypto/.gitignore b/arch/mips/crypto/.gitignore
-deleted file mode 100644
-index 0d47d4f21c6d..000000000000
---- a/arch/mips/crypto/.gitignore
-+++ /dev/null
-@@ -1,2 +0,0 @@
--# SPDX-License-Identifier: GPL-2.0-only
--poly1305-core.S
-diff --git a/arch/mips/crypto/Kconfig b/arch/mips/crypto/Kconfig
-deleted file mode 100644
-index 6a5bd5074867..000000000000
---- a/arch/mips/crypto/Kconfig
-+++ /dev/null
-@@ -1,5 +0,0 @@
--# SPDX-License-Identifier: GPL-2.0
--
--menu "Accelerated Cryptographic Algorithms for CPU (mips)"
--
--endmenu
-diff --git a/arch/mips/crypto/Makefile b/arch/mips/crypto/Makefile
-deleted file mode 100644
-index 5adb631a69c1..000000000000
---- a/arch/mips/crypto/Makefile
-+++ /dev/null
-@@ -1,5 +0,0 @@
--# SPDX-License-Identifier: GPL-2.0
--#
--# Makefile for MIPS crypto files..
--#
--
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 62221507f2b9..5203aa8f06f3 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1361,9 +1361,6 @@ endif
- if ARM64
- source "arch/arm64/crypto/Kconfig"
- endif
--if MIPS
--source "arch/mips/crypto/Kconfig"
--endif
- if PPC
- source "arch/powerpc/crypto/Kconfig"
- endif
--- 
-2.43.0
+在 2026/5/14 11:52, Eric Biggers 写道:
+> On Fri, May 08, 2026 at 08:15:23PM +0800, Baokun Li wrote:
+>> When a contiguous range of bits in a buffer is flipped, the CRC32c
+>> checksum can be updated incrementally without re-scanning the entire
+>> buffer, by exploiting the linearity of CRCs over GF(2):
+>>
+>>   New_CRC = Old_CRC ^ CRC(flip_mask << trailing_bits)
+>>
+>> Introduce crc32c_flip_range() which computes this delta using
+>> precomputed GF(2) shift matrices and nibble-indexed lookup tables.
+>> The implementation decomposes nbits and trailing_bits into
+>> power-of-2 components and combines them via the CRC concatenation
+>> property:
+>>
+>>   CRC(A || B) = shift(CRC(A), len(B)) ^ CRC(B)
+>>
+>> This gives O(log N) complexity with only ~9.8KB of static tables
+>> (fits in L1 cache).  The current maximum supported buffer size is
+>> 64KB (INCR_MAX_ORDER = 19, i.e. 2^19 bits = 524288 bits = 64KB).
+> It will be a little while before I can do a full review of this, but
+> just a high-level comment: "only ~9.8KB of static tables (fits in L1
+> cache)" isn't ideal.  Large tables tend to microbenchmark well, then
+> have worse real-world performance due to lots of other things contending
+> for the L1 cache.
+
+
+You're right, and that's exactly the trap I fell into when picking
+the initial size.  I went with the variant that had the best kunit
+microbenchmark while still fitting in a typical L1 -- the
+nibble-indexed (4-bit) tables.  I've now re-measured all three
+candidate table sizes:
+
+=== crc32c_flip_range benchmark (ns, speedup vs full) ===
+bitmap  full  1bit(2.5KB)  2bit(4.9KB)  4bit(9.8KB)
+1024      46   165 (0.3x)    82 (0.6x)    48 (1.0x)
+2048      88   180 (0.5x)    88 (1.0x)    53 (1.7x)
+4096     181   194 (0.9x)    98 (1.8x)    58 (3.1x)
+8192     358   207 (1.7x)   104 (3.4x)    63 (5.7x)
+16384    707   222 (3.2x)   112 (6.3x)   68 (10.4x)
+32768   1424   234 (6.1x)  121 (11.8x)   73 (19.5x)
+65536   2846  248 (11.5x)  129 (22.1x)   79 (36.0x)
+
+One thing worth mentioning: the upcoming crc32c_splice() API reuses
+the same GF(2) shift tables for byte-granular CRC updates (extent
+blocks, dir blocks, etc.).  It's being posted as a separate series
+because the ext4 integration is more involved, but roughly:
+
+  u32 crc32c_splice(const void *buf, u32 buflen, u32 old_crc,
+                    u32 old_region_crc, u32 offset, u32 len)
+  {
+      u32 new_region_crc, delta, trail_bits;
+
+      [...]
+      new_region_crc = crc32c(0, (const u8 *)buf + offset, len);
+      delta = old_region_crc ^ new_region_crc;
+
+      if (!delta)
+          return old_crc;
+
+      trail_bits = (buflen - offset - len) * 8;
+      delta = gf2_shift_crc(delta, trail_bits);
+
+      return old_crc ^ delta;
+  }
+
+The splice kunit numbers, for completeness:
+
+=== crc32c_splice benchmark (ns, speedup vs full) ===
+blk_regio  full  splice(1bit)  splice(2bit)  splice(4bit)
+1024_12      46      8 (5.8x)      9 (5.1x)      9 (5.1x)
+1024_32      46     15 (3.1x)     14 (3.3x)     15 (3.1x)
+1024_64      46     20 (2.3x)     19 (2.4x)     20 (2.3x)
+1024_128     46     30 (1.5x)     31 (1.5x)     30 (1.5x)
+1024_264     46     53 (0.9x)     53 (0.9x)     53 (0.9x)
+                         
+2048_12      88     8 (11.0x)     8 (11.0x)     8 (11.0x)
+2048_32      88     15 (5.9x)     13 (6.8x)     15 (5.9x)
+2048_64      89     20 (4.5x)     20 (4.5x)     20 (4.5x)
+2048_128     89     31 (2.9x)     30 (3.0x)     30 (3.0x)
+2048_264     88     53 (1.7x)     53 (1.7x)     53 (1.7x)
+                         
+4096_12     181     9 (20.1x)     7 (25.9x)     9 (20.1x)
+4096_32     181    14 (12.9x)    15 (12.1x)    15 (12.1x)
+4096_64     181     20 (9.1x)     20 (9.1x)     19 (9.5x)
+4096_128    181     31 (5.8x)     31 (5.8x)     30 (6.0x)
+4096_264    182     54 (3.4x)     53 (3.4x)     54 (3.4x)
+                         
+8192_12     358     9 (39.8x)     8 (44.8x)    10 (35.8x)
+8192_32     358    15 (23.9x)    15 (23.9x)    15 (23.9x)
+8192_64     358    21 (17.0x)    20 (17.9x)    21 (17.0x)
+8192_128    358    32 (11.2x)    31 (11.5x)    31 (11.5x)
+8192_264    358     54 (6.6x)     53 (6.8x)     53 (6.8x)
+                         
+16384_12    707    10 (70.7x)     8 (88.4x)     8 (88.4x)
+16384_32    706    15 (47.1x)    15 (47.1x)    15 (47.1x)
+16384_64    706    21 (33.6x)    19 (37.2x)    19 (37.2x)
+16384_128   707    30 (23.6x)    31 (22.8x)    30 (23.6x)
+16384_264   707    54 (13.1x)    53 (13.3x)    53 (13.3x)
+                         
+32768_12   1422   10 (142.2x)    9 (158.0x)    9 (158.0x)
+32768_32   1422    15 (94.8x)    15 (94.8x)    15 (94.8x)
+32768_64   1422    20 (71.1x)    19 (74.8x)    20 (71.1x)
+32768_128  1422    31 (45.9x)    31 (45.9x)    31 (45.9x)
+32768_264  1422    53 (26.8x)    53 (26.8x)    54 (26.3x)
+                         
+65536_12   2841   10 (284.1x)    9 (315.7x)    8 (355.1x)
+65536_32   2840   14 (202.9x)   15 (189.3x)   14 (202.9x)
+65536_64   2840   21 (135.2x)   19 (149.5x)   20 (142.0x)
+65536_128  2845    30 (94.8x)    31 (91.8x)    31 (91.8x)
+65536_264  2841    53 (53.6x)    53 (53.6x)    53 (53.6x)
+
+But, as you point out, what really matters is the real-world impact
+once the tables are competing for L1 with everything else.  I tested
+all three table sizes on an ext4 fio workload (single-process
+sequential fallocate of 64K extents) across a range of filesystem
+block sizes.  Results below, with both +flip_range alone and
++flip_range+splice applied:
+
+=== default mkfs, single-process (GB/s) ===
+config  base  raw-bit-flip  raw-bit-splice   2-bit-flip  2-bit-splice 
+ 4-bit-flip  4-bit-splice
+S_1k    15.4   15.3(-0.6%)     15.3(-0.6%)  15.1(-1.9%)   15.8(+2.6%) 
+15.0(-2.6%)   15.5(+0.6%)
+S_2k    17.6   17.7(+0.6%)     17.9(+1.7%)  17.6(+0.0%)   18.3(+4.0%) 
+17.2(-2.3%)   18.6(+5.7%)
+S_4k    16.9   17.0(+0.6%)    18.6(+10.1%)  17.4(+3.0%)   18.4(+8.9%) 
+17.3(+2.4%)  18.7(+10.7%)
+S_8k    15.8   16.3(+3.2%)    18.1(+14.6%)  16.6(+5.1%)  18.3(+15.8%) 
+16.4(+3.8%)  17.8(+12.7%)
+S_16k   12.5   13.1(+4.8%)    15.4(+23.2%)  13.0(+4.0%)  15.5(+24.0%) 
+12.9(+3.2%)  15.6(+24.8%)
+S_32k   8.93   9.37(+4.9%)    12.5(+40.0%)  9.10(+1.9%)  13.1(+46.7%) 
+9.07(+1.6%)  12.5(+40.0%)
+S_64k   8.17   8.43(+3.2%)    14.3(+75.0%)  8.64(+5.8%)  14.6(+78.7%) 
+8.39(+2.7%)  14.8(+81.2%)
+
+So the larger tables do measure a bit faster, but the gain over 2-bit
+is about 3% while the .rodata footprint doubles.  All three variants
+land within run-to-run noise on the real workload, which matches your
+prediction exactly.
+
+Based on this I'd lean toward the 2-bit (4.9 KB) variant for v2 as
+the better trade-off.  Would you prefer that, or the smaller 1-bit
+(2.5 KB) version?  The ext4 numbers say either is fine; 2-bit just
+keeps a little more headroom on the microbench in case other
+consumers show up later.
+
+
+> Another consideration is that basically every Linux kernel has
+> CONFIG_CRC32 enabled, regardless of whether they would actually find
+> this new functionality useful.
+
+Agreed.  As large-block hardware becomes more common I expect other
+filesystems beyond ext4 to hit the same large-buffer CRC overhead, so
+I deliberately put this in lib/crc as a general-purpose API rather
+than burying it inside ext4.  But you're right that it shouldn't be
+unconditionally compiled in.  For v2 I'll add CONFIG_CRC32_INCR,
+selected by consumers (initially just ext4), so kernels that don't
+need it pay zero .text/.rodata cost.
+
+> I'm not necessarily saying this should be its own option, especially if
+> it's useful for ext4 even in the non-LBS case.  But I do think it would
+> be nice if it could be a bit smaller and more memory-optimized.
+
+The non-LBS case does see some benefit, but it's modest -- the
+incremental update mostly matters once group-descriptor-size CRCs
+become large.  The good news is that the regression on small-block
+configs is essentially zero (see the S_1k / S_2k rows above), so I
+left it unconditionally enabled in the current series to keep things
+simple.
+
+If there's concern about that, I'm happy to either gate it on a
+sysfs/mount-option knob, or restrict it to LBS-only paths in ext4.
+
+>
+> Anyway, I'll look into the algorithm more when I have time.
+>
+Thanks again for taking the time on this -- the current series is
+still rough around the edges and I'd appreciate any further feedback
+once you get to a deeper review.
+
+
+Cheers,
+Baokun
 
