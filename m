@@ -1,62 +1,63 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 352C83CC7C5
-	for <linux-crypto@vger.kernel.org>; Sun, 17 May 2026 18:06:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 313F93CBE88
+	for <linux-crypto@vger.kernel.org>; Sun, 17 May 2026 18:06:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779041224; cv=none; b=QHbBbQYvSq7oQ1rLnc+cReUvkini1RrDZd3yGkvxmrtTEN8aAT1CBnAjAvSgf9KU6qvOKhBCltEGcvg+jjiupMbZwcGSfWC6dnNNC3qsKA/eHkA5HPKdEu5FA+tikTtg2hPoB6+Rs7OnJy+xfmpSQ3dnunKuhpwOLkv8112PuXU=
+	t=1779041224; cv=none; b=j+9hnrHETTqnW57icmLPRr18V88gXEjzXepKZJUzf2fyNIAqAOBPirqkOyWB78fjfQXqbtKPbVWRwke/21XLSSWVCx5/xJBb6XePjLWZMzEMx+NZl/BLf/cau+2zI6eeAqWVFpx6bWv1SRUjNlwUD9Vv+ou/nTi5unvTlQIoJ1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1779041224; c=relaxed/simple;
-	bh=8E8i2ov3OB5nxCGPsraNbhi7Lp2mIp0fHwCLul3Q9bg=;
+	bh=BfIoE2EgHiX5HcimtCpSI/ihSU7AhR9eDkloFf03Afk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=TYDagKYE7TiCOZGvE4OwyLA9xAZlS2FaUWZpDb5qy0hbIAVx2ik+aAw8+1XddSjNfHO4J4VYo+exF54bPTHBLSdvZYZ/0McXcnK8sDOF6ftKvAdMRpf98DuUHoWAohmsVSqO321zytmZDqKGLfwzi4e98GAhDdZp5sP8pp2CfLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GxC3Q42j; arc=none smtp.client-ip=209.85.128.47
+	 MIME-Version; b=BBgUT5bAk0SizqlTjkgThm8UN7J6p4t8HTa9rMdCZ8XHralZeZZIF3QMbiv8W6fTMNaejcFwOqPItaE4SaLkoRCbfrVgCiifFOml7zdWnELokoSoRwCm2jHuoflFYQ95Jbg5+CPEP2MS6/UAANzSH0zFT0W8ib//WD2rkQKJwL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f7kX1ObB; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GxC3Q42j"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-488ac04e13dso1863865e9.1
-        for <linux-crypto@vger.kernel.org>; Sun, 17 May 2026 11:06:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f7kX1ObB"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-48962cd0864so2315505e9.1
+        for <linux-crypto@vger.kernel.org>; Sun, 17 May 2026 11:06:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779041217; x=1779646017; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1779041213; x=1779646013; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UvLRNBQYDT8+Qt2zwMF/yaLEeJC75IH2Ss/ramc0Mks=;
-        b=GxC3Q42jaiZxMVkF+JMPIaYZ4JcEjhdXDWW6v4nscAbNFEEeZa8AibaDYur8kxdsXB
-         toj7u9c02ChHFak/MAoPkpqJQscPZv5QhL4NQvyXm05GdcMRLcYmiOERSC5ehssF1x+O
-         M4x3EmxNAbZmeb33eRn9nnkD/cO3nwWcGml5HWzMkTlTHYHJKwrFlZ5r2fzleYscy5sT
-         VJu619dptwYW8n1Z7DSO0rjRpbcVFf4HOOSIhOmMjRCARsk2JJcvxcInZZTwEU0qswKx
-         ntGQ+8eItnni4JL6mfJ8QCN+SNCc+cx2rr6XQzveWzJSKNJ4AdeQhgSOpg3+havzcpYS
-         TEiw==
+        bh=xZeqSTb+Ww2f5MTxnXj9yvOCpat7Odm2G/43tTwf1sE=;
+        b=f7kX1ObBXMdtErffe2O9VJhsKkkFrCM73EjSNzoYng1kRO8nrv34zuQNKDXPnsMwuX
+         bCGwTWwOs9abIzfOShAXSsU/dEb/UlmNSoWw3dqJ/SYgS8SwcC2Y7b9Jfy8n9a4bBMws
+         6GU1OdhF1nDLtGr85A/F/C4QEtWtsSeijxq3cHYbdTJmCBIjliqIUXBSsXmhAXtUslTz
+         ISuvJolZ2X3i9usQLBtI2TVGLZ64l758GwsUEu2oho+XgHPz43zzaSdj7YPm1ukIilRv
+         eO6a5az7Ae+rw3qfORVnRtgRZsFl1lcdQX661nnz+McCmgR50WVoKLDrhDBOm5xWw5cJ
+         skTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779041217; x=1779646017;
+        d=1e100.net; s=20251104; t=1779041213; x=1779646013;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=UvLRNBQYDT8+Qt2zwMF/yaLEeJC75IH2Ss/ramc0Mks=;
-        b=OMkN/ixiGA7Rfc707TnVesJqcHXAKblQ1XyWLbWLFVhujUZaAInSzgwsTwLlRp+oWh
-         ZkQKQWSHON0qqwtxIpfa512Q+Lmr1CJlcli3q7zt/UhkOWWsFbsejlYaDLflY7ML6uSc
-         xTzuQ+gEhNrtkalUDcqrO0axXwVz/M3M9Wi3kgA0jhc88wDw9KiINSoDgdEjm0hfzBYr
-         W1OKT1PV9rMv6Jrxq5SpPT84gPgZ6SCOtGwgEuZTC+oiw6FQtRoj8Jivrs5/TozYGCEi
-         miUoMmTGdDJ07qR7dmpaWdnrCnuThHmyD4prqUjC9wxnmkcRyRi8ZjiHVhC99PzwMArE
-         QZ9Q==
-X-Gm-Message-State: AOJu0YyFmyG1QlzHslDHtEsCjVp8iEv+38mg3u+kj7X3DkvVAHA+jHYn
-	YR5HHEBZJOxbpKz2YHfJ+jA5bwXfBOdyPC7eMfaUBl9YkE/3uxuBuygO
-X-Gm-Gg: Acq92OGCLOJSz4bobtopidFtI6u1FoK3oVomZC8CdHpq+RRoCbHJfE0pCotkdWMDKvJ
-	AFhjwlXNBysikNU/5HN6AOaAid16JaBMRaKzNFB573/gHjePVpxt3flWySxBAvHyu0YspAAvqoh
-	jp61bEaaJpY+Q2Z1cY7DlGKNUFZD7DqICyttR1oYRLs8b2czODKXz/c6szdKOUNZ/TcUXljxH2A
-	ykzSmXcnBq6RGOBo/4MQAV3/fDTfYk06J+ZsUjLzX84YQBqaGo6rzdJrOwdm37n+CD7rh0GWrGb
-	XRlBJv4yf6J84ez40576E9dXucDOl/PrIxZZWPBoayCmApsYEli64TQEtezwe8bC8FMXOHFUZhe
-	+WM0C0kGYVlor6bhhoC4wxHUNETAUuplim1Q1g5IbGzffRHn2z0LQ7BnzwstmTvKe4l3oqpM9hc
-	c9VE3Vr37p790tkvTK2qLJUiGH6/icrOPE18HlGdXXzl1xJx75VhODsmbAjFIGA4k=
-X-Received: by 2002:a5d:5850:0:b0:453:f281:b4ff with SMTP id ffacd0b85a97d-45e5c59557dmr8853464f8f.2.1779041216533;
-        Sun, 17 May 2026 11:06:56 -0700 (PDT)
+        bh=xZeqSTb+Ww2f5MTxnXj9yvOCpat7Odm2G/43tTwf1sE=;
+        b=sP/Oz7VxYlQRisRbeIMjGIwd9SBIXhu6LNNpGZqh3oiatVGAf3+MBaVKv+Qhlw5fCU
+         PxgJlfBTmGXJN17eUGqoUi23gyl7ui/MNibTOalgXIkD6GCGG0bihHJHZVZzeeMbdtR8
+         jQL7A/Kg/fWtYls+dbriAz1Znwt08wgWKRRyrJJN5VabeNJaB+b9Ufw0zhVERk5Rtgo2
+         UrB13+vxTTM3Rn0Av8IW6nXMlqYArMVd8OYNQN3EJyX31R6MChHsi689gYYXSKn1IQbR
+         KD6idGUw02km34P2kpJn3PqeZf/JWWEVf/bXpfZbT3CtB+sZf57qdWQ7VfyEcail/suO
+         kkUw==
+X-Gm-Message-State: AOJu0YxvBThIf2karS0zZ8Bw8wnblNZXKMHoRElilqofiW4rZFodaJdc
+	8B9ZunOle/PZvldAf35y6dB0FDsL1aPCbzW0yEDAdyhWxA78T+RkFv0X
+X-Gm-Gg: Acq92OEELOPnGPDdB1KOiJKKtipaPWppkiqvyWER9rHS015YpwtZ8jtqv/bGIZQ2Gwc
+	z/xdS0e7Hb9xWVJ/ZGMfZJREUXv5+g1U6WNmDN8EvafF/MjwZPT9OXbpEBs4ZJ5m7xloas34VZI
+	T1K07GonjdIdf9+GmZrykVV2e+xfRFVZHguhs2Kf06tgX32eOoJi4/BRrP612PJpG4ZXAPlbLTd
+	3ifjffPo/hf+MmRS6luLiWotAm5lGrjblF2PqH/yohczAKpXZoRfIdpXishXomyGvDCY2oaixwp
+	jZ4No5kZC7ihVoyvI9St5zLdNq/B9S2jw1XzCRbd9q6RuzRuWu4p1PpNObh7+J/0J8yBsOF3azn
+	E+37mEeuSn87ygJjWXlUpX5MTRSH3wvJ0v/MQLCESfV/KUjDIt2TG2GP8W17Z5Jy17aNewXyxTZ
+	ZJ+fF2KjuH8f8J/MLWQgYy3Ny4Jm1RtUp8+i1k0RZkR4hzYAEVkr4IkTA7g6D4fZg8XAXw/dsLV
+	Q==
+X-Received: by 2002:a5d:5f90:0:b0:454:454a:4cbd with SMTP id ffacd0b85a97d-45e5c6000c3mr8001358f8f.5.1779041213530;
+        Sun, 17 May 2026 11:06:53 -0700 (PDT)
 Received: from menon.v.cablecom.net (84-74-0-139.dclient.hispeed.ch. [84.74.0.139])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45da15a6454sm31766775f8f.34.2026.05.17.11.06.55
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45da15a6454sm31766775f8f.34.2026.05.17.11.06.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 May 2026 11:06:56 -0700 (PDT)
+        Sun, 17 May 2026 11:06:53 -0700 (PDT)
 From: Lothar Rubusch <l.rubusch@gmail.com>
 To: thorsten.blum@linux.dev,
 	herbert@gondor.apana.org.au,
@@ -68,9 +69,9 @@ Cc: linux-crypto@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	l.rubusch@gmail.com
-Subject: [PATCH 09/12] crypto: atmel-ecc - simplify remove path and relax busy handling
-Date: Sun, 17 May 2026 18:06:36 +0000
-Message-Id: <20260517180639.9657-11-l.rubusch@gmail.com>
+Subject: [PATCH 06/12] crypto: atmel-sha204a - add i2c hw client list and improve probe error handling
+Date: Sun, 17 May 2026 18:06:33 +0000
+Message-Id: <20260517180639.9657-8-l.rubusch@gmail.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20260517180639.9657-1-l.rubusch@gmail.com>
 References: <20260517180639.9657-1-l.rubusch@gmail.com>
@@ -82,56 +83,67 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Simplify atmel_ecc_remove() by removing early exit logic and
-centralizing client retrieval and validation.
+Add registration of the SHA204A I2C client into the shared atmel_i2c client
+management list during probe.
 
-Previously the driver returned early when active transform users
-were detected, which could leave partially initialized state
-without proper cleanup.
+This allows the driver to participate in the common hardware selection
+infrastructure used by Atmel crypto devices.
 
-Replace this with a warning when active transforms are present,
-but continue with full teardown of crypto registration and
-device cleanup.
+Improve error handling in atmel_sha204a_probe() by ensuring that partial
+initialization (hwrng registration or sysfs creation) results in proper
+cleanup of the client list entry.
 
-This ensures consistent removal behaviour even when the device
-is still in use.
+No functional change intended beyond improved lifecycle handling.
 
 Signed-off-by: Lothar Rubusch <l.rubusch@gmail.com>
 ---
- drivers/crypto/atmel-ecc.c | 19 ++++++-------------
- 1 file changed, 6 insertions(+), 13 deletions(-)
+ drivers/crypto/atmel-sha204a.c | 20 ++++++++++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
-index dcfc09d24497..ce7a2e750ba8 100644
---- a/drivers/crypto/atmel-ecc.c
-+++ b/drivers/crypto/atmel-ecc.c
-@@ -346,21 +346,14 @@ static int atmel_ecc_probe(struct i2c_client *client)
+diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha204a.c
+index 6e6ac4770416..cdfdcf2e43a7 100644
+--- a/drivers/crypto/atmel-sha204a.c
++++ b/drivers/crypto/atmel-sha204a.c
+@@ -173,6 +173,13 @@ static int atmel_sha204a_probe(struct i2c_client *client)
  
- static void atmel_ecc_remove(struct i2c_client *client)
- {
--	struct atmel_i2c_client_priv *i2c_priv = i2c_get_clientdata(client);
-+	struct atmel_i2c_client_priv *i2c_priv;
+ 	i2c_priv = i2c_get_clientdata(client);
  
--	/* Return EBUSY if i2c client already allocated. */
--	if (atomic_read(&i2c_priv->tfm_count)) {
--		/*
--		 * After we return here, the memory backing the device is freed.
--		 * That happens no matter what the return value of this function
--		 * is because in the Linux device model there is no error
--		 * handling for unbinding a driver.
--		 * If there is still some action pending, it probably involves
--		 * accessing the freed memory.
--		 */
--		dev_emerg(&client->dev, "Device is busy, expect memory corruption.\n");
-+	i2c_priv = i2c_get_clientdata(client);
-+	if (WARN_ON(!i2c_priv))
- 		return;
--	}
++	/* add to client list */
++	spin_lock(&atmel_i2c_mgmt.i2c_list_lock);
++	list_add_tail(&i2c_priv->i2c_client_list_node,
++		      &atmel_i2c_mgmt.i2c_client_list);
++	spin_unlock(&atmel_i2c_mgmt.i2c_list_lock);
 +
-+	if (atomic_read(&i2c_priv->tfm_count))
-+		dev_warn(&client->dev, "Device is busy, remove it anyhow\n");
++	/* register rng */
+ 	memset(&i2c_priv->hwrng, 0, sizeof(i2c_priv->hwrng));
  
- 	crypto_unregister_kpp(&atmel_ecdh_nist_p256);
+ 	i2c_priv->hwrng.name = dev_name(&client->dev);
+@@ -183,15 +190,24 @@ static int atmel_sha204a_probe(struct i2c_client *client)
+ 		i2c_priv->hwrng.quality = *quality;
+ 
+ 	ret = devm_hwrng_register(&client->dev, &i2c_priv->hwrng);
+-	if (ret)
++	if (ret) {
+ 		dev_warn(&client->dev, "failed to register RNG (%d)\n", ret);
++		goto err_list_del;
++	}
+ 
+ 	ret = sysfs_create_group(&client->dev.kobj, &atmel_sha204a_groups);
+ 	if (ret) {
+ 		dev_err(&client->dev, "failed to register sysfs entry\n");
+-		return ret;
++		goto err_list_del;
+ 	}
+ 
++	return ret;
++
++err_list_del:
++	spin_lock(&atmel_i2c_mgmt.i2c_list_lock);
++	list_del(&i2c_priv->i2c_client_list_node);
++	spin_unlock(&atmel_i2c_mgmt.i2c_list_lock);
++
+ 	return ret;
+ }
  
 -- 
 2.53.0
