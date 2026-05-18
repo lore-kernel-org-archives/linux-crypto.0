@@ -1,166 +1,174 @@
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A78F32D7F1
-	for <linux-crypto@vger.kernel.org>; Mon, 18 May 2026 23:37:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F9A226738C;
+	Mon, 18 May 2026 23:55:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779147436; cv=none; b=TMcoycrFjS1ILMnoJzGL50N91HuBAahX/NipEV94k9yK0ii7KNkAiVkhJOP2o19PfVxmZ+6wa+6y8leQ8QzNQYSXbas5VEsvmXCZI/1BGF8Xz1cuwKeXHHYXOm4bGxPZO4qmGsrVtGM8zMbhGnLW1BXY35eeKBOY+yC/FdLGpZU=
+	t=1779148512; cv=none; b=MQVbrDzB5sYcI/wDCwbOzk2+CmHSnbqNbbhNw0X1hunjU40DZGqAFCjNgvppz5Rq+5cz4IzKiRgIfC3BwmSSUFgkgSvinDFI2BQW6ji3g7pVJuvPiNslyclSqQAy/TijJrYQJEsAo/UHNBG7I+5YqtMvyw7cM5l3AdHfRDn2Jv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779147436; c=relaxed/simple;
-	bh=8TFc2YzkiapobSvWzVIWfZppi1wPCviN7yRGOLE1gB4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=T8XjWbmBlrGtT+wLmfVCAd+1UR8kRu+cRRZwowxI050aliwS+eHVSNEJx3j8zy7qzQTWMTRy8aIAbkcsn1QTyGqgTjxwQaeOz276FyVitHagZ8+dzPX7rX/cogkRAo6gTR9JRCzby0HPI9/SJu6MdjwSjI/ZB0lniRlrUtQ2W7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qN7U3jbB; arc=none smtp.client-ip=209.85.128.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1779148512; c=relaxed/simple;
+	bh=Oq+gnuMQRWjKoACeXqW8Y4zLGstl6ODlk5GgQd7tCZ8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=dQoyK2eeDoUkaAQ8iWAzQrtNIe88OGhXX9594AwnWIhkYxZIwEeuFv3VpGpe8j6NzFW8l1E8Sk3R/3MiZbI3W6AOvwSXcbj/b+OrQMutzJ6pXcmqsc0Xsp2YDaNAPI2VJX/N2gzRbail5UMwLTmefCCOt39pTxUqEvIwB6Zd7gk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SR7d5+u1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qN7U3jbB"
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-7bd6f65c781so21972767b3.1
-        for <linux-crypto@vger.kernel.org>; Mon, 18 May 2026 16:37:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779147434; x=1779752234; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rd1rj9mGSGdgZZkSdF/f3J82IFvafL5ag4QbFxUPAis=;
-        b=qN7U3jbBGtJQuaUe5JqfeWN9ftZfxYFYZNhLOt6VkIv81puK4/B4u0iclx/1mEaUR3
-         +nAoY9AzVegyRDY4Uatnjuvq7sZ0IHKQlefe9YSiLJd8wOYazqcvSLMU/vsMDWmzovEh
-         zfx2Om/rHWVvUSsGHODP0MjCUOqNm8bdG0WauEKYABdhajJI1pqPx0X+LV8z2N+wC6i5
-         uUNCS2jexwMXf+6DeJyDsKy8JhQQKM3UH4ugb+TykA2BRLZV398QnypMa+DmY6x3547H
-         RaKmeTb8LNoTM6GEmD3SS0pU+k30xM0qmIvC/re13DtANzobKrImk6ck7zZWUYlkpElZ
-         GJ+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779147434; x=1779752234;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=rd1rj9mGSGdgZZkSdF/f3J82IFvafL5ag4QbFxUPAis=;
-        b=DUBsBFXSNEPQb9pmKZpoKTlGWklLrhlfLGEJ+i8lS8PeRITwOQuRnhLKW1e3wderko
-         UpwGE187goQqr4rZsvawTPbVF9Ph2TSBYuxcGHkNG5Y5H9+AVvPJtJ+ws6a27LfFM4Ru
-         bdYRJxfkEeoTQyfhDp3sE4/NS/u+B2mUH7mTs9jjwXwb6LeJA6H3M7W22/HBC/ZjnfmY
-         1MPmqXQn7bj/5EO4hadyt0eiEZea6XtBoPwFcrXSMrsCtlJeod7DgI7j+xkP2z/yr+vU
-         dVmAmovYekMK981f87Z/5zktMxdOgdGq5pBmYD4I3QUohNsb+YNpHoT/VH19p1QymLuD
-         yZ3Q==
-X-Gm-Message-State: AOJu0YzOO4cM0BOYdWVUuFo8c1R24LXycX6Yr03WoUbiRY3sT70+3sJ+
-	QbzgQeh8zB7WOnwMVYa2VRJ2eqkbrocMCojOaQaS7TsD2OjkXSN6tVLXynjDo9dgMjI=
-X-Gm-Gg: Acq92OFs9DxmIDEz4Eiu9urFHpsG6NI2z+2EsrwII1akXFZTMzgiwFfz+CBJ3P7tuE0
-	DyndHIHbFvckf1DgrdrSKcW+Kg2nsDYBcZni9BPnsgshx2LpCRd7yy63xc/A8P99GKDaCZu1I/E
-	FuYd3zHjZy8K6PaUcwgb8wGuVQSo45GvzH5umTYkos0fYrhjSwDnBFnoJB3IcEPhptZsU17qABH
-	M5osFqvkZAIzSkElu8m8jrWtaigPpu2j0GoKo/hrbGvXuzqr37yglWk7f3FM0lqjqtN92o2ErmE
-	Nha4A3wObSlgKqqcpjiOUOSTdTo+io2vstio0Kj+LKYx3J/nouYstoZFbaR1ZofFSKFjZOSGpl3
-	EF+0NSD/qt1Em2jixkKmHDuyJUzcwLqY6w3KYlEjq3Axh0T1dOaYQmXGCcFFcv8Bmt2bv9RGeBD
-	IcmYXY3/ZE3QfhDYzjgN7xwvmEHg3My0kT7bAZThBX0cpe5CbTxOfrLm6K9UVHUGv8wN6oCWaVw
-	IOZqV8IKCrgn0p6enbfdQCk4BiYsYcekdX7QsBcPaVKBNdN4IiXT6YhsSEtJUjnPv4n9+GEkmou
-	l223kqlgQIqRjYhVITSTMTZd/Fo=
-X-Received: by 2002:a05:690c:397:b0:7bd:5cc4:2fa9 with SMTP id 00721157ae682-7c948ff04a2mr138475307b3.20.1779147434325;
-        Mon, 18 May 2026 16:37:14 -0700 (PDT)
-Received: from maxbox.tailad2ea6.ts.net ([2603:6081:16f0:a980::18f1])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-7cc991c9b64sm29058637b3.1.2026.05.18.16.37.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 May 2026 16:37:14 -0700 (PDT)
-From: Max Clinton <maxtclinton@gmail.com>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	herbert@gondor.apana.org.au,
-	gregkh@linuxfoundation.org,
-	davem@davemloft.net,
-	security@kernel.org,
-	stable@kernel.org,
-	Max Clinton <maxtclinton@gmail.com>
-Subject: [PATCH] crypto: algif_skcipher - snapshot IV for async skcipher requests
-Date: Mon, 18 May 2026 19:35:39 -0400
-Message-ID: <20260518233538.705966-2-maxtclinton@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <agp9Hc71Z3lGF_zu@gondor.apana.org.au>
-References: <agp9Hc71Z3lGF_zu@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SR7d5+u1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E81D7C2BCB7;
+	Mon, 18 May 2026 23:55:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1779148512;
+	bh=Oq+gnuMQRWjKoACeXqW8Y4zLGstl6ODlk5GgQd7tCZ8=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=SR7d5+u17pNQYr8ELcR1xR6JkyTOzTM7GiEFnfi8yqYX6yxpe+CXZdjyY770E8O5q
+	 3h1r06qdamKnBL5bVPZYGdpEbdDkH47F+T88CHYxX3Y+iNTmdg7jZdBPVebyI6RkZk
+	 gNR5jWYEmalMXgdnSOEXSwBKOoyHVUUwPculI94XbhrvNK3/AUMNKGVP3vlfwpFZhr
+	 Wg8YsIC0Qa6lB+Uy4DD84inuaBjXqED4JVElgKDBkc4MMd7TSpyCzUwBgZnF9cDb4k
+	 SRCQaJmL4M1LiMW5hsE55y5GtoZgnVIs5133RoHmzam32zoMsljjxPSWRY3BHwB3/g
+	 TUvzofbsc8PrA==
+Message-ID: <097fe9ea-bd19-4aec-a854-f00b050603a6@kernel.org>
+Date: Mon, 18 May 2026 18:55:08 -0500
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] treewide: replace /usr/bin/python3 shebangs with env
+ python3
+Content-Language: en-US
+To: Oli R <sigmatwojastara@gmail.com>,
+ Rob Clark <robin.clark@oss.qualcomm.com>, Dmitry Baryshkov
+ <lumag@kernel.org>, Abhinav Kumar <abhinav.kumar@linux.dev>,
+ Jessica Zhang <jesszhan0024@gmail.com>, Sean Paul <sean@poorly.run>,
+ Marijn Suijten <marijn.suijten@somainline.org>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+ Adrian Hunter <adrian.hunter@intel.com>, James Clark
+ <james.clark@linaro.org>, Shuah Khan <shuah@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>, Boqun Feng <boqun@kernel.org>,
+ "open list:DRM DRIVER for Qualcomm display hardware"
+ <linux-arm-msm@vger.kernel.org>,
+ "open list:DRM DRIVER for Qualcomm display hardware"
+ <dri-devel@lists.freedesktop.org>,
+ "open list:DRM DRIVER for Qualcomm display hardware"
+ <freedreno@lists.freedesktop.org>, open list <linux-kernel@vger.kernel.org>,
+ "open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER - DB..."
+ <linux-crypto@vger.kernel.org>,
+ "open list:PERFORMANCE EVENTS SUBSYSTEM" <linux-perf-users@vger.kernel.org>,
+ "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
+References: <20260515180806.246914-1-sigmatwojastara@gmail.com>
+From: Mario Limonciello <superm1@kernel.org>
+In-Reply-To: <20260515180806.246914-1-sigmatwojastara@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-AF_ALG skcipher AIO requests currently use the socket-wide IV buffer
-during request processing.  For async requests, later socket activity
-can update that shared state before the original request has fully
-completed, which can lead to inconsistent IV handling.
 
-Snapshot the IV into per-request storage when preparing the skcipher
-request, so in-flight operations no longer depend on mutable socket
-state.
 
-This mirrors the algif_aead fix from commit 5aa58c3a572b ("crypto:
-algif_aead - snapshot IV for async AEAD requests"), which addressed
-the same shape of bug in the AEAD sibling subsystem.
-
-Tested on Debian Trixie 6.12.74+deb13+1-amd64 (unpatched) and on
-v6.12.86 + this patch via virtme-ng on the same host. Reproducer
-results: 10-14% race rate over 50000 iterations on the unpatched
-kernel against cryptd(cbc(aes-generic)); 0 races at 50000 and
-200000 iterations on the patched kernel; 0 races at 200000
-iterations on the unpatched kernel with the synchronous
-cbc(aes-generic) driver as a control case (confirming the race is
-gated on the async dispatch path).
-
-Fixes: e870456d8e7c ("crypto: algif_skcipher - overhaul memory management")
-Cc: stable@kernel.org
-Reported-by: Max Clinton <maxtclinton@gmail.com>
-Signed-off-by: Max Clinton <maxtclinton@gmail.com>
----
- crypto/algif_skcipher.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
-
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index ba0a17fd9..519ff8d17 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -23,6 +23,7 @@
-  * the RX SGL release.
-  */
- 
-+#include <crypto/internal/skcipher.h>
- #include <crypto/scatterwalk.h>
- #include <crypto/skcipher.h>
- #include <crypto/if_alg.h>
-@@ -103,9 +104,11 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
- 	struct af_alg_ctx *ctx = ask->private;
- 	struct crypto_skcipher *tfm = pask->private;
- 	unsigned int bs = crypto_skcipher_chunksize(tfm);
-+	unsigned int ivsize = crypto_skcipher_ivsize(tfm);
- 	struct af_alg_async_req *areq;
- 	unsigned cflags = 0;
- 	int err = 0;
-+	void *iv;
- 	size_t len = 0;
- 
- 	if (!ctx->init || (ctx->more && ctx->used < bs)) {
-@@ -116,10 +119,14 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
- 
- 	/* Allocate cipher request for current operation. */
- 	areq = af_alg_alloc_areq(sk, sizeof(struct af_alg_async_req) +
--				     crypto_skcipher_reqsize(tfm));
-+				     crypto_skcipher_reqsize(tfm) + ivsize);
- 	if (IS_ERR(areq))
- 		return PTR_ERR(areq);
- 
-+	iv = (u8 *)skcipher_request_ctx(&areq->cra_u.skcipher_req) +
-+	     crypto_skcipher_reqsize(tfm);
-+	memcpy(iv, ctx->iv, ivsize);
-+
- 	/* convert iovecs of output buffers into RX SGL */
- 	err = af_alg_get_rsgl(sk, msg, flags, areq, ctx->used, &len);
- 	if (err)
-@@ -159,7 +166,7 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
- 	/* Initialize the crypto operation */
- 	skcipher_request_set_tfm(&areq->cra_u.skcipher_req, tfm);
- 	skcipher_request_set_crypt(&areq->cra_u.skcipher_req, areq->tsgl,
--				   areq->first_rsgl.sgl.sgt.sgl, len, ctx->iv);
-+				   areq->first_rsgl.sgl.sgt.sgl, len, iv);
- 
- 	if (ctx->state) {
- 		err = crypto_skcipher_import(&areq->cra_u.skcipher_req,
--- 
-2.47.3
+On 5/15/26 13:07, Oli R wrote:
+> Use /usr/bin/env python3 instead of hardcoded interpreter paths
+> to improve portability across environments where python3 is not
+> installed in /usr/bin.
+> 
+> No functional changes intended.
+> 
+> Signed-off-by: Oli R <sigmatwojastara@gmail.com>
+Reviewed-by: Mario Limonciello (AMD) <superm1@kernel.org) (tools/crypto/ccp)
+> ---
+>   drivers/gpu/drm/msm/registers/gen_header.py                     | 2 +-
+>   scripts/macro_checker.py                                        | 2 +-
+>   tools/crypto/ccp/dbc.py                                         | 2 +-
+>   tools/crypto/ccp/dbc_cli.py                                     | 2 +-
+>   tools/crypto/ccp/test_dbc.py                                    | 2 +-
+>   tools/perf/tests/shell/lib/perf_json_output_lint.py             | 2 +-
+>   .../selftests/devices/probe/test_discoverable_devices.py        | 2 +-
+>   tools/testing/selftests/rseq/rseq-slice-hist.py                 | 2 +-
+>   8 files changed, 8 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/gpu/drm/msm/registers/gen_header.py b/drivers/gpu/drm/msm/registers/gen_header.py
+> index 2acad951f1e2..10316f517a7d 100644
+> --- a/drivers/gpu/drm/msm/registers/gen_header.py
+> +++ b/drivers/gpu/drm/msm/registers/gen_header.py
+> @@ -1,4 +1,4 @@
+> -#!/usr/bin/python3
+> +#!/usr/bin/env python3
+>   #
+>   # Copyright © 2019-2024 Google, Inc.
+>   #
+> diff --git a/scripts/macro_checker.py b/scripts/macro_checker.py
+> index ba550982e98f..7dbb114a57d5 100755
+> --- a/scripts/macro_checker.py
+> +++ b/scripts/macro_checker.py
+> @@ -1,4 +1,4 @@
+> -#!/usr/bin/python3
+> +#!/usr/bin/env python3
+>   # SPDX-License-Identifier: GPL-2.0
+>   # Author: Julian Sun <sunjunchao2870@gmail.com>
+>   
+> diff --git a/tools/crypto/ccp/dbc.py b/tools/crypto/ccp/dbc.py
+> index 2b91415b1940..cd56a63aa8ce 100644
+> --- a/tools/crypto/ccp/dbc.py
+> +++ b/tools/crypto/ccp/dbc.py
+> @@ -1,4 +1,4 @@
+> -#!/usr/bin/python3
+> +#!/usr/bin/env python3
+>   # SPDX-License-Identifier: GPL-2.0
+>   
+>   import ctypes
+> diff --git a/tools/crypto/ccp/dbc_cli.py b/tools/crypto/ccp/dbc_cli.py
+> index bf52233fd038..bfe34f01e619 100755
+> --- a/tools/crypto/ccp/dbc_cli.py
+> +++ b/tools/crypto/ccp/dbc_cli.py
+> @@ -1,4 +1,4 @@
+> -#!/usr/bin/python3
+> +#!/usr/bin/env python3
+>   # SPDX-License-Identifier: GPL-2.0
+>   import argparse
+>   import binascii
+> diff --git a/tools/crypto/ccp/test_dbc.py b/tools/crypto/ccp/test_dbc.py
+> index bb0e671be96d..0ee3da6c6be7 100755
+> --- a/tools/crypto/ccp/test_dbc.py
+> +++ b/tools/crypto/ccp/test_dbc.py
+> @@ -1,4 +1,4 @@
+> -#!/usr/bin/python3
+> +#!/usr/bin/env python3
+>   # SPDX-License-Identifier: GPL-2.0
+>   import unittest
+>   import os
+> diff --git a/tools/perf/tests/shell/lib/perf_json_output_lint.py b/tools/perf/tests/shell/lib/perf_json_output_lint.py
+> index dafbde56cc76..dccafd507bb7 100644
+> --- a/tools/perf/tests/shell/lib/perf_json_output_lint.py
+> +++ b/tools/perf/tests/shell/lib/perf_json_output_lint.py
+> @@ -1,4 +1,4 @@
+> -#!/usr/bin/python
+> +#!/usr/bin/env python3
+>   # SPDX-License-Identifier: (LGPL-2.1 OR BSD-2-Clause)
+>   # Basic sanity check of perf JSON output as specified in the man page.
+>   
+> diff --git a/tools/testing/selftests/devices/probe/test_discoverable_devices.py b/tools/testing/selftests/devices/probe/test_discoverable_devices.py
+> index d7a2bb91c807..72a94bbfbc7b 100755
+> --- a/tools/testing/selftests/devices/probe/test_discoverable_devices.py
+> +++ b/tools/testing/selftests/devices/probe/test_discoverable_devices.py
+> @@ -1,4 +1,4 @@
+> -#!/usr/bin/python3
+> +#!/usr/bin/env python3
+>   # SPDX-License-Identifier: GPL-2.0
+>   #
+>   # Copyright (c) 2023 Collabora Ltd
+> diff --git a/tools/testing/selftests/rseq/rseq-slice-hist.py b/tools/testing/selftests/rseq/rseq-slice-hist.py
+> index b7933eeaefb9..2c43b2e2bf0d 100644
+> --- a/tools/testing/selftests/rseq/rseq-slice-hist.py
+> +++ b/tools/testing/selftests/rseq/rseq-slice-hist.py
+> @@ -1,4 +1,4 @@
+> -#!/usr/bin/python3
+> +#!/usr/bin/env python3
+>   
+>   #
+>   # trace-cmd record -e hrtimer_start -e hrtimer_cancel -e hrtimer_expire_entry -- $cmd
 
