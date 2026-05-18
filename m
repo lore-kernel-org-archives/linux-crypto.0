@@ -1,148 +1,166 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D15537F8B8;
-	Mon, 18 May 2026 22:38:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A78F32D7F1
+	for <linux-crypto@vger.kernel.org>; Mon, 18 May 2026 23:37:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779143890; cv=none; b=fKGYmaYUZe68id7BEBOYnzwDq5q2s4yjit7nRDMTy27KaQS7LGUqsMf+tur0PHAjOlobzZWUnrNkxmHOt3k2oVswHqXolwNlH5iVCg2ow+EGtS79v19icVA6jaILAFTEey77llnvC2r7HlyQhsOkKleyzN5Wem7WjdSVZ+P2jfc=
+	t=1779147436; cv=none; b=TMcoycrFjS1ILMnoJzGL50N91HuBAahX/NipEV94k9yK0ii7KNkAiVkhJOP2o19PfVxmZ+6wa+6y8leQ8QzNQYSXbas5VEsvmXCZI/1BGF8Xz1cuwKeXHHYXOm4bGxPZO4qmGsrVtGM8zMbhGnLW1BXY35eeKBOY+yC/FdLGpZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779143890; c=relaxed/simple;
-	bh=qCQwJ7EkWVljkBjA9B3uP8K28iY6jsqP50ZXR9QHS9k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ObHUOlnZ4lyW0Il6skSzJNgsdOl5G/EleGL4xA4uc0yC8esKX8ryFbfIXS0IQPz+Fs7z569RA5URUbXPHMWNaroLlz08sChPg5AxkWhAxLlECQcYB4OKE6aD1ButLO+R9aVs4fNyGtAYIdq/CWzamc8Nzme61gf84P+mIake6lE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CDqGMID0; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1779147436; c=relaxed/simple;
+	bh=8TFc2YzkiapobSvWzVIWfZppi1wPCviN7yRGOLE1gB4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=T8XjWbmBlrGtT+wLmfVCAd+1UR8kRu+cRRZwowxI050aliwS+eHVSNEJx3j8zy7qzQTWMTRy8aIAbkcsn1QTyGqgTjxwQaeOz276FyVitHagZ8+dzPX7rX/cogkRAo6gTR9JRCzby0HPI9/SJu6MdjwSjI/ZB0lniRlrUtQ2W7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=qN7U3jbB; arc=none smtp.client-ip=209.85.128.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CDqGMID0"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1779143889; x=1810679889;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=qCQwJ7EkWVljkBjA9B3uP8K28iY6jsqP50ZXR9QHS9k=;
-  b=CDqGMID0GcFb0E7SLDtb6Dvu5qVgcFSgrFKInplDjNkB3kcHp+leRpMy
-   Td963leaeEojMZ/y6wWYFpgPUH2fimm2b0cF0V1DAEOSR7cfnaZlrxGvS
-   RD7+PXZ9+lVK7TdkJoli/70e5v9FvvoGCb9qtmGr1nVZK2tYzAHEKUAGP
-   iQVGcG+OlYluU6EWk1OSL5k0tYDXis0c1/pbKznYkTWXe5uxfY25h3lNb
-   73tSuCG4CkE1S6k1eLe4Mbqgxkzskyegpmw2LJkIBMgs+VYxUw7idW7+B
-   HsjwHNVADgXO4/gjzTPDK5ETri9eG7bodZ9CzNvCFKC2jwyWsi2z5qFao
-   w==;
-X-CSE-ConnectionGUID: KUx31qXtQbyFXcYR9ecakg==
-X-CSE-MsgGUID: kCZmM64uSyKSppfNns3+/A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11790"; a="79033552"
-X-IronPort-AV: E=Sophos;i="6.23,242,1770624000"; 
-   d="scan'208";a="79033552"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2026 15:38:08 -0700
-X-CSE-ConnectionGUID: tx/d63/fQguxk2NMcNDBoQ==
-X-CSE-MsgGUID: 87aGHq5qRQCsM4DI4mVrtQ==
-X-ExtLoop1: 1
-Received: from jmaxwel1-mobl.amr.corp.intel.com (HELO [10.125.109.43]) ([10.125.109.43])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2026 15:38:07 -0700
-Message-ID: <0f222bda-12ed-48a1-996c-4c2cbddad4f5@intel.com>
-Date: Mon, 18 May 2026 15:38:10 -0700
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qN7U3jbB"
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-7bd6f65c781so21972767b3.1
+        for <linux-crypto@vger.kernel.org>; Mon, 18 May 2026 16:37:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1779147434; x=1779752234; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rd1rj9mGSGdgZZkSdF/f3J82IFvafL5ag4QbFxUPAis=;
+        b=qN7U3jbBGtJQuaUe5JqfeWN9ftZfxYFYZNhLOt6VkIv81puK4/B4u0iclx/1mEaUR3
+         +nAoY9AzVegyRDY4Uatnjuvq7sZ0IHKQlefe9YSiLJd8wOYazqcvSLMU/vsMDWmzovEh
+         zfx2Om/rHWVvUSsGHODP0MjCUOqNm8bdG0WauEKYABdhajJI1pqPx0X+LV8z2N+wC6i5
+         uUNCS2jexwMXf+6DeJyDsKy8JhQQKM3UH4ugb+TykA2BRLZV398QnypMa+DmY6x3547H
+         RaKmeTb8LNoTM6GEmD3SS0pU+k30xM0qmIvC/re13DtANzobKrImk6ck7zZWUYlkpElZ
+         GJ+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779147434; x=1779752234;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=rd1rj9mGSGdgZZkSdF/f3J82IFvafL5ag4QbFxUPAis=;
+        b=DUBsBFXSNEPQb9pmKZpoKTlGWklLrhlfLGEJ+i8lS8PeRITwOQuRnhLKW1e3wderko
+         UpwGE187goQqr4rZsvawTPbVF9Ph2TSBYuxcGHkNG5Y5H9+AVvPJtJ+ws6a27LfFM4Ru
+         bdYRJxfkEeoTQyfhDp3sE4/NS/u+B2mUH7mTs9jjwXwb6LeJA6H3M7W22/HBC/ZjnfmY
+         1MPmqXQn7bj/5EO4hadyt0eiEZea6XtBoPwFcrXSMrsCtlJeod7DgI7j+xkP2z/yr+vU
+         dVmAmovYekMK981f87Z/5zktMxdOgdGq5pBmYD4I3QUohNsb+YNpHoT/VH19p1QymLuD
+         yZ3Q==
+X-Gm-Message-State: AOJu0YzOO4cM0BOYdWVUuFo8c1R24LXycX6Yr03WoUbiRY3sT70+3sJ+
+	QbzgQeh8zB7WOnwMVYa2VRJ2eqkbrocMCojOaQaS7TsD2OjkXSN6tVLXynjDo9dgMjI=
+X-Gm-Gg: Acq92OFs9DxmIDEz4Eiu9urFHpsG6NI2z+2EsrwII1akXFZTMzgiwFfz+CBJ3P7tuE0
+	DyndHIHbFvckf1DgrdrSKcW+Kg2nsDYBcZni9BPnsgshx2LpCRd7yy63xc/A8P99GKDaCZu1I/E
+	FuYd3zHjZy8K6PaUcwgb8wGuVQSo45GvzH5umTYkos0fYrhjSwDnBFnoJB3IcEPhptZsU17qABH
+	M5osFqvkZAIzSkElu8m8jrWtaigPpu2j0GoKo/hrbGvXuzqr37yglWk7f3FM0lqjqtN92o2ErmE
+	Nha4A3wObSlgKqqcpjiOUOSTdTo+io2vstio0Kj+LKYx3J/nouYstoZFbaR1ZofFSKFjZOSGpl3
+	EF+0NSD/qt1Em2jixkKmHDuyJUzcwLqY6w3KYlEjq3Axh0T1dOaYQmXGCcFFcv8Bmt2bv9RGeBD
+	IcmYXY3/ZE3QfhDYzjgN7xwvmEHg3My0kT7bAZThBX0cpe5CbTxOfrLm6K9UVHUGv8wN6oCWaVw
+	IOZqV8IKCrgn0p6enbfdQCk4BiYsYcekdX7QsBcPaVKBNdN4IiXT6YhsSEtJUjnPv4n9+GEkmou
+	l223kqlgQIqRjYhVITSTMTZd/Fo=
+X-Received: by 2002:a05:690c:397:b0:7bd:5cc4:2fa9 with SMTP id 00721157ae682-7c948ff04a2mr138475307b3.20.1779147434325;
+        Mon, 18 May 2026 16:37:14 -0700 (PDT)
+Received: from maxbox.tailad2ea6.ts.net ([2603:6081:16f0:a980::18f1])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7cc991c9b64sm29058637b3.1.2026.05.18.16.37.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 May 2026 16:37:14 -0700 (PDT)
+From: Max Clinton <maxtclinton@gmail.com>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	herbert@gondor.apana.org.au,
+	gregkh@linuxfoundation.org,
+	davem@davemloft.net,
+	security@kernel.org,
+	stable@kernel.org,
+	Max Clinton <maxtclinton@gmail.com>
+Subject: [PATCH] crypto: algif_skcipher - snapshot IV for async skcipher requests
+Date: Mon, 18 May 2026 19:35:39 -0400
+Message-ID: <20260518233538.705966-2-maxtclinton@gmail.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <agp9Hc71Z3lGF_zu@gondor.apana.org.au>
+References: <agp9Hc71Z3lGF_zu@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 2/7] x86/msr: add wrmsrq_on_cpus helper
-To: "Kalra, Ashish" <ashish.kalra@amd.com>, tglx@kernel.org,
- mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
- hpa@zytor.com, seanjc@google.com, peterz@infradead.org,
- thomas.lendacky@amd.com, herbert@gondor.apana.org.au, davem@davemloft.net,
- ardb@kernel.org
-Cc: pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
- KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com,
- ackerleytng@google.com, jackyli@google.com, pgonda@google.com,
- rientjes@google.com, jacobhxu@google.com, xin@zytor.com,
- pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com, dyoung@redhat.com,
- nikunj@amd.com, john.allen@amd.com, darwi@linutronix.de,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
- kvm@vger.kernel.org, linux-coco@lists.linux.dev
-References: <cover.1779133590.git.ashish.kalra@amd.com>
- <c9fe5c2fef063f5006cc9bfa03eec824ac015db7.1779133590.git.ashish.kalra@amd.com>
- <c9f1d4d2-e567-4090-b342-c76125673f61@intel.com>
- <6e365465-9ecf-416f-9561-67cab6428e15@amd.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <6e365465-9ecf-416f-9561-67cab6428e15@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 5/18/26 15:09, Kalra, Ashish wrote:
-> On 5/18/2026 5:04 PM, Dave Hansen wrote:
->> On 5/18/26 14:42, Ashish Kalra wrote:
->>> Co-developed-by: Dave Hansen <dave.hansen@linux.intel.com>
->>> Signed-off-by: Dave Hansen <dave.hansen@linux.intel.com>
->>> Reviewed-by: Ackerley Tng <ackerleytng@google.com>
->>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
->> Hi Ashish,
->>
->> Sorry if my memory fails me, but I don't remember signing off on this.
->> Could you point me to the place where I gave you my Signed-off-by?
-> Sorry about this, added this accidentally. 
-> 
-> You had suggested the code change, i accidentally took it as a Signed-off.
+AF_ALG skcipher AIO requests currently use the socket-wide IV buffer
+during request processing.  For async requests, later socket activity
+can update that shared state before the original request has fully
+completed, which can lead to inconsistent IV handling.
 
-Hi Ashish,
+Snapshot the IV into per-request storage when preparing the skcipher
+request, so in-flight operations no longer depend on mutable socket
+state.
 
-First, please do me a favor and go back and re-read:
+This mirrors the algif_aead fix from commit 5aa58c3a572b ("crypto:
+algif_aead - snapshot IV for async AEAD requests"), which addressed
+the same shape of bug in the AEAD sibling subsystem.
 
-	Documentation/process/submitting-patches.rst
+Tested on Debian Trixie 6.12.74+deb13+1-amd64 (unpatched) and on
+v6.12.86 + this patch via virtme-ng on the same host. Reproducer
+results: 10-14% race rate over 50000 iterations on the unpatched
+kernel against cryptd(cbc(aes-generic)); 0 races at 50000 and
+200000 iterations on the patched kernel; 0 races at 200000
+iterations on the unpatched kernel with the synchronous
+cbc(aes-generic) driver as a control case (confirming the race is
+gated on the async dispatch path).
 
-I recommend that everyone do this every once in a while so they remember
-what they are constantly signing off on. It's important.
+Fixes: e870456d8e7c ("crypto: algif_skcipher - overhaul memory management")
+Cc: stable@kernel.org
+Reported-by: Max Clinton <maxtclinton@gmail.com>
+Signed-off-by: Max Clinton <maxtclinton@gmail.com>
+---
+ crypto/algif_skcipher.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-My personal rule for SoB lines is that I don't add them unless I've
-explicitly talked to the person. Even then, I vastly prefer that the
-person provides it to me *explicitly* (so I just copy and paste
-directly) and on a public mailing list. That way, the avenues for
-accidents to occur are very narrow.
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index ba0a17fd9..519ff8d17 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -23,6 +23,7 @@
+  * the RX SGL release.
+  */
+ 
++#include <crypto/internal/skcipher.h>
+ #include <crypto/scatterwalk.h>
+ #include <crypto/skcipher.h>
+ #include <crypto/if_alg.h>
+@@ -103,9 +104,11 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	struct af_alg_ctx *ctx = ask->private;
+ 	struct crypto_skcipher *tfm = pask->private;
+ 	unsigned int bs = crypto_skcipher_chunksize(tfm);
++	unsigned int ivsize = crypto_skcipher_ivsize(tfm);
+ 	struct af_alg_async_req *areq;
+ 	unsigned cflags = 0;
+ 	int err = 0;
++	void *iv;
+ 	size_t len = 0;
+ 
+ 	if (!ctx->init || (ctx->more && ctx->used < bs)) {
+@@ -116,10 +119,14 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+ 
+ 	/* Allocate cipher request for current operation. */
+ 	areq = af_alg_alloc_areq(sk, sizeof(struct af_alg_async_req) +
+-				     crypto_skcipher_reqsize(tfm));
++				     crypto_skcipher_reqsize(tfm) + ivsize);
+ 	if (IS_ERR(areq))
+ 		return PTR_ERR(areq);
+ 
++	iv = (u8 *)skcipher_request_ctx(&areq->cra_u.skcipher_req) +
++	     crypto_skcipher_reqsize(tfm);
++	memcpy(iv, ctx->iv, ivsize);
++
+ 	/* convert iovecs of output buffers into RX SGL */
+ 	err = af_alg_get_rsgl(sk, msg, flags, areq, ctx->used, &len);
+ 	if (err)
+@@ -159,7 +166,7 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	/* Initialize the crypto operation */
+ 	skcipher_request_set_tfm(&areq->cra_u.skcipher_req, tfm);
+ 	skcipher_request_set_crypt(&areq->cra_u.skcipher_req, areq->tsgl,
+-				   areq->first_rsgl.sgl.sgt.sgl, len, ctx->iv);
++				   areq->first_rsgl.sgl.sgt.sgl, len, iv);
+ 
+ 	if (ctx->state) {
+ 		err = crypto_skcipher_import(&areq->cra_u.skcipher_req,
+-- 
+2.47.3
+
