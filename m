@@ -1,62 +1,62 @@
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEDD73C4545
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB683BFE4F
 	for <linux-crypto@vger.kernel.org>; Tue, 19 May 2026 20:48:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779223704; cv=none; b=WlNU2rXbGNJXWqm5vZusXKRREnZMSZ7fehs0s6/7InSkYO8GbtdxnSKmTQ3ICQIZbnqJXlHYvphayEk73O//5niPLjQtGR5fO57RUeEuMIw5XZMmL0Aji2vJ+Qbn+nxPEsqFkCjZ4kPtrYUOyHNP/fAuItxjN28lH3wGqOIa2Hw=
+	t=1779223705; cv=none; b=pMMfUFKahEBNIn+YGtZjmq3pzbp6lPq8VnUQ/sctgls6WB4VyRO+xHNXHmvBCgtjBFk9GSDOveFmuz2A6DugwafOfbaZ6WQpFerOhi5hZwdV0QPgyrhfofpNMU0MMPss6RfVX8Gy74ZDAnhaJ22d//1I1N4EQSiv6iHf3nQUV+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779223704; c=relaxed/simple;
-	bh=2O141NQg4/9uuebb1EfUwG5gECLyMTnC8YQQqB084M4=;
+	s=arc-20240116; t=1779223705; c=relaxed/simple;
+	bh=m0BO1BJp7UiRiIUF0q/PMhak4m/3xBhMeT8SNCZ26Ow=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=V46T3Dmp6VztMCgVHv/hYCJJjKButzJFvPn2D8SiO3KCBrom1k23C3zBvERCk3PjsDSs5JR7ZiwZQ2Ln545mVHg6IvKRJpVCul1133tCelCyLq0WJ/ed9LES/LTJO3k7Ylef1yrMeU7bDef8H6ucn8GfRlLTZFe8ZQN+jC2aHKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nuLpsSiX; arc=none smtp.client-ip=209.85.221.49
+	 MIME-Version; b=lfx7HCZaaxJkBSdkysvKCQY/+beojNcQCOz9yNXZmIinaj6sr/s856xY6IQbJsNCD6Wvo29ovHWcvJlyyazxC2LG6ug2Si566ad70epdx2JeRk3PmnRBNbdK6eAoSPFn0fRhGtR2KZ3gxDX2mXJkaIIh6aD9YBF/sdgys5kgFGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bOV0P4GI; arc=none smtp.client-ip=209.85.221.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nuLpsSiX"
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-45e5f81074aso263436f8f.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bOV0P4GI"
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-44c44af71f8so494201f8f.1
         for <linux-crypto@vger.kernel.org>; Tue, 19 May 2026 13:48:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779223697; x=1779828497; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1779223699; x=1779828499; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gxI7hUf51SF8n1So+Ll4nAd4AxUxL7HVVQ7quL1tTus=;
-        b=nuLpsSiX4ynqAmkHvzy2jUHzjdbjMzD6U0M6rtcIjbMTafsruFYyv+dPN19lvYodR9
-         2dmXbCXihd9qoac6m7JpIvRoHgQfGVWtiSGscUVFk7Lh/NhY5VO/twJbLUDgZj2FM18k
-         Fi5CFwAlfyiYVUgZK8wYxdV2IN+OVNiBEHQebxxu8TyiEJUkgJfE/pvfHQkZC1eqqYG6
-         OP+Aj4hRxs3ubkFOK6QhPc1muBddZDw8o+FQXNWVwEa7FCMJsitmx0UC4PePw9hqe6QL
-         o+O1DVFwqhSd3h2gwcLonXBGE56PFbwf5GellsASHu8cJo8mDAvzulWshtFos0Nr15Oo
-         qOpg==
+        bh=CeQLtV3ZJs9NMCaLxxe8lNWCUSJcJ/X+OKLcCSGP6Uw=;
+        b=bOV0P4GImCXLytP0eBSoMlpSuoSGpGWwPGSeZHXaHRCLSq175q41SaSba54ZS5HeVH
+         6G/T5O4Ge66ezr20J1G1AyCNeSIysE3oko6PkgTShUIXpxfck7loVSCs/5C/in8hoV41
+         LNGNaVcfAVq7Ln6a41Di7zmujj8yqB26MBMjkenWj6uQl+XbSiLCoJhzFHd896H8kUwX
+         TRylbwKQHc2mHHHKDA0CeJtSYS/84lW5fzmJD24U9jQpu9pccwjimXFqv0eG2PvYRSHx
+         Xeo8FTWffAqebl8g7DrbflzaKxWhV6Ww/VyuJbcJbhYPFs1mw79Pz7XeDYRNByp6e4+Y
+         Y90A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779223697; x=1779828497;
+        d=1e100.net; s=20251104; t=1779223699; x=1779828499;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=gxI7hUf51SF8n1So+Ll4nAd4AxUxL7HVVQ7quL1tTus=;
-        b=bcYDh17O90JUJAVxo5LpdeIV+b6r0HbjbRL5/mgGvpb3OZGREH3NH0JyR8q9bke81J
-         dzQPyT8oG51WQWyrm+mFA20geLuSWD4sFiYXnM+nseRDkblZyoD9SLHt2iwhXPqB4U9p
-         xEQUs/B5TeRT3V8IRvbSbtIux5Qvw8stam0v82a+gld94wPS4bss5nFKPsaSVHB9mcek
-         Tve7SeSivVloXwbTBNmurAb+0s6lN+XUzGyYetzGIgo3A7t5b8hN8QWBLc5n82Wj8ryJ
-         VRU6GdIsdoctR8uArVsg3xwkJCIwa8d9X9XEgDBXaZ6xXfBgLjj7DwV7FKQsGEi+xScd
-         QZew==
-X-Gm-Message-State: AOJu0Yx0anCWISscb15XTatXnkBbgzFvYruES/JJGsZcihR4XzNTZdkl
-	pF0mLXdb/IpstuledaRHnXDdNsRznNYA6WTpYCjSGKDVq1l6snV16ETU
-X-Gm-Gg: Acq92OGnfKO0AzWy6IGa2YgfhgydWJ1yjO3xwxkXvCkQfxvNZeAhGg1UIGDHD1eupnm
-	qRXJdFsqU5ZdqWCpWXaj2OASVGdPeCm+kVN6rX67ktCV3Xad43bVlt+I/uVbS40m7EayUCAQbQM
-	Z8HYkGLki3pMwuCmgPVfHqHlWvf9HJIS0HR/YO4rfztnJhnHcuQVCJTfevs6eSu7lbUURabBVu/
-	Y5z5+Wb3ZoAXA4NRjzf/40UJpT4nGIzMabzxaHNXwm+zEdq4DOvKpInR+/LNkAb0FPQ33JZyqCI
-	hLVGNCVm2UnxoxqjVWPsPRUMIVLWESaDTy14uHVjqHyo7Bbh/vhyHNTYa8aoiqtV72eTn8aRHH1
-	Qs7XJqKOC3BvsAAbJPPVFf/UzeRUFFV4jAwN5BJV1VwdGbt1bUmtZ1Oz3jKPoXnevEJQji3AIeM
-	261fpwUehFIqMijU/l4xXK0HHSB2X5q0H0uA6dNJk2BIQMeV+NZQlimMrFgRGZsXo=
-X-Received: by 2002:a05:600c:4588:b0:489:1c1f:35e5 with SMTP id 5b1f17b1804b1-48fe664be2amr148849335e9.6.1779223697098;
-        Tue, 19 May 2026 13:48:17 -0700 (PDT)
+        bh=CeQLtV3ZJs9NMCaLxxe8lNWCUSJcJ/X+OKLcCSGP6Uw=;
+        b=Xug3x5pPgaC9O1XxAhmhmsZemtZGL3pYLdECmS1vo+8Ynf3Dj7u21Le4eDBFHWzV0b
+         8JpH2U0JzlcLhQvaVa2YlMp7CPXZl9DiCdWmmeA4ue/aydGu+r3A2Q4cV2BJZl6dBLdU
+         egj06yDIHCOgf1dSJ+ajVsfPbr71dB6qsLkWKIyYfZqTzI1IT3pagdowg2VKTk24p2WM
+         4sag++dGhFLCjN4MKlZZELVUYu28X/Y70Y35MJkFzVg03C00t+O4JGF9DbYNr22ZNAzF
+         Fv6o7WRS56CYuJk/1ypOSyCzoIh0CAthkr5pWzZAmNiH3+YfoE9cXmf8gK12O89lttOx
+         hGzg==
+X-Gm-Message-State: AOJu0YzmWg0YWuGbMImwXDeDWCi0dsTQ5X+3JXasTKfMI76Xd4MQ28pA
+	LD+DZKR4H8zBVmi2YiEaprWX0J/cwyJUcIWDcxGzjDsweXtDcDRpYQ0u
+X-Gm-Gg: Acq92OES6QCUzLkPDb8ZIcOLq4s3XJ7nTmF+mThMps+aGJBIeaYE8HcO2AUs+VN4CZD
+	yMGBCsGvTwKLKnaqzIyyfbIRRJoYWML3ym7W8Oj2EM8xzI4QupjXIMjLr9P6xOIr+W+A47c02CD
+	g5qyEML97txL/U8eH9f1rBxdTRra0e/Y4gjZiHOud4Tk0xZX7m5fwRIeCHJoQ871qD4iQfzD6FW
+	es0CJSqsTJYvNIWYsHALXc6z3eRb2mNEew5kpI5pqKmfL0wE4nF7z3Jnmj3hROnszXt1juljR7H
+	ShrIi80BjQIon/XM2iGxqi60wcG6XQtFKeLKK0VhgaNhzOQwSlCKHYzTxMaIZ39E1MtZkHf9zO6
+	XaS5vm4Am7m3ixDEMOCAArAXfLLXMimNobIX+YbsA19WO+tNScjTlhad3U89jm/0d0nSs+U5UFk
+	krVSR6d6S9iPxceKqxEMsQHIcTq+40l6A1imsBfEmtQM/Nwi8N92fMIVx9aU3THpg=
+X-Received: by 2002:a05:600c:4fc5:b0:489:1dc6:d6e with SMTP id 5b1f17b1804b1-48fe5fcf406mr148338135e9.1.1779223699130;
+        Tue, 19 May 2026 13:48:19 -0700 (PDT)
 Received: from menon.v.cablecom.net (84-74-0-139.dclient.hispeed.ch. [84.74.0.139])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fe4dac000sm356457755e9.0.2026.05.19.13.48.16
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48fe4dac000sm356457755e9.0.2026.05.19.13.48.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 May 2026 13:48:16 -0700 (PDT)
+        Tue, 19 May 2026 13:48:18 -0700 (PDT)
 From: Lothar Rubusch <l.rubusch@gmail.com>
 To: thorsten.blum@linux.dev,
 	herbert@gondor.apana.org.au,
@@ -68,9 +68,9 @@ Cc: linux-crypto@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	l.rubusch@gmail.com
-Subject: [PATCH v2 08/12] crypto: atmel-i2c - move shared client allocation logic to core
-Date: Tue, 19 May 2026 20:47:59 +0000
-Message-Id: <20260519204803.17034-9-l.rubusch@gmail.com>
+Subject: [PATCH v2 10/12] crypto: atmel-sha204a - integrate into core management tracking
+Date: Tue, 19 May 2026 20:48:01 +0000
+Message-Id: <20260519204803.17034-11-l.rubusch@gmail.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20260519204803.17034-1-l.rubusch@gmail.com>
 References: <20260519204803.17034-1-l.rubusch@gmail.com>
@@ -82,180 +82,104 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Migrate the I2C client allocation and runtime load-balancing routines out
-of the ECC driver code and into the central atmel-i2c core library module.
+Register the SHA204A I2C device instance into the shared atmel_i2c client
+management tracking list during the probe phase. This allows the driver to
+participate in the central hardware selection infrastructure.
 
-Export the symmetric lifecycle helper interfaces atmel_i2c_client_alloc()
-and atmel_i2c_client_free() using EXPORT_SYMBOL_GPL() to expose a unified
-client management API. This consolidation enables the dynamic selection
-subsystem (which chooses the least-loaded client device based on the active
-transformation count) to be shared by both the ECC driver and upcoming
-Atmel crypto modules.
+Rework the error-unwind paths inside atmel_sha204a_probe() to prevent stale
+entries from remaining in the global tracking structures if a partial
+initialization failure occurs. If sysfs group creation fails, explicitly
+trigger devm_hwrng_unregister() to preserve the strict lifecycle ordering
+introduced in previous stability fixes.
 
-Refactor the ECC driver's transformation context initialization (init_tfm)
-and teardown (exit_tfm) paths to use this centralized core API.
+Convert the removal path to use the core teardown helpers. Ensure the
+device readiness state is deactivated using atmel_i2c_deactivate_client()
+before any local hardware cleanup runs, and call
+atmel_i2c_unregister_client() at the end of the sequence to safely drop the
+node from global tracking.
 
-No functional change is intended.
+No functional change intended beyond improved lifecycle handling.
 
 Signed-off-by: Lothar Rubusch <l.rubusch@gmail.com>
 ---
- drivers/crypto/atmel-ecc.c | 50 +++-----------------------------------
- drivers/crypto/atmel-i2c.c | 46 +++++++++++++++++++++++++++++++++++
- drivers/crypto/atmel-i2c.h |  3 +++
- 3 files changed, 52 insertions(+), 47 deletions(-)
+ drivers/crypto/atmel-sha204a.c | 31 +++++++++++++++++++++++++------
+ 1 file changed, 25 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
-index 4f27e1caf106..7d090c557330 100644
---- a/drivers/crypto/atmel-ecc.c
-+++ b/drivers/crypto/atmel-ecc.c
-@@ -203,50 +203,6 @@ static int atmel_ecdh_compute_shared_secret(struct kpp_request *req)
+diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha204a.c
+index 3853d2b95449..38a269186e2a 100644
+--- a/drivers/crypto/atmel-sha204a.c
++++ b/drivers/crypto/atmel-sha204a.c
+@@ -172,9 +172,15 @@ static int atmel_sha204a_probe(struct i2c_client *client)
+ 		return ret;
+ 
+ 	i2c_priv = i2c_get_clientdata(client);
++	i2c_priv->ready = false;
+ 
+ 	i2c_priv->caps = 0;
+ 
++	spin_lock(&atmel_i2c_mgmt.i2c_list_lock);
++	list_add_tail(&i2c_priv->i2c_client_list_node,
++		      &atmel_i2c_mgmt.i2c_client_list);
++	spin_unlock(&atmel_i2c_mgmt.i2c_list_lock);
++
+ 	memset(&i2c_priv->hwrng, 0, sizeof(i2c_priv->hwrng));
+ 
+ 	i2c_priv->hwrng.name = dev_name(&client->dev);
+@@ -185,15 +191,28 @@ static int atmel_sha204a_probe(struct i2c_client *client)
+ 		i2c_priv->hwrng.quality = *quality;
+ 
+ 	ret = devm_hwrng_register(&client->dev, &i2c_priv->hwrng);
+-	if (ret)
++	if (ret) {
+ 		dev_warn(&client->dev, "failed to register RNG (%d)\n", ret);
++		goto err_list_del;
++	}
+ 
+ 	ret = sysfs_create_group(&client->dev.kobj, &atmel_sha204a_groups);
+ 	if (ret) {
+ 		dev_err(&client->dev, "failed to register sysfs entry\n");
+-		return ret;
++		goto err_hwrng_unregister;
+ 	}
+ 
++	spin_lock(&atmel_i2c_mgmt.i2c_list_lock);
++	i2c_priv->ready = true;
++	spin_unlock(&atmel_i2c_mgmt.i2c_list_lock);
++
++	return 0;
++
++err_hwrng_unregister:
++	devm_hwrng_unregister(&client->dev, &i2c_priv->hwrng);
++err_list_del:
++	atmel_i2c_unregister_client(i2c_priv);
++
  	return ret;
  }
  
--static struct i2c_client *atmel_ecc_i2c_client_alloc(void)
--{
--	struct atmel_i2c_client_priv *i2c_priv, *min_i2c_priv = NULL;
--	struct i2c_client *client = ERR_PTR(-ENODEV);
--	int min_tfm_cnt = INT_MAX;
--	int tfm_cnt;
--
--	spin_lock(&atmel_i2c_mgmt.i2c_list_lock);
--
--	if (list_empty(&atmel_i2c_mgmt.i2c_client_list)) {
--		spin_unlock(&atmel_i2c_mgmt.i2c_list_lock);
--		return ERR_PTR(-ENODEV);
--	}
--
--	list_for_each_entry(i2c_priv, &atmel_i2c_mgmt.i2c_client_list,
--			    i2c_client_list_node) {
--		if (!i2c_priv->ready)
--			continue;
--		tfm_cnt = atomic_read(&i2c_priv->tfm_count);
--		if (tfm_cnt < min_tfm_cnt) {
--			min_tfm_cnt = tfm_cnt;
--			min_i2c_priv = i2c_priv;
--		}
--		if (!min_tfm_cnt)
--			break;
--	}
--
--	if (min_i2c_priv) {
--		atomic_inc(&min_i2c_priv->tfm_count);
--		client = min_i2c_priv->client;
--	}
--
--	spin_unlock(&atmel_i2c_mgmt.i2c_list_lock);
--
--	return client;
--}
--
--static void atmel_ecc_i2c_client_free(struct i2c_client *client)
--{
--	struct atmel_i2c_client_priv *i2c_priv = i2c_get_clientdata(client);
--
--	atomic_dec(&i2c_priv->tfm_count);
--}
--
- static int atmel_ecdh_init_tfm(struct crypto_kpp *tfm)
+@@ -201,12 +220,13 @@ static void atmel_sha204a_remove(struct i2c_client *client)
  {
- 	const char *alg = kpp_alg_name(tfm);
-@@ -254,7 +210,7 @@ static int atmel_ecdh_init_tfm(struct crypto_kpp *tfm)
- 	struct atmel_ecdh_ctx *ctx = kpp_tfm_ctx(tfm);
+ 	struct atmel_i2c_client_priv *i2c_priv = i2c_get_clientdata(client);
  
- 	ctx->curve_id = ECC_CURVE_NIST_P256;
--	ctx->client = atmel_ecc_i2c_client_alloc();
-+	ctx->client = atmel_i2c_client_alloc();
- 	if (IS_ERR(ctx->client)) {
- 		pr_err("tfm - i2c_client binding failed\n");
- 		return PTR_ERR(ctx->client);
-@@ -264,7 +220,7 @@ static int atmel_ecdh_init_tfm(struct crypto_kpp *tfm)
- 	if (IS_ERR(fallback)) {
- 		dev_err(&ctx->client->dev, "Failed to allocate transformation for '%s': %ld\n",
- 			alg, PTR_ERR(fallback));
--		atmel_ecc_i2c_client_free(ctx->client);
-+		atmel_i2c_client_free(ctx->client);
- 		return PTR_ERR(fallback);
- 	}
+-	devm_hwrng_unregister(&client->dev, &i2c_priv->hwrng);
+-	atmel_i2c_flush_queue();
++	atmel_i2c_deactivate_client(i2c_priv);
  
-@@ -280,7 +236,7 @@ static void atmel_ecdh_exit_tfm(struct crypto_kpp *tfm)
- 
- 	kfree(ctx->public_key);
- 	crypto_free_kpp(ctx->fallback);
--	atmel_ecc_i2c_client_free(ctx->client);
-+	atmel_i2c_client_free(ctx->client);
++	devm_hwrng_unregister(&client->dev, &i2c_priv->hwrng);
+ 	sysfs_remove_group(&client->dev.kobj, &atmel_sha204a_groups);
+-
+ 	kfree((void *)i2c_priv->hwrng.priv);
++
++	atmel_i2c_unregister_client(i2c_priv);
  }
  
- static unsigned int atmel_ecdh_max_size(struct crypto_kpp *tfm)
-diff --git a/drivers/crypto/atmel-i2c.c b/drivers/crypto/atmel-i2c.c
-index c73ef3cadf0e..4621aa57833f 100644
---- a/drivers/crypto/atmel-i2c.c
-+++ b/drivers/crypto/atmel-i2c.c
-@@ -57,6 +57,52 @@ static void atmel_i2c_checksum(struct atmel_i2c_cmd *cmd)
- 	*__crc16 = cpu_to_le16(bitrev16(crc16(0, data, len)));
- }
+ static const struct of_device_id atmel_sha204a_dt_ids[] = {
+@@ -239,7 +259,6 @@ static int __init atmel_sha204a_init(void)
  
-+struct i2c_client *atmel_i2c_client_alloc(void)
-+{
-+	struct atmel_i2c_client_priv *i2c_priv, *min_i2c_priv = NULL;
-+	struct i2c_client *client = ERR_PTR(-ENODEV);
-+	int min_tfm_cnt = INT_MAX;
-+	int tfm_cnt;
-+
-+	spin_lock(&atmel_i2c_mgmt.i2c_list_lock);
-+
-+	if (list_empty(&atmel_i2c_mgmt.i2c_client_list)) {
-+		spin_unlock(&atmel_i2c_mgmt.i2c_list_lock);
-+		return ERR_PTR(-ENODEV);
-+	}
-+
-+	list_for_each_entry(i2c_priv, &atmel_i2c_mgmt.i2c_client_list,
-+			    i2c_client_list_node) {
-+		if (!i2c_priv->ready)
-+			continue;
-+		tfm_cnt = atomic_read(&i2c_priv->tfm_count);
-+		if (tfm_cnt < min_tfm_cnt) {
-+			min_tfm_cnt = tfm_cnt;
-+			min_i2c_priv = i2c_priv;
-+		}
-+		if (!min_tfm_cnt)
-+			break;
-+	}
-+
-+	if (min_i2c_priv) {
-+		atomic_inc(&min_i2c_priv->tfm_count);
-+		client = min_i2c_priv->client;
-+	}
-+
-+	spin_unlock(&atmel_i2c_mgmt.i2c_list_lock);
-+
-+	return client;
-+}
-+EXPORT_SYMBOL_GPL(atmel_i2c_client_alloc);
-+
-+void atmel_i2c_client_free(struct i2c_client *client)
-+{
-+	struct atmel_i2c_client_priv *i2c_priv = i2c_get_clientdata(client);
-+
-+	atomic_dec(&i2c_priv->tfm_count);
-+}
-+EXPORT_SYMBOL_GPL(atmel_i2c_client_free);
-+
- void atmel_i2c_init_read_config_cmd(struct atmel_i2c_cmd *cmd)
+ static void __exit atmel_sha204a_exit(void)
  {
- 	cmd->word_addr = COMMAND;
-diff --git a/drivers/crypto/atmel-i2c.h b/drivers/crypto/atmel-i2c.h
-index 351306c426aa..6c2d86fd9068 100644
---- a/drivers/crypto/atmel-i2c.h
-+++ b/drivers/crypto/atmel-i2c.h
-@@ -192,6 +192,9 @@ void atmel_i2c_init_genkey_cmd(struct atmel_i2c_cmd *cmd, u16 keyid);
- int atmel_i2c_init_ecdh_cmd(struct atmel_i2c_cmd *cmd,
- 			    struct scatterlist *pubkey);
- 
-+struct i2c_client *atmel_i2c_client_alloc(void);
-+void atmel_i2c_client_free(struct i2c_client *client);
-+
- void atmel_i2c_deactivate_client(struct atmel_i2c_client_priv *i2c_priv);
- void atmel_i2c_unregister_client(struct atmel_i2c_client_priv *i2c_priv);
+-	atmel_i2c_flush_queue();
+ 	i2c_del_driver(&atmel_sha204a_driver);
+ }
  
 -- 
 2.39.5
