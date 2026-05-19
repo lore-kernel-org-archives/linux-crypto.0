@@ -1,461 +1,185 @@
-Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010041.outbound.protection.outlook.com [40.93.198.41])
+Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011045.outbound.protection.outlook.com [52.101.52.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8021B3AD50E;
-	Tue, 19 May 2026 19:50:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 749603B4E80;
+	Tue, 19 May 2026 19:57:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.45
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779220250; cv=fail; b=ATdC0KfxEO6Pdh0zrtlMYjZHv7SlMM/rjVMlF3OG0SwzL2dXmBmDdG7UDKoMVpq1Ksbdkass6TxaLAqfeVjoojXr+M4Qbg9Gk0KRb3CLE/eJmtM8f1un2Lccun0Wi0fL+5CmwonfjObwDS+p0Acc4aqVM1TZkf3x6c6T94R4+M0=
+	t=1779220636; cv=fail; b=QXDAn78JIMxJVsiMmTmM62J7Sg+9lgFW1d+e4eOvbjwNK1T9sUn0GS+cPZuLCX0KWOi+5hE0pW4o59pREGdVodtJAAPaz4qrm9FTRaFv0AUMHgZWOBN9honwiefXhieGau44ZX0GCGShauo1jlnZNhPvhXFj5+HjhSBvGN16gJk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779220250; c=relaxed/simple;
-	bh=znaW6uv7ed6fsb9bf2kndskrF5bGu6M3GSv4vmxnU/g=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZKxqUk9pbk1LtIgmY+vAiYnCbBbDo3OoxviEMq148g0j/RA+bEc701+fMMn7nEp0fF9KFOR60BDnVys6k3X9zzdruYrh7TA5JIQUMPliki0BzQ6IL1rj/r7slOLsWIqKC9a8yzNq/1JxOsqoHZXDveWzKgzfhEaIGIAxQ3AbFW0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=hwp4qDW2; arc=fail smtp.client-ip=40.93.198.41
+	s=arc-20240116; t=1779220636; c=relaxed/simple;
+	bh=YCwJaAGuLCphoWZTh8o8LuwELy2jjPgRHINkRkERiUs=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=TUNMCWBV0geQhjKIb5l2Y5UCuhg8Mbob57azd+atGp97XpDuf27mjS1Ntskdjrr0nldtt7t6LVI1YWmFTfCtUVH5RRgrgAkzBbDDTKdEqJrkhaLq8/qhafo7KvlbJSkRLgLKlYWjCxHtvXcM6eqLHjjJcf1gWMyfk0iCOn0mcfU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=R1WR17EQ; arc=fail smtp.client-ip=52.101.52.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="hwp4qDW2"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="R1WR17EQ"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=FTLmIgpY/fi4hkn0pF+wuNYPNtqDZF3nFuUGmmHZ1d0PAwpl6OTAZf468PFxfD0s89K8KHaFNjfhkFuA3rQOnAiVObiQf7w0u1bDj7OuvEQakhOEBeAIgcskA+PJFT4U93fGrSDWrxZb8oqsOsL2/884M5N/MVHzqnqBe4cF4QCVAXg+e8q1/zJq9iUb/5K32/bwy610P6Gd3HjG+CCmTcUw1iv2ch7w0UC94yiqRqQ4ztI0hsSqMzsrX6NdmTUAZWWQybhTKxssFr+3Zj7cXSYImCQiPaFPV4Ef0lZHMwgykFJ0M0EJZWljdf5PJy/6iE550lIyhshKThaqwtGouQ==
+ b=QqM2ElSHiNDCDpZt50M1yxSPaYHofO5d6njUpLG5sdUrQiF6tVZK7zpy5s8G2p8wrP+Z5PnOII8sDnz75sJBnv9zdouzDmHZkfaxrDofRDvtreu7Xwxj/0mm1btf058tj80/7LvX0iCQSBuKB8JRXMBhc29O1ElLLhndRMU9RcE1DtsSnSXgJa4mxHCiMiXbB9LODzDaGPnkUjMYPgUH3bn10AbWRWyHpzi4IuibGB+nSTp50/pbfwNOLWxmuuhWumrrXhUC53GnLBjCkR6O2y9d18tB1nH9k9wZ//4pbGOn2h2vTs4qEkWQWY8xVMccC8rbdJcfExcDmIAbaP12fA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VZZ3WV7xvLowAcm+j4GOWxY84IrP9rrAyI4Ukmktu90=;
- b=eEGPUP+HQzar2q1G5JA6qWb6kmq3Q3dm2lRpASUJUi7Xpxgqnul2XzHz+jjJe8hhwx3vxnfiSY1khSXbfBgJ7Mio1F8j7EvWJQn0WDEG+PbNvrGA9c0JyRoHWeyNZfhvFUVGccpxQ/eZNiLZONtE2kcTifRZeB1YEq9IDJn8PScyOu0KWUCwxM3p/T8bpA3g1ETiHwMcfQHHxh+ziF7dw+igPu4iPSc+9UgdKHcXuMgHiSCkohlHDQWujbUtTm/E6eow1tKNPpTYO9EpfowdAU0iAWBRME6UU1kLz+JIj2ZooOHjXcypPrsUj6E44c6/X+wbZqP2/qPr7xH+ZSJtZw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
+ bh=N3O0PPTu6BKfdOmXBGtQHn1JASv6pEhkGm2eyC09cRY=;
+ b=iRw+xcRgeqTT/vinsxYyt6pez8qfgOqOxOCfnjk999CNpVTGyEWalXvkrBpPRm7wSBVvblV32EVNcWdp53cemxEd0V3hv2XwbXiV14K9i/5IdZcVq6eC1iFMoNyYMCFph3ATesRWcq2BPKuOAemMqbVbh+zYclUUQwfgs8IUIa8xD+glRnlKC7dVekbrDMulDYVRQ7pq1RFNw01+S8Kil8TVupFoQEbE6V7O7jVK9QY/6ujQPyiK2qZLvREJCrOYFgPBaBvPJQ32T9hDDJb478ClsoyV54cnT0CLXDckKN52EIlupHnsu8W7cAlbaK5EDxwy9Uhctrfa5hViJfjxsg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VZZ3WV7xvLowAcm+j4GOWxY84IrP9rrAyI4Ukmktu90=;
- b=hwp4qDW27zGYhz2UMhK7uJcqfjXm5fOL+Xjd5YJx8KyBXc+XyGwKtPVQP/SYLknqAGtNcUhwhe5Brc51ZBa9oAz08rEfRBGkCVfowF0uetDtr4sVTwVg34XSlyLV6JhpkNgyCfJU54FD+fysIYmlW+quWjvA2Ugi6/82tCVNxlw=
-Received: from PH8PR22CA0002.namprd22.prod.outlook.com (2603:10b6:510:2d1::26)
- by IA1PR12MB6308.namprd12.prod.outlook.com (2603:10b6:208:3e4::14) with
+ bh=N3O0PPTu6BKfdOmXBGtQHn1JASv6pEhkGm2eyC09cRY=;
+ b=R1WR17EQZs72lOZxnGyHvrN7IBlK+eFbpzSuUtzSbOcCy6cQe1BfZAaS9uvKWsDlXYNSHH7iD6SDsqTLPWWoVis6Qe+SvjQqioyauR6xiBK+LEz7+HAKkJW61dAr2pYha0wqvWGRqEm0x9HhaPhUroa+XDx0QdawVJGecmeLyC4=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CH3PR12MB8660.namprd12.prod.outlook.com (2603:10b6:610:177::5)
+ by MN0PR12MB5809.namprd12.prod.outlook.com (2603:10b6:208:375::7) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.14; Tue, 19 May
- 2026 19:50:37 +0000
-Received: from CY4PEPF0000EE32.namprd05.prod.outlook.com
- (2603:10b6:510:2d1:cafe::f1) by PH8PR22CA0002.outlook.office365.com
- (2603:10b6:510:2d1::26) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.48.14 via Frontend Transport; Tue, 19
- May 2026 19:50:36 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- CY4PEPF0000EE32.mail.protection.outlook.com (10.167.242.38) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.48.11 via Frontend Transport; Tue, 19 May 2026 19:50:35 +0000
-Received: from ellora.amd.com (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Tue, 19 May
- 2026 14:50:34 -0500
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.23; Tue, 19 May
+ 2026 19:57:09 +0000
+Received: from CH3PR12MB8660.namprd12.prod.outlook.com
+ ([fe80::87aa:52e5:4b72:d5f3]) by CH3PR12MB8660.namprd12.prod.outlook.com
+ ([fe80::87aa:52e5:4b72:d5f3%6]) with mapi id 15.21.0025.023; Tue, 19 May 2026
+ 19:57:08 +0000
+Message-ID: <a043a82c-f3dd-4f29-86fb-60638eaddc9b@amd.com>
+Date: Tue, 19 May 2026 15:57:03 -0400
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] crypto/ccp: Introduce SNP_VERIFY_MITIGATION command
+To: ashish.kalra@amd.com, thomas.lendacky@amd.com, john.allen@amd.com,
+ herbert@gondor.apana.org.au, davem@davemloft.net
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, aik@amd.com,
+ tycho@kernel.org, nikunj@amd.com, michael.roth@amd.com
+References: <36137b565d183fa2f2985ad098f2e2096f1c432f.1779219958.git.prsampat@amd.com>
+Content-Language: en-US
 From: "Pratik R. Sampat" <prsampat@amd.com>
-To: <ashish.kalra@amd.com>, <thomas.lendacky@amd.com>, <john.allen@amd.com>,
-	<herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<aik@amd.com>, <tycho@kernel.org>, <nikunj@amd.com>, <michael.roth@amd.com>,
-	<prsampat@amd.com>
-Subject: [PATCH v3] crypto/ccp: Introduce SNP_VERIFY_MITIGATION command
-Date: Tue, 19 May 2026 14:50:29 -0500
-Message-ID: <36137b565d183fa2f2985ad098f2e2096f1c432f.1779219958.git.prsampat@amd.com>
-X-Mailer: git-send-email 2.53.0
+In-Reply-To: <36137b565d183fa2f2985ad098f2e2096f1c432f.1779219958.git.prsampat@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH2PR14CA0059.namprd14.prod.outlook.com
+ (2603:10b6:610:56::39) To CH3PR12MB8660.namprd12.prod.outlook.com
+ (2603:10b6:610:177::5)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
- (10.181.42.216)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE32:EE_|IA1PR12MB6308:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8c51028a-c369-4864-4299-08deb5dfe4d3
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8660:EE_|MN0PR12MB5809:EE_
+X-MS-Office365-Filtering-Correlation-Id: ca8a4239-757e-4568-d04d-08deb5e0cf06
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|36860700016|82310400026|1800799024|3023799007|11063799006|56012099003|18002099003;
+	BCL:0;ARA:13230040|376014|366016|1800799024|11063799006|22082099003|56012099003|18002099003|3023799007;
 X-Microsoft-Antispam-Message-Info:
-	u9BnQasg32D1eO2DnyaGi0bYpuo3XkFnvVI7hZTD2H0txSOvI59lITwf1GMJItIv+dRABK0Lp2OYSPajZC4JIJv8cQMlbGSq+YP06f6erP2S4q+zbs9ZEPAXiNAGotMO+dJRUJKSVfdattR+CC/JuRc1c8Oysxm8hoKkMiC9lVWZIc7/btLgqYBQr2Td9MersV51FRyE26S7MVtlPpkXbc7xD7QqnePnWNI2Ejd2qtujbh1F6gCojO9ysWHs4OlprxIDs5taPqAj8YlGq4wwR1kyvlN2/ulgW+2boxQojKNu2rnSpTQAwy3dzxnuhoNZI84SHyXUBNePR5xF1wLQbc201CXk6GhDzAbLz0qcBP5nU5om89rkfdDvxW8BS7grCYuZDG6HHL0w1Xhu8iEUfKiXxKA8+q6B0co3ZQ+Tqs8EQk+wk1w5wowfl4UMSPa83XRS3zrWP9W6Pxup6+0EDHxEjCk0GnVmQm/oArgtv83HV6fQTEo+bcWwHaI3fdHD+IYJpG5B8RG+4D2QgrHRe1aAxz1gvin6JjE+kS4dzjg3c6kfeNofFRK29RLRdrMCaDNfUl8CW8OR82DVatVOCuk6twrnGf6nedSy/ews2+ZpguCQFT8NKB5IQgovgjFQG0cFSEG1PLRiDmv2J4Tvd9V84Q+Lr8mZ9S558mVDB1CQTIby2kulxGQO+bf9k4yCXy6fAqkFfiR/uLTDB50bRNS8pIrNBrQiIoVKRkvoqu0=
+	eI5vupzK1YZC+ThIwciYJb/t5pJeS+CYJGVAKe5pftgfFiPIAHz9iU0cVcTp5/hV1ye9n4lXv7YaBo6h8wtJb0urKLLA0b/hmh7mAf2e7KdARsL5MDgXfnHCy6vWe+bFbhxzK5tKMtHyXaW4Uu54fggvaf8DIBBD6c8bdsLNiR+aDF2VkDymd5sk53JieYCOWbRd/oPtNDsiwclrhYPTxk35z2rOJHgIGU9hD2kmJyiXXlYUUNx9UtloTKWgG1fBXIzlFKNf0Mhzam00oX0Q7ulb+Nqyzm0QTJcpJEIg4U4disf+qbeAYTiS2BSb6QjCl/GnNEkJl2uCsBxommzHXk2nb9FkavD6i72H+xTt5JetzxTlL9vN7EFvwN7UyGe1Woi5RLoQz4usoUR0j72HpA74pN5Pg6tmQArTuHifJoyDb7vrl9lggqCiheKbLwE6FnU4WysMa6C0nT4J+R56MPsLKBcRc6SNzMnwF94GdmJVnqH1iKibOTtqNS2863+LawfZEGr302JFbuNDWoEZZLsno87UEESP74GVWbH6ev36Te/q/RyNugIy4HM3XpRWYLKWPUn2n/Q5LnU94zsZRRf7E1gyANiY0EOH8KsmdNlHAYGuLQVdzmA+mRuJBUqpWCEO6U/+COqKI3rpdYsIZGdvRFuAbLF5jnmN0F/8HDcVz8vVTCW/G+Ek2a9k+He6Ljx55zCvP7TYUu5My30uZw==
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(36860700016)(82310400026)(1800799024)(3023799007)(11063799006)(56012099003)(18002099003);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8660.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(11063799006)(22082099003)(56012099003)(18002099003)(3023799007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	5ZkkFivC5eCJnWhqgONbsy15HXEoMKcUaUzUXco4PK0bNySxSsSxtku1/mqkJm8zdt6RmluIN4q3u2hswYYxAg7TMQ/sBWlopi8tVVvtW2Fzz9AfgTHyyQpLAcBUoy8gnWhnzJ6mISEXvURxqbJy51zgRA7dpeGXT1rMo2kJALFodbY6O8v8FyDVUGmpd+bS7hI4vk55Pj80Fb7V2jIxqLuNXngNLUJ5B4NahudZ77u75rD2U3CGY/TZnYKVsafJxSp/J7QIvD7518q0akFLUozr93AngvfZ0ZMzBALnINj2IYlHnwBoX2MKU9bn336uHkTJ20Bc2r/g02HFcQIyRxNHz4waJhB2gu+cn1BZx6zZL99vmMdOvJEaTjdo97Kq7ntUnzGdz1NQJ+lBobQdscaw5Cb/9OJ4ReEzni/sE/UMt/Q3HzBdixGLkz4VVgaO
+	=?utf-8?B?Vzd6M1h3YzVZdzJMbmF1YWVDWnRiTDYwZVRmUUNNdEN4YlBrdHRyc3h4WHUv?=
+ =?utf-8?B?L2xPZ09QSWpDRGFzZVB1d2s0MnI5Y2FzZDNXU2h5SVJhTUpORTVWeWUvbFdG?=
+ =?utf-8?B?TnRnSnNMQlp2YWpGM0VhbWZrTXlVWWhSWVZ4cFpPVnpzUkhUVGtKRHFrSGhN?=
+ =?utf-8?B?dStSVnBYV293QTZRMDVMM29CQ3hVdU1hc05aZmt5ZmI3SFkwcEpnUkpPUFVk?=
+ =?utf-8?B?YXgxUnlMYnhzaFhRa0RTeFNvNTlJMVV5cEdvejh2OGw0NkxTUmVNaFBudFV5?=
+ =?utf-8?B?YjdOcGxNNWZJTGtreTJsN2t0Q0M3WkVUL3RpK0JoTytkN2ZGeDYyWXJMUTc1?=
+ =?utf-8?B?WWFRelh0TVM1NUxDTEdiQmJaRHZUZnJYWlZTUlBlVmI2QXkrR1lkQzEzRjVy?=
+ =?utf-8?B?K0VVNVJoTkl2dWdUL3F1SDMza2dYbDVEdnhPS2tuUUtJdzA5dHlMR0N1dFFM?=
+ =?utf-8?B?aUJqakl3TThZbldVNXFRMTZYMHRKbkd6YUoxZ1JKQTRMaWxuaEVtYll0NkEw?=
+ =?utf-8?B?TkNrNVg3dkhLRWNuMTNNUy8zbDljaE04TCt6S0owZEwzbzJVQ0RndFpEUHJT?=
+ =?utf-8?B?TWdmWGNZWHkycFJ4OGVsYjhkY2FwWXRsalpmZ0pYS3luUXpsOEtmNzlBSEtv?=
+ =?utf-8?B?czZBek5Ub1RZcVBKcVlQUm5VTE5GZm5xbjhjY0hWSzBWWFdaakM0VEJxVEtQ?=
+ =?utf-8?B?TmFreFVhbDQ1a1FvTEpUYlROYjVTaXY0ck9HQ0J0b3VhdFZiY3lFd1ErVnZy?=
+ =?utf-8?B?Vk05ODlia3Y3aGtvbzZObytGM3BWa2dXUlFvdlNSQUt4UTg5MnFLM3IwZVBI?=
+ =?utf-8?B?dlBCdEJoazBRcXgwRXFFNTc0enNmMllNQzdxSlJXNWZ4WFNYMmkyMllZdk5k?=
+ =?utf-8?B?SmVPNzZ6UWZ0b3dNd0ZSdjZITTl2R2NnbGVOL2hpZlZsRksyNjgvZlZVY1E1?=
+ =?utf-8?B?NFUwT0tyS3hqL1k3dE12ZzMwSm13TDdZUTF1N09yclpsVS8rR1RjWHUxOEtF?=
+ =?utf-8?B?dnZsR3hxMHpXUnYrU1d3VXFBcDcwQUpqYmI4ZXptSjgvcE5Ob2VIMTVtRGdo?=
+ =?utf-8?B?bkt2elpKS2Nlcjk5RmFjS0Q1NFJuWnhPTWtITDV5aEJPZVhvQXhKSTZsR1lv?=
+ =?utf-8?B?emNDSVQ4dEJRN3lVU0x0U0hGZ3ovYWhmai9hbjBpWFdJR1JzRzlIcW9lUnda?=
+ =?utf-8?B?S3g4bFNUQUFoVlJyNHBYRmhLLzJpZ2lLUzU1bFNIUytxclZ2Zk8xY0MrcElQ?=
+ =?utf-8?B?L3lmSlBnaCtlK3ZDSWdUNUVVT2UyY2VuQ25iMXovaFVPRktjQlVDa09oUURh?=
+ =?utf-8?B?RkJuOHpEMVFScGlsTlJtQTcrMDZkaTlET3Z4dmxDL1dicHNiN29YdnI1THVq?=
+ =?utf-8?B?amZKRkpVTXhFUkN4RkxWUWdPd1Fjc1kwYUNwUWpHSDRrNWdXaGJJYVJLT3Vt?=
+ =?utf-8?B?YVVzQzdtUVZZNENuRFlRK051SnhVNFpGUVczWXpPZkJCUkdrYmRjQ255d0pF?=
+ =?utf-8?B?S3pGbGhXNjNSNjdRMlozZEZKVEFWSy9HRlJWbnJPaHBVaERPT2lxQWFxR2Zi?=
+ =?utf-8?B?bFVVZEZXdzdydXpsSlVOZmNhRVZSK1lHNGJUVDBVUGlIQlQ5OFJSWm44cFF1?=
+ =?utf-8?B?Sk9WOGFxSkRKeElFWnk3Y0lxNnQrelJYaXpzSURGSWxPelhCOFQ4Rk44S0xG?=
+ =?utf-8?B?ODJqeE41Q1VxNFh1Z1N5NU9DM0lEM1VaZUlGeXI5ZGZzWWRDT1pPM0ZaRFV6?=
+ =?utf-8?B?RjRMU2o1bW5CSkRUWkNUZGM1T3VvUHVwbisyejVNcDRMbjN1eXdyQjNJbk1v?=
+ =?utf-8?B?UlBybU5zQkljNVF5TlpOTEdEdUFTNzBtQUcwZURmVUJ6QlJ6a0YweHhVNHc3?=
+ =?utf-8?B?YnJTL2J5b09WcXl3K2tuemJZb3dEejdpWW9ET0VWQUd2YjY3b29WUUR6NTNW?=
+ =?utf-8?B?NEVhR01nWEU4TXRUSFhPVDRhQjBMVFNMYmpRdkFHU1IxUGlJeGpyV0Z1a3Iz?=
+ =?utf-8?B?cTJaSjJVTzVyaDNFR3ZGY2VBVEtsNlptQThjcThxRVMyWStDSVIzYWJCOWN3?=
+ =?utf-8?B?SS9odmdmYmJYVVlFb1pMOEFpVDYxUmhPWGlRM3lBUWxvMXYzMlRHMWQ4UFF3?=
+ =?utf-8?B?eGF2dG5FUmtpSENzaHdBMTJBckR3WGpyclBaZXJnY3AxQnNNNlZ0UnlaR3Ru?=
+ =?utf-8?B?NjErSm9qemdaZmluaElZdXpScncyaURYdmp4dVhMRmJEZTNaUFkyNW5MMVNY?=
+ =?utf-8?B?eE1SNUhJZWtZVXBTSXdibC9EUHlUZVQwOS9zcWc4SFN0blc1dWNsUDY0cmFw?=
+ =?utf-8?Q?2HFeSEqR5B5I+BTT0d?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2026 19:50:35.3686
+X-MS-Exchange-CrossTenant-Network-Message-Id: ca8a4239-757e-4568-d04d-08deb5e0cf06
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8660.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 May 2026 19:57:08.6956
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8c51028a-c369-4864-4299-08deb5dfe4d3
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE32.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6308
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Hp5VE/Tbl6XQ1tx7cuVuQfo7AE0QScQBrCz3IB6bo9Myn1HL7XjXkL8klxz4Zh6NR3YPrJH4NDKQis82/AO56Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5809
 
-The SEV-SNP firmware provides the SNP_VERIFY_MITIGATION command, which
-can be used to query the status of currently supported vulnerability
-mitigations and to initiate mitigations within the firmware.
 
-This command is an explicit mechanism to ascertain if a firmware
-mitigation is applied without needing a full RMP re-build, which is most
-useful in a live firmware update scenario.
 
-The firmware supports two subcommands: STATUS and VERIFY. The STATUS
-subcommand is used to query the supported and verified mitigation bits.
-The VERIFY subcommand initiates the mitigation process within the FW for
-the specified vulnerability. Expose a userspace interface under:
-/sys/firmware/sev/vulnerabilities/
-  - supported_mitigations (read-only): supported mitigation vector mask
-  - verified_mitigations (read/write): current verified mask; write a
-    vector to request VERIFY for that bit
+On 5/19/26 3:50 PM, Pratik R. Sampat wrote:
+> The SEV-SNP firmware provides the SNP_VERIFY_MITIGATION command, which
+> can be used to query the status of currently supported vulnerability
+> mitigations and to initiate mitigations within the firmware.
+> 
+> This command is an explicit mechanism to ascertain if a firmware
+> mitigation is applied without needing a full RMP re-build, which is most
+> useful in a live firmware update scenario.
+> 
+> The firmware supports two subcommands: STATUS and VERIFY. The STATUS
+> subcommand is used to query the supported and verified mitigation bits.
+> The VERIFY subcommand initiates the mitigation process within the FW for
+> the specified vulnerability. Expose a userspace interface under:
+> /sys/firmware/sev/vulnerabilities/
+>   - supported_mitigations (read-only): supported mitigation vector mask
+>   - verified_mitigations (read/write): current verified mask; write a
+>     vector to request VERIFY for that bit
+> 
+> The behavior of SNP_VERIFY_MITIGATION and the pre-requisites for using
+> it are bug-specific. Information about supported mitigations and its
+> corresponding vector is to be published as part of the AMD Security
+> Bulletin.
+> 
+> See SEV-SNP Firmware ABI specifications 1.58, SNP_VERIFY_MITIGATION for
+> more details.
+> 
+> Signed-off-by: Pratik R. Sampat <prsampat@amd.com>
+> ---
 
-The behavior of SNP_VERIFY_MITIGATION and the pre-requisites for using
-it are bug-specific. Information about supported mitigations and its
-corresponding vector is to be published as part of the AMD Security
-Bulletin.
+Apologies, missed adding the changelog with the patch. For the record:
 
-See SEV-SNP Firmware ABI specifications 1.58, SNP_VERIFY_MITIGATION for
-more details.
-
-Signed-off-by: Pratik R. Sampat <prsampat@amd.com>
 ---
- .../sysfs-firmware-sev-vulnerabilities        |  17 ++
- drivers/crypto/ccp/sev-dev.c                  | 172 ++++++++++++++++++
- drivers/crypto/ccp/sev-dev.h                  |   3 +
- include/linux/psp-sev.h                       |  51 ++++++
- 4 files changed, 243 insertions(+)
- create mode 100644 Documentation/ABI/testing/sysfs-firmware-sev-vulnerabilities
+v3:
+  * Remove failed_status interface and report failure via dev_err - Tycho
+  * Make vulnerability interfaces root only accessible - Sashiko
+  * Move /sys/firmware/vulnerabilities/ to
+    /sys/firmware/sev/vulnerabilities/ to be platform specific - Sashiko
+  * Guard sysfs creation under a new mutex to avoid racing during
+    creation and using the sev_cmd_mutex which would race with
+    vulnerability operations - Sashiko
 
-diff --git a/Documentation/ABI/testing/sysfs-firmware-sev-vulnerabilities b/Documentation/ABI/testing/sysfs-firmware-sev-vulnerabilities
-new file mode 100644
-index 000000000000..cc84adbac3c0
---- /dev/null
-+++ b/Documentation/ABI/testing/sysfs-firmware-sev-vulnerabilities
-@@ -0,0 +1,17 @@
-+What:		/sys/firmware/sev/vulnerabilities/
-+		/sys/firmware/sev/vulnerabilities/supported_mitigations
-+		/sys/firmware/sev/vulnerabilities/verified_mitigations
-+Date:		May 2026
-+Contact:	linux-crypto@vger.kernel.org
-+Description:	Information about SEV-SNP firmware vulnerability mitigations.
-+		supported_mitigations: Read-only interface that reports
-+				       the vector of mitigations supported by
-+				       the firmware.
-+		verified_mitigations: Read/write interface that reports
-+				      the vector of mitigations already verified
-+				      by the firmware. Writing a vector value
-+				      requests the firmware to VERIFY the
-+				      corresponding mitigation bit(s).
-+		The list of supported mitigations and the meaning of each
-+		vector bit are both platform- and bug-specific and are
-+		published as part of the AMD Security Bulletin.
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index d1e9e0ac63b6..eec4864c6597 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -57,6 +57,7 @@
- #define CMD_BUF_DESC_MAX (CMD_BUF_FW_WRITABLE_MAX + 1)
- 
- static DEFINE_MUTEX(sev_cmd_mutex);
-+static DEFINE_MUTEX(sev_mit_sysfs_mutex);
- static struct sev_misc_dev *misc_dev;
- 
- static int psp_cmd_timeout = 100;
-@@ -245,6 +246,7 @@ static int sev_cmd_buffer_len(int cmd)
- 	case SEV_CMD_SNP_LAUNCH_FINISH:		return sizeof(struct sev_data_snp_launch_finish);
- 	case SEV_CMD_SNP_DBG_DECRYPT:		return sizeof(struct sev_data_snp_dbg);
- 	case SEV_CMD_SNP_DBG_ENCRYPT:		return sizeof(struct sev_data_snp_dbg);
-+	case SEV_CMD_SNP_VERIFY_MITIGATION:	return sizeof(struct sev_data_snp_verify_mitigation);
- 	case SEV_CMD_SNP_PAGE_UNSMASH:		return sizeof(struct sev_data_snp_page_unsmash);
- 	case SEV_CMD_SNP_PLATFORM_STATUS:	return sizeof(struct sev_data_snp_addr);
- 	case SEV_CMD_SNP_GUEST_REQUEST:		return sizeof(struct sev_data_snp_guest_request);
-@@ -1351,6 +1353,162 @@ static int snp_filter_reserved_mem_regions(struct resource *rs, void *arg)
- 	return 0;
- }
- 
-+static int snp_verify_mitigation(u16 command, u64 vector,
-+				 struct sev_data_snp_verify_mitigation_dst *dst)
-+{
-+	struct sev_data_snp_verify_mitigation_dst *mit_dst = NULL;
-+	struct sev_data_snp_verify_mitigation data = {0};
-+	struct sev_device *sev = psp_master->sev_data;
-+	int ret, error = 0;
-+
-+	mit_dst = snp_alloc_firmware_page(GFP_KERNEL | __GFP_ZERO);
-+	if (!mit_dst)
-+		return -ENOMEM;
-+
-+	data.length = sizeof(data);
-+	data.subcommand = command;
-+	data.vector = vector;
-+	data.dst_paddr = __psp_pa(mit_dst);
-+	data.dst_paddr_en = true;
-+
-+	ret = sev_do_cmd(SEV_CMD_SNP_VERIFY_MITIGATION, &data, &error);
-+	if (!ret)
-+		memcpy(dst, mit_dst, sizeof(*mit_dst));
-+	else
-+		dev_err(sev->dev, "SNP_VERIFY_MITIGATION command failed, ret = %d, error = %#x\n",
-+			ret, error);
-+
-+	snp_free_firmware_page(mit_dst);
-+
-+	return ret;
-+}
-+
-+#ifdef CONFIG_SYSFS
-+static ssize_t supported_mitigations_show(struct kobject *kobj,
-+					  struct kobj_attribute *attr, char *buf)
-+{
-+	struct sev_data_snp_verify_mitigation_dst dst;
-+	int ret;
-+
-+	ret = snp_verify_mitigation(SNP_MIT_SUBCMD_REQ_STATUS, 0, &dst);
-+	if (ret)
-+		return ret;
-+
-+	return sysfs_emit(buf, "0x%llx\n", dst.mit_supported_vector);
-+}
-+
-+static struct kobj_attribute supported_attr =
-+		__ATTR_RO_MODE(supported_mitigations, 0400);
-+
-+static ssize_t verified_mitigations_show(struct kobject *kobj,
-+					 struct kobj_attribute *attr, char *buf)
-+{
-+	struct sev_data_snp_verify_mitigation_dst dst;
-+	int ret;
-+
-+	ret = snp_verify_mitigation(SNP_MIT_SUBCMD_REQ_STATUS, 0, &dst);
-+	if (ret)
-+		return ret;
-+
-+	return sysfs_emit(buf, "0x%llx\n", dst.mit_verified_vector);
-+}
-+
-+static ssize_t verified_mitigations_store(struct kobject *kobj,
-+					  struct kobj_attribute *attr,
-+					  const char *buf, size_t count)
-+{
-+	struct sev_data_snp_verify_mitigation_dst dst;
-+	struct sev_device *sev = psp_master->sev_data;
-+	u64 vector;
-+	int ret;
-+
-+	ret = kstrtoull(buf, 0, &vector);
-+	if (ret)
-+		return ret;
-+
-+	ret = snp_verify_mitigation(SNP_MIT_SUBCMD_REQ_VERIFY, vector, &dst);
-+	if (ret)
-+		return ret;
-+
-+	if (dst.mit_failure_status) {
-+		dev_err(sev->dev, "Verify Mitigation - failure status: 0x%x\n",
-+			dst.mit_failure_status);
-+		return -EIO;
-+	}
-+
-+	return count;
-+}
-+
-+static struct kobj_attribute verified_attr =
-+		__ATTR_RW_MODE(verified_mitigations, 0600);
-+
-+static struct attribute *mitigation_attrs[] = {
-+	&supported_attr.attr,
-+	&verified_attr.attr,
-+	NULL
-+};
-+
-+static const struct attribute_group mit_attr_group = {
-+	.attrs = mitigation_attrs,
-+};
-+
-+static void sev_snp_register_verify_mitigation(struct sev_device *sev)
-+{
-+	int rc;
-+
-+	if (!sev->snp_initialized || !sev->snp_plat_status.feature_info ||
-+	    !(sev->snp_feat_info_0.ecx & SNP_VERIFY_MITIGATION_SUPPORTED))
-+		return;
-+
-+	guard(mutex)(&sev_mit_sysfs_mutex);
-+
-+	if (sev->verify_mit)
-+		return;
-+
-+	if (!sev->sev_kobj) {
-+		sev->sev_kobj = kobject_create_and_add("sev", firmware_kobj);
-+		if (!sev->sev_kobj)
-+			return;
-+	}
-+
-+	sev->verify_mit = kobject_create_and_add("vulnerabilities", sev->sev_kobj);
-+	if (!sev->verify_mit)
-+		goto err_sev_kobj;
-+
-+	rc = sysfs_create_group(sev->verify_mit, &mit_attr_group);
-+	if (rc)
-+		goto err_verify_mit;
-+
-+	return;
-+
-+err_verify_mit:
-+	kobject_put(sev->verify_mit);
-+	sev->verify_mit = NULL;
-+err_sev_kobj:
-+	kobject_put(sev->sev_kobj);
-+	sev->sev_kobj = NULL;
-+}
-+
-+static void sev_snp_unregister_verify_mitigation(struct sev_device *sev)
-+{
-+	guard(mutex)(&sev_mit_sysfs_mutex);
-+
-+	if (sev->verify_mit) {
-+		sysfs_remove_group(sev->verify_mit, &mit_attr_group);
-+		kobject_put(sev->verify_mit);
-+		sev->verify_mit = NULL;
-+	}
-+
-+	if (sev->sev_kobj) {
-+		kobject_put(sev->sev_kobj);
-+		sev->sev_kobj = NULL;
-+	}
-+}
-+#else
-+static void sev_snp_register_verify_mitigation(struct sev_device *sev) { }
-+static void sev_snp_unregister_verify_mitigation(struct sev_device *sev) { }
-+#endif
-+
- static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
- {
- 	struct sev_data_range_list *snp_range_list __free(kfree) = NULL;
-@@ -1670,6 +1828,14 @@ int sev_platform_init(struct sev_platform_init_args *args)
- 	rc = _sev_platform_init_locked(args);
- 	mutex_unlock(&sev_cmd_mutex);
- 
-+	/*
-+	 * The shutdown + init path can race with in-flight _show()/_store() operations
-+	 * which acquire the sev_cmd_mutex. Register the sysfs interface outside
-+	 * the sev_cmd_mutex and serialize by sev_mit_sysfs_mutex instead.
-+	 */
-+	if (!rc)
-+		sev_snp_register_verify_mitigation(psp_master->sev_data);
-+
- 	return rc;
- }
- EXPORT_SYMBOL_GPL(sev_platform_init);
-@@ -2796,6 +2962,12 @@ static void sev_firmware_shutdown(struct sev_device *sev)
- 	if (sev->tio_status)
- 		sev_tsm_uninit(sev);
- 
-+	/*
-+	 * Concurrent access to the sysfs entry will call sev_do_cmd() for
-+	 * SNP_VERIFY_MITIGATION which locks the mutex and can cause a deadlock.
-+	 */
-+	sev_snp_unregister_verify_mitigation(sev);
-+
- 	mutex_lock(&sev_cmd_mutex);
- 
- 	__sev_firmware_shutdown(sev, false);
-diff --git a/drivers/crypto/ccp/sev-dev.h b/drivers/crypto/ccp/sev-dev.h
-index b1cd556bbbf6..d5e596606def 100644
---- a/drivers/crypto/ccp/sev-dev.h
-+++ b/drivers/crypto/ccp/sev-dev.h
-@@ -59,6 +59,9 @@ struct sev_device {
- 
- 	bool snp_initialized;
- 
-+	struct kobject *sev_kobj;
-+	struct kobject *verify_mit;
-+
- 	struct sev_user_data_status sev_plat_status;
- 
- 	struct sev_user_data_snp_status snp_plat_status;
-diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index d5099a2baca5..98666c5a6f79 100644
---- a/include/linux/psp-sev.h
-+++ b/include/linux/psp-sev.h
-@@ -129,6 +129,7 @@ enum sev_cmd {
- 	SEV_CMD_SNP_LAUNCH_FINISH	= 0x0A2,
- 	SEV_CMD_SNP_DBG_DECRYPT		= 0x0B0,
- 	SEV_CMD_SNP_DBG_ENCRYPT		= 0x0B1,
-+	SEV_CMD_SNP_VERIFY_MITIGATION	= 0x0B2,
- 	SEV_CMD_SNP_PAGE_SWAP_OUT	= 0x0C0,
- 	SEV_CMD_SNP_PAGE_SWAP_IN	= 0x0C1,
- 	SEV_CMD_SNP_PAGE_MOVE		= 0x0C2,
-@@ -898,10 +899,60 @@ struct snp_feature_info {
- #define SNP_CIPHER_TEXT_HIDING_SUPPORTED	BIT(3)
- #define SNP_AES_256_XTS_POLICY_SUPPORTED	BIT(4)
- #define SNP_CXL_ALLOW_POLICY_SUPPORTED		BIT(5)
-+#define SNP_VERIFY_MITIGATION_SUPPORTED	BIT(13)
- 
- /* Feature bits in EBX */
- #define SNP_SEV_TIO_SUPPORTED			BIT(1)
- 
-+#define SNP_MIT_SUBCMD_REQ_STATUS      0x0
-+#define SNP_MIT_SUBCMD_REQ_VERIFY      0x1
-+
-+/**
-+ * struct sev_data_snp_verify_mitigation - SNP_VERIFY_MITIGATION command params
-+ *
-+ * @length: Length of the command buffer read by the PSP
-+ * @subcommand: Mitigation sub-command for the firmware to execute.
-+ *              REQ_STATUS: 0x0 - Request status about currently supported and
-+ *                                verified mitigations
-+ *              REQ_VERIFY: 0x1 - Request to initiate verification mitigation
-+ *                                operation on a specific mitigation
-+ * @rsvd: Reserved
-+ * @vector: Bit specifying the vulnerability mitigation to process
-+ * @dst_paddr_en: Destination paddr enabled
-+ * @src_paddr_en: Source paddr enabled
-+ * @rsvd1: Reserved
-+ * @rsvd2: Reserved
-+ * @src_paddr: Source address for optional input data
-+ * @dst_paddr: Destination address to write the result
-+ * @rsvd3: Reserved
-+ */
-+struct sev_data_snp_verify_mitigation {
-+	u32 length;
-+	u16 subcommand;
-+	u16 rsvd;
-+	u64 vector;
-+	u32 dst_paddr_en : 1,
-+	    src_paddr_en : 1,
-+	    rsvd1 : 30;
-+	u8 rsvd2[4];
-+	u64 src_paddr;
-+	u64 dst_paddr;
-+	u8 rsvd3[24];
-+} __packed;
-+
-+/**
-+ * struct sev_data_snp_verify_mitigation_dst - mitigation result vectors
-+ *
-+ * @mit_verified_vector: Bit vector of vulnerability mitigations verified
-+ * @mit_supported_vector: Bit vector of vulnerability mitigations supported
-+ * @mit_failure_status: Status of the verification operation
-+ */
-+struct sev_data_snp_verify_mitigation_dst {
-+	u64 mit_verified_vector;                /* OUT */
-+	u64 mit_supported_vector;               /* OUT */
-+	u32 mit_failure_status;                 /* OUT */
-+} __packed;
-+
- #ifdef CONFIG_CRYPTO_DEV_SP_PSP
- 
- /**
--- 
-2.53.0
+v2: https://lore.kernel.org/linux-crypto/20260501152051.17469-1-prsampat@amd.com/
+  * Intrdouce /sys/firmware/vulnerabilities sysfs interface instead of
+    an ioctl interface - Boris
+  * Reword commit message to focus on need for a userspace interface - Sean
+  * Since download_firmware_ex is the primary usecase of this feature,
+    posting this patch in parallel to those discussions[1].
+  Link to RFC: https://lore.kernel.org/linux-crypto/20250630202319.56331-1-prsampat@amd.com/
 
+[1]: https://lore.kernel.org/linux-crypto/20260430160716.1120553-1-tycho@kernel.org/
+---
+
+Pratik
