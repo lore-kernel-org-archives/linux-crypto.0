@@ -1,119 +1,81 @@
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3C753E274A;
-	Tue, 19 May 2026 08:24:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9262D3E0C73
+	for <linux-crypto@vger.kernel.org>; Tue, 19 May 2026 08:37:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779179086; cv=none; b=KaDA1pKHe5/A0Z/W5PuVQG+D4F2IucC4k0CST1ttwO6/knjB/w19+tj/0gChVqpmb5MKxgBg3QZSw9LabUcXzORaLXYBXLFBNNEFqBzTBf39sSAhw/UviwNAk788cVlO0LA51sthziuitKO6+aMwVIkk4lYRzp3sXmH/r3OkiJE=
+	t=1779179830; cv=none; b=U3UtcPuWEhs7k9Q9R9prVB0zmeNkUF7TQDK6XPM6+ZbGvVwdDjv7May3DZTMp3tKwgfHCheK9nRzMVLr+53RtRMczRo6lQOy1QKYJgcoTzO5LEsJDwWT/V9jFaW6Cv+d8q8GBr7+PH8CBLFllECJq2JTzDrDlgMnfu/InND65jU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779179086; c=relaxed/simple;
-	bh=WddjLMCxE2Qnvqhi02yA5fGkqdgfSy+rWBfhjD3zYLU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QBOE/APCUu0YG3E97NYW5hZo5TAL5u115ExRuHRL8QgdrDf+QoBEOZbXjyMQAjfhn+spBGZUQZkvCjbVbfRDT2xiO2nlnBLsWLWhE+PfOcCJF4QWCtnwSEeH921w+EalC94QFb5OPHCHkjCaPR1sbUtfrn30J2hpH0UfUFnPueg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id C9A0568D0D; Tue, 19 May 2026 10:24:33 +0200 (CEST)
-Date: Tue, 19 May 2026 10:24:32 +0200
-From: Christoph Hellwig <hch@lst.de>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Christoph Hellwig <hch@lst.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
+	s=arc-20240116; t=1779179830; c=relaxed/simple;
+	bh=GCvQcOIc7uJYALg92V3wlUU/hVuUxO2oyTfTVg30Ho4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eZgV3kAVj5k/4dGGD/r6K1AOXokLSDN1JsLKp2OcJ/ySJWNAVLQzdUu5H8BVqnC9jHrLdp9jTx2cLHrXDVX12Ch3dWXxTQIs4yXYYxBQL4eO66sU9ht1uKsClsNZkgHOckU0jHC8eepkQJNe30oxsi8XqCgmPmu7H52aTO9ye/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pduDY5g8; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pduDY5g8"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1779179825;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=9mcQY7rZXuAtUqvNRCppzSTuyCCLaeN800BOjkfvpJs=;
+	b=pduDY5g8kpduMdZtx4SPIX1LvWO4t11VXAecXC+QH0u125UDk81tjlkBeZpyQjCLRgh9Rb
+	Ki7xbws8y5g25/UbEAc9wrikpgFD4NaF0H2ooigozKJJJqhLVsG6dbgYdrVN5s+arE2oNU
+	iAnwhPAwzp5IG4HuDkn/lDV6uSsRZWg=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Lukas Wunner <lukas@wunner.de>,
+	Ignat Korchagin <ignat@linux.win>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Dan Williams <dan.j.williams@intel.com>, Chris Mason <clm@fb.com>,
-	David Sterba <dsterba@suse.com>, Arnd Bergmann <arnd@arndb.de>,
-	Song Liu <song@kernel.org>, Yu Kuai <yukuai@fnnas.com>,
-	Li Nan <linan122@huawei.com>, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
-	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-raid@vger.kernel.org
-Subject: Re: cleanup the RAID6 P/Q library v3
-Message-ID: <20260519082432.GA14956@lst.de>
-References: <20260518051804.462141-1-hch@lst.de> <20260518141205.c100f76eec5f58e78bbbf7af@linux-foundation.org>
+	"David S. Miller" <davem@davemloft.net>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: ecrdsa - remove empty sig_alg exit callback
+Date: Tue, 19 May 2026 10:36:32 +0200
+Message-ID: <20260519083630.147673-3-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260518141205.c100f76eec5f58e78bbbf7af@linux-foundation.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+X-Developer-Signature: v=1; a=openpgp-sha256; l=953; i=thorsten.blum@linux.dev; h=from:subject; bh=GCvQcOIc7uJYALg92V3wlUU/hVuUxO2oyTfTVg30Ho4=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFk8inyW9feWMpktyJ9Q4NPX8jms/2cE04zOH7xli29mL HnOpb+zo5SFQYyLQVZMkeXBrB8zfEtrKjeZROyEmcPKBDKEgYtTACbyaxUjw5KvzPbepz1X1zM9 1N2bcTK29bfm3GiOmdr7m1IM/M3ynjL8lfCaf5g1fv70/XMdvk2UjJ3edz6y/a9E5Zrgyb+sEgr s2AA=
+X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, May 18, 2026 at 02:12:05PM -0700, Andrew Morton wrote:
-> Cool, I'll add this to mm.git's mm-nonmm-unstable branch for some
-> linux-next testing.
-> 
-> AI review found quite a lot to talk about:
-> 	https://sashiko.dev/#/patchset/20260518051804.462141-1-hch@lst.de
+ecrdsa_exit_tfm() is empty, and sig_alg .exit is optional. The
+corresponding .init callback is not set either, so there is nothing to
+release in .exit.
 
-Not a lot of it is very useful, though:
+Remove the empty function and leave .exit unset.
 
-raid6: turn the userspace test harness into a kunit test
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+ crypto/ecrdsa.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
- - complains about basically adding need_resched, which we've decided
-   we won't do now that we have lazy preempt.  This is probably going
-   to come up in lots of places because of the old training data
-
-raid6: use named initializers for struct raid6_calls
-
- - whining about keeping totally pointless comments
+diff --git a/crypto/ecrdsa.c b/crypto/ecrdsa.c
+index 2c0602f0cd40..4fb9906b47a8 100644
+--- a/crypto/ecrdsa.c
++++ b/crypto/ecrdsa.c
+@@ -259,16 +259,11 @@ static unsigned int ecrdsa_max_size(struct crypto_sig *tfm)
+ 	return 2 * ctx->pub_key.ndigits * sizeof(u64);
+ }
  
-raid6: warn when using less than four devices
-
- - complains about warning for btrfs which is clearly documented as the
-   outcome in the commit log
- - and also complaining that the enforcement isn't hard enough, but the
-   WARN_ON is the best we can do here
-
-raid6: rework registration of optimized algorithms
-
- - less registration causing less kunit coverage:  that's intentional
-   as it keeps testing time down and similar to other arch optimized
-   tests in crc and crypto code.  It also doesn't really reduce
-   coverage as before this series there was none.
-
-raid6: use static_call for gen_syndrom and xor_syndrom
-
- - doesn't seem to know that bool fails when an initcall fails
-
-raid6_kunit: use KUNIT_CASE_PARAM
-
- - whining about the code style.  I don't really like it either,
-   but the kunit case stuff is a mess
-
-There are a few somewhat useful things, though.
-
-raid6: hide internals
-
- - yes, the -I is duplicate and should be fixed
-
-raid6: rework registration of optimized algorithms
-
- - avx2 instead of avx512 is probably the right thing for no
-   benchmarking, but if it was intentional (it wasn't), that should
-   be document.  So I'll just switch back to the previous version to
-   keep the state of the art
+-static void ecrdsa_exit_tfm(struct crypto_sig *tfm)
+-{
+-}
+-
+ static struct sig_alg ecrdsa_alg = {
+ 	.verify		= ecrdsa_verify,
+ 	.set_pub_key	= ecrdsa_set_pub_key,
+ 	.key_size	= ecrdsa_key_size,
+ 	.max_size	= ecrdsa_max_size,
+-	.exit		= ecrdsa_exit_tfm,
+ 	.base = {
+ 		.cra_name	 = "ecrdsa",
+ 		.cra_driver_name = "ecrdsa-generic",
