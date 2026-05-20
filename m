@@ -1,117 +1,95 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from sender4-of-o51.zoho.com (sender4-of-o51.zoho.com [136.143.188.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE993F7ABC;
-	Wed, 20 May 2026 18:27:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779301665; cv=none; b=Gze9V1aPcYe1xEUKCCGhrSCYvieTaotcXR/BYqwHDjfBcKLk8jblPirCa8LF8YkvaDpX8Lf5hiOsuJSXJ2Qx9yvfTMVeZDP7wOHbu44uk4pMc24UpWex/bTNZ+HP124REY/ub+dSb/YOI96rklg63+oq/Ycp+VmFJrToB6Pt5o0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779301665; c=relaxed/simple;
-	bh=Y6K4hu1l3UXqWGY6QUjw5D1toYfIYfsN+7a8DHqoI4k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NBv7nsx/AwKt9zYIa8cx8sl5vQ5U7nkNtGz1a5CrV5l/FreFZUPWLUf0/LT86yw/j4PEMDvAKeO/25DfDGjPKmkHskDqmREqlF7HEcbfay+AtQCGX6fhW/BBVZFT1tPh3/xgJmmAokq/5WrXceYTjpMqjaFx9v5sQ3oSMmLIJXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fnC0JJuw; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3C77361662;
+	Wed, 20 May 2026 20:14:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779308095; cv=pass; b=sqbOxPvW/xL43YjWAfpcQ3mdxbDL/bW8n0nDAkmJzkFlkGecCuDf2n8Ghk3EJxRKKE0DjuI1+MmGIcVU1ftNdHDB39MzrtlxIe2p9JYfcFuK5I/fg50Zxu0kdnRNUhS/LRygkkO/UQ6g1wMR+0CZhTfIzCOa4Z3Ni8dOjO4ODEY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779308095; c=relaxed/simple;
+	bh=3sQXcyhBMV7Fy/iPzt6jvnFx2tQnSeys6xAJHBKj0uM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jxixcqktCwQ/ytHmbHWg4L1NCNV//rSlCxEyq8lCIQCTqwP9Dq2EHfCWI/cysDjh1dGbOiHQlYfdWKGHHwV5zd2JhgrUt2UUh6Wqnw8tGVFc4LqNW0aI5x0hNb0kIzab0sLJmtRNCMkUPDNdugAEB9kN6f55kud9aaJZ3IyvP74=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=apertussolutions.com; spf=pass smtp.mailfrom=apertussolutions.com; dkim=pass (1024-bit key) header.d=apertussolutions.com header.i=dpsmith@apertussolutions.com header.b=fk8v3jVU; arc=pass smtp.client-ip=136.143.188.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=apertussolutions.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=apertussolutions.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fnC0JJuw"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1779301665; x=1810837665;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Y6K4hu1l3UXqWGY6QUjw5D1toYfIYfsN+7a8DHqoI4k=;
-  b=fnC0JJuwZhJq1EGPuiZjxH6/IrhR49+NlYpRZskCGa2hZep3mA8eYKF1
-   R3QH6VHpd9WG0HQi4HGE2Kzt6uPjzfJzRuWbCPmsCMQK5+UwFbRj0VNGN
-   BXfXaJYcgEjfEiFeqLauGeTk2fDxvf1BfjJEay+shmvqRyI5f+L9FqhSc
-   u5iHeAi68ZF3vzAPZZRQ4vpDIXuTqjr4r6Mj+QDDAE7D7mjb8AtsX+s8s
-   vegbkwlMxno/F2aSJZwXegY3XDUqLBKgDgjxz76raXbJfVEjT/Q+WLgmJ
-   wENCZVI7hAcvqB1yVE6o9vkbgHboCOj39cONCM4xkbG9VoZYfZKjy04bV
-   g==;
-X-CSE-ConnectionGUID: 3xkB9UI4Qh6TAzaHLxOUhA==
-X-CSE-MsgGUID: muTHwHo0QoydzE2KF3R3MQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11792"; a="80177362"
-X-IronPort-AV: E=Sophos;i="6.23,244,1770624000"; 
-   d="scan'208";a="80177362"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2026 11:27:44 -0700
-X-CSE-ConnectionGUID: DuZ9iwDKRXCFnwlxhgpTBQ==
-X-CSE-MsgGUID: 1qotuqwZSIKV+9YRhpc2Yw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.23,244,1770624000"; 
-   d="scan'208";a="264072193"
-Received: from igk-lkp-server01.igk.intel.com (HELO bdf09bfdbd5f) ([10.211.93.152])
-  by fmviesa001.fm.intel.com with ESMTP; 20 May 2026 11:27:40 -0700
-Received: from kbuild by bdf09bfdbd5f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wPldq-00000000AcX-2omz;
-	Wed, 20 May 2026 18:27:38 +0000
-Date: Wed, 20 May 2026 20:27:27 +0200
-From: kernel test robot <lkp@intel.com>
-To: "Pratik R. Sampat" <prsampat@amd.com>, ashish.kalra@amd.com,
-	thomas.lendacky@amd.com, john.allen@amd.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net
-Cc: oe-kbuild-all@lists.linux.dev, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, aik@amd.com, tycho@kernel.org,
-	nikunj@amd.com, michael.roth@amd.com, prsampat@amd.com
-Subject: Re: [PATCH v3] crypto/ccp: Introduce SNP_VERIFY_MITIGATION command
-Message-ID: <202605202038.zpyF8AIf-lkp@intel.com>
-References: <36137b565d183fa2f2985ad098f2e2096f1c432f.1779219958.git.prsampat@amd.com>
+	dkim=pass (1024-bit key) header.d=apertussolutions.com header.i=dpsmith@apertussolutions.com header.b="fk8v3jVU"
+ARC-Seal: i=1; a=rsa-sha256; t=1779307955; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=F7zGj1KM1ljluaeAwqLEa2lH3pOe1//+GG7dZFuLI/e7EOJSEDFz7r/ZwPSXFaSPBjGDaBPn0evtNpBB0l5HBIb1P/fUeLabzdyhNHqLjeuGkLBgHLLVm5EQYbq04+VcicZG0jspNbLDSTyh8zBgXeTRPE3fhkuzIUVlkN+Kuec=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1779307955; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=DRXXEptyfYW324C3Rd22g0Bz5yZ2Gjy/Wsltr9WZ4UU=; 
+	b=hXusYhMz5XryhCubUebQISLI6+Ine8ivFgl/WZxwfusR8AzqJt1V+wVNJ1i9TWR7yNFDBQ9P1WW0mt6jlGz1g2pHHPmso0vwRGEu9eaVKtrXAo7S1Y5RKpyMKe+t9oPlp1nQNrItH2A1Q5SC1l1Bp1tYeBQF55St1jRYRdhYFng=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=apertussolutions.com;
+	spf=pass  smtp.mailfrom=dpsmith@apertussolutions.com;
+	dmarc=pass header.from=<dpsmith@apertussolutions.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1779307955;
+	s=zoho; d=apertussolutions.com; i=dpsmith@apertussolutions.com;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=DRXXEptyfYW324C3Rd22g0Bz5yZ2Gjy/Wsltr9WZ4UU=;
+	b=fk8v3jVUl1vMDS7ypit1OGgSRJCwy3CYGZ7bOP84cJvHacZTycXN7FVoTp+cYxXJ
+	4LosRO1EMAetAFMW4Gciwa6SnlryPlJl52AjnXmy+3NRWfGKGJgbzuGNwjhNhs3rEHq
+	zTT4q6Z7O0CO4d0W44EH8K4c898wh3G/6FtiBfXQ=
+Received: by mx.zohomail.com with SMTPS id 1779307952071689.0219932508874;
+	Wed, 20 May 2026 13:12:32 -0700 (PDT)
+Message-ID: <a5d70928-5d86-4439-a177-e5182552b3e2@apertussolutions.com>
+Date: Wed, 20 May 2026 16:12:28 -0400
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <36137b565d183fa2f2985ad098f2e2096f1c432f.1779219958.git.prsampat@amd.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v16 01/38] tpm: Initial step to reorganize TPM public
+ headers
+To: Dave Hansen <dave.hansen@intel.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Jarkko Sakkinen <jarkko@kernel.org>
+Cc: Ross Philipson <ross.philipson@gmail.com>, linux-kernel@vger.kernel.org,
+ x86@kernel.org, linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
+ linux-efi@vger.kernel.org, iommu@lists.linux.dev, tglx@linutronix.de,
+ mingo@redhat.com, bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
+ ardb@kernel.org, mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com,
+ peterhuewe@gmx.de, luto@amacapital.net, nivedita@alum.mit.edu,
+ herbert@gondor.apana.org.au, davem@davemloft.net, corbet@lwn.net,
+ ebiederm@xmission.com, dwmw2@infradead.org, baolu.lu@linux.intel.com,
+ kanth.ghatraju@oracle.com, daniel.kiper@oracle.com,
+ andrew.cooper3@citrix.com, trenchboot-devel@googlegroups.com
+References: <20260515211410.31440-1-ross.philipson@gmail.com>
+ <20260515211410.31440-2-ross.philipson@gmail.com>
+ <agemXwxVb9jvAbYM@kernel.org> <20260515230553.GO7702@ziepe.ca>
+ <8f8328d3-a7db-4a64-82f8-1e0e3eff93cf@intel.com>
+Content-Language: en-US
+From: "Daniel P. Smith" <dpsmith@apertussolutions.com>
+In-Reply-To: <8f8328d3-a7db-4a64-82f8-1e0e3eff93cf@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ZohoMailClient: External
 
-Hi Pratik,
+On 5/15/26 7:10 PM, Dave Hansen wrote:
+> On 5/15/26 16:05, Jason Gunthorpe wrote:
+>> Can we please split out and progress the TPM reorg mini-series at the
+>> front?
+> 
+> Yes, please.
+> 
 
-kernel test robot noticed the following build warnings:
+Yes, we will split this out, address the Sashiko comments, and work on 
+getting it out next week.
 
-[auto build test WARNING on herbert-cryptodev-2.6/master]
-[also build test WARNING on herbert-crypto-2.6/master linus/master v7.1-rc4]
-[cannot apply to next-20260520]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> Any way to break this down and merge in more bite-size pieces would be
+> better for everyone involved.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Pratik-R-Sampat/crypto-ccp-Introduce-SNP_VERIFY_MITIGATION-command/20260520-035846
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/36137b565d183fa2f2985ad098f2e2096f1c432f.1779219958.git.prsampat%40amd.com
-patch subject: [PATCH v3] crypto/ccp: Introduce SNP_VERIFY_MITIGATION command
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-docutils: docutils (Docutils 0.21.2, Python 3.13.5, on linux)
-reproduce: (https://download.01.org/0day-ci/archive/20260520/202605202038.zpyF8AIf-lkp@intel.com/reproduce)
+I went through the TPM only part of the series and only one commit was 
+of substantial length, note I am not considering those that were only 
+moving headers around. That's the new buffer allocation patch from 
+Jarkko. We can see if there is a way to split it up without resulting in 
+either unused code or breaking the TPM driver.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202605202038.zpyF8AIf-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   WARNING: /sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/os_mode is defined 2 times: Documentation/ABI/testing/sysfs-driver-hid-lenovo-go:364; Documentation/ABI/testing/sysfs-driver-hid-lenovo-go-s:234
-   WARNING: /sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/os_mode_index is defined 2 times: Documentation/ABI/testing/sysfs-driver-hid-lenovo-go:373; Documentation/ABI/testing/sysfs-driver-hid-lenovo-go-s:243
-   WARNING: /sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/touchpad/enabled is defined 2 times: Documentation/ABI/testing/sysfs-driver-hid-lenovo-go:636; Documentation/ABI/testing/sysfs-driver-hid-lenovo-go-s:252
-   WARNING: /sys/bus/usb/devices/<busnum>-<devnum>:<config num>.<interface num>/<hid-bus>:<vendor-id>:<product-id>.<num>/touchpad/enabled_index is defined 2 times: Documentation/ABI/testing/sysfs-driver-hid-lenovo-go:645; Documentation/ABI/testing/sysfs-driver-hid-lenovo-go-s:261
-   Documentation/ABI/testing/sysfs-firmware-sev-vulnerabilities:1: ERROR: Unexpected indentation. [docutils]
->> Documentation/ABI/testing/sysfs-firmware-sev-vulnerabilities:1: WARNING: Block quote ends without a blank line; unexpected unindent. [docutils]
->> Documentation/ABI/testing/sysfs-firmware-sev-vulnerabilities:1: WARNING: Definition list ends without a blank line; unexpected unindent. [docutils]
-   Documentation/arch/riscv/zicfilp.rst:79: WARNING: Inline literal start-string without end-string. [docutils]
-   Documentation/core-api/kref:328: ./include/linux/kref.h:72: WARNING: Invalid C declaration: Expected end of definition. [error at 96]
-   int kref_put_mutex (struct kref *kref, void (*release)(struct kref *kref), struct mutex *mutex) __cond_acquires(true# mutex)
-   ------------------------------------------------------------------------------------------------^
-   Documentation/core-api/kref:328: ./include/linux/kref.h:94: WARNING: Invalid C declaration: Expected end of definition. [error at 92]
-
-
-vim +1 Documentation/ABI/testing/sysfs-firmware-sev-vulnerabilities
-
-   > 1	What:		/sys/firmware/sev/vulnerabilities/
-
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+V/r,
+Daniel P. Smith
