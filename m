@@ -1,63 +1,62 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3A32366566
-	for <linux-crypto@vger.kernel.org>; Wed, 20 May 2026 15:57:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD3DF3BED26
+	for <linux-crypto@vger.kernel.org>; Wed, 20 May 2026 15:57:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779292648; cv=none; b=A1z/LymHTkTbA78Ersgz00yNvJ+SPfBU1UGrJEpx4bqmSzbN/VRhqVX99NmuZORuHLC49vKqRBJR2ioOznuSBLaPg/lQrOiwHUPU0FrkYt+Oj5qjX6+pQFXVJmjCrGSGs13q/syQTY7+uNXlbQ2FUTlEbDDU6YBWgcjd7oIsdxA=
+	t=1779292649; cv=none; b=REXF7CBXti8ZL1MyTIfv6L2Qwq5cHZEBYU47pjRthnAYNH777UEvFOKpHIlexDeA3SbghFgpoIdW+3SqVV1BCV/RjdvXbnz2KmHrnuOMeNxTDXrANtS1xE/+dQBoT+uRCDubQR0eCCHlprkPjOqwEFWDmUVmU8O5FagEIBZ+CXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779292648; c=relaxed/simple;
-	bh=XF6myLGOHXFEV6F9jGpi6se203QT+R1jon48xdKDRd8=;
+	s=arc-20240116; t=1779292649; c=relaxed/simple;
+	bh=SdZXb4YlAIgGQSiYVfEZ5WJEVes53hxYTkfaG3b/d3Q=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nZ3Q0pP3DL2XNpoOd90GrM9kSMWcpGrdpMvpL2eJL83zUlx9R7rZqw3VV2/xAokNGpe7QXU1JIBSkrVfOe20dSqhvZ3+cmtD4d034giHAJOPHB599Kgfy4VruRBfaas2mduvc9FwziGMsTORG9C8BoQ3pDnXG/pmpRoWboWIsqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WSL9VekL; arc=none smtp.client-ip=209.85.128.45
+	 MIME-Version; b=dII2pgI6rNX7MIh3YWBrUPctJ4QyHD4a0sqDe23/gFoDNbNO2Bww3ZVe9doI9ZvzEAEknOGmFfnvJufwXXA6fgmEfVCSLqK5wGicLxn3VGU4Wq3pnaHyOCi9n+w/22f+F2eeJrYvVfsowt+0s/BZupZ+0CIE3Dg8ZB1FJkixRJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HapiIFCv; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WSL9VekL"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4889d0a9df0so4154395e9.3
-        for <linux-crypto@vger.kernel.org>; Wed, 20 May 2026 08:57:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HapiIFCv"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-48d10c981e4so6607965e9.0
+        for <linux-crypto@vger.kernel.org>; Wed, 20 May 2026 08:57:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779292640; x=1779897440; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1779292643; x=1779897443; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pMbnbZ8Nz1p+R9q/BNLPx2BmIZnFVuHesrx4qEEwkQQ=;
-        b=WSL9VekL1I0eRe8QjSTW1ixk79lmHJyXWHDmMxxHJAbtrWonO1WQ+dXr3/mlGswhKd
-         3hA+wwv0HHCXMFjMYBZBwZcIsqMk/8ooPYx9R7roRjLulhwGXhfEqtV5O/uOrGY8KuTL
-         8uHiYwRvz+EGGn1W2RRJ0bUfMbmwMNC/irHJWRAqLw3S1fzZ/PYrwSOzA0QWK7TRicZ8
-         Lyq7gt/YqBRRWP4nKKLbdtF7THU/rr/Ik4rtySffJcQb6wjfLNZIZJlGcehvI9eRXWGO
-         rndmuZ3myhM9inPLZxYCEa2fVVbyjr/QSQ9O0hGPdP9Foj8tkp39ND/zyYsY917F/Fy8
-         7aOQ==
+        bh=Ix3QOsJRJfrw5u43r2mA+N3E2gg1vLyQm9dlzJ2uvsQ=;
+        b=HapiIFCvoauHywOC8FjTjGFmO5N9w/QGCYOkvupah06nqqnsTZvjqJ7rNgtd5sLj2t
+         EHaTM3ei/qPjkaRydVFESalcqYtoVzdSzpX9etlrWz1o4leJ2IzFcgqw6fxLknPS6ho8
+         Hn/n8hGopjDjoEOTJEuHxNWjezEzmXj2JdsQZmkGTVIi4q/aFNlMlQ+gPFXX9F2o8/YZ
+         WDCvNl3t4LNuUgKs5rxT9M16gJ7JglhO1DWC9XEMqZZS/b1Nt/tyWI2CQNHRpZJZnhWT
+         g8T/os7SdkNDZ8SfDmUA9WJtEWbb4EuKDRcoc96yWtBIir2VVagwSMrQ1UTLa/sUJkM5
+         CVnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779292640; x=1779897440;
+        d=1e100.net; s=20251104; t=1779292643; x=1779897443;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=pMbnbZ8Nz1p+R9q/BNLPx2BmIZnFVuHesrx4qEEwkQQ=;
-        b=jc+YFql9w4aM2hAIVtQrQF4WoOeOxzMPsk9PiaYtvpXn3vmFtlXs0VJyg38cMnR6GP
-         02bv0GafoH9+w4dAoaS0H1+niS0r4mxTGg7twmewuVc4PVVkLkfAyFnUTsxB1qyiZI8m
-         RCKaSkuux62bMZoOLnjQeE/OyRDT9k0Yq25Ir1Sg+YMgLH+EAmIQqaVVzfjh4I0IULhJ
-         2QML1JmjAc2Nb0RfG5NqaH+yYhhb2RvdGZCML19slWoMAQJgTYM36pHSIoMUKk2T3eCa
-         jWKhg8nTlluGkHD/wVT4MTHXBmg6CEqUr2yCAWL2+VXlUvT4qXyb7NUOTukjSWlE8sLo
-         FR8g==
-X-Gm-Message-State: AOJu0Yz01O0Q1NoTIhJQY3WFHWQKEGIFQYx150jEXL+92d0E7eebdmJV
-	/re4kcw77wHWXIKym5QqXjl4ziR+Fe0awRj/HvyCdMzENaKqebiJHn+O
-X-Gm-Gg: Acq92OG/yU6dOpTEExO1M5QxdESfVMV0ZAH2cCw0rLNyNbpUxN/S4Od4TOMiJQPuyOY
-	szzU5QN2ruqaKZs+VfnW3l+SNtbY7C8LKXJrc68ewyvJZfD4I5zjrx6xcFTLXhA+M+OVrs+oysv
-	xbZ9w9TPSpEYGBzreeRbZzaV0jYSfYdX0QZSxb1UsGuciIinAJkJNuNRxkr1WHIkt58R4UljqZu
-	qvLCRyRhgoEnF2VHe1wgIkgTgJBGSVGfQyJneQvwfaFfw7scdVQoRut21asZ1IoCv+dIPwT1MTO
-	mGvLqJRgzXcZTgzz1yDpl2Dn+453zREFtJUVGihly2pUs/cR5oJgvnzGnYG6qz/LGplv/7vxVJZ
-	bSoDLCeTVTJFIP0SmhBPkcKQqs7/yw5xWpaQrYr+iW91k3NsIo0fZt1RDx81smGq9sICZpZExBd
-	BFP5pZ64b5NrJoQnfkKln0wuOGlYmnIC6IdNoQvdzQ/5knR7Wroq3y1/lYXeOBnPJXMKaUY0NH4
-	g==
-X-Received: by 2002:a05:600c:4513:b0:48a:5501:799a with SMTP id 5b1f17b1804b1-48fe664c27cmr188890905e9.5.1779292639549;
-        Wed, 20 May 2026 08:57:19 -0700 (PDT)
+        bh=Ix3QOsJRJfrw5u43r2mA+N3E2gg1vLyQm9dlzJ2uvsQ=;
+        b=d+04CyO0gWXuf7OobjWt9W3eV529TrHLoJpkEKpnoY/zdoSCcnD8qhYVSrahLDKKpp
+         UPGcJR0pACEQfp6KK05KfuIgDvN3GdB3ZTKJk9emw1mQjZWSuL3/zSYG4sfGDCaAAs+3
+         GGR55PQSpJlKG+HRaKrzvBZ5juf2hAmXBJb3CbsNBudKaJabRHTtZoUexe1PE8fYYakz
+         o2HJu7xEFPZehrQL1iNzdEgkgaivuQFYI0a/4HIm87CBg8woHMlZmw2Iv1tI2nCmYtx7
+         1ePXM8tda5NvUylmMJ9cqm0Y7GQhrutGg+5GWhkjazalBeuyO/9gAbCibnsoSxtNbDRM
+         DXtw==
+X-Gm-Message-State: AOJu0YxSdO6B88PA4AeoA+/jVUzKP3AA4Bhz5dkEdxk0oNyqrJVW0n4/
+	oKoMxUOOIJcfsBQYKk0prAJYoX5dHvXYndaqrcjmfB7BCjyaHM2pa8U0
+X-Gm-Gg: Acq92OHRM8LcQR+7bmI0uoRuJljF7VJPY3xWTVT9No4/Y9xtMZSWYyeR3I+2+6/UbQi
+	yOiTRxR122W2hF/eo5ElfTVPbYPflEJRTolmdjXV2Jw2ZcUffKUpjQupKX7qm9eHpZ39QWN7zrX
+	4CX1q8K30x6C38fb1MamMF8P9HOEKZNFFo5W4EdrgZOfvptLsfnMOmAe1vwya/dn/SjFP4IuvdW
+	JKrrRg2HoQtjy3dIVrIcrlS7p3tG/CEjR3ZUXMDgfmbYcvAsjSO4Ig5sNBbrxDtwVJjyeJ5tCq2
+	fWKX1/5y3i7PnrpfgyTMzczHHY+gDWa8RpmZdiQnAB8uZaOqX7cfiDYg1dSQFL8vYCXYASYmgn6
+	ZAS4L4laLHHJ2yrIpd7VMBbcUOaXxSoqYPMM4vGXF0e0PEX1DeKQzsmLBW/3CY+dDGms1TEmSzr
+	yWwxifwwdmt5WlVX0CUiqoiXqthrG5aOCB1dimUh5WhBoSDKdXcIDL1GeeL92/bjQ=
+X-Received: by 2002:a05:600c:3b07:b0:48e:6db5:76e6 with SMTP id 5b1f17b1804b1-48fe63099c6mr198267165e9.2.1779292642678;
+        Wed, 20 May 2026 08:57:22 -0700 (PDT)
 Received: from menon.v.cablecom.net (84-74-0-139.dclient.hispeed.ch. [84.74.0.139])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48febe79ce3sm137216715e9.31.2026.05.20.08.57.17
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48febe79ce3sm137216715e9.31.2026.05.20.08.57.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 May 2026 08:57:19 -0700 (PDT)
+        Wed, 20 May 2026 08:57:22 -0700 (PDT)
 From: Lothar Rubusch <l.rubusch@gmail.com>
 To: thorsten.blum@linux.dev,
 	herbert@gondor.apana.org.au,
@@ -72,9 +71,9 @@ Cc: linux-crypto@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	l.rubusch@gmail.com
-Subject: [PATCH v3 06/12] crypto: atmel-i2c - introduce shared teardown helpers and fix queue flush
-Date: Wed, 20 May 2026 15:56:57 +0000
-Message-Id: <20260520155703.23018-7-l.rubusch@gmail.com>
+Subject: [PATCH v3 08/12] crypto: atmel-i2c - move shared client allocation logic to core
+Date: Wed, 20 May 2026 15:56:59 +0000
+Message-Id: <20260520155703.23018-9-l.rubusch@gmail.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20260520155703.23018-1-l.rubusch@gmail.com>
 References: <20260520155703.23018-1-l.rubusch@gmail.com>
@@ -86,117 +85,181 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce atmel_i2c_deactivate_client() and atmel_i2c_unregister_client()
-helpers in the atmel-i2c core library to modularize client teardown. This
-encapsulates common client state tracking and list manipulation operations.
+Migrate the I2C client allocation and runtime load-balancing routines out
+of the ECC driver code and into the central atmel-i2c core library module.
 
-Convert the ECC driver's error recovery and device removal paths to utilize
-these new helpers, ensuring consistent execution ordering when modifying
-device-readiness states and deleting linked-list nodes.
+Export the symmetric lifecycle helper interfaces atmel_i2c_client_alloc()
+and atmel_i2c_client_free() using EXPORT_SYMBOL_GPL() to expose a unified
+client management API. This consolidation enables the dynamic selection
+subsystem (which chooses the least-loaded client device based on the active
+transformation count) to be shared by both the ECC driver and upcoming
+Atmel crypto modules.
 
-Additionally, migrate the atmel_i2c_flush_queue() call out of the module
-exit path. It now runs inside the core unregistration helper. Export both
-new tracking symbols via EXPORT_SYMBOL_GPL() to match the existing core
-driver licensing standard.
+Refactor the ECC driver's transformation context initialization (init_tfm)
+and teardown (exit_tfm) paths to use this centralized core API.
+
+No functional change is intended.
 
 Signed-off-by: Lothar Rubusch <l.rubusch@gmail.com>
 ---
- drivers/crypto/atmel-ecc.c | 16 ++++------------
- drivers/crypto/atmel-i2c.c | 20 ++++++++++++++++++++
+ drivers/crypto/atmel-ecc.c | 50 +++-----------------------------------
+ drivers/crypto/atmel-i2c.c | 46 +++++++++++++++++++++++++++++++++++
  drivers/crypto/atmel-i2c.h |  3 +++
- 3 files changed, 27 insertions(+), 12 deletions(-)
+ 3 files changed, 52 insertions(+), 47 deletions(-)
 
 diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
-index cf6abc94d6c9..433f40224be2 100644
+index f166144febfe..19e9ee9c15e5 100644
 --- a/drivers/crypto/atmel-ecc.c
 +++ b/drivers/crypto/atmel-ecc.c
-@@ -337,11 +337,8 @@ static int atmel_ecc_probe(struct i2c_client *client)
- 	if (atmel_ecc_kpp_refcnt == 0) {
- 		ret = crypto_register_kpp(&atmel_ecdh_nist_p256);
- 		if (ret) {
--			spin_lock(&atmel_i2c_mgmt.i2c_list_lock);
--			list_del(&i2c_priv->i2c_client_list_node);
--			i2c_priv->ready = false;
--			spin_unlock(&atmel_i2c_mgmt.i2c_list_lock);
--
-+			atmel_i2c_deactivate_client(i2c_priv);
-+			atmel_i2c_unregister_client(i2c_priv);
- 			dev_err(&client->dev, "%s alg registration failed\n",
- 				atmel_ecdh_nist_p256.base.cra_driver_name);
- 
-@@ -360,9 +357,7 @@ static void atmel_ecc_remove(struct i2c_client *client)
- {
- 	struct atmel_i2c_client_priv *i2c_priv = i2c_get_clientdata(client);
- 
--	spin_lock(&atmel_i2c_mgmt.i2c_list_lock);
--	i2c_priv->ready = false;
--	spin_unlock(&atmel_i2c_mgmt.i2c_list_lock);
-+	atmel_i2c_deactivate_client(i2c_priv);
- 
- 	/*
- 	 * Note, the Linux Crypto Core automatically blocks until all active
-@@ -375,9 +370,7 @@ static void atmel_ecc_remove(struct i2c_client *client)
- 		crypto_unregister_kpp(&atmel_ecdh_nist_p256);
- 	mutex_unlock(&atmel_ecc_kpp_lock);
- 
--	spin_lock(&atmel_i2c_mgmt.i2c_list_lock);
--	list_del(&i2c_priv->i2c_client_list_node);
--	spin_unlock(&atmel_i2c_mgmt.i2c_list_lock);
-+	atmel_i2c_unregister_client(i2c_priv);
- }
- 
- static const struct of_device_id atmel_ecc_dt_ids[] = {
-@@ -411,7 +404,6 @@ static int __init atmel_ecc_init(void)
- 
- static void __exit atmel_ecc_exit(void)
- {
--	atmel_i2c_flush_queue();
- 	i2c_del_driver(&atmel_ecc_driver);
- }
- 
-diff --git a/drivers/crypto/atmel-i2c.c b/drivers/crypto/atmel-i2c.c
-index db24f65ae90e..cf3c57745414 100644
---- a/drivers/crypto/atmel-i2c.c
-+++ b/drivers/crypto/atmel-i2c.c
-@@ -354,6 +354,26 @@ static int device_sanity_check(struct i2c_client *client)
+@@ -203,50 +203,6 @@ static int atmel_ecdh_compute_shared_secret(struct kpp_request *req)
  	return ret;
  }
  
-+void atmel_i2c_deactivate_client(struct atmel_i2c_client_priv *i2c_priv)
-+{
-+	spin_lock(&atmel_i2c_mgmt.i2c_list_lock);
-+	i2c_priv->ready = false;
-+	spin_unlock(&atmel_i2c_mgmt.i2c_list_lock);
-+}
-+EXPORT_SYMBOL_GPL(atmel_i2c_deactivate_client);
-+
-+void atmel_i2c_unregister_client(struct atmel_i2c_client_priv *i2c_priv)
-+{
-+	spin_lock(&atmel_i2c_mgmt.i2c_list_lock);
-+	if (!list_empty(&i2c_priv->i2c_client_list_node))
-+		list_del_init(&i2c_priv->i2c_client_list_node);
-+	spin_unlock(&atmel_i2c_mgmt.i2c_list_lock);
-+
-+	/* don't sleep inside spin locks */
-+	atmel_i2c_flush_queue();
-+}
-+EXPORT_SYMBOL_GPL(atmel_i2c_unregister_client);
-+
- int atmel_i2c_probe(struct i2c_client *client)
+-static struct i2c_client *atmel_ecc_i2c_client_alloc(void)
+-{
+-	struct atmel_i2c_client_priv *i2c_priv, *min_i2c_priv = NULL;
+-	struct i2c_client *client = ERR_PTR(-ENODEV);
+-	int min_tfm_cnt = INT_MAX;
+-	int tfm_cnt;
+-
+-	spin_lock(&atmel_i2c_mgmt.i2c_list_lock);
+-
+-	if (list_empty(&atmel_i2c_mgmt.i2c_client_list)) {
+-		spin_unlock(&atmel_i2c_mgmt.i2c_list_lock);
+-		return ERR_PTR(-ENODEV);
+-	}
+-
+-	list_for_each_entry(i2c_priv, &atmel_i2c_mgmt.i2c_client_list,
+-			    i2c_client_list_node) {
+-		if (!i2c_priv->ready)
+-			continue;
+-		tfm_cnt = atomic_read(&i2c_priv->tfm_count);
+-		if (tfm_cnt < min_tfm_cnt) {
+-			min_tfm_cnt = tfm_cnt;
+-			min_i2c_priv = i2c_priv;
+-		}
+-		if (!min_tfm_cnt)
+-			break;
+-	}
+-
+-	if (min_i2c_priv) {
+-		atomic_inc(&min_i2c_priv->tfm_count);
+-		client = min_i2c_priv->client;
+-	}
+-
+-	spin_unlock(&atmel_i2c_mgmt.i2c_list_lock);
+-
+-	return client;
+-}
+-
+-static void atmel_ecc_i2c_client_free(struct i2c_client *client)
+-{
+-	struct atmel_i2c_client_priv *i2c_priv = i2c_get_clientdata(client);
+-
+-	atomic_dec(&i2c_priv->tfm_count);
+-}
+-
+ static int atmel_ecdh_init_tfm(struct crypto_kpp *tfm)
  {
- 	struct atmel_i2c_client_priv *i2c_priv;
+ 	const char *alg = kpp_alg_name(tfm);
+@@ -254,7 +210,7 @@ static int atmel_ecdh_init_tfm(struct crypto_kpp *tfm)
+ 	struct atmel_ecdh_ctx *ctx = kpp_tfm_ctx(tfm);
+ 
+ 	ctx->curve_id = ECC_CURVE_NIST_P256;
+-	ctx->client = atmel_ecc_i2c_client_alloc();
++	ctx->client = atmel_i2c_client_alloc();
+ 	if (IS_ERR(ctx->client)) {
+ 		pr_err("tfm - i2c_client binding failed\n");
+ 		return PTR_ERR(ctx->client);
+@@ -264,7 +220,7 @@ static int atmel_ecdh_init_tfm(struct crypto_kpp *tfm)
+ 	if (IS_ERR(fallback)) {
+ 		dev_err(&ctx->client->dev, "Failed to allocate transformation for '%s': %ld\n",
+ 			alg, PTR_ERR(fallback));
+-		atmel_ecc_i2c_client_free(ctx->client);
++		atmel_i2c_client_free(ctx->client);
+ 		return PTR_ERR(fallback);
+ 	}
+ 
+@@ -280,7 +236,7 @@ static void atmel_ecdh_exit_tfm(struct crypto_kpp *tfm)
+ 
+ 	kfree(ctx->public_key);
+ 	crypto_free_kpp(ctx->fallback);
+-	atmel_ecc_i2c_client_free(ctx->client);
++	atmel_i2c_client_free(ctx->client);
+ }
+ 
+ static unsigned int atmel_ecdh_max_size(struct crypto_kpp *tfm)
+diff --git a/drivers/crypto/atmel-i2c.c b/drivers/crypto/atmel-i2c.c
+index cf3c57745414..e10713a7bcfe 100644
+--- a/drivers/crypto/atmel-i2c.c
++++ b/drivers/crypto/atmel-i2c.c
+@@ -57,6 +57,52 @@ static void atmel_i2c_checksum(struct atmel_i2c_cmd *cmd)
+ 	*__crc16 = cpu_to_le16(bitrev16(crc16(0, data, len)));
+ }
+ 
++struct i2c_client *atmel_i2c_client_alloc(void)
++{
++	struct atmel_i2c_client_priv *i2c_priv, *min_i2c_priv = NULL;
++	struct i2c_client *client = ERR_PTR(-ENODEV);
++	int min_tfm_cnt = INT_MAX;
++	int tfm_cnt;
++
++	spin_lock(&atmel_i2c_mgmt.i2c_list_lock);
++
++	if (list_empty(&atmel_i2c_mgmt.i2c_client_list)) {
++		spin_unlock(&atmel_i2c_mgmt.i2c_list_lock);
++		return ERR_PTR(-ENODEV);
++	}
++
++	list_for_each_entry(i2c_priv, &atmel_i2c_mgmt.i2c_client_list,
++			    i2c_client_list_node) {
++		if (!i2c_priv->ready)
++			continue;
++		tfm_cnt = atomic_read(&i2c_priv->tfm_count);
++		if (tfm_cnt < min_tfm_cnt) {
++			min_tfm_cnt = tfm_cnt;
++			min_i2c_priv = i2c_priv;
++		}
++		if (!min_tfm_cnt)
++			break;
++	}
++
++	if (min_i2c_priv) {
++		atomic_inc(&min_i2c_priv->tfm_count);
++		client = min_i2c_priv->client;
++	}
++
++	spin_unlock(&atmel_i2c_mgmt.i2c_list_lock);
++
++	return client;
++}
++EXPORT_SYMBOL_GPL(atmel_i2c_client_alloc);
++
++void atmel_i2c_client_free(struct i2c_client *client)
++{
++	struct atmel_i2c_client_priv *i2c_priv = i2c_get_clientdata(client);
++
++	atomic_dec(&i2c_priv->tfm_count);
++}
++EXPORT_SYMBOL_GPL(atmel_i2c_client_free);
++
+ void atmel_i2c_init_read_config_cmd(struct atmel_i2c_cmd *cmd)
+ {
+ 	cmd->word_addr = COMMAND;
 diff --git a/drivers/crypto/atmel-i2c.h b/drivers/crypto/atmel-i2c.h
-index d54bd836e0f5..351306c426aa 100644
+index 351306c426aa..6c2d86fd9068 100644
 --- a/drivers/crypto/atmel-i2c.h
 +++ b/drivers/crypto/atmel-i2c.h
-@@ -192,4 +192,7 @@ void atmel_i2c_init_genkey_cmd(struct atmel_i2c_cmd *cmd, u16 keyid);
+@@ -192,6 +192,9 @@ void atmel_i2c_init_genkey_cmd(struct atmel_i2c_cmd *cmd, u16 keyid);
  int atmel_i2c_init_ecdh_cmd(struct atmel_i2c_cmd *cmd,
  			    struct scatterlist *pubkey);
  
-+void atmel_i2c_deactivate_client(struct atmel_i2c_client_priv *i2c_priv);
-+void atmel_i2c_unregister_client(struct atmel_i2c_client_priv *i2c_priv);
++struct i2c_client *atmel_i2c_client_alloc(void);
++void atmel_i2c_client_free(struct i2c_client *client);
 +
- #endif /* __ATMEL_I2C_H__ */
+ void atmel_i2c_deactivate_client(struct atmel_i2c_client_priv *i2c_priv);
+ void atmel_i2c_unregister_client(struct atmel_i2c_client_priv *i2c_priv);
+ 
 -- 
 2.39.5
 
