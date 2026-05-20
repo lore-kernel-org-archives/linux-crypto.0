@@ -1,58 +1,57 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F41BD3769E3;
-	Wed, 20 May 2026 12:41:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66C5B3A3E9C
+	for <linux-crypto@vger.kernel.org>; Wed, 20 May 2026 12:51:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779280871; cv=none; b=gZT9ZJ/+DwVgY+f5s2ZmZOg+NNq0UdoNUGRy8Ct/tVpsaQ2DWdG6IANc+2OWlxGmPPDCB4XcT/b1apxTgZKAlPoCzpaD98ZKLfht5t3hlHmROcWkAqjZS1JNNAQ9Zji+H977wkE/dru2RTVQCecJc17in9XIWHnbc133RavT5x4=
+	t=1779281482; cv=none; b=ik8ulV4T2IG1jBwp3nhsdycGEP4N7z3nwsM0arrVhhNaknLb7RxB0ABMiG7X1dNv+AaxBzve6VsurFCsIwEaO/QFRYm4I/bMZeQ1HNUg4QYgkCZLIrdbKrg0jzqlByYGH6WBzI1N28kBmPbrwO735wV+p4x5/NevCSEjsxBb+fQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779280871; c=relaxed/simple;
-	bh=DfpZUfPP0pnKiTgbruLJF9GHY1iu8bn6TCxdc6bKbJ0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Lp9uHkCTzuRR3nCfdMxvFOjBMSkssg8qRpDTMzHdRm3aBfjMY06QrE+azrO6Di2QI4NQai5y5WyE6T2fUgNa83xTZCSkRY0aEtFPvx33uyeAa98m1JD1uWcLQ4aqwQ2qX2egzFPO94h9clbwKZhGhwackc7qUswA/0RaJicdTjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QOkxxxUM; arc=none smtp.client-ip=198.175.65.20
+	s=arc-20240116; t=1779281482; c=relaxed/simple;
+	bh=gvQqM9DBcBl9/abfK7dsONyOtiqZpiVyfor8CRVyjD8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bTsqLpWkKNO+1OcoStPhmpbzvGFItfW4+zKfuxdl6cj7SA2UwYtcZZPXJ21CZXsSUG5j8pfmQNYhKgMHad9pBDtLzOqbKFV3mYqPkDzVqJ6FoFAID2LRV/8YVlhQGZ0bFHXb3U8v5MVeE/HL9KqVO+rwTjOAVXtx/dfa+AdptV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cdMdN3Iq; arc=none smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QOkxxxUM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cdMdN3Iq"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1779280870; x=1810816870;
+  t=1779281481; x=1810817481;
   h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
-  bh=DfpZUfPP0pnKiTgbruLJF9GHY1iu8bn6TCxdc6bKbJ0=;
-  b=QOkxxxUMdLkcWh5bEaB+Jg1XKp+rIXzXkKjw8qmzJbsDiYurQqUjYtlb
-   6psFm8ppiVLE6Et824IroV9og4nTiKtiuGiLXBiGLDhDRKPQdmjty1Nf/
-   U7Z3sCPmRXU07DfgB4S2XsWDid9/EB9reM5OSNkfp6+IcI97mRScV15sy
-   fSsZPPSL/1O1H4Jtjk0rTt9Fck9tpR7wKZ2CJrMsEZ0svJxjUJ66dUbax
-   ZaNZDXICWf1Yjrcgp0rnymy9KQBbvTsTgCiaPQVD5LGhOu3CVo8iqWjVB
-   DR6usuDPJrtmcNeD7GO+RbKCCVHMDt2GCSbjB8OkO7aH3zE/h9R3thF/8
-   Q==;
-X-CSE-ConnectionGUID: gSwQyHWKTH+OZp13+ZEJDQ==
-X-CSE-MsgGUID: XO61s6m4QJmdEcXtYxv9XQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11791"; a="79904049"
+  bh=gvQqM9DBcBl9/abfK7dsONyOtiqZpiVyfor8CRVyjD8=;
+  b=cdMdN3IqzjiZ2bqxpwaBVvyVpfy99YgwPGzDIq+kNwyknaKGeVAUOZBb
+   lcAKPY44Q0ASyqJRcMlaiOihV6MZSxtIDkMPanBQW1hlaSLbfUpKifDqC
+   vWbxTnvDViaIp21i5vFIwjbK3xgjnEmgGrX8g4vVZGNVKLz3d1vDXQzTM
+   JSBE/YlnfnvBWu5jihVKdWRjfYb6rryAPlvz0AD1vvAcXEjQT2QH85nIg
+   Wrx6IlMs/+ZzYrs34g1FHy4HcPu0xJcCLxWmEw/YWf0WzDiuxAuHnZuT3
+   nUYa7EUIruTJtV5wKtkYuZS/wPrFj02Qve+q5btzpKLQG5nQhXuUUFPL9
+   w==;
+X-CSE-ConnectionGUID: fph/iULqRk6B4aXHWl9WXA==
+X-CSE-MsgGUID: PY9CQousQ8Wpi7R4foAO0A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11792"; a="80159033"
 X-IronPort-AV: E=Sophos;i="6.23,244,1770624000"; 
-   d="scan'208";a="79904049"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2026 05:41:10 -0700
-X-CSE-ConnectionGUID: akIyfa3tQC+8XzrAljPgJw==
-X-CSE-MsgGUID: Ax2i6tYtTxCXVNRKunXzQw==
+   d="scan'208";a="80159033"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2026 05:51:20 -0700
+X-CSE-ConnectionGUID: yqXA+nPBSR28YNnPF5j29A==
+X-CSE-MsgGUID: dcAuS8e3SV+IYUBUduGunw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.23,244,1770624000"; 
-   d="scan'208";a="244158332"
+   d="scan'208";a="278267604"
 Received: from silpixa00401812.ir.intel.com ([10.20.226.90])
-  by orviesa003.jf.intel.com with ESMTP; 20 May 2026 05:41:08 -0700
+  by orviesa001.jf.intel.com with ESMTP; 20 May 2026 05:51:18 -0700
 From: Ahsan Atta <ahsan.atta@intel.com>
 To: herbert@gondor.apana.org.au
 Cc: linux-crypto@vger.kernel.org,
 	qat-linux@intel.com,
 	Ahsan Atta <ahsan.atta@intel.com>,
-	stable@vger.kernel.org,
-	Maksim Lukoshkov <maksim.lukoshkov@intel.com>,
+	Andy Shevchenko <andriy.shevchenko@intel.com>,
 	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH] crypto: qat - protect service table iterations with service_lock
-Date: Wed, 20 May 2026 13:41:55 +0100
-Message-ID: <20260520124155.211119-1-ahsan.atta@intel.com>
+Subject: [PATCH] crypto: qat - use pci logging variants for PCI-specific messages
+Date: Wed, 20 May 2026 13:51:50 +0100
+Message-ID: <20260520125150.211802-1-ahsan.atta@intel.com>
 X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -64,153 +63,302 @@ Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Co
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 
-The service_table list is protected by service_lock when entries are
-added or removed (in adf_service_add() and adf_service_remove()), but
-several functions iterate over the list without holding this lock.
+Replace dev_err(&pdev->dev, ...), dev_info(&pdev->dev, ...) and
+dev_dbg(&pdev->dev, ...) with pci_err(), pci_info() and pci_dbg()
+where the log message relates to a PCI subsystem operation such as
+device enable, BAR mapping, PCI region requests, PCI state
+save/restore, and SR-IOV management.
 
-A concurrent adf_service_register() or adf_service_unregister() call
-could modify the list during traversal, leading to list corruption or
-a use-after-free.
+Messages about driver-level logic (NUMA topology, device matching,
+accelerator units, capabilities, configuration, DMA) are intentionally
+left as dev_err() even when a struct pci_dev pointer is in scope,
+since those concern the device or driver rather than the PCI bus.
 
-Fix this by holding service_lock across all list_for_each_entry()
-iterations of service_table in adf_dev_init(), adf_dev_start(),
-adf_dev_stop(), adf_dev_shutdown(), adf_dev_restarting_notify(),
-adf_dev_restarted_notify(), and adf_error_notifier().
+No functional change.
 
-The lock ordering is safe: callers of the static helpers (adf_dev_up()
-and adf_dev_down()) acquire state_lock before service_lock, and no
-event_hld callback or service_lock holder ever acquires state_lock in
-the reverse order.
-
-Cc: stable@vger.kernel.org
-Fixes: d8cba25d2c68 ("crypto: qat - Intel(R) QAT driver framework")
+Suggested-by: Andy Shevchenko <andriy.shevchenko@intel.com>
 Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
-Co-developed-by: Maksim Lukoshkov <maksim.lukoshkov@intel.com>
-Signed-off-by: Maksim Lukoshkov <maksim.lukoshkov@intel.com>
 Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@intel.com>
 ---
- drivers/crypto/intel/qat/qat_common/adf_init.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ drivers/crypto/intel/qat/qat_420xx/adf_drv.c  |  8 +++----
+ drivers/crypto/intel/qat/qat_4xxx/adf_drv.c   |  8 +++----
+ drivers/crypto/intel/qat/qat_c3xxx/adf_drv.c  |  4 ++--
+ .../crypto/intel/qat/qat_c3xxxvf/adf_drv.c    |  2 +-
+ drivers/crypto/intel/qat/qat_c62x/adf_drv.c   |  4 ++--
+ drivers/crypto/intel/qat/qat_c62xvf/adf_drv.c |  2 +-
+ drivers/crypto/intel/qat/qat_common/adf_aer.c | 21 +++++++++----------
+ .../crypto/intel/qat/qat_common/adf_sriov.c   |  2 +-
+ .../crypto/intel/qat/qat_dh895xcc/adf_drv.c   |  4 ++--
+ .../crypto/intel/qat/qat_dh895xccvf/adf_drv.c |  2 +-
+ 10 files changed, 28 insertions(+), 29 deletions(-)
 
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_init.c b/drivers/crypto/intel/qat/qat_common/adf_init.c
-index f9f5696ed476..1c7f9e49914d 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_init.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_init.c
-@@ -155,15 +155,18 @@ static int adf_dev_init(struct adf_accel_dev *accel_dev)
- 	 * This is to facilitate any ordering dependencies between services
- 	 * prior to starting any of the accelerators.
- 	 */
-+	mutex_lock(&service_lock);
- 	list_for_each_entry(service, &service_table, list) {
- 		if (service->event_hld(accel_dev, ADF_EVENT_INIT)) {
- 			dev_err(&GET_DEV(accel_dev),
- 				"Failed to initialise service %s\n",
- 				service->name);
-+			mutex_unlock(&service_lock);
- 			return -EFAULT;
- 		}
- 		set_bit(accel_dev->accel_id, service->init_status);
+diff --git a/drivers/crypto/intel/qat/qat_420xx/adf_drv.c b/drivers/crypto/intel/qat/qat_420xx/adf_drv.c
+index 265bd52778c5..0f0827e2b0bd 100644
+--- a/drivers/crypto/intel/qat/qat_420xx/adf_drv.c
++++ b/drivers/crypto/intel/qat/qat_420xx/adf_drv.c
+@@ -101,7 +101,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	/* Enable PCI device */
+ 	ret = pcim_enable_device(pdev);
+ 	if (ret) {
+-		dev_err(&pdev->dev, "Can't enable PCI device.\n");
++		pci_err(pdev, "Can't enable PCI device.\n");
+ 		goto out_err;
  	}
-+	mutex_unlock(&service_lock);
  
- 	return 0;
- }
-@@ -233,15 +236,18 @@ static int adf_dev_start(struct adf_accel_dev *accel_dev)
- 	if (ret && ret != -EOPNOTSUPP)
- 		return ret;
+@@ -131,7 +131,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
  
-+	mutex_lock(&service_lock);
- 	list_for_each_entry(service, &service_table, list) {
- 		if (service->event_hld(accel_dev, ADF_EVENT_START)) {
- 			dev_err(&GET_DEV(accel_dev),
- 				"Failed to start service %s\n",
- 				service->name);
-+			mutex_unlock(&service_lock);
- 			return -EFAULT;
- 		}
- 		set_bit(accel_dev->accel_id, service->start_status);
+ 	ret = pcim_request_all_regions(pdev, pci_name(pdev));
+ 	if (ret) {
+-		dev_err(&pdev->dev, "Failed to request PCI regions.\n");
++		pci_err(pdev, "Failed to request PCI regions.\n");
+ 		goto out_err;
  	}
-+	mutex_unlock(&service_lock);
  
- 	clear_bit(ADF_STATUS_STARTING, &accel_dev->status);
- 	set_bit(ADF_STATUS_STARTED, &accel_dev->status);
-@@ -315,6 +321,7 @@ static void adf_dev_stop(struct adf_accel_dev *accel_dev)
- 		qat_comp_algs_unregister(hw_data->accel_capabilities_ext_mask);
- 	clear_bit(ADF_STATUS_COMP_ALGS_REGISTERED, &accel_dev->status);
- 
-+	mutex_lock(&service_lock);
- 	list_for_each_entry(service, &service_table, list) {
- 		if (!test_bit(accel_dev->accel_id, service->start_status))
- 			continue;
-@@ -326,6 +333,7 @@ static void adf_dev_stop(struct adf_accel_dev *accel_dev)
- 			clear_bit(accel_dev->accel_id, service->start_status);
+@@ -140,14 +140,14 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		bar = &accel_pci_dev->pci_bars[i++];
+ 		bar->virt_addr = pcim_iomap(pdev, bar_nr, 0);
+ 		if (!bar->virt_addr) {
+-			dev_err(&pdev->dev, "Failed to ioremap PCI region.\n");
++			pci_err(pdev, "Failed to ioremap PCI region.\n");
+ 			ret = -ENOMEM;
+ 			goto out_err;
  		}
  	}
-+	mutex_unlock(&service_lock);
  
- 	if (hw_data->stop_timer)
- 		hw_data->stop_timer(accel_dev);
-@@ -375,6 +383,7 @@ static void adf_dev_shutdown(struct adf_accel_dev *accel_dev)
- 				  &accel_dev->status);
+ 	if (pci_save_state(pdev)) {
+-		dev_err(&pdev->dev, "Failed to save pci state.\n");
++		pci_err(pdev, "Failed to save pci state.\n");
+ 		ret = -ENOMEM;
+ 		goto out_err;
+ 	}
+diff --git a/drivers/crypto/intel/qat/qat_4xxx/adf_drv.c b/drivers/crypto/intel/qat/qat_4xxx/adf_drv.c
+index 681c4dd8f3d2..aa95f762cb4b 100644
+--- a/drivers/crypto/intel/qat/qat_4xxx/adf_drv.c
++++ b/drivers/crypto/intel/qat/qat_4xxx/adf_drv.c
+@@ -103,7 +103,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	/* Enable PCI device */
+ 	ret = pcim_enable_device(pdev);
+ 	if (ret) {
+-		dev_err(&pdev->dev, "Can't enable PCI device.\n");
++		pci_err(pdev, "Can't enable PCI device.\n");
+ 		goto out_err;
  	}
  
-+	mutex_lock(&service_lock);
- 	list_for_each_entry(service, &service_table, list) {
- 		if (!test_bit(accel_dev->accel_id, service->init_status))
- 			continue;
-@@ -385,6 +394,7 @@ static void adf_dev_shutdown(struct adf_accel_dev *accel_dev)
- 		else
- 			clear_bit(accel_dev->accel_id, service->init_status);
+@@ -133,7 +133,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 
+ 	ret = pcim_request_all_regions(pdev, pci_name(pdev));
+ 	if (ret) {
+-		dev_err(&pdev->dev, "Failed to request PCI regions.\n");
++		pci_err(pdev, "Failed to request PCI regions.\n");
+ 		goto out_err;
  	}
-+	mutex_unlock(&service_lock);
  
- 	adf_rl_exit(accel_dev);
+@@ -142,14 +142,14 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		bar = &accel_pci_dev->pci_bars[i++];
+ 		bar->virt_addr = pcim_iomap(pdev, bar_nr, 0);
+ 		if (!bar->virt_addr) {
+-			dev_err(&pdev->dev, "Failed to ioremap PCI region.\n");
++			pci_err(pdev, "Failed to ioremap PCI region.\n");
+ 			ret = -ENOMEM;
+ 			goto out_err;
+ 		}
+ 	}
  
-@@ -419,12 +429,14 @@ int adf_dev_restarting_notify(struct adf_accel_dev *accel_dev)
+ 	if (pci_save_state(pdev)) {
+-		dev_err(&pdev->dev, "Failed to save pci state.\n");
++		pci_err(pdev, "Failed to save pci state.\n");
+ 		ret = -ENOMEM;
+ 		goto out_err;
+ 	}
+diff --git a/drivers/crypto/intel/qat/qat_c3xxx/adf_drv.c b/drivers/crypto/intel/qat/qat_c3xxx/adf_drv.c
+index ded52744b4fc..e816cc00632f 100644
+--- a/drivers/crypto/intel/qat/qat_c3xxx/adf_drv.c
++++ b/drivers/crypto/intel/qat/qat_c3xxx/adf_drv.c
+@@ -162,14 +162,14 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		bar->size = pci_resource_len(pdev, bar_nr);
+ 		bar->virt_addr = pci_iomap(accel_pci_dev->pci_dev, bar_nr, 0);
+ 		if (!bar->virt_addr) {
+-			dev_err(&pdev->dev, "Failed to map BAR %d\n", bar_nr);
++			pci_err(pdev, "Failed to map BAR %d\n", bar_nr);
+ 			ret = -EFAULT;
+ 			goto out_err_free_reg;
+ 		}
+ 	}
+ 
+ 	if (pci_save_state(pdev)) {
+-		dev_err(&pdev->dev, "Failed to save pci state\n");
++		pci_err(pdev, "Failed to save pci state\n");
+ 		ret = -ENOMEM;
+ 		goto out_err_free_reg;
+ 	}
+diff --git a/drivers/crypto/intel/qat/qat_c3xxxvf/adf_drv.c b/drivers/crypto/intel/qat/qat_c3xxxvf/adf_drv.c
+index e7600d284ed3..1c77f0a1882b 100644
+--- a/drivers/crypto/intel/qat/qat_c3xxxvf/adf_drv.c
++++ b/drivers/crypto/intel/qat/qat_c3xxxvf/adf_drv.c
+@@ -158,7 +158,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		bar->size = pci_resource_len(pdev, bar_nr);
+ 		bar->virt_addr = pci_iomap(accel_pci_dev->pci_dev, bar_nr, 0);
+ 		if (!bar->virt_addr) {
+-			dev_err(&pdev->dev, "Failed to map BAR %d\n", bar_nr);
++			pci_err(pdev, "Failed to map BAR %d\n", bar_nr);
+ 			ret = -EFAULT;
+ 			goto out_err_free_reg;
+ 		}
+diff --git a/drivers/crypto/intel/qat/qat_c62x/adf_drv.c b/drivers/crypto/intel/qat/qat_c62x/adf_drv.c
+index 2ebff5855b01..f48f3b437545 100644
+--- a/drivers/crypto/intel/qat/qat_c62x/adf_drv.c
++++ b/drivers/crypto/intel/qat/qat_c62x/adf_drv.c
+@@ -162,14 +162,14 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		bar->size = pci_resource_len(pdev, bar_nr);
+ 		bar->virt_addr = pci_iomap(accel_pci_dev->pci_dev, bar_nr, 0);
+ 		if (!bar->virt_addr) {
+-			dev_err(&pdev->dev, "Failed to map BAR %d\n", bar_nr);
++			pci_err(pdev, "Failed to map BAR %d\n", bar_nr);
+ 			ret = -EFAULT;
+ 			goto out_err_free_reg;
+ 		}
+ 	}
+ 
+ 	if (pci_save_state(pdev)) {
+-		dev_err(&pdev->dev, "Failed to save pci state\n");
++		pci_err(pdev, "Failed to save pci state\n");
+ 		ret = -ENOMEM;
+ 		goto out_err_free_reg;
+ 	}
+diff --git a/drivers/crypto/intel/qat/qat_c62xvf/adf_drv.c b/drivers/crypto/intel/qat/qat_c62xvf/adf_drv.c
+index 91e148bb4870..b96f19e31d05 100644
+--- a/drivers/crypto/intel/qat/qat_c62xvf/adf_drv.c
++++ b/drivers/crypto/intel/qat/qat_c62xvf/adf_drv.c
+@@ -158,7 +158,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		bar->size = pci_resource_len(pdev, bar_nr);
+ 		bar->virt_addr = pci_iomap(accel_pci_dev->pci_dev, bar_nr, 0);
+ 		if (!bar->virt_addr) {
+-			dev_err(&pdev->dev, "Failed to map BAR %d\n", bar_nr);
++			pci_err(pdev, "Failed to map BAR %d\n", bar_nr);
+ 			ret = -EFAULT;
+ 			goto out_err_free_reg;
+ 		}
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_aer.c b/drivers/crypto/intel/qat/qat_common/adf_aer.c
+index 3fc7d13e882c..d58cd7fbf707 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_aer.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_aer.c
+@@ -22,7 +22,7 @@ static pci_ers_result_t reset_prepare(struct pci_dev *pdev)
+ 	struct adf_accel_dev *accel_dev = adf_devmgr_pci_to_accel_dev(pdev);
+ 
+ 	if (!accel_dev) {
+-		dev_err(&pdev->dev, "Can't find acceleration device\n");
++		pci_err(pdev, "Can't find acceleration device\n");
+ 		return PCI_ERS_RESULT_DISCONNECT;
+ 	}
+ 
+@@ -46,7 +46,7 @@ static pci_ers_result_t reset_done(struct pci_dev *pdev)
+ 	int res;
+ 
+ 	if (!accel_dev) {
+-		dev_err(&pdev->dev, "Can't find acceleration device\n");
++		pci_err(pdev, "Can't find acceleration device\n");
+ 		return PCI_ERS_RESULT_DISCONNECT;
+ 	}
+ 
+@@ -64,7 +64,7 @@ static pci_ers_result_t reset_done(struct pci_dev *pdev)
+ 	clear_bit(ADF_STATUS_RESTARTING, &accel_dev->status);
+ 
+ reset_complete:
+-	dev_info(&pdev->dev, "Device reset completed successfully\n");
++	pci_info(pdev, "Device reset completed successfully\n");
+ 
+ 	return PCI_ERS_RESULT_RECOVERED;
+ }
+@@ -74,14 +74,14 @@ static pci_ers_result_t adf_error_detected(struct pci_dev *pdev,
  {
- 	struct service_hndl *service;
+ 	struct adf_accel_dev *accel_dev = adf_devmgr_pci_to_accel_dev(pdev);
  
-+	mutex_lock(&service_lock);
- 	list_for_each_entry(service, &service_table, list) {
- 		if (service->event_hld(accel_dev, ADF_EVENT_RESTARTING))
- 			dev_err(&GET_DEV(accel_dev),
- 				"Failed to restart service %s.\n",
- 				service->name);
+-	dev_info(&pdev->dev, "Acceleration driver hardware error detected.\n");
++	pci_info(pdev, "Acceleration driver hardware error detected.\n");
+ 	if (!accel_dev) {
+-		dev_err(&pdev->dev, "Can't find acceleration device\n");
++		pci_err(pdev, "Can't find acceleration device\n");
+ 		return PCI_ERS_RESULT_DISCONNECT;
  	}
-+	mutex_unlock(&service_lock);
- 	return 0;
+ 
+ 	if (state == pci_channel_io_perm_failure) {
+-		dev_err(&pdev->dev, "Can't recover from device error\n");
++		pci_err(pdev, "Can't recover from device error\n");
+ 		return PCI_ERS_RESULT_DISCONNECT;
+ 	}
+ 
+@@ -116,10 +116,9 @@ void adf_reset_sbr(struct adf_accel_dev *accel_dev)
+ 		parent = pdev;
+ 
+ 	if (!pci_wait_for_pending_transaction(pdev))
+-		dev_info(&GET_DEV(accel_dev),
+-			 "Transaction still in progress. Proceeding\n");
++		pci_info(pdev, "Transaction still in progress. Proceeding\n");
+ 
+-	dev_info(&GET_DEV(accel_dev), "Secondary bus reset\n");
++	pci_info(pdev, "Secondary bus reset\n");
+ 
+ 	pci_read_config_word(parent, PCI_BRIDGE_CONTROL, &bridge_ctl);
+ 	bridge_ctl |= PCI_BRIDGE_CTL_BUS_RESET;
+@@ -247,8 +246,8 @@ static pci_ers_result_t adf_slot_reset(struct pci_dev *pdev)
+ 
+ static void adf_resume(struct pci_dev *pdev)
+ {
+-	dev_info(&pdev->dev, "Acceleration driver reset completed\n");
+-	dev_info(&pdev->dev, "Device is up and running\n");
++	pci_info(pdev, "Acceleration driver reset completed\n");
++	pci_info(pdev, "Device is up and running\n");
  }
  
-@@ -432,12 +444,14 @@ int adf_dev_restarted_notify(struct adf_accel_dev *accel_dev)
- {
- 	struct service_hndl *service;
+ static void adf_reset_prepare(struct pci_dev *pdev)
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_sriov.c b/drivers/crypto/intel/qat/qat_common/adf_sriov.c
+index f2011300a929..f45ca2eecc00 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_sriov.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_sriov.c
+@@ -240,7 +240,7 @@ void adf_reenable_sriov(struct adf_accel_dev *accel_dev)
+ 	if (adf_add_sriov_configuration(accel_dev))
+ 		return;
  
-+	mutex_lock(&service_lock);
- 	list_for_each_entry(service, &service_table, list) {
- 		if (service->event_hld(accel_dev, ADF_EVENT_RESTARTED))
- 			dev_err(&GET_DEV(accel_dev),
- 				"Failed to restart service %s.\n",
- 				service->name);
- 	}
-+	mutex_unlock(&service_lock);
- 	return 0;
+-	dev_dbg(&pdev->dev, "Re-enabling SRIOV\n");
++	pci_dbg(pdev, "Re-enabling SRIOV\n");
+ 	adf_enable_sriov(accel_dev);
  }
  
-@@ -445,12 +459,14 @@ void adf_error_notifier(struct adf_accel_dev *accel_dev)
- {
- 	struct service_hndl *service;
- 
-+	mutex_lock(&service_lock);
- 	list_for_each_entry(service, &service_table, list) {
- 		if (service->event_hld(accel_dev, ADF_EVENT_FATAL_ERROR))
- 			dev_err(&GET_DEV(accel_dev),
- 				"Failed to send error event to %s.\n",
- 				service->name);
+diff --git a/drivers/crypto/intel/qat/qat_dh895xcc/adf_drv.c b/drivers/crypto/intel/qat/qat_dh895xcc/adf_drv.c
+index 97ad53eef38f..571f302edea3 100644
+--- a/drivers/crypto/intel/qat/qat_dh895xcc/adf_drv.c
++++ b/drivers/crypto/intel/qat/qat_dh895xcc/adf_drv.c
+@@ -162,14 +162,14 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		bar->size = pci_resource_len(pdev, bar_nr);
+ 		bar->virt_addr = pci_iomap(accel_pci_dev->pci_dev, bar_nr, 0);
+ 		if (!bar->virt_addr) {
+-			dev_err(&pdev->dev, "Failed to map BAR %d\n", bar_nr);
++			pci_err(pdev, "Failed to map BAR %d\n", bar_nr);
+ 			ret = -EFAULT;
+ 			goto out_err_free_reg;
+ 		}
  	}
-+	mutex_unlock(&service_lock);
- }
  
- int adf_dev_down(struct adf_accel_dev *accel_dev)
+ 	if (pci_save_state(pdev)) {
+-		dev_err(&pdev->dev, "Failed to save pci state\n");
++		pci_err(pdev, "Failed to save pci state\n");
+ 		ret = -ENOMEM;
+ 		goto out_err_free_reg;
+ 	}
+diff --git a/drivers/crypto/intel/qat/qat_dh895xccvf/adf_drv.c b/drivers/crypto/intel/qat/qat_dh895xccvf/adf_drv.c
+index a5edda8bad32..481551a08708 100644
+--- a/drivers/crypto/intel/qat/qat_dh895xccvf/adf_drv.c
++++ b/drivers/crypto/intel/qat/qat_dh895xccvf/adf_drv.c
+@@ -158,7 +158,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		bar->size = pci_resource_len(pdev, bar_nr);
+ 		bar->virt_addr = pci_iomap(accel_pci_dev->pci_dev, bar_nr, 0);
+ 		if (!bar->virt_addr) {
+-			dev_err(&pdev->dev, "Failed to map BAR %d\n", bar_nr);
++			pci_err(pdev, "Failed to map BAR %d\n", bar_nr);
+ 			ret = -EFAULT;
+ 			goto out_err_free_reg;
+ 		}
 -- 
 2.50.1
 
