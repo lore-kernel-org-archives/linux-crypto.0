@@ -1,183 +1,159 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119B33F1656
-	for <linux-crypto@vger.kernel.org>; Wed, 20 May 2026 15:25:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CA84331A48
+	for <linux-crypto@vger.kernel.org>; Wed, 20 May 2026 15:57:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779290742; cv=none; b=qRZfWiwB/dVg1utqmR2X1jjQWUBvRFpymX0dJ9Gtz2eAEgAzSoEa1+J5uA2M/xtjbfjL5dgc9WluTz7fu17H8HtMqzimKLxTmOCXK16O383RiPe+2qJwv9zp0x3UFcYdhTX8isgsHGiT+sb5kPjQMlP3Wf/tCrmBehw3p8FZf/g=
+	t=1779292632; cv=none; b=WbC2DPULVCgJyMq77m04Sng8PaFEm1nDVjlCRZGbCKpFyjmvngNd+Ntujyb4II01hNg4QlT0W67KABRtmndaQq06CO5QzVeDAVhKfnIDSfmXhcACCcrCCQlACuHGyfyVi1IjHleAyIFZzdbuTpIzuu7OGG0Ambeuoqjrze3QeNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779290742; c=relaxed/simple;
-	bh=30Ta3GeDyzeEDqzMXk9IkXAG48BD9LjaC/vjrDze5ng=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BVqCEv7xPaY6vEziDfUJOF05HqSA/0oB8plBbf8jlEoJW3D1eCnGdrcApJjxy6qkoXWIZdVdBbzTVymXPsZAkpKGo3zXBjMX0BUip/iPeTPYluuQ3C2Y9DoSDooS1Y42hOU/FbobnB9++2n3gbCBEwrr5ur1LI1A5ksCisArjuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b=YwPkrOcx; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+	s=arc-20240116; t=1779292632; c=relaxed/simple;
+	bh=MDuCqjxEvtSz1a5joUgErWDDffdjqGelBHkZFN1Bm+g=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Xkeben1zxHonuIjEInC5OosCofw96cbOf1ZEztGpaTPJ7zH2vSEWPQSjv2berRix0jQnUNR22UGqzOsRGduXzNG7gYslG5+vi/C8kISiM9dKRMCY2UGb5ZyNwZkZ7Wv8SGtEBLVUvX7RneIDufN389TjctPSRNboEURtXcNjV5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DhhJy7Y0; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b="YwPkrOcx"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-48e8132c6d0so33529425e9.1
-        for <linux-crypto@vger.kernel.org>; Wed, 20 May 2026 08:25:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DhhJy7Y0"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-488ac04e13dso4569435e9.1
+        for <linux-crypto@vger.kernel.org>; Wed, 20 May 2026 08:57:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre.com; s=google; t=1779290737; x=1779895537; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oFavJwHYbSM6FE0lfLUET7tWipL+OnMgDcLdxX5CbdE=;
-        b=YwPkrOcxSTiT7kLP2njirVpm9YCzM+z0EmMkbpjdX/AmxUy0GfmXwMf4Qu1i3f/p6H
-         sUdhOLBNxwxr56Cvd6x4/lAPPlzS8qoIGsXGAZ6ogVLIQhEeEnsKaXvN6n4pY0N2EcMn
-         NkamzI0dYGOunJ8Xf/Ws35G67fCBc1D7SPNgrAhjmp65RnMMNzmDHnvczjJxjjORj33+
-         DlNTE9uft0dlMoQGCiIHxqtVlMdiSoMDSqZRILuF7kk5PHBHBF2MKyuqjWHIK9Lv9E6F
-         j+9rQ0x1fPvAtKY2h6YaTgEby2JJ0bTjc9boK/qh5M+dAq9Ph/8tsM3n++ldTHZvjoWQ
-         0Nkw==
+        d=gmail.com; s=20251104; t=1779292628; x=1779897428; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=sTdz/Q/V1ezxHBxxkTwCW/MFW2KhgBZJoQk8ObwQ99w=;
+        b=DhhJy7Y0nZbyms4mNdOmbgN6msrgmcKH2UpqRLmuXFrnjvgKaeyCc8+K9muED5Tm1z
+         CgIeyhuGq0GQ3nwDxn4Fiu0dVSQgim7SX9/0QSzO6oN4Lbh3Np01KpsxdfJxBwuWK0xu
+         CDzwASBkqj5U9DzlaO4peY4DHPAl6swcHXGbEsapxnMOsxj814Qay+KMKpjBv25h31mC
+         fj8gl6oN1q94AfbrT1WhhFEa1ajoC3nPqoex7R7KwDnVphK1NiY76I6ZaBvs3T75H/kD
+         K1Ho5+clrrGlhxV1UTEniV+AkixnT3EJ+U9EEJ/vuMMU1td4Mxeh7RiXdY98X1Ioc4wO
+         10tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779290737; x=1779895537;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oFavJwHYbSM6FE0lfLUET7tWipL+OnMgDcLdxX5CbdE=;
-        b=NsxKlzYdh5CdQhUDJLV9VhcpjzyEMcmYRO1za1L4WzwlL7ukhb8mRvWclzoBZstoXQ
-         V8cmlFPNb6yuqSXIvillsVCa8ZsbCJY+bPlXRxXhKMyx+ntTf0bZW8ajDTrey3Fi35TD
-         eA0H+c0xlyVUu1s/Hx59Wx3UYHV9Ex9CdE4HcOm7exst35m2nOZDskKaBa3RflSiX3xH
-         6rj+7QHuNRFWZrVHwchP1nJjotXzIHkQ9WUYIfwOuVTaeqYzDWWJUroY2TqfVXawPZCS
-         hSRjbeUdK911/iGc4rOgGls4MPylxYmwogjb8/wpg1bhAHFsPpmL1Or7j1NZZ1yeRMIP
-         FO8Q==
-X-Forwarded-Encrypted: i=1; AFNElJ8ynAnJVDic2woDzSEGWOiofryukhNIxst+ifxZmlE8oEGHEg9AUq58WJTYRH2NuC3N8UxgHlE318x5ocU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzr1Z5GKbHAKy35rjVmQ/tQIvY85FYhtyy41jU42TwCn1keOrT0
-	DhyFypXaSvv/3ik9y8/GLlO/+SwvzKgR92WaN3x6a43tCJNa/oxyM1xHyymhHk1UK11KjkuTNiQ
-	TXDegqMvpvQ==
-X-Gm-Gg: Acq92OG1uTBwigvQzatkvt78HFnXau4xDzsV9uNjWb+Zy65n2y1yKka/cTFf6Y/sSuK
-	fPCRwDOmIYZhI0X2A5b5Dq/ERt97jFNyZkIiTLx+2lepBx2VPepLijCKHkOFm2R8JPsF+B0PAFt
-	Cth7FsI+LfQgoM+F9Ib6aK8u+ubCgVHsi+7xFfShPyKjQX1zOBnoyBYwypXPPy/7pwJw5HHiktk
-	09O8/C3gSt66Y7ZGtCq3xsxegwbwER7mqSLCClhR+CZUGv9CYt4QS1XigwZZGMbVBuawQLA5B+x
-	aUQUkqIA0qpcTuMl5SwH5br08tA4fc8t5PcUxCq1KwJHmsUtwvivTSZooM7LUFdZO0XFBuGMl5l
-	N5S1lGd3CHgnCx7hVszcMoQXV6Bq3e3c3GqfmnXrskNokpcpdqGkO7GLXU8XHd9co8ax/mhXjvM
-	44dMSrmCxAd81drZwrac/gRex9k8B2kFaxhUmnpFRLYYS7y4cZao2ysncso4r3lKT1MkoH/6BXk
-	HfH4KLtJg2rNJB3qyEkEJVpSQ==
-X-Received: by 2002:a05:600c:4e13:b0:490:31e:d6fd with SMTP id 5b1f17b1804b1-490031ed899mr279492645e9.25.1779290737373;
-        Wed, 20 May 2026 08:25:37 -0700 (PDT)
-Received: from localhost (p200300f65f47db04e561655f2aa05c7f.dip0.t-ipconnect.de. [2003:f6:5f47:db04:e561:655f:2aa0:5c7f])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-48fffb9aac4sm544034675e9.9.2026.05.20.08.25.36
+        d=1e100.net; s=20251104; t=1779292628; x=1779897428;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sTdz/Q/V1ezxHBxxkTwCW/MFW2KhgBZJoQk8ObwQ99w=;
+        b=b/ZkErcmJ8JxBUaOZeZoD1fyxjfIF7/ANU2iz58Z9RBkqJpzIXjUr0Ol27sUKKy6hB
+         Ig9p70zzUSMFGt8pnN8GxP8TEGVzLwTNroYHl9PmzGHCSDp9jjBljU/zJ1PH86yNAzGB
+         wt6LbpyS/JvEki3Ra4e0RhRd1Spa1qkraiRva5dEjdER60kmr3Zb/8WRjS5AJBcRdpJA
+         kcMrGkVj5tKFP98D6qcL+E0mw7689FrF0Ex/cAAhUnrYnNjMW3h2pXL/Dzm8JXgZOmhy
+         gcSicliKYVPPeGceG9+48tLmvXg1Fj5uJuEJqUVGn28M136+4FZ1PsGUdBIHHxATSMrX
+         oAJQ==
+X-Gm-Message-State: AOJu0Yz75EfAqyMCfJOrk4m4gbH67dO1i1A8kpo500FhUes9Chb+wCXE
+	EWvF1p0gcEcrM5GZ9Ppo4lzUhcT7vCsDlK2/jeO4+GBeUNPXH9qDJ4vl
+X-Gm-Gg: Acq92OEysjDgNnIbHsSjitTqVEcbEwsyVfF2FmKUJ6Xf2A55+X4a0oQHGrjvf2jPvH3
+	PU3ziTYSCQe0Jfv3jnOzSNqJC77wuox2I8vqXd/IdemDCCdkHyJrm2hBq/LO8DjMmPGXPqP0o0o
+	Owf8ox7iee8Ixi0SCDbfgxmUc4OLGw6pftI5tTmaiSuBLQ/t/TtM+0qnmTZNE4tERj/mm8ZYgqf
+	NOGivLqg4REoMMguUF3sbI9GV1IfISx+Gc3/5wPFcdC0sJtZPvGABfkyflc4tp36isw3zUEqumd
+	UciieT5f7Hzj8hMk9msBqnUNDy4RnRPQr3PWajyXyuzH4seB4kzvm05z7L4X1BcTXb169bI7obr
+	sJHKkq49PAIXcSlQn0H0XmJGoiifhX2KyTlJz/wdhOdQX6GTKlkzTHSC6SLVq1US7XFx/Ov5wH6
+	tzKRckwiE/dBte4IXqmYKXkCxAcWr9NjcV6tW9taMcb9N40CNxlyODlJmvqjvZHqw=
+X-Received: by 2002:a05:600c:4f8f:b0:486:f634:f2e with SMTP id 5b1f17b1804b1-48fe66423e1mr168095645e9.4.1779292628000;
+        Wed, 20 May 2026 08:57:08 -0700 (PDT)
+Received: from menon.v.cablecom.net (84-74-0-139.dclient.hispeed.ch. [84.74.0.139])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-48febe79ce3sm137216715e9.31.2026.05.20.08.57.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 May 2026 08:25:36 -0700 (PDT)
-Date: Wed, 20 May 2026 17:25:35 +0200
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig_=28The_Capable_Hub=29?= <u.kleine-koenig@baylibre.com>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Nicolas Ferre <nicolas.ferre@microchip.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>, linux-crypto@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/3] crypto: atmel-sha204a - Drop of_device_id data
-Message-ID: <ag3RTQEC_HyUM3K4@monoceros>
-References: <cover.1779260113.git.u.kleine-koenig@baylibre.com>
- <d0fc3069860f9e31122c1af635a1114dd2c443cf.1779260113.git.u.kleine-koenig@baylibre.com>
- <46130020-eaa5-44ad-9c6d-62ccb30c19d9@app.fastmail.com>
+        Wed, 20 May 2026 08:57:06 -0700 (PDT)
+From: Lothar Rubusch <l.rubusch@gmail.com>
+To: thorsten.blum@linux.dev,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	nicolas.ferre@microchip.com,
+	alexandre.belloni@bootlin.com,
+	claudiu.beznea@tuxon.dev,
+	tudor.ambarus@linaro.org,
+	ardb@kernel.org,
+	linusw@kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	l.rubusch@gmail.com
+Subject: [PATCH v3 00/12] crypto: atmel - introduce shared i2c core client management and capability-based selection framework
+Date: Wed, 20 May 2026 15:56:51 +0000
+Message-Id: <20260520155703.23018-1-l.rubusch@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="lntws6wrfne5ipt2"
-Content-Disposition: inline
-In-Reply-To: <46130020-eaa5-44ad-9c6d-62ccb30c19d9@app.fastmail.com>
+Content-Transfer-Encoding: 8bit
+
+This patch series introduces a staged refactoring of the Atmel crypto I2C
+drivers in preparation for a shared core-based architecture. The goal is to
+consolidate I2C client management and selection logic into a common
+atmel-i2c core driver while keeping ECC (ECDH) and SHA204A client drivers
+functionally separate but interoperating through shared infrastructure.
+
+The series moves existing ECC-specific client tracking into a shared
+management structure, relocates allocation and selection logic, and
+introduces capability-based filtering for hardware selection. This allows
+individual crypto drivers to request hardware clients based on supported
+features while still benefiting from a unified least-loaded selection
+strategy.
+
+Subsequent patches extend this base by:
+- migrating client management fully into the core driver,
+- introducing explicit capability advertisement by each hardware client,
+- updating ECC and SHA204A drivers to participate in capability-aware allocation,
+- and cleaning up probe/remove paths to ensure consistent lifecycle handling.
+
+No functional behavioral changes are intended at this stage beyond internal
+refactoring and preparation for future feature expansion. The series is
+designed to preserve existing crypto functionality while gradually
+centralizing shared logic in the atmel-i2c core layer, reducing duplication
+and improving maintainability across all Atmel crypto drivers.
+
+Signed-off-by: Lothar Rubusch <l.rubusch@gmail.com>
+---
+v2 -> v3:
+- sashiko feedback[2]
+- ecc: reorder setting ready flag in probe()
+- i2c: unconditionally call flush in unregister client function, to avoid UAF for multiple devices
+- i2c: fixed a sleep-in-atomic bug by moving atmel_i2c_flush_queue() outside the spin_lock section
+- sha204a: reorder calls in remove() avoid UAF flagged risk
+- sha204a: rephrase commit messages
+[2] https://sashiko.dev/#/patchset/20260519204803.17034-1-l.rubusch%40gmail.com
+
+v1 -> v2:
+- going over Sashiko feedback[1]
+- rephrasing commit messages and titles
+- fix: introduce a ready/state flag to address the UAF risk
+- fix: add kpp lock and refcnt to impede overwriting global driver struct
+- fix: explicitely clearing rng cached buffer in return branch
+- unregistering ready state by dedicated function
+- reorder Atmel ECC related things and atmel I2C at beginning
+- reorder Atmel SHA204a related things behind introduction of cap
+- patches dropped: NULL checks in remove functions
+- changed to EXPORT_SYMBOL_GPL
+- additionally to alloc hw client also migrate freeing it to core driver
+[1] https://sashiko.dev/#/patchset/20260517180639.9657-1-l.rubusch%40gmail.com
+---
+Lothar Rubusch (12):
+  crypto: atmel-ecc - rename driver_data before moving it into atmel-i2c
+  crypto: atmel-ecc - fix use after free situation
+  crypto: atmel-ecc - fix multi-device kpp registration
+  crypto: atmel - rename atmel_ecc_driver_data to atmel_i2c_client_mgmt
+  crypto: atmel-i2c - move client management instance into core
+  crypto: atmel-i2c - introduce shared teardown helpers and fix queue
+    flush
+  crypto: atmel-ecc - switch to module_i2c_driver
+  crypto: atmel-i2c - move shared client allocation logic to core
+  crypto: atmel-i2c - implement capability-based client selection
+  crypto: atmel-sha204a - integrate into core management tracking
+  crypto: atmel-sha204a - fix heap info leak on I2C transfer failure
+  crypto: atmel-sha204a - switch to module_i2c_driver
+
+ drivers/crypto/atmel-ecc.c     | 133 ++++++++++-----------------------
+ drivers/crypto/atmel-i2c.c     |  76 +++++++++++++++++++
+ drivers/crypto/atmel-i2c.h     |  17 ++++-
+ drivers/crypto/atmel-sha204a.c |  51 ++++++++-----
+ 4 files changed, 166 insertions(+), 111 deletions(-)
 
 
---lntws6wrfne5ipt2
-Content-Type: text/plain; protected-headers=v1; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v2 1/3] crypto: atmel-sha204a - Drop of_device_id data
-MIME-Version: 1.0
+base-commit: 6c9dddeb582fde005360f4fe02c760d45ca05fb5
+-- 
+2.39.5
 
-Hello Ard,
-
-On Wed, May 20, 2026 at 09:49:49AM +0200, Ard Biesheuvel wrote:
-> On Wed, 20 May 2026, at 09:01, Uwe Kleine-K=F6nig (The Capable Hub) wrote:
-> > The driver binds to i2c devices only and thus in the absence of an
-> > assignment for .data in the of_device_id array i2c_get_match_data()
-> > falls back to .driver_data from the i2c_device_id array. So only provide
-> > &atsha204_quality once to reduce duplication.
-> >
-> > Signed-off-by: Uwe Kleine-K=F6nig (The Capable Hub) <u.kleine-koenig@ba=
-ylibre.com>
-> > ---
-> >  drivers/crypto/atmel-sha204a.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha2=
-04a.c
-> > index 6e6ac4770416..f17e1f6af1a3 100644
-> > --- a/drivers/crypto/atmel-sha204a.c
-> > +++ b/drivers/crypto/atmel-sha204a.c
-> > @@ -208,8 +208,8 @@ static void atmel_sha204a_remove(struct i2c_client =
-*client)
-> >  }
-> >=20
-> >  static const struct of_device_id atmel_sha204a_dt_ids[] =3D {
-> > -	{ .compatible =3D "atmel,atsha204", .data =3D &atsha204_quality },
-> > -	{ .compatible =3D "atmel,atsha204a", },
-> > +	{ .compatible =3D "atmel,atsha204" },
-> > +	{ .compatible =3D "atmel,atsha204a" },
-> >  	{ }
-> >  };
-> >  MODULE_DEVICE_TABLE(of, atmel_sha204a_dt_ids);
->=20
-> Just trying to figure out how this is supposed to work:
->=20
-> i2c_get_match_data()
->   data =3D device_get_match_data(&client->dev);
->   ... returns NULL ...
->   if (!data) {
->     match =3D i2c_match_id(driver->id_table, client);
->     ... compares client->name with { "atsha204", "atsha204a" }
->=20
-> So we will be relying on client->name having been set to either=20
-> "atsha204" or "atsha204a" on the DT probe path before
-> i2c_match_data() is called, but I am struggling to see where
-> that might happen.
-
-That happens when the client is created. Relevant are:
-
-int of_i2c_get_board_info(struct device *dev, struct device_node *node,
-	...
-{
-	...
-	if (of_alias_from_compatible(node, info->type, sizeof(info->type)) < 0) {
-		...
-}
-
-which sets info->type from .compatible with the vendor part skipped.
-Then
-
-static struct i2c_client *of_i2c_register_device(...)
-{
-	...
-	ret =3D of_i2c_get_board_info(&adap->dev, node, &info);
-	...
-	client =3D i2c_new_client_device(adap, &info);
-	...
-}
-
-where i2c_new_client_device() uses info->type to populate client->name.
-
-Best regards
-Uwe
-
---lntws6wrfne5ipt2
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmoN0m0ACgkQj4D7WH0S
-/k7WaQf9FYK31sTuNaQNBScs4kD7Q1pEw2ipCPpXIU2XiiieMxxHqSTb9UAHQPAU
-R50AQz2QB1R+nHVvN1KhLjwmTNwShQpRY3YCZhTiWBiw4nq9o7dBh4vs7FTyAV4p
-AuDChDsDeU7FKwOvZhmEu7eaUmp037fw3pA44EHyNn/jn75pP7842GFfVuZwvwtT
-+IjPrcDiGej30I9uhligYc2ZkohnbHEVumD8KmMskUAJogOFajcKOpxiiAJoPfEy
-v5thRa17jUPi04sePMKGcrEyzlOQwep37FP52bdP/cfOB8TJqMpA4uJTDR47YHAv
-oUPaSopOv4qFqmH7fPfoI7FM64YYJA==
-=vjzT
------END PGP SIGNATURE-----
-
---lntws6wrfne5ipt2--
