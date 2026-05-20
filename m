@@ -1,91 +1,125 @@
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74D773955C4
-	for <linux-crypto@vger.kernel.org>; Wed, 20 May 2026 10:01:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 741803DBD74;
+	Wed, 20 May 2026 12:32:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779271283; cv=none; b=HsKSHdEA9dU2JBX8Ze3bo7nvyFeAZnapuArIRXRZIn9CAilVqnPh+k+HLwJzzGxy9eOZV1koSVWDUYl4XT10qmzr6Af4ayNImTjoDeeRr/jiAz0qzLHft4Hitan9UVJRTLFMfjTQCz6DUeXrCERf4LBfbR1ClKcDw9sQd5Zcht8=
+	t=1779280336; cv=none; b=fCVWIbdaG5BRGJDFQu0yRpm1sYeFRbRCXTXL0XXy2+O2qq1Y/NUTkJxUCm2Ag/VxcGXaVFTlfEcj+HKQknvtnwdmJrs3ILa5wxnaHvaKGgD8BJ4MBK3CaRIjxx3Np9VH0sq39xX9juU0IHsOzdFOu8/3r0qiahJbaAVTjdNgA38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779271283; c=relaxed/simple;
-	bh=yFwM5PqbotdeJzNgzjeqgA9RaNzQqOatkuIPDmcjdz0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kD80JKyuRGcP+mthV2rs0HOPL1mJjlahfDeNA+hlmMt+Mrfb51kWPo0CFo5J2kFT6/NqCDLat4c6UQe7J81rEsvV0iAmiLfpM6wy/MLpPic/Re8B3FdMS9nN+Fn09CGZaK9tpessoVk62mQ3PoJmbyIHS5gc512KRmDzpUg6gi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KWhd7ROi; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1779280336; c=relaxed/simple;
+	bh=j45hF3TbE2ckhDdgGSpYmjgf0nuwDYmtOhNC8EqphcM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=I876i6m2y7K9IVO5zdAJ6+BwQew8/myj4Y/2L+yn7LNmbwh0FZTTIoQqw6v7axUXeKptBIo+7uOl+SoLHkbXfVT3pOcb/1G66vp6gmkfLz3gkoNOkTWx2ZxF61yh/7ql9wY2ghliqxqf4ceSIxOJ7RVUeazqxYH0kwlvQND2u4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n6KoLBmI; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KWhd7ROi"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1779271272;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=oSYoZE3APiv3L4JqGabArJNg5tRoRTXBcqiwu9fBl84=;
-	b=KWhd7ROi6eMuEj5YqY3ZQss6XS82c+yMoNzfkcuapj8zevu/p3Aile2/WUCJFoWzxdG4gU
-	ftUibnJoC1k069DvutVd8PQByr9p4qCTUwa9B7Mh9qfWP6KqG6ayI+Fj6I6zlEp50Hu1Wl
-	NmueBYHIynaCBTl+DBH+DxSPThLJ2Ko=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Srujana Challa <schalla@marvell.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Thorsten Blum <thorsten.blum@linux.dev>,
-	Kees Cook <kees@kernel.org>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n6KoLBmI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1779280336; x=1810816336;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=j45hF3TbE2ckhDdgGSpYmjgf0nuwDYmtOhNC8EqphcM=;
+  b=n6KoLBmI2kLufrQvNzEQy94+MNhBIHTfEOi/nWwxfUjiZggmmUkYqL2l
+   tuX0nE/fWU2r0EX+OLvWyZpy3Xg71EMZUAwkc7MPaShguDRr59Kgi0dml
+   pTkPva6ylwrC2Rqd4UEp3uuo590DK9dbXn4sh5E+JHhIk5typjo1MNlst
+   ADdCw32dAndUmYSAP4Vk57PD87AgCrMesop9nz/puFIDDeWpfxDZA8Qv4
+   mX64FKIJyItOS8XjZHKAGW0/fXk+J2bOgFX+eyd7B5I5of+kmfvHecrVa
+   EAjXM+uxlR7YF4JbRPby1wi4aJ4Sr7/Yf1DbGtHPg5vTY2FM6HtQuIlww
+   g==;
+X-CSE-ConnectionGUID: C2fnL1BAS3KFDcooVFCtZw==
+X-CSE-MsgGUID: 3Pe6fd94SjC6gxpN7pNBvQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11791"; a="90473643"
+X-IronPort-AV: E=Sophos;i="6.23,244,1770624000"; 
+   d="scan'208";a="90473643"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2026 05:32:15 -0700
+X-CSE-ConnectionGUID: 0Zh5g+8WRj6cEGzm1a7rmg==
+X-CSE-MsgGUID: 6Itc0urkSuiT5PRuscATiQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.23,244,1770624000"; 
+   d="scan'208";a="235902473"
+Received: from silpixa00401812.ir.intel.com ([10.20.226.90])
+  by fmviesa010.fm.intel.com with ESMTP; 20 May 2026 05:32:13 -0700
+From: Ahsan Atta <ahsan.atta@intel.com>
+To: herbert@gondor.apana.org.au
 Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: octeontx - use strscpy_pad in ucode_load_store
-Date: Wed, 20 May 2026 12:00:30 +0200
-Message-ID: <20260520100031.246078-2-thorsten.blum@linux.dev>
+	qat-linux@intel.com,
+	Ahsan Atta <ahsan.atta@intel.com>,
+	stable@vger.kernel.org,
+	Maksim Lukoshkov <maksim.lukoshkov@intel.com>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH] crypto: qat - fix restarting state leak on allocation failure
+Date: Wed, 20 May 2026 13:33:00 +0100
+Message-ID: <20260520123300.210290-1-ahsan.atta@intel.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1758; i=thorsten.blum@linux.dev; h=from:subject; bh=yFwM5PqbotdeJzNgzjeqgA9RaNzQqOatkuIPDmcjdz0=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFm8bQ5vOxcXMXBcaK/cLXWiJOPU9MM5VV7+TitWv+A6l ZVssoS7o5SFQYyLQVZMkeXBrB8zfEtrKjeZROyEmcPKBDKEgYtTACayVZqRYc/rQ8uTbC4lukQG L973S3rjirPP3xxvKzvZfSSg9eFfq3ZGhvX2rU1GPN8qLUQPZt/r0TXr8Dku9817kcbGAomCuDN NXAA=
-X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 
-Instead of zero-initializing the temporary buffer and then copying into
-it with strscpy(), use strscpy_pad() to copy the string and zero-pad any
-trailing bytes. Drop the explicit size argument to further simplify the
-code since strscpy_pad() can determine it automatically when the
-destination buffer has a fixed length.
+In adf_dev_aer_schedule_reset(), ADF_STATUS_RESTARTING is set before
+allocating reset_data. If the allocation fails, the function returns
+-ENOMEM without queuing reset work, so nothing ever clears the bit.
+This leaves the device permanently stuck in the restarting state,
+causing all subsequent reset attempts to be silently skipped.
 
-Also use strscpy_pad() to check for string truncation instead of the
-hard-coded OTX_CPT_UCODE_NAME_LENGTH.
+Fix this by using test_and_set_bit() to atomically claim the
+RESTARTING state, preventing duplicate reset scheduling races under
+concurrent fatal error reporting. If the subsequent allocation fails,
+clear the bit to restore clean state so future reset attempts can
+proceed.
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: stable@vger.kernel.org
+Fixes: d8cba25d2c68 ("crypto: qat - Intel(R) QAT driver framework")
+Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
+Co-developed-by: Maksim Lukoshkov <maksim.lukoshkov@intel.com>
+Signed-off-by: Maksim Lukoshkov <maksim.lukoshkov@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/crypto/intel/qat/qat_common/adf_aer.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c b/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
-index e0f38d32bc93..205579a6ba2b 100644
---- a/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
-+++ b/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
-@@ -1318,7 +1318,7 @@ static ssize_t ucode_load_store(struct device *dev,
- {
- 	struct otx_cpt_engines engs[OTX_CPT_MAX_ETYPES_PER_GRP] = { {0} };
- 	char *ucode_filename[OTX_CPT_MAX_ETYPES_PER_GRP];
--	char tmp_buf[OTX_CPT_UCODE_NAME_LENGTH] = { 0 };
-+	char tmp_buf[OTX_CPT_UCODE_NAME_LENGTH];
- 	char *start, *val, *err_msg, *tmp;
- 	struct otx_cpt_eng_grps *eng_grps;
- 	int grp_idx = 0, ret = -EINVAL;
-@@ -1326,12 +1326,11 @@ static ssize_t ucode_load_store(struct device *dev,
- 	int del_grp_idx = -1;
- 	int ucode_idx = 0;
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_aer.c b/drivers/crypto/intel/qat/qat_common/adf_aer.c
+index af028488e660..3fc7d13e882c 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_aer.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_aer.c
+@@ -207,13 +207,14 @@ static int adf_dev_aer_schedule_reset(struct adf_accel_dev *accel_dev,
+ 	struct adf_reset_dev_data *reset_data;
  
--	if (count >= OTX_CPT_UCODE_NAME_LENGTH)
-+	if (strscpy_pad(tmp_buf, buf) < 0)
- 		return -EINVAL;
+ 	if (!adf_dev_started(accel_dev) ||
+-	    test_bit(ADF_STATUS_RESTARTING, &accel_dev->status))
++	    test_and_set_bit(ADF_STATUS_RESTARTING, &accel_dev->status))
+ 		return 0;
  
- 	eng_grps = container_of(attr, struct otx_cpt_eng_grps, ucode_load_attr);
- 	err_msg = "Invalid engine group format";
--	strscpy(tmp_buf, buf, OTX_CPT_UCODE_NAME_LENGTH);
- 	start = tmp_buf;
- 
- 	has_se = has_ie = has_ae = false;
+-	set_bit(ADF_STATUS_RESTARTING, &accel_dev->status);
+ 	reset_data = kzalloc_obj(*reset_data);
+-	if (!reset_data)
++	if (!reset_data) {
++		clear_bit(ADF_STATUS_RESTARTING, &accel_dev->status);
+ 		return -ENOMEM;
++	}
+ 	reset_data->accel_dev = accel_dev;
+ 	init_completion(&reset_data->compl);
+ 	reset_data->mode = mode;
+-- 
+2.50.1
+
+--------------------------------------------------------------
+Intel Research and Development Ireland Limited
+Registered in Ireland
+Registered Office: Collinstown Industrial Park, Leixlip, County Kildare
+Registered Number: 308263
+
+
+This e-mail and any attachments may contain confidential material for the sole
+use of the intended recipient(s). Any review or distribution by others is
+strictly prohibited. If you are not the intended recipient, please contact the
+sender and delete all copies.
+
