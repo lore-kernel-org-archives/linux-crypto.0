@@ -1,170 +1,151 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012060.outbound.protection.outlook.com [40.93.195.60])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8D0A384CF6
-	for <linux-crypto@vger.kernel.org>; Thu, 21 May 2026 06:51:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779346313; cv=none; b=mmUQS2ri1aJ+BJ0udoLlo4HE0eBLHx/IYeoFPB+eVX8jrdbNuAlrQXQJ5DUwXJ8+Rs9nXZR1OAjVcuo/i77OYbjlEvpfl/vVDm2NvPve9Kul31mKt4OiE53YjODQhWW2ZglOcoZBEzejSuVTHBaigUCd7ZbNXT9UHnk6AXV5h3g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779346313; c=relaxed/simple;
-	bh=OzXvlTwqyg/LORhSSsvxHKnz+VzK+OsN50SGeyyrFmo=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=AHvJUwOKIgEfjbKbwVyC8J1nioDnGTSRPPR3vPS6ip+XbPfty6OSlVIK4ssZdXS2YKszWRi63U595ZkLYvDhut/muBpM+ywYXk2ttfW9KKM1Xg9kpxyAdD+RYZUL1nZVhDdqxq6X8HFiBoO3HaeTboFikx1oN3BIEl5iZlK/2Xo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=B1vg3W/e; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=fpy8BxmF; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEEA839D6EE;
+	Thu, 21 May 2026 07:43:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.60
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779349406; cv=fail; b=Oh2zfvUMugYSSwS7XRM2qp3Bvk6V5r9WybQC/4eTBp3mBArIAGLOJy3znMLqekYzUHmQ2nQzHC6wHgKOqphlpkEPmKDVdwMLX11hUCvwGaPAO7iCQfzbH1fkjIrRxnX0BLAQmnEh0J1uzM56iYvG9NRqAVnA0OC++8LdSRAg3rc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779349406; c=relaxed/simple;
+	bh=2pt3o7rnn/j/FskeBkOiZtXjk8L+aiXT02zEENIlEvw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MZ2npM+14aeYm1v2hsIo3Urd+UODyYwrLvwV11S/S9rkoLSBYz5u5Pw0x3r+lHtNzGrCg27ek79jn7ukM6r2l8FBX4LKBRdv1WrYzvv1z5jMJIkbtfWIdWSZRYawp4h0B3fLodU8IFsyq1gFSiTVIK9FzCilWJrKpafyB4jKyw0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=injCpeAm; arc=fail smtp.client-ip=40.93.195.60
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="B1vg3W/e";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="fpy8BxmF"
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64L1IfJ32072102
-	for <linux-crypto@vger.kernel.org>; Thu, 21 May 2026 06:51:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	ipaFgG3ogON0geuVOtzTG/KiPSvXW3QMvF4djvkApMQ=; b=B1vg3W/euwWpmXT0
-	mzK/ivX/06i+rfYeWpY4Q3W0jG7eYYXGdcOb/6CtlDz2zAtjyAC76ywiKXwQ2qGP
-	G/FwwUPBgqXK4PMmDABwSM/Sa3l85HjCfxz7GMhau5d9oubwkrLSh+meSJV4yk+V
-	btNs5mLaK9MwW/pJiKawRCMYxytvUy2+gDVCXG7Q8j+Jv0FrHqpBjNrUgZLlYp02
-	ex7sRnqXkCmwpHaMe13QVtppYiW2fASuriagul9HYgHOCXH351shb3fu0Vr4fC8x
-	ggnd0nZp3NRv8z88HNpz4Sn3CRz73zpPTek9G9BfX1t7/0USEF4b8/SnK/k4BjNa
-	cYEfgw==
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com [209.85.215.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4e9r96124y-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Thu, 21 May 2026 06:51:50 +0000 (GMT)
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-c829366cf25so8682724a12.0
-        for <linux-crypto@vger.kernel.org>; Wed, 20 May 2026 23:51:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1779346309; x=1779951109; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ipaFgG3ogON0geuVOtzTG/KiPSvXW3QMvF4djvkApMQ=;
-        b=fpy8BxmF9If6zIOEIy9ghZXjRphg/WBy4FITj5ivZgX0Rsx7dybL3GH2xf5811tnBZ
-         RNIbK7u9q4LSpEllAWoNO4iNqKoN4Sum8l86pYwECo521+jsHMXUkZdQqyOWP5Ohkyws
-         ZFcRgJFyOJ0+k4p1na7qSo/iCnWTIlh1xAL8EXUu8Znfy2Ivg5ArwiJM220X/lElH9/y
-         568xquEDqj39P9dJ1kNCPh9+34OrnJEXxbfQMAwn663kIR6tGhs0SKt8Z2wTy9R0ofrg
-         aBC68X/tkCR9ZmeLoA4cZjtl1kYZoMh4GcANXEJsU+LRlD9ZU6KlI7lEcSZMoiwQdygx
-         F6SA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779346309; x=1779951109;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ipaFgG3ogON0geuVOtzTG/KiPSvXW3QMvF4djvkApMQ=;
-        b=cKkmG+yaoZk/itdJTH7R2v22XGMtkXoLtemnNt9oWSc+7Xie9ygK0wv+X2E0U7kKYM
-         XzOrbhEhtfe8SZvUUbPcRMcGNONePRNz+0n+udIn/gZ82qByG0mpPqRvDIsfo48rPZbi
-         +t/sNa+NCqEhCt9Km6nuIwnF6+sUM4OcYl+4b2K3BsNpR0Az/ZEc6Ki1mLGC3ZkJaICK
-         hUTvfhCTH2LAzGWe0yTEqnxPqvvTdT20vfpv2ehx4r3fQK2j3Uv2+AHXlLVb2+Ize8yO
-         LeGbe6lyWoOtLFygnvRtulmKP11jONk/gNP7YrHrAlDtJsgHaRhqlNuO3E0dJwECScOB
-         Z90g==
-X-Forwarded-Encrypted: i=1; AFNElJ8cA26aIqm9JLDD24B7MrGFqx3mJs5usXHaHO0KVm5vBGnRofW/O5ZCan8UCEPVkfq0d0xmS79Ie1bWP+4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgINHwPFLVUu+j7WTlWBAvvI8PT6b1QQ1ErX7zRbVYg31veF59
-	KmTax+P48mrYpdrGna31sv6/1Ium3E3bIzh/Jt12ZQeBKt2Hi56sL+t5PU2WbCE/Ok8wsqejDuq
-	yFhSl0PLnt2e7zmdajbE09xlHUMmarfxS8ZLmRWpDqCmgeuDpTAa6JvISv4GBNbfyvm0=
-X-Gm-Gg: Acq92OEYxOUIq6qgINuIlcYfMQM/yUXOqwfbyTyJ2Y4lftyJ2y3omLXKeZcg5p/nOfj
-	Y2EhkEqnUcB4GP9CrPOAxj/1iWUbl0FQdqT1BjRoqi6rKIBsGP5Og4PLYlO0MvKfBenptWf1Lz5
-	kBNfwxXv2ctveJFrmZHxHVEvLwkEWWBQuOq0tahAKOIucYmiOAhVsquaR/Y1sO9+wpATliwK5rs
-	GaApWbnZyzbM+VJJ8MaZnxcgzazr1aJimiKgzlaRlu6IgLI6pgyh40Qar08cnmLxpR/06j7ynqy
-	qMTX/QyRD1rXeFNiUls71ViGkRfqfp7/KFcqpqQn/ksT+yXJ2uHYPj0/wwlDvrS2+Yln7noQL8T
-	sKkfhIgHMtmIZ4VTVF3UNpp6uU7cRWvPOeF2J7PZ3ly1W+nE0OHHQCO9ViFaZkw==
-X-Received: by 2002:a05:6a00:845:b0:835:6d99:3f94 with SMTP id d2e1a72fcca58-8414adf542bmr1746470b3a.25.1779346309540;
-        Wed, 20 May 2026 23:51:49 -0700 (PDT)
-X-Received: by 2002:a05:6a00:845:b0:835:6d99:3f94 with SMTP id d2e1a72fcca58-8414adf542bmr1746442b3a.25.1779346309052;
-        Wed, 20 May 2026 23:51:49 -0700 (PDT)
-Received: from [10.92.163.96] ([202.46.23.19])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84154e59ea9sm232016b3a.61.2026.05.20.23.51.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 May 2026 23:51:48 -0700 (PDT)
-Message-ID: <d4d35e17-84fa-4c95-9bfb-abfd25ea7f4a@oss.qualcomm.com>
-Date: Thu, 21 May 2026 12:21:41 +0530
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="injCpeAm"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=RoIeaD8UkA2nmQCSDk5L00Q9ooy71xDTUDyp/dyg4ydbQO3M2SWNs4Ryt7IKr9yTojPVL1n77oxz5ZEUTYFhaqtSGBKVb2V3WdUoyQg9PqkUPqRTzeYAXpYMqGAn/gleU6VhDhPFN0RL+0120ZUdt1HACkH5t4SuV2YH6QuWxGB8D2nvVaqtDK2bFUq3OlDXZanplyVt5L/ttcslhZgWe1mBaw2aZa+KQJfqMo6GGSkigIjzZ7EQJrp5Hkxr0UqKspub3b3V6KGm8NnZHaCxzkLG9S+u+W12lqKMDlnKG5E9v7HgU1SwIx0qVX625aHUM2m+soMu6prfyWvbHa3Oaw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=W4e+mZGiwMdyAvG2qK6R3pjHBD0djoN9tKWfnnGva8U=;
+ b=ViyVjerNbLTfXbUeFyAusaZlp3lsloqq631I/s5L8UuM9u8M9fFcRShM+agolM+WeyTz+uAmCLOCyir91wZpPB28evBNgu6+QGeI0uySoMdSIUGuyUVkPevDOlUDv1ROGLlnBK3t6t9QM1jkosBeAIC4sKeSb4YQ7kjDiDPxPs/xYK7gPXl2AyqUaQ/UO3akg0vQyFTHvuNCZK1QeF/L+YBFGis6l6EfSr15ROkOnDUEhBY/0gnnU9eaF13C9z0nFxH9SIUdFA7bUtGlzGEuGAN4IbjAqzKL7idLwh+RBclb5NNAUSdmSVkILQSPTt7jWt/HAl4QkvlIvWG5b/HT4g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=W4e+mZGiwMdyAvG2qK6R3pjHBD0djoN9tKWfnnGva8U=;
+ b=injCpeAmy+up3u/1pDArAb6aCKxCs3AFNwsBYddHJw2yG1JzREIWQlwdIw/MPUGqCZS5g8Qnbmtg7kbOnLKlDTinAVZqZ6MhNtylbvBg9BXkGmk5fzTWVFMXvIVY7s/QMmzX4g/Rn0UAFpeU21Acju6LcVFT3xcP/jQPzk69IM0=
+Received: from BY5PR20CA0031.namprd20.prod.outlook.com (2603:10b6:a03:1f4::44)
+ by CY1PR12MB9603.namprd12.prod.outlook.com (2603:10b6:930:108::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.48.14; Thu, 21 May
+ 2026 07:43:20 +0000
+Received: from SJ5PEPF000001F4.namprd05.prod.outlook.com
+ (2603:10b6:a03:1f4:cafe::f8) by BY5PR20CA0031.outlook.office365.com
+ (2603:10b6:a03:1f4::44) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.48.17 via Frontend Transport; Thu, 21
+ May 2026 07:43:20 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ SJ5PEPF000001F4.mail.protection.outlook.com (10.167.242.72) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.48.11 via Frontend Transport; Thu, 21 May 2026 07:43:19 +0000
+Received: from aiemdee.amd.com (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Thu, 21 May
+ 2026 02:43:12 -0500
+From: Alexey Kardashevskiy <aik@amd.com>
+To: <linux-crypto@vger.kernel.org>
+CC: <linux-kernel@vger.kernel.org>, Tom Lendacky <thomas.lendacky@amd.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
+	<davem@davemloft.net>, Dan Williams <djbw@kernel.org>, Alexey Kardashevskiy
+	<aik@amd.com>, <x86@kernel.org>, <linux-coco@lists.linux.dev>, "Pratik R .
+ Sampat" <prsampat@amd.com>, Xu Yilun <yilun.xu@linux.intel.com>, "Aneesh
+ Kumar K . V" <aneesh.kumar@kernel.org>
+Subject: [PATCH kernel] crypto/ccp/tsm: Enable the root port after the endpoint
+Date: Thu, 21 May 2026 17:43:01 +1000
+Message-ID: <20260521074301.2369293-1-aik@amd.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
-Subject: Re: [PATCH 0/3] Add support for qcrypto on shikra
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Thara Gopinath <thara.gopinath@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
- <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, Vinod Koul <vkoul@kernel.org>,
-        Frank Li <Frank.Li@kernel.org>, Andy Gross <agross@kernel.org>,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        dmaengine@vger.kernel.org
-References: <20260515-shikra_qcrypto-v1-0-80f07b345c29@oss.qualcomm.com>
- <20260514194735.GA1939213@google.com>
-Content-Language: en-US
-In-Reply-To: <20260514194735.GA1939213@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-ORIG-GUID: IY3ztUkUpXKPQ44mWQHAaKueP1ZNNvEd
-X-Proofpoint-GUID: IY3ztUkUpXKPQ44mWQHAaKueP1ZNNvEd
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTIxMDA2NSBTYWx0ZWRfX3ReEJrV0HUtE
- MvlrULB3mX70vgbBuktuSztvkrFlbAWmYGXKvmuGK/EwBoNy3Y4ZMMAhDUUJxwFgNZ5eTPOhBb0
- FsG9p0TZNQ2Q8FPAnD4Q6d1pA/1cjhYywFlC9OEXVWOQ6ZHQ/eDODQkDyWnJoZbVvAViVU1WhH7
- 2sPQBaxD9fKU7vWxvjk7gQJ8beFg0EMWRePkEv8s+tYT4/AtQQnZvaZNZKuUAZCu9WDgihTT7KM
- Mr6RySIfkEW6o/RUeVFQSdrNZsATjDSWvKI3ILeWrX+k2YpLq8l2DAa8Non/9Unw+IGJFKgxoeA
- h17P+yA14Ikyh62Q+JjjkV/z3PwsjOlswhpE4BQ7nOmlTmO4ghgJJygLaVkRTzgwSp3M46PL+m7
- GkWEcyO4dibNgmuLcxc+MH9Lag6SFbTx6JFrRA8kwJpLxdO9JAB1OK1wNXETKIRc89dg9Ee2bsz
- UDigo/xHe4Ff+Olgn+Q==
-X-Authority-Analysis: v=2.4 cv=GqFyPE1C c=1 sm=1 tr=0 ts=6a0eab86 cx=c_pps
- a=oF/VQ+ItUULfLr/lQ2/icg==:117 a=j4ogTh8yFefVWWEFDRgCtg==:17
- a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=gowsoOTTUOVcmtlkKump:22
- a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8 a=1cRb9DtoxWFOFH21OVAA:9 a=QEXdDO2ut3YA:10
- a=3WC7DwWrALyhR5TkjVHa:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
- definitions=2026-05-20_03,2026-05-18_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 adultscore=0 spamscore=0 priorityscore=1501 lowpriorityscore=0
- bulkscore=0 clxscore=1015 impostorscore=0 suspectscore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2605130000 definitions=main-2605210065
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001F4:EE_|CY1PR12MB9603:EE_
+X-MS-Office365-Filtering-Correlation-Id: c09e7ec3-a2f6-433e-067c-08deb70ca0b0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700016|1800799024|376014|82310400026|6133799003|18002099003|56012099003|11063799006;
+X-Microsoft-Antispam-Message-Info:
+	WDoqAy815OctFyB2+nNemu/A0hM48lRZp3hGL+M5V3hRRLpJGMqoXG9azDas9K+oFbQz83m4/IbkO8LGTTrWuEQWanIivIlyqi5VXI8ScLeaSyBVgse5LW0biXrDvOSVhCFUMRvzpfgf0MGdm8StipQZyQ8iVrgzw8MMX6E4i8blSBWuKSsoXJ6QWKmuao9pFTn/UIg2xg43LKkb8TX5l1oqy1gTuot8inXTTMtyPiyp+yReuXviBP3A1Lfy4hanTMALRvTo/j9WjwR9UcIXxzm/vvtth8UhfQeCTEU3dETttTSe5xaadb60gbUWn2eS6h/slGNIimgA9xsA2BPgstPB6qooOGK1/1XrrbW8tU8QA43BpwlZayB3nwzAWN2h/SM7e1H0NklMxzKaggg7cJTDCSjimPb052fbA3n81lx1+XQu7EM1bWPgUFgXwfkZU/R/PSdvcQn72jldWJqTAZeZdWPiCNQL089v+zagsinUsEI+1M9F50BoB5Gofa2dr65DKaWeftE52FEPO2M40UFrgeTv80o37YD1Z97naFaxeukBzVU25zq3CzLyPxDOJEeUcfyD6IqIBgcoBx4MWPLEis9w5ms+RFw4jymECfTgHlaQrBVvaPXfcAJN9asCi0pTWkkQrcGrCkwn0mxoCB8KzmkThtZHFi+LyBfZf2Q4kXP/skiSBBh4FYAfWjYX3bia9PNaVaDQulnV7ZeDzN2EW8KPOwaVm130pzjjQBg=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700016)(1800799024)(376014)(82310400026)(6133799003)(18002099003)(56012099003)(11063799006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	32N6BR3sFhDhiK9m8+ZXH21aGk1XYpPA5cKceE08GZVrADHQqpK2fhuc/7L3U/u6fulrSXO3G5gEONFiOzBunLVXX6ClX9Rid/IJPxdXvtRO35rScKLXB1yjIjOtuMABi0YSq2XUkQ/qvl0u9fK1lJAzLqW3D8GjFlrkvlELcsxwlxdvibV6O159C95ir06V1spR7gE3rhNhR8JNTccZtWhn3Xr+pQPGUZRLc4PiRKA31X9AUlOvrPkCnAVO9sKf+KyULW47ZGkdr6S5Yzx3WJihVTtyvcd8VxMnEUtEgbWkQ9+rdI+PaNYBjwtT8JtTzmGRK6y+Nu3ckV0ModkxPw/LBwo8fk6OebEA7nAj3pjjsiZJVlYUfgIaTA+CPmOS3pgn1G9ZyxppShxeJKf55NguxixxS8DNHWlNfN/eIDvfoxw7Az2U7WMZtjWJcXv1
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 May 2026 07:43:19.5214
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: c09e7ec3-a2f6-433e-067c-08deb70ca0b0
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ5PEPF000001F4.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY1PR12MB9603
 
-On 15-05-2026 01:17, Eric Biggers wrote:
-> On Fri, May 15, 2026 at 12:53:35AM +0530, Kuldeep Singh wrote:
->> Add qcrypto and cryptobam DT nodes for enabling qcrypto on kaanapali.
->> Shikra bam dma supports 7 iommus so update dt-bindings accordingly.
->>
->> The patchset depends on below. There's recursive dependency so referred
->> to base DT patch here.
->> - https://lore.kernel.org/all/20260512-shikra-dt-v1-0-716438330dd0@oss.qualcomm.com/
->>
->> Validations:
->> - make ARCH=arm64 DT_CHECKER_FLAGS=-m DT_SCHEMA_FILES=Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml dt_binding_check
->> - make ARCH=arm64 qcom/shikra-cqs-evk.dtb CHECK_DTBS=1 DT_SCHEMA_FILES=Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
->> - cryptobam and crypto driver probe
->> - kcapi test
->>
->> Signed-off-by: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
-> 
-> What specific kernel features would this be useful for, and what
-> specific performance improvements are you seeing with those features?
+The PCIe r7.0, chapter "6.33.8 Other IDE Rules" mandates if selective IDE
+is enabled for config requersts, a stream must be enabled on the endpoint
+before enabling it on the rootport:
 
-I hope you mean 7 iommu entries.
+===
+For Selective IDE, the Stream must not be used until it has been enabled in
+both Partner Ports. For cases where one of the Partner Ports is a Root Port
+and Selective IDE for Configuration Requests is enabled, the other
+Partner Port must be enabled prior to the Root Port. For other scenarios,
+the mechanisms to satisfy this requirement are implementation-specific.
+===
 
-Please note, shikra is an old platform and differs with latest platforms
-like kaanapali in terms of iommus#.
-Kaanapali is optimised(in terms of iommus#) as same pipe index/sid i.e
-4/5 can be used for general purpose or for any other usecase like
-DRM/HDCP etc.
-Whereas for shikra, there's dedicated iommu entry for each usecase and
-same pipe index/sid cannot be used for other usecases.
+Do what the spec says.
 
-The performance will be be effectively similar.
+Fixes: 4be423572da1 ("crypto/ccp: Implement SEV-TIO PCIe IDE (phase1)")
+Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
+---
+ drivers/crypto/ccp/sev-dev-tsm.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
+diff --git a/drivers/crypto/ccp/sev-dev-tsm.c b/drivers/crypto/ccp/sev-dev-tsm.c
+index b07ae529b591..10549a2cc2ae 100644
+--- a/drivers/crypto/ccp/sev-dev-tsm.c
++++ b/drivers/crypto/ccp/sev-dev-tsm.c
+@@ -58,13 +58,13 @@ static int stream_enable(struct pci_ide *ide)
+ 	struct pci_dev *rp = pcie_find_root_port(ide->pdev);
+ 	int ret;
+ 
+-	ret = pci_ide_stream_enable(rp, ide);
+-	if (ret)
++	ret = pci_ide_stream_enable(ide->pdev, ide);
++	if (ret && ret != -ENXIO)
+ 		return ret;
+ 
+-	ret = pci_ide_stream_enable(ide->pdev, ide);
+-	if (ret)
+-		pci_ide_stream_disable(rp, ide);
++	ret = pci_ide_stream_enable(rp, ide);
++	if (ret && ret != -ENXIO)
++		pci_ide_stream_disable(ide->pdev, ide);
+ 
+ 	return ret;
+ }
 -- 
-Regards
-Kuldeep
+2.53.0
+
