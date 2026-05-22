@@ -1,30 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E5CE3624BC;
-	Fri, 22 May 2026 05:07:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A81C0299959;
+	Fri, 22 May 2026 05:07:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779426469; cv=none; b=sLAYjp1q0gdN5eZUy075S1k+4SUPBS7trswKY2B8tPk+hlzlgKe4KO/424QU5aVfq65QDc1i/p4glbDkTCaTRx3s83lHcj8rt1RVmYKulla8eD1T3ySok+VgN5HKpFM9qrKgp1/4O8xGktD2koTq8j6xhvwSjruTi9azWccmlb0=
+	t=1779426473; cv=none; b=ih8KZHl7aSAjqwFndP4vyJ8JNJeeuxF9mROm7Ckqz8kiD/T0VDMw1zDDctAzqFHHrzhMRSyYvFMlk3jt5mE14W+FsQdF0f29LzaaMuyiL28uqwJXPFTdCjMzIzLESpIW7fVtwHJumKxtkNkDMGoP+hPJG40YoH+xa3LsQdIzB28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779426469; c=relaxed/simple;
-	bh=XRaP13Cx+jXI1HSp39tijTlJ/WCsJx+09g66+aMv3Bc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ttN2vDnk0GyBJ+3YkXvvHvhfjenbKFgYnYQjciTCj9ZKfLIiihYBKtZDNiZBJk5xEL/yNylx3ZXQwHNoiQbijp+72BvKhZrfqclumoteqbpS/CUhzQzcDO2Pntf1G+/OzZsi5FFKRLhvySILccsNtEj49eqLwqLfQa3hqCdxdWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mOsL+y2f; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1779426473; c=relaxed/simple;
+	bh=hVRxru1x16s70uUS0wxX6YWW4QKlp4gCkIQBZIgHuio=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cRPs71NkIKxW9Ban4YMehl6CcHNGEsaVLDRmtN11RxP7spsFW8ULXaIcElUVtRmKwRY5+Y1TMZoPfax5aWtGSM4sUa7Fd3KMo5yHstJfrG6+ZjtH+R5fxnEgBu66Dw53MqRYqUUn1hWhM779KNDoeyq+iMXukVK81ybvsfFBnIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hx00hQOI; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mOsL+y2f"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 541541F000E9;
-	Fri, 22 May 2026 05:07:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hx00hQOI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4785C1F00A3D;
+	Fri, 22 May 2026 05:07:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779426468;
-	bh=OirFU4J8edbnkGYQjSL4iBniGJ6v+txcWQW9mPXg3Dc=;
-	h=From:To:Cc:Subject:Date;
-	b=mOsL+y2fIgEFtvbqDaYm/64qDsnKq6W5Pdnq7jbIAx9SRBlLLVcOKG7HPOF0jK6qN
-	 X/EyN0urs9h4anT2Ru0BlLkErwCvGjasr8ho+wKHPtvi79v7qF17CbLmjvyQiR+VJT
-	 E3oCUa6qmKQ6/yRLaGf+YlW3OIK+4ej70+7BTQz06zJQydL5bDJjqgGxPdxf4xntsh
-	 hLVQtsh4rNed/3QZoTby7QF/atRjyj7Umltr36gvVFXJ9ra0VVHmvdqZl1fp5eopNA
-	 D1TqPXaIqWK/CjO+6ld6a24mKJcV4c0O4iLFRjJqRIZtVhKU+Jd1PDQywU7XiKiaIN
-	 HgCQjEDvr05AA==
+	s=k20260515; t=1779426469;
+	bh=+1XgihtlNsmil2Qp26RG1tt4t704hNEdgcn9fDFYmHo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=Hx00hQOI6CKrRnDkw472hkyk8s+aF0hD660ARiBS4KruKjcBUV/D24DVSeTCOyfYS
+	 1SJ7VTqSAYxuKqlIQ3RqJqmRAb++TxkZLsRXlgi2o/kfgUBxxOpVTLy433bh8Q1ubi
+	 C33i5I8B1p4Uyl9t/Zvc0iMuTJVc+cj6P1gNwmoVnZLr7fg0cX2Gw3lwcSzTAZ0Z6y
+	 cyllaH8hAKXDdVYGXJan+Mhvhb/ZW44nMa+PCWJR423oCLMq5Kqtb+Ijxhin6qESnN
+	 YI+rq93Jyq9Xq2VVCVmWAUAAxUs+dvPhIN4+Aer0Shwq/N9V0MVZ3fKn2SxKguTZUu
+	 +RlEMtrZW999A==
 From: Eric Biggers <ebiggers@kernel.org>
 To: netdev@vger.kernel.org,
 	linux-afs@lists.infradead.org
@@ -38,162 +39,621 @@ Cc: David Howells <dhowells@redhat.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH net-next v2 0/5] Consolidate FCrypt and PCBC code into net/rxrpc/
-Date: Fri, 22 May 2026 00:07:31 -0500
-Message-ID: <20260522050740.84561-1-ebiggers@kernel.org>
+Subject: [PATCH net-next v2 1/5] net/rxrpc: Add local FCrypt-PCBC implementation
+Date: Fri, 22 May 2026 00:07:32 -0500
+Message-ID: <20260522050740.84561-2-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260522050740.84561-1-ebiggers@kernel.org>
+References: <20260522050740.84561-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The FCrypt "block cipher" and the PCBC mode of operation are obsolete
-and insecure.  Since their only user is net/rxrpc/, they belong there,
-not in the crypto API.
+Add a local implementation of FCrypt-PCBC encryption and decryption.
+This will be used instead of the crypto API one, allowing the crypto API
+one to be removed.  It will also simplify rxkad.c quite a bit.
 
-Therefore, this series removes these algorithms from the crypto API and
-replaces them with local implementations in net/rxrpc/.
+A KUnit test is included.  The FCrypt-PCBC test vectors are borrowed
+from the existing ones in crypto/testmgr.h.  Note that this adds the
+first KUnit test for net/rxrpc/, which previously had no KUnit tests.
 
-The local implementations are simpler too, as they avoid the crypto API
-boilerplate.
+The FCrypt code is based on crypto/fcrypt.c, but I simplified it a bit.
+The PCBC part is straightforward and I just wrote it from scratch.
 
-I don't know how to test all the code in net/rxrpc/, but everything
-should still work.  I added a KUnit test for the crypto functions.
+Tested with:
 
-Changed in v2:
-    - Added missing export of fcrypt_preparekey().
-    - Write "RxRPC crypto KUnit test" instead of "RxRPC KUnit test".
-    - Rebased onto latest net-next where decryption now happens in the
-      linear buffer rxrpc_call::rx_dec_buffer, simplifying the code.
+    kunit.py run --kunitconfig net/rxrpc/
 
-Eric Biggers (5):
-  net/rxrpc: Add local FCrypt-PCBC implementation
-  net/rxrpc: Use local FCrypt-PCBC implementation
-  net/rxrpc: Reimplement DES-PCBC using DES library
-  crypto: fcrypt - Remove support for FCrypt block cipher
-  crypto: pcbc - Remove support for PCBC mode
-
- arch/arm/configs/am200epdkit_defconfig        |   1 -
- arch/arm/configs/dove_defconfig               |   1 -
- arch/arm/configs/multi_v5_defconfig           |   1 -
- arch/arm/configs/mv78xx0_defconfig            |   1 -
- arch/arm/configs/mvebu_v5_defconfig           |   1 -
- arch/arm/configs/omap1_defconfig              |   1 -
- arch/arm/configs/orion5x_defconfig            |   1 -
- arch/arm/configs/pxa_defconfig                |   2 -
- arch/arm/configs/wpcm450_defconfig            |   1 -
- arch/m68k/configs/amiga_defconfig             |   2 -
- arch/m68k/configs/apollo_defconfig            |   2 -
- arch/m68k/configs/atari_defconfig             |   2 -
- arch/m68k/configs/bvme6000_defconfig          |   2 -
- arch/m68k/configs/hp300_defconfig             |   2 -
- arch/m68k/configs/mac_defconfig               |   2 -
- arch/m68k/configs/multi_defconfig             |   2 -
- arch/m68k/configs/mvme147_defconfig           |   2 -
- arch/m68k/configs/mvme16x_defconfig           |   2 -
- arch/m68k/configs/q40_defconfig               |   2 -
- arch/m68k/configs/sun3_defconfig              |   2 -
- arch/m68k/configs/sun3x_defconfig             |   2 -
- arch/mips/configs/bigsur_defconfig            |   2 -
- arch/mips/configs/decstation_64_defconfig     |   2 -
- arch/mips/configs/decstation_defconfig        |   2 -
- arch/mips/configs/decstation_r4k_defconfig    |   2 -
- arch/mips/configs/fuloong2e_defconfig         |   1 -
- arch/mips/configs/gpr_defconfig               |   1 -
- arch/mips/configs/ip22_defconfig              |   2 -
- arch/mips/configs/ip27_defconfig              |   2 -
- arch/mips/configs/ip30_defconfig              |   2 -
- arch/mips/configs/ip32_defconfig              |   2 -
- arch/mips/configs/lemote2f_defconfig          |   2 -
- arch/mips/configs/malta_defconfig             |   2 -
- arch/mips/configs/malta_kvm_defconfig         |   2 -
- arch/mips/configs/malta_qemu_32r6_defconfig   |   1 -
- arch/mips/configs/maltaaprp_defconfig         |   1 -
- arch/mips/configs/maltasmvp_defconfig         |   1 -
- arch/mips/configs/maltasmvp_eva_defconfig     |   1 -
- arch/mips/configs/maltaup_defconfig           |   1 -
- arch/mips/configs/maltaup_xpa_defconfig       |   2 -
- arch/mips/configs/mtx1_defconfig              |   1 -
- arch/mips/configs/rm200_defconfig             |   2 -
- arch/mips/configs/sb1250_swarm_defconfig      |   2 -
- arch/parisc/configs/generic-64bit_defconfig   |   2 -
- arch/powerpc/configs/44x/akebono_defconfig    |   1 -
- arch/powerpc/configs/44x/bamboo_defconfig     |   1 -
- arch/powerpc/configs/44x/currituck_defconfig  |   1 -
- arch/powerpc/configs/44x/ebony_defconfig      |   1 -
- arch/powerpc/configs/44x/eiger_defconfig      |   1 -
- arch/powerpc/configs/44x/fsp2_defconfig       |   1 -
- arch/powerpc/configs/44x/icon_defconfig       |   1 -
- arch/powerpc/configs/44x/iss476-smp_defconfig |   1 -
- arch/powerpc/configs/44x/katmai_defconfig     |   1 -
- arch/powerpc/configs/44x/rainier_defconfig    |   1 -
- arch/powerpc/configs/44x/redwood_defconfig    |   1 -
- arch/powerpc/configs/44x/sequoia_defconfig    |   1 -
- arch/powerpc/configs/44x/taishan_defconfig    |   1 -
- arch/powerpc/configs/52xx/cm5200_defconfig    |   1 -
- arch/powerpc/configs/52xx/motionpro_defconfig |   1 -
- arch/powerpc/configs/52xx/tqm5200_defconfig   |   1 -
- arch/powerpc/configs/83xx/asp8347_defconfig   |   1 -
- .../configs/83xx/mpc8313_rdb_defconfig        |   1 -
- .../configs/83xx/mpc8315_rdb_defconfig        |   1 -
- .../configs/83xx/mpc832x_rdb_defconfig        |   1 -
- .../configs/83xx/mpc834x_itx_defconfig        |   1 -
- .../configs/83xx/mpc834x_itxgp_defconfig      |   1 -
- .../configs/83xx/mpc837x_rdb_defconfig        |   1 -
- arch/powerpc/configs/amigaone_defconfig       |   1 -
- arch/powerpc/configs/cell_defconfig           |   1 -
- arch/powerpc/configs/chrp32_defconfig         |   1 -
- arch/powerpc/configs/ep8248e_defconfig        |   1 -
- arch/powerpc/configs/fsl-emb-nonhw.config     |   1 -
- arch/powerpc/configs/g5_defconfig             |   1 -
- arch/powerpc/configs/linkstation_defconfig    |   1 -
- arch/powerpc/configs/mgcoge_defconfig         |   1 -
- arch/powerpc/configs/mpc83xx_defconfig        |   1 -
- arch/powerpc/configs/mvme5100_defconfig       |   1 -
- arch/powerpc/configs/pmac32_defconfig         |   1 -
- arch/powerpc/configs/powernv_defconfig        |   1 -
- arch/powerpc/configs/ppc44x_defconfig         |   1 -
- arch/powerpc/configs/ppc64_defconfig          |   1 -
- arch/powerpc/configs/ppc64e_defconfig         |   1 -
- arch/powerpc/configs/ppc6xx_defconfig         |   2 -
- arch/powerpc/configs/ps3_defconfig            |   1 -
- arch/s390/configs/debug_defconfig             |   2 -
- arch/s390/configs/defconfig                   |   2 -
- arch/sh/configs/hp6xx_defconfig               |   1 -
- arch/sh/configs/r7780mp_defconfig             |   1 -
- arch/sh/configs/r7785rp_defconfig             |   1 -
- arch/sh/configs/se7712_defconfig              |   1 -
- arch/sh/configs/sh2007_defconfig              |   2 -
- arch/sparc/configs/sparc32_defconfig          |   1 -
- arch/sparc/configs/sparc64_defconfig          |   2 -
- crypto/Kconfig                                |  18 -
- crypto/Makefile                               |   2 -
- crypto/pcbc.c                                 | 195 --------
- crypto/tcrypt.c                               |   4 -
- crypto/testmgr.c                              |  15 -
- crypto/testmgr.h                              |  45 --
- net/rxrpc/.kunitconfig                        |   6 +
- net/rxrpc/Kconfig                             |  13 +-
- net/rxrpc/Makefile                            |   3 +-
- net/rxrpc/ar-internal.h                       |  21 +-
- {crypto => net/rxrpc}/fcrypt.c                | 330 ++++++--------
- net/rxrpc/key.c                               |   1 -
- net/rxrpc/rxkad.c                             | 429 +++++-------------
- net/rxrpc/server_key.c                        |   1 -
- net/rxrpc/tests/Makefile                      |   3 +
- net/rxrpc/tests/rxrpc_kunit.c                 | 140 ++++++
- 109 files changed, 427 insertions(+), 925 deletions(-)
- delete mode 100644 crypto/pcbc.c
+Acked-by: David Howells <dhowells@redhat.com>
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ net/rxrpc/.kunitconfig        |   6 +
+ net/rxrpc/Kconfig             |   7 +
+ net/rxrpc/Makefile            |   3 +-
+ net/rxrpc/ar-internal.h       |  14 ++
+ net/rxrpc/fcrypt.c            | 352 ++++++++++++++++++++++++++++++++++
+ net/rxrpc/tests/Makefile      |   3 +
+ net/rxrpc/tests/rxrpc_kunit.c | 109 +++++++++++
+ 7 files changed, 493 insertions(+), 1 deletion(-)
  create mode 100644 net/rxrpc/.kunitconfig
- rename {crypto => net/rxrpc}/fcrypt.c (65%)
+ create mode 100644 net/rxrpc/fcrypt.c
  create mode 100644 net/rxrpc/tests/Makefile
  create mode 100644 net/rxrpc/tests/rxrpc_kunit.c
 
-
-base-commit: 1a1f055318d82e64485a6ff8420e5f70b4267998
+diff --git a/net/rxrpc/.kunitconfig b/net/rxrpc/.kunitconfig
+new file mode 100644
+index 000000000000..44e4a909ff07
+--- /dev/null
++++ b/net/rxrpc/.kunitconfig
+@@ -0,0 +1,6 @@
++CONFIG_KUNIT=y
++CONFIG_NET=y
++CONFIG_INET=y
++CONFIG_AF_RXRPC=y
++CONFIG_RXKAD=y
++CONFIG_AF_RXRPC_KUNIT_TEST=y
+diff --git a/net/rxrpc/Kconfig b/net/rxrpc/Kconfig
+index 43416b3026fb..e2bb795cdf0c 100644
+--- a/net/rxrpc/Kconfig
++++ b/net/rxrpc/Kconfig
+@@ -95,6 +95,13 @@ config RXPERF
+ 	help
+ 	  Provide an rxperf service tester.  This listens on UDP port 7009 for
+ 	  incoming calls from the rxperf program (an example of which can be
+ 	  found in OpenAFS).
+ 
++config AF_RXRPC_KUNIT_TEST
++	tristate "RxRPC crypto KUnit test" if !KUNIT_ALL_TESTS
++	depends on KUNIT && RXKAD
++	default KUNIT_ALL_TESTS
++	help
++	  Enable the KUnit test suite for RxRPC's crypto routines.
++
+ endif
+diff --git a/net/rxrpc/Makefile b/net/rxrpc/Makefile
+index c0542bae719e..f994f9f30a29 100644
+--- a/net/rxrpc/Makefile
++++ b/net/rxrpc/Makefile
+@@ -36,13 +36,14 @@ rxrpc-y := \
+ 	skbuff.o \
+ 	txbuf.o \
+ 	utils.o
+ 
+ rxrpc-$(CONFIG_PROC_FS) += proc.o
+-rxrpc-$(CONFIG_RXKAD) += rxkad.o
++rxrpc-$(CONFIG_RXKAD) += rxkad.o fcrypt.o
+ rxrpc-$(CONFIG_SYSCTL) += sysctl.o
+ rxrpc-$(CONFIG_RXGK) += \
+ 	rxgk.o \
+ 	rxgk_app.o \
+ 	rxgk_kdf.o
+ 
+ obj-$(CONFIG_RXPERF) += rxperf.o
++obj-$(CONFIG_KUNIT) += tests/
+diff --git a/net/rxrpc/ar-internal.h b/net/rxrpc/ar-internal.h
+index 98f2165159d7..30aaf69b4c7c 100644
+--- a/net/rxrpc/ar-internal.h
++++ b/net/rxrpc/ar-internal.h
+@@ -13,18 +13,32 @@
+ #include <net/sock.h>
+ #include <net/af_rxrpc.h>
+ #include <keys/rxrpc-type.h>
+ #include "protocol.h"
+ 
++#define FCRYPT_ROUNDS 16
++
++struct fcrypt_key {
++	__be32 sched[FCRYPT_ROUNDS];
++};
++
+ #define FCRYPT_BSIZE 8
+ struct rxrpc_crypt {
+ 	union {
+ 		u8	x[FCRYPT_BSIZE];
+ 		__be32	n[2];
+ 	};
+ } __attribute__((aligned(8)));
+ 
++void fcrypt_preparekey(struct fcrypt_key *key, const u8 raw_key[FCRYPT_BSIZE]);
++void fcrypt_pcbc_encrypt(const struct fcrypt_key *key,
++			 const u8 iv[FCRYPT_BSIZE], const void *src, void *dst,
++			 size_t nblocks);
++void fcrypt_pcbc_decrypt(const struct fcrypt_key *key,
++			 const u8 iv[FCRYPT_BSIZE], const void *src, void *dst,
++			 size_t nblocks);
++
+ #define rxrpc_queue_work(WS)	queue_work(rxrpc_workqueue, (WS))
+ #define rxrpc_queue_delayed_work(WS,D)	\
+ 	queue_delayed_work(rxrpc_workqueue, (WS), (D))
+ 
+ struct key_preparsed_payload;
+diff --git a/net/rxrpc/fcrypt.c b/net/rxrpc/fcrypt.c
+new file mode 100644
+index 000000000000..a919e7598765
+--- /dev/null
++++ b/net/rxrpc/fcrypt.c
+@@ -0,0 +1,352 @@
++/* FCrypt encryption algorithm
++ *
++ * Copyright (C) 2006 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version
++ * 2 of the License, or (at your option) any later version.
++ *
++ * Based on code:
++ *
++ * Copyright (c) 1995 - 2000 Kungliga Tekniska Högskolan
++ * (Royal Institute of Technology, Stockholm, Sweden).
++ * All rights reserved.
++ *
++ * Redistribution and use in source and binary forms, with or without
++ * modification, are permitted provided that the following conditions
++ * are met:
++ *
++ * 1. Redistributions of source code must retain the above copyright
++ *    notice, this list of conditions and the following disclaimer.
++ *
++ * 2. Redistributions in binary form must reproduce the above copyright
++ *    notice, this list of conditions and the following disclaimer in the
++ *    documentation and/or other materials provided with the distribution.
++ *
++ * 3. Neither the name of the Institute nor the names of its contributors
++ *    may be used to endorse or promote products derived from this software
++ *    without specific prior written permission.
++ *
++ * THIS SOFTWARE IS PROVIDED BY THE INSTITUTE AND CONTRIBUTORS ``AS IS'' AND
++ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
++ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
++ * ARE DISCLAIMED.  IN NO EVENT SHALL THE INSTITUTE OR CONTRIBUTORS BE LIABLE
++ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
++ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
++ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
++ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
++ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
++ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
++ * SUCH DAMAGE.
++ */
++
++#include <asm/byteorder.h>
++#include <kunit/visibility.h>
++#include <linux/export.h>
++#include <linux/unaligned.h>
++#include "ar-internal.h"
++
++/*
++ * Sboxes for Feistel network derived from
++ * /afs/transarc.com/public/afsps/afs.rel31b.export-src/rxkad/sboxes.h
++ */
++#undef Z
++#define Z(x) cpu_to_be32(x << 3)
++static const __be32 sbox0[256] = {
++	Z(0xea), Z(0x7f), Z(0xb2), Z(0x64), Z(0x9d), Z(0xb0), Z(0xd9), Z(0x11),
++	Z(0xcd), Z(0x86), Z(0x86), Z(0x91), Z(0x0a), Z(0xb2), Z(0x93), Z(0x06),
++	Z(0x0e), Z(0x06), Z(0xd2), Z(0x65), Z(0x73), Z(0xc5), Z(0x28), Z(0x60),
++	Z(0xf2), Z(0x20), Z(0xb5), Z(0x38), Z(0x7e), Z(0xda), Z(0x9f), Z(0xe3),
++	Z(0xd2), Z(0xcf), Z(0xc4), Z(0x3c), Z(0x61), Z(0xff), Z(0x4a), Z(0x4a),
++	Z(0x35), Z(0xac), Z(0xaa), Z(0x5f), Z(0x2b), Z(0xbb), Z(0xbc), Z(0x53),
++	Z(0x4e), Z(0x9d), Z(0x78), Z(0xa3), Z(0xdc), Z(0x09), Z(0x32), Z(0x10),
++	Z(0xc6), Z(0x6f), Z(0x66), Z(0xd6), Z(0xab), Z(0xa9), Z(0xaf), Z(0xfd),
++	Z(0x3b), Z(0x95), Z(0xe8), Z(0x34), Z(0x9a), Z(0x81), Z(0x72), Z(0x80),
++	Z(0x9c), Z(0xf3), Z(0xec), Z(0xda), Z(0x9f), Z(0x26), Z(0x76), Z(0x15),
++	Z(0x3e), Z(0x55), Z(0x4d), Z(0xde), Z(0x84), Z(0xee), Z(0xad), Z(0xc7),
++	Z(0xf1), Z(0x6b), Z(0x3d), Z(0xd3), Z(0x04), Z(0x49), Z(0xaa), Z(0x24),
++	Z(0x0b), Z(0x8a), Z(0x83), Z(0xba), Z(0xfa), Z(0x85), Z(0xa0), Z(0xa8),
++	Z(0xb1), Z(0xd4), Z(0x01), Z(0xd8), Z(0x70), Z(0x64), Z(0xf0), Z(0x51),
++	Z(0xd2), Z(0xc3), Z(0xa7), Z(0x75), Z(0x8c), Z(0xa5), Z(0x64), Z(0xef),
++	Z(0x10), Z(0x4e), Z(0xb7), Z(0xc6), Z(0x61), Z(0x03), Z(0xeb), Z(0x44),
++	Z(0x3d), Z(0xe5), Z(0xb3), Z(0x5b), Z(0xae), Z(0xd5), Z(0xad), Z(0x1d),
++	Z(0xfa), Z(0x5a), Z(0x1e), Z(0x33), Z(0xab), Z(0x93), Z(0xa2), Z(0xb7),
++	Z(0xe7), Z(0xa8), Z(0x45), Z(0xa4), Z(0xcd), Z(0x29), Z(0x63), Z(0x44),
++	Z(0xb6), Z(0x69), Z(0x7e), Z(0x2e), Z(0x62), Z(0x03), Z(0xc8), Z(0xe0),
++	Z(0x17), Z(0xbb), Z(0xc7), Z(0xf3), Z(0x3f), Z(0x36), Z(0xba), Z(0x71),
++	Z(0x8e), Z(0x97), Z(0x65), Z(0x60), Z(0x69), Z(0xb6), Z(0xf6), Z(0xe6),
++	Z(0x6e), Z(0xe0), Z(0x81), Z(0x59), Z(0xe8), Z(0xaf), Z(0xdd), Z(0x95),
++	Z(0x22), Z(0x99), Z(0xfd), Z(0x63), Z(0x19), Z(0x74), Z(0x61), Z(0xb1),
++	Z(0xb6), Z(0x5b), Z(0xae), Z(0x54), Z(0xb3), Z(0x70), Z(0xff), Z(0xc6),
++	Z(0x3b), Z(0x3e), Z(0xc1), Z(0xd7), Z(0xe1), Z(0x0e), Z(0x76), Z(0xe5),
++	Z(0x36), Z(0x4f), Z(0x59), Z(0xc7), Z(0x08), Z(0x6e), Z(0x82), Z(0xa6),
++	Z(0x93), Z(0xc4), Z(0xaa), Z(0x26), Z(0x49), Z(0xe0), Z(0x21), Z(0x64),
++	Z(0x07), Z(0x9f), Z(0x64), Z(0x81), Z(0x9c), Z(0xbf), Z(0xf9), Z(0xd1),
++	Z(0x43), Z(0xf8), Z(0xb6), Z(0xb9), Z(0xf1), Z(0x24), Z(0x75), Z(0x03),
++	Z(0xe4), Z(0xb0), Z(0x99), Z(0x46), Z(0x3d), Z(0xf5), Z(0xd1), Z(0x39),
++	Z(0x72), Z(0x12), Z(0xf6), Z(0xba), Z(0x0c), Z(0x0d), Z(0x42), Z(0x2e)
++};
++
++#undef Z
++#define Z(x) cpu_to_be32(((x & 0x1f) << 27) | (x >> 5))
++static const __be32 sbox1[256] = {
++	Z(0x77), Z(0x14), Z(0xa6), Z(0xfe), Z(0xb2), Z(0x5e), Z(0x8c), Z(0x3e),
++	Z(0x67), Z(0x6c), Z(0xa1), Z(0x0d), Z(0xc2), Z(0xa2), Z(0xc1), Z(0x85),
++	Z(0x6c), Z(0x7b), Z(0x67), Z(0xc6), Z(0x23), Z(0xe3), Z(0xf2), Z(0x89),
++	Z(0x50), Z(0x9c), Z(0x03), Z(0xb7), Z(0x73), Z(0xe6), Z(0xe1), Z(0x39),
++	Z(0x31), Z(0x2c), Z(0x27), Z(0x9f), Z(0xa5), Z(0x69), Z(0x44), Z(0xd6),
++	Z(0x23), Z(0x83), Z(0x98), Z(0x7d), Z(0x3c), Z(0xb4), Z(0x2d), Z(0x99),
++	Z(0x1c), Z(0x1f), Z(0x8c), Z(0x20), Z(0x03), Z(0x7c), Z(0x5f), Z(0xad),
++	Z(0xf4), Z(0xfa), Z(0x95), Z(0xca), Z(0x76), Z(0x44), Z(0xcd), Z(0xb6),
++	Z(0xb8), Z(0xa1), Z(0xa1), Z(0xbe), Z(0x9e), Z(0x54), Z(0x8f), Z(0x0b),
++	Z(0x16), Z(0x74), Z(0x31), Z(0x8a), Z(0x23), Z(0x17), Z(0x04), Z(0xfa),
++	Z(0x79), Z(0x84), Z(0xb1), Z(0xf5), Z(0x13), Z(0xab), Z(0xb5), Z(0x2e),
++	Z(0xaa), Z(0x0c), Z(0x60), Z(0x6b), Z(0x5b), Z(0xc4), Z(0x4b), Z(0xbc),
++	Z(0xe2), Z(0xaf), Z(0x45), Z(0x73), Z(0xfa), Z(0xc9), Z(0x49), Z(0xcd),
++	Z(0x00), Z(0x92), Z(0x7d), Z(0x97), Z(0x7a), Z(0x18), Z(0x60), Z(0x3d),
++	Z(0xcf), Z(0x5b), Z(0xde), Z(0xc6), Z(0xe2), Z(0xe6), Z(0xbb), Z(0x8b),
++	Z(0x06), Z(0xda), Z(0x08), Z(0x15), Z(0x1b), Z(0x88), Z(0x6a), Z(0x17),
++	Z(0x89), Z(0xd0), Z(0xa9), Z(0xc1), Z(0xc9), Z(0x70), Z(0x6b), Z(0xe5),
++	Z(0x43), Z(0xf4), Z(0x68), Z(0xc8), Z(0xd3), Z(0x84), Z(0x28), Z(0x0a),
++	Z(0x52), Z(0x66), Z(0xa3), Z(0xca), Z(0xf2), Z(0xe3), Z(0x7f), Z(0x7a),
++	Z(0x31), Z(0xf7), Z(0x88), Z(0x94), Z(0x5e), Z(0x9c), Z(0x63), Z(0xd5),
++	Z(0x24), Z(0x66), Z(0xfc), Z(0xb3), Z(0x57), Z(0x25), Z(0xbe), Z(0x89),
++	Z(0x44), Z(0xc4), Z(0xe0), Z(0x8f), Z(0x23), Z(0x3c), Z(0x12), Z(0x52),
++	Z(0xf5), Z(0x1e), Z(0xf4), Z(0xcb), Z(0x18), Z(0x33), Z(0x1f), Z(0xf8),
++	Z(0x69), Z(0x10), Z(0x9d), Z(0xd3), Z(0xf7), Z(0x28), Z(0xf8), Z(0x30),
++	Z(0x05), Z(0x5e), Z(0x32), Z(0xc0), Z(0xd5), Z(0x19), Z(0xbd), Z(0x45),
++	Z(0x8b), Z(0x5b), Z(0xfd), Z(0xbc), Z(0xe2), Z(0x5c), Z(0xa9), Z(0x96),
++	Z(0xef), Z(0x70), Z(0xcf), Z(0xc2), Z(0x2a), Z(0xb3), Z(0x61), Z(0xad),
++	Z(0x80), Z(0x48), Z(0x81), Z(0xb7), Z(0x1d), Z(0x43), Z(0xd9), Z(0xd7),
++	Z(0x45), Z(0xf0), Z(0xd8), Z(0x8a), Z(0x59), Z(0x7c), Z(0x57), Z(0xc1),
++	Z(0x79), Z(0xc7), Z(0x34), Z(0xd6), Z(0x43), Z(0xdf), Z(0xe4), Z(0x78),
++	Z(0x16), Z(0x06), Z(0xda), Z(0x92), Z(0x76), Z(0x51), Z(0xe1), Z(0xd4),
++	Z(0x70), Z(0x03), Z(0xe0), Z(0x2f), Z(0x96), Z(0x91), Z(0x82), Z(0x80)
++};
++
++#undef Z
++#define Z(x) cpu_to_be32(x << 11)
++static const __be32 sbox2[256] = {
++	Z(0xf0), Z(0x37), Z(0x24), Z(0x53), Z(0x2a), Z(0x03), Z(0x83), Z(0x86),
++	Z(0xd1), Z(0xec), Z(0x50), Z(0xf0), Z(0x42), Z(0x78), Z(0x2f), Z(0x6d),
++	Z(0xbf), Z(0x80), Z(0x87), Z(0x27), Z(0x95), Z(0xe2), Z(0xc5), Z(0x5d),
++	Z(0xf9), Z(0x6f), Z(0xdb), Z(0xb4), Z(0x65), Z(0x6e), Z(0xe7), Z(0x24),
++	Z(0xc8), Z(0x1a), Z(0xbb), Z(0x49), Z(0xb5), Z(0x0a), Z(0x7d), Z(0xb9),
++	Z(0xe8), Z(0xdc), Z(0xb7), Z(0xd9), Z(0x45), Z(0x20), Z(0x1b), Z(0xce),
++	Z(0x59), Z(0x9d), Z(0x6b), Z(0xbd), Z(0x0e), Z(0x8f), Z(0xa3), Z(0xa9),
++	Z(0xbc), Z(0x74), Z(0xa6), Z(0xf6), Z(0x7f), Z(0x5f), Z(0xb1), Z(0x68),
++	Z(0x84), Z(0xbc), Z(0xa9), Z(0xfd), Z(0x55), Z(0x50), Z(0xe9), Z(0xb6),
++	Z(0x13), Z(0x5e), Z(0x07), Z(0xb8), Z(0x95), Z(0x02), Z(0xc0), Z(0xd0),
++	Z(0x6a), Z(0x1a), Z(0x85), Z(0xbd), Z(0xb6), Z(0xfd), Z(0xfe), Z(0x17),
++	Z(0x3f), Z(0x09), Z(0xa3), Z(0x8d), Z(0xfb), Z(0xed), Z(0xda), Z(0x1d),
++	Z(0x6d), Z(0x1c), Z(0x6c), Z(0x01), Z(0x5a), Z(0xe5), Z(0x71), Z(0x3e),
++	Z(0x8b), Z(0x6b), Z(0xbe), Z(0x29), Z(0xeb), Z(0x12), Z(0x19), Z(0x34),
++	Z(0xcd), Z(0xb3), Z(0xbd), Z(0x35), Z(0xea), Z(0x4b), Z(0xd5), Z(0xae),
++	Z(0x2a), Z(0x79), Z(0x5a), Z(0xa5), Z(0x32), Z(0x12), Z(0x7b), Z(0xdc),
++	Z(0x2c), Z(0xd0), Z(0x22), Z(0x4b), Z(0xb1), Z(0x85), Z(0x59), Z(0x80),
++	Z(0xc0), Z(0x30), Z(0x9f), Z(0x73), Z(0xd3), Z(0x14), Z(0x48), Z(0x40),
++	Z(0x07), Z(0x2d), Z(0x8f), Z(0x80), Z(0x0f), Z(0xce), Z(0x0b), Z(0x5e),
++	Z(0xb7), Z(0x5e), Z(0xac), Z(0x24), Z(0x94), Z(0x4a), Z(0x18), Z(0x15),
++	Z(0x05), Z(0xe8), Z(0x02), Z(0x77), Z(0xa9), Z(0xc7), Z(0x40), Z(0x45),
++	Z(0x89), Z(0xd1), Z(0xea), Z(0xde), Z(0x0c), Z(0x79), Z(0x2a), Z(0x99),
++	Z(0x6c), Z(0x3e), Z(0x95), Z(0xdd), Z(0x8c), Z(0x7d), Z(0xad), Z(0x6f),
++	Z(0xdc), Z(0xff), Z(0xfd), Z(0x62), Z(0x47), Z(0xb3), Z(0x21), Z(0x8a),
++	Z(0xec), Z(0x8e), Z(0x19), Z(0x18), Z(0xb4), Z(0x6e), Z(0x3d), Z(0xfd),
++	Z(0x74), Z(0x54), Z(0x1e), Z(0x04), Z(0x85), Z(0xd8), Z(0xbc), Z(0x1f),
++	Z(0x56), Z(0xe7), Z(0x3a), Z(0x56), Z(0x67), Z(0xd6), Z(0xc8), Z(0xa5),
++	Z(0xf3), Z(0x8e), Z(0xde), Z(0xae), Z(0x37), Z(0x49), Z(0xb7), Z(0xfa),
++	Z(0xc8), Z(0xf4), Z(0x1f), Z(0xe0), Z(0x2a), Z(0x9b), Z(0x15), Z(0xd1),
++	Z(0x34), Z(0x0e), Z(0xb5), Z(0xe0), Z(0x44), Z(0x78), Z(0x84), Z(0x59),
++	Z(0x56), Z(0x68), Z(0x77), Z(0xa5), Z(0x14), Z(0x06), Z(0xf5), Z(0x2f),
++	Z(0x8c), Z(0x8a), Z(0x73), Z(0x80), Z(0x76), Z(0xb4), Z(0x10), Z(0x86)
++};
++
++#undef Z
++#define Z(x) cpu_to_be32(x << 19)
++static const __be32 sbox3[256] = {
++	Z(0xa9), Z(0x2a), Z(0x48), Z(0x51), Z(0x84), Z(0x7e), Z(0x49), Z(0xe2),
++	Z(0xb5), Z(0xb7), Z(0x42), Z(0x33), Z(0x7d), Z(0x5d), Z(0xa6), Z(0x12),
++	Z(0x44), Z(0x48), Z(0x6d), Z(0x28), Z(0xaa), Z(0x20), Z(0x6d), Z(0x57),
++	Z(0xd6), Z(0x6b), Z(0x5d), Z(0x72), Z(0xf0), Z(0x92), Z(0x5a), Z(0x1b),
++	Z(0x53), Z(0x80), Z(0x24), Z(0x70), Z(0x9a), Z(0xcc), Z(0xa7), Z(0x66),
++	Z(0xa1), Z(0x01), Z(0xa5), Z(0x41), Z(0x97), Z(0x41), Z(0x31), Z(0x82),
++	Z(0xf1), Z(0x14), Z(0xcf), Z(0x53), Z(0x0d), Z(0xa0), Z(0x10), Z(0xcc),
++	Z(0x2a), Z(0x7d), Z(0xd2), Z(0xbf), Z(0x4b), Z(0x1a), Z(0xdb), Z(0x16),
++	Z(0x47), Z(0xf6), Z(0x51), Z(0x36), Z(0xed), Z(0xf3), Z(0xb9), Z(0x1a),
++	Z(0xa7), Z(0xdf), Z(0x29), Z(0x43), Z(0x01), Z(0x54), Z(0x70), Z(0xa4),
++	Z(0xbf), Z(0xd4), Z(0x0b), Z(0x53), Z(0x44), Z(0x60), Z(0x9e), Z(0x23),
++	Z(0xa1), Z(0x18), Z(0x68), Z(0x4f), Z(0xf0), Z(0x2f), Z(0x82), Z(0xc2),
++	Z(0x2a), Z(0x41), Z(0xb2), Z(0x42), Z(0x0c), Z(0xed), Z(0x0c), Z(0x1d),
++	Z(0x13), Z(0x3a), Z(0x3c), Z(0x6e), Z(0x35), Z(0xdc), Z(0x60), Z(0x65),
++	Z(0x85), Z(0xe9), Z(0x64), Z(0x02), Z(0x9a), Z(0x3f), Z(0x9f), Z(0x87),
++	Z(0x96), Z(0xdf), Z(0xbe), Z(0xf2), Z(0xcb), Z(0xe5), Z(0x6c), Z(0xd4),
++	Z(0x5a), Z(0x83), Z(0xbf), Z(0x92), Z(0x1b), Z(0x94), Z(0x00), Z(0x42),
++	Z(0xcf), Z(0x4b), Z(0x00), Z(0x75), Z(0xba), Z(0x8f), Z(0x76), Z(0x5f),
++	Z(0x5d), Z(0x3a), Z(0x4d), Z(0x09), Z(0x12), Z(0x08), Z(0x38), Z(0x95),
++	Z(0x17), Z(0xe4), Z(0x01), Z(0x1d), Z(0x4c), Z(0xa9), Z(0xcc), Z(0x85),
++	Z(0x82), Z(0x4c), Z(0x9d), Z(0x2f), Z(0x3b), Z(0x66), Z(0xa1), Z(0x34),
++	Z(0x10), Z(0xcd), Z(0x59), Z(0x89), Z(0xa5), Z(0x31), Z(0xcf), Z(0x05),
++	Z(0xc8), Z(0x84), Z(0xfa), Z(0xc7), Z(0xba), Z(0x4e), Z(0x8b), Z(0x1a),
++	Z(0x19), Z(0xf1), Z(0xa1), Z(0x3b), Z(0x18), Z(0x12), Z(0x17), Z(0xb0),
++	Z(0x98), Z(0x8d), Z(0x0b), Z(0x23), Z(0xc3), Z(0x3a), Z(0x2d), Z(0x20),
++	Z(0xdf), Z(0x13), Z(0xa0), Z(0xa8), Z(0x4c), Z(0x0d), Z(0x6c), Z(0x2f),
++	Z(0x47), Z(0x13), Z(0x13), Z(0x52), Z(0x1f), Z(0x2d), Z(0xf5), Z(0x79),
++	Z(0x3d), Z(0xa2), Z(0x54), Z(0xbd), Z(0x69), Z(0xc8), Z(0x6b), Z(0xf3),
++	Z(0x05), Z(0x28), Z(0xf1), Z(0x16), Z(0x46), Z(0x40), Z(0xb0), Z(0x11),
++	Z(0xd3), Z(0xb7), Z(0x95), Z(0x49), Z(0xcf), Z(0xc3), Z(0x1d), Z(0x8f),
++	Z(0xd8), Z(0xe1), Z(0x73), Z(0xdb), Z(0xad), Z(0xc8), Z(0xc9), Z(0xa9),
++	Z(0xa1), Z(0xc2), Z(0xc5), Z(0xe3), Z(0xba), Z(0xfc), Z(0x0e), Z(0x25)
++};
++
++union fcrypt_block {
++	__be64 a;
++	struct {
++		__be32 l, r;
++	};
++};
++
++#define F_ENCRYPT(R, L, sched)                                       \
++	do {                                                         \
++		union lc4 {                                          \
++			__be32 l;                                    \
++			u8 c[4];                                     \
++		} u;                                                 \
++		u.l = sched ^ R;                                     \
++		L ^= sbox0[u.c[0]] ^ sbox1[u.c[1]] ^ sbox2[u.c[2]] ^ \
++		     sbox3[u.c[3]];                                  \
++	} while (0)
++
++/* Encrypt one block using FCrypt. */
++static __be64 fcrypt_encrypt(const struct fcrypt_key *key, __be64 ptext)
++{
++	union fcrypt_block X = { .a = ptext };
++
++	/* This is a 16 round Feistel network with permutation F_ENCRYPT. */
++	F_ENCRYPT(X.r, X.l, key->sched[0x0]);
++	F_ENCRYPT(X.l, X.r, key->sched[0x1]);
++	F_ENCRYPT(X.r, X.l, key->sched[0x2]);
++	F_ENCRYPT(X.l, X.r, key->sched[0x3]);
++	F_ENCRYPT(X.r, X.l, key->sched[0x4]);
++	F_ENCRYPT(X.l, X.r, key->sched[0x5]);
++	F_ENCRYPT(X.r, X.l, key->sched[0x6]);
++	F_ENCRYPT(X.l, X.r, key->sched[0x7]);
++	F_ENCRYPT(X.r, X.l, key->sched[0x8]);
++	F_ENCRYPT(X.l, X.r, key->sched[0x9]);
++	F_ENCRYPT(X.r, X.l, key->sched[0xa]);
++	F_ENCRYPT(X.l, X.r, key->sched[0xb]);
++	F_ENCRYPT(X.r, X.l, key->sched[0xc]);
++	F_ENCRYPT(X.l, X.r, key->sched[0xd]);
++	F_ENCRYPT(X.r, X.l, key->sched[0xe]);
++	F_ENCRYPT(X.l, X.r, key->sched[0xf]);
++	return X.a;
++}
++
++/* Decrypt one block using FCrypt. */
++static __be64 fcrypt_decrypt(const struct fcrypt_key *key, __be64 ctext)
++{
++	union fcrypt_block X = { .a = ctext };
++
++	/* This is a 16 round Feistel network with permutation F_ENCRYPT. */
++	F_ENCRYPT(X.l, X.r, key->sched[0xf]);
++	F_ENCRYPT(X.r, X.l, key->sched[0xe]);
++	F_ENCRYPT(X.l, X.r, key->sched[0xd]);
++	F_ENCRYPT(X.r, X.l, key->sched[0xc]);
++	F_ENCRYPT(X.l, X.r, key->sched[0xb]);
++	F_ENCRYPT(X.r, X.l, key->sched[0xa]);
++	F_ENCRYPT(X.l, X.r, key->sched[0x9]);
++	F_ENCRYPT(X.r, X.l, key->sched[0x8]);
++	F_ENCRYPT(X.l, X.r, key->sched[0x7]);
++	F_ENCRYPT(X.r, X.l, key->sched[0x6]);
++	F_ENCRYPT(X.l, X.r, key->sched[0x5]);
++	F_ENCRYPT(X.r, X.l, key->sched[0x4]);
++	F_ENCRYPT(X.l, X.r, key->sched[0x3]);
++	F_ENCRYPT(X.r, X.l, key->sched[0x2]);
++	F_ENCRYPT(X.l, X.r, key->sched[0x1]);
++	F_ENCRYPT(X.r, X.l, key->sched[0x0]);
++	return X.a;
++}
++
++/**
++ * fcrypt_preparekey - Prepare a key for FCrypt encryption and decryption
++ * @key: (out) The prepared key
++ * @raw_key: The raw key as an 8-byte array
++ *
++ * This computes the FCrypt key schedule.
++ */
++void fcrypt_preparekey(struct fcrypt_key *key, const u8 raw_key[FCRYPT_BSIZE])
++{
++	u64 k = 0;
++
++	/* Load the 56 non-parity bits of the key.  Discard the parity bits. */
++	for (int i = 0; i < 8; i++)
++		k = (k << 7) | (raw_key[i] >> 1);
++
++	/* Generate the key schedule word for each round. */
++	for (int i = 0; i < FCRYPT_ROUNDS; i++) {
++		key->sched[i] = cpu_to_be32(k);
++		/* Rotate the low 56 bits of 'k' right by 11 bits. */
++		k = (k >> 11) | ((k & ((1 << 11) - 1)) << (56 - 11));
++	}
++}
++EXPORT_SYMBOL_IF_KUNIT(fcrypt_preparekey);
++
++/**
++ * fcrypt_pcbc_encrypt - Encrypt data using FCrypt cipher in PCBC mode
++ * @key: The key
++ * @iv: The 8-byte initialization vector
++ * @src: The source data
++ * @dst: The destination data.  Both in-place and out-of-place are supported.
++ * @nblocks: The number of 8-byte blocks to encrypt
++ *
++ * WARNING: This cipher is insecure.  Not only is the 56-bit key easily
++ * brute-forced, the cipher itself is cryptographically weak and doesn't even
++ * provide the intended 56-bit security level.  It effectively just acts as an
++ * obfuscation algorithm.  It is supported only for backwards compatibility.
++ */
++void fcrypt_pcbc_encrypt(const struct fcrypt_key *key,
++			 const u8 iv[FCRYPT_BSIZE], const void *src, void *dst,
++			 size_t nblocks)
++{
++	__be64 prev = get_unaligned((const __be64 *)iv);
++	const __be64 *src_blocks = src;
++	__be64 *dst_blocks = dst;
++
++	while (nblocks--) {
++		__be64 ptext, ctext;
++
++		ptext = get_unaligned(src_blocks++);
++		ctext = fcrypt_encrypt(key, prev ^ ptext);
++		put_unaligned(ctext, dst_blocks++);
++		prev = ptext ^ ctext;
++	}
++}
++EXPORT_SYMBOL_IF_KUNIT(fcrypt_pcbc_encrypt);
++
++/**
++ * fcrypt_pcbc_decrypt - Decrypt data using FCrypt cipher in PCBC mode
++ * @key: The key
++ * @iv: The 8-byte initialization vector
++ * @src: The source data
++ * @dst: The destination data.  Both in-place and out-of-place are supported.
++ * @nblocks: The number of 8-byte blocks to decrypt
++ */
++void fcrypt_pcbc_decrypt(const struct fcrypt_key *key,
++			 const u8 iv[FCRYPT_BSIZE], const void *src, void *dst,
++			 size_t nblocks)
++{
++	__be64 prev = get_unaligned((const __be64 *)iv);
++	const __be64 *src_blocks = src;
++	__be64 *dst_blocks = dst;
++
++	while (nblocks--) {
++		__be64 ptext, ctext;
++
++		ctext = get_unaligned(src_blocks++);
++		ptext = prev ^ fcrypt_decrypt(key, ctext);
++		put_unaligned(ptext, dst_blocks++);
++		prev = ptext ^ ctext;
++	}
++}
++EXPORT_SYMBOL_IF_KUNIT(fcrypt_pcbc_decrypt);
+diff --git a/net/rxrpc/tests/Makefile b/net/rxrpc/tests/Makefile
+new file mode 100644
+index 000000000000..4f51008800b4
+--- /dev/null
++++ b/net/rxrpc/tests/Makefile
+@@ -0,0 +1,3 @@
++# SPDX-License-Identifier: GPL-2.0
++
++obj-$(CONFIG_AF_RXRPC_KUNIT_TEST) += rxrpc_kunit.o
+diff --git a/net/rxrpc/tests/rxrpc_kunit.c b/net/rxrpc/tests/rxrpc_kunit.c
+new file mode 100644
+index 000000000000..85a9859fae44
+--- /dev/null
++++ b/net/rxrpc/tests/rxrpc_kunit.c
+@@ -0,0 +1,109 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Unit tests for RxRPC crypto functions
++ *
++ * Copyright 2026 Google LLC
++ */
++#include "../ar-internal.h"
++#include <kunit/test.h>
++
++struct fcrypt_pcbc_testvec {
++	u8 key[FCRYPT_BSIZE];
++	u8 iv[FCRYPT_BSIZE];
++	const u8 *ptext; /* plaintext */
++	const u8 *ctext; /* ciphertext */
++	size_t nblocks; /* length of ptext and ctext in blocks */
++};
++
++/* FCrypt-PCBC test vectors */
++static const struct fcrypt_pcbc_testvec fcrypt_pcbc_testvecs[] = {
++	{
++		/* http://www.openafs.org/pipermail/openafs-devel/2000-December/005320.html */
++		.key = "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.iv = "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.ptext = "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.ctext = "\x0E\x09\x00\xC7\x3E\xF7\xED\x41",
++		.nblocks = 1,
++	},
++	{
++		.key = "\x11\x44\x77\xAA\xDD\x00\x33\x66",
++		.iv = "\x00\x00\x00\x00\x00\x00\x00\x00",
++		.ptext = "\x12\x34\x56\x78\x9A\xBC\xDE\xF0",
++		.ctext = "\xD8\xED\x78\x74\x77\xEC\x06\x80",
++		.nblocks = 1,
++	},
++	{
++		/* From Arla */
++		.key = "\xf0\xe1\xd2\xc3\xb4\xa5\x96\x87",
++		.iv = "\xfe\xdc\xba\x98\x76\x54\x32\x10",
++		.ptext = "The quick brown fox jumps over the lazy dogs.\0\0",
++		.ctext = "\x00\xf0\x0e\x11\x75\xe6\x23\x82"
++			 "\xee\xac\x98\x62\x44\x51\xe4\x84"
++			 "\xc3\x59\xd8\xaa\x64\x60\xae\xf7"
++			 "\xd2\xd9\x13\x79\x72\xa3\x45\x03"
++			 "\x23\xb5\x62\xd7\x0c\xf5\x27\xd1"
++			 "\xf8\x91\x3c\xac\x44\x22\x92\xef",
++		.nblocks = 6,
++	},
++	{
++		.key = "\xfe\xdc\xba\x98\x76\x54\x32\x10",
++		.iv = "\xf0\xe1\xd2\xc3\xb4\xa5\x96\x87",
++		.ptext = "The quick brown fox jumps over the lazy dogs.\0\0",
++		.ctext = "\xca\x90\xf5\x9d\xcb\xd4\xd2\x3c"
++			 "\x01\x88\x7f\x3e\x31\x6e\x62\x9d"
++			 "\xd8\xe0\x57\xa3\x06\x3a\x42\x58"
++			 "\x2a\x28\xfe\x72\x52\x2f\xdd\xe0"
++			 "\x19\x89\x09\x1c\x2a\x8e\x8c\x94"
++			 "\xfc\xc7\x68\xe4\x88\xaa\xde\x0f",
++		.nblocks = 6,
++	}
++};
++
++static void test_fcrypt_pcbc(struct kunit *test)
++{
++	u8 data[48];
++
++	for (size_t i = 0; i < ARRAY_SIZE(fcrypt_pcbc_testvecs); i++) {
++		const struct fcrypt_pcbc_testvec *tv = &fcrypt_pcbc_testvecs[i];
++		const size_t nblocks = tv->nblocks;
++		const size_t len = nblocks * FCRYPT_BSIZE;
++		struct fcrypt_key key;
++
++		KUNIT_ASSERT_GE(test, sizeof(data), len);
++
++		fcrypt_preparekey(&key, tv->key);
++
++		/* out-of-place encryption */
++		fcrypt_pcbc_encrypt(&key, tv->iv, tv->ptext, data, nblocks);
++		KUNIT_ASSERT_MEMEQ(test, tv->ctext, data, len);
++
++		/* in-place encryption */
++		memcpy(data, tv->ptext, len);
++		fcrypt_pcbc_encrypt(&key, tv->iv, data, data, nblocks);
++		KUNIT_ASSERT_MEMEQ(test, tv->ctext, data, len);
++
++		/* out-of-place decryption */
++		fcrypt_pcbc_decrypt(&key, tv->iv, tv->ctext, data, nblocks);
++		KUNIT_ASSERT_MEMEQ(test, tv->ptext, data, len);
++
++		/* in-place decryption */
++		memcpy(data, tv->ctext, len);
++		fcrypt_pcbc_decrypt(&key, tv->iv, data, data, nblocks);
++		KUNIT_ASSERT_MEMEQ(test, tv->ptext, data, len);
++	}
++}
++
++static struct kunit_case rxrpc_test_cases[] = {
++	KUNIT_CASE(test_fcrypt_pcbc),
++	{},
++};
++
++static struct kunit_suite rxrpc_test_suite = {
++	.name = "rxrpc",
++	.test_cases = rxrpc_test_cases,
++};
++kunit_test_suite(rxrpc_test_suite);
++
++MODULE_DESCRIPTION("Unit tests for RxRPC crypto functions");
++MODULE_IMPORT_NS("EXPORTED_FOR_KUNIT_TESTING");
++MODULE_LICENSE("GPL");
 -- 
 2.54.0
 
