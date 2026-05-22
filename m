@@ -1,178 +1,213 @@
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012044.outbound.protection.outlook.com [52.101.43.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 801061A3172
-	for <linux-crypto@vger.kernel.org>; Fri, 22 May 2026 00:27:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779409642; cv=none; b=j/HpVyM1LetLreEd8iXNQFJTntqMeNhtkdgGahBenhH3mWPqKSkN5OlpBtXR0x5E1YjLCdAy1ecUn/1uI+v8h4W+C1e9hyGKeuRi+OyozgbjlQJC+I1yYphPCbU33UnW2AtGt1hSikWSji/3PBv0aIa8ViBz2l0sTqxstK0CxDI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779409642; c=relaxed/simple;
-	bh=OeaBJnpyh+HO3KMXuAPZK5iYCsIl+yzigcjSPICIOXM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cM8bhMaW/V2UvN8umRN9N5gZAyQ1TGhq91qLdq1j03CQ5UQGadOtuJpNKT/rC91FNVxcq4DA0gZa7b19SK5BSkNZQPavyJP3SwWwsWHftJMqzpXFnwGcIrv5bdcKpX1ylT/kCgIGwLRVU5loM8QgPHKsBYqn33cKhxdqaFqZRFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=PuX/S8HZ; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81AD72D12ED;
+	Fri, 22 May 2026 01:58:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779415094; cv=fail; b=pARbvr5EGA3NF9jM2d6R5yyJgDOG/I4zp+zC+LQ4Nn10TbPXeXbadRXFWDrU1CKLd340faKRd8FdqYkMtG8dgVhmgOte49568M/Jr1fwYJIhTFnFUXyy3loor9rjY/mSPCjGNMnvZWCgM5ol0z/PWMhJSRHieSJS9OgB8rNEGRE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779415094; c=relaxed/simple;
+	bh=NwUHdXHlMfR61/kzdGrOeHheHjLQuJ7E3ho0z6u7TvQ=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=N8QXRmTsBW6zSWjGLxakp+mKRIa/zsgjwTNZ1f4fQtwUDniZ15/kBXivGc60SxhYI82c9zMA0f2sRqJJ1QG1ao9HPy4GpXtIvLS92BMibiVh8tDvdmOzSqltJAOva9ecVcroqETjLiE/Qs7hQgJD6QfSa7sFvJTucYSOFnCC9Xc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Jc7bgwUE; arc=fail smtp.client-ip=52.101.43.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="PuX/S8HZ"
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-48e82c23840so54318035e9.3
-        for <linux-crypto@vger.kernel.org>; Thu, 21 May 2026 17:27:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1779409639; x=1780014439; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=6Ay5nOcwCJCKL9kJTKSvIioIW4guYTs+JXkN6Y689XM=;
-        b=PuX/S8HZNBG3rGmZb7jXpJY1TmOL6BM1XdZimuQ1Mo3sF1iQd1S+OSvIPpCNoJiRxP
-         ciYUxB+qCCeeiIVtYpCG6xYka03V3TYWGFAXmw6LSRvoRlY8P1HSsPqdN2vgYw+8+cV2
-         YbOorhIREcPpjLYESezzhxI6qhSwn/si/LgXHWjgb25pFgJW4wHAHA4oLh0S/8nSc9L7
-         nr5pQEAchCVDR6gk/vJzRuYg9H3tFchalPQkCtO64xf1/f3GQ7gL/zKWYkgnxIEjepd7
-         yoXnxlib59p3hr0/MhzefrNawh+lCo3Jda+C+8l3P6xklkK5ajky5yBhZBuHER90rsCd
-         JSzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779409639; x=1780014439;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6Ay5nOcwCJCKL9kJTKSvIioIW4guYTs+JXkN6Y689XM=;
-        b=hpbY1R8Y3X8SZwTsOql9IW+Kmjetk0Xa7rEAtrkpzjGjC7QUyEvFjI6R7dxX7OxScH
-         quncQiVsgqix9JqVB/QB9+GUXswFbIRMLeotrFovHmeeJsCzFeZahLCBEYv7PrDX64/2
-         DtbuHb97Rs2q7D61KFyDvzahqmrSEnneW7nkcPozY+nMcq7u0n4vEOU1TVcrPcEN6n38
-         W6bh7dixusjI2KUClXUytzFbc5kCTD16FiiLitUsulWHVv04O0Pws3LLtzDI3VlOFS4n
-         XQQyh0O75dYNMnDA54ICBDuGbqfWwgfmNiC/fmHtCrwf9f+XiSCmK2LimuJyU+GZxCn+
-         4LvQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8TKCmNwNyKgk5Mgz8/7CqwWat/qssCHV6vAFoYeTK7Ve/Lp9WI8Qi8XCatJvnN1hVy+k3lbW3Pu3Jecg0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnsGo3gZhn6GK7Ki7f7XjilNcJM0Smgjjt2lCKCyscqwiSM7nl
-	67CqzKS7RMdjkEE/oscRFoJD7OJwGRlFL78wnKF0BlapCqTf/ARjfBA7IuOYCCZUxbA=
-X-Gm-Gg: Acq92OHGaBYAK6WDOD/xoZzTtwqaIM0PKQogZUD+BL5Q8KNRQZ0Q5oh94B5jvXZgIf5
-	HxD01qOF+xGXEXh5+yO1jUWFF+gYARS+q5VdjxkRKof07FSJO7VpvozcZmpiPMKMCZFakI87v9t
-	IRfs/dmpFyfi0ZscP/3YRYfgkxo5nIIC7MASKPY4aOkgVLXglKUAe0H1kPBBPoVUZ7++KKNLbDx
-	LSGLvfIDYe3QqNDKEtnLRSlg8B7y3kwDl8dh+B4utAsnj+xPJuP2Nv+J5Exbkb3+0EI0FBmoXoz
-	+pKPjAobYPayjPy8ooa9kFrA/VoUoeg8t7ZXOKJUvQnluda7i9qIWEltoaxAkqf31rIRZOn6e2m
-	TXJqC63OVXT2FNXJfU2n8KPp8qH9gUIIaHuuQj0XAM5LFwOO7bSLKUNgDJ4UuychZ5nLaedj7dL
-	SSE94w7dzB9WIkEMZBEv1oHBIOqJT7YvtWQlY6LHiBQ+keXz3ZSRoqIe9A52hi2E/x+cjKv4d+S
-	82tUGSTDP/ExG1HOcZTJ2aLA7JK0rUWHqAA3RhC8zvjmcWJ0zPkMFwewg==
-X-Received: by 2002:a05:600c:4ecc:b0:490:3c90:2cda with SMTP id 5b1f17b1804b1-490426cef73mr10709345e9.20.1779409638952;
-        Thu, 21 May 2026 17:27:18 -0700 (PDT)
-Received: from ?IPV6:2403:580d:fda1:0:2bb5:f164:6e6a:38d8? (2403-580d-fda1-0-2bb5-f164-6e6a-38d8.ip6.aussiebb.net. [2403:580d:fda1:0:2bb5:f164:6e6a:38d8])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2beb0f91bccsm4187125ad.36.2026.05.21.17.27.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 May 2026 17:27:17 -0700 (PDT)
-Message-ID: <cced8d26-d846-470d-b112-344e53ec1b9c@suse.com>
-Date: Fri, 22 May 2026 09:57:00 +0930
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Jc7bgwUE"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=PoUV/pI7ep2O6YsJ4zk/2PL0p9DnA0qaK1Er8WKPsSEYZCgekVcZxWUCevRwZLIGaRks4BKHaN8qfvqk6/Dx+SCJVOH+Mj1Yyd+ga5eeqPgfoa/p4D9UEQ83ByvVWOhAlnZgoc6dyc5x4JInpQDQ1eMe7NOROwOTBMY73dlmd1no+fWCcLp9ypWJCqtssIyz0ZK2zk0PbV+tV6DWHpRPpJD5q57+IzsyrMKm1CU/SmZRFFmgUaJj385q9+PEMCdGKOivJtM9tpf8JYk6n/z7QGVm63LBTjBXBXpmUVux57HfiDhfdr0IiH9a9nuWRuaoz80hCF6w7T9b8aqSk8ZCug==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZIoYvyeiGIAuzTu9bMWtR1csQ0z7cGWxK9drnfGa6gg=;
+ b=J6Yku5a/mJIcKiG+b4vACJqpjQuiBYL23mu6Mf7sRyZ0gq/5AbsiNpfC6LbOJQbX197I3stdBlSZVfki2ApN8xaMN0MUpM5IEDUQsYIwea0w709WXHfkpku/wwONd6mxwvSU+9kpGsQXR6+VO31ed0YAexyrepC8TTE04fe5cyPUuttpTS/bmdbad2ISy50VcZovSCuqzGN7vHCAYKfDGm1nVzdDgg5QslY8msh4xaoPchKVOnk7jWKJ4p9wBFq+NbMg/YyixGmiAd7F33PkFc/ZlrmGiakLghUdH+5i1TCS7cD33GISxbpkgEfG3zUHkkta+IpU0eJ/LbUQdKSQ/g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZIoYvyeiGIAuzTu9bMWtR1csQ0z7cGWxK9drnfGa6gg=;
+ b=Jc7bgwUEtuWsnGzHkM6hInN54HZDAZnNHIAbLHeHYdoG1PZRnYlLRIFj1BKiSAcfFk9Cb6A3nG6rEflj0l9k36SqhHX/dxjJuun71WBYHUMlK/wzJ2d1tKwNxpA1MdGjIoWOXoRqxWcFfOLjkNCIuft4UYPEAhYeeamVVzGZCRk=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CH3PR12MB8660.namprd12.prod.outlook.com (2603:10b6:610:177::5)
+ by MN0PR12MB6128.namprd12.prod.outlook.com (2603:10b6:208:3c4::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.25.23; Fri, 22 May
+ 2026 01:58:10 +0000
+Received: from CH3PR12MB8660.namprd12.prod.outlook.com
+ ([fe80::87aa:52e5:4b72:d5f3]) by CH3PR12MB8660.namprd12.prod.outlook.com
+ ([fe80::87aa:52e5:4b72:d5f3%5]) with mapi id 15.21.0048.016; Fri, 22 May 2026
+ 01:58:09 +0000
+Message-ID: <8375f32a-f8fe-4681-821b-e1f17fbafb29@amd.com>
+Date: Thu, 21 May 2026 21:58:06 -0400
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] crypto/ccp: Introduce SNP_VERIFY_MITIGATION command
+To: Tom Lendacky <thomas.lendacky@amd.com>, Tycho Andersen <tycho@kernel.org>
+Cc: ashish.kalra@amd.com, john.allen@amd.com, herbert@gondor.apana.org.au,
+ davem@davemloft.net, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, aik@amd.com, nikunj@amd.com,
+ michael.roth@amd.com
+References: <36137b565d183fa2f2985ad098f2e2096f1c432f.1779219958.git.prsampat@amd.com>
+ <6d5fd5eb-e54c-47fd-943a-6d03aaafe243@amd.com>
+ <4ccf6dc7-88e6-488c-8314-5bcd95164661@amd.com>
+ <b02682e5-8890-454a-ab75-fff1b6566922@amd.com> <ag8c3v3GjWLWz-OS@tycho.pizza>
+ <4362cbe9-b9a6-42c8-8066-807e4a82c7e5@amd.com>
+Content-Language: en-US
+From: "Pratik R. Sampat" <prsampat@amd.com>
+In-Reply-To: <4362cbe9-b9a6-42c8-8066-807e4a82c7e5@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH2PR17CA0018.namprd17.prod.outlook.com
+ (2603:10b6:610:53::28) To CH3PR12MB8660.namprd12.prod.outlook.com
+ (2603:10b6:610:177::5)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/19] btrfs: require at least 4 devices for RAID 6
-To: Andrew Morton <akpm@linux-foundation.org>,
- Qu Wenruo <quwenruo.btrfs@gmx.com>
-Cc: Christoph Hellwig <hch@lst.de>, "H. Peter Anvin" <hpa@zytor.com>,
- kreijack@inwind.it, David Sterba <dsterba@suse.cz>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Ard Biesheuvel <ardb@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
- WANG Xuerui <kernel@xen0n.name>, Madhavan Srinivasan <maddy@linux.ibm.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
- "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
- Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Thomas Gleixner <tglx@kernel.org>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- Herbert Xu <herbert@gondor.apana.org.au>,
- Dan Williams <dan.j.williams@intel.com>, Chris Mason <clm@fb.com>,
- David Sterba <dsterba@suse.com>, Arnd Bergmann <arnd@arndb.de>,
- Song Liu <song@kernel.org>,
- Yu Kuai <yukuai@alb-78bjiv52429oh8qptp.cn-shenzhen.alb.aliyuncs.com>,
- Li Nan <linan122@huawei.com>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
- linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
- linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-btrfs@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-raid@vger.kernel.org
-References: <20260512052230.2947683-1-hch@lst.de>
- <20260512052230.2947683-2-hch@lst.de> <20260512114231.GG2558453@suse.cz>
- <20260513054742.GA1018@lst.de>
- <0a8d1ff4-f5a2-49e9-aa45-d25dbe4ded40@libero.it>
- <20260515043705.GA3855@lst.de>
- <34C16854-1065-4542-8836-DDED58EC1844@zytor.com>
- <20260518051207.GB9374@lst.de> <f46636c8-80ba-4802-a6a0-74cbc35e7bee@gmx.com>
- <20260521171730.7872482df453975cf60ce7dc@linux-foundation.org>
-Content-Language: en-US
-From: Qu Wenruo <wqu@suse.com>
-Autocrypt: addr=wqu@suse.com; keydata=
- xsBNBFnVga8BCACyhFP3ExcTIuB73jDIBA/vSoYcTyysFQzPvez64TUSCv1SgXEByR7fju3o
- 8RfaWuHCnkkea5luuTZMqfgTXrun2dqNVYDNOV6RIVrc4YuG20yhC1epnV55fJCThqij0MRL
- 1NxPKXIlEdHvN0Kov3CtWA+R1iNN0RCeVun7rmOrrjBK573aWC5sgP7YsBOLK79H3tmUtz6b
- 9Imuj0ZyEsa76Xg9PX9Hn2myKj1hfWGS+5og9Va4hrwQC8ipjXik6NKR5GDV+hOZkktU81G5
- gkQtGB9jOAYRs86QG/b7PtIlbd3+pppT0gaS+wvwMs8cuNG+Pu6KO1oC4jgdseFLu7NpABEB
- AAHNGFF1IFdlbnJ1byA8d3F1QHN1c2UuY29tPsLAlAQTAQgAPgIbAwULCQgHAgYVCAkKCwIE
- FgIDAQIeAQIXgBYhBC3fcuWlpVuonapC4cI9kfOhJf6oBQJnEXVgBQkQ/lqxAAoJEMI9kfOh
- Jf6o+jIH/2KhFmyOw4XWAYbnnijuYqb/obGae8HhcJO2KIGcxbsinK+KQFTSZnkFxnbsQ+VY
- fvtWBHGt8WfHcNmfjdejmy9si2jyy8smQV2jiB60a8iqQXGmsrkuR+AM2V360oEbMF3gVvim
- 2VSX2IiW9KERuhifjseNV1HLk0SHw5NnXiWh1THTqtvFFY+CwnLN2GqiMaSLF6gATW05/sEd
- V17MdI1z4+WSk7D57FlLjp50F3ow2WJtXwG8yG8d6S40dytZpH9iFuk12Sbg7lrtQxPPOIEU
- rpmZLfCNJJoZj603613w/M8EiZw6MohzikTWcFc55RLYJPBWQ+9puZtx1DopW2jOwE0EWdWB
- rwEIAKpT62HgSzL9zwGe+WIUCMB+nOEjXAfvoUPUwk+YCEDcOdfkkM5FyBoJs8TCEuPXGXBO
- Cl5P5B8OYYnkHkGWutAVlUTV8KESOIm/KJIA7jJA+Ss9VhMjtePfgWexw+P8itFRSRrrwyUf
- E+0WcAevblUi45LjWWZgpg3A80tHP0iToOZ5MbdYk7YFBE29cDSleskfV80ZKxFv6koQocq0
- vXzTfHvXNDELAuH7Ms/WJcdUzmPyBf3Oq6mKBBH8J6XZc9LjjNZwNbyvsHSrV5bgmu/THX2n
- g/3be+iqf6OggCiy3I1NSMJ5KtR0q2H2Nx2Vqb1fYPOID8McMV9Ll6rh8S8AEQEAAcLAfAQY
- AQgAJgIbDBYhBC3fcuWlpVuonapC4cI9kfOhJf6oBQJnEXWBBQkQ/lrSAAoJEMI9kfOhJf6o
- cakH+QHwDszsoYvmrNq36MFGgvAHRjdlrHRBa4A1V1kzd4kOUokongcrOOgHY9yfglcvZqlJ
- qfa4l+1oxs1BvCi29psteQTtw+memmcGruKi+YHD7793zNCMtAtYidDmQ2pWaLfqSaryjlzR
- /3tBWMyvIeWZKURnZbBzWRREB7iWxEbZ014B3gICqZPDRwwitHpH8Om3eZr7ygZck6bBa4MU
- o1XgbZcspyCGqu1xF/bMAY2iCDcq6ULKQceuKkbeQ8qxvt9hVxJC2W3lHq8dlK1pkHPDg9wO
- JoAXek8MF37R8gpLoGWl41FIUb3hFiu3zhDDvslYM4BmzI18QgQTQnotJH8=
-In-Reply-To: <20260521171730.7872482df453975cf60ce7dc@linux-foundation.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB8660:EE_|MN0PR12MB6128:EE_
+X-MS-Office365-Filtering-Correlation-Id: 90fd3754-3c0c-49bd-ca5a-08deb7a592eb
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|376014|18002099003|56012099003|22082099003|4143699003|5023799004|3023799007|11063799006|6133799003;
+X-Microsoft-Antispam-Message-Info:
+	aTVbd3rBWg/HAlT+sa8JF7ugmqpw1/hq5oTcRtupz11XfJCnDdRxS0v99s1URjt4sFvePl+bkcIBM9rfWav5VuQNBodtX/vaXIHic+2oF+Ha558AQBfA23Tcyz+81Bin9ZZrZJx+cCBrkLRArIDapPXtmhW8IOt9MERrM6WbZ276CR/vmeZyLq7WJunJT6AjJpRQELJmd6Oiyy+c6dZjtjr39EdGGMeLzVuVm1l/RVLtK2BbayGGWnLr8NBO9k5Cyx/W8umPB/1rLSBHNeegbmMLjs1Y4sAXVU6QMdWkUKM+Am+eyN0zSqW0krVGLfrtn2Mjfe+5vF4eEeDhUWdGq3EGCAyyVYFpJ6UhcRfH0UGBGsBOIBq+8qZfFqaQfZAPI/EY19k5bL/hvdzES8sFdEJowVehjPnwkmdTa6enXonUV4AfmbST6QMc6FfqtSPTA4Z2AcdSmtsBB8q2A8nQ4qc1oBCm/M2khSH0KhJxyjl1KZ5asjMzGTfyGlu/H2hzjkFPb80WmCK1nhTaOejrZl3uhdAx+YhxejArdX0b23HkPDDMJDwGPOU4HXZretdQIPJGRgIoud9r/z78TqLP5g9KPjHSQMhBcdyl/LXMP6tc41kzel8ohPkdSsj2Cutjyaww4xCKwCAoo5ljRVPyDSpFZV/SuN1QVvnLN3ZV44A060npMyRzYk0NtP/etsvbR3QJ0pP0JSiGJ3XHIoz0wg==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8660.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(18002099003)(56012099003)(22082099003)(4143699003)(5023799004)(3023799007)(11063799006)(6133799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?SERXTHBkS1I3aWdHN2g5aEYvbmh5TUZ1NWI4UCtqK0V0MmhYQ3FoaTh0ZUJn?=
+ =?utf-8?B?Ulc1Yjk0OFZ2bkVyZ3FDNnBCaHIxWCtMemVOdmtmQUk2anNCUFhMUjhWZTdM?=
+ =?utf-8?B?VUJ5dG1MRDNwbktUeXI5bzhRcFZ0c1dmVHNBWUhNcXlLcnNOTEZTYTlzMG9l?=
+ =?utf-8?B?eXVBWjJxUmpwbmZ0QkNiNEIzUzR5NWpMbW83S0IyZXF0L2x3aHJSVzZJUml4?=
+ =?utf-8?B?NUJHRHAvVnpETzZkaWtmQVlGV3o4bzlFWkpLRGNEeEl5dERITWhmOG1wNThs?=
+ =?utf-8?B?d2dURXRxZUNUZnN1UVFWdXhtcGtMTGJjREx5ckgzMmZ6anVHZTNKbWtYanNz?=
+ =?utf-8?B?UlJKMVNTTWoycHZkYXZPMExGMm9WVzMzeUNpN1RNSysyamVibkhJYmRxQXJ2?=
+ =?utf-8?B?azBkWjJVT1VSZHFwOVQ3aS9qVktrdlg0Zm9HK1pWL041S0VaaEIwWEc0aVpr?=
+ =?utf-8?B?MDdKdExJdFprZ0t5VGZTS1Z3dnlmSHY5S3Bkd1JpWHVWTVdNek9JeDdvcDZK?=
+ =?utf-8?B?U0xJaW1wZTd1S28yUDBHYVZKRHZpcDRuaHk1TFVkS0RjQTBKelBZdjU3b3g0?=
+ =?utf-8?B?YXZzOEloZ0tJOElaM296MXpRcERRUERWU3lZQ21lNnRiUGVpU2I3N0V2L3c1?=
+ =?utf-8?B?YmFCUzVRcSs1TUMrWFF6dGJnaE55QVNCUXVzcklHczFtV0RRVUVkU04zek5t?=
+ =?utf-8?B?M1VpUmFYTVJCdFdQZ0cvR3AvcS9yRFUxd0pLK2FDdEkvcGVsUlJnQUJXazAy?=
+ =?utf-8?B?cHk2NHlBTWNlWmF6cU92TkJ5eUtEaE9UbFExUklDdHZVSmUvcXIxOHdhMElS?=
+ =?utf-8?B?SjZOV21yQ3BaL0J1eVE2WGZwTUlpOWxqc0Z6b3M5WGprbENFcTI2VnFYRFhN?=
+ =?utf-8?B?S2Q4blpXTDlJUXdnQ2ZRM0QrditPSWYyK04yNUM3eTQ5VmxqWldmTXozeHVT?=
+ =?utf-8?B?aWhkaUhaU2t2eXBtVFhMeU1WeGlWanlJS2NtVlkvZ0QrdTZKaGhxYmQzcXM1?=
+ =?utf-8?B?MldXYk40S2hRVU50V0dCaUhDd0NPcjd6TlNPNS9VN3hKaTBVbHpWY3JuTHJD?=
+ =?utf-8?B?bWZ4Wk5McU4veWdERmVpVmgzclFCbkxmbmR0TTJ6YzJWYXdRNzJuL3N2Rk1H?=
+ =?utf-8?B?WkNyUHNmSGk3OENhbjJTdGFJZ0p4ZFJBeHBVZzM3cHhmNWgxc1BtSTY2L0N5?=
+ =?utf-8?B?T25LS05oUk9GblFUcmphS3pNSnI0TDF0RW5XWTdZYlJFL3NNNnRXTmFwcFRt?=
+ =?utf-8?B?Q21xeW52c0dnMGU4bm1oQkhJWm9laGFtQU84S09qUHBUV1UwZDVyeWpubnpK?=
+ =?utf-8?B?RzV1WGdBamFJblBVL2JWTFRhM2NhOStSdDE3eHRjcFp6QklBYXNSQlA0Sisy?=
+ =?utf-8?B?V29ZUTkyMGh5a0NJT1BwODNxZlY5MVkxUW1qcFJaR0JJOXd4QkRFVkdJeStv?=
+ =?utf-8?B?R25KVk4yb0hkMmNnODJVSkszdGJFMDJVUkhZMmQ0aUl4MXhhcGJpbzBSc2Fn?=
+ =?utf-8?B?cjhvK3NNNGtKTllBbWxXZFlEOHRRRU9qU0NHYmRLSGdpczdpdE00MW1KMjli?=
+ =?utf-8?B?UGZtelYrVE5SMWs2WTk2bHlaY1BLamMxYVg2UzAydzZ3Y3dVRnNHUXFZLzMv?=
+ =?utf-8?B?Nm5yR3dWUWQrVEx0SzVZM0ZtVjhYMEx5RENEa1JtOG1heDZLTHFJVlZEZWVT?=
+ =?utf-8?B?Z0dKeTdIczRJR2Y3UjJlb2RFeWJkbUx2NndqenZNVzcrSDVXNStQSVdOY29i?=
+ =?utf-8?B?LzNJbTNiWHdiVEJUM0QyZGMwWC9EMyt6ODdzR2s1QzdEV0E5N3NKR1BMUkFr?=
+ =?utf-8?B?bWdOdXNNcDYxTk56STVNZUJPUmJsVm40bVIwMXVncEdhaDhNSlM2c0tWZ0tr?=
+ =?utf-8?B?NmFlRDNHS2tNMnEzUVZ2MG96VXVJY2lJb1hZQ3FnOWJqaUpIcnRZSG5FZWlQ?=
+ =?utf-8?B?eGxBZXloQWdpUHE4ZzBSN2c0K2VqWkRwZzI4WEllTjJFYmRURURvR0JNd2Zt?=
+ =?utf-8?B?UHhwZGdnU3BQbWhpZkZERit0RC9vSFJwVHh1NEE0UkpMWnQ3ZnNWb2IxSXpU?=
+ =?utf-8?B?d2FqcGpWcEt3UnFJeFI2c0ZVd2Q0M0VwbzVwOUh4SVk2eGVudTJtazBUbnBs?=
+ =?utf-8?B?aWl0RnFxVGg4Q3ZEem9sL2dSSHBvV1pTdGdHWjZyc3AvaGdMM1AxR05mYldn?=
+ =?utf-8?B?c3lQSEYvNzVYMDVBamwrbjJjeGZSMS95cmRqRWtEa0NOSGZHQUk5anloanov?=
+ =?utf-8?B?L3dwREpOMmpPK2FRdnlGS1RleXFnNWFkZGRRUVRmNTFIS2JKVUtXemFvemZZ?=
+ =?utf-8?B?Z3dOZDlOZEtkKyt0YTRCTmJ4ckRnUlpzelZvcHd3S0Vqc2tpbTVBQT09?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 90fd3754-3c0c-49bd-ca5a-08deb7a592eb
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8660.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 May 2026 01:58:09.7065
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: X9pgYTM5niDgqs5fwRGjG/HDYXcSaCs2Hwqg6futcYzK+aC7DDmZDF6pQF/TEEEsi7tLaBvzyRo10jBWtJPxZQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6128
 
 
 
-在 2026/5/22 09:47, Andrew Morton 写道:
-> On Wed, 20 May 2026 18:11:09 +0930 Qu Wenruo <quwenruo.btrfs@gmx.com> wrote:
+On 5/21/26 4:04 PM, Tom Lendacky wrote:
+> On 5/21/26 10:05, Tycho Andersen wrote:
+>> On Thu, May 21, 2026 at 08:12:52AM -0500, Tom Lendacky wrote:
+>>>> Now, with unregister no longer protected by sev_cmd_mutex, a concurrent init
+>>>> can race with shutdown on the sysfs lifetime like so:
+>>>
+>>> Can it? Can init and shutdown race? Isn't that part of module load /
+>>> unload, I'm not sure how they can race...
+>>
+>> That's only true after
+>> https://lore.kernel.org/all/20260504165147.1615643-5-tycho@kernel.org/
+>> right? Before that, if the first init failed, you could trigger a
+>> re-init via ioctl(), and presumably trigger the race sashiko is
+>> complaining about by spamming ioctl() + sysfs writes on separate
+>> threads.
+
+Yes, this is the race I had in mind and probably what sashiko complained about
+in it's review too. I missed this patch from earlier. This should avoid any
+racing.
+
+>>
+>>>> t1                                 | t2
+>>>> ---------------------------------- | ----------------------------------
+>>>> sev_firmware_shutdown()            | sev_platform_init()
+>>>>   unregister_verify_mitigation()   |   register_verify_mitigation()
+>>>>     sysfs_remove_group()           |     sysfs_create_group()
+>>>>
+>>>> Both sides touch sev->verify_mit without serialization. The same race also
+>>>> exists for init vs init which is no longer covered by sev_cmd_mutex once
+>>>> register moves outside it.
+>>>
+>>> I don't think you can have init vs init race, can you? This just all seems
+>>> odd to me. Have you created all these race scenarios to test this out?
+>>>
+>>> Would putting the regsiter/unregister under the sev_cmd_mutex and then
+>>> taking the sev_cmd_mutex upon entry to _show()/_store() fix all this?
+>>> After obtaining the mutex in _show()/_store(), you check for
+>>> sev->verify_mit and return an error if NULL. Then you can use the
+>>> __sev_do_cmd_locked() to issue any commands.
+>>
+>> As long as sysfs_remove_group() happens before
+>> __sev_firmware_shutdown() it seems like it should be fine since sysfs
+>> will do its own synchronization. IIUC we might not need this locking
+>> at all assuming the above is applied?
+> 
+> That's what I'm thinking. I'll let Pratik confirm.
+> 
+
+Yes, sysfs should do its own synchronization and I'm assuming this means that we
+don't need any locks anymore and I can get rid of the sev_mit_sysfs_mutex and
+move unregister outside the sev_cmd_mutex.
+
+I tested this with putting a msleep() in the _show()/_store() and in parallel
+rmmod calling shutdown. This seems to work without issues whereas with the
+former approach I could deadlock waiting on sev_cmd_mutex.
+
+> 
+>>> Also, on the register function, all you need is the check for
+>>> !(sev->snp_feat_info_0.ecx & SNP_VERIFY_MITIGATION_SUPPORTED) since if
+>>> !sev->snp_plat_status.feature_info is true, so is this this check. And, as
+>>> the spec says, the required firmware state is based on the mitigation
+>>> requirements, so I don't think you should be checking for snp_initialized.
+
+Ack, will just keep the SNP_VERIFY_MITIGATION_SUPPORTED check in the next
+iteration.
+
+Thanks Tom and Tycho!
+--Pratik
+
+> Thanks,
+> Tom
 > 
 >>
->>
->> 在 2026/5/18 14:42, Christoph Hellwig 写道:
->>> On Fri, May 15, 2026 at 12:59:34PM -0700, H. Peter Anvin wrote:
->>>> I don't think this is a good idea. Error out; it is the btrfs maintainers' job to ensure user data isn't lost.
->>>>
->>>> The RAID-6 code has *never* supported only 3 units, and if it ever worked for *any* of the implementations it was purely by accident. Speaking as the original author I should know; this was deliberate as in some cases the degenerate case (3) would have required extra trays in the code to no user benefit.
->>>>
->>>> I would not be surprised if the kernel crashed or corrupted the page cache in that case.
->>>
->>> It does, that's why I wanted to exclude it.  Anyway, for the about to be
->>> resent version I'll drop this btrfs patch over the stated objection and
->>> will otherwise not change anything.  This means the (IMHO hypothetical)
->>> users of this configuration will get a WARN_ON_ONCE triggered, but
->>> otherwise keep working (or rather not working) as before.
->>>
->>
->> For the btrfs part, I believe I can get the current 2-disk-raid5 and
->> 3-disk-raid6 to fallback to raid1 inside btrfs.
->>
->> I hope the btrfs part can be finished and reach the next merge window,
->> but I'm not 100% sure.
->>
->> What is the planned cycle to merge this raid5/6 cleanup?
+>> Tycho
 > 
-> At present it's on track for the 7.2-rc1 merge window.  Does that suit?
-
-The current btrfs fix (*) is pretty small, I believe we can get it into 
-the next merge window, as long as we got enough review on it.
-
-*: 
-https://lore.kernel.org/linux-btrfs/a1d63733465229936351804f3760803d5894a962.1779274630.git.wqu@suse.com/T/#u
-
-
 
