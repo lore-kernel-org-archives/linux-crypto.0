@@ -1,44 +1,46 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE84037FF5B
-	for <linux-crypto@vger.kernel.org>; Fri, 22 May 2026 12:28:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C66A385D6F;
+	Fri, 22 May 2026 12:29:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779452941; cv=none; b=IVgUO11rPDp7FJRYePgvGECojBsBKo+F67E7ppjx1T3y/X+wyFWx81lMWufm78LQjumR4aOrYlqJBeZuivlPG2d2UJ/mtsvWmv+xcYfWPHRIEbmLUacNGot1dTwmL79P76blUc5/z50KgSWOvMo0f2oPBVxNx7L4AvH2wjPQUSM=
+	t=1779452985; cv=none; b=L58rhRKQ3XqTsJ22kDwBZr5dZ0V2qSRcmKMd0Y/jbTG7GYYcfVotcP85tKC9B456zM36DMcbF+5O+oQYolq8JS7ZDuy7FBPTlXh8x5VMhs0yS6UjgpANWvatoItAAHX2rYDAtPPuCx4lPFP5VExgQNNM7ZmYSkCVLXtqM5JqX3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779452941; c=relaxed/simple;
-	bh=T+nCUANsmFak+eJf0FtIpOAzMU3R1alFwnTdPbwwwu4=;
+	s=arc-20240116; t=1779452985; c=relaxed/simple;
+	bh=bfP3ppGvrRvAAPkLZfZZbNVX0zfbX+gpBVgiazTqtVk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XaAs58ToUgY+DLc6gNZ39e4NJUEc3LNKFvXlwqVp8rSGKp+aNTZB+lUNLM0L2vOy3CkKZtuMcIDeT0+Rk1URgLJU3Mg7vs3g3fSsnFFCSJZMLchfgw2y6seuBlRuhwUCiaDJLed2qFjlURl4YRU4gwvJOutDem/lHj7ToJyiHVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=K0o120yz; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=q9TxC5tpcZtasiDR66uz6oRa0IrJX9MzRByBg5KvALg31QEmaImiTjwa0WgfcVui+h6O/LwDrV1NMgG3I3XTdw9vgyBfEwoBgqW9q/6g44GYw6e0DRawFGF+M86mswwVOv3VhfcKtp6E97KnExRpPD20t0IgrYQ8coicHwqaBPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=rlGJcw8i; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="K0o120yz"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="rlGJcw8i"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=D5KOvLqdclCuO7oAdxlJxvP31AitgmlFaoO84+okCZY=; 
-	b=K0o120yzWdMEW9c3RgeSKmi/9hlWJQEnG8ktJYrp/Uru9F617MLupCVOmkNdKt63ysCdksKyb0F
-	VF/LvgRmwd6wbs1jMXxVF7wD1kq39q9X8JqAEuqxJkaiplLVx5ZtdnQC2QQPdODOqrUfhpBWDGdFv
-	D0GHBptPoSGKc+NmvJ5mVWgVhSYGpLGyA6PdXYuxAn19Kpp42Vx5J8jimYtcrCkLsmGSruXHsz1Eq
-	eIffGTukht2BHO1atbVTPXOg2c7rgFH0y74k7EeTG5IezcY2tin3fG9HaDtO0veHnABliwhFRSuJW
-	0ig8iL+DsTV0M5su64Ox17DIABsn5TIOJEVw==;
+	from:content-type:reply-to; bh=WK64VzlL8RZWVqvOu2cRYGGldJxTaVMQJcAV2DOHcjo=; 
+	b=rlGJcw8io3gljky96duGSunAKRQnaA/o3eAvxEHzhoFsj6HU3zwislXMlyzy4q61s980Kp2tfxx
+	nlROF30t25rtWBgdI9aJjqU7LwNB1yuWNhuIGHKdmKoczImDaKYSj+zJTjLAgimWvLK6zLGkqXmn9
+	wmtDaX22VwDOQ32i9k1WJTBsfwkmyuYNPFfL8tvwQpy66qK4ETRwuE3op2mGUzgHKYaTBol08aLzH
+	FdDdFbtWDLDiApmNDqt3ixIxeH3VOa9GvMfyMeQsQmVD0vex+w+RqJ07mBdO9rvH/MnAwR5aIVK8j
+	u8ILrbGdPmGjWhRcqU6nVZwJ8UmOSgcC9MJA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wQOzo-00GSKd-1B;
-	Fri, 22 May 2026 20:28:57 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 22 May 2026 20:28:56 +0800
-Date: Fri, 22 May 2026 20:28:56 +0800
+	id 1wQP0B-00GSLV-2e;
+	Fri, 22 May 2026 20:29:20 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 22 May 2026 20:29:19 +0800
+Date: Fri, 22 May 2026 20:29:19 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
-	Ahsan Atta <ahsan.atta@intel.com>,
-	Andy Shevchenko <andriy.shevchenko@intel.com>
-Subject: Re: [PATCH] crypto: qat - remove MODULE_VERSION
-Message-ID: <ahBMCK27Tp1Mo6st@gondor.apana.org.au>
-References: <20260513085808.626413-1-giovanni.cabiddu@intel.com>
+To: Anastasia Tishchenko <sv3iry@gmail.com>
+Cc: Lukas Wunner <lukas@wunner.de>, Stefan Berger <stefanb@linux.ibm.com>,
+	Ignat Korchagin <ignat@linux.win>,
+	"David S . Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v2] crypto: ecc - Fix carry overflow in vli multiplication
+Message-ID: <ahBMH5jT-kraeN06@gondor.apana.org.au>
+References: <20260513105741.55534-1-sv3iry@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,33 +49,39 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260513085808.626413-1-giovanni.cabiddu@intel.com>
+In-Reply-To: <20260513105741.55534-1-sv3iry@gmail.com>
 
-On Wed, May 13, 2026 at 09:57:45AM +0100, Giovanni Cabiddu wrote:
-> In-tree drivers do not need MODULE_VERSION as the kernel release
-> identifies the version of their code. The static version "0.6.0", which
-> the QAT drivers currently report, can be misleading as it might suggest
-> the drivers are outdated.
+On Wed, May 13, 2026 at 01:57:40PM +0300, Anastasia Tishchenko wrote:
+> The carry flag calculation fails when r01.m_high is saturated
+> (0xFFFFFFFFFFFFFFFF) and addition of lower bits overflows.
 > 
-> Remove MODULE_VERSION() from all QAT driver modules and the related
-> ADF_DRV_VERSION, ADF_MAJOR_VERSION, ADF_MINOR_VERSION and
-> ADF_BUILD_VERSION macros from adf_common_drv.h.
+> The condition (r01.m_high < product.m_high) doesn't handle the case
+> where r01.m_high == product.m_high and an additional carry exists
+> from lower-bit overflow.
 > 
-> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> Reviewed-by: Ahsan Atta <ahsan.atta@intel.com>
-> Reviewed-by: Andy Shevchenko <andriy.shevchenko@intel.com>
+> When commit 3c4b23901a0c ("crypto: ecdh - Add ECDH software support")
+> introduced crypto/ecc.c, it split the muladd() function in the
+> micro-ecc library into separate mul_64_64() and add_128_128() helpers.
+> It seems the check got lost in translation.
+> 
+> Add proper handling for this boundary by accounting for the carry
+> from the lower addition.
+> 
+> Fixes: 3c4b23901a0c ("crypto: ecdh - Add ECDH software support")
+> Signed-off-by: Anastasia Tishchenko <sv3iry@gmail.com>
+> Cc: stable@vger.kernel.org # v4.8+
 > ---
->  drivers/crypto/intel/qat/qat_420xx/adf_drv.c         | 1 -
->  drivers/crypto/intel/qat/qat_4xxx/adf_drv.c          | 1 -
->  drivers/crypto/intel/qat/qat_c3xxx/adf_drv.c         | 1 -
->  drivers/crypto/intel/qat/qat_c3xxxvf/adf_drv.c       | 1 -
->  drivers/crypto/intel/qat/qat_c62x/adf_drv.c          | 1 -
->  drivers/crypto/intel/qat/qat_c62xvf/adf_drv.c        | 1 -
->  drivers/crypto/intel/qat/qat_common/adf_common_drv.h | 7 -------
->  drivers/crypto/intel/qat/qat_common/adf_module.c     | 1 -
->  drivers/crypto/intel/qat/qat_dh895xcc/adf_drv.c      | 1 -
->  drivers/crypto/intel/qat/qat_dh895xccvf/adf_drv.c    | 1 -
->  10 files changed, 16 deletions(-)
+> Changes v1 -> v2:
+> * Rename add_128_128() to check_add_128_128_overflow() and let it return a bool
+>   indicating whether an overflow occurred
+> * Rewrite an explicit if-else statement using constant-time bitwise arithmetic
+>   to avoid a timing side-channel
+> 
+> Link to v1:
+> https://lore.kernel.org/r/20260508114844.29694-1-sv3iry@gmail.com/
+> ---
+>  crypto/ecc.c | 31 ++++++++++++++++++++-----------
+>  1 file changed, 20 insertions(+), 11 deletions(-)
 
 Patch applied.  Thanks.
 -- 
