@@ -1,63 +1,63 @@
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A243955FE
-	for <linux-crypto@vger.kernel.org>; Sat, 23 May 2026 12:15:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54ADA34FF74
+	for <linux-crypto@vger.kernel.org>; Sat, 23 May 2026 12:15:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779538550; cv=none; b=j+SDRpNIV3QN6W7mv4lvy08ZgSuPbqAZHkd84H8aiAp7LRMdtk3W02xg8Xdux8fJHyMux4KVk2jYdyF71XSOb5QUfHZ6rHSPkOTTcAzS8m7tqzrypAEe1uvyXJ1y3/fmhbkFod0eAMIToe6C+UKbbuJrCIi74jGNdgu43LlpS4o=
+	t=1779538552; cv=none; b=nVl8ehorQnAWHBdSvufMBfdWMvsI8daiS0zdGUXIj/xOBmy0d+U38sddllshKTsFXW4cI+8c1XKvLsMt0/SxhnRwbDpFpIjkaTlII9r0ZQuY+0K6TWyKe6yed3s7C9EReaxhYIjX3iaqst7oyBvp7vn0nk6lIbczbzvblckeCtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779538550; c=relaxed/simple;
-	bh=8l4tyC4y5/Ak0oYZbkuWnFYCquWoCgn8Deh8zHDa4TM=;
+	s=arc-20240116; t=1779538552; c=relaxed/simple;
+	bh=KHyLsuehdlpg0hwY3KJNtON2x37x6MuLItwo1XMPiH0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=f6NqDDyX5dNG2XIfrg9krW7fOVPNH5ewsLeywOgUa0v40Wg4e4uDCBuAb+CSl5KcFoBqcYH+pBVsltAu20Bn9dKmxZSGlS7M9J9sKu15yhl3NFZNN2byNJjD7cM78ZQ1GTOQTSzwoa2VUhyVe8gd5xsC31D/BvVWkiV+htNoJuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NqFuQuuy; arc=none smtp.client-ip=209.85.214.172
+	 MIME-Version; b=MvNhTeii2chuWnGtxtz8AwAyqIh5YCZhMdmYarYbeuwEn17YvRyR+4CbiPP3khtxxNU8BcqptSalMCmjSP8nrjCewUgymx2DWgwcqkCxNjEZ4xPtjcUjy3mSB4UfpkLtbiT2zafYcAFgOWujUBCLmlVLSdu+BqOll7nOVr8lqOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dCp8bATS; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NqFuQuuy"
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2b9fcf7c91bso92549085ad.0
-        for <linux-crypto@vger.kernel.org>; Sat, 23 May 2026 05:15:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dCp8bATS"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2b9fcf7c91bso92549625ad.0
+        for <linux-crypto@vger.kernel.org>; Sat, 23 May 2026 05:15:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779538544; x=1780143344; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1779538547; x=1780143347; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ptBan/oDFwIr7VXZlN8TdNfSiKDV9ouul3U9bPm2km8=;
-        b=NqFuQuuyrFcUeHomeDO7Hu7KciKYD0AtdvZe5Fq1EApZxDErm6dOjtTJpdQaALo+qn
-         INy/62H2MX0W9Vz2YkYQVAmNjYSZBT3JtCEDGnT1UWoKuwzPoNl3LPjDJ0LQQXwpN0z0
-         m8CXesgDEjaCGeQIjPoOHNedW/w92IAsMHVfjcoSVdwRPb6te8P16e3FxKqtz/crX8zR
-         w2mxQXLCCSmpgwqM8Ub3vUNz0rgYSqzmPj7i+kR79vn6LmNjqIm+RT5MeKW5Uj7oFDeU
-         F0MRQSZebF4NqTm2IVL8F7Ii6a9VVE71qneF+H2nq1e+S/JbmuCkWsqZRhy3+TS0RTUq
-         Wvdg==
+        bh=b2zrtx57P1TJdR+y3qfIhSkztYF/cKJ64UoY0xbwGSU=;
+        b=dCp8bATSAZSXp5JSjCus752mIR6VPVYhGh8YzrVQhbMbCuhvZAD8Gvt+OgZ986S+Vi
+         PGVhOfHa+1i36SLpcvthhjwAS4GxjVBM81N8BEZ90wE0XNFKygkNTXQhu6P5HPEeEjHT
+         NjzQTg+wR8KMw9lkwiVzzCcm6c2HAbTUG2FhddmXyIjpnZpipbj6xQXTG1bZzXbhKeSr
+         Hs7cZ4rUZFNAax+ok5hjRmLcLD+6tuoioiKKo1Da+fqKW91edfsjGZ75fnDprTtaTdwa
+         /ttZQ8hLPmu6TD600JHOM9En07ryBHp4kNUBWlUHDhArpetdKT9UxhLqIJzigTzpiz1v
+         /02w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779538544; x=1780143344;
+        d=1e100.net; s=20251104; t=1779538547; x=1780143347;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=ptBan/oDFwIr7VXZlN8TdNfSiKDV9ouul3U9bPm2km8=;
-        b=ZR2wDsOpFtQDpUb8ox+R2zc6Hg8/R9YR/C5sAoAfA5Fy/EeLTvIVwZ5dLyFuWmd4Y0
-         h6FSockYGrAQUG6lCZdo+Ih3zrvD7vDF6+Qkf3M5OjvTKOsDGHpH9S7MVJHTkgYAwXr5
-         /pqtu/6mP9yJwSluCymYRO/ByY0oQfFetmCDTN25NGAqxPDJH1tjjfq++Q4O9LozjZlG
-         +Cl5HE5O1eg+ftWAyBaX1dChf170iT0tB3oyCJ51QXAuKW0B8IegYjizXNTlusuyBRpK
-         xRyHa4/IRmauYB04g4XuaYVCmQGZH8XRBpKQ3zXkw1usXz6JmdG6Hmzl09bdyWAG7Y96
-         DOwg==
-X-Forwarded-Encrypted: i=1; AFNElJ+GRLhK109NymDWXPYVdiRG8gTpqb3b+mNQvDFNqTrCIo0vXlu2D+qS0TrcX60v3Sl7Wi/Wif+sA++PBXc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHjRXFvyJWEUP4wqW4d7HVgLv/CxVEvA7QyIQsRzAYJ+1KvkeJ
-	Am/t14P5ntw+26BITyJUhBWhTqVWLUc0MOVL5gzMsbjNVPQFLHCQs4jH
-X-Gm-Gg: Acq92OEpmm9fnU20WBPW78Yj4IOV1PUv3QbF6sgT1o0q2fJFia117loZpyZQacyuUyJ
-	ItDwtFD9+uFZov66W+JBLC8qEIc9OTyQDuorHcjBdYSuiRQZP90g8PSldm/PzC5sUC9EuJl15eN
-	mLmmDT+H+yXybBna8N0au5IsWJe9x5qDmAaVg10IjcGWP8PAci7NdAhbBdgJX36VQAKD4NP0zF8
-	SZeIRuULVbKBnb7qdIKZTPimQwILbnQhqggV3Of95RjnUNR8RwfQTgvZ6RIyTpowym8G4kDg9Ei
-	mzUwrki5smKYW/zSiku5hhgdOOSCvIin/w5+M2iLaa6hOQPmRgtCUDTT0AVFVVKgBqRb1vS11xZ
-	S7Qqy1NWZkXl/VOyHD/F26IhkbbKBUXmBapF1a/f9XGGFntzSSDuig/gnEcGYDCbczsOvEw9J14
-	ynBoT6Npt3KKfgR6QTQtQp9q+VU3IM+G1WF+k=
-X-Received: by 2002:a17:903:3d10:b0:2bc:6784:5260 with SMTP id d9443c01a7336-2beb06eb0e4mr90794065ad.37.1779538543856;
-        Sat, 23 May 2026 05:15:43 -0700 (PDT)
+        bh=b2zrtx57P1TJdR+y3qfIhSkztYF/cKJ64UoY0xbwGSU=;
+        b=s1LIejimBiwQa9CCoNqFZlKmenPBsFmkY38U3uTpoewnCVIMVIlAsOQ6JXQ01jQrsX
+         8evlfTO+1q++z/+h15b+y3WArpNRjGD+GyflpAu87813v/pVjF8Pa/4pdJBzAgMkVAba
+         68vqSSgCAiebzwRLsVNFZtcC3/QvIVWH465x1B/10Qox623uhDTpR4hNjD/cjLeccZbx
+         mkSWaR0rQ0sXuLqPv81NVgcQtKzVfI0NCzOdtmlrEnxsenRJ/xfw+zXK/eVT06I+GMgQ
+         0Kn7ZLIli/gdw1SGomTZRvA5GE/KBVh8C3mhubZDPVAKw5qBGsYZwQzostiFp+N5IlXX
+         eo8g==
+X-Forwarded-Encrypted: i=1; AFNElJ+hRIQIFlOTHudrwhwNoH1dE5m3XqJyL9TTbzntB5FPpiPrj7UuTxhrLdydZqvTHai1tKNPkS7SzoHniPk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTwTgjig2F9vYSnDi47m/g1t7lfxlF0tNSpNON4IUWz5Cejh+v
+	QsOVCHYHKJjK+mB9CIbZXYNtYBqNfnrsbKNHE1CW0A2WoeUiIlEnMYPK
+X-Gm-Gg: Acq92OFBQFBlf/onfWNjY25JHRJEnakzzKbBzg69bKGXahegX+omG/7uZ69DKLDHn/S
+	h/TD5MAZ4QoYjWoxjmcosRXlQ5u3UyKLHmhpN+U8ffaDuugq4x+d1+0Oa9+QNj5Xz9mqpngkEXT
+	qjYwx8ObGoRYtdJpGW4gtrmQYk+SQPDPJKphIk5xWjg9KPjzrx1u7WWzamJF0AdlSuQuyg/58gN
+	60OwqPJSLcbz8n0mXp+I7YnTTk8TIvrrAOCmsejN2bpJtQid65UFr/bg1ZgP3D0/0jCuSCkisz9
+	LMoO6A5ahtjpCoMcyrDzjYxLR3/HL2zE5a90+qIXyec8WAwyX3iOIO17ST1G/XauftgtlCtuvXa
+	UAAQYLXUKy/mSdCsCtqlamQDNHCQhm1DPAOpmu2OKKptr9XVnGmB7nQZSDFwU8QgX/4JAH/W42Q
+	cBrb9pAMe9pTkK7QzUknO7rd8j
+X-Received: by 2002:a17:902:f650:b0:2bd:8db9:cc0c with SMTP id d9443c01a7336-2beb038e50cmr78918005ad.6.1779538547270;
+        Sat, 23 May 2026 05:15:47 -0700 (PDT)
 Received: from mincom1 ([125.149.177.227])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2beb56ce4easm41746305ad.30.2026.05.23.05.15.40
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2beb56ce4easm41746305ad.30.2026.05.23.05.15.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 23 May 2026 05:15:43 -0700 (PDT)
+        Sat, 23 May 2026 05:15:46 -0700 (PDT)
 From: Jihong Min <hurryman2212@gmail.com>
 To: Christian Marangi <ansuelsmth@gmail.com>,
 	Antoine Tenart <atenart@kernel.org>,
@@ -76,9 +76,9 @@ Cc: linux-kernel@vger.kernel.org,
 	linux-mediatek@lists.infradead.org,
 	netdev@vger.kernel.org,
 	Jihong Min <hurryman2212@gmail.com>
-Subject: [PATCH 1/3] xfrm: extend ESP offload infrastructure for packet engines
-Date: Sat, 23 May 2026 21:15:20 +0900
-Message-ID: <20260523121522.3023992-2-hurryman2212@gmail.com>
+Subject: [PATCH 2/3] crypto: inside-secure: add EIP93 ESP packet backend
+Date: Sat, 23 May 2026 21:15:21 +0900
+Message-ID: <20260523121522.3023992-3-hurryman2212@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260523121522.3023992-1-hurryman2212@gmail.com>
 References: <20260523121522.3023992-1-hurryman2212@gmail.com>
@@ -90,223 +90,1842 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Some ESP offload engines operate on whole ESP packets rather than the
-generic software trailer layout. They can generate outbound ESP padding,
-next-header and ICV bytes in hardware, and inbound decapsulation can
-return an already-trimmed packet with the recovered next-header value.
+Expose an EIP93 packet-mode IPsec backend for netdev drivers that need
+ESP encapsulation and decapsulation offload without advertising EIP93
+itself as a netdev.
 
-Add a netdev offload callback for drivers to opt into hardware-generated
-ESP TX trailers, carry the reserved ESP TX tail length in xfrm_offload,
-and let ESP input skip software trailer removal when hardware has already
-done it.
-
-This keeps the default ESP offload behavior unchanged for existing devices
-while providing the infrastructure needed by packet-mode ESP engines.
+Add provider selection, capability reporting, SA lifecycle management,
+IPsec request completion, and provider fault notification around the
+existing EIP93 descriptor path.
 
 Assisted-by: Codex:gpt-5.5
 Signed-off-by: Jihong Min <hurryman2212@gmail.com>
 ---
- include/linux/netdevice.h |  3 +++
- include/net/xfrm.h        |  8 +++++++-
- net/ipv4/esp4.c           |  6 +++++-
- net/ipv4/esp4_offload.c   | 29 ++++++++++++++++++++++++++++-
- net/ipv6/esp6.c           |  6 +++++-
- net/ipv6/esp6_offload.c   | 29 ++++++++++++++++++++++++++++-
- 6 files changed, 76 insertions(+), 5 deletions(-)
+ MAINTAINERS                                   |    1 +
+ drivers/crypto/inside-secure/eip93/Kconfig    |   10 +
+ drivers/crypto/inside-secure/eip93/Makefile   |    1 +
+ .../crypto/inside-secure/eip93/eip93-ipsec.c  | 1413 +++++++++++++++++
+ .../crypto/inside-secure/eip93/eip93-main.c   |   69 +-
+ .../crypto/inside-secure/eip93/eip93-main.h   |   38 +-
+ include/crypto/eip93-ipsec.h                  |  132 ++
+ 7 files changed, 1643 insertions(+), 21 deletions(-)
+ create mode 100644 drivers/crypto/inside-secure/eip93/eip93-ipsec.c
+ create mode 100644 include/crypto/eip93-ipsec.h
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 0e1e581efc5a..b6ff04c3df78 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -1043,6 +1043,9 @@ struct xfrmdev_ops {
- 				      struct xfrm_state *x);
- 	bool	(*xdo_dev_offload_ok) (struct sk_buff *skb,
- 				       struct xfrm_state *x);
-+	/* Return true when the device generates the ESP trailer/ICV itself. */
-+	bool	(*xdo_dev_esp_tx_hw_trailer)(struct sk_buff *skb,
-+					     struct xfrm_state *x);
- 	void	(*xdo_dev_state_advance_esn) (struct xfrm_state *x);
- 	void	(*xdo_dev_state_update_stats) (struct xfrm_state *x);
- 	int	(*xdo_dev_policy_add) (struct xfrm_policy *x, struct netlink_ext_ack *extack);
-diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-index 10d3edde6b2f..160069901e0a 100644
---- a/include/net/xfrm.h
-+++ b/include/net/xfrm.h
-@@ -1141,7 +1141,7 @@ struct xfrm_offload {
- #define	CRYPTO_FALLBACK		8
- #define	XFRM_GSO_SEGMENT	16
- #define	XFRM_GRO		32
--/* 64 is free */
-+#define	XFRM_ESP_NO_TRAILER	64
- #define	XFRM_DEV_RESUME		128
- #define	XFRM_XMIT		256
+diff --git a/MAINTAINERS b/MAINTAINERS
+index f1e5e4258e7b..08cfede333e8 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -12743,6 +12743,7 @@ L:	linux-crypto@vger.kernel.org
+ S:	Maintained
+ F:	Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml
+ F:	drivers/crypto/inside-secure/eip93/
++F:	include/crypto/eip93-ipsec.h
  
-@@ -1158,6 +1158,12 @@ struct xfrm_offload {
- 	/* Used to keep whole l2 header for transport mode GRO */
- 	__u16			orig_mac_len;
+ INTEGRITY MEASUREMENT ARCHITECTURE (IMA)
+ M:	Mimi Zohar <zohar@linux.ibm.com>
+diff --git a/drivers/crypto/inside-secure/eip93/Kconfig b/drivers/crypto/inside-secure/eip93/Kconfig
+index 29523f6927dd..1a33ab6f04da 100644
+--- a/drivers/crypto/inside-secure/eip93/Kconfig
++++ b/drivers/crypto/inside-secure/eip93/Kconfig
+@@ -18,3 +18,13 @@ config CRYPTO_DEV_EIP93
+ 	  CTR crypto. Also provide DES and 3DES ECB and CBC.
  
+ 	  Also provide AEAD authenc(hmac(x), cipher(y)) for supported algo.
++
++config CRYPTO_DEV_EIP93_IPSEC
++	bool
++	depends on CRYPTO_DEV_EIP93
++	depends on XFRM_OFFLOAD
++	default y
++	help
++	  Select this if a netdev driver should be allowed to use EIP93 for
++	  ESP packet encapsulation and decapsulation rather than only the
++	  crypto transform.
+diff --git a/drivers/crypto/inside-secure/eip93/Makefile b/drivers/crypto/inside-secure/eip93/Makefile
+index a3d3d3677cdc..a5bb98370ff0 100644
+--- a/drivers/crypto/inside-secure/eip93/Makefile
++++ b/drivers/crypto/inside-secure/eip93/Makefile
+@@ -3,3 +3,4 @@ obj-$(CONFIG_CRYPTO_DEV_EIP93) += crypto-hw-eip93.o
+ crypto-hw-eip93-y += eip93-main.o eip93-common.o
+ crypto-hw-eip93-y += eip93-cipher.o eip93-aead.o
+ crypto-hw-eip93-y += eip93-hash.o
++crypto-hw-eip93-$(CONFIG_CRYPTO_DEV_EIP93_IPSEC) += eip93-ipsec.o
+diff --git a/drivers/crypto/inside-secure/eip93/eip93-ipsec.c b/drivers/crypto/inside-secure/eip93/eip93-ipsec.c
+new file mode 100644
+index 000000000000..7338f4c7e24a
+--- /dev/null
++++ b/drivers/crypto/inside-secure/eip93/eip93-ipsec.c
+@@ -0,0 +1,1413 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2026
++ *
++ * Jihong Min <hurryman2212@gmail.com>
++ */
++
++#include <crypto/aes.h>
++#include <crypto/eip93-ipsec.h>
++#include <crypto/hash.h>
++#include <crypto/hmac.h>
++#include <crypto/sha1.h>
++#include <crypto/sha2.h>
++#include <linux/completion.h>
++#include <linux/delay.h>
++#include <linux/device.h>
++#include <linux/dma-mapping.h>
++#include <linux/ip.h>
++#include <linux/list.h>
++#include <linux/mutex.h>
++#include <linux/netlink.h>
++#include <linux/notifier.h>
++#include <linux/of.h>
++#include <linux/refcount.h>
++#include <linux/skbuff.h>
++#include <linux/slab.h>
++#include <linux/spinlock.h>
++#include <linux/udp.h>
++#include <net/esp.h>
++#include <net/xfrm.h>
++#include <uapi/linux/pfkeyv2.h>
++
++#include "eip93-main.h"
++#include "eip93-regs.h"
++#include "eip93-common.h"
++
++#define EIP93_IPSEC_PAD_ALIGN 2
++#define EIP93_IPSEC_IDR_MIN 0
++#define EIP93_IPSEC_IDR_MAX (EIP93_RING_NUM - 1)
++#define EIP93_IPSEC_DIGEST_WORD_BITS (BITS_PER_BYTE * sizeof(u32))
++#define EIP93_IPSEC_DIGEST_WORDS(bits) ((bits) / EIP93_IPSEC_DIGEST_WORD_BITS)
++#define EIP93_IPSEC_HMAC_STATE_SIZE SHA256_DIGEST_SIZE
++#define EIP93_IPSEC_PRNG_BUF_SIZE 4080
++#define EIP93_IPSEC_PRNG_RESET_MODE 1
++#define EIP93_IPSEC_PRNG_POLL_US 10000
++#define EIP93_IPSEC_PRNG_POLL_STEP_US 10
++
++struct eip93_ipsec {
++	struct eip93_device *eip93;
++	struct list_head node;
++	struct list_head sa_list;
++	struct work_struct fault_work;
++	spinlock_t lock; /* protects dead/refcount admission */
++	refcount_t refcnt;
++	struct completion done;
++	enum eip93_ipsec_event fault_event;
++	u32 algo_flags;
++	bool dead;
++};
++
++struct eip93_ipsec_sa {
++	struct eip93_ipsec *ipsec;
++	struct sa_record *sa_record;
++	dma_addr_t sa_record_base;
++	struct list_head node;
++	struct list_head requests;
++	spinlock_t lock; /* protects dead/refcount admission */
++	refcount_t refcnt;
++	struct completion done;
++	u32 flags;
++	u16 family;
++	u8 authsize;
++	u8 blocksize;
++	u8 ivsize;
++	u8 encap_type;
++	bool esn;
++	bool dead;
++	bool aborting;
++};
++
++struct eip93_ipsec_request {
++	struct eip93_ipsec_sa *sa;
++	struct sk_buff *skb;
++	struct list_head node;
++	refcount_t refcnt;
++	eip93_ipsec_complete_t complete;
++	void *data;
++	dma_addr_t dma;
++	unsigned int dma_len;
++	enum dma_data_direction dma_dir;
++	int idr;
++};
++
++static DEFINE_MUTEX(eip93_ipsec_devices_lock);
++static LIST_HEAD(eip93_ipsec_devices);
++static BLOCKING_NOTIFIER_HEAD(eip93_ipsec_notifier);
++
++static bool eip93_ipsec_get_ref(struct eip93_ipsec *ipsec)
++{
++	bool ret = false;
++
++	spin_lock_bh(&ipsec->lock);
++	if (!ipsec->dead)
++		ret = refcount_inc_not_zero(&ipsec->refcnt);
++	spin_unlock_bh(&ipsec->lock);
++
++	return ret;
++}
++
++void eip93_ipsec_put(struct eip93_ipsec *ipsec)
++{
++	if (ipsec && refcount_dec_and_test(&ipsec->refcnt))
++		complete(&ipsec->done);
++}
++EXPORT_SYMBOL_GPL(eip93_ipsec_put);
++
++static bool eip93_ipsec_same_subsystem(struct device *consumer,
++				       struct eip93_ipsec *ipsec)
++{
++	struct device_node *consumer_parent;
++	struct device_node *eip93_parent;
++	struct device_node *consumer_np;
++	struct device_node *eip93_np;
++	bool match;
++
++	consumer_np = dev_of_node(consumer);
++	eip93_np = dev_of_node(ipsec->eip93->dev);
++	if (!consumer_np || !eip93_np)
++		return false;
++
++	consumer_parent = of_get_parent(consumer_np);
++	eip93_parent = of_get_parent(eip93_np);
++	match = consumer_parent && consumer_parent == eip93_parent;
++	of_node_put(consumer_parent);
++	of_node_put(eip93_parent);
++
++	return match;
++}
++
++static bool eip93_ipsec_hw_available(u32 flags)
++{
++	if (!(flags & EIP93_PE_OPTION_AES))
++		return false;
++
++	if (!(flags & (EIP93_PE_OPTION_AES_KEY128 | EIP93_PE_OPTION_AES_KEY192 |
++		       EIP93_PE_OPTION_AES_KEY256)))
++		return false;
++
++	return flags & (EIP93_PE_OPTION_SHA_1 | EIP93_PE_OPTION_SHA_256);
++}
++
++static bool eip93_ipsec_mark_dead(struct eip93_ipsec *ipsec)
++{
++	bool marked = false;
++
++	spin_lock_bh(&ipsec->lock);
++	if (!ipsec->dead) {
++		ipsec->dead = true;
++		marked = true;
++	}
++	spin_unlock_bh(&ipsec->lock);
++
++	return marked;
++}
++
++static bool eip93_ipsec_mark_dead_async(struct eip93_ipsec *ipsec,
++					enum eip93_ipsec_event event)
++{
++	bool marked = false;
++
++	spin_lock_bh(&ipsec->lock);
++	if (!ipsec->dead && refcount_inc_not_zero(&ipsec->refcnt)) {
++		ipsec->dead = true;
++		ipsec->fault_event = event;
++		marked = true;
++	}
++	spin_unlock_bh(&ipsec->lock);
++
++	if (marked)
++		schedule_work(&ipsec->fault_work);
++
++	return marked;
++}
++
++static bool eip93_ipsec_live_hw_available(struct eip93_ipsec *ipsec)
++{
++	u32 flags = readl(ipsec->eip93->base + EIP93_REG_PE_OPTION_1);
++
++	spin_lock_bh(&ipsec->lock);
++	ipsec->algo_flags = flags;
++	spin_unlock_bh(&ipsec->lock);
++
++	return eip93_ipsec_hw_available(flags);
++}
++
++struct eip93_ipsec *eip93_ipsec_get(struct device *consumer)
++{
++	struct eip93_ipsec *ipsec;
++	int err = -ENODEV;
++
++	if (!consumer)
++		return ERR_PTR(-EINVAL);
++
++	mutex_lock(&eip93_ipsec_devices_lock);
++	list_for_each_entry(ipsec, &eip93_ipsec_devices, node) {
++		if (!eip93_ipsec_same_subsystem(consumer, ipsec))
++			continue;
++
++		if (!eip93_ipsec_live_hw_available(ipsec)) {
++			enum eip93_ipsec_event event;
++
++			event = EIP93_IPSEC_EVENT_CAPABILITY_LOSS;
++			eip93_ipsec_mark_dead_async(ipsec, event);
++			err = -EOPNOTSUPP;
++			continue;
++		}
++
++		if (!eip93_ipsec_get_ref(ipsec)) {
++			err = -ENODEV;
++			continue;
++		}
++
++		mutex_unlock(&eip93_ipsec_devices_lock);
++		return ipsec;
++	}
++	mutex_unlock(&eip93_ipsec_devices_lock);
++
++	return ERR_PTR(err);
++}
++EXPORT_SYMBOL_GPL(eip93_ipsec_get);
++
++bool eip93_ipsec_available(struct eip93_ipsec *ipsec)
++{
++	bool available;
++
++	if (!ipsec)
++		return false;
++
++	spin_lock_bh(&ipsec->lock);
++	available = !ipsec->dead;
++	spin_unlock_bh(&ipsec->lock);
++	if (!available)
++		return false;
++
++	available = eip93_ipsec_live_hw_available(ipsec);
++	if (!available)
++		eip93_ipsec_mark_dead_async(ipsec,
++					    EIP93_IPSEC_EVENT_CAPABILITY_LOSS);
++
++	return available;
++}
++EXPORT_SYMBOL_GPL(eip93_ipsec_available);
++
++u32 eip93_ipsec_features(struct eip93_ipsec *ipsec)
++{
++	if (!eip93_ipsec_available(ipsec))
++		return 0;
++
++	return EIP93_IPSEC_FEATURE_ESP;
++}
++EXPORT_SYMBOL_GPL(eip93_ipsec_features);
++
++int eip93_ipsec_register_notifier(struct notifier_block *nb)
++{
++	return blocking_notifier_chain_register(&eip93_ipsec_notifier, nb);
++}
++EXPORT_SYMBOL_GPL(eip93_ipsec_register_notifier);
++
++void eip93_ipsec_unregister_notifier(struct notifier_block *nb)
++{
++	blocking_notifier_chain_unregister(&eip93_ipsec_notifier, nb);
++}
++EXPORT_SYMBOL_GPL(eip93_ipsec_unregister_notifier);
++
++static bool eip93_ipsec_sa_get(struct eip93_ipsec_sa *sa)
++{
++	bool ret = false;
++
++	spin_lock_bh(&sa->ipsec->lock);
++	spin_lock(&sa->lock);
++	if (!sa->ipsec->dead && !sa->dead)
++		ret = refcount_inc_not_zero(&sa->refcnt);
++	spin_unlock(&sa->lock);
++	spin_unlock_bh(&sa->ipsec->lock);
++
++	return ret;
++}
++
++static void eip93_ipsec_sa_put(struct eip93_ipsec_sa *sa)
++{
++	if (refcount_dec_and_test(&sa->refcnt))
++		complete(&sa->done);
++}
++
++static bool eip93_ipsec_request_get(struct eip93_ipsec_request *req)
++{
++	return refcount_inc_not_zero(&req->refcnt);
++}
++
++static void eip93_ipsec_request_put(struct eip93_ipsec_request *req)
++{
++	if (refcount_dec_and_test(&req->refcnt))
++		kfree(req);
++}
++
++static int eip93_ipsec_parse_flags(struct xfrm_state *x, u32 *flags)
++{
++	switch (x->props.ealgo) {
++	case SADB_X_EALG_AESCBC:
++		*flags |= EIP93_ALG_AES | EIP93_MODE_CBC;
++		break;
++	default:
++		return -EOPNOTSUPP;
++	}
++
++	switch (x->props.aalgo) {
++	case SADB_AALG_SHA1HMAC:
++		*flags |= EIP93_HASH_HMAC | EIP93_HASH_SHA1;
++		break;
++	case SADB_X_AALG_SHA2_256HMAC:
++		*flags |= EIP93_HASH_HMAC | EIP93_HASH_SHA256;
++		break;
++	default:
++		return -EOPNOTSUPP;
++	}
++
++	if (x->xso.dir == XFRM_DEV_OFFLOAD_IN)
++		*flags |= EIP93_DECRYPT;
++	else
++		*flags |= EIP93_ENCRYPT;
++
++	return 0;
++}
++
++static unsigned int eip93_ipsec_auth_digest_size(struct xfrm_state *x)
++{
++	switch (x->props.aalgo) {
++	case SADB_AALG_SHA1HMAC:
++		return SHA1_DIGEST_SIZE;
++	case SADB_X_AALG_SHA2_256HMAC:
++		return SHA256_DIGEST_SIZE;
++	default:
++		return 0;
++	}
++}
++
++static int eip93_ipsec_hmac_setkey(u32 flags, const u8 *key,
++				   unsigned int keylen, u8 *dest_ipad,
++				   u8 *dest_opad)
++{
++	u8 *ipad, *opad;
++	struct crypto_shash *tfm;
++	const char *alg_name;
++	unsigned int blocksize;
++	unsigned int digestsize;
++	unsigned int statesize;
++	unsigned int alloc_size;
++	unsigned int i;
++	int err;
++
++	switch (flags & EIP93_HASH_MASK) {
++	case EIP93_HASH_SHA1:
++		alg_name = "sha1";
++		digestsize = SHA1_DIGEST_SIZE;
++		break;
++	case EIP93_HASH_SHA256:
++		alg_name = "sha256";
++		digestsize = SHA256_DIGEST_SIZE;
++		break;
++	default:
++		return -EINVAL;
++	}
++
++	tfm = crypto_alloc_shash(alg_name, 0, CRYPTO_ALG_NEED_FALLBACK);
++	if (IS_ERR(tfm))
++		return PTR_ERR(tfm);
++
++	blocksize = crypto_shash_blocksize(tfm);
++	statesize = crypto_shash_statesize(tfm);
++	if (statesize < EIP93_IPSEC_HMAC_STATE_SIZE) {
++		err = -EINVAL;
++		goto free_tfm;
++	}
++
++	alloc_size = 2 * (blocksize + statesize);
++	ipad = kzalloc(alloc_size, GFP_KERNEL);
++	if (!ipad) {
++		err = -ENOMEM;
++		goto free_tfm;
++	}
++	opad = ipad + blocksize + statesize;
++
++	if (keylen > blocksize) {
++		SHASH_DESC_ON_STACK(desc, tfm);
++
++		desc->tfm = tfm;
++		err = crypto_shash_digest(desc, key, keylen, ipad);
++		shash_desc_zero(desc);
++		if (err)
++			goto free_pad;
++
++		keylen = digestsize;
++	} else {
++		memcpy(ipad, key, keylen);
++	}
++
++	memcpy(opad, ipad, blocksize);
++	for (i = 0; i < blocksize; i++) {
++		ipad[i] ^= HMAC_IPAD_VALUE;
++		opad[i] ^= HMAC_OPAD_VALUE;
++	}
++
++	{
++		SHASH_DESC_ON_STACK(desc, tfm);
++
++		desc->tfm = tfm;
++		err = crypto_shash_init(desc) ?:
++		      crypto_shash_update(desc, ipad, blocksize) ?:
++		      crypto_shash_export(desc, ipad) ?:
++		      crypto_shash_init(desc) ?:
++		      crypto_shash_update(desc, opad, blocksize) ?:
++		      crypto_shash_export(desc, opad);
++		shash_desc_zero(desc);
++	}
++	if (err)
++		goto free_pad;
++
 +	/*
-+	 * ESP packet engines can reserve tailroom in the generic ESP path and
-+	 * generate padding, next-header and ICV bytes during device TX.
++	 * EIP93 ESP protocol mode consumes the raw exported HMAC ipad/opad
++	 * state. The crypto API AEAD helper byteswaps this state for its basic
++	 * authenc path, but packet ESP mode matches mtk-eip93 with native
++	 * exported bytes in the SA record.
 +	 */
-+	__u16			esp_tx_tailen;
++	memcpy(dest_ipad, ipad, EIP93_IPSEC_HMAC_STATE_SIZE);
++	memcpy(dest_opad, opad, EIP93_IPSEC_HMAC_STATE_SIZE);
 +
- 	__u8			proto;
- 	__u8			inner_ipproto;
++free_pad:
++	kfree_sensitive(ipad);
++free_tfm:
++	crypto_free_shash(tfm);
++	return err;
++}
++
++static int eip93_ipsec_validate_algo(struct xfrm_state *x,
++				     struct netlink_ext_ack *extack)
++{
++	unsigned int authsize;
++	unsigned int keylen;
++
++	if (x->aead) {
++		NL_SET_ERR_MSG_MOD(extack, "AEAD SAs are unsupported");
++		return -EOPNOTSUPP;
++	}
++
++	if (!x->ealg || !x->aalg) {
++		NL_SET_ERR_MSG_MOD(extack, "encryption/auth required");
++		return -EOPNOTSUPP;
++	}
++
++	if (x->props.ealgo != SADB_X_EALG_AESCBC) {
++		NL_SET_ERR_MSG_MOD(extack, "only AES-CBC is supported");
++		return -EOPNOTSUPP;
++	}
++
++	keylen = x->ealg->alg_key_len / BITS_PER_BYTE;
++	if (keylen != AES_KEYSIZE_128 && keylen != AES_KEYSIZE_192 &&
++	    keylen != AES_KEYSIZE_256) {
++		NL_SET_ERR_MSG_MOD(extack, "unsupported AES-CBC key length");
++		return -EOPNOTSUPP;
++	}
++
++	authsize = eip93_ipsec_auth_digest_size(x);
++	if (!authsize) {
++		NL_SET_ERR_MSG_MOD(extack, "only SHA1/SHA256 HMAC");
++		return -EOPNOTSUPP;
++	}
++
++	if (x->aalg->alg_trunc_len % EIP93_IPSEC_DIGEST_WORD_BITS ||
++	    x->aalg->alg_trunc_len < EIP93_IPSEC_DIGEST_WORD_BITS ||
++	    x->aalg->alg_trunc_len > authsize * BITS_PER_BYTE) {
++		NL_SET_ERR_MSG_MOD(extack, "bad auth truncation length");
++		return -EOPNOTSUPP;
++	}
++
++	return 0;
++}
++
++static int eip93_ipsec_validate_state(struct xfrm_state *x,
++				      struct netlink_ext_ack *extack)
++{
++	switch (x->xso.dir) {
++	case XFRM_DEV_OFFLOAD_OUT:
++	case XFRM_DEV_OFFLOAD_IN:
++		break;
++	default:
++		NL_SET_ERR_MSG_MOD(extack, "only in/out SAs are supported");
++		return -EOPNOTSUPP;
++	}
++
++	if (x->xso.type != XFRM_DEV_OFFLOAD_CRYPTO) {
++		NL_SET_ERR_MSG_MOD(extack, "only crypto offload is supported");
++		return -EOPNOTSUPP;
++	}
++
++	if (x->id.proto != IPPROTO_ESP) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "EIP93 packet backend supports ESP only");
++		return -EOPNOTSUPP;
++	}
++
++	switch (x->props.family) {
++	case AF_INET:
++		break;
++#if IS_ENABLED(CONFIG_IPV6)
++	case AF_INET6:
++		break;
++#endif
++	default:
++		NL_SET_ERR_MSG_MOD(extack, "only IPv4/IPv6 is supported");
++		return -EOPNOTSUPP;
++	}
++
++	if (x->outer_mode.family != x->props.family) {
++		NL_SET_ERR_MSG_MOD(extack, "only same-family ESP is supported");
++		return -EOPNOTSUPP;
++	}
++
++	switch (x->props.mode) {
++	case XFRM_MODE_TUNNEL:
++	case XFRM_MODE_TRANSPORT:
++		break;
++	default:
++		NL_SET_ERR_MSG_MOD(extack, "only tunnel/transport");
++		return -EOPNOTSUPP;
++	}
++
++	if (x->outer_mode.encap != x->props.mode) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "outer ESP mode does not match state mode");
++		return -EOPNOTSUPP;
++	}
++
++	if (x->encap) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "NAT-T is unsupported by EIP93 packet ESP");
++		return -EOPNOTSUPP;
++	}
++
++	if (x->tfcpad) {
++		NL_SET_ERR_MSG_MOD(extack, "TFC padding is unsupported");
++		return -EOPNOTSUPP;
++	}
++
++	return eip93_ipsec_validate_algo(x, extack);
++}
++
++static int eip93_ipsec_validate_hw(struct xfrm_state *x, u32 flags,
++				   struct netlink_ext_ack *extack)
++{
++	unsigned int keylen = x->ealg->alg_key_len / BITS_PER_BYTE;
++	u32 required;
++
++	if (!(flags & EIP93_PE_OPTION_AES)) {
++		NL_SET_ERR_MSG_MOD(extack, "EIP93 AES engine is unavailable");
++		return -EOPNOTSUPP;
++	}
++
++	switch (keylen) {
++	case AES_KEYSIZE_128:
++		required = EIP93_PE_OPTION_AES_KEY128;
++		break;
++	case AES_KEYSIZE_192:
++		required = EIP93_PE_OPTION_AES_KEY192;
++		break;
++	case AES_KEYSIZE_256:
++		required = EIP93_PE_OPTION_AES_KEY256;
++		break;
++	default:
++		return -EOPNOTSUPP;
++	}
++
++	if (!(flags & required)) {
++		NL_SET_ERR_MSG_MOD(extack, "unsupported AES key length");
++		return -EOPNOTSUPP;
++	}
++
++	switch (x->props.aalgo) {
++	case SADB_AALG_SHA1HMAC:
++		required = EIP93_PE_OPTION_SHA_1;
++		break;
++	case SADB_X_AALG_SHA2_256HMAC:
++		required = EIP93_PE_OPTION_SHA_256;
++		break;
++	default:
++		return -EOPNOTSUPP;
++	}
++
++	if (!(flags & required)) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "EIP93 does not support this HMAC hash");
++		return -EOPNOTSUPP;
++	}
++
++	return 0;
++}
++
++static void eip93_ipsec_init_sa_record(struct eip93_ipsec_sa *sa,
++				       struct xfrm_state *x)
++{
++	struct sa_record *record = sa->sa_record;
++	unsigned int auth_words;
++	unsigned int enckeylen;
++
++	enckeylen = x->ealg->alg_key_len / BITS_PER_BYTE;
++	auth_words = EIP93_IPSEC_DIGEST_WORDS(x->aalg->alg_trunc_len);
++
++	eip93_set_sa_record(record, enckeylen, sa->flags);
++
++	record->sa_cmd0_word &=
++		~(EIP93_SA_CMD_OPGROUP | EIP93_SA_CMD_OPCODE |
++		  EIP93_SA_CMD_DIGEST_LENGTH | EIP93_SA_CMD_PAD_TYPE |
++		  EIP93_SA_CMD_IV_SOURCE | EIP93_SA_CMD_SAVE_IV);
++	record->sa_cmd0_word |=
++		EIP93_SA_CMD_OP_PROTOCOL | EIP93_SA_CMD_HDR_PROC |
++		EIP93_SA_CMD_PAD_IPSEC | EIP93_SA_CMD_SCPAD |
++		FIELD_PREP(EIP93_SA_CMD_OPCODE,
++			   EIP93_SA_CMD_OPCODE_PROTOCOL_OUT_ESP) |
++		FIELD_PREP(EIP93_SA_CMD_DIGEST_LENGTH, auth_words);
++
++	/*
++	 * ESP packet mode authenticates from the ESP header when the hash
++	 * crypt offset is zero. This is intentionally different from the AEAD
++	 * authenc path, whose AAD starts after the ESP header.
++	 */
++	record->sa_cmd1_word &=
++		~(EIP93_SA_CMD_HASH_CRYPT_OFFSET | EIP93_SA_CMD_BYTE_OFFSET |
++		  EIP93_SA_CMD_COPY_PAD | EIP93_SA_CMD_COPY_HEADER |
++		  EIP93_SA_CMD_COPY_DIGEST | EIP93_SA_CMD_COPY_PAYLOAD |
++		  EIP93_SA_CMD_EN_SEQNUM_CHK);
++	record->sa_cmd1_word |= EIP93_SA_CMD_HMAC | EIP93_SA_CMD_EN_SEQNUM_CHK;
++
++	if (x->xso.dir == XFRM_DEV_OFFLOAD_IN) {
++		record->sa_cmd0_word |= EIP93_SA_CMD_DIRECTION_IN |
++					EIP93_SA_CMD_IV_FROM_INPUT;
++		/*
++		 * Inbound ESP decapsulation keeps the outer header for XFRM and
++		 * lets hardware remove ESP pad/trailer/ICV bytes.
++		 */
++		record->sa_cmd1_word |= EIP93_SA_CMD_COPY_HEADER;
++	} else {
++		record->sa_cmd0_word |= EIP93_SA_CMD_IV_FROM_PRNG;
++		record->sa_cmd1_word |= EIP93_SA_CMD_COPY_DIGEST;
++	}
++
++	record->sa_spi = ntohl(x->id.spi);
++	if (sa->esn && x->replay_esn) {
++		if (x->xso.dir == XFRM_DEV_OFFLOAD_IN)
++			record->sa_seqnum[1] = x->replay_esn->seq_hi;
++		else
++			record->sa_seqnum[1] = x->replay_esn->oseq_hi;
++	} else {
++		record->sa_seqnum[1] = 0;
++	}
++	record->sa_seqnum[0] = 0;
++	record->sa_seqmum_mask[0] = 0xffffffff;
++	record->sa_seqmum_mask[1] = sa->esn ? 0xffffffff : 0;
++}
++
++static int eip93_ipsec_poll_result(struct eip93_device *eip93,
++				   struct eip93_descriptor **rdesc)
++{
++	struct eip93_descriptor *desc;
++	unsigned int i;
++	u32 pe_ctrl_stat;
++	u32 pe_length;
++
++	for (i = 0; i < EIP93_IPSEC_PRNG_POLL_US;
++	     i += EIP93_IPSEC_PRNG_POLL_STEP_US) {
++		if (readl(eip93->base + EIP93_REG_PE_RD_COUNT) &
++		    EIP93_PE_RD_COUNT)
++			break;
++		udelay(EIP93_IPSEC_PRNG_POLL_STEP_US);
++	}
++	if (i >= EIP93_IPSEC_PRNG_POLL_US)
++		return -ETIMEDOUT;
++
++	scoped_guard(spinlock_irqsave, &eip93->ring->read_lock)
++		desc = eip93_get_descriptor(eip93);
++	if (IS_ERR(desc))
++		return PTR_ERR(desc);
++	*rdesc = desc;
++
++	for (i = 0; i < EIP93_IPSEC_PRNG_POLL_US;
++	     i += EIP93_IPSEC_PRNG_POLL_STEP_US) {
++		pe_ctrl_stat = READ_ONCE((*rdesc)->pe_ctrl_stat_word);
++		pe_length = READ_ONCE((*rdesc)->pe_length_word);
++		if (FIELD_GET(EIP93_PE_CTRL_PE_READY_DES_TRING_OWN,
++			      pe_ctrl_stat) == EIP93_PE_CTRL_PE_READY &&
++		    FIELD_GET(EIP93_PE_LENGTH_HOST_PE_READY, pe_length) ==
++			    EIP93_PE_LENGTH_PE_READY)
++			break;
++		udelay(EIP93_IPSEC_PRNG_POLL_STEP_US);
++	}
++
++	writel(1, eip93->base + EIP93_REG_PE_RD_COUNT);
++	writel(EIP93_INT_RDR_THRESH, eip93->base + EIP93_REG_INT_CLR);
++
++	if (i >= EIP93_IPSEC_PRNG_POLL_US)
++		return -ETIMEDOUT;
++
++	return 0;
++}
++
++static int eip93_ipsec_init_prng(struct eip93_device *eip93)
++{
++	static const u32 prng_dt[4] = {};
++	static const u32 prng_key[4] = {
++		0xe0fc631d, 0xcbb9fb9a, 0x869285cb, 0xcbb9fb9a
++	};
++	static const u32 prng_seed[4] = {
++		0x758bac03, 0xf20ab39e, 0xa569f104, 0x95dfaea6
++	};
++	struct eip93_descriptor cdesc = {};
++	struct eip93_descriptor *rdesc;
++	struct sa_record *record;
++	dma_addr_t record_dma;
++	dma_addr_t buf_dma;
++	void *buf;
++	int err;
++
++	record = dma_alloc_coherent(eip93->dev, sizeof(*record), &record_dma,
++				    GFP_KERNEL);
++	if (!record)
++		return -ENOMEM;
++
++	buf = dma_alloc_coherent(eip93->dev, EIP93_IPSEC_PRNG_BUF_SIZE,
++				 &buf_dma, GFP_KERNEL);
++	if (!buf) {
++		err = -ENOMEM;
++		goto free_record;
++	}
++
++	memset(record, 0, sizeof(*record));
++	record->sa_cmd0_word =
++		EIP93_SA_CMD_OP_BASIC |
++		FIELD_PREP(EIP93_SA_CMD_OPCODE,
++			   EIP93_SA_CMD_OPCODE_BASIC_OUT_PRNG) |
++		EIP93_SA_CMD_CIPHER_AES | EIP93_SA_CMD_HASH_SHA1;
++	record->sa_cmd1_word = EIP93_SA_CMD_AES_KEY_128BIT;
++	memcpy(record->sa_key, prng_key, sizeof(prng_key));
++	memcpy(record->sa_i_digest, prng_seed, sizeof(prng_seed));
++	memcpy(record->sa_o_digest, prng_dt, sizeof(prng_dt));
++
++	cdesc.pe_ctrl_stat_word =
++		FIELD_PREP(EIP93_PE_CTRL_PE_READY_DES_TRING_OWN,
++			   EIP93_PE_CTRL_HOST_READY) |
++		FIELD_PREP(EIP93_PE_CTRL_PE_PRNG_MODE,
++			   EIP93_IPSEC_PRNG_RESET_MODE);
++	cdesc.dst_addr = (u32 __force)buf_dma;
++	cdesc.sa_addr = record_dma;
++	cdesc.user_id = FIELD_PREP(EIP93_PE_USER_ID_DESC_FLAGS,
++				   EIP93_DESC_PRNG | EIP93_DESC_LAST);
++	cdesc.pe_length_word =
++		FIELD_PREP(EIP93_PE_LENGTH_HOST_PE_READY,
++			   EIP93_PE_LENGTH_HOST_READY) |
++		FIELD_PREP(EIP93_PE_LENGTH_LENGTH,
++			   EIP93_IPSEC_PRNG_BUF_SIZE);
++
++	/*
++	 * Outbound ESP SAs use IV_FROM_PRNG. Initialize the EIP93 PRNG before
++	 * exposing the packet backend, otherwise the first ESP encrypt can
++	 * fail or emit unusable IV material.
++	 */
++	scoped_guard(spinlock_irqsave, &eip93->ring->write_lock)
++		err = eip93_put_descriptor(eip93, &cdesc);
++	if (err)
++		goto free_buf;
++
++	writel(1, eip93->base + EIP93_REG_PE_CD_COUNT);
++	err = eip93_ipsec_poll_result(eip93, &rdesc);
++	if (err)
++		goto free_buf;
++
++	err = rdesc->pe_ctrl_stat_word &
++	      (EIP93_PE_CTRL_PE_EXT_ERR_CODE | EIP93_PE_CTRL_PE_EXT_ERR |
++	       EIP93_PE_CTRL_PE_SEQNUM_ERR | EIP93_PE_CTRL_PE_PAD_ERR |
++	       EIP93_PE_CTRL_PE_AUTH_ERR);
++	err = eip93_parse_ctrl_stat_err(eip93, err);
++	if (err)
++		dev_err(eip93->dev, "IPsec PRNG init failed: %d\n", err);
++
++free_buf:
++	dma_free_coherent(eip93->dev, EIP93_IPSEC_PRNG_BUF_SIZE, buf, buf_dma);
++free_record:
++	dma_free_coherent(eip93->dev, sizeof(*record), record, record_dma);
++
++	return err;
++}
++
++static int eip93_ipsec_submit(struct eip93_ipsec_request *req,
++			      struct eip93_descriptor *cdesc)
++{
++	struct eip93_device *eip93 = req->sa->ipsec->eip93;
++	struct eip93_ipsec_sa *sa = req->sa;
++	struct eip93_ipsec *ipsec = sa->ipsec;
++	int err;
++
++	spin_lock_bh(&ipsec->lock);
++	if (ipsec->dead) {
++		err = -EOPNOTSUPP;
++		goto unlock_ipsec;
++	}
++
++	scoped_guard(spinlock_bh, &eip93->ring->idr_lock) req->idr =
++		idr_alloc(&eip93->ring->crypto_async_idr, req,
++			  EIP93_IPSEC_IDR_MIN, EIP93_IPSEC_IDR_MAX, GFP_ATOMIC);
++	if (req->idr < 0) {
++		err = req->idr == -ENOSPC ? -EBUSY : req->idr;
++		goto unlock_ipsec;
++	}
++
++	spin_lock(&sa->lock);
++	if (sa->dead) {
++		spin_unlock(&sa->lock);
++		err = -EOPNOTSUPP;
++		goto remove_idr;
++	}
++	list_add_tail(&req->node, &sa->requests);
++	spin_unlock(&sa->lock);
++
++	cdesc->user_id =
++		FIELD_PREP(EIP93_PE_USER_ID_CRYPTO_IDR, (u16)req->idr) |
++		FIELD_PREP(EIP93_PE_USER_ID_DESC_FLAGS,
++			   EIP93_DESC_IPSEC | EIP93_DESC_LAST);
++
++	scoped_guard(spinlock_irqsave, &eip93->ring->write_lock)
++		err = eip93_put_descriptor(eip93, cdesc);
++	if (err)
++		goto unlink_request;
++
++	writel(1, eip93->base + EIP93_REG_PE_CD_COUNT);
++	spin_unlock_bh(&ipsec->lock);
++
++	return -EINPROGRESS;
++
++unlink_request:
++	spin_lock(&sa->lock);
++	list_del_init(&req->node);
++	spin_unlock(&sa->lock);
++remove_idr:
++	scoped_guard(spinlock_bh, &eip93->ring->idr_lock)
++		idr_remove(&eip93->ring->crypto_async_idr, req->idr);
++	err = err == -ENOENT ? -EBUSY : err;
++unlock_ipsec:
++	spin_unlock_bh(&ipsec->lock);
++	return err;
++}
++
++static void eip93_ipsec_unlink_request(struct eip93_ipsec_request *req)
++{
++	struct eip93_ipsec_sa *sa = req->sa;
++
++	spin_lock_bh(&sa->lock);
++	if (!list_empty(&req->node))
++		list_del_init(&req->node);
++	spin_unlock_bh(&sa->lock);
++}
++
++static void eip93_ipsec_complete_request(struct eip93_ipsec_request *req,
++					 int err,
++					 struct eip93_ipsec_result result)
++{
++	struct eip93_ipsec_sa *sa = req->sa;
++	eip93_ipsec_complete_t complete = req->complete;
++	void *data = req->data;
++
++	dma_unmap_single(sa->ipsec->eip93->dev, req->dma, req->dma_len,
++			 req->dma_dir);
++	eip93_ipsec_unlink_request(req);
++	eip93_ipsec_sa_put(sa);
++	complete(data, err, result);
++	eip93_ipsec_request_put(req);
++}
++
++static void eip93_ipsec_abort_sa(struct eip93_ipsec_sa *sa, int err)
++{
++	struct eip93_device *eip93 = sa->ipsec->eip93;
++	struct eip93_ipsec_request *req;
++	bool claimed;
++
++	while (true) {
++		spin_lock_bh(&sa->lock);
++		if (list_empty(&sa->requests)) {
++			spin_unlock_bh(&sa->lock);
++			return;
++		}
++
++		req = list_first_entry(&sa->requests,
++				       struct eip93_ipsec_request, node);
++		if (!eip93_ipsec_request_get(req)) {
++			list_del_init(&req->node);
++			spin_unlock_bh(&sa->lock);
++			continue;
++		}
++		list_del_init(&req->node);
++		spin_unlock_bh(&sa->lock);
++
++		claimed = false;
++		scoped_guard(spinlock_bh, &eip93->ring->idr_lock) {
++			if (idr_find(&eip93->ring->crypto_async_idr,
++				     req->idr) == req) {
++				idr_remove(&eip93->ring->crypto_async_idr,
++					   req->idr);
++				claimed = true;
++			}
++		}
++
++		if (claimed) {
++			struct eip93_ipsec_result result = {};
++
++			eip93_ipsec_complete_request(req, err, result);
++		}
++		eip93_ipsec_request_put(req);
++	}
++}
++
++static void eip93_ipsec_abort_requests(struct eip93_ipsec *ipsec, int err)
++{
++	struct eip93_ipsec_sa *sa;
++
++	while (true) {
++		bool found = false;
++
++		spin_lock_bh(&ipsec->lock);
++		list_for_each_entry(sa, &ipsec->sa_list, node) {
++			spin_lock(&sa->lock);
++			if (sa->aborting) {
++				spin_unlock(&sa->lock);
++				continue;
++			}
++
++			sa->aborting = true;
++			found = refcount_inc_not_zero(&sa->refcnt);
++			spin_unlock(&sa->lock);
++			if (found)
++				break;
++		}
++		spin_unlock_bh(&ipsec->lock);
++		if (!found)
++			return;
++
++		eip93_ipsec_abort_sa(sa, err);
++		eip93_ipsec_sa_put(sa);
++	}
++}
++
++static void eip93_ipsec_fault_work(struct work_struct *work)
++{
++	struct eip93_ipsec *ipsec =
++		container_of(work, struct eip93_ipsec, fault_work);
++	enum eip93_ipsec_event event;
++
++	spin_lock_bh(&ipsec->lock);
++	event = ipsec->fault_event;
++	spin_unlock_bh(&ipsec->lock);
++
++	eip93_ipsec_abort_requests(ipsec, -EIO);
++	blocking_notifier_call_chain(&eip93_ipsec_notifier, event, ipsec);
++	eip93_ipsec_put(ipsec);
++}
++
++void eip93_ipsec_handle_result(struct eip93_ipsec_request *req, int err,
++			       u32 pe_ctrl_stat, u32 pe_length)
++{
++	struct eip93_ipsec_result result = {};
++
++	if (!req)
++		return;
++
++	if (err == -EIO || err == -EACCES)
++		eip93_ipsec_mark_dead_async(req->sa->ipsec,
++					    EIP93_IPSEC_EVENT_DMA_ERROR);
++
++	if (!err) {
++		result.packet_len = FIELD_GET(EIP93_PE_LENGTH_LENGTH, pe_length);
++		result.nexthdr = FIELD_GET(EIP93_PE_CTRL_PE_PAD_VALUE,
++					   pe_ctrl_stat);
++	}
++
++	eip93_ipsec_complete_request(req, err, result);
++}
++
++void eip93_ipsec_report_irq(struct eip93_device *eip93, u32 irq_status)
++{
++	struct eip93_ipsec *ipsec = eip93->ipsec;
++
++	if (!ipsec)
++		return;
++
++	if (irq_status & EIP93_INT_HALT) {
++		eip93_ipsec_mark_dead_async(ipsec, EIP93_IPSEC_EVENT_RESET);
++		return;
++	}
++
++	if (irq_status & (EIP93_INT_INTERFACE_ERR | EIP93_INT_RPOC_ERR |
++			  EIP93_INT_PE_RING_ERR))
++		eip93_ipsec_mark_dead_async(ipsec, EIP93_IPSEC_EVENT_DMA_ERROR);
++}
++
++int eip93_ipsec_register(struct eip93_device *eip93)
++{
++	struct eip93_ipsec *ipsec;
++	int err;
++
++	ipsec = kzalloc(sizeof(*ipsec), GFP_KERNEL);
++	if (!ipsec)
++		return -ENOMEM;
++
++	err = eip93_ipsec_init_prng(eip93);
++	if (err) {
++		kfree(ipsec);
++		return err;
++	}
++
++	ipsec->eip93 = eip93;
++	ipsec->algo_flags = readl(eip93->base + EIP93_REG_PE_OPTION_1);
++	ipsec->fault_event = EIP93_IPSEC_EVENT_REMOVE;
++	INIT_WORK(&ipsec->fault_work, eip93_ipsec_fault_work);
++	spin_lock_init(&ipsec->lock);
++	refcount_set(&ipsec->refcnt, 1);
++	init_completion(&ipsec->done);
++	INIT_LIST_HEAD(&ipsec->node);
++	INIT_LIST_HEAD(&ipsec->sa_list);
++
++	mutex_lock(&eip93_ipsec_devices_lock);
++	eip93->ipsec = ipsec;
++	list_add_tail(&ipsec->node, &eip93_ipsec_devices);
++	mutex_unlock(&eip93_ipsec_devices_lock);
++
++	return 0;
++}
++
++void eip93_ipsec_unregister(struct eip93_device *eip93)
++{
++	struct eip93_ipsec *ipsec = eip93->ipsec;
++	bool notify_remove;
++
++	if (!ipsec)
++		return;
++
++	mutex_lock(&eip93_ipsec_devices_lock);
++	notify_remove = eip93_ipsec_mark_dead(ipsec);
++	list_del_init(&ipsec->node);
++	eip93->ipsec = NULL;
++	mutex_unlock(&eip93_ipsec_devices_lock);
++
++	eip93_ipsec_abort_requests(ipsec, -ENODEV);
++	if (notify_remove)
++		blocking_notifier_call_chain(&eip93_ipsec_notifier,
++					     EIP93_IPSEC_EVENT_REMOVE, ipsec);
++
++	eip93_ipsec_put(ipsec);
++	wait_for_completion(&ipsec->done);
++	cancel_work_sync(&ipsec->fault_work);
++	kfree(ipsec);
++}
++
++int eip93_ipsec_state_add(struct eip93_ipsec *ipsec, struct xfrm_state *x,
++			  struct netlink_ext_ack *extack,
++			  struct eip93_ipsec_sa **sa)
++{
++	struct eip93_device *eip93;
++	struct eip93_ipsec_sa *new_sa;
++	unsigned int authkeylen;
++	unsigned int enckeylen;
++	int err;
++
++	if (!ipsec || !eip93_ipsec_get_ref(ipsec)) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "EIP93 packet backend is unavailable");
++		return -EOPNOTSUPP;
++	}
++
++	err = eip93_ipsec_validate_state(x, extack);
++	if (err)
++		goto put_ipsec;
++
++	err = eip93_ipsec_validate_hw(x, ipsec->algo_flags, extack);
++	if (err)
++		goto put_ipsec;
++
++	eip93 = ipsec->eip93;
++	new_sa = kzalloc(sizeof(*new_sa), GFP_KERNEL);
++	if (!new_sa) {
++		err = -ENOMEM;
++		goto put_ipsec;
++	}
++
++	new_sa->ipsec = ipsec;
++	new_sa->family = x->props.family;
++	new_sa->ivsize = AES_BLOCK_SIZE;
++	new_sa->authsize = x->aalg->alg_trunc_len / BITS_PER_BYTE;
++	new_sa->blocksize = AES_BLOCK_SIZE;
++	new_sa->encap_type = x->encap ? x->encap->encap_type : 0;
++	new_sa->esn = x->props.flags & XFRM_STATE_ESN;
++	INIT_LIST_HEAD(&new_sa->node);
++	INIT_LIST_HEAD(&new_sa->requests);
++	spin_lock_init(&new_sa->lock);
++	refcount_set(&new_sa->refcnt, 1);
++	init_completion(&new_sa->done);
++
++	err = eip93_ipsec_parse_flags(x, &new_sa->flags);
++	if (err)
++		goto free_sa;
++
++	new_sa->sa_record = kzalloc(sizeof(*new_sa->sa_record), GFP_KERNEL);
++	if (!new_sa->sa_record) {
++		err = -ENOMEM;
++		goto free_sa;
++	}
++
++	eip93_ipsec_init_sa_record(new_sa, x);
++
++	enckeylen = x->ealg->alg_key_len / BITS_PER_BYTE;
++	memcpy(new_sa->sa_record->sa_key, x->ealg->alg_key, enckeylen);
++
++	authkeylen = x->aalg->alg_key_len / BITS_PER_BYTE;
++	err = eip93_ipsec_hmac_setkey(new_sa->flags, x->aalg->alg_key,
++				      authkeylen,
++				      new_sa->sa_record->sa_i_digest,
++				      new_sa->sa_record->sa_o_digest);
++	if (err)
++		goto free_record;
++
++	new_sa->sa_record_base = dma_map_single(eip93->dev, new_sa->sa_record,
++						sizeof(*new_sa->sa_record),
++						DMA_TO_DEVICE);
++	if (dma_mapping_error(eip93->dev, new_sa->sa_record_base)) {
++		err = -ENOMEM;
++		goto free_record;
++	}
++
++	spin_lock_bh(&ipsec->lock);
++	if (ipsec->dead) {
++		spin_unlock_bh(&ipsec->lock);
++		err = -EOPNOTSUPP;
++		goto unmap_record;
++	}
++	list_add_tail(&new_sa->node, &ipsec->sa_list);
++	spin_unlock_bh(&ipsec->lock);
++
++	*sa = new_sa;
++
++	return 0;
++
++unmap_record:
++	dma_unmap_single(eip93->dev, new_sa->sa_record_base,
++			 sizeof(*new_sa->sa_record), DMA_TO_DEVICE);
++free_record:
++	kfree_sensitive(new_sa->sa_record);
++free_sa:
++	kfree(new_sa);
++put_ipsec:
++	eip93_ipsec_put(ipsec);
++	return err;
++}
++EXPORT_SYMBOL_GPL(eip93_ipsec_state_add);
++
++void eip93_ipsec_state_delete(struct eip93_ipsec_sa *sa)
++{
++	if (!sa)
++		return;
++
++	spin_lock_bh(&sa->ipsec->lock);
++	spin_lock(&sa->lock);
++	sa->dead = true;
++	list_del_init(&sa->node);
++	spin_unlock(&sa->lock);
++	spin_unlock_bh(&sa->ipsec->lock);
++
++	eip93_ipsec_sa_put(sa);
++	wait_for_completion(&sa->done);
++
++	dma_unmap_single(sa->ipsec->eip93->dev, sa->sa_record_base,
++			 sizeof(*sa->sa_record), DMA_TO_DEVICE);
++	kfree_sensitive(sa->sa_record);
++	eip93_ipsec_put(sa->ipsec);
++	kfree(sa);
++}
++EXPORT_SYMBOL_GPL(eip93_ipsec_state_delete);
++
++void eip93_ipsec_state_advance_esn(struct eip93_ipsec_sa *sa,
++				   struct xfrm_state *x)
++{
++	u32 seq_hi = 0;
++
++	if (!sa || !x || !sa->esn || !x->replay_esn)
++		return;
++
++	if (x->xso.dir == XFRM_DEV_OFFLOAD_IN)
++		seq_hi = x->replay_esn->seq_hi;
++	else if (x->xso.dir == XFRM_DEV_OFFLOAD_OUT)
++		seq_hi = x->replay_esn->oseq_hi;
++
++	spin_lock_bh(&sa->lock);
++	if (!sa->dead) {
++		sa->sa_record->sa_seqnum[1] = seq_hi;
++		dma_sync_single_for_device(sa->ipsec->eip93->dev,
++					   sa->sa_record_base,
++					   sizeof(*sa->sa_record),
++					   DMA_TO_DEVICE);
++	}
++	spin_unlock_bh(&sa->lock);
++}
++EXPORT_SYMBOL_GPL(eip93_ipsec_state_advance_esn);
++
++int eip93_ipsec_xmit(struct eip93_ipsec_sa *sa, struct sk_buff *skb,
++		     unsigned int esp_offset, eip93_ipsec_complete_t complete,
++		     void *data)
++{
++	struct eip93_descriptor cdesc = {};
++	struct eip93_ipsec_request *req;
++	struct xfrm_offload *xo;
++	unsigned int payload_len;
++	unsigned int crypt_len;
++	unsigned int dma_len;
++	unsigned int tailen;
++	int err;
++
++	if (!sa || !complete || !eip93_ipsec_sa_get(sa))
++		return -EOPNOTSUPP;
++
++	if (skb_is_nonlinear(skb)) {
++		err = -EINVAL;
++		goto put_sa;
++	}
++
++	if (skb->len <= esp_offset + sizeof(struct ip_esp_hdr) + sa->ivsize) {
++		err = -EINVAL;
++		goto put_sa;
++	}
++
++	xo = xfrm_offload(skb);
++	if (!xo) {
++		err = -EINVAL;
++		goto put_sa;
++	}
++
++	tailen = xo->esp_tx_tailen;
++	if (tailen) {
++		payload_len = skb->len - esp_offset - sizeof(struct ip_esp_hdr) -
++			      sa->ivsize;
++		dma_len = skb->len + tailen;
++		if (tailen > skb_tailroom(skb) || dma_len < skb->len) {
++			err = -ENOMEM;
++			goto put_sa;
++		}
++	} else {
++		u8 *trail;
++		u8 padlen;
++
++		if (skb->len <= esp_offset + sizeof(struct ip_esp_hdr) +
++					sa->ivsize + sa->authsize) {
++			err = -EINVAL;
++			goto put_sa;
++		}
++
++		crypt_len = skb->len - esp_offset - sizeof(struct ip_esp_hdr) -
++			    sa->ivsize - sa->authsize;
++		if (crypt_len < 2) {
++			err = -EINVAL;
++			goto put_sa;
++		}
++
++		trail = skb_tail_pointer(skb) - sa->authsize - 2;
++		padlen = trail[0];
++		if (crypt_len < padlen + 2) {
++			err = -EINVAL;
++			goto put_sa;
++		}
++
++		payload_len = crypt_len - padlen - 2;
++		dma_len = skb->len;
++	}
++	if (payload_len > FIELD_MAX(EIP93_PE_LENGTH_LENGTH)) {
++		err = -EINVAL;
++		goto put_sa;
++	}
++
++	req = kmalloc(sizeof(*req), GFP_ATOMIC);
++	if (!req) {
++		err = -ENOMEM;
++		goto put_sa;
++	}
++
++	req->sa = sa;
++	req->skb = skb;
++	INIT_LIST_HEAD(&req->node);
++	refcount_set(&req->refcnt, 1);
++	req->complete = complete;
++	req->data = data;
++	req->dma_len = dma_len;
++	req->dma_dir = DMA_BIDIRECTIONAL;
++	req->dma = dma_map_single(sa->ipsec->eip93->dev, skb->data,
++				  req->dma_len, req->dma_dir);
++	if (dma_mapping_error(sa->ipsec->eip93->dev, req->dma)) {
++		err = -ENOMEM;
++		goto free_req;
++	}
++
++	cdesc.pe_ctrl_stat_word =
++		FIELD_PREP(EIP93_PE_CTRL_PE_READY_DES_TRING_OWN,
++			   EIP93_PE_CTRL_HOST_READY) |
++		FIELD_PREP(EIP93_PE_CTRL_PE_PAD_CTRL_STAT,
++			   EIP93_IPSEC_PAD_ALIGN) |
++			FIELD_PREP(EIP93_PE_CTRL_PE_PAD_VALUE, xo->proto) |
++		EIP93_PE_CTRL_PE_HASH_FINAL;
++	cdesc.src_addr = (u32 __force)req->dma + esp_offset +
++			 sizeof(struct ip_esp_hdr) + sa->ivsize;
++	cdesc.dst_addr = (u32 __force)req->dma + esp_offset;
++	cdesc.sa_addr = sa->sa_record_base;
++	/*
++	 * EIP93 ESP protocol-out mode wants the plaintext payload length. It
++	 * generates ESP padding, next-header and ICV itself when tailroom was
++	 * reserved instead of filled by the generic ESP path.
++	 */
++	cdesc.pe_length_word = FIELD_PREP(EIP93_PE_LENGTH_HOST_PE_READY,
++					  EIP93_PE_LENGTH_HOST_READY) |
++			       FIELD_PREP(EIP93_PE_LENGTH_LENGTH, payload_len);
++
++	err = eip93_ipsec_submit(req, &cdesc);
++	if (err == -EINPROGRESS)
++		return err;
++
++	dma_unmap_single(sa->ipsec->eip93->dev, req->dma, req->dma_len,
++			 req->dma_dir);
++free_req:
++	eip93_ipsec_request_put(req);
++put_sa:
++	eip93_ipsec_sa_put(sa);
++	return err;
++}
++EXPORT_SYMBOL_GPL(eip93_ipsec_xmit);
++
++int eip93_ipsec_receive(struct eip93_ipsec_sa *sa, struct sk_buff *skb,
++			unsigned int packet_len,
++			eip93_ipsec_complete_t complete, void *data)
++{
++	struct eip93_descriptor cdesc = {};
++	struct eip93_ipsec_request *req;
++	int err;
++
++	if (!sa || !complete || !eip93_ipsec_sa_get(sa))
++		return -EOPNOTSUPP;
++
++	if (skb_is_nonlinear(skb)) {
++		err = -EINVAL;
++		goto put_sa;
++	}
++
++	req = kmalloc(sizeof(*req), GFP_ATOMIC);
++	if (!req) {
++		err = -ENOMEM;
++		goto put_sa;
++	}
++
++	req->sa = sa;
++	req->skb = skb;
++	INIT_LIST_HEAD(&req->node);
++	refcount_set(&req->refcnt, 1);
++	req->complete = complete;
++	req->data = data;
++	if (!packet_len || packet_len > skb->len ||
++	    packet_len > FIELD_MAX(EIP93_PE_LENGTH_LENGTH)) {
++		err = -EINVAL;
++		goto free_req;
++	}
++
++	req->dma_len = packet_len;
++	req->dma_dir = DMA_BIDIRECTIONAL;
++	req->dma = dma_map_single(sa->ipsec->eip93->dev, skb->data,
++				  req->dma_len, req->dma_dir);
++	if (dma_mapping_error(sa->ipsec->eip93->dev, req->dma)) {
++		err = -ENOMEM;
++		goto free_req;
++	}
++
++	cdesc.pe_ctrl_stat_word =
++		FIELD_PREP(EIP93_PE_CTRL_PE_READY_DES_TRING_OWN,
++			   EIP93_PE_CTRL_HOST_READY) |
++		FIELD_PREP(EIP93_PE_CTRL_PE_PAD_CTRL_STAT,
++			   EIP93_IPSEC_PAD_ALIGN) |
++		EIP93_PE_CTRL_PE_HASH_FINAL;
++	cdesc.src_addr = (u32 __force)req->dma;
++	cdesc.dst_addr = (u32 __force)req->dma;
++	cdesc.sa_addr = sa->sa_record_base;
++	cdesc.pe_length_word = FIELD_PREP(EIP93_PE_LENGTH_HOST_PE_READY,
++					  EIP93_PE_LENGTH_HOST_READY) |
++			       FIELD_PREP(EIP93_PE_LENGTH_LENGTH, req->dma_len);
++
++	err = eip93_ipsec_submit(req, &cdesc);
++	if (err == -EINPROGRESS)
++		return err;
++
++	dma_unmap_single(sa->ipsec->eip93->dev, req->dma, req->dma_len,
++			 req->dma_dir);
++free_req:
++	eip93_ipsec_request_put(req);
++put_sa:
++	eip93_ipsec_sa_put(sa);
++	return err;
++}
++EXPORT_SYMBOL_GPL(eip93_ipsec_receive);
+diff --git a/drivers/crypto/inside-secure/eip93/eip93-main.c b/drivers/crypto/inside-secure/eip93/eip93-main.c
+index 7dccfdeb7b11..1505e33d62bf 100644
+--- a/drivers/crypto/inside-secure/eip93/eip93-main.c
++++ b/drivers/crypto/inside-secure/eip93/eip93-main.c
+@@ -185,7 +185,9 @@ static int eip93_register_algs(struct eip93_device *eip93, u32 supported_algo_fl
+ 
+ static void eip93_handle_result_descriptor(struct eip93_device *eip93)
+ {
+-	struct crypto_async_request *async;
++	struct crypto_async_request *async = NULL;
++	struct eip93_ipsec_request *ipsec = NULL;
++	void *request;
+ 	struct eip93_descriptor *rdesc;
+ 	u16 desc_flags, crypto_idr;
+ 	bool last_entry;
+@@ -224,11 +226,11 @@ static void eip93_handle_result_descriptor(struct eip93_device *eip93)
+ 			 FIELD_GET(EIP93_PE_LENGTH_HOST_PE_READY, pe_length) !=
+ 			 EIP93_PE_LENGTH_PE_READY);
+ 
+-		err = rdesc->pe_ctrl_stat_word & (EIP93_PE_CTRL_PE_EXT_ERR_CODE |
+-						  EIP93_PE_CTRL_PE_EXT_ERR |
+-						  EIP93_PE_CTRL_PE_SEQNUM_ERR |
+-						  EIP93_PE_CTRL_PE_PAD_ERR |
+-						  EIP93_PE_CTRL_PE_AUTH_ERR);
++		err = pe_ctrl_stat & (EIP93_PE_CTRL_PE_EXT_ERR_CODE |
++				      EIP93_PE_CTRL_PE_EXT_ERR |
++				      EIP93_PE_CTRL_PE_SEQNUM_ERR |
++				      EIP93_PE_CTRL_PE_PAD_ERR |
++				      EIP93_PE_CTRL_PE_AUTH_ERR);
+ 
+ 		desc_flags = FIELD_GET(EIP93_PE_USER_ID_DESC_FLAGS, rdesc->user_id);
+ 		crypto_idr = FIELD_GET(EIP93_PE_USER_ID_CRYPTO_IDR, rdesc->user_id);
+@@ -248,23 +250,37 @@ static void eip93_handle_result_descriptor(struct eip93_device *eip93)
+ 	if (!last_entry)
+ 		goto get_more;
+ 
+-	/* Get crypto async ref only for last descriptor */
++	/* Get request ref only for last descriptor */
+ 	scoped_guard(spinlock_bh, &eip93->ring->idr_lock) {
+-		async = idr_find(&eip93->ring->crypto_async_idr, crypto_idr);
++		request = idr_find(&eip93->ring->crypto_async_idr, crypto_idr);
+ 		idr_remove(&eip93->ring->crypto_async_idr, crypto_idr);
+ 	}
++	if (!request) {
++		dev_warn_ratelimited(eip93->dev, "missing request id %u\n",
++				     crypto_idr);
++		goto get_more;
++	}
+ 
+ 	/* Parse error in ctrl stat word */
+ 	err = eip93_parse_ctrl_stat_err(eip93, err);
+ 
++	if (desc_flags & EIP93_DESC_IPSEC) {
++		ipsec = request;
++		eip93_ipsec_handle_result(ipsec, err, pe_ctrl_stat, pe_length);
++		goto get_more;
++	}
++
++	async = request;
++
+ 	if (desc_flags & EIP93_DESC_SKCIPHER)
+ 		eip93_skcipher_handle_result(async, err);
+-
+-	if (desc_flags & EIP93_DESC_AEAD)
++	else if (desc_flags & EIP93_DESC_AEAD)
+ 		eip93_aead_handle_result(async, err);
+-
+-	if (desc_flags & EIP93_DESC_HASH)
++	else if (desc_flags & EIP93_DESC_HASH)
+ 		eip93_hash_handle_result(async, err);
++	else
++		dev_warn_ratelimited(eip93->dev, "unknown descriptor flags %#x\n",
++				     desc_flags);
+ 
+ 	goto get_more;
+ }
+@@ -279,21 +295,26 @@ static void eip93_done_task(unsigned long data)
+ static irqreturn_t eip93_irq_handler(int irq, void *data)
+ {
+ 	struct eip93_device *eip93 = data;
++	bool handled = false;
+ 	u32 irq_status;
+ 
+ 	irq_status = readl(eip93->base + EIP93_REG_INT_MASK_STAT);
+ 	if (FIELD_GET(EIP93_INT_RDR_THRESH, irq_status)) {
+ 		eip93_irq_disable(eip93, EIP93_INT_RDR_THRESH);
+ 		tasklet_schedule(&eip93->ring->done_task);
+-		return IRQ_HANDLED;
++		irq_status &= ~EIP93_INT_RDR_THRESH;
++		handled = true;
+ 	}
+ 
+-	/* Ignore errors in AUTO mode, handled by the RDR */
++	if (!irq_status)
++		return handled ? IRQ_HANDLED : IRQ_NONE;
++
++	eip93_ipsec_report_irq(eip93, irq_status);
++
+ 	eip93_irq_clear(eip93, irq_status);
+-	if (irq_status)
+-		eip93_irq_disable(eip93, irq_status);
++	eip93_irq_disable(eip93, irq_status);
+ 
+-	return IRQ_NONE;
++	return IRQ_HANDLED;
+ }
+ 
+ static void eip93_initialize(struct eip93_device *eip93, u32 supported_algo_flags)
+@@ -455,15 +476,24 @@ static int eip93_crypto_probe(struct platform_device *pdev)
+ 
+ 	eip93_initialize(eip93, algo_flags);
+ 
+-	/* Init finished, enable RDR interrupt */
+-	eip93_irq_enable(eip93, EIP93_INT_RDR_THRESH);
++	ret = eip93_ipsec_register(eip93);
++	if (ret) {
++		eip93_cleanup(eip93);
++		return ret;
++	}
+ 
+ 	ret = eip93_register_algs(eip93, algo_flags);
+ 	if (ret) {
++		eip93_ipsec_unregister(eip93);
+ 		eip93_cleanup(eip93);
+ 		return ret;
+ 	}
+ 
++	/* Init finished, enable RDR and fatal error interrupts */
++	eip93_irq_enable(eip93, EIP93_INT_RDR_THRESH | EIP93_INT_INTERFACE_ERR |
++			 EIP93_INT_RPOC_ERR | EIP93_INT_PE_RING_ERR |
++			 EIP93_INT_HALT);
++
+ 	ver = readl(eip93->base + EIP93_REG_PE_REVISION);
+ 	/* EIP_EIP_NO:MAJOR_HW_REV:MINOR_HW_REV:HW_PATCH,PE(ALGO_FLAGS) */
+ 	dev_info(eip93->dev, "EIP%lu:%lx:%lx:%lx,PE(0x%x:0x%x)\n",
+@@ -484,6 +514,7 @@ static void eip93_crypto_remove(struct platform_device *pdev)
+ 
+ 	algo_flags = readl(eip93->base + EIP93_REG_PE_OPTION_1);
+ 
++	eip93_ipsec_unregister(eip93);
+ 	eip93_unregister_algs(algo_flags, ARRAY_SIZE(eip93_algs));
+ 	eip93_cleanup(eip93);
+ }
+diff --git a/drivers/crypto/inside-secure/eip93/eip93-main.h b/drivers/crypto/inside-secure/eip93/eip93-main.h
+index 990c2401b7ce..ca1bda5b2ac0 100644
+--- a/drivers/crypto/inside-secure/eip93/eip93-main.h
++++ b/drivers/crypto/inside-secure/eip93/eip93-main.h
+@@ -13,6 +13,7 @@
+ #include <crypto/internal/skcipher.h>
+ #include <linux/bitfield.h>
+ #include <linux/interrupt.h>
++#include <linux/kconfig.h>
+ 
+ #define EIP93_RING_BUSY_DELAY		500
+ 
+@@ -92,6 +93,8 @@
+ 						    EIP93_HASH_SHA224 | \
+ 						    EIP93_HASH_SHA256))
+ 
++struct eip93_ipsec;
++
+ /**
+  * struct eip93_device - crypto engine device structure
+  */
+@@ -101,6 +104,7 @@ struct eip93_device {
+ 	struct clk		*clk;
+ 	int			irq;
+ 	struct eip93_ring		*ring;
++	struct eip93_ipsec	*ipsec;
  };
-diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
-index 6a5febbdbee4..f21c8f2e60f7 100644
---- a/net/ipv4/esp4.c
-+++ b/net/ipv4/esp4.c
-@@ -720,7 +720,11 @@ int esp_input_done2(struct sk_buff *skb, int err)
- 	if (unlikely(err))
- 		goto out;
  
--	err = esp_remove_trailer(skb);
-+	/* Hardware ESP decapsulation can already remove pad/trailer/ICV. */
-+	if (xo && (xo->flags & XFRM_ESP_NO_TRAILER))
-+		err = xo->proto;
-+	else
-+		err = esp_remove_trailer(skb);
- 	if (unlikely(err < 0))
- 		goto out;
+ struct eip93_desc_ring {
+@@ -124,8 +128,8 @@ struct eip93_ring {
+ 	/* command/result rings */
+ 	struct eip93_desc_ring		cdr;
+ 	struct eip93_desc_ring		rdr;
+-	spinlock_t			write_lock;
+-	spinlock_t			read_lock;
++	spinlock_t			write_lock; /* command descriptor enqueue */
++	spinlock_t			read_lock; /* result descriptor dequeue */
+ 	/* aync idr */
+ 	spinlock_t			idr_lock;
+ 	struct idr			crypto_async_idr;
+@@ -148,4 +152,34 @@ struct eip93_alg_template {
+ 	} alg;
+ };
  
-diff --git a/net/ipv4/esp4_offload.c b/net/ipv4/esp4_offload.c
-index abd77162f5e7..f00fff98b69f 100644
---- a/net/ipv4/esp4_offload.c
-+++ b/net/ipv4/esp4_offload.c
-@@ -270,8 +270,10 @@ static int esp_xmit(struct xfrm_state *x, struct sk_buff *skb,  netdev_features_
- 	struct xfrm_offload *xo;
- 	struct ip_esp_hdr *esph;
- 	struct crypto_aead *aead;
-+	struct sk_buff *trailer;
- 	struct esp_info esp;
- 	bool hw_offload = true;
-+	bool hw_trailer = false;
- 	__u32 seq;
- 	int encap_type = 0;
- 
-@@ -281,6 +283,7 @@ static int esp_xmit(struct xfrm_state *x, struct sk_buff *skb,  netdev_features_
- 
- 	if (!xo)
- 		return -EINVAL;
-+	xo->esp_tx_tailen = 0;
- 
- 	if ((!(features & NETIF_F_HW_ESP) &&
- 	     !(skb->dev->gso_partial_features & NETIF_F_HW_ESP)) ||
-@@ -303,13 +306,37 @@ static int esp_xmit(struct xfrm_state *x, struct sk_buff *skb,  netdev_features_
- 	esp.clen = ALIGN(skb->len + 2 + esp.tfclen, blksize);
- 	esp.plen = esp.clen - skb->len - esp.tfclen;
- 	esp.tailen = esp.tfclen + esp.plen + alen;
-+	if (esp.tailen > U16_MAX)
-+		return -EINVAL;
- 
- 	esp.esph = ip_esp_hdr(skb);
- 
- 	if (x->encap)
- 		encap_type = x->encap->encap_type;
- 
--	if (!hw_offload || !skb_is_gso(skb) || (hw_offload && encap_type == UDP_ENCAP_ESPINUDP)) {
-+	if (hw_offload && !skb_is_gso(skb) && !encap_type && x->xso.dev &&
-+	    x->xso.dev->xfrmdev_ops &&
-+	    x->xso.dev->xfrmdev_ops->xdo_dev_esp_tx_hw_trailer)
-+		hw_trailer =
-+			x->xso.dev->xfrmdev_ops->xdo_dev_esp_tx_hw_trailer(skb, x);
++struct eip93_ipsec_request;
 +
-+	if (hw_trailer) {
-+		int esph_offset;
++#if IS_ENABLED(CONFIG_CRYPTO_DEV_EIP93_IPSEC)
++int eip93_ipsec_register(struct eip93_device *eip93);
++void eip93_ipsec_unregister(struct eip93_device *eip93);
++void eip93_ipsec_handle_result(struct eip93_ipsec_request *req, int err,
++			       u32 pe_ctrl_stat, u32 pe_length);
++void eip93_ipsec_report_irq(struct eip93_device *eip93, u32 irq_status);
++#else
++static inline int eip93_ipsec_register(struct eip93_device *eip93)
++{
++	return 0;
++}
 +
-+		/*
-+		 * The device packet engine will write ESP padding, next-header
-+		 * and ICV bytes. Keep skb->len unchanged here, but make sure the
-+		 * later DMA writer owns enough linear tailroom.
-+		 */
-+		esph_offset = (unsigned char *)esp.esph - skb_transport_header(skb);
-+		esp.nfrags = skb_cow_data(skb, esp.tailen, &trailer);
-+		if (esp.nfrags < 0)
-+			return esp.nfrags;
-+		esp.esph = (struct ip_esp_hdr *)(skb_transport_header(skb) +
-+						 esph_offset);
-+		xo->esp_tx_tailen = esp.tailen;
-+	} else if (!hw_offload || !skb_is_gso(skb) ||
-+		   (hw_offload && encap_type == UDP_ENCAP_ESPINUDP)) {
- 		esp.nfrags = esp_output_head(x, skb, &esp);
- 		if (esp.nfrags < 0)
- 			return esp.nfrags;
-diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
-index 9c06c5a1419d..730588f8eaba 100644
---- a/net/ipv6/esp6.c
-+++ b/net/ipv6/esp6.c
-@@ -751,7 +751,11 @@ int esp6_input_done2(struct sk_buff *skb, int err)
- 	if (unlikely(err))
- 		goto out;
- 
--	err = esp_remove_trailer(skb);
-+	/* Hardware ESP decapsulation can already remove pad/trailer/ICV. */
-+	if (xo && (xo->flags & XFRM_ESP_NO_TRAILER))
-+		err = xo->proto;
-+	else
-+		err = esp_remove_trailer(skb);
- 	if (unlikely(err < 0))
- 		goto out;
- 
-diff --git a/net/ipv6/esp6_offload.c b/net/ipv6/esp6_offload.c
-index 22895521a57d..d124493da40b 100644
---- a/net/ipv6/esp6_offload.c
-+++ b/net/ipv6/esp6_offload.c
-@@ -308,8 +308,10 @@ static int esp6_xmit(struct xfrm_state *x, struct sk_buff *skb,  netdev_features
- 	int blksize;
- 	struct xfrm_offload *xo;
- 	struct crypto_aead *aead;
-+	struct sk_buff *trailer;
- 	struct esp_info esp;
- 	bool hw_offload = true;
-+	bool hw_trailer = false;
- 	__u32 seq;
- 
- 	esp.inplace = true;
-@@ -318,6 +320,7 @@ static int esp6_xmit(struct xfrm_state *x, struct sk_buff *skb,  netdev_features
- 
- 	if (!xo)
- 		return -EINVAL;
-+	xo->esp_tx_tailen = 0;
- 
- 	if (!(features & NETIF_F_HW_ESP) || x->xso.dev != skb->dev) {
- 		xo->flags |= CRYPTO_FALLBACK;
-@@ -338,8 +341,32 @@ static int esp6_xmit(struct xfrm_state *x, struct sk_buff *skb,  netdev_features
- 	esp.clen = ALIGN(skb->len + 2 + esp.tfclen, blksize);
- 	esp.plen = esp.clen - skb->len - esp.tfclen;
- 	esp.tailen = esp.tfclen + esp.plen + alen;
-+	if (esp.tailen > U16_MAX)
-+		return -EINVAL;
- 
--	if (!hw_offload || !skb_is_gso(skb)) {
-+	if (hw_offload && !skb_is_gso(skb) && !x->encap && x->xso.dev &&
-+	    x->xso.dev->xfrmdev_ops &&
-+	    x->xso.dev->xfrmdev_ops->xdo_dev_esp_tx_hw_trailer)
-+		hw_trailer =
-+			x->xso.dev->xfrmdev_ops->xdo_dev_esp_tx_hw_trailer(skb, x);
++static inline void eip93_ipsec_unregister(struct eip93_device *eip93)
++{
++}
 +
-+	if (hw_trailer) {
-+		int esph_offset;
++static inline void eip93_ipsec_handle_result(struct eip93_ipsec_request *req,
++					     int err, u32 pe_ctrl_stat,
++					     u32 pe_length)
++{
++}
 +
-+		/*
-+		 * The device packet engine will write ESP padding, next-header
-+		 * and ICV bytes. Keep skb->len unchanged here, but make sure the
-+		 * later DMA writer owns enough linear tailroom.
-+		 */
-+		esp.esph = ip_esp_hdr(skb);
-+		esph_offset = (unsigned char *)esp.esph - skb_transport_header(skb);
-+		esp.nfrags = skb_cow_data(skb, esp.tailen, &trailer);
-+		if (esp.nfrags < 0)
-+			return esp.nfrags;
-+		esp.esph = (struct ip_esp_hdr *)(skb_transport_header(skb) +
-+						 esph_offset);
-+		xo->esp_tx_tailen = esp.tailen;
-+	} else if (!hw_offload || !skb_is_gso(skb)) {
- 		esp.nfrags = esp6_output_head(x, skb, &esp);
- 		if (esp.nfrags < 0)
- 			return esp.nfrags;
++static inline void eip93_ipsec_report_irq(struct eip93_device *eip93,
++					  u32 irq_status)
++{
++}
++#endif
++
+ #endif /* _EIP93_MAIN_H_ */
+diff --git a/include/crypto/eip93-ipsec.h b/include/crypto/eip93-ipsec.h
+new file mode 100644
+index 000000000000..bc0ba8f4f84e
+--- /dev/null
++++ b/include/crypto/eip93-ipsec.h
+@@ -0,0 +1,132 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * EIP93 IPsec offload API
++ *
++ * Copyright (c) 2026 Jihong Min <hurryman2212@gmail.com>
++ */
++#ifndef _CRYPTO_EIP93_IPSEC_H
++#define _CRYPTO_EIP93_IPSEC_H
++
++#include <linux/bits.h>
++#include <linux/err.h>
++#include <linux/errno.h>
++#include <linux/kconfig.h>
++#include <linux/types.h>
++
++struct device;
++struct netlink_ext_ack;
++struct notifier_block;
++struct sk_buff;
++struct xfrm_state;
++
++struct eip93_ipsec;
++struct eip93_ipsec_sa;
++
++struct eip93_ipsec_result {
++	unsigned int packet_len;
++	u8 nexthdr;
++};
++
++enum eip93_ipsec_feature {
++	EIP93_IPSEC_FEATURE_ESP = BIT(0),
++	EIP93_IPSEC_FEATURE_GSO_ESP = BIT(1),
++	EIP93_IPSEC_FEATURE_HW_ESP_TX_CSUM = BIT(2),
++};
++
++enum eip93_ipsec_event {
++	EIP93_IPSEC_EVENT_REMOVE,
++	EIP93_IPSEC_EVENT_RESET,
++	EIP93_IPSEC_EVENT_DMA_ERROR,
++	EIP93_IPSEC_EVENT_CAPABILITY_LOSS,
++};
++
++typedef void (*eip93_ipsec_complete_t)(void *data, int err,
++				       struct eip93_ipsec_result result);
++
++#if IS_REACHABLE(CONFIG_CRYPTO_DEV_EIP93) && \
++	IS_ENABLED(CONFIG_CRYPTO_DEV_EIP93_IPSEC)
++struct eip93_ipsec *eip93_ipsec_get(struct device *consumer);
++void eip93_ipsec_put(struct eip93_ipsec *ipsec);
++bool eip93_ipsec_available(struct eip93_ipsec *ipsec);
++u32 eip93_ipsec_features(struct eip93_ipsec *ipsec);
++int eip93_ipsec_register_notifier(struct notifier_block *nb);
++void eip93_ipsec_unregister_notifier(struct notifier_block *nb);
++int eip93_ipsec_state_add(struct eip93_ipsec *ipsec, struct xfrm_state *x,
++			  struct netlink_ext_ack *extack,
++			  struct eip93_ipsec_sa **sa);
++void eip93_ipsec_state_delete(struct eip93_ipsec_sa *sa);
++void eip93_ipsec_state_advance_esn(struct eip93_ipsec_sa *sa,
++				   struct xfrm_state *x);
++int eip93_ipsec_xmit(struct eip93_ipsec_sa *sa, struct sk_buff *skb,
++		     unsigned int esp_offset, eip93_ipsec_complete_t complete,
++		     void *data);
++int eip93_ipsec_receive(struct eip93_ipsec_sa *sa, struct sk_buff *skb,
++			unsigned int packet_len,
++			eip93_ipsec_complete_t complete, void *data);
++#else
++static inline struct eip93_ipsec *eip93_ipsec_get(struct device *consumer)
++{
++	return ERR_PTR(-EOPNOTSUPP);
++}
++
++static inline void eip93_ipsec_put(struct eip93_ipsec *ipsec)
++{
++}
++
++static inline bool eip93_ipsec_available(struct eip93_ipsec *ipsec)
++{
++	return false;
++}
++
++static inline u32 eip93_ipsec_features(struct eip93_ipsec *ipsec)
++{
++	return 0;
++}
++
++static inline int eip93_ipsec_register_notifier(struct notifier_block *nb)
++{
++	return 0;
++}
++
++static inline void eip93_ipsec_unregister_notifier(struct notifier_block *nb)
++{
++}
++
++static inline int eip93_ipsec_state_add(struct eip93_ipsec *ipsec,
++					struct xfrm_state *x,
++					struct netlink_ext_ack *extack,
++					struct eip93_ipsec_sa **sa)
++{
++	if (sa)
++		*sa = NULL;
++
++	return -EOPNOTSUPP;
++}
++
++static inline void eip93_ipsec_state_delete(struct eip93_ipsec_sa *sa)
++{
++}
++
++static inline void eip93_ipsec_state_advance_esn(struct eip93_ipsec_sa *sa,
++						 struct xfrm_state *x)
++{
++}
++
++static inline int eip93_ipsec_xmit(struct eip93_ipsec_sa *sa,
++				   struct sk_buff *skb, unsigned int esp_offset,
++				   eip93_ipsec_complete_t complete, void *data)
++{
++	return -EOPNOTSUPP;
++}
++
++static inline int eip93_ipsec_receive(struct eip93_ipsec_sa *sa,
++				      struct sk_buff *skb,
++				      unsigned int packet_len,
++				      eip93_ipsec_complete_t complete,
++				      void *data)
++{
++	return -EOPNOTSUPP;
++}
++#endif
++
++#endif /* _CRYPTO_EIP93_IPSEC_H */
 -- 
 2.53.0
 
