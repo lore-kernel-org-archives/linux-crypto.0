@@ -1,146 +1,151 @@
-Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from psionic.psi5.com (psionic.psi5.com [185.187.169.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC549263F34;
-	Sat, 23 May 2026 04:08:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B376422A7F0
+	for <linux-crypto@vger.kernel.org>; Sat, 23 May 2026 06:30:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.187.169.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779509336; cv=none; b=MUFUK5LITgZXBFq11X+jsShwuxedWTYVkI4Zrr3YSNkD9ydUI9XeygUVPJT/keqA6hCZPS5aO7PSJvvDRI/tZ97AI3Gy8RxX9F7h9PRxu+LiHFs1yykYTAAqX3NrwiPltEPXfd2kwyePxIqGgKgkhi0OhFEpRF2SGqjOv+DY0LY=
+	t=1779517822; cv=none; b=Fs/ttLHZsc8oj1DcaOwFLWY8PHtW0WQXzmYCdYbkLFtOiOdyhaJF11VlBifv28qmSv6wDWj/Ed7jdvg8M4q90io5y5mLBzt/NJ1OoaxzfjkE4UM6eGk4iwYJvs7Rq9pJlm9Eg0EkPr1X2UDfntshJYwfoLMz0LosKt2rzzs7vjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779509336; c=relaxed/simple;
-	bh=OaKAv+W9psRinPgP5Amv5ZAVRTdaoK1RAb56Tk9gPuA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HOGyvR9KpKn8JwWE0aks7AkSGW/S4ZETJqnVsXCjJ91L7VSbxeA1xUWgbQtAH22K8uTNFDp/jCFZWetRsj7kHOQjzQKugIlp2uQPxH9dQudkIxpBi+KhoBmGZjPzm2nlrkHWJEoODNbSGbuqv2VJoO+C0Y8xVnZFmXYfGN9KENk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
-Received: from localhost (1.5.5.2.4.d.e.f.f.f.5.f.9.d.6.0.a.5.c.d.c.d.9.1.0.b.8.0.1.0.0.2.ip6.arpa [IPv6:2001:8b0:19dc:dc5a:6d9:f5ff:fed4:2551])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: sam@gentoo.org)
-	by smtp.gentoo.org (Postfix) with ESMTPSA id EE14E34250E;
-	Sat, 23 May 2026 04:08:50 +0000 (UTC)
-From: Sam James <sam@gentoo.org>
-To: =?UTF-8?q?Breno=20Leit=C3=A3o?= <leitao@debian.org>,
-	Nayna Jain <nayna@linux.ibm.com>,
-	Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Eric Biggers <ebiggers@google.com>
-Cc: Sam James <sam@gentoo.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	stable@vger.kernel.org,
-	Calvin Buckley <calvin@cmpct.info>,
-	Brad Spengler <brad.spengler@opensrcsec.com>,
-	linux-crypto@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] crypto: nx: fix nx_crypto_ctx_exit argument
-Date: Sat, 23 May 2026 05:08:09 +0100
-Message-ID: <b8b1b6fe740187c70349cd04a820d57324e0f70c.1779509289.git.sam@gentoo.org>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260522184403.GA35544@quark>
-References: <20260522184403.GA35544@quark>
+	s=arc-20240116; t=1779517822; c=relaxed/simple;
+	bh=SRnj4VIpQMoo0py7BC+L3Q9AqSR0c/MgcO51JdaEJqw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=W/+i1Ch8lL6b2hTqVtr5N+aTMNTbsFjggSAOJ/mLT88orCv1ZusC3pdi4aMi5a/JTI8qqDKJYvqphA8cIk4HLYK22MBJgV0jxWjZ8woiACmjYlkeqDGd7s1jPFPOq8jwdwh99rQtcZ318sGGQlvPYkazgwfAXunjVMlG4xXZOL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de; spf=pass smtp.mailfrom=hogyros.de; arc=none smtp.client-ip=185.187.169.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hogyros.de
+Received: from [IPV6:2400:2410:b120:f200:9e5c:8eff:fec0:ee40] (unknown [IPv6:2400:2410:b120:f200:9e5c:8eff:fec0:ee40])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by psionic.psi5.com (Postfix) with ESMTPSA id 6D71F3F202;
+	Sat, 23 May 2026 08:30:08 +0200 (CEST)
+Message-ID: <767d956a-4c60-40af-8c89-a4eac672eab1@hogyros.de>
+Date: Sat, 23 May 2026 15:30:04 +0900
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: nx: fix nx_crypto_ctx_exit argument
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+References: <a3e89c1e8342ffa415b0d29725a0571a4f355d34.1779472902.git.sam@gentoo.org>
+ <20260522184403.GA35544@quark>
+Content-Language: en-US
+From: Simon Richter <Simon.Richter@hogyros.de>
+In-Reply-To: <20260522184403.GA35544@quark>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------VPw0waTVGrt5xBDwtBc7yXfu"
 
-nx_crypto_ctx_shash_exit calls nx_crypto_ctx_exit with crypto_shash_ctx(...)
-but crypto_shash_ctx gives a nx_crypto_ctx *, not a crypto_tfm *.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------VPw0waTVGrt5xBDwtBc7yXfu
+Content-Type: multipart/mixed; boundary="------------V3ZPYW54wIlst90pqFZ4FB50";
+ protected-headers="v1"
+From: Simon Richter <Simon.Richter@hogyros.de>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Message-ID: <767d956a-4c60-40af-8c89-a4eac672eab1@hogyros.de>
+Subject: Re: [PATCH] crypto: nx: fix nx_crypto_ctx_exit argument
+References: <a3e89c1e8342ffa415b0d29725a0571a4f355d34.1779472902.git.sam@gentoo.org>
+ <20260522184403.GA35544@quark>
+In-Reply-To: <20260522184403.GA35544@quark>
 
-Fix the type in nx_crypto_ctx_exit and drop the bogus crypto_tfm_ctx
-call.
+--------------V3ZPYW54wIlst90pqFZ4FB50
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-This fixes the following oops:
+SGksDQoNCk9uIDUvMjMvMjYgMDM6NDQsIEVyaWMgQmlnZ2VycyB3cm90ZToNCg0KPiBPdGhl
+cndpc2UgdGhpcyBsb29rcyBnb29kLiAgUmVhbGx5IHRoZXJlJ3MgYSBnb29kIGNoYW5jZSB0
+aGlzIGRyaXZlciBpcw0KPiBubyBsb25nZXIgdXNlZnVsIChpZiBpdCBldmVyIHdhcykgYW5k
+IHNob3VsZCBqdXN0IGJlIGRlbGV0ZWQsIGJ1dCB0aGF0DQo+IHdvdWxkIGJlIGEgc2VwYXJh
+dGUgZWZmb3J0Lg0KDQpJIGhhcHBlbiB0byBoYXZlIG9uZSAod2VsbCwgdHdvKSBvZiB0aGVz
+ZSwgc28gdGhpcyBpcyByZWxldmFudCB0byBteSANCmludGVyZXN0cy4NCg0KdGw7ZHI6IHRo
+ZSBjcnlwdG8gZHJpdmVycyBhcmUgbW9zdCBsaWtlbHkgdW51c2VkLCB0aGUgaGFyZHdhcmUg
+aXMgZ3JlYXQsIA0KYnV0IHRoZSBjcnlwdG8gc3Vic3lzdGVtIGNhbm5vdCB1c2UgaXQgZWZm
+aWNpZW50bHkuDQoNCkJlbG93IGRyaXZlcnMvY3J5cHRvL254LCB0aGVyZSBhcmUgdGhyZWUg
+ZHJpdmVycyBpbiBhIHRyZW5jaGNvYXQ6DQoNCiAgLSBhbiBOWCBjcnlwdG8gZHJpdmVyIHRo
+YXQgaXMgbm90IGVuZGlhbiBzYWZlLCBjYW4gdGhlcmVmb3JlIG9ubHkgYmUgDQp1c2VkIG9u
+IGJpZyBlbmRpYW4gc3lzdGVtcywgYW5kIHRoYXQgaW1wbGVtZW50cyBhIGJ1bmNoIG9mIEFF
+UyBtb2RlcyANCnBsdXMgU0hBMjU2L1NIQTUxMiwgYWxsIG9mIHRoZW0gc3luY2hyb25vdXMu
+DQogIC0gYW4gc2NvbXAgZHJpdmVyIHdpdGggYW4gSUJNIHNwZWNpZmljIGNvbXByZXNzaW9u
+IGFsZ29yaXRobQ0KICAtIGEgZ3ppcCBkcml2ZXIgdGhhdCBkb2VzIG5vdCBpbnRlZ3JhdGUg
+d2l0aCB0aGUgY3J5cHRvIHN1YnN5c3RlbSBhbmQgDQpwcm92aWRlcyBpdHMgb3duIHVzZXJz
+cGFjZSBpbnRlcmZhY2UuDQoNClRoZSAiYmlnIGVuZGlhbiBvbmx5IiB0aGluZyBpcyBhIG1h
+c3NpdmUgcmVzdHJpY3Rpb24sIHRoaXMgaXMgaG93IElCTSANCnNlcGFyYXRlcyBlbnRlcnBy
+aXNlIGFuZCBob2JieWlzdCBjdXN0b21lcnMsIHNvIGlmIHRoZXJlIGFyZSB1c2VycyBvZiAN
+CnRoaXMgbW9kdWxlLCB0aGVuIHRoZXkgYm90aCBoYXZlIGVudGVycHJpc2Ugc3VwcG9ydCBj
+b250cmFjdHMuDQoNClRoZSBnemlwIG1vZGUgaXMgcmVhbGx5IHVzZWZ1bCwgd2l0aCA0IEdC
+IG9mIHJhbmRvbSBkYXRhIEkgZ2V0DQoNCiQgdGltZSAuL254X2d6aXAgdGVzdC5iaW4NCnJl
+YWwgMG0yLjk4OXMNCnVzZXIgMG0xLjMxN3MNCnN5cyAgMG0xLjY2NXMNCg0KJCB0aW1lIGd6
+aXAgLTlrIHRlc3QuYmluDQpyZWFsIDJtNTcuNDY4cw0KdXNlciAybTU1LjMyNXMNCnN5cyAg
+MG0xLjY4MnMNCg0Kc28gMyBHQi9zIHZzIDIyIE1CL3MuIEV2ZW4gaWYgSSBoYWQgYSB3b3Jr
+bG9hZCB3aGVyZSBJIGNvdWxkIHVzZSBhbGwgdGhlIA0KQ1BVIGNvcmVzIGluIHBhcmFsbGVs
+LCBvZmZsb2FkaW5nIGlzIHN0aWxsIGZhc3RlciwgMTIwVyBjaGVhcGVyIGFuZCANCmxlYXZl
+cyB0aGUgQ1BVIGZyZWUgYXMgYSBib251cywgc28gSSB0aGluayB0aGF0J3MgYSBuby1icmFp
+bmVyLg0KDQpUaGUgIjg0MiIgY29tcHJlc3Npb24gaXMgbWFpbmx5IGRlc2lnbmVkIHRvIGJl
+IGZhc3QsIHRoZSBtYXJrZXRpbmcgDQptYXRlcmlhbCBjbGFpbXMgPiAyNSBHQi9zLCB3aGlj
+aCBtYWtlcyBzZW5zZSwgdGhpcyB1bml0IHNpdHMgb24gYSAxMjggDQpiaXQgd2lkZSBidXMg
+Y2xvY2tlZCBhdCAyIEdIeiwgYW5kIHRoZSBhbGdvcml0aG0gaXMgZGVzaWduZWQgYXJvdW5k
+IA0KdGhhdC4gT24gdGhlIG90aGVyIGhhbmQgaXQgaXMgZmFpcmx5IG5pY2hlLg0KDQpJIGNv
+dWxkbid0IGZpbmQgbnVtYmVycyBmb3IgdGhlIEFFUyBhbmQgU0hBIHVuaXRzLCBJJ2QgZXhw
+ZWN0IHRoZW0gdG8gYmUgDQppbiB0aGUgc2FtZSBiYWxscGFyaywgYnV0IEkgY2Fubm90IG1l
+YXN1cmUgdGhlbSBlYXNpbHkuIENQVSBpcyB+NTAwIE1CL3MgDQpmb3IgU0hBMSBhbmQgU0hB
+NTEyLCB+MzAwIE1CL3MgZm9yIFNIQTI1NiwgdGhhdCBzaG91bGQgYmUgZWFzeSB0byBiZWF0
+IA0KKGV2ZW4gYSBwcmltaXRpdmUgMi13YXkgU0hBMjU2IHdvdWxkIGJlIGF0IDQgR0Ivcywg
+YW5kIEkgZG91YnQgSUJNIGxlZnQgDQppdCBhdCB0aGF0KS4NCg0KUE9XRVIxMSBpbnRyb2R1
+Y2VzIG5ldyBvcGNvZGVzLCB3aGljaCB3aWxsIHNoYWtlIHRoaW5ncyB1cCwgYnV0IHRoZXNl
+IA0KbWFjaGluZXMgYXJlIG9uIGEgZmFpcmx5IGxvbmcgcmVwbGFjZW1lbnQgY3ljbGUuDQoN
+ClRoZSBtYWluIHByb2JsZW0gd2l0aCBnZXR0aW5nIHRoZSBhZHZlcnRpc2VkIHBlcmZvcm1h
+bmNlIGlzIGZlZWRpbmcgDQpyZXF1ZXN0cyBmYXN0IGVub3VnaC4gTGFyZ2UgcmVxdWVzdHMg
+YXJlIGVhc3ksIGJ1dCB0aGUgb3B0aW11bSBzdHJhdGVneSANCmZvciBmZWVkaW5nIHNtYWxs
+IHJlcXVlc3RzIGlzIGp1c3QgdG8gc3RhcnQgc3VibWl0dGluZywgcG9sbCBvbGQgDQpyZXF1
+ZXN0cyBmb3IgY29tcGxldGlvbiBpbmJldHdlZW4sIGFuZCBzdGFydCByZXF1ZXN0aW5nIGlu
+dGVycnVwdHMgb25seSANCmlmIG5vdGhpbmcgaXMgY29tcGxldGUgYW5kIGl0IGxvb2tzIGxp
+a2UgdGhlIHVuaXQgd2lsbCBiZSBidXN5IGZvciBhIHdoaWxlLg0KDQpUaGF0J3Mgbm90IHdo
+YXQgaXMgY3VycmVudGx5IGltcGxlbWVudGVkLCBhbmQgSSBkb3VidCBpdCBjb3VsZCBiZSAN
+CmltcGxlbWVudGVkIHdpdGggdGhlIGN1cnJlbnQga2VybmVsIGludGVyZmFjZXMsIHNvIGdl
+dHRpbmcgZGVjZW50IA0KcGVyZm9ybWFuY2UgaW5zaWRlIHRoZSBrZXJuZWwgd291bGQgcmVx
+dWlyZSBzb21lIHJlZGVzaWduLg0KDQpJIHN1cHBvc2UgdGhhdCBhbHNvIGV4cGxhaW5zIHRo
+ZSBzeW5jaHJvbm91cyBpbXBsZW1lbnRhdGlvbjogd2UgYXJlIA0Kc3VibWl0dGluZyB0aGUg
+cmVxdWVzdCBhbmQgcG9sbGluZyBmb3IgY29tcGxldGlvbiwgc28gb3ZlcmhlYWQgaXMgZmFp
+cmx5IA0KbWluaW1hbCBhbmQgc2hvdWxkIGJyZWFrIGV2ZW4gYXQgYSBmZXcgaHVuZHJlZCBi
+eXRlcywgYnV0IG9idmlvdXNseSB0aGF0IA0KaXMgbm90IHRoZSBpZGVhbCB3YXkgdG8gcnVu
+IHRoaXMgdGhpbmcuDQoNClRoZSBlbmRpYW5uZXNzIGlzc3VlcyBhcmUgdHJpdmlhbCB0byBm
+aXggKHJlYWxseSBqdXN0IG5lZWRzIGEgc3ByaW5rbGUgDQpvZiBjcHVfdG9fYmVYWC9iZVhY
+X3RvX2NwdSB3aGVuIHB1dHRpbmcgdGhlIGpvYiBjb250cm9sIGJsb2NrcyB0b2dldGhlciwg
+DQpsaWtlIG54LTg0MiBkb2VzKTsgaWYgeW91IGhhdmUgYSBkZWZpbml0aW9uIG9mIHdoYXQg
+eW91IHdvdWxkIGNvbnNpZGVyIGEgDQoicmVhbCB3b3JsZCIgd29ya2xvYWQgZm9yIEFFUyBJ
+IGNvdWxkIHJ1biB0aGF0IHRvIGdhdGhlciBzb21lIG51bWJlcnMuDQoNClNvIGZhciBob3dl
+dmVyLCBubyBvbmUgYm90aGVyZWQgZml4aW5nIHRoaXMsIGFuZCBJJ20gcHJldHR5IG1laCBh
+Ym91dCBpdCANCm15c2VsZiBzaW5jZSBJIGRvbid0IGhhdmUgU0hBL0FFUyB3b3JrbG9hZHMg
+aW4gdGhlIGtlcm5lbCwgb25seSBpbiANCnVzZXJzcGFjZS4NCg0KT3RoZXIgdGhhbiB0aGF0
+LCBpZiB5b3UgZGVjaWRlIHRvIHJlbW92ZSB0aGUgZHJpdmVyIGZyb20gdGhlIGNyeXB0byAN
+CnN1YnN5c3RlbSwgdGhlbiBueC1nemlwIHNob3VsZCBiZSBrZXB0IChhbmQgcHJvYmFibHkg
+bW92ZWQgc29tZXdoZXJlIA0KZWxzZSksIGJlY2F1c2UgaXQgaXMgbm90IGEgY3J5cHRvIGRy
+aXZlciwgaXQganVzdCBzaGFyZXMgYSBidW5jaCBvZiANCmhlYWRlcnMgd2l0aCB0aGVtLg0K
+DQogICAgU2ltb24NCg==
 
-  BUG: Unable to handle kernel data access at 0xc0403effffffffc8
-  Faulting instruction address: 0xc000000000396cb4
-  Oops: Kernel access of bad area, sig: 11 [#15]
-  Call Trace:
-   nx_crypto_ctx_shash_exit+0x24/0x60
-   crypto_shash_exit_tfm+0x28/0x40
-   crypto_destroy_tfm+0x98/0x140
-   crypto_exit_ahash_using_shash+0x20/0x40
-   crypto_destroy_tfm+0x98/0x140
-   hash_release+0x1c/0x30
-   alg_sock_destruct+0x38/0x60
-   __sk_destruct+0x48/0x2b0
-   af_alg_release+0x58/0xb0
-   __sock_release+0x68/0x150
-   sock_close+0x20/0x40
-   __fput+0x110/0x3a0
-   sys_close+0x48/0xa0
-   system_call_exception+0x140/0x2d0
-   system_call_common+0xf4/0x258
+--------------V3ZPYW54wIlst90pqFZ4FB50--
 
-.. which came from hardlink(1) opportunistically using AF_ALG.
+--------------VPw0waTVGrt5xBDwtBc7yXfu
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
-The same problem exists with nx_crypto_ctx_skcipher_exit getting a context
-it wasn't expecting, but apparently nobody hit that for years.
+-----BEGIN PGP SIGNATURE-----
 
-Cc: Eric Biggers <ebiggers@kernel.org>
-Cc: stable@vger.kernel.org
-Fixes: bfd9efddf990 ("crypto: nx - convert AES-ECB to skcipher API")
-Fixes: 9420e628e7d8 ("crypto: nx - Use API partial block handling")
-Reviewed-by: Eric Biggers <ebiggers@kernel.org>
-Reported-by: Calvin Buckley <calvin@cmpct.info>
-Tested-by: Calvin Buckley <calvin@cmpct.info>
-Suggested-by: Brad Spengler <brad.spengler@opensrcsec.com>
-Signed-off-by: Sam James <sam@gentoo.org>
----
-v2: Add stable cc, fix doc for tfm param.
+iQEzBAEBCgAdFiEEtjuqOJSXmNjSiX3Tfr04e7CZCBEFAmoRSWwACgkQfr04e7CZ
+CBEwkgf+MNXai5l3ryYzxPIeM1tSZP5FzNmUPeFFqqLKMr7jx1C9vrg5geB3aojF
+W/4C8SKCHPCj5zJvUbmWLYk2CW0N8H6twemoZu8ncwZDpVcFS9vZVHShKzrCX/Is
+7AzhrTNJ3PcPLSmElt0k7cs2qpMpwVK0kwxpUH0iYec6aCXrsL0QPwp3/XuQgT5h
+Yu7WZMVJl8RnkZignRGYjZ/3YQGVEOPBTp3D1ZdQYkauORfdQgn5TJl42rTsiycq
+vPzW2Riw0rS/yv5o+/NT//xIVH0Yp7FKJO1Msj/ugBqx+NvN1G+GS63oOchhHFl9
+pu6+XWMxv1xCOceWpgnabkTfaG7s1Q==
+=ghvn
+-----END PGP SIGNATURE-----
 
- drivers/crypto/nx/nx.c | 6 ++----
- drivers/crypto/nx/nx.h | 2 +-
- 2 files changed, 3 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/crypto/nx/nx.c b/drivers/crypto/nx/nx.c
-index 78135fb13f5c..f4bc947086f8 100644
---- a/drivers/crypto/nx/nx.c
-+++ b/drivers/crypto/nx/nx.c
-@@ -714,15 +714,13 @@ int nx_crypto_ctx_aes_xcbc_init(struct crypto_shash *tfm)
- /**
-  * nx_crypto_ctx_exit - destroy a crypto api context
-  *
-- * @tfm: the crypto transform pointer for the context
-+ * @tfm: the crypto api context
-  *
-  * As crypto API contexts are destroyed, this exit hook is called to free the
-  * memory associated with it.
-  */
--void nx_crypto_ctx_exit(struct crypto_tfm *tfm)
-+void nx_crypto_ctx_exit(struct nx_crypto_ctx *nx_ctx)
- {
--	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(tfm);
--
- 	kfree_sensitive(nx_ctx->kmem);
- 	nx_ctx->csbcpb = NULL;
- 	nx_ctx->csbcpb_aead = NULL;
-diff --git a/drivers/crypto/nx/nx.h b/drivers/crypto/nx/nx.h
-index 36974f08490a..6dfabfbf8192 100644
---- a/drivers/crypto/nx/nx.h
-+++ b/drivers/crypto/nx/nx.h
-@@ -153,7 +153,7 @@ int nx_crypto_ctx_aes_ctr_init(struct crypto_skcipher *tfm);
- int nx_crypto_ctx_aes_cbc_init(struct crypto_skcipher *tfm);
- int nx_crypto_ctx_aes_ecb_init(struct crypto_skcipher *tfm);
- int nx_crypto_ctx_sha_init(struct crypto_shash *tfm);
--void nx_crypto_ctx_exit(struct crypto_tfm *tfm);
-+void nx_crypto_ctx_exit(struct nx_crypto_ctx *nx_ctx);
- void nx_crypto_ctx_skcipher_exit(struct crypto_skcipher *tfm);
- void nx_crypto_ctx_aead_exit(struct crypto_aead *tfm);
- void nx_crypto_ctx_shash_exit(struct crypto_shash *tfm);
-
-base-commit: 758c807bb943138f887d42d986b645e12446ba9c
--- 
-2.54.0
-
+--------------VPw0waTVGrt5xBDwtBc7yXfu--
