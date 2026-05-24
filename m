@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 178202F8E81;
-	Sun, 24 May 2026 23:18:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9E7F2FE060;
+	Sun, 24 May 2026 23:43:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779664686; cv=none; b=M4KMtKI3g3BrPymYWYJDzVcI7F1tL2yZqbpLqVAg7pJRq+3yh5Bx0Q9NB6ZUKv/VEL2UnMqGPF78lkOeSOXt+Kjpp61vaKlZaMsKmnUwXkdXvNdTXwAjDGdQBX5zdX0m9r9IaFtY459PTRj/+ZdGbNykwL6NBT/V1Xu5uHST9t4=
+	t=1779666207; cv=none; b=fDltaYfi4a/m3JKeOw7uds2b6GaPeVkfRdEjWyp6DuNc3gOB1W7kB8A76EPXkAnrX+295X1UH12gp62fKouLNbNeY+VYi1Rwr3Dw7kV7a21le+Stdp9/YSSA3JSuIZlrRzdiBUbTcE6pyZ3L3KAnyKRW4QYaM7i9Hstzg6WvDA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779664686; c=relaxed/simple;
-	bh=YJhg6GOqfyRedY5GFa5yafRycTGCF64EpHZC5q7jRUE=;
+	s=arc-20240116; t=1779666207; c=relaxed/simple;
+	bh=VOmEuoqj1QUiQHRcFyD2vyoILB4OVqxCbqJRFJ4a65k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VLeNZxhzl+v7Qrgg+oTFn+xOk0n/XtGX3+wvD1zdNVpp25SehGnF41udTEayc5JgJ6dsj0n6WsskihijhzBi7TrGaC8+98WDHRWfKDYFseOyAU6ywOX6m2C6w0ehs13NHDdG+DHTdAZdiy1m/qHStPVPbxU+dh+uLMbWWHigOHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hT0ORmQh; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=VRpvVBjXHy/cLsYTbBKumpXDNfoZaonzdUNNB6Pr08povaw8iq0MAAeiiZEGpHlBUqWFkwakyABqRFAGb/JWViaoICN4f3Z8CsG0o2Tc2X81y8fI6eJAE+SmmnofSG0tQ5MVx688M6bY7BX2R0QwLKrIVw9odQDmyKwVKooaRQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lyXFgO6S; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hT0ORmQh"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 248DA1F000E9;
-	Sun, 24 May 2026 23:18:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lyXFgO6S"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id D0A3A1F000E9;
+	Sun, 24 May 2026 23:43:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779664684;
-	bh=1xKIl/BuAuJsq4s2VZpmIoNUIWA260ZKZNWVIohy8/8=;
+	s=k20260515; t=1779666206;
+	bh=4sOyiLRAJhl9sAFTpmyEnymyYch14BKVOAXeJ1tQ6aM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=hT0ORmQhFD00JDG5rjED9RwJyvhDpVhAoSRhyuD7Zmgdox8/45CLciCiffcc8e5SA
-	 zOoipZJe6mLbCUK1ABJj7/0VWlzt8BXeiIwjoNyq9lbSphGiaxUUr52b4r7+1KdceM
-	 RYAhtBtNtyll1Ojd/7Rb1z6KT9aKvMU7bbWEENFlqd5rhe999C3CWC0jJSjPA2xb8R
-	 myNOAJzuINvbtmXXNLNilOShBa5P+Fv5PU6Zg+gj/w+sqSPWq/UWL0FG/UibnGbazM
-	 BDmkZf+uJwUHholZuiQBjhL/z5Fv2/6M7axWSjou9xV8X7LU9e6U/Jaa253wP1WEyd
-	 /y9Y7m04vew3A==
-Date: Mon, 25 May 2026 02:18:00 +0300
+	b=lyXFgO6S5Gh7biB5sBEb3niyyTwrPanLaytjF3N7j9CHWLqNYgqnO7qCshElmu/HH
+	 6Y5auQUrL9F6KptUoX2A+Nkrznnn7uUxVy3mfbDitJaYnYUW2TbqptuszhQ2dTObHm
+	 LmQcEk4OkwRU54MkO/jPf+XWSqt5yXU0p0uMG1jjx5T4r6vYf8r8gMqm54EecypArW
+	 6eUgNG7gnR4ZfKq8qXYdkkIsnZw5bYY4laxUdY/UtijvSD/cBS3hvr++5piQ7wP4PJ
+	 TEYDftW26jsmIEyO9dWHIf65CzFlXl/o9aD2A+fCrSBmeZKG1XQLW4stGMivWLWX2x
+	 hC0K56haUc9eQ==
+Date: Mon, 25 May 2026 02:43:22 +0300
 From: Jarkko Sakkinen <jarkko@kernel.org>
 To: keyrings@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>, linux-crypto@vger.kernel.org,
@@ -41,7 +41,7 @@ Cc: David Howells <dhowells@redhat.com>, linux-crypto@vger.kernel.org,
 	"open list:SECURITY SUBSYSTEM" <linux-security-module@vger.kernel.org>,
 	open list <linux-kernel@vger.kernel.org>
 Subject: Re: [PATCH v8 0/3]
-Message-ID: <ahOHKJOllqX5dxym@kernel.org>
+Message-ID: <ahONGtGQkrOYlunW@kernel.org>
 References: <20260524051519.3708075-1-jarkko@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -56,61 +56,29 @@ In-Reply-To: <20260524051519.3708075-1-jarkko@kernel.org>
 On Sun, May 24, 2026 at 08:15:11AM +0300, Jarkko Sakkinen wrote:
 > This series introduces key type for operating with asymmetric keys using
 > a TPM2 chip.
-> 
-> Change Log
-> ==========
-> 
-> v8:
-> - Reset patch change logs given the overhaul of the code and patches.
-> - Have only single new subkey type.
-> - Make key type only use TPM operations.
-> - Use TPM2_Sign for both ECC and RSA keys.
-> - Align key descriptions with other key types.
-> 
-> Previous versions
-> =================
-> 
-> * v7: https://lore.kernel.org/linux-integrity/20240528210823.28798-1-jarkko@kernel.org/
-> * v6: https://lore.kernel.org/linux-integrity/20240528035136.11464-1-jarkko@kernel.org/
-> * v5: https://lore.kernel.org/linux-integrity/20240523212515.4875-1-jarkko@kernel.org/
-> * v4: https://lore.kernel.org/linux-integrity/20240522005252.17841-1-jarkko@kernel.org/
-> * v3: https://lore.kernel.org/linux-integrity/20240521152659.26438-1-jarkko@kernel.org/
-> * v2: https://lore.kernel.org/linux-integrity/336755.1716327854@warthog.procyon.org.uk/
-> * v1: https://lore.kernel.org/linux-integrity/20240520184727.22038-1-jarkko@kernel.org/
-> * Derived from https://lore.kernel.org/all/20200518172704.29608-1-prestwoj@gmail.com/
-> 
-> 
-> Jarkko Sakkinen (3):
->   lib/asn1_encoder: Add asn1_encode_integer_bytes()
->   crypto: Migrate TPMKey ASN.1 objects from trusted-keys
->   keys: asymmetric: tpm2_asymmetric
-> 
->  crypto/Kconfig                            |    7 +
->  crypto/Makefile                           |    6 +
->  crypto/asymmetric_keys/Kconfig            |   17 +
->  crypto/asymmetric_keys/Makefile           |    1 +
->  crypto/asymmetric_keys/tpm2_asymmetric.c  | 1096 +++++++++++++++++++++
->  crypto/tpm2_key.asn1                      |   11 +
->  crypto/tpm2_key.c                         |  150 +++
->  include/crypto/tpm2_key.h                 |   46 +
->  include/linux/asn1_encoder.h              |    3 +
->  include/linux/tpm.h                       |   10 +
->  lib/asn1_encoder.c                        |   62 ++
->  security/keys/trusted-keys/Kconfig        |    2 +-
->  security/keys/trusted-keys/Makefile       |    2 -
->  security/keys/trusted-keys/tpm2key.asn1   |   11 -
->  security/keys/trusted-keys/trusted_tpm2.c |  119 +--
->  15 files changed, 1421 insertions(+), 122 deletions(-)
->  create mode 100644 crypto/asymmetric_keys/tpm2_asymmetric.c
->  create mode 100644 crypto/tpm2_key.asn1
->  create mode 100644 crypto/tpm2_key.c
->  create mode 100644 include/crypto/tpm2_key.h
->  delete mode 100644 security/keys/trusted-keys/tpm2key.asn1
-> 
-> -- 
-> 2.47.3
-> 
 
-Oops, I deleted the subject line, it was unintentional :-)
+This would deserve more explanation but the original trait was to
+implement TPM2 parts of:
+
+https://datatracker.ietf.org/doc/draft-woodhouse-cert-best-practice/00/
+
+What motivated me to reiterate are actually these coding agents and how
+all secrets are sprayed across the home directory. So, besides iwd one
+could  use this feature to provide per-session cryptography for coding
+agents.
+
+There's a lot to do with security and coding agents as we have literally
+moved to an era where we host indeterministically rogues software in our
+development workstations.
+
+There's other questions too that we need to eventually answer like for
+instace, how to deal with persistent agent memory stored at the
+computer's hard drive?
+
+The irony here is that LLM is really neither rogue nor a lier. It is
+just a text predictor optimizing for maximum reward and those
+descriptions are just human interpretations of the output text. It
+understand neither evil, lying nor quality for that matter ;-)
 
 BR, Jarkko
+ 
