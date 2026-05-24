@@ -1,63 +1,63 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 501E21CD1E4
-	for <linux-crypto@vger.kernel.org>; Sun, 24 May 2026 19:45:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6867631717B
+	for <linux-crypto@vger.kernel.org>; Sun, 24 May 2026 19:45:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779651954; cv=none; b=gHdZAGlbMLCrcQ5xiRe5/m2ftMp5L1Oki/sroGhfecIN8EX5z6hbpzpvVP44LW0TxzQmClIBScgCjqLXq+YmyaE8PdunT2rirjlR5y+ufqp6Yld7EUvXwoztQu7h7CvENFPAfKEuDWr22RQdJPvJ63Qq9BxMlw9dgUOrpE9oKKI=
+	t=1779651956; cv=none; b=PvslMAORg/fBpTyXChjuaO99V6rX3lIfrFdmPNuL8gd8yGD+jux+ktkh5/aJwzXFouJu8Agc5MHLGvMEE2vqIhXP5brx5Poiyq9KFF1tFI3iluVGnRoOj/N/e3BlEat99o72CdIi9AYKJPRBOiCrR2GfsENp/KEuWOe1fy4mjOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779651954; c=relaxed/simple;
-	bh=4qw6UdagDB5Rg+pUwsg3VZ0z5i6gd9nT+MgXaEkbUrw=;
+	s=arc-20240116; t=1779651956; c=relaxed/simple;
+	bh=q26UTZln7vxpVLQUpB2k7H9kOQSzRK3kvbnGt02k2yk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hUZEpwhhnrVwCS+NffIgGcgj8uiOK8I7wIuIIGP/nJ0T426LzRdXuGVb14L6cPEnyl/qN9JZJCDE72BSKEFU/a9bJ9dHRH/87S43dmqPSmPM2j/t2qOlPLF9QUxVsLQbi5aAwvWQyHqtfspBS+dh6qb+m7UMoqjc8+vYl7AEahs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yzlo5mW+; arc=none smtp.client-ip=209.85.214.182
+	 MIME-Version; b=ecmitKv+jMS4+RUDT54AUgzp6OQZpua34D8R6pAv4S0eWHfOtzkM/tAgO9YhJhIGkjT4WytPc01SqLNf4vWK02jDH/HGh5X1sGaYjP4ycvOfgX+TdSLtnwKVql9eEFBwKbx++cPU4VPRURpcORiPESKQ74oKTWaQ6lhUtPphrj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IV4182/R; arc=none smtp.client-ip=209.85.214.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yzlo5mW+"
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2ba17c8cfacso94296425ad.2
-        for <linux-crypto@vger.kernel.org>; Sun, 24 May 2026 12:45:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IV4182/R"
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2b4650d5f5cso36736285ad.0
+        for <linux-crypto@vger.kernel.org>; Sun, 24 May 2026 12:45:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1779651951; x=1780256751; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1779651954; x=1780256754; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=upvkT7BOTIVikHvpyUtlt+ZS5mn49ZMriQt2QIdU8EA=;
-        b=Yzlo5mW+5FH8BD+LFnmSvrr6xDozUmMaBGTGvOcmbYFZbgRJiB1ZEtXeIe2SG+eQra
-         ZQ0QgExWkbOtQcS8BeANEc2fRFnhT7bJ+lnlQ/Ez5uC98GXPFjxk+ED2euva9QDzIjD7
-         psd7Z0axbudpetd4WIjdXGzfyXlnFwqFWj5XdHwnNvXjabz7j3sJSpbfVZCcg7PQt1Yf
-         8pFxhJvw0jGoSXCAX8mzlTV13FbcS9/1SAcv/f7zr0Br9nYKJkrraIeKANbcFgWFuUDd
-         F1uUkGZSPbknCgG+wb8KX/5EAXIxiUq4Ea4yPDkK1qBmKyfU0vNUgjmcI8TsG6K8iTvO
-         VAYA==
+        bh=neaNKTc1iKEb7KTL27Z88clko1muflEHCUKBETav0TM=;
+        b=IV4182/RWut+1YEBR+MLLOhF6j9FL1lcX9nS2n4rMpYUnEKWNCii08kYx04B8AqBw9
+         Nxb9s47iZ393HN3k6xOZevbRxCqHOkf650Wea1Y2dURF4XjjC00bALDYn5yJp3qaFnsO
+         EnN9HqQNrDVKA1NNx+EHlygYYuEj5/eU2/X4a/rlRJ5dvs7IL24CsLKq0S1AxdfLOaFb
+         NxgnyEDqKWSv34TT9csLdG4m30wZE+ZUM57yWSoRrOYTZNqauMcZQXrBE2ZaRlaWGpbl
+         D0PhqbTfOd2yVxOe+XyVX0ExzVnk/QI07q/VRiFUnol5XepagXZCFVoj0TgwNX9O9nbg
+         7RSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779651951; x=1780256751;
+        d=1e100.net; s=20251104; t=1779651954; x=1780256754;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=upvkT7BOTIVikHvpyUtlt+ZS5mn49ZMriQt2QIdU8EA=;
-        b=dGH9mnuUogxVk2lywDJXjfMrwrN/4BG97nA8c3zr7oD19xH/EEbJ059MfrG2CpjJ8T
-         ljjon984OB3d5N2gH9q/AGDADGDce0nkOsqCCqKZq0MzRZsicPo+e1xPHO7TDkERA48D
-         B4Wii0kdlqy3mgXqrUZa1A+NMlhd3J+d81NFJvtYcFpVZEuq9/b61VdFhEnEw2F1g3fi
-         WOUPGTyy+15IWaL8zl0NV5mhjBuI43+jWXbxurXn4PUNd9FUT4u01Vfz4EAcUOMYTvFc
-         SD8g9w5jUVwpjVfDrh6d4lkW6JlXdqCxvB1J7Tb9JnUiN8mYyOAwwtLXzkn9s0q87ZaT
-         3Rww==
-X-Forwarded-Encrypted: i=1; AFNElJ/bBYRI33B9ozFAdisPivYZqJNF5zeZ9qenz4mVMlE/0ev8Vp9ipsX1nCqE0TtsPz8eUllGOt3eATq3otc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvVr3vvbHT81wu3LkadG1QDconzR7XCxo4+xYgVgpGzwt4UVlw
-	EtHzqohclpeesnfbqvxroG5Av8xJkJFZkIV0t3FLGDhP5Eu6rl+NVN7F
-X-Gm-Gg: Acq92OGJvEZB1iG3lgMqJY4BMj9Q4QofD/7QGr+HqUFhPV948S8cwmHfvo2quwmjCCz
-	p9UgjI58zmS4Ih8vXFIXMC2JpmHZACm84na5NPmLLO/atDNEKzjaIoZ/0hVWp85OK7bGMBIOgPd
-	Gd+bLLy8Xrj5IzFrS6zSO67XZRTa4URkbxjsG6ULx1iVfMLkdhF+prRevsfxbe+6Eobga5tKaHV
-	/2fR1iwxAbY4/rVlk6Bjb0kDYRdNyq8WYBf/dmyDzWlLpkmBvgICinkxuLDgmXiyD3L4ULNvOo9
-	Wzgpi0YAEfUtGfPRUKXWvJ6pX8GNnQBpaF/Wr/oiiFybPSizMOl+w6AdZjBxtDrfNAO8jLXAqaG
-	AGY7XQiWEgExzFeBUZggWw9mwm+CcY0Ap6VO5XqZaAC2hM+TI268NO5LAEM5kPqc0K2t+H8Po05
-	JJI/Kwj/argeiQtMFzJ3z30fgC
-X-Received: by 2002:a17:903:440f:b0:2b0:67a7:5c4b with SMTP id d9443c01a7336-2beb0603fbemr127850575ad.28.1779651950934;
-        Sun, 24 May 2026 12:45:50 -0700 (PDT)
+        bh=neaNKTc1iKEb7KTL27Z88clko1muflEHCUKBETav0TM=;
+        b=lR/oALPODP55b8/LEFABP7BTlOMIpaRGwMvwBLscIMhtRRHAGAPa9+NnOuvZAYFsn+
+         TKIB8ScETF+8pQ0XaIpept7S32uN4DmKUklCMwuOQgfjRWGiw8gKkcunWP27WTDe82s+
+         TKBdNKNeEm/e+VDrLJb8ERqImcpGaymtRDAk651gYqJFBInqmcor2lj7aNZK/ZCIrh8l
+         +Qp/DZiPjrfwhGWoZfvXCkMWtcfvkTdEqlS/t90Fzh/JcIcdTpwxIH8N4w7YUAmR1byO
+         PRBS4MqcDxznfsT82TGSzkcFMZXMbm3kraHHwG5jh81B09ZePaigygpM7yowQ+gbNgVX
+         /hfg==
+X-Forwarded-Encrypted: i=1; AFNElJ/Tz7jj0LuAdx0Wm8zXUhNnrbXnl7rh6vdbcjLKGdRb4Q5wBC2MAG6gKkuA95BfF+Bss6FZsSivPm02V3A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBO78P2DGs1J1RHfYz46hKCxjjlRbIz4Tk3dut4R33P4NxM4N9
+	sT6v8MMxsh8Lcikb8Nzfs45bYvtv+b3QtVpDwlMpgW6WNPN4XjZT3qQa
+X-Gm-Gg: Acq92OEdyEIp0Rrw6FCtbeRgVhkKdKTFiQ2rHcx5ERAglo9dkWuRRRP++DvzwJaj3hA
+	daIjEG1rLXgPSHgMjjNmwKO38ZChIUtteyUlcSM6ifhRY553nQHLyLW8+l9EVGIoVwlwLJ8+BvP
+	0myZNSz34BBXriuMRwD0F7bSbDoVepKRHhkV/RcAKXBNWbV6++2Cu1VQ+38dhGuGwmOiZLA145a
+	5k2MG296WSSJRvrzCiQpwHVvPElKcR/knVAWDtbyCBKvXZl94PfxnesietmXtltfqBsmqBDfiZP
+	aNODlU2nrLuulChoi7rqoKuiTs491qYCr8TdeUMDPvkCZGbzYkoI9boOgp9L9sspVqEbscCnZPb
+	NGdwepsn3KuLScP/5B1BXoHz2DLO5y1s2f4odzV71rjIPaE6Zjtd/PjsKKdfhgs19TePj8m0XyW
+	zYfhssV9InRJ0oAJA4+Pw/VjNX
+X-Received: by 2002:a17:903:1a70:b0:2bc:d1ec:9f09 with SMTP id d9443c01a7336-2beb06be3d4mr123969875ad.40.1779651953703;
+        Sun, 24 May 2026 12:45:53 -0700 (PDT)
 Received: from mincom1 ([125.149.177.227])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2beb590aa7esm74414485ad.78.2026.05.24.12.45.48
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2beb590aa7esm74414485ad.78.2026.05.24.12.45.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 24 May 2026 12:45:50 -0700 (PDT)
+        Sun, 24 May 2026 12:45:53 -0700 (PDT)
 From: Jihong Min <hurryman2212@gmail.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	linux-crypto@vger.kernel.org
@@ -70,9 +70,9 @@ Cc: Christian Marangi <ansuelsmth@gmail.com>,
 	Mieczyslaw Nalewaj <namiltd@yahoo.com>,
 	Aleksander Jan Bajkowski <olek2@wp.pl>,
 	Jihong Min <hurryman2212@gmail.com>
-Subject: [PATCH 2/6] crypto: eip93: guard DMA cleanup on uninitialized mappings
-Date: Mon, 25 May 2026 04:45:24 +0900
-Message-ID: <20260524194528.3666383-3-hurryman2212@gmail.com>
+Subject: [PATCH 3/6] crypto: eip93: reject HMAC requests before setkey
+Date: Mon, 25 May 2026 04:45:25 +0900
+Message-ID: <20260524194528.3666383-4-hurryman2212@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260524194528.3666383-1-hurryman2212@gmail.com>
 References: <20260524194528.3666383-1-hurryman2212@gmail.com>
@@ -84,173 +84,34 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Several error paths can reach cleanup before all DMA addresses have been
-initialized or mapped. Initialize request DMA handles and check them before
-cleanup so the driver does not unmap zero or stale addresses.
+HMAC requests need the precomputed ipad/opad state installed by setkey().
+Using an HMAC tfm before setkey() initializes the request with an all-zero
+ipad and produces invalid hardware input.
 
-If mapping the temporary HMAC SA record fails, also release the block data
-DMA mapping that was already active.
+Reject those requests during hash init so the failure is explicit.
 
 Fixes: 9739f5f93b78 ("crypto: eip93 - Add Inside Secure SafeXcel EIP-93 crypto engine support")
-Reported-by: Benjamin Larsson <benjamin.larsson@genexis.eu>
 Originally-by: Mieczyslaw Nalewaj <namiltd@yahoo.com>
-Suggested-by: Benjamin Larsson <benjamin.larsson@genexis.eu>
 Assisted-by: Codex:gpt-5.5
 Signed-off-by: Jihong Min <hurryman2212@gmail.com>
 ---
- .../crypto/inside-secure/eip93/eip93-common.c |  8 ++-
- .../crypto/inside-secure/eip93/eip93-hash.c   | 54 ++++++++++++-------
- 2 files changed, 41 insertions(+), 21 deletions(-)
+ drivers/crypto/inside-secure/eip93/eip93-hash.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/crypto/inside-secure/eip93/eip93-common.c b/drivers/crypto/inside-secure/eip93/eip93-common.c
-index 4c163d7281b3..ed46730c36bc 100644
---- a/drivers/crypto/inside-secure/eip93/eip93-common.c
-+++ b/drivers/crypto/inside-secure/eip93/eip93-common.c
-@@ -527,6 +527,8 @@ int eip93_send_req(struct crypto_async_request *async,
- 
- 	rctx->sa_state_ctr = NULL;
- 	rctx->sa_state = NULL;
-+	rctx->sa_state_ctr_base = 0;
-+	rctx->sa_state_base = 0;
- 
- 	if (IS_ECB(flags))
- 		goto skip_iv;
-@@ -534,8 +536,10 @@ int eip93_send_req(struct crypto_async_request *async,
- 	memcpy(iv, reqiv, rctx->ivsize);
- 
- 	rctx->sa_state = kzalloc(sizeof(*rctx->sa_state), GFP_KERNEL);
--	if (!rctx->sa_state)
--		return -ENOMEM;
-+	if (!rctx->sa_state) {
-+		err = -ENOMEM;
-+		goto free_sa_state;
-+	}
- 
- 	sa_state = rctx->sa_state;
- 
 diff --git a/drivers/crypto/inside-secure/eip93/eip93-hash.c b/drivers/crypto/inside-secure/eip93/eip93-hash.c
-index 84d3ff2d3836..63bb6c4670cb 100644
+index 63bb6c4670cb..060e90c5eaa7 100644
 --- a/drivers/crypto/inside-secure/eip93/eip93-hash.c
 +++ b/drivers/crypto/inside-secure/eip93/eip93-hash.c
-@@ -34,7 +34,7 @@ static void eip93_hash_free_data_blocks(struct ahash_request *req)
- 	if (!list_empty(&rctx->blocks))
- 		INIT_LIST_HEAD(&rctx->blocks);
- 
--	if (rctx->finalize)
-+	if (rctx->finalize && rctx->data_dma)
- 		dma_unmap_single(eip93->dev, rctx->data_dma,
- 				 rctx->data_used,
- 				 DMA_TO_DEVICE);
-@@ -47,12 +47,13 @@ static void eip93_hash_free_sa_record(struct ahash_request *req)
+@@ -300,6 +300,9 @@ static int eip93_hash_init(struct ahash_request *req)
  	struct eip93_hash_ctx *ctx = crypto_ahash_ctx(ahash);
- 	struct eip93_device *eip93 = ctx->eip93;
+ 	struct sa_state *sa_state = &rctx->sa_state;
  
--	if (IS_HMAC(ctx->flags))
-+	if (IS_HMAC(ctx->flags) && rctx->sa_record_hmac_base)
- 		dma_unmap_single(eip93->dev, rctx->sa_record_hmac_base,
- 				 sizeof(rctx->sa_record_hmac), DMA_TO_DEVICE);
- 
--	dma_unmap_single(eip93->dev, rctx->sa_record_base,
--			 sizeof(rctx->sa_record), DMA_TO_DEVICE);
-+	if (rctx->sa_record_base)
-+		dma_unmap_single(eip93->dev, rctx->sa_record_base,
-+				 sizeof(rctx->sa_record), DMA_TO_DEVICE);
- }
- 
- void eip93_hash_handle_result(struct crypto_async_request *async, int err)
-@@ -66,8 +67,9 @@ void eip93_hash_handle_result(struct crypto_async_request *async, int err)
- 	struct eip93_device *eip93 = ctx->eip93;
- 	int i;
- 
--	dma_unmap_single(eip93->dev, rctx->sa_state_base,
--			 sizeof(*sa_state), DMA_FROM_DEVICE);
-+	if (rctx->sa_state_base)
-+		dma_unmap_single(eip93->dev, rctx->sa_state_base,
-+				 sizeof(*sa_state), DMA_FROM_DEVICE);
- 
- 	/*
- 	 * With partial_hash assume SHA256_DIGEST_SIZE buffer is passed.
-@@ -200,6 +202,10 @@ static void __eip93_hash_init(struct ahash_request *req)
- 
- 	rctx->len = 0;
- 	rctx->data_used = 0;
-+	rctx->sa_record_base = 0;
-+	rctx->sa_state_base = 0;
-+	rctx->sa_record_hmac_base = 0;
-+	rctx->data_dma = 0;
- 	rctx->partial_hash = false;
- 	rctx->finalize = false;
- 	INIT_LIST_HEAD(&rctx->blocks);
-@@ -250,8 +256,12 @@ static int eip93_send_hash_req(struct crypto_async_request *async, u8 *data,
- 									   sizeof(*sa_record_hmac),
- 									   DMA_TO_DEVICE);
- 				ret = dma_mapping_error(eip93->dev, rctx->sa_record_hmac_base);
--				if (ret)
-+				if (ret) {
-+					rctx->sa_record_hmac_base = 0;
-+					dma_unmap_single(eip93->dev, src_addr, len,
-+							 DMA_TO_DEVICE);
- 					return ret;
-+				}
- 
- 				cdesc.sa_addr = rctx->sa_record_hmac_base;
- 			}
-@@ -420,12 +430,14 @@ static int eip93_hash_update(struct ahash_request *req)
- 	return ret;
- 
- free_sa_record:
--	dma_unmap_single(eip93->dev, rctx->sa_record_base,
--			 sizeof(*sa_record), DMA_TO_DEVICE);
-+	if (rctx->sa_record_base)
-+		dma_unmap_single(eip93->dev, rctx->sa_record_base,
-+				 sizeof(*sa_record), DMA_TO_DEVICE);
- 
- free_sa_state:
--	dma_unmap_single(eip93->dev, rctx->sa_state_base,
--			 sizeof(*sa_state), DMA_TO_DEVICE);
-+	if (rctx->sa_state_base)
-+		dma_unmap_single(eip93->dev, rctx->sa_state_base,
-+				 sizeof(*sa_state), DMA_TO_DEVICE);
- 
- 	return ret;
- }
-@@ -501,12 +513,14 @@ static int __eip93_hash_final(struct ahash_request *req, bool map_dma)
- free_blocks:
- 	eip93_hash_free_data_blocks(req);
- 
--	dma_unmap_single(eip93->dev, rctx->sa_record_base,
--			 sizeof(*sa_record), DMA_TO_DEVICE);
-+	if (rctx->sa_record_base)
-+		dma_unmap_single(eip93->dev, rctx->sa_record_base,
-+				 sizeof(*sa_record), DMA_TO_DEVICE);
- 
- free_sa_state:
--	dma_unmap_single(eip93->dev, rctx->sa_state_base,
--			 sizeof(*sa_state), DMA_TO_DEVICE);
-+	if (rctx->sa_state_base)
-+		dma_unmap_single(eip93->dev, rctx->sa_state_base,
-+				 sizeof(*sa_state), DMA_TO_DEVICE);
- 
- 	return ret;
- }
-@@ -549,11 +563,13 @@ static int eip93_hash_finup(struct ahash_request *req)
- 	return __eip93_hash_final(req, false);
- 
- free_sa_record:
--	dma_unmap_single(eip93->dev, rctx->sa_record_base,
--			 sizeof(*sa_record), DMA_TO_DEVICE);
-+	if (rctx->sa_record_base)
-+		dma_unmap_single(eip93->dev, rctx->sa_record_base,
-+				 sizeof(*sa_record), DMA_TO_DEVICE);
- free_sa_state:
--	dma_unmap_single(eip93->dev, rctx->sa_state_base,
--			 sizeof(*sa_state), DMA_TO_DEVICE);
-+	if (rctx->sa_state_base)
-+		dma_unmap_single(eip93->dev, rctx->sa_state_base,
-+				 sizeof(*sa_state), DMA_TO_DEVICE);
- 
- 	return ret;
- }
++	if (IS_HMAC(ctx->flags) && !memchr_inv(ctx->ipad, 0, SHA256_BLOCK_SIZE))
++		return -EINVAL;
++
+ 	memset(sa_state->state_byte_cnt, 0, sizeof(u32) * 2);
+ 	eip93_hash_init_sa_state_digest(ctx->flags & EIP93_HASH_MASK,
+ 					sa_state->state_i_digest);
 -- 
 2.53.0
 
