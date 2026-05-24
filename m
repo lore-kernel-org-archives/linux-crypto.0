@@ -1,120 +1,116 @@
-Received: from outbound.ms.icloud.com (ms-2003e-snip4-11.eps.apple.com [57.103.72.141])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 255DE314B9D
-	for <linux-crypto@vger.kernel.org>; Sun, 24 May 2026 21:49:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.72.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 178202F8E81;
+	Sun, 24 May 2026 23:18:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779659380; cv=none; b=YY7jToEQs3jIr2Nw7c5Ukr48ja5Gj3DkWfBxndRUsaXCdBoK+swzQoJ3SyvjxXNeBk12aVS0QZxQaO42vqZKLl7HXavFMuBWMcUHadzHt4emtV5Xg3ixeamcbTQwv8gjtAduzfx78lX0VKOkuxge70frTKtTXDK3sf3iTYAyHtY=
+	t=1779664686; cv=none; b=M4KMtKI3g3BrPymYWYJDzVcI7F1tL2yZqbpLqVAg7pJRq+3yh5Bx0Q9NB6ZUKv/VEL2UnMqGPF78lkOeSOXt+Kjpp61vaKlZaMsKmnUwXkdXvNdTXwAjDGdQBX5zdX0m9r9IaFtY459PTRj/+ZdGbNykwL6NBT/V1Xu5uHST9t4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779659380; c=relaxed/simple;
-	bh=IIBCH6ptmgQHv1SDRa4yl26HmcZuF5f4ffCLhg9IUIE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=T6Vyt6SJAeWCjPZ0By6WOaizUMP1h28EqmteHZ0lFhWoNSqEydTLP/noT8HPnFKnj/u7agaLAbrfgNFFfwZW62xJnEt+GHI7bshaHaTOPKprMXab4bfvdMJtxS/+Im0ksqJBXMyFITwJUhxTiuBQZ5HDpqBmwairn32uFiUFdkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=EApFImie; arc=none smtp.client-ip=57.103.72.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+	s=arc-20240116; t=1779664686; c=relaxed/simple;
+	bh=YJhg6GOqfyRedY5GFa5yafRycTGCF64EpHZC5q7jRUE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VLeNZxhzl+v7Qrgg+oTFn+xOk0n/XtGX3+wvD1zdNVpp25SehGnF41udTEayc5JgJ6dsj0n6WsskihijhzBi7TrGaC8+98WDHRWfKDYFseOyAU6ywOX6m2C6w0ehs13NHDdG+DHTdAZdiy1m/qHStPVPbxU+dh+uLMbWWHigOHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hT0ORmQh; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="EApFImie"
-Received: from outbound.ms.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-west-3a-60-percent-7 (Postfix) with ESMTPS id 60F7518000B9;
-	Sun, 24 May 2026 21:49:37 +0000 (UTC)
-X-ICL-Out-Info: HUtFAUMEWwJACUgBTUQeDx5WFlZNRAJCTQhKBkMGXwteCE8EQwVZBVBcHA4FQhlACVQZXV8FWgAwUBtfAkIPHBNWFRMLU1ZbE1UXRgkZCF0dGQpQUAZaEhhcFFxQWB5GElYNXQkZBkFeUBtfAkIPHBNWFRMdQxkPKwhKBEMHRQJeCyUTCVNWWxNVF0YJGQhdHRkVWgkKVwYVC04KXVJfH0UPTVBAA1tUFhQZBgwARlZBDk0HC1UKAkNdTnMEVAddBV1WUAJaVRIEQAhWUF4IXh9MHA==
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com; s=1a1hai; t=1779659378; x=1782251378; bh=3yDmhTZJmpqaczhBUy2TX7zdpnWoGdUQ55ccG8khxV0=; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:x-icloud-hme; b=EApFImiePd9RPRLX/yeo6jKg2hsE04+pLXJe0TdIOQDka2I8NxaGDIsvPsxu3wRh6DXFX/vm2qZkpKhBnUcUanbRZ1uszy+9T6D1e8X/ckZEKNtXWZDogEWLdADGmR6NLJ0F2kpIVswYZWkiWnqA0S6gyYlVLZH18FjV+d4baXzlyPWKyb0fMl7IotTVBFpDE9KIunj+dTqkg8MvBqv4Ed85PYOHkn9iy4zK8hHbMXk+5KokiFnWEGmK25Pov2K7+tcvCUBGxOlZcT2WPM34viO5kX9poDLVa6QuelGlhBOb3ilO45Kjak8A2ZGVjtvk4X/e/gm4jS5TL8FTxSo0qA==
-Received: from [192.168.89.2] (unknown [17.57.154.37])
-	by p00-icloudmta-asmtp-us-west-3a-60-percent-7 (Postfix) with ESMTPSA id 1671B1800093;
-	Sun, 24 May 2026 21:49:34 +0000 (UTC)
-Message-ID: <4e2690e4-565c-40ff-a5a7-d1754fba03d6@icloud.com>
-Date: Mon, 25 May 2026 06:49:32 +0900
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hT0ORmQh"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 248DA1F000E9;
+	Sun, 24 May 2026 23:18:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779664684;
+	bh=1xKIl/BuAuJsq4s2VZpmIoNUIWA260ZKZNWVIohy8/8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=hT0ORmQhFD00JDG5rjED9RwJyvhDpVhAoSRhyuD7Zmgdox8/45CLciCiffcc8e5SA
+	 zOoipZJe6mLbCUK1ABJj7/0VWlzt8BXeiIwjoNyq9lbSphGiaxUUr52b4r7+1KdceM
+	 RYAhtBtNtyll1Ojd/7Rb1z6KT9aKvMU7bbWEENFlqd5rhe999C3CWC0jJSjPA2xb8R
+	 myNOAJzuINvbtmXXNLNilOShBa5P+Fv5PU6Zg+gj/w+sqSPWq/UWL0FG/UibnGbazM
+	 BDmkZf+uJwUHholZuiQBjhL/z5Fv2/6M7axWSjou9xV8X7LU9e6U/Jaa253wP1WEyd
+	 /y9Y7m04vew3A==
+Date: Mon, 25 May 2026 02:18:00 +0300
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: keyrings@vger.kernel.org
+Cc: David Howells <dhowells@redhat.com>, linux-crypto@vger.kernel.org,
+	linux-integrity@vger.kernel.org,
+	David Woodhouse <dwmw2@infradead.org>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Stefan Berger <stefanb@linux.ibm.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Mimi Zohar <zohar@linux.ibm.com>, Paul Moore <paul@paul-moore.com>,
+	James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	"open list:SECURITY SUBSYSTEM" <linux-security-module@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v8 0/3]
+Message-ID: <ahOHKJOllqX5dxym@kernel.org>
+References: <20260524051519.3708075-1-jarkko@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/6] crypto: eip93: return IRQ request errors from probe
-To: Aleksander Jan Bajkowski <olek2@wp.pl>,
- Jihong Min <hurryman2212@gmail.com>, Herbert Xu
- <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org
-Cc: Christian Marangi <ansuelsmth@gmail.com>,
- Antoine Tenart <atenart@kernel.org>, "David S . Miller"
- <davem@davemloft.net>, Richard van Schagen <vschagen@icloud.com>,
- linux-kernel@vger.kernel.org, Benjamin Larsson
- <benjamin.larsson@genexis.eu>, Mieczyslaw Nalewaj <namiltd@yahoo.com>
-References: <20260524194528.3666383-1-hurryman2212@gmail.com>
- <20260524194528.3666383-2-hurryman2212@gmail.com>
- <ddb3ad67-5125-457a-b033-8804f08b4439@wp.pl>
-Content-Language: en-US
-From: Jihong Min <hurryman2212@icloud.com>
-In-Reply-To: <ddb3ad67-5125-457a-b033-8804f08b4439@wp.pl>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: 0tkoMmssD7leauY8IX8sLfl0u0ZTBzZs
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI0MDIxOCBTYWx0ZWRfXwxr0FEnnkIRR
- RsIigoOfhALk5wIA/SobtORoTbX6EvyUXgIh3cXAnbeysOhc3hq8N5PI9RIAXWHlleNQIm9Giwy
- 32OSpuPYg81k/PCrjSGqPcNhYg+XzPOpQ1UbbGKnrrBLinCRVess/NnHUWTHP2zocua7zv+i2js
- ZGDVqHehDu1NVdlBlkebfRFrK3RwpTAJCmiMwy0a2NcIJkYFC0PtBrnHPRh7rQAII+1M7nWAzRg
- HjARUX1yddnI/IiqDodnM3vjssGDPDe8H+wNkjsmi8375yd22LtxJa3Y1nnjuqmkBBYo4wXyht1
- e+RJlLYjnVwSAx9vj2WH5GV9tn35On3t450adw1ObvZl3yOplQb7eNoHk8p1Ms=
-X-Authority-Info-Out: v=2.4 cv=TuHrRTXh c=1 sm=1 tr=0 ts=6a137272
- cx=c_apl:c_pps:t_out a=qkKslKyYc0ctBTeLUVfTFg==:117 a=IkcTkHD0fZMA:10
- a=NGcC8JguVDcA:10 a=x7bEGLp0ZPQA:10 a=5jDBv52wX64A:10
- a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=CjxXgO3LAAAA:8 a=pGLkceISAAAA:8
- a=EsG-66shvG4mn6RJVvsA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: 0tkoMmssD7leauY8IX8sLfl0u0ZTBzZs
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260524051519.3708075-1-jarkko@kernel.org>
 
-
-
-On 5/25/26 06:09, Aleksander Jan Bajkowski wrote:
-> Hi Jihjong,
-> I sent same patch a few days ago. You can find it on Patchwork[1].
+On Sun, May 24, 2026 at 08:15:11AM +0300, Jarkko Sakkinen wrote:
+> This series introduces key type for operating with asymmetric keys using
+> a TPM2 chip.
 > 
-> 1. https://patchwork.kernel.org/project/linux-crypto/
-> patch/20260518212506.292170-1-olek2@wp.pl/
-> Best regards,
-> Aleksander
+> Change Log
+> ==========
+> 
+> v8:
+> - Reset patch change logs given the overhaul of the code and patches.
+> - Have only single new subkey type.
+> - Make key type only use TPM operations.
+> - Use TPM2_Sign for both ECC and RSA keys.
+> - Align key descriptions with other key types.
+> 
+> Previous versions
+> =================
+> 
+> * v7: https://lore.kernel.org/linux-integrity/20240528210823.28798-1-jarkko@kernel.org/
+> * v6: https://lore.kernel.org/linux-integrity/20240528035136.11464-1-jarkko@kernel.org/
+> * v5: https://lore.kernel.org/linux-integrity/20240523212515.4875-1-jarkko@kernel.org/
+> * v4: https://lore.kernel.org/linux-integrity/20240522005252.17841-1-jarkko@kernel.org/
+> * v3: https://lore.kernel.org/linux-integrity/20240521152659.26438-1-jarkko@kernel.org/
+> * v2: https://lore.kernel.org/linux-integrity/336755.1716327854@warthog.procyon.org.uk/
+> * v1: https://lore.kernel.org/linux-integrity/20240520184727.22038-1-jarkko@kernel.org/
+> * Derived from https://lore.kernel.org/all/20200518172704.29608-1-prestwoj@gmail.com/
+> 
+> 
+> Jarkko Sakkinen (3):
+>   lib/asn1_encoder: Add asn1_encode_integer_bytes()
+>   crypto: Migrate TPMKey ASN.1 objects from trusted-keys
+>   keys: asymmetric: tpm2_asymmetric
+> 
+>  crypto/Kconfig                            |    7 +
+>  crypto/Makefile                           |    6 +
+>  crypto/asymmetric_keys/Kconfig            |   17 +
+>  crypto/asymmetric_keys/Makefile           |    1 +
+>  crypto/asymmetric_keys/tpm2_asymmetric.c  | 1096 +++++++++++++++++++++
+>  crypto/tpm2_key.asn1                      |   11 +
+>  crypto/tpm2_key.c                         |  150 +++
+>  include/crypto/tpm2_key.h                 |   46 +
+>  include/linux/asn1_encoder.h              |    3 +
+>  include/linux/tpm.h                       |   10 +
+>  lib/asn1_encoder.c                        |   62 ++
+>  security/keys/trusted-keys/Kconfig        |    2 +-
+>  security/keys/trusted-keys/Makefile       |    2 -
+>  security/keys/trusted-keys/tpm2key.asn1   |   11 -
+>  security/keys/trusted-keys/trusted_tpm2.c |  119 +--
+>  15 files changed, 1421 insertions(+), 122 deletions(-)
+>  create mode 100644 crypto/asymmetric_keys/tpm2_asymmetric.c
+>  create mode 100644 crypto/tpm2_key.asn1
+>  create mode 100644 crypto/tpm2_key.c
+>  create mode 100644 include/crypto/tpm2_key.h
+>  delete mode 100644 security/keys/trusted-keys/tpm2key.asn1
+> 
+> -- 
+> 2.47.3
 > 
 
-Hi Aleksander,
+Oops, I deleted the subject line, it was unintentional :-)
 
-I missed that patch. Thanks for pointing it out.
-
-I will drop this one from my next submission.
-
-
-Sincerely,
-Jihong Min
-
-> On 24/05/2026 21:45, Jihong Min wrote:
->> devm_request_threaded_irq() can fail, but eip93_crypto_probe()
->> continues as if the interrupt handler was installed. Return the error
->> immediately so the driver does not register algorithms for a device that
->> cannot signal completions.
->>
->> Fixes: 9739f5f93b78 ("crypto: eip93 - Add Inside Secure SafeXcel
->> EIP-93 crypto engine support")
->> Originally-by: Mieczyslaw Nalewaj <namiltd@yahoo.com>
->> Assisted-by: Codex:gpt-5.5
->> Signed-off-by: Jihong Min <hurryman2212@gmail.com>
->> ---
->>   drivers/crypto/inside-secure/eip93/eip93-main.c | 2 ++
->>   1 file changed, 2 insertions(+)
->>
->> diff --git a/drivers/crypto/inside-secure/eip93/eip93-main.c b/
->> drivers/crypto/inside-secure/eip93/eip93-main.c
->> index 7dccfdeb7b11..276839e1a515 100644
->> --- a/drivers/crypto/inside-secure/eip93/eip93-main.c
->> +++ b/drivers/crypto/inside-secure/eip93/eip93-main.c
->> @@ -433,6 +433,8 @@ static int eip93_crypto_probe(struct
->> platform_device *pdev)
->>       ret = devm_request_threaded_irq(eip93->dev, eip93->irq,
->> eip93_irq_handler,
->>                       NULL, IRQF_ONESHOT,
->>                       dev_name(eip93->dev), eip93);
->> +    if (ret)
->> +        return ret;
->>         eip93->ring = devm_kcalloc(eip93->dev, 1, sizeof(*eip93-
->> >ring), GFP_KERNEL);
->>       if (!eip93->ring)
-
+BR, Jarkko
