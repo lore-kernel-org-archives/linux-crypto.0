@@ -1,48 +1,63 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0A99299943;
-	Sun, 24 May 2026 05:20:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D07EE23909C
+	for <linux-crypto@vger.kernel.org>; Sun, 24 May 2026 07:10:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779600015; cv=none; b=KI+ujy79Jf70BGoreBPI7DblzTaGgkH6YCP0KJOR2uXS+ds9o+nZLPNxSoECKCC5gDTsCevf2EjDULcoMFc1PoSfGgqBqqszxD3E49983rKaHmKpFJZG3AN+zGZdvotnly+rYPlLJXyktExca/1eRCCtEiGgGLpcosAIxD23KVU=
+	t=1779606631; cv=none; b=E/FCqTsKQUWwD1W7QmL8La32GEQwPZVsP/7cP1cPDGZ7HvFzVPZ+nTLOnwGwD0xzuyIAQjsI2Ki1yEvcLGRg06Ihe8Bb2OjBwghDctvNu7hLXMZOWHqVadj7cxS853qqTN4PMZuwweuI3Ivx9/SYqzaLFBZeWV1/iA+hZxdvXD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779600015; c=relaxed/simple;
-	bh=nUk/or31ZcblcYRwbmyWvZEzsmOMAvxw8SC3x0CpR3w=;
+	s=arc-20240116; t=1779606631; c=relaxed/simple;
+	bh=CadOtTPs2huEqFzY459tuJVru51zfMqNKXGJL2Gub1k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e+z5dUPblxeY6wukGjT1q5jeV9SbvUHKRNKYqdwzHZqj80zOrZA6NmKjdo4Ihh1Ib6aHQOeiaUiT14ePZ200OOWD577K4uvMJIENcETWS/z8MfVTgrtEyG+U1Tuj4K8jVwfrUNmr6cr0c/1Jp+SlbFsTPpnjb033HU++DoEHw5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JIMeYT2t; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JIMeYT2t"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 1A28C1F000E9;
-	Sun, 24 May 2026 05:20:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779600013;
-	bh=YcuWooOWqE1a2Oivr+lPqrNpS1vi6j7CJ0wzXBRkecc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=JIMeYT2tFZ7SD2DMmH3HrRFpzYagXdYGswGtNnbkROo1dLSmY5oM5uQXYlbQAUpAT
-	 CgJZ4Aj+iS5vMSd+pKUXLP9ElmpUmD00zGFVOKoZWbfRDBF8peltrjUbgXxm1FzV58
-	 q463qJkh57SF1T6I3M0zO9RH3yvzV7s5ABtm61dgb+hIMBIhwD3teUMIbKDNrUesQ9
-	 CPDa6sYvPCTh6Ds/CcGktSQVjNiQuNTBi+zhlkX+nZpnSgbsItMWaVq71ZYIXYlAmh
-	 z72AC8P098XI9enzzXt5Bmx+m/MxnaASSGhJWRyeKs5OysIQXnJgjLxmf4qwccvb9z
-	 cFhhEaYJ2fwZA==
-Date: Sun, 24 May 2026 08:20:10 +0300
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: keyrings@vger.kernel.org
-Cc: David Howells <dhowells@redhat.com>, linux-crypto@vger.kernel.org,
-	linux-integrity@vger.kernel.org,
-	David Woodhouse <dwmw2@infradead.org>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Stefan Berger <stefanb@linux.ibm.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Mimi Zohar <zohar@linux.ibm.com>, Paul Moore <paul@paul-moore.com>,
-	James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	"open list:SECURITY SUBSYSTEM" <linux-security-module@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v8 0/3]
-Message-ID: <ahKKikSt249xjoqK@kernel.org>
-References: <20260524051519.3708075-1-jarkko@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=DpCShZlbDhfN7xic00zqhIgn3GIkVZJc9fBUTC9Irp3ZH4NjNtDm6PgwsdzNv/fONAkoDIUW/xGYvgA+fZIMCV4ASAscY+XfxArTjxoR7pohOnxitgO/mCrb8WL47wlkMBx5CJP6j3q6pAddjm86xGs7wCd7dvHENct9yk/9y+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-45d96d21e82so4772544f8f.0
+        for <linux-crypto@vger.kernel.org>; Sun, 24 May 2026 00:10:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779606628; x=1780211428;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xlYkz6g3wbQ9IFHWyxO5Z4osnU5OrF8poVvRpYxaIgg=;
+        b=d8kFatP1JyPc/f1uEtyg/fNJjVTqIXb1m4R9s+x7OPY9nb5+e2ImfHmRF3q1NtTfni
+         hezRrO/XehWY6USE8r9zeH94r9Cr57FOU84qn9jeHalLF37/K8eE3i6b1W2LqAR4A2m+
+         bbnap0f6Tv0l9CNM+qqLqV40Kr3Co09xFzNypvaEh12f3xFRiqDBoNyUi3kJzgw0e/AZ
+         8+PsNRf6sx2sLCdi0fge6MPLfubJCVF2EPjTdK7omB4wJnoq4mJaL7Z+0O6ajxEltANO
+         I81PVW5ERrciur8HyLqyrbno1765kR313zHXWK9qKpNKQsXJb3SuYejmbgnjjaroy328
+         4XGQ==
+X-Forwarded-Encrypted: i=1; AFNElJ8POz4lq6cr0Q0rG+xuR88q7Y/Loxj8SUXclUOfw3xdLD1PJ5YCYTUCYsORdwLTo9u7LBImaUQj0RdvUyc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzgFfwI1sZUCANuCMyEimgIiPhdcgzgQKXvKLqomekeoFLxiGTo
+	keEwrpIpKGj7bHQJo+68uvDji0eGOv+ntJv2w10rxh51MiH9Ml5ANff+
+X-Gm-Gg: Acq92OE0/1EcnPQ6KfB7gEuPDpGQZID2OOtuU8x25vuXNVmF9o8rIhJTWou6IBLIJAF
+	+J/DP1tLzVlyWNbS/60UPgRjbhwkcOqesTCVQ0cLayF+7kj3MgWnUEnAdFJew/VIqab/Ft7e+LI
+	EpdIbXN3jMIED1uIncSIl4uD5ZO8IHcIegO92RFSAZpWkyUeYQS4GPDNaD/UoTEEn2KgEMyuSuX
+	VPjqM/45ZAQ9rOuKywnqN5cdag+Sz7HGZkh+y2YrZEWGxRBaXspVY1SF3CBgYxAxVjBW8MMmdU8
+	pKU7cNiHE98HWf+l40JTAaP3PpWKAefU4jdZRkIDq4YTHXxxrcSj1WLmz65sCChq+JyeZwB1elw
+	ybMZ9sEMV/3m8A8c7k6bg8OiyDIGCAEAAtp938bjPSRLHvn1hOcgh2hCWztCsuRnn0Rvvd3Bx5N
+	cr+oJmLwU4tXzojqzDqqERttUU8QRPy4Y=
+X-Received: by 2002:a05:6000:4b12:b0:43d:7e34:889c with SMTP id ffacd0b85a97d-45eb38b5a04mr16209425f8f.39.1779606627897;
+        Sun, 24 May 2026 00:10:27 -0700 (PDT)
+Received: from gmail.com ([62.197.47.167])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45eb6c9ba2esm18077988f8f.8.2026.05.24.00.10.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 24 May 2026 00:10:27 -0700 (PDT)
+Date: Sun, 24 May 2026 08:10:26 +0100
+From: Breno Leitao <leitao@debian.org>
+To: Sam James <sam@gentoo.org>
+Cc: Nayna Jain <nayna@linux.ibm.com>, 
+	Paulo Flabiano Smorigo <pfsmorigo@gmail.com>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Biggers <ebiggers@google.com>, 
+	Ard Biesheuvel <ardb@kernel.org>, Eric Biggers <ebiggers@kernel.org>, 
+	Calvin Buckley <calvin@cmpct.info>, Brad Spengler <brad.spengler@opensrcsec.com>, 
+	linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: nx: fix nx_crypto_ctx_exit argument
+Message-ID: <ahKkTuPAf7UsU1Hx@gmail.com>
+References: <a3e89c1e8342ffa415b0d29725a0571a4f355d34.1779472902.git.sam@gentoo.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,70 +66,48 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260524051519.3708075-1-jarkko@kernel.org>
+In-Reply-To: <a3e89c1e8342ffa415b0d29725a0571a4f355d34.1779472902.git.sam@gentoo.org>
 
-On Sun, May 24, 2026 at 08:15:11AM +0300, Jarkko Sakkinen wrote:
-> This series introduces key type for operating with asymmetric keys using
-> a TPM2 chip.
+On Fri, May 22, 2026 at 07:01:42PM +0000, Sam James wrote:
+> nx_crypto_ctx_shash_exit calls nx_crypto_ctx_exit with crypto_shash_ctx(...)
+> but crypto_shash_ctx gives a nx_crypto_ctx *, not a crypto_tfm *.
 > 
-> Change Log
-> ==========
+> Fix the type in nx_crypto_ctx_exit and drop the bogus crypto_tfm_ctx
+> call.
 > 
-> v8:
-> - Reset patch change logs given the overhaul of the code and patches.
-> - Have only single new subkey type.
-> - Make key type only use TPM operations.
-> - Use TPM2_Sign for both ECC and RSA keys.
-> - Align key descriptions with other key types.
+> This fixes the following oops:
 > 
-> Previous versions
-> =================
+>   BUG: Unable to handle kernel data access at 0xc0403effffffffc8
+>   Faulting instruction address: 0xc000000000396cb4
+>   Oops: Kernel access of bad area, sig: 11 [#15]
+>   Call Trace:
+>    nx_crypto_ctx_shash_exit+0x24/0x60
+>    crypto_shash_exit_tfm+0x28/0x40
+>    crypto_destroy_tfm+0x98/0x140
+>    crypto_exit_ahash_using_shash+0x20/0x40
+>    crypto_destroy_tfm+0x98/0x140
+>    hash_release+0x1c/0x30
+>    alg_sock_destruct+0x38/0x60
+>    __sk_destruct+0x48/0x2b0
+>    af_alg_release+0x58/0xb0
+>    __sock_release+0x68/0x150
+>    sock_close+0x20/0x40
+>    __fput+0x110/0x3a0
+>    sys_close+0x48/0xa0
+>    system_call_exception+0x140/0x2d0
+>    system_call_common+0xf4/0x258
 > 
-> * v7: https://lore.kernel.org/linux-integrity/20240528210823.28798-1-jarkko@kernel.org/
-> * v6: https://lore.kernel.org/linux-integrity/20240528035136.11464-1-jarkko@kernel.org/
-> * v5: https://lore.kernel.org/linux-integrity/20240523212515.4875-1-jarkko@kernel.org/
-> * v4: https://lore.kernel.org/linux-integrity/20240522005252.17841-1-jarkko@kernel.org/
-> * v3: https://lore.kernel.org/linux-integrity/20240521152659.26438-1-jarkko@kernel.org/
-> * v2: https://lore.kernel.org/linux-integrity/336755.1716327854@warthog.procyon.org.uk/
-> * v1: https://lore.kernel.org/linux-integrity/20240520184727.22038-1-jarkko@kernel.org/
-> * Derived from https://lore.kernel.org/all/20200518172704.29608-1-prestwoj@gmail.com/
+> .. which came from hardlink(1) opportunistically using AF_ALG.
 > 
+> The same problem exists with nx_crypto_ctx_skcipher_exit getting a context
+> it wasn't expecting, but apparently nobody hit that for years.
 > 
-> Jarkko Sakkinen (3):
->   lib/asn1_encoder: Add asn1_encode_integer_bytes()
->   crypto: Migrate TPMKey ASN.1 objects from trusted-keys
->   keys: asymmetric: tpm2_asymmetric
-> 
->  crypto/Kconfig                            |    7 +
->  crypto/Makefile                           |    6 +
->  crypto/asymmetric_keys/Kconfig            |   17 +
->  crypto/asymmetric_keys/Makefile           |    1 +
->  crypto/asymmetric_keys/tpm2_asymmetric.c  | 1096 +++++++++++++++++++++
->  crypto/tpm2_key.asn1                      |   11 +
->  crypto/tpm2_key.c                         |  150 +++
->  include/crypto/tpm2_key.h                 |   46 +
->  include/linux/asn1_encoder.h              |    3 +
->  include/linux/tpm.h                       |   10 +
->  lib/asn1_encoder.c                        |   62 ++
->  security/keys/trusted-keys/Kconfig        |    2 +-
->  security/keys/trusted-keys/Makefile       |    2 -
->  security/keys/trusted-keys/tpm2key.asn1   |   11 -
->  security/keys/trusted-keys/trusted_tpm2.c |  119 +--
->  15 files changed, 1421 insertions(+), 122 deletions(-)
->  create mode 100644 crypto/asymmetric_keys/tpm2_asymmetric.c
->  create mode 100644 crypto/tpm2_key.asn1
->  create mode 100644 crypto/tpm2_key.c
->  create mode 100644 include/crypto/tpm2_key.h
->  delete mode 100644 security/keys/trusted-keys/tpm2key.asn1
-> 
-> -- 
-> 2.47.3
-> 
+> Cc: Eric Biggers <ebiggers@kernel.org>
+> Fixes: bfd9efddf990 ("crypto: nx - convert AES-ECB to skcipher API")
+> Fixes: 9420e628e7d8 ("crypto: nx - Use API partial block handling")
+> Reported-by: Calvin Buckley <calvin@cmpct.info>
+> Tested-by: Calvin Buckley <calvin@cmpct.info>
+> Suggested-by: Brad Spengler <brad.spengler@opensrcsec.com>
+> Signed-off-by: Sam James <sam@gentoo.org>
 
-There's some initial test code for this too:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/jarkko/linux-tpmdd-test.git/tree/overlay/usr/local/bin/tpmdd_tpm2_asymmetric.sh?h=main
-
-Ugh, that's one hell of an url...
-
-BR, Jarkko
+Acked-by: Breno Leitao <leitao@debian.org>
