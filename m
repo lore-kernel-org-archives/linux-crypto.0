@@ -1,98 +1,127 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9008F234973;
-	Mon, 25 May 2026 14:45:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 946EE387566;
+	Mon, 25 May 2026 14:59:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779720366; cv=none; b=EfOT72bISm5if64F8D7Uqb64Ae7evom4Wgpiv4OSEdIobwladWLyfuLr2JCmf6FqGIcop6Fv3THkv3oiMGkuRJmdVpzx3QB2EdXPBDZd0v3P6xtjEdmobQUng3dPOay3HEe2BAn388ZkM4vCYgI5cSRWYklCb19XX9xmTbvoqsw=
+	t=1779721182; cv=none; b=ij2igXElCv+KyOkBZhOOYvEvBQ4CAt1lPZ70zCRQYqacIhENLvY5JbutwCgoQXNoq0z4uos16n+UxJopKGGp0jZcunimPpKPECpGOT6HC3RSgOKQGZWpbFe2SO9C5tD03HloA8teDOjFKqW/UB3BaCuXOYz41PDs5pN147xJUGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779720366; c=relaxed/simple;
-	bh=Sm/M0HjNFqZ1eSv2mluixAU5gbpbTuKQVxvbD4heq34=;
+	s=arc-20240116; t=1779721182; c=relaxed/simple;
+	bh=B8wPoM4vVLoPf3Vj40P6Wp2Sn5gzPUbypAGMNGosdMU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A8qJmlixAyZIhrJbyc8L1FbpBQupxLcfl5ak3bcyvO6W7rn0gy94g4qOATpRW6ID1+kmXsWlo09s3FvdvcuktHrL/Vw7G1bqctde92asEv6AAv8Fw0NsRFhZ5PnBGYMokBZLQakWW60fnJdp3P1DD/2L/TwbtZqCLgjzyUGWePA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WL8/cH4P; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=svfEvvTv8zKAebNhFpQ88sw6QuMDx1zUh9ukhpPlWBHjpxHi7inYM7soBMP6P5/bUSkMVhGNCjb/p6TfV1KtTV6ixUtxRbv4jz8cns24HKD4FNnmoLUv/+4Pnhn3l5qmoOb/2neT6H+NsYMhgkeHw5zSvnR1XmA/8QkGm9Ottvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ng5ofvEq; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WL8/cH4P"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13E6E1F000E9;
-	Mon, 25 May 2026 14:45:54 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ng5ofvEq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 942601F000E9;
+	Mon, 25 May 2026 14:59:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779720355;
-	bh=b9cI/KWD1rPxgUtFYBlVXpvnvZIRUxCSpvplhBdA22Q=;
+	s=k20260515; t=1779721181;
+	bh=YgcxoFWvQzBGZlnk+prvgf7xYHShdN14BvMPoAeCOMc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=WL8/cH4P0gQ4bK41WN3FQmt/rz8FKNyik/pgMg7a8N1rzS70MgmkTSVgY9xeCBdb0
-	 HMiGu7DpFtxriPL6C1TwNeFCWus75GlgT1oGcOP/R6vhuc2/MyAD3GzStGXeZNk/lv
-	 uSOmuY92V6oJVkILucV9zPRLNdsJewP1oeh2v7x/1NYQbciCxz20ufDuhLYPKUmHlB
-	 6MdbJ48NW5QRynCPgSvU/n0a/kCfgep+PQPGwPl1EujUqi36qi4PObfImdOWSlq8jI
-	 ITydO2EtGK8DCrOiSPfWHupY1PbXzgmu9AeFZzCY3uD7Y9L+jrCHpzvNltCEJ5UP7x
-	 eACWUMxtzyPNg==
-Date: Mon, 25 May 2026 09:45:52 -0500
+	b=Ng5ofvEqGL9n3Uw8gG4a5YNQ+LxOsnt6kGvVG1D3sLFYEj2hf4bcC/bearluhEkfd
+	 6e4dnTbEv6Y6IEEbXcqCmYwtpkgNQv2EayQ7yQsobjclJyr/u7tpLktj+5jA3dWqmJ
+	 tYpGFkclCH83kaYdhXAKvlgawHyAaroV9MMhVmdLQU+LvIRUe3kql07Iv5OF/e3of+
+	 h1xRUGKHR3egr15Uo+e6WTwXjYi1EP+Rdy36zk8u/YgfstTVaUjgjXrrZn8XWOlKL7
+	 FLHYrFWjqWQ9qZkcvO9bIkxvNtyFql9FMvu0R2OYQmgLhTEjOdQ5+JtLHMSaSMX5ME
+	 1IstRdtXZPcEg==
+Date: Mon, 25 May 2026 09:59:39 -0500
 From: Eric Biggers <ebiggers@kernel.org>
-To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Cc: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
-	Thara Gopinath <thara.gopinath@gmail.com>,
+To: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Cc: Huacai Chen <chenhuacai@kernel.org>, linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Vinod Koul <vkoul@kernel.org>, Frank Li <Frank.Li@kernel.org>,
-	Andy Gross <agross@kernel.org>, linux-arm-msm@vger.kernel.org,
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, dmaengine@vger.kernel.org
-Subject: Re: [PATCH 0/3] Add support for qcrypto on shikra
-Message-ID: <20260525144552.GB2018@quark>
-References: <20260515-shikra_qcrypto-v1-0-80f07b345c29@oss.qualcomm.com>
- <20260514194735.GA1939213@google.com>
- <d4d35e17-84fa-4c95-9bfb-abfd25ea7f4a@oss.qualcomm.com>
- <20260522024912.GC5937@quark>
- <s5u3vlc3r2blg5hniwuqizazooldebr42n7hr2f4jw2ybbq3oe@cdmrv2etrmj2>
+	linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
+	Yinggang Gu <guyinggang@loongson.cn>, Lee Jones <lee@kernel.org>,
+	kernel test robot <lkp@intel.com>, stable@vger.kernel.org
+Subject: Re: [PATCH] crypto: loongson - Select CRYPTO_RNG
+Message-ID: <20260525145939.GC2018@quark>
+References: <20260522022525.12976-1-ebiggers@kernel.org>
+ <CAAhV-H5cDnWKxBobwRErRyvG8671e6VXsBe6w1RkX9rfn7CVFA@mail.gmail.com>
+ <20260522025722.GD5937@quark>
+ <d71adfa1-8895-e741-b72f-c5e99d5fb9e6@loongson.cn>
+ <20260522040310.GF5937@quark>
+ <bc3acf15-808d-4141-7f1f-4a7a7f856c6c@loongson.cn>
+ <20260522174835.GA1894319@google.com>
+ <4501444d-9c17-8d4b-8bfd-bd1d69d77a76@loongson.cn>
+ <20260525032006.GA243157@quark>
+ <05c794a7-f82d-5454-8df9-0ac543f8f8f7@loongson.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <s5u3vlc3r2blg5hniwuqizazooldebr42n7hr2f4jw2ybbq3oe@cdmrv2etrmj2>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <05c794a7-f82d-5454-8df9-0ac543f8f8f7@loongson.cn>
 
-On Mon, May 25, 2026 at 01:07:49PM +0300, Dmitry Baryshkov wrote:
-> Are other harware crypto drivers faster or slower than the CPU
-> implementation? What about the CAAM (sorry, it's just the driver that I
-> worked with few years ago). Or Xilinx? My guess would be that for the
-> most of the modern ARM64 hardware the NEON implementation is faster than
-> the "hw IP" one.
-
-Yes, QCE is hardly unique here.  It's just the one we're discussing now.
-
-> My assumtion has always been that we support crypto IP
-> for the sake of security (i.e. making sure that the key can't be found
-> in the cleartext in memory dumps or that it's impossible to tamper with
-> the hash values before singing/verification). From this point of view,
-> using priorities is expected and logical: most of the users will need a
-> quickest implementation. Some users will need to use protected keys or
-> other hw-only features.
+On Mon, May 25, 2026 at 04:17:25PM +0800, Qunqin Zhao wrote:
 > 
-> Note, I'm not commenting on the driver being buggy. If the issues are
-> not fixed in a timely manner, it should be marked with 'depends on
-> BROKEN' and further removed if the issues contine to be non-fixed.
+> 在 2026/5/25 上午11:20, Eric Biggers 写道:
+> > On Mon, May 25, 2026 at 10:45:14AM +0800, Qunqin Zhao wrote:
+> > > > > To be honest, I previously assumed that the `hw_random` was designed
+> > > > > strictly and exclusively for the TRNG mode.
+> > > > > 
+> > > > > Is it architecturally acceptable or common practice for a PRNG mode to
+> > > > > utilize `hw_random` as well?
+> > > > > 
+> > > > > Thanks,
+> > > > So the Loongson RNG is a PRNG?  Where does it get its entropy from, and
+> > > > what is its security strength?
+> > > Loongson's hardware supports both TRNG and PRNG simultaneously.
+> > > 
+> > > We can locate a reseed function within loongson-rng.c, which clearly
+> > > indicates that it is a PRNG driver.
+> > That reseed function gets called with entropy from the Linux RNG.  So,
+> > it seems it's really just a PRNG seeded from the Linux RNG.  What value
+> > does that provide over just using the Linux RNG directly?
+> 
+> Alternatively,the reseed function can serve  as a stirring mechanism, where
+> the primary entropy comes from the internal hardware TRNG.
+> 
+> Or simply ignore the  entropy from the Linux RNG entirely, trigger a
+> reseeding internal.
+> 
+> 
+> The driver merely forwards the seed to the firmware; how it is utilized and
+> what kind of random numbers are returned are entirely determined by the
+> firmware implementation.
+> 
+> > 
+> > > So the core issue here is whether a PRNG driver can utilize the crypto
+> > > interface.
+> > If you're asking about crypto_rng, it can.  But the crypto_rng interface
+> > is also kind of useless.  If you're asking about hwrng, it does look
+> > like it's designed for TRNGs.  Would it be possible for this driver to
+> > use the TRNG mode?
+> 
+> I mean crypto_rng.
+> 
+> We might use the hwrng interface to add support for the TRNG in this driver.
 
-Only a few drivers support protected keys ("paes", "phmac"); QCE is
-*not* one of them.  There are also no explicit users of protected keys
-in the kernel, so even if supported by the driver, it's almost never
-used in practice in Linux.  The only way this feature could potentially
-be used in Linux is if one of these drivers is present *and* userspace
-explicitly chooses to use it with one of the few kernel features that
-might implicitly support it, e.g. dm-crypt.  AFAIK that's extremely
-rare, and at least in Linux it's really just a checkbox feature.
+If you can actually provide fresh entropy on each call, then yes you
+should implement hwrng.
 
-(HW-wrapped inline crypto keys do get used, but those don't use the
-crypto API or these drivers at all.)
+> > 
+> > > If it cannot, does that imply the drivers listed below serve no practical
+> > > purpose? (7.1-rc1)
+> > > 
+> > > loongson@loongson:~/upstream/linux/drivers/crypto$ grep crypto_register_rng
+> > Most of the drivers in drivers/crypto/ are added by the hardware
+> > manufacturer without any regard for whether they're useful or not.
+> 
+> If we are dropping crypto-rng drivers entirely,
 
-As for making it "impossible to tamper with the hash values before
-signing/verification", these drivers don't provide anything there.
+We should, since they have no real point.
+
+> I am fine with removing the Loongson driver along with the others.
+> 
+> However, targeting the Loongson driver alone is unacceptable.
+
+We just happen to be digging into the details on this driver right now,
+since we're having to spend time fixing it.  Thanks for confirming that
+this is supported purely for parity with other drivers.
 
 - Eric
