@@ -1,58 +1,60 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D88C032B107;
-	Mon, 25 May 2026 15:26:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 398AB2F1FD7
+	for <linux-crypto@vger.kernel.org>; Mon, 25 May 2026 15:31:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779722775; cv=none; b=PdRxBs2Dcvd/o4p01cIotspNA70ZzMnVUNiOPl2VLuSlyPXXDOctPmhjz6uoa3rE2rGXVcrx08xBa2zSBkSj+T//FCulVasMyyBKC06VnVWZD9Z9tX0I1u1ESfTb126Q487/1wDLSnUDA7xZb5LmDGU00i1cTy/uJ1qZx9dgWsk=
+	t=1779723077; cv=none; b=l/36lbYGMi1jSKj9dxdpoEtbhhO1lnEu97+3iSUUIO6mAZRcO+d/1ouh42Da24DSBWr7tOLEvME8lbhMqKRoL32vhbqjf95wcEMRgPS5+lX5FzdulQBAWkEXRayfzRlMcIxrgkqSF8C0++/vAbOTjNjkW2X+pha1uZCN+VTkwqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779722775; c=relaxed/simple;
-	bh=RfcMM+1Ul1TH6o3SyNkodcSPyLfrfonQGF9fF1wOB2Q=;
+	s=arc-20240116; t=1779723077; c=relaxed/simple;
+	bh=r8swDJex6jUIPytR4EhqSUSdgn7ItdpKbWXlCYXafRw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NABw89P/QV/by9T0tEgOYW4gyPaZ3nj5Rrm1Jm3PgyLMTmufP2BaYruJZxiEekPU0VsnJ7V5sVEcS0uiWnXMYOISvZxfBmfZQgQ1uooKknXwowZ6LILadN8YNBqiYa7tawPUzBhE9UfkpZR5/J3GPwG6s1vaiCK1k4DfRCFvhjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ETJnT1Pn; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ETJnT1Pn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16C5B1F000E9;
-	Mon, 25 May 2026 15:26:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779722774;
-	bh=fMUe6rHhr5mw4H4Gp29XCyqFGgOSultc4Wo1eFJ9vMk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=ETJnT1PnKGCa4aTIfPr9o/NcH3g0HfaCkon7m+kBUe0LdVeEOTyu1sdmfXdDTgF1Z
-	 qejbctwH4buPjePVwT5glKjN83ZxQ7Unk3/7KCAEJqutSs+TFKD+shQHG7lP03+aJY
-	 6FqwhMEzXEqS78RMW25/4GItalC4KxH6CRgAF8FCTq3wyy4NIOrgv526M1XaEkPYsG
-	 6F7iW4TsLSCDN8Y8Wy2pxlLVNrjXK+XtnA7Ls7AQ0Yljvqv+fDetJ90OkGVGdOwaKp
-	 CcQm/24Qr4p0RGCuQIQfV70MgVRlfJ/wPyfeo4ZagRKzMkd7Er5DdguX2noWFbkcDO
-	 Sj3Wk5UHZPs6g==
-Date: Mon, 25 May 2026 10:26:11 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
-Cc: Thara Gopinath <thara.gopinath@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Vinod Koul <vkoul@kernel.org>, Frank Li <Frank.Li@kernel.org>,
-	Andy Gross <agross@kernel.org>, linux-arm-msm@vger.kernel.org,
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, dmaengine@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
-	Bartosz Golaszewski <brgl@kernel.org>,
-	Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>,
-	Neeraj Soni <neeraj.soni@oss.qualcomm.com>
-Subject: Re: [PATCH 0/3] Add support for qcrypto on shikra
-Message-ID: <20260525152611.GD2018@quark>
-References: <20260515-shikra_qcrypto-v1-0-80f07b345c29@oss.qualcomm.com>
- <20260514194735.GA1939213@google.com>
- <d4d35e17-84fa-4c95-9bfb-abfd25ea7f4a@oss.qualcomm.com>
- <20260522024912.GC5937@quark>
- <c1697372-54ec-4f57-85d9-ad375ff1a44d@oss.qualcomm.com>
- <20260525142843.GA2018@quark>
+	 Content-Type:Content-Disposition:In-Reply-To; b=O3UydHGAWec8CRaR9FeAu7OsN7/2TPjhRkXK95pBCsZz7+reKspeem/hBDtuv8MpITMoXzZljETj7BXRB0Df1voDJHoaOw8S9VKT/zw9ciHQyVZ8zEh0wwhjcCtkN+X+s6rvgY229sxfsXYRe5jYRxcEaRTRPoEAuO/VVo7qTX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-49050ff7cbdso20387275e9.2
+        for <linux-crypto@vger.kernel.org>; Mon, 25 May 2026 08:31:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779723073; x=1780327873;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gL2IpC5MvWuY4f2YMU2jwkl0JtJd1OwYuxD8i2xf5OA=;
+        b=HocrtruYHswUj58jDxUchAyCKtxAvVbDAInHJnnMEXCSOfrxBZDo/z2EHi/3quKfN8
+         RGgMcc9yKE3I8XjP5GloVo2E4OBzePnGH3hRREYTI94EQuzxcuO6MmrEQz1CCc9/ZCP+
+         ih02oL34/qt5ykW21mYaSu1v4BolUneU1Q+KxDKiHckB/nJ6S0BGoXQDmtvwTd52apnZ
+         PQk+8OEpu+Z6Ya9/mvSI+WjPOKZlSpE4yfojUyEM8xh9/vxIH60B7ybuBUBjtpwlNyk/
+         jqBgYLGStTddxo6PSw1++rP3f2ZYeYYeTwxQP94xoCxqrZ0f4zYsMTIW9xyiBDr71rEo
+         7qWQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9XQ/YppauDwcZHPjwLjf/sVnUoVWTX4qrleFzE8tTSj9+RNISp4fCdB+qCQRj/O7q1w+qZQ82lxFCqnxo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxtbD7DJp2vylCwM4LNOUD/Bt8tbeaplNTIeMen8sYSuSRh3tO
+	6uJS/A9jwaEy1CIaYVkt4vEHn9V9AlEUnvVxzagFHI8Sy+4xZwA+zAZx
+X-Gm-Gg: Acq92OHjJaxD7O4ibMWbHis4ASgqWGVqCuSBF6zx9mViJ9ekrqtXvV+lTHjmi27Biqr
+	YBY5iamysWYgWAN3bvKVF6dTpwI6uXwIQXfiQ+GKGWpD03hr+ka1iB4h6D0NMSCqAE4wly5ZZ0Z
+	aShIGmtF3blEZyUhxf3eiGmuzwl0mHSHSuC8QBQp5do0yKCbx4aHtnGI8FkPy6gMy0vDVPmuifQ
+	qGGENG2pECUgi5kiNEwNZb3EysBlihyMjKTd5YttUvdDBw2Ct3PGgPBY30aa18CHXlK7OHjvdo3
+	UJJn/5otROHDBR5ULTkikNLQ9qcmf2n+NLXgNgZn4OCYLQgXLW//j2VsE5iWWAKxhDsp6qtPWTp
+	WcGM0Ky3zxtBTJXM6w9I3OQFforCV/0o/g9yJA+WGaM3yepOniMK5rZAV+6RUBvbD1178N13Keg
+	ZRC+8S6hq4vl8hj+ykJ7Mge6cC2Gm9yhvBwaUL8lFp+Q==
+X-Received: by 2002:a05:600c:3113:b0:490:6237:521b with SMTP id 5b1f17b1804b1-49062375366mr90500225e9.27.1779723073078;
+        Mon, 25 May 2026 08:31:13 -0700 (PDT)
+Received: from gmail.com ([62.197.47.167])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-45eb6d6ebf0sm28873101f8f.34.2026.05.25.08.31.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 May 2026 08:31:10 -0700 (PDT)
+Date: Mon, 25 May 2026 16:30:45 +0100
+From: Breno Leitao <leitao@debian.org>
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Nayna Jain <nayna@linux.ibm.com>, 
+	Paulo Flabiano Smorigo <pfsmorigo@gmail.com>, Eric Biggers <ebiggers@kernel.org>, 
+	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] MAINTAINERS: powerpc: update VMX AES entries
+Message-ID: <ahRrFOvjvBSOVB7F@gmail.com>
+References: <20260524212943.799757-3-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -61,29 +63,21 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260525142843.GA2018@quark>
+In-Reply-To: <20260524212943.799757-3-thorsten.blum@linux.dev>
 
-On Mon, May 25, 2026 at 09:28:43AM -0500, Eric Biggers wrote:
-> ARMv8 Crypto Extensions are "hardware" as well, just in the CPU.  They
-> provide constant-time execution, for example.
+On Sun, May 24, 2026 at 11:29:45PM +0000, Thorsten Blum wrote:
+> Commit 7cf2082e74ce ("lib/crypto: powerpc/aes: Migrate POWER8 optimized
+> code into library") removed arch/powerpc/crypto/aes.c and moved
+> arch/powerpc/crypto/aesp8-ppc.pl to lib/crypto/powerpc/.
 > 
-> Granted, they don't protect from power analysis and electromagnetic
-> emanation attacks.  Does QCE actually provide those protections, though?
+> However, the "IBM Power VMX Cryptographic instructions" entry still
+> references the removed file and no longer covers the moved aesp8-ppc.pl.
 > 
-> Either way, it doesn't really matter in this case.  There are multiple
-> aspects to security, and before even considering these advanced
-> protections, the basics of security need to be absolutely solid.  That
-> is, the driver needs to always compute the crypto algorithms correctly,
-> and it needs to be completely robust when fuzzed by unprivileged
-> userspace (because it can accessed in that way).
+> Remove the stale entry, add lib/crypto/powerpc/aesp8-ppc.pl, and tighten
+> the arch/powerpc/crypto/aesp8-ppc.* pattern to match the remaining
+> header only.
+> 
+> Fixes: 7cf2082e74ce ("lib/crypto: powerpc/aes: Migrate POWER8 optimized code into library")
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 
-Looks like these protections are not even present either.  From
-https://csrc.nist.gov/CSRC/media/projects/cryptographic-module-validation-program/documents/security-policies/140sp5077.pdf :
-
-    > The Qualcomm Crypto Engine Core does not support any non-invasive
-    > security techniques. Therefore, this section is not applicable.
-    [...]
-    > The Qualcomm Crypto Engine Core does not implement security
-    > mechanisms to mitigate other attacks.
-
-- Eric
+Acked-by: Breno Leitao <leitao@debian.org>
