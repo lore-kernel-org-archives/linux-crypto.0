@@ -1,93 +1,194 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9589F1EA7CE;
-	Mon, 25 May 2026 03:20:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5E1333D4FD
+	for <linux-crypto@vger.kernel.org>; Mon, 25 May 2026 05:40:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779679210; cv=none; b=rGSuGF9nI+fx8Iv2hHBPUiRRm1pCOj0kOg/rmI9++4yk8vSvz6KzwtfYIhXmbT2ODBtTbv0U15btmDvWmh2ix1UMG3ANrgjirlSVCQpxKbPEe4o8oGGYDHjOtJiAaeyWARslnjwRsAb5bmk538odlC19obetEnPR3pR2hzAFmZQ=
+	t=1779687621; cv=none; b=bWdUssTZTR+P8G4/3jtdKoc4O1avPNiQNdIHIS3wTd6GIePZ54jh5EoSzvv5PFr4jAgdSJtK6wQZJtMLA+c8mb35t6uejfLtn0GP5lhA2qVTCxTSBkMmszNrGsYPoRLhTDb1XI3j9fLQ3+Px3maOj/9W/C6XSXlx+S4Rv87s4Bg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779679210; c=relaxed/simple;
-	bh=dujhx+kNkJj4kNiU/zgoiaK+THB6K/rFBIERBnI7OyY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ODil4idOV0fve3NyPpy6aTdGsDFpYxGe/mzjZnqBt3yYQCK+YkRrQ3BjiSG4N7ESy0sZBRstwgP9g3XxOMkXjvR031XOSxSOkvCnk+frLpcCfgMTRNtKpeoUo6sIZn+bJ0ZtUM+JT92+opLWrfewOt5j18pFrn1nX430YlOioe4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DTEABuQH; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1779687621; c=relaxed/simple;
+	bh=322HUqGm2V5uAHAY4HVPW2OCLrCgUfPAfmZK7el/h3c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CWD8WxZh9864ueC5VK6mBTrCYdojhurBrudmhPUpKHXe/sQkPeTPGUzO/KzhGS/kKPtIEirhPa4pVTAXX7AGfgwXiSRA5WvYaHrfDsDAg9gs+FBlH3Fl2WppE8lAX6YplRVIm9JtqF/DddhI1yJ/QAO03zP4H5dTV8yJG7Dx+4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=MPh+cISr; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=VnVjeZCo; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DTEABuQH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1627B1F000E9;
-	Mon, 25 May 2026 03:20:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779679208;
-	bh=vsyaQijSF17oIUNASElUtqLbJFypQHGCf/EnkeK63AM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=DTEABuQH/yQueBer9Vkmn/T1iSsMD8UI+in6nAOPm3PHV/3X+16QGNbPTybv5HxuZ
-	 dS/3SauIYktoOoG7mO8/viXSJ8/dGW0l6P4S4+Ch9QRd26kYIOVnm+B4rjMsaqOblc
-	 25qBnjKyEbh879DofpF6AE20PqZ+fxupDr/Un36ByLY/U0KSlESb8BSTdiKYmHN9j6
-	 H89eBG7DHano0NsDWQWuvYpmv+xM/hxHU/MxG7z6fA47psoBwUOwpKnhFfc4m2j5Nj
-	 YU2qfv9S5aDR3OVxPykdILWnVOqnZfixC1Z95JgU0YuzrOnkXeRu0wR397iFNNuO22
-	 asOgTUNGzlk+Q==
-Date: Sun, 24 May 2026 22:20:06 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Cc: Huacai Chen <chenhuacai@kernel.org>, linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
-	Yinggang Gu <guyinggang@loongson.cn>, Lee Jones <lee@kernel.org>,
-	kernel test robot <lkp@intel.com>, stable@vger.kernel.org
-Subject: Re: [PATCH] crypto: loongson - Select CRYPTO_RNG
-Message-ID: <20260525032006.GA243157@quark>
-References: <20260522022525.12976-1-ebiggers@kernel.org>
- <CAAhV-H5cDnWKxBobwRErRyvG8671e6VXsBe6w1RkX9rfn7CVFA@mail.gmail.com>
- <20260522025722.GD5937@quark>
- <d71adfa1-8895-e741-b72f-c5e99d5fb9e6@loongson.cn>
- <20260522040310.GF5937@quark>
- <bc3acf15-808d-4141-7f1f-4a7a7f856c6c@loongson.cn>
- <20260522174835.GA1894319@google.com>
- <4501444d-9c17-8d4b-8bfd-bd1d69d77a76@loongson.cn>
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="MPh+cISr";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="VnVjeZCo"
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64ONE3O7877595
+	for <linux-crypto@vger.kernel.org>; Mon, 25 May 2026 05:40:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	NXyCF+63V5r+f0I4sStSinPp8hUa1E+pxAtR+monLhk=; b=MPh+cISra0DFqIEr
+	QcC/HI0lzz1WvVFDuFENE8MS5/xxDzHsAaLuV+JDloXFrR+KDvAxTqb9zYpp76Ov
+	PnyGa4WkI35XD1ziGV4VK01i+xwodBQVz6VIjavYvjTiOmnIloUV2GR24ClYehuw
+	MrJS3ZND7BgIKyCSv7bNjkCmybfLOB8ekZjzRaL3+oCOh44orgEHlANVC20i4b+X
+	ENWqetDAkqeTg4KufCTFMcgSfNG3N4WWBgRPyfLv+TvIZINQ342mEbuTUxFHFiF0
+	cWHvv30QV/fTpsgSnPsDw+kuXEpFZwViz9DPvbFMIsYaFvaajaqd+IX51KjFfOow
+	RMuBDA==
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4eb4f3d1vf-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Mon, 25 May 2026 05:40:19 +0000 (GMT)
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2b9a3c3c4eeso91129275ad.3
+        for <linux-crypto@vger.kernel.org>; Sun, 24 May 2026 22:40:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1779687619; x=1780292419; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NXyCF+63V5r+f0I4sStSinPp8hUa1E+pxAtR+monLhk=;
+        b=VnVjeZCoXrGmN6s1HwPZA/nf2rHHK/NYV31JVwXbbZxoF76CPyGE/2C62mttw0ctos
+         CvarpvQDBD8GjkaaZqIKcViMdb3cNh341YFbiRdm3CVK6PryNJjkXCIDl57YWM3iB5D0
+         569W2cyl1BhIZvmuVsYJZ6ZTuTmSvx+6Gik6+MZ9TzP6pu9Z4YUNXPieI5hqZlcI4ZMw
+         ktzgj+ouew3ApnLdiWfMei4mOT5PBmv9XPA5VJC2uh6ZNArcTKfsXZ/sUTJonZgrOCOJ
+         HNhjnW8CywTax8w/MYsyyvdNsV5aVtnEY+CEfyUG4tF572Amh45bciuP0Ol9IF6OHNVb
+         huUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779687619; x=1780292419;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NXyCF+63V5r+f0I4sStSinPp8hUa1E+pxAtR+monLhk=;
+        b=RR8OQND8SVsRfaP1Rttd54QvYAISEZb7ltl0msx2xaQ+P/4gealZpMlZot7u5GiRAC
+         /z08P+SuNtE3XHl1Wj07OiHPKe/LlycO+yQmtC3vCRMOzMzkwRoCFQe4Mpp9l+0fh9PW
+         8qkiyDFL/5bcfb6ukqt0Bbsf+XFGkgUBnaYT9JD2l3QbL/Mp3GrCRF00xH2wcdkSO60u
+         WxtA78cEvn8eFsFRqri0vpTZboY/OKKLSAf6QA12o/xOdqD4UJrzMXLqvdE294tfEB9M
+         bX2SLyxfx2Nw/6vuUFm3PSY38yQdMIHrZ8Jwvl1Kx8UhwEidJGReC+Ykywvb3ZWMvHva
+         rIkw==
+X-Forwarded-Encrypted: i=1; AFNElJ/aeNze8LaIyzpiPaTJYQTYHjPw4btaCERiULS4yIrtMMQBp6rD0plbSnT97MvAQkgjwDSIT/aLebspZlg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUHT2KLy4Q3DWBC+vrQgVmvu7R6P9oipdEQZl2I5Jdglp8S6ed
+	Zb2nUEsfQd0aaWODeh+z6HVQ5FnRxRoGogRqp3Knr/KLuQIIZ+Puvkczo+XdQchXGdvWyr9UBgV
+	8275gxgDV0v3ZPA+FA7h3CYp3d0s8uJ2o+zkGSNeCGFsZmqEjF9JZenSUOMG0yTmybOM7M1h/p0
+	w=
+X-Gm-Gg: Acq92OFbWTbnFAie88h1uGqTE+Ws3YnY9smTF1vxelUMLkP87K5Aa018EDmXWDPp4FK
+	sGppsKkG8FRUxv9eZxPdbeY4TDlPGeeREJkj0XTFmxmvEwaqgBPOpa+ZqKoP7jU9OWfhu7bFCm/
+	TKZjjStpm4R+146Net1wyUdEdjvNpS3cZMPl3jmVwOJYRVk99gKDTDtD7ojTLupQWyVURWGqLPE
+	QmiAscwDsiVj5axvIVn/dVGQc2ZfnGtaDkg5d9AFsNmzLT/0v8nFw/JynAfBHSTQpmc1YrbZBy2
+	m2rzsl1mAcAIMcNZD6hWbD5cg5+SJab3xpGc/vtOqjTxhT45/9DB6TBmvTm3PtZ+JvHuTa8X2J0
+	PnvzS5GYs0rtLOGYyxLxYCfEX0NSFgZTmwO0eQ4r7Q9HEJwZIHaTh
+X-Received: by 2002:a17:903:3508:b0:2bd:9a28:7189 with SMTP id d9443c01a7336-2beb05a2183mr142763195ad.7.1779687619323;
+        Sun, 24 May 2026 22:40:19 -0700 (PDT)
+X-Received: by 2002:a17:903:3508:b0:2bd:9a28:7189 with SMTP id d9443c01a7336-2beb05a2183mr142762835ad.7.1779687618798;
+        Sun, 24 May 2026 22:40:18 -0700 (PDT)
+Received: from [10.217.223.47] ([202.46.22.19])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2beb56ce4easm78073875ad.30.2026.05.24.22.40.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 24 May 2026 22:40:18 -0700 (PDT)
+Message-ID: <c1697372-54ec-4f57-85d9-ad375ff1a44d@oss.qualcomm.com>
+Date: Mon, 25 May 2026 11:10:10 +0530
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4501444d-9c17-8d4b-8bfd-bd1d69d77a76@loongson.cn>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/3] Add support for qcrypto on shikra
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Thara Gopinath <thara.gopinath@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+        Frank Li <Frank.Li@kernel.org>, Andy Gross <agross@kernel.org>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dmaengine@vger.kernel.org,
+        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
+        Bartosz Golaszewski <brgl@kernel.org>,
+        Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>,
+        Neeraj Soni <neeraj.soni@oss.qualcomm.com>
+References: <20260515-shikra_qcrypto-v1-0-80f07b345c29@oss.qualcomm.com>
+ <20260514194735.GA1939213@google.com>
+ <d4d35e17-84fa-4c95-9bfb-abfd25ea7f4a@oss.qualcomm.com>
+ <20260522024912.GC5937@quark>
+Content-Language: en-US
+From: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
+In-Reply-To: <20260522024912.GC5937@quark>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: P8cdy5JKJKP5ZLuEakJyYrtYN_b1f2GO
+X-Authority-Analysis: v=2.4 cv=WvYb99fv c=1 sm=1 tr=0 ts=6a13e0c4 cx=c_pps
+ a=MTSHoo12Qbhz2p7MsH1ifg==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
+ a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yOCtJkima9RkubShWh1s:22
+ a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8 a=B3VgOHK6KqkFhVQj6DQA:9 a=QEXdDO2ut3YA:10
+ a=GvdueXVYPmCkWapjIL-Q:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI1MDA1MyBTYWx0ZWRfX0lo3TIs0W7SN
+ bDOR/wTbJs6b21G7mqMvZdW0GvZ1GLFP2p6zYxlDgAgXl7JNXoKE9gNOOfMZD2uMoqLWIYmycnk
+ s0+SopVIJWxTd33wD8DO4HbzcRAykajyH1TfBXTnwYS8fSDogz1e2KvF6O5cfTbce7sQmhbteln
+ s9gmF9ALrSlvij66J0woOJ4M/jg1tYy8IoEVK4KspJBWjuyt6Jn+FMTkdYMcBf039Yr9DWLwcKg
+ eQAIck+iJCgEk2gKv0adI34sDwj/WMSu9MoyP3iqHAdBAPKBD53t5QD0Fj1LfnYWOFpSQko0Wo+
+ w4LUMYpiBsgYsIZCGJnzxultQsUU1p3BRxgC27VKl75qOdfbYPDjSVNwrluI2Lawpr4LHodzByi
+ 0d5sHUytahl9mtiZigwGRSZS8Dk7AffxjD1Rx7QxRT9p0QOxyypj0z/JwmPnVi4V37AgGCjSTzt
+ /5HfAk/zE14itrpcoQA==
+X-Proofpoint-GUID: P8cdy5JKJKP5ZLuEakJyYrtYN_b1f2GO
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.51,FMLib:17.12.100.49
+ definitions=2026-05-25_01,2026-05-18_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 priorityscore=1501 lowpriorityscore=0 spamscore=0
+ clxscore=1015 phishscore=0 adultscore=0 suspectscore=0 impostorscore=0
+ bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2605130000
+ definitions=main-2605250053
 
-On Mon, May 25, 2026 at 10:45:14AM +0800, Qunqin Zhao wrote:
-> > > To be honest, I previously assumed that the `hw_random` was designed
-> > > strictly and exclusively for the TRNG mode.
-> > > 
-> > > Is it architecturally acceptable or common practice for a PRNG mode to
-> > > utilize `hw_random` as well?
-> > > 
-> > > Thanks,
-> > So the Loongson RNG is a PRNG?  Where does it get its entropy from, and
-> > what is its security strength?
+> It sounds like you don't actually have an answer to my questions, then.
 > 
-> Loongson's hardware supports both TRNG and PRNG simultaneously.
+> Performance tests (e.g.
+> https://lore.kernel.org/r/20250615031807.GA81869@sol/) have clearly
+> shown that this driver is an order of magnitude slower than the CPU.
 > 
-> We can locate a reseed function within loongson-rng.c, which clearly
-> indicates that it is a PRNG driver.
+> This driver has historically been quite harmful.  People were using it
+> accidentally and encountering very bad performance, as well as bugs such
+> as crashes and filesystem hangs.  We fixed that by lowering its
+> cra_priority.  But for the same reason, even when enabled on a platform,
+> it's not actually used.  Linux would be better without this driver.
+>
 
-That reseed function gets called with entropy from the Linux RNG.  So,
-it seems it's really just a PRNG seeded from the Linux RNG.  What value
-does that provide over just using the Linux RNG directly?
++Bartosz, Gaurav, Neeraj
 
-> So the core issue here is whether a PRNG driver can utilize the crypto
-> interface.
+Hi Eric,
 
-If you're asking about crypto_rng, it can.  But the crypto_rng interface
-is also kind of useless.  If you're asking about hwrng, it does look
-like it's designed for TRNGs.  Would it be possible for this driver to
-use the TRNG mode?
+GPCE is relevant in terms of providing hardware security.
+There are multiple usecases coming up for example to handle DRM/secure
+buffer usecases to improve overall throughput for secure content.
 
-> If it cannot, does that imply the drivers listed below serve no practical
-> purpose? (7.1-rc1)
-> 
-> loongson@loongson:~/upstream/linux/drivers/crypto$ grep crypto_register_rng
+Regarding performance, it's currently slower compared to arm CE but
+provides an edge by giving hardware security which is considered more
+secure.
 
-Most of the drivers in drivers/crypto/ are added by the hardware
-manufacturer without any regard for whether they're useful or not.
+Btw, there's been performance improvement with new targets and we are
+expecting to achieve far more better performance with new SoCs family.
+Pakala:    GPCE - 550MBps, ARMv8 - 8GBps
+Kaanapali: GPCE - 3GBps,   ARMv8 - 10GBps
 
-- Eric
+Please note, there's almost 5x improvement in kaanapali compared to
+pakala. Though overall is still slower compared to arm but as mentioned,
+expecting better performance with hardware improvements as we progress.
+
+Also, currently qce driver exhibit stability issues and that's what we
+are putting effort in stabilizing the software on immediate basis.
+
+There's parallel effort ongoing by Bartosz to introduce baseline for
+secure buffer usecases.
+https://lore.kernel.org/lkml/20260522-qcom-qce-cmd-descr-v18-0-99103926bafc@oss.qualcomm.com/
+There's active development ongoing and i believe lowering cra_priority
+for qce is fine as of now and can scale values once qce becomes
+performance efficient.
+
+Please share your thoughts. Thanks!
+
+-- 
+Regards
+Kuldeep
+
