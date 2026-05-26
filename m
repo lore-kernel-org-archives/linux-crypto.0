@@ -1,119 +1,115 @@
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.75.44.102])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AE7023D297
-	for <linux-crypto@vger.kernel.org>; Tue, 26 May 2026 10:11:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.75.44.102
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BABB3D9027
+	for <linux-crypto@vger.kernel.org>; Tue, 26 May 2026 10:22:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779790321; cv=none; b=BkqK6CTyH95SXMaSlczBNZ76e/35Sy7uGRBlNyIKL9BYk8+eOgtvAYQ2j7l+2eRxKItWRgTqP1Tl2jZc7yWFI1nLKrs9Le9iKweYM1sKQU2LruyY3IKRV14WuBLO8dJ/8V0KW9y6DY23ZQpVTowGJ9sO2xXECGrNbcOP+Jhldtc=
+	t=1779790969; cv=none; b=n4VsRZG0JIJBhWcK+manCSpaI/sDeGRnPBU4Rra3DfHjclTapXBYy6lfRjQMKWdIQop5mU9xyr89tE7lCY5KfFFh7IpycrVJiFME82LOZSOf7N2CaInl905VmbMcY+wmqUl/em8g0uTzvO8MOodydVR9Ql5fDWR2QExFsS9Cohw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779790321; c=relaxed/simple;
-	bh=5xjkngdWqDw1Hk6b7GUGO7seQD9FcSDoK7FryHpqYLc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fqAP0FOU0rdrgNcfhWQO4ginyyHMNQ3Sd2Katk/cU2977oIaB33HDmjcMAEWqnEYpTTcVvnb+itK/84L6mQ1883jBVWfomcOWlbd/CBqov8d2SWaGllQ0mTG4qBpC6crhResKdj8+SY/fOoaUpFymjTt/niu49v7bqF0VWoFlek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn; spf=pass smtp.mailfrom=lzu.edu.cn; arc=none smtp.client-ip=13.75.44.102
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lzu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lzu.edu.cn
-Received: from enjou-Legion-Y7000P-2019 (unknown [172.23.56.36])
-	by app1 (Coremail) with SMTP id ygmowABXdb_kcRVq5s8vAA--.21165S3;
-	Tue, 26 May 2026 18:11:50 +0800 (CST)
-From: Ren Wei <n05ec@lzu.edu.cn>
-To: linux-crypto@vger.kernel.org
-Cc: herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	yuantan098@gmail.com,
-	zcliangcn@gmail.com,
-	bird@lzu.edu.cn,
-	tr0jan@lzu.edu.cn,
-	ngochuongbui67@gmail.com,
-	n05ec@lzu.edu.cn
-Subject: [PATCH crypto 1/1] crypto: chacha20poly1305: validate poly1305 template argument
-Date: Tue, 26 May 2026 18:11:43 +0800
-Message-ID: <e7a116d3474cd00e421393e0512ad11b151ca2f1.1779777598.git.ngochuongbui67@gmail.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <cover.1779777598.git.ngochuongbui67@gmail.com>
-References: <cover.1779777598.git.ngochuongbui67@gmail.com>
+	s=arc-20240116; t=1779790969; c=relaxed/simple;
+	bh=hwh3B6/puad1rCmOYcUBON3492pPHvci/7pX365vmes=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CteHMUS91UF975a8UyFhYPTtqyu0oMRCZYaFBjwXnRzPK+CZobJ1E0zRqBOcFOK9MGT2eKqsGaz7w9POrTiftRcfn/NvasvdmIwL5lyIBV4xeHzFuy1iMfB2J1rh7UrIcHhsgyZktvGM6vxax2xuNwZDUNhHOGGIasR7QB8BX6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G3faCngs; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Rb1YXpzq; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G3faCngs";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rb1YXpzq"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1779790967;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Fy2dkBwbMAseBkbcRQehUKk5GPec6RoU2Jo6UlJsQ8k=;
+	b=G3faCngsrkqeQqSqWUofxs4afb7JgUHT886+OEwfZROkVtO6EELVLunMKY2rT8FxHwrHvZ
+	T/so7zKq2BMASDCorOby2cpg13JWf1e7FeU+RROAigqTiybIHtayqZvXIVksfNbsmAHYoK
+	5EPutZCHtIjgtAKx7mqAZi0+tt5rORE=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-509-AEmxKKNlMdqo-x60aiBNgA-1; Tue, 26 May 2026 06:22:46 -0400
+X-MC-Unique: AEmxKKNlMdqo-x60aiBNgA-1
+X-Mimecast-MFC-AGG-ID: AEmxKKNlMdqo-x60aiBNgA_1779790965
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-490479c2911so43639155e9.2
+        for <linux-crypto@vger.kernel.org>; Tue, 26 May 2026 03:22:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1779790965; x=1780395765; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Fy2dkBwbMAseBkbcRQehUKk5GPec6RoU2Jo6UlJsQ8k=;
+        b=Rb1YXpzqCUE2RoDCacVzBV7bJxQfzV0FtPcXKgB59fQFQP+njPKcEAiWuhERoJcHef
+         HTw0DIDT7uAwzNLymtUb8PFGWxhdmW/t9Ts8P+dFUdNQNhBhdYY+ziTCOHMOsEbclZkA
+         ZwTe2vixWi6suaQA9K6znSZ4BrqqQ/xBwP+UCk1SeNCZhw9AeMw1/QYUEwsmOsNlxo+x
+         1CUV2iUATX/mI8OyBPdEJb7wfwFidfmspNdXcXBMV0auNWOLFUHk6ToKGum3UDVuCkkm
+         00P1jD6AWUCdJCCXdVUJGaaemtC8Jq84E1CKY3f2CjJbWQXA90M2PExSC6Tmmjv4BqS3
+         Q3LA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779790965; x=1780395765;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Fy2dkBwbMAseBkbcRQehUKk5GPec6RoU2Jo6UlJsQ8k=;
+        b=RUAHjgyDNtJeqmIjwebwzpzv4d4SFeUwJRQVRnHMcobLwf2nLttfTkCBDwhPjrp6SU
+         le4O01RCIVgGQ6cWq5oHg+M1otxhBvy0D1kcRT+9RHalT/XHECWL75fPCW3Uw3ObTvw5
+         zc8MPi416ZIaD5enU+LbHijn8HGmLZzz/CG+MwnqCd/aDz3Ka5s/n5eXNo2+8BE/Twqn
+         3pgLMSgHOBW7n1+CzEGs4H2/CTGlTib6PvfRqsVTncqLuht/LTWo8S212Y2dzgq+aEIe
+         L77YWU6JoZsSZeNqkloI0LxxyIxXgV0PjFkFjscMgmlxqEaXXYm+P3DCzcnf4YcnOFVo
+         /pnA==
+X-Gm-Message-State: AOJu0Yxjnv1yMuPrVt9EzdnGDxdtvVMG3JEhVY8t/zow3KSeTxBqln9A
+	IFfk6YlWUKfm0Z7TCbP43YrpYuhMnu1E1XXZ9vrsiH6+vLAUKpxsyaijCLrywtbEwQ6rDBdxgZ1
+	+bh6U7zKsHSKvv+YGc4wl5TX17n4njfoVdD+uA8S5qYNidP9Mz4lT9EjF9X7s1kU/YQ==
+X-Gm-Gg: Acq92OFQjM2zYwQnXmV/uBruezRINWU6wPidAlUdtn/a7cjgkoZk9Cx7kgdQI0uTtLr
+	J9gVx2yx1ar0orbjjx4NKscM3ZHAl9cFBorkyQ4rsZo7p4+9xxCp6+tw4r33QKnVBsZuh56N7up
+	33lbZV9xmmdeyur0ax+orM8wVH9p7P0vOsF4YQdTqOPXGBxnfTcsQk9xLnfMUsScLfULn44BfUG
+	uI6irtjFte0ig+SAMYXspUQOcGvgflEuJdli/bfTXZVAka5i3I8yIi8qOVYIoJnHwLlDK4GIBXy
+	oHMOcImkjgsDcH+P1ZBxGAChmdg8DWzrc2Dh+6i3LtUucWis3vgCjbjatjoJmxgLL5MJtJKwWi1
+	JJ/+Hq1fWAP/27RBUenD4PB6UmOkoYXMRMLk8kKR8d+8Ld438Qq33t84kjA==
+X-Received: by 2002:a05:600c:46c6:b0:490:4927:3777 with SMTP id 5b1f17b1804b1-490492738a4mr258449365e9.2.1779790964930;
+        Tue, 26 May 2026 03:22:44 -0700 (PDT)
+X-Received: by 2002:a05:600c:46c6:b0:490:4927:3777 with SMTP id 5b1f17b1804b1-490492738a4mr258448765e9.2.1779790964516;
+        Tue, 26 May 2026 03:22:44 -0700 (PDT)
+Received: from [192.168.88.32] ([212.105.155.152])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4904527dbf3sm300099625e9.6.2026.05.26.03.22.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 May 2026 03:22:44 -0700 (PDT)
+Message-ID: <6e6a0129-ad37-486d-83e3-8914509b76b7@redhat.com>
+Date: Tue, 26 May 2026 12:22:42 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ygmowABXdb_kcRVq5s8vAA--.21165S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7tw15Xw1fJry5uFykAr15twb_yoW8KFyDpa
-	y3C3sFqryfJrnakrWkK3yrZa4kJr4v9ay3GrWktw1xAr10qr1IqrWIkFyYvF15Ca48C3y5
-	ZFZ0v3yq9w13GFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvC1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-	w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-	IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2
-	z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcV
-	Aq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j
-	6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
-	vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v26r1q6r43MxkIecxEwVCm
-	-wCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6cx26r48MxC20s026xCaFVCjc4AY6r
-	1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
-	b7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0x
-	vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAI
-	cVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2Kf
-	nxnUUI43ZEXa7VUbGQ6JUUUUU==
-X-CM-SenderInfo: zqqvvuo6o23hxhgxhubq/1tbiAQETCWoVV84EXwAAsn
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/6] Remove unused support for crypto tfm cloning
+To: Eric Biggers <ebiggers@kernel.org>, netdev@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, "David S . Miller"
+ <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+ Ard Biesheuvel <ardb@kernel.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ Dmitry Safonov <0x7f454c46@gmail.com>
+References: <20260522053028.91165-1-ebiggers@kernel.org>
+From: Paolo Abeni <pabeni@redhat.com>
+Content-Language: en-US
+In-Reply-To: <20260522053028.91165-1-ebiggers@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Xiaonan Zhao <ngochuongbui67@gmail.com>
+On 5/22/26 7:30 AM, Eric Biggers wrote:
+> This series is targeting net-next because it depends on
+> "net/tcp: Remove tcp_sigpool".  So far no commits in cryptodev conflict
+> with this, so I suggest that this be taken through net-next for 7.2.
 
-chachapoly_create() still accepts the compatibility poly1305 parameter
-in the template name, but it assumes the second template argument is
-always present and immediately passes it to strcmp().
+Makes sense, and series LGTM, but waiting a bit for an explicit ack from
+Herbert.
 
-When the argument is missing, crypto_attr_alg_name() returns an error
-pointer. Check for that before comparing the name so malformed template
-instantiations fail with an error instead of dereferencing the error
-pointer in strcmp().
-
-This matches the surrounding Crypto API template pattern where
-crypto_attr_alg_name() results are validated before string-specific use.
-
-Fixes: a298765e28ad ("crypto: chacha20poly1305 - Use lib/crypto poly1305")
-Cc: stable@kernel.org
-Reported-by: Yuan Tan <yuantan098@gmail.com>
-Reported-by: Zhengchuan Liang <zcliangcn@gmail.com>
-Reported-by: Xin Liu <bird@lzu.edu.cn>
-Co-developed-by: Luxing Yin <tr0jan@lzu.edu.cn>
-Signed-off-by: Luxing Yin <tr0jan@lzu.edu.cn>
-Signed-off-by: Xiaonan Zhao <ngochuongbui67@gmail.com>
-Signed-off-by: Ren Wei <n05ec@lzu.edu.cn>
----
- crypto/chacha20poly1305.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
-
-diff --git a/crypto/chacha20poly1305.c b/crypto/chacha20poly1305.c
-index b4b5a7198d84..27df9e1eb058 100644
---- a/crypto/chacha20poly1305.c
-+++ b/crypto/chacha20poly1305.c
-@@ -375,6 +375,7 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
- 	struct aead_instance *inst;
- 	struct chachapoly_instance_ctx *ctx;
- 	struct skcipher_alg_common *chacha;
-+	const char *poly_name;
- 	int err;
- 
- 	if (ivsize > CHACHAPOLY_IV_SIZE)
-@@ -396,9 +397,15 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
- 		goto err_free_inst;
- 	chacha = crypto_spawn_skcipher_alg_common(&ctx->chacha);
- 
-+	poly_name = crypto_attr_alg_name(tb[2]);
-+	if (IS_ERR(poly_name)) {
-+		err = PTR_ERR(poly_name);
-+		goto err_free_inst;
-+	}
-+
- 	err = -EINVAL;
--	if (strcmp(crypto_attr_alg_name(tb[2]), "poly1305") &&
--	    strcmp(crypto_attr_alg_name(tb[2]), "poly1305-generic"))
-+	if (strcmp(poly_name, "poly1305") &&
-+	    strcmp(poly_name, "poly1305-generic"))
- 		goto err_free_inst;
- 	/* Need 16-byte IV size, including Initial Block Counter value */
- 	if (chacha->ivsize != CHACHA_IV_SIZE)
--- 
-2.47.3
+/P
 
