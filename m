@@ -1,51 +1,51 @@
 Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0DBE367F54;
-	Wed, 27 May 2026 20:18:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A9073101D0;
+	Wed, 27 May 2026 21:06:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779913089; cv=none; b=Cn7K4p4MpqgG3Ua2tKHQrJV9wvmU2IYoAS1skTcQ7stIJkRVw52V3VcryPqb8rOKJYd4coNFjkgns9V+CqRTOtFNKZ2WM7HqfZ8Yh2rzXhFu1MOXUtiiHD3Fqgv6rEffYnw+emDQFwO8WozbeBn/+mKuy7+4PP2Hy3Zq75kf9qI=
+	t=1779916020; cv=none; b=qczHr48coXJJop8m0ywxcipEErACpWlpTv0bqFYUfqi987wv+DJgFrynPAFvor3/i/VVNcRsc3YhiNEJPy9D4v9PS2YUiJlArcNwHlQQ5ZEBuG4vsIiFRsI3jpNVU2Eolrs96hneZyPMb3rnjFOhJ2Fb+mCTDRp0aPFJSCk7CRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779913089; c=relaxed/simple;
-	bh=XtYYjMlM6bVPUDCnr22kIaw6GFg+B5OUm5pOtfQlYfo=;
+	s=arc-20240116; t=1779916020; c=relaxed/simple;
+	bh=T333W9UzfwFRyZqUtUnwPK7/vCADoN8h+s30/wxT1NY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t4ocphwJGZO8osExb2YH1OV7gX6YCxiA1RjCgcAZtqT3mW/ldLNqr/2AMuu4bw/rZALJdV00TNLf+c9JzuCOg8CN2Wr+F7nvX6/iPVkOe0T5vF2SzVgMaMipv1F4CR/RHd/ammz6dTgk2TS+r26V5HnYzsbNcvIuR4QQzi73K+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=fail (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=PWtnwTBw reason="signature verification failed"; arc=none smtp.client-ip=65.109.113.108
+	 Content-Type:Content-Disposition:In-Reply-To; b=Xyzs0byPnl0n2wFNTPrpffEYNLtLtx3i9zt4arlet69df2elqqUXjsJxXgqtqF9EFKYVyzkONmSb7UzPoGCk5fEKB3iuwTRP//Cz0E7+mgJLGYAa/qI52xZzXYUoUlFtSkFMWRltyLZgzILIwkoJMLmDkKD914jRWX1OdJe3xHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=MSNmsJrs; arc=none smtp.client-ip=65.109.113.108
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="PWtnwTBw"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="MSNmsJrs"
 Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 751AC40E0031;
-	Wed, 27 May 2026 20:18:04 +0000 (UTC)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id C70D940E00BA;
+	Wed, 27 May 2026 21:06:56 +0000 (UTC)
 X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=fail (4096-bit key)
-	reason="fail (body has been altered)" header.d=alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
 Received: from mail.alien8.de ([127.0.0.1])
 	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id G1lIHx-rVMOi; Wed, 27 May 2026 20:17:54 +0000 (UTC)
+	with ESMTP id LXhOfZMt6doO; Wed, 27 May 2026 21:06:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1779913073; bh=F3MXa6l0Flj1Bgg1aAsNjVybpJSuhc7kkfOSBEPLJT8=;
+	t=1779916006; bh=+HB2pTTn+1mGkcvaE+8Ypvs3xq7dhmSiIMi7/IobGeI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PWtnwTBwzUid6OfUVo9fpEPV8kJiBMvI5LtfXIfUhQy+nMWsJedo2Qhjs+F6HvtZ3
-	 a54goqO9NJiAZtvs5d0s/CGkyysa2LXz6loArUFAIfl/kyC3oi7iVNvIXYLWOuRQnW
-	 MHHHRiAjPVKjdvm3lPJ3oiK4GYmjRF34WsSLTcZcU55qe6RVOScyL1nrPTKjeYsuqo
-	 qnxA+GpZhZ/OYj0w6VcgYXCh9n4Hw90QrBvOqvMiAoSxw6ByKLhEpq7mj/5KHyRY4n
-	 mooi3UfrjjwO6Tqc2qrbyIrMJoGgyQk4C+09HgmU51P6ag7kk/ViekBH0Vdt8yWo0/
-	 4nO+4DizsU/bD78LWKK22E5NBKFRF9D2oRt/sZF0BGf/Pce0m7NUTy25ODTY5ujDFe
-	 ERTmJn9PFtB7KxdCV3vUoVZLgMO8joEMkF2X6nzYiXJnJDXUe21QexsYz7Bdo4LT9V
-	 983bLiF8A3wUv72/E9SPVfX92EdSnGUZuenvQdECMdp/uD8UIHnT6iFA86bZWzTw6w
-	 jD1mO4ZH8Zfg6JVrk7Si8nhxjuDlTEVuc0RHkfOGDWj1SpUER6SkJ5eGcrA17GF8u0
-	 kRTFnOBqbnQA3v5gAEwokDiHs1IgjyqPt1pBIqcRl6GklsgzgD/I+S6VEBJ/+9jwW9
-	 Fn35BHXAZva0pTbP68YMTnz4=
+	b=MSNmsJrsZfquvctjkm4A7wVSPWQOst3IF/Ws+ghRkWMWkMP/YEKONQcC/qPpK7EiN
+	 yRp3ZCmBr/nR1EJd65n9wjhmlc47wLNlTDM2Xb+CDagdckY/2uTalX0xAIP7p/pt+N
+	 Pb3Og82D0J+SrNTropVuIZrgwZ+EInH0jFN804aDxxv+XlInolW/FBo+RN8bRx++LX
+	 HY1dIGdOOGdqLvmuzCdKu0/w4VVGJxbGxSdvy/DN8o4wZbl8Ygjbnbel5PCFfKiefb
+	 vRpl0gYl4EOrUfkmHVvVHsy3SeFZpg2A8n6oRr3Odmv5xz46w6O19qDQ6zgZhxJmmr
+	 ejekiD93wbcnL1itzHQKcxtpaSrKk3OJVAl6iIhL36kYPtoltq3PYfFa/oHV2c9Z7e
+	 GjAqkiMaScudmRdwI99NGe7ThOSD8VdNhJZD0S/4SJOP10Ejzzc3pU0SJcZ74Vrmrf
+	 GgVinXTIIU13ofpT0UxWm/UbX2kc6ijleadMethc3GuMkl7g59iY1dSHZWFpN5AvZE
+	 51X7tOq/sq7j47vcuOoIGjBz+iERbEugz583sQzIg9CAnpKOlXbAN1N89PniWOKHMu
+	 b23Io7bghPsIbPOs723PXEROUXMPenr8/uRypKPWUs0OKJef90ZM8l5xkf0uUhXTff
+	 1HTpp10UT6W8ircra4oNcLcI=
 Received: from stx.tnic (unknown [IPv6:2600:1700:38ca:c00:b8a3:f58e:8829:9ca6])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 90D3940E01A1;
-	Wed, 27 May 2026 20:17:18 +0000 (UTC)
-Date: Wed, 27 May 2026 13:17:10 -0700
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 573BC40E01A1;
+	Wed, 27 May 2026 21:06:11 +0000 (UTC)
+Date: Wed, 27 May 2026 14:06:03 -0700
 From: Borislav Petkov <bp@alien8.de>
 To: Ashish Kalra <Ashish.Kalra@amd.com>
 Cc: tglx@kernel.org, mingo@redhat.com, dave.hansen@linux.intel.com,
@@ -61,11 +61,10 @@ Cc: tglx@kernel.org, mingo@redhat.com, dave.hansen@linux.intel.com,
 	john.allen@amd.com, darwi@linutronix.de,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
 	kvm@vger.kernel.org, linux-coco@lists.linux.dev
-Subject: Re: [PATCH v5 1/7] x86/cpufeatures: Add X86_FEATURE_AMD_RMPOPT
- feature flag
-Message-ID: <20260527201710.GAahdRRoHFOor425im@fat_crate.local>
+Subject: Re: [PATCH v5 2/7] x86/msr: add wrmsrq_on_cpus helper
+Message-ID: <20260527210603.GCahdcu8zvVjfKfGEL@fat_crate.local>
 References: <cover.1779133590.git.ashish.kalra@amd.com>
- <305b625c0528f16a95542001c66e643fbd3a2622.1779133590.git.ashish.kalra@amd.com>
+ <c9fe5c2fef063f5006cc9bfa03eec824ac015db7.1779133590.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -74,29 +73,35 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <305b625c0528f16a95542001c66e643fbd3a2622.1779133590.git.ashish.kalra@amd.com>
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <c9fe5c2fef063f5006cc9bfa03eec824ac015db7.1779133590.git.ashish.kalra@amd.com>
 
-On Mon, May 18, 2026 at 09:41:53PM +0000, Ashish Kalra wrote:
+On Mon, May 18, 2026 at 09:42:15PM +0000, Ashish Kalra wrote:
 > From: Ashish Kalra <ashish.kalra@amd.com>
->=20
-> Add a flag indicating whether RMPOPT instruction is supported.
->=20
-> RMPOPT is a new instruction designed to minimize the performance
-> overhead of RMP checks on the hypervisor and on non-SNP guests by
-> allowing RMP checks to be skipped when 1G regions of memory are known
-> not to contain any SEV-SNP guest memory.
+> 
+> The existing wrmsr_on_cpus() takes a per-cpu struct msr array, requiring
+> callers to allocate and populate per-cpu storage even when every CPU
+> receives the same value. This is unnecessary overhead for the common
+> case of writing a single uniform u64 to a per-CPU MSR across multiple
+> CPUs.
+> 
+> Add wrmsrq_on_cpus() which writes the same u64 value to the specified
+> MSR on all CPUs in the given cpumask.
 
-Streamline:
+So let's add yet another function which name differs from the other one by
+a single letter and have people go look at the implementation to know which is
+which...?
 
-"RMPOPT is a new instruction that reduces the performance overhead of RMP
-checks for the hypervisor and non=E2=80=91SNP guests by allowing those ch=
-ecks to be
-skipped when 1=E2=80=91GB memory regions are known to contain no SEV=E2=80=
-=91SNP guest
-memory."
+Instead of unifying what's there and extending this one to do what you want it
+to do?
 
---=20
+And now you have a wrmsrQ_on_cpus() but no rdmsrQ_on_cpus()?
+
+Because if you look at the code, you'll see how those are used: first you
+rdmsr on CPUs, modify each value and then wrmsr on same CPUs.
+
+So no, try again pls.
+
+-- 
 Regards/Gruss,
     Boris.
 
