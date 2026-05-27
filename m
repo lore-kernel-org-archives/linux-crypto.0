@@ -1,32 +1,32 @@
 Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 814E73DDDD3;
-	Wed, 27 May 2026 08:26:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F01C93DE44C
+	for <linux-crypto@vger.kernel.org>; Wed, 27 May 2026 08:26:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779870364; cv=none; b=HZ7Mp+eJKlpBOmFdrl5Qhn9Buz2R/VCebAd4SYzMqxTqSf/+AE+REqJkarZcKwUYNAPlkZlOOL0dElP58trObumMNgB1WgYykcu5BFUwiAtv873wpVYDuoNght7GRz5eUkaMVwQBmfxVjVWs7h3sRGCrMB6PSRLAh4/Bb9ZViA8=
+	t=1779870364; cv=none; b=iC4By9hOgsSoOHLR9s7gzJE5eg88w14nRHVS4qdHYSqBW447QTOVKhZQP03JiMkSY189wuFxtL/HwhDZjEiNYjp57cz3YZCWkk+9EN/H4R3s6qxXWqlwAIS9MkeiFm0f/0sIP6BlmANklfrzjHMM7ITj7zu/60RoZkCGSB4+9+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1779870364; c=relaxed/simple;
-	bh=4ZDdfunSOYjbYgeldm3GYKaP+rN9Vs55rGEdl/45ogY=;
+	bh=ZvfXWR5k1r7TzSLddYu+UEUvINjvO91+Xxhh/ScI/tw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pEd9TpMstoyW1NEX4DraiOhqVs7uZy5RQePdnwVlzXffTdqaXIgOHhGolRhvCyhko/tVWKXl5gBog9/tnBJULblOhxm9lo37quGlW9c/BOw9TtO3Ml92K0q6hVyzQlxDPQ032Y4TEk4XPi/pQULjd+gojZY6Q0i9EbqhcFIm/lo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xKGfD53z; arc=none smtp.client-ip=91.218.175.188
+	 MIME-Version; b=fEFsOnFeVG6ovEAqr/FzldnquSXpXZ7i1Gnf2ebqWch0uzIRtGmwg1F0EaPuVFHKyQ73xjX6cog3gqUnEwgUsh4JbcmhgFqpu5th21I/+zbc0LdNzbmnSUw4kFp2sXayWb2V52g2B641ECjghy3rgUn2T2a8kbWUPafCNG6+xBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wplAlSjv; arc=none smtp.client-ip=91.218.175.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xKGfD53z"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wplAlSjv"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1779870359;
+	t=1779870360;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Hc1xawfwnd7scbSik+dGMphjPZAj0ZJMCx6yMVuY1Zw=;
-	b=xKGfD53zVJCYuh0DFnUiGzshJLed7ajW2eENX2DzyRYQZwdIpp0BATMRdebZN1CVPJBWIr
-	nCgU/NVmCbcdySjnYlK1unC+wvxj0qdP8ziC8Or736QDfI1Q8b3J0Bti8BwjyQjSZA8U9H
-	df5KuR+eRuuNgUenyigJ1djWfj3Fpy0=
+	bh=pq9EXOiDNg6EPoIk3Z3sQS7nI7pVh35u0o+CMtBzT28=;
+	b=wplAlSjvoBCLkP0RWZoNS+ac0heamApqdVbtYDvPPLSnH/n+b/4/aVJMlvc9WN3KLqdUYU
+	5PBpn7gyokF8IiWrTtN28TNW+xwtBmBHTpBR+qlxaJgGZVu4keiGTXLbGRi2l8lifT9ZCE
+	//svJoO1HBigrvjZflq4sVtM2epsp1U=
 From: Thorsten Blum <thorsten.blum@linux.dev>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -40,9 +40,9 @@ Cc: linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	Thorsten Blum <thorsten.blum@linux.dev>
-Subject: [PATCH RESEND 4/6] crypto: af_alg - use sock_kzalloc in alloc_result + accept_parent_nokey
-Date: Wed, 27 May 2026 10:25:14 +0200
-Message-ID: <20260527082509.1133816-11-thorsten.blum@linux.dev>
+Subject: [PATCH RESEND 5/6] crypto: algif_rng - use sock_kzalloc in rng_accept_parent
+Date: Wed, 27 May 2026 10:25:15 +0200
+Message-ID: <20260527082509.1133816-12-thorsten.blum@linux.dev>
 In-Reply-To: <20260527082509.1133816-8-thorsten.blum@linux.dev>
 References: <20260527082509.1133816-8-thorsten.blum@linux.dev>
 Precedence: bulk
@@ -51,41 +51,27 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1229; i=thorsten.blum@linux.dev; h=from:subject; bh=4ZDdfunSOYjbYgeldm3GYKaP+rN9Vs55rGEdl/45ogY=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFliq3L9L3+u3NNdb2EvweTUYL3g584T+vKaq7mKfBe8u DdJZNW/jlIWBjEuBlkxRZYHs37M8C2tqdxkErETZg4rE8gQBi5OAZiI+QdGhv1CPsKam5eUZpVs 4s58tbz80IeldqHqOpuPSNVMKDGpLWJkWC3y7FSTjHjpAbMJB67ZnDMUFsgWEZoavXDOHreAA49 reQE=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=779; i=thorsten.blum@linux.dev; h=from:subject; bh=ZvfXWR5k1r7TzSLddYu+UEUvINjvO91+Xxhh/ScI/tw=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFliq/KYZgpsNo6Y55vMvrNqx2oV1ZnC8euZfXpVAzyiZ VXPu+V1lLIwiHExyIopsjyY9WOGb2lN5SaTiJ0wc1iZQIYwcHEKwETCTjL8symYd9jgevYJL+77 UYsOO+4QvTEp+3yPwbVFOyQUVar9HRj+Fy++vMdKtM2swHv70sMK6/xiZm83yD/S9P1Q09wQeTZ 1RgA=
 X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
 Replace sock_kmalloc() followed by memset(0) with sock_kzalloc() to
-simplify hash_alloc_result() and hash_accept_parent_nokey().
+simplify rng_accept_parent().
 
 Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 ---
- crypto/algif_hash.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ crypto/algif_rng.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
-index 4d3dfc60a16a..02c0e448390d 100644
---- a/crypto/algif_hash.c
-+++ b/crypto/algif_hash.c
-@@ -38,12 +38,10 @@ static int hash_alloc_result(struct sock *sk, struct hash_ctx *ctx)
- 
- 	ds = crypto_ahash_digestsize(crypto_ahash_reqtfm(&ctx->req));
- 
--	ctx->result = sock_kmalloc(sk, ds, GFP_KERNEL);
-+	ctx->result = sock_kzalloc(sk, ds, GFP_KERNEL);
- 	if (!ctx->result)
- 		return -ENOMEM;
- 
--	memset(ctx->result, 0, ds);
--
- 	return 0;
- }
- 
-@@ -412,11 +410,10 @@ static int hash_accept_parent_nokey(void *private, struct sock *sk)
- 	struct hash_ctx *ctx;
- 	unsigned int len = sizeof(*ctx) + crypto_ahash_reqsize(tfm);
+diff --git a/crypto/algif_rng.c b/crypto/algif_rng.c
+index a9fb492e929a..f609463f9e14 100644
+--- a/crypto/algif_rng.c
++++ b/crypto/algif_rng.c
+@@ -244,11 +244,10 @@ static int rng_accept_parent(void *private, struct sock *sk)
+ 	struct alg_sock *ask = alg_sk(sk);
+ 	unsigned int len = sizeof(*ctx);
  
 -	ctx = sock_kmalloc(sk, len, GFP_KERNEL);
 +	ctx = sock_kzalloc(sk, len, GFP_KERNEL);
@@ -94,5 +80,5 @@ index 4d3dfc60a16a..02c0e448390d 100644
  
 -	memset(ctx, 0, len);
  	ctx->len = len;
- 	crypto_init_wait(&ctx->wait);
  
+ 	/*
