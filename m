@@ -1,40 +1,42 @@
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D502D39EF2A
-	for <linux-crypto@vger.kernel.org>; Thu, 28 May 2026 09:09:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84EB73A3E68
+	for <linux-crypto@vger.kernel.org>; Thu, 28 May 2026 09:09:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779959363; cv=none; b=JdBL2emO+lZMXTKYjPJ39cnOnhZjUrDmrc1qKAPtI0q1HsZkVFbVEmYIc/fgJzf3p2Up5AJiM6m2Yw5FwK4RDl08nmN28+1Eq4IuTLIYyClsRQbUNdeWFXb5jZcuCMetB877PZzTpb4VR4zOnediMy3VETHGaAfgPzT0Ki/KwUU=
+	t=1779959365; cv=none; b=WX9C2wGMXDAmge89DYmYYcgPhDYNS0IMiC0lkCZsCDXyP58m8ZmrHzxNVnKLku0XSIqGXdiy4onMt1Vr0sJ1dr5Uir9uK2am1G/SbeBYK+liA15C9Lc7G9qMGFiVQ6uhZ4Xi4FWflLH1eVwU2tCitJlRApWhruQTAv/T8ATrPQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779959363; c=relaxed/simple;
-	bh=Qg35VnKR+yeiqLVcXImLUlEfa3huI2wAL13bmSWF0ig=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=t2kCtcJnJIWNxTEEbWAGiMs5Xv/ptD5w7fP3F5Lq1spIiqzUNme5vrmitZ1GyJ4AqhTXMwWM12leHBLT5GqfRMP2vUqkMS7KTQ9OZE29IEPXItQPDhH2XuKCqWX+gpt+RGSvJ27RcPgE62U1JmF18pc0cqU4pN4Vs2gJOJfBV40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=qMNGZS0g; arc=none smtp.client-ip=185.246.84.56
+	s=arc-20240116; t=1779959365; c=relaxed/simple;
+	bh=ta/Smu01jyKJATz3JseyekU4VD8FhqAsrm9jyf6++EE=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=RcFJ/QsVjV2SFOWjCnq/uTG05sovljbz3XOPr2LpWBizEeLFnUHTew7igVXb4Efhji1FrmaNOSCpE1Gy9ONzx+Uy/+OPOIm0XkColXDJlc90LXtqfTMKzQEOmia1NEZndW3mcxdFD3PMnxlmIBWjnOat28kgqryfcs84rntYleA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Zb86Fy2/; arc=none smtp.client-ip=185.246.85.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="qMNGZS0g"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Zb86Fy2/"
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 298241A36FC;
-	Thu, 28 May 2026 09:09:18 +0000 (UTC)
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 4224C4E42D77
+	for <linux-crypto@vger.kernel.org>; Thu, 28 May 2026 09:09:19 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id E635960495;
-	Thu, 28 May 2026 09:09:17 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 0C40410888508;
-	Thu, 28 May 2026 11:09:10 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 002EE60495;
+	Thu, 28 May 2026 09:09:19 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7FDB410888C9C;
+	Thu, 28 May 2026 11:09:17 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1779959357; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding; bh=dIQTh7JvbFjjKYumguQcjN0HHC3JAU8L3VHuBNTHH7E=;
-	b=qMNGZS0gVt0cQ7H8AiZn72scID9oz+fJHgVwAIpTOPs0tlOnb5WtfEHuW78iDeMrDkk5Xg
-	dD5Him8+nBmcvqDjLzuKlGRMN9sOmlX1J02VZVqm2SAqDhCVwvxu90Z/DwWomY7BphgUA8
-	ViBFrAponSfQVSmwABrHFrnb5bZv8MzENw2I80bbdQUCI2W+/kJt8cYEqVzbubzs2D96Dg
-	9MS9sZxc4t4bxn2CrozYOEQt+qRWrXe3Y1NgIEiDvoBUZ8ba3+1e/R1lQq3kDcwVA9xt91
-	ZW+0y+lBBdIINtolzLanOCg4i7i+kN00stppUiGiSmIUbbvYQ868IkiHXKhffA==
+	t=1779959358; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=ZAOYyGzuVeJEfkfZdY1hEMakzXPko6Rfa4nzO14aFhQ=;
+	b=Zb86Fy2/3YyPjNSySIXug/XTLo3TyIQ09pqoU/sPtvuBDgjAGBzM5UdYny8X1SjiYupBsE
+	x344xYyDSCaovLA9kbYmjFiEFPrRVLPYegN0twfjBEPZwQHzspPXFPEUh9CQuwXtObdJKf
+	ILRJytY+WryR3bVfzc3fPRCnLMRCLBtU6gfsvVElmnRYVaCXYPNwHc7IUHMPLquxUE90vq
+	dg4/Sn/ZIzgUGjG/pJF+IabHRnCU6sdIAZ0LMju46BCMUezh9iCSVVr06yJN+Ef7qhTMbk
+	oZOvhx9wtcDMSDS/WaD9Ab/Jt5ka53ptj3+XSTJPUKg76jQxKwtOGuiMQbMv3w==
 From: Paul Louvel <paul.louvel@bootlin.com>
-Subject: [PATCH 00/29] crypto: talitos - Driver cleanup
-Date: Thu, 28 May 2026 11:08:13 +0200
-Message-Id: <20260528-7-1-rc1_talitos_cleanup-v1-0-cb1ad6cdea49@bootlin.com>
+Date: Thu, 28 May 2026 11:08:14 +0200
+Subject: [PATCH 01/29] crypto: talitos/hash - Use CRYPTO_AHASH_BLOCK_ONLY
+ API
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -43,12 +45,9 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/02O3YrCMBBGX6XMtYFO0p+0ryJSJsnUjdTGTVJZE
- N9941ZkLw98c+Y8IHH0nGCsHhD57pMPawE8VGC/aD2z8K4wyFp2dYta9AJFtDhlWnwOabIL07r
- dxCAVUtewHGaCcn2LPPufP/PxtHPazIVtfunei8jfW3mZ9xkYSixsuF59HitntBlmKXutFPcv7
- dw01KIkQtaaOtmalpyG/6ljtYfWjTAh5MWvU5HnT3ViO5ntXMoEKuwGdnXvnB3vCk7P5y8mBe6
- ADgEAAA==
-X-Change-ID: 20260518-7-1-rc1_talitos_cleanup-9231a64e29fa
+Message-Id: <20260528-7-1-rc1_talitos_cleanup-v1-1-cb1ad6cdea49@bootlin.com>
+References: <20260528-7-1-rc1_talitos_cleanup-v1-0-cb1ad6cdea49@bootlin.com>
+In-Reply-To: <20260528-7-1-rc1_talitos_cleanup-v1-0-cb1ad6cdea49@bootlin.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>, 
  "David S. Miller" <davem@davemloft.net>
 Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
@@ -56,134 +55,380 @@ Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
  Christophe Leroy <chleroy@kernel.org>, linux-crypto@vger.kernel.org, 
  linux-kernel@vger.kernel.org, Paul Louvel <paul.louvel@bootlin.com>
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1779959350; l=6001;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1779959350; l=13750;
  i=paul.louvel@bootlin.com; s=20260313; h=from:subject:message-id;
- bh=Qg35VnKR+yeiqLVcXImLUlEfa3huI2wAL13bmSWF0ig=;
- b=PmsJf/DfUjuFpBpjyThMuUQBzNNrlcXB0niqym6bUqr474jIoMzuO1K2HQhHcPW1AS6d8rXV/
- OtNKD5i7bi1BGIkiT10yiHX8ojBgtkxnRnQhv4eIK56NVIiddQQFbYg
+ bh=ta/Smu01jyKJATz3JseyekU4VD8FhqAsrm9jyf6++EE=;
+ b=ij3JRthNFotaxPoUcPZ0DNg222To74uVJlPO0poTAQgrXJKREogDq+FRXoboXc0hCC1ZJMbyF
+ cKH8RoQGky4A85fzUoGXNuSYbETaB+G5NDEdAsjoUayf8Qr9DOpG1DE
 X-Developer-Key: i=paul.louvel@bootlin.com; a=ed25519;
  pk=eLW50NT18UAvUT5cAcYf88zNbBCZDLFXuptpyLVhVIU=
 X-Last-TLS-Session-Version: TLSv1.3
 
-The Freescale Integrated Security Engine (SEC) aka "Talitos" driver
-implementation is a monolithic ~3800-line file that mixes SEC1 and SEC2
-hardware variants with hash, skcipher, aead and hwrng algorithm.
+The hash implementation maintained a software buffer to accumulate
+partial blocks across update() calls, copying data to/from scatterlists
+with sg_copy_to_buffer()/sg_pcopy_to_buffer() and chaining in a virtual
+scatterlist entry.  This is unnecessary now with
+CRYPTO_AHASH_ALG_BLOCK_ONLY flag.
 
-This series reorganises the driver to improve readability and
-maintainability.
-One of the main motivation for this series is to eleminate all the
-conditionals around the has_ftr_sec1(). Some checks still remains in
-crypto algorithm implementation at the end of the series.
-
-Patch 1 adds the CRYPTO_AHASH_ALG_BLOCK_ONLY flag for the ahash
-implementation to eliminate manual partial-block buffering.
-
-Driver reorganisation (patches 2-9):
-
-  Move the driver into a dedicated directory, split the different crypto
-  implementation into dedicated translation units.
-
-Algorithm definition cleanup (patches 10-17):
-
-  Remove algorithm property mutations from the registration loop, delete
-  the now-unused priority field in struct talitos_alg_template, and
-  convert hash, skcipher and aead to the type-specific init_tfm/exit_tfm
-  API, replacing the deprecated cra_init/cra_exit fields.
-
-  Use preprocessor macros to deduplicate the hash, skcipher and aead
-  algorithm definitions.
-
-SEC1/SEC2 ops abstraction (patches 18-27):
-
-  Introduce struct talitos_ops, split SEC1/SEC2-specific
-  code into separate function variants, and replace runtime is_sec1
-  conditionals with indirect calls through the ops table.
-
-  Export common channel and error handling routines, and move SEC1 and
-  SEC2 ops into dedicated translation units.
-
-  Introduce struct talitos_ptr_ops to abstract SEC1/SEC2 pointer
-  helpers behind per-SEC-version ops, then remove the now-unused
-  global pointer helper functions.
-
-  Introduce per-SEC-version descriptor structures and ops.
-
-Patch 28 cleans up the includes in the core driver file now that all
-crypto implementation code has been moved out.
-
-Patch 29 removes a now-useless macro.
-
-No functional changes are intended for patches 2-29.
-
-This series depends on the "crypto: talitos - bug fixes" series :
-https://patch.msgid.link/20260507-bootlin_test-7-1-rc1_sec_bugfix-v3-0-c98d7589b942@bootlin.com
+Remove unnecessary fields in the request and export structure. On
+completion, pass any remaining tail bytes back via
+ahash_request_complete() so that the core re-submits them with the next
+request.
 
 Signed-off-by: Paul Louvel <paul.louvel@bootlin.com>
 ---
-Paul Louvel (29):
-      crypto: talitos/hash - Use CRYPTO_AHASH_BLOCK_ONLY API
-      crypto: talitos - Move driver into dedicated directory
-      crypto: talitos - Add missing includes to driver header file
-      crypto: talitos/hwrng - Move into separate file
-      crypto: talitos - Prepare crypto implementation file splitting
-      crypto: talitos - Introduce registration helper
-      crypto: talitos/hash - Move into separate file
-      crypto: talitos/skcipher - Move into separate file
-      crypto: talitos/aead - Move into separate file
-      crypto: talitos - Remove alg settings in talitos_register_common()
-      crypto: talitos - Remove unused priority field in struct talitos_alg_template
-      crypto: talitos/hash - Convert to init_tfm/exit_tfm type-specific API
-      crypto: talitos/skcipher - Convert to init/exit type-specific API
-      crypto: talitos/aead - Convert to init/exit type-specific API
-      crypto: talitos/hash - Use macro for algorithm definitions
-      crypto: talitos/skcipher - Use macro for algorithm definitions
-      crypto: talitos/aead - Use macro for algorithm definitions
-      crypto: talitos - Split SEC1/SEC2 code into separate function variants
-      crypto: talitos - Introduce struct talitos_ops
-      crypto: talitos - Replace SEC1/SEC2 conditionals with ops dispatch
-      crypto: talitos - Export common channel and error handling routines
-      crypto: talitos - Move SEC1 ops into talitos-sec1.c
-      crypto: talitos - Move SEC2 ops into talitos-sec2.c
-      crypto: talitos - Introduce per-SEC-version pointer helper ops
-      crypto: talitos - Dispatch pointer helpers through ptr_ops
-      crypto: talitos - Remove now-unused global pointer helpers
-      crypto: talitos - Introduce per-SEC-version descriptor structures and ops
-      crypto: talitos - Clean up includes in core driver file
-      crypto: talitos - Remove TALITOS_DESC_SIZE macro
+ drivers/crypto/talitos.c | 149 ++++++++++++++++++-----------------------------
+ 1 file changed, 57 insertions(+), 92 deletions(-)
 
- drivers/crypto/Kconfig                    |   38 +-
- drivers/crypto/Makefile                   |    2 +-
- drivers/crypto/talitos.c                  | 3640 -----------------------------
- drivers/crypto/talitos/Kconfig            |   36 +
- drivers/crypto/talitos/Makefile           |    6 +
- drivers/crypto/talitos/talitos-aead.c     |  677 ++++++
- drivers/crypto/talitos/talitos-hash.c     |  711 ++++++
- drivers/crypto/talitos/talitos-rng.c      |   93 +
- drivers/crypto/talitos/talitos-sec1.c     |  374 +++
- drivers/crypto/talitos/talitos-sec2.c     |  404 ++++
- drivers/crypto/talitos/talitos-skcipher.c |  364 +++
- drivers/crypto/talitos/talitos.c          |  917 ++++++++
- drivers/crypto/{ => talitos}/talitos.h    |  255 +-
- 13 files changed, 3810 insertions(+), 3707 deletions(-)
----
-base-commit: db8b9f227833e729faf44a512aa1e88a625b5ad8
-change-id: 20260518-7-1-rc1_talitos_cleanup-9231a64e29fa
-prerequisite-change-id: 20260504-bootlin_test-7-1-rc1_sec_bugfix-13169ed07ddc:v3
-prerequisite-patch-id: 7b364911e4b8d1c1033eb14e67ed24dac6a4bc13
-prerequisite-patch-id: 2c1cd7fdd003d9a116a697efa25d1716d548389f
-prerequisite-patch-id: b12bdbf565747609e0cfe0609a42cf69b5d816a1
-prerequisite-patch-id: 72cb2bc0fc2a48a5a029b049c199f4c86085cf04
-prerequisite-patch-id: 5f1f5ad6add760161bd48875df48c0893aa12613
-prerequisite-patch-id: 934931086968229434d15a2f2358aeb7e6975a1d
-prerequisite-patch-id: 8a0b4828fc0690e0c841bc9adcc6568bb522e0e8
-prerequisite-patch-id: 1d870f32e7dbf9a8bd3b8979558544107693e0f4
-prerequisite-patch-id: 758c18d7c9fabb14bd90df62e5e8a62a6f880db4
-prerequisite-patch-id: ce6e9e585f8edc1861ae6bb8fbdd836c20cbd290
-prerequisite-patch-id: 9446dc03e442ea81c5f5b39e802e01b37da29971
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index 584508963241..3610d9f6d5ea 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -941,25 +941,18 @@ struct talitos_ctx {
+ struct talitos_ahash_req_ctx {
+ 	u32 hw_context[TALITOS_MDEU_MAX_CONTEXT_SIZE / sizeof(u32)];
+ 	unsigned int hw_context_size;
+-	u8 buf[2][HASH_MAX_BLOCK_SIZE];
+-	int buf_idx;
+ 	unsigned int swinit;
+ 	unsigned int first_request;
+ 	unsigned int last_request;
+ 	unsigned int to_hash_later;
+-	unsigned int nbuf;
+-	struct scatterlist bufsl[2];
+-	struct scatterlist *psrc;
+ };
+ 
+ struct talitos_export_state {
+ 	u32 hw_context[TALITOS_MDEU_MAX_CONTEXT_SIZE / sizeof(u32)];
+-	u8 buf[HASH_MAX_BLOCK_SIZE];
+ 	unsigned int swinit;
+ 	unsigned int first_request;
+ 	unsigned int last_request;
+ 	unsigned int to_hash_later;
+-	unsigned int nbuf;
+ };
+ 
+ static int aead_setkey(struct crypto_aead *authenc,
+@@ -1826,14 +1819,8 @@ static void ahash_done(struct device *dev,
+ 	struct talitos_edesc *next;
+ 
+ 	if (is_sec1) {
+-		if (!req_ctx->last_request && req_ctx->to_hash_later) {
+-			/* Position any partial block for next update/final/finup */
+-			req_ctx->buf_idx = (req_ctx->buf_idx + 1) & 1;
+-			req_ctx->nbuf = req_ctx->to_hash_later;
+-		}
+-
+ 		free_edesc_list_from(areq, edesc);
+-		ahash_request_complete(areq, err);
++		ahash_request_complete(areq, err ?: req_ctx->to_hash_later);
+ 	} else {
+ 		next = edesc->next_desc;
+ 
+@@ -1851,14 +1838,9 @@ static void ahash_done(struct device *dev,
+ 			return;
+ 		}
+ out:
+-		if (!req_ctx->last_request && req_ctx->to_hash_later) {
+-			/* Position any partial block for next update/final/finup */
+-			req_ctx->buf_idx = (req_ctx->buf_idx + 1) & 1;
+-			req_ctx->nbuf = req_ctx->to_hash_later;
+-		}
+ 		if (err && next)
+ 			free_edesc_list_from(areq, next);
+-		ahash_request_complete(areq, err);
++		ahash_request_complete(areq, err ?: req_ctx->to_hash_later);
+ 	}
+ }
+ 
+@@ -1978,7 +1960,7 @@ ahash_process_req_prepare(struct ahash_request *areq, unsigned int nbytes,
+ 	size_t offset = 0;
+ 
+ 	do {
+-		src = scatterwalk_ffwd(tmp, req_ctx->psrc, offset);
++		src = scatterwalk_ffwd(tmp, areq->src, offset);
+ 
+ 		to_hash_this_desc =
+ 			min(nbytes, ALIGN_DOWN(desc_max, blocksize));
+@@ -1991,8 +1973,7 @@ ahash_process_req_prepare(struct ahash_request *areq, unsigned int nbytes,
+ 			return edesc;
+ 		}
+ 
+-		edesc->src =
+-			scatterwalk_ffwd(edesc->bufsl, req_ctx->psrc, offset);
++		edesc->src = scatterwalk_ffwd(edesc->bufsl, areq->src, offset);
+ 		edesc->desc.hdr = ctx->desc_hdr_template;
+ 		edesc->first = offset == 0;
+ 		edesc->last = nbytes - to_hash_this_desc == 0;
+@@ -2045,62 +2026,17 @@ static int ahash_process_req(struct ahash_request *areq, unsigned int nbytes)
+ 	bool is_sec1 = has_ftr_sec1(dev_get_drvdata(ctx->dev));
+ 	unsigned int nbytes_to_hash;
+ 	unsigned int to_hash_later;
+-	unsigned int nsg;
+-	int nents;
+ 	struct device *dev = ctx->dev;
+-	u8 *ctx_buf = req_ctx->buf[req_ctx->buf_idx];
+ 	int ret;
+ 
+-	if (!req_ctx->last_request && (nbytes + req_ctx->nbuf <= blocksize)) {
+-		/* Buffer up to one whole block */
+-		nents = sg_nents_for_len(areq->src, nbytes);
+-		if (nents < 0) {
+-			dev_err(dev, "Invalid number of src SG.\n");
+-			return nents;
+-		}
+-		sg_copy_to_buffer(areq->src, nents,
+-				  ctx_buf + req_ctx->nbuf, nbytes);
+-		req_ctx->nbuf += nbytes;
+-		return 0;
+-	}
+-
+-	/* At least (blocksize + 1) bytes are available to hash */
+-	nbytes_to_hash = nbytes + req_ctx->nbuf;
+-	to_hash_later = nbytes_to_hash & (blocksize - 1);
++	nbytes_to_hash = ALIGN_DOWN(nbytes, blocksize);
++	to_hash_later = nbytes - nbytes_to_hash;
+ 
+-	if (req_ctx->last_request)
++	if (req_ctx->last_request) {
++		nbytes_to_hash = nbytes;
+ 		to_hash_later = 0;
+-	else if (to_hash_later)
+-		/* There is a partial block. Hash the full block(s) now */
+-		nbytes_to_hash -= to_hash_later;
+-	else {
+-		/* Keep one block buffered */
+-		nbytes_to_hash -= blocksize;
+-		to_hash_later = blocksize;
+-	}
+-
+-	/* Chain in any previously buffered data */
+-	if (req_ctx->nbuf) {
+-		nsg = (req_ctx->nbuf < nbytes_to_hash) ? 2 : 1;
+-		sg_init_table(req_ctx->bufsl, nsg);
+-		sg_set_buf(req_ctx->bufsl, ctx_buf, req_ctx->nbuf);
+-		if (nsg > 1)
+-			sg_chain(req_ctx->bufsl, 2, areq->src);
+-		req_ctx->psrc = req_ctx->bufsl;
+-	} else
+-		req_ctx->psrc = areq->src;
+-
+-	if (to_hash_later) {
+-		nents = sg_nents_for_len(areq->src, nbytes);
+-		if (nents < 0) {
+-			dev_err(dev, "Invalid number of src SG.\n");
+-			return nents;
+-		}
+-		sg_pcopy_to_buffer(areq->src, nents,
+-				   req_ctx->buf[(req_ctx->buf_idx + 1) & 1],
+-				      to_hash_later,
+-				      nbytes - to_hash_later);
+ 	}
++
+ 	req_ctx->to_hash_later = to_hash_later;
+ 
+ 	edesc = ahash_process_req_prepare(areq, nbytes_to_hash, blocksize,
+@@ -2125,8 +2061,6 @@ static int ahash_init(struct ahash_request *areq)
+ 	dma_addr_t dma;
+ 
+ 	/* Initialize the context */
+-	req_ctx->buf_idx = 0;
+-	req_ctx->nbuf = 0;
+ 	req_ctx->first_request = 1;
+ 	req_ctx->swinit = 0; /* assume h/w init of context */
+ 	size =	(crypto_ahash_digestsize(tfm) <= SHA256_DIGEST_SIZE)
+@@ -2223,12 +2157,10 @@ static int ahash_export(struct ahash_request *areq, void *out)
+ 
+ 	memcpy(export->hw_context, req_ctx->hw_context,
+ 	       req_ctx->hw_context_size);
+-	memcpy(export->buf, req_ctx->buf[req_ctx->buf_idx], req_ctx->nbuf);
+ 	export->swinit = req_ctx->swinit;
+ 	export->first_request = req_ctx->first_request;
+ 	export->last_request = req_ctx->last_request;
+ 	export->to_hash_later = req_ctx->to_hash_later;
+-	export->nbuf = req_ctx->nbuf;
+ 
+ 	return 0;
+ }
+@@ -2249,12 +2181,10 @@ static int ahash_import(struct ahash_request *areq, const void *in)
+ 			: TALITOS_MDEU_CONTEXT_SIZE_SHA384_SHA512;
+ 	req_ctx->hw_context_size = size;
+ 	memcpy(req_ctx->hw_context, export->hw_context, size);
+-	memcpy(req_ctx->buf[0], export->buf, export->nbuf);
+ 	req_ctx->swinit = export->swinit;
+ 	req_ctx->first_request = export->first_request;
+ 	req_ctx->last_request = export->last_request;
+ 	req_ctx->to_hash_later = export->to_hash_later;
+-	req_ctx->nbuf = export->nbuf;
+ 
+ 	dma = dma_map_single(dev, req_ctx->hw_context, req_ctx->hw_context_size,
+ 			     DMA_TO_DEVICE);
+@@ -2932,8 +2862,11 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_name = "md5",
+ 				.cra_driver_name = "md5-talitos",
+ 				.cra_blocksize = MD5_HMAC_BLOCK_SIZE,
++				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
+-					     CRYPTO_ALG_ALLOCATES_MEMORY,
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
++					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
++					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+@@ -2948,8 +2881,11 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_name = "sha1",
+ 				.cra_driver_name = "sha1-talitos",
+ 				.cra_blocksize = SHA1_BLOCK_SIZE,
++				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
+-					     CRYPTO_ALG_ALLOCATES_MEMORY,
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
++					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
++					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+@@ -2964,8 +2900,11 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_name = "sha224",
+ 				.cra_driver_name = "sha224-talitos",
+ 				.cra_blocksize = SHA224_BLOCK_SIZE,
++				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
+-					     CRYPTO_ALG_ALLOCATES_MEMORY,
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
++					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
++					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+@@ -2980,8 +2919,11 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_name = "sha256",
+ 				.cra_driver_name = "sha256-talitos",
+ 				.cra_blocksize = SHA256_BLOCK_SIZE,
++				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
+-					     CRYPTO_ALG_ALLOCATES_MEMORY,
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
++					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
++					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+@@ -2996,8 +2938,11 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_name = "sha384",
+ 				.cra_driver_name = "sha384-talitos",
+ 				.cra_blocksize = SHA384_BLOCK_SIZE,
++				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
+-					     CRYPTO_ALG_ALLOCATES_MEMORY,
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
++					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
++					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+@@ -3012,8 +2957,11 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_name = "sha512",
+ 				.cra_driver_name = "sha512-talitos",
+ 				.cra_blocksize = SHA512_BLOCK_SIZE,
++				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
+-					     CRYPTO_ALG_ALLOCATES_MEMORY,
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
++					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
++					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+@@ -3028,8 +2976,11 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_name = "hmac(md5)",
+ 				.cra_driver_name = "hmac-md5-talitos",
+ 				.cra_blocksize = MD5_HMAC_BLOCK_SIZE,
++				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
+-					     CRYPTO_ALG_ALLOCATES_MEMORY,
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
++					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
++					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+@@ -3044,8 +2995,11 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_name = "hmac(sha1)",
+ 				.cra_driver_name = "hmac-sha1-talitos",
+ 				.cra_blocksize = SHA1_BLOCK_SIZE,
++				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
+-					     CRYPTO_ALG_ALLOCATES_MEMORY,
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
++					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
++					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+@@ -3060,8 +3014,11 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_name = "hmac(sha224)",
+ 				.cra_driver_name = "hmac-sha224-talitos",
+ 				.cra_blocksize = SHA224_BLOCK_SIZE,
++				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
+-					     CRYPTO_ALG_ALLOCATES_MEMORY,
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
++					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
++					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+@@ -3076,8 +3033,11 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_name = "hmac(sha256)",
+ 				.cra_driver_name = "hmac-sha256-talitos",
+ 				.cra_blocksize = SHA256_BLOCK_SIZE,
++				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
+-					     CRYPTO_ALG_ALLOCATES_MEMORY,
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
++					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
++					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+@@ -3092,8 +3052,11 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_name = "hmac(sha384)",
+ 				.cra_driver_name = "hmac-sha384-talitos",
+ 				.cra_blocksize = SHA384_BLOCK_SIZE,
++				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
+-					     CRYPTO_ALG_ALLOCATES_MEMORY,
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
++					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
++					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+@@ -3108,8 +3071,11 @@ static struct talitos_alg_template driver_algs[] = {
+ 				.cra_name = "hmac(sha512)",
+ 				.cra_driver_name = "hmac-sha512-talitos",
+ 				.cra_blocksize = SHA512_BLOCK_SIZE,
++				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
+ 				.cra_flags = CRYPTO_ALG_ASYNC |
+-					     CRYPTO_ALG_ALLOCATES_MEMORY,
++					     CRYPTO_ALG_ALLOCATES_MEMORY |
++					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
++					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
+ 			}
+ 		},
+ 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
+@@ -3181,7 +3147,6 @@ static int talitos_cra_init_ahash(struct crypto_tfm *tfm)
+ 				   algt.alg.hash);
+ 
+ 	ctx->keylen = 0;
+-	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
+ 				 sizeof(struct talitos_ahash_req_ctx));
+ 
+ 	return talitos_init_common(ctx, talitos_alg);
 
-Best regards,
---  
-Paul Louvel, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+-- 
+2.54.0
 
