@@ -1,208 +1,431 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFCB33E63A3
-	for <linux-crypto@vger.kernel.org>; Thu, 28 May 2026 11:55:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 334663E120D;
+	Thu, 28 May 2026 11:57:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779969304; cv=none; b=CssZFo3tnM82Yf6dVoZxl6CuTo61970D+MexLOEI4cM1ggAqAWMqRz95WcDkQHRuRQyIqy3d8PoNo0ijbZRONg63GAS3dGnhDq/rU/J0X19bXwjVQoK26Zp2dpvvCZs6JkQEvwkR6OMf7eRWBgRSHm7jyElFonNfeoF0vaP5Q8A=
+	t=1779969428; cv=none; b=sX9rjlO2C8KV4zVOL49+KnhsKX969VX9HlZWLVMZUY1Gfr/tTFrEb51hAJv/Fprf2ygrGeJkZj59fWC71SrXVNdQ8UdXIbywILpc42PM9iq4SXtmXhMpji3RFbGymeeNUHg4Tfa/rG+5O0yeZBSCVTbdk8P/JHswiuehLuYNglk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779969304; c=relaxed/simple;
-	bh=ESZdAJkvYN+GKJn/c6N2sSmBuX0qgNWKfn+CcPsIkuo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=geCzcwJQlAiCBGktgoMGi3S9leXbIat6xnPPfhdf56daDqCnQ71S9QIzKBQeVwYEmDXGWDQGOMEPCUJCcXTEQuyg4mZChJCBYJbVURqb/TwVe3PeE8B6MRXBVDfqavBT/rBVa4MPOTVHnEvBYXl2nDg1yyV1+nRWzEvOxRSTpe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=C0PebDQ2; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=RSaRxZ0a; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1779969428; c=relaxed/simple;
+	bh=Kq7Jhc7sY6IWnEPiN9ZM8FDbf6iXNUP8WHHQxnxQ+mA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JW0iAwyjNnQJM8wdoyJaXZhXMvCIHfB+BgOk8P2mKxX4721bhNk7OOnLrouWN8Baf6Ys55x/g+AYbm35CDnav7OocWhk8+d6w38IkQCiNf38a5HR1V/rMYgNotvILzjtUFT0MtHCBO6QnF41LTuOB4DWSPWTs76nhUffT5to6B8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=LObiiKfO; arc=none smtp.client-ip=113.46.200.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="C0PebDQ2";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="RSaRxZ0a"
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64S8vU043203254
-	for <linux-crypto@vger.kernel.org>; Thu, 28 May 2026 11:55:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	xwgyWXl/wbAR1I0i1THed+XapjmeMAOQHW+lUWk4Flo=; b=C0PebDQ2V5/4638E
-	JTnPHae4r49IccWGKPrq7STAqtJjbTaOeVJZHcUp7VzeHsjY5NEJIILjJl7XtsD5
-	yCL3+680nVwJsI8EZHXOK9O7QfcJcfszTmBmQ8ko2oMpnzQLGc7mpaOZ9C55NEzG
-	cyzKnLCwPdBIE5VrPP/mVXajQk6/NxC0Q2VG8X92YCAMTrhy1O0XpwMbHmj5aetj
-	5Hz0IrJ4vEJky7+4AzenSgLUj2K9fq8SO7tlconxL2CMB+V5rxefRbkf5eMWN+Fn
-	ymbYOAmTO6qLPMfqNWjnbOaY/u7UBb3IRDlf2KJdtX9d2wC5EYdNm9Py3icEQzA3
-	f5JWlA==
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ee7ynjkun-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Thu, 28 May 2026 11:55:00 +0000 (GMT)
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-2ba718173d1so83750745ad.0
-        for <linux-crypto@vger.kernel.org>; Thu, 28 May 2026 04:55:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1779969300; x=1780574100; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xwgyWXl/wbAR1I0i1THed+XapjmeMAOQHW+lUWk4Flo=;
-        b=RSaRxZ0arTI+iAsesq9XUhByNm12dpuTrotCiqq1zSfdJD59ypBI4/XlZ9RwP2HSJO
-         5JSuMgNCmSFZ1B+RP9we2smMw+dsYxWmlnJ2X7WAy0Dbfl4a7z2IHd1XZzytob/i6T0m
-         Jyr2rpLkkfy5IUQWayRH4npy1nmF0kfCVS5xuH+BZvktMP4UQ9Fwp6ecOHq1yRWjZo00
-         QSSVm71wK8XStyuNotAL0JuKs52di82bVbMDezw/tF60LrWqO+Oua7QOUauxaX76UWkS
-         ZafiwEdfTfNwmg/o6To2thBRmkOeeVXO3IvpJa1VM4Hk6ZvVNY8otbnaxFIux+l9VqQz
-         SZtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779969300; x=1780574100;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xwgyWXl/wbAR1I0i1THed+XapjmeMAOQHW+lUWk4Flo=;
-        b=rhwhGFCFraIXFy4fa3sfGZmGC9XqYrHvjvStWeb+pm3WOwO6Fnvb11b3hi/H1ORcpz
-         IIKTbPY4CVeWDKLPv7TlKSdZP9fY8zhxYW0O3j/KHiEFptqbAxrc7TFuTpcsjjyCjhe3
-         lu9b4nn710vmPOBcXIgyduMgjEQJwDE9PXEmyzXmfl1GDuA/Es7gsV725KIfLCNYvfsx
-         kDXX/xTa784Y8LZwsHKrM2d+XSXECszi/QEvoyMWbdOnNg3HlXj1GZyUdj3vws/iQ3VW
-         W+clgGpBVr/wHtfuG57xXpTZfDh5rCwxwOy9TcIXrE/hNcKWh5cgT7XkVC4I/SWnB8M4
-         B3dg==
-X-Forwarded-Encrypted: i=1; AFNElJ8zLoEYlKwIpxx7KBKSmz0RUbBrqe9+dsVznExx1oIn9yzlYFGKVOj4p9OVhKzKrFMdKj4Chp8rAj/++uA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyyJyPI44/mKvYlA48LTtWxRX/BL8mkmvVTW9+NeACcSEqgLWR7
-	0lK5D5oIakWyCJZLZuYixuwV5RmR1qo8JHVVJ5ljUP2wZHxdTzj+9z2uKmHNHtIMgqTzdDsJncu
-	h/+bZzdWuO4Oi9lNqhAXOXfW7lZtkRJPOyDZqPvla2IW6cerO3NdGFi+AIxe0zfzCnHA=
-X-Gm-Gg: Acq92OESzmerBVcESZN533Ra8+xjSJYub4qpwvIUGhlvpuyyOWJFd4rU/BlUr2ZH/MW
-	eCCvGY5Z93eXA751wBzz0JQ0KtQjY/A17MVerKNJ1lIowanYu9nWRz9tnVsBHcO0aOicdiazPOI
-	rpZLhofwR1i6PEoyhZfiRCY5nfDxYtpvSy2doeF4/2AVs+C28ESesPElrUwX8lwrZg2BHWEqTrs
-	vo8ppE2FUnl4U5PPK4uElZ0sk6d9wqdLpw3hrkE854KDS0T+bdyrI/aVFzTbdh7UlRC2OyjUuGE
-	tzdebFrRKnO+dHyKRBL+SBbNm3UNK7PemJrQTtuOU75hfZ3V+r8N2FCvZicbDIgPMDffZeZRHeS
-	rji2GjmrnB3pZ29f3OuI1UT1nBZih4ilf1pTMCr8F5iwKSzzL6+9InQgiexuG
-X-Received: by 2002:a17:903:1c9:b0:2bf:b17:ae3c with SMTP id d9443c01a7336-2bf0b17b382mr25105475ad.25.1779969300017;
-        Thu, 28 May 2026 04:55:00 -0700 (PDT)
-X-Received: by 2002:a17:903:1c9:b0:2bf:b17:ae3c with SMTP id d9443c01a7336-2bf0b17b382mr25105155ad.25.1779969299521;
-        Thu, 28 May 2026 04:54:59 -0700 (PDT)
-Received: from [192.168.1.8] ([223.190.84.8])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bf0534e4c2sm21854595ad.5.2026.05.28.04.54.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 May 2026 04:54:59 -0700 (PDT)
-Message-ID: <e49c4a45-6455-47f3-a91f-c32c1a0b99be@oss.qualcomm.com>
-Date: Thu, 28 May 2026 17:24:51 +0530
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="LObiiKfO"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=fbf7Hj3PIukobsWSY9514/dVnqMJTTqdf0sVvSUGSbk=;
+	b=LObiiKfOiXnnyf84BBNodtE/inh07mxr9Q0GdjyQxniePDWO/yL98vvXn7WNOMc5V9a4Ce2UT
+	CosICgvaOSVs/j2WSdz80QOhgGsQ5r5N2xgVRoyBsudA7XrCD73YiLTauVRSLdndlx5byaZNzxF
+	rQnTc96YjZU+xBblJVJjGww=
+Received: from mail.maildlp.com (unknown [172.19.163.214])
+	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4gR4X03LYlznTc6;
+	Thu, 28 May 2026 19:49:04 +0800 (CST)
+Received: from kwepemr100008.china.huawei.com (unknown [7.202.195.119])
+	by mail.maildlp.com (Postfix) with ESMTPS id EBAEC4056C;
+	Thu, 28 May 2026 19:57:00 +0800 (CST)
+Received: from localhost.localdomain (10.50.163.32) by
+ kwepemr100008.china.huawei.com (7.202.195.119) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.36; Thu, 28 May 2026 19:57:00 +0800
+From: ZongYu Wu <wuzongyu1@huawei.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<fanghao11@huawei.com>, <liulongfang@huawei.com>, <qianweili@huawei.com>,
+	<wangzhou1@hisilicon.com>, <huangchenghai2@huawei.com>,
+	<linwenkai6@hisilicon.com>
+Subject: [PATCH v2 3/5] crypto: hisilicon/hpre - implement full backlog support for hpre driver
+Date: Thu, 28 May 2026 19:55:29 +0800
+Message-ID: <20260528115531.174593-4-wuzongyu1@huawei.com>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20260528115531.174593-1-wuzongyu1@huawei.com>
+References: <20260528115531.174593-1-wuzongyu1@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/3] Add support for qcrypto on shikra
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Thara Gopinath <thara.gopinath@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
- <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, Vinod Koul <vkoul@kernel.org>,
-        Frank Li <Frank.Li@kernel.org>, Andy Gross <agross@kernel.org>,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        dmaengine@vger.kernel.org,
-        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
-        Bartosz Golaszewski <brgl@kernel.org>,
-        Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>,
-        Neeraj Soni <neeraj.soni@oss.qualcomm.com>
-References: <20260515-shikra_qcrypto-v1-0-80f07b345c29@oss.qualcomm.com>
- <20260514194735.GA1939213@google.com>
- <d4d35e17-84fa-4c95-9bfb-abfd25ea7f4a@oss.qualcomm.com>
- <20260522024912.GC5937@quark>
- <c1697372-54ec-4f57-85d9-ad375ff1a44d@oss.qualcomm.com>
- <20260525142843.GA2018@quark>
-Content-Language: en-US
-From: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
-In-Reply-To: <20260525142843.GA2018@quark>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI4MDExOSBTYWx0ZWRfX/CAm//iLTL2Q
- pQIPugMwkrBKrgZhjKz9rGnDbMxsGfJTjMqVJVaRqPR89jtba8wO+H+FX/CUduSBigZKmY8klAm
- gDy46yCeUvhypYnxDDuffuaGdFGKKctAUiQpXGWYyhj5NQAulsGvRdqgUUgKVyOnTK8C0jwXxSz
- OU8QszuilPc4pZUV5Ja9+ZDUj8V3VvA8Iu3RdCH9Q+xTB3MeO/w+mKhzJljg6ZXcyeowvdh4pwN
- xAQL1KcMFBcORuHFwqlQnXbKF2afDlogr3tpWT1kXQxFPmIpSLAnQKg4nPRC2twCkL6AqjxsQps
- 4iH21zJXic7pHR0c2zEcv26TzkMi2+iL5QoBNzxD+0HGK7nWiiKO34FEsmeSkqMVJl5ESxUIFPP
- HRXMOSgwNs1C3zesjK3LOfpMrmK/6v+0HOBP/HyKxukPicEPsfqjWs4IokNHV+uRLEcj/V5mb83
- qrkhs8hQvQJBb3kVTpw==
-X-Proofpoint-ORIG-GUID: tTik8avaqlglEDRwlIwkZvh3ngjC590u
-X-Proofpoint-GUID: tTik8avaqlglEDRwlIwkZvh3ngjC590u
-X-Authority-Analysis: v=2.4 cv=EdL4hvmC c=1 sm=1 tr=0 ts=6a182d14 cx=c_pps
- a=cmESyDAEBpBGqyK7t0alAg==:117 a=PgCQwUeJFwcsjcK5ROf6Ag==:17
- a=IkcTkHD0fZMA:10 a=NGcC8JguVDcA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yOCtJkima9RkubShWh1s:22
- a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8 a=hyd54oqyHhkzJM2O_60A:9 a=QEXdDO2ut3YA:10
- a=1OuFwYUASf3TG4hYMiVC:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-05-28_03,2026-05-28_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 priorityscore=1501 phishscore=0 clxscore=1015 bulkscore=0
- spamscore=0 adultscore=0 malwarescore=0 impostorscore=0 lowpriorityscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2605280119
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemr100008.china.huawei.com (7.202.195.119)
 
->> +Bartosz, Gaurav, Neeraj
->>
->> Hi Eric,
->>
->> GPCE is relevant in terms of providing hardware security.
->> There are multiple usecases coming up for example to handle DRM/secure
->> buffer usecases to improve overall throughput for secure content.
->>
->> Regarding performance, it's currently slower compared to arm CE but
->> provides an edge by giving hardware security which is considered more
->> secure.
->>
->> Btw, there's been performance improvement with new targets and we are
->> expecting to achieve far more better performance with new SoCs family.
->> Pakala:    GPCE - 550MBps, ARMv8 - 8GBps
->> Kaanapali: GPCE - 3GBps,   ARMv8 - 10GBps
->>
->> Please note, there's almost 5x improvement in kaanapali compared to
->> pakala. Though overall is still slower compared to arm but as mentioned,
->> expecting better performance with hardware improvements as we progress.
->>
->> Also, currently qce driver exhibit stability issues and that's what we
->> are putting effort in stabilizing the software on immediate basis.
->>
->> There's parallel effort ongoing by Bartosz to introduce baseline for
->> secure buffer usecases.
->> https://lore.kernel.org/lkml/20260522-qcom-qce-cmd-descr-v18-0-99103926bafc@oss.qualcomm.com/
->> There's active development ongoing and i believe lowering cra_priority
->> for qce is fine as of now and can scale values once qce becomes
->> performance efficient.
->>
->> Please share your thoughts. Thanks!
-> 
-> ARMv8 Crypto Extensions are "hardware" as well, just in the CPU.  They
-> provide constant-time execution, for example.
-> 
-> Granted, they don't protect from power analysis and electromagnetic
-> emanation attacks.  Does QCE actually provide those protections, though?
+From: lizhi <lizhi206@huawei.com>
 
-QCE doesn't provide these protections currently.
-What i wanted to highlight was there are certain security usecases which
-are possible via dedicated crypto engine only and not via arm cpu.
-> Either way, it doesn't really matter in this case.  There are multiple
-> aspects to security, and before even considering these advanced
-> protections, the basics of security need to be absolutely solid.  That
-> is, the driver needs to always compute the crypto algorithms correctly,
-> and it needs to be completely robust when fuzzed by unprivileged
-> userspace (because it can accessed in that way).
- > Yet, this driver "exhibits stability issues", fails the self-tests, and
-> doesn't even have exclusive access to the hardware!  These are all
-> security bugs.  That very much defeats the claimed point.  (Plus, due to
-> the performance issues no one wants to use it in Linux anyway.)
+When the hardware queue returns -EBUSY, requests are queued instead of
+being failed immediately. The driver retries queued requests from the
+completion path after earlier requests have finished.
 
-Sure, we are analyzing self-tests failures and are committed to fix any
-hung/stability issue in any aspect but i do feel it should not be a
-blocker to add new soc id support.
+This reduces request failures caused by temporary hardware congestion and
+improves throughput and stability under high load.
 
-Also, could you please elaborate more on "exclusive access to hardware"?
-Do you mean the hardware can be accessed by multiple execution
-environment like TEE and Linux?
+Signed-off-by: lizhi <lizhi206@huawei.com>
+Signed-off-by: Zongyu Wu <wuzongyu1@huawei.com>
+---
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c | 223 +++++++++++++++-----
+ 1 file changed, 166 insertions(+), 57 deletions(-)
+
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+index 09077abbf6ad..5d5c4d5a9fbc 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+@@ -30,6 +30,7 @@ struct hpre_ctx;
+ #define HPRE_DH_G_FLAG		0x02
+ #define HPRE_TRY_SEND_TIMES	100
+ #define HPRE_INVLD_REQ_ID		(-1)
++#define HPRE_ALG_TYPE_MASK	0x1F
+ 
+ #define HPRE_SQE_ALG_BITS	5
+ #define HPRE_SQE_DONE_SHIFT	30
+@@ -39,6 +40,7 @@ struct hpre_ctx;
+ #define HPRE_DFX_US_TO_NS	1000
+ 
+ #define HPRE_ENABLE_HPCORE_SHIFT	7
++#define HPRE_ECDH_CLR_DATA_SHIFT	2
+ 
+ /* due to nist p521  */
+ #define HPRE_ECC_MAX_KSZ	66
+@@ -138,6 +140,8 @@ struct hpre_asym_request {
+ 	int err;
+ 	hpre_cb cb;
+ 	struct timespec64 req_time;
++	struct crypto_async_request *base;
++	struct list_head list;
+ };
+ 
+ static inline unsigned int hpre_align_sz(void)
+@@ -241,8 +245,8 @@ static void hpre_hw_data_clr_all(struct hpre_ctx *ctx,
+ 				 struct scatterlist *dst,
+ 				 struct scatterlist *src)
+ {
+-	struct device *dev = ctx->dev;
+ 	struct hpre_sqe *sqe = &req->req;
++	struct device *dev = ctx->dev;
+ 	dma_addr_t tmp;
+ 
+ 	tmp = le64_to_cpu(sqe->in);
+@@ -270,6 +274,34 @@ static void hpre_hw_data_clr_all(struct hpre_ctx *ctx,
+ 	}
+ }
+ 
++static void hpre_ecdh_hw_data_clr_all(struct hpre_ctx *ctx,
++				      struct hpre_asym_request *req,
++				      struct scatterlist *dst,
++				      struct scatterlist *src)
++{
++	struct hpre_sqe *sqe = &req->req;
++	struct device *dev = ctx->dev;
++	dma_addr_t dma;
++
++	dma = le64_to_cpu(sqe->in);
++	if (unlikely(dma_mapping_error(dev, dma)))
++		return;
++
++	/* req->src may contain garbage value, check both src and req->src before freeing */
++	if (src && req->src)
++		dma_free_coherent(dev, ctx->key_sz << HPRE_ECDH_CLR_DATA_SHIFT,
++				  req->src, dma);
++
++	dma = le64_to_cpu(sqe->out);
++	if (unlikely(dma_mapping_error(dev, dma)))
++		return;
++
++	if (req->dst)
++		dma_free_coherent(dev, ctx->key_sz << 1, req->dst, dma);
++	if (dst)
++		dma_unmap_single(dev, dma, ctx->key_sz << 1, DMA_FROM_DEVICE);
++}
++
+ static int hpre_alg_res_post_hf(struct hpre_ctx *ctx, struct hpre_sqe *sqe,
+ 				void **kreq)
+ {
+@@ -323,6 +355,94 @@ static bool hpre_is_bd_timeout(struct hpre_asym_request *req,
+ 	return true;
+ }
+ 
++static int hpre_send(struct hpre_ctx *ctx, struct hpre_sqe *msg)
++{
++	struct hpre_dfx *dfx = ctx->hpre->debug.dfx;
++	int cnt = 0;
++	int ret;
++
++	do {
++		ret = hisi_qp_send(ctx->qp, msg);
++		if (ret != -EBUSY)
++			break;
++		atomic64_inc(&dfx[HPRE_SEND_BUSY_CNT].value);
++	} while (cnt++ < HPRE_TRY_SEND_TIMES);
++
++	if (likely(!ret)) {
++		atomic64_inc(&dfx[HPRE_SEND_CNT].value);
++		return ret;
++	}
++
++	if (ret != -EBUSY)
++		atomic64_inc(&dfx[HPRE_SEND_FAIL_CNT].value);
++
++	return ret;
++}
++
++static int hpre_send_backlog(struct hpre_ctx *ctx, struct hpre_sqe *msg)
++{
++	struct hpre_dfx *dfx = ctx->hpre->debug.dfx;
++	int ret;
++
++	ret = hisi_qp_send(ctx->qp, msg);
++	if (likely(!ret))
++		atomic64_inc(&dfx[HPRE_SEND_CNT].value);
++	else if (unlikely(ret != -EBUSY))
++		atomic64_inc(&dfx[HPRE_SEND_FAIL_CNT].value);
++	else
++		atomic64_inc(&dfx[HPRE_SEND_BUSY_CNT].value);
++
++	return ret;
++}
++
++static void hpre_alg_hw_data_clr_all(struct hpre_ctx *ctx, struct hpre_asym_request *h_req)
++{
++	switch (le32_to_cpu(h_req->req.dw0) & HPRE_ALG_TYPE_MASK) {
++	case HPRE_ALG_DH_G2:
++	case HPRE_ALG_DH:
++		hpre_hw_data_clr_all(ctx, h_req, h_req->areq.dh->dst, h_req->areq.dh->src);
++		break;
++	case HPRE_ALG_NC_NCRT:
++	case HPRE_ALG_NC_CRT:
++		hpre_hw_data_clr_all(ctx, h_req, h_req->areq.rsa->dst, h_req->areq.rsa->src);
++		break;
++	case HPRE_ALG_ECC_MUL:
++		hpre_ecdh_hw_data_clr_all(ctx, h_req, h_req->areq.ecdh->dst, h_req->areq.ecdh->src);
++		break;
++	default:
++		break;
++	}
++}
++
++static void hpre_alg_send_backlog(struct hisi_qp *qp)
++{
++	struct hpre_asym_request *req, *tmp;
++	int ret;
++
++	spin_lock_bh(&qp->backlog.lock);
++	list_for_each_entry_safe(req, tmp, &qp->backlog.list, list) {
++		ret = hpre_send_backlog(req->ctx, &req->req);
++		switch (ret) {
++		case 0:
++			list_del(&req->list);
++			crypto_request_complete(req->base, -EINPROGRESS);
++			break;
++		case -EBUSY:
++			/* Device is busy and stop send any request. */
++			goto unlock;
++		default:
++			/* Current no fallback for any send error. */
++			list_del(&req->list);
++			hpre_alg_hw_data_clr_all(req->ctx, req);
++			crypto_request_complete(req->base, -EIO);
++			break;
++		}
++	}
++
++unlock:
++	spin_unlock_bh(&qp->backlog.lock);
++}
++
+ static void hpre_dh_cb(struct hpre_ctx *ctx, void *resp)
+ {
+ 	struct hpre_dfx *dfx = ctx->hpre->debug.dfx;
+@@ -377,6 +497,7 @@ static void hpre_alg_cb(struct hisi_qp *qp, void *resp)
+ 	}
+ 
+ 	h_req->cb(h_req->ctx, resp);
++	hpre_alg_send_backlog(qp);
+ }
+ 
+ static int hpre_ctx_init(struct hpre_ctx *ctx, u8 type)
+@@ -450,25 +571,39 @@ static int hpre_msg_request_set(struct hpre_ctx *ctx, void *req, bool is_rsa)
+ 	return 0;
+ }
+ 
+-static int hpre_send(struct hpre_ctx *ctx, struct hpre_sqe *msg)
++static int hpre_alg_try_enqueue(struct hpre_asym_request *hpre_req)
+ {
+-	struct hpre_dfx *dfx = ctx->hpre->debug.dfx;
+-	int ctr = 0;
++	struct hisi_qp *qp = hpre_req->ctx->qp;
++
++	/* Check if any request is already backlogged */
++	if (!list_empty(&qp->backlog.list))
++		return -EBUSY;
++
++	/* Try to enqueue to HW ring */
++	return hpre_send_backlog(hpre_req->ctx, &hpre_req->req);
++}
++
++static int hpre_alg_send_message(struct hpre_asym_request *hpre_req)
++{
++	struct hisi_qp *qp = hpre_req->ctx->qp;
+ 	int ret;
+ 
+-	do {
+-		atomic64_inc(&dfx[HPRE_SEND_CNT].value);
+-		ret = hisi_qp_send(ctx->qp, msg);
+-		if (ret != -EBUSY)
+-			break;
+-		atomic64_inc(&dfx[HPRE_SEND_BUSY_CNT].value);
+-	} while (ctr++ < HPRE_TRY_SEND_TIMES);
++	if (!(hpre_req->base->flags & CRYPTO_TFM_REQ_MAY_BACKLOG)) {
++		ret = hpre_send(hpre_req->ctx, &hpre_req->req);
++		if (ret == -EBUSY)
++			return -ENOSPC;
++	} else {
++		ret = hpre_alg_try_enqueue(hpre_req);
++		if (ret == -EBUSY) {
++			spin_lock_bh(&qp->backlog.lock);
++			list_add_tail(&hpre_req->list, &qp->backlog.list);
++			spin_unlock_bh(&qp->backlog.lock);
++			return -EBUSY;
++		}
++	}
+ 
+ 	if (likely(!ret))
+-		return ret;
+-
+-	if (ret != -EBUSY)
+-		atomic64_inc(&dfx[HPRE_SEND_FAIL_CNT].value);
++		return -EINPROGRESS;
+ 
+ 	return ret;
+ }
+@@ -482,6 +617,7 @@ static int hpre_dh_compute_value(struct kpp_request *req)
+ 	struct hpre_sqe *msg = &hpre_req->req;
+ 	int ret;
+ 
++	hpre_req->base = &req->base;
+ 	ret = hpre_msg_request_set(ctx, req, false);
+ 	if (unlikely(ret))
+ 		return ret;
+@@ -503,14 +639,12 @@ static int hpre_dh_compute_value(struct kpp_request *req)
+ 	else
+ 		msg->dw0 = cpu_to_le32(le32_to_cpu(msg->dw0) | HPRE_ALG_DH);
+ 
+-	/* success */
+-	ret = hpre_send(ctx, msg);
+-	if (likely(!ret))
+-		return -EINPROGRESS;
++	ret = hpre_alg_send_message(hpre_req);
++	if (likely(ret == -EINPROGRESS || ret == -EBUSY))
++		return ret;
+ 
+ clear_all:
+ 	hpre_hw_data_clr_all(ctx, hpre_req, req->dst, req->src);
+-
+ 	return ret;
+ }
+ 
+@@ -755,6 +889,7 @@ static int hpre_rsa_enc(struct akcipher_request *req)
+ 	struct hpre_sqe *msg = &hpre_req->req;
+ 	int ret;
+ 
++	hpre_req->base = &req->base;
+ 	/* For unsupported key size and unavailable devices, use soft tfm instead */
+ 	if (ctx->fallback) {
+ 		akcipher_request_set_tfm(req, ctx->rsa.soft_tfm);
+@@ -781,10 +916,9 @@ static int hpre_rsa_enc(struct akcipher_request *req)
+ 	if (unlikely(ret))
+ 		goto clear_all;
+ 
+-	/* success */
+-	ret = hpre_send(ctx, msg);
+-	if (likely(!ret))
+-		return -EINPROGRESS;
++	ret = hpre_alg_send_message(hpre_req);
++	if (likely(ret == -EINPROGRESS || ret == -EBUSY))
++		return ret;
+ 
+ clear_all:
+ 	hpre_hw_data_clr_all(ctx, hpre_req, req->dst, req->src);
+@@ -801,6 +935,7 @@ static int hpre_rsa_dec(struct akcipher_request *req)
+ 	struct hpre_sqe *msg = &hpre_req->req;
+ 	int ret;
+ 
++	hpre_req->base = &req->base;
+ 	/* For unsupported key size and unavailable devices, use soft tfm instead */
+ 	if (ctx->fallback) {
+ 		akcipher_request_set_tfm(req, ctx->rsa.soft_tfm);
+@@ -834,10 +969,9 @@ static int hpre_rsa_dec(struct akcipher_request *req)
+ 	if (unlikely(ret))
+ 		goto clear_all;
+ 
+-	/* success */
+-	ret = hpre_send(ctx, msg);
+-	if (likely(!ret))
+-		return -EINPROGRESS;
++	ret = hpre_alg_send_message(hpre_req);
++	if (likely(ret == -EINPROGRESS || ret == -EBUSY))
++		return ret;
+ 
+ clear_all:
+ 	hpre_hw_data_clr_all(ctx, hpre_req, req->dst, req->src);
+@@ -1387,32 +1521,6 @@ static int hpre_ecdh_set_secret(struct crypto_kpp *tfm, const void *buf,
+ 	return 0;
+ }
+ 
+-static void hpre_ecdh_hw_data_clr_all(struct hpre_ctx *ctx,
+-				      struct hpre_asym_request *req,
+-				      struct scatterlist *dst,
+-				      struct scatterlist *src)
+-{
+-	struct device *dev = ctx->dev;
+-	struct hpre_sqe *sqe = &req->req;
+-	dma_addr_t dma;
+-
+-	dma = le64_to_cpu(sqe->in);
+-	if (unlikely(dma_mapping_error(dev, dma)))
+-		return;
+-
+-	if (src && req->src)
+-		dma_free_coherent(dev, ctx->key_sz << 2, req->src, dma);
+-
+-	dma = le64_to_cpu(sqe->out);
+-	if (unlikely(dma_mapping_error(dev, dma)))
+-		return;
+-
+-	if (req->dst)
+-		dma_free_coherent(dev, ctx->key_sz << 1, req->dst, dma);
+-	if (dst)
+-		dma_unmap_single(dev, dma, ctx->key_sz << 1, DMA_FROM_DEVICE);
+-}
+-
+ static void hpre_ecdh_cb(struct hpre_ctx *ctx, void *resp)
+ {
+ 	unsigned int curve_sz = hpre_ecdh_get_curvesz(ctx->curve_id);
+@@ -1538,6 +1646,7 @@ static int hpre_ecdh_compute_value(struct kpp_request *req)
+ 	struct hpre_sqe *msg = &hpre_req->req;
+ 	int ret;
+ 
++	hpre_req->base = &req->base;
+ 	ret = hpre_ecdh_msg_request_set(ctx, req);
+ 	if (unlikely(ret)) {
+ 		dev_err(dev, "failed to set ecdh request, ret = %d!\n", ret);
+@@ -1563,9 +1672,9 @@ static int hpre_ecdh_compute_value(struct kpp_request *req)
+ 	msg->dw0 = cpu_to_le32(le32_to_cpu(msg->dw0) | HPRE_ALG_ECC_MUL);
+ 	msg->resv1 = ctx->enable_hpcore << HPRE_ENABLE_HPCORE_SHIFT;
+ 
+-	ret = hpre_send(ctx, msg);
+-	if (likely(!ret))
+-		return -EINPROGRESS;
++	ret = hpre_alg_send_message(hpre_req);
++	if (likely(ret == -EINPROGRESS || ret == -EBUSY))
++		return ret;
+ 
+ clear_all:
+ 	hpre_ecdh_hw_data_clr_all(ctx, hpre_req, req->dst, req->src);
 -- 
-Regards
-Kuldeep
+2.33.0
 
