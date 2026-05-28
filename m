@@ -1,144 +1,131 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F7213FF89B;
-	Thu, 28 May 2026 15:59:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EEE83F23C4
+	for <linux-crypto@vger.kernel.org>; Thu, 28 May 2026 16:56:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779983945; cv=none; b=gV77eLnSX/eKmqxtRB9MoQeDRq4Va2u/n4wSFumJteDz0qOChOYrqQ+p6sxpIHZCQ5zAnWaT0PgoauvXAqGJna1fVIsfzaftG3AadYB0yNABm65TeB+6b5ISimfdTDDSdeDbVjiy7jcGDn47ihfw0x2JWyzGuY65e/Exz2h8AfQ=
+	t=1779987371; cv=none; b=dQUdSYsSxsxwFfHEZr1X/657xTCQsQxJpOMxzFDZmYft8XvdQOnbQz3ZTbrPFJoG6+z7n2eVYXF3xkcRgvTR0V15EQVdplRP0QBtacpg8yVB08oAWMb8sC18jp9zDBz2kFh0LDba+1tiT8DSGS/ZQFYWgUnZMT6ZvWX/zTw6smc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779983945; c=relaxed/simple;
-	bh=XgCXlshtxklSakhCi1RUwGGvMxGLeHuGIfvywM6bf5s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JPFor1km2xcPAfqmFgnJl5hBoX6NaxQ01chfHLV46F7jq0vYCE9pMFDoISPk5tJxhL/JtI6KLXaszeP9AddcOCvFxRWW6WmfrcT1g7+pT2a0EtsyrcZqJtOAyEdG8KP7JNzzhpZoofgRhuvXds6bn1R8hta+5ydjiZbKVsstm0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BuS37Px+; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1779987371; c=relaxed/simple;
+	bh=dRm6v9rJ98fryRZu+nDZ52gP6ZF+I/symBIWFqheIec=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RX5lJs/+93ruxY1NIIpV2/jfs8CzjTWvdZbI8nfxAlqtEzi+a2TatPVyuZAz1sDbtwSUdkQazjDCoR9zj5uuyWYD3uPX4pZV+R/O858Jt/ei7KUpw4ZD6ydUPFPISitwcDUo0+BuGXB2xTqudNfc9Bic7ztPSb/GEM98qEwoX5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=axxvXFIh; arc=none smtp.client-ip=209.85.161.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BuS37Px+"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1779983941; x=1811519941;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=XgCXlshtxklSakhCi1RUwGGvMxGLeHuGIfvywM6bf5s=;
-  b=BuS37Px+pPjXuhfRszN4WgZCUdTh1kY0RCJIfM7z+UqECm3MBX3f7Nnr
-   l7vdFOf7EXOHCJQLVW6wvm/eShmeLPY5wHGOhqP6vRdrR+0clYjUi8Wdm
-   c9QiGuQ/RjRl4e4mX8A8HWIK/VDARtOXbB/fZg9iF+Mx8WsM0k8B3/Xkv
-   jiXfoxsTZ7wtQxMs7iCy1L4DwJoXtIlU8qslbFbeLl/n/7OlHGFCCn/V7
-   kFiuhbdTIvpDPxUPlqOQvE86HkQpl/9wD9BupTjrgg1dgkqCxisxaZ3GT
-   EV2eLDMgT6bC27uycEH5d+iNthkgjHnYWAM4/mBbg3D+uHdniuLogPxYJ
-   A==;
-X-CSE-ConnectionGUID: DU2SgLNgRuincEk+ZfQrDg==
-X-CSE-MsgGUID: 0cZFJ3D1R32A2+AGb4KolA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11800"; a="79862914"
-X-IronPort-AV: E=Sophos;i="6.24,173,1774335600"; 
-   d="scan'208";a="79862914"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2026 08:59:00 -0700
-X-CSE-ConnectionGUID: Of34VBRHSkaRAaxqYRAIGw==
-X-CSE-MsgGUID: DW0qB+j6QpWBdnxdZFU33A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,173,1774335600"; 
-   d="scan'208";a="241548892"
-Received: from silpixa00401971.ir.intel.com ([10.20.226.106])
-  by orviesa006.jf.intel.com with ESMTP; 28 May 2026 08:58:59 -0700
-From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To: herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org,
-	qat-linux@intel.com,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	stable@vger.kernel.org,
-	Ahsan Atta <ahsan.atta@intel.com>,
-	Laurent M Coquerel <laurent.m.coquerel@intel.com>
-Subject: [PATCH] crypto: qat - validate RSA CRT component lengths
-Date: Thu, 28 May 2026 16:57:44 +0100
-Message-ID: <20260528155854.40858-1-giovanni.cabiddu@intel.com>
-X-Mailer: git-send-email 2.54.0
+	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="axxvXFIh"
+Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-69df5352d0eso651053eaf.3
+        for <linux-crypto@vger.kernel.org>; Thu, 28 May 2026 09:56:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1779987369; x=1780592169; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=WDGJeqE4tTfg/YKUkoTVnPS7Lm5TeqY7Toc0BSTB4Ms=;
+        b=axxvXFIhScPMwL1SYv1SB/8Twa6Qjpy4MHe4/Zy7f+oNlk8eF6vcpwSjMxUCgkdaZk
+         H2r4dgPHHu3jnBszJQpKbqLgekX8xr5tOZIcZbJbYQQIZ8ojEJRLFWpfSn02Vdt590Lj
+         +JdTIeluvDz8KhKs9IORim7N+sgGXktxRB1C70gXOxClZT7XoGhKqYzsUg9V7gQMK4UQ
+         QlnyMKWM+ISgiaifbHgBHXkboi3nHAgNX4VdKx0gQ4c9QFzxb5Lc246wAjsS2DSZdHMs
+         J0fMheyMpMNKb9nzBIxJBG9v1ZmNg2RAwLMqUUokGc6eK8QKKzP0eW7ObVslwpDeP5lb
+         H+UQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1779987369; x=1780592169;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WDGJeqE4tTfg/YKUkoTVnPS7Lm5TeqY7Toc0BSTB4Ms=;
+        b=qthpyo5Iy2SDZm9NHTTbaf7pDoSHabbOs2KyWRcaOEnwYdDPg2+qITAlJW3kBXthcI
+         teG2aGC/vIe+qDzUs4/veonpLVyaOhoOBHOspBuE4vOzAR+8jlprg/sTdmmFqUVHXarA
+         gI7JAKaPZ6fgVW/+uFpsozSQvReAESL832il+EOrayeGNoQVOmOZeuQffzcd0RudaY7I
+         8AWH4z4vdi/2icc6OGxUBYQhKCWB5amgVYok0K+jHFC2l7NbYGZPsKwq5UsvhoTOva1a
+         sjDUSgICl3ODz/M+sh9BK6cYn7hID3BL0LjPN604BLBO91GiXUtIE5qnFW98CPaRWNsF
+         hJ6w==
+X-Forwarded-Encrypted: i=1; AFNElJ9hIhzcJziegHKRhefFvwXwzy2CSANsutfpfX+iIQwwFZxKM9vjz07VGcpMZ12K21mGimXZ0VGXoNAzgDU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3CLl4ZiyytxdGoQgVChDSE8IxzSDE2AM1n8EWj/k/F5yFQ2ug
+	DQmVloNxz7ZTFlt/2usq1O4Cync3z9OqCU3YtZyM+e1gVF8JnUJ9Ui0bKU/sBdJCN+s=
+X-Gm-Gg: Acq92OGZomLunO/atH1ZJinHNd1CEsaUtCoFDU+p4IzExJU76D3pW9JpejeMqihJIGt
+	eEvPJs9Z5sBmHGZiZkVlKHL6Owx3UVbxGGBxg63LvGTLKr+qrXISiwdT/Y4nobfz27NwirkHAtw
+	PEN/64kY+p7PvMm7FR0kJxQi6B6t8jr8t8JTuWIGuXn7Z4mMj/M9zuINAt9jrx7KqvjpscgVv3g
+	PMmP0Slp4c9HqE5LUONNVbc7XNXDIMmcDsyzeZFV8LkZoytc20HVjPV03qlw+oQTFq4Od7qvObP
+	DO25uMilQSjCAQn70NizFazm7HDPCkAL7Iykzeo9uxi7iYTemgqE34cOsYDrcO/j+HDKqDVeUu7
+	Qlo/tudAaWAjdV7oWbYcEXjXU1qnSXw6kFOxNTb/MMOUsddyu1M0fYRFwhviLjHlPH3DaLL/L1G
+	JJ71r/m9lbvlVvFuz39Yb1F21CYWZsqOR6Bn4dyM0KwGQbz0ec1Oo8rWBlF4olXW6ajQO1bZsYJ
+	ngXf7GYnL0RXNSlizM=
+X-Received: by 2002:a05:6820:4c07:b0:69b:5fcb:1a69 with SMTP id 006d021491bc7-69d7ed105b6mr14873551eaf.59.1779987369074;
+        Thu, 28 May 2026 09:56:09 -0700 (PDT)
+Received: from [192.168.1.102] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-69e010cd4casm152656eaf.7.2026.05.28.09.56.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 May 2026 09:56:08 -0700 (PDT)
+Message-ID: <2cfd6455-7b5b-4974-b8a1-4a0abca69768@kernel.dk>
+Date: Thu, 28 May 2026 10:56:06 -0600
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] net: Remove support for AIO on sockets
+To: Christoph Hellwig <hch@infradead.org>
+Cc: demiobenour@gmail.com, Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemb@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
+ Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+ Adrian Hunter <adrian.hunter@intel.com>, James Clark
+ <james.clark@linaro.org>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <skhan@linuxfoundation.org>, Eric Biggers <ebiggers@google.com>,
+ Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ linux-doc@vger.kernel.org, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
+ <toke@toke.dk>, linux-api@vger.kernel.org,
+ David Howells <dhowells@redhat.com>
+References: <20260523-af-alg-harden-v1-0-c76755c3a5c5@gmail.com>
+ <20260523-af-alg-harden-v1-1-c76755c3a5c5@gmail.com>
+ <ahQCZQNoyO8GQt3H@infradead.org>
+ <92db3ff0-8f0b-4b61-a167-5004ffcf9025@kernel.dk>
+ <ahanjVfIDlCmeCUE@infradead.org>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <ahanjVfIDlCmeCUE@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The generic RSA key parser (rsa_helper.c) bounds each CRT component (p,
-q, dp, dq, qinv) by the modulus size n_sz, but qat_rsa_setkey_crt()
-allocates half-size DMA buffers (key_sz / 2) and right-aligns each
-component with:
+On 5/27/26 2:13 AM, Christoph Hellwig wrote:
+> On Tue, May 26, 2026 at 09:58:27AM -0600, Jens Axboe wrote:
+>>> The current TCP zerocopy implementation provides completion notification
+>>> through the socket error code, which is freaking weird and doesn't
+>>> integrate well with either io_uring or in-kernel callers.
+>>
+>> We already have that via io_uring
+> 
+> Where?  And how do make that available to in-kernel users like
+> storage protocols and network file system, which really suffer from
+> the current MSG_SPLICE_PAGES semantics.
 
-    memcpy(dst + half_key_sz - len, src, len)
+For zero copy, on both the receive and send side. Since we have a proper
+notification channel, that's what we use rather than the hack that is
+the error queue.
 
-When a CRT component is larger than half_key_sz the subtraction
-underflows and memcpy writes past the DMA buffer, causing memory
-corruption.
+>> , and without needing msg_kiocb or the
+> 
+> What do you think is the downside of using a kiocb here like for
+> everything else with async notifications?
 
-Add a len > half_key_sz check next to the existing !len check for each
-of the five CRT components so the driver falls back to the non-CRT path
-instead of writing out of bounds.
+Where would the notifications go? You'd end up inventing something new
+to propagate them to userspace then. The io_uring side does not rely on
+using msg_kiocb, and iirc that part was only ever used for the crypto
+stuff and largely broken. Which is why I do agree with just yanking it
+out.
 
-Fixes: 879f77e9071f ("crypto: qat - Add RSA CRT mode")
-Cc: stable@vger.kernel.org
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Ahsan Atta <ahsan.atta@intel.com>
-Reviewed-by: Laurent M Coquerel <laurent.m.coquerel@intel.com>
-Tested-by: Laurent M Coquerel <laurent.m.coquerel@intel.com>
----
- drivers/crypto/intel/qat/qat_common/qat_asym_algs.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c b/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
-index e09b9edfce42..75c15c8e41db 100644
---- a/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
-+++ b/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
-@@ -1085,7 +1085,7 @@ static void qat_rsa_setkey_crt(struct qat_rsa_ctx *ctx, struct rsa_key *rsa_key)
- 	ptr = rsa_key->p;
- 	len = rsa_key->p_sz;
- 	qat_rsa_drop_leading_zeros(&ptr, &len);
--	if (!len)
-+	if (!len || len > half_key_sz)
- 		goto err;
- 	ctx->p = dma_alloc_coherent(dev, half_key_sz, &ctx->dma_p, GFP_KERNEL);
- 	if (!ctx->p)
-@@ -1096,7 +1096,7 @@ static void qat_rsa_setkey_crt(struct qat_rsa_ctx *ctx, struct rsa_key *rsa_key)
- 	ptr = rsa_key->q;
- 	len = rsa_key->q_sz;
- 	qat_rsa_drop_leading_zeros(&ptr, &len);
--	if (!len)
-+	if (!len || len > half_key_sz)
- 		goto free_p;
- 	ctx->q = dma_alloc_coherent(dev, half_key_sz, &ctx->dma_q, GFP_KERNEL);
- 	if (!ctx->q)
-@@ -1107,7 +1107,7 @@ static void qat_rsa_setkey_crt(struct qat_rsa_ctx *ctx, struct rsa_key *rsa_key)
- 	ptr = rsa_key->dp;
- 	len = rsa_key->dp_sz;
- 	qat_rsa_drop_leading_zeros(&ptr, &len);
--	if (!len)
-+	if (!len || len > half_key_sz)
- 		goto free_q;
- 	ctx->dp = dma_alloc_coherent(dev, half_key_sz, &ctx->dma_dp,
- 				     GFP_KERNEL);
-@@ -1119,7 +1119,7 @@ static void qat_rsa_setkey_crt(struct qat_rsa_ctx *ctx, struct rsa_key *rsa_key)
- 	ptr = rsa_key->dq;
- 	len = rsa_key->dq_sz;
- 	qat_rsa_drop_leading_zeros(&ptr, &len);
--	if (!len)
-+	if (!len || len > half_key_sz)
- 		goto free_dp;
- 	ctx->dq = dma_alloc_coherent(dev, half_key_sz, &ctx->dma_dq,
- 				     GFP_KERNEL);
-@@ -1131,7 +1131,7 @@ static void qat_rsa_setkey_crt(struct qat_rsa_ctx *ctx, struct rsa_key *rsa_key)
- 	ptr = rsa_key->qinv;
- 	len = rsa_key->qinv_sz;
- 	qat_rsa_drop_leading_zeros(&ptr, &len);
--	if (!len)
-+	if (!len || len > half_key_sz)
- 		goto free_dq;
- 	ctx->qinv = dma_alloc_coherent(dev, half_key_sz, &ctx->dma_qinv,
- 				       GFP_KERNEL);
-
-base-commit: a36f3ace3504ad60981e21e3159655bcded4764f
 -- 
-2.54.0
-
+Jens Axboe
