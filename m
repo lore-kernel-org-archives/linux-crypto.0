@@ -1,141 +1,157 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCF3F3E833F;
-	Thu, 28 May 2026 12:42:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04F23F1661
+	for <linux-crypto@vger.kernel.org>; Thu, 28 May 2026 13:13:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779972139; cv=none; b=cjEC8C3JgZUy+98D1TO3oeqL/PyKv3JGqAA8Km3/kr+4xUnEuHuv6NBFAzQgcB8coowuhu++cm6fWKurcQte0nkPHhm7hAauymKcKiq4v13sVWcgYEdth2pYLO1++U8sjkQHEbjB2sssJHTQ7RkGWk4UtWDkHF4UvBG8qSKVYWM=
+	t=1779974009; cv=none; b=FKXPW4cF2/7KktHoQMBPK8QnqhigOOrZtQ/WiEHnoYLdBZkhx4oVtPRQrS7OKlkw3UP5Z4+wqA7Bv+tH+xJzAWemSYXmxybIVQxovxdJsEkWaezW5sK3CIpwGbZIuP/VVZz2QpbOAIAvYsD2BJNpnETsFUI96niIiGy3RSj6Vd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779972139; c=relaxed/simple;
-	bh=KJ4bXx5Jhw4lK4DMTDthJ7vwOLfI0qyGPlE0N0k3tkE=;
-	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=Ov5BPTr5OruqaY+tJkcUhvn4s311X90n7RXyo66NGkmjKOzJY6tLaTH7HQDNvRA94//waZz6DxF7Cemfhu6Bc46tYvZvnPXp2j4WuKPlILC8qM5m6EaSsMNVs0/wUPKAiTVDFtpHvQCsk4ZCmie8qBFcpl3qgXH6q/kx67xlsMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nnusktYs; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1779974009; c=relaxed/simple;
+	bh=mspoBZCTwb041Rjt8oeTx8IwYnHSbpHh6IFT1g7Opw4=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=klXzizGa7Naokc4+PA0K+Vq1CSRPXphuLmXPG+PC7Yx4xSlrtkU5ehzCYNOfjHfXGxYghjRnb9ZIp66e8IFTwq4eF07o8Z5rl8x3SXJLsVWBggINKP8fg+vR4VdhxsT11oeXpXB+N2663HWPRUG6xsuP7nEnR0mhZlGEf9pqpk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jiTh9UT7; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nnusktYs"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1779972138; x=1811508138;
-  h=from:date:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=KJ4bXx5Jhw4lK4DMTDthJ7vwOLfI0qyGPlE0N0k3tkE=;
-  b=nnusktYshzMQ94YAo/WY9vYTMd1a8k73O/tWynnaZr80teMuvPzRd58g
-   Y0FWXio5DsattbKR3+6k0K5RAz7uTNvSFl/dnqOvAdN9t7jidR8r+VmnB
-   FFMqn/McRxIgmiCl9NH8ygWSfRgiROpCdB5Rhv3rGT+gSkvcRUL+GtzyE
-   lLXliu2qniesiJcpVjGg9rJhn3G2ulhs08cjR2tj1/G+tJKE+ZnsgnlrR
-   6aJoygkIH2vbdwAcQgaQTWd21pxddfL68QQWNUniNv+7BFm3mB1oRsRSD
-   tv6ccbycFvP1MzwIRqNn0oyUun0mXTvoQ74kpe/ZdlmuIoB7M0BG/whvS
-   Q==;
-X-CSE-ConnectionGUID: bE5lkuKcTpCYnxi4BdCaDw==
-X-CSE-MsgGUID: xyShKGAGTe+iVfYRdvflWQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11799"; a="79960828"
-X-IronPort-AV: E=Sophos;i="6.24,173,1774335600"; 
-   d="scan'208";a="79960828"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2026 05:42:17 -0700
-X-CSE-ConnectionGUID: Zgvm9re8QNyOT84HzR7Xsg==
-X-CSE-MsgGUID: VOwf1bD0QlSg9PmMEtsr2w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.24,173,1774335600"; 
-   d="scan'208";a="242634568"
-Received: from ijarvine-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.187])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2026 05:42:08 -0700
-From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Date: Thu, 28 May 2026 15:42:04 +0300 (EEST)
-To: Harrison Vanderbyl <harrison.vanderbyl@gmail.com>
-cc: andersson@kernel.org, konradybcio@kernel.org, robh@kernel.org, 
-    krzk+dt@kernel.org, conor+dt@kernel.org, 
-    Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net, 
-    neil.armstrong@linaro.org, maarten.lankhorst@linux.intel.com, 
-    mripard@kernel.org, tzimmermann@suse.de, airlied@gmail.com, 
-    simona@ffwll.ch, jikos@kernel.org, bentiss@kernel.org, 
-    luzmaximilian@gmail.com, Hans de Goede <hansg@kernel.org>, 
-    Douglas Anderson <dianders@chromium.org>, 
-    Jessica Zhang <jesszhan0024@gmail.com>, linux-arm-msm@vger.kernel.org, 
-    devicetree@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, 
-    linux-crypto@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-    linux-input@vger.kernel.org, platform-driver-x86@vger.kernel.org
-Subject: Re: [PATCH v2 3/7] platform/surface: SAM: Add support for Surface
- Pro 12in
-In-Reply-To: <ab458aadea651396d9ea7629419a32dc7510c593.1778822464.git.harrison.vanderbyl@gmail.com>
-Message-ID: <6808166a-423c-c801-497a-ed95cccc8d0c@linux.intel.com>
-References: <cover.1778822464.git.harrison.vanderbyl@gmail.com> <ab458aadea651396d9ea7629419a32dc7510c593.1778822464.git.harrison.vanderbyl@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jiTh9UT7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 808531F00A3D
+	for <linux-crypto@vger.kernel.org>; Thu, 28 May 2026 13:13:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779974007;
+	bh=YYpeafvMhAx0qgEhbKf7QJbwzvvyekLX4+tpZsjO+/w=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc;
+	b=jiTh9UT76ucrnHoIIcGjrEgFVOoq/Gplzt/6ZT0GCZAcP6hYf26P9I/MIJIWEYi02
+	 TFjLFmfJTq7tRzdS2MNdxsYmQhhrflyF0QIJVa6NcKEXPQ9CJNB+bKqDiKC4rQDkF/
+	 egHGRL40QiPLA0JEglCVBpT9TtQSTDL8czczL2goDfalbmGjVO1DpSC6IG4k5fSaxs
+	 6u3qFdbaTebDHJypUaNQp3dfmVhkh1DWU3B6/wfhnYLTjcDhUb7NsBgNWImB7Jzhqm
+	 JoYm8ulAgxhACvXS+7QHRWlg/wh5qeGRKh965SiLNcpHkmF+jI9aBPtq5mnLshYVgN
+	 nEdy1dgbxGJXg==
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-393c40246afso140364291fa.1
+        for <linux-crypto@vger.kernel.org>; Thu, 28 May 2026 06:13:27 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ9M8AjPvopmHYbsks20MSo91bV1pZP5/MgI7mUqY/VpHgHIZsF1ooxOxX8oTIoc+cvhRSHLdIdw5RoTBQ4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywa4fZlHivnlLG8qwAHXVlGT2/sovQk1COImigtk3gH8ZhWthsj
+	SQSQYWAx5tzIp/3mp9CGmfhY3y/wP7J9wKj8EZj2ei+c4kt6qic1knlabdDxLMFoXY8H69NC2ta
+	gVmQ8Li4YAop9C3PV0GZOvh1yV+26+dJtjanDad/pdQ==
+X-Received: by 2002:a05:651c:212a:b0:393:aea6:857e with SMTP id
+ 38308e7fff4ca-395d89085f4mr89644911fa.10.1779974006225; Thu, 28 May 2026
+ 06:13:26 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Thu, 28 May 2026 09:13:23 -0400
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Thu, 28 May 2026 09:13:23 -0400
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <e49c4a45-6455-47f3-a91f-c32c1a0b99be@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <20260515-shikra_qcrypto-v1-0-80f07b345c29@oss.qualcomm.com>
+ <20260514194735.GA1939213@google.com> <d4d35e17-84fa-4c95-9bfb-abfd25ea7f4a@oss.qualcomm.com>
+ <20260522024912.GC5937@quark> <c1697372-54ec-4f57-85d9-ad375ff1a44d@oss.qualcomm.com>
+ <20260525142843.GA2018@quark> <e49c4a45-6455-47f3-a91f-c32c1a0b99be@oss.qualcomm.com>
+Date: Thu, 28 May 2026 09:13:23 -0400
+X-Gmail-Original-Message-ID: <CAMRc=MfC6CEwOXYttsav3mwqyJ2F4sburBj+zNJ25qMoweyL-Q@mail.gmail.com>
+X-Gm-Features: AVHnY4LugvRYZll4BPMcuUQeZJsNVmlPyEMrJTl0DoRxI9a9LoB78G8ub57WLMA
+Message-ID: <CAMRc=MfC6CEwOXYttsav3mwqyJ2F4sburBj+zNJ25qMoweyL-Q@mail.gmail.com>
+Subject: Re: [PATCH 0/3] Add support for qcrypto on shikra
+To: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
+Cc: Thara Gopinath <thara.gopinath@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Vinod Koul <vkoul@kernel.org>, Frank Li <Frank.Li@kernel.org>, Andy Gross <agross@kernel.org>, 
+	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	dmaengine@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, 
+	Bartosz Golaszewski <brgl@kernel.org>, Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>, 
+	Neeraj Soni <neeraj.soni@oss.qualcomm.com>, Eric Biggers <ebiggers@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 15 May 2026, Harrison Vanderbyl wrote:
+On Thu, 28 May 2026 13:54:51 +0200, Kuldeep Singh
+<kuldeep.singh@oss.qualcomm.com> said:
+>>> +Bartosz, Gaurav, Neeraj
+>>>
+>>> Hi Eric,
+>>>
+>>> GPCE is relevant in terms of providing hardware security.
+>>> There are multiple usecases coming up for example to handle DRM/secure
+>>> buffer usecases to improve overall throughput for secure content.
+>>>
+>>> Regarding performance, it's currently slower compared to arm CE but
+>>> provides an edge by giving hardware security which is considered more
+>>> secure.
+>>>
+>>> Btw, there's been performance improvement with new targets and we are
+>>> expecting to achieve far more better performance with new SoCs family.
+>>> Pakala:    GPCE - 550MBps, ARMv8 - 8GBps
+>>> Kaanapali: GPCE - 3GBps,   ARMv8 - 10GBps
+>>>
+>>> Please note, there's almost 5x improvement in kaanapali compared to
+>>> pakala. Though overall is still slower compared to arm but as mentioned,
+>>> expecting better performance with hardware improvements as we progress.
+>>>
+>>> Also, currently qce driver exhibit stability issues and that's what we
+>>> are putting effort in stabilizing the software on immediate basis.
+>>>
+>>> There's parallel effort ongoing by Bartosz to introduce baseline for
+>>> secure buffer usecases.
+>>> https://lore.kernel.org/lkml/20260522-qcom-qce-cmd-descr-v18-0-99103926bafc@oss.qualcomm.com/
+>>> There's active development ongoing and i believe lowering cra_priority
+>>> for qce is fine as of now and can scale values once qce becomes
+>>> performance efficient.
+>>>
+>>> Please share your thoughts. Thanks!
+>>
+>> ARMv8 Crypto Extensions are "hardware" as well, just in the CPU.  They
+>> provide constant-time execution, for example.
+>>
+>> Granted, they don't protect from power analysis and electromagnetic
+>> emanation attacks.  Does QCE actually provide those protections, though?
+>
+> QCE doesn't provide these protections currently.
+> What i wanted to highlight was there are certain security usecases which
+> are possible via dedicated crypto engine only and not via arm cpu.
+>> Either way, it doesn't really matter in this case.  There are multiple
+>> aspects to security, and before even considering these advanced
+>> protections, the basics of security need to be absolutely solid.  That
+>> is, the driver needs to always compute the crypto algorithms correctly,
+>> and it needs to be completely robust when fuzzed by unprivileged
+>> userspace (because it can accessed in that way).
+>  > Yet, this driver "exhibits stability issues", fails the self-tests, and
+>> doesn't even have exclusive access to the hardware!  These are all
+>> security bugs.  That very much defeats the claimed point.  (Plus, due to
+>> the performance issues no one wants to use it in Linux anyway.)
+>
+> Sure, we are analyzing self-tests failures and are committed to fix any
+> hung/stability issue in any aspect but i do feel it should not be a
+> blocker to add new soc id support.
+>
+> Also, could you please elaborate more on "exclusive access to hardware"?
+> Do you mean the hardware can be accessed by multiple execution
+> environment like TEE and Linux?
+> --
+> Regards
+> Kuldeep
+>
+>
 
-> Add a SAM client device node group and registry entry for the
-> Microsoft Surface Pro, 12-inch with Snapdragon.
-> 
-> This set enables the use of the following devices.
-> 1: cover keyboard
-> 2: cover touchpad
-> 3: pen stash events.
-> 
-> The battery info and charger info devices have been
-> purposefully omitted as they are also reported by
-> other drivers and cause conflicts.
-> 
-> Signed-off-by: Harrison Vanderbyl <harrison.vanderbyl@gmail.com>
-> ---
->  .../surface/surface_aggregator_registry.c         | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
-> 
-> diff --git a/drivers/platform/surface/surface_aggregator_registry.c b/drivers/platform/surface/surface_aggregator_registry.c
-> index 0599d5adf02e..884049961415 100644
-> --- a/drivers/platform/surface/surface_aggregator_registry.c
-> +++ b/drivers/platform/surface/surface_aggregator_registry.c
-> @@ -422,6 +422,19 @@ static const struct software_node *ssam_node_group_sp11[] = {
->  	NULL,
->  };
->  
-> +/* Devices for Surface Pro 12" first edition (ARM/QCOM) */
-> +static const struct software_node *ssam_node_group_sp12in[] = {
-> +	&ssam_node_root,
-> +	&ssam_node_hub_kip,
-> +	&ssam_node_tmp_sensors,
-> +	&ssam_node_hid_kip_keyboard,
-> +	&ssam_node_hid_sam_penstash,
+Eric: FYI I do plan - and have been allowed to by Qualcomm - to work on this
+driver further to refactor and improve it. However, the BAM locking series[1]
+needs to be queued first as it significantly changes the way the driver works.
+Any help with reviewing and getting these patches merged is appreciated. I
+don't want to start sending more patches before the 14 commit series gets queued
+first.
 
-Hi,
+Vinod: the series has been reviewed and tested. The NAND team at qualcomm is
+telling me they're using it internally already to fix a race between the modem
+firmware and linux. Can we get it queued for v7.2 please? This will make further
+refactoring easier.
 
-Could you please confirm this penstash is correct (sam vs kip)?
+I know about the self-tests etc., I will address them next.
 
-Sashiko suggested it might be wrong but take it's report with a grain of 
-salt, it's AI after all and sometimes seems to extrapolate about HW to a 
-sibling HW without any real knowledge:
+Bart
 
-https://sashiko.dev/#/patchset/cover.1778822464.git.harrison.vanderbyl%40gmail.com
-
--- 
- i.
-
-> +	&ssam_node_hid_kip_touchpad,
-> +	&ssam_node_hid_kip_fwupd,
-> +	&ssam_node_pos_tablet_switch,
-> +	NULL,
-> +};
-> +
->  /* -- SSAM platform/meta-hub driver. ---------------------------------------- */
->  
->  static const struct acpi_device_id ssam_platform_hub_acpi_match[] = {
-> @@ -500,6 +513,8 @@ static const struct of_device_id ssam_platform_hub_of_match[] __maybe_unused = {
->  	{ .compatible = "microsoft,arcata", (void *)ssam_node_group_sp9_5g },
->  	/* Surface Pro 11 (ARM/QCOM) */
->  	{ .compatible = "microsoft,denali", (void *)ssam_node_group_sp11 },
-> +	/* Surface Pro 12in First Edition (ARM/QCOM) */
-> +	{ .compatible = "microsoft,surface-pro-12in", (void *)ssam_node_group_sp12in },
->  	/* Surface Laptop 7 */
->  	{ .compatible = "microsoft,romulus13", (void *)ssam_node_group_sl7 },
->  	{ .compatible = "microsoft,romulus15", (void *)ssam_node_group_sl7 },
-
-
+[1] https://lore.kernel.org/all/20260526-qcom-qce-cmd-descr-v19-0-08472fdcbf4a@oss.qualcomm.com/
