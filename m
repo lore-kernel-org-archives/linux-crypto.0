@@ -1,116 +1,141 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE2B33E8320;
-	Thu, 28 May 2026 12:16:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCF3F3E833F;
+	Thu, 28 May 2026 12:42:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779970564; cv=none; b=c8JVnmPUfsvgzvH/EATfMuzCP7ggdYqKxHwoi3s1lx9JQRYPk6u2IhkUWBmG87KnggAwhhD49d8vBfF6/RNYiCeksVpmwh3/bmG0/JYm9c7Pji6rvZZhVCVEuKdiLWtjSOzOdGvtsWQUA8h18ZQ4K+85OaKUikWK9+UG82Pd4zo=
+	t=1779972139; cv=none; b=cjEC8C3JgZUy+98D1TO3oeqL/PyKv3JGqAA8Km3/kr+4xUnEuHuv6NBFAzQgcB8coowuhu++cm6fWKurcQte0nkPHhm7hAauymKcKiq4v13sVWcgYEdth2pYLO1++U8sjkQHEbjB2sssJHTQ7RkGWk4UtWDkHF4UvBG8qSKVYWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779970564; c=relaxed/simple;
-	bh=Ir+St5jjuyDHu0k2ayfYcSBkd8eojxxhArhUYtGtJQc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZgPGexKByTF/2eoaHFY9Y0aJ5M4+DzjHz4JkovSHgbxJNjkbvdf9zQC4CC2VYVcJod1fv+YGbkUlvSDUKvcuMRRhUgxQd4ZD3oKExO1JmZnEiaGPYVa9O4S2N+/LZUG82JbPfKgMyfeHv67/TQ694kz1tHWHPlROLZWsP/a3NoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V2CGDCj0; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1779972139; c=relaxed/simple;
+	bh=KJ4bXx5Jhw4lK4DMTDthJ7vwOLfI0qyGPlE0N0k3tkE=;
+	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=Ov5BPTr5OruqaY+tJkcUhvn4s311X90n7RXyo66NGkmjKOzJY6tLaTH7HQDNvRA94//waZz6DxF7Cemfhu6Bc46tYvZvnPXp2j4WuKPlILC8qM5m6EaSsMNVs0/wUPKAiTVDFtpHvQCsk4ZCmie8qBFcpl3qgXH6q/kx67xlsMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nnusktYs; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V2CGDCj0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E58101F00A3A;
-	Thu, 28 May 2026 12:16:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1779970562;
-	bh=+buq2ptcz3JEj/EpBlSaTdBpCSUNhIEKXgsoTZroRW0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=V2CGDCj0qdObonA6xsEmiUruzdyDhaDVcOjnUYm5RBz6bWG2BFVJy+o7es7XrKb17
-	 loHnHSxcdsS1+5bdiIepwg9k4Ca1cnPNI1PaXfX/ioYPQsRAFTHkvv6xTSTV/qGEu7
-	 XaXN+Ued0ofGEUw/Oih5zwV3xVSl8QzgiDus81nLKMosrdfQUYw5Vtf1dhrHQ9Hb+b
-	 ALjTzN+b72hj+v2GRBi4hjWrlAz4hmDBEJB5B66MfJ06ML/FL/Icz31uct8YbfaiE3
-	 IZlpfWZ6sWOcikRO5P9eRSqFv/iGUa/qAHupsdk9ewECpxaRrOEoOp337GpH4ZdRan
-	 ljNXA04XVAWSw==
-Date: Thu, 28 May 2026 14:16:00 +0200
-From: Thierry Reding <thierry.reding@kernel.org>
-To: Mikko Perttunen <mperttunen@nvidia.com>
-Cc: Thierry Reding <thierry.reding@gmail.com>, 
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	Jonathan Hunter <jonathanh@nvidia.com>, Akhil R <akhilrajeev@nvidia.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Aaron Kling <webgeek1234@gmail.com>, dri-devel@lists.freedesktop.org, linux-tegra@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 1/2] gpu: host1x: Allow entries in BO caches to be freed
-Message-ID: <ahgx9L954jPBWkdO@orome>
-References: <20260515-host1x-bocache-leak-v1-0-a0375f68aeab@nvidia.com>
- <20260515-host1x-bocache-leak-v1-1-a0375f68aeab@nvidia.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nnusktYs"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1779972138; x=1811508138;
+  h=from:date:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=KJ4bXx5Jhw4lK4DMTDthJ7vwOLfI0qyGPlE0N0k3tkE=;
+  b=nnusktYshzMQ94YAo/WY9vYTMd1a8k73O/tWynnaZr80teMuvPzRd58g
+   Y0FWXio5DsattbKR3+6k0K5RAz7uTNvSFl/dnqOvAdN9t7jidR8r+VmnB
+   FFMqn/McRxIgmiCl9NH8ygWSfRgiROpCdB5Rhv3rGT+gSkvcRUL+GtzyE
+   lLXliu2qniesiJcpVjGg9rJhn3G2ulhs08cjR2tj1/G+tJKE+ZnsgnlrR
+   6aJoygkIH2vbdwAcQgaQTWd21pxddfL68QQWNUniNv+7BFm3mB1oRsRSD
+   tv6ccbycFvP1MzwIRqNn0oyUun0mXTvoQ74kpe/ZdlmuIoB7M0BG/whvS
+   Q==;
+X-CSE-ConnectionGUID: bE5lkuKcTpCYnxi4BdCaDw==
+X-CSE-MsgGUID: xyShKGAGTe+iVfYRdvflWQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11799"; a="79960828"
+X-IronPort-AV: E=Sophos;i="6.24,173,1774335600"; 
+   d="scan'208";a="79960828"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2026 05:42:17 -0700
+X-CSE-ConnectionGUID: Zgvm9re8QNyOT84HzR7Xsg==
+X-CSE-MsgGUID: VOwf1bD0QlSg9PmMEtsr2w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,173,1774335600"; 
+   d="scan'208";a="242634568"
+Received: from ijarvine-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.187])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2026 05:42:08 -0700
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Date: Thu, 28 May 2026 15:42:04 +0300 (EEST)
+To: Harrison Vanderbyl <harrison.vanderbyl@gmail.com>
+cc: andersson@kernel.org, konradybcio@kernel.org, robh@kernel.org, 
+    krzk+dt@kernel.org, conor+dt@kernel.org, 
+    Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net, 
+    neil.armstrong@linaro.org, maarten.lankhorst@linux.intel.com, 
+    mripard@kernel.org, tzimmermann@suse.de, airlied@gmail.com, 
+    simona@ffwll.ch, jikos@kernel.org, bentiss@kernel.org, 
+    luzmaximilian@gmail.com, Hans de Goede <hansg@kernel.org>, 
+    Douglas Anderson <dianders@chromium.org>, 
+    Jessica Zhang <jesszhan0024@gmail.com>, linux-arm-msm@vger.kernel.org, 
+    devicetree@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, 
+    linux-crypto@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+    linux-input@vger.kernel.org, platform-driver-x86@vger.kernel.org
+Subject: Re: [PATCH v2 3/7] platform/surface: SAM: Add support for Surface
+ Pro 12in
+In-Reply-To: <ab458aadea651396d9ea7629419a32dc7510c593.1778822464.git.harrison.vanderbyl@gmail.com>
+Message-ID: <6808166a-423c-c801-497a-ed95cccc8d0c@linux.intel.com>
+References: <cover.1778822464.git.harrison.vanderbyl@gmail.com> <ab458aadea651396d9ea7629419a32dc7510c593.1778822464.git.harrison.vanderbyl@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="6my564ulmhwxpudn"
-Content-Disposition: inline
-In-Reply-To: <20260515-host1x-bocache-leak-v1-1-a0375f68aeab@nvidia.com>
+Content-Type: text/plain; charset=US-ASCII
 
+On Fri, 15 May 2026, Harrison Vanderbyl wrote:
 
---6my564ulmhwxpudn
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH 1/2] gpu: host1x: Allow entries in BO caches to be freed
-MIME-Version: 1.0
-
-On Fri, May 15, 2026 at 11:34:51AM +0900, Mikko Perttunen wrote:
-> When a buffer object is pinned via host1x_bo_pin() with a cache, the
-> resulting mapping is kept in the cache so it can be reused on subsequent
-> pins. Each mapping held a reference to the underlying host1x_bo (taken
-> in tegra_bo_pin / gather_bo_pin), so as long as a mapping was cached,
-> the bo itself could not be freed.
->=20
-> However, the only way to remove the cached mapping was through the free
-> path of the buffer object. This meant that if a bo got cached, it could
-> never get freed again.
->=20
-> Resolve the circularity by holding a weak reference to the bo from the
-> cache side. This is done by having the .pin callbacks not bump the bo's
-> refcount -- instead the common Host1x bo code does so, except for the
-> cache reference.
->=20
-> Also move the remove-cache-mapping-on-free code into a common function
-> inside Host1x code. This is only called from the TegraDRM GEM buffers
-> since those are the only ones that can be cached at the moment.
->=20
-> Reported-by: Aaron Kling <webgeek1234@gmail.com>
-> Fixes: 1f39b1dfa53c ("drm/tegra: Implement buffer object cache")
-> Signed-off-by: Mikko Perttunen <mperttunen@nvidia.com>
+> Add a SAM client device node group and registry entry for the
+> Microsoft Surface Pro, 12-inch with Snapdragon.
+> 
+> This set enables the use of the following devices.
+> 1: cover keyboard
+> 2: cover touchpad
+> 3: pen stash events.
+> 
+> The battery info and charger info devices have been
+> purposefully omitted as they are also reported by
+> other drivers and cause conflicts.
+> 
+> Signed-off-by: Harrison Vanderbyl <harrison.vanderbyl@gmail.com>
 > ---
->  drivers/gpu/drm/tegra/gem.c    | 13 ++-------
->  drivers/gpu/drm/tegra/submit.c |  3 +--
->  drivers/gpu/host1x/bus.c       | 60 ++++++++++++++++++++++++++++++++++++=
-+++++-
->  include/linux/host1x.h         |  7 +++++
->  4 files changed, 69 insertions(+), 14 deletions(-)
+>  .../surface/surface_aggregator_registry.c         | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
+> 
+> diff --git a/drivers/platform/surface/surface_aggregator_registry.c b/drivers/platform/surface/surface_aggregator_registry.c
+> index 0599d5adf02e..884049961415 100644
+> --- a/drivers/platform/surface/surface_aggregator_registry.c
+> +++ b/drivers/platform/surface/surface_aggregator_registry.c
+> @@ -422,6 +422,19 @@ static const struct software_node *ssam_node_group_sp11[] = {
+>  	NULL,
+>  };
+>  
+> +/* Devices for Surface Pro 12" first edition (ARM/QCOM) */
+> +static const struct software_node *ssam_node_group_sp12in[] = {
+> +	&ssam_node_root,
+> +	&ssam_node_hub_kip,
+> +	&ssam_node_tmp_sensors,
+> +	&ssam_node_hid_kip_keyboard,
+> +	&ssam_node_hid_sam_penstash,
 
-Applied, thanks.
+Hi,
 
-Thierry
+Could you please confirm this penstash is correct (sam vs kip)?
 
---6my564ulmhwxpudn
-Content-Type: application/pgp-signature; name="signature.asc"
+Sashiko suggested it might be wrong but take it's report with a grain of 
+salt, it's AI after all and sometimes seems to extrapolate about HW to a 
+sibling HW without any real knowledge:
 
------BEGIN PGP SIGNATURE-----
+https://sashiko.dev/#/patchset/cover.1778822464.git.harrison.vanderbyl%40gmail.com
 
-iQIzBAABCgAdFiEEiOrDCAFJzPfAjcif3SOs138+s6EFAmoYMgAACgkQ3SOs138+
-s6H4tQ//XkWRl3y7bAt9TLAdXWliceZEHfMdVL/tnvQt61OaxMiMXb3KF0U1CFSz
-bCrOSsS4t3L1/2zRbicJ7rW92tT3J3bNmHGroLo64ODozmDX9A8IKrLLPJ+1a3a5
-SXzNHyeK+3Gz7cUl0EwUyoCY0r/wBTl/povwzAE7Wk0cKL7vBMW8rjFTQkb/KYr3
-Tj4+q0VAELLmHLUGBo+zQlJHJIWN6SSCvzvaL7zE2vlgFvX0tZW1EMZrZ3AdNEln
-UmXCYkIYHOthnhqMFD1xUmp5YNcpaO0dQMY0kt3YC9AK5ZuDJXfs/Cv8ztittEOf
-KMITTDm+JyJ11MY5ycp9ipDpaSUk3Cbsw9vfwd0TNltsJvwyQnYNTlSpXMdseJPP
-hqRzk1j828d11x1FN+Qq3xtxQZUCSxX/V5DnioScXPMujFp48qh5W7evIwbJ2dss
-tfjImpSwWRZ7FmH4Rl7FnioU2oLUKTFP903bp0sEHWMQXW+HemlCPMKBxa6sgVRo
-9OTu2v29Vypb8Rp4VoehjumCjQxW64RZ9NfxH7MYyidh/Hxhz+2FEs/PzxreGp5e
-aLoWkLxgD2GJ1ueuh0sIf+4uS99Lf0Dho6Er2uko9+P0lgaxjIB4j2CQZ6Mjk5km
-cpWpm9CGI4v4e38pGfrXG0UhiWF4OK6lCYeut3jTgDzGw65UMY4=
-=fyjP
------END PGP SIGNATURE-----
+-- 
+ i.
 
---6my564ulmhwxpudn--
+> +	&ssam_node_hid_kip_touchpad,
+> +	&ssam_node_hid_kip_fwupd,
+> +	&ssam_node_pos_tablet_switch,
+> +	NULL,
+> +};
+> +
+>  /* -- SSAM platform/meta-hub driver. ---------------------------------------- */
+>  
+>  static const struct acpi_device_id ssam_platform_hub_acpi_match[] = {
+> @@ -500,6 +513,8 @@ static const struct of_device_id ssam_platform_hub_of_match[] __maybe_unused = {
+>  	{ .compatible = "microsoft,arcata", (void *)ssam_node_group_sp9_5g },
+>  	/* Surface Pro 11 (ARM/QCOM) */
+>  	{ .compatible = "microsoft,denali", (void *)ssam_node_group_sp11 },
+> +	/* Surface Pro 12in First Edition (ARM/QCOM) */
+> +	{ .compatible = "microsoft,surface-pro-12in", (void *)ssam_node_group_sp12in },
+>  	/* Surface Laptop 7 */
+>  	{ .compatible = "microsoft,romulus13", (void *)ssam_node_group_sl7 },
+>  	{ .compatible = "microsoft,romulus15", (void *)ssam_node_group_sl7 },
+
+
