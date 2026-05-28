@@ -1,154 +1,340 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dl1-f45.google.com (mail-dl1-f45.google.com [74.125.82.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9273277007
-	for <linux-crypto@vger.kernel.org>; Thu, 28 May 2026 13:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779976218; cv=none; b=ppMaYJFh5/8oHXCg9p1P+PU0Ff5yCdqK0nlCN7Z4dk6ygEen/8Zrz1167lgahNBqq7z4hIoTyy27Mk6RU9sKOSFtq/y/HC6ForPrjw2skmRHJE/6BWT2eiDGswNjQwSI46gWiJxwVpJr9cpkiAGhNKT3K+P9b/5AJhtajHEGPRY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779976218; c=relaxed/simple;
-	bh=vd/rQRJQWLIg+xDuYcY88Qbbo0c1bTx1+oaoNovwGyA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uAPr7Izw93gmxYBOt+LuKwWBmNJdPOH+m4obPbz46lA13aGvXYdaCMgXjT6gLIJ7M1rnnw6SO7TDgsIfUsTGPGevZ0pQUDtuQ1xK0ChGv6EAtDIU3gYH8xxEQ0IagXnIWSLwUcrUY3BDzfaVfO5DvR3Q3qdcjlcHK40tA28pdv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=NgX2AMwD; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=fdvJp/K5; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4E2A2F745C
+	for <linux-crypto@vger.kernel.org>; Thu, 28 May 2026 14:45:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1779979543; cv=pass; b=W6RaJ0N9aoi0ddx+QYi1C6tcOAr2WylIdEd38CDer18nP+sgKQ+P5k0Tp/4weDC7qFGFVdBotOQF48oz8d1GCApxvuQZAQIhkwA8mA7d/JMfQux+9j8Tb84OUN4NLDn5+YoHKAWP382mst+66M7Rn4nXTJuBwMBd7tgTi3pD0oE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1779979543; c=relaxed/simple;
+	bh=rq8gxBxKbnVaF8wdJLl6SkHZ/ZKLEKE5u5RN3PdP+Jw=;
+	h=From:In-Reply-To:References:MIME-Version:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fKG6mW+RcA3SPunjrmWb2dR5fLOYJPVJ3oznFvnW1Q4tPSSsUuvYLTn0ZnTppk04pikEcVZcwm3jz7A35N+yUVLC6pPb6Ij5w/baXOGvorptMnrzp9pvCkdlvxcSMvkkKrtUrh9TE9Tf1KYDCbE8L8EnHWYY1FKVvHftrItBtV0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WVv9XEIH; arc=pass smtp.client-ip=74.125.82.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="NgX2AMwD";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="fdvJp/K5"
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 64S8vqMp124483
-	for <linux-crypto@vger.kernel.org>; Thu, 28 May 2026 13:50:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=V1s8jKskQG0bDSH4tCE3i2dJ
-	j/wDsiGH0s/CmPfjVgE=; b=NgX2AMwDdKD5hgnZ/aYfhZ8QKTSbIG1dhVGw28oC
-	JE9VZ9pHC7Q9lp0qBxKGwnbXDagxOHrxzUaHpAS7hXdptOXPGCF4f8m6NQPyW6Z2
-	KMjfUFxVH1jCEkCXkKVUaj4KEssFUt1vVfIiUJl2DNaN8YEQT7sFqEuD088Kv8Ft
-	uJDIsZXU/ho+KkQKf2lx8e3lO5DUexyPcYZWGsH72h/Aa2tACM2fu8thXVZQYecv
-	WE1IY48F8aA9vkYcxFlfa3PFRdXFvyjyO8YLJMueXqkInfP/Xbd6Hgptmp00SJUY
-	zda8ERh+f/Z5TjiAA+dduUqaTkg5oqXjdYALwFWwdC1s+Q==
-Received: from mail-ua1-f69.google.com (mail-ua1-f69.google.com [209.85.222.69])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ee7ycay0u-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Thu, 28 May 2026 13:50:15 +0000 (GMT)
-Received: by mail-ua1-f69.google.com with SMTP id a1e0cc1a2514c-96396d1f745so387603241.1
-        for <linux-crypto@vger.kernel.org>; Thu, 28 May 2026 06:50:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WVv9XEIH"
+Received: by mail-dl1-f45.google.com with SMTP id a92af1059eb24-1363e78746eso9019584c88.1
+        for <linux-crypto@vger.kernel.org>; Thu, 28 May 2026 07:45:41 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1779979541; cv=none;
+        d=google.com; s=arc-20240605;
+        b=Y8Tyer0gMRUPdVT+7SZsYeDB30T5soe7ssnhEOPyY5HJqHvSeTpSvtdPvXD1mk1VKK
+         +EyYCtUuu2icWQUUAw6LalEGFoPUXIHCytgiZaiChBNdpU4PtKSTyRMCiuiEUZ0iHnvf
+         m5NkDdt9NMu45AeGAxgvKVqtcCcjj6DmyO0sVd7x79qKaeDCbmmzojuuVKEn3xOAulMq
+         Ik9G97HAP0Y3+5Wwj3jmq3mmSf4cuJQueW2zvSl1uGbR2UGOtwsya1CvrbNnsutnKJNw
+         IlzgaIr9bekmnVIi2Sh9M7o8FjrtLjXuSXq7cYBk+3lDMeqhz5iDKWKhTr6FSq6txaAA
+         kczA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:dkim-signature;
+        bh=+gjkdBns27ZcM6QB3XftdqjlzU6m8DV5aKnzoL5burk=;
+        fh=k7LFp1Bq6D9FNr33agN9m5KJAQUCNkZIeRdocrCZ2Q4=;
+        b=H7r0qz7zoCPW+mAW6jyW47BVQwglTBfuUmBjRnWWFuPV+CmlQGhhuCxyjod0QGiioc
+         XJgzBh1MvcE/3XB8nuZ1YIoHlYWCHQpcecrWjWM/AQSH3moTpeyE63lpp0n2qQDGmR0K
+         EFutzGYu66w77B1w2EE+ZB96b19lD152GwXUkWwYXmsZ3WFbQloAYyZZZ8KSa5ouW4eq
+         Ef2kZqPr/R3VSPTftCO5P+plz8ihOChQI/xpAS1el89M6A7/+jmqSB/aPAjqg1ChBVyS
+         RaUJKme09QVP3izsE+dd984kSTU4+KlN64bD9/H5V1mZLS2BDjOqQH1fI4lfE5lUj/eL
+         AI7Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1779976215; x=1780581015; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=V1s8jKskQG0bDSH4tCE3i2dJj/wDsiGH0s/CmPfjVgE=;
-        b=fdvJp/K5Q9X3GiJZCj+oDun76mibiFVvphFV8V7wH/f8dvY4BlIxrzIwgRC31A/Omu
-         nhVRXT6LZMoz24Bqt3kzkOoUOdIH2oy44dw3bYxFmvOOmPRJM2LiR1gZPw9oezawVzA/
-         g1B0Ovo+yyhP0hMTpa+TCHoUR6+Co18tlwHmtncIFgLtLq0SOOsp0lb20fYMD9PiqW4/
-         +iJz7dAUEJ7tbusRiRZaLm1p6cWl715j+c/Gu1gubVLhwih2fVKH8QVkK0HZbANvsOH3
-         mfoYH608D8boPTdhksT1p941dyivWSHI+StYMHqTxZm8f0wMdfYYjGQgeMnXnN9YUA5I
-         w+0Q==
+        d=google.com; s=20251104; t=1779979541; x=1780584341; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+gjkdBns27ZcM6QB3XftdqjlzU6m8DV5aKnzoL5burk=;
+        b=WVv9XEIHJZj8e8aZyIdryXx7XtpB9u/NNIzOc+cuc7bIDG4H1n0W1tX/mBdMNyWAkQ
+         ER9Ae/LZCL/jdYrsnLQSvd+QhYxB0B2bpdCBnpxgAs1qqxRSYmMeFIp346fuQ0rOI2vT
+         i7l2SskhCD+bq25iU0ScCJMYvxKYope5FQ5caBxNrdAkL/9K/DpDjq2ta7LN0pRnx3Ch
+         TH8dqNucCP0asRGcnzhqU925EKwGEORvbSeD9mBnxipPLlJVhd/Hkx5oe9atSoyQuNQR
+         +At4RBethXLIta2iru49G7TLxeATne8zoDP6M6R2+vkPfJXrX3eIFqEpWcrQLef9H8Zn
+         LbwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779976215; x=1780581015;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=V1s8jKskQG0bDSH4tCE3i2dJj/wDsiGH0s/CmPfjVgE=;
-        b=jcwHYBPFh8SeK1mX+SyI33OFSUcx5Gkm6F4Hdcqkm1eui3b/Q5ojiyBgWDrhnvDoC6
-         H1Hodv/3FIvr/LGtoSqpu6k659tPUhkFgxe0Ib62VK/xJ4BXAokDBMzbk1dMB2mHQER1
-         7ZOUiy7AsxCqiQDwcXxduOchedtBW4gIkDJjPIemXrREJgUhPrwnHrCHqTFr5ZZbmwqi
-         mwCWS1EvNQtzBboswj7TgdODFi9fz6u+A5aqshO4dlOtfM6SalYskCgwn0DDo9Tanai3
-         5YnClZO+bOVTICMUGs/shuidBkMnzGLSq306KzpDKw8PprM7LuncarxZhFm0z5DSV6Zu
-         X/2g==
-X-Forwarded-Encrypted: i=1; AFNElJ83qhWpUi6dRNdvhEkFfKOr9GEHcxAMX43vm8hGRwENeb7S1FdH+MZgUgNUU3Ef3vRaHfUrZN8eUTu32NY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHQbXEqz6Z+CF4yVX71D2UuLNuOlc0znbXA1Z9c+N3x0dH4lPQ
-	PoOV/MPfdkvexHsOrLZdjp0WOmnelAddR+bIgrsC/qGP8gM8BZivo2BUBaK/WDDYr0fv/IaIE/S
-	D01cPtsEVW+etXrro+ENOEXNVGtSoCEgs2IcmPtBJEd0Z+EJ54uCMUk28U8SZsedbhgs=
-X-Gm-Gg: Acq92OEnsmmeJr1mRaFxab8x4rGzYlvKIecYv2ydpHB1gsnNy8d+XtL4EsyF8T0z/Nb
-	8M8OfBPuK51ZcL2QJUXirJfHroOp1kydvG3TdLggP3NRnU0V6EI+7vCdtsWugMLkxxT0fpMQ1ap
-	9p43YG7Zh4rEgPai0bx0VaWRbp7uKTfbbK78JG06HS6jwvUvvxr1S2V4Y9KLxi7lAXoDkh3HcSO
-	HTuaDODltfD0iwnZZyzj6nQ+lPgDBxgN4nnR9MHKKM/D76RwKnY3QAMG5R233kXymiq6It9TcFr
-	BoauFoVan3dfeu6bWqzgDEVf0aB6bgmurY9Ul0ekFFka3bnjGmva1bdO0o5B30CEC7t0OURaB9j
-	MPTwU8TM5PJLGYbzo18NgvikOJWCoeCbijGKWU6ktZm3y4bqxp5OWjH7qThRKeKpQDT+gG5sx/C
-	B7Y1sTWjo9GtIfzgEHcI5JORCPOwsKIHY0DIyMLjfhtPRJzQ==
-X-Received: by 2002:a05:6102:5ccb:b0:632:73ad:6c8 with SMTP id ada2fe7eead31-67c7f273532mr15881168137.7.1779976214959;
-        Thu, 28 May 2026 06:50:14 -0700 (PDT)
-X-Received: by 2002:a05:6102:5ccb:b0:632:73ad:6c8 with SMTP id ada2fe7eead31-67c7f273532mr15881139137.7.1779976214562;
-        Thu, 28 May 2026 06:50:14 -0700 (PDT)
-Received: from umbar.lan (2001-14ba-a073-af00-264b-feff-fe8b-be8a.rev.dnainternet.fi. [2001:14ba:a073:af00:264b:feff:fe8b:be8a])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-395dcc45b19sm39183511fa.40.2026.05.28.06.50.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 May 2026 06:50:12 -0700 (PDT)
-Date: Thu, 28 May 2026 16:50:10 +0300
-From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-To: Bartosz Golaszewski <brgl@kernel.org>
-Cc: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
-        Thara Gopinath <thara.gopinath@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, Vinod Koul <vkoul@kernel.org>,
-        Frank Li <Frank.Li@kernel.org>, Andy Gross <agross@kernel.org>,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        dmaengine@vger.kernel.org,
-        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
-        Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>,
-        Neeraj Soni <neeraj.soni@oss.qualcomm.com>,
-        Eric Biggers <ebiggers@kernel.org>
-Subject: Re: [PATCH 0/3] Add support for qcrypto on shikra
-Message-ID: <lj7geczhthury476ilkjym2k5fblo5pqroefsbdfgh5jcf7zy2@qrss5xc7umn3>
-References: <20260515-shikra_qcrypto-v1-0-80f07b345c29@oss.qualcomm.com>
- <20260514194735.GA1939213@google.com>
- <d4d35e17-84fa-4c95-9bfb-abfd25ea7f4a@oss.qualcomm.com>
- <20260522024912.GC5937@quark>
- <c1697372-54ec-4f57-85d9-ad375ff1a44d@oss.qualcomm.com>
- <20260525142843.GA2018@quark>
- <e49c4a45-6455-47f3-a91f-c32c1a0b99be@oss.qualcomm.com>
- <CAMRc=MfC6CEwOXYttsav3mwqyJ2F4sburBj+zNJ25qMoweyL-Q@mail.gmail.com>
+        d=1e100.net; s=20251104; t=1779979541; x=1780584341;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+gjkdBns27ZcM6QB3XftdqjlzU6m8DV5aKnzoL5burk=;
+        b=NQ2zveUWaCahQyua9J2TAJjQ4ptZ0lzGy2YoZEbQmeYm44ZVRQdoVU7PLOy8ZG8cdd
+         LWxY5knTkVgdzs0/0N45ky6f/TDswJVum3k3sBE2fJYTb2iWpNqEs3lV1ZmgYTpKY9R8
+         vciMjqth0Jt44d2hb3qWDg8q7dBoS125abdZGAq3I14qLdoi8uSTfJTvBnvcG3jRmNo4
+         ELfG0sA7SInCB3I+ffpUinvsLrhM7u6Sp7O7OmMB8D8w/551kJ8tMTc5466k/ZJCLAix
+         rMKduIfAB862lxZsY05O/f+wfbffwhQwazCkNyyVMdt83SeZP742vF3lcZFa3OKJ7Uf+
+         5YiQ==
+X-Forwarded-Encrypted: i=1; AFNElJ+u/tu6MCOKIMp6Yno8FTN0NQf8EWmZJFAw9U7r0/yGK91CExbUM+nbkGG4WIzhmgxdEc0AY+wRQCJHkt0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWpoIwS5K31gDoy9+I+N43HZSowH+q6laS+y1Yv8mTEhx05qjV
+	v/wwnPYPalRyQZ5PsIn0km9HX7BYkSjhlkhsRYNLrJVxNtbJRI7PHNCtR+Czu91byNgmRav9wh4
+	VVD8Mv+YxUMdPB/WTtnHgrFyuHXe5ezaHBVXf1R1g
+X-Gm-Gg: Acq92OG0UyJY5TLO6PDaLNduDhbpN5lreaE8cqWapXhJ8kJhyt61LerLzhf6//1FkJD
+	Dl8Yf8PUfzMCL436RlSdVQbG4me+DJhPgFoVXoQ2neCWJaBtFV/5wPHQNrEj9Ekl5FUH8QUiR76
+	pC1OyW/ZGZ9fVB7F3EawRlWHuZiDBuCODMP/nbjsvSKu//tQ0nNzgmZIE8nzJZ5oUN2aP3UxWKw
+	1zrpReN9me8vaQKMW2WwHmFVhfsNsYwoixoRllrUYqCM8GJJ4lBxdReTL7+22YDayXaNxGJ/pdN
+	Ls3Tc8W1LLKHgJJYAdQrOtUD7VxzUM5Brbt2UtSknUqG/yNoPSJ/RyW9YTW0WhtKzcVPw4K0YS7
+	GmVFX
+X-Received: by 2002:a05:7022:258a:b0:135:e312:47a0 with SMTP id
+ a92af1059eb24-1365fa34af3mr9213804c88.26.1779979539969; Thu, 28 May 2026
+ 07:45:39 -0700 (PDT)
+Received: from 176938342045 named unknown by gmailapi.google.com with
+ HTTPREST; Thu, 28 May 2026 07:45:38 -0700
+Received: from 176938342045 named unknown by gmailapi.google.com with
+ HTTPREST; Thu, 28 May 2026 07:45:38 -0700
+From: Ackerley Tng <ackerleytng@google.com>
+In-Reply-To: <6f1ec3d8ebcf3aaceccc099c07d0deb545dd4ab9.1779133590.git.ashish.kalra@amd.com>
+References: <cover.1779133590.git.ashish.kalra@amd.com> <6f1ec3d8ebcf3aaceccc099c07d0deb545dd4ab9.1779133590.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMRc=MfC6CEwOXYttsav3mwqyJ2F4sburBj+zNJ25qMoweyL-Q@mail.gmail.com>
-X-Authority-Analysis: v=2.4 cv=VOntWdPX c=1 sm=1 tr=0 ts=6a184817 cx=c_pps
- a=UbhLPJ621ZpgOD2l3yZY1w==:117 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
- a=NGcC8JguVDcA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=ZpdpYltYx_vBUK5n70dp:22 a=EUspDBNiAAAA:8
- a=7wDE0xjjevibnHHXysgA:9 a=CjuIK1q_8ugA:10 a=TOPH6uDL9cOC6tEoww4z:22
-X-Proofpoint-GUID: 8MZEu2Zqv22--BD7WVPB8-PjkjELRrIG
-X-Proofpoint-ORIG-GUID: 8MZEu2Zqv22--BD7WVPB8-PjkjELRrIG
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNTI4MDEzOCBTYWx0ZWRfX7C7cQ9hfoCpm
- zMqyjuSJxsu+rqZ8qpQR+82ti09Hbvpblc74itOi3DIWzTSvbH5Ljir0skJsdoGIsAsu6H0uvK6
- igNF4mxD2PGlhsXTj/8FBRktjw/gGEBqt6CRXxBEGL3XMKVIOFPEx4YkZcsx2/t0T8/U3cEOuKh
- qZwqkKD29VN6zvJwGZfb4mUzVuyMBOqjLhngBJDEwj9iva4M5UdnDviFSVj1B7Bgp+168cyKxf0
- 2pMjssvIWJlo5P0Qanh0AQ4NM/KWLnqkb/mK9nrnKEoLWcZOOsyxvNQArx4k+VUd4319zfJxYvC
- ilt6RxAbPZ/2rJN9ajRtA07yfyHov/UySMc28pP8VFRZaqh3juN2CUWMOxz2cdDG3uoRVVN6mEz
- C70kGfyuW6B/Z0fL8f+9sVP+haCwviHf00yIQJGlVSxhbEhklYvYdHXVAqUio1hdd0SkgITUfA1
- fo2fQmsGXJT/BKTS8Jg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-05-28_03,2026-05-28_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 phishscore=0 adultscore=0 impostorscore=0 suspectscore=0
- lowpriorityscore=0 bulkscore=0 clxscore=1015 malwarescore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2605280138
+Date: Thu, 28 May 2026 07:45:38 -0700
+X-Gm-Features: AVHnY4IiVpW6Kxx2WcbuW_kautt7HYMS3rg-qGKju88FQuYeSjZIIv004vFPuvg
+Message-ID: <CAEvNRgGfyb7zvZ1u1j7YLomD+JdAxnVW36gtvNG9gxgZ80vMyQ@mail.gmail.com>
+Subject: Re: [PATCH v5 4/7] x86/sev: Add support to perform RMP optimizations asynchronously
+To: Ashish Kalra <Ashish.Kalra@amd.com>, tglx@kernel.org, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, seanjc@google.com, 
+	peterz@infradead.org, thomas.lendacky@amd.com, herbert@gondor.apana.org.au, 
+	davem@davemloft.net, ardb@kernel.org
+Cc: pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com, 
+	KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com, 
+	jackyli@google.com, pgonda@google.com, rientjes@google.com, 
+	jacobhxu@google.com, xin@zytor.com, pawan.kumar.gupta@linux.intel.com, 
+	babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com, john.allen@amd.com, 
+	darwi@linutronix.de, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, May 28, 2026 at 09:13:23AM -0400, Bartosz Golaszewski wrote:
-> On Thu, 28 May 2026 13:54:51 +0200, Kuldeep Singh
-> <kuldeep.singh@oss.qualcomm.com> said:
-> >>> +Bartosz, Gaurav, Neeraj
-> 
-> I know about the self-tests etc., I will address them next.
+Ashish Kalra <Ashish.Kalra@amd.com> writes:
 
-My 2c, the self-tests would be more important, as they are fixes. Doing
-the crypto in a wrong way is a bad idea...
+Thank you Ashish!
 
--- 
-With best wishes
-Dmitry
+> From: Ashish Kalra <ashish.kalra@amd.com>
+>
+> When SEV-SNP is enabled, all writes to memory are checked to ensure
+> integrity of SNP guest memory. This imposes performance overhead on the
+> whole system.
+>
+> RMPOPT is a new instruction that minimizes the performance overhead of
+> RMP checks on the hypervisor and on non-SNP guests by allowing RMP
+> checks to be skipped for 1GB regions of memory that are known not to
+> contain any SEV-SNP guest memory.
+>
+> Add support for performing RMP optimizations asynchronously using a
+> dedicated workqueue.
+>
+> Enable RMPOPT optimizations globally for all system RAM up to 2TB at
+
+This should also be updated to say "Enable RMPOPT optimizations for up
+to 2TB worth of system RAM at..."
+
+The current phrasing sounds like only addresses [0, 2TB) are allowed to
+be optimized, but actually any address [start, start + 2TB) can be
+optimized?
+
+> RMP initialization time. RMP checks can initially be skipped for 1GB
+> memory ranges that do not contain SEV-SNP guest memory (excluding
+> preassigned pages such as the RMP table and firmware pages). As SNP
+> guests are launched, RMPUPDATE will disable the corresponding RMPOPT
+> optimizations.
+>
+> Suggested-by: Thomas Lendacky <thomas.lendacky@amd.com>
+> Suggested-by: Dave Hansen <dave.hansen@linux.intel.com>
+> Reviewed-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> ---
+>  arch/x86/virt/svm/sev.c | 167 +++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 164 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
+> index 82f9dc7a57c3..8876cac052d5 100644
+> --- a/arch/x86/virt/svm/sev.c
+> +++ b/arch/x86/virt/svm/sev.c
+> @@ -19,6 +19,7 @@
+>  #include <linux/iommu.h>
+>  #include <linux/amd-iommu.h>
+>  #include <linux/nospec.h>
+> +#include <linux/workqueue.h>
+>
+>  #include <asm/sev.h>
+>  #include <asm/processor.h>
+> @@ -125,7 +126,18 @@ static void *rmp_bookkeeping __ro_after_init;
+>  static u64 probed_rmp_base, probed_rmp_size;
+>
+>  static cpumask_t rmpopt_cpumask;
+> -static phys_addr_t rmpopt_pa_start;
+> +static phys_addr_t rmpopt_pa_start, rmpopt_pa_end;
+> +
+> +enum rmpopt_function {
+> +	RMPOPT_FUNC_VERIFY_AND_REPORT_STATUS,
+> +	RMPOPT_FUNC_REPORT_STATUS
+> +};
+> +
+> +#define RMPOPT_WORK_TIMEOUT	10000
+> +
+> +static struct workqueue_struct *rmpopt_wq;
+> +static struct delayed_work rmpopt_delayed_work;
+> +static DEFINE_MUTEX(rmpopt_wq_mutex);
+>
+>  static LIST_HEAD(snp_leaked_pages_list);
+>  static DEFINE_SPINLOCK(snp_leaked_pages_list_lock);
+> @@ -564,12 +576,21 @@ EXPORT_SYMBOL_FOR_MODULES(snp_prepare, "ccp");
+>
+>  static void rmpopt_cleanup(void)
+>  {
+> +	guard(mutex)(&rmpopt_wq_mutex);
+> +
+> +	if (!rmpopt_wq)
+> +		return;
+> +
+> +	cancel_delayed_work_sync(&rmpopt_delayed_work);
+> +	destroy_workqueue(rmpopt_wq);
+> +
+>  	cpus_read_lock();
+>  	wrmsrq_on_cpus(&rmpopt_cpumask, MSR_AMD64_RMPOPT_BASE, 0);
+>  	cpus_read_unlock();
+>
+>  	cpumask_clear(&rmpopt_cpumask);
+> -	rmpopt_pa_start = 0;
+> +	rmpopt_pa_start = rmpopt_pa_end = 0;
+> +	rmpopt_wq = NULL;
+>  }
+>
+>  void snp_shutdown(void)
+> @@ -587,6 +608,105 @@ void snp_shutdown(void)
+>  }
+>  EXPORT_SYMBOL_FOR_MODULES(snp_shutdown, "ccp");
+>
+> +static inline bool __rmpopt(u64 rax, u64 rcx)
+
+Perhaps use pa_start instead of rax and op_type for rcx?
+
+> +{
+> +	bool optimized;
+> +
+> +	asm volatile(".byte 0xf2, 0x0f, 0x01, 0xfc"
+> +		     : "=@ccc" (optimized)
+> +		     : "a" (rax), "c" (rcx)
+> +		     : "memory", "cc");
+> +
+> +	return optimized;
+> +}
+> +
+> +static void rmpopt(u64 pa)
+> +{
+> +	u64 rax = ALIGN_DOWN(pa, SZ_1G);
+> +	u64 rcx = RMPOPT_FUNC_VERIFY_AND_REPORT_STATUS;
+> +
+
+And pa_start and op_type here too.
+
+> +	__rmpopt(rax, rcx);
+> +}
+> +
+> +/*
+> + * 'val' is a system physical address.
+> + */
+> +static void rmpopt_smp(void *val)
+> +{
+> +	rmpopt((u64)val);
+> +}
+> +
+> +/*
+> + * RMPOPT optimizations skip RMP checks at 1GB granularity if this
+> + * range of memory does not contain any SNP guest memory.
+> + */
+> +static void rmpopt_work_handler(struct work_struct *work)
+> +{
+> +	bool current_cpu_cleared = false;
+> +	phys_addr_t pa;
+> +	int this_cpu;
+> +
+> +	pr_info("Attempt RMP optimizations on physical address range @1GB alignment [0x%016llx - 0x%016llx]\n",
+> +		rmpopt_pa_start, rmpopt_pa_end);
+> +
+> +	/*
+> +	 * RMPOPT scans the RMP table, stores the result of the scan in the
+> +	 * reserved processor memory. The RMP scan is the most expensive
+> +	 * part. If a second RMPOPT occurs, it can skip the expensive scan
+> +	 * if they can see a cached result in the reserved processor memory.
+> +	 *
+> +	 * Do RMPOPT on one CPU alone. Then, follow that up with RMPOPT
+> +	 * on every other primary thread. This potentially allows the
+
+I like the leader and follower comments below, thanks! With this
+leader/follower setup, will the followers definitely see the cached scan
+results, or might the followers still potentially not benefit from the
+caching? If it's still only "potentially", why?
+
+> +	 * followers to use the "cached" scan results to avoid repeating
+> +	 * full scans.
+> +	 */
+> +
+> +	/*
+> +	 * Pin the worker to the current CPU for the leader loop so that
+> +	 * this_cpu remains valid and the RMPOPT instruction executes on
+> +	 * the CPU that was cleared from the cpumask.  The workqueue is
+> +	 * WQ_UNBOUND, so without pinning, the scheduler could migrate
+> +	 * the worker between the cpumask manipulation and the leader
+> +	 * loop, causing the leader to run on a different CPU while
+> +	 * this_cpu's core is skipped entirely.
+> +	 *
+> +	 * Use migrate_disable() rather than get_cpu() to prevent
+> +	 * migration while still allowing preemption.
+> +	 *
+> +	 * Note: rmpopt_cpumask is modified here without holding
+> +	 * rmpopt_wq_mutex.  This is safe because the delayed_work
+> +	 * mechanism guarantees single-threaded execution of this
+> +	 * handler, and rmpopt_cleanup() calls cancel_delayed_work_sync()
+> +	 * to ensure handler completion before tearing down the cpumask.
+> +	 */
+> +	migrate_disable();
+> +	this_cpu = smp_processor_id();
+> +	if (cpumask_test_cpu(this_cpu, &rmpopt_cpumask)) {
+> +		cpumask_clear_cpu(this_cpu, &rmpopt_cpumask);
+> +		current_cpu_cleared = true;
+> +	}
+> +
+
+Instead of reusing the global rmpopt_cpumask, why not make a copy of
+rmpopt_cpumask for this function? Then this function won't have to
+figure out current_cpu_cleared or restore rmpopt_cpumask at the end.
+
+I'm thinking to also drop the test and clear, this function can just
+always clear, like
+
+  cpumask_clear_cpu(smp_processor_id(), followers_cpumask);
+
+and later
+
+  on_each_cpu_mask(&followers_cpumask, ...);
+
+Actually, if for whatever reason cpumask_test_cpu(this_cpu,
+&rmpopt_cpumask) above returns false, would that mean somehow some cpu
+exists that wasn't enabled right when rmpopt was initialized? If yes,
+what happens if we call rmpopt() on a cpu where it wasn't initialized?
+
+> +	/* Leader: prime the RMPOPT cache on this CPU */
+> +	for (pa = rmpopt_pa_start; pa < rmpopt_pa_end; pa += SZ_1G)
+> +		rmpopt(pa);
+> +
+> +	migrate_enable();
+> +
+> +	/* Followers: run RMPOPT on all other cores */
+> +	cpus_read_lock();
+> +	for (pa = rmpopt_pa_start; pa < rmpopt_pa_end; pa += SZ_1G) {
+> +		on_each_cpu_mask(&rmpopt_cpumask, rmpopt_smp,
+> +				 (void *)pa, true);
+> +
+> +		 /* Give a chance for other threads to run */
+> +		cond_resched();
+> +	}
+> +	cpus_read_unlock();
+> +
+> +	if (current_cpu_cleared)
+> +		cpumask_set_cpu(this_cpu, &rmpopt_cpumask);
+> +}
+> +
+>
+> [...snip...]
+>
