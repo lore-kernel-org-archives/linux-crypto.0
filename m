@@ -1,42 +1,41 @@
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66B5A3A4F3D;
-	Thu, 28 May 2026 09:09:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA5D4317150
+	for <linux-crypto@vger.kernel.org>; Thu, 28 May 2026 09:09:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779959371; cv=none; b=uPAJcqi1qqXvjet0Mdt6VWNRYGAY0V718Ruu41ROCSSTHGcvj2SIsikwFZyGcGRs5rT44uvLTIR/u8HVjdfj31nqVC9xc0bdRFEA26ird+/MQpS+NO+HiogSLdaez9XCOdUXJQgOqpdVqOP4c9d9SVs8Ht3sqAR6a50dGwxqX0Y=
+	t=1779959371; cv=none; b=lOynVaDB7biCG1TJT2X7yx/VhxidyHNpQJsZIvgt9n3RsSXpr6laqWhd4RPCTkOabfyXxLixkfqzTLSmPtLQMElIyMH94RO76OyZa6S9sJLDFzHC+8wfuCzJJCAQwaJwJZg7jrBql1aO8AtwZDdX8Cex7dfb3dba+hXeOmeEH1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1779959371; c=relaxed/simple;
-	bh=G2ZUDkBKY0pg85mOJ+/IFbQy8Pb1k6V9YXstlwImGSQ=;
+	bh=nwED+gRb2it55nEH+dB+84AErpO9Lo1H1ndCWlFi6c8=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=J2i/jUzfasbn+o1W/E+P7M9oJliOucsRmlfC8Mzd3CmO8irMcc6MB5vdOyBFj9xhpESBmvguaK3TQ7uj7JgF7pPa9r+W27+JhM33t9CzvvlSDOija88bR47f61qjyGuPde2GzA5C3N3ToO+UHH87lRq8uUKp1CLCTwszqvpig4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hYrqPXhn; arc=none smtp.client-ip=185.171.202.116
+	 In-Reply-To:To:Cc; b=W5gWrrhnyjmcgZxmZvb1732M6TIk+zzFOl1MY6BQEH5u8kDwuHdv7kM6hQKPNPZ+Va5Y8N+TU4IwuMo1SgZfcJBDMkdL7xtF+aiylfYwHGORKevPqPXYgCOBbsw8N/j5DJ1SXekjC86EgzkmILwH0a3+BfMlvvMfWTQHdBbV6uQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=F5sFcetN; arc=none smtp.client-ip=185.246.85.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hYrqPXhn"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="F5sFcetN"
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 5B869C62445;
-	Thu, 28 May 2026 09:09:26 +0000 (UTC)
+	by smtpout-03.galae.net (Postfix) with ESMTPS id B9AC24E42D78;
+	Thu, 28 May 2026 09:09:24 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 33EA060495;
-	Thu, 28 May 2026 09:09:26 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 36D871088877F;
-	Thu, 28 May 2026 11:09:24 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 8EF0960495;
+	Thu, 28 May 2026 09:09:24 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 0747710888CA7;
+	Thu, 28 May 2026 11:09:22 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1779959365; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1779959363; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=NPUCnKewshR6MyA0+VEEdSmxBjBZnSZ99GMkaHwwJu8=;
-	b=hYrqPXhnsge2nT70x38IIPIvJZiXwwAVrrvxYufF2v6z0yqB15OeQlk/3DVg0P3GumRPGZ
-	n+57GWvUOv5XFC9S4WzwvGqGx+5ObsqVIcLTBp2O/SvpE1fPlRPjf1uMrpnVZOWd1RJuKl
-	eRakMTC9rZ4dxvPyD4cKcTWYOdZkzFcGCmeezi5Z8hc8enJI2AKQK46Cq2LAXdLnOQcnzZ
-	/vnlym8u9z9WlHbQUaI/nxTzq4981NNpMehx4AQ5UWBFvp4i7YZAFhW0bbZ5smRaW8ZNSA
-	p6GO+/c/0IRH/nXV0iGmsM0EZwQraC+flXlhGuXEjib7gR35yRpic3xfQi57Wg==
+	bh=aBSGuM3DUVG1FqL/RPhY2THQ09igkxVNbL+6loGb8Go=;
+	b=F5sFcetNu11RI0cvWuexPlERFGTR0hzFEFhfXWjbLdDhLW3nW+J7jdU5pQs+A1DXlOQU1n
+	1DSj00ILGAse6edptdGDnBceBAltA/eeaKEbyeUyR0mM2DoxfZ71QpFrSFIpakJfahgKsO
+	x7YLOSHwq4hGq6XGoKkvB/b9XFqQoSoQGqfzLtTy2hgmA6NoZ0NDGbhApg4jsfjERVvJXt
+	lZG8dy0JSzdpIZvMjAzGuaGNCn8axmPV669dET1WAaJgi3k4zq1TZgrpN6wDLnGDdGlti1
+	5AsHoCdY14nOT0Dcya3FdszgPqIYA+x4QDqQNyhR8Z96hkgqEPitBSvGAOEROg==
 From: Paul Louvel <paul.louvel@bootlin.com>
-Date: Thu, 28 May 2026 11:08:18 +0200
-Subject: [PATCH 05/29] crypto: talitos - Prepare crypto implementation file
- splitting
+Date: Thu, 28 May 2026 11:08:17 +0200
+Subject: [PATCH 04/29] crypto: talitos/hwrng - Move into separate file
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -45,7 +44,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260528-7-1-rc1_talitos_cleanup-v1-5-cb1ad6cdea49@bootlin.com>
+Message-Id: <20260528-7-1-rc1_talitos_cleanup-v1-4-cb1ad6cdea49@bootlin.com>
 References: <20260528-7-1-rc1_talitos_cleanup-v1-0-cb1ad6cdea49@bootlin.com>
 In-Reply-To: <20260528-7-1-rc1_talitos_cleanup-v1-0-cb1ad6cdea49@bootlin.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>, 
@@ -55,420 +54,240 @@ Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
  Christophe Leroy <chleroy@kernel.org>, linux-crypto@vger.kernel.org, 
  linux-kernel@vger.kernel.org, Paul Louvel <paul.louvel@bootlin.com>
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1779959350; l=14485;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1779959350; l=6422;
  i=paul.louvel@bootlin.com; s=20260313; h=from:subject:message-id;
- bh=G2ZUDkBKY0pg85mOJ+/IFbQy8Pb1k6V9YXstlwImGSQ=;
- b=rPyOp/z2Uvvm1voPU4ucDwe2vS9K96OkkHnkDdY011ciojRa1zOlb63ZVgKW3rLi+vc6omBF3
- olanm+EMywtCoBDO2IPMGZoxCBTF2K5jCVGNKMMaZbTjw11YXZwkqMj
+ bh=nwED+gRb2it55nEH+dB+84AErpO9Lo1H1ndCWlFi6c8=;
+ b=7+IVr4WiHt/uycspjEZZ4LYVAb/5M0Z7cDBNh1XXvKolzfUcfi0q7b4r4EF1ZlhlXPSvtroiv
+ nfg573EsG1HBC3n5iWoQY7dOz4PoDFiv5wCSZMzDdYfqh2JPW8CgQVC
 X-Developer-Key: i=paul.louvel@bootlin.com; a=ed25519;
  pk=eLW50NT18UAvUT5cAcYf88zNbBCZDLFXuptpyLVhVIU=
 X-Last-TLS-Session-Version: TLSv1.3
 
-Remove the static qualifier on multiple function that will be called
-inside each crypto implementation file.
-Add them to the main driver header file.
-
-Add the common structures too.
+Move the hardware random number generator implementation from
+talitos.c into a dedicated talitos-rng.c file.
 
 Signed-off-by: Paul Louvel <paul.louvel@bootlin.com>
 ---
- drivers/crypto/talitos/talitos.c | 123 ++++++++++++++-------------------------
- drivers/crypto/talitos/talitos.h |  91 +++++++++++++++++++++++++++++
- 2 files changed, 135 insertions(+), 79 deletions(-)
+ drivers/crypto/talitos/Makefile      |  2 +
+ drivers/crypto/talitos/talitos-rng.c | 93 ++++++++++++++++++++++++++++++++++++
+ drivers/crypto/talitos/talitos.c     | 83 --------------------------------
+ drivers/crypto/talitos/talitos.h     |  5 ++
+ 4 files changed, 100 insertions(+), 83 deletions(-)
 
+diff --git a/drivers/crypto/talitos/Makefile b/drivers/crypto/talitos/Makefile
+index fcc5db5e63c2..901ec681f010 100644
+--- a/drivers/crypto/talitos/Makefile
++++ b/drivers/crypto/talitos/Makefile
+@@ -1 +1,3 @@
+ obj-$(CONFIG_CRYPTO_DEV_TALITOS) += talitos.o
++
++talitos-y := talitos.o talitos-rng.o
+diff --git a/drivers/crypto/talitos/talitos-rng.c b/drivers/crypto/talitos/talitos-rng.c
+new file mode 100644
+index 000000000000..3aa00de33b25
+--- /dev/null
++++ b/drivers/crypto/talitos/talitos-rng.c
+@@ -0,0 +1,93 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++
++/*
++ * Freescale SEC (talitos) device hardware random number generator implementation
++ *
++ * Copyright (c) 2006-2011 Freescale Semiconductor, Inc.
++ */
++
++#include <linux/delay.h>
++#include <linux/io.h>
++
++#include "talitos.h"
++
++static int talitos_rng_data_present(struct hwrng *rng, int wait)
++{
++	struct device *dev = (struct device *)rng->priv;
++	struct talitos_private *priv = dev_get_drvdata(dev);
++	u32 ofl;
++	int i;
++
++	for (i = 0; i < 20; i++) {
++		ofl = in_be32(priv->reg_rngu + TALITOS_EUSR_LO) &
++		      TALITOS_RNGUSR_LO_OFL;
++		if (ofl || !wait)
++			break;
++		udelay(10);
++	}
++
++	return !!ofl;
++}
++
++static int talitos_rng_data_read(struct hwrng *rng, u32 *data)
++{
++	struct device *dev = (struct device *)rng->priv;
++	struct talitos_private *priv = dev_get_drvdata(dev);
++
++	/* rng fifo requires 64-bit accesses */
++	*data = in_be32(priv->reg_rngu + TALITOS_EU_FIFO);
++	*data = in_be32(priv->reg_rngu + TALITOS_EU_FIFO_LO);
++
++	return sizeof(u32);
++}
++
++static int talitos_rng_init(struct hwrng *rng)
++{
++	struct device *dev = (struct device *)rng->priv;
++	struct talitos_private *priv = dev_get_drvdata(dev);
++	unsigned int timeout = TALITOS_TIMEOUT;
++
++	setbits32(priv->reg_rngu + TALITOS_EURCR_LO, TALITOS_RNGURCR_LO_SR);
++	while (!(in_be32(priv->reg_rngu + TALITOS_EUSR_LO)
++		 & TALITOS_RNGUSR_LO_RD)
++	       && --timeout)
++		cpu_relax();
++	if (timeout == 0) {
++		dev_err(dev, "failed to reset rng hw\n");
++		return -ENODEV;
++	}
++
++	/* start generating */
++	setbits32(priv->reg_rngu + TALITOS_EUDSR_LO, 0);
++
++	return 0;
++}
++
++int talitos_register_rng(struct device *dev)
++{
++	struct talitos_private *priv = dev_get_drvdata(dev);
++	int err;
++
++	priv->rng.name		= dev_driver_string(dev);
++	priv->rng.init		= talitos_rng_init;
++	priv->rng.data_present	= talitos_rng_data_present;
++	priv->rng.data_read	= talitos_rng_data_read;
++	priv->rng.priv		= (unsigned long)dev;
++
++	err = hwrng_register(&priv->rng);
++	if (!err)
++		priv->rng_registered = true;
++
++	return err;
++}
++
++void talitos_unregister_rng(struct device *dev)
++{
++	struct talitos_private *priv = dev_get_drvdata(dev);
++
++	if (!priv->rng_registered)
++		return;
++
++	hwrng_unregister(&priv->rng);
++	priv->rng_registered = false;
++}
 diff --git a/drivers/crypto/talitos/talitos.c b/drivers/crypto/talitos/talitos.c
-index f5feff8f7d3d..3fc1069062da 100644
+index 8ca587b98d92..f5feff8f7d3d 100644
 --- a/drivers/crypto/talitos/talitos.c
 +++ b/drivers/crypto/talitos/talitos.c
-@@ -40,8 +40,8 @@
+@@ -820,89 +820,6 @@ DEF_TALITOS2_INTERRUPT(ch0_2, TALITOS2_ISR_CH_0_2_DONE, TALITOS2_ISR_CH_0_2_ERR,
+ DEF_TALITOS2_INTERRUPT(ch1_3, TALITOS2_ISR_CH_1_3_DONE, TALITOS2_ISR_CH_1_3_ERR,
+ 		       1)
  
- #include "talitos.h"
+-/*
+- * hwrng
+- */
+-static int talitos_rng_data_present(struct hwrng *rng, int wait)
+-{
+-	struct device *dev = (struct device *)rng->priv;
+-	struct talitos_private *priv = dev_get_drvdata(dev);
+-	u32 ofl;
+-	int i;
+-
+-	for (i = 0; i < 20; i++) {
+-		ofl = in_be32(priv->reg_rngu + TALITOS_EUSR_LO) &
+-		      TALITOS_RNGUSR_LO_OFL;
+-		if (ofl || !wait)
+-			break;
+-		udelay(10);
+-	}
+-
+-	return !!ofl;
+-}
+-
+-static int talitos_rng_data_read(struct hwrng *rng, u32 *data)
+-{
+-	struct device *dev = (struct device *)rng->priv;
+-	struct talitos_private *priv = dev_get_drvdata(dev);
+-
+-	/* rng fifo requires 64-bit accesses */
+-	*data = in_be32(priv->reg_rngu + TALITOS_EU_FIFO);
+-	*data = in_be32(priv->reg_rngu + TALITOS_EU_FIFO_LO);
+-
+-	return sizeof(u32);
+-}
+-
+-static int talitos_rng_init(struct hwrng *rng)
+-{
+-	struct device *dev = (struct device *)rng->priv;
+-	struct talitos_private *priv = dev_get_drvdata(dev);
+-	unsigned int timeout = TALITOS_TIMEOUT;
+-
+-	setbits32(priv->reg_rngu + TALITOS_EURCR_LO, TALITOS_RNGURCR_LO_SR);
+-	while (!(in_be32(priv->reg_rngu + TALITOS_EUSR_LO)
+-		 & TALITOS_RNGUSR_LO_RD)
+-	       && --timeout)
+-		cpu_relax();
+-	if (timeout == 0) {
+-		dev_err(dev, "failed to reset rng hw\n");
+-		return -ENODEV;
+-	}
+-
+-	/* start generating */
+-	setbits32(priv->reg_rngu + TALITOS_EUDSR_LO, 0);
+-
+-	return 0;
+-}
+-
+-static int talitos_register_rng(struct device *dev)
+-{
+-	struct talitos_private *priv = dev_get_drvdata(dev);
+-	int err;
+-
+-	priv->rng.name		= dev_driver_string(dev);
+-	priv->rng.init		= talitos_rng_init;
+-	priv->rng.data_present	= talitos_rng_data_present;
+-	priv->rng.data_read	= talitos_rng_data_read;
+-	priv->rng.priv		= (unsigned long)dev;
+-
+-	err = hwrng_register(&priv->rng);
+-	if (!err)
+-		priv->rng_registered = true;
+-
+-	return err;
+-}
+-
+-static void talitos_unregister_rng(struct device *dev)
+-{
+-	struct talitos_private *priv = dev_get_drvdata(dev);
+-
+-	if (!priv->rng_registered)
+-		return;
+-
+-	hwrng_unregister(&priv->rng);
+-	priv->rng_registered = false;
+-}
  
--static void to_talitos_ptr(struct talitos_ptr *ptr, dma_addr_t dma_addr,
--			   unsigned int len, bool is_sec1)
-+void to_talitos_ptr(struct talitos_ptr *ptr, dma_addr_t dma_addr,
-+		    unsigned int len, bool is_sec1)
- {
- 	ptr->ptr = cpu_to_be32(lower_32_bits(dma_addr));
- 	if (is_sec1) {
-@@ -52,8 +52,8 @@ static void to_talitos_ptr(struct talitos_ptr *ptr, dma_addr_t dma_addr,
- 	}
- }
- 
--static void copy_talitos_ptr(struct talitos_ptr *dst_ptr,
--			     struct talitos_ptr *src_ptr, bool is_sec1)
-+void copy_talitos_ptr(struct talitos_ptr *dst_ptr,
-+		      struct talitos_ptr *src_ptr, bool is_sec1)
- {
- 	dst_ptr->ptr = src_ptr->ptr;
- 	if (is_sec1) {
-@@ -64,8 +64,8 @@ static void copy_talitos_ptr(struct talitos_ptr *dst_ptr,
- 	}
- }
- 
--static unsigned short from_talitos_ptr_len(struct talitos_ptr *ptr,
--					   bool is_sec1)
-+unsigned short from_talitos_ptr_len(struct talitos_ptr *ptr,
-+				    bool is_sec1)
- {
- 	if (is_sec1)
- 		return be16_to_cpu(ptr->len1);
-@@ -73,14 +73,14 @@ static unsigned short from_talitos_ptr_len(struct talitos_ptr *ptr,
- 		return be16_to_cpu(ptr->len);
- }
- 
--static void to_talitos_ptr_ext_set(struct talitos_ptr *ptr, u8 val,
--				   bool is_sec1)
-+void to_talitos_ptr_ext_set(struct talitos_ptr *ptr, u8 val,
-+			    bool is_sec1)
- {
- 	if (!is_sec1)
- 		ptr->j_extent = val;
- }
- 
--static void to_talitos_ptr_ext_or(struct talitos_ptr *ptr, u8 val, bool is_sec1)
-+void to_talitos_ptr_ext_or(struct talitos_ptr *ptr, u8 val, bool is_sec1)
- {
- 	if (!is_sec1)
- 		ptr->j_extent |= val;
-@@ -102,15 +102,15 @@ static void __map_single_talitos_ptr(struct device *dev,
- 	to_talitos_ptr(ptr, dma_addr, len, is_sec1);
- }
- 
--static void map_single_talitos_ptr(struct device *dev,
--				   struct talitos_ptr *ptr,
--				   unsigned int len, void *data,
--				   enum dma_data_direction dir)
-+void map_single_talitos_ptr(struct device *dev,
-+			    struct talitos_ptr *ptr,
-+			    unsigned int len, void *data,
-+			    enum dma_data_direction dir)
- {
- 	__map_single_talitos_ptr(dev, ptr, len, data, dir, 0);
- }
- 
--static void map_single_talitos_ptr_nosync(struct device *dev,
-+void map_single_talitos_ptr_nosync(struct device *dev,
- 					  struct talitos_ptr *ptr,
- 					  unsigned int len, void *data,
- 					  enum dma_data_direction dir)
-@@ -122,9 +122,9 @@ static void map_single_talitos_ptr_nosync(struct device *dev,
  /*
-  * unmap bus single (contiguous) h/w descriptor pointer
-  */
--static void unmap_single_talitos_ptr(struct device *dev,
--				     struct talitos_ptr *ptr,
--				     enum dma_data_direction dir)
-+void unmap_single_talitos_ptr(struct device *dev,
-+			      struct talitos_ptr *ptr,
-+			      enum dma_data_direction dir)
- {
- 	struct talitos_private *priv = dev_get_drvdata(dev);
- 	bool is_sec1 = has_ftr_sec1(priv);
-@@ -303,11 +303,11 @@ static void dma_map_request(struct device *dev, struct talitos_request *request,
-  * callback must check err and feedback in descriptor header
-  * for device processing status.
-  */
--static int talitos_submit(struct device *dev, int ch, struct talitos_desc *desc,
--			  void (*callback)(struct device *dev,
--					   struct talitos_desc *desc,
--					   void *context, int error),
--			  void *context)
-+int talitos_submit(struct device *dev, int ch, struct talitos_desc *desc,
-+		   void (*callback)(struct device *dev,
-+				    struct talitos_desc *desc,
-+				    void *context, int error),
-+		   void *context)
- {
- 	struct talitos_private *priv = dev_get_drvdata(dev);
- 	struct talitos_request *request;
-@@ -830,24 +830,6 @@ DEF_TALITOS2_INTERRUPT(ch1_3, TALITOS2_ISR_CH_1_3_DONE, TALITOS2_ISR_CH_1_3_ERR,
-  * HMAC_SNOOP_NO_AFEA (HSNA) instead of type IPSEC_ESP
-  */
- #define TALITOS_CRA_PRIORITY_AEAD_HSNA	(TALITOS_CRA_PRIORITY - 1)
--#ifdef CONFIG_CRYPTO_DEV_TALITOS2
--#define TALITOS_MAX_KEY_SIZE		(AES_MAX_KEY_SIZE + SHA512_BLOCK_SIZE)
--#else
--#define TALITOS_MAX_KEY_SIZE		(AES_MAX_KEY_SIZE + SHA256_BLOCK_SIZE)
--#endif
--#define TALITOS_MAX_IV_LENGTH		16 /* max of AES_BLOCK_SIZE, DES3_EDE_BLOCK_SIZE */
--
--struct talitos_ctx {
--	struct device *dev;
--	int ch;
--	__be32 desc_hdr_template;
--	u8 key[TALITOS_MAX_KEY_SIZE];
--	u8 iv[TALITOS_MAX_IV_LENGTH];
--	dma_addr_t dma_key;
--	unsigned int keylen;
--	unsigned int enckeylen;
--	unsigned int authkeylen;
--};
- 
- #define HASH_MAX_BLOCK_SIZE		SHA512_BLOCK_SIZE
- #define TALITOS_MDEU_MAX_CONTEXT_SIZE	TALITOS_MDEU_CONTEXT_SIZE_SHA384_SHA512
-@@ -939,7 +921,7 @@ static int aead_des3_setkey(struct crypto_aead *authenc,
- 	return err;
- }
- 
--static void talitos_sg_unmap(struct device *dev,
-+void talitos_sg_unmap(struct device *dev,
- 			     struct talitos_edesc *edesc,
- 			     struct scatterlist *src,
- 			     struct scatterlist *dst,
-@@ -1124,7 +1106,7 @@ static int sg_to_link_tbl_offset(struct scatterlist *sg, int sg_count,
- 	return count;
- }
- 
--static int talitos_sg_map_ext(struct device *dev, struct scatterlist *src,
-+int talitos_sg_map_ext(struct device *dev, struct scatterlist *src,
- 			      unsigned int len, struct talitos_edesc *edesc,
- 			      struct talitos_ptr *ptr, int sg_count,
- 			      unsigned int offset, int tbl_off, int elen,
-@@ -1161,7 +1143,7 @@ static int talitos_sg_map_ext(struct device *dev, struct scatterlist *src,
- 	return sg_count;
- }
- 
--static int talitos_sg_map(struct device *dev, struct scatterlist *src,
-+int talitos_sg_map(struct device *dev, struct scatterlist *src,
- 			  unsigned int len, struct talitos_edesc *edesc,
- 			  struct talitos_ptr *ptr, int sg_count,
- 			  unsigned int offset, int tbl_off)
-@@ -1299,17 +1281,17 @@ static int ipsec_esp(struct talitos_edesc *edesc, struct aead_request *areq,
- /*
-  * allocate and map the extended descriptor
-  */
--static struct talitos_edesc *talitos_edesc_alloc(struct device *dev,
--						 struct scatterlist *src,
--						 struct scatterlist *dst,
--						 u8 *iv,
--						 unsigned int assoclen,
--						 unsigned int cryptlen,
--						 unsigned int authsize,
--						 unsigned int ivsize,
--						 int icv_stashing,
--						 u32 cryptoflags,
--						 bool encrypt)
-+struct talitos_edesc *talitos_edesc_alloc(struct device *dev,
-+					  struct scatterlist *src,
-+					  struct scatterlist *dst,
-+					  u8 *iv,
-+					  unsigned int assoclen,
-+					  unsigned int cryptlen,
-+					  unsigned int authsize,
-+					  unsigned int ivsize,
-+					  int icv_stashing,
-+					  u32 cryptoflags,
-+					  bool encrypt)
- {
- 	struct talitos_edesc *edesc;
- 	int src_nents, dst_nents, alloc_len, dma_len, src_len, dst_len;
-@@ -2172,18 +2154,6 @@ static int ahash_setkey(struct crypto_ahash *tfm, const u8 *key,
- 	return 0;
- }
- 
--
--struct talitos_alg_template {
--	u32 type;
--	u32 priority;
--	union {
--		struct skcipher_alg skcipher;
--		struct ahash_alg hash;
--		struct aead_alg aead;
--	} alg;
--	__be32 desc_hdr_template;
--};
--
- static struct talitos_alg_template driver_algs[] = {
- 	/* AEAD algorithms.  These use a single-pass ipsec_esp descriptor */
- 	{	.type = CRYPTO_ALG_TYPE_AEAD,
-@@ -2998,14 +2968,8 @@ static struct talitos_alg_template driver_algs[] = {
- 	}
- };
- 
--struct talitos_crypto_alg {
--	struct list_head entry;
--	struct device *dev;
--	struct talitos_alg_template algt;
--};
--
--static int talitos_init_common(struct talitos_ctx *ctx,
--			       struct talitos_crypto_alg *talitos_alg)
-+int talitos_init_common(struct talitos_ctx *ctx,
-+			struct talitos_crypto_alg *talitos_alg)
- {
- 	struct talitos_private *priv;
- 
-@@ -3066,7 +3030,7 @@ static int talitos_cra_init_ahash(struct crypto_tfm *tfm)
- 	return talitos_init_common(ctx, talitos_alg);
- }
- 
--static void talitos_cra_exit(struct crypto_tfm *tfm)
-+void talitos_cra_exit(struct crypto_tfm *tfm)
- {
- 	struct talitos_ctx *ctx = crypto_tfm_ctx(tfm);
- 	struct device *dev = ctx->dev;
-@@ -3080,7 +3044,7 @@ static void talitos_cra_exit(struct crypto_tfm *tfm)
-  * type and primary/secondary execution units required match the hw
-  * capabilities description provided in the device tree node.
-  */
--static int hw_supports(struct device *dev, __be32 desc_hdr_template)
-+int talitos_hw_supports(struct device *dev, __be32 desc_hdr_template)
- {
- 	struct talitos_private *priv = dev_get_drvdata(dev);
- 	int ret;
-@@ -3117,7 +3081,7 @@ static void talitos_remove(struct platform_device *ofdev)
- 		list_del(&t_alg->entry);
- 	}
- 
--	if (hw_supports(dev, DESC_HDR_SEL0_RNG))
-+	if (talitos_hw_supports(dev, DESC_HDR_SEL0_RNG))
- 		talitos_unregister_rng(dev);
- 
- 	for (i = 0; i < 2; i++)
-@@ -3426,7 +3390,7 @@ static int talitos_probe(struct platform_device *ofdev)
- 	}
- 
- 	/* register the RNG, if available */
--	if (hw_supports(dev, DESC_HDR_SEL0_RNG)) {
-+	if (talitos_hw_supports(dev, DESC_HDR_SEL0_RNG)) {
- 		err = talitos_register_rng(dev);
- 		if (err) {
- 			dev_err(dev, "failed to register hwrng: %d\n", err);
-@@ -3437,7 +3401,8 @@ static int talitos_probe(struct platform_device *ofdev)
- 
- 	/* register crypto algorithms the device supports */
- 	for (i = 0; i < ARRAY_SIZE(driver_algs); i++) {
--		if (hw_supports(dev, driver_algs[i].desc_hdr_template)) {
-+		if (talitos_hw_supports(dev,
-+					driver_algs[i].desc_hdr_template)) {
- 			struct talitos_crypto_alg *t_alg;
- 			struct crypto_alg *alg = NULL;
- 
+  * crypto alg
 diff --git a/drivers/crypto/talitos/talitos.h b/drivers/crypto/talitos/talitos.h
-index fa8c71b1f90f..1f81d336dae8 100644
+index 56e36a65ddcc..fa8c71b1f90f 100644
 --- a/drivers/crypto/talitos/talitos.h
 +++ b/drivers/crypto/talitos/talitos.h
-@@ -5,7 +5,13 @@
-  * Copyright (c) 2006-2011 Freescale Semiconductor, Inc.
-  */
- 
-+#include <crypto/aes.h>
-+#include <crypto/internal/aead.h>
-+#include <crypto/internal/hash.h>
-+#include <crypto/internal/skcipher.h>
-+#include <crypto/sha2.h>
- #include <linux/device.h>
-+#include <linux/dma-mapping.h>
- #include <linux/hw_random.h>
- #include <linux/interrupt.h>
- #include <linux/scatterlist.h>
-@@ -19,6 +25,13 @@
- #define PRIMARY_EU(desc_hdr) ((be32_to_cpu(desc_hdr) >> 28) & 0xf)
- #define SECONDARY_EU(desc_hdr) ((be32_to_cpu(desc_hdr) >> 16) & 0xf)
- 
-+#ifdef CONFIG_CRYPTO_DEV_TALITOS2
-+#define TALITOS_MAX_KEY_SIZE		(AES_MAX_KEY_SIZE + SHA512_BLOCK_SIZE)
-+#else
-+#define TALITOS_MAX_KEY_SIZE		(AES_MAX_KEY_SIZE + SHA256_BLOCK_SIZE)
-+#endif
-+#define TALITOS_MAX_IV_LENGTH		16 /* max of AES_BLOCK_SIZE, DES3_EDE_BLOCK_SIZE */
-+
- /* descriptor pointer entry */
- struct talitos_ptr {
- 	union {
-@@ -174,6 +187,35 @@ struct talitos_private {
- 
- };
- 
-+struct talitos_ctx {
-+	struct device *dev;
-+	int ch;
-+	__be32 desc_hdr_template;
-+	u8 key[TALITOS_MAX_KEY_SIZE];
-+	u8 iv[TALITOS_MAX_IV_LENGTH];
-+	dma_addr_t dma_key;
-+	unsigned int keylen;
-+	unsigned int enckeylen;
-+	unsigned int authkeylen;
-+};
-+
-+struct talitos_alg_template {
-+	u32 type;
-+	u32 priority;
-+	union {
-+		struct skcipher_alg skcipher;
-+		struct ahash_alg hash;
-+		struct aead_alg aead;
-+	} alg;
-+	__be32 desc_hdr_template;
-+};
-+
-+struct talitos_crypto_alg {
-+	struct list_head entry;
-+	struct device *dev;
-+	struct talitos_alg_template algt;
-+};
-+
- /* .features flag */
- #define TALITOS_FTR_SRC_LINK_TBL_LEN_INCLUDES_EXTENT 0x00000001
- #define TALITOS_FTR_HW_AUTH_CHECK 0x00000002
-@@ -432,6 +474,55 @@ static inline bool has_ftr_sec1(struct talitos_private *priv)
+@@ -431,3 +431,8 @@ static inline bool has_ftr_sec1(struct talitos_private *priv)
+ #define DESC_PTR_LNKTBL_JUMP			0x80
  #define DESC_PTR_LNKTBL_RET			0x02
  #define DESC_PTR_LNKTBL_NEXT			0x01
- 
-+void to_talitos_ptr(struct talitos_ptr *ptr, dma_addr_t dma_addr,
-+		    unsigned int len, bool is_sec1);
-+void copy_talitos_ptr(struct talitos_ptr *dst_ptr, struct talitos_ptr *src_ptr,
-+		      bool is_sec1);
-+unsigned short from_talitos_ptr_len(struct talitos_ptr *ptr, bool is_sec1);
-+void to_talitos_ptr_ext_set(struct talitos_ptr *ptr, u8 val, bool is_sec1);
-+void to_talitos_ptr_ext_or(struct talitos_ptr *ptr, u8 val, bool is_sec1);
 +
-+void map_single_talitos_ptr(struct device *dev, struct talitos_ptr *ptr,
-+			    unsigned int len, void *data,
-+			    enum dma_data_direction dir);
-+void map_single_talitos_ptr_nosync(struct device *dev, struct talitos_ptr *ptr,
-+				   unsigned int len, void *data,
-+				   enum dma_data_direction dir);
-+void unmap_single_talitos_ptr(struct device *dev, struct talitos_ptr *ptr,
-+			      enum dma_data_direction dir);
++/* Hardware RNG */
 +
-+int talitos_submit(struct device *dev, int ch, struct talitos_desc *desc,
-+		   void (*callback)(struct device *dev,
-+				    struct talitos_desc *desc, void *context,
-+				    int error),
-+		   void *context);
-+
-+void talitos_sg_unmap(struct device *dev, struct talitos_edesc *edesc,
-+		      struct scatterlist *src, struct scatterlist *dst,
-+		      unsigned int len, unsigned int offset);
-+int talitos_sg_map_ext(struct device *dev, struct scatterlist *src,
-+		       unsigned int len, struct talitos_edesc *edesc,
-+		       struct talitos_ptr *ptr, int sg_count,
-+		       unsigned int offset, int tbl_off, int elen, bool force,
-+		       int align);
-+int talitos_sg_map(struct device *dev, struct scatterlist *src,
-+		   unsigned int len, struct talitos_edesc *edesc,
-+		   struct talitos_ptr *ptr, int sg_count, unsigned int offset,
-+		   int tbl_off);
-+
-+struct talitos_edesc *
-+talitos_edesc_alloc(struct device *dev, struct scatterlist *src,
-+		    struct scatterlist *dst, u8 *iv, unsigned int assoclen,
-+		    unsigned int cryptlen, unsigned int authsize,
-+		    unsigned int ivsize, int icv_stashing, u32 cryptoflags,
-+		    bool encrypt);
-+
-+int talitos_hw_supports(struct device *dev, __be32 desc_hdr_template);
-+
-+int talitos_init_common(struct talitos_ctx *ctx,
-+			struct talitos_crypto_alg *talitos_alg);
-+void talitos_cra_exit(struct crypto_tfm *tfm);
-+
- /* Hardware RNG */
- 
- int talitos_register_rng(struct device *dev);
++int talitos_register_rng(struct device *dev);
++void talitos_unregister_rng(struct device *dev);
 
 -- 
 2.54.0
