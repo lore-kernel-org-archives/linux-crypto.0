@@ -1,131 +1,103 @@
-Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EEE83F23C4
-	for <linux-crypto@vger.kernel.org>; Thu, 28 May 2026 16:56:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52DEE3B4EA3;
+	Thu, 28 May 2026 17:52:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779987371; cv=none; b=dQUdSYsSxsxwFfHEZr1X/657xTCQsQxJpOMxzFDZmYft8XvdQOnbQz3ZTbrPFJoG6+z7n2eVYXF3xkcRgvTR0V15EQVdplRP0QBtacpg8yVB08oAWMb8sC18jp9zDBz2kFh0LDba+1tiT8DSGS/ZQFYWgUnZMT6ZvWX/zTw6smc=
+	t=1779990739; cv=none; b=YV16JzzaUva8nU4sKujD8dREU/CPRuAmtHGawruBXKX/ZHejg9BbRoSDJzIv9lUllrH5od925gCMhqqi33F7I1xDAmByUWOGJgozDcHuAvI1w/Qs5KnKz7mcSRq4t0N9fkzXEMgksaZfM9BIs8zvMIDfbEkeqrfv2FyoKy4ocWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779987371; c=relaxed/simple;
-	bh=dRm6v9rJ98fryRZu+nDZ52gP6ZF+I/symBIWFqheIec=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RX5lJs/+93ruxY1NIIpV2/jfs8CzjTWvdZbI8nfxAlqtEzi+a2TatPVyuZAz1sDbtwSUdkQazjDCoR9zj5uuyWYD3uPX4pZV+R/O858Jt/ei7KUpw4ZD6ydUPFPISitwcDUo0+BuGXB2xTqudNfc9Bic7ztPSb/GEM98qEwoX5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b=axxvXFIh; arc=none smtp.client-ip=209.85.161.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+	s=arc-20240116; t=1779990739; c=relaxed/simple;
+	bh=/WevIpPK3SaYeqJ1HmkSOi3MW+1TONCBYE4elIAounc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uryyft7CQ06RkVxxB0fGhZWEsNNbJ6sdpBFoAjAAilF9b3J8QWNjeVVdh1/NOZPgMNjY51FfGCQSUFEnfYJXtKN4mMZZIZmBJVCTKXEevuoTq0jqnBxoS0Xz0oKJ3S7HVbSKzsVRWl6lBx0uFwl0sM5kI4jMcWX1Ig2YG50KRqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h3RWVWIS; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20251104.gappssmtp.com header.i=@kernel-dk.20251104.gappssmtp.com header.b="axxvXFIh"
-Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-69df5352d0eso651053eaf.3
-        for <linux-crypto@vger.kernel.org>; Thu, 28 May 2026 09:56:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20251104.gappssmtp.com; s=20251104; t=1779987369; x=1780592169; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WDGJeqE4tTfg/YKUkoTVnPS7Lm5TeqY7Toc0BSTB4Ms=;
-        b=axxvXFIhScPMwL1SYv1SB/8Twa6Qjpy4MHe4/Zy7f+oNlk8eF6vcpwSjMxUCgkdaZk
-         H2r4dgPHHu3jnBszJQpKbqLgekX8xr5tOZIcZbJbYQQIZ8ojEJRLFWpfSn02Vdt590Lj
-         +JdTIeluvDz8KhKs9IORim7N+sgGXktxRB1C70gXOxClZT7XoGhKqYzsUg9V7gQMK4UQ
-         QlnyMKWM+ISgiaifbHgBHXkboi3nHAgNX4VdKx0gQ4c9QFzxb5Lc246wAjsS2DSZdHMs
-         J0fMheyMpMNKb9nzBIxJBG9v1ZmNg2RAwLMqUUokGc6eK8QKKzP0eW7ObVslwpDeP5lb
-         H+UQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1779987369; x=1780592169;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WDGJeqE4tTfg/YKUkoTVnPS7Lm5TeqY7Toc0BSTB4Ms=;
-        b=qthpyo5Iy2SDZm9NHTTbaf7pDoSHabbOs2KyWRcaOEnwYdDPg2+qITAlJW3kBXthcI
-         teG2aGC/vIe+qDzUs4/veonpLVyaOhoOBHOspBuE4vOzAR+8jlprg/sTdmmFqUVHXarA
-         gI7JAKaPZ6fgVW/+uFpsozSQvReAESL832il+EOrayeGNoQVOmOZeuQffzcd0RudaY7I
-         8AWH4z4vdi/2icc6OGxUBYQhKCWB5amgVYok0K+jHFC2l7NbYGZPsKwq5UsvhoTOva1a
-         sjDUSgICl3ODz/M+sh9BK6cYn7hID3BL0LjPN604BLBO91GiXUtIE5qnFW98CPaRWNsF
-         hJ6w==
-X-Forwarded-Encrypted: i=1; AFNElJ9hIhzcJziegHKRhefFvwXwzy2CSANsutfpfX+iIQwwFZxKM9vjz07VGcpMZ12K21mGimXZ0VGXoNAzgDU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3CLl4ZiyytxdGoQgVChDSE8IxzSDE2AM1n8EWj/k/F5yFQ2ug
-	DQmVloNxz7ZTFlt/2usq1O4Cync3z9OqCU3YtZyM+e1gVF8JnUJ9Ui0bKU/sBdJCN+s=
-X-Gm-Gg: Acq92OGZomLunO/atH1ZJinHNd1CEsaUtCoFDU+p4IzExJU76D3pW9JpejeMqihJIGt
-	eEvPJs9Z5sBmHGZiZkVlKHL6Owx3UVbxGGBxg63LvGTLKr+qrXISiwdT/Y4nobfz27NwirkHAtw
-	PEN/64kY+p7PvMm7FR0kJxQi6B6t8jr8t8JTuWIGuXn7Z4mMj/M9zuINAt9jrx7KqvjpscgVv3g
-	PMmP0Slp4c9HqE5LUONNVbc7XNXDIMmcDsyzeZFV8LkZoytc20HVjPV03qlw+oQTFq4Od7qvObP
-	DO25uMilQSjCAQn70NizFazm7HDPCkAL7Iykzeo9uxi7iYTemgqE34cOsYDrcO/j+HDKqDVeUu7
-	Qlo/tudAaWAjdV7oWbYcEXjXU1qnSXw6kFOxNTb/MMOUsddyu1M0fYRFwhviLjHlPH3DaLL/L1G
-	JJ71r/m9lbvlVvFuz39Yb1F21CYWZsqOR6Bn4dyM0KwGQbz0ec1Oo8rWBlF4olXW6ajQO1bZsYJ
-	ngXf7GYnL0RXNSlizM=
-X-Received: by 2002:a05:6820:4c07:b0:69b:5fcb:1a69 with SMTP id 006d021491bc7-69d7ed105b6mr14873551eaf.59.1779987369074;
-        Thu, 28 May 2026 09:56:09 -0700 (PDT)
-Received: from [192.168.1.102] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-69e010cd4casm152656eaf.7.2026.05.28.09.56.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 May 2026 09:56:08 -0700 (PDT)
-Message-ID: <2cfd6455-7b5b-4974-b8a1-4a0abca69768@kernel.dk>
-Date: Thu, 28 May 2026 10:56:06 -0600
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h3RWVWIS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB45B1F000E9;
+	Thu, 28 May 2026 17:52:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779990736;
+	bh=wA+h2LHJqTGA0QJnfQ0FCObieUhoPZ0RdKo+Y/z5Xyg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=h3RWVWIS+mWdQxZ5uz+s4obm8+Xaok4BxvqhGUauCmCTRepK6hIMUzS7G3R6gcT+Q
+	 9VOU+EiIiKShxPH++HQ8NedDIZl4IJYwy6tzFmD+HKQ74yPcphUdWbIxzQ8pA4u8C5
+	 LKrsQryP6HyEOU8VYRp6OQJP16pQiuqlz5UCVA4xB1+VT5Jk+R5Hggtr2RB8zY3whg
+	 R5Ch+8C+k5x8dbdmUSIhV8uKjSqaMc3efUjj9xVGZ5SbV+I3DIwDJDQLf0cnsSg+zA
+	 gMhjZjCOKcgsFrtiTy9ODdBazicvw5YEJ0NMueTgWpcBfzpipKY8ZcbvDPGSwJZ7vd
+	 H6+eDYAfggBmA==
+Date: Thu, 28 May 2026 17:52:14 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: Bartosz Golaszewski <brgl@kernel.org>
+Cc: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+	Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
+	Thara Gopinath <thara.gopinath@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Vinod Koul <vkoul@kernel.org>, Frank Li <Frank.Li@kernel.org>,
+	Andy Gross <agross@kernel.org>, linux-arm-msm@vger.kernel.org,
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, dmaengine@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
+	Gaurav Kashyap <gaurav.kashyap@oss.qualcomm.com>,
+	Neeraj Soni <neeraj.soni@oss.qualcomm.com>
+Subject: Re: [PATCH 0/3] Add support for qcrypto on shikra
+Message-ID: <20260528175214.GA3936298@google.com>
+References: <20260515-shikra_qcrypto-v1-0-80f07b345c29@oss.qualcomm.com>
+ <20260514194735.GA1939213@google.com>
+ <d4d35e17-84fa-4c95-9bfb-abfd25ea7f4a@oss.qualcomm.com>
+ <20260522024912.GC5937@quark>
+ <c1697372-54ec-4f57-85d9-ad375ff1a44d@oss.qualcomm.com>
+ <20260525142843.GA2018@quark>
+ <e49c4a45-6455-47f3-a91f-c32c1a0b99be@oss.qualcomm.com>
+ <CAMRc=MfC6CEwOXYttsav3mwqyJ2F4sburBj+zNJ25qMoweyL-Q@mail.gmail.com>
+ <lj7geczhthury476ilkjym2k5fblo5pqroefsbdfgh5jcf7zy2@qrss5xc7umn3>
+ <CAMRc=Me6cqasdBknbAjUZ5BqcpERYwV+NvseRJp4P0aTSYAMUw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] net: Remove support for AIO on sockets
-To: Christoph Hellwig <hch@infradead.org>
-Cc: demiobenour@gmail.com, Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Willem de Bruijn <willemb@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
- Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
- Adrian Hunter <adrian.hunter@intel.com>, James Clark
- <james.clark@linaro.org>, Jonathan Corbet <corbet@lwn.net>,
- Shuah Khan <skhan@linuxfoundation.org>, Eric Biggers <ebiggers@google.com>,
- Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, io-uring@vger.kernel.org,
- netdev@vger.kernel.org, linux-perf-users@vger.kernel.org,
- linux-doc@vger.kernel.org, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
- <toke@toke.dk>, linux-api@vger.kernel.org,
- David Howells <dhowells@redhat.com>
-References: <20260523-af-alg-harden-v1-0-c76755c3a5c5@gmail.com>
- <20260523-af-alg-harden-v1-1-c76755c3a5c5@gmail.com>
- <ahQCZQNoyO8GQt3H@infradead.org>
- <92db3ff0-8f0b-4b61-a167-5004ffcf9025@kernel.dk>
- <ahanjVfIDlCmeCUE@infradead.org>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <ahanjVfIDlCmeCUE@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMRc=Me6cqasdBknbAjUZ5BqcpERYwV+NvseRJp4P0aTSYAMUw@mail.gmail.com>
 
-On 5/27/26 2:13 AM, Christoph Hellwig wrote:
-> On Tue, May 26, 2026 at 09:58:27AM -0600, Jens Axboe wrote:
->>> The current TCP zerocopy implementation provides completion notification
->>> through the socket error code, which is freaking weird and doesn't
->>> integrate well with either io_uring or in-kernel callers.
->>
->> We already have that via io_uring
+On Thu, May 28, 2026 at 11:13:47AM -0400, Bartosz Golaszewski wrote:
+> On Thu, 28 May 2026 15:50:10 +0200, Dmitry Baryshkov
+> <dmitry.baryshkov@oss.qualcomm.com> said:
+> > On Thu, May 28, 2026 at 09:13:23AM -0400, Bartosz Golaszewski wrote:
+> >> On Thu, 28 May 2026 13:54:51 +0200, Kuldeep Singh
+> >> <kuldeep.singh@oss.qualcomm.com> said:
+> >> >>> +Bartosz, Gaurav, Neeraj
+> >>
+> >> I know about the self-tests etc., I will address them next.
+> >
+> > My 2c, the self-tests would be more important, as they are fixes. Doing
+> > the crypto in a wrong way is a bad idea...
+> >
 > 
-> Where?  And how do make that available to in-kernel users like
-> storage protocols and network file system, which really suffer from
-> the current MSG_SPLICE_PAGES semantics.
+> Then let that be "in parallel". :)
 
-For zero copy, on both the receive and send side. Since we have a proper
-notification channel, that's what we use rather than the hack that is
-the error queue.
+The race conditions between Linux and other environments (modem, TEE,
+etc) are of course about correctness as well, even though the self-tests
+don't expose race condition bugs.  The self-tests have always just done
+a few serialized tests.  That's sufficient for CPU-based code, but not
+for offload drivers, which need to be stress-tested to find the
+concurrency bugs that occur during actual use.
 
->> , and without needing msg_kiocb or the
-> 
-> What do you think is the downside of using a kiocb here like for
-> everything else with async notifications?
+Is there a plan to improve the tests to do stress testing as well?
 
-Where would the notifications go? You'd end up inventing something new
-to propagate them to userspace then. The io_uring side does not rely on
-using msg_kiocb, and iirc that part was only ever used for the crypto
-stuff and largely broken. Which is why I do agree with just yanking it
-out.
+It's kind of odd that they don't do that yet.  But it makes sense: the
+CPU-based code doesn't need it, while the offload driver authors have
+never cared enough about correctness and test coverage to add it.
 
--- 
-Jens Axboe
+I still don't really see a path forward here, given the track record and
+poor performance numbers.  This approach just doesn't work.
+
+- Eric
