@@ -1,106 +1,116 @@
-Received: from canpmsgout11.his.huawei.com (canpmsgout11.his.huawei.com [113.46.200.226])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E81253E63B9;
-	Thu, 28 May 2026 11:57:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE2B33E8320;
+	Thu, 28 May 2026 12:16:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1779969435; cv=none; b=a7gbJANzibqqQD5+652cU+tLtpq5ucGZnP5k55+AFO0zFFo6XrabiXCfvY0gx0Fwy2KhoyNFUGvZDEIe4xG0t1gsa0m9qPKLZKFib8DTeViiXYXkLeLNYGOslzoz0R68k+Hbc/LPfwreB63nWWYjr288Ocs2ZDmzUZUlrxI0VhY=
+	t=1779970564; cv=none; b=c8JVnmPUfsvgzvH/EATfMuzCP7ggdYqKxHwoi3s1lx9JQRYPk6u2IhkUWBmG87KnggAwhhD49d8vBfF6/RNYiCeksVpmwh3/bmG0/JYm9c7Pji6rvZZhVCVEuKdiLWtjSOzOdGvtsWQUA8h18ZQ4K+85OaKUikWK9+UG82Pd4zo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1779969435; c=relaxed/simple;
-	bh=hX1WpG0y8qkBmdTtG9BOn5LUOQEiL1v9TfaL0Cy03Oc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=V6NZCVFOpfgg2JlqHQDV0Bg84mXywzD4n93p36CDBeXTIgzwtIc/4kbXdWxzJi6kNDJ75HkeDuLTM1GEM/gHHp4bWVnwJKlQ1M6+TAyIRFxbQl2chCgBaYkksM1w2UX4Gv4wdW7/Ts5Lbjg26YIkr16sNAWgcJydOLTH9azTrhc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=jy0UPAro; arc=none smtp.client-ip=113.46.200.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1779970564; c=relaxed/simple;
+	bh=Ir+St5jjuyDHu0k2ayfYcSBkd8eojxxhArhUYtGtJQc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZgPGexKByTF/2eoaHFY9Y0aJ5M4+DzjHz4JkovSHgbxJNjkbvdf9zQC4CC2VYVcJod1fv+YGbkUlvSDUKvcuMRRhUgxQd4ZD3oKExO1JmZnEiaGPYVa9O4S2N+/LZUG82JbPfKgMyfeHv67/TQ694kz1tHWHPlROLZWsP/a3NoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V2CGDCj0; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="jy0UPAro"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=WY/b8mrnY3M4GaZDZc7/fEQZnRdvXe/m58scRCY69AU=;
-	b=jy0UPAroYzuoB9WE6aZsJ7fpmyz7fqyb0/2qz8AynKm2/EegpZLEY25dUUb8Yv71AheUgBBDm
-	C0yym0UGe1GbpgN0psyXf7Qh+XVRNob3pJTVNlF2jNE6BmEnmhg8suZ5ZCl67OM9z2sjivW2MAI
-	O8xyG2PcSbbWbjKwBB1gbMg=
-Received: from mail.maildlp.com (unknown [172.19.163.127])
-	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4gR4X86WYnzKmW7;
-	Thu, 28 May 2026 19:49:12 +0800 (CST)
-Received: from kwepemr100008.china.huawei.com (unknown [7.202.195.119])
-	by mail.maildlp.com (Postfix) with ESMTPS id B082C40572;
-	Thu, 28 May 2026 19:57:01 +0800 (CST)
-Received: from localhost.localdomain (10.50.163.32) by
- kwepemr100008.china.huawei.com (7.202.195.119) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.36; Thu, 28 May 2026 19:57:01 +0800
-From: ZongYu Wu <wuzongyu1@huawei.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<fanghao11@huawei.com>, <liulongfang@huawei.com>, <qianweili@huawei.com>,
-	<wangzhou1@hisilicon.com>, <huangchenghai2@huawei.com>,
-	<linwenkai6@hisilicon.com>
-Subject: [PATCH v2 5/5] crypto: hisilicon/sec2 - restore iv for ctr mode
-Date: Thu, 28 May 2026 19:55:31 +0800
-Message-ID: <20260528115531.174593-6-wuzongyu1@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20260528115531.174593-1-wuzongyu1@huawei.com>
-References: <20260528115531.174593-1-wuzongyu1@huawei.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V2CGDCj0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E58101F00A3A;
+	Thu, 28 May 2026 12:16:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1779970562;
+	bh=+buq2ptcz3JEj/EpBlSaTdBpCSUNhIEKXgsoTZroRW0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=V2CGDCj0qdObonA6xsEmiUruzdyDhaDVcOjnUYm5RBz6bWG2BFVJy+o7es7XrKb17
+	 loHnHSxcdsS1+5bdiIepwg9k4Ca1cnPNI1PaXfX/ioYPQsRAFTHkvv6xTSTV/qGEu7
+	 XaXN+Ued0ofGEUw/Oih5zwV3xVSl8QzgiDus81nLKMosrdfQUYw5Vtf1dhrHQ9Hb+b
+	 ALjTzN+b72hj+v2GRBi4hjWrlAz4hmDBEJB5B66MfJ06ML/FL/Icz31uct8YbfaiE3
+	 IZlpfWZ6sWOcikRO5P9eRSqFv/iGUa/qAHupsdk9ewECpxaRrOEoOp337GpH4ZdRan
+	 ljNXA04XVAWSw==
+Date: Thu, 28 May 2026 14:16:00 +0200
+From: Thierry Reding <thierry.reding@kernel.org>
+To: Mikko Perttunen <mperttunen@nvidia.com>
+Cc: Thierry Reding <thierry.reding@gmail.com>, 
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Jonathan Hunter <jonathanh@nvidia.com>, Akhil R <akhilrajeev@nvidia.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Aaron Kling <webgeek1234@gmail.com>, dri-devel@lists.freedesktop.org, linux-tegra@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 1/2] gpu: host1x: Allow entries in BO caches to be freed
+Message-ID: <ahgx9L954jPBWkdO@orome>
+References: <20260515-host1x-bocache-leak-v1-0-a0375f68aeab@nvidia.com>
+ <20260515-host1x-bocache-leak-v1-1-a0375f68aeab@nvidia.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- kwepemr100008.china.huawei.com (7.202.195.119)
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="6my564ulmhwxpudn"
+Content-Disposition: inline
+In-Reply-To: <20260515-host1x-bocache-leak-v1-1-a0375f68aeab@nvidia.com>
 
-From: Wenkai Lin <linwenkai6@hisilicon.com>
 
-Upon termination of the CTR task, the initial vector (IV) is
-restored to guarantee valid IV availability for subsequent tasks.
+--6my564ulmhwxpudn
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH 1/2] gpu: host1x: Allow entries in BO caches to be freed
+MIME-Version: 1.0
 
-Fixes: 7b44c0eecd6a ("crypto: hisilicon/sec - add new skcipher mode for SEC")
-Signed-off-by: Wenkai Lin <linwenkai6@hisilicon.com>
-Signed-off-by: Zongyu Wu <wuzongyu1@huawei.com>
----
- drivers/crypto/hisilicon/sec2/sec_crypto.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+On Fri, May 15, 2026 at 11:34:51AM +0900, Mikko Perttunen wrote:
+> When a buffer object is pinned via host1x_bo_pin() with a cache, the
+> resulting mapping is kept in the cache so it can be reused on subsequent
+> pins. Each mapping held a reference to the underlying host1x_bo (taken
+> in tegra_bo_pin / gather_bo_pin), so as long as a mapping was cached,
+> the bo itself could not be freed.
+>=20
+> However, the only way to remove the cached mapping was through the free
+> path of the buffer object. This meant that if a bo got cached, it could
+> never get freed again.
+>=20
+> Resolve the circularity by holding a weak reference to the bo from the
+> cache side. This is done by having the .pin callbacks not bump the bo's
+> refcount -- instead the common Host1x bo code does so, except for the
+> cache reference.
+>=20
+> Also move the remove-cache-mapping-on-free code into a common function
+> inside Host1x code. This is only called from the TegraDRM GEM buffers
+> since those are the only ones that can be cached at the moment.
+>=20
+> Reported-by: Aaron Kling <webgeek1234@gmail.com>
+> Fixes: 1f39b1dfa53c ("drm/tegra: Implement buffer object cache")
+> Signed-off-by: Mikko Perttunen <mperttunen@nvidia.com>
+> ---
+>  drivers/gpu/drm/tegra/gem.c    | 13 ++-------
+>  drivers/gpu/drm/tegra/submit.c |  3 +--
+>  drivers/gpu/host1x/bus.c       | 60 ++++++++++++++++++++++++++++++++++++=
++++++-
+>  include/linux/host1x.h         |  7 +++++
+>  4 files changed, 69 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-index 901abe8761e5..03f873f68828 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-@@ -1970,6 +1970,7 @@ static int sec_request_init(struct sec_ctx *ctx, struct sec_req *req)
- 
- static int sec_process(struct sec_ctx *ctx, struct sec_req *req)
- {
-+	bool need_copy_iv = false;
- 	int ret;
- 
- 	ret = sec_request_init(ctx, req);
-@@ -1982,8 +1983,10 @@ static int sec_process(struct sec_ctx *ctx, struct sec_req *req)
- 
- 	/* Output IV as decrypto */
- 	if (!req->c_req.encrypt && (ctx->c_ctx.c_mode == SEC_CMODE_CBC ||
--	    ctx->c_ctx.c_mode == SEC_CMODE_CTR))
-+	    ctx->c_ctx.c_mode == SEC_CMODE_CTR)) {
-+		need_copy_iv = true;
- 		sec_update_iv(req, ctx->alg_type);
-+	}
- 
- 	ret = ctx->req_op->bd_send(ctx, req);
- 	if (likely(ret == -EINPROGRESS || ret == -EBUSY))
-@@ -1992,7 +1995,7 @@ static int sec_process(struct sec_ctx *ctx, struct sec_req *req)
- 		dev_err_ratelimited(ctx->dev, "send sec request failed!\n");
- 
- 	/* As failing, restore the IV from user */
--	if (ctx->c_ctx.c_mode == SEC_CMODE_CBC && !req->c_req.encrypt) {
-+	if (need_copy_iv) {
- 		if (ctx->alg_type == SEC_SKCIPHER)
- 			memcpy(req->c_req.sk_req->iv, req->c_req.c_ivin,
- 			       ctx->c_ctx.ivsize);
--- 
-2.33.0
+Applied, thanks.
 
+Thierry
+
+--6my564ulmhwxpudn
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEiOrDCAFJzPfAjcif3SOs138+s6EFAmoYMgAACgkQ3SOs138+
+s6H4tQ//XkWRl3y7bAt9TLAdXWliceZEHfMdVL/tnvQt61OaxMiMXb3KF0U1CFSz
+bCrOSsS4t3L1/2zRbicJ7rW92tT3J3bNmHGroLo64ODozmDX9A8IKrLLPJ+1a3a5
+SXzNHyeK+3Gz7cUl0EwUyoCY0r/wBTl/povwzAE7Wk0cKL7vBMW8rjFTQkb/KYr3
+Tj4+q0VAELLmHLUGBo+zQlJHJIWN6SSCvzvaL7zE2vlgFvX0tZW1EMZrZ3AdNEln
+UmXCYkIYHOthnhqMFD1xUmp5YNcpaO0dQMY0kt3YC9AK5ZuDJXfs/Cv8ztittEOf
+KMITTDm+JyJ11MY5ycp9ipDpaSUk3Cbsw9vfwd0TNltsJvwyQnYNTlSpXMdseJPP
+hqRzk1j828d11x1FN+Qq3xtxQZUCSxX/V5DnioScXPMujFp48qh5W7evIwbJ2dss
+tfjImpSwWRZ7FmH4Rl7FnioU2oLUKTFP903bp0sEHWMQXW+HemlCPMKBxa6sgVRo
+9OTu2v29Vypb8Rp4VoehjumCjQxW64RZ9NfxH7MYyidh/Hxhz+2FEs/PzxreGp5e
+aLoWkLxgD2GJ1ueuh0sIf+4uS99Lf0Dho6Er2uko9+P0lgaxjIB4j2CQZ6Mjk5km
+cpWpm9CGI4v4e38pGfrXG0UhiWF4OK6lCYeut3jTgDzGw65UMY4=
+=fyjP
+-----END PGP SIGNATURE-----
+
+--6my564ulmhwxpudn--
