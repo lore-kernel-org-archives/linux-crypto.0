@@ -1,54 +1,46 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0D441C5799;
-	Fri, 29 May 2026 06:02:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FC7C2C15A5;
+	Fri, 29 May 2026 06:06:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780034567; cv=none; b=XawpqPdKro5UDU/xWUf63Dh854okPuJ+0/kY6kzuGACmWyiQHJgaixb7TLZiYF7C2DLfcXGMBk0zkbQCfvkMRID0txm0NO4bAXxb98kIPyW+OpJOPHKZVb5m8tLpJMAp2xnqNc2EbmjbvcMc24SlNPwsAUoNOZYOqBsNJngQWOY=
+	t=1780034792; cv=none; b=DH2jUUHkC0iGSGrYIT2fmUhEx0l8Ymjxa/z1LwIPabWGVFGV9MtZg1uIzgy0hbNeKcu5Ez0Io0pT0TNF3Yu5gJgtNiPSP3OCJdRvIca8cQqdvSKT8wdT6FogIxZxl4saNXB1CUNBnRTjbmUaxmJLf2V+pfOUx5cPUXvdeOeBAGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780034567; c=relaxed/simple;
-	bh=YaWDiFRGUA++NkyEGhrt6qbDxdbwfTw1Uj2b47SF9g0=;
+	s=arc-20240116; t=1780034792; c=relaxed/simple;
+	bh=Rz1PQmiUbfbGjiF6j0jVCpRI/u6bYn1X7b1Iemcfn5Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sNtGhcA9YwxCGsChEekbw/TazhzZl5FCmO0g3pA1BKS1cBGf68iIAE4L/vswJt7OKpjNcg6yQWyWtPRG1mFXoFOw517Na56IBuZAnQU20RC5+xFKv9/ILRLz5ROD8vpj2kWTcJm/JRa40WRFxele4kSuN1M9xeMHuUZYDcV+/SQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=WBrq4d+o; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=Tb9RIosCz7WK3qh22djuAwXAxQqPIaputGD15DB7haBGGGM3gpetYWmvRi4rPeCU2TpmQT9VutsNZzb2orR86b4FszvvYRaDRxVTnRmpDhNxnii1WSWGWf2KRQqJQhJ6hyU5UMBz9F9/+ROdAuIKB2/vhnApmC5cVPd9kqrCPkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=r3gaSo0q; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="WBrq4d+o"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="r3gaSo0q"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=8bnKmxC52GLCZuQR2/K5yUFJK7C3/40LM1QGIO+W7gs=; 
-	b=WBrq4d+ogwqXWwvCgpR4z9CUnERscO04wktu6Guaqr62plL3OSKSKPZNaVOcGWRAE9bgegp1e+C
-	aAzwEOr15mzfnZzf++/iblZcNbI9/E+Ha49gt8Xh5laPg/8B0I/JHEkYqpolfaTYalFiula5Aw7CV
-	QGWEGVghDnOWV1mhdmwHunqqXlWDIKU8ffwCw/U/2EkpRDr+7MCnRIvWCZbBZylQY5E9GQ3Ft/3y8
-	/rw2Wdc/qmstQWt/v9d3CFQfOTYFADgwvPQMj4wX1Y+6Yxgn7/VHIeuQnAVlHQ6rlVIyRGgjOjB3o
-	TFyy/t0JEvP8naBYe/Ozpi/VG9F7FY+vWbSg==;
+	from:content-type:reply-to; bh=blrD1b7iv5E583OimT5b10drAf9IDtHxLR7DVziUmkA=; 
+	b=r3gaSo0qSflVRGAoU6Rm1GZQtudrRG4+5p/XHr1XVY5GMOI08UUJAWtOncXdLxdjc9z3LgJsieJ
+	MBPT9jxa9+wC02Nt1WZMOeOQOzNkxkoObDt6XQ3r88rOVMS0FEf3d2y7Rapovb9yUdjUc4gHamctR
+	f4NTUaVkhVRufJcH51AH+jl7N+orqmOwbsuXUPWRYI9alY9iDxHvdzq6RDjAeGjsEyb+QZA7kVoFJ
+	ls1NEcMcKSk/LY+r5NKIlYV5sOzAUbrGYIKxwGqm9+LLMGPe6cuIlHpyQ8UVHcSrvB6Cogj4CiYXA
+	RjZBmubZGDgtFYuYyZceEOl/1KewOARAm9UQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wSqIj-000dAy-1V;
-	Fri, 29 May 2026 14:02:34 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 29 May 2026 14:02:33 +0800
-Date: Fri, 29 May 2026 14:02:33 +0800
+	id 1wSqMK-000dEm-2R;
+	Fri, 29 May 2026 14:06:17 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 29 May 2026 14:06:16 +0800
+Date: Fri, 29 May 2026 14:06:16 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Harald Freudenberger <freude@linux.ibm.com>,
-	Holger Dengler <dengler@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Patrick Steuer <patrick.steuer@de.ibm.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] s390: crypto: add select CRYPTO_AEAD for aes
-Message-ID: <ahkr-efyVqgF9hOr@gondor.apana.org.au>
-References: <20260520073911.843561-1-arnd@kernel.org>
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: Srujana Challa <schalla@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Kees Cook <kees@kernel.org>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: octeontx - use strscpy_pad in ucode_load_store
+Message-ID: <ahks2F_yS2CoxuO7@gondor.apana.org.au>
+References: <20260520100031.246078-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -57,26 +49,22 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260520073911.843561-1-arnd@kernel.org>
+In-Reply-To: <20260520100031.246078-2-thorsten.blum@linux.dev>
 
-On Wed, May 20, 2026 at 09:38:44AM +0200, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
+On Wed, May 20, 2026 at 12:00:30PM +0200, Thorsten Blum wrote:
+> Instead of zero-initializing the temporary buffer and then copying into
+> it with strscpy(), use strscpy_pad() to copy the string and zero-pad any
+> trailing bytes. Drop the explicit size argument to further simplify the
+> code since strscpy_pad() can determine it automatically when the
+> destination buffer has a fixed length.
 > 
-> The aes driver registers both skcipher and aead algorithms,
-> but when aead is not enabled this causes a link failure:
+> Also use strscpy_pad() to check for string truncation instead of the
+> hard-coded OTX_CPT_UCODE_NAME_LENGTH.
 > 
-> s390-linux-ld: arch/s390/crypto/aes_s390.o: in function `aes_s390_fini':
-> arch/s390/crypto/aes_s390.c:969:(.text+0x115e): undefined reference to `crypto_unregister_aead'
-> s390-linux-ld: arch/s390/crypto/aes_s390.o: in function `aes_s390_init':
-> arch/s390/crypto/aes_s390.c:1028:(.init.text+0x294): undefined reference to `crypto_register_aead'
-> 
-> Add the missing 'select' statement.
-> 
-> Fixes: bf7fa038707c ("s390/crypto: add s390 platform specific aes gcm support.")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 > ---
->  arch/s390/crypto/Kconfig | 1 +
->  1 file changed, 1 insertion(+)
+>  drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
 
 Patch applied.  Thanks.
 -- 
