@@ -1,73 +1,84 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4988E1DF72C;
-	Fri, 29 May 2026 06:12:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9FF3AE713
+	for <linux-crypto@vger.kernel.org>; Fri, 29 May 2026 07:05:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780035127; cv=none; b=kJSbTy51IsxTjPzofK150JnaVmKmK/Ccwz6GvOZ2rz0T1Bwm2WKc8HXJIqiGKwPMwTsnlbnzxCERUbmtcm81SDoC4Nx1DNwaaRbrwSHOVWLqGv8HwXD7e7cWlWTQSjeerzIHf4r3e6zYE+rmRVhrszSVaJIAw6ThAJabmBLJzMA=
+	t=1780038337; cv=none; b=IkOwU3hHnDztyaBUfmtTw2Jt7bnyD5fsEPpasg6NHElmOXtqCoNvCvcPncogHnteMc8KO5Wjs7pcrC1O6sgCZt/8vGfpYaz/2T5prNPpgwgbU6R5iudvVEZfzSmZTpinSVz/V74O5GcvzVzY0mZgp4IeBhq7aPlUBspwcIVlwLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780035127; c=relaxed/simple;
-	bh=5cq51ZvUmXttPL64hpXmKVU7eFwJlq9i7rnAZ58QdbQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G3QAu0gN3A1B+8t292FgdEZ4t3JiqkjuIvP1hwrUWerMbOS9/gxF+IKpVImPAbPUo1T2hnXfVYC8nRwInrQmvRO/OGPXUcYPC5Tl0oJaVG5RgTfpY/Lcq4YXiW6cSs84ioTQAzDTNSODqv5W3mmv7wlpuGMm70UQR37klyxHjHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=cC0+4cRY; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1780038337; c=relaxed/simple;
+	bh=yS1XlYDjTMgxwgN2DZGzDYeL5SarwMcWqXtVsPpG4iU=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=qlHkB9Drdb7+7lRuLsdzSpqr7fYncwQpT3xqj76QYNoZiyVXgdgnC2rTjKrEfcpAFHY/LmxFq7NFHHW6GWC3LTxpyJRY8z2A++IoFvCxcFwXzlbFRnKkS0IVUU0mEVBRiByGwzmw14Z0OK79WD2MNCNSx82crp8MmPFzaKh8zmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XnwYGh/o; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="cC0+4cRY"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=PoVKhzzmIrNFG1UZP8NlLw5m4P+ZkY+UrKc384/A01c=; 
-	b=cC0+4cRYSBdg1Ia1D5a53vjxX/DCxbbNTWHu/uwdEPa+CZQB0l0vfFG8wgnJt6TaP5wdklXnfDM
-	3/uJPvxERoWwaueKdVheUVyCYWGJ7GqaswEGFr9Kdw47hCd8GaXRYeXHsOiYnA+OSV8ozV5FAM0TN
-	BYHTf9Le4XBPqEuJ9E/hu5oe+84evLWwkrncIxq+lc5J7ws7BLfb0b4Zr0CHwcdWppcj8XVo6y3Wt
-	vhe5jJ0V5xPGZfITJB7W9KmzdAU2/NQuZ1UUFfcpf8x/7TBcW5QgZPLdQJyyWz79qeGXx7vKyfOYA
-	O3fz/b1wY1ponZNHylgVvI4zbAGEpj/xpPKg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wSqRf-000dL1-1P;
-	Fri, 29 May 2026 14:11:48 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 29 May 2026 14:11:47 +0800
-Date: Fri, 29 May 2026 14:11:47 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Tianchu Chen <tianchu.chen@linux.dev>
-Cc: clabbe.montjoie@gmail.com, davem@davemloft.net, wens@kernel.org,
-	jernej.skrabec@gmail.com, samuel@sholland.org,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: sun4i-ss: restrict PRNG seed length to prevent
- heap overflow
-Message-ID: <ahkuI-Z2w0sea_ba@gondor.apana.org.au>
-References: <af749a8447bd7f0e9dd26ca6c87e9c6afecb09d9@linux.dev>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XnwYGh/o"
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <af749a8447bd7f0e9dd26ca6c87e9c6afecb09d9@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1780038331;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=L1/AzmjwYbvz5ac6FUFa2AXbd/guUDNm7WSGUACd+fE=;
+	b=XnwYGh/o1rfZsynwCJXEx2rjmGjHm/owl7jHyuy0Vc0OrpofbU7dzYUkbSlAaUFJjPR4/p
+	xQPqAlKZN1UOhyKM3lEBNMxrtajO6d7x/ot20UyfuhDIhBX6uwlSjN5ReQvSMwk4DDxicw
+	KOVYDCuWjg7i/lyFRKx5guKlq+7jKBU=
+Date: Fri, 29 May 2026 07:05:24 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Tianchu Chen" <tianchu.chen@linux.dev>
+Message-ID: <554bc5c03d16e7a76db35be4a1c0d23cda2d4df6@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH] crypto: sun4i-ss: restrict PRNG seed length to prevent
+ heap overflow
+To: "Herbert Xu" <herbert@gondor.apana.org.au>
+Cc: clabbe.montjoie@gmail.com, davem@davemloft.net, wens@kernel.org,
+ jernej.skrabec@gmail.com, samuel@sholland.org,
+ linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org
+In-Reply-To: <ahkuI-Z2w0sea_ba@gondor.apana.org.au>
+References: <af749a8447bd7f0e9dd26ca6c87e9c6afecb09d9@linux.dev>
+ <ahkuI-Z2w0sea_ba@gondor.apana.org.au>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, May 28, 2026 at 02:53:17PM +0000, Tianchu Chen wrote:
->
-> diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c
-> index 491fcb7b8..010fa891c 100644
-> --- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c
-> +++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c
-> @@ -8,6 +8,8 @@ int sun4i_ss_prng_seed(struct crypto_rng *tfm, const u8 *seed,
->  	struct rng_alg *alg = crypto_rng_alg(tfm);
->  
->  	algt = container_of(alg, struct sun4i_ss_alg_template, alg.rng);
-> +	if (slen > sizeof(algt->ss->seed))
-> +		return -EINVAL;
+May 29, 2026 at 2:11 PM, "Herbert Xu" <herbert@gondor.apana.org.au mailto=
+:herbert@gondor.apana.org.au?to=3D%22Herbert%20Xu%22%20%3Cherbert%40gondo=
+r.apana.org.au%3E > wrote:
 
-This should simply ignore the extra data instead of failing.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>=20
+>=20On Thu, May 28, 2026 at 02:53:17PM +0000, Tianchu Chen wrote:
+>=20
+>=20>=20
+>=20> diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c b/dr=
+ivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c
+> >  index 491fcb7b8..010fa891c 100644
+> >  --- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c
+> >  +++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c
+> >  @@ -8,6 +8,8 @@ int sun4i_ss_prng_seed(struct crypto_rng *tfm, const=
+ u8 *seed,
+> >  struct rng_alg *alg =3D crypto_rng_alg(tfm);
+> >=20=20
+>=20>  algt =3D container_of(alg, struct sun4i_ss_alg_template, alg.rng);
+> >  + if (slen > sizeof(algt->ss->seed))
+> >  + return -EINVAL;
+> >=20
+>=20This should simply ignore the extra data instead of failing.
+
+
+Thanks for pointing out, silent truncation is more appropriate here.=20
+
+I'll=20send a v2 patch with min_t soon.
+
+Best regards,
+Tianchu Chen
