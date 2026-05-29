@@ -1,46 +1,63 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A780360751;
-	Fri, 29 May 2026 06:08:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D63E2E7389;
+	Fri, 29 May 2026 06:10:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780034910; cv=none; b=b3gDPTCD4bSRR21YVk1d9TcJSOuMtbn0DKFou8GUAJvDEyF+8BByMgu1e2Pwq2VXaHBOf3ZsAlgz6U2oGNf8kp2So8I0OiepUj9I60CURkmNPqAMX/EtLPpQXndw75qbOnwMFsE5W9hfpyCpHgU4haoiVld0x9LfNqrRe1WHrI4=
+	t=1780035019; cv=none; b=TbFQ9fLJ1qmKdaQpDDxbdbnt7JbbWcKrIvLE5Dh9C7LX3Os6zAEMaKDFGIeRtnofAA0SOLAbGL9CsVyFbN3C9N0LZ+TGKucN1wGdWc2ZlDvBCzASaOg3jg3fZSzKDHx0+D9RHYq7Oc406xzNedPa+uUxUcykygrmSzAGz/NkVSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780034910; c=relaxed/simple;
-	bh=RBz//esfofXvbehmuF8QGKMMslpRvLKFHYYxjIwoPcM=;
+	s=arc-20240116; t=1780035019; c=relaxed/simple;
+	bh=osaKBTLJ0lV7a7mqYpO/cFFhkXh0WHooJI0CnQ+IbKM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HAt/nHR68jEl7Cd0ec8JiaexEoEEmi7ilxn16MeiwLsqJXb6PBFeCeyVqc/ileAuDm32Dk7H1Yfjh7sGNmeOV9Swt0IRi264KGbofbdteJSUJiHdGk666nklw+6BSdHm8Qo1BHW2MlrAlwG69W1TNn3isVzqjqiINt1sFTl/dko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=bgYUFCco; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y1hCrQSYeF3kuxTVSApT1mKQMJvFJ/Fu52Vb3jq8ffPf8NVEhbmsXt+yRwnWP7OGKpf11ooeX2dWIKOvzOIwrkRwdC7mVRvOdLFiq6XXpMlbQvFH0gG24X8lEOBNoXlrzfaa/IdIgXHWvp+PevNl92SNhv8shkhsLhOOlPrq/w4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=hVguPhg4; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="bgYUFCco"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="hVguPhg4"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=bUi6qNPCJHs1zjImKGBpaa0dufszLYZyWbxdSNWETVo=; 
-	b=bgYUFCcoZ/+pBgZ4BgEIM/6U8LBKUang6Ju5OrggXpuoRp0Gl2Nbiyn4wG5RsnyqhC8AFiA2M+z
-	sB8N/V4dAM+cjb6WaAOgMr7dq0Ga6rQjuYv4ZY70/IqBeGkBIbnThJ8AZVneKlygelhQHm+29jPDL
-	BBVLjEXNQEmCJZ+qk7drDf2wpdQjGSMfwQqhqdNQgubnAlquycGI8swLCol7vCqiaflDRpMQQRdft
-	wxutGbwemtSLW+6sUHYC9Z4FpZDr3y/mhpSVpd/7/ni8alW/gTZ54KiBFNNEUe5yQgzrJ9EUotnMm
-	O7VFLG1N5xH8+q7oH35RkZ6wAhN3UgNGxwuQ==;
+	from:content-type:reply-to; bh=J3EhnnX3hHQdWB4TNUAD/20YRD6cojsn1uHBbo0VX2k=; 
+	b=hVguPhg4DROuLmAKUFs1ljpnkC82MqXEZ8MsQtl0U7pKDDS7hG6Bfizq8yHMAWvHkJTDgmyGvP7
+	PIL1z1cWNlR4a8BRTLrG40bbS/hQ+CcrHJjgEDWZMzOiU7Eepu4OnJdg3+MAAlQXkyCCWiBhdH4Gq
+	j1tcryJQQPS9WhE6qhTOdwVV1eX1DG8XHQY7Wldu7umXiGouAzuqjdaWCZA/ZjoXqt4FAyChx4mDM
+	lXQRShs4OuWYbtsvjYL2Rh54V/gvqRxZ1ER9RbB4bYYHqzGTizkNUj5Z69bNlCON3ENcu4T2ngKId
+	dDgIeNQaNfq418mRPMZ9k7CLbAtRyF65Yvew==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wSqOP-000dJI-2C;
-	Fri, 29 May 2026 14:08:26 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 29 May 2026 14:08:25 +0800
-Date: Fri, 29 May 2026 14:08:25 +0800
+	id 1wSqPc-000dKa-2D;
+	Fri, 29 May 2026 14:09:41 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 29 May 2026 14:09:40 +0800
+Date: Fri, 29 May 2026 14:09:40 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	loongarch@lists.linux.dev, Huacai Chen <chenhuacai@kernel.org>,
-	Qunqin Zhao <zhaoqunqin@loongson.cn>,
-	Yinggang Gu <guyinggang@loongson.cn>, Lee Jones <lee@kernel.org>,
-	kernel test robot <lkp@intel.com>, stable@vger.kernel.org
-Subject: Re: [PATCH] crypto: loongson - Select CRYPTO_RNG
-Message-ID: <ahktWQCfZYel_0hZ@gondor.apana.org.au>
-References: <20260522022525.12976-1-ebiggers@kernel.org>
+To: demiobenour@gmail.com
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>, Jens Axboe <axboe@kernel.dk>,
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Arnaldo Carvalho de Melo <acme@kernel.org>,
+	Namhyung Kim <namhyung@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+	Adrian Hunter <adrian.hunter@intel.com>,
+	James Clark <james.clark@linaro.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Eric Biggers <ebiggers@google.com>,
+	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, io-uring@vger.kernel.org,
+	netdev@vger.kernel.org, linux-perf-users@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH 0/3] AF_ALG: Remove support for AIO and old-style drivers
+Message-ID: <ahktpDYvPV9sb9zf@gondor.apana.org.au>
+References: <20260523-af-alg-harden-v1-0-c76755c3a5c5@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,21 +66,43 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260522022525.12976-1-ebiggers@kernel.org>
+In-Reply-To: <20260523-af-alg-harden-v1-0-c76755c3a5c5@gmail.com>
 
-On Thu, May 21, 2026 at 09:25:25PM -0500, Eric Biggers wrote:
-> This driver registers a rng_alg, so it requires CRYPTO_RNG.
+On Sat, May 23, 2026 at 03:43:01PM -0400, Demi Marie Obenour via B4 Relay wrote:
+> AF_ALG is a deprecated API only useful for compatibility with existing
+> userspace.  It has had a lot of vulnerabilities, including the infamous
+> CopyFail.
 > 
-> Fixes: 766b2d724c8d ("crypto: loongson - add Loongson RNG driver support")
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202605201622.qWOiiZTV-lkp@intel.com/
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> Rip out support for offload drivers, which tend to be buggy.  Also rip
+> out support for AIO, which actually bloats the entire socket subsystem.
+> 
+> Only compile-tested.
+> 
+> Signed-off-by: Demi Marie Obenour <demiobenour@gmail.com>
 > ---
->  drivers/crypto/loongson/Kconfig | 1 +
->  1 file changed, 1 insertion(+)
+> Demi Marie Obenour (3):
+>       net: Remove support for AIO on sockets
+>       AF_ALG: Drop support for off-CPU cryptography
+>       AF_ALG: Document that it is *always* slower
+> 
+>  Documentation/crypto/userspace-if.rst          | 26 ++++++++--
+>  crypto/af_alg.c                                | 35 ++------------
+>  crypto/algif_aead.c                            | 43 ++++-------------
+>  crypto/algif_hash.c                            |  4 +-
+>  crypto/algif_rng.c                             |  4 +-
+>  crypto/algif_skcipher.c                        | 66 ++++++--------------------
+>  include/crypto/if_alg.h                        | 19 ++++++--
+>  include/linux/socket.h                         |  1 -
+>  io_uring/net.c                                 |  1 -
+>  net/compat.c                                   |  1 -
+>  net/socket.c                                   |  7 +--
+>  tools/perf/trace/beauty/include/linux/socket.h |  1 -
+>  12 files changed, 70 insertions(+), 138 deletions(-)
+> ---
+> base-commit: 49e05bb00f2e8168695f7af4d694c39e1423e8a2
+> change-id: 20260502-af-alg-harden-900849451653
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
