@@ -1,33 +1,33 @@
-Received: from mail-244108.protonmail.ch (mail-244108.protonmail.ch [109.224.244.108])
+Received: from mail-244107.protonmail.ch (mail-244107.protonmail.ch [109.224.244.107])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7BCB313E38
-	for <linux-crypto@vger.kernel.org>; Fri, 29 May 2026 19:49:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1BA374722
+	for <linux-crypto@vger.kernel.org>; Fri, 29 May 2026 19:56:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780084154; cv=none; b=WQEIUPDlCv+scjMY8OrsRYawB51IhKLzl96xXc9+tWwrjrGuvq1Bg944UW9XPcHJkQeCryDYGe6Q6vOtJ66BKceZumHBkLvH5neBsmmcJJfhXUxikVtveYRglTDXbXT/3UiJvXZ4fHt4cl9e8UEArD60xfyVrFTP+PArdxZRXWY=
+	t=1780084598; cv=none; b=EcxD3QyOjWirFP+DVqsJRjiZDTyOz+DXrPBckvur8Lp1UjcXPLS+xyXFk0wzhMN5VFLuLTrj056NDZ6na4++4ObfaE9kvTxVmQ1Lh6za4wyzO6BJgom8q8qLEmmbZd+Ca2LoKOKw+IWTnxee28YFxn3no+tJV+H8wzVbcgqmmc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780084154; c=relaxed/simple;
-	bh=xwXBQyguUR9lGGYsKqJ2g8lpgrn3qfGcf0LQaVzrkp8=;
+	s=arc-20240116; t=1780084598; c=relaxed/simple;
+	bh=qrmCAg/r0bsbT9tp2TEVqvaLqaDEjeQhHF7RaLKrVJg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rAqrt5jb6T0KzMGCmOfcE3OongcTKnPPHwZnaN2AlXmfIjsqsEwF5+PYWkWYtzStujFGLChmybBN8PUEnALvi7400i4l2rBAjt1Rca+HIIipkpTjDghmfgULPoQU+MXA2gxU0FYUOHQm82V+9yVKrpNkEVDt2M+9YmgEr7/NVgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=onurozkan.dev; spf=pass smtp.mailfrom=onurozkan.dev; dkim=pass (2048-bit key) header.d=onurozkan.dev header.i=@onurozkan.dev header.b=aIh1zRa7; arc=none smtp.client-ip=109.224.244.108
+	 MIME-Version:Content-Type; b=oJpgFJ/PigVci7KD00HRWpR71M8hoY4oV6y6pNnNL7+gT1ClEuRP8USsbLmUNf1exCAn9ks6ACKuMPRlyKn3pc3lYec9tsLV+VovB3tZ/tcJVQiVBm6m4HML7Lo7bNFBhN7pJjZiRGppzcHB/VZMWhvhJvmlzYFzzw2e8FKGEM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=onurozkan.dev; spf=pass smtp.mailfrom=onurozkan.dev; dkim=pass (2048-bit key) header.d=onurozkan.dev header.i=@onurozkan.dev header.b=CL45S4eX; arc=none smtp.client-ip=109.224.244.107
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=onurozkan.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=onurozkan.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=onurozkan.dev header.i=@onurozkan.dev header.b="aIh1zRa7"
+	dkim=pass (2048-bit key) header.d=onurozkan.dev header.i=@onurozkan.dev header.b="CL45S4eX"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=onurozkan.dev;
-	s=protonmail; t=1780084147; x=1780343347;
-	bh=Mj8CpXobtgEqUiyWZOPXwFI3AggRfzcDvN9MYOTsk6Y=;
+	s=protonmail; t=1780084592; x=1780343792;
+	bh=mjo2FG5RGGMq0AqVpw4IIHQZGbmZiYbucah7EBw2h8U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:From:To:
 	 Cc:Date:Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=aIh1zRa7WeaDyGz4A/qMNFWMHUYg3CqH8s5QttIs6XoDtFIQHAQGYwa19OrEHzSCO
-	 aqeb0wUu8lj7qTTeElIyy92FkdvBuitGquUqe1Iy4lrO6x1m0iZ8fq2z5e07t2xre5
-	 PDl5+SBfKYfW4Ob1IJjkPpsQQGit35c8IiDuQMO71m3smZewAlzo+eGYLyKUVG8Vcs
-	 uSut8HozXCdpH8ZsGYtmAiudX2sVbq/T7UjIU6ORJCBzF9cQ2Q5qOXFzDCSxQnKjtE
-	 YUZROIwwpnSmJ6av2bGNMJ+b64sogsvP9pO8XDTDAkO0RXxqKLEMTvg9tNwUwArcLF
-	 yRgaCCtFUz0/Q==
-X-Pm-Submission-Id: 4gRv7J2fbMz1DDLQ
+	b=CL45S4eXXbiYSXEN9TQwmt8sw2GyewGlos6qDHuNStax+RA8V8tsIXSD3m1tS5cNY
+	 /2CangnSFS76sSLLo+yZz6MulurcOA0FBq++vB8kCt5fnGz7c/+V678/Lw22Pg5ZfY
+	 nbcwTwKaL94AxylcRdI77vNF5LPM09cA3EcQhp8i64PpHqn7wtl/PyBBQijYj+bNzY
+	 BanuOOW8/NmrtsrZsOFfe8dq4hg9jkd01iY5H8wQrXCR8spBNZ51ww1inVO4hTKf3w
+	 vViqwg+zjZ29PpkSLUCPlHg7nc5VGxHvGsBFU9ckD/kkj/6XLyMALe2v124MMJDEcR
+	 o++4XZh0CtI6Q==
+X-Pm-Submission-Id: 4gRvHx1VpBz1DFFV
 From: =?UTF-8?q?Onur=20=C3=96zkan?= <work@onurozkan.dev>
 To: Manos Pitsidianakis <manos@pitsidianak.is>
 Cc: Miguel Ojeda <ojeda@kernel.org>,
@@ -45,8 +45,8 @@ Cc: Miguel Ojeda <ojeda@kernel.org>,
 	linux-crypto@vger.kernel.org,
 	manos.pitsidianakis@linaro.org
 Subject: Re: [PATCH 2/2] rust: add hw_random module
-Date: Fri, 29 May 2026 22:48:44 +0300
-Message-ID: <20260529194858.32029-1-work@onurozkan.dev>
+Date: Fri, 29 May 2026 22:56:18 +0300
+Message-ID: <20260529195627.36670-1-work@onurozkan.dev>
 X-Mailer: git-send-email 2.51.2
 In-Reply-To: <20260529-rust-hw_random-virtio-rng-v1-2-b3153dd90311@pitsidianak.is>
 References: <20260529-rust-hw_random-virtio-rng-v1-0-b3153dd90311@pitsidianak.is> <20260529-rust-hw_random-virtio-rng-v1-2-b3153dd90311@pitsidianak.is>
@@ -72,12 +72,6 @@ Manos Pitsidianakis <manos@pitsidianak.is> wrote:=0D
 > happens once in driver probe and unregistration happens on driver=0D
 > teardown; there shouldn't be multiple threads doing their own thing in=0D
 > both cases.=0D
-=0D
-hw_random/core.c seem to use Mutex, why are you not using Mutex<bool> inste=
-ad of=0D
-flipping atomics which doesn't really serialize register & unregister prope=
-rly?=0D
-=0D
 > =0D
 > Signed-off-by: Manos Pitsidianakis <manos@pitsidianak.is>=0D
 > ---=0D
@@ -184,14 +178,6 @@ HwRngImpl` method at any=0D
 > +        c_int,    //=0D
 > +        c_ushort, //=0D
 > +        c_void,   //=0D
-=0D
-You don't need to put "//" to every line. You can simply do:=0D
-=0D
-	a,=0D
-	b,=0D
-	c,=0D
-	//=0D
-=0D
 > +    },=0D
 > +    mem::{=0D
 > +        MaybeUninit, //=0D
@@ -220,11 +206,6 @@ s how many bytes were=0D
 > +=0D
 > +impl Buffer<'_> {=0D
 > +    /// Returns `true` if the buffer has been filled.=0D
-=0D
-Either the doc or function name is wrong. Looking at the function logic, th=
-is=0D
-should be called "is_full"?=0D
-=0D
 > +    #[inline]=0D
 > +    pub const fn is_empty(&self) -> bool {=0D
 > +        self.written =3D=3D self.inner.len()=0D
@@ -233,6 +214,14 @@ should be called "is_full"?=0D
 > +    /// Returns the number of bytes that can be written.=0D
 > +    #[inline]=0D
 > +    pub const fn len(&self) -> usize {=0D
+=0D
+This name is quite confusing for what it actually does. `len()` is a very c=
+ommon=0D
+API across many types and readers would usually expect it to return the tot=
+al=0D
+length of the buffer. A more explicit name like `remaining_len()` or=0D
+`writable_len()` would make it much clearer.=0D
+=0D
 > +        self.inner.len() - self.written=0D
 > +    }=0D
 > +=0D
@@ -292,9 +281,6 @@ t with the rng_mutex lock.=0D
 > +=0D
 > +#[vtable]=0D
 > +/// Trait for the implementation of hardware RNGs.=0D
-=0D
-Doc-comment should come first.=0D
-=0D
 > +pub trait HwRngImpl: Send + Sync {=0D
 > +    #[inline]=0D
 > +    /// Initialization callback, can be optionally implemented.=0D
