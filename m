@@ -1,41 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 019C23624C9;
-	Fri, 29 May 2026 22:05:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCE3E35AC07;
+	Fri, 29 May 2026 23:34:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780092353; cv=none; b=XFOajRLhILL/qfo6vcs3+oejINnzI90ODzo2YQvrEzdcU0R7zpXfaaekcemCTloUdxWnZhFdO015aalQckVVL8VHwn6AIzqZqq7ar2e38ovmOLpfDuSeqHBPVUf8w+A4nDYc0U2BSGbh7TZv9IKRZs9YgEr29gk8cQ4UdHi7wPU=
+	t=1780097681; cv=none; b=cnYCFO9YEP4g2eeBxfGV2HTnVFjgPUhyCnHjquS2QryHRefFgtxLS9PuvwfRL8h5pWrkxTWsr2dXh9S5EVyv6+EdmSEDhUc/NaMSvmn8ST+uSPdckOS3voGZ4b05aGekxfDiDhEXuF9xXrFKlfOgrlEmYB1YpuxjAOB4zczR2vI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780092353; c=relaxed/simple;
-	bh=u08XzB1uIqSuvj36hyCmUWuA0CJK5je6fl1B1TJUrwU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qXKSoZ1f3UqpIgrwf0av6h94ZkfGjDOZxIhIIiYb/3p+f4Py3VlIXKQtGZ7eCmUQGa4LZKbQ6wIMVayQNlMljBBpmCSAWIkg44GGcj/eRKVmA2BiUOJz2CFnjwjF/+e/k4Ek5lenYybjkWINHdCa791Cp5ZU/diM68qc3CnCIMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=akEjEg2x; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780097681; c=relaxed/simple;
+	bh=b8Kck+xuHwWrflj4CXJK6WlvQP8VgGSpelKBTEAkHWo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=StffH/249UAfzS+uD0N+TeuetgR2SiEBnC2yoiG17phGsmR8QvQREHJziuRDYRr3pPr7u6GovWftzUd3/FDbBgncmMsaNDUMMxMWu4xTOsRqSKcN4KqEsQq7ROrY0PhX55/4Dn4CXN7gK9S9T5NfV4LyksJ5aBWa45NVRA8yoCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qm46BBSS; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="akEjEg2x"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 678F21F00893;
-	Fri, 29 May 2026 22:05:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qm46BBSS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C5D11F00893;
+	Fri, 29 May 2026 23:34:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780092351;
-	bh=Kl6flcBu84jgTqywF8Efo372BSZV1TwotLetIP7TH+E=;
+	s=k20260515; t=1780097679;
+	bh=v5fZjVvIPi8DCkgOLIKe29rCtOkSMS7f2MSh2pmPCnw=;
 	h=From:To:Cc:Subject:Date;
-	b=akEjEg2xai2zRUB11O7ILEXDf5sziOAGFIamK2DEty3zjK3rs64EnpSn9PghTlcZQ
-	 siW0MF8usb/5O0YZeTDyHHv1YIMJKAHcHr44OyM5ZK2iD6T+9iSl+PXS9/CqOONPhe
-	 Ac0gWboneIRAm3yFBt7qLlxW+5RBm4Hry8jmEZ5yIZeIeAa0B6lV6bFba7ce0JuJOn
-	 /aGvwl0Prp94UDFGX+AAhM/1gca3iuhrPhNZPO2yk/16ntIDLyocHfyqNE+FPVDxE8
-	 3E3u/bRFtf9PsJ3IXZA7ajIohFaXcTTVf7rl2m7pr885eR8tKocqnAhfsXXzmWXE3m
-	 zUsZvOylliK4A==
+	b=Qm46BBSSjglxlGIPd4ehemTzUm94BNxqqvVNMJAu7weG6clBqZ3qzSWZEsLyaDJ51
+	 a+3mq0iAR1TAkVIh5tSEGBA4QEg7RgANZcznYFyK3V+RV0p7LHSMTb0O7VRP89c9Yu
+	 zghpEBtLkxBEag4Z12drDKGiDNA5Fa/u3pLsMDg2vM6e2sQPWDLREUEzyUJRwkCcKt
+	 4vIZp+uU3KsBQX2v8gwh+pHofS017vbAoXfawSJw3Txo+dLtt6tZ2tVNo/O6GkVmEN
+	 1rQeA6Egl6Dl2ejOe+pkXr3mcgr4vw+aUJgxJsB3ZqmPevh2lbLsaLkkGmFKpxt31z
+	 P1enIaZKdcYRg==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Christian Lamparter <chunkeey@gmail.com>,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org,
+Cc: linux-kernel@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	Qunqin Zhao <zhaoqunqin@loongson.cn>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Yinggang Gu <guyinggang@loongson.cn>,
+	Lee Jones <lee@kernel.org>,
 	Eric Biggers <ebiggers@kernel.org>,
 	stable@vger.kernel.org
-Subject: [PATCH] crypto: crypto4xx - Remove insecure and unused rng_alg
-Date: Fri, 29 May 2026 15:04:30 -0700
-Message-ID: <20260529220430.34135-1-ebiggers@kernel.org>
+Subject: [PATCH] crypto: loongson - Remove broken and unused loongson-rng
+Date: Fri, 29 May 2026 16:32:08 -0700
+Message-ID: <20260529233208.8703-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -45,283 +48,359 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Remove crypto4xx_rng, as it is insecure and unused:
+The loongson-rng rng_alg has several vulnerabilities, including not
+providing forward security, and a use-after-free bug due to the use of
+wait_for_completion_interruptible().
 
-- It has only a 64-bit security strength, which is highly inadequate.
-  This can be seen by the fact that crypto4xx_hw_init() seeds it with
-  only 64 bits of entropy, and the fact that the original commit
-  mentions that it implements ANSI X9.17 Annex C.
+Meanwhile, the rng_alg framework doesn't really have any purpose in the
+first place other than to access the software algorithms crypto/drbg.c
+and crypto/jitterentropy.c.  Hardware-specific rng_algs have no
+in-kernel user, and unlike hwrng there's no feed into the actual Linux
+RNG.  As such, there's really no point to this code.  There are of
+course other rng_alg drivers that are similarly unused, but they're
+similarly in the process of being phased out, e.g.
+https://lore.kernel.org/r/20260529193648.18172-1-ebiggers@kernel.org and
+https://lore.kernel.org/r/20260529220430.34135-1-ebiggers@kernel.org
 
-  Another issue was that this driver didn't implement the crypto_rng API
-  correctly, as crypto4xx_prng_generate() didn't return 0 on success.
+Given that, there's no point in fixing forward these vulnerabilities,
+and it makes much more sense to simply roll back the addition of this
+driver.  If this platform provides TRNG (not PRNG) functionality, it
+could make sense to add a hwrng driver, but it would be quite different.
 
-- No user of this code is known.  It's usable only theoretically via the
-  "rng" algorithm type of AF_ALG.  But userspace actually just uses the
-  actual Linux RNG (/dev/random etc) instead.  And rng_algs don't
-  contribute entropy to the actual Linux RNG either.  (This may have
-  been confused with hwrng, which does contribute entropy.)
-
-Fixes: d072bfa48853 ("crypto: crypto4xx - add prng crypto support")
+Link: https://lore.kernel.org/linux-crypto/20260525145939.GC2018@quark/
+Fixes: 766b2d724c8d ("crypto: loongson - add Loongson RNG driver support")
 Cc: stable@vger.kernel.org
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- drivers/crypto/Kconfig                  |  1 -
- drivers/crypto/amcc/crypto4xx_core.c    | 88 -------------------------
- drivers/crypto/amcc/crypto4xx_core.h    |  4 --
- drivers/crypto/amcc/crypto4xx_reg_def.h | 11 ----
- 4 files changed, 104 deletions(-)
+ MAINTAINERS                                 |   1 -
+ arch/loongarch/configs/loongson32_defconfig |   1 -
+ arch/loongarch/configs/loongson64_defconfig |   1 -
+ drivers/crypto/Kconfig                      |   1 -
+ drivers/crypto/Makefile                     |   1 -
+ drivers/crypto/loongson/Kconfig             |   6 -
+ drivers/crypto/loongson/Makefile            |   1 -
+ drivers/crypto/loongson/loongson-rng.c      | 209 --------------------
+ 8 files changed, 221 deletions(-)
+ delete mode 100644 drivers/crypto/loongson/Kconfig
+ delete mode 100644 drivers/crypto/loongson/Makefile
+ delete mode 100644 drivers/crypto/loongson/loongson-rng.c
 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 882214b0e7db..6c805560c77c 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -15068,11 +15068,10 @@ F:	drivers/pwm/pwm-loongson.c
+ LOONGSON SECURITY ENGINE DRIVERS
+ M:	Qunqin Zhao <zhaoqunqin@loongson.cn>
+ L:	linux-crypto@vger.kernel.org
+ S:	Maintained
+ F:	drivers/char/tpm/tpm_loongson.c
+-F:	drivers/crypto/loongson/
+ F:	drivers/mfd/loongson-se.c
+ F:	include/linux/mfd/loongson-se.h
+ 
+ LOONGSON-2 SOC SERIES CLOCK DRIVER
+ M:	Yinbo Zhu <zhuyinbo@loongson.cn>
+diff --git a/arch/loongarch/configs/loongson32_defconfig b/arch/loongarch/configs/loongson32_defconfig
+index d5ef396dffe3..82897236863f 100644
+--- a/arch/loongarch/configs/loongson32_defconfig
++++ b/arch/loongarch/configs/loongson32_defconfig
+@@ -1089,11 +1089,10 @@ CONFIG_CRYPTO_LZ4HC=m
+ CONFIG_CRYPTO_USER_API_HASH=m
+ CONFIG_CRYPTO_USER_API_SKCIPHER=m
+ CONFIG_CRYPTO_USER_API_RNG=m
+ CONFIG_CRYPTO_USER_API_AEAD=m
+ CONFIG_CRYPTO_DEV_VIRTIO=m
+-CONFIG_CRYPTO_DEV_LOONGSON_RNG=m
+ CONFIG_DMA_CMA=y
+ CONFIG_CMA_SIZE_MBYTES=0
+ CONFIG_PRINTK_TIME=y
+ CONFIG_STRIP_ASM_SYMS=y
+ CONFIG_MAGIC_SYSRQ=y
+diff --git a/arch/loongarch/configs/loongson64_defconfig b/arch/loongarch/configs/loongson64_defconfig
+index cba4cdff5acd..a94e88bd7ec5 100644
+--- a/arch/loongarch/configs/loongson64_defconfig
++++ b/arch/loongarch/configs/loongson64_defconfig
+@@ -1122,11 +1122,10 @@ CONFIG_CRYPTO_LZ4HC=m
+ CONFIG_CRYPTO_USER_API_HASH=m
+ CONFIG_CRYPTO_USER_API_SKCIPHER=m
+ CONFIG_CRYPTO_USER_API_RNG=m
+ CONFIG_CRYPTO_USER_API_AEAD=m
+ CONFIG_CRYPTO_DEV_VIRTIO=m
+-CONFIG_CRYPTO_DEV_LOONGSON_RNG=m
+ CONFIG_DMA_CMA=y
+ CONFIG_DMA_NUMA_CMA=y
+ CONFIG_CMA_SIZE_MBYTES=0
+ CONFIG_PRINTK_TIME=y
+ CONFIG_STRIP_ASM_SYMS=y
 diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 3449b3c9c6ad..5dab813a9f74 100644
+index 3449b3c9c6ad..075ec9432789 100644
 --- a/drivers/crypto/Kconfig
 +++ b/drivers/crypto/Kconfig
-@@ -299,11 +299,10 @@ config CRYPTO_DEV_PPC4XX
- 	select CRYPTO_AES
- 	select CRYPTO_LIB_AES
- 	select CRYPTO_CCM
- 	select CRYPTO_CTR
- 	select CRYPTO_GCM
+@@ -844,11 +844,10 @@ config CRYPTO_DEV_CCREE
+ 	  Choose this if you wish to use hardware acceleration of
+ 	  cryptographic operations on the system REE.
+ 	  If unsure say Y.
+ 
+ source "drivers/crypto/hisilicon/Kconfig"
+-source "drivers/crypto/loongson/Kconfig"
+ 
+ source "drivers/crypto/amlogic/Kconfig"
+ 
+ config CRYPTO_DEV_SA2UL
+ 	tristate "Support for TI security accelerator"
+diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
+index 283bbc650b5b..ad773158ae56 100644
+--- a/drivers/crypto/Makefile
++++ b/drivers/crypto/Makefile
+@@ -41,11 +41,10 @@ obj-$(CONFIG_CRYPTO_DEV_VIRTIO) += virtio/
+ obj-$(CONFIG_CRYPTO_DEV_BCM_SPU) += bcm/
+ obj-y += inside-secure/
+ obj-$(CONFIG_CRYPTO_DEV_ARTPEC6) += axis/
+ obj-y += xilinx/
+ obj-y += hisilicon/
+-obj-y += loongson/
+ obj-$(CONFIG_CRYPTO_DEV_AMLOGIC_GXL) += amlogic/
+ obj-y += intel/
+ obj-y += starfive/
+ obj-y += cavium/
+ obj-y += ti/
+diff --git a/drivers/crypto/loongson/Kconfig b/drivers/crypto/loongson/Kconfig
+deleted file mode 100644
+index f4e1544ffbb4..000000000000
+--- a/drivers/crypto/loongson/Kconfig
++++ /dev/null
+@@ -1,6 +0,0 @@
+-config CRYPTO_DEV_LOONGSON_RNG
+-	tristate "Support for Loongson RNG Driver"
+-	depends on MFD_LOONGSON_SE
 -	select CRYPTO_RNG
- 	select CRYPTO_SKCIPHER
- 	help
- 	  This option allows you to have support for AMCC crypto acceleration.
- 
- config HW_RANDOM_PPC4XX
-diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
-index b7b6c97d2147..68c5ff7a85b4 100644
---- a/drivers/crypto/amcc/crypto4xx_core.c
-+++ b/drivers/crypto/amcc/crypto4xx_core.c
-@@ -29,15 +29,13 @@
- #include <crypto/aead.h>
- #include <crypto/aes.h>
- #include <crypto/ctr.h>
- #include <crypto/gcm.h>
- #include <crypto/sha1.h>
--#include <crypto/rng.h>
- #include <crypto/scatterwalk.h>
- #include <crypto/skcipher.h>
- #include <crypto/internal/aead.h>
+-	help
+-	  Support for Loongson RNG Driver.
+diff --git a/drivers/crypto/loongson/Makefile b/drivers/crypto/loongson/Makefile
+deleted file mode 100644
+index 1ce5ec32b553..000000000000
+--- a/drivers/crypto/loongson/Makefile
++++ /dev/null
+@@ -1 +0,0 @@
+-obj-$(CONFIG_CRYPTO_DEV_LOONGSON_RNG)  += loongson-rng.o
+diff --git a/drivers/crypto/loongson/loongson-rng.c b/drivers/crypto/loongson/loongson-rng.c
+deleted file mode 100644
+index 3a4940260f9e..000000000000
+--- a/drivers/crypto/loongson/loongson-rng.c
++++ /dev/null
+@@ -1,209 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0
+-/* Copyright (c) 2019 HiSilicon Limited. */
+-/* Copyright (c) 2025 Loongson Technology Corporation Limited. */
+-
+-#include <linux/crypto.h>
+-#include <linux/err.h>
+-#include <linux/hw_random.h>
+-#include <linux/io.h>
+-#include <linux/iopoll.h>
+-#include <linux/kernel.h>
+-#include <linux/list.h>
+-#include <linux/mfd/loongson-se.h>
+-#include <linux/module.h>
+-#include <linux/mutex.h>
+-#include <linux/platform_device.h>
+-#include <linux/random.h>
 -#include <crypto/internal/rng.h>
- #include <crypto/internal/skcipher.h>
- #include "crypto4xx_reg_def.h"
- #include "crypto4xx_core.h"
- #include "crypto4xx_sa.h"
- #include "crypto4xx_trng.h"
-@@ -983,14 +981,10 @@ static int crypto4xx_register_alg(struct crypto4xx_device *sec_dev,
- 		switch (alg->alg.type) {
- 		case CRYPTO_ALG_TYPE_AEAD:
- 			rc = crypto_register_aead(&alg->alg.u.aead);
- 			break;
- 
--		case CRYPTO_ALG_TYPE_RNG:
--			rc = crypto_register_rng(&alg->alg.u.rng);
--			break;
 -
- 		default:
- 			rc = crypto_register_skcipher(&alg->alg.u.cipher);
- 			break;
- 		}
- 
-@@ -1012,14 +1006,10 @@ static void crypto4xx_unregister_alg(struct crypto4xx_device *sec_dev)
- 		switch (alg->alg.type) {
- 		case CRYPTO_ALG_TYPE_AEAD:
- 			crypto_unregister_aead(&alg->alg.u.aead);
- 			break;
- 
--		case CRYPTO_ALG_TYPE_RNG:
--			crypto_unregister_rng(&alg->alg.u.rng);
--			break;
+-#define SE_SEED_SIZE 32
 -
- 		default:
- 			crypto_unregister_skcipher(&alg->alg.u.cipher);
- 		}
- 		kfree(alg);
- 	}
-@@ -1074,73 +1064,10 @@ static irqreturn_t crypto4xx_ce_interrupt_handler_revb(int irq, void *data)
- {
- 	return crypto4xx_interrupt_handler(irq, data, PPC4XX_INTERRUPT_CLR |
- 		PPC4XX_TMO_ERR_INT);
- }
- 
--static int ppc4xx_prng_data_read(struct crypto4xx_device *dev,
--				 u8 *data, unsigned int max)
+-struct loongson_rng_list {
+-	struct mutex lock;
+-	struct list_head list;
+-	int registered;
+-};
+-
+-struct loongson_rng {
+-	u32 used;
+-	struct loongson_se_engine *engine;
+-	struct list_head list;
+-	struct mutex lock;
+-};
+-
+-struct loongson_rng_ctx {
+-	struct loongson_rng *rng;
+-};
+-
+-struct loongson_rng_cmd {
+-	u32 cmd_id;
+-	union {
+-		u32 len;
+-		u32 ret;
+-	} u;
+-	u32 seed_off;
+-	u32 out_off;
+-	u32 pad[4];
+-};
+-
+-static struct loongson_rng_list rng_devices = {
+-	.lock = __MUTEX_INITIALIZER(rng_devices.lock),
+-	.list = LIST_HEAD_INIT(rng_devices.list),
+-};
+-
+-static int loongson_rng_generate(struct crypto_rng *tfm, const u8 *src,
+-			  unsigned int slen, u8 *dstn, unsigned int dlen)
 -{
--	unsigned int i, curr = 0;
--	u32 val[2];
+-	struct loongson_rng_ctx *ctx = crypto_rng_ctx(tfm);
+-	struct loongson_rng *rng = ctx->rng;
+-	struct loongson_rng_cmd *cmd = rng->engine->command;
+-	int err, len;
 -
+-	mutex_lock(&rng->lock);
+-	cmd->seed_off = 0;
 -	do {
--		/* trigger PRN generation */
--		writel(PPC4XX_PRNG_CTRL_AUTO_EN,
--		       dev->ce_base + CRYPTO4XX_PRNG_CTRL);
+-		len = min(dlen, rng->engine->buffer_size);
+-		cmd = rng->engine->command;
+-		cmd->u.len = len;
+-		err = loongson_se_send_engine_cmd(rng->engine);
+-		if (err)
+-			break;
 -
--		for (i = 0; i < 1024; i++) {
--			/* usually 19 iterations are enough */
--			if ((readl(dev->ce_base + CRYPTO4XX_PRNG_STAT) &
--			     CRYPTO4XX_PRNG_STAT_BUSY))
--				continue;
--
--			val[0] = readl_be(dev->ce_base + CRYPTO4XX_PRNG_RES_0);
--			val[1] = readl_be(dev->ce_base + CRYPTO4XX_PRNG_RES_1);
+-		cmd = rng->engine->command_ret;
+-		if (cmd->u.ret) {
+-			err = -EIO;
 -			break;
 -		}
--		if (i == 1024)
--			return -ETIMEDOUT;
 -
--		if ((max - curr) >= 8) {
--			memcpy(data, &val, 8);
--			data += 8;
--			curr += 8;
--		} else {
--			/* copy only remaining bytes */
--			memcpy(data, &val, max - curr);
--			break;
+-		memcpy(dstn, rng->engine->data_buffer, len);
+-		dlen -= len;
+-		dstn += len;
+-	} while (dlen > 0);
+-	mutex_unlock(&rng->lock);
+-
+-	return err;
+-}
+-
+-static int loongson_rng_init(struct crypto_tfm *tfm)
+-{
+-	struct loongson_rng_ctx *ctx = crypto_tfm_ctx(tfm);
+-	struct loongson_rng *rng;
+-	u32 min_used = U32_MAX;
+-
+-	mutex_lock(&rng_devices.lock);
+-	list_for_each_entry(rng, &rng_devices.list, list) {
+-		if (rng->used < min_used) {
+-			ctx->rng = rng;
+-			min_used = rng->used;
 -		}
--	} while (curr < max);
+-	}
+-	ctx->rng->used++;
+-	mutex_unlock(&rng_devices.lock);
 -
--	return curr;
--}
--
--static int crypto4xx_prng_generate(struct crypto_rng *tfm,
--				   const u8 *src, unsigned int slen,
--				   u8 *dstn, unsigned int dlen)
--{
--	struct rng_alg *alg = crypto_rng_alg(tfm);
--	struct crypto4xx_alg *amcc_alg;
--	struct crypto4xx_device *dev;
--	int ret;
--
--	amcc_alg = container_of(alg, struct crypto4xx_alg, alg.u.rng);
--	dev = amcc_alg->dev;
--
--	mutex_lock(&dev->core_dev->rng_lock);
--	ret = ppc4xx_prng_data_read(dev, dstn, dlen);
--	mutex_unlock(&dev->core_dev->rng_lock);
--	return ret;
--}
--
--
--static int crypto4xx_prng_seed(struct crypto_rng *tfm, const u8 *seed,
--			unsigned int slen)
--{
 -	return 0;
 -}
 -
- /*
-  * Supported Crypto Algorithms
-  */
- static struct crypto4xx_alg_common crypto4xx_alg[] = {
- 	/* Crypto AES modes */
-@@ -1266,22 +1193,10 @@ static struct crypto4xx_alg_common crypto4xx_alg[] = {
- 			.cra_blocksize	= 1,
- 			.cra_ctxsize	= sizeof(struct crypto4xx_ctx),
- 			.cra_module	= THIS_MODULE,
- 		},
- 	} },
--	{ .type = CRYPTO_ALG_TYPE_RNG, .u.rng = {
--		.base = {
--			.cra_name		= "stdrng",
--			.cra_driver_name        = "crypto4xx_rng",
--			.cra_priority		= 300,
--			.cra_ctxsize		= 0,
--			.cra_module		= THIS_MODULE,
--		},
--		.generate               = crypto4xx_prng_generate,
--		.seed                   = crypto4xx_prng_seed,
--		.seedsize               = 0,
--	} },
- };
- 
- /*
-  * Module Initialization Routine
-  */
-@@ -1351,13 +1266,10 @@ static int crypto4xx_probe(struct platform_device *ofdev)
- 	}
- 
- 	core_dev->dev->core_dev = core_dev;
- 	core_dev->dev->is_revb = is_revb;
- 	core_dev->device = dev;
--	rc = devm_mutex_init(&ofdev->dev, &core_dev->rng_lock);
--	if (rc)
--		return rc;
- 	spin_lock_init(&core_dev->lock);
- 	INIT_LIST_HEAD(&core_dev->dev->alg_list);
- 	ratelimit_default_init(&core_dev->dev->aead_ratelimit);
- 	rc = crypto4xx_build_sdr(core_dev->dev);
- 	if (rc)
-diff --git a/drivers/crypto/amcc/crypto4xx_core.h b/drivers/crypto/amcc/crypto4xx_core.h
-index ee36630c670f..3a028aec3f0c 100644
---- a/drivers/crypto/amcc/crypto4xx_core.h
-+++ b/drivers/crypto/amcc/crypto4xx_core.h
-@@ -12,14 +12,12 @@
- 
- #ifndef __CRYPTO4XX_CORE_H__
- #define __CRYPTO4XX_CORE_H__
- 
- #include <linux/ratelimit.h>
--#include <linux/mutex.h>
- #include <linux/scatterlist.h>
- #include <crypto/internal/aead.h>
--#include <crypto/internal/rng.h>
- #include <crypto/internal/skcipher.h>
- #include "crypto4xx_reg_def.h"
- #include "crypto4xx_sa.h"
- 
- #define PPC460SX_SDR0_SRST                      0x201
-@@ -109,11 +107,10 @@ struct crypto4xx_core_device {
- 	struct hwrng *trng;
- 	u32 int_status;
- 	u32 irq;
- 	struct tasklet_struct tasklet;
- 	spinlock_t lock;
--	struct mutex rng_lock;
- };
- 
- struct crypto4xx_ctx {
- 	struct crypto4xx_device *dev;
- 	struct dynamic_sa_ctl *sa_in;
-@@ -133,11 +130,10 @@ struct crypto4xx_aead_reqctx {
- struct crypto4xx_alg_common {
- 	u32 type;
- 	union {
- 		struct skcipher_alg cipher;
- 		struct aead_alg aead;
--		struct rng_alg rng;
- 	} u;
- };
- 
- struct crypto4xx_alg {
- 	struct list_head  entry;
-diff --git a/drivers/crypto/amcc/crypto4xx_reg_def.h b/drivers/crypto/amcc/crypto4xx_reg_def.h
-index 1038061224da..73d626308a84 100644
---- a/drivers/crypto/amcc/crypto4xx_reg_def.h
-+++ b/drivers/crypto/amcc/crypto4xx_reg_def.h
-@@ -88,24 +88,13 @@
- 
- #define CRYPTO4XX_DMA_CFG	        	0x000600d4
- #define CRYPTO4XX_BYTE_ORDER_CFG 		0x000600d8
- #define CRYPTO4XX_ENDIAN_CFG			0x000600d8
- 
--#define CRYPTO4XX_PRNG_STAT			0x00070000
--#define CRYPTO4XX_PRNG_STAT_BUSY		0x1
- #define CRYPTO4XX_PRNG_CTRL			0x00070004
- #define CRYPTO4XX_PRNG_SEED_L			0x00070008
- #define CRYPTO4XX_PRNG_SEED_H			0x0007000c
+-static void loongson_rng_exit(struct crypto_tfm *tfm)
+-{
+-	struct loongson_rng_ctx *ctx = crypto_tfm_ctx(tfm);
 -
--#define CRYPTO4XX_PRNG_RES_0			0x00070020
--#define CRYPTO4XX_PRNG_RES_1			0x00070024
--#define CRYPTO4XX_PRNG_RES_2			0x00070028
--#define CRYPTO4XX_PRNG_RES_3			0x0007002C
+-	mutex_lock(&rng_devices.lock);
+-	ctx->rng->used--;
+-	mutex_unlock(&rng_devices.lock);
+-}
 -
--#define CRYPTO4XX_PRNG_LFSR_L			0x00070030
--#define CRYPTO4XX_PRNG_LFSR_H			0x00070034
+-static int loongson_rng_seed(struct crypto_rng *tfm, const u8 *seed,
+-			     unsigned int slen)
+-{
+-	struct loongson_rng_ctx *ctx = crypto_rng_ctx(tfm);
+-	struct loongson_rng *rng = ctx->rng;
+-	struct loongson_rng_cmd *cmd;
+-	int err;
 -
- /*
-  * Initialize CRYPTO ENGINE registers, and memory bases.
-  */
- #define PPC4XX_PDR_POLL				0x3ff
- #define PPC4XX_OUTPUT_THRESHOLD			2
+-	if (slen < SE_SEED_SIZE)
+-		return -EINVAL;
+-
+-	slen = min(slen, rng->engine->buffer_size);
+-
+-	mutex_lock(&rng->lock);
+-	cmd = rng->engine->command;
+-	cmd->u.len = slen;
+-	cmd->seed_off = rng->engine->buffer_off;
+-	memcpy(rng->engine->data_buffer, seed, slen);
+-	err = loongson_se_send_engine_cmd(rng->engine);
+-	if (err)
+-		goto out;
+-
+-	cmd = rng->engine->command_ret;
+-	if (cmd->u.ret)
+-		err = -EIO;
+-out:
+-	mutex_unlock(&rng->lock);
+-
+-	return err;
+-}
+-
+-static struct rng_alg loongson_rng_alg = {
+-	.generate = loongson_rng_generate,
+-	.seed =	loongson_rng_seed,
+-	.seedsize = SE_SEED_SIZE,
+-	.base = {
+-		.cra_name = "stdrng",
+-		.cra_driver_name = "loongson_stdrng",
+-		.cra_priority = 300,
+-		.cra_ctxsize = sizeof(struct loongson_rng_ctx),
+-		.cra_module = THIS_MODULE,
+-		.cra_init = loongson_rng_init,
+-		.cra_exit = loongson_rng_exit,
+-	},
+-};
+-
+-static int loongson_rng_probe(struct platform_device *pdev)
+-{
+-	struct loongson_rng_cmd *cmd;
+-	struct loongson_rng *rng;
+-	int ret = 0;
+-
+-	rng = devm_kzalloc(&pdev->dev, sizeof(*rng), GFP_KERNEL);
+-	if (!rng)
+-		return -ENOMEM;
+-
+-	rng->engine = loongson_se_init_engine(pdev->dev.parent, SE_ENGINE_RNG);
+-	if (!rng->engine)
+-		return -ENODEV;
+-	cmd = rng->engine->command;
+-	cmd->cmd_id = SE_CMD_RNG;
+-	cmd->out_off = rng->engine->buffer_off;
+-	mutex_init(&rng->lock);
+-
+-	mutex_lock(&rng_devices.lock);
+-
+-	if (!rng_devices.registered) {
+-		ret = crypto_register_rng(&loongson_rng_alg);
+-		if (ret) {
+-			dev_err(&pdev->dev, "failed to register crypto(%d)\n", ret);
+-			goto out;
+-		}
+-		rng_devices.registered = 1;
+-	}
+-
+-	list_add_tail(&rng->list, &rng_devices.list);
+-out:
+-	mutex_unlock(&rng_devices.lock);
+-
+-	return ret;
+-}
+-
+-static struct platform_driver loongson_rng_driver = {
+-	.probe		= loongson_rng_probe,
+-	.driver		= {
+-		.name	= "loongson-rng",
+-	},
+-};
+-module_platform_driver(loongson_rng_driver);
+-
+-MODULE_ALIAS("platform:loongson-rng");
+-MODULE_LICENSE("GPL");
+-MODULE_AUTHOR("Yinggang Gu <guyinggang@loongson.cn>");
+-MODULE_AUTHOR("Qunqin Zhao <zhaoqunqin@loongson.cn>");
+-MODULE_DESCRIPTION("Loongson Random Number Generator driver");
 
-base-commit: 49e05bb00f2e8168695f7af4d694c39e1423e8a2
+base-commit: 5624ea54f3ba5c83d2e5503411a31a8be0278c1e
 -- 
 2.54.0
 
