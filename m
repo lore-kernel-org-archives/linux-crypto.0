@@ -1,47 +1,50 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 654493451A6;
-	Sat, 30 May 2026 10:39:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9BFF2FE074;
+	Sat, 30 May 2026 10:48:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780137596; cv=none; b=Cl4jZ1GU+YOn38KhW5w857Gy1Dla67rsM+qPkxskWvnSGq16R9HfW4aE0xYFJfu/I5O6PRDX77EGH+eSCKPmwLUnHS0550mfYzXkP7B+ppmDRedM/OwtPzg9FgPGftM6bhya2w7qwi5EYBkODF55JiKdi2RWUDbTpvcswLatJAw=
+	t=1780138093; cv=none; b=d5bfONUwg9Ge43KVvsOvgYldyMw07qBR/gFlGhdYaunrmYUpnEd1xd2aKsg/kXVgtEUvpS/H4UDQrZxTwEbeTtkv50xU7xkckBYcxL2JZgtzSsQ8WRW7fnijp9U/p4VpT8ggnBmP9xGecKQRWTOGqn0QFVo/QMBUMAEihyxio7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780137596; c=relaxed/simple;
-	bh=bvX+5/EHDb2E4TM3oDNEENftks1JXuPee/Yx7K7moS4=;
+	s=arc-20240116; t=1780138093; c=relaxed/simple;
+	bh=P0FCZwwYbVMr0jekGLdzkA0WJKNkpxU2GibrYj/mhk0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R048jC19syx/uohg8E48fS3v3mvixXLZVE6UyRoJskrD1/aFS1UF1EN+5Ibm/t4Oz4EfzeC8ClY3kWrr03ftqupz3ZDv5oS1xBOJMplyLMkFYK5GxzXi0dlC7TME0xnk2yHyv91c061AA/NdTtAGyjLGn3uRF18iOAcotv1Hd7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YyuIxUIo; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=N9/VN4TOGiG7KZ/7RUk9WvZ7a6NGBgrIeoJ99EIlm/KxTQ/Z8DjmiLZ6nAbOtp1nu1KTjJRMq4eAIff1A8MUAcVTD/48ILP6LezQrOKq0oyDlVIa8vmlEva60x3k+kfbFKbBt9/2TKAw4/0Qt07wN+1BC/KPflf6f7hDvifhm8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MP5c73d9; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YyuIxUIo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52E401F00898;
-	Sat, 30 May 2026 10:39:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MP5c73d9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C49D91F00893;
+	Sat, 30 May 2026 10:48:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780137593;
-	bh=bvX+5/EHDb2E4TM3oDNEENftks1JXuPee/Yx7K7moS4=;
+	s=k20260515; t=1780138092;
+	bh=8ZOkOiUGphlye6XMDBEWeJg+3upNBwM3JqNA5E14kxQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=YyuIxUIokMM8XDlrO0hwKH0AkWm7eJOhPt6XO8bdEeyUtWKgrz9bOBbgkYF+CPS0j
-	 qb494VaPM+t3IaLgk//VQKCaXV6YrwZvf+UfY18xNxjAjFGC3nT+ySSh7pX8Z04dgF
-	 z+55x2y/Igt8BffDsUiCb/L1mxzUPU03q/0ng3AO0mrlDu2rhgksOAbuodnO9jOHZ0
-	 4PpOx/NHPutvet3axdSVcedmOvUrwfs+tcYS0Ge+IMGSeL8r+j0MC7mUAUhOESaqHR
-	 iqUJXm+UQbJSWCNh/U/Y/VKXxDzwI/PMJ06+lnE92sdaial2+JQSUGq4UPvTic0eRi
-	 GlljQKh5GbgmA==
-Date: Sat, 30 May 2026 12:39:51 +0200
+	b=MP5c73d9myscEqyCSzql55cJ27CeS+f0OyRedHnif8Ny44lNNrYxpOuTIVQqlUmbf
+	 iS1Lyx17qVCiER0uLQcw/OIH0j42Zi70dtGt9eAGTS/iaMEbnbbJWVK087lh5ZFMxM
+	 A3/9LnhWwT0BqzFAtrPh16o3vvzNTryX+Y/nRsNJnx1fCvA1jtMqVZywrgd8KKCpie
+	 uIVjnR//3JbS0erZg+8JCOyPZcGQIpSHvFTXXasBuyrM8Wjj+vFAV7YPzM1vyla2cc
+	 NvugdXL2GIQfechTmq05Y2/AzeIldT2WGT955Dw4r3FgkJFM3d3094zUQVxzplrOvC
+	 DkP0oorkhEPgw==
+Date: Sat, 30 May 2026 12:48:10 +0200
 From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Vinod Koul <vkoul@kernel.org>, 
-	Thara Gopinath <thara.gopinath@gmail.com>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Frank Li <Frank.Li@kernel.org>, Andy Gross <agross@kernel.org>, 
-	Harshal Dev <harshal.dev@oss.qualcomm.com>, linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, dmaengine@vger.kernel.org
-Subject: Re: [PATCH 4/5] dt-bindings: dma: qcom,bam-dma: Increase iommus
- maxItems to seven
-Message-ID: <20260530-spiffy-glittering-quail-dff199@quoll>
-References: <20260521-shikra_crypto_changse-v1-0-0154cc9cc0de@oss.qualcomm.com>
- <20260521-shikra_crypto_changse-v1-4-0154cc9cc0de@oss.qualcomm.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Demi Marie Obenour <demiobenour@gmail.com>, 
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Thara Gopinath <thara.gopinath@gmail.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Russell King <linux@armlinux.org.uk>, 
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	Ard Biesheuvel <ardb@kernel.org>, devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH 1/2] crypto: Delete Qualcomm crypto engine driver
+Message-ID: <20260530-unbeatable-supportive-wren-c27de8@quoll>
+References: <20260523-delete-qce-v1-0-86105cd7f406@gmail.com>
+ <20260523-delete-qce-v1-1-86105cd7f406@gmail.com>
+ <7rgfuvv3hai7g4wt4accbkejtzdt5dnb6mkj6x7ox5sz35q4n2@h7j6rr7extuj>
+ <66317f6a-645e-432b-ae11-8f40569d4117@gmail.com>
+ <d97382a6-6c5d-4a3f-89cc-3ae9b432de3f@kernel.org>
+ <20260524204537.GB110177@quark>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,13 +53,56 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260521-shikra_crypto_changse-v1-4-0154cc9cc0de@oss.qualcomm.com>
+In-Reply-To: <20260524204537.GB110177@quark>
 
-On Thu, May 21, 2026 at 06:47:11PM +0530, Kuldeep Singh wrote:
-> Shikra bam dma engine support 7 iommu entries and not 6.
-> Increase maxItems property for iommus to pass dtbs_check errors.
+On Sun, May 24, 2026 at 03:45:37PM -0500, Eric Biggers wrote:
+> On Sun, May 24, 2026 at 10:29:28PM +0200, Krzysztof Kozlowski wrote:
+> > On 24/05/2026 22:12, Demi Marie Obenour wrote:
+> > > On 5/24/26 12:42, Dmitry Baryshkov wrote:
+> > >> On Sat, May 23, 2026 at 03:03:56PM -0400, Demi Marie Obenour via B4 Relay wrote:
+> > >>> From: Demi Marie Obenour <demiobenour@gmail.com>
+> > >>>
+> > >>> It's slower than the generic C code and causes problems.
+> > >>
+> > >> Which problems?
+> > > 
+> > > See https://lore.kernel.org/all/20260522024912.GC5937@quark/.
+> > 
+> > Your commit is still incomplete and other people's opinion is poor
+> > reason. If you do not know what to write, ask that person to make
+> > necessary changes.
+> > 
+> > Not mentioning that removing driver is not even necessary to achieve the
+> > goal Eric was mentioning and if I understood correctly: you are removing
+> > even the pieces Eric found useful.
+> 
+> This driver is more than an order of magnitude slower than the CPU for
+> both encryption and hashing.  See:
+> 
+>     https://lore.kernel.org/r/20250704070322.20692-1-ebiggers@kernel.org/
+>     https://lore.kernel.org/r/20250615031807.GA81869@sol/
+> 
+> There are many examples of it having bugs as well, for example see the
+> second link above.
+> 
+> That's why it had to be disabled via the cra_priority system.  This
+> driver was actively making Linux worse.
+> 
+> This isn't particularly unique to drivers/crypto/, of course.  This one
+> we just have data on, so it's a bit clearer.
+> 
+> I've yet to see any real reason to keep this driver.
+> 
+> Crypto drivers need to be held to a higher standard than other device
+> drivers, as well.  The onus is on those who want to keep a particular
+> crypto driver to prove that it's worth keeping.
 
-What errors? There is no Shikra in upstream so how could we have errors?
+Commit doing the work should have all these explanations, including
+numbers. External references are not a proper justification for commits.
+
+Make your case, describe the findings including impact (or lack of
+impact) on ongoing hw wrapped keys work and inlined encryption for other
+devices (ICE).
 
 Best regards,
 Krzysztof
