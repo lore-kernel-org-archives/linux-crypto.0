@@ -1,123 +1,146 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C675623E25B;
-	Sun, 31 May 2026 16:01:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E4FF38E5ED
+	for <linux-crypto@vger.kernel.org>; Sun, 31 May 2026 16:27:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780243304; cv=none; b=PfJHV88SNiFKR+l6v9o0fNY7YQekaKCdHKVHztslkqsbBDD2T7qTlYAb1v4BDLDbZPaThyGCB46RLbP9wQ5PnP4Sbk77JSNIvuDY1laFZXYj5owvmRf0wkWmurJsRX/kz4RuRESTnpSuhA4/kE+Cc7ry7yXDjSoAXNLU/QUNTwA=
+	t=1780244867; cv=none; b=VQBUdWCveHER5DSyfkX6SeJD4fKHB4aZuqUgDbtcqpCzUwku9wiXkG9drphfFLhChnQa0Isuy0/qY/tSj+cko145aWHpXryTjNQMDAOdrelgj51YHyERtt9aEQy193leJBx3gJKUByGj72chyUEj/rpfXu+JPlij1MVLqA2iCBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780243304; c=relaxed/simple;
-	bh=fhuhiehJFZcSOGn14Hjza4IXXuXrGYzev5Sb76h8B68=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I/MtUCZ2iRUaPUyJ4uW3Eu4koEIagVMyRM1APw9a5CCrTYtdnQd36HhSFF5wIcKstj8aYdELKrfaQ4B1Jdw9hUqBdAhLbc3aRX3CpjGOCtDOkcK0HdCRkZiJ4lnYnf6KOYWVwFwMRRsLWcNyUiiYExb6ZqmECsuQ5NfSFhgl4X8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ialh5EIq; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780244867; c=relaxed/simple;
+	bh=0Z7N0xCYu6VkyFfhnSi8o2vTsl4Gm9ruQYGU2oUarIU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IvqQq/jvjjC1edQwRx4r/MVNrcI9SZM+nWqq067qsYYcJ1vbrp/G89A1yWCjpJfpP50iD42BXwjUcIJm813XJCC8IaUejrIvDWFvP0f00wldCMBr09U/SsyW1m3kAxOQd4a9JEKji4eSgV5YH2Jh7iTH7AaHA0hB9VjTMBtHLlM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vbou+zIi; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ialh5EIq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38FF71F00893;
-	Sun, 31 May 2026 16:01:43 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vbou+zIi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27CC51F008A1
+	for <linux-crypto@vger.kernel.org>; Sun, 31 May 2026 16:27:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780243303;
-	bh=ps2TjyB09tV9voLQd4jP0mWt7CpejjrGG3yYcZeN2+s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=ialh5EIqBZjQ1Fuj2nwl996CNtiTfS1EcPFgjXmt7/kZuU6/Qkjf8CwkcdNY2ohX+
-	 Vg5ttoC4+58UL+TX7jc4eBQt7clET3tnBW3LOnz7gcFmmCO1YH6moMP65QwkD7Ba/o
-	 9OUjlb6xYCHTCSeMayA+hojJ9GgSxnACmNYVqblCSKMkUkTmy2t23TLFxnvE8njWX0
-	 CXk6cIYK30sL0dwCORiF1OGWwh5b5QJlGQLiHEGSPTtTtj0xE6F87BUegYqShJ7b7q
-	 1j8M+TLJ9YB7hAF4XhGx/4uQFnSH+/DTabyv6nqpLH+osktiIvF+2BICmEMo9SESRM
-	 DKscjz1ri6smA==
-Date: Sun, 31 May 2026 09:00:20 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Aleksander Jan Bajkowski <olek2@wp.pl>
-Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-	Christian Lamparter <chunkeey@gmail.com>,
-	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] crypto: crypto4xx - Remove insecure and unused rng_alg
-Message-ID: <20260531160020.GA2255@sol>
-References: <20260529220430.34135-1-ebiggers@kernel.org>
- <5c74c261-53cf-4185-a8a0-7554bc9fe5f7@wp.pl>
- <20260530192630.GB6807@quark>
- <465adf3a-2c27-43d0-afdb-68ae12b89d10@wp.pl>
+	s=k20260515; t=1780244866;
+	bh=b/T/RdXiN7bhTsikP7tDXhBU6HaNdabK8ZTbQ4skuK0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=Vbou+zIiA3Mr4kpYeiYJTqi2gIfmOZkK11YoGOHJXJolFeVAEfBS1YmHpT2wbl7E4
+	 1TtFyx5TF2YuygGadxrQcJ1BbSDjThQNgIQTDV+k7mbJnCEVnmCp/WdYdPgTqysu3r
+	 iMc/SXEPVkZBePzOusjof6PMTt34N5mN/BWjlITLi6GWFVDZrYjjZMV3nyOz0eZh0H
+	 nSY9BsHNYDHM9flWN3Wyu66qytrnINpASR4KeaMgIHf179bUlLCtBEgwXjc2B1+jsG
+	 pI0eIsJ5J4yCzh+imQOSoXBDCyq6QOJRceCoO6RwRvc+V1+Aw4d5g0j4MWmuAfjJGI
+	 iJoGujrTk1fCg==
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5aa63daf2a5so918292e87.3
+        for <linux-crypto@vger.kernel.org>; Sun, 31 May 2026 09:27:46 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ/0HRqHMkCjxxhMdxRA37x5seU4MEBRjq8vZX/75cstYnoXTRVmve9wTEilIE7aBjLEwJSylDNur/DwsIs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/azduYv2c42jsAk+laD8gSJ0i33AjUA00y9U6M7waqfLxkviL
+	7Fe/f2yqeP1KV5DGA4STieExK+TVutNb7D9y1S3M0KrBSLLsHLalY1WWjB0ASLKh29lFMUYCbhJ
+	Vb+WJYMrtoohgwjDTQdrowviYpmgkP03DlWeaoHSKIQ==
+X-Received: by 2002:a05:6512:800d:10b0:5a8:fca6:a537 with SMTP id
+ 2adb3069b0e04-5aa608ff3d8mr1341020e87.22.1780244864645; Sun, 31 May 2026
+ 09:27:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <465adf3a-2c27-43d0-afdb-68ae12b89d10@wp.pl>
+References: <20260526-qcom-qce-cmd-descr-v19-0-08472fdcbf4a@oss.qualcomm.com> <20260529162251.GB2706@sol>
+In-Reply-To: <20260529162251.GB2706@sol>
+From: Bartosz Golaszewski <brgl@kernel.org>
+Date: Sun, 31 May 2026 18:27:32 +0200
+X-Gmail-Original-Message-ID: <CAMRc=MdJ5GN_Lbi9PeCoW=fNnjCz-WAq66TSa8f=fZGOHFZ41Q@mail.gmail.com>
+X-Gm-Features: AVHnY4KA4mut6jG-LIp_D5JMZD7phc05G5rBuCgHgHRyzFVSAKUzF_CQJazrdyg
+Message-ID: <CAMRc=MdJ5GN_Lbi9PeCoW=fNnjCz-WAq66TSa8f=fZGOHFZ41Q@mail.gmail.com>
+Subject: Re: [PATCH v19 00/14] crypto/dmaengine: qce: introduce BAM locking
+ and use DMA for register I/O
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, Vinod Koul <vkoul@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Thara Gopinath <thara.gopinath@gmail.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Udit Tiwari <quic_utiwari@quicinc.com>, Md Sadre Alam <mdalam@qti.qualcomm.com>, 
+	Dmitry Baryshkov <lumag@kernel.org>, Manivannan Sadhasivam <mani@kernel.org>, 
+	Stephan Gerhold <stephan.gerhold@linaro.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Peter Ujfalusi <peter.ujfalusi@gmail.com>, Michal Simek <michal.simek@amd.com>, 
+	Frank Li <Frank.Li@kernel.org>, Andy Gross <agross@codeaurora.org>, 
+	Neil Armstrong <neil.armstrong@linaro.org>, dmaengine@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, May 31, 2026 at 12:15:49PM +0200, Aleksander Jan Bajkowski wrote:
-> Hi Eric,
-> 
-> On 30/05/2026 21:26, Eric Biggers wrote:
-> > On Sat, May 30, 2026 at 05:05:19PM +0200, Aleksander Jan Bajkowski wrote:
-> > > Hi Eric,
-> > > 
-> > > On 30/05/2026 00:04, Eric Biggers wrote:
-> > > > Remove crypto4xx_rng, as it is insecure and unused:
-> > > > 
-> > > > - It has only a 64-bit security strength, which is highly inadequate.
-> > > >     This can be seen by the fact that crypto4xx_hw_init() seeds it with
-> > > >     only 64 bits of entropy, and the fact that the original commit
-> > > >     mentions that it implements ANSI X9.17 Annex C.
-> > > In addition to a seed, the PRNG also uses ring oscillators as sources of
-> > > entropy. The entropy should be higher than 64b. This is the Rambus EIP-73d
-> > > IP core. The same IP core is built into eip93 (EIP-73a), eip97 (EIP-73d),
-> > > and eip197 (EIP-73d). You can find the documentation online. The complete
-> > > "container" is actually Rambus EIP-94, and one of its parts is EIP-73d.
-> > Just because it may have another source of entropy doesn't mean its
-> > security strength is higher than 64 bits.
-> > 
-> > I cannot find any documentation other than
-> > https://datasheet.octopart.com/PPC460EX-SUB800T-AMCC-datasheet-11553412.pdf
-> > which says "ANSI X9.17 Annex C compliant using a DES algorithm".
-> > 
-> > DES actually has a 56-bit key, so maybe I was over-generous.
-> > 
-> > And according to https://cacr.uwaterloo.ca/hac/about/chap5.pdf ANSI
-> > X9.17 has only a 64-bit state anyway.  So even if we assume the
-> > datasheet is incorrect and the algorithm is actually 3DES which has a
-> > longer key, the state is likely still 64-bit.
-> According to the datasheet, there is no second source of entropy. The PRNG
-> has three built-in LFSRs. Each of them can be initialized independently. The
-> first LFSR is used to generate input data. The second and third are used to
-> generate keys for DES encryption. The output of the first LFSR is encrypted
-> using 3DES with two 64-bit keys. Between individual DES operations, data is
-> XORed with the seed. It sounds like a fairly secure design if properly
-> reseeded.
-> There is also a newer design (EIP73a) based on the same algorithm. The
-> only difference is the replacing of 3DES with AES using a 2TDEA scheme.
-> The DES-based variant is more widely used, even in new SoCs.
+On Fri, May 29, 2026 at 6:24=E2=80=AFPM Eric Biggers <ebiggers@kernel.org> =
+wrote:
+>
+> On Tue, May 26, 2026 at 03:10:48PM +0200, Bartosz Golaszewski wrote:
+> > I feel like I fell into the trap of trying to address pre-existing
+> > issues reported by sashiko and in the process provoking more reports so
+> > let this be the last iteration where I do this. Vinod can we get this
+> > queued for v7.2 now and iron out any previously existing problems in
+> > tree?
+> >
+> > Merging strategy: there are build-time dependencies between the crypto
+> > and DMA patches so the best approach is for Vinod to create an immutabl=
+e
+> > branch with the DMA part pulled in by the crypto tree.
+> >
+> > This iteration continues to build on top of v12 but uses the BAM's NWD
+> > bit on data descriptors as suggested by Stephan. To that end, there are
+> > some more changes like reversing the order of command and data
+> > descriptors queuedy by the QCE driver.
+> >
+> > Currently the QCE crypto driver accesses the crypto engine registers
+> > directly via CPU. Trust Zone may perform crypto operations simultaneous=
+ly
+> > resulting in a race condition. To remedy that, let's introduce support
+> > for BAM locking/unlocking to the driver. The BAM driver will now wrap
+> > any existing issued descriptor chains with additional descriptors
+> > performing the locking when the client starts the transaction
+> > (dmaengine_issue_pending()). The client wanting to profit from locking
+> > needs to switch to performing register I/O over DMA and communicate the
+> > address to which to perform the dummy writes via a call to
+> > dmaengine_desc_attach_metadata().
+> >
+> > In the specific case of the BAM DMA this translates to sending command
+> > descriptors performing dummy writes with the relevant flags set. The BA=
+M
+> > will then lock all other pipes not related to the current pipe group, a=
+nd
+> > keep handling the current pipe only until it sees the the unlock bit.
+> >
+> > In order for the locking to work correctly, we also need to switch to
+> > using DMA for all register I/O.
+> >
+> > On top of this, the series contains some additional tweaks and
+> > refactoring.
+> >
+> > The goal of this is not to improve the performance but to prepare the
+> > driver for supporting decryption into secure buffers in the future.
+> >
+> > Tested with tcrypt.ko, kcapi and cryptsetup.
+> >
+> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.co=
+m>
+>
+> None of these fixes are Cc'ed to stable, so stable kernels will remain
+> vulnerable to these race conditions.
+>
+> Shouldn't this be preceded by a patch, Cc'ed to stable, that marks the
+> driver as BROKEN?  As discussed in the other thread
+> (https://lore.kernel.org/linux-crypto/20260515-shikra_qcrypto-v1-0-80f07b=
+345c29@oss.qualcomm.com/T/#u),
+> none of the current functionality of this driver is actually useful in
+> Linux.  It's just been causing problems.
+>
 
-Okay, it sounds like you're walking back your claim that there's a
-second source of entropy.  That leaves just the 64-bit seed that the
-driver writes to CRYPTO4XX_PRNG_SEED_L || CRYPTO4XX_PRNG_SEED_H, which
-probably corresponds to the "first LFSR" you mentioned.  The driver
-doesn't initialize the other LFSRs.
+I don't believe any of it should be backported. This is not a
+regression, multiple EEs were never supported, so it's a new feature.
+Also: backporting of over 500 diff lines across two subsystems doesn't
+sound like a good idea to me.
 
-> > So it isn't looking good.  And since it's an undocumented proprietary
-> > design it shouldn't be given the benefit of the doubt either.
-> > 
-> As I mentioned earlier, this IP core is quite well documented[1] (page 198).
-> Half of all SOHO routers have the EIP-73d built in. The algorithm is also
-> described in TRM for some of these SoCs :)
-> 
-> List od SoCs with EIP-73d:
-> AMCC PPC405EX/PPC460EX,
-> Intel/Maxlinear GRX350, URX850,
-> Marvell Armada 37x0, 7k, 8k,
-> Mediatek MT7623/MT7981/MT7986/MT7987/MT7988,
-> Qualcomm IPQ975x.
-> 
-> [1] https://www.scribd.com/document/734250956/Safexcel-Ip-94-Plb-Sas-v1-5?_gl=1*dng4pf*_up*MQ..*_ga*OTQ4NjkzMTAxLjE3ODAyMjA4ODI.*_ga_Z4ZC50DED6*czE3ODAyMjA4ODEkbzEkZzEkdDE3ODAyMjA4ODEkajYwJGwwJGgw*_ga_8KZ8BV0P5W*czE3ODAyMjA4ODEkbzEkZzEkdDE3ODAyMjA4ODEkajYwJGwwJGgw
+On the other hand, if marking the driver as BROKEN for the time being
+allows for a faster pace of queuing any changes to it, then I'm for
+it. Let's unmark it once we fix it.
 
-The option to download the file is paywalled.
-
-Anyway, even if it turns out that this is secure (it won't), it's still
-unused code that should be removed anyway.  The fact that it's not up to
-modern security standards just provides some additional motivation.
-
-- Eric
+Bart
