@@ -1,79 +1,73 @@
 Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F0063CAA51
-	for <linux-crypto@vger.kernel.org>; Mon,  1 Jun 2026 14:57:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94A773D7D87
+	for <linux-crypto@vger.kernel.org>; Mon,  1 Jun 2026 15:08:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780325847; cv=none; b=h82cOd+uUlQugEueiqH1iIUw2pUEKyBHmOkjK2YwPVxAJ9gEG3wYnbwULmUJPcsqxDZxb8d+7z41EpOkGqSwA5wc1YuCdGNDcsbPZo+vS6BK9KC0J2LM1XCCpFhnPeSe6XqnRjoklQEOLBcHiJha9p0MY2rp5pXrWx/6vvJncEk=
+	t=1780326498; cv=none; b=tFffRtLZGSOfdlVxWiuxqqIQSn8S8rc4W9rTuluGrr/WPPf1B3ZD+8to8YFb/+k+0sptRLhngC/fhnrRfIQ3tLfWL24SMKokvgX8kw16pK8TTacovVr3RHopQxg2hJoMpXTTJl2Ccgde1zDxtEIn+p6IMecsMS6GJzVbvmdMN1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780325847; c=relaxed/simple;
-	bh=3U/hoCMfqrN8WYMe6LpM/eJcEaNfw0c3jaGz+fXlIRQ=;
+	s=arc-20240116; t=1780326498; c=relaxed/simple;
+	bh=8cYW1eZoP6NBNGgjXZ5EeGzBWJiUFyOZDDX8DreahPY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Jw2RaGvNDdQnk58pxC0dvwCcveQWe2pJstNruMrWwv+7sw0bdtfVFeWQ8JTxm13nSR2yUxSzjkBKRzz4o4ixBBV9HAByQO6/RE9EwZDNBadXG1x1rIoYbbtCT1aKfZsYzEFdo+hhU2LwQLObcflRWmcAh3eR71a61aRIhh4wYt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DMC2b/cn; arc=none smtp.client-ip=209.85.221.53
+	 Content-Type:Content-Disposition:In-Reply-To; b=dgt+Bj9f0h07TZxDYPdrqDMu8rHHRakRI/jtt2FR74WZ7fUyMcDjX9h5ABGELwDrKBaHdL0/lCeGt806Ge+sdEdHRAg9eIUdz7Xw6aB8MNJoRrxDVOf42pvvm8aSRINPUFVWUcNaiRuxsGv2THUc0L7ACNCkqV1D7MrbUOX1Ues=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W/eIcnx9; arc=none smtp.client-ip=209.85.221.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DMC2b/cn"
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-45ef5146b56so1791412f8f.0
-        for <linux-crypto@vger.kernel.org>; Mon, 01 Jun 2026 07:57:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W/eIcnx9"
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-45ef82204c6so1214453f8f.3
+        for <linux-crypto@vger.kernel.org>; Mon, 01 Jun 2026 08:08:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780325845; x=1780930645; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1780326496; x=1780931296; darn=vger.kernel.org;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=gfecz+ZWs/BTOXCnvzAkst5tZtXH0lgY7BHeUFyc1xs=;
-        b=DMC2b/cn/Zo4sw5g1sBqwqrnNX/OHyqX+T+opTkM+11oeJ3ilxNqPAGBhXNU2soY0G
-         0Eh7lgxJqh9kjl9g/CNGzKFvkC3ddInd0ipayjmx2nKO9PepaZ4VZ5GSHIIMaw3ygNT3
-         n4q+3MQ4PTUV+0aH9SHU3DC3tv+zMGEV4F/h5o7AIB9e6qugKyyJMYQGfAjh7+JqulS8
-         3U3w4xcR1ILOvU8Gxn1Tu9nIUWcGhwrSyZj/RzZKk/47YXWQvLVdTJ/4GHV+PZuq1ZFW
-         2EQ30FAvRgWdw05jQxdSl75RZB/snqvQTBhFGqenN5rcs9DuaGkE2vBh0krrpbz/XPeX
-         2Omg==
+        bh=/iDvFkdNstCMV6U6YBcdPpzEdn9fHll2vJW0mE3op7o=;
+        b=W/eIcnx9x2qiMXYqTwnjxzj1De0XzRjRutk7v952pCfNih879aCH4qPFA2mxNTkAjr
+         GSydIoNShWsyybsfT5UICvLEL0hi9blzHqyQYGBNTB9hk7ry+AOC08WDC/EGmzh6imlu
+         JmGYBo1q2p97R51k183KrMDMENdKPpl4dAwpx2QKwHIEirtYWh94vItZJBz+yAIHQIJF
+         aJqwf0BcpSYmUh+PBadmQ72dXvsUgwHbt69EYp92qmQg1e0WUoWJJQ4LuNM7gp60xn71
+         c1Er8uy9xjGpHoPn87nw8kp4USv63CjP/OG8fVhtiyow+rcLkBofpyO7ZrIRTftBi+AM
+         6wTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780325845; x=1780930645;
+        d=1e100.net; s=20251104; t=1780326496; x=1780931296;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gfecz+ZWs/BTOXCnvzAkst5tZtXH0lgY7BHeUFyc1xs=;
-        b=Flm1ALPd95JakcVy0k5ggimqCgF/knxn62CsxWnEUN8cBAwmiISHlKYuM3zrPRHk6P
-         +jNAERZF5oT1G424F1KvN+aVGstO3ii2m6nvWxn9qV5Lj7RS6vGgCVi603QEKZz/M+kr
-         0i4kgqdTeXiEdlYMfoFRGkjbDaRVDzW6j+dJ4GVZ72qmlcX8b0GBuQwBD5tdfYDk/VOe
-         UbzpJnD3wMbeV8WwIgCiqbYLDjrX5wsOTs1CM1UK5L6F3QRzJyvcK4o224KhF1LO3+Xf
-         DTpchTL+hnuHL52DkfwRuNISJJuT7ZyWxwGcgZCyeD8onN7RfsUPvQ9jMwoYgTfRlo+L
-         JsgA==
-X-Forwarded-Encrypted: i=1; AFNElJ8/JcnQzSylED01zSpFL6R579QuRVhe1XGaMG4bfMMtxYYBX4RZIb3EgEczyHbqkVf/x4oFVZctX8KbtFI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyamHbRo7wo5TJ9jcOos6lDp31547TcUu4IJr3rfbsVwZqalq1V
-	c8Oni7N/bDnj7o1fN0xBNB4xxf5a+ZBgV+F9Ukt6BF8LVMWZ7k7t0r4C
-X-Gm-Gg: Acq92OGGKstMGAKF12L9eKbH/BM9E2u2Ut8OnJ31Uvd+TuZz6+T51snO5G5TdxJV5RB
-	1PQk8vWWtZxxsi0E95K/41xt5k4qGnJswhwPDNjDk4xnco14L1auFTOuflswOQAJkoZLQ/h/Jzr
-	KK9NJ4ETgooPQCCFDWRyAHuemkanyfr16i9cc3Cp0YUXHuZA2ixa5wkHgFJ9r8qhsIV/q4odtKR
-	4nI4fvsVT+mDjG7i8oVwtXjzixrjBp1UVoxbnOSbmmeUiyl0s1JYlQD3jg6g9gFAV48WM2ZIfbk
-	pTZ6QvkP7Rz1Ywih9t1LYcK8V/Y+/cuLWSCCS/175CH4NCYms9clxcfrg3U3si59khRx4X3vNWG
-	iswVP+gLyHAejw/86947Tmeq/lKMEjy1LXzIM1RlomikCJMynqVQwM5BBplfZiIVDEEvRFPzxVw
-	DhYkH4NAoRCmPED5qndOurtDDED8GtzJd6dg==
-X-Received: by 2002:a5d:59c6:0:b0:45e:e936:5e30 with SMTP id ffacd0b85a97d-45ef6e696cbmr18803207f8f.6.1780325844434;
-        Mon, 01 Jun 2026 07:57:24 -0700 (PDT)
+        bh=/iDvFkdNstCMV6U6YBcdPpzEdn9fHll2vJW0mE3op7o=;
+        b=rroclLWO9xCkKRewg/sm57pUE0G9bhTPZSE/8/tdw9I+jyb9tbvVq9KTD0zdS2YaVC
+         1N2De+bzE4NufxikXUo55a9CTUENp8rQKghdHlFeJdYrPFBSA1bG7GiKYtW79QguRQcV
+         0nytKi7/yy4xAivijXeYv0KB/PbYRkdWobTJmsFObR7acAzbeDkvTS63Kvv7YFXPUfuG
+         orLgxyDraPzlzWCTaItAJD0a1uV8/SdDdGrV7j6Yv1LJHHZKFP+wLigr3+ITOo1G5hrA
+         jB65N5oqwFQ+SZxXLXTIh5wXb7ou1EHPj3RXas+RovlO9I1+x7kcegaKCAPH7le0fAle
+         b3Tg==
+X-Gm-Message-State: AOJu0Yz12jEfcbik8c0hjORseKbYHD9iE7aVdQV9FljEI0Q2GJVR3yi3
+	ixUfHUXA7NqfKlpwoNFJ/pilWSe+6V8GBxH30vs8Svy4lcslN6UPXktu
+X-Gm-Gg: Acq92OEoOA26f28BWpp3DVSYLkpvtHlHYOQtg9VBgCRKK42u5dVyy3sVaZ8SL0xslpM
+	+8DlsdOEVMrJnAmhQy4MQXZjdrNWuro20juM9eC7zBp7E6bFfhuC6AGEJuMsLIX4OyblL3jK+p8
+	0RAbTGEOUHpZxGUpZ4ysBuMG2fk+zMkjNcnOeMgPe/7DO3yAK7l8FQsa6AhGpT07ZzVQtSCf8IF
+	ZHK+ku5x+ycBYNSafvgirQqq3Dp04b95bJ2+0e+k5jlq3CPN/D7YOjtw9b+oDike2erXrfXnPyY
+	1pi3kpGPScWCcp0eCf8+NZ98OiPKD3ev62NsgtQUb3AUjspRvDykDtPUjDMj+Q7HLg4JJRLOhu5
+	Q2h1GPVxQxg4fgPOLa9uSwQHF/2aYwQ37grDlL1Fa2+VkYXHlCZFuyMfJ5NvyC4qW1b9rqOsHhR
+	9ME5uoe95o2LI4r5bDaVwfIQadQgelZITZ9Q==
+X-Received: by 2002:a05:600d:4453:10b0:490:6869:ef13 with SMTP id 5b1f17b1804b1-490a2918e9fmr148899075e9.14.1780326495794;
+        Mon, 01 Jun 2026 08:08:15 -0700 (PDT)
 Received: from Red ([2a01:cb1d:897:7800:4a02:2aff:fe07:1efc])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-45ef34a03f8sm27548200f8f.7.2026.06.01.07.57.23
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4909c6319ddsm245702965e9.0.2026.06.01.08.08.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jun 2026 07:57:23 -0700 (PDT)
-Date: Mon, 1 Jun 2026 16:57:21 +0200
+        Mon, 01 Jun 2026 08:08:15 -0700 (PDT)
+Date: Mon, 1 Jun 2026 17:08:13 +0200
 From: Corentin Labbe <clabbe.montjoie@gmail.com>
 To: Eric Biggers <ebiggers@kernel.org>
-Cc: Tianchu Chen <tianchu.chen@linux.dev>, herbert@gondor.apana.org.au,
-	davem@davemloft.net, wens@kernel.org, jernej.skrabec@gmail.com,
-	samuel@sholland.org, linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] crypto: sun4i-ss - clamp PRNG seed length to prevent
- heap overflow
-Message-ID: <ah2d0RyZcVp614_k@Red>
-References: <af749a8447bd7f0e9dd26ca6c87e9c6afecb09d9@linux.dev>
- <4d4407c05835a50413fa1e974e3aa3f4abfe2d5b@linux.dev>
- <20260529161057.GA2706@sol>
- <ahnIbpBLyn5z_siT@Red>
- <20260529173341.GA566433@google.com>
+Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-sunxi@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, Chen-Yu Tsai <wens@kernel.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>, stable@vger.kernel.org
+Subject: Re: [PATCH] crypto: sun4i-ss - Remove insecure and unused rng_alg
+Message-ID: <ah2gXTMxfH-ux_J2@Red>
+References: <20260529193648.18172-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -83,53 +77,27 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20260529173341.GA566433@google.com>
+In-Reply-To: <20260529193648.18172-1-ebiggers@kernel.org>
 
-Le Fri, May 29, 2026 at 05:33:41PM +0000, Eric Biggers a écrit :
-> On Fri, May 29, 2026 at 07:10:06PM +0200, Corentin Labbe wrote:
-> > Le Fri, May 29, 2026 at 09:10:57AM -0700, Eric Biggers a écrit :
-> > > On Fri, May 29, 2026 at 08:08:01AM +0000, Tianchu Chen wrote:
-> > > > From: Tianchu Chen <flynnnchen@tencent.com>
-> > > > 
-> > > > sun4i_ss_prng_seed() copies the user-supplied seed into ss->seed
-> > > > using the user-provided length with no bounds check. The crypto core
-> > > > does not enforce slen <= seedsize before calling into the driver, so a
-> > > > userspace caller via AF_ALG setsockopt(ALG_SET_KEY) can pass up to
-> > > > sysctl_optmem_max bytes, overflowing the fixed-size buffer and
-> > > > corrupting adjacent heap memory.
-> > > > 
-> > > > Clamp the copy length to the buffer size, matching the approach used by
-> > > > loongson-rng for oversized seeds.
-> > > > 
-> > > > Discovered by Atuin - Automated Vulnerability Discovery Engine.
-> > > > 
-> > > > Fixes: 6298e948215f ("crypto: sunxi-ss - Add Allwinner Security System crypto accelerator")
-> > > > Cc: stable@vger.kernel.org
-> > > > Signed-off-by: Tianchu Chen <flynnnchen@tencent.com>
-> > > > ---
-> > > > v2: Silently clamp oversized seeds with min_t instead of returning
-> > > >     -EINVAL (Herbert Xu).
-> > > 
-> > > sun4i-ss-prng.c is useless, is still broken, and should just be deleted.
-> > 
-> > Hello
-> > 
-> > useless ? clearly no, it helped a lot on devices where it is.
+Le Fri, May 29, 2026 at 12:36:48PM -0700, Eric Biggers a écrit :
+> Remove sun4i_ss_rng, as it is insecure and unused:
 > 
-> The only way this code is reachable is via "rng" algorithm type in
-> AF_ALG, which is almost never used.  Everyone just uses the regular
-> Linux RNG (/dev/random etc) instead, as they should.
+> - It has multiple vulnerabilities.  sun4i_ss_prng_seed() is missing
+>   locking and has a buffer overflow.  sun4i_ss_prng_generate() fails to
+>   fill the entire buffer with cryptographic random bytes, because it
+>   rounds the destination length down and also doesn't actually wait for
+>   the hardware to be ready before pulling bytes from it.
 > 
-> In fact, anyone were to accidentally use this it would be a security
-> vulnerability, seeing as sun4i_ss_prng_generate() doesn't actually fill
-> in all the bytes that were requested.  It also doesn't wait for the FIFO
-> to be ready when reading data from it.
+> - No user of this code is known.  It's usable only theoretically via the
+>   "rng" algorithm type of AF_ALG.  But userspace actually just uses the
+>   actual Linux RNG (/dev/random etc) instead.  And rng_algs don't
+>   contribute entropy to the actual Linux RNG either.  (This may have
+>   been confused with hwrng, which does contribute entropy.)
 > 
-> Is it possible that there's a misunderstanding here and you think this
-> provides entropy to the regular Linux RNG?  It doesn't.  hwrng does
-> that, crypto_rng does not.
-> 
+> Fixes: b8ae5c7387ad ("crypto: sun4i-ss - support the Security System PRNG")
+> Cc: stable@vger.kernel.org
+> Cc: Corentin Labbe <clabbe.montjoie@gmail.com>
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
 
-I believe to have used rngd for that. ( or something like that)
-
-Anyway, I understand why want to remove it.
+Acked-by: Corentin LABBE <clabbe.montjoie@gmail.com>
