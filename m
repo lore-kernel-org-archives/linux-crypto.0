@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6866A25DB1A;
-	Mon,  1 Jun 2026 05:52:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A136134EF1F;
+	Mon,  1 Jun 2026 06:15:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780293124; cv=none; b=iI5QEwZV2cn+nzQ78D60SAekr5OBHP2R4hw7iwIdob+qAgrruXsqpoZTxsjgTOEdVgwA+ZtxrC2GuO2oGKDBDHgz3+x5qlJcFmkS/NruFYq+t94cMPzsUDY8YmTyfldMFQ+YamnJErrxeMLtPvlMPla3YR878KNe4c9YGxKKJwk=
+	t=1780294561; cv=none; b=tBBFrKcG7wXw/gwdh4A0HgD5oHPohcwMo5S8HIXW0Di9T0AQ7wbwWQ0keNxQlwbQnYZDRsYDSINzKwWi/TelEifxtzYTBtUWNqQNhsbADsISbTzCY+UFwLu6Ve31Rti+4uHz2MgdqeDNj/iV83PxPH7UYfckhVhsVpwnga4Mb7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780293124; c=relaxed/simple;
-	bh=xhwsKB8/Psutoq0cO62/LPM7HEXvUGkVC2dNfvSjJEA=;
+	s=arc-20240116; t=1780294561; c=relaxed/simple;
+	bh=An+Et4XywLlNvsznQ3jwd4+ap9PkQCqZ45FpI1W5BD8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZWv+nONT5WU9QNrVAwL1bxz7ywDj5/E/Vbr73UYS54n1CIz2Po/p1iSIcM7dwnfgZPVQamwUC+Uh2obVgHgt0T2IMNF23AviwTa6Hge8t2lITPo+XSbPC8VIglmLsXfsoevDZLwGwJFimzzSVdc25SMtK09+xnpae3WJRSK1k5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jpNkQnxf; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:Content-Type; b=C66dDs2AIzsgEwqn9BZ4c+eZ77W4+GPcUNe0chZB+K8T/72EhLF/d+XP8kV+gPb8VRY5f5WYLy1EiCRGXP8V2ulk9GTOJfoUCW2bB9NyrRfsk4xCUfon1290XcQJoKNoswbByjOoyXn8YdXf/4J7Ej0VCNHi6XkWNEqUB/lrbUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IrosvPTL; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jpNkQnxf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24FDD1F00893;
-	Mon,  1 Jun 2026 05:51:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IrosvPTL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 428A11F00893;
+	Mon,  1 Jun 2026 06:15:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780293122;
-	bh=dexSvds61LnfQO88Uko2yPN5+bizNdItqN7ihyL0Fyw=;
+	s=k20260515; t=1780294559;
+	bh=0T/O5ac2hSWODWPsOjYTceNCUDT0CjxOn57lFOMJvy8=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=jpNkQnxfIY606jqnwtCkSrNJiJAETm7S04GeGb5GzKoAZRyRKpWJoXtLcQCD0Pzq6
-	 AW7LA1XRq0ojA29JTYidsLLLlI1W6f49u5CEqPobwVLM8jhvA3iIv3ht+Nw5eA0zq3
-	 Y65hkbHA8gQhm8LTi7GXe7O3aIX1+moQV9Yv4e2P6I7iL1aLj81bn1AR8/Xlfm5ozG
-	 4w2eE+G4G8Y5dXTqPXGzxqcEkS3QgxCIUaxtGEd1SB8/nAgLATBMX+TGahiXSgIrFf
-	 X92qWBIPy4AF3MhAualM4nBj7s2Hb9Ecnbt/2nZsYwDnFxQVTgRZsm3G48B/TopmIt
-	 itUDWCv6pqvvQ==
-Message-ID: <a3494787-b508-46ee-921c-b7e34d38cf59@kernel.org>
-Date: Mon, 1 Jun 2026 07:51:58 +0200
+	b=IrosvPTLz5TNKHQg9SrOHFYIUEU4+CNuKpN58oqtToC2C9CP5BJnu38jSBhmo07R+
+	 QwiZguEiaUYDZGI2ZiDtSBuAv/o5EoP3pp39Mth7zXNJUqtiar5/cpPxz7mtQ30UsZ
+	 UhimXEPMTAaCEobdMNHB3UN+TPhk57QHxsbmc686Wy1kzcUrAUdnyNMCG/kpVM/eIb
+	 1pdgCcQ4dl+d0s8aVvXLKtN8JhpHlk8QHraELxPpdsTxhghqC7rBAqXP3p8Wt2AMpK
+	 W1OVknXQrN9/Sp6cPy3ivBtxTexrCRxgzLm4r913/p2+e55NRVOcj0fGByeNDM0CUk
+	 VFUnNZPm/RK6A==
+Message-ID: <1488f7b3-cda0-4267-827c-fae23b17c1e8@kernel.org>
+Date: Mon, 1 Jun 2026 08:15:54 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,8 +35,7 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 18/29] crypto: talitos - Split SEC1/SEC2 code into
- separate function variants
+Subject: Re: [PATCH 00/29] crypto: talitos - Driver cleanup
 To: Paul Louvel <paul.louvel@bootlin.com>,
  Herbert Xu <herbert@gondor.apana.org.au>,
  "David S. Miller" <davem@davemloft.net>
@@ -44,868 +43,226 @@ Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
  Herve Codina <herve.codina@bootlin.com>, linux-crypto@vger.kernel.org,
  linux-kernel@vger.kernel.org
 References: <20260528-7-1-rc1_talitos_cleanup-v1-0-cb1ad6cdea49@bootlin.com>
- <20260528-7-1-rc1_talitos_cleanup-v1-18-cb1ad6cdea49@bootlin.com>
 Content-Language: fr-FR
 From: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
-In-Reply-To: <20260528-7-1-rc1_talitos_cleanup-v1-18-cb1ad6cdea49@bootlin.com>
+In-Reply-To: <20260528-7-1-rc1_talitos_cleanup-v1-0-cb1ad6cdea49@bootlin.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 
 
 Le 28/05/2026 à 11:08, Paul Louvel a écrit :
-> Split the functions that have SEC1/SEC2-specific behavior into
-> separate sec1_ and sec2_ function variants, removing the runtime
-> is_sec1 checks from within each function body.
+> The Freescale Integrated Security Engine (SEC) aka "Talitos" driver
+> implementation is a monolithic ~3800-line file that mixes SEC1 and SEC2
+> hardware variants with hash, skcipher, aead and hwrng algorithm.
 > 
-> The callers still dispatch between the two variants using local
-> is_sec1 variables and if/else checks.
+> This series reorganises the driver to improve readability and
+> maintainability.
+
+Did you analyse the cost of this series ? bloat-o-meter gives the 
+following result, allthough I'm a bit surprised there are only added 
+items, no removed items:
+
+add/remove: 36/0 grow/shrink: 44/0 up/down: 34309/0 (34309)
+Function                                     old     new   delta
+aead_driver_algs                               -    9280   +9280
+hash_driver_algs                               -    5568   +5568
+skcipher_driver_algs                           -    3712   +3712
+ipsec_esp                                   1552    3088   +1536
+ahash_process_req                           1912    3368   +1456
+common_nonsnoop.constprop                    884    1704    +820
+aead_des3_setkey                             628    1256    +628
+ahash_setkey                                 608    1220    +612
+ipsec_esp_unmap                              468    1028    +560
+sec1_talitos_handle_error                      -     548    +548
+aead_setkey                                  460     920    +460
+talitos1_interrupt_4ch                      2204    2648    +444
+aead_decrypt                                 432     868    +436
+free_edesc_list_from                         348     772    +424
+sec1_dma_map_request                           -     356    +356
+ahash_import                                 352     708    +356
+talitos_register_hash                          -     344    +344
+skcipher_setkey.isra                           -     336    +336
+ahash_export                                 312     628    +316
+ahash_init                                   300     604    +304
+talitos1_done_4ch                            280     560    +280
+common_nonsnoop_unmap                        192     460    +268
+talitos_rng_init                             252     504    +252
+ipsec_esp_decrypt_swauth_done                236     472    +236
+sec1_reset_device                              -     220    +220
+talitos_register_aead                          -     208    +208
+sec1_reset_channel                             -     208    +208
+sec1_talitos_probe_irq                         -     204    +204
+talitos1_done_ch0                            196     392    +196
+skcipher_encrypt                             164     360    +196
+skcipher_decrypt                             164     360    +196
+skcipher_des3_setkey                         192     380    +188
+ipsec_esp_decrypt_hwauth_done                144     320    +176
+ipsec_esp_encrypt_done                       172     344    +172
+ahash_digest_sha224_swinit                   172     344    +172
+talitos_rng_data_present                     164     328    +164
+ahash_init_sha224_swinit                     164     328    +164
+aead_encrypt                                 132     296    +164
+skcipher_done                                144     292    +148
+talitos_register_skcipher                      -     144    +144
+skcipher_des_setkey                          140     280    +140
+sec1_get_request_hdr                           -     132    +132
+sec1_dma_unmap_request                         -     132    +132
+crypto_des_verify_key                        132     264    +132
+talitos_register_rng                           -     124    +124
+sec1_configure_device                          -     108    +108
+aead_edesc_alloc                             104     208    +104
+skcipher_edesc_alloc                          92     184     +92
+ahash_done                                    92     184     +92
+skcipher_aes_setkey                           44     120     +76
+sec1_search_desc_hdr_in_request                -      76     +76
+talitos_unregister_rng                         -      68     +68
+talitos_rng_data_read                         64     128     +64
+padded_hash                                   64     128     +64
+ahash_digest                                  60     120     +60
+sec1_init_task                                 -      52     +52
+sec1_ops                                       -      40     +40
+talitos_register_sec1                          -      32     +32
+talitos_cra_init_ahash                        84     108     +24
+sec1_ptr_ops                                   -      24     +24
+sec1_copy_talitos_ptr                          -      20     +20
+talitos_cra_init_skcipher                     76      92     +16
+talitos_cra_init_aead                         76      92     +16
+sec1_get_ptr                                   -      16     +16
+sec1_desc_ops                                  -      16     +16
+ahash_update                                  16      32     +16
+ahash_finup                                   16      32     +16
+ahash_final                                   16      32     +16
+sec1_to_talitos_ptr                            -      12     +12
+talitos_cra_exit_skcipher                      -       8      +8
+talitos_cra_exit_ahash                         -       8      +8
+talitos_cra_exit_aead                          -       8      +8
+sec1_set_hdr                                   -       8      +8
+sec1_get_ptr_value                             -       8      +8
+sec1_get_hdr_lo                                -       8      +8
+sec1_get_hdr                                   -       8      +8
+sec1_from_talitos_ptr_len                      -       8      +8
+__already_done                                 2       7      +5
+sec1_to_talitos_ptr_ext_set                    -       4      +4
+sec1_to_talitos_ptr_ext_or                     -       4      +4
+Total: Before=41269, After=75578, chg +83.14%
+
+
+
+> One of the main motivation for this series is to eleminate all the
+> conditionals around the has_ftr_sec1(). Some checks still remains in
+> crypto algorithm implementation at the end of the series.
+> 
+> Patch 1 adds the CRYPTO_AHASH_ALG_BLOCK_ONLY flag for the ahash
+> implementation to eliminate manual partial-block buffering.
+> 
+> Driver reorganisation (patches 2-9):
+> 
+>    Move the driver into a dedicated directory, split the different crypto
+>    implementation into dedicated translation units.
+> 
+> Algorithm definition cleanup (patches 10-17):
+> 
+>    Remove algorithm property mutations from the registration loop, delete
+>    the now-unused priority field in struct talitos_alg_template, and
+>    convert hash, skcipher and aead to the type-specific init_tfm/exit_tfm
+>    API, replacing the deprecated cra_init/cra_exit fields.
+> 
+>    Use preprocessor macros to deduplicate the hash, skcipher and aead
+>    algorithm definitions.
+> 
+> SEC1/SEC2 ops abstraction (patches 18-27):
+> 
+>    Introduce struct talitos_ops, split SEC1/SEC2-specific
+>    code into separate function variants, and replace runtime is_sec1
+>    conditionals with indirect calls through the ops table.
+> 
+>    Export common channel and error handling routines, and move SEC1 and
+>    SEC2 ops into dedicated translation units.
+> 
+>    Introduce struct talitos_ptr_ops to abstract SEC1/SEC2 pointer
+>    helpers behind per-SEC-version ops, then remove the now-unused
+>    global pointer helper functions.
+> 
+>    Introduce per-SEC-version descriptor structures and ops.
+> 
+> Patch 28 cleans up the includes in the core driver file now that all
+> crypto implementation code has been moved out.
+> 
+> Patch 29 removes a now-useless macro.
+> 
+> No functional changes are intended for patches 2-29.
+> 
+> This series depends on the "crypto: talitos - bug fixes" series :
+> https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpatch.msgid.link%2F20260507-bootlin_test-7-1-rc1_sec_bugfix-v3-0-c98d7589b942%40bootlin.com&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7C55c202dc74294a47211f08debc98cf05%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C639155561647821924%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=jor10ujpsx58tqxZUNGvDx63lqwVJW5asMdUS8CF1zg%3D&reserved=0
 > 
 > Signed-off-by: Paul Louvel <paul.louvel@bootlin.com>
-
-Build fails:
-
-   DESCEND objtool
-   INSTALL libsubcmd_headers
-   CC      drivers/crypto/talitos/talitos.o
-drivers/crypto/talitos/talitos.c: In function 'sec1_talitos_handle_error':
-drivers/crypto/talitos/talitos.c:752:21: error: 'struct talitos_private' 
-has no member named 'ops'
-   752 |                 priv->ops->reset_channel(dev, ch);
-       |                     ^~
-drivers/crypto/talitos/talitos.c: In function 'sec2_talitos_handle_error':
-drivers/crypto/talitos/talitos.c:811:29: error: 'struct talitos_private' 
-has no member named 'ops'
-   811 |                         priv->ops->reset_channel(dev, ch);
-       |                             ^~
-make[5]: *** [scripts/Makefile.build:289: 
-drivers/crypto/talitos/talitos.o] Error 1
-   CC      drivers/crypto/talitos/talitos-rng.o
-   CC      drivers/crypto/talitos/talitos-hash.o
-   CC      drivers/crypto/talitos/talitos-skcipher.o
-   CC      drivers/crypto/talitos/talitos-aead.o
-make[5]: Target 'drivers/crypto/talitos/' not remade because of errors.
-make[4]: *** [scripts/Makefile.build:548: drivers/crypto/talitos] Error 2
-make[4]: Target 'drivers/crypto/talitos/' not remade because of errors.
-make[3]: *** [scripts/Makefile.build:548: drivers/crypto] Error 2
-make[3]: Target 'drivers/crypto/talitos/' not remade because of errors.
-make[2]: *** [scripts/Makefile.build:548: drivers] Error 2
-make[2]: Target 'drivers/crypto/talitos/' not remade because of errors.
-make[1]: *** [/home/chleroy/linux-powerpc/Makefile:2141: .] Error 2
-make[1]: Target 'drivers/crypto/talitos/' not remade because of errors.
-make: *** [Makefile:248: __sub-make] Error 2
-make: Target 'drivers/crypto/talitos/' not remade because of errors.
-
-
 > ---
->   drivers/crypto/talitos/talitos.c | 524 +++++++++++++++++++++++++--------------
->   drivers/crypto/talitos/talitos.h |  36 ++-
->   2 files changed, 357 insertions(+), 203 deletions(-)
+> Paul Louvel (29):
+>        crypto: talitos/hash - Use CRYPTO_AHASH_BLOCK_ONLY API
+>        crypto: talitos - Move driver into dedicated directory
+>        crypto: talitos - Add missing includes to driver header file
+>        crypto: talitos/hwrng - Move into separate file
+>        crypto: talitos - Prepare crypto implementation file splitting
+>        crypto: talitos - Introduce registration helper
+>        crypto: talitos/hash - Move into separate file
+>        crypto: talitos/skcipher - Move into separate file
+>        crypto: talitos/aead - Move into separate file
+>        crypto: talitos - Remove alg settings in talitos_register_common()
+>        crypto: talitos - Remove unused priority field in struct talitos_alg_template
+>        crypto: talitos/hash - Convert to init_tfm/exit_tfm type-specific API
+>        crypto: talitos/skcipher - Convert to init/exit type-specific API
+>        crypto: talitos/aead - Convert to init/exit type-specific API
+>        crypto: talitos/hash - Use macro for algorithm definitions
+>        crypto: talitos/skcipher - Use macro for algorithm definitions
+>        crypto: talitos/aead - Use macro for algorithm definitions
+>        crypto: talitos - Split SEC1/SEC2 code into separate function variants
+>        crypto: talitos - Introduce struct talitos_ops
+>        crypto: talitos - Replace SEC1/SEC2 conditionals with ops dispatch
+>        crypto: talitos - Export common channel and error handling routines
+>        crypto: talitos - Move SEC1 ops into talitos-sec1.c
+>        crypto: talitos - Move SEC2 ops into talitos-sec2.c
+>        crypto: talitos - Introduce per-SEC-version pointer helper ops
+>        crypto: talitos - Dispatch pointer helpers through ptr_ops
+>        crypto: talitos - Remove now-unused global pointer helpers
+>        crypto: talitos - Introduce per-SEC-version descriptor structures and ops
+>        crypto: talitos - Clean up includes in core driver file
+>        crypto: talitos - Remove TALITOS_DESC_SIZE macro
 > 
-> diff --git a/drivers/crypto/talitos/talitos.c b/drivers/crypto/talitos/talitos.c
-> index f38a156a0459..b6793d97735e 100644
-> --- a/drivers/crypto/talitos/talitos.c
-> +++ b/drivers/crypto/talitos/talitos.c
-> @@ -133,75 +133,124 @@ void unmap_single_talitos_ptr(struct device *dev,
->   			 from_talitos_ptr_len(ptr, is_sec1), dir);
->   }
->   
-> -static int reset_channel(struct device *dev, int ch)
-> +static int sec1_reset_channel(struct device *dev, int ch)
->   {
->   	struct talitos_private *priv = dev_get_drvdata(dev);
->   	unsigned int timeout = TALITOS_TIMEOUT;
-> -	bool is_sec1 = has_ftr_sec1(priv);
->   
-> -	if (is_sec1) {
-> -		setbits32(priv->chan[ch].reg + TALITOS_CCCR_LO,
-> -			  TALITOS1_CCCR_LO_RESET);
-> +	setbits32(priv->chan[ch].reg + TALITOS_CCCR_LO, TALITOS1_CCCR_LO_RESET);
->   
-> -		while ((in_be32(priv->chan[ch].reg + TALITOS_CCCR_LO) &
-> -			TALITOS1_CCCR_LO_RESET) && --timeout)
-> -			cpu_relax();
-> -	} else {
-> -		setbits32(priv->chan[ch].reg + TALITOS_CCCR,
-> -			  TALITOS2_CCCR_RESET);
-> +	while ((in_be32(priv->chan[ch].reg + TALITOS_CCCR_LO) &
-> +		TALITOS1_CCCR_LO_RESET) &&
-> +	       --timeout)
-> +		cpu_relax();
->   
-> -		while ((in_be32(priv->chan[ch].reg + TALITOS_CCCR) &
-> -			TALITOS2_CCCR_RESET) && --timeout)
-> -			cpu_relax();
-> +	if (timeout == 0) {
-> +		dev_err(dev, "failed to reset sec1 channel %d\n", ch);
-> +		return -EIO;
->   	}
->   
-> +	setbits32(priv->chan[ch].reg + TALITOS_CCCR_LO,
-> +		  TALITOS_CCCR_LO_NE | TALITOS_CCCR_LO_CDIE |
-> +			  TALITOS_CCCR_LO_CDWE);
-> +
-> +	return 0;
-> +}
-> +
-> +static int sec2_reset_channel(struct device *dev, int ch)
-> +{
-> +	struct talitos_private *priv = dev_get_drvdata(dev);
-> +	unsigned int timeout = TALITOS_TIMEOUT;
-> +
-> +	setbits32(priv->chan[ch].reg + TALITOS_CCCR, TALITOS2_CCCR_RESET);
-> +
-> +	while ((in_be32(priv->chan[ch].reg + TALITOS_CCCR) &
-> +		TALITOS2_CCCR_RESET) &&
-> +	       --timeout)
-> +		cpu_relax();
-> +
->   	if (timeout == 0) {
-> -		dev_err(dev, "failed to reset channel %d\n", ch);
-> +		dev_err(dev, "failed to reset sec2 channel %d\n", ch);
->   		return -EIO;
->   	}
->   
-> -	/* set 36-bit addressing, done writeback enable and done IRQ enable */
-> -	setbits32(priv->chan[ch].reg + TALITOS_CCCR_LO, TALITOS_CCCR_LO_EAE |
-> -		  TALITOS_CCCR_LO_CDWE | TALITOS_CCCR_LO_CDIE);
-> -	/* enable chaining descriptors */
-> -	if (is_sec1)
-> -		setbits32(priv->chan[ch].reg + TALITOS_CCCR_LO,
-> -			  TALITOS_CCCR_LO_NE);
-> +	setbits32(priv->chan[ch].reg + TALITOS_CCCR_LO,
-> +		  TALITOS_CCCR_LO_EAE | TALITOS_CCCR_LO_CDWE |
-> +			  TALITOS_CCCR_LO_CDIE);
->   
-> -	/* and ICCR writeback, if available */
-> +	/* ICCR writeback, if available */
->   	if (priv->features & TALITOS_FTR_HW_AUTH_CHECK)
->   		setbits32(priv->chan[ch].reg + TALITOS_CCCR_LO,
-> -		          TALITOS_CCCR_LO_IWSE);
-> +			  TALITOS_CCCR_LO_IWSE);
->   
->   	return 0;
->   }
->   
-> -static int reset_device(struct device *dev)
-> +static int sec1_reset_device(struct device *dev)
->   {
->   	struct talitos_private *priv = dev_get_drvdata(dev);
->   	unsigned int timeout = TALITOS_TIMEOUT;
-> -	bool is_sec1 = has_ftr_sec1(priv);
-> -	u32 mcr = is_sec1 ? TALITOS1_MCR_SWR : TALITOS2_MCR_SWR;
->   
-> -	setbits32(priv->reg + TALITOS_MCR, mcr);
-> +	setbits32(priv->reg + TALITOS_MCR, TALITOS1_MCR_SWR);
->   
-> -	while ((in_be32(priv->reg + TALITOS_MCR) & mcr)
-> -	       && --timeout)
-> +	while ((in_be32(priv->reg + TALITOS_MCR) & TALITOS1_MCR_SWR) &&
-> +	       --timeout)
->   		cpu_relax();
->   
-> -	if (priv->irq[1]) {
-> -		mcr = TALITOS_MCR_RCA1 | TALITOS_MCR_RCA3;
-> -		setbits32(priv->reg + TALITOS_MCR, mcr);
-> +	if (timeout == 0) {
-> +		dev_err(dev, "failed to reset sec1 device\n");
-> +		return -EIO;
->   	}
->   
-> +	return 0;
-> +}
-> +
-> +static int sec2_reset_device(struct device *dev)
-> +{
-> +	struct talitos_private *priv = dev_get_drvdata(dev);
-> +	unsigned int timeout = TALITOS_TIMEOUT;
-> +
-> +	setbits32(priv->reg + TALITOS_MCR, TALITOS2_MCR_SWR);
-> +
-> +	while ((in_be32(priv->reg + TALITOS_MCR) & TALITOS2_MCR_SWR) &&
-> +	       --timeout)
-> +		cpu_relax();
-> +
-> +	if (priv->irq[1])
-> +		setbits32(priv->reg + TALITOS_MCR,
-> +			  TALITOS_MCR_RCA1 | TALITOS_MCR_RCA3);
-> +
->   	if (timeout == 0) {
-> -		dev_err(dev, "failed to reset device\n");
-> +		dev_err(dev, "failed to reset sec2 device\n");
->   		return -EIO;
->   	}
->   
->   	return 0;
->   }
->   
-> +static void sec1_configure_device(struct device *dev)
-> +{
-> +	struct talitos_private *priv = dev_get_drvdata(dev);
-> +
-> +	clrbits32(priv->reg + TALITOS_IMR, TALITOS1_IMR_INIT);
-> +	clrbits32(priv->reg + TALITOS_IMR_LO, TALITOS1_IMR_LO_INIT);
-> +	/* disable parity error check in DEU (erroneous? test vect.) */
-> +	setbits32(priv->reg_deu + TALITOS_EUICR, TALITOS1_DEUICR_KPE);
-> +}
-> +
-> +static void sec2_configure_device(struct device *dev)
-> +{
-> +	struct talitos_private *priv = dev_get_drvdata(dev);
-> +
-> +	setbits32(priv->reg + TALITOS_IMR, TALITOS2_IMR_INIT);
-> +	setbits32(priv->reg + TALITOS_IMR_LO, TALITOS2_IMR_LO_INIT);
-> +
-> +	/* disable integrity check error interrupts (use writeback instead) */
-> +	if (priv->features & TALITOS_FTR_HW_AUTH_CHECK)
-> +		setbits32(priv->reg_mdeu + TALITOS_EUICR_LO,
-> +			  TALITOS_MDEUICR_LO_ICE);
-> +}
-> +
->   /*
->    * Reset and initialize the device
->    */
-> @@ -217,80 +266,81 @@ static int init_device(struct device *dev)
->   	 * are not fully cleared by writing the MCR:SWR bit,
->   	 * set bit twice to completely reset
->   	 */
-> -	err = reset_device(dev);
-> +	if (is_sec1)
-> +		err = sec1_reset_device(dev);
-> +	else
-> +		err = sec2_reset_device(dev);
-> +
->   	if (err)
->   		return err;
->   
-> -	err = reset_device(dev);
-> +	if (is_sec1)
-> +		err = sec1_reset_device(dev);
-> +	else
-> +		err = sec2_reset_device(dev);
->   	if (err)
->   		return err;
->   
->   	/* reset channels */
->   	for (ch = 0; ch < priv->num_channels; ch++) {
-> -		err = reset_channel(dev, ch);
-> +		if (is_sec1)
-> +			err = sec1_reset_channel(dev, ch);
-> +		else
-> +			err = sec2_reset_channel(dev, ch);
->   		if (err)
->   			return err;
->   	}
->   
-> -	/* enable channel done and error interrupts */
-> -	if (is_sec1) {
-> -		clrbits32(priv->reg + TALITOS_IMR, TALITOS1_IMR_INIT);
-> -		clrbits32(priv->reg + TALITOS_IMR_LO, TALITOS1_IMR_LO_INIT);
-> -		/* disable parity error check in DEU (erroneous? test vect.) */
-> -		setbits32(priv->reg_deu + TALITOS_EUICR, TALITOS1_DEUICR_KPE);
-> -	} else {
-> -		setbits32(priv->reg + TALITOS_IMR, TALITOS2_IMR_INIT);
-> -		setbits32(priv->reg + TALITOS_IMR_LO, TALITOS2_IMR_LO_INIT);
-> -	}
-> -
-> -	/* disable integrity check error interrupts (use writeback instead) */
-> -	if (priv->features & TALITOS_FTR_HW_AUTH_CHECK)
-> -		setbits32(priv->reg_mdeu + TALITOS_EUICR_LO,
-> -		          TALITOS_MDEUICR_LO_ICE);
-> +	if (is_sec1)
-> +		sec1_configure_device(dev);
-> +	else
-> +		sec2_configure_device(dev);
->   
->   	return 0;
->   }
->   
-> -static void dma_map_request(struct device *dev, struct talitos_request *request,
-> -			    struct talitos_desc *desc, bool is_sec1)
-> +static void sec1_dma_map_request(struct device *dev,
-> +				 struct talitos_request *request,
-> +				 struct talitos_desc *desc)
->   {
->   	struct talitos_edesc *edesc =
->   		container_of(desc, struct talitos_edesc, desc);
->   	dma_addr_t dma_desc, prev_dma_desc;
->   	struct talitos_edesc *prev_edesc = NULL;
->   
-> -	if (is_sec1) {
-> -		while (edesc) {
-> -			edesc->desc.hdr1 = edesc->desc.hdr;
-> +	while (edesc) {
-> +		edesc->desc.hdr1 = edesc->desc.hdr;
->   
-> -			dma_desc = dma_map_single(dev, &edesc->desc.hdr1,
-> -						  TALITOS_DESC_SIZE,
-> -						  DMA_BIDIRECTIONAL);
-> +		dma_desc = dma_map_single(dev, &edesc->desc.hdr1,
-> +					  TALITOS_DESC_SIZE, DMA_BIDIRECTIONAL);
->   
-> -			if (!prev_edesc) {
-> -				request->dma_desc = dma_desc;
-> -				goto next;
-> -			}
-> +		if (!prev_edesc) {
-> +			request->dma_desc = dma_desc;
-> +			goto next;
-> +		}
->   
-> -			/* Chain in any previous descriptors. */
-> +		/* Chain in any previous descriptors. */
->   
-> -			prev_edesc->desc.next_desc = cpu_to_be32(dma_desc);
-> +		prev_edesc->desc.next_desc = cpu_to_be32(dma_desc);
->   
-> -			dma_sync_single_for_device(dev, prev_dma_desc,
-> -						   TALITOS_DESC_SIZE,
-> -						   DMA_TO_DEVICE);
-> +		dma_sync_single_for_device(dev, prev_dma_desc,
-> +					   TALITOS_DESC_SIZE, DMA_TO_DEVICE);
->   
->   next:
-> -			prev_edesc = edesc;
-> -			prev_dma_desc = dma_desc;
-> -			edesc = edesc->next_desc;
-> -		}
-> -	} else {
-> -		request->dma_desc = dma_map_single(dev, desc, TALITOS_DESC_SIZE,
-> -						   DMA_BIDIRECTIONAL);
-> +		prev_edesc = edesc;
-> +		prev_dma_desc = dma_desc;
-> +		edesc = edesc->next_desc;
->   	}
->   }
->   
-> +static void sec2_dma_map_request(struct device *dev,
-> +				 struct talitos_request *request,
-> +				 struct talitos_desc *desc)
-> +{
-> +	request->dma_desc =
-> +		dma_map_single(dev, desc, TALITOS_DESC_SIZE, DMA_BIDIRECTIONAL);
-> +}
-> +
->   /**
->    * talitos_submit - submits a descriptor to the device for processing
->    * @dev:	the SEC device to be used
-> @@ -327,7 +377,10 @@ int talitos_submit(struct device *dev, int ch, struct talitos_desc *desc,
->   	request = &priv->chan[ch].fifo[head];
->   
->   	/* map descriptor and save caller data */
-> -	dma_map_request(dev, request, desc, is_sec1);
-> +	if (is_sec1)
-> +		sec1_dma_map_request(dev, request, desc);
-> +	else
-> +		sec2_dma_map_request(dev, request, desc);
->   	request->callback = callback;
->   	request->context = context;
->   
-> @@ -349,19 +402,12 @@ int talitos_submit(struct device *dev, int ch, struct talitos_desc *desc,
->   	return -EINPROGRESS;
->   }
->   
-> -static __be32 get_request_hdr(struct device *dev,
-> -			      struct talitos_request *request, bool is_sec1)
-> +static __be32 sec1_get_request_hdr(struct device *dev,
-> +				   struct talitos_request *request)
->   {
->   	struct talitos_edesc *edesc;
->   	dma_addr_t dma_desc;
->   
-> -	if (!is_sec1) {
-> -		dma_sync_single_for_cpu(dev, request->dma_desc,
-> -					TALITOS_DESC_SIZE, DMA_BIDIRECTIONAL);
-> -
-> -		return request->desc->hdr;
-> -	}
-> -
->   	edesc = container_of(request->desc, struct talitos_edesc, desc);
->   	dma_desc = request->dma_desc;
->   	while (edesc->next_desc) {
-> @@ -375,27 +421,37 @@ static __be32 get_request_hdr(struct device *dev,
->   	return edesc->desc.hdr1;
->   }
->   
-> -static void dma_unmap_request(struct device *dev,
-> -			      struct talitos_request *request, bool is_sec1)
-> +static __be32 sec2_get_request_hdr(struct device *dev,
-> +				   struct talitos_request *request)
-> +{
-> +	dma_sync_single_for_cpu(dev, request->dma_desc, TALITOS_DESC_SIZE,
-> +				DMA_BIDIRECTIONAL);
-> +
-> +	return request->desc->hdr;
-> +}
-> +
-> +static void sec1_dma_unmap_request(struct device *dev,
-> +				   struct talitos_request *request)
->   {
->   	struct talitos_edesc *edesc;
->   
-> -	if (is_sec1) {
-> -		dma_unmap_single(dev, request->dma_desc, TALITOS_DESC_SIZE,
-> -				 DMA_BIDIRECTIONAL);
-> -		edesc = container_of(request->desc, struct talitos_edesc, desc);
-> -		while (edesc->next_desc) {
-> -			dma_unmap_single(dev,
-> -					 be32_to_cpu(edesc->desc.next_desc),
-> -					 TALITOS_DESC_SIZE, DMA_BIDIRECTIONAL);
-> -			edesc = edesc->next_desc;
-> -		}
-> -	} else {
-> -		dma_unmap_single(dev, request->dma_desc, TALITOS_DESC_SIZE,
-> -				 DMA_BIDIRECTIONAL);
-> +	dma_unmap_single(dev, request->dma_desc, TALITOS_DESC_SIZE,
-> +			 DMA_BIDIRECTIONAL);
-> +	edesc = container_of(request->desc, struct talitos_edesc, desc);
-> +	while (edesc->next_desc) {
-> +		dma_unmap_single(dev, be32_to_cpu(edesc->desc.next_desc),
-> +				 TALITOS_DESC_SIZE, DMA_BIDIRECTIONAL);
-> +		edesc = edesc->next_desc;
->   	}
->   }
->   
-> +static void sec2_dma_unmap_request(struct device *dev,
-> +				   struct talitos_request *request)
-> +{
-> +	dma_unmap_single(dev, request->dma_desc, TALITOS_DESC_SIZE,
-> +			 DMA_BIDIRECTIONAL);
-> +}
-> +
->   /*
->    * process what was done, notify callback of error if not
->    */
-> @@ -417,7 +473,10 @@ static void flush_channel(struct device *dev, int ch, int error, int reset_ch)
->   
->   		/* descriptors with their done bits set don't get the error */
->   		rmb();
-> -		hdr = get_request_hdr(dev, request, is_sec1);
-> +		if (is_sec1)
-> +			hdr = sec1_get_request_hdr(dev, request);
-> +		else
-> +			hdr = sec2_get_request_hdr(dev, request);
->   
->   		if ((hdr & DESC_HDR_DONE) == DESC_HDR_DONE)
->   			status = 0;
-> @@ -427,7 +486,10 @@ static void flush_channel(struct device *dev, int ch, int error, int reset_ch)
->   			else
->   				status = error;
->   
-> -		dma_unmap_request(dev, request, is_sec1);
-> +		if (is_sec1)
-> +			sec1_dma_unmap_request(dev, request);
-> +		else
-> +			sec2_dma_unmap_request(dev, request);
->   
->   		/* copy entries so we can call callback outside lock */
->   		saved_req.desc = request->desc;
-> @@ -516,21 +578,30 @@ DEF_TALITOS2_DONE(ch0, TALITOS2_ISR_CH_0_DONE)
->   DEF_TALITOS2_DONE(ch0_2, TALITOS2_ISR_CH_0_2_DONE)
->   DEF_TALITOS2_DONE(ch1_3, TALITOS2_ISR_CH_1_3_DONE)
->   
-> -static __be32 search_desc_hdr_in_request(struct talitos_request *request,
-> -					 dma_addr_t cur_desc, bool is_sec1)
-> +static __be32 sec1_search_desc_hdr_in_request(struct talitos_request *request,
-> +					      dma_addr_t cur_desc)
->   {
->   	struct talitos_edesc *edesc;
->   
-> -	if (request->dma_desc == cur_desc) {
-> +
-> +	if (request->dma_desc == cur_desc)
->   		return request->desc->hdr;
-> -	} else if (is_sec1) {
-> -		edesc = container_of(request->desc, struct talitos_edesc, desc);
-> -		while (edesc->next_desc) {
-> -			if (edesc->desc.next_desc == cpu_to_be32(cur_desc))
-> -				return edesc->next_desc->desc.hdr1;
-> -			edesc = edesc->next_desc;
-> -		}
-> +
-> +	edesc = container_of(request->desc, struct talitos_edesc, desc);
-> +	while (edesc->next_desc) {
-> +		if (edesc->desc.next_desc == cpu_to_be32(cur_desc))
-> +			return edesc->next_desc->desc.hdr1;
-> +		edesc = edesc->next_desc;
->   	}
-> +
-> +	return 0;
-> +}
-> +
-> +static __be32 sec2_search_desc_hdr_in_request(struct talitos_request *request,
-> +					      dma_addr_t cur_desc)
-> +{
-> +	if (request->dma_desc == cur_desc)
-> +		return request->desc->hdr;
->   	return 0;
->   }
->   
-> @@ -559,7 +630,10 @@ static __be32 current_desc_hdr(struct device *dev, int ch)
->   	do {
->   		request = &priv->chan[ch].fifo[iter];
->   
-> -		hdr = search_desc_hdr_in_request(request, cur_desc, is_sec1);
-> +		if (is_sec1)
-> +			hdr = sec1_search_desc_hdr_in_request(request, cur_desc);
-> +		else
-> +			hdr = sec2_search_desc_hdr_in_request(request, cur_desc);
->   		if (hdr)
->   			break;
->   
-> @@ -647,79 +721,100 @@ static void report_eu_error(struct device *dev, int ch, __be32 desc_hdr)
->   			in_be32(priv->chan[ch].reg + TALITOS_DESCBUF_LO + 8*i));
->   }
->   
-> -/*
-> - * recover from error interrupts
-> - */
-> -static void talitos_error(struct device *dev, u32 isr, u32 isr_lo)
-> +static int sec1_talitos_handle_error(struct device *dev, u32 isr, u32 isr_lo)
-> +{
-> +	struct talitos_private *priv = dev_get_drvdata(dev);
-> +	int ch, error;
-> +	u32 v_lo;
-> +
-> +	for (ch = 0; ch < priv->num_channels; ch++) {
-> +		if (!TALITOS1_CH_HAS_ERROR(isr, ch))
-> +			continue;
-> +
-> +		v_lo = in_be32(priv->chan[ch].reg + TALITOS_CCPSR_LO);
-> +
-> +		error = -EINVAL;
-> +
-> +		if (v_lo & TALITOS1_CCPSR_LO_TEA)
-> +			dev_err(dev, "transfer error acknowledge\n");
-> +		if (v_lo & TALITOS1_CCPSR_LO_PTRNC)
-> +			dev_err(dev, "pointer not complete error\n");
-> +		if (v_lo & TALITOS1_CCPSR_LO_PE)
-> +			dev_err(dev, "parity error\n");
-> +		if (v_lo & TALITOS1_CCPSR_LO_IDH)
-> +			dev_err(dev, "illegal descriptor header error\n");
-> +		if (v_lo & TALITOS1_CCPSR_LO_SA)
-> +			dev_err(dev, "static assignment error\n");
-> +		if (v_lo & TALITOS1_CCPSR_LO_EU)
-> +			report_eu_error(dev, ch, current_desc_hdr(dev, ch));
-> +
-> +		flush_channel(dev, ch, error, 1);
-> +		priv->ops->reset_channel(dev, ch);
-> +	}
-> +
-> +	if (isr_lo & TALITOS1_ISR_TEA_ERR)
-> +		dev_err(dev, "TEA error: ISR 0x%08x_%08x\n", isr, isr_lo);
-> +
-> +	return (isr & ~TALITOS1_ISR_4CHERR) || isr_lo;
-> +}
-> +
-> +static int sec2_talitos_handle_error(struct device *dev, u32 isr, u32 isr_lo)
->   {
->   	struct talitos_private *priv = dev_get_drvdata(dev);
->   	unsigned int timeout = TALITOS_TIMEOUT;
->   	int ch, error, reset_dev = 0;
->   	u32 v_lo;
-> -	bool is_sec1 = has_ftr_sec1(priv);
-> -	int reset_ch = is_sec1 ? 1 : 0; /* only SEC2 supports continuation */
-> +	int reset_ch = 0;
->   
->   	for (ch = 0; ch < priv->num_channels; ch++) {
-> -		/* skip channels without errors */
-> -		if (is_sec1) {
-> -			/* bits 29, 31, 17, 19 */
-> -			if (!(isr & (1 << (29 + (ch & 1) * 2 - (ch & 2) * 6))))
-> -				continue;
-> -		} else {
-> -			if (!(isr & (1 << (ch * 2 + 1))))
-> -				continue;
-> -		}
-> +		if (!TALITOS2_CH_HAS_ERROR(isr, ch))
-> +			continue;
->   
->   		error = -EINVAL;
->   
->   		v_lo = in_be32(priv->chan[ch].reg + TALITOS_CCPSR_LO);
->   
-> -		if (v_lo & TALITOS_CCPSR_LO_DOF) {
-> +		if (v_lo & TALITOS2_CCPSR_LO_DOF) {
->   			dev_err(dev, "double fetch fifo overflow error\n");
->   			error = -EAGAIN;
->   			reset_ch = 1;
->   		}
-> -		if (v_lo & TALITOS_CCPSR_LO_SOF) {
-> +		if (v_lo & TALITOS2_CCPSR_LO_SOF) {
->   			/* h/w dropped descriptor */
->   			dev_err(dev, "single fetch fifo overflow error\n");
->   			error = -EAGAIN;
->   		}
-> -		if (v_lo & TALITOS_CCPSR_LO_MDTE)
-> +		if (v_lo & TALITOS2_CCPSR_LO_MDTE)
->   			dev_err(dev, "master data transfer error\n");
-> -		if (v_lo & TALITOS_CCPSR_LO_SGDLZ)
-> -			dev_err(dev, is_sec1 ? "pointer not complete error\n"
-> -					     : "s/g data length zero error\n");
-> -		if (v_lo & TALITOS_CCPSR_LO_FPZ)
-> -			dev_err(dev, is_sec1 ? "parity error\n"
-> -					     : "fetch pointer zero error\n");
-> -		if (v_lo & TALITOS_CCPSR_LO_IDH)
-> +		if (v_lo & TALITOS2_CCPSR_LO_SGDLZ)
-> +			dev_err(dev, "s/g data length zero error\n");
-> +		if (v_lo & TALITOS2_CCPSR_LO_FPZ)
-> +			dev_err(dev, "fetch pointer zero error\n");
-> +		if (v_lo & TALITOS2_CCPSR_LO_IDH)
->   			dev_err(dev, "illegal descriptor header error\n");
-> -		if (v_lo & TALITOS_CCPSR_LO_IEU)
-> -			dev_err(dev, is_sec1 ? "static assignment error\n"
-> -					     : "invalid exec unit error\n");
-> -		if (v_lo & TALITOS_CCPSR_LO_EU)
-> +		if (v_lo & TALITOS2_CCPSR_LO_IEU)
-> +			dev_err(dev, "invalid exec unit error\n");
-> +		if (v_lo & TALITOS2_CCPSR_LO_EU)
->   			report_eu_error(dev, ch, current_desc_hdr(dev, ch));
-> -		if (!is_sec1) {
-> -			if (v_lo & TALITOS_CCPSR_LO_GB)
-> -				dev_err(dev, "gather boundary error\n");
-> -			if (v_lo & TALITOS_CCPSR_LO_GRL)
-> -				dev_err(dev, "gather return/length error\n");
-> -			if (v_lo & TALITOS_CCPSR_LO_SB)
-> -				dev_err(dev, "scatter boundary error\n");
-> -			if (v_lo & TALITOS_CCPSR_LO_SRL)
-> -				dev_err(dev, "scatter return/length error\n");
-> -		}
-> +		if (v_lo & TALITOS2_CCPSR_LO_GB)
-> +			dev_err(dev, "gather boundary error\n");
-> +		if (v_lo & TALITOS2_CCPSR_LO_GRL)
-> +			dev_err(dev, "gather return/length error\n");
-> +		if (v_lo & TALITOS2_CCPSR_LO_SB)
-> +			dev_err(dev, "scatter boundary error\n");
-> +		if (v_lo & TALITOS2_CCPSR_LO_SRL)
-> +			dev_err(dev, "scatter return/length error\n");
->   
->   		flush_channel(dev, ch, error, reset_ch);
->   
->   		if (reset_ch) {
-> -			reset_channel(dev, ch);
-> +			priv->ops->reset_channel(dev, ch);
->   		} else {
->   			setbits32(priv->chan[ch].reg + TALITOS_CCCR,
->   				  TALITOS2_CCCR_CONT);
->   			setbits32(priv->chan[ch].reg + TALITOS_CCCR_LO, 0);
->   			while ((in_be32(priv->chan[ch].reg + TALITOS_CCCR) &
-> -			       TALITOS2_CCCR_CONT) && --timeout)
-> +				TALITOS2_CCCR_CONT) && --timeout)
->   				cpu_relax();
->   			if (timeout == 0) {
->   				dev_err(dev, "failed to restart channel %d\n",
-> @@ -728,14 +823,29 @@ static void talitos_error(struct device *dev, u32 isr, u32 isr_lo)
->   			}
->   		}
->   	}
-> -	if (reset_dev || (is_sec1 && isr & ~TALITOS1_ISR_4CHERR) ||
-> -	    (!is_sec1 && isr & ~TALITOS2_ISR_4CHERR) || isr_lo) {
-> -		if (is_sec1 && (isr_lo & TALITOS1_ISR_TEA_ERR))
-> -			dev_err(dev, "TEA error: ISR 0x%08x_%08x\n",
-> -				isr, isr_lo);
-> -		else
-> -			dev_err(dev, "done overflow, internal time out, or "
-> -				"rngu error: ISR 0x%08x_%08x\n", isr, isr_lo);
-> +
-> +	return reset_dev || (isr & ~TALITOS2_ISR_4CHERR) || isr_lo;
-> +}
-> +
-> +/*
-> + * recover from error interrupts
-> + */
-> +static void talitos_error(struct device *dev, u32 isr, u32 isr_lo)
-> +{
-> +	struct talitos_private *priv = dev_get_drvdata(dev);
-> +	bool is_sec1 = has_ftr_sec1(priv);
-> +	int ch, reset_dev;
-> +
-> +	if (is_sec1)
-> +		reset_dev = sec1_talitos_handle_error(dev, isr, isr_lo);
-> +	else
-> +		reset_dev = sec2_talitos_handle_error(dev, isr, isr_lo);
-> +
-> +	if (reset_dev) {
-> +		dev_err(dev,
-> +			"done overflow, internal time out, or "
-> +			"rngu error: ISR 0x%08x_%08x\n",
-> +			isr, isr_lo);
->   
->   		/* purge request queues */
->   		for (ch = 0; ch < priv->num_channels; ch++)
-> @@ -1181,25 +1291,41 @@ int talitos_register_common(struct device *dev,
->   	return 0;
->   }
->   
-> -static int talitos_probe_irq(struct platform_device *ofdev)
-> +static int sec1_talitos_probe_irq(struct platform_device *ofdev)
->   {
->   	struct device *dev = &ofdev->dev;
->   	struct device_node *np = ofdev->dev.of_node;
->   	struct talitos_private *priv = dev_get_drvdata(dev);
->   	int err;
-> -	bool is_sec1 = has_ftr_sec1(priv);
->   
->   	priv->irq[0] = irq_of_parse_and_map(np, 0);
->   	if (!priv->irq[0]) {
->   		dev_err(dev, "failed to map irq\n");
->   		return -EINVAL;
->   	}
-> -	if (is_sec1) {
-> -		err = request_irq(priv->irq[0], talitos1_interrupt_4ch, 0,
-> -				  dev_driver_string(dev), dev);
-> -		goto primary_out;
-> +	err = request_irq(priv->irq[0], talitos1_interrupt_4ch, 0,
-> +			  dev_driver_string(dev), dev);
-> +	if (err) {
-> +		dev_err(dev, "failed to request primary irq\n");
-> +		irq_dispose_mapping(priv->irq[0]);
-> +		priv->irq[0] = 0;
->   	}
->   
-> +	return err;
-> +}
-> +
-> +static int sec2_talitos_probe_irq(struct platform_device *ofdev)
-> +{
-> +	struct device *dev = &ofdev->dev;
-> +	struct device_node *np = ofdev->dev.of_node;
-> +	struct talitos_private *priv = dev_get_drvdata(dev);
-> +	int err;
-> +
-> +	priv->irq[0] = irq_of_parse_and_map(np, 0);
-> +	if (!priv->irq[0]) {
-> +		dev_err(dev, "failed to map irq\n");
-> +		return -EINVAL;
-> +	}
->   	priv->irq[1] = irq_of_parse_and_map(np, 1);
->   
->   	/* get the primary irq line */
-> @@ -1235,6 +1361,36 @@ static int talitos_probe_irq(struct platform_device *ofdev)
->   	return err;
->   }
->   
-> +static void sec1_init_task(struct device *dev)
-> +{
-> +	struct talitos_private *priv = dev_get_drvdata(dev);
-> +
-> +	if (priv->num_channels == 1)
-> +		tasklet_init(&priv->done_task[0], talitos1_done_ch0,
-> +			     (unsigned long)dev);
-> +	else
-> +		tasklet_init(&priv->done_task[0], talitos1_done_4ch,
-> +			     (unsigned long)dev);
-> +}
-> +
-> +static void sec2_init_task(struct device *dev)
-> +{
-> +	struct talitos_private *priv = dev_get_drvdata(dev);
-> +
-> +	if (priv->irq[1]) {
-> +		tasklet_init(&priv->done_task[0], talitos2_done_ch0_2,
-> +			     (unsigned long)dev);
-> +		tasklet_init(&priv->done_task[1], talitos2_done_ch1_3,
-> +			     (unsigned long)dev);
-> +	} else if (priv->num_channels == 1) {
-> +		tasklet_init(&priv->done_task[0], talitos2_done_ch0,
-> +			     (unsigned long)dev);
-> +	} else {
-> +		tasklet_init(&priv->done_task[0], talitos2_done_4ch,
-> +			     (unsigned long)dev);
-> +	}
-> +}
-> +
->   static int talitos_probe(struct platform_device *ofdev)
->   {
->   	struct device *dev = &ofdev->dev;
-> @@ -1317,31 +1473,17 @@ static int talitos_probe(struct platform_device *ofdev)
->   		stride = TALITOS2_CH_STRIDE;
->   	}
->   
-> -	err = talitos_probe_irq(ofdev);
-> +	if (has_ftr_sec1(priv))
-> +		err = sec1_talitos_probe_irq(ofdev);
-> +	else
-> +		err = sec2_talitos_probe_irq(ofdev);
->   	if (err)
->   		goto err_out;
->   
-> -	if (has_ftr_sec1(priv)) {
-> -		if (priv->num_channels == 1)
-> -			tasklet_init(&priv->done_task[0], talitos1_done_ch0,
-> -				     (unsigned long)dev);
-> -		else
-> -			tasklet_init(&priv->done_task[0], talitos1_done_4ch,
-> -				     (unsigned long)dev);
-> -	} else {
-> -		if (priv->irq[1]) {
-> -			tasklet_init(&priv->done_task[0], talitos2_done_ch0_2,
-> -				     (unsigned long)dev);
-> -			tasklet_init(&priv->done_task[1], talitos2_done_ch1_3,
-> -				     (unsigned long)dev);
-> -		} else if (priv->num_channels == 1) {
-> -			tasklet_init(&priv->done_task[0], talitos2_done_ch0,
-> -				     (unsigned long)dev);
-> -		} else {
-> -			tasklet_init(&priv->done_task[0], talitos2_done_4ch,
-> -				     (unsigned long)dev);
-> -		}
-> -	}
-> +	if (has_ftr_sec1(priv))
-> +		sec1_init_task(dev);
-> +	else
-> +		sec2_init_task(dev);
->   
->   	priv->fifo_len = roundup_pow_of_two(priv->chfifo_len);
->   
-> diff --git a/drivers/crypto/talitos/talitos.h b/drivers/crypto/talitos/talitos.h
-> index 6cf3628c52c2..904fdc9dec80 100644
-> --- a/drivers/crypto/talitos/talitos.h
-> +++ b/drivers/crypto/talitos/talitos.h
-> @@ -301,20 +301,32 @@ static inline bool has_ftr_sec1(struct talitos_private *priv)
->   #define   TALITOS1_CCCR_LO_RESET	0x1    /* channel reset on SEC1 */
->   
->   /* CCPSR: channel pointer status register */
-> +
-> +/* bits 29, 31, 17, 19 */
-> +#define TALITOS1_CH_HAS_ERROR(isr, ch) \
-> +	((isr) & (1 << (29 + ((ch) & 1) * 2 - ((ch) & 2) * 6)))
-> +#define TALITOS2_CH_HAS_ERROR(isr, ch) ((isr) & (1 << ((ch) * 2 + 1)))
-> +
->   #define TALITOS_CCPSR			0x10
->   #define TALITOS_CCPSR_LO		0x14
-> -#define   TALITOS_CCPSR_LO_DOF		0x8000 /* double FF write oflow error */
-> -#define   TALITOS_CCPSR_LO_SOF		0x4000 /* single FF write oflow error */
-> -#define   TALITOS_CCPSR_LO_MDTE		0x2000 /* master data transfer error */
-> -#define   TALITOS_CCPSR_LO_SGDLZ	0x1000 /* s/g data len zero error */
-> -#define   TALITOS_CCPSR_LO_FPZ		0x0800 /* fetch ptr zero error */
-> -#define   TALITOS_CCPSR_LO_IDH		0x0400 /* illegal desc hdr error */
-> -#define   TALITOS_CCPSR_LO_IEU		0x0200 /* invalid EU error */
-> -#define   TALITOS_CCPSR_LO_EU		0x0100 /* EU error detected */
-> -#define   TALITOS_CCPSR_LO_GB		0x0080 /* gather boundary error */
-> -#define   TALITOS_CCPSR_LO_GRL		0x0040 /* gather return/length error */
-> -#define   TALITOS_CCPSR_LO_SB		0x0020 /* scatter boundary error */
-> -#define   TALITOS_CCPSR_LO_SRL		0x0010 /* scatter return/length error */
-> +#define   TALITOS1_CCPSR_LO_TEA		0x2000 /* transfer error acknowledge */
-> +#define   TALITOS1_CCPSR_LO_PTRNC	0x1000 /* pointer not complete error */
-> +#define   TALITOS1_CCPSR_LO_PE		0x0800 /* parity error */
-> +#define   TALITOS1_CCPSR_LO_IDH		0x0400 /* illegal desc hdr error */
-> +#define   TALITOS1_CCPSR_LO_SA		0x0200 /* static assignment error */
-> +#define   TALITOS1_CCPSR_LO_EU		0x0100 /* EU error detected */
-> +#define   TALITOS2_CCPSR_LO_DOF		0x8000 /* double FF write oflow error */
-> +#define   TALITOS2_CCPSR_LO_SOF		0x4000 /* single FF write oflow error */
-> +#define   TALITOS2_CCPSR_LO_MDTE	0x2000 /* master data transfer error */
-> +#define   TALITOS2_CCPSR_LO_SGDLZ	0x1000 /* s/g data len zero error */
-> +#define   TALITOS2_CCPSR_LO_FPZ		0x0800 /* fetch ptr zero error */
-> +#define   TALITOS2_CCPSR_LO_IDH		0x0400 /* illegal desc hdr error */
-> +#define   TALITOS2_CCPSR_LO_IEU		0x0200 /* invalid EU error */
-> +#define   TALITOS2_CCPSR_LO_EU		0x0100 /* EU error detected */
-> +#define   TALITOS2_CCPSR_LO_GB		0x0080 /* gather boundary error */
-> +#define   TALITOS2_CCPSR_LO_GRL		0x0040 /* gather return/length error */
-> +#define   TALITOS2_CCPSR_LO_SB		0x0020 /* scatter boundary error */
-> +#define   TALITOS2_CCPSR_LO_SRL		0x0010 /* scatter return/length error */
->   
->   /* channel fetch fifo register */
->   #define TALITOS_FF			0x48
+>   drivers/crypto/Kconfig                    |   38 +-
+>   drivers/crypto/Makefile                   |    2 +-
+>   drivers/crypto/talitos.c                  | 3640 -----------------------------
+>   drivers/crypto/talitos/Kconfig            |   36 +
+>   drivers/crypto/talitos/Makefile           |    6 +
+>   drivers/crypto/talitos/talitos-aead.c     |  677 ++++++
+>   drivers/crypto/talitos/talitos-hash.c     |  711 ++++++
+>   drivers/crypto/talitos/talitos-rng.c      |   93 +
+>   drivers/crypto/talitos/talitos-sec1.c     |  374 +++
+>   drivers/crypto/talitos/talitos-sec2.c     |  404 ++++
+>   drivers/crypto/talitos/talitos-skcipher.c |  364 +++
+>   drivers/crypto/talitos/talitos.c          |  917 ++++++++
+>   drivers/crypto/{ => talitos}/talitos.h    |  255 +-
+>   13 files changed, 3810 insertions(+), 3707 deletions(-)
+> ---
+> base-commit: db8b9f227833e729faf44a512aa1e88a625b5ad8
+> change-id: 20260518-7-1-rc1_talitos_cleanup-9231a64e29fa
+> prerequisite-change-id: 20260504-bootlin_test-7-1-rc1_sec_bugfix-13169ed07ddc:v3
+> prerequisite-patch-id: 7b364911e4b8d1c1033eb14e67ed24dac6a4bc13
+> prerequisite-patch-id: 2c1cd7fdd003d9a116a697efa25d1716d548389f
+> prerequisite-patch-id: b12bdbf565747609e0cfe0609a42cf69b5d816a1
+> prerequisite-patch-id: 72cb2bc0fc2a48a5a029b049c199f4c86085cf04
+> prerequisite-patch-id: 5f1f5ad6add760161bd48875df48c0893aa12613
+> prerequisite-patch-id: 934931086968229434d15a2f2358aeb7e6975a1d
+> prerequisite-patch-id: 8a0b4828fc0690e0c841bc9adcc6568bb522e0e8
+> prerequisite-patch-id: 1d870f32e7dbf9a8bd3b8979558544107693e0f4
+> prerequisite-patch-id: 758c18d7c9fabb14bd90df62e5e8a62a6f880db4
+> prerequisite-patch-id: ce6e9e585f8edc1861ae6bb8fbdd836c20cbd290
+> prerequisite-patch-id: 9446dc03e442ea81c5f5b39e802e01b37da29971
+> 
+> Best regards,
+> --
+> Paul Louvel, Bootlin
+> Embedded Linux and Kernel engineering
+> https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fbootlin.com%2F&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7C55c202dc74294a47211f08debc98cf05%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C639155561647851452%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=orDISoOYFS%2F%2F0ThHpS71R6nscnJxyMar0jASTbsYdG8%3D&reserved=0
 > 
 
