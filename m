@@ -1,51 +1,52 @@
-Received: from pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.245.243.92])
+Received: from pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com [35.162.73.231])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32B93346E56;
-	Mon,  1 Jun 2026 08:56:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.245.243.92
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1555A34041E;
+	Mon,  1 Jun 2026 08:56:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.162.73.231
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780304217; cv=none; b=qogqkOlFL4lXDz9yzxYoBAFhoxxyvArDd8tboIlek8latusKCxIjeKrJz/QNmWi273qqIzS48R55WUPB4TeP6cdU8wJLTx7/KX8/ILhY3QgmyCqTrWKjvVVHXkMIs6B+5y535tmDExGcW/cI9IK6K+bVK5WwksJVxJsXqz3Hlx0=
+	t=1780304218; cv=none; b=rASbzipebdhDVpaej37Yr9o0M+9NoObVsbZi6qaezi8GkzIfvpckpljoXEoR5/umNE+Mjt0KP6TJFR8+UOdmbnz5LYmSM6Bt3ImwPYUvgl5xExJnFs6CdlMGqNnzdabkIaVLqMxfwMwNQ+wstDd9O6j3l9T7Nt6CPGnY8SaV+ms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780304217; c=relaxed/simple;
-	bh=qAZ4FgCDdoGgok26w2HQG3LR0EHPJ2K5/hlohTE+/9I=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NZjMfSCkysZhl3yxtDQG8jdBmjb7uZpSvoW5pZFbpotXBckT1B8oijeXelb0h0He4jWZSAPgXzlX9sOPkwNQFk+KLJx4pFimx2oYbafUwLGABAbhBWv/e6yDx9tWAAY/M7tMbVUIt9mkXvb83SjF7oXT9TYez9/kd7N7ekvBPTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=BQ2A+hHV; arc=none smtp.client-ip=44.245.243.92
+	s=arc-20240116; t=1780304218; c=relaxed/simple;
+	bh=brY78eHumn6MuvKkXCJ9AnJRnJmLHJ6mv2dTj0dAtPQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nbfSeDpMmb+IUJHhFhYjnAsZFbX0BKFVLH77iRzBCIAA0DAsjG7z6bENBIb8NZ26PzbUPhy01eZ8PosjSoShKVIiJi38GnKVH9OQzTsAPEWPcpUk6Rho34S9k+ROUwiXkI8bpfgGRtAoVz3MvRxvAvJj9drQDrbOC3IUMvm623Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=Tqg2BiFs; arc=none smtp.client-ip=35.162.73.231
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="BQ2A+hHV"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="Tqg2BiFs"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1780304214; x=1811840214;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Ymtn60IMDtZyz70m2rrmpV8+GhXXyb9X4BQIXzuwKdo=;
-  b=BQ2A+hHVgeftSp09JQJYH8tUk2bFQrRHCRgghIcr5jV7cwUgtvgwvwK+
-   aHnvJ7ZeFcDPILemTiypp+0YaiEgMbHWgLeS5s3RQQvYkwwAKVl8DcmGa
-   BRdw0fnHkSogXsdY3dwaTnK+yaJiK5H8n09ft76NHe+SMwsj+eRNrn/RB
-   f30Ec48Kgqm/nRiYbARS05G2kXi67ZV3tVOLJjVVwGnY9mNAw7Gyw1zk/
-   0tP8JYVRQpypNs75yMbD7Y39AvyuJMCd31iLX3gnVFP3I/cBnXeD2QaTi
-   PKoYYUWHO/bNu1V3i59BLIitchRPiVR6N5WSYiKpwa/HWmsftekhYVJfF
-   w==;
-X-CSE-ConnectionGUID: kPkfHEvcQcy5lJL8BzXZhA==
-X-CSE-MsgGUID: RgogAhS5SySxK/uXW20BPg==
+  t=1780304216; x=1811840216;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=5hWjHiPpN3tr3yd/VMdnL29meF/bHchDg0dPu9a1a04=;
+  b=Tqg2BiFs4IoU4ndjYJ3vKNm5mVXxef4vyoij/s9biMgkafzaAmv1p+tl
+   hWllEblU35eHuUpOkNMFNxfzxlDQY10lT8oSuC6bEbXUWw7mupC8YXNkB
+   FnlWHYOdBwqzh/u9htUeQ+44zV6Osw+JHf9l6H/IYpzo9K46hdjHD1vjG
+   VopK+8j2HataU6JjzCFYIADaKJjsNpK0I8UfHks4bPWn4OuPpbvRzO4Z/
+   uvNoG+eeacioW+FFGic0jOwOPjxsqK9hB+i8q8UCGOa9Jp6JvaxSNRqVb
+   eNApToK5B+kFWzKSZQoFW5b2rAfId//ctPUwOy3QCUseAKbzr2WEhp82D
+   g==;
+X-CSE-ConnectionGUID: 1WFnCCB7RIqq7EA8tvQcAQ==
+X-CSE-MsgGUID: 09EexNlMQiK2LGpdeC7DMQ==
 X-IronPort-AV: E=Sophos;i="6.24,180,1774310400"; 
-   d="scan'208";a="20338963"
-Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
-  by internal-pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2026 08:56:51 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [205.251.233.234:17165]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.6.91:2525] with esmtp (Farcaster)
- id 50f9dd4c-1df3-4494-874c-6a577002553d; Mon, 1 Jun 2026 08:56:51 +0000 (UTC)
-X-Farcaster-Flow-ID: 50f9dd4c-1df3-4494-874c-6a577002553d
+   d="scan'208";a="20627502"
+Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
+  by internal-pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2026 08:56:53 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [205.251.233.104:22757]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.19.88:2525] with esmtp (Farcaster)
+ id 955b43c8-4623-4aeb-8a43-04f3c04bfc52; Mon, 1 Jun 2026 08:56:52 +0000 (UTC)
+X-Farcaster-Flow-ID: 955b43c8-4623-4aeb-8a43-04f3c04bfc52
 Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Mon, 1 Jun 2026 08:56:50 +0000
+ Mon, 1 Jun 2026 08:56:52 +0000
 Received: from dev-dsk-lravich-1b-7405803b.eu-west-1.amazon.com (10.13.225.95)
  by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Mon, 1 Jun 2026 08:56:48 +0000
+ Mon, 1 Jun 2026 08:56:50 +0000
 From: Leonid Ravich <lravich@amazon.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 CC: Alasdair Kergon <agk@redhat.com>, Ard Biesheuvel <ardb@kernel.org>, "Eric
@@ -53,10 +54,12 @@ CC: Alasdair Kergon <agk@redhat.com>, Ard Biesheuvel <ardb@kernel.org>, "Eric
 	<horia.geanta@nxp.com>, Gilad Ben-Yossef <gilad@benyossef.com>,
 	<linux-crypto@vger.kernel.org>, <dm-devel@lists.linux.dev>,
 	<linux-block@vger.kernel.org>
-Subject: [PATCH v3 0/4] crypto: skcipher - per-tfm multi-data-unit batching
-Date: Mon, 1 Jun 2026 08:56:40 +0000
-Message-ID: <20260601085644.13026-1-lravich@amazon.com>
+Subject: [PATCH v3 1/4] crypto: skcipher - add per-tfm data_unit_size for batched requests
+Date: Mon, 1 Jun 2026 08:56:41 +0000
+Message-ID: <20260601085644.13026-2-lravich@amazon.com>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260601085644.13026-1-lravich@amazon.com>
+References: <20260601085644.13026-1-lravich@amazon.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -68,158 +71,366 @@ Content-Transfer-Encoding: 8bit
 X-ClientProxiedBy: EX19D033UWA004.ant.amazon.com (10.13.139.85) To
  EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-This is v3 of the multi-data-unit skcipher request series, addressing
-review feedback from Mikulas Patocka on v2.
+Add a per-tfm data_unit_size and an algorithm capability flag that
+together allow a caller to submit several data units in a single
+skcipher request.  The IV passed in the request applies to the first
+data unit; the algorithm advances the tweak between data units
+according to the mode specification (e.g., LE128 multiply for XTS per
+IEEE 1619).
 
-v2: https://lore.kernel.org/linux-crypto/20260527065021.19525-1-lravich@amazon.com/
-v1: https://lore.kernel.org/linux-crypto/20260519115955.27267-1-lravich@amazon.com/
+This mirrors the data_unit_size concept already exposed by
+struct blk_crypto_config for inline encryption hardware, but at the
+software skcipher layer.  The first user is dm-crypt, which today
+issues one request per sector and so pays a per-sector cost in
+request allocation, IV generation, callback dispatch, and completion
+handling.  Allowing the cipher to consume a whole bio per request
+removes that overhead for drivers that can chain across data units
+internally.
 
-The series adds a per-tfm "data unit size" to the skcipher API so a
-caller can submit several data units in one crypto request, mirroring
-the data_unit_size concept already exposed by struct blk_crypto_config
-for inline encryption hardware.  The first user is dm-crypt, which
-today issues one skcipher request per sector and so pays a per-sector
-cost in request allocation, callback dispatch, completion handling,
-and scatterlist setup.
+The data_unit_size lives on struct crypto_skcipher rather than on
+struct skcipher_request because it does not change between requests
+for any plausible consumer: dm-crypt picks one sector size per
+mapped target at table load time; fscrypt would pick one per master
+key.  Anchoring it to the tfm also lets the driver validate it once
+at setkey() time and avoids per-request initialisation hazards on
+mempool-recycled requests.
 
-Proof-of-concept performance numbers from the RFC reply [1]: +19%
-throughput / -40% CPU on a single-core arm64 system with a hardware
-XTS-AES-256 accelerator running fio 4 KiB sequential writes through
-dm-crypt, when an out-of-tree arm64 xts driver advertises the new
-flag.  This series itself does not include arch enablement.
+Capability is advertised with CRYPTO_ALG_SKCIPHER_MULTI_DATA_UNIT
+in cra_flags (type-specific high-byte range, mirroring the
+CRYPTO_AHASH_ALG_* convention).  This makes the capability visible
+in /proc/crypto and lets templates OR it into their derived
+algorithms.
 
-[1] https://lore.kernel.org/linux-crypto/20260428101225.24316-1-lravich@amazon.com/
+crypto_skcipher_set_data_unit_size() returns -EOPNOTSUPP if the
+algorithm does not advertise the flag, and accepts 0 (the default)
+unconditionally so callers can re-disable batching cheaply.
 
-Changes since v2
-----------------
+crypto_skcipher_encrypt()/decrypt() reject requests whose cryptlen
+is not a multiple of the configured data_unit_size with -EINVAL.
+The check is gated on data_unit_size != 0 so it costs nothing for
+the common single-data-unit case.
 
-Patch 4 (dm-crypt) only.  Patches 1-3 are unchanged from v2.
+No in-tree algorithm advertises the flag yet; subsequent patches
+add the generic xts() template, arm64, and x86 producers as well
+as the dm-crypt consumer.
 
-  - Replace integer division with the equivalent shift, and tighten
-    the size sanity check from "is total < sector_size?" to "is
-    total a multiple of sector_size?".  Reject unaligned residues
-    explicitly instead of silently truncating them.  The local
-    n_sectors variable used only for a now-redundant !=0 check was
-    dropped — crypt_convert()'s outer while-loop already guarantees
-    iter_in.bi_size > 0 on entry.  (Mikulas)
+Signed-off-by: Leonid Ravich <lravich@amazon.com>
+---
+ crypto/skcipher.c                  | 120 +++++++++++++++++++++++++++++
+ include/crypto/internal/skcipher.h |  34 ++++++++
+ include/crypto/skcipher.h          |  85 ++++++++++++++++++++
+ 3 files changed, 239 insertions(+)
 
-  - Drop `min(iter_in.bi_size, iter_out.bi_size)` in favour of using
-    iter_in.bi_size directly, with a WARN_ON_ONCE() to flag any
-    future violation of the "iter_in and iter_out describe equally-
-    sized payloads" invariant maintained by crypt_convert_init().
-    Replaces a silent mask of a real bug with an explicit warning.
-    (Mikulas)
-
-Changes since v1
-----------------
-
-Patch 4 only.  Addressed Mikulas's review of v1:
-
-  - Multi-DU scatterlist allocation uses
-    GFP_NOIO | __GFP_NORETRY | __GFP_NOWARN.
-
-  - On scatterlist allocation failure, return -EAGAIN.
-    crypt_convert() handles -EAGAIN by clearing its local multi_du
-    flag and re-entering the per-sector path for the rest of this
-    crypt_convert() invocation.  The per-tfm data_unit_size on the
-    cipher remains set, so subsequent bios (which start a fresh
-    crypt_convert() and re-read cipher_flags) get to try multi-DU
-    again once memory pressure eases.
-
-    This gives forward progress under total memory exhaustion: the
-    per-sector path uses only cc->req_pool (a mempool with reservoir
-    set up at table-load time) and the inline
-    dmreq->sg_in[]/sg_out[] arrays, never doing any allocation that
-    could fail.
-
-  - Walk the bio with __bio_for_each_bvec instead of
-    __bio_for_each_segment for folio-friendly SG construction.
-
-Design overview (unchanged from v1)
------------------------------------
-
-* Patch 1 adds an `unsigned int data_unit_size` field to
-  `struct crypto_skcipher` (per-tfm: invariant for the consumer's
-  lifetime, set once via `crypto_skcipher_set_data_unit_size()`),
-  plus a capability flag CRYPTO_ALG_SKCIPHER_MULTI_DATA_UNIT in
-  `cra_flags` (type-specific high-byte range, mirroring the
-  CRYPTO_AHASH_ALG_BLOCK_ONLY precedent).  `crypto_skcipher_encrypt()`
-  and `crypto_skcipher_decrypt()` validate that `cryptlen` is a
-  positive multiple of `data_unit_size`.  The setter rejects
-  sub-blocksize values; algorithm registration rejects the flag for
-  algorithms with `ivsize != 16`.
-
-  Also exposes `skcipher_walk_data_units()` in
-  <crypto/internal/skcipher.h> as a default per-DU dispatcher for
-  drivers that don't want to roll their own.
-
-* Patch 2 lets the generic `xts(...)` template advertise the flag
-  when the inner cipher is synchronous.
-
-* Patch 3 extends `testmgr` with a self-comparison test that fires
-  automatically for every alg advertising the flag.
-
-* Patch 4 turns dm-crypt on automatically when all of the
-  following hold at table load: skcipher (not aead), tfms_count
-  == 1, IV mode is plain or plain64, no per-sector
-  iv_gen_ops->post() hook, no dm-integrity stacking, and the
-  underlying cipher advertises the capability.
-
-This series intentionally does NOT add the capability flag to any
-arch crypto driver.  Arch maintainers can opt in independently in
-follow-up patches.
-
-Verification
-------------
-
-A formal regression protocol is included in the project tree
-(.claude/regression-protocol.md, .claude/run-regression.sh).  The
-v3 reference run reports 12/12 cases PASS:
-
-  - x86 + arm64 build clean (with and without out-of-tree arch
-    enablement).
-  - checkpatch.pl --strict: clean on all 4 patches.
-  - testmgr self-comparison: PASS for any algorithm advertising the
-    flag (verified end-to-end against an out-of-tree arm64/x86 xts
-    driver during regression).
-  - dm-crypt activation gating: plain/plain64 enabled,
-    essiv:sha256 / plain64be fall back.
-  - dm-crypt round-trip plain64: PASS with multi-DU active.
-  - dm-crypt round-trip essiv:sha256 (per-sector path on multi-DU
-    kernel): PASS.
-  - dm-crypt low-memory (mem=128M): PASS, no OOM kill.
-  - Byte-equivalence: 256 MB of ciphertext written through the
-    multi-DU path is bit-identical to ciphertext written through
-    the per-sector path on an unpatched axboe/for-next baseline
-    (sha256
-    4913910b1aa6f8859fcb8f4adec20230274993a3ade8f4dd0140a323dc43efc0).
-    The on-disk format is unchanged.
-  - arm64 functional (activation + round-trip) under qemu-aarch64:
-    PASS.
-
-The OOM-fallback path (multi-DU helper returns -EAGAIN, caller
-reverts to per-sector) is verified by inspection: the fallback is
-two lines in crypt_convert(), the per-sector path uses only the
-existing mempool reserve and the inline dmreq SG arrays (no
-allocation that could fail), and there is no shared state between
-the two paths that could deadlock.
-
-Leonid Ravich (4):
-  crypto: skcipher - add per-tfm data_unit_size for batched requests
-  crypto: xts - support multiple data units per request in template
-  crypto: testmgr - exercise multi-data-unit path for skcipher
-  dm crypt: batch all sectors of a bio per crypto request
-
- crypto/skcipher.c                  | 120 ++++++++++++
- crypto/testmgr.c                   | 129 +++++++++++++
- crypto/xts.c                       |  25 ++-
- drivers/md/dm-crypt.c              | 281 ++++++++++++++++++++++++++++-
- include/crypto/internal/skcipher.h |  34 ++++
- include/crypto/skcipher.h          |  85 +++++++++
- 6 files changed, 665 insertions(+), 9 deletions(-)
-
-
-base-commit: a8cafdf8c949f17c92eca0045532e88ac0dac30d
+diff --git a/crypto/skcipher.c b/crypto/skcipher.c
+index 2b31d1d5d268..bc37bd554aec 100644
+--- a/crypto/skcipher.c
++++ b/crypto/skcipher.c
+@@ -432,13 +432,119 @@ int crypto_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ }
+ EXPORT_SYMBOL_GPL(crypto_skcipher_setkey);
+ 
++int crypto_skcipher_set_data_unit_size(struct crypto_skcipher *tfm,
++				       unsigned int data_unit_size)
++{
++	unsigned int blocksize;
++
++	if (!data_unit_size) {
++		tfm->data_unit_size = 0;
++		return 0;
++	}
++
++	if (!crypto_skcipher_supports_multi_data_unit(tfm))
++		return -EOPNOTSUPP;
++
++	blocksize = crypto_skcipher_blocksize(tfm);
++	if (data_unit_size < blocksize || data_unit_size % blocksize)
++		return -EINVAL;
++
++	tfm->data_unit_size = data_unit_size;
++	return 0;
++}
++EXPORT_SYMBOL_GPL(crypto_skcipher_set_data_unit_size);
++
++static int crypto_skcipher_check_data_unit_size(struct crypto_skcipher *tfm,
++						struct skcipher_request *req)
++{
++	unsigned int du = tfm->data_unit_size;
++
++	if (likely(!du))
++		return 0;
++	if (req->cryptlen % du)
++		return -EINVAL;
++	return 0;
++}
++
++/*
++ * Increment a 16-byte little-endian counter held in @iv.  See
++ * crypto_skcipher_set_data_unit_size() for the convention.
++ */
++static inline void skcipher_iv_inc_le128(u8 *iv)
++{
++	__le64 lo_le, hi_le;
++	u64 lo;
++
++	memcpy(&lo_le, iv, 8);
++	memcpy(&hi_le, iv + 8, 8);
++	lo = le64_to_cpu(lo_le) + 1;
++	lo_le = cpu_to_le64(lo);
++	memcpy(iv, &lo_le, 8);
++	if (unlikely(lo == 0)) {
++		hi_le = cpu_to_le64(le64_to_cpu(hi_le) + 1);
++		memcpy(iv + 8, &hi_le, 8);
++	}
++}
++
++int skcipher_walk_data_units(struct skcipher_request *req,
++			     int (*body)(struct skcipher_request *))
++{
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	const unsigned int du = tfm->data_unit_size;
++	const unsigned int total = req->cryptlen;
++	struct scatterlist *orig_src = req->src;
++	struct scatterlist *orig_dst = req->dst;
++	struct scatterlist src_sg[2], dst_sg[2];
++	u8 iv_save[16];
++	unsigned int off;
++	int err = 0;
++
++	if (likely(!du))
++		return body(req);
++
++	/*
++	 * Registration of an algorithm advertising
++	 * CRYPTO_ALG_SKCIPHER_MULTI_DATA_UNIT enforces ivsize == 16
++	 * (see skcipher_prepare_alg_common()), so this is purely
++	 * defensive against algorithm-registration bugs.
++	 */
++	if (WARN_ON_ONCE(crypto_skcipher_ivsize(tfm) != 16))
++		return -EINVAL;
++
++	memcpy(iv_save, req->iv, 16);
++
++	for (off = 0; off < total; off += du) {
++		req->cryptlen = du;
++		req->src = scatterwalk_ffwd(src_sg, orig_src, off);
++		req->dst = (orig_src == orig_dst) ? req->src :
++			   scatterwalk_ffwd(dst_sg, orig_dst, off);
++
++		err = body(req);
++		if (err)
++			break;
++
++		skcipher_iv_inc_le128(iv_save);
++		memcpy(req->iv, iv_save, 16);
++	}
++
++	req->src = orig_src;
++	req->dst = orig_dst;
++	req->cryptlen = total;
++	return err;
++}
++EXPORT_SYMBOL_GPL(skcipher_walk_data_units);
++
+ int crypto_skcipher_encrypt(struct skcipher_request *req)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
++	int err;
+ 
+ 	if (crypto_skcipher_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
+ 		return -ENOKEY;
++	err = crypto_skcipher_check_data_unit_size(tfm, req);
++	if (err)
++		return err;
+ 	if (alg->co.base.cra_type != &crypto_skcipher_type)
+ 		return crypto_lskcipher_encrypt_sg(req);
+ 	return alg->encrypt(req);
+@@ -449,9 +555,13 @@ int crypto_skcipher_decrypt(struct skcipher_request *req)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
++	int err;
+ 
+ 	if (crypto_skcipher_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
+ 		return -ENOKEY;
++	err = crypto_skcipher_check_data_unit_size(tfm, req);
++	if (err)
++		return err;
+ 	if (alg->co.base.cra_type != &crypto_skcipher_type)
+ 		return crypto_lskcipher_decrypt_sg(req);
+ 	return alg->decrypt(req);
+@@ -680,6 +790,16 @@ int skcipher_prepare_alg_common(struct skcipher_alg_common *alg)
+ 	    (alg->ivsize + alg->statesize) > PAGE_SIZE / 2)
+ 		return -EINVAL;
+ 
++	/*
++	 * Algorithms advertising multi-data-unit support must use the
++	 * 16-byte little-endian counter convention documented in
++	 * crypto_skcipher_set_data_unit_size(); see also
++	 * skcipher_walk_data_units().
++	 */
++	if ((base->cra_flags & CRYPTO_ALG_SKCIPHER_MULTI_DATA_UNIT) &&
++	    alg->ivsize != 16)
++		return -EINVAL;
++
+ 	if (!alg->chunksize)
+ 		alg->chunksize = base->cra_blocksize;
+ 
+diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
+index a965b6aabf61..bed1b1f1bbdc 100644
+--- a/include/crypto/internal/skcipher.h
++++ b/include/crypto/internal/skcipher.h
+@@ -21,6 +21,40 @@
+  */
+ #define CRYPTO_ALG_SKCIPHER_REQSIZE_LARGE CRYPTO_ALG_OPTIONAL_KEY
+ 
++/**
++ * skcipher_walk_data_units - dispatch a request as one body call per data unit
++ * @req: the caller's skcipher request
++ * @body: the algorithm's single-data-unit encrypt or decrypt function
++ *
++ * When tfm->data_unit_size is zero this is a tail call into @body with
++ * @req unchanged.  Otherwise the request is split into
++ * cryptlen / data_unit_size sub-ranges and @body is called once per
++ * sub-range with req->cryptlen, req->src, req->dst, and req->iv adjusted
++ * for that sub-range.  The IV passed to data unit n is the caller-
++ * supplied IV plus n, where + is a 128-bit little-endian add — this
++ * matches the convention documented in
++ * crypto_skcipher_set_data_unit_size().
++ *
++ * Many single-data-unit XTS bodies modify the IV buffer in place during
++ * processing (the tweak is walked block by block).  This helper saves
++ * the caller's IV before each call and rewrites the next data unit's
++ * IV from the saved value, so the body always sees a fresh per-DU IV
++ * regardless of any in-place mutation it performs.
++ *
++ * The body MUST run to completion synchronously.  Drivers that use this
++ * helper therefore advertise CRYPTO_ALG_SKCIPHER_MULTI_DATA_UNIT only
++ * for synchronous configurations.
++ *
++ * After the call returns, the contents of req->iv are unspecified per
++ * the documented contract.  src/dst/cryptlen are restored to the
++ * caller's values to keep skcipher request post-conditions intact.
++ *
++ * Return: 0 on success, or the body's negative errno on the first
++ *	   data unit that returned non-zero.
++ */
++int skcipher_walk_data_units(struct skcipher_request *req,
++			     int (*body)(struct skcipher_request *));
++
+ struct aead_request;
+ struct rtattr;
+ 
+diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
+index 4efe2ca8c4d1..5941b6b24b98 100644
+--- a/include/crypto/skcipher.h
++++ b/include/crypto/skcipher.h
+@@ -26,6 +26,15 @@
+ /* Set this bit if the skcipher operation is not final. */
+ #define CRYPTO_SKCIPHER_REQ_NOTFINAL	0x00000002
+ 
++/*
++ * Set in cra_flags by an skcipher algorithm that supports processing
++ * multiple data units in a single request.  See
++ * crypto_skcipher_set_data_unit_size().
++ *
++ * Type-specific flag in the 0xff000000 reserved range.
++ */
++#define CRYPTO_ALG_SKCIPHER_MULTI_DATA_UNIT	0x01000000
++
+ struct scatterlist;
+ 
+ /**
+@@ -53,6 +62,22 @@ struct skcipher_request {
+ struct crypto_skcipher {
+ 	unsigned int reqsize;
+ 
++	/*
++	 * Number of bytes in one data unit when batching multiple data units
++	 * per request.  0 means "single data unit per request" (legacy
++	 * behaviour).  Set via crypto_skcipher_set_data_unit_size().
++	 *
++	 * When non-zero, cryptlen must be a multiple of data_unit_size.  The
++	 * IV passed in skcipher_request::iv applies to the first data unit;
++	 * the algorithm advances the tweak between data units according to
++	 * the mode specification (e.g., LE128 multiply for XTS per
++	 * IEEE 1619).
++	 *
++	 * Only algorithms that advertise CRYPTO_ALG_SKCIPHER_MULTI_DATA_UNIT
++	 * in cra_flags accept a non-zero value.
++	 */
++	unsigned int data_unit_size;
++
+ 	struct crypto_tfm base;
+ };
+ 
+@@ -492,6 +517,66 @@ static inline unsigned int crypto_lskcipher_chunksize(
+ 	return crypto_lskcipher_alg(tfm)->co.chunksize;
+ }
+ 
++/**
++ * crypto_skcipher_supports_multi_data_unit() - test multi-data-unit support
++ * @tfm: cipher handle
++ *
++ * Return: true if the algorithm advertises that it can process multiple
++ *	   data units in a single skcipher_request.
++ */
++static inline bool
++crypto_skcipher_supports_multi_data_unit(struct crypto_skcipher *tfm)
++{
++	return crypto_skcipher_alg_common(tfm)->base.cra_flags &
++		CRYPTO_ALG_SKCIPHER_MULTI_DATA_UNIT;
++}
++
++/**
++ * crypto_skcipher_set_data_unit_size() - set data unit size for the tfm
++ * @tfm: cipher handle
++ * @data_unit_size: data unit size in bytes; 0 disables multi-data-unit mode
++ *
++ * Configure the tfm to process multiple data units per request.  When set
++ * to a non-zero value, every subsequent encrypt/decrypt request must have
++ * cryptlen that is a multiple of @data_unit_size.  Each data unit is
++ * processed as if it were a separate request whose IV is derived from the
++ * preceding data unit's IV by the algorithm-specific tweak update rule:
++ * the implementation treats the caller-supplied IV as a 128-bit
++ * little-endian counter and adds the data-unit index for each subsequent
++ * data unit.
++ *
++ * The contents of req->iv after a multi-data-unit request returns are
++ * unspecified — callers MUST NOT rely on it being either the original
++ * value or the final-data-unit value.  Set a fresh IV before every
++ * request.
++ *
++ * The algorithm must advertise CRYPTO_ALG_SKCIPHER_MULTI_DATA_UNIT in its
++ * cra_flags.  @data_unit_size must be a positive multiple of the
++ * algorithm's cra_blocksize, otherwise -EINVAL is returned.
++ *
++ * Setting @data_unit_size to 0 reverts the tfm to single-data-unit
++ * behaviour and is always permitted.
++ *
++ * Return: 0 on success; -EOPNOTSUPP if the algorithm does not advertise
++ *	   multi-data-unit support; -EINVAL if @data_unit_size is not a
++ *	   positive multiple of the cipher block size.
++ */
++int crypto_skcipher_set_data_unit_size(struct crypto_skcipher *tfm,
++				       unsigned int data_unit_size);
++
++/**
++ * crypto_skcipher_data_unit_size() - obtain data unit size
++ * @tfm: cipher handle
++ *
++ * Return: configured data unit size in bytes; 0 if multi-data-unit mode
++ *	   is disabled.
++ */
++static inline unsigned int
++crypto_skcipher_data_unit_size(struct crypto_skcipher *tfm)
++{
++	return tfm->data_unit_size;
++}
++
+ /**
+  * crypto_skcipher_statesize() - obtain state size
+  * @tfm: cipher handle
 -- 
 2.47.3
 
