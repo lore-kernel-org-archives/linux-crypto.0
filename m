@@ -1,202 +1,86 @@
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01B32201004
-	for <linux-crypto@vger.kernel.org>; Mon,  1 Jun 2026 09:18:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA0D339061C
+	for <linux-crypto@vger.kernel.org>; Mon,  1 Jun 2026 09:19:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780305487; cv=none; b=JFoJxZHoMfcuO0eXtC+5Fozqb9NCqGBqp1DeRNGM1LEaapxfHOYUNm2x+TI7aqt32qOxJiOLKoXwT1iRooaRcWOZ3XmFzA+t7jq3SCdRyXaBQYFX6gBXeRBt2NPhwtkob+X4BP8zcQU91gXxOajuQYJ4kb0MDGeh5JwfkkPBuso=
+	t=1780305581; cv=none; b=QC5bLRuDxmh3H1aH0qfm3bljKTnWAr1IDVG97pqNgpjPp3l7chOo2KmT7PoS0rO7+Mj1Tdi78haxaxPtwjPVdCilN9GAHwnUKH0ZjvKihQGYklMVD/QzgX4U9k3XVeGHPTsDevOSYJEUTiqh7cyvZ+eFUk1ohbAR53OvEtl1OBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780305487; c=relaxed/simple;
-	bh=j/gvaqYS1F/8rzBxer7eqfUq1FJ5JDJr4LyygljEqNs=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
-	 References:In-Reply-To; b=nGyVTSQxF2+hrGWm1bZmFS+JWRUkHWdKCsVD7tWvOTc0rIXClfZGHX8upYFTaSc9JT6ZCk+OgOIRKqeHQvNlZdR7qdZZK5iKPxuZe4MbMsCeFNyNi/WOkm3fBKULxLeTBNHwMtJzsUBtjrwQtnSa6MFRz7wyrrTiCdGOMQ/bCoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=h4w/9QSv; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	s=arc-20240116; t=1780305581; c=relaxed/simple;
+	bh=PPChPTR/glaiNHISsa+FGiwhtJkD2/oee5H5c/F4L5k=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc; b=HiN5a3OGiKkafhVnxl/9+vq54to2qRNwDoYL9NiEFvhom4BdKjYsXJL0vgTwCpXWVtm96c9ywxkw2PQ3jyVIy/u0aJj7M7nKfMaM2L5WaoRtEVKqxwStaAnLkFgIzihW9eswu0R7BHEDeo1ovUs9QNkhY1fOBx9sjaVGB1vwmx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iKIKQJRy; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="h4w/9QSv"
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 788D24E42DD1;
-	Mon,  1 Jun 2026 09:18:03 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 483AC602AB;
-	Mon,  1 Jun 2026 09:18:03 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 044B7108881A3;
-	Mon,  1 Jun 2026 11:17:53 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1780305480; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=9wm/CqkWxiyphbpZmHCocTiGIxjyJmn0FoTfyyyYf9c=;
-	b=h4w/9QSv8y8Mho4GFBImGv4iVg+lPXv1qQuwjm4sOrMhx91sIUeKJsAoRvFQB35ICvzZaT
-	mzzjEAeAbo4IMcIyu6MkqoKGQYejLK8AVQXq7Y0Cqtg8+wMiT1Do79QPL9SOnSYi9r734z
-	tNrhMzxubIg7dDRCEOEEuipa/zhk12+bv2nsDkYOULWY3jLGuUoku9tfmn2IAjQDioQbIo
-	x1Qzd3Eb/+Uf/4274AshtPt80twMyaM63HniNl5VRiH675Qf91/yID/9s/Tuns1VspOPc5
-	vNdGF9QIJBjAq8WG1GaeyrBh/MhU+GEUxvYvF2UToDVGJJA0VwdGOAKYtzDlWA==
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iKIKQJRy"
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1780305566;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=d5IyFKFbRT3IKZtpikCYlnIfXgvvgQ7v1CmhoyZgrLI=;
+	b=iKIKQJRyZO7nrywzvbDm3R6lAw+dIiZnj3xTdbymV1G11dNR4PzQ5gu3ZcC38ePos4UHZz
+	dbJexfJbtJKCAi6nLtpJ67BFXN0C1G54yyypw8GGbuCHn6f8LFZto5N85lKcz+6n5qKHH+
+	USlkhKTQOCl3Nbyu3whgXhpp4klhYEA=
+Date: Mon, 01 Jun 2026 09:19:23 +0000
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 01 Jun 2026 11:17:53 +0200
-Message-Id: <DIXLMBNKMF1N.2FVTXFA6MP1NF@bootlin.com>
-From: "Paul Louvel" <paul.louvel@bootlin.com>
-To: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, "Paul Louvel"
- <paul.louvel@bootlin.com>, "Herbert Xu" <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>
-Cc: "Thomas Petazzoni" <thomas.petazzoni@bootlin.com>, "Herve Codina"
- <herve.codina@bootlin.com>, <linux-crypto@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 00/29] crypto: talitos - Driver cleanup
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20260528-7-1-rc1_talitos_cleanup-v1-0-cb1ad6cdea49@bootlin.com>
- <1488f7b3-cda0-4267-827c-fae23b17c1e8@kernel.org>
-In-Reply-To: <1488f7b3-cda0-4267-827c-fae23b17c1e8@kernel.org>
-X-Last-TLS-Session-Version: TLSv1.3
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Tianchu Chen" <tianchu.chen@linux.dev>
+Message-ID: <d52449abfd8e1e46c8bfe9ebdc00d931fc0e4147@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH] crypto: sun4i-ss - Remove insecure and unused rng_alg
+To: ebiggers@kernel.org
+Cc: clabbe.montjoie@gmail.com, herbert@gondor.apana.org.au,
+ jernej.skrabec@gmail.com, linux-arm-kernel@lists.infradead.org,
+ linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-sunxi@lists.linux.dev, samuel@sholland.org, stable@vger.kernel.org,
+ wens@kernel.org
+X-Migadu-Flow: FLOW_OUT
 
->> The Freescale Integrated Security Engine (SEC) aka "Talitos" driver
->> implementation is a monolithic ~3800-line file that mixes SEC1 and SEC2
->> hardware variants with hash, skcipher, aead and hwrng algorithm.
->>=20
->> This series reorganises the driver to improve readability and
->> maintainability.
+From: Tianchu Chen <flynnnchen@tencent.com>
+In-Reply-To: <20260529193648.18172-1-ebiggers@kernel.org>
+References: <20260529193648.18172-1-ebiggers@kernel.org>
+
+On Fri, May 29, 2026 at 12:36:48PM -0700, Eric Biggers wrote:
+> Remove sun4i_ss_rng, as it is insecure and unused:
 >
-> Did you analyse the cost of this series ? bloat-o-meter gives the=20
-> following result, allthough I'm a bit surprised there are only added=20
-> items, no removed items:
+> - It has multiple vulnerabilities.  sun4i_ss_prng_seed() is missing
+>   locking and has a buffer overflow.
 
-When you say 'cost', do you mean cost in terms of code size ? performance c=
-ost ?
-or both ?
-Regarding code size, I trusted the differences shown in the cover letter by=
- git:
+Thanks for cleaning this up.
 
-> 13 files changed, 3810 insertions(+), 3707 deletions(-)
+For the record, the sun4i_ss_prng_seed() buffer overflow you mention here
+is the same issue we reported earlier with a targeted fix:
+  https://lore.kernel.org/linux-crypto/20260529194152.GA3628@quark/
 
-There is 103 insertions more than deletions. This is due to the fact that
-splitting up SEC1/SEC2 code requires additional function and structures.
-I find it acceptable given the readability improvement.
+It is an unauthenticated, unbounded memcpy() into the 24-byte ss->seed[]
+buffer, reachable from any user via AF_ALG ALG_SET_KEY with no privileges
+on affected Allwinner sun4i hardware.
 
-As for performance, I ran ftrace with the function graph tracer, hashing a =
-100kb
-file.
+Please note that this should be treated as a security fix. For the earlie=
+r
+stable releases, keeping the rng_alg but adding a proper bounds check in
+sun4i_ss_prng_seed() might still be a preferable option to consider.
 
-Without the series applied:
+Given the above, would you mind adding the following trailers to the comm=
+it
+message?  Besides crediting the discovery and report, they would also mak=
+e
+this security issue easier to track and reference across the stable trees=
+:
 
-be935f36ae14489758e28a83cfec418d3ad600b64628166f275c7ae6aac7b9af  ./test_10=
-0k.bin
-# tracer: function_graph
-#
-# CPU  DURATION                  FUNCTION CALLS
-# |     |   |                     |   |   |   |
- 0) + 20.256 us   |  ahash_init();
- 0)               |  ahash_do_req_chain() {
- 0)               |    ahash_update() {
- 0) + 41.088 us   |      ahash_process_req();
- 0) + 54.272 us   |    }
- 0) + 61.536 us   |  }
- ------------------------------------------
- 0)  sha256s-196   =3D>    <idle>-0  =20
- ------------------------------------------
-
- 0) + 45.248 us   |  ahash_done();
- ------------------------------------------
- 0)    <idle>-0    =3D>  sha256s-196 =20
- ------------------------------------------
-
- 0)               |  ahash_do_req_chain() {
- 0)               |    ahash_update() {
- 0) + 39.552 us   |      ahash_process_req();
- 0) + 53.472 us   |    }
- 0) + 68.576 us   |  }
- ------------------------------------------
- 0)  sha256s-196   =3D>    <idle>-0  =20
- ------------------------------------------
-
- 0) + 39.680 us   |  ahash_done();
- ------------------------------------------
- 0)    <idle>-0    =3D>  sha256s-196 =20
- ------------------------------------------
-
- 0)               |  ahash_do_req_chain() {
- 0)               |    ahash_finup() {
- 0)               |      ahash_process_req() {
- 0) + 16.800 us   |        ahash_done();
- 0) + 96.192 us   |      }
- 0) ! 103.616 us  |    }
- 0) ! 121.344 us  |  }
-
-With the series applied:
-
-be935f36ae14489758e28a83cfec418d3ad600b64628166f275c7ae6aac7b9af  ./test_10=
-0k.bin
-# tracer: function_graph
-#
-# CPU  DURATION                  FUNCTION CALLS
-# |     |   |                     |   |   |   |
- 0) + 20.576 us   |  ahash_init();
- 0)               |  ahash_do_req_chain() {
- 0)               |    ahash_update() {
- 0) + 32.896 us   |      ahash_process_req();
- 0) + 46.688 us   |    }
- 0) + 54.016 us   |  }
- ------------------------------------------
- 0)  sha256s-196   =3D>    <idle>-0  =20
- ------------------------------------------
-
- 0)               |  ahash_done() {
- 0)               |    ahash_update_done() {
- 0)   9.312 us    |      ahash_update_finish();
- 0) + 44.416 us   |    }
- 0) + 73.216 us   |  }
- ------------------------------------------
- 0)    <idle>-0    =3D>  sha256s-196 =20
- ------------------------------------------
-
- 0)               |  ahash_do_req_chain() {
- 0)               |    ahash_update() {
- 0) + 33.120 us   |      ahash_process_req();
- 0) + 46.912 us   |    }
- 0) + 61.664 us   |  }
- ------------------------------------------
- 0)  sha256s-196   =3D>    <idle>-0  =20
- ------------------------------------------
-
- 0)               |  ahash_done() {
- 0)               |    ahash_update_done() {
- 0)   8.928 us    |      ahash_update_finish();
- 0) + 42.720 us   |    }
- 0) + 69.440 us   |  }
- ------------------------------------------
- 0)    <idle>-0    =3D>  sha256s-196 =20
- ------------------------------------------
-
- 0)               |  ahash_do_req_chain() {
- 0)               |    ahash_finup() {
- 0)               |      ahash_process_req() {
- 0)               |        ahash_done() {
- 0)   5.696 us    |          ahash_finup_done();
- 0) + 29.760 us   |        }
- 0) ! 107.168 us  |      }
- 0) ! 113.696 us  |    }
- 0) ! 131.840 us  |  }
-
-It looks like there is a slight performance penalty with ahash_finup().
-Otherwise, there is a slight performance improvement for the other measurem=
-ents.
-I do not know if there is a better way to measure the performance impact of=
- this
-series. If you know, do not hesitate to share it to me.
+  Discovered by Atuin - Automated Vulnerability Discovery Engine
+  Reported-by: Tianchu Chen <flynnnchen@tencent.com>
 
 
-Best regards,
-Paul.
-
---=20
-Paul Louvel, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+Thanks,
+Tianchu
