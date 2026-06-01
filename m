@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB76282F38;
-	Mon,  1 Jun 2026 11:47:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA2D9282F38;
+	Mon,  1 Jun 2026 11:47:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780314428; cv=none; b=q7pd1rNk2+uJUljXYBSAzzF4nXjPObeJLVQwnqvXgBj69Gf1ZR4Ht2QGqN1DZ4NzkkY28AZzQiTpKUzfOg7ustbUfN9RzZmEMRWwOw5EJgOmXDqzsBx9jHZCq0PdLNXJ1KMED2C3L9/LIWpIdvdUaZH4JoMxX+4JbEzBqDSGSU0=
+	t=1780314473; cv=none; b=H/aoMvhdMlMsDi2psfUPszRWlUnKzhiZNSLlk782I+hR0nhjMcJVpljeQIbdEuPLcqS/F5eqbp6Mya1Dq4XVhWO5jaqxMRzTrQXQkUmZXpvZljaQNCxZFRtxdbD6YKeZ/h/i6kFCSlSCwvgMbzqvSFkvovRyQ8VBn+JaikhB9EY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780314428; c=relaxed/simple;
-	bh=nYy8j21IjNE7thkcbx7HmJtvXTVObi+Kt8PiTNMprpU=;
+	s=arc-20240116; t=1780314473; c=relaxed/simple;
+	bh=qHyPVCRepRZzn+ABb6K4eq4Qc/kn4+1MvfUTVKAmbGA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=s4/oVFuyFewrhL8KNi9928UTxXwt2E2IOLEHg7VW8QNDihVKlUX6cIDaJAhWlvtSJX8jtCPesXLnZ/iMTLNiF+Flqn26OMe2q11apDJbSMh5Yh2sNVBtC3h4QeF740FyceyKi/RPEmzXKifH/72LFGwdTQcd6M5g+MOTUkyF3p8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FifNWqcU; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:Content-Type; b=L+8vAMmoPL+J+ddu5Zkc9ySHIw2fWRrouaLjwjR0qfYGSoa8o+d/8i5CWtMD4Nt2jBgUPa2ycgemd3m1KiOSjUBD0/9nUcLhCBqHOmAIIX9VGgpSwQC7+/GyXnA9pFHR4/h3W+qdfXgjHytdD027nFjHoFt19QAxFG59W+bsu/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TXTc6FO0; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FifNWqcU"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52B651F00893;
-	Mon,  1 Jun 2026 11:47:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TXTc6FO0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60CB81F00893;
+	Mon,  1 Jun 2026 11:47:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780314424;
-	bh=jWqYo4K/K6ebxbAcrswx1IkT+HGyuaH20yPBIo5NwFw=;
+	s=k20260515; t=1780314471;
+	bh=yHw0oMGPDeMcklLkrATmOIEHXD94LkahjP4ZzTRgdGA=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=FifNWqcUruABV6Dj5of5sFwq7UAK+s/z4YEfzFxGGKxQtTRZ3wuBAUx2HXgHcRS5U
-	 DaguCjE6FpQ5jEoVjpaTe+1xgDqASWXlxcfvT17xxwhlUygRgbjO8x+d/+y+77Ob0S
-	 XmcCNisizU6OXFUFDZNEgPEqDjaLoVE8AwNjZVfRAqIKXSaGlLPaEZEmAwr4yYa64x
-	 Jjdw80j0/upd4SZ2p6qoAe6yEwI1NEVH6Qc7lTW7SGNKFdaXVE4FM1/l29i8lKTx97
-	 K50tpP3D53MdWys6erxgy6QtcsZNAkI4PVt/hPSLaW45lx9S185zA2PhFqW74r5C04
-	 oGfq/O0ZHrp2Q==
-Message-ID: <6a5ec43a-b05a-431c-9ace-2f7b58523895@kernel.org>
-Date: Mon, 1 Jun 2026 13:47:00 +0200
+	b=TXTc6FO0JXn+zH5d4bNUjKC6VXqfff5L1itY4Fd1gGBbGAhF6I1H/vhHYBLN2R3MU
+	 GORpx8/Sw8jbLM0yqbe69IRbfbGbsffl1PnEA7sCrKIRAbl2dZXdE0RpZjIEVKcoVb
+	 WaR6ZH/mvo4yMfgQl4oh61555FKbeMWzOwKYexdwN/TrX4l/EoqCfRXsi4LVfulIz5
+	 6hsPJZgTRP8jjk7Oxmd4vd6QFlmOndFYkmmxDCDTSgRmYKPB/Z0G4Nj2xtBea80xbQ
+	 rLUX91AtFkh86QTxH6LRuNV0YKNkn4Pdr5VezDVG1eEZgI600mcyRJwBHFGcd2U40L
+	 sP8zKSvlu+n1A==
+Message-ID: <88806ca7-35bb-4b7a-b4da-3632785cec40@kernel.org>
+Date: Mon, 1 Jun 2026 13:47:47 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,7 +35,7 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 07/29] crypto: talitos/hash - Move into separate file
+Subject: Re: [PATCH 08/29] crypto: talitos/skcipher - Move into separate file
 To: Paul Louvel <paul.louvel@bootlin.com>,
  Herbert Xu <herbert@gondor.apana.org.au>,
  "David S. Miller" <davem@davemloft.net>
@@ -43,876 +43,436 @@ Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
  Herve Codina <herve.codina@bootlin.com>, linux-crypto@vger.kernel.org,
  linux-kernel@vger.kernel.org
 References: <20260528-7-1-rc1_talitos_cleanup-v1-0-cb1ad6cdea49@bootlin.com>
- <20260528-7-1-rc1_talitos_cleanup-v1-7-cb1ad6cdea49@bootlin.com>
+ <20260528-7-1-rc1_talitos_cleanup-v1-8-cb1ad6cdea49@bootlin.com>
 Content-Language: fr-FR
 From: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
-In-Reply-To: <20260528-7-1-rc1_talitos_cleanup-v1-7-cb1ad6cdea49@bootlin.com>
+In-Reply-To: <20260528-7-1-rc1_talitos_cleanup-v1-8-cb1ad6cdea49@bootlin.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 
 
 Le 28/05/2026 à 11:08, Paul Louvel a écrit :
-> Move the ahash algorithm implementations from talitos.c into a dedicated
-> talitos-hash.c file.
+> Move the skcipher algorithm implementations from talitos.c into
+> a dedicated talitos-skcipher.c file.
+> 
 > 
 > Signed-off-by: Paul Louvel <paul.louvel@bootlin.com>
 
 Reviewed-by: Christophe Leroy (CS GROUP) <chleroy@kernel.org>
 
-While at it, (maybe another patch) the problem with size 0 hash on SEC1 
-is not a driver bug but a hardware bug, it is therefore probably not 
-worth a pr_err() because there is nothing the user can do about it and 
-it is transparent as there is a workaround in the driver.
-
 > ---
->   drivers/crypto/talitos/Makefile       |   2 +-
->   drivers/crypto/talitos/talitos-hash.c | 832 ++++++++++++++++++++++++++++++++++
->   drivers/crypto/talitos/talitos.c      | 807 +--------------------------------
->   drivers/crypto/talitos/talitos.h      |   4 +
->   4 files changed, 847 insertions(+), 798 deletions(-)
+>   drivers/crypto/talitos/Makefile           |   2 +-
+>   drivers/crypto/talitos/talitos-skcipher.c | 396 ++++++++++++++++++++++++++++++
+>   drivers/crypto/talitos/talitos.c          | 377 +---------------------------
+>   drivers/crypto/talitos/talitos.h          |   1 +
+>   4 files changed, 408 insertions(+), 368 deletions(-)
 > 
 > diff --git a/drivers/crypto/talitos/Makefile b/drivers/crypto/talitos/Makefile
-> index 901ec681f010..40d37f9364ef 100644
+> index 40d37f9364ef..d4f19f2f6375 100644
 > --- a/drivers/crypto/talitos/Makefile
 > +++ b/drivers/crypto/talitos/Makefile
 > @@ -1,3 +1,3 @@
 >   obj-$(CONFIG_CRYPTO_DEV_TALITOS) += talitos.o
 >   
-> -talitos-y := talitos.o talitos-rng.o
-> +talitos-y := talitos.o talitos-rng.o talitos-hash.o
-> diff --git a/drivers/crypto/talitos/talitos-hash.c b/drivers/crypto/talitos/talitos-hash.c
+> -talitos-y := talitos.o talitos-rng.o talitos-hash.o
+> +talitos-y := talitos.o talitos-rng.o talitos-hash.o talitos-skcipher.o
+> diff --git a/drivers/crypto/talitos/talitos-skcipher.c b/drivers/crypto/talitos/talitos-skcipher.c
 > new file mode 100644
-> index 000000000000..5792e7093392
+> index 000000000000..4f742930ec47
 > --- /dev/null
-> +++ b/drivers/crypto/talitos/talitos-hash.c
-> @@ -0,0 +1,832 @@
+> +++ b/drivers/crypto/talitos/talitos-skcipher.c
+> @@ -0,0 +1,396 @@
 > +// SPDX-License-Identifier: GPL-2.0-or-later
 > +
 > +/*
-> + * Freescale SEC (talitos) hash implementation
+> + * Freescale SEC (talitos) skcipher implementation
 > + *
 > + * Copyright (c) 2006-2011 Freescale Semiconductor, Inc.
 > + */
 > +
-> +#include <linux/scatterlist.h>
-> +
-> +#include <crypto/hash.h>
-> +#include <crypto/internal/hash.h>
-> +#include <crypto/md5.h>
-> +#include <crypto/scatterwalk.h>
-> +#include <crypto/sha1.h>
+> +#include <crypto/internal/des.h>
+> +#include <crypto/internal/skcipher.h>
 > +
 > +#include "talitos.h"
 > +
-> +#define HASH_MAX_BLOCK_SIZE		SHA512_BLOCK_SIZE
-> +#define TALITOS_MDEU_MAX_CONTEXT_SIZE	TALITOS_MDEU_CONTEXT_SIZE_SHA384_SHA512
-> +
-> +struct talitos_ahash_req_ctx {
-> +	u32 hw_context[TALITOS_MDEU_MAX_CONTEXT_SIZE / sizeof(u32)];
-> +	unsigned int hw_context_size;
-> +	unsigned int swinit;
-> +	unsigned int first_request;
-> +	unsigned int last_request;
-> +	unsigned int to_hash_later;
-> +};
-> +
-> +struct talitos_export_state {
-> +	u32 hw_context[TALITOS_MDEU_MAX_CONTEXT_SIZE / sizeof(u32)];
-> +	unsigned int swinit;
-> +	unsigned int first_request;
-> +	unsigned int last_request;
-> +	unsigned int to_hash_later;
-> +};
-> +
-> +static void common_nonsnoop_hash_unmap(struct device *dev,
-> +				       struct talitos_edesc *edesc,
-> +				       struct ahash_request *areq)
+> +static void common_nonsnoop_unmap(struct device *dev,
+> +				  struct talitos_edesc *edesc,
+> +				  struct skcipher_request *areq)
 > +{
-> +	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
-> +	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-> +	struct talitos_private *priv = dev_get_drvdata(dev);
-> +	bool is_sec1 = has_ftr_sec1(priv);
-> +	struct talitos_desc *desc = &edesc->desc;
+> +	unmap_single_talitos_ptr(dev, &edesc->desc.ptr[5], DMA_FROM_DEVICE);
 > +
-> +	unmap_single_talitos_ptr(dev, &desc->ptr[5], DMA_FROM_DEVICE);
-> +
-> +	if (edesc->last && req_ctx->last_request)
-> +		memcpy(areq->result, req_ctx->hw_context,
-> +		       crypto_ahash_digestsize(tfm));
-> +
-> +	if (edesc->src)
-> +		talitos_sg_unmap(dev, edesc, edesc->src, NULL, 0, 0);
-> +
-> +	/* When using hashctx-in, must unmap it. */
-> +	if (from_talitos_ptr_len(&desc->ptr[1], is_sec1))
-> +		unmap_single_talitos_ptr(dev, &desc->ptr[1],
-> +					 DMA_TO_DEVICE);
+> +	talitos_sg_unmap(dev, edesc, areq->src, areq->dst, areq->cryptlen, 0);
+> +	unmap_single_talitos_ptr(dev, &edesc->desc.ptr[1], DMA_TO_DEVICE);
 > +
 > +	if (edesc->dma_len)
 > +		dma_unmap_single(dev, edesc->dma_link_tbl, edesc->dma_len,
 > +				 DMA_BIDIRECTIONAL);
 > +}
 > +
-> +static void free_edesc_list_from(struct ahash_request *areq, struct talitos_edesc *edesc)
+> +static void skcipher_done(struct device *dev,
+> +			    struct talitos_desc *desc, void *context,
+> +			    int err)
 > +{
-> +	struct talitos_ctx *ctx = crypto_ahash_ctx(crypto_ahash_reqtfm(areq));
-> +	struct talitos_edesc *next;
+> +	struct skcipher_request *areq = context;
+> +	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(areq);
+> +	struct talitos_ctx *ctx = crypto_skcipher_ctx(cipher);
+> +	unsigned int ivsize = crypto_skcipher_ivsize(cipher);
+> +	struct talitos_edesc *edesc;
 > +
-> +	while (edesc) {
-> +		next = edesc->next_desc;
-> +		common_nonsnoop_hash_unmap(ctx->dev, edesc, areq);
-> +		kfree(edesc);
-> +		edesc = next;
-> +	}
+> +	edesc = container_of(desc, struct talitos_edesc, desc);
+> +
+> +	common_nonsnoop_unmap(dev, edesc, areq);
+> +	memcpy(areq->iv, ctx->iv, ivsize);
+> +
+> +	kfree(edesc);
+> +
+> +	skcipher_request_complete(areq, err);
 > +}
 > +
-> +static void ahash_done(struct device *dev,
-> +		       struct talitos_desc *desc, void *context,
-> +		       int err)
+> +static int common_nonsnoop(struct talitos_edesc *edesc,
+> +			   struct skcipher_request *areq,
+> +			   void (*callback) (struct device *dev,
+> +					     struct talitos_desc *desc,
+> +					     void *context, int error))
 > +{
-> +	struct ahash_request *areq = context;
-> +	struct talitos_edesc *edesc =
-> +		 container_of(desc, struct talitos_edesc, desc);
-> +	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
-> +	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-> +	bool is_sec1 = has_ftr_sec1(dev_get_drvdata(dev));
-> +	struct talitos_ctx *ctx = crypto_ahash_ctx(tfm);
-> +	struct talitos_edesc *next;
-> +
-> +	if (is_sec1) {
-> +		free_edesc_list_from(areq, edesc);
-> +		ahash_request_complete(areq, err ?: req_ctx->to_hash_later);
-> +	} else {
-> +		next = edesc->next_desc;
-> +
-> +		common_nonsnoop_hash_unmap(dev, edesc, areq);
-> +		kfree(edesc);
-> +
-> +		if (err)
-> +			goto out;
-> +
-> +		if (next) {
-> +			err = talitos_submit(dev, ctx->ch, &next->desc,
-> +					     ahash_done, areq);
-> +			if (err != -EINPROGRESS)
-> +				goto out;
-> +			return;
-> +		}
-> +out:
-> +		if (err && next)
-> +			free_edesc_list_from(areq, next);
-> +		ahash_request_complete(areq, err ?: req_ctx->to_hash_later);
-> +	}
-> +}
-> +
-> +/*
-> + * SEC1 doesn't like hashing of 0 sized message, so we do the padding
-> + * ourself and submit a padded block
-> + */
-> +static void talitos_handle_buggy_hash(struct talitos_ctx *ctx,
-> +			       struct talitos_edesc *edesc,
-> +			       struct talitos_ptr *ptr)
-> +{
-> +	static u8 padded_hash[64] = {
-> +		0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-> +		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-> +		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-> +		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-> +	};
-> +
-> +	pr_err_once("Bug in SEC1, padding ourself\n");
-> +	edesc->desc.hdr &= ~DESC_HDR_MODE0_MDEU_PAD;
-> +	map_single_talitos_ptr(ctx->dev, ptr, sizeof(padded_hash),
-> +			       (char *)padded_hash, DMA_TO_DEVICE);
-> +}
-> +
-> +static void common_nonsnoop_hash(struct talitos_edesc *edesc,
-> +				 struct ahash_request *areq,
-> +				 unsigned int length)
-> +{
-> +	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-> +	struct talitos_ctx *ctx = crypto_ahash_ctx(tfm);
-> +	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
+> +	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(areq);
+> +	struct talitos_ctx *ctx = crypto_skcipher_ctx(cipher);
 > +	struct device *dev = ctx->dev;
 > +	struct talitos_desc *desc = &edesc->desc;
+> +	unsigned int cryptlen = areq->cryptlen;
+> +	unsigned int ivsize = crypto_skcipher_ivsize(cipher);
+> +	int sg_count, ret;
 > +	bool sync_needed = false;
 > +	struct talitos_private *priv = dev_get_drvdata(dev);
 > +	bool is_sec1 = has_ftr_sec1(priv);
-> +	int sg_count;
+> +	bool is_ctr = (desc->hdr & DESC_HDR_SEL0_MASK) == DESC_HDR_SEL0_AESU &&
+> +		      (desc->hdr & DESC_HDR_MODE0_AESU_MASK) == DESC_HDR_MODE0_AESU_CTR;
 > +
 > +	/* first DWORD empty */
 > +
-> +	/* hash context in */
-> +	if (!edesc->first || !req_ctx->first_request || req_ctx->swinit) {
-> +		map_single_talitos_ptr_nosync(dev, &desc->ptr[1],
-> +					      req_ctx->hw_context_size,
-> +					      req_ctx->hw_context,
-> +					      DMA_TO_DEVICE);
-> +		req_ctx->swinit = 0;
-> +	}
-> +	/* Indicate next op is not the first. */
-> +	req_ctx->first_request = 0;
+> +	/* cipher iv */
+> +	to_talitos_ptr(&desc->ptr[1], edesc->iv_dma, ivsize, is_sec1);
 > +
-> +	/* HMAC key */
-> +	if (ctx->keylen)
-> +		to_talitos_ptr(&desc->ptr[2], ctx->dma_key, ctx->keylen,
-> +			       is_sec1);
+> +	/* cipher key */
+> +	to_talitos_ptr(&desc->ptr[2], ctx->dma_key, ctx->keylen, is_sec1);
 > +
 > +	sg_count = edesc->src_nents ?: 1;
 > +	if (is_sec1 && sg_count > 1)
-> +		sg_copy_to_buffer(edesc->src, sg_count, edesc->buf, length);
-> +	else if (length)
-> +		sg_count = dma_map_sg(dev, edesc->src, sg_count, DMA_TO_DEVICE);
-> +
+> +		sg_copy_to_buffer(areq->src, sg_count, edesc->buf,
+> +				  cryptlen);
+> +	else
+> +		sg_count = dma_map_sg(dev, areq->src, sg_count,
+> +				      (areq->src == areq->dst) ?
+> +				      DMA_BIDIRECTIONAL : DMA_TO_DEVICE);
 > +	/*
-> +	 * data in
+> +	 * cipher in
 > +	 */
-> +	sg_count = talitos_sg_map(dev, edesc->src, length, edesc, &desc->ptr[3],
-> +				  sg_count, 0, 0);
+> +	sg_count = talitos_sg_map_ext(dev, areq->src, cryptlen, edesc, &desc->ptr[3],
+> +				      sg_count, 0, 0, 0, false, is_ctr ? 16 : 1);
 > +	if (sg_count > 1)
 > +		sync_needed = true;
 > +
-> +	/* fifth DWORD empty */
+> +	/* cipher out */
+> +	if (areq->src != areq->dst) {
+> +		sg_count = edesc->dst_nents ? : 1;
+> +		if (!is_sec1 || sg_count == 1)
+> +			dma_map_sg(dev, areq->dst, sg_count, DMA_FROM_DEVICE);
+> +	}
 > +
-> +	/* hash/HMAC out -or- hash context out */
-> +	if (edesc->last && req_ctx->last_request)
-> +		map_single_talitos_ptr(dev, &desc->ptr[5],
-> +				       crypto_ahash_digestsize(tfm),
-> +				       req_ctx->hw_context, DMA_FROM_DEVICE);
-> +	else
-> +		map_single_talitos_ptr_nosync(dev, &desc->ptr[5],
-> +					      req_ctx->hw_context_size,
-> +					      req_ctx->hw_context,
-> +					      DMA_FROM_DEVICE);
+> +	ret = talitos_sg_map(dev, areq->dst, cryptlen, edesc, &desc->ptr[4],
+> +			     sg_count, 0, (edesc->src_nents + 1));
+> +	if (ret > 1)
+> +		sync_needed = true;
+> +
+> +	/* iv out */
+> +	map_single_talitos_ptr(dev, &desc->ptr[5], ivsize, ctx->iv,
+> +			       DMA_FROM_DEVICE);
 > +
 > +	/* last DWORD empty */
-> +
-> +	if (is_sec1 && from_talitos_ptr_len(&desc->ptr[3], true) == 0)
-> +		talitos_handle_buggy_hash(ctx, edesc, &desc->ptr[3]);
 > +
 > +	if (sync_needed)
 > +		dma_sync_single_for_device(dev, edesc->dma_link_tbl,
 > +					   edesc->dma_len, DMA_BIDIRECTIONAL);
-> +}
 > +
-> +static struct talitos_edesc *ahash_edesc_alloc(struct ahash_request *areq,
-> +					       struct scatterlist *src,
-> +					       unsigned int nbytes)
-> +{
-> +	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-> +	struct talitos_ctx *ctx = crypto_ahash_ctx(tfm);
-> +
-> +	return talitos_edesc_alloc(ctx->dev, src, NULL, NULL, 0,
-> +				   nbytes, 0, 0, 0, areq->base.flags, false);
-> +}
-> +
-> +static struct talitos_edesc *
-> +ahash_process_req_prepare(struct ahash_request *areq, unsigned int nbytes,
-> +			  unsigned int blocksize, bool is_sec1)
-> +{
-> +	struct talitos_ctx *ctx = crypto_ahash_ctx(crypto_ahash_reqtfm(areq));
-> +	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
-> +	struct talitos_edesc *first = NULL, *prev_edesc = NULL, *edesc;
-> +	size_t desc_max = is_sec1 ? TALITOS1_MAX_DATA_LEN :
-> +				    TALITOS2_MAX_DATA_LEN;
-> +	struct scatterlist tmp[2];
-> +	size_t to_hash_this_desc;
-> +	struct scatterlist *src;
-> +	size_t offset = 0;
-> +
-> +	do {
-> +		src = scatterwalk_ffwd(tmp, areq->src, offset);
-> +
-> +		to_hash_this_desc =
-> +			min(nbytes, ALIGN_DOWN(desc_max, blocksize));
-> +
-> +		/* Allocate extended descriptor */
-> +		edesc = ahash_edesc_alloc(areq, src, to_hash_this_desc);
-> +		if (IS_ERR(edesc)) {
-> +			if (first)
-> +				free_edesc_list_from(areq, first);
-> +			return edesc;
-> +		}
-> +
-> +		edesc->src = scatterwalk_ffwd(edesc->bufsl, areq->src, offset);
-> +		edesc->desc.hdr = ctx->desc_hdr_template;
-> +		edesc->first = offset == 0;
-> +		edesc->last = nbytes - to_hash_this_desc == 0;
-> +
-> +		/* On last one, request SEC to pad; otherwise continue */
-> +		if (req_ctx->last_request && edesc->last)
-> +			edesc->desc.hdr |= DESC_HDR_MODE0_MDEU_PAD;
-> +		else
-> +			edesc->desc.hdr |= DESC_HDR_MODE0_MDEU_CONT;
-> +
-> +		/* request SEC to INIT hash. */
-> +		if (req_ctx->first_request && edesc->first && !req_ctx->swinit)
-> +			edesc->desc.hdr |= DESC_HDR_MODE0_MDEU_INIT;
-> +
-> +		/*
-> +		 * When the tfm context has a keylen, it's an HMAC.
-> +		 * A first or last (ie. not middle) descriptor must request HMAC.
-> +		 */
-> +		if (ctx->keylen && ((req_ctx->first_request && edesc->first) ||
-> +				    (req_ctx->last_request && edesc->last)))
-> +			edesc->desc.hdr |= DESC_HDR_MODE0_MDEU_HMAC;
-> +
-> +		/* clear the DN bit  */
-> +		if (is_sec1 && !edesc->last)
-> +			edesc->desc.hdr &= ~DESC_HDR_DONE_NOTIFY;
-> +
-> +		common_nonsnoop_hash(edesc, areq, to_hash_this_desc);
-> +
-> +		offset += to_hash_this_desc;
-> +		nbytes -= to_hash_this_desc;
-> +
-> +		if (!prev_edesc)
-> +			first = edesc;
-> +		else
-> +			prev_edesc->next_desc = edesc;
-> +		prev_edesc = edesc;
-> +	} while (nbytes);
-> +
-> +	return first;
-> +}
-> +
-> +static int ahash_process_req(struct ahash_request *areq, unsigned int nbytes)
-> +{
-> +	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-> +	struct talitos_ctx *ctx = crypto_ahash_ctx(tfm);
-> +	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
-> +	struct talitos_edesc *edesc;
-> +	unsigned int blocksize =
-> +			crypto_tfm_alg_blocksize(crypto_ahash_tfm(tfm));
-> +	bool is_sec1 = has_ftr_sec1(dev_get_drvdata(ctx->dev));
-> +	unsigned int nbytes_to_hash;
-> +	unsigned int to_hash_later;
-> +	struct device *dev = ctx->dev;
-> +	int ret;
-> +
-> +	nbytes_to_hash = ALIGN_DOWN(nbytes, blocksize);
-> +	to_hash_later = nbytes - nbytes_to_hash;
-> +
-> +	if (req_ctx->last_request) {
-> +		nbytes_to_hash = nbytes;
-> +		to_hash_later = 0;
+> +	ret = talitos_submit(dev, ctx->ch, desc, callback, areq);
+> +	if (ret != -EINPROGRESS) {
+> +		common_nonsnoop_unmap(dev, edesc, areq);
+> +		kfree(edesc);
 > +	}
-> +
-> +	req_ctx->to_hash_later = to_hash_later;
-> +
-> +	edesc = ahash_process_req_prepare(areq, nbytes_to_hash, blocksize,
-> +					  is_sec1);
-> +	if (IS_ERR(edesc))
-> +		return PTR_ERR(edesc);
-> +
-> +	ret = talitos_submit(dev, ctx->ch, &edesc->desc, ahash_done, areq);
-> +	if (ret != -EINPROGRESS)
-> +		free_edesc_list_from(areq, edesc);
-> +
 > +	return ret;
 > +}
 > +
-> +static int ahash_init(struct ahash_request *areq)
+> +static int skcipher_setkey(struct crypto_skcipher *cipher,
+> +			     const u8 *key, unsigned int keylen)
 > +{
-> +	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-> +	struct talitos_ctx *ctx = crypto_ahash_ctx(tfm);
+> +	struct talitos_ctx *ctx = crypto_skcipher_ctx(cipher);
 > +	struct device *dev = ctx->dev;
-> +	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
-> +	unsigned int size;
-> +	dma_addr_t dma;
-> +
-> +	/* Initialize the context */
-> +	req_ctx->first_request = 1;
-> +	req_ctx->swinit = 0; /* assume h/w init of context */
-> +	size =	(crypto_ahash_digestsize(tfm) <= SHA256_DIGEST_SIZE)
-> +			? TALITOS_MDEU_CONTEXT_SIZE_MD5_SHA1_SHA256
-> +			: TALITOS_MDEU_CONTEXT_SIZE_SHA384_SHA512;
-> +	req_ctx->hw_context_size = size;
-> +	req_ctx->last_request = 0;
-> +
-> +	dma = dma_map_single(dev, req_ctx->hw_context, req_ctx->hw_context_size,
-> +			     DMA_TO_DEVICE);
-> +	dma_unmap_single(dev, dma, req_ctx->hw_context_size, DMA_TO_DEVICE);
-> +
-> +	return 0;
-> +}
-> +
-> +/*
-> + * on h/w without explicit sha224 support, we initialize h/w context
-> + * manually with sha224 constants, and tell it to run sha256.
-> + */
-> +static int ahash_init_sha224_swinit(struct ahash_request *areq)
-> +{
-> +	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
-> +
-> +	req_ctx->hw_context[0] = SHA224_H0;
-> +	req_ctx->hw_context[1] = SHA224_H1;
-> +	req_ctx->hw_context[2] = SHA224_H2;
-> +	req_ctx->hw_context[3] = SHA224_H3;
-> +	req_ctx->hw_context[4] = SHA224_H4;
-> +	req_ctx->hw_context[5] = SHA224_H5;
-> +	req_ctx->hw_context[6] = SHA224_H6;
-> +	req_ctx->hw_context[7] = SHA224_H7;
-> +
-> +	/* init 64-bit count */
-> +	req_ctx->hw_context[8] = 0;
-> +	req_ctx->hw_context[9] = 0;
-> +
-> +	ahash_init(areq);
-> +	req_ctx->swinit = 1;/* prevent h/w initting context with sha256 values*/
-> +
-> +	return 0;
-> +}
-> +
-> +static int ahash_update(struct ahash_request *areq)
-> +{
-> +	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
-> +
-> +	req_ctx->last_request = 0;
-> +
-> +	return ahash_process_req(areq, areq->nbytes);
-> +}
-> +
-> +static int ahash_final(struct ahash_request *areq)
-> +{
-> +	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
-> +
-> +	req_ctx->last_request = 1;
-> +
-> +	return ahash_process_req(areq, 0);
-> +}
-> +
-> +static int ahash_finup(struct ahash_request *areq)
-> +{
-> +	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
-> +
-> +	req_ctx->last_request = 1;
-> +
-> +	return ahash_process_req(areq, areq->nbytes);
-> +}
-> +
-> +static int ahash_digest(struct ahash_request *areq)
-> +{
-> +	ahash_init(areq);
-> +	return ahash_finup(areq);
-> +}
-> +
-> +static int ahash_digest_sha224_swinit(struct ahash_request *areq)
-> +{
-> +	ahash_init_sha224_swinit(areq);
-> +	return ahash_finup(areq);
-> +}
-> +
-> +static int ahash_export(struct ahash_request *areq, void *out)
-> +{
-> +	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
-> +	struct talitos_export_state *export = out;
-> +	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-> +	struct talitos_ctx *ctx = crypto_ahash_ctx(tfm);
-> +	struct device *dev = ctx->dev;
-> +	dma_addr_t dma;
-> +
-> +	dma = dma_map_single(dev, req_ctx->hw_context, req_ctx->hw_context_size,
-> +			     DMA_FROM_DEVICE);
-> +	dma_unmap_single(dev, dma, req_ctx->hw_context_size, DMA_FROM_DEVICE);
-> +
-> +	memcpy(export->hw_context, req_ctx->hw_context,
-> +	       req_ctx->hw_context_size);
-> +	export->swinit = req_ctx->swinit;
-> +	export->first_request = req_ctx->first_request;
-> +	export->last_request = req_ctx->last_request;
-> +	export->to_hash_later = req_ctx->to_hash_later;
-> +
-> +	return 0;
-> +}
-> +
-> +static int ahash_import(struct ahash_request *areq, const void *in)
-> +{
-> +	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
-> +	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-> +	struct talitos_ctx *ctx = crypto_ahash_ctx(tfm);
-> +	struct device *dev = ctx->dev;
-> +	const struct talitos_export_state *export = in;
-> +	unsigned int size;
-> +	dma_addr_t dma;
-> +
-> +	memset(req_ctx, 0, sizeof(*req_ctx));
-> +	size = (crypto_ahash_digestsize(tfm) <= SHA256_DIGEST_SIZE)
-> +			? TALITOS_MDEU_CONTEXT_SIZE_MD5_SHA1_SHA256
-> +			: TALITOS_MDEU_CONTEXT_SIZE_SHA384_SHA512;
-> +	req_ctx->hw_context_size = size;
-> +	memcpy(req_ctx->hw_context, export->hw_context, size);
-> +	req_ctx->swinit = export->swinit;
-> +	req_ctx->first_request = export->first_request;
-> +	req_ctx->last_request = export->last_request;
-> +	req_ctx->to_hash_later = export->to_hash_later;
-> +
-> +	dma = dma_map_single(dev, req_ctx->hw_context, req_ctx->hw_context_size,
-> +			     DMA_TO_DEVICE);
-> +	dma_unmap_single(dev, dma, req_ctx->hw_context_size, DMA_TO_DEVICE);
-> +
-> +	return 0;
-> +}
-> +
-> +static int keyhash(struct crypto_ahash *tfm, const u8 *key, unsigned int keylen,
-> +		   u8 *hash)
-> +{
-> +	struct talitos_ctx *ctx = crypto_tfm_ctx(crypto_ahash_tfm(tfm));
-> +
-> +	struct scatterlist sg[1];
-> +	struct ahash_request *req;
-> +	struct crypto_wait wait;
-> +	int ret;
-> +
-> +	crypto_init_wait(&wait);
-> +
-> +	req = ahash_request_alloc(tfm, GFP_KERNEL);
-> +	if (!req)
-> +		return -ENOMEM;
-> +
-> +	/* Keep tfm keylen == 0 during hash of the long key */
-> +	ctx->keylen = 0;
-> +	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-> +				   crypto_req_done, &wait);
-> +
-> +	sg_init_one(&sg[0], key, keylen);
-> +
-> +	ahash_request_set_crypt(req, sg, hash, keylen);
-> +	ret = crypto_wait_req(crypto_ahash_digest(req), &wait);
-> +
-> +	ahash_request_free(req);
-> +
-> +	return ret;
-> +}
-> +
-> +static int ahash_setkey(struct crypto_ahash *tfm, const u8 *key,
-> +			unsigned int keylen)
-> +{
-> +	struct talitos_ctx *ctx = crypto_tfm_ctx(crypto_ahash_tfm(tfm));
-> +	struct device *dev = ctx->dev;
-> +	unsigned int blocksize =
-> +			crypto_tfm_alg_blocksize(crypto_ahash_tfm(tfm));
-> +	unsigned int digestsize = crypto_ahash_digestsize(tfm);
-> +	unsigned int keysize = keylen;
-> +	u8 hash[SHA512_DIGEST_SIZE];
-> +	int ret;
-> +
-> +	if (keylen <= blocksize)
-> +		memcpy(ctx->key, key, keysize);
-> +	else {
-> +		/* Must get the hash of the long key */
-> +		ret = keyhash(tfm, key, keylen, hash);
-> +
-> +		if (ret)
-> +			return -EINVAL;
-> +
-> +		keysize = digestsize;
-> +		memcpy(ctx->key, hash, digestsize);
-> +	}
 > +
 > +	if (ctx->keylen)
 > +		dma_unmap_single(dev, ctx->dma_key, ctx->keylen, DMA_TO_DEVICE);
 > +
-> +	ctx->keylen = keysize;
-> +	ctx->dma_key = dma_map_single(dev, ctx->key, keysize, DMA_TO_DEVICE);
+> +	memcpy(&ctx->key, key, keylen);
+> +	ctx->keylen = keylen;
+> +
+> +	ctx->dma_key = dma_map_single(dev, ctx->key, keylen, DMA_TO_DEVICE);
 > +
 > +	return 0;
 > +}
 > +
-> +static int talitos_cra_init_ahash(struct crypto_tfm *tfm)
+> +static int skcipher_des_setkey(struct crypto_skcipher *cipher,
+> +				 const u8 *key, unsigned int keylen)
 > +{
-> +	struct crypto_alg *alg = tfm->__crt_alg;
+> +	return verify_skcipher_des_key(cipher, key) ?:
+> +	       skcipher_setkey(cipher, key, keylen);
+> +}
+> +
+> +static int skcipher_des3_setkey(struct crypto_skcipher *cipher,
+> +				  const u8 *key, unsigned int keylen)
+> +{
+> +	return verify_skcipher_des3_key(cipher, key) ?:
+> +	       skcipher_setkey(cipher, key, keylen);
+> +}
+> +
+> +static int skcipher_aes_setkey(struct crypto_skcipher *cipher,
+> +				  const u8 *key, unsigned int keylen)
+> +{
+> +	if (keylen == AES_KEYSIZE_128 || keylen == AES_KEYSIZE_192 ||
+> +	    keylen == AES_KEYSIZE_256)
+> +		return skcipher_setkey(cipher, key, keylen);
+> +
+> +	return -EINVAL;
+> +}
+> +
+> +static struct talitos_edesc *skcipher_edesc_alloc(struct skcipher_request *
+> +						    areq, bool encrypt)
+> +{
+> +	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(areq);
+> +	struct talitos_ctx *ctx = crypto_skcipher_ctx(cipher);
+> +	unsigned int ivsize = crypto_skcipher_ivsize(cipher);
+> +
+> +	return talitos_edesc_alloc(ctx->dev, areq->src, areq->dst,
+> +				   areq->iv, 0, areq->cryptlen, 0, ivsize, 0,
+> +				   areq->base.flags, encrypt);
+> +}
+> +
+> +static int skcipher_encrypt(struct skcipher_request *areq)
+> +{
+> +	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(areq);
+> +	struct talitos_ctx *ctx = crypto_skcipher_ctx(cipher);
+> +	struct talitos_edesc *edesc;
+> +	unsigned int blocksize =
+> +			crypto_tfm_alg_blocksize(crypto_skcipher_tfm(cipher));
+> +
+> +	if (!areq->cryptlen)
+> +		return 0;
+> +
+> +	if (areq->cryptlen % blocksize)
+> +		return -EINVAL;
+> +
+> +	/* allocate extended descriptor */
+> +	edesc = skcipher_edesc_alloc(areq, true);
+> +	if (IS_ERR(edesc))
+> +		return PTR_ERR(edesc);
+> +
+> +	/* set encrypt */
+> +	edesc->desc.hdr = ctx->desc_hdr_template | DESC_HDR_MODE0_ENCRYPT;
+> +
+> +	return common_nonsnoop(edesc, areq, skcipher_done);
+> +}
+> +
+> +static int skcipher_decrypt(struct skcipher_request *areq)
+> +{
+> +	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(areq);
+> +	struct talitos_ctx *ctx = crypto_skcipher_ctx(cipher);
+> +	struct talitos_edesc *edesc;
+> +	unsigned int blocksize =
+> +			crypto_tfm_alg_blocksize(crypto_skcipher_tfm(cipher));
+> +
+> +	if (!areq->cryptlen)
+> +		return 0;
+> +
+> +	if (areq->cryptlen % blocksize)
+> +		return -EINVAL;
+> +
+> +	/* allocate extended descriptor */
+> +	edesc = skcipher_edesc_alloc(areq, false);
+> +	if (IS_ERR(edesc))
+> +		return PTR_ERR(edesc);
+> +
+> +	edesc->desc.hdr = ctx->desc_hdr_template | DESC_HDR_DIR_INBOUND;
+> +
+> +	return common_nonsnoop(edesc, areq, skcipher_done);
+> +}
+> +
+> +static int talitos_cra_init_skcipher(struct crypto_skcipher *tfm)
+> +{
+> +	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
 > +	struct talitos_crypto_alg *talitos_alg;
-> +	struct talitos_ctx *ctx = crypto_tfm_ctx(tfm);
+> +	struct talitos_ctx *ctx = crypto_skcipher_ctx(tfm);
 > +
-> +	talitos_alg = container_of(__crypto_ahash_alg(alg),
-> +				   struct talitos_crypto_alg,
-> +				   algt.alg.hash);
-> +
-> +	ctx->keylen = 0;
-> +				 sizeof(struct talitos_ahash_req_ctx));
+> +	talitos_alg = container_of(alg, struct talitos_crypto_alg,
+> +				   algt.alg.skcipher);
 > +
 > +	return talitos_init_common(ctx, talitos_alg);
 > +}
 > +
-> +static struct talitos_alg_template hash_driver_algs[] = {
-> +	{	.type = CRYPTO_ALG_TYPE_AHASH,
-> +		.alg.hash = {
-> +			.halg.digestsize = MD5_DIGEST_SIZE,
-> +			.halg.statesize = sizeof(struct talitos_export_state),
-> +			.halg.base = {
-> +				.cra_name = "md5",
-> +				.cra_driver_name = "md5-talitos",
-> +				.cra_blocksize = MD5_HMAC_BLOCK_SIZE,
-> +				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
-> +				.cra_flags = CRYPTO_ALG_ASYNC |
-> +					     CRYPTO_ALG_ALLOCATES_MEMORY |
-> +					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
-> +					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
-> +			}
+> +static struct talitos_alg_template skcipher_driver_algs[] = {
+> +	{	.type = CRYPTO_ALG_TYPE_SKCIPHER,
+> +		.alg.skcipher = {
+> +			.base.cra_name = "ecb(aes)",
+> +			.base.cra_driver_name = "ecb-aes-talitos",
+> +			.base.cra_blocksize = AES_BLOCK_SIZE,
+> +			.base.cra_flags = CRYPTO_ALG_ASYNC |
+> +					  CRYPTO_ALG_ALLOCATES_MEMORY,
+> +			.min_keysize = AES_MIN_KEY_SIZE,
+> +			.max_keysize = AES_MAX_KEY_SIZE,
+> +			.setkey = skcipher_aes_setkey,
 > +		},
 > +		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> +				     DESC_HDR_SEL0_MDEUA |
-> +				     DESC_HDR_MODE0_MDEU_MD5,
+> +				     DESC_HDR_SEL0_AESU,
 > +	},
-> +	{	.type = CRYPTO_ALG_TYPE_AHASH,
-> +		.alg.hash = {
-> +			.halg.digestsize = SHA1_DIGEST_SIZE,
-> +			.halg.statesize = sizeof(struct talitos_export_state),
-> +			.halg.base = {
-> +				.cra_name = "sha1",
-> +				.cra_driver_name = "sha1-talitos",
-> +				.cra_blocksize = SHA1_BLOCK_SIZE,
-> +				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
-> +				.cra_flags = CRYPTO_ALG_ASYNC |
-> +					     CRYPTO_ALG_ALLOCATES_MEMORY |
-> +					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
-> +					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
-> +			}
+> +	{	.type = CRYPTO_ALG_TYPE_SKCIPHER,
+> +		.alg.skcipher = {
+> +			.base.cra_name = "cbc(aes)",
+> +			.base.cra_driver_name = "cbc-aes-talitos",
+> +			.base.cra_blocksize = AES_BLOCK_SIZE,
+> +			.base.cra_flags = CRYPTO_ALG_ASYNC |
+> +					  CRYPTO_ALG_ALLOCATES_MEMORY,
+> +			.min_keysize = AES_MIN_KEY_SIZE,
+> +			.max_keysize = AES_MAX_KEY_SIZE,
+> +			.ivsize = AES_BLOCK_SIZE,
+> +			.setkey = skcipher_aes_setkey,
 > +		},
 > +		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> +				     DESC_HDR_SEL0_MDEUA |
-> +				     DESC_HDR_MODE0_MDEU_SHA1,
+> +				     DESC_HDR_SEL0_AESU |
+> +				     DESC_HDR_MODE0_AESU_CBC,
 > +	},
-> +	{	.type = CRYPTO_ALG_TYPE_AHASH,
-> +		.alg.hash = {
-> +			.halg.digestsize = SHA224_DIGEST_SIZE,
-> +			.halg.statesize = sizeof(struct talitos_export_state),
-> +			.halg.base = {
-> +				.cra_name = "sha224",
-> +				.cra_driver_name = "sha224-talitos",
-> +				.cra_blocksize = SHA224_BLOCK_SIZE,
-> +				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
-> +				.cra_flags = CRYPTO_ALG_ASYNC |
-> +					     CRYPTO_ALG_ALLOCATES_MEMORY |
-> +					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
-> +					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
-> +			}
+> +	{	.type = CRYPTO_ALG_TYPE_SKCIPHER,
+> +		.alg.skcipher = {
+> +			.base.cra_name = "ctr(aes)",
+> +			.base.cra_driver_name = "ctr-aes-talitos",
+> +			.base.cra_blocksize = 1,
+> +			.base.cra_flags = CRYPTO_ALG_ASYNC |
+> +					  CRYPTO_ALG_ALLOCATES_MEMORY,
+> +			.min_keysize = AES_MIN_KEY_SIZE,
+> +			.max_keysize = AES_MAX_KEY_SIZE,
+> +			.ivsize = AES_BLOCK_SIZE,
+> +			.setkey = skcipher_aes_setkey,
 > +		},
-> +		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> +				     DESC_HDR_SEL0_MDEUA |
-> +				     DESC_HDR_MODE0_MDEU_SHA224,
+> +		.desc_hdr_template = DESC_HDR_TYPE_AESU_CTR_NONSNOOP |
+> +				     DESC_HDR_SEL0_AESU |
+> +				     DESC_HDR_MODE0_AESU_CTR,
 > +	},
-> +	{	.type = CRYPTO_ALG_TYPE_AHASH,
-> +		.alg.hash = {
-> +			.halg.digestsize = SHA256_DIGEST_SIZE,
-> +			.halg.statesize = sizeof(struct talitos_export_state),
-> +			.halg.base = {
-> +				.cra_name = "sha256",
-> +				.cra_driver_name = "sha256-talitos",
-> +				.cra_blocksize = SHA256_BLOCK_SIZE,
-> +				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
-> +				.cra_flags = CRYPTO_ALG_ASYNC |
-> +					     CRYPTO_ALG_ALLOCATES_MEMORY |
-> +					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
-> +					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
-> +			}
+> +	{	.type = CRYPTO_ALG_TYPE_SKCIPHER,
+> +		.alg.skcipher = {
+> +			.base.cra_name = "ctr(aes)",
+> +			.base.cra_driver_name = "ctr-aes-talitos",
+> +			.base.cra_blocksize = 1,
+> +			.base.cra_flags = CRYPTO_ALG_ASYNC |
+> +					  CRYPTO_ALG_ALLOCATES_MEMORY,
+> +			.min_keysize = AES_MIN_KEY_SIZE,
+> +			.max_keysize = AES_MAX_KEY_SIZE,
+> +			.ivsize = AES_BLOCK_SIZE,
+> +			.setkey = skcipher_aes_setkey,
 > +		},
 > +		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> +				     DESC_HDR_SEL0_MDEUA |
-> +				     DESC_HDR_MODE0_MDEU_SHA256,
+> +				     DESC_HDR_SEL0_AESU |
+> +				     DESC_HDR_MODE0_AESU_CTR,
 > +	},
-> +	{	.type = CRYPTO_ALG_TYPE_AHASH,
-> +		.alg.hash = {
-> +			.halg.digestsize = SHA384_DIGEST_SIZE,
-> +			.halg.statesize = sizeof(struct talitos_export_state),
-> +			.halg.base = {
-> +				.cra_name = "sha384",
-> +				.cra_driver_name = "sha384-talitos",
-> +				.cra_blocksize = SHA384_BLOCK_SIZE,
-> +				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
-> +				.cra_flags = CRYPTO_ALG_ASYNC |
-> +					     CRYPTO_ALG_ALLOCATES_MEMORY |
-> +					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
-> +					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
-> +			}
+> +	{	.type = CRYPTO_ALG_TYPE_SKCIPHER,
+> +		.alg.skcipher = {
+> +			.base.cra_name = "ecb(des)",
+> +			.base.cra_driver_name = "ecb-des-talitos",
+> +			.base.cra_blocksize = DES_BLOCK_SIZE,
+> +			.base.cra_flags = CRYPTO_ALG_ASYNC |
+> +					  CRYPTO_ALG_ALLOCATES_MEMORY,
+> +			.min_keysize = DES_KEY_SIZE,
+> +			.max_keysize = DES_KEY_SIZE,
+> +			.setkey = skcipher_des_setkey,
 > +		},
 > +		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> +				     DESC_HDR_SEL0_MDEUB |
-> +				     DESC_HDR_MODE0_MDEUB_SHA384,
+> +				     DESC_HDR_SEL0_DEU,
 > +	},
-> +	{	.type = CRYPTO_ALG_TYPE_AHASH,
-> +		.alg.hash = {
-> +			.halg.digestsize = SHA512_DIGEST_SIZE,
-> +			.halg.statesize = sizeof(struct talitos_export_state),
-> +			.halg.base = {
-> +				.cra_name = "sha512",
-> +				.cra_driver_name = "sha512-talitos",
-> +				.cra_blocksize = SHA512_BLOCK_SIZE,
-> +				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
-> +				.cra_flags = CRYPTO_ALG_ASYNC |
-> +					     CRYPTO_ALG_ALLOCATES_MEMORY |
-> +					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
-> +					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
-> +			}
+> +	{	.type = CRYPTO_ALG_TYPE_SKCIPHER,
+> +		.alg.skcipher = {
+> +			.base.cra_name = "cbc(des)",
+> +			.base.cra_driver_name = "cbc-des-talitos",
+> +			.base.cra_blocksize = DES_BLOCK_SIZE,
+> +			.base.cra_flags = CRYPTO_ALG_ASYNC |
+> +					  CRYPTO_ALG_ALLOCATES_MEMORY,
+> +			.min_keysize = DES_KEY_SIZE,
+> +			.max_keysize = DES_KEY_SIZE,
+> +			.ivsize = DES_BLOCK_SIZE,
+> +			.setkey = skcipher_des_setkey,
 > +		},
 > +		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> +				     DESC_HDR_SEL0_MDEUB |
-> +				     DESC_HDR_MODE0_MDEUB_SHA512,
+> +				     DESC_HDR_SEL0_DEU |
+> +				     DESC_HDR_MODE0_DEU_CBC,
 > +	},
-> +	{	.type = CRYPTO_ALG_TYPE_AHASH,
-> +		.alg.hash = {
-> +			.halg.digestsize = MD5_DIGEST_SIZE,
-> +			.halg.statesize = sizeof(struct talitos_export_state),
-> +			.halg.base = {
-> +				.cra_name = "hmac(md5)",
-> +				.cra_driver_name = "hmac-md5-talitos",
-> +				.cra_blocksize = MD5_HMAC_BLOCK_SIZE,
-> +				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
-> +				.cra_flags = CRYPTO_ALG_ASYNC |
-> +					     CRYPTO_ALG_ALLOCATES_MEMORY |
-> +					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
-> +					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
-> +			}
+> +	{	.type = CRYPTO_ALG_TYPE_SKCIPHER,
+> +		.alg.skcipher = {
+> +			.base.cra_name = "ecb(des3_ede)",
+> +			.base.cra_driver_name = "ecb-3des-talitos",
+> +			.base.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+> +			.base.cra_flags = CRYPTO_ALG_ASYNC |
+> +					  CRYPTO_ALG_ALLOCATES_MEMORY,
+> +			.min_keysize = DES3_EDE_KEY_SIZE,
+> +			.max_keysize = DES3_EDE_KEY_SIZE,
+> +			.setkey = skcipher_des3_setkey,
 > +		},
 > +		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> +				     DESC_HDR_SEL0_MDEUA |
-> +				     DESC_HDR_MODE0_MDEU_MD5,
+> +				     DESC_HDR_SEL0_DEU |
+> +				     DESC_HDR_MODE0_DEU_3DES,
 > +	},
-> +	{	.type = CRYPTO_ALG_TYPE_AHASH,
-> +		.alg.hash = {
-> +			.halg.digestsize = SHA1_DIGEST_SIZE,
-> +			.halg.statesize = sizeof(struct talitos_export_state),
-> +			.halg.base = {
-> +				.cra_name = "hmac(sha1)",
-> +				.cra_driver_name = "hmac-sha1-talitos",
-> +				.cra_blocksize = SHA1_BLOCK_SIZE,
-> +				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
-> +				.cra_flags = CRYPTO_ALG_ASYNC |
-> +					     CRYPTO_ALG_ALLOCATES_MEMORY |
-> +					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
-> +					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
-> +			}
+> +	{	.type = CRYPTO_ALG_TYPE_SKCIPHER,
+> +		.alg.skcipher = {
+> +			.base.cra_name = "cbc(des3_ede)",
+> +			.base.cra_driver_name = "cbc-3des-talitos",
+> +			.base.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+> +			.base.cra_flags = CRYPTO_ALG_ASYNC |
+> +					  CRYPTO_ALG_ALLOCATES_MEMORY,
+> +			.min_keysize = DES3_EDE_KEY_SIZE,
+> +			.max_keysize = DES3_EDE_KEY_SIZE,
+> +			.ivsize = DES3_EDE_BLOCK_SIZE,
+> +			.setkey = skcipher_des3_setkey,
 > +		},
 > +		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> +				     DESC_HDR_SEL0_MDEUA |
-> +				     DESC_HDR_MODE0_MDEU_SHA1,
+> +				     DESC_HDR_SEL0_DEU |
+> +				     DESC_HDR_MODE0_DEU_CBC |
+> +				     DESC_HDR_MODE0_DEU_3DES,
 > +	},
-> +	{	.type = CRYPTO_ALG_TYPE_AHASH,
-> +		.alg.hash = {
-> +			.halg.digestsize = SHA224_DIGEST_SIZE,
-> +			.halg.statesize = sizeof(struct talitos_export_state),
-> +			.halg.base = {
-> +				.cra_name = "hmac(sha224)",
-> +				.cra_driver_name = "hmac-sha224-talitos",
-> +				.cra_blocksize = SHA224_BLOCK_SIZE,
-> +				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
-> +				.cra_flags = CRYPTO_ALG_ASYNC |
-> +					     CRYPTO_ALG_ALLOCATES_MEMORY |
-> +					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
-> +					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
-> +			}
-> +		},
-> +		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> +				     DESC_HDR_SEL0_MDEUA |
-> +				     DESC_HDR_MODE0_MDEU_SHA224,
-> +	},
-> +	{	.type = CRYPTO_ALG_TYPE_AHASH,
-> +		.alg.hash = {
-> +			.halg.digestsize = SHA256_DIGEST_SIZE,
-> +			.halg.statesize = sizeof(struct talitos_export_state),
-> +			.halg.base = {
-> +				.cra_name = "hmac(sha256)",
-> +				.cra_driver_name = "hmac-sha256-talitos",
-> +				.cra_blocksize = SHA256_BLOCK_SIZE,
-> +				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
-> +				.cra_flags = CRYPTO_ALG_ASYNC |
-> +					     CRYPTO_ALG_ALLOCATES_MEMORY |
-> +					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
-> +					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
-> +			}
-> +		},
-> +		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> +				     DESC_HDR_SEL0_MDEUA |
-> +				     DESC_HDR_MODE0_MDEU_SHA256,
-> +	},
-> +	{	.type = CRYPTO_ALG_TYPE_AHASH,
-> +		.alg.hash = {
-> +			.halg.digestsize = SHA384_DIGEST_SIZE,
-> +			.halg.statesize = sizeof(struct talitos_export_state),
-> +			.halg.base = {
-> +				.cra_name = "hmac(sha384)",
-> +				.cra_driver_name = "hmac-sha384-talitos",
-> +				.cra_blocksize = SHA384_BLOCK_SIZE,
-> +				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
-> +				.cra_flags = CRYPTO_ALG_ASYNC |
-> +					     CRYPTO_ALG_ALLOCATES_MEMORY |
-> +					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
-> +					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
-> +			}
-> +		},
-> +		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> +				     DESC_HDR_SEL0_MDEUB |
-> +				     DESC_HDR_MODE0_MDEUB_SHA384,
-> +	},
-> +	{	.type = CRYPTO_ALG_TYPE_AHASH,
-> +		.alg.hash = {
-> +			.halg.digestsize = SHA512_DIGEST_SIZE,
-> +			.halg.statesize = sizeof(struct talitos_export_state),
-> +			.halg.base = {
-> +				.cra_name = "hmac(sha512)",
-> +				.cra_driver_name = "hmac-sha512-talitos",
-> +				.cra_blocksize = SHA512_BLOCK_SIZE,
-> +				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
-> +				.cra_flags = CRYPTO_ALG_ASYNC |
-> +					     CRYPTO_ALG_ALLOCATES_MEMORY |
-> +					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
-> +					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
-> +			}
-> +		},
-> +		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> +				     DESC_HDR_SEL0_MDEUB |
-> +				     DESC_HDR_MODE0_MDEUB_SHA512,
-> +	}
 > +};
 > +
-> +int talitos_register_hash(struct device *dev)
+> +int talitos_register_skcipher(struct device *dev)
 > +{
 > +	struct talitos_private *priv = dev_get_drvdata(dev);
-> +	struct ahash_alg *ahash_alg;
+> +	struct skcipher_alg *skcipher_alg;
 > +	struct crypto_alg *alg;
 > +	size_t i;
 > +	int ret;
 > +
-> +	for (i = 0; i < ARRAY_SIZE(hash_driver_algs); i++) {
-> +		if (!talitos_hw_supports(dev,
-> +					 hash_driver_algs[i].desc_hdr_template))
+> +	for (i = 0; i < ARRAY_SIZE(skcipher_driver_algs); i++) {
+> +		if (!talitos_hw_supports(
+> +			    dev, skcipher_driver_algs[i].desc_hdr_template))
 > +			continue;
 > +
-> +		ahash_alg = &hash_driver_algs[i].alg.hash;
-> +		alg = &ahash_alg->halg.base;
+> +		skcipher_alg = &skcipher_driver_algs[i].alg.skcipher;
+> +		alg = &skcipher_alg->base;
 > +
-> +		alg->cra_init = talitos_cra_init_ahash;
 > +		alg->cra_exit = talitos_cra_exit;
-> +		ahash_alg->init = ahash_init;
-> +		ahash_alg->update = ahash_update;
-> +		ahash_alg->final = ahash_final;
-> +		ahash_alg->finup = ahash_finup;
-> +		ahash_alg->digest = ahash_digest;
-> +		if (!strncmp(alg->cra_name, "hmac", 4))
-> +			ahash_alg->setkey = ahash_setkey;
-> +		ahash_alg->import = ahash_import;
-> +		ahash_alg->export = ahash_export;
+> +		skcipher_alg->init = talitos_cra_init_skcipher;
+> +		skcipher_alg->setkey = skcipher_alg->setkey ?: skcipher_setkey;
+> +		skcipher_alg->encrypt = skcipher_encrypt;
+> +		skcipher_alg->decrypt = skcipher_decrypt;
 > +
-> +		if (!(priv->features & TALITOS_FTR_HMAC_OK) &&
-> +		    !strncmp(alg->cra_name, "hmac", 4)) {
-> +			/* not supported */
+> +		if (!strcmp(alg->cra_name, "ctr(aes)") && !has_ftr_sec1(priv) &&
+> +		    DESC_TYPE(skcipher_driver_algs[i].desc_hdr_template) !=
+> +			    DESC_TYPE(DESC_HDR_TYPE_AESU_CTR_NONSNOOP)) {
 > +			continue;
 > +		}
 > +
-> +		if (!(priv->features & TALITOS_FTR_SHA224_HWINIT) &&
-> +		    (!strcmp(alg->cra_name, "sha224") ||
-> +		     !strcmp(alg->cra_name, "hmac(sha224)"))) {
-> +			ahash_alg->init = ahash_init_sha224_swinit;
-> +			ahash_alg->digest = ahash_digest_sha224_swinit;
-> +			hash_driver_algs[i].desc_hdr_template =
-> +				DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> +				DESC_HDR_SEL0_MDEUA |
-> +				DESC_HDR_MODE0_MDEU_SHA256;
-> +		}
-> +
-> +		ret = talitos_register_common(dev, &hash_driver_algs[i]);
+> +		ret = talitos_register_common(dev, &skcipher_driver_algs[i]);
 > +		if (ret)
 > +			return ret;
 > +	}
@@ -920,790 +480,369 @@ it is transparent as there is a workaround in the driver.
 > +	return 0;
 > +}
 > diff --git a/drivers/crypto/talitos/talitos.c b/drivers/crypto/talitos/talitos.c
-> index 869739dcc4d7..b8bcb970d7d5 100644
+> index b8bcb970d7d5..cd37bc379f86 100644
 > --- a/drivers/crypto/talitos/talitos.c
 > +++ b/drivers/crypto/talitos/talitos.c
-> @@ -831,26 +831,6 @@ DEF_TALITOS2_INTERRUPT(ch1_3, TALITOS2_ISR_CH_1_3_DONE, TALITOS2_ISR_CH_1_3_ERR,
->    */
->   #define TALITOS_CRA_PRIORITY_AEAD_HSNA	(TALITOS_CRA_PRIORITY - 1)
->   
-> -#define HASH_MAX_BLOCK_SIZE		SHA512_BLOCK_SIZE
-> -#define TALITOS_MDEU_MAX_CONTEXT_SIZE	TALITOS_MDEU_CONTEXT_SIZE_SHA384_SHA512
-> -
-> -struct talitos_ahash_req_ctx {
-> -	u32 hw_context[TALITOS_MDEU_MAX_CONTEXT_SIZE / sizeof(u32)];
-> -	unsigned int hw_context_size;
-> -	unsigned int swinit;
-> -	unsigned int first_request;
-> -	unsigned int last_request;
-> -	unsigned int to_hash_later;
-> -};
-> -
-> -struct talitos_export_state {
-> -	u32 hw_context[TALITOS_MDEU_MAX_CONTEXT_SIZE / sizeof(u32)];
-> -	unsigned int swinit;
-> -	unsigned int first_request;
-> -	unsigned int last_request;
-> -	unsigned int to_hash_later;
-> -};
-> -
->   static int aead_setkey(struct crypto_aead *authenc,
->   		       const u8 *key, unsigned int keylen)
->   {
-> @@ -1659,501 +1639,6 @@ static int skcipher_decrypt(struct skcipher_request *areq)
->   	return common_nonsnoop(edesc, areq, skcipher_done);
+> @@ -1430,215 +1430,6 @@ static int aead_decrypt(struct aead_request *req)
+>   	return ipsec_esp(edesc, req, false, ipsec_esp_decrypt_swauth_done);
 >   }
 >   
-> -static void common_nonsnoop_hash_unmap(struct device *dev,
-> -				       struct talitos_edesc *edesc,
-> -				       struct ahash_request *areq)
+> -static int skcipher_setkey(struct crypto_skcipher *cipher,
+> -			     const u8 *key, unsigned int keylen)
 > -{
-> -	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
-> -	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-> -	struct talitos_private *priv = dev_get_drvdata(dev);
-> -	bool is_sec1 = has_ftr_sec1(priv);
-> -	struct talitos_desc *desc = &edesc->desc;
+> -	struct talitos_ctx *ctx = crypto_skcipher_ctx(cipher);
+> -	struct device *dev = ctx->dev;
 > -
-> -	unmap_single_talitos_ptr(dev, &desc->ptr[5], DMA_FROM_DEVICE);
+> -	if (ctx->keylen)
+> -		dma_unmap_single(dev, ctx->dma_key, ctx->keylen, DMA_TO_DEVICE);
 > -
-> -	if (edesc->last && req_ctx->last_request)
-> -		memcpy(areq->result, req_ctx->hw_context,
-> -		       crypto_ahash_digestsize(tfm));
+> -	memcpy(&ctx->key, key, keylen);
+> -	ctx->keylen = keylen;
 > -
-> -	if (edesc->src)
-> -		talitos_sg_unmap(dev, edesc, edesc->src, NULL, 0, 0);
+> -	ctx->dma_key = dma_map_single(dev, ctx->key, keylen, DMA_TO_DEVICE);
 > -
-> -	/* When using hashctx-in, must unmap it. */
-> -	if (from_talitos_ptr_len(&desc->ptr[1], is_sec1))
-> -		unmap_single_talitos_ptr(dev, &desc->ptr[1],
-> -					 DMA_TO_DEVICE);
+> -	return 0;
+> -}
+> -
+> -static int skcipher_des_setkey(struct crypto_skcipher *cipher,
+> -				 const u8 *key, unsigned int keylen)
+> -{
+> -	return verify_skcipher_des_key(cipher, key) ?:
+> -	       skcipher_setkey(cipher, key, keylen);
+> -}
+> -
+> -static int skcipher_des3_setkey(struct crypto_skcipher *cipher,
+> -				  const u8 *key, unsigned int keylen)
+> -{
+> -	return verify_skcipher_des3_key(cipher, key) ?:
+> -	       skcipher_setkey(cipher, key, keylen);
+> -}
+> -
+> -static int skcipher_aes_setkey(struct crypto_skcipher *cipher,
+> -				  const u8 *key, unsigned int keylen)
+> -{
+> -	if (keylen == AES_KEYSIZE_128 || keylen == AES_KEYSIZE_192 ||
+> -	    keylen == AES_KEYSIZE_256)
+> -		return skcipher_setkey(cipher, key, keylen);
+> -
+> -	return -EINVAL;
+> -}
+> -
+> -static void common_nonsnoop_unmap(struct device *dev,
+> -				  struct talitos_edesc *edesc,
+> -				  struct skcipher_request *areq)
+> -{
+> -	unmap_single_talitos_ptr(dev, &edesc->desc.ptr[5], DMA_FROM_DEVICE);
+> -
+> -	talitos_sg_unmap(dev, edesc, areq->src, areq->dst, areq->cryptlen, 0);
+> -	unmap_single_talitos_ptr(dev, &edesc->desc.ptr[1], DMA_TO_DEVICE);
 > -
 > -	if (edesc->dma_len)
 > -		dma_unmap_single(dev, edesc->dma_link_tbl, edesc->dma_len,
 > -				 DMA_BIDIRECTIONAL);
 > -}
 > -
-> -static void free_edesc_list_from(struct ahash_request *areq, struct talitos_edesc *edesc)
+> -static void skcipher_done(struct device *dev,
+> -			    struct talitos_desc *desc, void *context,
+> -			    int err)
 > -{
-> -	struct talitos_ctx *ctx = crypto_ahash_ctx(crypto_ahash_reqtfm(areq));
-> -	struct talitos_edesc *next;
+> -	struct skcipher_request *areq = context;
+> -	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(areq);
+> -	struct talitos_ctx *ctx = crypto_skcipher_ctx(cipher);
+> -	unsigned int ivsize = crypto_skcipher_ivsize(cipher);
+> -	struct talitos_edesc *edesc;
 > -
-> -	while (edesc) {
-> -		next = edesc->next_desc;
-> -		common_nonsnoop_hash_unmap(ctx->dev, edesc, areq);
-> -		kfree(edesc);
-> -		edesc = next;
-> -	}
+> -	edesc = container_of(desc, struct talitos_edesc, desc);
+> -
+> -	common_nonsnoop_unmap(dev, edesc, areq);
+> -	memcpy(areq->iv, ctx->iv, ivsize);
+> -
+> -	kfree(edesc);
+> -
+> -	skcipher_request_complete(areq, err);
 > -}
 > -
-> -static void ahash_done(struct device *dev,
-> -		       struct talitos_desc *desc, void *context,
-> -		       int err)
+> -static int common_nonsnoop(struct talitos_edesc *edesc,
+> -			   struct skcipher_request *areq,
+> -			   void (*callback) (struct device *dev,
+> -					     struct talitos_desc *desc,
+> -					     void *context, int error))
 > -{
-> -	struct ahash_request *areq = context;
-> -	struct talitos_edesc *edesc =
-> -		 container_of(desc, struct talitos_edesc, desc);
-> -	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
-> -	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-> -	bool is_sec1 = has_ftr_sec1(dev_get_drvdata(dev));
-> -	struct talitos_ctx *ctx = crypto_ahash_ctx(tfm);
-> -	struct talitos_edesc *next;
-> -
-> -	if (is_sec1) {
-> -		free_edesc_list_from(areq, edesc);
-> -		ahash_request_complete(areq, err ?: req_ctx->to_hash_later);
-> -	} else {
-> -		next = edesc->next_desc;
-> -
-> -		common_nonsnoop_hash_unmap(dev, edesc, areq);
-> -		kfree(edesc);
-> -
-> -		if (err)
-> -			goto out;
-> -
-> -		if (next) {
-> -			err = talitos_submit(dev, ctx->ch, &next->desc,
-> -					     ahash_done, areq);
-> -			if (err != -EINPROGRESS)
-> -				goto out;
-> -			return;
-> -		}
-> -out:
-> -		if (err && next)
-> -			free_edesc_list_from(areq, next);
-> -		ahash_request_complete(areq, err ?: req_ctx->to_hash_later);
-> -	}
-> -}
-> -
-> -/*
-> - * SEC1 doesn't like hashing of 0 sized message, so we do the padding
-> - * ourself and submit a padded block
-> - */
-> -static void talitos_handle_buggy_hash(struct talitos_ctx *ctx,
-> -			       struct talitos_edesc *edesc,
-> -			       struct talitos_ptr *ptr)
-> -{
-> -	static u8 padded_hash[64] = {
-> -		0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-> -		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-> -		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-> -		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-> -	};
-> -
-> -	pr_err_once("Bug in SEC1, padding ourself\n");
-> -	edesc->desc.hdr &= ~DESC_HDR_MODE0_MDEU_PAD;
-> -	map_single_talitos_ptr(ctx->dev, ptr, sizeof(padded_hash),
-> -			       (char *)padded_hash, DMA_TO_DEVICE);
-> -}
-> -
-> -static void common_nonsnoop_hash(struct talitos_edesc *edesc,
-> -				 struct ahash_request *areq,
-> -				 unsigned int length)
-> -{
-> -	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-> -	struct talitos_ctx *ctx = crypto_ahash_ctx(tfm);
-> -	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
+> -	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(areq);
+> -	struct talitos_ctx *ctx = crypto_skcipher_ctx(cipher);
 > -	struct device *dev = ctx->dev;
 > -	struct talitos_desc *desc = &edesc->desc;
+> -	unsigned int cryptlen = areq->cryptlen;
+> -	unsigned int ivsize = crypto_skcipher_ivsize(cipher);
+> -	int sg_count, ret;
 > -	bool sync_needed = false;
 > -	struct talitos_private *priv = dev_get_drvdata(dev);
 > -	bool is_sec1 = has_ftr_sec1(priv);
-> -	int sg_count;
+> -	bool is_ctr = (desc->hdr & DESC_HDR_SEL0_MASK) == DESC_HDR_SEL0_AESU &&
+> -		      (desc->hdr & DESC_HDR_MODE0_AESU_MASK) == DESC_HDR_MODE0_AESU_CTR;
 > -
 > -	/* first DWORD empty */
 > -
-> -	/* hash context in */
-> -	if (!edesc->first || !req_ctx->first_request || req_ctx->swinit) {
-> -		map_single_talitos_ptr_nosync(dev, &desc->ptr[1],
-> -					      req_ctx->hw_context_size,
-> -					      req_ctx->hw_context,
-> -					      DMA_TO_DEVICE);
-> -		req_ctx->swinit = 0;
-> -	}
-> -	/* Indicate next op is not the first. */
-> -	req_ctx->first_request = 0;
+> -	/* cipher iv */
+> -	to_talitos_ptr(&desc->ptr[1], edesc->iv_dma, ivsize, is_sec1);
 > -
-> -	/* HMAC key */
-> -	if (ctx->keylen)
-> -		to_talitos_ptr(&desc->ptr[2], ctx->dma_key, ctx->keylen,
-> -			       is_sec1);
+> -	/* cipher key */
+> -	to_talitos_ptr(&desc->ptr[2], ctx->dma_key, ctx->keylen, is_sec1);
 > -
 > -	sg_count = edesc->src_nents ?: 1;
 > -	if (is_sec1 && sg_count > 1)
-> -		sg_copy_to_buffer(edesc->src, sg_count, edesc->buf, length);
-> -	else if (length)
-> -		sg_count = dma_map_sg(dev, edesc->src, sg_count, DMA_TO_DEVICE);
-> -
+> -		sg_copy_to_buffer(areq->src, sg_count, edesc->buf,
+> -				  cryptlen);
+> -	else
+> -		sg_count = dma_map_sg(dev, areq->src, sg_count,
+> -				      (areq->src == areq->dst) ?
+> -				      DMA_BIDIRECTIONAL : DMA_TO_DEVICE);
 > -	/*
-> -	 * data in
+> -	 * cipher in
 > -	 */
-> -	sg_count = talitos_sg_map(dev, edesc->src, length, edesc, &desc->ptr[3],
-> -				  sg_count, 0, 0);
+> -	sg_count = talitos_sg_map_ext(dev, areq->src, cryptlen, edesc, &desc->ptr[3],
+> -				      sg_count, 0, 0, 0, false, is_ctr ? 16 : 1);
 > -	if (sg_count > 1)
 > -		sync_needed = true;
 > -
-> -	/* fifth DWORD empty */
+> -	/* cipher out */
+> -	if (areq->src != areq->dst) {
+> -		sg_count = edesc->dst_nents ? : 1;
+> -		if (!is_sec1 || sg_count == 1)
+> -			dma_map_sg(dev, areq->dst, sg_count, DMA_FROM_DEVICE);
+> -	}
 > -
-> -	/* hash/HMAC out -or- hash context out */
-> -	if (edesc->last && req_ctx->last_request)
-> -		map_single_talitos_ptr(dev, &desc->ptr[5],
-> -				       crypto_ahash_digestsize(tfm),
-> -				       req_ctx->hw_context, DMA_FROM_DEVICE);
-> -	else
-> -		map_single_talitos_ptr_nosync(dev, &desc->ptr[5],
-> -					      req_ctx->hw_context_size,
-> -					      req_ctx->hw_context,
-> -					      DMA_FROM_DEVICE);
+> -	ret = talitos_sg_map(dev, areq->dst, cryptlen, edesc, &desc->ptr[4],
+> -			     sg_count, 0, (edesc->src_nents + 1));
+> -	if (ret > 1)
+> -		sync_needed = true;
+> -
+> -	/* iv out */
+> -	map_single_talitos_ptr(dev, &desc->ptr[5], ivsize, ctx->iv,
+> -			       DMA_FROM_DEVICE);
 > -
 > -	/* last DWORD empty */
-> -
-> -	if (is_sec1 && from_talitos_ptr_len(&desc->ptr[3], true) == 0)
-> -		talitos_handle_buggy_hash(ctx, edesc, &desc->ptr[3]);
 > -
 > -	if (sync_needed)
 > -		dma_sync_single_for_device(dev, edesc->dma_link_tbl,
 > -					   edesc->dma_len, DMA_BIDIRECTIONAL);
+> -
+> -	ret = talitos_submit(dev, ctx->ch, desc, callback, areq);
+> -	if (ret != -EINPROGRESS) {
+> -		common_nonsnoop_unmap(dev, edesc, areq);
+> -		kfree(edesc);
+> -	}
+> -	return ret;
 > -}
 > -
-> -static struct talitos_edesc *ahash_edesc_alloc(struct ahash_request *areq,
-> -					       struct scatterlist *src,
-> -					       unsigned int nbytes)
+> -static struct talitos_edesc *skcipher_edesc_alloc(struct skcipher_request *
+> -						    areq, bool encrypt)
 > -{
-> -	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-> -	struct talitos_ctx *ctx = crypto_ahash_ctx(tfm);
+> -	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(areq);
+> -	struct talitos_ctx *ctx = crypto_skcipher_ctx(cipher);
+> -	unsigned int ivsize = crypto_skcipher_ivsize(cipher);
 > -
-> -	return talitos_edesc_alloc(ctx->dev, src, NULL, NULL, 0,
-> -				   nbytes, 0, 0, 0, areq->base.flags, false);
+> -	return talitos_edesc_alloc(ctx->dev, areq->src, areq->dst,
+> -				   areq->iv, 0, areq->cryptlen, 0, ivsize, 0,
+> -				   areq->base.flags, encrypt);
 > -}
 > -
-> -static struct talitos_edesc *
-> -ahash_process_req_prepare(struct ahash_request *areq, unsigned int nbytes,
-> -			  unsigned int blocksize, bool is_sec1)
+> -static int skcipher_encrypt(struct skcipher_request *areq)
 > -{
-> -	struct talitos_ctx *ctx = crypto_ahash_ctx(crypto_ahash_reqtfm(areq));
-> -	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
-> -	struct talitos_edesc *first = NULL, *prev_edesc = NULL, *edesc;
-> -	size_t desc_max = is_sec1 ? TALITOS1_MAX_DATA_LEN :
-> -				    TALITOS2_MAX_DATA_LEN;
-> -	struct scatterlist tmp[2];
-> -	size_t to_hash_this_desc;
-> -	struct scatterlist *src;
-> -	size_t offset = 0;
-> -
-> -	do {
-> -		src = scatterwalk_ffwd(tmp, areq->src, offset);
-> -
-> -		to_hash_this_desc =
-> -			min(nbytes, ALIGN_DOWN(desc_max, blocksize));
-> -
-> -		/* Allocate extended descriptor */
-> -		edesc = ahash_edesc_alloc(areq, src, to_hash_this_desc);
-> -		if (IS_ERR(edesc)) {
-> -			if (first)
-> -				free_edesc_list_from(areq, first);
-> -			return edesc;
-> -		}
-> -
-> -		edesc->src = scatterwalk_ffwd(edesc->bufsl, areq->src, offset);
-> -		edesc->desc.hdr = ctx->desc_hdr_template;
-> -		edesc->first = offset == 0;
-> -		edesc->last = nbytes - to_hash_this_desc == 0;
-> -
-> -		/* On last one, request SEC to pad; otherwise continue */
-> -		if (req_ctx->last_request && edesc->last)
-> -			edesc->desc.hdr |= DESC_HDR_MODE0_MDEU_PAD;
-> -		else
-> -			edesc->desc.hdr |= DESC_HDR_MODE0_MDEU_CONT;
-> -
-> -		/* request SEC to INIT hash. */
-> -		if (req_ctx->first_request && edesc->first && !req_ctx->swinit)
-> -			edesc->desc.hdr |= DESC_HDR_MODE0_MDEU_INIT;
-> -
-> -		/*
-> -		 * When the tfm context has a keylen, it's an HMAC.
-> -		 * A first or last (ie. not middle) descriptor must request HMAC.
-> -		 */
-> -		if (ctx->keylen && ((req_ctx->first_request && edesc->first) ||
-> -				    (req_ctx->last_request && edesc->last)))
-> -			edesc->desc.hdr |= DESC_HDR_MODE0_MDEU_HMAC;
-> -
-> -		/* clear the DN bit  */
-> -		if (is_sec1 && !edesc->last)
-> -			edesc->desc.hdr &= ~DESC_HDR_DONE_NOTIFY;
-> -
-> -		common_nonsnoop_hash(edesc, areq, to_hash_this_desc);
-> -
-> -		offset += to_hash_this_desc;
-> -		nbytes -= to_hash_this_desc;
-> -
-> -		if (!prev_edesc)
-> -			first = edesc;
-> -		else
-> -			prev_edesc->next_desc = edesc;
-> -		prev_edesc = edesc;
-> -	} while (nbytes);
-> -
-> -	return first;
-> -}
-> -
-> -static int ahash_process_req(struct ahash_request *areq, unsigned int nbytes)
-> -{
-> -	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-> -	struct talitos_ctx *ctx = crypto_ahash_ctx(tfm);
-> -	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
+> -	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(areq);
+> -	struct talitos_ctx *ctx = crypto_skcipher_ctx(cipher);
 > -	struct talitos_edesc *edesc;
 > -	unsigned int blocksize =
-> -			crypto_tfm_alg_blocksize(crypto_ahash_tfm(tfm));
-> -	bool is_sec1 = has_ftr_sec1(dev_get_drvdata(ctx->dev));
-> -	unsigned int nbytes_to_hash;
-> -	unsigned int to_hash_later;
-> -	struct device *dev = ctx->dev;
-> -	int ret;
+> -			crypto_tfm_alg_blocksize(crypto_skcipher_tfm(cipher));
 > -
-> -	nbytes_to_hash = ALIGN_DOWN(nbytes, blocksize);
-> -	to_hash_later = nbytes - nbytes_to_hash;
+> -	if (!areq->cryptlen)
+> -		return 0;
 > -
-> -	if (req_ctx->last_request) {
-> -		nbytes_to_hash = nbytes;
-> -		to_hash_later = 0;
-> -	}
+> -	if (areq->cryptlen % blocksize)
+> -		return -EINVAL;
 > -
-> -	req_ctx->to_hash_later = to_hash_later;
-> -
-> -	edesc = ahash_process_req_prepare(areq, nbytes_to_hash, blocksize,
-> -					  is_sec1);
+> -	/* allocate extended descriptor */
+> -	edesc = skcipher_edesc_alloc(areq, true);
 > -	if (IS_ERR(edesc))
 > -		return PTR_ERR(edesc);
 > -
-> -	ret = talitos_submit(dev, ctx->ch, &edesc->desc, ahash_done, areq);
-> -	if (ret != -EINPROGRESS)
-> -		free_edesc_list_from(areq, edesc);
+> -	/* set encrypt */
+> -	edesc->desc.hdr = ctx->desc_hdr_template | DESC_HDR_MODE0_ENCRYPT;
 > -
-> -	return ret;
+> -	return common_nonsnoop(edesc, areq, skcipher_done);
 > -}
 > -
-> -static int ahash_init(struct ahash_request *areq)
+> -static int skcipher_decrypt(struct skcipher_request *areq)
 > -{
-> -	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-> -	struct talitos_ctx *ctx = crypto_ahash_ctx(tfm);
-> -	struct device *dev = ctx->dev;
-> -	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
-> -	unsigned int size;
-> -	dma_addr_t dma;
-> -
-> -	/* Initialize the context */
-> -	req_ctx->first_request = 1;
-> -	req_ctx->swinit = 0; /* assume h/w init of context */
-> -	size =	(crypto_ahash_digestsize(tfm) <= SHA256_DIGEST_SIZE)
-> -			? TALITOS_MDEU_CONTEXT_SIZE_MD5_SHA1_SHA256
-> -			: TALITOS_MDEU_CONTEXT_SIZE_SHA384_SHA512;
-> -	req_ctx->hw_context_size = size;
-> -	req_ctx->last_request = 0;
-> -
-> -	dma = dma_map_single(dev, req_ctx->hw_context, req_ctx->hw_context_size,
-> -			     DMA_TO_DEVICE);
-> -	dma_unmap_single(dev, dma, req_ctx->hw_context_size, DMA_TO_DEVICE);
-> -
-> -	return 0;
-> -}
-> -
-> -/*
-> - * on h/w without explicit sha224 support, we initialize h/w context
-> - * manually with sha224 constants, and tell it to run sha256.
-> - */
-> -static int ahash_init_sha224_swinit(struct ahash_request *areq)
-> -{
-> -	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
-> -
-> -	req_ctx->hw_context[0] = SHA224_H0;
-> -	req_ctx->hw_context[1] = SHA224_H1;
-> -	req_ctx->hw_context[2] = SHA224_H2;
-> -	req_ctx->hw_context[3] = SHA224_H3;
-> -	req_ctx->hw_context[4] = SHA224_H4;
-> -	req_ctx->hw_context[5] = SHA224_H5;
-> -	req_ctx->hw_context[6] = SHA224_H6;
-> -	req_ctx->hw_context[7] = SHA224_H7;
-> -
-> -	/* init 64-bit count */
-> -	req_ctx->hw_context[8] = 0;
-> -	req_ctx->hw_context[9] = 0;
-> -
-> -	ahash_init(areq);
-> -	req_ctx->swinit = 1;/* prevent h/w initting context with sha256 values*/
-> -
-> -	return 0;
-> -}
-> -
-> -static int ahash_update(struct ahash_request *areq)
-> -{
-> -	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
-> -
-> -	req_ctx->last_request = 0;
-> -
-> -	return ahash_process_req(areq, areq->nbytes);
-> -}
-> -
-> -static int ahash_final(struct ahash_request *areq)
-> -{
-> -	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
-> -
-> -	req_ctx->last_request = 1;
-> -
-> -	return ahash_process_req(areq, 0);
-> -}
-> -
-> -static int ahash_finup(struct ahash_request *areq)
-> -{
-> -	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
-> -
-> -	req_ctx->last_request = 1;
-> -
-> -	return ahash_process_req(areq, areq->nbytes);
-> -}
-> -
-> -static int ahash_digest(struct ahash_request *areq)
-> -{
-> -	ahash_init(areq);
-> -	return ahash_finup(areq);
-> -}
-> -
-> -static int ahash_digest_sha224_swinit(struct ahash_request *areq)
-> -{
-> -	ahash_init_sha224_swinit(areq);
-> -	return ahash_finup(areq);
-> -}
-> -
-> -static int ahash_export(struct ahash_request *areq, void *out)
-> -{
-> -	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
-> -	struct talitos_export_state *export = out;
-> -	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-> -	struct talitos_ctx *ctx = crypto_ahash_ctx(tfm);
-> -	struct device *dev = ctx->dev;
-> -	dma_addr_t dma;
-> -
-> -	dma = dma_map_single(dev, req_ctx->hw_context, req_ctx->hw_context_size,
-> -			     DMA_FROM_DEVICE);
-> -	dma_unmap_single(dev, dma, req_ctx->hw_context_size, DMA_FROM_DEVICE);
-> -
-> -	memcpy(export->hw_context, req_ctx->hw_context,
-> -	       req_ctx->hw_context_size);
-> -	export->swinit = req_ctx->swinit;
-> -	export->first_request = req_ctx->first_request;
-> -	export->last_request = req_ctx->last_request;
-> -	export->to_hash_later = req_ctx->to_hash_later;
-> -
-> -	return 0;
-> -}
-> -
-> -static int ahash_import(struct ahash_request *areq, const void *in)
-> -{
-> -	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
-> -	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-> -	struct talitos_ctx *ctx = crypto_ahash_ctx(tfm);
-> -	struct device *dev = ctx->dev;
-> -	const struct talitos_export_state *export = in;
-> -	unsigned int size;
-> -	dma_addr_t dma;
-> -
-> -	memset(req_ctx, 0, sizeof(*req_ctx));
-> -	size = (crypto_ahash_digestsize(tfm) <= SHA256_DIGEST_SIZE)
-> -			? TALITOS_MDEU_CONTEXT_SIZE_MD5_SHA1_SHA256
-> -			: TALITOS_MDEU_CONTEXT_SIZE_SHA384_SHA512;
-> -	req_ctx->hw_context_size = size;
-> -	memcpy(req_ctx->hw_context, export->hw_context, size);
-> -	req_ctx->swinit = export->swinit;
-> -	req_ctx->first_request = export->first_request;
-> -	req_ctx->last_request = export->last_request;
-> -	req_ctx->to_hash_later = export->to_hash_later;
-> -
-> -	dma = dma_map_single(dev, req_ctx->hw_context, req_ctx->hw_context_size,
-> -			     DMA_TO_DEVICE);
-> -	dma_unmap_single(dev, dma, req_ctx->hw_context_size, DMA_TO_DEVICE);
-> -
-> -	return 0;
-> -}
-> -
-> -static int keyhash(struct crypto_ahash *tfm, const u8 *key, unsigned int keylen,
-> -		   u8 *hash)
-> -{
-> -	struct talitos_ctx *ctx = crypto_tfm_ctx(crypto_ahash_tfm(tfm));
-> -
-> -	struct scatterlist sg[1];
-> -	struct ahash_request *req;
-> -	struct crypto_wait wait;
-> -	int ret;
-> -
-> -	crypto_init_wait(&wait);
-> -
-> -	req = ahash_request_alloc(tfm, GFP_KERNEL);
-> -	if (!req)
-> -		return -ENOMEM;
-> -
-> -	/* Keep tfm keylen == 0 during hash of the long key */
-> -	ctx->keylen = 0;
-> -	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-> -				   crypto_req_done, &wait);
-> -
-> -	sg_init_one(&sg[0], key, keylen);
-> -
-> -	ahash_request_set_crypt(req, sg, hash, keylen);
-> -	ret = crypto_wait_req(crypto_ahash_digest(req), &wait);
-> -
-> -	ahash_request_free(req);
-> -
-> -	return ret;
-> -}
-> -
-> -static int ahash_setkey(struct crypto_ahash *tfm, const u8 *key,
-> -			unsigned int keylen)
-> -{
-> -	struct talitos_ctx *ctx = crypto_tfm_ctx(crypto_ahash_tfm(tfm));
-> -	struct device *dev = ctx->dev;
+> -	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(areq);
+> -	struct talitos_ctx *ctx = crypto_skcipher_ctx(cipher);
+> -	struct talitos_edesc *edesc;
 > -	unsigned int blocksize =
-> -			crypto_tfm_alg_blocksize(crypto_ahash_tfm(tfm));
-> -	unsigned int digestsize = crypto_ahash_digestsize(tfm);
-> -	unsigned int keysize = keylen;
-> -	u8 hash[SHA512_DIGEST_SIZE];
-> -	int ret;
+> -			crypto_tfm_alg_blocksize(crypto_skcipher_tfm(cipher));
 > -
-> -	if (keylen <= blocksize)
-> -		memcpy(ctx->key, key, keysize);
-> -	else {
-> -		/* Must get the hash of the long key */
-> -		ret = keyhash(tfm, key, keylen, hash);
+> -	if (!areq->cryptlen)
+> -		return 0;
 > -
-> -		if (ret)
-> -			return -EINVAL;
+> -	if (areq->cryptlen % blocksize)
+> -		return -EINVAL;
 > -
-> -		keysize = digestsize;
-> -		memcpy(ctx->key, hash, digestsize);
-> -	}
+> -	/* allocate extended descriptor */
+> -	edesc = skcipher_edesc_alloc(areq, false);
+> -	if (IS_ERR(edesc))
+> -		return PTR_ERR(edesc);
 > -
-> -	if (ctx->keylen)
-> -		dma_unmap_single(dev, ctx->dma_key, ctx->keylen, DMA_TO_DEVICE);
+> -	edesc->desc.hdr = ctx->desc_hdr_template | DESC_HDR_DIR_INBOUND;
 > -
-> -	ctx->keylen = keysize;
-> -	ctx->dma_key = dma_map_single(dev, ctx->key, keysize, DMA_TO_DEVICE);
-> -
-> -	return 0;
+> -	return common_nonsnoop(edesc, areq, skcipher_done);
 > -}
 > -
 >   static struct talitos_alg_template driver_algs[] = {
 >   	/* AEAD algorithms.  These use a single-pass ipsec_esp descriptor */
 >   	{	.type = CRYPTO_ALG_TYPE_AEAD,
-> @@ -2737,235 +2222,6 @@ static struct talitos_alg_template driver_algs[] = {
->   		                     DESC_HDR_MODE0_DEU_CBC |
->   		                     DESC_HDR_MODE0_DEU_3DES,
+> @@ -2097,131 +1888,6 @@ static struct talitos_alg_template driver_algs[] = {
+>   				     DESC_HDR_MODE1_MDEU_PAD |
+>   				     DESC_HDR_MODE1_MDEU_MD5_HMAC,
 >   	},
-> -	/* AHASH algorithms. */
-> -	{	.type = CRYPTO_ALG_TYPE_AHASH,
-> -		.alg.hash = {
-> -			.halg.digestsize = MD5_DIGEST_SIZE,
-> -			.halg.statesize = sizeof(struct talitos_export_state),
-> -			.halg.base = {
-> -				.cra_name = "md5",
-> -				.cra_driver_name = "md5-talitos",
-> -				.cra_blocksize = MD5_HMAC_BLOCK_SIZE,
-> -				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
-> -				.cra_flags = CRYPTO_ALG_ASYNC |
-> -					     CRYPTO_ALG_ALLOCATES_MEMORY |
-> -					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
-> -					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
-> -			}
+> -	/* SKCIPHER algorithms. */
+> -	{	.type = CRYPTO_ALG_TYPE_SKCIPHER,
+> -		.alg.skcipher = {
+> -			.base.cra_name = "ecb(aes)",
+> -			.base.cra_driver_name = "ecb-aes-talitos",
+> -			.base.cra_blocksize = AES_BLOCK_SIZE,
+> -			.base.cra_flags = CRYPTO_ALG_ASYNC |
+> -					  CRYPTO_ALG_ALLOCATES_MEMORY,
+> -			.min_keysize = AES_MIN_KEY_SIZE,
+> -			.max_keysize = AES_MAX_KEY_SIZE,
+> -			.setkey = skcipher_aes_setkey,
 > -		},
 > -		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> -				     DESC_HDR_SEL0_MDEUA |
-> -				     DESC_HDR_MODE0_MDEU_MD5,
+> -				     DESC_HDR_SEL0_AESU,
 > -	},
-> -	{	.type = CRYPTO_ALG_TYPE_AHASH,
-> -		.alg.hash = {
-> -			.halg.digestsize = SHA1_DIGEST_SIZE,
-> -			.halg.statesize = sizeof(struct talitos_export_state),
-> -			.halg.base = {
-> -				.cra_name = "sha1",
-> -				.cra_driver_name = "sha1-talitos",
-> -				.cra_blocksize = SHA1_BLOCK_SIZE,
-> -				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
-> -				.cra_flags = CRYPTO_ALG_ASYNC |
-> -					     CRYPTO_ALG_ALLOCATES_MEMORY |
-> -					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
-> -					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
-> -			}
+> -	{	.type = CRYPTO_ALG_TYPE_SKCIPHER,
+> -		.alg.skcipher = {
+> -			.base.cra_name = "cbc(aes)",
+> -			.base.cra_driver_name = "cbc-aes-talitos",
+> -			.base.cra_blocksize = AES_BLOCK_SIZE,
+> -			.base.cra_flags = CRYPTO_ALG_ASYNC |
+> -					  CRYPTO_ALG_ALLOCATES_MEMORY,
+> -			.min_keysize = AES_MIN_KEY_SIZE,
+> -			.max_keysize = AES_MAX_KEY_SIZE,
+> -			.ivsize = AES_BLOCK_SIZE,
+> -			.setkey = skcipher_aes_setkey,
 > -		},
 > -		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> -				     DESC_HDR_SEL0_MDEUA |
-> -				     DESC_HDR_MODE0_MDEU_SHA1,
+> -				     DESC_HDR_SEL0_AESU |
+> -				     DESC_HDR_MODE0_AESU_CBC,
 > -	},
-> -	{	.type = CRYPTO_ALG_TYPE_AHASH,
-> -		.alg.hash = {
-> -			.halg.digestsize = SHA224_DIGEST_SIZE,
-> -			.halg.statesize = sizeof(struct talitos_export_state),
-> -			.halg.base = {
-> -				.cra_name = "sha224",
-> -				.cra_driver_name = "sha224-talitos",
-> -				.cra_blocksize = SHA224_BLOCK_SIZE,
-> -				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
-> -				.cra_flags = CRYPTO_ALG_ASYNC |
-> -					     CRYPTO_ALG_ALLOCATES_MEMORY |
-> -					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
-> -					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
-> -			}
+> -	{	.type = CRYPTO_ALG_TYPE_SKCIPHER,
+> -		.alg.skcipher = {
+> -			.base.cra_name = "ctr(aes)",
+> -			.base.cra_driver_name = "ctr-aes-talitos",
+> -			.base.cra_blocksize = 1,
+> -			.base.cra_flags = CRYPTO_ALG_ASYNC |
+> -					  CRYPTO_ALG_ALLOCATES_MEMORY,
+> -			.min_keysize = AES_MIN_KEY_SIZE,
+> -			.max_keysize = AES_MAX_KEY_SIZE,
+> -			.ivsize = AES_BLOCK_SIZE,
+> -			.setkey = skcipher_aes_setkey,
 > -		},
-> -		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> -				     DESC_HDR_SEL0_MDEUA |
-> -				     DESC_HDR_MODE0_MDEU_SHA224,
+> -		.desc_hdr_template = DESC_HDR_TYPE_AESU_CTR_NONSNOOP |
+> -				     DESC_HDR_SEL0_AESU |
+> -				     DESC_HDR_MODE0_AESU_CTR,
 > -	},
-> -	{	.type = CRYPTO_ALG_TYPE_AHASH,
-> -		.alg.hash = {
-> -			.halg.digestsize = SHA256_DIGEST_SIZE,
-> -			.halg.statesize = sizeof(struct talitos_export_state),
-> -			.halg.base = {
-> -				.cra_name = "sha256",
-> -				.cra_driver_name = "sha256-talitos",
-> -				.cra_blocksize = SHA256_BLOCK_SIZE,
-> -				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
-> -				.cra_flags = CRYPTO_ALG_ASYNC |
-> -					     CRYPTO_ALG_ALLOCATES_MEMORY |
-> -					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
-> -					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
-> -			}
+> -	{	.type = CRYPTO_ALG_TYPE_SKCIPHER,
+> -		.alg.skcipher = {
+> -			.base.cra_name = "ctr(aes)",
+> -			.base.cra_driver_name = "ctr-aes-talitos",
+> -			.base.cra_blocksize = 1,
+> -			.base.cra_flags = CRYPTO_ALG_ASYNC |
+> -					  CRYPTO_ALG_ALLOCATES_MEMORY,
+> -			.min_keysize = AES_MIN_KEY_SIZE,
+> -			.max_keysize = AES_MAX_KEY_SIZE,
+> -			.ivsize = AES_BLOCK_SIZE,
+> -			.setkey = skcipher_aes_setkey,
 > -		},
 > -		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> -				     DESC_HDR_SEL0_MDEUA |
-> -				     DESC_HDR_MODE0_MDEU_SHA256,
+> -				     DESC_HDR_SEL0_AESU |
+> -				     DESC_HDR_MODE0_AESU_CTR,
 > -	},
-> -	{	.type = CRYPTO_ALG_TYPE_AHASH,
-> -		.alg.hash = {
-> -			.halg.digestsize = SHA384_DIGEST_SIZE,
-> -			.halg.statesize = sizeof(struct talitos_export_state),
-> -			.halg.base = {
-> -				.cra_name = "sha384",
-> -				.cra_driver_name = "sha384-talitos",
-> -				.cra_blocksize = SHA384_BLOCK_SIZE,
-> -				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
-> -				.cra_flags = CRYPTO_ALG_ASYNC |
-> -					     CRYPTO_ALG_ALLOCATES_MEMORY |
-> -					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
-> -					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
-> -			}
+> -	{	.type = CRYPTO_ALG_TYPE_SKCIPHER,
+> -		.alg.skcipher = {
+> -			.base.cra_name = "ecb(des)",
+> -			.base.cra_driver_name = "ecb-des-talitos",
+> -			.base.cra_blocksize = DES_BLOCK_SIZE,
+> -			.base.cra_flags = CRYPTO_ALG_ASYNC |
+> -					  CRYPTO_ALG_ALLOCATES_MEMORY,
+> -			.min_keysize = DES_KEY_SIZE,
+> -			.max_keysize = DES_KEY_SIZE,
+> -			.setkey = skcipher_des_setkey,
 > -		},
 > -		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> -				     DESC_HDR_SEL0_MDEUB |
-> -				     DESC_HDR_MODE0_MDEUB_SHA384,
+> -				     DESC_HDR_SEL0_DEU,
 > -	},
-> -	{	.type = CRYPTO_ALG_TYPE_AHASH,
-> -		.alg.hash = {
-> -			.halg.digestsize = SHA512_DIGEST_SIZE,
-> -			.halg.statesize = sizeof(struct talitos_export_state),
-> -			.halg.base = {
-> -				.cra_name = "sha512",
-> -				.cra_driver_name = "sha512-talitos",
-> -				.cra_blocksize = SHA512_BLOCK_SIZE,
-> -				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
-> -				.cra_flags = CRYPTO_ALG_ASYNC |
-> -					     CRYPTO_ALG_ALLOCATES_MEMORY |
-> -					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
-> -					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
-> -			}
+> -	{	.type = CRYPTO_ALG_TYPE_SKCIPHER,
+> -		.alg.skcipher = {
+> -			.base.cra_name = "cbc(des)",
+> -			.base.cra_driver_name = "cbc-des-talitos",
+> -			.base.cra_blocksize = DES_BLOCK_SIZE,
+> -			.base.cra_flags = CRYPTO_ALG_ASYNC |
+> -					  CRYPTO_ALG_ALLOCATES_MEMORY,
+> -			.min_keysize = DES_KEY_SIZE,
+> -			.max_keysize = DES_KEY_SIZE,
+> -			.ivsize = DES_BLOCK_SIZE,
+> -			.setkey = skcipher_des_setkey,
 > -		},
 > -		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> -				     DESC_HDR_SEL0_MDEUB |
-> -				     DESC_HDR_MODE0_MDEUB_SHA512,
+> -				     DESC_HDR_SEL0_DEU |
+> -				     DESC_HDR_MODE0_DEU_CBC,
 > -	},
-> -	{	.type = CRYPTO_ALG_TYPE_AHASH,
-> -		.alg.hash = {
-> -			.halg.digestsize = MD5_DIGEST_SIZE,
-> -			.halg.statesize = sizeof(struct talitos_export_state),
-> -			.halg.base = {
-> -				.cra_name = "hmac(md5)",
-> -				.cra_driver_name = "hmac-md5-talitos",
-> -				.cra_blocksize = MD5_HMAC_BLOCK_SIZE,
-> -				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
-> -				.cra_flags = CRYPTO_ALG_ASYNC |
-> -					     CRYPTO_ALG_ALLOCATES_MEMORY |
-> -					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
-> -					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
-> -			}
+> -	{	.type = CRYPTO_ALG_TYPE_SKCIPHER,
+> -		.alg.skcipher = {
+> -			.base.cra_name = "ecb(des3_ede)",
+> -			.base.cra_driver_name = "ecb-3des-talitos",
+> -			.base.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+> -			.base.cra_flags = CRYPTO_ALG_ASYNC |
+> -					  CRYPTO_ALG_ALLOCATES_MEMORY,
+> -			.min_keysize = DES3_EDE_KEY_SIZE,
+> -			.max_keysize = DES3_EDE_KEY_SIZE,
+> -			.setkey = skcipher_des3_setkey,
 > -		},
 > -		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> -				     DESC_HDR_SEL0_MDEUA |
-> -				     DESC_HDR_MODE0_MDEU_MD5,
+> -				     DESC_HDR_SEL0_DEU |
+> -				     DESC_HDR_MODE0_DEU_3DES,
 > -	},
-> -	{	.type = CRYPTO_ALG_TYPE_AHASH,
-> -		.alg.hash = {
-> -			.halg.digestsize = SHA1_DIGEST_SIZE,
-> -			.halg.statesize = sizeof(struct talitos_export_state),
-> -			.halg.base = {
-> -				.cra_name = "hmac(sha1)",
-> -				.cra_driver_name = "hmac-sha1-talitos",
-> -				.cra_blocksize = SHA1_BLOCK_SIZE,
-> -				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
-> -				.cra_flags = CRYPTO_ALG_ASYNC |
-> -					     CRYPTO_ALG_ALLOCATES_MEMORY |
-> -					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
-> -					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
-> -			}
+> -	{	.type = CRYPTO_ALG_TYPE_SKCIPHER,
+> -		.alg.skcipher = {
+> -			.base.cra_name = "cbc(des3_ede)",
+> -			.base.cra_driver_name = "cbc-3des-talitos",
+> -			.base.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+> -			.base.cra_flags = CRYPTO_ALG_ASYNC |
+> -					  CRYPTO_ALG_ALLOCATES_MEMORY,
+> -			.min_keysize = DES3_EDE_KEY_SIZE,
+> -			.max_keysize = DES3_EDE_KEY_SIZE,
+> -			.ivsize = DES3_EDE_BLOCK_SIZE,
+> -			.setkey = skcipher_des3_setkey,
 > -		},
 > -		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> -				     DESC_HDR_SEL0_MDEUA |
-> -				     DESC_HDR_MODE0_MDEU_SHA1,
+> -			             DESC_HDR_SEL0_DEU |
+> -		                     DESC_HDR_MODE0_DEU_CBC |
+> -		                     DESC_HDR_MODE0_DEU_3DES,
 > -	},
-> -	{	.type = CRYPTO_ALG_TYPE_AHASH,
-> -		.alg.hash = {
-> -			.halg.digestsize = SHA224_DIGEST_SIZE,
-> -			.halg.statesize = sizeof(struct talitos_export_state),
-> -			.halg.base = {
-> -				.cra_name = "hmac(sha224)",
-> -				.cra_driver_name = "hmac-sha224-talitos",
-> -				.cra_blocksize = SHA224_BLOCK_SIZE,
-> -				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
-> -				.cra_flags = CRYPTO_ALG_ASYNC |
-> -					     CRYPTO_ALG_ALLOCATES_MEMORY |
-> -					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
-> -					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
-> -			}
-> -		},
-> -		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> -				     DESC_HDR_SEL0_MDEUA |
-> -				     DESC_HDR_MODE0_MDEU_SHA224,
-> -	},
-> -	{	.type = CRYPTO_ALG_TYPE_AHASH,
-> -		.alg.hash = {
-> -			.halg.digestsize = SHA256_DIGEST_SIZE,
-> -			.halg.statesize = sizeof(struct talitos_export_state),
-> -			.halg.base = {
-> -				.cra_name = "hmac(sha256)",
-> -				.cra_driver_name = "hmac-sha256-talitos",
-> -				.cra_blocksize = SHA256_BLOCK_SIZE,
-> -				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
-> -				.cra_flags = CRYPTO_ALG_ASYNC |
-> -					     CRYPTO_ALG_ALLOCATES_MEMORY |
-> -					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
-> -					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
-> -			}
-> -		},
-> -		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> -				     DESC_HDR_SEL0_MDEUA |
-> -				     DESC_HDR_MODE0_MDEU_SHA256,
-> -	},
-> -	{	.type = CRYPTO_ALG_TYPE_AHASH,
-> -		.alg.hash = {
-> -			.halg.digestsize = SHA384_DIGEST_SIZE,
-> -			.halg.statesize = sizeof(struct talitos_export_state),
-> -			.halg.base = {
-> -				.cra_name = "hmac(sha384)",
-> -				.cra_driver_name = "hmac-sha384-talitos",
-> -				.cra_blocksize = SHA384_BLOCK_SIZE,
-> -				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
-> -				.cra_flags = CRYPTO_ALG_ASYNC |
-> -					     CRYPTO_ALG_ALLOCATES_MEMORY |
-> -					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
-> -					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
-> -			}
-> -		},
-> -		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> -				     DESC_HDR_SEL0_MDEUB |
-> -				     DESC_HDR_MODE0_MDEUB_SHA384,
-> -	},
-> -	{	.type = CRYPTO_ALG_TYPE_AHASH,
-> -		.alg.hash = {
-> -			.halg.digestsize = SHA512_DIGEST_SIZE,
-> -			.halg.statesize = sizeof(struct talitos_export_state),
-> -			.halg.base = {
-> -				.cra_name = "hmac(sha512)",
-> -				.cra_driver_name = "hmac-sha512-talitos",
-> -				.cra_blocksize = SHA512_BLOCK_SIZE,
-> -				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
-> -				.cra_flags = CRYPTO_ALG_ASYNC |
-> -					     CRYPTO_ALG_ALLOCATES_MEMORY |
-> -					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
-> -					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
-> -			}
-> -		},
-> -		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> -				     DESC_HDR_SEL0_MDEUB |
-> -				     DESC_HDR_MODE0_MDEUB_SHA512,
-> -	}
 >   };
 >   
 >   int talitos_init_common(struct talitos_ctx *ctx,
-> @@ -3014,22 +2270,6 @@ static int talitos_cra_init_skcipher(struct crypto_skcipher *tfm)
+> @@ -2258,18 +1924,6 @@ static int talitos_cra_init_aead(struct crypto_aead *tfm)
 >   	return talitos_init_common(ctx, talitos_alg);
 >   }
 >   
-> -static int talitos_cra_init_ahash(struct crypto_tfm *tfm)
+> -static int talitos_cra_init_skcipher(struct crypto_skcipher *tfm)
 > -{
-> -	struct crypto_alg *alg = tfm->__crt_alg;
+> -	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
 > -	struct talitos_crypto_alg *talitos_alg;
-> -	struct talitos_ctx *ctx = crypto_tfm_ctx(tfm);
+> -	struct talitos_ctx *ctx = crypto_skcipher_ctx(tfm);
 > -
-> -	talitos_alg = container_of(__crypto_ahash_alg(alg),
-> -				   struct talitos_crypto_alg,
-> -				   algt.alg.hash);
-> -
-> -	ctx->keylen = 0;
-> -				 sizeof(struct talitos_ahash_req_ctx));
+> -	talitos_alg = container_of(alg, struct talitos_crypto_alg,
+> -				   algt.alg.skcipher);
 > -
 > -	return talitos_init_common(ctx, talitos_alg);
 > -}
@@ -1711,92 +850,73 @@ it is transparent as there is a workaround in the driver.
 >   void talitos_cra_exit(struct crypto_tfm *tfm)
 >   {
 >   	struct talitos_ctx *ctx = crypto_tfm_ctx(tfm);
-> @@ -3128,6 +2368,12 @@ int talitos_register_common(struct device *dev,
->   	t_alg->algt = *template;
->   
->   	switch (t_alg->algt.type) {
-> +	case CRYPTO_ALG_TYPE_AHASH:
-> +		alg = &t_alg->algt.alg.hash.halg.base;
+> @@ -2374,6 +2028,12 @@ int talitos_register_common(struct device *dev,
+>   				       t_alg->algt.type);
+>   		ret = crypto_register_ahash(&t_alg->algt.alg.hash);
+>   		break;
+> +	case CRYPTO_ALG_TYPE_SKCIPHER:
+> +		alg = &t_alg->algt.alg.skcipher.base;
 > +		talitos_alg_set_common(priv, alg, t_alg->algt.priority,
 > +				       t_alg->algt.type);
-> +		ret = crypto_register_ahash(&t_alg->algt.alg.hash);
+> +		ret = crypto_register_skcipher(&t_alg->algt.alg.skcipher);
 > +		break;
 >   	default:
 >   		dev_err(dev, "unknown algorithm type %d\n", t_alg->algt.type);
 >   		devm_kfree(dev, t_alg);
-> @@ -3193,37 +2439,6 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
->   			return ERR_PTR(-ENOTSUPP);
->   		}
->   		break;
-> -	case CRYPTO_ALG_TYPE_AHASH:
-> -		alg = &t_alg->algt.alg.hash.halg.base;
-> -		alg->cra_init = talitos_cra_init_ahash;
+> @@ -2410,21 +2070,6 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
+>   	t_alg->algt = *template;
+>   
+>   	switch (t_alg->algt.type) {
+> -	case CRYPTO_ALG_TYPE_SKCIPHER:
+> -		alg = &t_alg->algt.alg.skcipher.base;
 > -		alg->cra_exit = talitos_cra_exit;
-> -		t_alg->algt.alg.hash.init = ahash_init;
-> -		t_alg->algt.alg.hash.update = ahash_update;
-> -		t_alg->algt.alg.hash.final = ahash_final;
-> -		t_alg->algt.alg.hash.finup = ahash_finup;
-> -		t_alg->algt.alg.hash.digest = ahash_digest;
-> -		if (!strncmp(alg->cra_name, "hmac", 4))
-> -			t_alg->algt.alg.hash.setkey = ahash_setkey;
-> -		t_alg->algt.alg.hash.import = ahash_import;
-> -		t_alg->algt.alg.hash.export = ahash_export;
-> -
-> -		if (!(priv->features & TALITOS_FTR_HMAC_OK) &&
-> -		    !strncmp(alg->cra_name, "hmac", 4)) {
+> -		t_alg->algt.alg.skcipher.init = talitos_cra_init_skcipher;
+> -		t_alg->algt.alg.skcipher.setkey =
+> -			t_alg->algt.alg.skcipher.setkey ?: skcipher_setkey;
+> -		t_alg->algt.alg.skcipher.encrypt = skcipher_encrypt;
+> -		t_alg->algt.alg.skcipher.decrypt = skcipher_decrypt;
+> -		if (!strcmp(alg->cra_name, "ctr(aes)") && !has_ftr_sec1(priv) &&
+> -		    DESC_TYPE(t_alg->algt.desc_hdr_template) !=
+> -		    DESC_TYPE(DESC_HDR_TYPE_AESU_CTR_NONSNOOP)) {
 > -			devm_kfree(dev, t_alg);
 > -			return ERR_PTR(-ENOTSUPP);
 > -		}
-> -		if (!(priv->features & TALITOS_FTR_SHA224_HWINIT) &&
-> -		    (!strcmp(alg->cra_name, "sha224") ||
-> -		     !strcmp(alg->cra_name, "hmac(sha224)"))) {
-> -			t_alg->algt.alg.hash.init = ahash_init_sha224_swinit;
-> -			t_alg->algt.alg.hash.digest =
-> -				ahash_digest_sha224_swinit;
-> -			t_alg->algt.desc_hdr_template =
-> -					DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-> -					DESC_HDR_SEL0_MDEUA |
-> -					DESC_HDR_MODE0_MDEU_SHA256;
-> -		}
 > -		break;
->   	default:
->   		dev_err(dev, "unknown algorithm type %d\n", t_alg->algt.type);
->   		devm_kfree(dev, t_alg);
-> @@ -3452,6 +2667,10 @@ static int talitos_probe(struct platform_device *ofdev)
->   			dev_info(dev, "hwrng\n");
->   	}
+>   	case CRYPTO_ALG_TYPE_AEAD:
+>   		alg = &t_alg->algt.alg.aead.base;
+>   		alg->cra_exit = talitos_cra_exit;
+> @@ -2671,6 +2316,10 @@ static int talitos_probe(struct platform_device *ofdev)
+>   	if (err)
+>   		goto err_out;
 >   
-> +	err = talitos_register_hash(dev);
+> +	err = talitos_register_skcipher(dev);
 > +	if (err)
 > +		goto err_out;
 > +
 >   	/* register crypto algorithms the device supports */
 >   	for (i = 0; i < ARRAY_SIZE(driver_algs); i++) {
 >   		if (talitos_hw_supports(dev,
-> @@ -3479,12 +2698,6 @@ static int talitos_probe(struct platform_device *ofdev)
->   					&t_alg->algt.alg.aead);
->   				alg = &t_alg->algt.alg.aead.base;
->   				break;
-> -
-> -			case CRYPTO_ALG_TYPE_AHASH:
-> -				err = crypto_register_ahash(
-> -						&t_alg->algt.alg.hash);
-> -				alg = &t_alg->algt.alg.hash.halg.base;
-> -				break;
+> @@ -2687,12 +2336,6 @@ static int talitos_probe(struct platform_device *ofdev)
 >   			}
->   			if (err) {
->   				dev_err(dev, "%s alg registration failed\n",
+>   
+>   			switch (t_alg->algt.type) {
+> -			case CRYPTO_ALG_TYPE_SKCIPHER:
+> -				err = crypto_register_skcipher(
+> -						&t_alg->algt.alg.skcipher);
+> -				alg = &t_alg->algt.alg.skcipher.base;
+> -				break;
+> -
+>   			case CRYPTO_ALG_TYPE_AEAD:
+>   				err = crypto_register_aead(
+>   					&t_alg->algt.alg.aead);
 > diff --git a/drivers/crypto/talitos/talitos.h b/drivers/crypto/talitos/talitos.h
-> index afed9947f4c0..e703c18cb81f 100644
+> index e703c18cb81f..7e7d41673fa5 100644
 > --- a/drivers/crypto/talitos/talitos.h
 > +++ b/drivers/crypto/talitos/talitos.h
-> @@ -530,3 +530,7 @@ int talitos_register_common(struct device *dev,
+> @@ -534,3 +534,4 @@ void talitos_unregister_rng(struct device *dev);
+>   /* Hash */
 >   
->   int talitos_register_rng(struct device *dev);
->   void talitos_unregister_rng(struct device *dev);
-> +
-> +/* Hash */
-> +
-> +int talitos_register_hash(struct device *dev);
+>   int talitos_register_hash(struct device *dev);
+> +int talitos_register_skcipher(struct device *dev);
 > 
 
