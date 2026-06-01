@@ -1,892 +1,188 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EDB81A5BAE;
-	Mon,  1 Jun 2026 12:32:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23DC6377EC2
+	for <linux-crypto@vger.kernel.org>; Mon,  1 Jun 2026 13:19:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780317174; cv=none; b=aHdHmxDntfiJZXApi55Y2tarDfJjwFip+PlTW2SmiD7rngfBcocojI5aJk0RqMBXmRjFPXFXRcTUyliQaUyz2aBJONAd6G1YMxjF7ru1z4eOh66cOyzdOHzRAWRBvrTssozGTX1Yb32iUeFD9vckgCg1mIdRjOHD3bk9wbhd1Rc=
+	t=1780319966; cv=none; b=SEtwskVddENT/gk/k9NaU3nHV5j96XW0zUhJHPE4cqX69k9r4LyrnZ9fMW+XC4ejVORBZYDUZrQqjhrRagx4Cezvn5fMGvjFoAQx5VNv/DMwbKVLu4MK87ffcq4qSVEuVNsSWodtqpvNGypjM+Ttlyl6wAAcAA9GW830HEJLgTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780317174; c=relaxed/simple;
-	bh=wGq8jbqq0I5P0ptKbTU67lVEy3r/mCtzfzqDOJ9XWpE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EELv2Cu9bqddKtQG00he4UiHBpJNjCNqEItW4WJtKealUEECYTt3qkXrVCUgPDZWzb5RFMPXrQ3H1b3b5VlX1xYAvyH+yOjeeDJw2+lyfKtJD9csSjleKHu6c66Opl1tsskMpnBI77X9Rv3JhCvMh6EyUE+kqsvjZi3FvPETDaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QbcvJ5tH; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780319966; c=relaxed/simple;
+	bh=eEcUs/0ldlHEr/vItb8TmDNfi5kAqLZm0m/4glP6n1o=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=QRZfduBHQ3rF28gyqCUg+EyM8BVcLX+SFlDFMl0g9D6P5McMx+FdYRp5on5arVLd9jbKzB8KqEcBL398kWILHxbdkJamtcKzpOyWYN02sWZ09r+uaPG3AFYrE6Nxt/5fg5dm0tfleah+o11adY/CldbUPTu+cfIWt4MvmgjyMxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=S5HKiG0X; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QbcvJ5tH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15A511F00893;
-	Mon,  1 Jun 2026 12:32:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780317172;
-	bh=E2zX2gAI4Q3qb8NiPbtmNURZHetWg5Fa0TN1g/To0dQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=QbcvJ5tHQ0CYKU3gGSnVDEZ11C1w99w95gmhKewrADtQeOS9YBMC9oJ/jESx05Q4B
-	 3U5UkbL1ndDYLZyKF4mXZH33efDoVMUXF/k8/tqTeNBZIn7fF2KrrqXAaSz4URn4Wt
-	 fz7xqS7SSi7dAu/MV2UZt2xbUxbrYEfRCoXROH8J3BF2ivKyvUx0C7Dp7bthBdxL6H
-	 6ax0rRc59X+AM3VoHf40poYlFvRMreGDWXNo5zPyicvB+Td0C0f8btZHt6BSOQn01l
-	 ADct5Lsa7GtntFjYJprgcK6jPgkpuTS0RIN2m5CnQFi0gn0f6vh5FH0enWit/tFpyx
-	 0kLz57smKAUpg==
-Message-ID: <d998ea38-8770-468f-bfdd-9bb4c34e54a7@kernel.org>
-Date: Mon, 1 Jun 2026 14:32:48 +0200
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="S5HKiG0X"
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 989121A37A0
+	for <linux-crypto@vger.kernel.org>; Mon,  1 Jun 2026 13:19:22 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 5F6756026B;
+	Mon,  1 Jun 2026 13:19:22 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 67C111088822D;
+	Mon,  1 Jun 2026 15:19:18 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1780319961; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=AhwLvc5lDAjyDZ47lqpQEFRZclNmFPWmcqbIXciM6mA=;
+	b=S5HKiG0XERPJPMHE9KKlNWn6Dbsd6r3HYuKVL7XaBgTphaF41YeoLmFu6ZGLBB8oblMeEI
+	Qk4uvWrz6U/aEi1hWK/NB0FtJudiWR5pzm9te4ke090UsxS+qpuFV8O2Lw97MjvLwlsi6J
+	r2aIL5cxD5i+eELUUs8uyfcNS11AVKnqESsafe32XX2x223lu2oPyxycEIVCtGDYoY9gpk
+	RfjTE32WdiSFd9WIslhRutVqbUWYtdC1iuOXmT1pBZpzAUUvaBjsVawSXULKxt92GiL/fp
+	9RZISMveqWDFohRe6GHy/7EalhgryRDcxf0kYW/wCxjc/0XliefVd8tYVK/sNQ==
+From: "Thomas Richard (TI)" <thomas.richard@bootlin.com>
+Date: Mon, 01 Jun 2026 15:19:13 +0200
+Subject: [PATCH v2] hwrng: core - Do not read data during PM sleep
+ transition
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 18/29] crypto: talitos - Split SEC1/SEC2 code into
- separate function variants
-To: Paul Louvel <paul.louvel@bootlin.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- Herve Codina <herve.codina@bootlin.com>, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20260528-7-1-rc1_talitos_cleanup-v1-0-cb1ad6cdea49@bootlin.com>
- <20260528-7-1-rc1_talitos_cleanup-v1-18-cb1ad6cdea49@bootlin.com>
-Content-Language: fr-FR
-From: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
-In-Reply-To: <20260528-7-1-rc1_talitos_cleanup-v1-18-cb1ad6cdea49@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20260601-hw-random-fix-hwrng-fillfn-crash-suspend-resume-v2-1-667ce5da32ee@bootlin.com>
+X-B4-Tracking: v=1; b=H4sIANCGHWoC/52OTQ6CMBCFr0K6dgwtKYor72FYQDulTaDFKaCGc
+ HcrLty7e99L3s/KIpLDyC7ZyggXF13wCcQhY8o2vkNwOjETuShzyQuwD6DG6zCAcc9E5Luk+t5
+ 4UNREC3GOI3oNhHEeEERldJuXxdnIiqXWkTAF98Vb/WXC+5yGp59pXZwCvfZXC/+4/x9YOHBou
+ ZCSK65OWl/bEKbe+aMKA6u3bXsDjxFLPwUBAAA=
+X-Change-ID: 20260513-hw-random-fix-hwrng-fillfn-crash-suspend-resume-29fdb0638f59
+To: Olivia Mackall <olivia@selenic.com>, 
+ Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ gregory.clement@bootlin.com, richard.genoud@bootlin.com, u-kumar1@ti.com, 
+ a-kumar2@ti.com, "Thomas Richard (TI)" <thomas.richard@bootlin.com>
+X-Mailer: b4 0.14.3
+X-Last-TLS-Session-Version: TLSv1.3
 
+The hwrng_fillfn() kernel thread accesses the RNG device directly. During
+suspend and resume sequences, hwrng_fillfn() may attempt to access the RNG
+device while it is suspended. To address this, the hwrng_fillfn() kernel
+thread checks if a PM sleep transition is in progress before to access the
+RNG device.
 
+Issue was found while doing suspend-to-ram on J721S2 EVM board with
+omap-rng driver.
 
-Le 28/05/2026 à 11:08, Paul Louvel a écrit :
-> Split the functions that have SEC1/SEC2-specific behavior into
-> separate sec1_ and sec2_ function variants, removing the runtime
-> is_sec1 checks from within each function body.
+echo mem > /sys/power/state
+[   27.922259] PM: suspend entry (deep)
+[   27.927191] Filesystems sync: 0.000 seconds
+[   27.933858] Freezing user space processes
+[   27.939119] Freezing user space processes completed (elapsed 0.001 seconds)
+[   27.946090] OOM killer disabled.
+[   27.949315] Freezing remaining freezable tasks
+[   27.954887] Freezing remaining freezable tasks completed (elapsed 0.001 seconds)
+[   27.963337] GFP mask restricted
+[   27.967069] omap_rng 4e10000.rng: PM: calling platform_pm_suspend @ 195, parent: 4e00000.crypto
+[   27.967072] mmcblk mmc1:9fb0: PM: calling mmc_bus_suspend @ 122, parent: mmc1
+[   27.968636] mmcblk mmc1:9fb0: PM: mmc_bus_suspend returned 0 after 1546 usecs
+[   27.975778] omap_rng 4e10000.rng: PM: platform_pm_suspend returned 0 after 3 usecs
+...
+[   33.510667] ti-sci 44083000.system-controller: PM: ti_sci_suspend_noirq returned 0 after 0 usecs
+[   33.510671] SError Interrupt on CPU0, code 0x00000000bf000000 -- SError
+[   33.510681] CPU: 0 UID: 0 PID: 132 Comm: hwrng Tainted: G   M    W           7.0.0-12695-g8923b7a6e11d #19 PREEMPT
+[   33.510690] Tainted: [M]=MACHINE_CHECK, [W]=WARN
+[   33.510693] Hardware name: Texas Instruments J721S2 EVM (DT)
+[   33.510697] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[   33.510701] pc : omap_rng_do_read+0x3c/0xe0
+[   33.510709] lr : omap_rng_do_read+0x58/0xe0
+[   33.510712] sp : ffff80008942be00
+[   33.510713] x29: ffff80008942be00 x28: 0000000000000000 x27: 0000000000000000
+[   33.510719] x26: 0000000000000010 x25: 0000000000000010 x24: ffff0008065644e8
+[   33.510724] x23: ffff8000878b3370 x22: ffff00080148b2c0 x21: 0000000000000000
+[   33.510728] x20: ffff000806564480 x19: 0000000000000064 x18: 0000000000000000
+[   33.510732] x17: 6573752031207265 x16: 7466612030206465 x15: 6e72757465722071
+[   33.510737] x14: ffff0008062c8080 x13: 000031702bc0da42 x12: 0000000000000001
+[   33.510741] x11: 00000000000000c0 x10: 0000000000000b30 x9 : ffff80008942bc80
+[   33.510745] x8 : ffff0008062c8b90 x7 : ffff000b7dfa34c0 x6 : 0000000805ca16c1
+[   33.510749] x5 : 0000000000000000 x4 : ffff800080e17bfc x3 : ffff800087389c68
+[   33.510753] x2 : 0000000000000000 x1 : 0000000000000010 x0 : 000000000000a7c6
+[   33.510759] Kernel panic - not syncing: Asynchronous SError Interrupt
+[   33.510762] CPU: 0 UID: 0 PID: 132 Comm: hwrng Tainted: G   M    W           7.0.0-12695-g8923b7a6e11d #19 PREEMPT
+[   33.510767] Tainted: [M]=MACHINE_CHECK, [W]=WARN
+[   33.510768] Hardware name: Texas Instruments J721S2 EVM (DT)
+[   33.510770] Call trace:
+[   33.510772]  show_stack+0x18/0x24 (C)
+[   33.510780]  dump_stack_lvl+0x34/0x8c
+[   33.510788]  dump_stack+0x18/0x24
+[   33.510792]  vpanic+0x47c/0x4dc
+[   33.510799]  do_panic_on_target_cpu+0x0/0x1c
+[   33.510803]  add_taint+0x0/0xbc
+[   33.510807]  arm64_serror_panic+0x70/0x80
+[   33.510812]  do_serror+0x3c/0x70
+[   33.510815]  el1h_64_error_handler+0x34/0x50
+[   33.510823]  el1h_64_error+0x6c/0x70
+[   33.510827]  omap_rng_do_read+0x3c/0xe0 (P)
+[   33.510831]  hwrng_fillfn+0x98/0x330
+[   33.510834]  kthread+0x130/0x13c
+[   33.510845]  ret_from_fork+0x10/0x20
+[   33.510850] SMP: stopping secondary CPUs
+[   33.519442] Kernel Offset: disabled
+[   33.519444] CPU features: 0x04000000,800a0008,00040001,0400421b
+[   33.519448] Memory Limit: none
+[   33.732904] ---[ end Kernel panic - not syncing: Asynchronous SError Interrupt ]---
 
-Regarding naming, I would prefer prefixing with talitos1_ and talitos2_ 
-to stick with the already existing naming we already have today:
-- talitos1_done_ch0
-- talitos1_done_4ch
-- talitos1_interrupt_4ch,
-- talitos2_done_ch0_2,
-- talitos2_done_ch1_3,
-- talitos2_done_ch0,
-- talitos2_done_4ch,
-- talitos2_interrupt_4ch,
-- talitos2_interrupt_ch0_2,
-- talitos2_interrupt_ch1_3,
+Signed-off-by: Thomas Richard (TI) <thomas.richard@bootlin.com>
+---
+This patch is related to the patch [1]. But it fixes the issue in a very
+different way. Patch [1] set the hwrng_fillfn() kernel thread freezable,
+but this solution was not acceptable as it could introduce an important
+delay in the suspend sequence (up to 10s to freeze the freezable kernel
+threads).
 
-Christophe
+In this second iteration, I fixed a potential uninitialized variable use.
 
-> 
-> The callers still dispatch between the two variants using local
-> is_sec1 variables and if/else checks.
-> 
-> Signed-off-by: Paul Louvel <paul.louvel@bootlin.com>
-> ---
->   drivers/crypto/talitos/talitos.c | 524 +++++++++++++++++++++++++--------------
->   drivers/crypto/talitos/talitos.h |  36 ++-
->   2 files changed, 357 insertions(+), 203 deletions(-)
-> 
-> diff --git a/drivers/crypto/talitos/talitos.c b/drivers/crypto/talitos/talitos.c
-> index f38a156a0459..b6793d97735e 100644
-> --- a/drivers/crypto/talitos/talitos.c
-> +++ b/drivers/crypto/talitos/talitos.c
-> @@ -133,75 +133,124 @@ void unmap_single_talitos_ptr(struct device *dev,
->   			 from_talitos_ptr_len(ptr, is_sec1), dir);
->   }
->   
-> -static int reset_channel(struct device *dev, int ch)
-> +static int sec1_reset_channel(struct device *dev, int ch)
->   {
->   	struct talitos_private *priv = dev_get_drvdata(dev);
->   	unsigned int timeout = TALITOS_TIMEOUT;
-> -	bool is_sec1 = has_ftr_sec1(priv);
->   
-> -	if (is_sec1) {
-> -		setbits32(priv->chan[ch].reg + TALITOS_CCCR_LO,
-> -			  TALITOS1_CCCR_LO_RESET);
-> +	setbits32(priv->chan[ch].reg + TALITOS_CCCR_LO, TALITOS1_CCCR_LO_RESET);
->   
-> -		while ((in_be32(priv->chan[ch].reg + TALITOS_CCCR_LO) &
-> -			TALITOS1_CCCR_LO_RESET) && --timeout)
-> -			cpu_relax();
-> -	} else {
-> -		setbits32(priv->chan[ch].reg + TALITOS_CCCR,
-> -			  TALITOS2_CCCR_RESET);
-> +	while ((in_be32(priv->chan[ch].reg + TALITOS_CCCR_LO) &
-> +		TALITOS1_CCCR_LO_RESET) &&
-> +	       --timeout)
-> +		cpu_relax();
->   
-> -		while ((in_be32(priv->chan[ch].reg + TALITOS_CCCR) &
-> -			TALITOS2_CCCR_RESET) && --timeout)
-> -			cpu_relax();
-> +	if (timeout == 0) {
-> +		dev_err(dev, "failed to reset sec1 channel %d\n", ch);
-> +		return -EIO;
->   	}
->   
-> +	setbits32(priv->chan[ch].reg + TALITOS_CCCR_LO,
-> +		  TALITOS_CCCR_LO_NE | TALITOS_CCCR_LO_CDIE |
-> +			  TALITOS_CCCR_LO_CDWE);
-> +
-> +	return 0;
-> +}
-> +
-> +static int sec2_reset_channel(struct device *dev, int ch)
-> +{
-> +	struct talitos_private *priv = dev_get_drvdata(dev);
-> +	unsigned int timeout = TALITOS_TIMEOUT;
-> +
-> +	setbits32(priv->chan[ch].reg + TALITOS_CCCR, TALITOS2_CCCR_RESET);
-> +
-> +	while ((in_be32(priv->chan[ch].reg + TALITOS_CCCR) &
-> +		TALITOS2_CCCR_RESET) &&
-> +	       --timeout)
-> +		cpu_relax();
-> +
->   	if (timeout == 0) {
-> -		dev_err(dev, "failed to reset channel %d\n", ch);
-> +		dev_err(dev, "failed to reset sec2 channel %d\n", ch);
->   		return -EIO;
->   	}
->   
-> -	/* set 36-bit addressing, done writeback enable and done IRQ enable */
-> -	setbits32(priv->chan[ch].reg + TALITOS_CCCR_LO, TALITOS_CCCR_LO_EAE |
-> -		  TALITOS_CCCR_LO_CDWE | TALITOS_CCCR_LO_CDIE);
-> -	/* enable chaining descriptors */
-> -	if (is_sec1)
-> -		setbits32(priv->chan[ch].reg + TALITOS_CCCR_LO,
-> -			  TALITOS_CCCR_LO_NE);
-> +	setbits32(priv->chan[ch].reg + TALITOS_CCCR_LO,
-> +		  TALITOS_CCCR_LO_EAE | TALITOS_CCCR_LO_CDWE |
-> +			  TALITOS_CCCR_LO_CDIE);
->   
-> -	/* and ICCR writeback, if available */
-> +	/* ICCR writeback, if available */
->   	if (priv->features & TALITOS_FTR_HW_AUTH_CHECK)
->   		setbits32(priv->chan[ch].reg + TALITOS_CCCR_LO,
-> -		          TALITOS_CCCR_LO_IWSE);
-> +			  TALITOS_CCCR_LO_IWSE);
->   
->   	return 0;
->   }
->   
-> -static int reset_device(struct device *dev)
-> +static int sec1_reset_device(struct device *dev)
->   {
->   	struct talitos_private *priv = dev_get_drvdata(dev);
->   	unsigned int timeout = TALITOS_TIMEOUT;
-> -	bool is_sec1 = has_ftr_sec1(priv);
-> -	u32 mcr = is_sec1 ? TALITOS1_MCR_SWR : TALITOS2_MCR_SWR;
->   
-> -	setbits32(priv->reg + TALITOS_MCR, mcr);
-> +	setbits32(priv->reg + TALITOS_MCR, TALITOS1_MCR_SWR);
->   
-> -	while ((in_be32(priv->reg + TALITOS_MCR) & mcr)
-> -	       && --timeout)
-> +	while ((in_be32(priv->reg + TALITOS_MCR) & TALITOS1_MCR_SWR) &&
-> +	       --timeout)
->   		cpu_relax();
->   
-> -	if (priv->irq[1]) {
-> -		mcr = TALITOS_MCR_RCA1 | TALITOS_MCR_RCA3;
-> -		setbits32(priv->reg + TALITOS_MCR, mcr);
-> +	if (timeout == 0) {
-> +		dev_err(dev, "failed to reset sec1 device\n");
-> +		return -EIO;
->   	}
->   
-> +	return 0;
-> +}
-> +
-> +static int sec2_reset_device(struct device *dev)
-> +{
-> +	struct talitos_private *priv = dev_get_drvdata(dev);
-> +	unsigned int timeout = TALITOS_TIMEOUT;
-> +
-> +	setbits32(priv->reg + TALITOS_MCR, TALITOS2_MCR_SWR);
-> +
-> +	while ((in_be32(priv->reg + TALITOS_MCR) & TALITOS2_MCR_SWR) &&
-> +	       --timeout)
-> +		cpu_relax();
-> +
-> +	if (priv->irq[1])
-> +		setbits32(priv->reg + TALITOS_MCR,
-> +			  TALITOS_MCR_RCA1 | TALITOS_MCR_RCA3);
-> +
->   	if (timeout == 0) {
-> -		dev_err(dev, "failed to reset device\n");
-> +		dev_err(dev, "failed to reset sec2 device\n");
->   		return -EIO;
->   	}
->   
->   	return 0;
->   }
->   
-> +static void sec1_configure_device(struct device *dev)
-> +{
-> +	struct talitos_private *priv = dev_get_drvdata(dev);
-> +
-> +	clrbits32(priv->reg + TALITOS_IMR, TALITOS1_IMR_INIT);
-> +	clrbits32(priv->reg + TALITOS_IMR_LO, TALITOS1_IMR_LO_INIT);
-> +	/* disable parity error check in DEU (erroneous? test vect.) */
-> +	setbits32(priv->reg_deu + TALITOS_EUICR, TALITOS1_DEUICR_KPE);
-> +}
-> +
-> +static void sec2_configure_device(struct device *dev)
-> +{
-> +	struct talitos_private *priv = dev_get_drvdata(dev);
-> +
-> +	setbits32(priv->reg + TALITOS_IMR, TALITOS2_IMR_INIT);
-> +	setbits32(priv->reg + TALITOS_IMR_LO, TALITOS2_IMR_LO_INIT);
-> +
-> +	/* disable integrity check error interrupts (use writeback instead) */
-> +	if (priv->features & TALITOS_FTR_HW_AUTH_CHECK)
-> +		setbits32(priv->reg_mdeu + TALITOS_EUICR_LO,
-> +			  TALITOS_MDEUICR_LO_ICE);
-> +}
-> +
->   /*
->    * Reset and initialize the device
->    */
-> @@ -217,80 +266,81 @@ static int init_device(struct device *dev)
->   	 * are not fully cleared by writing the MCR:SWR bit,
->   	 * set bit twice to completely reset
->   	 */
-> -	err = reset_device(dev);
-> +	if (is_sec1)
-> +		err = sec1_reset_device(dev);
-> +	else
-> +		err = sec2_reset_device(dev);
-> +
->   	if (err)
->   		return err;
->   
-> -	err = reset_device(dev);
-> +	if (is_sec1)
-> +		err = sec1_reset_device(dev);
-> +	else
-> +		err = sec2_reset_device(dev);
->   	if (err)
->   		return err;
->   
->   	/* reset channels */
->   	for (ch = 0; ch < priv->num_channels; ch++) {
-> -		err = reset_channel(dev, ch);
-> +		if (is_sec1)
-> +			err = sec1_reset_channel(dev, ch);
-> +		else
-> +			err = sec2_reset_channel(dev, ch);
->   		if (err)
->   			return err;
->   	}
->   
-> -	/* enable channel done and error interrupts */
-> -	if (is_sec1) {
-> -		clrbits32(priv->reg + TALITOS_IMR, TALITOS1_IMR_INIT);
-> -		clrbits32(priv->reg + TALITOS_IMR_LO, TALITOS1_IMR_LO_INIT);
-> -		/* disable parity error check in DEU (erroneous? test vect.) */
-> -		setbits32(priv->reg_deu + TALITOS_EUICR, TALITOS1_DEUICR_KPE);
-> -	} else {
-> -		setbits32(priv->reg + TALITOS_IMR, TALITOS2_IMR_INIT);
-> -		setbits32(priv->reg + TALITOS_IMR_LO, TALITOS2_IMR_LO_INIT);
-> -	}
-> -
-> -	/* disable integrity check error interrupts (use writeback instead) */
-> -	if (priv->features & TALITOS_FTR_HW_AUTH_CHECK)
-> -		setbits32(priv->reg_mdeu + TALITOS_EUICR_LO,
-> -		          TALITOS_MDEUICR_LO_ICE);
-> +	if (is_sec1)
-> +		sec1_configure_device(dev);
-> +	else
-> +		sec2_configure_device(dev);
->   
->   	return 0;
->   }
->   
-> -static void dma_map_request(struct device *dev, struct talitos_request *request,
-> -			    struct talitos_desc *desc, bool is_sec1)
-> +static void sec1_dma_map_request(struct device *dev,
-> +				 struct talitos_request *request,
-> +				 struct talitos_desc *desc)
->   {
->   	struct talitos_edesc *edesc =
->   		container_of(desc, struct talitos_edesc, desc);
->   	dma_addr_t dma_desc, prev_dma_desc;
->   	struct talitos_edesc *prev_edesc = NULL;
->   
-> -	if (is_sec1) {
-> -		while (edesc) {
-> -			edesc->desc.hdr1 = edesc->desc.hdr;
-> +	while (edesc) {
-> +		edesc->desc.hdr1 = edesc->desc.hdr;
->   
-> -			dma_desc = dma_map_single(dev, &edesc->desc.hdr1,
-> -						  TALITOS_DESC_SIZE,
-> -						  DMA_BIDIRECTIONAL);
-> +		dma_desc = dma_map_single(dev, &edesc->desc.hdr1,
-> +					  TALITOS_DESC_SIZE, DMA_BIDIRECTIONAL);
->   
-> -			if (!prev_edesc) {
-> -				request->dma_desc = dma_desc;
-> -				goto next;
-> -			}
-> +		if (!prev_edesc) {
-> +			request->dma_desc = dma_desc;
-> +			goto next;
-> +		}
->   
-> -			/* Chain in any previous descriptors. */
-> +		/* Chain in any previous descriptors. */
->   
-> -			prev_edesc->desc.next_desc = cpu_to_be32(dma_desc);
-> +		prev_edesc->desc.next_desc = cpu_to_be32(dma_desc);
->   
-> -			dma_sync_single_for_device(dev, prev_dma_desc,
-> -						   TALITOS_DESC_SIZE,
-> -						   DMA_TO_DEVICE);
-> +		dma_sync_single_for_device(dev, prev_dma_desc,
-> +					   TALITOS_DESC_SIZE, DMA_TO_DEVICE);
->   
->   next:
-> -			prev_edesc = edesc;
-> -			prev_dma_desc = dma_desc;
-> -			edesc = edesc->next_desc;
-> -		}
-> -	} else {
-> -		request->dma_desc = dma_map_single(dev, desc, TALITOS_DESC_SIZE,
-> -						   DMA_BIDIRECTIONAL);
-> +		prev_edesc = edesc;
-> +		prev_dma_desc = dma_desc;
-> +		edesc = edesc->next_desc;
->   	}
->   }
->   
-> +static void sec2_dma_map_request(struct device *dev,
-> +				 struct talitos_request *request,
-> +				 struct talitos_desc *desc)
-> +{
-> +	request->dma_desc =
-> +		dma_map_single(dev, desc, TALITOS_DESC_SIZE, DMA_BIDIRECTIONAL);
-> +}
-> +
->   /**
->    * talitos_submit - submits a descriptor to the device for processing
->    * @dev:	the SEC device to be used
-> @@ -327,7 +377,10 @@ int talitos_submit(struct device *dev, int ch, struct talitos_desc *desc,
->   	request = &priv->chan[ch].fifo[head];
->   
->   	/* map descriptor and save caller data */
-> -	dma_map_request(dev, request, desc, is_sec1);
-> +	if (is_sec1)
-> +		sec1_dma_map_request(dev, request, desc);
-> +	else
-> +		sec2_dma_map_request(dev, request, desc);
->   	request->callback = callback;
->   	request->context = context;
->   
-> @@ -349,19 +402,12 @@ int talitos_submit(struct device *dev, int ch, struct talitos_desc *desc,
->   	return -EINPROGRESS;
->   }
->   
-> -static __be32 get_request_hdr(struct device *dev,
-> -			      struct talitos_request *request, bool is_sec1)
-> +static __be32 sec1_get_request_hdr(struct device *dev,
-> +				   struct talitos_request *request)
->   {
->   	struct talitos_edesc *edesc;
->   	dma_addr_t dma_desc;
->   
-> -	if (!is_sec1) {
-> -		dma_sync_single_for_cpu(dev, request->dma_desc,
-> -					TALITOS_DESC_SIZE, DMA_BIDIRECTIONAL);
-> -
-> -		return request->desc->hdr;
-> -	}
-> -
->   	edesc = container_of(request->desc, struct talitos_edesc, desc);
->   	dma_desc = request->dma_desc;
->   	while (edesc->next_desc) {
-> @@ -375,27 +421,37 @@ static __be32 get_request_hdr(struct device *dev,
->   	return edesc->desc.hdr1;
->   }
->   
-> -static void dma_unmap_request(struct device *dev,
-> -			      struct talitos_request *request, bool is_sec1)
-> +static __be32 sec2_get_request_hdr(struct device *dev,
-> +				   struct talitos_request *request)
-> +{
-> +	dma_sync_single_for_cpu(dev, request->dma_desc, TALITOS_DESC_SIZE,
-> +				DMA_BIDIRECTIONAL);
-> +
-> +	return request->desc->hdr;
-> +}
-> +
-> +static void sec1_dma_unmap_request(struct device *dev,
-> +				   struct talitos_request *request)
->   {
->   	struct talitos_edesc *edesc;
->   
-> -	if (is_sec1) {
-> -		dma_unmap_single(dev, request->dma_desc, TALITOS_DESC_SIZE,
-> -				 DMA_BIDIRECTIONAL);
-> -		edesc = container_of(request->desc, struct talitos_edesc, desc);
-> -		while (edesc->next_desc) {
-> -			dma_unmap_single(dev,
-> -					 be32_to_cpu(edesc->desc.next_desc),
-> -					 TALITOS_DESC_SIZE, DMA_BIDIRECTIONAL);
-> -			edesc = edesc->next_desc;
-> -		}
-> -	} else {
-> -		dma_unmap_single(dev, request->dma_desc, TALITOS_DESC_SIZE,
-> -				 DMA_BIDIRECTIONAL);
-> +	dma_unmap_single(dev, request->dma_desc, TALITOS_DESC_SIZE,
-> +			 DMA_BIDIRECTIONAL);
-> +	edesc = container_of(request->desc, struct talitos_edesc, desc);
-> +	while (edesc->next_desc) {
-> +		dma_unmap_single(dev, be32_to_cpu(edesc->desc.next_desc),
-> +				 TALITOS_DESC_SIZE, DMA_BIDIRECTIONAL);
-> +		edesc = edesc->next_desc;
->   	}
->   }
->   
-> +static void sec2_dma_unmap_request(struct device *dev,
-> +				   struct talitos_request *request)
-> +{
-> +	dma_unmap_single(dev, request->dma_desc, TALITOS_DESC_SIZE,
-> +			 DMA_BIDIRECTIONAL);
-> +}
-> +
->   /*
->    * process what was done, notify callback of error if not
->    */
-> @@ -417,7 +473,10 @@ static void flush_channel(struct device *dev, int ch, int error, int reset_ch)
->   
->   		/* descriptors with their done bits set don't get the error */
->   		rmb();
-> -		hdr = get_request_hdr(dev, request, is_sec1);
-> +		if (is_sec1)
-> +			hdr = sec1_get_request_hdr(dev, request);
-> +		else
-> +			hdr = sec2_get_request_hdr(dev, request);
->   
->   		if ((hdr & DESC_HDR_DONE) == DESC_HDR_DONE)
->   			status = 0;
-> @@ -427,7 +486,10 @@ static void flush_channel(struct device *dev, int ch, int error, int reset_ch)
->   			else
->   				status = error;
->   
-> -		dma_unmap_request(dev, request, is_sec1);
-> +		if (is_sec1)
-> +			sec1_dma_unmap_request(dev, request);
-> +		else
-> +			sec2_dma_unmap_request(dev, request);
->   
->   		/* copy entries so we can call callback outside lock */
->   		saved_req.desc = request->desc;
-> @@ -516,21 +578,30 @@ DEF_TALITOS2_DONE(ch0, TALITOS2_ISR_CH_0_DONE)
->   DEF_TALITOS2_DONE(ch0_2, TALITOS2_ISR_CH_0_2_DONE)
->   DEF_TALITOS2_DONE(ch1_3, TALITOS2_ISR_CH_1_3_DONE)
->   
-> -static __be32 search_desc_hdr_in_request(struct talitos_request *request,
-> -					 dma_addr_t cur_desc, bool is_sec1)
-> +static __be32 sec1_search_desc_hdr_in_request(struct talitos_request *request,
-> +					      dma_addr_t cur_desc)
->   {
->   	struct talitos_edesc *edesc;
->   
-> -	if (request->dma_desc == cur_desc) {
-> +
-> +	if (request->dma_desc == cur_desc)
->   		return request->desc->hdr;
-> -	} else if (is_sec1) {
-> -		edesc = container_of(request->desc, struct talitos_edesc, desc);
-> -		while (edesc->next_desc) {
-> -			if (edesc->desc.next_desc == cpu_to_be32(cur_desc))
-> -				return edesc->next_desc->desc.hdr1;
-> -			edesc = edesc->next_desc;
-> -		}
-> +
-> +	edesc = container_of(request->desc, struct talitos_edesc, desc);
-> +	while (edesc->next_desc) {
-> +		if (edesc->desc.next_desc == cpu_to_be32(cur_desc))
-> +			return edesc->next_desc->desc.hdr1;
-> +		edesc = edesc->next_desc;
->   	}
-> +
-> +	return 0;
-> +}
-> +
-> +static __be32 sec2_search_desc_hdr_in_request(struct talitos_request *request,
-> +					      dma_addr_t cur_desc)
-> +{
-> +	if (request->dma_desc == cur_desc)
-> +		return request->desc->hdr;
->   	return 0;
->   }
->   
-> @@ -559,7 +630,10 @@ static __be32 current_desc_hdr(struct device *dev, int ch)
->   	do {
->   		request = &priv->chan[ch].fifo[iter];
->   
-> -		hdr = search_desc_hdr_in_request(request, cur_desc, is_sec1);
-> +		if (is_sec1)
-> +			hdr = sec1_search_desc_hdr_in_request(request, cur_desc);
-> +		else
-> +			hdr = sec2_search_desc_hdr_in_request(request, cur_desc);
->   		if (hdr)
->   			break;
->   
-> @@ -647,79 +721,100 @@ static void report_eu_error(struct device *dev, int ch, __be32 desc_hdr)
->   			in_be32(priv->chan[ch].reg + TALITOS_DESCBUF_LO + 8*i));
->   }
->   
-> -/*
-> - * recover from error interrupts
-> - */
-> -static void talitos_error(struct device *dev, u32 isr, u32 isr_lo)
-> +static int sec1_talitos_handle_error(struct device *dev, u32 isr, u32 isr_lo)
-> +{
-> +	struct talitos_private *priv = dev_get_drvdata(dev);
-> +	int ch, error;
-> +	u32 v_lo;
-> +
-> +	for (ch = 0; ch < priv->num_channels; ch++) {
-> +		if (!TALITOS1_CH_HAS_ERROR(isr, ch))
-> +			continue;
-> +
-> +		v_lo = in_be32(priv->chan[ch].reg + TALITOS_CCPSR_LO);
-> +
-> +		error = -EINVAL;
-> +
-> +		if (v_lo & TALITOS1_CCPSR_LO_TEA)
-> +			dev_err(dev, "transfer error acknowledge\n");
-> +		if (v_lo & TALITOS1_CCPSR_LO_PTRNC)
-> +			dev_err(dev, "pointer not complete error\n");
-> +		if (v_lo & TALITOS1_CCPSR_LO_PE)
-> +			dev_err(dev, "parity error\n");
-> +		if (v_lo & TALITOS1_CCPSR_LO_IDH)
-> +			dev_err(dev, "illegal descriptor header error\n");
-> +		if (v_lo & TALITOS1_CCPSR_LO_SA)
-> +			dev_err(dev, "static assignment error\n");
-> +		if (v_lo & TALITOS1_CCPSR_LO_EU)
-> +			report_eu_error(dev, ch, current_desc_hdr(dev, ch));
-> +
-> +		flush_channel(dev, ch, error, 1);
-> +		priv->ops->reset_channel(dev, ch);
-> +	}
-> +
-> +	if (isr_lo & TALITOS1_ISR_TEA_ERR)
-> +		dev_err(dev, "TEA error: ISR 0x%08x_%08x\n", isr, isr_lo);
-> +
-> +	return (isr & ~TALITOS1_ISR_4CHERR) || isr_lo;
-> +}
-> +
-> +static int sec2_talitos_handle_error(struct device *dev, u32 isr, u32 isr_lo)
->   {
->   	struct talitos_private *priv = dev_get_drvdata(dev);
->   	unsigned int timeout = TALITOS_TIMEOUT;
->   	int ch, error, reset_dev = 0;
->   	u32 v_lo;
-> -	bool is_sec1 = has_ftr_sec1(priv);
-> -	int reset_ch = is_sec1 ? 1 : 0; /* only SEC2 supports continuation */
-> +	int reset_ch = 0;
->   
->   	for (ch = 0; ch < priv->num_channels; ch++) {
-> -		/* skip channels without errors */
-> -		if (is_sec1) {
-> -			/* bits 29, 31, 17, 19 */
-> -			if (!(isr & (1 << (29 + (ch & 1) * 2 - (ch & 2) * 6))))
-> -				continue;
-> -		} else {
-> -			if (!(isr & (1 << (ch * 2 + 1))))
-> -				continue;
-> -		}
-> +		if (!TALITOS2_CH_HAS_ERROR(isr, ch))
-> +			continue;
->   
->   		error = -EINVAL;
->   
->   		v_lo = in_be32(priv->chan[ch].reg + TALITOS_CCPSR_LO);
->   
-> -		if (v_lo & TALITOS_CCPSR_LO_DOF) {
-> +		if (v_lo & TALITOS2_CCPSR_LO_DOF) {
->   			dev_err(dev, "double fetch fifo overflow error\n");
->   			error = -EAGAIN;
->   			reset_ch = 1;
->   		}
-> -		if (v_lo & TALITOS_CCPSR_LO_SOF) {
-> +		if (v_lo & TALITOS2_CCPSR_LO_SOF) {
->   			/* h/w dropped descriptor */
->   			dev_err(dev, "single fetch fifo overflow error\n");
->   			error = -EAGAIN;
->   		}
-> -		if (v_lo & TALITOS_CCPSR_LO_MDTE)
-> +		if (v_lo & TALITOS2_CCPSR_LO_MDTE)
->   			dev_err(dev, "master data transfer error\n");
-> -		if (v_lo & TALITOS_CCPSR_LO_SGDLZ)
-> -			dev_err(dev, is_sec1 ? "pointer not complete error\n"
-> -					     : "s/g data length zero error\n");
-> -		if (v_lo & TALITOS_CCPSR_LO_FPZ)
-> -			dev_err(dev, is_sec1 ? "parity error\n"
-> -					     : "fetch pointer zero error\n");
-> -		if (v_lo & TALITOS_CCPSR_LO_IDH)
-> +		if (v_lo & TALITOS2_CCPSR_LO_SGDLZ)
-> +			dev_err(dev, "s/g data length zero error\n");
-> +		if (v_lo & TALITOS2_CCPSR_LO_FPZ)
-> +			dev_err(dev, "fetch pointer zero error\n");
-> +		if (v_lo & TALITOS2_CCPSR_LO_IDH)
->   			dev_err(dev, "illegal descriptor header error\n");
-> -		if (v_lo & TALITOS_CCPSR_LO_IEU)
-> -			dev_err(dev, is_sec1 ? "static assignment error\n"
-> -					     : "invalid exec unit error\n");
-> -		if (v_lo & TALITOS_CCPSR_LO_EU)
-> +		if (v_lo & TALITOS2_CCPSR_LO_IEU)
-> +			dev_err(dev, "invalid exec unit error\n");
-> +		if (v_lo & TALITOS2_CCPSR_LO_EU)
->   			report_eu_error(dev, ch, current_desc_hdr(dev, ch));
-> -		if (!is_sec1) {
-> -			if (v_lo & TALITOS_CCPSR_LO_GB)
-> -				dev_err(dev, "gather boundary error\n");
-> -			if (v_lo & TALITOS_CCPSR_LO_GRL)
-> -				dev_err(dev, "gather return/length error\n");
-> -			if (v_lo & TALITOS_CCPSR_LO_SB)
-> -				dev_err(dev, "scatter boundary error\n");
-> -			if (v_lo & TALITOS_CCPSR_LO_SRL)
-> -				dev_err(dev, "scatter return/length error\n");
-> -		}
-> +		if (v_lo & TALITOS2_CCPSR_LO_GB)
-> +			dev_err(dev, "gather boundary error\n");
-> +		if (v_lo & TALITOS2_CCPSR_LO_GRL)
-> +			dev_err(dev, "gather return/length error\n");
-> +		if (v_lo & TALITOS2_CCPSR_LO_SB)
-> +			dev_err(dev, "scatter boundary error\n");
-> +		if (v_lo & TALITOS2_CCPSR_LO_SRL)
-> +			dev_err(dev, "scatter return/length error\n");
->   
->   		flush_channel(dev, ch, error, reset_ch);
->   
->   		if (reset_ch) {
-> -			reset_channel(dev, ch);
-> +			priv->ops->reset_channel(dev, ch);
->   		} else {
->   			setbits32(priv->chan[ch].reg + TALITOS_CCCR,
->   				  TALITOS2_CCCR_CONT);
->   			setbits32(priv->chan[ch].reg + TALITOS_CCCR_LO, 0);
->   			while ((in_be32(priv->chan[ch].reg + TALITOS_CCCR) &
-> -			       TALITOS2_CCCR_CONT) && --timeout)
-> +				TALITOS2_CCCR_CONT) && --timeout)
->   				cpu_relax();
->   			if (timeout == 0) {
->   				dev_err(dev, "failed to restart channel %d\n",
-> @@ -728,14 +823,29 @@ static void talitos_error(struct device *dev, u32 isr, u32 isr_lo)
->   			}
->   		}
->   	}
-> -	if (reset_dev || (is_sec1 && isr & ~TALITOS1_ISR_4CHERR) ||
-> -	    (!is_sec1 && isr & ~TALITOS2_ISR_4CHERR) || isr_lo) {
-> -		if (is_sec1 && (isr_lo & TALITOS1_ISR_TEA_ERR))
-> -			dev_err(dev, "TEA error: ISR 0x%08x_%08x\n",
-> -				isr, isr_lo);
-> -		else
-> -			dev_err(dev, "done overflow, internal time out, or "
-> -				"rngu error: ISR 0x%08x_%08x\n", isr, isr_lo);
-> +
-> +	return reset_dev || (isr & ~TALITOS2_ISR_4CHERR) || isr_lo;
-> +}
-> +
-> +/*
-> + * recover from error interrupts
-> + */
-> +static void talitos_error(struct device *dev, u32 isr, u32 isr_lo)
-> +{
-> +	struct talitos_private *priv = dev_get_drvdata(dev);
-> +	bool is_sec1 = has_ftr_sec1(priv);
-> +	int ch, reset_dev;
-> +
-> +	if (is_sec1)
-> +		reset_dev = sec1_talitos_handle_error(dev, isr, isr_lo);
-> +	else
-> +		reset_dev = sec2_talitos_handle_error(dev, isr, isr_lo);
-> +
-> +	if (reset_dev) {
-> +		dev_err(dev,
-> +			"done overflow, internal time out, or "
-> +			"rngu error: ISR 0x%08x_%08x\n",
-> +			isr, isr_lo);
->   
->   		/* purge request queues */
->   		for (ch = 0; ch < priv->num_channels; ch++)
-> @@ -1181,25 +1291,41 @@ int talitos_register_common(struct device *dev,
->   	return 0;
->   }
->   
-> -static int talitos_probe_irq(struct platform_device *ofdev)
-> +static int sec1_talitos_probe_irq(struct platform_device *ofdev)
->   {
->   	struct device *dev = &ofdev->dev;
->   	struct device_node *np = ofdev->dev.of_node;
->   	struct talitos_private *priv = dev_get_drvdata(dev);
->   	int err;
-> -	bool is_sec1 = has_ftr_sec1(priv);
->   
->   	priv->irq[0] = irq_of_parse_and_map(np, 0);
->   	if (!priv->irq[0]) {
->   		dev_err(dev, "failed to map irq\n");
->   		return -EINVAL;
->   	}
-> -	if (is_sec1) {
-> -		err = request_irq(priv->irq[0], talitos1_interrupt_4ch, 0,
-> -				  dev_driver_string(dev), dev);
-> -		goto primary_out;
-> +	err = request_irq(priv->irq[0], talitos1_interrupt_4ch, 0,
-> +			  dev_driver_string(dev), dev);
-> +	if (err) {
-> +		dev_err(dev, "failed to request primary irq\n");
-> +		irq_dispose_mapping(priv->irq[0]);
-> +		priv->irq[0] = 0;
->   	}
->   
-> +	return err;
-> +}
-> +
-> +static int sec2_talitos_probe_irq(struct platform_device *ofdev)
-> +{
-> +	struct device *dev = &ofdev->dev;
-> +	struct device_node *np = ofdev->dev.of_node;
-> +	struct talitos_private *priv = dev_get_drvdata(dev);
-> +	int err;
-> +
-> +	priv->irq[0] = irq_of_parse_and_map(np, 0);
-> +	if (!priv->irq[0]) {
-> +		dev_err(dev, "failed to map irq\n");
-> +		return -EINVAL;
-> +	}
->   	priv->irq[1] = irq_of_parse_and_map(np, 1);
->   
->   	/* get the primary irq line */
-> @@ -1235,6 +1361,36 @@ static int talitos_probe_irq(struct platform_device *ofdev)
->   	return err;
->   }
->   
-> +static void sec1_init_task(struct device *dev)
-> +{
-> +	struct talitos_private *priv = dev_get_drvdata(dev);
-> +
-> +	if (priv->num_channels == 1)
-> +		tasklet_init(&priv->done_task[0], talitos1_done_ch0,
-> +			     (unsigned long)dev);
-> +	else
-> +		tasklet_init(&priv->done_task[0], talitos1_done_4ch,
-> +			     (unsigned long)dev);
-> +}
-> +
-> +static void sec2_init_task(struct device *dev)
-> +{
-> +	struct talitos_private *priv = dev_get_drvdata(dev);
-> +
-> +	if (priv->irq[1]) {
-> +		tasklet_init(&priv->done_task[0], talitos2_done_ch0_2,
-> +			     (unsigned long)dev);
-> +		tasklet_init(&priv->done_task[1], talitos2_done_ch1_3,
-> +			     (unsigned long)dev);
-> +	} else if (priv->num_channels == 1) {
-> +		tasklet_init(&priv->done_task[0], talitos2_done_ch0,
-> +			     (unsigned long)dev);
-> +	} else {
-> +		tasklet_init(&priv->done_task[0], talitos2_done_4ch,
-> +			     (unsigned long)dev);
-> +	}
-> +}
-> +
->   static int talitos_probe(struct platform_device *ofdev)
->   {
->   	struct device *dev = &ofdev->dev;
-> @@ -1317,31 +1473,17 @@ static int talitos_probe(struct platform_device *ofdev)
->   		stride = TALITOS2_CH_STRIDE;
->   	}
->   
-> -	err = talitos_probe_irq(ofdev);
-> +	if (has_ftr_sec1(priv))
-> +		err = sec1_talitos_probe_irq(ofdev);
-> +	else
-> +		err = sec2_talitos_probe_irq(ofdev);
->   	if (err)
->   		goto err_out;
->   
-> -	if (has_ftr_sec1(priv)) {
-> -		if (priv->num_channels == 1)
-> -			tasklet_init(&priv->done_task[0], talitos1_done_ch0,
-> -				     (unsigned long)dev);
-> -		else
-> -			tasklet_init(&priv->done_task[0], talitos1_done_4ch,
-> -				     (unsigned long)dev);
-> -	} else {
-> -		if (priv->irq[1]) {
-> -			tasklet_init(&priv->done_task[0], talitos2_done_ch0_2,
-> -				     (unsigned long)dev);
-> -			tasklet_init(&priv->done_task[1], talitos2_done_ch1_3,
-> -				     (unsigned long)dev);
-> -		} else if (priv->num_channels == 1) {
-> -			tasklet_init(&priv->done_task[0], talitos2_done_ch0,
-> -				     (unsigned long)dev);
-> -		} else {
-> -			tasklet_init(&priv->done_task[0], talitos2_done_4ch,
-> -				     (unsigned long)dev);
-> -		}
-> -	}
-> +	if (has_ftr_sec1(priv))
-> +		sec1_init_task(dev);
-> +	else
-> +		sec2_init_task(dev);
->   
->   	priv->fifo_len = roundup_pow_of_two(priv->chfifo_len);
->   
-> diff --git a/drivers/crypto/talitos/talitos.h b/drivers/crypto/talitos/talitos.h
-> index 6cf3628c52c2..904fdc9dec80 100644
-> --- a/drivers/crypto/talitos/talitos.h
-> +++ b/drivers/crypto/talitos/talitos.h
-> @@ -301,20 +301,32 @@ static inline bool has_ftr_sec1(struct talitos_private *priv)
->   #define   TALITOS1_CCCR_LO_RESET	0x1    /* channel reset on SEC1 */
->   
->   /* CCPSR: channel pointer status register */
-> +
-> +/* bits 29, 31, 17, 19 */
-> +#define TALITOS1_CH_HAS_ERROR(isr, ch) \
-> +	((isr) & (1 << (29 + ((ch) & 1) * 2 - ((ch) & 2) * 6)))
-> +#define TALITOS2_CH_HAS_ERROR(isr, ch) ((isr) & (1 << ((ch) * 2 + 1)))
-> +
->   #define TALITOS_CCPSR			0x10
->   #define TALITOS_CCPSR_LO		0x14
-> -#define   TALITOS_CCPSR_LO_DOF		0x8000 /* double FF write oflow error */
-> -#define   TALITOS_CCPSR_LO_SOF		0x4000 /* single FF write oflow error */
-> -#define   TALITOS_CCPSR_LO_MDTE		0x2000 /* master data transfer error */
-> -#define   TALITOS_CCPSR_LO_SGDLZ	0x1000 /* s/g data len zero error */
-> -#define   TALITOS_CCPSR_LO_FPZ		0x0800 /* fetch ptr zero error */
-> -#define   TALITOS_CCPSR_LO_IDH		0x0400 /* illegal desc hdr error */
-> -#define   TALITOS_CCPSR_LO_IEU		0x0200 /* invalid EU error */
-> -#define   TALITOS_CCPSR_LO_EU		0x0100 /* EU error detected */
-> -#define   TALITOS_CCPSR_LO_GB		0x0080 /* gather boundary error */
-> -#define   TALITOS_CCPSR_LO_GRL		0x0040 /* gather return/length error */
-> -#define   TALITOS_CCPSR_LO_SB		0x0020 /* scatter boundary error */
-> -#define   TALITOS_CCPSR_LO_SRL		0x0010 /* scatter return/length error */
-> +#define   TALITOS1_CCPSR_LO_TEA		0x2000 /* transfer error acknowledge */
-> +#define   TALITOS1_CCPSR_LO_PTRNC	0x1000 /* pointer not complete error */
-> +#define   TALITOS1_CCPSR_LO_PE		0x0800 /* parity error */
-> +#define   TALITOS1_CCPSR_LO_IDH		0x0400 /* illegal desc hdr error */
-> +#define   TALITOS1_CCPSR_LO_SA		0x0200 /* static assignment error */
-> +#define   TALITOS1_CCPSR_LO_EU		0x0100 /* EU error detected */
-> +#define   TALITOS2_CCPSR_LO_DOF		0x8000 /* double FF write oflow error */
-> +#define   TALITOS2_CCPSR_LO_SOF		0x4000 /* single FF write oflow error */
-> +#define   TALITOS2_CCPSR_LO_MDTE	0x2000 /* master data transfer error */
-> +#define   TALITOS2_CCPSR_LO_SGDLZ	0x1000 /* s/g data len zero error */
-> +#define   TALITOS2_CCPSR_LO_FPZ		0x0800 /* fetch ptr zero error */
-> +#define   TALITOS2_CCPSR_LO_IDH		0x0400 /* illegal desc hdr error */
-> +#define   TALITOS2_CCPSR_LO_IEU		0x0200 /* invalid EU error */
-> +#define   TALITOS2_CCPSR_LO_EU		0x0100 /* EU error detected */
-> +#define   TALITOS2_CCPSR_LO_GB		0x0080 /* gather boundary error */
-> +#define   TALITOS2_CCPSR_LO_GRL		0x0040 /* gather return/length error */
-> +#define   TALITOS2_CCPSR_LO_SB		0x0020 /* scatter boundary error */
-> +#define   TALITOS2_CCPSR_LO_SRL		0x0010 /* scatter return/length error */
->   
->   /* channel fetch fifo register */
->   #define TALITOS_FF			0x48
-> 
+[1] https://lore.kernel.org/all/20260427-hw-random-set-hwrng-fillfn-kthread-freezable-v1-1-9bbe4f88b43a@bootlin.com/
+---
+Changes in v2:
+- Initialize rc variable.
+- Link to v1: https://lore.kernel.org/r/20260513-hw-random-fix-hwrng-fillfn-crash-suspend-resume-v1-1-b12551c1c7dd@bootlin.com
+---
+ drivers/char/hw_random/core.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index aba92d777f72..7a4dddbd5b51 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -25,6 +25,7 @@
+ #include <linux/sched/signal.h>
+ #include <linux/slab.h>
+ #include <linux/string.h>
++#include <linux/suspend.h>
+ #include <linux/uaccess.h>
+ #include <linux/workqueue.h>
+ 
+@@ -516,7 +517,7 @@ ATTRIBUTE_GROUPS(rng_dev);
+ static int hwrng_fillfn(void *unused)
+ {
+ 	size_t entropy, entropy_credit = 0; /* in 1/1024 of a bit */
+-	long rc;
++	long rc = 0;
+ 
+ 	while (!kthread_should_stop()) {
+ 		unsigned short quality;
+@@ -538,8 +539,9 @@ static int hwrng_fillfn(void *unused)
+ 		}
+ 
+ 		mutex_lock(&reading_mutex);
+-		rc = rng_get_data(rng, rng_fillbuf,
+-				  rng_buffer_size(), 1);
++		if (!pm_sleep_transition_in_progress())
++			rc = rng_get_data(rng, rng_fillbuf,
++					  rng_buffer_size(), 1);
+ 		if (current_quality != rng->quality)
+ 			rng->quality = current_quality; /* obsolete */
+ 		quality = rng->quality;
+
+---
+base-commit: f615e82f0b35c473499583a1432ade66060a02b2
+change-id: 20260513-hw-random-fix-hwrng-fillfn-crash-suspend-resume-29fdb0638f59
+
+Best regards,
+-- 
+Thomas Richard (TI) <thomas.richard@bootlin.com>
 
