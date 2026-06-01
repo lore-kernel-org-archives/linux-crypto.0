@@ -1,36 +1,34 @@
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30118352016
-	for <linux-crypto@vger.kernel.org>; Mon,  1 Jun 2026 23:04:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2501344DBD
+	for <linux-crypto@vger.kernel.org>; Mon,  1 Jun 2026 23:04:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780355094; cv=none; b=JezAPkQhDXXkobBHZmFRMs6WVSZVP3DHfsLULCLtfCL7aEgJqGKlM8AZLr35JEjP+QkvrROvSMvzKPfOSXHjYNxk32yumHqO0hK7YHw5yNn0ENw/Gpe2hEeNrYX4m+7f2H+IP9bHY9O66td56RNyNIpwqXqhdvtxhl35nT7ctuo=
+	t=1780355097; cv=none; b=bayW6pxNUf8cI2921ETEuG1RYoEWc5foJwPgIyImTX7QoY8GpgCv7ErsMyqrRj8e7YzWiOsxLwJzCI/T2/J5b+gna5ju+hR6+8EuZB/FRRhLUdgF0dul3r9KVxYn93EAfCCytXwfxXQdQAp9ZGZayCwGxdBLiMS54Htj9AHEF1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780355094; c=relaxed/simple;
-	bh=Uzh9aoY+3BR7q/Cka+rhzBuUGwNlpyblwx+0tJWMaGw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=qnYihMbUwVbfJfR1ScCal/utnZ/PKDjhonh+jjZUAK2GCc1AW/hdbAB9JKvsyA0tZfqBO2qHEeIgj2R+tx4kYOrrJdP6qHXpe7xeR4J6UlB7eUNwYCviMUbQgNGl7MGaHIIBdGZI0fgER4x6pNPUMX1DfFiqR27yFi7SL/zCSjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xpLKQ578; arc=none smtp.client-ip=95.215.58.188
+	s=arc-20240116; t=1780355097; c=relaxed/simple;
+	bh=LlFLtsINCgccXSPn4jWjE8uZpKLYLfsXdGiD4JrYBSw=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=LMHMiTDqY2e4Eu2DJcBqy+uNO5Z2wuz/l8tLDRjQg4uFt1NheU4qdpL6AzGwwpXCx+BIPI+ZEX6YauKLuq0ana8IocMurVnxQNoxW+iNRay8Qf4tEHBPBnQhsXSf0gBKm5innFRrgJ2YdbNh6tizVJoCcEzzwQedbdTthGoXGHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JTbu5ChD; arc=none smtp.client-ip=95.215.58.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xpLKQ578"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JTbu5ChD"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780355091;
+	t=1780355084;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8Bvf4Jr5d3UMYOq7tmej32Y+RUqc/jpd+AKbJsTaXNA=;
-	b=xpLKQ578EbaZaVFXeAjzTTqxwYu+dyhFf8q9GaNW7MKWVZ3oLc15Z34gorh1Ed/TFAQSDr
-	p7AFal87GfHKFUcmt/aWldBWzS2De9yvdmiGFO4PGSvKUnLa+46i2Cmt9ijwFKF7V2kG7L
-	mLDqujed1hTxvjhql3+sWx/QVsWD9lE=
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=fdOT1ubVljYo/8E3or6+JlpXdVVi9C39SjL7RbBhzUU=;
+	b=JTbu5ChDEHc1Ha+ecWVBaCQpQlPo6d0ncrPhDvDiiXrtr5NBgcqPOaEBsW4ou+bVDM/o81
+	bOhieV2T8oBQKGrIbyLFN9v4junbavukpB7NAUr6aMw6FDzTpqRWoQFrBRum9QT9uRCov6
+	BC0B4tUGzrszlpR/aequhJjE5YNFbpM=
 From: Atish Patra <atish.patra@linux.dev>
-Date: Mon, 01 Jun 2026 16:04:35 -0700
-Subject: [PATCH v2 1/4] KVM: SEV: Do not allow intra-host
- migration/mirroring of SNP VMs
+Subject: [PATCH v2 0/4] KVM: Miscellaneous SEV/SNP related fixes
+Date: Mon, 01 Jun 2026 16:04:34 -0700
+Message-Id: <20260601-sev_snp_fixes-v2-0-611891b28a86@meta.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -39,9 +37,9 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260601-sev_snp_fixes-v2-1-611891b28a86@meta.com>
-References: <20260601-sev_snp_fixes-v2-0-611891b28a86@meta.com>
-In-Reply-To: <20260601-sev_snp_fixes-v2-0-611891b28a86@meta.com>
+X-B4-Tracking: v=1; b=H4sIAAMQHmoC/12MwQ7CIBAFf6XZsxjAUMBT/8M0DdLVciht2IZoG
+ v5dbOLF47yXmR0IU0CCa7NDwhwoLLGCPDXgJxefyMJYGSSXLVdSMcI8UFyHR3ghMX7XF22sF84
+ KqM6a8DiqcusrT4G2Jb2PfBbf9Vcyf6UsGGdjqx03QgmtbTfj5s5+maEvpXwAwCvtyakAAAA=
 To: Sean Christopherson <seanjc@google.com>, 
  Paolo Bonzini <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>, 
  Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
@@ -55,52 +53,53 @@ Cc: clm@meta.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
  Atish Patra <atishp@meta.com>, Sashiko <sashiko-bot@kernel.org>
 X-Migadu-Flow: FLOW_OUT
 
-From: Atish Patra <atishp@meta.com>
+This series addresses a few issues found during code audit of the
+KVM SEV/SNP and CCP driver code. The fixes include a incorrect lock state
+and incomplete state handling during intra-host migration for SNP VMs.
 
-The intra-host migration/mirroring feature is not fully implemented for
-SEV-SNP VMs. The proper migration requires additional SNP-specific
-state such as guest_req_mutex, guest_req_buf, and guest_resp_buf to be
-transferred or initialized on the destination.
+To: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+To: Borislav Petkov <bp@alien8.de>
+To: Dave Hansen <dave.hansen@linux.intel.com>
+To: x86@kernel.org
+To: H. Peter Anvin <hpa@zytor.com>
+To: Tom Lendacky <thomas.lendacky@amd.com>
+To: Peter Gonda <pgonda@google.com>
+To: Brijesh Singh <brijesh.singh@amd.com>
+To: Youngjae Lee <youngjaelee@meta.com>
+To: Ashish Kalra <ashish.kalra@amd.com>
+To: Michael Roth <michael.roth@amd.com>
+To: John Allen <john.allen@amd.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: clm@meta.com
+Cc: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+Cc: stable@vger.kernel.org
 
-The SNP VM mirroring requires vmsa features to be copied as well otherwise
-ASID would be bound to SNP range while VM is detected as a SEV VM.
-
-Reject SNP source VMs in migration/mirroring until proper SNP state
-transfer is implemented.
-
-Fixes: 0b020f5af092 ("KVM: SEV: Add support for SEV-ES intra host migration")
-
-Reported-by: Chris Mason <clm@meta.com>
-Reported-by: Sashiko <sashiko-bot@kernel.org>
-Assisted-by: Claude:claude-opus-4-6
 Signed-off-by: Atish Patra <atishp@meta.com>
 ---
- arch/x86/kvm/svm/sev.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Changes in v2:
+- Added fixes based on the reports by Sashiko. 
+- Added a kselftest for validating SNP VM mirroring/migration rejection. 
+- Link to v1: https://lore.kernel.org/r/20260528-sev_snp_fixes-v1-0-d67a08151779@meta.com
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index c2126b3c3072..e6ad6af128c9 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -2142,7 +2142,8 @@ int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
- 		return ret;
- 
- 	if (kvm->arch.vm_type != source_kvm->arch.vm_type ||
--	    sev_guest(kvm) || !sev_guest(source_kvm)) {
-+	    sev_guest(kvm) || !sev_guest(source_kvm) ||
-+	    sev_snp_guest(source_kvm)) {
- 		ret = -EINVAL;
- 		goto out_unlock;
- 	}
-@@ -2865,6 +2866,7 @@ int sev_vm_copy_enc_context_from(struct kvm *kvm, unsigned int source_fd)
- 	 * created after SEV/SEV-ES initialization, e.g. to init intercepts.
- 	 */
- 	if (sev_guest(kvm) || !sev_guest(source_kvm) ||
-+	    sev_snp_guest(source_kvm) ||
- 	    is_mirroring_enc_context(source_kvm) || kvm->created_vcpus) {
- 		ret = -EINVAL;
- 		goto e_unlock;
+---
+Atish Patra (4):
+      KVM: SEV: Do not allow intra-host migration/mirroring of SNP VMs
+      KVM: selftests: Verify SNP VMs are rejected from migration and mirroring
+      crypto: ccp: Fix possible deadlock in SEV init failure path
+      crypto: ccp: Fix memory leak in SEV INIT_EX path
 
+ arch/x86/kvm/svm/sev.c                             |  4 +-
+ drivers/crypto/ccp/sev-dev.c                       | 18 +++++++--
+ .../testing/selftests/kvm/x86/sev_migrate_tests.c  | 47 ++++++++++++++++++++++
+ 3 files changed, 65 insertions(+), 4 deletions(-)
+---
+base-commit: e7ae89a0c97ce2b68b0983cd01eda67cf373517d
+change-id: 20260525-sev_snp_fixes-0b73789c1a91
+
+Best regards,
 -- 
-2.53.0-Meta
+Atish Patra <atishp@meta.com>
 
