@@ -1,98 +1,202 @@
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8096438D3FF
-	for <linux-crypto@vger.kernel.org>; Mon,  1 Jun 2026 09:03:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01B32201004
+	for <linux-crypto@vger.kernel.org>; Mon,  1 Jun 2026 09:18:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780304625; cv=none; b=GWBpmg3V13j35QtyrV1LooeSiU2WH43Dmy8s/vB5smrIWT8wziqj+0JsQvkafKhPIwjSpii2j28SXQhPbERGzzQW6vSrs2PZeuInuVBQzoh4t/ntZLag/oVPQ+OEkajroDL4NKSHeJ7oIjr2X016lJ3FSirjXLjO4AVYxnH+vs8=
+	t=1780305487; cv=none; b=JFoJxZHoMfcuO0eXtC+5Fozqb9NCqGBqp1DeRNGM1LEaapxfHOYUNm2x+TI7aqt32qOxJiOLKoXwT1iRooaRcWOZ3XmFzA+t7jq3SCdRyXaBQYFX6gBXeRBt2NPhwtkob+X4BP8zcQU91gXxOajuQYJ4kb0MDGeh5JwfkkPBuso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780304625; c=relaxed/simple;
-	bh=4DjmUwOCGOcB+Zvv7fk+Re0YCdBWlSozkc1Kn99ViNo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=an2OXB4JJSYGarLJECGkfhQidd+SDMnchoTP/IX7nqCXhtH+paM6OjVfWkCD02PxO2vVL7CuPYOAcMgJgZmNz/0ubyJ1uGl8yWD1icx6wsDKoHrq+K0JoCfLXCWx7hroDdLclqwlgQA4rG9A5bLgJIOcLu0ZIQcZW4H6Mwurk6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=b/qwF6XI; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	s=arc-20240116; t=1780305487; c=relaxed/simple;
+	bh=j/gvaqYS1F/8rzBxer7eqfUq1FJ5JDJr4LyygljEqNs=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
+	 References:In-Reply-To; b=nGyVTSQxF2+hrGWm1bZmFS+JWRUkHWdKCsVD7tWvOTc0rIXClfZGHX8upYFTaSc9JT6ZCk+OgOIRKqeHQvNlZdR7qdZZK5iKPxuZe4MbMsCeFNyNi/WOkm3fBKULxLeTBNHwMtJzsUBtjrwQtnSa6MFRz7wyrrTiCdGOMQ/bCoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=h4w/9QSv; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="b/qwF6XI"
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-490ae94a89eso1405555e9.1
-        for <linux-crypto@vger.kernel.org>; Mon, 01 Jun 2026 02:03:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1780304623; x=1780909423; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4DjmUwOCGOcB+Zvv7fk+Re0YCdBWlSozkc1Kn99ViNo=;
-        b=b/qwF6XIJvHX4hLWbFVjjtKlcnEb238dkdhjV8dxU/LwTPSnMN0Uxbflh6qQBWLkmv
-         io6ylku+3DlgfEnr2XiOOyRe+lGQvuRaREE/psJKEz1KgeR+v+PQqbR67PKaECguqpwX
-         015OQR1cmnp/MPFwXSos68QSBA0YoOS4/WMF9JiKUKtvTitrOk1ZE31CquOSEDOi71tv
-         bZOM6sb98VYjMObIlVXUKq8SGnGE0rtElsKtzoiIzmxQp9Jgqb0QetD1S0W+eiYBbXFt
-         YhXaQiASCjvWH3fq363QNUly8U7vlmqbMFXRMoHAjCuSqaeGuGVwrx8aLoURG7j/zBjk
-         EcPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780304623; x=1780909423;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=4DjmUwOCGOcB+Zvv7fk+Re0YCdBWlSozkc1Kn99ViNo=;
-        b=cNaAv9NMsdl5GJ8r1s+0Dyp0ayq3w6D19sF1ihKas6OgacTRLh+U+8Qb35tSTOVtmn
-         Wn0jZsFqhE6li1VRIFNId14cSJqtImYKcnBdba/6fYvKPTcSTaLMQL+Wg3TzjnMBbFZp
-         iswIGauSBw3iIxBJwaCsXun1ALdjL7yd1LG9ay/nT6eVuMjggaFKZ0uNoI5L+pWv88nm
-         pz5tPVgzk/mYncOF+EXYfxeQshjAa5Itdh7FbCo0Rhe4Fsp0e4xfDGRjVQK5hNPfUNcq
-         o0f49g9n6BQDNgXIvBIh0KBVBow7DjyGXirKnBuUjpjfJu5SlIyarsxKE9SGNo5p/tSN
-         3pIQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+6Nn55PwPrf+0h5aeYH3HlHBXgRgAGDj3Hr0+0p8KqVazoKGP5X9whFl0P23Q/bA0X9E2N6oAMzhTjZGo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXxSh9xXp0J7oCC7wO8SIvhJHUlylR1dOlzTCMfEzWb6qIgpZr
-	fcTbwTkfuBen6L+f+gtszntQ2ZcYn7cqIoBM9SDdGnJzAL9Kvo5Yh+WfNNiD/lbWRBo=
-X-Gm-Gg: Acq92OH+Kvo7SuvOxOgm5Q9IscrZLy1wNjKMI/wjEXyen4M9N4yLhrND03ShCUauw8+
-	DmR9T4rcmJLVgn2i8bzmBq6w0QujYZRRXPfJHlUguLbzWctqjdTyxJTwpRwA+zt4Rr32wbaqxcJ
-	OhGXapJrQ7Qgcn1KWPgnsTQ8lLTAOoaNIbkYCt0WYkLqyH+zIi0+g3zwh1tQY0SjZDw3ff0qjM5
-	G88g3NISlTa5E3C8wdPSQli0NUKa16gq45W/DDZW8+znUOGNsVgp3Y5xxX1XOAa+alectYX1EFx
-	hsepC7HfF91fBJwhjeV/Cld1XrkQ7ah01yHCluRaiRALyP/WDA+jlj/rNp6/3tqWXjhXH+zNeuB
-	NfQmdW2hLwB6pYDrxBbVaWCwWntf/RMN63DsT7EkxIz+WWQbrQ6LkEYaLX0VV06h7VWzc5CcwLE
-	WCGCCHfrht2PljxnGvxuOQjgSnZH9vXCZ1hp656UEvYFarsc6Dejk4lPJFxzEOjiNY8z9t
-X-Received: by 2002:a05:600c:458f:b0:48a:5546:61a1 with SMTP id 5b1f17b1804b1-490a2915aedmr194248805e9.15.1780304622657;
-        Mon, 01 Jun 2026 02:03:42 -0700 (PDT)
-Received: from localhost.localdomain ([2a00:6d43:105:c401:e307:1a37:2e76:ce91])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4909c127befsm74525925e9.31.2026.06.01.02.03.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jun 2026 02:03:42 -0700 (PDT)
-From: Marco Crivellari <marco.crivellari@suse.com>
-To: l.rubusch@gmail.com
-Cc: alexandre.belloni@bootlin.com,
-	claudiu.beznea@tuxon.dev,
-	davem@davemloft.net,
-	herbert@gondor.apana.org.au,
-	linux-arm-kernel@lists.infradead.org,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	nicolas.ferre@microchip.com,
-	thorsten.blum@linux.dev,
-	Marco Crivellari <marco.crivellari@suse.com>
-Subject: Re: [PATCH 10/12] crypto: atmel - update workqueue flags and add flush on exit
-Date: Mon,  1 Jun 2026 11:03:29 +0200
-Message-ID: <20260601090329.52616-1-marco.crivellari@suse.com>
-X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260512224349.64621-11-l.rubusch@gmail.com>
-References: <20260512224349.64621-11-l.rubusch@gmail.com>
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="h4w/9QSv"
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 788D24E42DD1;
+	Mon,  1 Jun 2026 09:18:03 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 483AC602AB;
+	Mon,  1 Jun 2026 09:18:03 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 044B7108881A3;
+	Mon,  1 Jun 2026 11:17:53 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1780305480; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=9wm/CqkWxiyphbpZmHCocTiGIxjyJmn0FoTfyyyYf9c=;
+	b=h4w/9QSv8y8Mho4GFBImGv4iVg+lPXv1qQuwjm4sOrMhx91sIUeKJsAoRvFQB35ICvzZaT
+	mzzjEAeAbo4IMcIyu6MkqoKGQYejLK8AVQXq7Y0Cqtg8+wMiT1Do79QPL9SOnSYi9r734z
+	tNrhMzxubIg7dDRCEOEEuipa/zhk12+bv2nsDkYOULWY3jLGuUoku9tfmn2IAjQDioQbIo
+	x1Qzd3Eb/+Uf/4274AshtPt80twMyaM63HniNl5VRiH675Qf91/yID/9s/Tuns1VspOPc5
+	vNdGF9QIJBjAq8WG1GaeyrBh/MhU+GEUxvYvF2UToDVGJJA0VwdGOAKYtzDlWA==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 01 Jun 2026 11:17:53 +0200
+Message-Id: <DIXLMBNKMF1N.2FVTXFA6MP1NF@bootlin.com>
+From: "Paul Louvel" <paul.louvel@bootlin.com>
+To: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, "Paul Louvel"
+ <paul.louvel@bootlin.com>, "Herbert Xu" <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>
+Cc: "Thomas Petazzoni" <thomas.petazzoni@bootlin.com>, "Herve Codina"
+ <herve.codina@bootlin.com>, <linux-crypto@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 00/29] crypto: talitos - Driver cleanup
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260528-7-1-rc1_talitos_cleanup-v1-0-cb1ad6cdea49@bootlin.com>
+ <1488f7b3-cda0-4267-827c-fae23b17c1e8@kernel.org>
+In-Reply-To: <1488f7b3-cda0-4267-827c-fae23b17c1e8@kernel.org>
+X-Last-TLS-Session-Version: TLSv1.3
 
-Hi,
+>> The Freescale Integrated Security Engine (SEC) aka "Talitos" driver
+>> implementation is a monolithic ~3800-line file that mixes SEC1 and SEC2
+>> hardware variants with hash, skcipher, aead and hwrng algorithm.
+>>=20
+>> This series reorganises the driver to improve readability and
+>> maintainability.
+>
+> Did you analyse the cost of this series ? bloat-o-meter gives the=20
+> following result, allthough I'm a bit surprised there are only added=20
+> items, no removed items:
 
-> Update workqueue initialization to use WQ_MEM_RECLAIM instead of
-> WQ_PERCPU
+When you say 'cost', do you mean cost in terms of code size ? performance c=
+ost ?
+or both ?
+Regarding code size, I trusted the differences shown in the cover letter by=
+ git:
 
-Not sure if you're working on this series right now, but this must keep
-the WQ_PERCPU flag. WQ_PERCPU has been added to mark explicitly mark
-workqueue that are per-CPU (it is the complement of WQ_UNBOUND).
+> 13 files changed, 3810 insertions(+), 3707 deletions(-)
+
+There is 103 insertions more than deletions. This is due to the fact that
+splitting up SEC1/SEC2 code requires additional function and structures.
+I find it acceptable given the readability improvement.
+
+As for performance, I ran ftrace with the function graph tracer, hashing a =
+100kb
+file.
+
+Without the series applied:
+
+be935f36ae14489758e28a83cfec418d3ad600b64628166f275c7ae6aac7b9af  ./test_10=
+0k.bin
+# tracer: function_graph
+#
+# CPU  DURATION                  FUNCTION CALLS
+# |     |   |                     |   |   |   |
+ 0) + 20.256 us   |  ahash_init();
+ 0)               |  ahash_do_req_chain() {
+ 0)               |    ahash_update() {
+ 0) + 41.088 us   |      ahash_process_req();
+ 0) + 54.272 us   |    }
+ 0) + 61.536 us   |  }
+ ------------------------------------------
+ 0)  sha256s-196   =3D>    <idle>-0  =20
+ ------------------------------------------
+
+ 0) + 45.248 us   |  ahash_done();
+ ------------------------------------------
+ 0)    <idle>-0    =3D>  sha256s-196 =20
+ ------------------------------------------
+
+ 0)               |  ahash_do_req_chain() {
+ 0)               |    ahash_update() {
+ 0) + 39.552 us   |      ahash_process_req();
+ 0) + 53.472 us   |    }
+ 0) + 68.576 us   |  }
+ ------------------------------------------
+ 0)  sha256s-196   =3D>    <idle>-0  =20
+ ------------------------------------------
+
+ 0) + 39.680 us   |  ahash_done();
+ ------------------------------------------
+ 0)    <idle>-0    =3D>  sha256s-196 =20
+ ------------------------------------------
+
+ 0)               |  ahash_do_req_chain() {
+ 0)               |    ahash_finup() {
+ 0)               |      ahash_process_req() {
+ 0) + 16.800 us   |        ahash_done();
+ 0) + 96.192 us   |      }
+ 0) ! 103.616 us  |    }
+ 0) ! 121.344 us  |  }
+
+With the series applied:
+
+be935f36ae14489758e28a83cfec418d3ad600b64628166f275c7ae6aac7b9af  ./test_10=
+0k.bin
+# tracer: function_graph
+#
+# CPU  DURATION                  FUNCTION CALLS
+# |     |   |                     |   |   |   |
+ 0) + 20.576 us   |  ahash_init();
+ 0)               |  ahash_do_req_chain() {
+ 0)               |    ahash_update() {
+ 0) + 32.896 us   |      ahash_process_req();
+ 0) + 46.688 us   |    }
+ 0) + 54.016 us   |  }
+ ------------------------------------------
+ 0)  sha256s-196   =3D>    <idle>-0  =20
+ ------------------------------------------
+
+ 0)               |  ahash_done() {
+ 0)               |    ahash_update_done() {
+ 0)   9.312 us    |      ahash_update_finish();
+ 0) + 44.416 us   |    }
+ 0) + 73.216 us   |  }
+ ------------------------------------------
+ 0)    <idle>-0    =3D>  sha256s-196 =20
+ ------------------------------------------
+
+ 0)               |  ahash_do_req_chain() {
+ 0)               |    ahash_update() {
+ 0) + 33.120 us   |      ahash_process_req();
+ 0) + 46.912 us   |    }
+ 0) + 61.664 us   |  }
+ ------------------------------------------
+ 0)  sha256s-196   =3D>    <idle>-0  =20
+ ------------------------------------------
+
+ 0)               |  ahash_done() {
+ 0)               |    ahash_update_done() {
+ 0)   8.928 us    |      ahash_update_finish();
+ 0) + 42.720 us   |    }
+ 0) + 69.440 us   |  }
+ ------------------------------------------
+ 0)    <idle>-0    =3D>  sha256s-196 =20
+ ------------------------------------------
+
+ 0)               |  ahash_do_req_chain() {
+ 0)               |    ahash_finup() {
+ 0)               |      ahash_process_req() {
+ 0)               |        ahash_done() {
+ 0)   5.696 us    |          ahash_finup_done();
+ 0) + 29.760 us   |        }
+ 0) ! 107.168 us  |      }
+ 0) ! 113.696 us  |    }
+ 0) ! 131.840 us  |  }
+
+It looks like there is a slight performance penalty with ahash_finup().
+Otherwise, there is a slight performance improvement for the other measurem=
+ents.
+I do not know if there is a better way to measure the performance impact of=
+ this
+series. If you know, do not hesitate to share it to me.
 
 
-Thanks!
+Best regards,
+Paul.
+
+--=20
+Paul Louvel, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
