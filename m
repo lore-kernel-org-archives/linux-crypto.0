@@ -1,126 +1,121 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60800175A68
-	for <linux-crypto@vger.kernel.org>; Tue,  2 Jun 2026 14:55:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61FED36F8E4
+	for <linux-crypto@vger.kernel.org>; Tue,  2 Jun 2026 16:38:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780412141; cv=none; b=FC4cBl1UeY7d9s/4VIBCdb+YPr2f8H+s6JAL28kx1kujCf3FXVry/5QiyJ0soTJ9/E9UrPExmLpGyUAqrMwQVA2uTDw/20mq35Jv0dEu4IP2m70bGEX5KeJwSDKtmvHoU/YVAYk7HMDUR59PIcVpq7hL/lR8FhJgIB6JH5GAqe4=
+	t=1780418320; cv=none; b=SWVk2r48visrNBkyODRGgDnybfNvHAOqzZditu9/F6qv049/mVl9+jiQYXy23fXdfwslh/X381u+eCv76yrFhdstSFRl1+4wtHmwzvewxaK8HgACWOvHYApR/8VxauF6IklFmnWl4poUQ7YgT5IJyVENVAJ0BYdfcI7qDQXdFX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780412141; c=relaxed/simple;
-	bh=huZPDyaaxaWqbuzsZLbbJYPVbXLJQN21p/3G+fkDcvI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=f5KBeHGeu3sqW70OSNsnI/J78/NkRaxeK0mGVZ4vxGiRqSVJOoG1ETaa3DrA7ZVGLrvEcTIsau9WYd9JFLLYFXF4jHOw8A9OJ3tXLdxvAkHkG1wEH51mMzGxlVBziXJhDelD2NTqwmnLY2l7DWhHhKXSmylAs0+/Dy1Dm1GF2I8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ixDwqJfw; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1780418320; c=relaxed/simple;
+	bh=SqqoX5qQzGE5eNHSgLyrNrWlqXnwPa/uOKYx/N6zAZQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=deeaQWooMoyifU6zYFnBoaZgTuxuBbk9quFSXuyRJPJrbxCnzvYOkjUgOMhh9bAtU0GNERsC1iseBjqaxUqjVM8E5VqiHUi6Eh9dvgSaLRYzfau75oG05RZRL0SbtDG7+OYWjFjvXosjS76uLO3N8MyGZnX+C+OxR4P28ptWXgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Dhp1RuoM; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ixDwqJfw"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2c132ac5ec2so4922885ad.1
-        for <linux-crypto@vger.kernel.org>; Tue, 02 Jun 2026 07:55:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Dhp1RuoM"
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-490b4e1ade7so2188955e9.0
+        for <linux-crypto@vger.kernel.org>; Tue, 02 Jun 2026 09:38:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780412139; x=1781016939; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gyMAbMxrhbJniIgaWCKhzTUQRO2Rtdp9wpj0gvULeMk=;
-        b=ixDwqJfwqnCtrOtsS5f+YxRtjuafzbjx6Xy0h4kJ5YEgJcQ1euU2jN1bYhsGqIuFea
-         Op4kLcQCMA6+hUERfS1Ek+6W6qUA4CK4Laq5O0lLUNijdv0gHhkC8U0OA3Ae3ryafcgz
-         3TLpX+aPyC+10jhG8jK2bb9MSah60X/aBjBpZLzvWUpm/K03xjjL5p1HwjdJoWgtDTqq
-         K9gqWydhZecBQXseZQRwDxyYMNftuH4vw3/HhMuCajMHeS86I6vDz1nOD+UY4TLEIscG
-         JM0vbjTPRpnZW14sTUZoBUa8xR4eM2jzmcGP/5XD5qeWtBKqX5SDWnypxxaKk6xsibyZ
-         OqgQ==
+        d=linaro.org; s=google; t=1780418318; x=1781023118; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SqqoX5qQzGE5eNHSgLyrNrWlqXnwPa/uOKYx/N6zAZQ=;
+        b=Dhp1RuoMIgkOz1tIgivCGlzcEfCM/F0TwNwrOlD30SOrPUP9X0pk1jKf45MVZXD2qB
+         Y0U2Vh/tibUVKER8x1Wo8FLqPs+VhIPGR222R58rC2yCrEfGdyQvYBOE+pEfchOdbhkt
+         pU0giNtPmGEguen+ViRMghJUGwIMgKi17GuJksCNJtyfUNChDz/NmidxQjstu3eUEQOs
+         xrFrShXa3Na1mri/KdchGz82zqQrrsxTxWshTVVGcANc39kYo8SSegNQ/J3H84x6x7S4
+         aphwriiQvgNf31lUKqNreRJvIPavKKUfsDPrxRkdD/3WnNff4c7FXxWQCPyX6HXerUQT
+         PGuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780412139; x=1781016939;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gyMAbMxrhbJniIgaWCKhzTUQRO2Rtdp9wpj0gvULeMk=;
-        b=fXkgqWH6E5ByILyjfXxXUJZk9sYZd1WXjuhsxikfREgZWiySeMIQKWASKjIm3r5bAN
-         Z1Xo6wTV4eyS4ZGaoKYlC99+vMn/+ndQTOKNnKFQsdK4axhslZYogjAJIAHxahsMw0y/
-         i9M2DxyWuBzlAx2DfuczfaYVCWYqXCX2SvdQlGQppKABM9oX0KMZdcheZFp4twKhdFgs
-         iM3Leqwr66OCYHFtJbHVbWRhu5ajhzHpLmOCvIIN6R4H1Q/leKrP13Rlpcud+EYXduKU
-         ur4PavCFqmDCgAbd08LoxmJjEPVTAqwT5JkIYvza9smGRTz4JTuLM7PAo24LqRYtLH0c
-         U9uQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+ze6FvIdMPhvgFnyUdDfzX6bw972vq773/mbtWgDHxxKHCWBGVCRk96zgxCD2s4jGTEJQkdw9WvuB0ItM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJAV2eTgFR98QZdMgEMOa5yNm5X0pr/WEInt8zn8Jy0iSiZ9K2
-	js59qGnD0u+TD8zKtwJlGUEC2amXdyX88xqiyHEynTRe9RNnFPh9xHd2RR98E9PzL+g=
-X-Gm-Gg: Acq92OHT0ouKp0ZuevwppLZN2wpkpAzfLO8Jj8Hm9WLxrtyh7KmRYxuOUwfG43Yvix+
-	lgeTRVLz16d7HCkfxW2iQ7YLqx29tBUnQra8gx+aDRv+pq3KF7UGhw16TmxQPZfHCRX+Gazglu+
-	B5931VMkugyAp5TUbn7sUKCSLhG6P8EBb1b8jOA0qymHhYtnnZQM8h54O4OoKpbF7ixJMeu2uLf
-	4dBp4dfQGiFyXdtYLSnQPEy5la5iMaAzyq86ie3T2JIiS0gnAmuSCp8srv3EDcvwMAp2+846U4R
-	rg2n5TZoZvQrZlX3LNcenJOBg2mwIL5QbR7WrNXeWs+aWLwMANz1QWeVhrnxrJBqtJegqor95Uo
-	WV9sVhD3v9RYrtbxaRw99rWc8rIkXbTs7jHqrIJg6faU09sTiK2hgPz9D0OiLLvMrpGO74ddWSZ
-	m6ytOS0+nHPL/KejCLCNbhJHnX2rtbnGZUaEUhYGROcafaY/S5SPNquTVC6DtNBrl9SaDdgbMmq
-	dKnLyIIXf40mfdt7rv0dRP6dcQ7
-X-Received: by 2002:a17:903:41ce:b0:2c0:bcff:e198 with SMTP id d9443c01a7336-2c0bcffe31cmr146642155ad.41.1780412139430;
-        Tue, 02 Jun 2026 07:55:39 -0700 (PDT)
-Received: from junjungu-PC.localdomain ([223.166.246.30])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bf23c0d727sm135113615ad.59.2026.06.02.07.55.36
+        d=1e100.net; s=20251104; t=1780418318; x=1781023118;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SqqoX5qQzGE5eNHSgLyrNrWlqXnwPa/uOKYx/N6zAZQ=;
+        b=BjCLpuA3NQl6FYBtRm1HlqGpYoJgRz2Y2HYcUFWrd5+A8xwDFq8jvRIdjyvNlUX2zT
+         pI0hTSyVfk8Vf8e1CNb/xd78n9kZosi/RlyBtCQSbW6EOtE3NG07+y0ud3QqeJxDixZA
+         nw7GZogw+2m63shURu10nI0dl0Ce++daVJwQ6Ly5ZMAtxoHCt8oKg3UG7gK19v7axuTV
+         DW7wodhTcptbRB7OvnXeIh113R9WCWi0oVYsf61hAbISJ3wqruRBlscUCE4rEw8OJXR0
+         wiFYmGZWxUCioa85WfMumRGzl41pFaVPHCm78V1EjbkWJDNzm6rXqlgh8uDVCFq+JEiT
+         Nm0g==
+X-Forwarded-Encrypted: i=1; AFNElJ/MFqwnn/XGSRsOb+1jathdZpww4BsRvgqvwM3ZDZKRH8tG00C31egwQuA4h+8MKEcczAEzUi25QlmTX2o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwrmO0TZoqhBPAc4+IT1YyLoRix5uLofpzQmZPysEZiJhhcsgD4
+	7J+1B8J8IL/md7aRePn4os4usAIlgxifD32bnFxDqYLRZLI4vW+1LV+y3Fji17ZmPXU=
+X-Gm-Gg: Acq92OHdNA0MsqjFTmNB2Jya23yFXBMX44+OpfvZ3aGuK9V/DyjmVisBm3FcKkhtp7i
+	ZYIjrGT91JPVEB8uPPhWnniG77hyc96sXFdDSYBy9La+I4crSk28Yh/q2vt+xoA43jRgu4MO6xO
+	7yCI4NlDihew0cK5pDGZJAUFYofCsS7DitZ3UnJF4a4tUg/u6p4U383YG7lE8TaLvNRIkm06LTh
+	KPb+duun7t2SxcPg24RZI/DEdxW+PI72ODntaasIzw9dT3eExMFWr67ZUDQPlG4SvJRW0VhQMqO
+	f1rHJjVIBq3bW+962aYMr672fjuXi5YzWguznWPMcZbc7iKSpLvwXW790Tm1TEE+e/+E+PG1E7f
+	6jP5ykCgmi+9fKuQJtGKZhdMCRvWutD+1Y/e716qokOOxz+/lqhgWzpg4hxtjFgVGkjNa5wVODg
+	qIkKlzmT93ToTjjnUZ7T8LhOwmTPCCtyh0wls1R0mnxZ4oMA==
+X-Received: by 2002:a05:600c:608e:b0:48f:d1c0:5cd3 with SMTP id 5b1f17b1804b1-490b5065ee5mr8757815e9.13.1780418317804;
+        Tue, 02 Jun 2026 09:38:37 -0700 (PDT)
+Received: from linaro.org ([2a02:2454:ff23:4410:9db1:6daa:c0a7:d3cf])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f2e4b18sm407269f8f.10.2026.06.02.09.38.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jun 2026 07:55:38 -0700 (PDT)
-From: Felix Gu <ustc.gu@gmail.com>
-Date: Tue, 02 Jun 2026 22:55:35 +0800
-Subject: [PATCH] crypto: cavium/cpt - fix DMA cleanup using wrong loop
- index
+        Tue, 02 Jun 2026 09:38:37 -0700 (PDT)
+Date: Tue, 2 Jun 2026 18:38:21 +0200
+From: Stephan Gerhold <stephan.gerhold@linaro.org>
+To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Cc: Vinod Koul <vkoul@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Thara Gopinath <thara.gopinath@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Udit Tiwari <quic_utiwari@quicinc.com>,
+	Md Sadre Alam <mdalam@qti.qualcomm.com>,
+	Dmitry Baryshkov <lumag@kernel.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Peter Ujfalusi <peter.ujfalusi@gmail.com>,
+	Michal Simek <michal.simek@amd.com>, Frank Li <Frank.Li@kernel.org>,
+	Andy Gross <agross@codeaurora.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	dmaengine@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	brgl@kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+Subject: Re: [PATCH v19 00/14] crypto/dmaengine: qce: introduce BAM locking
+ and use DMA for register I/O
+Message-ID: <ah8G_ajPS1KhgPP_@linaro.org>
+References: <20260526-qcom-qce-cmd-descr-v19-0-08472fdcbf4a@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260602-cptvf-v1-1-d68e58e59173@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAObuHmoC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDIzMDMwMj3eSCkrI0XfOUFKMUQ2NjUwOLNCWg2oKi1LTMCrA50bEQfnFpUlZ
- qcglIs1JtLQBgHh0RaQAAAA==
-X-Change-ID: 20260602-cptvf-7dd2d133508f
-To: George Cherian <gcherian@marvell.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>, 
- "David S. Miller" <davem@davemloft.net>, 
- David Daney <david.daney@cavium.com>
-Cc: George Cherian <george.cherian@cavium.com>, 
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Felix Gu <ustc.gu@gmail.com>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1780412138; l=1206;
- i=ustc.gu@gmail.com; h=from:subject:message-id;
- bh=huZPDyaaxaWqbuzsZLbbJYPVbXLJQN21p/3G+fkDcvI=;
- b=pLsI3tYyTEAVB+K2l+REd321CBO/zXiCGGZrM/yLiIy1p9/8mIJUuhiChVxIjsbPgpNZGFFlg
- yP9ugGss/ZiC1fCie94JfUk+6bamSzd4iBriHeN8Bcc53dZW6J0v93D
-X-Developer-Key: i=ustc.gu@gmail.com; a=ed25519;
- pk=fjUXwmjchVN7Ja6KGP55IXOzFeCl9edaHoQIEUA+/hw=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260526-qcom-qce-cmd-descr-v19-0-08472fdcbf4a@oss.qualcomm.com>
 
-The sg_cleanup error path used list[i] instead of list[j] when unmapping
-DMA buffers, leaking successfully mapped entries and repeatedly unmapping
-the failed one.
+On Tue, May 26, 2026 at 03:10:48PM +0200, Bartosz Golaszewski wrote:
+> I feel like I fell into the trap of trying to address pre-existing
+> issues reported by sashiko and in the process provoking more reports so
+> let this be the last iteration where I do this. Vinod can we get this
+> queued for v7.2 now and iron out any previously existing problems in
+> tree?
 
-Fixes: c694b233295b ("crypto: cavium - Add the Virtual Function driver for CPT")
-Signed-off-by: Felix Gu <ustc.gu@gmail.com>
----
- drivers/crypto/cavium/cpt/cptvf_reqmanager.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Thanks a lot for working on fixing all these issues!
 
-diff --git a/drivers/crypto/cavium/cpt/cptvf_reqmanager.c b/drivers/crypto/cavium/cpt/cptvf_reqmanager.c
-index e183b60277ff..de305cbeccbe 100644
---- a/drivers/crypto/cavium/cpt/cptvf_reqmanager.c
-+++ b/drivers/crypto/cavium/cpt/cptvf_reqmanager.c
-@@ -108,8 +108,8 @@ static int setup_sgio_components(struct cpt_vf *cptvf, struct buf_ptr *list,
- sg_cleanup:
- 	for (j = 0; j < i; j++) {
- 		if (list[j].dma_addr) {
--			dma_unmap_single(&pdev->dev, list[i].dma_addr,
--					 list[i].size, DMA_BIDIRECTIONAL);
-+			dma_unmap_single(&pdev->dev, list[j].dma_addr,
-+					 list[j].size, DMA_BIDIRECTIONAL);
- 		}
- 
- 		list[j].dma_addr = 0;
+I agree there is no point addressing all the "pre-existing issues"
+pointed out by Sashiko, but have you looked through the other comments
+for new issues pointed out for your patches?
 
----
-base-commit: 08484c504b55a98bd100527fbe10a3caf55ff3ff
-change-id: 20260602-cptvf-7dd2d133508f
+Out of curiosity, I was looking a bit at the comments for [PATCH v19
+06/14] dmaengine: qcom: bam_dma: add support for BAM locking [1]. There
+are 8 open comments there (Critical: 1, High: 6 and Medium: 1). From a
+quick look I would say most of these could be valid. The critical one
+about the usage of dma_cookie_assign() sounds a bit concerning to me, if
+it is true we would be basically breaking parts of the dmaengine API for
+consumers by inserting the lock descriptor in front of everything else.
 
-Best regards,
---  
-Felix Gu <ustc.gu@gmail.com>
+[1]: https://sashiko.dev/#/patchset/20260526-qcom-qce-cmd-descr-v19-0-08472fdcbf4a%40oss.qualcomm.com?part=6
 
+Thanks,
+Stephan
