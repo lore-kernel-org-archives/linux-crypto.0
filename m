@@ -1,69 +1,69 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0DC01B6D1A
-	for <linux-crypto@vger.kernel.org>; Tue,  2 Jun 2026 01:46:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F8123EAAF
+	for <linux-crypto@vger.kernel.org>; Tue,  2 Jun 2026 01:47:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780364774; cv=none; b=AgFaifEm/zvIQ1LDIVymwFYhsc1qJUs3qvnaCZHNLmyiwlMeaafVIouESPXP2JKdhF4r7EGZJk6CnUQldy7yCOK5oI6vzlKHlS4NrS2TMCnY7Y/fB1DdZycAtU3VdhzcOPjKCLgvL1WMPNaznHp811TYxN87IqDzqBGTUJPY3fo=
+	t=1780364826; cv=none; b=Khc5VZg2JVxVsDXA1rRtheSKRNpClTMcRxsDzbGVxR5w6GgNRF4fVoWSFRQ6o3+ne0CWeg25M2Opr1Xc+YjSxiUPFq4PBehWWd/K43WTDELN+HqKN9H6V/S3IC0NnG3ahDzebysFH5BNLpcOcu3sRiP+k+8IcZ9qe/qaQjoWZiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780364774; c=relaxed/simple;
-	bh=IQs5IZ5NNl86+sSkd5aL5e9UTBxBuhDqL6rJdBGcQMk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=N2WgEc+RQb9Lv9tbIBot/OQ1CSFmL4Mzhsu1w8KYH51saPO4b1lELvRp96fdJNLxEMvpNIgqNp3ecO0kQtBNyYo+F75WTGhNcr3JHV/0DniN6peQlJm9JjZkRlFEYno0MczPsgYpfmB/IIM3cKIS0I0YbWXA1ZVYozurxj9h7MM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bK74qrY2; arc=none smtp.client-ip=209.85.214.177
+	s=arc-20240116; t=1780364826; c=relaxed/simple;
+	bh=bsVYNCTaBm8NP/a8z4vT5Nw9PVJWnd6S/RIbZpCokA4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rD9/xhSG+mSs9F8BKe93vXfT4jJPLJgBtK8NqUhHcJSpIbrzfjRtSJZ5NueOGXQL1RqNl4k4l1G+EXH5E9W28heCiy+a/idjSINLdTlTSgQjSQPC5Aa0J8xZ4h9MdKhtk7M70Cj4P8QmO8jbigAEx/o0TeWHVEQAkZ4gZrVcpAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZU3xzdQE; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bK74qrY2"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2bea7176c72so87084765ad.0
-        for <linux-crypto@vger.kernel.org>; Mon, 01 Jun 2026 18:46:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZU3xzdQE"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2c0c32f6ce1so12653685ad.2
+        for <linux-crypto@vger.kernel.org>; Mon, 01 Jun 2026 18:47:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780364772; x=1780969572; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1780364823; x=1780969623; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=dTGVpdaFXGUQW3sQeSXtN3M02faeyWcv40oYea6YDJQ=;
-        b=bK74qrY2uc7IbjYsNX1Dk3FaerTD6OR5hFGGQ1C2DW9gAYieY5xuWgSauUBxRofQaZ
-         NmGo1uPREuRiNaNFFi5WhuQFo60+PJnT+KINm3ckPqYhvrtRdXSOmgbsUcVNVAtzuaFR
-         A7SOruOCFiwxTUFUxGCUSeGUeq9bID9K0or7jHPYm/NqVmAor3RLeLMNjfc5Npv6WGLR
-         kjWv7T+DC4sGsMnXrgengtUMgq0KpAaALmX68vI7l7XMpzMwKqZgtwMXuOIiL2ST0hKI
-         yx5fFRhX5HfHI0OiCO5oqNN7dFDuWZdRLeIqiU+5peVMDg2GELnua93NPKVokmMWP1RL
-         WgGw==
+        bh=KhwKwq+oR5VxK7FFuu21d6kQ4Vbv5ERvHXpa8GTJxhA=;
+        b=ZU3xzdQE2nMTgx9ASWtjo6y+IdWD2O69SYMVe2Y15Kvt/+sawNu8sCIUF7ce9eWxRP
+         9nrfaRgSEfUFzvRUkGLYz18CDz9B0d9to6Q+p35roNq6i43A5m2ofa1RMc36nc3Xb0oD
+         s2R3Fy4clyR2XPuncJqOV7P7h39FQtx9JhBQoDEB7ftxNpdZVSXPH4SyybyGjllZoQb7
+         Ko0Ku73qED24zXgqNWh/yUES3XE1GwzPVSUP0dvMOVZhsr4YpiPy/aSf92D3vE7di0Lv
+         dC12CSys/MmaMjTZ39UggV6mBVYKVhd22LL8tA5wNWSAeqVV2zhzDMpS/iOzqPyKTY8W
+         1Chg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780364772; x=1780969572;
+        d=1e100.net; s=20251104; t=1780364823; x=1780969623;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dTGVpdaFXGUQW3sQeSXtN3M02faeyWcv40oYea6YDJQ=;
-        b=SwJoLxKlRLp3EZrfst1amUs9cNeziq6b1JwQ3ybELmciSLp/XZ25ByLGZuASZotC2Z
-         +f+cZlaeULXyKqD6yQV9CtWTvkoWPrgCrHlJTxXVckBJWBkyOIbb9t4MZnGcmrcV3cMj
-         TtJGnKUOFgrZkQ11KvrZvjam8YjO1UXsnVi3Rxqkb9z/lju5+1USl67KpioxVgRQ+8Xl
-         2eFZinnBEiaod3BefvZu2hYXTnsTN8Av4wdwRNkZSrMgxz6V5Ck9GmFgo8B4gueEfQaY
-         vR7NJn1xrpQBq+5RhbpaWlprhlZD2AZsLK2mGjfaSMWZFsq8V8ttEYV0gjNaJ2Kf9HH4
-         KZ4g==
-X-Gm-Message-State: AOJu0Yz9j4L1ul5ZxnWzazdHFfzLJledwqkMnmImGvql/oua3es4k++G
-	QplKIHj6MDaAaGx1NPLE9T9J+zkNz8NlNl14e4MUDWJEmT+yetMYd7jjJ1K5/A==
-X-Gm-Gg: Acq92OFJGPgspgLr16HZ1u4uLSVy6hN1XzhCtw5tCFiI/1R1iv0spYLyoPddu07rgCq
-	6jv2r+jBssO2270CnVVdP/rJUvF05azpUnGop9JfF0nNwzxEEecmu6MIOc981tXy7ecNTEzNtBf
-	74WJPn08v+UU8lKHMlbATz8ex9+9XdmBjitLM3szheCwPqEXeLNH5QM23q+Z+Sr3y5LFMETp7pA
-	ENWX2YFwYQVwrY1MFIaraM4TH2xe/B104qcePoTXKTiBPgsq9IyZJFFhzYzoEG1ZXd0Yy6pUJgs
-	pQtr11JPmDj2S2PM1HdO2jlXHb1lmyLPS+MjMUYfnUfAHYJrUl74nFIbszi81TXPSTLmt6sIG66
-	Ep5jvUYSqcQFkR16j2dX/JGuFCYMy1XLqJYPcOvpXiKVFxiBPb+yQcMRFuGDRD60bxLL28B/6rJ
-	0bKtFM/bjyLfWQN5KshgAtqtGrM6/BRdeD7wlyjR3R4OK2tssRaZHBt4ogpUZPTPfDfbTeU4d2C
-	hC4E1a8N08x5u6npTcYzZs2pvhlB/gvU1YVy+J0GneG+FFzTCwIuUSG
-X-Received: by 2002:a17:903:32ce:b0:2c0:c37d:dfc1 with SMTP id d9443c01a7336-2c0c37de0dfmr110086075ad.34.1780364772106;
-        Mon, 01 Jun 2026 18:46:12 -0700 (PDT)
+        bh=KhwKwq+oR5VxK7FFuu21d6kQ4Vbv5ERvHXpa8GTJxhA=;
+        b=lVi2SFr2IZPuYKQU4nAUhtVy3OXtJpTt1YNxuFFdZO3bG/gBG3jo4OGZzJlHkF4yQH
+         T2LMW8fHImKs09ehUT5DgFDPYoJKFBQKM0v5Fpx7dnhcWtLhxbqqnWL8r1wsgxFj4KLK
+         CPLzG6S6PHiyphtrkqrCsdQgVLazCnu9rPstBmE/i3z0HBiZnhh0oPT2JjGXPRhxBMWd
+         I514if8vKWaHrp3oaY2V5aI6YtFZBNT2CwVaOX0wsuPvfatj5JZayvh+OF45WMwb+LHg
+         zxkQSoScFjd8EuOrjvnkr4TB5zw86tdy2lDDaaENAuM7U+/QOwWICpgvXzhE3pAu3ijn
+         MIZw==
+X-Gm-Message-State: AOJu0Ywf0pDM+QMQ7l/Nw1IFEceu9y41juyY5dEuGFVccgjcVZJ1O6pb
+	GCu+lFffJS4QsbLoaGhdiidk0WpMI+eGWSiJURcZp4mWHK8jPcf2DzALHg0eNQ==
+X-Gm-Gg: Acq92OGS/4XIh8vEA4a0keDCND1SwjcSoTb+3O6f5AJXG2ZcTR5teV8JwGZHq1iIwlY
+	ah7dsYor8bnDqW0IbFv3ZbIZhR6bFWLw0J9fFrPvm0xj1rgtDGDjjXXx/uBmDlN3e3V5ZSj+PvT
+	FP/VwQ6wbG5QGEENXogZi03Jzhb2KMb/cPGGW9S62RBAIMK0kt5mTedxDWaHn3PLZ6i+oSWYi0v
+	Kx/pO+T9vB/WgXj7dzxOAc9LYKFtGTtkbgB5uq02Dv7K5Ze2orWbLFcSgXHYoz3QjeTIsd2cETO
+	SuGTCSZQzYpTRTJsPpUqL0wTMCeMl7VDf50JAFwC/1mzvABMmtZshmZDKsfOEPprJzBXB779WdD
+	DtJebnQkqRTilIf+BTsEgD6YwDTf5p7pzAa+OKeW4NHAJkMY9WRBG+wI5i3VgSup1A3dZtPPXBx
+	y/WuLCvtJ/B2hxyZXLrpaweyIvkxfzMdZ8pZ12BGf5Mc8QE6heCOWEhGJlsDr5D4YJm5Q2Qyeha
+	jmCbyZqLlf4hZNxXXxi5jeJGo6/tOvyWd43XHIQpl4FAw==
+X-Received: by 2002:a17:903:240e:b0:2ae:450c:951e with SMTP id d9443c01a7336-2bf367f27dcmr142894745ad.17.1780364823307;
+        Mon, 01 Jun 2026 18:47:03 -0700 (PDT)
 Received: from ryzen ([2601:644:8000:5b5d:7285:c2ff:fe45:8a32])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bf239fd85dsm112273465ad.25.2026.06.01.18.46.10
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bf239fd84fsm119660615ad.23.2026.06.01.18.47.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jun 2026 18:46:11 -0700 (PDT)
+        Mon, 01 Jun 2026 18:47:02 -0700 (PDT)
 From: Rosen Penev <rosenp@gmail.com>
 To: linux-crypto@vger.kernel.org
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH] crypto: amcc - check ppc4xx_trng_probe() return value
-Date: Mon,  1 Jun 2026 18:45:53 -0700
-Message-ID: <20260602014553.522044-1-rosenp@gmail.com>
+Subject: [PATCH] crypto: amcc - convert irq_of_parse_and_map to platform_get_irq
+Date: Mon,  1 Jun 2026 18:46:45 -0700
+Message-ID: <20260602014645.522137-1-rosenp@gmail.com>
 X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -73,100 +73,51 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-ppc4xx_trng_probe() can fail for several reasons (missing TRNG node,
-iomap failure, allocation failure, hwrng registration failure). Change
-its return type from void to int and propagate error codes back to the
-caller in crypto4xx_probe() so that probe failures are handled properly.
+Replace the deprecated irq_of_parse_and_map() call with the modern
+platform_get_irq() in the probe function. This also improves error
+handling: platform_get_irq() returns a negative errno on failure,
+whereas irq_of_parse_and_map() returned 0.
+
+Change the irq field in struct crypto4xx_core_device from u32 to int
+to match the return type of platform_get_irq().
 
 Assisted-by: opencode:big-pickle
 Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- drivers/crypto/amcc/crypto4xx_core.c |  5 ++++-
- drivers/crypto/amcc/crypto4xx_trng.c | 12 ++++++------
- drivers/crypto/amcc/crypto4xx_trng.h |  6 +++---
- 3 files changed, 13 insertions(+), 10 deletions(-)
+ drivers/crypto/amcc/crypto4xx_core.c | 6 +++++-
+ drivers/crypto/amcc/crypto4xx_core.h | 2 +-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
-index 0f1b2653769c..596a90af2c90 100644
+index b7b6c97d2147..063282a2ad63 100644
 --- a/drivers/crypto/amcc/crypto4xx_core.c
 +++ b/drivers/crypto/amcc/crypto4xx_core.c
-@@ -1346,7 +1346,10 @@ static int crypto4xx_probe(struct platform_device *ofdev)
- 	if (rc)
- 		goto err_tasklet;
- 
--	ppc4xx_trng_probe(core_dev);
-+	rc = ppc4xx_trng_probe(core_dev);
-+	if (rc)
-+		goto err_tasklet;
-+
- 	return 0;
- 
- err_tasklet:
-diff --git a/drivers/crypto/amcc/crypto4xx_trng.c b/drivers/crypto/amcc/crypto4xx_trng.c
-index 031dd2bf8598..f762f92dd03e 100644
---- a/drivers/crypto/amcc/crypto4xx_trng.c
-+++ b/drivers/crypto/amcc/crypto4xx_trng.c
-@@ -68,7 +68,7 @@ static const struct of_device_id ppc4xx_trng_match[] = {
- 	{},
- };
- 
--void ppc4xx_trng_probe(struct crypto4xx_core_device *core_dev)
-+int ppc4xx_trng_probe(struct crypto4xx_core_device *core_dev)
- {
- 	struct crypto4xx_device *dev = core_dev->dev;
- 	struct device_node *trng = NULL;
-@@ -79,17 +79,17 @@ void ppc4xx_trng_probe(struct crypto4xx_core_device *core_dev)
- 	trng = of_find_matching_node(NULL, ppc4xx_trng_match);
- 	if (!trng || !of_device_is_available(trng)) {
- 		of_node_put(trng);
--		return;
-+		return -ENODEV;
+@@ -1382,7 +1382,11 @@ static int crypto4xx_probe(struct platform_device *ofdev)
  	}
  
- 	dev->trng_base = devm_of_iomap(core_dev->device, trng, 0, NULL);
- 	of_node_put(trng);
- 	if (IS_ERR(dev->trng_base))
--		return;
-+		return PTR_ERR(dev->trng_base);
- 
- 	rng = devm_kzalloc(core_dev->device, sizeof(*rng), GFP_KERNEL);
- 	if (!rng)
--		return;
-+		return -ENOMEM;
- 
- 	rng->name = KBUILD_MODNAME;
- 	rng->data_present = ppc4xx_trng_data_present;
-@@ -103,9 +103,9 @@ void ppc4xx_trng_probe(struct crypto4xx_core_device *core_dev)
- 		ppc4xx_trng_enable(dev, false);
- 		dev_err(core_dev->device, "failed to register hwrng (%d).\n",
- 			err);
--		return;
-+		return err;
- 	}
--	return;
-+	return 0;
- }
- 
- void ppc4xx_trng_remove(struct crypto4xx_core_device *core_dev)
-diff --git a/drivers/crypto/amcc/crypto4xx_trng.h b/drivers/crypto/amcc/crypto4xx_trng.h
-index 7356716274cb..7c6f426ab275 100644
---- a/drivers/crypto/amcc/crypto4xx_trng.h
-+++ b/drivers/crypto/amcc/crypto4xx_trng.h
-@@ -13,11 +13,11 @@
- #define __CRYPTO4XX_TRNG_H__
- 
- #ifdef CONFIG_HW_RANDOM_PPC4XX
--void ppc4xx_trng_probe(struct crypto4xx_core_device *core_dev);
-+int ppc4xx_trng_probe(struct crypto4xx_core_device *core_dev);
- void ppc4xx_trng_remove(struct crypto4xx_core_device *core_dev);
- #else
--static inline void ppc4xx_trng_probe(
--	struct crypto4xx_core_device *dev __maybe_unused) { }
-+static inline int ppc4xx_trng_probe(
-+	struct crypto4xx_core_device *dev __maybe_unused) { return -ENODEV; }
- static inline void ppc4xx_trng_remove(
- 	struct crypto4xx_core_device *dev __maybe_unused) { }
- #endif
+ 	/* Register for Crypto isr, Crypto Engine IRQ */
+-	core_dev->irq = irq_of_parse_and_map(ofdev->dev.of_node, 0);
++	core_dev->irq = platform_get_irq(ofdev, 0);
++	if (core_dev->irq < 0) {
++		rc = core_dev->irq;
++		goto err_iomap;
++	}
+ 	rc = devm_request_irq(&ofdev->dev, core_dev->irq,
+ 			      is_revb ? crypto4xx_ce_interrupt_handler_revb :
+ 					crypto4xx_ce_interrupt_handler,
+diff --git a/drivers/crypto/amcc/crypto4xx_core.h b/drivers/crypto/amcc/crypto4xx_core.h
+index ee36630c670f..391475d00bdb 100644
+--- a/drivers/crypto/amcc/crypto4xx_core.h
++++ b/drivers/crypto/amcc/crypto4xx_core.h
+@@ -108,7 +108,7 @@ struct crypto4xx_core_device {
+ 	struct crypto4xx_device *dev;
+ 	struct hwrng *trng;
+ 	u32 int_status;
+-	u32 irq;
++	int irq;
+ 	struct tasklet_struct tasklet;
+ 	spinlock_t lock;
+ 	struct mutex rng_lock;
 -- 
 2.54.0
 
