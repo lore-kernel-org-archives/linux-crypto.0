@@ -1,40 +1,41 @@
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E95C390989
-	for <linux-crypto@vger.kernel.org>; Tue,  2 Jun 2026 18:17:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 770513909A4
+	for <linux-crypto@vger.kernel.org>; Tue,  2 Jun 2026 18:45:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780424247; cv=none; b=YORtWe7g8EVT/C7SFgBNoj2hVyn7UzSVVNTBuOJK3myCjz/GTkDwzzgzb39WpBRtfE2RMZmXMjm1w2Gob2AYrUqNMKOhl8fy2nKIEt5n0UvGNzh9cFcOrwlaz4rAayBgB8/w37Dz0NtQ5J92SFEWcIaVFfDQK6V10wQnQ2SIHoI=
+	t=1780425904; cv=none; b=mNcGrWk9qPEvUAgwmn3Rf9pGS6prL1kd3wQbEye1Gp5UJk8TUOUsuiQ9sKCdL+TJSdSjrWw/e+e+Fz5oEp6U7bq4xL+QLAPrBWgAFdpY0TB6AANWmKUDsyr5w+GIoRta6r3qFvQoexVxslk8jOO+zGoZO1GG9Aj1zXCbUYvpEBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780424247; c=relaxed/simple;
-	bh=lKrbErFL33y0hvZLmkIS71x1sxFvJ5v/SI1TpWYA9xA=;
+	s=arc-20240116; t=1780425904; c=relaxed/simple;
+	bh=mII4M3T9V53JqO8KFebIJB5RYzAb69uiYF7BjywVILA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i/eEFufLxbfoWVg3mpfWTGrLRYSiIlUITgZdY6toxl8uFkHv+dSk9FhxRMQLS8xHA1vdKT/gEWeOzsVXPifn2Fah4/p5mZsSn18IagoygYngqQxGhUAJy9ZzByxl8P39V42ipPKF2e0pbx9gBd856cAbxi0sHI1UAQxOxDahefA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BB8/dpvx; arc=none smtp.client-ip=91.218.175.178
+	 In-Reply-To:Content-Type; b=bgqnhuZaj1THmHw5M2jGGjVI5ZchHwguZR5/yOgr6wWzWCgpvDYAI+NX2WZW92Q7u2ki9nGQsVleaXVMdoKyfYunPwH/R3JhJRH1y+4btJKZqXWGGv0+KGWF2xjya+kT9yIkjFXeYBtxoOJTOb9SaNyCpPd8hqJ457qEYaIbv6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TbiXWH97; arc=none smtp.client-ip=95.215.58.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BB8/dpvx"
-Message-ID: <9f134eb4-1c64-47c4-8c4d-feb3c75072e6@linux.dev>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TbiXWH97"
+Message-ID: <2fb74fd3-c67c-4311-a850-16dbf0da39e9@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780424234;
+	t=1780425891;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=KwNAHhnYjbAwxb3CujRs87uODn/mS6bwBRlR99Zbexw=;
-	b=BB8/dpvxkI7ABBOHbbeUMG9d/OHBj/j+bxj8pt9mKsrjGzrzANg73shTc6xoqaD/+aPP0Y
-	vjKYgCbcV3WOG7slgBbAE1+AzCYXkkR0MeM4lA+LI99GrQz1UM1pgr8frkxXrK2lpQb7mG
-	ZbKZwEmW1VvzZbsEBSBae6FKovSch1A=
-Date: Tue, 2 Jun 2026 11:17:06 -0700
+	bh=/KjihzjRvX97rw+gmB11nyILK6Vj1Lk2bHpGiUdh8Qs=;
+	b=TbiXWH97plXQYDb4V0rQM7USSlkYQdyywRkC0e+ZEeB0v11cxNMVgZtUQy7OVWaP3yApIf
+	N3Y6RE8CZltBN3huHU/uvfoWYxw06QQ4OtdB+GERjZzR66MS8C9XYLDhe9y8FJ3SXB1OFv
+	it5GQXUuEpgcW3dn3VfLAgCihO1xWCc=
+Date: Tue, 2 Jun 2026 11:44:42 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 4/4] crypto: ccp: Fix memory leak in SEV INIT_EX path
+Subject: Re: [PATCH v2 1/4] KVM: SEV: Do not allow intra-host
+ migration/mirroring of SNP VMs
 To: Tom Lendacky <thomas.lendacky@amd.com>,
  Sean Christopherson <seanjc@google.com>, Paolo Bonzini
  <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -47,95 +48,73 @@ Cc: clm@meta.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-crypto@vger.kernel.org, stable@vger.kernel.org,
  Atish Patra <atishp@meta.com>, Sashiko <sashiko-bot@kernel.org>
 References: <20260601-sev_snp_fixes-v2-0-611891b28a86@meta.com>
- <20260601-sev_snp_fixes-v2-4-611891b28a86@meta.com>
- <f57a427b-0fc8-41f6-bc3c-cd86e7812629@amd.com>
+ <20260601-sev_snp_fixes-v2-1-611891b28a86@meta.com>
+ <ec31f685-e766-42e0-8239-eb6202cabdde@amd.com>
 Content-Language: en-US
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Atish Patra <atish.patra@linux.dev>
-In-Reply-To: <f57a427b-0fc8-41f6-bc3c-cd86e7812629@amd.com>
+In-Reply-To: <ec31f685-e766-42e0-8239-eb6202cabdde@amd.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Migadu-Flow: FLOW_OUT
 
 
-On 6/2/26 7:54 AM, Tom Lendacky wrote:
+On 6/2/26 7:38 AM, Tom Lendacky wrote:
 > On 6/1/26 18:04, Atish Patra wrote:
 >> From: Atish Patra <atishp@meta.com>
 >>
->> allocated pages in _init_ext_path are never freed and sev_init_ex_buffer
->> is left pointing at the leaked memory in case of any failures during the
->> function..
+>> The intra-host migration/mirroring feature is not fully implemented for
+>> SEV-SNP VMs. The proper migration requires additional SNP-specific
+>> state such as guest_req_mutex, guest_req_buf, and guest_resp_buf to be
+>> transferred or initialized on the destination.
 >>
->> Fix by adding an error path that frees the pages and clears
->> sev_init_ex_buffer. Make sure we only free the memory if the failure
->> happens before the conversion. Otherwise, we may end up trying to free
->> up converted pages in case of reclaim failure. rmp_mark_pages_firmware
->> failures should be rare enough to avoid more code complexity to track
->> down which pages were reclaimed/leaked vs which are not.
+>> The SNP VM mirroring requires vmsa features to be copied as well otherwise
+>> ASID would be bound to SNP range while VM is detected as a SEV VM.
 >>
->> Fixes: 7364a6fbca45 ("crypto: ccp: Handle non-volatile INIT_EX data when SNP is enabled")
+>> Reject SNP source VMs in migration/mirroring until proper SNP state
+>> transfer is implemented.
 >>
->> Reported-by: Sashiko <sashiko-bot@kernel.org>
->> Signed-off-by: Atish Patra <atishp@meta.com>
-> Not sure the goto's are the best, but they do the job - just a personal
-> preference for me here.
->
-> The new comment below is a bit verbose, I would think it is sufficient to
-> just say something like "Pages can be in an inconsistent state, don't
-> release them back to the system" or such.
-Sure. I will update the comment.
-> It might be nice in the future if we can identify if the reclaim was
-> successful and use that for determining whether the pages are safe to
-> freed... but the failure chance should be practically zero, so I'm not
-> sure it is worth it.
+>> Fixes: 0b020f5af092 ("KVM: SEV: Add support for SEV-ES intra host migration")
+> Probably not the correct Fixes: tag. It should the tag that first
+> introduces SNP hypervisor support.
 
-Yes. I had started that path but was not sure if the code churn is worth it.
-I can send it as a separate patch and we can take a call if you are 
-think it's worth.
+Ahh yes. Fixed.
 
+> And adding a comment above the if statements that indicate additional
+> support is required for SNP, so don't allow it for now, would be nice.
+Added.
+> Otherwise, for the actual code...
 >
 > Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
 >
+>> Reported-by: Chris Mason <clm@meta.com>
+>> Reported-by: Sashiko <sashiko-bot@kernel.org>
+>> Assisted-by: Claude:claude-opus-4-6
+>> Signed-off-by: Atish Patra <atishp@meta.com>
 >> ---
->>   drivers/crypto/ccp/sev-dev.c | 16 ++++++++++++++--
->>   1 file changed, 14 insertions(+), 2 deletions(-)
+>>   arch/x86/kvm/svm/sev.c | 4 +++-
+>>   1 file changed, 3 insertions(+), 1 deletion(-)
 >>
->> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
->> index 3d4793e8e34b..8566f164430b 100644
->> --- a/drivers/crypto/ccp/sev-dev.c
->> +++ b/drivers/crypto/ccp/sev-dev.c
->> @@ -1550,7 +1550,7 @@ static int __sev_platform_init_handle_init_ex_path(struct sev_device *sev)
+>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+>> index c2126b3c3072..e6ad6af128c9 100644
+>> --- a/arch/x86/kvm/svm/sev.c
+>> +++ b/arch/x86/kvm/svm/sev.c
+>> @@ -2142,7 +2142,8 @@ int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
+>>   		return ret;
 >>   
->>   	rc = sev_read_init_ex_file();
->>   	if (rc)
->> -		return rc;
->> +		goto err_free;
->>   
->>   	/* If SEV-SNP is initialized, transition to firmware page. */
->>   	if (sev->snp_initialized) {
->> @@ -1559,11 +1559,23 @@ static int __sev_platform_init_handle_init_ex_path(struct sev_device *sev)
->>   		npages = 1UL << get_order(NV_LENGTH);
->>   		if (rmp_mark_pages_firmware(__pa(sev_init_ex_buffer), npages, true)) {
->>   			dev_err(sev->dev, "SEV: INIT_EX NV memory page state change failed.\n");
->> -			return -ENOMEM;
->> +			rc = -ENOMEM;
->> +			/*
->> +			 * Don't free on conversion failure: the rollback may
->> +			 * have left pages firmware-owned, and a high-order
->> +			 * block can't be partially freed.
->> +			 */
->> +			goto err_reset;
->>   		}
+>>   	if (kvm->arch.vm_type != source_kvm->arch.vm_type ||
+>> -	    sev_guest(kvm) || !sev_guest(source_kvm)) {
+>> +	    sev_guest(kvm) || !sev_guest(source_kvm) ||
+>> +	    sev_snp_guest(source_kvm)) {
+>>   		ret = -EINVAL;
+>>   		goto out_unlock;
 >>   	}
->>   
->>   	return 0;
->> +
->> +err_free:
->> +	__free_pages(page, get_order(NV_LENGTH));
->> +err_reset:
->> +	sev_init_ex_buffer = NULL;
->> +	return rc;
->>   }
->>   
->>   static int __sev_platform_init_locked(int *error)
+>> @@ -2865,6 +2866,7 @@ int sev_vm_copy_enc_context_from(struct kvm *kvm, unsigned int source_fd)
+>>   	 * created after SEV/SEV-ES initialization, e.g. to init intercepts.
+>>   	 */
+>>   	if (sev_guest(kvm) || !sev_guest(source_kvm) ||
+>> +	    sev_snp_guest(source_kvm) ||
+>>   	    is_mirroring_enc_context(source_kvm) || kvm->created_vcpus) {
+>>   		ret = -EINVAL;
+>>   		goto e_unlock;
 >>
