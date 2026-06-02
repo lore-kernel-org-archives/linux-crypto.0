@@ -1,119 +1,172 @@
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3495A353EF7;
-	Mon,  1 Jun 2026 23:05:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0DC01B6D1A
+	for <linux-crypto@vger.kernel.org>; Tue,  2 Jun 2026 01:46:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780355112; cv=none; b=pZ5pqi71eHTMkbzuMT/8C75u6scSTtnvvWdGJf0KRwQI5YUqxOlJD94BEzTD8BAr0PbKthsu0TkwA2KlbbvHak2b8J4VxJT/+Rr1XTomGvwLwKACXlKg+xFIc4nIhD1dRf+MW5Vw9W6XzgWoPJshkSqFMhTYI3yk9Pu7/boIXf8=
+	t=1780364774; cv=none; b=AgFaifEm/zvIQ1LDIVymwFYhsc1qJUs3qvnaCZHNLmyiwlMeaafVIouESPXP2JKdhF4r7EGZJk6CnUQldy7yCOK5oI6vzlKHlS4NrS2TMCnY7Y/fB1DdZycAtU3VdhzcOPjKCLgvL1WMPNaznHp811TYxN87IqDzqBGTUJPY3fo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780355112; c=relaxed/simple;
-	bh=yBBNAHqeZj0yiEVQo2C2bFNBe2fJ1AMu/zDl1C0BFZE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=nfms75g8v6WpRUHXaTfFOtJNDfX5qOrUyoEGuJ3zP/560c3rD8vukSlHYiqjKRX4N5FSJAa03MmM+z6LSso6qMkmD6KChqr2lSNBWwbaws7pIRDTLGCGK62OholKGdctw6dXT+jubre3pFOT9jKMWIcXDdHKT03nNyTHkEErFQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pj91PvV1; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1780364774; c=relaxed/simple;
+	bh=IQs5IZ5NNl86+sSkd5aL5e9UTBxBuhDqL6rJdBGcQMk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=N2WgEc+RQb9Lv9tbIBot/OQ1CSFmL4Mzhsu1w8KYH51saPO4b1lELvRp96fdJNLxEMvpNIgqNp3ecO0kQtBNyYo+F75WTGhNcr3JHV/0DniN6peQlJm9JjZkRlFEYno0MczPsgYpfmB/IIM3cKIS0I0YbWXA1ZVYozurxj9h7MM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bK74qrY2; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pj91PvV1"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780355109;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FD4N0HbKLWVq/NAJ+NnEjLSsyGj1uFnK4ULSwpaY3Y0=;
-	b=pj91PvV1cVjFcCE77aVCey+4+FKCJdufWf/K6N24g9FsMXJY461BZaWWyvnEEJtjGcBP7J
-	MWQ1EpYNd0i2PsMf37at8DVxErFArvg6gwqcaOXcPi2hQinJX6YBY9J+FSSXZKxbswD2h8
-	dwxqxCUs3rlJ9O6chgry5wRQaSVJzBA=
-From: Atish Patra <atish.patra@linux.dev>
-Date: Mon, 01 Jun 2026 16:04:38 -0700
-Subject: [PATCH v2 4/4] crypto: ccp: Fix memory leak in SEV INIT_EX path
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bK74qrY2"
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2bea7176c72so87084765ad.0
+        for <linux-crypto@vger.kernel.org>; Mon, 01 Jun 2026 18:46:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780364772; x=1780969572; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dTGVpdaFXGUQW3sQeSXtN3M02faeyWcv40oYea6YDJQ=;
+        b=bK74qrY2uc7IbjYsNX1Dk3FaerTD6OR5hFGGQ1C2DW9gAYieY5xuWgSauUBxRofQaZ
+         NmGo1uPREuRiNaNFFi5WhuQFo60+PJnT+KINm3ckPqYhvrtRdXSOmgbsUcVNVAtzuaFR
+         A7SOruOCFiwxTUFUxGCUSeGUeq9bID9K0or7jHPYm/NqVmAor3RLeLMNjfc5Npv6WGLR
+         kjWv7T+DC4sGsMnXrgengtUMgq0KpAaALmX68vI7l7XMpzMwKqZgtwMXuOIiL2ST0hKI
+         yx5fFRhX5HfHI0OiCO5oqNN7dFDuWZdRLeIqiU+5peVMDg2GELnua93NPKVokmMWP1RL
+         WgGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780364772; x=1780969572;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dTGVpdaFXGUQW3sQeSXtN3M02faeyWcv40oYea6YDJQ=;
+        b=SwJoLxKlRLp3EZrfst1amUs9cNeziq6b1JwQ3ybELmciSLp/XZ25ByLGZuASZotC2Z
+         +f+cZlaeULXyKqD6yQV9CtWTvkoWPrgCrHlJTxXVckBJWBkyOIbb9t4MZnGcmrcV3cMj
+         TtJGnKUOFgrZkQ11KvrZvjam8YjO1UXsnVi3Rxqkb9z/lju5+1USl67KpioxVgRQ+8Xl
+         2eFZinnBEiaod3BefvZu2hYXTnsTN8Av4wdwRNkZSrMgxz6V5Ck9GmFgo8B4gueEfQaY
+         vR7NJn1xrpQBq+5RhbpaWlprhlZD2AZsLK2mGjfaSMWZFsq8V8ttEYV0gjNaJ2Kf9HH4
+         KZ4g==
+X-Gm-Message-State: AOJu0Yz9j4L1ul5ZxnWzazdHFfzLJledwqkMnmImGvql/oua3es4k++G
+	QplKIHj6MDaAaGx1NPLE9T9J+zkNz8NlNl14e4MUDWJEmT+yetMYd7jjJ1K5/A==
+X-Gm-Gg: Acq92OFJGPgspgLr16HZ1u4uLSVy6hN1XzhCtw5tCFiI/1R1iv0spYLyoPddu07rgCq
+	6jv2r+jBssO2270CnVVdP/rJUvF05azpUnGop9JfF0nNwzxEEecmu6MIOc981tXy7ecNTEzNtBf
+	74WJPn08v+UU8lKHMlbATz8ex9+9XdmBjitLM3szheCwPqEXeLNH5QM23q+Z+Sr3y5LFMETp7pA
+	ENWX2YFwYQVwrY1MFIaraM4TH2xe/B104qcePoTXKTiBPgsq9IyZJFFhzYzoEG1ZXd0Yy6pUJgs
+	pQtr11JPmDj2S2PM1HdO2jlXHb1lmyLPS+MjMUYfnUfAHYJrUl74nFIbszi81TXPSTLmt6sIG66
+	Ep5jvUYSqcQFkR16j2dX/JGuFCYMy1XLqJYPcOvpXiKVFxiBPb+yQcMRFuGDRD60bxLL28B/6rJ
+	0bKtFM/bjyLfWQN5KshgAtqtGrM6/BRdeD7wlyjR3R4OK2tssRaZHBt4ogpUZPTPfDfbTeU4d2C
+	hC4E1a8N08x5u6npTcYzZs2pvhlB/gvU1YVy+J0GneG+FFzTCwIuUSG
+X-Received: by 2002:a17:903:32ce:b0:2c0:c37d:dfc1 with SMTP id d9443c01a7336-2c0c37de0dfmr110086075ad.34.1780364772106;
+        Mon, 01 Jun 2026 18:46:12 -0700 (PDT)
+Received: from ryzen ([2601:644:8000:5b5d:7285:c2ff:fe45:8a32])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2bf239fd85dsm112273465ad.25.2026.06.01.18.46.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jun 2026 18:46:11 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: linux-crypto@vger.kernel.org
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH] crypto: amcc - check ppc4xx_trng_probe() return value
+Date: Mon,  1 Jun 2026 18:45:53 -0700
+Message-ID: <20260602014553.522044-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260601-sev_snp_fixes-v2-4-611891b28a86@meta.com>
-References: <20260601-sev_snp_fixes-v2-0-611891b28a86@meta.com>
-In-Reply-To: <20260601-sev_snp_fixes-v2-0-611891b28a86@meta.com>
-To: Sean Christopherson <seanjc@google.com>, 
- Paolo Bonzini <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>, 
- Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
- "H. Peter Anvin" <hpa@zytor.com>, Tom Lendacky <thomas.lendacky@amd.com>, 
- Peter Gonda <pgonda@google.com>, Brijesh Singh <brijesh.singh@amd.com>, 
- Youngjae Lee <youngjaelee@meta.com>, Ashish Kalra <ashish.kalra@amd.com>, 
- Michael Roth <michael.roth@amd.com>, John Allen <john.allen@amd.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>
-Cc: clm@meta.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-crypto@vger.kernel.org, stable@vger.kernel.org, 
- Atish Patra <atishp@meta.com>, Sashiko <sashiko-bot@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-From: Atish Patra <atishp@meta.com>
+ppc4xx_trng_probe() can fail for several reasons (missing TRNG node,
+iomap failure, allocation failure, hwrng registration failure). Change
+its return type from void to int and propagate error codes back to the
+caller in crypto4xx_probe() so that probe failures are handled properly.
 
-allocated pages in _init_ext_path are never freed and sev_init_ex_buffer
-is left pointing at the leaked memory in case of any failures during the
-function..
-
-Fix by adding an error path that frees the pages and clears
-sev_init_ex_buffer. Make sure we only free the memory if the failure
-happens before the conversion. Otherwise, we may end up trying to free
-up converted pages in case of reclaim failure. rmp_mark_pages_firmware
-failures should be rare enough to avoid more code complexity to track
-down which pages were reclaimed/leaked vs which are not.
-
-Fixes: 7364a6fbca45 ("crypto: ccp: Handle non-volatile INIT_EX data when SNP is enabled")
-
-Reported-by: Sashiko <sashiko-bot@kernel.org>
-Signed-off-by: Atish Patra <atishp@meta.com>
+Assisted-by: opencode:big-pickle
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- drivers/crypto/ccp/sev-dev.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+ drivers/crypto/amcc/crypto4xx_core.c |  5 ++++-
+ drivers/crypto/amcc/crypto4xx_trng.c | 12 ++++++------
+ drivers/crypto/amcc/crypto4xx_trng.h |  6 +++---
+ 3 files changed, 13 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 3d4793e8e34b..8566f164430b 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -1550,7 +1550,7 @@ static int __sev_platform_init_handle_init_ex_path(struct sev_device *sev)
- 
- 	rc = sev_read_init_ex_file();
+diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
+index 0f1b2653769c..596a90af2c90 100644
+--- a/drivers/crypto/amcc/crypto4xx_core.c
++++ b/drivers/crypto/amcc/crypto4xx_core.c
+@@ -1346,7 +1346,10 @@ static int crypto4xx_probe(struct platform_device *ofdev)
  	if (rc)
--		return rc;
-+		goto err_free;
+ 		goto err_tasklet;
  
- 	/* If SEV-SNP is initialized, transition to firmware page. */
- 	if (sev->snp_initialized) {
-@@ -1559,11 +1559,23 @@ static int __sev_platform_init_handle_init_ex_path(struct sev_device *sev)
- 		npages = 1UL << get_order(NV_LENGTH);
- 		if (rmp_mark_pages_firmware(__pa(sev_init_ex_buffer), npages, true)) {
- 			dev_err(sev->dev, "SEV: INIT_EX NV memory page state change failed.\n");
--			return -ENOMEM;
-+			rc = -ENOMEM;
-+			/*
-+			 * Don't free on conversion failure: the rollback may
-+			 * have left pages firmware-owned, and a high-order
-+			 * block can't be partially freed.
-+			 */
-+			goto err_reset;
- 		}
+-	ppc4xx_trng_probe(core_dev);
++	rc = ppc4xx_trng_probe(core_dev);
++	if (rc)
++		goto err_tasklet;
++
+ 	return 0;
+ 
+ err_tasklet:
+diff --git a/drivers/crypto/amcc/crypto4xx_trng.c b/drivers/crypto/amcc/crypto4xx_trng.c
+index 031dd2bf8598..f762f92dd03e 100644
+--- a/drivers/crypto/amcc/crypto4xx_trng.c
++++ b/drivers/crypto/amcc/crypto4xx_trng.c
+@@ -68,7 +68,7 @@ static const struct of_device_id ppc4xx_trng_match[] = {
+ 	{},
+ };
+ 
+-void ppc4xx_trng_probe(struct crypto4xx_core_device *core_dev)
++int ppc4xx_trng_probe(struct crypto4xx_core_device *core_dev)
+ {
+ 	struct crypto4xx_device *dev = core_dev->dev;
+ 	struct device_node *trng = NULL;
+@@ -79,17 +79,17 @@ void ppc4xx_trng_probe(struct crypto4xx_core_device *core_dev)
+ 	trng = of_find_matching_node(NULL, ppc4xx_trng_match);
+ 	if (!trng || !of_device_is_available(trng)) {
+ 		of_node_put(trng);
+-		return;
++		return -ENODEV;
  	}
  
- 	return 0;
-+
-+err_free:
-+	__free_pages(page, get_order(NV_LENGTH));
-+err_reset:
-+	sev_init_ex_buffer = NULL;
-+	return rc;
+ 	dev->trng_base = devm_of_iomap(core_dev->device, trng, 0, NULL);
+ 	of_node_put(trng);
+ 	if (IS_ERR(dev->trng_base))
+-		return;
++		return PTR_ERR(dev->trng_base);
+ 
+ 	rng = devm_kzalloc(core_dev->device, sizeof(*rng), GFP_KERNEL);
+ 	if (!rng)
+-		return;
++		return -ENOMEM;
+ 
+ 	rng->name = KBUILD_MODNAME;
+ 	rng->data_present = ppc4xx_trng_data_present;
+@@ -103,9 +103,9 @@ void ppc4xx_trng_probe(struct crypto4xx_core_device *core_dev)
+ 		ppc4xx_trng_enable(dev, false);
+ 		dev_err(core_dev->device, "failed to register hwrng (%d).\n",
+ 			err);
+-		return;
++		return err;
+ 	}
+-	return;
++	return 0;
  }
  
- static int __sev_platform_init_locked(int *error)
-
+ void ppc4xx_trng_remove(struct crypto4xx_core_device *core_dev)
+diff --git a/drivers/crypto/amcc/crypto4xx_trng.h b/drivers/crypto/amcc/crypto4xx_trng.h
+index 7356716274cb..7c6f426ab275 100644
+--- a/drivers/crypto/amcc/crypto4xx_trng.h
++++ b/drivers/crypto/amcc/crypto4xx_trng.h
+@@ -13,11 +13,11 @@
+ #define __CRYPTO4XX_TRNG_H__
+ 
+ #ifdef CONFIG_HW_RANDOM_PPC4XX
+-void ppc4xx_trng_probe(struct crypto4xx_core_device *core_dev);
++int ppc4xx_trng_probe(struct crypto4xx_core_device *core_dev);
+ void ppc4xx_trng_remove(struct crypto4xx_core_device *core_dev);
+ #else
+-static inline void ppc4xx_trng_probe(
+-	struct crypto4xx_core_device *dev __maybe_unused) { }
++static inline int ppc4xx_trng_probe(
++	struct crypto4xx_core_device *dev __maybe_unused) { return -ENODEV; }
+ static inline void ppc4xx_trng_remove(
+ 	struct crypto4xx_core_device *dev __maybe_unused) { }
+ #endif
 -- 
-2.53.0-Meta
+2.54.0
 
