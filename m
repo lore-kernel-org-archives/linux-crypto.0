@@ -1,36 +1,36 @@
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 881D93A168E
-	for <linux-crypto@vger.kernel.org>; Tue,  2 Jun 2026 22:36:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C18D63AD50E
+	for <linux-crypto@vger.kernel.org>; Tue,  2 Jun 2026 22:36:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780439813; cv=none; b=sWbNLhU62c41E3r15lMqaFPt0T+Ern7724UJUcyVkPKw+EZa6EeheFNK2FHYBfe50XdywbqliLLl3kEyWuva9rqESoIgKf5B1r098iNjw20DdiQ3Ty9r0bi+iimV3marK9rxARpnjjSLJRc3yS4ntNrwH/V1KjHJa89mUqiRqLo=
+	t=1780439816; cv=none; b=D85EmcL/rn1tO2t10HuuLAOpmDyve5/xJxLTOMOYLQloDiXCSIgwKqLMsbeT7cQxRCu4i7RfN1PyeiN91sRn0efWehzelWaonIqS8y275XkXSkTvTE4AmyfdcHjsLW54xsaqCYT+982euGDdaAejD3wye/VMBHLS+dbfZLF+yZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780439813; c=relaxed/simple;
-	bh=nLmgK2QUTw1cM7CspAyD0+EJIbz7/EpovpRhFQ4nPyg=;
+	s=arc-20240116; t=1780439816; c=relaxed/simple;
+	bh=hJHj9af2b4aGE8hdvzxfH1HNHgYHgZ+5YN6mW3BKutM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=MV9vLFbluKij58xdthyEDqDX3JjZQGZ2n8XcJIr2o+K6LzTXPzYphPCW4QDUNMRAOpQtJPGa3gmEJfd8PEHemc9BVJFQ8Z0NP6rFEYfoS2eu+q+m/pVLgqxAd0kGQz+wwBGPjb7C+hL/DhrBFVaSa28sTJAO9aHXV+xTEquHK4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sTPVwVRE; arc=none smtp.client-ip=91.218.175.173
+	 In-Reply-To:To:Cc; b=Kb9wJVJoxT+2vS/TBSi4W6Pmd7OAo+R17TvaYzN2bM57QQ+0N3YWGBQ0GN+mVqCJL+a/wEInLQmcKDlpPz4uFJS21VNl4SstAsS2AxwRtmNaFAcH7SEXWb/utoAiF9mOxYKT9B8UgDUwB1EcHUf/NZBEQCkFuH1bir10051XoJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SoyRONPK; arc=none smtp.client-ip=91.218.175.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sTPVwVRE"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SoyRONPK"
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1780439809;
+	t=1780439812;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=YU3VGYDHMSuXOk2TlF1/XLiQKn7O+Ll77KLtsMACVqw=;
-	b=sTPVwVRERoNEMtd4MBnKVafqVhpUTs8gV9/gqRM5ohPJ/FIyyFE5GYSGX/KRLRdW3b2lmM
-	9cPxHthtwG58xNu1E+sTSkJ3db3Qw2qvZ+C4DjePNsJ99tmYajze3IFMoJo6v7H0xsT3se
-	3k/HD1lbSAoevqEJRoLu99K/zbyN2Ac=
+	bh=qwUuu9T1lQ6cMXR7h0uQbhUHWqF4ALjjRwoKhkOobCI=;
+	b=SoyRONPKp4Ug4mCFZHWRI62iAUsegWvVxtlzNu8Iv1nqJ5WrOm3merrIDlJo9ie/xt+VMy
+	KpiFMb0f65wJFnw1va/ETFuvcxziFT2PU583U/gVnwJzj/rnbAMstfh78K7/W19qRMwMXC
+	aIonyrqntDDY2OxVaSUyU7/CXvuZEQ8=
 From: Atish Patra <atish.patra@linux.dev>
-Date: Tue, 02 Jun 2026 15:36:32 -0700
-Subject: [PATCH v3 1/4] KVM: SEV: Do not allow intra-host
- migration/mirroring of SNP VMs
+Date: Tue, 02 Jun 2026 15:36:33 -0700
+Subject: [PATCH v3 2/4] KVM: selftests: Verify SNP VMs are rejected from
+ migration and mirroring
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -39,7 +39,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260602-sev_snp_fixes-v3-1-24bfd3ae047c@meta.com>
+Message-Id: <20260602-sev_snp_fixes-v3-2-24bfd3ae047c@meta.com>
 References: <20260602-sev_snp_fixes-v3-0-24bfd3ae047c@meta.com>
 In-Reply-To: <20260602-sev_snp_fixes-v3-0-24bfd3ae047c@meta.com>
 To: Sean Christopherson <seanjc@google.com>, 
@@ -52,60 +52,93 @@ To: Sean Christopherson <seanjc@google.com>,
  Herbert Xu <herbert@gondor.apana.org.au>
 Cc: clm@meta.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
  linux-crypto@vger.kernel.org, stable@vger.kernel.org, 
- Atish Patra <atishp@meta.com>, Sashiko <sashiko-bot@kernel.org>
+ Atish Patra <atishp@meta.com>
 X-Migadu-Flow: FLOW_OUT
 
 From: Atish Patra <atishp@meta.com>
 
-The intra-host migration/mirroring feature is not fully implemented for
-SEV-SNP VMs. The proper migration requires additional SNP-specific
-state such as guest_req_mutex, guest_req_buf, and guest_resp_buf to be
-transferred or initialized on the destination.
+Migration and mirroring of SEV-SNP VMs are not supported yet.
 
-The SNP VM mirroring requires vmsa features to be copied as well otherwise
-ASID would be bound to SNP range while VM is detected as a SEV VM.
+Add two selftests that verify KVM rejects intra-host migration and
+mirroring when the source VM is an SNP VM, so the restriction stays enforced
+until proper SNP state transfer is implemented.
 
-Reject SNP source VMs in migration/mirroring until proper SNP state
-transfer is implemented.
-
-Fixes: 1dfe571c12cf ("KVM: SEV: Add initial SEV-SNP support")
-
-Reported-by: Chris Mason <clm@meta.com>
-Reported-by: Sashiko <sashiko-bot@kernel.org>
-Assisted-by: Claude:claude-opus-4-6
-Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
 Signed-off-by: Atish Patra <atishp@meta.com>
 ---
- arch/x86/kvm/svm/sev.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ .../testing/selftests/kvm/x86/sev_migrate_tests.c  | 47 ++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index c2126b3c3072..a34326a77290 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -2141,8 +2141,10 @@ int sev_vm_move_enc_context_from(struct kvm *kvm, unsigned int source_fd)
- 	if (ret)
- 		return ret;
+diff --git a/tools/testing/selftests/kvm/x86/sev_migrate_tests.c b/tools/testing/selftests/kvm/x86/sev_migrate_tests.c
+index 6b0928e69051..acef6ab26d3d 100644
+--- a/tools/testing/selftests/kvm/x86/sev_migrate_tests.c
++++ b/tools/testing/selftests/kvm/x86/sev_migrate_tests.c
+@@ -313,6 +313,49 @@ static void test_sev_mirror_parameters(void)
+ 	kvm_vm_free(vm_no_vcpu);
+ }
  
-+	/* Do not allow SNP VM migration until additional state transfer is implemented  */
- 	if (kvm->arch.vm_type != source_kvm->arch.vm_type ||
--	    sev_guest(kvm) || !sev_guest(source_kvm)) {
-+	    sev_guest(kvm) || !sev_guest(source_kvm) ||
-+	    sev_snp_guest(source_kvm)) {
- 		ret = -EINVAL;
- 		goto out_unlock;
++static void test_sev_snp_migrate_reject(void)
++{
++	struct kvm_vm *src_vm, *dst_vm;
++	int ret;
++
++	src_vm = vm_create_barebones_type(KVM_X86_SNP_VM);
++	snp_vm_init(src_vm);
++	__vm_vcpu_add(src_vm, 0);
++	vm_sev_launch(src_vm, snp_default_policy(), NULL);
++
++	dst_vm = vm_create_barebones_type(KVM_X86_SNP_VM);
++	__vm_vcpu_add(dst_vm, 0);
++
++	ret = __sev_migrate_from(dst_vm, src_vm);
++	TEST_ASSERT(ret == -1 && errno == EINVAL,
++		    "SNP VM migration should be rejected. ret: %d, errno: %d",
++		    ret, errno);
++
++	kvm_vm_free(src_vm);
++	kvm_vm_free(dst_vm);
++}
++
++static void test_sev_snp_mirror_reject(void)
++{
++	struct kvm_vm *src_vm, *dst_vm;
++	int ret;
++
++	src_vm = vm_create_barebones_type(KVM_X86_SNP_VM);
++	snp_vm_init(src_vm);
++	__vm_vcpu_add(src_vm, 0);
++	vm_sev_launch(src_vm, snp_default_policy(), NULL);
++
++	dst_vm = aux_vm_create(false);
++
++	ret = __sev_mirror_create(dst_vm, src_vm);
++	TEST_ASSERT(ret == -1 && errno == EINVAL,
++		    "SNP VM mirroring should be rejected. ret: %d, errno: %d",
++		    ret, errno);
++
++	kvm_vm_free(src_vm);
++	kvm_vm_free(dst_vm);
++}
++
+ static void test_sev_move_copy(void)
+ {
+ 	struct kvm_vm *dst_vm, *dst2_vm, *dst3_vm, *sev_vm, *mirror_vm,
+@@ -384,12 +427,16 @@ int main(int argc, char *argv[])
+ 		test_sev_migrate_parameters();
+ 		if (kvm_has_cap(KVM_CAP_VM_COPY_ENC_CONTEXT_FROM))
+ 			test_sev_move_copy();
++		if (kvm_cpu_has(X86_FEATURE_SEV_SNP))
++			test_sev_snp_migrate_reject();
  	}
-@@ -2863,8 +2865,10 @@ int sev_vm_copy_enc_context_from(struct kvm *kvm, unsigned int source_fd)
- 	 * disallow out-of-band SEV/SEV-ES init if the target is already an
- 	 * SEV guest, or if vCPUs have been created.  KVM relies on vCPUs being
- 	 * created after SEV/SEV-ES initialization, e.g. to init intercepts.
-+	 * Also do not allow SNP VM mirroring until additional state transfer is implemented.
- 	 */
- 	if (sev_guest(kvm) || !sev_guest(source_kvm) ||
-+	    sev_snp_guest(source_kvm) ||
- 	    is_mirroring_enc_context(source_kvm) || kvm->created_vcpus) {
- 		ret = -EINVAL;
- 		goto e_unlock;
+ 	if (kvm_has_cap(KVM_CAP_VM_COPY_ENC_CONTEXT_FROM)) {
+ 		test_sev_mirror(/* es= */ false);
+ 		if (have_sev_es)
+ 			test_sev_mirror(/* es= */ true);
+ 		test_sev_mirror_parameters();
++		if (kvm_cpu_has(X86_FEATURE_SEV_SNP))
++			test_sev_snp_mirror_reject();
+ 	}
+ 	return 0;
+ }
 
 -- 
 2.53.0-Meta
