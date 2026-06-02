@@ -1,99 +1,141 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73210380FC7
-	for <linux-crypto@vger.kernel.org>; Tue,  2 Jun 2026 17:26:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E95C390989
+	for <linux-crypto@vger.kernel.org>; Tue,  2 Jun 2026 18:17:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780421185; cv=none; b=XRrITGWFUO0pzQ0HdgyLjj+BJaiWfwXs1ioLd2ATLNMOQoLS5uCZ5SAZD0TneCT4JMrgv9h6EyBD5b0CZUiTt3xkDDE65CC5l9v/qj8jLAN531X+YYSCTxu8gMI7jLXz8lZdOVHNpgZ3VBbPSNOvKNqYzfdRYTqEF6wqmwv71+o=
+	t=1780424247; cv=none; b=YORtWe7g8EVT/C7SFgBNoj2hVyn7UzSVVNTBuOJK3myCjz/GTkDwzzgzb39WpBRtfE2RMZmXMjm1w2Gob2AYrUqNMKOhl8fy2nKIEt5n0UvGNzh9cFcOrwlaz4rAayBgB8/w37Dz0NtQ5J92SFEWcIaVFfDQK6V10wQnQ2SIHoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780421185; c=relaxed/simple;
-	bh=QJHorl3xOeduBvAKtKAREWRw7Npws2A6veRs5qeSZwI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pTBPq01wAq3vEpZIAi0pwSftxr4LDQP8xm27vEcxw2dwkTWEZqg3VZqKM5X++RdBYJNvK2QjSiE7c21Nu2gIEHLVnCi16y9XbiOCGIt0/fwdIbNpXYwf7/2rayb7Vh5OcuTQ7j/Gi3I9Co9fFn2eL1veLPnVaMGH6xcgvmTH+sw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=famDYgPC; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780424247; c=relaxed/simple;
+	bh=lKrbErFL33y0hvZLmkIS71x1sxFvJ5v/SI1TpWYA9xA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=i/eEFufLxbfoWVg3mpfWTGrLRYSiIlUITgZdY6toxl8uFkHv+dSk9FhxRMQLS8xHA1vdKT/gEWeOzsVXPifn2Fah4/p5mZsSn18IagoygYngqQxGhUAJy9ZzByxl8P39V42ipPKF2e0pbx9gBd856cAbxi0sHI1UAQxOxDahefA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BB8/dpvx; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="famDYgPC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41F171F0089B;
-	Tue,  2 Jun 2026 17:26:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780421184;
-	bh=crzGd2e/H3YsozTRXg+pjftVc81TUrCT6e7aIghwWBg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=famDYgPCte0YZKqGrIiLMcLIZoRLMsY5KriRL2Skv6hg40j/hMAZ5T2xqFr1/OQQ3
-	 NvkJ9CDhklH1EFBRZDiew6vHmjDmX6t59GiKy0zWsqEMbf+qttZNt9kuWpO6Z1JMm9
-	 N3dh0BZKnGw3vn0aj+OQcGh+DhG2eOMndAshDnszcWDK50/Il/BJh5wDVXXtQdAUa+
-	 Oc8We7frZXMZ2ziZN2REiIS+O6UEg1Q6Jo454aIphzrzHEUpAZM0mIOt89CxsHSo26
-	 KLgO778dWRpruz6KcGHNIt8ft/dWbWdZAEdKdUzplwQ3Rkl5euuziu4nmFZfr01Uu7
-	 vr+FzLwBlzC+w==
-Date: Tue, 2 Jun 2026 17:26:22 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Dan Carpenter <error27@gmail.com>
-Cc: linux-crypto@vger.kernel.org
-Subject: Re: [bug report] crypto: omap - switch from scatter_walk to plain
- offset
-Message-ID: <20260602172622.GA2503276@google.com>
-References: <ah6SJiFErFV17cMi@stanley.mountain>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BB8/dpvx"
+Message-ID: <9f134eb4-1c64-47c4-8c4d-feb3c75072e6@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1780424234;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KwNAHhnYjbAwxb3CujRs87uODn/mS6bwBRlR99Zbexw=;
+	b=BB8/dpvxkI7ABBOHbbeUMG9d/OHBj/j+bxj8pt9mKsrjGzrzANg73shTc6xoqaD/+aPP0Y
+	vjKYgCbcV3WOG7slgBbAE1+AzCYXkkR0MeM4lA+LI99GrQz1UM1pgr8frkxXrK2lpQb7mG
+	ZbKZwEmW1VvzZbsEBSBae6FKovSch1A=
+Date: Tue, 2 Jun 2026 11:17:06 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ah6SJiFErFV17cMi@stanley.mountain>
+Subject: Re: [PATCH v2 4/4] crypto: ccp: Fix memory leak in SEV INIT_EX path
+To: Tom Lendacky <thomas.lendacky@amd.com>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>, Peter Gonda <pgonda@google.com>,
+ Brijesh Singh <brijesh.singh@amd.com>, Youngjae Lee <youngjaelee@meta.com>,
+ Ashish Kalra <ashish.kalra@amd.com>, Michael Roth <michael.roth@amd.com>,
+ John Allen <john.allen@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>
+Cc: clm@meta.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org, stable@vger.kernel.org,
+ Atish Patra <atishp@meta.com>, Sashiko <sashiko-bot@kernel.org>
+References: <20260601-sev_snp_fixes-v2-0-611891b28a86@meta.com>
+ <20260601-sev_snp_fixes-v2-4-611891b28a86@meta.com>
+ <f57a427b-0fc8-41f6-bc3c-cd86e7812629@amd.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Atish Patra <atish.patra@linux.dev>
+In-Reply-To: <f57a427b-0fc8-41f6-bc3c-cd86e7812629@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jun 02, 2026 at 11:19:50AM +0300, Dan Carpenter wrote:
-> Hello Eric Biggers,
-> 
-> Commit 42c5675c2f5b ("crypto: omap - switch from scatter_walk to
-> plain offset") from Jan 5, 2025 (linux-next), leads to the following
-> Smatch static checker warning:
-> 
-> drivers/crypto/omap-des.c:842 omap_des_irq() error: we previously assumed 'dd->in_sg' could be null (see line 844)
-> drivers/crypto/omap-des.c:872 omap_des_irq() error: we previously assumed 'dd->out_sg' could be null (see line 874)
-> 
-> drivers/crypto/omap-des.c
->     823 static irqreturn_t omap_des_irq(int irq, void *dev_id)
->     824 {
->     825         struct omap_des_dev *dd = dev_id;
->     826         u32 status, i;
->     827         u32 *src, *dst;
->     828 
->     829         status = omap_des_read(dd, DES_REG_IRQ_STATUS(dd));
->     830         if (status & DES_REG_IRQ_DATA_IN) {
->     831                 omap_des_write(dd, DES_REG_IRQ_ENABLE(dd), 0x0);
->     832 
->     833                 BUG_ON(!dd->in_sg);
->     834 
->     835                 BUG_ON(dd->in_sg_offset > dd->in_sg->length);
->     836 
->     837                 src = sg_virt(dd->in_sg) + dd->in_sg_offset;
->     838 
->     839                 for (i = 0; i < DES_BLOCK_WORDS; i++) {
->     840                         omap_des_write(dd, DES_REG_DATA_N(dd, i), *src);
->     841                         dd->in_sg_offset += 4;
-> --> 842                         if (dd->in_sg_offset == dd->in_sg->length) {
->                                                         ^^^^^^^^^
-> Dereference.
-> 
->     843                                 dd->in_sg = sg_next(dd->in_sg);
-> 
-> Imagine that sg_next() returns NULL, then the next iteration through the
-> loop will crash.
-> 
->     844                                 if (dd->in_sg) {
->     845                                         dd->in_sg_offset = 0;
->     846                                         src = sg_virt(dd->in_sg);
->     847                                 }
->     848                         } else {
->     849                                 src++;
->     850                         }
->     851                 }
->     852 
->     853                 /* Clear IRQ status */
 
-Pre-existing bug.
+On 6/2/26 7:54 AM, Tom Lendacky wrote:
+> On 6/1/26 18:04, Atish Patra wrote:
+>> From: Atish Patra <atishp@meta.com>
+>>
+>> allocated pages in _init_ext_path are never freed and sev_init_ex_buffer
+>> is left pointing at the leaked memory in case of any failures during the
+>> function..
+>>
+>> Fix by adding an error path that frees the pages and clears
+>> sev_init_ex_buffer. Make sure we only free the memory if the failure
+>> happens before the conversion. Otherwise, we may end up trying to free
+>> up converted pages in case of reclaim failure. rmp_mark_pages_firmware
+>> failures should be rare enough to avoid more code complexity to track
+>> down which pages were reclaimed/leaked vs which are not.
+>>
+>> Fixes: 7364a6fbca45 ("crypto: ccp: Handle non-volatile INIT_EX data when SNP is enabled")
+>>
+>> Reported-by: Sashiko <sashiko-bot@kernel.org>
+>> Signed-off-by: Atish Patra <atishp@meta.com>
+> Not sure the goto's are the best, but they do the job - just a personal
+> preference for me here.
+>
+> The new comment below is a bit verbose, I would think it is sufficient to
+> just say something like "Pages can be in an inconsistent state, don't
+> release them back to the system" or such.
+Sure. I will update the comment.
+> It might be nice in the future if we can identify if the reclaim was
+> successful and use that for determining whether the pages are safe to
+> freed... but the failure chance should be practically zero, so I'm not
+> sure it is worth it.
 
-- Eric
+Yes. I had started that path but was not sure if the code churn is worth it.
+I can send it as a separate patch and we can take a call if you are 
+think it's worth.
+
+>
+> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+>
+>> ---
+>>   drivers/crypto/ccp/sev-dev.c | 16 ++++++++++++++--
+>>   1 file changed, 14 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+>> index 3d4793e8e34b..8566f164430b 100644
+>> --- a/drivers/crypto/ccp/sev-dev.c
+>> +++ b/drivers/crypto/ccp/sev-dev.c
+>> @@ -1550,7 +1550,7 @@ static int __sev_platform_init_handle_init_ex_path(struct sev_device *sev)
+>>   
+>>   	rc = sev_read_init_ex_file();
+>>   	if (rc)
+>> -		return rc;
+>> +		goto err_free;
+>>   
+>>   	/* If SEV-SNP is initialized, transition to firmware page. */
+>>   	if (sev->snp_initialized) {
+>> @@ -1559,11 +1559,23 @@ static int __sev_platform_init_handle_init_ex_path(struct sev_device *sev)
+>>   		npages = 1UL << get_order(NV_LENGTH);
+>>   		if (rmp_mark_pages_firmware(__pa(sev_init_ex_buffer), npages, true)) {
+>>   			dev_err(sev->dev, "SEV: INIT_EX NV memory page state change failed.\n");
+>> -			return -ENOMEM;
+>> +			rc = -ENOMEM;
+>> +			/*
+>> +			 * Don't free on conversion failure: the rollback may
+>> +			 * have left pages firmware-owned, and a high-order
+>> +			 * block can't be partially freed.
+>> +			 */
+>> +			goto err_reset;
+>>   		}
+>>   	}
+>>   
+>>   	return 0;
+>> +
+>> +err_free:
+>> +	__free_pages(page, get_order(NV_LENGTH));
+>> +err_reset:
+>> +	sev_init_ex_buffer = NULL;
+>> +	return rc;
+>>   }
+>>   
+>>   static int __sev_platform_init_locked(int *error)
+>>
