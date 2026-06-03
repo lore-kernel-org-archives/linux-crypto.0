@@ -1,82 +1,87 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8491F3806C5;
-	Wed,  3 Jun 2026 02:47:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC737305687;
+	Wed,  3 Jun 2026 05:07:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780454870; cv=none; b=kw/zOp91qLmuYftbUt2VHdHFW2KUbnJdTUStNE9HxlLNqKThjNWDbBl4jXYczDTyEi1pF3ybOS48im970+Wezgi/jw/9AscJNJg9YvRKcdgQ8KzBtFeGbMqcfFnBXeDZf80yQcKplGbcmiqL+iWgpOsBTIFQ9UKtULvhCcKaG2w=
+	t=1780463243; cv=none; b=sZCJcyAAoXuGjM8SVpvuLqbwWYLBetE+Epb5MuYVEM2EceQQj04T7ju+BqFN40+hxnN6dPsAdjmEYYdQvWI/l8PStH78h1DdhhVMiGBELtZMQcvU+FGQLkX4s9f2ipVi7kCwVaTU09LO7NXRjtcP9FoD5xRJtixSN3GzNL9YgWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780454870; c=relaxed/simple;
-	bh=zLThn5ELlGVTZIgTCfgBk6HK3rThC41kW3qQNWkowfE=;
+	s=arc-20240116; t=1780463243; c=relaxed/simple;
+	bh=ShBCDpb+nNi0u9x1/49snwBYQCd/jqe/tsYpi9A1mFs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hb3rrnx8HvVnu3TNpz90cWYjItzsNCzdNb+fqnlr7cQGLxRPqunviACjhLvHE/iTfwV2ocTFuy/5JAYP9iG2efXDMwrLS7L9YqcZD65+SicizIEkRh5p32A/I9LOdHX4g+iwYzv7tAOe8xU1kjBcf/Bpe4tFNClb308rZmDjAes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=pLGc/652; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z5JW6IBNFraG4rUvoX71ZRGApXTmRtqzdNgjA0pPio6q/hq1DqJuyP5gxF5udG9uu/hKevgKagXLRb75F78PouyUuymOJNP1jEeJPVXf636Ofga10jyRUlVaQm7xqXe1FPi8fnzO+9n/PzEePNXRs/5Jvhr+w/CQx+QI2UV+A50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lQiC8qDx; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="pLGc/652"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=cdWzvcfGbnqyGx7staWmXlYN+VUHJippWxB+WP8/jYo=; 
-	b=pLGc/652HdHsnEHoUufPC6OlrYYCt03ydV8VlaMOf6OGVi4bFXhe/UEkLHvuiYWv/BBgBsrNhb0
-	p/wK475B1X0rprjBVKHx9WRfoGabh9ldhkCf7DnNZI/Rs/d5saJYKXr/+kcg32gbHslKveEuXjksY
-	t1GnQ0hkeJ003UKAETsg6KGr8OhsMG3LWZOmpqwPzlM7QLRuZouVFOZiDJK5Pv2OtMR8mCesjRfKL
-	0SwuoBW9HrrwFTJ0A5HAJ39QHwCcoLalXcMRS2uoOfuLjsEHPRz0XppRGcZPAvp6XArwCSx1dw2bO
-	raIeEOg8WgteRc1sUnbKHO3qjKZgzcnkTShg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wUbdr-001uGs-0f;
-	Wed, 03 Jun 2026 10:47:40 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 03 Jun 2026 10:47:39 +0800
-Date: Wed, 3 Jun 2026 10:47:39 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Wentao Liang <vulab@iscas.ac.cn>
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH] crypto/algapi: fix refcount leak in crypto_register_alg()
-Message-ID: <ah-Vyxfn9ZLIhNLU@gondor.apana.org.au>
-References: <20260603024119.3693829-1-vulab@iscas.ac.cn>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lQiC8qDx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0589A1F00893;
+	Wed,  3 Jun 2026 05:07:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780463242;
+	bh=NZfs+8QOWHnzBC5Gw/raUgTWyy6cc00garM0ZCoyNHM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=lQiC8qDxBfCppepp8RAXwBm2d7G7zdfLHpWlC056Xc1ees/MkpyX/zWEZagIGK3lT
+	 QVwPaIXwKL+J/lQWpL/Dp7CZ1VtoHm+kVDqrFVYdh1f0pl8RYJ0WNWgJqZNcFwG+gY
+	 qh2YLl1aMavqpBi5YOOAHZN8SOneMPIqI8LVt28Y+HflsIQoyPfElIiMOmOULdp43G
+	 cRBTkoT+15spsTsNvytRX5lJvp4TXMWP2tg+jjZZ45fAMkk1wlqswsoQ3jLIajb0G2
+	 3NInLz/nGO85BSLAqJPLiZnogdVOIoVCGGwtjB2tcwbFgFJaAO9faTr4EHqitT0/Pa
+	 dcS7tbMIyCBDw==
+Date: Tue, 2 Jun 2026 22:05:57 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Marc Dionne <marc.c.dionne@gmail.com>
+Cc: netdev@vger.kernel.org, linux-afs@lists.infradead.org,
+	David Howells <dhowells@redhat.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net-next v2 0/5] Consolidate FCrypt and PCBC code into
+ net/rxrpc/
+Message-ID: <20260603050557.GB18149@sol>
+References: <20260522050740.84561-1-ebiggers@kernel.org>
+ <CAB9dFduBir-41_Ef4noEJPHsFU-++JHDxMU-6S7B8pBYynvadA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260603024119.3693829-1-vulab@iscas.ac.cn>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAB9dFduBir-41_Ef4noEJPHsFU-++JHDxMU-6S7B8pBYynvadA@mail.gmail.com>
 
-On Wed, Jun 03, 2026 at 02:41:19AM +0000, Wentao Liang wrote:
-> In crypto_register_alg(), if the algorithm registration fails after
-> a successful crypto_alg_get() on the template algorithm, the acquired
-> reference is never released. This can occur when the new algorithm is
-> not allowed to be registered due to a constraint check failure.
+On Fri, May 22, 2026 at 10:06:49AM -0300, Marc Dionne wrote:
+> On Fri, May 22, 2026 at 2:07 AM Eric Biggers <ebiggers@kernel.org> wrote:
+> >
+> > The FCrypt "block cipher" and the PCBC mode of operation are obsolete
+> > and insecure.  Since their only user is net/rxrpc/, they belong there,
+> > not in the crypto API.
+> >
+> > Therefore, this series removes these algorithms from the crypto API and
+> > replaces them with local implementations in net/rxrpc/.
+> >
+> > The local implementations are simpler too, as they avoid the crypto API
+> > boilerplate.
+> >
+> > I don't know how to test all the code in net/rxrpc/, but everything
+> > should still work.  I added a KUnit test for the crypto functions.
+> >
+> > Changed in v2:
+> >     - Added missing export of fcrypt_preparekey().
+> >     - Write "RxRPC crypto KUnit test" instead of "RxRPC KUnit test".
+> >     - Rebased onto latest net-next where decryption now happens in the
+> >       linear buffer rxrpc_call::rx_dec_buffer, simplifying the code.
 > 
-> Fix the leak by adding a corresponding crypto_alg_put() call in the
-> error path before returning.
+> Looks good in testing with our kafs test suite, forcing the use of
+> rxkad with encryption.
 > 
-> Cc: stable@vger.kernel.org
-> Fixes: f1440a90465b ("crypto: api - Add support for duplicating algorithms before registration")
-> Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
-> ---
->  crypto/algapi.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/crypto/algapi.c b/crypto/algapi.c
-> index 37de377719ae..b0e4b13131c3 100644
-> --- a/crypto/algapi.c
-> +++ b/crypto/algapi.c
-> @@ -447,6 +447,7 @@ int crypto_register_alg(struct crypto_alg *alg)
->  
->  		p = kmemdup(p, algsize + sizeof(*alg), GFP_KERNEL);
->  		if (!p)
-> +			crypto_alg_put(alg);
->  			return -ENOMEM;
+> Feel free to add for the series:
+> Tested-by: Marc Dionne <marc.dionne@auristor.com>
 
-Where is this reference count coming from?
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks!
+
+If there's no more feedback, could this be applied to net-next?
+
+- Eric
