@@ -1,262 +1,299 @@
-Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD843391E58
-	for <linux-crypto@vger.kernel.org>; Thu,  4 Jun 2026 07:56:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780559802; cv=pass; b=FEbmYkdUqM1IrxGojvUE2yxa3nGMtXo+j7Abj/Ftkm1GfVqhzB86YuAml7KpU3Bgh0OdouubqyLzND8Ka9Qbna8BLdQ9+RYcag18E1FMgq8eObZVZ55hQPNCb06AMrSN1OpUHcQhLs/H+Yt2fLxlpPgltXXMxBJj57cOsHQyAUU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780559802; c=relaxed/simple;
-	bh=W4eBpaCKNBt9F3TWPxb3NCw8aR7zTaqNv6oeGFZdV+o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=j1tQOyEkhsl5rebhtvpcs5icj+aBgD4sNLlHoZOSvK5H3C5ymcOwdFKpsxTcZBo5/TmOuC+xps2aG8cEK5Ue/oltC7HE6JNGN3C5/UjU3Hh79R/horJdVZoA06uMIIcUE8tWYcNruF/mRqw5O9dImh+YgDU1hqQQ7oWj6j8b8qI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PsccG/Ol; arc=pass smtp.client-ip=74.125.224.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2D373264CF;
+	Thu,  4 Jun 2026 09:37:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780565881; cv=none; b=jj8Vi0sagMoeXkwuT52t9yzPFwj6hYaoWmwEKR2uHj/yUowVe9OKuP+nMBmYgINWgQuuw8T1Obfi7kfLfHKW8n4L3xCHgxR/SUAWYcUIZu0P39D128VAGzfr59LwLmyRN1zLTNuQaN4jzmU/JOWgwuJYss3txWYa4WJK/rpMAGI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780565881; c=relaxed/simple;
+	bh=wpm9AXofKUrtZeyvDk5gVDnSH5UWhLWdiSpqyjD5K9w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gCFf/6pPNVodYHfoQkaHowtLhOumkVcDBLIzuKEyyfaxYECf6o6i1FLwpm6ahyxdY+xPofXplJUTshW8uSOAL8EuVRk3LspeA1jcmoxBBs1kgKrOJEoHijpbCt8KwInvdOht0IJN/NV9ZxO9vfp4M3fYjFP8VM/HuSHLtlFdTm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E/jf3bU5; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PsccG/Ol"
-Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-66050f7af22so67951d50.0
-        for <linux-crypto@vger.kernel.org>; Thu, 04 Jun 2026 00:56:40 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1780559800; cv=none;
-        d=google.com; s=arc-20240605;
-        b=JIuI4xCzYtMR8S8xB12cefmqpHHSbw6AAS++hRTcnG/tZNpgBO5BA8mHQM9iPJcF3q
-         addKEOwdPaeDcxF0TS9Ie82ZIRTPvH7H/4SLL5MQN9Hd5QoSIY7iWxJkfWF5MwR5YkLR
-         LnlP1zEt1gMmwOkPQEZRJEpILttsM0GFghhSKv0OEh8tgGNNNKQiSJMkLu0VlcrUDT0F
-         q27G1t84CGhEqbqXiMSaWXMsYvs+nsbvA6cdgXxekc5Wa30PIVsYku6FXBRBgiiy9XxN
-         8ewjrC2NEp1A3A93Ol26xkm+n6RhaDu4e6wMJfVq0EkU5Qu+GZl8Vmq1djSODhGEnuT+
-         mEOA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=eGgotgVvr2112uvvc1DyL29QVRiLiPk2tEKJibU9Fy8=;
-        fh=X0Iz2gzona6KASzVoDOHNmfJAgTn8THqLsOAbp1Yubg=;
-        b=LXBqqjJNBO+i+7o5MWphzQQ+VTdGy0CjcylGtTBYiswv9NEb+gyHfpvn+oxearH8lr
-         mkKr1HD1yodUAyhCRaNRb1UJxCJ9zXAGewXr5r/9alInJ2eWgc7AJs9ligeGZ7noXuUU
-         hHYtTKNmw5dUvymLq9CiyOhZLYI4rak2HKI6HNDpULzzdzbGFh/N/aMFeiQx2w18lCNy
-         dQJBVUkk7TJ+N7KJLvu6EoxftpaPL0ob3p5fuwGn9ySh98OM/43SfPuNOsJlOdo9/ysD
-         bAFL2RY6uiqL5gtPaFXz7j3EHPBc2lvc3Op30SA6uvAo/1y5splrWEFbPN/IkuALJoNi
-         gvtw==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780559800; x=1781164600; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eGgotgVvr2112uvvc1DyL29QVRiLiPk2tEKJibU9Fy8=;
-        b=PsccG/Ol3aZlkDrRrLz7csF3gHPhc/5hjRewk0TilnDsw0SYc27DK3fTsLcdpIfzDs
-         pWZqV2TmJQrEwlfXxzE5KWzEQagufP8LmSNBpQkC/7l2ryiG95Dh75DKOoougtEb9G6t
-         nMRiCLZ7BBgewKz1KafCZWUcQTAkTapqmAgKJl6rFB3EH07p4DgGipycf5MgirGIzFVY
-         f4iinaCoqpWziz0NucFVtt7YEO3K9X7hnUX00/IRlVTKH+K0n9vcSTfIsSnJOy1RQy6c
-         zvUc9dOQ/7p21BF5T+JEE3WNACl4zEcgw1Sf3o9JSy4MuGzFTamulJGlSAgJCjs16BB0
-         1/Pw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780559800; x=1781164600;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=eGgotgVvr2112uvvc1DyL29QVRiLiPk2tEKJibU9Fy8=;
-        b=I/AVoBhvn+pRI12Kbi5VLS5+CPdFw5FHnTe7apXrxBboFt95cZO+/3OJTqEyF2O/ve
-         qQYpWRsct59nxOkgje4NpuW3wlzLSMRSQN2Ak7VmrhI2t0UgcPwYmJXrUQPB8Ll7sbIM
-         M8xsww9SGzQ8gfG20Sg9ja9Fv8zhn5ovYpsuY4zHZ5bM6DJQaBnWNYEwm9CUj7hyq93D
-         dFrbLLDFlLPoDx+Axql353EjORa/80CK6tAGXhfrpMxkJi9jADemygRdg2oX05sCjQ9t
-         Mbj9sFeO3HWTvzDKHQyOziXidnA8N/sUUCKHu5PQjbXx4rccqSuOhB2xWfhfcfS/m4Li
-         Cg6A==
-X-Forwarded-Encrypted: i=1; AFNElJ8su0W5U2C7xPtFWPpa30OKGxMWeaoQ8JDLDpqInaK/qRQcCCCIJniZ7sqckyq2t0bp3YytD6POjV+M3GA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGJ4LvxUEseYN20j0QtJP6NW1DgPnt1n3w4nqMAyvnWRXlT6wB
-	i0qm7+t7QiUxlbREurzQyGTCJ4sb9xwC5bz1XPimd2kP+T2AdKlUt/7TM+7wbEf6+hb/oBjIitA
-	EuXny3880LlMeLaFOpw7cXTh3yF2Bn4s=
-X-Gm-Gg: Acq92OHiHZKRLvBpYWnMWx7L6uKY3Tgeq0aSpdBQZXk+NeVQiO9v9KcS/TaPdLuJx6j
-	6KBA3eJmsKh68BJiLIKwKbtU5vUDeXGahJSLILPPc5THJcp6ji5a9Uab/K+2MrngMttjOusssrx
-	xqDbwFU9DwQQ4Mg9tGJSj2nXBQrgXTjXIdo/kGNkIXs54uY0FW9yan1n0BzScnj2z/fGxeqjIpl
-	6oXazn2Uo8nY4KOiKdi5WRUASvaTDt7Mu+7Bq5FpdxABOVyamb0StX7z/15OWuyvsjjZJFGj9aH
-	W8iCUVWDKbqs0xg=
-X-Received: by 2002:a53:ac81:0:b0:65e:3bde:1c8d with SMTP id
- 956f58d0204a3-660f3e4dc46mr957229d50.2.1780559799732; Thu, 04 Jun 2026
- 00:56:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E/jf3bU5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A09521F00893;
+	Thu,  4 Jun 2026 09:37:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780565879;
+	bh=PZESff+3K5aN8VsDlxLWWoHzK60uf539ndleuuoF1ws=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=E/jf3bU5qs06MXjFXNuVzYPSmeefgOrwyzPamyrK16ToFj6ZQi5CVr8shqEwWIrOZ
+	 FFPwi+1wN+Gppxs315blq048C0hJfFGQSI1/ma7W2y0iFdcgqewrmZAm7xjqD2kTzy
+	 7Msk3Y+EMURUXqynurxpkKbDHEIcSH57rCoxgdT3EC4rJHIbPmAIoP6NaWndpO18Yt
+	 fXkv8kJuZ6IeltmIWYLkdy7TtZ06enHZY5DicG3oa7mEpBGSdDcqjfgItej/KzOZOj
+	 nLLe9KO+yiZqVzgI/atgoK5NjQwyq3QoO1BMyCtXjECNzx4rDfi4m9lM2ywY3rCLFM
+	 936/12COmN9jA==
+Message-ID: <5dce751a-0d48-467e-b8c9-6702366cfd06@kernel.org>
+Date: Thu, 4 Jun 2026 11:37:55 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260529092703.33086-1-l.rubusch@gmail.com> <ah381bcuVfN8PQr0@linux.dev>
-In-Reply-To: <ah381bcuVfN8PQr0@linux.dev>
-From: Lothar Rubusch <l.rubusch@gmail.com>
-Date: Thu, 4 Jun 2026 09:56:03 +0200
-X-Gm-Features: AVHnY4J2DHztDoFLLVQlenrixqwpyOZeMKkQ7C8oahq4-g3DlS-OWLO5LNf1rU4
-Message-ID: <CAFXKEHamUnW9S2nvDD+iHdZB8+66s2SYVEq7KYvUbs32S4behw@mail.gmail.com>
-Subject: Re: [PATCH 1/1] crypto: atmel-ecc - fix use after free situation
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net, 
-	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com, 
-	claudiu.beznea@tuxon.dev, tudor.ambarus@linaro.org, krzk+dt@kernel.org, 
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 20/29] crypto: talitos - Replace SEC1/SEC2 conditionals
+ with ops dispatch
+To: Paul Louvel <paul.louvel@bootlin.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ Herve Codina <herve.codina@bootlin.com>, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260528-7-1-rc1_talitos_cleanup-v1-0-cb1ad6cdea49@bootlin.com>
+ <20260528-7-1-rc1_talitos_cleanup-v1-20-cb1ad6cdea49@bootlin.com>
+Content-Language: fr-FR
+From: "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>
+In-Reply-To: <20260528-7-1-rc1_talitos_cleanup-v1-20-cb1ad6cdea49@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Thorsten, thanks for the feedback. Pls, find my comment down below.
 
-On Mon, Jun 1, 2026 at 11:42=E2=80=AFPM Thorsten Blum <thorsten.blum@linux.=
-dev> wrote:
->
-> On Fri, May 29, 2026 at 09:27:03AM +0000, Lothar Rubusch wrote:
-> > Fixes a possible race condition, when having multiple of such devices
-> > attached (identified by sashiko feedback).
-> >
-> > The Scenario:
-> >     Thread A (Device 1 Probe): Successfully adds i2c_priv to the global
-> >              list (Line 324). The lock is released.
-> >     Thread B (An active crypto request): Concurrently calls
-> >               atmel_ecc_i2c_client_alloc(). It scans the global list, s=
-ees
-> >               Device 1, and assigns a crypto job to it.
-> >     Thread A: Moves to line 332. crypto_register_kpp() fails (e.g., out=
- of
-> >               memory or name clash).
-> >     Thread A: Enters the error path. It removes Device 1 from the list =
-and
-> >               frees the i2c_priv memory.
-> >     Thread B: Is still actively trying to talk to the I2C hardware usin=
-g
-> >               the i2c_priv pointer it grabbed in Step 2. The memory is =
-now
-> >               gone. Result: Kernel crash (Use-After-Free).
-> >
-> > Fixes: 11105693fa05 ("crypto: atmel-ecc - introduce Microchip / Atmel E=
-CC driver")
-> > Signed-off-by: Lothar Rubusch <l.rubusch@gmail.com>
-> > ---
-> >  drivers/crypto/atmel-ecc.c | 10 ++++++++++
-> >  drivers/crypto/atmel-i2c.h |  2 ++
-> >  2 files changed, 12 insertions(+)
-> >
-> > diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
-> > index 0ca02995a1de..d391fe1462f6 100644
-> > --- a/drivers/crypto/atmel-ecc.c
-> > +++ b/drivers/crypto/atmel-ecc.c
-> > @@ -218,6 +218,8 @@ static struct i2c_client *atmel_ecc_i2c_client_allo=
-c(void)
-> >
-> >       list_for_each_entry(i2c_priv, &driver_data.i2c_client_list,
-> >                           i2c_client_list_node) {
-> > +             if (!i2c_priv->ready)
-> > +                     continue;
-> >               tfm_cnt =3D atomic_read(&i2c_priv->tfm_count);
-> >               if (tfm_cnt < min_tfm_cnt) {
-> >                       min_tfm_cnt =3D tfm_cnt;
-> > @@ -322,20 +324,24 @@ static int atmel_ecc_probe(struct i2c_client *cli=
-ent)
-> >               return ret;
-> >
-> >       i2c_priv =3D i2c_get_clientdata(client);
-> > +     i2c_priv->ready =3D false;
-> >
-> >       spin_lock(&driver_data.i2c_list_lock);
-> >       list_add_tail(&i2c_priv->i2c_client_list_node,
-> >                     &driver_data.i2c_client_list);
-> > +     i2c_priv->ready =3D true;
-> >       spin_unlock(&driver_data.i2c_list_lock);
-> >
-> >       ret =3D crypto_register_kpp(&atmel_ecdh_nist_p256);
-> >       if (ret) {
-> >               spin_lock(&driver_data.i2c_list_lock);
-> > +             i2c_priv->ready =3D false;
-> >               list_del(&i2c_priv->i2c_client_list_node);
-> >               spin_unlock(&driver_data.i2c_list_lock);
-> >
-> >               dev_err(&client->dev, "%s alg registration failed\n",
-> >                       atmel_ecdh_nist_p256.base.cra_driver_name);
-> > +             return ret;
-> >       } else {
-> >               dev_info(&client->dev, "atmel ecc algorithms registered i=
-n /proc/crypto\n");
-> >       }
-> > @@ -347,6 +353,10 @@ static void atmel_ecc_remove(struct i2c_client *cl=
-ient)
-> >  {
-> >       struct atmel_i2c_client_priv *i2c_priv =3D i2c_get_clientdata(cli=
-ent);
-> >
-> > +     spin_lock(&driver_data.i2c_list_lock);
-> > +     i2c_priv->ready =3D false;
-> > +     spin_unlock(&driver_data.i2c_list_lock);
-> > +
-> >       /* Return EBUSY if i2c client already allocated. */
-> >       if (atomic_read(&i2c_priv->tfm_count)) {
-> >               /*
-> > diff --git a/drivers/crypto/atmel-i2c.h b/drivers/crypto/atmel-i2c.h
-> > index 72f04c15682f..e3b12030f9c4 100644
-> > --- a/drivers/crypto/atmel-i2c.h
-> > +++ b/drivers/crypto/atmel-i2c.h
-> > @@ -129,6 +129,7 @@ struct atmel_ecc_driver_data {
-> >   * @wake_token_sz       : size in bytes of the wake_token
-> >   * @tfm_count           : number of active crypto transformations on i=
-2c client
-> >   * @hwrng               : hold the hardware generated rng
-> > + * @ready               : hw client is ready to use
-> >   *
-> >   * Reads and writes from/to the i2c client are sequential. The first b=
-yte
-> >   * transmitted to the device is treated as the byte size. Any attempt =
-to send
-> > @@ -145,6 +146,7 @@ struct atmel_i2c_client_priv {
-> >       size_t wake_token_sz;
-> >       atomic_t tfm_count ____cacheline_aligned;
-> >       struct hwrng hwrng;
-> > +     bool ready;
-> >  };
->
-> I don't think the ready flag fixes the race. A concurrent tfm can still
-> bind to the shared I2C client after atmel_ecc_probe() adds it to the
-> global list and marks it as ready, but before crypto_register_kpp()
-> fails.
 
-Argh... I see your point. The "ready" now is transparent to the
-i2c_client_list usage and serves for nothing, that's nonsense. Going
-some overengineering-steps back, my original idea (to satisfy a
-sashiko complaint), in my own words:
+Le 28/05/2026 à 11:08, Paul Louvel a écrit :
+> Replace the if/else is_sec1 dispatches in callers with indirect calls
+> through priv->ops. Add static const sec1_ops and sec2_ops structs
+> populated with the SEC1 and SEC2 function variants, and set priv->ops
+> at probe time based on the detected hardware.
 
-Thread A:
-1. probe()
-  V
-2. probe(): add i2c_priv to i2c_client_list <-------------- Thread B reques=
-ts
-  V
-3. probe(): registers kpp
-  V
-4. probe(): say, register kpp fails
-  V
-5. probe(): remove i2c_priv from i2c_client_list <-----
+Why is that needed ?
 
-Thread B:
-Now if a crypto request/TFM comes in (thread B) and requests a client
-from the i2c_client_list.
-(Note, this is a case where the device must be, say, the second such
-device so that kpp is already registered for any atmel driver).
+I understand your objective at the end is to get rid of that is_sec1 
+boolean that is carried over the entire call chain but using ops for 
+that seems overkill.
 
-If this happens before step 2 or after step 5, it's fine. This
-instance is still not on the list. If it happens at step 2 through
-step 4 this is problematic. A i2c_priv could be returned which is
-actually (still) not ready. In the meanwhile i2c_priv will be removed,
-but the TFM continues refering to this instance.
+What about changing it to a helper using static branches, something like 
+(untested) :
 
-Question:
-- Do you see the issue here, too? Or, is my understanding wrong? Can
-this be problematic / lead to UAF?
+#if defined(CONFIG_CRYPTO_DEV_TALITOS1) && 
+defined(CONFIG_CRYPTO_DEV_TALITOS2)
+DECLARE_STATIC_KEY_FALSE(talitos_is_sec1);
+static __always_inline bool is_sec1(void)
+{
+	return static_branch_unlikely(&talitos_is_sec1);
+}
 
-- If true, my first idea was to set a "ready" state initially to
-false, after kpp registered successfully, set it to true. The flag is
-checked then, as in this patch. Then I probably messed it up. So,
-could this approach solve the situation?
+static inline void talitos_init_branch(bool is_sec1)
+{
+	if (is_sec1)
+		static_branch_enable(&talitos_is_sec1);
+}
+#else
+static __always_inline bool is_sec1(void)
+{
+	return IS_ENABLED(CONFIG_CRYPTO_DEV_TALITOS1);
+}
 
-If you not answer I'll present this in the next days.
+static inline void talitos_init_branch(bool is_sec1)
+{
+	BUILD_BUG_ON(is_sec1 && !IS_ENABLED(CONFIG_CRYPTO_DEV_TALITOS1));
+}
+#endif
 
-Best,
-L
+> 
+> 
+> Signed-off-by: Paul Louvel <paul.louvel@bootlin.com>
+> ---
+>   drivers/crypto/talitos/talitos.c | 88 +++++++++++++++++++---------------------
+>   1 file changed, 41 insertions(+), 47 deletions(-)
+> 
+> diff --git a/drivers/crypto/talitos/talitos.c b/drivers/crypto/talitos/talitos.c
+> index b6793d97735e..c4a311a8e7fd 100644
+> --- a/drivers/crypto/talitos/talitos.c
+> +++ b/drivers/crypto/talitos/talitos.c
+> @@ -258,7 +258,6 @@ static int init_device(struct device *dev)
+>   {
+>   	struct talitos_private *priv = dev_get_drvdata(dev);
+>   	int ch, err;
+> -	bool is_sec1 = has_ftr_sec1(priv);
+>   
+>   	/*
+>   	 * Master reset
+> @@ -266,35 +265,23 @@ static int init_device(struct device *dev)
+>   	 * are not fully cleared by writing the MCR:SWR bit,
+>   	 * set bit twice to completely reset
+>   	 */
+> -	if (is_sec1)
+> -		err = sec1_reset_device(dev);
+> -	else
+> -		err = sec2_reset_device(dev);
+> +	err = priv->ops->reset_device(dev);
+>   
+>   	if (err)
+>   		return err;
+>   
+> -	if (is_sec1)
+> -		err = sec1_reset_device(dev);
+> -	else
+> -		err = sec2_reset_device(dev);
+> +	err = priv->ops->reset_device(dev);
+>   	if (err)
+>   		return err;
+>   
+>   	/* reset channels */
+>   	for (ch = 0; ch < priv->num_channels; ch++) {
+> -		if (is_sec1)
+> -			err = sec1_reset_channel(dev, ch);
+> -		else
+> -			err = sec2_reset_channel(dev, ch);
+> +		err = priv->ops->reset_channel(dev, ch);
+>   		if (err)
+>   			return err;
+>   	}
+>   
+> -	if (is_sec1)
+> -		sec1_configure_device(dev);
+> -	else
+> -		sec2_configure_device(dev);
+> +	priv->ops->configure_device(dev);
+>   
+>   	return 0;
+>   }
+> @@ -363,7 +350,6 @@ int talitos_submit(struct device *dev, int ch, struct talitos_desc *desc,
+>   	struct talitos_request *request;
+>   	unsigned long flags;
+>   	int head;
+> -	bool is_sec1 = has_ftr_sec1(priv);
+>   
+>   	spin_lock_irqsave(&priv->chan[ch].head_lock, flags);
+>   
+> @@ -377,10 +363,8 @@ int talitos_submit(struct device *dev, int ch, struct talitos_desc *desc,
+>   	request = &priv->chan[ch].fifo[head];
+>   
+>   	/* map descriptor and save caller data */
+> -	if (is_sec1)
+> -		sec1_dma_map_request(dev, request, desc);
+> -	else
+> -		sec2_dma_map_request(dev, request, desc);
+> +	priv->ops->dma_map_request(dev, request, desc);
+> +
+>   	request->callback = callback;
+>   	request->context = context;
+>   
+> @@ -461,7 +445,6 @@ static void flush_channel(struct device *dev, int ch, int error, int reset_ch)
+>   	struct talitos_request *request, saved_req;
+>   	unsigned long flags;
+>   	int tail, status;
+> -	bool is_sec1 = has_ftr_sec1(priv);
+>   
+>   	spin_lock_irqsave(&priv->chan[ch].tail_lock, flags);
+>   
+> @@ -473,10 +456,7 @@ static void flush_channel(struct device *dev, int ch, int error, int reset_ch)
+>   
+>   		/* descriptors with their done bits set don't get the error */
+>   		rmb();
+> -		if (is_sec1)
+> -			hdr = sec1_get_request_hdr(dev, request);
+> -		else
+> -			hdr = sec2_get_request_hdr(dev, request);
+> +		hdr = priv->ops->get_request_hdr(dev, request);
+>   
+>   		if ((hdr & DESC_HDR_DONE) == DESC_HDR_DONE)
+>   			status = 0;
+> @@ -486,10 +466,7 @@ static void flush_channel(struct device *dev, int ch, int error, int reset_ch)
+>   			else
+>   				status = error;
+>   
+> -		if (is_sec1)
+> -			sec1_dma_unmap_request(dev, request);
+> -		else
+> -			sec2_dma_unmap_request(dev, request);
+> +		priv->ops->dma_unmap_request(dev, request);
+>   
+>   		/* copy entries so we can call callback outside lock */
+>   		saved_req.desc = request->desc;
+> @@ -611,7 +588,6 @@ static __be32 sec2_search_desc_hdr_in_request(struct talitos_request *request,
+>   static __be32 current_desc_hdr(struct device *dev, int ch)
+>   {
+>   	struct talitos_private *priv = dev_get_drvdata(dev);
+> -	bool is_sec1 = has_ftr_sec1(priv);
+>   	struct talitos_request *request;
+>   	int tail, iter;
+>   	dma_addr_t cur_desc;
+> @@ -630,10 +606,7 @@ static __be32 current_desc_hdr(struct device *dev, int ch)
+>   	do {
+>   		request = &priv->chan[ch].fifo[iter];
+>   
+> -		if (is_sec1)
+> -			hdr = sec1_search_desc_hdr_in_request(request, cur_desc);
+> -		else
+> -			hdr = sec2_search_desc_hdr_in_request(request, cur_desc);
+> +		hdr = priv->ops->search_desc_hdr_in_request(request, cur_desc);
+>   		if (hdr)
+>   			break;
+>   
+> @@ -833,13 +806,9 @@ static int sec2_talitos_handle_error(struct device *dev, u32 isr, u32 isr_lo)
+>   static void talitos_error(struct device *dev, u32 isr, u32 isr_lo)
+>   {
+>   	struct talitos_private *priv = dev_get_drvdata(dev);
+> -	bool is_sec1 = has_ftr_sec1(priv);
+>   	int ch, reset_dev;
+>   
+> -	if (is_sec1)
+> -		reset_dev = sec1_talitos_handle_error(dev, isr, isr_lo);
+> -	else
+> -		reset_dev = sec2_talitos_handle_error(dev, isr, isr_lo);
+> +	reset_dev = priv->ops->handle_error(dev, isr, isr_lo);
+>   
+>   	if (reset_dev) {
+>   		dev_err(dev,
+> @@ -1391,6 +1360,32 @@ static void sec2_init_task(struct device *dev)
+>   	}
+>   }
+>   
+> +static const struct talitos_ops sec1_ops = {
+> +	.probe_irq = sec1_talitos_probe_irq,
+> +	.init_task = sec1_init_task,
+> +	.reset_device = sec1_reset_device,
+> +	.reset_channel = sec1_reset_channel,
+> +	.configure_device = sec1_configure_device,
+> +	.dma_map_request = sec1_dma_map_request,
+> +	.dma_unmap_request = sec1_dma_unmap_request,
+> +	.get_request_hdr = sec1_get_request_hdr,
+> +	.search_desc_hdr_in_request = sec1_search_desc_hdr_in_request,
+> +	.handle_error = sec1_talitos_handle_error,
+> +};
+> +
+> +static const struct talitos_ops sec2_ops = {
+> +	.probe_irq = sec2_talitos_probe_irq,
+> +	.init_task = sec2_init_task,
+> +	.reset_device = sec2_reset_device,
+> +	.reset_channel = sec2_reset_channel,
+> +	.configure_device = sec2_configure_device,
+> +	.dma_map_request = sec2_dma_map_request,
+> +	.dma_unmap_request = sec2_dma_unmap_request,
+> +	.get_request_hdr = sec2_get_request_hdr,
+> +	.search_desc_hdr_in_request = sec2_search_desc_hdr_in_request,
+> +	.handle_error = sec2_talitos_handle_error,
+> +};
+> +
+>   static int talitos_probe(struct platform_device *ofdev)
+>   {
+>   	struct device *dev = &ofdev->dev;
+> @@ -1474,16 +1469,15 @@ static int talitos_probe(struct platform_device *ofdev)
+>   	}
+>   
+>   	if (has_ftr_sec1(priv))
+> -		err = sec1_talitos_probe_irq(ofdev);
+> +		priv->ops = &sec1_ops;
+>   	else
+> -		err = sec2_talitos_probe_irq(ofdev);
+> +		priv->ops = &sec2_ops;
+> +
+> +	err = priv->ops->probe_irq(ofdev);
+>   	if (err)
+>   		goto err_out;
+>   
+> -	if (has_ftr_sec1(priv))
+> -		sec1_init_task(dev);
+> -	else
+> -		sec2_init_task(dev);
+> +	priv->ops->init_task(dev);
+>   
+>   	priv->fifo_len = roundup_pow_of_two(priv->chfifo_len);
+>   
+> 
 
->
-> Thanks,
-> Thorsten
