@@ -1,124 +1,122 @@
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C68379C49
-	for <linux-crypto@vger.kernel.org>; Thu,  4 Jun 2026 10:47:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F80E428822
+	for <linux-crypto@vger.kernel.org>; Thu,  4 Jun 2026 11:50:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780570071; cv=none; b=p/brGGAtNZRZsIbcyBMOdEdJyEQQpte8T6+iMgkaAqPXSF4w6ugWWNe0XxzvN1PdC5W+x/P/my4VU/d41o4urQ5lz1GoSL5uXzPYWWrzXqLcDkeRPAGCqtUvU2OuaOJUYw9rSzaefaTVfJPk5CXf/TuWaye5HPVwPk5tm48fUsg=
+	t=1780573852; cv=none; b=q/PNDqSQbvduD4B6bT6zDqAeTTC4wbTs81nEfNmfzsRDeIoepBOgxS0R/Rdfxa91sFqYGYjkYMvzEv5htsIS10mtR9uEoJZTV+752+tyv6mnA1kz1mWiLus1MOQLPxwOqZu+80wyzswfwkr43a8RX/vv0LfIpwTU+V57uPQr1nE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780570071; c=relaxed/simple;
-	bh=hKJbxc8NsHsFUvDDH6xySveIIcdPNbn0KUG3fWPXg+8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ewtottwwpkIoB+lAfMwUaMLpgt0Qdl0Jf7l1HwhqSHtjAdV8oVAqGCxgYbq4TYvBOPzSq/TAhH/w+vx1d0NuJQ9hRLu8p1jdtuwaBlvz2+QHhnfv6c1uNCr9jznkMzlEPGXyZJtRSuvjh+dhry3SnFUs+qpm0YJZvL7lAXf9w2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=s7K23d4t; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1780573852; c=relaxed/simple;
+	bh=+AP/U3cPeU0fXOEAiHxHazm6k88v5P4k80O8mHj3UmM=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YmuQAGYEWOTxBiG+Bhy9rq6cWMM5dtxABeqa/0ot/VGZdCQorBLoQMMEjXCC3XPTDV3yy3KtJXsqyUY2mESVoIxPcxPtZoTpZjbe4e+0sUF7LvPmv6uAgV5stATg+tM8dmRXkRA0tV5m4cx+gmoXEWZG5jlVgzZWxz7K2Lar0x0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jPwF9Ksp; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s7K23d4t"
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-bec429c2bb1so79192866b.1
-        for <linux-crypto@vger.kernel.org>; Thu, 04 Jun 2026 03:47:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780570068; x=1781174868; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jwJB9cBfnfHdEwA/fwRLYD3Mdm/VM1ICLl5KQOk5Qu0=;
-        b=s7K23d4tZvUdj8REaaKKMf0cycohR56cuaf2+iS05GqZvPkAD58BYrzvC+t/ykoIGE
-         YRPk1a/HXk7AaczjaLbealrCU2XtYpHVynK13KO9b48X3nxmr9C9dewo/MchZVgwVXAO
-         +/Y9z+dEZlFIAAhyye3qPsIrYJKBiqw/HCskRE7xJLVnSTL5k7kboe2sOgoc/PzMBE5d
-         fnFk5qyAPlatRHsnM38tArB0x3eQW/GrYbVmtaCkdwll3SvzRMetwCD3ze1lmro4IeA3
-         rkZyHzdRWXFhlN15qYKTAoh3e0TvOqGQ/wwH9rmVRg8Lz+jlG5hawIPOWyzVHxGFfHFV
-         B83g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780570068; x=1781174868;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jwJB9cBfnfHdEwA/fwRLYD3Mdm/VM1ICLl5KQOk5Qu0=;
-        b=hHHxAQYFLVDjQ7pxZaKseX9VEbkco0p+hVKSLRrcPwv2mKoEx7TK1lol3aDUpYgwbd
-         Pm1qqGev9ZYDSJdBa/AR4qvhIQdiwg7Qm4qQZRy4SefA/K9t55BsFkEjOogn3BJUxdBn
-         fUzUYvhuHFHhdF28Yh/tZipbafjo8dS/WuBQM8ID+H4qcqqKmaDfN9q9NJTGToG9k7c6
-         I6Se+XeYutIQTQbFZQ7Bwp3O95Tk8uh4wCc5GLHkvcspImf+EEVEbBRZnwyQhsGr039u
-         uMIj8pArKpHG/qyTkELGCll5sHRDU8jamZKpUSxS8idBfb0rzb3T2TCZS7OixmPLtH6t
-         lihg==
-X-Forwarded-Encrypted: i=1; AFNElJ8Xh87nJlzRF1P9vH5rwFHKOMTTy2tCBgxjQcUxzyht1MzwVpzbHgtgc8rFDENJ8wJt7GjELgIZJc4JocA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzvdZlzJEX62vnb929zguwg0F/472A1wD1yNpUVdHugi7JlLRoN
-	dkZCyvuk9yF7DFMhoCpCjC8J1V7JJok3tEIhOfUKvEgoY38Y9WZUMZ9N
-X-Gm-Gg: Acq92OGNRrAX2x5mN7vyxUhjxgVO7DjaL2XK4MS2bBZvhTcZWY6PU0ocfgli6cgn9xT
-	lIGqFWtDyjpJ+zaHtu7iWS8K6tkABelS9c+b/ntVgFaAcDFs0EEYUo6SmHXybxz+RL9yWuDLwtO
-	CeFJ2oFvfY/faV2IdyRkcoGznr/N1OLzsx86dBE/oUWEzyNJoLNJJmCRaYZrS1UvdbqtdH3vM92
-	OWD8/nDBra8GzBOXjhWz5OYtExOpntYWRgeMIWATo27CbM4DkTasNNfAMJE8TaPxqWsQ/YbyeFs
-	MobOzgg7huCGvAVPmbEyA7Pff7twdI/n4uawH1kjv5mvE09XLdJGcTa/FgKR8sTIQFmHRCFBZr9
-	4xoKvHuTf+PRxmSlnf/dV72NhlOPlmTdzB36RmjVecyG4WkPOukhar8e19EyXd+DdeCGz6TsASM
-	Bp921Kh8ch9AAKa5v0zoEJBg4LJ75mUPCpjshzrwUETUfliDQPyXdrkzK5dBGr5XgBbFC6q+c+1
-	la7IBO7oIqConw+ZIXKxQ==
-X-Received: by 2002:a17:907:3c8e:b0:bec:157:a63a with SMTP id a640c23a62f3a-bf0ac20eb8emr362199666b.1.1780570067915;
-        Thu, 04 Jun 2026 03:47:47 -0700 (PDT)
-Received: from ?IPV6:2a02:8109:a307:d900:9c30:fc5f:5bdd:2e3f? ([2a02:8109:a307:d900:9c30:fc5f:5bdd:2e3f])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bf055307aacsm289054766b.47.2026.06.04.03.47.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Jun 2026 03:47:47 -0700 (PDT)
-Message-ID: <a56c9f94-e694-44cf-85ac-c4bcc8d18f70@gmail.com>
-Date: Thu, 4 Jun 2026 11:47:44 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jPwF9Ksp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDB881F0089A
+	for <linux-crypto@vger.kernel.org>; Thu,  4 Jun 2026 11:50:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780573850;
+	bh=+AP/U3cPeU0fXOEAiHxHazm6k88v5P4k80O8mHj3UmM=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc;
+	b=jPwF9KspNjzGCXYyS+GMEFcIEpKsT/7uy/LNtb867JKgkmVPqD+frOr4elp9UnnXt
+	 U3SDuHGBXV+/7PlBxXhBADvh4RlKCmnKEXmqhbUug82hifbtWjVrAf8qMx6nOg6138
+	 QQLlVTEW7dPef0W5MhUajMNQXB+ZD7VpBhHGxCPXMVKJF6CBxIQwXpPwY2i5kRRhz9
+	 5/gniVTJCS4K7rB70m4LCqH7aih1aD/PadqwDHTt/oS7/CrrgSTijgarlfuK6ZWkhV
+	 qA6AaTNxt8Qg0fJGYvzPPqVw17tdzZUNjWKCNamaXNYoaUd74k7KgqfKUYoi9pSiaN
+	 g32hywqnbehLQ==
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-39661f81eacso7506841fa.0
+        for <linux-crypto@vger.kernel.org>; Thu, 04 Jun 2026 04:50:50 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ+ht6nrXq5OiMW9Q/xKgz/3kEazhbzVTQRic+Wdhc9S6Dt9cJeJ022+fZizlUdQBnClih5K2F+TMIr1ZuM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmHi2p2aj4UAsk1hzs0MDRN7mK9zqwR9JxcP3wPBoVSRzTWQ/c
+	zadNXYJ4Fs12mqv4aXyiulVH9gvdwdA9nHaW9kLIcDURGBIPy0jwPhqv4nG/cyN8dBLCZtClW42
+	oOfm7X/R7wWiuqhNn61+lRYkuD9A2QdommpYoY1HGmA==
+X-Received: by 2002:a05:651c:242:b0:38b:dd55:b71 with SMTP id
+ 38308e7fff4ca-396bbb2b99dmr9083771fa.20.1780573849639; Thu, 04 Jun 2026
+ 04:50:49 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Thu, 4 Jun 2026 04:50:48 -0700
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Thu, 4 Jun 2026 04:50:48 -0700
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <aiFScCW_NEY3CsEf@vaman>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] rhashtable: Use irq work for shrinking
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: bot+bpf-ci@kernel.org, bpf@vger.kernel.org, ast@kernel.org,
- andrii@kernel.org, daniel@iogearbox.net, kafai@meta.com,
- kernel-team@meta.com, eddyz87@gmail.com, memxor@gmail.com,
- yatsenko@meta.com, martin.lau@kernel.org, yonghong.song@linux.dev,
- clm@meta.com, ihor.solodrai@linux.dev, Tejun Heo <tj@kernel.org>,
- Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-References: <20260602-rhash-v6-3-1bfd35a4184f@meta.com>
- <4d811506109736528d816b6a1f613becd9460079ee7bfc67c509e67e7d2f44af@mail.kernel.org>
- <3960ffc3-78f3-46da-baaf-ce72b6495698@gmail.com>
- <aiDgUPXZUi-jnTdo@gondor.apana.org.au>
-Content-Language: en-US
-From: Mykyta Yatsenko <mykyta.yatsenko5@gmail.com>
-In-Reply-To: <aiDgUPXZUi-jnTdo@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20260526-qcom-qce-cmd-descr-v19-0-08472fdcbf4a@oss.qualcomm.com>
+ <ah8G_ajPS1KhgPP_@linaro.org> <aiFScCW_NEY3CsEf@vaman>
+Date: Thu, 4 Jun 2026 04:50:48 -0700
+X-Gmail-Original-Message-ID: <CAMRc=McYB+S1LmqRJbWKirMGqwJHZCTWj6KnB6Z8qUsYQWBqkw@mail.gmail.com>
+X-Gm-Features: AVHnY4ItlnHzBWkZf26uoYFprN5coNBr4vZZe2XdpgFnq6HAZyN9LACZLu6Trcg
+Message-ID: <CAMRc=McYB+S1LmqRJbWKirMGqwJHZCTWj6KnB6Z8qUsYQWBqkw@mail.gmail.com>
+Subject: Re: [PATCH v19 00/14] crypto/dmaengine: qce: introduce BAM locking
+ and use DMA for register I/O
+To: Vinod Koul <vkoul@kernel.org>
+Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Thara Gopinath <thara.gopinath@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Udit Tiwari <quic_utiwari@quicinc.com>, 
+	Md Sadre Alam <mdalam@qti.qualcomm.com>, Dmitry Baryshkov <lumag@kernel.org>, 
+	Manivannan Sadhasivam <mani@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Peter Ujfalusi <peter.ujfalusi@gmail.com>, Michal Simek <michal.simek@amd.com>, 
+	Frank Li <Frank.Li@kernel.org>, Andy Gross <agross@codeaurora.org>, 
+	Neil Armstrong <neil.armstrong@linaro.org>, dmaengine@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, brgl@kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, 
+	Stephan Gerhold <stephan.gerhold@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 
-
-On 6/4/26 3:17 AM, Herbert Xu wrote:
-> On Wed, Jun 03, 2026 at 02:08:25PM +0100, Mykyta Yatsenko wrote:
+On Thu, 4 Jun 2026 12:24:48 +0200, Vinod Koul <vkoul@kernel.org> said:
+> On 02-06-26, 18:38, Stephan Gerhold wrote:
+>> On Tue, May 26, 2026 at 03:10:48PM +0200, Bartosz Golaszewski wrote:
+>> > I feel like I fell into the trap of trying to address pre-existing
+>> > issues reported by sashiko and in the process provoking more reports so
+>> > let this be the last iteration where I do this. Vinod can we get this
+>> > queued for v7.2 now and iron out any previously existing problems in
+>> > tree?
 >>
->> For v7 I'm dropping automatic_shrinking, because it adds a risk of
->> calling schedule_work() on element deletion path (__rhashtable_remove_fast_one())
->> when hashtable size drops below 30% of the capacity.
-> 
-> Now that expansion uses irq work I think shrinking should switch
-> to that as well.
-> 
+>> Thanks a lot for working on fixing all these issues!
+>>
+>> I agree there is no point addressing all the "pre-existing issues"
+>> pointed out by Sashiko, but have you looked through the other comments
+>> for new issues pointed out for your patches?
+>
+> I hope Bart and Qualcomm can fix these driver issues as well
+>>
+>> Out of curiosity, I was looking a bit at the comments for [PATCH v19
+>> 06/14] dmaengine: qcom: bam_dma: add support for BAM locking [1]. There
+>> are 8 open comments there (Critical: 1, High: 6 and Medium: 1). From a
+>> quick look I would say most of these could be valid. The critical one
+>> about the usage of dma_cookie_assign() sounds a bit concerning to me, if
+>> it is true we would be basically breaking parts of the dmaengine API for
+>> consumers by inserting the lock descriptor in front of everything else.
+>
+> Yes this seems to be a valid one. Attaching another descriptor for lock
+> does not sound right to me, as in this case causes descriptor to be
+> marked 'done' prematurely.
+>
 
-Makes sense, thanks, I'll include your patch below in this series then.
+Yes, I have a fix for this queued.
 
-> ---8<---
-> Use irq work for automatic shrinking so that this may be called
-> in NMI context.
-> 
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> diff --git a/include/linux/rhashtable.h b/include/linux/rhashtable.h
-> index ef5230cece36..0693bce6f890 100644
-> --- a/include/linux/rhashtable.h
-> +++ b/include/linux/rhashtable.h
-> @@ -1117,7 +1117,7 @@ static __always_inline int __rhashtable_remove_fast_one(
->  		atomic_dec(&ht->nelems);
->  		if (unlikely(ht->p.automatic_shrinking &&
->  			     rht_shrink_below_30(ht, tbl)))
-> -			schedule_work(&ht->run_work);
-> +			irq_work_queue(&ht->run_irq_work);
->  		err = 0;
->  	}
->  
-> Cheers,
+> Honestly, I am not quite happy with the way lock is being handled here.
+> I would hope we can have some better suggestions. Adding a descriptor
+> for lock does not look right to me. We are adding odd hardware/firmware
+> behaviour on engine apis.
+>
+> I had earlier suggested to lock always or lock only for hw/sw versions
+> supported inside the driver, that might be simplist solution without the
+> complexity added here
+>
 
+I'm not sure what you mean here. Several iterations ago it was deferred to
+consumer drivers. Mani objected and Bjorn and you agreed. I reworked it to move
+the locking logic into the DMA driver as requested.
+
+Bart
