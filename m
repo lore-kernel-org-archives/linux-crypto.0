@@ -1,93 +1,124 @@
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE6A03A759C;
-	Thu,  4 Jun 2026 10:27:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C68379C49
+	for <linux-crypto@vger.kernel.org>; Thu,  4 Jun 2026 10:47:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780568852; cv=none; b=rlNOH3Yp3vrIHAmvG1h1+m/wO2zXn8N2HMKTkSf96ftKXt6hsdurswA4ChvGq6P0N3ZP7SYgduqJU/33GR2jS+SPUqBMwPij/vzE/vL3IYk1GLm7vn/bhYIuPhGlvzisz9Ppq8VwG5TqNb4RdaysDSMJfG2Ywco/75yMi0Pynq0=
+	t=1780570071; cv=none; b=p/brGGAtNZRZsIbcyBMOdEdJyEQQpte8T6+iMgkaAqPXSF4w6ugWWNe0XxzvN1PdC5W+x/P/my4VU/d41o4urQ5lz1GoSL5uXzPYWWrzXqLcDkeRPAGCqtUvU2OuaOJUYw9rSzaefaTVfJPk5CXf/TuWaye5HPVwPk5tm48fUsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780568852; c=relaxed/simple;
-	bh=als/dxOGF3vxwARVfzOa2gkKyEh9l70RPOinUzZ6Wr4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BgLl7d+LNyXgh+SiWjqfBDoFK8o0wD7GvUE4ioL3aF1R8rG33AdtGZqFTMMQltyuvAxatuUxROaDO3mgiVUo9v2Q3h18oFcAF9DJklYGVaU1b464IpwXENFmA3ILMHKbqh7maFOl4oSEC8Lgjf165c1fUB8mAvzhSU2xMpbv8AU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from dfae2b116770.home.arpa (unknown [36.110.52.2])
-	by APP-01 (Coremail) with SMTP id qwCowADnh9AEUyFqknqXAA--.107S2;
-	Thu, 04 Jun 2026 18:27:16 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: akhilrajeev@nvidia.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	thierry.reding@kernel.org,
-	jonathanh@nvidia.com
-Cc: linux-crypto@vger.kernel.org,
-	linux-tegra@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wentao Liang <vulab@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH] crypto: tegra: fix refcount leak in tegra_se_host1x_submit()
-Date: Thu,  4 Jun 2026 10:27:06 +0000
-Message-Id: <20260604102706.3787771-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1780570071; c=relaxed/simple;
+	bh=hKJbxc8NsHsFUvDDH6xySveIIcdPNbn0KUG3fWPXg+8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ewtottwwpkIoB+lAfMwUaMLpgt0Qdl0Jf7l1HwhqSHtjAdV8oVAqGCxgYbq4TYvBOPzSq/TAhH/w+vx1d0NuJQ9hRLu8p1jdtuwaBlvz2+QHhnfv6c1uNCr9jznkMzlEPGXyZJtRSuvjh+dhry3SnFUs+qpm0YJZvL7lAXf9w2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=s7K23d4t; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s7K23d4t"
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-bec429c2bb1so79192866b.1
+        for <linux-crypto@vger.kernel.org>; Thu, 04 Jun 2026 03:47:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780570068; x=1781174868; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jwJB9cBfnfHdEwA/fwRLYD3Mdm/VM1ICLl5KQOk5Qu0=;
+        b=s7K23d4tZvUdj8REaaKKMf0cycohR56cuaf2+iS05GqZvPkAD58BYrzvC+t/ykoIGE
+         YRPk1a/HXk7AaczjaLbealrCU2XtYpHVynK13KO9b48X3nxmr9C9dewo/MchZVgwVXAO
+         +/Y9z+dEZlFIAAhyye3qPsIrYJKBiqw/HCskRE7xJLVnSTL5k7kboe2sOgoc/PzMBE5d
+         fnFk5qyAPlatRHsnM38tArB0x3eQW/GrYbVmtaCkdwll3SvzRMetwCD3ze1lmro4IeA3
+         rkZyHzdRWXFhlN15qYKTAoh3e0TvOqGQ/wwH9rmVRg8Lz+jlG5hawIPOWyzVHxGFfHFV
+         B83g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780570068; x=1781174868;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jwJB9cBfnfHdEwA/fwRLYD3Mdm/VM1ICLl5KQOk5Qu0=;
+        b=hHHxAQYFLVDjQ7pxZaKseX9VEbkco0p+hVKSLRrcPwv2mKoEx7TK1lol3aDUpYgwbd
+         Pm1qqGev9ZYDSJdBa/AR4qvhIQdiwg7Qm4qQZRy4SefA/K9t55BsFkEjOogn3BJUxdBn
+         fUzUYvhuHFHhdF28Yh/tZipbafjo8dS/WuBQM8ID+H4qcqqKmaDfN9q9NJTGToG9k7c6
+         I6Se+XeYutIQTQbFZQ7Bwp3O95Tk8uh4wCc5GLHkvcspImf+EEVEbBRZnwyQhsGr039u
+         uMIj8pArKpHG/qyTkELGCll5sHRDU8jamZKpUSxS8idBfb0rzb3T2TCZS7OixmPLtH6t
+         lihg==
+X-Forwarded-Encrypted: i=1; AFNElJ8Xh87nJlzRF1P9vH5rwFHKOMTTy2tCBgxjQcUxzyht1MzwVpzbHgtgc8rFDENJ8wJt7GjELgIZJc4JocA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzvdZlzJEX62vnb929zguwg0F/472A1wD1yNpUVdHugi7JlLRoN
+	dkZCyvuk9yF7DFMhoCpCjC8J1V7JJok3tEIhOfUKvEgoY38Y9WZUMZ9N
+X-Gm-Gg: Acq92OGNRrAX2x5mN7vyxUhjxgVO7DjaL2XK4MS2bBZvhTcZWY6PU0ocfgli6cgn9xT
+	lIGqFWtDyjpJ+zaHtu7iWS8K6tkABelS9c+b/ntVgFaAcDFs0EEYUo6SmHXybxz+RL9yWuDLwtO
+	CeFJ2oFvfY/faV2IdyRkcoGznr/N1OLzsx86dBE/oUWEzyNJoLNJJmCRaYZrS1UvdbqtdH3vM92
+	OWD8/nDBra8GzBOXjhWz5OYtExOpntYWRgeMIWATo27CbM4DkTasNNfAMJE8TaPxqWsQ/YbyeFs
+	MobOzgg7huCGvAVPmbEyA7Pff7twdI/n4uawH1kjv5mvE09XLdJGcTa/FgKR8sTIQFmHRCFBZr9
+	4xoKvHuTf+PRxmSlnf/dV72NhlOPlmTdzB36RmjVecyG4WkPOukhar8e19EyXd+DdeCGz6TsASM
+	Bp921Kh8ch9AAKa5v0zoEJBg4LJ75mUPCpjshzrwUETUfliDQPyXdrkzK5dBGr5XgBbFC6q+c+1
+	la7IBO7oIqConw+ZIXKxQ==
+X-Received: by 2002:a17:907:3c8e:b0:bec:157:a63a with SMTP id a640c23a62f3a-bf0ac20eb8emr362199666b.1.1780570067915;
+        Thu, 04 Jun 2026 03:47:47 -0700 (PDT)
+Received: from ?IPV6:2a02:8109:a307:d900:9c30:fc5f:5bdd:2e3f? ([2a02:8109:a307:d900:9c30:fc5f:5bdd:2e3f])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-bf055307aacsm289054766b.47.2026.06.04.03.47.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Jun 2026 03:47:47 -0700 (PDT)
+Message-ID: <a56c9f94-e694-44cf-85ac-c4bcc8d18f70@gmail.com>
+Date: Thu, 4 Jun 2026 11:47:44 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowADnh9AEUyFqknqXAA--.107S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7uF4Utw17Ww47Cr4DJr4rAFb_yoW8Jw43pF
-	Z0k3yqyr98Jr4rGFn7JF48CFy093y3ZryDGw4fAa42yrs8JFyUAF43CFWjvay8WrsYgr12
-	qFZrA3y5ur18uaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r126r1DMcIj6I8E87Iv67AKxVW8Jr0_Cr1UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x
-	0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2
-	zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF
-	4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWU
-	CwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCT
-	nIWIevJa73UjIFyTuYvjfUrrWFUUUUU
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiCREIA2ohQhU22gAAsj
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] rhashtable: Use irq work for shrinking
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: bot+bpf-ci@kernel.org, bpf@vger.kernel.org, ast@kernel.org,
+ andrii@kernel.org, daniel@iogearbox.net, kafai@meta.com,
+ kernel-team@meta.com, eddyz87@gmail.com, memxor@gmail.com,
+ yatsenko@meta.com, martin.lau@kernel.org, yonghong.song@linux.dev,
+ clm@meta.com, ihor.solodrai@linux.dev, Tejun Heo <tj@kernel.org>,
+ Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+References: <20260602-rhash-v6-3-1bfd35a4184f@meta.com>
+ <4d811506109736528d816b6a1f613becd9460079ee7bfc67c509e67e7d2f44af@mail.kernel.org>
+ <3960ffc3-78f3-46da-baaf-ce72b6495698@gmail.com>
+ <aiDgUPXZUi-jnTdo@gondor.apana.org.au>
+Content-Language: en-US
+From: Mykyta Yatsenko <mykyta.yatsenko5@gmail.com>
+In-Reply-To: <aiDgUPXZUi-jnTdo@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The timeout error path in tegra_se_host1x_submit() returns without
-calling host1x_job_put(), while all other paths (success, submit
-error, pin error) properly release the job reference through the
-job_put label.  Since host1x_job_alloc() initializes the reference
-count and host1x_job_put() is required to drop it, omitting it on
-timeout causes a permanent refcount leak.
 
-Fix this by redirecting the timeout return to the existing job_put
-label, ensuring the job reference and any associated syncpt
-references are consistently released.
+On 6/4/26 3:17 AM, Herbert Xu wrote:
+> On Wed, Jun 03, 2026 at 02:08:25PM +0100, Mykyta Yatsenko wrote:
+>>
+>> For v7 I'm dropping automatic_shrinking, because it adds a risk of
+>> calling schedule_work() on element deletion path (__rhashtable_remove_fast_one())
+>> when hashtable size drops below 30% of the capacity.
+> 
+> Now that expansion uses irq work I think shrinking should switch
+> to that as well.
+> 
 
-Cc: stable@vger.kernel.org
-Fixes: 0880bb3b00c8 ("crypto: tegra - Add Tegra Security Engine driver")
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
----
- drivers/crypto/tegra/tegra-se-main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Makes sense, thanks, I'll include your patch below in this series then.
 
-diff --git a/drivers/crypto/tegra/tegra-se-main.c b/drivers/crypto/tegra/tegra-se-main.c
-index eb71113ed146..e8d8c3a23d7a 100644
---- a/drivers/crypto/tegra/tegra-se-main.c
-+++ b/drivers/crypto/tegra/tegra-se-main.c
-@@ -180,7 +180,7 @@ int tegra_se_host1x_submit(struct tegra_se *se, struct tegra_se_cmdbuf *cmdbuf,
- 				 MAX_SCHEDULE_TIMEOUT, NULL);
- 	if (ret) {
- 		dev_err(se->dev, "host1x job timed out\n");
--		return ret;
-+		goto job_put;
- 	}
- 
- 	host1x_job_put(job);
--- 
-2.34.1
+> ---8<---
+> Use irq work for automatic shrinking so that this may be called
+> in NMI context.
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> 
+> diff --git a/include/linux/rhashtable.h b/include/linux/rhashtable.h
+> index ef5230cece36..0693bce6f890 100644
+> --- a/include/linux/rhashtable.h
+> +++ b/include/linux/rhashtable.h
+> @@ -1117,7 +1117,7 @@ static __always_inline int __rhashtable_remove_fast_one(
+>  		atomic_dec(&ht->nelems);
+>  		if (unlikely(ht->p.automatic_shrinking &&
+>  			     rht_shrink_below_30(ht, tbl)))
+> -			schedule_work(&ht->run_work);
+> +			irq_work_queue(&ht->run_irq_work);
+>  		err = 0;
+>  	}
+>  
+> Cheers,
 
