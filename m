@@ -1,57 +1,45 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 304904C900C;
-	Fri,  5 Jun 2026 11:41:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C19034C9560
+	for <linux-crypto@vger.kernel.org>; Fri,  5 Jun 2026 11:41:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780659669; cv=none; b=uQPpb6jFf9WxlksLJaTqjGtk+6I1IpdWCgi+wbO0X6VJ/b1ectkPyYoVTHfbdiXyfM1s9JxYjj77UmvLA/VOUeRZCtuRzOq6F6lq+OYeLkjA+CcOdPqaICP9XcwK+HSTdH9hCto5gItRl/0p6dnbvj0L4zxepVg0411BfnGGyaU=
+	t=1780659689; cv=none; b=d/xIXu30gXp+zFBNqDy3/DC0jSN6SxBIKSRNqGxWNghvO3q1NoUQ+iTzmBdJWo/V8L5HSHot/5iSdJ9TUSMX0bucHCLtg6PgSwMGkaYGaMit/jmcaa3MZIMa/aNpFZUCKR1jVzslxtfvCbbTBsDv8b5ANrr4DIy5CGND6f/bRF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780659669; c=relaxed/simple;
-	bh=ruvxWh86ohm4ms2IgQ1NLDnLGpVHthhXbP7XOqhzRMQ=;
+	s=arc-20240116; t=1780659689; c=relaxed/simple;
+	bh=XTtRpkPqefyFjRlDnUJg47EbwcbO55yMLGphUyX0iIE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tniczYlUrjeOeJNYZVKiQP1YJXte85xjP3WHui/hQyAzzhRvUo78uhYxtpgW5ZOF4it4SMpZ/+7vkrwbZep+0yRaoSCRbwUgu7VCC62nAOC5I3NQxlgWrfLLxy6ht3wo4VlZc16UBZgbO2lLMvKVzkie9CRKXYR0f8fDbUbZxOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=NDP3QGkF; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=WUwyWh0PK5R4Z2Hs5doTxeYCY/lIoZD+6M5V5zOEk1NNPMiqi8kNdOE0aHAaBqyl8K4pUnUU3Ve1WiAKXl3WQZj2luTvuzrwxZ8l5Go0KlLVA4bIkdDSdIr741Q0X/dNL/xr9QDuVgRsf8uv4arP7kWRvpkbJrUKTcBkr2fTJxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=LMjV4yMt; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="NDP3QGkF"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="LMjV4yMt"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=lUIlwDRbVjok4ajTygSVNKHvLUaeGdfxBXTjvFFHo5M=; 
-	b=NDP3QGkFA4vtpHDzQ2UJGolDWjWukJR87ouH3CfqwnMcwyX38SSecaG2dCq0ldYwctFl8/2l0yD
-	BG2x9sEVJOHBYuxYIh43lNeDuM2zh5Ln9zSEZPzVLpMGF8JTNBrPxB6RP35dfuYoMvFgebBcAMGLP
-	oK0YAi33OwIugsdraTEJJQeFVTxD9IIvKt93Xv0J7GoJQes6m7nsL5iHQExpHd8qMNUgEp/8SA6mZ
-	dbICrcnwC0mM/w4ZvaHQya+k2L6JtVRifO3eDbuGEGeP+quV6zKLA5Jp9ZYF/iwZp2YN/WJpFMfkT
-	Sw8zpHTKBT6VZNBSUFD9OAX4hteqkyMKM64Q==;
+	from:content-type:reply-to; bh=XchOpw9KsKkHaelfjYETSyFqMY8Ddr9vk9QK/BEVTDc=; 
+	b=LMjV4yMte8DCUayM8dUT7aX7aRCbW3J5pVVVA70ijP5d4uNka89xBd8EsIcIkd4j2pdiftfxW1p
+	mLgs7+nQjdnS+kvgKzmKHvfQuZiJMWtchvnplLW8LU/yizK64nSI0VKjtXdQADoXl1bHXE8gwS47J
+	MLu49l6i8Kq55ETCG1437uG8+Qs10yelr70bhjFxU4TOPGQk/Z2cdyz0+YC34K0iMZJwfYLxY1EOV
+	x0cgI0zBXbVQgoWHfUKRJ9YJZO2tcfrGgtgoIOXozxYnROtpHSeVcJinS4TLozNB1Nm4qc4Nwy/zg
+	4oaBQ/z/9RBZG8Pxnbn0og7R3XUK1NSnDe8g==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wVSuT-002olj-0h;
-	Fri, 05 Jun 2026 19:40:22 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 05 Jun 2026 19:40:21 +0800
-Date: Fri, 5 Jun 2026 19:40:21 +0800
+	id 1wVSvU-002omw-0W;
+	Fri, 05 Jun 2026 19:41:25 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 05 Jun 2026 19:41:24 +0800
+Date: Fri, 5 Jun 2026 19:41:24 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Sam James <sam@gentoo.org>
-Cc: Breno =?iso-8859-1?Q?Leit=E3o?= <leitao@debian.org>,
-	Nayna Jain <nayna@linux.ibm.com>,
-	Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Eric Biggers <ebiggers@google.com>,
-	Eric Biggers <ebiggers@kernel.org>, stable@vger.kernel.org,
-	Calvin Buckley <calvin@cmpct.info>,
-	Brad Spengler <brad.spengler@opensrcsec.com>,
-	linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] crypto: nx: fix nx_crypto_ctx_exit argument
-Message-ID: <aiK1pSrxD7bnQDy2@gondor.apana.org.au>
-References: <b8b1b6fe740187c70349cd04a820d57324e0f70c.1779509289.git.sam@gentoo.org>
- <844faa8a75585e4088c95c052dd0ecd189bc3a64.1779695779.git.sam@gentoo.org>
+To: nitesh.venkatesh@intel.com
+Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
+	Junyuan Wang <junyuan.wang@intel.com>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Ahsan Atta <ahsan.atta@intel.com>
+Subject: Re: [PATCH] crypto: qat - add KPT support for GEN6 devices
+Message-ID: <aiK15ETsRjhmnJn4@gondor.apana.org.au>
+References: <20260526092839.432243-1-nitesh.venkatesh@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -60,62 +48,55 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <844faa8a75585e4088c95c052dd0ecd189bc3a64.1779695779.git.sam@gentoo.org>
+In-Reply-To: <20260526092839.432243-1-nitesh.venkatesh@intel.com>
 
-On Mon, May 25, 2026 at 08:56:19AM +0100, Sam James wrote:
-> nx_crypto_ctx_shash_exit calls nx_crypto_ctx_exit with crypto_shash_ctx(...)
-> but crypto_shash_ctx gives a nx_crypto_ctx *, not a crypto_tfm *.
+On Tue, May 26, 2026 at 09:28:39AM +0000, nitesh.venkatesh@intel.com wrote:
+> From: Junyuan Wang <junyuan.wang@intel.com>
 > 
-> Fix the type in nx_crypto_ctx_exit and drop the bogus crypto_tfm_ctx
-> call.
+> Add support for Intel Key Protection Technology (KPT) on QAT GEN6
+> devices.
 > 
-> This fixes the following oops:
+> KPT protects private keys from exposure by keeping them wrapped
+> (encrypted) while in use, in-flight, and at rest. Keys remain in wrapped
+> form and are not exposed in plaintext in host memory. This feature
+> operates outside of the Linux crypto framework and kernel keyring.
 > 
->   BUG: Unable to handle kernel data access at 0xc0403effffffffc8
->   Faulting instruction address: 0xc000000000396cb4
->   Oops: Kernel access of bad area, sig: 11 [#15]
->   Call Trace:
->    nx_crypto_ctx_shash_exit+0x24/0x60
->    crypto_shash_exit_tfm+0x28/0x40
->    crypto_destroy_tfm+0x98/0x140
->    crypto_exit_ahash_using_shash+0x20/0x40
->    crypto_destroy_tfm+0x98/0x140
->    hash_release+0x1c/0x30
->    alg_sock_destruct+0x38/0x60
->    __sk_destruct+0x48/0x2b0
->    af_alg_release+0x58/0xb0
->    __sock_release+0x68/0x150
->    sock_close+0x20/0x40
->    __fput+0x110/0x3a0
->    sys_close+0x48/0xa0
->    system_call_exception+0x140/0x2d0
->    system_call_common+0xf4/0x258
+> Extend the firmware admin interface to enable and configure KPT. During
+> device initialisation, if KPT is enabled, the driver sends an admin
+> message to firmware to enable KPT mode and configure parameters such as
+> the maximum number of SWK (Symmetric Wrapping Key) slots and the SWK
+> time-to-live (TTL).
 > 
-> .. which came from hardlink(1) opportunistically using AF_ALG.
+> Expose KPT configuration via a new sysfs attribute group, "qat_kpt", and
+> add ABI documentation.
 > 
-> The same problem exists with nx_crypto_ctx_skcipher_exit getting a context
-> it wasn't expecting, but apparently nobody hit that for years.
-> 
-> Cc: Eric Biggers <ebiggers@kernel.org>
-> Cc: stable@vger.kernel.org
-> Fixes: bfd9efddf990 ("crypto: nx - convert AES-ECB to skcipher API")
-> Fixes: 9420e628e7d8 ("crypto: nx - Use API partial block handling")
-> Acked-by: Breno Leitao <leitao@debian.org>
-> Reviewed-by: Eric Biggers <ebiggers@kernel.org>
-> Reported-by: Calvin Buckley <calvin@cmpct.info>
-> Tested-by: Calvin Buckley <calvin@cmpct.info>
-> Suggested-by: Brad Spengler <brad.spengler@opensrcsec.com>
-> Signed-off-by: Sam James <sam@gentoo.org>
+> Co-developed-by: Nitesh Venkatesh <nitesh.venkatesh@intel.com>
+> Signed-off-by: Nitesh Venkatesh <nitesh.venkatesh@intel.com>
+> Signed-off-by: Junyuan Wang <junyuan.wang@intel.com>
+> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> Reviewed-by: Ahsan Atta <ahsan.atta@intel.com>
 > ---
-> v3: Fix doc tag.
-> v2: Add stable cc, fix doc for tfm param.
-> 
-> v1: https://lore.kernel.org/all/a3e89c1e8342ffa415b0d29725a0571a4f355d34.1779472902.git.sam@gentoo.org/
-> v2: https://lore.kernel.org/all/b8b1b6fe740187c70349cd04a820d57324e0f70c.1779509289.git.sam@gentoo.org/
-> 
->  drivers/crypto/nx/nx.c | 6 ++----
->  drivers/crypto/nx/nx.h | 2 +-
->  2 files changed, 3 insertions(+), 5 deletions(-)
+>  .../ABI/testing/sysfs-driver-qat_kpt          |  97 ++++++
+>  .../intel/qat/qat_6xxx/adf_6xxx_hw_data.c     |  21 +-
+>  .../intel/qat/qat_6xxx/adf_6xxx_hw_data.h     |   9 +
+>  drivers/crypto/intel/qat/qat_6xxx/adf_drv.c   |   6 +
+>  drivers/crypto/intel/qat/qat_common/Makefile  |   2 +
+>  .../intel/qat/qat_common/adf_accel_devices.h  |   2 +
+>  .../crypto/intel/qat/qat_common/adf_admin.c   |  39 +++
+>  .../crypto/intel/qat/qat_common/adf_admin.h   |   2 +
+>  .../crypto/intel/qat/qat_common/adf_init.c    |   8 +
+>  drivers/crypto/intel/qat/qat_common/adf_kpt.c |  56 ++++
+>  drivers/crypto/intel/qat/qat_common/adf_kpt.h |  29 ++
+>  .../intel/qat/qat_common/adf_sysfs_kpt.c      | 296 ++++++++++++++++++
+>  .../intel/qat/qat_common/adf_sysfs_kpt.h      |  10 +
+>  .../qat/qat_common/icp_qat_fw_init_admin.h    |   8 +
+>  .../crypto/intel/qat/qat_common/icp_qat_hw.h  |   3 +-
+>  15 files changed, 586 insertions(+), 2 deletions(-)
+>  create mode 100644 Documentation/ABI/testing/sysfs-driver-qat_kpt
+>  create mode 100644 drivers/crypto/intel/qat/qat_common/adf_kpt.c
+>  create mode 100644 drivers/crypto/intel/qat/qat_common/adf_kpt.h
+>  create mode 100644 drivers/crypto/intel/qat/qat_common/adf_sysfs_kpt.c
+>  create mode 100644 drivers/crypto/intel/qat/qat_common/adf_sysfs_kpt.h
 
 Patch applied.  Thanks.
 -- 
