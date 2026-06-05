@@ -1,82 +1,80 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C324D90CD;
-	Fri,  5 Jun 2026 11:48:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657323C73E5;
+	Fri,  5 Jun 2026 15:10:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780660092; cv=none; b=WKvXA6R3nARMlAIf7NDTFaDp7yS2FPpIBKETMtOeTxjGVKjQ2tO0VCt+lWXghScFgN5JbnpSuzV0FX/a5NJy1qgHsbl9mUi8iCPssyto6n8dWqJ8H/xvSb6sLfRiWn4a/aeq2GYSMiycmXVO1vAA0CxWG5ASngJCdbqtpGDz1uU=
+	t=1780672228; cv=none; b=DmPJ5zGSYETpPX5mY0d/gyXBZWAKXfy5VijiPiLrN2LiiOjapx8GfLz/Zyl/pBV5kQUj022vSEeA54iqm++UJaDTW/bRlZwwEcAW46QLv00WLZEzJD9agWg2tj9n1cB7ssEmeelrzX6Av9Gd0xODMFMTUjIQ51hZ2sVPlp2NmeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780660092; c=relaxed/simple;
-	bh=aSd80DdxXs+WYidBs49MY7Uom36DWSi5hyTXnor6CQY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WORk4cwXlf03qNhCOYz6adDG2fZuKab3DT8Floe4I0+1buyn5kwW7N3L7y9UQqVhnS1ynWXYEFP/ni2lbsdzCQ0hFc1zzrnsdJF8u8Yl6N8SorC6G+cn6Mc/A3TB8fFOwOkZL4wdVs7cdmkbhgs0w3zgTWM3Uw92TAfgzcajCAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Zx612sDk; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1780672228; c=relaxed/simple;
+	bh=+44rknf9POmsbTO3YJaOJjrIrp1KTt5t6L0xUpx1d48=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=J7YbThWFsKRHBheQQWivOWaBgmREoCjglqjBF5dwYrQ8+RMcp/CiCPC2idLjUhVagjwfA6/YP8EF9gTG+CrPzSbnqtJykwqkzXgFIVu0aXC+afmzOuGrAIQtEoykl+q9Amfko0hEh71gaZYPEDv3foKlM9Xk0fIa9kgI3fdMsRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jrPorASL; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Zx612sDk"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=zlyadE4qYISd12lSmjZ2ehMfzSKYMN8+0MHuwIpIAvg=; 
-	b=Zx612sDkM1ybmbtgfb2luRUpPZ0BbdmTl166Mm9tLdrHiO5adAHbeOgdFqCz0h1xt+4bKX1xN+H
-	/fKomphmLHHyj58EPcf4edX7hb41ijp5xxjiXcFWaYM1zaRozwgALadRs8ZPxQA2aEU/Ruwt8vaN8
-	+i9QtB/M418y2N8iUxtIvBeWN4qYY0R92MtOM4hzGlszc8PInlfW2wu4ICbG/bp52TXECH0T6wmK8
-	Vq9k6HXWtJUlwRzqdjCvqBX1U1CUk0vlC1Edhk28pPWsp1MCniPRSEn14ZnD6+4PMfQvko/a6I7ZC
-	331Yo6CC1TGWqVoPHpnMcQYhzLCFAu7Wg9nQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1wVT1x-002ovl-2F;
-	Fri, 05 Jun 2026 19:48:06 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 05 Jun 2026 19:48:05 +0800
-Date: Fri, 5 Jun 2026 19:48:05 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: ZongYu Wu <wuzongyu1@huawei.com>
-Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, fanghao11@huawei.com,
-	liulongfang@huawei.com, qianweili@huawei.com,
-	wangzhou1@hisilicon.com, huangchenghai2@huawei.com,
-	linwenkai6@hisilicon.com
-Subject: Re: [PATCH v2 1/5] crypto: hisilicon/zip - add backlog support for
- zip
-Message-ID: <aiK3dY25BJv4APu_@gondor.apana.org.au>
-References: <20260528115531.174593-1-wuzongyu1@huawei.com>
- <20260528115531.174593-2-wuzongyu1@huawei.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jrPorASL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0413A1F00893;
+	Fri,  5 Jun 2026 15:10:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1780672227;
+	bh=bNiYy2YfaQcMsJTyZlifLww+uLEb+yP4a6jCsMOj3Sg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=jrPorASLeRpkOPGO7F6vrxY3NuV5wyaZAPTEVhTDu5EEptrx4tn6qYXP5/r1Xsk18
+	 FmPLL2je9581h59q6RZNYph0vPTUODEmY5QXamdacqcMVRXB4/Kru42DAwBVjwN7t/
+	 vZNtb9tMeAsnQ9ejx4EkDa51LHvpCl8zluey4wMxFfm6wtj1HRoLWD05ldv8w4LqhP
+	 MsFMwIk5oOl+H/RpU24RXVrq2TFQvUYA8alRjMXo11ExxTiOJhXjgMHuteNrjL8KEC
+	 M378Nd9x3VqDYrIGlM9mL8u+KqxCR1nm7Kfs+Y6qKq0n49abtFH6xnPbwQ7jcmECiu
+	 NuuaGkxD1ONiA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93D333930BA1;
+	Fri,  5 Jun 2026 15:10:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260528115531.174593-2-wuzongyu1@huawei.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] rhashtable: Use irq work for shrinking
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <178067222714.3794367.10286050193642059000.git-patchwork-notify@kernel.org>
+Date: Fri, 05 Jun 2026 15:10:27 +0000
+References: <aiDgUPXZUi-jnTdo@gondor.apana.org.au>
+In-Reply-To: <aiDgUPXZUi-jnTdo@gondor.apana.org.au>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: mykyta.yatsenko5@gmail.com, bot+bpf-ci@kernel.org, bpf@vger.kernel.org,
+ ast@kernel.org, andrii@kernel.org, daniel@iogearbox.net, kafai@meta.com,
+ kernel-team@meta.com, eddyz87@gmail.com, memxor@gmail.com, yatsenko@meta.com,
+ martin.lau@kernel.org, yonghong.song@linux.dev, clm@meta.com,
+ ihor.solodrai@linux.dev, tj@kernel.org, linux-crypto@vger.kernel.org
 
-On Thu, May 28, 2026 at 07:55:27PM +0800, ZongYu Wu wrote:
-> From: Chenghai Huang <huangchenghai2@huawei.com>
+Hello:
+
+This patch was applied to bpf/bpf-next.git (master)
+by Alexei Starovoitov <ast@kernel.org>:
+
+On Thu, 4 Jun 2026 10:17:52 +0800 you wrote:
+> On Wed, Jun 03, 2026 at 02:08:25PM +0100, Mykyta Yatsenko wrote:
+> >
+> > For v7 I'm dropping automatic_shrinking, because it adds a risk of
+> > calling schedule_work() on element deletion path (__rhashtable_remove_fast_one())
+> > when hashtable size drops below 30% of the capacity.
 > 
-> When the hardware queue is busy, requests are now queued instead of
-> being failed immediately. Queued requests are retried when earlier
-> requests complete, which prevents transient failures under heavy load.
+> Now that expansion uses irq work I think shrinking should switch
+> to that as well.
 > 
-> The backlog path also provides a fallback mechanism while the hardware
-> is temporarily unavailable, such as during device reset.
-> 
-> Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
-> Signed-off-by: Zongyu Wu <wuzongyu1@huawei.com>
-> ---
->  drivers/crypto/hisilicon/zip/zip_crypto.c | 286 ++++++++++++++--------
->  1 file changed, 183 insertions(+), 103 deletions(-)
+> [...]
 
-We already have a generic queueing mechanism in the form of
-crypto_engine.
+Here is the summary with links:
+  - rhashtable: Use irq work for shrinking
+    https://git.kernel.org/bpf/bpf-next/c/46730ee6e884
 
-Please add support for acomp to it instead of rolling your own
-queueing mechanism.
-
-Thanks,
+You are awesome, thank you!
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
