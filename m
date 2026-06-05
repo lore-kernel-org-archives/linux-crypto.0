@@ -1,35 +1,42 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mail-43170.protonmail.ch (mail-43170.protonmail.ch [185.70.43.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657323C73E5;
-	Fri,  5 Jun 2026 15:10:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2FCF33DEC2;
+	Fri,  5 Jun 2026 19:28:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780672228; cv=none; b=DmPJ5zGSYETpPX5mY0d/gyXBZWAKXfy5VijiPiLrN2LiiOjapx8GfLz/Zyl/pBV5kQUj022vSEeA54iqm++UJaDTW/bRlZwwEcAW46QLv00WLZEzJD9agWg2tj9n1cB7ssEmeelrzX6Av9Gd0xODMFMTUjIQ51hZ2sVPlp2NmeI=
+	t=1780687733; cv=none; b=F2+rxqTHkJkfEOExnWHhszWknZbGYvs+y9WdnwwlnHASFqic4TLYZ9e8GYAzRp/AoIWHcj+4IgDQyUTHKwJeeRCk7E0nvqhhME65ToXGsTVRwnskygDMbn/JJ6i+pcTaih4EmLD3GWm+hJabiTtgOaNS9AV6TElbNcJCnrr1hgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780672228; c=relaxed/simple;
-	bh=+44rknf9POmsbTO3YJaOJjrIrp1KTt5t6L0xUpx1d48=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=J7YbThWFsKRHBheQQWivOWaBgmREoCjglqjBF5dwYrQ8+RMcp/CiCPC2idLjUhVagjwfA6/YP8EF9gTG+CrPzSbnqtJykwqkzXgFIVu0aXC+afmzOuGrAIQtEoykl+q9Amfko0hEh71gaZYPEDv3foKlM9Xk0fIa9kgI3fdMsRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jrPorASL; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1780687733; c=relaxed/simple;
+	bh=vdtEDajxxZVgnp50aMgTU9QM3ODnDkdA+q7IJkMReQY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WHGirVnyPeaGPIPsDDpVPKWVynA3iEQ3K9etQDSyyFxLX3Ad+TETFm3twJUN11gokQlae/p4BkgdtxddBnEPOguDlqoLGUl7f2AbKj7W6lamnYKcTJDyoth6ZaqcIleOhKKAvKQtGyUtWb7IeEMETvlJsy3ystuUJAB94bPipa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=theesfeld.net; spf=fail smtp.mailfrom=theesfeld.net; dkim=fail (0-bit key) header.d=theesfeld.net header.i=@theesfeld.net header.b=vptDfhut reason="key not found in DNS"; arc=none smtp.client-ip=185.70.43.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=theesfeld.net
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=theesfeld.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jrPorASL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0413A1F00893;
-	Fri,  5 Jun 2026 15:10:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780672227;
-	bh=bNiYy2YfaQcMsJTyZlifLww+uLEb+yP4a6jCsMOj3Sg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=jrPorASLeRpkOPGO7F6vrxY3NuV5wyaZAPTEVhTDu5EEptrx4tn6qYXP5/r1Xsk18
-	 FmPLL2je9581h59q6RZNYph0vPTUODEmY5QXamdacqcMVRXB4/Kru42DAwBVjwN7t/
-	 vZNtb9tMeAsnQ9ejx4EkDa51LHvpCl8zluey4wMxFfm6wtj1HRoLWD05ldv8w4LqhP
-	 MsFMwIk5oOl+H/RpU24RXVrq2TFQvUYA8alRjMXo11ExxTiOJhXjgMHuteNrjL8KEC
-	 M378Nd9x3VqDYrIGlM9mL8u+KqxCR1nm7Kfs+Y6qKq0n49abtFH6xnPbwQ7jcmECiu
-	 NuuaGkxD1ONiA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93D333930BA1;
-	Fri,  5 Jun 2026 15:10:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=theesfeld.net header.i=@theesfeld.net header.b="vptDfhut"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=theesfeld.net;
+	s=protonmail2; t=1780687729; x=1780946929;
+	bh=cq9yyO2RKkR9c5bNY/rnxelk0EBMhcs43KERyqnMXzY=;
+	h=From:To:Cc:Subject:Date:Message-ID:From:To:Cc:Date:Subject:
+	 Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=vptDfhutrPhOGlpJ9binHcZFeRpO+WoSJEcCFgP6XEvN6pMQlha+K/3uuXjdMnEhI
+	 ti5jfc7dMENFVNNeYctlXaFT+WumNMsQj607YlQkVl8R9apQqjxHs+XvSKKZ8mLvkI
+	 oLgxNs68oFnLgwBINyEJFtyxR2TcW4JBYYfTjlY/S8y/IPHNEehdxwlWXn6naqt9lI
+	 rMPGuWG3jhh/uiYHY4dU5gOMjelbLWswZcA68SN+8EqQJgFY/vlFY3JOGR/Y7/XSIu
+	 kPxI/j/6Ly8ESUyGw1/sSFGRzzlwZ0by0csmXIJRy4C5L7QCLP40pN0Ei8ZF1NKjN1
+	 pohVd7UqZW+fg==
+X-Pm-Submission-Id: 4gXBLj30K8z1DDL0
+From: William Theesfeld <william@theesfeld.net>
+To: Deepak Saxena <dsaxena@plexity.net>
+Cc: Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] hwrng: omap - balance runtime PM and clocks on probe-defer paths
+Date: Fri,  5 Jun 2026 15:28:42 -0400
+Message-ID: <20260605192842.372935-1-william@theesfeld.net>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -37,44 +44,87 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] rhashtable: Use irq work for shrinking
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178067222714.3794367.10286050193642059000.git-patchwork-notify@kernel.org>
-Date: Fri, 05 Jun 2026 15:10:27 +0000
-References: <aiDgUPXZUi-jnTdo@gondor.apana.org.au>
-In-Reply-To: <aiDgUPXZUi-jnTdo@gondor.apana.org.au>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: mykyta.yatsenko5@gmail.com, bot+bpf-ci@kernel.org, bpf@vger.kernel.org,
- ast@kernel.org, andrii@kernel.org, daniel@iogearbox.net, kafai@meta.com,
- kernel-team@meta.com, eddyz87@gmail.com, memxor@gmail.com, yatsenko@meta.com,
- martin.lau@kernel.org, yonghong.song@linux.dev, clm@meta.com,
- ihor.solodrai@linux.dev, tj@kernel.org, linux-crypto@vger.kernel.org
 
-Hello:
+omap_rng_probe() calls pm_runtime_enable() and pm_runtime_resume_and_get()
+to bring the device up.  If either devm_clk_get() call subsequently
+returns -EPROBE_DEFER, the function returns -EPROBE_DEFER directly,
+leaking the runtime PM usage counter taken by resume_and_get() and
+leaving pm_runtime enabled.
 
-This patch was applied to bpf/bpf-next.git (master)
-by Alexei Starovoitov <ast@kernel.org>:
+Convert both early returns to set ret and jump to err_register, which
+already performs the matching pm_runtime_put_sync() + pm_runtime_disable()
+unwind.  Because devm_clk_get() returns ERR_PTR on failure (not NULL)
+and err_register calls clk_disable_unprepare() unconditionally, also
+NULL out the failed clk pointers before the goto so that
+clk_disable_unprepare() (which only handles NULL safely, not ERR_PTR)
+does not deref an error pointer.
 
-On Thu, 4 Jun 2026 10:17:52 +0800 you wrote:
-> On Wed, Jun 03, 2026 at 02:08:25PM +0100, Mykyta Yatsenko wrote:
-> >
-> > For v7 I'm dropping automatic_shrinking, because it adds a risk of
-> > calling schedule_work() on element deletion path (__rhashtable_remove_fast_one())
-> > when hashtable size drops below 30% of the capacity.
-> 
-> Now that expansion uses irq work I think shrinking should switch
-> to that as well.
-> 
-> [...]
+While here, NULL out priv->clk and priv->clk_reg in the existing
+"optional clock not present" else branches.  In that pre-existing case
+the pointer was left as ERR_PTR, and the unconditional
+clk_disable_unprepare() in omap_rng_remove() would have dereferenced
+it on driver unbind.  No functional change for systems where both
+clocks are present.
 
-Here is the summary with links:
-  - rhashtable: Use irq work for shrinking
-    https://git.kernel.org/bpf/bpf-next/c/46730ee6e884
+Found by smatch ("missing unwind goto?").
 
-You are awesome, thank you!
+Signed-off-by: William Theesfeld <william@theesfeld.net>
+---
+ drivers/char/hw_random/omap-rng.c | 24 ++++++++++++++++++++----
+ 1 file changed, 20 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
+index 5e8b50f15..1902865a9 100644
+--- a/drivers/char/hw_random/omap-rng.c
++++ b/drivers/char/hw_random/omap-rng.c
+@@ -459,8 +459,11 @@ static int omap_rng_probe(struct platform_device *pdev)
+ 	}
+ 
+ 	priv->clk = devm_clk_get(&pdev->dev, NULL);
+-	if (PTR_ERR(priv->clk) == -EPROBE_DEFER)
+-		return -EPROBE_DEFER;
++	if (PTR_ERR(priv->clk) == -EPROBE_DEFER) {
++		priv->clk = NULL;
++		ret = -EPROBE_DEFER;
++		goto err_register;
++	}
+ 	if (!IS_ERR(priv->clk)) {
+ 		ret = clk_prepare_enable(priv->clk);
+ 		if (ret) {
+@@ -468,11 +471,21 @@ static int omap_rng_probe(struct platform_device *pdev)
+ 				"Unable to enable the clk: %d\n", ret);
+ 			goto err_register;
+ 		}
++	} else {
++		/*
++		 * No optional clock present; make priv->clk safe for the
++		 * unconditional clk_disable_unprepare() in err_register and
++		 * in omap_rng_remove().
++		 */
++		priv->clk = NULL;
+ 	}
+ 
+ 	priv->clk_reg = devm_clk_get(&pdev->dev, "reg");
+-	if (PTR_ERR(priv->clk_reg) == -EPROBE_DEFER)
+-		return -EPROBE_DEFER;
++	if (PTR_ERR(priv->clk_reg) == -EPROBE_DEFER) {
++		priv->clk_reg = NULL;
++		ret = -EPROBE_DEFER;
++		goto err_register;
++	}
+ 	if (!IS_ERR(priv->clk_reg)) {
+ 		ret = clk_prepare_enable(priv->clk_reg);
+ 		if (ret) {
+@@ -481,6 +494,9 @@ static int omap_rng_probe(struct platform_device *pdev)
+ 				ret);
+ 			goto err_register;
+ 		}
++	} else {
++		/* Same rationale as for priv->clk above. */
++		priv->clk_reg = NULL;
+ 	}
+ 
+ 	ret = (dev->of_node) ? of_get_omap_rng_device_details(priv, pdev) :
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.54.0
 
