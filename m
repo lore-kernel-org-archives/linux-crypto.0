@@ -1,202 +1,308 @@
-Received: from mail-ot1-f78.google.com (mail-ot1-f78.google.com [209.85.210.78])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E65512E6CC7
-	for <linux-crypto@vger.kernel.org>; Sat,  6 Jun 2026 16:43:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FCB7313E2B
+	for <linux-crypto@vger.kernel.org>; Sat,  6 Jun 2026 20:11:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780764217; cv=none; b=lSZ2ghaDaJu1I9clM5qTe8mYR6QKWe0h4COTORZXb+94pk/MlUQlMlOrNCVjEmVsgY8gEJptsMMV9iKD2AAX212Rhy9h79HwbqSInnDZ2nDAWgbe15i1qq/SXZ0Ef8v5Y7CSWr7nEukUZtlOy6RtucokS/kc/sldTDK9Bmj+a+Y=
+	t=1780776694; cv=none; b=X+qrj+xYjznouZBFXcASAThDz08oTFL6WwBOMU2k2GanJPIDfy2c1gotD41jS0pW7aKl+gJEryWpmiK8RQKNOlC+MjJb4RaiYd/ztfA7KBr7F+L7ghnUYWyOxBswsxaRcW7C1fOG/BjolAhc4EHbbcd+ZjMTIIXt1OVVf+T+LdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780764217; c=relaxed/simple;
-	bh=N1cMyWdy2eTSuBOraWn76SHNvwH/nqNjhmSv5ad8U48=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=N6HzKlQBC2Xd722Oipgu2Uru6Qv80Eon0gsmV/OPreamlX5gqA5rX2BOp4q63+xYJawG2ZYY81g6dZ7JwCPRz+KDIgUevgYgCnQy2Wf3wQO5jC0jfcvGom88fzXAkP3KkLaZZa28ONGietyeeTvypambOwgxcErVxpNpV5+Q/mk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f78.google.com with SMTP id 46e09a7af769-7e6db540d17so5747845a34.0
-        for <linux-crypto@vger.kernel.org>; Sat, 06 Jun 2026 09:43:35 -0700 (PDT)
+	s=arc-20240116; t=1780776694; c=relaxed/simple;
+	bh=w3sIkzZ8sJKLLi/G4Ikcs7T8/ELzxdVP4zO12xpcCko=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AcmDmN+AGzENrkqWF+bO82yU6JF0nYQZKe+lveyKdiXHqgaIva/MrCXavewsZoYqFqcS95Ziwp2mWegfydkTa3cwq4bwckmmaAY90ZRb5AUtsD1qmdn42JdkuGgTBxZiWQ66/8ozB2le50ZtNTAlrLjLINL2D9O5Bfq5mNOFbQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=syZ93O2s; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="syZ93O2s"
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-490b8adf7efso1808305e9.1
+        for <linux-crypto@vger.kernel.org>; Sat, 06 Jun 2026 13:11:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780776691; x=1781381491; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dOOnGKhqXgyE5tvsSDo31ys2lneC3zZUQbZqWGyQ4jY=;
+        b=syZ93O2sDZWotHiU4+1PXT0wZXBMuLwYE46YbkOfJmccZvhpCAXncx7UsGIdygWnkB
+         pic+1pS/i6X2hU174jlgLWIAVSradYynZaayLBqCejwb7OtAnUgQogsZavRAKNlnbCTQ
+         3lWkUHFRQ8lCPubXoQd+yfQVdJ0AJr04Bkk6PhXbnxPMSsNbwks0jRBGBh8E6a1ZQ2tD
+         nz/dLezEWHyWyGV7fIUiKr3bC+dY8nb9qo/xaTyhrT+Tw5BChSkHJnzYYLgDlML8zyQd
+         s/TlqM4X1GpWVmE8wEpayTTuwl0m6jwFoYCqC232JUfsN2Np1sr2oV1qQbT87Kb/1wa4
+         GCzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780764214; x=1781369014;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mdCPkvJAxBED08vCYu3LyBpnUNR81kJq+FrazPIoX6c=;
-        b=ShTuhx5F+UcjyKQ2JqWhHAfRmN+hWOaMXmU6+1VZUbZclIwkmU4drB0i9GtE53ZvkW
-         C2o29l8fzWsrtPHhKxQKqpuvtML5VJAHsDmql+Erf/jV8DcjkbeLBhLSk6Vt4G+8nf1h
-         YK28F/esH050pGpHgEUfnxRlYmWMm5vecfL85eM9XpvjDOnFK7ImLSptJXnazFXYOfMj
-         MB7mVHe2++3rqqU4uobfWX1oXBHpq30t7rCyaRCTsDgtN+eouqCpVjwnBGyFH+HhyNc5
-         9W7X/SPK9qlH+0GHPakYQjhJeiBymYp35A4yksv/VtNBxRhv+ovdizdIpryZBVSifUaQ
-         xL2w==
-X-Forwarded-Encrypted: i=1; AFNElJ8/GQlcoJmBfC0MZcXwP2TX0A326ovJOaRkn70K/Pf5Y49TrBYx1L2j9OSszwt0R4Fa5W03i6840jvx7FI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyu/UNX49c1gHuK3iT5vjDPnjFbuh/nJ8eO+P3df7VED1o9vOIJ
-	aMlHrF5Fc+a8aoQ9s6eDJuh73mw+HNIbiHiC2ZC+zNLJbJTSSulZ5KCMNUqG1MuB2QAmJqZCGfB
-	jujlhwiVCYZqndsvynzSToQtZGMz4idWHXD7h4rHyg6/XUeSmx2mh9qNCgv8=
+        d=1e100.net; s=20251104; t=1780776691; x=1781381491;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dOOnGKhqXgyE5tvsSDo31ys2lneC3zZUQbZqWGyQ4jY=;
+        b=qFBXQVIql/rg1cJvc5y3Qh8jdoRNvLYVWvupD6OuSzPnYErbsFP2dRpLjAtqWyCsEr
+         JJzLkp+i+8HimLr99U5urW2Vr0oq96+LQZRFvpy3PQTauo41AIEZybnvinCSrRJbCwE9
+         5tMCMegqzgEsTlP1eMszl+h8gTnTXhf8rTCfIBurSugbtP4/rVaYz0yhC5yVj7iU4bZs
+         G0y0EKaOTJUzCdT6Ka+Wk8MPDPoKCxbT84rurMLxY0DurWc47F5JWdrIQJTacRPfhqfC
+         Qr3w+WkXWhixXwbhaXvk2gaC5HZPZZJuIQCR0wQlrVNliVRSIeSrNjRs8Ycxwc8YjKuO
+         rICQ==
+X-Gm-Message-State: AOJu0YwDsO8ay/iKUPpGBZ4nOfanuwrxun2EQfHwW0hnjtUkLiE6GcHk
+	mdP6dmzeVLeBbhlTNlQGVvITEuyl7VBhQWEkV+Hz51f96hJU9qie/sot
+X-Gm-Gg: Acq92OF/0csfduocQC0vbAX68S4AN1hA0wKP98Jgb3+AvdKSODvBxDnWOHaMAdgOgdZ
+	N3sdOucZwajhTMBRLROwLX1zNpz3CPm4/eNoH0zAhb9oz9XV8sIo4kvFOPGLLBQu59ussjvCjOx
+	5ZC6ujtOgLlS7ES4Xx7oWQUYckHGLXGF/+QTF1EXIOpXljLe9nMvmmsNi4bVo0oulkJnf6bZHh7
+	j0PYCDmJB5p6dektp29htxnqMrYFgev0L895K91b2Rvr124qYK8vaWZsOvEcJjgeEu7wMAz+rCm
+	FL66UuNpHszqfRikdG/S1eDbFoTTsxeFp7pFvZBcDXgOyY7iUP3Mwry6Wd7eb10ES6C8YXY5nn4
+	s+YGwsC8Y3MBNO1rNF4MFUc7ft2aU/qhV7K3UfWBoi/+Q+DkC4PoOrDECJyiJnNCGwhtVIn6cGK
+	nx4No62Uo+zTbq/U8BXuz1LmuhVMT9zof6IDMgJGtbk3Uc7TZRpzJNz68y0kbN76Yll5ZRfvzrL
+	g==
+X-Received: by 2002:a05:600c:a011:b0:488:7e7b:dbc2 with SMTP id 5b1f17b1804b1-490c25dcc9bmr64016335e9.3.1780776691198;
+        Sat, 06 Jun 2026 13:11:31 -0700 (PDT)
+Received: from menon.v.cablecom.net (84-74-0-139.dclient.hispeed.ch. [84.74.0.139])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490bc3fd663sm289512465e9.10.2026.06.06.13.11.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 06 Jun 2026 13:11:30 -0700 (PDT)
+From: Lothar Rubusch <l.rubusch@gmail.com>
+To: thorsten.blum@linux.dev,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	nicolas.ferre@microchip.com,
+	alexandre.belloni@bootlin.com,
+	claudiu.beznea@tuxon.dev,
+	tudor.ambarus@linaro.org,
+	krzk+dt@kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	l.rubusch@gmail.com
+Subject: [PATCH v2 1/1] crypto: atmel-ecc - fix multi-device use-after-free and registration races
+Date: Sat,  6 Jun 2026 20:11:20 +0000
+Message-Id: <20260606201120.35536-1-l.rubusch@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:161f:b0:69e:6e2a:d63d with SMTP id
- 006d021491bc7-69e6e2adda4mr3371193eaf.31.1780764214714; Sat, 06 Jun 2026
- 09:43:34 -0700 (PDT)
-Date: Sat, 06 Jun 2026 09:43:34 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6a244e36.c25708ab.1b19ef.0007.GAE@google.com>
-Subject: [syzbot] [crypto?] KMSAN: uninit-value in sw842_compress (2)
-From: syzbot <syzbot+bf5586280a66e9ccdfa9@syzkaller.appspotmail.com>
-To: davem@davemloft.net, haren@us.ibm.com, herbert@gondor.apana.org.au, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+During parallel driver initialization or driver teardown sequences
+in setups with multiple atmel-ecc instances, a race condition exists
+between atmel_ecc_i2c_client_alloc() and the probe/remove paths.
 
-syzbot found the following issue on:
+A concurrent transformation request can fetch an i2c_client instance
+from the global i2c_client_list before the kpp is fully registered, or
+while it is actively being unbound, resulting in a use-after-free (UAF)
+risk.
 
-HEAD commit:    6f3ed7fec72f Merge tag 'for-7.1/dm-fixes-3' of git://git.k..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17311750580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a0ca3b8cb3875012
-dashboard link: https://syzkaller.appspot.com/bug?extid=bf5586280a66e9ccdfa9
-compiler:       Debian clang version 21.1.8 (++20251221033036+2078da43e25a-1~exp1~20251221153213.50), Debian LLD 21.1.8
+1. The initialization problem in probe(): Adding first an i2c client to the
+i2c_client_list, and then registering the kpp algorim may result in a race,
+when this happens for a second (or further) probed device. In this case the
+algorithm is already registered, so a TFM may arrive, while the latest
+probing device is added to the list, but not kpp registered. In case this
+fails and this last device is going to be removed again from the list, this
+leaves a window where the TFM might obtain a pointer to the - now deleted -
+i2c client, which opens a UAF risk. Furthermore, there will happen atempts
+to multiple registering the same driver to the same type of algorithm.
+Note, a simple reverting of the order: first register kpp, second add the
+i2c client to the i2c_client_list - is not possible here, since the kpp
+registration immediately triggers the self tests, which then will allocate
+and require an i2c client.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+2. The removal problem, also related to the re-initialization in particular
+scenarios where this might happen to quick, might result in overwriting not
+fully freed memory resources. The remove might still take time, a
+re-probing then overwrite the (still existing) static resource without
+having it before cleaned up before. Here were additional issues with the
+order of when to remove the i2c client from the i2c_client_list but already
+having removed the resources.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/74be992d336f/disk-6f3ed7fe.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/d51c3e8d59b5/vmlinux-6f3ed7fe.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/34df0814d707/bzImage-6f3ed7fe.xz
+Address this by implementing an independent subsystem reference counter
+kpp refcnt protected by a dedicated mutex to ensure the static global kpp
+algorithm structure is registered exactly once by the first probing device
+instance. In multi-device scenarios, or when extending the resource
+management support of the i2c_client_list to all atmel-i2c based device
+drivers, such scenarios can become realistic. The particular algorithm is
+registered only once. Each i2c client (i.e. each probing device driver) is
+added as client to the i2c_client_list. This guarantee that only the first
+probe will register the algorithm. The list is populated for further calls
+to probe, and subsequent calls to the client alloc function.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+bf5586280a66e9ccdfa9@syzkaller.appspotmail.com
+Concurrently, decouple list mutations from registration by moving the
+global list eviction to the absolute top of the remove lifecycle. This
+keeps the quick execution of the list allocation loop intact, ensures that
+unbinding hardware is instantly blind to the rest of the system, and
+completely bypasses the recursive deadlock condition previously triggered
+by synchronous crypto API self-tests.
 
-=====================================================
-BUG: KMSAN: uninit-value in sw842_compress+0xd09/0x5060 lib/842/842_compress.c:528
- sw842_compress+0xd09/0x5060 lib/842/842_compress.c:528
- crypto842_scompress+0x4e/0x70 crypto/842.c:46
- scomp_acomp_comp_decomp+0xa49/0x1120 include/crypto/internal/scompress.h:-1
- scomp_acomp_compress+0x33/0x40 crypto/scompress.c:280
- crypto_acomp_compress+0x5c4/0xe50 crypto/acompress.c:287
- zswap_compress mm/zswap.c:874 [inline]
- zswap_store_page mm/zswap.c:1415 [inline]
- zswap_store+0x1a1d/0x48b0 mm/zswap.c:1526
- swap_writeout+0x7a1/0x1120 mm/page_io.c:275
- shmem_writeout+0x1db1/0x2210 mm/shmem.c:1705
- writeout mm/vmscan.c:630 [inline]
- pageout mm/vmscan.c:679 [inline]
- shrink_folio_list+0x5ade/0x8000 mm/vmscan.c:1400
- evict_folios+0x9704/0xbb70 mm/vmscan.c:4854
- try_to_shrink_lruvec+0x1734/0x24b0 mm/vmscan.c:5009
- lru_gen_shrink_lruvec mm/vmscan.c:5173 [inline]
- shrink_lruvec+0x4f8/0x4e20 mm/vmscan.c:5932
- shrink_node_memcgs mm/vmscan.c:6171 [inline]
- shrink_node+0xf19/0x5a30 mm/vmscan.c:6215
- shrink_zones mm/vmscan.c:6454 [inline]
- do_try_to_free_pages+0x956/0x2640 mm/vmscan.c:6516
- try_to_free_mem_cgroup_pages+0x352/0x920 mm/vmscan.c:6838
- try_charge_memcg+0x815/0x1c20 mm/memcontrol.c:2627
- charge_memcg+0x113/0x410 mm/memcontrol.c:5021
- __mem_cgroup_charge+0x71/0x2e0 mm/memcontrol.c:5038
- mem_cgroup_charge include/linux/memcontrol.h:644 [inline]
- shmem_alloc_and_add_folio+0xe4d/0x1bd0 mm/shmem.c:1985
- shmem_get_folio_gfp+0xad3/0x1fc0 mm/shmem.c:2564
- shmem_get_folio mm/shmem.c:2670 [inline]
- shmem_write_begin+0x230/0x560 mm/shmem.c:3303
- generic_perform_write+0x364/0x1050 mm/filemap.c:4325
- shmem_file_write_iter+0x2b7/0x2f0 mm/shmem.c:3478
- __kernel_write_iter+0x6f9/0xdd0 fs/read_write.c:621
- dump_emit_page fs/coredump.c:1304 [inline]
- dump_user_range+0x1936/0x2070 fs/coredump.c:1378
- elf_core_dump+0x697e/0x6c30 fs/binfmt_elf.c:2109
- coredump_write+0x20c9/0x2ce0 fs/coredump.c:1053
- do_coredump fs/coredump.c:1132 [inline]
- vfs_coredump+0x7ae1/0x8f00 fs/coredump.c:1206
- get_signal+0x2075/0x29f0 kernel/signal.c:3022
- arch_do_signal_or_restart+0x53/0xc70 arch/x86/kernel/signal.c:337
- __exit_to_user_mode_loop kernel/entry/common.c:64 [inline]
- exit_to_user_mode_loop kernel/entry/common.c:98 [inline]
- __exit_to_user_mode_prepare include/linux/irq-entry-common.h:207 [inline]
- irqentry_exit_to_user_mode_prepare include/linux/irq-entry-common.h:244 [inline]
- irqentry_exit_to_user_mode include/linux/irq-entry-common.h:315 [inline]
- irqentry_exit+0x16f/0xa00 kernel/entry/common.c:162
- exc_page_fault+0x7e/0xb0 arch/x86/mm/fault.c:1530
- asm_exc_page_fault+0x2b/0x30 arch/x86/include/asm/idtentry.h:618
-
-Uninit was stored to memory at:
- memcpy_from_iter lib/iov_iter.c:85 [inline]
- iterate_bvec include/linux/iov_iter.h:123 [inline]
- iterate_and_advance2 include/linux/iov_iter.h:306 [inline]
- iterate_and_advance include/linux/iov_iter.h:330 [inline]
- __copy_from_iter lib/iov_iter.c:261 [inline]
- copy_folio_from_iter_atomic+0xe91/0x3810 lib/iov_iter.c:491
- generic_perform_write+0x8b7/0x1050 mm/filemap.c:4343
- shmem_file_write_iter+0x2b7/0x2f0 mm/shmem.c:3478
- lo_rw_aio+0x1164/0x14a0 drivers/block/loop.c:-1
- do_req_filebacked drivers/block/loop.c:-1 [inline]
- loop_handle_cmd drivers/block/loop.c:1925 [inline]
- loop_process_work+0xf05/0x1ff0 drivers/block/loop.c:1960
- loop_workfn+0x3e/0x60 drivers/block/loop.c:1984
- process_one_work kernel/workqueue.c:3314 [inline]
- process_scheduled_works+0xb65/0x1e40 kernel/workqueue.c:3397
- worker_thread+0xee4/0x1590 kernel/workqueue.c:3478
- kthread+0x53a/0x5f0 kernel/kthread.c:436
- ret_from_fork+0x20f/0x8d0 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-Uninit was created at:
- __alloc_frozen_pages_noprof+0x6fa/0x1000 mm/page_alloc.c:5244
- __alloc_pages_noprof mm/page_alloc.c:5255 [inline]
- alloc_pages_bulk_noprof+0x1664/0x1aa0 mm/page_alloc.c:5175
- btrfs_alloc_page_array fs/btrfs/extent_io.c:675 [inline]
- alloc_eb_folio_array fs/btrfs/extent_io.c:699 [inline]
- alloc_extent_buffer+0xa85/0x4670 fs/btrfs/extent_io.c:3495
- btrfs_find_create_tree_block+0x44/0x60 fs/btrfs/disk-io.c:574
- btrfs_init_new_buffer fs/btrfs/extent-tree.c:5260 [inline]
- btrfs_alloc_tree_block+0x3fe/0x1bc0 fs/btrfs/extent-tree.c:5373
- btrfs_alloc_log_tree_node fs/btrfs/disk-io.c:890 [inline]
- btrfs_add_log_tree+0x243/0x7a0 fs/btrfs/disk-io.c:938
- start_log_trans fs/btrfs/tree-log.c:349 [inline]
- btrfs_log_inode_parent+0x9cf/0x1e00 fs/btrfs/tree-log.c:7562
- btrfs_log_dentry_safe+0x96/0x130 fs/btrfs/tree-log.c:7668
- btrfs_sync_file+0x16bc/0x21c0 fs/btrfs/file.c:1736
- vfs_fsync_range+0x135/0x1c0 fs/sync.c:186
- generic_write_sync include/linux/fs.h:2654 [inline]
- btrfs_do_write_iter+0xb20/0xd70 fs/btrfs/file.c:1473
- btrfs_file_write_iter+0x38/0x50 fs/btrfs/file.c:1483
- do_iter_readv_writev+0x9e0/0xc10 fs/read_write.c:-1
- vfs_writev+0x52a/0x1500 fs/read_write.c:1059
- do_pwritev fs/read_write.c:1155 [inline]
- __do_sys_pwritev2 fs/read_write.c:1213 [inline]
- __se_sys_pwritev2+0x22f/0x470 fs/read_write.c:1204
- __x64_sys_pwritev2+0xe4/0x150 fs/read_write.c:1204
- x64_sys_call+0x10a2/0x3ea0 arch/x86/include/generated/asm/syscalls_64.h:329
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0x15d/0x3c0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-CPU: 0 UID: 0 PID: 15366 Comm: syz.6.2383 Not tainted syzkaller #0 PREEMPT(lazy) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/18/2026
-=====================================================
-
-
+Fixes: 11105693fa05 ("crypto: atmel-ecc - introduce Microchip / Atmel ECC driver")
+Signed-off-by: Lothar Rubusch <l.rubusch@gmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+v1 -> v2:
+- remove the initial approach with "ready" state bool, replace it by
+  this be a more comprehensive approach
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+ drivers/crypto/atmel-ecc.c | 96 +++++++++++++++++++++++++++-----------
+ drivers/crypto/atmel-i2c.h |  1 +
+ 2 files changed, 70 insertions(+), 27 deletions(-)
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
+index 0ca02995a1de..0f1567bf23b7 100644
+--- a/drivers/crypto/atmel-ecc.c
++++ b/drivers/crypto/atmel-ecc.c
+@@ -23,6 +23,11 @@
+ #include <crypto/kpp.h>
+ #include "atmel-i2c.h"
+ 
++static DEFINE_MUTEX(atmel_ecc_kpp_lock);
++static int atmel_ecc_kpp_refcnt;
++DECLARE_COMPLETION(atmel_ecc_unreg_done);
++static bool atmel_ecc_unreg_active;
++
+ static struct atmel_ecc_driver_data driver_data;
+ 
+ /**
+@@ -241,7 +246,8 @@ static void atmel_ecc_i2c_client_free(struct i2c_client *client)
+ {
+ 	struct atmel_i2c_client_priv *i2c_priv = i2c_get_clientdata(client);
+ 
+-	atomic_dec(&i2c_priv->tfm_count);
++	if (atomic_dec_and_test(&i2c_priv->tfm_count))
++		complete(&i2c_priv->remove_done);
+ }
+ 
+ static int atmel_ecdh_init_tfm(struct crypto_kpp *tfm)
+@@ -276,7 +282,8 @@ static void atmel_ecdh_exit_tfm(struct crypto_kpp *tfm)
+ 	struct atmel_ecdh_ctx *ctx = kpp_tfm_ctx(tfm);
+ 
+ 	kfree(ctx->public_key);
+-	crypto_free_kpp(ctx->fallback);
++	if (ctx->fallback)
++		crypto_free_kpp(ctx->fallback);
+ 	atmel_ecc_i2c_client_free(ctx->client);
+ }
+ 
+@@ -315,6 +322,7 @@ static struct kpp_alg atmel_ecdh_nist_p256 = {
+ static int atmel_ecc_probe(struct i2c_client *client)
+ {
+ 	struct atmel_i2c_client_priv *i2c_priv;
++	unsigned long timeout;
+ 	int ret;
+ 
+ 	ret = atmel_i2c_probe(client);
+@@ -328,44 +336,78 @@ static int atmel_ecc_probe(struct i2c_client *client)
+ 		      &driver_data.i2c_client_list);
+ 	spin_unlock(&driver_data.i2c_list_lock);
+ 
+-	ret = crypto_register_kpp(&atmel_ecdh_nist_p256);
+-	if (ret) {
+-		spin_lock(&driver_data.i2c_list_lock);
+-		list_del(&i2c_priv->i2c_client_list_node);
+-		spin_unlock(&driver_data.i2c_list_lock);
++	mutex_lock(&atmel_ecc_kpp_lock);
++	/*
++	 * For cases where the same/last such device is still in unregistering,
++	 * and now re-registering (refcnt is 0, but completion still exists).
++	 * Safely capture the pointer, drop the lock and sleep until it
++	 * terminates upon completion or retry limit reached.
++	 */
++	while (atmel_ecc_unreg_active) {
++		mutex_unlock(&atmel_ecc_kpp_lock);
++		timeout = wait_for_completion_timeout(&atmel_ecc_unreg_done,
++						      msecs_to_jiffies(2000));
++		mutex_lock(&atmel_ecc_kpp_lock);
++
++		if (timeout == 0) {
++			spin_lock(&driver_data.i2c_list_lock);
++			list_del(&i2c_priv->i2c_client_list_node);
++			spin_unlock(&driver_data.i2c_list_lock);
++			mutex_unlock(&atmel_ecc_kpp_lock);
++
++			dev_err(&client->dev, "probe timed out, former driver instance not fully deregistered\n");
++			return -ETIMEDOUT;
++		}
++	}
+ 
+-		dev_err(&client->dev, "%s alg registration failed\n",
+-			atmel_ecdh_nist_p256.base.cra_driver_name);
+-	} else {
+-		dev_info(&client->dev, "atmel ecc algorithms registered in /proc/crypto\n");
++	if (atmel_ecc_kpp_refcnt == 0) {
++		ret = crypto_register_kpp(&atmel_ecdh_nist_p256);
++		if (ret) {
++			spin_lock(&driver_data.i2c_list_lock);
++			list_del(&i2c_priv->i2c_client_list_node);
++			spin_unlock(&driver_data.i2c_list_lock);
++			mutex_unlock(&atmel_ecc_kpp_lock);
++
++			dev_err(&client->dev, "%s alg registration failed\n",
++				atmel_ecdh_nist_p256.base.cra_driver_name);
++			return ret;
++		}
+ 	}
++	atmel_ecc_kpp_refcnt++;
++	mutex_unlock(&atmel_ecc_kpp_lock);
+ 
++	dev_info(&client->dev, "atmel ecc algorithms registered in /proc/crypto\n");
+ 	return ret;
+ }
+ 
+ static void atmel_ecc_remove(struct i2c_client *client)
+ {
+ 	struct atmel_i2c_client_priv *i2c_priv = i2c_get_clientdata(client);
+-
+-	/* Return EBUSY if i2c client already allocated. */
+-	if (atomic_read(&i2c_priv->tfm_count)) {
+-		/*
+-		 * After we return here, the memory backing the device is freed.
+-		 * That happens no matter what the return value of this function
+-		 * is because in the Linux device model there is no error
+-		 * handling for unbinding a driver.
+-		 * If there is still some action pending, it probably involves
+-		 * accessing the freed memory.
+-		 */
+-		dev_emerg(&client->dev, "Device is busy, expect memory corruption.\n");
+-		return;
+-	}
+-
+-	crypto_unregister_kpp(&atmel_ecdh_nist_p256);
++	bool trigger_unreg = false;
+ 
+ 	spin_lock(&driver_data.i2c_list_lock);
+ 	list_del(&i2c_priv->i2c_client_list_node);
+ 	spin_unlock(&driver_data.i2c_list_lock);
++
++	mutex_lock(&atmel_ecc_kpp_lock);
++	atmel_ecc_kpp_refcnt--;
++	if (atmel_ecc_kpp_refcnt == 0) {
++		trigger_unreg = true;
++		atmel_ecc_unreg_active = true;
++		reinit_completion(&atmel_ecc_unreg_done);
++	}
++	mutex_unlock(&atmel_ecc_kpp_lock);
++
++	if (atomic_read(&i2c_priv->tfm_count))
++		wait_for_completion(&i2c_priv->remove_done);
++
++	if (trigger_unreg) {
++		crypto_unregister_kpp(&atmel_ecdh_nist_p256);
++		mutex_lock(&atmel_ecc_kpp_lock);
++		atmel_ecc_unreg_active = false;
++		complete_all(&atmel_ecc_unreg_done);
++		mutex_unlock(&atmel_ecc_kpp_lock);
++	}
+ }
+ 
+ static const struct of_device_id atmel_ecc_dt_ids[] = {
+diff --git a/drivers/crypto/atmel-i2c.h b/drivers/crypto/atmel-i2c.h
+index 72f04c15682f..d957c2ff60d8 100644
+--- a/drivers/crypto/atmel-i2c.h
++++ b/drivers/crypto/atmel-i2c.h
+@@ -145,6 +145,7 @@ struct atmel_i2c_client_priv {
+ 	size_t wake_token_sz;
+ 	atomic_t tfm_count ____cacheline_aligned;
+ 	struct hwrng hwrng;
++	struct completion remove_done;
+ };
+ 
+ /**
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+base-commit: 5624ea54f3ba5c83d2e5503411a31a8be0278c1e
+-- 
+2.53.0
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
