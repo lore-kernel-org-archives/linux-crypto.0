@@ -1,74 +1,78 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5193732B99E
-	for <linux-crypto@vger.kernel.org>; Sun,  7 Jun 2026 11:25:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08F9A4071C4
+	for <linux-crypto@vger.kernel.org>; Sun,  7 Jun 2026 14:18:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780831540; cv=none; b=DirX0Cs4ByqA50dKZwT4+l2itAe5AbyRk0AV/6owbtgb0junTMX5jmOIxMcfba7kX6cp53Bkzal9kN2eHligFiXx+9orc5lbN3zfmmvCfZXi7ifmb1++qMwOMX5gD/Cg4LM2ERLSibcUU40fLpWsuK8QGbC0A+dcCTtJWD/z+ss=
+	t=1780841939; cv=none; b=bXA0cwZRMAepJB+92ZkorTwRXv0ZpHlpUauImR9IIy+MapR5SjlB0cRv2MWH5qu2N3LwhyLsONb/qmVn4p6U0d6izkGiMc57foLeprrCPvKwPwCyGhWyVK3/8xZIsHSALrwOJQ+Ag11D8Cv/hU/da1i/Ji72sW2gvYMKTENeWEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780831540; c=relaxed/simple;
-	bh=WK8dNOBYpsLHJqBG9EtuIZvlHcO5fFHa4uh22QQA2Wg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r1l8hFUsD+kbNQ8v5FtJj9R8tqMZ8maClE5ek9Pu81Zt06mtymgN9o4P2892V77w1573pt01rWESX4w/N21NojNjJL05U1GG4fHuMA2OVJM2Vg8SZ+vuigG8GBbgA8wXmSmXDc/Mfr9IpO91dujP5LlgVvYKjTRbEgmA0Mzt8K8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BjQfyJQY; arc=none smtp.client-ip=209.85.128.44
+	s=arc-20240116; t=1780841939; c=relaxed/simple;
+	bh=sewERidK/PGbDcxU3wMEIW+Y7Hb5rISxx4Fryl9AGX4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AWpUENxH1nl34wpV6y3R0qR350lA0YPk9MvCG7E4dxjmvhTUnknKZukDJzeDW/hBY2FCdW8Cw9S1eA1p7IbsDMItocziKf+PjTJsxzv4mFNUfriyBOtiPyGtEXJS0L988ZXaZ1UJ/QO+hyZorUBa6ihdVPJ05uRp8zBXcrcOddQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LdTkzmWP; arc=none smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BjQfyJQY"
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-490be03d47bso27411945e9.0
-        for <linux-crypto@vger.kernel.org>; Sun, 07 Jun 2026 04:25:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LdTkzmWP"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-490c28f84fdso4597605e9.0
+        for <linux-crypto@vger.kernel.org>; Sun, 07 Jun 2026 07:18:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1780831537; x=1781436337; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1780841936; x=1781446736; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=m9nxHZo/Ea/9cV2py7u1jKrjrNWsS0AoJHAz+pUd7Ps=;
-        b=BjQfyJQYvfOF7r+OjqPJYt5laIp9ccLuAj9tRGbLwuwQtclKIpeUDxfRkM+vfRA5CD
-         EhqGJaDs7JV40zw60Urtoj9+bJvkDpnXcmaDq/ZCpVJZiY7Vu//Muyuw371WyadY82uX
-         Mmek6DIE0Nky4Jl1zmvWOmKdmAxzvHC85A2V7U7A+S0BQ6bYsF82LZZbTG+OVUY9FxgA
-         zpnYMMn7bw410qqbWZthTfQGaRN5nrM+HD1wbvuAzP4WflXLPuAKNBFjIJUi99OD/wUq
-         uW3G81EJB6XMMq/9UptG+o9QRhTdk/imirAWf7w7aSkplN/7+L8G5hScBty2I6BW6hMN
-         tLfg==
+        bh=zQKhvcVv1v1PdmzRN7tWxQYMtWPLAaBJ9ZJA0l4oMfU=;
+        b=LdTkzmWPVkDGwQsH3fkHJYOgy46cExF8qLmaKSj2yC9aXqKakDPAJqBOuCQDZ6y92T
+         bHD9gv1zU1VP+wK8y1ZHji89X/SLlqWhyXIbk+C9lGD0j7oEujJIr0PmZfMgNpSa2Uws
+         6hZ7iBthQ2rSfcfd4nmqTXSz86VHt4GwXTQJ4uZ2XBJAWA4Pp71ao7NAd8N5d/EPSZJf
+         zl9+l9f4HzhIF69V8XwXeKiU9rAZctc/TN2k0Nc9jB6YtwurfFGoXNcszL/+HJuMr3rY
+         vsZKoLBc73U+P+QkYGwYtprgycYedKyLvSNcWcJ2lRYJpLYsFNEusDy6QtIGtIPinsQm
+         wZHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1780831537; x=1781436337;
+        d=1e100.net; s=20251104; t=1780841936; x=1781446736;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=m9nxHZo/Ea/9cV2py7u1jKrjrNWsS0AoJHAz+pUd7Ps=;
-        b=meJl/X697AIE/Wmg1ceIUtv6qHOLb7L41bdlmorSQiWJ9CnCoTO9yDIizjk+B1AFL6
-         9vKo8sqU8/EvYqu5Ud4CbxX8Q73/KVXFmqf9VO2b535krdToU57D02AW3MLwnjSWsZ/G
-         dQ4gmyr+eJysu0mPV1qxeEWorx/cCaXomeSRk5kReQfjczvuXaFECWHUKlU5l7k0RwzP
-         OR3kyx5kRn2+hWHEfS+DOOzxIt4c9y72IU65Dzm+KXjMuNpY0TlhBRlmOTdk7etX621n
-         w0nGhTl1Hquk5AtE28XuvFPdAsMopqUlR9NwEPKJ6FncUbOK6f30AnNpnQYMywpeHvQl
-         rnug==
-X-Forwarded-Encrypted: i=1; AFNElJ+KChIiHOaqKfpY+2R+eI4w6dGjPY6yM5esINASA9ugXvHwFhSVWRgBZi0bdFYeDXrULm8Rc6fUrPGfC9w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywpk9Q0omXzHIyt0k5XeaIzY+ZZo9zBRVp4gIRtnKYSqnFksR/f
-	ah6UsWQJOw5oH8saLJOP4tSGFlsizO+79f+QiHGgbMZmFWGZIqs3QQyj
-X-Gm-Gg: Acq92OFGXDJO9lmBCl8M9CtC0u0N0F/sOSdnMoELWq3riU5NbIfYWBgbv1ldgJbOPWF
-	1Q8TtWVgKO86KD7RsDfaLBNBFdhUaCZ1Gsd4ZONe+UwdY3kqEO+nvSeexzu3ZCUvrCMml4t4mW/
-	Pwcw9i+1uRt4eFGKqNNjVO8TXhdmhU7PuiVg2NwA4V9dwfwwECj9EixWUfzKKOss3BG7yVKkTjd
-	PH6LksxruQwA5KOKgP/h7objl4oth4Sfbud5GXYOh50IDvkZEJ224aT2bzNO4aAm1t3eKopvK8A
-	H3VaEMgqqZU4SbZWD/XRpo6Qt/R/FtlY14Ia/FVI3BKfoUMwgjTE03amFW7WwL28IocAK0NBMwr
-	SP+QxRHOzgcwC0dnf7NrQJriR4LgGoCRKAFNLRXUN+/1ICTLk6BcTKZsDRYvChK5jerNlH0jDc9
-	FkchreaJnNcnVesuy/6rMJKo4AHM0qptkni56W7C61+ZkyN4sJKwx/oMedb+suUDvHhwpIvw==
-X-Received: by 2002:a05:600c:81c9:b0:490:b724:507d with SMTP id 5b1f17b1804b1-490c259f6e2mr153245535e9.11.1780831536484;
-        Sun, 07 Jun 2026 04:25:36 -0700 (PDT)
-Received: from localhost.localdomain ([2a02:1210:8e0c:3300:bec7:46ff:fea1:47ad])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-490c2d37edbsm211286635e9.2.2026.06.07.04.25.34
+        bh=zQKhvcVv1v1PdmzRN7tWxQYMtWPLAaBJ9ZJA0l4oMfU=;
+        b=gN23dN0JWn6uPxrW8qwlxSAhKuyJOJpheDqey50do3KLeqHItX3b8qhykqbL6gQFDy
+         FKjoZUs3Pb5ixhCjPFVNBuM/gU8Kp+0YsDLjMaGrVMxVujrvkpveAQ3ERjuBpAEnSyJO
+         88eTy3/u56n1k/ZaVVcfAaHPoOfGb9W8JzAPeYuQC92h6FvkwRk4mKSm5+nTruxu+W+e
+         mnK05AEZZc80dc+ue4a5lo44T5gzdv2pEitAnNL+uLnYttpbcA/gmhswB0iIqWNLwAR2
+         RYeif21rxqIZjTbqgpDijVh4Kym8XBryRVWim96VOwzeLlAfNBcayUGU2Gfae1jxSt69
+         raHQ==
+X-Gm-Message-State: AOJu0YyfUCGlye3lMPf5ZqTWC4YNy7pJXe894kYvE1vN5Qdu3B+z/C8f
+	EgIEzWTuiyoN1iCk6PGIlUE8NlC17f9pBqtBUhm5pmDWdFa+1/E3+VqCNN3kJA==
+X-Gm-Gg: Acq92OE2NTdL8UX03mWdoKitifZ/VaRPuQdiFfkhXHY8I6FBUfWd8/sSUdhs9F2ZdED
+	I4dOAi7mmmrGENcQ2jgqk4C4sl4MP4ewxqGESNE1nkUCJ1Cr/+hYPg7P/OKFA3dCdoFIgq7/pcn
+	l1JUnUECoHLxo7X4OJlUecP8d1ic2TR18dlramaUet0Ma6CZVr1hnh0bj4TmKTkOiQdqaTj0IB2
+	CXRrzTWZQnrlPwULozVjfqnkjLRC6yXitesrpbj9lm/QLLgH11C2jsFb5drcbqVMGdWmCf7o9jl
+	+t7AD/E5OvGLIXna6pIIl+TPJ4tjAL58L7aEWeyzDhuGzWc6KrQtSvrlEczhYdjbcq75Sgf2caM
+	p9dO+p+xCDkVa4g27OiUL0D2KSgVAvK8hoNsx3J+/VYMwpT6n8lcRoXVW64gvT8PzVTQRFDo63k
+	gpl3apOpvtBvv1+afXA3aEJURGAnp5py0oHIlTcoLzlC/zKrgb15m9DvfNhqYG78jXQ7RTbMq8D
+	g==
+X-Received: by 2002:a05:600c:470c:b0:48a:5546:619e with SMTP id 5b1f17b1804b1-490c25dcc59mr85982595e9.4.1780841936223;
+        Sun, 07 Jun 2026 07:18:56 -0700 (PDT)
+Received: from menon.v.cablecom.net (84-74-0-139.dclient.hispeed.ch. [84.74.0.139])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f3446aesm47948197f8f.24.2026.06.07.07.18.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Jun 2026 04:25:35 -0700 (PDT)
-From: Fabian Blatter <fabianblatter09@gmail.com>
-To: lukas@wunner.de,
-	ignat@linux.win,
+        Sun, 07 Jun 2026 07:18:55 -0700 (PDT)
+From: Lothar Rubusch <l.rubusch@gmail.com>
+To: thorsten.blum@linux.dev,
 	herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Cc: stefanb@linux.ibm.com,
-	linux-crypto@vger.kernel.org,
+	davem@davemloft.net,
+	nicolas.ferre@microchip.com,
+	alexandre.belloni@bootlin.com,
+	claudiu.beznea@tuxon.dev,
+	tudor.ambarus@linaro.org,
+	krzk+dt@kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
-	Fabian Blatter <fabianblatter09@gmail.com>
-Subject: [PATCH] crypto: ecc - Optimize vli additive operations using compiler builtins
-Date: Sun,  7 Jun 2026 13:24:35 +0200
-Message-ID: <20260607112435.42804-1-fabianblatter09@gmail.com>
-X-Mailer: git-send-email 2.54.0
+	l.rubusch@gmail.com
+Subject: [PATCH v3 1/1] crypto: atmel-ecc - fix multi-device use-after-free and registration races
+Date: Sun,  7 Jun 2026 14:18:51 +0000
+Message-Id: <20260607141851.37835-1-l.rubusch@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -77,364 +81,277 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Replace the software carry flag emulation with compiler builtins.
+During parallel driver initialization or driver teardown sequences
+in setups with multiple atmel-ecc instances, a race condition exists
+between atmel_ecc_i2c_client_alloc() and the probe/remove paths.
 
-Even the newest compilers struggle with taking advantage of the
-hardware carry flag. Compiler builtins allow the compiler to
-much more easily achieve this while still remaining constant-time.
+A concurrent transformation request can fetch an i2c_client instance
+from the global i2c_client_list before the kpp is fully registered, or
+while it is actively being unbound, resulting in a use-after-free (UAF)
+risk.
 
-This yields an approximately 6-7% performance improvement
-on the ecc_gen_privkey, ecc_make_pub_key and crypto_ecdh_shared_secret
-functions on x86_64 on all curve sizes.
+1. The initialization problem in probe(): Adding first an i2c client to the
+i2c_client_list, and then registering the kpp algorim may result in a race,
+when this happens for a second (or further) probed device. In this case the
+algorithm is already registered, so a TFM may arrive, while the latest
+probing device is added to the list, but not kpp registered. In case this
+fails and this last device is going to be removed again from the list, this
+leaves a window where the TFM might obtain a pointer to the - now deleted -
+i2c client, which opens a UAF risk. Furthermore, there will happen atempts
+to multiple registering the same driver to the same type of algorithm.
+Note, a simple reverting of the order: first register kpp, second add the
+i2c client to the i2c_client_list - is not possible here, since the kpp
+registration immediately triggers the self tests, which then will allocate
+and require an i2c client.
 
-Additionally, the code becomes much more readable.
+2. The critical race condition problem: It exists when an Atmel device
+instance is rapidly removed and immediately re-probed, before the global
+resources are fully cleaned up. In this scenario, the asynchronous
+unregistration sequence in the remove() lags behind the incoming probe()
+function. Because of the global algorithm structure being not yet
+completely cleaned up, the newly re-probed device incorrectly intercepts
+the static, partially-dismantled global context. It then overwrites active
+pointers and re-acquires the global instance prematurely. In this way, when
+the deregistration sequence finally completes its execution, under the
+newly initialized device, it may lose the tracking references, leaking the
+older driver memory blocks, and introducing an immediate UAF risk.
 
-Signed-off-by: Fabian Blatter <fabianblatter09@gmail.com>
+3. The removal race problem, when a call to remove() starts removing the
+device, but another thread executing a TFM, a severe Time-of-Check to
+Time-of-Use (TOCTOU) race condition exists in the teardown path between the
+asynchronous remove() sequence and completing TFMs. When the device is
+unbound, the remove() function evaluates the active tfm_count and decides
+whether to wait or proceed with resource deallocation. However, if the
+final active TFM finishes its crypto operation and invokes the client free
+function immediately after remove() performs its reference check but before
+it can sleep, the completion signal is fired into a clearing state. The
+unbind thread then misinterprets the zeroed counter, skips the
+synchronization barrier entirely, and instantly deallocates the per-device
+private structures. This leaves the final TFM worker thread executing code
+inside a completely freed memory area, triggering an immediate UAF kernel
+panic. Note, simply calling the kpp unregister here won't clean up the
+situation in the context of having a setup with external hardware on a slow
+bus.
+
+Address this by implementing an independent subsystem reference counter
+kpp refcnt protected by a dedicated mutex to ensure the static global kpp
+algorithm structure is registered exactly once by the first probing device
+instance. In multi-device scenarios, or when extending the resource
+management support of the i2c_client_list to all atmel-i2c based device
+drivers, such scenarios can become realistic. The particular algorithm is
+registered only once. Each i2c client (i.e. each probing device driver) is
+added as client to the i2c_client_list. This guarantee that only the first
+probe will register the algorithm. The list is populated for further calls
+to probe, and subsequent calls to the client alloc function.
+
+Concurrently, decouple list mutations from registration by moving the
+global list eviction to the absolute top of the remove lifecycle. This
+keeps the quick execution of the list allocation loop intact, ensures that
+unbinding hardware is instantly blind to the rest of the system, and
+completely bypasses the recursive deadlock condition previously triggered
+by synchronous crypto API self-tests.
+
+Fixes: 11105693fa05 ("crypto: atmel-ecc - introduce Microchip / Atmel ECC driver")
+Signed-off-by: Lothar Rubusch <l.rubusch@gmail.com>
 ---
+ drivers/crypto/atmel-ecc.c | 106 +++++++++++++++++++++++++++----------
+ drivers/crypto/atmel-i2c.h |   3 ++
+ 2 files changed, 82 insertions(+), 27 deletions(-)
 
-Hi,
-
-I'd like to expand on the benchmarks, compare the generated assembly,
-and clarify some things.
-
-
-Use of compiler builtins:
-
-This patch uses __builtin_addcll, __builtin_subcll when available and
-otherwise __builtin_uaddll_overflow, __builtin_usubll_overflow. the
-latter have existed since ancient gcc versions, so no third fallback
-is needed.
-
-I have put the add_carry and sub_borrow inline functions with the
-preprocessor logic for builtin selection directly in crypto/ecc.c.
-Please let me know if you would like them to be somewhere else.
-
-They do not emit data-dependent branches, and so remain constant-time.
-
-
-Benchmarks:
-
-All benchmarks were run single-threaded on my AMD 7700X CPU limited to
-5.6Ghz. I have measured both nanoseconds and clock cycles, since their
-combination can hint at downclocking issues and allows calculation of
-the clock speed during the benchmark.
-
-I have omitted the raw output from the benchmarking code, as they much
-exceed the 72 character limit.
-
-I have calculated the percent differences, included clock speed
-calculations and relevant summaries.
-
-
-Macro benchmarks:
-
-These were run in a virtualized environment using virtme-ng on the
-compiled linux kernel image compiled with default flags.
-
-(the first value is the original time per operation, the second the
-patched one. cc is short for clock cycles)
-
-Curve keypair generation (ecc_gen_privkey + ecc_make_pub_key):
-
-P256:
- - 646963ns/op -> 600632ns/op = -7.71%
- - 2911300cc/op -> 2702854cc/op = -7.71%
- - 4.4999Ghz -> 4.5000Ghz = no difference
-
-P384:
- - 1239160ns/op -> 1153940ns/op = -7.38%
- - 5576250cc/op -> 5192749cc/op = -7.38%
- - 4.5000Ghz -> 4.5000Ghz = no difference
-
-Shared secret generation (crypto_ecdh_shared_secret):
-
-P256:
- - 320114ns/op -> 297548ns/op = -7.58%
- - 1440521cc/op -> 1338972cc/op = -7.58%
- - 4.5000Ghz -> 4.5000Ghz = no difference
-
-P384:
- - 620768ns/op -> 582560ns/op = -6.55%
- - 2793467cc/op -> 2621529cc/op = -6.55%
- - 4.5000Ghz -> 4.5000Ghz = no difference
-
-The benchmarks clearly indicate a roughly 6-7% performance increase on
-the public API functions. It also appears that virtme-ng limited the
-clock speed to 4.5Ghz
-
-
-Micro benchmarks:
-
-Since the vli additive functions only rely on u64 being defined, these
-were run without virtualization and with varying compilers and
-compiler flags.
-
-The microbenchmarks show much more mixed results, depending
-heavily on the compiler and optimization level used.
-
-For instance, on gcc and O2, the vli_add present in the
-patch is actually 25.3% slower than the original one. I have tracked
-this down to gcc using a weird way to restore the carry flag after
-each iteration, causing way more dependent instructions, preventing
-ILP from executing multiple at once.
-
-This is quite interesting, since, as far as I know, the kernel compiles
-with gcc and O2 by default, yet the macro-level benchmarks still show a
-performance increase. The effect seems to be reversed when crypto/ecc.c
-gets compiled. Or maybe the linux kernel uses some additional
-optimization flags, I am unsure.
-
-However, most of the time, the patched version outperforms the original
-one by a wide margin:
- - On clang -O2 or -O3, vli_add and vli_uadd show a 4.074x and 5.384x
-   speedup.
- - On gcc, vli_uadd shows a 74% performance increase at O2, 
-   and a 2.07x speedup at O3.
-
-The performance profile of vli_sub and vli_usub is almost identical to
-that of vli_add and vli_uadd.
-
-
-Assembly comparison:
-
-I have put together a piece of code on Compiler explorer, to make sure
-it compiles on old gcc versions, view instructions and play around with
-compiler settings.
-
-If you would like, you can play around yourself here:
-https://godbolt.org/z/1jT5zesz8
-
-When using clang 22.1 at -O3 -march=lunarlake, the difference between
-the patched and original version is particularly clear. The patched
-version produces this assembly in the unrolled vli_add loop:
-
-mov     rax, qword ptr [rsi + 8*rcx + 16]
-adc     rax, qword ptr [rdx + 8*rcx + 16]
-mov     qword ptr [rdi + 8*rcx + 16], rax
-mov     rax, qword ptr [rsi + 8*rcx + 24]
-adc     rax, qword ptr [rdx + 8*rcx + 24]
-mov     qword ptr [rdi + 8*rcx + 24], rax
-mov     rax, qword ptr [rsi + 8*rcx + 32]
-adc     rax, qword ptr [rdx + 8*rcx + 32]
-mov     qword ptr [rdi + 8*rcx + 32], rax
-mov     rax, qword ptr [rsi + 8*rcx + 40]
-adc     rax, qword ptr [rdx + 8*rcx + 40]
-mov     qword ptr [rdi + 8*rcx + 40], rax
-mov     rax, qword ptr [rsi + 8*rcx + 48]
-adc     rax, qword ptr [rdx + 8*rcx + 48]
-
-This is basically optimal for an inner loop. It's pure adc and mov
-instructions. The loop counting part is still nowhere near perfect,
-and still uses setc instructions. But it is still better than what
-the original version produces with the same compiler and flags:
-
-mov     r10, qword ptr [rsi + 8*rcx]
-lea     r11, [r10 + rax]
-add     r11, qword ptr [rdx + 8*rcx]
-xor     ebx, ebx
-cmp     r11, r10
-setb    bl
-cmove   rbx, rax
-mov     qword ptr [rdi + 8*rcx], r11
-mov     rax, qword ptr [rsi + 8*rcx + 8]
-lea     r10, [rax + rbx]
-add     r10, qword ptr [rdx + 8*rcx + 8]
-xor     r11d, r11d
-cmp     r10, rax
-setb    r11b
-cmove   r11, rbx
-mov     qword ptr [rdi + 8*rcx + 8], r10
-mov     rax, qword ptr [rsi + 8*rcx + 16]
-lea     r10, [rax + r11]
-add     r10, qword ptr [rdx + 8*rcx + 16]
-xor     ebx, ebx
-cmp     r10, rax
-setb    bl
-cmove   rbx, r11
-mov     qword ptr [rdi + 8*rcx + 16], r10
-mov     rax, qword ptr [rsi + 8*rcx + 24]
-lea     r10, [rax + rbx]
-add     r10, qword ptr [rdx + 8*rcx + 24]
-xor     r11d, r11d
-cmp     r10, rax
-setb    r11b
-cmove   r11, rbx
-
-This is downright horrendous. that entire block of processes only 4
-limbs, thats 8 instructions per limb! The add instructions
-are also not adc instructions, showing that the carry flag is
-being fully emulated. This demonstrates how even on the newest
-compilers and at the highest optimization level, still cannot
-generate hardware carry chains without explicit use of builtins.
-
-I should note that not just clang 22.1.0 with -O3 -march=lunarlake
-does this. Gcc and clang show this behaviour on every version i have
-tested, regardless of target architecture.
-
-I am not very familiar with ARM or RISC-V assembly, but looking at
-compiler explorer, the effect clearly persists, and in the case of
-RISC-V actually gets much worse.
-
-This affects all architectures across all compilers and compiler
-flags.
-
-
-If you have gotten this far, thank you for reading this and I am looking
-forward to any feedback! If you would like any changes to this patch,
-I am very happy to send a v2.
-
- crypto/ecc.c | 98 ++++++++++++++++++++++++++++++++--------------------
- 1 file changed, 60 insertions(+), 38 deletions(-)
-
-diff --git a/crypto/ecc.c b/crypto/ecc.c
-index 43b0def3a225..4f7bb6f424d8 100644
---- a/crypto/ecc.c
-+++ b/crypto/ecc.c
-@@ -279,6 +279,48 @@ static void vli_rshift1(u64 *vli, unsigned int ndigits)
+diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
+index 0ca02995a1de..df285ca9a6f3 100644
+--- a/drivers/crypto/atmel-ecc.c
++++ b/drivers/crypto/atmel-ecc.c
+@@ -23,6 +23,11 @@
+ #include <crypto/kpp.h>
+ #include "atmel-i2c.h"
+ 
++static DEFINE_MUTEX(atmel_ecc_kpp_lock);
++static int atmel_ecc_kpp_refcnt;
++DECLARE_COMPLETION(atmel_ecc_unreg_done);
++static bool atmel_ecc_unreg_active;
++
+ static struct atmel_ecc_driver_data driver_data;
+ 
+ /**
+@@ -241,7 +246,10 @@ static void atmel_ecc_i2c_client_free(struct i2c_client *client)
+ {
+ 	struct atmel_i2c_client_priv *i2c_priv = i2c_get_clientdata(client);
+ 
+-	atomic_dec(&i2c_priv->tfm_count);
++	spin_lock(&driver_data.i2c_list_lock);
++	if (atomic_dec_and_test(&i2c_priv->tfm_count) && i2c_priv->unbinding)
++		complete(&i2c_priv->remove_done);
++	spin_unlock(&driver_data.i2c_list_lock);
+ }
+ 
+ static int atmel_ecdh_init_tfm(struct crypto_kpp *tfm)
+@@ -276,7 +284,8 @@ static void atmel_ecdh_exit_tfm(struct crypto_kpp *tfm)
+ 	struct atmel_ecdh_ctx *ctx = kpp_tfm_ctx(tfm);
+ 
+ 	kfree(ctx->public_key);
+-	crypto_free_kpp(ctx->fallback);
++	if (ctx->fallback)
++		crypto_free_kpp(ctx->fallback);
+ 	atmel_ecc_i2c_client_free(ctx->client);
+ }
+ 
+@@ -315,6 +324,7 @@ static struct kpp_alg atmel_ecdh_nist_p256 = {
+ static int atmel_ecc_probe(struct i2c_client *client)
+ {
+ 	struct atmel_i2c_client_priv *i2c_priv;
++	unsigned long timeout;
+ 	int ret;
+ 
+ 	ret = atmel_i2c_probe(client);
+@@ -323,49 +333,91 @@ static int atmel_ecc_probe(struct i2c_client *client)
+ 
+ 	i2c_priv = i2c_get_clientdata(client);
+ 
++	init_completion(&i2c_priv->remove_done);
++	i2c_priv->unbinding = false;
++
+ 	spin_lock(&driver_data.i2c_list_lock);
+ 	list_add_tail(&i2c_priv->i2c_client_list_node,
+ 		      &driver_data.i2c_client_list);
+ 	spin_unlock(&driver_data.i2c_list_lock);
+ 
+-	ret = crypto_register_kpp(&atmel_ecdh_nist_p256);
+-	if (ret) {
+-		spin_lock(&driver_data.i2c_list_lock);
+-		list_del(&i2c_priv->i2c_client_list_node);
+-		spin_unlock(&driver_data.i2c_list_lock);
++	mutex_lock(&atmel_ecc_kpp_lock);
++	/*
++	 * For cases where the same/last such device is still in unregistering,
++	 * and now re-registering (refcnt is 0, but completion still exists).
++	 * Safely capture the pointer, drop the lock and sleep until it
++	 * terminates upon completion or retry limit reached.
++	 */
++	while (atmel_ecc_unreg_active) {
++		mutex_unlock(&atmel_ecc_kpp_lock);
++		timeout = wait_for_completion_timeout(&atmel_ecc_unreg_done,
++						      msecs_to_jiffies(2000));
++		mutex_lock(&atmel_ecc_kpp_lock);
++
++		if (timeout == 0) {
++			spin_lock(&driver_data.i2c_list_lock);
++			list_del(&i2c_priv->i2c_client_list_node);
++			spin_unlock(&driver_data.i2c_list_lock);
++			mutex_unlock(&atmel_ecc_kpp_lock);
++
++			dev_err(&client->dev, "probe timed out, former driver instance not fully deregistered\n");
++			return -ETIMEDOUT;
++		}
++	}
+ 
+-		dev_err(&client->dev, "%s alg registration failed\n",
+-			atmel_ecdh_nist_p256.base.cra_driver_name);
+-	} else {
+-		dev_info(&client->dev, "atmel ecc algorithms registered in /proc/crypto\n");
++	if (atmel_ecc_kpp_refcnt == 0) {
++		ret = crypto_register_kpp(&atmel_ecdh_nist_p256);
++		if (ret) {
++			spin_lock(&driver_data.i2c_list_lock);
++			list_del(&i2c_priv->i2c_client_list_node);
++			spin_unlock(&driver_data.i2c_list_lock);
++			mutex_unlock(&atmel_ecc_kpp_lock);
++
++			dev_err(&client->dev, "%s alg registration failed\n",
++				atmel_ecdh_nist_p256.base.cra_driver_name);
++			return ret;
++		}
  	}
++	atmel_ecc_kpp_refcnt++;
++	mutex_unlock(&atmel_ecc_kpp_lock);
+ 
++	dev_info(&client->dev, "atmel ecc algorithms registered in /proc/crypto\n");
+ 	return ret;
  }
  
-+#ifdef __has_builtin
-+#if __has_builtin(__builtin_addcll)
-+#define USE_BUILTIN_ADDC
-+#endif
-+#endif
-+
-+/* Computes result = left + right + carry_in and updates carry_out */
-+static inline void add_carry(u64 left, u64 right, u64 *result, u64 carry_in,
-+			     u64 *carry_out)
-+{
-+#ifdef USE_BUILTIN_ADDC
-+	*result = __builtin_addcll(left, right, carry_in, carry_out);
-+#else
-+	u64 sum1, sum2;
-+	u64 c1 = __builtin_uaddll_overflow(left, right, &sum1);
-+	u64 c2 = __builtin_uaddll_overflow(sum1, carry_in, &sum2);
-+	*result = sum2;
-+	*carry_out = c1 | c2;
-+#endif
-+}
-+
-+#ifdef __has_builtin
-+#if __has_builtin(__builtin_subcll)
-+#define USE_BUILTIN_SUBC
-+#endif
-+#endif
-+
-+/* Computes result = left - right - borrow_in and updates borrow_out */
-+static inline void sub_borrow(u64 left, u64 right, u64 *result, u64 borrow_in,
-+			      u64 *borrow_out)
-+{
-+#ifdef USE_BUILTIN_SUBC
-+	*result = __builtin_subcll(left, right, borrow_in, borrow_out);
-+#else
-+	u64 diff1, diff2;
-+	u64 b1 = __builtin_usubll_overflow(left, right, &diff1);
-+	u64 b2 = __builtin_usubll_overflow(diff1, borrow_in, &diff2);
-+	*result = diff2;
-+	*borrow_out = b1 | b2;
-+#endif
-+}
-+
- /* Computes result = left + right, returning carry. Can modify in place. */
- static u64 vli_add(u64 *result, const u64 *left, const u64 *right,
- 		   unsigned int ndigits)
-@@ -286,15 +328,8 @@ static u64 vli_add(u64 *result, const u64 *left, const u64 *right,
- 	u64 carry = 0;
- 	int i;
- 
--	for (i = 0; i < ndigits; i++) {
--		u64 sum;
--
--		sum = left[i] + right[i] + carry;
--		if (sum != left[i])
--			carry = (sum < left[i]);
--
--		result[i] = sum;
--	}
-+	for (i = 0; i < ndigits; i++)
-+		add_carry(left[i], right[i], &result[i], carry, &carry);
- 
- 	return carry;
- }
-@@ -303,40 +338,29 @@ static u64 vli_add(u64 *result, const u64 *left, const u64 *right,
- static u64 vli_uadd(u64 *result, const u64 *left, u64 right,
- 		    unsigned int ndigits)
+ static void atmel_ecc_remove(struct i2c_client *client)
  {
--	u64 carry = right;
-+	u64 carry;
- 	int i;
- 
--	for (i = 0; i < ndigits; i++) {
--		u64 sum;
-+	if (ndigits == 0)
-+		return right;
- 
--		sum = left[i] + carry;
--		if (sum != left[i])
--			carry = (sum < left[i]);
--		else
--			carry = !!carry;
-+	carry = __builtin_uaddll_overflow(left[0], right, &result[0]);
- 
--		result[i] = sum;
--	}
-+	for (i = 1; i < ndigits; i++)
-+		carry = __builtin_uaddll_overflow(left[i], carry, &result[i]);
- 
- 	return carry;
- }
- 
- /* Computes result = left - right, returning borrow. Can modify in place. */
- u64 vli_sub(u64 *result, const u64 *left, const u64 *right,
--		   unsigned int ndigits)
-+	    unsigned int ndigits)
- {
- 	u64 borrow = 0;
- 	int i;
- 
--	for (i = 0; i < ndigits; i++) {
--		u64 diff;
+ 	struct atmel_i2c_client_priv *i2c_priv = i2c_get_clientdata(client);
 -
--		diff = left[i] - right[i] - borrow;
--		if (diff != left[i])
--			borrow = (diff > left[i]);
+-	/* Return EBUSY if i2c client already allocated. */
+-	if (atomic_read(&i2c_priv->tfm_count)) {
+-		/*
+-		 * After we return here, the memory backing the device is freed.
+-		 * That happens no matter what the return value of this function
+-		 * is because in the Linux device model there is no error
+-		 * handling for unbinding a driver.
+-		 * If there is still some action pending, it probably involves
+-		 * accessing the freed memory.
+-		 */
+-		dev_emerg(&client->dev, "Device is busy, expect memory corruption.\n");
+-		return;
+-	}
 -
--		result[i] = diff;
--	}
-+	for (i = 0; i < ndigits; i++)
-+		sub_borrow(left[i], right[i], &result[i], borrow, &borrow);
+-	crypto_unregister_kpp(&atmel_ecdh_nist_p256);
++	bool trigger_unreg = false;
++	bool wait_needed = false;
  
- 	return borrow;
+ 	spin_lock(&driver_data.i2c_list_lock);
+ 	list_del(&i2c_priv->i2c_client_list_node);
++	i2c_priv->unbinding = true;
++	reinit_completion(&i2c_priv->remove_done);
++	if (atomic_read(&i2c_priv->tfm_count) > 0)
++		wait_needed = true;
+ 	spin_unlock(&driver_data.i2c_list_lock);
++
++	if (wait_needed)
++		wait_for_completion(&i2c_priv->remove_done);
++
++	mutex_lock(&atmel_ecc_kpp_lock);
++	atmel_ecc_kpp_refcnt--;
++	if (atmel_ecc_kpp_refcnt == 0) {
++		trigger_unreg = true;
++		atmel_ecc_unreg_active = true;
++		reinit_completion(&atmel_ecc_unreg_done);
++	}
++	mutex_unlock(&atmel_ecc_kpp_lock);
++
++	if (trigger_unreg) {
++		crypto_unregister_kpp(&atmel_ecdh_nist_p256);
++		mutex_lock(&atmel_ecc_kpp_lock);
++		atmel_ecc_unreg_active = false;
++		complete_all(&atmel_ecc_unreg_done);
++		mutex_unlock(&atmel_ecc_kpp_lock);
++	}
  }
-@@ -344,20 +368,18 @@ EXPORT_SYMBOL(vli_sub);
  
- /* Computes result = left - right, returning borrow. Can modify in place. */
- static u64 vli_usub(u64 *result, const u64 *left, u64 right,
--	     unsigned int ndigits)
-+		    unsigned int ndigits)
- {
--	u64 borrow = right;
-+	u64 borrow;
- 	int i;
+ static const struct of_device_id atmel_ecc_dt_ids[] = {
+diff --git a/drivers/crypto/atmel-i2c.h b/drivers/crypto/atmel-i2c.h
+index 72f04c15682f..8e6617422191 100644
+--- a/drivers/crypto/atmel-i2c.h
++++ b/drivers/crypto/atmel-i2c.h
+@@ -129,6 +129,7 @@ struct atmel_ecc_driver_data {
+  * @wake_token_sz       : size in bytes of the wake_token
+  * @tfm_count           : number of active crypto transformations on i2c client
+  * @hwrng               : hold the hardware generated rng
++ * @unbinding           : unbinding handshake
+  *
+  * Reads and writes from/to the i2c client are sequential. The first byte
+  * transmitted to the device is treated as the byte size. Any attempt to send
+@@ -145,6 +146,8 @@ struct atmel_i2c_client_priv {
+ 	size_t wake_token_sz;
+ 	atomic_t tfm_count ____cacheline_aligned;
+ 	struct hwrng hwrng;
++	struct completion remove_done;
++	bool unbinding;
+ };
  
--	for (i = 0; i < ndigits; i++) {
--		u64 diff;
-+	if (ndigits == 0)
-+		return right;
- 
--		diff = left[i] - borrow;
--		if (diff != left[i])
--			borrow = (diff > left[i]);
-+	borrow = __builtin_usubll_overflow(left[0], right, &result[0]);
- 
--		result[i] = diff;
--	}
-+	for (i = 1; i < ndigits; i++)
-+		borrow = __builtin_usubll_overflow(left[i], borrow, &result[i]);
- 
- 	return borrow;
- }
+ /**
+
+base-commit: 5624ea54f3ba5c83d2e5503411a31a8be0278c1e
+prerequisite-patch-id: c4d6779c74f5ca16536803c314af99c4346a14e1
+prerequisite-patch-id: edd38ca9cc59d9e34c0944e2e7b533cdeb422c81
+prerequisite-patch-id: 55f668761eaff284d13ab86085686eae426fc524
+prerequisite-patch-id: b96e5855ea503314931ff3184f96af049c16b19f
+prerequisite-patch-id: 5a761e93900d75ef5f887324002c6e52ba47558a
+prerequisite-patch-id: 77570d656bdcb6a9bfa3c70b730db8f22767a70b
+prerequisite-patch-id: 10a90dfb8890f39c19ea4117ffbb7cf3c801dcb7
+prerequisite-patch-id: 86c4da8c2119be06fe5d494066523f6b8507abe4
 -- 
-2.54.0
+2.53.0
 
