@@ -1,269 +1,152 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81AE3381AEA;
-	Mon,  8 Jun 2026 18:01:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1780941690; cv=none; b=U9CbjeXwhLfncy2cQWH+nc+rsdxO3fMA3wIOwVARq83GGUYDM3fRaP6/UAIfzB3uLwCQzWwLl11yISn1pF5NdETgzKVGb5vMhdhrBrcF/b8UZOArxXYjIyAKTnzFtFtZG3Deeuh+cLV16EC6Tj7S417aRDgk9vb6yvfsZ7UfsJU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1780941690; c=relaxed/simple;
-	bh=i6LVEATDVcFj/fgp0J6dHvawDKwQBX5hiEAkWSx+yIc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Pt2RabdyK+Q9cqzZGku0iGfmgnnygIaBKl7ZBI2r075pMSyD9ota8jssZkDgOA5tgWQOjptXkEznyg/H9ZGCIpcyZKZDns8Bp/cz95WovfNJhdMGIfHYjFsQyhRIsgJRRNLSIWZj4fpL6+Mg0TnJF/YkpTOW8gpWa5jfRiliR28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kVujId1O; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CF16367295
+	for <linux-crypto@vger.kernel.org>; Mon,  8 Jun 2026 18:11:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.180
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1780942310; cv=pass; b=KAo49VYmqoBmC0s4e+vaDeVcAZ5RiK1EV9wN3pihxQTTSpekK975DS3XVNsUj+2xSADR+brNNWK+n5eK3ixmwi5GAjo9Af4512Dityc5RuA9BZeeEyowuMcED8Kc/LQfEONeU4HaOowVdVqgijOkFC5duS3oYz2ujgdAgCZqwCA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1780942310; c=relaxed/simple;
+	bh=VZpVuEIFYp9UsfFz5BGKAT3YAHB73zvlRx6pwQWbJ0E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UzODcYcYV344E3g5z5z3TSMt/aQ9gn1QmZ5QymvWSpF6Ke3sbtyH5ElH39bxvhqxBxHIwAJsTe7Q69QtIpN0/9weYdvmXI/l/utuYNPIpI2yf1C4XwyYO2zjM/9iYzC2kFw3ZWeCQYKrT7f8lljr8MeQcG4OgULqaFKv4sAGg5Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VOzeiRdk; arc=pass smtp.client-ip=74.125.82.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kVujId1O"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9E5B1F00898;
-	Mon,  8 Jun 2026 18:01:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1780941689;
-	bh=6t9kkdnggwp6fUfxOmyPAAOrt4ejtitYpOM1vPhKfso=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=kVujId1O5U/5f3Fq1jOeVjUxIplNlzsUjceV/aGhOAHD/OiK2+Ly3DmG4QUR4H48Q
-	 YZFj2zcSBgvGu9O7ZlqdLFJIJ97hpgPOzz8SA9sSI6FpTH50oE53wsKg9btoCYgBLw
-	 Af3IcikRS/OCrLICX/+e7CDJs2GicWVhGRm2GCStiYkFb07ogrg0gi7EoBQqNIdVIB
-	 K+0TVy10mn8h7aPxFa2ZQtOOi/cFt819Cj03f67nu7ZFthrYm7Z6xsATkULYaS4H57
-	 kqM+rzrsT5BPx6nUWg6DrPhgyKRg+LrmitAjvi1JrdJziTXtpn7RzN3UMAsZ059G2t
-	 /ZaaStehGATGw==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Om Prakash Singh <quic_omprsing@quicinc.com>,
-	Bjorn Andersson <quic_bjorande@quicinc.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	linux-arm-msm@vger.kernel.org,
-	Olivia Mackall <olivia@selenic.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Neeraj Soni <neeraj.soni@oss.qualcomm.com>,
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Subject: [PATCH v2 4/4] hwrng: qcom - Move qcom-rng.c into drivers/char/hw_random/
-Date: Mon,  8 Jun 2026 17:58:48 +0000
-Message-ID: <20260608175848.2045229-5-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.54.0.1064.gd145956f57-goog
-In-Reply-To: <20260608175848.2045229-1-ebiggers@kernel.org>
-References: <20260608175848.2045229-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VOzeiRdk"
+Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-304f590dd91so5015806eec.0
+        for <linux-crypto@vger.kernel.org>; Mon, 08 Jun 2026 11:11:48 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1780942308; cv=none;
+        d=google.com; s=arc-20240605;
+        b=C5YEbE+1CTVK17M4Z5Uz7ZQREqNDPNgvtaSeZShks5M/TMIIf2dQO/e2rlVsOqRoES
+         nnGiqeLN57+5ltuQcbRrp2p9vhYY6JE3QMMJa+WOtCFk/o5y3gkzvMfUe4DUJ+vFg4zy
+         cY3QCcMHklzP+3+nvPAXaNoAlbcPnJLvuKvnFgJYcSozrA7+zqQLxr5O1css5vZ11oP4
+         BUQh5BVTvZbTTdgCfz4Qa4pPMLVCORlWag2bVdgcIJbf1+/iCPHoN/CtTde8HZSlzJwa
+         Hb3OtWue6xC7jOkIZYm/LUDirHxTJpopsX7pWwO67bHkih6yJwvJrsuCmkLrqGMKw5h/
+         +C5w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Ep5iwWlczkBtdvT0ueoldhn2n7yNnVgtmpFujFfNkgg=;
+        fh=RstN9zTpY9eTJSfuHdABDlhe8dkh+/V4qJU5TWmISE4=;
+        b=KLZ+Y6HK6dWR7QS1rtoqKyGF2qBap165QUvodA38jGFDDv3I8vOqcPPBmbeE6AfYzX
+         5cdzZ+3f93H+rXipR/MHg09UIbLAZcOR2wwEqcgLNCrmHZyVsSw7KWP7+LJRKP5W+8yZ
+         QLPmoc+XBPvf5nz+YabN1PJ+bulp7JhUMAS0eKDpyDeqcSDflR7TtcP12RZfYXHnrTtD
+         75uMRbMrdvi1GJBhz9Syc9SBJFMEFN4x3rDL7sGO1Y7vEsksPL11jqgoMbh1hoFx7y2b
+         6+jZhAI9gXA2WWA4jwIDYr1TFD0zTdH4Mpi7EmraJ3b62qxibxq0qp8eMFVH4a1jtzxD
+         e3dw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1780942308; x=1781547108; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ep5iwWlczkBtdvT0ueoldhn2n7yNnVgtmpFujFfNkgg=;
+        b=VOzeiRdk1KnojBUbI4Q4spYN0loFYMm7+wM2pmzYMiXfYlC/INktsaz3wOh0h0+YqQ
+         7vQN607z3XTTm4PQ6OONe0xoaUJuQ1ISDH4OmGBxlvkCct34fpTODuNSiUCuNuDAtJPh
+         JMDjOMSYDN+wkGpQo6OEe1MjzERAV4ax1a0BVuTa5CkV1Z5XRVMY/k0SlFepPKCnRtko
+         PkHKXyb6EgIAdntCHmHj33TdwDADZchljdy2T5VnGMJw0hlnWoXVvRcEJB9pA5bLCVUu
+         O1dt2ZR1aeJRs88vnuv0chjK8HcXDTHReFScXro8vWVwXcFxxYJ+v602VaPLbM/dqc/J
+         MwFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1780942308; x=1781547108;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Ep5iwWlczkBtdvT0ueoldhn2n7yNnVgtmpFujFfNkgg=;
+        b=bxYH3vGbMsmLbh5I4zy2yqu9mS7NjUBCaUbkulA5pazICUl+3IlfA3diRKJQ19/d71
+         24EmetPWglcLiKYlS0DZkeXBR6AR0//0TjcAYS7BVQq+l4kSj9USdhKwnHRpkNZ5s0o/
+         KEIOduP9fkjOH6yTheWxsYExnrWkrwhKQlfFlaCiJH54st/NtaIsSMqCqsBf4+xC7YZ8
+         fJcIMgoChIUJbDjRWMOhgPtc388elEJ2WSB5IRip1U8I91DioP75jj6g1oITes6X4Ac7
+         xkD65C0kxsJLnRSwOncqTAqEe93Xqvrp116exZKdkx5NjMpawwDG2lTD2/TPqQ7UR/nH
+         7G4Q==
+X-Forwarded-Encrypted: i=1; AFNElJ9cvof5ZL7HDaS87iIcpV9m9TB7Mpc87LXK/GEc/HbP7pEL6N8/GmRYSzCYPTkdqXQenemJ4zXNxUjtG/Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6DvkF2G8g2Hlqa0j+lPbB0Fzm5vQANy997GFV144JS/kbrS3L
+	UF7sJe8Spk3E8PK3NUCVKd/bjacdakXiInL5bTI+WLBJB3tod+kpSTG3x3/SWUcKunCiFwnLpg2
+	f9e6P9Ugol/AInJ4420aAr9le+zBEZoc=
+X-Gm-Gg: Acq92OFpolCEga0auYtym2EnjZ8trw1haWeB46T0NizXadcfolHhOLFCwpLNIdGF1Qx
+	TKn9LCeX1XDn3mcJQF0ftmq5RWWh86n05ghYPryFdohV1w/swfsyqQitzirdBOdbG1dDdhTHMB+
+	xhKeewWNuaN7IJNec8CXSbMsnr9tllG3IutGaomDWOVBYTvISTkzGU36zLvrmhSJrPCiE1ixt47
+	foy7Kcw+Ej+9YRIupMX1SQfafGnYgEeF7DNKsfO4isKVWanv6a4Z272W0MYaWP2qmqytaZCk18A
+	iY5csAPiQ+kx3y4=
+X-Received: by 2002:a05:7300:3b06:b0:2ed:e14:e954 with SMTP id
+ 5a478bee46e88-3077b8014d6mr7984972eec.30.1780942307519; Mon, 08 Jun 2026
+ 11:11:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260522050740.84561-1-ebiggers@kernel.org> <CAB9dFduBir-41_Ef4noEJPHsFU-++JHDxMU-6S7B8pBYynvadA@mail.gmail.com>
+ <20260603050557.GB18149@sol> <20260608173921.GA434331@google.com>
+In-Reply-To: <20260608173921.GA434331@google.com>
+From: Marc Dionne <marc.c.dionne@gmail.com>
+Date: Mon, 8 Jun 2026 15:11:35 -0300
+X-Gm-Features: AVVi8Ccuf9-VZpieD-CilJz3X4Bu-AwhKT-kdmFxIlO2MI1v6r1hS5SlD2UxAzQ
+Message-ID: <CAB9dFds7kUSMRPAV_BGZ5hGYd-yPq3YziFW5VTN7FgXTtHuhZw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 0/5] Consolidate FCrypt and PCBC code into net/rxrpc/
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: netdev@vger.kernel.org, linux-afs@lists.infradead.org, 
+	David Howells <dhowells@redhat.com>, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Since this file just implements a hwrng driver, move it into
-drivers/char/hw_random/.  Rename the kconfig option accordingly as well.
+On Mon, Jun 8, 2026 at 2:39=E2=80=AFPM Eric Biggers <ebiggers@kernel.org> w=
+rote:
+>
+> On Tue, Jun 02, 2026 at 10:05:57PM -0700, Eric Biggers wrote:
+> > On Fri, May 22, 2026 at 10:06:49AM -0300, Marc Dionne wrote:
+> > > On Fri, May 22, 2026 at 2:07=E2=80=AFAM Eric Biggers <ebiggers@kernel=
+.org> wrote:
+> > > >
+> > > > The FCrypt "block cipher" and the PCBC mode of operation are obsole=
+te
+> > > > and insecure.  Since their only user is net/rxrpc/, they belong the=
+re,
+> > > > not in the crypto API.
+> > > >
+> > > > Therefore, this series removes these algorithms from the crypto API=
+ and
+> > > > replaces them with local implementations in net/rxrpc/.
+> > > >
+> > > > The local implementations are simpler too, as they avoid the crypto=
+ API
+> > > > boilerplate.
+> > > >
+> > > > I don't know how to test all the code in net/rxrpc/, but everything
+> > > > should still work.  I added a KUnit test for the crypto functions.
+> > > >
+> > > > Changed in v2:
+> > > >     - Added missing export of fcrypt_preparekey().
+> > > >     - Write "RxRPC crypto KUnit test" instead of "RxRPC KUnit test"=
+.
+> > > >     - Rebased onto latest net-next where decryption now happens in =
+the
+> > > >       linear buffer rxrpc_call::rx_dec_buffer, simplifying the code=
+.
+> > >
+> > > Looks good in testing with our kafs test suite, forcing the use of
+> > > rxkad with encryption.
+> > >
+> > > Feel free to add for the series:
+> > > Tested-by: Marc Dionne <marc.dionne@auristor.com>
+> >
+> > Thanks!
+> >
+> > If there's no more feedback, could this be applied to net-next?
+>
+> Any update on this?
+>
+> - Eric
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- arch/arm/configs/multi_v7_defconfig           |  2 +-
- arch/arm/configs/qcom_defconfig               |  2 +-
- arch/arm64/configs/defconfig                  |  2 +-
- drivers/char/hw_random/Kconfig                | 11 +++++++++++
- drivers/char/hw_random/Makefile               |  1 +
- drivers/{crypto => char/hw_random}/qcom-rng.c |  0
- drivers/crypto/Kconfig                        | 11 -----------
- drivers/crypto/Makefile                       |  1 -
- drivers/gpu/drm/ci/arm64.config               |  2 +-
- 9 files changed, 16 insertions(+), 16 deletions(-)
- rename drivers/{crypto => char/hw_random}/qcom-rng.c (100%)
+Looks fine to me (and in testing), I wasn't sure if David had a chance
+to look at v2, as he was away for a little while.
 
-diff --git a/arch/arm/configs/multi_v7_defconfig b/arch/arm/configs/multi_v7_defconfig
-index bcc9aabc1202..a3c612a9d423 100644
---- a/arch/arm/configs/multi_v7_defconfig
-+++ b/arch/arm/configs/multi_v7_defconfig
-@@ -404,10 +404,11 @@ CONFIG_SERIAL_DEV_BUS=y
- CONFIG_VIRTIO_CONSOLE=y
- CONFIG_ASPEED_KCS_IPMI_BMC=m
- CONFIG_ASPEED_BT_IPMI_BMC=m
- CONFIG_HW_RANDOM=y
- CONFIG_HW_RANDOM_ST=y
-+CONFIG_HW_RANDOM_QCOM=m
- CONFIG_TCG_TPM=m
- CONFIG_TCG_TIS_I2C_INFINEON=m
- CONFIG_I2C_CHARDEV=y
- CONFIG_I2C_ARB_GPIO_CHALLENGE=m
- CONFIG_I2C_MUX_GPIO=y
-@@ -1334,11 +1335,10 @@ CONFIG_CRYPTO_DEV_S5P=m
- CONFIG_CRYPTO_DEV_ATMEL_AES=m
- CONFIG_CRYPTO_DEV_ATMEL_TDES=m
- CONFIG_CRYPTO_DEV_ATMEL_SHA=m
- CONFIG_CRYPTO_DEV_MARVELL_CESA=m
- CONFIG_CRYPTO_DEV_QCE=m
--CONFIG_CRYPTO_DEV_QCOM_RNG=m
- CONFIG_CRYPTO_DEV_ROCKCHIP=m
- CONFIG_CRYPTO_DEV_STM32_HASH=m
- CONFIG_CRYPTO_DEV_STM32_CRYP=m
- CONFIG_CMA_SIZE_MBYTES=64
- CONFIG_PRINTK_TIME=y
-diff --git a/arch/arm/configs/qcom_defconfig b/arch/arm/configs/qcom_defconfig
-index 29a1dea500f0..d57554971c03 100644
---- a/arch/arm/configs/qcom_defconfig
-+++ b/arch/arm/configs/qcom_defconfig
-@@ -115,10 +115,11 @@ CONFIG_SERIO_LIBPS2=y
- # CONFIG_LEGACY_PTYS is not set
- CONFIG_SERIAL_MSM=y
- CONFIG_SERIAL_MSM_CONSOLE=y
- CONFIG_SERIAL_DEV_BUS=y
- CONFIG_HW_RANDOM=y
-+CONFIG_HW_RANDOM_QCOM=m
- CONFIG_I2C=y
- CONFIG_I2C_CHARDEV=y
- CONFIG_I2C_QUP=y
- CONFIG_SPI=y
- CONFIG_SPI_QUP=y
-@@ -309,11 +310,10 @@ CONFIG_CRYPTO_USER=m
- CONFIG_CRYPTO_USER_API=m
- CONFIG_CRYPTO_USER_API_HASH=m
- CONFIG_CRYPTO_USER_API_SKCIPHER=m
- CONFIG_CRYPTO_USER_API_RNG=m
- CONFIG_CRYPTO_USER_API_AEAD=m
--CONFIG_CRYPTO_DEV_QCOM_RNG=m
- CONFIG_DMA_CMA=y
- CONFIG_CMA_SIZE_MBYTES=64
- CONFIG_PRINTK_TIME=y
- CONFIG_DYNAMIC_DEBUG=y
- CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
-diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
-index d905a0777f93..bb930cce7233 100644
---- a/arch/arm64/configs/defconfig
-+++ b/arch/arm64/configs/defconfig
-@@ -548,10 +548,11 @@ CONFIG_VIRTIO_CONSOLE=y
- CONFIG_IPMI_HANDLER=m
- CONFIG_IPMI_DEVICE_INTERFACE=m
- CONFIG_IPMI_SI=m
- CONFIG_HW_RANDOM=y
- CONFIG_HW_RANDOM_VIRTIO=y
-+CONFIG_HW_RANDOM_QCOM=m
- CONFIG_TCG_TPM=y
- CONFIG_TCG_TIS=m
- CONFIG_TCG_TIS_SPI=m
- CONFIG_TCG_TIS_SPI_CR50=y
- CONFIG_TCG_TIS_I2C_CR50=m
-@@ -1951,11 +1952,10 @@ CONFIG_CRYPTO_AES_ARM64_BS=m
- CONFIG_CRYPTO_AES_ARM64_CE_CCM=y
- CONFIG_CRYPTO_DEV_SUN8I_CE=m
- CONFIG_CRYPTO_DEV_FSL_CAAM=m
- CONFIG_CRYPTO_DEV_FSL_DPAA2_CAAM=m
- CONFIG_CRYPTO_DEV_QCE=m
--CONFIG_CRYPTO_DEV_QCOM_RNG=m
- CONFIG_CRYPTO_DEV_TEGRA=m
- CONFIG_CRYPTO_DEV_XILINX_TRNG=m
- CONFIG_CRYPTO_DEV_ZYNQMP_AES=m
- CONFIG_CRYPTO_DEV_ZYNQMP_SHA3=m
- CONFIG_CRYPTO_DEV_CCREE=m
-diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index 492a2a61a65b..7102e03dcf0a 100644
---- a/drivers/char/hw_random/Kconfig
-+++ b/drivers/char/hw_random/Kconfig
-@@ -613,10 +613,21 @@ config HW_RANDOM_ROCKCHIP
- 	  To compile this driver as a module, choose M here: the
- 	  module will be called rockchip-rng.
- 
- 	  If unsure, say Y.
- 
-+config HW_RANDOM_QCOM
-+	tristate "Qualcomm True Random Number Generator Driver"
-+	depends on ARCH_QCOM || COMPILE_TEST
-+	depends on HW_RANDOM
-+	help
-+	  This driver provides support for the True Random Number
-+	  Generator hardware found on some Qualcomm SoCs.
-+
-+	  To compile this driver as a module, choose M here. The
-+	  module will be called qcom-rng. If unsure, say N.
-+
- endif # HW_RANDOM
- 
- config UML_RANDOM
- 	depends on UML
- 	select HW_RANDOM
-diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
-index b9132b3f5d21..605ba8df5a8f 100644
---- a/drivers/char/hw_random/Makefile
-+++ b/drivers/char/hw_random/Makefile
-@@ -50,5 +50,6 @@ obj-$(CONFIG_HW_RANDOM_XIPHERA) += xiphera-trng.o
- obj-$(CONFIG_HW_RANDOM_ARM_SMCCC_TRNG) += arm_smccc_trng.o
- obj-$(CONFIG_HW_RANDOM_CN10K) += cn10k-rng.o
- obj-$(CONFIG_HW_RANDOM_POLARFIRE_SOC) += mpfs-rng.o
- obj-$(CONFIG_HW_RANDOM_ROCKCHIP) += rockchip-rng.o
- obj-$(CONFIG_HW_RANDOM_JH7110) += jh7110-trng.o
-+obj-$(CONFIG_HW_RANDOM_QCOM) += qcom-rng.o
-diff --git a/drivers/crypto/qcom-rng.c b/drivers/char/hw_random/qcom-rng.c
-similarity index 100%
-rename from drivers/crypto/qcom-rng.c
-rename to drivers/char/hw_random/qcom-rng.c
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index a12cd677467b..07f0fa3341fc 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -654,21 +654,10 @@ config CRYPTO_DEV_QCE_SW_MAX_LEN
- 
- 	  Note that 192-bit keys are not supported by the hardware and are
- 	  always processed by the software fallback, and all DES requests
- 	  are done by the hardware.
- 
--config CRYPTO_DEV_QCOM_RNG
--	tristate "Qualcomm Random Number Generator Driver"
--	depends on ARCH_QCOM || COMPILE_TEST
--	depends on HW_RANDOM
--	help
--	  This driver provides support for the Random Number
--	  Generator hardware found on Qualcomm SoCs.
--
--	  To compile this driver as a module, choose M here. The
--	  module will be called qcom-rng. If unsure, say N.
--
- config CRYPTO_DEV_IMGTEC_HASH
- 	tristate "Imagination Technologies hardware hash accelerator"
- 	depends on MIPS || COMPILE_TEST
- 	select CRYPTO_MD5
- 	select CRYPTO_SHA1
-diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-index 283bbc650b5b..a5f3d388f4d0 100644
---- a/drivers/crypto/Makefile
-+++ b/drivers/crypto/Makefile
-@@ -26,11 +26,10 @@ obj-$(CONFIG_CRYPTO_DEV_OMAP_DES) += omap-des.o
- obj-$(CONFIG_CRYPTO_DEV_OMAP_SHAM) += omap-sham.o
- obj-$(CONFIG_CRYPTO_DEV_PADLOCK_AES) += padlock-aes.o
- obj-$(CONFIG_CRYPTO_DEV_PADLOCK_SHA) += padlock-sha.o
- obj-$(CONFIG_CRYPTO_DEV_PPC4XX) += amcc/
- obj-$(CONFIG_CRYPTO_DEV_QCE) += qce/
--obj-$(CONFIG_CRYPTO_DEV_QCOM_RNG) += qcom-rng.o
- obj-$(CONFIG_CRYPTO_DEV_ROCKCHIP) += rockchip/
- obj-$(CONFIG_CRYPTO_DEV_S5P) += s5p-sss.o
- obj-$(CONFIG_CRYPTO_DEV_SA2UL) += sa2ul.o
- obj-$(CONFIG_CRYPTO_DEV_SAHARA) += sahara.o
- obj-$(CONFIG_CRYPTO_DEV_SL3516) += gemini/
-diff --git a/drivers/gpu/drm/ci/arm64.config b/drivers/gpu/drm/ci/arm64.config
-index 563a69669a7b..c46125c1f80f 100644
---- a/drivers/gpu/drm/ci/arm64.config
-+++ b/drivers/gpu/drm/ci/arm64.config
-@@ -76,11 +76,10 @@ CONFIG_INTERCONNECT_QCOM_SDM845=y
- CONFIG_INTERCONNECT_QCOM_MSM8916=y
- CONFIG_INTERCONNECT_QCOM_MSM8996=y
- CONFIG_INTERCONNECT_QCOM_OSM_L3=y
- CONFIG_INTERCONNECT_QCOM_SC7180=y
- CONFIG_INTERCONNECT_QCOM_SM8350=y
--CONFIG_CRYPTO_DEV_QCOM_RNG=y
- CONFIG_SC_DISPCC_7180=y
- CONFIG_SC_GPUCC_7180=y
- CONFIG_SM_GPUCC_8350=y
- CONFIG_QCOM_SPMI_ADC5=y
- CONFIG_QCOM_SPMI_VADC=y
-@@ -187,10 +186,11 @@ CONFIG_PWM_MEDIATEK=y
- CONFIG_DRM_MEDIATEK_HDMI=y
- CONFIG_GNSS=y
- CONFIG_GNSS_MTK_SERIAL=y
- CONFIG_HW_RANDOM=y
- CONFIG_HW_RANDOM_MTK=y
-+CONFIG_HW_RANDOM_QCOM=y
- CONFIG_MTK_DEVAPC=y
- CONFIG_PWM_MTK_DISP=y
- CONFIG_MTK_CMDQ=y
- CONFIG_REGULATOR_DA9211=y
- CONFIG_DRM_ANALOGIX_ANX7625=y
--- 
-2.54.0.1064.gd145956f57-goog
-
+Marc
