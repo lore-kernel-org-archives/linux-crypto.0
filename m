@@ -1,115 +1,116 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF0D54C77CE;
-	Tue,  9 Jun 2026 18:58:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D60B3E44ED
+	for <linux-crypto@vger.kernel.org>; Tue,  9 Jun 2026 19:25:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781031503; cv=none; b=cZ9HBOGlTJIPR0XSnWi2sBLA5S4wPQU4hjdfuMq88jEu/rRkVV6P9X9L8hyO1mmFkz2ThtUB6hSmQvvMyWEul893PD04rCNNrWg+ItYKQWMNgAqpScdOB0wkwQx6Rai8ZcAAGZcDYSBHe7Cx1K3SYFzMODBQYNpf0/Wq24ImlG8=
+	t=1781033145; cv=none; b=e0fD9NWfgIQ5jP6ow2yoY+yX/Jmkh/bL/dmbcog7mVaWH1338XoOnyU8Tjn1Lw6czdOIWrLgZPktZkCEltM03ay6MwkOKEQbC023ukrcrxwBQ6ljI5QhJ9wSrd1GVeA8CUevbJJISwPr3rvq67uhFcawfKoWJNbOTyLS+nMbKss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781031503; c=relaxed/simple;
-	bh=L8VcJhFxK63g3GeeYh4o/Y6uXlMj/Dk09lzG3eFunV8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tNdLu8WqL07vP681QxUfUqAis3oADSGzx3cj8VyfHj/6OYXntS0+fzev4vY4WpLI8qRn32VGejZLbmmPLWrsBH38PhJQlULg3e3HyxXBXbsqjpBYeyUQPC1e4xVQMv6pN/hp4Us6MsjoNrfp1UOmWnVg8OG09sAaEPMMKcxMASA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=QOCkQ+Ja; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1781033145; c=relaxed/simple;
+	bh=q/hyI2CAQKKslq+Q6JufItUDwvXLZnAzNjiOX4tUczo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=APE1yVr+qnZGmrJ0e+8VzlBjkR25j6+ssOmD7QmYi66PLgdQQ8kMr/fgEw/IfkM6BVj8vMNk7WR0IuK1fkBe1rPa+9DjgEreUigvdij10GMeQtHw2h/qQjSOG9SZ+2zL4tIc3ROfHGYOj6ytrDN8X8n31jzzukRS9fW7rs00T30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kPyI4ht2; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="QOCkQ+Ja"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 659HU4nG3887500;
-	Tue, 9 Jun 2026 18:58:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=WYLGxR
-	y7aSIfgfzuhc0N6xHkjoK9PxOBLeSOeCGAE14=; b=QOCkQ+JaOvwnBJ5Fp4XmKR
-	wzhI9PJJB5IZxB21eHP/6kLh/3YcFxB2SrARZ7g/JdGYpwTXSW51Dv5XzAY2WE25
-	XyUFo17Y099h8+zyosTuVSBBDrZfJn8Yurpjyo0O5bF/xn9aldYNHD+C3GG1hJOP
-	6tfzM7d9sDFnjex42NF6ayzUbkRPSTILOS5dVK8DYMpsqzUxEoqTDExDHPuya3m8
-	0R49CwooHJ7mzakj2rX2U9keXoHzxvN5CH6lwsf9AoXnzywEylgDVNglNtb9o4jc
-	OCaaYujs7AMZ7e8lgIYcHIRkBsbssaiLw/QJpZOcVgVsowe0+tV5DiNx5iy3G0bQ
-	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4emb23ww3w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Jun 2026 18:58:12 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 659Ingwk005285;
-	Tue, 9 Jun 2026 18:58:11 GMT
-Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4emych3bbr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Jun 2026 18:58:11 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
-	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 659IwB2k000934
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 9 Jun 2026 18:58:11 GMT
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2C7EA58055;
-	Tue,  9 Jun 2026 18:58:11 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 81C385803F;
-	Tue,  9 Jun 2026 18:58:10 +0000 (GMT)
-Received: from [9.47.158.153] (unknown [9.47.158.153])
-	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  9 Jun 2026 18:58:10 +0000 (GMT)
-Message-ID: <bd992448-8ded-46f8-bf91-97792b9a11ad@linux.ibm.com>
-Date: Tue, 9 Jun 2026 14:58:09 -0400
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kPyI4ht2"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B6FA1F00893;
+	Tue,  9 Jun 2026 19:25:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781033144;
+	bh=+ddnk60tXdM7hobNqKcXw8Ox9Bo2tDNzlWPY9VejNHg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=kPyI4ht2inC1WvYi3jOSbK9wpVETA1UAmAk0x/oEd7xv4u+8+R6skBfQE8B7KQM91
+	 4mSO1+EJfKNPo/OIn7MPTona/dsQ7pwF624X58pbG5Gs3lq6pL9FOwKWGM7kk3U3rH
+	 qbc79/HR5J2Gohha0JFIibQg6b8U22FOQhhFBt6NOVc4o+65t16cGQ/K3qhC3F2aD9
+	 ZOocKkdVyO2zqSc4tEcTFoGSje1dgpnk1wYZ+8NoPTzrs6dJmW4JWoSB7Rf/Dkw+di
+	 TVfZGXLteOtOFDBgCGq6splzcaQNxHQ0I1JwU4Kofhpqps/ghumeYW+oHohhZnyjY2
+	 +qvsau/RsnvvQ==
+Date: Tue, 9 Jun 2026 19:25:42 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: kstzavertaylo <kstzavertaylo@gmail.com>
+Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+Subject: Re: [RFC] ML-KEM (FIPS 203) implementation with reusable
+ decapsulation pool
+Message-ID: <20260609192542.GA3811606@google.com>
+References: <CAMho2RfgwvNhWJidb_Xn3RRt71TFjQ2QBKP9Xt8ur22L-ZWP9A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: ecc - Optimize vli additive operations using
- compiler builtins
-To: Fabian Blatter <fabianblatter09@gmail.com>, lukas@wunner.de,
-        ignat@linux.win, herbert@gondor.apana.org.au, davem@davemloft.net
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20260607112435.42804-1-fabianblatter09@gmail.com>
-Content-Language: en-US
-From: Stefan Berger <stefanb@linux.ibm.com>
-In-Reply-To: <20260607112435.42804-1-fabianblatter09@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Authority-Analysis: v=2.4 cv=b4uCJNGx c=1 sm=1 tr=0 ts=6a286245 cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=RTuf3evP9GeFNN_N0Y0A:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-ORIG-GUID: TkO3KmtKbF4ZAskeUAwkAe63D3qo4pTt
-X-Proofpoint-GUID: 1CL4EIcqlM8b5JFwtL_keCGzIG7DDq6D
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjA5MDE3NSBTYWx0ZWRfX6Z+ry4KU5H46
- k7+QV8nJwc8I1gRSFi7PpsioJk4EtobRPb1ienuqHEI0trxLMWjLJgrXggkbPDicJH2cBExsSqX
- GNmamQkEZOxii4hSM4fUaKSYC7Ilhhg50gqovRO5GfMS6CcPa4abejzfZ93L8GXltks1jrSY/n0
- sC6EqSlsw/owfEKUGfrEWJVMbaAWPzRNqFF7tVGns7zs6KI6JtbYPKi3vGKN8A2YedsQZz3drmk
- GRvDiMi7GFoLnd2AW13TE8ah6l8EAkUExsyOo5AyLYvwM498uFuncOcZt4L9W5Kx1U9nXCY1ReB
- gwLAbXpsOshkp65mb5ep4F5ZeaN8lKXiBykSfavq59ZPzmetZ1hOAmUgvgL6qKpQ8R+9iL2Y571
- VFxApDpeT3190TxqCLW51ypF5sSGjHy70nTkRjpUN9kysb8P8hrdYpyZdmdEWXpi6nym1368J3n
- yapojNdXz0LdBgTeJ2w==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-09_04,2026-06-09_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 spamscore=0 bulkscore=0 phishscore=0 priorityscore=1501
- lowpriorityscore=0 adultscore=0 malwarescore=0 impostorscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2605210000 definitions=main-2606090175
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMho2RfgwvNhWJidb_Xn3RRt71TFjQ2QBKP9Xt8ur22L-ZWP9A@mail.gmail.com>
 
-
-
-On 6/7/26 7:24 AM, Fabian Blatter wrote:
-> Replace the software carry flag emulation with compiler builtins.
+On Tue, Jun 09, 2026 at 10:45:48AM +0300, kstzavertaylo wrote:
+> Hello,
+> I have been working on an ML-KEM (FIPS 203) implementation for the
+> Linux kernel. This is an early RFC to solicit feedback on the overall
+> design and architecture before further polishing.
 > 
-> Even the newest compilers struggle with taking advantage of the
-> hardware carry flag. Compiler builtins allow the compiler to
-> much more easily achieve this while still remaining constant-time.
+> The implementation consists of two closely related variants sharing
+> the same core cryptographic logic:
+>     1. A userspace implementation accompanied by a set of validation
+> programs, including NIST KAT vectors, timing-leakage testing (dudect),
+> pool stress tests, and additional functional tests.
+>     2. A Linux kernel module implementing the KPP interface and
+> reusing the same core architecture where possible.
+> 
+> Key features include:
+>    1. Support for all three parameter sets: ML-KEM-512, ML-KEM-768,
+> and ML-KEM-1024.
+>    2. The implementation uses a reusable decapsulation pool consisting
+> of preallocated slots associated with a key context. The goal of this
+> design is to move memory allocation to key initialization and avoid
+> per-decapsulation allocations.
+>    3. Explicit zeroization of sensitive data and constant-time
+> operations where required.
+>    4. Portable C11 codebase with minimal differences between userspace
+> and kernel versions.
+> 
+> I am aware that some aspects (local SHA3/SHAKE implementation, coding
+> style, etc.) will likely need adjustment to align with upstream
+> expectations.
+> 
+> At this stage, I would like to ask for feedback on the following points:
+>    1. Is the general direction (KPP integration + reusable
+> decapsulation pool) acceptable?
+>    2. Are there any fundamental concerns with the pool-based architecture?
+>    3. Would you prefer to reuse kernel crypto primitives for
+> SHA3/SHAKE, or is the current embedded approach acceptable at this
+> stage?
+> 
+> The implementation is available at: repository - https://github.com/kstzv/ml-kem
+> 
+> Documentation and implementation details are available in the repository.
+> 
+> Any feedback, criticism or suggestions would be greatly appreciated.
 
-It looks like you made vli_usub and vli_uadd constant-time now because 
-otherwise the loops could be ended early once borrow == 0 or carry == 0 
-respectively. Are all the other functions that operate on the private 
-keys constant-time?
+There's already a kernel patchset for ML-KEM and X-Wing ready to go:
+https://lore.kernel.org/linux-crypto/20260525184403.101818-1-ebiggers@kernel.org/T/#u
+It's a high quality implementation that fully follows kernel conventions
+already.  There just hasn't been a reason to merge it yet, since there's
+no user yet.
 
+We could consider replacing my ML-KEM implementation (patch 1 of that
+series) with a different one.  But it would have to be a high-quality
+implementation that brings something substantially new to the table.
+
+I think only an integration of
+https://github.com/pq-code-package/mlkem-native *might* have a chance at
+passing that bar.  However, it would be way more code than my
+implementation, would have significant integration challenges, and would
+need some fixing up to work in the kernel.  The main benefit would be
+getting the assembly code, but it's not clear that will be needed.  So
+those are some of the reasons I didn't reach for that initially.
+
+I don't think integrating https://github.com/kstzv/ml-kem would be
+beneficial, for a number of reasons.
+
+Anyway, I suggest you review the pre-existing patchset
+https://lore.kernel.org/linux-crypto/20260525184403.101818-1-ebiggers@kernel.org/
+and give feedback on that, if you have any.
+
+- Eric
