@@ -1,35 +1,50 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B094A1A239A;
-	Wed, 10 Jun 2026 00:20:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9291C27AC31;
+	Wed, 10 Jun 2026 01:34:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781050813; cv=none; b=QFOU/lEg9Nj26HD/xkIt6hs1d2W5v/ujTfRmxCovtVl9NsurK9VFrHEEsZI4vD2RyiXA9I7yisfkFEJzvmt46a/TmfYQPs6J1hb6q7bfh5apA5LWEXGSi7bqxAgLadMUsmvcLlU87vj+/z4OflgVZdGmsULglVIUs6HP2tmJYWg=
+	t=1781055287; cv=none; b=uD6XxOcrl2+esZMT3F5UxEWetGUs5ZG+3hyAr4JfGa+L5jnSGC62xaQ2gOQKVz5+6UTyF1UoWjRg2zWCq+/kUMAqkaANPH8RVMNe+UVRWQzA25gLK/8AJVkQZ4M/S/FURywY43fXCsYHtZDhlUGxvmr3FRV8P943cK2UYbHrwTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781050813; c=relaxed/simple;
-	bh=lIXsDvASR11s+lkmmPZBN8NZv0scO5jmKsi1J+B44ws=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=s/Zm8fI2yjsKxhiAOGxlutPcaphBaD8BmeRhfXekpQoPZ8nAvYo7G4KndFbojO/lzDn1DCReiYjztcIu19tPfzfdAVMHhpM+MG62nGvrf5F8p/6Q0U5hxIRmnV8jxYelUNE40xo1aX10oSt0PW1V4VlbXAvIO2lIyGnkwsxLTUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hNzBHLz0; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1781055287; c=relaxed/simple;
+	bh=RpDlFmoaL6fP/Fh6Zo74YHQDi1nPidAuVYgxB5T9rP8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Pk9P98OyRZ9YJrFuEynJYBylMYBfcIX6wN9q2G529fzWsZzc+mViDi2sDLV2hnaRQO0HB+cVm9px9wNH3h6DMDWVZIsQiYPaegB0X9yMbNklkXk3vg4rbCDuHEgSSEeHYD0R3i4pp+TCDB+a9uMApxDU6CEOSusJ7N6EFpG3FB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=sDJRQ4ta; arc=none smtp.client-ip=113.46.200.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hNzBHLz0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 318A11F00893;
-	Wed, 10 Jun 2026 00:20:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781050811;
-	bh=pg9xF3NdKInQJrrnXNni1toksgqVe/gvi7C8c5BGpTA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=hNzBHLz01nf4M7xYK9x6gHglA9zt49GhJ6Pa2qmgeFzx5Bw7gKqnplr/Le4oDt9n0
-	 68i+JdyeTUmPo9Uew61l74MR4VTfFlQEuxXRWxQciAby6oU0Z+DtXjzJvOcI5UKlzx
-	 z1PbbfjsJoIWHmYtw/diXZpTynLQ2vL/XMo1isslq7a8SihVgbXV6TN+6ngF+87sXL
-	 v4ial373xl+O74wxdU1zpPqptnagW3wb3jJjjVLtw88uPlFD1Yg0DdIx3hyo9SbqRJ
-	 pBxhcFj/9B+gB3GF6t6+JcFSXfdjHv/7mEnnUvTlOQluaXQRLOd73eDlrZBUk7QUK9
-	 5UShVBqeOmUDA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 939AE3930A0F;
-	Wed, 10 Jun 2026 00:20:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="sDJRQ4ta"
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=fsJv/QMhLT5GMl33vhwMXp5cDRu3eIkqfuH1+wY1z6s=;
+	b=sDJRQ4talTv2URGca5fUtOkqG5EdsxbhbHVRjbcHlmn4OXHXF8GiGU+A0tP/r1BVn/SVdWMbR
+	LhR4tPiUZthZJ+p1D6RYFO+aAmCTcrygiswsgucAe51uIDGe0n3C2uI9MSYhfX1QjdFyXJlhCY7
+	QRiv2pQBsBG/3HBd8GAICmw=
+Received: from mail.maildlp.com (unknown [172.19.163.200])
+	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4gZp5y0WhCz1K9CG;
+	Wed, 10 Jun 2026 09:26:46 +0800 (CST)
+Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id C72D44056A;
+	Wed, 10 Jun 2026 09:34:38 +0800 (CST)
+Received: from kwepemq200001.china.huawei.com (7.202.195.16) by
+ dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 10 Jun 2026 09:34:38 +0800
+Received: from localhost.localdomain (10.50.163.32) by
+ kwepemq200001.china.huawei.com (7.202.195.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 10 Jun 2026 09:34:38 +0800
+From: Chenghai Huang <huangchenghai2@huawei.com>
+To: <shenyang39@huawei.com>, <fanghao11@huawei.com>, <liulongfang@huawei.com>,
+	<qianweili@huawei.com>, <wangzhou1@hisilicon.com>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+Subject: [PATCH] MAINTAINERS: update hisilicon zip driver maintainer
+Date: Wed, 10 Jun 2026 09:34:37 +0800
+Message-ID: <20260610013437.1354503-1-huangchenghai2@huawei.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -37,50 +52,31 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/5] Consolidate FCrypt and PCBC code into
- net/rxrpc/
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <178105080939.2761032.9825918956605127872.git-patchwork-notify@kernel.org>
-Date: Wed, 10 Jun 2026 00:20:09 +0000
-References: <20260522050740.84561-1-ebiggers@kernel.org>
-In-Reply-To: <20260522050740.84561-1-ebiggers@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: netdev@vger.kernel.org, linux-afs@lists.infradead.org,
- dhowells@redhat.com, marc.dionne@auristor.com, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemq200001.china.huawei.com (7.202.195.16)
 
-Hello:
+Add Chenghai Huang as the maintainer of the hisilicon zip driver,
+replacing Yang Shen.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Signed-off-by: Chenghai Huang<huangchenghai2@huawei.com>
+---
+ MAINTAINERS | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On Fri, 22 May 2026 00:07:31 -0500 you wrote:
-> The FCrypt "block cipher" and the PCBC mode of operation are obsolete
-> and insecure.  Since their only user is net/rxrpc/, they belong there,
-> not in the crypto API.
-> 
-> Therefore, this series removes these algorithms from the crypto API and
-> replaces them with local implementations in net/rxrpc/.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v2,1/5] net/rxrpc: Add local FCrypt-PCBC implementation
-    https://git.kernel.org/netdev/net-next/c/f10e73dffd2a
-  - [net-next,v2,2/5] net/rxrpc: Use local FCrypt-PCBC implementation
-    https://git.kernel.org/netdev/net-next/c/97b768514a6e
-  - [net-next,v2,3/5] net/rxrpc: Reimplement DES-PCBC using DES library
-    https://git.kernel.org/netdev/net-next/c/432042e25e33
-  - [net-next,v2,4/5] crypto: fcrypt - Remove support for FCrypt block cipher
-    https://git.kernel.org/netdev/net-next/c/374efbdc85d0
-  - [net-next,v2,5/5] crypto: pcbc - Remove support for PCBC mode
-    https://git.kernel.org/netdev/net-next/c/1967bfaf7ba1
-
-You are awesome, thank you!
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 882214b0e7db..7c66740aeb3c 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -11714,7 +11714,7 @@ W:	http://www.hisilicon.com
+ F:	drivers/spi/spi-hisi-sfc-v3xx.c
+ 
+ HISILICON ZIP Controller DRIVER
+-M:	Yang Shen <shenyang39@huawei.com>
++M:	Chenghai Huang<huangchenghai2@huawei.com>
+ M:	Zhou Wang <wangzhou1@hisilicon.com>
+ L:	linux-crypto@vger.kernel.org
+ S:	Maintained
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
