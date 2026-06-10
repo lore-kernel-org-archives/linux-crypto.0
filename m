@@ -1,45 +1,63 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33355198A17;
-	Wed, 10 Jun 2026 18:46:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C31D6342515
+	for <linux-crypto@vger.kernel.org>; Wed, 10 Jun 2026 19:17:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781117173; cv=none; b=WjsrOnGw88iP0k7EBVC5gO3DyWDl7n81bhr20tYwEvP/JrRUoBdgadKGZTxKJC6cqmpch/7BhmOcRz0TsjnxeCU7u1OF4SwN994hM5Xl59grktcIzZnDeGBrJfbSYTwiTq35YsXdHlSEetuCOkf4ri7lZK0mGQQ2nazC3Nqxb4c=
+	t=1781119053; cv=none; b=BYI4VCYKHaDqNexfcsn96dODI824UQ6XpgpJTOg9D6aydYXGP6DwzqJtVyCJ7gdOVCQyQLxtvsyqrdalsylNA7rWw9I6nrJXItGXagcpVGaNLOb2wJgSItbuGpeoTQpjakEN2SMUYVitQRF+35eFmYwtw+35oM9+N9mc7uVoa7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781117173; c=relaxed/simple;
-	bh=cKa0C7RWNxna7+igPsyvuyrZuAkIXCY/m7gqxTWNX1o=;
+	s=arc-20240116; t=1781119053; c=relaxed/simple;
+	bh=AZvi6ZNzBZy6L1WVZ0LtkofFo1vWzMWYeJFKz3V4hFE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qRx93R/ch2z/RK+9FXBigoXM38SLysV3FKLpAROmxDyKdon1s/kPk7S3odNjg5k/kaUSIG+xKTKHpFO+YRlzFS6YLcJxXx1byKq4nBcYoCny4LTZOb3zIfg/0+i8uEwZ4Qw/3dzLW37rldla6DJEISUWdkB65+2cWvsZ6zZROA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iutapL2+; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=ENIv1nUm3l9D3vE0YznjsJxKK9uLNGJl9VSuZ2bXdeoMbwu/H5bP5jNwb19GMfDhCL/59gAkKmpx1zcU9erPyTRVX4ZK31aKP9PFJNSJApSw4zhaXM3OrLyMnYf48n6TZ0WHm99SgzV9Cxo2vtu+O7wmgZIKQgLN7qUiPGywihk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Orrg8s0G; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iutapL2+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBE631F00893;
-	Wed, 10 Jun 2026 18:46:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781117172;
-	bh=Tmu2H2I/38vgEjISS8LN6iSZ2VEkEfA+KHPORyr5q3U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=iutapL2+t8wP+RR2xr8fON5bRWPsB/4+ldBmrPw2ClkHLIGl2OipriMB4OPXUdH8I
-	 xJoEF6ZD507N3paMFpzHTn4zW4Uet85EPeGx+5v8U0fpgxOceYY5rAd0Hwg+I8JD0R
-	 uGCpWOkzROyob5hDy//bmLn675nHWB++pTuMXia2Wj4Y8vopkiePHkuF+caAhjLvrg
-	 0WoU/1dleFVTVmD6xxypZviSwt2Sq1aRHtzpBFVfd5WMQenrf19zMTW8JwG8nmz4K5
-	 lciLOGghndERy+/NETQqHGR7vPh/DhEsGn7Zf+Lk1zG7D9ERZubATNCqAsYtDFDZze
-	 P2jM2C+WPqBrQ==
-Date: Wed, 10 Jun 2026 18:46:10 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
-Cc: Thara Gopinath <thara.gopinath@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Bartosz Golaszewski <brgl@kernel.org>,
-	Thara Gopinath <thara.gopinath@linaro.org>,
-	linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] crypto: qce: Fix CTR-AES for partial block requests
-Message-ID: <20260610184610.GC1158828@google.com>
-References: <20260610-qce_selftest_fix-v1-0-1b0504783a46@oss.qualcomm.com>
- <20260610-qce_selftest_fix-v1-2-1b0504783a46@oss.qualcomm.com>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Orrg8s0G"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1781119051;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/myOSqG7uv5qCnsE2QetCIJ83uVxLLLFgvexWhF+Xlo=;
+	b=Orrg8s0GzQH/elWDaM8swFa1uIkYrzqyjF75NIKuWcrvL353TeCCbeOJx7wf9O+X1rKXh5
+	9QbkN/0TGjdm5Qf1rDtRICfEqDGD0uLDlaC4ThUNRBqGKx7l73mPbfrw3tl7iveFTZ9TOs
+	AODHc7nR05W7+FKQZBtF5VX82bD11oE=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-481-wXi_R3TWMLeok5rQbRDlbA-1; Wed,
+ 10 Jun 2026 15:17:23 -0400
+X-MC-Unique: wXi_R3TWMLeok5rQbRDlbA-1
+X-Mimecast-MFC-AGG-ID: wXi_R3TWMLeok5rQbRDlbA_1781119041
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0E7FC180048E;
+	Wed, 10 Jun 2026 19:17:20 +0000 (UTC)
+Received: from thinkpad (headnet02.pony-001.prod.iad2.dc.redhat.com [10.2.32.102])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CABD23008DCB;
+	Wed, 10 Jun 2026 19:17:13 +0000 (UTC)
+Date: Wed, 10 Jun 2026 21:17:10 +0200
+From: Felix Maurer <fmaurer@redhat.com>
+To: Daniel Hodges <daniel@danielhodges.dev>
+Cc: Daniel Hodges <git@danielhodges.dev>, bpf@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, ast@kernel.org, andrii@kernel.org,
+	daniel@iogearbox.net, vadim.fedorenko@linux.dev, song@kernel.org,
+	yatsenko@meta.com, martin.lau@linux.dev, eddyz87@gmail.com,
+	haoluo@google.com, jolsa@kernel.org, john.fastabend@gmail.com,
+	kpsingh@kernel.org, sdf@fomichev.me, yonghong.song@linux.dev,
+	herbert@gondor.apana.org.au, davem@davemloft.net
+Subject: Re: [PATCH bpf-next v8 0/4] Add cryptographic hash and signature
+ verification kfuncs to BPF
+Message-ID: <aim4Ntj22wM30Ga8@thinkpad>
+References: <20260225202935.31986-1-git@danielhodges.dev>
+ <ag8zGP5azt743BWc@thinkpad>
+ <fm43bx7min3olvz4ok46emxvyvbczw4weq5dkwitzwmq6h4jzg@a56b3irxynks>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -48,46 +66,112 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260610-qce_selftest_fix-v1-2-1b0504783a46@oss.qualcomm.com>
+In-Reply-To: <fm43bx7min3olvz4ok46emxvyvbczw4weq5dkwitzwmq6h4jzg@a56b3irxynks>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Wed, Jun 10, 2026 at 11:24:05AM +0530, Kuldeep Singh wrote:
-> In CTR mode, the IV acts as the initial counter block.
-> APer NIST SP 800-38A, after a CTR mode operation the next unused counter
-> value is:
-> 
-> IV_next = IV_in + ceil(cryptlen / AES_BLOCK_SIZE)
-> 
-> The skcipher requires req->iv to hold this updated counter on
-> completion, ensuring chained requests produce correct results.
-> 
-> Referring to Crypto6.0 documentation, Section 2.2.5 says:
-> "The count value increments automatically once per block of data (in
-> AES, a block is 16 bytes) based on the value in the
-> CRYPTO_ENCR_CNTR_MASK registers."
-> 
-> QCE increments internal counter register once per full 16-byte block(for
-> ctr-aes) is processed. In case of partial request length, the hardware
-> uses the current counter to generate keystreams but does not increment
-> the counter register afterwards. So the counter value written in
-> CRYPTO_ENCR_CNTRn_IVn later once read by software is one less than the
-> expected value.
-> 
-> Crypto selftest framework capture this scenario with test vector
-> 4 comprising of a 499-byte payload (31 full blocks + 3 partial bytes).
-> Error:
-> [    5.606169] alg: skcipher: ctr-aes-qce encryption test failed (wrong output IV) on test vector 4, cfg="in-place (one sglist)"
-> [    5.606176] 00000000: e7 82 1d b8 53 11 ac 47 e2 7d 18 d6 71 0c a7 61
-> [    5.606192] alg: self-tests for ctr(aes) using ctr-aes-qce failed (rc=-22)
-> Expected iv_out: 0x62 (iv_in + 32)
-> Obtained iv_out: 0x61 (iv_in + 31, partial block not counted)
-> 
-> To fix this, just increase the counter value for partial block requests
-> by 1 and for the full block size requests, don't take any action as
-> expected value is already returned by the hardware.
-> 
-> Signed-off-by: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
+Hi Daniel,
 
-This fix isn't Cc'ed to stable, so stable kernels will remain vulnerable
-to this bug.
+Sorry for taking long to get back to you, I've been on vacation for a
+while.
 
-- Eric
+> It would also be helpful to hear about what your use case is.
+
+I'll put this one first, as it probably informs my thinking quite a bit.
+My use case is accessing hash functions from the networking bpf hooks,
+mostly XDP and tc. I'm less interested in the cryptographic hash
+functions (although I think we should support them as well), but
+checksums like CRC32c which have efficient implementations in the kernel
+and are not straightforward to implement in bpf.
+
+> > Taking an initial look at your hashing patches, I'm wondering: the usual
+> > interface to hash/digest algorithms is to have three functions: an
+> > init() function to set up state
+>
+> Doesn't bpf_crypto_ctx_create already provide the initialization? I was
+> trying to make that pattern work by adding the bpf_crypto_type_id to
+> make the code a little more maintainable.
+
+No, bpf_crypto_ctx_create() doesn't do the initialization I was
+referring to, it only creates the tfm that is later used to do the
+hashing. The actual init() of the hash function happens inside
+crypto_shash_digest(). More details at the end of my reply.
+
+> > an update() function that can be called  multiple times to hash new
+> > bytes, and a finalize() function that creates the actual hash.
+> > Depending on the algorithm, some of them (esp.  finalize) may be
+> > no-ops. Often, a fourth function, like hash(), is provided
+>
+> I think the bpf_crypto_encrypt should cover that along with the
+> bpf_crypto_hash in the first patch.
+
+Not sure if I understand you correctly, bpf_crypto_encrypt() shouldn't
+be callable for a hashing crypto context at all?
+
+> > I think we should provide the same init/update/finalize interface in bpf
+> > as well to make the API more flexible. That would require splitting out
+> > the shash_desc from the (mostly static) context. But doing so would also
+> > address the review comment from bpf-ci bot to patch 1. WDYT?
+>
+> I was trying to make things work with the existing bpf_crypto_ctx
+> lifecycle. IIRC in the V1/V2 of the series there was a separate struct
+> but it was suggested to integrate the changes into bpf_crypto_ctx.
+
+Yes, I see that the idea is to integrate into the existing life cycle
+and I appreciate that! But IIUC, they are subtly different at the
+moment.  Just to be sure, the idea of your first two patches is to
+provide an interface to shash that supports the do-all-at-once function
+hash()/digest() (i.e., internally do init+update+finalize), pretty much
+the equivalent of the existing encrypt() + decrypt() interface to
+skcipher, right? I.e. not supporting each and every use case for now but
+just the case where all data is available and we want to hash/encrypt/
+decrypt in one go?
+
+With that assumption, the current implementation for skcipher looks like
+this: we have bpf_crypto_ctx_create(). It sets up a bpf_crypto_ctx with
+the chosen algorithm, the right key, etc. It must be called from a
+sleepable bpf program because it may require to load the kernel module
+with the requested algorithm. The prepared bpf_crypto_ctx can be stored
+in a map so it can be used from other (non-sleepable) bpf programs,
+e.g., XDP programs.
+
+When the bpf_crypto_ctx is used with encrypt()/decrypt(), both functions
+have the siv argument. It's a dynptr to some memory, containing the IV
+for algorithms that need it, but also has room for the *state* if the
+algorithm needs it. This means, the state is provided (fresh) for each
+invocation of encrypt/decrypt.
+
+Your proposed implementation for shash, bpf_crypto_ctx_create() calls
+bpf_crypto_shash_alloc_tfm() which creates the tfm (just as above, needs
+to be in a sleepable bpf program to potentially load modules), but it
+also allocates the shash_desc which has room for some algorithm state if
+needed. This mixes the static, long-living, reusable tfm with the
+per-invocation shash_desc. shash is safe to use with the same tfm
+concurrently exactly because the state is stored in the shash_desc,
+which must not be used concurrently. Think of the shash_desc to be the
+equivalent of the siv for skcipher.
+
+Therefore, I think the memory for shash_desc.__ctx should come from a
+dynptr as well. Do you agree or did I miss something?
+
+Btw, your bpf_crypto_shash_alloc_tfm() never sets shash_desc.__ctx, so
+that's a bug anyways.
+
+> Regarding the bpf-ci bot I think it's somewhat valid, but you could
+> solve that by putting the bpf_crypto_ctx in a per CPU map or protecting
+> it with a bpf spinlock.
+
+Two things for that: for networking use cases, needing a lock because of
+implementation details doesn't sound very intriguing. Plus, if per-cpu
+or a lock are required, that's currently not enforced. This means an
+invalid/unsafe bpf program could pass the verifier, right?
+
+> If you want to give it a go feel free.
+
+If you're still interested in pursuing this, please go ahead with your
+work, I don't want to take it from you. Only if you're explicitly not
+interested anymore, I'll go ahead and try to build something on top of
+you work. Just let me know :)
+
+Thanks,
+   Felix
+
