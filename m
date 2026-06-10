@@ -1,104 +1,66 @@
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AAAB38A29A;
-	Wed, 10 Jun 2026 07:18:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB5193B14B1;
+	Wed, 10 Jun 2026 08:55:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781075941; cv=none; b=qRls+61hz445bEL+AUX19IBRv4Z32hLg5xVI3Vf8U6x1gQhT2MeY/Py+818U/wvimTDoOBkm3hYL/xU05aUNCihJ2T6FUPTuOA3vZ/Wa8xsJwA+3r2JykyOy54qJrEqhuZ9LwY4UplWi5Z7bJc3r6MNTWfuTvM3Q+g5i/1ZdilA=
+	t=1781081711; cv=none; b=aQHx5p7nr4FS4iXitqu1mvrur+/I+MBrWeTRbQIHLIPiZ7Zy22ovqx7eDjlawaEcA/tdTbgd5WxLUmcAGAWCl4Qdg1G7JlMXw5b6DgBtiaMsbPP0DqmGGrp9UCrNU2jeJGlAuU5IGWnyZR/l7tCWsKSfcxqmb0JiD+dyoE4b2E0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781075941; c=relaxed/simple;
-	bh=KabWLugESkcH2GuNNe6giO1ysnlLsWK4c6X3vJq4dUM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=i2+bds9nMKnfIa2qYurb457NcbqzgO0A+voEA8TogXu7mzWsdpGhuJ3gDXXuxMtlRv2eOfeqwHr+1cNYLZUo80JlPMkn6ZphO9h6azpomMgbf30fbPQMQBz5N38HVVNH/8Dl3nJAThqkRFXTpiUfi2/dXBcDmPuR3P5nB2iPTow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.40.54.15])
-	by gateway (Coremail) with SMTP id _____8CxHurZDylqkpQSAA--.48571S3;
-	Wed, 10 Jun 2026 15:18:49 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.40.54.15])
-	by front1 (Coremail) with SMTP id qMiowJDxaeDWDylqL62hAA--.45694S2;
-	Wed, 10 Jun 2026 15:18:47 +0800 (CST)
-From: Qunqin Zhao <zhaoqunqin@loongson.cn>
-To: lee@kernel.org
-Cc: chenhuacai@kernel.org,
-	xry111@xry111.site,
-	linux-kernel@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	linux-crypto@vger.kernel.org,
-	Qunqin Zhao <zhaoqunqin@loongson.cn>
-Subject: [PATCH v3] mfd: loongson-se: Add multi-node support
-Date: Wed, 10 Jun 2026 23:13:54 +0800
-Message-Id: <20260610151354.32617-1-zhaoqunqin@loongson.cn>
-X-Mailer: git-send-email 2.20.1
+	s=arc-20240116; t=1781081711; c=relaxed/simple;
+	bh=DuXhchlQRc/ktqxlkDooSIAF8Anm4npGNhalnWTsdOE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kriMMi+lhU31pRWPS892P2smx6xpTamSHc+CSFa4XFh5S0DGMo67ECSEVSRqcBVQY0MUCk4kkEbEvcW6y9DYQqfhYQRg3Fg2lARRguZiUnQevT+sYuygkWYSR+dGFROielsiIwoiU/OpYa/zIP/+HxLxjgAeyXxPPY5rfEVuP6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WFTFhevg; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WFTFhevg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1AAA1F00893;
+	Wed, 10 Jun 2026 08:55:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781081710;
+	bh=TRTyM5MS3WUrXryQN7PJQVfhWuatgRYyBVXvwmd2zTE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=WFTFhevgbbLMPMRo1DQ+HhUgrsa6YL87dv+/P14TPw2SeAnJ4j/R5BzbzBuw6GKmF
+	 L2C59ozuazxirlRTHP0jo7MXXuo09SkNSfOrvrLWC9rTCpRna2CIC92Xzcygd8tzsG
+	 cTTj/j6hJWCS5Qc8RPHK7EtEc1TV/Yv1ERTi9YUzWZbEeKPcrknqB7DtkZJ6F5Jjxr
+	 UnyYIHnn9Nm7uApSxihY272Xjo5Gz/KB6n88X2T11FNm8Ei2EQMz4rLsghIdE5GneS
+	 C7RTMULy+gPjqiYjCfQzqxNV5jpA+p1LBHteyCGP2JBI5QVOsEx+0C2Cfx4HXNji9a
+	 EXduVOAXdSySg==
+Date: Wed, 10 Jun 2026 10:55:06 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Jingyi Wang <jingyi.wang@oss.qualcomm.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Vinod Koul <vkoul@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	aiqun.yu@oss.qualcomm.com, tingwei.zhang@oss.qualcomm.com, trilok.soni@oss.qualcomm.com, 
+	yijie.yang@oss.qualcomm.com, linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] dt-bindings: crypto: qcom,prng: Document Maili TRNG
+Message-ID: <20260610-spirited-scarlet-tortoise-fad4da@quoll>
+References: <20260609-maili-crypto-v1-0-0f577df56a61@oss.qualcomm.com>
+ <20260609-maili-crypto-v1-1-0f577df56a61@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowJDxaeDWDylqL62hAA--.45694S2
-X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
-X-Coremail-Antispam: 1Uk129KBj93XoW7urW8tFW7Zw48Jr4fGF1fKrX_yoW8Ar1DpF
-	4UWa4qkr4UG3W0kw1DZa1DuF1YyayYq3y3GanFqw47Aas8tw1kZFy3tFW7WF43AFW8XayU
-	ZrZYgF48uFW8uFcCm3ZEXasCq-sJn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUvSb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M280x2IEY4vEnII2IxkI6r1a6r45M28lY4IE
-	w2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84
-	ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l
-	84ACjcxK6I8E87Iv6xkF7I0E14v26r4UJVWxJr1le2I262IYc4CY6c8Ij28IcVAaY2xG8w
-	AqjxCEc2xF0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8I
-	cVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjc
-	xG0xvY0x0EwIxGrwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s02
-	6c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF
-	0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvE
-	c7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14
-	v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7I
-	U0Jku3UUUUU==
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260609-maili-crypto-v1-1-0f577df56a61@oss.qualcomm.com>
 
-On the Loongson platform, each node is equipped with a security engine
-device. However, due to a hardware flaw, only the device on node 0 can
-trigger interrupts. Therefore, interrupts from other nodes are forwarded
-by node 0. We need to check in the interrupt handler of node 0 whether
-this interrupt is intended for other nodes, this can be accomplished via
-shared interrupt handling.
+On Tue, Jun 09, 2026 at 02:08:56AM -0700, Jingyi Wang wrote:
+> Maili SoC has the True Random Number Generator (TRNG) which is compatible
+> with the baseline IP "qcom,trng". Hence, document the compatible as such.
+> 
+> Signed-off-by: Jingyi Wang <jingyi.wang@oss.qualcomm.com>
+> ---
+>  Documentation/devicetree/bindings/crypto/qcom,prng.yaml | 1 +
+>  1 file changed, 1 insertion(+)
 
-Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
----
-V3: 
-Using shared interrupts (IRQF_SHARED) instead of manually
-iterating through all devices to check for interrupts.
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
 
-Link to v2:
-https://lore.kernel.org/all/20260427165133.23350-1-zhaoqunqin@loongson.cn/
-
- drivers/mfd/loongson-se.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/mfd/loongson-se.c b/drivers/mfd/loongson-se.c
-index 3902ba377d6..e63ea40d5db 100644
---- a/drivers/mfd/loongson-se.c
-+++ b/drivers/mfd/loongson-se.c
-@@ -219,7 +219,7 @@ static int loongson_se_probe(struct platform_device *pdev)
- 
- 	for (i = 0; i < nr_irq; i++) {
- 		irq = platform_get_irq(pdev, i);
--		err = devm_request_irq(dev, irq, se_irq_handler, 0, "loongson-se", se);
-+		err = devm_request_irq(dev, irq, se_irq_handler, IRQF_SHARED, "loongson-se", se);
- 		if (err)
- 			dev_err(dev, "failed to request IRQ: %d\n", irq);
- 	}
-@@ -228,7 +228,7 @@ static int loongson_se_probe(struct platform_device *pdev)
- 	if (err)
- 		return err;
- 
--	return devm_mfd_add_devices(dev, PLATFORM_DEVID_NONE, engines,
-+	return devm_mfd_add_devices(dev, PLATFORM_DEVID_AUTO, engines,
- 				    ARRAY_SIZE(engines), NULL, 0, NULL);
- }
- 
-
-base-commit: 254f49634ee16a731174d2ae34bc50bd5f45e731
--- 
-2.47.2
+Best regards,
+Krzysztof
 
