@@ -1,87 +1,89 @@
-Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 463F82FFF9D;
-	Wed, 10 Jun 2026 01:47:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 445212165EA;
+	Wed, 10 Jun 2026 02:38:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781056029; cv=none; b=Om+WPaexGiGKkHKiOgCVT6npx6yoajDvwcc/lUk9d/ufi8C/o68ot6Yw8L6SpqAq32NaFu6L/EYyOsOpeREQZpwXgZVyfEuovRh5xDPtaAj1uiU6nWnM0v6Z3YrDb0Qor96/IP8OQ/Ew5XU2UrKZYEkWh5qOSkWQmf8uv9WpfqY=
+	t=1781059129; cv=none; b=qzO3rdlBdgl+4PxkgIle/HEbShUE2k+ulcuAJ84w6SrUvQzSyMX9fWY0Bw8r+Ybj+y9PXM8gSRMv9udkFgGONP1JnnIjC4rVJ7xZvdoys4fTkAlR2KJj6P+yJ0R6GqbGgQQNxR17YzOtX0ccASq8VxhTglxu6r6z+aLj9ek9tV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781056029; c=relaxed/simple;
-	bh=YRfMwGHvz751/FzID/tLviLXUrHY7p3dyIMcJG1JHuc=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=g9VqT7rE/KXXwWl2FzGSvt54lpmG67af/ysZ+Pc/e9hMhHzZhLtL/dJyd+JCy2T/PygLQBRc/fh7r0jVZIGDPBuQoU8IoP7Ku/LhnNFsItvHc7N/teHroGyxflKbHCCm12b70h/jKQRVzOCjbwZqvIISUDBvBzM7Wb1UI7xutKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=qgQvh89P; arc=none smtp.client-ip=113.46.200.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1781059129; c=relaxed/simple;
+	bh=DjLshAltart9t2Y8L80+63ENGySICbXbBUCkfmhve8I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hxHl05zsCici1gl2GzfeKe+IhyDOdb9E+Fx8YssdRqbdizGIALrmYUJ7vJyCRy4WuyiOf1ffQOklIBnZPfG3b/nYzwsAkL25PNnC9vI7vGmrD3chwfuErb571vzwb1LfCOb/WHrsJAWyQqONBChUhCxzMJRtLqwCcHeAuusjPKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=ejIouRFC; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="qgQvh89P"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=0GRQowiqy86F6wWwGj99SSIj8J8U6XTDL9K41o7flx4=;
-	b=qgQvh89PoSoBxBrmLMijA+U0o1GIaMQyFrhRAhls6Ud73oCpjROz1jkhEKA77hTm9O7I+u1EZ
-	mIXBDZ0KGdYCtUg4KFTKsRnJQ1N6PceeggXyOURjtECj6NhBBs2JdlYNVOMZ4ReK+x6paVQFOAf
-	dDOFy7alIQntlCUxDkx3Epw=
-Received: from mail.maildlp.com (unknown [172.19.163.214])
-	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4gZpNF64vvz1K9Vw;
-	Wed, 10 Jun 2026 09:39:09 +0800 (CST)
-Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
-	by mail.maildlp.com (Postfix) with ESMTPS id 920D34056C;
-	Wed, 10 Jun 2026 09:47:02 +0800 (CST)
-Received: from [10.67.121.110] (10.67.121.110) by
- dggpemf500015.china.huawei.com (7.185.36.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 10 Jun 2026 09:47:01 +0800
-Subject: Re: [PATCH] MAINTAINERS: update hisilicon zip driver maintainer
-To: Chenghai Huang <huangchenghai2@huawei.com>, <shenyang39@huawei.com>,
-	<fanghao11@huawei.com>, <qianweili@huawei.com>, <wangzhou1@hisilicon.com>,
-	<herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
-References: <20260610013437.1354503-1-huangchenghai2@huawei.com>
-From: liulongfang <liulongfang@huawei.com>
-Message-ID: <d0875aef-6efd-6370-99b5-3f055369aa02@huawei.com>
-Date: Wed, 10 Jun 2026 09:47:01 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="ejIouRFC"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=F4PfoyOSBZB+B0oBmVrxEsJLeUyLRt7oiVKVVfBrTFU=; 
+	b=ejIouRFCgL7Pds8B1YDOO/rMwKfebD3iQvcM6K5PpBdqW/z0u0jBSvoAFkCPmPn9n6x7yijEjYs
+	ziFpZlhxhlEalPp1bMVtmtIkl+BICLcsUU4l4mxBUFUMUvJTLtvL3tzvoI9vQKPIGQNJuc8ZCm0g0
+	bG4KMs5q1/tMEg50HKqbbRKqjMT4ES7atVRzfOTmuJn+DgGCuvtkWuuCBJXbdE5l8JlD9liUu0EP7
+	PZW/meLn7TBvsBSoo5j9rUekxWmtiufQ4BB10Hgf3eGYad7/pafzNqoTwnnXuVXFWJonLL5BqUy3p
+	+/lxisVf0Zp9X6tzs3h4v3y1x90/wZYOZQWQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1wX8pn-000000049DN-3OyY;
+	Wed, 10 Jun 2026 10:38:28 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 10 Jun 2026 10:38:27 +0800
+Date: Wed, 10 Jun 2026 10:38:27 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.c.dionne@gmail.com>, netdev@vger.kernel.org,
+	linux-afs@lists.infradead.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: Re: [PATCH net-next v2 0/5] Consolidate FCrypt and PCBC code into
+ net/rxrpc/
+Message-ID: <aijOI93Fg8wJICgP@gondor.apana.org.au>
+References: <20260608173921.GA434331@google.com>
+ <20260522050740.84561-1-ebiggers@kernel.org>
+ <CAB9dFduBir-41_Ef4noEJPHsFU-++JHDxMU-6S7B8pBYynvadA@mail.gmail.com>
+ <20260603050557.GB18149@sol>
+ <764077.1780985938@warthog.procyon.org.uk>
+ <a4091402-e7c0-415e-a2a4-67d2b509462f@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20260610013437.1354503-1-huangchenghai2@huawei.com>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- dggpemf500015.china.huawei.com (7.185.36.143)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a4091402-e7c0-415e-a2a4-67d2b509462f@redhat.com>
 
-On 2026/6/10 9:34, Chenghai Huang wrote:
-> Add Chenghai Huang as the maintainer of the hisilicon zip driver,
-> replacing Yang Shen.
+On Tue, Jun 09, 2026 at 06:11:31PM +0200, Paolo Abeni wrote:
+> Hi,
 > 
-> Signed-off-by: Chenghai Huang<huangchenghai2@huawei.com>
-> ---
->  MAINTAINERS | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> On 6/9/26 8:18 AM, David Howells wrote:
+> > Eric Biggers <ebiggers@kernel.org> wrote:
+> > 
+> >>> If there's no more feedback, could this be applied to net-next?
+> >>
+> >> Any update on this?
+> > 
+> > It's fine by me, but I'm not sure what I need to do with it - shouldn't it
+> > already be in the netdev queue, or do I need to post it?
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 882214b0e7db..7c66740aeb3c 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -11714,7 +11714,7 @@ W:	http://www.hisilicon.com
->  F:	drivers/spi/spi-hisi-sfc-v3xx.c
->  
->  HISILICON ZIP Controller DRIVER
-> -M:	Yang Shen <shenyang39@huawei.com>
-> +M:	Chenghai Huang<huangchenghai2@huawei.com>
->  M:	Zhou Wang <wangzhou1@hisilicon.com>
->  L:	linux-crypto@vger.kernel.org
->  S:	Maintained
->
+> This slipped under my radar, sorry. I just revived it in PW. Also, I
+> think we need an explicit ack from Herbert.
+> 
+> Link to ML post:
+> 
+> https://lore.kernel.org/all/20260522050740.84561-1-ebiggers@kernel.org/
 
-Reviewed-by: Longfang Liu <liulongfang@huawei.com>
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Longfang
-Thanks.
-
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
