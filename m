@@ -1,162 +1,158 @@
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63DBE3BADB7;
-	Thu, 11 Jun 2026 07:37:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2CC5370AC8
+	for <linux-crypto@vger.kernel.org>; Thu, 11 Jun 2026 07:58:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781163427; cv=none; b=GUFwClMv9SQJ47yAYljXScwKoPcPLz0YT1atFEn4sXAkOTWPTthT8/ZWpzq8FtW9CyOgblE86nkY4CsiszaAvWUBcrpqVC7k5zyAd1aYSiKtg1WT1c/0RObT37BWfR1s76sia0ZuRVBl8aQQJeUKMZSFYXx3Vsd7oMl4cKOBpMQ=
+	t=1781164706; cv=none; b=UAK5kaAsFoBFwqreFl8u2Z7W0+Fmq2gOdKT7kPh7+sRyU/k9vXc2b2SmZVjqqHUiGn9l3FpafDjE7CA4jwC6M09T78dTS5J8GRFmHDRg4NEj4P1nVE4F76rAeeWTNl+p93hSGDE/2DpQL/iFSXgljV2f+aZRV8am3KTMItf1VeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781163427; c=relaxed/simple;
-	bh=SK4R1wkRudsJALTEbXJa0wGjEhBmNwxrT9yiRS3QoaU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=RxeDSUvQC6an+tNfIGglskOCInObQf03dTVs3vFbUWWA3OLu4oTmmNn79GJImlXIExiOlHhw/WEYCKMkBlwOvySKYpPRqOgUZCnOWKleJYAa7Yvtyg8/M2FDHVd+XGkXjeSY0QFc+iH5O1fROsur3oK8UKfX/P/6QMB/9rgZ2lg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=DCtTJymI; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	s=arc-20240116; t=1781164706; c=relaxed/simple;
+	bh=Bjyaxy6d6sDYB0cCMVeZFvsz5568RZUKEAaWTXKM5X0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CEU5XwJZnS0j7BnHmoahDRotRhHbtsPuIDwKU6xVy2Efvchml9GVh5t0TangpsQJDmBKydMmBRBrb78VraXQdoT5Tb4dfRFwIEpIkItdh2wIRjXqmPgqOGNNDYs31LlhzYOyKMFeYbR8mNw3T7hW22pHpCd8VCY07brLWNjcpLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jFkayUyf; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=WjjU4qZ1; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="DCtTJymI"
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id F4025C49F68;
-	Thu, 11 Jun 2026 07:37:04 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id B7D885FF03;
-	Thu, 11 Jun 2026 07:37:02 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7F1A8106B9E5E;
-	Thu, 11 Jun 2026 09:37:01 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1781163422; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=ow2Cxrdwc88th7EZd0b3eAv0efoe5h+5PTN9hZq0PKY=;
-	b=DCtTJymIJikjEoMBVks/XwDIqSI0MOjNGKLy+O0vnKqMeU9tIdz1AfQzVRrqAdPRDPpBxL
-	nomm5QzZ8tjYQVJv03zUPyD+0f83hmrjUCc22QTlghKXLhW+LL1ddB/dYOhRzlGanymeF+
-	Yciyq/lQ33bGeAK87sJK48do0pnQmZxAqpQvPP7qGVwya6NDC3jC0Tl+Pz2C5dv5qeW955
-	vbEuy1pcmedDUsRogIcvJWlw6w3o60/nq4V/TYW/fGT8Aaqg3p9Z5z5tHD1Ta/Lz69nb6J
-	n7yAuzruD/zXQynTG37gCo8YkzRmLW+ZPA1tmJqugJXpwj3reuy0TfKm8xQ0FQ==
-From: Paul Louvel <paul.louvel@bootlin.com>
-Date: Thu, 11 Jun 2026 09:36:13 +0200
-Subject: [PATCH v2 19/19] crypto: talitos - Remove TALITOS_DESC_SIZE macro
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jFkayUyf";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="WjjU4qZ1"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1781164704;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RPZeu4WL540NL3gNeV8fLdaGS7lC3tamuCeTPSZyTwA=;
+	b=jFkayUyfK6/RF21IiqtiOuc3ECU89KeKmVI1nyEJgYii1PeMQdWHcGrwrY5HvXR++p1B56
+	H3N1A4WNlkwcZP6hpknDSjZ9c064bkLcVPA2ScZfcJhP2av8kQd4+OmAQGeCdzRXs+M9pw
+	accOZ1ush39yOlt+BEd0/9fP6sBOg88=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-397-6WYz6qaXMniOXiUyFAcBuQ-1; Thu, 11 Jun 2026 03:58:23 -0400
+X-MC-Unique: 6WYz6qaXMniOXiUyFAcBuQ-1
+X-Mimecast-MFC-AGG-ID: 6WYz6qaXMniOXiUyFAcBuQ_1781164702
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-490bfd70b0fso76799315e9.0
+        for <linux-crypto@vger.kernel.org>; Thu, 11 Jun 2026 00:58:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1781164702; x=1781769502; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RPZeu4WL540NL3gNeV8fLdaGS7lC3tamuCeTPSZyTwA=;
+        b=WjjU4qZ1kWsk0PF23cQWp2FEI8rM6sOTrKrFwoYF017fbPV8UAKCNQAEja+LhxKUkl
+         TQANN0Web0ndXeIFWCq1qRg8QcXG6hF4xwr6b++xTODdLbwcDZg/9M1TY6cQ4DRU5oiG
+         HEmD3mVDwiwVOK//IIeRlFAn8gKkRYyW8sEdNX0gyczkDfgokiHnWl+VERJEBX+/Jp8k
+         eXc/2fcdz8j4kP8Y5s6ULgLv66G2cB0HjFZvahkoWfZVpdFbIEvejC8p2530G1BhUE67
+         I+aTlHeBwgVUABRlkAdYlPRU6w7qp3EL1ch9ZZUfUxDkwRT3gerZtdKu4EBNx29HSi7X
+         bFkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781164702; x=1781769502;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RPZeu4WL540NL3gNeV8fLdaGS7lC3tamuCeTPSZyTwA=;
+        b=gpIH8QIL6oi4htF5+iovBR0pY6j0NgPxdkPXwoU/GA4/U+Lf/eNd+jERQfXLogUNhE
+         XYarGhcfdzq02UoZcjcQtAw1uoACEZmcL+ZwNlCF8GONPzY6885Wtu/WOUh7JXkn1m83
+         cOBiuXrUi7PjbI7Gt0F5MbJbSAszJEsiHZbgUbAa4F+w5n00f1xYeMp6buImQmAa9XlT
+         LqE5R44eJlbnX6fJ98Yup8nIc1i+ofnM+xiK+YckLM9PWezmPJgtobzg6rN6erpgUkOY
+         d8BZrGPJ2V5juyMfbsXsYjA3o6bsXbOrsVMH4C9yxBSEnGu0Rrx/w3Tqcu3wIQHI074S
+         d+9Q==
+X-Forwarded-Encrypted: i=1; AFNElJ/puouK1riu99Ywo5Q9EsbJ4AnpegDQGEzIR1nqNCAqQPiIneUaa1d7kzpWBIx4HrIMAkXcsNRLmgijCAs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEgNqgLTgWWcBvMLP2zvyZbbtWZDSiOSuiZKWMZkyfPjoF97hN
+	2J/ONhr6jtTy7h+NTqZFLx3JcsMGMRP1tMgy0D/1kaZuD+17h8BulbfsXu2/fUkEjH6FmcKVVBv
+	06sabU5iW5UyooGDIs9C1skDTek0eiC3kkrdAB/ePMhQJCWqKR3y3dLuR2H6+uSDQUQ==
+X-Gm-Gg: Acq92OGyRMfXU6OaDRf02UUJc00GBDAwj6yWoJ/mIgpwS8/LTVyVcWlbXbeSPM2hdJ0
+	SOvNlQaxvqoAjfHA202NGucoCvccx7YQ8+Q/3eaPPFG5K8JX3SFWAr7hIsdBT8Lh1OtIvNGE2H7
+	2qDVPcS/dw7UKUjDU/c9btlYE+ui5kOiNxcYn/uuArcxET4z8+G8lN6C0jiEqGrhwvqQX8MBdOY
+	vZqZ+y4XWAPtxXj4MIGjHS8Au/LrN+MBPQGL4yuYmPYqWSPHUxHOhl1cYLxlTLLYa9hu3N2lquf
+	abVzVbxNna98x2yoeyWUTssB/g9cHmQxijt3BCA/O+OqE8+YWh54G2rv+gJxJGtURL4033fiGtD
+	O5ODmJLYMrmqShzb9MolzxftoEESZZvvf+ysS8ljT/0836i64Cld3mw==
+X-Received: by 2002:a05:600c:8b31:b0:490:bb3e:30b0 with SMTP id 5b1f17b1804b1-490e55dc1c0mr20745535e9.4.1781164702043;
+        Thu, 11 Jun 2026 00:58:22 -0700 (PDT)
+X-Received: by 2002:a05:600c:8b31:b0:490:bb3e:30b0 with SMTP id 5b1f17b1804b1-490e55dc1c0mr20745215e9.4.1781164701625;
+        Thu, 11 Jun 2026 00:58:21 -0700 (PDT)
+Received: from redhat.com (IGLD-80-230-85-71.inter.net.il. [80.230.85.71])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f2ec711sm76254621f8f.12.2026.06.11.00.58.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Jun 2026 00:58:21 -0700 (PDT)
+Date: Thu, 11 Jun 2026 03:58:17 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Michael Bommarito <michael.bommarito@gmail.com>,
+	Olivia Mackall <olivia@selenic.com>, linux-crypto@vger.kernel.org,
+	Jason Wang <jasowang@redhat.com>, Kees Cook <kees@kernel.org>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
+	Dan Williams <djbw@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>, torvalds@linux-foundation.org,
+	alan@linux.intel.com, tglx@linutronix.de
+Subject: Re: [PATCH v3] hwrng: virtio: clamp device-reported used.len at
+ copy_data()
+Message-ID: <20260611035035-mutt-send-email-mst@kernel.org>
+References: <20260531142251.2792061-1-michael.bommarito@gmail.com>
+ <aio83ZWadVTiuNpR@gondor.apana.org.au>
+ <20260611025916-mutt-send-email-mst@kernel.org>
+ <aipn8sIAQ6Ai2sax@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260611-7-1-rc1_talitos_cleanup-v2-19-aa4a813ce69b@bootlin.com>
-References: <20260611-7-1-rc1_talitos_cleanup-v2-0-aa4a813ce69b@bootlin.com>
-In-Reply-To: <20260611-7-1-rc1_talitos_cleanup-v2-0-aa4a813ce69b@bootlin.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>, 
- "David S. Miller" <davem@davemloft.net>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- Herve Codina <herve.codina@bootlin.com>, 
- Christophe Leroy <chleroy@kernel.org>, linux-crypto@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Paul Louvel <paul.louvel@bootlin.com>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1781163398; l=3411;
- i=paul.louvel@bootlin.com; s=20260313; h=from:subject:message-id;
- bh=SK4R1wkRudsJALTEbXJa0wGjEhBmNwxrT9yiRS3QoaU=;
- b=WOjr8dKe8/57PHaqzA1YQi7Io+rKLmVD0D16hSS1ok3KlfvQSDt8YCI/zaiIyxieWS+/C9d8K
- oYyFvSrG2nJDYh7/qtfvk1aLxTqbGAiGpnEBzWfECHOOE6qsMJWnyl/
-X-Developer-Key: i=paul.louvel@bootlin.com; a=ed25519;
- pk=eLW50NT18UAvUT5cAcYf88zNbBCZDLFXuptpyLVhVIU=
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aipn8sIAQ6Ai2sax@gondor.apana.org.au>
 
-Now that TALITOS_DESC_SIZE is simply sizeof(struct talitos_desc) with no
-arithmetic, the macro is useless. Replace all occurrences with the
-underlying sizeof expression and remove the macro.
+On Thu, Jun 11, 2026 at 03:46:58PM +0800, Herbert Xu wrote:
+> On Thu, Jun 11, 2026 at 03:30:14AM -0400, Michael S. Tsirkin wrote:
+> > On Thu, Jun 11, 2026 at 12:43:09PM +0800, Herbert Xu wrote:
+> > > On Sun, May 31, 2026 at 10:22:51AM -0400, Michael Bommarito wrote:
+> > > >
+> > > > +	size = min_t(unsigned int, size, avail - vi->data_idx);
+> > > > +	idx = array_index_nospec(vi->data_idx, sizeof(vi->data));
+> > > > +	memcpy(buf, vi->data + idx, size);
+> > 
+> > All the "malicious device" things are confusing. Spectre things -
+> > doubly so.
+> > 
+> > So if an access is speculated then CPU might speculate feeding a kernel
+> > secret into RNG. And then the speculated RNG value maybe can be also
+> > speculatively be used by some kernel code as an index
+> > to trigger a cache access, finally leaking the secret?
+> > 
+> > Maybe?
+> 
+> The way Spectre works is if you have an actual instruction using
+> idx directly.  I don't see how that translates to memcpy.
 
-Signed-off-by: Paul Louvel <paul.louvel@bootlin.com>
----
- drivers/crypto/talitos/talitos.c | 16 ++++++++--------
- drivers/crypto/talitos/talitos.h |  2 --
- 2 files changed, 8 insertions(+), 10 deletions(-)
+I am not sure it has to be direct:
 
-diff --git a/drivers/crypto/talitos/talitos.c b/drivers/crypto/talitos/talitos.c
-index 1221eb9497fb..7faf3c2606a9 100644
---- a/drivers/crypto/talitos/talitos.c
-+++ b/drivers/crypto/talitos/talitos.c
-@@ -166,7 +166,7 @@ static void dma_map_request(struct device *dev, struct talitos_request *request,
- 	if (is_sec1()) {
- 		while (edesc) {
- 			dma_desc = dma_map_single(dev, &edesc->desc.sec1.hdr,
--						  TALITOS_DESC_SIZE,
-+						  sizeof(struct talitos_desc),
- 						  DMA_BIDIRECTIONAL);
- 
- 			if (!prev_edesc) {
-@@ -179,7 +179,7 @@ static void dma_map_request(struct device *dev, struct talitos_request *request,
- 			prev_edesc->desc.sec1.next_desc = cpu_to_be32(dma_desc);
- 
- 			dma_sync_single_for_device(dev, prev_dma_desc,
--						   TALITOS_DESC_SIZE,
-+						   sizeof(struct talitos_desc),
- 						   DMA_TO_DEVICE);
- 
- next:
-@@ -188,7 +188,7 @@ static void dma_map_request(struct device *dev, struct talitos_request *request,
- 			edesc = edesc->next_desc;
- 		}
- 	} else {
--		request->dma_desc = dma_map_single(dev, desc, TALITOS_DESC_SIZE,
-+		request->dma_desc = dma_map_single(dev, desc, sizeof(struct talitos_desc),
- 						   DMA_BIDIRECTIONAL);
- 	}
- }
-@@ -258,7 +258,7 @@ static __be32 get_request_hdr(struct device *dev,
- 
- 	if (!is_sec1()) {
- 		dma_sync_single_for_cpu(dev, request->dma_desc,
--					TALITOS_DESC_SIZE, DMA_BIDIRECTIONAL);
-+					sizeof(struct talitos_desc), DMA_BIDIRECTIONAL);
- 
- 		return request->desc->sec2.hdr;
- 	}
-@@ -270,7 +270,7 @@ static __be32 get_request_hdr(struct device *dev,
- 		edesc = edesc->next_desc;
- 	}
- 
--	dma_sync_single_for_cpu(dev, dma_desc, TALITOS_DESC_SIZE,
-+	dma_sync_single_for_cpu(dev, dma_desc, sizeof(struct talitos_desc),
- 				DMA_BIDIRECTIONAL);
- 
- 	return edesc->desc.sec1.hdr;
-@@ -282,17 +282,17 @@ static void dma_unmap_request(struct device *dev,
- 	struct talitos_edesc *edesc;
- 
- 	if (is_sec1()) {
--		dma_unmap_single(dev, request->dma_desc, TALITOS_DESC_SIZE,
-+		dma_unmap_single(dev, request->dma_desc, sizeof(struct talitos_desc),
- 				 DMA_BIDIRECTIONAL);
- 		edesc = container_of(request->desc, struct talitos_edesc, desc);
- 		while (edesc->next_desc) {
- 			dma_unmap_single(dev,
- 					 be32_to_cpu(edesc->desc.sec1.next_desc),
--					 TALITOS_DESC_SIZE, DMA_BIDIRECTIONAL);
-+					 sizeof(struct talitos_desc), DMA_BIDIRECTIONAL);
- 			edesc = edesc->next_desc;
- 		}
- 	} else {
--		dma_unmap_single(dev, request->dma_desc, TALITOS_DESC_SIZE,
-+		dma_unmap_single(dev, request->dma_desc, sizeof(struct talitos_desc),
- 				 DMA_BIDIRECTIONAL);
- 	}
- }
-diff --git a/drivers/crypto/talitos/talitos.h b/drivers/crypto/talitos/talitos.h
-index 2e2414ad1e03..6b9ce69daed4 100644
---- a/drivers/crypto/talitos/talitos.h
-+++ b/drivers/crypto/talitos/talitos.h
-@@ -78,8 +78,6 @@ struct talitos_desc {
- 	};
- };
- 
--#define TALITOS_DESC_SIZE	(sizeof(struct talitos_desc))
--
- /*
-  * talitos_edesc - s/w-extended descriptor
-  * @bufsl: scatterlist buffer
+if (malicious_idx > SIZE)
+	return;
+src += malicious_idx;
+memcpy(&value, src, ...)
+....
+hash = complex_hash_of(value)
+....
+return p[hash * 512];
 
--- 
-2.54.0
+is IIUC still a valid spectre v1 gadget leaking a value beyong SIZE, or
+did I miss something?
+
+
+And rng is a kind of a complex hash, but I also think in that "...."
+in the kernel is probably large enough to close any transient execution
+window.
+
+
+So sure, we can drop this.
+
+
+
+
+> Cheers,
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
