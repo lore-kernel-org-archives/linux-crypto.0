@@ -1,45 +1,44 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7790A2EB0F;
-	Thu, 11 Jun 2026 08:49:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3026C3D76;
+	Thu, 11 Jun 2026 08:49:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781167742; cv=none; b=lv8VpEA9uUWFKpN9lLU3OMvgUQj9FXRdFI0a+waUBs0YafFRVYLbyMabudnsKidhpuQqDwCmVd0PNgmp0BoJDJEnGH1yGvLswjrNc4DH/Wrqg9M3p/+rHH5PGnkkymLzhmGZVb87igqXdCniSQjrw/qzxRD1fhtjbs7lZ8pYwLk=
+	t=1781167754; cv=none; b=t2Gpn2ISq0NxleBKObBFQn9zyqVBGo5GrDw4PDhFdu9CRhVa+tQIV+8XlAtTmSGXhgTDND6LKsHogkLt56Jn5+E17Oq18Hd3wWo+yFdLfoJpznRo4ev/y3olmNKHzcOfbw3QaAMGVABvZLm+QwfmMBC1D5TssRQcyMC47O75e3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781167742; c=relaxed/simple;
-	bh=KmUBOod+bdcfw7TO+IHiPF2Yu0qcxFioX+evYn9InQc=;
+	s=arc-20240116; t=1781167754; c=relaxed/simple;
+	bh=Sh8DtzAtEaaONFPu8J7mdOxs8YqBVuZ8faYzps/SF+A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WG6yVQ7vZKBDSDGhLsN53NiALUx1Chq0s2Fv3q/twZbo87NPoeY+WJWHICZZrqGfVUA+MjGUjC5Wgc3cpKQlP3vYonkHQ+jfmFrlChql435V0BTMdKFsgTQIMAOo9rn8wzK8+M8494aBRuiB2j2IfBA/yU0SNmKUIT87StIp4OI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=IImM62aC; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=lziXAl3tLIR5RbxF2s5l3AbRjWa7zLxZUd4jPsZzfACKlw3snLNFxPVkY79ciXuvtvAVM+qzxR7PC7bdjTZt8O754IcPk17kfFKGaouLDRkxaiG4MLKrZY2TmHF78t0HPAsoXGKg0C9Ip8XzbuzxqDSAvVvJxh13BP6VxC2u+AE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=cg1X5iXa; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="IImM62aC"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="cg1X5iXa"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=QQm2jwLs/EAdPqnVD3OnZ1YF7ka09zxXxXw4pnxA2UY=; 
-	b=IImM62aCTzUVqQk/pgtpU0qUmBH0Qf/4Yu+k0YnL1i05CP3zk4JnNbHRFGJ3TbBXSanbO9ZHKSw
-	hxXq2eQ2Csr6hWJFiZ2wLWyJVfzgogoWhYd9M84x61UdWtMjNXNLoLmp4oAWbZZzpte06UX64YR17
-	AShxQml5FxpODWypyVbzmtl07j89hap19HSV+ejE5VDkru2GgCdIHbgZOQ4GGVFtZPR8DgJ0UpqVX
-	VxA6GmAhXyopt9D4crzDYfhiMz4/CJmM1YqCEUZPGZCTjwyy9m1s+fNt/j/flhVxSerIsxjq+cejN
-	oiHuJeTEHBOhkgx9X5/grR4LVffFVPX5ytQQ==;
+	from:content-type:reply-to; bh=Vxnwla4AZxmN0V+dRHGleQO3LIjMPtj8WL9mYuCfzic=; 
+	b=cg1X5iXaonOWKvS23sHFkuP/Z9or91ujEXWbUd2E8NPidijV0j+lJcYiMXnkpUeHpvZtGuMIJU8
+	DZJgo1BPgVN/pJpxFlb7A3w1K1cQ1/HEMku83F49vTkaAbbpHUaTGM7u5CAz2UH2FFYUsWceJ2YNH
+	yqM2/SotzBVWGcr3RDifFBRsV6hGOEWODSdlkIUPgNrXwNrj5+yz/VQGow8FLNeQanQiaePsU4yJA
+	S3g3e9+EC7uCVuR4M9Z2/y7NlSsDwapGRb0KSsiABgR9sZE9ORdmOpqJKhPrtBYFMTcLGn4+BKCmN
+	I2ha+od5kDt5fF91WRfR4DItZOAGAJhG2raQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wXb5i-00000004XUM-0Rj0;
-	Thu, 11 Jun 2026 16:48:47 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 11 Jun 2026 16:48:46 +0800
-Date: Thu, 11 Jun 2026 16:48:46 +0800
+	id 1wXb65-00000004XVI-2vpu;
+	Thu, 11 Jun 2026 16:49:10 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 11 Jun 2026 16:49:09 +0800
+Date: Thu, 11 Jun 2026 16:49:09 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, Olivia Mackall <olivia@selenic.com>,
-	Weili Qian <qianweili@huawei.com>, Wei Xu <xuwei5@hisilicon.com>,
-	Longfang Liu <liulongfang@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] HiSilicon TRNG fix and simplification
-Message-ID: <aip2blIEFe3N1MbO@gondor.apana.org.au>
-References: <20260530202624.20768-1-ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Alim Akhtar <alim.akhtar@samsung.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: exynos-rng - Remove exynos-rng driver
+Message-ID: <aip2hV8tlSNL3zpM@gondor.apana.org.au>
+References: <20260531175932.32171-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -48,44 +47,36 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260530202624.20768-1-ebiggers@kernel.org>
+In-Reply-To: <20260531175932.32171-1-ebiggers@kernel.org>
 
-On Sat, May 30, 2026 at 01:26:22PM -0700, Eric Biggers wrote:
-> This series fixes and greatly simplifies the HiSilicon TRNG driver by
-> removing the gratuitous crypto_rng interface, leaving just hwrng which
-> is the one that actually matters.
+On Sun, May 31, 2026 at 10:59:31AM -0700, Eric Biggers wrote:
+> This driver has no purpose.  It doesn't feed into the Linux RNG, nor
+> does it implement the hwrng interface.  It is accessible only via the
+> "rng" algorithm type of AF_ALG, which isn't used in practice.  Everyone
+> uses either the Linux RNG, or rarely /dev/hwrng.
 > 
-> Note that this mirrors similar changes in other drivers such as qcom-rng
-> (https://lore.kernel.org/r/20260530020332.143058-1-ebiggers@kernel.org)
+> Moreover, this is a PRNG whose only source of entropy is the 160-bit
+> seed the user passes in.  So this can be used only by a user who already
+> has a source of cryptographically secure random numbers, such as
+> /dev/random.  Which they can, and do, just use in the first place.
 > 
-> Eric Biggers (2):
->   crypto: hisi-trng - Remove crypto_rng interface
->   hwrng: hisi-trng - Move hisi-trng into drivers/char/hw_random/
+> Just remove this driver.  There's no need to keep useless code around.
 > 
->  MAINTAINERS                            |   2 +-
->  arch/arm64/configs/defconfig           |   2 +-
->  drivers/char/hw_random/Kconfig         |  10 +
->  drivers/char/hw_random/Makefile        |   1 +
->  drivers/char/hw_random/hisi-trng-v2.c  |  98 +++++++
->  drivers/crypto/hisilicon/Kconfig       |   8 -
->  drivers/crypto/hisilicon/Makefile      |   1 -
->  drivers/crypto/hisilicon/trng/Makefile |   2 -
->  drivers/crypto/hisilicon/trng/trng.c   | 390 -------------------------
->  9 files changed, 111 insertions(+), 403 deletions(-)
->  create mode 100644 drivers/char/hw_random/hisi-trng-v2.c
->  delete mode 100644 drivers/crypto/hisilicon/trng/Makefile
->  delete mode 100644 drivers/crypto/hisilicon/trng/trng.c
+> Note that the other crypto_rng drivers in drivers/crypto/ are similarly
+> unused and are being removed too.  This commit just handles exynos-rng.
 > 
-> 
-> base-commit: 5624ea54f3ba5c83d2e5503411a31a8be0278c1e
-> prerequisite-patch-id: 07e982b663ac3f8312ca524f6b91b5b38661df5e
-> prerequisite-patch-id: 72064361a8f36e015ab0b7e1fa4d364b40d90506
-> prerequisite-patch-id: 8978b8e0db7f47935e5f6f0aff14a97f55d3073c
-> prerequisite-patch-id: 6aa0e3e93a008279d71e535a3d0cf48643f55e19
-> -- 
-> 2.54.0
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
+>  MAINTAINERS                         |   8 -
+>  arch/arm/configs/exynos_defconfig   |   1 -
+>  arch/arm/configs/multi_v7_defconfig |   1 -
+>  drivers/crypto/Kconfig              |  18 --
+>  drivers/crypto/Makefile             |   1 -
+>  drivers/crypto/exynos-rng.c         | 399 ----------------------------
+>  6 files changed, 428 deletions(-)
+>  delete mode 100644 drivers/crypto/exynos-rng.c
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
