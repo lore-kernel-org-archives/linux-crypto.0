@@ -1,137 +1,132 @@
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14F3032BF4B
-	for <linux-crypto@vger.kernel.org>; Thu, 11 Jun 2026 07:11:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781161882; cv=pass; b=rpSMfkmCTPskQaeYpxG9IJxyaBQNmnWOnJI4oWY4swP+Fe8BmWev7ac2uQ3IofEKnTTJlzpHM1qEwO+SEtH60SWjqVoquEk1TmTfYdzSlxd/EcEetwl6i9tH1wkItFV47yU3sK7iw9qQoZZSJJe6wVT7RWEny8LXfxamCVEXZJw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781161882; c=relaxed/simple;
-	bh=A+vjY9UePGm++PcxVZs5XDA+KliAt9XGKyHV2kvhaX8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uYZOKIKFbSKtf/H86i+qm43IfiL3nsGeNgcxsEZStINZYYvsmeKfcAht8d8LG5JSXeY+B5Z3/dEzeeQKw1+9Cy+bGRwx5UWwYoqesIhRr638ccjNcKGMxmnfCtR2eXEy10Qk54ZN3ZWsqcSB9aRpBZLDdeV2AEeh44YhFILWh/A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=wE3yK/b0; arc=pass smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC3F6362152
+	for <linux-crypto@vger.kernel.org>; Thu, 11 Jun 2026 07:30:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781163026; cv=none; b=JTmGfHoUGzbLxJ94R6LBrnsTVyFyekV4Mpe6e2jMFt4EZr0c+JEYvL9PUeBFx01PaEUftDWF58tEUobDroCPgEC/Qj/HEd2bQfGUS7zVDURTo/+owZyKIsFuDxyrJg3yw1GjB9MJ5qwZMc3IeOce5Mf0CwtYB/Tve7rpBXXqPVU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781163026; c=relaxed/simple;
+	bh=42msgMb3P+btIm3Tjqc0kuZBe+w26HUqseSgoftktpY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rDYnzH6ScGt5Fz7lyjDN484nY/pO2fVu789EgTd3sAQN0WsiN2CM+pCm7ogXd8mTAF4e8FjCWQB+eLRi7QNdMODz59dXIIBLQy8C+/GPvmy8PYIe8UlNb2qVpZkFm2eSXHtMUDgvsoSGt1Qv+Kavtj04b34kRiQjCPMqG05vD8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fPBMBiDQ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Zp76OBJ5; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wE3yK/b0"
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-691c5776f35so6196022a12.3
-        for <linux-crypto@vger.kernel.org>; Thu, 11 Jun 2026 00:11:20 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1781161879; cv=none;
-        d=google.com; s=arc-20240605;
-        b=cULXW1pPRbWkjjRmNDLmGMp8zofecYtM5RdRL1Zjicm2Fe1L+Dy8TRilR6AQk5pMlj
-         CGwC9sLtU+FrrHc1RBw5PQ/cv1zplDfIxba0eHQjMI23jbm4J7u0fgFJxIjJmcMneTGp
-         fTz8zQkm/xRIFljJiPcET5m6EKfPJ8ZylLq8JTdsKe2uG+3B+6FMvOAlUy9q042oNvKb
-         dTrwST1IN6QwF02ucn/Nh9SDHGAhUXolRD9WK55OhYB1RuHlrbxSdqKcJgIrju7nmafX
-         aqq8Do61lYy71/6+FBdgjh75SLStyHf+Ryjp1ILA+UMCOnTm12+o5ATkb8DKIOVz6yyP
-         sATQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=f/de9C39QdWQLV5Q6hT47S1phWBZwegbTCNZx8KIleQ=;
-        fh=oXnSoDMGtUoFSMQtW/r2TZJsxklgBHwj8EaW97sOaJM=;
-        b=i8ZTQnyc3z+GMWKiKfrtwGxyCWT4F+3lpadxNASVon8qGN/OZrVJq1UfYjaDPP56vm
-         JK9tjuuAG8hlXsYaxKB1gYtfX3gnlSGYAUmyVXXLavYyAeQ3eXUBXWHPc87yW2TskfGv
-         CCkgPu+MRcu3bGbxKnf5HvKuzAyd7saHuaALZwzqhpTxNwiWtHFWDJsb4CH5BOi85ZTu
-         pmD9B8WEQhgt+x4RST8QnwcK+RRHXQGF2Usg6jb8D8eofiy7QJ1xQ75nbYDguu3a9aq3
-         47wUkS8fYZloMLF/2HjhpRpuq+xyH3kCU1le5QOeP5SQnMZwz18nX6VB7zDLooxCYYoV
-         oXkQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fPBMBiDQ";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zp76OBJ5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1781163024;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QHOpC92ZLUKoaDH3aPL88/GHfZMM5nBt86vbyTmpcKE=;
+	b=fPBMBiDQSIT7ejtPtX5KAKlopa5gNWyapcCBqB5S99p2rzFW2oXPnazuKrEbbgenQHqOjB
+	b9BNJ8WhAV10beSOX4WSwJX3OoC2qe7PtU3GMrpZUPgO7cY6BUuxB+2GwBySMKeOvw5XId
+	a8Ob34x3tauspT4Hdw30uq5nXvtPMvQ=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-240-EnY2q6G8PhaxzVjqaXO8zQ-1; Thu, 11 Jun 2026 03:30:22 -0400
+X-MC-Unique: EnY2q6G8PhaxzVjqaXO8zQ-1
+X-Mimecast-MFC-AGG-ID: EnY2q6G8PhaxzVjqaXO8zQ_1781163022
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-46016bedbaaso3722483f8f.1
+        for <linux-crypto@vger.kernel.org>; Thu, 11 Jun 2026 00:30:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1781161879; x=1781766679; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=f/de9C39QdWQLV5Q6hT47S1phWBZwegbTCNZx8KIleQ=;
-        b=wE3yK/b0YoexmPEmKXgpFzlJcsfRs3aITD+EWWRh2bt2RPjzi5bqo2qjU/5dCTRRv+
-         L1mvmhmN9eF6xctowNtD6Qv+8qX3XP9Yi5XYLJ6ADW3aP6SATT5Xlqk2u+iXh6gsYK89
-         i67FI6iyM84EUceCD0SUpa9/pXYE82dMJSgNXEdEDXbDP79m8oYouDt2u6XCWoeU4KbJ
-         ZLljcWg3oHa+Lr3rPVn3OE8NVmWizJ8xNr/KZIOxAqhE5eZ8PKpIp5EL5zUFguFHo7/T
-         XnKrbAAh6lOi+fUEfEi01nFcIC4AgkRIMFryGzz7wM5xAwbNKYWnCWumGNWEo3AjlEg3
-         DTtQ==
+        d=redhat.com; s=google; t=1781163022; x=1781767822; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QHOpC92ZLUKoaDH3aPL88/GHfZMM5nBt86vbyTmpcKE=;
+        b=Zp76OBJ5NUD+C4YhbPL7OwX2M2SD4rLosky/UP0EIqnIjW2RDnboVKirHjL67abWtf
+         t/z3ydYuUX12Hzi8N/CjyMQiU2dUO3J0mKdSWDXuBH7dSDLLzuE/IxJqQ+8soCE3SNnT
+         qsyT05WvRpCbXqqxMoR2He00dHrSKOYZbaGhmffUGqM+7MPDJZYoR6TC2C5MaXk722iC
+         WoDIW49Y5pxy+ys9Oh62O645k7fURRwCHpZequ2gfU4WPkhJB4RKQpm9TB6phCxeECpr
+         4FxHDiLt+80gMnRZdBYR9hnSKfG6NwWc8ywkND8xFS1E1hLuBkJwzliRNpxgQp8Mimrj
+         uIHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781161879; x=1781766679;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f/de9C39QdWQLV5Q6hT47S1phWBZwegbTCNZx8KIleQ=;
-        b=fC/XDJyEcGZ0ljUgWiuuXEbFCdAjwHuEC3dNbN6DE6XlNm8XtI1ZySKOK8QaQ2CtD0
-         bhnkNKKgvb0Dw0shMhqVbDMC3gREOqIaPuYv8I9bsIwnv5+SCn38oL03gdIZTWHgMkUY
-         nyrW+GqR1UOsI9Pr21wxWY1dIymNt8YZRMgfFPFuqf+F7oC7BUieOZZMmcT4EL1hIAB/
-         ttHrCaI5oMJHC65fm4FfEJcEZb06xS2LGbA1M4PpWGMi9GmV0fgG2trGiGYYOeZhot0g
-         76tzgeC9NxzlQTcB7NcuT16t6APPi6NDROTm1x/xYimOwN2odBAR0HZqr2iQMwmxTx6b
-         ctTw==
-X-Gm-Message-State: AOJu0YzcSXcgtYrQoAst0DyQESMCVEe29isMzvuT0fb2WC+hrWyoJ9Io
-	dqrNZ70e7SgnQI8qf3Nd/y79S8V8cLnHoi0mR7Yekv0k6mYGLCZdaN4O77dpVAfj3W5dQ4jg18A
-	8KTBz8NRkze/q9s1u7wxATM6/UAXAWwHDmjL38cKiwQ==
-X-Gm-Gg: Acq92OGPZDHH+4qO6rget31BSKNA2Ly3hCGQt1v4sKVQ16cS0uerKcDlSM1Pr6wHNZJ
-	1q3q7a93HKIlrW7Ozc3yQPE/hYFm6BhSpSsJMeH6+ESc4rZa1FrIs4WvirkeM+631fgmV2Q2XbR
-	ZOkOy1a4tFZLTd8DkiKIf8HiAFtTiftbyeVeii5XNQAYr6WE+LYwr3SMzTbrcjdzKQkyYatfEWP
-	hMojD+nwcNWHHrKUOCQA6p54Yr5L/A819daRUkWVJb+hxmE7FMFn+x2q56nLCWiDYdkwTlg6V6R
-	001fbFb4/iORJjLDw6jIMkWX0Hhlin4fUOIZOcA5VS8EktZyE9oV
-X-Received: by 2002:a05:6402:520d:b0:689:c099:ef99 with SMTP id
- 4fb4d7f45d1cf-6930e2e85ddmr662846a12.22.1781161879564; Thu, 11 Jun 2026
- 00:11:19 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1781163022; x=1781767822;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QHOpC92ZLUKoaDH3aPL88/GHfZMM5nBt86vbyTmpcKE=;
+        b=fs4kpiEr3Dx8aOk/Hk5w6Q2TVvBV75wmE70KInrD0MZHGHsiv9VjK1zOl28amdNk2a
+         +kjsZnMuCxezU5/R67DMMuoUytn54Eh2Md6XF2V3S9RSrLlLRIt74i71lWBDYI9tZw2z
+         DkHTn0/7xRZcbftZl/xx65T/65iJFhD79MGDlogGZhgsXB4lFL2XUZ9PyJmK9ANPa6wz
+         n+LpH9uNjp8IULfa9rKaoeNXZzz4QbOCvcNl7Z1fsFP/JNsO29AabdifBbTPnbsxxWR0
+         UrxFEFldO6MORQ5frZAJgd6f1d/8qF/5uvglhAlJhR1F+dkHRIA9KE1oKGJNyPy3ftxu
+         DjJA==
+X-Forwarded-Encrypted: i=1; AFNElJ9Drjo1R3fPpObscTPR95BwxKbUxhsOjigo+nXaiodaGdacrlFwVFsMTcif9ujjYkuznEnM4QDl9p8pCd4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6coGBQ0LOUG5b+t07X/jO1kuholTozVLr9G63G/FifjGGqCjX
+	ds2OD1xftNG85zWguvQBRBUPKqif75oSaan8pcUXC26wXKd17VmoGcvPk6zXC/aXj/Ya378KbSb
+	bx3TEv23vj7h98+zIRohMyvJSXCPlhXiWBGMBbsEqBe9SgWfPOvuTK/+vsKfa68Mk7g==
+X-Gm-Gg: Acq92OGTiHupeLQHilgUwGe+xL4OXZcH35Dq9bR73F4TqJEGXwc1mkAI7efMFKYqvO0
+	QVngjILL3AfQgl/DFs37CL0yrYWaGO3a7/o/d2a8TOyuM8R8w7gHBnylHliP+ZeHazPx3rj2Arx
+	kQ/tG5Atr+yWFIBCLPtQU4hN1LRW2BlA2SFelbuePgVeUJ7ed4lCOlBdDONHA+rhJwh86mc8nAi
+	5D17xSOxgzv4PQrRFW8+7/TBTc3tY0Lti01mGXalMmr0l00GMYWVz6lz7pPysgVNDTXceJrYA9J
+	zinmAaQwmCrVnuUNeksks7grG6iUybbHoyv48ntenUz8FJy45LkNLlb7EjF0TUmvcX5AKdhUUEu
+	VX8WsZ4cfIQFEnPTSoCeIRdDY3icxw/fOPfjvBvnfFLZpr5dOlTq7+g==
+X-Received: by 2002:a05:6000:220b:b0:460:1643:caf7 with SMTP id ffacd0b85a97d-460677acf24mr2526965f8f.27.1781163019836;
+        Thu, 11 Jun 2026 00:30:19 -0700 (PDT)
+X-Received: by 2002:a05:6000:220b:b0:460:1643:caf7 with SMTP id ffacd0b85a97d-460677acf24mr2526879f8f.27.1781163019248;
+        Thu, 11 Jun 2026 00:30:19 -0700 (PDT)
+Received: from redhat.com (IGLD-80-230-85-71.inter.net.il. [80.230.85.71])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4601f2e4b18sm62096991f8f.10.2026.06.11.00.30.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Jun 2026 00:30:18 -0700 (PDT)
+Date: Thu, 11 Jun 2026 03:30:14 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Michael Bommarito <michael.bommarito@gmail.com>,
+	Olivia Mackall <olivia@selenic.com>, linux-crypto@vger.kernel.org,
+	Jason Wang <jasowang@redhat.com>, Kees Cook <kees@kernel.org>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
+	Dan Williams <djbw@kernel.org>, Ingo Molnar <mingo@redhat.com>,
+	"H. Peter Anvin" <hpa@zytor.com>, torvalds@linux-foundation.org,
+	alan@linux.intel.com, tglx@linutronix.de
+Subject: Re: [PATCH v3] hwrng: virtio: clamp device-reported used.len at
+ copy_data()
+Message-ID: <20260611025916-mutt-send-email-mst@kernel.org>
+References: <20260531142251.2792061-1-michael.bommarito@gmail.com>
+ <aio83ZWadVTiuNpR@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260531175932.32171-1-ebiggers@kernel.org> <CADrjBPo3BpSk49oasf_9g06xrBMkw+NiKo10xDKjWr8sJ+Zc-Q@mail.gmail.com>
- <20260610183902.GA1158828@google.com>
-In-Reply-To: <20260610183902.GA1158828@google.com>
-From: Peter Griffin <peter.griffin@linaro.org>
-Date: Thu, 11 Jun 2026 08:11:06 +0100
-X-Gm-Features: AVVi8CdK6eYIPK8G4aFqD8lMifZVhDYEkmKnIKOnCa2_bel3Ygx-BiVfzt5sLyg
-Message-ID: <CADrjBPoVFCb4rTze4mQhdQ0=FJmhpFiET0GCRBx9FaGs9DsrDA@mail.gmail.com>
-Subject: Re: [PATCH] crypto: exynos-rng - Remove exynos-rng driver
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, 
-	linux-samsung-soc@vger.kernel.org, Krzysztof Kozlowski <krzk@kernel.org>, 
-	Alim Akhtar <alim.akhtar@samsung.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aio83ZWadVTiuNpR@gondor.apana.org.au>
 
-Hi Eric,
-
-On Wed, 10 Jun 2026 at 19:39, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Wed, Jun 10, 2026 at 03:46:54PM +0100, Peter Griffin wrote:
-> > Hi Eric,
+On Thu, Jun 11, 2026 at 12:43:09PM +0800, Herbert Xu wrote:
+> On Sun, May 31, 2026 at 10:22:51AM -0400, Michael Bommarito wrote:
 > >
-> > On Sun, 31 May 2026 at 19:02, Eric Biggers <ebiggers@kernel.org> wrote:
-> > >
-> > > This driver has no purpose.  It doesn't feed into the Linux RNG, nor
-> > > does it implement the hwrng interface.  It is accessible only via the
-> > > "rng" algorithm type of AF_ALG, which isn't used in practice.  Everyone
-> > > uses either the Linux RNG, or rarely /dev/hwrng.
-> > >
-> > > Moreover, this is a PRNG whose only source of entropy is the 160-bit
-> > > seed the user passes in.  So this can be used only by a user who already
-> > > has a source of cryptographically secure random numbers, such as
-> > > /dev/random.  Which they can, and do, just use in the first place.
-> > >
-> > > Just remove this driver.  There's no need to keep useless code around.
-> > >
-> > > Note that the other crypto_rng drivers in drivers/crypto/ are similarly
-> > > unused and are being removed too.  This commit just handles exynos-rng.
-> > >
-> > > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> > > ---
-> >
-> > If the driver is being removed, should the binding documentation for
-> > this driver not also be deleted (see
-> > Documentation/devicetree/bindings/rng/samsung,exynos4-rng.yaml)?
-> >
-> > Peter
->
-> In other discussions I've been told that devicetree bindings are
-> hardware descriptions that should still exist even if there is no
-> driver.  It doesn't make a lot of sense, but it seems to be what the
-> devicetree people want.  I expect there would be objections to removing
-> this binding.
+> > +	size = min_t(unsigned int, size, avail - vi->data_idx);
+> > +	idx = array_index_nospec(vi->data_idx, sizeof(vi->data));
+> > +	memcpy(buf, vi->data + idx, size);
+> 
+> I don't see how nospec can help here.  Please enlighten me.
 
-Ok thanks for confirming.
 
-Peter.
+All the "malicious device" things are confusing. Spectre things -
+doubly so.
+
+So if an access is speculated then CPU might speculate feeding a kernel
+secret into RNG. And then the speculated RNG value maybe can be also
+speculatively be used by some kernel code as an index
+to trigger a cache access, finally leaking the secret?
+
+Maybe?
+
+
+
+
+> Thanks,
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
