@@ -1,36 +1,36 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D3223403E4;
-	Thu, 11 Jun 2026 05:49:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8D9C24DFF9;
+	Thu, 11 Jun 2026 05:50:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781156955; cv=none; b=RStmm/yD+7rLLtnA7xgW4QeGFcLaAntE01/m3Pp0kP1Bhl9wmyE6EsLZo1ciPFe4A6scp5j8gubTbKkH1apxXk4ldFlrxdb3KMVQHi4cO0A+VSt1iuHrxjI6+gm8w4OCCIz9rO0Vy9ZLHCnY5mwLtJxlm+2K7SHB0H4HXqa+nCQ=
+	t=1781157059; cv=none; b=hfZgEc3k7xYObr/wyYG45ZH2tgCU/NfMO3KOUycH1Fil74+F17r/VsY1ZKxtSeKNNBRmWdhKRjfY1TzepXUpl98esGZK0YPN8Pyhe3/OcdQ47X4lm53CisvbpSnrzO/qOldxqMGEsrwVeAN8fCaXWpjt08YA+f0moH10KVbIV44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781156955; c=relaxed/simple;
-	bh=Cyg0gfS1CyZiOB3kXWPlXzrhcDAHMxUjdMxiF7hGPPI=;
+	s=arc-20240116; t=1781157059; c=relaxed/simple;
+	bh=aFCBRapvOXew+Noti49kRnnBaKKU2jD8tcX7iyV7Sfk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IYkqToASGiUY7tgmqVGuZchVyRGXaoKLTmufx7VBME3LBQfhcO4SwOJ7ApbGDpit26GAtzTJjqXdLLFbQfordpyoH2be/y7uYaEKmgCNdLTEBgDWrd9w1mZ3BiSYQtekJiB+MFjW9mLpYvYFwiNi0eaYO98EUiQht0ZRf0xXdIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=p5hKQjjA; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=hSQHfquBdwO+wuOhAL8bSMlk4jtA41NE03Ltxzu0bwdZgmUQrYt1NdcGpZr3nzTzRoE7dbv8d18Nv3xDK9geJV5rNZDLQ3FqSeRhIXjsEc7YjlpW8z828Ps8nnhez4EEjrTP66jzxGfNWgc8ESrYK8hqrbrBiLkjUprRHl6SgLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=PHsFQmuq; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="p5hKQjjA"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="PHsFQmuq"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=SmEPSkt8E7zGFX+Ycvi6FJfzrUqOPKPfjFIb6OeM/pw=; 
-	b=p5hKQjjAGfj0YdQ5mDrrhu/R/DCB+ki5ng+3e2s2eEG8tQP33b36XxRcSkiHPfknoy7FcoFEjsm
-	cASMPCcYKA/Vx0Miyv+P31MCn7Diymkah4Xid1veDdHQi8BnPDydlJhxfwB46YWarW5DQOWfFNkJz
-	ixSg3YMR4Wv7ndVvNX81hayjf1uTqq6YWsP1kTuuQCPDhvDcFxNYBk07wCvouaBZ9xawaV9LCmLT2
-	c9EPPXx5XbIkUoWIpoIUiDb5IbKJr5MsIyblYIfsF2UFJQ3RGrT4ZFnmKnBrjH1nseEYrx1uFDJkg
-	cVE1+dweS+CS1IhbWxTUBSbt2rZYT7kOI0BQ==;
+	from:content-type:reply-to; bh=nqS/eIx4316IuyHGDGsTI2Mit/s75slnzsaDmUc7NhU=; 
+	b=PHsFQmuq1Z2V1HiPubIPvX4M8kGjH9eqqFv3hpzoti55/gcKnKwu9U7vyL4R+/pPRcSshgHHwBC
+	iPUn5K5MobboF+N7OlRnEfRRd7/h9ZajuV54EWlp1wOAv/QHahgcKaDYYcqDhOKq66Exo3YNEAIIU
+	LaNJIgn3QwTZfEi4OsiTMUTq7jZS/NTJNLDtjV9xt2hXVfHHLJkXD+/qHMIvvZXQFG6IwtdDLZs5l
+	6sM1CP7SrzKbKiVSjoXHer41qbnFut1jkydXowuDXP7KhcbskusC9HO4SFQslZps1OPgQC7KiCpph
+	T2Us3L5y8ic/9scnHYWkjEd+enLSYq82il/A==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wXYHr-00000004UYn-3J6E;
-	Thu, 11 Jun 2026 13:49:08 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 11 Jun 2026 13:49:07 +0800
-Date: Thu, 11 Jun 2026 13:49:07 +0800
+	id 1wXYJa-00000004UZM-0NLn;
+	Thu, 11 Jun 2026 13:50:55 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 11 Jun 2026 13:50:54 +0800
+Date: Thu, 11 Jun 2026 13:50:54 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -39,7 +39,7 @@ Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	manjunath.hadli@vayavyalabs.com, adityak@vayavyalabs.com,
 	navami.telsang@vayavyalabs.com, bhoomikak@vayavyalabs.com
 Subject: Re: [PATCH v13 2/4] crypto: spacc - Add SPAcc ahash support
-Message-ID: <aipMU4eFuNDsXDvt@gondor.apana.org.au>
+Message-ID: <aipMvkD_Y4NO4hfR@gondor.apana.org.au>
 References: <20260604165210.1141842-1-pavitrakumarm@vayavyalabs.com>
  <20260604165210.1141842-3-pavitrakumarm@vayavyalabs.com>
 Precedence: bulk
@@ -53,39 +53,59 @@ Content-Disposition: inline
 In-Reply-To: <20260604165210.1141842-3-pavitrakumarm@vayavyalabs.com>
 
 On Thu, Jun 04, 2026 at 10:22:08PM +0530, Pavitrakumar Managutte wrote:
->
-> +static int spacc_hash_do_one_request(struct crypto_engine *engine, void *areq)
-> +{
-> +	struct ahash_request *req = ahash_request_cast(areq);
-> +	struct crypto_ahash *reqtfm = crypto_ahash_reqtfm(req);
-> +	struct spacc_crypto_ctx *tctx = crypto_ahash_ctx(reqtfm);
-> +	struct spacc_crypto_reqctx *ctx = ahash_request_ctx(req);
-> +	struct spacc_priv *priv = dev_get_drvdata(tctx->dev);
-> +	const struct spacc_alg *salg = spacc_tfm_ahash(&reqtfm->base);
-> +	int rc = 0;
-> +
-> +	ctx->single_shot = 1;
-> +	ctx->total_nents = sg_nents(req->src);
-> +
-> +	tctx->tmp_sgl = kmalloc_array(2, sizeof(*tctx->tmp_sgl), GFP_KERNEL);
-> +
-> +	if (!tctx->tmp_sgl)
-> +		goto fallback;
-> +
-> +	sg_init_table(tctx->tmp_sgl, 2);
-> +	tctx->tmp_sgl[0].length = 0;
-> +
-> +	if (tctx->handle < 0 || !tctx->ctx_valid) {
-> +		priv = dev_get_drvdata(salg->dev);
-> +		tctx->dev = get_device(salg->dev);
-> +
-> +		rc = spacc_is_mode_keysize_supported(&priv->spacc,
-> +				salg->mode->id, tctx->keylen, 1);
+> Add ahash support to SPAcc driver.
+> Below are the hash algos supported:
+> - cmac(aes)
+> - xcbc(aes)
+> - cmac(sm4)
+> - xcbc(sm4)
+> - hmac(md5)
+> - md5
+> - hmac(sha1)
+> - sha1
+> - sha224
+> - sha256
+> - sha384
+> - sha512
+> - hmac(sha224)
+> - hmac(sha256)
+> - hmac(sha384)
+> - hmac(sha512)
+> - sha3-224
+> - sha3-256
+> - sha3-384
+> - sha3-512
+> - michael_mic
+> 
+> Co-developed-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
+> Signed-off-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
+> Acked-by: Ross Bannerman <rbannerm@synopsys.com>
+> Signed-off-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+> Signed-off-by: Manjunath Hadli <manjunath.hadli@vayavyalabs.com>
+> ---
+>  drivers/crypto/dwc-spacc/spacc_ahash.c     |  897 ++++++++++++++
+>  drivers/crypto/dwc-spacc/spacc_core.c      | 1311 ++++++++++++++++++++
+>  drivers/crypto/dwc-spacc/spacc_core.h      |  838 +++++++++++++
+>  drivers/crypto/dwc-spacc/spacc_device.c    |  275 ++++
+>  drivers/crypto/dwc-spacc/spacc_device.h    |  237 ++++
+>  drivers/crypto/dwc-spacc/spacc_hal.c       |  374 ++++++
+>  drivers/crypto/dwc-spacc/spacc_hal.h       |  114 ++
+>  drivers/crypto/dwc-spacc/spacc_interrupt.c |  329 +++++
+>  drivers/crypto/dwc-spacc/spacc_manager.c   |  611 +++++++++
+>  9 files changed, 4986 insertions(+)
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_ahash.c
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_core.c
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_core.h
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_device.c
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_device.h
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.c
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.h
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_interrupt.c
+>  create mode 100644 drivers/crypto/dwc-spacc/spacc_manager.c
 
-This check could've been done before going through the crypto
-engine.  If we're just going to use the fallback, there is no
-point going all the way through the engine just to drop out right
-at the end.
+Please also check the Sashiko comments, some of those look alarming:
+
+https://sashiko.dev/#/patchset/20260604165210.1141842-1-pavitrakumarm%40vayavyalabs.com
 
 Thanks,
 -- 
