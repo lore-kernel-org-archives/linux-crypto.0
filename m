@@ -1,177 +1,189 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010049.outbound.protection.outlook.com [52.101.56.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C31D6342515
-	for <linux-crypto@vger.kernel.org>; Wed, 10 Jun 2026 19:17:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781119053; cv=none; b=BYI4VCYKHaDqNexfcsn96dODI824UQ6XpgpJTOg9D6aydYXGP6DwzqJtVyCJ7gdOVCQyQLxtvsyqrdalsylNA7rWw9I6nrJXItGXagcpVGaNLOb2wJgSItbuGpeoTQpjakEN2SMUYVitQRF+35eFmYwtw+35oM9+N9mc7uVoa7k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781119053; c=relaxed/simple;
-	bh=AZvi6ZNzBZy6L1WVZ0LtkofFo1vWzMWYeJFKz3V4hFE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ENIv1nUm3l9D3vE0YznjsJxKK9uLNGJl9VSuZ2bXdeoMbwu/H5bP5jNwb19GMfDhCL/59gAkKmpx1zcU9erPyTRVX4ZK31aKP9PFJNSJApSw4zhaXM3OrLyMnYf48n6TZ0WHm99SgzV9Cxo2vtu+O7wmgZIKQgLN7qUiPGywihk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Orrg8s0G; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D99F421A95D;
+	Thu, 11 Jun 2026 02:52:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781146381; cv=fail; b=tnrCcOz/A7rbNLgFFSHhV9RjG+obKE9c9iLESHdGmVaQAkhgG0YN2qaHE3RRFBPYbW0F5peaX67+IOCP7okmvCPgBU8EOPKrbpk62fhULPTFCuCopCL2ohmryBDrEtb8tpa8auWENZDrx22/DmFkvy5yzQCiex6hllwmYOnAznI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781146381; c=relaxed/simple;
+	bh=d+xzT3dhgauhk+5az6jPxY8L4WgguVyR3aJCIuTPjCI=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=FS7XIxgHYzQDOlhWxgg/t5nGcIIJ8fmC89ffdgTrfv303VfYUJwA8hXPGbxCj3eC2SxfCdV6IeKiSY9TPcGcLSTjkrfEajx4GSOTcQDI7yvO9YcVSoNwOUMmVxPWJSlSfyyu4Ase36GrFz8KsoCL5et2Xi1y7phbFDNXPZqdHRI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=1NbTHbB5; arc=fail smtp.client-ip=52.101.56.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Orrg8s0G"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1781119051;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/myOSqG7uv5qCnsE2QetCIJ83uVxLLLFgvexWhF+Xlo=;
-	b=Orrg8s0GzQH/elWDaM8swFa1uIkYrzqyjF75NIKuWcrvL353TeCCbeOJx7wf9O+X1rKXh5
-	9QbkN/0TGjdm5Qf1rDtRICfEqDGD0uLDlaC4ThUNRBqGKx7l73mPbfrw3tl7iveFTZ9TOs
-	AODHc7nR05W7+FKQZBtF5VX82bD11oE=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-481-wXi_R3TWMLeok5rQbRDlbA-1; Wed,
- 10 Jun 2026 15:17:23 -0400
-X-MC-Unique: wXi_R3TWMLeok5rQbRDlbA-1
-X-Mimecast-MFC-AGG-ID: wXi_R3TWMLeok5rQbRDlbA_1781119041
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0E7FC180048E;
-	Wed, 10 Jun 2026 19:17:20 +0000 (UTC)
-Received: from thinkpad (headnet02.pony-001.prod.iad2.dc.redhat.com [10.2.32.102])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CABD23008DCB;
-	Wed, 10 Jun 2026 19:17:13 +0000 (UTC)
-Date: Wed, 10 Jun 2026 21:17:10 +0200
-From: Felix Maurer <fmaurer@redhat.com>
-To: Daniel Hodges <daniel@danielhodges.dev>
-Cc: Daniel Hodges <git@danielhodges.dev>, bpf@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, ast@kernel.org, andrii@kernel.org,
-	daniel@iogearbox.net, vadim.fedorenko@linux.dev, song@kernel.org,
-	yatsenko@meta.com, martin.lau@linux.dev, eddyz87@gmail.com,
-	haoluo@google.com, jolsa@kernel.org, john.fastabend@gmail.com,
-	kpsingh@kernel.org, sdf@fomichev.me, yonghong.song@linux.dev,
-	herbert@gondor.apana.org.au, davem@davemloft.net
-Subject: Re: [PATCH bpf-next v8 0/4] Add cryptographic hash and signature
- verification kfuncs to BPF
-Message-ID: <aim4Ntj22wM30Ga8@thinkpad>
-References: <20260225202935.31986-1-git@danielhodges.dev>
- <ag8zGP5azt743BWc@thinkpad>
- <fm43bx7min3olvz4ok46emxvyvbczw4weq5dkwitzwmq6h4jzg@a56b3irxynks>
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="1NbTHbB5"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hw1Ye/DNHcbNStjX9p7PiCrQE4GvJDW7QOU96W6liLYI9Ug8LatSU6fed/bKUnuiqp7n7mk/Yd/HLW+/+xgl0hDnlA25wMx5fmXqUitnj6H3NAGL5VBj0VESSJEq8DdsutnP1nwYBNfeu/65JRAYEr0dYFiAPVdlHR/QZqtQGeKG1sRYXzrzJUCIeESZ3bND3xvcK/do+nYtvb71y71oE8yE+oHJq/mKEnkWMo+ygfm/m1vY65u7HQG70JO5J63F5l/yEZLbbbNMT3haniiAMUL7AvL25C8sS9SvSl8XW7LVab5CwYG2ASUqykwRkBEC78IIlqObA+8EeGmCpgthcg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lV1aAtPyXCcnP+P6XkpiCKHOZt6IpgeaVy/0s1tJef0=;
+ b=FOJJo642y9uZNn4U5nwhb5RlJ1wfXkAtcR0o7eM/Mj2/TH8JAYfz1hk5noJRx7MAmP9riOUzfN+ghS1/0gqrf0EUet4cn0JGGZf3W+E4IgOFA5PX7MQHFBKcd1meqlZ51dehhaPQCcLEnZC5hz8JU8Q/W+WillVc94NOncjn0a50c83l1FPp/QpFvsHNRzRcz2OJj70rvzZPKkjvDswVNwlbrbPVW2xWYi1VN4KXUqecexNdvBMmsGCnSiduqfN4Z7IRaUKmYTo2eVBqPT7oJca9kTtewezC2Sb32swPb4d7aQhCtCW7qD12i300Nn7GI130rQ99axEuAs6/BrYM/Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lV1aAtPyXCcnP+P6XkpiCKHOZt6IpgeaVy/0s1tJef0=;
+ b=1NbTHbB5Fot0jY1vBNELVsBXOTcszsyFdk8yxXa3H0pI9MoysfmrB1hKYY9OYUhNavUMYF2FcPZR5TodvNve6yWh/Kbsu1+74q03TIRfCp8kruVEFNZbu4EppT3wDygA1Kt1xcp6sM5Xq/GvbwtAeGaDJ8W4AYdc7yu9eQbTx/A=
+Received: from DS7PR12MB9549.namprd12.prod.outlook.com (2603:10b6:8:24e::7) by
+ SN7PR12MB8602.namprd12.prod.outlook.com (2603:10b6:806:26d::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.92.17; Thu, 11 Jun
+ 2026 02:52:56 +0000
+Received: from DS7PR12MB9549.namprd12.prod.outlook.com
+ ([fe80::bace:1330:9ab2:acc6]) by DS7PR12MB9549.namprd12.prod.outlook.com
+ ([fe80::bace:1330:9ab2:acc6%6]) with mapi id 15.21.0092.011; Thu, 11 Jun 2026
+ 02:52:56 +0000
+From: "Jain, Harsh (AECG-SSW)" <h.jain@amd.com>
+To: Eric Biggers <ebiggers@kernel.org>, "linux-crypto@vger.kernel.org"
+	<linux-crypto@vger.kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Botcha,
+ Mounika" <Mounika.Botcha@amd.com>, Olivia Mackall <olivia@selenic.com>,
+	"Simek, Michal" <michal.simek@amd.com>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "Savitala, Sarat Chand"
+	<sarat.chand.savitala@amd.com>, "Dhanawade, Mohan" <mohan.dhanawade@amd.com>
+Subject: RE: [PATCH 0/4] Xilinx TRNG fix and simplification
+Thread-Topic: [PATCH 0/4] Xilinx TRNG fix and simplification
+Thread-Index: AQHc8TLoUsF1hl40KkacAzPG2NSr+7Y4t2RA
+Date: Thu, 11 Jun 2026 02:52:56 +0000
+Message-ID:
+ <DS7PR12MB9549D4679D5011B6B25FEA0C971B2@DS7PR12MB9549.namprd12.prod.outlook.com>
+References: <20260531191738.55843-1-ebiggers@kernel.org>
+In-Reply-To: <20260531191738.55843-1-ebiggers@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_198e8dea-a4f3-4850-b16a-fd6d2b1302b4_Enabled=True;MSIP_Label_198e8dea-a4f3-4850-b16a-fd6d2b1302b4_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;MSIP_Label_198e8dea-a4f3-4850-b16a-fd6d2b1302b4_SetDate=2026-06-11T02:49:17.0000000Z;MSIP_Label_198e8dea-a4f3-4850-b16a-fd6d2b1302b4_Name=AMD
+ General
+ v26;MSIP_Label_198e8dea-a4f3-4850-b16a-fd6d2b1302b4_ContentBits=3;MSIP_Label_198e8dea-a4f3-4850-b16a-fd6d2b1302b4_Method=Standard
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS7PR12MB9549:EE_|SN7PR12MB8602:EE_
+x-ms-office365-filtering-correlation-id: b3d3e020-7b35-4fda-2ebc-08dec7648a35
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|23010399003|376014|366016|38070700021|18002099003|22082099003|56012099006|11063799006;
+x-microsoft-antispam-message-info:
+ du1buuNCfRO2ehXdeAb5XCzlarjXh3yEnpWC4o9CQ9Cixk3yXeOroKpDOmWk1ROLMMB97VVgUBgMx6wBA4HWNugqYsd1krgpYbNQNu7GYbb5JUuD8AXds9vwK1D44j6kh8gTF6bUv0HQ8t3DiuOrMHyntjKiW4DTpJ200i4tLwg8MMgiLB5hgngLaE4oYYxbXNs7QH20wt4lxa69m94RMOWcKktE2jD86BptGWCPm/HYSKk9LcV/sOxSVyL+NLVmuoPUdk3L75fcetqArLKLD6fyBDSkUjstkfmZrL/i4QVlNinIRZAbg+8+6F/Wd5pDiGbldLGWthlBmXT0H/MB3bYALQvtOgk5/QDyPLtYMaZx0pE+yuwLWI0b9XYSkOwOyxdqGaIJYdKvXDKAM3g3+nMGZ2c4/ea44XzxWLrFVI2fGIf9MpQ+C3XTMOVjsZzl/tt5mjpQs5vlNDPhxuLbsWH7aPNS4QRD26V4sOtko9cf8OKMsUDjYXS+tZNwcYEnqbIH1TxUCSEUxZ9QK7kEkEhg0y7VpOGrI/cT4zRHvvesx62C47WBB9SATwKHnMFZoSMyQMlx3a/Au9GfOoD3Qkd+kDvUoY/Z8qf2SNVihVlivD09r1kFa+gW7IO/0qVg4/id4aROGthyF12T/e79D2r4apTSJdVvUaFSwPAebDgV4h0vietWJj2DtmdFNkKPkStE/v/kN9WWMop6t4KLLxPsMh/fexqvvO2zM+6kM7AtRoZ8/YhlMz7Cm076oLi6
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB9549.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(23010399003)(376014)(366016)(38070700021)(18002099003)(22082099003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?iwN+npcK58zEOleWerCO9BRZ67GRRYv+Pr/WNrOItUsWr+BmhC7Q55Uz/Pk1?=
+ =?us-ascii?Q?CU4sifzIJ917sJAwL7/ZuKOkIkUb+wjDLTM0/z3Ph1lIZz6lKI1Oq+H1My+3?=
+ =?us-ascii?Q?LJTOz5xbQnexHIp0H4OtUXAKOcnG/DwUy2aCfS0vZynsKHTcViSTKPBJSPpX?=
+ =?us-ascii?Q?nyUSP5oA0Pu0IHtPAlaEYrEM+4YbuOkhk8IffwIdI4jk5ESV/ALUg7dygarG?=
+ =?us-ascii?Q?hdvN/Z9j81MSTiUPQYs4pQPS94Kq/vMIfvpXyNw3FPxSuiVqg3/evyWisEYK?=
+ =?us-ascii?Q?/xubg6ivnPZKzW86LOQiCDsL7A90HKBC1q/OnpPAZu3ya0JgFIXzF1EM+XiA?=
+ =?us-ascii?Q?SxASvZK+JyfhG6P6wf7sjAeNhSvbx9QPqoSiuP1WJmBs+Mx7vbxjk6xF8FwO?=
+ =?us-ascii?Q?mSR1gxnwkjbxFPAelvpCMDp5nzJ3/OlfHRpjCzxASS1J/xHo8FuiG4viiaNO?=
+ =?us-ascii?Q?tm5KaCBZSmwJN7DMuxVG6InbFAo+TBUp5T/FrWEG+8Z5k/2RQzMCuSeCSKkO?=
+ =?us-ascii?Q?b+QWP4kcUh+QXtBmr3VeEGvbgPOktgJIXp9lSF09ip/vtiwwgD4kiI98PqzS?=
+ =?us-ascii?Q?pxPBbNj1LoreJpCPpa2KMHKCMzH+/owZ0RDZWRiH2psdKdlAhQbGZCO1LlWW?=
+ =?us-ascii?Q?JuwtUSQkXZ1Ns/DWvwTUA5J7SbmU2x+CwptiE/J9I2qejX3TVsuyO4CGSyt2?=
+ =?us-ascii?Q?DwaZYai6MpNr7BPyyDb3/xRPF2U366kGZTDb54FR3V7dP/kwFndIYaMlVKGr?=
+ =?us-ascii?Q?e+CjuFJu2CpH6tEUVI1tjwXqK6mDnLC7anZ+tCJ/sUr1kpXdxGGr2kfmzAxh?=
+ =?us-ascii?Q?Z5g/7oojRtNiHMrwwVxjJi/ZupwtYzksCbBmjbrNJrxIpNoo53J4BdfVa/W6?=
+ =?us-ascii?Q?YzXr9syNWahEkE51T9arlLPswwst6NVErpYJtUcfUU6V1SXZ3Q6OHFqB8DLg?=
+ =?us-ascii?Q?7zxZZivVvk73WvTJLKVf0MU4kQw+i30td26VLNI0u5oNOrNGRcX837dfgBw9?=
+ =?us-ascii?Q?xPgZTGavxuxPN7XmPR+htIAF56TjrV3hX39+tw44vVhm0Jn5d9bqRUf9zDDU?=
+ =?us-ascii?Q?WN1OhnzBRdVKIjsuDsF5KCKu0KV+60j2gc2iroglXOdFWRk9AT27KYD+9Pq+?=
+ =?us-ascii?Q?ka/URnX0RvN9pJl5NdqWB3Gi+9FNBdj5jms1VVFqlrEh0/E+/g64q2p+NVPA?=
+ =?us-ascii?Q?QyFxOeQx81Nz3m3DixEr/dIn2cW4ipbI2eMQN1gAQ1hkGsvCu9lEI4xa2Kjj?=
+ =?us-ascii?Q?EXivC8WnXjHjFr3zXRu7bKuzEO85Yg4KMlLO69yvvSXren+iqnrntVVqbKAA?=
+ =?us-ascii?Q?VX2T7kwTHuXv8mgmMnbCBoG+xAM/ztqXcriskZGBvtECV7yW3cnfdAiN98CO?=
+ =?us-ascii?Q?+h8WMJ8gp/Ni6nxJf7cNW6WDEOXeBWWVWbzVykd5cJrqX1bidujQxdX/kgY5?=
+ =?us-ascii?Q?uRShPMHu3pw0rbMm5sx3pd0W8PWOpaFgjpsDNpGyFPDtF+/KZTw3ZY584K+V?=
+ =?us-ascii?Q?N+wU4JqrRPkNv+v3MWqCnxkZWYQ5BAKaXWViA9eEMpqSLDzIFavCggsgXiZv?=
+ =?us-ascii?Q?zvJVBDWCs0neLhRIlSiTfz/XozRWzij6bHSqOuepVcqE/cFCIcWRhnjBZeWi?=
+ =?us-ascii?Q?smMIbxmojqzTVz7mNZtoEACvbGx8jEOm1NbQ47yR54VVwtsCQhgBuIayv1Hh?=
+ =?us-ascii?Q?WhUXSwxx6/1r0GLCAoncueT/AlFgCGEn7shX8f9GnOeLL1lf?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fm43bx7min3olvz4ok46emxvyvbczw4weq5dkwitzwmq6h4jzg@a56b3irxynks>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB9549.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b3d3e020-7b35-4fda-2ebc-08dec7648a35
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Jun 2026 02:52:56.2534
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: btIYMoMd9zPP0xrriejz8lk40jzVuxDM4W6yWtOMdgpGtEZyjaank4WLbg6rviXb
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB8602
 
-Hi Daniel,
+AMD General
 
-Sorry for taking long to get back to you, I've been on vacation for a
-while.
+Acked-by: Harsh Jain <h.jain@amd.com>
 
-> It would also be helpful to hear about what your use case is.
-
-I'll put this one first, as it probably informs my thinking quite a bit.
-My use case is accessing hash functions from the networking bpf hooks,
-mostly XDP and tc. I'm less interested in the cryptographic hash
-functions (although I think we should support them as well), but
-checksums like CRC32c which have efficient implementations in the kernel
-and are not straightforward to implement in bpf.
-
-> > Taking an initial look at your hashing patches, I'm wondering: the usual
-> > interface to hash/digest algorithms is to have three functions: an
-> > init() function to set up state
+> -----Original Message-----
+> From: Eric Biggers <ebiggers@kernel.org>
+> Sent: Monday, June 1, 2026 12:48 AM
+> To: linux-crypto@vger.kernel.org; Herbert Xu <herbert@gondor.apana.org.au=
 >
-> Doesn't bpf_crypto_ctx_create already provide the initialization? I was
-> trying to make that pattern work by adding the bpf_crypto_type_id to
-> make the code a little more maintainable.
-
-No, bpf_crypto_ctx_create() doesn't do the initialization I was
-referring to, it only creates the tfm that is later used to do the
-hashing. The actual init() of the hash function happens inside
-crypto_shash_digest(). More details at the end of my reply.
-
-> > an update() function that can be called  multiple times to hash new
-> > bytes, and a finalize() function that creates the actual hash.
-> > Depending on the algorithm, some of them (esp.  finalize) may be
-> > no-ops. Often, a fourth function, like hash(), is provided
+> Cc: linux-kernel@vger.kernel.org; Botcha, Mounika <Mounika.Botcha@amd.com=
+>;
+> Jain, Harsh (AECG-SSW) <h.jain@amd.com>; Olivia Mackall
+> <olivia@selenic.com>; Simek, Michal <michal.simek@amd.com>; linux-arm-
+> kernel@lists.infradead.org; Eric Biggers <ebiggers@kernel.org>
+> Subject: [PATCH 0/4] Xilinx TRNG fix and simplification
 >
-> I think the bpf_crypto_encrypt should cover that along with the
-> bpf_crypto_hash in the first patch.
-
-Not sure if I understand you correctly, bpf_crypto_encrypt() shouldn't
-be callable for a hashing crypto context at all?
-
-> > I think we should provide the same init/update/finalize interface in bpf
-> > as well to make the API more flexible. That would require splitting out
-> > the shash_desc from the (mostly static) context. But doing so would also
-> > address the review comment from bpf-ci bot to patch 1. WDYT?
 >
-> I was trying to make things work with the existing bpf_crypto_ctx
-> lifecycle. IIRC in the V1/V2 of the series there was a separate struct
-> but it was suggested to integrate the changes into bpf_crypto_ctx.
-
-Yes, I see that the idea is to integrate into the existing life cycle
-and I appreciate that! But IIUC, they are subtly different at the
-moment.  Just to be sure, the idea of your first two patches is to
-provide an interface to shash that supports the do-all-at-once function
-hash()/digest() (i.e., internally do init+update+finalize), pretty much
-the equivalent of the existing encrypt() + decrypt() interface to
-skcipher, right? I.e. not supporting each and every use case for now but
-just the case where all data is available and we want to hash/encrypt/
-decrypt in one go?
-
-With that assumption, the current implementation for skcipher looks like
-this: we have bpf_crypto_ctx_create(). It sets up a bpf_crypto_ctx with
-the chosen algorithm, the right key, etc. It must be called from a
-sleepable bpf program because it may require to load the kernel module
-with the requested algorithm. The prepared bpf_crypto_ctx can be stored
-in a map so it can be used from other (non-sleepable) bpf programs,
-e.g., XDP programs.
-
-When the bpf_crypto_ctx is used with encrypt()/decrypt(), both functions
-have the siv argument. It's a dynptr to some memory, containing the IV
-for algorithms that need it, but also has room for the *state* if the
-algorithm needs it. This means, the state is provided (fresh) for each
-invocation of encrypt/decrypt.
-
-Your proposed implementation for shash, bpf_crypto_ctx_create() calls
-bpf_crypto_shash_alloc_tfm() which creates the tfm (just as above, needs
-to be in a sleepable bpf program to potentially load modules), but it
-also allocates the shash_desc which has room for some algorithm state if
-needed. This mixes the static, long-living, reusable tfm with the
-per-invocation shash_desc. shash is safe to use with the same tfm
-concurrently exactly because the state is stored in the shash_desc,
-which must not be used concurrently. Think of the shash_desc to be the
-equivalent of the siv for skcipher.
-
-Therefore, I think the memory for shash_desc.__ctx should come from a
-dynptr as well. Do you agree or did I miss something?
-
-Btw, your bpf_crypto_shash_alloc_tfm() never sets shash_desc.__ctx, so
-that's a bug anyways.
-
-> Regarding the bpf-ci bot I think it's somewhat valid, but you could
-> solve that by putting the bpf_crypto_ctx in a per CPU map or protecting
-> it with a bpf spinlock.
-
-Two things for that: for networking use cases, needing a lock because of
-implementation details doesn't sound very intriguing. Plus, if per-cpu
-or a lock are required, that's currently not enforced. This means an
-invalid/unsafe bpf program could pass the verifier, right?
-
-> If you want to give it a go feel free.
-
-If you're still interested in pursuing this, please go ahead with your
-work, I don't want to take it from you. Only if you're explicitly not
-interested anymore, I'll go ahead and try to build something on top of
-you work. Just let me know :)
-
-Thanks,
-   Felix
+>
+> This series fixes and greatly simplifies the Xilinx TRNG driver by:
+>
+> - Removing the gratuitous crypto_rng interface, leaving just hwrng which
+>   is the one that actually matters.
+>
+> - Replacing the really complicated AES based entropy extraction
+>   algorithm with a much simpler one.
+>
+> Note that this mirrors similar changes in other drivers.
+>
+> Eric Biggers (4):
+>   crypto: xilinx-trng - Remove crypto_rng interface
+>   crypto: xilinx-trng - Fix return value of xtrng_hwrng_trng_read()
+>   crypto: xilinx-trng - Replace crypto_drbg_ctr_df() with HMAC-SHA512
+>   hwrng: xilinx - Move xilinx-rng into drivers/char/hw_random/
+>
+>  MAINTAINERS                                   |   2 +-
+>  arch/arm64/configs/defconfig                  |   2 +-
+>  crypto/Kconfig                                |   5 -
+>  crypto/Makefile                               |   2 -
+>  crypto/df_sp80090a.c                          | 222 ------------------
+>  drivers/char/hw_random/Kconfig                |  11 +
+>  drivers/char/hw_random/Makefile               |   1 +
+>  .../xilinx =3D> char/hw_random}/xilinx-trng.c   | 134 ++---------
+>  drivers/crypto/Kconfig                        |  13 -
+>  drivers/crypto/xilinx/Makefile                |   1 -
+>  include/crypto/df_sp80090a.h                  |  53 -----
+>  11 files changed, 37 insertions(+), 409 deletions(-)
+>  delete mode 100644 crypto/df_sp80090a.c
+>  rename drivers/{crypto/xilinx =3D> char/hw_random}/xilinx-trng.c (75%)
+>  delete mode 100644 include/crypto/df_sp80090a.h
+>
+>
+> base-commit: 5624ea54f3ba5c83d2e5503411a31a8be0278c1e
+> prerequisite-patch-id: 07e982b663ac3f8312ca524f6b91b5b38661df5e
+> prerequisite-patch-id: 72064361a8f36e015ab0b7e1fa4d364b40d90506
+> prerequisite-patch-id: 8978b8e0db7f47935e5f6f0aff14a97f55d3073c
+> prerequisite-patch-id: 6aa0e3e93a008279d71e535a3d0cf48643f55e19
+> --
+> 2.54.0
 
