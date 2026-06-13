@@ -1,77 +1,74 @@
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-dl1-f68.google.com (mail-dl1-f68.google.com [74.125.82.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C476D3368AB
-	for <linux-crypto@vger.kernel.org>; Sat, 13 Jun 2026 20:20:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA6E26E71E
+	for <linux-crypto@vger.kernel.org>; Sat, 13 Jun 2026 22:36:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781382044; cv=none; b=bHmv05B06MdwXltrCOX4uuIZuHfXVR5tx6Bo1fvWbvfS5Kd6YgmiUFa/RxwXOPPicQ+43pyoxXTZ+GsEIaD6xh+rbdnsp47/P1hotO2ErQjALDS27pZQtK8YDGqNQTJRmdDJEhJXBfpQhJFV1wLotiFHKwF6vv4w9MJ4omLnFaM=
+	t=1781390216; cv=none; b=HLSBX3ugirM6ZWmH248DA6zwo/BEQg5ok2r17hXFhKjRMYYuxcMdL+Ulcq7s0DZxv46XyKqP9fJjsb804yFTAP/hgF8ho/q3OEUaD6zlXgQY5b26s+lD9zTAA3B9tHHiHJMhxJwXkfxGaJKZVH2VogJErTYVRNcayxRBnFLnZKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781382044; c=relaxed/simple;
-	bh=JD4sU/lh6bgl+zrfoe9EhQV49WX5ddYjmerl7XCgF7s=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CbyqMJ5jHRaxVHwRdCrmrWyeSMYkhB7LW/xQXgSyUPVjlu7q4U25xGbwM8TyybQnOVwYrewILJap/BRWLej7LTWrLuobCSJITocH3dGYznG0Z64EWAY7NrosmuwZJ7Ue8M9WkE0TRJTaEpiNXc1nybEHW0aTAyRnyfJAiykj2Ag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WXv7+H2x; arc=none smtp.client-ip=209.85.128.41
+	s=arc-20240116; t=1781390216; c=relaxed/simple;
+	bh=h+tI3stwiGTxgkfAJhfASTTw8PeWJ3Lj02d/Ek3YFYE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BX79T4zomi3AjOD97oCmhvYtPAKl/FDKowPB+rpBCcUKn3Nj/u7u5j3ANN1ukryPNjSgy8UwsOunSu0xWOs70ui9mo5ROlsWzI/RlAG04LUV4wD3CbuxGQXtio24SLD4yNrqrfTAUq/SI0IJe1SRBG0F5gQxwJNGdx1hU0qaxwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bcjYPqMx; arc=none smtp.client-ip=74.125.82.68
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WXv7+H2x"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-490c28f84fdso4690275e9.0
-        for <linux-crypto@vger.kernel.org>; Sat, 13 Jun 2026 13:20:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bcjYPqMx"
+Received: by mail-dl1-f68.google.com with SMTP id a92af1059eb24-13810b63a1aso5078142c88.1
+        for <linux-crypto@vger.kernel.org>; Sat, 13 Jun 2026 15:36:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781382041; x=1781986841; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1781390215; x=1781995015; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=2h1pIz+Y3QiNp1EUEItf+otEd0xBBWZpK67JdzPkqGk=;
-        b=WXv7+H2xUp5AOy4rRyoj5eolCH6ZrUcLW404Zfdu6suHU/t4EYIGjcGwAlG6y7/U5v
-         UQ0uxbtV7O7o3r2cOYxx0sFsvhJro84Ao1P6OwP0CObbJ+rBhtDwsihLE1vCghoa07e8
-         Ef4K5cx1A/S6QTGruTz1qsYTzKIOIfihC5pfCunfJDmTuvuvPFM93cbGw3TYlKf2Wqq1
-         sMHALE+zvF5dXzxU6cMSCWbA7WvzVGeyUgnwaAd6xMWFn8dxfBoaLkt5UojWHNRF/ldz
-         hV09KtvL8i9mV0/kdfakYMC+Ug6k4kHMWqubNbbcuP1E5NnV/pTYsjoYe6tcjIxKadWu
-         x60A==
+        bh=XiDlOMwIBEzJgDCkrbGsmaIjHNUQPh0ynYvlELyCcHQ=;
+        b=bcjYPqMxhp+FV/Htkto+EIASNLl02zQ3r1rMX6J6zcs/Y5MEZqwaUI0SWzwLSgWPfv
+         jFtHPxCBP1e8ZxUgeEz2NySE6KigpuYQFqMzMxJyHcXhtTjqDxHrjIvOJLzTxV2afKF+
+         qr1naiJCz+M4lbRwKcTrgU2d02RM+qww0ie4J35kRN3WhDeHL/c11snwF+MH7ta6HCxC
+         nMJuHPADwjAQ0U4wlDvMif1reitbuMvcgUugXXkJBfqQ3NQ36uHtAuqEFFzK5Dp70Hgr
+         ZB87j72loFPDEtoVXv7zIOHHMaQsngJjvcTLJpVvBCA29/qachtJSaCHPqzCIzpaE06J
+         wqAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781382041; x=1781986841;
+        d=1e100.net; s=20251104; t=1781390215; x=1781995015;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2h1pIz+Y3QiNp1EUEItf+otEd0xBBWZpK67JdzPkqGk=;
-        b=NVUSMD4O5wdFdVUS5Q4fu1XTgiebgDPFtBAlY33P43B83FkuuBbgDqJr8JoLOmmE+K
-         uJtca/gFRMIVQJQdIjWDjorgZ+rPUsx7+IBxhHozeE4kOUdlOc5khIDZe+gDBKRhEwxi
-         uhC4aYsdavo2j4UE7oyATrMaNXiJRCfXQ4OSe1Xpf10l2nLvfncBxMzAclUi39uMLgge
-         nIm1FxzyWbIM84FhCi2gTW+eSBKi+vkKrjqEzJZeoQf6ibERXryCViLD2eL5MmXDplYD
-         Tj9KzfLpNwyVe0I+py4kBjL6kevNPruZ9E2KZsyq8FLsSrJhLsghWCzJZntrGumuV5X3
-         C+HA==
-X-Gm-Message-State: AOJu0YxZ1ATwKGbpF570Ey652q5wOXWZIuphyNElUGHQ6yJXk5AbFskd
-	16tHmfIaoIjaoeAlPjZDqv64gLV7D+SYehkUt4yC+faCTGWw2qCboRwv
-X-Gm-Gg: Acq92OF76A/xc3K0jfA+pHFVqvcf6W3NDiTQRgNn/hB1AQRwGne1Iv6rDUFoRjh/wo8
-	rGeuSKDUAF1N1SRu4+zLkJAn1e52oBmjF076yC8xLvVrE5WSjUL93lV6DpFpQNBTGqOQlcoh7Bh
-	n7BHNmT6Gl66eKEQFOZF5XMyAGByi43aAIVL0VB92f7+9GBZLJMa+4itEz/dwsiH9rzGAFLaYAm
-	O3urjqbkx9bcAHlXeQSWec80sGJm394pjQhCZE2sMaMBh1muRNFsjFlyhDfmYvueHZ9zFOmwYao
-	FKuhNgzE0FSfU1jMwivopBmone1vvoKbwR5AjCLahxCQKBms026MeJf2LLfXHcs5XxMVzfaRUPQ
-	yfoLj+H8UGB91pvG5P+ZcMe7E9xNfW62CntsWXiKALnXvbwglDQB72Nd7o0BgP876s45qvPQjg8
-	izFbKhWiCmcHZGdsO3t5qXqblHbJVfOd9TqYhwAt4Cr21sNrL99uZ8tZDUs5Cf2NY=
-X-Received: by 2002:a05:600c:3492:b0:490:b2b2:87d2 with SMTP id 5b1f17b1804b1-490ec50492dmr42515025e9.5.1781382041044;
-        Sat, 13 Jun 2026 13:20:41 -0700 (PDT)
-Received: from menon.v.cablecom.net (84-74-0-139.dclient.hispeed.ch. [84.74.0.139])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-492203c0801sm90785635e9.10.2026.06.13.13.20.39
+        bh=XiDlOMwIBEzJgDCkrbGsmaIjHNUQPh0ynYvlELyCcHQ=;
+        b=F1d1SDqcQBL25Ym7GONvk1rP8OR9U45mTcKcFaaFvpb7VuXxIMyIymRnB5coz9ni5X
+         p7dJhdrKLHnjURKno97cLZYPCxFwuQ58j3UtNPhbRbCTGUEv5X4eZnX31/NzC6uP4kZ1
+         EmvjprCwcl+FDqBo9xyW2TauAIU1U2btnom1Zqne6oc6mflvMvmJyyHf7EdKyPd+Nguw
+         61vlJJwyO0IXG6tVLAS/UjCFUzYhUTqTCxoq3rVqrZT8YdUpq8FX2rmZwSKbOGTImQAR
+         mvIMf/iTy8W6SiulV8xAjGkfBDRYkjOm3rq4ZDhZBCtgeM1IwT8E6h9oIPmAuF12aViA
+         ZSQw==
+X-Gm-Message-State: AOJu0YwGl+JzzXlxtuKsWMhp3bcU02DtkYpEZbjwvCVn2tpLSI+nbjF0
+	LatOsCrz53fhWWrU3vYU39YTG5JMbGNWHKlgUvz2X1uBD0Oq222CcptkJKNbTCiF
+X-Gm-Gg: Acq92OEdKf3jLWDUrskrgc+Y1MXy3nBQmq3Ky/fPoJpJFf67V3q1adxP6vDN0fGKyV0
+	R5DSf3m3lvqju0/Jan2V9k4orQ7gQy/mx+hbknBvDkWsJsCv9/1uAtamGYkgy8n4kIE9Tz5TY+5
+	wdHd0Gx40hPfdQ7VZ58XxilrfhQsvUtCNV9wzw8en9GNmaXszpsnUg0UbRJMA7htT0te+tQj8wg
+	2fudgoDIFkkVWPD5btBF8afP0FyqOm47EFm2OfErC2zXlY/bSv6ekgR3Tz8esi4z+vI628VjWvi
+	eRK62nfRuo3TbD16eqDBDtbV50Y8jO4lAt+o1s3JE/rxIm0zbOJdEdWLySYhP/l94r2XwV+ofvN
+	SsDXMs0gLhYehM4wvZhoAUBR7ZAOW2VbJVCSvjTEM7A58vllLn8U2oXHTPaMPeVHDrYFOugnJuQ
+	F1xD4dYsf3vy0TkCP9eQzOUr5ok4lvoXpxji2AQHh1KiwIRRGyQ5/roA/rPaA1i4gpMXL/3/Wg4
+	2gYn2IR2OGr+F1LfJYrVy3cq3Gr1+kbk/BUNs5VY9msrHKR+qMhatSBD7ae+FSku1RWGyAriXfg
+	nIRzWgU8dAAKzMNhpnWmxzYR02Zx
+X-Received: by 2002:a05:7300:6d22:b0:304:e2a5:689e with SMTP id 5a478bee46e88-3081ff40814mr4819684eec.2.1781390214752;
+        Sat, 13 Jun 2026 15:36:54 -0700 (PDT)
+Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3081eb95450sm11091739eec.28.2026.06.13.15.36.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 13 Jun 2026 13:20:40 -0700 (PDT)
-From: Lothar Rubusch <l.rubusch@gmail.com>
-To: thorsten.blum@linux.dev,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	nicolas.ferre@microchip.com,
-	alexandre.belloni@bootlin.com,
-	claudiu.beznea@tuxon.dev,
-	ardb@kernel.org,
-	krzk+dt@kernel.org
-Cc: linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	l.rubusch@gmail.com
-Subject: [PATCH v3 1/1] crypto: atmel-sha204a - fix heap info leak on I2C transfer failure
-Date: Sat, 13 Jun 2026 20:20:37 +0000
-Message-Id: <20260613202037.47744-1-l.rubusch@gmail.com>
-X-Mailer: git-send-email 2.39.5
+        Sat, 13 Jun 2026 15:36:54 -0700 (PDT)
+From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+To: linux-crypto@vger.kernel.org,
+	linux-samsung-soc@vger.kernel.org
+Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Vladimir Zapolskiy <vz@mleia.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: [PATCH] crypto: s5p-sss - correct CONFIG_CRYPTO_DEV_EXYNOS_RNG macro name in comment
+Date: Sat, 13 Jun 2026 15:36:47 -0700
+Message-ID: <20260613223648.119694-1-enelsonmoore@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -80,64 +77,32 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The nonblocking RNG path allocates a work_data structure to track the
-state of an in-flight asynchronous I2C request. This pointer is stored
-in rng->priv and later consumed by the read path once the transaction
-completes.
+A comment in drivers/crypto/s5p-sss.c incorrectly refers to
+CONFIG_EXYNOS_RNG instead of CONFIG_CRYPTO_DEV_EXYNOS_RNG. Correct it.
 
-If the underlying I2C transfer fails, the completion callback is invoked
-with a non-zero status. In this case, the allocated work_data is not
-usable for producing RNG output and must not remain associated with the
-hwrng state.
+Discovered while searching for CONFIG_* symbols referenced in code but
+not defined in any Kconfig file.
 
-Previously, the failure path only logged a warning but left the pointer
-state uncleared, which can result in subsequent read attempts observing
-stale state and interpreting it as valid completion data.
-
-Fix this by freeing the pending work_data. The I2C transaction reports
-an error. This ensures that failed requests do not leave residual state
-behind that could be interpreted as valid RNG data on later reads.
-Clearing rng->priv is done at the subsequent call to nonblocking read.
-
-Fixes: da001fb651b0 ("crypto: atmel-i2c - add support for SHA204A random number generator")
-Signed-off-by: Lothar Rubusch <l.rubusch@gmail.com>
-Assisted-by: Gemini:1.5 Pro [google]
-Reviewed-by: Thorsten Blum <thorsten.blum@linux.dev>
+Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
 ---
-v2 -> v3:
-- remove existing error-path cleanup behavior [`rng->priv = 0;`],
-  update commit msg
-- rebased
+ drivers/crypto/s5p-sss.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-v1 -> v2:
-- reword commit message for clarity and precision
-- keep existing error-path cleanup behavior unchanged, update commit msg
-
- drivers/crypto/atmel-sha204a.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha204a.c
-index 4c9af737b33a..5eb76245347d 100644
---- a/drivers/crypto/atmel-sha204a.c
-+++ b/drivers/crypto/atmel-sha204a.c
-@@ -31,10 +31,14 @@ static void atmel_sha204a_rng_done(struct atmel_i2c_work_data *work_data,
- 	struct atmel_i2c_client_priv *i2c_priv = work_data->ctx;
- 	struct hwrng *rng = areq;
+diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
+index bdda7b39af85..9bb1b1661174 100644
+--- a/drivers/crypto/s5p-sss.c
++++ b/drivers/crypto/s5p-sss.c
+@@ -2151,8 +2151,8 @@ static int s5p_aes_probe(struct platform_device *pdev)
  
--	if (status)
-+	if (status) {
- 		dev_warn_ratelimited(&i2c_priv->client->dev,
- 				     "i2c transaction failed (%d)\n",
- 				     status);
-+		kfree(work_data);
-+		atomic_dec(&i2c_priv->tfm_count);
-+		return;
-+	}
- 
- 	rng->priv = (unsigned long)work_data;
- 	atomic_dec(&i2c_priv->tfm_count);
-
-base-commit: 6ea0ce3a19f9c37a014099e2b0a46b27fa164564
+ 	/*
+ 	 * Note: HASH and PRNG uses the same registers in secss, avoid
+-	 * overwrite each other. This will drop HASH when CONFIG_EXYNOS_RNG
+-	 * is enabled in config. We need larger size for HASH registers in
++	 * overwrite each other. This will drop HASH when CONFIG_CRYPTO_DEV_EXYNOS_RNG
++	 * is enabled. We need larger size for HASH registers in
+ 	 * secss, current describe only AES/DES
+ 	 */
+ 	if (IS_ENABLED(CONFIG_CRYPTO_DEV_EXYNOS_HASH)) {
 -- 
-2.53.0
+2.43.0
 
