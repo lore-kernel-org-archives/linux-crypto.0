@@ -1,41 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 340AB126BF7
-	for <linux-crypto@vger.kernel.org>; Fri, 12 Jun 2026 18:32:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D913B1CAA7D;
+	Sat, 13 Jun 2026 00:28:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781289163; cv=none; b=TanRwVmwvI3qwWpS0TStUogOHRXn5lsZfKfzpjReNuE3obofbDhDlvtQL+fQVgIcBI0wNmkr39UwOQcjhld4kVnspKldu7XPIIhIkxsOVyYBd0jFYwpahDnIz+JiQiwziM22HkQCA3bGFUbjMXorjcf6wsDM6bzHj7V7AsLkgKU=
+	t=1781310512; cv=none; b=MycDd9jeeFlB5vBi53Lkb5XfNBXQ5CcBIFHCrsuWPpyjO/zJY65Qhc05UCu4sZTcfl3cPpskirLc9i/NzaxUMSTgSeWz34KMb0NTarVHeUWaPammDoZET1hXEA+cUMK94BKuCanzneL5ZKWrV3D+GgMlDVbRYkjAxNK+/9AoZKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781289163; c=relaxed/simple;
-	bh=VSY7e6mwHa6GFXqRwywWBp0c8Z69E0AH3wwBN28BN9A=;
+	s=arc-20240116; t=1781310512; c=relaxed/simple;
+	bh=4mkdEs9CJvL84x884hlKLkdz7Llip4y5CJsViZZvkHs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uoTNuytaXlOUo/aiWNYxRvjvwjvdMwJL4CQDIH/bY9R8EN4pFN5pJ2DY33qu6xZsENST/oV7+bSnbRJsXo2BGmnFLNmR3zG734u6ohCDpGDLzxvujf/7k7JRZToKKpfc5tcrqpwn/dta7Kc6JGZKk8wOTqc18LXznPkWrlC8R1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M9XZ8zzm; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=ix2xtg4KkJh/qzZjs7qr5wm2hzrdx0bsrKb1ZtZEuAFIq9DAvqqGB8zRtQx/0EdCjG/x5UmwrMWFLl/XmbNLZdZZZYS0ph0gmVyWAAHBvBORoNgTdgc2AseC4yHo7DGk1K9jC6tE63gB/BM2zMrrR+obn4M01Tov5D7wVaTHdXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gxb/I1Ll; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M9XZ8zzm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA3D71F000E9;
-	Fri, 12 Jun 2026 18:32:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gxb/I1Ll"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42D501F000E9;
+	Sat, 13 Jun 2026 00:28:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781289161;
-	bh=mvcWInPHA/zbkgvk0Rse/vKMKr/qBbd26eIrz/w4RAI=;
+	s=k20260515; t=1781310510;
+	bh=E88nDX0LboKcZOB9sj63LdgOK/q2xivkASqKKo2Tno8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=M9XZ8zzmH4wxkbj0uu06SkK+n7aR6PwXGxg9CEUr5at5QCq495zLCd2RQtWSZ74Na
-	 MZqN1AAf7whMNwE6+31thAL3r9mtqhnX8O+j+l0yuzfx+ML5SFHDT6SFpPQBV2ff8N
-	 jKPb1HSPKUNBmOTfkpOS+tAa6ZPIE9UXuJ6hNUSl8ClMtSmpgfXlnbhiPCAiFsiPq5
-	 DbO85RZG/PO2yeLxmVL+pPBLRpqJmhSkU+ggDmsUTRhGA7fyDambnpHWuKJKcbp0Qo
-	 wMWdgPH1t/MAIwJMkwAm91F68v/00Ga2WHCoTPV/gGF3J05mgFBADMsdI4MWJ1N9tP
-	 dw/K2TrHocqCg==
-Date: Fri, 12 Jun 2026 18:32:40 +0000
+	b=Gxb/I1Llu4Dv818cVfWaaOmRyp8ABFk3kg6obmwxzcU5yksljNNN2o/7tibnjHWBo
+	 26lX9O0sBPjw5/ym9jdEcZkk2MW1055RSWA6tQAnvr/122kvdIMWpkn2CY/4ZnxGyf
+	 P9KE2FkuiFeWn4gE1q+UMQzVd78Pcp6bwvVZQrjTVXRzeN4nklBxKM85JWhWyPAhmr
+	 zDXTK+wz5TCv8G1gla/peiHXIfk0XrXsKSd8ipxzBZD7vCf536l6RIurY5U2IJRZx0
+	 Bhj9h8D1pFNRf43z6L2rTVDFeoKAYK92mHGydNYzo0SDKwekJN4ChL5HSmt23mglfH
+	 uYCAfj8VG73cQ==
+Date: Fri, 12 Jun 2026 17:27:04 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: kstzavertaylo <kstzavertaylo@gmail.com>
-Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
-Subject: Re: [RFC] ML-KEM (FIPS 203) implementation with reusable
- decapsulation pool
-Message-ID: <20260612183240.GA2157807@google.com>
-References: <CAMho2RfgwvNhWJidb_Xn3RRt71TFjQ2QBKP9Xt8ur22L-ZWP9A@mail.gmail.com>
- <20260609192542.GA3811606@google.com>
- <CAMho2Rem-B908oaFQzTx8Mg895LuvPcfN9+ANoHW+XfGW+wB6A@mail.gmail.com>
+To: David Laight <david.laight.linux@gmail.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	x86@kernel.org, Andrea Mazzoleni <amadvance@gmail.com>
+Subject: Re: [PATCH] lib/raid/xor: x86: Add AVX-512 optimized xor_gen()
+Message-ID: <20260613002704.GA11922@sol>
+References: <20260612044034.117442-1-ebiggers@kernel.org>
+ <20260612052247.GA8848@lst.de>
+ <20260612100432.1f1c8c7a@pumpkin>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -44,70 +46,213 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAMho2Rem-B908oaFQzTx8Mg895LuvPcfN9+ANoHW+XfGW+wB6A@mail.gmail.com>
+In-Reply-To: <20260612100432.1f1c8c7a@pumpkin>
 
-On Fri, Jun 12, 2026 at 05:14:54PM +0300, kstzavertaylo wrote:
-> Thank you for the detailed reply and for pointing me to the existing
-> ML-KEM/X-Wing patchset. I spent some time reviewing the implementation
-> to better understand the design choices and how they compare to the
-> approach I took in my own work.
+On Fri, Jun 12, 2026 at 10:04:32AM +0100, David Laight wrote:
+> On Fri, 12 Jun 2026 07:22:47 +0200
+> Christoph Hellwig <hch@lst.de> wrote:
 > 
-> After reviewing the patchset, I can see several strengths in the
-> implementation. It integrates cleanly into the existing lib/crypto
-> infrastructure, reuses kernel cryptographic primitives, avoids large
-> stack allocations, and includes KUnit-based validation. The
-> implementation also appears intentionally compact and well aligned
-> with existing kernel conventions.
+> > On Thu, Jun 11, 2026 at 09:40:34PM -0700, Eric Biggers wrote:
+> > > Add an implementation of xor_gen() using AVX-512.  
+> > 
+> > > Benchmark on AMD Ryzen 9 9950X (Zen 5):  
+> > 
+> > Can you share the benchmark?
+> > 
+> > In my local tree I have ports of the AVX2 and AVX512 implementations
+> > from snapraid (https://github.com/amadvance/snapraid), which in userspace
+> > give really good performance.  On my Laptop with a AMD Ryzen AI 7 PRO 350
+> > (which is a Zen5 with the slower double pumped AVX512 unit), both of
+> > them get over 1GB/s throughput on the snapraid benchmarks.  I've been
+> > holding them back as I don't have a good kernel benchmarking harness,
+> > and it's missing the quirks for old AVX512 or the newer AMD special
+> > cases.
 > 
-> While reviewing the implementation, I noticed that decapsulation
-> allocates a temporary workspace for each operation. This is one of the
-> areas where my design diverged, which is what originally motivated the
-> reusable pool approach.
+> From my experiments on Intel cpu (and I don't remember the zen-5 being
+> that different - but I've done less testing on it) you don't need to
+> unroll loops very much at all.
 > 
-> My implementation was developed with a somewhat different goal in
-> mind. I experimented with a reusable decapsulation workspace model
-> where memory is allocated during key initialization and then reused
-> across subsequent decapsulation operations. The main motivation was
-> reducing allocation frequency and minimizing both stack usage and
-> repeated memory management during decapsulation.
->
-> As a result, the implementation avoids allocations during
-> decapsulation entirely by reusing preallocated workspaces associated
-> with the key context. My original hypothesis was that moving memory
-> allocation to key initialization, thereby eliminating allocations from
-> the decapsulation path, could reduce allocation overhead during
-> repeated decapsulation operations and be beneficial in environments
-> where allocation activity is considered undesirable.
+> A reasonable model seems to be that the uops generated by the instruction
+> decoder get executed when all the prerequisite registers and the required
+> execution unit are available.
+> So for a memory copy (and the xor is basically a copy) the control loop
+> can run way ahead of the read/write instructions.
+> This means you can get the control loop 'for free' and unrolling further
+> makes no/little difference.
+> 
+> Each xor is two memory reads and one memory write.
+> The cpu I was using could only do one write/clock - so you can only do one
+> xor each clock. I think some of the newer ones can to two writes/clock but
+> I'm not sure how many reads/clock they can do - might still be 2, don't
+> think it s 4.
+> So you should be able to get one xor per clock, but I doubt you'll get two
+> (and possibly not even 1.3 - which would require 4 memory accesses per clock).
+> 
+> The best loop construct is the one that uses negative offsets from the
+> end of the buffers, basically:
+> 	buf += len;
+> 	offset = -len;
+> 	do
+> 		f(buf[offset]);
+> 	while (offset += size);
+> that reduces the loop control to just an 'add' and 'jnz' (which can
+> get merged into a single u-op).
+> 
+> The cpu have enough execution units to execute two memory reads,
+> a memory write, an xor the add and jnz every clock.
+> So even the 'rolled up' loop might run at one xor per clock.
+> While I think I got a 'one clock loop' on my zen-5 (testing
+> word-at-a-time strlen) I only managed a two clock loop on the newest
+> Intel cpu I've got (which isn't that new).
+> So put two xor in the loop and it shouldn't be limited by the loop
+> control, but will be limited by the memory accesses instead.
+> 
+> Further unrolling shouldn't help and may make things worse.
+> The Intel cpu have logic to directly forward the result of an
+> ALU instruction into the next few instructions, but after that you can
+> get a stall because of the 'round trip' via the register file.
+> So part way down an unrolled nn(%reg) sequence you can get a stall.
+> An extra 'add $0,%reg' in the middle of the unrolled loop will
+> 'refresh' the register and speed things up.
+> (I hit that with a loop that needed a rather more complicated control
+> structure.)
+> 
+> You definitely need to use the pmc clock counter and data dependencies
+> against the rdpmc instruction to get sensible performance figures.
+> The can reasonably reliably measure down to less than 20 clocks.
 
-In my ML-KEM code, all the decapsulation memory is consolidated into
-struct mlkem_decap_workspace.  It would be straightforward to support
-the caller providing a pre-allocated workspace.
+The version at the end of this email is what you're suggesting, I think.
+On Sapphire Rapids and Ryzen 9 9950X it's about the same speed as mine,
+just a few percent slower on Sapphire with src_cnt == 1.
 
-In the case of X-Wing, we could also support pre-expanding the
-decapsulation key.
+So we could use it.  It's just a bit fragile since it assumes the loop
+overhead and indexed addressing will never be a bottleneck on any
+current or future CPU.  Unrolling by more gives something more robust
+that "just works", without having to analyze whether the loops are okay
+on each CPU model individually based on microarchitectural details.
 
-It just depends on what is actually going to be needed by the kernel
-feature(s) that are going to use this.  Which we don't really know yet.
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * AVX-512 optimized implementation of xor_gen()
+ *
+ * Copyright 2026 Google LLC
+ */
 
-We do know that it hasn't been found to be useful for the crypto
-subsystem to provide pools for any other algorithm in the kernel, for a
-variety of reasons.  Usually callers can just allocate per-operation, or
-they have some sort of object (inode, block device, socket, etc.) that's
-a natural place for them to cache whatever they need anyway.  In the
-rare cases where some sort of pool is needed it's implemented in the
-caller, optimized for the particular use case.  So I think there's a
-good chance your pool idea is going off on the wrong track.
+#include <linux/compiler.h>
+#include <linux/types.h>
+#include <linux/unroll.h>
+#include <asm/fpu/api.h>
+#include "xor_impl.h"
+#include "xor_arch.h"
 
-> Another difference is the integration level. My prototype explored
-> direct integration through the KPP interface, whereas the patchset
-> focuses on providing a reusable cryptographic library component within
-> lib/crypto. These approaches address somewhat different layers of the
-> kernel crypto stack.
+static void xor_avx512_2(long bytes, u8 *p0, const u8 *p1)
+{
+	long i = -bytes; /* Use negative indexing to minimize loop overhead. */
 
-We don't need crypto_kpp support, as it's much more complex and harder
-to use than the crypto library
-(https://docs.kernel.org/crypto/libcrypto.html).  Also it seems it's not
-really possible anyway, since crypto_kpp is an old design that works for
-Diffie-Hellman but not KEMs.
+	p0 += bytes;
+	p1 += bytes;
+	unrolled_none
+	do {
+		/* unroll by 2x to reduce loop overhead */
+		asm volatile("vmovdqa64 (%2,%0), %%zmm0\n"
+			     "vmovdqa64 64(%2,%0), %%zmm1\n"
+			     "vpxorq (%2,%1), %%zmm0, %%zmm0\n"
+			     "vpxorq 64(%2,%1), %%zmm1, %%zmm1\n"
+			     "vmovdqa64 %%zmm0, (%2,%0)\n"
+			     "vmovdqa64 %%zmm1, 64(%2,%0)\n"
+			     :
+			     : "r"(p0), "r"(p1), "r"(i)
+			     : "memory");
+	} while ((i += 128) != 0);
+}
 
-- Eric
+static void xor_avx512_3(long bytes, u8 *p0, const u8 *p1, const u8 *p2)
+{
+	long i = -bytes; /* Use negative indexing to minimize loop overhead. */
+
+	p0 += bytes;
+	p1 += bytes;
+	p2 += bytes;
+	unrolled_none
+	do {
+		/* unroll by 2x to reduce loop overhead */
+		asm volatile("vmovdqa64 (%3,%0), %%zmm0\n"
+			     "vmovdqa64 64(%3,%0), %%zmm1\n"
+			     "vmovdqa64 (%3,%1), %%zmm2\n"
+			     "vmovdqa64 64(%3,%1), %%zmm3\n"
+			     "vpternlogq $0x96, (%3,%2), %%zmm2, %%zmm0\n"
+			     "vpternlogq $0x96, 64(%3,%2), %%zmm3, %%zmm1\n"
+			     "vmovdqa64 %%zmm0, (%3,%0)\n"
+			     "vmovdqa64 %%zmm1, 64(%3,%0)\n"
+			     :
+			     : "r"(p0), "r"(p1), "r"(p2), "r"(i)
+			     : "memory");
+	} while ((i += 128) != 0);
+}
+
+static void xor_avx512_4(long bytes, u8 *p0, const u8 *p1, const u8 *p2,
+			 const u8 *p3)
+{
+	long i = -bytes; /* Use negative indexing to minimize loop overhead. */
+
+	p0 += bytes;
+	p1 += bytes;
+	p2 += bytes;
+	p3 += bytes;
+	unrolled_none
+	do {
+		asm volatile("vmovdqa64 (%4,%0), %%zmm0\n"
+			     "vmovdqa64 (%4,%1), %%zmm1\n"
+			     "vpxorq (%4,%2), %%zmm0, %%zmm0\n"
+			     "vpternlogq $0x96, (%4,%3), %%zmm1, %%zmm0\n"
+			     "vmovdqa64 %%zmm0, (%4,%0)\n"
+			     :
+			     : "r"(p0), "r"(p1), "r"(p2), "r"(p3), "r"(i)
+			     : "memory");
+	} while ((i += 64) != 0);
+}
+
+static void xor_avx512_5(long bytes, u8 *p0, const u8 *p1, const u8 *p2,
+			 const u8 *p3, const u8 *p4)
+{
+	long i = -bytes; /* Use negative indexing to minimize loop overhead. */
+
+	p0 += bytes;
+	p1 += bytes;
+	p2 += bytes;
+	p3 += bytes;
+	p4 += bytes;
+	unrolled_none
+	do {
+		asm volatile("vmovdqa64 (%5,%0), %%zmm0\n"
+			     "vmovdqa64 (%5,%1), %%zmm1\n"
+			     "vpternlogq $0x96, (%5,%2), %%zmm1, %%zmm0\n"
+			     "vmovdqa64 (%5,%3), %%zmm1\n"
+			     "vpternlogq $0x96, (%5,%4), %%zmm1, %%zmm0\n"
+			     "vmovdqa64 %%zmm0, (%5,%0)\n"
+			     :
+			     : "r"(p0), "r"(p1), "r"(p2), "r"(p3), "r"(p4),
+			       "r"(i)
+			     : "memory");
+	} while ((i += 64) != 0);
+}
+
+DO_XOR_BLOCKS(avx512_inner, xor_avx512_2, xor_avx512_3, xor_avx512_4,
+	      xor_avx512_5);
+
+/*
+ * Preconditions: bytes is a nonzero multiple of 512, and all buffers are
+ * 64-byte aligned.
+ */
+static void xor_gen_avx512(void *dest, void **srcs, unsigned int src_cnt,
+			   unsigned int bytes)
+{
+	kernel_fpu_begin();
+	xor_gen_avx512_inner(dest, srcs, src_cnt, bytes);
+	kernel_fpu_end();
+}
+
+struct xor_block_template xor_block_avx512 = {
+	.name = "avx512",
+	.xor_gen = xor_gen_avx512,
+};
