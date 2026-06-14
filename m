@@ -1,87 +1,113 @@
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39994204C3B
-	for <linux-crypto@vger.kernel.org>; Sun, 14 Jun 2026 15:32:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781451151; cv=none; b=RLgZpNmhsc9paHzkb104Fglz5fV9SV9jvmemI7bFwkXbMvDt1atV2fX4cXhz/P52NGLQ6fohQayB3zrapj9udJYOQ+ORbgkbaVQzZB1CAWE+TZo3cNngDkJU5hMzp+190owh3Vta9ef7rf0odbGSF2NGFGcM9v2pIDitLmppH1s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781451151; c=relaxed/simple;
-	bh=vtG6I1YRkDLmoTi9RIExw8JVs/PFrmG5JoHLnv0oDNA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ExeEDc73S+RqFazzbSRIDu1v3l7jQfLaa6WWUvNloubETAw2/Q6g08N2SFTJBFcY7+IVZe20Yu797CYLK7+FI68rLerRGiXy1x3FEiJe9/Bvk7sQy8X6FTNXDd3Ww28EVONEj+14LWMmHt9HIQNwyBpD1XV/SWZqIM3C1qqE6HI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=usrtVg5H; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7731037BE9F
+	for <linux-crypto@vger.kernel.org>; Sun, 14 Jun 2026 16:14:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.128.169
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781453691; cv=pass; b=kpuX0b0wTWH7fBj3nF9eZQbwWi/Z8Lb/RCKml/+nqnWxLDyHgGsdLWKJW8L9NZUwQnzaPcteiS6irHiA7DE86JW4YkPakBMIoW91iNp6huGjld/CAgdf0rnptRz01Qfi6Mukhe9+Q5U0iji6OTU/Ey0Q9CFS+7yHa20Q4cg0kiU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781453691; c=relaxed/simple;
+	bh=GafyeebZAzgXIwpDZ/XxAtB3YDhyuA1vtDBy2V1SRQg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ll0TjJgstsibjm9+V+ZxGIFri9lPGy9sexiArtE+UvKCX5a2oa11F1ButBALJfGJie8SQENVTrIUdtwfXJGhrniMittWqelDX2T9pAb1nuORUFPgxX8f3Xeri5QMejaDK0TgyKjQRQYu4DPIT6H0KS3IzHtymaNQGXB4CPXibbQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XUTmy7PG; arc=pass smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="usrtVg5H"
-Date: Sun, 14 Jun 2026 17:32:12 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1781451137;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=it8LMlVWF10Lwo6oFL3Mcq2DPsP7nH+z8zyDQbz1dIc=;
-	b=usrtVg5HC9eNBVVGTLTYRbwuNMph3MKh8bS8buqXecP5vUTHBMmu/wMsevZ0IAXdf/RUbU
-	3lsj+HioYVGV2DDimCAf6br4KG37ypnSZWrKck9f1rSWei0UmQ2/zmLYecszF2iTfMsVvI
-	xdbaYaFH240yuhPIobIftIMaM5JCzqs=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH RESEND 1/6] sock: add sock_kzalloc helper
-Message-ID: <ai7JfHTFgFt6YN_K@linux.dev>
-References: <20260527082509.1133816-8-thorsten.blum@linux.dev>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XUTmy7PG"
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-7e266714bd3so27462927b3.2
+        for <linux-crypto@vger.kernel.org>; Sun, 14 Jun 2026 09:14:50 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1781453689; cv=none;
+        d=google.com; s=arc-20240605;
+        b=agA2rXh3SmDRmxUGYcyEzsbpOJZjLF+XZu6C9PtdA0vimWhbc0UEVmtUr0kNJGEH+W
+         Zvj/M9j3Ng6XsDTM71X0Nfmp2T+ZYeKCKTmbQonGVj7mJT0taKViBe2eVq9+a1rJCWzj
+         CYFnLecuoGZl25q+2KK52eXzP+892btgyym0Jq/Q/Isj5Ayg1WWRrFVR1nlWJQ2TEjWr
+         THjFuwYQgjyMGO2N2khqezFKKBiPftW7nihkqPQ7Uv98KhK2U7KyJHoZnZRnQg+kFRf3
+         i74nKdpxPiwgHunXSxJuQ4uVZR6V9uK0Yl4rHE2lQedme5AKQsKe9P+9UOTF+FthQ1Ui
+         TMrA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=Ty5lBs7BYCuv0nBuQV2yqa7LPhpPLdyc9ZwRXmG1e1M=;
+        fh=3pb4NkQnkRzHlnlE7ZYYEzllV3I2oHG4W6IFaxBWG7c=;
+        b=YdZMNnZVCqeqmH4ZIC2dJRrzlSiUVtku0WlphaeKt9lu7YLVssXj66FrcQV67oQvAt
+         vCMqspC2NOr1DXAgy1yAZaYYVvkUwydqKHro2i+xwjQBi0TsKzweMshYuRBV9oUzRJcV
+         uqHkW/0S7xdMCVvFo+J+k+u7ZudXqa6rSXk51bvxAiNpVFIfSwEITdR26+Ar/Bc4KV1Q
+         YE6urFlKZupoEx3D3LMXKWYINIv6iQO8HyS9VU67O5uB/aloRqCLEY033jbzp+CP27by
+         +YTI1dU9AIpIQkHRMAgmhc06Z7LPX38RtpWCtf9M38+E8E5SkYLXNPdxMsDNtKMlfRpV
+         p3Cg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1781453689; x=1782058489; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ty5lBs7BYCuv0nBuQV2yqa7LPhpPLdyc9ZwRXmG1e1M=;
+        b=XUTmy7PGnqvfuM473dNwh1C7K6lBu6VukOxzAsS9E8FuE9xx4HKQ4WsVmaFdW1QYHx
+         Ar1eNKkajF8AD/3hCW1FeX0A0vulHxloQXKrA+eM/YfYQ1OmCrsm5EXCFfZeMOp1+RrK
+         TeQ43glLoFd+ghdQa4Cm0BWGnZqTOob76mIpKsxwkVfjsQIdpXXNPnwhf4SDKYAmA4Ls
+         yNFea5pNvbw9uXukO/Yl78LYl3mOcpGeHESYduGpJ/n/ExD/PktUCGonPDldk8OH13hs
+         CY5iDi01CwbnjCGWPNhDZKG/pzkvCc+5STdTZySpL+g8hyrk0ELdkkBisEx+vwViIIu2
+         idIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781453689; x=1782058489;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Ty5lBs7BYCuv0nBuQV2yqa7LPhpPLdyc9ZwRXmG1e1M=;
+        b=f8BfrC+MD1rRVx3XhI5F5+VKjGp4PxepZOVYpuJnw+6vHbsYKD5RijAQiTAQ3Sc2V6
+         cP8b6zSaxTu+udWwqRBYJdsq3n1emzB61LMm83GW6EjiHZ/+dv9ncxopUREMzXsAywAW
+         /HIajHeXT8/dRNxOcXbLjU9UnVkgl8pdOPVpP3qdqleIdg/1O6yTX43RsaQx8ZuU5XB2
+         b6QvyVrd4+Tgqu1vfMLjo6A376jgM+cj7rROHKHhKCTgT7IVQ5vqAu/vdEEhLfOtBI9f
+         U0QbXD8YT/KQhskpJ7gcLaxKdJRDw/SzN9kLj7TB7p8HdCprpoJsdI30xiEDbE2Ko+fZ
+         UZMA==
+X-Forwarded-Encrypted: i=1; AFNElJ/ZfUsPneeQEG/BfY8Nuaz8KzSt+jfTSEKrFgE5GuohPLy0fVXU3TJQ7lsaWONsQ1Ke/qvYC2am3u1mvrE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBfRtvjuCOT+QsCXnyM+V/76WqYgaJaiSpF1a8+i9oDPSD6NkC
+	7TCfq++tfhxeXJgsaTstJvDx1nIqh076tEDvncnP+/urzhseNWHlOep/sQ6o1UQ/HFN0p2g+D1N
+	nrV5VpxhvdmSLUcwckJ7AfEsrMIGedHo=
+X-Gm-Gg: Acq92OG1Go8rNP1vD74flLg6j3Z9RIChVaS+mf2J7jldgstfDeE9SDhjX8bTeUagLd1
+	wDufyEHtx9m38HOdfO1i4Y05/yqnkifW9Qu+RWBgoXV9NW1HUiWWj4+KhFknnT5B/yCW7dJfGMt
+	Uh80mg5HeR2TN/PB6GnIVNKTQMQ8AWKCQLatFeEP0kncznjSgS2XjV9R3gw5f3TxFGVG9K1u+E6
+	9gTx44rpAjAUiSXPkTennL1PkdJVsSYyrJKbcRBCMPkbzNKVv13bSsTs+HKQaaoGzHftiOVsHNK
+	8Xfv42/QneE2Xxgz5sVwLBAOhJBV5/o4HRJN
+X-Received: by 2002:a05:690c:4a08:b0:7dc:61c7:5929 with SMTP id
+ 00721157ae682-7f8c1e186fcmr72702827b3.14.1781453689525; Sun, 14 Jun 2026
+ 09:14:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260527082509.1133816-8-thorsten.blum@linux.dev>
-X-Migadu-Flow: FLOW_OUT
+References: <20260531142251.2792061-1-michael.bommarito@gmail.com>
+ <aio83ZWadVTiuNpR@gondor.apana.org.au> <20260611025916-mutt-send-email-mst@kernel.org>
+ <aipn8sIAQ6Ai2sax@gondor.apana.org.au> <20260611035035-mutt-send-email-mst@kernel.org>
+ <aipvZhfvdtRxOQm0@gondor.apana.org.au> <20260611050731-mutt-send-email-mst@kernel.org>
+ <aip9nja-Oz2RxkWi@gondor.apana.org.au> <20260611064040-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20260611064040-mutt-send-email-mst@kernel.org>
+From: Michael Bommarito <michael.bommarito@gmail.com>
+Date: Sun, 14 Jun 2026 12:14:38 -0400
+X-Gm-Features: AVVi8CcUV6kBzoaAvDDRMWKFTCSd_vc02sh0mmpZIxeJVk8RGpH0yKfWyYpQUKU
+Message-ID: <CAJJ9bXyihwkBc71jWbvmPHU-s5=i5G19g5jP-d+5-3_G6MW=cg@mail.gmail.com>
+Subject: Re: [PATCH v3] hwrng: virtio: clamp device-reported used.len at copy_data()
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, Olivia Mackall <olivia@selenic.com>, 
+	linux-crypto@vger.kernel.org, Jason Wang <jasowang@redhat.com>, 
+	Kees Cook <kees@kernel.org>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Dan Williams <djbw@kernel.org>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, 
+	torvalds@linux-foundation.org, alan@linux.intel.com, tglx@linutronix.de
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 27, 2026 at 10:25:11AM +0200, Thorsten Blum wrote:
-> Add sock_kzalloc() helper - the sock equivalent to kzalloc().
-> 
-> Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
-> ---
-> Patch 1/6 needs an Acked-by: from netdev maintainers for the series to
-> go through Herbert's crypto tree:
-> https://lore.kernel.org/lkml/ahVkZOxZtFes6Huf@gondor.apana.org.au/
-> ---
->  include/net/sock.h | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/include/net/sock.h b/include/net/sock.h
-> index 76bfd3e56d63..b521bd34ac9f 100644
-> --- a/include/net/sock.h
-> +++ b/include/net/sock.h
-> @@ -1913,6 +1913,11 @@ void sock_kfree_s(struct sock *sk, void *mem, int size);
->  void sock_kzfree_s(struct sock *sk, void *mem, int size);
->  void sk_send_sigurg(struct sock *sk);
->  
-> +static inline void *sock_kzalloc(struct sock *sk, int size, gfp_t priority)
-> +{
-> +	return sock_kmalloc(sk, size, priority | __GFP_ZERO);
-> +}
-> +
->  static inline void sock_replace_proto(struct sock *sk, struct proto *proto)
->  {
->  	if (sk->sk_socket)
+On Thu, Jun 11, 2026 at 6:43=E2=80=AFAM Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
+> AKA defence is depth programming)
+> Alright we can drop this. No biggie.
 
-Gentle ping? Patch 1/6 still needs an ack from netdev maintainers.
+Sorry for the delay.  I'll ship a v4 without the nospec
 
 Thanks,
-Thorsten
+Mike
