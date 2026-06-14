@@ -1,118 +1,87 @@
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60B432E63C
-	for <linux-crypto@vger.kernel.org>; Sun, 14 Jun 2026 15:27:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39994204C3B
+	for <linux-crypto@vger.kernel.org>; Sun, 14 Jun 2026 15:32:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781450849; cv=none; b=Svd8aG5112BajpIWvEHNwaf6RPLzac2z8KwXzzmHRCHP18PMSwjmUfny1on8g/vOsv81klHKA+XtTU2hfLulHUiZBftJyvDlvlKTqiRoyVWFhdqeP3WkpLvH73wES28O9hGJVCo0RzQyodcnqwKVVpZFcYIHJzjbt3MnX0cyrb4=
+	t=1781451151; cv=none; b=RLgZpNmhsc9paHzkb104Fglz5fV9SV9jvmemI7bFwkXbMvDt1atV2fX4cXhz/P52NGLQ6fohQayB3zrapj9udJYOQ+ORbgkbaVQzZB1CAWE+TZo3cNngDkJU5hMzp+190owh3Vta9ef7rf0odbGSF2NGFGcM9v2pIDitLmppH1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781450849; c=relaxed/simple;
-	bh=2kNkUgAdLJGKlXgq8oY9CHVL3t2dpNtXWG2IT1ZC6lc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EhVyMQgMTo30a0sR/wR3hIgsM+FfSwCp4F0F6RjQ8OyaddZ2AZzlFAdqm1xpNCNjyz/nMMxr70zBPMo2/9ANSl3uqpbINMSEX+HisG9geDSbFvyocBBsu59M8D8C8qgJX7+RtHS5KbyweRt3DqXqzDplmE4L0/f4dl2q2IyXX6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nkOd8rKE; arc=none smtp.client-ip=91.218.175.185
+	s=arc-20240116; t=1781451151; c=relaxed/simple;
+	bh=vtG6I1YRkDLmoTi9RIExw8JVs/PFrmG5JoHLnv0oDNA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ExeEDc73S+RqFazzbSRIDu1v3l7jQfLaa6WWUvNloubETAw2/Q6g08N2SFTJBFcY7+IVZe20Yu797CYLK7+FI68rLerRGiXy1x3FEiJe9/Bvk7sQy8X6FTNXDd3Ww28EVONEj+14LWMmHt9HIQNwyBpD1XV/SWZqIM3C1qqE6HI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=usrtVg5H; arc=none smtp.client-ip=91.218.175.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nkOd8rKE"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="usrtVg5H"
+Date: Sun, 14 Jun 2026 17:32:12 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1781450845;
+	t=1781451137;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=eDCFtAvpueOIK9+mnyHt/B8LMjjjILaDNCbh2gVjU8Y=;
-	b=nkOd8rKEIYIYcbpcac8X47XAi+crhIfm87m3OcSZoAgOnjCaPbUTERSfl6gLCo+yRXO3JC
-	PRjTqzDgqw1R3GNrmd62VbL5l121K9kCB0j89g0yMFuwV0q0imWzespm0iE6wUkSe1kFe+
-	0a4h7GPtb338dywM1VTaIRzgwvBhLUY=
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=it8LMlVWF10Lwo6oFL3Mcq2DPsP7nH+z8zyDQbz1dIc=;
+	b=usrtVg5HC9eNBVVGTLTYRbwuNMph3MKh8bS8buqXecP5vUTHBMmu/wMsevZ0IAXdf/RUbU
+	3lsj+HioYVGV2DDimCAf6br4KG37ypnSZWrKck9f1rSWei0UmQ2/zmLYecszF2iTfMsVvI
+	xdbaYaFH240yuhPIobIftIMaM5JCzqs=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Bartosz Golaszewski <brgl@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	linux-crypto@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: qce - drop unused scatterlist traversal in qce_ahash_update
-Date: Sun, 14 Jun 2026 17:26:07 +0200
-Message-ID: <20260614152605.701754-3-thorsten.blum@linux.dev>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH RESEND 1/6] sock: add sock_kzalloc helper
+Message-ID: <ai7JfHTFgFt6YN_K@linux.dev>
+References: <20260527082509.1133816-8-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2258; i=thorsten.blum@linux.dev; h=from:subject; bh=2kNkUgAdLJGKlXgq8oY9CHVL3t2dpNtXWG2IT1ZC6lc=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFl6J3gZ35XscGM6GWyf819ddrP2TyvDj73pzH8FHv0TO NvIsySio5SFQYyLQVZMkeXBrB8zfEtrKjeZROyEmcPKBDKEgYtTACYycS/D/5AzoYXax+UZE9RP zmFhfRh2ZdPu/b9fybyTmbVTqYZpfRvDPyMeRYYui/kSh4xcF657f4jrtktU4Y3zi9cm6a7rXpK uzAoA
-X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260527082509.1133816-8-thorsten.blum@linux.dev>
 X-Migadu-Flow: FLOW_OUT
 
-Commit df12ef60c87b ("crypto: qce/sha - Do not modify scatterlist passed
-along with request") removed the only use of sg_last, rendering the
-scatterlist traversal useless. Remove it and its local variables.
+On Wed, May 27, 2026 at 10:25:11AM +0200, Thorsten Blum wrote:
+> Add sock_kzalloc() helper - the sock equivalent to kzalloc().
+> 
+> Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> ---
+> Patch 1/6 needs an Acked-by: from netdev maintainers for the series to
+> go through Herbert's crypto tree:
+> https://lore.kernel.org/lkml/ahVkZOxZtFes6Huf@gondor.apana.org.au/
+> ---
+>  include/net/sock.h | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/include/net/sock.h b/include/net/sock.h
+> index 76bfd3e56d63..b521bd34ac9f 100644
+> --- a/include/net/sock.h
+> +++ b/include/net/sock.h
+> @@ -1913,6 +1913,11 @@ void sock_kfree_s(struct sock *sk, void *mem, int size);
+>  void sock_kzfree_s(struct sock *sk, void *mem, int size);
+>  void sk_send_sigurg(struct sock *sk);
+>  
+> +static inline void *sock_kzalloc(struct sock *sk, int size, gfp_t priority)
+> +{
+> +	return sock_kmalloc(sk, size, priority | __GFP_ZERO);
+> +}
+> +
+>  static inline void sock_replace_proto(struct sock *sk, struct proto *proto)
+>  {
+>  	if (sk->sk_socket)
 
-Also remove the redundant hash_later check, inline the source offset,
-and assign the number of complete blocks directly to req->nbytes.
+Gentle ping? Patch 1/6 still needs an ack from netdev maintainers.
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- drivers/crypto/qce/sha.c | 31 +++++--------------------------
- 1 file changed, 5 insertions(+), 26 deletions(-)
-
-diff --git a/drivers/crypto/qce/sha.c b/drivers/crypto/qce/sha.c
-index 1b37121cbcdc..13a1174d2175 100644
---- a/drivers/crypto/qce/sha.c
-+++ b/drivers/crypto/qce/sha.c
-@@ -187,10 +187,8 @@ static int qce_ahash_update(struct ahash_request *req)
- 	struct qce_sha_reqctx *rctx = ahash_request_ctx_dma(req);
- 	struct qce_alg_template *tmpl = to_ahash_tmpl(req->base.tfm);
- 	struct qce_device *qce = tmpl->qce;
--	struct scatterlist *sg_last, *sg;
--	unsigned int total, len;
-+	unsigned int total;
- 	unsigned int hash_later;
--	unsigned int nbytes;
- 	unsigned int blocksize;
- 
- 	blocksize = crypto_tfm_alg_blocksize(crypto_ahash_tfm(tfm));
-@@ -238,28 +236,8 @@ static int qce_ahash_update(struct ahash_request *req)
- 	if (!hash_later)
- 		hash_later = blocksize;
- 
--	if (hash_later) {
--		unsigned int src_offset = req->nbytes - hash_later;
--		scatterwalk_map_and_copy(rctx->buf, req->src, src_offset,
--					 hash_later, 0);
--	}
--
--	/* here nbytes is multiple of blocksize */
--	nbytes = total - hash_later;
--
--	len = rctx->buflen;
--	sg = sg_last = req->src;
--
--	while (len < nbytes && sg) {
--		if (len + sg_dma_len(sg) > nbytes)
--			break;
--		len += sg_dma_len(sg);
--		sg_last = sg;
--		sg = sg_next(sg);
--	}
--
--	if (!sg_last)
--		return -EINVAL;
-+	scatterwalk_map_and_copy(rctx->buf, req->src, req->nbytes - hash_later,
-+				 hash_later, 0);
- 
- 	if (rctx->buflen) {
- 		sg_init_table(rctx->sg, 2);
-@@ -268,7 +246,8 @@ static int qce_ahash_update(struct ahash_request *req)
- 		req->src = rctx->sg;
- 	}
- 
--	req->nbytes = nbytes;
-+	/* hash only complete blocks */
-+	req->nbytes = total - hash_later;
- 	rctx->buflen = hash_later;
- 
- 	return qce->async_req_enqueue(tmpl->qce, &req->base);
+Thanks,
+Thorsten
