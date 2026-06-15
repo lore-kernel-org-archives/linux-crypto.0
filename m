@@ -1,52 +1,52 @@
-Received: from pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.245.243.92])
+Received: from pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com [34.218.115.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CDEC3DA5A5;
-	Mon, 15 Jun 2026 11:15:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.245.243.92
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3323B3E3DBB;
+	Mon, 15 Jun 2026 11:15:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.218.115.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781522113; cv=none; b=sJfvMpTagXFZg7t1E34B/1wBUCblvXSwpmDZAsgJCqUQaKF2aYk0iE31RWfT9X3ikC1Oakz2WXk2l3Hq/RjdGk6PLcSEaRug4PecBjQifJdDmB0jxAvGqrMgs+OmeVf3crLkmEs2CZTqWkJBvdC9gn8CoxOuR7xPEurpF2sgtpA=
+	t=1781522117; cv=none; b=agEmpMMT+BI+po2li/owFrwL3PvE58XdvN4qPhnykMv19LTPHWZ5ueWtcDAsXWhwT4Sk99Ztxvi0NY6UleGwnw8nBuPo1jF6NCsMsqT8ozVzyJIAqlolucA5M/WBo1Sp20CEy41PLXllfC74lFF2BtQYjuLv2t/37pvHz9Kp1a0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781522113; c=relaxed/simple;
-	bh=ciMYLH+iUM9q05ZT4XtBY+PHMs7r5ZbpQ0Rc821yV9g=;
+	s=arc-20240116; t=1781522117; c=relaxed/simple;
+	bh=givqApBd1z3ikwCVvCZHP5VbAmBxnIvXEMeO6ONi/AE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DREmhuUbFAvNuyZVVCJhEwmQ3b/WY1JCaNC7Mz8PSuoEzDSvda6SoYPdeG3t/ajTgw1gOPThFHrlnHfis1dO5gwiwMrNnjUGsZQgcEQdbmPX/rN+k1kPYbhtp6JBjNXDhSsvJGJkv0MaTSpGtXLJF2uhmR0mQbAJMgnEir8E6Sw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=J8M/vQqV; arc=none smtp.client-ip=44.245.243.92
+	 MIME-Version:Content-Type; b=LjuzjwTnHBF4NH/gcWN3KwFApdUVTTZjArSTcJ3ykNQHNwdzBzJY0L8q+tsVoyIhCPS55FLCm5tsxksAwliIbh2jYvvBWtxsgaSn4CiImsgoA6v1bwo2ojq7Fd1+xLHsX07MFyz2V90a02LvF1DvY7ejhJU6TdLG+Jk5N3rh+aM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=mrbDY/8e; arc=none smtp.client-ip=34.218.115.239
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="J8M/vQqV"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="mrbDY/8e"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1781522112; x=1813058112;
+  t=1781522115; x=1813058115;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=coO4f3CGZoL4jOgbuQqbftSIxxxR+UrDn5/Rv9Zcyyo=;
-  b=J8M/vQqVNhZ6nViFLqYWaoXiAOL1YEEfJAIXnWDnRfiI56qRNDfQDfH5
-   Te1J8nGbrk6Km9a7DpqjYB849twqKVamu5V7Z2aubigtAf6QLJ27jfAzt
-   qBHLc/LdRKEvvMOPxc1oe9Ry7TjAyD5nQSuoXJYdZKUro5i0mSLseHBoV
-   KGmgcwbZN79YTC9eNNHexxCuxe1ELwNnZ77+utJ59Fqtuvmqxq/GcgaIp
-   VXvSUq9nIsTIeJAp7LrUIL6SZ0M0Sz9CLZUyXs7PxEgeHsdxkWxVC0//O
-   eixZERW0WSREOBiBvp+PLK1Y+2VKR4Mamw1GL0Ruj1XEfr4Vmb7Sm8ZV4
-   g==;
-X-CSE-ConnectionGUID: uk5i50VXQLiR0JbYhF3feg==
-X-CSE-MsgGUID: fGjdYRUOTGqvLilq3u4rvQ==
+  bh=6DQKUBc8vy9hke6V6MN2fhvts/vCRiqqrLeYQ+y0u3w=;
+  b=mrbDY/8elIXWirZjRETz6KqApHlCHKFSe6iFeHSIL2OBxhQJj/PpXH7o
+   USsP2S4Y8l54Oku3Hy2BxNwNnRU1Fdl4EROLE/QdIyVBU9r7kERF6d3gS
+   4A0/80+6BzaHiG4Kw7Dt4FtnTWsPkvQ5LrNu7D3k7RogxSfMrcVF71y3s
+   bdmSyENI9qdzT9MaUYyi6n0npbXXlc2q/W9ZTbslwryXvICKAm3FpiEl8
+   Q9TnM/YZWiCVBorLekyoHodpOxbux7gzjpwefo1uUiPK6zOJvDmwVo77n
+   b58Xeh9qZtxT6RfNVtmsj9hY5CPLs1eoLKWydi0WxIXWpO5WrJznhu9V7
+   A==;
+X-CSE-ConnectionGUID: dE/WWH8qSqiBRf052Nyj3w==
+X-CSE-MsgGUID: ZFm8VP33TC6Rp7FPOaGdpg==
 X-IronPort-AV: E=Sophos;i="6.24,206,1774310400"; 
-   d="scan'208";a="21273359"
-Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
-  by internal-pdx-out-001.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2026 11:15:08 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [205.251.233.51:21428]
+   d="scan'208";a="21559217"
+Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
+  by internal-pdx-out-013.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2026 11:15:12 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [205.251.233.105:6960]
  by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.63.253:2525] with esmtp (Farcaster)
- id 52eaf02d-f54f-4d0e-b898-9fb056db8c23; Mon, 15 Jun 2026 11:15:08 +0000 (UTC)
-X-Farcaster-Flow-ID: 52eaf02d-f54f-4d0e-b898-9fb056db8c23
+ id 2b372b3b-699f-4c4f-b598-e388e7267d48; Mon, 15 Jun 2026 11:15:12 +0000 (UTC)
+X-Farcaster-Flow-ID: 2b372b3b-699f-4c4f-b598-e388e7267d48
 Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Mon, 15 Jun 2026 11:15:08 +0000
+ Mon, 15 Jun 2026 11:15:11 +0000
 Received: from dev-dsk-lravich-1b-7405803b.eu-west-1.amazon.com (10.13.225.95)
  by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.37;
- Mon, 15 Jun 2026 11:15:06 +0000
+ Mon, 15 Jun 2026 11:15:10 +0000
 From: Leonid Ravich <lravich@amazon.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 CC: Alasdair Kergon <agk@redhat.com>, Ard Biesheuvel <ardb@kernel.org>, "Eric
@@ -54,9 +54,9 @@ CC: Alasdair Kergon <agk@redhat.com>, Ard Biesheuvel <ardb@kernel.org>, "Eric
 	<horia.geanta@nxp.com>, Gilad Ben-Yossef <gilad@benyossef.com>,
 	<linux-crypto@vger.kernel.org>, <dm-devel@lists.linux.dev>,
 	<linux-block@vger.kernel.org>
-Subject: [PATCH v4 1/3] crypto: skcipher - add per-request data_unit_size with auto-splitting
-Date: Mon, 15 Jun 2026 11:14:57 +0000
-Message-ID: <20260615111459.9452-2-lravich@amazon.com>
+Subject: [PATCH v4 3/3] dm crypt: batch all sectors of a bio per crypto request
+Date: Mon, 15 Jun 2026 11:14:59 +0000
+Message-ID: <20260615111459.9452-4-lravich@amazon.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260615111459.9452-1-lravich@amazon.com>
 References: <20260615111459.9452-1-lravich@amazon.com>
@@ -66,324 +66,386 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 X-ClientProxiedBy: EX19D035UWA004.ant.amazon.com (10.13.139.109) To
  EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-Add a data_unit_size field to struct skcipher_request that lets a
-caller submit several data units (typically 512..4096-byte sectors)
-sharing one starting IV in a single request.  Algorithms derive each
-data unit's IV from the caller-supplied IV by treating it as a
-128-bit little-endian counter and adding the data-unit index, which
-matches the layout produced by dm-crypt's plain64 IV mode and by
-typical inline-encryption hardware.
+Submit one skcipher request per bio with
+skcipher_request_set_data_unit_size(req, cc->sector_size) instead of
+issuing one request per sector.  This removes per-sector overhead in
+the crypto API hot path: request allocation, callback dispatch,
+completion handling, and SG setup.
 
-This mirrors the data_unit_size concept already exposed by
-struct blk_crypto_config for inline encryption.
+The optimisation is enabled automatically at table load when all
+of the following hold:
 
-The crypto API auto-splits a multi-data-unit request into per-DU
-sub-requests when the underlying algorithm does not advertise
-CRYPTO_ALG_SKCIPHER_NATIVE_MULTI_DU (a type-specific cra_flags bit,
-defined in crypto/internal/skcipher.h).  A consumer sets
-data_unit_size and submits: a native driver handles all units in one
-pass, otherwise the core splits transparently.  The split derives
-per-DU IVs as a 128-bit LE counter, so this is correct only for
-algorithms using that IV convention (e.g. XTS with plain64-style
-IVs); callers are responsible for that match, as they already are for
-the IV itself.
+ - the cipher is non-aead (i.e. skcipher), sync, tfms_count 1;
+ - the IV mode advertises sector_iv_le128, i.e. its per-sector IV
+   advances as a 128-bit LE counter, matching the convention
+   documented in skcipher_request_set_data_unit_size().  Only plain64
+   sets it today (its 64-bit LE counter extends correctly); plain is
+   excluded as its 32-bit counter wraps differently across a
+   2^32-sector boundary;
+ - ivsize is 16 (the core rejects other sizes with -EOPNOTSUPP);
+ - the iv_gen_ops->post() hook is unset;
+ - dm-integrity is not stacked (no integrity tag or integrity IV).
 
-skcipher_request_set_tfm() resets the field to 0 so a request reused
-from a pool or stack defaults to single-data-unit semantics; callers
-that want batching set it explicitly via
-skcipher_request_set_data_unit_size() after configuring the tfm.
+The cipher driver does not need to advertise anything: the crypto
+API auto-splits multi-data-unit requests for drivers that cannot
+handle them natively, so dm-crypt sees the same fast batched
+submission contract regardless of the underlying driver.
 
-crypto_skcipher_encrypt()/decrypt() call
-crypto_skcipher_validate_multi_du() before any algorithm dispatch.
-data_unit_size must be a power of two when non-zero (realistic sizes
-are 512..4096, letting the per-DU loop and the cryptlen alignment
-check use a mask instead of a divide) and cryptlen a positive
-multiple of it; a malformed geometry is rejected with -EINVAL.  A
-target that cannot do multi-DU - ivsize != SKCIPHER_MDU_IVSIZE (16),
-an lskcipher, or an async algorithm without the native flag - is
-rejected with -EOPNOTSUPP so a caller can fall back.  Async is
-excluded because the splitter dispatches synchronously: an
--EINPROGRESS return would leave later units unsubmitted while the
-driver still owned the request's scatterlists and IV.  The check
-gates the native path too, so algorithms never see a malformed
-multi-DU request.
+A new CRYPT_MULTI_DATA_UNIT cipher_flag, set once at construction
+time, gates the multi-data-unit dispatch.  The existing per-sector
+path in crypt_convert_block_skcipher() is unchanged; the new
+crypt_convert_block_skcipher_multi() is reached from a small
+dispatch in crypt_convert() and shares the same backlog/-EBUSY/
+-EINPROGRESS flow control with the per-sector path.
 
-No in-tree algorithm sets CRYPTO_ALG_SKCIPHER_NATIVE_MULTI_DU yet;
-subsequent patches add the testmgr coverage and the dm-crypt
-consumer.
+Heap-allocated scatterlists are stashed in dm_crypt_request and
+freed in crypt_free_req_skcipher() to avoid races between the
+synchronous-success free path and async-completion reuse from the
+request pool.  On scatterlist allocation failure the helper returns
+-EAGAIN, and the core returns -EOPNOTSUPP if a driver turns out
+unable to do multi-DU; crypt_convert() handles both by clearing its
+local multi_du flag and falling back to the per-sector path for the
+rest of the current crypt_convert() invocation, ensuring forward progress
+on the swap-out-to-dm-crypt path even under total memory exhaustion
+(the per-sector path uses only cc->req_pool, a mempool with
+reservoir set up at table-load time, and the inline
+dmreq->sg_in[]/sg_out[] arrays — no allocation that could fail).
+
+Verified end-to-end with a byte-equivalence test: encrypted output
+of plain64 dm-crypt with the multi-data-unit path matches output of
+the single-data-unit path bit-for-bit over a 256 MB device, with
+xts-aes-aesni driving the auto-split path.
 
 Signed-off-by: Leonid Ravich <lravich@amazon.com>
 ---
- crypto/skcipher.c                  | 132 +++++++++++++++++++++++++++++
- include/crypto/internal/skcipher.h |  10 +++
- include/crypto/skcipher.h          |  28 ++++++
- 3 files changed, 170 insertions(+)
+ drivers/md/dm-crypt.c | 215 ++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 207 insertions(+), 8 deletions(-)
 
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index 2b31d1d5d268..9262b47acfb9 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -17,6 +17,7 @@
- #include <linux/cryptouser.h>
- #include <linux/err.h>
- #include <linux/kernel.h>
-+#include <linux/log2.h>
- #include <linux/mm.h>
- #include <linux/module.h>
- #include <linux/seq_file.h>
-@@ -432,15 +433,139 @@ int crypto_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
- }
- EXPORT_SYMBOL_GPL(crypto_skcipher_setkey);
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index 608b617fb817..bfb98dd876d7 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -101,6 +101,9 @@ struct dm_crypt_request {
+ 	struct scatterlist sg_in[4];
+ 	struct scatterlist sg_out[4];
+ 	u64 iv_sector;
++	/* Multi-data-unit SG arrays, NULL when sg_in[]/sg_out[] suffice. */
++	struct scatterlist *sg_in_ext;
++	struct scatterlist *sg_out_ext;
+ };
  
-+/* IV size for the 128-bit LE-counter multi-data-unit convention. */
-+#define SKCIPHER_MDU_IVSIZE	16
-+
-+static inline void skcipher_iv_inc_le128(u8 *iv)
-+{
-+	__le64 lo_le, hi_le;
-+	u64 lo;
-+
-+	memcpy(&lo_le, iv, 8);
-+	memcpy(&hi_le, iv + 8, 8);
-+	lo = le64_to_cpu(lo_le) + 1;
-+	lo_le = cpu_to_le64(lo);
-+	memcpy(iv, &lo_le, 8);
-+	if (unlikely(lo == 0)) {
-+		hi_le = cpu_to_le64(le64_to_cpu(hi_le) + 1);
-+		memcpy(iv + 8, &hi_le, 8);
-+	}
-+}
-+
-+/*
-+ * Dispatch a multi-data-unit request as one single-DU sub-request per
-+ * unit.  Each unit's IV is the caller's IV plus the unit index, taken
-+ * as a 128-bit little-endian counter.  A pair of scatter_walks advances
-+ * through src/dst in a single linear pass (O(entries + units)); building
-+ * each sub-request's view with scatterwalk_ffwd() would instead rescan
-+ * from the head every unit, i.e. O(units^2).
-+ */
-+static int skcipher_split_data_units(struct skcipher_request *req,
-+				     int (*body)(struct skcipher_request *))
-+{
-+	const unsigned int du = req->data_unit_size;
-+	const unsigned int total = req->cryptlen;
-+	struct scatterlist *orig_src = req->src;
-+	struct scatterlist *orig_dst = req->dst;
-+	bool inplace = orig_src == orig_dst;
-+	struct scatter_walk src_walk, dst_walk;
-+	struct scatterlist src_sg[2], dst_sg[2];
-+	u8 iv_orig[SKCIPHER_MDU_IVSIZE];
-+	u8 iv_work[SKCIPHER_MDU_IVSIZE];
-+	unsigned int off;
-+	int err = 0;
-+
-+	memcpy(iv_orig, req->iv, sizeof(iv_orig));
-+	memcpy(iv_work, iv_orig, sizeof(iv_orig));
-+
-+	sg_init_table(src_sg, 2);
-+	scatterwalk_start(&src_walk, orig_src);
-+	if (!inplace) {
-+		sg_init_table(dst_sg, 2);
-+		scatterwalk_start(&dst_walk, orig_dst);
-+	}
-+
-+	/* Stop the per-DU body from re-entering the splitter. */
-+	req->data_unit_size = 0;
-+	req->src = src_sg;
-+	req->dst = inplace ? src_sg : dst_sg;
-+
-+	for (off = 0; off < total; off += du) {
-+		req->cryptlen = du;
-+		scatterwalk_get_sglist(&src_walk, src_sg);
-+		scatterwalk_skip(&src_walk, du);
-+		if (!inplace) {
-+			scatterwalk_get_sglist(&dst_walk, dst_sg);
-+			scatterwalk_skip(&dst_walk, du);
-+		}
-+
-+		err = body(req);
-+		if (err)
-+			break;
-+
-+		skcipher_iv_inc_le128(iv_work);
-+		memcpy(req->iv, iv_work, sizeof(iv_work));
-+	}
-+
-+	/* Caller-visible IV is the starting IV regardless of outcome. */
-+	memcpy(req->iv, iv_orig, sizeof(iv_orig));
-+	req->src = orig_src;
-+	req->dst = orig_dst;
-+	req->cryptlen = total;
-+	req->data_unit_size = du;
-+	return err;
-+}
-+
-+static int crypto_skcipher_validate_multi_du(struct skcipher_request *req)
-+{
-+	const unsigned int du = req->data_unit_size;
-+	struct crypto_skcipher *tfm;
-+	struct skcipher_alg *alg;
-+	u32 cra_flags;
-+
-+	if (likely(!du))
-+		return 0;
-+	if (!is_power_of_2(du) || du < SKCIPHER_MDU_IVSIZE)
-+		return -EINVAL;
-+	if (!req->cryptlen || (req->cryptlen & (du - 1)))
-+		return -EINVAL;
-+
-+	tfm = crypto_skcipher_reqtfm(req);
-+	alg = crypto_skcipher_alg(tfm);
-+
-+	/* lskcipher's *_sg path doesn't honour data_unit_size. */
-+	if (alg->co.base.cra_type != &crypto_skcipher_type)
-+		return -EOPNOTSUPP;
-+
-+	/* Capability mismatch, not a malformed request: report -EOPNOTSUPP. */
-+	if (crypto_skcipher_ivsize(tfm) != SKCIPHER_MDU_IVSIZE)
-+		return -EOPNOTSUPP;
-+
-+	/* The auto-splitter is sync-only; native drivers own async dispatch. */
-+	cra_flags = alg->co.base.cra_flags;
-+	if ((cra_flags & CRYPTO_ALG_ASYNC) &&
-+	    !(cra_flags & CRYPTO_ALG_SKCIPHER_NATIVE_MULTI_DU))
-+		return -EOPNOTSUPP;
-+
-+	return 0;
-+}
-+
- int crypto_skcipher_encrypt(struct skcipher_request *req)
- {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
-+	int err;
+ struct crypt_config;
+@@ -115,6 +118,12 @@ struct crypt_iv_operations {
+ 			 struct dm_crypt_request *dmreq);
+ 	void (*post)(struct crypt_config *cc, u8 *iv,
+ 		     struct dm_crypt_request *dmreq);
++	/*
++	 * The per-sector IV advances as a 128-bit LE counter, so a bio's
++	 * consecutive sectors share one starting IV and can be batched into
++	 * a single skcipher request via data_unit_size.
++	 */
++	bool sector_iv_le128;
+ };
  
- 	if (crypto_skcipher_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
- 		return -ENOKEY;
-+	err = crypto_skcipher_validate_multi_du(req);
-+	if (err)
-+		return err;
- 	if (alg->co.base.cra_type != &crypto_skcipher_type)
- 		return crypto_lskcipher_encrypt_sg(req);
-+	if (req->data_unit_size &&
-+	    !(alg->co.base.cra_flags & CRYPTO_ALG_SKCIPHER_NATIVE_MULTI_DU))
-+		return skcipher_split_data_units(req, alg->encrypt);
- 	return alg->encrypt(req);
- }
- EXPORT_SYMBOL_GPL(crypto_skcipher_encrypt);
-@@ -449,11 +574,18 @@ int crypto_skcipher_decrypt(struct skcipher_request *req)
- {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
-+	int err;
+ struct iv_benbi_private {
+@@ -151,6 +160,7 @@ enum cipher_flags {
+ 	CRYPT_IV_LARGE_SECTORS,		/* Calculate IV from sector_size, not 512B sectors */
+ 	CRYPT_ENCRYPT_PREPROCESS,	/* Must preprocess data for encryption (elephant) */
+ 	CRYPT_KEY_MAC_SIZE_SET,		/* The integrity_key_size option was used */
++	CRYPT_MULTI_DATA_UNIT,		/* Batch all sectors of a bio per crypto request */
+ };
  
- 	if (crypto_skcipher_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
- 		return -ENOKEY;
-+	err = crypto_skcipher_validate_multi_du(req);
-+	if (err)
-+		return err;
- 	if (alg->co.base.cra_type != &crypto_skcipher_type)
- 		return crypto_lskcipher_decrypt_sg(req);
-+	if (req->data_unit_size &&
-+	    !(alg->co.base.cra_flags & CRYPTO_ALG_SKCIPHER_NATIVE_MULTI_DU))
-+		return skcipher_split_data_units(req, alg->decrypt);
- 	return alg->decrypt(req);
+ /*
+@@ -1018,7 +1028,8 @@ static const struct crypt_iv_operations crypt_iv_plain_ops = {
+ };
+ 
+ static const struct crypt_iv_operations crypt_iv_plain64_ops = {
+-	.generator = crypt_iv_plain64_gen
++	.generator = crypt_iv_plain64_gen,
++	.sector_iv_le128 = true,
+ };
+ 
+ static const struct crypt_iv_operations crypt_iv_plain64be_ops = {
+@@ -1426,12 +1437,126 @@ static int crypt_convert_block_skcipher(struct crypt_config *cc,
+ 	return r;
  }
- EXPORT_SYMBOL_GPL(crypto_skcipher_decrypt);
-diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
-index a965b6aabf61..4c826f3bc715 100644
---- a/include/crypto/internal/skcipher.h
-+++ b/include/crypto/internal/skcipher.h
-@@ -21,6 +21,16 @@
-  */
- #define CRYPTO_ALG_SKCIPHER_REQSIZE_LARGE CRYPTO_ALG_OPTIONAL_KEY
  
 +/*
-+ * Set by an skcipher that handles skcipher_request::data_unit_size > 0
-+ * natively in one pass; otherwise the API splits the request.  Lives in
-+ * the type-specific 0xff000000 cra_flags range.  A native driver must
-+ * derive per-DU IVs as a 128-bit LE counter and leave @iv at the
-+ * caller-supplied starting value on return, success or error, matching
-+ * the auto-splitter so the two paths are observably identical.
++ * Submit all remaining sectors of the current bio in one skcipher request.
++ * Same return convention as crypt_convert_block_skcipher() except for
++ * -EAGAIN, which the caller must treat as "disable multi-DU and re-enter
++ * the per-sector path" so swap-out-to-dm-crypt always makes forward
++ * progress on the mempool reserve.
 + */
-+#define CRYPTO_ALG_SKCIPHER_NATIVE_MULTI_DU	0x01000000
-+
- struct aead_request;
- struct rtattr;
- 
-diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
-index 4efe2ca8c4d1..ced1fae08147 100644
---- a/include/crypto/skcipher.h
-+++ b/include/crypto/skcipher.h
-@@ -31,6 +31,11 @@ struct scatterlist;
- /**
-  *	struct skcipher_request - Symmetric key cipher request
-  *	@cryptlen: Number of bytes to encrypt or decrypt
-+ *	@data_unit_size: Size in bytes of each data unit, or 0 for a
-+ *		single-data-unit request (the default).  When non-zero,
-+ *		must be a power of two, @cryptlen must be a positive
-+ *		multiple of it, and per-DU IVs are derived from @iv as a
-+ *		128-bit little-endian counter.
-  *	@iv: Initialisation Vector
-  *	@src: Source SG list
-  *	@dst: Destination SG list
-@@ -39,6 +44,7 @@ struct scatterlist;
-  */
- struct skcipher_request {
- 	unsigned int cryptlen;
-+	unsigned int data_unit_size;
- 
- 	u8 *iv;
- 
-@@ -225,6 +231,7 @@ struct lskcipher_alg {
- 	struct skcipher_request *name = \
- 		(((struct skcipher_request *)__##name##_desc)->base.tfm = \
- 			crypto_sync_skcipher_tfm((_tfm)), \
-+		 ((struct skcipher_request *)__##name##_desc)->data_unit_size = 0, \
- 		 (void *)__##name##_desc)
- 
- /**
-@@ -819,6 +826,8 @@ static inline void skcipher_request_set_tfm(struct skcipher_request *req,
- 					    struct crypto_skcipher *tfm)
- {
- 	req->base.tfm = crypto_skcipher_tfm(tfm);
-+	/* Reused requests default to single-data-unit. */
-+	req->data_unit_size = 0;
- }
- 
- static inline void skcipher_request_set_sync_tfm(struct skcipher_request *req,
-@@ -937,5 +946,24 @@ static inline void skcipher_request_set_crypt(
- 	req->iv = iv;
- }
- 
-+/**
-+ * skcipher_request_set_data_unit_size() - submit as multiple data units
-+ * @req: request handle
-+ * @data_unit_size: data-unit size in bytes (power of two), or 0 to disable
-+ *
-+ * Process @req as @cryptlen / @data_unit_size data units sharing one starting
-+ * @iv, with per-DU IVs derived as a 128-bit little-endian counter.  @cryptlen
-+ * must be a positive multiple of @data_unit_size, else the encrypt/decrypt
-+ * call returns -EINVAL; a target that cannot do multi-DU (ivsize != 16, an
-+ * lskcipher, or async without native support) returns -EOPNOTSUPP.  Unlike
-+ * the single-DU path, @iv is preserved across the call regardless of outcome.
-+ */
-+static inline void
-+skcipher_request_set_data_unit_size(struct skcipher_request *req,
-+				    unsigned int data_unit_size)
++static int crypt_convert_block_skcipher_multi(struct crypt_config *cc,
++					      struct convert_context *ctx,
++					      struct skcipher_request *req,
++					      unsigned int *out_processed)
 +{
-+	req->data_unit_size = data_unit_size;
++	const unsigned int sector_size = cc->sector_size;
++	const gfp_t gfp = GFP_NOIO | __GFP_NORETRY | __GFP_NOWARN;
++	unsigned int total = ctx->iter_in.bi_size;
++	unsigned int n_sg_in = 0, n_sg_out = 0;
++	struct dm_crypt_request *dmreq = dmreq_of_req(cc, req);
++	struct scatterlist *sg_in = NULL, *sg_out = NULL;
++	struct bvec_iter iter_in, iter_out;
++	struct bio_vec bv;
++	u8 *iv, *org_iv;
++	int r;
++
++	if (WARN_ON_ONCE(ctx->iter_in.bi_size != ctx->iter_out.bi_size))
++		return -EIO;
++	if (unlikely(total & (sector_size - 1)))
++		return -EIO;
++
++	iter_in = ctx->iter_in;
++	iter_in.bi_size = total;
++	__bio_for_each_bvec(bv, ctx->bio_in, iter_in, iter_in)
++		n_sg_in++;
++
++	iter_out = ctx->iter_out;
++	iter_out.bi_size = total;
++	__bio_for_each_bvec(bv, ctx->bio_out, iter_out, iter_out)
++		n_sg_out++;
++
++	sg_in = kmalloc_array(n_sg_in, sizeof(*sg_in), gfp);
++	sg_out = (ctx->bio_in == ctx->bio_out) ? sg_in :
++		 kmalloc_array(n_sg_out, sizeof(*sg_out), gfp);
++	if (!sg_in || !sg_out) {
++		kfree(sg_in);
++		if (sg_out != sg_in)
++			kfree(sg_out);
++		return -EAGAIN;
++	}
++
++	sg_init_table(sg_in, n_sg_in);
++	{
++		unsigned int i = 0;
++
++		iter_in = ctx->iter_in;
++		iter_in.bi_size = total;
++		__bio_for_each_bvec(bv, ctx->bio_in, iter_in, iter_in)
++			sg_set_page(&sg_in[i++], bv.bv_page, bv.bv_len,
++				    bv.bv_offset);
++	}
++
++	if (sg_out != sg_in) {
++		unsigned int i = 0;
++
++		sg_init_table(sg_out, n_sg_out);
++		iter_out = ctx->iter_out;
++		iter_out.bi_size = total;
++		__bio_for_each_bvec(bv, ctx->bio_out, iter_out, iter_out)
++			sg_set_page(&sg_out[i++], bv.bv_page, bv.bv_len,
++				    bv.bv_offset);
++	}
++
++	dmreq->iv_sector = ctx->cc_sector;
++	if (test_bit(CRYPT_IV_LARGE_SECTORS, &cc->cipher_flags))
++		dmreq->iv_sector >>= cc->sector_shift;
++	dmreq->ctx = ctx;
++
++	iv = iv_of_dmreq(cc, dmreq);
++	org_iv = org_iv_of_dmreq(cc, dmreq);
++	r = cc->iv_gen_ops->generator(cc, org_iv, dmreq);
++	if (r < 0)
++		goto out_free_sg;
++	memcpy(iv, org_iv, cc->iv_size);
++
++	dmreq->sg_in_ext = sg_in;
++	dmreq->sg_out_ext = (sg_out == sg_in) ? NULL : sg_out;
++
++	skcipher_request_set_crypt(req, sg_in, sg_out, total, iv);
++	skcipher_request_set_data_unit_size(req, sector_size);
++
++	if (bio_data_dir(ctx->bio_in) == WRITE)
++		r = crypto_skcipher_encrypt(req);
++	else
++		r = crypto_skcipher_decrypt(req);
++
++	/*
++	 * Sync error: kcryptd_async_done won't run, so free the SG
++	 * arrays here.  Async returns (-EINPROGRESS, -EBUSY) hand
++	 * ownership to the completion callback.
++	 */
++	if (r && r != -EINPROGRESS && r != -EBUSY)
++		goto out_free_sg;
++
++	*out_processed = total;
++	return r;
++
++out_free_sg:
++	kfree(sg_in);
++	if (sg_out != sg_in)
++		kfree(sg_out);
++	dmreq->sg_in_ext = NULL;
++	dmreq->sg_out_ext = NULL;
++	return r;
 +}
 +
- #endif	/* _CRYPTO_SKCIPHER_H */
+ static void kcryptd_async_done(void *async_req, int error);
  
-
-base-commit: a8cafdf8c949f17c92eca0045532e88ac0dac30d
+ static int crypt_alloc_req_skcipher(struct crypt_config *cc,
+ 				     struct convert_context *ctx)
+ {
+ 	unsigned int key_index = ctx->cc_sector & (cc->tfms_count - 1);
++	struct dm_crypt_request *dmreq;
+ 
+ 	if (!ctx->r.req) {
+ 		ctx->r.req = mempool_alloc(&cc->req_pool, in_interrupt() ? GFP_ATOMIC : GFP_NOIO);
+@@ -1441,6 +1566,11 @@ static int crypt_alloc_req_skcipher(struct crypt_config *cc,
+ 
+ 	skcipher_request_set_tfm(ctx->r.req, cc->cipher_tfm.tfms[key_index]);
+ 
++	/* Multi-DU SG arrays are owned by the helper that allocates them. */
++	dmreq = dmreq_of_req(cc, ctx->r.req);
++	dmreq->sg_in_ext = NULL;
++	dmreq->sg_out_ext = NULL;
++
+ 	/*
+ 	 * Use REQ_MAY_BACKLOG so a cipher driver internally backlogs
+ 	 * requests if driver request queue is full.
+@@ -1487,6 +1617,12 @@ static void crypt_free_req_skcipher(struct crypt_config *cc,
+ 				    struct skcipher_request *req, struct bio *base_bio)
+ {
+ 	struct dm_crypt_io *io = dm_per_bio_data(base_bio, cc->per_bio_data_size);
++	struct dm_crypt_request *dmreq = dmreq_of_req(cc, req);
++
++	kfree(dmreq->sg_in_ext);
++	dmreq->sg_in_ext = NULL;
++	kfree(dmreq->sg_out_ext);
++	dmreq->sg_out_ext = NULL;
+ 
+ 	if ((struct skcipher_request *)(io + 1) != req)
+ 		mempool_free(req, &cc->req_pool);
+@@ -1515,7 +1651,9 @@ static void crypt_free_req(struct crypt_config *cc, void *req, struct bio *base_
+ static blk_status_t crypt_convert(struct crypt_config *cc,
+ 			 struct convert_context *ctx, bool atomic, bool reset_pending)
+ {
+-	unsigned int sector_step = cc->sector_size >> SECTOR_SHIFT;
++	const unsigned int sector_step = cc->sector_size >> SECTOR_SHIFT;
++	bool multi_du = test_bit(CRYPT_MULTI_DATA_UNIT, &cc->cipher_flags);
++	unsigned int processed;
+ 	int r;
+ 
+ 	/*
+@@ -1536,8 +1674,13 @@ static blk_status_t crypt_convert(struct crypt_config *cc,
+ 
+ 		atomic_inc(&ctx->cc_pending);
+ 
++		processed = cc->sector_size;
+ 		if (crypt_integrity_aead(cc))
+ 			r = crypt_convert_block_aead(cc, ctx, ctx->r.req_aead, ctx->tag_offset);
++		else if (multi_du)
++			r = crypt_convert_block_skcipher_multi(cc, ctx,
++							       ctx->r.req,
++							       &processed);
+ 		else
+ 			r = crypt_convert_block_skcipher(cc, ctx, ctx->r.req, ctx->tag_offset);
+ 
+@@ -1559,8 +1702,19 @@ static blk_status_t crypt_convert(struct crypt_config *cc,
+ 					 * exit and continue processing in a workqueue
+ 					 */
+ 					ctx->r.req = NULL;
+-					ctx->tag_offset++;
+-					ctx->cc_sector += sector_step;
++					if (!multi_du) {
++						ctx->tag_offset++;
++						ctx->cc_sector += sector_step;
++					} else {
++						bio_advance_iter(ctx->bio_in,
++								 &ctx->iter_in,
++								 processed);
++						bio_advance_iter(ctx->bio_out,
++								 &ctx->iter_out,
++								 processed);
++						ctx->cc_sector +=
++							processed >> SECTOR_SHIFT;
++					}
+ 					return BLK_STS_DEV_RESOURCE;
+ 				}
+ 			} else {
+@@ -1574,19 +1728,41 @@ static blk_status_t crypt_convert(struct crypt_config *cc,
+ 		 */
+ 		case -EINPROGRESS:
+ 			ctx->r.req = NULL;
+-			ctx->tag_offset++;
+-			ctx->cc_sector += sector_step;
++			if (!multi_du) {
++				ctx->tag_offset++;
++				ctx->cc_sector += sector_step;
++			} else {
++				bio_advance_iter(ctx->bio_in, &ctx->iter_in,
++						 processed);
++				bio_advance_iter(ctx->bio_out, &ctx->iter_out,
++						 processed);
++				ctx->cc_sector += processed >> SECTOR_SHIFT;
++			}
+ 			continue;
+ 		/*
+ 		 * The request was already processed (synchronously).
+ 		 */
+ 		case 0:
+ 			atomic_dec(&ctx->cc_pending);
+-			ctx->cc_sector += sector_step;
+-			ctx->tag_offset++;
++			if (!multi_du) {
++				ctx->cc_sector += sector_step;
++				ctx->tag_offset++;
++			} else {
++				bio_advance_iter(ctx->bio_in, &ctx->iter_in,
++						 processed);
++				bio_advance_iter(ctx->bio_out, &ctx->iter_out,
++						 processed);
++				ctx->cc_sector += processed >> SECTOR_SHIFT;
++			}
+ 			if (!atomic)
+ 				cond_resched();
+ 			continue;
++		/* Multi-DU rejected (no memory or sync-only mismatch): fall back. */
++		case -EAGAIN:
++		case -EOPNOTSUPP:
++			atomic_dec(&ctx->cc_pending);
++			multi_du = false;
++			continue;
+ 		/*
+ 		 * There was a data integrity error.
+ 		 */
+@@ -3063,6 +3239,29 @@ static int crypt_ctr_cipher(struct dm_target *ti, char *cipher_in, char *key)
+ 		}
+ 	}
+ 
++	/*
++	 * Enable multi-data-unit batching only when per-DU IVs can be
++	 * derived from one starting IV as a 128-bit LE counter, matching
++	 * skcipher_request_set_data_unit_size().  Only IV modes flagged
++	 * sector_iv_le128 qualify (plain64; not plain, whose 32-bit counter
++	 * wraps differently across a 2^32-sector boundary).  ivsize must be
++	 * 16 (the core rejects otherwise) and the cipher must be sync,
++	 * single-tfm, no integrity, no per-sector post() hook.  The driver
++	 * advertises nothing: the core auto-splits for drivers that lack
++	 * native support.
++	 */
++	if (!crypt_integrity_aead(cc) && cc->tfms_count == 1 &&
++	    cc->iv_gen_ops && cc->iv_gen_ops->sector_iv_le128 &&
++	    !cc->iv_gen_ops->post &&
++	    !cc->integrity_tag_size && !cc->integrity_iv_size &&
++	    crypto_skcipher_ivsize(any_tfm(cc)) == 16 &&
++	    !(crypto_skcipher_alg(any_tfm(cc))->base.cra_flags &
++	      CRYPTO_ALG_ASYNC)) {
++		set_bit(CRYPT_MULTI_DATA_UNIT, &cc->cipher_flags);
++		DMINFO("Using multi-data-unit crypto offload (du=%u)",
++		       cc->sector_size);
++	}
++
+ 	/* wipe the kernel key payload copy */
+ 	if (cc->key_string)
+ 		memset(cc->key, 0, cc->key_size * sizeof(u8));
 -- 
 2.47.3
 
