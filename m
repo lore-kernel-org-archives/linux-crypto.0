@@ -1,80 +1,76 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012054.outbound.protection.outlook.com [40.93.195.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3493B2E7374;
-	Mon, 15 Jun 2026 19:22:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781551349; cv=none; b=SUrgLgvA8Vx8k4aubNa/k31JQI9bcNnWsYC3gmsjSfPxmI/YaLvrIBxL7cHEuRscMTQZesah+c091fHbGSD7ZjX4B8BPuBhwe//o9QNA6OMdujmyZZvqGuoSCB71C33MWHGvpGIELc1QLcuVxFRFc5zMyuW8XXr/Qd75EpxOuPk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781551349; c=relaxed/simple;
-	bh=o3F7A/bnAq0XW5a21IEGDfKW43mfbG3ce8tXJR48iAU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=A3gI2W9ACxGcd5MvoPvhIGPwgOQ9ELmvKWqoFwCYVnMgNWUD5zd8EZ/RfapheiBtTKO1amtJ/bZjibYxfrnpioog7G885JsMQWmf+LMx+ya/566y/Ve6dRZ1oBKtuOdoyg5lkF3aOBBAGB+XJPDV75qIuSpgzeeJy38VuNJyzIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=gmrWJfYi; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C2033A783D;
+	Mon, 15 Jun 2026 19:47:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1781552876; cv=fail; b=GWAUV4og5pPFMlvqKhRnAYuLU4g/dLIslGmxOGSOsoHgr3ljPIsGtoAcxBDy9cLt6gYJGAUGn0gCQfitTByVJawP9bU4Cc/uUqoKO+/9t59zTCyjlfuShRp7AzCbb7OMdI90+Yo0L72LgE/iTGtLKCQobBYOArXidm2BubcChlA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1781552876; c=relaxed/simple;
+	bh=Bs0x8MdLsSw7nabgwdIL67i5tIbibAwlMkOXFXeIDiQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hx68OF5x5EMcjQvv2rUtrdfJddYWO3PjOlhtTxcOjckg/tWzRp3wtZQ2BIOD71vKdYne1NpA+y8IzAPTM7eAvyA2mYjnHf06hlxlvyboZF39zKC6u8GUeudDQIWYRr+R7eB6YQ0ZZrF3gJISGbBsiY+/u58wLrVMlYWs5EgoH8U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=rHSctB9M; arc=fail smtp.client-ip=40.93.195.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gmrWJfYi"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65FJIEdu3289605;
-	Mon, 15 Jun 2026 19:22:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=2Ul6nM7ohRVaXLyZbA2q+iy5yeHdJ9qor+CXP+6ek
-	8A=; b=gmrWJfYij8KI+pZjeonZXvKhkT14HMHi5Wj2ig/UL7hnV7GYy0D+rz33h
-	mXsM7ghGodLChYjlruPtL+hIf1lAghcIiz1arsMQZYOuEoKyo6Hox4E3hacDfqhj
-	bUuiPqcStJDdZSKQGiZCFnuvwM1vzAqsu6aNitTChr4HUZ9cyqx4XMYfr9OtUCyq
-	vZo8zbiPfBtVaLFMT+LuC8y2FcCnmj7kDQy8m5G2IuyIXj0P31MqlUfARioOfqwS
-	PT2arz1Ngt/vh6bCWizwK51FuoVOVr9wvBdCb9dOPxOCIWpzbXdnRGJoPdMBM4L7
-	Vp+UHZuCozRCAKI7IutGBNz9uXk2Q==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4es23nj7yh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 15 Jun 2026 19:22:05 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 65FJJdcR010461;
-	Mon, 15 Jun 2026 19:22:04 GMT
-Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4esjhk00vr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 15 Jun 2026 19:22:04 +0000 (GMT)
-Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
-	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 65FJM4Jh9831074
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 15 Jun 2026 19:22:04 GMT
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D63C458052;
-	Mon, 15 Jun 2026 19:22:03 +0000 (GMT)
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5DE5658067;
-	Mon, 15 Jun 2026 19:22:01 +0000 (GMT)
-Received: from IBM-D32RQW3.ibm.com (unknown [9.61.247.102])
-	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 15 Jun 2026 19:22:01 +0000 (GMT)
-From: Farhan Ali <alifm@linux.ibm.com>
-To: linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org
-Cc: helgaas@kernel.org, giovanni.cabiddu@intel.com, alifm@linux.ibm.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        dennis.dalessandro@cornelisnetworks.com, jgg@ziepe.ca, leon@kernel.org,
-        vikas.gupta@broadcom.com, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, michael.chan@broadcom.com,
-        pavan.chebbi@broadcom.com, claudiu.manoil@nxp.com,
-        vladimir.oltean@nxp.com, wei.fang@nxp.com, xiaoning.wang@nxp.com,
-        anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-        kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-        decui@microsoft.com, longli@microsoft.com, richardcochran@gmail.com,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        qat-linux@intel.com (open list:QAT DRIVER),
-        linux-crypto@vger.kernel.org (open list:CRYPTO API),
-        linux-rdma@vger.kernel.org (open list:HFI1 DRIVER),
-        netdev@vger.kernel.org (open list:BROADCOM BNG_EN 800 GIGABIT ETHERNET DRIVER),
-        imx@lists.linux.dev (open list:FREESCALE ENETC ETHERNET DRIVERS),
-        intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
-        linux-hyperv@vger.kernel.org (open list:Hyper-V/Azure CORE AND DRIVERS)
-Subject: [RFC PATCH v1] PCI: Remove pcie_flr() and convert all callers to use pcie_reset_flr()
-Date: Mon, 15 Jun 2026 12:21:58 -0700
-Message-ID: <20260615192200.3489-1-alifm@linux.ibm.com>
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="rHSctB9M"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=cCEl9WPtsPCeaRUpjAydZ24/QJn/auy4ZmaRQzNnX0VsBU+ec+3Qlf/cYb+JUw9FU1lopYQLs9viKxnBnyoSPAPBkVmmRnw+ib8ysaKpam04d/MWOoYFk4jj8L5hFIm1Dc3MajQh3Qk1kWaa5NicyJpZ2J7TOgh5Tvy5qejyb5FwWywPX90qGZT1+cagAxs8HWlXXWE7aM87LyRoRXPepi1kmYqfdPZMSsgn1uRI9e32hqJcUZOCp7/jfli1JgUwtA6dcxmEQYwQj35NAH2+CI975uy9yoHy/8u8Zn8F7CUdndR4xEBUBxy9n+LtGHwI1t3QcogBmfIsGFeL2YheLA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=L5kZVxqC76XTwBaZ9PiZBTqh9WqG8fUHPFzKvsr94kU=;
+ b=UgUrGHpTzA2+CbK6U/2RDruYvawFKoYjkjll7g6bz/gC6cTzHb54Z0ziSEHjvXegP3yRIeAuQK7WfYucQraeRMM9xM0Md2xHppZJLixS6ef1c18HABVV17hNz6LGiRi1MnmdW1HdSQjAPekGFVdESvytnxkLikXZ3wR0a3KnqbbRHQDcu3w/Pj95kvY1ewHGGTVonVCR2zjE0i/M4j3J2tpNc1DOjybsTA5nizEN+kTrnxf+fBM+xFjFveKV1SXuAV63slj7nENuw5e7pRSpiVbzbr4ypjfBBgzVjTErRcYNgvBuOdSLIL2vqDAFG0WX5JXKUh5oj7gcyC4sHjZtRg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=L5kZVxqC76XTwBaZ9PiZBTqh9WqG8fUHPFzKvsr94kU=;
+ b=rHSctB9MJwOCC4JutHnHrKROfgUc4PA419cqmVN8D2Q38huI+BW8iY+FPsR0WxS1xIK/cXXHddBUz5Fyv6ijeQZgo8EbMdw68bhbtzkDVDQ8D17w9l1UqkikSzjZjtTFYI2tkqf5Vu9GObtrCsdLTzFpqcaG2ZY8vXhMkNqq/p8=
+Received: from MN2PR06CA0015.namprd06.prod.outlook.com (2603:10b6:208:23d::20)
+ by PH7PR12MB7869.namprd12.prod.outlook.com (2603:10b6:510:27e::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.18; Mon, 15 Jun
+ 2026 19:47:46 +0000
+Received: from BL02EPF00021F6F.namprd02.prod.outlook.com
+ (2603:10b6:208:23d:cafe::53) by MN2PR06CA0015.outlook.office365.com
+ (2603:10b6:208:23d::20) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.113.18 via Frontend Transport; Mon,
+ 15 Jun 2026 19:47:44 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ BL02EPF00021F6F.mail.protection.outlook.com (10.167.249.11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.139.8 via Frontend Transport; Mon, 15 Jun 2026 19:47:43 +0000
+Received: from nigeria-2635-os.amd.com (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Mon, 15 Jun
+ 2026 14:47:42 -0500
+From: Ashish Kalra <Ashish.Kalra@amd.com>
+To: <tglx@kernel.org>, <mingo@redhat.com>, <bp@alien8.de>,
+	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>,
+	<seanjc@google.com>, <peterz@infradead.org>, <thomas.lendacky@amd.com>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <ardb@kernel.org>
+CC: <pbonzini@redhat.com>, <aik@amd.com>, <Michael.Roth@amd.com>,
+	<KPrateek.Nayak@amd.com>, <Tycho.Andersen@amd.com>,
+	<Nathan.Fontenot@amd.com>, <ackerleytng@google.com>, <jackyli@google.com>,
+	<pgonda@google.com>, <rientjes@google.com>, <jacobhxu@google.com>,
+	<xin@zytor.com>, <pawan.kumar.gupta@linux.intel.com>, <babu.moger@amd.com>,
+	<dyoung@redhat.com>, <nikunj@amd.com>, <john.allen@amd.com>,
+	<darwi@linutronix.de>, <linux-kernel@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<linux-coco@lists.linux.dev>
+Subject: [PATCH v8 0/7] Add RMPOPT support.
+Date: Mon, 15 Jun 2026 19:47:31 +0000
+Message-ID: <cover.1781294296.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -83,418 +79,277 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Reinject: loops=2 maxloops=12
-X-Authority-Analysis: v=2.4 cv=XtnK/1F9 c=1 sm=1 tr=0 ts=6a3050de cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=FelO9ux0wxsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=iQ6ETzBq9ecOQQE5vZCe:22 a=QyXUC8HyAAAA:8 a=VnNF1IyMAAAA:8
- a=rrdNmPcgNGMj36RtdNMA:9 a=O8hF6Hzn-FEA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE1MDIwNCBTYWx0ZWRfX15D2ERi6K36E
- cfuKhpGulDA1q5GV1D4QABpqX93qm1T2iLTDzg+x2djf44fCjprtYNs/z6Cgxr+9JzS4ZJPUxG/
- bWItgek2EE45W2AKmoHWGBOqz8IbnPY9czT9fZ55OKmhaId3EaEvVqSc7SqjPdf+/EKFIqXnDLa
- GB/CkvFOkhJDMj9DIfnsVMVjgHqJbTYbro+YZnLFWZuLaVxT7IsqPFnD/cTkoRe/NUKTJpHE9UT
- KpGxtCexYwDpp7HVl5zpW5M5JKwWtJNvGxIHHagTUBbN6MF1o8qFpxHPmF9FH4vgObHUAYmuZSp
- OiZ9gdzTUT63mbLuB43NcwvV4PjrpAzNnTWZrb5nAxTzxUe+UP7jZTMDnBX1h/rtYDp8wP21ygC
- KapFBjkV+9up+O9lzChzbcxkZoNRqaRlB/rJki5AWgaRk4cG3NrTWLbMu15U8JvBJrZ6l3I/upp
- DULV8mTLV54wYMit44g==
-X-Proofpoint-GUID: 0_j4JWqQX8RSuVA9OmMvQpFslvkDXYKl
-X-Proofpoint-ORIG-GUID: fD3CfdWkUO2xFqIwvrcrU9u1pqC9A76p
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjE1MDIwNCBTYWx0ZWRfXxPPmC5y5Uuy0
- +P87YY4UR8RCkU8E8NytutzriOGmKekg289scdUV2wkw95TKaGVZY+CfgiuwPSpzP9UmhzMzSQO
- K07q5C5Zhu7FmIb2aOvPYnjEWcZvlC8=
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-15_05,2026-06-15_04,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 adultscore=0 phishscore=0 lowpriorityscore=0 priorityscore=1501
- suspectscore=0 clxscore=1011 malwarescore=0 spamscore=0 impostorscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606040000 definitions=main-2606150204
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF00021F6F:EE_|PH7PR12MB7869:EE_
+X-MS-Office365-Filtering-Correlation-Id: cf0c81b8-177c-4c90-1644-08decb16f7b6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|7416014|36860700016|82310400026|376014|23010399003|921020|3023799007|18002099003|56012099006|11063799006|6133799003;
+X-Microsoft-Antispam-Message-Info:
+	2jtGbp+PiU/hBTegy+/3V6r0TrM9wgB8wpxPQQruOCprqBy8i3302xF8ebkd33JGvGps2u42kLMbyG9RJIDPQGLRerMGZ3rKx6sTMAdIbajV1dFAkvGZKYjCe8Ica9ROjknOiVamPuxYNnOsC3SeJWQpF/IGOUWsf9/NnMQa4zbcbLHf6z1zxHJna+CWJ8Y8Nf5mzlWRyPhIZnKOgsPZjf2KpOrDtx4wn+pIEewzBp5ooPFUgy23oKjqBz3daKLhNZd8QnqT3UJZouIxYgapfP5y1XJjDvb5tu1W6hZ5O25Pfd+SRFdaPl05N5TdXAPzXnEGejIFreRHf/fqX1OmVLSbqYlPYh77PAETOMnFSDyBJ8v9kV/mpRhCD2Wx3TDE3cp0kaHiTGZD7jz58cgoE9ykwaxRY6T2LIZfZlvT4viHAC2B0hDQ1p5L0ax+50y128MYeAWvATqE7/nvmZ11MWDjbTeIkhYai6CNqQyCbK+fix37i7hnghPCZUp6Mxa9YAV0lcuq8XIGUItzGd5oD8plL/sYl22ucii4ALX9TfcEoSi1SqZZDmETiU7nrLWlgGgnDK6KQdmfJ0gxbOKFF/Bg1r6Hs4yx33eLT9ONCezBVp+2OuTnsVw8R2shzstM8m6Ue86dk3CHlXWkuRKIrrDEYvl3/Ll4Y/pdU/TrWG92OltyK1gvvxsCWZC4IQ1C0YcVpUkk7dpYCImoMRN8e7akGe3UX+dNe+fUNhclSRgxMQ8dsqidO3nCmHtnHtcD9UtdMmqbpmpUwW0FjtP9yQ==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(36860700016)(82310400026)(376014)(23010399003)(921020)(3023799007)(18002099003)(56012099006)(11063799006)(6133799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	PPHpBACXWre0geahhGa/lbNih+ka96blCWz2EG/jDOx5KoxTTgiFGIbJ57UPzVu7GE1WDXyPLHIewzDkJg970IwC+KtUBsvw6GeGgX43G9ji3mPrthJPbniLfzFLdCChJl8jUuvJMV/zLaIvyaEzQAIba6I8f8MnGXqjO4RDtioC3m7jMFAxvArStoB/87JgS0hbLhYe4p3BRKdF61r2/xuhya87E0RYwpcm+uy+V0DBpKjOIeDzC5GHfWMzmhCv3IhRnVQJzilYSnTE98kVJuiKVgGH+y5xV9+0aYSn8hOxiwjXsewom9t/1b6Jwzt2aurvb9+DKS85M+2IuZ8BYP6Ij9rp8X/RH/de7DUoyWLmMZE4emKvWE4qbNVwiXVOPin0mWt82oblEq3AoJBbIoAqzwSEynEV5Unp9PtVVbiG7Czp26MCqUzhYEVMdIcA
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jun 2026 19:47:43.8296
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: cf0c81b8-177c-4c90-1644-08decb16f7b6
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL02EPF00021F6F.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7869
 
-The pcie_reset_flr() function includes validation checks to verify FLR
-support before performing the reset, while pcie_flr() performs the reset
-unconditionally. Having both functions creates unnecessary complexity.
+From: Ashish Kalra <ashish.kalra@amd.com>
 
-Commit 56f107d7813f ("PCI: Add pcie_reset_flr() with 'probe' argument")
-introduced pcie_reset_flr() and removed pcie_has_flr(), converting callers
-that previously used the pcie_has_flr() + pcie_flr() to use
-pcie_reset_flr() instead. However, it did not convert all pcie_flr()
-callers, leaving two different FLR mechanisms in the kernel.
+In the SEV-SNP architecture, hypervisor and non-SNP guests are subject
+to RMP checks on writes to provide integrity of SEV-SNP guest memory.
 
-One of the callers of pcie_flr(), the Intel 82599 Virtual Function has a
-defect where FLR works despite not advertising FLR support in the PCIe
-Device Capability register.  Rather than using pcie_flr() to work around
-this, enable the FLR capability bit in devcap via an early quirk. This
-allows the device to use the standard pcie_reset_flr() path instead of
-requiring a device-specific reset method.
+The RMPOPT architecture enables optimizations whereby the RMP checks
+can be skipped if 1GB regions of memory are known to not contain any
+SNP guest memory.
 
-Remove pcie_flr() entirely and convert all remaining callers to
-pcie_reset_flr(), ensuring consistent validation across the kernel.
+RMPOPT is a new instruction designed to minimize the performance
+overhead of RMP checks for the hypervisor and non-SNP guests.
 
-Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
----
- drivers/crypto/intel/qat/qat_common/adf_aer.c |  2 +-
- drivers/infiniband/hw/hfi1/chip.c             |  4 +-
- .../net/ethernet/broadcom/bnge/bnge_core.c    |  2 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  4 +-
- .../ethernet/cavium/liquidio/lio_vf_main.c    |  2 +-
- .../ethernet/cavium/liquidio/octeon_mailbox.c |  3 +-
- drivers/net/ethernet/freescale/enetc/enetc.c  |  2 +-
- .../ethernet/freescale/enetc/enetc_pci_mdio.c |  2 +-
- drivers/net/ethernet/intel/ice/ice_main.c     |  2 +-
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |  2 +-
- drivers/net/ethernet/microsoft/mana/mana_en.c |  3 +-
- drivers/pci/pci.c                             | 38 ++++++------------
- drivers/pci/quirks.c                          | 40 +++++++++----------
- drivers/ptp/ptp_netc.c                        |  2 +-
- include/linux/pci.h                           |  1 -
- 15 files changed, 49 insertions(+), 60 deletions(-)
+RMPOPT instruction currently supports two functions. In case of the
+verify and report status function the CPU will read the RMP contents,
+verify the entire 1GB region starting at the provided SPA is HV-owned.
+For the entire 1GB region it checks that all RMP entries in this region
+are HV-owned (i.e, not in assigned state) and then accordingly updates
+the RMPOPT table to indicate if optimization has been enabled and
+provide indication to software if the optimization was successful.
 
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_aer.c b/drivers/crypto/intel/qat/qat_common/adf_aer.c
-index ed01fb9ad74e..a2364a59bc7f 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_aer.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_aer.c
-@@ -89,7 +89,7 @@ EXPORT_SYMBOL_GPL(adf_reset_sbr);
- 
- void adf_reset_flr(struct adf_accel_dev *accel_dev)
- {
--	pcie_flr(accel_to_pci_dev(accel_dev));
-+	pcie_reset_flr(accel_to_pci_dev(accel_dev), PCI_RESET_DO_RESET);
- }
- EXPORT_SYMBOL_GPL(adf_reset_flr);
- 
-diff --git a/drivers/infiniband/hw/hfi1/chip.c b/drivers/infiniband/hw/hfi1/chip.c
-index 44c524e45396..9f53d73e5e76 100644
---- a/drivers/infiniband/hw/hfi1/chip.c
-+++ b/drivers/infiniband/hw/hfi1/chip.c
-@@ -14042,7 +14042,7 @@ static int init_chip(struct hfi1_devdata *dd)
- 		dd_dev_info(dd, "Resetting CSRs with FLR\n");
- 
- 		/* do the FLR, the DC reset will remain */
--		pcie_flr(dd->pcidev);
-+		pcie_reset_flr(dd->pcidev, PCI_RESET_DO_RESET);
- 
- 		/* restore command and BARs */
- 		ret = restore_pci_variables(dd);
-@@ -14054,7 +14054,7 @@ static int init_chip(struct hfi1_devdata *dd)
- 
- 		if (is_ax(dd)) {
- 			dd_dev_info(dd, "Resetting CSRs with FLR\n");
--			pcie_flr(dd->pcidev);
-+			pcie_reset_flr(dd->pcidev, PCI_RESET_DO_RESET);
- 			ret = restore_pci_variables(dd);
- 			if (ret) {
- 				dd_dev_err(dd, "%s: Could not restore PCI variables\n",
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_core.c b/drivers/net/ethernet/broadcom/bnge/bnge_core.c
-index 68b74eb2c3a2..4aec01f53e54 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_core.c
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_core.c
-@@ -274,7 +274,7 @@ static int bnge_probe_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 
- 	if (is_kdump_kernel()) {
- 		pci_clear_master(pdev);
--		pcie_flr(pdev);
-+		pcie_reset_flr(pdev, PCI_RESET_DO_RESET);
- 	}
- 
- 	rc = bnge_pci_enable(pdev);
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 35e1f8f663c7..21f8dcbe671e 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -16918,7 +16918,7 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	 */
- 	if (is_kdump_kernel()) {
- 		pci_clear_master(pdev);
--		pcie_flr(pdev);
-+		pcie_reset_flr(pdev, PCI_RESET_DO_RESET);
- 	}
- 
- 	max_irqs = bnxt_get_max_irq(pdev);
-@@ -17203,7 +17203,7 @@ static void bnxt_shutdown(struct pci_dev *pdev)
- 		netif_close(dev);
- 
- 	if (bnxt_hwrm_func_drv_unrgtr(bp)) {
--		pcie_flr(pdev);
-+		pcie_reset_flr(pdev, PCI_RESET_DO_RESET);
- 		goto shutdown_exit;
- 	}
- 	bnxt_ptp_clear(bp);
-diff --git a/drivers/net/ethernet/cavium/liquidio/lio_vf_main.c b/drivers/net/ethernet/cavium/liquidio/lio_vf_main.c
-index 43c595f3b84e..7f3557d36341 100644
---- a/drivers/net/ethernet/cavium/liquidio/lio_vf_main.c
-+++ b/drivers/net/ethernet/cavium/liquidio/lio_vf_main.c
-@@ -429,7 +429,7 @@ static void octeon_pci_flr(struct octeon_device *oct)
- 	pci_write_config_word(oct->pci_dev, PCI_COMMAND,
- 			      PCI_COMMAND_INTX_DISABLE);
- 
--	pcie_flr(oct->pci_dev);
-+	pcie_reset_flr(oct->pci_dev, PCI_RESET_DO_RESET);
- 
- 	pci_cfg_access_unlock(oct->pci_dev);
- 
-diff --git a/drivers/net/ethernet/cavium/liquidio/octeon_mailbox.c b/drivers/net/ethernet/cavium/liquidio/octeon_mailbox.c
-index ad685f5d0a13..be08e213aa9a 100644
---- a/drivers/net/ethernet/cavium/liquidio/octeon_mailbox.c
-+++ b/drivers/net/ethernet/cavium/liquidio/octeon_mailbox.c
-@@ -260,7 +260,8 @@ static int octeon_mbox_process_cmd(struct octeon_mbox *mbox,
- 		dev_info(&oct->pci_dev->dev,
- 			 "got a request for FLR from VF that owns DPI ring %u\n",
- 			 mbox->q_no);
--		pcie_flr(oct->sriov_info.dpiring_to_vfpcidev_lut[mbox->q_no]);
-+		pcie_reset_flr(oct->sriov_info.dpiring_to_vfpcidev_lut[mbox->q_no],
-+			       PCI_RESET_DO_RESET);
- 		break;
- 
- 	case OCTEON_PF_CHANGED_VF_MACADDR:
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c b/drivers/net/ethernet/freescale/enetc/enetc.c
-index aa8a87124b10..c1c1b523abb5 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc.c
-@@ -3635,7 +3635,7 @@ int enetc_pci_probe(struct pci_dev *pdev, const char *name, int sizeof_priv)
- 	size_t alloc_size;
- 	int err, len;
- 
--	pcie_flr(pdev);
-+	pcie_reset_flr(pdev, PCI_RESET_DO_RESET);
- 	err = pci_enable_device_mem(pdev);
- 	if (err)
- 		return dev_err_probe(&pdev->dev, err, "device enable failed\n");
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c b/drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c
-index e108cac8288d..cfccfca1981d 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_pci_mdio.c
-@@ -73,7 +73,7 @@ static int enetc_pci_mdio_probe(struct pci_dev *pdev,
- 	mdio_priv->mdio_base = ENETC_EMDIO_BASE;
- 	snprintf(bus->id, MII_BUS_ID_SIZE, "%s", dev_name(dev));
- 
--	pcie_flr(pdev);
-+	pcie_reset_flr(pdev, PCI_RESET_DO_RESET);
- 	err = pci_enable_device_mem(pdev);
- 	if (err) {
- 		dev_err(dev, "device enable failed\n");
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index e2fbe111f849..14b8a90625a8 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -5180,7 +5180,7 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
- 	if (is_kdump_kernel()) {
- 		pci_save_state(pdev);
- 		pci_clear_master(pdev);
--		err = pcie_flr(pdev);
-+		err = pcie_reset_flr(pdev, PCI_RESET_DO_RESET);
- 		if (err)
- 			return err;
- 		pci_restore_state(pdev);
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index 2646ee6f295f..d8796a68094f 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -8318,7 +8318,7 @@ static void ixgbe_check_for_bad_vf(struct ixgbe_adapter *adapter)
- 		if (status_reg != IXGBE_FAILED_READ_CFG_WORD &&
- 		    status_reg & PCI_STATUS_REC_MASTER_ABORT) {
- 			ixgbe_bad_vf_abort(adapter, vf);
--			pcie_flr(vfdev);
-+			pcie_reset_flr(vfdev, PCI_RESET_DO_RESET);
- 		}
- 	}
- }
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index c9b1df1ed109..e51c1170aba7 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -3305,7 +3305,8 @@ static int mana_dealloc_queues(struct net_device *ndev)
- 			}
- 			if (atomic_read(&txq->pending_sends)) {
- 				err =
--				    pcie_flr(to_pci_dev(gd->gdma_context->dev));
-+				    pcie_reset_flr(to_pci_dev(gd->gdma_context->dev),
-+						   PCI_RESET_DO_RESET);
- 				if (err) {
- 					netdev_err(ndev, "flr failed %d with %d pkts pending in txq %u\n",
- 						   err,
-diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
-index d34266651ad0..878556ea50de 100644
---- a/drivers/pci/pci.c
-+++ b/drivers/pci/pci.c
-@@ -4321,16 +4321,25 @@ int pci_wait_for_pending_transaction(struct pci_dev *dev)
- EXPORT_SYMBOL(pci_wait_for_pending_transaction);
- 
- /**
-- * pcie_flr - initiate a PCIe function level reset
-+ * pcie_reset_flr - initiate a PCIe function level reset
-  * @dev: device to reset
-+ * @probe: if true, return 0 if device can be reset this way
-  *
-- * Initiate a function level reset unconditionally on @dev without
-- * checking any flags and DEVCAP
-+ * Initiate a function level reset on @dev.
-  */
--int pcie_flr(struct pci_dev *dev)
-+int pcie_reset_flr(struct pci_dev *dev, bool probe)
- {
- 	int ret;
- 
-+	if (dev->dev_flags & PCI_DEV_FLAGS_NO_FLR_RESET)
-+		return -ENOTTY;
-+
-+	if (!(dev->devcap & PCI_EXP_DEVCAP_FLR))
-+		return -ENOTTY;
-+
-+	if (probe)
-+		return 0;
-+
- 	if (!pci_wait_for_pending_transaction(dev))
- 		pci_err(dev, "timed out waiting for pending transaction; performing function level reset anyway\n");
- 
-@@ -4357,28 +4366,7 @@ int pcie_flr(struct pci_dev *dev)
- done:
- 	pci_dev_reset_iommu_done(dev);
- 	return ret;
--}
--EXPORT_SYMBOL_GPL(pcie_flr);
--
--/**
-- * pcie_reset_flr - initiate a PCIe function level reset
-- * @dev: device to reset
-- * @probe: if true, return 0 if device can be reset this way
-- *
-- * Initiate a function level reset on @dev.
-- */
--int pcie_reset_flr(struct pci_dev *dev, bool probe)
--{
--	if (dev->dev_flags & PCI_DEV_FLAGS_NO_FLR_RESET)
--		return -ENOTTY;
--
--	if (!(dev->devcap & PCI_EXP_DEVCAP_FLR))
--		return -ENOTTY;
--
--	if (probe)
--		return 0;
- 
--	return pcie_flr(dev);
- }
- EXPORT_SYMBOL_GPL(pcie_reset_flr);
- 
-diff --git a/drivers/pci/quirks.c b/drivers/pci/quirks.c
-index caaed1a01dc0..564f581599b8 100644
---- a/drivers/pci/quirks.c
-+++ b/drivers/pci/quirks.c
-@@ -2019,6 +2019,23 @@ DECLARE_PCI_FIXUP_EARLY(PCI_VENDOR_ID_INTEL,	PCI_DEVICE_ID_INTEL_PXH_0,	quirk_pc
- DECLARE_PCI_FIXUP_EARLY(PCI_VENDOR_ID_INTEL,	PCI_DEVICE_ID_INTEL_PXH_1,	quirk_pcie_pxh);
- DECLARE_PCI_FIXUP_EARLY(PCI_VENDOR_ID_INTEL,	PCI_DEVICE_ID_INTEL_PXHV,	quirk_pcie_pxh);
- 
-+#define PCI_DEVICE_ID_INTEL_82599_SFP_VF   0x10ed
-+static void quirk_intel_82599_sfp_virtfn(struct pci_dev *dev)
-+{
-+	/*
-+	 * http://www.intel.com/content/dam/doc/datasheet/82599-10-gbe-controller-datasheet.pdf
-+	 *
-+	 * The 82599 supports FLR on VFs, but FLR support is reported only
-+	 * in the PF DEVCAP (sec 9.3.10.4), not in the VF DEVCAP (sec 9.5).
-+	 * So enable PCI_EXP_DEVCAP_FLR directly without first checking if it is
-+	 * supported.
-+	 */
-+
-+	dev->devcap |= PCI_EXP_DEVCAP_FLR;
-+}
-+
-+DECLARE_PCI_FIXUP_EARLY(PCI_VENDOR_ID_INTEL, PCI_DEVICE_ID_INTEL_82599_SFP_VF, quirk_intel_82599_sfp_virtfn);
-+
- /*
-  * Some Intel PCI Express chipsets have trouble with downstream device
-  * power management.
-@@ -3944,20 +3961,6 @@ DECLARE_PCI_FIXUP_SUSPEND_LATE(PCI_VENDOR_ID_INTEL,
-  * reset a single function if other methods (e.g. FLR, PM D0->D3) are
-  * not available.
-  */
--static int reset_intel_82599_sfp_virtfn(struct pci_dev *dev, bool probe)
--{
--	/*
--	 * http://www.intel.com/content/dam/doc/datasheet/82599-10-gbe-controller-datasheet.pdf
--	 *
--	 * The 82599 supports FLR on VFs, but FLR support is reported only
--	 * in the PF DEVCAP (sec 9.3.10.4), not in the VF DEVCAP (sec 9.5).
--	 * Thus we must call pcie_flr() directly without first checking if it is
--	 * supported.
--	 */
--	if (!probe)
--		pcie_flr(dev);
--	return 0;
--}
- 
- #define SOUTH_CHICKEN2		0xc2004
- #define PCH_PP_STATUS		0xc7200
-@@ -4058,7 +4061,7 @@ static int reset_chelsio_generic_dev(struct pci_dev *dev, bool probe)
- 				      PCI_MSIX_FLAGS_ENABLE |
- 				      PCI_MSIX_FLAGS_MASKALL);
- 
--	pcie_flr(dev);
-+	pcie_reset_flr(dev, PCI_RESET_DO_RESET);
- 
- 	/*
- 	 * Restore the configuration information (BAR values, etc.) including
-@@ -4070,7 +4073,6 @@ static int reset_chelsio_generic_dev(struct pci_dev *dev, bool probe)
- 	return 0;
- }
- 
--#define PCI_DEVICE_ID_INTEL_82599_SFP_VF   0x10ed
- #define PCI_DEVICE_ID_INTEL_IVB_M_VGA      0x0156
- #define PCI_DEVICE_ID_INTEL_IVB_M2_VGA     0x0166
- 
-@@ -4150,7 +4152,7 @@ static int nvme_disable_and_flr(struct pci_dev *dev, bool probe)
- 
- 	pci_iounmap(dev, bar);
- 
--	pcie_flr(dev);
-+	pcie_reset_flr(dev, PCI_RESET_DO_RESET);
- 
- 	return 0;
- }
-@@ -4207,7 +4209,7 @@ static int reset_hinic_vf_dev(struct pci_dev *pdev, bool probe)
- 	val = val | HINIC_VF_FLR_PROC_BIT;
- 	iowrite32be(val, bar + HINIC_VF_OP);
- 
--	pcie_flr(pdev);
-+	pcie_reset_flr(pdev, PCI_RESET_DO_RESET);
- 
- 	/*
- 	 * The device must recapture its Bus and Device Numbers after FLR
-@@ -4238,8 +4240,6 @@ static int reset_hinic_vf_dev(struct pci_dev *pdev, bool probe)
- }
- 
- static const struct pci_dev_reset_methods pci_dev_reset_methods[] = {
--	{ PCI_VENDOR_ID_INTEL, PCI_DEVICE_ID_INTEL_82599_SFP_VF,
--		 reset_intel_82599_sfp_virtfn },
- 	{ PCI_VENDOR_ID_INTEL, PCI_DEVICE_ID_INTEL_IVB_M_VGA,
- 		reset_ivb_igd },
- 	{ PCI_VENDOR_ID_INTEL, PCI_DEVICE_ID_INTEL_IVB_M2_VGA,
-diff --git a/drivers/ptp/ptp_netc.c b/drivers/ptp/ptp_netc.c
-index 94e952ee6990..24bae237926a 100644
---- a/drivers/ptp/ptp_netc.c
-+++ b/drivers/ptp/ptp_netc.c
-@@ -802,7 +802,7 @@ static int netc_timer_pci_probe(struct pci_dev *pdev)
- 	if (!priv)
- 		return -ENOMEM;
- 
--	pcie_flr(pdev);
-+	pcie_reset_flr(pdev, PCI_RESET_DO_RESET);
- 	err = pci_enable_device_mem(pdev);
- 	if (err)
- 		return dev_err_probe(dev, err, "Failed to enable device\n");
-diff --git a/include/linux/pci.h b/include/linux/pci.h
-index 2c4454583c11..345f0821471a 100644
---- a/include/linux/pci.h
-+++ b/include/linux/pci.h
-@@ -1468,7 +1468,6 @@ u32 pcie_bandwidth_available(struct pci_dev *dev, struct pci_dev **limiting_dev,
- int pcie_link_speed_mbps(struct pci_dev *pdev);
- void pcie_print_link_status(struct pci_dev *dev);
- int pcie_reset_flr(struct pci_dev *dev, bool probe);
--int pcie_flr(struct pci_dev *dev);
- int __pci_reset_function_locked(struct pci_dev *dev);
- int pci_reset_function(struct pci_dev *dev);
- int pci_reset_function_locked(struct pci_dev *dev);
+In case of report status function, the CPU returns the optimization
+status for the 1GB region.
+
+The RMPOPT table is managed by a combination of software and hardware.
+Software uses the RMPOPT instruction to set bits in the table,
+indicating that regions of memory are entirely HV-owned.  Hardware
+automatically clears bits in the RMPOPT table when RMP contents are
+changed during RMPUPDATE instruction.
+
+For more information on the RMPOPT instruction, see the AMD64 RMPOPT
+technical documentation.
+
+As SNP is enabled by default the hypervisor and non-SNP guests are
+subject to RMP write checks to provide integrity of SNP guest memory.
+
+This patch-series adds support to enable RMP optimizations for up to
+2TB of system RAM across the system and allow RMPUPDATE to disable
+those optimizations as SNP guests are launched.
+
+Support for RAM larger than 2 TB will be added in follow-on series.
+
+This series also adds support to disable CPU hotplug while SNP is
+active, as the SEV firmware enumerates CPUs at SNP initialization and is
+not aware of the OS bringing CPUs online or offline afterwards.  This
+also keeps the set of CPUs stable for the asynchronous RMPOPT scan, so
+the per-core RMPOPT_BASE MSRs programmed during setup remain valid.
+
+This series also introduces support to re-enable RMP optimizations
+during SNP guest termination, after guest pages have been converted
+back to shared.
+
+RMP optimizations are performed asynchronously by queuing work on a
+dedicated workqueue after a 10 second delay.
+
+Delaying work allows batching of multiple SNP guest terminations.
+
+Once 1GB hugetlb guest_memfd support is merged, support for
+re-enabling RMPOPT optimizations during 1GB page cleanup will be added
+in follow-on series.
+
+Additionally add debugfs interface to report per-CPU RMPOPT status
+across all system RAM.
+
+v8:
+- Add a new patch to disable CPU hotplug while SNP is active, keeping
+  the CPU set stable for the RMPOPT work handler.
+- Drop the setup_clear_cpu_cap(X86_FEATURE_RMPOPT) calls; the
+  rmpopt_configured bool is the runtime guard.
+- WARN_ON_ONCE() on the RMPOPT_BASE MSR writes that previously ignored
+  their return value.
+- Run the RMPOPT leader scan via work_on_cpu() instead of
+  smp_call_function_single() so it executes in process context.  This
+  fixes the AB-BA deadlock between migrate_disable() and cpus_read_lock()
+  and avoids running the long RMP scan in IPI context with interrupts
+  disabled.
+- Use mod_delayed_work() in snp_rmpopt_all_physmem() so the batching
+  delay tracks the last SNP guest termination.
+
+  Sashiko AI code review identified several of the above issues.
+
+v7:
+- Sync tools/arch/x86/include/asm/cpufeatures.h to mirror the kernel
+  header for X86_FEATURE_RMPOPT.
+- Fix commit title to use X86_FEATURE_RMPOPT to match the code
+  (was X86_FEATURE_AMD_RMPOPT).
+- Add static bool rmpopt_configured, set only when segmented RMP setup
+  succeeds in setup_rmptable().  Check rmpopt_configured alongside
+  cpu_feature_enabled(X86_FEATURE_RMPOPT) in snp_setup_rmpopt() and
+  snp_rmpopt_all_physmem(), because setup_clear_cpu_cap() is unreliable
+  after alternatives are patched.  Add snp_clear_rmpopt_configured()
+  called from amd_cc_platform_clear() when CC_ATTR_HOST_SEV_SNP is
+  cleared.  Do not use __ro_after_init on rmpopt_configured since the
+  writer snp_clear_rmpopt_configured() is not __init.
+- Add cond_resched() to all three leader loops in rmpopt_work_handler()
+  to prevent soft lockups on systems with up to 2TB of RAM.
+- Add comment above __rmpopt() documenting the RMPOPT instruction
+  encoding (F2 0F 01 FC) and register interface (RAX = system physical
+  address input, RCX = operation type input, RFLAGS.CF = output).
+  Note: RMPOPT does not modify RAX unlike PVALIDATE/RMPUPDATE, so
+  the existing "a" (input-only) constraint is correct.
+
+  Sashiko AI code review identified several of the above issues.
+
+v6:
+- Drop wrmsrq_on_cpus() helper; use for_each_cpu() with wrmsrq_on_cpu()
+  instead, as RMPOPT_BASE MSR programming is not performance-critical.
+- Rewrite rmpopt_work_handler() leader selection to use a local
+  follower_mask copy instead of modifying the global rmpopt_cpumask.
+  This eliminates the current_cpu_cleared tracking and the restore at
+  the end, and removes the need for synchronization comments about
+  transient cpumask inconsistency.
+- Add three-way leader selection in rmpopt_work_handler():
+  1. Current CPU is a primary thread in cpumask: run leader locally.
+  2. Current CPU is a sibling thread whose primary is in cpumask:
+     run leader locally (RMPOPT_BASE MSR is per-core), remove the
+     primary from followers via cpumask_andnot(topology_sibling_cpumask).
+  3. Current CPU's core has no RMPOPT_BASE MSR programmed: pick an
+     explicit leader via cpumask_first() + smp_call_function_single()
+     to avoid #UD, with cpus_read_lock() around the IPI loop.
+- Add WARN_ON_ONCE guard for empty cpumask in the explicit leader
+  fallback path, with migrate_enable() before goto out.
+- Add .llseek = seq_lseek to rmpopt_table_fops for consistency with
+  other seq_file-based debugfs files and to support tools like "less".
+- Change debugfs file permissions from 0444 to 0400 to restrict access
+  to root only.
+- Add comment in rmpopt_table_seq_show() explaining why cpu_online_mask
+  is safe: RMPOPT_BASE MSR is per-core and snp_prepare() ensures all
+  CPUs are online when the MSR is programmed.
+
+  Sashiko AI code review identified several of the above issues.
+
+v5:
+- Introduce rmpopt_cleanup() to tear down workqueue, debugfs, cpumask,
+  and MSR state, called from snp_shutdown().
+- Introduce rmpopt_wq_mutex to serialize snp_setup_rmpopt(),
+  snp_rmpopt_all_physmem(), and rmpopt_cleanup().
+- Introduce rmpopt_show_mutex to serialize debugfs reporting of
+  rmpopt_report_cpumask.
+- Move snp_rmpopt_all_physmem() call after SNP DECOMMISSION during
+  guest shutdown.
+- Use migrate_disable()/migrate_enable() for CPU pinning in the
+  rmpopt_work_handler() leader loop to maintain CPU affinity without
+  disabling preemption for the entire RMPOPT scan.
+- Add cpus_read_lock()/cpus_read_unlock() around the follower
+  on_each_cpu_mask() loop in rmpopt_work_handler().
+- Guard snp_setup_rmpopt() against re-initialization when
+  SNP_SHUTDOWN_EX with x86_snp_shutdown=0 skips rmpopt_cleanup()
+  but clears snp_initialized, preventing workqueue and resource
+  leaks on repeated init/shutdown cycles.
+- Replace setup_clear_cpu_cap() with pr_err() on alloc_workqueue()
+  failure in snp_setup_rmpopt(), as setup_clear_cpu_cap() cannot be
+  used after alternatives are patched; callers check rmpopt_wq != NULL
+  as the runtime guard instead.
+- Add pr_info() when RMPOPT coverage is capped at 2TB.
+- Add comments noting CPU hotplug is not supported with SNP enabled
+  and only online primary threads are covered by rmpopt_cpumask.
+- Add comment in setup_rmptable() noting Segmented RMP must be
+  enabled to enable RMPOPT.
+- Simplify cpumask setup loop to set if primary thread rather than
+  skip if not primary.
+- Improve grammar and clarity in snp_setup_rmpopt() comments.
+- Added Reviewed-by's.
+
+  Sashiko AI code review identified several of the above issues.
+
+v4:
+- Add new wrmsrq_on_cpus() helper to write same u64 value to a
+  per-CPU MSR across a cpumask without per-cpu struct allocation
+  overhead. 
+- Rename configure_and_enable_rmpopt() to snp_setup_rmpopt().
+- Use wrmsrq_on_cpus() instead of wrmsrq_on_cpu() loop for
+  programming RMPOPT_BASE MSRs.
+- Add setup_clear_cpu_cap(X86_FEATURE_RMPOPT) if segmented RMP
+  setup fails or workqueue allocation fails.
+- Add X86_FEATURE_RMPOPT feature clear logic in amd_cc_platform_clear()
+  for CC_ATTR_HOST_SEV_SNP.
+- All of the above allow checking for only X86_FEATURE_RMPOPT for both
+  RMPOPT setup/enable and RMP re-optimizations.
+- Rename snp_perform_rmp_optimization() to snp_rmpopt_all_physmem().
+- Split rmpopt() into rmpopt() and rmpopt_smp() for SMP callback use.
+- Introduce separate rmpopt_report_cpumask for debugfs reporting,
+  distinct from rmpopt_cpumask used for primary thread tracking.
+- Remove snp_perform_rmp_optimization() call from __sev_snp_init_locked() 
+  and instead setup and enable RMPOPT after SNP is enabled and 
+  initialized.
+
+v3:
+- Drop all RMPOPT kthread support and introduce adding custom and
+  dedicated workqueue to schedule delayed and asynchronous RMPOPT work.
+- Drop the guest_memfd inode cleanup interface and add support to
+  re-enable RMP optimizations during guest shutdown using the
+  asynchronous and delayed workqueue interface.
+- Introduce new __rmpopt() helper and rmpopt() and
+  rmpopt_report_status() wrappers on top which use rax and rcx
+  parameters to closely match RMPOPT specs.
+- Use new optimized RMPOPT loop to issue RMPOPT instructions on all
+  system RAM upto 2TB and all CPUs, by optimizing each range on one CPU
+  first, then let other CPUs execute RMPOPT in parallel so they can skip
+  most work as the range has already been optimized.
+- Also add support for running the optimized RMPOPT loop only on
+  one thread per core.
+- Replace all PUD_SIZE references with SZ_1G to conform to 1GB regions
+  as specified by RMPOPT specifications and not be dependent on PUD_SIZE
+  which makes the RMPOPT patch-set independent of x86 page table sizes.
+- Use wrmsrq_on_cpu() to program the RMPOPT_BASE MSR registers on
+  all CPUs that removes all ugly casting to use on_each_cpu_mask().
+- Fix inline commits and patch commit messages
+
+
+v2:
+- Drop all NUMA and Socket configuration and enablement support and
+  enable RMPOPT support for up to 2TB of system RAM.
+- Drop get_cpumask_of_primary_threads() and enable per-core RMPOPT
+  base MSRs and issue RMPOPT instruction on all CPUs.
+- Drop the configfs interface to manually re-enable RMP optimizations.
+- Add new guest_memfd cleanup interface to automatically re-enable
+  RMP optimizations during guest shutdown.
+- Include references to the public RMPOPT documentation.
+- Move debugfs directory for RMPOPT under architecuture specific
+  parent directory.
+
+Ashish Kalra (7):
+  x86/cpufeatures: Add X86_FEATURE_RMPOPT feature flag
+  x86/sev: Initialize RMPOPT configuration MSRs
+  crypto/ccp: Disable CPU hotplug while SNP is active
+  x86/sev: Add support to perform RMP optimizations asynchronously
+  x86/sev: Add interface to re-enable RMP optimizations.
+  KVM: SEV: Perform RMP optimizations on SNP guest shutdown
+  x86/sev: Add debugfs support for RMPOPT
+
+ arch/x86/coco/core.c                     |   2 +
+ arch/x86/include/asm/cpufeatures.h       |   2 +-
+ arch/x86/include/asm/msr-index.h         |   3 +
+ arch/x86/include/asm/sev.h               |   6 +
+ arch/x86/kernel/cpu/scattered.c          |   1 +
+ arch/x86/kvm/svm/sev.c                   |   2 +
+ arch/x86/virt/svm/sev.c                  | 437 +++++++++++++++++++++++
+ drivers/crypto/ccp/sev-dev.c             |  32 +-
+ tools/arch/x86/include/asm/cpufeatures.h |   2 +-
+ 9 files changed, 484 insertions(+), 3 deletions(-)
+
 -- 
 2.43.0
 
