@@ -1,34 +1,38 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B8021448E0;
-	Tue, 16 Jun 2026 04:51:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 099933C6A29;
+	Tue, 16 Jun 2026 04:53:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781585514; cv=none; b=Lh+HhOQxpzidvt9Fl0UsodO0iTgCRR7w6Q8hwAqnVnYOrhEIx+dg+sCaPyuE/LhmLdueU7o2kPxlhnQSigr1tYSj5Ij57Fe6oCSx9+WhWW3TsX2ToTxArEKORL7L5f8+s5mKWebPo9evPHfEhHnWvrcxtSH5AmWpEUi2devk3jg=
+	t=1781585615; cv=none; b=BJH8xwBJ74N/IR0NkIZGxh36m5+ZCD7F9WvbG2XeoOB6OpvA1Ds1OpQ8sbXn8Q3Rv+exxxDri/Qvo7V24yEgVZMnr+AHOgjZ3J44+h1d15jQVmYPXnMrst2xlu6eVXJfxF1q/ZPlVxQbfcwOJ5kE1DNVeF/EUh69xPbDVdbZ7iY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781585514; c=relaxed/simple;
-	bh=CDe3fP83zvxWYTUtNEfNFBErP1of+id1fhWVjf93Q9g=;
+	s=arc-20240116; t=1781585615; c=relaxed/simple;
+	bh=se6JjSFqEhcNOcO5yXaTc4lQy0fzqgSqIPAWH1BewYA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CskXQo6yGG53zE1+pyoo+euZXc7j7XH6QKRvIUdk4yZEhSlIn3cIIEUzY3LhW5d/uhdJfobMPiMXBtJLMWgh07d+X8iea2369kAdV9MxoFORSsCjOLF8v9u4/UCERCSTXgaIt60fnTAkUJGBIAZ5k0qrBK4sAV49DZZNJCfaNHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dMwo2yh0; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=rYI/t68vaNZVExiC2KgznbAOtRWsSotzGc7F87wtHMs75dikgcVr24AuEs6W2GuG3ij1JkD+klwigxTBGL0sKYyyth0fzy5eHMmz6w/1IHlpi9jVShiMMfYDjlaq9RBT7OhHZv8DcCK5FXuDTVQORgPc9YmcA8mWVt0iC86wJ2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=VmPsuxtx; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dMwo2yh0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89ECB1F000E9;
-	Tue, 16 Jun 2026 04:51:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781585512;
-	bh=EYZQNXEAHS+yGmR3jEboZ3cP60eSiYFi0WDQBnHMECI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=dMwo2yh0fYx0tzSOvW6JigGmOTTMCGUydxb3M1bv5/meEuSFb5CXp2nFuBpmSEQ/A
-	 xDbaTxvLf4qZ0ruZqJBkEInHP5xpU9kXVcHgIYBwEU3phGNIJKJsY27ZqtY6DJCK6w
-	 SqL0CmEvEm+5E6Z/6UpEHDwHlSsF5tSTCwhmFm6xQdMu8abxnTPJB59SQdzGhM43FS
-	 DmY7Siel5TIkBmUtIBk7mDkB0npIMGJnj7wceXPAeXUvRcB4CO5qPZFLvvkI52RUza
-	 i0DpvAtBMqy37GQOQzOSlPTUZceKqbSwhZ4zIteZjGltrQiaOUd5SbxScgqwXET8zs
-	 ddmRybaWSBSXQ==
-Date: Mon, 15 Jun 2026 21:50:23 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="VmPsuxtx"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=Drc4fXjipljDF28wMil4aX3O9W2wJZel/OFv8NyFnHk=; 
+	b=VmPsuxtx+9Bg8KvHv/jo8rkDWN8e5B9NelDNvldK4sqHaOvY7kBjn36NTuRuakXklslItoeNIyQ
+	fUZb+fhu5jE/C/xc3lCQRbcky3ffEu0x2YWR6HZ4x0rxGzNAxu2ixPJfO+tUnrmxhjdgGPrT/CFdD
+	LJrE9e6041bBLhJJQvvfTl7J39KdXI7b/uQq33PoG5c3ykJyCZXB4mpmmsoR5f663smt0pjDLd8i2
+	SVHerGdf2znKxnYpToC+S9XgVzsmP5YVUgIcwUAKd8gKXUpcWOhgEzyxKkyOF80LZozXIxvz2AfRV
+	2vF540NGMOhUUH1MRjZO53OHeloOumdSGr2w==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1wZLng-00000005lJC-0YMs;
+	Tue, 16 Jun 2026 12:53:25 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 16 Jun 2026 12:53:23 +0800
+Date: Tue, 16 Jun 2026 12:53:23 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Biggers <ebiggers@kernel.org>
 Cc: Leonid Ravich <lravich@amazon.com>, Alasdair Kergon <agk@redhat.com>,
 	Ard Biesheuvel <ardb@kernel.org>, Jens Axboe <axboe@kernel.dk>,
 	Horia Geanta <horia.geanta@nxp.com>,
@@ -37,10 +41,11 @@ Cc: Leonid Ravich <lravich@amazon.com>, Alasdair Kergon <agk@redhat.com>,
 	linux-block@vger.kernel.org
 Subject: Re: [PATCH v4 0/3] crypto: skcipher - per-request multi-data-unit
  batching
-Message-ID: <20260616045023.GA113934@sol>
+Message-ID: <ajDWww8OgNcXs73c@gondor.apana.org.au>
 References: <20260615111459.9452-1-lravich@amazon.com>
  <20260615225317.GB28589@quark>
  <ajDNT5jVGgRtiNH6@gondor.apana.org.au>
+ <20260616045023.GA113934@sol>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,34 +54,25 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ajDNT5jVGgRtiNH6@gondor.apana.org.au>
+In-Reply-To: <20260616045023.GA113934@sol>
 
-On Tue, Jun 16, 2026 at 12:13:03PM +0800, Herbert Xu wrote:
-> On Mon, Jun 15, 2026 at 03:53:17PM -0700, Eric Biggers wrote:
-> >
-> > So in other words, this series slows down dm-crypt and crypto_skcipher
-> > for everyone to optimize for an out-of-tree driver.  And there's also no
-> > benchmark showing that your driver is even worth it over just using the
-> > CPU.
-> 
-> There is no reason why the software fallback should be slower
-> than the status quo.  Existing callers of the Crypto API will
-> be issuing one indirect function call per data unit.  With the
-> new scheme, the indirect calls per unit moves from from the caller
-> into the Crypto API.
+On Mon, Jun 15, 2026 at 09:50:23PM -0700, Eric Biggers wrote:
+>
+> Have you checked the code?  This patchset adds overhead in multiple
+> places.  Dynamically allocating multiple scatterlists and then parsing
+> them, adding a new field to skcipher_request for everyone, new checks in
+> crypto_skcipher_en/decrypt for everyone, new checks to validate the data
+> unit size that the caller knew was valid in the first place, etc.
 
-Have you checked the code?  This patchset adds overhead in multiple
-places.  Dynamically allocating multiple scatterlists and then parsing
-them, adding a new field to skcipher_request for everyone, new checks in
-crypto_skcipher_en/decrypt for everyone, new checks to validate the data
-unit size that the caller knew was valid in the first place, etc.
+No I have not :)
 
-> In fact, we could move it down further and improve upon the
-> status quo by splitting the data in each algorithm implemntation
-> so that the calls per unit become direct function calls and only
-> the overall call into the Crypto API remains indirect.
+I'm just stating the general principle.
 
-That's not what this patchset does.  But also, as we know, a better way
-to eliminate "Crypto API" overhead is to call the algorithms directly.
+Of course I will not apply the patch-set until I have reviewed it
+properly.
 
-- Eric
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
