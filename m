@@ -1,82 +1,92 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A55F5339858;
-	Tue, 16 Jun 2026 09:40:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E10DF2E7162
+	for <linux-crypto@vger.kernel.org>; Tue, 16 Jun 2026 10:41:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781602823; cv=none; b=nnC48PHwqyT1E+4+zBjLv2rd/Qs/qrp67NhRoSPraQB6S+98+4de5mGaGuJ7di6s78n9/IvNoIoGUB0mXWzxLK7mzfoxcQFpyO9t612fiKioVm9zXi1/std1ja2f6VwXKRB1HraihAlISztq50To23Xeq968RRfjWisxQXhR3bA=
+	t=1781606487; cv=none; b=YADpGcfjzN0qX0sVpCVdcuOunVv1Y2NXrFcRojH9q/7PW3dGbfcr+bUNyVJ9iNmxpVQWcsTv4BXLu2feTlB0DlN/JHOQfR1ffYBNu4QMIqxfQJYJ3VMOGSArDsZ/QpfHS6Y5Wb43zE5NwsdYXDnu2Q5bh/M81HEPJ/cl/dJLEWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781602823; c=relaxed/simple;
-	bh=OIHpckKJks3XBDlA50IGTEDTHyoTlokbdEXrlbpULrA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dlbIMvVQzVvjEd6boYDcCApHV6b8XZAy/Rje2BVxB+0NrMOaMGgI6Azve/vqnFN2aqtyuksIq/LxDDdLrPbXaptoQeuGHCMhnkl4UBhthahPKRWVUnXx+XYxyjsn5G3g0Kv0W9SYCvKnPnWMgdPg518rACegv34YaWCyUgSzeGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 617cab1c696711f1aa26b74ffac11d73-20260616
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:3cf760ff-d287-4309-96ec-bc1cb30c5adf,IP:0,U
-	RL:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:25
-X-CID-META: VersionHash:e7bac3a,CLOUDID:4a10856e43b4a916e87dfa08b6f540b3,BulkI
-	D:nil,BulkQuantity:0,Recheck:0,SF:102|850|865|898,TC:nil,Content:0|15|50,E
-	DM:5,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:
-	0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 617cab1c696711f1aa26b74ffac11d73-20260616
-X-User: zenghongling@kylinos.cn
-Received: from localhost.localdomain [(10.44.16.150)] by mailgw.kylinos.cn
-	(envelope-from <zenghongling@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 503189994; Tue, 16 Jun 2026 17:40:16 +0800
-From: Hongling Zeng <zenghongling@kylinos.cn>
-To: t-pratham@ti.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	zhongling0719@126.com,
-	Hongling Zeng <zenghongling@kylinos.cn>
-Subject: [PATCH] crypto: ti-dthev2 - Fix potential invalid access when device list is empty
-Date: Tue, 16 Jun 2026 17:40:11 +0800
-Message-Id: <20260616094011.122733-1-zenghongling@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1781606487; c=relaxed/simple;
+	bh=GiwgUDhVPuccDsHM6fcajwPeBmdY/V23LoCQ/JyqQ5w=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=a4MX9Cl5OO7sJ8joCWpehgEPh0H/exMnVYoAPvqWgF+bL1o9T9uWlCvcUlck0e8VlGoJy4pAMCQDlXNrgglxktL8t0+bZH+X7mwp2pXdkP7/70PqD2kjjz1f9aSVccCS4ZJTTYGJ8Gsez1dGO6f84jmk+JqMWHiARHiRyBY30I4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lDST57TJ; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lDST57TJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B677D1F01559
+	for <linux-crypto@vger.kernel.org>; Tue, 16 Jun 2026 10:41:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781606484;
+	bh=2tpmLa3dd6flsbsy+JH4P54/CMX4D7LsJ6W8CltvTok=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc;
+	b=lDST57TJodRceigb2VwiaQ0BBbw1vD9bcd9X+L/nZuc6pTHePvV4PTHHs537n9baA
+	 67mbbjNVI3bXFnrZcPIUhGxb4fRHzSstlZPhGjb1gUDOui4i92rQevtsl4KRu5s+/j
+	 2B9u0UDWiPDndFFN60XSAIdtKWCIPeoP+spHQctav/sGCBTE8KIcMW1AZtt5Ytfhjv
+	 nrJn6CdUEheRPHjszM3T5wAzpxGipr4r/hjfBCCTKzppunk8tdW7OYuxo0yDYA5C72
+	 RXkFbjX3cgn4dc3P9PweExe7AuoSMG7XiyGF+ZQad0sEK+YfaxLoOmf0/MV7haV9dG
+	 8+XZ1+sV/eSLw==
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5aa63daf2a5so3214368e87.3
+        for <linux-crypto@vger.kernel.org>; Tue, 16 Jun 2026 03:41:24 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ/4A8ZRBA0/H2sEMb2bUAmzuDPtYZD2hcpzc2oRLvLS7+3AL0wnEI5uH61toygkaqxkaL0md7ldX567HCE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPjMB4wVXA+5a5wIf+m6p2cmIkIhXO+UDXMveJ730zTlYPOFlO
+	qUAAKMSexxQCc6oyD0p6bO54YmLZlHlNK5DYEypOTjiUiDLWBrVUoP+VmyV3NJTHMU2ObvGdRir
+	JyVXGR69jD56PR43kZZXWpZ/fA57XScwiJ+NIg22ykA==
+X-Received: by 2002:a05:6512:3e17:b0:5aa:6946:6e4d with SMTP id
+ 2adb3069b0e04-5ad4351b594mr963896e87.19.1781606483423; Tue, 16 Jun 2026
+ 03:41:23 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 16 Jun 2026 10:41:21 +0000
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 16 Jun 2026 10:41:21 +0000
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <20260616051820.GA127019@sol>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260615-qce-fix-self-tests-v2-0-dc911f1aad42@oss.qualcomm.com>
+ <20260615-qce-fix-self-tests-v2-1-dc911f1aad42@oss.qualcomm.com> <20260616051820.GA127019@sol>
+Date: Tue, 16 Jun 2026 10:41:21 +0000
+X-Gmail-Original-Message-ID: <CAMRc=McmpeWY2yVbf-KoAG-uC8_cvcW6MJXFSOjnEFqpmjaoig@mail.gmail.com>
+X-Gm-Features: AVVi8CfBtys2dQpRs7E2oMR0x48_wmRqAKjUTOb8b_ZnXmDQi8Ass0ebG3f0ZrY
+Message-ID: <CAMRc=McmpeWY2yVbf-KoAG-uC8_cvcW6MJXFSOjnEFqpmjaoig@mail.gmail.com>
+Subject: Re: [PATCH v2 1/8] crypto: qce - Remove unsafe/deprecated algorithms
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Thara Gopinath <thara.gopinath@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Stanimir Varbanov <svarbanov@mm-sol.com>, 
+	Eneas U de Queiroz <cotequeiroz@gmail.com>, Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>, 
+	linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, brgl@kernel.org, stable@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"
 
-list_first_entry() never returns NULL - if the list is empty, it still
-returns a pointer to an invalid object, leading to potential invalid
-memory access when dereferenced.
+On Tue, 16 Jun 2026 07:18:20 +0200, Eric Biggers <ebiggers@kernel.org> said:
+> On Mon, Jun 15, 2026 at 05:49:52PM +0200, Bartosz Golaszewski wrote:
+>> Remove algorithms that are either unsafe or deprecated and have no
+>> in-kernel users that cannot be served by the ARM CE implementations.
+>>
+>> AES-ECB reveals plaintext patterns (identical plaintext blocks produce
+>> identical ciphertext blocks) and should not be exposed as a hardware-
+>> accelerated primitive. DES, Triple DES and HMAC-SHA1 have been
+>> deprecated for years.
+>>
+>> Remove ecb(aes), cbc(des), ecb(des3_ede), cbc(des3_ede), hmac(sha1) and
+>> all AEAD variants built on these primitives. Also clean up the - now dead
+>> - code, flags and constants.
+>>
+>> Cc: stable@vger.kernel.org
+>> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+>
+> What is the rationale for still supporting the following?
+>
+>     sha1
+>     ecb(des)
+>     authenc(hmac(sha256),cbc(des))
+>
 
-Fix this by using list_first_entry_or_null instead of list_first_entry.
+No, I should have removed those too. I'll update it in v3.
 
-Fixes: 52f641bc63a4 ("crypto: ti - Add driver for DTHE V2 AES Engine (ECB, CBC)")
-Signed-off-by: Hongling Zeng <zenghongling@kylinos.cn>
----
- drivers/crypto/ti/dthev2-common.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/ti/dthev2-common.c b/drivers/crypto/ti/dthev2-common.c
-index a2ad79bec105..cc0244938267 100644
---- a/drivers/crypto/ti/dthev2-common.c
-+++ b/drivers/crypto/ti/dthev2-common.c
-@@ -40,7 +40,7 @@ struct dthe_data *dthe_get_dev(struct dthe_tfm_ctx *ctx)
- 		return ctx->dev_data;
- 
- 	spin_lock_bh(&dthe_dev_list.lock);
--	dev_data = list_first_entry(&dthe_dev_list.dev_list, struct dthe_data, list);
-+	dev_data = list_first_entry_or_null(&dthe_dev_list.dev_list, struct dthe_data, list);
- 	if (dev_data)
- 		list_move_tail(&dev_data->list, &dthe_dev_list.dev_list);
- 	spin_unlock_bh(&dthe_dev_list.lock);
--- 
-2.25.1
-
+Bart
