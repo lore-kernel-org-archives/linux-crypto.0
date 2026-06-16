@@ -1,69 +1,69 @@
-Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013061.outbound.protection.outlook.com [40.93.196.61])
+Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012071.outbound.protection.outlook.com [40.107.200.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E243DB322;
-	Tue, 16 Jun 2026 06:04:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 025FA314D18;
+	Tue, 16 Jun 2026 07:27:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.71
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781589855; cv=fail; b=ThAw3/qCg+KJl4Y3s0OHKMSglwySPJC1NiIhUxhOC72uElitoQhRNWrHSj08NXODhIohxtS8P7WIIYOs8J+i+511SO2Dag/tcsaTkM2Bhf0YOMzqNtIJVvboXcWjW0EF81NFDCKOd57BX5koODvzeDNI9+hSUVGtoNiJhbBOrV4=
+	t=1781594866; cv=fail; b=HYq7BAQXwtMQZROKoRFvlBHsjHrlbmdGidAOwKLL+3TdVTuy780Wf29VPyU+3Uo/DOYIEmkBG3qes16ZaGa830affz7kFr9AVtgbPAxuoK7K3CMOGkuvXquHdBMGKxvVC0gI254WaUZ5ygfbM/TB6EK2eFr75cWj4tsxGg+9u+k=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781589855; c=relaxed/simple;
-	bh=mTgiDi1KF0DwB0HoQjxcIxygCu9t+Smi2caxnDJOhlY=;
+	s=arc-20240116; t=1781594866; c=relaxed/simple;
+	bh=+CiPN4Obibz/RZpw3paXXUpMOoEqnwFZkRl/EYt3LlM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=sA1Bx3cI4rRw81WWrsqx4CvlWse0PT/oqLTnJZgxgpdK6mMvT5MB9sooPuQOGTsR0XTPaG9eQXgtlTYKHkYbnEx2UJEXQTcEoZjqjyy3aRCuym1RAEVXo022Ig80puu7bow7t3zBI41n4YLmus8BOs9Hhy/mO1pPoBZ5hh9ANg4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=dqp0y49U; arc=fail smtp.client-ip=40.93.196.61
+	 In-Reply-To:Content-Type; b=do0oVUi++7tLMwUlt4WGqRpzg1mbOvd2XX1M41rNZq76H+9ZSKzbXMoWulRgZAi3f1+GNgeWbDGK1kZRVPvPaif4ygxwWd/8nHt1K7RkHRxu5qKEjr1KMg7w/ZnB4gM8xeYPdnUOGrDBj3Rb8vXAU0cEtmn9jfU6lDtQWbtWFGA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=wwbgqmlV; arc=fail smtp.client-ip=40.107.200.71
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="dqp0y49U"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="wwbgqmlV"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=E8yHNli2q9FcftlAUQ4xUu6kNzvGgNTLXh3h1wJJkBbSkkM+i45jJ81IVMCXw1VjMgnwYqVRVm/y33XVmrUVSe0v5zQO+2R0KAXtIQRLxY4RArhXl728XF985AeR1xggEHWyY77kiSflm2hsXXwTNMkE0ga3P08TSlmaL3ev7nJeJ6u6VtwOS3nbWhCDCSXdLjUKc26shZTK1QlAJx9KWZnmNFkGDmE+3EUrrjEVXPlxtPe/e8UCSiWtKMuJytXk0TGmjjos6MHrBEgCzDg59R76Ln6ziScEubm+EUMFzyAMiWV3Sdlbz+7DFgIAS38ST98abpBdCDWu0us2HBuJXA==
+ b=SpoZ2a1mzfWzeBc9PgSmj23UX+sOAJEMq1kxj8DU9FQuysRAhoImZweOaElqcGMfYzxQYr7Xtd/zSmgWKMXPzbS8li6MifencVqIEwFCjl3HJa9w2IPBUxXbpWwdlYe3UZ7I1J+eNvWqSyLyri9dQPJ8IZmQTid9sq98+B8FaKKevAgIP4A9fe8ejlzh69wej4b9s48sQuYxIdciDv82/AA3w2wkx5gDTMmTQNDLtbv6rEUc5BcFQa+/svFRm7zPVTCZGok39ecZhTsWLNM9r6vhjQUaXCoGteHxP0vHqImXfKSP12o8uiAjMeXiJSawpSZ5+y67SUNqIYWdrLYOug==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vlCqWAloRLHmBD57Evhm4kk0nDTP2qMQSPDNks/WIzA=;
- b=EhEeKJo6QHyctOiCABGk+EROCMoJc3ix9C0MUpuy6RUmLyGrNau5KNW0d4xrbBpbQm3lI1+9fRY8tNPpWy5/N4DlKOcPjWYxRY79J5GKktN9ddGvf4tMmvPGy536X0fQ3EdYwMFBaroO4y3kubZZalK/KrlUPHWmBlfosKaK7XijQugAcuaSVz6QTOm9MtXpWISWvOvwgHds+CH6TNK9R394sJpDALjFVRFUpZ9Mmua9TAwaiFhWeDpWvMcmhvlz2kKiyq7glkXwOojMsV/BbgG11ExXClQJRqZMGiy/Lk43xLkhLg5X3QsDkKilGfn1XKWIMgOFeGZPLJl+AIo1tQ==
+ bh=yMbrZN8ZiJRa9iRFbMfdyl36iGIaHFvtXokcqC+WZvE=;
+ b=amJrSEpwar3nv5PWC/0qJCSxdfdYOajmM3Vn1QjbgJq6pwd/4lxquU7zOhPRFZsoOBEcaw6rbI+Aadbe/+/uysZNypL+snH1Fe+mhb6DrIsFgQuqGLqrnUSfzAFVdH0Pa+bV2lD9OaxMJmylJCvExm668vG1EvuUazm7fKVjG6DQj6CZTinIim20Je5ChcMbG5HFOGBvrYsWdP86nrIk9DD2G+zCxlzjBXzCMS5Focm7ZKAh0fOcmuW9MSmN4xlHVR/JxZJC2SHyV4n8DoAzOod531MmgpWQDHO26pfzUd7b7Dk8TWRAKwPDYYAWczg697FUsqUuKWvnRqATvT58+g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vlCqWAloRLHmBD57Evhm4kk0nDTP2qMQSPDNks/WIzA=;
- b=dqp0y49UnO6VX+8VKd521Tta6UrZKJCbreZCc5FkDiyBy1oejs6fj2mepy3mrgQhgOjer9o21+RPLOU6LcYBey7snwxN6ps9QQsKELclCJKe8CYqqKd/Zqg50HSxu391Uwz+kngRHMlVmWW22kvhajdAvu4FrcfusR+OycEEGK8=
-Received: from IA1P220CA0011.NAMP220.PROD.OUTLOOK.COM (2603:10b6:208:461::12)
- by DM4PR12MB8521.namprd12.prod.outlook.com (2603:10b6:8:17e::6) with
+ bh=yMbrZN8ZiJRa9iRFbMfdyl36iGIaHFvtXokcqC+WZvE=;
+ b=wwbgqmlVUDHR0J2I+n/T2nVaLDDV29wFe2iXI8AtG/QSTucZUFui/IBxZ32ypyJIGryvBnHN2puZ4Fk2O+NMhnG64knwe5K+Nd8da6LeVJzvn8fcnJSH5DwlHSbCqeDjvZUQV9jEXiw9ZYemFZyq8kpnPc8K2rvr1c9DYC6iT/I=
+Received: from SJ0PR13CA0160.namprd13.prod.outlook.com (2603:10b6:a03:2c7::15)
+ by SJ2PR12MB8717.namprd12.prod.outlook.com (2603:10b6:a03:53d::12) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.113.18; Tue, 16 Jun
- 2026 06:04:07 +0000
-Received: from BL6PEPF0001AB53.namprd02.prod.outlook.com
- (2603:10b6:208:461:cafe::9b) by IA1P220CA0011.outlook.office365.com
- (2603:10b6:208:461::12) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.113.18 via Frontend Transport; Tue,
- 16 Jun 2026 06:04:07 +0000
+ 2026 07:27:40 +0000
+Received: from MWH0EPF000C6190.namprd02.prod.outlook.com
+ (2603:10b6:a03:2c7:cafe::5e) by SJ0PR13CA0160.outlook.office365.com
+ (2603:10b6:a03:2c7::15) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.139.11 via Frontend Transport; Tue,
+ 16 Jun 2026 07:27:40 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
 Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- BL6PEPF0001AB53.mail.protection.outlook.com (10.167.241.5) with Microsoft
+ client-ip=165.204.84.17; helo=satlexmb08.amd.com; pr=C
+Received: from satlexmb08.amd.com (165.204.84.17) by
+ MWH0EPF000C6190.mail.protection.outlook.com (10.167.249.101) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.139.8 via Frontend Transport; Tue, 16 Jun 2026 06:04:07 +0000
-Received: from satlexmb10.amd.com (10.181.42.219) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ 15.21.139.8 via Frontend Transport; Tue, 16 Jun 2026 07:27:40 +0000
+Received: from satlexmb10.amd.com (10.181.42.219) by satlexmb08.amd.com
+ (10.181.42.217) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Tue, 16 Jun
- 2026 01:04:04 -0500
+ 2026 02:27:39 -0500
 Received: from satlexmb07.amd.com (10.181.42.216) by satlexmb10.amd.com
  (10.181.42.219) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Tue, 16 Jun
- 2026 01:04:01 -0500
+ 2026 02:27:39 -0500
 Received: from [10.136.46.240] (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server id 15.2.2562.41 via Frontend
- Transport; Tue, 16 Jun 2026 01:03:52 -0500
-Message-ID: <fb2f1105-3bef-4197-bccd-865c013ce712@amd.com>
-Date: Tue, 16 Jun 2026 11:33:51 +0530
+ Transport; Tue, 16 Jun 2026 02:27:29 -0500
+Message-ID: <0fa0bc95-ff31-40c5-b083-3c885d09d0ab@amd.com>
+Date: Tue, 16 Jun 2026 12:57:28 +0530
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -71,7 +71,8 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 2/7] x86/sev: Initialize RMPOPT configuration MSRs
+Subject: Re: [PATCH v8 4/7] x86/sev: Add support to perform RMP optimizations
+ asynchronously
 To: Ashish Kalra <Ashish.Kalra@amd.com>, <tglx@kernel.org>,
 	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
 	<x86@kernel.org>, <hpa@zytor.com>, <seanjc@google.com>,
@@ -87,109 +88,157 @@ CC: <pbonzini@redhat.com>, <aik@amd.com>, <Michael.Roth@amd.com>,
 	<linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
 	<linux-coco@lists.linux.dev>
 References: <cover.1781419998.git.ashish.kalra@amd.com>
- <6a4d0ec9e037d91c0fdba9c525942ca288e1b1b2.1781419998.git.ashish.kalra@amd.com>
+ <de274c2fb3f794ff1f19f0c96184ee50d04d1282.1781419998.git.ashish.kalra@amd.com>
 Content-Language: en-US
 From: K Prateek Nayak <kprateek.nayak@amd.com>
-In-Reply-To: <6a4d0ec9e037d91c0fdba9c525942ca288e1b1b2.1781419998.git.ashish.kalra@amd.com>
+In-Reply-To: <de274c2fb3f794ff1f19f0c96184ee50d04d1282.1781419998.git.ashish.kalra@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB53:EE_|DM4PR12MB8521:EE_
-X-MS-Office365-Filtering-Correlation-Id: 053f0527-cd57-4314-900d-08decb6d136e
+X-MS-TrafficTypeDiagnostic: MWH0EPF000C6190:EE_|SJ2PR12MB8717:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1552474e-54f9-42fb-69b7-08decb78bf9a
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|36860700016|7416014|23010399003|376014|18002099003|22082099003|921020|56012099006|4143699003|11063799006;
+	BCL:0;ARA:13230040|82310400026|7416014|376014|23010399003|1800799024|36860700016|921020|22082099003|18002099003|10063799003|3023799007|11063799006|56012099006|6133799003|4143699003;
 X-Microsoft-Antispam-Message-Info:
-	siPdaCV4olqjDE/qkbDYXOZcY6otKFzrFgiSZOelGdI4nF/n8xhzCQBeZxWT/iMd7DEPdpNo9C+k1EKr5R/W2d//pKvtX13PsGuWY0WdvP+XSZw632m63KarJZBnZCP6L+BD9ObW3zK4tHqosFdwo6159I1fVx2mPJzIyc8KHszmUZsB83IsuRkMt3sQJyqrHxCoAvemtkMmNysi82QmkMZZ1n6UBBNYNZO4rS0Tl4eeZtxDRaPw3101xYOY+iWgmMrhkNdJeTptxkn9se4TWWurjtFi+mmH0jkalg30G82ykKqmUBwHo6faomvws9dsFS0UDeZkiWaQkSa7e6xvZRAq7qdVTxgCnAep3HIXkJ+a4Ca4h+gXOP6qtUjw2QXRsjYWuiykBYgF5a00NFYdNlL/qGGq+PvY7W9VVegW+ziW2Cxa6/2I+Y2diSA+BF2F4xULWBkbOGMMbKx4mIX/DEy2Hwp5/fIjaVHcSVEWCBvHlCXV+FoM+mmF+0UPGiLL8fgflcLORzx2kuzBOkizd/QU+gRXl/8WtuPVxINZhe0EoFJrLkusxOCyU5GJKwcSCr02ChrnP0k3pfvqHtvjSOVWL+nh5skLOPkbs6yU5Dh1D92+VNnuZFFiLK/0ds9AIBS8yuZ/S4JZnV0Mgb1lgTl2y7LYdI7C2hvD2dLF4PEHzCibJUgHzBpoa3+E+orw+sjx0KpSi7JOa/vkh3pdAfAY+u25mOPs5+8ytHCBvTdskIhFgBn7AWWpcKTXzN0qmIsTpwbEK+SAYxzt1xKMOg==
+	PNF5UsrWbNDrGagnZ/ljZx2OMI2y6uXitgUKsWwQZtoMIq6PbxCVzq7/HNsJ9EcIhot+Eg7eYuFW2Gaen5NE7ArvubGU8EIRadfAFrH09/9QRV/c5q0liHEFowYfDYkzXD7CIwoy+itnUqrGQ1cvQLMf+4ZwZ8JukNJix77z1Bg6t8bA8FQWjiFnR6K/NSk4DW9+4NqjzcIznRmp7kaQVVnWe99WnKi7/IOIbEHXlAS/wW6GZyp8e52J1KllzBPEUguuWxmMiwU+R64+mSw3+j3A4zU6dVnV2sfaMoTVtm1OgAg/AH+HBd6yJ5jSck/F/4VKo9TKH6N917TMlbplg2IXKPl3YDx89cG+Hi5vM7jl7uWD1K4q67AZG0tnAQWdNf6sqofD281diO3z8Sw3MnydwREjRj3DrmcvEAeayWxO+jF5FdBn+8qghG7t6xofaS+z9CFHWXg6e8p1qYgZIMYPFx0HwLD0oSFALLFMVR3Ebf5caDrmVudrFodUv5CZcH9E8QmvjvQdXrSjk+Eg446/2ydRvuZyorMhbMIBexTnUbH0eSlvtcU2xdKqWE/6c7AGa7XuTWR8/M4L4lyks9ZNP8Iuug9Wt1vpU8oM4tMe0ztwzkDXxcOhDJnwicxx45NGlWEjs/JvpFDRcD6r3da+ysmDPFqe83rj+4wOwOCy50CvjB6kytyO+vt/XIS5ZFIFah1gcVG7h+s7Z8vW4/S7Hqa+Tog5cQk5HiobEAOTysOP7NTcLIeM1w5SqAZbYw1iCd8Xn76F4+YeuZ4x3w==
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700016)(7416014)(23010399003)(376014)(18002099003)(22082099003)(921020)(56012099006)(4143699003)(11063799006);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb08.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(7416014)(376014)(23010399003)(1800799024)(36860700016)(921020)(22082099003)(18002099003)(10063799003)(3023799007)(11063799006)(56012099006)(6133799003)(4143699003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	chl6PWOJ0V3OQG3cm0xJx9CrDm5jvItT3XgxKlbOfE8m0m+TQ08CnDGgskrxMzL8H5xRp1VeZ3pq+TIEKtooXx3I062jHnJT3Wkms3+aIUPsgu85qAL11LV+Vefy3iMTKLz5U+twvkXRaS1jfg/Zwh8eJ+xLIRLFs9vk8cJpJDxswTDtDzlamf8HwfQDAnyqv0qBntXMkvveUuY/2zCscRvKMB1j6pDxtZ9QBMtzvYSaaisHxaJpHJ54/5dhuXGp4c0LugIQqxN1bkdLOx8bcdi3GuP1eO+JlG6a8xst5e9Dg1SWywdYNciWvzIuCHmY2ae6yxGDBrA5/b38YsF1ir7UN4URJp5fR3i4/homXis5NffAwo1h5jmHZbBG2RFuucD4M4KyJw4+/iqOreuPtPwhq3RzhR6ejd4Kq9fL0v4bpmjqFhGGKCn0j04lZsc+
+	fE9Wpz1dzC2LcwIX9//szHpRnL1U88O1xZYLKF34UppBS6WVkpfwvyFxGu8qEPj3DNOvC8twWzysJqb5wzyD/B6R6pD/0ILK7aCWL96FeAxViOh2RgozYH5uRa7tyTXyxD3n7Pxk00TQf2g9HZWYexdF+iArKXIhjfC3TVF/OZ7tQG+HdB3ecjeswuEoP+n1na7KBrWi3Ga1rzGf5wTXRdqZoNCMCM/RL1g1TeDylvxEsUwFZnGhaJeBbIFSQkULfncr0XFKz1Hj206Gp0fZUIgW1VsZzwNAVCmupy6aK2S9uP0UiSWeQJXIUzm3Q495JmzvjdFDqMJQBk1Nlz6gnhho/FxZTOxwLTmcujMBpI3AT1Aj4bPwMyeXz14MAdwnIEmzSz/9ZFm/xxTyFOvQOEoqfyyOiManYLgmU/ePJSjujb4DoJ2D8piSRtp+35fs
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jun 2026 06:04:07.0806
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jun 2026 07:27:40.3547
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 053f0527-cd57-4314-900d-08decb6d136e
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1552474e-54f9-42fb-69b7-08decb78bf9a
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb08.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF0001AB53.namprd02.prod.outlook.com
+	MWH0EPF000C6190.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB8521
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8717
 
 Hello Ashish,
 
-On 6/16/2026 1:18 AM, Ashish Kalra wrote:
-> diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-> index 8bcdce98f6dc..1b5c18408f0b 100644
-> --- a/arch/x86/virt/svm/sev.c
-> +++ b/arch/x86/virt/svm/sev.c
-> @@ -124,6 +124,10 @@ static void *rmp_bookkeeping __ro_after_init;
->  
->  static u64 probed_rmp_base, probed_rmp_size;
->  
-> +static cpumask_t rmpopt_cpumask;
+On 6/16/2026 1:19 AM, Ashish Kalra wrote:
+> +	/*
+> +	 * RMPOPT scans the RMP table, stores the result of the scan in the
+> +	 * reserved processor memory. The RMP scan is the most expensive
+> +	 * part. If a second RMPOPT occurs, it can skip the expensive scan
+> +	 * if they can see a cached result in the reserved processor memory.
+> +	 *
+> +	 * Do RMPOPT on one CPU alone. Then, follow that up with RMPOPT
+> +	 * on every other primary thread. Followers are "designed to"
+> +	 * skip the scan if they see the "cached" scan results.
+> +	 */
+> +	cpumask_copy(follower_mask, &rmpopt_cpumask);
 
-nit.
+rmpopt_cpumask is constructed after hotplug is disabled but ...
 
-I believe you can use cpumask_var_t here and do a zalloc_cpumask_var()
-during snp_setup_rmpopt(). That way !X86_FEATURE_RMPOPT configs don't
-have to needlessly waste space to keep a redundant cpumask around.
-
-Same comment for rmpopt_report_cpumask in Patch 7 which can be
-allocated dynamically during rmpopt_debugfs_setup().
-
-> +static phys_addr_t rmpopt_pa_start;
-> +static bool rmpopt_configured;
 > +
->  static LIST_HEAD(snp_leaked_pages_list);
->  static DEFINE_SPINLOCK(snp_leaked_pages_list_lock);
->  
-> @@ -490,7 +494,12 @@ static bool __init setup_rmptable(void)
->  	if (rmp_cfg & MSR_AMD64_SEG_RMP_ENABLED) {
->  		if (!setup_segmented_rmptable())
->  			return false;
-> +		rmpopt_configured = true;
->  	} else {
+> +	/*
+> +	 * Pin the worker to the current CPU for the leader loop so that
+> +	 * this_cpu remains valid and the RMPOPT instruction executes on
+> +	 * the correct CPU.
+> +	 *
+> +	 * Use migrate_disable() rather than get_cpu() to prevent
+> +	 * migration while still allowing preemption.
+> +	 */
+> +	migrate_disable();
+> +	this_cpu = smp_processor_id();
+> +
+> +	if (cpumask_test_cpu(this_cpu, follower_mask)) {
 > +		/*
-> +		 * RMPOPT requires a segmented RMP table, so leave
-> +		 * rmpopt_configured clear on contiguous RMP systems.
+> +		 * Current CPU is a primary thread in rmpopt_cpumask.
+> +		 * Run leader locally and remove from follower mask.
 > +		 */
->  		if (!setup_contiguous_rmptable())
->  			return false;
->  	}
-> @@ -555,6 +564,21 @@ int snp_prepare(void)
->  }
->  EXPORT_SYMBOL_FOR_MODULES(snp_prepare, "ccp");
->  
-> +static void rmpopt_cleanup(void)
-> +{
-> +	int cpu;
+> +		cpumask_clear_cpu(this_cpu, follower_mask);
 > +
-> +	cpus_read_lock();
+> +		for (pa = rmpopt_pa_start; pa < rmpopt_pa_end; pa += SZ_1G) {
+> +			rmpopt(pa);
+> +			cond_resched();
+> +		}
+> +	} else if (cpumask_intersects(topology_sibling_cpumask(this_cpu),
+> +				      follower_mask)) {
+> +		/*
+> +		 * Current CPU is a sibling thread whose primary is in
+> +		 * rmpopt_cpumask.  RMPOPT_BASE MSR is per-core, so it
+> +		 * is safe to run the leader locally.  Remove the sibling's
+> +		 * primary from the follower mask as this core is already
+> +		 * covered by the leader.
+> +		 */
+> +		cpumask_andnot(follower_mask, follower_mask,
+> +			       topology_sibling_cpumask(this_cpu));
+> +
+> +		for (pa = rmpopt_pa_start; pa < rmpopt_pa_end; pa += SZ_1G) {
+> +			rmpopt(pa);
+> +			cond_resched();
+> +		}
+> +	} else {
+> +		/*
+> +		 * Current CPU does not have RMPOPT_BASE MSR programmed.
+> +		 * Pick an explicit leader from the cpumask to avoid #UD.
+> +		 * Use work_on_cpu() to run in process context on the leader,
+> +		 * avoiding IPI latency.
+> +		 */
 
-nit.
+... this_cpu is neither in the "rmpopt_cpumask", nor is any of its
+siblings on "rmpopt_cpumask".
 
-You can use guard(cpus_read_lock)() unless there is a complicated
-locking pattern where you need to drop and re-acquire the read lock.
+How does that happen?
+
+> +		int leader_cpu = cpumask_first(follower_mask);
+> +
+> +		if (WARN_ON_ONCE(leader_cpu >= nr_cpu_ids)) {
+> +			migrate_enable();
+> +			goto out;
+> +		}
+> +
+> +		cpumask_clear_cpu(leader_cpu, follower_mask);
+> +
+> +		/* Release migration pin before work_on_cpu(). */
+> +		migrate_enable();
+> +
+> +		work_on_cpu(leader_cpu, rmpopt_leader_fn, NULL);
+
+This creates a delayed work and also waits for it to finish execution
+which will add more latency than a simple IPI if the comment about IPI
+latency above is accurate.
+
+I think there is some corner case in construction of the
+"rmpopt_cpumask" that requires this not-so-pretty else block. Can you
+elaborate why this is required?
+
+Perhaps the "rmpopt_cpumask" construction needs:
+
+    for_each_online_cpu(cpu) {
+        /* Nominate the first CPU on the sibling mask for RMPOPT */
+        if (cpu != cpumask_first(topology_sibling_cpumask(cpu)))
+            continue;
+        cpumask_set_cpu(cpu, &rmpopt_cpumask);
+    }
+
+
+and all you need here is:
+
+    /* Do RMPOPt for local core */
+    for (pa = rmpopt_pa_start; pa < rmpopt_pa_end; pa += SZ_1G)
+        rmpopt(pa);
+
+    /* Skip this core from concurrent RMPOPT */
+    cpumask_and_not(follower_mask, &rmpopt_cpumask, topology_sibling_cpumask(cpu));
+
+No?
 
 > +
-> +	for_each_cpu(cpu, &rmpopt_cpumask)
-> +		WARN_ON_ONCE(wrmsrq_on_cpu(cpu, MSR_AMD64_RMPOPT_BASE, 0));
+> +		goto followers;
+> +	}
 > +
-> +	cpus_read_unlock();
+> +	migrate_enable();
 > +
-> +	cpumask_clear(&rmpopt_cpumask);
-> +	rmpopt_pa_start = 0;
-> +}
-> +
->  void snp_shutdown(void)
->  {
->  	u64 syscfg;
-
 -- 
 Thanks and Regards,
 Prateek
