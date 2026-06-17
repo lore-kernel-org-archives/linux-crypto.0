@@ -1,61 +1,63 @@
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 976F621D596
-	for <linux-crypto@vger.kernel.org>; Wed, 17 Jun 2026 11:44:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADCB7314A65
+	for <linux-crypto@vger.kernel.org>; Wed, 17 Jun 2026 11:46:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781696693; cv=none; b=YXXuKRbJqsPA0lHWCzjMdSaBJApRgjpks5nevUe1MRutXk4julAVVx6c8wYYRQ6jn43Yk3xkzsfrHeuoirewuWHH7SGSYKZTeUTFTDeWN0PcqEO/UoHFsIgLEUWTQtoVswTf2gFo1XgQH0D/24sD/fuIBOe3A+ge1WHqu/lDvF0=
+	t=1781696817; cv=none; b=lL2Ubd70uwyzIr8uy6AIPINRlR6l1OsXFhWw6Uo8zvGtYwhQwAmCUuaOFLo2gu7PiZv3PETEQNLS3zW99qpFmvGNKDCyAAJi86+82eWIoapYuqf/lBnWJqp6ehziVGXKcdBxfwKrMFPJecnt0fg/X4hGJ4uCFLv2UATBoRlkt1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781696693; c=relaxed/simple;
-	bh=6PRiza3LXnOI5sh399qO0oBWFGp2+hOMtX90PkVi46A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=T7di+U+wbONqchbUQpAc2UOl4XhY4t0rBMvdAjFta2G4EAFEoi0BHc6Vx+IqEdPC9JNEBWmYqD4xeWSbEePgwmkIgdILFVXan+Rr8MGqR9zZJeWjEu6B0A9oxzinB/rZ9ocLt/73qwXMj03aj7n4a1tXQ/1A5YifvwIcxJmyzew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OuOuDUPA; arc=none smtp.client-ip=209.85.221.54
+	s=arc-20240116; t=1781696817; c=relaxed/simple;
+	bh=0X7i2KUBJWNqMEcdWRUJvZ6mZ/oWjbbd8I5nakizUHM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=jao3NIQypsgsv0GOY1bkxdKAb5LUcX5wV2XB1ZGVvF12dp01/qcK8CDtETN3/gOcwPMpDVviN9dOpJl0rXkVD/R712RL3tiqOta1egrX553Fiw5/cYJgYnPVjwfSa+0NJ/6dS2ZRJMBwDPgJE7bKy4IWa4mLDrg6KLeSwvg4nXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MQgNy2MA; arc=none smtp.client-ip=209.85.221.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OuOuDUPA"
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-46066e640easo3485919f8f.1
-        for <linux-crypto@vger.kernel.org>; Wed, 17 Jun 2026 04:44:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MQgNy2MA"
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-4629d80fa08so618627f8f.3
+        for <linux-crypto@vger.kernel.org>; Wed, 17 Jun 2026 04:46:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781696688; x=1782301488; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=HPDJtP52p5BOP+sKi7OFUfIBErlWFolQCAuHzVeCjRo=;
-        b=OuOuDUPAR4dq8V67wlZu7BAr9/kD1BFa8qxQw1eYgvS3cMky6B2m+oj4ev2J45pFHl
-         ohkYTCy65X0vyrT2yaIHC6Eqb1/cfcHm+4j0NhWjvaWQ3/aqiVkIlrVEfj6SHofeDoX6
-         mgCfsTyvXB4lpPOspsx8ihJ0RG8gdf/TWqlVkPuzGgsUd47OioRCLnLflVKAlZ/beRFp
-         2CwwOJkg8hgXgbsGyaSvoxACJ+9tkftqjENEcK7gOyoBFaehk3/fFC514Bqp2UpYv7Pe
-         06YqDMd7t3Hz/ik+8AOxX5ORR3PVIwJXvBknn99T+Y23HCnYqByfj/G0nOE/pqoLB+xr
-         rzjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781696688; x=1782301488;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1781696814; x=1782301614; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HPDJtP52p5BOP+sKi7OFUfIBErlWFolQCAuHzVeCjRo=;
-        b=GMYC4rFO66dxu367ABt/42N1QFeHgxCZpIF9N7wjawzMLZbRgCCJWOkY5mzhkLxsD/
-         VXsxBQYaYT+MX0184iCIOlY9m2y2g2ucRp2oHuN6VSdvo+7E0OIMnU8YbvrKRQFlg8Ks
-         dfjCRAdKBIWAl16byuLNbK/h4ChEOqeqHwp9bpsfOfaDmZZGmmg+nW3qzJ9ah9X6CUfK
-         A3OQPp6H0v916qIQNWHhba+Jr/SBY/BzWzNYW4YwjqPmicggRYj9h+4jFX8rOoIPWQb2
-         2hZsiWc7zyDCR1U0N8ubEKPp85Bfhhaeh4TdAzJEFzab3gqgESU2WeP5XVGJdbk4rVQ5
-         pqzw==
-X-Forwarded-Encrypted: i=1; AFNElJ840cnQ660QqbuBbHBozdwRaWph60kGNnu5e1z+P6UGUxASEuoksULRbsbNmmFb1EgBn85MzxkKIGp3pUo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEr8ic0B/U1L5nStmRoPN9jEem4Pu8GNZaixZhlQMzjJZZKktQ
-	BwgX/vFQP68uXSjvDD8lbQUFF54xQABafTMh15PwJ0Olr4ebZFWS++7L
-X-Gm-Gg: AfdE7cny0mBV4pLIOZsTudocEoUFXzYrfMxyW7FwkwhkNK8MomDFFn6WK+BBRoYE54M
-	2IAlHSVtRkH00UxNfe3ZhHuquO9Bgie1Yv/5koZ0DRpholDmT5X5oAV7pFNX6PjthwgkmWKON9v
-	sF5LhiQK6S0EQgGa7lHgeOcp7DhpjEqT3SV9nz3ZcBP43XlSWjHy001C+3Q1QqOH+8e2x4vlHtd
-	AfG2QelujlGwXv+PArGT8UTTVXA6APYBvkIW0Xa0RtzdNqpPPCU2O6K+psggrtL8ROwrkKd3dJz
-	bdsHjRzR90MpdzGLPk8Y000CpxtMFVUeWi7INnqzqUoQjLMDNR8r85i7Ndf3zQAA0LKJG73bvoH
-	2C2iC3/vFx8f7ZNOXFxF2YwzDudwa6v8ONS6YonamSfN/SMRoNwA67sOJ/WfRmlsxLlyZ4HT7zD
-	TNgBbxJwbOFKEgWrUsF5FXyZQYGVzB56oBNzEDtrTRiN6yRLmsJuqCP+r/Qpftj18=
-X-Received: by 2002:a5d:6109:0:b0:460:e00:121c with SMTP id ffacd0b85a97d-46237b7179emr4214957f8f.28.1781696687715;
-        Wed, 17 Jun 2026 04:44:47 -0700 (PDT)
+        bh=T1xUbc08OXQwXD0H7YUvkinrceXsCq3vVphz8033T20=;
+        b=MQgNy2MAE+0vCqlZg/iP3tr7HRbBAt4XWHzWfePtoV3q+HWVWAinIF2i6ICLAJiXSh
+         qxGXofukYn8vKIlL4dXrN1PE5+STubqLYzzakaHLsEbl2yf5/PjB+K1GMSljMhzwvuse
+         /iS+Wric5wZ2h0jjHS2rnd8WrWzzHGcWiJBLx7QhsedOt1N+5oqk1iAMqu+C4JSLUSVz
+         aS2I3iX2fRHK6e5W9dqqZipE1FSwu/+QLe9S+toyxHkKDF7SjUoAm/4W/7jEW40m2vfs
+         eY/MOXGllax/2tclPfoeyNIjwDFocfDCxBQV4lA4fqFWHnhK+saOIirhfOkM3xVON88F
+         7foA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1781696814; x=1782301614;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=T1xUbc08OXQwXD0H7YUvkinrceXsCq3vVphz8033T20=;
+        b=lPS/5LhUSB3larFNbHo0FSsCWKN7yf14T81HfVHSD2gN4NX79DyRXsV4Sxkniks5Oq
+         ZRug0hMZJMn8i/m9YP9sIN9woeR/2mAMb6aYCatrBXPvBQbKxgIYum3J8uTL6bh2Op5N
+         j1CspH18riDOvzJ/TxBLnVSi1ZQTy/02JZMk7qHFeKK57ZlgJP9ya/e5vJvjJCWPF0lT
+         2NyVkQhRLvPS8uCzEhq/R3Sopq1ogZiIbw55xoOmHh3uPeBg4xoYrcSrJ16UnwBCzsmc
+         s5eE63KQfEtkIt6DbUJcG/LzgYlkHHIr8vIS/OkOBa2Tolog//sfsc9Yuc/uLxHvzJIF
+         kTng==
+X-Forwarded-Encrypted: i=1; AFNElJ8scLhesWGiR5wzQ/t2RO+rV+wnxEBgvDZhZPYRm90BqM/hP0JfmhE3NGDyU6mEcflPdlSL9BVYmHQj+c4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyADrme7LWV760AUrpP5Ga9hq5DZfqi0P0/7o34TPwbfPZq7V0Z
+	dXw2EJq3fu6nEQbyS5hDu0we1nZoEpgrU3/X9aD1ucRoJvI26rhda9hr
+X-Gm-Gg: AfdE7cnsV4HoZr5U1r3yE7GvVoYZkCiLL/lAz05Ab+KyxfizsKddbrXW/tpKeP/XFef
+	eS6WkmWDyoiX7UjyOQbmV6GfQlgNWx+OMOvQr2mGxuyYv3JJv3VTtEOF3Q+Bur66o0fVmEP1Od/
+	XE1tA08OkHVXR5J6hqITwKudCihyfZYFiCXi81u8KNe7t6h+vClrzhF6XYnWElMa/4O57bu0P0m
+	TaZj7VT4PlIp5LRvIrRic8bw9wQXisuAHwlxauYh4UnBYKhIRl17SWnRa3Y69vm7ch5CHITDrRq
+	UxA7+YZWR9Hl1YU7VM1UIibs1p/9a9WhSC4VDX3ltWA4DMfZ4La4QaGVZaDwfa+sYlFbLrNwqg5
+	j+OeQDRF/d36tDKywdTxgmPoVIlf228Jy7cCuqn/mOI21x7Y6caAV7rl+Pp1hcM7kcz5r/f5Yap
+	71iOHml/dlEV8oFbIOVWrHv50aPc/q+a5TehDLMEfTcn4RljXwt8r8V0BHwzCKnQU=
+X-Received: by 2002:a5d:5d81:0:b0:441:1e41:194 with SMTP id ffacd0b85a97d-46236ef6b36mr6601847f8f.17.1781696814071;
+        Wed, 17 Jun 2026 04:46:54 -0700 (PDT)
 Received: from fedora ([196.77.26.11])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4606f2c4240sm48998658f8f.27.2026.06.17.04.44.46
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-462e7fc53fasm3221857f8f.33.2026.06.17.04.46.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jun 2026 04:44:47 -0700 (PDT)
+        Wed, 17 Jun 2026 04:46:53 -0700 (PDT)
 From: Jad Keskes <inasj268@gmail.com>
 To: Krzysztof Kozlowski <krzk+dt@kernel.org>
 Cc: Olivia Mackall <olivia@selenic.com>,
@@ -67,10 +69,12 @@ Cc: Olivia Mackall <olivia@selenic.com>,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Jad Keskes <inasj268@gmail.com>
-Subject: [PATCH v4 1/2] dt-bindings: rng: timeriomem_rng: add reg-io-width and mask properties
-Date: Wed, 17 Jun 2026 12:44:35 +0100
-Message-ID: <20260617114436.1909659-1-inasj268@gmail.com>
+Subject: [PATCH v4 2/2] hw_random: timeriomem-rng: add configurable read width and data mask
+Date: Wed, 17 Jun 2026 12:46:42 +0100
+Message-ID: <20260617114642.1911191-1-inasj268@gmail.com>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260617114436.1909659-1-inasj268@gmail.com>
+References: <20260617114436.1909659-1-inasj268@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -79,106 +83,182 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add optional reg-io-width (1, 2, or 4 bytes) and mask properties to the
-binding.  reg-io-width selects the bus access size,  mask is ANDed with
-the raw register value to allow only the entropy-bearing bits through.
+The TODO for supporting read sizes other than 32 bits and masking has
+been sitting in this driver since 2009.  Implement it.
 
-Update the example to show a typical 1-byte configuration.
-Update SPDX to dual license to match kernel convention.
-Drop the misleading '32-bit aligned' constraint from the reg
-description since alignment now depends on the configured width.
+Add reg-io-width (1, 2, or 4 bytes) and mask support.  The read loop
+dispatches on width using readb/readw/readl so a configured 1-byte
+access doesn't trigger a bus error on hardware that rejects 32-bit
+reads to that address.  The mask is ANDed with the value before storing.
+
+These are platform properties, not runtime policy -- width depends on
+SoC integration, mask reflects which output bits carry entropy.
+
+The alignment check in probe is updated to verify the resource is
+aligned to the configured width instead of hardcoding 4-byte alignment.
 
 Signed-off-by: Jad Keskes <inasj268@gmail.com>
 ---
- .../bindings/rng/timeriomem_rng.yaml          | 48 +++++++++++++++----
- 1 file changed, 40 insertions(+), 8 deletions(-)
+ drivers/char/hw_random/timeriomem-rng.c | 77 ++++++++++++++++++++-----
+ include/linux/timeriomem-rng.h          | 12 ++++
+ 2 files changed, 76 insertions(+), 13 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/rng/timeriomem_rng.yaml b/Documentation/devicetree/bindings/rng/timeriomem_rng.yaml
-index 4754174e9849..740bc52bf474 100644
---- a/Documentation/devicetree/bindings/rng/timeriomem_rng.yaml
-+++ b/Documentation/devicetree/bindings/rng/timeriomem_rng.yaml
-@@ -1,10 +1,16 @@
--# SPDX-License-Identifier: GPL-2.0-only
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
- %YAML 1.2
- ---
- $id: http://devicetree.org/schemas/rng/timeriomem_rng.yaml#
- $schema: http://devicetree.org/meta-schemas/core.yaml#
+diff --git a/drivers/char/hw_random/timeriomem-rng.c b/drivers/char/hw_random/timeriomem-rng.c
+index e61f06393209..42393409f22a 100644
+--- a/drivers/char/hw_random/timeriomem-rng.c
++++ b/drivers/char/hw_random/timeriomem-rng.c
+@@ -14,7 +14,9 @@
+  *   has to do is provide the address and 'wait time' that new data becomes
+  *   available.
+  *
+- * TODO: add support for reading sizes other than 32bits and masking
++ * The read width (8, 16, or 32 bits) and an optional data mask can be
++ * configured through platform data or device tree properties.  Default is
++ * 32-bit reads with no mask.
+  */
  
--title: TimerIO Random Number Generator
-+title: Timer IOMEM Hardware Random Number Generator
+ #include <linux/completion.h>
+@@ -34,6 +36,8 @@ struct timeriomem_rng_private {
+ 	void __iomem		*io_base;
+ 	ktime_t			period;
+ 	unsigned int		present:1;
++	unsigned int		reg_io_width;
++	u32			mask;
+ 
+ 	struct hrtimer		timer;
+ 	struct completion	completion;
+@@ -48,6 +52,7 @@ static int timeriomem_rng_read(struct hwrng *hwrng, void *data,
+ 		container_of(hwrng, struct timeriomem_rng_private, rng_ops);
+ 	int retval = 0;
+ 	int period_us = ktime_to_us(priv->period);
++	int chunk = priv->reg_io_width;
+ 
+ 	/*
+ 	 * There may not have been enough time for new data to be generated
+@@ -71,11 +76,28 @@ static int timeriomem_rng_read(struct hwrng *hwrng, void *data,
+ 			usleep_range(period_us,
+ 					period_us + max(1, period_us / 100));
+ 
+-		*(u32 *)data = readl(priv->io_base);
+-		retval += sizeof(u32);
+-		data += sizeof(u32);
+-		max -= sizeof(u32);
+-	} while (wait && max > sizeof(u32));
++		switch (priv->reg_io_width) {
++		case 1: {
++			u8 val = readb(priv->io_base) & priv->mask;
++			*(u8 *)data = val;
++			break;
++		}
++		case 2: {
++			u16 val = readw(priv->io_base) & priv->mask;
++			*(u16 *)data = val;
++			break;
++		}
++		case 4: {
++			u32 val = readl(priv->io_base) & priv->mask;
++			*(u32 *)data = val;
++			break;
++		}
++		}
 +
-+description: |
-+  This binding covers platforms that have a single IO memory address which
-+  provides periodic random data.  The driver reads from the address at a
-+  fixed interval, returning a configurable-width value masked to the desired
-+  bits.
++		retval += chunk;
++		data += chunk;
++		max -= chunk;
++	} while (wait && max > chunk);
  
- maintainers:
-   - Krzysztof Kozlowski <krzk@kernel.org>
-@@ -13,9 +19,17 @@ properties:
-   compatible:
-     const: timeriomem_rng
+ 	/*
+ 	 * Block any new callers until the RNG has had time to generate new
+@@ -125,11 +147,8 @@ static int timeriomem_rng_probe(struct platform_device *pdev)
+ 	if (IS_ERR(priv->io_base))
+ 		return PTR_ERR(priv->io_base);
  
-+  reg:
-+    maxItems: 1
-+    description:
-+      Base address to sample from.  Must be aligned to the configured access
-+      width (1, 2, or 4 bytes) and at least that wide.
+-	if (res->start % 4 != 0 || resource_size(res) < 4) {
+-		dev_err(&pdev->dev,
+-			"address must be at least four bytes wide and 32-bit aligned\n");
+-		return -EINVAL;
+-	}
++	priv->reg_io_width = 4;
++	priv->mask = 0xFFFFFFFF;
+ 
+ 	if (pdev->dev.of_node) {
+ 		int i;
+@@ -145,9 +164,41 @@ static int timeriomem_rng_probe(struct platform_device *pdev)
+ 		if (!of_property_read_u32(pdev->dev.of_node,
+ 						"quality", &i))
+ 			priv->rng_ops.quality = i;
 +
-   period:
-     $ref: /schemas/types.yaml#/definitions/uint32
--    description: wait time in microseconds to use between samples
-+    description:
-+      Interval in microseconds between reads.  New random data is expected to
-+      be available at this rate.
- 
-   quality:
-     $ref: /schemas/types.yaml#/definitions/uint32
-@@ -26,16 +40,26 @@ properties:
-       instead.  Note that the default quality is usually zero which disables
-       using this rng to automatically fill the kernel's entropy pool.
- 
--  reg:
--    maxItems: 1
-+  reg-io-width:
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+    default: 4
-+    enum: [1, 2, 4]
-     description:
--      Base address to sample from. Currently 'reg' must be at least four bytes
--      wide and 32-bit aligned.
-+      Access width in bytes.  Determines whether the read is performed as
-+      an 8-bit, 16-bit, or 32-bit bus access.
++		of_property_read_u32(pdev->dev.of_node,
++				     "reg-io-width", &priv->reg_io_width);
++		of_property_read_u32(pdev->dev.of_node,
++				     "mask", &priv->mask);
+ 	} else {
+ 		period = pdata->period;
+ 		priv->rng_ops.quality = pdata->quality;
 +
-+  mask:
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+    default: 0xFFFFFFFF
-+    description:
-+      Mask applied to the value read from the register.  Bits set to 0 in
-+      the mask are cleared in the output data.  Default (no mask) passes
-+      all bits through.
- 
- required:
-   - compatible
--  - period
-   - reg
-+  - period
- 
- additionalProperties: false
- 
-@@ -46,3 +70,11 @@ examples:
-         reg = <0x44 0x04>;
-         period = <1000000>;
-     };
++		if (pdata->reg_io_width_set)
++			priv->reg_io_width = pdata->reg_io_width;
++		if (pdata->mask_set)
++			priv->mask = pdata->mask;
++	}
 +
-+    rng@64 {
-+        compatible = "timeriomem_rng";
-+        reg = <0x64 0x01>;
-+        period = <50000>;
-+        reg-io-width = <1>;
-+        mask = <0xFF>;
-+    };
++	if (priv->reg_io_width == 0)
++		priv->reg_io_width = 4;
++
++	switch (priv->reg_io_width) {
++	case 1:
++	case 2:
++	case 4:
++		break;
++	default:
++		dev_err(&pdev->dev, "invalid reg-io-width %u, must be 1, 2, or 4\n",
++			priv->reg_io_width);
++		return -EINVAL;
++	}
++
++	if (!IS_ALIGNED(res->start, priv->reg_io_width) ||
++	    resource_size(res) < priv->reg_io_width) {
++		dev_err(&pdev->dev,
++			"address must be %u-byte aligned\n",
++			priv->reg_io_width);
++		return -EINVAL;
+ 	}
+ 
+ 	priv->period = us_to_ktime(period);
+@@ -167,8 +218,8 @@ static int timeriomem_rng_probe(struct platform_device *pdev)
+ 		return err;
+ 	}
+ 
+-	dev_info(&pdev->dev, "32bits from 0x%p @ %dus\n",
+-			priv->io_base, period);
++	dev_info(&pdev->dev, "%u-byte from %p @ %dus\n",
++		 priv->reg_io_width, priv->io_base, period);
+ 
+ 	return 0;
+ }
+diff --git a/include/linux/timeriomem-rng.h b/include/linux/timeriomem-rng.h
+index 672df7fbf6c1..5732489a17a1 100644
+--- a/include/linux/timeriomem-rng.h
++++ b/include/linux/timeriomem-rng.h
+@@ -16,6 +16,18 @@ struct timeriomem_rng_data {
+ 
+ 	/* bits of entropy per 1024 bits read */
+ 	unsigned int		quality;
++
++	/* read width (1, 2, or 4 bytes), 0 means 4 */
++	unsigned int		reg_io_width;
++
++	/* set to true if reg-io-width is explicitly provided */
++	bool			reg_io_width_set;
++
++	/* mask applied to raw read value */
++	u32			mask;
++
++	/* set to true if mask is explicitly provided */
++	bool			mask_set;
+ };
+ 
+ #endif /* _LINUX_TIMERIOMEM_RNG_H */
 -- 
 2.54.0
 
