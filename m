@@ -1,153 +1,132 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CED293A59BA
-	for <linux-crypto@vger.kernel.org>; Wed, 17 Jun 2026 09:45:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 428363D47C3
+	for <linux-crypto@vger.kernel.org>; Wed, 17 Jun 2026 10:05:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781689559; cv=none; b=BDmZ+We2KYHw02+Z50EzV5nZStM4fkYxzXAcM87W4JNE+P+X6ZA9KAQCkE3dtEG+AzDAGAL25naxrIloUChvj56MoNJHpijuOfqM6zNWhsFST/WCj3GOwhJaFGtDZYEE5ojiElH4+Ao/UTAqUAjt/f2rbvGdvhdoq9dd/iFV3+c=
+	t=1781690728; cv=none; b=VOzydnD/jEdKizzvxaENDA4ojYCUzXi+RBImI984mghLT/foNA0qRw4Jsj44cvSYUJ7x7Ef5m3FXqSW/9/PCmn1HFDktCRNwtzmyOORI1IH18+EGt2ce+p0NpaakG1hJKCc0Wj3Q1t2XwjnTA1/rG5eMqOqkK4p205mDDcOyX48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781689559; c=relaxed/simple;
-	bh=0eRo7lDvmCW7gx4j5qTCHNZE3+C651RdhR1Op86dcnw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=K8xWvsJA/l4ErAtmehlhnjnfF6lSBPO3agpBFddyLdT/D+SOxqLkbqLeyxaI2VhEFujKQkAMPbx9k7m7isDXGp/1ysHjuxqwuIbegdwWdkzg1dfrW2TGTZeanMN7dKUeqa0fbXn2h2wp7tLNB13SQB6niDgFHSS8Bi3OAs1CKu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=kbBA9OGt; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Kwz5ZSbN; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1781690728; c=relaxed/simple;
+	bh=GRels6+00DOfhtua/SMwmdOjxdx+1fjruBc3u5+ohXk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WU+9Q4WvHVqaCF38FIXItTWGhc36lDtnohkvu7kPW3VI6h3Ubpdmn0+RSMUq33FssgKefPXMBbT6YpxH+4qwa6NvlvXjXeriwTwWvqEjo1mlUgSKcf1yJjyivrlvRqbNFgBV3C/pMxcfyenDNMUYzbm1OwF5irdJgjL+xRBGPnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KHVdx7Fs; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="kbBA9OGt";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Kwz5ZSbN"
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65H8WAl02058005
-	for <linux-crypto@vger.kernel.org>; Wed, 17 Jun 2026 09:45:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	COQEA4gxr5ZMXmqKWJk+TCvG3sDkrEPKf7iIbRo/t0g=; b=kbBA9OGtgznYgcQh
-	nnxgm3uze/+3P83wSJKSmi9/uRQXujx0ffoTZn2Wn3i/BS1pfPDBuRx/fzhHCxg2
-	Ghlqw8nKVfvOac0fYkO9FN2XaIz00WL1jvIosVTKHcJ2hjPCqxo+DX/b+wGJ6IvD
-	qrujl7BQ9zG+pqrf+/C/+9Ky73A43lxia8BP5NfJ1zor3vLnXJ5vqN4qSsONHbEh
-	v3aJgOGLA6O8B5CCZ5TpGCsS2LTp0W8n1oGquIz/rLJ/VY1qTVCG8QrICDZLyyFQ
-	SHyhLLUPaxiZZcZxNkWS4Q7QzvoRMzIgWgdsSR11+mqQfuMKlzMzzyD62rJJ7yZK
-	mkAd9g==
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com [209.85.216.72])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4eueesagfh-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Wed, 17 Jun 2026 09:45:57 +0000 (GMT)
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-36e09ec696aso8955067a91.0
-        for <linux-crypto@vger.kernel.org>; Wed, 17 Jun 2026 02:45:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KHVdx7Fs"
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-4629d80fa08so518121f8f.3
+        for <linux-crypto@vger.kernel.org>; Wed, 17 Jun 2026 03:05:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1781689557; x=1782294357; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=COQEA4gxr5ZMXmqKWJk+TCvG3sDkrEPKf7iIbRo/t0g=;
-        b=Kwz5ZSbNtrYb1YoEetdP7wBTB1nAS+iRn2XdTOWGmxh4NqEex9OpoA3y2Fbm6G4VQB
-         /y2M2DxE8Y7VGof5O/yPODX4sEB6+7dOl+8BOMCYdpCWUCOxDWoOjKTh6Su3ctDME9U+
-         ynyyxOmN6tc6FBne++ud/sUc87SZMqh1Ktswajxmb0jR8GKpHEijHnGWx31OuhUtdZRQ
-         hl6zqD1Mwsb2EQTcQ9BgWGALx0pLvGqY666JaoemFB7NzHsguCygMS6WePSXjcnh8B0f
-         7i9VhdllrZB/K8MvL8CDJ42afFEMD1aSpr7oXAUFDHKoenZMwFlgRmkUU5375wkVbdWF
-         Bopw==
+        d=gmail.com; s=20251104; t=1781690720; x=1782295520; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f2OPmLF096KqR20zLR2fjLEx0fdz7L4iVkInjy+NLrw=;
+        b=KHVdx7FsSUX70y3nKbzgeoG+EGfzuN1tVtPT9iW1MdcrPaD+DmOKUZZzWJ7/TKiUNw
+         LAIgDSl/dhkhFfZ8N8B0kFHVKw6XH4kD3FnQzzMxOXzCVtvjTGpRjYNq0ollIURBJgWH
+         c/blhzVx+wytjXV6FkmHdZ6X+6Kgyay6SRM8RNcfDnRkadFc18p8QEic7dBGKn4ssFRR
+         N2D4QhBJm9ZVz7Ww3B9g+fRM6nEZhI2k4e68uz7NXOYaM3MTZpgQ99W6Sog49cNuQDZt
+         c27kTW0qz6uz4tEckDe/lVI3UP99ejgTQtSNgxZVvmjEh5yTk5fqRmQ+jwh/42CWKn1Q
+         stiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781689557; x=1782294357;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=COQEA4gxr5ZMXmqKWJk+TCvG3sDkrEPKf7iIbRo/t0g=;
-        b=TUgFmKeABSXlVYCyU4AdyfnH9/jpqsNH7Pjhhm6rXfke923Zq+7/XVlMOKYFyvoxLu
-         MPY6gxQ7gmKp086zJCi5MR4UaaxjHll+/r+SGoxah9OAsjgV904Q8Lq/w/qh72NYZvte
-         8YU/WVS1Rqkq69yEbPIEJehCXB3tfURnwmIkKad3RrkXLi2gE5wkc0zb7rgjA3Gea9Ot
-         RzD5vN/5ncMESW0KuuNA04Aemyh6c7ZIa5G0mx7OjXqxvgQ8wjrd4VAnOlLRpSaTyqWH
-         hJ9pw3gUbJ/7Szldb6TatH8AgHkKhbYhDBCiM+lsVBm/ehUU/LY1dd62V2D90ezkL8ib
-         tTHw==
-X-Forwarded-Encrypted: i=1; AFNElJ9IbQ7hGdaLTsE3t4l8m7NqKNmibrgXoL74AbKRAVbhbe7l5jN26d+0V0YEgmq4CbZheJ89Xj9fFAPdNtw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZx6bm+FeXOfQHDQcm9sCngU+5jcxbxzEDimvqcUP6YbunHsM9
-	E6U60OwQOjMhxjYUyCkBcmlcuEjNHgbk+4Ad1/3v5GopHLWUnXF0cF5WrEPmeB3L2G01KPVe938
-	dsHS8pE6heSv2A5rB4W/E2KKvMVKBN5vJQdlyRKVswscSLXFzqDR5sGGAPTs4jc5OKa4=
-X-Gm-Gg: AfdE7clPA0Xi5IkyRvuhH0Rr0Q56lmlcV42ZSbU/3cRgo+GRQ1bWtMhKaKm485dkaJl
-	edhtxfdjTioMi+GQ14ifDd+758k7W/0i0V9T+McZbe5gfozBHbtfLk9i6nfQOG3fQWyFpyZq8KL
-	ZF2ngXXXgmfKcP+EznjbyyIb6kG5SUPT1ZdXD1lN/YkJiqCq2q+AKIkWLcaubVghE6Q2NaO5iXi
-	kowripj9RKkivbpJPL+rDk7Le3+bscV7ode9CjQsafn+M1fI7Y7hdMWukCYcKdi5cMlI+9MdOlU
-	ZEMj21Voh6y6N4GHPcJhfSd+R9ChIMZSSb0fup1bZyPxgf0PN2ErxV2GjNHrOrCHzoMt5FStT2F
-	tcx0O/+zVyZusCz5USTFLinP6SqoABGK/Yl7/xxi58cI=
-X-Received: by 2002:a17:90b:38ca:b0:36d:b424:4f17 with SMTP id 98e67ed59e1d1-37c936a2631mr3149681a91.1.1781689556832;
-        Wed, 17 Jun 2026 02:45:56 -0700 (PDT)
-X-Received: by 2002:a17:90b:38ca:b0:36d:b424:4f17 with SMTP id 98e67ed59e1d1-37c936a2631mr3149648a91.1.1781689556422;
-        Wed, 17 Jun 2026 02:45:56 -0700 (PDT)
-Received: from [10.217.223.142] ([202.46.22.19])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-37c522a3d53sm5626666a91.15.2026.06.17.02.45.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Jun 2026 02:45:55 -0700 (PDT)
-Message-ID: <ce7ddb59-d219-4684-a56f-35ce4c3c345b@oss.qualcomm.com>
-Date: Wed, 17 Jun 2026 15:15:51 +0530
+        d=1e100.net; s=20251104; t=1781690720; x=1782295520;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=f2OPmLF096KqR20zLR2fjLEx0fdz7L4iVkInjy+NLrw=;
+        b=TowDOGx5pBmWG/lrb5CyZDicEKq5VESs/2DRmtZQCdhC6wioJXaFqEDDEoNqvkEDEf
+         Vtm4tED/gIobEF2LnBUdItheAlxFnNk4RGFQg+kKFaliGtoAGk0yNUg+TGtr71cstipd
+         yPJh1tEyiCOksrr3hUfuHp0OjScAe5LAQfiY/qsVI+4eNcUjeX8TccLcNH8YAUpU+s/o
+         K4IRd0JqMQtLmIUXrUlfGBK8xwuWHzwd75Kowj9XvqEZJ9/9pMhNobR5+gHr500A/3hU
+         qb6ofhzq4O0+Uok3zO5sjFR3qhgWp/elmW4pR9sVBr8SxaHyuxGjx4rfa3WsnbhPCvzF
+         9Krg==
+X-Forwarded-Encrypted: i=1; AFNElJ8+8Sqp+4PIvED068XaCyKUCGHDF9oJRmmkL+nhl8JBr1BUMdV0VCmu8fSZqxJNLjLwKqERDODBrgPMT+c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkyptEAE0i4mTXVBqSh2Lw6WxiLzeh1hGEbDluraUy7WdaSUi8
+	dAQuRWHC11gXu7LxXLYbrGrCbOYgV7TIvA86Wa8PsVs0t78XUaF2Webq
+X-Gm-Gg: AfdE7clFAc63FqqIMTaqNgn4leTA1BaFRLzTtG3XS07HfvOjNAVd/3v7L1cJf7FMMWQ
+	7pOO7q3lMN1s3GcFC5+l9ATb51Car7T/38odBIVXWQd0aR4+x1FASOMtu5GfceGbdNGKZw2hORA
+	mO9EPKH967Om/N3AJN3v+Dy/+eA5owcVc0yWH2UzCbT+lFYYZhNrjpnGAmKKXyJZ8+sEA45+q2b
+	a+45k2U6e1+XO6rHQUtZEfN+m5pG5frBzHH/Ecr5cfkO7QjHCeP07GA0QMm36AHS38XAt5jDtj5
+	gGEHvnGbJurTz8yhHdE7OS6jgTxO51A+buE0qaQv3alS3PYmjoRjpM7Ino+icPjrxPSDXV1Y1do
+	5Zn8xbMolTv+aXFTmToKQf9oZvKdqe9VFHmCpfvwPIm67BadFHpecgeq/e/OXvIBgUu2aPn91FY
+	OZVlCoj0wnpUrEOibT6pqKAhTq7E75SgkX1vJNf+WwcW/rGDggjg==
+X-Received: by 2002:a05:6000:461e:b0:45e:f2bd:2b17 with SMTP id ffacd0b85a97d-46238acb523mr5897596f8f.21.1781690720067;
+        Wed, 17 Jun 2026 03:05:20 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4606f2dbfb1sm55720157f8f.35.2026.06.17.03.05.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Jun 2026 03:05:19 -0700 (PDT)
+Date: Wed, 17 Jun 2026 11:05:16 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Eric Biggers <ebiggers@kernel.org>, Andrew Morton
+ <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org, x86@kernel.org, linux-raid@vger.kernel.org
+Subject: Re: [PATCH v3] lib/raid/xor: x86: Add AVX-512 optimized xor_gen()
+Message-ID: <20260617110516.0a70950e@pumpkin>
+In-Reply-To: <20260617055653.GB19218@lst.de>
+References: <20260615190338.26581-1-ebiggers@kernel.org>
+	<20260617055653.GB19218@lst.de>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/2] Fix Qualcomm Crypto engine self tests failures
-To: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-Cc: Eric Biggers <ebiggers@kernel.org>, Bartosz Golaszewski
- <brgl@kernel.org>,
-        Thara Gopinath <thara.gopinath@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Thara Gopinath <thara.gopinath@linaro.org>,
-        linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20260610-qce_selftest_fix-v1-0-1b0504783a46@oss.qualcomm.com>
- <20260610184205.GB1158828@google.com>
- <1abc518e-e24e-44ff-9b15-1766dcecd8a2@oss.qualcomm.com>
- <4fzeulsheu5tam6pcymjqkqnqi3ibjgwchiefy27wr7b5i2yhk@4m47fpfbsmwf>
-Content-Language: en-US
-From: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
-In-Reply-To: <4fzeulsheu5tam6pcymjqkqnqi3ibjgwchiefy27wr7b5i2yhk@4m47fpfbsmwf>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjE3MDA5MCBTYWx0ZWRfXxk30DrljPY4Q
- ZcfsbBP3XN0dS5PjrCE0DA/iBVxt3Ym2aY34owySbbvmUCUaDSgj6WTU0RKQCLXOoDBHuzQ8VS4
- QHg4zIUuQ4Myl7u1rE3GKQHYLLdXIDs=
-X-Proofpoint-ORIG-GUID: ae_YsxBNaOKYWejAni92NP7XUqpm0Noh
-X-Authority-Analysis: v=2.4 cv=R6oz39RX c=1 sm=1 tr=0 ts=6a326cd5 cx=c_pps
- a=RP+M6JBNLl+fLTcSJhASfg==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
- a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=ZpdpYltYx_vBUK5n70dp:22
- a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8 a=eESiKCN2Xvo0jsfTh0cA:9 a=QEXdDO2ut3YA:10
- a=iS9zxrgQBfv6-_F4QbHw:22
-X-Proofpoint-GUID: ae_YsxBNaOKYWejAni92NP7XUqpm0Noh
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE3MDA5MCBTYWx0ZWRfXyIyYVjGsKQba
- 15dYeG1pvIyQ7Y8odBrch7JW+h0XTYYbzQ08mJNUPSs3ET3aKupPKW7ZpzcDLo/alwx7ubVYER0
- Qax4TgWi8x+B2UFwbWQsp43ZmkV0kEHghTaOL2GI00CJhM9RpFY7kv73crL/ri9fc+uYQmXRUjT
- yZ5EXeEkJTjyHHURs8U8ZCyWxrMmWOKcaSHv1+/vFg2zE7sNwAmKaONZ+4D0kXxr/hDiYjX3jBK
- 0y8H6Qk5hviZEQAe58O46Tp10x0XIdN+6vkn/QXx4l5eiYiDkLkkv3gXtvg3CONwwnz4gPtrdCM
- W+PnhqEnss60ERx3KTXNi4Ltqty19aiveRwP8lhY2VQef7yhNAxDJBm9XA3zRgmMLbilivxv9zd
- pPEspypU1ZoHIJ8eEQN2JE0UzYgNh3CjhBVVeQNASBUk1kGVnuuAg+iH2d2uPgJ/dYa74rkRHRB
- T7q/aOzJrHYRduwdZ6Q==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-17_01,2026-06-16_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 bulkscore=0 clxscore=1015 impostorscore=0 phishscore=0
- lowpriorityscore=0 suspectscore=0 priorityscore=1501 malwarescore=0
- adultscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2606170090
 
->> Seems Bartosz will be sending patches for algorithm removal changes.
->> The rest relevant selftests issues we'll fix accordingly.
+On Wed, 17 Jun 2026 07:56:53 +0200
+Christoph Hellwig <hch@lst.de> wrote:
+
+> Can use the xor: prefix used for all other commits to lib/raid/xor?
 > 
-> So, the old kernels will remain broken? Or do we expect to backport the
-> cipher removal patches too?
+> > Benchmark on AMD Ryzen 9 9950X (Zen 5):
+> > 
+> >     src_cnt    avx          avx512       Improvement
+> >     =======    ==========   ==========   ===========
+> >     1          56353 MB/s   75388 MB/s   33%
+> >     2          54274 MB/s   68409 MB/s   26%
+> >     3          44649 MB/s   64042 MB/s   43%
+> >     4          41315 MB/s   55002 MB/s   33%  
+> 
+> On my Zen 5 mobile (AMD Ryzen AI 7 PRO 350) both the existing
+> AVX2 and this AVX512 code give numbers in the 200+ GB/s range.  Not
+> sure if is just the different benchmarking or something else going on.
 
-Kindly see Barotsz series on top of this one[1].
-Fixes will be backported on older kernels too.
+I'd expect benchmarking of the xor loop to show that it is doing
+2 memory reads every clock.
+At 5GHz (I'm sure my zen5 will reach that single threaded) that
+is 320 GB/s for src_cnt == 1 and 160 GB/s for src_cnt == 3.
 
-[1]
-https://lore.kernel.org/linux-arm-msm/20260615-qce-fix-self-tests-v2-0-dc911f1aad42@oss.qualcomm.com/
+200 GB/s with 32 byte cache reads would need a 200/32 = 6GHz cpu
+just for the reads.
 
--- 
-Regards
-Kuldeep
+But I expect Eric is benchmarking more code and may be limited
+by data cache refills.
+
+> 
+> FYI, one or 2 sources are basically useless as they RAID5 configs
+> that have no benefits over simple mirroring and thus the numbers
+> aren't too interesting.
+
+With three disks you xor two buffers (src_count == 1) to get the parity
+to write to the third - so that is a valid RAID5 config.
+
+> 
+> > +DO_XOR_BLOCKS(avx512_inner, xor_avx512_2, xor_avx512_3, xor_avx512_4,
+> > +	      xor_avx512_5);  
+> 
+> Is there really much of a benefit of doing the historic DO_XOR_BLOCKS
+> vs doing the loop manually?  Especially as the common cases for a
+> modern RAID will usually loop over more disks than this was built
+> for.  I.e., in practice one or two source buffers only happen at the
+> end of a loop over more disks.
+
+I stopped looking at what was being tested at that point :-)
+
+	David
+
