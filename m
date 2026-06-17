@@ -1,47 +1,57 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DFF647DFA5;
-	Wed, 17 Jun 2026 16:05:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F5C333A6E0;
+	Wed, 17 Jun 2026 17:18:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781712355; cv=none; b=V/xo82ENgWg9HNZsX0T6zqIgw31tTRwAHCrl2rZtSMaGTvRIYIGfEm0mNsAVmqR0N3pT6RWenLt6AVBW8JjluJ6CTS8g53vi3s4vfG3jd2PPDVo10NZ42LvZwgeXxThIJP1+3LH81JfjELoXWz4X1W3e5EytcO7DJIFRvOeINHI=
+	t=1781716696; cv=none; b=oTHuLJJ+dJfyeAmPzBp0wEjXnQL51HYA95bNN+9LHEl9gLofeSANV+IhISyhbw9JDUnINaybMepmoCwcogtV7H52NipfuC0SH1OHdEcYoU2uvAVSozIkCbD3rVEdlrlTE07uvrklpb6ZNO9iUzD3drZFs0hlf8n3b9Y9p9PvAoo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781712355; c=relaxed/simple;
-	bh=xy5pKmpHR+8apKnOQYTmpDygAfYhxlGd9QQhURnxDB0=;
+	s=arc-20240116; t=1781716696; c=relaxed/simple;
+	bh=l8hcPdpn9AMbyB99DvePSyEqaE1eyDAHze7o2OkGcyY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=grHmdLXBjaLp4MUk513lVLf+mcMimtND6Zgxm1OL0mj7xeN2eLT/ZvTpusAf0eNAkwQRDgdBIy8yO0V2c/MVaAWcjUzT70vcjN0+1vwswFQBp8UdFIA9IHQNGj5R/wMqRL6MDfhlpYSbflxRHQ0PWqXgaY/xtDMmZokntQ4rqTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QeXpHjOZ; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=TgqMbPaQLnh63G3945YwBuvRFaqeah1TFLuHZJMamMdW9cMmmAK/j/te0IXAUhx5v4a0vTyhaZThmoYxL+/XantXKtQVAliVTAbrEZ1ajan58P0egw0UJAex31e3TUGgrkEoZb4rk1KOnqKkI9pSg/hWaB33gmXOBslhADOFnhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lGjKtV47; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QeXpHjOZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E8EA1F00A3D;
-	Wed, 17 Jun 2026 16:05:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lGjKtV47"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B72911F000E9;
+	Wed, 17 Jun 2026 17:18:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781712345;
-	bh=Bpns6yus6XLe48Ane9Z4QuHWfQYFi/6/9PVRUaHA5qk=;
+	s=k20260515; t=1781716694;
+	bh=/f4xE4u+ffk1oOCvjwpeDXHL3oZ9vgO7YB9e19Vu9+Y=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=QeXpHjOZfwNWL9KTxEQnzpY41ylIsdi+mnTMtyDNCU7IzT7h/eGyRBA++5D4ytpjF
-	 7VV+hd5MKl5R1qWerv0K3Mz4UR+EFyT4g0GohxEpeOv7XClJmZr10ZTM/wTVmW/6+F
-	 tAPcrEvr7gMLLOzPOmMQZcJo6qcslbEGlCT8cjO1CSakBwcnKuxwDVO79CjBW5wY29
-	 Y/t8T3QU4gCrwqmfiJn5Ph67cWTAKrza/lvY5TbTq6SnucCudxXeMBomaPJbZeQ6vN
-	 jMeWdX/QAdBncvPT2OjvjT6KuPIz5jrES0WmHC74pcLAzhWgtfz/YtgB9QsMvFvFt3
-	 uoXA/zaZwY+8A==
-Date: Wed, 17 Jun 2026 16:05:43 +0000
+	b=lGjKtV47NvY+G1P9uYXp+4/gyMgLgDQrduLqzC88KWb/cELicXoS4/uYfna+omLzA
+	 kTHHIct7/E2IiozpSqUUXbTi0AVd24bRx7SBTtA3lHZSjIUIla+rki3EISH2x79xLE
+	 CZUMDLUK7L9IaS4nt4AJcFcZOKp7PMVIBfV/yCOLJB0rS0RncSbTAIVo9CxmbK/Z8c
+	 oQ5G8jwL3wjVVS4VFuozCCk5p8svSa1boqDf+QX5jj0Vgc0TOXUVQHzxUGMRBuH8/8
+	 bNfs3awYHQHSiqXNUlqME9aeWEplWjUluKIFhib0XNuqoTUoh7Hj5pjz6T7DyKwkwA
+	 rUHiH9wBR2reg==
+Date: Wed, 17 Jun 2026 17:18:12 +0000
 From: Eric Biggers <ebiggers@kernel.org>
-To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Cc: Thara Gopinath <thara.gopinath@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Stanimir Varbanov <svarbanov@mm-sol.com>,
-	Eneas U de Queiroz <cotequeiroz@gmail.com>,
-	Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
-	linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, brgl@kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v3 1/8] crypto: qce - Remove unsafe/deprecated algorithms
-Message-ID: <20260617160543.GB785086@google.com>
-References: <20260617-qce-fix-self-tests-v3-0-ecc2b4dedcfd@oss.qualcomm.com>
- <20260617-qce-fix-self-tests-v3-1-ecc2b4dedcfd@oss.qualcomm.com>
+To: Mike Lothian <mike@fireburn.co.uk>
+Cc: rust-for-linux@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
+	Gary Guo <gary@garyguo.net>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Yury Norov (NVIDIA)" <yury.norov@gmail.com>,
+	Asahi Lina <lina+kernel@asahilina.net>,
+	Lorenzo Stoakes <ljs@kernel.org>,
+	Joel Fernandes <joelagnelf@nvidia.com>,
+	Alexandre Courbot <acourbot@nvidia.com>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>,
+	Krishna Ketan Rai <prafulrai522@gmail.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 1/2] rust: crypto: add library AES-128 / SHA-256 /
+ HMAC-SHA256 bindings
+Message-ID: <20260617171812.GE785086@google.com>
+References: <20260617150143.2152-1-mike@fireburn.co.uk>
+ <20260617150143.2152-2-mike@fireburn.co.uk>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,29 +60,33 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260617-qce-fix-self-tests-v3-1-ecc2b4dedcfd@oss.qualcomm.com>
+In-Reply-To: <20260617150143.2152-2-mike@fireburn.co.uk>
 
-On Wed, Jun 17, 2026 at 05:49:30PM +0200, Bartosz Golaszewski wrote:
-> Remove algorithms that are either unsafe or deprecated and have no
-> in-kernel users that cannot be served by the ARM CE implementations.
-> 
-> AES-ECB reveals plaintext patterns (identical plaintext blocks produce
-> identical ciphertext blocks) and should not be exposed as a hardware-
-> accelerated primitive. DES, Triple DES and HMAC-SHA1 have been
-> deprecated for years.
-> 
-> Remove sha1, ecb(aes), ecb(des), cbc(des), ecb(des3_ede), cbc(des3_ede),
-> hmac(sha1) and all AEAD variants built on these primitives as well as
-> authenc(hmac(sha256),cbc(des)). Also clean up the - now dead - code,
-> flags and constants.
-> 
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+On Wed, Jun 17, 2026 at 04:01:32PM +0100, Mike Lothian wrote:
+> +/*
+> + * AES-128 single-block ECB encryption: out = AES(key, in).
+> + *
+> + * A helper because aes_encrypt() takes a transparent union (aes_encrypt_arg)
+> + * that bindgen cannot express. SHA-256 and HMAC-SHA256 are plain extern
+> + * functions and are bound directly.
+> + */
+> +__rust_helper int
+> +rust_helper_aes128_encrypt_block(const u8 *key, const u8 *in, u8 *out)
+> +{
+> +	struct aes_enckey enckey;
+> +	int ret;
+> +
+> +	ret = aes_prepareenckey(&enckey, key, AES_KEYSIZE_128);
+> +	if (ret)
+> +		return ret;
+> +	aes_encrypt(&enckey, out, in);
+> +	memzero_explicit(&enckey, sizeof(enckey));
+> +	return 0;
+> +}
 
-Acked-by: Eric Biggers <ebiggers@kernel.org>
-
-Looks pretty comprehensive, but I did notice a few leftovers: a comment
-still mentions DES3_EDE_BLOCK_SIZE, and there's still some ECB-related
-code (grep for ENCR_MODE_ECB, QCE_MODE_ECB, and IS_ECB).
+This is kind of an anti-pattern, both in expanding the key for every
+block and also exposing bare AES instead of AES modes of operation.
+It's true that lib/crypto/ is missing a lot of AES modes (I'm working on
+that), but AES-CMAC is there already which is one of the two you need.
 
 - Eric
