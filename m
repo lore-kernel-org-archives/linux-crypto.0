@@ -1,264 +1,133 @@
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADCB7314A65
-	for <linux-crypto@vger.kernel.org>; Wed, 17 Jun 2026 11:46:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 500C323D297
+	for <linux-crypto@vger.kernel.org>; Wed, 17 Jun 2026 15:01:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781696817; cv=none; b=lL2Ubd70uwyzIr8uy6AIPINRlR6l1OsXFhWw6Uo8zvGtYwhQwAmCUuaOFLo2gu7PiZv3PETEQNLS3zW99qpFmvGNKDCyAAJi86+82eWIoapYuqf/lBnWJqp6ehziVGXKcdBxfwKrMFPJecnt0fg/X4hGJ4uCFLv2UATBoRlkt1M=
+	t=1781708513; cv=none; b=hLWlrBlsBoqLicQX4sYZrDh6Xb2LK84qABasJTWPbQSkovSFAogPU6tJ6+fVDhuYrS/K3jA7FwEs0BJlADvuxPMez+EahEXMJgYce0n5X+lbL0PjOEVyAI2jh8ABIqvMVM8TOCJBWG7KXH3os2nwRRBioGrPu9GDA1JFx8/GJHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781696817; c=relaxed/simple;
-	bh=0X7i2KUBJWNqMEcdWRUJvZ6mZ/oWjbbd8I5nakizUHM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jao3NIQypsgsv0GOY1bkxdKAb5LUcX5wV2XB1ZGVvF12dp01/qcK8CDtETN3/gOcwPMpDVviN9dOpJl0rXkVD/R712RL3tiqOta1egrX553Fiw5/cYJgYnPVjwfSa+0NJ/6dS2ZRJMBwDPgJE7bKy4IWa4mLDrg6KLeSwvg4nXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MQgNy2MA; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1781708513; c=relaxed/simple;
+	bh=v4HgzcMPKtCA1bfRUgCAIH2p6H7a1hFEIgPWyKO8bQc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XMQ28Qb4XlgKeWQj3OoAyvlIv+gOoOG5bfRZgohEyyXpsBXS750vZGU6owYVrdargd2UBmG7/aW0ASzz/X7Abf2uMsEnKGMg82ofxHNL+lGIScfKPNAs43YkdwjmETRAg8lnvLQ8PJpMT4wQwBmT2QwE6apnVNe3OHAtNMKfefA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fireburn.co.uk; spf=none smtp.mailfrom=fireburn.co.uk; dkim=pass (2048-bit key) header.d=fireburn-co-uk.20251104.gappssmtp.com header.i=@fireburn-co-uk.20251104.gappssmtp.com header.b=j0YsbjIP; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fireburn.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=fireburn.co.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MQgNy2MA"
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-4629d80fa08so618627f8f.3
-        for <linux-crypto@vger.kernel.org>; Wed, 17 Jun 2026 04:46:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=fireburn-co-uk.20251104.gappssmtp.com header.i=@fireburn-co-uk.20251104.gappssmtp.com header.b="j0YsbjIP"
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-3967738c801so51789981fa.2
+        for <linux-crypto@vger.kernel.org>; Wed, 17 Jun 2026 08:01:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781696814; x=1782301614; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T1xUbc08OXQwXD0H7YUvkinrceXsCq3vVphz8033T20=;
-        b=MQgNy2MAE+0vCqlZg/iP3tr7HRbBAt4XWHzWfePtoV3q+HWVWAinIF2i6ICLAJiXSh
-         qxGXofukYn8vKIlL4dXrN1PE5+STubqLYzzakaHLsEbl2yf5/PjB+K1GMSljMhzwvuse
-         /iS+Wric5wZ2h0jjHS2rnd8WrWzzHGcWiJBLx7QhsedOt1N+5oqk1iAMqu+C4JSLUSVz
-         aS2I3iX2fRHK6e5W9dqqZipE1FSwu/+QLe9S+toyxHkKDF7SjUoAm/4W/7jEW40m2vfs
-         eY/MOXGllax/2tclPfoeyNIjwDFocfDCxBQV4lA4fqFWHnhK+saOIirhfOkM3xVON88F
-         7foA==
+        d=fireburn-co-uk.20251104.gappssmtp.com; s=20251104; t=1781708510; x=1782313310; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UTwZZKye4gPezAdX2S6YpGx1K71xdb9A7yBEG4t0T58=;
+        b=j0YsbjIP3pFfC4u28KGWkjco/gPZdd7L73yzXQSy5sfSXSpCnwM2aCEEaD5E7QCdMC
+         pOP+/Y06zYULVJr6x/ek7fGk8hK0trF+aw2kGazIRz7+uAXBF+74mzpLe2uR6kJc0qwp
+         nKYfDjotXy9/X18qCgiYN8G0Uj+xpo+xPmNR1I7g3qQVcVkMicFS0jyFPbSD8w03FOpt
+         CtcZA6+7wquNWh6TbyecQ0nwffKtE581muiYkJczhAAamuLsW/Qg32k6thzNszdsRhOB
+         JXPr0DPRJNYLhXOxRRq65qJKAnfwfzX0zXcVLxurErHVDIOrnN04C/ZhuI+Irz5i/sY2
+         W9rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781696814; x=1782301614;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=T1xUbc08OXQwXD0H7YUvkinrceXsCq3vVphz8033T20=;
-        b=lPS/5LhUSB3larFNbHo0FSsCWKN7yf14T81HfVHSD2gN4NX79DyRXsV4Sxkniks5Oq
-         ZRug0hMZJMn8i/m9YP9sIN9woeR/2mAMb6aYCatrBXPvBQbKxgIYum3J8uTL6bh2Op5N
-         j1CspH18riDOvzJ/TxBLnVSi1ZQTy/02JZMk7qHFeKK57ZlgJP9ya/e5vJvjJCWPF0lT
-         2NyVkQhRLvPS8uCzEhq/R3Sopq1ogZiIbw55xoOmHh3uPeBg4xoYrcSrJ16UnwBCzsmc
-         s5eE63KQfEtkIt6DbUJcG/LzgYlkHHIr8vIS/OkOBa2Tolog//sfsc9Yuc/uLxHvzJIF
-         kTng==
-X-Forwarded-Encrypted: i=1; AFNElJ8scLhesWGiR5wzQ/t2RO+rV+wnxEBgvDZhZPYRm90BqM/hP0JfmhE3NGDyU6mEcflPdlSL9BVYmHQj+c4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyADrme7LWV760AUrpP5Ga9hq5DZfqi0P0/7o34TPwbfPZq7V0Z
-	dXw2EJq3fu6nEQbyS5hDu0we1nZoEpgrU3/X9aD1ucRoJvI26rhda9hr
-X-Gm-Gg: AfdE7cnsV4HoZr5U1r3yE7GvVoYZkCiLL/lAz05Ab+KyxfizsKddbrXW/tpKeP/XFef
-	eS6WkmWDyoiX7UjyOQbmV6GfQlgNWx+OMOvQr2mGxuyYv3JJv3VTtEOF3Q+Bur66o0fVmEP1Od/
-	XE1tA08OkHVXR5J6hqITwKudCihyfZYFiCXi81u8KNe7t6h+vClrzhF6XYnWElMa/4O57bu0P0m
-	TaZj7VT4PlIp5LRvIrRic8bw9wQXisuAHwlxauYh4UnBYKhIRl17SWnRa3Y69vm7ch5CHITDrRq
-	UxA7+YZWR9Hl1YU7VM1UIibs1p/9a9WhSC4VDX3ltWA4DMfZ4La4QaGVZaDwfa+sYlFbLrNwqg5
-	j+OeQDRF/d36tDKywdTxgmPoVIlf228Jy7cCuqn/mOI21x7Y6caAV7rl+Pp1hcM7kcz5r/f5Yap
-	71iOHml/dlEV8oFbIOVWrHv50aPc/q+a5TehDLMEfTcn4RljXwt8r8V0BHwzCKnQU=
-X-Received: by 2002:a5d:5d81:0:b0:441:1e41:194 with SMTP id ffacd0b85a97d-46236ef6b36mr6601847f8f.17.1781696814071;
-        Wed, 17 Jun 2026 04:46:54 -0700 (PDT)
-Received: from fedora ([196.77.26.11])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-462e7fc53fasm3221857f8f.33.2026.06.17.04.46.52
+        d=1e100.net; s=20251104; t=1781708510; x=1782313310;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UTwZZKye4gPezAdX2S6YpGx1K71xdb9A7yBEG4t0T58=;
+        b=PTueF6qvVLgxsyp10d7Q8paRrj9pLYYCNv9K8MkwSX/ZDHdcdwu0O3Agi4yvA5J7bY
+         aCunz/suZSIj2F+ZYZYDVi7+mdgd6+XaIHr1Rxe01kc4b4AclwaWI6VjAu2C4juPZbHB
+         HGNHFKQBbUdY5r/rJxvwzNje9uEBHJvsiJcgAPFuZ+CiWFF+wqxZDWu7wmaNl3VIoTPU
+         0j6Ke9PUWW0/fCPwOSsWW3jJ9y6YojQ6Bi6UUL2Dt4Z0IM846CjHbeIFduBTly7rqCkB
+         M5Vp/ZXqUBJR+S6GDpEGpwFr4+BlNywDg83KeVacV8jmTQhj5sslgookXWDaeEKq0m9q
+         VEAQ==
+X-Forwarded-Encrypted: i=1; AFNElJ9cepNEmV917tidBGQgoGPpphzrgtHfLdZGR03hhfOdL/83PmRl2Ee6UD2ELBgC9Z63xGr78v35uqUg3Po=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwnyPUXUA0UUlLl01d5sCTnkFsfiU6bh2WTUwRY91LzrBKU3Ynm
+	S8QkRwQqqCUEfsyYNXBtJ/ALSkhg+3fJyDzZMbNdPoWscqCPKxJhajwnRdNjOC1rVjeghRdfi+M
+	tCjN62oWU
+X-Gm-Gg: AfdE7cm34V/2Oo/n6L3t9vG5oHL+ORZYWpM9pDvbrEYG4WZLaa+8p3YlHt/o1FVWpHU
+	Xdn3nwcxIUAxz9BA/SB4DH3ya86d/c9AMc1kFrfu9U2G/iddW4xlPYymrk+BSHUv+qGbVSynRN0
+	15fQKLMxvumsSOE6aKP1EZbj+pAsXZ69ZvWHsSbbfSAFke5J4n4FecHlwcrcGMTe+6TC6BeCZv/
+	0ls6uMicZXlzBjhFRB3VOlcePqpmpKRZUbOmEQ6Qxfy00E07//FKGwSUtrO3xXrc+pjqJfUJWF0
+	hZmmRUk9JP87w9n2Zy0RojPht7ODMFVnZSF86O+ucs6fdC5BBtbhVszU5sQMbNh+Vl7GPauuG8G
+	Gyrg5y/ZJhIMIUhK4Znp9hc1Keob29ACldKF2eQ3aXEAmCvku5CuGhyEXmqYDFxMIgtZkivpQ9t
+	H8bns3ZU6tWaD5jrUUPyuzJk46/8fiBOMjkxTB2MRSsAZNhHOZTQD369af
+X-Received: by 2002:a2e:b888:0:b0:38e:6:4f89 with SMTP id 38308e7fff4ca-39969c2feadmr11390881fa.25.1781708509077;
+        Wed, 17 Jun 2026 08:01:49 -0700 (PDT)
+Received: from axion.fireburn.co.uk ([137.220.119.72])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-461abb44c3dsm13769159f8f.9.2026.06.17.08.01.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jun 2026 04:46:53 -0700 (PDT)
-From: Jad Keskes <inasj268@gmail.com>
-To: Krzysztof Kozlowski <krzk+dt@kernel.org>
-Cc: Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Rob Herring <robh@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Alexander Clouter <alex@digriz.org.uk>,
+        Wed, 17 Jun 2026 08:01:48 -0700 (PDT)
+From: Mike Lothian <mike@fireburn.co.uk>
+To: rust-for-linux@vger.kernel.org
+Cc: Mike Lothian <mike@fireburn.co.uk>,
 	linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jad Keskes <inasj268@gmail.com>
-Subject: [PATCH v4 2/2] hw_random: timeriomem-rng: add configurable read width and data mask
-Date: Wed, 17 Jun 2026 12:46:42 +0100
-Message-ID: <20260617114642.1911191-1-inasj268@gmail.com>
+	Eric Biggers <ebiggers@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Boqun Feng <boqun@kernel.org>,
+	Gary Guo <gary@garyguo.net>,
+	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	linux-kernel@vger.kernel.org
+Subject: [RFC PATCH 0/2] rust: crypto: library AES-128 / SHA-256 / HMAC + RSA
+Date: Wed, 17 Jun 2026 16:01:31 +0100
+Message-ID: <20260617150143.2152-1-mike@fireburn.co.uk>
 X-Mailer: git-send-email 2.54.0
-In-Reply-To: <20260617114436.1909659-1-inasj268@gmail.com>
-References: <20260617114436.1909659-1-inasj268@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The TODO for supporting read sizes other than 32 bits and masking has
-been sitting in this driver since 2009.  Implement it.
+This RFC series adds a small, reusable kernel::crypto module so in-kernel
+Rust code can hash, encrypt a single AES block, and do RSA public-key
+encryption:
 
-Add reg-io-width (1, 2, or 4 bytes) and mask support.  The read loop
-dispatches on width using readb/readw/readl so a configured 1-byte
-access doesn't trigger a bus error on hardware that rejects 32-bit
-reads to that address.  The mask is ANDed with the value before storing.
+  1/2  sha256(), hmac_sha256(), Aes128 (single-block ECB)
+  2/2  Akcipher + rsa_pubkey_encrypt() over crypto_akcipher
 
-These are platform properties, not runtime policy -- width depends on
-SoC integration, mask reflects which output bits carry entropy.
+Patch 1 binds the library crypto (lib/crypto) functions directly
+(SHA-256 / HMAC-SHA256) and uses one rust_helper_ shim for aes_encrypt()
+(its transparent union is unbindable). It runs synchronously in the
+calling context with no allocation and is the independently-mergeable,
+self-contained contribution.
 
-The alignment check in probe is updated to verify the resource is
-aligned to the configured width instead of hardcoding 4-byte alignment.
+Patch 2 adds crypto::Akcipher, a thin wrapper over the asynchronous
+public-key API (crypto_akcipher) driven synchronously, and a
+crypto::rsa_pubkey_encrypt() convenience built on it: it DER-encodes the
+RSAPublicKey the "rsa" transform expects, runs one encrypt, and leaves
+padding to the caller. The request/scatterlist/completion plumbing (all
+static-inline or on-stack) plus a kmalloc bounce for the DMA data path
+live in one rust_helper_ shim; crypto_free_akcipher() and
+crypto_akcipher_set_pub_key() are exposed through 1:1 shims. Going
+through crypto_akcipher rather than the MPI math library means it
+composes with any registered RSA implementation, including hardware
+offload. It is kept a separate patch so the public-key surface can be
+reviewed (or deferred) on its own without touching patch 1.
 
-Signed-off-by: Jad Keskes <inasj268@gmail.com>
----
- drivers/char/hw_random/timeriomem-rng.c | 77 ++++++++++++++++++++-----
- include/linux/timeriomem-rng.h          | 12 ++++
- 2 files changed, 76 insertions(+), 13 deletions(-)
+Both were factored out of an out-of-tree in-kernel Rust DisplayLink DL3
+dock driver (which needs SHA/HMAC/AES for HDCP 2.2 and RSA for the AKE),
+but the module is generic. Compile-tested in-tree against drm-next.
 
-diff --git a/drivers/char/hw_random/timeriomem-rng.c b/drivers/char/hw_random/timeriomem-rng.c
-index e61f06393209..42393409f22a 100644
---- a/drivers/char/hw_random/timeriomem-rng.c
-+++ b/drivers/char/hw_random/timeriomem-rng.c
-@@ -14,7 +14,9 @@
-  *   has to do is provide the address and 'wait time' that new data becomes
-  *   available.
-  *
-- * TODO: add support for reading sizes other than 32bits and masking
-+ * The read width (8, 16, or 32 bits) and an optional data mask can be
-+ * configured through platform data or device tree properties.  Default is
-+ * 32-bit reads with no mask.
-  */
- 
- #include <linux/completion.h>
-@@ -34,6 +36,8 @@ struct timeriomem_rng_private {
- 	void __iomem		*io_base;
- 	ktime_t			period;
- 	unsigned int		present:1;
-+	unsigned int		reg_io_width;
-+	u32			mask;
- 
- 	struct hrtimer		timer;
- 	struct completion	completion;
-@@ -48,6 +52,7 @@ static int timeriomem_rng_read(struct hwrng *hwrng, void *data,
- 		container_of(hwrng, struct timeriomem_rng_private, rng_ops);
- 	int retval = 0;
- 	int period_us = ktime_to_us(priv->period);
-+	int chunk = priv->reg_io_width;
- 
- 	/*
- 	 * There may not have been enough time for new data to be generated
-@@ -71,11 +76,28 @@ static int timeriomem_rng_read(struct hwrng *hwrng, void *data,
- 			usleep_range(period_us,
- 					period_us + max(1, period_us / 100));
- 
--		*(u32 *)data = readl(priv->io_base);
--		retval += sizeof(u32);
--		data += sizeof(u32);
--		max -= sizeof(u32);
--	} while (wait && max > sizeof(u32));
-+		switch (priv->reg_io_width) {
-+		case 1: {
-+			u8 val = readb(priv->io_base) & priv->mask;
-+			*(u8 *)data = val;
-+			break;
-+		}
-+		case 2: {
-+			u16 val = readw(priv->io_base) & priv->mask;
-+			*(u16 *)data = val;
-+			break;
-+		}
-+		case 4: {
-+			u32 val = readl(priv->io_base) & priv->mask;
-+			*(u32 *)data = val;
-+			break;
-+		}
-+		}
-+
-+		retval += chunk;
-+		data += chunk;
-+		max -= chunk;
-+	} while (wait && max > chunk);
- 
- 	/*
- 	 * Block any new callers until the RNG has had time to generate new
-@@ -125,11 +147,8 @@ static int timeriomem_rng_probe(struct platform_device *pdev)
- 	if (IS_ERR(priv->io_base))
- 		return PTR_ERR(priv->io_base);
- 
--	if (res->start % 4 != 0 || resource_size(res) < 4) {
--		dev_err(&pdev->dev,
--			"address must be at least four bytes wide and 32-bit aligned\n");
--		return -EINVAL;
--	}
-+	priv->reg_io_width = 4;
-+	priv->mask = 0xFFFFFFFF;
- 
- 	if (pdev->dev.of_node) {
- 		int i;
-@@ -145,9 +164,41 @@ static int timeriomem_rng_probe(struct platform_device *pdev)
- 		if (!of_property_read_u32(pdev->dev.of_node,
- 						"quality", &i))
- 			priv->rng_ops.quality = i;
-+
-+		of_property_read_u32(pdev->dev.of_node,
-+				     "reg-io-width", &priv->reg_io_width);
-+		of_property_read_u32(pdev->dev.of_node,
-+				     "mask", &priv->mask);
- 	} else {
- 		period = pdata->period;
- 		priv->rng_ops.quality = pdata->quality;
-+
-+		if (pdata->reg_io_width_set)
-+			priv->reg_io_width = pdata->reg_io_width;
-+		if (pdata->mask_set)
-+			priv->mask = pdata->mask;
-+	}
-+
-+	if (priv->reg_io_width == 0)
-+		priv->reg_io_width = 4;
-+
-+	switch (priv->reg_io_width) {
-+	case 1:
-+	case 2:
-+	case 4:
-+		break;
-+	default:
-+		dev_err(&pdev->dev, "invalid reg-io-width %u, must be 1, 2, or 4\n",
-+			priv->reg_io_width);
-+		return -EINVAL;
-+	}
-+
-+	if (!IS_ALIGNED(res->start, priv->reg_io_width) ||
-+	    resource_size(res) < priv->reg_io_width) {
-+		dev_err(&pdev->dev,
-+			"address must be %u-byte aligned\n",
-+			priv->reg_io_width);
-+		return -EINVAL;
- 	}
- 
- 	priv->period = us_to_ktime(period);
-@@ -167,8 +218,8 @@ static int timeriomem_rng_probe(struct platform_device *pdev)
- 		return err;
- 	}
- 
--	dev_info(&pdev->dev, "32bits from 0x%p @ %dus\n",
--			priv->io_base, period);
-+	dev_info(&pdev->dev, "%u-byte from %p @ %dus\n",
-+		 priv->reg_io_width, priv->io_base, period);
- 
- 	return 0;
- }
-diff --git a/include/linux/timeriomem-rng.h b/include/linux/timeriomem-rng.h
-index 672df7fbf6c1..5732489a17a1 100644
---- a/include/linux/timeriomem-rng.h
-+++ b/include/linux/timeriomem-rng.h
-@@ -16,6 +16,18 @@ struct timeriomem_rng_data {
- 
- 	/* bits of entropy per 1024 bits read */
- 	unsigned int		quality;
-+
-+	/* read width (1, 2, or 4 bytes), 0 means 4 */
-+	unsigned int		reg_io_width;
-+
-+	/* set to true if reg-io-width is explicitly provided */
-+	bool			reg_io_width_set;
-+
-+	/* mask applied to raw read value */
-+	u32			mask;
-+
-+	/* set to true if mask is explicitly provided */
-+	bool			mask_set;
- };
- 
- #endif /* _LINUX_TIMERIOMEM_RNG_H */
--- 
+Mike Lothian (2):
+  rust: crypto: add library AES-128 / SHA-256 / HMAC-SHA256 bindings
+  rust: crypto: add RSA public-key encryption via crypto_akcipher
+
+ rust/bindings/bindings_helper.h |   3 +
+ rust/helpers/crypto.c           |  95 +++++++++++++++++++++++++++
+ rust/helpers/helpers.c          |   1 +
+ rust/kernel/crypto.rs           | 255 ++++++++++++++++++++++++++++++++++
+ rust/kernel/lib.rs              |   1 +
+ 5 files changed, 355 insertions(+)
+
+--
 2.54.0
-
