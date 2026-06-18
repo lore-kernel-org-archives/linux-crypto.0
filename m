@@ -1,50 +1,50 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D3F82F8EB8;
-	Thu, 18 Jun 2026 21:42:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 547CA2F8E95;
+	Thu, 18 Jun 2026 21:42:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781818928; cv=none; b=kMqx8gejys5q/WTXCWGxP4HuEC6fHR28mT/mgsnjb1oJKDl4Rprph+Syyhd1vLCY+BvDag0UjHzwkevJj1anPg37NovKhMy7oOmc5NFeaG1Hr7q852YWOSWsK8e5UjRgBH650AE5cY9SanmjDXsnCUsROYAAhv0+1JwY6OiietE=
+	t=1781818977; cv=none; b=sbgMOgCBF7cHAuUuduRIGhz8aRRYsI6qeBBzoJBRvxfX/ayZvitgUE2H+yvSsMTMRoM/27H2Glc7sYQ4CbTkt6cwinjc3eIWPDs5GID0pieqSlVXBA/lMU2fZJYIq6PRAXWCwZk97UHL+s35zPlPj5b7H0oDiNeZsgM8n/1aSeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781818928; c=relaxed/simple;
-	bh=XL0O2ajx2YPVmV2OKV640EsmjX4W7Q6tueNXGSL+CKg=;
+	s=arc-20240116; t=1781818977; c=relaxed/simple;
+	bh=kWswe8/gr+xeqBslNsB9mWSdq+XPjvXe0tThcE0fCu4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EccOWnK3yrSDAfeAe2ccTLzV1UpzdYZUDAiGpw7GzL/DHmxKFikOfNrDf9QJOTSC3/I1sxemMTWeyhwnfBsDq96PSIgBJuutMn8tA++l55tXfhZpknIQzg5ttJlHygEaP6vaopR1Sq5xAY+djZaDDZdXzGSQIvmK0uNLhchgi2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZqFawcz4; arc=none smtp.client-ip=192.198.163.17
+	 In-Reply-To:Content-Type; b=KJWchSeprwvfq0itpQTTEp97kWbDCE7ANPoiovEPsulzp6wsj4nCnxAwbZXyQkjc+5Da1Shz2jZ6Dp9TrRqqylgZPLeGt17NYTqGHo35Z2fClR4Yy6p9Pj1yIpSO5Wzrqm7liC+CddzbtfkBqMej7Eo/vM/NeM27DepCNUda9jI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UEQJYs9P; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZqFawcz4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UEQJYs9P"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1781818927; x=1813354927;
+  t=1781818976; x=1813354976;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=XL0O2ajx2YPVmV2OKV640EsmjX4W7Q6tueNXGSL+CKg=;
-  b=ZqFawcz48cOi/IdbvyenZakQRbncj0a3/JlMef1ziMbEyOgL32xGMzvn
-   y+mrfvLbAlbpwKxgVHYuXln0WlssqZMv/A+HdBI6YIN91QIK1Npm4TwGY
-   kQ5742kFFDgOh1ovJ+MBaubYcMK/zdQIFrisSpP+UfgwRyhhvChsGbaac
-   S51TMzN4wbDVW+SEJJOKsdU5eDGEDIBdQytkTlOFvkgqQvtY4WqfaPrnN
-   8X80eteOiLDEJ6RIUX57yQuKZWQkVtjPlM66GxFMSvx1MD0mynN4TczYI
-   FmpbzPyXe80YbLpgJaQGRewllp+iOhevId/HlfMTxrwUws81aB7hi0ctf
-   Q==;
-X-CSE-ConnectionGUID: DDMG4UrjQz+7BdNm6eepFg==
-X-CSE-MsgGUID: ak3MxrLySdKnQom0Xbbpyg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11821"; a="82550700"
+  bh=kWswe8/gr+xeqBslNsB9mWSdq+XPjvXe0tThcE0fCu4=;
+  b=UEQJYs9Pr16igl6eufAc6aHaHzt4TYSTTRgueASUp1yXNGRJZnvO22BU
+   GMmgZEdF5sSysuu1d/RsIU5cSzv+Bk2x2XMyA51KHrEWxON26BgMwed9V
+   SjPut2kgNOyUFh5Vq4ORSnNfTzCDqf9u7cOxYUVg4vRUO6+D9ahiznmHj
+   mzxQsF2bsf0POqtvHObBZLQiK3cyHrq0WrNkNu9xWQivQXydLfITYPNWS
+   ZHux895/VaI8AQN4zuCs8F8dpkVCsxRuHSgvhvpYoGC6Raxepc3QKILP/
+   UMMj5AzHp9ELNu/6g86ZedukFO+9u//XnJNmDIXnkLhqPT5VhpS/YlW2d
+   A==;
+X-CSE-ConnectionGUID: LG7BV/mMSOmdWe97LLxgMA==
+X-CSE-MsgGUID: wht55q4jT+izXEBGTRV+9Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11821"; a="82550848"
 X-IronPort-AV: E=Sophos;i="6.24,212,1774335600"; 
-   d="scan'208";a="82550700"
+   d="scan'208";a="82550848"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2026 14:42:04 -0700
-X-CSE-ConnectionGUID: yiI6kEGXTWGMlMupw9y6NQ==
-X-CSE-MsgGUID: iX2QgOy5RxaNqvrvz3SU9w==
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2026 14:42:55 -0700
+X-CSE-ConnectionGUID: 857mgjK5SsaG/mv/U7PrUw==
+X-CSE-MsgGUID: Dz84JW+vS6OgxQ1pxgswog==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.24,212,1774335600"; 
-   d="scan'208";a="245560041"
+   d="scan'208";a="245560091"
 Received: from rfrazer-mobl3.amr.corp.intel.com (HELO [10.125.111.222]) ([10.125.111.222])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2026 14:42:03 -0700
-Message-ID: <fdf0919f-0576-45e3-8600-72ac40c6f8af@intel.com>
-Date: Thu, 18 Jun 2026 14:42:02 -0700
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2026 14:42:54 -0700
+Message-ID: <56eef9fa-d8cb-480a-b3b1-f01456ebdb4f@intel.com>
+Date: Thu, 18 Jun 2026 14:42:50 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,13 +52,12 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 6/7] KVM: SEV: Perform RMP optimizations on SNP guest
- shutdown
-To: Ashish Kalra <Ashish.Kalra@amd.com>, tglx@kernel.org, mingo@redhat.com,
- bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- seanjc@google.com, peterz@infradead.org, thomas.lendacky@amd.com,
- herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org
-Cc: pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
+Subject: Re: [PATCH v8 7/7] x86/sev: Add debugfs support for RMPOPT
+To: "Kalra, Ashish" <ashish.kalra@amd.com>, Borislav Petkov <bp@alien8.de>
+Cc: tglx@kernel.org, mingo@redhat.com, dave.hansen@linux.intel.com,
+ x86@kernel.org, hpa@zytor.com, seanjc@google.com, peterz@infradead.org,
+ thomas.lendacky@amd.com, herbert@gondor.apana.org.au, davem@davemloft.net,
+ ardb@kernel.org, pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
  KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com,
  ackerleytng@google.com, jackyli@google.com, pgonda@google.com,
  rientjes@google.com, jacobhxu@google.com, xin@zytor.com,
@@ -67,7 +66,9 @@ Cc: pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
  linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
  kvm@vger.kernel.org, linux-coco@lists.linux.dev
 References: <cover.1781419998.git.ashish.kalra@amd.com>
- <25c3693a59c8f00796e84f1ffa668df6e3b734b5.1781419998.git.ashish.kalra@amd.com>
+ <cc9aa9b6cfa2ce826f2ad53f8a13d3b7bf0790b6.1781419998.git.ashish.kalra@amd.com>
+ <20260618180814.GCajQ0Dv0CoRMJxbP0@fat_crate.local>
+ <5849645c-f701-4768-8cdf-1f9032e3226f@amd.com>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -113,20 +114,17 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <25c3693a59c8f00796e84f1ffa668df6e3b734b5.1781419998.git.ashish.kalra@amd.com>
+In-Reply-To: <5849645c-f701-4768-8cdf-1f9032e3226f@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 6/15/26 12:50, Ashish Kalra wrote:
-> From: Ashish Kalra <ashish.kalra@amd.com>
-> 
-> Pages are converted from shared to private as SNP guests are launched.
-> This destroys exisiting RMPOPT optimizations in the regions where
-> pages are converted.
-> 
-> Conversely, guest pages are converted back to shared during SNP guest
-> termination and their region may become eligible for RMPOPT
-> optimization.
+On 6/18/26 12:57, Kalra, Ashish wrote:
+> Maybe i can add a line to this patch's commit message stating it's a
+> debug-only interface with no stability guarantee.
 
-Oh, actually that would be good text for the *previous* patch too. You
-might want to move some of it there.
+I'd highly suggest reading the lwn article Boris referenced.
+
+In the meantime, drop this patch from the series. Please. Let's revisit
+debugging interfaces *after* this gets merged. That way, you can
+concentrate on functionality and not debug interfaces that aren't
+critically needed.
