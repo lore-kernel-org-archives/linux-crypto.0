@@ -1,193 +1,190 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C7543F44E0
-	for <linux-crypto@vger.kernel.org>; Thu, 18 Jun 2026 11:58:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 757993EEAC2
+	for <linux-crypto@vger.kernel.org>; Thu, 18 Jun 2026 12:01:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781783920; cv=none; b=YfM4oQ93E1OnRZ36eqy/jnY2Ure4j9V8ivhZM9d9kx4kxAizlmnzNdRxEHmEb48sTD78EyXNyVLbEv+vZTc05KXOD+2EiBzuj/LgOWLVgyMnK3jmM79C+C3ynqo7MLgY02KvCLXopnadBimuGQFNqXgmphuad8t2VzF/ZRQcV4M=
+	t=1781784087; cv=none; b=g0BZjpCBlJN3DkIDY9YQaGMbM6YfO9ElCNYnem74ev5448OnGhDW1asAKDg7tYO5tvNfuiKukYpBmuoDq2LgwWsvY/nagxr/rHFRxPr0ftP4p4cky/h9mExTKPgXXfN9gSJvf9vAkfMWXCvOZhJXhkUACN/TKsX6XbIy4OQ+MrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781783920; c=relaxed/simple;
-	bh=KZ2n6uHf9sALlO8azO9QIykYyyZQYitsXVJH6IWYZnw=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ooQtICIUsThtKbscP8pnmxkujdd9dqPJHCUC25FtYWOgjRoIDvmPi69I23f8HfLrnwiT5zBkIQ+KPj6JE2U7566CAnNpq6CmpJbvCw/t1ipuEB8zs7y4AozXQ6SdR8KDzuhVdEIiJFdMKk/venjrwdkjx1oxzD3dEonM7v2M0jk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=EznYjMPK; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=WplL9qt4; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1781784087; c=relaxed/simple;
+	bh=0eiZHGb9KKIgUxkII4zJTF+i6GeM/3brFI9yXSPJloU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r/q9r7RzTotLFzi8cKyKXKRkEl2LM+1COIbPTSbi2/ocmD5GJ+ss+GlxC8zmYXcPHQi+wGDyOe7x4Mevdy/frQit4NMGpFUsdRY/voojhDaSN7QW+SN7BJRCCzM/XAOTIp2NsfqXK3Z5Eh0XF+Yh/HcB0tk7P33xenSSHSNh92U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GSSWBYSo; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="EznYjMPK";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="WplL9qt4"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 65IArjUY936483
-	for <linux-crypto@vger.kernel.org>; Thu, 18 Jun 2026 11:58:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	Ewl4h7yTa+CJnsF+C3UlKgDF7RA9ieleZlORZvvMj6Q=; b=EznYjMPKmetpcu21
-	gX+/j/d4J7/it8cSNiw+GlxErMSn1uhiQqJoEi7dBY03FY9ZVnbfhjMirdsCqKAX
-	jZDTCMeJ41hAMR/+V/+43E6Wt/pL/rAfNFu2anU5He/PK8CCDeVVvLhcMQVu4CW1
-	LgwKMlZFgkjZ5rSTuO89fk9jocYiqxQGVphW3GpYBaHGrVaiZkW7f5Sp1+gsVhXL
-	U1DkhLS15MhR+mPeejpI3v0Pfj5u0dIlL7zqm+RdtO1KpM0BN/n9Q1VgeuCe1Yrg
-	gl4V7VPO5EOrBljZ74mMEzlXBqzG3gqKDzXY2cktGxUFK3PoYN82QhaT7tK1Qfum
-	LrfNFQ==
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com [209.85.216.70])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4euxt5436h-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Thu, 18 Jun 2026 11:58:34 +0000 (GMT)
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-37c5fd2ee08so1721491a91.0
-        for <linux-crypto@vger.kernel.org>; Thu, 18 Jun 2026 04:58:34 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GSSWBYSo"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-491b390f9e9so7348245e9.0
+        for <linux-crypto@vger.kernel.org>; Thu, 18 Jun 2026 05:01:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1781783914; x=1782388714; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Ewl4h7yTa+CJnsF+C3UlKgDF7RA9ieleZlORZvvMj6Q=;
-        b=WplL9qt4bh2hHHh15kttoFU6bvDls2YBvbfE7Pvgq464704ely82fPt4GJALcJxJke
-         1k2+J4aKyXrM1+3b8BROJWMsUh02XgfLg4nGDlt6r1FXmixjRZ0SSvXtY8xfHmUdaBTm
-         CnO8R69xuxZ4wPoAE+LZPygTFiVFRgJPaD+WYUQF7lAbfx0zXxVaw3YktJPjOcb99eHC
-         33aFVC9S6lT+lrbNSvgtwGSQHKdC6um3hQNYfG6slAYVbEvzRNEhTVK/G1OBtdLsMFpW
-         iw8UBlwQ1f+7EbcPyoXtWgNY92orgH+OYukAD6w6orJfx59N4U5uXXPTzq/V0+Tu99ql
-         QdPg==
+        d=gmail.com; s=20251104; t=1781784085; x=1782388885; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xNIuXvhlBD5VWoUVh2+QzcLjcnytf8FvE3IBj55kuEA=;
+        b=GSSWBYSoQqK4YmcTS3CeTWNxlFcVCsPkUFWQzlujYE2RpvWrsg6X3sLeYDhKb9sc/H
+         MEhpFJNOITGdg4vFdxm8SDVhU3hQ0bab9X8yhv6vTjxa1VJkbRWLK6FdQBzuyWQQIlv9
+         grOEZTtQa98UzXdrZdBcQX5yFTOL4K5yi+JVzphapUwxY5QWq1Y0AQ708szMt67JmiZP
+         JRZp9dJubd6c9Jfu+OI59TVLEXIq7x/QS1XukGtz74vff9EMqI/GYuBDYcKtdzalkYMh
+         jnyF2T0lwKWgUwaN6tX7qmPmUng2hv1TVqBdLfbFEMVP/OADq3C6TiigUFMIK7ydrRTt
+         j1PA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781783914; x=1782388714;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ewl4h7yTa+CJnsF+C3UlKgDF7RA9ieleZlORZvvMj6Q=;
-        b=Kt/qL0CWAfA1XvRpJChIR1GBFaEeOOzucUOFvncbs0AARPGq8NIl9IjpGzPttR7+5N
-         osGzzszCcmKulbyxXHqfpeoqtj/G1QgRBdHvKYJ8yK0qyezjB545aIf/pmWxRp+h0q0v
-         ZXPGN/PCyuJXeuyMD7Kn7t7MmHUWL9GFQRUfrwB4AGLSy3Ser7aZwuy0dGvLtqBd5qQT
-         pQSzXJfM1VYhBGDw/fLo6Wzi5G3BonTaEvvkKdab8V6nNsNpYDpHEDTPKd7wNDWlKSFD
-         7HqcEGJW1l5VxpnIu3ZFUHQwlREznPta/ttrEXGENd3xqYAvKQlMD4x1GP7yYgHYC7g7
-         b0Cw==
-X-Forwarded-Encrypted: i=1; AFNElJ/LvTO4sCG/VcHrVzN/3coNx2je+dr20LwTTjRThbkF6LqPk3G7pp05qSYasTEkVdJKNBsd1NOEnpD6RXQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxrkw/Di5U45WR+poUahdbZWCzQAgCsSBwBg1tfUsL/1GEWAVIo
-	WXBCPTEcBQAg7aKzr+Cm8KgliCYDUSzCDkyABT5glnXP1Z+K6qIOTswexaUldSDM4JWAZvV+KHL
-	2Y7+rf2LZikPyuYEtFI504RFnNTY+BjZkkCpXUnOgA+XkjLrw1tq2YS+MDptOEP1IE0U=
-X-Gm-Gg: AfdE7cnHueU0FraTdUOboM6ypznG9lDB0kdMA2ErBS3c6ZBmyGoo/NnY4TGm/ZQ+HTA
-	838/YkivvKiJJxSdQEl4B+jzWcokpsmZEDJ7n5nEOXpaRDNF1rw+Xed/mAESXmPaNJAn/djJqzK
-	ZJL5QQ/c0LH4ROesgkAIdZCtqHJpdpZyP/EW9GMVK0FMAtUPR5AVKs9e+/iLvvVBvJV3PaJKFeB
-	PCXBT8bknRQ1JKdC29Xxo06/toopwhhfGjWVGPFhZPRMKVz0z5xyXSNOYp7z5cld5XP/8jMLiBU
-	dVGpc0S/Mr5qb5yisny2iuLlCYK91qU0Qwnm4dogPgwwmxSn6Mp3CScuBnGElRJsCafan2wHuUY
-	7lBE2Bd5La64DIVNcH1HewIBrZ+GSWMH33PGgKV2L
-X-Received: by 2002:a17:90b:1c92:b0:36b:de66:92c3 with SMTP id 98e67ed59e1d1-37cdbdb5acdmr2858164a91.10.1781783914120;
-        Thu, 18 Jun 2026 04:58:34 -0700 (PDT)
-X-Received: by 2002:a17:90b:1c92:b0:36b:de66:92c3 with SMTP id 98e67ed59e1d1-37cdbdb5acdmr2858139a91.10.1781783913689;
-        Thu, 18 Jun 2026 04:58:33 -0700 (PDT)
-Received: from [10.217.223.121] ([202.46.22.19])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-37c5228ecd9sm9012749a91.11.2026.06.18.04.58.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Jun 2026 04:58:33 -0700 (PDT)
-Message-ID: <b4794e93-0fd3-4559-9ecd-02d679bd06b5@oss.qualcomm.com>
-Date: Thu, 18 Jun 2026 17:28:27 +0530
+        d=1e100.net; s=20251104; t=1781784085; x=1782388885;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xNIuXvhlBD5VWoUVh2+QzcLjcnytf8FvE3IBj55kuEA=;
+        b=XfM7xd7YikW7eZ8n2uESwbTqIq5bhdK58+DE1+2DpwEtBzIC7E9i/27TVoQo6zuPOv
+         62gokUYGIjvGJpbSqyQQPeSBRQa1IIvnm4ePpjSsZdiJTdxHRWcJCrRsuIPz+vGMCHE6
+         KMQElcT0Q6Z+Qit4VMBh38gfCOndhMN+g2fkMiedbXqAoP5bcA4Qr4NET6SwFnrn6GyE
+         3Q75eCSqf199vNVOCU5dl4hzmB3hBmpNMcnYkFM7cloM2pAXm3pGiHQ78BNlvCmISZuD
+         CNigbtESXgt2ZJXmOjANn0SvdBnnI1s5InJtXFW0tpDlKvzT6Xw0Rlo1X65hKxw9xu4s
+         QWxQ==
+X-Forwarded-Encrypted: i=1; AFNElJ/2ZOLTIpyQPy+E/TwvJnD9a7lPYanfI2nte7wDO2VakYaeTAXi9qle+/6nU85DRYFq5CS7s9ow+sC9JIg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYNNioXnE07agcIjhrDX8RZ/fdvm65Y6+qrFdSqmALc/JUpXf+
+	QmjY27PioY4P2Sph+YzEMjuKB/AfJQforfPhPEMpNpYFThS/AWXVgbsRsjJJ4PM4
+X-Gm-Gg: AfdE7cn1Rv2hiDlIRz+H5KAAZjfrlkwFcwAZndk3iPuoA3SOjpK4caWAmSC5/cwvGgS
+	M1Yi7CILffTbYFDvbg5HI3ihWHNYd4splZmdKHJy/fmDAPEeQfL7OtVWzlF9Ooly1PgX4C5ANEy
+	rjKr07ppHQ6M2Vv1Pc/sUurlg8QNp0Oqd8uIdsoXGpLSAYEIOHYltDNpEKNDixVzmgOxj1H3BVR
+	Faz2qcgxx9fOcqIMC4ESRtF4yPoA/8lY2NN/wtlpgmUjnEVOzja9E6i1Xsx5B6J8JAlnVr49c6q
+	kit/+CMmfrtjIahf2nf5zWJXfAsRJr51ahAd90FxlIw6j4oq1gzNOtTwQIJ27E+ZhqY5KdJE2Fr
+	2ybGHS2TWjaNNyW8NmaUlEyoVkzuUb8IxM7fPVlhefoTTCYRase5dkiDGtdRMcbgJNZOsO82kEp
+	Bn2DqCAlPoBgaZW019UFFsuALycKMJ/cja4Hq89XjNzkRNOq3CTJIP21amOnF36eqxGIo=
+X-Received: by 2002:a05:600c:4c09:b0:490:b355:9c8c with SMTP id 5b1f17b1804b1-492333ca42bmr93315975e9.23.1781784083060;
+        Thu, 18 Jun 2026 05:01:23 -0700 (PDT)
+Received: from fedora ([196.121.162.160])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49230a8ec56sm218506175e9.9.2026.06.18.05.01.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Jun 2026 05:01:22 -0700 (PDT)
+From: Jad Keskes <inasj268@gmail.com>
+To: Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Alexander Clouter <alex@digriz.org.uk>,
+	devicetree@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jad Keskes <inasj268@gmail.com>
+Subject: [PATCH v5 1/2] dt-bindings: rng: timeriomem_rng: add reg-io-width and mask properties
+Date: Thu, 18 Jun 2026 13:01:09 +0100
+Message-ID: <20260618120110.36439-1-inasj268@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/2] arm64: dts: qcom: glymur: add TRNG node
-From: Harshal Dev <harshal.dev@oss.qualcomm.com>
-To: Bjorn Andersson <andersson@kernel.org>
-Cc: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
-        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
- <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
-References: <20260424-glymur_trng_enablement-v2-0-0603cbe68440@oss.qualcomm.com>
- <20260424-glymur_trng_enablement-v2-2-0603cbe68440@oss.qualcomm.com>
- <814cff7c-fc03-42a0-93e6-852598943ac4@oss.qualcomm.com>
- <0debc1fb-f6ae-44c6-aa87-d5ef3e39b47d@oss.qualcomm.com>
-Content-Language: en-US
-In-Reply-To: <0debc1fb-f6ae-44c6-aa87-d5ef3e39b47d@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: GuTPlsGK29mDbA090J8-yv1NkI78KYh7
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNjE4MDExMSBTYWx0ZWRfXyrY1egGLPFX5
- VR35mdIuFuc8Wt2lLD73c3NLFlv30rmjGx5ruGpkJSa7WznSxNMWxql1q/1hUY4y4VQkgyr6Aq1
- T/9asIsS3G04uEb1xaE+ITgCu8ek6Wk=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNjE4MDExMSBTYWx0ZWRfX+f7df1a7H1zk
- fkR2SFIZbgsw1sp37LYG/90HcWsmzOHqSeUrbAyMqlr6W/xmDxlMWZKb6zeK7DGEXpegB4AO0pd
- U4AdnMTZEDuaeQXRzxHaKch9lzXODMd5gd8+FWqHpWMqvH+o0PKa078dG2QrQJ2xMC997l1vi9b
- QuoOgiqjzD7WBKe4JRUXba908sSuxQOYqDzI6iKwhlyoR91zjz6Q5sCIZCz6KQ8ZEgMX1U9Mze+
- bYvUfQ4TC8xH3xJ5Nx5hfMz/D4gLkXcsgyvOxq1OM+MEWVs5IZg58aM4Vux6zq5J0Ows47SKNyf
- ctunrVWcobka6UlbCpDsfazXRzlW6cNjfvF98Lc+gEC/FyHuwC2DXdHFo9EU7wjfaWcV6dqu4zk
- TEzMeh/5jZ5/FbE2xep+98g6g+gAJXCqptk6LgqGnsi01WDmk1XTLWeIc60r1P93uhTZWT5Hdni
- i7Ny6G8O/g6mIUtvj4A==
-X-Authority-Analysis: v=2.4 cv=PMw/P/qC c=1 sm=1 tr=0 ts=6a33dd6a cx=c_pps
- a=0uOsjrqzRL749jD1oC5vDA==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
- a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=_K5XuSEh1TEqbUxoQ0s3:22
- a=EUspDBNiAAAA:8 a=Z0BHpR-UP7m2DiSvRn4A:9 a=QEXdDO2ut3YA:10
- a=mQ_c8vxmzFEMiUWkPHU9:22
-X-Proofpoint-ORIG-GUID: GuTPlsGK29mDbA090J8-yv1NkI78KYh7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.125,FMLib:17.12.100.49
- definitions=2026-06-18_01,2026-06-18_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 clxscore=1015 suspectscore=0 priorityscore=1501 bulkscore=0
- malwarescore=0 impostorscore=0 spamscore=0 lowpriorityscore=0 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2606180111
+Content-Transfer-Encoding: 8bit
 
-Hi Bjorn,
+Add optional reg-io-width (1, 2, or 4 bytes) and mask properties.
+reg-io-width selects the bus access size.  mask is ANDed with the raw
+register value to allow only the entropy-bearing bits through.
 
-On 6/9/2026 12:06 PM, Harshal Dev wrote:
-> Hello Bjorn,
-> 
-> On 5/18/2026 2:06 PM, Harshal Dev wrote:
->> Hi Bjorn,
->>
->> On 4/24/2026 2:05 PM, Harshal Dev wrote:
->>> Glymur has a True Random Number Generator, add the node with the correct
->>> compatible set.
->>>
->>> Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
->>> Signed-off-by: Harshal Dev <harshal.dev@oss.qualcomm.com>
->>> ---
->>>  arch/arm64/boot/dts/qcom/glymur.dtsi | 5 +++++
->>>  1 file changed, 5 insertions(+)
->>>
->>> diff --git a/arch/arm64/boot/dts/qcom/glymur.dtsi b/arch/arm64/boot/dts/qcom/glymur.dtsi
->>> index f23cf81ddb77..64bbd5691229 100644
->>> --- a/arch/arm64/boot/dts/qcom/glymur.dtsi
->>> +++ b/arch/arm64/boot/dts/qcom/glymur.dtsi
->>> @@ -3675,6 +3675,11 @@ pcie3b_phy: phy@f10000 {
->>>  			status = "disabled";
->>>  		};
->>>  
->>> +		rng: rng@10c3000 {
->>> +			compatible = "qcom,glymur-trng", "qcom,trng";
->>> +			reg = <0x0 0x010c3000 0x0 0x1000>;
->>> +		};
->>> +
->>>  		tcsr_mutex: hwlock@1f40000 {
->>>  			compatible = "qcom,tcsr-mutex";
->>>  			reg = <0x0 0x01f40000 0x0 0x20000>;
->>>
->>
->> A gentle reminder to pick this patch for the 7.2 merge window.
->>
-> 
-> Another reminder to pick this patch up in-case you've missed it.
-> 
+Update the example to show a 1-byte configuration.
 
-Gentle reminder.
+Signed-off-by: Jad Keskes <inasj268@gmail.com>
+---
+v5:
+- Fix description to describe hardware, not the binding
+- Drop SPDX dual-license change
+- Merge examples into one
+v4: Initial version with reg-io-width (replaced custom width from v3)
+v3: Changed from custom width to reg-io-width per dt-bindings convention
+v2: Split DT binding and driver into separate patches
+v1: Initial submission
+---
+ .../bindings/rng/timeriomem_rng.yaml          | 50 ++++++++++++++-----
+ 1 file changed, 37 insertions(+), 13 deletions(-)
 
-Thanks,
-Harshal
-
-> Thanks,
-> Harshal
-> 
->> Regards,
->> Harshal
-> 
+diff --git a/Documentation/devicetree/bindings/rng/timeriomem_rng.yaml b/Documentation/devicetree/bindings/rng/timeriomem_rng.yaml
+index 4754174e9849..7f0068f785b7 100644
+--- a/Documentation/devicetree/bindings/rng/timeriomem_rng.yaml
++++ b/Documentation/devicetree/bindings/rng/timeriomem_rng.yaml
+@@ -4,7 +4,11 @@
+ $id: http://devicetree.org/schemas/rng/timeriomem_rng.yaml#
+ $schema: http://devicetree.org/meta-schemas/core.yaml#
+ 
+-title: TimerIO Random Number Generator
++title: Timer IOMEM hardware random number generator
++
++description: |
++  A device that provides random data via a single memory-mapped IO register.
++  A new value becomes available at a fixed interval.
+ 
+ maintainers:
+   - Krzysztof Kozlowski <krzk@kernel.org>
+@@ -13,29 +17,47 @@ properties:
+   compatible:
+     const: timeriomem_rng
+ 
++  reg:
++    maxItems: 1
++    description:
++      Base address to sample from.  Must be aligned to the configured access
++      width (1, 2, or 4 bytes) and at least that wide.
++
+   period:
+     $ref: /schemas/types.yaml#/definitions/uint32
+-    description: wait time in microseconds to use between samples
++    description:
++      Interval in microseconds between random value updates.
+ 
+   quality:
+     $ref: /schemas/types.yaml#/definitions/uint32
+     default: 0
+     description:
+-      Estimated number of bits of true entropy per 1024 bits read from the rng.
+-      Defaults to zero which causes the kernel's default quality to be used
+-      instead.  Note that the default quality is usually zero which disables
+-      using this rng to automatically fill the kernel's entropy pool.
++      Estimated number of bits of true entropy per 1024 bits read from the
++      device.  Defaults to zero which causes the kernel's default quality to
++      be used instead.  Note that the default quality is usually zero which
++      disables using this RNG to automatically fill the kernel's entropy
++      pool.
+ 
+-  reg:
+-    maxItems: 1
++  reg-io-width:
++    $ref: /schemas/types.yaml#/definitions/uint32
++    default: 4
++    enum: [1, 2, 4]
+     description:
+-      Base address to sample from. Currently 'reg' must be at least four bytes
+-      wide and 32-bit aligned.
++      Access width in bytes.  Determines whether the read is performed as
++      an 8-bit, 16-bit, or 32-bit bus access.
++
++  mask:
++    $ref: /schemas/types.yaml#/definitions/uint32
++    default: 0xFFFFFFFF
++    description:
++      Mask applied to the value read from the register.  Bits set to 0 in
++      the mask are cleared in the output data.  Default (no mask) passes
++      all bits through.
+ 
+ required:
+   - compatible
+-  - period
+   - reg
++  - period
+ 
+ additionalProperties: false
+ 
+@@ -43,6 +65,8 @@ examples:
+   - |
+     rng@44 {
+         compatible = "timeriomem_rng";
+-        reg = <0x44 0x04>;
+-        period = <1000000>;
++        reg = <0x44 0x01>;
++        period = <50000>;
++        reg-io-width = <1>;
++        mask = <0xFF>;
+     };
+-- 
+2.54.0
 
