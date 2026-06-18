@@ -1,50 +1,50 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6973D325706;
-	Thu, 18 Jun 2026 21:35:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F5D2F8E95;
+	Thu, 18 Jun 2026 21:41:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781818532; cv=none; b=cDR/TQOZoCcNlCldcMz1MTWkRrkGFP1iegH/hytI/0PrG0ZJgWRE9pJYB1fxcwiuU9wI/cDUK1fRiJ+iYxwVVsz1H2R0Qeiby2Ua4qXV7Mto5zdbj297JtfX1kKL2pmM64wdihS3GSpZ6XepdrBxmizPzp37NcgFVQYZVJj6Hss=
+	t=1781818881; cv=none; b=P3+yI/sjoVYm7XwwqHw62zsZznJigqxqLzBSAjO1WbL5cmYifdg3Jb0GuH+SHDWRyeVPMAwDUnILR1QPKFoFXn7A6p+oxw5qymj1jAgnG32YRSlmpDhgUKCZRFmon8j+JcltRxirq3K1VLjUHOfuPgRslrVrQz5ckO9pdcksnRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781818532; c=relaxed/simple;
-	bh=EyosDPPZWdOuLqpAYPtwyHVOSYMZDaCg7zHbVJhwCTA=;
+	s=arc-20240116; t=1781818881; c=relaxed/simple;
+	bh=EqQh7sQyjfQ2i+UlpLfY06A5FPB68Rxqhw+Rc+NXTCk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NUTIj1SoPN1xMqDDGbNv6HiHfo8QmoAUDfYWvH5/z2t1NZ2nTn2Pn5+AQ11Ye9FGZMWrNokMYWAHlfAZGHDCnUXgkNzke4kAEXWO+ro2EJd6nr2kwGXjauthmkTRzZydbvN6yNP4P55a+zE8CJrRIB4csmroICZQycs7Na4oaYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EXby5z9f; arc=none smtp.client-ip=192.198.163.15
+	 In-Reply-To:Content-Type; b=fKUHqLOANk3L9/92zw8Azzsq4VB/a5wni+KEAevOMv9PrgCJAItjnOVaIMK8ZjpYVP2LSqd8Q0NA9A/fbMM/S/TldZYKN93Yz5Gw1JQg6JLGAib67udenBVLk0TB9UdamJK/sIxh2Z2fwRFTNOVh5L100OplswuiAjkEERakdCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=faUyffYK; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EXby5z9f"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="faUyffYK"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1781818530; x=1813354530;
+  t=1781818880; x=1813354880;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=EyosDPPZWdOuLqpAYPtwyHVOSYMZDaCg7zHbVJhwCTA=;
-  b=EXby5z9fHjNDioFjGIRc4GYaqevPQUCWmeTW16u7Pebncfun6fiBOwtc
-   gFN4VjE+R9WdqRVYRneI0WJGcF6Vc7+Ssbdsrlmwff9FKiqpT/0SdH7oe
-   kR8glfmDo4EkEcVyQ4oMFjsQ4FfTlxNeaF0CQXrkIyu65czte/qBs+G+Q
-   OC0PtHcQlah9TzajMTEvr9KZ7fpchHPPrQ9CXl/IIKKlr8wEyhcgo/y2m
-   WPyP4AHDJbvENxoicfuuGVBlhGeVNCkAH3z2WkKA0Mbz5RZ0zvtez77r5
-   fASnxA/pXcsMD/0GW2/+ZMrCf7e2eRVlHFO5k6XPodRuECTlon60C58Ql
+  bh=EqQh7sQyjfQ2i+UlpLfY06A5FPB68Rxqhw+Rc+NXTCk=;
+  b=faUyffYKThDQuavOg/ZjKv6MEYkae+xiEFu8hxHryPjXxAuKVSsF3GBw
+   cWubA1/H5jhoTmYFt12dtOLuBmrTP+Kj2qA9A4NsR899zxZ6DidmDSFka
+   ZCGFcL+//2A7Du+21UAfdnf2hm1TvkMN6N9HZ83+mURPdCA8vLu4jjeo9
+   zOd41zPk75Eq6WMtB+JAiXym2XOLKZZAYY5zSoqRNHsfSmWeA6JYnrRUV
+   tA+qrD45aRDX8CsaOyUo6gK5o/MM9M5OKsgxGILIuQ9B6Er+1Hu1s42VK
+   yHzKj558B0LJ+n93LrFkopDMVW7mrpP/C4xDDDSUGRoaFXPqp3DvvBLuY
    w==;
-X-CSE-ConnectionGUID: iMmAZ+DYT86X5Nw602cuGQ==
-X-CSE-MsgGUID: iw9zYyyTQTSl4mRJonY3mg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11821"; a="82781143"
+X-CSE-ConnectionGUID: 4ud04ZjtTvC+JdTcC3C0Tg==
+X-CSE-MsgGUID: ltbalLxHTWKxb8M+HmPYyQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11821"; a="82550580"
 X-IronPort-AV: E=Sophos;i="6.24,212,1774335600"; 
-   d="scan'208";a="82781143"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2026 14:35:30 -0700
-X-CSE-ConnectionGUID: FBJllL8bQo2yQd//EB90xQ==
-X-CSE-MsgGUID: ZFPs+9BtRW2MhaGxo3t5Kw==
+   d="scan'208";a="82550580"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2026 14:41:19 -0700
+X-CSE-ConnectionGUID: sOE3iEX8SBuneScJ3sT2IQ==
+X-CSE-MsgGUID: eFXa3WRBQBGL6rsmYIjcYQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.24,212,1774335600"; 
-   d="scan'208";a="286590281"
+   d="scan'208";a="245559936"
 Received: from rfrazer-mobl3.amr.corp.intel.com (HELO [10.125.111.222]) ([10.125.111.222])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2026 14:35:29 -0700
-Message-ID: <49380c3e-c275-4211-876a-c51f644aeb17@intel.com>
-Date: Thu, 18 Jun 2026 14:35:28 -0700
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2026 14:41:18 -0700
+Message-ID: <060e3ab5-4632-413d-aed6-2fd99d782fac@intel.com>
+Date: Thu, 18 Jun 2026 14:41:17 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,8 +52,8 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 3/7] crypto/ccp: Disable CPU hotplug while SNP is
- active
+Subject: Re: [PATCH v8 5/7] x86/sev: Add interface to re-enable RMP
+ optimizations.
 To: Ashish Kalra <Ashish.Kalra@amd.com>, tglx@kernel.org, mingo@redhat.com,
  bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
  seanjc@google.com, peterz@infradead.org, thomas.lendacky@amd.com,
@@ -67,9 +67,9 @@ Cc: pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
  linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
  kvm@vger.kernel.org, linux-coco@lists.linux.dev
 References: <cover.1781419998.git.ashish.kalra@amd.com>
- <1feccf6e2a56d949b30f403c0ca7949f580e5982.1781419998.git.ashish.kalra@amd.com>
-Content-Language: en-US
+ <cdb8098074de8e150dcf534ab806e38744325a57.1781419998.git.ashish.kalra@amd.com>
 From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
  xsFNBE6HMP0BEADIMA3XYkQfF3dwHlj58Yjsc4E5y5G67cfbt8dvaUq2fx1lR0K9h1bOI6fC
  oAiUXvGAOxPDsB/P6UEOISPpLl5IuYsSwAeZGkdQ5g6m1xq7AlDJQZddhr/1DC/nMVa/2BoY
@@ -113,30 +113,57 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <1feccf6e2a56d949b30f403c0ca7949f580e5982.1781419998.git.ashish.kalra@amd.com>
+In-Reply-To: <cdb8098074de8e150dcf534ab806e38744325a57.1781419998.git.ashish.kalra@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 6/15/26 12:49, Ashish Kalra wrote:
-> +	/*
-> +	 * Disable CPU hotplug while SNP is active.  Guard against stacking
-> +	 * the disable count: the legacy SNP_SHUTDOWN_EX path clears
-> +	 * snp_initialized without re-enabling hotplug, so this can run
-> +	 * again while hotplug is already disabled.
-> +	 */
-> +	if (!snp_cpu_hotplug_disabled) {
-> +		cpu_hotplug_disable();
-> +		snp_cpu_hotplug_disabled = true;
-> +	}
+> From: Ashish Kalra <ashish.kalra@amd.com>
+> 
+> RMPOPT table is a per-CPU table which indicates if 1GB regions of
+> physical memory are entirely hypervisor-owned or not.
+> 
+> When performing host memory accesses in hypervisor mode as well as
+> non-SNP guest mode, the processor may consult the RMPOPT table to
+> potentially skip an RMP access and improve performance.
+> 
+> Events such as RMPUPDATE can clear RMP optimizations. Add an interface
+> to re-enable those optimizations.
 
-This seems like a hack, guys.
+This doesn't really help me understand when or how this function might
+be called.
 
-cpu_hotplug_disable() seems like more of a temporary lock than enforcing
-basically permanent system state.
+	Normal guest evens like splitting and collapsing large pages can
+	clear RMP optimizations. Without some intervention, all RMP
+	optimizations would eventually be lost. Periodically re-optimize
+	the system.
 
-This seems like it would be better implemented by registering a CPU
-hotplug callback and then refusing to offline if sev->snp_initialized is
-set.
+> The interface uses mod_delayed_work() instead of queue_delayed_work()
+> so that the delay timer is reset on each call. This provides proper
+> batching semantics: re-optimization runs 10 seconds after the *last*
+> VM termination rather than after the first. mod_delayed_work() also
+> re-queues work that is already in-flight, so a re-scan request
+> during an active scan is not silently dropped.
 
-snp_setup_rmpopt() can be run any time, right? It doesn't need to be
-after sev->snp_initialized=1.
+This seems sane.
+
+> +void snp_rmpopt_all_physmem(void)
+> +{
+> +	if (!cpu_feature_enabled(X86_FEATURE_RMPOPT) || !rmpopt_configured)
+> +		return;
+> +
+> +	guard(mutex)(&rmpopt_wq_mutex);
+> +
+> +	if (!rmpopt_wq)
+> +		return;
+> +
+> +	mod_delayed_work(rmpopt_wq, &rmpopt_delayed_work,
+> +			 msecs_to_jiffies(RMPOPT_WORK_TIMEOUT));
+> +}
+> +EXPORT_SYMBOL_GPL(snp_rmpopt_all_physmem);
+
+Does this need to be globally exported? Or can it be exported to a
+single module namespace?
+
+I'm close to being able to ack this, but it's still got a few too many
+nits to ack.
