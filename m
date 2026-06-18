@@ -1,112 +1,253 @@
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 248953BFE4A
-	for <linux-crypto@vger.kernel.org>; Thu, 18 Jun 2026 09:59:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DBA93BFE4A;
+	Thu, 18 Jun 2026 09:59:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781776752; cv=none; b=fvJADY/dHVbbJnAIeALeRw64f5Qb0ZdcMo/MIPdAKQrNrex83htDm+rrLhgBIuwS+UO15l45OT2T65YjZ7nx3Y03gDQPbQXcpXPMIKmd7MbypIQiS54YMV0H6+1PN5pM9SQxDF3g+YbVC536L0v2Us8QOopyFjbk0FcBTxX2tkY=
+	t=1781776795; cv=none; b=WXfc64lm1vNksVhZkaJd6wztphkzIc9saixCpsWsj9QiMwBNJMfdCbx2lYyfA9TrhjwqE2Bmd+c8ZxGg3az1zxeSssozXvHdV9jbF4d83NkKK3SLRXKwCJ2Ygt8NNkv357y/e4tFy3sg/2qUdLs+Bn80WcwBhLP5+yRmi6ME1y0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781776752; c=relaxed/simple;
-	bh=gLUutZyLJxZbKf4agxXUs15ykDIeHM9nhDCepEXWEm4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SwVLIEaV7Z/jzDKqz3u0mpEUnU/zRm2ja8qw4CgNX5dtPI36V2i+IATodh0eqIK97sUpDxae+L+KAlPnt0vxzsAkJJ6K1hq+pQH48hPMBHjpRtbDSzu2bI5uchKbxgKP0wQelslPd+hEBrxBh5iIKJtWmqjT4idJXIeBOxq4FMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=agOj3rAw; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1781776795; c=relaxed/simple;
+	bh=ZMUFwh1rdhBRwejhWnvx/At8/Ih16Eds2ZtOMSzmBQw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AthlLzkYr0QWuolFiRtAfJJ6bXuJQ79pB/GcxJPdk+Dhfb3nx+DpqLVku4SHNzXE0Qd+l0Rss3U68ptlHlDxnusuHOor+M4IG1CH/bl0i1UCVZf1QvvY6NLE7gF0UWQ4aL4gnvoSPRoJyGCISwlcXEDSxZVrwNE2DgOcuJxqxRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Apq6h9lp; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="agOj3rAw"
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-490b3637b90so5064445e9.3
-        for <linux-crypto@vger.kernel.org>; Thu, 18 Jun 2026 02:59:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1781776749; x=1782381549; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pzjkYvyfaRfjDGoow7iIRFvjI6CXIQdXmrKP5JQFJ6E=;
-        b=agOj3rAwyegNduo1VaYdg8EgJ44RWLlQKOCEVJOTCvAFs3jXrg/M1h6r99k6MoUcyR
-         xoye7KGNvhn14ZgS0VeU3cT59+3EiKH0Z2wynr8v4FCGY/hR0wDP1bH0TDjLQ90Q8F9Q
-         i0Dd7ZXcTHiL3XxXdkmbWGHPfBZlUknAn//9lAieFu40t3EeCdCKB/jhbTUMG10MVdzr
-         y8i12TNBH72nVrP7M+G1DCva0JBxzFlbdAQVOzKWEnJSZI1/EYs8vKLtpj7eWo//qNib
-         xy8hjLToEknbmLYBpP/+1pJk/XuSsSZetQ955PhuyjZC8PYYaYqSpMzhNULDCMncdukx
-         he4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1781776749; x=1782381549;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=pzjkYvyfaRfjDGoow7iIRFvjI6CXIQdXmrKP5JQFJ6E=;
-        b=ZPJ10uA1TnGYAnKUdDSAbm4MT3IAboC9XcnJE1wRu7Qps34nFfIRzqk4o+ChUdfl2Y
-         dVOU/gUbOCcw08Y29z6koLR3bx2zV1qBzD9uU3d5BN4u/aXgz2pllbs6XIqwM/VbMiid
-         VCLWGd/FFujzMuxzmG9/3g1FSXW6nQMQSZayFEBrF5qHgP5foRzN54FrxAs0dg7uuSEp
-         Erd61CY8fdzeVzX5eWIUgKf0EGQ5BjNTWP7J0/amn42vV6gtsrgb5zFrMsL7VkXmgQme
-         uZ4vVPMAP2HP0m5Ix/z3lT31njJBjj2VFIivYcbmvhKjuKzxjOO8WsA9QEAlIpFx1kYy
-         sPyQ==
-X-Forwarded-Encrypted: i=1; AFNElJ+OcQ6NZk6a0qGQH8nfdIo3BQdP2mxlhFgVQd2cpyPCtggABnb4JjHzOLNP5H3fBPQXmx+bUIlc6DqK0Zc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBxWZEs36YchFCVHdDpazn1m0d0fwyuWiPiIjxAsFAMBTfmoMa
-	cHYPLIBzu+Q4qlXacqFp4wjvSBgIiX4ILgGSEi85/u2Nv4O08RxnQ56m
-X-Gm-Gg: AfdE7cnRx0KkHYwoWyMm/DD5i+yloo4rBclJzyprr7rsP817QdPAZIX/xCnVTcHLbyA
-	ZBMY0gotWWVwCsoFNjGCNPOK1spkiI3s4jsctZuEPWKZfbuJ0dvasCqBtO9Q3u+wybIr9S4lM1f
-	HIsOEUc1vPh5MyG/cCT2YR1H8j0bbVT7EdrPu7RV5iajuDHdSG0XfovYNWl5MJDmKYhV35jJbnX
-	4kLdmZ72Qk3eT9rRMC8aai65TjD5OrpWZGiiESek4cNmDeIlDJA9Atlq3/pU2RTntwNu+UYEQGB
-	7QkH4/qCjg6B4nLXPgjruNGoh7WDA2LAnnIhBK09eQZLlMxpaHrpsk6dXOXqdYA0RX578smVMUi
-	R8rJoEbF8EMIzcs15V1lEx/3fsFcx1GnH2tuQT3pUunYtK63Dq8HKDoln7xlv6WgSQhfllBKblP
-	4zykF6r04pE4TL/ImmPZKhKo2SgG94IjcvatDNzWbRgAw0IqSTlw==
-X-Received: by 2002:a05:600c:4ed4:b0:492:1e36:85dd with SMTP id 5b1f17b1804b1-49238231011mr48552325e9.37.1781776749410;
-        Thu, 18 Jun 2026 02:59:09 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4922fa96f0esm261148635e9.12.2026.06.18.02.59.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jun 2026 02:59:08 -0700 (PDT)
-Date: Thu, 18 Jun 2026 10:59:06 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Eric Biggers <ebiggers@kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, x86@kernel.org, linux-raid@vger.kernel.org
-Subject: Re: [PATCH v3] lib/raid/xor: x86: Add AVX-512 optimized xor_gen()
-Message-ID: <20260618105906.11033b70@pumpkin>
-In-Reply-To: <20260618092500.GC17530@lst.de>
-References: <20260615190338.26581-1-ebiggers@kernel.org>
-	<20260617055653.GB19218@lst.de>
-	<20260617110516.0a70950e@pumpkin>
-	<20260618092500.GC17530@lst.de>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Apq6h9lp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F6881F000E9;
+	Thu, 18 Jun 2026 09:59:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1781776794;
+	bh=0dlGudfFAC3otFWacI21RRWCZ1fDq0nS+7CfWTl1NZ0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Apq6h9lpffqdMZ6E45Jn6kccXqd4TjkpRHCmeLBCjCAkxCOrTPTgXLcK6kQvuQqHh
+	 WXuqAcmcom58vLtYQFUBvgMsmsKIMKgtwiL7dzSZR+6M10GUC1AABR4cHktOEYnbgb
+	 dm3qo5/RX72N8iAjnGsTkoZGjiKrCh7J/LdKph7li8onJPY7ZdiUkbD2hbFegf+3Cy
+	 0OuFEBzPky1tZneNvyj7YDGIzrWqytXipPyJq0l8R9TqYbxxLHSAD86Si1pGGlwkM4
+	 QKTJR1B/AUpYmxLLsXQ9xD9enwRkxv+r6/LJmzv1ANnAoXPtVTZf+oklJhqYGWDFF/
+	 EN3hkzZ+lIecQ==
+Date: Thu, 18 Jun 2026 10:59:49 +0100
+From: Lee Jones <lee@kernel.org>
+To: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Cc: chenhuacai@kernel.org, xry111@xry111.site, linux-kernel@vger.kernel.org,
+	loongarch@lists.linux.dev, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v3] mfd: loongson-se: Add multi-node support
+Message-ID: <20260618095949.GB1672911@google.com>
+References: <20260610151354.32617-1-zhaoqunqin@loongson.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260610151354.32617-1-zhaoqunqin@loongson.cn>
 
-On Thu, 18 Jun 2026 11:25:00 +0200
-Christoph Hellwig <hch@lst.de> wrote:
+/* Sashiko Automation: Issues Found (7 Findings) */
 
-> On Wed, Jun 17, 2026 at 11:05:16AM +0100, David Laight wrote:
-> > > FYI, one or 2 sources are basically useless as they RAID5 configs
-> > > that have no benefits over simple mirroring and thus the numbers
-> > > aren't too interesting.  
-> > 
-> > With three disks you xor two buffers (src_count == 1) to get the parity
-> > to write to the third - so that is a valid RAID5 config.  
+Worth chewing through.
+
+> On the Loongson platform, each node is equipped with a security engine
+> device. However, due to a hardware flaw, only the device on node 0 can
+> trigger interrupts. Therefore, interrupts from other nodes are forwarded
+> by node 0. We need to check in the interrupt handler of node 0 whether
+> this interrupt is intended for other nodes, this can be accomplished via
+> shared interrupt handling.
 > 
-> Sure.  It did not say it is invalid, it just isn't very useful.
+> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
+> ---
+> V3: 
+> Using shared interrupts (IRQF_SHARED) instead of manually
+> iterating through all devices to check for interrupts.
+> 
+> Link to v2:
+> https://lore.kernel.org/all/20260427165133.23350-1-zhaoqunqin@loongson.cn/
+> 
+>  drivers/mfd/loongson-se.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/mfd/loongson-se.c b/drivers/mfd/loongson-se.c
+> index 3902ba377d6..e63ea40d5db 100644
+> --- a/drivers/mfd/loongson-se.c
+> +++ b/drivers/mfd/loongson-se.c
+> @@ -219,7 +219,7 @@ static int loongson_se_probe(struct platform_device *pdev)
+>  
+>  	for (i = 0; i < nr_irq; i++) {
+>  		irq = platform_get_irq(pdev, i);
+> -		err = devm_request_irq(dev, irq, se_irq_handler, 0, "loongson-se", se);
+> +		err = devm_request_irq(dev, irq, se_irq_handler, IRQF_SHARED, "loongson-se", se);
+
+[Severity: High]
+With IRQF_SHARED now being used, does se_irq_handler() need to return
+IRQ_NONE when it doesn't process any interrupts?
+
+drivers/mfd/loongson-se.c:se_irq_handler() {
+...
+	/* For engines */
+	while (int_status) {
+		id = __ffs(int_status);
+		complete(&se->engines[id].completion);
+		int_status &= ~BIT(id);
+		writel(BIT(id), se->base + SE_S2LINT_CL);
+	}
+
+	spin_unlock(&se->dev_lock);
+
+	return IRQ_HANDLED;
+}
+
+If another device sharing the IRQ line triggers an interrupt and
+int_status is 0, the handler will skip processing but unconditionally
+return IRQ_HANDLED.
+
+This defeats the spurious interrupt detection mechanism in
+note_interrupt(), which could lead to a system lockup if an interrupt
+storm occurs on the shared line.
+
+
+
+[Severity: Critical]
+This is a pre-existing issue, but does se_irq_handler() lack bounds
+checking when accessing the engines array?
+
+drivers/mfd/loongson-se.c:se_irq_handler() {
+...
+	/* For engines */
+	while (int_status) {
+		id = __ffs(int_status);
+		complete(&se->engines[id].completion);
+...
+
+The driver enables all 32 possible interrupts by writing SE_INT_ALL
+(0xffffffff) to SE_S2LINT_EN in loongson_se_probe(). The engines array
+has a fixed size of SE_ENGINE_MAX (16).
+
+If the hardware sets any interrupt bit from 16 to 31, id will be >= 16,
+resulting in an out-of-bounds memory write when calling complete().
+Could this corrupt adjacent heap memory?
+
+
+
+[Severity: Critical]
+This isn't a bug introduced by this patch, but is it safe to use
+devm_kmalloc() with GFP_KERNEL here instead of devm_kzalloc()?
+
+drivers/mfd/loongson-se.c:loongson_se_probe() {
+...
+	se = devm_kmalloc(dev, sizeof(*se), GFP_KERNEL);
+...
+	writel(SE_INT_ALL, se->base + SE_S2LINT_EN);
+...
+	err = devm_request_irq(dev, irq, se_irq_handler, IRQF_SHARED, "loongson-se", se);
+...
+
+The se->engines array contains uninitialized garbage because it is
+allocated with devm_kmalloc(). Hardware interrupts are globally enabled
+and the IRQ handler is registered before the engine completions are
+initialized.
+
+If a leftover interrupt from a prior hardware state is pending when the
+handler registers, se_irq_handler() could execute
+complete(&se->engines[id].completion) on random, uninitialized memory.
+
+
+>  		if (err)
+>  			dev_err(dev, "failed to request IRQ: %d\n", irq);
+>  	}
+
+[Severity: High]
+This is a pre-existing issue, but should the probe function return an
+error if devm_request_irq() fails?
+
+If devm_request_irq() fails, the loop continues without returning an
+error code. Immediately after, loongson_se_init() issues a hardware
+command and calls wait_for_completion_interruptible(&se->cmd_completion).
+
+Since no interrupt handler is registered to signal complete(), the
+worker thread executing the probe will hang indefinitely.
+
+
+> @@ -228,7 +228,7 @@ static int loongson_se_probe(struct platform_device *pdev)
+>  	if (err)
+>  		return err;
+>  
+> -	return devm_mfd_add_devices(dev, PLATFORM_DEVID_NONE, engines,
+> +	return devm_mfd_add_devices(dev, PLATFORM_DEVID_AUTO, engines,
+>  				    ARRAY_SIZE(engines), NULL, 0, NULL);
+>  }
+
+[Severity: High]
+This isn't a bug introduced by this patch, but is a reinit_completion()
+needed before waiting on the completions?
+
+drivers/mfd/loongson-se.c:loongson_se_send_engine_cmd() {
+...
+	return wait_for_completion_interruptible(&engine->completion);
+}
+
+If a user process executing this is interrupted by a signal, it returns
+-ERESTARTSYS immediately while the hardware command continues executing.
+When the hardware eventually finishes, the interrupt handler calls
+complete(), incrementing the completion counter.
+
+Because reinit_completion() is never called before initiating the next
+command, the subsequent wait_for_completion_interruptible() will
+immediately return success before the new hardware command has actually
+finished, breaking hardware synchronization.
+
+
+
+[Severity: High]
+This is a pre-existing issue, but does loongson_se_init() write
+uninitialized stack memory to the device registers?
+
+drivers/mfd/loongson-se.c:loongson_se_init() {
+	struct loongson_se_controller_cmd cmd;
+	int err;
+
+	cmd.command_id = SE_CMD_START;
+	err = loongson_se_send_controller_cmd(se, &cmd);
+...
+
+For SE_CMD_START, only cmd.command_id is initialized, leaving the
+cmd.info array uninitialized. loongson_se_send_controller_cmd() then
+unconditionally writes SE_SEND_CMD_REG_LEN (8) u32 words to the device
+via writel().
+
+This writes 28 bytes of uninitialized kernel stack contents directly to
+the device MMIO registers.
+
+
+
+[Severity: High]
+This isn't a bug introduced by this patch, but does the platform driver
+declaration lack a .remove callback to properly halt the hardware?
+
+drivers/mfd/loongson-se.c:
+...
+static struct platform_driver loongson_se_driver = {
+	.probe   = loongson_se_probe,
+	.driver  = {
+		.name  = "loongson-se",
+		.acpi_match_table = loongson_se_acpi_match,
+	},
+};
+
+During driver unbind or module removal, devres will automatically free
+the DMA buffer and the IRQ. Because there is no explicit teardown step
+to send a stop command or disable hardware interrupts, the controller
+remains fully active.
+
+If the hardware continues to process and writes to the now-freed DMA
+memory, could it cause memory corruption or trigger IOMMU faults?
+
+>  
+> 
+> base-commit: 254f49634ee16a731174d2ae34bc50bd5f45e731
+> -- 
+> 2.47.2
 > 
 
-It gives you 2/3 the total capacity, mirroring only gives 1/2.
-But for a lot of uses I suspect disks are cheap enough that mirroring
-is usually the 'best bet'.
-It also means that there are a set of catastrophic failures that can
-be more easily recovered.
-
-It is probably more important to ensure all the disks in a raid set
-come from different production lines - otherwise they are likely to
-fail at the same time.
-
-At least modern disks don't (seem to) suffer from 'sticky oil' which
-would tend to stop them restarting after they got cold while turned off.
-Raid doesn't help when multiple disks fail to start!
-
-	David
+-- 
+Lee Jones
