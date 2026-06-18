@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6810640D59E;
-	Thu, 18 Jun 2026 04:12:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6400A40D59E;
+	Thu, 18 Jun 2026 04:12:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781755921; cv=none; b=DIv9ekvP1bdKO/AQwk4LBGfECRCqrqCA+aplFNS2YEPEAk7/z0DB5ISP1WAA7jFjmUFfijYUt/BYMKqs4K3uFxn8SfznaUzUb/ECicZ4dfPhJBxG7rXTVI6wIZnx7tjoKviX86+5yUcKKg4ssGi/Kt1tdmdRtjdTh/TGkQMGON4=
+	t=1781755946; cv=none; b=k7DYs/OMjBFFfdvhXSrSP/Br2mAy9F7EE2WREreAyxeTa5prngj53iJKuaBsEYxTMhLWLjXVH9f3jBe98NmCIjNhala0Lq2+ZeEHgsIWuFCUxChfaXVhRaKTMX80mw4Zxh/KuVE7EjFDbK74HV4p972nVpHqoU9yFI+oEQKnKeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781755921; c=relaxed/simple;
-	bh=blXrhGPt5pKGzuMniFrpZHyHa+xg/CSxw2d5LV+j/uM=;
+	s=arc-20240116; t=1781755946; c=relaxed/simple;
+	bh=Vm/rUwZpvTWT+CXVfPaeNJJ0P2iQKwYxkdA1TgbPS0U=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AmHgDs8ZyD9AnxEY1sopYx/DMVbjNilo6AkWE0Y6Es9yfJ1IE9Jz3ZMIvEEJaMNtGNE4q/OFx4An/P7RXBjiP9Aaa8EP+MLJDHFDhLPCTKOzQxMR+DT/EEwVkmTXM5JHephYHgXtM0YIfLcvy8cEbSags1zXo0V9P01VOB5sRNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XD5QFL1S; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:Content-Type; b=JdA6nty+PulFWdP/QjtAdMtaAETPEhMLllj+HNZbgQ1LKy2MD4CQsQwo+F8VBuni8xXS35cAp2963/IxuvRU5vu59LDYreRk2k614vMhzV6P0+oB8mOt6UMkiulXMZIeCI1lfUg0gtj4UeoRe9RHalZ1u7wnLjy2weu6CjQAlFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kGEaU94e; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XD5QFL1S"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27AB01F000E9;
-	Thu, 18 Jun 2026 04:11:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kGEaU94e"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89D6F1F000E9;
+	Thu, 18 Jun 2026 04:12:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1781755919;
-	bh=vcqfM7qi5CWnj5UgyGu1a+vIMvZVBh4Xn4YdVQYidaY=;
+	s=k20260515; t=1781755945;
+	bh=unnyOAtKK1eWzoO/xerrdWcrEcsmhYvv60qTdRonPBk=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=XD5QFL1SIF5+CtXJE7AE4D1+5KcjZ4a0pfbCjfnuG6Rg6SzEz2daL6h3LoJxfm7eF
-	 MlnB8BwPRy8AzAgflFazhvL0cAigH2YFVGB/28GRs8wi7o38YQ0/S818XZaM+3ZBQj
-	 MyNhZD0G22hKjuYsfOexJYvzMxwU8ezBHGf0O0dQ2FC/3uHkmV/gzMcxjzs8qp1e7a
-	 eNv1r2fYX9Zs9ZDRt2FYqs+8oYlE1jbyjnu1bpBCiCwh5d23VRh6vKivHrCl9xDfja
-	 sFpmFCnrZ44cI4VrgSE5yimNagMJxjeTYmjC6ROAXj19aiftnjLvVB21l7FblIbwX9
-	 oDCtuGt6nRZXw==
-Message-ID: <a523755d-a256-4fe8-97af-6e2f26358221@kernel.org>
-Date: Thu, 18 Jun 2026 06:11:52 +0200
+	b=kGEaU94eaR2coSTz5oBauyjcZ12nL0mZsS38tVM0OkFibWWoxhtf5jGDIPgApDDkH
+	 jI/blfLXywUg1VjTyt8mM7kHoUfUGeQtnbJCWXVl7HINFceDQrv1G/zqT6dJJ3y/Ra
+	 JOCUnWM1XILfr9SEJbTPB9LSxMPDfOQi0V7LhKJdyPyF958Y6zQVhPBTId25/iiQgI
+	 /Q1OkHZf9qesdE3QErLbJ8Ipk2Vulyp/rPbHsSYzv5bVtcEFvvVt4fhrB/aj7BpanH
+	 2VwcfnP+XBSSX37GDu8T47o+tr8KN3g0W6uWeEQQgBMlON+pRjS2S0BNyi/eu9xwN9
+	 gdC/5/JHDgrIA==
+Message-ID: <caa0c2b1-c0d0-49c6-940e-2e67313a1c5c@kernel.org>
+Date: Thu, 18 Jun 2026 06:12:18 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -100,9 +100,6 @@ On 17/06/2026 13:44, Jad Keskes wrote:
 > 
 > Update the example to show a typical 1-byte configuration.
 > Update SPDX to dual license to match kernel convention.
-
-And did you Cc all of the copyright holders?
-
 > Drop the misleading '32-bit aligned' constraint from the reg
 > description since alignment now depends on the configured width.
 > 
@@ -110,106 +107,9 @@ And did you Cc all of the copyright holders?
 > ---
 >  .../bindings/rng/timeriomem_rng.yaml          | 48 +++++++++++++++----
 >  1 file changed, 40 insertions(+), 8 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/rng/timeriomem_rng.yaml b/Documentation/devicetree/bindings/rng/timeriomem_rng.yaml
-> index 4754174e9849..740bc52bf474 100644
-> --- a/Documentation/devicetree/bindings/rng/timeriomem_rng.yaml
-> +++ b/Documentation/devicetree/bindings/rng/timeriomem_rng.yaml
-> @@ -1,10 +1,16 @@
-> -# SPDX-License-Identifier: GPL-2.0-only
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-
-Don't mix multiple changes into one commit.
 
 
->  %YAML 1.2
->  ---
->  $id: http://devicetree.org/schemas/rng/timeriomem_rng.yaml#
->  $schema: http://devicetree.org/meta-schemas/core.yaml#
->  
-> -title: TimerIO Random Number Generator
-> +title: Timer IOMEM Hardware Random Number Generator
-> +
-> +description: |
-> +  This binding covers platforms that have a single IO memory address which
-
-Do not describe the binding. Describe the hardware.
-
-> +  provides periodic random data.  The driver reads from the address at a
-
-Do not describe drivers. Describe the hardware.
-
-> +  fixed interval, returning a configurable-width value masked to the desired
-> +  bits.
->  
->  maintainers:
->    - Krzysztof Kozlowski <krzk@kernel.org>
-> @@ -13,9 +19,17 @@ properties:
->    compatible:
->      const: timeriomem_rng
->  
-> +  reg:
-> +    maxItems: 1
-> +    description:
-> +      Base address to sample from.  Must be aligned to the configured access
-> +      width (1, 2, or 4 bytes) and at least that wide.
-> +
->    period:
->      $ref: /schemas/types.yaml#/definitions/uint32
-> -    description: wait time in microseconds to use between samples
-> +    description:
-> +      Interval in microseconds between reads.  New random data is expected to
-> +      be available at this rate.
->  
->    quality:
->      $ref: /schemas/types.yaml#/definitions/uint32
-> @@ -26,16 +40,26 @@ properties:
->        instead.  Note that the default quality is usually zero which disables
->        using this rng to automatically fill the kernel's entropy pool.
->  
-> -  reg:
-> -    maxItems: 1
-> +  reg-io-width:
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +    default: 4
-> +    enum: [1, 2, 4]
->      description:
-> -      Base address to sample from. Currently 'reg' must be at least four bytes
-> -      wide and 32-bit aligned.
-> +      Access width in bytes.  Determines whether the read is performed as
-> +      an 8-bit, 16-bit, or 32-bit bus access.
-> +
-> +  mask:
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +    default: 0xFFFFFFFF
-> +    description:
-> +      Mask applied to the value read from the register.  Bits set to 0 in
-> +      the mask are cleared in the output data.  Default (no mask) passes
-> +      all bits through.
->  
->  required:
->    - compatible
-> -  - period
->    - reg
-> +  - period
->  
->  additionalProperties: false
->  
-> @@ -46,3 +70,11 @@ examples:
->          reg = <0x44 0x04>;
->          period = <1000000>;
->      };
-> +
-> +    rng@64 {
-> +        compatible = "timeriomem_rng";
-> +        reg = <0x64 0x01>;
-> +        period = <50000>;
-> +        reg-io-width = <1>;
-> +        mask = <0xFF>;
-> +    };
-
-Grow existing example. Or why can't it grow?
-
+... And where is any changelog?
 
 Best regards,
 Krzysztof
