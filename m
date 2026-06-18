@@ -1,50 +1,50 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F5D2F8E95;
-	Thu, 18 Jun 2026 21:41:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D3F82F8EB8;
+	Thu, 18 Jun 2026 21:42:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1781818881; cv=none; b=P3+yI/sjoVYm7XwwqHw62zsZznJigqxqLzBSAjO1WbL5cmYifdg3Jb0GuH+SHDWRyeVPMAwDUnILR1QPKFoFXn7A6p+oxw5qymj1jAgnG32YRSlmpDhgUKCZRFmon8j+JcltRxirq3K1VLjUHOfuPgRslrVrQz5ckO9pdcksnRU=
+	t=1781818928; cv=none; b=kMqx8gejys5q/WTXCWGxP4HuEC6fHR28mT/mgsnjb1oJKDl4Rprph+Syyhd1vLCY+BvDag0UjHzwkevJj1anPg37NovKhMy7oOmc5NFeaG1Hr7q852YWOSWsK8e5UjRgBH650AE5cY9SanmjDXsnCUsROYAAhv0+1JwY6OiietE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1781818881; c=relaxed/simple;
-	bh=EqQh7sQyjfQ2i+UlpLfY06A5FPB68Rxqhw+Rc+NXTCk=;
+	s=arc-20240116; t=1781818928; c=relaxed/simple;
+	bh=XL0O2ajx2YPVmV2OKV640EsmjX4W7Q6tueNXGSL+CKg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fKUHqLOANk3L9/92zw8Azzsq4VB/a5wni+KEAevOMv9PrgCJAItjnOVaIMK8ZjpYVP2LSqd8Q0NA9A/fbMM/S/TldZYKN93Yz5Gw1JQg6JLGAib67udenBVLk0TB9UdamJK/sIxh2Z2fwRFTNOVh5L100OplswuiAjkEERakdCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=faUyffYK; arc=none smtp.client-ip=192.198.163.17
+	 In-Reply-To:Content-Type; b=EccOWnK3yrSDAfeAe2ccTLzV1UpzdYZUDAiGpw7GzL/DHmxKFikOfNrDf9QJOTSC3/I1sxemMTWeyhwnfBsDq96PSIgBJuutMn8tA++l55tXfhZpknIQzg5ttJlHygEaP6vaopR1Sq5xAY+djZaDDZdXzGSQIvmK0uNLhchgi2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZqFawcz4; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="faUyffYK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZqFawcz4"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1781818880; x=1813354880;
+  t=1781818927; x=1813354927;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=EqQh7sQyjfQ2i+UlpLfY06A5FPB68Rxqhw+Rc+NXTCk=;
-  b=faUyffYKThDQuavOg/ZjKv6MEYkae+xiEFu8hxHryPjXxAuKVSsF3GBw
-   cWubA1/H5jhoTmYFt12dtOLuBmrTP+Kj2qA9A4NsR899zxZ6DidmDSFka
-   ZCGFcL+//2A7Du+21UAfdnf2hm1TvkMN6N9HZ83+mURPdCA8vLu4jjeo9
-   zOd41zPk75Eq6WMtB+JAiXym2XOLKZZAYY5zSoqRNHsfSmWeA6JYnrRUV
-   tA+qrD45aRDX8CsaOyUo6gK5o/MM9M5OKsgxGILIuQ9B6Er+1Hu1s42VK
-   yHzKj558B0LJ+n93LrFkopDMVW7mrpP/C4xDDDSUGRoaFXPqp3DvvBLuY
-   w==;
-X-CSE-ConnectionGUID: 4ud04ZjtTvC+JdTcC3C0Tg==
-X-CSE-MsgGUID: ltbalLxHTWKxb8M+HmPYyQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11821"; a="82550580"
+  bh=XL0O2ajx2YPVmV2OKV640EsmjX4W7Q6tueNXGSL+CKg=;
+  b=ZqFawcz48cOi/IdbvyenZakQRbncj0a3/JlMef1ziMbEyOgL32xGMzvn
+   y+mrfvLbAlbpwKxgVHYuXln0WlssqZMv/A+HdBI6YIN91QIK1Npm4TwGY
+   kQ5742kFFDgOh1ovJ+MBaubYcMK/zdQIFrisSpP+UfgwRyhhvChsGbaac
+   S51TMzN4wbDVW+SEJJOKsdU5eDGEDIBdQytkTlOFvkgqQvtY4WqfaPrnN
+   8X80eteOiLDEJ6RIUX57yQuKZWQkVtjPlM66GxFMSvx1MD0mynN4TczYI
+   FmpbzPyXe80YbLpgJaQGRewllp+iOhevId/HlfMTxrwUws81aB7hi0ctf
+   Q==;
+X-CSE-ConnectionGUID: DDMG4UrjQz+7BdNm6eepFg==
+X-CSE-MsgGUID: ak3MxrLySdKnQom0Xbbpyg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11821"; a="82550700"
 X-IronPort-AV: E=Sophos;i="6.24,212,1774335600"; 
-   d="scan'208";a="82550580"
+   d="scan'208";a="82550700"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2026 14:41:19 -0700
-X-CSE-ConnectionGUID: sOE3iEX8SBuneScJ3sT2IQ==
-X-CSE-MsgGUID: eFXa3WRBQBGL6rsmYIjcYQ==
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2026 14:42:04 -0700
+X-CSE-ConnectionGUID: yiI6kEGXTWGMlMupw9y6NQ==
+X-CSE-MsgGUID: iX2QgOy5RxaNqvrvz3SU9w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.24,212,1774335600"; 
-   d="scan'208";a="245559936"
+   d="scan'208";a="245560041"
 Received: from rfrazer-mobl3.amr.corp.intel.com (HELO [10.125.111.222]) ([10.125.111.222])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2026 14:41:18 -0700
-Message-ID: <060e3ab5-4632-413d-aed6-2fd99d782fac@intel.com>
-Date: Thu, 18 Jun 2026 14:41:17 -0700
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2026 14:42:03 -0700
+Message-ID: <fdf0919f-0576-45e3-8600-72ac40c6f8af@intel.com>
+Date: Thu, 18 Jun 2026 14:42:02 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,8 +52,8 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 5/7] x86/sev: Add interface to re-enable RMP
- optimizations.
+Subject: Re: [PATCH v8 6/7] KVM: SEV: Perform RMP optimizations on SNP guest
+ shutdown
 To: Ashish Kalra <Ashish.Kalra@amd.com>, tglx@kernel.org, mingo@redhat.com,
  bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
  seanjc@google.com, peterz@infradead.org, thomas.lendacky@amd.com,
@@ -67,7 +67,7 @@ Cc: pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
  linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
  kvm@vger.kernel.org, linux-coco@lists.linux.dev
 References: <cover.1781419998.git.ashish.kalra@amd.com>
- <cdb8098074de8e150dcf534ab806e38744325a57.1781419998.git.ashish.kalra@amd.com>
+ <25c3693a59c8f00796e84f1ffa668df6e3b734b5.1781419998.git.ashish.kalra@amd.com>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -113,57 +113,20 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <cdb8098074de8e150dcf534ab806e38744325a57.1781419998.git.ashish.kalra@amd.com>
+In-Reply-To: <25c3693a59c8f00796e84f1ffa668df6e3b734b5.1781419998.git.ashish.kalra@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 6/15/26 12:49, Ashish Kalra wrote:
+On 6/15/26 12:50, Ashish Kalra wrote:
 > From: Ashish Kalra <ashish.kalra@amd.com>
 > 
-> RMPOPT table is a per-CPU table which indicates if 1GB regions of
-> physical memory are entirely hypervisor-owned or not.
+> Pages are converted from shared to private as SNP guests are launched.
+> This destroys exisiting RMPOPT optimizations in the regions where
+> pages are converted.
 > 
-> When performing host memory accesses in hypervisor mode as well as
-> non-SNP guest mode, the processor may consult the RMPOPT table to
-> potentially skip an RMP access and improve performance.
-> 
-> Events such as RMPUPDATE can clear RMP optimizations. Add an interface
-> to re-enable those optimizations.
+> Conversely, guest pages are converted back to shared during SNP guest
+> termination and their region may become eligible for RMPOPT
+> optimization.
 
-This doesn't really help me understand when or how this function might
-be called.
-
-	Normal guest evens like splitting and collapsing large pages can
-	clear RMP optimizations. Without some intervention, all RMP
-	optimizations would eventually be lost. Periodically re-optimize
-	the system.
-
-> The interface uses mod_delayed_work() instead of queue_delayed_work()
-> so that the delay timer is reset on each call. This provides proper
-> batching semantics: re-optimization runs 10 seconds after the *last*
-> VM termination rather than after the first. mod_delayed_work() also
-> re-queues work that is already in-flight, so a re-scan request
-> during an active scan is not silently dropped.
-
-This seems sane.
-
-> +void snp_rmpopt_all_physmem(void)
-> +{
-> +	if (!cpu_feature_enabled(X86_FEATURE_RMPOPT) || !rmpopt_configured)
-> +		return;
-> +
-> +	guard(mutex)(&rmpopt_wq_mutex);
-> +
-> +	if (!rmpopt_wq)
-> +		return;
-> +
-> +	mod_delayed_work(rmpopt_wq, &rmpopt_delayed_work,
-> +			 msecs_to_jiffies(RMPOPT_WORK_TIMEOUT));
-> +}
-> +EXPORT_SYMBOL_GPL(snp_rmpopt_all_physmem);
-
-Does this need to be globally exported? Or can it be exported to a
-single module namespace?
-
-I'm close to being able to ack this, but it's still got a few too many
-nits to ack.
+Oh, actually that would be good text for the *previous* patch too. You
+might want to move some of it there.
