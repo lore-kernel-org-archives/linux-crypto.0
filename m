@@ -1,146 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from imap5.colo.codethink.co.uk (imap5.colo.codethink.co.uk [78.40.148.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A11A30F958;
-	Mon, 22 Jun 2026 14:56:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3544E3264EF;
+	Mon, 22 Jun 2026 15:03:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.40.148.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782140177; cv=none; b=IyQYUi+cFAz+xGa0SnY49FlBZL4pORWR/nHP1HspeL0+Dn2gGPRcCo8yD70jeHltigNGVkP2zL5Hxwe8Hf3Mmg18w3HQ0WQ26eDa2ROyUNSOAhNkaD5s8LD0Q/IA7xp0kBh6kiQgR4YrVbMDrYg3MnYzJtJT7DbGfrRzZlhZK8w=
+	t=1782140609; cv=none; b=FShY9hwdbkh0b5RT5pfMGgNZFnV0+qQDNkFa+qa/3iicPn5vALOaLDIrePRt163JfJonvji4hLAnJj7wWpCjh8oGQHyq3CGyZ+DqhZZFNBS899Z2K/a0RtgzFpWZrkrl3w9LX6Sr+M4rzZ3O+c0R1TVhy8LYhfHF9aLVNUTe7u4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782140177; c=relaxed/simple;
-	bh=Q8cnKTr5Gh+ig4y7XghOSKCucx5F1OW3eLFRGxBdlLc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aoeq5pXBe8kX9Y3h8Wzoe7lK+VSWP49Pkch9HkybfHy588+cktmCvgfDYQ/YefvWC5PKm3c+gPWZtbMnCLNAbQG4g8tBpjAqu+ZvzEvXdoS66lnb50bzWrB3ZiGlgpvgyMeSc/lgvjb9jZEfOVnYBILBh36OEIJSVAvA6NtNw/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IihDIC4+; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782140609; c=relaxed/simple;
+	bh=IrEd8FptjLcghWDqFnK6vKBmn5UYZ8T10P12SGk3/Fs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WuhL2sEKeXFr4nj+B1cGc9/lmEgtuZJXeH41gV1zABEgoUx3UUpk5pCmYgBHHlOgplHyPRUsy9Ncz1LnkP9NLACXRLly6Dh0bFFHpHPaMTUcHC8etMWvf3Fph7eDR0L003hPOmgUFiWL78xYA/GsI+/ogZpsWFIitBDv59iDqHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=codethink.co.uk; spf=pass smtp.mailfrom=codethink.com; dkim=pass (2048-bit key) header.d=codethink.co.uk header.i=@codethink.co.uk header.b=LnswnFRD; arc=none smtp.client-ip=78.40.148.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=codethink.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codethink.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IihDIC4+"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 6047D1F000E9;
-	Mon, 22 Jun 2026 14:56:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782140175;
-	bh=7+xd5/DgJYlCExSOQuRhC1KD3huRFMoCoOulZj4XDjQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=IihDIC4++KdDUXuTnvp5AEW5NknSpDvcZJHhB587L6oJB9fmkKd4xlUKTS5au+gm2
-	 sD32z5LLUzXrXh6gc0r7e7gcJ9O7L91SOtGB44LTdqF9JB7eYhFkeOcQb38bFglbb7
-	 hGk6uyRl8XmkAf3AvxTKId6MetM23KPxRougzaxE41CiDdBXGZIgGwh45zU0KelZPI
-	 KDmkCup23wast1juNCETYR388CwcGs7i4qKj8P/AlHSA79HVvCY0dtOtdjxSRZERxS
-	 vIwxAla9uLbxdsFvosKOEcm5kRj2Kn11V1EIKKlt0zaFngdM1nLbitG9+XIE0axonE
-	 e7+GSSMd5bbfA==
-Date: Mon, 22 Jun 2026 17:56:11 +0300
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Weiming Shi <bestswngs@gmail.com>, David Howells <dhowells@redhat.com>,
-	Lukas Wunner <lukas@wunner.de>, Ignat Korchagin <ignat@linux.win>,
-	"David S . Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org, Xiang Mei <xmei5@asu.edu>
-Subject: Re: [PATCH v2] asymmetric_keys: check asymmetric_key_ids() for NULL
- before dereference
-Message-ID: <ajlNCxltXkuWfIw-@kernel.org>
-References: <20260502163328.696098-2-bestswngs@gmail.com>
- <aji3B9a72VEAOu03@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=codethink.co.uk header.i=@codethink.co.uk header.b="LnswnFRD"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=codethink.co.uk; s=imap5-20230908; h=Sender:Content-Transfer-Encoding:
+	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:In-Reply-To:
+	References; bh=0ZvJNbuAq/7ydrarG4EIaziK9KwrNXcz/RJYYERhC2I=; b=LnswnFRDSTNUrX
+	Rb/CmjdFWxFrDrfNDG0TOgqTvSN77aTBbyW4wSiV52M627jymZw3Zxg+D/FQQ4dye97PAgapTbpJX
+	x1LduxsApNFYcX+0ASvZxnWeQj/bauHyj6g3NYI/BuY5Y/j0qNeVP/zjfNnoRqFeSleLNRz7qisdo
+	ixEyGTOxdqqD+dI8fz+t3LlO2Q+snlrp+IEvrGQlvYUkXWE8OzSl7ojesuid4tM7s+HhY7tSCKLjn
+	dW7DAVJQfzPFbxzIJcobojG4XXKYUJEAD3akDbvOCoBV0ZKRFBWG9uVLBQ6FCHn+smb6M7lH6pKfP
+	03/fQoIV/N3zit6oPOAw==;
+Received: from [167.98.27.226] (helo=rainbowdash)
+	by imap5.colo.codethink.co.uk with esmtpsa  (Exim 4.94.2 #2 (Debian))
+	id 1wbgBI-005GQs-LT; Mon, 22 Jun 2026 16:03:24 +0100
+Received: from ben by rainbowdash with local (Exim 4.99.4)
+	(envelope-from <ben@rainbowdash>)
+	id 1wbgBI-00000002Cw8-1pW0;
+	Mon, 22 Jun 2026 16:03:24 +0100
+From: Ben Dooks <ben.dooks@codethink.co.uk>
+To: linux-crypto@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	Gonglei <arei.gonglei@huawei.com>
+Cc: linux-kernel@vger.kernel.org,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Ben Dooks <ben.dooks@codethink.co.uk>
+Subject: [PATCH] crypto: virtio - fix missing le64_to_cpu() conversions
+Date: Mon, 22 Jun 2026 16:03:22 +0100
+Message-Id: <20260622150322.526375-1-ben.dooks@codethink.co.uk>
+X-Mailer: git-send-email 2.37.2.352.g3c44437643
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aji3B9a72VEAOu03@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
+Sender: srv_ts003@codethink.com
 
-On Mon, Jun 22, 2026 at 12:16:07PM +0800, Herbert Xu wrote:
-> On Sat, May 02, 2026 at 09:33:29AM -0700, Weiming Shi wrote:
-> >
-> > diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric_keys/asymmetric_type.c
-> > index 16a7ae16593c..22f04656d529 100644
-> > --- a/crypto/asymmetric_keys/asymmetric_type.c
-> > +++ b/crypto/asymmetric_keys/asymmetric_type.c
-> > @@ -109,6 +109,8 @@ struct key *find_asymmetric_key(struct key *keyring,
-> >  	if (id_0 && id_1) {
-> >  		const struct asymmetric_key_ids *kids = asymmetric_key_ids(key);
-> >  
-> > +		if (!kids)
-> > +			goto reject;
-> 
-> This check is actually unnecessary because we've already matched
-> the key against the kid so it must be present.
-> 
-> I'd get rid of this check or perhaps add a comment instead.
+There are two cases of sending a __le64 type to a print function
+so fix this by adding le64_to_cpu() which fixes the following
+(prototype) sparse warnings:
 
-+1
+drivers/crypto/virtio/virtio_crypto_skcipher_algs.c:234:17: warning: incorrect type in argument 3 (different base types)
+drivers/crypto/virtio/virtio_crypto_skcipher_algs.c:234:17:    expected unsigned long long
+drivers/crypto/virtio/virtio_crypto_skcipher_algs.c:234:17:    got restricted __le64 [usertype] session_id
+drivers/crypto/virtio/virtio_crypto_akcipher_algs.c:196:17: warning: incorrect type in argument 3 (different base types)
+drivers/crypto/virtio/virtio_crypto_akcipher_algs.c:196:17:    expected unsigned long long
+drivers/crypto/virtio/virtio_crypto_akcipher_algs.c:196:17:    got restricted __le64 [usertype] session_id
 
-> 
-> >  		if (!kids->id[1]) {
-> >  			pr_debug("First ID matches, but second is missing\n");
-> >  			goto reject;
-> > diff --git a/crypto/asymmetric_keys/restrict.c b/crypto/asymmetric_keys/restrict.c
-> > index 86292965f493..ccf1084f720e 100644
-> > --- a/crypto/asymmetric_keys/restrict.c
-> > +++ b/crypto/asymmetric_keys/restrict.c
-> > @@ -243,10 +243,14 @@ static int key_or_keyring_common(struct key *dest_keyring,
-> >  			if (IS_ERR(key))
-> >  				key = NULL;
-> >  		} else if (trusted->type == &key_type_asymmetric) {
-> > +			const struct asymmetric_key_ids *kids;
-> >  			const struct asymmetric_key_id **signer_ids;
-> >  
-> > -			signer_ids = (const struct asymmetric_key_id **)
-> > -				asymmetric_key_ids(trusted)->id;
-> > +			kids = asymmetric_key_ids(trusted);
-> > +			if (!kids)
-> > +				goto skip_trusted;
-> 
-> Yes this is definitely buggy.
-> 
-> I think it was introduced by these two commits:
-> 
-> commit 3c58b2362ba828ee2970c66c6a6fd7b04fde4413
-> Author: David Howells <dhowells@redhat.com>
-> Date:   Tue Oct 9 17:47:46 2018 +0100
-> 
->     KEYS: Implement PKCS#8 RSA Private Key parser [ver #2]
-> 
-> and
-> 
-> commit 7e3c4d22083f6e7316c5229b6197ca2d5335aa35
-> Author: Mat Martineau <martineau@kernel.org>
-> Date:   Mon Jun 27 16:45:16 2016 -0700
-> 
->     KEYS: Restrict asymmetric key linkage using a specific keychain
-> 
-> So the Fixes header should point to them.
+Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk>
+---
+ drivers/crypto/virtio/virtio_crypto_akcipher_algs.c | 3 ++-
+ drivers/crypto/virtio/virtio_crypto_skcipher_algs.c | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-+1
-
-> 
-> > @@ -290,6 +294,7 @@ static int key_or_keyring_common(struct key *dest_keyring,
-> >  		}
-> >  	}
-> >  
-> > +skip_trusted:
-> >  	if (check_dest && !key) {
-> >  		/* See if the destination has a key that signed this one. */
-> >  		key = find_asymmetric_key(dest_keyring, sig->auth_ids[0],
-> 
-> I'm not sure continuing here is a good idea.  Having a private key
-> here makes no sense whatsoever and we should just bail out right
-> away.
-> 
-> I would recommend returning an error of some sort if kids is NULL.
-> 
-> David/Lukas/Ignat, any opinions?
-
-I think with a quick skim that you are right. I'll work on this area
-for the next version.
-
-> 
-> Thanks,
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-
-Thanks for the review!
-
-BR, Jarkko
+diff --git a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
+index d8d452cac391..404e33b16db6 100644
+--- a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
++++ b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
+@@ -194,7 +194,8 @@ static int virtio_crypto_alg_akcipher_close_session(struct virtio_crypto_akciphe
+ 
+ 	if (ctrl_status->status != VIRTIO_CRYPTO_OK) {
+ 		pr_err("virtio_crypto: Close session failed status: %u, session_id: 0x%llx\n",
+-			ctrl_status->status, destroy_session->session_id);
++			ctrl_status->status,
++		       le64_to_cpu(destroy_session->session_id));
+ 		err = -EINVAL;
+ 		goto out;
+ 	}
+diff --git a/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
+index e82fc16cab25..3ca441ae2759 100644
+--- a/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
++++ b/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
+@@ -232,7 +232,8 @@ static int virtio_crypto_alg_skcipher_close_session(
+ 
+ 	if (ctrl_status->status != VIRTIO_CRYPTO_OK) {
+ 		pr_err("virtio_crypto: Close session failed status: %u, session_id: 0x%llx\n",
+-			ctrl_status->status, destroy_session->session_id);
++			ctrl_status->status,
++		       le64_to_cpu(destroy_session->session_id));
+ 
+ 		err = -EINVAL;
+ 		goto out;
+-- 
+2.37.2.352.g3c44437643
 
