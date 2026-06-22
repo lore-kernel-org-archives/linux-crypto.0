@@ -1,108 +1,120 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C83938F64C
-	for <linux-crypto@vger.kernel.org>; Mon, 22 Jun 2026 08:25:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 095D1238159;
+	Mon, 22 Jun 2026 08:37:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782116718; cv=none; b=ZQz4caiBF06btNs+X/dzG77SXU7i5vOwWFy1/S0tThSvuBCIQKTIRHN3tq9EcChs31d+PKbVcUPnl9N4bWsz0HJF+YKE5GlLJKpiUjfOv//MJfvPTunpb5oD7AtID+b1HbXmBCM0+9J2rzbA/wTNNsLVtG3ZXG5hp9ezC2kQCdQ=
+	t=1782117471; cv=none; b=Qf/0kATbivMuVZTC6NRp2yVNhBpSATd8UW97WNTco9HX1Vnr66h+qf/rKmEYtJSoNhSlrdxZqR/4BgBfZveqjWWGbFFp13a65rYd0ifw15wgWQItntZCeFzTa/FI4QcnIp9IO1Hh2RP3AqPgdowisEb+rCmTsMZff1bZBexCAB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782116718; c=relaxed/simple;
-	bh=X/OpTbuthlVusCSOnihn3WAb4xYSqe+YlVeJG6hFE4A=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lgRZH5yyoK3vNdN4qJU4DdVrpaSwH0pckRDY6tnHhYyDYPp+YxcbZuc1ggvj8IqO2OwsDqDipkQX4uZ95Df1p/Qix1vVcEj7kRz79iWpVTeMz/O3pYoax6ElNkzZ7caCxp9r3f1d70hxJT7ETpdhn1QY2adxz1CaUf6tWdiVQas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QSC4F7Fj; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782117471; c=relaxed/simple;
+	bh=o0XPey02pNHXumHWa6TQBgjgCeS/R84YiOVlMcvQRTw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=kdsgHnVGCzUbVL9DRipZrLUJnChZekP9N+jzeqr/olTe2w18p91Hmi9jWv+qibOuHS32MTpVtRMM4VQ8JRah1snf3S7sR+7kCw94jccFu7cakKpp6WTQgRT4wbX8aImb3bj9j8yTyTEHqLYrq0il7V0AGWb3j2nF6YcGm0Tks/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lwi+leCq; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QSC4F7Fj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DD3F1F00ACA
-	for <linux-crypto@vger.kernel.org>; Mon, 22 Jun 2026 08:25:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782116715;
-	bh=dGzB8a7uRXU43VC5H/RJSltTtPvZBBro4QCVA4GdtP4=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=QSC4F7Fjsb6UDa4UQFHkpPf01msyxFA6Bx6zSIx11l5u2hRCTnsJJsqnnKWwfS90U
-	 Gvc8JsZemI27tAmK7IUkxys4/vM7INW1OqlmD73hg6M5RtME5mNP6BMdr3O0h9QprD
-	 m2M3gqpc8fhwYahDbMuqFarZ3/sqhfHTlE0cp5r4S45q1yeMB4yn28bLomdxxzDF/Y
-	 /W66RlS48R912piU1q4bGvht4vyavZU5QNwTBcoeiX0Kctwkcwhboe5OJks6p/cglw
-	 eRhLs4bf03IZAZlREfqTjXhEl73c6B9+3rtyYPvSBz5wICmFKHlGa6wJMbzMAegEBj
-	 sdlEn6pZhMJrA==
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-39669bcaadfso34044221fa.0
-        for <linux-crypto@vger.kernel.org>; Mon, 22 Jun 2026 01:25:15 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AFNElJ8W42mycV/hy3MTmyqYbV0yKKzpobvz5dLjfSJz7vPC7FSGEjkFNcoUi/AWjaqzGGf7fZiDZOQo/Ah5xK4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVP+xgw5TYL2fWulavPuW6Qr9+hTeDDj/e3jRkH6Mlply1tQ9Y
-	H9SQ0xJeOlOrZ3byAoL4MgLn8PdqUSnm/gHmQqinBhPQ8EbmscjtXxbxw1TnIOdQB6ZVGcdgGO9
-	5XX2rKLuQbUtuj84vEL6yVLoyTGgyrkie9jZhDqsMxQ==
-X-Received: by 2002:a2e:a815:0:b0:393:b365:6e24 with SMTP id
- 38308e7fff4ca-3998bc52fb3mr30333831fa.4.1782116714327; Mon, 22 Jun 2026
- 01:25:14 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 22 Jun 2026 04:25:12 -0400
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 22 Jun 2026 04:25:12 -0400
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20260619164506.GA3223@sol>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lwi+leCq"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1782117469; x=1813653469;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=o0XPey02pNHXumHWa6TQBgjgCeS/R84YiOVlMcvQRTw=;
+  b=lwi+leCqmYWmuFst6FQBZ5DAHNBzvjzKOvdFm9YAWYeck1lFLPstlLLE
+   HfvGplF7vI7ppon4Tfz83R0sJ7Q6UnhkB/puK65jNkqLWlw+oi1UKW+D2
+   dmHcxGUFHvd15Dc0mMhfGhhAkaz7ESnKhl+LjgjHZNbe03xX5s2/kyNKX
+   T2bQkviWBa+gpSAAvQYc38+tPbNSKQi5BFa0ScUd3NRX/apt0d888B4Lh
+   XD1X3LFU5Ma16ZgS00f+GAY92w+Y1DarSdKVL2ZmHgWSG3tOfzLz3BQvQ
+   ft49GdYMp53Vh5tvIMO+kqgJGdj8W04FzLYd7CsN+FVf6+Cmg2mV7j/HT
+   A==;
+X-CSE-ConnectionGUID: MUrLK/3DQ/+jOxbEeduDLw==
+X-CSE-MsgGUID: jN0ZpEg6Tg+TQc4Ge4NM4g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11824"; a="82844719"
+X-IronPort-AV: E=Sophos;i="6.24,218,1774335600"; 
+   d="scan'208";a="82844719"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2026 01:37:48 -0700
+X-CSE-ConnectionGUID: 51x2ahlxRfadoXyoUtL0hA==
+X-CSE-MsgGUID: PGIuZ8mzSP2g3MT4S82HXw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.24,218,1774335600"; 
+   d="scan'208";a="254255860"
+Received: from abityuts-desk.ger.corp.intel.com (HELO localhost) ([10.245.245.82])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2026 01:37:33 -0700
+From: Jani Nikula <jani.nikula@linux.intel.com>
+To: Kaitao Cheng <kaitao.cheng@linux.dev>, Andrew Morton
+ <akpm@linux-foundation.org>, David Hildenbrand <david@kernel.org>, Jens
+ Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, Alexander Viro
+ <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim
+ <namhyung@kernel.org>, Thomas Gleixner <tglx@kernel.org>, Juri Lelli
+ <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>,
+ Paul Moore <paul@paul-moore.com>, Andy Shevchenko
+ <andriy.shevchenko@linux.intel.com>, "Paul E. McKenney"
+ <paulmck@kernel.org>, Shakeel Butt <shakeel.butt@linux.dev>, Christian
+ =?utf-8?Q?K=C3=B6nig?= <christian.koenig@amd.com>
+Cc: David Howells <dhowells@redhat.com>, Simona Vetter
+ <simona.vetter@ffwll.ch>, Randy Dunlap <rdunlap@infradead.org>, Luca
+ Ceresoli <luca.ceresoli@bootlin.com>, Philipp Stanner <phasta@kernel.org>,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ cgroups@vger.kernel.org, linux-ntfs-dev@lists.sourceforge.net,
+ linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
+ audit@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-perf-users@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, kexec@lists.infradead.org,
+ live-patching@vger.kernel.org, linux-modules@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-pm@vger.kernel.org,
+ rcu@vger.kernel.org, sched-ext@lists.linux.dev, linux-mm@kvack.org,
+ virtualization@lists.linux.dev, damon@lists.linux.dev,
+ llvm@lists.linux.dev, chengkaitao <chengkaitao@kylinos.cn>
+Subject: Re: [PATCH v3 0/7] Prepare mutable list iterators to cache cursor
+ state
+In-Reply-To: <20260622040533.29824-1-kaitao.cheng@linux.dev>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park,
+ 6 krs Bertel Jungin Aukio 5, 02600 Espoo, Finland
+References: <20260622040533.29824-1-kaitao.cheng@linux.dev>
+Date: Mon, 22 Jun 2026 11:37:29 +0300
+Message-ID: <88f34c7fa5a3d1700cc8005818751d6aa31f09df@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260521-shikra_crypto_changse-v1-0-0154cc9cc0de@oss.qualcomm.com>
- <53b1fa61-9692-42fd-a295-98bbeacbcd9a@oss.qualcomm.com> <20260619164506.GA3223@sol>
-Date: Mon, 22 Jun 2026 04:25:12 -0400
-X-Gmail-Original-Message-ID: <CAMRc=MdJJRPBeNtAUr82b4zv7vLjrRQ76Q3bJHQYEigaE2Hqog@mail.gmail.com>
-X-Gm-Features: AVVi8CeAxt9KMOL095y2v4UTrPSzivkzFWS7f7st5RqKHpq1WC_YJZWgEPbn2QE
-Message-ID: <CAMRc=MdJJRPBeNtAUr82b4zv7vLjrRQ76Q3bJHQYEigaE2Hqog@mail.gmail.com>
-Subject: Re: [PATCH 0/5] Shikra: Add DT support for ice, rng and qce
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Vinod Koul <vkoul@kernel.org>, 
-	Thara Gopinath <thara.gopinath@gmail.com>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Frank Li <Frank.Li@kernel.org>, Andy Gross <agross@kernel.org>, 
-	Harshal Dev <harshal.dev@oss.qualcomm.com>, linux-arm-msm@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, dmaengine@vger.kernel.org, 
-	Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 
-On Fri, 19 Jun 2026 18:45:06 +0200, Eric Biggers <ebiggers@kernel.org> said:
-> On Fri, Jun 19, 2026 at 02:13:28PM +0530, Kuldeep Singh wrote:
->> On 21-05-2026 18:47, Kuldeep Singh wrote:
->> > This patchseries attempt to enable sdhc-ice, rng and qce on shikra
->> > platform similar to other platforms.
->> >
->> > Previously, the 3 dt-bindigs/DT changes were sent as individual series
->> > and with feedback received, clubbed them together as all belong to same
->> > crypto subsystem.
->> >
->> > Here's link to old patchsets.
->> > QCE: https://lore.kernel.org/lkml/20260515-shikra_qcrypto-v1-0-80f07b345c29@oss.qualcomm.com/
->>
->> Hi Eric,
->>
->> As selftests issues for QCE are now fixed[1], so shikra series should be
->> good to proceed? as your concerns[2] are now addressed.
->> I am waiting for merge window to end and will send next rev post that.
->>
->> [1]
->> https://lore.kernel.org/linux-arm-msm/20260617-qce-fix-self-tests-v3-0-ecc2b4dedcfd@oss.qualcomm.com/
->> [2] https://lore.kernel.org/lkml/20260522024912.GC5937@quark/
+On Mon, 22 Jun 2026, Kaitao Cheng <kaitao.cheng@linux.dev> wrote:
+> Add *_mutable() iterator variants for list, hlist and llist.  The new
+> helpers are variadic and support both forms.  In the common case, the
+> caller omits the temporary cursor and the macro creates a unique internal
+> cursor with typeof(pos) and __UNIQUE_ID().  If a loop really needs an
+> explicit temporary cursor, the caller can still pass it and the helper
+> keeps the existing *_safe() behaviour.
 >
-> If you think that then it sounds like you need to read what I actually
-> said.  The fixes are appreciated but don't change the big picture.
+> For example, a call site may use the shorter form:
 >
-> - Eric
+>   list_for_each_entry_mutable(pos, head, member)
 >
+> or keep the explicit temporary cursor form:
+>
+>   list_for_each_entry_mutable(pos, tmp, head, member)
 
-Eric,
+I'm unconvinced it's a good idea to allow two forms with macro trickery,
+*especially* when it's not the last argument you can omit. I think it's
+a footgun.
 
-I mentioned it in another thread[1]. This series is not adding any new features
-to the QCE driver, it describes the hardware. The SoC *does have* this IP and
-no matter the state of the support in the kernel, there's nothing wrong in
-extending the existing bindings and adding new dts nodes.
+IMO stick with the first form only, and there'll always be the _safe
+variant that can be used when the temp pointer is needed.
 
-Thanks,
-Bartosz
 
-[1] https://lore.kernel.org/all/CAMRc=MfY-tmMCdw9FVBgfkX-FvB5Nx2X06S023GhASenSCQSNA@mail.gmail.com/
+BR,
+Jani.
+
+
+-- 
+Jani Nikula, Intel
