@@ -1,106 +1,150 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-dy1-f171.google.com (mail-dy1-f171.google.com [74.125.82.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66C3933EAF9;
-	Mon, 22 Jun 2026 18:19:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13288347BC1
+	for <linux-crypto@vger.kernel.org>; Mon, 22 Jun 2026 19:03:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782152353; cv=none; b=EQXkeN3onOy9/fldx1D6yD7Ghq8bMXuvPyvBJcrw6EfweuyqhQte+iwb9hcqWkLn/h5/dcclFRX0DKDEjgNnajtr0k0kvOqhy7ogJ8YQCbKw5tiboy1Y3ZF9M7YkM9u72nqGH03KAqXt7tRSEjUcCgGk1Ri1yJQZnd4a6cCC3+E=
+	t=1782155035; cv=none; b=O+kQ3XPhLk/f+9mLurHsXwR+wDY0A4MP5CJ+z+SUe6HLCITtURq3idvf+czMEG9EHlPhd12Y9/9aUkdBAlFTBWW19S9hFz+PrD+7GyBXJg1vrCDPSTjyOVW80EHGv5AyRi1vdKxVt95BBohEbUasT6cR/JcL97OBEKuWwZuQJmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782152353; c=relaxed/simple;
-	bh=aKPfzKSh4kE5bd0323tvQMZuR4CGMJhZvfCO//1dm0k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oomhXPD5hBMTzyl6BYtrupE0mXfzVTz7jorrTJnhhYJ0fc+UlebG1Ec6B2AaajwTbVsh9btEFeiYXhzd3z07b6ZtvQ5WiMDgbuHW7r3WXESrbL19WMgVUO8d3M7+ioDlMmQ6vggFPVZdhkMjeDmm05mRU40467JOVf6j74UQ8vM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W/QrQ8Gs; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782155035; c=relaxed/simple;
+	bh=uM6rjwv+rWrcNEl8KjTKnVcDSG3oUNpsPUMqnFOcLeE=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=F8XfVL0JZ538CgPlZZ6gTwgXnmVB9ai4mZT3t1gMO6BPYUtw2388vIUWmpZznH1Dj0dJogIn7puvJzwM7ArdqI14JFbleRUG40v5PtlDBJDSbFM/mh/AiYWjjSf/czbsoV88jOVeZmoTT46RlJfsfymDWqgeShcCXivAPi2Q/gA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LFiZE21b; arc=none smtp.client-ip=74.125.82.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W/QrQ8Gs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D82D1F000E9;
-	Mon, 22 Jun 2026 18:19:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782152351;
-	bh=XKlqJDn41xHqxzBssntuIwLv2qXiV/8MEgFKl/31tuA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=W/QrQ8GsogW7QyIXylJn27vxjfhXkXzLQahuKRQQthlkDvW6mIkGRGFoQ3mHpnOnl
-	 8pFOXS8rAz6Jrdna6Qq63quSFnPeujpT2upF4iIggQQzxNQI+4WstblsTliuE06/qc
-	 JX1JWmRjRYM04WCNoQ6KG1nkuD8+1QNZVKGWaugrzWjklmz1z22Je/LyjALcT4QCUr
-	 Pz9PlT7YLynMWhP56ut9YH2jYvUTpBknBf38PhpAQ79ppC8mHtlUERsmrGQO0b+cYD
-	 MavyY5UKyd3nqs0WZMYVxHixpTJhwL19J36iDFNmuT27gjIU6lyx9iWpEer3nu6+21
-	 iZqorFo426LSg==
-Date: Mon, 22 Jun 2026 18:19:09 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Bartosz Golaszewski <brgl@kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Vinod Koul <vkoul@kernel.org>,
-	Thara Gopinath <thara.gopinath@gmail.com>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Frank Li <Frank.Li@kernel.org>, Andy Gross <agross@kernel.org>,
-	Harshal Dev <harshal.dev@oss.qualcomm.com>,
-	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	dmaengine@vger.kernel.org,
-	Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
-Subject: Re: [PATCH 0/5] Shikra: Add DT support for ice, rng and qce
-Message-ID: <20260622181909.GA1250822@google.com>
-References: <20260521-shikra_crypto_changse-v1-0-0154cc9cc0de@oss.qualcomm.com>
- <53b1fa61-9692-42fd-a295-98bbeacbcd9a@oss.qualcomm.com>
- <20260619164506.GA3223@sol>
- <CAMRc=MdJJRPBeNtAUr82b4zv7vLjrRQ76Q3bJHQYEigaE2Hqog@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LFiZE21b"
+Received: by mail-dy1-f171.google.com with SMTP id 5a478bee46e88-3042a388168so186237eec.1
+        for <linux-crypto@vger.kernel.org>; Mon, 22 Jun 2026 12:03:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782155033; x=1782759833; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=uM6rjwv+rWrcNEl8KjTKnVcDSG3oUNpsPUMqnFOcLeE=;
+        b=LFiZE21bJOd27mvhUeQY65zQorGfroSNylZhnl5pr3qjxqG/eN1p6cReYMi7Y8XHb0
+         7P2yUKScTc7SL9KBMwdl8WT1nEKnGZf9ur45NKJJuEmRNsVr4TarSwghnJCBC39U5FT/
+         hbLMbAuZB7Uhid7P768tqQ5oB5rNa0UgEghjqL8I6E/OiecFdkW7XXJUCVzAvM2Bcvqj
+         aAAg70ofC8G+A3+uW7Vx2nk3e0tc12ATFJvEbWA6+4EjPe4CrUqJXP2Emg2HT57KZ67b
+         LsX6aiKqdjYFThFXLMKvM5eHENHiOf+kS4D8rdkQabgcObx3aWN/R9FVWrU0LGgqTlRe
+         mYGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782155033; x=1782759833;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uM6rjwv+rWrcNEl8KjTKnVcDSG3oUNpsPUMqnFOcLeE=;
+        b=TTl1Gn8d5O5tmyI98sUcdthOuMyUdf2iAgEWsPMY+LTnl5zSzLnyl7oBBnHUKPN+M1
+         9EowYDcVDHkm5md1kfcrFt3nDoFGbxqcJ1qRwrDSwu/8l9sUEVehJpMoo0rS562L30lG
+         dCD711Zn1kzYmsiMmO4CZac+hDfoF9aYpQm4Mj9t00EZXZwa/M2jLDcvowAyirPfkx2O
+         VHP6g0W/wsp/iE5PVwExy+dHfBjq2AeX9/yNAwS2cBSgisZFGwahFqOQVUaefUbeqbLk
+         lnd6XsjADYu1Os8m4FJUOclfG8tTlzOWYF4ZlHAnrupf1MiEF3HM2yTqCrAo18Q3uW13
+         TgEQ==
+X-Forwarded-Encrypted: i=1; AHgh+Ro/sVTZtNYoRXo4GWdlgeHHyYHVmD/zGkRMkjCpPMQHTZzc/3pHA0QJx7fwXuUP8Bved7J3oSsrTnAzXgw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQmwlAjb+R6sAwbO1XxpEe+xy9XFSLWYAJasvDaOPMcTYNRyPY
+	jehtG2sLBj/aSBIlO8uEEf0d8RBqXq7fZQjpQsVbTPik6lQHdM4YfA1o
+X-Gm-Gg: AfdE7ckYnTfk7NGXGKeF22L4zmC/gFXZgGCM5eJ/bZAsGi9dgx5ejgMeJWQELKIHO6L
+	kC2cY1nMmUwlLi0qoRAc9riw5yue03Ycv5xCMW1SYjyEidzgtieb4IYuITnGP4zanwcK0eODVGo
+	S4LcaPMRDpsSU/AINs8Uij8se6bF9VISNZnrAZwOEGIsnardhwbjj9PpG8+mMWYUlsTxmtPk2bN
+	JHiUusGAkhanrw5Ls8KbDdFE0AauldkKFd1znEFUGHVtRoEDZ52Dgojy7X3Ec9a1vnn/HW40x6s
+	X3qXmqFhyGIqLDh7qF9PvoIZR69CAfhz5607A7zrequM5nTOzZoEP870tsrbf5ncHCV6AcpNBYc
+	9OZExP0OAWsB6fwo4EThXEQUdMn3/yF8ePRmOcQL79qoCebGJDooKHMUOD/DuWd5w+vl+gbUepv
+	vi45MVSYJbVZVwdCgn8jmvIlRiLQfReywVMHsznRXJd6N/+8Y9/aBAozxnWuHmsdvSqY4=
+X-Received: by 2002:a05:693c:2887:b0:30b:cc4e:6396 with SMTP id 5a478bee46e88-30c5553b105mr382073eec.7.1782155033135;
+        Mon, 22 Jun 2026 12:03:53 -0700 (PDT)
+Received: from ?IPv6:2a03:83e0:115c:1:6e2:c699:67c:63fe? ([2620:10d:c090:500::1:5387])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30c1be4967fsm10549199eec.26.2026.06.22.12.03.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Jun 2026 12:03:52 -0700 (PDT)
+Message-ID: <1979fc81ae7bdaabda8616cd9698a40ef8bbfaee.camel@gmail.com>
+Subject: Re: [PATCH v3 5/7] kernel: Use mutable list iterators
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Kaitao Cheng <kaitao.cheng@linux.dev>, Paul Moore <paul@paul-moore.com>,
+  Eric Paris <eparis@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann	 <daniel@iogearbox.net>, Andrii Nakryiko
+ <andrii@kernel.org>, Kumar Kartikeya Dwivedi <memxor@gmail.com>, "David S.
+ Miller" <davem@davemloft.net>, Jakub Kicinski	 <kuba@kernel.org>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, John Fastabend	
+ <john.fastabend@gmail.com>, Tejun Heo <tj@kernel.org>, Johannes Weiner	
+ <hannes@cmpxchg.org>, Michal =?ISO-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>, 
+ Maarten Lankhorst	 <dev@lankhorst.se>, Maxime Ripard <mripard@kernel.org>,
+ Natalie Vock	 <natalie.vock@gmx.de>, Peter Zijlstra <peterz@infradead.org>,
+ Ingo Molnar	 <mingo@redhat.com>, Arnaldo Carvalho de Melo
+ <acme@kernel.org>, Namhyung Kim	 <namhyung@kernel.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Oleg Nesterov	 <oleg@redhat.com>, Peter
+ Oberparleiter <oberpar@linux.ibm.com>, Andrew Morton	
+ <akpm@linux-foundation.org>, Baoquan He <baoquan.he@linux.dev>, Mike
+ Rapoport	 <rppt@kernel.org>, Pasha Tatashin <pasha.tatashin@soleen.com>,
+ Pratyush Yadav	 <pratyush@kernel.org>, Naveen N Rao <naveen@kernel.org>,
+ Josh Poimboeuf	 <jpoimboe@kernel.org>, Jiri Kosina <jikos@kernel.org>,
+ Miroslav Benes	 <mbenes@suse.cz>, Petr Mladek <pmladek@suse.com>, Will
+ Deacon <will@kernel.org>,  Boqun Feng <boqun@kernel.org>, Luis Chamberlain
+ <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>,  Daniel Gomez
+ <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, Steffen
+ Klassert	 <steffen.klassert@secunet.com>, Daniel Jordan
+ <daniel.m.jordan@oracle.com>,  "Rafael J. Wysocki"	 <rafael@kernel.org>,
+ Davidlohr Bueso <dave@stgolabs.net>, "Paul E. McKenney"	
+ <paulmck@kernel.org>, Josh Triplett <josh@joshtriplett.org>, Frederic
+ Weisbecker <frederic@kernel.org>, Neeraj Upadhyay
+ <neeraj.upadhyay@kernel.org>, Joel Fernandes	 <joelagnelf@nvidia.com>,
+ Uladzislau Rezki <urezki@gmail.com>, Juri Lelli	 <juri.lelli@redhat.com>,
+ Vincent Guittot <vincent.guittot@linaro.org>, Kees Cook <kees@kernel.org>,
+ Balbir Singh <bsingharora@gmail.com>, Anna-Maria Behnsen	
+ <anna-maria@linutronix.de>, Thomas Gleixner <tglx@kernel.org>, John Stultz	
+ <jstultz@google.com>, KP Singh <kpsingh@kernel.org>, Matt Bobrowski	
+ <mattbobrowski@google.com>, Nathan Chancellor <nathan@kernel.org>, Martin
+ KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Mark Rutland
+ <mark.rutland@arm.com>,  Mathieu Desnoyers
+ <mathieu.desnoyers@efficios.com>, Dietmar Eggemann
+ <dietmar.eggemann@arm.com>, David Vernet	 <void@manifault.com>, Steven
+ Rostedt <rostedt@goodmis.org>
+Cc: audit@vger.kernel.org, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, 	netdev@vger.kernel.org, cgroups@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, 	linux-perf-users@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, 	kexec@lists.infradead.org,
+ live-patching@vger.kernel.org, 	linux-modules@vger.kernel.org,
+ linux-crypto@vger.kernel.org, 	linux-pm@vger.kernel.org,
+ rcu@vger.kernel.org, sched-ext@lists.linux.dev, 	llvm@lists.linux.dev,
+ Kaitao Cheng <chengkaitao@kylinos.cn>
+Date: Mon, 22 Jun 2026 12:03:46 -0700
+In-Reply-To: <20260622042811.31684-1-kaitao.cheng@linux.dev>
+References: <20260622040533.29824-1-kaitao.cheng@linux.dev>
+	 <20260622042811.31684-1-kaitao.cheng@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.60.1 (3.60.1-1.fc44) 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMRc=MdJJRPBeNtAUr82b4zv7vLjrRQ76Q3bJHQYEigaE2Hqog@mail.gmail.com>
 
-On Mon, Jun 22, 2026 at 04:25:12AM -0400, Bartosz Golaszewski wrote:
-> On Fri, 19 Jun 2026 18:45:06 +0200, Eric Biggers <ebiggers@kernel.org> said:
-> > On Fri, Jun 19, 2026 at 02:13:28PM +0530, Kuldeep Singh wrote:
-> >> On 21-05-2026 18:47, Kuldeep Singh wrote:
-> >> > This patchseries attempt to enable sdhc-ice, rng and qce on shikra
-> >> > platform similar to other platforms.
-> >> >
-> >> > Previously, the 3 dt-bindigs/DT changes were sent as individual series
-> >> > and with feedback received, clubbed them together as all belong to same
-> >> > crypto subsystem.
-> >> >
-> >> > Here's link to old patchsets.
-> >> > QCE: https://lore.kernel.org/lkml/20260515-shikra_qcrypto-v1-0-80f07b345c29@oss.qualcomm.com/
-> >>
-> >> Hi Eric,
-> >>
-> >> As selftests issues for QCE are now fixed[1], so shikra series should be
-> >> good to proceed? as your concerns[2] are now addressed.
-> >> I am waiting for merge window to end and will send next rev post that.
-> >>
-> >> [1]
-> >> https://lore.kernel.org/linux-arm-msm/20260617-qce-fix-self-tests-v3-0-ecc2b4dedcfd@oss.qualcomm.com/
-> >> [2] https://lore.kernel.org/lkml/20260522024912.GC5937@quark/
-> >
-> > If you think that then it sounds like you need to read what I actually
-> > said.  The fixes are appreciated but don't change the big picture.
-> >
-> > - Eric
-> >
-> 
-> Eric,
-> 
-> I mentioned it in another thread[1]. This series is not adding any new features
-> to the QCE driver, it describes the hardware. The SoC *does have* this IP and
-> no matter the state of the support in the kernel, there's nothing wrong in
-> extending the existing bindings and adding new dts nodes.
-> 
-> Thanks,
-> Bartosz
+On Mon, 2026-06-22 at 12:28 +0800, Kaitao Cheng wrote:
+> From: Kaitao Cheng <chengkaitao@kylinos.cn>
+>=20
+> The safe list iteration helpers require callers to provide a temporary
+> cursor even when the cursor is only used internally by the loop. This
+> leaves many functions with otherwise unused variables whose only purpose
+> is to satisfy the old iterator interface.
+>=20
+> Use the mutable list iteration helpers for those cases. The mutable
+> helpers keep the same removal-safe traversal semantics, while allowing
+> the temporary cursor to be internal to the macro when the caller does
+> not need to observe it.
+>=20
+> Convert list, hlist and llist users under kernel/ where the temporary
+> cursor is not used outside the iteration. Keep the explicit cursor form
+> where the next entry is still needed by the surrounding code.
+>=20
+> No functional change intended.
+>=20
+> Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
+> ---
 
-It enables the driver on a new platform.  So it very much has a real
-effect.  It's not just adding a hardware description without a user.
+Beside the fact that this does not apply,
+I don't see a reason why is this needed for BPF sub-tree.
 
-- Eric
+[...]
