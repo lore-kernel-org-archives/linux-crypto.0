@@ -1,88 +1,123 @@
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010022.outbound.protection.outlook.com [52.101.85.22])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011043.outbound.protection.outlook.com [40.93.194.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E6163921F6;
-	Mon, 22 Jun 2026 08:51:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A6B636C9C2;
+	Mon, 22 Jun 2026 09:15:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.43
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782118292; cv=fail; b=hHhUYhGHGMRkQFI1Xoqox1PxYcawQS39mkuR+AtrwqcVH58zhILpwtvlyvoP6zMBLsKCtzex1s/OzOgjfbz5/JC9e0/HskSMvBmwujlNpM8gMBjogNPfHD57yVjK+6hta8PsmBdfIgfBXVgK556Q2q7JDIAadr0cY0mr4oyRwYc=
+	t=1782119741; cv=fail; b=uly9lgu1KVLJkzEpxhJqfz0zQXQ1IQrNigaIz5gOBcv/A47/+fmGv1ykS7hbvLL20yOcFPYCkfxBZMjv5yZ65uvz9GAfXGk4bZpPsJG5k3hp62tIWu7bJqS8QDic8ddQNsmNtxGL00ZiS4dMmKY+1bFTV6c3KGLRh3u/F9u9skY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782118292; c=relaxed/simple;
-	bh=5nsxj7zwfySyJPiUSPAYBBuCFUlLNIcFsTKvpV2+Lrc=;
+	s=arc-20240116; t=1782119741; c=relaxed/simple;
+	bh=UjaUMvuPb8KPecLXsvxDAldry1ko0dI75laFJs3ynvk=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=lPSJGQbO2jZWAnjWqjHXbwRrUvnXcRYFam603MU/jGpyv3X8W6/6apZfRXwZpZfuXwuC5yM39+oNsAZSdOrsnhn4WKqINLiOoAmBlwGeU7gY2sdQCN28RfDf6T+/sL2VV7SvFAMneysIGw6a+6YqYBC3Ipxx6qeHoBu2b7ceOfM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Oj464p5y; arc=fail smtp.client-ip=52.101.85.22
+	 Content-Type:MIME-Version; b=ktkKyekEhhF8Y2F7Sg/r48jDgfFZ/8Nzb575Mod21E/dD65WFUT0fcfqMppxmdHyuFu1trknfXjXg+w8UlOTpoXKmkWK1zaiIIQUYY03jTmOTXHUI5G2dsw6/mqLwc1w7h8vJrNMY5Yhq8T6Lo6uTQzkVGtE9NjmWulk4PeSLjo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=HomFplGN; arc=fail smtp.client-ip=40.93.194.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Oj464p5y"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="HomFplGN"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nwQEh21o2VSckybAsizVeLRP7aTQEFc4SNJ0W9rMBBl7zoo8WGU8Mc/X0VHZvDlOeUm8vF41TVCHv1zvIWYDnaDUneW/1gBrbztOfzufGEaqS3BE2IjU9VOKDAFNUxLIJAzJu8bR0hODDMG7+BBipKPx4k4TNZWBVZV2X9/zYZx+hU8+d+MHc9Zl4OfHM4/YvOkqJHtBbW3KoiD3Ei4h/9i542in/JhC/S32kgZ+nMScNTtScKx1142XpMQdnioZ2EEj3wXGBQVcLbI0P78AfMPJEtx7vknE/8Vhidz5f0DTraRsaZPFx2HSmEAD8FxRiJkcowwTYcqIiC1IcmTElw==
+ b=O/Yxas6CBBWrwVyVxWYUWOiTmIidUd0yB41piwXvEvGOp1DaTQpKeeiV+AqQlelfCwNY2bXiIbrgpamHat0h/ZNhJWc3PiieIuWMEdv+7yk4ow/mhnLmscnA7Tx8dilIDI3X85Vk6UwX6HVHb8DqtPkDRsg0YIMq5pepOqTGVPpdfjinBrSbX8js/vyia+IkXdm8RC2IXEtsuXnGmDKCdPpzSp4rWsPjmWnS9OPcZZ0GiyQAZg/W+Vpr64+hnZI0Lyvnr/Gm8i7D+08prcTpYlO3Ys0XbKvWt3NDfgZO6Qvj5/1ylRmniljBXPX/9sJAyfR4ksr5E0qzNbRqFwaf1w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=N1CTmu+6LGlgB/BKD81AcsdoGTuKCbZDkKyItYzOVJo=;
- b=v2BY7tj0h5oxjj5yjsfFWtN6tFLH1gBgks+WFLJ8PSOPB7aoNyAVL0vDPzKTPwTOrGmnSA7hQkXhi3bwmVz8vho6Sl8SMT3wr+E0jWH+MCC+yBqfbtDGMYbpdmEudGgvNcKe8wV+zzL5dGk+PzpFfNcTLxG71TbWPjnG+rUcJzlgQQXNn5zrlkRJzozVkLPbZcQwUq5yWwoQ9rlLYR2bxt64rKBWZg757AbAoP3JQbsp+9M+yU+avHJgkPUIpIUYzIMBfmAyfV6vCu5Jsntk6q8FjvoqJiaMMivEeQIQLtE4mjz3kF9snAu+26NgmnaEr3QD8xS9+ouPCxblF/ZSnQ==
+ bh=gtlDKiNHIds+t6+ScbEFDLLKqfVPruttD+psXsyALgw=;
+ b=DoU9skz/vQyWm9DqoRdv4ftykRRINzif1Tsm3FjNyzdWjF11LwK/OtSsoz3HxadUlX0flRCa9PvUSGhMV/XaA+Oq5qdoE+INJJejYP9c8apmW8EYnt+ZSsoNLoathT0nawIqdWxKtvtps+ecWRnv13TA2/awiIZtQPFMdx3Iy7tOgi3Q3BGK0K2cFDTa5Y/NASZS//4mOwX3U7O/gmXQErCBXeOUvfL4FyGJyYwMPhGdHXQZhrKl4Dg9FCRA4GqWIYaYhCu2wDBIvqgIAcH1T0qQFKgHPIW4/EHBlUaYfnQ6qGpb7cMkzJgmS7uDeR4P30D7aJ6gd308Qmrk3mSL5A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=N1CTmu+6LGlgB/BKD81AcsdoGTuKCbZDkKyItYzOVJo=;
- b=Oj464p5yFx5WkTQKYW8C8t7LwqSVyT6K0+Eerw7lOm1sv/TNiWcQQ12aVmFPOGW8RHuWPAaEUnGLM0cm98TZ162SScfM2ZUYlKAxuSj/Opwr+nDe74rJojsk35fGlijgwwCpXUr1RSNLZCtfh/zo5Xq68aZg8LGT0MwX4rNmDvQ=
+ bh=gtlDKiNHIds+t6+ScbEFDLLKqfVPruttD+psXsyALgw=;
+ b=HomFplGNfi0sYkXVxRXR61Y50ur8kBE3YMRNVDirccIhxjarh0cMQxU3i2LkJ1hbmzkhd20QWlIajeO3Ip+5CYR2qBPVW+KXYKRSD3WGu6rcmgNDdHyTclRVFKNBo4uBN0bEZKzJaqF4jagTa9w+OW6oef9SOjoNVKTu/Xl4FSk=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
- by SA0PR12MB4365.namprd12.prod.outlook.com (2603:10b6:806:96::22) with
+Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
+ by SJ2PR12MB8690.namprd12.prod.outlook.com (2603:10b6:a03:540::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.19; Mon, 22 Jun
- 2026 08:51:25 +0000
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::ce69:cfae:774d:a65c]) by PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::ce69:cfae:774d:a65c%5]) with mapi id 15.21.0113.015; Mon, 22 Jun 2026
- 08:51:25 +0000
-Message-ID: <4f55fc00-e83f-43a3-9dd3-739c75534b14@amd.com>
-Date: Mon, 22 Jun 2026 10:51:10 +0200
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.18; Mon, 22 Jun
+ 2026 09:15:30 +0000
+Received: from BL3PR12MB9049.namprd12.prod.outlook.com
+ ([fe80::ae6a:9bdd:af5b:e9ad]) by BL3PR12MB9049.namprd12.prod.outlook.com
+ ([fe80::ae6a:9bdd:af5b:e9ad%7]) with mapi id 15.21.0139.018; Mon, 22 Jun 2026
+ 09:15:29 +0000
+Message-ID: <07b6d905-11b6-48b9-9a51-f8f98bf89281@amd.com>
+Date: Mon, 22 Jun 2026 04:15:25 -0500
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/7] list: Add mutable iterator variants
-To: Kaitao Cheng <kaitao.cheng@linux.dev>,
- Andrew Morton <akpm@linux-foundation.org>,
- David Hildenbrand <david@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- Tejun Heo <tj@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Johannes Weiner <hannes@cmpxchg.org>, Peter Zijlstra <peterz@infradead.org>,
- Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
- Juri Lelli <juri.lelli@redhat.com>,
- Vincent Guittot <vincent.guittot@linaro.org>,
- Paul Moore <paul@paul-moore.com>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- "Paul E. McKenney" <paulmck@kernel.org>,
- Shakeel Butt <shakeel.butt@linux.dev>
-Cc: David Howells <dhowells@redhat.com>,
- Simona Vetter <simona.vetter@ffwll.ch>, Randy Dunlap
- <rdunlap@infradead.org>, Luca Ceresoli <luca.ceresoli@bootlin.com>,
- Philipp Stanner <phasta@kernel.org>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
- linux-ntfs-dev@lists.sourceforge.net, linux-fsdevel@vger.kernel.org,
- io-uring@vger.kernel.org, audit@vger.kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linux-perf-users@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- kexec@lists.infradead.org, live-patching@vger.kernel.org,
- linux-modules@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-pm@vger.kernel.org, rcu@vger.kernel.org, sched-ext@lists.linux.dev,
- linux-mm@kvack.org, virtualization@lists.linux.dev, damon@lists.linux.dev,
- llvm@lists.linux.dev, Kaitao Cheng <chengkaitao@kylinos.cn>
-References: <20260622040533.29824-1-kaitao.cheng@linux.dev>
- <20260622040533.29824-2-kaitao.cheng@linux.dev>
+Subject: Re: [PATCH v8 3/7] crypto/ccp: Disable CPU hotplug while SNP is
+ active
+To: Thomas Gleixner <tglx@kernel.org>, Borislav Petkov <bp@alien8.de>
+Cc: Dave Hansen <dave.hansen@intel.com>, mingo@redhat.com,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ seanjc@google.com, peterz@infradead.org, thomas.lendacky@amd.com,
+ herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org,
+ pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
+ KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com,
+ ackerleytng@google.com, jackyli@google.com, pgonda@google.com,
+ rientjes@google.com, jacobhxu@google.com, xin@zytor.com,
+ pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com, dyoung@redhat.com,
+ nikunj@amd.com, john.allen@amd.com, darwi@linutronix.de,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+ kvm@vger.kernel.org, linux-coco@lists.linux.dev
+References: <cover.1781419998.git.ashish.kalra@amd.com>
+ <1feccf6e2a56d949b30f403c0ca7949f580e5982.1781419998.git.ashish.kalra@amd.com>
+ <49380c3e-c275-4211-876a-c51f644aeb17@intel.com>
+ <bd2dc2e0-e975-40a9-8e0a-4403db858316@amd.com>
+ <20260619221022.GBajW-TvxyCuGo0FWX@fat_crate.local>
+ <d91bf0a8-0c4a-4552-9009-0ecef46aa279@amd.com>
+ <20260619232007.GCajXOpyPbiu4FVZIW@fat_crate.local>
+ <e68a126a-6f2e-4a76-a691-f514b7f37489@amd.com> <87fr2gmav6.ffs@fw13>
 Content-Language: en-US
-From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
-In-Reply-To: <20260622040533.29824-2-kaitao.cheng@linux.dev>
+From: "Kalra, Ashish" <ashish.kalra@amd.com>
+Autocrypt: addr=ashish.kalra@amd.com; keydata=
+ xsFNBGnyeG8BEADrp4EWc3KHI3tz7Lnw4HgRJRG6U+IJKAp6EBnQA5uimlJspSAr+jf23I2a
+ T0mr1uiTnZG0JkfgFpTgwBYcR+d8J96WP9LDeId9z6R7b5jyB64fhYqX8Hpich3lon2Woijn
+ azEZ++sSUtAU75m2j9ZE6lkkPM2Ti9YWSBsSg92KDVVROXLO9n6U80lzudJrKAKHE0/PagzV
+ D5gjV/s7lb9PX8khKVK3ockGRuy97lw2mAcw17EV8GE5cuToOOzpP8ESXBt1g7xoXVcbHYol
+ yuX1ljHEfqy7cCtTsBk1+LzPuhZ7532MIfVmFtDcNUSwCGeGgwNRZno7lAJ9xd6fLkZPTEZ4
+ UNsaViyzmJ22P7xMiZqXWQWSk1LohnGhZZdTaIwidWT12c8RX+qVUCzesaFXGqKt0PNTipTp
+ L39iEZO8m/+lC1BmTo0EoYtsNfrlngwNPsSU7rtd/t00RuW4YHhXALT2JUbulLCHGK1w9isH
+ E7dJXprYjUiZRVF3SaeTF4zg5AzkWRB+0yL2KzWQPumDx1gscLNFev8J1EbdrYClcpUuNxKG
+ MMG95wPqWtZm/HaNyG08alXDZcnq8hhxA7AbJLnPYpqWd108p0qp3Vr0UrvuekBKZ6Y7be+m
+ Hb4A1xRX3hE2kB971lsVp0lXSEGFHB9TJw7FH/S8paITH58y4wARAQABzSNBc2hpc2ggS2Fs
+ cmEgPGFzaGlzaC5rYWxyYUBhbWQuY29tPsLBkQQTAQoAOxYhBOnNssdBmZnznITYhaE6KKJw
+ lji/BQJp8nhvAhsDBQsJCAcCAiICBhUKCQgLAgQWAgMBAh4HAheAAAoJEKE6KKJwlji/q7AP
+ +wfg5wOWq+f7eB3uh0agX5Ax/o5r5hlK0EMyl+srJ4jc+NmNKKuVPwx0EwZEpuEcbDLlQuO3
+ JIyi13wm6n6FvIBOCfWjvndpaci1QGTMtZDnxueXM8UeFST3KjIEWFXbvgiAyiZBE+lHaSBp
+ 7UfAL19icIomKdCVCRtnqOsTvv7mcyPL8qs+OAOu8akvp3NlGsqLrkSB/YTEBKmh8oOR0aXz
+ 4VBIHpfTIppIu+F5l5PxOQGwNv/AfQ/oN+Aeo+o8i3s57gViqP8uVlVcI/vi1S4hngmc87Ah
+ 3p7KdbrxxPzahD+p1fMXsCwEf0dyJIRduDgAkpktmSLoRzBGkjtOX5nvs75QgA3r0WsvcfxF
+ zly+nnhu2GsptY+uu/ZzW6PCz6p0pHMiDfPAL1cfizY8eTMFJN5fnOW9rwXvKbM+DHbowfkw
+ NtF0DecH3qjmqAzGg2srE9XJxwOotS1JgeBp1TZsah8pXBaY+Z7s1iaY58H2TrdiDbz88DD+
+ TGX4ZHPjocpqeUuwxn7gTCKQq3K1fjt6IKY0A1ocxQEK33pjQMRTJ8lwy4z37V6EohmvCs9w
+ 5qyvI9D1gnMnFrqpbry1Jz7z1HB4sFFYxIxyMh86uOcUxGmHRrCiII3YqiSmzizvq4aUmHxd
+ YE1Wy+pKx2HVobhnuKIKoSJj2JgYV0+O5dk6zsFNBGnyeG8BEAC+BGciGUt4ODNq38ouK/6E
+ jlkJPpnxlksBhlhwce/p1vvARFceifVbawkM8ePHyIXrzxho0PUDjteGFFDjP1o/N0rQzgbf
+ 0INfkbJpHME+SYETxrkm+j9oe8DiHXZhdatY5rupZoypodNQJDD1G/HoT7bBQxPj6xDBgHWH
+ OyZbg1jjQXSWESgVX118uiQ5M9RdO+gc/YGLt5FDvN892uWs8899QBm804SdSlwkZGMKXZXv
+ 12qKw+swQoVzBdCqSLOOtIhGevkl6Ul5+N8iT7xeKMVZffAxkz7DF1yDovhJhrYtgKyUMQqW
+ qCINhtp9wHvPt+wfutzYsCLVJvVLMIj3fPtfYBSPXQu2FP0z2Nx6oUxQR/LjilP4UezSdXt9
+ WWpb+mvDLmelNuoA7WUxRauQBKu6tR1zoFl3zTdW4ZiSqZRgKInSfaVhINUMv8gqcLlAzkVS
+ seOwRrwNDUosSW3gVwj28m/T9JSfGR62i58WmH0sFQG42yuIbq/uE4crf2oQDrpFNzTJgx6+
+ Ede711weViGHEQz5vsgERmQrJDddRTgl/SlGtkAYNpVFJgYV2N/jYjiz98hgE2MYgZ2Kd8WL
+ T8dvswsQguvkDMpWJZ2BunYhRLGIpyVDhepu05qyFuNYA50GX/qcj7POBSEx/6mBaIQC7oXI
+ ffsirWGyL5WEVQARAQABwsF2BBgBCgAgFiEE6c2yx0GZmfOchNiFoTooonCWOL8FAmnyeG8C
+ GwwACgkQoTooonCWOL/tdA//RIcNr6dB4ZZaKWDe5SSw0KD7hKExIIiBkxIv5XILcazPK21x
+ LlDbXUHxWWaG+9wezceRRBe3GjRo2aKEpQzuAOgR5Ix5tRe5yJAFozO/CCGixiBzQ2I2TGIv
+ rp8xZqqvmgogckqz3RE9Rx5VF7bqKriuGbF+WciPU6+YSuN1rH+esS40yoFu2skbYAMfm+Av
+ AvEMDAmkR1o+weVZZAZMjm+2ZpCm2xXk5bjAqPQ+GoH70x/kPVv+TXjTN68xIjmP6gwA7c1P
+ qozwWzaA2Q2HO5D76clT3tmHbtzMuYt3cfwbWbCpNaqycaHvktATiRjy60Bz9FvRL8cMt0+4
+ jumtJoa0nAEmx88QzaMOK3QDW6KoDKzV8bqAHBPtrwH+jhOKId07yHmWCZxIGJAkhwqsdEx8
+ bXpP3nTer40r1tvds54lxhKxOlVvf5iBoxa3kC8f6cTNJeGm5ettvD5iFSR+fwAUDEyZEtxQ
+ f3Brs3CLkBfijS0zCw9rWqlZJGSst5xwV8UdfppsPWkU9lAUR8UZFsO+g1xCxtBc0nucygzh
+ O+mvU01WFeZGTnW7INdP+eDIvj4XYmVSjwCSNvDphJkPccAn2KFcPxYh8PJAqCDw++nfNDrc
+ BXA1uh2XzCnnzbc62A+AjwXB89wvlctBLptKlnKBVtrsKEFIoLugtmfIsa4=
+In-Reply-To: <87fr2gmav6.ffs@fw13>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FRYP281CA0001.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::11)
- To PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: CH0PR03CA0290.namprd03.prod.outlook.com
+ (2603:10b6:610:e6::25) To BL3PR12MB9049.namprd12.prod.outlook.com
+ (2603:10b6:208:3b8::21)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -90,462 +125,148 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|SA0PR12MB4365:EE_
-X-MS-Office365-Filtering-Correlation-Id: f5843db8-2292-4c6f-6373-08ded03b7106
+X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|SJ2PR12MB8690:EE_
+X-MS-Office365-Filtering-Correlation-Id: c09e6c39-0f20-4dd0-4963-08ded03ece1a
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|376014|7416014|1800799024|366016|18002099003|22082099003|921020|4143699003|6133799003|56012099006|11063799006;
+	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|23010399003|18002099003|22082099003|56012099006|4143699003|5023799004|11063799006;
 X-Microsoft-Antispam-Message-Info:
-	UrYmGbn8maWnHNc5D1qlVh+jrcQmrgStTdJf4BpRRFgI09yY0t5o3kI+QFue1RhDqmkyHpxlbNIsUyVgifZBOfhgqCKTMcjX995MBXWc20TEezTy5dAGaJra4KOqCesvs8RpPueT0jpnFEwuvTeS3ivGUM75dL6izUy8aZ5IA9mkAlRyUxcdmVBWoVuN3m3FQa1T1jMdGsfOLVZIi5pGVsHI8Vg00YPKD0qr5kXFjd/sNeinWHYCNkwR1HIcyfjeFoWuBJ0xuPLSv0ZQMLm4nUaJ6/fCgDfkZysVJyYCjdU7AXJ/tAW0o8wmQbWA4/AEwiC0MmyWuVg8HaSTBShQX4TNauMFcLGutmZSSNW077PQwIcEUnKRoW/FA0mQ7TkpSflOuOgzVUJFfXfRiduI5+807QLgLHM09PTDE2r9q9MOVMatD74eT2o1BBGRwrLLJolVQhYpkznZ9O6QMSF3KFOuL8uEA/nRzKJz9LorWYPkk5Z++5e8KmAoMQvJBwwh7V1k7jSq6csJb7X0EKS7JAjrpUsCe6Kd73jW5zEdBErveu3sVf1+ktIcyuDFF18B7xKsBEIP7CF6PAwdRDJuc8lNstT6A14JkeH+9nJwJTY7BI2jnUP7ZE282Y7U9nkglCXQ59yNkgS/WDdKg6jk3F4gDabH999DqevpnZFnlGpX921G6ifWu98iLl/S02N/shf0Me8MgGWkt8E+cGwGRA==
+	fZ8YMUqLXOIoXot2YH2WqzeOKNGNgUTXOXkWGsXPSPW+PAW3WKfAleIweFf7NQ3DxQICt7XkRG1RZUrV5Df+SUKmLku0pD2Qc0jGdi452I90QA78bXWygLh8as2hoxnaDG15BmPZOMqCKW3sfJiJOZ2LAdjkynJdNpINLOIJceQoW2v9VkFomnyahxpk8AJ3YKuZm9vZU8GpFuyRyp9G9YDpdJd8nBlQM40yDgIejGx1kJWxek7TCmCmLYhvOluSoCV7TW9HxznC6o/PxZP9/P3PhvjnPci0NwlnMuAdcTSxQUXmWQfuEysFAgU3C1twzgV35rZe4kZwRvkMUtao1ITM75OlA4klIuXgO7SzGVTNC/eBGvfvzGk8iF6iwYcTGIP65UzYPNSoacE5rnlX1Eszq54gFaWkg8cBTlwCYpK0T4ggBxR0pvv5Hr+6iwGIYxwW+pprgGKCoR9Rgb1DPOgPmLWRhTB/8L7HfZRuVHYP4JmPHVYVlY0KQ+e82qZtU4XIr5kfgL9WU0IF2EoMbJDzEbr2XZh8WffTjiZmZlum9AT0+YyEXLJCpVWQ2TvztFCk39D1hosUSGR+LzeSy2rBK8MPhKazXLDK+4QgI68U5dEGRubaAgzquKBqN7WKObeSGHYaxxsloSWjjqhJXrBju3NZEV4SkUA6fje8Gh4=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(376014)(7416014)(1800799024)(366016)(18002099003)(22082099003)(921020)(4143699003)(6133799003)(56012099006)(11063799006);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(23010399003)(18002099003)(22082099003)(56012099006)(4143699003)(5023799004)(11063799006);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?azFEQUF2QnZLcC9OTzB6SkdoWk9zdXBGTHNqdVlzTWNaVWVTRHN1ZDVQQUpQ?=
- =?utf-8?B?UFdNTUhKZWxsd2hFTitYRmw2aTYvZW5sc08vZWdYeDdaaXdLdzBpWkZuUUFL?=
- =?utf-8?B?MDZWTVE3dzExbzNMQnBlTEt3RVN0Nk1aTjJEdlQzamhvRFU2SWgwVGVoUUNt?=
- =?utf-8?B?ZjJhQVBlVGZ2WkRtVHh6SzZHbHlPNUtJZEJKNDJTT3F1YkVZeGpCNjVmenVr?=
- =?utf-8?B?WGpXSW0rLzM1TThvQjBoRVBJNDlIQUsyK1M0TmRFNkphQWJCVzMrRWxGQnoz?=
- =?utf-8?B?VmptY1F4SXZkdTBrVjhMZmp4SmdVVkJKT09vQkVIOU91bXlZeEliZmFNYVdh?=
- =?utf-8?B?eVViOE5SVHdPVmVqaGdMSGs3MjMydVBmR3A1RFloL2llSmV1SFJIVERWQ1F3?=
- =?utf-8?B?RC84R2kyRHkwVjFzblY1RUZHRjN3aFhISi91VUQ4Uy9lc1RTMkRIK2JjR0VC?=
- =?utf-8?B?SDE0eSt3R2VBRm1TN09RdzcrTzB3by80Qy9DcG9acWZnRDFJanpObWh3NHlr?=
- =?utf-8?B?aGU5WVdCMUhNeEwreU5HNE8zQW5iZmltR2Jvd2FrYmN5M1JabExEMGtTby9U?=
- =?utf-8?B?TjJZaXpObGJxWmNrTWxYWGdZdUE1bHRLMVdCbUNCelR4MjI3OWJsVVp3aFBK?=
- =?utf-8?B?NzUvUU9Ia2NTb3N5VFZveWFPZVR2bkFSeUgxb3NzS0ZCeEdHRTRiMFJIN2xI?=
- =?utf-8?B?bjJyMFQrYTZFR3N0YlpXRE9VY3J4NVF3d0FLNnlITTZIcGk2ZnhFTDlzL3RO?=
- =?utf-8?B?QTBROFpwRjUwMTZFdW5QNW1VYmh0VUxoZi9LMnNtNTV2QmtWSXlqT3hKMlZS?=
- =?utf-8?B?UzY4aW51Q0kyMWZkaGY5MjB1VzdLTGw0MFVaYnZOcHVHKzFwT09xSXdqVU1U?=
- =?utf-8?B?R0dJWW5jR0RFc1JIMkVkM3lkS0JlanFUSWVwblQyTlZVV1BjUEVrbThjUXlY?=
- =?utf-8?B?ZHN6TjlrbFJrRDc2MklweWoyeFdFdmNVemRMejRQK0NINFlycFBnMVBzSmpM?=
- =?utf-8?B?L0RiNU1PZXloakd6VVVwVXNwTzA0aHZuMUNXOUpJQmlPakkrQWpTTVR4QTVC?=
- =?utf-8?B?YUk5VGVBM2d6ejdibE9YVjE3UFRVWFBXc09XeXVBMUQvYmE1Y0NXQ01VRWxI?=
- =?utf-8?B?QkFpcTQvTnpOMGZ1a3cxeFdhOSttME1LTVplUHc5RWJBWG4yREp5SmRUc0d4?=
- =?utf-8?B?ZWh6V3MxNXBWK0pWUFZ3b2hyazdOa2xvSEUrWnRsZjVWMHVQVGJ1WEhNeGNy?=
- =?utf-8?B?L01XSFhReWk5QmNFRTNLWjRmS1o1Rm9qMzNPenpGNHdYZS9oNjlha2g3MERW?=
- =?utf-8?B?cHc4cnI4QUpvN1FoSzZCQWJMNkVTWU9MU2hBcGZEM0hvMHM0cHc2RGtkQmVS?=
- =?utf-8?B?ajIxeHhKL0ZSMWJxN2YwTGdjVkJyM0J6eDBIZGhJTDVVejJrTnMyUlFmamI2?=
- =?utf-8?B?aWJUMm5QN0c1d1V1bm1oSCt6Mi82ZkZGcUx6aW85MGpVcDVUQkpHaTZqNFVW?=
- =?utf-8?B?cVBNYVVMNzd1T25kUWVhNWczTGxhV0hRZSswYjRFdVZSRlRRMDJkcElKclJD?=
- =?utf-8?B?bWdJQ00vdVFxbXZWYUhVTURmNUhTSVhONWRUbjFUaHdTd21UcDk0Nlpna0Z0?=
- =?utf-8?B?WEs5VlNvUC8vbjBFNTltMDVqNEZaY2tpRmcybmZvL20rRWtJRUZXTmVoRHVk?=
- =?utf-8?B?dGwzYVVoUDViSkxPeFJOR28wQ3N1YXNtdHlDTGtwZk5xbnFBTTFWaGtybWxM?=
- =?utf-8?B?REJnTTBFTnRydjhodnkwd3U4Ty9tdStqMDdjbUpIMjVQU0ZNUmIvaWN1d1pj?=
- =?utf-8?B?Q0JubWNkNUtPTExteUtRUUdUalpydUJDMXZHa3hMTERhWFFCZ0I3bTk4dnFV?=
- =?utf-8?B?YklhOXZ6MEtaUnhwUUMrOGtMOW1EWjBMZUl4K01YamZlZkFoOG8yNStHMERt?=
- =?utf-8?B?NWordldKV3lBTWVmVW1TWGtvRzh6YjhpZzV3L3h5aTJRMVB3YTdkWi9QZTVS?=
- =?utf-8?B?UHZaMUt2UUhsYk9XcEJmTE9neDFJRHpiSlhHR3dhWjd0SWJLUS83bVhyMEl6?=
- =?utf-8?B?U0RweUtUNHRYNis4TFhYNU94U1A0S2JabmIyQ29qWU5tUk55M1FadC9ZRU9T?=
- =?utf-8?B?NHlxM1E4aDF2RXYzd3ltOHlBeEVFUHp1REF2cUovemZ1aFJyVHFtdFE4WkR5?=
- =?utf-8?B?UGxUZ05XQWFsVE1FNEptYXV6akl3K0JEVU5EYVN2eXAwUEFtMjJ5RUdSd1hN?=
- =?utf-8?B?eVFRTzZNOHlHayt3ZGhXbEw3ZWl5SER6SlpOc2d1WG1IcVRhRzJCZEY2cmUw?=
- =?utf-8?Q?I/sExwDfVHkzWno0CT?=
+	=?utf-8?B?UkVOdEFMeS94Y1VCU2xsVjdHYjVOcFo5aFhZSE0xK29qR2R3cUlkOThaWWJN?=
+ =?utf-8?B?cWE5czFkTHVDSzZiM0FPd0plOHUyajlBVVRKRk5aUlJBK2l4dG5mYmJPd1F2?=
+ =?utf-8?B?cERQV1dkWmp0K3p2azFnK2JpQ21kd0M0SFFPWW9od3gwRi9VNWt5RlJ2RE9a?=
+ =?utf-8?B?SjRSeUk5aWc3ZlRiNVZoa1pZR2ZUaTF3TDl0UW8wa2lRV1YxSWxHeWJvQW42?=
+ =?utf-8?B?OTZ5TExMWURNbElscGQ0bnhqaXdlblAyUlRxaDJjOERtYmIrNkx1cHRKdG1z?=
+ =?utf-8?B?M2VrUHdqVUZ1SDVoK3N6TFNpQ29pb2w4dHdpSWhMYXYvOVBZcEc5SjQ1eFZo?=
+ =?utf-8?B?djJGY2tHUHQzMDhEenY0UlVpbnpQaDFmRXFGeDlwVWpjdXdZL3E4V2QvTDhk?=
+ =?utf-8?B?UDhzUENjMFdER1ZmWVB6MHhuU3dWaWpSNWdHejhQNkFuWDNiaEdPVEhVR1dI?=
+ =?utf-8?B?bytra09XNE4xUTZwMGNDc1NLc2tZT0JhbGZOZ0lUdWZNWkt4bWUzbjFpbHBj?=
+ =?utf-8?B?bVh0SHA0b3RCODduOGlaNEVleHJLM3JYZnFURUR6VGtEY1FZeHpXNWdXSDJ5?=
+ =?utf-8?B?TGtrUDdvVVhmNHduMThUUm9TVjNIRGNvQXhnZG82Q3ZQaUVkUmpKUW8xTFN0?=
+ =?utf-8?B?VGpJMFFRd0d1MU1VZjlJcUZMekIzRlp0KytRUktMZ3o0MzFBMm1aUlRCOG9C?=
+ =?utf-8?B?ckcrMVpTQ05Cby8zdFJ4RmI0Z2dBRnRBLzNtWXdsdkQ4YVFuRkUzZWVPWXh4?=
+ =?utf-8?B?TDJrNWl5UnUzT1IwWE1KcHRsOGZPRjNBNkcvVUgxaGZGSFdpRzluc0grbi96?=
+ =?utf-8?B?QkwxQ0cvQi82UGdMRXVqS0VjZStaOE4vcHJTOWNULzFjV29GM0xhbERLcmNx?=
+ =?utf-8?B?M2ZXU1hHVEh5eHFZWlQ0VTBlUFJibnJQbElGTmRobmxEeCtnZUlLWnRGWjB3?=
+ =?utf-8?B?UnBlR3RVREhiY3NwRTBvMjZST2RHNXVDTVRJbjg0ZzA1eDVoQmhPa1NraDBU?=
+ =?utf-8?B?eXc2YzkyNlIxRHlkU0xJMGpuUmlZVmpHNHpIWG02cUk5Ym04cDFVRTA1NmU4?=
+ =?utf-8?B?aXdjU1lRY3BycFhDb3d6YnBESXV2YjFUbVV5ekdPUjlZdlBzQTh3bTdrTGFm?=
+ =?utf-8?B?NW44YngramhyL01waGVxbGkvbHBIUFlZTzFFOWJsaHJJVjVzdDVtaDJ0b0Iw?=
+ =?utf-8?B?bmM2amlqWFkxTGZ3UzJiTkU1Rk9MWjcrZFdCTm1iNnlmWVRjeXVHMGVlUnpY?=
+ =?utf-8?B?cFBvenhNNkJHSzZ6bm1jRzZuc2pQVDlaaSs2MTA5VkNmM1VHN0hhZStGV25z?=
+ =?utf-8?B?UFhqbXJIL3FSTnJlUFBDQzBaNGlNMDAxLzlZSEtIaHpjbjNXdTBPNCtaMXZt?=
+ =?utf-8?B?aExSWTNIbzlIeGt1K3RKcnJxajI0NlhmSDV3SUtDNEROMWJRUzI2OVZqNjJo?=
+ =?utf-8?B?S1ZIdXlCMy8zZlpmUkJuR2M4cVRRUUxBZTV5SUpPeUhjdlFmMGFoWTBKZXJ6?=
+ =?utf-8?B?bDIxRkl4OURtQklPNXRjTmFYdXFwTlVFaUphaVArRTE0Y0c4clBIMDF5YlU2?=
+ =?utf-8?B?NVp6bVY4WTNlU01NZngzcVY2T3Uvc0NRRGFKZ1NiVmo3ZjdqZ1RFdlZ1T3FL?=
+ =?utf-8?B?WUpnaVRoYUxzbjhNVDdVWHk4c2tIZmZwV0pMVW5ZdWNzWWYxQm5Kei9aREl3?=
+ =?utf-8?B?K2lnQXJ5WFlySVJNMXlXcENKQnhmajdKb05nbm40My9PRUR6VkdSRUN5dTdi?=
+ =?utf-8?B?cURveWlYNEVvVS83bVIvLzA3eFpUbHYzV1VjQ0JTZ0t6QmNZWloxNThDRXRS?=
+ =?utf-8?B?enFUcmxnbUphaStxaWJOSFUrbVhsNTVBRW5rRTFIRDYzYjdzTTJMcFM4bkoz?=
+ =?utf-8?B?Njc4RWF4Y0FaUWNERlgxT0N1aXhRWXg1ZjNjV0pCQlhSQ0IxTWxDTkdJRDU4?=
+ =?utf-8?B?SkJ1Rlh1bFNPSGlLUHYvQkZNYkpLcXZ1YkZGQlhrY3VhRDZLcGdQRitMWlQ2?=
+ =?utf-8?B?TkNyNktoZHJwV0RtVVVoMm0wT0drWHgzbjFBZUNhSHBEK05lWTFDVU1JNXhP?=
+ =?utf-8?B?Q0pyN1F3cU9FSElhdXdiRm92RTRqNkxJT01NNzJlbjI0RXd5Q0MvcWI5aTUy?=
+ =?utf-8?B?c0pQRjJzL3F3bVBtVnc3VVBud00ya2laWVVremx0MzNFaGpjQ2tOQWtxYUpy?=
+ =?utf-8?B?L2dZd1QvSkZjRVdSNU1qV3R0WUdaZHFmVDJHT1Nhd0Z5Tjc0U0I1QjFqKzA5?=
+ =?utf-8?B?NWRkUHVlZkowMi8yZjc1UGtZckFEQ0twT251eHFMeGQzNDQ5emNBc0pCT0Rp?=
+ =?utf-8?Q?+wDT+mTuFAecdgjEX6?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f5843db8-2292-4c6f-6373-08ded03b7106
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c09e6c39-0f20-4dd0-4963-08ded03ece1a
+X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jun 2026 08:51:25.3341
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jun 2026 09:15:29.8959
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MyQthcf0k8t8V1QPq+PMD5vm3w+cwazXpSklvIukCqaryCgt6VPENiHsqHAftsLd
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4365
+X-MS-Exchange-CrossTenant-UserPrincipalName: syJD8rfHr/lXYviUXg4X4A6Un8+CMKDrwPfqrdXP5XWqpAckNd23soWM1riohXxwnZmcay6fcY5L3oQqatzIrQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8690
 
-On 6/22/26 06:05, Kaitao Cheng wrote:
-> From: Kaitao Cheng <chengkaitao@kylinos.cn>
+
+On 6/21/2026 5:44 AM, Thomas Gleixner wrote:
+> On Fri, Jun 19 2026 at 18:51, Ashish Kalra wrote:
+>> On 6/19/2026 6:20 PM, Borislav Petkov wrote:
+>>> I'd let tglx maybe give a better idea but this cpu_hotplug_disable static var
+>>> in kernel/cpu.c could get a getter function and be used instead of you
+>>> reinventing the wheel in here.
+>>
+>> I don't follow — I'm not reinventing anything here. Patch 3 will use
+>> the existing CPU-hotplug callback interface: cpuhp_setup_state() with
+>> a down callback that returns -EBUSY to refuse the offline while SNP is
+>> active. That's the standard mechanism for conditionally preventing a
+>> CPU offline, and it keeps no private "hotplug disabled" state of its
+>> own — so there's nothing here for a getter on cpu_hotplug_disabled to
+>> replace.
 > 
-> The list_for_each*_safe() helpers are used when the loop body may
-> remove the current entry.  Their API exposes the temporary cursor at
-> every call site, even though most users only need it for the iterator
-> implementation and never reference it in the loop body.
+> That's not a standard mechanism. That's a hack as you have to start the
+> offlining operation in order to prevent something you already know.
 > 
-> Add *_mutable() variants for list and hlist iteration.  The new helpers
-> support both forms: callers may keep passing an explicit temporary cursor
-> when they need to inspect or reset it, or omit it and let the helper use
-> a unique internal cursor.
-
-That sounds like a bad idea to me. The macro should really be doing one job and that as best as it can.
-
-> This makes call sites that only mutate the list through the current entry
-> less noisy, while keeping the existing *_safe() helpers available for
-> compatibility.
-
-This can be perfectly used for code that which really needs the separate variable for the next entry.
-
-Regards,
-Christian.
-
-
+> The return code which prevents offlining is there for situations where
+> the subsystem/driver is momentarily in a state which cannot be
+> resolved.
 > 
-> Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
-> ---
->  include/linux/list.h | 269 +++++++++++++++++++++++++++++++++++++------
->  1 file changed, 231 insertions(+), 38 deletions(-)
+> That's a very different story than knowing that state at the point of
+> installing the callback already.
 > 
-> diff --git a/include/linux/list.h b/include/linux/list.h
-> index 09d979976b3b..1081def7cea9 100644
-> --- a/include/linux/list.h
-> +++ b/include/linux/list.h
-> @@ -7,6 +7,7 @@
->  #include <linux/stddef.h>
->  #include <linux/poison.h>
->  #include <linux/const.h>
-> +#include <linux/args.h>
->  
->  #include <asm/barrier.h>
->  
-> @@ -763,28 +764,72 @@ static inline void list_splice_tail_init(struct list_head *list,
->  #define list_for_each_prev(pos, head) \
->  	for (pos = (head)->prev; !list_is_head(pos, (head)); pos = pos->prev)
->  
-> -/**
-> - * list_for_each_safe - iterate over a list safe against removal of list entry
-> - * @pos:	the &struct list_head to use as a loop cursor.
-> - * @n:		another &struct list_head to use as temporary storage
-> - * @head:	the head for your list.
-> +/*
-> + * list_for_each_safe is an old interface, use list_for_each_mutable instead.
->   */
->  #define list_for_each_safe(pos, n, head) \
->  	for (pos = (head)->next, n = pos->next; \
->  	     !list_is_head(pos, (head)); \
->  	     pos = n, n = pos->next)
->  
-> +#define __list_for_each_mutable_internal(pos, tmp, head)		\
-> +	for (typeof(pos) tmp = (pos = (head)->next)->next;		\
-> +	     !list_is_head(pos, (head));				\
-> +	     pos = tmp, tmp = pos->next)
-> +
-> +#define __list_for_each_mutable1(pos, head)				\
-> +	__list_for_each_mutable_internal(pos, __UNIQUE_ID(next), head)
-> +
-> +#define __list_for_each_mutable2(pos, next, head)			\
-> +	list_for_each_safe(pos, next, head)
-> +
->  /**
-> - * list_for_each_prev_safe - iterate over a list backwards safe against removal of list entry
-> + * list_for_each_mutable - iterate over a list safe against entry removal
->   * @pos:	the &struct list_head to use as a loop cursor.
-> - * @n:		another &struct list_head to use as temporary storage
-> - * @head:	the head for your list.
-> + * @...:	either (head) or (next, head)
-> + *
-> + * next:	another &struct list_head to use as optional temporary storage.
-> + *		The temporary cursor is internal unless explicitly supplied by
-> + *		the caller.
-> + * head:	the head for your list.
-> + */
-> +#define list_for_each_mutable(pos, ...)					\
-> +	CONCATENATE(__list_for_each_mutable, COUNT_ARGS(__VA_ARGS__))	\
-> +		(pos, __VA_ARGS__)
-> +
-> +/*
-> + * list_for_each_prev_safe is an old interface, use list_for_each_prev_mutable instead.
->   */
->  #define list_for_each_prev_safe(pos, n, head) \
->  	for (pos = (head)->prev, n = pos->prev; \
->  	     !list_is_head(pos, (head)); \
->  	     pos = n, n = pos->prev)
->  
-> +#define __list_for_each_prev_mutable_internal(pos, tmp, head)		\
-> +	for (typeof(pos) tmp = (pos = (head)->prev)->prev;		\
-> +	     !list_is_head(pos, (head));				\
-> +	     pos = tmp, tmp = pos->prev)
-> +
-> +#define __list_for_each_prev_mutable1(pos, head)			\
-> +	__list_for_each_prev_mutable_internal(pos, __UNIQUE_ID(prev), head)
-> +
-> +#define __list_for_each_prev_mutable2(pos, prev, head)			\
-> +	list_for_each_prev_safe(pos, prev, head)
-> +
-> +/**
-> + * list_for_each_prev_mutable - iterate over a list backwards safe against entry removal
-> + * @pos:	the &struct list_head to use as a loop cursor.
-> + * @...:	either (head) or (prev, head)
-> + *
-> + * prev:	another &struct list_head to use as optional temporary storage.
-> + *		The temporary cursor is internal unless explicitly supplied by
-> + *		the caller.
-> + * head:	the head for your list.
-> + */
-> +#define list_for_each_prev_mutable(pos, ...)				\
-> +	CONCATENATE(__list_for_each_prev_mutable, COUNT_ARGS(__VA_ARGS__)) \
-> +		(pos, __VA_ARGS__)
-> +
->  /**
->   * list_count_nodes - count nodes in the list
->   * @head:	the head for your list.
-> @@ -895,12 +940,8 @@ static inline size_t list_count_nodes(struct list_head *head)
->  	for (; !list_entry_is_head(pos, head, member);			\
->  	     pos = list_prev_entry(pos, member))
->  
-> -/**
-> - * list_for_each_entry_safe - iterate over list of given type safe against removal of list entry
-> - * @pos:	the type * to use as a loop cursor.
-> - * @n:		another type * to use as temporary storage
-> - * @head:	the head for your list.
-> - * @member:	the name of the list_head within the struct.
-> +/*
-> + * list_for_each_entry_safe is an old interface, use list_for_each_entry_mutable instead.
->   */
->  #define list_for_each_entry_safe(pos, n, head, member)			\
->  	for (pos = list_first_entry(head, typeof(*pos), member),	\
-> @@ -908,15 +949,36 @@ static inline size_t list_count_nodes(struct list_head *head)
->  	     !list_entry_is_head(pos, head, member); 			\
->  	     pos = n, n = list_next_entry(n, member))
->  
-> +#define __list_for_each_entry_mutable_internal(pos, tmp, head, member)	\
-> +	for (typeof(pos) tmp = list_next_entry(pos =			\
-> +		list_first_entry(head, typeof(*pos), member), member);	\
-> +	     !list_entry_is_head(pos, head, member);			\
-> +	     pos = tmp, tmp = list_next_entry(tmp, member))
-> +
-> +#define __list_for_each_entry_mutable2(pos, head, member)		\
-> +	__list_for_each_entry_mutable_internal(pos, __UNIQUE_ID(next), head, member)
-> +
-> +#define __list_for_each_entry_mutable3(pos, next, head, member)		\
-> +	list_for_each_entry_safe(pos, next, head, member)
-> +
->  /**
-> - * list_for_each_entry_safe_continue - continue list iteration safe against removal
-> + * list_for_each_entry_mutable - iterate over a list safe against entry removal
->   * @pos:	the type * to use as a loop cursor.
-> - * @n:		another type * to use as temporary storage
-> - * @head:	the head for your list.
-> - * @member:	the name of the list_head within the struct.
-> + * @...:	either (head, member) or (next, head, member)
->   *
-> - * Iterate over list of given type, continuing after current point,
-> - * safe against removal of list entry.
-> + * next:	another type * to use as optional temporary storage. The
-> + *		temporary cursor is internal unless explicitly supplied by the
-> + *		caller.
-> + * head:	the head for your list.
-> + * member:	the name of the list_head within the struct.
-> + */
-> +#define list_for_each_entry_mutable(pos, ...)				\
-> +	CONCATENATE(__list_for_each_entry_mutable, COUNT_ARGS(__VA_ARGS__)) \
-> +		(pos, __VA_ARGS__)
-> +
-> +/*
-> + * list_for_each_entry_safe_continue is an old interface,
-> + * use list_for_each_entry_mutable_continue instead.
->   */
->  #define list_for_each_entry_safe_continue(pos, n, head, member) 		\
->  	for (pos = list_next_entry(pos, member), 				\
-> @@ -924,30 +986,79 @@ static inline size_t list_count_nodes(struct list_head *head)
->  	     !list_entry_is_head(pos, head, member);				\
->  	     pos = n, n = list_next_entry(n, member))
->  
-> +#define __list_for_each_entry_mutable_continue_internal(pos, tmp, head, member) \
-> +	for (typeof(pos) tmp = list_next_entry(pos =			\
-> +		list_next_entry(pos, member), member);			\
-> +	     !list_entry_is_head(pos, head, member);			\
-> +	     pos = tmp, tmp = list_next_entry(tmp, member))
-> +
-> +#define __list_for_each_entry_mutable_continue2(pos, head, member)	\
-> +	__list_for_each_entry_mutable_continue_internal(pos,		\
-> +		__UNIQUE_ID(next), head, member)
-> +
-> +#define __list_for_each_entry_mutable_continue3(pos, next, head, member) \
-> +	list_for_each_entry_safe_continue(pos, next, head, member)
-> +
->  /**
-> - * list_for_each_entry_safe_from - iterate over list from current point safe against removal
-> + * list_for_each_entry_mutable_continue - continue list iteration safe against removal
->   * @pos:	the type * to use as a loop cursor.
-> - * @n:		another type * to use as temporary storage
-> - * @head:	the head for your list.
-> - * @member:	the name of the list_head within the struct.
-> + * @...:	either (head, member) or (next, head, member)
->   *
-> - * Iterate over list of given type from current point, safe against
-> - * removal of list entry.
-> + * next:	another type * to use as optional temporary storage. The
-> + *		temporary cursor is internal unless explicitly supplied by the
-> + *		caller.
-> + * head:	the head for your list.
-> + * member:	the name of the list_head within the struct.
-> + *
-> + * Iterate over list of given type, continuing after current point,
-> + * safe against removal of list entry.
-> + */
-> +#define list_for_each_entry_mutable_continue(pos, ...)			\
-> +	CONCATENATE(__list_for_each_entry_mutable_continue,		\
-> +		COUNT_ARGS(__VA_ARGS__))(pos, __VA_ARGS__)
-> +
-> +/*
-> + * list_for_each_entry_safe_from is an old interface,
-> + * use list_for_each_entry_mutable_from instead.
->   */
->  #define list_for_each_entry_safe_from(pos, n, head, member) 			\
->  	for (n = list_next_entry(pos, member);					\
->  	     !list_entry_is_head(pos, head, member);				\
->  	     pos = n, n = list_next_entry(n, member))
->  
-> +#define __list_for_each_entry_mutable_from_internal(pos, tmp, head, member) \
-> +	for (typeof(pos) tmp = list_next_entry(pos, member);		\
-> +	     !list_entry_is_head(pos, head, member);			\
-> +	     pos = tmp, tmp = list_next_entry(tmp, member))
-> +
-> +#define __list_for_each_entry_mutable_from2(pos, head, member)		\
-> +	__list_for_each_entry_mutable_from_internal(pos,		\
-> +		__UNIQUE_ID(next), head, member)
-> +
-> +#define __list_for_each_entry_mutable_from3(pos, next, head, member)	\
-> +	list_for_each_entry_safe_from(pos, next, head, member)
-> +
->  /**
-> - * list_for_each_entry_safe_reverse - iterate backwards over list safe against removal
-> + * list_for_each_entry_mutable_from - iterate over list from current point safe against removal
->   * @pos:	the type * to use as a loop cursor.
-> - * @n:		another type * to use as temporary storage
-> - * @head:	the head for your list.
-> - * @member:	the name of the list_head within the struct.
-> + * @...:	either (head, member) or (next, head, member)
->   *
-> - * Iterate backwards over list of given type, safe against removal
-> - * of list entry.
-> + * next:	another type * to use as optional temporary storage. The
-> + *		temporary cursor is internal unless explicitly supplied by the
-> + *		caller.
-> + * head:	the head for your list.
-> + * member:	the name of the list_head within the struct.
-> + *
-> + * Iterate over list of given type from current point, safe against
-> + * removal of list entry.
-> + */
-> +#define list_for_each_entry_mutable_from(pos, ...)			\
-> +	CONCATENATE(__list_for_each_entry_mutable_from,			\
-> +		COUNT_ARGS(__VA_ARGS__))(pos, __VA_ARGS__)
-> +
-> +/*
-> + * list_for_each_entry_safe_reverse is an old interface,
-> + * use list_for_each_entry_mutable_reverse instead.
->   */
->  #define list_for_each_entry_safe_reverse(pos, n, head, member)		\
->  	for (pos = list_last_entry(head, typeof(*pos), member),		\
-> @@ -955,6 +1066,37 @@ static inline size_t list_count_nodes(struct list_head *head)
->  	     !list_entry_is_head(pos, head, member); 			\
->  	     pos = n, n = list_prev_entry(n, member))
->  
-> +#define __list_for_each_entry_mutable_reverse_internal(pos, tmp, head, member) \
-> +	for (typeof(pos) tmp = list_prev_entry(pos =			\
-> +		list_last_entry(head, typeof(*pos), member), member);	\
-> +	     !list_entry_is_head(pos, head, member);			\
-> +	     pos = tmp, tmp = list_prev_entry(tmp, member))
-> +
-> +#define __list_for_each_entry_mutable_reverse2(pos, head, member)	\
-> +	__list_for_each_entry_mutable_reverse_internal(pos,		\
-> +		__UNIQUE_ID(prev), head, member)
-> +
-> +#define __list_for_each_entry_mutable_reverse3(pos, prev, head, member)	\
-> +	list_for_each_entry_safe_reverse(pos, prev, head, member)
-> +
-> +/**
-> + * list_for_each_entry_mutable_reverse - iterate backwards over list safe against removal
-> + * @pos:	the type * to use as a loop cursor.
-> + * @...:	either (head, member) or (prev, head, member)
-> + *
-> + * prev:	another type * to use as optional temporary storage. The
-> + *		temporary cursor is internal unless explicitly supplied by the
-> + *		caller.
-> + * head:	the head for your list.
-> + * member:	the name of the list_head within the struct.
-> + *
-> + * Iterate backwards over list of given type, safe against removal
-> + * of list entry.
-> + */
-> +#define list_for_each_entry_mutable_reverse(pos, ...)			\
-> +	CONCATENATE(__list_for_each_entry_mutable_reverse,		\
-> +		COUNT_ARGS(__VA_ARGS__))(pos, __VA_ARGS__)
-> +
->  /**
->   * list_safe_reset_next - reset a stale list_for_each_entry_safe loop
->   * @pos:	the loop cursor used in the list_for_each_entry_safe loop
-> @@ -1189,6 +1331,31 @@ static inline void hlist_splice_init(struct hlist_head *from,
->  	for (pos = (head)->first; pos && ({ n = pos->next; 1; }); \
->  	     pos = n)
->  
-> +#define __hlist_for_each_mutable_internal(pos, tmp, head)		\
-> +	for (typeof(pos) tmp = (pos = (head)->first) ? pos->next : NULL; \
-> +	     pos;							\
-> +	     pos = tmp, tmp = pos ? pos->next : NULL)
-> +
-> +#define __hlist_for_each_mutable1(pos, head)				\
-> +	__hlist_for_each_mutable_internal(pos, __UNIQUE_ID(next), head)
-> +
-> +#define __hlist_for_each_mutable2(pos, next, head)			\
-> +	hlist_for_each_safe(pos, next, head)
-> +
-> +/**
-> + * hlist_for_each_mutable - iterate over a hlist safe against entry removal
-> + * @pos:	the &struct hlist_node to use as a loop cursor.
-> + * @...:	either (head) or (next, head)
-> + *
-> + * next:	another &struct hlist_node to use as optional temporary storage.
-> + *		The temporary cursor is internal unless explicitly supplied by
-> + *		the caller.
-> + * head:	the head for your hlist.
-> + */
-> +#define hlist_for_each_mutable(pos, ...)				\
-> +	CONCATENATE(__hlist_for_each_mutable, COUNT_ARGS(__VA_ARGS__))	\
-> +		(pos, __VA_ARGS__)
-> +
->  #define hlist_entry_safe(ptr, type, member) \
->  	({ typeof(ptr) ____ptr = (ptr); \
->  	   ____ptr ? hlist_entry(____ptr, type, member) : NULL; \
-> @@ -1224,18 +1391,44 @@ static inline void hlist_splice_init(struct hlist_head *from,
->  	for (; pos;							\
->  	     pos = hlist_entry_safe((pos)->member.next, typeof(*(pos)), member))
->  
-> -/**
-> - * hlist_for_each_entry_safe - iterate over list of given type safe against removal of list entry
-> - * @pos:	the type * to use as a loop cursor.
-> - * @n:		a &struct hlist_node to use as temporary storage
-> - * @head:	the head for your list.
-> - * @member:	the name of the hlist_node within the struct.
-> +/*
-> + * hlist_for_each_entry_safe is an old interface, use hlist_for_each_entry_mutable instead.
->   */
->  #define hlist_for_each_entry_safe(pos, n, head, member) 		\
->  	for (pos = hlist_entry_safe((head)->first, typeof(*pos), member);\
->  	     pos && ({ n = pos->member.next; 1; });			\
->  	     pos = hlist_entry_safe(n, typeof(*pos), member))
->  
-> +#define __hlist_for_each_entry_mutable_internal(pos, tmp, head, member)	\
-> +	for (struct hlist_node *tmp = (pos =				\
-> +		hlist_entry_safe((head)->first, typeof(*pos), member)) ? \
-> +		pos->member.next : NULL;				\
-> +	     pos;							\
-> +	     pos = hlist_entry_safe((tmp), typeof(*pos), member),	\
-> +		tmp = pos ? pos->member.next : NULL)
-> +
-> +#define __hlist_for_each_entry_mutable2(pos, head, member)		\
-> +	__hlist_for_each_entry_mutable_internal(pos,			\
-> +		__UNIQUE_ID(next), head, member)
-> +
-> +#define __hlist_for_each_entry_mutable3(pos, next, head, member)	\
-> +	hlist_for_each_entry_safe(pos, next, head, member)
-> +
-> +/**
-> + * hlist_for_each_entry_mutable - iterate over hlist safe against entry removal
-> + * @pos:	the type * to use as a loop cursor.
-> + * @...:	either (head, member) or (next, head, member)
-> + *
-> + * next:	a &struct hlist_node to use as optional temporary storage. The
-> + *		temporary cursor is internal unless explicitly supplied by the
-> + *		caller.
-> + * head:	the head for your hlist.
-> + * member:	the name of the hlist_node within the struct.
-> + */
-> +#define hlist_for_each_entry_mutable(pos, ...)				\
-> +	CONCATENATE(__hlist_for_each_entry_mutable,			\
-> +		COUNT_ARGS(__VA_ARGS__))(pos, __VA_ARGS__)
-> +
->  /**
->   * hlist_count_nodes - count nodes in the hlist
->   * @head:	the head for your hlist.
 
+Sure.
+
+>> I chose the cpuhp callback specifically over
+>> cpu_hotplug_disable_offlining(): the callback can be torn down with
+>> cpuhp_remove_state() when SNP is fully shut down, which re-enables CPU
+>> offlining. cpu_hotplug_disable_offlining() sets
+>> cpu_hotplug_offline_disabled, which is __ro_after_init and one-way —
+>> there's no interface to clear it, and adding one would mean dropping
+>> the __ro_after_init marking and a new core "re-enable offlining"
+>> API. So that route can't re-enable offlining on SNP shutdown without
+>> new core plumbing, whereas the cpuhp callback gives me that for free.
+> 
+> That's exactly the wrong attitude. Hack around a core limitation in a
+> random driver by abusing the provided mechanism instead of sitting down
+> and doing the extra five lines of code which makes it entirely clear
+> what's going on.
+> 
+> When Boris asked me how to disable hotplug, I had the impression that
+> this is about permanently preventing it. So I pointed him to
+> cpu_hotplug_disable_offlining().
+> 
+> If I had known that it's about temporary prevention during runtime of
+> something, then I'd pointed him to cpu_hotplug_disable()/enable() which
+> is five lines farther down in cpu.c. It's not rocket science to find
+> them. The first AI chatbot I asked pointed me to it immediately.
+> 
+> cpu_hotplug_disable()/enable() is _the_ standard mechanism to prevent
+> hotplug operations temporarily. They return -EBUSY without invoking any
+> callback or changing any related state.
+> 
+
+This is the interface i have been using, in fact this current patch (v8) is based
+on cpu_hotplug_disable()/enable(), but then this thread started from review feedback
+on the v8 patch using cpu_hotplug_disable()/enable() that it looks like a hack — 
+the concern being that cpu_hotplug_disable() reads as a temporary lock rather than a
+way to enforce a basically-permanent system state.
+
+That's what led me to look at cpu_hotplug_disable_offlining() and a cpuhp down-callback
+as alternatives.
+
+Your point that cpu_hotplug_disable()/enable() is the standard mechanism to prevent hotplug
+operations temporarily settles it, and the disable/enable pair being reversible is exactly
+what's wanted here: it's undone when SNP is fully shut down, so it isn't actually permanent
+(unlike cpu_hotplug_disable_offlining(), which is one-way). So I'll stay with 
+cpu_hotplug_disable()/enable() and drop the alternatives.
+
+Thanks,
+Ashish
+
+> So what's exactly the new core plumbing you need?
+> 
+> Thanks,
+> 
+>         tglx
+> 
