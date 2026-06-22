@@ -1,120 +1,146 @@
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 806D629D270;
-	Mon, 22 Jun 2026 14:45:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A11A30F958;
+	Mon, 22 Jun 2026 14:56:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782139559; cv=none; b=DeKOF13+8pDFOVXPeU1GC43C8Ig/fxVXDL/lRSTgzi4bY1LdIXxxrdbbQY14/B+dVEkBzagV/Z+AkMRVw/jkWDJ9Qb0LGfuNKbBO4jpGCpw9djDRYhi7pqu4VySDgh5RpLU9bcJJ8RInRz9hzXwRH2XKaj43uU1hZBDtBZMVFKI=
+	t=1782140177; cv=none; b=IyQYUi+cFAz+xGa0SnY49FlBZL4pORWR/nHP1HspeL0+Dn2gGPRcCo8yD70jeHltigNGVkP2zL5Hxwe8Hf3Mmg18w3HQ0WQ26eDa2ROyUNSOAhNkaD5s8LD0Q/IA7xp0kBh6kiQgR4YrVbMDrYg3MnYzJtJT7DbGfrRzZlhZK8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782139559; c=relaxed/simple;
-	bh=seEuGJQPHl7cpUghtZ7WZ3R5gvpd1kZRcayw8AKhYjk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oDpcaG+4mbeWthi/o3l8Biy+U51v8MVH0r5WHErz3IfoSoqO3Z3ZT/VaHV+/FrOMAJN5SGHsegfaGDXpdt2dQbhEE6CA9cysvJglD9GZjdfqSDBsCUklwxad9GdeEUFcIjnCcU8krtzLdL/jjoVkr85RDq35FneKjW142OFTLt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [117.182.74.238])
-	by APP-01 (Coremail) with SMTP id qwCowAB3GtObSjlq8snAAg--.26626S2;
-	Mon, 22 Jun 2026 22:45:49 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: Ayush Sawal <ayush.sawal@chelsio.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wentao Liang <vulab@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH v2] crypto: chcr - fix inflight counter leaks in multiple paths
-Date: Mon, 22 Jun 2026 22:45:44 +0800
-Message-Id: <20260622144544.47023-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	s=arc-20240116; t=1782140177; c=relaxed/simple;
+	bh=Q8cnKTr5Gh+ig4y7XghOSKCucx5F1OW3eLFRGxBdlLc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aoeq5pXBe8kX9Y3h8Wzoe7lK+VSWP49Pkch9HkybfHy588+cktmCvgfDYQ/YefvWC5PKm3c+gPWZtbMnCLNAbQG4g8tBpjAqu+ZvzEvXdoS66lnb50bzWrB3ZiGlgpvgyMeSc/lgvjb9jZEfOVnYBILBh36OEIJSVAvA6NtNw/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IihDIC4+; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IihDIC4+"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 6047D1F000E9;
+	Mon, 22 Jun 2026 14:56:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782140175;
+	bh=7+xd5/DgJYlCExSOQuRhC1KD3huRFMoCoOulZj4XDjQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=IihDIC4++KdDUXuTnvp5AEW5NknSpDvcZJHhB587L6oJB9fmkKd4xlUKTS5au+gm2
+	 sD32z5LLUzXrXh6gc0r7e7gcJ9O7L91SOtGB44LTdqF9JB7eYhFkeOcQb38bFglbb7
+	 hGk6uyRl8XmkAf3AvxTKId6MetM23KPxRougzaxE41CiDdBXGZIgGwh45zU0KelZPI
+	 KDmkCup23wast1juNCETYR388CwcGs7i4qKj8P/AlHSA79HVvCY0dtOtdjxSRZERxS
+	 vIwxAla9uLbxdsFvosKOEcm5kRj2Kn11V1EIKKlt0zaFngdM1nLbitG9+XIE0axonE
+	 e7+GSSMd5bbfA==
+Date: Mon, 22 Jun 2026 17:56:11 +0300
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Weiming Shi <bestswngs@gmail.com>, David Howells <dhowells@redhat.com>,
+	Lukas Wunner <lukas@wunner.de>, Ignat Korchagin <ignat@linux.win>,
+	"David S . Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org, Xiang Mei <xmei5@asu.edu>
+Subject: Re: [PATCH v2] asymmetric_keys: check asymmetric_key_ids() for NULL
+ before dereference
+Message-ID: <ajlNCxltXkuWfIw-@kernel.org>
+References: <20260502163328.696098-2-bestswngs@gmail.com>
+ <aji3B9a72VEAOu03@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowAB3GtObSjlq8snAAg--.26626S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7tFWUAw15urWDWw43Ar1DWrg_yoW8KrWDpF
-	s8CrZYyryrXr17GF9Yyw1rWa43X3y29FWakrW5ta40vwsYq3ykXFsFvF1jvF1rJFWrJ3yU
-	X3yqqF1rZa4DGaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkl14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v26r12
-	6r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
-	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y
-	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
-	WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
-	IxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUbSfO7UUUU
-	U==
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiCREGA2o5I0xq6AABsi
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aji3B9a72VEAOu03@gondor.apana.org.au>
 
-In multiple functions, dev->inflight is incremented via atomic_inc()
-before submitting operations. If subsequent calls fail, the functions
-return without decrementing the counter, causing it to drift and
-potentially stalling future operations that rely on the counter
-reaching zero.
+On Mon, Jun 22, 2026 at 12:16:07PM +0800, Herbert Xu wrote:
+> On Sat, May 02, 2026 at 09:33:29AM -0700, Weiming Shi wrote:
+> >
+> > diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric_keys/asymmetric_type.c
+> > index 16a7ae16593c..22f04656d529 100644
+> > --- a/crypto/asymmetric_keys/asymmetric_type.c
+> > +++ b/crypto/asymmetric_keys/asymmetric_type.c
+> > @@ -109,6 +109,8 @@ struct key *find_asymmetric_key(struct key *keyring,
+> >  	if (id_0 && id_1) {
+> >  		const struct asymmetric_key_ids *kids = asymmetric_key_ids(key);
+> >  
+> > +		if (!kids)
+> > +			goto reject;
+> 
+> This check is actually unnecessary because we've already matched
+> the key against the kid so it must be present.
+> 
+> I'd get rid of this check or perhaps add a comment instead.
 
-Fix the following functions with missing decrement on error paths:
-- chcr_aes_encrypt()
-- chcr_aes_decrypt()
-- chcr_aead_op()
++1
 
-For chcr_aes_encrypt() and chcr_aes_decrypt(), use a common error
-label to decrement the counter. For chcr_aead_op(), use the existing
-chcr_dec_wrcount() helper on the invalid assoclen error path.
+> 
+> >  		if (!kids->id[1]) {
+> >  			pr_debug("First ID matches, but second is missing\n");
+> >  			goto reject;
+> > diff --git a/crypto/asymmetric_keys/restrict.c b/crypto/asymmetric_keys/restrict.c
+> > index 86292965f493..ccf1084f720e 100644
+> > --- a/crypto/asymmetric_keys/restrict.c
+> > +++ b/crypto/asymmetric_keys/restrict.c
+> > @@ -243,10 +243,14 @@ static int key_or_keyring_common(struct key *dest_keyring,
+> >  			if (IS_ERR(key))
+> >  				key = NULL;
+> >  		} else if (trusted->type == &key_type_asymmetric) {
+> > +			const struct asymmetric_key_ids *kids;
+> >  			const struct asymmetric_key_id **signer_ids;
+> >  
+> > -			signer_ids = (const struct asymmetric_key_id **)
+> > -				asymmetric_key_ids(trusted)->id;
+> > +			kids = asymmetric_key_ids(trusted);
+> > +			if (!kids)
+> > +				goto skip_trusted;
+> 
+> Yes this is definitely buggy.
+> 
+> I think it was introduced by these two commits:
+> 
+> commit 3c58b2362ba828ee2970c66c6a6fd7b04fde4413
+> Author: David Howells <dhowells@redhat.com>
+> Date:   Tue Oct 9 17:47:46 2018 +0100
+> 
+>     KEYS: Implement PKCS#8 RSA Private Key parser [ver #2]
+> 
+> and
+> 
+> commit 7e3c4d22083f6e7316c5229b6197ca2d5335aa35
+> Author: Mat Martineau <martineau@kernel.org>
+> Date:   Mon Jun 27 16:45:16 2016 -0700
+> 
+>     KEYS: Restrict asymmetric key linkage using a specific keychain
+> 
+> So the Fixes header should point to them.
 
-Cc: stable@vger.kernel.org
-Fixes: b8fd1f4170e7 ("crypto: chcr - Add ctr mode and process large sg entries for cipher")
-Fixes: d91a3159e8d9 ("Crypto/chcr: fix gcm-aes and rfc4106-gcm failed tests")
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
----
- drivers/crypto/chelsio/chcr_algo.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
++1
 
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index 6dec42282768..b69cd46193d0 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -1359,7 +1359,7 @@ static int chcr_aes_encrypt(struct skcipher_request *req)
- 	err = process_cipher(req, u_ctx->lldi.rxq_ids[reqctx->rxqidx],
- 			     &skb, CHCR_ENCRYPT_OP);
- 	if (err || !skb)
--		return  err;
-+		goto error;
- 	skb->dev = u_ctx->lldi.ports[0];
- 	set_wr_txq(skb, CPL_PRIORITY_DATA, reqctx->txqidx);
- 	chcr_send_wr(skb);
-@@ -1402,11 +1402,15 @@ static int chcr_aes_decrypt(struct skcipher_request *req)
- 	err = process_cipher(req, u_ctx->lldi.rxq_ids[reqctx->rxqidx],
- 			     &skb, CHCR_DECRYPT_OP);
- 	if (err || !skb)
--		return err;
-+		goto error;
- 	skb->dev = u_ctx->lldi.ports[0];
- 	set_wr_txq(skb, CPL_PRIORITY_DATA, reqctx->txqidx);
- 	chcr_send_wr(skb);
- 	return -EINPROGRESS;
-+
-+error:
-+	chcr_dec_wrcount(dev);
-+	return err;
- }
- static int chcr_device_init(struct chcr_context *ctx)
- {
-@@ -3636,6 +3640,7 @@ static int chcr_aead_op(struct aead_request *req,
- 	    crypto_ipsec_check_assoclen(req->assoclen) != 0) {
- 		pr_err("RFC4106: Invalid value of assoclen %d\n",
- 		       req->assoclen);
-+		chcr_dec_wrcount(cdev);
- 		return -EINVAL;
- 	}
- 
--- 
-2.39.5 (Apple Git-154)
+> 
+> > @@ -290,6 +294,7 @@ static int key_or_keyring_common(struct key *dest_keyring,
+> >  		}
+> >  	}
+> >  
+> > +skip_trusted:
+> >  	if (check_dest && !key) {
+> >  		/* See if the destination has a key that signed this one. */
+> >  		key = find_asymmetric_key(dest_keyring, sig->auth_ids[0],
+> 
+> I'm not sure continuing here is a good idea.  Having a private key
+> here makes no sense whatsoever and we should just bail out right
+> away.
+> 
+> I would recommend returning an error of some sort if kids is NULL.
+> 
+> David/Lukas/Ignat, any opinions?
+
+I think with a quick skim that you are right. I'll work on this area
+for the next version.
+
+> 
+> Thanks,
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+Thanks for the review!
+
+BR, Jarkko
 
