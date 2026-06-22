@@ -1,150 +1,106 @@
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94330244675;
-	Mon, 22 Jun 2026 15:19:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66C3933EAF9;
+	Mon, 22 Jun 2026 18:19:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782141564; cv=none; b=IISZMAFZdLt/7UbF68SZANnmo06GUJz4983jdVxpOhJfhkQsmLyVaq7PTbiEWsCzlhdE0qC5jLiGB+U9NnKkueQjs/4shbKqpA2A/g4Rf/8WXNezeRTf6p1q21XvvxSDUI9A5BT5LotN9hjDG+UfOiZJHOMNz5vbf0dckqpBDMc=
+	t=1782152353; cv=none; b=EQXkeN3onOy9/fldx1D6yD7Ghq8bMXuvPyvBJcrw6EfweuyqhQte+iwb9hcqWkLn/h5/dcclFRX0DKDEjgNnajtr0k0kvOqhy7ogJ8YQCbKw5tiboy1Y3ZF9M7YkM9u72nqGH03KAqXt7tRSEjUcCgGk1Ri1yJQZnd4a6cCC3+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782141564; c=relaxed/simple;
-	bh=iBwmvKevVolFhLql59YnzV3ie1X7obFkzvuuRhqWefs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=I7RpQlK4ZhGCEQjJAGhlDFqF8VBXz4Fl0bMUWViBDv21YGBhev8XnhxG1A6xFuVCf3o0UvkvTytdBjE9vPRdeMWdzIbvr8ALXOAm7LXYUlAEPOYNk3bPU2QnOPGN7mpZqhZYZZ0yrqf0cjMpLRUsFDSJou5T0Cv2GDxliZYtFEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [117.182.74.238])
-	by APP-01 (Coremail) with SMTP id qwCowACXO9RwUjlqCILBAg--.27065S2;
-	Mon, 22 Jun 2026 23:19:14 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: Ayush Sawal <ayush.sawal@chelsio.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wentao Liang <vulab@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH v3] Fix multiple issues in chcr driver:
-Date: Mon, 22 Jun 2026 23:19:10 +0800
-Message-Id: <20260622151910.49402-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	s=arc-20240116; t=1782152353; c=relaxed/simple;
+	bh=aKPfzKSh4kE5bd0323tvQMZuR4CGMJhZvfCO//1dm0k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oomhXPD5hBMTzyl6BYtrupE0mXfzVTz7jorrTJnhhYJ0fc+UlebG1Ec6B2AaajwTbVsh9btEFeiYXhzd3z07b6ZtvQ5WiMDgbuHW7r3WXESrbL19WMgVUO8d3M7+ioDlMmQ6vggFPVZdhkMjeDmm05mRU40467JOVf6j74UQ8vM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W/QrQ8Gs; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W/QrQ8Gs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D82D1F000E9;
+	Mon, 22 Jun 2026 18:19:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782152351;
+	bh=XKlqJDn41xHqxzBssntuIwLv2qXiV/8MEgFKl/31tuA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=W/QrQ8GsogW7QyIXylJn27vxjfhXkXzLQahuKRQQthlkDvW6mIkGRGFoQ3mHpnOnl
+	 8pFOXS8rAz6Jrdna6Qq63quSFnPeujpT2upF4iIggQQzxNQI+4WstblsTliuE06/qc
+	 JX1JWmRjRYM04WCNoQ6KG1nkuD8+1QNZVKGWaugrzWjklmz1z22Je/LyjALcT4QCUr
+	 Pz9PlT7YLynMWhP56ut9YH2jYvUTpBknBf38PhpAQ79ppC8mHtlUERsmrGQO0b+cYD
+	 MavyY5UKyd3nqs0WZMYVxHixpTJhwL19J36iDFNmuT27gjIU6lyx9iWpEer3nu6+21
+	 iZqorFo426LSg==
+Date: Mon, 22 Jun 2026 18:19:09 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: Bartosz Golaszewski <brgl@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Vinod Koul <vkoul@kernel.org>,
+	Thara Gopinath <thara.gopinath@gmail.com>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Frank Li <Frank.Li@kernel.org>, Andy Gross <agross@kernel.org>,
+	Harshal Dev <harshal.dev@oss.qualcomm.com>,
+	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	dmaengine@vger.kernel.org,
+	Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
+Subject: Re: [PATCH 0/5] Shikra: Add DT support for ice, rng and qce
+Message-ID: <20260622181909.GA1250822@google.com>
+References: <20260521-shikra_crypto_changse-v1-0-0154cc9cc0de@oss.qualcomm.com>
+ <53b1fa61-9692-42fd-a295-98bbeacbcd9a@oss.qualcomm.com>
+ <20260619164506.GA3223@sol>
+ <CAMRc=MdJJRPBeNtAUr82b4zv7vLjrRQ76Q3bJHQYEigaE2Hqog@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowACXO9RwUjlqCILBAg--.27065S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxZr1xKFWDJw1rury8Ww15Arb_yoW5uF1rpF
-	s8CFZayryrJr17GF92yws5Wa43A3y3uF43CrWFya40vwsYqrykXaykZF1jvF1fGFWrG3yU
-	ZwsrXa1fCa4UG37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkl14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v26r12
-	6r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
-	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y
-	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
-	WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
-	IxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUjJ73PUUUU
-	U==
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiCQ4GA2o5I0xylAABsZ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMRc=MdJJRPBeNtAUr82b4zv7vLjrRQ76Q3bJHQYEigaE2Hqog@mail.gmail.com>
 
-1. In chcr_ahash_final() and chcr_ahash_digest(), chcr_send_wr()
-   return value is not checked. If it fails, DMA buffers are not
-   unmapped, causing leaks.
+On Mon, Jun 22, 2026 at 04:25:12AM -0400, Bartosz Golaszewski wrote:
+> On Fri, 19 Jun 2026 18:45:06 +0200, Eric Biggers <ebiggers@kernel.org> said:
+> > On Fri, Jun 19, 2026 at 02:13:28PM +0530, Kuldeep Singh wrote:
+> >> On 21-05-2026 18:47, Kuldeep Singh wrote:
+> >> > This patchseries attempt to enable sdhc-ice, rng and qce on shikra
+> >> > platform similar to other platforms.
+> >> >
+> >> > Previously, the 3 dt-bindigs/DT changes were sent as individual series
+> >> > and with feedback received, clubbed them together as all belong to same
+> >> > crypto subsystem.
+> >> >
+> >> > Here's link to old patchsets.
+> >> > QCE: https://lore.kernel.org/lkml/20260515-shikra_qcrypto-v1-0-80f07b345c29@oss.qualcomm.com/
+> >>
+> >> Hi Eric,
+> >>
+> >> As selftests issues for QCE are now fixed[1], so shikra series should be
+> >> good to proceed? as your concerns[2] are now addressed.
+> >> I am waiting for merge window to end and will send next rev post that.
+> >>
+> >> [1]
+> >> https://lore.kernel.org/linux-arm-msm/20260617-qce-fix-self-tests-v3-0-ecc2b4dedcfd@oss.qualcomm.com/
+> >> [2] https://lore.kernel.org/lkml/20260522024912.GC5937@quark/
+> >
+> > If you think that then it sounds like you need to read what I actually
+> > said.  The fixes are appreciated but don't change the big picture.
+> >
+> > - Eric
+> >
+> 
+> Eric,
+> 
+> I mentioned it in another thread[1]. This series is not adding any new features
+> to the QCE driver, it describes the hardware. The SoC *does have* this IP and
+> no matter the state of the support in the kernel, there's nothing wrong in
+> extending the existing bindings and adding new dts nodes.
+> 
+> Thanks,
+> Bartosz
 
-2. In chcr_aead_op(), the inflight counter is not decremented when
-   assoclen validation fails.
+It enables the driver on a new platform.  So it very much has a real
+effect.  It's not just adding a hardware description without a user.
 
-Fix by:
-- Adding error handling for chcr_send_wr() with goto unmap
-- Adding chcr_dec_wrcount() on the assoclen error path
-
-Fix the following functions with missing decrement on error paths:
-- chcr_aes_encrypt()
-- chcr_aes_decrypt()
-- chcr_aead_op()
-
-For chcr_aes_encrypt() and chcr_aes_decrypt(), use a common error
-label to decrement the counter. For chcr_aead_op(), use the existing
-chcr_dec_wrcount() helper on the invalid assoclen error path.
-
-Cc: stable@vger.kernel.org
-Fixes: b8fd1f4170e7 ("crypto: chcr - Add ctr mode and process large sg entries for cipher")
-Fixes: d91a3159e8d9 ("Crypto/chcr: fix gcm-aes and rfc4106-gcm failed tests")
-Fixes: 324429d74127 ("chcr: Support for Chelsio's Crypto Hardware")
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
----
- drivers/crypto/chelsio/chcr_algo.c | 19 +++++++++++++++----
- 1 file changed, 15 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index 6dec42282768..e431e8c1fdbd 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -1359,7 +1359,7 @@ static int chcr_aes_encrypt(struct skcipher_request *req)
- 	err = process_cipher(req, u_ctx->lldi.rxq_ids[reqctx->rxqidx],
- 			     &skb, CHCR_ENCRYPT_OP);
- 	if (err || !skb)
--		return  err;
-+		goto error;
- 	skb->dev = u_ctx->lldi.ports[0];
- 	set_wr_txq(skb, CPL_PRIORITY_DATA, reqctx->txqidx);
- 	chcr_send_wr(skb);
-@@ -1402,11 +1402,15 @@ static int chcr_aes_decrypt(struct skcipher_request *req)
- 	err = process_cipher(req, u_ctx->lldi.rxq_ids[reqctx->rxqidx],
- 			     &skb, CHCR_DECRYPT_OP);
- 	if (err || !skb)
--		return err;
-+		goto error;
- 	skb->dev = u_ctx->lldi.ports[0];
- 	set_wr_txq(skb, CPL_PRIORITY_DATA, reqctx->txqidx);
- 	chcr_send_wr(skb);
- 	return -EINPROGRESS;
-+
-+error:
-+	chcr_dec_wrcount(dev);
-+	return err;
- }
- static int chcr_device_init(struct chcr_context *ctx)
- {
-@@ -1877,7 +1881,10 @@ static int chcr_ahash_finup(struct ahash_request *req)
- 	req_ctx->hctx_wr.processed += params.sg_len;
- 	skb->dev = u_ctx->lldi.ports[0];
- 	set_wr_txq(skb, CPL_PRIORITY_DATA, req_ctx->txqidx);
--	chcr_send_wr(skb);
-+	if (chcr_send_wr(skb)) {
-+		error = -EIO;
-+		goto unmap;
-+	}
- 	return -EINPROGRESS;
- unmap:
- 	chcr_hash_dma_unmap(&u_ctx->lldi.pdev->dev, req);
-@@ -1978,7 +1985,10 @@ static int chcr_ahash_digest(struct ahash_request *req)
- 	req_ctx->hctx_wr.processed += params.sg_len;
- 	skb->dev = u_ctx->lldi.ports[0];
- 	set_wr_txq(skb, CPL_PRIORITY_DATA, req_ctx->txqidx);
--	chcr_send_wr(skb);
-+	if (chcr_send_wr(skb)) {
-+		error = -EIO;
-+		goto unmap;
-+	}
- 	return -EINPROGRESS;
- unmap:
- 	chcr_hash_dma_unmap(&u_ctx->lldi.pdev->dev, req);
-@@ -3636,6 +3646,7 @@ static int chcr_aead_op(struct aead_request *req,
- 	    crypto_ipsec_check_assoclen(req->assoclen) != 0) {
- 		pr_err("RFC4106: Invalid value of assoclen %d\n",
- 		       req->assoclen);
-+		chcr_dec_wrcount(cdev);
- 		return -EINVAL;
- 	}
- 
--- 
-2.39.5 (Apple Git-154)
-
+- Eric
