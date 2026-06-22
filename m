@@ -1,150 +1,190 @@
-Received: from mail-dy1-f171.google.com (mail-dy1-f171.google.com [74.125.82.171])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13288347BC1
-	for <linux-crypto@vger.kernel.org>; Mon, 22 Jun 2026 19:03:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C311834B68C
+	for <linux-crypto@vger.kernel.org>; Mon, 22 Jun 2026 20:21:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782155035; cv=none; b=O+kQ3XPhLk/f+9mLurHsXwR+wDY0A4MP5CJ+z+SUe6HLCITtURq3idvf+czMEG9EHlPhd12Y9/9aUkdBAlFTBWW19S9hFz+PrD+7GyBXJg1vrCDPSTjyOVW80EHGv5AyRi1vdKxVt95BBohEbUasT6cR/JcL97OBEKuWwZuQJmE=
+	t=1782159681; cv=none; b=pLlBsCirZnP/oQxlaKtmm2YDQpw4HX3EMIkG+1ELD3XARBtz+1FWGG36WJZoW5Vl6J6e8kFsvOK3po4nGEke46FTOr6DjsltwzqmHcxocdg5tWZduQCbyYwH2pt7XBATai6OZzagcrdd3WwIdZsdv99P3hDabi2VgNypRDg931k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782155035; c=relaxed/simple;
-	bh=uM6rjwv+rWrcNEl8KjTKnVcDSG3oUNpsPUMqnFOcLeE=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=F8XfVL0JZ538CgPlZZ6gTwgXnmVB9ai4mZT3t1gMO6BPYUtw2388vIUWmpZznH1Dj0dJogIn7puvJzwM7ArdqI14JFbleRUG40v5PtlDBJDSbFM/mh/AiYWjjSf/czbsoV88jOVeZmoTT46RlJfsfymDWqgeShcCXivAPi2Q/gA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LFiZE21b; arc=none smtp.client-ip=74.125.82.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1782159681; c=relaxed/simple;
+	bh=nnx1Bky1wAIRaB3zi2foM2fegfU+yLHj+NalW3CIDc0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hq9ymS95+qDDKWBTGq2Ca6Fyh/rBIZ4fMUUNeOWqvgrvRUkQNd0t01j3iKeSmrLu3ou2QjY5VXTwuQ2dL3PExEBTwMm5VFsRGkq57Oup3NBU4hdux3LeCtMLRY6dWL7oV5g6lAa+tL/i1hHnaAbrxrnMUE0y95DPpBmeKxr1PC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.win; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.win
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LFiZE21b"
-Received: by mail-dy1-f171.google.com with SMTP id 5a478bee46e88-3042a388168so186237eec.1
-        for <linux-crypto@vger.kernel.org>; Mon, 22 Jun 2026 12:03:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782155033; x=1782759833; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=uM6rjwv+rWrcNEl8KjTKnVcDSG3oUNpsPUMqnFOcLeE=;
-        b=LFiZE21bJOd27mvhUeQY65zQorGfroSNylZhnl5pr3qjxqG/eN1p6cReYMi7Y8XHb0
-         7P2yUKScTc7SL9KBMwdl8WT1nEKnGZf9ur45NKJJuEmRNsVr4TarSwghnJCBC39U5FT/
-         hbLMbAuZB7Uhid7P768tqQ5oB5rNa0UgEghjqL8I6E/OiecFdkW7XXJUCVzAvM2Bcvqj
-         aAAg70ofC8G+A3+uW7Vx2nk3e0tc12ATFJvEbWA6+4EjPe4CrUqJXP2Emg2HT57KZ67b
-         LsX6aiKqdjYFThFXLMKvM5eHENHiOf+kS4D8rdkQabgcObx3aWN/R9FVWrU0LGgqTlRe
-         mYGw==
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-697ad7f663cso2439222a12.1
+        for <linux-crypto@vger.kernel.org>; Mon, 22 Jun 2026 13:21:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782155033; x=1782759833;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uM6rjwv+rWrcNEl8KjTKnVcDSG3oUNpsPUMqnFOcLeE=;
-        b=TTl1Gn8d5O5tmyI98sUcdthOuMyUdf2iAgEWsPMY+LTnl5zSzLnyl7oBBnHUKPN+M1
-         9EowYDcVDHkm5md1kfcrFt3nDoFGbxqcJ1qRwrDSwu/8l9sUEVehJpMoo0rS562L30lG
-         dCD711Zn1kzYmsiMmO4CZac+hDfoF9aYpQm4Mj9t00EZXZwa/M2jLDcvowAyirPfkx2O
-         VHP6g0W/wsp/iE5PVwExy+dHfBjq2AeX9/yNAwS2cBSgisZFGwahFqOQVUaefUbeqbLk
-         lnd6XsjADYu1Os8m4FJUOclfG8tTlzOWYF4ZlHAnrupf1MiEF3HM2yTqCrAo18Q3uW13
-         TgEQ==
-X-Forwarded-Encrypted: i=1; AHgh+Ro/sVTZtNYoRXo4GWdlgeHHyYHVmD/zGkRMkjCpPMQHTZzc/3pHA0QJx7fwXuUP8Bved7J3oSsrTnAzXgw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQmwlAjb+R6sAwbO1XxpEe+xy9XFSLWYAJasvDaOPMcTYNRyPY
-	jehtG2sLBj/aSBIlO8uEEf0d8RBqXq7fZQjpQsVbTPik6lQHdM4YfA1o
-X-Gm-Gg: AfdE7ckYnTfk7NGXGKeF22L4zmC/gFXZgGCM5eJ/bZAsGi9dgx5ejgMeJWQELKIHO6L
-	kC2cY1nMmUwlLi0qoRAc9riw5yue03Ycv5xCMW1SYjyEidzgtieb4IYuITnGP4zanwcK0eODVGo
-	S4LcaPMRDpsSU/AINs8Uij8se6bF9VISNZnrAZwOEGIsnardhwbjj9PpG8+mMWYUlsTxmtPk2bN
-	JHiUusGAkhanrw5Ls8KbDdFE0AauldkKFd1znEFUGHVtRoEDZ52Dgojy7X3Ec9a1vnn/HW40x6s
-	X3qXmqFhyGIqLDh7qF9PvoIZR69CAfhz5607A7zrequM5nTOzZoEP870tsrbf5ncHCV6AcpNBYc
-	9OZExP0OAWsB6fwo4EThXEQUdMn3/yF8ePRmOcQL79qoCebGJDooKHMUOD/DuWd5w+vl+gbUepv
-	vi45MVSYJbVZVwdCgn8jmvIlRiLQfReywVMHsznRXJd6N/+8Y9/aBAozxnWuHmsdvSqY4=
-X-Received: by 2002:a05:693c:2887:b0:30b:cc4e:6396 with SMTP id 5a478bee46e88-30c5553b105mr382073eec.7.1782155033135;
-        Mon, 22 Jun 2026 12:03:53 -0700 (PDT)
-Received: from ?IPv6:2a03:83e0:115c:1:6e2:c699:67c:63fe? ([2620:10d:c090:500::1:5387])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-30c1be4967fsm10549199eec.26.2026.06.22.12.03.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jun 2026 12:03:52 -0700 (PDT)
-Message-ID: <1979fc81ae7bdaabda8616cd9698a40ef8bbfaee.camel@gmail.com>
-Subject: Re: [PATCH v3 5/7] kernel: Use mutable list iterators
-From: Eduard Zingerman <eddyz87@gmail.com>
-To: Kaitao Cheng <kaitao.cheng@linux.dev>, Paul Moore <paul@paul-moore.com>,
-  Eric Paris <eparis@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann	 <daniel@iogearbox.net>, Andrii Nakryiko
- <andrii@kernel.org>, Kumar Kartikeya Dwivedi <memxor@gmail.com>, "David S.
- Miller" <davem@davemloft.net>, Jakub Kicinski	 <kuba@kernel.org>, Jesper
- Dangaard Brouer <hawk@kernel.org>, John Fastabend	
- <john.fastabend@gmail.com>, Tejun Heo <tj@kernel.org>, Johannes Weiner	
- <hannes@cmpxchg.org>, Michal =?ISO-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>, 
- Maarten Lankhorst	 <dev@lankhorst.se>, Maxime Ripard <mripard@kernel.org>,
- Natalie Vock	 <natalie.vock@gmx.de>, Peter Zijlstra <peterz@infradead.org>,
- Ingo Molnar	 <mingo@redhat.com>, Arnaldo Carvalho de Melo
- <acme@kernel.org>, Namhyung Kim	 <namhyung@kernel.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Oleg Nesterov	 <oleg@redhat.com>, Peter
- Oberparleiter <oberpar@linux.ibm.com>, Andrew Morton	
- <akpm@linux-foundation.org>, Baoquan He <baoquan.he@linux.dev>, Mike
- Rapoport	 <rppt@kernel.org>, Pasha Tatashin <pasha.tatashin@soleen.com>,
- Pratyush Yadav	 <pratyush@kernel.org>, Naveen N Rao <naveen@kernel.org>,
- Josh Poimboeuf	 <jpoimboe@kernel.org>, Jiri Kosina <jikos@kernel.org>,
- Miroslav Benes	 <mbenes@suse.cz>, Petr Mladek <pmladek@suse.com>, Will
- Deacon <will@kernel.org>,  Boqun Feng <boqun@kernel.org>, Luis Chamberlain
- <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>,  Daniel Gomez
- <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, Steffen
- Klassert	 <steffen.klassert@secunet.com>, Daniel Jordan
- <daniel.m.jordan@oracle.com>,  "Rafael J. Wysocki"	 <rafael@kernel.org>,
- Davidlohr Bueso <dave@stgolabs.net>, "Paul E. McKenney"	
- <paulmck@kernel.org>, Josh Triplett <josh@joshtriplett.org>, Frederic
- Weisbecker <frederic@kernel.org>, Neeraj Upadhyay
- <neeraj.upadhyay@kernel.org>, Joel Fernandes	 <joelagnelf@nvidia.com>,
- Uladzislau Rezki <urezki@gmail.com>, Juri Lelli	 <juri.lelli@redhat.com>,
- Vincent Guittot <vincent.guittot@linaro.org>, Kees Cook <kees@kernel.org>,
- Balbir Singh <bsingharora@gmail.com>, Anna-Maria Behnsen	
- <anna-maria@linutronix.de>, Thomas Gleixner <tglx@kernel.org>, John Stultz	
- <jstultz@google.com>, KP Singh <kpsingh@kernel.org>, Matt Bobrowski	
- <mattbobrowski@google.com>, Nathan Chancellor <nathan@kernel.org>, Martin
- KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Mark Rutland
- <mark.rutland@arm.com>,  Mathieu Desnoyers
- <mathieu.desnoyers@efficios.com>, Dietmar Eggemann
- <dietmar.eggemann@arm.com>, David Vernet	 <void@manifault.com>, Steven
- Rostedt <rostedt@goodmis.org>
-Cc: audit@vger.kernel.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, 	netdev@vger.kernel.org, cgroups@vger.kernel.org,
- dri-devel@lists.freedesktop.org, 	linux-perf-users@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, 	kexec@lists.infradead.org,
- live-patching@vger.kernel.org, 	linux-modules@vger.kernel.org,
- linux-crypto@vger.kernel.org, 	linux-pm@vger.kernel.org,
- rcu@vger.kernel.org, sched-ext@lists.linux.dev, 	llvm@lists.linux.dev,
- Kaitao Cheng <chengkaitao@kylinos.cn>
-Date: Mon, 22 Jun 2026 12:03:46 -0700
-In-Reply-To: <20260622042811.31684-1-kaitao.cheng@linux.dev>
-References: <20260622040533.29824-1-kaitao.cheng@linux.dev>
-	 <20260622042811.31684-1-kaitao.cheng@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.60.1 (3.60.1-1.fc44) 
+        d=1e100.net; s=20251104; t=1782159678; x=1782764478;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=jVlFfRpn9UntpPh6Z18ZIlYWvmrIqOtd+zdy9KzVAtA=;
+        b=aaAW0fcyIIP+JiXSgMcohPBZVN74VD9h3VlWeybL7N6JA+fJz81iYMGwg78MZlfjvK
+         YQN2e2F1KnA2AdW46ul5U4Y9MxSyXnl4ZONWqnwAVQ2nTSO67Cs+DBj6ZLHEshVZbwM9
+         sedKKNJS3yWarqoMxg1pHt/ODmDlEHHLudpyTHfVZ6pz8Rfm+aDl1viorigdDFR1NL85
+         wk+LNAc9C3Ui+e6H6+a5n31SKNviwljLbAjmzVqZyJL5BdbVFL5zw8x8hTabMLxA4Alr
+         z3GWhFsEnzDeqPfTu+ejkVgn7OfnRF/EBcJ5zks3d7I0goZ9p3BHzVY/MyK2Qtvq3J5O
+         zl8Q==
+X-Forwarded-Encrypted: i=1; AFNElJ97PKXgXRzCru0pzn4ekf4Kr/hGpvNyGn2u3f53T/wpCzF8sCQkaM73Ftpg1lcdp56hyWSuqoORZWFlVF0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8V2daowwAeC+ZM20GbOZtKG2AUMRtI9PeIsGOe1nMQqi5cVX7
+	r6Y3VYBaHCq71V2VWF0D8AiITuZPROQ93Z2qhw2xXTt7HDtlUqSTHVKjYXGM24AOoZM=
+X-Gm-Gg: AfdE7clMpj5N6bHPBjq2QxMiISM6XA+fu1pmudrh6WBQDUZIvxYZGEAUyAo1hLUCWeV
+	X3s3qsUhCS3rQwmgWxR8cuN04/0HJfJAiKwNZjY35c8l3539M4v6t5ZUXgD8IgvUPTC5DAx5WQk
+	UAf+0K5ylDIFq1EZ4lINrM3qJElZRlgoCkdopHFvO13tIBqRhsXj94Oq5M4yS9OGNsVzVjhN+9/
+	zysmmOtk3YFivqurqKGTbYxzGmlQkox6qTownPGDoNUQP2A15ZRfxMkD+yPPFM7h0dW7kDSWQW0
+	lu3UOAX9zW6oqQvRzq5blKENa31wJ2C+UZkzsST001lu5f8pQhw9Xg6HF2avpcUfVFPTs48NnvF
+	xKs7ZpyAQx2zwKreBaXCXim+mbdD/KVGtPtC0eyoLXkJgw2sKjA0ZMmZDsWcxQoa+XF6VwJYIQj
+	Q7n4ip/Qjsg4F8QB7LaXth2h/6PrYcq5z4+QqcY/PORmRcT/+/de5XLA==
+X-Received: by 2002:a05:6402:4583:b0:692:4a58:a93 with SMTP id 4fb4d7f45d1cf-696e5221636mr7280142a12.21.1782159678118;
+        Mon, 22 Jun 2026 13:21:18 -0700 (PDT)
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com. [209.85.208.45])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-697d366f5c8sm449311a12.31.2026.06.22.13.21.16
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Jun 2026 13:21:17 -0700 (PDT)
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-697ad7f663cso2439163a12.1
+        for <linux-crypto@vger.kernel.org>; Mon, 22 Jun 2026 13:21:16 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AFNElJ8edVyaASynqOP3diqd4WGliLB3LeGy4SNCwidfmm68LMsYe9+34gAiyk6aJtvZf6f22eQBD4srSkPRM6Y=@vger.kernel.org
+X-Received: by 2002:a17:907:a03:b0:c0d:7573:7256 with SMTP id
+ a640c23a62f3a-c0d7573740amr435737666b.51.1782159676483; Mon, 22 Jun 2026
+ 13:21:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20260502163328.696098-2-bestswngs@gmail.com> <aji3B9a72VEAOu03@gondor.apana.org.au>
+ <ajlNCxltXkuWfIw-@kernel.org>
+In-Reply-To: <ajlNCxltXkuWfIw-@kernel.org>
+From: Ignat Korchagin <ignat@linux.win>
+Date: Mon, 22 Jun 2026 21:21:04 +0100
+X-Gmail-Original-Message-ID: <CAOs+rJVutdn6vqjSxidx-fA_R8PYsqJbbpMRUW+ijJeXoavCYA@mail.gmail.com>
+X-Gm-Features: AVVi8CcdlgikvHr2XETEkUfuG_HaLob-n6pc__1dO-GEG4Nf3-J3r6h8h6TyyI4
+Message-ID: <CAOs+rJVutdn6vqjSxidx-fA_R8PYsqJbbpMRUW+ijJeXoavCYA@mail.gmail.com>
+Subject: Re: [PATCH v2] asymmetric_keys: check asymmetric_key_ids() for NULL
+ before dereference
+To: Herbert Xu <herbert@gondor.apana.org.au>, Weiming Shi <bestswngs@gmail.com>
+Cc: David Howells <dhowells@redhat.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
+	Lukas Wunner <lukas@wunner.de>, "David S . Miller" <davem@davemloft.net>, keyrings@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, Xiang Mei <xmei5@asu.edu>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2026-06-22 at 12:28 +0800, Kaitao Cheng wrote:
-> From: Kaitao Cheng <chengkaitao@kylinos.cn>
->=20
-> The safe list iteration helpers require callers to provide a temporary
-> cursor even when the cursor is only used internally by the loop. This
-> leaves many functions with otherwise unused variables whose only purpose
-> is to satisfy the old iterator interface.
->=20
-> Use the mutable list iteration helpers for those cases. The mutable
-> helpers keep the same removal-safe traversal semantics, while allowing
-> the temporary cursor to be internal to the macro when the caller does
-> not need to observe it.
->=20
-> Convert list, hlist and llist users under kernel/ where the temporary
-> cursor is not used outside the iteration. Keep the explicit cursor form
-> where the next entry is still needed by the surrounding code.
->=20
-> No functional change intended.
->=20
-> Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
-> ---
+On Mon, Jun 22, 2026 at 3:56=E2=80=AFPM Jarkko Sakkinen <jarkko@kernel.org>=
+ wrote:
+>
+> On Mon, Jun 22, 2026 at 12:16:07PM +0800, Herbert Xu wrote:
+> > On Sat, May 02, 2026 at 09:33:29AM -0700, Weiming Shi wrote:
+> > >
+> > > diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymme=
+tric_keys/asymmetric_type.c
+> > > index 16a7ae16593c..22f04656d529 100644
+> > > --- a/crypto/asymmetric_keys/asymmetric_type.c
+> > > +++ b/crypto/asymmetric_keys/asymmetric_type.c
+> > > @@ -109,6 +109,8 @@ struct key *find_asymmetric_key(struct key *keyri=
+ng,
+> > >     if (id_0 && id_1) {
+> > >             const struct asymmetric_key_ids *kids =3D asymmetric_key_=
+ids(key);
+> > >
+> > > +           if (!kids)
+> > > +                   goto reject;
+> >
+> > This check is actually unnecessary because we've already matched
+> > the key against the kid so it must be present.
+> >
+> > I'd get rid of this check or perhaps add a comment instead.
+>
+> +1
+>
+> >
+> > >             if (!kids->id[1]) {
+> > >                     pr_debug("First ID matches, but second is missing=
+\n");
+> > >                     goto reject;
+> > > diff --git a/crypto/asymmetric_keys/restrict.c b/crypto/asymmetric_ke=
+ys/restrict.c
+> > > index 86292965f493..ccf1084f720e 100644
+> > > --- a/crypto/asymmetric_keys/restrict.c
+> > > +++ b/crypto/asymmetric_keys/restrict.c
+> > > @@ -243,10 +243,14 @@ static int key_or_keyring_common(struct key *de=
+st_keyring,
+> > >                     if (IS_ERR(key))
+> > >                             key =3D NULL;
+> > >             } else if (trusted->type =3D=3D &key_type_asymmetric) {
+> > > +                   const struct asymmetric_key_ids *kids;
+> > >                     const struct asymmetric_key_id **signer_ids;
+> > >
+> > > -                   signer_ids =3D (const struct asymmetric_key_id **=
+)
+> > > -                           asymmetric_key_ids(trusted)->id;
+> > > +                   kids =3D asymmetric_key_ids(trusted);
+> > > +                   if (!kids)
+> > > +                           goto skip_trusted;
+> >
+> > Yes this is definitely buggy.
+> >
+> > I think it was introduced by these two commits:
+> >
+> > commit 3c58b2362ba828ee2970c66c6a6fd7b04fde4413
+> > Author: David Howells <dhowells@redhat.com>
+> > Date:   Tue Oct 9 17:47:46 2018 +0100
+> >
+> >     KEYS: Implement PKCS#8 RSA Private Key parser [ver #2]
+> >
+> > and
+> >
+> > commit 7e3c4d22083f6e7316c5229b6197ca2d5335aa35
+> > Author: Mat Martineau <martineau@kernel.org>
+> > Date:   Mon Jun 27 16:45:16 2016 -0700
+> >
+> >     KEYS: Restrict asymmetric key linkage using a specific keychain
+> >
+> > So the Fixes header should point to them.
+>
+> +1
+>
+> >
+> > > @@ -290,6 +294,7 @@ static int key_or_keyring_common(struct key *dest=
+_keyring,
+> > >             }
+> > >     }
+> > >
+> > > +skip_trusted:
+> > >     if (check_dest && !key) {
+> > >             /* See if the destination has a key that signed this one.=
+ */
+> > >             key =3D find_asymmetric_key(dest_keyring, sig->auth_ids[0=
+],
+> >
+> > I'm not sure continuing here is a good idea.  Having a private key
+> > here makes no sense whatsoever and we should just bail out right
+> > away.
+> >
+> > I would recommend returning an error of some sort if kids is NULL.
+> >
+> > David/Lukas/Ignat, any opinions?
 
-Beside the fact that this does not apply,
-I don't see a reason why is this needed for BPF sub-tree.
+As I reread the original submission (somehow I never got the V2) it
+seems we're restricting a keyring with a private key?! Which indeed
+does not make sense.
 
-[...]
+> I think with a quick skim that you are right. I'll work on this area
+> for the next version.
+>
+> >
+> > Thanks,
+> > --
+> > Email: Herbert Xu <herbert@gondor.apana.org.au>
+> > Home Page: http://gondor.apana.org.au/~herbert/
+> > PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+>
+> Thanks for the review!
+>
+> BR, Jarkko
+>
+>
