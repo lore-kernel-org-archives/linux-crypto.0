@@ -1,66 +1,65 @@
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E74C238AC8C
-	for <linux-crypto@vger.kernel.org>; Tue, 23 Jun 2026 17:24:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E713938BF8D
+	for <linux-crypto@vger.kernel.org>; Tue, 23 Jun 2026 17:29:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782235452; cv=none; b=e7cG2dy9LaOceNnIO1do+CYGSD0BA0n0sse41pQz9x1YjNCvtCZZxEFhPsWEJt1jHPPkV3j+hZi+3LpuT0Qi0x14+xIfHrYD70eSWm+9vHcEiylIro7jrgfIeF3CXwGRBKWW5QujjHtho6NEnXz6vWrP42HGULw19PxnPE8SgO0=
+	t=1782235770; cv=none; b=gjkrFVm3k5cNAmH2sTC8vboS9IOL5wu0/EG1Uyrs+Q6vS2t15dJBmu78VqgvgigF/MRzJ9H+02T0vuHXqhC7t60CzzfdgYICYK9DU1x4lgnyXC1BRTrPApRzi8bwTvi5E/YqK/EDvNHK95IsJM6VDjh72A0u2D8FbBxHjjcmLb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782235452; c=relaxed/simple;
-	bh=fBD+5DExfaYK3P8CKt7zVDHJXxAAt+bPfNDioBKgBz0=;
+	s=arc-20240116; t=1782235770; c=relaxed/simple;
+	bh=wPAIx3nSF08OdslJj1W91/uowOC0XHLZRcyIChO7aLg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Fyxe+aYLIcW0MTKThDqbWC18uxQkNn7eU1kDOM9EcCT2m4hx5zgZnc85uThbi5VbwdNzkpj66uTiH1CU6SDvD/EMHAEN9ImWCfrQJ2UC5WJoFyLeJATLZHQ5R1eVjxlHwFD0ZzvdyPKrZjhHJ5X/8ir1HPzFnD47Zem3Xzm+ui0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VR7fqfMZ; arc=none smtp.client-ip=209.85.128.177
+	 In-Reply-To:Content-Type; b=feU0KF8ny9Tqg0+mjVpYvcTfkYSYFmtQ25gW9UdJ/UoEesti2E8gsLjDQXcuHCgaeBp+Yvd/DCXbBQM9TCx6d8JeNkf5h6H7vBgmn9c571yk0nRoA1AnCdxhzlGmxPrz5NJ+vn6q/sWULdTDa6la5tW+g4vk1HkpXoxG4Y+zmmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mjkG9z2I; arc=none smtp.client-ip=74.125.224.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VR7fqfMZ"
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-7fd3801ca22so1634377b3.1
-        for <linux-crypto@vger.kernel.org>; Tue, 23 Jun 2026 10:24:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mjkG9z2I"
+Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-663271f8694so64744d50.0
+        for <linux-crypto@vger.kernel.org>; Tue, 23 Jun 2026 10:29:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782235450; x=1782840250; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1782235768; x=1782840568; darn=vger.kernel.org;
         h=in-reply-to:autocrypt:from:content-language:references:cc:to
          :subject:user-agent:mime-version:date:message-id:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=ToN0gHsD8VJSvIoHxpeRalPyzQFarCO6q3R3P+Q79UM=;
-        b=VR7fqfMZgPuKmfYjlk2Sx+0apFswIxWX59cLTC7795djcRFqaHAGuhStN+x1Wn9whp
-         /eWeqG2ikj+0CQ3F3wib9P8RUxR5sg6+KYaLTx2pRCDeCEWBzNkaS7VTv0sdKt+fuHyL
-         +GSrIBUeaYlJPxF4RCHj2dK6aCGX3OjKzYbF3RqVjR5oqoOhWstZXvIxjvAm4zmkHA48
-         tZod/Qt+J+RdMO/SlGqj/lxyd6F94YKLyKqQr6ZX1DuiBbAAV2ZuYn8OlmLsSMKQmZ8Z
-         +9qbMItRXluqx1MafLoLewUUR/ZBIjZAe/2tX2sKFDRVL3ADKmYPl9Bcm8oksWsZ8bCa
-         w2Ng==
+        bh=WoFY6kRmV4ff5tcBtPk2BEE3SwLM4fWjcTW+OpGVfjM=;
+        b=mjkG9z2I8EpXuPeCtWpGgDzT8trSNpI7QxGxD66kwNzFfo36Zfagz5napgi1IHrdMs
+         nC/j85mmm+aCKC1P96LgBklN5WiNq4XMLKzEizjNoZqdsjNryKW9Y9ly9LPEJL4QlBXO
+         PSBf8Iwplia1gZIKCe4h+3VoUJ85e+kqhgKs2Tz9uEo65iQ0SaSG0pCGQqe7AeU1Sd3N
+         7w7h7rABRBWd/jVd9pOyoaWOKs75aJ/yB5ldsa/UYIBhy5ileLGGg0dcWKFVMQhzidPX
+         kMxRPgKNvowWLpdo9mDpi4QuXo/jS2W+UlbB1uX5qj8nZ7FJ5dIjQJW/BABtx7McYn+9
+         GCgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782235450; x=1782840250;
+        d=1e100.net; s=20251104; t=1782235768; x=1782840568;
         h=in-reply-to:autocrypt:from:content-language:references:cc:to
          :subject:user-agent:mime-version:date:message-id:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ToN0gHsD8VJSvIoHxpeRalPyzQFarCO6q3R3P+Q79UM=;
-        b=ARSXd7YcteO5kdHMnPaA/yfMRvNcvt1xRgZvwP2jsRH7A8IecLRQJmAGV3kWvEm6SX
-         604QGI/f2+AEd8/qOxYAM7MLyKtLK+TLxFP0ZoVm91ZrenqRwm/U9y12lAVS903LYx3r
-         vv8mwlxg8gVWgE0hBbo2mtGw1lDsJ4YYW0ITMLNj/J5XSEQDrqkUs/KjWawE5BuhC/ZN
-         6TvrPTECLQ0TtLkECkRWebF9qQTTnUJNgVVJUwgE2z6Adyok9Xfi9eo+k8HCWG3VwdSE
-         qL5c0M6CNOOzaPRnWXVu5CkMkW91WNbpdmGvQUXMEekO+WO6LAYyyiV+e4roNE2q7uUn
-         jSCg==
-X-Forwarded-Encrypted: i=1; AHgh+RqkjjVEv293KqLZ8v62lHCIZol7I4jVrfhH930qA9SrDPFYgvU6EGc26iNV5tBydmS5tTGGqVCpE5ISJ7E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxKP5R6bNAMDq5jopczAvTa9dbT8n31MM1SRoTToQfVLcAy6MX
-	t2mv2t3AVWGlouOr9l0Ipr0zGfuD0U5bLuqp4xlulJXx43fDiVfvMGdm
-X-Gm-Gg: AfdE7ckwBD7JSMlmcOwDq6isyxH3IDaq/M6dee4CvpQffSQSH/+NUHS6rTY7954Mhwb
-	IO7Ry2QpNiILAUIjGVHbVSBNHET90TVCk6g3fisIGiKGf0V0D/fcbCxDGFR6smF4zCYzCW/KKBj
-	q7Ksnbocy1vvmIwzd4XQGSgl3rxL7KNan4GE6pt0zMKt9n1jtU7j1wV8TxM9WAtkSUjfV5GRVGu
-	TvhZ1McbQDKVW4VE0AwxuvqaFGiuEjSf9tcnl6pCdd9VThjeylfavphEGLzJ5kvyb7SX0aoArKZ
-	fycF5mc6841SjX11jdEV3U9Zd9xWwlX27aJrVkq2x+NHxRoExzVk1xoVMaw9i+DA0cauy5iA4Sg
-	arrxRTjjdgM5dw99CO0Hz+LvXigtM+exwdPp7cROKx13+gOSMTmzBHxnU0OQONxTyDL/FFajKlI
-	d83MRpqyzhYa3ggU+qvmIx0PlxoUseHDW6kDu2dxpcirFRTo8iT9P/dBYWpzS7rq/0VRBW24qUH
-	wZFUaPWZJozo/vLJ8BsTBom9gCn
-X-Received: by 2002:a05:690c:e36a:b0:7ff:1000:9c1a with SMTP id 00721157ae682-80266163257mr190396367b3.26.1782235449584;
-        Tue, 23 Jun 2026 10:24:09 -0700 (PDT)
+        bh=WoFY6kRmV4ff5tcBtPk2BEE3SwLM4fWjcTW+OpGVfjM=;
+        b=o3fkxYkdAjDHsqsTZUnjmmmbK7q5FTAkBdUUY3sgpatEMV1ij+X3OWYyAhS0PoFbQ3
+         BKDuvsd9YkwmQPl5LovUJCgjYGaf6U0KX+Fgpo5AaqWwL+TxwK6sx0FOg8FqZ2UEnBRw
+         pOdZOikQglnomheWCtik6eyf4kpzv7FeyvYT8TDnRuNtRCdxTuVXMactcDinb9c8T49g
+         C5gW5uw0uZSwEfP0oxIykE3tfQbX+vVj9YOp/B7ItEHL7RU0JUftMW0cwMLJP3UKISgQ
+         DswEkltJa22KLngBRF530lCdgNXRiIvtnOwCH+YzBp9Qx3pN6SFcFGwyoN9wPCOdSH82
+         nCew==
+X-Gm-Message-State: AOJu0YztktHo3byHafEmF8wNsWUgGc4ErTPO2CvWck5wp2AANttM7sNt
+	WAbdydhbBGy3QOWv8b12DyBZCeBZSeBlEflHbaGhMJyyMtOp7UhYbVsn
+X-Gm-Gg: AfdE7cm6RmRr5LpX1ezp6MbBMtH2ZBnecLZUlP6QF+lXI1GyveUm6ol/VVHVXzAMtbO
+	k7edQe1UXd/pYM+1iNj9iXjXW6otmLFUW2WFS/ixCLl6xzPfiT2SDzyxxYrgLbj/82zxjAbFqAR
+	HE8sic21rAgvVyGU8OvWXVmZh8cSMY/L+vT2u2YSSb10QMxp6UpsyNdh5toU+biULyTjuosVrW6
+	13z1I0QCkC1+BacBoHIe412AbwSgJgq9BDjs1Fgyr0cW3TKn5noYYDyL+RO9PZflPIOi2+jO3gS
+	Uu1exJnBlUiMS8uQYe3iFmlpKUol5kHEkpC0QP7/2LqicArnGZE2ksLd4zBkuTsamv0ujObVhc9
+	9GSVJOdWWbXPa5ModlWQoUDxfYQvL4shhgczqfb1QZ7m5QZVO5UzlFpSXVRsL0hMM/d9Mizarzw
+	+nGcfdqjI6K60D0EjvA4VMABKd5Qq9sViAoNCyRJWS9MUx1hjnRW5RYIwUH70mIUdwi8ximOiyF
+	eFeSLb0OWaKNJDLPjVF3OU9tcyY
+X-Received: by 2002:a05:690e:b87:b0:651:b938:188b with SMTP id 956f58d0204a3-662ffcec93amr18730141d50.24.1782235765153;
+        Tue, 23 Jun 2026 10:29:25 -0700 (PDT)
 Received: from [10.138.34.110] (h69-131-147-66.cncrtn.broadband.dynamic.tds.net. [69.131.147.66])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-8025c96fdb3sm48164007b3.1.2026.06.23.10.24.08
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-66314d3a98esm5490551d50.12.2026.06.23.10.29.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Jun 2026 10:24:08 -0700 (PDT)
-Message-ID: <34e20a64-17d3-4994-89f1-6084cd4fae36@gmail.com>
-Date: Tue, 23 Jun 2026 13:24:01 -0400
+        Tue, 23 Jun 2026 10:29:24 -0700 (PDT)
+Message-ID: <01b73988-b35c-4ce8-8463-4589fe18b0b0@gmail.com>
+Date: Tue, 23 Jun 2026 13:29:20 -0400
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -70,13 +69,16 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] crypto: af_alg - Add af_alg_restrict sysctl, defaulting
  to 1
-To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
- Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+To: Eric Biggers <ebiggers@kernel.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
  linux-bluetooth@vger.kernel.org, iwd@lists.linux.dev,
  linux-hardening@vger.kernel.org, Milan Broz <gmazyland@gmail.com>,
  Andy Lutomirski <luto@amacapital.net>
 References: <20260622234803.6982-1-ebiggers@kernel.org>
+ <CABBYNZ+QLvkYkn_EcBZ4+GopyhKqJLcfCoABYcw1VamavbSvhg@mail.gmail.com>
+ <20260623165208.GB1793@sol>
 Content-Language: en-US
 From: Demi Marie Obenour <demiobenour@gmail.com>
 Autocrypt: addr=demiobenour@gmail.com; keydata=
@@ -122,28 +124,31 @@ Autocrypt: addr=demiobenour@gmail.com; keydata=
  vUSQHSrmfOzX3cV4yfmjM5lewgSstoxGyTx2M8enslgdXhPthZlDnTnOT+C+OTsh8+m5tos8
  HQjaPM01MKBiAqdPgksm1wu2DrrwUi6ChRVTUBcj6+/9IJ81H2P2gJk3Ls3AVIxIffLoY34E
  +MYSfkEjBz0E8CLOcAw7JIwAaeBT
-In-Reply-To: <20260622234803.6982-1-ebiggers@kernel.org>
+In-Reply-To: <20260623165208.GB1793@sol>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="------------Q0SecAFdwyfq6TUsxDpKlVgR"
+ boundary="------------xEkN0T3V6TIatl1Qv8o6Acjp"
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------Q0SecAFdwyfq6TUsxDpKlVgR
-Content-Type: multipart/mixed; boundary="------------06Jbuzx7taoAbDNVcFc1QAHk";
+--------------xEkN0T3V6TIatl1Qv8o6Acjp
+Content-Type: multipart/mixed; boundary="------------fljDCN9aahD0urO0LKbRnBS8";
  protected-headers="v1"
-Message-ID: <34e20a64-17d3-4994-89f1-6084cd4fae36@gmail.com>
-Date: Tue, 23 Jun 2026 13:24:01 -0400
+Message-ID: <01b73988-b35c-4ce8-8463-4589fe18b0b0@gmail.com>
+Date: Tue, 23 Jun 2026 13:29:20 -0400
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] crypto: af_alg - Add af_alg_restrict sysctl, defaulting
  to 1
-To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
- Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+To: Eric Biggers <ebiggers@kernel.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
  linux-bluetooth@vger.kernel.org, iwd@lists.linux.dev,
  linux-hardening@vger.kernel.org, Milan Broz <gmazyland@gmail.com>,
  Andy Lutomirski <luto@amacapital.net>
 References: <20260622234803.6982-1-ebiggers@kernel.org>
+ <CABBYNZ+QLvkYkn_EcBZ4+GopyhKqJLcfCoABYcw1VamavbSvhg@mail.gmail.com>
+ <20260623165208.GB1793@sol>
 Content-Language: en-US
 From: Demi Marie Obenour <demiobenour@gmail.com>
 Autocrypt: addr=demiobenour@gmail.com; keydata=
@@ -189,199 +194,44 @@ Autocrypt: addr=demiobenour@gmail.com; keydata=
  vUSQHSrmfOzX3cV4yfmjM5lewgSstoxGyTx2M8enslgdXhPthZlDnTnOT+C+OTsh8+m5tos8
  HQjaPM01MKBiAqdPgksm1wu2DrrwUi6ChRVTUBcj6+/9IJ81H2P2gJk3Ls3AVIxIffLoY34E
  +MYSfkEjBz0E8CLOcAw7JIwAaeBT
-In-Reply-To: <20260622234803.6982-1-ebiggers@kernel.org>
+In-Reply-To: <20260623165208.GB1793@sol>
 
---------------06Jbuzx7taoAbDNVcFc1QAHk
-Content-Type: multipart/mixed; boundary="------------452gzRjdYchSV4WeKzfxX0An"
+--------------fljDCN9aahD0urO0LKbRnBS8
+Content-Type: multipart/mixed; boundary="------------nHpiFTlUeP2vhe33ywnzWULP"
 
---------------452gzRjdYchSV4WeKzfxX0An
+--------------nHpiFTlUeP2vhe33ywnzWULP
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On 6/22/26 19:48, Eric Biggers wrote:
-> AF_ALG is a frequent source of vulnerabilities and a maintenance
-> nightmare.  It exposes far more functionality to userspace than ever
-> should have been exposed, especially to unprivileged processes.  Recent=
+On 6/23/26 12:52, Eric Biggers wrote:
+> On Tue, Jun 23, 2026 at 11:04:14AM -0400, Luiz Augusto von Dentz wrote:=
 
-> exploits have targeted kernel internal implementation details like
-> "authencesn" that have zero use case for userspace access.
+>>> +=3D=3D=3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>> +0    AF_ALG is unrestricted.
+>>> +
+>>> +1    AF_ALG is supported with a limited list of algorithms. The list=
+
+>>> +     is designed for compatibility with known users such as iwd and
+>>> +     bluez that haven't yet been fixed to use userspace crypto code.=
+
+>>
+>> Is the expectation that we go shopping for userspace crypto here?
 >=20
-> Fortunately, AF_ALG is rarely used in practice, as userspace crypto
-> libraries exist.  And when it is used, only some functionality is known=
+> Yes, same as what 99% of userspace already does.  Probably you'll just
+> want to link to OpenSSL, but it could be something else if you want.
 
-> to be used, and many users are known to hold capabilities already.
-> iwd for example requires CAP_NET_ADMIN and has a known algorithm list
-> (https://lore.kernel.org/linux-crypto/bcbbef00-5881-421b-8892-7be6c04b8=
-32d@gmail.com/).
->=20
-> Thus, let's restrict the set of allowed algorithms by default, dependin=
-g
-> on the capabilities held.
->=20
-> Add a sysctl /proc/sys/crypto/af_alg_restrict with meaning:
->=20
->     0: unrestricted
->     1: limited functionality
->     2: completely disabled
->=20
-> Set the default value to 1, which enables an algorithm allowlist for
-> unprivileged processes and a slightly longer allowlist for privileged
-> processes.
->=20
-> Note that the list may be tweaked in the future.  However, the common
-> use cases such as iwd and bluez are taken into account already.  I've
-> tested that iwd still works with the default value of 1.
-I think there is room for something in-between the allowlist provided
-here and "no restrictions".  For instance, I think it makes sense
-to have a mode that allows modern=C2=B8 widely-used algorithms (AES-GCM,
-ChaCha20-Poly1305, SHA-3, HMAC, etc) to all users.
+Hard disagree on OpenSSL.  It's not a good library.
 
-This makes it less likely someone turns off all restrictions.
+See <https://cryptography.io/en/latest/statements/state-of-openssl/>.
 
-XFRM allows providing an arbitrary algorithm name, and it appears to
-be accessible in unprivileged user namespaces.  That also needs an
-allowlist.
-> diff --git a/crypto/algif_aead.c b/crypto/algif_aead.c
-> index 787aac8aeb24..b9217f9086aa 100644
-> --- a/crypto/algif_aead.c
-> +++ b/crypto/algif_aead.c
-> @@ -32,10 +32,15 @@
->  #include <linux/mm.h>
->  #include <linux/module.h>
->  #include <linux/net.h>
->  #include <net/sock.h>
-> =20
-> +static const struct af_alg_allowlist_entry aead_allowlist[] =3D {
-> +	{ "ccm(aes)", true }, /* bluez */
-> +	{},
-> +};
-> +
->  static inline bool aead_sufficient_data(struct sock *sk)
->  {
->  	struct alg_sock *ask =3D alg_sk(sk);
->  	struct sock *psk =3D ask->parent;
->  	struct alg_sock *pask =3D alg_sk(psk);
-> @@ -342,10 +347,16 @@ static struct proto_ops algif_aead_ops_nokey =3D =
-{
->  	.poll		=3D	af_alg_poll,
->  };
-> =20
->  static void *aead_bind(const char *name)
->  {
-> +	int err;
-> +
-> +	err =3D af_alg_check_restriction(name, aead_allowlist);
-> +	if (err)
-> +		return ERR_PTR(err);
-> +
->  	return crypto_alloc_aead(name, 0, AF_ALG_CRYPTOAPI_MASK);
->  }
-> =20
->  static void aead_release(void *private)
->  {
-> diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
-> index 5452ad6c1506..a8d958d51ece 100644
-> --- a/crypto/algif_hash.c
-> +++ b/crypto/algif_hash.c
-> @@ -14,10 +14,28 @@
->  #include <linux/mm.h>
->  #include <linux/module.h>
->  #include <linux/net.h>
->  #include <net/sock.h>
-> =20
-> +static const struct af_alg_allowlist_entry hash_allowlist[] =3D {
-> +	{ "cmac(aes)", true }, /* iwd, bluez */
-> +	{ "hmac(md5)", true }, /* iwd */
-> +	{ "hmac(sha1)", true }, /* iwd */
-> +	{ "hmac(sha224)", true }, /* iwd */
-> +	{ "hmac(sha256)", true }, /* iwd */
-> +	{ "hmac(sha384)", true }, /* iwd */
-> +	{ "hmac(sha512)", true }, /* iwd, sha512hmac */
-
-Should this entry have privileged =3D false?  sha512hmac doesn't
-need privileges.
-
-> +	{ "md4", true }, /* iwd */
-> +	{ "md5", true }, /* iwd */
-> +	{ "sha1", false }, /* iwd, iproute2 < 7.0 */
-> +	{ "sha224", true }, /* iwd */
-> +	{ "sha256", true }, /* iwd */
-> +	{ "sha384", true }, /* iwd */
-> +	{ "sha512", true }, /* iwd */
-> +	{},
-> +};
-> +
->  struct hash_ctx {
->  	struct af_alg_sgl sgl;
-> =20
->  	u8 *result;
-> =20
-> @@ -380,10 +398,16 @@ static struct proto_ops algif_hash_ops_nokey =3D =
-{
->  	.accept		=3D	hash_accept_nokey,
->  };
-> =20
->  static void *hash_bind(const char *name)
->  {
-> +	int err;
-> +
-> +	err =3D af_alg_check_restriction(name, hash_allowlist);
-> +	if (err)
-> +		return ERR_PTR(err);
-> +
->  	return crypto_alloc_ahash(name, 0, AF_ALG_CRYPTOAPI_MASK);
->  }
-> =20
->  static void hash_release(void *private)
->  {
-> diff --git a/crypto/algif_rng.c b/crypto/algif_rng.c
-> index 4dfe7899f8fa..bd522915d56d 100644
-> --- a/crypto/algif_rng.c
-> +++ b/crypto/algif_rng.c
-> @@ -48,10 +48,14 @@
-> =20
->  MODULE_LICENSE("GPL");
->  MODULE_AUTHOR("Stephan Mueller <smueller@chronox.de>");
->  MODULE_DESCRIPTION("User-space interface for random number generators"=
-);
-> =20
-> +static const struct af_alg_allowlist_entry rng_allowlist[] =3D {
-> +	{},
-> +};
-
-Can this whole file be deleted?  You wrote that it isn't actually used.
-
-(snip)
-> diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-> index df20bdfe1f1f..2b8069667974 100644
-> --- a/crypto/algif_skcipher.c
-> +++ b/crypto/algif_skcipher.c
-> @@ -32,10 +32,24 @@
->  #include <linux/mm.h>
->  #include <linux/module.h>
->  #include <linux/net.h>
->  #include <net/sock.h>
-> =20
-> +static const struct af_alg_allowlist_entry skcipher_allowlist[] =3D {
-> +	{ "adiantum(xchacha12,aes)", false }, /* cryptsetup */
-> +	{ "adiantum(xchacha20,aes)", false }, /* cryptsetup */
-> +	{ "cbc(aes)", true }, /* iwd */
-> +	{ "cbc(des)", true }, /* iwd */
-> +	{ "cbc(des3_ede)", true }, /* iwd */
-> +	{ "ctr(aes)", true }, /* iwd */
-> +	{ "ecb(aes)", true }, /* iwd, bluez */
-> +	{ "ecb(des)", true }, /* iwd */
-> +	{ "hctr2(aes)", false }, /* cryptsetup */
-> +	{ "xts(aes)", false }, /* cryptsetup benchmark */
-> +	{},
-> +};
-
-Do the cryptsetup ones really need to be accessible to unprivileged users=
-?
+Distributions should ship AWS-LC and either rebuild reverse
+dependencies when needed, or work with upstream to catch ABI breaks.
 --=20
 Sincerely,
 Demi Marie Obenour (she/her/hers)
---------------452gzRjdYchSV4WeKzfxX0An
+--------------nHpiFTlUeP2vhe33ywnzWULP
 Content-Type: application/pgp-keys; name="OpenPGP_0xB288B55FFF9C22C1.asc"
 Content-Disposition: attachment; filename="OpenPGP_0xB288B55FFF9C22C1.asc"
 Content-Description: OpenPGP public key
@@ -501,30 +351,30 @@ EtJuZYM5blWncBOJCoWMnBEcTEo/viU3GgcVRw=3D=3D
 =3Dx94R
 -----END PGP PUBLIC KEY BLOCK-----
 
---------------452gzRjdYchSV4WeKzfxX0An--
+--------------nHpiFTlUeP2vhe33ywnzWULP--
 
---------------06Jbuzx7taoAbDNVcFc1QAHk--
+--------------fljDCN9aahD0urO0LKbRnBS8--
 
---------------Q0SecAFdwyfq6TUsxDpKlVgR
+--------------xEkN0T3V6TIatl1Qv8o6Acjp
 Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEopQtqVJW1aeuo9/sszaHOrMp8lMFAmo6wTIACgkQszaHOrMp
-8lPcqxAAoFqgS6oQcaTSm23ZpuFp00BPOleSqDD1mTTKjRm+C6x/d/U2hTVCtEls
-jO+o0069EBlaGa9murt3wA678qAiCJNGdxQByltMhA+WdRFVB/sP3I5PYFHvmTm8
-nzFnOR/1nTr+nLXNmY0DpPknZ2Gin8OF3R8KBguMU0mfT1uUeDigCeEnVBF7Cygk
-NpT/PAhAN4qn48rojNmRNk0q99kKUdIUwk8fN4thE6Zjgs7r7u6nwpaH5BZ3gOwV
-9GiJCwzeFRDHW1B8EbT9JZD/L9g/0+JJGHZEz2r9uHnpJw5uEQ56LFgUYQp4EAhc
-GYLdx13pnkZw3bkRlxUbZ5loPLiEO3QGlSILlu+ua/dYTbcBsdADqUu1tkHGKmyG
-60PAe9P1X4JKqvotTEp09E7/qm2ssAG3ITeQ+FPIvhm0Dy0An8EJV/PSMHH4Mk6B
-8/mv7e6SWpU/dvYob4TrZUMS3JPCFZI+KJluCT+u4j6wi5DahyP2BJXKxjhn7A93
-B57eHvAuSPIUkbOSxOK6lOAEdu6zLb+JXluw+Jj6LRwrz89epKhZq8QdDvKp6Hxu
-D7/y3BwIGxDST6i7o0sMjvh2sY41tOkzn6Oi0/5oElL0T76OMLCbWhCmBkb0ypoP
-7q/qoneFpYV4kzPmETnZ58MpY1IzlBOHFPk8SpVmZ5XKHGXG+p8=
-=ZdrN
+iQIzBAEBCgAdFiEEopQtqVJW1aeuo9/sszaHOrMp8lMFAmo6wnEACgkQszaHOrMp
+8lMBpA/9EUJf8hboRJ6zH6PU5wdJRkzH8+meBfDqLQpry/w50jaOdLkm08BSlx4g
+mbcqZnoZy4BYbUZQw/HwaUO5RAqP1KffSStWz0X58c66CAt+Qn87wtgfrurIhEtL
+oxPi0/cC9lAPd//yDG7UVs1rH1jNWo9o56P6QI/97FMchAvpe6HqQl64N1C5HrdJ
+72lfsJVtkQV/gCECWn5KNJrjFxHIHwJRGWeYVCNA1AHOILg6S1Md+rt8iDmfKgM4
+ACM6IvvggW2Wr6mNHJ7eEorb6sb1kUcOaGgZSGZIjfj6XIuRfp5VOW60VQl7yR5o
+qu1jUXgGGMmXT8fKw8h6wo9Tf1PDePYzP4GvH7hTbsMcZkjJOFW0obXL2sJ/8y+H
+FKKpIEfIkaiR0zI6m94zSnPe7V0f4llcYAGu34dUZxHONvpOAmR/l3njA4nPaOFM
+pjHTkxBmceWhuZ/dY061o6de1YBBixloOQkYQc2ibR2/t+UTorox9O2TXVKqcAvG
+2PYP4sUpOiGzIkbeI86kaGQggScs3hbzD/nZToAwz/31xMmlnvSSiIh1+x32ZSKW
+3SKM1M/7P1bGZwBNganqxUVLXobN52nwbDM/E8TVV1z0ovZeadBZd1Cg2Qovi25F
+EOYfh6B1hlYz/m+IMpC7IYK0hYCKzL67OcBfksJ67WputaO8Wn0=
+=j4vh
 -----END PGP SIGNATURE-----
 
---------------Q0SecAFdwyfq6TUsxDpKlVgR--
+--------------xEkN0T3V6TIatl1Qv8o6Acjp--
