@@ -1,104 +1,94 @@
-Received: from mailout3.hostsharing.net (mailout3.hostsharing.net [144.76.133.104])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA8A037C109;
-	Tue, 23 Jun 2026 13:44:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.133.104
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D497E37E317;
+	Tue, 23 Jun 2026 13:55:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782222284; cv=none; b=WZw/AGzPv8IdT7XiNoNwvjnkufbEMBBY0LpCDLBqTrXBw3hUlF4PNAJcf0z3f6JrOloCnnmrSqbe1In+9ZKWGLj0pK98uzhqNVKD/+BglRQp+3yQcmuV6Ial4mRM79o3KN40oOLoHEnpdSXJxPRNxcWkzS3jqtrn7B6y3N+D1zI=
+	t=1782222940; cv=none; b=WdkKgKLWynW9LS+xPq0TDIB2c4z16tPWshyL1Y9YRuGNsr6Z6ZzQX/xG63ENI/L1FwzXWDNada8CbZkGREnxzQSirsvy4uhXLmCZL2KlmOAnqQpagc7Xj7LoQ8mtN0eSS8xWt+0rmjAX4xNHMhFRUOw21Gx19rRgFLuEv1n6wk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782222284; c=relaxed/simple;
-	bh=bmJEfaGA/HL/+Rmr9wa/IHUYDf0IFENblFDia8vZaWU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=oBNSM1kOPvZUamITMgaUVXdQxX8Zgmf6kPenfkKmSzDIToXL1m7qP1DbPo6dvehvZQcQ9j1ZPhg0lA05kg7lLj0eQtlMkm3HD6leNbcpnO0p/RdxuDMZUQB+jNhVR0EsUyWINpqgjHSI7t1jrzqyeeDB856EAPAL2IsrXJY5x9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=144.76.133.104
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384
-	 client-signature ECDSA (secp384r1) client-digest SHA384)
-	(Client CN "*.hostsharing.net", Issuer "GlobalSign GCC R6 AlphaSSL CA 2025" (verified OK))
-	by mailout3.hostsharing.net (Postfix) with ESMTPS id E09EFC23;
-	Tue, 23 Jun 2026 15:37:01 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id AF18E6015CB6; Tue, 23 Jun 2026 15:37:01 +0200 (CEST)
-Date: Tue, 23 Jun 2026 15:37:01 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: Fabian Blatter <fabianblatter09@gmail.com>
-Cc: ignat@linux.win, herbert@gondor.apana.org.au, davem@davemloft.net,
-	stefanb@linux.ibm.com, linux-crypto@vger.kernel.org,
+	s=arc-20240116; t=1782222940; c=relaxed/simple;
+	bh=EH0yhlzgWwtCLlqM9UxTYkdpzLslcaXjnuV6zaQcPEY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QdBZzAYTt9L3l4qMHbltQgmaXlRDfcDOBPpGbKuDVjyvGGmsB+id4kpFllesnL0RBaHzQybC3k7DXqUM4V8QQkbjkUIve+54Vz4dbjOacQsReKb8jpFcE2rcMXPrPVF45plc8iKyL1Y8E+Er+s1PkUJngq+xJzVKFikWgY4F1v8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost.localdomain (unknown [111.196.245.140])
+	by APP-05 (Coremail) with SMTP id zQCowACX99pQkDpq_TTYFA--.34224S2;
+	Tue, 23 Jun 2026 21:55:28 +0800 (CST)
+From: Pengpeng Hou <pengpeng@iscas.ac.cn>
+To: Corentin Labbe <clabbe@baylibre.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Heiko Stuebner <heiko@sntech.de>,
+	John Keeping <john@keeping.me.uk>
+Cc: Pengpeng Hou <pengpeng@iscas.ac.cn>,
+	linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-rockchip@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: ecc - Optimize vli additive operations using
- compiler builtins
-Message-ID: <ajqL_VMVA6n-gfQP@wunner.de>
+Subject: [PATCH] crypto: rockchip: fail ahash requests on HASH idle timeout
+Date: Tue, 23 Jun 2026 21:55:28 +0800
+Message-ID: <20260623135528.46115-1-pengpeng@iscas.ac.cn>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAGtAT=nJOAxecN+eYVwkzQAUcr2BaBhAO=ni9hWqdRKUQ06=fA@mail.gmail.com>
- <20260607112435.42804-1-fabianblatter09@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQCowACX99pQkDpq_TTYFA--.34224S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7ur4DCFWDCFWDGr1kCr1kGrg_yoW8Gw15pF
+	43K39FyrykCr4qgF9Yywn0yFZ5XasIvay3ArZ7G3y5Zw1Sy34kXryxCFy0vF1jvF93Aa1j
+	yFs7A345Gr1UWrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCT
+	nIWIevJa73UjIFyTuYvjfU5iihUUUUU
+X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
 
-On Sun, Jun 07, 2026 at 01:24:35PM +0200, Fabian Blatter wrote:
-> This patch uses __builtin_addcll, __builtin_subcll when available and
-> otherwise __builtin_uaddll_overflow, __builtin_usubll_overflow. the
-> latter have existed since ancient gcc versions, so no third fallback
-> is needed.
+rk_hash_run() waits for RK_CRYPTO_HASH_STS to become idle after the
+final DMA transfer, but ignores the poll result. If the hash engine
+never becomes idle, the driver still reads the digest registers and
+finalizes the request with the previous success value.
 
-crypto/ecc.c is derived from https://github.com/kmackay/micro-ecc/,
-which seeks to be a portable ECC library.  I suspect the portability
-goal is the reason why it doesn't take advantage of compiler builtins
-or other optimizations.
+Store the poll result and finalize the request with the timeout error
+before reading the digest registers.
 
-The kernel is much less encumbered, the minimum compiler versions are
-apparent from Documentation/process/changes.rst.  If these compiler
-versions support the builtins you're using then everything should be
-alright.
+Fixes: 37bc22159c45 ("crypto: rockchip - use read_poll_timeout")
+Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
+---
+ drivers/crypto/rockchip/rk3288_crypto_ahash.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-> I have put the add_carry and sub_borrow inline functions with the
-> preprocessor logic for builtin selection directly in crypto/ecc.c.
-> Please let me know if you would like them to be somewhere else.
+diff --git a/drivers/crypto/rockchip/rk3288_crypto_ahash.c b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
+index b9f5a8b42..d3482619a 100644
+--- a/drivers/crypto/rockchip/rk3288_crypto_ahash.c
++++ b/drivers/crypto/rockchip/rk3288_crypto_ahash.c
+@@ -324,7 +324,12 @@ static int rk_hash_run(struct crypto_engine *engine, void *breq)
+ 	 * efficiency, and make it response quickly when dma
+ 	 * complete.
+ 	 */
+-	readl_poll_timeout(rkc->reg + RK_CRYPTO_HASH_STS, v, v == 0, 10, 1000);
++	err = readl_poll_timeout(rkc->reg + RK_CRYPTO_HASH_STS, v,
++				 v == 0, 10, 1000);
++	if (err) {
++		dev_err(rkc->dev, "HASH idle timeout\n");
++		goto theend;
++	}
+ 
+ 	for (i = 0; i < crypto_ahash_digestsize(tfm) / 4; i++) {
+ 		v = readl(rkc->reg + RK_CRYPTO_HASH_DOUT_0 + i * 4);
+-- 
+2.50.1 (Apple Git-155)
 
-Seems reasonable to me.
-
-> This is quite interesting, since, as far as I know, the kernel compiles
-> with gcc and O2 by default, yet the macro-level benchmarks still show a
-> performance increase. The effect seems to be reversed when crypto/ecc.c
-> gets compiled. Or maybe the linux kernel uses some additional
-> optimization flags, I am unsure.
-
-You can compile the kernel with V=1 to see the full command line.
-
-> However, most of the time, the patched version outperforms the original
-> one by a wide margin:
->  - On clang -O2 or -O3, vli_add and vli_uadd show a 4.074x and 5.384x
->    speedup.
->  - On gcc, vli_uadd shows a 74% performance increase at O2, 
->    and a 2.07x speedup at O3.
-
-There is precedent in the tree for overriding the default -O2 with -O3,
-see lib/lz4/Makefile and arch/mips/vdso/Makefile.
-
-It might be worth using that for crypto/ecc.c if it doesn't cause
-breakage and yields a significant speedup.
-
-> I am happy to make any changes to this patch if you like.
-> I could also look into making `vli_cmp` and `vli_is_zero`,
-> or others constant-time in a future patch.
-
-Your patch LGTM and I don't see a need for a v2.
-
-Previously we discussed replacing the ECC point multiplication algorithm
-used by crypto/ecc.c with a newer constant time Montgomery ladder.
-If you are interested in continuing working on crypto/ecc.c,
-this might be a worthwhile topic:
-
-https://lore.kernel.org/r/aftFAexDFrYbIeBM@wunner.de/
-
-Thanks,
-
-Lukas
