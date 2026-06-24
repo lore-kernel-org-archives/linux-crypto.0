@@ -1,264 +1,272 @@
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F6D93C1F5E
-	for <linux-crypto@vger.kernel.org>; Wed, 24 Jun 2026 14:23:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782311011; cv=none; b=fuJKkkGSuFGpNFaU+3p9M+goQdVO2w6lC+5ChxQGcx0kkaetnErg75INbhcuRfjyGw+beq9N8dYlclgkOYg5izzCLh3X5rbFK6OkvvxowCgppIn8RZjnePVH8wdMcCqfmFf0/KIjJpnVmEPT+uotkVLOWIPAZ4GZa0jFW8Os2Rs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782311011; c=relaxed/simple;
-	bh=ANcnDbJl1GrE6afhpUmaNktn53Zw0TE+IUnQR7Lyflk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UZe0F+CEM0Y+FcHXOnXA1y8Bbjw1BQRnTBQ77X5SUt5miWe/2UFu2z+MZboMk9NsMLfCO8JYbth9xgUrgBIB0+X1MdKy5UxIITLZ8XQBU61SIV+Opda4BLb4fxPsL1CrVGS24uiXZGJmabfAgXc4KMNnRswyqq5TgSsSO9nX0iE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CK1QgHuI; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 631843C943F
+	for <linux-crypto@vger.kernel.org>; Wed, 24 Jun 2026 14:44:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.180
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782312287; cv=pass; b=n8QVUQprqxpLDPK4BnukVrzEKtnGL2GFmfE9TdaPYkG02ARX2gvOM6Eyd6vmkxhrDH75peui5MEkkfEmpV0QYYsAzeG4Wg1e/1vseqKVyD8eR5fP4ldASWj20UD2hcI8X14h6gBoOuXULXUVu+AOqaVXE/VEipFpY5SMaxuQ0uM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782312287; c=relaxed/simple;
+	bh=32wZkNORP8iuzMZ+i7kPfSuj0LBIUcjLGqQt345rGGw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jIYEkMOGBBdDu9/jxIduYGFQfATvcSgBOKJtPlEYtoNH6/SkKkPpU7BNDWvgfh+vxvDK4r3xEu4ATUHvr6olIrZpsJVSczl600oPELU6FVuQgBJwwYijQweSFpAkN73FLmKK6NLRy2YmKQ2L2WQp2wK3jeIrSbk/kA6qNK3xHKs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mvLyshfo; arc=pass smtp.client-ip=74.125.82.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CK1QgHuI"
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-4629051c946so786354f8f.1
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Jun 2026 07:23:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mvLyshfo"
+Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-3078e0dcd67so1575489eec.0
+        for <linux-crypto@vger.kernel.org>; Wed, 24 Jun 2026 07:44:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1782312285; cv=none;
+        d=google.com; s=arc-20240605;
+        b=f8sQiaw3+3CzonxRWIeJNiX1wlK8bnOqI86FyKR5ZQ47aDJ42nmUvbNtt1bNZOKGQY
+         hBjRrfQLGhWbMX47TN0ipaqWDvEHDznTpj3FXipnP/kHAWSMGYyivTBHJ5FLCg+sEQO/
+         pEM9X/d9yQ0GvaUUYSSFzs6qjmIbE/EndzlkeZKfz3V5VBgTuGYp6xjur7idAoe8TxJ0
+         p8cF/4Isv1SZbtrrty80bCp+1tz4dxqiSbTBE/4i0IuCTY8BWvCQgt4Kan6OoYsgYpm5
+         IRTmZO0UuOjJWo+mpSj97+o3hxtsLMerTj+WnxEkdH1htoOe9j+s/N42+4xmnPzl0jSn
+         avxw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=ceZnDK/sKbEueEWuAoK1U45lE2R6s30snNQKMY7lKqQ=;
+        fh=9VW+1w7iumsEyOVLR1pal2ryBvkKrhVd0peJpwWbwfA=;
+        b=Aj42Xn5snJsX1M4J0GfMGkD2N9ot2u4l78Y9yBZoX+m0tB/Kt8CtDN8pFluvhJhaEz
+         54PKmWRo3fdVkfKRdXUsofWNwz3lRn560PBEYqAx2onpRF34ZZzSHALbepcOZlLmYl0K
+         4NSzbCKKZAMF/kyUGir47APfxvFoFPPbTRnJ2gu84RCb1UhZJpUULsemDKsxwr+w1HBS
+         CgsV++iIuWZHkzb1toszp5sAUQrRT/9FFAmDTyOzLzrk2QmNVB9eqTbyxt3wESZsAfYP
+         e13AGJVtAQA86X1/OLVRRSvuwq/kg1+x2ZfWwaNDeJ7uIHYCA/2jknCmzINf1wM2bNOJ
+         P9fg==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782311007; x=1782915807; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1782312285; x=1782917085; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Per6MI6n5CBZ4jce2Yah0coKW3mXxHCaIKwWKmwmsgQ=;
-        b=CK1QgHuIU3L+Hoq9eyhLAP/tW60WuHCUI7tfWelD/UEnl2Wy0NhsVkfh8AA22XEOA2
-         hDg0I3Qw0c8thCpYKIRQF2GB97/jDtHq3N7sH/zC33OPWPVMkUtDc/wZajKMWaLEVhh+
-         9ZNJdTbT7ze+PrqZ/wGdLFb1rAwCCMVFvHdTBfoD6HTQegbltGhdwjkQ+PvECoQiudJB
-         SKRNGqOXEB2kF2ZVf2qCX1biZAaWtJawZh0E366EpIQ4SAIrWsXVO2ZBPpaWDzupv+RC
-         TaMQybC2UB1JHLVfYACnBxKWlff5n5TZv8mwnhHgObgWNzrtct1UvpEaaP+EMi+/wDnr
-         NuMA==
+        bh=ceZnDK/sKbEueEWuAoK1U45lE2R6s30snNQKMY7lKqQ=;
+        b=mvLyshfo2HtoIsrxqtHsiwTOdz/1XjptofLq+hajEjOyrbVkq6ooLYuoX/NvG/t2uI
+         ctN0jyRwQfVuUzjBS3qo//q9JtjAZVzLVu9QDhBCew4LZomPUgRR5oTV8saO3emwCiiH
+         II4v83CKmNLWVPSfsBFMaz7oE2PkQF+N1XuKxNj1f4OEhEqHtSOe5xvfBJ/HNrFnpzQE
+         SpyYla5LyXmrK6e3RXb8ojitjruW+Mw31+1lexixjeP64XxMJD9eNJg8TvPKtdQgvB+R
+         ec70O2t4cEp8JQIaQqUCM8WIiGLvUUSX9YOTHRS2wuyCGZ6QIKoYNiz3oCFKiPhwoYjy
+         aBrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782311007; x=1782915807;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20251104; t=1782312285; x=1782917085;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Per6MI6n5CBZ4jce2Yah0coKW3mXxHCaIKwWKmwmsgQ=;
-        b=ER1UBVnbs/HqUMABP0fWuFwBQaRckKqr8+jdwRIEk4zrIYP2c8lr82SODLdfLPmOCH
-         dWiCAa1/X/jrW+P82GUduRWnWWSj1wpAocDxBncPXyipbe62WeKjlFeGDl1JWl6ejUGh
-         rL2+A5oZlJYAjosnMTEK61hhGrfY/wGFVEzrb3wq6CvxF8QFfvzToKSBhEoU1YiEa7Uu
-         oGWtlZ7xfPb+ISyQm/OHZUq4auUZ3//QPNYzYzo5AL19oS7BInnBQLIoOMgtwaT+LMFk
-         7kgg+9AD9XVXuGidJR6MeaO7WrM+z0i8PR0FgTZUSh5MnPIIMkYTY3YFRXtRiahSaOls
-         EZvw==
-X-Forwarded-Encrypted: i=1; AHgh+RpI4tob4ObPYBAoY1WjtMShuQS4rZE5LYfH2TQW847Ze34VqUs7yOZaOdIeagxxtyWK1ydnQhhUu3bB9H0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMLpYyeiLddo66woGHqHHjOufp9mJ127xlIYHvhbO0nZ3aHi4G
-	L+82JEMk188z6umVif2XFDN3+KPloqpkCSgexZ0LH24ShboZjrqQW370
-X-Gm-Gg: AfdE7ck2BmB0nRtvcj0JytBOCoFaXcBGdojwejGLQEM3sowafekQuChLqozAlFHcwMr
-	uVnMzmCmWH1l2pOWq0RTXVeSAhT5MZJ1JZiIYtkxJGbmVsmvX4BkAKr9Qz/0UXafrysi2AiD/La
-	XI5j4iHTjlvJCovpTJCbKrz4xRgphCcyMQeMh3gVuodt+phNxgPYJQQ8y+OnBJ0Fa4fJKHSrxAz
-	+ESz4LKeyXGp7R85xIedIxjFfBOIoIMLd7+y6+/D0zQNA+eGtHsbRNgeyZ1FaaYqneG9winObKW
-	kyxf+joVqE1n09DiuICt16Di7mElhEPw2xW82iI794lw5U4BTxbtanRobj3F+BooIuzK7BG1ktl
-	4XGb5hg9yn7ytmMDPozPGRSz+fkLENnKuGeF9upbVc43a5mq/8YZuj2t7n3ib/1eOPcbhzIDsjz
-	7Qvz/V3XL0KdfFAtU6IN4dTs8pDfKU9yuVxI0jb1zEmMq1aeC7dw==
-X-Received: by 2002:a05:6000:471a:b0:460:2e53:a6f6 with SMTP id ffacd0b85a97d-46d04583b35mr1261972f8f.12.1782311006854;
-        Wed, 24 Jun 2026 07:23:26 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-46c221d9405sm8183744f8f.22.2026.06.24.07.23.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jun 2026 07:23:26 -0700 (PDT)
-Date: Wed, 24 Jun 2026 15:23:24 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Christian =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>
-Cc: Kaitao Cheng <kaitao.cheng@linux.dev>, Andrew Morton
- <akpm@linux-foundation.org>, David Hildenbrand <david@kernel.org>, Jens
- Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>, Alexander Viro
- <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>,
- Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>, Namhyung Kim
- <namhyung@kernel.org>, Thomas Gleixner <tglx@kernel.org>, Juri Lelli
- <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, Paul
- Moore <paul@paul-moore.com>, Andy Shevchenko
- <andriy.shevchenko@linux.intel.com>, "Paul E. McKenney"
- <paulmck@kernel.org>, Shakeel Butt <shakeel.butt@linux.dev>, David Howells
- <dhowells@redhat.com>, Simona Vetter <simona.vetter@ffwll.ch>, Randy Dunlap
- <rdunlap@infradead.org>, Luca Ceresoli <luca.ceresoli@bootlin.com>, Philipp
- Stanner <phasta@kernel.org>, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
- linux-ntfs-dev@lists.sourceforge.net, linux-fsdevel@vger.kernel.org,
- io-uring@vger.kernel.org, audit@vger.kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linux-perf-users@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- kexec@lists.infradead.org, live-patching@vger.kernel.org,
- linux-modules@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-pm@vger.kernel.org, rcu@vger.kernel.org, sched-ext@lists.linux.dev,
- linux-mm@kvack.org, virtualization@lists.linux.dev, damon@lists.linux.dev,
- llvm@lists.linux.dev, Kaitao Cheng <chengkaitao@kylinos.cn>
-Subject: Re: [PATCH v3 1/7] list: Add mutable iterator variants
-Message-ID: <20260624152324.3def88ce@pumpkin>
-In-Reply-To: <cf8467c7-b98f-44a5-9cf9-60b43b5da711@amd.com>
-References: <20260622040533.29824-1-kaitao.cheng@linux.dev>
-	<20260622040533.29824-2-kaitao.cheng@linux.dev>
-	<20260622094242.64531b9a@pumpkin>
-	<351a6b67-b394-4c58-aee2-88b6c8089ad5@linux.dev>
-	<cf8467c7-b98f-44a5-9cf9-60b43b5da711@amd.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        bh=ceZnDK/sKbEueEWuAoK1U45lE2R6s30snNQKMY7lKqQ=;
+        b=lMpD5UGofU+j8zDNTkvq/7zo4xkCEiJGBE3yhUqj0HvQ9QXge8p6/gahypZcQXQ6QJ
+         k6rtQQDirxNV7JjPTtdvDb3DebmgHva6Px5UV79WOKIbVzwDZQ8fvYPkClftU/lwD1lS
+         yCeE8AfeX1DDb+LOYo38CGYSmPuPYx4OCkW7Toxb6eQcIw7VmDgd6zZ0RTEnxmC/FQk1
+         NrDemThFsKGCm42A64EVSUXR7V2jFAD9AZJSXmCEnDFzAQVbsUPKEORW+bc7ntXM0dJR
+         hPV2JaV5Y31bYaJqFVQb9O+q8t/TQBhKfh3qJWeqt3VgwBqwZg0aGr8fVIOsEllYGT1s
+         YsgQ==
+X-Gm-Message-State: AOJu0YyDGSxuG04Y1NzWhB9YAvvsZBZJwS0bBAOOoopvx3YSF0mQ5E9p
+	In6aQZnZFBkemzb6C1zZGWc7UHBqMQU7H4XxW+9Efr7xAmZpbNyE4XRS1B+NUKrjnhW37WyyTnj
+	JaOP9N2ErquBKeQHjSdJy20UCyyJLndB7TNhn
+X-Gm-Gg: AfdE7cm2NoBTZUsxm4asXkg1FPt5krPTwVVBNFU+Q+yTVXaLNagdhR4a+6dmkTGKXGn
+	Jc+LKqWyRibd5FN6b+tHV1eQkScpLCvULE5WqEdmFXnNPVsU3MoBFw/otsgocVU0vy9gySoNpaO
+	IceLE6+ElvprJEkBVM+oQWZyty/Ez9Jnm7YoRzBEhnT9PnMrT2IOQs4e4UjaI17AUaeS2LluCn9
+	9sweMJs41PXAIFVwNMOeYfoEa0OF5OE7UmpXHVk2QPcOl8WIDhihubJt5TTe+CUpHrCPg==
+X-Received: by 2002:a05:7300:214b:b0:2ed:e14:42e9 with SMTP id
+ 5a478bee46e88-30c68ec5a61mr4412177eec.34.1782312285061; Wed, 24 Jun 2026
+ 07:44:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <CAMho2RfgwvNhWJidb_Xn3RRt71TFjQ2QBKP9Xt8ur22L-ZWP9A@mail.gmail.com>
+ <20260609192542.GA3811606@google.com> <CAMho2Rem-B908oaFQzTx8Mg895LuvPcfN9+ANoHW+XfGW+wB6A@mail.gmail.com>
+ <20260612183240.GA2157807@google.com> <CAMho2Re4pc4f_TkApfwsbfguiaN_Ccw770_A+0fc9G7L_GBAnA@mail.gmail.com>
+In-Reply-To: <CAMho2Re4pc4f_TkApfwsbfguiaN_Ccw770_A+0fc9G7L_GBAnA@mail.gmail.com>
+From: kstzavertaylo <kstzavertaylo@gmail.com>
+Date: Wed, 24 Jun 2026 17:44:46 +0300
+X-Gm-Features: AVVi8CfOGMG86JNsbfqdst4j4EWGC8WQsdk6iRyID4PX8ztGI8x5etSNnwj4gbI
+Message-ID: <CAMho2Ren_PucPRyyTSySdniFfBLECBL+nxH3x6-5Mxsp+89iqw@mail.gmail.com>
+Subject: Re: [RFC] ML-KEM (FIPS 203) implementation with reusable
+ decapsulation pool
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 24 Jun 2026 15:23:47 +0200
-Christian K=C3=B6nig <christian.koenig@amd.com> wrote:
+Hello,
 
-> On 6/24/26 15:14, Kaitao Cheng wrote:
-> >=20
-> >=20
-> > =E5=9C=A8 2026/6/22 16:42, David Laight =E5=86=99=E9=81=93: =20
-> >> On Mon, 22 Jun 2026 12:05:31 +0800
-> >> Kaitao Cheng <kaitao.cheng@linux.dev> wrote:
-> >> =20
-> >>> From: Kaitao Cheng <chengkaitao@kylinos.cn>
-> >>>
-> >>> The list_for_each*_safe() helpers are used when the loop body may
-> >>> remove the current entry.  Their API exposes the temporary cursor at
-> >>> every call site, even though most users only need it for the iterator
-> >>> implementation and never reference it in the loop body.
-> >>>
-> >>> Add *_mutable() variants for list and hlist iteration.  The new helpe=
-rs
-> >>> support both forms: callers may keep passing an explicit temporary cu=
-rsor
-> >>> when they need to inspect or reset it, or omit it and let the helper =
-use
-> >>> a unique internal cursor. =20
-> >>
-> >> I'm not really sure 'mutable' means anything either.
-> >> It is possible to make it valid for the loop body (or even other threa=
-ds)
-> >> to delete arbitrary list items - but that needs significant extra over=
-heads.
-> >>
-> >> It might be worth doing something that doesn't need the extra variable,
-> >> but there is little point doing all the churn just to rename things.
-> >> =20
-> >>>
-> >>> This makes call sites that only mutate the list through the current e=
-ntry
-> >>> less noisy, while keeping the existing *_safe() helpers available for
-> >>> compatibility.
-> >>>
-> >>> Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
-> >>> ---
-> >>>  include/linux/list.h | 269 +++++++++++++++++++++++++++++++++++++----=
---
-> >>>  1 file changed, 231 insertions(+), 38 deletions(-)
-> >>>
-> >>> diff --git a/include/linux/list.h b/include/linux/list.h
-> >>> index 09d979976b3b..1081def7cea9 100644
-> >>> --- a/include/linux/list.h
-> >>> +++ b/include/linux/list.h
-> >>> @@ -7,6 +7,7 @@
-> >>>  #include <linux/stddef.h>
-> >>>  #include <linux/poison.h>
-> >>>  #include <linux/const.h>
-> >>> +#include <linux/args.h>
-> >>> =20
-> >>>  #include <asm/barrier.h>
-> >>> =20
-> >>> @@ -763,28 +764,72 @@ static inline void list_splice_tail_init(struct=
- list_head *list,
-> >>>  #define list_for_each_prev(pos, head) \
-> >>>  	for (pos =3D (head)->prev; !list_is_head(pos, (head)); pos =3D pos-=
->prev)
-> >>> =20
-> >>> -/**
-> >>> - * list_for_each_safe - iterate over a list safe against removal of =
-list entry
-> >>> - * @pos:	the &struct list_head to use as a loop cursor.
-> >>> - * @n:		another &struct list_head to use as temporary storage
-> >>> - * @head:	the head for your list.
-> >>> +/*
-> >>> + * list_for_each_safe is an old interface, use list_for_each_mutable=
- instead.
-> >>>   */
-> >>>  #define list_for_each_safe(pos, n, head) \
-> >>>  	for (pos =3D (head)->next, n =3D pos->next; \
-> >>>  	     !list_is_head(pos, (head)); \
-> >>>  	     pos =3D n, n =3D pos->next)
-> >>> =20
-> >>> +#define __list_for_each_mutable_internal(pos, tmp, head)		\
-> >>> +	for (typeof(pos) tmp =3D (pos =3D (head)->next)->next;		\ =20
-> >>
-> >> Use auto
-> >> =20
-> >>> +	     !list_is_head(pos, (head));				\
-> >>> +	     pos =3D tmp, tmp =3D pos->next)
-> >>> +
-> >>> +#define __list_for_each_mutable1(pos, head)				\
-> >>> +	__list_for_each_mutable_internal(pos, __UNIQUE_ID(next), head)
-> >>> +
-> >>> +#define __list_for_each_mutable2(pos, next, head)			\
-> >>> +	list_for_each_safe(pos, next, head)
-> >>> +
-> >>>  /**
-> >>> - * list_for_each_prev_safe - iterate over a list backwards safe agai=
-nst removal of list entry
-> >>> + * list_for_each_mutable - iterate over a list safe against entry re=
-moval
-> >>>   * @pos:	the &struct list_head to use as a loop cursor.
-> >>> - * @n:		another &struct list_head to use as temporary storage
-> >>> - * @head:	the head for your list.
-> >>> + * @...:	either (head) or (next, head)
-> >>> + *
-> >>> + * next:	another &struct list_head to use as optional temporary stor=
-age.
-> >>> + *		The temporary cursor is internal unless explicitly supplied by
-> >>> + *		the caller.
-> >>> + * head:	the head for your list.
-> >>> + */
-> >>> +#define list_for_each_mutable(pos, ...)					\
-> >>> +	CONCATENATE(__list_for_each_mutable, COUNT_ARGS(__VA_ARGS__))	\
-> >>> +		(pos, __VA_ARGS__) =20
-> >>
-> >> The variable argument count logic really just slows down compilation.
-> >> Maybe there aren't enough copies of this code to make that significant.
-> >> But just because you can do it doesn't mean it is a gooD idea.
-> >> I'm also not sure it really adds anything to the readability.
-> >>
-> >> And, it you are going to make the middle argument optional there is
-> >> no need to change the macro name. =20
-> >=20
-> > Christian K=C3=B6nig and Jani Nikula also disagree with the variadic-ar=
-gument
-> > implementation approach. If we abandon that method, it means we will
-> > inevitably need to add some new macros. If mutable is not a good name,
-> > suggestions for better alternatives would be welcome; coming up with a
-> > suitable name is indeed rather tricky. =20
->=20
-> I don't think you need to add a new macro for the specific use case that =
-people want to modify the next element of the iteration.
->=20
-> If I remember your numbers correctly that is a really corner case and kee=
-ping using the existing *_safe() macros for that sounds perfectly fine to m=
-e.
+Since our previous discussion, I have significantly updated the
+userspace implementation and completed a series of benchmarks and
+validation tests.
 
-IIRC currently you have a choice of either:
-	define               Item that can't be deleted
-	list_for_each()	     The current item.
-	list_for_each_safe() The next item.
-There is also likely to be code that updates the variables to allow
-for other scenarios.
+The implementation allocates all memory required for a given key
+during key creation and subsequently operates entirely within that
+preallocated memory until the key is destroyed.
 
-Note that if increase a reference count and release a lock then list_for_ea=
-ch()
-is likely safer than list_for_each_safe() :-)
+During decapsulation, the same memory allocated at key creation is
+reused across operations, eliminating runtime memory allocations in
+the decapsulation path.
 
-list.h has 9 variants of the 'safe' loop.
-The bloat of another 9 is getting excessive.
 
-It has to be said that this is one of my least favourite type of list...
+I compared the implementation against PQClean ML-KEM. The main observations=
+ are:
 
-	David
+* Stack usage remains approximately 1 KB regardless of the selected
+ML-KEM security level.
+* No memory allocations are performed during decapsulation.
+* Throughput is generally comparable to PQClean.
+* For ML-KEM-1024, the implementation is currently about 5=E2=80=938% slowe=
+r
+than PQClean.
+* The trade-off is increased persistent memory consumption and a more
+complex internal architecture based on reusable preallocated
+resources.
 
->=20
-> Regards,
-> Christian.
+I also took your earlier feedback into account and came to the
+conclusion that integration through lib/crypto would be a better
+direction than the KPP interface. As a result, I am now seriously
+considering adapting the implementation for lib/crypto instead.
 
+In addition, I am continuing to investigate further optimizations in
+pure C. If these experiments produce meaningful results, I will
+publish them and would be happy to share the findings in the future.
+
+Benchmark results, methodology, stack usage measurements, memory usage
+analysis, and PQClean comparisons are available here:
+
+Release:
+https://github.com/kstzv/ml-kem/releases/tag/v1.1.0
+
+Benchmarks:
+https://github.com/kstzv/ml-kem/tree/v1.1.0/portable/userspace/benchmarks
+
+Thank you again for your earlier feedback.
+
+Best regards,
+K. S. Zavertailo
+
+On Sun, Jun 14, 2026 at 10:50=E2=80=AFAM kstzavertaylo <kstzavertaylo@gmail=
+.com> wrote:
+>
+> Thank you for the detailed feedback and for outlining the historical
+> context regarding pools in the crypto subsystem.
+>
+>
+> I understand your point of view and the preference for keeping the
+> core implementation simple with per-operation allocations (or
+> caller-provided workspaces), especially given the lack of precedent
+> for pool-based designs in lib/crypto. My approach with the reusable
+> decapsulation pool was driven by a focus on constrained environments
+> where minimizing stack usage and relying on reusable preallocated
+> working memory during the hot path can be particularly valuable.
+> However, I fully agree that concrete data is needed to properly
+> evaluate the trade-offs.
+>
+>
+> I see your point regarding preallocated workspaces and caller-managed
+> caching. One of the goals of my prototype was to explore a design
+> where decapsulation operates on reusable preallocated contexts rather
+> than per-call working memory, primarily to reduce stack requirements
+> and move memory management into an initialization phase. I need to
+> analyze more carefully how much of this can already be achieved
+> through a caller-provided workspace model and whether the additional
+> complexity of a dedicated pool is actually justified.
+>
+>
+> I am currently working on benchmarks that compare stack consumption,
+> allocation behavior, memory footprint, and performance between the
+> different approaches. Once I have solid numbers, I will share the
+> results and my conclusions.
+>
+>
+> I also appreciate the clarification regarding KPP. My original
+> prototype used KPP because it appeared to be the closest existing
+> interface for key establishment, but I am not specifically attached to
+> that approach and will spend some time evaluating how the same ideas
+> could fit into the lib/crypto model as well. In the meantime, I will
+> also look into how the pre-allocated workspace support you suggested
+> could be integrated.
+>
+>
+> Best regards,
+> K. Zavertailo
+>
+>
+> On Fri, Jun 12, 2026 at 9:32=E2=80=AFPM Eric Biggers <ebiggers@kernel.org=
+> wrote:
+> >
+> > On Fri, Jun 12, 2026 at 05:14:54PM +0300, kstzavertaylo wrote:
+> > > Thank you for the detailed reply and for pointing me to the existing
+> > > ML-KEM/X-Wing patchset. I spent some time reviewing the implementatio=
+n
+> > > to better understand the design choices and how they compare to the
+> > > approach I took in my own work.
+> > >
+> > > After reviewing the patchset, I can see several strengths in the
+> > > implementation. It integrates cleanly into the existing lib/crypto
+> > > infrastructure, reuses kernel cryptographic primitives, avoids large
+> > > stack allocations, and includes KUnit-based validation. The
+> > > implementation also appears intentionally compact and well aligned
+> > > with existing kernel conventions.
+> > >
+> > > While reviewing the implementation, I noticed that decapsulation
+> > > allocates a temporary workspace for each operation. This is one of th=
+e
+> > > areas where my design diverged, which is what originally motivated th=
+e
+> > > reusable pool approach.
+> > >
+> > > My implementation was developed with a somewhat different goal in
+> > > mind. I experimented with a reusable decapsulation workspace model
+> > > where memory is allocated during key initialization and then reused
+> > > across subsequent decapsulation operations. The main motivation was
+> > > reducing allocation frequency and minimizing both stack usage and
+> > > repeated memory management during decapsulation.
+> > >
+> > > As a result, the implementation avoids allocations during
+> > > decapsulation entirely by reusing preallocated workspaces associated
+> > > with the key context. My original hypothesis was that moving memory
+> > > allocation to key initialization, thereby eliminating allocations fro=
+m
+> > > the decapsulation path, could reduce allocation overhead during
+> > > repeated decapsulation operations and be beneficial in environments
+> > > where allocation activity is considered undesirable.
+> >
+> > In my ML-KEM code, all the decapsulation memory is consolidated into
+> > struct mlkem_decap_workspace.  It would be straightforward to support
+> > the caller providing a pre-allocated workspace.
+> >
+> > In the case of X-Wing, we could also support pre-expanding the
+> > decapsulation key.
+> >
+> > It just depends on what is actually going to be needed by the kernel
+> > feature(s) that are going to use this.  Which we don't really know yet.
+> >
+> > We do know that it hasn't been found to be useful for the crypto
+> > subsystem to provide pools for any other algorithm in the kernel, for a
+> > variety of reasons.  Usually callers can just allocate per-operation, o=
+r
+> > they have some sort of object (inode, block device, socket, etc.) that'=
+s
+> > a natural place for them to cache whatever they need anyway.  In the
+> > rare cases where some sort of pool is needed it's implemented in the
+> > caller, optimized for the particular use case.  So I think there's a
+> > good chance your pool idea is going off on the wrong track.
+> >
+> > > Another difference is the integration level. My prototype explored
+> > > direct integration through the KPP interface, whereas the patchset
+> > > focuses on providing a reusable cryptographic library component withi=
+n
+> > > lib/crypto. These approaches address somewhat different layers of the
+> > > kernel crypto stack.
+> >
+> > We don't need crypto_kpp support, as it's much more complex and harder
+> > to use than the crypto library
+> > (https://docs.kernel.org/crypto/libcrypto.html).  Also it seems it's no=
+t
+> > really possible anyway, since crypto_kpp is an old design that works fo=
+r
+> > Diffie-Hellman but not KEMs.
+> >
+> > - Eric
