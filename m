@@ -1,64 +1,77 @@
-Received: from pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com [35.162.73.231])
+Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013060.outbound.protection.outlook.com [40.93.201.60])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E40A2305E28;
-	Wed, 24 Jun 2026 19:53:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.162.73.231
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782330787; cv=none; b=KQavhEkRqcxxdbuB0chTc53sC1zriCKYEPKyLZU7R9KHo78QlOzkE9R09GrIIyzdi3fOk8bpsF9rwc2naMQl0o7Dl3bFnJQMZn/Q5Kh2mJFc+CgClN0rFFn8vIvPry0M899A1HoaQYC06Ylx61KjRsJdH5eifsQjq9kUfrVHkDo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782330787; c=relaxed/simple;
-	bh=uGManwo2POKMO9mUH2vgxLmsUYYgJxBMxApUaz/JoN4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Yqmf48A9bHjTTmb9Rv3w6YfOA6Y6eWBtsdrZW0RHbUEy32XQfL9JdbvvaiWKrcqdY6GE8QZt5sCimvHGYd+PBTVFw11u3Cuf1yE4/hvkiQclTONRa7/xzqpDXi8Sdi5Kv1KxqjtbxyVldzbLTuBqggqS/JOKgcA/jsqkMkydHnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=nOICm2iu; arc=none smtp.client-ip=35.162.73.231
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5752322A;
+	Wed, 24 Jun 2026 21:56:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.60
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782338168; cv=fail; b=Ibr924LtG5hEG+ZBCE4ecrbTKHe1SzCmB12R+UFkvmkOyIQ7m/jqRY3EPSDuBH5BJsWJkPpWW1r6tt+Z4H0oPirOGHKn0RCzH7ZkLyWtf8P2s1+EMYEUbMY3gT5pOeH6NPc+srkfklkz1vblllzwkJLorm8BVjmjH6CGNciSz84=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782338168; c=relaxed/simple;
+	bh=acVXkil0g+6nzNn6XCe35E+nusVN5sI5nCeQ9wOOI1A=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=iU+kmJ6M5ox5KH4F2nNUyaOP46IOY1CwL7KdjdOE8Ol3E1P7BqFzprWpCTEeshdzGE0u3JoSovaL9059Qf9K0Dxru5Gjg/deP/77bzQS4qyE1W6GKus8/7NRSSbuEd2iK9OHbU9jiDJwjil43CUWAvdP+T2mVd7w8xP5fx+Abb0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=RrvBW3SN; arc=fail smtp.client-ip=40.93.201.60
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="nOICm2iu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1782330786; x=1813866786;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=9kzduUnU0W5KLUH8xRjByArbNZrNdOxKMBIECVRVqgo=;
-  b=nOICm2iuvF/7hBvOGRmdUEltZ79ODKCbDCM/qGUw+xaZGctieYbzpW+P
-   t//aMECdcpQ7YwpTTGXZJooLjhmvPnbmZY+6sXkDQ8WT0JV4318moojUY
-   Sh1ghJEaYS2z0raGJtgrnb6Br9JQejUAomOPJVrCEwd1O/y28gNkAgtNC
-   NedB4OQkrOMzLoifsNYCS8SYPAo+57Fz07SWWeZeQrbAX5IPpjI0dZ7Lm
-   rRRABkqKMK6cf8ndPdR3ovV4h8KmILmlNdc+6IQCPozw5XnVTfR7K2d7C
-   gZfsx9z6N5L5YX3wucb4y6XL4Fv9hk6Y3MIg8V4c/SSV3LAeXBDIqr5ZZ
-   g==;
-X-CSE-ConnectionGUID: T4dFEcxWRLmb1DhwaTaxaQ==
-X-CSE-MsgGUID: CrIjSsjgRWCy8HXfNV8Ngg==
-X-IronPort-AV: E=Sophos;i="6.24,223,1774310400"; 
-   d="scan'208";a="22234931"
-Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
-  by internal-pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2026 19:53:03 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [205.251.233.111:4369]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.1.61:2525] with esmtp (Farcaster)
- id 485ff261-6d1f-4c4d-9fd6-0a3f6bebcd59; Wed, 24 Jun 2026 19:53:03 +0000 (UTC)
-X-Farcaster-Flow-ID: 485ff261-6d1f-4c4d-9fd6-0a3f6bebcd59
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43;
- Wed, 24 Jun 2026 19:53:02 +0000
-Received: from dev-dsk-lravich-1b-7405803b.eu-west-1.amazon.com (10.13.225.95)
- by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43;
- Wed, 24 Jun 2026 19:53:01 +0000
-From: Leonid Ravich <lravich@amazon.com>
-To: Eric Biggers <ebiggers@kernel.org>, Herbert Xu
-	<herbert@gondor.apana.org.au>
-CC: Alasdair Kergon <agk@redhat.com>, Ard Biesheuvel <ardb@kernel.org>, "Jens
- Axboe" <axboe@kernel.dk>, <dm-devel@lists.linux.dev>,
-	<linux-block@vger.kernel.org>, <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH v4 0/3] crypto: skcipher - per-request multi-data-unit batching
-Date: Wed, 24 Jun 2026 19:52:55 +0000
-Message-ID: <20260624195255.1102-1-lravich@amazon.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260622182328.GB1250822@google.com>
-References: <20260622182328.GB1250822@google.com>
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="RrvBW3SN"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Y6dUhKEw1tlyZALc32d4BaOgCJb9YD67zJzGk2d2d3oGK9iIiHJO8vw7p/VYc7LHxClx0rfJGCyGeXOkTDEWyQFkgDXYMjhpkLSYwR1/3v3pleHzL4uatgMVFJ32i8p5Xvj5Vl1ms5lrYaHWkgfZMI4BOdsbANkUuI0hO1xa6S7n98wRGPL/q5MLA7JFYEL40T5nCVtjuS1TYEY5BuL5QkF8JTdP0trUp85YZvyUD3XP2+EXOQMhpMC4z5tUZu7qWFeVNJcC5EGAsUkZRRO1kEZYz9fcd7eA5ch59FXa8f2FCpPGqMpk0zjYAg9DTGp+XcmmX5JA8RefKih07DYkPA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PNQeb3FKb9p6JEkaiNmjWqaDuRHXRJaV6udZdyngGHo=;
+ b=SmBkDv0KCWEOlVfqtyBP/tnrpVQVRsTsyqUUOs/vwpN6hZl+4RLtMJOi8iqYdQJhRoyhU7cC5g3Vn0b0uLMDLW/oQenwqm7vQgIDPxXfDSn5v5a2itBy/bY2Zc4Dc8CkNO6SSL72quoEiNYSYhcAnmaiPyEOqweNaOtnXh6/8OojvgI+OGQCE2CYEJAuKp3hzuz3NxSE+srxXlAqbldyR+yvZvhKca5Gx9LHA44HaFUnvbtX6CaCbnlBQHfsYXiI866owrSQPXRDAoudqAXUfD7bfdX4pJo88foQoHmharJRloK71A2bHYmmzkB3OJ6kO33akPSekZLShrqt8ADsdA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PNQeb3FKb9p6JEkaiNmjWqaDuRHXRJaV6udZdyngGHo=;
+ b=RrvBW3SNWQTQkEZ5EJxOqc16mDvqfJ1tgxKK9GRd/Osyu3yLVA4JWhQV1QK6DCOR0VIe1jWzkpOyG1E5QO5jD0gqyouITKAEVBW4YO3mzh1+XSUfhL8xCZIByEmdfZ/91hwyz5/BANPEj2+30cdY+UN6UsQMRpEfZ7OwXIoG16I=
+Received: from BN9PR03CA0214.namprd03.prod.outlook.com (2603:10b6:408:f8::9)
+ by SA1PR12MB5615.namprd12.prod.outlook.com (2603:10b6:806:229::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.13; Wed, 24 Jun
+ 2026 21:56:03 +0000
+Received: from BN2PEPF000044A4.namprd02.prod.outlook.com
+ (2603:10b6:408:f8:cafe::68) by BN9PR03CA0214.outlook.office365.com
+ (2603:10b6:408:f8::9) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.159.13 via Frontend Transport; Wed,
+ 24 Jun 2026 21:56:03 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ BN2PEPF000044A4.mail.protection.outlook.com (10.167.243.155) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.181.6 via Frontend Transport; Wed, 24 Jun 2026 21:56:02 +0000
+Received: from nigeria-2635-os.amd.com (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Wed, 24 Jun
+ 2026 16:56:01 -0500
+From: Ashish Kalra <Ashish.Kalra@amd.com>
+To: <tglx@kernel.org>, <mingo@redhat.com>, <bp@alien8.de>,
+	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>,
+	<seanjc@google.com>, <peterz@infradead.org>, <thomas.lendacky@amd.com>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <ardb@kernel.org>
+CC: <pbonzini@redhat.com>, <aik@amd.com>, <Michael.Roth@amd.com>,
+	<KPrateek.Nayak@amd.com>, <Tycho.Andersen@amd.com>,
+	<Nathan.Fontenot@amd.com>, <ackerleytng@google.com>, <jackyli@google.com>,
+	<pgonda@google.com>, <rientjes@google.com>, <jacobhxu@google.com>,
+	<xin@zytor.com>, <pawan.kumar.gupta@linux.intel.com>, <babu.moger@amd.com>,
+	<dyoung@redhat.com>, <nikunj@amd.com>, <john.allen@amd.com>,
+	<darwi@linutronix.de>, <linux-kernel@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<linux-coco@lists.linux.dev>
+Subject: [PATCH v9 0/6] Add RMPOPT support.
+Date: Wed, 24 Jun 2026 21:55:51 +0000
+Message-ID: <cover.1782245104.git.ashish.kalra@amd.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -67,38 +80,295 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWA001.ant.amazon.com (10.13.139.124) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN2PEPF000044A4:EE_|SA1PR12MB5615:EE_
+X-MS-Office365-Filtering-Correlation-Id: a9b62bf6-9794-4c89-faed-08ded23b6268
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|23010399003|82310400026|376014|7416014|36860700016|1800799024|18002099003|921020|56012099006|5023799004|11063799006|3023799007|6133799003;
+X-Microsoft-Antispam-Message-Info:
+	wUN/RSqjbeiz843KrBhXDc6pBtX0oP0bHFaXwleuQqPqQg3a2FYnJpAtUkHX+VKACddT8u4t9mr1/K70SaqhbYdtS63F+L11bopNL4ihKg/M5YnnPLfXCS2ZW8GEzAJfxkGufiizV2RVV0FCFEGqP/1uCIu96gwMmu/2h7EKNmgfnLx4LIrIoGdwo9YYpZm+kIjyhHB6Gy3qghe500CpHCTWqe3HFUF7lzGQsNZcOxTCk19uN6XGKK2B176bgeEwXM1OT6Jn9SoeiONwYkC9xiMkWxatRd48rrP8hl/gGMVenjj1RT7Lz8QsT42amHc8tDcsUCb4zwVohMcetsWPxkx+BMYpRnYlOUPDAcW3FCMI7GPOxwo5RL4I/e1Q/CYr86ETrjmA22gBrPuUP0RG/KvAtgjzAw8nv/yOBgM3qAHwL1nTwE747/R3SB0KYQe030w0DgBJN4z8ki7IRDgiu7Mx6/UETXelbdJfqfRvyY1weJV30zCiJEpiD0MAWU4gqA+KcxPKMZzNzkB9AuOo+mRjfSGGKnVpNJLjixYqgH/SBC3f+e7EFTuRB6pu5kBTUFK9r9+ploKfeQiLIYrJf56MPHKuBwKvbh2g/Zu6hIdK8pdKk4cMBtb2tHJ8H4nGoG5AoYs1Oq2TMUGpq4uq05vXrlyMqzO2GfpT/jR1kf5arSC3LDQeCG9mMGLCUcIfJeeO/t/6U+k2zz/ZDNixrQG6SygK8tx1szdc1WyMWUxSBDZv0YVWeTkVFzE5l3lO
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(23010399003)(82310400026)(376014)(7416014)(36860700016)(1800799024)(18002099003)(921020)(56012099006)(5023799004)(11063799006)(3023799007)(6133799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	8Y1uygxqXVSGU1wndamCfGjGhuTPLe8o/16drpDXFqyNmmsUDKcUN8my8Dh9ofACPjNdcRVPENsW/dhGf6bISeuCR+Py9hUwD16mNMWbe8xO7gfAbJIpHw4VyB5lvkaLX1C2jRFJGgHqIpieeClu3GqLc9b0fbFsos8Zr6kVu+VfKFjGXae8OtHUNbYXMvGRIHzPYSalznseXd4hgoI/uLC7yc4tZ+Sv4BqCsRVJFATqjzfE3or+poBtSkBeFpIzn3j5nrr+KgbXAwqXN1ow8cfYeHSDV2Lc7Sz6i9fe2uikGYwbdv986SnqH068Lj0Ms7j0JN/YAUSKiD5hovhgK89Wfkm7r9P3N3XjaI1FYuoRTzM19UKHyvqQkRTAjYilP3bJyXvLYBdX1gM8UDjRQ6hVQpa406DcOOzzRfujTExSV1pmSEGhEh7udXqjtRpP
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2026 21:56:02.8873
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: a9b62bf6-9794-4c89-faed-08ded23b6268
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN2PEPF000044A4.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB5615
 
-On Mon, Jun 22, 2026 at 06:23:28PM +0000, Eric Biggers wrote:
-> I don't think there's a path forward without an in-tree user that's
-> shown to be worthwhile over just using the acceleration built directly
-> into the CPU.  As well as confirmation of no regression to existing
-> users, including in cases where the inline sg list can't be used.
+From: Ashish Kalra <ashish.kalra@amd.com>
 
-Agreed. Proposing a smaller v5 that meets the no-regression bar now and
-leaves "beats the CPU" to a follow-up with a real in-tree user.
+In the SEV-SNP architecture, hypervisor and non-SNP guests are subject
+to RMP checks on writes to provide integrity of SEV-SNP guest memory.
 
-dm-crypt submits one request per contiguous bio segment (a single
-bio_vec) with data_unit_size = sector_size, instead of one per sector.
-E.g. default sector_size 512 with a 4 KiB bio_vec: one request of 8
-data units, which the fallback splitter walks as 8 per-sector calls --
-dm-crypt no longer open-codes the per-data-unit loop itself.
+The RMPOPT architecture enables optimizations whereby the RMP checks
+can be skipped if 1GB regions of memory are known to not contain any
+SNP guest memory.
 
-  - Uses only the existing inline sg_in[0]/sg_out[0] entry. No per-bio
-    scatterlist, no kmalloc -- the "inline sg list can't be used" case
-    doesn't exist here, so there's nothing to regress.
-  - For a non-native algorithm the core auto-splits into the same
-    per-sector calls dm-crypt makes today: identical output and cost.
-    This is what Herbert predicted -- the per-unit indirect call just
-    moves from the caller into the API; the fallback is no slower.
+RMPOPT is a new instruction designed to minimize the performance
+overhead of RMP checks for the hypervisor and non-SNP guests.
 
-So it stands on no-regression alone, with no software throughput claim.
-What it adds is the interface a native one-pass driver needs. I'd land
-that now and bring a native offload user + numbers as the follow-up,
-rather than block the interface on the driver.
+RMPOPT instruction currently supports two functions. In case of the
+verify and report status function the CPU will read the RMP contents,
+verify the entire 1GB region starting at the provided SPA is HV-owned.
+For the entire 1GB region it checks that all RMP entries in this region
+are HV-owned (i.e, not in assigned state) and then accordingly updates
+the RMPOPT table to indicate if optimization has been enabled and
+provide indication to software if the optimization was successful.
 
-Acceptable? If so I'll respin v5 as the minimal version.
+In case of report status function, the CPU returns the optimization
+status for the 1GB region.
 
-Thanks,
-Leonid
+The RMPOPT table is managed by a combination of software and hardware.
+Software uses the RMPOPT instruction to set bits in the table,
+indicating that regions of memory are entirely HV-owned.  Hardware
+automatically clears bits in the RMPOPT table when RMP contents are
+changed during RMPUPDATE instruction.
+
+For more information on the RMPOPT instruction, see the AMD64 RMPOPT
+technical documentation.
+
+As SNP is enabled by default the hypervisor and non-SNP guests are
+subject to RMP write checks to provide integrity of SNP guest memory.
+
+This patch-series adds support to enable RMP optimizations for up to
+2TB of system RAM across the system and allow RMPUPDATE to disable
+those optimizations as SNP guests are launched.
+
+Support for RAM larger than 2 TB will be added in follow-on series.
+
+This series also adds support to disable CPU hotplug while SNP is
+active, as the SEV firmware enumerates CPUs at SNP initialization and is
+not aware of the OS bringing CPUs online or offline afterwards.  This
+also keeps the set of CPUs stable for the asynchronous RMPOPT scan, so
+the per-core RMPOPT_BASE MSRs programmed during setup remain valid.
+
+This series also introduces support to re-enable RMP optimizations
+during SNP guest termination, after guest pages have been converted
+back to shared.
+
+RMP optimizations are performed asynchronously by queuing work on a
+dedicated workqueue after a 10 second delay.
+
+Delaying work allows batching of multiple SNP guest terminations.
+
+Once 1GB hugetlb guest_memfd support is merged, support for
+re-enabling RMPOPT optimizations during 1GB page cleanup will be added
+in follow-on series.
+
+v9:
+- Rename rmpopt_configured to rmpopt_capable.
+- Make rmpopt_cpumask a cpumask_var_t (allocated/freed at setup/cleanup)
+  instead of a static cpumask_t.
+- Drop the v8 WARN_ON_ONCE() on the RMPOPT_BASE writes; use a plain
+  wrmsrq_on_cpu(), matching the SNP MSR-write convention in this file.
+- Disable CPU hotplug with cpu_hotplug_disable()/cpu_hotplug_enable()
+  (per tglx); re-enable only on the full x86_snp_shutdown path.
+- Simplify rmpopt_work_handler() to a single leader-then-followers path:
+  with CPU hotplug disabled while SNP is active and snp_prepare()
+  requiring all CPUs online when RMPOPT_BASE is programmed, every core is
+  always programmed, so the explicit-leader fallback is now unreachable.
+  Drop it along with the v8 work_on_cpu()/rmpopt_leader_fn() helper.
+- Drop the debugfs interface (was patch 7/7) and its report-only
+  plumbing; observability will be revisited after this series is merged.
+- Restrict snp_rmpopt_all_physmem()'s export to the kvm-amd module.
+- Use scoped_guard(cpus_read_lock) for the per-CPU MSR and follower
+  loops.
+
+  Sashiko AI upstream review identified several of the above issues.
+
+v8:
+- Add a new patch to disable CPU hotplug while SNP is active, keeping
+  the CPU set stable for the RMPOPT work handler.
+- Drop the setup_clear_cpu_cap(X86_FEATURE_RMPOPT) calls; the
+  rmpopt_configured bool is the runtime guard.
+- WARN_ON_ONCE() on the RMPOPT_BASE MSR writes that previously ignored
+  their return value.
+- Simplify rmpopt_work_handler() by removing the explicit-leader
+  fallback: with CPU hotplug disabled while SNP is active and
+  snp_prepare() requiring all CPUs online when RMPOPT_BASE is programmed,
+  every core is always programmed, so the running CPU can always be the
+  leader.  This drops the smp_call_function_single() fallback (and with
+  it the AB-BA deadlock and IRQ-latency concerns) and collapses the
+  leader selection into a single leader-then-followers path.
+- Use mod_delayed_work() in snp_rmpopt_all_physmem() so the batching
+  delay tracks the last SNP guest termination.
+
+  Sashiko AI code review identified several of the above issues.
+
+v7:
+- Sync tools/arch/x86/include/asm/cpufeatures.h to mirror the kernel
+  header for X86_FEATURE_RMPOPT.
+- Fix commit title to use X86_FEATURE_RMPOPT to match the code
+  (was X86_FEATURE_AMD_RMPOPT).
+- Add static bool rmpopt_configured, set only when segmented RMP setup
+  succeeds in setup_rmptable().  Check rmpopt_configured alongside
+  cpu_feature_enabled(X86_FEATURE_RMPOPT) in snp_setup_rmpopt() and
+  snp_rmpopt_all_physmem(), because setup_clear_cpu_cap() is unreliable
+  after alternatives are patched.  Add snp_clear_rmpopt_configured()
+  called from amd_cc_platform_clear() when CC_ATTR_HOST_SEV_SNP is
+  cleared.  Do not use __ro_after_init on rmpopt_configured since the
+  writer snp_clear_rmpopt_configured() is not __init.
+- Add cond_resched() to all three leader loops in rmpopt_work_handler()
+  to prevent soft lockups on systems with up to 2TB of RAM.
+- Add comment above __rmpopt() documenting the RMPOPT instruction
+  encoding (F2 0F 01 FC) and register interface (RAX = system physical
+  address input, RCX = operation type input, RFLAGS.CF = output).
+  Note: RMPOPT does not modify RAX unlike PVALIDATE/RMPUPDATE, so
+  the existing "a" (input-only) constraint is correct.
+
+  Sashiko AI code review identified several of the above issues.
+
+v6:
+- Drop wrmsrq_on_cpus() helper; use for_each_cpu() with wrmsrq_on_cpu()
+  instead, as RMPOPT_BASE MSR programming is not performance-critical.
+- Rewrite rmpopt_work_handler() leader selection to use a local
+  follower_mask copy instead of modifying the global rmpopt_cpumask.
+  This eliminates the current_cpu_cleared tracking and the restore at
+  the end, and removes the need for synchronization comments about
+  transient cpumask inconsistency.
+- Add three-way leader selection in rmpopt_work_handler():
+  1. Current CPU is a primary thread in cpumask: run leader locally.
+  2. Current CPU is a sibling thread whose primary is in cpumask:
+     run leader locally (RMPOPT_BASE MSR is per-core), remove the
+     primary from followers via cpumask_andnot(topology_sibling_cpumask).
+  3. Current CPU's core has no RMPOPT_BASE MSR programmed: pick an
+     explicit leader via cpumask_first() + smp_call_function_single()
+     to avoid #UD, with cpus_read_lock() around the IPI loop.
+- Add WARN_ON_ONCE guard for empty cpumask in the explicit leader
+  fallback path, with migrate_enable() before goto out.
+- Add .llseek = seq_lseek to rmpopt_table_fops for consistency with
+  other seq_file-based debugfs files and to support tools like "less".
+- Change debugfs file permissions from 0444 to 0400 to restrict access
+  to root only.
+- Add comment in rmpopt_table_seq_show() explaining why cpu_online_mask
+  is safe: RMPOPT_BASE MSR is per-core and snp_prepare() ensures all
+  CPUs are online when the MSR is programmed.
+
+  Sashiko AI code review identified several of the above issues.
+
+v5:
+- Introduce rmpopt_cleanup() to tear down workqueue, debugfs, cpumask,
+  and MSR state, called from snp_shutdown().
+- Introduce rmpopt_wq_mutex to serialize snp_setup_rmpopt(),
+  snp_rmpopt_all_physmem(), and rmpopt_cleanup().
+- Introduce rmpopt_show_mutex to serialize debugfs reporting of
+  rmpopt_report_cpumask.
+- Move snp_rmpopt_all_physmem() call after SNP DECOMMISSION during
+  guest shutdown.
+- Use migrate_disable()/migrate_enable() for CPU pinning in the
+  rmpopt_work_handler() leader loop to maintain CPU affinity without
+  disabling preemption for the entire RMPOPT scan.
+- Add cpus_read_lock()/cpus_read_unlock() around the follower
+  on_each_cpu_mask() loop in rmpopt_work_handler().
+- Guard snp_setup_rmpopt() against re-initialization when
+  SNP_SHUTDOWN_EX with x86_snp_shutdown=0 skips rmpopt_cleanup()
+  but clears snp_initialized, preventing workqueue and resource
+  leaks on repeated init/shutdown cycles.
+- Replace setup_clear_cpu_cap() with pr_err() on alloc_workqueue()
+  failure in snp_setup_rmpopt(), as setup_clear_cpu_cap() cannot be
+  used after alternatives are patched; callers check rmpopt_wq != NULL
+  as the runtime guard instead.
+- Add pr_info() when RMPOPT coverage is capped at 2TB.
+- Add comments noting CPU hotplug is not supported with SNP enabled
+  and only online primary threads are covered by rmpopt_cpumask.
+- Add comment in setup_rmptable() noting Segmented RMP must be
+  enabled to enable RMPOPT.
+- Simplify cpumask setup loop to set if primary thread rather than
+  skip if not primary.
+- Improve grammar and clarity in snp_setup_rmpopt() comments.
+- Added Reviewed-by's.
+
+  Sashiko AI code review identified several of the above issues.
+
+v4:
+- Add new wrmsrq_on_cpus() helper to write same u64 value to a
+  per-CPU MSR across a cpumask without per-cpu struct allocation
+  overhead. 
+- Rename configure_and_enable_rmpopt() to snp_setup_rmpopt().
+- Use wrmsrq_on_cpus() instead of wrmsrq_on_cpu() loop for
+  programming RMPOPT_BASE MSRs.
+- Add setup_clear_cpu_cap(X86_FEATURE_RMPOPT) if segmented RMP
+  setup fails or workqueue allocation fails.
+- Add X86_FEATURE_RMPOPT feature clear logic in amd_cc_platform_clear()
+  for CC_ATTR_HOST_SEV_SNP.
+- All of the above allow checking for only X86_FEATURE_RMPOPT for both
+  RMPOPT setup/enable and RMP re-optimizations.
+- Rename snp_perform_rmp_optimization() to snp_rmpopt_all_physmem().
+- Split rmpopt() into rmpopt() and rmpopt_smp() for SMP callback use.
+- Introduce separate rmpopt_report_cpumask for debugfs reporting,
+  distinct from rmpopt_cpumask used for primary thread tracking.
+- Remove snp_perform_rmp_optimization() call from __sev_snp_init_locked() 
+  and instead setup and enable RMPOPT after SNP is enabled and 
+  initialized.
+
+v3:
+- Drop all RMPOPT kthread support and introduce adding custom and
+  dedicated workqueue to schedule delayed and asynchronous RMPOPT work.
+- Drop the guest_memfd inode cleanup interface and add support to
+  re-enable RMP optimizations during guest shutdown using the
+  asynchronous and delayed workqueue interface.
+- Introduce new __rmpopt() helper and rmpopt() and
+  rmpopt_report_status() wrappers on top which use rax and rcx
+  parameters to closely match RMPOPT specs.
+- Use new optimized RMPOPT loop to issue RMPOPT instructions on all
+  system RAM upto 2TB and all CPUs, by optimizing each range on one CPU
+  first, then let other CPUs execute RMPOPT in parallel so they can skip
+  most work as the range has already been optimized.
+- Also add support for running the optimized RMPOPT loop only on
+  one thread per core.
+- Replace all PUD_SIZE references with SZ_1G to conform to 1GB regions
+  as specified by RMPOPT specifications and not be dependent on PUD_SIZE
+  which makes the RMPOPT patch-set independent of x86 page table sizes.
+- Use wrmsrq_on_cpu() to program the RMPOPT_BASE MSR registers on
+  all CPUs that removes all ugly casting to use on_each_cpu_mask().
+- Fix inline commits and patch commit messages
+
+
+v2:
+- Drop all NUMA and Socket configuration and enablement support and
+  enable RMPOPT support for up to 2TB of system RAM.
+- Drop get_cpumask_of_primary_threads() and enable per-core RMPOPT
+  base MSRs and issue RMPOPT instruction on all CPUs.
+- Drop the configfs interface to manually re-enable RMP optimizations.
+- Add new guest_memfd cleanup interface to automatically re-enable
+  RMP optimizations during guest shutdown.
+- Include references to the public RMPOPT documentation.
+- Move debugfs directory for RMPOPT under architecuture specific
+  parent directory.
+
+Ashish Kalra (6):
+  x86/cpufeatures: Add X86_FEATURE_RMPOPT feature flag
+  x86/sev: Initialize RMPOPT configuration MSRs
+  x86/sev: Disable CPU hotplug while SNP is active
+  x86/sev: Add support to perform RMP optimizations asynchronously
+  x86/sev: Add interface to re-enable RMP optimizations.
+  KVM: SEV: Perform RMP optimizations on SNP guest shutdown
+
+ arch/x86/coco/core.c                     |   2 +
+ arch/x86/include/asm/cpufeatures.h       |   2 +-
+ arch/x86/include/asm/msr-index.h         |   3 +
+ arch/x86/include/asm/sev.h               |   8 +
+ arch/x86/kernel/cpu/scattered.c          |   1 +
+ arch/x86/kvm/svm/sev.c                   |  10 +
+ arch/x86/virt/svm/sev.c                  | 274 +++++++++++++++++++++++
+ drivers/crypto/ccp/sev-dev.c             |   6 +
+ tools/arch/x86/include/asm/cpufeatures.h |   2 +-
+ 9 files changed, 306 insertions(+), 2 deletions(-)
+
+-- 
+2.43.0
+
