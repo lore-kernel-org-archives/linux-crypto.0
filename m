@@ -1,272 +1,104 @@
-Received: from mail-dy1-f180.google.com (mail-dy1-f180.google.com [74.125.82.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com [35.162.73.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 631843C943F
-	for <linux-crypto@vger.kernel.org>; Wed, 24 Jun 2026 14:44:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.82.180
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782312287; cv=pass; b=n8QVUQprqxpLDPK4BnukVrzEKtnGL2GFmfE9TdaPYkG02ARX2gvOM6Eyd6vmkxhrDH75peui5MEkkfEmpV0QYYsAzeG4Wg1e/1vseqKVyD8eR5fP4ldASWj20UD2hcI8X14h6gBoOuXULXUVu+AOqaVXE/VEipFpY5SMaxuQ0uM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782312287; c=relaxed/simple;
-	bh=32wZkNORP8iuzMZ+i7kPfSuj0LBIUcjLGqQt345rGGw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jIYEkMOGBBdDu9/jxIduYGFQfATvcSgBOKJtPlEYtoNH6/SkKkPpU7BNDWvgfh+vxvDK4r3xEu4ATUHvr6olIrZpsJVSczl600oPELU6FVuQgBJwwYijQweSFpAkN73FLmKK6NLRy2YmKQ2L2WQp2wK3jeIrSbk/kA6qNK3xHKs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mvLyshfo; arc=pass smtp.client-ip=74.125.82.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E40A2305E28;
+	Wed, 24 Jun 2026 19:53:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.162.73.231
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782330787; cv=none; b=KQavhEkRqcxxdbuB0chTc53sC1zriCKYEPKyLZU7R9KHo78QlOzkE9R09GrIIyzdi3fOk8bpsF9rwc2naMQl0o7Dl3bFnJQMZn/Q5Kh2mJFc+CgClN0rFFn8vIvPry0M899A1HoaQYC06Ylx61KjRsJdH5eifsQjq9kUfrVHkDo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782330787; c=relaxed/simple;
+	bh=uGManwo2POKMO9mUH2vgxLmsUYYgJxBMxApUaz/JoN4=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Yqmf48A9bHjTTmb9Rv3w6YfOA6Y6eWBtsdrZW0RHbUEy32XQfL9JdbvvaiWKrcqdY6GE8QZt5sCimvHGYd+PBTVFw11u3Cuf1yE4/hvkiQclTONRa7/xzqpDXi8Sdi5Kv1KxqjtbxyVldzbLTuBqggqS/JOKgcA/jsqkMkydHnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=nOICm2iu; arc=none smtp.client-ip=35.162.73.231
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mvLyshfo"
-Received: by mail-dy1-f180.google.com with SMTP id 5a478bee46e88-3078e0dcd67so1575489eec.0
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Jun 2026 07:44:46 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1782312285; cv=none;
-        d=google.com; s=arc-20240605;
-        b=f8sQiaw3+3CzonxRWIeJNiX1wlK8bnOqI86FyKR5ZQ47aDJ42nmUvbNtt1bNZOKGQY
-         hBjRrfQLGhWbMX47TN0ipaqWDvEHDznTpj3FXipnP/kHAWSMGYyivTBHJ5FLCg+sEQO/
-         pEM9X/d9yQ0GvaUUYSSFzs6qjmIbE/EndzlkeZKfz3V5VBgTuGYp6xjur7idAoe8TxJ0
-         p8cF/4Isv1SZbtrrty80bCp+1tz4dxqiSbTBE/4i0IuCTY8BWvCQgt4Kan6OoYsgYpm5
-         IRTmZO0UuOjJWo+mpSj97+o3hxtsLMerTj+WnxEkdH1htoOe9j+s/N42+4xmnPzl0jSn
-         avxw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=ceZnDK/sKbEueEWuAoK1U45lE2R6s30snNQKMY7lKqQ=;
-        fh=9VW+1w7iumsEyOVLR1pal2ryBvkKrhVd0peJpwWbwfA=;
-        b=Aj42Xn5snJsX1M4J0GfMGkD2N9ot2u4l78Y9yBZoX+m0tB/Kt8CtDN8pFluvhJhaEz
-         54PKmWRo3fdVkfKRdXUsofWNwz3lRn560PBEYqAx2onpRF34ZZzSHALbepcOZlLmYl0K
-         4NSzbCKKZAMF/kyUGir47APfxvFoFPPbTRnJ2gu84RCb1UhZJpUULsemDKsxwr+w1HBS
-         CgsV++iIuWZHkzb1toszp5sAUQrRT/9FFAmDTyOzLzrk2QmNVB9eqTbyxt3wESZsAfYP
-         e13AGJVtAQA86X1/OLVRRSvuwq/kg1+x2ZfWwaNDeJ7uIHYCA/2jknCmzINf1wM2bNOJ
-         P9fg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="nOICm2iu"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782312285; x=1782917085; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ceZnDK/sKbEueEWuAoK1U45lE2R6s30snNQKMY7lKqQ=;
-        b=mvLyshfo2HtoIsrxqtHsiwTOdz/1XjptofLq+hajEjOyrbVkq6ooLYuoX/NvG/t2uI
-         ctN0jyRwQfVuUzjBS3qo//q9JtjAZVzLVu9QDhBCew4LZomPUgRR5oTV8saO3emwCiiH
-         II4v83CKmNLWVPSfsBFMaz7oE2PkQF+N1XuKxNj1f4OEhEqHtSOe5xvfBJ/HNrFnpzQE
-         SpyYla5LyXmrK6e3RXb8ojitjruW+Mw31+1lexixjeP64XxMJD9eNJg8TvPKtdQgvB+R
-         ec70O2t4cEp8JQIaQqUCM8WIiGLvUUSX9YOTHRS2wuyCGZ6QIKoYNiz3oCFKiPhwoYjy
-         aBrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782312285; x=1782917085;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ceZnDK/sKbEueEWuAoK1U45lE2R6s30snNQKMY7lKqQ=;
-        b=lMpD5UGofU+j8zDNTkvq/7zo4xkCEiJGBE3yhUqj0HvQ9QXge8p6/gahypZcQXQ6QJ
-         k6rtQQDirxNV7JjPTtdvDb3DebmgHva6Px5UV79WOKIbVzwDZQ8fvYPkClftU/lwD1lS
-         yCeE8AfeX1DDb+LOYo38CGYSmPuPYx4OCkW7Toxb6eQcIw7VmDgd6zZ0RTEnxmC/FQk1
-         NrDemThFsKGCm42A64EVSUXR7V2jFAD9AZJSXmCEnDFzAQVbsUPKEORW+bc7ntXM0dJR
-         hPV2JaV5Y31bYaJqFVQb9O+q8t/TQBhKfh3qJWeqt3VgwBqwZg0aGr8fVIOsEllYGT1s
-         YsgQ==
-X-Gm-Message-State: AOJu0YyDGSxuG04Y1NzWhB9YAvvsZBZJwS0bBAOOoopvx3YSF0mQ5E9p
-	In6aQZnZFBkemzb6C1zZGWc7UHBqMQU7H4XxW+9Efr7xAmZpbNyE4XRS1B+NUKrjnhW37WyyTnj
-	JaOP9N2ErquBKeQHjSdJy20UCyyJLndB7TNhn
-X-Gm-Gg: AfdE7cm2NoBTZUsxm4asXkg1FPt5krPTwVVBNFU+Q+yTVXaLNagdhR4a+6dmkTGKXGn
-	Jc+LKqWyRibd5FN6b+tHV1eQkScpLCvULE5WqEdmFXnNPVsU3MoBFw/otsgocVU0vy9gySoNpaO
-	IceLE6+ElvprJEkBVM+oQWZyty/Ez9Jnm7YoRzBEhnT9PnMrT2IOQs4e4UjaI17AUaeS2LluCn9
-	9sweMJs41PXAIFVwNMOeYfoEa0OF5OE7UmpXHVk2QPcOl8WIDhihubJt5TTe+CUpHrCPg==
-X-Received: by 2002:a05:7300:214b:b0:2ed:e14:42e9 with SMTP id
- 5a478bee46e88-30c68ec5a61mr4412177eec.34.1782312285061; Wed, 24 Jun 2026
- 07:44:45 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1782330786; x=1813866786;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=9kzduUnU0W5KLUH8xRjByArbNZrNdOxKMBIECVRVqgo=;
+  b=nOICm2iuvF/7hBvOGRmdUEltZ79ODKCbDCM/qGUw+xaZGctieYbzpW+P
+   t//aMECdcpQ7YwpTTGXZJooLjhmvPnbmZY+6sXkDQ8WT0JV4318moojUY
+   Sh1ghJEaYS2z0raGJtgrnb6Br9JQejUAomOPJVrCEwd1O/y28gNkAgtNC
+   NedB4OQkrOMzLoifsNYCS8SYPAo+57Fz07SWWeZeQrbAX5IPpjI0dZ7Lm
+   rRRABkqKMK6cf8ndPdR3ovV4h8KmILmlNdc+6IQCPozw5XnVTfR7K2d7C
+   gZfsx9z6N5L5YX3wucb4y6XL4Fv9hk6Y3MIg8V4c/SSV3LAeXBDIqr5ZZ
+   g==;
+X-CSE-ConnectionGUID: T4dFEcxWRLmb1DhwaTaxaQ==
+X-CSE-MsgGUID: CrIjSsjgRWCy8HXfNV8Ngg==
+X-IronPort-AV: E=Sophos;i="6.24,223,1774310400"; 
+   d="scan'208";a="22234931"
+Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
+  by internal-pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2026 19:53:03 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [205.251.233.111:4369]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.1.61:2525] with esmtp (Farcaster)
+ id 485ff261-6d1f-4c4d-9fd6-0a3f6bebcd59; Wed, 24 Jun 2026 19:53:03 +0000 (UTC)
+X-Farcaster-Flow-ID: 485ff261-6d1f-4c4d-9fd6-0a3f6bebcd59
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43;
+ Wed, 24 Jun 2026 19:53:02 +0000
+Received: from dev-dsk-lravich-1b-7405803b.eu-west-1.amazon.com (10.13.225.95)
+ by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43;
+ Wed, 24 Jun 2026 19:53:01 +0000
+From: Leonid Ravich <lravich@amazon.com>
+To: Eric Biggers <ebiggers@kernel.org>, Herbert Xu
+	<herbert@gondor.apana.org.au>
+CC: Alasdair Kergon <agk@redhat.com>, Ard Biesheuvel <ardb@kernel.org>, "Jens
+ Axboe" <axboe@kernel.dk>, <dm-devel@lists.linux.dev>,
+	<linux-block@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH v4 0/3] crypto: skcipher - per-request multi-data-unit batching
+Date: Wed, 24 Jun 2026 19:52:55 +0000
+Message-ID: <20260624195255.1102-1-lravich@amazon.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260622182328.GB1250822@google.com>
+References: <20260622182328.GB1250822@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAMho2RfgwvNhWJidb_Xn3RRt71TFjQ2QBKP9Xt8ur22L-ZWP9A@mail.gmail.com>
- <20260609192542.GA3811606@google.com> <CAMho2Rem-B908oaFQzTx8Mg895LuvPcfN9+ANoHW+XfGW+wB6A@mail.gmail.com>
- <20260612183240.GA2157807@google.com> <CAMho2Re4pc4f_TkApfwsbfguiaN_Ccw770_A+0fc9G7L_GBAnA@mail.gmail.com>
-In-Reply-To: <CAMho2Re4pc4f_TkApfwsbfguiaN_Ccw770_A+0fc9G7L_GBAnA@mail.gmail.com>
-From: kstzavertaylo <kstzavertaylo@gmail.com>
-Date: Wed, 24 Jun 2026 17:44:46 +0300
-X-Gm-Features: AVVi8CfOGMG86JNsbfqdst4j4EWGC8WQsdk6iRyID4PX8ztGI8x5etSNnwj4gbI
-Message-ID: <CAMho2Ren_PucPRyyTSySdniFfBLECBL+nxH3x6-5Mxsp+89iqw@mail.gmail.com>
-Subject: Re: [RFC] ML-KEM (FIPS 203) implementation with reusable
- decapsulation pool
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D041UWA001.ant.amazon.com (10.13.139.124) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-Hello,
+On Mon, Jun 22, 2026 at 06:23:28PM +0000, Eric Biggers wrote:
+> I don't think there's a path forward without an in-tree user that's
+> shown to be worthwhile over just using the acceleration built directly
+> into the CPU.  As well as confirmation of no regression to existing
+> users, including in cases where the inline sg list can't be used.
 
-Since our previous discussion, I have significantly updated the
-userspace implementation and completed a series of benchmarks and
-validation tests.
+Agreed. Proposing a smaller v5 that meets the no-regression bar now and
+leaves "beats the CPU" to a follow-up with a real in-tree user.
 
-The implementation allocates all memory required for a given key
-during key creation and subsequently operates entirely within that
-preallocated memory until the key is destroyed.
+dm-crypt submits one request per contiguous bio segment (a single
+bio_vec) with data_unit_size = sector_size, instead of one per sector.
+E.g. default sector_size 512 with a 4 KiB bio_vec: one request of 8
+data units, which the fallback splitter walks as 8 per-sector calls --
+dm-crypt no longer open-codes the per-data-unit loop itself.
 
-During decapsulation, the same memory allocated at key creation is
-reused across operations, eliminating runtime memory allocations in
-the decapsulation path.
+  - Uses only the existing inline sg_in[0]/sg_out[0] entry. No per-bio
+    scatterlist, no kmalloc -- the "inline sg list can't be used" case
+    doesn't exist here, so there's nothing to regress.
+  - For a non-native algorithm the core auto-splits into the same
+    per-sector calls dm-crypt makes today: identical output and cost.
+    This is what Herbert predicted -- the per-unit indirect call just
+    moves from the caller into the API; the fallback is no slower.
 
+So it stands on no-regression alone, with no software throughput claim.
+What it adds is the interface a native one-pass driver needs. I'd land
+that now and bring a native offload user + numbers as the follow-up,
+rather than block the interface on the driver.
 
-I compared the implementation against PQClean ML-KEM. The main observations=
- are:
+Acceptable? If so I'll respin v5 as the minimal version.
 
-* Stack usage remains approximately 1 KB regardless of the selected
-ML-KEM security level.
-* No memory allocations are performed during decapsulation.
-* Throughput is generally comparable to PQClean.
-* For ML-KEM-1024, the implementation is currently about 5=E2=80=938% slowe=
-r
-than PQClean.
-* The trade-off is increased persistent memory consumption and a more
-complex internal architecture based on reusable preallocated
-resources.
-
-I also took your earlier feedback into account and came to the
-conclusion that integration through lib/crypto would be a better
-direction than the KPP interface. As a result, I am now seriously
-considering adapting the implementation for lib/crypto instead.
-
-In addition, I am continuing to investigate further optimizations in
-pure C. If these experiments produce meaningful results, I will
-publish them and would be happy to share the findings in the future.
-
-Benchmark results, methodology, stack usage measurements, memory usage
-analysis, and PQClean comparisons are available here:
-
-Release:
-https://github.com/kstzv/ml-kem/releases/tag/v1.1.0
-
-Benchmarks:
-https://github.com/kstzv/ml-kem/tree/v1.1.0/portable/userspace/benchmarks
-
-Thank you again for your earlier feedback.
-
-Best regards,
-K. S. Zavertailo
-
-On Sun, Jun 14, 2026 at 10:50=E2=80=AFAM kstzavertaylo <kstzavertaylo@gmail=
-.com> wrote:
->
-> Thank you for the detailed feedback and for outlining the historical
-> context regarding pools in the crypto subsystem.
->
->
-> I understand your point of view and the preference for keeping the
-> core implementation simple with per-operation allocations (or
-> caller-provided workspaces), especially given the lack of precedent
-> for pool-based designs in lib/crypto. My approach with the reusable
-> decapsulation pool was driven by a focus on constrained environments
-> where minimizing stack usage and relying on reusable preallocated
-> working memory during the hot path can be particularly valuable.
-> However, I fully agree that concrete data is needed to properly
-> evaluate the trade-offs.
->
->
-> I see your point regarding preallocated workspaces and caller-managed
-> caching. One of the goals of my prototype was to explore a design
-> where decapsulation operates on reusable preallocated contexts rather
-> than per-call working memory, primarily to reduce stack requirements
-> and move memory management into an initialization phase. I need to
-> analyze more carefully how much of this can already be achieved
-> through a caller-provided workspace model and whether the additional
-> complexity of a dedicated pool is actually justified.
->
->
-> I am currently working on benchmarks that compare stack consumption,
-> allocation behavior, memory footprint, and performance between the
-> different approaches. Once I have solid numbers, I will share the
-> results and my conclusions.
->
->
-> I also appreciate the clarification regarding KPP. My original
-> prototype used KPP because it appeared to be the closest existing
-> interface for key establishment, but I am not specifically attached to
-> that approach and will spend some time evaluating how the same ideas
-> could fit into the lib/crypto model as well. In the meantime, I will
-> also look into how the pre-allocated workspace support you suggested
-> could be integrated.
->
->
-> Best regards,
-> K. Zavertailo
->
->
-> On Fri, Jun 12, 2026 at 9:32=E2=80=AFPM Eric Biggers <ebiggers@kernel.org=
-> wrote:
-> >
-> > On Fri, Jun 12, 2026 at 05:14:54PM +0300, kstzavertaylo wrote:
-> > > Thank you for the detailed reply and for pointing me to the existing
-> > > ML-KEM/X-Wing patchset. I spent some time reviewing the implementatio=
-n
-> > > to better understand the design choices and how they compare to the
-> > > approach I took in my own work.
-> > >
-> > > After reviewing the patchset, I can see several strengths in the
-> > > implementation. It integrates cleanly into the existing lib/crypto
-> > > infrastructure, reuses kernel cryptographic primitives, avoids large
-> > > stack allocations, and includes KUnit-based validation. The
-> > > implementation also appears intentionally compact and well aligned
-> > > with existing kernel conventions.
-> > >
-> > > While reviewing the implementation, I noticed that decapsulation
-> > > allocates a temporary workspace for each operation. This is one of th=
-e
-> > > areas where my design diverged, which is what originally motivated th=
-e
-> > > reusable pool approach.
-> > >
-> > > My implementation was developed with a somewhat different goal in
-> > > mind. I experimented with a reusable decapsulation workspace model
-> > > where memory is allocated during key initialization and then reused
-> > > across subsequent decapsulation operations. The main motivation was
-> > > reducing allocation frequency and minimizing both stack usage and
-> > > repeated memory management during decapsulation.
-> > >
-> > > As a result, the implementation avoids allocations during
-> > > decapsulation entirely by reusing preallocated workspaces associated
-> > > with the key context. My original hypothesis was that moving memory
-> > > allocation to key initialization, thereby eliminating allocations fro=
-m
-> > > the decapsulation path, could reduce allocation overhead during
-> > > repeated decapsulation operations and be beneficial in environments
-> > > where allocation activity is considered undesirable.
-> >
-> > In my ML-KEM code, all the decapsulation memory is consolidated into
-> > struct mlkem_decap_workspace.  It would be straightforward to support
-> > the caller providing a pre-allocated workspace.
-> >
-> > In the case of X-Wing, we could also support pre-expanding the
-> > decapsulation key.
-> >
-> > It just depends on what is actually going to be needed by the kernel
-> > feature(s) that are going to use this.  Which we don't really know yet.
-> >
-> > We do know that it hasn't been found to be useful for the crypto
-> > subsystem to provide pools for any other algorithm in the kernel, for a
-> > variety of reasons.  Usually callers can just allocate per-operation, o=
-r
-> > they have some sort of object (inode, block device, socket, etc.) that'=
-s
-> > a natural place for them to cache whatever they need anyway.  In the
-> > rare cases where some sort of pool is needed it's implemented in the
-> > caller, optimized for the particular use case.  So I think there's a
-> > good chance your pool idea is going off on the wrong track.
-> >
-> > > Another difference is the integration level. My prototype explored
-> > > direct integration through the KPP interface, whereas the patchset
-> > > focuses on providing a reusable cryptographic library component withi=
-n
-> > > lib/crypto. These approaches address somewhat different layers of the
-> > > kernel crypto stack.
-> >
-> > We don't need crypto_kpp support, as it's much more complex and harder
-> > to use than the crypto library
-> > (https://docs.kernel.org/crypto/libcrypto.html).  Also it seems it's no=
-t
-> > really possible anyway, since crypto_kpp is an old design that works fo=
-r
-> > Diffie-Hellman but not KEMs.
-> >
-> > - Eric
+Thanks,
+Leonid
