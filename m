@@ -1,46 +1,46 @@
-Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011068.outbound.protection.outlook.com [52.101.52.68])
+Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012014.outbound.protection.outlook.com [52.101.53.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0462028C5CB;
-	Wed, 24 Jun 2026 21:59:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B80262882BE;
+	Wed, 24 Jun 2026 21:59:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.14
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782338343; cv=fail; b=Az2yNXECHmu8m0Y9zHJh8ZE0o6IMjhaWLp79ovLRG25C7z++OwYLULiJ56A//gooCJ4qplmioie2eB20CRMk1fDT4ajJAnVfQiwRBJcsdM4mz4Xhyks09yI6IjfabXJXqvd2jutrwvUcS7UEz1oUVTdL7uNL4zdOJdar+1GWLjs=
+	t=1782338371; cv=fail; b=KUgmJcQ42Y+FeWtvPUqEvKTPE7MssS497CdbNKGj2Xd/AtOTfSPZrQkXYwQw0eLRMwxhzbxgajS0DvdE261137MNRMSSQnim5tyeG44EL+9lD/PCU+cVP4R+gfwzaxsLTtcB2nXfYIiqfrCzhT8r262aYp+GmAb+A61TIEib0YY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782338343; c=relaxed/simple;
-	bh=GqhTMaZjWSV66iIzdZWT9NT87wYOANICabeseaeG5Sw=;
+	s=arc-20240116; t=1782338371; c=relaxed/simple;
+	bh=9aeeVgINA8fs1sHlIJJlRvorlBLS/TmWQmWmQr7mL8A=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Zrle/UZVUHsnlbYZ9mkoXY+BhbM40UqJrKUcUm99NeNx+pBPsiRk/nkb+4zWGIEZKWhBd7oNte8k5swnIYykpH6o/cxp8dNJ57LTFwzxz9S9Fj2FOedQtfzYbxm1x2VfxsQ1J0ylthQYM2R0gAhoZc4Ldl7jcUczZM+1FPGGVAU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=1SL2hOV8; arc=fail smtp.client-ip=52.101.52.68
+	 MIME-Version:Content-Type; b=ZX+aEXB4HrSxehDNjDnhwHGGeTv19M0wR3N7cnEGXtJ821luCRFJulZKJ6rfQFoe+nqxJ+7g9OKbjx4ginjax74LbqNzE90rkvcZUOVBOUa/oqaE6eOW+grY5UhdASH69KvRZVRJnq4/7/VD0Tir+xSDZ3VU9egHzba+5TJ9RB0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=jmhKRJ4p; arc=fail smtp.client-ip=52.101.53.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="1SL2hOV8"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="jmhKRJ4p"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=op+JIL74kgrb2Z+CqFsqhYg2C2c4kgyWGeeoij9OXeCAuk2UlMh7vZEqJsmiu+1sKhi8ErjyLsqCej9ubgxMnsYa7S0+xENjK8632CDNSAdPHvZGLg4tp47DmCUZ1aHbmYDvPxNH2aBNkuZyZ5fIpQB6XQe3Jn2iSxsM+x200d7z1aqygOettM41HKAMcjTy+inGzxjL8WKv55Q5HZuya4As2ayPi29xYEl1uklYO9lXHR+omQpm74pz6orTPx5tie9LPbvhLht8Ou8DMZ/JAuMpqVE2BYonqxuIw/u4YO6RZc29aNjTyCyj+WfsmdqASvA/yr4SjSSQXIfiar6a2g==
+ b=ISuks+myRAkaIL9TXsifxIbRwQh824pdxFpB2H/UqeLhhY7kcm0n15VrQxenKugRfs+HA7nfbZMcf9tiFnI7/wurl3VxPPjPKAapQ2lenop5+djeQZZ6UGMRt9XBp57xvUvsWRAFnVG9h84DH4m0hvSy8DGNPcUjOvYK3K9gOFnRZis9xFrQbC4sGRSK2/gXa9uVz34/hDqeAtEQe49UZxHT91KksambSBehFqJUh3jxS7vEQJwUSjlp09X1nvmmSUUgGrzxr77sXrsZOdle7KNwKUUrZ9bTF/nOBITIT2oq6/6uGRsaaGgRfrcAHC0KhRqCFxehOQCYMoWah5mosw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lg70Jh4RT2FOVbFeIgso4zS0qakzwOj/57bHolmhE6E=;
- b=DSj+Tl5KFQ/hdcs7LTtSO0/CkTsqHulAULkX9gwzNOP6cts6+I1bTfMbTA9L9KbLjfAKUZXHzemy1OnFE/nNzWKg9p8Zy4pJx8YKcccqA5ZpH8XL/ESe2MVUCczOd0mAb7J7B5Y6PY8fH162Vua+U6ATFTpXk8ELQGp74FRkOuQSjITedFhJCWovS20wT320QdEA8rJHhgO5bBnEQIIrUlh5YEyxu0FAjOPxnSZMh6P3NG/IAev6ul3/b2a8DrWqosDkJTHyYwNpWLigNG9x83Uu57bdCYpPALuU2andmnrZEoulgPOWx5wLYOZYwOsJX5vspra3Io3scxmT4LVyQg==
+ bh=x+bVTvWbDmLjm832j/kV+GkLHw0aNiUZ3r64Lre/sDw=;
+ b=kDywIkgyNs126HBEtXaOtqduqBGf/kTjZAO84JjILuVn3j1AYzqwk2+faMbC3Ze8Vglm1b37aauCbSWpLI21hr2Ix6zM1EIiEFRRtVVu7iALFo5lWmS9DxhfjtsqiHTrw8iOgRXTvXu6Y9v9OSKiqph59ZcLYsOmbyf3UyjlFTjluyIOb3BOmREY2vDUL+3WDqqMHSRmIZb1+zowIbDzqcpBPqm0rYnCpaTjBDzp+R4fIgtgws9HJh5X6Nl/4FWaJ+PyKGeIIS6S/UyxZkBNDayc2Auw7hKr3GSLc0f/TVFRn7N8wK1jLH4OC0YxYCBDI7UQkJs9Y+ak7Husa9uyiw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lg70Jh4RT2FOVbFeIgso4zS0qakzwOj/57bHolmhE6E=;
- b=1SL2hOV8tDNbotcCs0cR9mf0dosoVoTQpgYPaLc9YfouwGSbzRRuViwu3rHyqXFZ+lORWBtkJ93WFJlRObRwdLBDBxyKtWmgzIBf940SRVNBSQ0bG6oNL2FlLFz6mUAcvP8lODvckeiGKC0JeWCdBjD0tuhhY3Ka6Dj26YNmX8E=
-Received: from LV3P220CA0001.NAMP220.PROD.OUTLOOK.COM (2603:10b6:408:234::33)
- by CY8PR12MB8338.namprd12.prod.outlook.com (2603:10b6:930:7b::8) with
+ bh=x+bVTvWbDmLjm832j/kV+GkLHw0aNiUZ3r64Lre/sDw=;
+ b=jmhKRJ4pnK+EviKRnHzlsXPV91m4g0Xk1UhVsjEVPr7S6eAdcNQzjkL5MX8f9UYiPVrJDdzQ5J8NZ7OSAby5/HxH030YM0UgPRoUcF/kkYqUMdZUHXDjYeo4jCBTqZQ8QOnjPITVuoRmH054Q0X5ve5eNWyUS6s25+8jEnzHfgs=
+Received: from BN9PR03CA0126.namprd03.prod.outlook.com (2603:10b6:408:fe::11)
+ by DS7PR12MB6358.namprd12.prod.outlook.com (2603:10b6:8:95::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.13; Wed, 24 Jun
- 2026 21:58:57 +0000
-Received: from BN2PEPF0000449D.namprd02.prod.outlook.com
- (2603:10b6:408:234:cafe::ac) by LV3P220CA0001.outlook.office365.com
- (2603:10b6:408:234::33) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.159.14 via Frontend Transport; Wed,
- 24 Jun 2026 21:58:56 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.159.14; Wed, 24 Jun
+ 2026 21:59:25 +0000
+Received: from BN2PEPF000044A2.namprd02.prod.outlook.com
+ (2603:10b6:408:fe:cafe::5f) by BN9PR03CA0126.outlook.office365.com
+ (2603:10b6:408:fe::11) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.159.13 via Frontend Transport; Wed,
+ 24 Jun 2026 21:59:25 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -48,13 +48,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
 Received: from satlexmb07.amd.com (165.204.84.17) by
- BN2PEPF0000449D.mail.protection.outlook.com (10.167.243.148) with Microsoft
+ BN2PEPF000044A2.mail.protection.outlook.com (10.167.243.153) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.159.10 via Frontend Transport; Wed, 24 Jun 2026 21:58:56 +0000
+ 15.21.159.10 via Frontend Transport; Wed, 24 Jun 2026 21:59:25 +0000
 Received: from nigeria-2635-os.amd.com (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Wed, 24 Jun
- 2026 16:58:55 -0500
+ 2026 16:59:23 -0500
 From: Ashish Kalra <Ashish.Kalra@amd.com>
 To: <tglx@kernel.org>, <mingo@redhat.com>, <bp@alien8.de>,
 	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>,
@@ -69,9 +69,9 @@ CC: <pbonzini@redhat.com>, <aik@amd.com>, <Michael.Roth@amd.com>,
 	<darwi@linutronix.de>, <linux-kernel@vger.kernel.org>,
 	<linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
 	<linux-coco@lists.linux.dev>
-Subject: [PATCH v9 5/6] x86/sev: Add interface to re-enable RMP optimizations.
-Date: Wed, 24 Jun 2026 21:58:44 +0000
-Message-ID: <e9fb911f584c514ba7136d642220219dd2938a84.1782336473.git.ashish.kalra@amd.com>
+Subject: [PATCH v9 6/6] KVM: SEV: Perform RMP optimizations on SNP guest shutdown
+Date: Wed, 24 Jun 2026 21:59:12 +0000
+Message-ID: <df21c9e39f42aba758bb6c0100b2f5c17f019cc9.1782336473.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1782336473.git.ashish.kalra@amd.com>
 References: <cover.1782336473.git.ashish.kalra@amd.com>
@@ -87,110 +87,73 @@ X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN2PEPF0000449D:EE_|CY8PR12MB8338:EE_
-X-MS-Office365-Filtering-Correlation-Id: e069b726-04e7-407c-79c3-08ded23bc9f2
+X-MS-TrafficTypeDiagnostic: BN2PEPF000044A2:EE_|DS7PR12MB6358:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9b3948b8-43e7-45e4-ceff-08ded23bdb0e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|23010399003|1800799024|36860700016|7416014|921020|6133799003|18002099003|22082099003|56012099006|5023799004|11063799006;
+	BCL:0;ARA:13230040|36860700016|82310400026|1800799024|7416014|376014|23010399003|11063799006|56012099006|18002099003|22082099003|921020;
 X-Microsoft-Antispam-Message-Info:
-	Gq2pNX7uxPWCJ8oWaB34Usug1V106zlfbQetV750EUpQWxfHAKDvQUDYYNl0f3obfm+qPTZ5EZ1zRjMuG684Y1/p4eFNWuPhVaCcuQAzcmA7gfAYnnaXdurdolJcScMqlRCpz+0E6wydYIYndYB7AmgeR5Jh7Q6b27hc5dtqPZRirkDmmY9TgivdUj9eHBNZLeu4HTaDlW6WSj0bnoB+eGaniBfxPQkcdRlZWPQ8kUX9PSjg2ebNkpE7YfqWbzUv0943ZTMc0DgIfIH+R0hOsjxZxa/tMFyy76pIJwjDYPT7CqjyL7JsJtASLa9Tu5WyTaBGc93RUimIjeccZ9dqgg4WcqenOr7yjXOXwBIStxs0QbuHyGjpFZ6FVRsgfMViNLZqqqP7frAUj4exkZUlD5jv9fw3HBJEZIbPlF8zfZnZFZZ6EAQpp+51dQ98KW47VuPOpqGt62RviwFU/RVpMc0uUFSNEdIeavUhXyCLI0Tr7y8bWmB+voFQvNV8AlOx9VqH54hssFD5VDEVuPTBsbw8hXVXfWhICVHD0z+YvjlqopXEqwe0hNYe4vZ65qtSijpiwvmmkWZD+As6P1ce6K00Ta2BI9an6Vlz4IjzrW3y4sbx5RDUJOxHxgN7jZH1V3Ex9UFHVpPuZX0Db7kssLGQJk7p1WmZuOeXKxz7eAmZf8BeybduyiAL0/k86RSATeXy6ESVdEBf2dbd44rmF66TblIeyMxtRquA5LUkuTOnAljS4arT38IZAywT1nW5
+	owGyRm1EeaVSADWu+qx66lT2903jLGrnJJOYun5eIuBKQ5dGvPHtZ2V44klBfmAHR6cNBPJZ31FYKScnplQy6jgulynlGg2mQmGDTVNyRCq2epKrVSngRs0ulRclNJmP4hPX9rmvZKko35kN3Si1GmFpndCPLDDcV6/+v8/a9Q284/iVrCDlzCqyeUvQVDwPmvaayXEmafztfQOqqKeFGW8UUfzQURsWhBfvnphA9MyRpCHPuUCbYaPmU2Ox5XY12YdswSsbUlVwYBqFy1af2949D3EPYRX3D67W69f3hu0xwWtuLAZAJ62rqhw1Vmo/TKCzdSU4u3XAMTl7K15gSZOPOJcf4mBh8YGUtpTRPJEHn0kJ9AZm269aowqkwaqYv8advi0NOii/1+Um2B824ySZFoZ3lgtw3WMexj5/G/9UonEj98ByvmMZncQMaiZQ8kJWcP2a7GcMs+CqnSGtBM3M/Ehx8EvTtUYYnlRzhCujLGE6Graxy/Vst+0fRLPOyWH51mGGBjvVwap+Ou2lpp54vUstr8yeZexooiP7jqoBgHy8S/xm5SM6/rtSPTjXbx/EaQHyYdz5bzDaTemtOZxYfDC1tp1KXZpSJwH4RbW4tzLBL69gIq+zykxPeecy8EneHIZ6Tp3heiLBv/SYhWOVgql4VhFHc7hqTRQPTw0SpGw1YgPumDDOBxdGo1oltz4fYroKeM4838+4FJ+LWLzD9QNawdqvcDKtYPf4Xt0oJ6MSSGTPtWk/BC5C+sxo
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(23010399003)(1800799024)(36860700016)(7416014)(921020)(6133799003)(18002099003)(22082099003)(56012099006)(5023799004)(11063799006);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700016)(82310400026)(1800799024)(7416014)(376014)(23010399003)(11063799006)(56012099006)(18002099003)(22082099003)(921020);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	w8FAwNWPCnvRUd9nZisK5GSaGlY+FTTVoYWJS/INOdeRBjzEhzWrx4ZgL9xxgV6qGBwZ+pdUplakLdXupcT1UVU6P0feQPiP/eH6iWMqemjJm4/hhQJ15OI11QxgfMTP0pytq2jeTC5VMZWaXoXQ/PX3UKPXPvc9+D5pAxnR6IGAmvJCbO5e2SeirINbk1c3WM6S0ecMuI6UIAhKmRWgZMGrMQ4xxwqT28osalmsWCu+bgBN76YH4y7UMOcu2JxBIziLGOGf0/8Bj27ZIINwIjBo5KcBFR71r+qkUy1nPvq72Pl6ZhiY984JZJnGfObZNYOWrBy3JSgRPOeLSUUY2JqgJZO0y1bGCUFYwczVa7WwJ6AqYLmPb4N1qjIXpPj1uIzBIXRNyEmecTLWx4GsqxaIxUqMbMeH07SWwUAsqTY2RzWYQyKb9MPXWdFu0E5E
+	1nqkMn/Lj/z53Mgj7H3tL2Fh+Li0sv5MLeTUFP6QJiF/mEHzfoYo2JzD8HD592LHvMdvMwi0swyYYakYwzDCXXeVoJs0rrR1OcFJzXCOk9zmPzrDYC1EE6zauGlbcqwCQlkS718RKs2+06QgjZohhMfrfq1WDPI3vXP9DfjKEQ6emxdxiUR6+djEgDD8VxMxHDnqlzccGWDKu5eAWD81GtweSxbJoNCgoP74WSkkyyUt5r5dMDme7fNh04MlW11Abyzm4zHnAb/vMpFtR7OLAefFcebgfvMdYvFeQiKSfxvH95lcoq3FMFh5G9tirWk1e781iekke6dUBsC84Wgkuzyp6QTsShATzXd3thaQkynr3ccNjdU9hbl3QFlUhlzCxeTzlVMfh9c4NU8c8r8xyqKqJ65q4Cq5m8Z7IJbTc13DKtMS0yU1ZbBrcMT6A0z5
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2026 21:58:56.5763
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2026 21:59:25.2999
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e069b726-04e7-407c-79c3-08ded23bc9f2
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9b3948b8-43e7-45e4-ceff-08ded23bdb0e
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN2PEPF0000449D.namprd02.prod.outlook.com
+	BN2PEPF000044A2.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8338
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6358
 
 From: Ashish Kalra <ashish.kalra@amd.com>
 
-RMPOPT table is a per-CPU table which indicates if 1GB regions of
-physical memory are entirely hypervisor-owned or not.
+Pages are converted from shared to private as SNP guests are launched.
+This destroys exisiting RMPOPT optimizations in the regions where
+pages are converted.
 
-When performing host memory accesses in hypervisor mode as well as
-non-SNP guest mode, the processor may consult the RMPOPT table to
-potentially skip an RMP access and improve performance.
+Conversely, guest pages are converted back to shared during SNP guest
+termination and their region may become eligible for RMPOPT
+optimization.
 
-Normal guest events clear RMP optimizations: pages are converted from
-shared to private as SNP guests are launched, and large pages are split
-and collapsed during guest operation -- both clear the RMPOPT
-optimizations for the affected 1GB regions.  Conversely, guest pages are
-converted back to shared during SNP guest termination, so those regions
-may become eligible for RMPOPT optimization again.
+To take advantage of this, perform RMPOPT after guest termination.
+Do it after a delay so that a single RMPOPT pass can be done if
+multiple guests terminate in a short period of time.
 
-Without some intervention, all RMP optimizations would eventually be
-lost.  Add an interface to re-optimize all of physical memory.
-
-The interface uses mod_delayed_work() instead of queue_delayed_work()
-so that the delay timer is reset on each call. This provides proper
-batching semantics: re-optimization runs 10 seconds after the *last*
-VM termination rather than after the first. mod_delayed_work() also
-re-queues work that is already in-flight, so a re-scan request
-during an active scan is not silently dropped.
-
+Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
 Reviewed-by: Ackerley Tng <ackerleytng@google.com>
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 ---
- arch/x86/include/asm/sev.h |  2 ++
- arch/x86/virt/svm/sev.c    | 15 +++++++++++++++
- 2 files changed, 17 insertions(+)
+ arch/x86/kvm/svm/sev.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
-index 440c813fedde..d40beafbebb6 100644
---- a/arch/x86/include/asm/sev.h
-+++ b/arch/x86/include/asm/sev.h
-@@ -662,6 +662,7 @@ static inline void snp_leak_pages(u64 pfn, unsigned int pages)
- 	__snp_leak_pages(pfn, pages, true);
- }
- int snp_prepare(void);
-+void snp_rmpopt_all_physmem(void);
- void snp_setup_rmpopt(void);
- void snp_clear_rmpopt_capable(void);
- void snp_disable_cpu_hotplug(void);
-@@ -683,6 +684,7 @@ static inline void snp_leak_pages(u64 pfn, unsigned int npages) {}
- static inline void kdump_sev_callback(void) { }
- static inline void snp_fixup_e820_tables(void) {}
- static inline int snp_prepare(void) { return -ENODEV; }
-+static inline void snp_rmpopt_all_physmem(void) {}
- static inline void snp_setup_rmpopt(void) {}
- static inline void snp_clear_rmpopt_capable(void) {}
- static inline void snp_disable_cpu_hotplug(void) {}
-diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-index 5f99cbbc6cbd..4661e5271a2d 100644
---- a/arch/x86/virt/svm/sev.c
-+++ b/arch/x86/virt/svm/sev.c
-@@ -743,6 +743,21 @@ static void rmpopt_work_handler(struct work_struct *work)
- 	free_cpumask_var(follower_mask);
- }
- 
-+void snp_rmpopt_all_physmem(void)
-+{
-+	if (!cpu_feature_enabled(X86_FEATURE_RMPOPT) || !rmpopt_capable)
-+		return;
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index e107f368ed2d..23e236b13ccd 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -3005,6 +3005,16 @@ void sev_vm_destroy(struct kvm *kvm)
+ 		 */
+ 		if (snp_decommission_context(kvm))
+ 			return;
 +
-+	guard(mutex)(&rmpopt_wq_mutex);
-+
-+	if (!rmpopt_wq)
-+		return;
-+
-+	mod_delayed_work(rmpopt_wq, &rmpopt_delayed_work,
-+			 msecs_to_jiffies(RMPOPT_WORK_TIMEOUT));
-+}
-+EXPORT_SYMBOL_FOR_MODULES(snp_rmpopt_all_physmem, "kvm-amd");
-+
- void snp_setup_rmpopt(void)
- {
- 	u64 rmpopt_base;
++		/*
++		 * Perform RMP optimizations on memory freed by terminating
++		 * guests.  The scan is deferred, so it normally runs after
++		 * sev_gmem_invalidate() has converted this guest's pages back to
++		 * shared, and picks them up then.  A very large guest whose
++		 * conversion has not finished by then is picked up by a later
++		 * teardown's scan.
++		 */
++		snp_rmpopt_all_physmem();
+ 	} else {
+ 		sev_unbind_asid(kvm, sev->handle);
+ 	}
 -- 
 2.43.0
 
