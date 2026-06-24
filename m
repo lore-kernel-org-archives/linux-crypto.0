@@ -1,43 +1,42 @@
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD77735E949;
-	Wed, 24 Jun 2026 13:06:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFBAB363C45;
+	Wed, 24 Jun 2026 13:15:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782306370; cv=none; b=tIbQcVS+l45XJPlsdxaJppGRbVNVcHIpK4Nf2j7iE0yJ6i4WI+IFxM94tpt6EcnDxhiLwM0flJcR75t07Wgfoiw6flgMRQ9KUHzshKq58UYgnReZWKNvxWhxHcz18wpWWPfuhW8l8ot6KTy5LQQVtFoxKwkKTDLSxnrGmrFB4Jc=
+	t=1782306928; cv=none; b=jNu/eFh6HW6B4VCDhQXIaW8k2eltHhqp7nDvjpynVUI1ZSpg9cH1V1IZsZyoj8Ok1leliQlS7s+Uw/CGcyuxiuuYkDnDUfWGsDYRXX0OB1bsxQXBaRDPcufP1uIYJo3w81YJpUYdGDEKfrukzg3t7oLy/BSjV6a1yVbSvC7FBYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782306370; c=relaxed/simple;
-	bh=DuA83fRrvg9FcK3+uKVtP7zDj3cARtxSAMCxIPj6Ris=;
+	s=arc-20240116; t=1782306928; c=relaxed/simple;
+	bh=moyOQIzaR6smZ9rBrd3W/NuwPZRv54jsj9HwphWn/HQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GxQqwB5bcDD6p6fXOfyETLmurFkaLYTxla0hFM9/fNj9sFkoue3r4JeQVmzkrU7L24UQp9n10Yvvl4mealxKEV3SYQTZVs8S1jQzl1UlMs9q9O+PP5zukQSMi35RjNw89OXPZasPrPuX76JefqAIRermLVNM4PknZjZmnVYCxvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=t7N5AMoP; arc=none smtp.client-ip=91.218.175.174
+	 In-Reply-To:Content-Type; b=KLd6GtpauGCNhDeGTku3OcQHwYSl5+vuhjC2jBpYHgdsrWZm9chvxNxEYC10tHv3xqi7ezyglgVjCVmsmpJL56czye2JeC0fl3GZzaqLZTbjEJtCqol0jj+sx0gU7fHvLJm9Qn94XgvNr2d5zsfsAWfEtJ+Q7vPg1DoEoOAQ240=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Kz4Q9rbh; arc=none smtp.client-ip=91.218.175.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="t7N5AMoP"
-Message-ID: <96334e07-dbd9-47a0-93f5-ac4762b7b919@linux.dev>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Kz4Q9rbh"
+Message-ID: <351a6b67-b394-4c58-aee2-88b6c8089ad5@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1782306356;
+	t=1782306914;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Z2iAFOHBRMR/Xa17pT7sXAqMACpdvIbkzmpfw9EGJVs=;
-	b=t7N5AMoP0/i8dFY3FrC7HO2yNmLfeZFETlWYqXUODrlmNpqyaftZywjo0y9UNn13O8QGRa
-	AXb39zIwwMhdHGGwdLIWZOxZlc/RB5gme76K1wm+eYFw8s2/p0wLK8vNz3AEO2CElTbLsC
-	uEFuGXWFUWXMM2nzKZ+r26KvGnuXTwQ=
-Date: Wed, 24 Jun 2026 21:05:32 +0800
+	bh=Jm5h4EGMu1/G65UxgDlhva2Uqze8a2QIkXsB3xVvPew=;
+	b=Kz4Q9rbh7etgj8euhlBLWO3TzYATCTCfu6njur0dxfGVJdMqB9UP/InGWtI0bOGTstOlHl
+	POIMRyO3mRJBT5/BeQDQV44BuugXQiS1AZGuvJ0EWei9+7fme1gtEeTZSwt1IwIDM7n5ZK
+	H6199we71vGASxf1nAZQvllBRzYOKVU=
+Date: Wed, 24 Jun 2026 21:14:50 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3 0/7] Prepare mutable list iterators to cache cursor
- state
-To: Jani Nikula <jani.nikula@linux.intel.com>,
- Andrew Morton <akpm@linux-foundation.org>,
+Subject: Re: [PATCH v3 1/7] list: Add mutable iterator variants
+To: David Laight <david.laight.linux@gmail.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
  David Hildenbrand <david@kernel.org>, Jens Axboe <axboe@kernel.dk>,
  Tejun Heo <tj@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>,
  Christian Brauner <brauner@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
@@ -51,10 +50,10 @@ To: Jani Nikula <jani.nikula@linux.intel.com>,
  Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
  "Paul E. McKenney" <paulmck@kernel.org>,
  Shakeel Butt <shakeel.butt@linux.dev>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
-Cc: David Howells <dhowells@redhat.com>,
- Simona Vetter <simona.vetter@ffwll.ch>, Randy Dunlap
- <rdunlap@infradead.org>, Luca Ceresoli <luca.ceresoli@bootlin.com>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ David Howells <dhowells@redhat.com>, Simona Vetter <simona.vetter@ffwll.ch>,
+ Randy Dunlap <rdunlap@infradead.org>,
+ Luca Ceresoli <luca.ceresoli@bootlin.com>,
  Philipp Stanner <phasta@kernel.org>, linux-block@vger.kernel.org,
  linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
  linux-ntfs-dev@lists.sourceforge.net, linux-fsdevel@vger.kernel.org,
@@ -65,46 +64,125 @@ Cc: David Howells <dhowells@redhat.com>,
  linux-modules@vger.kernel.org, linux-crypto@vger.kernel.org,
  linux-pm@vger.kernel.org, rcu@vger.kernel.org, sched-ext@lists.linux.dev,
  linux-mm@kvack.org, virtualization@lists.linux.dev, damon@lists.linux.dev,
- llvm@lists.linux.dev, chengkaitao <chengkaitao@kylinos.cn>
+ llvm@lists.linux.dev, Kaitao Cheng <chengkaitao@kylinos.cn>
 References: <20260622040533.29824-1-kaitao.cheng@linux.dev>
- <88f34c7fa5a3d1700cc8005818751d6aa31f09df@intel.com>
+ <20260622040533.29824-2-kaitao.cheng@linux.dev>
+ <20260622094242.64531b9a@pumpkin>
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Kaitao Cheng <kaitao.cheng@linux.dev>
-In-Reply-To: <88f34c7fa5a3d1700cc8005818751d6aa31f09df@intel.com>
+In-Reply-To: <20260622094242.64531b9a@pumpkin>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
 
 
-在 2026/6/22 16:37, Jani Nikula 写道:
-> On Mon, 22 Jun 2026, Kaitao Cheng <kaitao.cheng@linux.dev> wrote:
->> Add *_mutable() iterator variants for list, hlist and llist.  The new
->> helpers are variadic and support both forms.  In the common case, the
->> caller omits the temporary cursor and the macro creates a unique internal
->> cursor with typeof(pos) and __UNIQUE_ID().  If a loop really needs an
->> explicit temporary cursor, the caller can still pass it and the helper
->> keeps the existing *_safe() behaviour.
->>
->> For example, a call site may use the shorter form:
->>
->>   list_for_each_entry_mutable(pos, head, member)
->>
->> or keep the explicit temporary cursor form:
->>
->>   list_for_each_entry_mutable(pos, tmp, head, member)
+在 2026/6/22 16:42, David Laight 写道:
+> On Mon, 22 Jun 2026 12:05:31 +0800
+> Kaitao Cheng <kaitao.cheng@linux.dev> wrote:
 > 
-> I'm unconvinced it's a good idea to allow two forms with macro trickery,
-> *especially* when it's not the last argument you can omit. I think it's
-> a footgun.
+>> From: Kaitao Cheng <chengkaitao@kylinos.cn>
+>>
+>> The list_for_each*_safe() helpers are used when the loop body may
+>> remove the current entry.  Their API exposes the temporary cursor at
+>> every call site, even though most users only need it for the iterator
+>> implementation and never reference it in the loop body.
+>>
+>> Add *_mutable() variants for list and hlist iteration.  The new helpers
+>> support both forms: callers may keep passing an explicit temporary cursor
+>> when they need to inspect or reset it, or omit it and let the helper use
+>> a unique internal cursor.
 > 
-> IMO stick with the first form only, and there'll always be the _safe
-> variant that can be used when the temp pointer is needed.
+> I'm not really sure 'mutable' means anything either.
+> It is possible to make it valid for the loop body (or even other threads)
+> to delete arbitrary list items - but that needs significant extra overheads.
+> 
+> It might be worth doing something that doesn't need the extra variable,
+> but there is little point doing all the churn just to rename things.
+> 
+>>
+>> This makes call sites that only mutate the list through the current entry
+>> less noisy, while keeping the existing *_safe() helpers available for
+>> compatibility.
+>>
+>> Signed-off-by: Kaitao Cheng <chengkaitao@kylinos.cn>
+>> ---
+>>  include/linux/list.h | 269 +++++++++++++++++++++++++++++++++++++------
+>>  1 file changed, 231 insertions(+), 38 deletions(-)
+>>
+>> diff --git a/include/linux/list.h b/include/linux/list.h
+>> index 09d979976b3b..1081def7cea9 100644
+>> --- a/include/linux/list.h
+>> +++ b/include/linux/list.h
+>> @@ -7,6 +7,7 @@
+>>  #include <linux/stddef.h>
+>>  #include <linux/poison.h>
+>>  #include <linux/const.h>
+>> +#include <linux/args.h>
+>>  
+>>  #include <asm/barrier.h>
+>>  
+>> @@ -763,28 +764,72 @@ static inline void list_splice_tail_init(struct list_head *list,
+>>  #define list_for_each_prev(pos, head) \
+>>  	for (pos = (head)->prev; !list_is_head(pos, (head)); pos = pos->prev)
+>>  
+>> -/**
+>> - * list_for_each_safe - iterate over a list safe against removal of list entry
+>> - * @pos:	the &struct list_head to use as a loop cursor.
+>> - * @n:		another &struct list_head to use as temporary storage
+>> - * @head:	the head for your list.
+>> +/*
+>> + * list_for_each_safe is an old interface, use list_for_each_mutable instead.
+>>   */
+>>  #define list_for_each_safe(pos, n, head) \
+>>  	for (pos = (head)->next, n = pos->next; \
+>>  	     !list_is_head(pos, (head)); \
+>>  	     pos = n, n = pos->next)
+>>  
+>> +#define __list_for_each_mutable_internal(pos, tmp, head)		\
+>> +	for (typeof(pos) tmp = (pos = (head)->next)->next;		\
+> 
+> Use auto
+> 
+>> +	     !list_is_head(pos, (head));				\
+>> +	     pos = tmp, tmp = pos->next)
+>> +
+>> +#define __list_for_each_mutable1(pos, head)				\
+>> +	__list_for_each_mutable_internal(pos, __UNIQUE_ID(next), head)
+>> +
+>> +#define __list_for_each_mutable2(pos, next, head)			\
+>> +	list_for_each_safe(pos, next, head)
+>> +
+>>  /**
+>> - * list_for_each_prev_safe - iterate over a list backwards safe against removal of list entry
+>> + * list_for_each_mutable - iterate over a list safe against entry removal
+>>   * @pos:	the &struct list_head to use as a loop cursor.
+>> - * @n:		another &struct list_head to use as temporary storage
+>> - * @head:	the head for your list.
+>> + * @...:	either (head) or (next, head)
+>> + *
+>> + * next:	another &struct list_head to use as optional temporary storage.
+>> + *		The temporary cursor is internal unless explicitly supplied by
+>> + *		the caller.
+>> + * head:	the head for your list.
+>> + */
+>> +#define list_for_each_mutable(pos, ...)					\
+>> +	CONCATENATE(__list_for_each_mutable, COUNT_ARGS(__VA_ARGS__))	\
+>> +		(pos, __VA_ARGS__)
+> 
+> The variable argument count logic really just slows down compilation.
+> Maybe there aren't enough copies of this code to make that significant.
+> But just because you can do it doesn't mean it is a gooD idea.
+> I'm also not sure it really adds anything to the readability.
+> 
+> And, it you are going to make the middle argument optional there is
+> no need to change the macro name.
 
-Could we go back to the v1 version? What do you think of that
-implementation approach?
-
-https://lore.kernel.org/all/20260529082149.76764-1-kaitao.cheng@linux.dev/
+Christian König and Jani Nikula also disagree with the variadic-argument
+implementation approach. If we abandon that method, it means we will
+inevitably need to add some new macros. If mutable is not a good name,
+suggestions for better alternatives would be welcome; coming up with a
+suitable name is indeed rather tricky.
 
 -- 
 Thanks
