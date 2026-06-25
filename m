@@ -1,180 +1,58 @@
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012045.outbound.protection.outlook.com [52.101.43.45])
+Received: from aesomtva16d.serverdata.net (aesomtva16d.serverdata.net [64.78.48.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C2C6233704;
-	Thu, 25 Jun 2026 03:45:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782359135; cv=fail; b=Z2tSYaWY4RuP0lGU33Pit2y5nqjgFQIKXMYxNSS+8r6qAaihIV+LYHol+xIyiyruev84i7iKwJZeVO5AO6+o2oLo6n3g9ReNjvbWYgbar789ogeXQzCu7dMkZ3/LClxq3V/59j1jFWWgRDauNXU+q3pH8IRCagIl3IcCczCdU34=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782359135; c=relaxed/simple;
-	bh=16UIrMKlW7kuhbDA3a/Af6VsrvccsRopV5TDci5A1Hc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=OH7XrTgqu1BoFZfUIPuSNbVMqbhJSqLIspgZ/xdctF2qWXSJEAuHzUCvCvO+McAuKq+oXBbBzB7HFTLahnZntXvWD9ZQ1fklJAyHFWMdWm/8h55r9jPVyQwFyqcJtoo8MFggemVvOS1HGMNGje/zsUdFN4+3AMJz9zN2XQ/Dzgk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=KLIty9cC; arc=fail smtp.client-ip=52.101.43.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="KLIty9cC"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=doUyJK7Qbiq17wgGcPE/FRHwAUtOm/NvKMlFcnN59GaX+Wzf84yBYv+VdgNK6S4N/Y0ylLrHgzJKJCbbcgmhasAuBMgB94KjuYg8/x9xfCuNTpLSDtb2PCagf57O0+xy2vQ3R+wtYK/dujHNRgdTfT9I+A/WaIUgVy3bpi+ZKc2Uf7gEvUNYEa9Rolsph73BNdxn8Q4DJ6ivBd+xJj+8vrDzKO1UXOmmjIK6zQFkQBxs11ZbGgf9FUYBEnxqIXfAPBKg1gHkgBDYzKiws35+Rwz012AV/7EXKkLj7hNqgMJywjGqkw/90GohcXEo8YoDSt6ZlDWhH2jwhHn3aui5ww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7VfN3eUSG2znRzzfTRHxAdqKHyd+c/JHdUhek4gynkE=;
- b=SdG8Z20RTn9MMJRVUDrEX/TNQCBOdykTBn3iYjPJkGc7yyYQff+qIGzyCvf//1Fblb5SNWAk3OYCDSkOH/Lmig54PCTBGsXg6BmtPtt+sHU6S+2qQddsWavNhCdUDC1o/a0+OTyDRE51hW1pIq9pH6AHgViZ2Q/iN5Af6LeecxfJqFlSXWNnjzxD57/YwR77GrjT1hKtCo7Pj+7+Ms5MLqJ/Z2dlJM4e4HygkLTT/hvrmtSSZEwLHlZY+tKgvFRKjyKrXAwyaYn8NibriFWRJ4wmYF9z7wVRMfVDPbAxxInzzPapx4mwMapxmHuyVX/eWObLfnIRIgR06+oY1B6/Qw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7VfN3eUSG2znRzzfTRHxAdqKHyd+c/JHdUhek4gynkE=;
- b=KLIty9cCs8L/xdWU80qbco/pnz7HhJelIfxp40SyBdHsBDzE0ollu2+fYxVlhsMgZnHwAm8F7LP2hY4cRwBF2kywtnJmL/OtAglRBRW+mGzy+m4Uov3GgYEueShy1Lag+p5w80IAsaaUDxn5wADZ62n5SqOvKZOt8biu3q98IDc=
-Received: from SJ0PR05CA0206.namprd05.prod.outlook.com (2603:10b6:a03:330::31)
- by SA5PPFCAFD069B8.namprd12.prod.outlook.com (2603:10b6:80f:fc04::8e1) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.139.20; Thu, 25 Jun
- 2026 03:45:30 +0000
-Received: from SJ5PEPF000001F2.namprd05.prod.outlook.com
- (2603:10b6:a03:330:cafe::a2) by SJ0PR05CA0206.outlook.office365.com
- (2603:10b6:a03:330::31) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.139.11 via Frontend Transport; Thu,
- 25 Jun 2026 03:45:30 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
-Received: from satlexmb07.amd.com (165.204.84.17) by
- SJ5PEPF000001F2.mail.protection.outlook.com (10.167.242.70) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.181.6 via Frontend Transport; Thu, 25 Jun 2026 03:45:30 +0000
-Received: from Satlexmb09.amd.com (10.181.42.218) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Wed, 24 Jun
- 2026 22:45:28 -0500
-Received: from satlexmb08.amd.com (10.181.42.217) by satlexmb09.amd.com
- (10.181.42.218) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Wed, 24 Jun
- 2026 20:45:28 -0700
-Received: from [10.136.35.225] (10.180.168.240) by satlexmb08.amd.com
- (10.181.42.217) with Microsoft SMTP Server id 15.2.2562.41 via Frontend
- Transport; Wed, 24 Jun 2026 22:45:18 -0500
-Message-ID: <fe9927ad-a06a-4a4b-8122-12644513ed14@amd.com>
-Date: Thu, 25 Jun 2026 09:15:12 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E906A1F5842
+	for <linux-crypto@vger.kernel.org>; Thu, 25 Jun 2026 04:52:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.78.48.235
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782363125; cv=none; b=lMTuirJ73RUUUgxckdBh8XLIpRi/1iAQITXnKbPP9VXrtPiufWcCVNVuZYJH6QERv/biHK3bhFWZIMdykEa+NMnY0ze4yQ4z6xUag39RKXAYSMc/MqV993sH5huqaHyHsPexb0d1UKy+13vz7xcX/SCqIUpCdeq4H6/Qf6ht+54=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782363125; c=relaxed/simple;
+	bh=egW8Y0SayjbMhnGY16ygLDMO9tc9OaQ20vDRFoJPC5Y=;
+	h=From:To:Subject:Message-ID:Date:MIME-Version:Content-Type; b=fK3YBc8KaJsevpEoTEX1mg0Pz5EZ2rivLzK0S8YDwrAfieX36uvWyP8qkRbLB02ebrZRo0WVAXAfGA78opxJla0tLKbrO1BsOvqBMtzuAjQ4luey5JzKj8OtBMpml3aVde+ytbv/3ArZpGVmNGCzKCfr3yMaE4SUfJ4/1olzXNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wesselsproknor.hostpilot.com; spf=pass smtp.mailfrom=wesselsproknor.hostpilot.com; arc=none smtp.client-ip=64.78.48.235
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wesselsproknor.hostpilot.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wesselsproknor.hostpilot.com
+Received: from aesoc-va-1-3.serverpod.net (aesoc-va-1-3.serverpod.net [10.216.97.8])
+	by aesomt-va-1-6.localdomain (Postfix) with ESMTP id B04D9C007D
+	for <linux-crypto@vger.kernel.org>; Wed, 24 Jun 2026 21:42:59 -0700 (PDT)
+Received: from MBX092-E1-VA-9.exch092.serverpod.net (unknown [10.217.23.182])
+	by aesomt-va-1-2.localdomain (Postfix) with ESMTP id 7AA851200AA
+	for <linux-crypto@vger.kernel.org>; Wed, 24 Jun 2026 21:42:59 -0700 (PDT)
+Received: from [127.0.0.1] (173.225.107.183) by
+ MBX092-E1-VA-9.exch092.serverpod.net (10.217.23.182) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.43; Thu, 25 Jun 2026 00:42:51 -0400
+From: <ZamaJuli@wesselsproknor.hostpilot.com>
+To: <linux-crypto@vger.kernel.org>
+Subject: Test Campaign 1782362571457-4323
+Message-ID: 
+ <744e554d-257b-fdc1-1267-a00f488449d1@wesselsproknor.hostpilot.com>
+Content-Transfer-Encoding: 7bit
+Date: Thu, 25 Jun 2026 04:42:51 +0000
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 3/6] x86/sev: Disable CPU hotplug while SNP is active
-To: Ashish Kalra <Ashish.Kalra@amd.com>, <tglx@kernel.org>,
-	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
-	<x86@kernel.org>, <hpa@zytor.com>, <seanjc@google.com>,
-	<peterz@infradead.org>, <thomas.lendacky@amd.com>,
-	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <ardb@kernel.org>
-CC: <pbonzini@redhat.com>, <aik@amd.com>, <Michael.Roth@amd.com>,
-	<Tycho.Andersen@amd.com>, <Nathan.Fontenot@amd.com>,
-	<ackerleytng@google.com>, <jackyli@google.com>, <pgonda@google.com>,
-	<rientjes@google.com>, <jacobhxu@google.com>, <xin@zytor.com>,
-	<pawan.kumar.gupta@linux.intel.com>, <babu.moger@amd.com>,
-	<dyoung@redhat.com>, <nikunj@amd.com>, <john.allen@amd.com>,
-	<darwi@linutronix.de>, <linux-kernel@vger.kernel.org>,
-	<linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
-	<linux-coco@lists.linux.dev>
-References: <cover.1782336473.git.ashish.kalra@amd.com>
- <ba146ca15b7f76eee386c8c073fb3f1cc36e5781.1782336473.git.ashish.kalra@amd.com>
-Content-Language: en-US
-From: K Prateek Nayak <kprateek.nayak@amd.com>
-In-Reply-To: <ba146ca15b7f76eee386c8c073fb3f1cc36e5781.1782336473.git.ashish.kalra@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001F2:EE_|SA5PPFCAFD069B8:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2d5fda12-2cdf-43a6-8c2e-08ded26c33ec
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700016|1800799024|376014|7416014|23010399003|4143699003|3023799007|11063799006|56012099006|921020|6133799003|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	7hsn2ndu/gRlF70SupPeY2L975BgWMXWehRiSGy/QrQFwX1HRF+cv9fd8Zv5KAmx0CjQB9HWI9da1cWtY5zKJM8mpxzSt1DB2UKg6uZolhWJANpkxBLAEAloMt5J+b7SqnJI3WygnR4Ql6mKavFyFhGplxFcGFOOGPYZckOKHkzGaaXqIif2UJB7v+mwpG6vIkP5nUQwERmYGXKU2fIvMmMayWOC+Fx/mkkqbMu7kl8qazbZTF0vlDnBKGp5RF/syTmbcOYE9JPdgi823ouGJJAqOb1E/TpYE0Bb/hFnPzA6zjAPHYWrxFxZnQrJh+afvBzU8aCJaaWtNiyrE532Z1LFMa4lVyAHf59n2l4e6yYah+uOYRN7f5+ohFjPrBG9XSzvaLPeZoIiMX1RgKRqlbcYBNOCkQLJEFZPSOBYV34VH5TfmNv2Kf/m8q3NWNx3fEOVMJ2gjJavdwJYDZnPXdh8lYV2Lon0aeDUp1pzdokLpdhjKcoD7K/AFON41oOtMO7qRV/+pCNzYKtHJslTNumABn8RORNI799wga0zmfimGgmt1jthk07OKMphtw4cuxMA/ediqZJDS06WZ+oIO92tsCjR8sYRGMzyIR7fRllblR+FWDkhdTLnVo9cV43M9U4/9kC0npHKgxHofnXS6uUqHGLyoN4XIYlAo4Lf9Gyg5MgGwWxV1wYDvbudFfXRAal8QXU8TTZINPfw52foNmM9P/iRxi767NX3ndzEdWO/zxvFkdwxXoWlDLVa6zvA
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700016)(1800799024)(376014)(7416014)(23010399003)(4143699003)(3023799007)(11063799006)(56012099006)(921020)(6133799003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	QYbELyHSP3QNLkiY4kquqVUV1EZ7ceW3QLSi8Hgtv8+8ie6j/8KjrQTScq3Gxe0FE3pLdzZKLP6TiztgWbWGXMysxtsdC9S1AMr/AEhSLJHHbk3Sy/nii6n3M/rBoKTI8h9kW96xxo16sAGIzOjd06/bX70F36N6bUNz1IivfGuXSHziuTZJNfjc8fUHAH/UH1rtNU+WOv7j3iUyLbl2g10gITX3q0sy5Q6HY7pd5dOPTHTM7hooZE+1G65q8XVn1O80RgiH4hdMdGr5pRM+05Z2z5Migj+8ZmepPBdA4FGGqTGnNmnz94oBoKOorv1gyxc8UEGhOqSw+SI237zBCp+WfObMmii3WY5YumKQfP0vn6cpfWQxcCcrChphoYRxVucP6Jtk0p4YBU7qpoHlYrRYQ/0vUL4mL/VbRo9baSxc0ZaChEQ8GzcMicPLEdhc
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2026 03:45:30.1908
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2d5fda12-2cdf-43a6-8c2e-08ded26c33ec
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001F2.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA5PPFCAFD069B8
+Content-Type: text/plain; charset="utf-8"
+X-ClientProxiedBy: MBX092-E1-VA-2.exch092.serverpod.net (10.217.23.130) To
+ MBX092-E1-VA-9.exch092.serverpod.net (10.217.23.182)
+X-Source-Routing-Agent: True
+X-CMAE-Score: 0
+X-CMAE-Analysis: v=2.4 cv=H8PIfsUi c=1 sm=1 tr=0 ts=6a3cb1d3
+	a=KmXYD0nqxBNGM8eoLlxHEg==:117 a=rCyhkYPouZquQ8S5x+Ivjg==:17
+	a=soLeVifEdbMA:10 a=IkcTkHD0fZMA:10 a=FelO9ux0wxsA:10
+	a=OQdMzU7Jr8vsYeHqMKcA:9 a=QEXdDO2ut3YA:10
+Spam-Stopper-Id: b157bd03-2c85-4660-85d5-70a235f6913c
+Spam-Stopper-v2: Yes
+X-Envelope-Mail-From: ZamaJuli@wesselsproknor.hostpilot.com
+X-Spam-Score: 0
+X-Spam-Category: LEGIT
+X-Spam-Reasons: {'verdict': 'clean',
+ 'spamcause': 'dmFkZTFJW34dbnQRdnALtsgsUi16YWkQpI7Yp59jJ6tRZMXQjXA8qz54n1m8DamuwCtUXidK9Et8aHA0rrXszzXbrfEq6pz/mLMpZcJPNMM+T2BbN/vUOBmAi+L8pvU5YNWIp9gA1BGhuBtbZAvX6tHSwJ6pMjp6n0jEcT+JNsnazps2ykcLRVYFznhXtBBlrBCD0fcxVEQfqhQAeyWXWvF0TXDSagrfCJO8lLL3kWFjMY6C4QidHpndf4j/YzYmYgghJPjHVPpXpvjpsRQtbbEEBJlC59pdvVmzNlmCmVP4iNgqiflOpK+FENWJ5QI7Kl5xMQ58e6cW4I8smQjz8MWYYOXRrM+/6tA0AnW736TstjzJNomfcaXRX+Y1n9x6Et+ZR3HPvYYFkFDnvq8gAVCbdBaSzM5OZ3qY2qsdxYgibZGEoAtwJRoTz67d1niVmPoadvMkkRYeIzJSdg8g7kq52Jgp/NAoywIz4aHLor+02Ff2dhT+vypc9p32tfH8orVj7PNk1U62ZBuJzXRRjv6uY5JWp9j8+2RA2plBxHU9KW3LYYZZ1NDp8iX1UuCulnQ4dzG7V8sGplVy6J6UMKUiIz+6+9Bxnp6zGpPUakv2PPrbO3VsHGCo7vh34kFJzWbOmyFg8dySJgfFVqIc2iBgOvhAyimggwdHduM3gqt4m3EHug',
+ 'elapsed': '9ms'}
+X-AES-Category: LEGIT
 
-Hello Ashish,
-
-On 6/25/2026 3:26 AM, Ashish Kalra wrote:
-> From: Ashish Kalra <ashish.kalra@amd.com>
-> 
-> While SNP is active, every memory write is checked against the RMP to
-> protect the integrity of SEV-SNP guest memory.  By the SNP architecture
-> these checks cannot be disabled on a subset of CPUs: they are gated
-> per-core by SYSCFG[SNP_EN], which the SEV firmware requires to be set on
-> every present CPU before SNP initialization.  A CPU that does not have
-> SNP_EN set and was not initialized via SNP_INIT performs no RMP checks at
-> all, so there is no valid configuration with SNP active and any CPU exempt
-> from RMP checks.
-> 
-> The firmware determines which CPUs are present from the processor and the
-> BIOS/UEFI configuration (e.g. SMT disabled in the BIOS) and enumerates
-> them at SNP init; it is not aware of the OS bringing CPUs online or
-> offline afterwards.  A CPU brought online after SNP init was not
-> enumerated at SNP_INIT and does not have SNP_EN set, so writes from it are
-> not RMP-checked and could corrupt SEV-SNP guest memory, and there is no
-> way to keep work off such a CPU once it is online.  OS CPU hotplug can thus
-> diverge from the firmware's expectations and break SNP.
-
-If this is true ...
-
-[..snip..]
-
-> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index 217b6b19802e..66475145b3fa 100644
-> --- a/drivers/crypto/ccp/sev-dev.c
-> +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -1479,6 +1479,9 @@ static int __sev_snp_init_locked(int *error, unsigned int max_snp_asid)
->  
->  	snp_hv_fixed_pages_state_update(sev, HV_FIXED);
->  
-> +	/* Disable CPU hotplug while SNP is active (see snp_disable_cpu_hotplug). */
-> +	snp_disable_cpu_hotplug();
-
-... then this should be done at snp_prepare() before
-on_each_cpu(snp_enable) right?
-
-If not, then any CPU hotplug between the cpus_read_unlock() there and
-the snp_disable_cpu_hotplug() here will not have the SNP_EN set.
-
-Isn't that a concern?
-
-Also, this patch can probably go first since the FW assumptions on
-hotplug exists independent of RMPOPT bits.
-
-> +
->  	snp_setup_rmpopt();
->  
->  	sev->snp_initialized = true;
-
--- 
-Thanks and Regards,
-Prateek
-
+Please reply to this email.
