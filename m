@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBCDB38399A;
-	Fri, 26 Jun 2026 04:39:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698AA303C8A;
+	Fri, 26 Jun 2026 04:39:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782448768; cv=none; b=HRg5Z3NEaYkc1i5bQKhb1+wP8LeqUgTarsraNtQ6lFfDT2scEvBLsbk7vYWlEiL/b+DaDgiduBZlKKndEon5FFF7+4/hEXdEOkLxDOAgy8a+JlOi9CR6MgDbHHEFZ7e0r7UugL0MjCc7l0snXTLhoGKG2BH/iF8IOijjcqhg6nY=
+	t=1782448768; cv=none; b=bM0uBxngRsE3/Y7xG3exPdrZMGvv8OiN8vAAZxKz8f1BhwlC/IRI2SzJP+4ZPvgbw774Veety5JCd57H663B3wbV3IITNADxUXlHFVXnu1/19BBCWCA2KHtZriH8GqX6WpatJw7gi3g5nBzuE9XOgiZ7OVMprcq3+463ZS1fyzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1782448768; c=relaxed/simple;
-	bh=RPItkOWasZqcyfOLtDz+/QpFuQkb3slxm+8bnisBhws=;
+	bh=AnFJLbySyDeETlahUwPNSX4yvDcZvB12/BG4xCpoqSs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=K8YXFRXtl2LoY9CDRGnwcC81Ofx6hKd6yZIBsKFoDZy7SkXjjzLOBWBc+nZHfTFU3H4ZGVBfEFyDEj48D2bOuKyW9MKT2zHCY9lTJk/ljZcu24qGBNLd0c3lRuYrikoZ/W1xtCdBg5s5ne/RVLKytjAiJ0blgS4EG42AAVgNhhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gZzDs4LY; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=RuUUomZLZYDoZxlpH+GV13SzY+0TDZ4VIq5FC/91rXwSbuVU6jWFJbiOfsAqKpk1oS/sDfEQAKrv6GzXmKYhSihS0n6t4qtT1VGzAYMTdEj8/036swaSCuTnEs2igfGDZA9CzCGQmZ6Bmd9OnjE4Iu8LmSDUdZ5c5CSDKXIKQOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aY5nPgvb; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gZzDs4LY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A6611F00A3E;
-	Fri, 26 Jun 2026 04:39:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aY5nPgvb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A4E31F00A3A;
+	Fri, 26 Jun 2026 04:39:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782448765;
-	bh=XKHZjuqa6SA7Q+q9Rian771zvDreJMenlySa40ODDo4=;
+	s=k20260515; t=1782448764;
+	bh=LTvew5FISW1+Y3DoGy6/+WEaicn3tFu5Y6jzIXpOte4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=gZzDs4LY1eQrVc4m3L3prP2YGRmr0ZDlgWf5RvT0ELnNdCSh6UFJ0vNT8Aip3r0Ps
-	 KcUEGZDvsjsYjD30dB5rZ10Ml0y30P4Ov5veDg+QkTGaXN0qBXMZgISNPLZD2LqLoH
-	 PfuDnsgatoprHVpvqvLHafIQnitGKb6aYbYSDwZUBs0nFA54f4wOlog6aIIbIQ20Xk
-	 fZmOd9ltXX0bAu9qbt/5Wdxckb91zl0Sq2GOPapRx38A0GUE3dVe4OCLRTxG3JH/QJ
-	 VVveOIT1nU0u218YJca17NApbALRkGWsglZA4JGcvABdb7cSlE5xfjI/LlyRnmAgYV
-	 CCRWLP1EKregA==
+	b=aY5nPgvbra9i2bLfegYp1BAgDIW7yQTbZOTbY43eHQpARuNo8vS8rxIW8dHP97WzX
+	 FdHvq7EK/hRKLDUYEuOL8JBSgd5gwtd+ZEC43UuakTmE/iZKhQpcuZwi6fmaJRdOYV
+	 GDIHewT/RRFX0RcExOrIJoye03Ek8YK6tUlzKStr7oypfBloh3fc2Lr3/GbDiX+UGn
+	 TOYnEbWOEXzSlmqJ6AnERYnsgHw8cB/pvZn2U9Q9AfaNZ8WQkM/7LhCkNxdUmaM25t
+	 CEhk2lm8DPDXjkUeRPT8yTLMDkekhAGaEX14YILcfCJUuIkCUtf25WlhuQ0TplOzzr
+	 G8+RpnKSX1/Pw==
 From: Eric Biggers <ebiggers@kernel.org>
 To: x86@kernel.org
 Cc: linux-um@lists.infradead.org,
@@ -35,9 +35,9 @@ Cc: linux-um@lists.infradead.org,
 	Christoph Hellwig <hch@lst.de>,
 	Andrew Morton <akpm@linux-foundation.org>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 5/8] lib/crc: x86: Stop using cpu_has_xfeatures()
-Date: Thu, 25 Jun 2026 21:37:28 -0700
-Message-ID: <20260626043731.319287-6-ebiggers@kernel.org>
+Subject: [PATCH 1/8] x86/fpu: Check for missing AVX and AVX-512 xstate bits
+Date: Thu, 25 Jun 2026 21:37:24 -0700
+Message-ID: <20260626043731.319287-2-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260626043731.319287-1-ebiggers@kernel.org>
 References: <20260626043731.319287-1-ebiggers@kernel.org>
@@ -49,46 +49,64 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Checking both boot_cpu_has() and cpu_has_xfeatures() has never really
-been needed in practice, and it's never been universally done (e.g.,
-lib/raid/ omits cpu_has_xfeatures()).  Nevertheless, both x86 and UML
-now explicitly clear the AVX and AVX-512 flags if their xfeatures are
-missing, which should remove any remaining doubts.
+If the CPU declares AVX or AVX-512 support, verify that the
+corresponding xstate bits are also set.  If not, warn and clear them.
 
-Thus, remove all the calls to cpu_has_xfeatures().
+This eliminates the perceived need for AVX and AVX-512 optimized code in
+the kernel to call cpu_has_xfeatures().  That has never been universally
+done, which strongly suggests that it has never really been needed in
+practice, but this should remove any remaining doubt.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- lib/crc/x86/crc-pclmul-template.h | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ arch/x86/kernel/fpu/xstate.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/lib/crc/x86/crc-pclmul-template.h b/lib/crc/x86/crc-pclmul-template.h
-index 02744831c6fa..893119bb7c07 100644
---- a/lib/crc/x86/crc-pclmul-template.h
-+++ b/lib/crc/x86/crc-pclmul-template.h
-@@ -25,20 +25,18 @@ crc_t prefix##_vpclmul_avx512(crc_t crc, const u8 *p, size_t len,	\
- DEFINE_STATIC_CALL(prefix##_pclmul, prefix##_pclmul_sse)
- 
- static inline bool have_vpclmul(void)
- {
- 	return boot_cpu_has(X86_FEATURE_VPCLMULQDQ) &&
--	       boot_cpu_has(X86_FEATURE_AVX2) &&
--	       cpu_has_xfeatures(XFEATURE_MASK_YMM, NULL);
-+	       boot_cpu_has(X86_FEATURE_AVX2);
+diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
+index a7b6524a9dea..7f7e62e4ebc5 100644
+--- a/arch/x86/kernel/fpu/xstate.c
++++ b/arch/x86/kernel/fpu/xstate.c
+@@ -797,10 +797,27 @@ static u64 __init guest_default_mask(void)
+ 	 * for KVM guests.
+ 	 */
+ 	return ~(u64)XFEATURE_MASK_USER_DYNAMIC;
  }
  
- static inline bool have_avx512(void)
- {
- 	return boot_cpu_has(X86_FEATURE_AVX512BW) &&
- 	       boot_cpu_has(X86_FEATURE_AVX512VL) &&
--	       !boot_cpu_has(X86_FEATURE_PREFER_YMM) &&
--	       cpu_has_xfeatures(XFEATURE_MASK_AVX512, NULL);
-+	       !boot_cpu_has(X86_FEATURE_PREFER_YMM);
- }
- 
++/* Clear any X86_FEATURE_* used by the kernel whose xfeatures are missing. */
++static void __init clear_cpu_caps_with_missing_xfeatures(u64 xfeatures)
++{
++	u64 mask;
++
++	mask = XFEATURE_MASK_FPSSE | XFEATURE_MASK_YMM;
++	if (boot_cpu_has(X86_FEATURE_AVX) && (xfeatures & mask) != mask) {
++		pr_err("x86/fpu: Disabling AVX support due to missing xstate features\n");
++		setup_clear_cpu_cap(X86_FEATURE_AVX);
++	}
++	mask = XFEATURE_MASK_FPSSE | XFEATURE_MASK_YMM | XFEATURE_MASK_AVX512;
++	if (boot_cpu_has(X86_FEATURE_AVX512F) && (xfeatures & mask) != mask) {
++		pr_err("x86/fpu: Disabling AVX-512 support due to missing xstate features\n");
++		setup_clear_cpu_cap(X86_FEATURE_AVX512F);
++	}
++}
++
  /*
-  * Call a [V]PCLMULQDQ optimized CRC function if the data length is at least 16
-  * bytes, the CPU has PCLMULQDQ support, and the current context may use SIMD.
+  * Enable and initialize the xsave feature.
+  * Called once per system bootup.
+  */
+ void __init fpu__init_system_xstate(unsigned int legacy_size)
+@@ -853,10 +870,12 @@ void __init fpu__init_system_xstate(unsigned int legacy_size)
+ 		pr_err("x86/fpu: Both APX/MPX present in the CPU's xstate features: 0x%llx.\n",
+ 		       fpu_kernel_cfg.max_features);
+ 		goto out_disable;
+ 	}
+ 
++	clear_cpu_caps_with_missing_xfeatures(fpu_kernel_cfg.max_features);
++
+ 	fpu_kernel_cfg.independent_features = fpu_kernel_cfg.max_features &
+ 					      XFEATURE_MASK_INDEPENDENT;
+ 
+ 	/*
+ 	 * Clear XSAVE features that are disabled in the normal CPUID.
 -- 
 2.54.0
 
