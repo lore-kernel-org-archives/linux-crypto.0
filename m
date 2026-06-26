@@ -1,123 +1,86 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp25.cstnet.cn [159.226.251.25])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 038373DB327;
-	Fri, 26 Jun 2026 10:57:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D80B3F39CF;
+	Fri, 26 Jun 2026 12:15:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782471480; cv=none; b=aBiQO54nPNZ/jeyVa4IMe8Yu/W76LfiWNpeSNnMXIb/FSomXmmV6p/G7OHYuXZoTIw2DXjlx5haI31uDAeyKZ+gnK43G43uEMwcZzZA2mjCIjXxhz04XK21xpZKWB47OtCnnZx0epMNDb+GKwPpdsgGVPu1AsjPSyg9wvtK6cR0=
+	t=1782476105; cv=none; b=hbHYJjhPAogYb3aOu2PgCdgcHoEqB0nGN4RIvSD4a4wVwMHeKWJnEfuiXJf3ND6cDIxnVj8phq0bHNa/hRe8IEORIqaPCBSMgp8IP9CbK4iW6Zp+K9tV0GWyFX7b8WmCcSqC2wbFh7zimW21p5ObYvyKTTWh1xwzw+5EyeP7DH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782471480; c=relaxed/simple;
-	bh=63xVF5ybA58lufS8+mQU0NJ6N2HaPImjxW3MDpTwDj0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=obBsLy2JHtCnpAnmFNdYHVA30E7n3DJ5v/TEVBahdP/wJ/egzVE7dtaDCHPCZHESEo8nuPY2NqXdbr2figB49XY4tdR/oNhPsdBwApk4JRtbYH73rsTxAhoRksgQQc+cwSTumirMKIzkvM/Njeso/SAoM6YE/23UZokEnYZ+KGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=My/1BS+s; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="My/1BS+s"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7351B1F000E9;
-	Fri, 26 Jun 2026 10:57:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782471478;
-	bh=ZTRPyMyzXJJHzBuvJUIeax1xIMpUkC2R+b5TUXDfLVg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=My/1BS+sODPPWkKG5n35GpohqpvIdqpVm5jWKuOA91DwPIV4FMBeiMnXbIOLzlSQX
-	 G47l2zPc1OhCTSS+gMbjyDBTIqPNhR+h3fylG7wpAEzkqYXY1k3JGpwuA+cfUKGL8K
-	 O8V74f1xsA5AlIQ4dL4Zj/JnGhrqZrAzg6PjJs7LSCaDKpIYpv4d0Rv9WMZCFZeeVv
-	 ndbOcQwcAxzq8jMCpJrxBR9ciJB5fLX1K5wx8/gIzBlNn1nft373kMpl1AWTuSuSzx
-	 bGHH6RvfFgYN/vXg7EBPy9oUGrL8QbN2JZaNW0QWj4N5GyvcYPa0WihXf86QgEnS2c
-	 BZFMyOzA0vlPw==
-Date: Fri, 26 Jun 2026 12:57:53 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
-Cc: Albert Ou <aou@eecs.berkeley.edu>, 
-	Alex Ousherovitch <aousherovitch@rambus.com>, Conor Dooley <conor+dt@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Jonathan Corbet <corbet@lwn.net>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <pjw@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>, Alexandre Ghiti <alex@ghiti.fr>, devicetree@vger.kernel.org, 
-	Joel Wittenauer <Joel.Wittenauer@cryptography.com>, linux-api@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, Shuah Khan <skhan@linuxfoundation.org>, sipsupport@rambus.com, 
-	Thi Nguyen <thin@rambus.com>
-Subject: Re: [PATCH 19/19] MAINTAINERS: add Rambus CryptoManager Hub (CMH)
-Message-ID: <20260626-lush-eel-of-election-5fcbde@quoll>
-References: <20260625173328.1140487-1-skrishnamoorthy@rambus.com>
- <20260625173328.1140487-20-skrishnamoorthy@rambus.com>
+	s=arc-20240116; t=1782476105; c=relaxed/simple;
+	bh=BwvsnC4UhZyqxd7c8+4jOgiwbvv8x7zN1b6evwCzP+4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hf+Dpx6AlBSHHkTiX/khL0mC4L7g9Y/QuYLMSnDhXBXcQKU4VRag6o9RyEyTJdzsXTwn/79U+U1QX66vT6+jOsnjBVXcbSLGed6daTj6CIVdJHPvOwLQojy4RRw5K6fu52C/2DPZ54ljrs3U7qOPuv9l3+CnqHZn1aRSPA8cCAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost.localdomain (unknown [117.182.75.66])
+	by APP-05 (Coremail) with SMTP id zQCowABXo8Y_bT5qWZJnFQ--.31905S2;
+	Fri, 26 Jun 2026 20:14:56 +0800 (CST)
+From: WenTao Liang <vulab@iscas.ac.cn>
+To: akhilrajeev@nvidia.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	thierry.reding@kernel.org,
+	jonathanh@nvidia.com
+Cc: linux-crypto@vger.kernel.org,
+	linux-tegra@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	WenTao Liang <vulab@iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] fix: crypto/tegra: tegra_se_host1x_submit: timeout path leaks host1x_job   reference
+Date: Fri, 26 Jun 2026 20:14:53 +0800
+Message-Id: <20260626121453.35043-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260625173328.1140487-20-skrishnamoorthy@rambus.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQCowABXo8Y_bT5qWZJnFQ--.31905S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrKry5Kw43Xr1rAFW7uFWfZrb_yoWDCrX_ur
+	9Fgr1xX3yUJr4xZw47Cr4xZFZY9343Xw18KayjvasxG34UZw47WFyxurnI9r48G3ykJF1D
+	u3W2qryrtr4Y9jkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb3xFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
+	Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r1Y6r17McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr
+	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
+	n2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
+	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+	17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
+	IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4l
+	IxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvf
+	C2KfnxnUUI43ZEXa7VUbzpBDUUUUU==
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiCREKA2o+TZNhhAAAs+
 
-On Thu, Jun 25, 2026 at 10:33:27AM -0700, Saravanakrishnan Krishnamoorthy wrote:
-> From: Alex Ousherovitch <aousherovitch@rambus.com>
-> 
-> Add MAINTAINERS entry for the CRI CryptoManager Hub (CMH) hardware
-> crypto accelerator driver under drivers/crypto/cmh/.
-> 
-> Co-developed-by: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
-> Signed-off-by: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
-> Signed-off-by: Alex Ousherovitch <aousherovitch@rambus.com>
-> Reviewed-by: Joel Wittenauer <Joel.Wittenauer@cryptography.com>
-> Reviewed-by: Thi Nguyen <thin@rambus.com>
+When host1x_syncpt_wait returns a timeout error, the function returns ret
+  directly without calling host1x_job_put(job). The job reference acquired
+  by host1x_job_alloc is properly released on all other error paths via the
+  job_put label but is missing on the timeout path.
 
-Are these people really provided you with Reviewer's statement of
-oversight? Do they understand what does it mean?
+Cc: stable@vger.kernel.org
+Fixes: 0880bb3b00c8 ("crypto: tegra - Add Tegra Security Engine driver")
+Signed-off-by: WenTao Liang <vulab@iscas.ac.cn>
+---
+ drivers/crypto/tegra/tegra-se-main.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> ---
->  MAINTAINERS | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 90034eb7874e..ecb389795e3d 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -6797,6 +6797,25 @@ F:       kernel/cred.c
->  F:     rust/kernel/cred.rs
->  F:     Documentation/security/credentials.rst
-> 
-> +CRI CRYPTOMANAGER HUB (CMH) HARDWARE CRYPTO ACCELERATOR
-> +M:     Alex Ousherovitch <aousherovitch@rambus.com>
-> +M:     Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
-> +R:     Joel Wittenauer <Joel.Wittenauer@cryptography.com>
-> +R:     Thi Nguyen <thin@rambus.com>
-> +L:     linux-crypto@vger.kernel.org
-> +L:     sipsupport@rambus.com (moderated for non-subscribers)
-
-NAK, drop. You are not allowed to add here internal moderated mailing
-lists. We are not going to participate in your corporate dances.
-
-> +S:     Maintained
-> +T:     git https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
-
-Drop, you do not have commit rights there.
-
-> +F:     Documentation/ABI/testing/cmh-mgmt
-> +F:     Documentation/ABI/testing/debugfs-driver-cmh
-> +F:     Documentation/ABI/testing/sysfs-driver-cmh
-> +F:     Documentation/crypto/device_drivers/cmh.rst
-> +F:     Documentation/devicetree/bindings/crypto/cri,cmh.yaml
-> +F:     Documentation/userspace-api/ioctl/cmh_mgmt.rst
-> +F:     drivers/crypto/cmh/
-> +F:     include/uapi/linux/cmh_mgmt_ioctl.h
-> +F:     tools/testing/selftests/drivers/crypto/cmh/
-> +
->  INTEL CRPS COMMON REDUNDANT PSU DRIVER
->  M:     Ninad Palsule <ninad@linux.ibm.com>
->  L:     linux-hwmon@vger.kernel.org
-> --
-> 2.43.7
-> 
-> 
-> ** This message and any attachments are for the sole use of the intended recipient(s). It may contain information that is confidential and privileged. If you are not the intended recipient of this message, you are prohibited from printing, copying, forwarding or saving it. Please delete the message and attachments and notify the sender immediately. **
-
-Heh, I should have ignored your message...
-
-
-Best regards,
-Krzysztof
+diff --git a/drivers/crypto/tegra/tegra-se-main.c b/drivers/crypto/tegra/tegra-se-main.c
+index eb71113ed146..7fbf69236ff2 100644
+--- a/drivers/crypto/tegra/tegra-se-main.c
++++ b/drivers/crypto/tegra/tegra-se-main.c
+@@ -180,6 +180,7 @@ int tegra_se_host1x_submit(struct tegra_se *se, struct tegra_se_cmdbuf *cmdbuf,
+ 				 MAX_SCHEDULE_TIMEOUT, NULL);
+ 	if (ret) {
+ 		dev_err(se->dev, "host1x job timed out\n");
++		host1x_job_put(job);
+ 		return ret;
+ 	}
+ 
+-- 
+2.39.5 (Apple Git-154)
 
