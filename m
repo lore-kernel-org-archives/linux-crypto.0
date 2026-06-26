@@ -1,117 +1,125 @@
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D18D33E2AB0
-	for <linux-crypto@vger.kernel.org>; Fri, 26 Jun 2026 07:41:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08EA827FD51;
+	Fri, 26 Jun 2026 08:21:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782459678; cv=none; b=qM8uGa1bEWFykpgjkTp3F5CK2z1oEe9Gr2SH3jvLMhGLnHhG1spzsp2YpLYMTetwBZk4bvyvfzPXep+lyFIaG9bYpxoIQYMozXHh3Cnl/TLpMgqMVLGHFY+MSj9OAbiAt8USQxOIqhhJpc9+rzVNdq3CQLQ5CtqDFOvPxvbiwi4=
+	t=1782462073; cv=none; b=F0nQZFnDiQhTt9c5MjvSYbcn/uk62jD2Gk9PNSKTtbTHLBWBe2udgowp4WO8xnzZamhn19B6KzeG7vmxtoBFmR6q6rF7h/HJSILrX3ZTeK5yWo1Umx9zHU5ULsgac/E0OtTOhD9zVrySRTk9rqS69Xpb/vl3bBcs1sf1TkrzmAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782459678; c=relaxed/simple;
-	bh=tB6BfSmbDpWx8DBiFm+S2h4b9xfHN2ANaz1OEIho8fQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TghdD3T0xTQL77IE4ZZjaT7uPdM63bH+k/s9/2ESnYuTy4Qv069l6amHpSu+niRmYogs10ApgIttgH5ytZd8tQsbPGHkLEtm531pQDcA4kr+RHZioe2WpMYBFnvWOaSQ+KilLna0Y/MSuNxLFHU2S98qswYWl1xRDpnaMpJ6zUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HZ95o8oJ; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1782462073; c=relaxed/simple;
+	bh=1LBlkTheA3kClbGdWMDAwKTnWvFnD+kxP8XV/azEEVg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=hNldIJRmg1YLI2lNnat3lM+BlTlQhYkqEOeQQykeSZOXQ2aP5BFVrRqDL1OyVrToi1bWX6CNoMMdpEk8hns3PxNA1EVxLbiN57yIqGt+5QVjMWgN4Hn3A/juXhS+XqPzCIZzY6H4FzD1nleohLGjFkIdfoQKfL0jPHOUtTdbzyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VRNylShy; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HZ95o8oJ"
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-462342ac290so603338f8f.2
-        for <linux-crypto@vger.kernel.org>; Fri, 26 Jun 2026 00:41:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782459675; x=1783064475; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=k25eMOii6qvKTUwqK2ux2YYsD1dZ9vGEfhftC5yZWFo=;
-        b=HZ95o8oJbST9PAJPOJEl9Z9evFOonWzoD6BtTidtv2hNkyEP2S4qfTviKp1NsI1bsB
-         sxodC3B/Ro3Q0Jt2+e6NUy/grtj21sZ+0L8EffhY+qzcvnnQ/PjfhcWF17zEcJcKzFNI
-         JiODiG4OTRp3oWhbn2w2enIoHnKhWdiWvE0CWQ548434DIISs2gHGDNXYT20JVMBGdwQ
-         kdpEHg3uCTN1hGtcsMGh1qRA8+dtlUTI95CDIGwVeGd9SbFIcK2ZqI8ysz/nOwI6yZYo
-         QD4ViHBIyLQS/GonOUs7xeGgvo04c8hhvKQF/8K+Kc93cI33X9KGmF+3WfFxMIV6SXXC
-         6kRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782459675; x=1783064475;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=k25eMOii6qvKTUwqK2ux2YYsD1dZ9vGEfhftC5yZWFo=;
-        b=NJqSVdClhbT0jjwXRK0wVQF2yGIkrSjlyQlB9R700hOeoIKuzkX8t7edAsCHULU+c8
-         FRYKDJpuBwWKxJZ5Ab4M2Y9lhYD2qHu6n8t+PqDQtVX5uu+iUO9Vb6MTSgXDTImj4rXg
-         SnNlcqinRZM2bKHofwGgZcw2QxFAVhTC1TxB0HsemC2OO0/c/0amtk9oBRMCj+sADSfI
-         rtDEtVWw/YM6vOv+pRKMdW0/5hePtAdS9523YKFpijlJnDCu3AoUvf+N8xVs9kQWB1Rt
-         ht5MCmuX9vq6wQMrMfaD0s22arEYhFZqQEiuk5dbxRnrV3DI2hu+HeyXyW7MmTpKTZ+D
-         c2vQ==
-X-Forwarded-Encrypted: i=1; AHgh+RrGUcGtDalT7qO4lt7333hdz9McolO6nxeRQO60Ehvg9TRxV1Y2qXvvvAtb82KuGGYA9aJYuj3LUkuGrWE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwzQF+MtocdZ8xZol/rVUAaKwGXD+e+9B2y5DesHet0Kn7MJwOd
-	PIDw464lTsDEyjsIFQbSumW3ErlZKLgzHBSuT1CwXdPAaSqSnyfybb+/
-X-Gm-Gg: AfdE7cnHAcQeRJq2itONUE7a1/dwu3OgwDp10eI2PQCU2Cub32QnVJ9Xmz6AfMAkbY/
-	QhZTY2atThb9/FwEVjBLWYcAUT1OfoLqMf+QVpcpzOwIl7c9qm5JZ3oKVbrGR6ey5Ncu2uqAMA/
-	7m+nplwNYdFCtDXBydVAHrjLxFMmNlsI3BzU/XHjqRjd9KfXF+6R9l/EyVzy4IpjbJgTivwpT76
-	3Q1oHgNKYYXLgpB0rGVwkKbCxfmy0M1fx0wqcQbJGBzNdJg3KARmPTn3RTjno+78UIbyUOMkZmc
-	IN3/kPPfZRx1ImutSd1pOMlYrWCyWhjVCX3z/tryjiJbsrGEHFZ/uKk78Nxe22Jp0+vSTnF3cFY
-	IRHrkPLRa5u/+/zs9KDC8nhz2Cyy7Pg+YvZaUq4laRFwm601uJD8Z57wjJuRB1R6vNsSPzvaSC0
-	dt4gYoWLsXqQl6rdLixWGgCZrDSExKDYtaW3uuQLeyxlM/XsKWIw==
-X-Received: by 2002:a05:6000:24c2:b0:46d:654:d1f1 with SMTP id ffacd0b85a97d-46dc1a91830mr9870326f8f.21.1782459674983;
-        Fri, 26 Jun 2026 00:41:14 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-46c1ee01c3bsm23853241f8f.10.2026.06.26.00.41.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jun 2026 00:41:14 -0700 (PDT)
-Date: Fri, 26 Jun 2026 08:41:13 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: x86@kernel.org, linux-um@lists.infradead.org,
- linux-raid@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>, Andrew Morton
- <akpm@linux-foundation.org>
-Subject: Re: [PATCH 2/8] um: Check for missing AVX and AVX-512 xstate bits
-Message-ID: <20260626084113.42eae31c@pumpkin>
-In-Reply-To: <20260626043731.319287-3-ebiggers@kernel.org>
-References: <20260626043731.319287-1-ebiggers@kernel.org>
-	<20260626043731.319287-3-ebiggers@kernel.org>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VRNylShy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97F631F000E9;
+	Fri, 26 Jun 2026 08:21:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782462071;
+	bh=iV8Y1qpbWig8yFM44HizyDZ9SD78GLMuCnUipxKToIg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=VRNylShyN+OO0dqReJbUBK5qFI1f6x5ouAiqFCYrkYYUy8b1gMx/LM0S+wdPJVGQF
+	 jJ/q0NoPAVrPkfBKALquiLSi66MRTNQPndo+znqjmDQLg1xvBKHoopICntwZGcuu8X
+	 ikLcRHzizfC+yRm+bZ7OqmquLsXsx3wcYGymB8+hC4hw6j6FB7rvlCxdjjIDW9i03i
+	 E/eIBYBNSh2a2AMpC34HSlEWm0jMor1n5uqlth3PC9c/0gDQf2WRm6QHi6eYZoWMYY
+	 DrTngTHNnd66HVz+Vov38qbQvIoPF2E9rhyCjS5TazDwiUUoPzl699cy+/S32kavM1
+	 FKdrOosJGm0+w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0C0B39389E8;
+	Fri, 26 Jun 2026 08:20:59 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 01/18] raid6: turn the userspace test harness into a kunit
+ test
+From: patchwork-bot+linux-riscv@kernel.org
+Message-Id: 
+ <178246205852.3816447.1024923704586855592.git-patchwork-notify@kernel.org>
+Date: Fri, 26 Jun 2026 08:20:58 +0000
+References: <20260518051804.462141-2-hch@lst.de>
+In-Reply-To: <20260518051804.462141-2-hch@lst.de>
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-riscv@lists.infradead.org, akpm@linux-foundation.org,
+ catalin.marinas@arm.com, will@kernel.org, ardb@kernel.org,
+ chenhuacai@kernel.org, kernel@xen0n.name, maddy@linux.ibm.com,
+ mpe@ellerman.id.au, npiggin@gmail.com, chleroy@kernel.org, pjw@kernel.org,
+ palmer@dabbelt.com, aou@eecs.berkeley.edu, alex@ghiti.fr, hca@linux.ibm.com,
+ gor@linux.ibm.com, agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
+ svens@linux.ibm.com, tglx@kernel.org, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ herbert@gondor.apana.org.au, dan.j.williams@intel.com, clm@fb.com,
+ dsterba@suse.com, arnd@arndb.de, song@kernel.org, yukuai@fnnas.com,
+ linan122@huawei.com, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
+ linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-raid@vger.kernel.org
 
-On Thu, 25 Jun 2026 21:37:25 -0700
-Eric Biggers <ebiggers@kernel.org> wrote:
+Hello:
 
-> If the CPU declares AVX or AVX-512 support, verify that all the
-> corresponding xstate bits are also set.  If any are missing, warn and
-> don't set the corresponding X86_FEATURE_* flags.
+This series was applied to riscv/linux.git (fixes)
+by Andrew Morton <akpm@linux-foundation.org>:
+
+On Mon, 18 May 2026 07:17:44 +0200 you wrote:
+> Currently the raid6 code can be compiled as userspace code to run the
+> test suite.  Convert that to be a kunit case with minimal changes to
+> avoid mutating global state so that we can drop this requirement.
 > 
-> This eliminates the perceived need for UML-supporting AVX and AVX-512
-> optimized code in the kernel (that is, lib/raid/ currently) to start
-> checking the xstate bits in addition to X86_FEATURE_AVX*.
+> Note that this is not a good kunit test case yet and will need a lot more
+> work, but that is deferred until the raid6 code is moved to it's new
+> place, which is easier if the userspace makefile doesn't need adjustments
+> for the new location first.
 > 
-...
->  static void __init parse_host_cpu_flags(char *line)
->  {
-> +	u64 xcr0 = read_xcr0();
->  	int i;
-> +
->  	for (i = 0; i < 32*NCAPINTS; i++) {
->  		if ((x86_cap_flags[i] != NULL) && strstr(line, x86_cap_flags[i]))
+> [...]
 
-'line' comes from /proc/cpuinfo
-Surely something would be terribly wrong if that included something the kernel
-had disabled (or didn't support).
+Here is the summary with links:
+  - [01/18] raid6: turn the userspace test harness into a kunit test
+    https://git.kernel.org/riscv/c/c4697486fc23
+  - [02/18] raid6: remove __KERNEL__ ifdefs
+    https://git.kernel.org/riscv/c/3d6beb659ddf
+  - [03/18] raid6: move to lib/raid/
+    https://git.kernel.org/riscv/c/3626738bc714
+  - [04/18] raid6: remove unused defines in pq.h
+    https://git.kernel.org/riscv/c/06d2a66fb7c0
+  - [05/18] raid6: remove raid6_get_zero_page
+    https://git.kernel.org/riscv/c/885d31423183
+  - [06/18] raid6: use named initializers for struct raid6_calls
+    https://git.kernel.org/riscv/c/7e91f76a9668
+  - [07/18] raid6: improve the public interface
+    https://git.kernel.org/riscv/c/35472bc6f31b
+  - [08/18] raid6: warn when using less than four devices
+    https://git.kernel.org/riscv/c/2790045a62eb
+  - [09/18] raid6: hide internals
+    (no matching commit)
+  - [10/18] raid6: rework registration of optimized algorithms
+    (no matching commit)
+  - [11/18] raid6: use static_call for gen_syndrom and xor_syndrom
+    https://git.kernel.org/riscv/c/10f4b8e2a164
+  - [12/18] raid6: use static_call for raid6_recov_2data and raid6_recov_datap
+    https://git.kernel.org/riscv/c/dd83de0341da
+  - [13/18] raid6: update top of file comments
+    https://git.kernel.org/riscv/c/30bf04bd13a5
+  - [14/18] raid6_kunit: use KUNIT_CASE_PARAM
+    https://git.kernel.org/riscv/c/2175395f76c3
+  - [15/18] raid6_kunit: dynamically allocate data buffers using vmalloc
+    https://git.kernel.org/riscv/c/d67c25712fe3
+  - [16/18] raid6_kunit: cleanup dataptr handling
+    https://git.kernel.org/riscv/c/562bcbfcb99b
+  - [17/18] raid6_kunit: randomize parameters and increase limits
+    https://git.kernel.org/riscv/c/fa0c812c0aa5
+  - [18/18] raid6_kunit: randomize buffer alignment
+    https://git.kernel.org/riscv/c/8cf0a6c4bb9e
 
-	David
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-
-> -			set_cpu_cap(&boot_cpu_data, i);
-> +			validate_and_set_cpu_cap(i, xcr0);
->  	}
->  }
->  
->  static void __init parse_cache_line(char *line)
->  {
 
