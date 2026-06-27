@@ -1,127 +1,96 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 942A33BFAEF
-	for <linux-crypto@vger.kernel.org>; Fri, 26 Jun 2026 21:33:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1C57146D5A;
+	Sat, 27 Jun 2026 01:36:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782509615; cv=none; b=DkyW4XYXmYR+YBZhnAF4QkURZgKAv7jIYBwus2XcAJr9g4OCCToYIorOcwxZ9y/RFS/beNacmEFr3v61VgRlWkne505YJCg1i3/07dVGkpb4a08Ai7tiCtXbYe6QvHqSiFfVTrJgc4tKUEQHoKDnY0cyxASbomocFbDe0MmOQLU=
+	t=1782524217; cv=none; b=GG3z24Y8jgsaEmL9lYxfbBnRYAZD4n4SQRWf8IYId9y5KnjeR7XAwCxAugYOix5PKG7+2kD7fK2emsExyso5+NN8DNDEKnUURHaOtezhINYZSpFWf1sB+eZCBmIov3A9VzpO/Zx5mu6T4M+A2U2BKrl+1U2i/6PHFTXG9YN0Qgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782509615; c=relaxed/simple;
-	bh=jFyrdE9S39jhHBJDzagMp+EO2K/uGVFzRqK05EyhCXk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mYn5Z06AP+ZiMxgKrX+b43GjOJHj+dZ7MC5ey6J4taXb61Pd2A2tHEI+WapVVKRKFZbJUUK9emFQyqxvuRN922MVe4Sh3yz24HLjkSbhv3tykZ5bSMHxX0e142hgxl4hxpHXE2IDpuVP5l05Xjn95V1dmabe7JZtuK9UeUpcA48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RS+c+dd1; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1782524217; c=relaxed/simple;
+	bh=vlFmuIXNikKGJcM/rV+RwQGeISv45Ze+30sLXQvpSug=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=szZyCKuy/+bRIchGnwD3bXDx7kkZ4Y4QSSXOTc2F+K7GA7xscXv0EVxgIMIh1APr7aBDTmwpzRlAETlSak9PqVgwXLzV9UNJfNB4l10yBKHCC6POVMGoCqj6ime4K2WtlAZrIsHj4E3i9yBShpAEI5DJOoB+1C+JUoUzqZ3k1w4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=qMyBFc1g; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RS+c+dd1"
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-490bc6a7958so18220245e9.1
-        for <linux-crypto@vger.kernel.org>; Fri, 26 Jun 2026 14:33:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1782509613; x=1783114413; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CkLfNfssIEW0SW6igjjDLzI26xT1AWB7xGjnkz3o0pk=;
-        b=RS+c+dd1pWDQ/BsmzjLT8DCtvOkDOwkxo3SzoRiG/YI7cfMp8UKtREriIXtaeTAgi+
-         kXWpV9sfRv1rc2SQOAGLL0S0lC0/GGQzldeO//LgHlhLF1JIrekR+j4dM6yQFv7TqtsV
-         HCgF9NYQXMT9aRdd/3gFc+QT9BuAYnV/hxnOJtWgnmU6LgcU1c67xE8o4qKku7YI4YGl
-         1dURCsznUTJbhDhy708CPUigsffO6ysQWhOvYSTDnjPons3eQCwsvyqsE4E/Pbqz065D
-         Yiu32Em9HmtXXxNdh0RWOwQj4+r08ZPYjcEpaAX1TUZcWP+/Uc6M88Akc0kY99KNnEt1
-         v88w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1782509613; x=1783114413;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=CkLfNfssIEW0SW6igjjDLzI26xT1AWB7xGjnkz3o0pk=;
-        b=CqhIpiVD/3UCnzDOPdv0mC9D123CzmEWGWndDsBae9FjWfZEIwFCdMw5gbAAzsfLnq
-         IT59+l068XZSZTg6buu3vkbhw1ok1SPbJ4HJYR3GTFpXO49hJaJQLoD/t4nwmGcQYDmK
-         +YCCditZSWUuSbO9lvc6oF34hATVIYfqq+7jITKbVch+efV6uFG0Zrwu8DludY097aw+
-         ANF9MiA/w9mI6MeltQ97u+sJOGlzMNf4iFgcZv5RjNvmj+p2A2jN8OwNCNbUmpMBQMq4
-         0B35YHXyFL9SOaD6QQ1iKTQAohqv3SNV1GZAaPGF0UdLTvnLFLbxYzYZ+MMXJSB+R15M
-         tWAQ==
-X-Forwarded-Encrypted: i=1; AFNElJ8bgkOafzqer4F2vX6i8H7lzZ41Jpt1hdjRuvtOPZr2ctcUMMSNDm/JEogKXhci8rVCs9OAiIMN8zzkON0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyw8sDlPFcOPZZHL8uozf6MGTxWLW13S5ftEim0LTh7/sDu3e+y
-	Ty1YOAD5BcwBhlZSzs9YJ74T7j0dk95gIlOZ71xbsqzMO6cIY65t4kCj
-X-Gm-Gg: AfdE7cmfwKtYSdmmDNl2LM3OKwOJUVwOgI9fg4DruuIkJ+VWIn8zfPBZ1QvgGsINzFF
-	z9eXRHIR0SZS7DsZ62unhgbrcg/d5MdPOPUv982Kcdzhh4DgCkGG+y1wTCJVC27MJ6dCWhAGgxI
-	d408XXBCrppE9YSrJswjdDnX23+kzln5W+qZUFC2z1dppISjkTRphnk97RunJoN9GJuFhRyahPc
-	N+SCJS+439M75NvQzTmIbuLNakEtPTJFh2OAklJQCHhh+2snnEO7yj2sxmiS1zzE3lvvUqwX2zr
-	/zb2UHjpzemQo0IEahgAsrn+fWdf7mwFxGdOdtw1+TdtLXHUHljDB1ZcOIbnk52cbfpSwwm2/0o
-	Qq48/nCdmoY3LoHlkgQ90zmwPqIWzB+NJvEZflGgoNrdDTNdE+aOL5HuAYJXDCOeejiQNeczYyy
-	JhrcYsM2o1/j8UJT9JNnIttwurKzB2rtPoMakgLj6DEJSmT02rcw==
-X-Received: by 2002:a05:600c:3b25:b0:490:5000:917 with SMTP id 5b1f17b1804b1-492663d6d67mr113592695e9.1.1782509612976;
-        Fri, 26 Jun 2026 14:33:32 -0700 (PDT)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49269002511sm104108085e9.8.2026.06.26.14.33.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jun 2026 14:33:32 -0700 (PDT)
-Date: Fri, 26 Jun 2026 22:33:31 +0100
-From: David Laight <david.laight.linux@gmail.com>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Anton Ivanov <anton.ivanov@cambridgegreys.com>, x86@kernel.org,
- linux-um@lists.infradead.org, linux-raid@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, Christoph
- Hellwig <hch@lst.de>, Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH 2/8] um: Check for missing AVX and AVX-512 xstate bits
-Message-ID: <20260626223331.3451c11b@pumpkin>
-In-Reply-To: <20260626205544.GB2368695@google.com>
-References: <20260626043731.319287-1-ebiggers@kernel.org>
-	<20260626043731.319287-3-ebiggers@kernel.org>
-	<20260626084113.42eae31c@pumpkin>
-	<6a20b442-b97f-4cae-9168-30201d5ef82c@cambridgegreys.com>
-	<20260626114957.1a2b7e5b@pumpkin>
-	<20260626205544.GB2368695@google.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="qMyBFc1g"
+Received: from [IPV6:2601:646:8081:7da1:dcd4:e1f8:5d79:bdb4] ([IPv6:2601:646:8081:7da1:dcd4:e1f8:5d79:bdb4])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 65R0qN0N2285168
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Fri, 26 Jun 2026 17:52:24 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 65R0qN0N2285168
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2026052701; t=1782521550;
+	bh=CoKSivJMaQDV2sSkRTRw7olGkcZfQ72Xwmih/Aa0td0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=qMyBFc1gnGXRksBwsJ1/rUznZgiE7lPuLPv/lWpmOM+5Q3Fqu1GkBtPV/i01hTsmm
+	 FyrrwODPBIMXlAoyCpEVfCiClmUhwPWsNagz78j3LDMf+Ut0XXJAAidVe9l1aTOAut
+	 7WQuEQASgzET2NWeiLHKYC5brvZfsPACaGhvlYNW5X1iG8c+02aTJiS4yaJSFbtRty
+	 RzVpKhz70FSqCBKm8TK2gLW8sDPukFdgs1lqJ60AGqtpglwDIA/PnerR6f0L+dvu0f
+	 tzL0aZnBm0Ed9q+Fj1E4zhVGr5LPAVMhZk4GFV4YP0Rst/9nwzTfe9CuWNPpW58FjU
+	 Q8Foj51/YA5sw==
+Message-ID: <7d8efc7c-65e3-49f8-9381-910de7affef2@zytor.com>
+Date: Fri, 26 Jun 2026 17:52:18 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: cleanup the RAID6 P/Q library v3
+To: Christoph Hellwig <hch@lst.de>, Andrew Morton <akpm@linux-foundation.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        WANG Xuerui <kernel@xen0n.name>,
+        Madhavan Srinivasan <maddy@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+        Paul Walmsley <pjw@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Thomas Gleixner <tglx@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Dan Williams <dan.j.williams@intel.com>, Chris Mason <clm@fb.com>,
+        David Sterba <dsterba@suse.com>, Arnd Bergmann <arnd@arndb.de>,
+        Song Liu <song@kernel.org>,
+        Yu Kuai <yukuai@alb-78bjiv52429oh8qptp.cn-shenzhen.alb.aliyuncs.com>,
+        Li Nan <linan122@huawei.com>, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, loongarch@lists.linux.dev,
+        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-raid@vger.kernel.org
+References: <20260518051804.462141-1-hch@lst.de>
+ <20260518141205.c100f76eec5f58e78bbbf7af@linux-foundation.org>
+ <20260519082432.GA14956@lst.de>
+Content-Language: en-US, sv-SE
+From: "H. Peter Anvin" <hpa@zytor.com>
+In-Reply-To: <20260519082432.GA14956@lst.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Fri, 26 Jun 2026 20:55:44 +0000
-Eric Biggers <ebiggers@kernel.org> wrote:
-
-> On Fri, Jun 26, 2026 at 11:49:57AM +0100, David Laight wrote:
-> > > UML is just another userland application from this perspective, so
-> > > there is no reason for it to behave any different from the rest of
-> > > the userland.  
+On 2026-05-19 01:24, Christoph Hellwig wrote:
 > 
-> Which is why it should do the XCR0 check that the vast majority of
-> userspace programs do, right?  It has always been part of the documented
-> way to detect AVX and AVX-512 support.
-
-That and looking at the other 'cpuid' registers rather than reading
-/proc/cpuinfo.
-If you want to run 'um' on (say) NetBSD you'd need to do it differently.
-
-> (I think this helps explain why LLMs notice this too.  They've been
-> trained on lots of code that does it correctly.)
+> raid6: rework registration of optimized algorithms
 > 
-> That being said, it does seem likely that it's basically obsolete now.
-> So maybe we could take a shortcut and omit it.
+>  - avx2 instead of avx512 is probably the right thing for no
+>    benchmarking, but if it was intentional (it wasn't), that should
+>    be document.  So I'll just switch back to the previous version to
+>    keep the state of the art
 
-It would need the linux kernel to report a cpu feature that needed
-kernel support, but that the kernel didn't support.
+It is unlikely to be the right thing *going forward*, though.
 
-But for things like popcnt um should probably check the relevant cpuid bit
-rather than scanning /proc/cpuinfo.
+The very unfortunate performance inversion is likely model-specific. It is one
+of those things where you largely would have to have a list of quirks :(
 
-> 
-> The important thing is really that we make a definitive decision *once*
-> for each of UML and native x86.  The status quo is that the decision is
-> instead punted to every individual AVX optimized function in the kernel,
-> which isn't working well.
-
-Indeed.
-
-	David
-
-> 
-> - Eric
+	-hpa
 
