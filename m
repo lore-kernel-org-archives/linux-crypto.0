@@ -1,136 +1,129 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FDF623D2A4;
-	Sun, 28 Jun 2026 18:54:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF110364935
+	for <linux-crypto@vger.kernel.org>; Sun, 28 Jun 2026 23:20:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782672847; cv=none; b=q8SRp1ekAB1m0BDAYmFEl/kbzN1v6/VvlwviVr1HMYTS/5lF26hFxEAzA8Pz12a47ZEU6Iu2DoTS2ABjO22VzVCOAy/bI0QSX9hLnajravGzvj3isQHU6Ea2LiaSXGNMerP3HWAMPK1oXOIgdiSgkX2Uwn5KaACVidHgrwBTTZ4=
+	t=1782688804; cv=none; b=saW8xoEZGGvyXE8jr2WMCPQOTQE4wtivgSDwaI4+rdLrd1k1hCSYKsqX8NOYu+pk7VQYkRr6ZVw63jt9LEkQ6yYgBNpI8ruLbzNpxrJdhGIlQIlqciB79DfknyaYFTkbO8dRxpT75kiHCtFHtJFsXKofc8bNN7ajCROmxw9zDVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782672847; c=relaxed/simple;
-	bh=2mBQgjcxrqblWqv5J8Qk8wJk+A0S9tR+UwxzmB1h0I4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Edp7pQjjaXJCG4LcD1+Dt1H4LcUZrVueXrE0mCT5LziUY9mmCeGXc7bCfbvBATWLxAwim9GbwxPtXNV1hgFVH1zmiZsJoSmJYTdRgP6Z4/O9wUIqKIyf7+doMrSxW56bMXetu2LW3lt6kX/TQYxOQwF2arNDWvqX48krnfTFhoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oMVPNL6S; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1782688804; c=relaxed/simple;
+	bh=TFh52Z3aYd0ikbblTiHAbY7mMw+49K+zzSQUsYqlNE8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XsTrk6k50fszmSKfCR4b+J3orNbZZFJ2syG0ZU/pYLkpY8jEHfDVO1VRS0VskyCaJtUtP29FiBzCsYP/5xY8xtXz2F/WEqvDUrRbbILSGecTFMteHQeRhKvTXsDrpupC9Nry/8kzZAR4v0vVkJYu+3LVX9B4iEiW7ZhCe76DhG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ci9efz4M; arc=none smtp.client-ip=209.85.215.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oMVPNL6S"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9D661F00A3A;
-	Sun, 28 Jun 2026 18:54:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1782672846;
-	bh=TcbXPpzfkxQPhdknKxPzE7hKJWojVVYNJ0ZYN7VuqUo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=oMVPNL6SGcurNCHXmW3JSPOFJI7LH22YpXBxlnznKGMdIsyI5od+fvvZQORfmixi4
-	 2L1jV5FAXwl4QGVq+k/k3nIGmT9xw2yO/jDCg1Qsmt6l+tgWabUSdiWGJQmBsp+c0r
-	 r/11LXfw6sDRUWlbeMYYEhHISwmY5WhDpWeMtQop3avlDAaKPOJYpwqJULGXyclMcG
-	 LEFqaUmhxbdzHb7DALTBvRQSK7p+QiYZEnC505OmTXbQZDDOkaqC2FzkyV2di0yIPq
-	 V0cyA4hD6W4Q2dBuocn6AJPu9Bps9oYQ7iPmwW29QmFaf8KawKNEE/30XrqtugZWrk
-	 OqfO2HS5hy8pQ==
-Date: Sun, 28 Jun 2026 11:54:04 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Demi Marie Obenour <demiobenour@gmail.com>
-Cc: Andy Lutomirski <luto@amacapital.net>, linux-crypto@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ci9efz4M"
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-c85d4b4245aso1611279a12.1
+        for <linux-crypto@vger.kernel.org>; Sun, 28 Jun 2026 16:20:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1782688802; x=1783293602; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UcVzp6hS2wbilTH9sWD8SVsexr892ADQOI78SGhqqdA=;
+        b=Ci9efz4Mx4ek8ZBf1TIptrow7Xmyv2tRtuPLA4mxH4kq0JTnANeAYHfJn44exquuAs
+         oG0T2EUp1vWnAJ+mWL2JHeg+DWe5KEHtrJPhhosAbGxlYLgnV1p6C3ih6UEwyQv5jukh
+         Wi9IM6xSFqP3q311zHLDcKGt6XyMpEnch7o210FH4x5wOwvg9lqQ7qqqxR7EiJJgcGuj
+         bTUCnpAsz++QfqxZauh8AUdxPJdpoCc7jHoDGeLpb4cAIXOMTGTBUgmodzuwhKDrLnwp
+         wyzW/N+9d5Ypuda6BMNvJbjeL0X0pB6l8j1O6DXrSCmLAF6KLbqU9jciHNi8ysy7V+jf
+         8H7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782688802; x=1783293602;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UcVzp6hS2wbilTH9sWD8SVsexr892ADQOI78SGhqqdA=;
+        b=RXWrvZzgbVVqbUfTpCwaHiLfAKFMMH+FI1GbBk21QBSI2ohaUY4hTmFBXa7kIld1qH
+         2CnmbjEjefmc4u/vqySPfFhOKdVR56JYW/e5hgVE2FpRfO88bFocyTgXisUiNdmHnz9S
+         d3oJ4DAyQ/GowTeZTqIIZEx0EqKvy2vvQO3yHBRo7/zorqb4YMzL4PhwsWhmJGGyIL6Y
+         EXH1oEZLRkAtI7yTzGZCh+s97FFhg3Pjcdmg5runuZ+51q+pKSan3CQ2WrfreJFCXDP2
+         AaeCxLbY+e2D50OWM9+OqJg2XnjEwk7eRNdEoRWZ3xZC4F+vSl98vQ4PpUFZCgxbqGhM
+         XKWw==
+X-Gm-Message-State: AOJu0YynECWAnzlzZAMuMYPW7z1NPYg36+OS1nMmZHKP/Bi5IkgxHSaW
+	JbPKp3OkyPW6lu/c3Rfy74zuh2naoE9x6KYn4RFdRlott6filOuYen0tl8nS5g==
+X-Gm-Gg: AfdE7cl7+rIgxWlPtXQbwCYXl0t9oRv66dbXJb9bmBQneNuL4JaWMXfC75Cr0Rkw16O
+	FrUiYzONjWx+DEhBRrGoV4pzaVhUQu1T2VwdldjDFq6rJSGK9WjFOLmabBcorKnqIJeoBfewR04
+	YtYUtuq8bgI3ARsM/Kwylwjnp4g96QoTBMTBTCMmmzv4LR6wRVpjVUhrghD8etTEssa+nPLj67J
+	V88K4Ab1cZO+TuxZgOCfGPH1K2qne1Fc47OsEIoC98PhcD2kM5B9d0RaYm0YWcFZjGFgy5RGKi2
+	xLe9XB5P/n2x3XIRN6R4W4CphJzOkdecndzP5i75YoH72uNCkFAVeNF+XkYAfinfHR55x4yRMni
+	q/vVv38oirjL+YLm9Q2HRZJthBeimdUYaGgDs10R2g3UUTJ+zqyvUwHiduh5x//c0JwtGHzMZSf
+	u+9KP8SL2m18WtOJZ3EOrGBNBQrzqj1wAfNf1FfEY5rM9vfWsHWV3n3euu84CyO96/4J0ZgXuZ2
+	1Liix8WcQ==
+X-Received: by 2002:a05:6a21:3a45:b0:3bf:a26e:3dbc with SMTP id adf61e73a8af0-3bfa26e4986mr859526637.19.1782688802070;
+        Sun, 28 Jun 2026 16:20:02 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8000:7a86::e34])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c92bcc91f6dsm6643007a12.27.2026.06.28.16.20.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 28 Jun 2026 16:20:01 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: linux-crypto@vger.kernel.org
+Cc: Srujana Challa <schalla@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, iwd@lists.linux.dev,
-	linux-hardening@vger.kernel.org, Milan Broz <gmazyland@gmail.com>
-Subject: Re: [PATCH] crypto: af_alg - Add af_alg_restrict sysctl, defaulting
- to 1
-Message-ID: <20260628185404.GA2292@quark>
-References: <20260622234803.6982-1-ebiggers@kernel.org>
- <CALCETrXPj0u=FZ=aFcZAHk3fFZa7rCuPEjx6cOMXmT3sdkC7SA@mail.gmail.com>
- <20260623192715.GE1850517@google.com>
- <c7cb79ce-48f9-4433-ab4f-88b4c4df996c@gmail.com>
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH] crypto: cesa: add missing free_irq() calls
+Date: Sun, 28 Jun 2026 16:20:00 -0700
+Message-ID: <20260628232000.1287439-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <c7cb79ce-48f9-4433-ab4f-88b4c4df996c@gmail.com>
 
-On Tue, Jun 23, 2026 at 10:09:27PM -0400, Demi Marie Obenour wrote:
-> On 6/23/26 15:27, Eric Biggers wrote:
-> > On Tue, Jun 23, 2026 at 12:12:24PM -0700, Andy Lutomirski wrote:
-> >> On Mon, Jun 22, 2026 at 4:49 PM Eric Biggers <ebiggers@kernel.org> wrote:
-> >>>
-> >>> AF_ALG is a frequent source of vulnerabilities and a maintenance
-> >>> nightmare.  It exposes far more functionality to userspace than ever
-> >>> should have been exposed, especially to unprivileged processes.  Recent
-> >>> exploits have targeted kernel internal implementation details like
-> >>> "authencesn" that have zero use case for userspace access.
-> >>>
-> >>> Fortunately, AF_ALG is rarely used in practice, as userspace crypto
-> >>> libraries exist.  And when it is used, only some functionality is known
-> >>> to be used, and many users are known to hold capabilities already.
-> >>> iwd for example requires CAP_NET_ADMIN and has a known algorithm list
-> >>> (https://lore.kernel.org/linux-crypto/bcbbef00-5881-421b-8892-7be6c04b832d@gmail.com/).
-> >>>
-> >>> Thus, let's restrict the set of allowed algorithms by default, depending
-> >>> on the capabilities held.
-> >>>
-> >>> Add a sysctl /proc/sys/crypto/af_alg_restrict with meaning:
-> >>>
-> >>>     0: unrestricted
-> >>>     1: limited functionality
-> >>>     2: completely disabled
-> >>>
-> >>> Set the default value to 1, which enables an algorithm allowlist for
-> >>> unprivileged processes and a slightly longer allowlist for privileged
-> >>> processes.
-> >>
-> >> In our brave new world of containers, this is a bit awkward.  The
-> >> admin is sort of asking two separate questions:
-> >>
-> >> 1. Is the actual running distro and its privileged components capable
-> >> of working without AF_ALG or with only the parts marked as being
-> >> unprivileged?
-> >>
-> >> 2. Is the system running contains that need the unprivileged parts?
-> >> (Which is maybe just sha1 for ip?  I really don't know.)
-> >>
-> >> Should there maybe be two separate options so that all options are
-> >> available?  Or maybe something between 2 and 3 that means "limited
-> >> functionality and privileged modes are completely disabled"?
-> > 
-> > If we want to offer more settings we could.  I could see this getting
-> > quite complex pretty quickly once everyone weighs in, though.  There's
-> > quite a bit of value in keeping things simple, even if the offered
-> > settings won't be optimal for every case.
-> > 
-> > - Eric
-> 
-> What about exposing both allowlists to userspace and making them
-> configurable?
-> 
-> I'm mostly concerned about systems running code (possibly
-> closed-source) that uses algorithms that nobody here knows about.
-> It would be better to allow a single algorithm than to turn off all
-> restrictions.
-> -- 
-> Sincerely,
-> Demi Marie Obenour (she/her/hers)
+Add the missing free_irq() calls, along with irq_set_affinity_hint(NULL)
+to clear the affinity hint set during probe.
 
-I think the following is what you're asking for:
+Fixes: 5bbf25419f8e ("crypto: marvell/cesa - use request_threaded_irq instead of devm variant")
+Assisted-by: opencode:big-pickle
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ drivers/crypto/marvell/cesa/cesa.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-    sysctl crypto.algif_aead_priv_allowlist='ccm(aes)'
-    sysctl crypto.algif_aead_unpriv_allowlist=''
-    sysctl crypto.algif_hash_priv_allowlist='cmac(aes),hmac(md5),hmac(sha1),hmac(sha256),hmac(sha384),hmac(sha512),md4,md5,sha224,sha256,sha384,sha512'
-    sysctl crypto.algif_hash_unpriv_allowlist='sha1'
-    sysctl crypto.algif_skcipher_priv_allowlist='cbc(aes),cbc(des),cbc(des3_ede),ctr(aes),ecb(aes),ecb(des)'
-    sysctl crypto.algif_skcipher_unpriv_allowlist='adiantum(xchacha12,aes),adiantum(xchacha20,aes),hctr2(aes),xts(aes)'
-    sysctl crypto.algif_rng_priv_allowlist=''
-    sysctl crypto.algif_rng_unpriv_allowlist=''
+diff --git a/drivers/crypto/marvell/cesa/cesa.c b/drivers/crypto/marvell/cesa/cesa.c
+index 75d8ba23d9a2..57c9295be711 100644
+--- a/drivers/crypto/marvell/cesa/cesa.c
++++ b/drivers/crypto/marvell/cesa/cesa.c
+@@ -511,7 +511,7 @@ static int mv_cesa_probe(struct platform_device *pdev)
+ 		writel(engine->sram_dma & CESA_SA_SRAM_MSK,
+ 		       engine->regs + CESA_SA_DESC_P0);
+ 
+-		ret = devm_request_threaded_irq(dev, irq, NULL, mv_cesa_int,
++		ret = request_threaded_irq(irq, NULL, mv_cesa_int,
+ 						IRQF_ONESHOT,
+ 						dev_name(&pdev->dev),
+ 						engine);
+@@ -540,6 +540,10 @@ static int mv_cesa_probe(struct platform_device *pdev)
+ 	return 0;
+ 
+ err_cleanup:
++	while (i--) {
++		irq_set_affinity_hint(cesa->engines[i].irq, NULL);
++		free_irq(cesa->engines[i].irq, &cesa->engines[i]);
++	}
+ 	for (i = 0; i < caps->nengines; i++)
+ 		mv_cesa_put_sram(pdev, i);
+ 
+@@ -553,8 +557,13 @@ static void mv_cesa_remove(struct platform_device *pdev)
+ 
+ 	mv_cesa_remove_algs(cesa);
+ 
+-	for (i = 0; i < cesa->caps->nengines; i++)
++	for (i = 0; i < cesa->caps->nengines; i++) {
++		struct mv_cesa_engine *engine = &cesa->engines[i];
++
++		irq_set_affinity_hint(engine->irq, NULL);
++		free_irq(engine->irq, engine);
+ 		mv_cesa_put_sram(pdev, i);
++	}
+ }
+ 
+ static const struct platform_device_id mv_cesa_plat_id_table[] = {
+-- 
+2.54.0
 
-We could do that if it's what people want.  Just keep in mind that it
-would be much more complex than the single tristate sysctl.  And in
-practice the number of people who are knowledgeable enough to create
-these lists is quite small; we've seen similar things with other "Crypto
-API" configuration knobs that seem to never be touched in practice.
-
-Any thoughts?
-
-- Eric
