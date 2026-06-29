@@ -1,74 +1,83 @@
-Received: from psionic.psi5.com (psionic.psi5.com [185.187.169.70])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B26731A3172;
-	Mon, 29 Jun 2026 03:20:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.187.169.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E74B737DEA2;
+	Mon, 29 Jun 2026 03:28:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782703215; cv=none; b=fnkElokmddvfbGT/RHqignAEN800PHnS5B6Elx8of8EG9gZem70K21ugQLdmHH4RG187qd03EIx5WeBCQILAlwHD8zPOr09wpa01oSwZJCJHLyv6fIo6f5MCYCEnbnG/7Yu3ASaYoEWqPIcJUK3tnpE03bzChgwbhiPvQHeMOOM=
+	t=1782703689; cv=none; b=pUtbXnutX/6xqWp5Gv/YyS8cf8GqKJvqyATds02i25959vPpXmc0dUvNFc0eUUVsRyKKvg/ZOOpygHLWvFUiGfG6jAOW3fypk1HGLh5kTi4i1JqEbHNzKy7mVIcNzd6NY42h0nThvRipGR5iI6/R/OjcjFaxxsrA7kLVVjouq9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782703215; c=relaxed/simple;
-	bh=ADXiNB9r584fVcz58aoglRRDDRnHgsGaxlcnPJMrx/U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BmDZd4xfTORNiClGbxM4TWmS9G1J7uURMv6uDFs35bFLM6T5HT7vHB/puBUF9+zYaTaUS6kvwNk7czkER6hw9lJdn5fBXxkIRzTgIopqDX9SmzHfHKAvXChqIUYVhwyb79aVObigsGyqfSt4zQT9W4CESUHFXXZb3OLxZaPO+a0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de; spf=pass smtp.mailfrom=hogyros.de; arc=none smtp.client-ip=185.187.169.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hogyros.de
-Received: from [192.168.10.90] (unknown [39.110.247.193])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by psionic.psi5.com (Postfix) with ESMTPSA id 32BDE3F209;
-	Mon, 29 Jun 2026 05:11:16 +0200 (CEST)
-Message-ID: <641f0391-dd4b-4b25-88f5-5298fa6bf823@hogyros.de>
-Date: Mon, 29 Jun 2026 12:11:12 +0900
+	s=arc-20240116; t=1782703689; c=relaxed/simple;
+	bh=5zB+je9lQ1tGhP/t9lxIm32J2PwQwLZjjKw3m4AhsNQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=huAfdmVJeofwz1d1vTnSK1b9Oh5j2UXSOVdsDJ5tKtWASLwxS1GiaX9fYg8a3blowXxS6aMvlAmaApiz4UuCeIivWf50Ly5mBjGFue2Gnv3Qhavd3by5+t+FOnrEeYdcEezUs9tqxHDpSZqIsNHZJZNHIAijWkTwM4Utq7luGwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fel4PdcU; arc=none smtp.client-ip=100.103.45.18
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fel4PdcU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 606DF1F000E9;
+	Mon, 29 Jun 2026 03:28:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1782703688;
+	bh=mkQir9JSn28EgBSoiIxqaa+E1e9/QhLgZWWbRzFEI40=;
+	h=From:To:Cc:Subject:Date;
+	b=fel4PdcUBmKsNQfQOR432qllH/glRENtfKDE42oAsEdWruCcIBehU+7534/UMHe7c
+	 EIyDpsgEyA423oCJxkeoN1hOeFwvz7caKfPC0vxzd5pwtL2GpBO35jMml/WvA6V3lf
+	 SRcDEaKz0JY2+hD0H/aVEbsdQQX8EY8htPIswqLO/z7xOqMVgHe15YytNi3ZBwmoZa
+	 ELOmL9yLjLRnd04xlsQcDHpYjo1tKsW2t3j5JZqlu6VSg01Q+65vEuCtO4bnhuce6A
+	 9PZL4KaC+2aXxEU4p3UuvhjKZ2vKnFy+sGfU7yDLaIa0JqxhIPdvKaglMTFcc5ejuv
+	 z8S/vGPhl0SCw==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH] lib/crypto: md5: Remove support for md5_mod_init_arch()
+Date: Sun, 28 Jun 2026 20:25:52 -0700
+Message-ID: <20260629032552.26100-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: af_alg - Add af_alg_restrict sysctl, defaulting
- to 1
-To: Eric Biggers <ebiggers@kernel.org>,
- Demi Marie Obenour <demiobenour@gmail.com>
-Cc: Andy Lutomirski <luto@amacapital.net>, linux-crypto@vger.kernel.org,
- Herbert Xu <herbert@gondor.apana.org.au>, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- iwd@lists.linux.dev, linux-hardening@vger.kernel.org,
- Milan Broz <gmazyland@gmail.com>
-References: <20260622234803.6982-1-ebiggers@kernel.org>
- <CALCETrXPj0u=FZ=aFcZAHk3fFZa7rCuPEjx6cOMXmT3sdkC7SA@mail.gmail.com>
- <20260623192715.GE1850517@google.com>
- <c7cb79ce-48f9-4433-ab4f-88b4c4df996c@gmail.com>
- <20260628185404.GA2292@quark>
-Content-Language: en-US
-From: Simon Richter <Simon.Richter@hogyros.de>
-In-Reply-To: <20260628185404.GA2292@quark>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi,
+No definitions of md5_mod_init_arch() remain, so remove the code that
+handles it.
 
-On 6/29/26 3:54 AM, Eric Biggers wrote:
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ lib/crypto/md5.c | 14 --------------
+ 1 file changed, 14 deletions(-)
 
-> We could do that if it's what people want.  Just keep in mind that it
-> would be much more complex than the single tristate sysctl.  And in
-> practice the number of people who are knowledgeable enough to create
-> these lists is quite small; we've seen similar things with other "Crypto
-> API" configuration knobs that seem to never be touched in practice.
+diff --git a/lib/crypto/md5.c b/lib/crypto/md5.c
+index 6bf130cfbbf9..3d2b017a0525 100644
+--- a/lib/crypto/md5.c
++++ b/lib/crypto/md5.c
+@@ -298,19 +298,5 @@ void hmac_md5_usingrawkey(const u8 *raw_key, size_t raw_key_len,
+ }
+ EXPORT_SYMBOL_GPL(hmac_md5_usingrawkey);
+ 
+-#ifdef md5_mod_init_arch
+-static int __init md5_mod_init(void)
+-{
+-	md5_mod_init_arch();
+-	return 0;
+-}
+-subsys_initcall(md5_mod_init);
+-
+-static void __exit md5_mod_exit(void)
+-{
+-}
+-module_exit(md5_mod_exit);
+-#endif
+-
+ MODULE_DESCRIPTION("MD5 and HMAC-MD5 library functions");
+ MODULE_LICENSE("GPL");
 
-I don't think finer grained control is necessary.
+base-commit: dc59e4fea9d83f03bad6bddf3fa2e52491777482
+-- 
+2.54.0
 
-The tristate is the best possible interface for the people running 
-precompiled distribution kernels. Ideally, deactivating the restriction 
-should also be disallowed in lockdown mode -- and this becomes a lot 
-easier to subvert if the list of algorithms is runtime configurable.
-
-I think it is safe to assume that the people using AF_ALG with hardware 
-crypto engines are building embedded systems with a custom kernel 
-configuration, so the .config is probably the best place for the 
-selection of algorithms that should remain available in restricted mode.
-
-    Simon
