@@ -1,60 +1,60 @@
-Received: from pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.35.192.45])
+Received: from pdx-out-008.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-008.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.42.203.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86C5126E706;
-	Tue, 30 Jun 2026 08:34:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.35.192.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 877561C84D7;
+	Tue, 30 Jun 2026 08:34:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.42.203.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782808492; cv=none; b=CJE8V1d++Nmi+hOKSNRzqrZXfHncGkTo5dMYmQcr5dCKZwLGDX+qMDmSgbyKgKqqvXZJtMODRd0d1Cp2R/AxtHYidGcwcpNltQBUXuPcnD5jnhFF+lZXDyqzZx4fh/BrRQddZxIabqG01gStPLv+GNrgUVkD5XapdLngTgEOE34=
+	t=1782808493; cv=none; b=r4Ml2bO3v6HG2RZcJuk3nPue35FySsApW/VjUn9T3NE9zJq/gaRWa2Qhkuc4/Vc8P1QFJQgsV88XJ1Y+kzEitpMbACASldMyeZcfnaFqRLwMDhC5tw4hCW+YpDeAw93oV/swqe2Th2TJeIn7qPaphRG/2v6/BXzo/p42qLWp6U8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782808492; c=relaxed/simple;
-	bh=4d9N22ePKHu0cqNDRs94YVybwOIJYuJQMIDBQnjtGzE=;
+	s=arc-20240116; t=1782808493; c=relaxed/simple;
+	bh=MT973WI+1zLDLKuJCpoqZ7cguYVZCHjb6uoO1khLiaE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aZJmd85kyIgZLz9guAwdqvjAbM3iBY5IdWXS4RjI5nAweOKzdzNOzgcDjOhWfyuKNWFcTTH+himsGMgF06xgbX12/yvgj9KJX2nk17R3HXwYjeXc0COno+/5dFkwmH5HRMFgNY8jDrHqPstzycDLselQhZY9G5gVuREpO6kK4Ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=QlW00SL9; arc=none smtp.client-ip=52.35.192.45
+	 MIME-Version:Content-Type; b=ZyY5xYOfgdvKW+8rQ+W1dnlNiOqC2vphN3GyklV1K01BkJqjL3uMpQLjwitXZu03lqFtNnWkY/TS/g5jDqaCNpoAe+dnBixLEMRaShzT5/dtiWvThobbAT4zf7nXc6RwJYO7/vVn6EKLVu5tmszH0s0NHwCyjALn+1outRuMK4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=P6d7E/7m; arc=none smtp.client-ip=52.42.203.116
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="QlW00SL9"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="P6d7E/7m"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1782808487; x=1814344487;
+  t=1782808491; x=1814344491;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=L0aNwTM4xsyVDJfGkroBvflBS/wHl3/+s2a0+xJHX7Q=;
-  b=QlW00SL9nlWCrLxnsYofIYofth0hYN2mLdSey+t84t9RtRP7N0raLChn
-   D2P2Un+QDgXbWt440IDKscdnjrnZL0zxEUktWa1l/h9FqCAZx7eNeURcr
-   ynN+mFYrcMH1oBpJqY3/23pQDgY0zFxQzyUthTgscjlEAEueilvrhVje8
-   NIuq2xRjEUWpUPskk3RRUTLTeOIgOsE+Und0GLtu7bbUwoonF4Uajf5hs
-   uW8hpej+cOvz58Wg/OSeiYqW0RHsA28Mku4r+XZyEsc7/hBg4MAjP98rN
-   t9nMp+kUDrIZsbqc99SQUrZhgW3uw8xEEdzzmt9c/DV1kt8gExa6fEYQp
-   w==;
-X-CSE-ConnectionGUID: v8hd5pM8TS6cGsTUrqndBQ==
-X-CSE-MsgGUID: VIC36+V0Rry+OQ2tUOwq+A==
+  bh=Bx0GQOmsTclm6TCG9H7S3q+B3WBObT6DmJ7WoGwiFH4=;
+  b=P6d7E/7mxwDKCfRu88ZqmW1iFYxg5TGwqyXA8TAU8+/TsgJwCC0WwNNL
+   wYjr7WuCmNL5pePP3TDr12F6EcJZivjECT+j2fDvvyXfeWu0tMQAYyc6X
+   3bjRSr2BtNi/MGDrP2RIYMJ+WOjfDi1JjjOW3iulTIDYVI53xGrOpJ9Xw
+   22vP/48oVts1FfldUMVIR/xuiHemahyA64sIPZkS/7M2vVHWvQgUcYV/s
+   h4H9LNUMTQZuZCJIZGZR+LwWcNfYWaqgFr2w6zW/sDrfZ7R9yzyXOO1q6
+   tzk94gjwJAHQzR9doy9ctfXkTriBn1Eu/z95O97csHhcBEBAAXw68hp+3
+   Q==;
+X-CSE-ConnectionGUID: KDirh4L/TiS4BtzGEyMrhA==
+X-CSE-MsgGUID: +2eQZ5w4RBO+oEd85Liu4g==
 X-IronPort-AV: E=Sophos;i="6.24,233,1774310400"; 
-   d="scan'208";a="22530319"
-Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
-  by internal-pdx-out-011.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2026 08:34:44 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [205.251.233.53:5494]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.1.61:2525] with esmtp (Farcaster)
- id a1bad821-8a74-40bd-b3ca-5eeafe1137a8; Tue, 30 Jun 2026 08:34:44 +0000 (UTC)
-X-Farcaster-Flow-ID: a1bad821-8a74-40bd-b3ca-5eeafe1137a8
+   d="scan'208";a="22777039"
+Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
+  by internal-pdx-out-008.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2026 08:34:48 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [205.251.233.178:12729]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.30.151:2525] with esmtp (Farcaster)
+ id a931eed2-86b9-445e-bf2a-2513aa59ff2a; Tue, 30 Jun 2026 08:34:48 +0000 (UTC)
+X-Farcaster-Flow-ID: a931eed2-86b9-445e-bf2a-2513aa59ff2a
 Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43;
- Tue, 30 Jun 2026 08:34:44 +0000
+ Tue, 30 Jun 2026 08:34:47 +0000
 Received: from dev-dsk-lravich-1b-7405803b.eu-west-1.amazon.com (10.13.225.95)
  by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43;
- Tue, 30 Jun 2026 08:34:42 +0000
+ Tue, 30 Jun 2026 08:34:46 +0000
 From: Leonid Ravich <lravich@amazon.com>
 To: <linux-crypto@vger.kernel.org>, <dm-devel@lists.linux.dev>
 CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <ebiggers@kernel.org>,
 	<snitzer@kernel.org>, <mpatocka@redhat.com>, <axboe@kernel.dk>
-Subject: [PATCH v5 2/5] crypto: dun - data-unit-number dispatch template
-Date: Tue, 30 Jun 2026 08:34:28 +0000
-Message-ID: <20260630083431.2772-3-lravich@amazon.com>
+Subject: [PATCH v5 4/5] dm crypt: batch a bio segment's sectors via dun()
+Date: Tue, 30 Jun 2026 08:34:30 +0000
+Message-ID: <20260630083431.2772-5-lravich@amazon.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260630083431.2772-1-lravich@amazon.com>
 References: <20260630083431.2772-1-lravich@amazon.com>
@@ -69,450 +69,444 @@ Content-Type: text/plain
 X-ClientProxiedBy: EX19D044UWA001.ant.amazon.com (10.13.139.100) To
  EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-Add a dun(...) skcipher template that wraps an inner skcipher whose IV
-is a wide data-unit-number counter (e.g. dun(xts(aes),le)).  When the
-caller sets skcipher_request::data_unit_size, the template splits the
-request into cryptlen / data_unit_size sub-requests on the inner cipher,
-walking the IV +1 per unit.  Each inner ->encrypt/->decrypt is a direct
-call, so only the outer dispatch into the crypto API is indirect -- the
-per-unit work is not.
+Submit one skcipher request per contiguous bio segment (a single
+bio_vec) with data_unit_size = cc->sector_size, instead of one request
+per sector.  E.g. the default 512-byte sector with a 4 KiB bio_vec
+becomes one request of 8 data units; the crypto layer (the dun()
+template, or a native driver) walks the per-sector IV as a data-unit
+counter.  Because a bio_vec is one contiguous segment, the request uses
+only the existing inline dmreq->sg_in[0]/sg_out[0] entry -- no per-bio
+scatterlist allocation, and no regression on small random I/O.
 
-The second template parameter selects the counter endianness: dun(...,le)
-for a little-endian counter (dm-crypt plain64, blk-crypto inline
-encryption) and dun(...,be) for a big-endian one (dm-crypt plain64be).
-Those are the only two ways a per-unit IV relates to its neighbour by a
-+1 step; IV modes that are not such a counter are simply not wrapped.
-Like cryptd() and pcrypt(), dun() wraps an inner skcipher and changes
-only how the request is dispatched -- here, split across data units --
-performing no cipher transform of its own.
+crypt_alloc_tfms() wraps the skcipher in dun(<cipher>,<endian>) when
+crypt_can_batch_dun() holds: an IV mode that is a data-unit counter (its
+crypt_iv_operations sets dun_endian to the counter endianness -- "le" for
+plain64, "be" for plain64be; non-counter modes such as lmk/tcw/eboiv
+leave it NULL and are excluded), single-tfm, non-aead, and sector_size
+512 or iv_large_sectors so the per-unit IV step is exactly one.  This is
+the same kind of name rewrite as essiv(), done in the one alloc helper so
+callers are unchanged.
 
-A dun() tfm exists solely for multi-DU dispatch, so a request with
-data_unit_size 0 is rejected with -EINVAL; a caller wanting plain
-single-DU encryption uses the inner skcipher.
+DM_CRYPT selects CRYPTO_DUN and dun() resolves against a sync inner
+cipher, so wrapping has no acceptable failure that the bare cipher would
+survive -- there is no fallback; any error propagates.  (A config whose
+only xts provider is async with no generic CRYPTO_XTS would now fail to
+activate rather than silently run per-sector; generic xts is selected by
+the dependency chain, so this does not arise in practice.)
 
-A hardware engine that consumes a whole multi-DU request in one pass
-registers its own dun(...) at a higher cra_priority and is selected
-automatically by the existing priority mechanism; no per-algorithm
-capability flag is needed.  The generic template is sync-only (the split
-loop treats any non-zero inner return as terminal), so it resolves against
-a sync inner cipher (mask | CRYPTO_ALG_ASYNC); async is left to such
-native drivers.
+crypt_convert_block_skcipher() handles both cases in one function: the
+length is crypt_skcipher_len() -- a whole contiguous segment when
+batching, else a single sector -- and data_unit_size is set
+unconditionally (a dun() tfm reads it; a plain skcipher ignores it).  It
+advances the bio iterators itself (as the aead path already does) and
+reports the bytes processed, so crypt_convert() advances cc_sector /
+tag_offset uniformly via one helper, no per-case duplication.
 
-The inner IV must be a whole number of 64-bit limbs and no wider than 32
-bytes: 16 covers xts(...), 32 covers the widest inline-encryption mode
-(Adiantum).
+Verified byte-equivalent to the per-sector path: plain64 and plain64be
+dm-crypt with dun() produce ciphertext bit-identical to an unpatched
+kernel over a 256 MB device (xts-aes driving the split).
 
-Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Leonid Ravich <lravich@amazon.com>
 ---
- crypto/Kconfig  |  14 ++
- crypto/Makefile |   1 +
- crypto/dun.c    | 359 ++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 374 insertions(+)
- create mode 100644 crypto/dun.c
+ drivers/md/Kconfig    |   1 +
+ drivers/md/dm-crypt.c | 208 +++++++++++++++++++++++++++++++++---------
+ 2 files changed, 166 insertions(+), 43 deletions(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 103d1f58cb7c..4f90a780c4fc 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -746,6 +746,20 @@ config CRYPTO_XTS
- 	  implementation currently can't handle a sectorsize which is not a
- 	  multiple of 16 bytes.
- 
-+config CRYPTO_DUN
-+	tristate "Data-unit-number (DUN) dispatch template"
-+	select CRYPTO_SKCIPHER
-+	select CRYPTO_MANAGER
-+	help
-+	  dun(...) wraps an skcipher whose IV is a wide data-unit-number
-+	  counter (e.g. xts(aes)) and lets a caller submit several data units
-+	  sharing one starting IV in a single request, via
-+	  skcipher_request::data_unit_size.  The counter endianness is the
-+	  second parameter: dun(xts(aes),le) or dun(xts(aes),be).  The template
-+	  splits the request into one inner call per data unit; a hardware
-+	  driver may register a higher-priority dun(...) that handles the whole
-+	  request in one pass.  The first user is dm-crypt.
-+
- endmenu
- 
- menu "AEAD (authenticated encryption with associated data) ciphers"
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 162242593c7c..584d9e8c4347 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -93,6 +93,7 @@ obj-$(CONFIG_CRYPTO_PCBC) += pcbc.o
- obj-$(CONFIG_CRYPTO_CTS) += cts.o
- obj-$(CONFIG_CRYPTO_LRW) += lrw.o
- obj-$(CONFIG_CRYPTO_XTS) += xts.o
-+obj-$(CONFIG_CRYPTO_DUN) += dun.o
- obj-$(CONFIG_CRYPTO_CTR) += ctr.o
- obj-$(CONFIG_CRYPTO_XCTR) += xctr.o
- obj-$(CONFIG_CRYPTO_HCTR2) += hctr2.o
-diff --git a/crypto/dun.c b/crypto/dun.c
-new file mode 100644
-index 000000000000..4fcb81a025b9
---- /dev/null
-+++ b/crypto/dun.c
-@@ -0,0 +1,359 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * dun: data-unit-number dispatch template for skcipher
-+ *
-+ * Wraps an inner skcipher (e.g. xts(aes)) and, when the caller sets
-+ * skcipher_request::data_unit_size, splits the request into cryptlen /
-+ * data_unit_size sub-requests, each unit's IV the previous one +1 -- the
-+ * data-unit-number (DUN) convention.  The second parameter selects the IV
-+ * walk (see struct dun_mode): dun(xts(aes),le) or dun(xts(aes),be).
-+ *
-+ * Like cryptd()/pcrypt(), dun() only changes how a request is dispatched and
-+ * performs no transform of its own; a native one-pass multi-DU driver wins by
-+ * cra_priority.  Callers that never set data_unit_size pay nothing.
-+ */
-+
-+#include <crypto/algapi.h>
-+#include <crypto/internal/skcipher.h>
-+#include <crypto/scatterwalk.h>
-+#include <linux/err.h>
-+#include <linux/init.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/string.h>
-+
-+/* Bounds the on-stack IV buffers: 16 covers xts(...), 32 covers Adiantum. */
-+#define DUN_MAX_IVSIZE		32
-+
-+/*
-+ * A dun() mode is the rule for deriving each data unit's IV from the request's
-+ * starting IV.  @name is the template's second parameter; @iv_next advances the
-+ * @ivsize-byte @iv in place to the next data unit.  @ivsize_ok rejects IV sizes
-+ * the walk can't handle.  Add a row to dun_modes[] to support a new convention.
-+ */
-+struct dun_mode {
-+	const char *name;
-+	void (*iv_next)(u8 *iv, unsigned int ivsize);
-+	bool (*ivsize_ok)(unsigned int ivsize);
-+};
-+
-+struct dun_tfm_ctx {
-+	struct crypto_skcipher *child;
-+	const struct dun_mode *mode;
-+};
-+
-+struct dun_inst_ctx {
-+	struct crypto_skcipher_spawn spawn;
-+	const struct dun_mode *mode;
-+};
-+
-+struct dun_request_ctx {
-+	/* Must be last; the child request is appended with its own reqsize. */
-+	struct skcipher_request subreq;
-+};
-+
-+/* Little-endian counter: increment the IV per __le64 limb, low limb first. */
-+static void dun_iv_next_le(u8 *iv, unsigned int ivsize)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < ivsize; i += sizeof(__le64)) {
-+		__le64 limb;
-+		u64 v;
-+
-+		memcpy(&limb, iv + i, sizeof(limb));
-+		v = le64_to_cpu(limb) + 1;
-+		limb = cpu_to_le64(v);
-+		memcpy(iv + i, &limb, sizeof(limb));
-+		if (likely(v != 0))
-+			break;			/* no carry into the next limb */
-+	}
-+}
-+
-+/* Big-endian counter: increment the IV byte-wise from the last byte. */
-+static void dun_iv_next_be(u8 *iv, unsigned int ivsize)
-+{
-+	unsigned int i = ivsize;
-+
-+	while (i--) {
-+		if (likely(++iv[i]))
-+			break;			/* no carry into the next byte */
-+	}
-+}
-+
-+/*
-+ * le requires this: it walks the IV in __le64 limbs, so the size must be a
-+ * whole number of limbs.  be increments byte-wise and would accept any size,
-+ * but reuses the same check for a uniform value-space.
-+ */
-+static bool dun_ivsize_whole_limbs(unsigned int ivsize)
-+{
-+	return IS_ALIGNED(ivsize, sizeof(__le64));
-+}
-+
-+static const struct dun_mode dun_modes[] = {
-+	{ "le", dun_iv_next_le, dun_ivsize_whole_limbs },
-+	{ "be", dun_iv_next_be, dun_ivsize_whole_limbs },
-+};
-+
-+static const struct dun_mode *dun_find_mode(const char *name)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(dun_modes); i++)
-+		if (!strcmp(name, dun_modes[i].name))
-+			return &dun_modes[i];
-+	return NULL;
-+}
-+
-+static int dun_setkey(struct crypto_skcipher *parent, const u8 *key,
-+		      unsigned int keylen)
-+{
-+	struct dun_tfm_ctx *ctx = crypto_skcipher_ctx(parent);
-+	struct crypto_skcipher *child = ctx->child;
-+
-+	crypto_skcipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
-+	crypto_skcipher_set_flags(child, crypto_skcipher_get_flags(parent) &
-+					 CRYPTO_TFM_REQ_MASK);
-+	return crypto_skcipher_setkey(child, key, keylen);
-+}
-+
-+/*
-+ * Run one inner ->crypt per data unit, walking the IV as a wide counter.
-+ * @req->iv is never modified; the inner cipher only sees the iv_unit copy.
-+ */
-+static int dun_split(struct skcipher_request *req,
-+		     int (*crypt)(struct skcipher_request *))
-+{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct dun_tfm_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct dun_request_ctx *rctx = skcipher_request_ctx(req);
-+	struct skcipher_request *subreq = &rctx->subreq;
-+	const unsigned int du = req->data_unit_size;
-+	const unsigned int total = req->cryptlen;
-+	const unsigned int ivsize = crypto_skcipher_ivsize(tfm);
-+	const struct dun_mode *mode = ctx->mode;
-+	bool inplace = req->src == req->dst;
-+	struct scatter_walk src_walk, dst_walk;
-+	struct scatterlist src_sg[2], dst_sg[2];
-+	u8 iv_ctr[DUN_MAX_IVSIZE];
-+	u8 iv_unit[DUN_MAX_IVSIZE];
-+	unsigned int off;
-+	int err = 0;
-+
-+	/* iv_ctr is the counter; iv_unit is a per-unit copy an inner may write
-+	 * back in place (e.g. xts, essiv), so the counter is never mutated.
-+	 */
-+	memcpy(iv_ctr, req->iv, ivsize);
-+
-+	sg_init_table(src_sg, 2);
-+	scatterwalk_start(&src_walk, req->src);
-+	if (!inplace) {
-+		sg_init_table(dst_sg, 2);
-+		scatterwalk_start(&dst_walk, req->dst);
-+	}
-+
-+	skcipher_request_set_tfm(subreq, ctx->child);
-+	skcipher_request_set_callback(subreq, skcipher_request_flags(req),
-+				      NULL, NULL);
-+
-+	for (off = 0; off < total; off += du) {
-+		struct scatterlist *s, *d;
-+
-+		scatterwalk_get_sglist(&src_walk, src_sg);
-+		scatterwalk_skip(&src_walk, du);
-+		s = src_sg;
-+		if (inplace) {
-+			d = src_sg;
-+		} else {
-+			scatterwalk_get_sglist(&dst_walk, dst_sg);
-+			scatterwalk_skip(&dst_walk, du);
-+			d = dst_sg;
-+		}
-+
-+		memcpy(iv_unit, iv_ctr, ivsize);
-+		skcipher_request_set_crypt(subreq, s, d, du, iv_unit);
-+		err = crypt(subreq);
-+		if (err)
-+			break;
-+
-+		mode->iv_next(iv_ctr, ivsize);
-+	}
-+
-+	return err;
-+}
-+
-+/*
-+ * Validate a multi-DU request: non-zero cryptlen, and a data_unit_size that is
-+ * set, a multiple of the block size, and divides cryptlen evenly.
-+ */
-+static int dun_check(struct skcipher_request *req)
-+{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+
-+	if (!req->cryptlen || !req->data_unit_size ||
-+	    !IS_ALIGNED(req->data_unit_size, crypto_skcipher_blocksize(tfm)) ||
-+	    (req->cryptlen % req->data_unit_size))
-+		return -EINVAL;
-+	return 0;
-+}
-+
-+static int dun_encrypt(struct skcipher_request *req)
-+{
-+	int err = dun_check(req);
-+
-+	if (err)
-+		return err;
-+	return dun_split(req, crypto_skcipher_encrypt);
-+}
-+
-+static int dun_decrypt(struct skcipher_request *req)
-+{
-+	int err = dun_check(req);
-+
-+	if (err)
-+		return err;
-+	return dun_split(req, crypto_skcipher_decrypt);
-+}
-+
-+static int dun_init_tfm(struct crypto_skcipher *tfm)
-+{
-+	struct skcipher_instance *inst = skcipher_alg_instance(tfm);
-+	struct dun_inst_ctx *ictx = skcipher_instance_ctx(inst);
-+	struct dun_tfm_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct crypto_skcipher *child;
-+
-+	child = crypto_spawn_skcipher(&ictx->spawn);
-+	if (IS_ERR(child))
-+		return PTR_ERR(child);
-+
-+	ctx->child = child;
-+	ctx->mode = ictx->mode;
-+	crypto_skcipher_set_reqsize(tfm,
-+				    sizeof(struct dun_request_ctx) +
-+				    crypto_skcipher_reqsize(child));
-+	return 0;
-+}
-+
-+static void dun_exit_tfm(struct crypto_skcipher *tfm)
-+{
-+	struct dun_tfm_ctx *ctx = crypto_skcipher_ctx(tfm);
-+
-+	crypto_free_skcipher(ctx->child);
-+}
-+
-+static void dun_free_instance(struct skcipher_instance *inst)
-+{
-+	struct dun_inst_ctx *ictx = skcipher_instance_ctx(inst);
-+
-+	crypto_drop_skcipher(&ictx->spawn);
-+	kfree(inst);
-+}
-+
-+static int dun_create(struct crypto_template *tmpl, struct rtattr **tb)
-+{
-+	struct skcipher_alg_common *alg;
-+	struct skcipher_instance *inst;
-+	struct dun_inst_ctx *ictx;
-+	const struct dun_mode *mode;
-+	const char *cipher_name;
-+	const char *mode_name;
-+	u32 mask;
-+	int err;
-+
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_SKCIPHER, &mask);
-+	if (err)
-+		return err;
-+
-+	cipher_name = crypto_attr_alg_name(tb[1]);
-+	if (IS_ERR(cipher_name))
-+		return PTR_ERR(cipher_name);
-+
-+	/* Second parameter: the IV-walk mode (see dun_modes[]). */
-+	mode_name = crypto_attr_alg_name(tb[2]);
-+	if (IS_ERR(mode_name))
-+		return PTR_ERR(mode_name);
-+	mode = dun_find_mode(mode_name);
-+	if (!mode)
-+		return -EINVAL;
-+
-+	inst = kzalloc(sizeof(*inst) + sizeof(*ictx), GFP_KERNEL);
-+	if (!inst)
-+		return -ENOMEM;
-+	ictx = skcipher_instance_ctx(inst);
-+	ictx->mode = mode;
+diff --git a/drivers/md/Kconfig b/drivers/md/Kconfig
+index a3fcdca7e6db..e8e299566374 100644
+--- a/drivers/md/Kconfig
++++ b/drivers/md/Kconfig
+@@ -299,6 +299,7 @@ config DM_CRYPT
+ 	select CRC32
+ 	select CRYPTO
+ 	select CRYPTO_CBC
++	select CRYPTO_DUN # multi-data-unit batching of contiguous sectors
+ 	select CRYPTO_ESSIV
+ 	select CRYPTO_LIB_AES
+ 	select CRYPTO_LIB_MD5 # needed by lmk IV mode
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index 608b617fb817..44938223ad3e 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -115,6 +115,13 @@ struct crypt_iv_operations {
+ 			 struct dm_crypt_request *dmreq);
+ 	void (*post)(struct crypt_config *cc, u8 *iv,
+ 		     struct dm_crypt_request *dmreq);
 +
 +	/*
-+	 * Sync-only: the split loop can't drive an async (-EINPROGRESS) child,
-+	 * so resolve against a sync inner (mask | CRYPTO_ALG_ASYNC).
++	 * Counter endianness ("le"/"be") for IV modes whose per-sector IV is a
++	 * data-unit-number counter (IV(s+i) == IV(s)+i), batchable via
++	 * dun(<cipher>,<dun_endian>).  NULL for non-counter modes (lmk, tcw, ...).
 +	 */
-+	err = crypto_grab_skcipher(&ictx->spawn, skcipher_crypto_instance(inst),
-+				   cipher_name, 0, mask | CRYPTO_ALG_ASYNC);
-+	if (err)
-+		goto err_free_inst;
++	const char *dun_endian;
+ };
+ 
+ struct iv_benbi_private {
+@@ -151,6 +158,7 @@ enum cipher_flags {
+ 	CRYPT_IV_LARGE_SECTORS,		/* Calculate IV from sector_size, not 512B sectors */
+ 	CRYPT_ENCRYPT_PREPROCESS,	/* Must preprocess data for encryption (elephant) */
+ 	CRYPT_KEY_MAC_SIZE_SET,		/* The integrity_key_size option was used */
++	CRYPT_MULTI_DATA_UNIT,		/* Batch a bio segment's sectors per crypto request */
+ };
+ 
+ /*
+@@ -1018,15 +1026,19 @@ static const struct crypt_iv_operations crypt_iv_plain_ops = {
+ };
+ 
+ static const struct crypt_iv_operations crypt_iv_plain64_ops = {
+-	.generator = crypt_iv_plain64_gen
++	.generator = crypt_iv_plain64_gen,
++	.dun_endian = "le",
+ };
+ 
+ static const struct crypt_iv_operations crypt_iv_plain64be_ops = {
+-	.generator = crypt_iv_plain64be_gen
++	.generator = crypt_iv_plain64be_gen,
++	.dun_endian = "be",
+ };
+ 
+ static const struct crypt_iv_operations crypt_iv_essiv_ops = {
+-	.generator = crypt_iv_essiv_gen
++	.generator = crypt_iv_essiv_gen,
++	/* IV input is le64(sector); the salt-encrypt lives in essiv(). */
++	.dun_endian = "le",
+ };
+ 
+ static const struct crypt_iv_operations crypt_iv_benbi_ops = {
+@@ -1349,21 +1361,51 @@ static int crypt_convert_block_aead(struct crypt_config *cc,
+ 	return r;
+ }
+ 
++/*
++ * Bytes to process in one skcipher request: a whole contiguous segment when
++ * batching (multi-data-unit), else one sector.  0 means an unusable
++ * (sub-sector / misaligned) segment.
++ */
++static unsigned int crypt_skcipher_len(struct crypt_config *cc,
++				       const struct bio_vec *bv_in,
++				       const struct bio_vec *bv_out)
++{
++	const unsigned int sector_size = cc->sector_size;
 +
-+	alg = crypto_spawn_skcipher_alg_common(&ictx->spawn);
++	if (test_bit(CRYPT_MULTI_DATA_UNIT, &cc->cipher_flags))
++		return round_down(min(bv_in->bv_len, bv_out->bv_len),
++				  sector_size);
 +
-+	/* The mode must accept this IV size, and it must fit our buffers. */
-+	err = -EINVAL;
-+	if (!alg->ivsize || alg->ivsize > DUN_MAX_IVSIZE ||
-+	    !mode->ivsize_ok(alg->ivsize))
-+		goto err_free_inst;
++	/* Reject unexpected unaligned bio. */
++	if (unlikely(bv_in->bv_len & (sector_size - 1)))
++		return 0;
++	return sector_size;
++}
 +
-+	err = -ENAMETOOLONG;
-+	if (snprintf(inst->alg.base.cra_name, CRYPTO_MAX_ALG_NAME, "dun(%s,%s)",
-+		     alg->base.cra_name, mode->name) >= CRYPTO_MAX_ALG_NAME)
-+		goto err_free_inst;
-+	if (snprintf(inst->alg.base.cra_driver_name, CRYPTO_MAX_ALG_NAME,
-+		     "dun(%s,%s)", alg->base.cra_driver_name,
-+		     mode->name) >= CRYPTO_MAX_ALG_NAME)
-+		goto err_free_inst;
++/*
++ * Encrypt/decrypt one bio segment (one sector, or a whole segment when
++ * batching) and report the bytes done in *out_processed.  The integrity /
++ * preprocess / post handling is inert when batching (crypt_can_batch_dun()
++ * excludes those configs).
++ */
+ static int crypt_convert_block_skcipher(struct crypt_config *cc,
+ 					struct convert_context *ctx,
+ 					struct skcipher_request *req,
+-					unsigned int tag_offset)
++					unsigned int tag_offset,
++					unsigned int *out_processed)
+ {
+ 	struct bio_vec bv_in = bio_iter_iovec(ctx->bio_in, ctx->iter_in);
+ 	struct bio_vec bv_out = bio_iter_iovec(ctx->bio_out, ctx->iter_out);
++	const unsigned int sector_size = cc->sector_size;
+ 	struct scatterlist *sg_in, *sg_out;
+ 	struct dm_crypt_request *dmreq;
+ 	u8 *iv, *org_iv, *tag_iv;
+ 	__le64 *sector;
++	unsigned int len;
+ 	int r = 0;
+ 
+-	/* Reject unexpected unaligned bio. */
+-	if (unlikely(bv_in.bv_len & (cc->sector_size - 1)))
++	len = crypt_skcipher_len(cc, &bv_in, &bv_out);
++	if (unlikely(!len))
+ 		return -EIO;
+ 
+ 	dmreq = dmreq_of_req(cc, req);
+@@ -1386,10 +1428,10 @@ static int crypt_convert_block_skcipher(struct crypt_config *cc,
+ 	sg_out = &dmreq->sg_out[0];
+ 
+ 	sg_init_table(sg_in, 1);
+-	sg_set_page(sg_in, bv_in.bv_page, cc->sector_size, bv_in.bv_offset);
++	sg_set_page(sg_in, bv_in.bv_page, len, bv_in.bv_offset);
+ 
+ 	sg_init_table(sg_out, 1);
+-	sg_set_page(sg_out, bv_out.bv_page, cc->sector_size, bv_out.bv_offset);
++	sg_set_page(sg_out, bv_out.bv_page, len, bv_out.bv_offset);
+ 
+ 	if (cc->iv_gen_ops) {
+ 		/* For READs use IV stored in integrity metadata */
+@@ -1410,7 +1452,9 @@ static int crypt_convert_block_skcipher(struct crypt_config *cc,
+ 		memcpy(iv, org_iv, cc->iv_size);
+ 	}
+ 
+-	skcipher_request_set_crypt(req, sg_in, sg_out, cc->sector_size, iv);
++	skcipher_request_set_crypt(req, sg_in, sg_out, len, iv);
++	/* A dun() tfm reads this; a plain skcipher ignores it (len is one sector). */
++	skcipher_request_set_data_unit_size(req, sector_size);
+ 
+ 	if (bio_data_dir(ctx->bio_in) == WRITE)
+ 		r = crypto_skcipher_encrypt(req);
+@@ -1420,9 +1464,10 @@ static int crypt_convert_block_skcipher(struct crypt_config *cc,
+ 	if (!r && cc->iv_gen_ops && cc->iv_gen_ops->post)
+ 		cc->iv_gen_ops->post(cc, org_iv, dmreq);
+ 
+-	bio_advance_iter(ctx->bio_in, &ctx->iter_in, cc->sector_size);
+-	bio_advance_iter(ctx->bio_out, &ctx->iter_out, cc->sector_size);
++	bio_advance_iter(ctx->bio_in, &ctx->iter_in, len);
++	bio_advance_iter(ctx->bio_out, &ctx->iter_out, len);
+ 
++	*out_processed = len;
+ 	return r;
+ }
+ 
+@@ -1509,13 +1554,25 @@ static void crypt_free_req(struct crypt_config *cc, void *req, struct bio *base_
+ 		crypt_free_req_skcipher(cc, req, base_bio);
+ }
+ 
++/*
++ * Advance the IV-sector and integrity-tag cursors by @processed bytes; the
++ * bio iterators are advanced by the per-block helpers themselves.
++ */
++static void crypt_convert_advance(struct crypt_config *cc,
++				  struct convert_context *ctx,
++				  unsigned int processed)
++{
++	ctx->cc_sector += processed >> SECTOR_SHIFT;
++	ctx->tag_offset += processed / cc->sector_size;
++}
 +
-+	inst->alg.base.cra_priority = alg->base.cra_priority;
-+	inst->alg.base.cra_blocksize = alg->base.cra_blocksize;
-+	inst->alg.base.cra_alignmask = alg->base.cra_alignmask;
-+	inst->alg.base.cra_ctxsize = sizeof(struct dun_tfm_ctx);
+ /*
+  * Encrypt / decrypt data from one bio to another one (can be the same one)
+  */
+ static blk_status_t crypt_convert(struct crypt_config *cc,
+ 			 struct convert_context *ctx, bool atomic, bool reset_pending)
+ {
+-	unsigned int sector_step = cc->sector_size >> SECTOR_SHIFT;
++	unsigned int processed;
+ 	int r;
+ 
+ 	/*
+@@ -1536,10 +1593,12 @@ static blk_status_t crypt_convert(struct crypt_config *cc,
+ 
+ 		atomic_inc(&ctx->cc_pending);
+ 
++		processed = cc->sector_size;
+ 		if (crypt_integrity_aead(cc))
+ 			r = crypt_convert_block_aead(cc, ctx, ctx->r.req_aead, ctx->tag_offset);
+ 		else
+-			r = crypt_convert_block_skcipher(cc, ctx, ctx->r.req, ctx->tag_offset);
++			r = crypt_convert_block_skcipher(cc, ctx, ctx->r.req,
++							 ctx->tag_offset, &processed);
+ 
+ 		switch (r) {
+ 		/*
+@@ -1559,8 +1618,7 @@ static blk_status_t crypt_convert(struct crypt_config *cc,
+ 					 * exit and continue processing in a workqueue
+ 					 */
+ 					ctx->r.req = NULL;
+-					ctx->tag_offset++;
+-					ctx->cc_sector += sector_step;
++					crypt_convert_advance(cc, ctx, processed);
+ 					return BLK_STS_DEV_RESOURCE;
+ 				}
+ 			} else {
+@@ -1574,16 +1632,14 @@ static blk_status_t crypt_convert(struct crypt_config *cc,
+ 		 */
+ 		case -EINPROGRESS:
+ 			ctx->r.req = NULL;
+-			ctx->tag_offset++;
+-			ctx->cc_sector += sector_step;
++			crypt_convert_advance(cc, ctx, processed);
+ 			continue;
+ 		/*
+ 		 * The request was already processed (synchronously).
+ 		 */
+ 		case 0:
+ 			atomic_dec(&ctx->cc_pending);
+-			ctx->cc_sector += sector_step;
+-			ctx->tag_offset++;
++			crypt_convert_advance(cc, ctx, processed);
+ 			if (!atomic)
+ 				cond_resched();
+ 			continue;
+@@ -2345,12 +2401,37 @@ static int crypt_alloc_tfms_aead(struct crypt_config *cc, char *ciphermode)
+ 	return 0;
+ }
+ 
++/*
++ * Whether to wrap the cipher in dun() for multi-data-unit batching: a counter
++ * IV mode (dun_endian set: plain64 "le", plain64be "be", essiv "le"), single-
++ * tfm, non-aead, and a per-unit IV step of exactly one (512B sectors or
++ * iv_large_sectors).  Integrity is configured
++ * after alloc, so it is re-checked post-alloc in crypt_ctr_cipher(); an
++ * integrity config keeps an inert dun() wrapper but never sets the batch flag.
++ */
++static bool crypt_can_batch_dun(struct crypt_config *cc)
++{
++	return !crypt_integrity_aead(cc) && cc->tfms_count == 1 &&
++		cc->iv_gen_ops && cc->iv_gen_ops->dun_endian &&
++		(cc->sector_size == (1 << SECTOR_SHIFT) ||
++		 test_bit(CRYPT_IV_LARGE_SECTORS, &cc->cipher_flags));
++}
 +
-+	inst->alg.ivsize = alg->ivsize;
-+	inst->alg.chunksize = alg->chunksize;
-+	inst->alg.min_keysize = alg->min_keysize;
-+	inst->alg.max_keysize = alg->max_keysize;
+ static int crypt_alloc_tfms(struct crypt_config *cc, char *ciphermode)
+ {
++	char dun_api[CRYPTO_MAX_ALG_NAME];
 +
-+	inst->alg.init = dun_init_tfm;
-+	inst->alg.exit = dun_exit_tfm;
-+	inst->alg.setkey = dun_setkey;
-+	inst->alg.encrypt = dun_encrypt;
-+	inst->alg.decrypt = dun_decrypt;
+ 	if (crypt_integrity_aead(cc))
+ 		return crypt_alloc_tfms_aead(cc, ciphermode);
+-	else
+-		return crypt_alloc_tfms_skcipher(cc, ciphermode);
 +
-+	inst->free = dun_free_instance;
-+
-+	err = skcipher_register_instance(tmpl, inst);
-+	if (err) {
-+err_free_inst:
-+		dun_free_instance(inst);
++	/* Wrap in dun() for batching when eligible (like the essiv() rewrite). */
++	if (crypt_can_batch_dun(cc)) {
++		if (snprintf(dun_api, sizeof(dun_api), "dun(%s,%s)", ciphermode,
++			     cc->iv_gen_ops->dun_endian) >= (int)sizeof(dun_api))
++			return -ENAMETOOLONG;
++		ciphermode = dun_api;
 +	}
-+	return err;
-+}
-+
-+static struct crypto_template dun_tmpl = {
-+	.name = "dun",
-+	.create = dun_create,
-+	.module = THIS_MODULE,
-+};
-+
-+static int __init dun_module_init(void)
++	return crypt_alloc_tfms_skcipher(cc, ciphermode);
+ }
+ 
+ static unsigned int crypt_subkey_size(struct crypt_config *cc)
+@@ -2747,25 +2828,15 @@ static void crypt_dtr(struct dm_target *ti)
+ 	dm_audit_log_dtr(DM_MSG_PREFIX, ti, 1);
+ }
+ 
+-static int crypt_ctr_ivmode(struct dm_target *ti, const char *ivmode)
++/*
++ * Select cc->iv_gen_ops from the IV mode string -- pure parsing, no tfm
++ * dependency, so it runs before alloc and lets crypt_can_batch_dun() see the
++ * mode.  The tfm-dependent IV sizing is finished later by crypt_ctr_ivmode().
++ */
++static int crypt_select_ivmode(struct dm_target *ti, const char *ivmode)
+ {
+ 	struct crypt_config *cc = ti->private;
+ 
+-	if (crypt_integrity_aead(cc))
+-		cc->iv_size = crypto_aead_ivsize(any_tfm_aead(cc));
+-	else
+-		cc->iv_size = crypto_skcipher_ivsize(any_tfm(cc));
+-
+-	if (cc->iv_size)
+-		/* at least a 64 bit sector number should fit in our buffer */
+-		cc->iv_size = max(cc->iv_size,
+-				  (unsigned int)(sizeof(u64) / sizeof(u8)));
+-	else if (ivmode) {
+-		DMWARN("Selected cipher does not support IVs");
+-		ivmode = NULL;
+-	}
+-
+-	/* Choose ivmode, see comments at iv code. */
+ 	if (ivmode == NULL)
+ 		cc->iv_gen_ops = NULL;
+ 	else if (strcmp(ivmode, "plain") == 0)
+@@ -2803,12 +2874,8 @@ static int crypt_ctr_ivmode(struct dm_target *ti, const char *ivmode)
+ 		}
+ 	} else if (strcmp(ivmode, "tcw") == 0) {
+ 		cc->iv_gen_ops = &crypt_iv_tcw_ops;
+-		cc->key_parts += 2; /* IV + whitening */
+-		cc->key_extra_size = cc->iv_size + TCW_WHITENING_SIZE;
+ 	} else if (strcmp(ivmode, "random") == 0) {
+ 		cc->iv_gen_ops = &crypt_iv_random_ops;
+-		/* Need storage space in integrity fields. */
+-		cc->integrity_iv_size = cc->iv_size;
+ 	} else {
+ 		ti->error = "Invalid IV mode";
+ 		return -EINVAL;
+@@ -2817,6 +2884,37 @@ static int crypt_ctr_ivmode(struct dm_target *ti, const char *ivmode)
+ 	return 0;
+ }
+ 
++static int crypt_ctr_ivmode(struct dm_target *ti, const char *ivmode)
 +{
-+	return crypto_register_template(&dun_tmpl);
++	struct crypt_config *cc = ti->private;
++
++	if (crypt_integrity_aead(cc))
++		cc->iv_size = crypto_aead_ivsize(any_tfm_aead(cc));
++	else
++		cc->iv_size = crypto_skcipher_ivsize(any_tfm(cc));
++
++	if (cc->iv_size)
++		/* at least a 64 bit sector number should fit in our buffer */
++		cc->iv_size = max(cc->iv_size,
++				  (unsigned int)(sizeof(u64) / sizeof(u8)));
++	else if (ivmode) {
++		DMWARN("Selected cipher does not support IVs");
++		ivmode = NULL;
++		cc->iv_gen_ops = NULL;
++	}
++
++	/* Finish the tfm-dependent IV sizing; modes are already selected. */
++	if (cc->iv_gen_ops == &crypt_iv_tcw_ops) {
++		cc->key_parts += 2; /* IV + whitening */
++		cc->key_extra_size = cc->iv_size + TCW_WHITENING_SIZE;
++	} else if (cc->iv_gen_ops == &crypt_iv_random_ops) {
++		/* Need storage space in integrity fields. */
++		cc->integrity_iv_size = cc->iv_size;
++	}
++
++	return 0;
 +}
 +
-+static void __exit dun_module_exit(void)
-+{
-+	crypto_unregister_template(&dun_tmpl);
-+}
+ /*
+  * Workaround to parse HMAC algorithm from AEAD crypto API spec.
+  * The HMAC is needed to calculate tag size (HMAC digest size).
+@@ -2914,7 +3012,12 @@ static int crypt_ctr_cipher_new(struct dm_target *ti, char *cipher_in, char *key
+ 
+ 	cc->key_parts = cc->tfms_count;
+ 
+-	/* Allocate cipher */
++	/* Select IV mode before alloc so dun() wrapping can be decided. */
++	ret = crypt_select_ivmode(ti, *ivmode);
++	if (ret < 0)
++		return ret;
 +
-+module_init(dun_module_init);
-+module_exit(dun_module_exit);
++	/* Allocate cipher (skcipher may be wrapped in dun()). */
+ 	ret = crypt_alloc_tfms(cc, cipher_api);
+ 	if (ret < 0) {
+ 		ti->error = "Error allocating crypto tfm";
+@@ -2999,7 +3102,13 @@ static int crypt_ctr_cipher_old(struct dm_target *ti, char *cipher_in, char *key
+ 		goto bad_mem;
+ 	}
+ 
+-	/* Allocate cipher */
++	/* Select IV mode before alloc so dun() wrapping can be decided. */
++	ret = crypt_select_ivmode(ti, *ivmode);
++	if (ret < 0) {
++		kfree(cipher_api);
++		return ret;
++	}
 +
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("Data-unit-number dispatch template for skcipher");
-+MODULE_ALIAS_CRYPTO("dun");
+ 	ret = crypt_alloc_tfms(cc, cipher_api);
+ 	if (ret < 0) {
+ 		ti->error = "Error allocating crypto tfm";
+@@ -3063,6 +3172,19 @@ static int crypt_ctr_cipher(struct dm_target *ti, char *cipher_in, char *key)
+ 		}
+ 	}
+ 
++	/*
++	 * Enable batching only if the cipher was dun()-wrapped at alloc time and
++	 * no integrity was configured (integrity is set up after cipher alloc).
++	 */
++	if (!crypt_integrity_aead(cc) && !cc->integrity_tag_size &&
++	    !cc->integrity_iv_size &&
++	    !strncmp(crypto_skcipher_alg(any_tfm(cc))->base.cra_name,
++		     "dun(", 4)) {
++		set_bit(CRYPT_MULTI_DATA_UNIT, &cc->cipher_flags);
++		DMINFO("Using multi-data-unit crypto offload (du=%u)",
++		       cc->sector_size);
++	}
++
+ 	/* wipe the kernel key payload copy */
+ 	if (cc->key_string)
+ 		memset(cc->key, 0, cc->key_size * sizeof(u8));
 -- 
 2.47.3
 
