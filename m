@@ -1,60 +1,63 @@
-Received: from pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.12.53.23])
+Received: from pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com [44.246.77.92])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2853F175A73;
-	Tue, 30 Jun 2026 08:34:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.12.53.23
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40BA12C15AB;
+	Tue, 30 Jun 2026 08:34:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.246.77.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782808485; cv=none; b=Jq+nJ24jJquuzUw+5Z62cVZAVvMmvguHdANwVxI7Vh5V861Bi5ysHz90unPbPakRAw9KnX8e/d+vDeJeYFD6VaNjBZztfSS1nTJe6BRev7L/DeszquKCUUTozDNAfgf69CdCJNAEnL5W3QlvwTd2wjnkl16w49EoAugonkjqfdc=
+	t=1782808488; cv=none; b=Uuo2A3EtqpihcGHwIFEk8HUaq2mFhddLaB/inOrKZf7cmX56bh+9bY66RIx/p/os65TUrJdLO9NsZuX12ol+XSZZlle2WFptFTxbVsWr5OuhHOMAxfA/JXaQVYbHPwXRUcEYEnp/EgGzr17J+2n83NSqTJqeD6N6nSrv0DNeqzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782808485; c=relaxed/simple;
-	bh=JYaumYkBv0kjz2xoFNFCDUpGr+z6z9dCpj1s0A6VBy8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GHEq3ZTZTp59TeqVgdlHJ33OlZaZe1mRlg3uiESC1rDMZQTb9X/ShJNo/5fsB7v2YRtBOxJAP1JvoFAcAffjVB9Qfp429m/h5Iy/Wyvy3rWg6j3mSRHkef8hh3tUde2xSFWkarNFSME566oDi0XbZeTn48rNVd7Ub7hzpAxm0xo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=VXHkggGK; arc=none smtp.client-ip=52.12.53.23
+	s=arc-20240116; t=1782808488; c=relaxed/simple;
+	bh=xKDP/+V3jnaiSpuEcD818Sp9Q4KVwjkkPoAHCQlJrnA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tw/9y6CTTBT+fdbOvXvvWRiKbq1SwGixcHOlQmcO3GeMiFvprO/Yvn2sICm4nTme/2v97cWKbsZGy3b50dGjjsVmEd2dZ/d20N+Gq2vs4UokeVjSlvxNbi7P+qOQgGhEkhGbYLhrsP7W7KyCUEo67uGp3uvzvubiIOuq16wMmGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=GRYANt2s; arc=none smtp.client-ip=44.246.77.92
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="VXHkggGK"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="GRYANt2s"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1782808484; x=1814344484;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=0wWIWx6VxC5AOt4Sl1rdWlyfm+czyirB2HJBLKnJQeo=;
-  b=VXHkggGKw31kpSjjDZb+yHsQhm+41MBJgxzuvw1orvVc1gy1DLJLBpk3
-   jQVVGxJYGlzKlB59lcqtPwsTwFTIhTiqEuWAjJnz23Uz8tgXEFOeqQwuK
-   VCcLV8kIKJwlr65oeyRVyRXhMjbMhIIdWhzdF88D7+vp6A0PfcjF05VPx
-   ZttxI9rv+cxSJ4bPlbvIiH30RDjn/KSjgXB8rbeiyrf5UBL2FmTUB5EYC
-   LvklJGZRX6IeI+C78i0/h0zteKm6Uc4swbdu7nG6AumZuib2eVbfnHcOx
-   LoJDTMb+XqXdymWTjL0DvSLkNEHmuYuCkJN72ezIghkh5QMyjdaGRnhcz
-   g==;
-X-CSE-ConnectionGUID: 12m0zAUKRxGRhidSawgPKA==
-X-CSE-MsgGUID: R5zjJiWCTVmc5S6g7A4MCQ==
+  t=1782808487; x=1814344487;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=x6HnoWCjSlNulaMCuXnLhg8pbxgY0nSAvFotzYJDa44=;
+  b=GRYANt2sCx3uSeAd7UeAznrIW51HpBkzwfT0ivKRtTA6OpfI1SZDhfaO
+   cG5v8XbeH8WdaHsv8G1OWDQTwHIfn5IR2FYb1iTR01z0iY2jW4QDGwDlS
+   wJqUNOOPo1DJBUMfZvMdOguqQ+JA9oDcdHUzYeZikoCj0hkJ+USWW7HQ3
+   jFu41eXgMGzhnD1oi6tYBeg5H/UpfW7fnXPwZXCBVxOFA/wb5t4a42IYe
+   cd7hnXuD/JCluXZdLNOP7NzVp/QeHRycchfHuAWnzGg5tbOG7rlr2dRfz
+   yBRqnkaNuAft1ZBnOdKgYXhY/oA189YN9ZdZW7MAXJ7SY+fw1tCFMEGjo
+   A==;
+X-CSE-ConnectionGUID: jRkMF5cmQfirAiI3vkE8GA==
+X-CSE-MsgGUID: rn+3vEbwSQuwUJMxM8EkSA==
 X-IronPort-AV: E=Sophos;i="6.24,233,1774310400"; 
-   d="scan'208";a="22629074"
-Received: from ip-10-5-9-48.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.9.48])
-  by internal-pdx-out-010.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2026 08:34:41 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [205.251.233.111:1149]
+   d="scan'208";a="22751780"
+Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
+  by internal-pdx-out-004.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2026 08:34:42 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [205.251.233.236:27690]
  by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.52.142:2525] with esmtp (Farcaster)
- id a6d397e5-85fb-4904-9f2d-a0b67e412c02; Tue, 30 Jun 2026 08:34:40 +0000 (UTC)
-X-Farcaster-Flow-ID: a6d397e5-85fb-4904-9f2d-a0b67e412c02
+ id 67011798-3020-490a-a0d7-2940c15a8805; Tue, 30 Jun 2026 08:34:42 +0000 (UTC)
+X-Farcaster-Flow-ID: 67011798-3020-490a-a0d7-2940c15a8805
 Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43;
- Tue, 30 Jun 2026 08:34:40 +0000
+ Tue, 30 Jun 2026 08:34:42 +0000
 Received: from dev-dsk-lravich-1b-7405803b.eu-west-1.amazon.com (10.13.225.95)
  by EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.43;
- Tue, 30 Jun 2026 08:34:38 +0000
+ Tue, 30 Jun 2026 08:34:40 +0000
 From: Leonid Ravich <lravich@amazon.com>
 To: <linux-crypto@vger.kernel.org>, <dm-devel@lists.linux.dev>
 CC: <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <ebiggers@kernel.org>,
 	<snitzer@kernel.org>, <mpatocka@redhat.com>, <axboe@kernel.dk>
-Subject: [PATCH v5 0/5] crypto: skcipher - multi-data-unit dispatch as a template
-Date: Tue, 30 Jun 2026 08:34:26 +0000
-Message-ID: <20260630083431.2772-1-lravich@amazon.com>
+Subject: [PATCH v5 1/5] crypto: skcipher - add per-request data_unit_size
+Date: Tue, 30 Jun 2026 08:34:27 +0000
+Message-ID: <20260630083431.2772-2-lravich@amazon.com>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260630083431.2772-1-lravich@amazon.com>
+References: <20260630083431.2772-1-lravich@amazon.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -66,181 +69,97 @@ Content-Type: text/plain
 X-ClientProxiedBy: EX19D044UWA001.ant.amazon.com (10.13.139.100) To
  EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-This is v5. It reworks the multi-data-unit support from the in-core
-auto-splitter of v4 into a crypto template, dun(...), addressing the v4
-review: there is now no added cost on the core skcipher path, no
-per-algorithm capability flag, and the per-data-unit split lives in an
-algorithm rather than in crypto_skcipher_encrypt/decrypt the shape
-Herbert suggested, which removes the "overhead for everyone" Eric
-objected to.
+Add a data_unit_size field to struct skcipher_request.  When non-zero,
+the request covers cryptlen / data_unit_size data units that share one
+starting IV; per-unit IVs are derived from the request IV as a wide
+data-unit-number counter (the convention also used by blk-crypto for
+inline encryption).  cryptlen must be a positive multiple of
+data_unit_size.
 
-v4: https://lore.kernel.org/linux-crypto/20260615105022.8025-1-lravich@amazon.com/
+The field is honoured by an skcipher that understands data units -- an
+instance of the dun(...) template (added next), or a driver that handles
+a whole multi-DU request natively.  A plain skcipher ignores it, so the
+field is inert for every existing caller; the core en/decrypt path is
+unchanged.  skcipher_request_set_tfm() and the on-stack request
+initialiser reset it to 0 so a reused request defaults to single-DU.
 
-Model
+Signed-off-by: Leonid Ravich <lravich@amazon.com>
 ---
+ include/crypto/skcipher.h | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-A skcipher_request gains a data_unit_size field (patch 1). When set,
-the request covers cryptlen / data_unit_size data units sharing one
-starting IV; per-unit IVs are derived from the IV as a wide data-unit-
-number (DUN) counter the convention blk-crypto already uses for
-inline encryption.
-
-dun(...) (patch 2) is a template that wraps an inner skcipher whose IV
-is that counter (e.g. dun(xts(aes),le)). Its ->encrypt/->decrypt split
-the request into one inner call per data unit, walking the IV +1 each
-unit; each inner call is direct, so only the outer dispatch into the API
-is indirect. A plain skcipher is unchanged and ignores data_unit_size,
-so existing callers pay nothing the field is inert and the core
-en/decrypt path is untouched.
-
-The second template parameter selects how the per-unit IV advances. A
-neighbour relates by a +1 step in exactly one of two ways, little- or
-big-endian, so dun(...,le) / dun(...,be) is a closed parameter space,
-not an open-ended set of "IV types". Internally each is one row of a
-small struct dun_mode op table (an iv_next walk plus an ivsize
-predicate); adding a future convention e.g. a width-bounded counter,
-or an affine sector<<shift+k step is one row, with the dispatch loop
-unchanged. IV constructions that are not such a counter are simply not
-wrapped (the consumer keeps its per-unit path); an IV that is encrypted
-(essiv) composes as the inner algorithm, dun(essiv(...),le), since the
-encryption already lives in that inner template.
-
-Why a template
---------------
-
-  - No core cost for anyone. crypto_skcipher_encrypt/decrypt are stock;
-    only a dun() tfm reads data_unit_size. (addresses Eric's "adds
-    checks/overhead for everyone")
-
-  - No capability flag. A hardware engine that handles a whole multi-DU
-    request in one pass registers its own dun(xts(aes),le) at a higher
-    cra_priority and is picked automatically exactly how
-    xts-aes-aesni already beats generic xts. No CRYPTO_ALG_* bit, no
-    core branch choosing native-vs-split. Such a native driver may also
-    be async (it owns its dispatch); only the generic template is
-    sync-only.
-
-  - The split is in the algorithm. (the direction Herbert described)
-
-  - It is the same kind of wrapper crypto/ already has. Like cryptd()
-    (async dispatch) and pcrypt() (parallel dispatch), dun() wraps an
-    inner skcipher and changes only how the request is dispatched 
-    here, split across data units performing no cipher transform of
-    its own.
-
-  - It is a reusable primitive, not a dm-crypt feature. Two in-tree
-    consumers are included: dm-crypt (patch 4) and blk-crypto-fallback
-    (patch 5), which both open-code the per-DUN loop today; fscrypt's
-    direct (non-inline) path open-codes the same loop and could follow.
-    A HW engine is a provider via cra_priority. Consumers and providers
-    are decoupled through one named algorithm.
-
-What it does and does not buy
------------------------------
-
-On a software cipher this is not a throughput win: the generic template
-still issues one inner encrypt per data unit, so the AES compute is
-unchanged. It removes per-request overhead and the consumer's
-open-coded per-unit loop, and is byte-for-byte identical to the
-per-sector path (Verification). The win is for a one-pass provider; no
-software throughput is claimed.
-
-dm-crypt consumer (patch 4)
----------------------------
-
-dm-crypt submits one request per contiguous bio segment with
-data_unit_size = cc->sector_size (e.g. the default 512-byte sector with
-a 4 KiB bio_vec -> one request of 8 data units), using only its existing
-inline single-entry scatterlist no per-bio allocation, no regression.
-It allocates dun(<cipher>,<endian>) instead of the bare cipher when the
-config can form the DUN counter: a counter IV mode (plain64 -> le,
-plain64be -> be; essiv/lmk/tcw etc. are not plain counters and stay
-per-sector), single-tfm, non-aead, sector_size 512 or iv_large_sectors.
-DM_CRYPT selects CRYPTO_DUN and the template resolves against a sync
-inner, so there is no acceptable wrap failure the bare cipher would
-survive; an integrity config keeps an inert dun() wrapper but never
-batches (one inner call per request == the per-sector path).
-
-blk-crypto-fallback consumer (patch 5)
---------------------------------------
-
-Every blk-crypto inline-encryption mode feeds the DUN as a little-endian
-counter, so the fallback wraps its cipher as dun(<cipher>,le)
-unconditionally (BLK_INLINE_ENCRYPTION_FALLBACK selects CRYPTO_DUN).
-Because the template handles any counter width up to 32 bytes, this
-covers all four modes AES-256-XTS, AES-128-CBC-ESSIV, Adiantum
-(32-byte IV) and SM4-XTS and the open-coded per-unit loop is removed
-from both the encrypt and decrypt paths.
-
-Verification
-------------
-
-Regression protocol in the tree, on x86 + arm64 under qemu: build clean
-and checkpatch strict clean (the lone warning is the new-file
-MAINTAINERS reminder; crypto/ is an F: catch-all); testmgr dun()
-cross-check (batched == N x single-DU reference over a fragmented
-scatterlist, plus a boundary-seeded IV that forces a carry across a
-64-bit limb / byte run) for every accepted ivsize including 32 (Adiantum)
-in BOTH dun(...,le) and dun(...,be), so the big-endian counter path is
-exercised independently of any consumer; an AF_ALG probe forces the
-dun() cross-check to run for each blk-crypto inner cipher
-(dun(essiv(cbc(aes),sha256),le), dun(adiantum(xchacha12,aes),le), ...);
-dm-crypt plain64/plain64be activate dun() (le/be), essiv / plain fall
-back; negative gates (multikey and integrity not batched); plain64 and
-plain64be round-trips and a 4096-byte iv_large_sectors round-trip;
-low-memory; arm64 functional; an end-to-end blk-crypto-fallback test
-(ext4 + fscrypt -o inlinecrypt with no inline HW, driving dun(xts,le)
-and verifying a post-cache-drop round-trip); and byte-equivalence:
-ciphertext is bit-identical to an unpatched axboe/for-next baseline
-(sha256 4913910b...43efc0 le, da0869a9...63004 be).
-
-Changes since v4
-----------------
-
-- The in-core auto-splitter and validator are gone; multi-DU dispatch is
-  the dun(...) template. crypto_skcipher_encrypt/decrypt revert to
-  stock, so there is no added cost on the core path.
-- The CRYPTO_ALG_SKCIPHER_NATIVE_MULTI_DU capability flag is dropped; a
-  native one-pass driver is selected by cra_priority instead.
-- The template is dun(<inner>,<endian>) in the cryptd()/pcrypt() family
-  of dispatch-only wrappers; the counter endianness (le/be) is its
-  second parameter, backed by a struct dun_mode op table so a future
-  counter convention is one table row. It handles any counter width up
- to 32 bytes (covering Adiantum) and rejects a data_unit_size 0 /
- cryptlen 0 request.
-- dm-crypt allocates dun(<cipher>,le|be) when eligible (selecting the IV
- mode before tfm allocation); plain64 -> le, plain64be -> be. An
-  integrity config keeps an inert dun() wrapper but never batches.
-  DM_CRYPT selects CRYPTO_DUN.
-- blk-crypto-fallback is a second consumer (patch 5), demonstrating the
-  template is a shared primitive, not dm-crypt-only; it wraps every mode
-  as dun(<cipher>,le) and BLK_INLINE_ENCRYPTION_FALLBACK selects
-  CRYPTO_DUN.
-- testmgr exercises the template via dun(<inner>,le) and dun(<inner>,be),
-  including ivsize 32 and a carry-boundary IV; an end-to-end fscrypt
-  -o inlinecrypt test drives the blk-crypto-fallback consumer.
-
-Leonid Ravich (5):
-  crypto: skcipher - add per-request data_unit_size
-  crypto: dun - data-unit-number dispatch template
-  crypto: testmgr - test dun() dispatch
-  dm crypt: batch a bio segment's sectors via dun()
-  blk-crypto: fallback - batch a segment's data units via dun()
-
- block/Kconfig               |   1 +
- block/blk-crypto-fallback.c |  74 ++++----
- crypto/Kconfig              |  14 ++
- crypto/Makefile             |   1 +
- crypto/dun.c                | 359 ++++++++++++++++++++++++++++++++++++
- crypto/testmgr.c            | 289 +++++++++++++++++++++++++++++
- drivers/md/Kconfig          |   1 +
- drivers/md/dm-crypt.c       | 208 ++++++++++++++++-----
- include/crypto/skcipher.h   |  34 ++++
- 9 files changed, 899 insertions(+), 82 deletions(-)
- create mode 100644 crypto/dun.c
-
-
-base-commit: a8cafdf8c949f17c92eca0045532e88ac0dac30d
+diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
+index 4efe2ca8c4d1..1121be80cb53 100644
+--- a/include/crypto/skcipher.h
++++ b/include/crypto/skcipher.h
+@@ -31,6 +31,13 @@ struct scatterlist;
+ /**
+  *	struct skcipher_request - Symmetric key cipher request
+  *	@cryptlen: Number of bytes to encrypt or decrypt
++ *	@data_unit_size: Size in bytes of each data unit, or 0 for a
++ *		single-data-unit request (the default).  When non-zero,
++ *		must be a multiple of the cipher block size, @cryptlen must
++ *		be a positive multiple of it, and per-DU IVs are derived from
++ *		@iv as a wide counter (the data-unit-number convention); the
++ *		counter width and endianness are chosen by the consumer (e.g.
++ *		the dun() template's second parameter).
+  *	@iv: Initialisation Vector
+  *	@src: Source SG list
+  *	@dst: Destination SG list
+@@ -39,6 +46,7 @@ struct scatterlist;
+  */
+ struct skcipher_request {
+ 	unsigned int cryptlen;
++	unsigned int data_unit_size;
+ 
+ 	u8 *iv;
+ 
+@@ -225,6 +233,7 @@ struct lskcipher_alg {
+ 	struct skcipher_request *name = \
+ 		(((struct skcipher_request *)__##name##_desc)->base.tfm = \
+ 			crypto_sync_skcipher_tfm((_tfm)), \
++		 ((struct skcipher_request *)__##name##_desc)->data_unit_size = 0, \
+ 		 (void *)__##name##_desc)
+ 
+ /**
+@@ -819,6 +828,8 @@ static inline void skcipher_request_set_tfm(struct skcipher_request *req,
+ 					    struct crypto_skcipher *tfm)
+ {
+ 	req->base.tfm = crypto_skcipher_tfm(tfm);
++	/* Reused requests default to single-data-unit. */
++	req->data_unit_size = 0;
+ }
+ 
+ static inline void skcipher_request_set_sync_tfm(struct skcipher_request *req,
+@@ -937,5 +948,28 @@ static inline void skcipher_request_set_crypt(
+ 	req->iv = iv;
+ }
+ 
++/**
++ * skcipher_request_set_data_unit_size() - submit as multiple data units
++ * @req: request handle
++ * @data_unit_size: data-unit size in bytes (a multiple of the cipher block
++ *		    size), or 0 to disable
++ *
++ * Process @req as @cryptlen / @data_unit_size data units sharing one starting
++ * @iv, with per-DU IVs derived by treating @iv as a wide counter (the data-
++ * unit-number convention).  @cryptlen must be a positive multiple of
++ * @data_unit_size.  This is honoured only by a tfm that understands data
++ * units -- an instance of the dun(...) template (which splits the request
++ * into one inner call per unit, with the counter endianness given as its
++ * second parameter), or a driver that consumes a whole multi-DU request
++ * natively, which rejects a request violating these constraints with -EINVAL.
++ * A plain skcipher ignores the field.
++ */
++static inline void
++skcipher_request_set_data_unit_size(struct skcipher_request *req,
++				    unsigned int data_unit_size)
++{
++	req->data_unit_size = data_unit_size;
++}
++
+ #endif	/* _CRYPTO_SKCIPHER_H */
+ 
 -- 
 2.47.3
 
