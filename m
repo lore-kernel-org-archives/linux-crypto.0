@@ -1,39 +1,27 @@
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+Received: from psionic.psi5.com (psionic.psi5.com [185.187.169.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A6DD47887A;
-	Tue, 30 Jun 2026 20:24:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0AAD3655CE;
+	Wed,  1 Jul 2026 02:53:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.187.169.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782851084; cv=none; b=mK9HGYVl0eaAGcYURX+8clQ7rxB24mkSrmM1fgZ5JaUPomCZ6Tv1ONHO22Ldr+DKfBLyLl/FDuBJm7uMIAdNRpcD3ZL8FzpDPWt1xvnSi3LuiatPTGb6m8LZoR1EhixK4VPk51ZmYLq+K40m1qrSM685+jXXmyHlMFyWCOA8zco=
+	t=1782874415; cv=none; b=qPN8ES/OixtoTrlFtXcX2MhemWpOuay4/WYl2gA/poHkyC7jTDIqugeJIN6I1KWMNgNkK4kZX6mSQ/BHVbLfRgwLI+T0r4SvffwjgowDDCo7/2lmQjua1/SXXQ3w8jljPE4dVwMawkCNpLfr9z+0yU3xqper7AdXzmj1+G5imy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782851084; c=relaxed/simple;
-	bh=lvnSDXwnO2IamEnDSVp9Sr31rByjrt2f9gYfHAIvtUo=;
+	s=arc-20240116; t=1782874415; c=relaxed/simple;
+	bh=kQjb6s8eSqpZaTAs2ZaSHN/LuWoun0cjyTvFL4/2ePs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GlSAlkFRxFow8ZVhUjnE8VZbPacHYiyC5FmqRtpFlgEBQOF249CIyNGQMgMZm+mdFvICDK+gvSkzaN7i52a2O80KKilhLtxvFrTEjbUsXrza9JdjeO+hmSaa9OIhKUaDTLgVe9WMXRBB1IAKyMNuiLNPxEPYrRi15ji0NEbz+mU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=K5lFI3Zq; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="K5lFI3Zq"
-Received: from [IPV6:2601:646:8081:7da1:c71f:dfcf:59c7:993c] ([IPv6:2601:646:8081:7da1:c71f:dfcf:59c7:993c])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 65UK6ofd3661806
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Tue, 30 Jun 2026 13:06:51 -0700
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 65UK6ofd3661806
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2026062701; t=1782850020;
-	bh=i2G6UAafySOmb8rY0Of+scGPJBnbme4rl6a4zKkZXos=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=K5lFI3Zq4F/mIozRU6/PLoKoYWvuV/6E6cXfs0gd3x7InpQddwy7n7lCqU9zTol6p
-	 iERjS1DYHe87ViLOQDzm87qe53A2nTT739eUJgh3GED1sB/6THV4FmbnfKfjF+gZM6
-	 V3hs8AlxsrgKHqVEonk0hhP6kKL9gYgNa+4EuHtRIhIHX/70mvzshRnY18tWCCdI5w
-	 Ll1EMcK2sxp8iMYsZYSnfeyWpSYeZ1t3FhRicQwouhz9KMqYRLpgCuNpQxbhJ9r8I9
-	 ZsFBJMIoIbws3i0Y3H2zHi5XFwogldA2J2JWZnvAJa/cf38a+7JjgFWPQpcUApHU2I
-	 YRs6tPbYTSHfg==
-Message-ID: <ccd35c56-08ac-46b1-9c76-2554d5a234a9@zytor.com>
-Date: Tue, 30 Jun 2026 13:06:44 -0700
+	 In-Reply-To:Content-Type; b=ocL3ZUyfb/G2Dcd6DsGvaooOZRwa4IRUUkgMV7t82AbED+R7EIZym5cP1lEXjgicvN3MCUsw2mXtLpN03Tza/jzRJbwIKOaNiSSG5H4kta9bcNLRSIs8ZMae5KVnrFhCn0Vv2URFMfZJwBhdkPy7/0Ub5eyZNZfSssSAxNJuSZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de; spf=pass smtp.mailfrom=hogyros.de; arc=none smtp.client-ip=185.187.169.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hogyros.de
+Received: from [192.168.10.90] (unknown [39.110.247.193])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by psionic.psi5.com (Postfix) with ESMTPSA id 054133F07B;
+	Wed,  1 Jul 2026 04:53:20 +0200 (CEST)
+Message-ID: <d96594ba-4ad5-4541-9660-2469875db9b7@hogyros.de>
+Date: Wed, 1 Jul 2026 11:53:16 +0900
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -41,161 +29,52 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/32] x86/msr: Drop 32-bit MSR interfaces
-To: Arnd Bergmann <arnd@arndb.de>, Juergen Gross <jgross@suse.com>,
-        linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org,
-        "linux-edac@vger.kernel.org" <linux-edac@vger.kernel.org>,
-        x86@kernel.org, linux-acpi@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-pci@vger.kernel.org,
-        virtualization@lists.linux.dev, linux-ide@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
-        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
-        linux-hyperv@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linux-mtd@lists.infradead.org,
-        platform-driver-x86@vger.kernel.org
-Cc: "Rafael J . Wysocki" <rafael@kernel.org>,
-        Daniel Lezcano <daniel.lezcano@kernel.org>,
-        Zhang Rui <rui.zhang@intel.com>,
-        "lukasz.luba@arm.com" <lukasz.luba@arm.com>,
-        Jason Baron
- <jbaron@akamai.com>, Borislav Petkov <bp@alien8.de>,
-        Tony Luck <tony.luck@intel.com>, Yazen Ghannam <yazen.ghannam@amd.com>,
-        Len Brown <lenb@kernel.org>, Pavel Machek <pavel@kernel.org>,
-        Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini
- <pbonzini@redhat.com>,
-        "Kirill A. Shutemov" <kas@kernel.org>,
-        Rick Edgecombe <rick.p.edgecombe@intel.com>, Pu Wen <puwen@hygon.cn>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Ajay Kaher <ajay.kaher@broadcom.com>,
-        Alexey Makhalov <alexey.makhalov@broadcom.com>,
-        Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>,
-        Viresh Kumar <viresh.kumar@linaro.org>,
-        Reinette Chatre <reinette.chatre@intel.com>,
-        Dave Martin <Dave.Martin@arm.com>, James Morse <james.morse@arm.com>,
-        Babu Moger <babu.moger@amd.com>,
-        Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
-        Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
-        Dave Airlie <airlied@redhat.com>, Helge Deller <deller@gmx.de>,
-        linux-geode@lists.infradead.org, Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Linus Walleij <linusw@kernel.org>,
-        Bartosz Golaszewski <brgl@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
-        Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        James Clark
- <james.clark@linaro.org>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Huang Rui <ray.huang@amd.com>,
-        Mario Limonciello <mario.limonciello@amd.com>,
-        Perry Yuan <perry.yuan@amd.com>,
-        K Prateek Nayak <kprateek.nayak@amd.com>,
-        "srinivas.pandruvada@linux.intel.com" <srinivas.pandruvada@linux.intel.com>,
-        Artem Bityutskiy <artem.bityutskiy@linux.intel.com>,
-        Artem Bityutskiy <dedekind1@gmail.com>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Ashok Raj <ashok.raj.linux@gmail.com>,
-        Hans de Goede <hansg@kernel.org>,
-        =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-        Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
-        David E Box <david.e.box@intel.com>, xen-devel@lists.xenproject.org
-References: <20260629060526.3638272-1-jgross@suse.com>
- <d7c1db52-529a-43cc-ac7d-38b52627e8bc@app.fastmail.com>
- <c1608c48-13c2-4290-826b-28b5ca51eaf7@suse.com>
- <7332feff-2649-496c-8e49-b0a19eb54a32@app.fastmail.com>
- <9acced19-573d-4923-9329-8be408d2e555@suse.com>
- <d315e0a8-e4e9-4f7e-80a9-7c236849eabd@app.fastmail.com>
-Content-Language: en-US, sv-SE
-From: "H. Peter Anvin" <hpa@zytor.com>
-In-Reply-To: <d315e0a8-e4e9-4f7e-80a9-7c236849eabd@app.fastmail.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH] crypto: af_alg - Add af_alg_restrict sysctl, defaulting
+ to 1
+To: Demi Marie Obenour <demiobenour@gmail.com>,
+ Eric Biggers <ebiggers@kernel.org>
+Cc: Andy Lutomirski <luto@amacapital.net>, linux-crypto@vger.kernel.org,
+ Herbert Xu <herbert@gondor.apana.org.au>, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ iwd@lists.linux.dev, linux-hardening@vger.kernel.org,
+ Milan Broz <gmazyland@gmail.com>
+References: <20260622234803.6982-1-ebiggers@kernel.org>
+ <CALCETrXPj0u=FZ=aFcZAHk3fFZa7rCuPEjx6cOMXmT3sdkC7SA@mail.gmail.com>
+ <20260623192715.GE1850517@google.com>
+ <c7cb79ce-48f9-4433-ab4f-88b4c4df996c@gmail.com>
+ <20260628185404.GA2292@quark>
+ <641f0391-dd4b-4b25-88f5-5298fa6bf823@hogyros.de>
+ <8c24ad17-8295-47be-a562-44c23538c4cb@gmail.com>
+Content-Language: en-US
+From: Simon Richter <Simon.Richter@hogyros.de>
+In-Reply-To: <8c24ad17-8295-47be-a562-44c23538c4cb@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 2026-06-29 01:38, Arnd Bergmann wrote:
->>
->> There is no RDMSRQ instruction on any x86 CPU. Are you mixing this up with
->> WRMSRNS/RDMSR using an immediate for addressing the MSR?
-> 
-> Yes, I was just confused about the exact definition here and assumed
-> the single-register output version was actually called rdmsrq.
-> 
-So just to be clear:
+Hi,
 
-There are three instructions(*):
+On 7/1/26 12:54 AM, Demi Marie Obenour wrote:
 
-	wrmsr		- implicit form only
-	wrmsrns		- implicit or immediate
-	rdmsr		- implicit or immediate
+> That said, if the crypto_rng support is to remain, should it have a
+> non-empty allowlist for privileged processes?  Otherwise, it's dead code
+> with the default sysctl value.
 
-The implicit form are the same on 32 and 64 bits (and, in fact, 16 bits): they
-take a MSR register address in %ecx and the data as two 32-bit words in
-%edx:%eax. This interface predates x86-64 by about a decade, and the Linux MSR
-interfaces were designed when Linux was 32-bit only, so it made sense at the
-time to treat them as two halves, especially since MSRs often are various
-kinds of bitfields. It didn't help that gcc at the time was extremely
-inefficient in its handling of multiword arithmetic (it is much better now),
-so using a u64 would have made for much worse code.
+For desktop users, it is indeed dead, but only if we can guarantee that 
+they will never change the sysctl value to allow all algorithms.
 
-The immediate forms are 64-bit only and use a single arbitrary 64-bit
-register; the MSR address is kept in an immediate in the instruction, just
-like they are for most other register types. The only thing that is "special"
-there is that the possible register address space is very large (2^32)
-although in practice a very small fraction of that is (currently) used.
+So I'd probably do an enabled-by-default configuration option that takes 
+away the option to enable all algorithms, and the RNG code in AF_ALG 
+becomes conditional on that option.
 
-The immediate forms are expected to be faster, and provide for further
-performance improvements in future microarchitectures. This is important,
-because it provides a fine-grain uniform architecture for supervisor-only
-state, instead of having to give a bulk ISA (XSAVES/XRSTORS) that is different
-from the fine-grained architecture, and still get good performance. This gives
-the kernel very fine level control over the context switch flows, for one thing.
+I think that embedded systems will still use this code until a better 
+alternative exists, so it's not entirely dead, and the best way to get 
+rid of it is to build something better.
 
-WRMSRNS is a non-serializing form of WRMSR, which is defined as an
-architecturally hard-serializing instruction, although some MSRs have been
-retconned as non-serializing (and the set is different between vendors.) We
-want to switch that over to the model where the kernel explicitly opts in to
-nonserialization, but that means using alternatives since not all CPUs have
-the WRMSRNS instruction.
+I'd love to see a vDSO based interface for all crypto operations that 
+allows reusing the code in the kernel from userspace, avoids the system 
+call overhead in the likely case that the CPU based implementation is 
+also the most efficient, and allows for more flexibility with hardware 
+interfaces (quite a few allow submission directly from unprivileged 
+processes).
 
-Furthermore, we want to use alternatives so we can make use of the
-immediate-format instructions when the MSR address is known at compile time,
-which it is in *nearly* all cases. If we are smart about it we can also use
-this to let the tracing framework be specific about what MSRs to trace, since
-some MSRs are frequently accessed, but many are set at startup and then
-rarely, if ever, touched.
-
-
-(*) There are actually two more instructions:
-
-	RDMSRLIST
-	WRMSRLIST
-
-... which are bulk versions of RDMSR and WRMSRNS respectively. They can be
-useful to save and restore entire groups of MSRs in one shot, such as
-performance counter configurations. By architecturally allowing the memory
-operations and MSR operations to operate asynchronously, they give some of the
-pipeline benefits of the immediate MSR operations without requiring the MSR
-set to have been set at compile time or code to be dynamically generated.
-
-However, they expose an entirely different programming model, whereas the
-immediate- and -NS instruction choices can be entirely hidden at the C level.
-
+    Simon
