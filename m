@@ -1,265 +1,363 @@
-Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013041.outbound.protection.outlook.com [40.93.201.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A939733FE0D;
-	Wed,  1 Jul 2026 07:31:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1782891098; cv=fail; b=ij0Nqy8pUXz5PvZ7FH1204W+I+72+X/LCJ/ieaJ6ojzC4UUsSuxKvemp/7U00noremJT/HXIxz2Iw2RBO8KLjW60tNp4yURnHqwkUu+dIu6fnk+XcwpzXHXhPwrQJYh0bEHPtXtZXp2e3+58H8Y5FpPSC0FicrDJpT8YVGL8+MQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1782891098; c=relaxed/simple;
-	bh=pc7h5uULeYS6RhyiyyeAtJGA4c4jTckwMuHPEBc6qRM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=j/VGmWHpFsiSbq9AIHTjGLO25l5wq73T78Po3Nlbgn6jv+w5SBcLKFbp/n16Xs/7x+eeOGs8Q0EcsLl46RMPpSBgAJm6IY5feqSimClny8+7BjHEIrPv579qnl9BPtOXRouVR8PDB5JheSekZsO15/0lmy8pFIPQeFq34+4Oka8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=VCHBnp/K; arc=fail smtp.client-ip=40.93.201.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 981103E8688
+	for <linux-crypto@vger.kernel.org>; Wed,  1 Jul 2026 08:33:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1782894814; cv=none; b=fPXWVjlnu7JdGC/TIAaGPpPfDh/txhBEuQ+yy5uULzg2EGKn1wHUl0VnbnmbK79o8r8dOm9tBjw7q9qjYFYI6l1acvg7JcC61kML0SGtufiyaFr+czp4yt6q3t8+zail2no+liCKS1FEOa1EnKX29jdD6INt08cgNsryhC78trg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1782894814; c=relaxed/simple;
+	bh=vjpi9gDuzwwRM7WLjI09X9TThOB1p5PHgz+55yL6rYs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KN1VNAfJ1ByVeeGSSKz43riv2XA1XdaHfmj4ZDbOpBlg4j14IguBf+Ev1Sl7ZYdKZlW/ieoRCZ8hE6+SCZY42azOBT7ACdmJdquvkX9iOalVTE4YQPK30hl3EStRTFbPUc2KIe8g0TXiim4kjCxfUbuPmeXEh6PpuRTFZmiGto8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=DkFUWyqW; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="VCHBnp/K"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=PBU/y99J8WTGfFv+ZJU9ZPBptqKlrj+4iQ+Fdymve9qlcn5R0O75u6fbpro2gBWNxoj+k74TbjGi47wfldB96HQApqIU03bEGprxAOy2x4j4gsDuPhZgihdUjFSrWtwKurosa0XGFDwKYa9nl6s6EFAy4lhhhLAhLiJ47ibusp6WwkEn3aO2K+Y9y1CFRcFiboLOKq97dKd2FVyXuGeAMvU5gibSVMN+ylOfkEsbKEBOX/tD/lXnpnmHJGDhIQp1NeLiPV/ajNKyIi9GF353lQdTOAc1bhd9cJ8JKxWdyiARwcMXJ63Td+dHTPBk8PiNJJZU171FOEUCmq0AFhpqXw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RuV8a1CwzpzVDxsgDrgfy7XNpYOTGy0EFYQPFPpbjcw=;
- b=MN8X7qJFwBRRQn5WESPveBtC/E79HbvVRJJBYKpofQIvUV9uQtF0VUr/DDefuMk2zHrDmWMHxB45D6iSQxrHaEohdfqYo3wP81ZkCElNdBW587JFdpIIqTZJrYgEWYIA9mpAM43SG2EXA8XheJ9s3KxnvyCLWThhDSRCSxPYluPjueJM3DfDMcNRXMtJhjsirxD9JQTMKoGTlw+ENounh35SiC1wrOFOaFJHOezddlzjEokZqk7kcLTPWyUxHIZcExpegnvf+hgmPXf4BJ58abVaXGyMeRLOSe/82kj3KlnDKk1c9hkyw374YfNZ40CpAZE83MgLYDai/C62MGLSXQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RuV8a1CwzpzVDxsgDrgfy7XNpYOTGy0EFYQPFPpbjcw=;
- b=VCHBnp/KV0xkXBtah2L7hRjtUm36VJe7xNmlA3eiI5w4Zsx8qMzqZ5UaAegCioqlCWOlOh6FsPNSYMMaQIvvFLRQ73Tyz/X6g0b5uRIcqmlyLnbrzluPl+AFBKOy+Eia+Fu3IbY6SqKxQOcoj6Hq7nZzJebiaPaxA5oJK6ti6lk=
-Received: from DS7PR12MB9549.namprd12.prod.outlook.com (2603:10b6:8:24e::7) by
- MW6PR12MB8708.namprd12.prod.outlook.com (2603:10b6:303:242::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.8; Wed, 1 Jul 2026
- 07:31:30 +0000
-Received: from DS7PR12MB9549.namprd12.prod.outlook.com
- ([fe80::bace:1330:9ab2:acc6]) by DS7PR12MB9549.namprd12.prod.outlook.com
- ([fe80::bace:1330:9ab2:acc6%6]) with mapi id 15.21.0181.008; Wed, 1 Jul 2026
- 07:31:30 +0000
-From: "Jain, Harsh (AECG-SSW)" <h.jain@amd.com>
-To: Pengpeng Hou <pengpeng@iscas.ac.cn>, "Botcha, Mounika"
-	<Mounika.Botcha@amd.com>, Olivia Mackall <olivia@selenic.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, "Simek, Michal" <michal.simek@amd.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-CC: "Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>, "Savitala, Sarat
- Chand" <sarat.chand.savitala@amd.com>
-Subject: RE: [PATCH] hwrng: xilinx-trng: propagate timeout before any data is
- read
-Thread-Topic: [PATCH] hwrng: xilinx-trng: propagate timeout before any data is
- read
-Thread-Index: AQHdAtabK9gmDgDVD0GaZNSQvCuqerZYUT1g
-Date: Wed, 1 Jul 2026 07:31:29 +0000
-Message-ID:
- <DS7PR12MB954988025789E3A5F4F18FE297F62@DS7PR12MB9549.namprd12.prod.outlook.com>
-References: <20260623060728.18906-1-pengpeng@iscas.ac.cn>
-In-Reply-To: <20260623060728.18906-1-pengpeng@iscas.ac.cn>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_198e8dea-a4f3-4850-b16a-fd6d2b1302b4_Enabled=True;MSIP_Label_198e8dea-a4f3-4850-b16a-fd6d2b1302b4_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;MSIP_Label_198e8dea-a4f3-4850-b16a-fd6d2b1302b4_SetDate=2026-07-01T07:30:15.0000000Z;MSIP_Label_198e8dea-a4f3-4850-b16a-fd6d2b1302b4_Name=AMD
- General
- v26;MSIP_Label_198e8dea-a4f3-4850-b16a-fd6d2b1302b4_ContentBits=3;MSIP_Label_198e8dea-a4f3-4850-b16a-fd6d2b1302b4_Method=Standard
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS7PR12MB9549:EE_|MW6PR12MB8708:EE_
-x-ms-office365-filtering-correlation-id: 189d383a-28ff-4d0c-a202-08ded742c4a5
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|23010399003|1800799024|376014|38070700021|921020|3023799007|11063799006|56012099006|18002099003|22082099003;
-x-microsoft-antispam-message-info:
- L97MEBipzZboF0aH7fTS12ZH9mJpID/apmk07bHqfVqPlFEXrJ2TbnBciKCRI6m7ZFhjo8tG7rM868BdvdojhTMi9JiEkfDFp8g27oXqJkbpFXTDM3nHnmbp8+C6izCXFV7vBEiG4MsdsXoR5zl2biptGrj9BTtCsM0GDdm6wq5n6LNgLw4rI0M8tn3Cyxsb/AJQLKTvNObBEcUdkdE0XglLDqLhzvRlz6iwahqJ1bZ5D8Kk3uvDa/G/DbjBMUto1d2UTVONYp3j1f5ZAzj1HH1YSiwucxxDLRCjP2r4z3CptPDSp7RRzS+ctm2v3RkqoTR3DLBrz9n9TuE6JmELLC7DaarwPlYWhz8APQJ0wAtL97BZFnKQl1ZPntO8DZKLx6G9F5hVJKOi7e9cgKqcQTfliFR9H6YjHTOZ5krghdMI/40fX758VZ7k0VtJ99h3n6vPbou3fddgi94y17FJ1CpqL29o+mqoqjLT9dEkmdsSKRicv8W08wpC+QrIX4X4fIJ4oOhUpwNyKsaGPXH4EjNwjnu6AdkfLOU4tn7wAgTfPQ/bMagk/KqSn0c3yVsdZvORZsBVPTscBQ2Gm4mkoMEGAoZa1C9rZqCKPRhim+tmhc7BVnC8ujeD5vvnV4s2yv4gsFL2I2xgJqzs+ZRlADIC6UkKaj454duSvhbYKhreie5/5Juin+P0+kIY4hD/PpyoKgxFecuNE6OBEUbjou09Yj31OsznlYPCMDsMxGoTvyY4CzfMP5FxlKWDjF9m
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB9549.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(23010399003)(1800799024)(376014)(38070700021)(921020)(3023799007)(11063799006)(56012099006)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?D0Mo0kaP9xA/qOlY5cWX+6iYeZb1oZWpxUFOk7QJaB3g7SF3gmLXrH7CS7TD?=
- =?us-ascii?Q?Z4yVWcbTAlBb8IuIThUyCwyj7FhYNi4AhrCWTxRHD7cg4Cnrsk692lowmvOw?=
- =?us-ascii?Q?M8DzeMnzRnKzQrMNRe24DyooFSReAjrVwdPw0xZ07ad1PSBrLbW4qklF+Lid?=
- =?us-ascii?Q?MpSfCQMsDYzUvwLh6Km02ACJyeXAk06RYVK6h3eacMsJU8t0yOj7zn2OP0ss?=
- =?us-ascii?Q?DzK6K9hDwGF4Cuefl7j1a9vGEb7kc1qbAisBAwD8P1FXqLK2QrlUWp+XP005?=
- =?us-ascii?Q?j/TtSgjU5Uwb7/sCs2LKM6bMzh+FybbF+1NeFd//BieSLyZkRVcLMY16FI2U?=
- =?us-ascii?Q?g6fEPNJSPOIGD/WLeYjK82wFBSEbg80QEDbuXYy2BUyQCpfwpunKFRVQ4e68?=
- =?us-ascii?Q?b5T5ri3iae3octsmW/+7AHhS7ukE/aEK1uuGTP0dMGupkA1xV3EVAEy3oSf+?=
- =?us-ascii?Q?KZv3zbJ+iIOkOuUakVpSel3Llfii1+NpX/3QSJuJ0C6YrZAOj4+pcMbAwFVD?=
- =?us-ascii?Q?NYEk30WYnw73+/kfmqd+RIda00e+ZntUzAVWCNmej8zrWG5VZUxj4NZ2d/zA?=
- =?us-ascii?Q?2+I3ukM6VOed3a8JPgxGVHt1o7geGIFw1b//hxyffVqnbq7i5sWBsPrGHFyD?=
- =?us-ascii?Q?VVDhhFBHQ5EIWbY6u1U1d3Oycli2f2S5zNSS2BiJ0uH1C0JrB1FvtiL0NHxs?=
- =?us-ascii?Q?uZpviqTtL3w8WsYbl4NHF1Ca3tWlXLKk5DrnSpFiZGJ+ssBCySpv99q27LzS?=
- =?us-ascii?Q?zupt1Q8lfOedIRsEkVa7emkYBA2qvYHS3CAutosLrCDjC+eJYwX5KD7x9fRh?=
- =?us-ascii?Q?VyPSTqW06pScp4cwKvdNUGSMQQEiwNg5gY7RS8HZ+j5Rh8wsXqzc1bitzewZ?=
- =?us-ascii?Q?6U5gvsrr5NFwXANwDUVaPLa18AWzL4rhOK9DqPqZxtrwFgJwOyugck9/5+XF?=
- =?us-ascii?Q?21BnZiUgNRJ1GPqbeCfEScqmoVHGqCMfsltLlVKqX7FdHv3RXfmQoWP04goJ?=
- =?us-ascii?Q?Y5d0UDhOmfhqcAvJy9n0ED/r6a0aeidnEsMAMWkJYRFnpny2buPQqV2WxbuQ?=
- =?us-ascii?Q?BAvm7UWwEKHm7S6DiKBYaC11xMoU6I8WKEVsg7uh3wX8p53sRAgllFBbdqjG?=
- =?us-ascii?Q?2EANQzxTRsaXDfK4Wj9YBbQ6dZFYBLVtbkPc14GX8pEPliJIffyWkb3KLtLK?=
- =?us-ascii?Q?TDCkwYQJDHYdDcYQKa1uwn0CVHP3XMJV4WHAEz081rv+cwtapy8dp5MKZ4Um?=
- =?us-ascii?Q?ClMaAYBCpkJS+8DoGIKeFVpx6V89h/SYqhBwMAc/fJxpfu4IHlAop6p2JKJP?=
- =?us-ascii?Q?hVEtNnRwFkNZ7/pnjc5OIcGalcnt4UI58Trz2nCOMbTlJAXkJIJU9SFEXrwP?=
- =?us-ascii?Q?zKAU/rg4Zeuu53uRTIlW1g3+YPgWnw37klv8cScWg7wNgF6QWuDyWWBKVkKb?=
- =?us-ascii?Q?5ECBJO2R1/a2pwLvP/84TKZnFZ7TGxxUBR9bT2R/OIsMfqjkq9aaX+uhvzFd?=
- =?us-ascii?Q?UapURMe53HaBxt9wau0Fkw+dQiYhPirCYKKC/sfKfM91EFkT3q+T+5RVPAXa?=
- =?us-ascii?Q?T05Tuy7njOlOqYavpeoJl/xBzFUjVtMKTopNgDpenphvq2g3iz0m/LZkWeC0?=
- =?us-ascii?Q?ktCp8jpwhdDOs/gCV3vD+GR5s5HgbwsdTkG5OOlTc/j6yX04UdJ/ZTdvObZl?=
- =?us-ascii?Q?hiWS6I2K2wP/2mpTJt0gohR5QddbqNSJnaopqh4N/elclXxc?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="DkFUWyqW"
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-697763eeafcso698631a12.3
+        for <linux-crypto@vger.kernel.org>; Wed, 01 Jul 2026 01:33:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1782894810; x=1783499610; darn=vger.kernel.org;
+        h=in-reply-to:autocrypt:from:content-language:references:cc:to
+         :subject:user-agent:mime-version:date:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=vjpi9gDuzwwRM7WLjI09X9TThOB1p5PHgz+55yL6rYs=;
+        b=DkFUWyqWgHxHYcBp/nkaazJBOgywn1jIJGObl7tyCpjYq9+mpQKE+0rynd2RjzfAln
+         TfpbQG1lMoQrqU2qN/QNEJrSnUNTuJDCihBoNOPiNjSsf8gMYeHq4a+oS513NxoZz+E9
+         Odh+0eqoXLTk3yGO/G1x3pOr0oR+2gXsdJXRTV5EzHkYrsoAX9CVJWxOvTzEQtox/BrK
+         LmvuNVDJQ+tBKftxx/vOWMhmHIwJ2fqU63brG78qvhy3up//G6cYDjnATwlwhIfR+7R/
+         mD1mFHE2Bu4D/3hu8ajaIwZq/P1TEnqwZhExPIFBCCAdizo5oKdylPa7PUUgedYmHqfI
+         poaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1782894810; x=1783499610;
+        h=in-reply-to:autocrypt:from:content-language:references:cc:to
+         :subject:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vjpi9gDuzwwRM7WLjI09X9TThOB1p5PHgz+55yL6rYs=;
+        b=IsUFXc64GbZ2kZH+EgQtGfkzbk4Y6A6n7wAC/fYDYsjrKHCtuIqPcCKZ41MkPYy768
+         enCr448U65WBbszWWyRk0lEOhMH+3WK8t1NYheXfiiF8oXR4pi7adVmM+iR7TjXO/Gz9
+         FlYIxP4OAfkCqCMqFUHPzHJIuW+Krsl7EXRZ27y6Nekf2T1lqZkRKZbhboosUcumO7qa
+         oat6WsdRzN/vZCFB0LRs/UDck0YAZV33L4kuwDJEZsA4ko9WRyEQmOFEpTd3iUFYm0XO
+         WPs9ekt4LNtaTZkMJRZvz/i9v9JD9uaRMhHodnFVUYK1xsFbbZTfuB8SJiTKr6fmea6G
+         CCjA==
+X-Forwarded-Encrypted: i=1; AHgh+RpcjE/t0vasfxpehHmSd42T3NSyGOosqTGwE3P2nm/DkA8DY5CMwYHdQNfEvM2kOFaTOwhMrpJeooT/25Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9qBNmEvBox9an4Tii8DCME7ZXO3VfvKvlT8OQhPFnUqJ5VFT2
+	W1cn81KZ3Wkgl0gA8cGK2usCCIEoVAfif0cZMpXShlDZij4q1nnUeNhIXJBgJ4BMdfQ=
+X-Gm-Gg: AfdE7cmaMSL3RnTiDAEous4rEU32mJwMVTNrfIJZisG+Itfzu/HMDr+we+v7du074Ba
+	iUt8yKwcLUP+KbD0nRj5YZTDG3L4L6X1obUiSMrmQORpLVCIZ4sw8SJSkE0B3beZgCaTohOUTTh
+	o9VxcTiH5JIKzsb9Tz3G9yuaQEkICkjfzBOBaZBEgidJCl50agGF4Ovka4Iz1cwhxg5AZXBG+hd
+	wiQ4TEzwudt/frtvaru5jdTQzmVG2jbdOpZ00Xx86mvpEdMhs0UmLkZ3pc+qpeKEc0A2R6EiZt2
+	qdsav6niYH/BFKSjGSTTd3AW0LmEP5KyLKap5inikLYJf3LifkEDYJyJ4kCTsS3nWyGFMx57B27
+	OHSxSRS9kaoK7oiG+LZkMd+w1IvawC2XToq0vLX/93p5oRV6KiK4IzG9tpM3QJ0GC2J4Gok443V
+	dy2QaLrviCKjBcsgrj6yCTox8n4TMLDhUCvkQHZuTcSKuKmd6nZJG3Og77M+Fbqgdmgc5PVZdFu
+	qwRxEfmSLLJgTfa9HAviYg98Lu5rj6lLxdUJ/gzbPW7v5OLM+bC9g==
+X-Received: by 2002:a05:6402:4146:b0:698:99be:29d6 with SMTP id 4fb4d7f45d1cf-6989f38e868mr343446a12.29.1782894809526;
+        Wed, 01 Jul 2026 01:33:29 -0700 (PDT)
+Received: from ?IPV6:2a00:12d0:af5d:ad01:5d3f:14e6:9bcb:5112? (2a00-12d0-af5d-ad01-5d3f-14e6-9bcb-5112.ip.tng.de. [2a00:12d0:af5d:ad01:5d3f:14e6:9bcb:5112])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6987c21f123sm2359277a12.0.2026.07.01.01.33.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Jul 2026 01:33:29 -0700 (PDT)
+Message-ID: <0c5e4515-b51e-4b19-8389-a76cabc88042@suse.com>
+Date: Wed, 1 Jul 2026 10:33:27 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB9549.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 189d383a-28ff-4d0c-a202-08ded742c4a5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Jul 2026 07:31:29.9980
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: WlEz3eWPAfFDIC4xFo87qb8maMS9LBu9o9ZueReAaR2tYf2dz5EFJMTjXU2M5Kt0
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8708
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/32] x86/msr: Drop 32-bit MSR interfaces
+To: Sean Christopherson <seanjc@google.com>, Ingo Molnar <mingo@kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org,
+ linux-pm@vger.kernel.org,
+ "linux-edac@vger.kernel.org" <linux-edac@vger.kernel.org>, x86@kernel.org,
+ linux-acpi@vger.kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+ linux-pci@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-ide@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linux-fbdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+ "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+ linux-hyperv@vger.kernel.org, linux-hwmon@vger.kernel.org,
+ linux-perf-users@vger.kernel.org, linux-mtd@lists.infradead.org,
+ platform-driver-x86@vger.kernel.org, "Rafael J . Wysocki"
+ <rafael@kernel.org>, Daniel Lezcano <daniel.lezcano@kernel.org>,
+ Zhang Rui <rui.zhang@intel.com>, "lukasz.luba@arm.com"
+ <lukasz.luba@arm.com>, Jason Baron <jbaron@akamai.com>,
+ Borislav Petkov <bp@alien8.de>, Tony Luck <tony.luck@intel.com>,
+ Yazen Ghannam <yazen.ghannam@amd.com>, Len Brown <lenb@kernel.org>,
+ Pavel Machek <pavel@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
+ Ingo Molnar <mingo@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "H. Peter Anvin" <hpa@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Kirill A. Shutemov" <kas@kernel.org>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>, Pu Wen <puwen@hygon.cn>,
+ Bjorn Helgaas <bhelgaas@google.com>, Ajay Kaher <ajay.kaher@broadcom.com>,
+ Alexey Makhalov <alexey.makhalov@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>,
+ Viresh Kumar <viresh.kumar@linaro.org>,
+ Reinette Chatre <reinette.chatre@intel.com>,
+ Dave Martin <Dave.Martin@arm.com>, James Morse <james.morse@arm.com>,
+ Babu Moger <babu.moger@amd.com>, Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
+ Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
+ Dave Airlie <airlied@redhat.com>, Helge Deller <deller@gmx.de>,
+ linux-geode@lists.infradead.org, Olivia Mackall <olivia@selenic.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Linus Walleij <linusw@kernel.org>,
+ Bartosz Golaszewski <brgl@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "K. Y. Srinivasan" <kys@microsoft.com>,
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+ Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>,
+ Guenter Roeck <linux@roeck-us.net>, Peter Zijlstra <peterz@infradead.org>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+ Adrian Hunter <adrian.hunter@intel.com>, James Clark
+ <james.clark@linaro.org>, Josh Poimboeuf <jpoimboe@kernel.org>,
+ Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, Andy Lutomirski <luto@kernel.org>,
+ Boris Ostrovsky <boris.ostrovsky@oracle.com>, Huang Rui <ray.huang@amd.com>,
+ Mario Limonciello <mario.limonciello@amd.com>,
+ Perry Yuan <perry.yuan@amd.com>, K Prateek Nayak <kprateek.nayak@amd.com>,
+ "srinivas.pandruvada@linux.intel.com" <srinivas.pandruvada@linux.intel.com>,
+ Artem Bityutskiy <artem.bityutskiy@linux.intel.com>,
+ Artem Bityutskiy <dedekind1@gmail.com>,
+ Miquel Raynal <miquel.raynal@bootlin.com>,
+ Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
+ Ashok Raj <ashok.raj.linux@gmail.com>, Hans de Goede <hansg@kernel.org>,
+ =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
+ David E Box <david.e.box@intel.com>, xen-devel@lists.xenproject.org
+References: <20260629060526.3638272-1-jgross@suse.com>
+ <d7c1db52-529a-43cc-ac7d-38b52627e8bc@app.fastmail.com>
+ <c1608c48-13c2-4290-826b-28b5ca51eaf7@suse.com>
+ <7332feff-2649-496c-8e49-b0a19eb54a32@app.fastmail.com>
+ <akJUz0kYkEBdLSZ3@gmail.com> <akQR9YMtMHReJTfB@google.com>
+Content-Language: en-US
+From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
+Autocrypt: addr=jgross@suse.com; keydata=
+ xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOB
+ ycWxw3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJve
+ dYm8Of8Zd621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJ
+ NwQpd369y9bfIhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvx
+ XP3FAp2pkW0xqG7/377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEB
+ AAHNH0p1ZXJnZW4gR3Jvc3MgPGpncm9zc0BzdXNlLmNvbT7CwHkEEwECACMFAlOMcK8CGwMH
+ CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRCw3p3WKL8TL8eZB/9G0juS/kDY9LhEXseh
+ mE9U+iA1VsLhgDqVbsOtZ/S14LRFHczNd/Lqkn7souCSoyWsBs3/wO+OjPvxf7m+Ef+sMtr0
+ G5lCWEWa9wa0IXx5HRPW/ScL+e4AVUbL7rurYMfwCzco+7TfjhMEOkC+va5gzi1KrErgNRHH
+ kg3PhlnRY0Udyqx++UYkAsN4TQuEhNN32MvN0Np3WlBJOgKcuXpIElmMM5f1BBzJSKBkW0Jc
+ Wy3h2Wy912vHKpPV/Xv7ZwVJ27v7KcuZcErtptDevAljxJtE7aJG6WiBzm+v9EswyWxwMCIO
+ RoVBYuiocc51872tRGywc03xaQydB+9R7BHPzsBNBFOMcBYBCADLMfoA44MwGOB9YT1V4KCy
+ vAfd7E0BTfaAurbG+Olacciz3yd09QOmejFZC6AnoykydyvTFLAWYcSCdISMr88COmmCbJzn
+ sHAogjexXiif6ANUUlHpjxlHCCcELmZUzomNDnEOTxZFeWMTFF9Rf2k2F0Tl4E5kmsNGgtSa
+ aMO0rNZoOEiD/7UfPP3dfh8JCQ1VtUUsQtT1sxos8Eb/HmriJhnaTZ7Hp3jtgTVkV0ybpgFg
+ w6WMaRkrBh17mV0z2ajjmabB7SJxcouSkR0hcpNl4oM74d2/VqoW4BxxxOD1FcNCObCELfIS
+ auZx+XT6s+CE7Qi/c44ibBMR7hyjdzWbABEBAAHCwF8EGAECAAkFAlOMcBYCGwwACgkQsN6d
+ 1ii/Ey9D+Af/WFr3q+bg/8v5tCknCtn92d5lyYTBNt7xgWzDZX8G6/pngzKyWfedArllp0Pn
+ fgIXtMNV+3t8Li1Tg843EXkP7+2+CQ98MB8XvvPLYAfW8nNDV85TyVgWlldNcgdv7nn1Sq8g
+ HwB2BHdIAkYce3hEoDQXt/mKlgEGsLpzJcnLKimtPXQQy9TxUaLBe9PInPd+Ohix0XOlY+Uk
+ QFEx50Ki3rSDl2Zt2tnkNYKUCvTJq7jvOlaPd6d/W0tZqpyy7KVay+K4aMobDsodB3dvEAs6
+ ScCnh03dDAFgIq5nsB11j3KPKdVoPlfucX2c7kGNH+LUMbzqV6beIENfNexkOfxHfw==
+In-Reply-To: <akQR9YMtMHReJTfB@google.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------yR0aQa1Dp38FRBSVbM28PBR6"
 
-AMD General
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------yR0aQa1Dp38FRBSVbM28PBR6
+Content-Type: multipart/mixed; boundary="------------vD8700IqVizDT0GQTpFiBkTP";
+ protected-headers="v1"
+From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
+To: Sean Christopherson <seanjc@google.com>, Ingo Molnar <mingo@kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org,
+ linux-pm@vger.kernel.org,
+ "linux-edac@vger.kernel.org" <linux-edac@vger.kernel.org>, x86@kernel.org,
+ linux-acpi@vger.kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+ linux-pci@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-ide@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linux-fbdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+ "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+ linux-hyperv@vger.kernel.org, linux-hwmon@vger.kernel.org,
+ linux-perf-users@vger.kernel.org, linux-mtd@lists.infradead.org,
+ platform-driver-x86@vger.kernel.org, "Rafael J . Wysocki"
+ <rafael@kernel.org>, Daniel Lezcano <daniel.lezcano@kernel.org>,
+ Zhang Rui <rui.zhang@intel.com>, "lukasz.luba@arm.com"
+ <lukasz.luba@arm.com>, Jason Baron <jbaron@akamai.com>,
+ Borislav Petkov <bp@alien8.de>, Tony Luck <tony.luck@intel.com>,
+ Yazen Ghannam <yazen.ghannam@amd.com>, Len Brown <lenb@kernel.org>,
+ Pavel Machek <pavel@kernel.org>, Thomas Gleixner <tglx@kernel.org>,
+ Ingo Molnar <mingo@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "H. Peter Anvin" <hpa@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Kirill A. Shutemov" <kas@kernel.org>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>, Pu Wen <puwen@hygon.cn>,
+ Bjorn Helgaas <bhelgaas@google.com>, Ajay Kaher <ajay.kaher@broadcom.com>,
+ Alexey Makhalov <alexey.makhalov@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>,
+ Viresh Kumar <viresh.kumar@linaro.org>,
+ Reinette Chatre <reinette.chatre@intel.com>,
+ Dave Martin <Dave.Martin@arm.com>, James Morse <james.morse@arm.com>,
+ Babu Moger <babu.moger@amd.com>, Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
+ Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
+ Dave Airlie <airlied@redhat.com>, Helge Deller <deller@gmx.de>,
+ linux-geode@lists.infradead.org, Olivia Mackall <olivia@selenic.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Linus Walleij <linusw@kernel.org>,
+ Bartosz Golaszewski <brgl@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "K. Y. Srinivasan" <kys@microsoft.com>,
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+ Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>,
+ Guenter Roeck <linux@roeck-us.net>, Peter Zijlstra <peterz@infradead.org>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
+ Adrian Hunter <adrian.hunter@intel.com>, James Clark
+ <james.clark@linaro.org>, Josh Poimboeuf <jpoimboe@kernel.org>,
+ Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>, Andy Lutomirski <luto@kernel.org>,
+ Boris Ostrovsky <boris.ostrovsky@oracle.com>, Huang Rui <ray.huang@amd.com>,
+ Mario Limonciello <mario.limonciello@amd.com>,
+ Perry Yuan <perry.yuan@amd.com>, K Prateek Nayak <kprateek.nayak@amd.com>,
+ "srinivas.pandruvada@linux.intel.com" <srinivas.pandruvada@linux.intel.com>,
+ Artem Bityutskiy <artem.bityutskiy@linux.intel.com>,
+ Artem Bityutskiy <dedekind1@gmail.com>,
+ Miquel Raynal <miquel.raynal@bootlin.com>,
+ Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
+ Ashok Raj <ashok.raj.linux@gmail.com>, Hans de Goede <hansg@kernel.org>,
+ =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
+ David E Box <david.e.box@intel.com>, xen-devel@lists.xenproject.org
+Message-ID: <0c5e4515-b51e-4b19-8389-a76cabc88042@suse.com>
+Subject: Re: [PATCH 00/32] x86/msr: Drop 32-bit MSR interfaces
+References: <20260629060526.3638272-1-jgross@suse.com>
+ <d7c1db52-529a-43cc-ac7d-38b52627e8bc@app.fastmail.com>
+ <c1608c48-13c2-4290-826b-28b5ca51eaf7@suse.com>
+ <7332feff-2649-496c-8e49-b0a19eb54a32@app.fastmail.com>
+ <akJUz0kYkEBdLSZ3@gmail.com> <akQR9YMtMHReJTfB@google.com>
+In-Reply-To: <akQR9YMtMHReJTfB@google.com>
 
-Reviewed-by : Harsh Jain <h.jain@amd.com>
+--------------vD8700IqVizDT0GQTpFiBkTP
+Content-Type: multipart/mixed; boundary="------------jBK7pBe03sqwPCAFbkx06T5B"
 
+--------------jBK7pBe03sqwPCAFbkx06T5B
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-> -----Original Message-----
-> From: Pengpeng Hou <pengpeng@iscas.ac.cn>
-> Sent: Tuesday, June 23, 2026 11:37 AM
-> To: Botcha, Mounika <Mounika.Botcha@amd.com>; Jain, Harsh (AECG-SSW)
-> <h.jain@amd.com>; Olivia Mackall <olivia@selenic.com>; Herbert Xu
-> <herbert@gondor.apana.org.au>; Simek, Michal <michal.simek@amd.com>; linu=
-x-
-> crypto@vger.kernel.org; linux-arm-kernel@lists.infradead.org; linux-
-> kernel@vger.kernel.org
-> Cc: Pengpeng Hou <pengpeng@iscas.ac.cn>
-> Subject: [PATCH] hwrng: xilinx-trng: propagate timeout before any data is=
- read
->
->
-> xtrng_readblock32() polls for 16-byte chunks but returns the number of
-> bytes read even when the first poll times out. Its caller then treats a
-> zero return as a short successful read, and partial reads for full
-> 32-byte blocks can make the tail copy use a fixed block offset rather
-> than the amount already produced.
->
-> Return the poll error when no data has been read, preserve partial
-> positive returns after some data is available, stop the generator on all
-> collection exits, and append tail bytes at the current output count.
->
-> Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
-> ---
->  drivers/char/hw_random/xilinx-trng.c | 32 +++++++++++++++++++++-------
->  1 file changed, 24 insertions(+), 8 deletions(-)
->
-> diff --git a/drivers/char/hw_random/xilinx-trng.c b/drivers/char/hw_rando=
-m/xilinx-
-> trng.c
-> index f615d5adddde..4a1a168bb46a 100644
-> --- a/drivers/char/hw_random/xilinx-trng.c
-> +++ b/drivers/char/hw_random/xilinx-trng.c
-> @@ -87,8 +87,8 @@ static void xtrng_softreset(struct xilinx_rng *rng)
->         xtrng_readwrite32(rng->rng_base + TRNG_CTRL_OFFSET,
-> TRNG_CTRL_PRNGSRST_MASK, 0);
->  }
->
-> -/* Return no. of bytes read */
-> -static size_t xtrng_readblock32(void __iomem *rng_base, __be32 *buf, int
-> blocks32, bool wait)
-> +/* Return no. of bytes read or a negative error before any data is read.=
- */
-> +static int xtrng_readblock32(void __iomem *rng_base, __be32 *buf, int bl=
-ocks32,
-> bool wait)
->  {
->         int read =3D 0, ret;
->         int timeout =3D 1;
-> @@ -103,8 +103,11 @@ static size_t xtrng_readblock32(void __iomem *rng_ba=
-se,
-> __be32 *buf, int blocks3
->                 ret =3D readl_poll_timeout(rng_base + TRNG_STATUS_OFFSET,=
- val,
->                                          (val & TRNG_STATUS_QCNT_MASK) =
-=3D=3D
->                                          TRNG_STATUS_QCNT_16_BYTES, !!wai=
-t, timeout);
-> -               if (ret)
-> +               if (ret) {
-> +                       if (!read)
-> +                               return ret;
->                         break;
-> +               }
->
->                 for (idx =3D 0; idx < TRNG_READ_4_WORD; idx++) {
->                         *(buf + read) =3D cpu_to_be32(ioread32(rng_base +
-> TRNG_CORE_OUTPUT_OFFSET));
-> @@ -119,27 +122,40 @@ static int xtrng_collect_random_data(struct xilinx_=
-rng
-> *rng, u8 *rand_gen_buf,
->  {
->         u8 randbuf[TRNG_SEC_STRENGTH_BYTES];
->         int byteleft, blocks, count =3D 0;
-> +       int full_blocks_bytes;
->         int ret;
->
->         byteleft =3D no_of_random_bytes & (TRNG_SEC_STRENGTH_BYTES - 1);
->         blocks =3D no_of_random_bytes >> TRNG_SEC_STRENGTH_SHIFT;
-> +       full_blocks_bytes =3D blocks * TRNG_SEC_STRENGTH_BYTES;
->         xtrng_readwrite32(rng->rng_base + TRNG_CTRL_OFFSET,
-> TRNG_CTRL_PRNGSTART_MASK,
->                           TRNG_CTRL_PRNGSTART_MASK);
->         if (blocks) {
->                 ret =3D xtrng_readblock32(rng->rng_base, (__be32 *)rand_g=
-en_buf, blocks,
-> wait);
-> -               if (!ret)
-> -                       return 0;
-> +               if (ret <=3D 0) {
-> +                       count =3D ret;
-> +                       goto out_stop;
-> +               }
->                 count +=3D ret;
-> +               if (ret < full_blocks_bytes)
-> +                       goto out_stop;
->         }
->
->         if (byteleft) {
->                 ret =3D xtrng_readblock32(rng->rng_base, (__be32 *)randbu=
-f, 1, wait);
-> +               if (ret < 0) {
-> +                       if (!count)
-> +                               count =3D ret;
-> +                       goto out_stop;
-> +               }
->                 if (!ret)
-> -                       return count;
-> -               memcpy(rand_gen_buf + (blocks * TRNG_SEC_STRENGTH_BYTES),
-> randbuf, byteleft);
-> -               count +=3D byteleft;
-> +                       goto out_stop;
-> +               ret =3D min(ret, no_of_random_bytes - count);
-> +               memcpy(rand_gen_buf + count, randbuf, ret);
-> +               count +=3D ret;
->         }
->
-> +out_stop:
->         xtrng_readwrite32(rng->rng_base + TRNG_CTRL_OFFSET,
->                           TRNG_CTRL_PRNGMODE_MASK |
-> TRNG_CTRL_PRNGSTART_MASK, 0U);
->
-> --
-> 2.50.1 (Apple Git-155)
+T24gMzAuMDYuMjYgMjA6NTksIFNlYW4gQ2hyaXN0b3BoZXJzb24gd3JvdGU6DQo+IE9uIE1v
+biwgSnVuIDI5LCAyMDI2LCBJbmdvIE1vbG5hciB3cm90ZToNCj4+ICogQXJuZCBCZXJnbWFu
+biA8YXJuZEBhcm5kYi5kZT4gd3JvdGU6DQo+Pg0KPj4+Pj4+IE5vdGUgdGhhdCBtb3N0IHBh
+dGNoZXMgb2YgdGhpcyBzZXJpZXMgYXJlIGluZGVwZW5kZW50IGZyb20gZWFjaCBvdGhlci4N
+Cj4+Pj4+PiBPbmx5IHRoZSBwYXRjaGVzIHJlbW92aW5nIGEgc3BlY2lmaWMgaW50ZXJmYWNl
+IChwYXRjaGVzIDcsIDE1LCAyNiBhbmQNCj4+Pj4+PiAzMCkgYW5kIHRoZSBsYXN0IHR3byBw
+YXRjaGVzIG9mIHRoZSBzZXJpZXMgZGVwZW5kIG9uIGFsbCBwcmV2aW91cw0KPj4+Pj4+IHBh
+dGNoZXMuDQo+Pj4+Pg0KPj4+Pj4gSXQgbG9va3MgbGlrZSB5b3UgYXJlIHRvdWNoaW5nIG1v
+c3QgZmlsZXMgdHdpY2Ugb3IgbW9yZSBoZXJlLCB0bw0KPj4+Pj4gZmlyc3QgY29udmVydCBm
+cm9tIHJkbXNyIHRvIHJkbXNycSBhbmQgdGhlbiB0byBjaGFuZ2UgdGhlDQo+Pj4+PiB0d28t
+YXJndW1lbnQgcmRtc3JxKCkgbWFjcm8gdG8gYSBzaW5nbGUtYXJndW1lbnQgaW5saW5lLiBJ
+ZiB5b3UNCj4+Pj4+IGludHJvZHVjZSB0aGUgaW5saW5lIHZlcnNpb24gb2YgcmRtc3JxKCkg
+Zmlyc3QsIHlvdSBzaG91bGQgYmUNCj4+Pj4+IGFibGUgdG8gc2tpcCB0aGUgc2Vjb25kIHN0
+ZXAgKHBhdGNoIDMxKSBhcyB0aGV5IGNvdWxkIGJlIGFibGUNCj4+Pj4+IHRvIGNvZXhpc3Qu
+DQo+Pj4+DQo+Pj4+IEkndmUgZGlzY3Vzc2VkIGhvdyB0byBzdHJ1Y3R1cmUgdGhlIHNlcmll
+cyB3aXRoIEluZ28gTW9sbmFyIGJlZm9yZSBbMV0uIFRoZQ0KPj4+PiBjdXJyZW50IGFwcHJv
+YWNoIHdhcyBoaXMgcHJlZmVyZW5jZS4NCj4+Pg0KPj4+IE9rLg0KPj4NCj4+IE5vdGUgdGhh
+dCB0aGUgaW5kaXZpZHVhbCBwYXRjaGVzIGFyZSBJTU8gc2lnbmlmaWNhbnRseSBlYXNpZXIg
+dG8gcmV2aWV3DQo+PiB0aHJvdWdoIHRoZSBhY3R1YWwgMzItYml0ID0+IDY0LWJpdCB2YXJp
+YWJsZSBhc3NpZ25tZW50IGNoYW5nZXMgZG9uZQ0KPj4gaW4gaXNvbGF0aW9uICh3aGljaCBz
+b21ldGltZXMgaW5jbHVkZSBtaW5vciBjbGVhbnVwcyksIHdoaWxlDQo+PiB0aGUgQ29jY2lu
+ZWxsZSBzZW1hbnRpYyBwYXRjaDoNCj4+DQo+PiAgICAgeyBhKGIsYykgPT4gYyA9IGEoYikg
+fQ0KPj4NCj4+IHdoaWNoIGNoYW5nZXMgYm90aCB0aGUgZnVuY3Rpb24gc2lnbmF0dXJlIGFu
+ZCB0aGUgb3JkZXIgb2YgdGVybXMgYXMNCj4+IHdlbGwsIGlzIGp1c3QgYSBzaW5nbGUgYWRk
+LW9uIHRyZWV3aWRlIHBhdGNoLg0KPiANCj4gSXMgdGhlIHBsYW4gZm9yIHN1YnN5c3RlbSBt
+YWludGFpbmVycyB0byBwaWNrIHVwIHRoZSByZWxldmFudCBwYXRjaGVzLCBhbmQgdGhlbg0K
+PiBkbyB0aGUgdHJlZXdpZGUgY2hhbmdlIG9uZSByZWxlYXNlIGN5Y2xlIGxhdGVyPw0KDQpZ
+ZXMsIHBsZWFzZS4NCg0KDQpKdWVyZ2VuDQo=
+--------------jBK7pBe03sqwPCAFbkx06T5B
+Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
 
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+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
+kt+z4drzFUyEjLM1vVvIMjkUoJs=3D
+=3DeeAB
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------jBK7pBe03sqwPCAFbkx06T5B--
+
+--------------vD8700IqVizDT0GQTpFiBkTP--
+
+--------------yR0aQa1Dp38FRBSVbM28PBR6
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmpE0NcFAwAAAAAACgkQsN6d1ii/Ey+4
+VQf5ARTTFZkvO/RB1pgLA5pxpW3UUS3uxxV7SopNU0hZc/AzNq9az9lJfyH7jPZ8QBmU9IKulebG
+ITlyXQQs6UjK+gdS9lqvVR/gt7jXQo56BFaXUZQwHSt8ln7k9LhUmdEaBj2m305DZnpb9SGilWTg
+FU/0xAyiM++MkxazBUebIsHavKxiZg3dIjZQ6L7GCivFopHxm59Fg0dv+E0OzaQGPmtrz/oR7sNP
+AkYiOzz84cF2fQXnHTlKAU02RMhfJ2YDp/KAdwPaf1hFwAZsNFL3usH2Ku34Q0ARJoRpUockNhfc
+G3t+JspAVbLH9NBe6jFF+6eWh86FKPsmtwZt0e9tvQ==
+=ng7t
+-----END PGP SIGNATURE-----
+
+--------------yR0aQa1Dp38FRBSVbM28PBR6--
