@@ -1,113 +1,124 @@
-Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BF7F3D45EA
-	for <linux-crypto@vger.kernel.org>; Fri,  3 Jul 2026 14:09:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783087783; cv=pass; b=j304DIG17gv13bQ8Pd7iTQ1wXB0ZoJAnZ4gVAbqwNCBQXSurjsg9Ng9QxR5ppfQi9iSJnZ4E633N5ZraERd6Gy0db5E34F7QCexmTlVUTLgwxab1X/tNEg0T9B8MWuHenXlJ6SC5o9tNH1YsU6vQU/OK/3/0TYOk7qA83jXwdXg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783087783; c=relaxed/simple;
-	bh=nPlr4TTuFu5sDiDKlEBaYUGajGflCNHRFrMOSsr1njI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hIK2nWhSOa5Xach/41mwdwkTh/oJZfiDwSXYT2sNqGBeJQi950ybOXfWDAvxmbAw/4doQQMIQPxxNdqSre5tAxTOn9as8aBiMjD//P/J94wwsOVUvaXTi8fYxs/vi9KXiwQZJhIdhjVVcRyfzbG6iV2pckiRkABeDHpw8SNRb4Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SllowcRF; arc=pass smtp.client-ip=74.125.224.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4C025B09C;
+	Fri,  3 Jul 2026 17:38:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783100300; cv=none; b=T+NRX0Jh8wRk5bsZLed/ObPxzSTV+wsNTj6x97tSW+s3lWsC5NV02aGx4FMvHabk3bavUqg3vevlcRDL/sGwnFq4gJMdUCnwB2DMTLmWGMOT0Fz/c8FR4gdRZX+Zo/HoEMg8hSNVYyxA2vrEOhL/kN7xws3f/x/aQTaZ0jXHKnM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783100300; c=relaxed/simple;
+	bh=nXJnsdLsM93mqYbkHmj9fVt5nkAxY73wwf1qK2C6pG0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lWqedSAjqXoW7LfcKKJR0Nw/p71Jiqdb87HfcA8QBWQLhA07cCwam2G6WUBn1m2ijJw+MkmOD54WWEiBU6TulWH969Zuhub9g0mcovu2Bp4+GqWfufe1lBinq48gtIlcXXeKk1+U4+q8InrD8IdsOLJR4lomfSsa59xEpbv8i7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fhtn9Dio; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SllowcRF"
-Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-664dd23829eso554660d50.3
-        for <linux-crypto@vger.kernel.org>; Fri, 03 Jul 2026 07:09:42 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783087781; cv=none;
-        d=google.com; s=arc-20260327;
-        b=cYXGXtUcngKNVGA+R9Wlv4MyKjabfaajaDSKmYF7lNpAMcyKPe6mpVNXdixL/evOGG
-         L4SL22oJ6cxkc3qjXa9eNS648BDSA1+3X/e3m7miNAkIA23IryRx7I9PDwTabVYPGtv1
-         qbbv3lTchbBXcKwxuZIQTceHItnKiJi3thFlIfWNZcFQsJmmMvmGqbYvvjWU77ycnbTo
-         X2xJjmxcn+AkvfOF5p5E90zkm/NVf4OkhZn6gmm5Jt6RcYOtQ+OGQ7UpotukyjAgmO5f
-         HhqvQn26mL+SQrrzclx5D33cMudlAe/Df7vhHtotZQAQ8NQJNRX0YEedLGDEzlCplP0Z
-         rtzA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature;
-        bh=6iulTPjI8CJ+y8cbiQwWahbhZvI0ZZS53MeDPgGqhAQ=;
-        fh=oLVVBeryFj0vrZUTmSxdU/oif/yGggZTBCoUE6PVA3k=;
-        b=pCGFSWrg1YDbMJyF3+y28n17xu+/SRRYV4WMS+zQNhVSTRMHhXzojMn5gKc/nazi5I
-         ai7pXQ3ImqvHEzQsrAuSR7WWBpr20vzybw7K86hTVAQbBfazBbUS7tF7UQYdhGdZUMIo
-         04dKra9ZFic1wYJab41cj1u6tcrz91zjUoMrcuwknVuz5ymzihexJENTk+vwY0K5h1eS
-         KTIr3MXNRFMU/T0vtz+vO6qACx9eLcJZHC2Z0mvMsiJiLxodvr1fuqVbqmOaVpHu2T7T
-         toBNE9tX/dpOgxKvmL6pc4nLvwG8n+IB6vbTIeOOFoY0BsuwphqC41sKFjaTRDm8C8m4
-         jPiA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783087781; x=1783692581; darn=vger.kernel.org;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=6iulTPjI8CJ+y8cbiQwWahbhZvI0ZZS53MeDPgGqhAQ=;
-        b=SllowcRFlTeWfJk81No6mtxzzrwIh1rOo5g9BfZiPxEEBuc4xLbniZqJEACONtx7t9
-         V9SSbCmpOCzdbjPUlGD/3cN76mDXd8I1zLRTCQ0o8b0LoGcJu4GNV16p8Iwt2qd8mkE8
-         R+VpEAjD+NwVkJ+GhRL2VOd6WVe+XhnOTbDwAUVl+oJlYVsmNzIHI1jLGyHI9beQn7pt
-         JVKBZiB+bSodYa1v443ClaLR1i3l8ciwdnCFHMjOI32QtWTtw08ixOW6y5g+YEG0s69y
-         5f2f6L7jd9tlyzXzFUrs6dJNmp+1NnlZQ8I/d/LSqqU5nSxhNby/RPW5EGNJZZWobfq5
-         ZHUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783087781; x=1783692581;
-        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
-         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=6iulTPjI8CJ+y8cbiQwWahbhZvI0ZZS53MeDPgGqhAQ=;
-        b=W1i+9DhAGeIsoTlND+XBAG2ekddpSYK60IcNQu0xJA+MqjUhAfnoQnB6rW5VG0cKOZ
-         HXc9bCHL91IX9qI0G+ttM0uIDtW0Yzi0HDuX96tDAIXoUgHon0s6utrvDMtJnlVOd+ea
-         LGk3ZOISQIA0GkO7RtlTBi8oHcYqzuyI12qXmKgX+UupYumERQYNlYDm799oSUYlY6E9
-         52sMmEATOQp3Hhyspjd558AoDP/8IC1s08DiRIrl6A9bw0kJCX2YjtQoYItJF5zeShpy
-         iHhJRwXKSNdCK5KblkpJayTJ5dj5Lr6eosZN/qs4Q/M7w4GkvqDzsqqe5z0T1YJxSX5w
-         f8Cg==
-X-Forwarded-Encrypted: i=1; AHgh+RqESFQArsZLJukIfPzUlfZGquhh1fX5pCOy79l0N5gTmkXNjrJo3ztXWyppfQetA3gQMtOb8Re1y7iTePU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywe2+2bP/t6OL7IYxrBjJ+qswCvqhOrC1RBMJvcGNIwKCef6E4m
-	j2yrH2EDqB/jOaENd/AOvbUGjaNY1zJxJWb7D/Eq/+oxSVMZ3pQglG8bxGvgnB78aqkos/qoXcp
-	XWY95wMTNnuuV8bM3nEC3tPIvrKHyChB/dg==
-X-Gm-Gg: AfdE7cl/tnYqaOWQC2jKS+YDTdEr2imW9ljsdrGnwKyPBg7Lcf4Ceogkv5PIi9k+Bt4
-	mp0PF/moZLPjHStnOlCWCe783jpN4Q8ctsuAycjcX3K0V5IyyvyzZcvZpdsH3TV/xCoHpF3zezI
-	mrO29cAr4b9EIII54Kbcj4twgTMAZP9CZnpyI8Gjf07+dF6NbuVaiHGTCXhynMDCTvSgkimFGvV
-	YQEoYkPzoTISwUVXXvZgR5U5+9sd8LXTeTKxBOoRTdfOKxXdGKASFkZrS4SVFRsZiSkFxCXFzJf
-	9b+Np1DUDo/xupXmGA2Jl+bTU+c=
-X-Received: by 2002:a05:690e:140b:b0:664:ae69:230a with SMTP id
- 956f58d0204a3-6659672606amr9255979d50.71.1783087781278; Fri, 03 Jul 2026
- 07:09:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fhtn9Dio"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id C18D81F000E9;
+	Fri,  3 Jul 2026 17:38:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783100298;
+	bh=HnxPqiOLGycxJp+uPN8CE/Rc87ZyzW9wZbMldSEgCI8=;
+	h=From:To:Cc:Subject:Date;
+	b=Fhtn9Dioqf7HGLb3MGP48wv9XyzjDK61eCaYKYc6x6PqAEU80CYYGSUBcnn7Z90rI
+	 LnBCcZbMZZG6BVrwugDcE/NiOBY1Nu7iQqMrc138jqniJR7XQFHTnLAeiQi9fcwX7/
+	 oHHOZd8tfF/5xMbL3FeCyptGoP1gTta5haZTLLbu0r+Ofc2guBybpaez1bV9MPTt56
+	 unj/a3Br/3+yT467PvQ5hOkroGPZoaCPImcLxkRartxGCGOWcCsj/akNuOfGciedI5
+	 ScyYISabg75t3QM4pCkxSYMS3+QMxIFAjN2Fdrq7xHLowJ+Knk7dGOf9ByKhzoejjO
+	 NjeLBfSlZmIBA==
+From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <ukleinek@kernel.org>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	Mark Gross <markgross@kernel.org>
+Cc: Konstantin Ryabitsev <konstantin@linuxfoundation.org>,
+	linux-edac@vger.kernel.org,
+	Borislav Petkov <bp@alien8.de>,
+	Tony Luck <tony.luck@intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-kernel@vger.kernel.org,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v3] MAINTAINERS: Drop Mark Gross
+Date: Fri,  3 Jul 2026 19:38:03 +0200
+Message-ID: <20260703173803.3589003-2-ukleinek@kernel.org>
+X-Mailer: git-send-email 2.55.0.11.g153666a7d9bb
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260613085858.32580-1-mertsftl@gmail.com> <akd0zGzVZSG_45hK@gondor.apana.org.au>
-In-Reply-To: <akd0zGzVZSG_45hK@gondor.apana.org.au>
-From: Mert Seftali <mertsftl@gmail.com>
-Date: Fri, 3 Jul 2026 16:09:30 +0200
-X-Gm-Features: AVVi8CdFNXrXg7zUVKFrWxPF_ASSzbUEsOQRZYtFlz-QcX_rAj16GMgPD07WP-s
-Message-ID: <CAA3Noor7Bg5dDwfYyoSszyvLRibAxE2iq_41=5a8sKhOhFUHUQ@mail.gmail.com>
-Subject: Re: [PATCH] crypto: ti - Use list_first_entry_or_null() in dthe_get_dev()
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: T Pratham <t-pratham@ti.com>, "David S . Miller" <davem@davemloft.net>, 
-	Dan Carpenter <error27@gmail.com>, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2115; i=ukleinek@kernel.org; h=from:subject; bh=nXJnsdLsM93mqYbkHmj9fVt5nkAxY73wwf1qK2C6pG0=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBqR/N7Wy1d44937AOVhPlX44c64v1TT/P1S3Iy9 IicfnaXqhqJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCakfzewAKCRCPgPtYfRL+ TrySB/982uqvd5z0fb5aGmSx3tU4YD1A5qa14JDMEtav5R8+xn4CGT+hDu7YyhWyJhG34PsBMSc uCipvStN4jXEwDR/ZhUGTnidPyZNXCNI+ewVLELt5FnVzRUR8AWoFWwR5a6NY/FwImJaJsUaxv3 Hf5zx+1v5RRS8omjPepL1f6/1WllkKNrrVpxtLRcAEC3y1Qi1jNeI+xQ9nutTEBie0sK4d2dYXZ Hm70J+BIdTRlx9a2+au1cRHKKrRam9Bz5Yki5hgY4sc5QA1hIj7N44/nIvXk9c6GqMBRT0Ko24F GQvEvCWo4EZ6u6KohcMC6LIkIj6B9F3QhhZpeeOfa1lf2Xks
+X-Developer-Key: i=ukleinek@kernel.org; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
+Content-Transfer-Encoding: 8bit
 
-On Fri, 3 Jul 2026, Herbert Xu wrote:
-> This only fixes the symptom of the problem.  But the root goes deeper.
->
-> The main issue is that the device can go away in the middle of an
-> operation. [...]
+Sending mail to Mark's Intel address results in the intel mail
+server rejecting the mail. Dave Hansen confirmed he left Intel.
+The kernel.org address seems to work, but there was no reply from Mark
+on the discussion about broken email settings and his maintainer
+entries.
 
-Yeah agreed. my patch only covers the empty-list case the test robot
-flagged but it doesn't touch the lifetime problem at all.
+So drop him from all maintainer entries.
 
-Doing that one properly is a much bigger change than a one-liner though, and
-i'd rather take the time to understand the driver's lifecycle and do it right
-than send you a half-baked fix. So, is the list_first_entry_or_null() change
-still worth taking as a small correctness fix on its own or would you rather
-drop it and sort the lifetime issue as a whole?
+Signed-off-by: Uwe Kleine-König <ukleinek@kernel.org>
+---
+Hello,
 
-Thanks,
-Mert
+this patch was already send end of May (v1 @
+https://lore.kernel.org/all/20260526173806.3227828-2-ukleinek@kernel.org).
+Konstantin then suggested to change the maintainer contacts to the
+kernel.org address as at least one of the forward-addresses for the
+kernel.org account didn't bounce. This v2
+(https://lore.kernel.org/all/20260526193238.3622176-2-ukleinek@kernel.org)
+wasn't picked up yet, but given the continued silence I think removing
+Mark completely is the saner choice now.
+
+If someone has a better contact, please make him react. If he returns
+later, the entries can easily get restored.
+
+Best regards
+Uwe
+
+ MAINTAINERS | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index f96621b3214c..d5260c8e9af5 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -9354,9 +9354,8 @@ S:	Supported
+ F:	drivers/edac/dmc520_edac.c
+ 
+ EDAC-E752X
+-M:	Mark Gross <markgross@kernel.org>
+ L:	linux-edac@vger.kernel.org
+-S:	Maintained
++S:	Orphan
+ F:	drivers/edac/e752x_edac.c
+ 
+ EDAC-E7XXX
+@@ -13211,7 +13210,6 @@ F:	drivers/crypto/intel/keembay/ocs-aes.h
+ 
+ INTEL KEEM BAY OCS ECC CRYPTO DRIVER
+ M:	Prabhjot Khurana <prabhjot.khurana@intel.com>
+-M:	Mark Gross <mgross@linux.intel.com>
+ S:	Maintained
+ F:	Documentation/devicetree/bindings/crypto/intel,keembay-ocs-ecc.yaml
+ F:	drivers/crypto/intel/keembay/Kconfig
+@@ -26683,8 +26681,7 @@ S:	Maintained
+ F:	drivers/net/ethernet/tehuti/tn40*
+ 
+ TELECOM CLOCK DRIVER FOR MCPL0010
+-M:	Mark Gross <markgross@kernel.org>
+-S:	Supported
++S:	Orphan
+ F:	drivers/char/tlclk.c
+ 
+ TEMPO SEMICONDUCTOR DRIVERS
+
+base-commit: 2b763db0c2763d6bf73d7d3e69665222d1f377cf
+-- 
+2.55.0.11.g153666a7d9bb
+
