@@ -1,81 +1,90 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C1C22C21D9;
-	Fri,  3 Jul 2026 07:18:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9503D2BEC4E
+	for <linux-crypto@vger.kernel.org>; Fri,  3 Jul 2026 08:16:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783063098; cv=none; b=bwj6sBJAEbTyte4AVXgWMmhMJoLdEMUPh7U5kZEQDgEDtKzrCiAyH8gL61cHw5Sl8UtLnwdikiKYr/af2giSSp9YC06IGdG8Oj6nVJwiTzzUXF6dQDq21NXVfTDC4hz0zjVVgka40gCyDAyeCzI94r8xQ6Sb6IHzDFeiuLLHhc4=
+	t=1783066584; cv=none; b=onom9PzxwbTgmhMLVHSTkcJNN0gV5dt/yTm78qmU03uk27KYnLAc2ZI2yL2mOzFRB1Plq7dBPjOMTJsTxKQyTHVk9euMnIW+koCZj1Zp1PEULNCkx0478z3G4ULtQ8f/YgFm3QBLV6n6sHn7E9+sXJD6JGAMcf+FdK9benT2vLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783063098; c=relaxed/simple;
-	bh=9j1rleesf6eU1gz52aImXaulF7Yq0IZ9pa+dr53kFDU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BCgusXsRxiCyz9FnS52TtFCMFrsyyq3iybbHDH2Bf+2wRQLJXiJMG/4wy3cTqXmI1FQF9xfj6DL8g9b8IAUcK6ZXLAAFWQRJPnIJKBL7sIDdtmZskmoxwoB/umndisfqoZRH2F+GxNBON2Tq4ZIl682fa4c5Lfuo1c7e7odz/JE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Z9G/Dfyi; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1783066584; c=relaxed/simple;
+	bh=qQC6pzd7ZW+6w81nTceX1afYorhY8BSlJVG/W/7Y+l4=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tSKl5OuNBxOFOpmm62PR72Bd9W4RLo7OeCIgKQCDOQG3/Db5aTl0Gj+iCn0/v9tALehOnwQo4+hKT+OFUgYPiq5RDGLEM4CVHCCjhQjnhMtAlfCVYC5PhCoQ/c1dJ5QX/D+J7jVqzN4I1OpH5bOtf1XP+pEhQ+6Nrp5PFIhVKis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SnxsbFRr; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Z9G/Dfyi"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=PRFdd3N33TY7ztrR7vrjtBo7P1zO+yDY2pFBvFjUSL4=; 
-	b=Z9G/DfyiyKf7kQrh6hDsOLBOtnwGQKqgYRTXgVjaVc6/XJB4p00GcMEz1DLd4gxrydQLuIDd8D9
-	we96TxP3PVYMzmaCYlBhdpZAJ5fChKKLiiHaN3PlsOXNeRbmlylbN7+RI1967ZqpyZ/oXOrn3Vn46
-	ZutZx0QQeGCzsgx/qqFdEXgV1blS8EmaYVV/ZuI19BW1W9WmJc8N+RPelj9z7RxrSOXcNmzyaeGSh
-	pK0ja+Q+1v1LKD9F66dTF7a2bbVwPBLrIEZZ9SXaXa//KhIn2KlDclX23oyBd9tK9M+hMhY6mZYjS
-	JaTDNYhCY5XbmBB4bCbqhExiS7Z/cD6SB5qA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wfYA6-0000000AHne-42Nu;
-	Fri, 03 Jul 2026 15:18:12 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 03 Jul 2026 15:18:10 +0800
-Date: Fri, 3 Jul 2026 15:18:10 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Paul Louvel <paul.louvel@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Christophe Leroy <chleroy@kernel.org>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 01/19] crypto: talitos/hash - Use
- CRYPTO_AHASH_BLOCK_ONLY API
-Message-ID: <akdiMro0yKwwicaa@gondor.apana.org.au>
-References: <20260611-7-1-rc1_talitos_cleanup-v2-0-aa4a813ce69b@bootlin.com>
- <20260611-7-1-rc1_talitos_cleanup-v2-1-aa4a813ce69b@bootlin.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SnxsbFRr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52E931F00A3A
+	for <linux-crypto@vger.kernel.org>; Fri,  3 Jul 2026 08:16:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783066583;
+	bh=qQC6pzd7ZW+6w81nTceX1afYorhY8BSlJVG/W/7Y+l4=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc;
+	b=SnxsbFRrKsb107wQrvD0J/wnqyeeG0qlWaTxooQGjbvtWgOPp2ppKVs9iugUO2dIe
+	 PTNpGIajPjxxqrbrVu9/tjuZpDcg+HEXephaY0hvvu1Y2hG0w+tx85iCYK7SNF5TiN
+	 FcMMg9FnoqszzXErKQliIWqgLkOybc9CE0oM919hCCrUDMrBh6xuwtl0Qedz+HYQAR
+	 l1tG7yeaRNe4dh5ialvoF80Y20+ydDEDMeiP7gbSj4KS9bSpb9VtTdofdwypWESm7k
+	 NY+wknY2PT8YhPtrcSzsNSTW0lHRCUcRSB4xuagsJlWcXuX9ZOKBXQnQSb3QG5MUSL
+	 PfrTX3WZqfSQw==
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-39afb0d9f7eso3172911fa.0
+        for <linux-crypto@vger.kernel.org>; Fri, 03 Jul 2026 01:16:23 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+RrvV9lAUTzYs0N85DcvGRTG/NSAxbXJWOAACxYBvuKEWzFruPdyYvJMRZSC00mIywAZHF4DJ20eH7LHaoE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsnGURTBFPAk17EpcxnNzlQB+/xjHi3tmEJLfdrcwWp822RQF/
+	/l1JsVyDrnlRTqrScOHI+Y5l8SVb+clVkmmRW83T9c2LcpWfJ7oAn6aPOC0Pr6OWzIcfj3aO5+S
+	TeYuus+WsfBEtv72RrqEvoq9BsgWKrVwb6GTjz6Kj8A==
+X-Received: by 2002:a05:6512:124d:b0:5ae:c542:33ef with SMTP id
+ 2adb3069b0e04-5aec6795b43mr2021138e87.8.1783066582095; Fri, 03 Jul 2026
+ 01:16:22 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Fri, 3 Jul 2026 03:16:21 -0500
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Fri, 3 Jul 2026 03:16:21 -0500
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <20260702-b4-shikra_crypto_changse-v2-6-66173f2f28b3@qti.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260611-7-1-rc1_talitos_cleanup-v2-1-aa4a813ce69b@bootlin.com>
+References: <20260702-b4-shikra_crypto_changse-v2-0-66173f2f28b3@qti.qualcomm.com>
+ <20260702-b4-shikra_crypto_changse-v2-6-66173f2f28b3@qti.qualcomm.com>
+Date: Fri, 3 Jul 2026 03:16:21 -0500
+X-Gmail-Original-Message-ID: <CAMRc=MdNrdAJmD-mgP0wXaiKid5pE8m4_9rOpXcrLk+T35sFgA@mail.gmail.com>
+X-Gm-Features: AVVi8Cc4AXtmTJ4dPWDBNLruLtcz6tHIZccf9Ba9r0GLPfEhItZNEGvR8CW_x68
+Message-ID: <CAMRc=MdNrdAJmD-mgP0wXaiKid5pE8m4_9rOpXcrLk+T35sFgA@mail.gmail.com>
+Subject: Re: [PATCH v2 6/6] arm64: dts: qcom: shikra: Add ICE, TRNG and QCE nodes
+To: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>, linux-arm-msm@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, dmaengine@vger.kernel.org, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Harshal Dev <harshal.dev@oss.qualcomm.com>, 
+	Vinod Koul <vkoul@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Frank Li <Frank.Li@kernel.org>, 
+	Andy Gross <agross@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jun 11, 2026 at 09:35:55AM +0200, Paul Louvel wrote:
+On Wed, 1 Jul 2026 22:17:16 +0200, Kuldeep Singh
+<kuldeep.singh@oss.qualcomm.com> said:
+> Add device tree nodes describing the crypto hardware blocks present
+> on the Qualcomm Shikra platform:
 >
-> @@ -2932,8 +2861,11 @@ static struct talitos_alg_template driver_algs[] = {
->  				.cra_name = "md5",
->  				.cra_driver_name = "md5-talitos",
->  				.cra_blocksize = MD5_HMAC_BLOCK_SIZE,
-> +				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
->  				.cra_flags = CRYPTO_ALG_ASYNC |
-> -					     CRYPTO_ALG_ALLOCATES_MEMORY,
-> +					     CRYPTO_ALG_ALLOCATES_MEMORY |
-> +					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
-> +					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
+> - BAM DMA controller used by the Qualcomm crypto engine
+> - QCE (crypto) engine with DMA support
+> - TRNG hardware random number generator
+> - Inline crypto engine (ICE)
+>
+> Also connect the SDHC controller to ICE via "qcom,ice" property to
+> support inline encryption.
+>
+> On Shikra, different BAM pipe pairs (for example 0x84/0x94 and
+> 0x86/0x96) may still resolve to the same resulting SID due SMMU-side
+> optimization. They are still distinct pipe pairs and therefore require
+> separate DT IOMMU entries.
+>
+> Signed-off-by: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
+> ---
 
-Sorry, but the FINAL_NONZERO flag doesn't work for algorithms like
-md5.
-
-The reason is that all implementations of md5 must accept the exports
-from each other.  So as long as the generic md5 doesn't not set
-FINAL_NONZERO, your driver will need to be able to take that on
-import.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
