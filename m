@@ -1,74 +1,86 @@
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE8C34D4C9
-	for <linux-crypto@vger.kernel.org>; Thu,  2 Jul 2026 23:39:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A60C272801
+	for <linux-crypto@vger.kernel.org>; Fri,  3 Jul 2026 03:01:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783035569; cv=none; b=nFr8OmVxu2s+vp3ccTFbeJA29OFLBp4PZUt1N872YQ+MfuTvHFwzGaz8i2w76HajlgGCJXtM1IQg4LoIwTfiShNJPLXEQ8xUNh4mNWu4YoIteGXobZGX2ONuMWUCWGWi8eHqMEuXhwglyBGLKWSt9zLWicJFU6PR6U8nNKRKtTs=
+	t=1783047664; cv=none; b=qLuFWlcd6g9aYHkrlxuorgr2B3YQgmUsCwH03z//5DQlmO+XbmiIeh2jGpHlzllGiNdqSR956IFr8XsYQB26+ao7NZxwwqNdLqw7MPK66vrC4aa6Zu9xOzy9l9vWhgwMrCConhxIgfsQ+h9jKtWAIhebFMGq3nzB9YLZv1q//lE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783035569; c=relaxed/simple;
-	bh=RMNYY3fjjV69/m+j/rX8VNshnfJkZr46jhy+RJtWjw4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NIDQ1vGPl6h5vVNOEws0DY9o0sxQWSffLbfVx2iE3fW34UqNtA2FuUcM/rHncrRm30+3r3G50IXbF/XHk4aSQOX1YizdqRQhR0+LEY+l2UQ+2rs0Pcd0NKO/t6Q5vMQhqWxkSJgc00bznesFPIdl4UIEy5hWcj2rWbP+1/JKGKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XxdsEtnh; arc=none smtp.client-ip=209.85.222.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1783047664; c=relaxed/simple;
+	bh=6NjfDtvfguHyET98XVCFvMjKd8ovYZdUgW7vZatG5EY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=i3Y3kttcRCBK0Z3jzhLgP0gGnjlMJaHWugLXpx3jcSYAgkCerS0Rj6euK90j9AU/ACRypVq00bqM0dCSHnisLs3H0+finYPrxysyfVyZAN40hNBbHkPwMCblEfEOqoxi4rCLayVItSgRQ+QOBloXcx+g8hWdA8eT215/kxSajjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fireburn.co.uk; spf=none smtp.mailfrom=fireburn.co.uk; dkim=pass (2048-bit key) header.d=fireburn-co-uk.20251104.gappssmtp.com header.i=@fireburn-co-uk.20251104.gappssmtp.com header.b=YWMb62w4; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fireburn.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=fireburn.co.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XxdsEtnh"
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-92e6391b114so189487685a.3
-        for <linux-crypto@vger.kernel.org>; Thu, 02 Jul 2026 16:39:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=fireburn-co-uk.20251104.gappssmtp.com header.i=@fireburn-co-uk.20251104.gappssmtp.com header.b="YWMb62w4"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-49241dbf9c1so426735e9.2
+        for <linux-crypto@vger.kernel.org>; Thu, 02 Jul 2026 20:01:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783035568; x=1783640368; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=WNKDryeWnXSKKY8fUHk6zFjL8w+dDzKefQJ/uzoOjJU=;
-        b=XxdsEtnh7Twxz798rYThkEQGzUeQ+dfJZenTFyKgm0ZuClEDdwTOVNzR8PcjgX4H5c
-         ny8udbwDVeAFeY+tT2I9soLbsAB4cqmGaDaaTR54i7BnM93GKGJRVT32p7euwbfivGVl
-         x0IDmBtDe9p103y5ZWBorI1b52Nkm5fpBijKpslht5HLNdTurQzZJ9+4TCyYRBLS/z75
-         r9pMSn26JoX0Ls4TiAsiOZ/2I9YEk78IqnAUxlHDy6bFGw/eH+owtsmTY4n6vVFv2z0b
-         zPqlU3nxd6xxcCn9ag9PnHfrM39KEDpDOATPMYpD3ZJxvWSKzRyweNdG48PkVER/6cuq
-         mJpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783035568; x=1783640368;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=fireburn-co-uk.20251104.gappssmtp.com; s=20251104; t=1783047661; x=1783652461; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=WNKDryeWnXSKKY8fUHk6zFjL8w+dDzKefQJ/uzoOjJU=;
-        b=Du02KtWH8KeJviBUOxqyj2ChuTzQ0qld6lV/Eh30eZrH4HO/uX4eXiygWe5atBt6BV
-         MB553DHjZl3z0imzqE8jTvJ33VjhcLFYABmiTYSueLRqims1OB11fHQR8kFqPoDuQOkC
-         lyX/9zyyArD8oW8eqhV+8weOqwoxqHApz1zHFEFmrX0MkWbutJingWgckFTTYYfLzkWt
-         2cra9GoxPvU+A4sHht7oj+MzUs+0DXgCjY4cBJqJFoRhvi0mS/GbGKRow5+eOnRZ7fKQ
-         g4sTdNarIWZ5Vfx+6zFWn4/tj4uo+ZPSc3gJgyRfSeWTgb+hipjRS/efrNDlDQbLJwlB
-         oErA==
-X-Forwarded-Encrypted: i=1; AFNElJ+lfWZ1OrvJ5VW3FSmtdUskGQYNP0sK31VNwgg1tzeiSlCiKJY7OTdO1AfdVk2o4jWQdRoeqBBs8S+xssY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yya+qLbBs05pyQag+E9OTwiYzaCqryax2Z1p2no4XivM6pTrebK
-	ZpY5UFdfldva1+M0OEUIvpJ6T+oNg9jtbwrW8FdDBp8vvVswTDt+kGD87qeLfwhIEy4=
-X-Gm-Gg: AfdE7cmUx8iSEvm2+FHvZ4tubGLZHi1eCnTPMn5XSCEacDgdLNlraEeq638P3alPrUS
-	BSQsZoS+VjPf7i6QD9LJ2SK4Fa9zs8EkX2xfKPWfxWTZ/DEYOlfvySDgq8iMRFyQU9YZvhJew8W
-	Gpwge73pUJQMZhh1WzDMBPJ5wTgEQp5ih511Dn6xJmzEkdMYtVfSkv5BV1UJxq1ejy/b+qZuQOS
-	nu7jRIWGNEtmMoCU2oUGM/6fVt1629O7NbVpLT08/HXw4joVYR1I/XNQVdN9I85E62cAeJcfR9B
-	dfqrgPRp2v5GzVV1rUySKB0l7WOzNoTsQvqOIfNDXAJssR4E7qBSjHLchQRyJrjUFCQPOwILS99
-	IbEqorcOozPlqEjkX55Y1XMBee/oxLnBTyaUZiHLWBkKFs25hm+n0TbugiYWWYIU/SQlwV2D8fw
-	1FXq4rRYTYALBn5COHyY8Bc42s9pofkccQb9PsEwrGgG1jTP+vCrvrI1EKF449vcuCa1PoGXGW6
-	yCCAdasJUu/Izo=
-X-Received: by 2002:a05:620a:4628:b0:92e:5cfd:154e with SMTP id af79cd13be357-92e7afb156emr1054949485a.14.1783035567540;
-        Thu, 02 Jul 2026 16:39:27 -0700 (PDT)
-Received: from i4-gl-tmk5904.ad.psu.edu ([130.203.156.186])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8f46e84e1casm42310676d6.11.2026.07.02.16.39.26
+        bh=yTs/XtijO8c54KRJepqsfIing448R27R7obvVm8uj2U=;
+        b=YWMb62w4LgZS/WeqADa/plP29wbXVWRvJUCIeWTp8eTl8SRn3iohCU58xHX812eB/H
+         PuU6NllLTxpo5fBCBJZ9n7O4scCY/nYPiH0KQtyfxRB0aLaErR3wa4teTCa5OzQIF5Sp
+         hLdji4C2E/zC2l/e1mXyehuqEbcWeIsrxYAKj9Ezr3B/pd3ba3aydYxu0+eGt6VHoEl9
+         F7OY500wgs3Jc6LINYK9oFmuraeNH9vFNSmBoY7qB2EPTMhQIQNCM7WV1ATGLFBCJgcq
+         anokeRj62+e31rOFKJ7kMHvrt8kbw/A/5fgXaNekYl7SoCM4BC35Qn/Mfq0jeGZrPMb3
+         9mdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783047661; x=1783652461;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=yTs/XtijO8c54KRJepqsfIing448R27R7obvVm8uj2U=;
+        b=fdAadGpyGpi7W5DbWvEwRe4SiRT+82DoSRoTMtl8ZRSt9uPVD/F6dhXJ3SkhcloOnb
+         Bs954X4wmZpF0ko+pNCRfApSlX4zF7b60jxJVfHx/Y1/iyqr0RmWxuWAOlg/HPdJhZwt
+         JLpLsz8EhBn/z6fkX7BojPYk+BPiJJ0Ah/6zya1lqqxMUY4TiA1EbrqQxQDqEykFJbHi
+         Y2Dq5FyqDrX7CioxHuyX0C7ebywxlU5Tvg8FwPfHNz/gtxQGHOG6GNuMJSyscT9F3q6p
+         0clflqqxoRq9CSPw4aVo4LpoKFRhe0yoITUe+hNZDNlYAyOMIF0sYIqhULza89c+dyfe
+         SI+Q==
+X-Gm-Message-State: AOJu0YwRrCmAeaS14O9XPE9uK05YURvAYcP751enFFPlY2clFJ/hxK1h
+	D5AJEs63OG2qu2/7blWVQNN2RDCYLpvj22uRdlP01/oKR9ja1Qn8loAQwUyf+8U4og==
+X-Gm-Gg: AfdE7cnEn9xB/L7fzLUeYH5ul/9Af9H0AYW08rouLcbEDFnVTK9UkkCKZbLnoJp3cIs
+	nboME7Fa644Eb/FNCEGtaTzUnogoux8pkSe5G8ZvGyQ/VaFU9+tLGun88R3Y8UHIb4H8/wGnyCw
+	4xqx+abXaZ59dWMC1rZIlsmvUrGVlm+HVmpzNH9sFGWQLH2YCFahaGb7bkaJMZgFJXopVthdSJd
+	PK0Xpxc6OLGpWgaWG3RDHRM9OBdGN3mTVuL2mvixxwWUDC0WYvsXPD1tf/s4U+Dw5SI6T3Ec80t
+	ZvFTtlLT6hQWKZxGR9PM1l79e1DxAM3zrrCw/N7t5XdmIx/AfStI8NsWIMJSw0/K0otbsOh4gGP
+	k4XkJd118J7fWmlkr3u/GZQ1IEOieIA4djzC4B4PkyWFD3CniEgS04oQ4Vkc6DYFrVMLcA0d7Ml
+	h16icB1YckHJqsqIeXT12AuNUkuR1qZJvcaD/duXbtTAbkrJj7wt4GygAZ
+X-Received: by 2002:a05:600c:2e43:b0:493:c14a:a1ca with SMTP id 5b1f17b1804b1-493c3cd4aeemr75130465e9.3.1783047660863;
+        Thu, 02 Jul 2026 20:01:00 -0700 (PDT)
+Received: from axion.fireburn.co.uk ([137.220.119.72])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493bef183e7sm199495015e9.2.2026.07.02.20.00.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jul 2026 16:39:27 -0700 (PDT)
-From: Yuho Choi <dbgh9129@gmail.com>
-To: Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Alexander Sverdlin <alex@sverdlin.org>,
-	Nishanth Menon <nm@ti.com>,
-	linux-crypto@vger.kernel.org,
+        Thu, 02 Jul 2026 20:00:59 -0700 (PDT)
+From: Mike Lothian <mike@fireburn.co.uk>
+To: rust-for-linux@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	Eric Biggers <ebiggers@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Boqun Feng <boqun@kernel.org>,
+	Gary Guo <gary@garyguo.net>,
+	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
 	linux-kernel@vger.kernel.org,
-	Yuho Choi <dbgh9129@gmail.com>
-Subject: [PATCH v1] hwrng: ks-sa: Fix runtime PM cleanup on registration failure
-Date: Thu,  2 Jul 2026 19:39:21 -0400
-Message-ID: <20260702233921.100478-1-dbgh9129@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	Mike Lothian <mike@fireburn.co.uk>
+Subject: [RFC PATCH v2 0/3] rust: crypto: library AES-128 / SHA-256 / HMAC + RSA
+Date: Fri,  3 Jul 2026 04:00:50 +0100
+Message-ID: <20260703030056.2763-1-mike@fireburn.co.uk>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260617150143.2152-1-mike@fireburn.co.uk>
+References: <20260617150143.2152-1-mike@fireburn.co.uk>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -77,39 +89,81 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-ks_sa_rng_probe() enables runtime PM and resumes the device before
-registering the hwrng. If devm_hwrng_register() fails, probe returns
-without dropping the runtime PM usage count or disabling runtime PM.
+This is v2 of the crypto bindings, rebased onto current drm-next --
+no functional change from the version prepared but never sent after
+v1's review (see "Changes since v1" below for what that review fixed).
+It adds a small, reusable kernel::crypto module so in-kernel Rust code
+can hash, MAC, encrypt a single AES block, and do RSA public-key
+encryption:
 
-Unwind the runtime PM state on the registration failure path, matching
-the cleanup done by remove().
+  1/3  sha256(), hmac_sha256(), Aes128 (key-prepared-once block cipher)
+  2/3  aes_cmac() over the in-tree AES-CMAC library
+  3/3  rsa_pubkey_encrypt() over a new lib/crypto RSA primitive
 
-Fixes: e9009fb227fa ("hwrng: ks-sa - Use pm_runtime_resume_and_get() to replace open coding")
-Signed-off-by: Yuho Choi <dbgh9129@gmail.com>
----
- drivers/char/hw_random/ks-sa-rng.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+Patch 1 binds the library crypto (lib/crypto) functions directly
+(SHA-256 / HMAC-SHA256) and uses one rust_helper_ shim for aes_encrypt()
+(its transparent union is unbindable). It runs synchronously in the
+calling context with no allocation and is the independently-mergeable,
+self-contained contribution.
 
-diff --git a/drivers/char/hw_random/ks-sa-rng.c b/drivers/char/hw_random/ks-sa-rng.c
-index 9e408144a10c..4494f1e4ab4d 100644
---- a/drivers/char/hw_random/ks-sa-rng.c
-+++ b/drivers/char/hw_random/ks-sa-rng.c
-@@ -242,7 +242,14 @@ static int ks_sa_rng_probe(struct platform_device *pdev)
- 		return dev_err_probe(dev, ret, "Failed to enable SA power-domain\n");
- 	}
- 
--	return devm_hwrng_register(&pdev->dev, &ks_sa_rng->rng);
-+	ret = devm_hwrng_register(dev, &ks_sa_rng->rng);
-+	if (ret) {
-+		pm_runtime_put_sync(dev);
-+		pm_runtime_disable(dev);
-+		return ret;
-+	}
-+
-+	return 0;
- }
- 
- static void ks_sa_rng_remove(struct platform_device *pdev)
--- 
-2.43.0
+Patch 2 adds crypto::aes_cmac() over the in-tree AES-CMAC library
+(<crypto/aes-cbc-macs.h>) -- the one mode of operation the consumer needs
+that lib/crypto already ships -- rather than building CMAC out of bare
+AES. The 128-bit key is prepared once and wiped after use.
 
+Patch 3 adds an RSA public-key primitive. Rather than bind crypto_akcipher
+(which Eric flagged as a very bad API not to grow), it adds a small
+lib/crypto entry point -- lib/crypto/rsa.c, rsa_pubkey_encrypt(), the bare
+RSAEP primitive c = m^e mod n [RFC8017 sec 5.1.1] over the MPI library --
+and binds that directly: no akcipher tfm, DER key encoding, scatterlists or
+async completion. The caller applies its own padding (RSAES-OAEP, ...). It
+is gated by a new bool CONFIG_CRYPTO_LIB_RSA (selects MPILIB); because the
+Rust wrapper is exported from the built-in kernel crate the symbol must be
+in vmlinux, so the option is a bool and the wrapper is
+#[cfg(CONFIG_CRYPTO_LIB_RSA)]-gated -- a kernel that does not configure it
+gains no dependency. A from-scratch constant-time/allocation-free lib/crypto
+RSA (Eric's longer-term direction) is left as future work.
+
+All three were factored out of an in-kernel Rust DisplayLink DL3 dock
+driver (which needs SHA/HMAC/AES-CMAC for HDCP 2.2 and RSA for the AKE),
+posted alongside as drm/vino ("[RFC PATCH v2 00/6] drm/vino: DisplayLink
+DL3 dock driver"); the intent is to land both upstream. The module is
+generic. Compile-tested in-tree against current drm-next. Source:
+  https://github.com/FireBurn/vino-scripts
+  https://github.com/FireBurn/linux/tree/vino
+  https://gitlab.freedesktop.org/FireBurn/linux/-/tree/vino
+
+Changes since v1 (Eric Biggers):
+ - Drop the bare single-block ECB helper that re-expanded the key per block;
+   Aes128 now prepares the key schedule once and reuses it for a keystream.
+ - Add aes_cmac() over the in-tree AES-CMAC library (<crypto/aes-cbc-macs.h>)
+   instead of building CMAC out of bare AES (now patch 2/3); the vino driver
+   drops its hand-rolled CMAC for it.
+ - RSA no longer binds crypto_akcipher. v1 exposed an Akcipher transform;
+   following Eric's guidance to drop that API, v2 adds a small lib/crypto RSA
+   primitive instead (lib/crypto/rsa.c, now patch 3/3) and binds it directly.
+   A full constant-time lib/crypto RSA is left as future work.
+ - Rebased onto current drm-next; no other functional change.
+
+Mike Lothian (3):
+  rust: crypto: add library AES-128 / SHA-256 / HMAC-SHA256 bindings
+  rust: crypto: use the in-tree AES-CMAC library
+  rust: crypto: add an RSA public-key primitive in lib/crypto
+
+ include/crypto/rsa.h            |  15 +++
+ lib/crypto/Kconfig              |   9 ++
+ lib/crypto/Makefile             |   3 +
+ lib/crypto/rsa.c                | 102 +++++++++++++++++++
+ rust/bindings/bindings_helper.h |   4 +
+ rust/helpers/crypto.c           |  37 +++++++
+ rust/helpers/helpers.c          |   1 +
+ rust/kernel/crypto.rs           | 169 ++++++++++++++++++++++++++++++++
+ rust/kernel/lib.rs              |   1 +
+ 9 files changed, 341 insertions(+)
+ create mode 100644 include/crypto/rsa.h
+ create mode 100644 lib/crypto/rsa.c
+ create mode 100644 rust/helpers/crypto.c
+ create mode 100644 rust/kernel/crypto.rs
+
+--
+2.55.0
