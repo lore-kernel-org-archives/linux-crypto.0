@@ -1,45 +1,48 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 132A23451B0;
-	Fri,  3 Jul 2026 07:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C1C22C21D9;
+	Fri,  3 Jul 2026 07:18:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783062035; cv=none; b=O8GgO/VKen4D1OvN82w3lWjGniEK64Zg0031UPUcyFifioWj8M4xSORIVUaUqv2+IWHddbGOrUD0hRQXo44xF5rIuhApkJN4iJtkL5rzaSMYfUGJ5PeinW/gYLuvQWEYxeCQmoF1j2xcLY9eoeGhQACM06dGf9i2+TNiDYkJxb0=
+	t=1783063098; cv=none; b=bwj6sBJAEbTyte4AVXgWMmhMJoLdEMUPh7U5kZEQDgEDtKzrCiAyH8gL61cHw5Sl8UtLnwdikiKYr/af2giSSp9YC06IGdG8Oj6nVJwiTzzUXF6dQDq21NXVfTDC4hz0zjVVgka40gCyDAyeCzI94r8xQ6Sb6IHzDFeiuLLHhc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783062035; c=relaxed/simple;
-	bh=qN2vKE5Fn8xDUD3eHawEdlqobivVCRK6hrnO6m3Yzm4=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=qbNJ0ARwrHRvBn0Na/DDeI3eMrv1RSBTn+I4FyH1r/cskV8cl2i1wiicf/Atq4TnVuDdKodBvDob23DwynVEfJwomNALiTLJFgZQHe4KH4NYKwVhNHIaIoeUrU1WzezP7qIhJf1+N1+fn4u2Ev6CiXsoQuOOftUUclyhJZ1pEiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=M3qO+uFb; arc=none smtp.client-ip=180.181.231.80
+	s=arc-20240116; t=1783063098; c=relaxed/simple;
+	bh=9j1rleesf6eU1gz52aImXaulF7Yq0IZ9pa+dr53kFDU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BCgusXsRxiCyz9FnS52TtFCMFrsyyq3iybbHDH2Bf+2wRQLJXiJMG/4wy3cTqXmI1FQF9xfj6DL8g9b8IAUcK6ZXLAAFWQRJPnIJKBL7sIDdtmZskmoxwoB/umndisfqoZRH2F+GxNBON2Tq4ZIl682fa4c5Lfuo1c7e7odz/JE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Z9G/Dfyi; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="M3qO+uFb"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Z9G/Dfyi"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:from:
-	content-type:references:reply-to;
-	bh=huYPoepGe1WD2g2cbld41nXud9yg4hSdMCBncMeGpxc=; b=M3qO+uFbBR1AzEQRUBjwjiCG0n
-	nYMkvdOp8p87nyBxYmQZTwMd/uKBwAmx2xjwEMqz54pTodACE0yJF10t/ts0+mbphpima0pvjA34l
-	++BSSzy2jfGiaPQvXeeTO3bKD6krCZryvkFnB6fBnyGvPAcpcAwG7jfjFU2N3YEXw3gLDpbwWbROF
-	/Pt4gLcXpkAsiKz8W0Pxv7goEBsltaI16irhzMULGNsElRfGZYRe/3D7OwDvoQ8ITMu5/nMYCV9K/
-	DHaTNic5K1YJHxbSIv5FUzZjn804ulkm7m49+tdRcg+X1CLcRAK1HSDzoWopnnBMCIHU3t+okkYq3
-	chDAF/+Q==;
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=PRFdd3N33TY7ztrR7vrjtBo7P1zO+yDY2pFBvFjUSL4=; 
+	b=Z9G/DfyiyKf7kQrh6hDsOLBOtnwGQKqgYRTXgVjaVc6/XJB4p00GcMEz1DLd4gxrydQLuIDd8D9
+	we96TxP3PVYMzmaCYlBhdpZAJ5fChKKLiiHaN3PlsOXNeRbmlylbN7+RI1967ZqpyZ/oXOrn3Vn46
+	ZutZx0QQeGCzsgx/qqFdEXgV1blS8EmaYVV/ZuI19BW1W9WmJc8N+RPelj9z7RxrSOXcNmzyaeGSh
+	pK0ja+Q+1v1LKD9F66dTF7a2bbVwPBLrIEZZ9SXaXa//KhIn2KlDclX23oyBd9tK9M+hMhY6mZYjS
+	JaTDNYhCY5XbmBB4bCbqhExiS7Z/cD6SB5qA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wfXsu-0000000AHUA-0iLw;
-	Fri, 03 Jul 2026 15:00:25 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 03 Jul 2026 15:00:24 +0800
-Date: Fri, 3 Jul 2026 15:00:24 +0800
+	id 1wfYA6-0000000AHne-42Nu;
+	Fri, 03 Jul 2026 15:18:12 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 03 Jul 2026 15:18:10 +0800
+Date: Fri, 3 Jul 2026 15:18:10 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: William Theesfeld <william@theesfeld.net>
-Cc: dsaxena@plexity.net, olivia@selenic.com, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
-Subject: Re: [PATCH] hwrng: omap - balance runtime PM and clocks on
- probe-defer paths
-Message-ID: <akdeCL5BWlK5homr@gondor.apana.org.au>
+To: Paul Louvel <paul.louvel@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Christophe Leroy <chleroy@kernel.org>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 01/19] crypto: talitos/hash - Use
+ CRYPTO_AHASH_BLOCK_ONLY API
+Message-ID: <akdiMro0yKwwicaa@gondor.apana.org.au>
+References: <20260611-7-1-rc1_talitos_cleanup-v2-0-aa4a813ce69b@bootlin.com>
+ <20260611-7-1-rc1_talitos_cleanup-v2-1-aa4a813ce69b@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -48,51 +51,30 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260605192842.372935-1-william@theesfeld.net>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+In-Reply-To: <20260611-7-1-rc1_talitos_cleanup-v2-1-aa4a813ce69b@bootlin.com>
 
-William Theesfeld <william@theesfeld.net> wrote:
-> omap_rng_probe() calls pm_runtime_enable() and pm_runtime_resume_and_get()
-> to bring the device up.  If either devm_clk_get() call subsequently
-> returns -EPROBE_DEFER, the function returns -EPROBE_DEFER directly,
-> leaking the runtime PM usage counter taken by resume_and_get() and
-> leaving pm_runtime enabled.
-> 
-> Convert both early returns to set ret and jump to err_register, which
-> already performs the matching pm_runtime_put_sync() + pm_runtime_disable()
-> unwind.  Because devm_clk_get() returns ERR_PTR on failure (not NULL)
-> and err_register calls clk_disable_unprepare() unconditionally, also
-> NULL out the failed clk pointers before the goto so that
-> clk_disable_unprepare() (which only handles NULL safely, not ERR_PTR)
-> does not deref an error pointer.
-> 
-> While here, NULL out priv->clk and priv->clk_reg in the existing
-> "optional clock not present" else branches.  In that pre-existing case
-> the pointer was left as ERR_PTR, and the unconditional
-> clk_disable_unprepare() in omap_rng_remove() would have dereferenced
-> it on driver unbind.  No functional change for systems where both
-> clocks are present.
-> 
-> Found by smatch ("missing unwind goto?").
-> 
-> Signed-off-by: William Theesfeld <william@theesfeld.net>
-> ---
-> drivers/char/hw_random/omap-rng.c | 24 ++++++++++++++++++++----
-> 1 file changed, 20 insertions(+), 4 deletions(-)
+On Thu, Jun 11, 2026 at 09:35:55AM +0200, Paul Louvel wrote:
+>
+> @@ -2932,8 +2861,11 @@ static struct talitos_alg_template driver_algs[] = {
+>  				.cra_name = "md5",
+>  				.cra_driver_name = "md5-talitos",
+>  				.cra_blocksize = MD5_HMAC_BLOCK_SIZE,
+> +				.cra_reqsize = sizeof(struct talitos_ahash_req_ctx),
+>  				.cra_flags = CRYPTO_ALG_ASYNC |
+> -					     CRYPTO_ALG_ALLOCATES_MEMORY,
+> +					     CRYPTO_ALG_ALLOCATES_MEMORY |
+> +					     CRYPTO_AHASH_ALG_BLOCK_ONLY |
+> +					     CRYPTO_AHASH_ALG_FINAL_NONZERO,
 
-Looks alright to me.
+Sorry, but the FINAL_NONZERO flag doesn't work for algorithms like
+md5.
 
-But please add a Fixes header.  I think the bug was added by:
+The reason is that all implementations of md5 must accept the exports
+from each other.  So as long as the generic md5 doesn't not set
+FINAL_NONZERO, your driver will need to be able to take that on
+import.
 
-commit 43ec540e6f9b8e795dc9000114636ff72afc5b01
-Author: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
-Date:   Tue Mar 7 15:14:49 2017 +0100
-
-    hwrng: omap - move clock related code to omap_rng_probe()
-
-as prior to that the probe function did the right thing.
-
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
