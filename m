@@ -1,62 +1,62 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2003D2D24B7
-	for <linux-crypto@vger.kernel.org>; Fri,  3 Jul 2026 03:01:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0FD82D7386
+	for <linux-crypto@vger.kernel.org>; Fri,  3 Jul 2026 03:01:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783047667; cv=none; b=MpGbGb/HsODvKnIA1sUhPqyi1byt4c+NPvVdnhVl8AH3cFpA1+//warL8gKwGbaUtiD09dmUhJqR8muFj1ZKWmeKAkElMuksGB4BvqOBx3C8tsOATd7AObCi2NPuMT4jnmx9r2qkl6erGccavTtcfMNrsV5yhGXVZxY13B00iF8=
+	t=1783047668; cv=none; b=bC0M09PxiEAVAuOJVrUJymtlC/GSA9FdbGQ30hiaFUh4u9xbDg/1xxnwGM+ULqHZoQGQmjmZ6N9JP4WRrcdg265YkFcmwDttTg4cF/tci7tyZB8IkEYw/C9m139/z0YHPAMHN8cs+d9QpknuDo16D/go1+1h9robZn7tBupjW0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783047667; c=relaxed/simple;
-	bh=ShOpn9kF3gVYKwCMKMLMTSxS22TbosQNRw0NgktUOnQ=;
+	s=arc-20240116; t=1783047668; c=relaxed/simple;
+	bh=vNMwT10aUyIs/UOUOeCfpeIMwXxkHRgS5Z5j0voWgjU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Qw9ozEzGZsdyh0dQyuZlpS9sdzqehc+2P/Emym0HDU7jZC9Zqvn3YZJlqjCZiN2O44/fPODYwArga+FqYjelItbMWcW2tWOj0neSrENhGIBBIqyUdW+Z0N4owKIWqGzqu9RCufdzbph7gTYt1WGUaJOmMzRKOfsYdZa9D3W9M64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fireburn.co.uk; spf=none smtp.mailfrom=fireburn.co.uk; dkim=pass (2048-bit key) header.d=fireburn-co-uk.20251104.gappssmtp.com header.i=@fireburn-co-uk.20251104.gappssmtp.com header.b=rlSY2hBI; arc=none smtp.client-ip=209.85.128.51
+	 MIME-Version:Content-Type; b=SjA/Z8FQrHRqSLESKXCTCnvaSaXKhYyG0wn0gIhXfliEY51PYsNS29tU2e90lYRpB/5FwQ980xsv23OTxkG9vYDRLER1c9S4LxaE+yosaux490/YxJHLJARzQWD+zK9bX0KhyKOkLb2v4xh4/wsvk3hlNW9kssa+AYOrax0lZn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fireburn.co.uk; spf=none smtp.mailfrom=fireburn.co.uk; dkim=pass (2048-bit key) header.d=fireburn-co-uk.20251104.gappssmtp.com header.i=@fireburn-co-uk.20251104.gappssmtp.com header.b=M1JHDGGu; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fireburn.co.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=fireburn.co.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fireburn-co-uk.20251104.gappssmtp.com header.i=@fireburn-co-uk.20251104.gappssmtp.com header.b="rlSY2hBI"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-493bf73ec2aso268925e9.2
-        for <linux-crypto@vger.kernel.org>; Thu, 02 Jul 2026 20:01:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=fireburn-co-uk.20251104.gappssmtp.com header.i=@fireburn-co-uk.20251104.gappssmtp.com header.b="M1JHDGGu"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-493bc8fda98so523495e9.0
+        for <linux-crypto@vger.kernel.org>; Thu, 02 Jul 2026 20:01:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fireburn-co-uk.20251104.gappssmtp.com; s=20251104; t=1783047664; x=1783652464; darn=vger.kernel.org;
+        d=fireburn-co-uk.20251104.gappssmtp.com; s=20251104; t=1783047665; x=1783652465; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QmFFr1nVwg9qMyBj4UlMZMNsqttnsXWZbsMMOlcBB2E=;
-        b=rlSY2hBIPOIos4V9yAoBwJQvAg51TQWcAu4XivE7Z+B/pHxyyz16vE8mvkpwOpXqGP
-         ia9s9MaBr1lEJkZCoB9ba9LN346xHwW4CYbL+SO2J/ilKrIbA3kqzz9KOf28dTQg6JGU
-         YXC3jjZfNpbpdXggfaIDuoj/DG30S1OpRk9FJzcLxmMGC+MjnXjAmbAXxwm4GL4Y8rdL
-         fFE4tnUZ+aAUP6g9miQss8MQNHGaBMordY81AKGnyHxpuzhof6TTl5YdJzPq6f9myJMM
-         +hqdP4DUY4VfaGHAzTHiB/6g3jPfAaJSYDouxnoBYmSyfiHKqk4P8dRJLLOuRvQkqt/V
-         pjog==
+        bh=vFxVq+fsBKcws494QRfz2Vi1lFIC+br0mAAxV3ScsVg=;
+        b=M1JHDGGuH/yeWD7ZoZS1518kHzSk/KMusnuNjFQuo4lYkev92pQLtL/m+i+EtlnAvH
+         OEa3ALUYqHZlqITQpBH/n+3nMQI/t37TDaEbvA82RzQUQ/y7aMziyqHq3/cV5gJlQzPl
+         KoDJuMWBhakcMyXmgrMFuz22d+LYYvBEztilExNfCctMXtZuled3mS8oqleRJTccLKrV
+         1yy53Hj5AgMXHc4hf6BflNTzBrPUHi/s0FwII6ImdPpteBt7aS9XzfVOXqO6R4Rawhtj
+         cjBlxbx/IpbqB7cepLGDkK9IdJOaiU2PzXIXlysx5Q2ziBg8iLshbkcZ1o6C7iIkz+ds
+         594w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783047664; x=1783652464;
+        d=1e100.net; s=20251104; t=1783047665; x=1783652465;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=QmFFr1nVwg9qMyBj4UlMZMNsqttnsXWZbsMMOlcBB2E=;
-        b=EP7VSpBoXPWP/RbGAcH0cbweN9IoEOGPzDXA9J3Q+mctjEJh3b5sP6nRZjupHJS1tv
-         dxA6DL2EECM0l9ch2O9eGJ55YoOUHU1HDAoUS+oicxVNCyeVTfbYSvn57zXxfPgziEhd
-         QL0NslD3HqjkXHKV/vXcdehqR4oXxTpNit83yIHsdMgXTdcy/U/JJEjJw6TJqr4LHEW6
-         MMQ2D7sOuA4YMz80wfYD11WZ31OPM+MLGN03bRBoBO+tzTHadKOojWoVH1BOwFtHl3dH
-         vYbAtBJ8mBdn9zhV5B1Vlt8cdTKh8Lhr+OSAUPRwv0XhDFK95BgzylmG5/z5Kgv0tran
-         mn6w==
-X-Gm-Message-State: AOJu0YyyCrIalmH+ok0t8nuKL9+hgXA4N7R+ChojSxZHSSvDwGjMw/sL
-	2IFerPt+ExhMedhLpqG150C9ejBJRgO1IDSlOhW5xn3W9Z6KqfG+iP2xHi4GIJh7oQ==
-X-Gm-Gg: AfdE7cmqgvo0ByHb9Vq+kCtwVwPcwQjxszeNal1ADD+sLV7z8zqBx6NB2tBX1XiSQ1V
-	WGiM+PrjkkJRVlzAPLcjqc9sGSBR8Ulhiz9540vJYIq1IMhgK4/vJBpOaJ9YS+5SSIUO0/kynaY
-	0WJ67T6YfMzcNZS3awDUrFG5iO2JRqjqYZK63sB7LqMuxTA4znbLuTO7AYMoYZqkX+EW+kWA/QF
-	Q96Ir7qjROFo3OrVseAYurd3BFgW1m7xmN110GnrlRsQUqlcKJfEioA87rktj/8CVDzLfVjG8KD
-	XL7ZkTMwFS7nCFwQdhH/TfKavrdLQj9o5dWTWKQ24iNBaeewLyYjyciRjslVcopdNaRTVAuf+2N
-	LaXw+8qZNyLOQPph3P6L4QJaKG8Q9VmzcIO5mI+pkO2eQ+X372bjgny+4DJg1eDheCsHNPDR2Ij
-	K2uOaCF7w+A4UlLSWrRbIMxWgooWQZbaIIzsa6xzpW72fu7ep+qXPYlykU
-X-Received: by 2002:a05:600c:4f94:b0:493:adc3:cced with SMTP id 5b1f17b1804b1-493c2b9826fmr119242225e9.34.1783047663925;
-        Thu, 02 Jul 2026 20:01:03 -0700 (PDT)
+        bh=vFxVq+fsBKcws494QRfz2Vi1lFIC+br0mAAxV3ScsVg=;
+        b=rLu5GM8JJWekAsoloaLrxqv+eS+qZwm++91pMXVNKyz/BFWuWBcD1fHc+khgQ4rO28
+         0Yb8PLfRXUp/yKwIAX8uwA7O9kER86yGJ6JA7NFxc6C/J4jBp1HAWMRTf4SumU6uT96S
+         4opY+Jf5VJInbDdTVn35ziYmGEGiKcgokMDWYZq2nQ/rlVPpuW92f0CkHnIlL+CIP4G6
+         M1xvZWN56v1/vfqE5dfENlAHFjzYnUm5QhHK8CB0T0K55coApUBN8mj/Yf+sZK/666BC
+         cIRFBg4IAZEQCh/ptnNjmH5QPsnmLnnulyqO7IJDxS4vsmL9hzbmxgLhjGfGeXls7cDc
+         Xcdg==
+X-Gm-Message-State: AOJu0YypJFDiocuFVryw7O8jZuiV/ncOoChF7kmsopNME6//NVr77657
+	oN7U8ahnyuao5wwfyrz/zeQm+NJUYO8QXfzMX68UGIxXCC94GAg8BpkD0W/VP/6bZQ==
+X-Gm-Gg: AfdE7cmhL6cgdjrIk4uJlGSsCGArgJyR3MsVv0Z67nsZWM2hzqbq8V/Yj6jTNHwcb3r
+	FKpiLHLXu25bYX/Ix7nxQrLrwWr+42AZ6xenrFziXfmuKGNP2PvINLOamA4c3AXpGMD7sLJLixY
+	o3GEgw+O+ZHpdwVrPaIhfbV0WgtX2dvmHJJUibIrcNuIuV2zQNLyt5Bu+bdIEJLRgq4do9ST+Wh
+	bmRou3hQqo3Av8b49d6FOoSGmKOb3K2lxKyuHVDl6sICwhIj5I8KAoy+XL4vSSY4s9sFSyozC+z
+	edWAzpHc3sFP6PAmA2yjOT4Y+mqOCRUxQHc7syWzuFJ/4jGWKjX5V1Ub69f0w1EYkZdHo18GlsU
+	4+vA31i1hkxBaK48X0mA0wDH0mI4gqxHAC8B6aR7JCRehZWE7DCeUIYKUnP+X6qUgtaQePj5uk3
+	vALbEUZfrEanEbY4WolviwpoRa9GIUdp2zc0TEHRK0FPrczoG85aXyQhqXY3IY+ocug88=
+X-Received: by 2002:a05:600c:524a:b0:493:af0d:484c with SMTP id 5b1f17b1804b1-493c3df2fb5mr108882145e9.34.1783047665359;
+        Thu, 02 Jul 2026 20:01:05 -0700 (PDT)
 Received: from axion.fireburn.co.uk ([137.220.119.72])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493bef183e7sm199495015e9.2.2026.07.02.20.01.02
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493bef183e7sm199495015e9.2.2026.07.02.20.01.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jul 2026 20:01:03 -0700 (PDT)
+        Thu, 02 Jul 2026 20:01:04 -0700 (PDT)
 From: Mike Lothian <mike@fireburn.co.uk>
 To: rust-for-linux@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
@@ -75,9 +75,9 @@ Cc: linux-crypto@vger.kernel.org,
 	Danilo Krummrich <dakr@kernel.org>,
 	linux-kernel@vger.kernel.org,
 	Mike Lothian <mike@fireburn.co.uk>
-Subject: [RFC PATCH v2 2/3] rust: crypto: use the in-tree AES-CMAC library
-Date: Fri,  3 Jul 2026 04:00:52 +0100
-Message-ID: <20260703030056.2763-3-mike@fireburn.co.uk>
+Subject: [RFC PATCH v2 3/3] rust: crypto: add an RSA public-key primitive in lib/crypto
+Date: Fri,  3 Jul 2026 04:00:53 +0100
+Message-ID: <20260703030056.2763-4-mike@fireburn.co.uk>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260703030056.2763-1-mike@fireburn.co.uk>
 References: <20260617150143.2152-1-mike@fireburn.co.uk>
@@ -91,217 +91,284 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Address the v1 RFC review (Eric Biggers):
+Address the v1 RFC review (Eric Biggers): rather than binding
+crypto_akcipher ("a very bad API"), add the RSA public-key operation as a
+small lib/crypto primitive and bind that.
 
- - Drop the bare single-block ECB helper (`aes128_encrypt_block`), which
-   re-expanded the AES key on every block and exposed bare ECB instead of a
-   mode of operation. `Aes128::new()` now prepares the key schedule once (via
-   `aes_prepareenckey()`) and `encrypt_block()` reuses it, so a keystream loop
-   (e.g. AES-CTR, which `lib/crypto` does not yet provide) no longer re-expands
-   the key per block. This stays a low-level building block for the modes the
-   library is missing.
+New lib/crypto/rsa.c exports
 
- - Add `crypto::aes_cmac()` over the in-tree AES-CMAC library
-   (<crypto/aes-cbc-macs.h>) instead of building CMAC out of bare AES, so the
-   one mode of operation vino needs that the library already ships comes from
-   the library.
+  int rsa_pubkey_encrypt(const u8 *n, size_t n_len, const u8 *e, size_t
+			 e_len, const u8 *in, size_t in_len, u8 *out,
+			 size_t out_len);
+
+the bare RSAEP primitive c = m^e mod n [RFC8017 sec 5.1.1], computed with
+the MPI big-integer library (the same arithmetic crypto/rsa.c uses) but
+without the akcipher tfm, DER key encoding, scatterlists or async
+completion. It rejects m >= n (which mpi_powm() would otherwise silently
+reduce, yielding an undecryptable ciphertext), writes the result
+fixed-width big-endian left zero-padded to out_len, and zeroes out on
+every error path. Callers apply their own padding (RSAES-OAEP, ...).
+Declared in include/crypto/rsa.h, gated by a new CONFIG_CRYPTO_LIB_RSA
+(selects MPILIB).
+
+crypto::rsa_pubkey_encrypt() wraps it directly. Because the wrapper is
+compiled into and exported from the built-in kernel crate, the C symbol
+must live in vmlinux: CONFIG_CRYPTO_LIB_RSA is therefore a bool (a select
+forces it built-in) and the wrapper is #[cfg(CONFIG_CRYPTO_LIB_RSA)]-gated
+so no vmlinux dependency is introduced for kernels that do not configure
+it. A consumer (e.g. the vino driver) selects it.
+
+A from-scratch constant-time/allocation-free RSA is out of scope; this is
+the lib/crypto entry point that lets a Rust caller avoid crypto_akcipher.
 
 Signed-off-by: Mike Lothian <mike@fireburn.co.uk>
 Assisted-by: Claude:claude-opus-4-8 [Claude-Code]
 ---
- rust/bindings/bindings_helper.h |  1 +
- rust/helpers/crypto.c           | 40 ++++++++++------
- rust/kernel/crypto.rs           | 85 ++++++++++++++++++++++++++-------
- 3 files changed, 94 insertions(+), 32 deletions(-)
+ include/crypto/rsa.h            |  15 +++++
+ lib/crypto/Kconfig              |   9 +++
+ lib/crypto/Makefile             |   3 +
+ lib/crypto/rsa.c                | 102 ++++++++++++++++++++++++++++++++
+ rust/bindings/bindings_helper.h |   1 +
+ rust/kernel/crypto.rs           |  43 ++++++++++++++
+ 6 files changed, 173 insertions(+)
+ create mode 100644 include/crypto/rsa.h
+ create mode 100644 lib/crypto/rsa.c
 
+diff --git a/include/crypto/rsa.h b/include/crypto/rsa.h
+new file mode 100644
+index 000000000000..c11d7b5cae9a
+--- /dev/null
++++ b/include/crypto/rsa.h
+@@ -0,0 +1,15 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * RSA public-key primitive (RSAEP), library interface.
++ *
++ * Copyright (c) 2026 Mike Lothian <mike@fireburn.co.uk>
++ */
++#ifndef _CRYPTO_RSA_H
++#define _CRYPTO_RSA_H
++
++#include <linux/types.h>
++
++int rsa_pubkey_encrypt(const u8 *n, size_t n_len, const u8 *e, size_t e_len,
++		       const u8 *in, size_t in_len, u8 *out, size_t out_len);
++
++#endif /* _CRYPTO_RSA_H */
+diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
+index 591c1c2a7fb3..04655c104e65 100644
+--- a/lib/crypto/Kconfig
++++ b/lib/crypto/Kconfig
+@@ -45,6 +45,15 @@ config CRYPTO_LIB_AESGCM
+ config CRYPTO_LIB_ARC4
+ 	tristate
+ 
++config CRYPTO_LIB_RSA
++	bool
++	select MPILIB
++	help
++	  The RSA public-key primitive (RSAEP, out = in^e mod n), built on the
++	  MPI big-integer library. The bare primitive only; callers apply their
++	  own padding. Bool rather than tristate: the in-kernel consumer is the
++	  built-in Rust crypto bindings, so it must live in vmlinux.
++
+ config CRYPTO_LIB_GF128MUL
+ 	tristate
+ 
+diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
+index f1e9bf89785f..486557df59e3 100644
+--- a/lib/crypto/Makefile
++++ b/lib/crypto/Makefile
+@@ -69,6 +69,9 @@ libaesgcm-y					:= aesgcm.o
+ obj-$(CONFIG_CRYPTO_LIB_ARC4)			+= libarc4.o
+ libarc4-y					:= arc4.o
+ 
++obj-$(CONFIG_CRYPTO_LIB_RSA)			+= librsa.o
++librsa-y					:= rsa.o
++
+ obj-$(CONFIG_CRYPTO_LIB_GF128MUL)		+= gf128mul.o
+ 
+ ################################################################################
+diff --git a/lib/crypto/rsa.c b/lib/crypto/rsa.c
+new file mode 100644
+index 000000000000..21c1d6c9ea26
+--- /dev/null
++++ b/lib/crypto/rsa.c
+@@ -0,0 +1,102 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * RSA public-key primitive (RSAEP) [RFC8017 sec 5.1.1].
++ *
++ * A minimal synchronous library entry point for the RSA public-key operation,
++ * built on the MPI big-integer library (the same arithmetic the crypto_akcipher
++ * "rsa" transform uses), but without the akcipher tfm allocation, DER key
++ * encoding, scatterlists or asynchronous completion machinery. It performs only
++ * the bare RSAEP primitive; callers apply any encoding/padding (RSAES-OAEP,
++ * RSAES-PKCS1-v1_5, ...) themselves.
++ *
++ * Copyright (c) 2026 Mike Lothian <mike@fireburn.co.uk>
++ */
++
++#include <crypto/rsa.h>
++#include <linux/errno.h>
++#include <linux/export.h>
++#include <linux/mpi.h>
++#include <linux/module.h>
++#include <linux/string.h>
++
++/**
++ * rsa_pubkey_encrypt() - RSA public-key operation, out = (in ^ e) mod n
++ * @n: modulus, unsigned big-endian
++ * @n_len: length of @n, in bytes
++ * @e: public exponent, unsigned big-endian
++ * @e_len: length of @e, in bytes
++ * @in: input, unsigned big-endian; already padded by the caller
++ * @in_len: length of @in, in bytes
++ * @out: output buffer; receives the result big-endian, left zero-padded to
++ *	 exactly @out_len bytes
++ * @out_len: size of @out; pass the modulus length (e.g. 128 for RSA-1024)
++ *
++ * Computes the bare RSAEP primitive c = m^e mod n, where m is @in interpreted
++ * as a big-endian integer. This is the raw public-key operation [RFC8017 sec
++ * 5.1.1]; the caller is responsible for any message encoding/padding.
++ *
++ * @in interpreted as an integer must be numerically less than @n, as RSA
++ * requires: a larger value would be silently reduced mod n by the modular
++ * exponentiation and yield a ciphertext the peer cannot decrypt, so it is
++ * rejected. On any error path @out is zeroed, so it never retains data from a
++ * partial computation.
++ *
++ * Return: 0 on success; -EINVAL on a malformed key or out-of-range input;
++ * -EOVERFLOW if the result does not fit in @out_len; -ENOMEM on allocation
++ * failure.
++ */
++int rsa_pubkey_encrypt(const u8 *n, size_t n_len, const u8 *e, size_t e_len,
++		       const u8 *in, size_t in_len, u8 *out, size_t out_len)
++{
++	MPI mn, me, mbase, mres;
++	unsigned int nbytes;
++	int ret = -ENOMEM;
++
++	if (!n_len || !e_len || !in_len || !out_len)
++		return -EINVAL;
++
++	mn = mpi_read_raw_data(n, n_len);
++	me = mpi_read_raw_data(e, e_len);
++	mbase = mpi_read_raw_data(in, in_len);
++	mres = mpi_alloc(0);
++	if (!mn || !me || !mbase || !mres)
++		goto out;
++
++	/*
++	 * RSA requires 0 <= m < n; reject m >= n rather than let mpi_powm()
++	 * silently reduce it and produce an undecryptable ciphertext.
++	 */
++	if (mpi_cmp(mbase, mn) >= 0) {
++		ret = -EINVAL;
++		goto out;
++	}
++
++	ret = mpi_powm(mres, mbase, me, mn);
++	if (ret)
++		goto out;
++
++	/*
++	 * mpi_read_buffer() writes the minimal big-endian form left-aligned
++	 * (and returns -EOVERFLOW without writing if @out_len is too small);
++	 * right-align it into the fixed-width output and zero-pad the front.
++	 */
++	ret = mpi_read_buffer(mres, out, out_len, &nbytes, NULL);
++	if (ret)
++		goto out;
++	if (nbytes < out_len) {
++		memmove(out + (out_len - nbytes), out, nbytes);
++		memset(out, 0, out_len - nbytes);
++	}
++out:
++	if (ret)
++		memzero_explicit(out, out_len);
++	mpi_free(mn);
++	mpi_free(me);
++	mpi_free(mbase);
++	mpi_free(mres);
++	return ret;
++}
++EXPORT_SYMBOL_GPL(rsa_pubkey_encrypt);
++
++MODULE_DESCRIPTION("RSA public-key primitive (RSAEP)");
++MODULE_LICENSE("GPL");
 diff --git a/rust/bindings/bindings_helper.h b/rust/bindings/bindings_helper.h
-index 14671e1825bb..60effaf3af16 100644
+index 60effaf3af16..7bb04d68f9d2 100644
 --- a/rust/bindings/bindings_helper.h
 +++ b/rust/bindings/bindings_helper.h
-@@ -28,6 +28,7 @@
-  */
+@@ -29,6 +29,7 @@
  #include <linux/hrtimer_types.h>
  
-+#include <crypto/aes.h>
+ #include <crypto/aes.h>
++#include <crypto/rsa.h>
  #include <crypto/sha2.h>
  
  #include <linux/acpi.h>
-diff --git a/rust/helpers/crypto.c b/rust/helpers/crypto.c
-index dc9614f6fc8e..a18780231ce0 100644
---- a/rust/helpers/crypto.c
-+++ b/rust/helpers/crypto.c
-@@ -1,25 +1,37 @@
- // SPDX-License-Identifier: GPL-2.0
- 
- #include <crypto/aes.h>
-+#include <crypto/aes-cbc-macs.h>
- #include <linux/string.h>
- 
- /*
-- * AES-128 single-block ECB encryption: out = AES(key, in).
-- *
-- * A helper because aes_encrypt() takes a transparent union (aes_encrypt_arg)
-- * that bindgen cannot express. SHA-256 and HMAC-SHA256 are plain extern
-+ * aes_encrypt() takes a transparent union (aes_encrypt_arg) that bindgen cannot
-+ * express, so the single-block encrypt step is wrapped here. The key schedule
-+ * is prepared once (aes_prepareenckey() is a plain extern bound directly) and
-+ * the resulting struct aes_enckey is reused across blocks by the caller, so the
-+ * key is not re-expanded per block. SHA-256 and HMAC-SHA256 are plain extern
-  * functions and are bound directly.
-  */
--__rust_helper int
--rust_helper_aes128_encrypt_block(const u8 *key, const u8 *in, u8 *out)
-+__rust_helper void
-+rust_helper_aes_enckey_encrypt_block(const struct aes_enckey *key, u8 *out,
-+				     const u8 *in)
- {
--	struct aes_enckey enckey;
--	int ret;
-+	aes_encrypt(key, out, in);
-+}
-+
-+/*
-+ * AES-CMAC one-shot over the in-tree library (crypto/aes-cbc-macs.h): prepares
-+ * the 128-bit key, MACs @data and writes the 16-byte tag to @out. A helper
-+ * because both aes_cmac_preparekey()'s struct and the aes_cmac() one-shot are
-+ * not expressible from Rust directly. The key length is fixed at 128 bits, so
-+ * aes_cmac_preparekey() cannot fail; the prepared key is wiped before return.
-+ */
-+__rust_helper void
-+rust_helper_aes_cmac(const u8 *key, const u8 *data, size_t data_len, u8 *out)
-+{
-+	struct aes_cmac_key cmac_key;
- 
--	ret = aes_prepareenckey(&enckey, key, AES_KEYSIZE_128);
--	if (ret)
--		return ret;
--	aes_encrypt(&enckey, out, in);
--	memzero_explicit(&enckey, sizeof(enckey));
--	return 0;
-+	aes_cmac_preparekey(&cmac_key, key, AES_KEYSIZE_128);
-+	aes_cmac(&cmac_key, data, data_len, out);
-+	memzero_explicit(&cmac_key, sizeof(cmac_key));
- }
 diff --git a/rust/kernel/crypto.rs b/rust/kernel/crypto.rs
-index c8f2cb994cfd..7d96c1c710a4 100644
+index 7d96c1c710a4..b6836e771cfa 100644
 --- a/rust/kernel/crypto.rs
 +++ b/rust/kernel/crypto.rs
-@@ -2,11 +2,15 @@
- 
- //! Safe wrappers over the kernel's synchronous library crypto.
+@@ -9,8 +9,12 @@
+ //! synchronously in the calling context with no allocation; the hashes and the
+ //! MAC are infallible.
  //!
--//! Exposes the one-shot `lib/crypto` primitives — AES-128 single-block ECB,
--//! SHA-256 and HMAC-SHA256 — for use from Rust. They run synchronously in the
--//! calling context with no allocation; the hashes are infallible.
-+//! Exposes the one-shot `lib/crypto` primitives — AES-128 (an [`Aes128`] key
-+//! prepared once for single-block encryption, the building block for modes the
-+//! library does not yet provide such as AES-CTR), the in-tree AES-CMAC
-+//! ([`aes_cmac`]), SHA-256 and HMAC-SHA256 — for use from Rust. They run
-+//! synchronously in the calling context with no allocation; the hashes and the
-+//! MAC are infallible.
- //!
++//! Also exposes the `lib/crypto` RSA public-key primitive
++//! ([`rsa_pubkey_encrypt`]) for callers that do their own padding.
++//!
  //! C headers: [`include/crypto/aes.h`](srctree/include/crypto/aes.h),
-+//! [`include/crypto/aes-cbc-macs.h`](srctree/include/crypto/aes-cbc-macs.h),
+ //! [`include/crypto/aes-cbc-macs.h`](srctree/include/crypto/aes-cbc-macs.h),
++//! [`include/crypto/rsa.h`](srctree/include/crypto/rsa.h),
  //! [`include/crypto/sha2.h`](srctree/include/crypto/sha2.h).
  
  use crate::{bindings, error::to_result, prelude::*};
-@@ -42,36 +46,81 @@
-     out
- }
- 
--/// An AES-128 key usable for single-block ECB encryption.
-+/// Returns `AES-CMAC-128(key, data)` (RFC 4493), computed by the in-tree
-+/// AES-CMAC library ([`include/crypto/aes-cbc-macs.h`]). The 128-bit key is
-+/// prepared and wiped internally; the call is infallible.
-+///
-+/// [`include/crypto/aes-cbc-macs.h`]: srctree/include/crypto/aes-cbc-macs.h
-+pub fn aes_cmac(
-+    key: &[u8; AES128_BLOCK_SIZE],
-+    data: &[u8],
-+) -> [u8; AES128_BLOCK_SIZE] {
-+    let mut out = [0u8; AES128_BLOCK_SIZE];
-+    // SAFETY: `key` is a valid 16-byte key, `data` is valid for `data.len()`
-+    // reads, and `out` is a valid `AES128_BLOCK_SIZE`-byte output buffer, as the
-+    // helper requires.
-+    unsafe {
-+        bindings::aes_cmac(key.as_ptr(), data.as_ptr(), data.len(), out.as_mut_ptr())
-+    };
-+    out
-+}
-+
-+/// An AES-128 key, expanded once for single-block encryption.
-+///
-+/// The key schedule is computed in [`Aes128::new`] and reused across every
-+/// [`encrypt_block`](Aes128::encrypt_block) call, so encrypting a stream of
-+/// blocks (e.g. an AES-CTR keystream) does not re-expand the key per block. This
-+/// is a low-level building block: prefer a full mode of operation where the
-+/// library provides one (see [`aes_cmac`]); the bare block cipher is here only
-+/// for modes `lib/crypto` does not yet expose, such as AES-CTR.
- ///
- /// # Examples
- ///
- /// ```
- /// use kernel::crypto::Aes128;
--/// let cipher = Aes128::new([0u8; 16]);
--/// let _ct = cipher.encrypt_block(&[0u8; 16])?;
-+/// let cipher = Aes128::new(&[0u8; 16])?;
-+/// let _ct = cipher.encrypt_block(&[0u8; 16]);
- /// # Ok::<(), Error>(())
- /// ```
--pub struct Aes128([u8; AES128_BLOCK_SIZE]);
-+pub struct Aes128(bindings::aes_enckey);
- 
- impl Aes128 {
--    /// Creates an AES-128 key from 16 raw key bytes.
--    pub fn new(key: [u8; AES128_BLOCK_SIZE]) -> Self {
--        Self(key)
-+    /// Expands an AES-128 key from 16 raw key bytes.
-+    pub fn new(key: &[u8; AES128_BLOCK_SIZE]) -> Result<Self> {
-+        // SAFETY: `aes_enckey` is a plain-old-data key schedule (integer arrays
-+        // in a union of integer arrays); an all-zero bit pattern is a valid,
-+        // inert initial value, fully overwritten by `aes_prepareenckey()` below.
-+        let mut enckey: bindings::aes_enckey = unsafe { core::mem::zeroed() };
-+        // SAFETY: `enckey` is a valid, owned `aes_enckey`; `key` is a valid
-+        // 16-byte buffer; `AES128_BLOCK_SIZE` (16) is a supported key length.
-+        let ret = unsafe {
-+            bindings::aes_prepareenckey(&mut enckey, key.as_ptr(), AES128_BLOCK_SIZE)
-+        };
-+        to_result(ret)?;
-+        Ok(Self(enckey))
-     }
- 
--    /// Encrypts one 16-byte block: returns `AES-128-ECB(key, block)`.
-+    /// Encrypts one 16-byte block with the prepared key: returns
-+    /// `AES-128-ECB(key, block)`.
-     pub fn encrypt_block(
-         &self,
-         block: &[u8; AES128_BLOCK_SIZE],
--    ) -> Result<[u8; AES128_BLOCK_SIZE]> {
-+    ) -> [u8; AES128_BLOCK_SIZE] {
-         let mut out = [0u8; AES128_BLOCK_SIZE];
--        // SAFETY: `self.0`, `block` and `out` are all valid 16-byte buffers, as
--        // the helper requires.
--        let ret = unsafe {
--            bindings::aes128_encrypt_block(self.0.as_ptr(), block.as_ptr(), out.as_mut_ptr())
-+        // SAFETY: `self.0` is a prepared encryption key; `block` and `out` are
-+        // valid 16-byte buffers, as the helper requires.
-+        unsafe {
-+            bindings::aes_enckey_encrypt_block(&self.0, out.as_mut_ptr(), block.as_ptr())
-         };
--        to_result(ret)?;
--        Ok(out)
-+        out
-+    }
-+}
-+
-+impl Drop for Aes128 {
-+    fn drop(&mut self) {
-+        // SAFETY: `self.0` is a valid, owned `aes_enckey`; overwriting it with
-+        // an all-zero `aes_enckey` clears the expanded key schedule.
-+        // `write_volatile` keeps the store from being optimised away.
-+        unsafe { core::ptr::write_volatile(&mut self.0, core::mem::zeroed()) };
+@@ -124,3 +128,42 @@ fn drop(&mut self) {
+         unsafe { core::ptr::write_volatile(&mut self.0, core::mem::zeroed()) };
      }
  }
++
++/// Computes the RSA public-key primitive `out = (input ^ exponent) mod modulus`
++/// using the in-tree `lib/crypto` RSA library (`rsa_pubkey_encrypt()` in
++/// [`lib/crypto/rsa.c`](srctree/lib/crypto/rsa.c)).
++///
++/// All buffers are unsigned big-endian. `out` is written fixed-width to exactly
++/// `out.len()` bytes (left zero-padded); pass `out.len()` equal to the modulus
++/// size (e.g. 128 for RSA-1024). This is the bare primitive: the caller applies
++/// any padding (PKCS#1 v1.5, EME-OAEP, …) to `input` first.
++///
++/// `input` interpreted as an integer must be less than `modulus`, as RSA
++/// requires; otherwise an error is returned. On any error `out` is zeroed by the
++/// library, so it never retains data from a partial computation.
++///
++/// Only available when `CONFIG_CRYPTO_LIB_RSA` is enabled (a consumer selects
++/// it); the backing library is then built into the kernel.
++#[cfg(CONFIG_CRYPTO_LIB_RSA)]
++pub fn rsa_pubkey_encrypt(
++    modulus: &[u8],
++    exponent: &[u8],
++    input: &[u8],
++    out: &mut [u8],
++) -> Result {
++    // SAFETY: each slice is valid for its stated length; the library function
++    // reads `modulus`/`exponent`/`input` and writes exactly `out.len()` bytes
++    // into `out` (left zero-padded), zeroing it on any error.
++    to_result(unsafe {
++        bindings::rsa_pubkey_encrypt(
++            modulus.as_ptr(),
++            modulus.len(),
++            exponent.as_ptr(),
++            exponent.len(),
++            input.as_ptr(),
++            input.len(),
++            out.as_mut_ptr(),
++            out.len(),
++        )
++    })
++}
 -- 
 2.55.0
 
