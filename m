@@ -1,62 +1,62 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A60C272801
-	for <linux-crypto@vger.kernel.org>; Fri,  3 Jul 2026 03:01:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20B5B2D061D
+	for <linux-crypto@vger.kernel.org>; Fri,  3 Jul 2026 03:01:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783047664; cv=none; b=qLuFWlcd6g9aYHkrlxuorgr2B3YQgmUsCwH03z//5DQlmO+XbmiIeh2jGpHlzllGiNdqSR956IFr8XsYQB26+ao7NZxwwqNdLqw7MPK66vrC4aa6Zu9xOzy9l9vWhgwMrCConhxIgfsQ+h9jKtWAIhebFMGq3nzB9YLZv1q//lE=
+	t=1783047665; cv=none; b=Gr+ZXRYmuah3NzYnl1WmfCX//CBKhhznad9jMFWCul3zeDgHFkfRBYitxKPUI85nn0xiwj8xrdUtdNz54cklvDQ5grRHtCHL3Qc6/3kbIK/AurCxDoTeuef8S6Kir7VGfTrhUCxk6Fjj1xoQJtf8LBfwHx8TWxST2fhvXLG0csg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783047664; c=relaxed/simple;
-	bh=6NjfDtvfguHyET98XVCFvMjKd8ovYZdUgW7vZatG5EY=;
+	s=arc-20240116; t=1783047665; c=relaxed/simple;
+	bh=JcssajxRi9PNX78hwKD3nC3DUtxZW5CBP4nY1hEy3WU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=i3Y3kttcRCBK0Z3jzhLgP0gGnjlMJaHWugLXpx3jcSYAgkCerS0Rj6euK90j9AU/ACRypVq00bqM0dCSHnisLs3H0+finYPrxysyfVyZAN40hNBbHkPwMCblEfEOqoxi4rCLayVItSgRQ+QOBloXcx+g8hWdA8eT215/kxSajjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fireburn.co.uk; spf=none smtp.mailfrom=fireburn.co.uk; dkim=pass (2048-bit key) header.d=fireburn-co-uk.20251104.gappssmtp.com header.i=@fireburn-co-uk.20251104.gappssmtp.com header.b=YWMb62w4; arc=none smtp.client-ip=209.85.128.47
+	 MIME-Version:Content-Type; b=Umpn/gy9u6kbchIHARaHk0qxLi2kI0vLImwK4mVolnSdL07FA3aFO6oHjNKpzut8T80QC1Y3/Vj8kiIKSMyhtguyI92r/R5COQAA8V2xFGKnVgaeW7KrYL49vznT0zSN42jVbBqKyDdd9dq7u8JmYVvpSOplMi6ZDqKjDlUTsi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fireburn.co.uk; spf=none smtp.mailfrom=fireburn.co.uk; dkim=pass (2048-bit key) header.d=fireburn-co-uk.20251104.gappssmtp.com header.i=@fireburn-co-uk.20251104.gappssmtp.com header.b=ADeFgD6m; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fireburn.co.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=fireburn.co.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fireburn-co-uk.20251104.gappssmtp.com header.i=@fireburn-co-uk.20251104.gappssmtp.com header.b="YWMb62w4"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-49241dbf9c1so426735e9.2
-        for <linux-crypto@vger.kernel.org>; Thu, 02 Jul 2026 20:01:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=fireburn-co-uk.20251104.gappssmtp.com header.i=@fireburn-co-uk.20251104.gappssmtp.com header.b="ADeFgD6m"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-490cf3000f0so416015e9.1
+        for <linux-crypto@vger.kernel.org>; Thu, 02 Jul 2026 20:01:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fireburn-co-uk.20251104.gappssmtp.com; s=20251104; t=1783047661; x=1783652461; darn=vger.kernel.org;
+        d=fireburn-co-uk.20251104.gappssmtp.com; s=20251104; t=1783047662; x=1783652462; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=yTs/XtijO8c54KRJepqsfIing448R27R7obvVm8uj2U=;
-        b=YWMb62w4LgZS/WeqADa/plP29wbXVWRvJUCIeWTp8eTl8SRn3iohCU58xHX812eB/H
-         PuU6NllLTxpo5fBCBJZ9n7O4scCY/nYPiH0KQtyfxRB0aLaErR3wa4teTCa5OzQIF5Sp
-         hLdji4C2E/zC2l/e1mXyehuqEbcWeIsrxYAKj9Ezr3B/pd3ba3aydYxu0+eGt6VHoEl9
-         F7OY500wgs3Jc6LINYK9oFmuraeNH9vFNSmBoY7qB2EPTMhQIQNCM7WV1ATGLFBCJgcq
-         anokeRj62+e31rOFKJ7kMHvrt8kbw/A/5fgXaNekYl7SoCM4BC35Qn/Mfq0jeGZrPMb3
-         9mdg==
+         :message-id:reply-to;
+        bh=AHdvnoaQNk7ls45hnvahZXx3/d9yXQUlDlEG/vvXbjU=;
+        b=ADeFgD6m3ecRtaSL3WIRUFFK3v9yuAeYxyudJ3c/Cq/4DCddXFLJM2KC1VFozOVR/k
+         8Y7ZT94GuC3mGVDX9BB8u60uThznVnNajB0boWn3mCW1wvJbexmFqK26XYvaCvaQb0Cf
+         Yqa39CL5/EiYzGa6jpK2oE1PXLFVCGofw/inNaUpOOB27AnODqctEYGVRWMwcc9rpvzd
+         3lr4EpEMxLjdP0i7O91/lFXhORFa2QVK5vCASvOTTeym3/uaOa9zWASSWDcjGvbcn9bL
+         L8cJIqJ0pNM6dvOs3c16wE2BBxuh8v0AN8Xt+p+NVqRp32e/agWV8K3KrEIl3tTwQoqE
+         HYcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783047661; x=1783652461;
+        d=1e100.net; s=20251104; t=1783047662; x=1783652462;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=yTs/XtijO8c54KRJepqsfIing448R27R7obvVm8uj2U=;
-        b=fdAadGpyGpi7W5DbWvEwRe4SiRT+82DoSRoTMtl8ZRSt9uPVD/F6dhXJ3SkhcloOnb
-         Bs954X4wmZpF0ko+pNCRfApSlX4zF7b60jxJVfHx/Y1/iyqr0RmWxuWAOlg/HPdJhZwt
-         JLpLsz8EhBn/z6fkX7BojPYk+BPiJJ0Ah/6zya1lqqxMUY4TiA1EbrqQxQDqEykFJbHi
-         Y2Dq5FyqDrX7CioxHuyX0C7ebywxlU5Tvg8FwPfHNz/gtxQGHOG6GNuMJSyscT9F3q6p
-         0clflqqxoRq9CSPw4aVo4LpoKFRhe0yoITUe+hNZDNlYAyOMIF0sYIqhULza89c+dyfe
-         SI+Q==
-X-Gm-Message-State: AOJu0YwRrCmAeaS14O9XPE9uK05YURvAYcP751enFFPlY2clFJ/hxK1h
-	D5AJEs63OG2qu2/7blWVQNN2RDCYLpvj22uRdlP01/oKR9ja1Qn8loAQwUyf+8U4og==
-X-Gm-Gg: AfdE7cnEn9xB/L7fzLUeYH5ul/9Af9H0AYW08rouLcbEDFnVTK9UkkCKZbLnoJp3cIs
-	nboME7Fa644Eb/FNCEGtaTzUnogoux8pkSe5G8ZvGyQ/VaFU9+tLGun88R3Y8UHIb4H8/wGnyCw
-	4xqx+abXaZ59dWMC1rZIlsmvUrGVlm+HVmpzNH9sFGWQLH2YCFahaGb7bkaJMZgFJXopVthdSJd
-	PK0Xpxc6OLGpWgaWG3RDHRM9OBdGN3mTVuL2mvixxwWUDC0WYvsXPD1tf/s4U+Dw5SI6T3Ec80t
-	ZvFTtlLT6hQWKZxGR9PM1l79e1DxAM3zrrCw/N7t5XdmIx/AfStI8NsWIMJSw0/K0otbsOh4gGP
-	k4XkJd118J7fWmlkr3u/GZQ1IEOieIA4djzC4B4PkyWFD3CniEgS04oQ4Vkc6DYFrVMLcA0d7Ml
-	h16icB1YckHJqsqIeXT12AuNUkuR1qZJvcaD/duXbtTAbkrJj7wt4GygAZ
-X-Received: by 2002:a05:600c:2e43:b0:493:c14a:a1ca with SMTP id 5b1f17b1804b1-493c3cd4aeemr75130465e9.3.1783047660863;
-        Thu, 02 Jul 2026 20:01:00 -0700 (PDT)
+         :to:cc:subject:date:message-id:reply-to;
+        bh=AHdvnoaQNk7ls45hnvahZXx3/d9yXQUlDlEG/vvXbjU=;
+        b=MqShVq6Sidp0W0MNeHS11CUh/xFHgZJZDQeajG4nYzKDFHYEUanIaWicFx7u4BCk78
+         1p+PIszeRYWNAZnOumk5kB2AXtUSDA2Rjuz7zsNwMGC9khmNoE8BzijguKMkktO3DZxn
+         5b50kjrJ7CLdz1szrhDSat9VB4lfgrk3TvTBaao5gsauua3Lhjcp5HlVsZzcFrH9QX1f
+         42uzE5+93qnnrW2uhM+OhIK03tRaHG+8neQ2kCSbBb0HEXsxmCjQMz7SGoiYE4aoVnut
+         i7fkhcvLYf25Y2Yq5UuXAugn9my5Qh1Zqcu0MKItj2YYvGCJvwuyciATuCwO4fsvHQ+H
+         b4qA==
+X-Gm-Message-State: AOJu0Ywvc3mT0f4cgOncV8xgVDlZWdL6gayLqccfG19lP9rf4gtu01S8
+	eSyrKgN+vtzeBWKW2sBB+OWzdda9jrsGVcpI2pYbwn59uUU3o14rTnk8xiIlFBL3pQ==
+X-Gm-Gg: AfdE7cnM26fDObzo/LZqgufndQY0q5G3arNGRqBUzOwaSdAzramaaQ+PEIp1VqsFFNY
+	GtbrZi10p5ZmbZAOs0vTcDemMgNlg4TAKSO0K9sO7urE+i3/DEktCGwqXLRt9uQ64e5N5kGV5p3
+	pNJr7EgZsgyz55NRYfq9PHba/PWZbc1beodvsD6+BAlHxkJ/kRKinEWkd9cLCpOZje6lRB4Cspy
+	YaS+2+feXOXRd/f4ncJnPYHOG2XHJyz1Unj3R2r8wO/O4RxTDihLRK/wEYtiKT5bGIpQ1SvmNTD
+	4g4vAS/e7rdD1mlZK10wYToRZajXyUDorXMzNGi+8peqGWu38TeseFB9+pbezgYsGBdmJRVrYIW
+	Paj3zZH8dGStc1IAWiD4a7TPxKe3IB17m0EafjR3ukggir/L26/iU1dKrruvqL5SoFtKBQ7gQ2w
+	bZSXOgXH79xH5XpgfWnjBWHIqpsXoOZJDQ/L4c8IRSbHr0q8ey3zIs6X8y8WJsGRDQnBQ=
+X-Received: by 2002:a05:600c:8590:b0:490:9588:bdb6 with SMTP id 5b1f17b1804b1-493c2ba43a2mr103955105e9.33.1783047662567;
+        Thu, 02 Jul 2026 20:01:02 -0700 (PDT)
 Received: from axion.fireburn.co.uk ([137.220.119.72])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493bef183e7sm199495015e9.2.2026.07.02.20.00.59
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493bef183e7sm199495015e9.2.2026.07.02.20.01.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jul 2026 20:00:59 -0700 (PDT)
+        Thu, 02 Jul 2026 20:01:01 -0700 (PDT)
 From: Mike Lothian <mike@fireburn.co.uk>
 To: rust-for-linux@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
@@ -75,95 +75,203 @@ Cc: linux-crypto@vger.kernel.org,
 	Danilo Krummrich <dakr@kernel.org>,
 	linux-kernel@vger.kernel.org,
 	Mike Lothian <mike@fireburn.co.uk>
-Subject: [RFC PATCH v2 0/3] rust: crypto: library AES-128 / SHA-256 / HMAC + RSA
-Date: Fri,  3 Jul 2026 04:00:50 +0100
-Message-ID: <20260703030056.2763-1-mike@fireburn.co.uk>
+Subject: [RFC PATCH v2 1/3] rust: crypto: add library AES-128 / SHA-256 / HMAC-SHA256 bindings
+Date: Fri,  3 Jul 2026 04:00:51 +0100
+Message-ID: <20260703030056.2763-2-mike@fireburn.co.uk>
 X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260617150143.2152-1-mike@fireburn.co.uk>
+In-Reply-To: <20260703030056.2763-1-mike@fireburn.co.uk>
 References: <20260617150143.2152-1-mike@fireburn.co.uk>
+ <20260703030056.2763-1-mike@fireburn.co.uk>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This is v2 of the crypto bindings, rebased onto current drm-next --
-no functional change from the version prepared but never sent after
-v1's review (see "Changes since v1" below for what that review fixed).
-It adds a small, reusable kernel::crypto module so in-kernel Rust code
-can hash, MAC, encrypt a single AES block, and do RSA public-key
-encryption:
+Add a small `kernel::crypto` module exposing the kernel's synchronous
+library crypto (lib/crypto) to Rust: SHA-256, HMAC-SHA256 and single-block
+AES-128 ECB. These are one-shot, allocation-free and run in the calling
+context, suitable for in-kernel Rust users that need a hash or a block
+cipher without the full asynchronous crypto API.
 
-  1/3  sha256(), hmac_sha256(), Aes128 (key-prepared-once block cipher)
-  2/3  aes_cmac() over the in-tree AES-CMAC library
-  3/3  rsa_pubkey_encrypt() over a new lib/crypto RSA primitive
+SHA-256 (`sha256()`) and HMAC-SHA256 (`hmac_sha256_usingrawkey()`) are
+plain exported functions and are bound directly via bindgen, so their
+header `<crypto/sha2.h>` is added to bindings_helper.h. AES single-block
+encryption goes through a `rust_helper_` shim because `aes_encrypt()` takes
+a transparent union (`aes_encrypt_arg`) that bindgen cannot express; the
+shim also zeroes the expanded key schedule before returning.
 
-Patch 1 binds the library crypto (lib/crypto) functions directly
-(SHA-256 / HMAC-SHA256) and uses one rust_helper_ shim for aes_encrypt()
-(its transparent union is unbindable). It runs synchronously in the
-calling context with no allocation and is the independently-mergeable,
-self-contained contribution.
+The Rust API: `crypto::sha256(&[u8]) -> [u8; 32]`,
+`crypto::hmac_sha256(key, data) -> [u8; 32]`, and the `crypto::Aes128`
+type, created with `Aes128::new(key)` and used via
+`encrypt_block(&[u8; 16]) -> Result<[u8; 16]>`.
 
-Patch 2 adds crypto::aes_cmac() over the in-tree AES-CMAC library
-(<crypto/aes-cbc-macs.h>) -- the one mode of operation the consumer needs
-that lib/crypto already ships -- rather than building CMAC out of bare
-AES. The 128-bit key is prepared once and wiped after use.
-
-Patch 3 adds an RSA public-key primitive. Rather than bind crypto_akcipher
-(which Eric flagged as a very bad API not to grow), it adds a small
-lib/crypto entry point -- lib/crypto/rsa.c, rsa_pubkey_encrypt(), the bare
-RSAEP primitive c = m^e mod n [RFC8017 sec 5.1.1] over the MPI library --
-and binds that directly: no akcipher tfm, DER key encoding, scatterlists or
-async completion. The caller applies its own padding (RSAES-OAEP, ...). It
-is gated by a new bool CONFIG_CRYPTO_LIB_RSA (selects MPILIB); because the
-Rust wrapper is exported from the built-in kernel crate the symbol must be
-in vmlinux, so the option is a bool and the wrapper is
-#[cfg(CONFIG_CRYPTO_LIB_RSA)]-gated -- a kernel that does not configure it
-gains no dependency. A from-scratch constant-time/allocation-free lib/crypto
-RSA (Eric's longer-term direction) is left as future work.
-
-All three were factored out of an in-kernel Rust DisplayLink DL3 dock
-driver (which needs SHA/HMAC/AES-CMAC for HDCP 2.2 and RSA for the AKE),
-posted alongside as drm/vino ("[RFC PATCH v2 00/6] drm/vino: DisplayLink
-DL3 dock driver"); the intent is to land both upstream. The module is
-generic. Compile-tested in-tree against current drm-next. Source:
-  https://github.com/FireBurn/vino-scripts
-  https://github.com/FireBurn/linux/tree/vino
-  https://gitlab.freedesktop.org/FireBurn/linux/-/tree/vino
-
-Changes since v1 (Eric Biggers):
- - Drop the bare single-block ECB helper that re-expanded the key per block;
-   Aes128 now prepares the key schedule once and reuses it for a keystream.
- - Add aes_cmac() over the in-tree AES-CMAC library (<crypto/aes-cbc-macs.h>)
-   instead of building CMAC out of bare AES (now patch 2/3); the vino driver
-   drops its hand-rolled CMAC for it.
- - RSA no longer binds crypto_akcipher. v1 exposed an Akcipher transform;
-   following Eric's guidance to drop that API, v2 adds a small lib/crypto RSA
-   primitive instead (lib/crypto/rsa.c, now patch 3/3) and binds it directly.
-   A full constant-time lib/crypto RSA is left as future work.
- - Rebased onto current drm-next; no other functional change.
-
-Mike Lothian (3):
-  rust: crypto: add library AES-128 / SHA-256 / HMAC-SHA256 bindings
-  rust: crypto: use the in-tree AES-CMAC library
-  rust: crypto: add an RSA public-key primitive in lib/crypto
-
- include/crypto/rsa.h            |  15 +++
- lib/crypto/Kconfig              |   9 ++
- lib/crypto/Makefile             |   3 +
- lib/crypto/rsa.c                | 102 +++++++++++++++++++
- rust/bindings/bindings_helper.h |   4 +
- rust/helpers/crypto.c           |  37 +++++++
- rust/helpers/helpers.c          |   1 +
- rust/kernel/crypto.rs           | 169 ++++++++++++++++++++++++++++++++
- rust/kernel/lib.rs              |   1 +
- 9 files changed, 341 insertions(+)
- create mode 100644 include/crypto/rsa.h
- create mode 100644 lib/crypto/rsa.c
+Signed-off-by: Mike Lothian <mike@fireburn.co.uk>
+Assisted-by: Claude:claude-opus-4-8 [Claude-Code]
+---
+ rust/bindings/bindings_helper.h |  2 +
+ rust/helpers/crypto.c           | 25 +++++++++++
+ rust/helpers/helpers.c          |  1 +
+ rust/kernel/crypto.rs           | 77 +++++++++++++++++++++++++++++++++
+ rust/kernel/lib.rs              |  1 +
+ 5 files changed, 106 insertions(+)
  create mode 100644 rust/helpers/crypto.c
  create mode 100644 rust/kernel/crypto.rs
 
---
+diff --git a/rust/bindings/bindings_helper.h b/rust/bindings/bindings_helper.h
+index 1124785e210b..14671e1825bb 100644
+--- a/rust/bindings/bindings_helper.h
++++ b/rust/bindings/bindings_helper.h
+@@ -28,6 +28,8 @@
+  */
+ #include <linux/hrtimer_types.h>
+ 
++#include <crypto/sha2.h>
++
+ #include <linux/acpi.h>
+ #include <linux/gpu_buddy.h>
+ #include <drm/drm_device.h>
+diff --git a/rust/helpers/crypto.c b/rust/helpers/crypto.c
+new file mode 100644
+index 000000000000..dc9614f6fc8e
+--- /dev/null
++++ b/rust/helpers/crypto.c
+@@ -0,0 +1,25 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#include <crypto/aes.h>
++#include <linux/string.h>
++
++/*
++ * AES-128 single-block ECB encryption: out = AES(key, in).
++ *
++ * A helper because aes_encrypt() takes a transparent union (aes_encrypt_arg)
++ * that bindgen cannot express. SHA-256 and HMAC-SHA256 are plain extern
++ * functions and are bound directly.
++ */
++__rust_helper int
++rust_helper_aes128_encrypt_block(const u8 *key, const u8 *in, u8 *out)
++{
++	struct aes_enckey enckey;
++	int ret;
++
++	ret = aes_prepareenckey(&enckey, key, AES_KEYSIZE_128);
++	if (ret)
++		return ret;
++	aes_encrypt(&enckey, out, in);
++	memzero_explicit(&enckey, sizeof(enckey));
++	return 0;
++}
+diff --git a/rust/helpers/helpers.c b/rust/helpers/helpers.c
+index 998e31052e66..4f8a1d6d129c 100644
+--- a/rust/helpers/helpers.c
++++ b/rust/helpers/helpers.c
+@@ -56,6 +56,7 @@
+ #include "cpufreq.c"
+ #include "cpumask.c"
+ #include "cred.c"
++#include "crypto.c"
+ #include "device.c"
+ #include "dma.c"
+ #include "dma-resv.c"
+diff --git a/rust/kernel/crypto.rs b/rust/kernel/crypto.rs
+new file mode 100644
+index 000000000000..c8f2cb994cfd
+--- /dev/null
++++ b/rust/kernel/crypto.rs
+@@ -0,0 +1,77 @@
++// SPDX-License-Identifier: GPL-2.0
++
++//! Safe wrappers over the kernel's synchronous library crypto.
++//!
++//! Exposes the one-shot `lib/crypto` primitives — AES-128 single-block ECB,
++//! SHA-256 and HMAC-SHA256 — for use from Rust. They run synchronously in the
++//! calling context with no allocation; the hashes are infallible.
++//!
++//! C headers: [`include/crypto/aes.h`](srctree/include/crypto/aes.h),
++//! [`include/crypto/sha2.h`](srctree/include/crypto/sha2.h).
++
++use crate::{bindings, error::to_result, prelude::*};
++
++/// Size of a SHA-256 / HMAC-SHA256 digest, in bytes.
++pub const SHA256_DIGEST_SIZE: usize = 32;
++/// AES-128 block and key size, in bytes.
++pub const AES128_BLOCK_SIZE: usize = 16;
++
++/// Returns the SHA-256 digest of `data`.
++pub fn sha256(data: &[u8]) -> [u8; SHA256_DIGEST_SIZE] {
++    let mut out = [0u8; SHA256_DIGEST_SIZE];
++    // SAFETY: `data` is valid for `data.len()` reads and `out` is a valid
++    // `SHA256_DIGEST_SIZE`-byte output buffer, as `sha256()` requires.
++    unsafe { bindings::sha256(data.as_ptr(), data.len(), out.as_mut_ptr()) };
++    out
++}
++
++/// Returns `HMAC-SHA256(key, data)`.
++pub fn hmac_sha256(key: &[u8], data: &[u8]) -> [u8; SHA256_DIGEST_SIZE] {
++    let mut out = [0u8; SHA256_DIGEST_SIZE];
++    // SAFETY: `key` and `data` are valid for their respective lengths and `out`
++    // is a valid `SHA256_DIGEST_SIZE`-byte output buffer, as required.
++    unsafe {
++        bindings::hmac_sha256_usingrawkey(
++            key.as_ptr(),
++            key.len(),
++            data.as_ptr(),
++            data.len(),
++            out.as_mut_ptr(),
++        )
++    };
++    out
++}
++
++/// An AES-128 key usable for single-block ECB encryption.
++///
++/// # Examples
++///
++/// ```
++/// use kernel::crypto::Aes128;
++/// let cipher = Aes128::new([0u8; 16]);
++/// let _ct = cipher.encrypt_block(&[0u8; 16])?;
++/// # Ok::<(), Error>(())
++/// ```
++pub struct Aes128([u8; AES128_BLOCK_SIZE]);
++
++impl Aes128 {
++    /// Creates an AES-128 key from 16 raw key bytes.
++    pub fn new(key: [u8; AES128_BLOCK_SIZE]) -> Self {
++        Self(key)
++    }
++
++    /// Encrypts one 16-byte block: returns `AES-128-ECB(key, block)`.
++    pub fn encrypt_block(
++        &self,
++        block: &[u8; AES128_BLOCK_SIZE],
++    ) -> Result<[u8; AES128_BLOCK_SIZE]> {
++        let mut out = [0u8; AES128_BLOCK_SIZE];
++        // SAFETY: `self.0`, `block` and `out` are all valid 16-byte buffers, as
++        // the helper requires.
++        let ret = unsafe {
++            bindings::aes128_encrypt_block(self.0.as_ptr(), block.as_ptr(), out.as_mut_ptr())
++        };
++        to_result(ret)?;
++        Ok(out)
++    }
++}
+diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
+index 9512af7156df..7fcbf3e7d7af 100644
+--- a/rust/kernel/lib.rs
++++ b/rust/kernel/lib.rs
+@@ -59,6 +59,7 @@
+ pub mod cpufreq;
+ pub mod cpumask;
+ pub mod cred;
++pub mod crypto;
+ pub mod debugfs;
+ pub mod device;
+ pub mod device_id;
+-- 
 2.55.0
+
