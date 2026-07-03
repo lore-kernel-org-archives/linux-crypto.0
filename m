@@ -1,91 +1,115 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9650F380FF7;
-	Fri,  3 Jul 2026 06:19:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA2D8282F18;
+	Fri,  3 Jul 2026 06:51:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783059569; cv=none; b=LBDmdTsfBoV0dGBVXvnualqDSD2fz77bqYz4Rf+GMUBGsWN5XRq4jKY+RWb+Z7Erjj0z+RdTw+0INx0NU6Y2gc2CVQpMaJytojot6t6n2ArhWBduRtoMVcQ7JngSXM86AuRmfxKfgRj1Vn8z7PG3Q4q71TJHbwoTl8UKs/NGKnE=
+	t=1783061494; cv=none; b=CIsxLN1DBuTALtHO5sfCkDJb4WSdjngtacvgInnMKJPBjj4JWJq7PwJ6sAsZsNMO0JTQ65HwuGfttqvuhKwnkDaiRga2I8+PygFY0ISC+k50NGleoAgEUi8dGjxw3KcIFhCryvo2Tl4XXQCUNf4ZB0esemf6H7HvT/jncl3j+kg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783059569; c=relaxed/simple;
-	bh=6KylznHOqiWd22SnFBQraUpSbQmxUJRMz+dU7yx/cUY=;
+	s=arc-20240116; t=1783061494; c=relaxed/simple;
+	bh=VyBwtiwEieSiIIGma2mDQI0QVyOxWGwCHI21AN1y5wM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fe7rSbN++35ExlBlk4BLFDDo++2SVmNKo1eWx3+WLtC0KKid8uKq1DQ9nYg2vkHkgsk8JFaG9j21rMLSVMZs8YEz4XEra5rigszOd3UEyvNpbavy+Ic14alIpuqPwuZ/OCG+okIrTqrFLwD1kLIcOwfljQYPfIZikPA6nCUpZnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=dIzzF/nf; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dbnhx0tzCNcWCZxDpFUDPdVfMbKISqi/QsHdfXED/n6pgZP0xezgP+GAuh1by+5t8hFCaKdMyXBKwcjh1DI09GLFWijQTq9zJxl3kS6vhkXs0cNiL4Bvt4JJNf5lWX8CgHaaQs6TqCoQmwvTTMvhgi4TphD2FpGak0fPjdqMzi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I7Na/6Vq; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="dIzzF/nf"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=DXEQ90sJPpbTVqwRJFktHc90n2QX5ZI2D1JPxidYX3I=; 
-	b=dIzzF/nfDsKxfew7reyEO7o32o0SsY7FOPtycwv9Lep7ZC9LAXWfjATwXD+ny2sudVmjP5ca0pw
-	W08CeNki5VyXkTC/weZbRveC4g7x6dE38svlNqFLGlY27BcDXYA0JgFXXS11uEseTKWCplA0ybUL+
-	bWxN/tjPQSJCRLwCPWGYNGsuzybHuYkfDZa5gunevLUbK1xdD/DVnvHzJQW/xbulpUbZZvbjGhei5
-	TFCIGh3UUAd4LdfWJOEJ3Yy9Ca7tkpKL3qaF8B2fvnftC4aTMhYDMjlFtHybSGLUc13db5g2dSeEx
-	cXOwTYOvYF5QkIryQpwVrBYOqYflPmAkXYRA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wfXF5-0000000AGiE-3BxF;
-	Fri, 03 Jul 2026 14:19:16 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 03 Jul 2026 14:19:15 +0800
-Date: Fri, 3 Jul 2026 14:19:15 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Atish Patra <atish.patra@linux.dev>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Peter Gonda <pgonda@google.com>,
-	Brijesh Singh <brijesh.singh@amd.com>,
-	Youngjae Lee <youngjaelee@meta.com>,
-	Ashish Kalra <ashish.kalra@amd.com>,
-	Michael Roth <michael.roth@amd.com>,
-	John Allen <john.allen@amd.com>, clm@meta.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	stable@vger.kernel.org, Atish Patra <atishp@meta.com>,
-	Sashiko <sashiko-bot@kernel.org>
-Subject: Re: [PATCH v3 4/4] crypto: ccp: Fix memory leak in SEV INIT_EX path
-Message-ID: <akdUY_qEi2DaQKcR@gondor.apana.org.au>
-References: <20260602-sev_snp_fixes-v3-0-24bfd3ae047c@meta.com>
- <20260602-sev_snp_fixes-v3-4-24bfd3ae047c@meta.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I7Na/6Vq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 306C31F00A3F;
+	Fri,  3 Jul 2026 06:51:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783061492;
+	bh=t+IcM7mmiTmoh28YJxL6FUZ0PgcEuIvhrm5jZ5vcolI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=I7Na/6Vqws4y7tOz0+uPfwk6zFUa+43bNDWH2tbbizoa29y5PZs9SnHFomLnKhROD
+	 O+qVzgqRvKPWI9zfPUNsxUfeRMz1pofeqi1m22j+NNYE23dh6i0TDHYftiqYJxA7eP
+	 Zk7fhrTw5mXyV1FhxhwnQ7Gd7Z4eH79h7mjSUXAGUefmBsCNJSXy8xDifl11TsbazB
+	 I4NW7rlkY00wzrGNIuesentthOXEx5IseSzYN25ikyFS6k3tcKj6gzV1lBi1xsYDRn
+	 V5JeiOYOxBgNkl9pEGe+u11GgEbAhQKaUDC/P4mjpf7xonhK9ZErgvXfzdM+W6eu07
+	 Fas+yUSMTQVEA==
+Date: Fri, 3 Jul 2026 08:51:27 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Harshal Dev <harshal.dev@oss.qualcomm.com>, 
+	Vinod Koul <vkoul@kernel.org>, Bartosz Golaszewski <brgl@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Frank Li <Frank.Li@kernel.org>, Andy Gross <agross@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>, linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, dmaengine@vger.kernel.org
+Subject: Re: [PATCH v2 1/6] dt-bindings: crypto: qcom,inline-crypto-engine:
+ Fix legacy/new SoC strictness split
+Message-ID: <20260703-nice-beetle-of-efficiency-eafad3@quoll>
+References: <20260702-b4-shikra_crypto_changse-v2-0-66173f2f28b3@qti.qualcomm.com>
+ <20260702-b4-shikra_crypto_changse-v2-1-66173f2f28b3@qti.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260602-sev_snp_fixes-v3-4-24bfd3ae047c@meta.com>
+In-Reply-To: <20260702-b4-shikra_crypto_changse-v2-1-66173f2f28b3@qti.qualcomm.com>
 
-On Tue, Jun 02, 2026 at 03:36:35PM -0700, Atish Patra wrote:
-> From: Atish Patra <atishp@meta.com>
+On Thu, Jul 02, 2026 at 01:47:11AM +0530, Kuldeep Singh wrote:
+> Couple of already merged SoCs describe ICE as single clock historically
+> which are recently updated with mandatory 2 clocks.
 > 
-> allocated pages in _init_ext_path are never freed and sev_init_ex_buffer
-> is left pointing at the leaked memory in case of any failures during the
-> function..
+> Keep only the known legacy compatibles flexible, and make strict
+> validation default(of power-domains and 2 clocks) for all other Soc
+> compatibles.
 > 
-> Fix by adding an error path that frees the pages and clears
-> sev_init_ex_buffer. Make sure we only free the memory if the failure
-> happens before the conversion. Otherwise, we may end up trying to free
-> up converted pages in case of reclaim failure. rmp_mark_pages_firmware
-> failures should be rare enough to avoid more code complexity to track
-> down which pages were reclaimed/leaked vs which are not.
+> This ensures old DTs are valid while ensuring any new SoC (not in the
+> legacy allowlist) must follow latest requirements by default.
 > 
-> Fixes: 7364a6fbca45 ("crypto: ccp: Handle non-volatile INIT_EX data when SNP is enabled")
-> 
-> Reported-by: Sashiko <sashiko-bot@kernel.org>
-> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
-> Signed-off-by: Atish Patra <atishp@meta.com>
+> Fixes: e27264daac7d ("dt-bindings: crypto: qcom,ice: Fix missing power-domain and iface clk")
+
+Please drop, original codeo was correct, no bug to fix.
+
+> Signed-off-by: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
 > ---
->  drivers/crypto/ccp/sev-dev.c | 17 ++++++++++++++---
->  1 file changed, 14 insertions(+), 3 deletions(-)
+>  .../bindings/crypto/qcom,inline-crypto-engine.yaml | 23 ++++++++++++++++------
+>  1 file changed, 17 insertions(+), 6 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+> index db895c50e2d2..4f3689a24410 100644
+> --- a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+> +++ b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+> @@ -55,14 +55,25 @@ required:
+>  
+>  additionalProperties: false
+>  
+> +# Do not extend the list.
+> +# Legacy SoCs are allowed for single clock.
+> +# New SoCs must provide both clocks and power domains.
+>  allOf:
+>    - if:
+> -      properties:
+> -        compatible:
+> -          contains:
+> -            enum:
+> -              - qcom,eliza-inline-crypto-engine
+> -              - qcom,milos-inline-crypto-engine
+> +      not:
+> +        properties:
+> +          compatible:
+> +            contains:
+> +              enum:
+> +                - qcom,kaanapali-inline-crypto-engine
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Your change is not equivalent in relation to hawi. Please make it
+explicit in commit msg - all devices which are fixed by this.
+
+> +                - qcom,qcs8300-inline-crypto-engine
+> +                - qcom,sa8775p-inline-crypto-engine
+> +                - qcom,sc7180-inline-crypto-engine
+> +                - qcom,sc7280-inline-crypto-engine
+> +                - qcom,sm8450-inline-crypto-engine
+> +                - qcom,sm8550-inline-crypto-engine
+> +                - qcom,sm8650-inline-crypto-engine
+> +                - qcom,sm8750-inline-crypto-engine
+
+Best regards,
+Krzysztof
+
