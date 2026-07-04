@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D082B2F1FDE;
-	Sat,  4 Jul 2026 08:38:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52ECA1DFDA1;
+	Sat,  4 Jul 2026 08:38:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783154288; cv=none; b=Wi+257nJwsgRtOj3za9nAgO5H6WFPh4lX3gGp58Pg5wVw8R9OuODIOYYElMVe4IHWQV5bJ/8Xjt3MG75XpTgd3rXjnvNmdCvsWEkcrL0+/WM9Zsh2hUqcPvc9IRpekTMynaSbMaPmj1zwNOnpFd2WtwfIsGNlGHHWB/ZTi1sJnI=
+	t=1783154334; cv=none; b=tJVcB+1lXlUMngt9knN6vSlltM9RU/mji+8mE9cTQvuRmJtfLFwylA9jZrDAt7GL8SvQgWlMXlkrq26+e0+jBk9MFxgp8gDxWI8LrBLmTb47BBDe7NdWplRh1g8PJIq+QGrrqIZe654iqge8/s+84yLgjQOhCbF+cIVJnXUL4eo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783154288; c=relaxed/simple;
-	bh=NL4LfJOLRarXOdemigXNoyY6JW/H03SUe5/w89b+qpo=;
+	s=arc-20240116; t=1783154334; c=relaxed/simple;
+	bh=vH1A3MQng7xfrTYTwAmEwemPiA4notIL1+Cer2qykCM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eTHGshlN659NS98RI6S1+Dbm7cOrZfxeIhUhYpNMswPJkWzlH02hq01IZpjpUd4PCquPOz1WnbCcrcsR5XvoTE57ZyRcF+S1qPZD3wQy+Ee8NJL37XPHHfGnrYBb6MBnwRyotflxN82OMQPNtq+ulVsg3id3hoWoi3iNMs0PV3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dNiQpkoF; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:Content-Type; b=dD5ifc3GCltuQ2T1pdAUnzFc8yandismYEUfM8qO4sP8eYF4h08w5V/pEN3Vov3sYOiVwR42zMPkgd8yjst3powTfw0I57bmRNhCu3RuSwz4451ER7LgX8Q2fugqHp8jS273/jTpeiA9KanRjdb5GtCMERlZxxaPooNPy9aMCvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R4ngji2+; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dNiQpkoF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD8E01F000E9;
-	Sat,  4 Jul 2026 08:37:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R4ngji2+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2502F1F000E9;
+	Sat,  4 Jul 2026 08:38:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783154287;
-	bh=xAsASuuRLAwLyZhXp5gdhk/Oh2/01zF6Q+8Tymjl8lY=;
+	s=k20260515; t=1783154333;
+	bh=boTDy2vyq9N37dSz7w8wgplqGo+9zArCnclnXz5NtRc=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=dNiQpkoF3jVu0ZqU4ICCe1WIFEgfqtUE7XtgQjIE/zhB/fV47dbWrJ+5MWg5FnNy/
-	 0fKaZwOa251Iy1Fqx4a9roDRjZcqLDsWLxnwu8ekbvknay+z1YkV03R8h5g8mT0/n/
-	 DiEPCL8araUq5CY84tTd8nX/RlCUVOfBmXSvh7JqPhKm2G7fPn6JBt7lzcodVXelo/
-	 fhr25K4+6VugGQhO7atB4xTvBqwApKwes9Q8YmhEDVjy3Gql3dirb2yZR3rYKwAL4F
-	 OuTxaaHIpAmnOBssxWGNdCyI78XY3yedPauIiHMEgZECDwBF12mK4aehuydAsE6llu
-	 oadrJb0kr2KMw==
-Message-ID: <95251d7b-fcdb-40cf-aedd-a60773eb3136@kernel.org>
-Date: Sat, 4 Jul 2026 10:37:57 +0200
+	b=R4ngji2+PzmCKa9go2MPCJlbzHWkqhP+VGuNgvmmhhrUx2+WfKRHOR5JVFoa6Ntoo
+	 UYVv3pZ6QAhKl6SRa8QV/bHidBIkdKqGVmiWRAPnZzBNcBLR1zrxEO9U8Emen++wSp
+	 1iECEHGr4mOGQBVSdI/yQvRnBL87FLOCN9OZSw0JjsNEwI6CgI4vZaxaWf6xr+szmN
+	 /IaBaQVajf+Rjc1XX0l2jHEVOnPkOO1X6WC+9irHlH1RkmF6jHlYC0ZlvqvM8akknG
+	 GQLSNSHzSS0cd9oQehlh60StuE6tC3TeSo2W7c2X/hoD/F/stwdfs8UPsveOCkX6qf
+	 bmqiWb6De7nVQ==
+Message-ID: <dfa3ff03-3180-401c-952b-ce6fbdcde813@kernel.org>
+Date: Sat, 4 Jul 2026 10:38:40 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -57,6 +57,7 @@ References: <20260702-b4-shikra_crypto_changse-v2-0-66173f2f28b3@qti.qualcomm.co
  <e53f9b7d-66f1-4922-ab20-f6e66015c912@oss.qualcomm.com>
  <0b182566-2a54-4e31-9a1e-40bdbb0f4a65@oss.qualcomm.com>
  <bb8f2283-93b6-4ea7-ada0-875778c89b3a@oss.qualcomm.com>
+ <95251d7b-fcdb-40cf-aedd-a60773eb3136@kernel.org>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -102,43 +103,52 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  K9bCVaboTA2T77QYkRcRJYSsO1alGX0ome/hMLD1daXlkrNUp1HWa3K4iytLRXjCSIorWiGs
  n+q3krnpXu3TFkA8qtOFZMdnIiFuiq1yLT8hptsV5xh1TA2nsVvSYiaCr3q4s4BKjS/KrLDb
  qoxzw8ISjdUp4pA85vb6YLCmb39NgidD+7PmAr65lBNveIFynTgsja1rRQ4=
-In-Reply-To: <bb8f2283-93b6-4ea7-ada0-875778c89b3a@oss.qualcomm.com>
+In-Reply-To: <95251d7b-fcdb-40cf-aedd-a60773eb3136@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 03/07/2026 11:01, Kuldeep Singh wrote:
-> 
-> 
-> On 03-07-2026 14:27, Konrad Dybcio wrote:
->> On 7/3/26 10:38 AM, Kuldeep Singh wrote:
->>> On 03-07-2026 12:24, Krzysztof Kozlowski wrote:
->>>> On Thu, Jul 02, 2026 at 01:47:15AM +0530, Kuldeep Singh wrote:
->>>>> Upcoming Shikra BAM DMA uses 7 IOMMU entries and not 6, so increase the
->>>>> `iommus` maxItems constraint.
->>>>>
->>>>> Fix below error:
->>>>> dma-controller@1b04000 (qcom,bam-v1.7.4): iommus: [[25, 132, 17], [25,
->>>>
->>>> There is no dma-controller@1b04000 in DTS. Please drop all the warnings
->>>> which do not exist.
->>>
->>> Kindly check patch 6/6, it is introducing bam node with 7iommus which IP
->>> describes and hence, updated bindings before to accustom this which also
->>> helps in avoiding rob's dt-schema bot error.
+On 04/07/2026 10:37, Krzysztof Kozlowski wrote:
+> On 03/07/2026 11:01, Kuldeep Singh wrote:
 >>
->> Krzysztof is saying that the error doesn't exist in the tree (because
->> the offending DTS hunk is not merged), so you shouldn't claim this fixes
->> an error, rather that Shikra simply needs it
+>>
+>> On 03-07-2026 14:27, Konrad Dybcio wrote:
+>>> On 7/3/26 10:38 AM, Kuldeep Singh wrote:
+>>>> On 03-07-2026 12:24, Krzysztof Kozlowski wrote:
+>>>>> On Thu, Jul 02, 2026 at 01:47:15AM +0530, Kuldeep Singh wrote:
+>>>>>> Upcoming Shikra BAM DMA uses 7 IOMMU entries and not 6, so increase the
+>>>>>> `iommus` maxItems constraint.
+>>>>>>
+>>>>>> Fix below error:
+>>>>>> dma-controller@1b04000 (qcom,bam-v1.7.4): iommus: [[25, 132, 17], [25,
+>>>>>
+>>>>> There is no dma-controller@1b04000 in DTS. Please drop all the warnings
+>>>>> which do not exist.
+>>>>
+>>>> Kindly check patch 6/6, it is introducing bam node with 7iommus which IP
+>>>> describes and hence, updated bindings before to accustom this which also
+>>>> helps in avoiding rob's dt-schema bot error.
+>>>
+>>> Krzysztof is saying that the error doesn't exist in the tree (because
+>>> the offending DTS hunk is not merged), so you shouldn't claim this fixes
+>>> an error, rather that Shikra simply needs it
+>>
+>> In previous patchset, krzysztof ask was to add error in commit log and
+>> hence updated that.
+>> Maybe some misunderstanding!
 > 
-> In previous patchset, krzysztof ask was to add error in commit log and
-> hence updated that.
-> Maybe some misunderstanding!
+> From that answer you should have understood there are no warnings to be
+> fixed, no warnings to be mentioned, so that commit msg should have been
+> fixed.
+> 
+> Solution is not to add fake warnings in such case, like you did here.
+> 
 
-From that answer you should have understood there are no warnings to be
-fixed, no warnings to be mentioned, so that commit msg should have been
-fixed.
 
-Solution is not to add fake warnings in such case, like you did here.
+I even said that to you last time at v1!
+
+"Again, there is no error. Revert this patch and check."
+
+https://lore.kernel.org/all/c6415963-ef68-4422-a7fb-fd23b007de32@kernel.org/
 
 Best regards,
 Krzysztof
