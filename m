@@ -1,84 +1,78 @@
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ECAA2ECD3A;
-	Sat,  4 Jul 2026 12:46:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D75D812B94;
+	Sun,  5 Jul 2026 05:31:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783169191; cv=none; b=mg90Eu7PsFet2GtpO3ggDQG6IRFpGRNSYxZ9s/MBfEzB+iReqoNvFMMdPT8SYG7xWJiL7lmHgjNV98WrPGVe1UagmszI/8Bn8DuH5YHvAri4us4fZc8/G0NoGFjxD+/9QsD2Fd0n/Q5rLYyPOo9TtzAihlssYPcMoQFx1jbGwUA=
+	t=1783229510; cv=none; b=Wh/8i75CrDWwryupTq0OwPuhus12eo0w1deebxJwP7wXOwZgnFb6W48yFiZ2liCrGN6FsPBpCLRxWIcxxSc/KJ/gQ/rJ9lxFDioJOqzmMJS7mBJiLEo9Ssa4rCKPvz7K1oV0VtrwPs0XWfgkPQVud96TZLuh8stwDJrH96Zw4Yk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783169191; c=relaxed/simple;
-	bh=jc0icbrBgyq1RxPfrWHXRbPtc0W6C9OpcPU6A+B9ugk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bpLjuf3PJ+kNUxf2JB9sxsleLHxMboNa9etKr2F6DEM1JFU83Po7k/TM5KZFoH22yJxsQzKabYT/kDxs2sCyxKp1cMaVcFJLgzB6ed65EwLg6oQMAF+XuCx4Xl0zdzsK0FXaBt8i5ypGzdVmc4b7Kp/aPnE9eO8cByfUsgfZV/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [111.196.245.140])
-	by APP-03 (Coremail) with SMTP id rQCowAC3r7aTAElqjlvWFg--.11714S2;
-	Sat, 04 Jul 2026 20:46:12 +0800 (CST)
-From: Pengpeng Hou <pengpeng@iscas.ac.cn>
-To: Prabhjot Khurana <prabhjot.khurana@intel.com>,
-	Mark Gross <mgross@linux.intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: Pengpeng Hou <pengpeng@iscas.ac.cn>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: keembay: add missing MODULE_DEVICE_TABLE()
-Date: Sat,  4 Jul 2026 20:46:09 +0800
-Message-ID: <20260704124609.16628-1-pengpeng@iscas.ac.cn>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1783229510; c=relaxed/simple;
+	bh=E7nUGitEE/r0cDHqzqXKRyc7GCK5lG/uilNvbwAxGTs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=by+zRurhu7m+fHDNmRfiFFYK+PxlDjZTVhuCRo4e/Gcdh5TOjYQYpXu1OMWXUsnH3BRj5yOTL1jVjg65li6zicoqd9h6YePztk/6msrg6gDaYe0jHhnMfjMb3Ck0St28vwp8Mu17GOVMp3ACS8KW9u1m7+ktbY20zvzfaqykvwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Xa/aBT/0; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Xa/aBT/0"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=ocYHhDBt0KElBTDMdzYyH7sibDgLVdUqmfT8KH4XuQI=; 
+	b=Xa/aBT/0H8hKLRYlnrUAzv2merApOTWuebA0BQtcLu/QSJHNYEvsXtoZRm0sp8/UGXIb/ZO8Ckw
+	JjPufEx+V2QStez4icDFgq2RFOXIXGHjCxt6vYtony8gShZqmgEhcPJu/cbODf0mLKmROLaNd3XMU
+	2Jeg/niFMEY/8YvItxhsN69uuJYMJH72t84ColZNVBQYwazphXHPwi7CYjI08VMtaMR/neqsZ496W
+	wRNVcyqstMbNUMOcuXBcmI3sbREYGNvpRHwg9hSEuRfewt8MnKnn/H7+5lk3fcKnyzdH0+3Bll6d+
+	Vh9DXSCqJtPWDOa/lsQU+kDGKa5Akeh9YMOg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1wgFS3-0000000Ajbg-1r9H;
+	Sun, 05 Jul 2026 13:31:36 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 05 Jul 2026 13:31:35 +0800
+Date: Sun, 5 Jul 2026 13:31:35 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Manos Pitsidianakis <manos@pitsidianak.is>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] hw_random/core: fix rng list on registration error
+Message-ID: <aknsN0PT1rarFbWd@gondor.apana.org.au>
+References: <20260605-hw_random_registration_rng_list-v2-1-d98b8ccbe16e@pitsidianak.is>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowAC3r7aTAElqjlvWFg--.11714S2
-X-Coremail-Antispam: 1UD129KBjvdXoWrtr45uw1rurW7Aw4DuryrtFb_yoWkAFb_CF
-	18WrZ7WryFkwnYgF1YqwsxZr9Ykwn5uF97GryFqa4avasxXF1UuFWkurnIvw15Jr4jyF98
-	Xrn8WF18CrW2vjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb4AFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
-	Gr1UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUAVWUtwAv7VC2z280aVAFwI0_Cr0_Gr1UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_
-	JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67
-	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIY
-	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14
-	v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWxJVW8
-	Jr1lIxAIcVC2z280aVCY1x0267AKxVWxJr0_GcJvcSsGvfC2KfnxnUUI43ZEXa7VU1F_MD
-	UUUUU==
-X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260605-hw_random_registration_rng_list-v2-1-d98b8ccbe16e@pitsidianak.is>
 
-The driver has an OF match table wired to .of_match_table, but does
-not export the table with MODULE_DEVICE_TABLE().
+On Fri, Jun 05, 2026 at 02:23:51PM +0300, Manos Pitsidianakis wrote:
+> hwrng_register(rng) does the following:
+> 
+> 1. Checks if rng has name and read methods set
+> 2. Checks if the name already exists
+> 3. Adds rng to global rng_list
+> 4. May try to set rng to current_rng
+> 
+> If step 4 fails, it returns an error. However, it does not remove the
+> rng from rng_list, causing a dangling reference which can result in
+> use-after-free if the caller frees rng, since registration failed.
+> 
+> Add a list_del_init() cleanup step.
+> 
+> Fixes: 2bbb6983887f ("hwrng: use rng source with best quality")
+> Signed-off-by: Manos Pitsidianakis <manos@pitsidianak.is>
+> ---
+> Changes in v2:
+> - Add Fixes: trailer
+> - Link to v1: https://lore.kernel.org/r/20260525-hw_random_registration_rng_list-v1-1-ee1c215d544d@pitsidianak.is
+> ---
+>  drivers/char/hw_random/core.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 
-Add the missing MODULE_DEVICE_TABLE(of, ...) entry so module alias
-information is generated for OF based module autoloading.
-
-This is a source-level fix.  It does not claim dynamic hardware
-reproduction; the evidence is the driver-owned match table, its use by
-the platform driver, and the missing module alias publication.
-
-Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
----
- drivers/crypto/intel/keembay/keembay-ocs-ecc.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/crypto/intel/keembay/keembay-ocs-ecc.c b/drivers/crypto/intel/keembay/keembay-ocs-ecc.c
-index e61a95f66a0c..9e555b02086c 100644
---- a/drivers/crypto/intel/keembay/keembay-ocs-ecc.c
-+++ b/drivers/crypto/intel/keembay/keembay-ocs-ecc.c
-@@ -978,6 +978,7 @@ static const struct of_device_id kmb_ocs_ecc_of_match[] = {
- 	},
- 	{}
- };
-+MODULE_DEVICE_TABLE(of, kmb_ocs_ecc_of_match);
- 
- /* The OCS driver is a platform device. */
- static struct platform_driver kmb_ocs_ecc_driver = {
-
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
