@@ -1,45 +1,49 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A291E78F2B;
-	Sun,  5 Jul 2026 08:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB7A3433E7A;
+	Sun,  5 Jul 2026 08:33:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783240326; cv=none; b=QTix35cII+0QUJCBMYkzf08ky72j2ndPNOL8ei/mK4mAEqk2F5RKp+bD8CyXu0IB3G0aRtDqHNuf6xjm4IJlRDEtKfDKpuxgFXSPelpt15YqxoIXch0eFfMg90oa2/RLhRrGrZ2r1k/5eqYWN4HYBsilSTndcebgFlros95vLMo=
+	t=1783240420; cv=none; b=pOZdW3nygaQtxRbQm3ItL6oMGApqzPkEMLmPeoQplf8Q3QEAGMQACWuCg91EX2nmx7fq+eSz0ZZS3hVoLU+Y3QiBiYIn2kvza/YXmFg+P7G4SiNRORz+deqqTyZDUP0o70rOUgzfcgyYhnPFlWsF8P8iJcBfRobMVBQ7ViTNO78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783240326; c=relaxed/simple;
-	bh=F4HRd61PC5wC5hTGf1MMPk7ErqLFD9JIa7HW4/L/CHs=;
+	s=arc-20240116; t=1783240420; c=relaxed/simple;
+	bh=ZYfWVZBwE87UsI5RQSs+53jrp0ELz2YHyiPdy6sEhvE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Iw91VrQewIHoPDUp2qsowX2jp+LTa7BZ9AGjtHYLDAGiSCvYXTNAeROvrL1NoipU/E7NF5VTS2LlkQxjgkfIfNkizpe1D8MVW31fsBM1c9cmiB4TJBTDvR1ZB/z9NdSUVwpNRs1bhdvrIcWxWKd7wJeQ2LyEab3+1F/auiltISQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=lQubVYDn; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=Qt38wRhN+wqiUR+gYgtjQGt/PH7mQ84JGZHvvp2yOIoBePCanzYeOJK09+I2ieLDmdGxUJ/KAIH+W4PcIIOWO9fX5nFznrgBp6YPzzlJPL61a/FPbCvEd6xPcRhAmP5oqLNtSJrntVl5aqQ9hEbBzdIaiNpW+jNuXtgOUzBkJ+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=D6I3DI8N; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="lQubVYDn"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="D6I3DI8N"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=u1ThbLSodWf0lwDI+25VPVsvqW22OFSxSVxWmvJ+Npk=; 
-	b=lQubVYDn497QS3k0Wz9CUOXt8E+COGfrd7XEIMYKtGqVQShROdgGC7t8ms7D9jbB6mfEroaDvKu
-	F+oR+3rqbj5Bo89D8ljNwHRucOADnScPZ3hHuCiBYxy3S9sJ7+ORhbOHTp4e4js+iGtbi4HX21U7e
-	phaaiLpWWHqgF6PqTYGzjO8Bbm1FbRuY+7P69FY2BMkkunUxbbpCbD930S2byS9h1By+5Dnu70ZDJ
-	qKhm6XDtkNgw1VSCp8oI5ktyvUT2hys9XxAUaoDPl9CF6/Fha0XKLdGXi+D124UGvhTbQTYPvIxs0
-	KdKWc47W04prIMddTFv33ovzd6NySIj9AUiA==;
+	from:content-type:reply-to; bh=tVOBl3pFmHo3gQUWye2S7BCioHkaAaDOttuAOXMpMbY=; 
+	b=D6I3DI8NrIG+5KjAQ09sHY2/wH31qmCbqLiknGddMJKS9tBOvhOicIexz/4/iaI7I+gKiNIW/ox
+	McyPSUScfuTFcJdzyTNalysnm1OCOX3KZpkjG23n8Aj+F6Slu2qSEDy/iFPxDou8ST4LSWqYNSK5X
+	kZxCElPJaZwznrpqj9rl0yCPRoggt9srb2dJj9b8khFJn1scLeG0ouRJWUo+hETj7chyRkxY3xnZE
+	ZeYVOaMovC4vGOWZu5FVPHG8PjYCCPaBOtmh/XcaHWFgNXDTtAsLE+WUb973YH95R1TdQvz49F11Z
+	57l76GmNBEOMuDQtZQg47wsLf7Rcs24/+BOQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wgIGf-0000000Al0u-1EhV;
-	Sun, 05 Jul 2026 16:32:02 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 05 Jul 2026 16:32:01 +0800
-Date: Sun, 5 Jul 2026 16:32:01 +0800
+	id 1wgII8-0000000Al1Q-02x1;
+	Sun, 05 Jul 2026 16:33:33 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 05 Jul 2026 16:33:32 +0800
+Date: Sun, 5 Jul 2026 16:33:32 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: "Pratik R. Sampat" <prsampat@amd.com>
-Cc: ashish.kalra@amd.com, thomas.lendacky@amd.com, john.allen@amd.com,
-	davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, aik@amd.com, tycho@kernel.org,
-	nikunj@amd.com, michael.roth@amd.com
-Subject: Re: [PATCH v5] crypto/ccp: Introduce SNP_VERIFY_MITIGATION command
-Message-ID: <akoWgZuz356fAiQS@gondor.apana.org.au>
-References: <682e46e778b7394fb679591c9b6e4d9aeafa9462.1781533471.git.prsampat@amd.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Gaurav Jain <gaurav.jain@nxp.com>,
+	Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+	Pankaj Gupta <pankaj.gupta@nxp.com>,
+	Corentin Labbe <clabbe.montjoie@gmail.com>,
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+	linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH 0/7] Finish removing crypto_rng from drivers/crypto/
+Message-ID: <akoW3D0-IEaNP9Zj@gondor.apana.org.au>
+References: <20260615224131.69370-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -48,77 +52,62 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <682e46e778b7394fb679591c9b6e4d9aeafa9462.1781533471.git.prsampat@amd.com>
+In-Reply-To: <20260615224131.69370-1-ebiggers@kernel.org>
 
-On Mon, Jun 15, 2026 at 03:23:15PM +0000, Pratik R. Sampat wrote:
-> The SEV-SNP firmware provides the SNP_VERIFY_MITIGATION command, which
-> can be used to query the status of currently supported vulnerability
-> mitigations and to initiate mitigations within the firmware.
+On Mon, Jun 15, 2026 at 03:41:24PM -0700, Eric Biggers wrote:
+> This series finishes removing the unused, redundant, and frequently
+> broken crypto_rng support from drivers/crypto/.  It applies to
+> cryptodev/master.
 > 
-> This command is an explicit mechanism to ascertain if a firmware
-> mitigation is applied without needing a full RMP re-build, which is most
-> useful in a live firmware update scenario.
+> Patches 1-4 are a resend of
+> https://lore.kernel.org/linux-crypto/20260608175848.2045229-1-ebiggers@kernel.org/
 > 
-> The firmware supports two subcommands: STATUS and VERIFY. The STATUS
-> subcommand is used to query the supported and verified mitigation bits.
-> The VERIFY subcommand initiates the mitigation process within the FW for
-> the specified vulnerability. Expose a userspace interface under:
-> /sys/firmware/sev/vulnerabilities/
->   - supported_mitigations (read-only): supported mitigation vector mask
->   - verified_mitigations (read/write): current verified mask; write a
->     vector to request VERIFY for that bit
+> Please consider these patches for 7.2, considering that most of these
+> drivers had security vulnerabilities which would have needed to be fixed
+> right away anyway.  And the qcom hwrng fixes are important too.
 > 
-> The behavior of SNP_VERIFY_MITIGATION and the pre-requisites for using
-> it are bug-specific. Information about supported mitigations and its
-> corresponding vector is to be published as part of the AMD Security
-> Bulletin.
+> Eric Biggers (7):
+>   crypto: qcom-rng - Enable clock in hwrng case
+>   crypto: qcom-rng - Allow zero as a random number
+>   crypto: qcom-rng - Remove crypto_rng interface
+>   hwrng: qcom - Move qcom-rng.c into drivers/char/hw_random/
+>   crypto: sun8i-ce - Remove crypto_rng interface
+>   crypto: sun8i-ss - Remove crypto_rng interface
+>   crypto: caam - Remove crypto_rng interface
 > 
-> See SEV-SNP Firmware ABI specifications 1.58, SNP_VERIFY_MITIGATION for
-> more details.
+>  arch/arm/configs/multi_v7_defconfig           |   2 +-
+>  arch/arm/configs/qcom_defconfig               |   2 +-
+>  arch/arm64/configs/defconfig                  |   2 +-
+>  drivers/char/hw_random/Kconfig                |  11 +
+>  drivers/char/hw_random/Makefile               |   1 +
+>  drivers/{crypto => char/hw_random}/qcom-rng.c | 156 ++----------
+>  drivers/crypto/Kconfig                        |  12 -
+>  drivers/crypto/Makefile                       |   1 -
+>  drivers/crypto/allwinner/Kconfig              |  16 --
+>  drivers/crypto/allwinner/sun8i-ce/Makefile    |   1 -
+>  .../crypto/allwinner/sun8i-ce/sun8i-ce-core.c |  63 -----
+>  .../crypto/allwinner/sun8i-ce/sun8i-ce-prng.c | 159 ------------
+>  drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h  |  29 ---
+>  drivers/crypto/allwinner/sun8i-ss/Makefile    |   1 -
+>  .../crypto/allwinner/sun8i-ss/sun8i-ss-core.c |  45 ----
+>  .../crypto/allwinner/sun8i-ss/sun8i-ss-prng.c | 177 -------------
+>  drivers/crypto/allwinner/sun8i-ss/sun8i-ss.h  |  23 --
+>  drivers/crypto/caam/Kconfig                   |   9 -
+>  drivers/crypto/caam/Makefile                  |   1 -
+>  drivers/crypto/caam/caamprng.c                | 241 ------------------
+>  drivers/crypto/caam/intern.h                  |  15 --
+>  drivers/crypto/caam/jr.c                      |   2 -
+>  drivers/gpu/drm/ci/arm64.config               |   2 +-
+>  23 files changed, 41 insertions(+), 930 deletions(-)
+>  rename drivers/{crypto => char/hw_random}/qcom-rng.c (53%)
+>  delete mode 100644 drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
+>  delete mode 100644 drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c
+>  delete mode 100644 drivers/crypto/caam/caamprng.c
 > 
-> Reviewed-by: Tycho Andersen (AMD) <tycho@kernel.org>
-> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
-> Signed-off-by: Pratik R. Sampat <prsampat@amd.com>
-> ---
-> v5:
->  * Collect Reviewed-by Tags
->  * Check for multiple bits set in the mitigation vector - Tom
->  * Add CONFG_SYSFS option to #else and #endif - Tom
->  * Minor whitespace and grammer fixes - Tom
->  * Return -EINVAL instead of -EIO for mitigation failure bit set
->    reporting - Tycho
 > 
-> v4: https://lore.kernel.org/linux-crypto/4957b07dbb4029a4c59bb3cf35f068c36284aa48.1780693665.git.prsampat@amd.com/
->  * Split interface definitions in documentation - Kernel Test Bot
->  * Wrap snp_verify_mitigation() under #ifdef CONFIG_SYSFS - Tom
->  * Remove check for snp initialized and feature info active for
->    registering mitigigation interface - Tom
->  * Since init vs init races should not be possible anymore[1], remove the
->    sysfs mutex guard as sysfs' own synchornization suffices - Tom, Tycho
->  * Dropping the reviewed-by since the patch has changed in a meaningful
->    way
-> 
-> v3: https://lore.kernel.org/linux-crypto/a043a82c-f3dd-4f29-86fb-60638eaddc9b@amd.com/
->   * Remove failed_status interface and report failure via dev_err - Tycho
->   * Make vulnerability interfaces root only accessible - Sashiko
->   * Move /sys/firmware/vulnerabilities/ to
->     /sys/firmware/sev/vulnerabilities/ to be platform specific - Sashiko
->   * Guard sysfs creation under a new mutex to avoid racing during
->     creation and using the sev_cmd_mutex which would race with
->     vulnerability operations - Sashiko
-> 
-> [1]: https://lore.kernel.org/all/20260504165147.1615643-5-tycho@kernel.org/
-> 
-> Patch based on cryptodev-2.6
-> ---
->  .../sysfs-firmware-sev-vulnerabilities        |  19 ++
->  drivers/crypto/ccp/sev-dev.c                  | 177 ++++++++++++++++++
->  drivers/crypto/ccp/sev-dev.h                  |   3 +
->  include/linux/psp-sev.h                       |  51 +++++
->  4 files changed, 250 insertions(+)
->  create mode 100644 Documentation/ABI/testing/sysfs-firmware-sev-vulnerabilities
+> base-commit: 6ea0ce3a19f9c37a014099e2b0a46b27fa164564
 
-Patch applied.  Thanks.
+Patches 4-7 applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
