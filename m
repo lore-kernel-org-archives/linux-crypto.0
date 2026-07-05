@@ -1,43 +1,47 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90F242D7386
-	for <linux-crypto@vger.kernel.org>; Sun,  5 Jul 2026 05:33:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3237330C158;
+	Sun,  5 Jul 2026 08:27:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783229629; cv=none; b=LAxdARndYl8G/LeciuQyTv3B+Ec1DShXGkZ44Bye+yzWpFbx+mHPw3Sa8i2qaEEsf7r/FypRE91RHNmFSWq+cwW2uOUml3PYutXek95/BTe9/L5YvGZhZba1w0resouyD6WkgZh147301sEfXXphHFKq9Jdl9oPXzu7ZE4CNDm4=
+	t=1783240027; cv=none; b=oHuQfrREuFlHJWGSEQFilAVAFUUw4R/fR6xTcBgVCCBodVS1NsePLEsDtBdeSUOjMMHfc6bJfzXGrnbl/tqCIg+pIjyFjhO3kDl1huvZSH4PJ0RUgiGyWOZsAq5TxpRFROiiurHBu95541Clw87BZehocBWlKm4+geGKl5S8EHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783229629; c=relaxed/simple;
-	bh=/JHZ5d1JqOQS5U6fooIrqXyMLZ3iIbkbuR0s1OFqiLY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QWo37+46T0bwdG7pWORVpfK25XSoOwJl5yzZi/9yuXBVz4cZzUl9JwEY5m5RWlKcJEkHjDzfdatPNlk/0R8NHw4ya+g8Z+W64MNTivzoKQeJKvCO1EvL8bQFVcUQcyIEP1KmIiZjciMMYIeKLNN1LVVlzOkvDBZ8sQlkbcFmtes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=C3VACG++; arc=none smtp.client-ip=180.181.231.80
+	s=arc-20240116; t=1783240027; c=relaxed/simple;
+	bh=EpKlMW5LveiYMuciMiXq64pDB1DX6k3eAxVfOX1YcKM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=WJb9vFva69HiMScS7MYvFXHl5IqYLZPWQmJ7LsFn7yLFuV43oMtgY1kloUVqfUNnSJbTYleFRPZJlKi+zihZBmKj6L8WT2DePqnFM+HW/8Eaewmzc0fLhtuCATr53jq2iuGTPR45xBW50w80ESGJpxp/kvSm8O+wKIwy8QRIUew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=IdE6efxt; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="C3VACG++"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="IdE6efxt"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=vLJZmJLp7yryHBbgocuwka/zedyBQs285vhANmqDRP4=; 
-	b=C3VACG++3iBkzcf8qW28mfoX1Ynf411vHd+1LKuk00eINvUS9jO8chOzlcWyIerMzq5kYX/3TGM
-	dKvzpIbOUNp8+sd/nT2/Rgu9bGiRbc2PeqypaaWIII6NWSI2m8SCQfk8PFSj5baTTk4u418lth9Xm
-	BM9JwnCNnkEvjrKmOK10AUvEvgUwJSs/Dh08akV1N4OsDDhreFCySwPFkUcnqk9XoxSg1cl3dfN6+
-	E5jEPlis2Z9/V9tfzkkXy7zYwDYzooZA9T8eq8MGC3CApDuco6A8HTO/f28iqXe1Sz7VGlx+rOUEz
-	xeDAAEI9O2wBgD6hAjCtRqD2FxSZvX7Nphng==;
+	Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:from:
+	content-type:references:reply-to;
+	bh=uOa1wMFrNOEdUyDKqta6glQyq4ySoPGgS/Mn8d2L3d4=; b=IdE6efxtbCK7cJNiuqrnOQfxlc
+	5W1XYMbFN8Yq3RH/oSL2bjG9FtgjEjFJs/cckyV7SsMLIFWWuo9gARB3dcwoertEWMXm5m6qFBrPM
+	Zz377ylFTUilGGFn+mBc9ckLtikGk92HqsGpPdoDNUU5B6i7WmP4YpCjEGxWdWdI7nsfusKlYk6g2
+	RKVDqKmRBeVPGrNHIOBCuqHsm+JGcARXntMBbvapSL1v4J+oMEPERMtRIIXyfuuyHLdMULCY2soeF
+	lfU+7kp7/rjZqMwwA4NhxSJj3ZxszybTydpP8RK8ndzEmjzDJxwK4cneukBRu9AjfGFmDpX4CZ/D8
+	LPbZxVbQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wgFU8-0000000AjgI-41u4;
-	Sun, 05 Jul 2026 13:33:46 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 05 Jul 2026 13:33:44 +0800
-Date: Sun, 5 Jul 2026 13:33:44 +0800
+	id 1wgIBj-0000000Akub-44HX;
+	Sun, 05 Jul 2026 16:26:57 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 05 Jul 2026 16:26:55 +0800
+Date: Sun, 5 Jul 2026 16:26:55 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
-	Ahsan Atta <ahsan.atta@intel.com>
-Subject: Re: [PATCH] crypto: qat - clear AES key schedule from stack
-Message-ID: <aknsuDYTebbOaYHz@gondor.apana.org.au>
-References: <20260608150441.136014-1-giovanni.cabiddu@intel.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	quic_omprsing@quicinc.com, quic_bjorande@quicinc.com,
+	neil.armstrong@linaro.org, linux-arm-msm@vger.kernel.org,
+	olivia@selenic.com, ebiggers@kernel.org,
+	neeraj.soni@oss.qualcomm.com, dmitry.baryshkov@oss.qualcomm.com,
+	konrad.dybcio@oss.qualcomm.com
+Subject: Re: [PATCH v2 0/4] qcom-rng fixes and cleanups
+Message-ID: <akoVT0XHNhxy9-ej@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -46,22 +50,47 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260608150441.136014-1-giovanni.cabiddu@intel.com>
+In-Reply-To: <20260608175848.2045229-1-ebiggers@kernel.org>
+X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
 
-On Mon, Jun 08, 2026 at 04:04:20PM +0100, Giovanni Cabiddu wrote:
-> qat_alg_xts_reverse_key() expands the forward XTS AES key on the stack.
-> That schedule contains key material and can remain in the stack frame.
+Eric Biggers <ebiggers@kernel.org> wrote:
+> This series fixes several bugs in qcom-rng, including failure to enable
+> the clock before accessing the hardware, generating biased random
+> numbers, and generating duplicate or non-random numbers due to missing
+> locking.  To fix the latter bug, it drops the support for the
+> duplicative crypto_rng interface, which isn't used in practice, leaving
+> just hwrng which is the one that actually matters.
 > 
-> Clear the temporary crypto_aes_ctx with memzero_explicit() after the copy.
+> This series is targeting cryptodev/master
 > 
-> Fixes: 5106dfeaeabe ("crypto: qat - add AES-XTS support for QAT GEN4 devices")
-> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> Reviewed-by: Ahsan Atta <ahsan.atta@intel.com>
-> ---
->  drivers/crypto/intel/qat/qat_common/qat_algs.c | 1 +
->  1 file changed, 1 insertion(+)
+> Changed in v2:
+>  - Changed patch 3 to make the driver continue to be bound even when
+>    hwrng is unsupported.
+>  - Added blank line in patch 2
+>  - Added Reviewed-by
+> 
+> Eric Biggers (4):
+>  crypto: qcom-rng - Enable clock in hwrng case
+>  crypto: qcom-rng - Allow zero as a random number
+>  crypto: qcom-rng - Remove crypto_rng interface
+>  hwrng: qcom - Move qcom-rng.c into drivers/char/hw_random/
+> 
+> arch/arm/configs/multi_v7_defconfig           |   2 +-
+> arch/arm/configs/qcom_defconfig               |   2 +-
+> arch/arm64/configs/defconfig                  |   2 +-
+> drivers/char/hw_random/Kconfig                |  11 ++
+> drivers/char/hw_random/Makefile               |   1 +
+> drivers/{crypto => char/hw_random}/qcom-rng.c | 156 +++---------------
+> drivers/crypto/Kconfig                        |  12 --
+> drivers/crypto/Makefile                       |   1 -
+> drivers/gpu/drm/ci/arm64.config               |   2 +-
+> 9 files changed, 41 insertions(+), 148 deletions(-)
+> rename drivers/{crypto => char/hw_random}/qcom-rng.c (53%)
+> 
+> 
+> base-commit: 79bbe453e5bfa6e1c6aa2e8329bfc8f152b81c9b
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
