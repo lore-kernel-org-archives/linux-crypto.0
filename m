@@ -1,47 +1,48 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3237330C158;
-	Sun,  5 Jul 2026 08:27:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 911CE367F25;
+	Sun,  5 Jul 2026 08:28:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783240027; cv=none; b=oHuQfrREuFlHJWGSEQFilAVAFUUw4R/fR6xTcBgVCCBodVS1NsePLEsDtBdeSUOjMMHfc6bJfzXGrnbl/tqCIg+pIjyFjhO3kDl1huvZSH4PJ0RUgiGyWOZsAq5TxpRFROiiurHBu95541Clw87BZehocBWlKm4+geGKl5S8EHs=
+	t=1783240091; cv=none; b=GDG7Ga5euJdt8wYOOoFIp7Huka2imie0GYjQAlcy+lGL/+UBzrRR0/xol8PtH88Sdoi2zJARjCTv/7Rv4IgbppgjY26wcjxMIwSkpTdyAWeEUrlLdpm8i1nzPsx5ZL0/zqxDAAL8RTVASK3Ewc8X3HxzQ9tCt4UUlsOlmwLo+8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783240027; c=relaxed/simple;
-	bh=EpKlMW5LveiYMuciMiXq64pDB1DX6k3eAxVfOX1YcKM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=WJb9vFva69HiMScS7MYvFXHl5IqYLZPWQmJ7LsFn7yLFuV43oMtgY1kloUVqfUNnSJbTYleFRPZJlKi+zihZBmKj6L8WT2DePqnFM+HW/8Eaewmzc0fLhtuCATr53jq2iuGTPR45xBW50w80ESGJpxp/kvSm8O+wKIwy8QRIUew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=IdE6efxt; arc=none smtp.client-ip=180.181.231.80
+	s=arc-20240116; t=1783240091; c=relaxed/simple;
+	bh=k75elt+eyD9YDBjNhXvbk5/JL2OCqJuB712+DBx/Grk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AJ/rE0LCT3/WoCAImATmZDr2LLkxQ5LcqXH7AMSY5+wfWA9fyF/RnZCgIifCCZ3wdEqHalsQHSO/HXSUfTve9zLVUjLqo2ltldMZ5ahmgYj9KszFw0w7J5OHefVq+BEFXzJhva8mMKueX7Tp0wYvqHm7JNoj5Jha9B/ICjqaJOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=pFXxJCeC; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="IdE6efxt"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="pFXxJCeC"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:from:
-	content-type:references:reply-to;
-	bh=uOa1wMFrNOEdUyDKqta6glQyq4ySoPGgS/Mn8d2L3d4=; b=IdE6efxtbCK7cJNiuqrnOQfxlc
-	5W1XYMbFN8Yq3RH/oSL2bjG9FtgjEjFJs/cckyV7SsMLIFWWuo9gARB3dcwoertEWMXm5m6qFBrPM
-	Zz377ylFTUilGGFn+mBc9ckLtikGk92HqsGpPdoDNUU5B6i7WmP4YpCjEGxWdWdI7nsfusKlYk6g2
-	RKVDqKmRBeVPGrNHIOBCuqHsm+JGcARXntMBbvapSL1v4J+oMEPERMtRIIXyfuuyHLdMULCY2soeF
-	lfU+7kp7/rjZqMwwA4NhxSJj3ZxszybTydpP8RK8ndzEmjzDJxwK4cneukBRu9AjfGFmDpX4CZ/D8
-	LPbZxVbQ==;
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=/NBII0BMp4fa4Zg7Dwve5MwdwbOFNBeaugYhi2j46os=; 
+	b=pFXxJCeC94YKMvrKpNVRWm3lhw5VmWiwAhEyP9FTVAuk8m01+iQTxCrfHHGr//b3/0htR69GYV1
+	ne6cm8yEELa/nVjC00rqnMHORaPMsllWofq2IhcN8USvPY2jhW4B5NAiK7jljqXg4N+hbVPqlwT5I
+	/BaPuOgxLIoglDAbUYgje4fB1lnovYJ2qIoYzQaEFxWwqMFaZnIZ/gWEdrhUiab+q0ynjtZZKiREN
+	E2OawUNb4msMJML7kT7+699+ZMb0XH0i8lYYaQFu/HzTeocTuFgezvxjOTsiGkYJK7R/UkCYrVqc9
+	BdKGrNhA5VTBIUVLJ5RzCa220YThxiee1E1g==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wgIBj-0000000Akub-44HX;
-	Sun, 05 Jul 2026 16:26:57 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 05 Jul 2026 16:26:55 +0800
-Date: Sun, 5 Jul 2026 16:26:55 +0800
+	id 1wgICh-0000000Akuo-0WG4;
+	Sun, 05 Jul 2026 16:27:56 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 05 Jul 2026 16:27:55 +0800
+Date: Sun, 5 Jul 2026 16:27:55 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	quic_omprsing@quicinc.com, quic_bjorande@quicinc.com,
-	neil.armstrong@linaro.org, linux-arm-msm@vger.kernel.org,
-	olivia@selenic.com, ebiggers@kernel.org,
-	neeraj.soni@oss.qualcomm.com, dmitry.baryshkov@oss.qualcomm.com,
-	konrad.dybcio@oss.qualcomm.com
-Subject: Re: [PATCH v2 0/4] qcom-rng fixes and cleanups
-Message-ID: <akoVT0XHNhxy9-ej@gondor.apana.org.au>
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] crypto: atmel-i2c - improve comment in
+ atmel_i2c_init_ecdh_cmd
+Message-ID: <akoViy68bvKvD7jM@gondor.apana.org.au>
+References: <20260609100552.233494-3-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,45 +51,17 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260608175848.2045229-1-ebiggers@kernel.org>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+In-Reply-To: <20260609100552.233494-3-thorsten.blum@linux.dev>
 
-Eric Biggers <ebiggers@kernel.org> wrote:
-> This series fixes several bugs in qcom-rng, including failure to enable
-> the clock before accessing the hardware, generating biased random
-> numbers, and generating duplicate or non-random numbers due to missing
-> locking.  To fix the latter bug, it drops the support for the
-> duplicative crypto_rng interface, which isn't used in practice, leaving
-> just hwrng which is the one that actually matters.
+On Tue, Jun 09, 2026 at 12:05:53PM +0200, Thorsten Blum wrote:
+> Clarify that a P-256 public key is encoded as two 32-byte coordinates.
 > 
-> This series is targeting cryptodev/master
-> 
-> Changed in v2:
->  - Changed patch 3 to make the driver continue to be bound even when
->    hwrng is unsupported.
->  - Added blank line in patch 2
->  - Added Reviewed-by
-> 
-> Eric Biggers (4):
->  crypto: qcom-rng - Enable clock in hwrng case
->  crypto: qcom-rng - Allow zero as a random number
->  crypto: qcom-rng - Remove crypto_rng interface
->  hwrng: qcom - Move qcom-rng.c into drivers/char/hw_random/
-> 
-> arch/arm/configs/multi_v7_defconfig           |   2 +-
-> arch/arm/configs/qcom_defconfig               |   2 +-
-> arch/arm64/configs/defconfig                  |   2 +-
-> drivers/char/hw_random/Kconfig                |  11 ++
-> drivers/char/hw_random/Makefile               |   1 +
-> drivers/{crypto => char/hw_random}/qcom-rng.c | 156 +++---------------
-> drivers/crypto/Kconfig                        |  12 --
-> drivers/crypto/Makefile                       |   1 -
-> drivers/gpu/drm/ci/arm64.config               |   2 +-
-> 9 files changed, 41 insertions(+), 148 deletions(-)
-> rename drivers/{crypto => char/hw_random}/qcom-rng.c (53%)
-> 
-> 
-> base-commit: 79bbe453e5bfa6e1c6aa2e8329bfc8f152b81c9b
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> ---
+> No changes in patch 1/2.
+> ---
+>  drivers/crypto/atmel-i2c.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
 
 All applied.  Thanks.
 -- 
