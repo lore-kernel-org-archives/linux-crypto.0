@@ -1,172 +1,166 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BECD930D405
-	for <linux-crypto@vger.kernel.org>; Sun,  5 Jul 2026 22:01:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6FDA3B42F1
+	for <linux-crypto@vger.kernel.org>; Mon,  6 Jul 2026 05:11:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783288882; cv=none; b=p6WWDCrqE4Deov6M8fXzh6RdMY7Z2vDrm5QJup+wAOJBnDbNHkY5FQC3zz9HJDrn5x8lGp0QRvIveu1pB61itGC43cLE4ahoAYffqRwJIA6pMIBH///nyRtLZZO+023nPJe+z+AVEz6sDvoJEiBMUg4T49FqqPlg8wicMIexEBw=
+	t=1783314680; cv=none; b=FkG8kFDP2jG4c9R8z+4kJ6g5wcmXTs3PIiJSNx4G7yIsx98Ome6oFF/UfUm0OCLMh49wDItSTpWSeFDEF/Fcjche6u0S05WWDEkzBx9JldJvysfP74kNjAV5RAcx++gDz7wM+nUSG3+B/5Cu462sUFUTFbuh7SMHLHPbgz0tKzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783288882; c=relaxed/simple;
-	bh=J4FjOshJ6RBO/3MOt+VmllNZWiRL7HFHiixP5bQuZpM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=a5iLNTkgmqONgQbc09P9W/xoDO/uhxwZ0WZM0QYGQkhdZPs6wTYNQonJmDiNWLelaHXfeUD3cGW6kHl36DjA/D/QdeMemo75nqTSFnshnibznfjK+qUJECz0XALbk/qqUJCIEmaZMpHflhIC9Yx2KtnPWkcIyVPRzNa8Py0SpNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CSVja2Qd; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1783314680; c=relaxed/simple;
+	bh=P997Ne0ukAp9OVBdlFOQgAT6dUdsnk4v4SF9WhQSZdI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kjPuXzkedFbhGvXxBsCVGw8m7sTcouWTqQcxnNGbdFOFo4utp7zkzhGvR3rFAGZyD47ZtOUWLYeD0dKENlOTF90crs3EzWpiXQy0ISTCCMoVC8LvRBMBv1CRHoRHVY2w1gNSIFhf/yG2YKyYS4uzoxgG4ow3DHffRg+9XwNQUtQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GvtRTTGo; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=XILF7Hwa; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CSVja2Qd"
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-493c2c0b9a8so21376485e9.1
-        for <linux-crypto@vger.kernel.org>; Sun, 05 Jul 2026 15:01:20 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GvtRTTGo";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="XILF7Hwa"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1783314678;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=XfZobLIyFSfKPQ8moG7Mp4eAnQzlNBi6mn41MBA1fRQ=;
+	b=GvtRTTGoYKCJ/cX+lHnU7DtVCudCxU6lslirpVN2PuUhGOrehfStSLkuhNDhaADS5DDGMD
+	wJvJo45f4BFGweOR6jfbXcInir+kat5ACNEX2yJ4gEBM3Js/hp/UYbL+7Ac7XgUWtw5c1y
+	mRLAJIUA5Hr5KZRSlg8AIpdTz+e9gzE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-478-PgG4_lUqMGK_-xJCTILgRg-1; Mon, 06 Jul 2026 01:11:14 -0400
+X-MC-Unique: PgG4_lUqMGK_-xJCTILgRg-1
+X-Mimecast-MFC-AGG-ID: PgG4_lUqMGK_-xJCTILgRg_1783314673
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-47780faf8cfso1624528f8f.3
+        for <linux-crypto@vger.kernel.org>; Sun, 05 Jul 2026 22:11:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783288879; x=1783893679; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=YvlYxiNAfYjqJ5SupCEKeoITyZXsujlTXQzFGXeco6M=;
-        b=CSVja2Qd2GVOBY8yspmioTVFtOKkhfQDERDH08vdH/sskCSTGK53XUr9g4Y3rY50/h
-         ipwBnXRE/OjGi9nQdRmHp+f5VwdzOsiF32GElB54z6GvYwTGfkkMAc/m5xlQAQbDC6/1
-         bBEaSBUyeYbd8hJqoL3zGJhr9aUDAcdYsBIkw4nhdcohNhjWq7PwxFEVkA9lBM6Qm+Ur
-         BgGmmtRy1Uflo/zXO2Zxn1IGfR7V3rXJmOv0+DVESiirWUFmSVcjR2Nlo0QqJSPMByT5
-         9fDWW5td9iuFzD0zD2FJJB6e0S2STpycg3LgsRYjcOa0oPitIY9UfpxQiJ4odppQ1PZc
-         Ld3A==
+        d=redhat.com; s=google; t=1783314673; x=1783919473; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=XfZobLIyFSfKPQ8moG7Mp4eAnQzlNBi6mn41MBA1fRQ=;
+        b=XILF7Hwa90foCjp7GJLSpanjxjOhtMNHcfgh+OjQ19j8HUtapMusMAUnWGORTYy2Fb
+         s+NxYw5b6lILbbiXBfiPYbLi7SxZGIFGswUb/jpaNUnwYYkPK6m0UGIK15s/NOPM5iS/
+         5mh0iswuKeQ0PD3GlfX8N7fiBch/shW4RCvCdygIf4WFGqE/6gkswO2ij0m7/zUr6DsP
+         3WsfoqzPIhAzvSYMPTMaj8Zzy1SMHcI08EfYlivmWMupnjve32tdhd6IeOT0QArusZWp
+         5CBbZzByCbFzIDRpcdMvPAfTTJYafhWHXqwmSLpuTx7wjTIb+zE3P2bKShD9RyGV7AFu
+         EIug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783288879; x=1783893679;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=YvlYxiNAfYjqJ5SupCEKeoITyZXsujlTXQzFGXeco6M=;
-        b=lmJDupE7iuAsYoc7K0Da84aeeeCHVjaB6Cf7P22o53cGWlD2Pc2K5Fj9Azds5Pg33C
-         r2Kvs7elY6AzE7hhsTzBFPTPCg00dPXGbSUDmevsfwX+JW5Ip9GSEjNnzu5k0xDBjsQM
-         JdHyKrxEMx/96oiQnq+3BLnIrfLpJBjUmADwqHgrJPcUTS619okZSo0apLIikhkOmlja
-         b1/Im/eiUViZRNUu1dbXr0WFafgJ2g7nSBY9kD11u0hFV7Gd2ojvazGQFmfn4InFwuNy
-         lbdYfg95sctbdBaH7ri8+vOVEep7oABCMHSgVs7patAUs3Qqohh0YUIjmka/lMsP6D11
-         PJ1Q==
-X-Gm-Message-State: AOJu0Yw4Gmo4ia9AWNPAZiFbjq26SZyTpUqcJZz3Y12JjOZaJhH4nLxC
-	9CQBQEKUr65gURTjgakjCJGon3heUy35Pr+mH+50W2Aw0xoYusPzdVjp
-X-Gm-Gg: AfdE7cn/q1aUWgn/0sQhaQdR48c+rqduG7dklbTwuN9sPgReuO3bLKnKPue/1L5V+jQ
-	nesMorFysSWoRLmthor7PpFKWUrGHMgyHljgmEIbnYWxYe7De+tz46W1+WrjBOx4U5MHZ3sG/LD
-	tjOmvAvhy49DbnDrwXuCdGsmBGEqieaWv/NL3WUv+zHRjwMGnFiolJCjq2AN7ykp8SnvoWWSHAD
-	WB19l6KiP4D1gUDsuBV6plRJXc3m30A1HMJxi+zb6Cv7zDV206Zron5QQds2NGKhlSJsTa3gqgH
-	9VhWh/0YZJfkeXZxlVTBKygX+tEtT/Q/j6wo4LiQ07Tpqq/Nc6VXVaCN0IakDSBXU37QIvJLVVa
-	o9YLo68OS7DUi+ykpOAdrIb8b5BS20luJZsmqFljchVWm0LM6CHDff2WeqK7H0DTKoix+WTW6wV
-	X3dTC1NXd40vfGFY1SONfoM6Bpvw==
-X-Received: by 2002:a05:600c:190e:b0:490:469c:556b with SMTP id 5b1f17b1804b1-493d4ee52d9mr64705305e9.12.1783288879237;
-        Sun, 05 Jul 2026 15:01:19 -0700 (PDT)
-Received: from tt.. ([31.223.44.89])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493c63172fesm544853265e9.0.2026.07.05.15.01.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 05 Jul 2026 15:01:18 -0700 (PDT)
-From: =?UTF-8?q?Muhammet=20Kaan=20KILIN=C3=87?= <muhammetkaankilinc@gmail.com>
-To: herbert@gondor.apana.org.au,
-	ebiggers@kernel.org
-Cc: linux-crypto@vger.kernel.org,
-	stable@vger.kernel.org,
-	sashal@kernel.org,
-	=?UTF-8?q?Muhammet=20Kaan=20KILIN=C3=87?= <muhammetkaankilinc@gmail.com>
-Subject: [PATCH 2/2] crypto: algif_skcipher - force synchronous processing on trees without ctx->state
-Date: Sun,  5 Jul 2026 22:01:11 +0000
-Message-ID: <20260705220112.2522-3-muhammetkaankilinc@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260705220112.2522-1-muhammetkaankilinc@gmail.com>
-References: <20260705220112.2522-1-muhammetkaankilinc@gmail.com>
+        d=1e100.net; s=20251104; t=1783314673; x=1783919473;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XfZobLIyFSfKPQ8moG7Mp4eAnQzlNBi6mn41MBA1fRQ=;
+        b=WHIwLD5d4SjPdQLzWHXh4DWgQPMKnV9HvSARtAxFvWwFhhrvKeTkzqE8EntIN2S8DB
+         LmlrWCcraK2m0lQ3A4edSwPYRW0i4Z2avz206feo1n0a9lqUtJhuKdX2yzkY1LILpv3N
+         l32y9+Pto0TDTdPIkVWO9hZ1gbb4XNEkFIMnO77+IfqqZMMTEIdYWrLMaZbYmvDB3dcZ
+         kNg6q3Z5YRAt4plgaa4DQkHebJhsXBJ+OREtJ4ojwRV10jPPE7hKc88cLBkvdI0vWwT3
+         1z2VQ61XmdlySZPMTQy8CBa7dM5e9fLI2Ymbg2l7WCzwAG2awkDyqT1F9CGjkLhBFoZH
+         164A==
+X-Forwarded-Encrypted: i=1; AHgh+RoK+gMiU1ALSSGNpKmFwLOXOms0LzI3NNUrypCuH/R/QVRROfzHBFP+hTg8dP8yfrNcRFLGjCW3a1CoqEg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQ+v0s10kMFLbjsKCvDVQlDrbXO5Jepw23WpeyYiYcdXPlsmmu
+	i9L3Hs3fJlUbsoGz6RL7+3lv+nLM/Ewsb6LnEOlTh5jj1PGCncquSpItb45qvNcPsCiQQUCtZXN
+	6GqkQVoER0M1PqnkaYVIhmDTaQ9xGxudfVZaAke9qLI9zEs6mbiqW9WshoKuA0gp0Uw==
+X-Gm-Gg: AfdE7cmo38HxDhFnzmFgV7384w1eynyDbmRwv0DFRu6MvzV0/iHOqrPQwYiFPxn6J6C
+	Z7Yhfqnct8aRNBFs080CpO/vKyRO5UKt+WtpsQoUIo7wX4pKAaafQJFoRmG27vmDdl9q+Vgvdd8
+	STDF0GHlhmExRU74VvBmucMop8uRrFJw2rBsTum08Me4NGDydoXk6L31/9sBWazFu4XRTfkQCVE
+	dbY14EJSZRT+55eRevhxunE+Ou9Z7IeJJtD4lvjXuw9v7K0ALYPKS+WBM9tyb0Jey+RCaB6lZkj
+	ARAT75VnsYMrOCFHZuTt5D8Ar3AbBO9cIyc5IRuzHhJb7gd4W60C92xI1po9LnO64PEIO3oBQXI
+	hMo3axMGB/eZnG8LaToSAnlMQaJdI4y7eZ61mucggKEKt6ujb+E3l
+X-Received: by 2002:a05:600c:8b6b:b0:493:cc25:85cb with SMTP id 5b1f17b1804b1-493d11d275dmr104107855e9.8.1783314673341;
+        Sun, 05 Jul 2026 22:11:13 -0700 (PDT)
+X-Received: by 2002:a05:600c:8b6b:b0:493:cc25:85cb with SMTP id 5b1f17b1804b1-493d11d275dmr104107635e9.8.1783314672967;
+        Sun, 05 Jul 2026 22:11:12 -0700 (PDT)
+Received: from ?IPV6:2a01:599:b25:5a4f:dc68:5203:b109:1efb? ([2a01:599:b25:5a4f:dc68:5203:b109:1efb])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47aa0f21543sm20570611f8f.35.2026.07.05.22.11.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 05 Jul 2026 22:11:12 -0700 (PDT)
+Message-ID: <6ed4c75d-c17d-40e6-9ef2-6c29ca54342e@redhat.com>
+Date: Mon, 6 Jul 2026 07:11:10 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: qat - use strscpy_pad to simplify
+ adf_service_string_to_mask
+To: Thorsten Blum <thorsten.blum@linux.dev>,
+ Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>,
+ Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
+Cc: qat-linux@intel.com, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260705133842.241401-3-thorsten.blum@linux.dev>
+From: Thomas Huth <thuth@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <20260705133842.241401-3-thorsten.blum@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The AIO/async path in skcipher_recvmsg() passes the socket-wide ctx->iv
-directly into the skcipher request. After io_submit() the socket lock is
-dropped and the request is processed asynchronously, so a concurrent
-sendmsg(ALG_SET_IV) can overwrite ctx->iv and make the in-flight request
-run under an attacker-controlled IV. For CTR/stream modes this is
-IV/keystream reuse and lets an unprivileged user recover the plaintext of
-a concurrent operation.
-
-Newer trees snapshot ctx->iv per request and rely on ctx->state
-(crypto_skcipher_import/export) to carry the chained IV. These trees lack
-ctx->state and chain the IV in-place, so a per-request snapshot alone
-would break MSG_MORE chaining, and a snapshot plus completion-time
-writeback would reintroduce a race on ctx->iv outside the socket lock.
-
-Make the operation synchronous instead, which removes both the IV race and
-any writeback race. This mirrors the upstream resolution, commit
-fcc77d33a34c ("net: Remove support for AIO on sockets"), which removed the
-AIO socket path entirely. io_submit() now completes synchronously; AF_ALG
-async is rarely used in practice.
-
-Tested on 6.6.y: attacker IV injection dropped from 2296/200000 to 0/200000
-after the change; MSG_MORE chunked CTR output bit-identical to single-shot.
-
-Reported-by: Muhammet Kaan KILINÇ <muhammetkaankilinc@gmail.com>
-Fixes: e870456d8e7c ("crypto: algif_skcipher - overhaul memory management")
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Muhammet Kaan KILINÇ <muhammetkaankilinc@gmail.com>
----
- crypto/algif_skcipher.c | 49 +++++++++++++++--------------------------
- 1 file changed, 18 insertions(+), 31 deletions(-)
-
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index e31b1da58..b12df4544 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -109,33 +109,20 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
- 
--	if (msg->msg_iocb && !is_sync_kiocb(msg->msg_iocb)) {
--		/* AIO operation */
--		sock_hold(sk);
--		areq->iocb = msg->msg_iocb;
--
--		/* Remember output size that will be generated. */
--		areq->outlen = len;
--
--		skcipher_request_set_callback(&areq->cra_u.skcipher_req,
--					      CRYPTO_TFM_REQ_MAY_SLEEP,
--					      af_alg_async_cb, areq);
--		err = ctx->enc ?
--			crypto_skcipher_encrypt(&areq->cra_u.skcipher_req) :
--			crypto_skcipher_decrypt(&areq->cra_u.skcipher_req);
--
--		/* AIO operation in progress */
--		if (err == -EINPROGRESS)
--			return -EIOCBQUEUED;
--
--		sock_put(sk);
--	} else {
--		/* Synchronous operation */
--		skcipher_request_set_callback(&areq->cra_u.skcipher_req,
--					      CRYPTO_TFM_REQ_MAY_SLEEP |
--					      CRYPTO_TFM_REQ_MAY_BACKLOG,
--					      crypto_req_done, &ctx->wait);
--		err = crypto_wait_req(ctx->enc ?
--			crypto_skcipher_encrypt(&areq->cra_u.skcipher_req) :
--			crypto_skcipher_decrypt(&areq->cra_u.skcipher_req),
--						 &ctx->wait);
--	}
-+	/*
-+	 * Force synchronous processing.  The async (AIO) path passed the
-+	 * socket-wide ctx->iv into the request, which the worker
-+	 * dereferenced after the socket lock was dropped, letting a
-+	 * concurrent sendmsg(ALG_SET_IV) inject an attacker IV.  Mainline
-+	 * removed the AIO socket path in commit fcc77d33a34c ("net: Remove
-+	 * support for AIO on sockets"); these stable trees lack the
-+	 * per-request ctx->state used by newer kernels, so the minimal safe
-+	 * fix is to always complete synchronously.
-+	 */
-+	skcipher_request_set_callback(&areq->cra_u.skcipher_req,
-+				      CRYPTO_TFM_REQ_MAY_SLEEP |
-+				      CRYPTO_TFM_REQ_MAY_BACKLOG,
-+				      crypto_req_done, &ctx->wait);
-+	err = crypto_wait_req(ctx->enc ?
-+		crypto_skcipher_encrypt(&areq->cra_u.skcipher_req) :
-+		crypto_skcipher_decrypt(&areq->cra_u.skcipher_req),
-+				      &ctx->wait);
- 
--- 
-2.43.0
+On 05/07/2026 15.38, Thorsten Blum wrote:
+> Use strscpy_pad() to copy buf and zero-pad any trailing bytes instead of
+> zero-initializing the local services buffer and then using strscpy() to
+> copy into it. Also use the strscpy_pad() return value to detect string
+> truncation instead of checking the caller-provided length.
+> 
+> Remove the now-unused length parameters from
+> adf_service_string_to_mask() and adf_parse_service_string(). Also remove
+> the redundant strnlen() call in adf_get_service_mask(), which only
+> computed the removed length argument.
+> 
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> ---
+>   .../intel/qat/qat_common/adf_cfg_services.c       | 15 ++++++---------
+>   .../intel/qat/qat_common/adf_cfg_services.h       |  2 +-
+>   drivers/crypto/intel/qat/qat_common/adf_sysfs.c   |  2 +-
+>   3 files changed, 8 insertions(+), 11 deletions(-)
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
