@@ -1,73 +1,75 @@
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69BF83EB10D
-	for <linux-crypto@vger.kernel.org>; Tue,  7 Jul 2026 16:41:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A10843847F
+	for <linux-crypto@vger.kernel.org>; Tue,  7 Jul 2026 17:15:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783442482; cv=none; b=qr5lfkCeXDZ8mJSupxAXbwdlDcsjojTxViuL3eKspD1jlLWQCQ5bkhiu7cK1O1cWohIozsTxM4m3lMT/Q++0qKI7KYrGXFIFp+K/TfLA7FBoeHbPYNfYCgiY65GwbpY5xXMeWuGkgKJKaVDVwNZ6QyPmjbZtv1psn90z/w9Nd+g=
+	t=1783444559; cv=none; b=H9Tgkjqo+2Zzenpl0OX3QOy2etfN3+1xYy3LzRKoVQKK1q3uAGsy7ruiiwndL+olMy83UyHiBHpTh+tXOsId9kkiT7KUdTYLxKBMcr/glckhgoRxSV73xEtGZtSdgPLVMavzSUD1EXefEWNAxMkGV9vPv4AkPbxRKqKDu4onrhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783442482; c=relaxed/simple;
-	bh=pRw2aE3zP/6+tyDlVYaq9PHDVORyZOUtI3jc6WRypW8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hStnul2T2R/Frb41x4giLOHxuDw9NSbg8bpVLvfAIw86Y/dCYCJby0bp5BR+o0qf1itEOtCZdB57RRF8QBK+HCD2aDxqL2kqBbPWGYAM92hAz3Wo7E//l7NalyaDJPOtL5qTRDDvSGWUJPKZr9ai1crVhEPsqACBzt7qZTfVer0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cwGL8Wgb; arc=none smtp.client-ip=209.85.216.50
+	s=arc-20240116; t=1783444559; c=relaxed/simple;
+	bh=10Mha+rr8r0djXqoM15tF2PmLDWsDMomIMO/5vW/vLk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Wd1kxl7ync+7GwYk4wYnvvLFFLIr53u6iSV/46um+t9iqgVkhgdayB20kVP76JxOgZpIR/uJ8uJn3DwQBhgSc9EbwMYGFCOL8fgnM7DKm8+vlPxS/qbQ6HZNkCQMgLZBuEoEeAkLzGeflAMIeY+EMjnpkqHoTvj1VD3m6fafJMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LNP3ojpj; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cwGL8Wgb"
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-3811e59df58so2781652a91.1
-        for <linux-crypto@vger.kernel.org>; Tue, 07 Jul 2026 09:41:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LNP3ojpj"
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-84780c95e2eso3707638b3a.3
+        for <linux-crypto@vger.kernel.org>; Tue, 07 Jul 2026 10:15:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783442480; x=1784047280; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1783444558; x=1784049358; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=um+I22NvykoeURWhQfLJXvnvNPhwLnxmij4j6eD24dA=;
-        b=cwGL8WgblSRMktM4HZS+7zwzswsjORwC88MIsGFWcco7R1ByZcjJtv5UU22owziwYw
-         ZUR8rNt3mftv1DZoPpJf0Sf+AK14MQ8dmdxZcncLZz085VIxlZHL9jkH6nrZx/3pTZFq
-         oq92JvQUTxQuJMfKX+7pf5uhYufTY+2lM3+nXTzSyz+kHKTmdqpNKcNRCYy2pVGvL4WJ
-         xTotsBbzBu35seAnM4ooHu9qOSBO4zHWF8933LLRfP2e44DXOYPhYNUDPe640g9ZjiJG
-         DoJtGLatw5jA+TI326WJ6n7rSn2qVYGcjb3Ogdeuf3UBgxpqP53o0hD1ePjTwPN37L1T
-         h+KA==
+        bh=PqhZWbzzy0RZ+tTYC5Zxee2buyxObsMSHIZeaXqnIUU=;
+        b=LNP3ojpjssRn6UjOF0JG2m2JX+ox1jzKYL3IfgEOcJ+y22+Wgj0RbHZibzK0OYFAdS
+         O2wCd/DZh0NYEetSdmMn6nNyF4nENrMTXeuTwGMG3jEGr0sfsxVZdNYwDMk63S2q/hQy
+         Gb5A8qFspIG4S9JkVSR/2hlsRwGURYqtlXeL2JixyleS1DyLdzVyF14URMiRyMPGbH6C
+         N0gp6ZbV25nJEh9PWoA53/AjsgcRf7U+SEOgibXnHyD7xy8fGzTwsBmTKb84s/BPKEfV
+         9GznG5j0XrTEJHR5hfCAFR0xCGOPUZP3GXYDy7ZMhRb/XkE+DheDFaKlhnCoeO8I2ePZ
+         uZrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783442480; x=1784047280;
+        d=1e100.net; s=20251104; t=1783444558; x=1784049358;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=um+I22NvykoeURWhQfLJXvnvNPhwLnxmij4j6eD24dA=;
-        b=XnYnA6Zc1ByWCla5w9b2Pkyvp0m35mK8gzxadkTyJQd6rDqj9Mj2/Jih1rWSDUnQXw
-         jfx0td1hK/bme7CzppyydPtU+Cyj7CT5K4fgzp6rvLKBe13xYSULc0947FawVhbEPOdA
-         SeFp42/gNQj4k5oMBekQKZja/yusnTTrRTTV7r2qwxiVELkGs2g48qrXGtyBC47xkdmq
-         jVrMzyvnbPLgWffRQ+PanXINGqzBOLSrfEluEN6+B4vfXz3Nc+nbw7OGVLDcKaGrMgPS
-         4cV+zf/69FewkPK2bFycj7uF4o2MDD8q96JhTBd1cBOqsCGo22OZG2mAPWRfPmT4/5h+
-         rxCw==
-X-Gm-Message-State: AOJu0YzznXxpFnE0N+/Lhejetsj9avCngncRpWrBQkHK3NhpgDpz28rD
-	UNj6zJWVm9KsR0FXYBO0MmR+Cnf/l3CZ5F0kpaT31u8nP2FzUa1M0/vZ
-X-Gm-Gg: AfdE7cloEUFP7inCZLMvG7y/QT4QWO043Tzprf/gjAHcCgAMwEB45s/imPtGuqBbZJB
-	vwvHv8IvveKBQvReE4zXT5YZXaLQQGpHzwDkOqC2uMqZeGvYg1C/wF5FRPzz2r9e8gJeNeVna5k
-	1bqtHB3QsI0idFAOhH+3U0qF7TBPX8ugK9QWe8vzjKzyNfmZg2cLQfm/kIkZdkDUtOSF7nQ7NbM
-	Dj1VeIypql+Lq5i8/T/KtW44vhM1Il6gxq8ZkvYO6CeiGyf+inq5PsMinEPv9d6QRVx/7J7zsNa
-	4qMhbJNL90NkQCb/iUl89EZdCxmRppBLpK/BHS3FieloNx+dC7oql/HQ9fMxcBGJvHs9Qh1fa/i
-	Ei4IXjDA4z874TJEPApD3ox+M+wO3gJSSMTqK1D224W0TSxctL4Ft01bIPfaNu7ErXL7hjhiqzy
-	ZmwmAASU8sQIS9TRfGtEa+ktpK7jIsEg==
-X-Received: by 2002:a17:90b:1d52:b0:37f:d9dc:557 with SMTP id 98e67ed59e1d1-38756ce150bmr6769726a91.16.1783442479843;
-        Tue, 07 Jul 2026 09:41:19 -0700 (PDT)
-Received: from LAPTOP-83ECOPAB.localdomain ([167.220.149.19])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-387d15f0c35sm1448027a91.8.2026.07.07.09.41.18
+        bh=PqhZWbzzy0RZ+tTYC5Zxee2buyxObsMSHIZeaXqnIUU=;
+        b=cqWa2DKokSJsNOHAkka3hECGLq9JhDJwcfi3xlyxuI8a8XuQy3n6zwbAeirQG5FO4Y
+         Ns9LN9dp4u5VmeFu3b8fQo13OBUQV/0C5OIuiiOLyKI7wu+g49cAVnJDN8f+aHMma75j
+         y/1yc1ucdXD4MQYwraEL1DDeVCAZqtsuX2cu3MhO6ur29hg1+LWrBiIVwni9ED/726vq
+         K02YloOBW8mNVJiOUJ+syc+Ep2yGZYgnvM+yx1+fSLCC4kBOrV26EnxqqKVZhVjhfrkA
+         Xij+Oz7xhCAUwHgA0bURCure3FCGrCBhPh0WoZguAq4+Smf3iPhreoDVtz2TWGyVrAMU
+         EiAg==
+X-Gm-Message-State: AOJu0Yw4cKPBpueahcux/K3UJlVUdxlffnLw191JgkUZFiueRApynsBQ
+	uJa/erzyD4Qmyb8+vWyqywC1rcPuw62W7mFE++oGeC99F1xE2rkP5mAwbNdI4KCD
+X-Gm-Gg: AfdE7cnACdW955LVLAxJcopUME4LxeaxGdR1gmrvQl5gf4O0tPrjTVDoepVjk2ordNg
+	ZuCF2QE6GmEqPsERufMlB45GRcKofe4C01jXtuy0kLB03K1VY7dj9YmtKVxL6NpffJSmFXw4VYK
+	n+Gh/4k4+/fgb9cwOrNcCPpEVnB0G5Hvka2s6z+GjL6Pi85jud9bHYJ2Clbion4j77YxkAwZdJI
+	EdV0IZRNPJR2B9sk/uvv4dZo8AI8i5kham3R84YU6zSNycSXRPvyrwmB1yzX8BIUCRqXWbRNtwl
+	So7CgssuPxlxCmuvJIoEVKo8sBifnYN5pDiTeBHHw6GIFoo4zaxg3XMLpcMfbVd3PWoeE6GHksd
+	ocG6UtQLPmThk0J5ww4uy5p52dmaR8h6Y6n/5La+U0+n0qJAAaLBws8IkIADx6CgFQy8qhd/V8Q
+	bZqqFsfkB8Y+4s
+X-Received: by 2002:a05:6a00:1821:b0:842:747f:c043 with SMTP id d2e1a72fcca58-84826be1c3fmr5799977b3a.1.1783444557468;
+        Tue, 07 Jul 2026 10:15:57 -0700 (PDT)
+Received: from mincom1 ([175.235.236.90])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-847f6b5e566sm5784602b3a.3.2026.07.07.10.15.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jul 2026 09:41:19 -0700 (PDT)
-From: "Cen Zhang (Microsoft)" <blbllhy@gmail.com>
-To: herbert@gondor.apana.org.au,
-	tgraf@suug.ch,
-	akpm@linux-foundation.org
+        Tue, 07 Jul 2026 10:15:57 -0700 (PDT)
+From: Jihong Min <hurryman2212@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	AutonomousCodeSecurity@microsoft.com,
-	tgopinath@linux.microsoft.com,
-	kys@microsoft.com,
-	blbllhy@gmail.com
-Subject: [PATCH v3] lib/rhashtable: clear stale iter->p on table restart
-Date: Tue,  7 Jul 2026 12:41:15 -0400
-Message-ID: <20260707164115.4979-1-blbllhy@gmail.com>
+	"David S . Miller" <davem@davemloft.net>,
+	Antoine Tenart <atenart@kernel.org>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Richard van Schagen <vschagen@icloud.com>,
+	Benjamin Larsson <benjamin.larsson@genexis.eu>,
+	Mieczyslaw Nalewaj <namiltd@yahoo.com>,
+	Aleksander Jan Bajkowski <olek2@wp.pl>,
+	Jihong Min <hurryman2212@gmail.com>
+Subject: [PATCH v2 0/5] crypto: eip93: fix request lifetime and completion handling
+Date: Wed,  8 Jul 2026 02:15:32 +0900
+Message-ID: <20260707171537.467608-1-hurryman2212@gmail.com>
 X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -77,57 +79,48 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-rhashtable_walk_start_check() has two restart paths when resuming a walk.
-When iter->walker.tbl is valid, it re-validates iter->p against the table
-and sets iter->p = NULL if the object is gone.  When iter->walker.tbl is
-NULL (table was freed during resize), it resets slot and skip but forgets
-to clear iter->p.
+This is v2 of the EIP-93 fix series:
 
-rhashtable_walk_next() then dereferences the stale iter->p, reading
-freed memory.  This is a use-after-free.
+https://lore.kernel.org/linux-crypto/20260524194528.3666383-1-hurryman2212@gmail.com/
 
-Any caller that does multi-fragment rhashtable walks across
-walk_stop/walk_start boundaries is affected.  Concrete cases include
-netlink_diag (__netlink_diag_dump in net/netlink/diag.c) and TIPC
-(tipc_nl_sk_walk in net/tipc/socket.c).
+This series keeps the remaining request lifetime and completion handling
+fixes from v1. Patch 1/6 from v1 is omitted because an equivalent
+devm_request_threaded_irq() failure handling fix is already in this tree as
+commit 85a61bf9145d ("crypto: inside-secure/eip93 - Add check for
+devm_request_threaded_irq").
 
-Crash stack (netlink_diag):
-  BUG: KASAN: slab-use-after-free in rhashtable_walk_next+0x365/0x3c0
-  Read of size 8 at addr ffff88801a9d2438 (freed kmalloc-2k, offset 1080)
-  Call Trace:
-   rhashtable_walk_next+0x365/0x3c0 (lib/rhashtable.c:1016)
-   __netlink_diag_dump+0x160/0x760 (net/netlink/diag.c:122)
-   netlink_diag_dump+0xc2/0x240
-   netlink_dump+0x5bc/0x1270
-   netlink_recvmsg+0x7a3/0x980
-   sock_recvmsg+0x1bc/0x200
-   __sys_recvfrom+0x1d4/0x2c0
+The patches collect EIP-93 fixes that had been carried out-of-tree and
+rework them for the current driver. The original fixes came from work by
+multiple people; the individual commits carry provenance trailers where the
+original author, reporter or tester is known.
 
-Fixes: 5d240a8936f6 ("rhashtable: improve rhashtable_walk stability when
-stop/start used.")
-Reported-by: AutonomousCodeSecurity@microsoft.com
-Closes: https://lore.kernel.org/linux-crypto/CAB8m9Wh559e+=n8z51gB8DrbEyCc2mc0MgGjrRR6_VXBmU=2AQ@mail.gmail.com
-Signed-off-by: Cen Zhang (Microsoft) <blbllhy@gmail.com>
----
-v3: Solved patch format issue
-v2: Fix commit subject in Fixes tag
-Link: https://lore.kernel.org/linux-crypto/CAB8m9Wh559e+=n8z51gB8DrbEyCc2mc0MgGjrRR6_VXBmU=2AQ@mail.gmail.com
+Tested on a Lumen W1700K2 wireless AP running a Linux 6.18 based OpenWrt
+build, after verifying that the resulting driver changes match the
+corresponding OpenWrt patch diffs, modulo upstream context differences.
 
- lib/rhashtable.c | 1 +
- 1 file changed, 1 insertion(+)
+Changes in v2:
+- Drop the IRQ request error patch; the equivalent fix is already present.
+- Rebase the remaining fixes onto cryptodev-2.6 master at e264401ce477.
+- Keep the remaining code changes unchanged from v1.
 
-diff --git a/lib/rhashtable.c b/lib/rhashtable.c
-index 40cfb38ac..d459bef24 100644
---- a/lib/rhashtable.c
-+++ b/lib/rhashtable.c
-@@ -878,6 +878,7 @@ int rhashtable_walk_start_check(struct rhashtable_iter *iter)
- 		iter->walker.tbl = rht_dereference_rcu(ht->tbl, ht);
- 		iter->slot = 0;
- 		iter->skip = 0;
-+		iter->p = NULL;
- 		return -EAGAIN;
- 	}
- 
+Jihong Min (5):
+  crypto: eip93: guard DMA cleanup on uninitialized mappings
+  crypto: eip93: reject HMAC requests before setkey
+  crypto: eip93: use request-local SA records for cipher requests
+  crypto: eip93: order result descriptor reads after PE_READY
+  crypto: eip93: handle request ID exhaustion
+
+ .../crypto/inside-secure/eip93/eip93-aead.c   | 34 +++++---
+ .../crypto/inside-secure/eip93/eip93-cipher.c | 34 +++++---
+ .../crypto/inside-secure/eip93/eip93-cipher.h |  3 +-
+ .../crypto/inside-secure/eip93/eip93-common.c | 65 ++++++++++++---
+ .../crypto/inside-secure/eip93/eip93-common.h |  3 +
+ .../crypto/inside-secure/eip93/eip93-hash.c   | 79 +++++++++++++------
+ .../crypto/inside-secure/eip93/eip93-main.c   | 19 +++--
+ .../crypto/inside-secure/eip93/eip93-main.h   |  2 +
+ 8 files changed, 174 insertions(+), 65 deletions(-)
+
+
+base-commit: e264401ce4776a288524e5b87593d4d864147115
 -- 
 2.53.0
-
