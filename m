@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E477388E49;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8C7B389E07;
 	Tue,  7 Jul 2026 05:37:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783402642; cv=none; b=R0CCdtVbjE3fHf36uel3paOk2P9aEL40EdPhLCblXaU8BisyV3pfa0YYYWCHiZ3zAG/n0DmdPGnbd9UBRspVScu02gqHxUmwgQJntkJEZfXd8bdA+uunfZGR9HDpH71x+JUdJgWk7QSj8S9LrhdM3hsmXldX8mNHcLalq55ao+8=
+	t=1783402642; cv=none; b=qqagQyBhaTsOuOy+ajsbPjq+iq04MPJerD6s4jJf2zDZYB2/ntqeEr1anhlgYJrux190OqSM0rMpcJupbsHvJNTKNfM0PAlU2Egkp1tT1vL3EKl9jrrZsQIxCrZhtiePl51q+p7lXazdz7CmEan38WterkqbwOIZfuxvHMqgIgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1783402642; c=relaxed/simple;
-	bh=wnM35bJcOrJW22IbMYdfntJ03MQkTuCcS9UbLh1bL9M=;
+	bh=JUvxLnL9vpa1qoGMo/a2pWEPEBy/aCKnlVR2i8ABYMc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gTLVPa5V+Qv9EW44DK8Yrk2qGC5f223Dm0msoRnC9S4pnHFMXR+NeCzTpdaRlhiH1Te0zgHIycZv/aYxTD8keng24HF6ksO3WskD/mYQZznVZNNgODGF/j41MNFV0zW34oaSulLA76APTtvMUhaM7+anuymJRYY1V1+9Xf0ujrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VNxfwFNa; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=NlKbj31CTc3lgUj/91IRzK1jlG1kXlhh3OUTSO7yTlv8turqpEyoX3deIOalEOVQhJbW6n1tXUAXGUiAqhHb8eCY6gUGkB6zU966rDX2DoWjK1fpUieMffc7Y+6xW0JmnLdqOa4jmfb114MxBiezGjTqWfQ6QZ6P//0GoZFgCTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=njl4289U; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VNxfwFNa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED4071F00ADF;
-	Tue,  7 Jul 2026 05:37:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="njl4289U"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 731A01F01559;
+	Tue,  7 Jul 2026 05:37:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1783402640;
-	bh=hAKO0zcfr94vN6Gl2AEd3YrY6lcA0R+sy07m8WcBAq4=;
+	bh=LbNafXAY5xfOmZmZ537LeD5hPSYzOYozluS3k1H6r8w=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=VNxfwFNahzvFW5d2ACnLY6FXEB50wCOITn6eBsl5uPVUsMxNe6Xl1NmSx9wW3nERO
-	 FFqORB9sTKVCJWXYZ7xFMxAWo+1WQccb7QWo+vRthopeQejMDCxxGUrNEiiDCu1hVs
-	 tu/IU/WiGw5dgX7GwDpwqFkyj0+p756xyuEe9+7eNxSgJBDIS6yOQWyT6C54Oinuuv
-	 xkLPstCObLb8h4c4YeqUrV56hE11RTMAbdCPET5VnjrKNV+OoJEq2eKaP1I99pJP96
-	 +7oFSzHrKQHhfZHLJj+aygEyTVxBiOgMYolBaA/3gJsbSjnfoL+iiIkbeqQNfMy7lE
-	 jX+JJl6P/+6yQ==
+	b=njl4289UX0+Lx2Uf/1RtupR10DRfjK2S2wrJxgORsI9av/p1/C58tGOV7LeRdvLbm
+	 AupC0dE+lcNmghkBnK1qQhyOe0JgYKSfiS3viY594cWQMW7PLcAuhZWv2ILgn8h+b1
+	 0HwUatkzjKoKXF4ByHFcF+vrDu+qB13NAr4s4T+xk0FyMZr4KYcspewqJ3mncelfFB
+	 8b+X5j+em9T565XVuZ1b7oDOcbyGVa/WTegwHlW59RzGjFMFWMJ8YJznuwHWtJsGXK
+	 BNfWSUF5Le9N0g2I/HnPEmf/SIXQW5AYrOQpp1VRWbN0Z/Ed7qrYq78TrlMqLBO96E
+	 Fe4Mwq1ZYc5iw==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 14/33] x86/sev: Use new AES-GCM library
-Date: Mon,  6 Jul 2026 22:34:44 -0700
-Message-ID: <20260707053503.209874-15-ebiggers@kernel.org>
+Subject: [PATCH 16/33] crypto: aes - Remove AES-CBC-MAC support
+Date: Mon,  6 Jul 2026 22:34:46 -0700
+Message-ID: <20260707053503.209874-17-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260707053503.209874-1-ebiggers@kernel.org>
 References: <20260707053503.209874-1-ebiggers@kernel.org>
@@ -44,206 +44,172 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The old AES-GCM library code is being replaced as part of an overhaul
-that is adding support for all the common AES encryption modes with
-consistent conventions.  The SEV code is the only client of the old
-AES-GCM code, so update it to the new API.
+"cbcmac(aes)" is used only by the "ccm" template when instantiated as
+"ccm(aes)".  Since native "ccm(aes)" support has been added to
+crypto/aes.c, the "cbcmac(aes)" crypto_shash is no longer needed.
 
-Besides some slight adjustments to the calling convention, the only
-notable change is replacing the direct accesses to the auth tag length
-field (which should be considered private until/unless someone truly
-needs it) with the AUTHTAG_LEN constant.
+Note that "cmac(aes)" and "xcbc(aes)" remain supported.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- arch/x86/Kconfig                        |  2 +-
- arch/x86/coco/sev/core.c                | 44 ++++++++++++-------------
- arch/x86/include/asm/sev.h              |  2 +-
- drivers/virt/coco/sev-guest/sev-guest.c |  7 ++--
- 4 files changed, 26 insertions(+), 29 deletions(-)
+ crypto/Kconfig                       |  4 +-
+ crypto/aes.c                         | 62 ----------------------------
+ crypto/testmgr.c                     |  6 +--
+ drivers/crypto/starfive/jh7110-aes.c |  2 +-
+ 4 files changed, 6 insertions(+), 68 deletions(-)
 
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index bdad90f210e4..0b89641cac16 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -1495,7 +1495,7 @@ config AMD_MEM_ENCRYPT
- 	select ARCH_HAS_CC_PLATFORM
- 	select X86_MEM_ENCRYPT
- 	select UNACCEPTED_MEMORY
--	select CRYPTO_LIB_AESGCM
-+	select CRYPTO_LIB_AES_GCM
- 	help
- 	  Say yes to enable support for the encryption of system memory.
- 	  This requires an AMD processor that supports Secure Memory
-diff --git a/arch/x86/coco/sev/core.c b/arch/x86/coco/sev/core.c
-index ecd77d3217f3..085bbee6baf4 100644
---- a/arch/x86/coco/sev/core.c
-+++ b/arch/x86/coco/sev/core.c
-@@ -25,7 +25,7 @@
- #include <linux/psp-sev.h>
- #include <linux/dmi.h>
- #include <uapi/linux/sev-guest.h>
--#include <crypto/gcm.h>
-+#include <crypto/aes-gcm.h>
- 
- #include <asm/init.h>
- #include <asm/cpu_entry_area.h>
-@@ -1535,21 +1535,21 @@ static u8 *get_vmpck(int id, struct snp_secrets_page *secrets, u32 **seqno)
- 	return key;
- }
- 
--static struct aesgcm_ctx *snp_init_crypto(u8 *key, size_t keylen)
-+static struct aes_gcm_key *snp_init_crypto(const u8 *key, size_t keylen)
- {
--	struct aesgcm_ctx *ctx;
-+	struct aes_gcm_key *gcm_key;
- 
--	ctx = kzalloc_obj(*ctx);
--	if (!ctx)
-+	gcm_key = kzalloc_obj(*gcm_key);
-+	if (!gcm_key)
- 		return NULL;
- 
--	if (aesgcm_expandkey(ctx, key, keylen, AUTHTAG_LEN)) {
--		pr_err("Crypto context initialization failed\n");
--		kfree(ctx);
-+	if (aes_gcm_preparekey(gcm_key, key, keylen, AUTHTAG_LEN)) {
-+		pr_err("AES-GCM key preparation failed\n");
-+		kfree(gcm_key);
- 		return NULL;
- 	}
- 
--	return ctx;
-+	return gcm_key;
- }
- 
- int snp_msg_init(struct snp_msg_desc *mdesc, int vmpck_id)
-@@ -1572,8 +1572,8 @@ int snp_msg_init(struct snp_msg_desc *mdesc, int vmpck_id)
- 
- 	mdesc->vmpck_id = vmpck_id;
- 
--	mdesc->ctx = snp_init_crypto(mdesc->vmpck, VMPCK_KEY_LEN);
--	if (!mdesc->ctx)
-+	mdesc->gcm_key = snp_init_crypto(mdesc->vmpck, VMPCK_KEY_LEN);
-+	if (!mdesc->gcm_key)
- 		return -ENOMEM;
- 
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index e6b894dc784a..83adbd54d725 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -359,14 +359,14 @@ config CRYPTO_AES
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_LIB_AES
+ 	select CRYPTO_LIB_AES_CBC if CRYPTO_CBC || CRYPTO_CTS
+-	select CRYPTO_LIB_AES_CBC_MACS if CRYPTO_CMAC || CRYPTO_XCBC || CRYPTO_CCM
++	select CRYPTO_LIB_AES_CBC_MACS if CRYPTO_CMAC || CRYPTO_XCBC
+ 	select CRYPTO_LIB_AES_CCM if CRYPTO_CCM
+ 	select CRYPTO_LIB_AES_CTR if CRYPTO_CTR || CRYPTO_XCTR
+ 	select CRYPTO_LIB_AES_ECB if CRYPTO_ECB
+ 	select CRYPTO_LIB_AES_GCM if CRYPTO_GCM
+ 	select CRYPTO_LIB_AES_XTS if CRYPTO_XTS
+ 	select CRYPTO_AEAD if CRYPTO_GCM || CRYPTO_CCM
+-	select CRYPTO_HASH if CRYPTO_CMAC || CRYPTO_XCBC || CRYPTO_CCM
++	select CRYPTO_HASH if CRYPTO_CMAC || CRYPTO_XCBC
+ 	# CRYPTO_SKCIPHER should be selected only if a mode that needs it is
+ 	# enabled, but that doesn't work due to a recursive dependency caused by
+ 	# CRYPTO_SKCIPHER selecting CRYPTO_ECB.  So just always select it.
+diff --git a/crypto/aes.c b/crypto/aes.c
+index ac5190292b3c..5f9c8eab67b4 100644
+--- a/crypto/aes.c
++++ b/crypto/aes.c
+@@ -95,47 +95,6 @@ static int __maybe_unused crypto_aes_cmac_digest(struct shash_desc *desc,
  	return 0;
-@@ -1624,7 +1624,7 @@ void snp_msg_free(struct snp_msg_desc *mdesc)
- 	if (!mdesc)
- 		return;
+ }
  
--	kfree(mdesc->ctx);
-+	kfree(mdesc->gcm_key);
- 	free_shared_pages(mdesc->response, sizeof(struct snp_guest_msg));
- 	free_shared_pages(mdesc->request, sizeof(struct snp_guest_msg));
- 	iounmap((__force void __iomem *)mdesc->secrets);
-@@ -1709,7 +1709,7 @@ static int verify_and_dec_payload(struct snp_msg_desc *mdesc, struct snp_guest_r
- 	struct snp_guest_msg *req_msg = &mdesc->secret_request;
- 	struct snp_guest_msg_hdr *req_msg_hdr = &req_msg->hdr;
- 	struct snp_guest_msg_hdr *resp_msg_hdr = &resp_msg->hdr;
--	struct aesgcm_ctx *ctx = mdesc->ctx;
-+	struct aes_gcm_key *gcm_key = mdesc->gcm_key;
- 	u8 iv[GCM_AES_IV_SIZE] = {};
- 
- 	pr_debug("response [seqno %lld type %d version %d sz %d]\n",
-@@ -1732,23 +1732,21 @@ static int verify_and_dec_payload(struct snp_msg_desc *mdesc, struct snp_guest_r
- 	 * If the message size is greater than our buffer length then return
- 	 * an error.
- 	 */
--	if (unlikely((resp_msg_hdr->msg_sz + ctx->authsize) > req->resp_sz))
-+	if (unlikely(resp_msg_hdr->msg_sz + AUTHTAG_LEN > req->resp_sz))
- 		return -EBADMSG;
- 
- 	/* Decrypt the payload */
- 	memcpy(iv, &resp_msg_hdr->msg_seqno, min(sizeof(iv), sizeof(resp_msg_hdr->msg_seqno)));
--	if (!aesgcm_decrypt(ctx, req->resp_buf, resp_msg->payload, resp_msg_hdr->msg_sz,
--			    &resp_msg_hdr->algo, AAD_LEN, iv, resp_msg_hdr->authtag))
--		return -EBADMSG;
+-#define AES_CBCMAC_KEY(tfm) ((struct aes_enckey *)crypto_shash_ctx(tfm))
+-#define AES_CBCMAC_CTX(desc) ((struct aes_cbcmac_ctx *)shash_desc_ctx(desc))
 -
+-static int __maybe_unused crypto_aes_cbcmac_setkey(struct crypto_shash *tfm,
+-						   const u8 *in_key,
+-						   unsigned int key_len)
+-{
+-	return aes_prepareenckey(AES_CBCMAC_KEY(tfm), in_key, key_len);
+-}
+-
+-static int __maybe_unused crypto_aes_cbcmac_init(struct shash_desc *desc)
+-{
+-	aes_cbcmac_init(AES_CBCMAC_CTX(desc), AES_CBCMAC_KEY(desc->tfm));
 -	return 0;
-+	return aes_gcm_decrypt(req->resp_buf, resp_msg->payload,
-+			       resp_msg_hdr->authtag, resp_msg_hdr->msg_sz,
-+			       &resp_msg_hdr->algo, AAD_LEN, iv, gcm_key);
- }
+-}
+-
+-static int __maybe_unused crypto_aes_cbcmac_update(struct shash_desc *desc,
+-						   const u8 *data,
+-						   unsigned int len)
+-{
+-	aes_cbcmac_update(AES_CBCMAC_CTX(desc), data, len);
+-	return 0;
+-}
+-
+-static int __maybe_unused crypto_aes_cbcmac_final(struct shash_desc *desc,
+-						  u8 *out)
+-{
+-	aes_cbcmac_final(AES_CBCMAC_CTX(desc), out);
+-	return 0;
+-}
+-
+-static int __maybe_unused crypto_aes_cbcmac_digest(struct shash_desc *desc,
+-						   const u8 *data,
+-						   unsigned int len, u8 *out)
+-{
+-	aes_cbcmac_init(AES_CBCMAC_CTX(desc), AES_CBCMAC_KEY(desc->tfm));
+-	aes_cbcmac_update(AES_CBCMAC_CTX(desc), data, len);
+-	aes_cbcmac_final(AES_CBCMAC_CTX(desc), out);
+-	return 0;
+-}
+-
+ static struct crypto_alg alg = {
+ 	.cra_name = "aes",
+ 	.cra_driver_name = "aes-lib",
+@@ -190,23 +149,6 @@ static struct shash_alg mac_algs[] = {
+ 		.descsize = sizeof(struct aes_cmac_ctx),
+ 	},
+ #endif
+-#if IS_ENABLED(CONFIG_CRYPTO_CCM)
+-	{
+-		.base.cra_name = "cbcmac(aes)",
+-		.base.cra_driver_name = "cbcmac-aes-lib",
+-		.base.cra_priority = 300,
+-		.base.cra_blocksize = AES_BLOCK_SIZE,
+-		.base.cra_ctxsize = sizeof(struct aes_enckey),
+-		.base.cra_module = THIS_MODULE,
+-		.digestsize = AES_BLOCK_SIZE,
+-		.setkey = crypto_aes_cbcmac_setkey,
+-		.init = crypto_aes_cbcmac_init,
+-		.update = crypto_aes_cbcmac_update,
+-		.final = crypto_aes_cbcmac_final,
+-		.digest = crypto_aes_cbcmac_digest,
+-		.descsize = sizeof(struct aes_cbcmac_ctx),
+-	},
+-#endif
+ };
  
- static int enc_payload(struct snp_msg_desc *mdesc, u64 seqno, struct snp_guest_req *req)
+ static __maybe_unused int
+@@ -1096,10 +1038,6 @@ MODULE_ALIAS_CRYPTO("cmac-aes-lib");
+ MODULE_ALIAS_CRYPTO("xcbc(aes)");
+ MODULE_ALIAS_CRYPTO("xcbc-aes-lib");
+ #endif
+-#if IS_ENABLED(CONFIG_CRYPTO_CCM)
+-MODULE_ALIAS_CRYPTO("cbcmac(aes)");
+-MODULE_ALIAS_CRYPTO("cbcmac-aes-lib");
+-#endif
+ #if IS_ENABLED(CONFIG_CRYPTO_ECB)
+ MODULE_ALIAS_CRYPTO("ecb(aes)");
+ MODULE_ALIAS_CRYPTO("ecb-aes-lib");
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 4958211fbfa9..b25c15173c76 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -4421,7 +4421,7 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 	}, {
+ #endif
+ 		.alg = "cbcmac(aes)",
+-		.generic_driver = "cbcmac-aes-lib",
++		.generic_driver = "cbcmac(aes-lib)",
+ 		.test = alg_test_hash,
+ 		.suite = {
+ 			.hash = __VECS(aes_cbcmac_tv_template)
+@@ -4434,7 +4434,7 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		}
+ 	}, {
+ 		.alg = "ccm(aes)",
+-		.generic_driver = "ccm_base(ctr(aes-lib),cbcmac-aes-lib)",
++		.generic_driver = "ccm_base(ctr(aes-lib),cbcmac(aes-lib))",
+ 		.test = alg_test_aead,
+ 		.fips_allowed = 1,
+ 		.suite = {
+@@ -5239,7 +5239,7 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		}
+ 	}, {
+ 		.alg = "rfc4309(ccm(aes))",
+-		.generic_driver = "rfc4309(ccm_base(ctr(aes-lib),cbcmac-aes-lib))",
++		.generic_driver = "rfc4309(ccm_base(ctr(aes-lib),cbcmac(aes-lib)))",
+ 		.test = alg_test_aead,
+ 		.fips_allowed = 1,
+ 		.suite = {
+diff --git a/drivers/crypto/starfive/jh7110-aes.c b/drivers/crypto/starfive/jh7110-aes.c
+index a0713aa21250..c591a850f093 100644
+--- a/drivers/crypto/starfive/jh7110-aes.c
++++ b/drivers/crypto/starfive/jh7110-aes.c
+@@ -1003,7 +1003,7 @@ static int starfive_aes_ctr_init_tfm(struct crypto_skcipher *tfm)
+ 
+ static int starfive_aes_ccm_init_tfm(struct crypto_aead *tfm)
  {
- 	struct snp_guest_msg *msg = &mdesc->secret_request;
- 	struct snp_guest_msg_hdr *hdr = &msg->hdr;
--	struct aesgcm_ctx *ctx = mdesc->ctx;
-+	struct aes_gcm_key *gcm_key = mdesc->gcm_key;
- 	u8 iv[GCM_AES_IV_SIZE] = {};
- 
- 	memset(msg, 0, sizeof(*msg));
-@@ -1769,12 +1767,12 @@ static int enc_payload(struct snp_msg_desc *mdesc, u64 seqno, struct snp_guest_r
- 	pr_debug("request [seqno %lld type %d version %d sz %d]\n",
- 		 hdr->msg_seqno, hdr->msg_type, hdr->msg_version, hdr->msg_sz);
- 
--	if (WARN_ON((req->req_sz + ctx->authsize) > sizeof(msg->payload)))
-+	if (WARN_ON(req->req_sz + AUTHTAG_LEN > sizeof(msg->payload)))
- 		return -EBADMSG;
- 
- 	memcpy(iv, &hdr->msg_seqno, min(sizeof(iv), sizeof(hdr->msg_seqno)));
--	aesgcm_encrypt(ctx, msg->payload, req->req_buf, req->req_sz, &hdr->algo,
--		       AAD_LEN, iv, hdr->authtag);
-+	aes_gcm_encrypt(msg->payload, hdr->authtag, req->req_buf, req->req_sz,
-+			&hdr->algo, AAD_LEN, iv, gcm_key);
- 
- 	return 0;
+-	return starfive_aes_aead_init_tfm(tfm, "ccm_base(ctr(aes-lib),cbcmac-aes-lib)");
++	return starfive_aes_aead_init_tfm(tfm, "ccm_base(ctr(aes-lib),cbcmac(aes-lib))");
  }
-diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
-index 594cfa19cbd4..9e7a077c445d 100644
---- a/arch/x86/include/asm/sev.h
-+++ b/arch/x86/include/asm/sev.h
-@@ -314,7 +314,7 @@ struct snp_msg_desc {
  
- 	struct snp_secrets_page *secrets;
- 
--	struct aesgcm_ctx *ctx;
-+	struct aes_gcm_key *gcm_key;
- 
- 	u32 *os_area_msg_seqno;
- 	u8 *vmpck;
-diff --git a/drivers/virt/coco/sev-guest/sev-guest.c b/drivers/virt/coco/sev-guest/sev-guest.c
-index d186ae55cf63..935537a41469 100644
---- a/drivers/virt/coco/sev-guest/sev-guest.c
-+++ b/drivers/virt/coco/sev-guest/sev-guest.c
-@@ -17,7 +17,6 @@
- #include <linux/set_memory.h>
- #include <linux/fs.h>
- #include <linux/tsm.h>
--#include <crypto/gcm.h>
- #include <linux/psp-sev.h>
- #include <linux/sockptr.h>
- #include <linux/cleanup.h>
-@@ -87,7 +86,7 @@ static int get_report(struct snp_guest_dev *snp_dev, struct snp_guest_request_io
- 	 * response payload. Make sure that it has enough space to cover the
- 	 * authtag.
- 	 */
--	resp_len = sizeof(report_resp->data) + mdesc->ctx->authsize;
-+	resp_len = sizeof(report_resp->data) + AUTHTAG_LEN;
- 	report_resp = kzalloc(resp_len, GFP_KERNEL_ACCOUNT);
- 	if (!report_resp)
- 		return -ENOMEM;
-@@ -130,7 +129,7 @@ static int get_derived_key(struct snp_guest_dev *snp_dev, struct snp_guest_reque
- 	 * response payload. Make sure that it has enough space to cover the
- 	 * authtag.
- 	 */
--	resp_len = sizeof(derived_key_resp->data) + mdesc->ctx->authsize;
-+	resp_len = sizeof(derived_key_resp->data) + AUTHTAG_LEN;
- 	derived_key_resp = kzalloc(resp_len, GFP_KERNEL_ACCOUNT);
- 	if (!derived_key_resp)
- 		return -ENOMEM;
-@@ -230,7 +229,7 @@ static int get_ext_report(struct snp_guest_dev *snp_dev, struct snp_guest_reques
- 	 * response payload. Make sure that it has enough space to cover the
- 	 * authtag.
- 	 */
--	resp_len = sizeof(report_resp->data) + mdesc->ctx->authsize;
-+	resp_len = sizeof(report_resp->data) + AUTHTAG_LEN;
- 	report_resp = kzalloc(resp_len, GFP_KERNEL_ACCOUNT);
- 	if (!report_resp) {
- 		ret = -ENOMEM;
+ static int starfive_aes_gcm_init_tfm(struct crypto_aead *tfm)
 -- 
 2.54.0
 
