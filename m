@@ -1,146 +1,135 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73362420867;
-	Tue,  7 Jul 2026 05:48:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B896386429;
+	Tue,  7 Jul 2026 05:59:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783403337; cv=none; b=JO4y2aec1l4FJ5ZOOtdahSDRvtzoWyo+FGVAdGfuxzbWO+zpIsR763hzNm2SITFJM9Q2ebsrIVD+Szsi94nU6Luvd4BKyjHrsybBG5nfiIKKlps/qkEdfao36asmGtWjnz+1sSWBf1qM97UJtPTB18X76FWYjDji2N6X0g+rEOk=
+	t=1783403961; cv=none; b=AceC+zyb1RE2h6O86KcOiSICioq8PWNOWCXoUsL7zOt2aa3IYguuf6hvC8mvalMr8G4+3aNL97G3swsqRxymZwI7CbKMMeffL0K6vxrnSl5Spw+ske0BITvBhJJfEisrxCHANFbzZLYAlAAdYEnl+rtkbtMqbKFIHRkTFDYTJng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783403337; c=relaxed/simple;
-	bh=anW19eFsSIJVBDpy1qgRpoTdy9wnCsNqZb16JlXlA7Q=;
+	s=arc-20240116; t=1783403961; c=relaxed/simple;
+	bh=tvp7tO/3/vp2vOMpQ0g7cifsMip31Y9+Y/tn8KvPKdQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SMjjyV+/RHQTquX8o0l4wcgtyO/er14Ev9TxfOtTOlUtehmTYcTevQu8QiLZfxu5H0dqrZCgi2/ybc96/PTjqgCYOOyEldtM2/937NzTcrxgIsJiG+z9YtfUPjY80G/WvTNXxVSKkGkwuoj6gTQ6nAqrh3sHbrKAtqyZUWEtU1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=emx5GChy; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=BwB9nHJ4vmrG3QEsfQYD2kRCa6LD8ljBbkZfS84yPF6gMSSBWeXUGF1NDyei89ZxA0bYyTjZQk58Fv265lBw8rdXi+fDcXYtdeL1LlP2kNwnYuhOpyiRphHcQwqlKAa6FW8HJYcpYI0ZXGPcqnErOnGvTTd0x27NC5ModVcp0wY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BkyescGX; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="emx5GChy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED32A1F000E9;
-	Tue,  7 Jul 2026 05:48:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BkyescGX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3D331F000E9;
+	Tue,  7 Jul 2026 05:59:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783403336;
-	bh=QU/N7EOWA0pTmbm6JqvHRwqhI8zxRYtn/Z8dK9VXm94=;
+	s=k20260515; t=1783403960;
+	bh=7D/m/W8tzZlfAqTmnTytTOiDe/2TNBGHcK9HiLWgM6Y=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=emx5GChyymV0h+9hQgfH/03uenGrRszU4oVNF2/0fG/6NglWrLpoXDLKYqKLufPbr
-	 hts8EzW5+B7qnenXZwpNhOBQCQlDYadeDPModJ33QwsX4PNDH+u2VmUIxQfNrUmL/J
-	 5nThCRsJF1L2uKK0G9WraToYCX/yLhTcxWF29COeCgisLMbLhJ1gvzFZG7oBgvgV42
-	 GBTwybvTLsdtDZSRCnNq7foKvVF/JFI74ll+HzWh51jzeIbLx+ywthbuwR0dEN5dQk
-	 hg1RrUMfjM75OUkRSGFR7mWm4n0BWZdTwiLM+zfrQ76SSJvS9EydNi2gs7EarG8xf9
-	 E9atppRXei8eA==
-Date: Mon, 6 Jul 2026 22:47:06 -0700
+	b=BkyescGXXlEUhKfFGug3euJywCIkhDGRElVJujQJxPcwe2MqPeBS72CZszGSkgtAq
+	 bpjgr27bKuHrDRKyj8Lsej68e0uxfVAR6aFzW9+C0BA5MsbQb97NlL/IQwzfUAPe56
+	 Kdb7YAhGTRv6x7CPt/2g12StlVW/0h72PNTO6o19vCGiS3IIfwJILJimySfH9BpcuI
+	 j/9XOOMxO6harw08eetHD9vg9SqQZJ5GL3r6VIUgPVh58edV/Ln3Bevnocn2Dx+0Er
+	 hFv5kTN3H/TZ5m8oqWVJ98glJ7uhBOZgE2hyAX+0JhK4QyZhSvTI6ttGmnnT1JYaPW
+	 0MLLGm70nS0Lw==
+Date: Mon, 6 Jul 2026 22:57:30 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: linux-wireless@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 1/2] wifi: mac80211: use aesgcm library
-Message-ID: <20260707054706.GA1791@sol>
-References: <20260505211841.669767-3-johannes@sipsolutions.net>
- <20260505221653.GA10301@quark>
- <3114cff87fee71ffca7b48f271e2503876518257.camel@sipsolutions.net>
+To: Alexandre Knecht <knecht.alexandre@gmail.com>
+Cc: herbert@gondor.apana.org.au, "David S . Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH] crypto: ctr - Convert from skcipher to lskcipher
+Message-ID: <20260707055730.GB1791@sol>
+References: <20260510230901.1772949-1-knecht.alexandre@gmail.com>
+ <20260510233237.GA60510@quark>
+ <20260510234452.GB60510@quark>
+ <CAHAB8Wy1APeCcm7_OfrNYeZFcMXfZ5rUSeDX7-c7WO_rGg2Zig@mail.gmail.com>
+ <20260511001935.GC60510@quark>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <3114cff87fee71ffca7b48f271e2503876518257.camel@sipsolutions.net>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260511001935.GC60510@quark>
 
-On Wed, May 06, 2026 at 09:06:21AM +0200, Johannes Berg wrote:
-> Hi Eric,
+On Sun, May 10, 2026 at 05:19:35PM -0700, Eric Biggers wrote:
+> On Mon, May 11, 2026 at 02:02:22AM +0200, Alexandre Knecht wrote:
+> > Le lun. 11 mai 2026 à 01:44, Eric Biggers <ebiggers@kernel.org> a écrit :
+> > > Also note that lskcipher doesn't provide access to the accelerated AES
+> > > mode implementations.  Indeed, almost nothing is supported by lskcipher.
+> > > The fact that you found something to be missing isn't surprising.
+> > >
+> > > I think "lskcipher" is kind of a dead end, to be honest.  It's not clear
+> > > why it got added.  The path forwards is to get the AES encryption modes
+> > > added to lib/crypto/ and to just use that instead.
+> > >
+> > > - Eric
+> > 
+> > Hi Eric,
+> > 
+> > Thanks for the review — you're asking the right questions.
+> > 
+> > I'm developing a VXLAN/EVPN-based CNI for Kubernetes (releasing in the
+> > coming months), and the goal is to implement datapath encryption for
+> > overlay traffic in a zero-trust datacenter model. The encryption
+> > happens in BPF programs attached via TC on the VXLAN device (encrypt
+> > inner frames on egress, decrypt on ingress).
+> > 
+> > The algorithm I actually need is AES-GCM (authenticated encryption of
+> > VXLAN inner frames, with the outer headers as AAD). When I looked at
+> > bpf_crypto, I found that:
+> > 
+> > 1. Only lskcipher ("skcipher" type) was implemented
+> > 2. ecb(aes) was the only usable algorithm
+> > 3. AEAD support was designed for (authsize field exists in
+> >  bpf_crypto_params, setauthsize in bpf_crypto_type) but never
+> >  implemented
+> > 4. ctr(aes) wasn't available as lskcipher either
+> > 
+> > I looked at Herbert's history converting ECB and CBC to lskcipher and
+> > assumed that was the path forward for CTR. But you're right, the
+> > real goal is AEAD, not CTR. CTR alone doesn't give me integrity.
+> > 
+> > Your point about lib/crypto/ is interesting. If there's a path to
+> > expose AES-GCM (or the building blocks) as direct library calls that
+> > BPF programs in TC/XDP could use (avoiding the template/instance
+> > machinery and getting hardware acceleration) that would be ideal for
+> > this use case.
+> > 
+> > What would that look like? Is there existing lib/crypto/ work for
+> > AES-GCM that could be wired up to BPF, or would that need to be
+> > built?
 > 
-> > I really appreciate the enthusiasm for the crypto library!
+> Sure, it makes sense that AES-GCM is what you actually need.  There's
+> actually a lot of demand for AES-GCM in lib/crypto/, and I've been
+> working on it.
 > 
-> :)
+> There's already an existing AES-GCM lib/crypto/ API (see
+> include/crypto/gcm.h), and I optimized it a bit in 7.0 and 7.1.  For
+> example, it now uses the architecture-optimized single-block AES code.
 > 
-> > And it isn't
-> > surprising, since it's clearly the way to go.
+> You might be able to go ahead and use that right now.
 > 
-> I was kinda just playing with it, having been reminded that some code
-> was already ported.
+> However, it currently supports only one-shot computation, and it doesn't
+> yet take advantage of the fully optimized AES-GCM assembly code that
+> interleaves the AES and GHASH computations.  I'm planning to address
+> both of those limitations soon.
 > 
-> > But I do think these two
-> > patches are jumping the gun a bit, since we haven't yet migrated all the
-> > optimized AES-GCM code into the library, or added an improved AES-GCM
-> > API that provides enough functionality to fulfill all the in-kernel use
-> > cases (for example, incremental computation of AES-GMAC).
-> 
-> > So as-is these two patches could regress performance in some cases
-> > (despite the library having less overhead).
-> 
-> Fair. I don't think the performance matters all that much (though I
-> shouldn't lie about it in the commit log) since this is mostly used for
-> testing - I don't think there are many users of software crypto beyond
-> that. Some, for sure, but I believe those are all old drivers that will
-> get you a maximum of ~25 Mbps throughput (both directions combined) if
-> you're lucky :)
-> 
-> Anyway, I don't really disagree either, none of this is urgent or
-> important at this point.
-> 
-> Also, there's a separate conversation to be had here - I was looking and
-> we also instantiate ccm(aes) and ctr(aes) in mac80211, and I didn't find
-> equivalent library calls for those.
-> 
-> > And also the AES-GCM API is
-> > likely to change a bit.  In particular I don't think code outside the
-> > crypto subsystem should be constructing its own AES-GMAC by combining
-> > the GHASH functions with the AES functions, as your second patch does.
-> > Instead they should invoke an AES-GMAC API (or AES-GCM, of which
-> > AES-GMAC is a special case) provided by lib/crypto/.
-> 
-> I _was_ thinking that could be better ... and forgot that GMAC is just a
-> GCM special case, despite obviously constructing it by hand. Oops.
-> 
-> I actually thought about exporting aesgcm_mac(), but of course that'd
-> basically be equivalent to just using aesgcm_encrypt() without data.
-> 
-> However, both of them can only use a single buffer for the associated
-> data, so they can't be used here. The crypto API used sg tables which
-> aren't great either, but definitely more flexible than the current
-> function. Note that in this case I actually need to use three or four
-> AAD buffers:
-> 
->  - the pseudo-header constructed outside the frame buffer specifically
->    for WiFi, representing the frame header but not exactly the same
->  - for beacons an 8-byte zero buffer representing the Timestamp
->  - the frame payload without the MIC
->    (and without the Timestamp for beacons)
->  - a 16-byte zero buffer representing the MIC
-> 
-> This would require a more specific GMAC API like the CMAC API, or,
-> equivalently but more flexible, an init/aad_update/data_update/final GCM
-> API. Could even have
-> 
->   aes_gcm_init()
->   aes_gcm_update_aad()
->   aes_gcm_update_data()
->   aes_gcm_final()
-> 
-> and
->   #define aes_gmac_init aes_gcm_init
->   #define aes_gmac_update aes_gmac_update_aad
->   #define aes_gmac_final aes_gcm_final
-> 
-> or something like that, I guess.
-> 
-> > So I'd ask that we wait just a bit until I can finish getting the
-> > AES-GCM library APIs into a good state.  I got a lot of the prerequisite
-> > work in for 7.0 and 7.1, and I'll see if I can finish it in 7.2.  I've
-> > just been a bit busy with other things in the past few weeks.
-> 
-> Sure, no hurry, was mostly playing with how that'd look like. Maybe it
-> even helps figure out the right APIs ;-)
+> Anyway, that seems like the clear way forward.  The lskcipher thing
+> seems like a dead end to me.
 
-FYI, the following series adds new library APIs for AES-GCM, AES-CCM,
-and AES-CTR (and also several other modes):
+FYI, the following series adds new library APIs for AES-GCM and other
+AES modes:
 https://lore.kernel.org/linux-crypto/20260707053503.209874-1-ebiggers@kernel.org/
 
-It also has proof of concept patches that convert many kernel
-subsystems, including mac80211, to use them.
+It also includes proof-of-concept patches to convert BPF crypto to use
+the AES-ECB and AES-CBC library APIs, then add AES-GCM support.
 
-It will take a while to land everything, including bringing all the
-existing architecture-specific optimizations to the library (which that
-series doesn't do).  But I'd like to first land the new APIs as a
-starting point.
+I think that is roughly what you're looking for, and also what should
+have been implemented in "BPF crypto" in the first place.  (Minus
+AES-ECB, which is silly and should never have been supported in BPF
+crypto.  And maybe minus AES-CBC too.)  But let me know what you think.
+
+(I didn't Cc that series to everyone just for the proof-of-concept
+patches, as I wrote them for lots of kernel subsystems.  For now they're
+mainly for informing the API design and preparing for later.)
 
 - Eric
