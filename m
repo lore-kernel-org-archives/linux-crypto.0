@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6723E38F920;
-	Tue,  7 Jul 2026 05:37:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FCED39EF1F;
+	Tue,  7 Jul 2026 05:37:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783402646; cv=none; b=WcZFDc+8Mnia/QtHvQzxJp1zQ1YKOnk24VW+uDneqMI5MvXWyZ9pMJCqsuOdZTKYaGNkI1W7DehMZVIUKs03IFEuBiO5XfBgmO+YF7qhu4grOwPOw1T+xpo/OSDru/ocKFdFq+UlfmWUbuVVRISch/MHAlWWnL5MslSeC9VdCMM=
+	t=1783402646; cv=none; b=I99iKVQX00e9kcmkTJ0nqxF00catA09h0XBl45Miuq//reQtTjknIkGAkr8WaaGmiD59IdRyQYJJfBvWGmsCmlrc9OXA9BN4nVsDLnHfr3de3UMWFwApvGDOqn0ru2/8YweGODVgLJ7yXl5W/vSfX0b4IuYgZnZzDcHaI23bEK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1783402646; c=relaxed/simple;
-	bh=Dz8yKB26vG2HnPMvp+igSccZwAGUjL1gOgnhflaRqDg=;
+	bh=UvcBn62SD8vakqjWyUCHmVRephIHZGNOwd3mdLdw6Bw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z0n2QGJ+hUZuQ9WoH77h1/yuuZuugcFV/zwW80WZGIjjmFftFcDaYH1wslUWsVHl04zuMw+7M/M/GFIeqVM31kJM1biXGF9+M+h7F1RQNjkAJAeW2m7DlRq0L+82FGcK0hRhkGBCHzhGDZ+00g+gmPAubN9V7RME3fWmloE4izY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ib1m2yY1; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=r+58UAfp8Dt5J+llhlqWaF36McUMoMG4Ve5GA+RhzWKzt3++dHDw0R3Xm9JS6ZHBR9UUvzV1LZH9JFUbkWiQrsLwOySXzaeRWYM8/nqdc36pjKmSEf84Zyvc/+VOca9lwtgonKfl0OkOPHA9dc21hWKAFnuCLzpzAojgHRLBm30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q4+EMJYg; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ib1m2yY1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 361F91F00ADB;
-	Tue,  7 Jul 2026 05:37:21 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q4+EMJYg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDDEE1F00ADE;
+	Tue,  7 Jul 2026 05:37:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783402641;
-	bh=5EkEAif+4g9CrWQBgUR9FUyTjayBDRMHvyMvzlM9cOU=;
+	s=k20260515; t=1783402643;
+	bh=79FTno7cmzts1TIfmzvidsMNWTqpX8oOYqsqgisTO1Y=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=ib1m2yY19QrR11R/q52qV8nndgOV6bgRU/t0Bw1yfsmGnruBBDYCRH9vnQYulrs/t
-	 MyerAIfBjiSbI1FFuWrUuZhcfjMGMM0Z8K/sGh2SBe52LdYn1V3zOmXLIuCYewX125
-	 RCTStMUL8rLue4yIAnNJyJSirsa73ZY7wJWv4cxWoVyv7btHs/FKf4jy05muMMvMDG
-	 TaNoQsRX7nKI/plXHtXmotbHr4feyvJJ8LvZymb7RrYcF6aI064a3mOCgI6rMtrie7
-	 m5ybHewDOJFhPVaOBpY0bGqQWJjajVZ3NbJPeG/BoA1hqeWEoGBqlJzraQ3ueieWMV
-	 zuS0bsbBzwPhw==
+	b=Q4+EMJYgHHA8LLI7a9suDJc2BMIEutnzLomPwAkPUOpnb72GMgI0b6pTQ4ropgon4
+	 kIQ4POflzH2dxKHnzeBD+JkSCTzGMwbgci+iuyAzXRTxZd+J5kEs8mxbQ/uXgUo+cg
+	 438tHUY0YFz9PfXWVAvMbkw3JTakusTtLyKjL27vTdavGZPMwR4hnNr3KCDhI0xzM2
+	 1jl0pRgVHyUxgzuoI9erOMUerM+fgjgARcas38NQM+rIxRkIC+Ls2bAwObWH42LRyC
+	 jNbjwdAsX4Vv2vnTH8vBiw3OIjzcTmYMsTmQzvuokx172w8KpcjsslwUF+APkA8pVP
+	 CQb3syu4tEFIg==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 19/33] KEYS: encrypted: Use AES-CBC library instead of crypto_skcipher
-Date: Mon,  6 Jul 2026 22:34:49 -0700
-Message-ID: <20260707053503.209874-20-ebiggers@kernel.org>
+Subject: [PATCH 26/33] macsec: Use AES-GCM library instead of crypto_aead
+Date: Mon,  6 Jul 2026 22:34:56 -0700
+Message-ID: <20260707053503.209874-27-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260707053503.209874-1-ebiggers@kernel.org>
 References: <20260707053503.209874-1-ebiggers@kernel.org>
@@ -44,354 +44,573 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Now that there's a library API for AES-CBC, use it instead of a
-"cbc(aes)" crypto_skcipher.  This significantly simplifies the code.
+Now that there's a library API for AES-GCM, use it instead of a
+"gcm(aes)" crypto_aead.  This significantly simplifies the code.
 
-Note that this use of AES-CBC remains questionable (an AEAD should be
-used instead), but it remains for backwards compatibility.
+Notably, per-skb dynamic memory allocations and conversions to
+scatterlists are eliminated.  We now just iterate through the skb's data
+and process it directly.
+
+Asynchronous en/decryption operations are no longer supported, as that
+execution model has been found to not be beneficial.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- security/keys/Kconfig                    |   4 +-
- security/keys/encrypted-keys/encrypted.c | 194 +++++++----------------
- 2 files changed, 62 insertions(+), 136 deletions(-)
+ drivers/net/Kconfig  |   4 +-
+ drivers/net/macsec.c | 327 ++++++++++++++-----------------------------
+ include/net/macsec.h |   5 +-
+ 3 files changed, 106 insertions(+), 230 deletions(-)
 
-diff --git a/security/keys/Kconfig b/security/keys/Kconfig
-index f4510d8cb485..d482f632791a 100644
---- a/security/keys/Kconfig
-+++ b/security/keys/Kconfig
-@@ -83,9 +83,7 @@ endif
+diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
+index ff79c466712d..e7322d5a1164 100644
+--- a/drivers/net/Kconfig
++++ b/drivers/net/Kconfig
+@@ -317,9 +317,7 @@ config AMT
  
- config ENCRYPTED_KEYS
- 	tristate "ENCRYPTED KEYS"
+ config MACSEC
+ 	tristate "IEEE 802.1AE MAC-level encryption (MACsec)"
 -	select CRYPTO
 -	select CRYPTO_AES
--	select CRYPTO_CBC
-+	select CRYPTO_LIB_AES_CBC
- 	select CRYPTO_LIB_SHA256
+-	select CRYPTO_GCM
++	select CRYPTO_LIB_AES_GCM
+ 	select GRO_CELLS
  	help
- 	  This option provides support for create/encrypting/decrypting keys
-diff --git a/security/keys/encrypted-keys/encrypted.c b/security/keys/encrypted-keys/encrypted.c
-index 59cb77b237b3..3dae2c29496b 100644
---- a/security/keys/encrypted-keys/encrypted.c
-+++ b/security/keys/encrypted-keys/encrypted.c
-@@ -25,11 +25,9 @@
- #include <linux/key-type.h>
- #include <linux/random.h>
- #include <linux/rcupdate.h>
--#include <linux/scatterlist.h>
- #include <linux/ctype.h>
--#include <crypto/aes.h>
-+#include <crypto/aes-cbc.h>
- #include <crypto/sha2.h>
--#include <crypto/skcipher.h>
- #include <crypto/utils.h>
- 
- #include "encrypted.h"
-@@ -37,17 +35,15 @@
- 
- static const char KEY_TRUSTED_PREFIX[] = "trusted:";
- static const char KEY_USER_PREFIX[] = "user:";
--static const char blkcipher_alg[] = "cbc(aes)";
- static const char key_format_default[] = "default";
- static const char key_format_ecryptfs[] = "ecryptfs";
- static const char key_format_enc32[] = "enc32";
--static unsigned int ivsize;
--static int blksize;
- 
- #define KEY_TRUSTED_PREFIX_LEN (sizeof (KEY_TRUSTED_PREFIX) - 1)
- #define KEY_USER_PREFIX_LEN (sizeof (KEY_USER_PREFIX) - 1)
- #define KEY_ECRYPTFS_DESC_LEN 16
- #define HASH_SIZE SHA256_DIGEST_SIZE
-+#define IV_SIZE AES_BLOCK_SIZE /* AES-CBC initialization vector size in bytes */
- #define MAX_DATA_SIZE 4096
- #define MIN_DATA_SIZE  20
- #define KEY_ENC32_PAYLOAD_LEN 32
-@@ -79,22 +75,6 @@ module_param(user_decrypted_data, bool, 0);
- MODULE_PARM_DESC(user_decrypted_data,
- 	"Allow instantiation of encrypted keys using provided decrypted data");
- 
--static int aes_get_sizes(void)
--{
--	struct crypto_skcipher *tfm;
--
--	tfm = crypto_alloc_skcipher(blkcipher_alg, 0, CRYPTO_ALG_ASYNC);
--	if (IS_ERR(tfm)) {
--		pr_err("encrypted_key: failed to alloc_cipher (%ld)\n",
--		       PTR_ERR(tfm));
--		return PTR_ERR(tfm);
--	}
--	ivsize = crypto_skcipher_ivsize(tfm);
--	blksize = crypto_skcipher_blocksize(tfm);
--	crypto_free_skcipher(tfm);
--	return 0;
--}
--
- /*
-  * valid_ecryptfs_desc - verify the description of a new/loaded encrypted key
-  *
-@@ -354,39 +334,6 @@ static int get_derived_key(u8 *derived_key, enum derived_key_type key_type,
- 	return 0;
+ 	   MACsec is an encryption standard for Ethernet.
+diff --git a/drivers/net/macsec.c b/drivers/net/macsec.c
+index fb009120a924..ce32dae77a60 100644
+--- a/drivers/net/macsec.c
++++ b/drivers/net/macsec.c
+@@ -9,7 +9,7 @@
+ #include <linux/skbuff.h>
+ #include <linux/socket.h>
+ #include <linux/module.h>
+-#include <crypto/aead.h>
++#include <crypto/aes-gcm.h>
+ #include <linux/etherdevice.h>
+ #include <linux/netdevice.h>
+ #include <linux/rtnetlink.h>
+@@ -134,7 +134,6 @@ static struct macsec_rxh_data *macsec_data_rtnl(const struct net_device *dev)
  }
  
--static struct skcipher_request *init_skcipher_req(const u8 *key,
--						  unsigned int key_len)
--{
--	struct skcipher_request *req;
--	struct crypto_skcipher *tfm;
--	int ret;
+ struct macsec_cb {
+-	struct aead_request *req;
+ 	union {
+ 		struct macsec_tx_sa *tx_sa;
+ 		struct macsec_rx_sa *rx_sa;
+@@ -181,9 +180,8 @@ static void free_rxsa_work(struct work_struct *work)
+ 	struct macsec_rx_sa *sa =
+ 		container_of(to_rcu_work(work), struct macsec_rx_sa, destroy_work);
+ 
+-	crypto_free_aead(sa->key.tfm);
+ 	free_percpu(sa->stats);
+-	kfree(sa);
++	kfree_sensitive(sa);
+ }
+ 
+ static void macsec_rxsa_put(struct macsec_rx_sa *sa)
+@@ -210,9 +208,8 @@ static void free_txsa_work(struct work_struct *work)
+ 	struct macsec_tx_sa *sa =
+ 		container_of(to_rcu_work(work), struct macsec_tx_sa, destroy_work);
+ 
+-	crypto_free_aead(sa->key.tfm);
+ 	free_percpu(sa->stats);
+-	kfree(sa);
++	kfree_sensitive(sa);
+ }
+ 
+ static void macsec_txsa_put(struct macsec_tx_sa *sa)
+@@ -541,70 +538,72 @@ static void count_tx(struct net_device *dev, int ret, int len)
+ 		dev_sw_netstats_tx_add(dev, 1, len);
+ }
+ 
+-static void macsec_encrypt_done(void *data, int err)
++static void macsec_crypt_chunk(struct aes_gcm_ctx *ctx, u8 *data, size_t avail,
++			       size_t *assoc_len, size_t *crypt_len,
++			       bool encrypt)
+ {
+-	struct sk_buff *skb = data;
+-	struct net_device *dev = skb->dev;
+-	struct macsec_dev *macsec = macsec_priv(dev);
+-	struct macsec_tx_sa *sa = macsec_skb_cb(skb)->tx_sa;
+-	int len, ret;
++	size_t n;
+ 
+-	aead_request_free(macsec_skb_cb(skb)->req);
 -
--	tfm = crypto_alloc_skcipher(blkcipher_alg, 0, CRYPTO_ALG_ASYNC);
--	if (IS_ERR(tfm)) {
--		pr_err("encrypted_key: failed to load %s transform (%ld)\n",
--		       blkcipher_alg, PTR_ERR(tfm));
--		return ERR_CAST(tfm);
--	}
+-	rcu_read_lock_bh();
+-	macsec_count_tx(skb, &macsec->secy.tx_sc, macsec_skb_cb(skb)->tx_sa);
+-	/* packet is encrypted/protected so tx_bytes must be calculated */
+-	len = macsec_msdu_len(skb) + 2 * ETH_ALEN;
+-	macsec_encrypt_finish(skb, dev);
+-	ret = dev_queue_xmit(skb);
+-	count_tx(dev, ret, len);
+-	rcu_read_unlock_bh();
++	if (*assoc_len && avail) {
++		/* Associated data */
++		n = min(avail, *assoc_len);
++		aes_gcm_auth_update(ctx, data, n);
++		data += n;
++		avail -= n;
++		*assoc_len -= n;
++	}
+ 
+-	macsec_txsa_put(sa);
+-	dev_put(dev);
++	if (*crypt_len && avail) {
++		/* En/decrypted data */
++		n = min(avail, *crypt_len);
++		if (encrypt)
++			aes_gcm_encrypt_update(ctx, data, data, n);
++		else
++			aes_gcm_decrypt_update(ctx, data, data, n);
++		*crypt_len -= n;
++	}
+ }
+ 
+-static struct aead_request *macsec_alloc_req(struct crypto_aead *tfm,
+-					     unsigned char **iv,
+-					     struct scatterlist **sg,
+-					     int num_frags)
++/**
++ * macsec_crypt_skb() - Encrypt or decrypt an skb in-place using AES-GCM
++ * @ctx: An AES-GCM context
++ * @skb: The socket buffer to process
++ * @assoc_len: Length of associated data
++ * @crypt_len: Length of payload data to encrypt or decrypt
++ * @encrypt: True for encryption, false for decryption
++ *
++ * Updates the given AES-GCM context with @assoc_len bytes of associated data
++ * from the skb, then encrypts or decrypts @crypt_len bytes in-place.  Context
++ * initialization and finalization are handled by the caller.
++ *
++ * The data (both associated and en/decrypted) is taken from the linear head and
++ * frag_list.  It is assumed that the @skb was processed by skb_cow_data(),
++ * meaning it has no page fragments (nr_frags == 0) and is writable.
++ */
++static void macsec_crypt_skb(struct aes_gcm_ctx *ctx, struct sk_buff *skb,
++			     size_t assoc_len, size_t crypt_len, bool encrypt)
+ {
+-	size_t size, iv_offset, sg_offset;
+-	struct aead_request *req;
+-	void *tmp;
++	struct sk_buff *frag_iter;
+ 
+-	size = sizeof(struct aead_request) + crypto_aead_reqsize(tfm);
+-	iv_offset = size;
+-	size += GCM_AES_IV_LEN;
 -
--	ret = crypto_skcipher_setkey(tfm, key, key_len);
--	if (ret < 0) {
--		pr_err("encrypted_key: failed to setkey (%d)\n", ret);
--		crypto_free_skcipher(tfm);
--		return ERR_PTR(ret);
--	}
+-	size = ALIGN(size, __alignof__(struct scatterlist));
+-	sg_offset = size;
+-	size += sizeof(struct scatterlist) * num_frags;
 -
--	req = skcipher_request_alloc(tfm, GFP_KERNEL);
+-	tmp = kmalloc(size, GFP_ATOMIC);
+-	if (!tmp)
+-		return NULL;
+-
+-	*iv = (unsigned char *)(tmp + iv_offset);
+-	*sg = (struct scatterlist *)(tmp + sg_offset);
+-	req = tmp;
+-
+-	aead_request_set_tfm(req, tfm);
+-
+-	return req;
++	WARN_ON_ONCE(skb_shinfo(skb)->nr_frags);
++	macsec_crypt_chunk(ctx, skb->data, skb_headlen(skb), &assoc_len,
++			   &crypt_len, encrypt);
++	skb_walk_frags(skb, frag_iter)
++		macsec_crypt_chunk(ctx, frag_iter->data, frag_iter->len,
++				   &assoc_len, &crypt_len, encrypt);
+ }
+ 
+ static struct sk_buff *macsec_encrypt(struct sk_buff *skb,
+ 				      struct net_device *dev)
+ {
+ 	int ret;
+-	struct scatterlist *sg;
+ 	struct sk_buff *trailer;
+-	unsigned char *iv;
++	u8 iv[GCM_AES_IV_LEN];
+ 	struct ethhdr *eth;
+ 	struct macsec_eth_header *hh;
+-	size_t unprotected_len;
+-	struct aead_request *req;
++	size_t unprotected_len, assoc_len, crypt_len;
++	struct aes_gcm_ctx ctx;
++	u8 icv[MACSEC_DEFAULT_ICV_LEN];
+ 	struct macsec_secy *secy;
+ 	struct macsec_tx_sc *tx_sc;
+ 	struct macsec_tx_sa *tx_sa;
+@@ -681,56 +680,32 @@ static struct sk_buff *macsec_encrypt(struct sk_buff *skb,
+ 		return ERR_PTR(ret);
+ 	}
+ 
+-	req = macsec_alloc_req(tx_sa->key.tfm, &iv, &sg, ret);
 -	if (!req) {
--		pr_err("encrypted_key: failed to allocate request for %s\n",
--		       blkcipher_alg);
--		crypto_free_skcipher(tfm);
+-		macsec_txsa_put(tx_sa);
+-		kfree_skb(skb);
 -		return ERR_PTR(-ENOMEM);
 -	}
 -
--	skcipher_request_set_callback(req, 0, NULL, NULL);
--	return req;
+ 	if (secy->xpn)
+ 		macsec_fill_iv_xpn(iv, tx_sa->ssci, pn.full64, tx_sa->key.salt);
+ 	else
+ 		macsec_fill_iv(iv, secy->sci, pn.lower);
+ 
+-	sg_init_table(sg, ret);
+-	ret = skb_to_sgvec(skb, sg, 0, skb->len);
+-	if (unlikely(ret < 0)) {
+-		aead_request_free(req);
+-		macsec_txsa_put(tx_sa);
+-		kfree_skb(skb);
+-		return ERR_PTR(ret);
+-	}
+-
+ 	if (tx_sc->encrypt) {
+-		int len = skb->len - macsec_hdr_len(sci_present) -
+-			  secy->icv_len;
+-		aead_request_set_crypt(req, sg, sg, len, iv);
+-		aead_request_set_ad(req, macsec_hdr_len(sci_present));
++		assoc_len = macsec_hdr_len(sci_present);
++		crypt_len = skb->len - assoc_len - secy->icv_len;
+ 	} else {
+-		aead_request_set_crypt(req, sg, sg, 0, iv);
+-		aead_request_set_ad(req, skb->len - secy->icv_len);
++		assoc_len = skb->len - secy->icv_len;
++		crypt_len = 0;
+ 	}
+ 
+-	macsec_skb_cb(skb)->req = req;
+-	macsec_skb_cb(skb)->tx_sa = tx_sa;
+-	macsec_skb_cb(skb)->has_sci = sci_present;
+-	aead_request_set_callback(req, 0, macsec_encrypt_done, skb);
++	aes_gcm_init(&ctx, iv, &tx_sa->key.gcm_key);
++	macsec_crypt_skb(&ctx, skb, assoc_len, crypt_len, true);
++	aes_gcm_encrypt_final(&ctx, icv);
+ 
+-	dev_hold(skb->dev);
+-	ret = crypto_aead_encrypt(req);
+-	if (ret == -EINPROGRESS) {
+-		return ERR_PTR(ret);
+-	} else if (ret != 0) {
+-		dev_put(skb->dev);
+-		kfree_skb(skb);
+-		aead_request_free(req);
++	ret = skb_store_bits(skb, skb->len - secy->icv_len, icv, secy->icv_len);
++	if (unlikely(ret < 0)) {
+ 		macsec_txsa_put(tx_sa);
+-		return ERR_PTR(-EINVAL);
++		kfree_skb(skb);
++		return ERR_PTR(ret);
+ 	}
+ 
+-	dev_put(skb->dev);
+-	aead_request_free(req);
++	macsec_skb_cb(skb)->tx_sa = tx_sa;
++	macsec_skb_cb(skb)->has_sci = sci_present;
+ 	macsec_txsa_put(tx_sa);
+ 
+ 	return skb;
+@@ -844,45 +819,6 @@ static void count_rx(struct net_device *dev, int len)
+ 	dev_sw_netstats_rx_add(dev, len);
+ }
+ 
+-static void macsec_decrypt_done(void *data, int err)
+-{
+-	struct sk_buff *skb = data;
+-	struct net_device *dev = skb->dev;
+-	struct macsec_dev *macsec = macsec_priv(dev);
+-	struct macsec_rx_sa *rx_sa = macsec_skb_cb(skb)->rx_sa;
+-	struct macsec_rx_sc *rx_sc = rx_sa->sc;
+-	int len;
+-	u32 pn;
+-
+-	aead_request_free(macsec_skb_cb(skb)->req);
+-
+-	if (!err)
+-		macsec_skb_cb(skb)->valid = true;
+-
+-	rcu_read_lock_bh();
+-	pn = ntohl(macsec_ethhdr(skb)->packet_number);
+-	if (!macsec_post_decrypt(skb, &macsec->secy, pn)) {
+-		rcu_read_unlock_bh();
+-		kfree_skb(skb);
+-		goto out;
+-	}
+-
+-	macsec_finalize_skb(skb, macsec->secy.icv_len,
+-			    macsec_extra_len(macsec_skb_cb(skb)->has_sci));
+-	len = skb->len;
+-	macsec_reset_skb(skb, macsec->secy.netdev);
+-
+-	if (gro_cells_receive(&macsec->gro_cells, skb) == NET_RX_SUCCESS)
+-		count_rx(dev, len);
+-
+-	rcu_read_unlock_bh();
+-
+-out:
+-	macsec_rxsa_put(rx_sa);
+-	macsec_rxsc_put(rx_sc);
+-	dev_put(dev);
 -}
 -
- static struct key *request_master_key(struct encrypted_key_payload *epayload,
- 				      const u8 **master_key, size_t *master_keylen)
+ static struct sk_buff *macsec_decrypt(struct sk_buff *skb,
+ 				      struct net_device *dev,
+ 				      struct macsec_rx_sa *rx_sa,
+@@ -890,12 +826,13 @@ static struct sk_buff *macsec_decrypt(struct sk_buff *skb,
+ 				      struct macsec_secy *secy)
  {
-@@ -427,42 +374,35 @@ static int derived_key_encrypt(struct encrypted_key_payload *epayload,
- 			       const u8 *derived_key,
- 			       unsigned int derived_keylen)
- {
--	struct scatterlist sg_in[2];
--	struct scatterlist sg_out[1];
--	struct crypto_skcipher *tfm;
--	struct skcipher_request *req;
-+	struct aes_enckey key;
- 	unsigned int encrypted_datalen;
--	u8 iv[AES_BLOCK_SIZE];
-+	u8 iv[IV_SIZE];
  	int ret;
+-	struct scatterlist *sg;
+ 	struct sk_buff *trailer;
+-	unsigned char *iv;
+-	struct aead_request *req;
++	u8 iv[GCM_AES_IV_LEN];
++	size_t assoc_len, crypt_len;
++	struct aes_gcm_ctx ctx;
+ 	struct macsec_eth_header *hdr;
+ 	u32 hdr_pn;
++	u8 icv[MACSEC_DEFAULT_ICV_LEN];
+ 	u16 icv_len = secy->icv_len;
  
--	encrypted_datalen = roundup(epayload->decrypted_datalen, blksize);
-+	ret = aes_prepareenckey(&key, derived_key, derived_keylen);
-+	if (ret < 0) /* Should never fail here, since a valid length was used */
-+		return ret;
+ 	macsec_skb_cb(skb)->valid = false;
+@@ -908,11 +845,6 @@ static struct sk_buff *macsec_decrypt(struct sk_buff *skb,
+ 		kfree_skb(skb);
+ 		return ERR_PTR(ret);
+ 	}
+-	req = macsec_alloc_req(rx_sa->key.tfm, &iv, &sg, ret);
+-	if (!req) {
+-		kfree_skb(skb);
+-		return ERR_PTR(-ENOMEM);
+-	}
  
--	req = init_skcipher_req(derived_key, derived_keylen);
--	ret = PTR_ERR(req);
--	if (IS_ERR(req))
--		goto out;
- 	dump_decrypted_data(epayload);
- 
--	sg_init_table(sg_in, 2);
--	sg_set_buf(&sg_in[0], epayload->decrypted_data,
--		   epayload->decrypted_datalen);
--	sg_set_page(&sg_in[1], ZERO_PAGE(0), AES_BLOCK_SIZE, 0);
--
--	sg_init_table(sg_out, 1);
--	sg_set_buf(sg_out, epayload->encrypted_data, encrypted_datalen);
--
-+	/*
-+	 * Pad the plaintext with zeros up to the next multiple of
-+	 * AES_BLOCK_SIZE, to make it have a valid length for AES-CBC.
-+	 * To do this without needing a temporary buffer, copy the plaintext
-+	 * into ->encrypted_data, pad it, and encrypt it in-place.
-+	 */
-+	encrypted_datalen =
-+		roundup(epayload->decrypted_datalen, AES_BLOCK_SIZE);
-+	memset(epayload->encrypted_data, 0, encrypted_datalen);
-+	memcpy(epayload->encrypted_data, epayload->decrypted_data,
-+	       epayload->decrypted_datalen);
- 	memcpy(iv, epayload->iv, sizeof(iv));
--	skcipher_request_set_crypt(req, sg_in, sg_out, encrypted_datalen, iv);
--	ret = crypto_skcipher_encrypt(req);
--	tfm = crypto_skcipher_reqtfm(req);
--	skcipher_request_free(req);
--	crypto_free_skcipher(tfm);
--	if (ret < 0)
--		pr_err("encrypted_key: failed to encrypt (%d)\n", ret);
--	else
--		dump_encrypted_data(epayload, encrypted_datalen);
--out:
--	return ret;
-+	aes_cbc_encrypt(epayload->encrypted_data, epayload->encrypted_data,
-+			encrypted_datalen, iv, &key);
-+	dump_encrypted_data(epayload, encrypted_datalen);
-+
-+	memzero_explicit(&key, sizeof(key));
-+	return 0;
- }
- 
- static int datablob_hmac_append(struct encrypted_key_payload *epayload,
-@@ -528,45 +468,37 @@ static int derived_key_decrypt(struct encrypted_key_payload *epayload,
- 			       const u8 *derived_key,
- 			       unsigned int derived_keylen)
- {
--	struct scatterlist sg_in[1];
--	struct scatterlist sg_out[2];
--	struct crypto_skcipher *tfm;
--	struct skcipher_request *req;
-+	struct aes_key key;
- 	unsigned int encrypted_datalen;
--	u8 iv[AES_BLOCK_SIZE];
--	u8 *pad;
-+	u8 iv[IV_SIZE];
-+	u8 *tmp;
- 	int ret;
- 
--	/* Throwaway buffer to hold the unused zero padding at the end */
--	pad = kmalloc(AES_BLOCK_SIZE, GFP_KERNEL);
--	if (!pad)
--		return -ENOMEM;
-+	ret = aes_preparekey(&key, derived_key, derived_keylen);
-+	if (ret < 0) /* Should never fail here, since a valid length was used */
-+		return ret;
- 
--	encrypted_datalen = roundup(epayload->decrypted_datalen, blksize);
--	req = init_skcipher_req(derived_key, derived_keylen);
--	ret = PTR_ERR(req);
--	if (IS_ERR(req))
-+	/*
-+	 * The plaintext was padded before encryption, so decrypt it into a
-+	 * temporary buffer that has space for the padding.
-+	 */
-+	encrypted_datalen =
-+		roundup(epayload->decrypted_datalen, AES_BLOCK_SIZE);
-+	tmp = kmalloc(encrypted_datalen, GFP_KERNEL);
-+	if (!tmp) {
-+		ret = -ENOMEM;
- 		goto out;
-+	}
- 	dump_encrypted_data(epayload, encrypted_datalen);
--
--	sg_init_table(sg_in, 1);
--	sg_init_table(sg_out, 2);
--	sg_set_buf(sg_in, epayload->encrypted_data, encrypted_datalen);
--	sg_set_buf(&sg_out[0], epayload->decrypted_data,
--		   epayload->decrypted_datalen);
--	sg_set_buf(&sg_out[1], pad, AES_BLOCK_SIZE);
--
- 	memcpy(iv, epayload->iv, sizeof(iv));
--	skcipher_request_set_crypt(req, sg_in, sg_out, encrypted_datalen, iv);
--	ret = crypto_skcipher_decrypt(req);
--	tfm = crypto_skcipher_reqtfm(req);
--	skcipher_request_free(req);
--	crypto_free_skcipher(tfm);
--	if (ret < 0)
--		goto out;
-+	aes_cbc_decrypt(tmp, epayload->encrypted_data, encrypted_datalen, iv,
-+			&key);
-+	memcpy(epayload->decrypted_data, tmp, epayload->decrypted_datalen);
- 	dump_decrypted_data(epayload);
-+	ret = 0;
- out:
--	kfree(pad);
-+	kfree_sensitive(tmp);
-+	memzero_explicit(&key, sizeof(key));
- 	return ret;
- }
- 
-@@ -630,10 +562,10 @@ static struct encrypted_key_payload *encrypted_key_alloc(struct key *key,
- 		}
+ 	hdr = (struct macsec_eth_header *)skb->data;
+ 	hdr_pn = ntohl(hdr->packet_number);
+@@ -931,55 +863,33 @@ static struct sk_buff *macsec_decrypt(struct sk_buff *skb,
+ 		macsec_fill_iv(iv, sci, hdr_pn);
  	}
  
--	encrypted_datalen = roundup(decrypted_datalen, blksize);
-+	encrypted_datalen = roundup(decrypted_datalen, AES_BLOCK_SIZE);
- 
--	datablob_len = format_len + 1 + strlen(master_desc) + 1
--	    + strlen(datalen) + 1 + ivsize + 1 + encrypted_datalen;
-+	datablob_len = format_len + 1 + strlen(master_desc) + 1 +
-+		       strlen(datalen) + 1 + IV_SIZE + 1 + encrypted_datalen;
- 
- 	ret = key_payload_reserve(key, payload_datalen + datablob_len
- 				  + HASH_SIZE + 1);
-@@ -664,13 +596,14 @@ static int encrypted_key_decrypt(struct encrypted_key_payload *epayload,
- 	size_t asciilen;
- 	int ret;
- 
--	encrypted_datalen = roundup(epayload->decrypted_datalen, blksize);
--	asciilen = (ivsize + 1 + encrypted_datalen + HASH_SIZE) * 2;
-+	encrypted_datalen =
-+		roundup(epayload->decrypted_datalen, AES_BLOCK_SIZE);
-+	asciilen = (IV_SIZE + 1 + encrypted_datalen + HASH_SIZE) * 2;
- 	if (strlen(hex_encoded_iv) != asciilen)
- 		return -EINVAL;
- 
--	hex_encoded_data = hex_encoded_iv + (2 * ivsize) + 2;
--	ret = hex2bin(epayload->iv, hex_encoded_iv, ivsize);
-+	hex_encoded_data = hex_encoded_iv + (2 * IV_SIZE) + 2;
-+	ret = hex2bin(epayload->iv, hex_encoded_iv, IV_SIZE);
- 	if (ret < 0)
- 		return -EINVAL;
- 	ret = hex2bin(epayload->encrypted_data, hex_encoded_data,
-@@ -719,7 +652,7 @@ static void __ekey_init(struct encrypted_key_payload *epayload,
- 	epayload->master_desc = epayload->format + format_len + 1;
- 	epayload->datalen = epayload->master_desc + strlen(master_desc) + 1;
- 	epayload->iv = epayload->datalen + strlen(datalen) + 1;
--	epayload->encrypted_data = epayload->iv + ivsize + 1;
-+	epayload->encrypted_data = epayload->iv + IV_SIZE + 1;
- 	epayload->decrypted_data = epayload->payload_data;
- 
- 	if (!format)
-@@ -763,11 +696,11 @@ static int encrypted_init(struct encrypted_key_payload *epayload,
- 	if (hex_encoded_iv) {
- 		ret = encrypted_key_decrypt(epayload, format, hex_encoded_iv);
- 	} else if (decrypted_data) {
--		get_random_bytes(epayload->iv, ivsize);
-+		get_random_bytes(epayload->iv, IV_SIZE);
- 		ret = hex2bin(epayload->decrypted_data, decrypted_data,
- 			      epayload->decrypted_datalen);
+-	sg_init_table(sg, ret);
+-	ret = skb_to_sgvec(skb, sg, 0, skb->len);
+-	if (unlikely(ret < 0)) {
+-		aead_request_free(req);
+-		kfree_skb(skb);
+-		return ERR_PTR(ret);
+-	}
+-
+ 	if (hdr->tci_an & MACSEC_TCI_E) {
+ 		/* confidentiality: ethernet + macsec header
+ 		 * authenticated, encrypted payload
+ 		 */
+-		int len = skb->len - macsec_hdr_len(macsec_skb_cb(skb)->has_sci);
+-
+-		aead_request_set_crypt(req, sg, sg, len, iv);
+-		aead_request_set_ad(req, macsec_hdr_len(macsec_skb_cb(skb)->has_sci));
+-		skb = skb_unshare(skb, GFP_ATOMIC);
+-		if (!skb) {
+-			aead_request_free(req);
+-			return ERR_PTR(-ENOMEM);
+-		}
++		assoc_len = macsec_hdr_len(macsec_skb_cb(skb)->has_sci);
++		crypt_len = skb->len - assoc_len - icv_len;
  	} else {
--		get_random_bytes(epayload->iv, ivsize);
-+		get_random_bytes(epayload->iv, IV_SIZE);
- 		get_random_bytes(epayload->decrypted_data, epayload->decrypted_datalen);
+ 		/* integrity only: all headers + data authenticated */
+-		aead_request_set_crypt(req, sg, sg, icv_len, iv);
+-		aead_request_set_ad(req, skb->len - icv_len);
++		assoc_len = skb->len - icv_len;
++		crypt_len = 0;
  	}
- 	return ret;
-@@ -884,7 +817,7 @@ static int encrypted_update(struct key *key, struct key_preparsed_payload *prep)
- 	__ekey_init(new_epayload, epayload->format, new_master_desc,
- 		    epayload->datalen);
  
--	memcpy(new_epayload->iv, epayload->iv, ivsize);
-+	memcpy(new_epayload->iv, epayload->iv, IV_SIZE);
- 	memcpy(new_epayload->payload_data, epayload->payload_data,
- 	       epayload->payload_datalen);
+-	macsec_skb_cb(skb)->req = req;
+-	skb->dev = dev;
+-	aead_request_set_callback(req, 0, macsec_decrypt_done, skb);
++	aes_gcm_init(&ctx, iv, &rx_sa->key.gcm_key);
++	macsec_crypt_skb(&ctx, skb, assoc_len, crypt_len, false);
  
-@@ -918,9 +851,9 @@ static long encrypted_read(const struct key *key, char *buffer,
- 	epayload = dereference_key_locked(key);
+-	dev_hold(dev);
+-	ret = crypto_aead_decrypt(req);
+-	if (ret == -EINPROGRESS) {
++	ret = skb_copy_bits(skb, skb->len - icv_len, icv, icv_len);
++	if (unlikely(ret < 0)) {
++		memzero_explicit(&ctx, sizeof(ctx));
++		kfree_skb(skb);
+ 		return ERR_PTR(ret);
+-	} else if (ret != 0) {
+-		/* decryption/authentication failed
+-		 * 10.6 if validateFrames is disabled, deliver anyway
+-		 */
+-		if (ret != -EBADMSG) {
+-			kfree_skb(skb);
+-			skb = ERR_PTR(ret);
+-		}
+-	} else {
+-		macsec_skb_cb(skb)->valid = true;
+ 	}
+-	dev_put(dev);
  
- 	/* returns the hex encoded iv, encrypted-data, and hmac as ascii */
--	asciiblob_len = epayload->datablob_len + ivsize + 1
--	    + roundup(epayload->decrypted_datalen, blksize)
--	    + (HASH_SIZE * 2);
-+	asciiblob_len = epayload->datablob_len + IV_SIZE + 1 +
-+			roundup(epayload->decrypted_datalen, AES_BLOCK_SIZE) +
-+			(HASH_SIZE * 2);
+-	aead_request_free(req);
++	if (aes_gcm_decrypt_final(&ctx, icv) == 0)
++		macsec_skb_cb(skb)->valid = true;
++	/* else, decryption/authentication failed
++	 * 10.6 if validateFrames is disabled, deliver anyway
++	 */
  
- 	if (!buffer || buflen < asciiblob_len)
- 		return asciiblob_len;
-@@ -982,11 +915,6 @@ EXPORT_SYMBOL_GPL(key_type_encrypted);
+ 	return skb;
+ }
+@@ -1276,11 +1186,8 @@ static rx_handler_result_t macsec_handle_frame(struct sk_buff **pskb)
+ 		skb = macsec_decrypt(skb, dev, rx_sa, sci, secy);
  
- static int __init init_encrypted(void)
- {
+ 	if (IS_ERR(skb)) {
+-		/* the decrypt callback needs the reference */
+-		if (PTR_ERR(skb) != -EINPROGRESS) {
+-			macsec_rxsa_put(rx_sa);
+-			macsec_rxsc_put(rx_sc);
+-		}
++		macsec_rxsa_put(rx_sa);
++		macsec_rxsc_put(rx_sc);
+ 		rcu_read_unlock();
+ 		*pskb = NULL;
+ 		return RX_HANDLER_CONSUMED;
+@@ -1370,41 +1277,19 @@ static rx_handler_result_t macsec_handle_frame(struct sk_buff **pskb)
+ 	return RX_HANDLER_PASS;
+ }
+ 
+-static struct crypto_aead *macsec_alloc_tfm(char *key, int key_len, int icv_len)
+-{
+-	struct crypto_aead *tfm;
 -	int ret;
 -
--	ret = aes_get_sizes();
+-	tfm = crypto_alloc_aead("gcm(aes)", 0, 0);
+-
+-	if (IS_ERR(tfm))
+-		return tfm;
+-
+-	ret = crypto_aead_setkey(tfm, key, key_len);
 -	if (ret < 0)
--		return ret;
- 	return register_key_type(&key_type_encrypted);
- }
+-		goto fail;
+-
+-	ret = crypto_aead_setauthsize(tfm, icv_len);
+-	if (ret < 0)
+-		goto fail;
+-
+-	return tfm;
+-fail:
+-	crypto_free_aead(tfm);
+-	return ERR_PTR(ret);
+-}
+-
+ static int init_rx_sa(struct macsec_rx_sa *rx_sa, char *sak, int key_len,
+ 		      int icv_len)
+ {
++	int err;
++
+ 	rx_sa->stats = alloc_percpu(struct macsec_rx_sa_stats);
+ 	if (!rx_sa->stats)
+ 		return -ENOMEM;
+ 
+-	rx_sa->key.tfm = macsec_alloc_tfm(sak, key_len, icv_len);
+-	if (IS_ERR(rx_sa->key.tfm)) {
++	err = aes_gcm_preparekey(&rx_sa->key.gcm_key, sak, key_len, icv_len);
++	if (err) {
+ 		free_percpu(rx_sa->stats);
+-		return PTR_ERR(rx_sa->key.tfm);
++		return err;
+ 	}
+ 
+ 	rx_sa->ssci = MACSEC_UNDEF_SSCI;
+@@ -1498,14 +1383,16 @@ static struct macsec_rx_sc *create_rx_sc(struct net_device *dev, sci_t sci,
+ static int init_tx_sa(struct macsec_tx_sa *tx_sa, char *sak, int key_len,
+ 		      int icv_len)
+ {
++	int err;
++
+ 	tx_sa->stats = alloc_percpu(struct macsec_tx_sa_stats);
+ 	if (!tx_sa->stats)
+ 		return -ENOMEM;
+ 
+-	tx_sa->key.tfm = macsec_alloc_tfm(sak, key_len, icv_len);
+-	if (IS_ERR(tx_sa->key.tfm)) {
++	err = aes_gcm_preparekey(&tx_sa->key.gcm_key, sak, key_len, icv_len);
++	if (err) {
+ 		free_percpu(tx_sa->stats);
+-		return PTR_ERR(tx_sa->key.tfm);
++		return err;
+ 	}
+ 
+ 	tx_sa->ssci = MACSEC_UNDEF_SSCI;
+@@ -1813,7 +1700,7 @@ static int macsec_add_rxsa(struct sk_buff *skb, struct genl_info *info)
+ 	err = init_rx_sa(rx_sa, nla_data(tb_sa[MACSEC_SA_ATTR_KEY]),
+ 			 secy->key_len, secy->icv_len);
+ 	if (err < 0) {
+-		kfree(rx_sa);
++		kfree_sensitive(rx_sa);
+ 		rtnl_unlock();
+ 		return err;
+ 	}
+@@ -2021,7 +1908,7 @@ static int macsec_add_txsa(struct sk_buff *skb, struct genl_info *info)
+ 	err = init_tx_sa(tx_sa, nla_data(tb_sa[MACSEC_SA_ATTR_KEY]),
+ 			 secy->key_len, secy->icv_len);
+ 	if (err < 0) {
+-		kfree(tx_sa);
++		kfree_sensitive(tx_sa);
+ 		rtnl_unlock();
+ 		return err;
+ 	}
+@@ -3508,8 +3395,7 @@ static netdev_tx_t macsec_start_xmit(struct sk_buff *skb,
+ 	len = skb->len;
+ 	skb = macsec_encrypt(skb, dev);
+ 	if (IS_ERR(skb)) {
+-		if (PTR_ERR(skb) != -EINPROGRESS)
+-			DEV_STATS_INC(dev, tx_dropped);
++		DEV_STATS_INC(dev, tx_dropped);
+ 		return NETDEV_TX_OK;
+ 	}
+ 
+@@ -4316,17 +4202,8 @@ static int macsec_validate_attr(struct nlattr *tb[], struct nlattr *data[],
+ 
+ 	if (data[IFLA_MACSEC_ICV_LEN]) {
+ 		icv_len = nla_get_u8(data[IFLA_MACSEC_ICV_LEN]);
+-		if (icv_len != MACSEC_DEFAULT_ICV_LEN) {
+-			char dummy_key[DEFAULT_SAK_LEN] = { 0 };
+-			struct crypto_aead *dummy_tfm;
+-
+-			dummy_tfm = macsec_alloc_tfm(dummy_key,
+-						     DEFAULT_SAK_LEN,
+-						     icv_len);
+-			if (IS_ERR(dummy_tfm))
+-				return PTR_ERR(dummy_tfm);
+-			crypto_free_aead(dummy_tfm);
+-		}
++		if (crypto_gcm_check_authsize(icv_len) != 0)
++			return -EINVAL;
+ 	}
+ 
+ 	es  = nla_get_u8_default(data[IFLA_MACSEC_ES], false);
+diff --git a/include/net/macsec.h b/include/net/macsec.h
+index d962093ee923..a315a33b3ac3 100644
+--- a/include/net/macsec.h
++++ b/include/net/macsec.h
+@@ -7,6 +7,7 @@
+ #ifndef _NET_MACSEC_H_
+ #define _NET_MACSEC_H_
+ 
++#include <crypto/aes-gcm.h>
+ #include <linux/u64_stats_sync.h>
+ #include <linux/if_vlan.h>
+ #include <linux/workqueue.h>
+@@ -63,12 +64,12 @@ typedef union pn {
+ /**
+  * struct macsec_key - SA key
+  * @id: user-provided key identifier
+- * @tfm: crypto struct, key storage
++ * @gcm_key: the AES-GCM key
+  * @salt: salt used to generate IV in XPN cipher suites
+  */
+ struct macsec_key {
+ 	u8 id[MACSEC_KEYID_LEN];
+-	struct crypto_aead *tfm;
++	struct aes_gcm_key gcm_key;
+ 	salt_t salt;
+ };
  
 -- 
 2.54.0
