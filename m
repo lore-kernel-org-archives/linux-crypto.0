@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A59FC3921F0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E01C2387374;
 	Tue,  7 Jul 2026 05:37:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783402643; cv=none; b=RJe5Exay92Pcr9T9hwy2nKhqqp2LnxNVVNN0rh7wOxQeJJ3fWfUfX6BNfzykZW1WuFda/3zcwB0+GqB3dHAM5Hq+xeBJVHaNYgVMpRdTVyAJ9bHJmNGY4LxI4AzBp40PIvy/9bKaEyrdIg/98bjeKJVWoc81vlZPFnvGf+0+mHk=
+	t=1783402644; cv=none; b=AoQMYNmFI/tmdkJ6gVG7So1M0oIjL+aiSQ8igcN/F3OUrarMiSCczhxJ+fHeqyagAvIQLYZDtddmNvHMwV90xNhASnrnEn8GxyG+FXXZGkIxJsMGHU1D5iMi53Htjlik9LzHRBgSGhimSraqI2+vyZHhpiW6YN24sa5ujmIFw4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783402643; c=relaxed/simple;
-	bh=Y506qYP1nJjf5VCd52qeUpmPjAYlEBrasmvjxFp7Z2g=;
+	s=arc-20240116; t=1783402644; c=relaxed/simple;
+	bh=gIvow1kNjUgx+7Alwmp6JXsJwe2CGRssXMhnO8CPY2k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=K2ZmOYb1sj0MXp+wPjy/ASDQKWH9WPDPEWQp1Rt0PWnUcnT98lhmORCkhNoUqG8XERJk99QnX1sj+PTnc+okjGB/24deFX1Z2gJFttkPeXoYlQv8wPQfE+DC0ku630zl+wGw4ciW90MAaLTWr/Bi7ZM5yD98EcsMcW30Z23GJT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XchPIdr/; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=AiZV3kRULSaEsbeYryLW2lNuelp+P5lFUCRXVr0X1qUr4cz5okE5Cg8hxJ4K/xmf/XcbVWBhqkAhEECgUHUo26CkjbJGSC2zx/HJvbccL9HctIOq1DwPc/HijJY8qYP+dEqgOh7joCnMiRjXzj6eFNEQVesWn+R2rgYyFzFptjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PtXVMpI/; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XchPIdr/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72EAE1F00A3D;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PtXVMpI/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFD541F00A3E;
 	Tue,  7 Jul 2026 05:37:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1783402641;
-	bh=DJ4rm7m9eF2Eg4nx7XWa0AHSuv5kDOX3I9CUtOoXvOA=;
+	bh=X5vHrn7bKTqvNsJPYPSM5LCbI2NmT7uhHtgspE6rsp8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=XchPIdr/uZYLFhhhlsz9URURiokIDY/rgl+dDbeVv8Q2iYgV9nfdPwzz/Wyax10LI
-	 m3pfBpWM7jie3uOZRgQyBt04TRiP7Py4S3iua2DKG8yE+ZLqhhPkv2a+1c5/Fj6BNB
-	 R4wcCproS1kpRr+z0Btfkicj+DOkY+OwjB8vizUF3c7aFLGv3FPloi6uZhxcENETpX
-	 VvJSpZw8mKsnpsLZ1kdMwZqURlFJvJdEDJEpdJV+vkCaQMhfmNCwkwAeZcmJDcA22D
-	 FrWsajqTm8/0PDDHxVxp9C/FvOyK5zFW0le82z/LI1GPwWXXk+FXpeVwl+kxAHCeiF
-	 jwzz3zDoLLaWg==
+	b=PtXVMpI/V0g2zp7SEOmxCmmPBZO/WV+5GvT2UiJ1AxhX1kiFMScQmPiXkWuPRQ1MS
+	 JP5JUYzpag6lO9wI+J7VG/ETbf+Azt2hsSL7Kjey9mAutHB93wcCFizLu83lR3ogml
+	 7VjMFz6iTldIL6Ssp5MqmIcBBKnaoB440nxc4NyCSietFHLQskRJ0Rh7GncMwwAZXL
+	 8zuyCjCDTS3tHILhwLYaDJccX11XnjV3hGC9Gg9q1fvoWBOpqGTu3k8KS9mIwqgt5A
+	 3gP2ZEzeroKsz38PFT1J/zepVJs7DAdosvQdomlw5olgc7rFVq9K0PYYVuwFseY3jL
+	 Ojm06gxWNMwqg==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 20/33] KEYS: trusted: dcp: Use AES-GCM library instead of crypto_aead
-Date: Mon,  6 Jul 2026 22:34:50 -0700
-Message-ID: <20260707053503.209874-21-ebiggers@kernel.org>
+Subject: [PATCH 21/33] libceph: Use AES-CBC library in ceph_aes_crypt()
+Date: Mon,  6 Jul 2026 22:34:51 -0700
+Message-ID: <20260707053503.209874-22-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260707053503.209874-1-ebiggers@kernel.org>
 References: <20260707053503.209874-1-ebiggers@kernel.org>
@@ -44,139 +44,197 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Now that there's a library API for AES-GCM, use it instead of a
-"gcm(aes)" crypto_aead.  This significantly simplifies the code.
+Now that there's a library API for AES-CBC, use it instead of a
+"cbc(aes)" crypto_skcipher.  This significantly simplifies the code.
 
-Note, I've left unchanged two pre-existing issues with this code:
+Notably, the new ceph_aes_crypt() just operates on the actual buffer
+directly.  It no longer needs to be converted into a scatterlist.
 
-- trusted_key_unseal() doesn't validate that the decrypted key actually
-  fits in the buffer to which it's written.
+This conversion also eliminates the broken code that intended to
+allocate crypto_skcipher objects from a GFP_NOIO context.  That isn't
+actually supported: crypto_alloc_skcipher() takes crypto_alg_sem which
+isn't GFP_NOIO safe, and it can also load kernel modules.
 
-- dcp_blob_fmt::nonce is unnecessarily long, at 16 bytes rather than the
-  12 bytes that are actually used by the AES-GCM operations.  Probably
-  unfixable since it's part of the blob format.
+Note that ceph_aes_crypt() verifies only a single padding byte rather
+than all of them.  That's probably a bug.  But I've left it unchanged,
+as fixing it is outside the scope of this commit.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- security/keys/trusted-keys/Kconfig       |  1 +
- security/keys/trusted-keys/trusted_dcp.c | 69 +++++-------------------
- 2 files changed, 15 insertions(+), 55 deletions(-)
+ net/ceph/Kconfig  |  3 +--
+ net/ceph/crypto.c | 66 ++++++++++-------------------------------------
+ net/ceph/crypto.h |  3 ++-
+ 3 files changed, 16 insertions(+), 56 deletions(-)
 
-diff --git a/security/keys/trusted-keys/Kconfig b/security/keys/trusted-keys/Kconfig
-index e5a4a53aeab2..361882191ff9 100644
---- a/security/keys/trusted-keys/Kconfig
-+++ b/security/keys/trusted-keys/Kconfig
-@@ -63,6 +63,7 @@ config TRUSTED_KEYS_DCP
- 	bool "DCP-based trusted keys"
- 	depends on CRYPTO_DEV_MXS_DCP >= TRUSTED_KEYS
- 	default y
-+	select CRYPTO_LIB_AES_GCM
- 	select HAVE_TRUSTED_KEYS_DEBUG
- 	select HAVE_TRUSTED_KEYS
- 	help
-diff --git a/security/keys/trusted-keys/trusted_dcp.c b/security/keys/trusted-keys/trusted_dcp.c
-index 7b6eb655df0c..f9b2e0ad162d 100644
---- a/security/keys/trusted-keys/trusted_dcp.c
-+++ b/security/keys/trusted-keys/trusted_dcp.c
-@@ -3,10 +3,8 @@
-  * Copyright (C) 2021 sigma star gmbh
-  */
- 
--#include <crypto/aead.h>
- #include <crypto/aes.h>
--#include <crypto/algapi.h>
--#include <crypto/gcm.h>
-+#include <crypto/aes-gcm.h>
- #include <crypto/skcipher.h>
- #include <keys/trusted-type.h>
+diff --git a/net/ceph/Kconfig b/net/ceph/Kconfig
+index 7e2528cde4b9..74aa2817253b 100644
+--- a/net/ceph/Kconfig
++++ b/net/ceph/Kconfig
+@@ -3,10 +3,9 @@ config CEPH_LIB
+ 	tristate "Ceph core library"
+ 	depends on INET
+ 	select CRC32
+-	select CRYPTO_AES
+-	select CRYPTO_CBC
+ 	select CRYPTO_GCM
+ 	select CRYPTO_KRB5
++	select CRYPTO_LIB_AES_CBC
+ 	select CRYPTO_LIB_SHA256
+ 	select CRYPTO
+ 	select KEYS
+diff --git a/net/ceph/crypto.c b/net/ceph/crypto.c
+index de7496791c91..83bbef71bfaf 100644
+--- a/net/ceph/crypto.c
++++ b/net/ceph/crypto.c
+@@ -6,9 +6,8 @@
+ #include <linux/scatterlist.h>
+ #include <linux/sched.h>
+ #include <linux/slab.h>
+-#include <crypto/aes.h>
++#include <crypto/aes-cbc.h>
+ #include <crypto/krb5.h>
+-#include <crypto/skcipher.h>
  #include <linux/key-type.h>
-@@ -126,64 +124,25 @@ static int do_dcp_crypto(u8 *in, u8 *out, bool do_encrypt)
- 	return res;
- }
+ #include <linux/sched/mm.h>
  
--static int do_aead_crypto(u8 *in, u8 *out, size_t len, u8 *key, u8 *nonce,
-+static int do_aead_crypto(u8 *in, u8 *out, size_t len,
-+			  const u8 key[AES_KEYSIZE_128], const u8 nonce[12],
- 			  bool do_encrypt)
+@@ -17,27 +16,6 @@
+ #include <linux/ceph/decode.h>
+ #include "crypto.h"
+ 
+-static int set_aes_tfm(struct ceph_crypto_key *key)
+-{
+-	unsigned int noio_flag;
+-	int ret;
+-
+-	noio_flag = memalloc_noio_save();
+-	key->aes_tfm = crypto_alloc_sync_skcipher("cbc(aes)", 0, 0);
+-	memalloc_noio_restore(noio_flag);
+-	if (IS_ERR(key->aes_tfm)) {
+-		ret = PTR_ERR(key->aes_tfm);
+-		key->aes_tfm = NULL;
+-		return ret;
+-	}
+-
+-	ret = crypto_sync_skcipher_setkey(key->aes_tfm, key->key, key->len);
+-	if (ret)
+-		return ret;
+-
+-	return 0;
+-}
+-
+ static int set_krb5_tfms(struct ceph_crypto_key *key, const u32 *key_usages,
+ 			 int key_usage_cnt)
  {
--	struct aead_request *aead_req = NULL;
--	struct scatterlist src_sg, dst_sg;
--	struct crypto_aead *aead;
-+	struct aes_gcm_key gcm;
- 	int ret;
--	DECLARE_CRYPTO_WAIT(wait);
--
--	aead = crypto_alloc_aead("gcm(aes)", 0, CRYPTO_ALG_ASYNC);
--	if (IS_ERR(aead)) {
--		ret = PTR_ERR(aead);
--		goto out;
--	}
+@@ -82,7 +60,7 @@ int ceph_crypto_key_prepare(struct ceph_crypto_key *key,
+ 	case CEPH_CRYPTO_NONE:
+ 		return 0; /* nothing to do */
+ 	case CEPH_CRYPTO_AES:
+-		return set_aes_tfm(key);
++		return aes_preparekey(&key->aes_key, key->key, key->len);
+ 	case CEPH_CRYPTO_AES256KRB5:
+ 		hmac_sha256_preparekey(&key->hmac_key, key->key, key->len);
+ 		return set_krb5_tfms(key, key_usages, key_usage_cnt);
+@@ -174,10 +152,7 @@ void ceph_crypto_key_destroy(struct ceph_crypto_key *key)
+ 	key->key = NULL;
  
--	ret = crypto_aead_setauthsize(aead, DCP_BLOB_AUTHLEN);
--	if (ret < 0) {
--		pr_err("Can't set crypto auth tag len: %d\n", ret);
--		goto free_aead;
--	}
--
--	aead_req = aead_request_alloc(aead, GFP_KERNEL);
--	if (!aead_req) {
--		ret = -ENOMEM;
--		goto free_aead;
--	}
-+	ret = aes_gcm_preparekey(&gcm, key, AES_KEYSIZE_128, DCP_BLOB_AUTHLEN);
-+	if (ret) /* Should never fail here, since valid lengths were used. */
-+		return ret;
+ 	if (key->type == CEPH_CRYPTO_AES) {
+-		if (key->aes_tfm) {
+-			crypto_free_sync_skcipher(key->aes_tfm);
+-			key->aes_tfm = NULL;
+-		}
++		memzero_explicit(&key->aes_key, sizeof(key->aes_key));
+ 	} else if (key->type == CEPH_CRYPTO_AES256KRB5) {
+ 		memzero_explicit(&key->hmac_key, sizeof(key->hmac_key));
+ 		for (i = 0; i < ARRAY_SIZE(key->krb5_tfms); i++) {
+@@ -264,26 +239,20 @@ static void teardown_sgtable(struct sg_table *sgt)
+ static int ceph_aes_crypt(const struct ceph_crypto_key *key, bool encrypt,
+ 			  void *buf, int buf_len, int in_len, int *pout_len)
+ {
+-	SYNC_SKCIPHER_REQUEST_ON_STACK(req, key->aes_tfm);
+-	struct sg_table sgt;
+-	struct scatterlist prealloc_sg;
+ 	char iv[AES_BLOCK_SIZE] __aligned(8);
+ 	int pad_byte = AES_BLOCK_SIZE - (in_len & (AES_BLOCK_SIZE - 1));
+ 	int crypt_len = encrypt ? in_len + pad_byte : in_len;
+-	int ret;
  
--	sg_init_one(&src_sg, in, len);
- 	if (do_encrypt) {
--		/*
--		 * If we encrypt our buffer has extra space for the auth tag.
--		 */
--		sg_init_one(&dst_sg, out, len + DCP_BLOB_AUTHLEN);
-+		aes_gcm_encrypt(out, out + len, in, len, NULL, 0, nonce, &gcm);
-+		ret = 0;
- 	} else {
--		sg_init_one(&dst_sg, out, len);
-+		ret = aes_gcm_decrypt(out, in, in + len, len, NULL, 0, nonce,
-+				      &gcm);
+ 	WARN_ON(crypt_len > buf_len);
++	if (crypt_len <= 0 || crypt_len % AES_BLOCK_SIZE != 0) {
++		pr_err("%s: got bad crypt_len %d for %scrypt\n", __func__,
++		       crypt_len, encrypt ? "en" : "de");
++		return -EINVAL;
++	}
+ 	if (encrypt)
+ 		memset(buf + in_len, pad_byte, pad_byte);
+-	ret = setup_sgtable(&sgt, &prealloc_sg, buf, crypt_len);
+-	if (ret)
+-		return ret;
+ 
+ 	memcpy(iv, aes_iv, AES_BLOCK_SIZE);
+-	skcipher_request_set_sync_tfm(req, key->aes_tfm);
+-	skcipher_request_set_callback(req, 0, NULL, NULL);
+-	skcipher_request_set_crypt(req, sgt.sgl, sgt.sgl, crypt_len, iv);
+-
+ 	/*
+ 	print_hex_dump(KERN_ERR, "key: ", DUMP_PREFIX_NONE, 16, 1,
+ 		       key->key, key->len, 1);
+@@ -291,15 +260,10 @@ static int ceph_aes_crypt(const struct ceph_crypto_key *key, bool encrypt,
+ 		       buf, crypt_len, 1);
+ 	*/
+ 	if (encrypt)
+-		ret = crypto_skcipher_encrypt(req);
++		aes_cbc_encrypt(buf, buf, crypt_len, iv, &key->aes_key);
+ 	else
+-		ret = crypto_skcipher_decrypt(req);
+-	skcipher_request_zero(req);
+-	if (ret) {
+-		pr_err("%s %scrypt failed: %d\n", __func__,
+-		       encrypt ? "en" : "de", ret);
+-		goto out_sgt;
+-	}
++		aes_cbc_decrypt(buf, buf, crypt_len, iv, &key->aes_key);
++
+ 	/*
+ 	print_hex_dump(KERN_ERR, "out: ", DUMP_PREFIX_NONE, 16, 1,
+ 		       buf, crypt_len, 1);
+@@ -315,14 +279,10 @@ static int ceph_aes_crypt(const struct ceph_crypto_key *key, bool encrypt,
+ 		} else {
+ 			pr_err("%s got bad padding %d on in_len %d\n",
+ 			       __func__, pad_byte, in_len);
+-			ret = -EPERM;
+-			goto out_sgt;
++			return -EPERM;
+ 		}
  	}
 -
--	aead_request_set_crypt(aead_req, &src_sg, &dst_sg, len, nonce);
--	aead_request_set_callback(aead_req, CRYPTO_TFM_REQ_MAY_SLEEP,
--				  crypto_req_done, &wait);
--	aead_request_set_ad(aead_req, 0);
--
--	if (crypto_aead_setkey(aead, key, AES_KEYSIZE_128)) {
--		pr_err("Can't set crypto AEAD key\n");
--		ret = -EINVAL;
--		goto free_req;
--	}
--
--	if (do_encrypt)
--		ret = crypto_wait_req(crypto_aead_encrypt(aead_req), &wait);
--	else
--		ret = crypto_wait_req(crypto_aead_decrypt(aead_req), &wait);
--
--free_req:
--	aead_request_free(aead_req);
--free_aead:
--	crypto_free_aead(aead);
--out:
-+	memzero_explicit(&gcm, sizeof(gcm));
- 	return ret;
+-out_sgt:
+-	teardown_sgtable(&sgt);
+-	return ret;
++	return 0;
  }
  
-@@ -273,8 +232,8 @@ static int trusted_dcp_unseal(struct trusted_key_payload *p, char *datablob)
- 		goto out;
- 	}
+ static int ceph_krb5_encrypt(const struct ceph_crypto_key *key, int usage_slot,
+diff --git a/net/ceph/crypto.h b/net/ceph/crypto.h
+index 3a2ade15abbc..d4d97565ebfb 100644
+--- a/net/ceph/crypto.h
++++ b/net/ceph/crypto.h
+@@ -2,6 +2,7 @@
+ #ifndef _FS_CEPH_CRYPTO_H
+ #define _FS_CEPH_CRYPTO_H
  
--	ret = do_aead_crypto(b->payload, p->key, p->key_len + DCP_BLOB_AUTHLEN,
--			     plain_blob_key, b->nonce, false);
-+	ret = do_aead_crypto(b->payload, p->key, p->key_len, plain_blob_key,
-+			     b->nonce, false);
- 	if (ret) {
- 		pr_err("Unwrap of DCP payload failed: %i\n", ret);
- 		goto out;
++#include <crypto/aes.h>
+ #include <crypto/sha2.h>
+ #include <linux/ceph/types.h>
+ #include <linux/ceph/buffer.h>
+@@ -19,7 +20,7 @@ struct ceph_crypto_key {
+ 	void *key;
+ 
+ 	union {
+-		struct crypto_sync_skcipher *aes_tfm;
++		struct aes_key aes_key;
+ 		struct {
+ 			struct hmac_sha256_key hmac_key;
+ 			const struct krb5_enctype *krb5_type;
 -- 
 2.54.0
 
