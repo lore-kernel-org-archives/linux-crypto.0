@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C6B73845D9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E0613859EB;
 	Tue,  7 Jul 2026 05:37:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783402638; cv=none; b=ZdCEzXgzSltu8dF0X1kG8tmDJ1qT+v+wpLCX5Z5aa36Q5tsgX7qS6E0RhMoRHgif2KBY5WFV8CKehoEK7UvA3+ZLtBkr/7tL+mWuduOeFzxWxnQZgDxRdUVjTHDOSCHQwGn/tyvuKNq3O0tj7uyswhWlI651sCDKGXWXkgCsTUE=
+	t=1783402639; cv=none; b=Mv9eaQFA6DbGR6OTDbRZ9GRdxLAH1Rg3SvrnLeyj+EXtD7sXLGzVfAP0GjO3ZUmiDie19DcfUCLpMqJgruiY0vLRMNdvWR1/DSn5kKfET5JbJsQgvTam+eH0KKFiFvBfaQdsn4VqVZT3Uf0sBgK2epyxBsYvtqWCtMEx+cDoKt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783402638; c=relaxed/simple;
-	bh=pKFE636ZhlHHgdJMAhw6v12s+gU9FNIzWAc9pyVfcqU=;
+	s=arc-20240116; t=1783402639; c=relaxed/simple;
+	bh=PXdXwsrUi2NWo324JSarAOnx0zYwJLxJ5M91rveRiXU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rEOfIsiWex4Ni/nceRmLwEt63KchZDSM3HEVbf/dycH4ZWrezRHBYMLxC8UOwtUTcCJ7B0flzXDcX05RPW3r0qCnUwQUU08ILX/VaLQ+S97D2uKYLg50KdB0CsJrJNRQM7BBoCHNW4sSQ7QZLEaokdLsZrn4qQo3D7EoZd/DCeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ItbpmhbO; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=BvMF22ci87Epe/Q5GfdzEXrz9SNBX/8XleXTSRC5Rocq9pXpmb8LU9ofdwR452IVymCZ3BAOS4f5CN2bZoeAPNLHDVWav6dB5qpH6Lyyo8Kl/0wtzaQGidetgqgvoETJWbzxSE75EH2+D0XlaDZyu7Uq7SPHt17/xWgtjAH/9ng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f+ognuI1; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ItbpmhbO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E4FF1F00AC4;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f+ognuI1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B9481F00A3A;
 	Tue,  7 Jul 2026 05:37:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1783402637;
-	bh=j+4O0okr2Fchtoroq5Bkyi/mC7UaScT82OCy5U/8SJ4=;
+	bh=5T/jsOuvM2QUitIopTD+7S03PtU+f5Se909LBmt5gkk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=ItbpmhbOPMalw8tM0dp2YLcRNrG9ID13cQ45uKip6JQm/FJL98GLsys5GDQ7tO21w
-	 gA+QaiKg+M6/Uf/o9gFfHjg7Wwj3/HCnvrRopOnARKPNPB42AufoFDU1HQA9YymxwZ
-	 YMRCL4rRRVKydolFyNhH3aKEDr91kK4otozbKTJuTsKnYQ2bP/qSBMTqbxVhmvKDOx
-	 EiK5gj9VfSGvpe704ufYwzmrcvpo/8uGGxA6XDhlU9ccyWooNIx889Xtt7L7EC64B0
-	 rYDElieUgVZ4bznrCXxWUUOJibQkhGUL/f8IY8uPFFbWdqvv1IgLyVGikb3aIYYSFj
-	 w+BgiT0L4tb2Q==
+	b=f+ognuI1kREQB++GvnR7MFmdJ1C7IWwtK74zhZTaQ584dl31AU1Xrb+TaO4z5WF8O
+	 gxv4NbNxXzmUfjXesws+WsiZ55vPoaGFOPjq/uhXp6VE1CcoJ4kGS3Hwg9OK9hB8zS
+	 j/ZIC9FzKBAttn3mxGUTYwgV5ZP2W50kSNNhV1OP6LxxbHO5JGTMnUykDuwfzptk6S
+	 A0e0XfSUi7ZUdceWVKWc8T7NVab6HKtUTzMq/dpoudzXAgjmEdWl256qKxvLiiMrf6
+	 +G6rPbeYYwtlNukNiWMxv6iHLhaoNbFE6B6XfCHto1OYaXsqd2Lk1meykfkRNTkWm8
+	 S0GL4AEuzOfEQ==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 03/33] lib/crypto: aes: Add CBC and CBC-CTS support
-Date: Mon,  6 Jul 2026 22:34:33 -0700
-Message-ID: <20260707053503.209874-4-ebiggers@kernel.org>
+Subject: [PATCH 04/33] lib/crypto: aes: Add CTR and XCTR support
+Date: Mon,  6 Jul 2026 22:34:34 -0700
+Message-ID: <20260707053503.209874-5-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.54.0
 In-Reply-To: <20260707053503.209874-1-ebiggers@kernel.org>
 References: <20260707053503.209874-1-ebiggers@kernel.org>
@@ -44,359 +44,256 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add support for AES-CBC and AES-CBC-CTS to the crypto library.
+Add support for AES-CTR and AES-XCTR to the crypto library.
 
 These will be used to provide streamlined implementations of the
-"cbc(aes)" and "cts(cbc(aes))" crypto_skcipher algorithms.  Most users
-of these crypto_skcipher algorithms will also be able to switch to the
-library, which as usual will be simpler and faster, e.g.:
+"ctr(aes)" and "xctr(aes)" crypto_skcipher algorithms.  Most users of
+"ctr(aes)" will also be able to switch to the library, which as usual
+will be simpler and faster, e.g.:
 
-    - block/blk-crypto-fallback.c (for AES-128-CBC-ESSIV)
-    - fs/crypto/crypto.c (for AES-128-CBC-ESSIV)
-    - fs/crypto/fname.c (for AES-256-CTS and AES-128-CBC)
-    - kernel/bpf/crypto.c
-    - net/ceph/crypto.c
-    - security/keys/encrypted-keys/encrypted.c
+  - net/mac80211/fils_aead.c
+  - net/mac802154/llsec.c
 
-As usual, the architecture-optimized AES-CBC and AES-CBC-CTS code will
-be migrated into the library as well (using the hooks provided in this
+As usual, the architecture-optimized AES-CTR and AES-XCTR code will be
+migrated into the library as well (using the hooks provided in this
 commit), eliminating lots of repetitive boilerplate code.
+
+This is also a prerequisite for supporting AES-GCM, AES-CCM, and
+AES-HCTR2 in the crypto library.
 
 Initial test coverage is provided by the crypto_skcipher support added
 in a later commit.  I'm planning a KUnit test suite as well.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- .../crypto/libcrypto-unauth-encryption.rst    |   7 +
- include/crypto/aes-cbc.h                      |  77 ++++++++
- lib/crypto/Kconfig                            |   6 +
- lib/crypto/aes.c                              | 174 ++++++++++++++++++
- lib/crypto/tests/Kconfig                      |   1 +
- 5 files changed, 265 insertions(+)
- create mode 100644 include/crypto/aes-cbc.h
+ .../crypto/libcrypto-unauth-encryption.rst    |  7 ++
+ include/crypto/aes-ctr.h                      | 56 +++++++++++
+ lib/crypto/Kconfig                            |  6 ++
+ lib/crypto/aes.c                              | 93 +++++++++++++++++++
+ lib/crypto/tests/Kconfig                      |  1 +
+ 5 files changed, 163 insertions(+)
+ create mode 100644 include/crypto/aes-ctr.h
 
 diff --git a/Documentation/crypto/libcrypto-unauth-encryption.rst b/Documentation/crypto/libcrypto-unauth-encryption.rst
-index 891c15279749..fb8106034089 100644
+index fb8106034089..6aca01d715da 100644
 --- a/Documentation/crypto/libcrypto-unauth-encryption.rst
 +++ b/Documentation/crypto/libcrypto-unauth-encryption.rst
-@@ -20,6 +20,13 @@ mode.  The legitimate use cases for these algorithms are:
+@@ -27,6 +27,13 @@ Support for AES in the CBC and CBC-CTS modes of operation.
  
- Besides the above, these shouldn't be used.
+ .. kernel-doc:: include/crypto/aes-cbc.h
  
-+AES-CBC
-+-------
++AES-CTR and AES-XCTR
++--------------------
 +
-+Support for AES in the CBC and CBC-CTS modes of operation.
++Support for AES in the CTR and XCTR modes of operation.
 +
-+.. kernel-doc:: include/crypto/aes-cbc.h
++.. kernel-doc:: include/crypto/aes-ctr.h
 +
  AES-ECB
  -------
  
-diff --git a/include/crypto/aes-cbc.h b/include/crypto/aes-cbc.h
+diff --git a/include/crypto/aes-ctr.h b/include/crypto/aes-ctr.h
 new file mode 100644
-index 000000000000..3e8d1a9ce8a9
+index 000000000000..fa2b7d303e55
 --- /dev/null
-+++ b/include/crypto/aes-cbc.h
-@@ -0,0 +1,77 @@
++++ b/include/crypto/aes-ctr.h
+@@ -0,0 +1,56 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +/*
-+ * AES-CBC and AES-CBC-CTS unauthenticated encryption and decryption
++ * AES-CTR and AES-XCTR stream ciphers
 + *
 + * Copyright 2026 Google LLC
 + */
-+#ifndef _CRYPTO_AES_CBC_H
-+#define _CRYPTO_AES_CBC_H
++#ifndef _CRYPTO_AES_CTR_H
++#define _CRYPTO_AES_CTR_H
 +
 +#include <crypto/aes.h>
 +
 +/**
-+ * aes_cbc_encrypt() - Encrypt data using AES-CBC
++ * aes_ctr() - AES-CTR en/decryption
 + * @dst: The destination buffer.  Can be in-place or out-of-place.  For other
 + *	 overlaps the behavior is unspecified.
 + * @src: The source data
-+ * @len: Number of bytes to encrypt.  Must be a multiple of AES_BLOCK_SIZE.
-+ * @iv: The initialization vector.  It is updated with the next value, i.e. the
-+ *	last ciphertext block (or left unchanged if @len == 0).
++ * @len: Number of bytes to en/decrypt
++ * @ctr: The counter.  It will be incremented by ceil(@len / AES_BLOCK_SIZE).
 + * @key: The key
 + *
-+ * This supports incremental encryption.  The length of each chunk must be a
-+ * multiple of AES_BLOCK_SIZE, and the updated @iv must be passed in each time.
++ * This implements AES in counter mode with a 128-bit big endian counter.
++ *
++ * This supports incremental en/decryption.  The length of each non-final chunk
++ * must be a multiple of AES_BLOCK_SIZE, and the updated @ctr must be passed in
++ * each time.
 + *
 + * Context: Any context.
 + */
-+void aes_cbc_encrypt(u8 *dst, const u8 *src, size_t len,
-+		     u8 iv[at_least AES_BLOCK_SIZE], aes_encrypt_arg key);
++void aes_ctr(u8 *dst, const u8 *src, size_t len,
++	     u8 ctr[at_least AES_BLOCK_SIZE], aes_encrypt_arg key);
 +
 +/**
-+ * aes_cbc_decrypt() - Decrypt data using AES-CBC
++ * aes_xctr() - AES-XCTR en/decryption
 + * @dst: The destination buffer.  Can be in-place or out-of-place.  For other
 + *	 overlaps the behavior is unspecified.
 + * @src: The source data
-+ * @len: Number of bytes to decrypt.  Must be a multiple of AES_BLOCK_SIZE.
-+ * @iv: The initialization vector.  It is updated with the next value, i.e. the
-+ *	last ciphertext block (or left unchanged if @len == 0).
++ * @len: Number of bytes to en/decrypt
++ * @ctr: The block counter.  For the first call, set it to 1.  It will be
++ *	 incremented by ceil(@len / AES_BLOCK_SIZE).
++ * @iv: The initialization vector
 + * @key: The key
 + *
-+ * This supports incremental decryption.  The length of each chunk must be a
-+ * multiple of AES_BLOCK_SIZE, and the updated @iv must be passed in each time.
++ * This implements AES in XOR Counter mode, as specified in the paper
++ * "Length-preserving encryption with HCTR2"
++ * (https://eprint.iacr.org/2021/1441.pdf).
++ *
++ * This supports incremental en/decryption.  The length of each non-final chunk
++ * must be a multiple of AES_BLOCK_SIZE, and the updated @ctr must be passed in
++ * each time.
 + *
 + * Context: Any context.
 + */
-+void aes_cbc_decrypt(u8 *dst, const u8 *src, size_t len,
-+		     u8 iv[at_least AES_BLOCK_SIZE], const struct aes_key *key);
++void aes_xctr(u8 *dst, const u8 *src, size_t len, u64 *ctr,
++	      const u8 iv[at_least AES_BLOCK_SIZE], aes_encrypt_arg key);
 +
-+/**
-+ * aes_cbc_cts_encrypt() - Encrypt data using AES-CBC-CTS (CS3 variant)
-+ * @dst: The destination buffer.  Can be in-place or out-of-place.  For other
-+ *	 overlaps the behavior is unspecified.
-+ * @src: The source data
-+ * @len: Number of bytes to encrypt, at least AES_BLOCK_SIZE
-+ * @iv: The initialization vector, clobbered by this function
-+ * @key: The key
-+ *
-+ * Context: Any context.
-+ */
-+void aes_cbc_cts_encrypt(u8 *dst, const u8 *src, size_t len,
-+			 u8 iv[at_least AES_BLOCK_SIZE], aes_encrypt_arg key);
-+
-+/**
-+ * aes_cbc_cts_decrypt() - Decrypt data using AES-CBC-CTS (CS3 variant)
-+ * @dst: The destination buffer.  Can be in-place or out-of-place.  For other
-+ *	 overlaps the behavior is unspecified.
-+ * @src: The source data
-+ * @len: Number of bytes to decrypt, at least AES_BLOCK_SIZE
-+ * @iv: The initialization vector, clobbered by this function
-+ * @key: The key
-+ *
-+ * Context: Any context.
-+ */
-+void aes_cbc_cts_decrypt(u8 *dst, const u8 *src, size_t len,
-+			 u8 iv[at_least AES_BLOCK_SIZE],
-+			 const struct aes_key *key);
-+
-+#endif /* _CRYPTO_AES_CBC_H */
++#endif /* _CRYPTO_AES_CTR_H */
 diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-index 26514c181a7f..c64cc3e12b57 100644
+index c64cc3e12b57..96febc3df6d6 100644
 --- a/lib/crypto/Kconfig
 +++ b/lib/crypto/Kconfig
-@@ -27,6 +27,12 @@ config CRYPTO_LIB_AESCFB
- 	select CRYPTO_LIB_AES
- 	select CRYPTO_LIB_UTILS
+@@ -47,6 +47,12 @@ config CRYPTO_LIB_AES_ECB
+ 	help
+ 	  The AES-ECB library functions.
  
-+config CRYPTO_LIB_AES_CBC
++config CRYPTO_LIB_AES_CTR
 +	tristate
 +	select CRYPTO_LIB_AES
 +	help
-+	  The AES-CBC and AES-CBC-CTS library functions.
++	  The AES-CTR and AES-XCTR library functions.
 +
- config CRYPTO_LIB_AES_CBC_MACS
+ config CRYPTO_LIB_AESGCM
  	tristate
  	select CRYPTO_LIB_AES
 diff --git a/lib/crypto/aes.c b/lib/crypto/aes.c
-index e2f1ebf81405..3635fbe946f3 100644
+index 3635fbe946f3..9da274a72221 100644
 --- a/lib/crypto/aes.c
 +++ b/lib/crypto/aes.c
-@@ -5,6 +5,7 @@
-  */
+@@ -6,6 +6,7 @@
  
  #include <crypto/aes-cbc-macs.h>
-+#include <crypto/aes-cbc.h>
+ #include <crypto/aes-cbc.h>
++#include <crypto/aes-ctr.h>
  #include <crypto/aes-ecb.h>
  #include <crypto/aes.h>
  #include <crypto/utils.h>
-@@ -793,6 +794,179 @@ void aes_ecb_decrypt(u8 *dst, const u8 *src, size_t len,
- EXPORT_SYMBOL_GPL(aes_ecb_decrypt);
- #endif /* CONFIG_CRYPTO_LIB_AES_ECB */
+@@ -967,6 +968,98 @@ void aes_cbc_cts_decrypt(u8 *dst, const u8 *src, size_t len,
+ EXPORT_SYMBOL_GPL(aes_cbc_cts_decrypt);
+ #endif /* CONFIG_CRYPTO_LIB_AES_CBC */
  
-+#if IS_ENABLED(CONFIG_CRYPTO_LIB_AES_CBC)
++#if IS_ENABLED(CONFIG_CRYPTO_LIB_AES_CTR)
 +/*
-+ * Hooks for optimized AES-CBC implementations, overridable by the architecture.
-+ * They are called with len > 0 && len % AES_BLOCK_SIZE == 0.  Returning false
-+ * causes the fallback implementation to be used instead.
++ * Hooks for optimized AES-CTR and AES-XCTR implementations, overridable by the
++ * architecture.  They are called with any len >= 0.  Returning false causes the
++ * fallback implementation to be used instead.
 + */
-+#ifndef aes_cbc_encrypt_arch
-+static bool aes_cbc_encrypt_arch(u8 *dst, const u8 *src, size_t len,
-+				 u8 iv[AES_BLOCK_SIZE],
-+				 const struct aes_enckey *key)
++#ifndef aes_ctr_arch
++static bool aes_ctr_arch(u8 *dst, const u8 *src, size_t len,
++			 u8 ctr[AES_BLOCK_SIZE], const struct aes_enckey *key)
 +{
 +	return false;
 +}
 +#endif
-+#ifndef aes_cbc_decrypt_arch
-+static bool aes_cbc_decrypt_arch(u8 *dst, const u8 *src, size_t len,
-+				 u8 iv[AES_BLOCK_SIZE],
-+				 const struct aes_key *key)
++#ifndef aes_xctr_arch
++static bool aes_xctr_arch(u8 *dst, const u8 *src, size_t len, u64 *ctr,
++			  const u8 iv[AES_BLOCK_SIZE],
++			  const struct aes_enckey *key)
 +{
 +	return false;
 +}
 +#endif
 +
-+void aes_cbc_encrypt(u8 *dst, const u8 *src, size_t len, u8 iv[AES_BLOCK_SIZE],
-+		     aes_encrypt_arg key)
++static __always_inline void inc_be128_ctr(u8 ctr[AES_BLOCK_SIZE])
 +{
-+	const u8 *prev = iv;
++	/* Casts to u8 are needed because of the implicit integer promotion. */
++	if (((u8)++ctr[AES_BLOCK_SIZE - 1]) != 0)
++		return;
++	for (int i = AES_BLOCK_SIZE - 2; i >= 0; i--) {
++		if ((u8)++ctr[i] != 0)
++			break;
++	}
++}
 +
-+	if (WARN_ON_ONCE(len % AES_BLOCK_SIZE))
-+		len = round_down(len, AES_BLOCK_SIZE);
++void aes_ctr(u8 *dst, const u8 *src, size_t len, u8 ctr[AES_BLOCK_SIZE],
++	     aes_encrypt_arg key)
++{
++	u8 keystream[AES_BLOCK_SIZE] __aligned(__alignof__(long));
 +
-+	if (unlikely(len == 0))
++	if (likely(aes_ctr_arch(dst, src, len, ctr, key.enc_key)))
 +		return;
 +
-+	if (likely(aes_cbc_encrypt_arch(dst, src, len, iv, key.enc_key)))
-+		return;
-+
-+	do {
-+		crypto_xor_cpy(dst, src, prev, AES_BLOCK_SIZE);
-+		aes_encrypt(key, dst, dst);
-+		prev = dst;
++	/* Handle the full blocks. */
++	for (; len >= AES_BLOCK_SIZE; len -= AES_BLOCK_SIZE) {
++		aes_encrypt(key, keystream, ctr);
++		crypto_xor_cpy(dst, src, keystream, AES_BLOCK_SIZE);
++		inc_be128_ctr(ctr);
 +		dst += AES_BLOCK_SIZE;
 +		src += AES_BLOCK_SIZE;
-+		len -= AES_BLOCK_SIZE;
-+	} while (len);
-+	memcpy(iv, prev, AES_BLOCK_SIZE);
-+}
-+EXPORT_SYMBOL_GPL(aes_cbc_encrypt);
-+
-+void aes_cbc_decrypt(u8 *dst, const u8 *src, size_t len, u8 iv[AES_BLOCK_SIZE],
-+		     const struct aes_key *key)
-+{
-+	u8 next_iv[AES_BLOCK_SIZE];
-+
-+	if (WARN_ON_ONCE(len % AES_BLOCK_SIZE))
-+		len = round_down(len, AES_BLOCK_SIZE);
-+
-+	if (unlikely(len == 0))
-+		return;
-+
-+	if (likely(aes_cbc_decrypt_arch(dst, src, len, iv, key)))
-+		return;
-+
-+	len -= AES_BLOCK_SIZE;
-+	dst += len;
-+	src += len;
-+	memcpy(next_iv, src, AES_BLOCK_SIZE);
-+	for (;;) {
-+		aes_decrypt(key, dst, src);
-+		if (len == 0)
-+			break;
-+		src -= AES_BLOCK_SIZE;
-+		crypto_xor(dst, src, AES_BLOCK_SIZE);
-+		dst -= AES_BLOCK_SIZE;
-+		len -= AES_BLOCK_SIZE;
 +	}
-+	crypto_xor(dst, iv, AES_BLOCK_SIZE);
-+	memcpy(iv, next_iv, AES_BLOCK_SIZE);
-+}
-+EXPORT_SYMBOL_GPL(aes_cbc_decrypt);
-+
-+/*
-+ * Hooks for optimized AES-CBC-CTS implementations, overridable by the
-+ * architecture.  They are called with len > AES_BLOCK_SIZE.  Returning false
-+ * causes the fallback implementation to be used instead.  The fallback
-+ * implementation still uses the arch-optimized AES-CBC code if available, but
-+ * direct implementation of AES-CBC-CTS is helpful on short messages.
-+ */
-+#ifndef aes_cbc_cts_encrypt_arch
-+static bool aes_cbc_cts_encrypt_arch(u8 *dst, const u8 *src, size_t len,
-+				     u8 iv[AES_BLOCK_SIZE],
-+				     const struct aes_enckey *key)
-+{
-+	return false;
-+}
-+#endif
-+#ifndef aes_cbc_cts_decrypt_arch
-+static bool aes_cbc_cts_decrypt_arch(u8 *dst, const u8 *src, size_t len,
-+				     u8 iv[AES_BLOCK_SIZE],
-+				     const struct aes_key *key)
-+{
-+	return false;
-+}
-+#endif
-+
-+void aes_cbc_cts_encrypt(u8 *dst, const u8 *src, size_t len,
-+			 u8 iv[AES_BLOCK_SIZE], aes_encrypt_arg key)
-+{
-+	/* Offset to P[n] and C[n] (last plaintext and ciphertext block) */
-+	size_t pn_offset = round_down(len - 1, AES_BLOCK_SIZE);
-+	/* Length of P[n] and C[n], 1 <= pn_len <= AES_BLOCK_SIZE */
-+	size_t pn_len = len - pn_offset;
-+	u8 tmp[AES_BLOCK_SIZE] __aligned(__alignof__(long));
-+	u8 *pad;
-+
-+	if (WARN_ON_ONCE(len < AES_BLOCK_SIZE))
-+		return;
-+
-+	if (len == AES_BLOCK_SIZE) {
-+		aes_cbc_encrypt(dst, src, len, iv, key);
-+		return;
++	/* Handle any partial block at the end. */
++	if (len) {
++		aes_encrypt(key, keystream, ctr);
++		crypto_xor_cpy(dst, src, keystream, len);
++		/* Counter is incremented even with just a partial block. */
++		inc_be128_ctr(ctr);
 +	}
-+	if (likely(aes_cbc_cts_encrypt_arch(dst, src, len, iv, key.enc_key)))
-+		return;
-+
-+	/* CBC-encrypt all blocks except the last. */
-+	aes_cbc_encrypt(dst, src, pn_offset, iv, key);
-+
-+	/* Compute C[n] and C[n - 1], considering that src may equal dst. */
-+	pad = &dst[pn_offset - AES_BLOCK_SIZE];
-+	memcpy(tmp, pad, AES_BLOCK_SIZE);
-+	crypto_xor(tmp, &src[pn_offset], pn_len);
-+	memcpy(&dst[pn_offset], pad, pn_len); /* C[n] */
-+	aes_encrypt(key, pad, tmp); /* C[n - 1] */
-+
-+	memzero_explicit(tmp, sizeof(tmp));
++	memzero_explicit(keystream, sizeof(keystream));
 +}
-+EXPORT_SYMBOL_GPL(aes_cbc_cts_encrypt);
++EXPORT_SYMBOL_GPL(aes_ctr);
 +
-+void aes_cbc_cts_decrypt(u8 *dst, const u8 *src, size_t len,
-+			 u8 iv[AES_BLOCK_SIZE], const struct aes_key *key)
++void aes_xctr(u8 *dst, const u8 *src, size_t len, u64 *ctr,
++	      const u8 iv[AES_BLOCK_SIZE], aes_encrypt_arg key)
 +{
-+	/* Offset to P[n] and C[n] (last plaintext and ciphertext block) */
-+	size_t pn_offset = round_down(len - 1, AES_BLOCK_SIZE);
-+	/* Length of P[n] and C[n], 1 <= pn_len <= AES_BLOCK_SIZE */
-+	size_t pn_len = len - pn_offset;
-+	u8 *pad;
++	const __le64 iv0 = get_unaligned((const __le64 *)&iv[0]);
++	__le64 aes_input[2];
++	u8 keystream[AES_BLOCK_SIZE] __aligned(__alignof__(long));
 +
-+	if (WARN_ON_ONCE(len < AES_BLOCK_SIZE))
++	if (likely(aes_xctr_arch(dst, src, len, ctr, iv, key.enc_key)))
 +		return;
 +
-+	if (len == AES_BLOCK_SIZE) {
-+		aes_cbc_decrypt(dst, src, len, iv, key);
-+		return;
++	aes_input[1] = get_unaligned((const __le64 *)&iv[8]);
++	/* Handle the full blocks. */
++	for (; len >= AES_BLOCK_SIZE; len -= AES_BLOCK_SIZE) {
++		aes_input[0] = iv0 ^ cpu_to_le64((*ctr)++);
++		aes_encrypt(key, keystream, (const u8 *)aes_input);
++		crypto_xor_cpy(dst, src, keystream, AES_BLOCK_SIZE);
++		dst += AES_BLOCK_SIZE;
++		src += AES_BLOCK_SIZE;
 +	}
-+	if (likely(aes_cbc_cts_decrypt_arch(dst, src, len, iv, key)))
-+		return;
-+
-+	/* Compute P[0]..P[n - 2]. */
-+	aes_cbc_decrypt(dst, src, pn_offset - AES_BLOCK_SIZE, iv, key);
-+
-+	/* Compute P[n] and P[n - 1], considering that src may equal dst. */
-+	pad = &dst[pn_offset - AES_BLOCK_SIZE];
-+	aes_decrypt(key, pad, &src[pn_offset - AES_BLOCK_SIZE]);
-+	crypto_xor_cpy(&dst[pn_offset], &src[pn_offset], pad,
-+		       pn_len); /* P[n] */
-+	crypto_xor(pad, &dst[pn_offset], pn_len);
-+	aes_decrypt(key, pad, pad);
-+	crypto_xor(pad, iv, AES_BLOCK_SIZE); /* P[n - 1] */
++	/* Handle any partial block at the end. */
++	if (len) {
++		/* Counter is incremented even with just a partial block. */
++		aes_input[0] = iv0 ^ cpu_to_le64((*ctr)++);
++		aes_encrypt(key, keystream, (const u8 *)aes_input);
++		crypto_xor_cpy(dst, src, keystream, len);
++	}
++	memzero_explicit(keystream, sizeof(keystream));
++	memzero_explicit(aes_input, sizeof(aes_input));
 +}
-+EXPORT_SYMBOL_GPL(aes_cbc_cts_decrypt);
-+#endif /* CONFIG_CRYPTO_LIB_AES_CBC */
++EXPORT_SYMBOL_GPL(aes_xctr);
++#endif /* CONFIG_CRYPTO_LIB_AES_CTR */
 +
  static int __init aes_mod_init(void)
  {
  #ifdef aes_mod_init_arch
 diff --git a/lib/crypto/tests/Kconfig b/lib/crypto/tests/Kconfig
-index a57e87dbb1b1..e78086f3c954 100644
+index e78086f3c954..9284d0134d77 100644
 --- a/lib/crypto/tests/Kconfig
 +++ b/lib/crypto/tests/Kconfig
-@@ -144,6 +144,7 @@ config CRYPTO_LIB_SM3_KUNIT_TEST
- config CRYPTO_LIB_ENABLE_ALL_FOR_KUNIT
- 	tristate "Enable all crypto library code for KUnit tests"
+@@ -146,6 +146,7 @@ config CRYPTO_LIB_ENABLE_ALL_FOR_KUNIT
  	depends on KUNIT
-+	select CRYPTO_LIB_AES_CBC
+ 	select CRYPTO_LIB_AES_CBC
  	select CRYPTO_LIB_AES_CBC_MACS
++	select CRYPTO_LIB_AES_CTR
  	select CRYPTO_LIB_AES_ECB
  	select CRYPTO_LIB_BLAKE2B
+ 	select CRYPTO_LIB_CHACHA20POLY1305
 -- 
 2.54.0
 
