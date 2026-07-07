@@ -1,38 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC9B835F184;
-	Tue,  7 Jul 2026 05:37:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CDFE376A02;
+	Tue,  7 Jul 2026 05:37:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783402638; cv=none; b=F1H4ueccpoCQFserDySggbEQReb1unCOeY6Up713fDC+7SAWs8QIMV39O0+3VoBvJJrB5/kNdfh0F9yI3XTj6tQQZftIFZIP1+MGB1lF2T9Um2d1zXyDpyPW2latGMg9zFDVqZCW6Tn00c8JEkXzvLhwY1CNaqrRU01hK5G0obw=
+	t=1783402638; cv=none; b=sIEmtb7Xtia9FehrWFSyj7M5HeZCyGt0yGEB3XlrLZXTb2lQTsegcSSMoJYtN4jIesoS/9lfv4kk82v/XbdhhvGqBSa3nax+fNbKuXMIcqhyC/FkMUZMxqIF/a7hMKybQvoX7B1Wd7E5ZP08XZzZTUjI/+ljMT7yOwgB4lx/3Mw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1783402638; c=relaxed/simple;
-	bh=kdYB5HIZ8XxwCPSNqTMnOdXSssECCaVCdvIOyP/NW0k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=F6eNyPe55TNLA9JvRR3kjA0XEaRkf+QbfHcAp1MS4DHYXcJhcAp9cCaGWaeKPEe7cQ126iejao0e24JOAl2SHn4LS7R8EolifLmP8M1XK6hLbDCCSxfHpGQgTlGHHVYLpTpXxHcPUnKDRvzU34h19jDtwwmCs6Mj52Okq6eUWmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=USh7KgSg; arc=none smtp.client-ip=100.103.45.18
+	bh=OeWNVbgTJSNbl8qlmF/Hc8nghlNjQNVYaBhE7CY2F0Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=P+lK4Q1TwYarDbJ5GKE6DWson8nK5S9J06FU4RvNpPMROBz1dwEK/ssSsyD1MKSUtRb4PLV9ospNFlLDIzyyAgNUV3+1gFrYwiooSbbR5Valj4keZ14+Sk48/D1v3ZLgphJF3AnSN91Vl+H/NPR/CGZPWI5nVWjqK918CpBTqIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=coW/C5CM; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="USh7KgSg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69F141F000E9;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="coW/C5CM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E52351F00A3E;
 	Tue,  7 Jul 2026 05:37:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783402636;
-	bh=m5P5buTEZLHTajtq565EH+TFnWS7XHOenGsKfPMwJHU=;
-	h=From:To:Cc:Subject:Date;
-	b=USh7KgSg1iEiXcZnoSgCBOnTjDUOJYMDbZ7fGS4FwG6ohtJSCIKshw843pDw0C02D
-	 frlrGbOTSbFGNEaS1pchiyT8BBmHGqiFqQaKCzBH0ComP5FvCGjkUBrG/m6v/r3P5t
-	 jLVuRravAPwg+AoBzufh3x3KLo3wAi0Z7Itxw2JMQVxbPUhC+4wnVV3MLcHUBqF/i1
-	 FNNyh9dCfdE4r1WNykJhWUOzZoIh8+HjbUlQYyQFu1bqetjc4/lL+vog1H9wX640MP
-	 LZ7Hq9r94G+CZJcG0wpL6vLc8ORli5dVRjmqRyoCZWQXeLfUTXZ+fE1P8bcUZRpUYX
-	 i4astjyI42fSA==
+	s=k20260515; t=1783402637;
+	bh=8sNUhgScXm8dR1MHDBIUDLo9ViVtIikG2IEU+Pl4IQw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=coW/C5CMQp4uTfukquWRySZKwmazl3ZPBXBpd7RX93HSpw24j2GvtRHMB7UpCFyU5
+	 hTe15Burtuqiq/6N3JmzxD1gUWsjdRt1tj+6bB/APn0IEOhXEvLBXO1Wzv4ybPpp+G
+	 0jISvwvmJ0F3QeWF1UHzhb//4L8Rg4KqI5rPue6IbTaELV1xWmflFkVIndazJa+p23
+	 tsIenrIcu0NMAO/xW3MrVj87yhpbljNtuIzXTeAyCRIVJVqT1w62yQQrlFOPNt2/K2
+	 plX5YoLIawwgCU2R17Ae+iUbg/1w38PEgvyM42FAdYleqL3nfZdhWK8MmCqkLHmAw1
+	 OcvB8JKdM0hyQ==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 00/33] Library APIs for AES encryption modes
-Date: Mon,  6 Jul 2026 22:34:30 -0700
-Message-ID: <20260707053503.209874-1-ebiggers@kernel.org>
+Subject: [PATCH 02/33] lib/crypto: aes: Add ECB support
+Date: Mon,  6 Jul 2026 22:34:32 -0700
+Message-ID: <20260707053503.209874-3-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.54.0
+In-Reply-To: <20260707053503.209874-1-ebiggers@kernel.org>
+References: <20260707053503.209874-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -41,181 +44,250 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series applies to v7.2-rc2.  It can also be retrieved from:
+Add support for AES-ECB to the crypto library.
 
-    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git aes-modes-v1
+This will be used to provide a streamlined implementation of the
+"ecb(aes)" crypto_skcipher algorithm.  fs/crypto/keysetup_v1.c will also
+use aes_ecb_encrypt() directly.
 
-This series adds library APIs for all the AES encryption modes that are
-used in the kernel, both authenticated and unauthenticated: AES-ECB,
-AES-CBC, AES-CBC-CTS, AES-CTR, AES-XCTR, AES-XTS, AES-GCM, and AES-CCM.
+As usual, the architecture-optimized AES-ECB code will be migrated into
+the library as well (using the hooks provided in this commit),
+eliminating lots of repetitive boilerplate code.
 
-Patches 2-7 add the library APIs, and patches 8-13 wire them up to the
-traditional crypto API (with just priority 110 for now).  These are
-intended to be taken through libcrypto-next for 7.3.
+ECB is obsolete of course, but we need this for parity with the
+traditional API and to support some odd users of ECB in the kernel.
 
-The remaining patches (14-33) convert users of the traditional crypto
-API to use the new library APIs instead.  Most of these will be for 7.4
-or later.  For now please consider these to be proof-of-concept patches
-for helping inform the API design.  Most of them I haven't tested, and
-their performance also won't be optimal yet (since the arch-optimized
-code for these AES modes needs to be migrated into the library first).
-Nevertheless I think they do make it very clear that (as usual) the
-library is much easier to use than the traditional crypto API, and we
-can expect performance improvements once everything is wired up as well.
+Initial test coverage is provided by the crypto_skcipher support added
+in a later commit.  I'm planning a KUnit test suite as well.
 
-Apologies for the large patch series, but it ended up being easiest to
-handle all the AES modes at once rather than try to do them one by one.
-This ensures a consistent design for them, which is really important.
-Additionally, the arch-optimized AES code tends to intermingle different
-modes, and many depend on each other anyway.
+Create a documentation file libcrypto-unauth-encryption.rst to hold the
+documentation for this and other unauthenticated encryption modes.
 
-But as a result, to keep this series manageable it doesn't include the
-usual KUnit tests or the integration of the architecture-optimized code.
-Those will be sent separately in follow-up series.
-
-Feedback is appreciated, especially on patches 2-7 and the library APIs
-they add.
-
-Eric Biggers (33):
-  crypto: xts - Split out __xts_verify_key() helper
-  lib/crypto: aes: Add ECB support
-  lib/crypto: aes: Add CBC and CBC-CTS support
-  lib/crypto: aes: Add CTR and XCTR support
-  lib/crypto: aes: Add XTS support
-  lib/crypto: aes: Add GCM support
-  lib/crypto: aes: Add CCM support
-  crypto: aes - Add ECB support using library
-  crypto: aes - Add CBC and CBC-CTS support using library
-  crypto: aes - Add CTR and XCTR support using library
-  crypto: aes - Add XTS support using library
-  crypto: aes - Add GCM support using library
-  crypto: aes - Add CCM support using library
-  x86/sev: Use new AES-GCM library
-  lib/crypto: aesgcm: Remove old AES-GCM library
-  crypto: aes - Remove AES-CBC-MAC support
-  lib/crypto: aes: Remove aes_cbcmac_* functions
-  fscrypt: Use aes_ecb_encrypt() for v1 key derivation
-  KEYS: encrypted: Use AES-CBC library instead of crypto_skcipher
-  KEYS: trusted: dcp: Use AES-GCM library instead of crypto_aead
-  libceph: Use AES-CBC library in ceph_aes_crypt()
-  libceph: Reimplement messenger v2 encryption using AES-GCM library
-  wifi: mac80211: Use AES-CTR library in fils_aead.c
-  wifi: mac80211: Use AES-GCM library for GMAC suite
-  wifi: mac80211: Use crypto libraries for GCMP and CCMP suites
-  macsec: Use AES-GCM library instead of crypto_aead
-  wifi: ipw2x00: Use AES-CCM library
-  mac802154: Use AES-CCM and AES-CTR libraries
-  bpf: crypto: Use AES-CBC and AES-ECB libraries
-  bpf: crypto: Add AES-GCM support
-  smb: client: Use AES-GCM and AES-CCM libraries
-  ksmbd: Use AES-GCM and AES-CCM libraries
-  net: tipc: Use AES-GCM library instead of crypto_aead
-
- .../crypto/libcrypto-auth-encryption.rst      |   20 +
- .../crypto/libcrypto-unauth-encryption.rst    |   49 +
- Documentation/crypto/libcrypto.rst            |    2 +
- MAINTAINERS                                   |    2 -
- arch/x86/Kconfig                              |    2 +-
- arch/x86/coco/sev/core.c                      |   44 +-
- arch/x86/include/asm/sev.h                    |    2 +-
- crypto/Kconfig                                |   15 +-
- crypto/Makefile                               |    3 -
- crypto/aes.c                                  |  937 +++++++++++++-
- crypto/bpf_crypto_skcipher.c                  |   83 --
- crypto/testmgr.c                              |    6 +-
- drivers/crypto/starfive/jh7110-aes.c          |    2 +-
- drivers/net/Kconfig                           |    4 +-
- drivers/net/macsec.c                          |  327 ++---
- drivers/net/wireless/intel/ipw2x00/Kconfig    |    2 +-
- .../intel/ipw2x00/libipw_crypto_ccmp.c        |  117 +-
- drivers/virt/coco/sev-guest/sev-guest.c       |    7 +-
- fs/crypto/Kconfig                             |    2 +-
- fs/crypto/keysetup_v1.c                       |    5 +-
- fs/smb/client/Kconfig                         |    7 +-
- fs/smb/client/cifsencrypt.c                   |   14 -
- fs/smb/client/cifsfs.c                        |    4 -
- fs/smb/client/cifsglob.h                      |    8 -
- fs/smb/client/cifsproto.h                     |   89 --
- fs/smb/client/connect.c                       |   14 +-
- fs/smb/client/smb2ops.c                       |  275 ++--
- fs/smb/client/smb2pdu.c                       |    2 -
- fs/smb/client/smb2proto.h                     |    1 -
- fs/smb/client/smb2transport.c                 |   39 -
- fs/smb/server/Kconfig                         |    6 +-
- fs/smb/server/Makefile                        |    2 +-
- fs/smb/server/auth.c                          |  227 ----
- fs/smb/server/auth.h                          |    2 -
- fs/smb/server/crypto_ctx.c                    |  176 ---
- fs/smb/server/crypto_ctx.h                    |   32 -
- fs/smb/server/server.c                        |   14 +-
- fs/smb/server/smb2pdu.c                       |  133 +-
- include/crypto/aes-cbc-macs.h                 |   22 +-
- include/crypto/aes-cbc.h                      |   77 ++
- include/crypto/aes-ccm.h                      |  244 ++++
- include/crypto/aes-ctr.h                      |   56 +
- include/crypto/aes-ecb.h                      |   49 +
- include/crypto/aes-gcm.h                      |  249 ++++
- include/crypto/aes-xts.h                      |   87 ++
- include/crypto/gcm.h                          |   23 +-
- include/crypto/xts.h                          |   18 +-
- include/linux/bpf_crypto.h                    |   24 -
- include/linux/ceph/messenger.h                |   22 +-
- include/net/macsec.h                          |    5 +-
- kernel/bpf/Kconfig                            |   14 +
- kernel/bpf/Makefile                           |    4 +-
- kernel/bpf/crypto.c                           |  302 ++---
- lib/crypto/Kconfig                            |   41 +-
- lib/crypto/Makefile                           |    3 -
- lib/crypto/aes.c                              | 1146 ++++++++++++++++-
- lib/crypto/aesgcm.c                           |  721 -----------
- lib/crypto/tests/Kconfig                      |    6 +
- lib/crypto/tests/aes_cbc_macs_kunit.c         |   68 +-
- net/ceph/Kconfig                              |    5 +-
- net/ceph/crypto.c                             |   66 +-
- net/ceph/crypto.h                             |    3 +-
- net/ceph/messenger_v2.c                       |  963 +++++---------
- net/mac80211/Kconfig                          |    7 +-
- net/mac80211/Makefile                         |    1 -
- net/mac80211/aead_api.c                       |  113 --
- net/mac80211/aead_api.h                       |   23 -
- net/mac80211/aes_ccm.h                        |   39 +-
- net/mac80211/aes_gcm.h                        |   38 +-
- net/mac80211/aes_gmac.c                       |   85 +-
- net/mac80211/aes_gmac.h                       |   10 +-
- net/mac80211/fils_aead.c                      |   90 +-
- net/mac80211/key.c                            |   42 +-
- net/mac80211/key.h                            |    8 +-
- net/mac80211/wpa.c                            |   23 +-
- net/mac802154/Kconfig                         |    6 +-
- net/mac802154/llsec.c                         |  158 +--
- net/mac802154/llsec.h                         |    8 +-
- net/tipc/Kconfig                              |    4 +-
- net/tipc/crypto.c                             |  467 ++-----
- net/tipc/msg.h                                |    3 -
- net/tipc/sysctl.c                             |    6 +
- security/keys/Kconfig                         |    4 +-
- security/keys/encrypted-keys/encrypted.c      |  194 +--
- security/keys/trusted-keys/Kconfig            |    1 +
- security/keys/trusted-keys/trusted_dcp.c      |   69 +-
- 86 files changed, 4167 insertions(+), 4126 deletions(-)
- create mode 100644 Documentation/crypto/libcrypto-auth-encryption.rst
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ .../crypto/libcrypto-unauth-encryption.rst    | 28 ++++++++++
+ Documentation/crypto/libcrypto.rst            |  1 +
+ include/crypto/aes-ecb.h                      | 49 ++++++++++++++++
+ lib/crypto/Kconfig                            |  9 ++-
+ lib/crypto/aes.c                              | 56 +++++++++++++++++++
+ lib/crypto/tests/Kconfig                      |  1 +
+ 6 files changed, 142 insertions(+), 2 deletions(-)
  create mode 100644 Documentation/crypto/libcrypto-unauth-encryption.rst
- delete mode 100644 crypto/bpf_crypto_skcipher.c
- delete mode 100644 fs/smb/server/crypto_ctx.c
- delete mode 100644 fs/smb/server/crypto_ctx.h
- create mode 100644 include/crypto/aes-cbc.h
- create mode 100644 include/crypto/aes-ccm.h
- create mode 100644 include/crypto/aes-ctr.h
  create mode 100644 include/crypto/aes-ecb.h
- create mode 100644 include/crypto/aes-gcm.h
- create mode 100644 include/crypto/aes-xts.h
- delete mode 100644 include/linux/bpf_crypto.h
- delete mode 100644 lib/crypto/aesgcm.c
- delete mode 100644 net/mac80211/aead_api.c
- delete mode 100644 net/mac80211/aead_api.h
 
-
-base-commit: 8cdeaa50eae8dad34885515f62559ee83e7e8dda
+diff --git a/Documentation/crypto/libcrypto-unauth-encryption.rst b/Documentation/crypto/libcrypto-unauth-encryption.rst
+new file mode 100644
+index 000000000000..891c15279749
+--- /dev/null
++++ b/Documentation/crypto/libcrypto-unauth-encryption.rst
+@@ -0,0 +1,28 @@
++.. SPDX-License-Identifier: GPL-2.0-or-later
++
++Unauthenticated encryption
++==========================
++
++Support for unauthenticated encryption and decryption, including bare stream
++ciphers and other length-preserving algorithms such as block ciphers in XTS
++mode.  The legitimate use cases for these algorithms are:
++
++- Support for legacy protocols that really should have chosen an authenticated
++  mode (or even another primitive entirely) but didn't.
++
++- Internal components of authenticated modes.  For example, AES-CTR is used by
++  AES-GCM and AES-CCM internally.
++
++- Storage encryption that cannot accommodate ciphertext expansion.  Usually
++  AES-XTS is used for this.
++
++- Stream ciphers for key derivation and random number generation.
++
++Besides the above, these shouldn't be used.
++
++AES-ECB
++-------
++
++Support for AES in the ECB mode of operation.
++
++.. kernel-doc:: include/crypto/aes-ecb.h
+diff --git a/Documentation/crypto/libcrypto.rst b/Documentation/crypto/libcrypto.rst
+index a1557d45b0e5..bbf5ca137910 100644
+--- a/Documentation/crypto/libcrypto.rst
++++ b/Documentation/crypto/libcrypto.rst
+@@ -161,5 +161,6 @@ API documentation
+    libcrypto-blockcipher
+    libcrypto-hash
+    libcrypto-signature
++   libcrypto-unauth-encryption
+    libcrypto-utils
+    sha3
+diff --git a/include/crypto/aes-ecb.h b/include/crypto/aes-ecb.h
+new file mode 100644
+index 000000000000..bfc56bdb082c
+--- /dev/null
++++ b/include/crypto/aes-ecb.h
+@@ -0,0 +1,49 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * AES-ECB unauthenticated encryption and decryption
++ *
++ * Copyright 2026 Google LLC
++ */
++#ifndef _CRYPTO_AES_ECB_H
++#define _CRYPTO_AES_ECB_H
++
++#include <crypto/aes.h>
++
++/**
++ * aes_ecb_encrypt() - Encrypt data using AES-ECB
++ * @dst: The destination buffer.  Can be in-place or out-of-place.  For other
++ *	 overlaps the behavior is unspecified.
++ * @src: The source data
++ * @len: Number of bytes to encrypt.  Must be a multiple of AES_BLOCK_SIZE.
++ * @key: The key
++ *
++ * ECB mode is insecure by itself.  This function exists only for compatibility
++ * with legacy protocols and for internal use by other modes.
++ *
++ * This supports incremental encryption, but the length of each chunk must be a
++ * multiple of AES_BLOCK_SIZE.
++ *
++ * Context: Any context.
++ */
++void aes_ecb_encrypt(u8 *dst, const u8 *src, size_t len, aes_encrypt_arg key);
++
++/**
++ * aes_ecb_decrypt() - Decrypt data using AES-ECB
++ * @dst: The destination buffer.  Can be in-place or out-of-place.  For other
++ *	 overlaps the behavior is unspecified.
++ * @src: The source data
++ * @len: Number of bytes to decrypt.  Must be a multiple of AES_BLOCK_SIZE.
++ * @key: The key
++ *
++ * ECB mode is insecure by itself.  This function exists only for compatibility
++ * with legacy protocols and for internal use by other modes.
++ *
++ * This supports incremental decryption, but the length of each chunk must be a
++ * multiple of AES_BLOCK_SIZE.
++ *
++ * Context: Any context.
++ */
++void aes_ecb_decrypt(u8 *dst, const u8 *src, size_t len,
++		     const struct aes_key *key);
++
++#endif /* _CRYPTO_AES_ECB_H */
+diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
+index 591c1c2a7fb3..26514c181a7f 100644
+--- a/lib/crypto/Kconfig
++++ b/lib/crypto/Kconfig
+@@ -8,8 +8,7 @@ config CRYPTO_LIB_UTILS
+ 
+ config CRYPTO_LIB_AES
+ 	tristate
+-	# Select dependencies of modes that are part of libaes.
+-	select CRYPTO_LIB_UTILS if CRYPTO_LIB_AES_CBC_MACS
++	select CRYPTO_LIB_UTILS
+ 
+ config CRYPTO_LIB_AES_ARCH
+ 	bool
+@@ -36,6 +35,12 @@ config CRYPTO_LIB_AES_CBC_MACS
+ 	  this if your module uses any of the functions from
+ 	  <crypto/aes-cbc-macs.h>.
+ 
++config CRYPTO_LIB_AES_ECB
++	tristate
++	select CRYPTO_LIB_AES
++	help
++	  The AES-ECB library functions.
++
+ config CRYPTO_LIB_AESGCM
+ 	tristate
+ 	select CRYPTO_LIB_AES
+diff --git a/lib/crypto/aes.c b/lib/crypto/aes.c
+index ca733f15b2a8..e2f1ebf81405 100644
+--- a/lib/crypto/aes.c
++++ b/lib/crypto/aes.c
+@@ -5,6 +5,7 @@
+  */
+ 
+ #include <crypto/aes-cbc-macs.h>
++#include <crypto/aes-ecb.h>
+ #include <crypto/aes.h>
+ #include <crypto/utils.h>
+ #include <linux/cache.h>
+@@ -737,6 +738,61 @@ static inline void aes_cmac_fips_test(void)
+ }
+ #endif /* !CONFIG_CRYPTO_LIB_AES_CBC_MACS */
+ 
++#if IS_ENABLED(CONFIG_CRYPTO_LIB_AES_ECB)
++/*
++ * Hooks for optimized AES-ECB implementations, overridable by the architecture.
++ * They are called with len > 0 && len % AES_BLOCK_SIZE == 0.  Returning false
++ * causes the fallback implementation to be used instead.
++ */
++#ifndef aes_ecb_encrypt_arch
++static bool aes_ecb_encrypt_arch(u8 *dst, const u8 *src, size_t len,
++				 const struct aes_enckey *key)
++{
++	return false;
++}
++#endif
++#ifndef aes_ecb_decrypt_arch
++static bool aes_ecb_decrypt_arch(u8 *dst, const u8 *src, size_t len,
++				 const struct aes_key *key)
++{
++	return false;
++}
++#endif
++
++void aes_ecb_encrypt(u8 *dst, const u8 *src, size_t len, aes_encrypt_arg key)
++{
++	if (WARN_ON_ONCE(len % AES_BLOCK_SIZE))
++		len = round_down(len, AES_BLOCK_SIZE);
++
++	if (unlikely(len == 0))
++		return;
++
++	if (likely(aes_ecb_encrypt_arch(dst, src, len, key.enc_key)))
++		return;
++
++	for (size_t i = 0; i < len; i += AES_BLOCK_SIZE)
++		aes_encrypt(key, &dst[i], &src[i]);
++}
++EXPORT_SYMBOL_GPL(aes_ecb_encrypt);
++
++void aes_ecb_decrypt(u8 *dst, const u8 *src, size_t len,
++		     const struct aes_key *key)
++{
++	if (WARN_ON_ONCE(len % AES_BLOCK_SIZE))
++		len = round_down(len, AES_BLOCK_SIZE);
++
++	if (unlikely(len == 0))
++		return;
++
++	if (likely(aes_ecb_decrypt_arch(dst, src, len, key)))
++		return;
++
++	for (size_t i = 0; i < len; i += AES_BLOCK_SIZE)
++		aes_decrypt(key, &dst[i], &src[i]);
++}
++EXPORT_SYMBOL_GPL(aes_ecb_decrypt);
++#endif /* CONFIG_CRYPTO_LIB_AES_ECB */
++
+ static int __init aes_mod_init(void)
+ {
+ #ifdef aes_mod_init_arch
+diff --git a/lib/crypto/tests/Kconfig b/lib/crypto/tests/Kconfig
+index 9409c1a935c3..a57e87dbb1b1 100644
+--- a/lib/crypto/tests/Kconfig
++++ b/lib/crypto/tests/Kconfig
+@@ -145,6 +145,7 @@ config CRYPTO_LIB_ENABLE_ALL_FOR_KUNIT
+ 	tristate "Enable all crypto library code for KUnit tests"
+ 	depends on KUNIT
+ 	select CRYPTO_LIB_AES_CBC_MACS
++	select CRYPTO_LIB_AES_ECB
+ 	select CRYPTO_LIB_BLAKE2B
+ 	select CRYPTO_LIB_CHACHA20POLY1305
+ 	select CRYPTO_LIB_CURVE25519
 -- 
 2.54.0
 
