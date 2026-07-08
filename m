@@ -1,40 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6429A3DD521;
-	Wed,  8 Jul 2026 15:03:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A043DD521;
+	Wed,  8 Jul 2026 15:03:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783523015; cv=none; b=N/smBYPcPaSww6oT3iTYoWxyYzv6JGKW+eLaACDUEC6F8Xmn6HlH9v/uLWee6vSsPdsI45OQmldAHfTQm30ch2yIBHuHEzEfEp3JoIJEgnb/EKCTudw0u92ZTAV5M9zJ5fuVEzdsR4jZ+f49i7qToTDWWqh7to1/t6askQeE60I=
+	t=1783523037; cv=none; b=ZF4u+RqgrrCFss8agW2CLAyakwH13STtT6civ8q5wqCulph7v8649OPXoDOSX4RBevKCAhoRVf0AHB/sudD2i7YmoGC1DqI92PL/2GAUaXSqFwjt5o8mCT5PZbYohoRh7eKMb6J4s6LG/QlO0RYQNSpSXrzlrYmTDm70wI1yaow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783523015; c=relaxed/simple;
-	bh=0cBkKjyrciEKUZkMuOe34r1fAT+m9IVhg3Sl31NikLA=;
+	s=arc-20240116; t=1783523037; c=relaxed/simple;
+	bh=ozbDkpERH6eS7Si13V6qz2k1Ockh5KC4ASIiPUGSquM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lxFuqVFRRi5y+o6VWwzfm/S+/oKuG7vGZmm6P35vVXAR+1KclPcwaHxgKzwlq4wDxBHlGLmAQ6t5hEAA3S1+BytWSdwWN5xTB7xnP2RJ4KPoDZjtg86MENN1vPEQs90YTpbqhKCg4TBErIG4e4PAEGNYvyN34VLFvpE0WMCJ/2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aqDMDpQf; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=pzoXD8s0Y7vtEjaD24cpdWu2m3XS+hNjTCFah44/punG74VAgsEPOJYDfCisJqe/YmqG4VQDI0P0i1oqW7Z/VMxOA22P+KzAJG8Mp2zZeeDINaR1Yd8KvhDOxwUv8uoCrNnqlKmFbbsjQtAANOQbyT6vpseklUyUFEyhLe6HiXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VZE4IpdL; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aqDMDpQf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE2EA1F00A3D;
-	Wed,  8 Jul 2026 15:03:32 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VZE4IpdL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E142E1F000E9;
+	Wed,  8 Jul 2026 15:03:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783523014;
-	bh=/QagJEoC0CuwHGgxS2TQOOJJq+6D8ca2QfC4ut6ZhKQ=;
+	s=k20260515; t=1783523035;
+	bh=6lOoLeoST3DsMEdt45LFc9dqUSr7Eq3hHB2+CBF1gOw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=aqDMDpQfD2Jb1qSZay12CsvGQic4T+CYcDuI43jHnfh+EKvaLqXFSFMF8mWdBB6Gj
-	 4htk5cA+3GG9cua+CFYJ4HORJ/2SuFp33nxYtoEcCk+iOSycIagCugxq+SZ09zNd3m
-	 Dz9o+j1Exhma1tuOThbq0w8z/5H4ayUNi7XmbI7gygNITYFlvucojYrDjGypWyGFxO
-	 tsxdS1uStccWzVgnwn5rFpRuZ5ZYNYzlK/VCaJQ4iGevwC1gNpD7Q3xkdAfwiGU0pj
-	 QnDOcp3XjBo5G/+BF/a5E6nqKW1Bp8LkyAYdG7NP8JvzElcaL9OWDXieo2uSR8GCe1
-	 RisaaO5A9SJJQ==
-Date: Wed, 8 Jul 2026 16:03:29 +0100
+	b=VZE4IpdLkxSA6/ssYYZglkjwkarWp6PACqjBRVN7rZMu33kN7uVCm/knysW6QSxZW
+	 qeND1nAPyQQJmjSqDfNZ71w1L5I+fdTjACI7TO14Yh12lHGkEhmY+U370bqAf71zSZ
+	 o2GXktfup2Kkp4owd9aOPSiKZ6Gm0OHtDX2o/DqBTWkNZLk/bwtuDvykxzbjlFb5NR
+	 tUd+i6MlfWmAAyeF2BnbsrH7kdHbB0c93/WSBstR/gp9FQe+86i2xqf8sPTcPFZVC4
+	 EzuSibQyyuupSkfC0kvE1koG9lxW2yshIiE8CZBCmN3RRAGUFANXL/K5+ubEDeXPOT
+	 +rNumVN+199nw==
+Date: Wed, 8 Jul 2026 16:03:51 +0100
 From: Lee Jones <lee@kernel.org>
 To: Qunqin Zhao <zhaoqunqin@loongson.cn>
 Cc: chenhuacai@kernel.org, xry111@xry111.site, linux-kernel@vger.kernel.org,
 	loongarch@lists.linux.dev, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v4 1/2] mfd: loongson-se: Fix miscellaneous issues
-Message-ID: <20260708150329.GH2108533@google.com>
+Subject: Re: [PATCH v4 2/2] mfd: loongson-se: Add multi-node support
+Message-ID: <20260708150351.GI2108533@google.com>
 References: <20260629071109.7341-1-zhaoqunqin@loongson.cn>
- <20260629071109.7341-2-zhaoqunqin@loongson.cn>
+ <20260629071109.7341-3-zhaoqunqin@loongson.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -43,248 +43,180 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260629071109.7341-2-zhaoqunqin@loongson.cn>
+In-Reply-To: <20260629071109.7341-3-zhaoqunqin@loongson.cn>
 
-Oof, that's a lot of findings.  Please review and remedy each.
+Same here please.
 
-/* Sashiko Automation: Issues Found (10 Findings) */
+/* Sashiko Automation: Issues Found (6 Findings) */
 
 On Mon, 29 Jun 2026, Qunqin Zhao wrote:
 
-> Address multiple historical driver issues discovered by the Sashiko
-> Automation system within the loongson_se_probe() initialization flow
-> and the driver's interrupt service routines [1].
+> On the Loongson platform, each node is equipped with a security engine
+> device. However, due to a hardware flaw, only the device on node 0 can
+> trigger interrupts. Therefore, interrupts from other nodes are forwarded
+> by node 0. We need to check in the interrupt handler of node 0 whether
+> this interrupt is intended for other nodes, this can be accomplished via
+> shared interrupt handling.
 > 
-> - Add an explicit bounds check for 'id' before accessing the fixed-size
->   'engines' array in se_irq_handler() to prevent potential out-of-bounds
->   memory writes.
-> 
-> - Switch the allocations from devm_kmalloc() to devm_kzalloc() to
->   guarantee the descriptor structures are properly zero-initialized.
-> 
-> - Return an error code from loongson_se_probe() if devm_request_irq()
->   fails, preventing an indefinite hang during completion waits.
-> 
-> - Add a reinit_completion() before waiting on the completions to ensure
->   proper hardware synchronization.
-> 
-> - Prevent writing uninitialized stack memory to device registers in
->   loongson_se_init() by properly initializing local command structures.
-> 
-> - Add a .remove callback to the platform driver to properly halt the
->   hardware.
-> 
-> Link: https://lore.kernel.org/all/20260618095949.GB1672911@google.com/ [1]
-> Fixes: e551fa3159e3 ("mfd: Add support for Loongson Security Engine chip controller")
 > Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
 > ---
->  drivers/mfd/loongson-se.c       | 23 +++++++++++++++++++----
->  include/linux/mfd/loongson-se.h |  1 +
->  2 files changed, 20 insertions(+), 4 deletions(-)
+>  drivers/mfd/loongson-se.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
 > 
 > diff --git a/drivers/mfd/loongson-se.c b/drivers/mfd/loongson-se.c
-> index 3902ba377d..aa34e663c4 100644
+> index aa34e663c4..2f296faa97 100644
 > --- a/drivers/mfd/loongson-se.c
 > +++ b/drivers/mfd/loongson-se.c
-> @@ -85,6 +85,8 @@ int loongson_se_send_engine_cmd(struct loongson_se_engine *engine)
+> @@ -142,6 +142,11 @@ static irqreturn_t se_irq_handler(int irq, void *dev_id)
+>  
+>  	int_status = readl(se->base + SE_S2LINT_STAT);
+>  
+> +	if (int_status == 0) {
+> +		spin_unlock(&se->dev_lock);
+> +		return IRQ_NONE;
+> +	}
+> +
+>  	/* For controller */
+>  	if (int_status & SE_INT_CONTROLLER) {
+>  		complete(&se->cmd_completion);
+> @@ -222,7 +227,7 @@ static int loongson_se_probe(struct platform_device *pdev)
+>  
+>  	for (i = 0; i < nr_irq; i++) {
+>  		irq = platform_get_irq(pdev, i);
+> -		err = devm_request_irq(dev, irq, se_irq_handler, 0, "loongson-se", se);
+> +		err = devm_request_irq(dev, irq, se_irq_handler, IRQF_SHARED, "loongson-se", se);
+
+[Severity: High]
+Could unmasking interrupts before registering the shared handler create a
+race condition?
+
+Because writel(SE_INT_ALL, se->base + SE_S2LINT_EN) is called earlier in
+loongson_se_probe() to unmask interrupts, registering a shared interrupt
+handler here means that if node 1's interrupts are unmasked, it could
+instantly assert the shared IRQ line.
+
+Since node 1 hasn't fully registered its handler yet, node 0's handler might
+return IRQ_NONE, causing the kernel to repeatedly receive an unhandled
+interrupt and eventually disable the IRQ line.
+
+
+
+[Severity: High]
+This is a pre-existing issue, but might the new use of IRQF_SHARED expose an
+uninitialized completion object in the interrupt handler?
+
+The completion structures for the engines are zero-allocated via
+devm_kzalloc() in loongson_se_probe() and are only initialized later in
+loongson_se_init_engine().
+
+If a pending or spurious engine interrupt fires on the shared line before
+the child engine devices are fully initialized, the handler will execute:
+
+se_irq_handler()
+    ...
+    while (int_status) {
+        id = __ffs(int_status);
+        if (id < SE_ENGINE_MAX)
+            complete(&se->engines[id].completion);
+
+Calling complete() here on a zeroed structure dereferences a NULL
+wait.head.next pointer, which could cause a kernel panic.
+
+
+>  		if (err) {
+>  			dev_err(dev, "failed to request IRQ: %d\n", irq);
+>  			return err;
+> @@ -233,7 +238,7 @@ static int loongson_se_probe(struct platform_device *pdev)
 >  	if (err)
 >  		return err;
 >  
-> +	reinit_completion(&engine->completion);
-> +
-
-[Severity: High]
-If a fast hardware completion occurs between loongson_se_poll() signaling the
-hardware to start and this reinit_completion(), the IRQ handler runs and sets
-the completion to done. Will this reinit_completion() then immediately clear
-the done state, causing the subsequent wait_for_completion_interruptible()
-to block indefinitely?
-
-
->  	return wait_for_completion_interruptible(&engine->completion);
->  }
-
-[Severity: High]
-This is a pre-existing issue, but controller commands also rely on
-wait_for_completion_interruptible() without reinitializing the completion
-structure. If loongson_se_send_controller_cmd() is interrupted by a signal,
-it returns -ERESTARTSYS, and the hardware eventually sets the completion state
-to done. Will the next controller command see the completion as already done
-and return success without actually waiting?
-
-
-
-[Severity: High]
-This is a pre-existing issue, but does loongson_se_poll() hold an
-irq-disabling spinlock for up to 10 milliseconds?
-
-loongson_se_poll() acquires a spinlock with spin_lock_irq(), and then uses
-readl_relaxed_poll_timeout_atomic() with a 10,000 us timeout. Could this
-cause severe scheduling latency spikes or trigger hard lockup panics if the
-hardware is slow?
-
-
-
->  EXPORT_SYMBOL_GPL(loongson_se_send_engine_cmd);
-> @@ -150,7 +152,8 @@ static irqreturn_t se_irq_handler(int irq, void *dev_id)
->  	/* For engines */
->  	while (int_status) {
->  		id = __ffs(int_status);
-> -		complete(&se->engines[id].completion);
-> +		if (id < SE_ENGINE_MAX)
-> +			complete(&se->engines[id].completion);
->  		int_status &= ~BIT(id);
->  		writel(BIT(id), se->base + SE_S2LINT_CL);
->  	}
-> @@ -162,7 +165,7 @@ static irqreturn_t se_irq_handler(int irq, void *dev_id)
->  
->  static int loongson_se_init(struct loongson_se *se, dma_addr_t addr, int size)
->  {
-> -	struct loongson_se_controller_cmd cmd;
-> +	struct loongson_se_controller_cmd cmd = {0};
->  	int err;
->  
->  	cmd.command_id = SE_CMD_START;
-> @@ -190,7 +193,7 @@ static int loongson_se_probe(struct platform_device *pdev)
->  	int nr_irq, irq, err, i;
->  	dma_addr_t paddr;
->  
-> -	se = devm_kmalloc(dev, sizeof(*se), GFP_KERNEL);
-> +	se = devm_kzalloc(dev, sizeof(*se), GFP_KERNEL);
-
-[Severity: Critical]
-This is a pre-existing issue, but switching to devm_kzalloc() without calling
-init_completion() for the engines array leaves the completion structs
-improperly initialized.
-
-A zeroed struct list_head inside swait_queue_head evaluates as non-empty in
-list_empty(). If an interrupt fires before a child driver calls
-loongson_se_init_engine(), se_irq_handler() will pass the new bounds check
-and call complete(), which dereferences a NULL list head. Can this cause a
-deterministic kernel panic on spurious interrupts?
-
-
-
->  	if (!se)
->  		return -ENOMEM;
->  
-> @@ -220,8 +223,10 @@ static int loongson_se_probe(struct platform_device *pdev)
->  	for (i = 0; i < nr_irq; i++) {
->  		irq = platform_get_irq(pdev, i);
-
-[Severity: High]
-This is a pre-existing issue, but the probe function returns -ENODEV if
-platform_irq_count() fails earlier:
-
-    nr_irq = platform_irq_count(pdev);
-    if (nr_irq <= 0)
-        return -ENODEV;
-
-Does overwriting the return value of platform_irq_count() break probe deferral
-if it returns -EPROBE_DEFER when the interrupt provider is not yet available?
-
-
-
-[Severity: High]
-This is a pre-existing issue, but earlier in probe, writel(SE_INT_ALL, ...)
-enables all device interrupts before devm_request_irq() registers the handler.
-If an interrupt fires in this window, no handler is present.
-
-Additionally, if probe fails after this point, interrupts are never disabled.
-Can this leave the hardware asserting unhandled interrupts and cause a system
-lockup?
-
-
->  		err = devm_request_irq(dev, irq, se_irq_handler, 0, "loongson-se", se);
-> -		if (err)
-> +		if (err) {
->  			dev_err(dev, "failed to request IRQ: %d\n", irq);
-> +			return err;
-> +		}
->  	}
->  
->  	err = loongson_se_init(se, paddr, se->dmam_size);
-
-[Severity: High]
-This is a pre-existing issue, but is the driver blindly trusting the
-firmware's dmam_size property without minimum bound checks?
-
-In loongson_se_init_engine(), command buffers are placed at fixed offsets:
-
-    engine->command = se->dmam_base + id * (2 * SE_ENGINE_CMD_SIZE);
-
-If the provided dmam_size is smaller than the required space for all engines,
-could these calculations yield pointers outside the allocated DMA buffer and
-cause memory corruption?
-
-
-> @@ -232,6 +237,15 @@ static int loongson_se_probe(struct platform_device *pdev)
+> -	return devm_mfd_add_devices(dev, PLATFORM_DEVID_NONE, engines,
+> +	return devm_mfd_add_devices(dev, PLATFORM_DEVID_AUTO, engines,
 >  				    ARRAY_SIZE(engines), NULL, 0, NULL);
 >  }
 
-[Severity: High]
-This is a pre-existing issue, but if the devm_mfd_add_devices() call fails,
-probe returns an error without sending SE_CMD_STOP to the already-started
-controller.
+[Severity: Critical]
+This isn't a bug introduced by this patch, but does the probe error path leak
+running hardware state?
 
-Since devres will free the DMA buffers, can the still-running hardware
-continue to access the freed memory and cause corruption?
+loongson_se_init() configures the hardware to use the allocated DMA memory
+and sends SE_CMD_START. If devm_mfd_add_devices() fails here, the probe
+returns an error and devres frees the DMA memory.
 
-
->  
-> +static void loongson_se_remove(struct platform_device *pdev)
-> +{
-> +	struct loongson_se *se = dev_get_drvdata(&pdev->dev);
-> +	struct loongson_se_controller_cmd cmd = {0};
-> +
-> +	cmd.command_id = SE_CMD_STOP;
-> +	loongson_se_send_controller_cmd(se, &cmd);
-
-[Severity: High]
-Because the child devices were registered via devm_mfd_add_devices(), their
-unbind sequence happens later in the devres teardown phase, after this remove
-callback returns.
-
-If this halts the hardware controller before its child MFD devices are
-unbound, will the child drivers still be fully active? Could any hardware
-access by the children during their own remove callbacks fail or hang?
+However, the hardware is never sent SE_CMD_STOP in the error path. It
+remains active and retains a pointer to the freed DMA memory, which could
+allow it to corrupt system memory via DMA.
 
 
 
 [Severity: High]
-loongson_se_send_controller_cmd() waits using
-wait_for_completion_interruptible(). If the thread executing the removal
-receives a signal, the wait aborts immediately and returns -ERESTARTSYS.
+This is a pre-existing issue, but are hardware interrupts left globally
+enabled if probe fails or the device is removed?
 
-Since this remove function ignores the return value, can devres free the
-DMA buffers while the hardware is still processing the STOP command, leading
-to DMA memory corruption?
+loongson_se_probe() unconditionally enables all hardware interrupts earlier
+via writel(SE_INT_ALL, se->base + SE_S2LINT_EN). If devm_mfd_add_devices()
+fails, the probe function returns an error and the IRQ handler is
+unregistered, but the hardware interrupts are never masked.
+
+Similarly, loongson_se_remove() stops the controller but fails to write 0
+to the interrupt enable register.
+
+Because the IRQ is shared, a pending interrupt from this device could
+continuously trigger the shared IRQ line without a registered handler to
+clear it, causing an unhandled interrupt storm that forces the kernel to
+permanently disable the IRQ line.
+
+While reviewing the completion handling in this driver, I noticed a couple
+other pre-existing issues outside the scope of this diff:
 
 
-> +}
-> +
->  static const struct acpi_device_id loongson_se_acpi_match[] = {
->  	{ "LOON0011", 0 },
->  	{ }
-> @@ -240,6 +254,7 @@ MODULE_DEVICE_TABLE(acpi, loongson_se_acpi_match);
->  
->  static struct platform_driver loongson_se_driver = {
->  	.probe   = loongson_se_probe,
-> +	.remove  = loongson_se_remove,
->  	.driver  = {
->  		.name  = "loongson-se",
->  		.acpi_match_table = loongson_se_acpi_match,
-> diff --git a/include/linux/mfd/loongson-se.h b/include/linux/mfd/loongson-se.h
-> index 07afa0c252..8237ccab7b 100644
-> --- a/include/linux/mfd/loongson-se.h
-> +++ b/include/linux/mfd/loongson-se.h
-> @@ -9,6 +9,7 @@
->  #define SE_SEND_CMD_REG_LEN		0x8
->  /* Controller command ID */
->  #define SE_CMD_START			0x0
-> +#define SE_CMD_STOP			0x1
->  #define SE_CMD_SET_DMA			0x3
->  #define SE_CMD_SET_ENGINE_CMDBUF	0x4
+
+[Severity: High]
+This isn't a bug introduced by this patch, but does re-initializing the
+completion variable after triggering the hardware create a race condition?
+
+Looking at loongson_se_send_engine_cmd():
+
+loongson_se_send_engine_cmd()
+    ...
+    loongson_se_poll() // triggers hardware and reenables interrupts
+    ...
+    reinit_completion(&engine->completion);
+    ...
+    wait_for_completion_interruptible(&engine->completion);
+
+If the hardware completes the command quickly after loongson_se_poll()
+unmasks interrupts, it triggers an interrupt. The handler will call
+complete(), but then execution resumes in loongson_se_send_engine_cmd()
+where reinit_completion() clears the completion state.
+
+This would cause the subsequent wait_for_completion_interruptible() to hang
+indefinitely since the completion event was lost.
+
+
+
+[Severity: High]
+This is a pre-existing issue, but could missing completion re-initialization
+cause controller commands to falsely return success?
+
+Looking at loongson_se_send_controller_cmd():
+
+loongson_se_send_controller_cmd()
+    ...
+    // hardware triggered
+    return wait_for_completion_interruptible(&se->cmd_completion);
+
+The function waits on the completion without first calling
+reinit_completion() to clear any leftover state.
+
+If a previous wait was interrupted by a signal (returning -ERESTARTSYS),
+the hardware may still complete later, leaving a positive done count in
+the completion structure. On the next call to
+loongson_se_send_controller_cmd(), wait_for_completion_interruptible()
+would immediately consume the leftover count and return success before the
+new hardware command has actually finished. This could break serialization
+and corrupt hardware or DMA state.
+
 >  
 > -- 
 > 2.47.2
