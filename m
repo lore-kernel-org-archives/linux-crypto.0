@@ -1,41 +1,36 @@
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D3A4380FCE;
-	Wed,  8 Jul 2026 14:07:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CD73390228;
+	Wed,  8 Jul 2026 14:55:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783519633; cv=none; b=t4es52mms1vJ4a3b9rlNg+s+yYsqNHgN3v/36iDmuXi8KNaZtqIc3R+2bIhfnu/yZ2i6Kt4ee0Yv0845aT3s4CurqXJn6xSy1jdVvDi++7pY4LN+jnRvyXLXb8qXiT/mPfH9Sv+epl3TBR+D2P9YL4yPunuFHx6vwHWBHuYwhHQ=
+	t=1783522525; cv=none; b=lECXL9R5ViXOWkYZtHH/c6Yqy7yV4VozRShKqNm5hBhBNGk/mIethq+zhmN8ktuOwjPf1UAm98tQgwuRgzUGAbHf/6zQcV6HZgxIId8gvt3JGPtW0PK9xnGNC0+Aj1/CTqYD44cxBzjcNKRx8aDV4oh3+d2CVti0iJ8aWQH/OH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783519633; c=relaxed/simple;
-	bh=O5vhrXD//CdCW3GRndVtoG/T03EbREdTGHTbE0SorTI=;
+	s=arc-20240116; t=1783522525; c=relaxed/simple;
+	bh=8FhydZ5T6HRYZO1CUeYB4dyiCSrzViAcpUgRLUr8FGE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YHV0XGGh89jCOzZ8CbpOCkwrZmBWHK9kGjhCK6O7EKAKUNFsYMbzvX2IgvCdRnyOgjFGYIQC4h6GgDt54+GkmGHk4f39/4x47YhkEjpwcW1ClrMuNj/OaIYuhFLDbvGUShgs66T7wVx981H2K7en67iFMI1m480OMgtkIlDWVGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=y2yIlIxd; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+	 Content-Type:Content-Disposition:In-Reply-To; b=lDqECGGqAv/K8iNiHQgOYUbpAzz6KaspXfStnSid8Nsf05jpJ7X0LhAPlfWcG/6wZC3Wk5A6tgzq5mp5wceh+fMJGL7nNW9bs2yukhARnpVquKjwvMqKeBSlHPVaX21hUp0GjQA25VGEO0noaX1JgDcOnzHxdhDoRblOzJ/62Lw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=xW4i8IH0; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="y2yIlIxd"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Z6OwcHjGnPVZnFThOc0FM6ldsN6O58E7FKit7r1HTQw=; b=y2yIlIxd5qPqJ3SGXBVE5DNCiC
-	G7J7cVQqk1Pj/7JiDZiu3R8fl364ct4VkwSmNJTXOn1T8e2klZ2mGAPH6Q7N8jqws7zwrUcbx07In
-	FsmZYcS7x4+DQ0WIXI128EujSWdO/dSXJiZRD5ycFfF+0NYhmEB/Xsl3iJQR+7bR+Iyg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1whSvc-00BKQd-8B; Wed, 08 Jul 2026 16:07:08 +0200
-Date: Wed, 8 Jul 2026 16:07:08 +0200
-From: Andrew Lunn <andrew@lunn.ch>
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="xW4i8IH0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AE281F000E9;
+	Wed,  8 Jul 2026 14:55:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
+	s=korg; t=1783522523;
+	bh=N4tk33+gGzEvWhx3TAYATpFb6wxOHUQmG8/nMmeWOk0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=xW4i8IH00Xp6ZAjNrt4/A3qUb/gBuHTe/GlvTkuACu4a9Pz0zHAJa6o5Zjifg3gJ7
+	 RZjLOgySpbzaGfHe1VBkUx6uoZ7r9my1/m1uZVWhbuNgeO+eZ7cckcAXUw1lPNde4o
+	 QVN2IHGaRvCryL30/1DVjQWiXXoyUMZ7O05dyy0E=
+Date: Wed, 8 Jul 2026 16:55:20 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
 To: Yuan Tan <yuantan098@gmail.com>
 Cc: linux-kernel@vger.kernel.org, workflows@vger.kernel.org,
-	jhs@mojatatu.com, gregkh@linuxfoundation.org, sven@narfation.org,
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
+	jhs@mojatatu.com, sven@narfation.org, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, linux-crypto@vger.kernel.org
 Subject: Re: [RFC] VEGA: a syzbot-like workflow for LLM-found kernel bugs
-Message-ID: <b392a243-7fc2-4fb6-a264-ba1e01891e30@lunn.ch>
+Message-ID: <2026070828-carried-extortion-789e@gregkh>
 References: <20260708092247.4188498-1-yuantan098@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -47,34 +42,77 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20260708092247.4188498-1-yuantan098@gmail.com>
 
-> The rough idea
-> ==============
+On Wed, Jul 08, 2026 at 02:22:47AM -0700, Yuan Tan wrote:
+> Hi all,
 > 
-> VEGA would have a public dashboard, similar to syzbot, and would
-> send selected bug reports to the relevant kernel mailing lists.
+> We would like to ask for feedback on a proposed workflow for reporting Linux
+> kernel bugs found by an LLM-assisted code auditing tool that we have
+> been developing since earlier this year.
 > 
-> The goal is to send reports that contain enough information for maintainers
-> or other developers to pick up, understand, reproduce and fix the issue.
+> Since February, we have been developing an LLM-driven kernel code auditing
+> tool called VEGA. It started as a side project, but the results became much
+> substantial than we expected: VEGA has found hundreds of valid bugs in Linux
+> kernel.
 > 
-> For each public report, we expect to include:
+> That immediately created a practical problem: we do not want to dump a large
+> pile of bug reports onto mail lists and annoy the maintainers.
+
+True, which is why we all end up with long lists of issues/patches at
+the moment.  The initial reaction is "we need a dashboard for everyone
+to collab around!" like you did here, but I'd like to say this is not
+the best thing to do at all.
+
+syzbot can get away with a dashboard because someone is tending to it,
+triaging the "serious" bugs before they become public, and only letting
+the "would be nice to fix one day" type issues remain.  That's a huge
+resource commitment that Google has made here, and that's great, but I
+doubt that anyone else will have those resources to do this type of
+thing.
+
+Instead, let's just work to get these things fixed.  We all have
+hundreds of patches/reports in our internal systems right now,
+attempting to triage/rank/coordinate would just waste time.  In other
+words, just grind through them, send patches out, and get these fixed.
+
+I'm doing this now, and I know many others are as well.  We are all
+running "different" tools, and so we find different issues, so we can
+all just keep sending patches as we get them done.  It's going to take a
+lot of effort (I've somehow convinced 8 interns to help me out with this
+this summer), but once we get it done, we'll be much better off.
+
+> The first thing we tried was to fix as many as we could ourselves. We
+> started working with a group of student volunteers. Most of them are
+> college students, so we have been training them, reviewing their patches,
+> and trying to build an internal review process before anything is sent to
+> the mailing list. The goal is to turn these findings into useful fixes, and
+> also to help new contributors grow into people who can reduce maintainer
+> workload instead of adding to it.
 > 
->   - a description of the bug
->   - the tested kernel tree and commit
->   - the kernel config and environment
->   - the crash log
->   - a minimized user-space reproducer
->   - the suspected introducing commit
->   - a suggested fix patch
+> The process was not perfect. Some patches were not good enough, and we also
+> made some mistakes early on when deciding what should be called a security
+> issue.  Our internal review process has been improving with the help of the
+> community.
 
-It would be nice if you could try to parse the git logs for the driver
-and extrapolate its age, and if it is still being actively Maintained
-by somebody.
+That's great, keep it up!
 
-We see lots of LLM generated patches for theoretical bugs, mostly in
-error paths, for drivers which are EOL, and it is unlikely anybody is
-still using the hardware. Such patches waste Reviewer/Maintainer time.
+> But the remaining queue is still too large for us to handle.
+> 
+> Recently Jamal pointed out problems around our tags. That made me realize
+> that we should probably stop treating this as an ad-hoc patch effort and
+> build something closer to syzbot: public, reproducible, trackable,
+> deduplicated, and useful to maintainers.
 
-Maybe even make this part of your triage process. Prioritise issues
-found on newer, used drivers, over old likely unused drives.
+Again, I think that effort is going to be larger than just getting the
+patches fixed and pushed out.  It also turns into a central
+point-of-failure, which is what we do not want to have at all for the
+kernel.
 
-      Andrew
+But hey, I could be totally wrong.  Maybe some generous company that is
+involved in unleashing this hell on us would be so kind as to pony up to
+do the work to create this and help fix the issues that their tools are
+finding.  Just like Google did in the past, there is precedent, but for
+some reason people don't like learning from history...
+
+It's going to be a long 18 months...
+
+greg k-h
