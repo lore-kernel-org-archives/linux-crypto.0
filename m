@@ -1,92 +1,80 @@
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B1974657DD;
-	Wed,  8 Jul 2026 12:59:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D3A4380FCE;
+	Wed,  8 Jul 2026 14:07:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783515597; cv=none; b=LmWLTec1Hzr0qKZepHxNlWG+HsiZe0dvd1EraEgdi/4fkL/1pxcKFLBPgxnm/5eJ/cVjTRY2Pdo4KB1psrTDc0DBZl6vYQSqkIKWXjrSJzCbq71GjwOWoTuu7AW87jfOmIdfGTewTsQSH2kE6O6OWJKehcURyiicDupxOuZAlK0=
+	t=1783519633; cv=none; b=t4es52mms1vJ4a3b9rlNg+s+yYsqNHgN3v/36iDmuXi8KNaZtqIc3R+2bIhfnu/yZ2i6Kt4ee0Yv0845aT3s4CurqXJn6xSy1jdVvDi++7pY4LN+jnRvyXLXb8qXiT/mPfH9Sv+epl3TBR+D2P9YL4yPunuFHx6vwHWBHuYwhHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783515597; c=relaxed/simple;
-	bh=V7aK68/26qBGEJjFgpBRUzW4ex72yHCq+Vx2aTGwmY0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=JnGPBq3OcKdOyrk310u43pTH5fvTiDyVqSc6eia3zHbfQ7jnyllsdePSiXbDZv9xBc7B2EUMm014XSKwFiAp787K+xaIAoLjYuviWqKf7SCOvZJuca9rMA5FViHTQoZu0fbotkh7U6SKRzDC4xjAcTtSL2uZ78TRC6K7giMhfxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=VOAH5+5D; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	s=arc-20240116; t=1783519633; c=relaxed/simple;
+	bh=O5vhrXD//CdCW3GRndVtoG/T03EbREdTGHTbE0SorTI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YHV0XGGh89jCOzZ8CbpOCkwrZmBWHK9kGjhCK6O7EKAKUNFsYMbzvX2IgvCdRnyOgjFGYIQC4h6GgDt54+GkmGHk4f39/4x47YhkEjpwcW1ClrMuNj/OaIYuhFLDbvGUShgs66T7wVx981H2K7en67iFMI1m480OMgtkIlDWVGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=y2yIlIxd; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="VOAH5+5D"
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 121164E40CF7;
-	Wed,  8 Jul 2026 12:59:55 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id D759060337;
-	Wed,  8 Jul 2026 12:59:54 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C0E2411BC0DDB;
-	Wed,  8 Jul 2026 14:59:48 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1783515593; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=KqbPk7W/xg9la/kQEemsDvBwfwa0jXXj/79ki0DXFUk=;
-	b=VOAH5+5DHS2rc2xNoQRdbNJZoXcP50tsx2tg6u9Vn+1G8/gWEAO0EhcRuPez+p7StIu5MH
-	5fcxKSvilbQdrohHObOos7NpPJBK8lX44UxS3cvlop87Sm0cSG8YYmO44ycvaW0orfuhZy
-	NQghTqrl59BpuSjzHFOXtUQPv5YMjTLAtDyDT40cNKtXO8QcPdl1X4jtZiUWsz2zCJ2Rgl
-	CeWCSdKD9pGBpJYBBUA9rQQp2tPdQ5D0x5EhdaZLqtQeTsFPLSGQ0Qy5JlSbbYP7ixkq6i
-	602YLUhIXs7OP5tq88tgmqV5VIyFmyTd7GLXGVYeyb6fWcndHksvT6yg0Lgjzw==
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Michael Turquette <mturquette@baylibre.com>,  Stephen Boyd
- <sboyd@kernel.org>,  Rob Herring <robh@kernel.org>,  Krzysztof Kozlowski
- <krzk+dt@kernel.org>,  Conor Dooley <conor+dt@kernel.org>,  Thomas
- Gleixner <tglx@kernel.org>,  Olivia Mackall <olivia@selenic.com>,  Herbert
- Xu <herbert@gondor.apana.org.au>,  Jayesh Choudhary <j-choudhary@ti.com>,
-  "David S. Miller" <davem@davemloft.net>,  Christian Marangi
- <ansuelsmth@gmail.com>,  Antoine Tenart <atenart@kernel.org>,  Magnus Damm
- <magnus.damm@gmail.com>,  Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-  Pascal EBERHARD <pascal.eberhard@se.com>,  Wolfram Sang
- <wsa+renesas@sang-engineering.com>,  linux-clk@vger.kernel.org,
-  devicetree@vger.kernel.org,  linux-kernel@vger.kernel.org,
-  linux-crypto@vger.kernel.org,  linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH 12/16] irqchip/eip201-aic: Add support for Safexcel
- EIP-201 AIC
-In-Reply-To: <CAMuHMdWr5OT0iAbZMgDAizO9KnhmyUN3hsqFnp+JYRao4aKu_A@mail.gmail.com>
-	(Geert Uytterhoeven's message of "Wed, 8 Apr 2026 10:05:18 +0200")
-References: <20260327-schneider-v7-0-rc1-crypto-v1-0-5e6ff7853994@bootlin.com>
-	<20260327-schneider-v7-0-rc1-crypto-v1-12-5e6ff7853994@bootlin.com>
-	<CAMuHMdWr5OT0iAbZMgDAizO9KnhmyUN3hsqFnp+JYRao4aKu_A@mail.gmail.com>
-User-Agent: mu4e 1.12.7; emacs 30.2
-Date: Wed, 08 Jul 2026 14:59:48 +0200
-Message-ID: <87ldbliqm3.fsf@bootlin.com>
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="y2yIlIxd"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Z6OwcHjGnPVZnFThOc0FM6ldsN6O58E7FKit7r1HTQw=; b=y2yIlIxd5qPqJ3SGXBVE5DNCiC
+	G7J7cVQqk1Pj/7JiDZiu3R8fl364ct4VkwSmNJTXOn1T8e2klZ2mGAPH6Q7N8jqws7zwrUcbx07In
+	FsmZYcS7x4+DQ0WIXI128EujSWdO/dSXJiZRD5ycFfF+0NYhmEB/Xsl3iJQR+7bR+Iyg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1whSvc-00BKQd-8B; Wed, 08 Jul 2026 16:07:08 +0200
+Date: Wed, 8 Jul 2026 16:07:08 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Yuan Tan <yuantan098@gmail.com>
+Cc: linux-kernel@vger.kernel.org, workflows@vger.kernel.org,
+	jhs@mojatatu.com, gregkh@linuxfoundation.org, sven@narfation.org,
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: Re: [RFC] VEGA: a syzbot-like workflow for LLM-found kernel bugs
+Message-ID: <b392a243-7fc2-4fb6-a264-ba1e01891e30@lunn.ch>
+References: <20260708092247.4188498-1-yuantan098@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260708092247.4188498-1-yuantan098@gmail.com>
 
-Hello Geert,
+> The rough idea
+> ==============
+> 
+> VEGA would have a public dashboard, similar to syzbot, and would
+> send selected bug reports to the relevant kernel mailing lists.
+> 
+> The goal is to send reports that contain enough information for maintainers
+> or other developers to pick up, understand, reproduce and fix the issue.
+> 
+> For each public report, we expect to include:
+> 
+>   - a description of the bug
+>   - the tested kernel tree and commit
+>   - the kernel config and environment
+>   - the crash log
+>   - a minimized user-space reproducer
+>   - the suspected introducing commit
+>   - a suggested fix patch
 
-Sorry for the late replay.
+It would be nice if you could try to parse the git logs for the driver
+and extrapolate its age, and if it is still being actively Maintained
+by somebody.
 
->> --- a/drivers/irqchip/Kconfig
->> +++ b/drivers/irqchip/Kconfig
->> @@ -826,4 +826,12 @@ config SUNPLUS_SP7021_INTC
->>           chained controller, routing all interrupt source in P-Chip to
->>           the primary controller on C-Chip.
->>
->> +config SAFEXCEL_EIP201_AIC
->> +        tristate "Safexcel EIP201 AIC"
->
-> Is there any platform dependency that could be added here?
+We see lots of LLM generated patches for theoretical bugs, mostly in
+error paths, for drivers which are EOL, and it is unlikely anybody is
+still using the hardware. Such patches waste Reviewer/Maintainer time.
 
-In practice no, because this is an IP block that has been integrated in
-many SoCs (I don't have the list). However if you care about reducing
-the list of possible options I can make it depend on the RZN1
-architecture, where I need it, but I don't see this as an relevant
-move. What do you prefer?
+Maybe even make this part of your triage process. Prioritise issues
+found on newer, used drivers, over old likely unused drives.
 
-Thanks,
-Miqu=C3=A8l
+      Andrew
