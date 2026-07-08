@@ -1,61 +1,63 @@
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F0FE3BAD9B
-	for <linux-crypto@vger.kernel.org>; Wed,  8 Jul 2026 17:58:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3157843713C
+	for <linux-crypto@vger.kernel.org>; Wed,  8 Jul 2026 17:59:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783533539; cv=none; b=kDibq5UwU3AWCN0TtcflF7Vj9JwCJyLWtqk+eHRcrRrDWZ2F/LEV9zEXRIWpfmxjahnB7ivDAzba8Y1ewAuwXcxLUNPsnHRes+UHb1+CPmI8VFClcCcDkip8mGKxgSQ9MDdqtQ/2WYeRCe2tfZuSVcBhdOJVSV+3Kmx7xXRwGvQ=
+	t=1783533543; cv=none; b=MB6kz5zEjWgeyB4NTfVNJz9o7Y3OK/BH3IkPGbJcFpcSR+fInLantiZkh+Ra2jvbN0r0sP4NJPD6/fk5th3GTjlFgYSSLx5A8Wm/+V7ll2ECc6IC+fIshA8IXuBCl8N5vClKnwrMYoszRydWPdHwktxSU0ENm9+LDTw3Ced6P2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783533539; c=relaxed/simple;
-	bh=Dx/U1QTn3apYjRiz0yi9z250wQK129Fy+tAB/HadHMY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qmC8mUtnNpbBGlJXWcpN89AHh3O/BDP0ZnNKX48O4mrzcgCkJ37s4Dkxd6G+9TRF71k3PmMTn1KaGdHF/qqg55QsYW9Z51Fg0XIJHxq5krqIl06krfdCmKPwRZaRNVf/DcgChX1OpvtbVDpZ6Ee20GHZ/v3DTGAwJOmbdi+BsUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zy+f3Yfu; arc=none smtp.client-ip=209.85.208.49
+	s=arc-20240116; t=1783533543; c=relaxed/simple;
+	bh=qR8da7hKtoo+tPfwG3vADxqc/OIuPfs3p6aDdWf+HJs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=m28aKDgw3r0PPVhshJ9CNPMfkMViFm1EUs7VkRv+YWXkyL4mkIug5HJQ+JDwlpQjrMfMuLc2pKa/T9jMMwoSsjuQoIHPQ/wDHfkDSuSaOlwUsvzkqJVuJ6gutJxQNcyjLR2CZcb7ZprpSElRkSCE4k7Wh03+33ekk+Vo9LXoCp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=okXq95Bu; arc=none smtp.client-ip=209.85.208.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zy+f3Yfu"
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-6986578d8c0so51208a12.1
-        for <linux-crypto@vger.kernel.org>; Wed, 08 Jul 2026 10:58:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="okXq95Bu"
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-69a50b818c8so1643220a12.2
+        for <linux-crypto@vger.kernel.org>; Wed, 08 Jul 2026 10:59:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783533536; x=1784138336; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=mQO7OwEt2ayLBwYgGRVhBYGfbjzxMLDxfhpK0SkwD/o=;
-        b=Zy+f3Yfu/N/8tVVS/2aEcVR1GVrcbS53CCvzgs1q63rWItqT8wU9J7alx81f6xSTGQ
-         GtGMG+0cawyOmWcG8diitYzhCGQYBmTeglh3kt/DyElNScC/S1bw5oXQzjYp59uVEUYq
-         v73b+F2ijHYp9/KHfM+iTXJp8h3APA/O4VCbr5cTUm3bsBAQksH2FDRUycRvSD2V9CJ/
-         HR633lucUQO8CtFojS48UlEE/Ud4YLF3vGb19tQaUuQ+jjeJIQRYYQk6RcDuLOHujyYr
-         fQ/TxujbhbdWK8whc2VHRFEBd3jLYPsAC/0i8yi0C9Z4pqOwxTlK1lpkUAGSoZ8Fy0mG
-         HJZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783533536; x=1784138336;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20251104; t=1783533541; x=1784138341; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=mQO7OwEt2ayLBwYgGRVhBYGfbjzxMLDxfhpK0SkwD/o=;
-        b=jWkc8u0LtQy8qYBScv1yCANAtwLbcv1dlBNKWP2QS1rjqCl+2vg6NqGye0VlGDOg5a
-         tx7C/doppuhEdE0xyfDAqoNUszbnI3QZZ30DULzdl7CWRiSnpF1Q1aM/RdV7ekmMW/uJ
-         tms+CmXNYQA0sRLGIfKrt2+Rn9TGfAA3WJJ1RYU5zVQI81gl5wg7q1BvoA7g5G+GwuzR
-         I+5pf9g4+7bBXoydh+XtdDxWt4Qkecpex4yjiG5BoA7vI/h1FfQgEbliNanbYbVIFHkG
-         byzw2jwP+gKD7PaJbjoNIjNF/5UTN6vitHz707Llrvm3bttF1nzCml2aBsc+rjUexmcI
-         Jajg==
-X-Forwarded-Encrypted: i=1; AHgh+RqYjkZCVVf5GG0zJg630nmV0aUwSbaZdNf8tqL5zdNqTPHUkMxZ2BvNkMfliYcLinPH/+rAGgTbHfpNj6g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYSQ+SQeyedN1gEQSQk9JsOrGIabqo7v58Zv8T4LYcjpXMuGu9
-	/BdpGOlQn1dbqMzBZw+plGs9jpKAn9FG9T6M/IZPjPbeSdkXqUpx5J7x
-X-Gm-Gg: AfdE7cmZKhRsM2pgKGHnQcFDKLaUh+uIrvUd3+2wRKzitbuEdVZuDUw0cz+ZZMVhvpr
-	CTskDDYE9Czp7DKFOeI0aQN2gf8xXYsuXb/nLQj52aMrzrhErKY6WrZAYRo6eLyRswSnIekFo1K
-	G6c/1IWBtNdDNrHA8woumdvq0WKZTqBIciPcaG3I/7F36sSbalc1OSCHyemtGQy9IYTpx0OvWML
-	k2JFyUD2E3MjhpPxnRmLWptZly2d+sQVttsq5Ff+tAEL0BDF18F/eT+/jy5K1rSg44QLKxT5pDs
-	7ZdP8s5peXmKu/RHgWhK2p84o2rg17qLNlj3PpuClHR0bQb+Hkdax4LW41GXGfYe5M/EcWFVpST
-	Fkpl+pH7BMp6h1+3AmLuBddN1xJfwOJZLDe3VQWCQk6g7BZ8MvxJDIi2fhvknmL/lMY34ryt4Xd
-	UWor41UQ==
-X-Received: by 2002:a17:906:4fce:b0:c12:5e26:da50 with SMTP id a640c23a62f3a-c15ce14c65bmr157380766b.65.1783533535639;
-        Wed, 08 Jul 2026 10:58:55 -0700 (PDT)
+        bh=ANaeyZnIlvUZuUb+qcVD79ri5D/Hu+DLtzSwYPDFNAo=;
+        b=okXq95BumxxuPuQcGSoDV1NhQQWS+Pw+q68vEYQuqMONf6t0YyZS6oarm3EO7av1hY
+         sm5bc5QrNtKjLCHBDgwxC9znCd+yqRvDve8Dmp3LGG0JbvgK1wT+2EsmLR7kUkIIicLY
+         W4SvUqdumDi8n1XEg4dTxOEV/EitJsUqQ/gl9vC6r5QZ3fxE+n/rX2mwS3biBPjJEiLA
+         5MNcIYCZ6Zuo/XRVa2zs99mbc3EB283P9embX+uYa8OJV8MJrt3l6n2Hm2/40rJrDVnH
+         1vLr2JBNYk0DhkTiU5q6Y0ts5LEvAZNXPqd5tvRxWmlZVJDFKXwOPgnUOxsMDybM/pYr
+         YMYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783533541; x=1784138341;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=ANaeyZnIlvUZuUb+qcVD79ri5D/Hu+DLtzSwYPDFNAo=;
+        b=RwOgs3MiNN2HGyYKbVnA+1xdwTGcbL00MoPDoM1AYlExHlZer5j14FuN8bYMY/P9wE
+         KJ5v/zskKH76BZdgA8Xj6NcwG4xfHwbzDiZFyw6rpJtkQqVjdggA+4OT2teAcW0bFPm2
+         +o3JgOs6LX6aQTJUZgUC9rsPabbskuUL40o4OIikdTVHV55V5q15uqEFA3e4GTHeU3RI
+         WHBvDXCee5ohTDO/cY6up3dkbLNtnKv/ZvrIZI7Jbr/C+W+wmV6RCWnnL80jzgqLnsfN
+         WRpGVuWpb+vbEiIwHPw43i794d0w7BoAI6EIdLFJQxxZL9BVEUc/Q8fjRSAfxfVTAtmX
+         oZcQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rp+Sv/rPpcZjqcK+t/gxB+Zp9l2UiTEXVyLwViH/jxQ0cUD215T59OM6wGtOg8EfQFGh1yuwLbHgXvMvCY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzdVSqiujdZ1n9W7ZiddoX3MxIJT/lofystyWGzFj6AGqfoMVu7
+	0TewTvKxBT/BRCYn1dlxkmfwjP+2E/uFxrI8CtaemxV2VdI2HchyvqrK
+X-Gm-Gg: AfdE7clFIvPudUh9vxCwQdeR+7ayH8/daFi151ACmVqI1iJyWm92VuOHi+Fe2cwU/GX
+	VMef8c0/aB2XdphTDltDvK3eo80AGeLDIzSbFsdEM2ALv+sWMZ0YnXebmDW6TPEyJ+l6u8kkC9H
+	gJNE7oTtYBdgoQ7PdJj/WlBkg+mqv2Bfh8ohWtFEGjvA9eO4dEfqJqXthoA6pDtegcrUaNW73Ml
+	vwMXz9ZqmkUGt3dRU+3vOS4nFxF5+sliF8PPd877b0+zVuoVx/yeVqnCI3w6a3jdzhawfzcwZ5K
+	1xCoSCw+SXShU1KszYj53svS4ebft5LleD1Hl+jKXvVZ/PrZ3CB1TsGg1zwMYIzBdKQzmk3w567
+	RQ99WTU6nAIvSeNZ074iVlpQoJCqC+nKddbF381/crvq0u6UbtpEHK3VolAFLr2Yd1WzM5Fg4j9
+	cJz9KkKQ==
+X-Received: by 2002:a17:907:a286:b0:c15:b6bd:cbb8 with SMTP id a640c23a62f3a-c15ce121a12mr164929166b.50.1783533540594;
+        Wed, 08 Jul 2026 10:59:00 -0700 (PDT)
 Received: from olympus.. ([2a0a:ef40:ea3:3f01:2e0:4cff:fe68:285])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c15ad9bcc26sm357653666b.34.2026.07.08.10.58.54
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c15ad9bcc26sm357653666b.34.2026.07.08.10.58.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jul 2026 10:58:55 -0700 (PDT)
+        Wed, 08 Jul 2026 10:59:00 -0700 (PDT)
 From: Dawid Olesinski <dawidro@gmail.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S . Miller" <davem@davemloft.net>,
@@ -70,10 +72,12 @@ Cc: Conor Dooley <conor+dt@kernel.org>,
 	linux-rockchip@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Dawid Olesinski <dawidro@gmail.com>
-Subject: [PATCH v2 0/4] crypto: rockchip: Add RK356x/RK3588 cryptographic offloader
-Date: Wed,  8 Jul 2026 18:58:21 +0100
-Message-ID: <20260708175837.1718437-1-dawidro@gmail.com>
+Subject: [PATCH v2 1/4] dt-bindings: crypto: rockchip: Add RK356x/RK3588 crypto engine binding
+Date: Wed,  8 Jul 2026 18:58:22 +0100
+Message-ID: <20260708175837.1718437-2-dawidro@gmail.com>
 X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20260708175837.1718437-1-dawidro@gmail.com>
+References: <20260708175837.1718437-1-dawidro@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -82,109 +86,109 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series adds support for the second-generation (V2) Rockchip
-cryptographic hardware accelerator found on RK3568 and RK3588 SoCs.
+Add a YAML device tree binding for the Rockchip second-generation (V2)
+cryptographic hardware accelerator present on the RK3568 and RK3588 SoCs.
 
-The IP block provides AES (ECB, CBC, XTS) and hash (SHA-1, SHA-256,
-SHA-384, SHA-512, MD5, SM3) offload via an LLI-based DMA engine.
+The IP block exposes AES-ECB, AES-CBC, AES-XTS block ciphers, SHA-1,
+SHA-224, SHA-256, SHA-384, SHA-512, MD5, and SM3 hash algorithms, each
+with a hardware DMA engine controlled via linked-list descriptors.
 
-The series is ordered as required: binding first, then driver, then
-the two DTS nodes that reference the binding.
+The binding covers two compatible strings:
 
-A prerequisite patch removing SECURECRU reset definitions from the
-non-secure CRU driver is sent separately to the clk/reset tree, as it
-touches a different subsystem. That patch is not a hard dependency for
-the driver to build or load, but it is needed for correctness on RK3588:
-those register offsets map into TrustZone-protected MMIO and must not be
-accessed directly by Linux.
+  - rockchip,rk3568-crypto: clocks and resets are driven directly by the
+    non-secure CRU (accessible to Linux at EL1).
+  - rockchip,rk3588-crypto: clocks and resets live in SECURECRU, a
+    register bank sandboxed to TrustZone. Linux must request them through
+    the ARM SCMI firmware interface (scmi_clk / scmi_reset), as direct
+    MMIO access to SECURECRU from EL1 triggers a bus fault.
 
-This work started from unmerged patches by Corentin Labbe
-<clabbe@baylibre.com> posted at:
-https://patchew.org/linux/20231107155532.3747113-1-clabbe@baylibre.com/
-
-The implementation has been substantially reworked. Notable changes from
-Corentin's original series:
-  - DMA descriptor race condition and DMA mapping leak on timeout fixed
-  - Per-device algorithm copy replaces global device list, removing a
-    locking bottleneck and correctly supporting multiple instances
-  - Runtime PM autosuspend added; clocks and reset gated between requests
-  - Multi-SG hash requests routed to software fallback (hardware padding
-    engine requires total message length upfront and cannot maintain
-    state across LLI boundaries)
-  - Hardware interrupt enable register write corrected to use the
-    HIWORD_UPDATE mask that the hardware requires
-  - Software fallback for all registered algorithms; statesize promotion
-    for export/import compatibility with ARM Crypto Extensions drivers
-  - SCMI reset and clock references in DTS corrected for RK3588
-
-Tested on Orange Pi 5 Pro (RK3588S). All nine algorithm selftests pass.
-AES-CBC throughput measured at ~100 MiB/s with cryptsetup. PM
-autosuspend/resume verified over 1000 consecutive hash requests with no
-errors. 20 modprobe/rmmod cycles produce no DMA coherent memory leaks.
-
-Patch series for the crypto subsystem:
-  [1/4] dt-bindings: crypto: rockchip: Add RK356x/RK3588 crypto engine
-  binding
-  [2/4] crypto: rockchip: Add RK356x/RK3588 cryptographic offloader driver
-  [3/4] arm64: dts: rockchip: Add crypto node to rk356x-base
-  [4/4] arm64: dts: rockchip: Add crypto node to rk3588-base
-
-Separate patch for clk/reset tree:
-  clk: rockchip: rk3588: Remove SECURECRU reset definitions
-
-Changes in v2:
- - dt-bindings: wrap example in a bus node with #address/#size-cells = 2
-   and add the SCMI clock/reset dt-binding includes so dt_binding_check
-   passes (Rob Herring / Krzysztof Kozlowski review).
- - crypto: fix Kconfig to select CRYPTO_SM3 instead of the non-existent
-   CRYPTO_SM3_GENERIC.
- - crypto: drop IRQF_SHARED (the line is dedicated) and request the IRQ
-   only after clocks are enabled and the completion is initialised;
-   reorder probe accordingly.
- - crypto: set a 32-bit DMA mask before allocating the descriptor table.
- - crypto: suspend the device explicitly on removal before disabling
-   runtime PM to avoid leaking clocks.
- - crypto: call synchronize_irq() on the DMA timeout paths to close a
-   race with delayed interrupts.
- - crypto: convert fallback statistics to atomic_long_t.
- - crypto: use cpu_to_le32() for all LLI descriptor fields (big-endian
-   correctness).
- - crypto: read key/IV with get_unaligned_be32() to fix an alignment
-   fault and a big-endian double-swap.
- - crypto: fix the CBC/XTS IV backup offset to use the processed length
-   instead of the scatterlist capacity.
- - arm64: dts: rk356x: move the crypto node into unit-address order.
-
-v1: https://patchwork.kernel.org/project/devicetree/cover/20260530160704.3453555-1-dawidro@gmail.com/
-
-Build/rebase fixes (not from review):
- - crypto: use sizeof(struct sm3_ctx) for the SM3 statesize, as
-   struct sm3_state was removed by the lib/crypto SM3 conversion.
- - crypto: add the missing SHA-224 zero-message case.
-
-Dawid Olesinski (4):
-  dt-bindings: crypto: rockchip: Add RK356x/RK3588 crypto engine binding
-  crypto: rockchip: Add RK356x/RK3588 cryptographic offloader driver
-  arm64: dts: rockchip: Add crypto node to rk356x-base
-  arm64: dts: rockchip: Add crypto node to rk3588-base
-
- .../crypto/rockchip,rk3588-crypto.yaml        |  75 ++
- arch/arm64/boot/dts/rockchip/rk356x-base.dtsi |  12 +
- arch/arm64/boot/dts/rockchip/rk3588-base.dtsi |  12 +
- drivers/crypto/Kconfig                        |  32 +
- drivers/crypto/Makefile                       |   1 +
- drivers/crypto/rockchip/Makefile              |   5 +
- drivers/crypto/rockchip/rk2_crypto.c          | 746 ++++++++++++++++++
- drivers/crypto/rockchip/rk2_crypto.h          | 249 ++++++
- drivers/crypto/rockchip/rk2_crypto_ahash.c    | 565 +++++++++++++
- drivers/crypto/rockchip/rk2_crypto_skcipher.c | 728 +++++++++++++++++
- 10 files changed, 2425 insertions(+)
+Signed-off-by: Dawid Olesinski <dawidro@gmail.com>
+---
+ .../crypto/rockchip,rk3588-crypto.yaml        | 75 +++++++++++++++++++
+ 1 file changed, 75 insertions(+)
  create mode 100644 Documentation/devicetree/bindings/crypto/rockchip,rk3588-crypto.yaml
- create mode 100644 drivers/crypto/rockchip/rk2_crypto.c
- create mode 100644 drivers/crypto/rockchip/rk2_crypto.h
- create mode 100644 drivers/crypto/rockchip/rk2_crypto_ahash.c
- create mode 100644 drivers/crypto/rockchip/rk2_crypto_skcipher.c
 
+diff --git a/Documentation/devicetree/bindings/crypto/rockchip,rk3588-crypto.yaml b/Documentation/devicetree/bindings/crypto/rockchip,rk3588-crypto.yaml
+new file mode 100644
+index 000000000000..fc09f21b0654
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/rockchip,rk3588-crypto.yaml
+@@ -0,0 +1,75 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/crypto/rockchip,rk3588-crypto.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Rockchip cryptographic offloader
++
++maintainers:
++  - Heiko Stuebner <heiko@sntech.de>
++  - Corentin Labbe <clabbe@baylibre.com>
++  - Dawid Olesinski <dawidro@gmail.com>
++
++properties:
++  compatible:
++    enum:
++      - rockchip,rk3568-crypto
++      - rockchip,rk3588-crypto
++
++  reg:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 1
++
++  clocks:
++    items:
++      - description: Core clock for the crypto IP internal logic
++      - description: AXI interconnect clock interface
++      - description: AHB interface clock
++
++  clock-names:
++    items:
++      - const: core
++      - const: aclk
++      - const: hclk
++
++  resets:
++    maxItems: 1
++
++  reset-names:
++    items:
++      - const: core
++
++required:
++  - compatible
++  - reg
++  - interrupts
++  - clocks
++  - clock-names
++  - resets
++
++additionalProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/interrupt-controller/arm-gic.h>
++    #include <dt-bindings/clock/rockchip,rk3588-cru.h>
++    #include <dt-bindings/reset/rockchip,rk3588-cru.h>
++
++    bus {
++      #address-cells = <2>;
++      #size-cells = <2>;
++
++      crypto@fe370000 {
++        compatible = "rockchip,rk3588-crypto";
++        reg = <0x0 0xfe370000 0x0 0x2000>;
++        interrupts = <GIC_SPI 209 IRQ_TYPE_LEVEL_HIGH 0>;
++        clocks = <&scmi_clk SCMI_CRYPTO_CORE>, <&scmi_clk SCMI_ACLK_SECURE_NS>,
++                 <&scmi_clk SCMI_HCLK_SECURE_NS>;
++        clock-names = "core", "aclk", "hclk";
++        resets = <&scmi_reset SCMI_SRST_CRYPTO_CORE>;
++        reset-names = "core";
++        };
++    };
 -- 
 2.47.3
 
