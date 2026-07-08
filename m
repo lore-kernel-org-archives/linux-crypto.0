@@ -1,174 +1,185 @@
-Received: from cyan.elm.relay.mailchannels.net (cyan.elm.relay.mailchannels.net [23.83.212.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE4913EB7FB
-	for <linux-crypto@vger.kernel.org>; Wed,  8 Jul 2026 07:24:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.83.212.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AD2737C929
+	for <linux-crypto@vger.kernel.org>; Wed,  8 Jul 2026 09:22:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783495471; cv=none; b=MExmK3KoueA9tn9+0MT75uLetJIw1kbTIRcrHJcVRncGqK7RJuqe0aBPCL1VH1m0Dj8zo8NfZ5Jxf1cGiptpLisb/9M7nTqOZjcubgh8N+U3KL7WCYUXsBJUuInlJQxDJnHxDMumesNniLRrmUH/qGZwYmM7ldul1y093awcbFg=
+	t=1783502578; cv=none; b=LlGYTK89P4B7LB+AuTMKUsVt6qNDnJTZq6N0W2M/00PtKv6g8L3lGOV0i0bwlrz1kRx5PnXvf6QSVz0RYeKgou+lHaeBJTMxW1sh5NHwZufgxyluh20L/F+VKGbpi7dAdH9CQfXK7Blfu/T6An9bR3ddHXYLpRlahrj1yfe+Uf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783495471; c=relaxed/simple;
-	bh=S4XWIfKff1hniR8Hh+JkjY1cmMqYsrdCWVctmmjwwLc=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=FQsGyqNpy8ThnQGe9lOrTVs6fkuAeDWXY6CfKGB4RfQeypJwAIJHc0Su8ppzQmHYN0QGFxxJEKdwt2F7hxH5ADyTJisfJZD6jyyvIj44P1xSNEPehJfHSdsXDoox1ZsuIc6Z9vN7onnX/iWpVHqsQt6x0w/sDPJP2AkOKvY9Tqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=scientia.org; spf=pass smtp.mailfrom=scientia.org; arc=none smtp.client-ip=23.83.212.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=scientia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=scientia.org
-X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-	by relay.mailchannels.net (Postfix) with ESMTP id BD0274E1580;
-	Wed, 08 Jul 2026 02:14:08 +0000 (UTC)
-Received: from cpanel-007-fra.hostingww.com (100-99-175-78.trex-nlb.outbound.svc.cluster.local [100.99.175.78])
-	(Authenticated sender: instrampxe0y3a)
-	by relay.mailchannels.net (Postfix) with ESMTPA id A60BD4E1756;
-	Wed, 08 Jul 2026 02:14:07 +0000 (UTC)
-X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
-X-MC-Relay: Neutral
-X-MC-Copy: stored-urls
-X-MailChannels-SenderId: instrampxe0y3a|x-authuser|calestyo@scientia.org
-X-MailChannels-Auth-Id: instrampxe0y3a
-X-Towering-Hysterical: 1abbe8d73161fa88_1783476848668_1443487694
-X-MC-Loop-Signature: 1783476848668:3127782482
-X-MC-Ingress-Time: 1783476848668
-Received: from cpanel-007-fra.hostingww.com (cpanel-007-fra.hostingww.com
- [3.69.87.180])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
-	by 100.99.175.78 (trex/8.0.2);
-	Wed, 08 Jul 2026 02:14:08 +0000
-Received: from p5b0ed87c.dip0.t-ipconnect.de ([91.14.216.124]:62194 helo=heisenberg.fritz.box)
-	by cpanel-007-fra.hostingww.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.99.4)
-	(envelope-from <calestyo@scientia.org>)
-	id 1whHna-0000000F1yd-2Ylk;
-	Wed, 08 Jul 2026 02:14:06 +0000
-Message-ID: <04fbbc8611699e469f44edbccdf3cf1ac65075d3.camel@scientia.org>
-Subject: Re: AF_ALG deprecation fallout
-From: Christoph Anton Mitterer <calestyo@scientia.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, 
- Milan Broz <gmazyland@gmail.com>
-Date: Wed, 08 Jul 2026 04:14:04 +0200
-In-Reply-To: <20260708011112.GA3890@sol>
-References: <27816cc353731e8e5484adad7d0fc447777727d8.camel@scientia.org>
-	 <20260708011112.GA3890@sol>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2-10 
+	s=arc-20240116; t=1783502578; c=relaxed/simple;
+	bh=71IPpVxSL6rELSFV3RscCJl7aym1gXBpQyo2V285sW4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QAjzgU/gu8jWESuGBhI3ma3WMvKtLX/V9aulYgus4QYKVPcVA7vQM8461GVBTuTnQWrX/kiNtnYnL8ZN5YNheBiiSE1ATuRiRzmLFpqiMNjTZ6soshPUHs+9dw8BqzPvmxR+zKMrDIjhEpWfw5XXqMdKw3m+IkH1ooc+ZwXnMLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=oiAX3HRW; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oiAX3HRW"
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-381216921aaso477787a91.1
+        for <linux-crypto@vger.kernel.org>; Wed, 08 Jul 2026 02:22:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783502576; x=1784107376; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bESlo7lvNwhdiVElYDSnZy0QW9Bj+WsccRVrVGGNJng=;
+        b=oiAX3HRWBGooIDPulrZn1l987zJdstH6BPbfN05ASw4hB35iJdMBZ0YS8nsNTs7ePL
+         j3IRes2PnwojXzYU9NApKi2RPH1kFghEsvJNjad8A6lt6NAlQaacFDggaaA2t0aOzkeP
+         f7v0sXq0y/aGroJ8n16OTv5EUFZztalq3WLGn5J9wrYco9f2DIqB03K/KNJ7u25p35WY
+         Q5ClouECdVbbyz0uZqQM0Se4l21yINh6j2LzNPH+4Zf12OWh6bK0ZFma4b2+btlDju8u
+         b43opC16xq8o0VFCk0hr9hp3uu29bs14ZReLVRqPFZ3K2hFvatl1D2nBqAZyadRfMo3k
+         zxZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783502576; x=1784107376;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bESlo7lvNwhdiVElYDSnZy0QW9Bj+WsccRVrVGGNJng=;
+        b=J4k9uIUUl/IQYhDq7zNHXy7yg+GI5gLNGH5bKK6TS/DIwZ4Gi6k5ugJ3lhrvuJ+PNv
+         toLcH4iB0+zvinI1ISAS41Y+h/hSLSgzYYs/c6bvKIMk5mzBPh+J9qrMt4FTMTAGtPMS
+         0+DenJB5yhpRsPbGfbWyrBmcy6uth59/wazYwJwwgqY59f/dPhr6r3ZxfE5Eyev1Tigm
+         XkvPOnaDicc3cNDwF7S2XQL0vhqXC0u5v99irsDqdZlINgvXAZ/8sEh/t5oPtRYUZgde
+         ijc59um4a2dtMb8p+nnhdHq7i6wp7IohWZg5qwFOcuvspw1EkZdIDXZt4f7Ez9VCW1n0
+         I2LQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rpx/Ade8/jWNVN9/i8MdfUPq0AgOT9u4JHoMv4y9AsOcRDLjttR2fBCufvL5K964S65Atx/LLOUvgYl0Sk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yza8O8XiF3bfAraTMrWtZ3MqicHX7nl+63d2ZhsuW7Sd+l4UKGm
+	yxRuBPJKiHc7Gx6O/tfZLbXrL2NPPrRqAC/nu4lEj5s/pt+R/dBaCdJoTPmv+A==
+X-Gm-Gg: AfdE7ckoAeRdPUrZi3e/zG5Iww+ItOAS2XdtNONQYH1DTrZT1ZZUPlGcGVgtXVLWG2G
+	4e8+5rTDQ/C/s5l3rjjNMNAgpmtm0iOihQ5SnmFljUIohlXzvGkNaudA0QaSiSQ3ljnf/xDHbsS
+	WhL6CJGTIAaxnmiLOo9bLhFnEnTRFDuqQ/jtq8SCHuvsPoi3tyrmOhHX3rAbr3N8gP9K5xcOXPe
+	+FS3Yt4v/dUwTNSlpI5IxD2I6LA1/XsTL790f6kPulKg1qg009ks4vBeO0UE8GPDsO55QvJhfCZ
+	RVGHiIjfCnEHsCLsWYLwumWCsyKZR2LoDS+d1qXEjX8EhDadoDFQsGmfquMEA0qVigK98zfQB3t
+	qOU4AuI5fXmsktOSt+ABo0BSwIwp8w5xSCo784dm6lf1JmGV5lZ+hpgZ8tDvg132HOiHBQRhURk
+	TMQSvd
+X-Received: by 2002:a17:90b:17c1:b0:37f:ed7e:7e42 with SMTP id 98e67ed59e1d1-3893ff630c1mr1831193a91.14.1783502576376;
+        Wed, 08 Jul 2026 02:22:56 -0700 (PDT)
+Received: from homebox ([66.75.253.8])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3118389d9bcsm9985334eec.20.2026.07.08.02.22.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Jul 2026 02:22:56 -0700 (PDT)
+From: Yuan Tan <yuantan098@gmail.com>
+To: linux-kernel@vger.kernel.org,
+	workflows@vger.kernel.org
+Cc: yuantan098@gmail.com,
+	jhs@mojatatu.com,
+	gregkh@linuxfoundation.org,
+	sven@narfation.org,
+	netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: [RFC] VEGA: a syzbot-like workflow for LLM-found kernel bugs
+Date: Wed,  8 Jul 2026 02:22:47 -0700
+Message-ID: <20260708092247.4188498-1-yuantan098@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-AuthUser: calestyo@scientia.org
+Content-Transfer-Encoding: 8bit
 
-Hey Eric.
+Hi all,
 
-Thanks for your fast reply :-)
+We would like to ask for feedback on a proposed workflow for reporting Linux
+kernel bugs found by an LLM-assisted code auditing tool that we have
+been developing since earlier this year.
 
-On Tue, 2026-07-07 at 18:11 -0700, Eric Biggers wrote:
-> In 7.3 we'll indeed be introducing an algorithm allowlist for AF_ALG.
-> But I already proposed including "xts(serpent)", "xts(twofish)", and
-> "xts(camellia)" on it
-> (
-> https://lore.kernel.org/linux-crypto/20260705184419.40762-1-ebiggers@k
-> ernel.org/)
-> based on their mention in various online documentation for
-> cryptsetup,
-> which suggests they indeed likely have some (rare) real-world use.
+Since February, we have been developing an LLM-driven kernel code auditing
+tool called VEGA. It started as a side project, but the results became much
+substantial than we expected: VEGA has found hundreds of valid bugs in Linux
+kernel.
 
-Good :-)
+That immediately created a practical problem: we do not want to dump a large
+pile of bug reports onto mail lists and annoy the maintainers.
 
+The first thing we tried was to fix as many as we could ourselves. We
+started working with a group of student volunteers. Most of them are
+college students, so we have been training them, reviewing their patches,
+and trying to build an internal review process before anything is sent to
+the mailing list. The goal is to turn these findings into useful fixes, and
+also to help new contributors grow into people who can reduce maintainer
+workload instead of adding to it.
 
+The process was not perfect. Some patches were not good enough, and we also
+made some mistakes early on when deciding what should be called a security
+issue.  Our internal review process has been improving with the help of the
+community.
 
-> I'm interested in allowing any other algorithms that still have
-> real-world use via AF_ALG, if any exist.=C2=A0 If you're aware of any,
-> please
-> speak up.
+Since March, we picked up non-root triggerable bug first and have worked on
+fixes for more than 100 validated kernel bugs. we especially want to thank
+the students and professor who have helped a lot with this effort.
 
-[X]Chacha, IIRC, would anyway be used without XTS...
+But the remaining queue is still too large for us to handle.
 
-Well, I personally don't use any others, but of course other might.
-What about all these legacy modes that were used for years in examples,
-like cast5-cbc-essiv, aes-cbc-essiv, etc.?
+Recently Jamal pointed out problems around our tags. That made me realize
+that we should probably stop treating this as an ad-hoc patch effort and
+build something closer to syzbot: public, reproducible, trackable,
+deduplicated, and useful to maintainers.
 
-Does your list have any effects on things like chained algos (which I
-think cryptsetup allows to use for tcrypt).
+So this mail is an RFC for a VEGA reporting workflow.
 
+The rough idea
+==============
 
-> =C2=A0 In particular, if you could confirm that the "xts(serpent)"
-> and "xts(twofish)" allowlist entries are necessary and sufficient for
-> you, that would be helpful.
+VEGA would have a public dashboard, similar to syzbot, and would
+send selected bug reports to the relevant kernel mailing lists.
 
-For me they are. Actually I would want to replace my use of twofish by
-something xchacha based (see * below), but I would want to keep xts-
-serpent in the long term.
+The goal is to send reports that contain enough information for maintainers
+or other developers to pick up, understand, reproduce and fix the issue.
 
+For each public report, we expect to include:
 
-> Note that cryptsetup 2.8.7 will further reduce the cases in which it
-> even needs AF_ALG at all.=C2=A0 So just because you are using a particula=
-r
-> algorithm doesn't necessarily mean you need it in AF_ALG.
+  - a description of the bug
+  - the tested kernel tree and commit
+  - the kernel config and environment
+  - the crash log
+  - a minimized user-space reproducer
+  - the suspected introducing commit
+  - a suggested fix patch
 
-I see. Well at least 2.8.6 still needed it for opening a dm-crypt
-device that used serpent-xts-plain64.
+The suggested fix patch is meant to reduce maintainer burden. It still need
+human review, but hopefully it can save a lot time from building a patch
+from scratch.
 
+What will be public
+===================
 
-> No algorithms have been proposed to be dropped from dm-crypt (which
-> is
-> *not* the same thing as AF_ALG), by the way.=C2=A0 Given that dm-crypt
-> allows
-> some "interesting" algorithms like RC4, DES-ECB, and even the null
-> cipher, I do think we can expect an allowlist for it at some point as
-> well.=C2=A0 But that would be separate.
+All VEGA findings that we have evaluated as not having major security
+impact can be published on the VEGA dashboard. The dashboard would make it
+possible to see what VEGA found, whether the issue was reproduced, whether
+a fix exists, whether it was reported to a mailing list, and whether it has
+been fixed upstream.
 
-While these cases won't affect me, legacy users should be kept in mind.
+For issues that we have validated as having possible serious security
+impact, we will not publish it on the public dashboard before going through
+the appropriate kernel security process.
 
-Perhaps waiting a few years where opening such dm-crypt mapping merely
-gives a warning that this is about to go away, then - if possible - for
-a few years allowing read-only mappings.
+Dumping everything onto the mailing list may be annoying. During the initial
+stage, reports will be rate-limited and sent manually. We will check for
+duplicates against lore/upstream, and make sure the issue is not already
+fixed or reported.
 
+Report identity and tags
+========================
 
-> I'd indeed like to remove AF_ALG entirely eventually.=C2=A0 But that's a
-> long
-> term thing that would be many years from now and would occur only
-> after
-> iwd, bluez, cryptsetup etc. have all fully migrated to userspace
-> crypto.
+Each public VEGA report will have a stable identity, similar to
+syzbot reports.
 
-Good to hear that you guys have it already on your radar, that some
-people may use these non-AES algos and may want to continue doing so
-even in the long term.
-So please keep this in mind. :-)
+One possible format is:
 
+  Reported-by: VEGA <vega+HASH@DOMAIN>
+  Closes: <public dashboard URL>
+
+=========
+
+We would like to hear what maintainers think about this before we start
+sending these reports.
+
+We do not want VEGA to become another source of mailing list noise. The goal
+is to make LLM-based bug finding transparent and useful, and to make sure
+the reports come with enough context, reproducers, suggested fixes, and
+tracking so that they reduce work rather than create more.
 
 Thanks,
-Chris.
+Yuan
 
-
-* A bit off topic, but since some of the relevant people are already in
-CC:
-
-I've wrote just before on the cryptsetup mailing list, that we have the
-nice integrity support in cryptsetup for quite some years now, but I
-guess only few people actually use it because all the available
-algorithms/modes were kinda recommended against[0].
-
-I think XChacha20+Poly1305 might be in reach (but still not actually
-usable?), having finally a large enough nonce (192bits?).
-
-Now I'm not a crypt export, so don't really know which of [X]Chacha20
-vs. AES256 is considered stronger.
-At least AES has probably received far more scrutiny than any other
-crypto algo ever.
-
-So any chances that the kernel provides a usable AEAD mode for AES (or
-maybe even Serpent ;-P)?=C2=A0
-
-Like with GCM but a larger nonce?
-Or what about EAX, OCB? I blindly assume, that the patents have all
-expired, given that OpenPGP now uses them since RFC 9580.
-
-
-[0] https://gitlab.com/cryptsetup/cryptsetup/-/blob/5723601af5e5c14ccdf3cda=
-0b13756e3ea1b511b/docs/v2.0.0-ReleaseNotes#L259-274
