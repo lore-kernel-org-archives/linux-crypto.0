@@ -1,63 +1,63 @@
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 347D344BC92
-	for <linux-crypto@vger.kernel.org>; Wed,  8 Jul 2026 17:59:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53DCC4ADD8E
+	for <linux-crypto@vger.kernel.org>; Wed,  8 Jul 2026 17:59:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783533554; cv=none; b=UHwP902em33LJvM+cGnHDiXbi+eoqBXgvWxzS19Ipg6xyOrNeHF1K4srrS/DacdLqrgleDvc+kiI6vtLun54SPQX4dSHuciW7AaCe3XHSnYfWU8leoaKi2tzcyoN166ScCEuO7/akKU96oTnHZMNpKIDXYx8fwMSGkDQLLpc7Zo=
+	t=1783533559; cv=none; b=YHj63r0Lwx94IXf/QOvEyNY5AYWkStYZ1RIkBsKA/o+v0nKKY/hvJAIo1KFIDcyHewz2tnai4R6FJ9ldsmqmKbm98lRzlwhmi3ec1oirDmk95lNLY+hqC0uLIpCaRVjoLvHrUqqv7h0hfQczM0iOb2ijiIK7PbBuAeFQMCCP1Vo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783533554; c=relaxed/simple;
-	bh=kBDjEzQ80kgpn8wJAREQLaXT5HdibWwvuZRJylSEIBs=;
+	s=arc-20240116; t=1783533559; c=relaxed/simple;
+	bh=g0zBm/HT/JX8+0Ve2noPh/XhrvlAOxSKonPdGSV7PAk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Zz5jHI8w2zI65NJmKlZB7FW/dB0FtQQtve904eq1NGZsc1Wy1DvaTWSBOzepzk9xlBt5TPCOALdVRAFlkiErAmkdP/tZit1v3H31oaLErcmWiGoQ8NWKiYgNgYI5/RPllgOR/6p6HQ2D6GLPMWudfKaUHZ+a/aaMq7g8qcNFEZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NLqYK+Fx; arc=none smtp.client-ip=209.85.218.41
+	 MIME-Version; b=KraETYkpOlWZVFybNnCJLSStvx4+oSkY8Ylngfey39Q8iaS2AoTGm34ndXZNEJYXd4n/wjbxUcEjrVtgkjwLanyCfZD9Fq+GB11SWPeaNWqi4YC3T9LyGyaghtNyNVTVCpucSqr7rCXZsNE15TP7Nk8SINpEO/ye0QufDgC30HQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HTUPiprO; arc=none smtp.client-ip=209.85.218.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NLqYK+Fx"
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-c15d3cd51b2so95973866b.3
-        for <linux-crypto@vger.kernel.org>; Wed, 08 Jul 2026 10:59:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HTUPiprO"
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-c1276f8414bso118538866b.0
+        for <linux-crypto@vger.kernel.org>; Wed, 08 Jul 2026 10:59:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783533552; x=1784138352; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1783533555; x=1784138355; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=Sa+hq1ddPX1RzBXoQyE6BmGgQ/wGb1XIxI/SPhDUhIA=;
-        b=NLqYK+FxxhKI3Ept5cV/2oaeL7lvywevLOCb7ZxMk9aRRKRzlPoPPMwY2SK18LNKEy
-         XKRPu37fICoBPkgK1e4pTBiM0DfW1V+i+B44JAlHboWWNBHDXmZjAgPCbcjfISkwMTgL
-         8NBCsXEkV9m6OeNARyq186dDRDSjDFAUBAPobIr8vmenFb60ggR/iUWOumKu8YmHy56p
-         CCgqOhBjZ+BAxG7RfjlvP7+YfeExv/1UnOvT/5pZdL6S8JLSzB15pGroY8ASM05W55BY
-         +ec5nlGNGAWI9SZ4wv/lx6bt4UeoUDjwgsslLFv+MEjfsLtdixcDkpHk1wXXu7rYmkfc
-         +bTw==
+        bh=h3RbPrXYdQbVWUvs+F9bureO/gAjNoSjgQ1E6c4QgBI=;
+        b=HTUPiprOuzgdZnrc0eX8kY55b194o0cAPFEbqczJQ+cxhsdwf9tVdkoZ1GdapfWfK7
+         FlMnBf9AV8J9zM9QfeXGZzMmc7tBB13liJgTwx83Nm6lTDVg+lDWRYQONI3PvpziBPUV
+         pFR4vDE1pqS24Hy+GQGUrf6xF0ioj1zvqaZ6eccK1vRkJbUDkMaXwNtGlyiD3didMm2u
+         HrJlQZz0XNzw/6/c0jRZ4tbSIIqP4R3oa/XKUBvd/wk0D/tS3JefJTRkV8hGMTyaIxSC
+         kgaMZloiBUVTJ1IOSZB5pv55Is1MV0i0MZSMeiSlikQWpsi6MseRIlsrT1CLEP38kAvq
+         n68A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783533552; x=1784138352;
+        d=1e100.net; s=20251104; t=1783533555; x=1784138355;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Sa+hq1ddPX1RzBXoQyE6BmGgQ/wGb1XIxI/SPhDUhIA=;
-        b=NtGZoZU4BqeRlOdGS8AVaGhykX2jnr5HnlwlsbZbMaQAhnGurdxhC6eFiK4+RYeni4
-         1srxuAOv93MYQj6sEW9M/POuOuCsBnlw0idafH63EJvikEYcGkwKtsKxpgGlaM/CJMzZ
-         zRyfLkytGiFOKsgLkKsLTFB+hTwovBr1xOpmPzgc9P9pWQFyze0piY4JwPTC4F6g+gcN
-         41j9e4B5CUT8MQ2iszMrNyH+aVYhS30StyC8Ds8hWeZYrC88lCIA5zRRm7nH1XWs2Gtn
-         NNvZRuZkPExYijWJYiKRZx42KqMNPS6teFkJQAGt4tKt5qhSo77bgm8WiDYfLF0Ko9fY
-         CRuA==
-X-Forwarded-Encrypted: i=1; AHgh+RqICl4MH05f2XDJWOaBBpN5fcF1sW/Zm/tfwUHSPFqIVLAQgPrMR7+SWJDw4hsI5OwZPXv8IalYj0PuDOg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQylRny5TcBFJm5+aySZ52qtTcej1sa3J87Gnv+cZrInCqtCvz
-	UBQu1aXT9A+D8fEBgfrwRynxAFCydGmqVBpU6o//Rf6yErEXVzRh90Fr
-X-Gm-Gg: AfdE7cnNQLOi2eKePy9I/an32nhPnSmaZXhp6chr0vT81E9IFCsxAbO5Zc0FekgtX1K
-	g7R0a9oC3pNuEOPLcrZgk5P3NPaX5RiSIXYpDgC0DqXcq3X+SPzrGrxsgF34vgMtkI6BCTTUqxu
-	tKxsGD3QVUbeigF6GjVFSJ5CjO4fwRENXbsZW4AJOqlJvcksreVqnPQqDtysR1XHf2RS8hehvMl
-	sBPU77+4qYg2zxN+1pIzMsz/8b9zgNd9cZmccpZMn6osPFRXdnHOWQirMaBJAxeQBUKDvM9iAUY
-	Pgg5e7QW4JzAt4+mnwBLXrHL4KeqoYLb8lAOGFSqS37kaTNORkyb8CMiBzhccCV677wpxxVcViK
-	2CkrU3BOFSoYfZRrMrmXvxZjVRW/AjFfWUrz5IhgeZUBS/g4YWlAPihcy/tEuDtJPGchW9cktmx
-	cqfoUEew==
-X-Received: by 2002:a17:907:9406:b0:c12:6a72:5882 with SMTP id a640c23a62f3a-c15cde71af8mr169523166b.5.1783533551631;
-        Wed, 08 Jul 2026 10:59:11 -0700 (PDT)
+        bh=h3RbPrXYdQbVWUvs+F9bureO/gAjNoSjgQ1E6c4QgBI=;
+        b=oTIenabOafpQh+R5ReCklqX5Y0pMBY6iyErykrnay/f4xxRvBPXDS5o8DRtA4Ne1v7
+         94n6cDtEilcoNa7NIIKURmMg6t5rAuwLIx8g14zE+04Rqc2IlSG4QOhivasDuT6NHakn
+         pRU2meJERYRLgnxc0+r5ahQlbLjNjydVh46apoTy3j1p2XHkdfwu54RqyJY0hly+zdxI
+         +cKzDjTuL+knPRy3N64u36nOM7MkTPQUhcBM0PTAPK8FdCO23Fmo9VZPJmI4gYPahWgs
+         vBqx4vFnFYEGSp+gp8JAjO40jRv/6IeERbmkfzX4hnq/EwWB9OGVcqa3ItTIHqdaVPic
+         rA1g==
+X-Forwarded-Encrypted: i=1; AHgh+RpaRHFnrhSkOCitKYUsSqZ5jY7/iISf3Nf1tnEBwia/MDAxteHFFxU/rmU+5wyipMoOnd0hkd5TKCjE1c4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8UlAv97g4yWsjRt5pg08fXrkinCg2Oo6oB6bfPVNSOZ0+tHAl
+	BCIVK+xPn9zd8JZo+prxNL+wZRPbrFBcfcacwL+Nn1WfkFfDSRX4eP7Z
+X-Gm-Gg: AfdE7clE1WthSZMBwcoI6cTJizv1DWRLaicleJsM3ii+UI6PdWsPwsZoYoAj+BIngVa
+	hrGTwLbf+SOfBQHuuw2gUOYh0HU9b+zUjq5PsQycw1uodzOiJ+e4maSpezfPDvyZuf4Oj7Yl5C6
+	bkUTm5/ND4Yia4T/tqpvOyVvYvaNZ1JaCg+OZdUH3P6QfL4U3x9ZHQMR+IJgyDUM1MRaWOqMVq/
+	Pl2ZBHG1peRXFlhFKDMW5sP4UzKV6Cm3UjdfKNocOd4NkzJvizk+h8wcA8M6dJQoyHIT391rJ3v
+	TKWZvEEPy+1W2z4EcKUCk33igrEGfkqiBRIZOZARvUguc3dqsoabihtOSLe774gVV+WiML/b3cG
+	n6cvkDbJViXEwgn3wk/584eiL4Ady1SqaX+stErb+7bL+4lWTaO7Fk+83PzNpYYDcXQtdw/ED5A
+	VLudbHUXJSaQqMwRkk
+X-Received: by 2002:a17:907:3f18:b0:c11:f4d6:48fc with SMTP id a640c23a62f3a-c15ce1c331cmr188941466b.45.1783533555363;
+        Wed, 08 Jul 2026 10:59:15 -0700 (PDT)
 Received: from olympus.. ([2a0a:ef40:ea3:3f01:2e0:4cff:fe68:285])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c15ad9bcc26sm357653666b.34.2026.07.08.10.59.10
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c15ad9bcc26sm357653666b.34.2026.07.08.10.59.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jul 2026 10:59:11 -0700 (PDT)
+        Wed, 08 Jul 2026 10:59:14 -0700 (PDT)
 From: Dawid Olesinski <dawidro@gmail.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S . Miller" <davem@davemloft.net>,
@@ -72,9 +72,9 @@ Cc: Conor Dooley <conor+dt@kernel.org>,
 	linux-rockchip@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Dawid Olesinski <dawidro@gmail.com>
-Subject: [PATCH v2 3/4] arm64: dts: rockchip: Add crypto node to rk356x-base
-Date: Wed,  8 Jul 2026 18:58:24 +0100
-Message-ID: <20260708175837.1718437-4-dawidro@gmail.com>
+Subject: [PATCH v2 4/4] arm64: dts: rockchip: Add crypto node to rk3588-base
+Date: Wed,  8 Jul 2026 18:58:25 +0100
+Message-ID: <20260708175837.1718437-5-dawidro@gmail.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20260708175837.1718437-1-dawidro@gmail.com>
 References: <20260708175837.1718437-1-dawidro@gmail.com>
@@ -87,43 +87,51 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 Add the device tree node for the V2 cryptographic hardware accelerator
-on RK356x SoCs (RK3566, RK3568).
+on RK3588.
 
-The IP block sits in the non-secure peripheral domain. Its three clocks
-(core, aclk, hclk) and reset line are accessible directly through the
-main non-secure CRU, so no firmware intermediary is required.
+On RK3588 the crypto IP sits inside the secure domain controlled by
+SECURECRU, a register bank that is exclusively accessible to the
+TrustZone firmware (TF-A). Linux must therefore obtain its clocks and
+reset line through the ARM SCMI interface provided by the firmware
+rather than mapping the CRU registers directly. Attempting direct MMIO
+access to SECURECRU from the non-secure world triggers an asynchronous
+bus fault.
+
+The interrupt uses the four-cell GICv3 format as required by the RK3588
+GIC node definition (the fourth cell is the CPU affinity/partition
+specifier; 0 means no affinity constraint).
 
 The node is disabled by default; board files that wish to use hardware
 crypto offload must enable it.
 
 Signed-off-by: Dawid Olesinski <dawidro@gmail.com>
 ---
- arch/arm64/boot/dts/rockchip/rk356x-base.dtsi | 12 ++++++++++++
+ arch/arm64/boot/dts/rockchip/rk3588-base.dtsi | 12 ++++++++++++
  1 file changed, 12 insertions(+)
 
-diff --git a/arch/arm64/boot/dts/rockchip/rk356x-base.dtsi b/arch/arm64/boot/dts/rockchip/rk356x-base.dtsi
-index a5832895bd39..9de7e7487ca1 100644
---- a/arch/arm64/boot/dts/rockchip/rk356x-base.dtsi
-+++ b/arch/arm64/boot/dts/rockchip/rk356x-base.dtsi
-@@ -1112,6 +1112,18 @@ sdhci: mmc@fe310000 {
+diff --git a/arch/arm64/boot/dts/rockchip/rk3588-base.dtsi b/arch/arm64/boot/dts/rockchip/rk3588-base.dtsi
+index fc1fdbfd3162..a7560b09aeb6 100644
+--- a/arch/arm64/boot/dts/rockchip/rk3588-base.dtsi
++++ b/arch/arm64/boot/dts/rockchip/rk3588-base.dtsi
+@@ -2447,6 +2447,18 @@ sdhci: mmc@fe2e0000 {
  		status = "disabled";
  	};
  
-+	crypto: crypto@fe380000 {
-+		compatible = "rockchip,rk3568-crypto";
-+		reg = <0x0 0xfe380000 0x0 0x2000>;
-+		interrupts = <GIC_SPI 4 IRQ_TYPE_LEVEL_HIGH>;
-+		clocks = <&cru CLK_CRYPTO_NS_CORE>, <&cru ACLK_CRYPTO_NS>,
-+			 <&cru HCLK_CRYPTO_NS>;
++	crypto: crypto@fe370000 {
++		compatible = "rockchip,rk3588-crypto";
++		reg = <0x0 0xfe370000 0x0 0x2000>;
++		interrupts = <GIC_SPI 209 IRQ_TYPE_LEVEL_HIGH 0>;
++		clocks = <&scmi_clk SCMI_CRYPTO_CORE>, <&scmi_clk SCMI_ACLK_SECURE_NS>,
++			 <&scmi_clk SCMI_HCLK_SECURE_NS>;
 +		clock-names = "core", "aclk", "hclk";
-+		resets = <&cru SRST_CRYPTO_NS_CORE>;
++		resets = <&scmi_reset SCMI_SRST_CRYPTO_CORE>;
 +		reset-names = "core";
 +		status = "disabled";
 +	};
 +
- 	/*
- 	 * Testing showed that the HWRNG found in RK3566 produces unacceptably
- 	 * low quality of random data, so the HWRNG isn't enabled for all RK356x
+ 	rng@fe378000 {
+ 		compatible = "rockchip,rk3588-rng";
+ 		reg = <0x0 0xfe378000 0x0 0x200>;
 -- 
 2.47.3
 
