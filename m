@@ -1,160 +1,386 @@
-Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FB533C555B;
-	Wed,  8 Jul 2026 10:48:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C2DC425CEE
+	for <linux-crypto@vger.kernel.org>; Wed,  8 Jul 2026 11:16:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783507694; cv=none; b=XIirKnmoK8X4RizhzGRrOtLr3apjp8vwPC5swXlCbgBWNzsraXiOzf0Ryx5a91/yreWrG5qm/nEr/ijRyQ1Q2N1rtsMD/uSe8GCD/D4i4dHFPP7doi7OwliBJjnFSbSTms7C70rfjb+WFpihJeM1teWUwu19x1TqVUT4FfdqSNQ=
+	t=1783509406; cv=none; b=FRP6rFHcVQcwqtsZ6vqXLx3U8QoYdDxx+pQSRlRV5E8nwKcggExN1X9cf7Tdh4mWZGl8x09o24cRZXPQeyD3RldnwMUH2z8lMydUU4VOHAVJ93FOF5v7odnF5U71XosJtwsykzXfW3Nqnb5XmnvooMr/k/ZLlznurIv3yA13Kog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783507694; c=relaxed/simple;
-	bh=C+3z98aoNdTcNqpCFwp6bSQvevvKTWyRxGXhwHiPylE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F1zF79wfUXDnDPyphjUZSM2Tr3L26tmooB7vefZ/YJb4RbAotM3hySTztzuMEnRUgDeAEzez1n/ascfdty4KbshJd2/uIw1wQk5080Q9rhyQDsKAjg+fdnWKra1OUTfSCboP8eExMZ2dl93U7AvfH/SeLC+z+NdRsKk55KPiI4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=kfT0yzHb; arc=none smtp.client-ip=213.167.242.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ideasonboard.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
+	s=arc-20240116; t=1783509406; c=relaxed/simple;
+	bh=E3FC72ljteUGOGcVpTGBp/YrOoyfgnbCfRcJyfB8Y/0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sXV8mho69mYp607A3kWSxoWWJ/hWFV7YPXyKzdG+3goBqULnqtzbIFOw3KHvL8c9gCh2RS7PGXFxhiiEDwQuatF1ONqqpiccG/aAhi1CVcG59Rtxh5r0BLYCL9RbJwvLSSdCBo7zPAO0fJtjROfr2tmBEy1C0LYivg+IDTblmXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b=B1WQrAqk; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="kfT0yzHb"
-Received: from killaraus.ideasonboard.com (2001-14ba-70f3-e800--a06.rev.dnainternet.fi [IPv6:2001:14ba:70f3:e800::a06])
-	by perceval.ideasonboard.com (Postfix) with ESMTPSA id 5722CEAA;
-	Wed,  8 Jul 2026 12:47:08 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
-	s=mail; t=1783507628;
-	bh=C+3z98aoNdTcNqpCFwp6bSQvevvKTWyRxGXhwHiPylE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kfT0yzHb0qI20BNcydafbmbqMKPvItu1evit41y2WDmuzZJF375NKA6R5mnBDcXay
-	 HtJ9pEw62kf7Vuwd9VQiZ7nkfuqHDwq0dJfXMuY7e3bxZFLMtg0xjbp0G8t7VBVERD
-	 /e8LHHX8W+1jRjWXRboYhOUKIRoSHVW0ft77nLPg=
-Date: Wed, 8 Jul 2026 13:47:56 +0300
-From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-To: Yuan Tan <yuantan098@gmail.com>
-Cc: linux-kernel@vger.kernel.org, workflows@vger.kernel.org,
-	jhs@mojatatu.com, gregkh@linuxfoundation.org, sven@narfation.org,
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [RFC] VEGA: a syzbot-like workflow for LLM-found kernel bugs
-Message-ID: <20260708104756.GA333627@killaraus.ideasonboard.com>
-References: <20260708092247.4188498-1-yuantan098@gmail.com>
+	dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b="B1WQrAqk"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-493c7902f47so3885075e9.1
+        for <linux-crypto@vger.kernel.org>; Wed, 08 Jul 2026 04:16:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre.com; s=google; t=1783509396; x=1784114196; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=mrywEV0ctTdfJBRbqMucCmD8SIRnDB8S2VGVl/K2tlQ=;
+        b=B1WQrAqkyKAeldJfqVV7s2dSbXwQoJjseoRi5DSvCfzpd0qXNHkKd7XWWWbRF2pYRD
+         /GLu59mAGSa7ypfuFIWooGSf7sIU+YOSS1QUxd0dUSlRxE7HRzhvnMfXQNQ5MqO7p6//
+         g3i2qsC9UKGPzl1A91f15gcukJTthkd9/hecMLee0+3pllyWPQz1a3G+EwPLlBCLQ930
+         xqYKwRc3oQrds72m0PU1H6VvXrqx3zBBf34hsDSad4OvTjb5xMJtO2KKiKUWQeXyju9U
+         zMFUxbHDWa0PvDBw5NCIMe8VymYDGq2W90YePam1rPa6gdLx1h0oWN6U+d9PysY+QMjS
+         7blQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783509396; x=1784114196;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=mrywEV0ctTdfJBRbqMucCmD8SIRnDB8S2VGVl/K2tlQ=;
+        b=PIdWs07XMcOQBiJux2zN/8zzWz746jJTnXsy/Vn3QanEOPPj8upoUeEVPNiCi8vr4s
+         6Up/XEtzH8hgKc/nklEXRqs/qmkgBPKEuaOTkRZQakVQK8as4kMDi4nMGWzSdh+JIw0x
+         3zQ/uoxnMI8UHRngrw/cOXjihUiHyL0AO11L/z/9inRxQq6WCD6Y/jAXFg7+WzONOVV1
+         t2kcdZ8/8sIoPEWslbNmePh3iQtJPrNZo62qHXTJwTVxvrA0OztpZCYI16fio1vtD+Pd
+         ik29Yi+TlNHbMO/ilWUj3KNKgD/GXa4+DX0mayp3jow1p2JfOnkTCPxkI+yeVlY4lnl0
+         3vdQ==
+X-Forwarded-Encrypted: i=1; AHgh+RpoqnF5ncE6vGlYioeR/aA5+edtMiR4ceZPGQFnZZucucR3VeqJxyFjPLst8lNgI8AvZ7JfCl6ghDTRPYU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzY+iS1q0wmlifl6d3H5rhrOIggsJK6F6qvhSMn7nWHJVEQh4wX
+	DVCDDie97aJX+CKipRuyL6F2KI0YHr/XihRrpluBfHfy8n8nT2oX9F2JjpoqqH2sWcM=
+X-Gm-Gg: AfdE7cmCtHgmyChDIMf4AVGQcMfynKxl/JLE2Hao7Nuag8AtYuHKTh6wSBQuKQGjtQn
+	xGB8Wjgf5SYHlw3sClJO4WapB059+ptvErUr+Yv50dlXQ28+mAa0T1CWEPgsY8UQLzivuOLI9X6
+	62/RWHTRc0RD54rHqyZtyG0rkIEmZs9azPYR7AlG/UNdtky98yP40E6EaDEmWKFUChN6xKC+GiW
+	oyt3NDq5BEEHObquQ2KdDNtV6IHZHEo1Q3nVZhItFzrk0rhHccpkmNyj41VkI6zxAtX7+FS1akX
+	2gVBSQHaNj41ihfooI0TXwbQS1bb09Y6oeS0jMKidA2+fpQK96K1Rin+CNIgKfPfAJR5amdMD7o
+	klHLM7hgrO6Fnswg+FBQdj+gTH8F66NBudasB/ZLHVQxmuj/kpironVzyIOmUcB4m1hT3bCROGV
+	gBFr9T+doFiZhL+qRm/er737Xqupatqw60t+pigg0eBqXsmksPzNokGJXc46jkqVP9nqA8XdKPF
+	/Mm
+X-Received: by 2002:a05:600c:3e07:b0:493:d0b2:bc46 with SMTP id 5b1f17b1804b1-493e6868818mr22405785e9.28.1783509395617;
+        Wed, 08 Jul 2026 04:16:35 -0700 (PDT)
+Received: from localhost (p200300f65f47db04930dc5bd4534e1e5.dip0.t-ipconnect.de. [2003:f6:5f47:db04:930d:c5bd:4534:e1e5])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-47aa0f2186bsm40991012f8f.36.2026.07.08.04.16.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Jul 2026 04:16:35 -0700 (PDT)
+From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig=20=28The=20Capable=20Hub=29?= <u.kleine-koenig@baylibre.com>
+To: Lee Jones <lee@kernel.org>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Ray Jui <rjui@broadcom.com>,
+	Scott Branden <sbranden@broadcom.com>,
+	mfd@lists.linux.dev,
+	linux-rpi-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-mediatek@lists.infradead.org,
+	Qunqin Zhao <zhaoqunqin@loongson.cn>,
+	linux-crypto@vger.kernel.org,
+	Benson Leung <bleung@chromium.org>,
+	Guenter Roeck <groeck@chromium.org>,
+	chrome-platform@lists.linux.dev,
+	Colin Foster <colin.foster@in-advantage.com>,
+	David Rhodes <david.rhodes@cirrus.com>,
+	Richard Fitzgerald <rf@opensource.cirrus.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Mika Westerberg <mika.westerberg@linux.intel.com>,
+	Zha Qipeng <qipeng.zha@intel.com>,
+	Thomas Richard <thomas.richard@bootlin.com>,
+	linux-sound@vger.kernel.org,
+	patches@opensource.cirrus.com,
+	Xu Yilun <yilun.xu@intel.com>,
+	Tom Rix <trix@redhat.com>,
+	Michael Hennerich <michael.hennerich@analog.com>,
+	Chen-Yu Tsai <wens@kernel.org>,
+	Marek Vasut <marek.vasut+renesas@gmail.com>,
+	James Ogletree <jogletre@opensource.cirrus.com>,
+	Fred Treven <fred.treven@cirrus.com>,
+	Ben Bright <ben.bright@cirrus.com>,
+	Support Opensource <support.opensource@diasemi.com>,
+	Andy Shevchenko <andy@kernel.org>,
+	Charles Keepax <ckeepax@opensource.cirrus.com>,
+	Chanwoo Choi <cw00.choi@samsung.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	=?utf-8?q?Andr=C3=A9_Draszik?= <andre.draszik@linaro.org>,
+	Aaro Koskinen <aaro.koskinen@iki.fi>,
+	Andreas Kemnade <andreas@kemnade.info>,
+	Kevin Hilman <khilman@baylibre.com>,
+	Roger Quadros <rogerq@kernel.org>,
+	Tony Lindgren <tony@atomide.com>,
+	Andreas Werner <andreas.werner@men.de>,
+	Samuel Kayode <samkay014@gmail.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	linux-renesas-soc@vger.kernel.org,
+	linux-omap@vger.kernel.org,
+	imx@lists.linux.dev,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Linus Walleij <linusw@kernel.org>,
+	linux@ew.tq-group.com,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Peter Griffin <peter.griffin@linaro.org>,
+	Alim Akhtar <alim.akhtar@samsung.com>,
+	Tim Harvey <tharvey@gateworks.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Sven Peter <sven@kernel.org>,
+	Janne Grunau <j@jannau.net>,
+	Neal Gompa <neal@gompa.dev>,
+	Mathieu Dubois-Briand <mathieu.dubois-briand@bootlin.com>,
+	Luca Ceresoli <luca.ceresoli@bootlin.com>,
+	Saravanan Sekar <sravanhome@gmail.com>,
+	Frank Li <Frank.Li@nxp.com>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	=?utf-8?q?Jonathan_Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
+	Matti Vaittinen <mazziesaccount@gmail.com>,
+	Orson Zhai <orsonzhai@gmail.com>,
+	Baolin Wang <baolin.wang@linux.alibaba.com>,
+	Chunyan Zhang <zhang.lyra@gmail.com>,
+	Fabrice Gasnier <fabrice.gasnier@foss.st.com>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Liviu Dudau <liviu.dudau@arm.com>,
+	Sudeep Holla <sudeep.holla@kernel.org>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	linux-samsung-soc@vger.kernel.org,
+	linux-amlogic@lists.infradead.org,
+	asahi@lists.linux.dev,
+	linux-arm-msm@vger.kernel.org,
+	linux-sunxi@lists.linux.dev,
+	Peter Tyser <ptyser@xes-inc.com>
+Subject: [PATCH v2 00/23] mfd: Use named initializers for arrays of *_device_data
+Date: Wed,  8 Jul 2026 13:15:07 +0200
+Message-ID: <cover.1783507945.git.u.kleine-koenig@baylibre.com>
+X-Mailer: git-send-email 2.55.0.11.g153666a7d9bb
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260708092247.4188498-1-yuantan098@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=10455; i=u.kleine-koenig@baylibre.com; h=from:subject:message-id; bh=E3FC72ljteUGOGcVpTGBp/YrOoyfgnbCfRcJyfB8Y/0=; b=owGbwMvMwMXY3/A7olbonx/jabUkhiw/Q5s+Y/k2o7lHpivyHIncWbh850X+jPRNklNv1OUu/ aWVzvewk9GYhYGRi0FWTJHFvnFNplWVXGTn2n+XYQaxMoFMYeDiFICJ6DzjYNhU8rM+z2p9eUKp X1D4b7MgQ+8ZqyOSv7Hly5nxhf09eenT9602CQJvrz87OONjYenZm5cfbCrentXdUvfpl1LULqm vCz+Y/NeomcT78CvDzuQarcm2nqbGuxt+nDQy9Fvl4jj12VypDMGQn2tfsjCqzT+Q8exTr5y7uW 1Mof0UwSWvw9kDPv6Sl/9QEb55R4O8Z50Na0JXpv3mojvlJ3IaPimrTq5j8NnI/GBy80pWY1425 8WWlXaaqq8Xd//uqxOqmf4rfH2+SPMx1jutu47e3ee2fXXW8kPuV/jsZF92d/2/JDI33HRW8VXe lcY/VdmSz/ZZ3L/rLG5q2aFRGFnzmTVxnUrCasvcTyvdAQ==
+X-Developer-Key: i=u.kleine-koenig@baylibre.com; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jul 08, 2026 at 02:22:47AM -0700, Yuan Tan wrote:
-> Hi all,
-> 
-> We would like to ask for feedback on a proposed workflow for reporting Linux
-> kernel bugs found by an LLM-assisted code auditing tool that we have
-> been developing since earlier this year.
-> 
-> Since February, we have been developing an LLM-driven kernel code auditing
-> tool called VEGA. It started as a side project, but the results became much
-> substantial than we expected: VEGA has found hundreds of valid bugs in Linux
-> kernel.
-> 
-> That immediately created a practical problem: we do not want to dump a large
-> pile of bug reports onto mail lists and annoy the maintainers.
-> 
-> The first thing we tried was to fix as many as we could ourselves. We
-> started working with a group of student volunteers. Most of them are
-> college students, so we have been training them, reviewing their patches,
-> and trying to build an internal review process before anything is sent to
-> the mailing list. The goal is to turn these findings into useful fixes, and
-> also to help new contributors grow into people who can reduce maintainer
-> workload instead of adding to it.
-> 
-> The process was not perfect. Some patches were not good enough, and we also
-> made some mistakes early on when deciding what should be called a security
-> issue.  Our internal review process has been improving with the help of the
-> community.
-> 
-> Since March, we picked up non-root triggerable bug first and have worked on
-> fixes for more than 100 validated kernel bugs. we especially want to thank
-> the students and professor who have helped a lot with this effort.
-> 
-> But the remaining queue is still too large for us to handle.
-> 
-> Recently Jamal pointed out problems around our tags. That made me realize
-> that we should probably stop treating this as an ad-hoc patch effort and
-> build something closer to syzbot: public, reproducible, trackable,
-> deduplicated, and useful to maintainers.
-> 
-> So this mail is an RFC for a VEGA reporting workflow.
-> 
-> The rough idea
-> ==============
-> 
-> VEGA would have a public dashboard, similar to syzbot, and would
-> send selected bug reports to the relevant kernel mailing lists.
-> 
-> The goal is to send reports that contain enough information for maintainers
-> or other developers to pick up, understand, reproduce and fix the issue.
-> 
-> For each public report, we expect to include:
-> 
->   - a description of the bug
->   - the tested kernel tree and commit
->   - the kernel config and environment
->   - the crash log
->   - a minimized user-space reproducer
->   - the suspected introducing commit
->   - a suggested fix patch
-> 
-> The suggested fix patch is meant to reduce maintainer burden. It still need
-> human review, but hopefully it can save a lot time from building a patch
-> from scratch.
+Hello,
 
-Will the information included in the public report (including the
-suggested fix) be written by a human or an LLM ? In the latter case I
-don't see how you could reasonably claim to reduce maintainer burden, so
-that would be a big NACK as far as I'm concerned.
+this series superseeds my previous patch "[PATCH v1] mfd: Use named
+initializers for arrays of i2c_device_data"
+(https://lore.kernel.org/lkml/20260515095839.4005460-2-u.kleine-koenig@baylibre.com)
+that Lee asked me to rebase and also the series "[PATCH v1 0/3] mfd:
+Initialize spi_device_id arrays using member names"
+(https://lore.kernel.org/lkml/cover.1783003256.git.u.kleine-koenig@baylibre.com).
 
-> What will be public
-> ===================
-> 
-> All VEGA findings that we have evaluated as not having major security
-> impact can be published on the VEGA dashboard. The dashboard would make it
-> possible to see what VEGA found, whether the issue was reproduced, whether
-> a fix exists, whether it was reported to a mailing list, and whether it has
-> been fixed upstream.
-> 
-> For issues that we have validated as having possible serious security
-> impact, we will not publish it on the public dashboard before going through
-> the appropriate kernel security process.
-> 
-> Dumping everything onto the mailing list may be annoying. During the initial
-> stage, reports will be rate-limited and sent manually. We will check for
-> duplicates against lore/upstream, and make sure the issue is not already
-> fixed or reported.
-> 
-> Report identity and tags
-> ========================
-> 
-> Each public VEGA report will have a stable identity, similar to
-> syzbot reports.
-> 
-> One possible format is:
-> 
->   Reported-by: VEGA <vega+HASH@DOMAIN>
->   Closes: <public dashboard URL>
-> 
-> =========
-> 
-> We would like to hear what maintainers think about this before we start
-> sending these reports.
-> 
-> We do not want VEGA to become another source of mailing list noise. The goal
-> is to make LLM-based bug finding transparent and useful, and to make sure
-> the reports come with enough context, reproducers, suggested fixes, and
-> tracking so that they reduce work rather than create more.
+The objective for this series is to prepare mfd for changing
+of_device_id etc to make driver_data a union, see
+https://lore.kernel.org/all/cover.1780048925.git.u.kleine-koenig@baylibre.com/
+for the idea behind it.
 
+This series is based on yesterday's next/master and it does the
+restructuring not only for i2c and spi (as the two series mentioned
+above), but for all *_device_id structures that I intend to modify with
+a union that affect mfd. So (I hope) this is the only patch series
+affecting mfd for this quest.
+
+I don't care much about the last few patches unifying the coding style.
+I think it's a good opportunity to do that, but if you don't like them,
+just don't apply these.
+
+Best regards
+Uwe
+
+Uwe Kleine-König (The Capable Hub) (23):
+  mfd: bcm2835-pm: Remove member of struct bcm2835_pm that is only used
+    locally
+  mfd: bcm2835-pm: Drop unused header
+  mfd: kempld: Simplify device abstraction
+  mfd: lp87565: Explicitly set driver data for the generic dt compatible
+  mfd: mt6360: Drop irrelevant __maybe_unused
+  mfd: rt4831: Drop irrelevant __maybe_unused
+  mfd: loongson-se: Drop unused assignment of acpi_device_id driver data
+  mfd: Drop unused assignment of i2c_device_id driver data
+  mfd: Drop unused assignment of platform_device_id driver data
+  mfd: Drop unused assignment of spi_device_id driver data
+  mfd: Use named initializers for acpi_device_id arrays
+  mfd: intel-m10-bmc-pmci: Use named initializers for dfl_device_id
+    array
+  mfd: Use named initializers for arrays of i2c_device_id
+  mfd: twl6030: Use named initializers for of_device_id
+  mfd: Use PCI_DEVICE* macros to initialize pci_device_id arrays
+  mfd: Use named initializers for platform_device_id array
+  mfd: Use named initializers for arrays of spi_device_id
+  mfd: Unify style of acpi_device_id arrays
+  mfd: Unify style of dmi_system_id arrays
+  mfd: Unify style of i2c_device_id arrays
+  mfd: Unify style of of_device_id arrays
+  mfd: Unify style of pci_device_id arrays
+  mfd: Unify style of spi_device_id arrays
+
+ drivers/mfd/88pm800.c                 |  4 +-
+ drivers/mfd/88pm805.c                 |  4 +-
+ drivers/mfd/88pm860x-core.c           |  8 ++--
+ drivers/mfd/aat2870-core.c            |  2 +-
+ drivers/mfd/ab8500-core.c             |  8 ++--
+ drivers/mfd/ab8500-sysctrl.c          |  4 +-
+ drivers/mfd/ac100.c                   |  2 +-
+ drivers/mfd/act8945a.c                |  8 ++--
+ drivers/mfd/adp5520.c                 |  4 +-
+ drivers/mfd/altera-a10sr.c            |  4 +-
+ drivers/mfd/altera-sysmgr.c           |  2 +-
+ drivers/mfd/arizona-i2c.c             | 14 +++----
+ drivers/mfd/arizona-spi.c             | 14 +++----
+ drivers/mfd/as3711.c                  |  8 ++--
+ drivers/mfd/as3722.c                  |  8 ++--
+ drivers/mfd/atmel-hlcdc.c             |  2 +-
+ drivers/mfd/atmel-smc.c               |  2 +-
+ drivers/mfd/axp20x-i2c.c              | 26 ++++++------
+ drivers/mfd/axp20x-rsb.c              |  2 +-
+ drivers/mfd/bcm2835-pm.c              | 15 +++++--
+ drivers/mfd/bcm590xx.c                |  4 +-
+ drivers/mfd/bd9571mwv.c               |  6 +--
+ drivers/mfd/bq257xx.c                 |  8 ++--
+ drivers/mfd/cgbc-core.c               |  2 +-
+ drivers/mfd/cros_ec_dev.c             |  2 +-
+ drivers/mfd/cs40l50-i2c.c             |  6 +--
+ drivers/mfd/cs40l50-spi.c             |  6 +--
+ drivers/mfd/cs42l43-i2c.c             |  8 ++--
+ drivers/mfd/cs5535-mfd.c              |  2 +-
+ drivers/mfd/da903x.c                  |  6 +--
+ drivers/mfd/da9052-i2c.c              | 12 +++---
+ drivers/mfd/da9052-spi.c              | 12 +++---
+ drivers/mfd/da9055-i2c.c              |  2 +-
+ drivers/mfd/da9062-core.c             |  4 +-
+ drivers/mfd/da9063-i2c.c              | 11 ++---
+ drivers/mfd/da9150-core.c             |  4 +-
+ drivers/mfd/db8500-prcmu.c            |  4 +-
+ drivers/mfd/exynos-lpass.c            |  2 +-
+ drivers/mfd/gateworks-gsc.c           |  2 +-
+ drivers/mfd/hi6421-pmic-core.c        |  6 +--
+ drivers/mfd/hi655x-pmic.c             |  4 +-
+ drivers/mfd/intel-lpss-acpi.c         | 58 +++++++++++++--------------
+ drivers/mfd/intel-m10-bmc-pmci.c      |  2 +-
+ drivers/mfd/intel-m10-bmc-spi.c       |  6 +--
+ drivers/mfd/intel_pmc_bxt.c           |  2 +-
+ drivers/mfd/intel_quark_i2c_gpio.c    |  6 +--
+ drivers/mfd/intel_soc_pmic_bxtwc.c    |  2 +-
+ drivers/mfd/intel_soc_pmic_chtdc_ti.c |  4 +-
+ drivers/mfd/intel_soc_pmic_chtwc.c    |  2 +-
+ drivers/mfd/intel_soc_pmic_crc.c      |  6 +--
+ drivers/mfd/intel_soc_pmic_mrfld.c    |  4 +-
+ drivers/mfd/ioc3.c                    |  4 +-
+ drivers/mfd/janz-cmodio.c             | 14 +++----
+ drivers/mfd/kempld-core.c             | 29 ++++++--------
+ drivers/mfd/khadas-mcu.c              |  4 +-
+ drivers/mfd/lm3533-core.c             |  2 +-
+ drivers/mfd/lochnagar-i2c.c           |  2 +-
+ drivers/mfd/loongson-se.c             |  2 +-
+ drivers/mfd/lp3943.c                  |  4 +-
+ drivers/mfd/lp873x.c                  |  4 +-
+ drivers/mfd/lp87565.c                 |  9 +++--
+ drivers/mfd/lp8788.c                  |  2 +-
+ drivers/mfd/lpc_ich.c                 |  2 +-
+ drivers/mfd/macsmc.c                  |  2 +-
+ drivers/mfd/madera-core.c             |  2 +-
+ drivers/mfd/madera-i2c.c              | 18 ++++-----
+ drivers/mfd/madera-spi.c              | 18 ++++-----
+ drivers/mfd/max14577.c                |  4 +-
+ drivers/mfd/max7360.c                 |  2 +-
+ drivers/mfd/max77541.c                |  4 +-
+ drivers/mfd/max77620.c                |  8 ++--
+ drivers/mfd/max77686.c                |  2 +-
+ drivers/mfd/max77693.c                |  2 +-
+ drivers/mfd/max77714.c                |  2 +-
+ drivers/mfd/max77759.c                |  4 +-
+ drivers/mfd/max77843.c                |  8 ++--
+ drivers/mfd/max8907.c                 |  6 +--
+ drivers/mfd/max8925-i2c.c             |  4 +-
+ drivers/mfd/max8997.c                 |  6 +--
+ drivers/mfd/max8998.c                 |  6 +--
+ drivers/mfd/mc13xxx-spi.c             |  6 +--
+ drivers/mfd/menelaus.c                |  2 +-
+ drivers/mfd/menf21bmc.c               |  2 +-
+ drivers/mfd/motorola-cpcap.c          | 12 +++---
+ drivers/mfd/mp2629.c                  |  2 +-
+ drivers/mfd/mt6360-core.c             |  6 +--
+ drivers/mfd/mt6370.c                  |  2 +-
+ drivers/mfd/mt6397-core.c             |  4 +-
+ drivers/mfd/mxs-lradc.c               |  4 +-
+ drivers/mfd/ntxec.c                   |  4 +-
+ drivers/mfd/ocelot-spi.c              |  2 +-
+ drivers/mfd/omap-usb-host.c           |  4 +-
+ drivers/mfd/palmas.c                  |  8 ++--
+ drivers/mfd/pf1550.c                  |  2 +-
+ drivers/mfd/qcom-pm8008.c             |  4 +-
+ drivers/mfd/qcom-pm8xxx.c             |  6 +--
+ drivers/mfd/rc5t583.c                 |  4 +-
+ drivers/mfd/rdc321x-southbridge.c     |  2 +-
+ drivers/mfd/retu-mfd.c                |  4 +-
+ drivers/mfd/rk8xx-i2c.c               |  2 +-
+ drivers/mfd/rk8xx-spi.c               |  2 +-
+ drivers/mfd/rohm-bd71828.c            |  4 +-
+ drivers/mfd/rohm-bd9576.c             |  6 +--
+ drivers/mfd/rsmu_i2c.c                | 18 ++++-----
+ drivers/mfd/rsmu_spi.c                | 14 +++----
+ drivers/mfd/rt4831.c                  |  6 +--
+ drivers/mfd/rt5033.c                  |  4 +-
+ drivers/mfd/rz-mtu3.c                 |  2 +-
+ drivers/mfd/sec-acpm.c                |  6 +--
+ drivers/mfd/sec-i2c.c                 | 22 +++++-----
+ drivers/mfd/si476x-i2c.c              |  8 ++--
+ drivers/mfd/simple-mfd-i2c.c          |  2 +-
+ drivers/mfd/sky81452.c                |  4 +-
+ drivers/mfd/sm501.c                   |  4 +-
+ drivers/mfd/smpro-core.c              |  2 +-
+ drivers/mfd/sprd-sc27xx-spi.c         |  4 +-
+ drivers/mfd/ssbi.c                    |  2 +-
+ drivers/mfd/stm32-lptimer.c           |  4 +-
+ drivers/mfd/stm32-timers.c            |  4 +-
+ drivers/mfd/stmfx.c                   |  4 +-
+ drivers/mfd/stmpe-i2c.c               | 34 ++++++++--------
+ drivers/mfd/stmpe-spi.c               | 26 ++++++------
+ drivers/mfd/stw481x.c                 |  8 ++--
+ drivers/mfd/sun6i-prcm.c              |  2 +-
+ drivers/mfd/tc3589x.c                 | 14 +++----
+ drivers/mfd/ti-lmu.c                  | 10 ++---
+ drivers/mfd/timberdale.c              |  2 +-
+ drivers/mfd/tps6105x.c                |  6 +--
+ drivers/mfd/tps65010.c                | 10 ++---
+ drivers/mfd/tps6507x.c                |  6 +--
+ drivers/mfd/tps65086.c                |  4 +-
+ drivers/mfd/tps65090.c                |  6 +--
+ drivers/mfd/tps65217.c                |  6 +--
+ drivers/mfd/tps65218.c                |  8 ++--
+ drivers/mfd/tps65219.c                |  8 ++--
+ drivers/mfd/tps6586x.c                |  6 +--
+ drivers/mfd/tps65910.c                | 12 +++---
+ drivers/mfd/tps65912-i2c.c            |  4 +-
+ drivers/mfd/tps65912-spi.c            |  4 +-
+ drivers/mfd/tps6594-i2c.c             | 12 +++---
+ drivers/mfd/tps6594-spi.c             | 12 +++---
+ drivers/mfd/tqmx86.c                  |  2 +-
+ drivers/mfd/twl-core.c                | 22 +++++-----
+ drivers/mfd/twl4030-audio.c           |  4 +-
+ drivers/mfd/twl4030-power.c           |  2 +-
+ drivers/mfd/twl6030-irq.c             |  6 +--
+ drivers/mfd/twl6040.c                 |  4 +-
+ drivers/mfd/upboard-fpga.c            |  6 +--
+ drivers/mfd/vexpress-sysreg.c         |  4 +-
+ drivers/mfd/vx855.c                   |  2 +-
+ drivers/mfd/wm831x-core.c             |  2 +-
+ drivers/mfd/wm831x-i2c.c              | 14 +++----
+ drivers/mfd/wm831x-spi.c              | 16 ++++----
+ drivers/mfd/wm8350-i2c.c              |  6 +--
+ drivers/mfd/wm8400-core.c             |  4 +-
+ drivers/mfd/wm8994-core.c             |  8 ++--
+ include/linux/mfd/bcm2835-pm.h        |  9 -----
+ include/linux/mfd/kempld.h            |  2 -
+ 158 files changed, 518 insertions(+), 521 deletions(-)
+
+
+base-commit: 8e9685d3c41c35dd1b37df70d854137abcb2fbac
 -- 
-Regards,
+2.55.0.11.g153666a7d9bb
 
-Laurent Pinchart
