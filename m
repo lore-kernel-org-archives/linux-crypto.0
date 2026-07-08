@@ -1,226 +1,114 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A043DD521;
-	Wed,  8 Jul 2026 15:03:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 847323F12F5;
+	Wed,  8 Jul 2026 15:04:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783523037; cv=none; b=ZF4u+RqgrrCFss8agW2CLAyakwH13STtT6civ8q5wqCulph7v8649OPXoDOSX4RBevKCAhoRVf0AHB/sudD2i7YmoGC1DqI92PL/2GAUaXSqFwjt5o8mCT5PZbYohoRh7eKMb6J4s6LG/QlO0RYQNSpSXrzlrYmTDm70wI1yaow=
+	t=1783523079; cv=none; b=YxhflrfB9a9BwWSMDKYC536TaYVXcsEZmc0roObpOxdpyux17ZCxs7RAjkSQoKIXGyEyf0dVULjnBPJ4yi5NtIjBiOOvoeqJ6kAiUwWkPvIOX1Gc9R1vIjvYtLYNVsZ3j7pTnnfgI348Y/aLAQ5Jwn3dzBkdGq+7vhBoAQx9C/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783523037; c=relaxed/simple;
-	bh=ozbDkpERH6eS7Si13V6qz2k1Ockh5KC4ASIiPUGSquM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pzoXD8s0Y7vtEjaD24cpdWu2m3XS+hNjTCFah44/punG74VAgsEPOJYDfCisJqe/YmqG4VQDI0P0i1oqW7Z/VMxOA22P+KzAJG8Mp2zZeeDINaR1Yd8KvhDOxwUv8uoCrNnqlKmFbbsjQtAANOQbyT6vpseklUyUFEyhLe6HiXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VZE4IpdL; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783523079; c=relaxed/simple;
+	bh=q6WzhvHEK1zBLo09d+1w9A+q4i17hzUyPxyhhhNLWOw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KJwq9bTVxJd7Z3uIZXyyiVpo6100q//dzC2aIzBQ/7ObT7ksDti3Zlhgq3x+KHtDW6iKSom9TG35DKxbL3gzXeJJw8qJ6JKAlU9RK50MKIuk2Z0gLfWbTkkfjUlpKPxEiVkeq4niJW77UeTK9/zsrunW6Tdi0KCg8yC6ZEp9F5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hUqtXPlC; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VZE4IpdL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E142E1F000E9;
-	Wed,  8 Jul 2026 15:03:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783523035;
-	bh=6lOoLeoST3DsMEdt45LFc9dqUSr7Eq3hHB2+CBF1gOw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=VZE4IpdLkxSA6/ssYYZglkjwkarWp6PACqjBRVN7rZMu33kN7uVCm/knysW6QSxZW
-	 qeND1nAPyQQJmjSqDfNZ71w1L5I+fdTjACI7TO14Yh12lHGkEhmY+U370bqAf71zSZ
-	 o2GXktfup2Kkp4owd9aOPSiKZ6Gm0OHtDX2o/DqBTWkNZLk/bwtuDvykxzbjlFb5NR
-	 tUd+i6MlfWmAAyeF2BnbsrH7kdHbB0c93/WSBstR/gp9FQe+86i2xqf8sPTcPFZVC4
-	 EzuSibQyyuupSkfC0kvE1koG9lxW2yshIiE8CZBCmN3RRAGUFANXL/K5+ubEDeXPOT
-	 +rNumVN+199nw==
-Date: Wed, 8 Jul 2026 16:03:51 +0100
-From: Lee Jones <lee@kernel.org>
-To: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Cc: chenhuacai@kernel.org, xry111@xry111.site, linux-kernel@vger.kernel.org,
-	loongarch@lists.linux.dev, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v4 2/2] mfd: loongson-se: Add multi-node support
-Message-ID: <20260708150351.GI2108533@google.com>
-References: <20260629071109.7341-1-zhaoqunqin@loongson.cn>
- <20260629071109.7341-3-zhaoqunqin@loongson.cn>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hUqtXPlC"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1783523073;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=N0tnrtHNCdPPaeil/2FJ7xhWeZJlpBvAHaqYCxTjbds=;
+	b=hUqtXPlCKELHA6EiN9LfGfbVZe4c7bDuZoHBgOwhbzi72GRUinJRiobYqhbd/jB69TgpCU
+	8ruYxUGJpT6Umayo14BjAa/WAKGrtjcJUBr2/RxhA/o6dtB6FTwQ6h2kkEurFMzvOVlz71
+	GbUIvRFoXa2Ntr6oXNd2vuc4M8jkNDo=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Thorsten Blum <thorsten.blum@linux.dev>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>
+Cc: linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: atmel-sha204a - clear RNG data from memory
+Date: Wed,  8 Jul 2026 17:04:00 +0200
+Message-ID: <20260708150359.545852-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260629071109.7341-3-zhaoqunqin@loongson.cn>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2157; i=thorsten.blum@linux.dev; h=from:subject; bh=q6WzhvHEK1zBLo09d+1w9A+q4i17hzUyPxyhhhNLWOw=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFl+afc5ply5Gz+/81i136fpd7unxxkaGBaG3z2zJu7Vu i/3A9YKdZSyMIhxMciKKbI8mPVjhm9pTeUmk4idMHNYmUCGMHBxCsBEJjowMjT3b2z7njlNdvpB rmj3EpuOgM7jv+81Oq4tnj5B2MjIwJmR4U+j5oRbjI4ch1JWbbdb95dp4Z/tQmtMuj92HNvazJ7 Lyg8A
+X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Same here please.
+In atmel_sha204a_rng_read(), use memzero_explicit() to clear the local
+stack variable cmd before it goes out of scope, since cmd.data may still
+hold the last 32 random bytes.
 
-/* Sashiko Automation: Issues Found (6 Findings) */
+Since atmel_sha204a_rng_done() caches work_data in hwrng::priv, and its
+response data is later used as RNG entropy, use kfree_sensitive() to
+clear the cached data on transaction failure and device removal.
 
-On Mon, 29 Jun 2026, Qunqin Zhao wrote:
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+ drivers/crypto/atmel-sha204a.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-> On the Loongson platform, each node is equipped with a security engine
-> device. However, due to a hardware flaw, only the device on node 0 can
-> trigger interrupts. Therefore, interrupts from other nodes are forwarded
-> by node 0. We need to check in the interrupt handler of node 0 whether
-> this interrupt is intended for other nodes, this can be accomplished via
-> shared interrupt handling.
-> 
-> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
-> ---
->  drivers/mfd/loongson-se.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/mfd/loongson-se.c b/drivers/mfd/loongson-se.c
-> index aa34e663c4..2f296faa97 100644
-> --- a/drivers/mfd/loongson-se.c
-> +++ b/drivers/mfd/loongson-se.c
-> @@ -142,6 +142,11 @@ static irqreturn_t se_irq_handler(int irq, void *dev_id)
->  
->  	int_status = readl(se->base + SE_S2LINT_STAT);
->  
-> +	if (int_status == 0) {
-> +		spin_unlock(&se->dev_lock);
-> +		return IRQ_NONE;
-> +	}
-> +
->  	/* For controller */
->  	if (int_status & SE_INT_CONTROLLER) {
->  		complete(&se->cmd_completion);
-> @@ -222,7 +227,7 @@ static int loongson_se_probe(struct platform_device *pdev)
->  
->  	for (i = 0; i < nr_irq; i++) {
->  		irq = platform_get_irq(pdev, i);
-> -		err = devm_request_irq(dev, irq, se_irq_handler, 0, "loongson-se", se);
-> +		err = devm_request_irq(dev, irq, se_irq_handler, IRQF_SHARED, "loongson-se", se);
+diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha204a.c
+index 5eb76245347d..21a84c29c9b7 100644
+--- a/drivers/crypto/atmel-sha204a.c
++++ b/drivers/crypto/atmel-sha204a.c
+@@ -15,6 +15,7 @@
+ #include <linux/module.h>
+ #include <linux/scatterlist.h>
+ #include <linux/slab.h>
++#include <linux/string.h>
+ #include <linux/sysfs.h>
+ #include <linux/workqueue.h>
+ #include "atmel-i2c.h"
+@@ -35,7 +36,7 @@ static void atmel_sha204a_rng_done(struct atmel_i2c_work_data *work_data,
+ 		dev_warn_ratelimited(&i2c_priv->client->dev,
+ 				     "i2c transaction failed (%d)\n",
+ 				     status);
+-		kfree(work_data);
++		kfree_sensitive(work_data);
+ 		atomic_dec(&i2c_priv->tfm_count);
+ 		return;
+ 	}
+@@ -95,12 +96,15 @@ static int atmel_sha204a_rng_read(struct hwrng *rng, void *data, size_t max,
+ 
+ 	ret = atmel_i2c_send_receive(i2c_priv->client, &cmd);
+ 	if (ret)
+-		return ret;
++		goto out;
+ 
+ 	max = min(RANDOM_RSP_SIZE - CMD_OVERHEAD_SIZE, max);
+ 	memcpy(data, &cmd.data[RSP_DATA_IDX], max);
++	ret = max;
+ 
+-	return max;
++out:
++	memzero_explicit(&cmd, sizeof(cmd));
++	return ret;
+ }
+ 
+ static int atmel_sha204a_otp_read(struct i2c_client *client, u16 addr, u8 *otp)
+@@ -209,7 +213,7 @@ static void atmel_sha204a_remove(struct i2c_client *client)
+ 	devm_hwrng_unregister(&client->dev, &i2c_priv->hwrng);
+ 	atmel_i2c_flush_queue();
+ 
+-	kfree((void *)i2c_priv->hwrng.priv);
++	kfree_sensitive((void *)i2c_priv->hwrng.priv);
+ }
+ 
+ static const struct of_device_id atmel_sha204a_dt_ids[] = {
 
-[Severity: High]
-Could unmasking interrupts before registering the shared handler create a
-race condition?
-
-Because writel(SE_INT_ALL, se->base + SE_S2LINT_EN) is called earlier in
-loongson_se_probe() to unmask interrupts, registering a shared interrupt
-handler here means that if node 1's interrupts are unmasked, it could
-instantly assert the shared IRQ line.
-
-Since node 1 hasn't fully registered its handler yet, node 0's handler might
-return IRQ_NONE, causing the kernel to repeatedly receive an unhandled
-interrupt and eventually disable the IRQ line.
-
-
-
-[Severity: High]
-This is a pre-existing issue, but might the new use of IRQF_SHARED expose an
-uninitialized completion object in the interrupt handler?
-
-The completion structures for the engines are zero-allocated via
-devm_kzalloc() in loongson_se_probe() and are only initialized later in
-loongson_se_init_engine().
-
-If a pending or spurious engine interrupt fires on the shared line before
-the child engine devices are fully initialized, the handler will execute:
-
-se_irq_handler()
-    ...
-    while (int_status) {
-        id = __ffs(int_status);
-        if (id < SE_ENGINE_MAX)
-            complete(&se->engines[id].completion);
-
-Calling complete() here on a zeroed structure dereferences a NULL
-wait.head.next pointer, which could cause a kernel panic.
-
-
->  		if (err) {
->  			dev_err(dev, "failed to request IRQ: %d\n", irq);
->  			return err;
-> @@ -233,7 +238,7 @@ static int loongson_se_probe(struct platform_device *pdev)
->  	if (err)
->  		return err;
->  
-> -	return devm_mfd_add_devices(dev, PLATFORM_DEVID_NONE, engines,
-> +	return devm_mfd_add_devices(dev, PLATFORM_DEVID_AUTO, engines,
->  				    ARRAY_SIZE(engines), NULL, 0, NULL);
->  }
-
-[Severity: Critical]
-This isn't a bug introduced by this patch, but does the probe error path leak
-running hardware state?
-
-loongson_se_init() configures the hardware to use the allocated DMA memory
-and sends SE_CMD_START. If devm_mfd_add_devices() fails here, the probe
-returns an error and devres frees the DMA memory.
-
-However, the hardware is never sent SE_CMD_STOP in the error path. It
-remains active and retains a pointer to the freed DMA memory, which could
-allow it to corrupt system memory via DMA.
-
-
-
-[Severity: High]
-This is a pre-existing issue, but are hardware interrupts left globally
-enabled if probe fails or the device is removed?
-
-loongson_se_probe() unconditionally enables all hardware interrupts earlier
-via writel(SE_INT_ALL, se->base + SE_S2LINT_EN). If devm_mfd_add_devices()
-fails, the probe function returns an error and the IRQ handler is
-unregistered, but the hardware interrupts are never masked.
-
-Similarly, loongson_se_remove() stops the controller but fails to write 0
-to the interrupt enable register.
-
-Because the IRQ is shared, a pending interrupt from this device could
-continuously trigger the shared IRQ line without a registered handler to
-clear it, causing an unhandled interrupt storm that forces the kernel to
-permanently disable the IRQ line.
-
-While reviewing the completion handling in this driver, I noticed a couple
-other pre-existing issues outside the scope of this diff:
-
-
-
-[Severity: High]
-This isn't a bug introduced by this patch, but does re-initializing the
-completion variable after triggering the hardware create a race condition?
-
-Looking at loongson_se_send_engine_cmd():
-
-loongson_se_send_engine_cmd()
-    ...
-    loongson_se_poll() // triggers hardware and reenables interrupts
-    ...
-    reinit_completion(&engine->completion);
-    ...
-    wait_for_completion_interruptible(&engine->completion);
-
-If the hardware completes the command quickly after loongson_se_poll()
-unmasks interrupts, it triggers an interrupt. The handler will call
-complete(), but then execution resumes in loongson_se_send_engine_cmd()
-where reinit_completion() clears the completion state.
-
-This would cause the subsequent wait_for_completion_interruptible() to hang
-indefinitely since the completion event was lost.
-
-
-
-[Severity: High]
-This is a pre-existing issue, but could missing completion re-initialization
-cause controller commands to falsely return success?
-
-Looking at loongson_se_send_controller_cmd():
-
-loongson_se_send_controller_cmd()
-    ...
-    // hardware triggered
-    return wait_for_completion_interruptible(&se->cmd_completion);
-
-The function waits on the completion without first calling
-reinit_completion() to clear any leftover state.
-
-If a previous wait was interrupted by a signal (returning -ERESTARTSYS),
-the hardware may still complete later, leaving a positive done count in
-the completion structure. On the next call to
-loongson_se_send_controller_cmd(), wait_for_completion_interruptible()
-would immediately consume the leftover count and return success before the
-new hardware command has actually finished. This could break serialization
-and corrupt hardware or DMA state.
-
->  
-> -- 
-> 2.47.2
-> 
-
--- 
-Lee Jones
+base-commit: e264401ce4776a288524e5b87593d4d864147115
