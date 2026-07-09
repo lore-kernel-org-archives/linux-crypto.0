@@ -1,110 +1,93 @@
-Received: from cyan.elm.relay.mailchannels.net (cyan.elm.relay.mailchannels.net [23.83.212.47])
+Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8223637757F
-	for <linux-crypto@vger.kernel.org>; Thu,  9 Jul 2026 14:32:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.83.212.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0671536CE03;
+	Thu,  9 Jul 2026 14:39:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783607539; cv=none; b=l0pHBmPxfsUodmRPHZplj0BSVk+YT1ZmDX9RcCfHbMz3Eqv3RLD25fzhPu13z+1ypURGkwJomzvkCzBCT/nXLEr0kgnLcxiGrfBGkROnkkCMoI2ZU48/ktX3XV3wZSAYpyUgo4ALOUVNrEQU02IxwRcpNfjm++WPW1OmUxcsO5I=
+	t=1783607968; cv=none; b=ujSgvRX8E83xEq6TLn1gfhHcg6ABtJNnUlw2zCW6xVjgV3YsObU2Nr9+GSauXxUFAbJmVh656yQcGXaireoDlALqTRer9Lw/YOSsvCXis58a1KL4k35/ETAmxjH4TLuJ0855Z03SlKrFjjnN3jbr5TdWnN3Qz2/ixTMzaJcEQ9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783607539; c=relaxed/simple;
-	bh=V0a2ILp/tCsE6dw0LWeROasiy4crFA3UOludhXO5JsE=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=G1optxYpcSlZZP6cjuQ9oOc+H1IMC1uQyRQMBT3C4sZRDd15jjsAsh4bXpbGKM/nLxHa8H1FpWe44sqok3Sau6uW2WdCCfOI5T4SHVrVYZQOrHbc5P3Jx/0aq2dIKafOga8/FKpgOOu5WHJEn0aeTkGGDSAHeEGLmb1APk5ARNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=scientia.org; spf=pass smtp.mailfrom=scientia.org; arc=none smtp.client-ip=23.83.212.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=scientia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=scientia.org
-X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-	by relay.mailchannels.net (Postfix) with ESMTP id 6D764722AE1;
-	Thu, 09 Jul 2026 12:38:55 +0000 (UTC)
-Received: from cpanel-007-fra.hostingww.com (trex-green-6.trex.outbound.svc.cluster.local [100.99.18.246])
-	(Authenticated sender: instrampxe0y3a)
-	by relay.mailchannels.net (Postfix) with ESMTPA id 1CFF7722D10;
-	Thu, 09 Jul 2026 12:38:53 +0000 (UTC)
-X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
-X-MC-Relay: Neutral
-X-MC-Copy: stored-urls
-X-MailChannels-SenderId: instrampxe0y3a|x-authuser|calestyo@scientia.org
-X-MailChannels-Auth-Id: instrampxe0y3a
-X-Hook-Left: 6173d548431ec6da_1783600735271_2102916553
-X-MC-Loop-Signature: 1783600735271:136814838
-X-MC-Ingress-Time: 1783600735271
-Received: from cpanel-007-fra.hostingww.com (cpanel-007-fra.hostingww.com
- [3.69.87.180])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
-	by 100.99.18.246 (trex/8.0.2);
-	Thu, 09 Jul 2026 12:38:55 +0000
-Received: from tmo-083-158.customers.d1-online.com ([80.187.83.158]:12616 helo=ehlo.thunderbird.net)
-	by cpanel-007-fra.hostingww.com with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
-	(Exim 4.99.4)
-	(envelope-from <calestyo@scientia.org>)
-	id 1who1k-00000009w7H-1m7G;
-	Thu, 09 Jul 2026 12:38:52 +0000
-Date: Thu, 09 Jul 2026 14:38:50 +0200
-From: Christoph Anton Mitterer <calestyo@scientia.org>
-To: Milan Broz <gmazyland@gmail.com>, Eric Biggers <ebiggers@kernel.org>
-CC: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: AF_ALG deprecation fallout
-In-Reply-To: <aac82bdd-6a28-4e65-97f4-3d5942d2a6af@gmail.com>
-References: <27816cc353731e8e5484adad7d0fc447777727d8.camel@scientia.org> <20260708011112.GA3890@sol> <04fbbc8611699e469f44edbccdf3cf1ac65075d3.camel@scientia.org> <20260708030153.GA14700@sol> <aac82bdd-6a28-4e65-97f4-3d5942d2a6af@gmail.com>
-Message-ID: <5B8D2771-3FBD-4FF0-A2A0-A57120A53F5A@scientia.org>
+	s=arc-20240116; t=1783607968; c=relaxed/simple;
+	bh=49zOOt5+xEk9/lTP2PmM+mws9UQunmmAuhg/nSTLDRA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mSb0bgI30WhMX14rJvKPGDo9Bj4LneZu9ZsSrycCpX4JBy+PeLo363RsFqSBxlsChh8lQJk8W7XNaRBMjfwJh4xhdXqBafVa5hnBilUKjaCW/aF87JbCJqEoltFaBFTcfkl7eTruQ52HKD1uOkrBP79ww1Kje7CkKDJBUXtWXc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=dRhx9Vg5; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=k4Cl4FVG; arc=none smtp.client-ip=80.241.56.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="dRhx9Vg5";
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="k4Cl4FVG"
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA512)
+	(No client certificate requested)
+	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4gwyK91bs2zKvv5;
+	Thu, 09 Jul 2026 16:39:25 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1783607965;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=gccvbgfpf+svZIfM1dyBRepcYv+RTgI55mHg15KJzOY=;
+	b=dRhx9Vg5XMMaNFWJxU6loVPHKXRgx76ulJ4aNmbnw/TFAikPLPvCsKnmoGb6MqsU7MqsRB
+	EKvwM7G1PVrbog4awVRT/tb1FXgKSA2EdChJ+wJQzS7y+6kKnTdfTumtkn7vzF3/cLs8v4
+	LvhSZwanT2f8ljrcABuR1xbbHykqtM1+dd/hVEoIhpku3DRaLZyYcyPlibysj/mzV9lNil
+	3Ay4JvV//zsm8vor4ZDf4l/ZI93upTMcENCK4HvfyZz3Q8gJGABThATGu63UmBlEXRvbGN
+	jt71CVnXcSg5viLL4U9HeqW4O9FIPrQU8qd0u+kEW665MDM9JsusGuOg84fd+w==
+From: Manuel Ebner <manuelebner@mailbox.org>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1783607963;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=gccvbgfpf+svZIfM1dyBRepcYv+RTgI55mHg15KJzOY=;
+	b=k4Cl4FVGxyhYi+jtAQI3/DLHP5ZVnJxXj9xuIuKtJ1u7CygKjlNHFgcW0iWb/KVhByrXc6
+	PEOQNGDeRz115of/FfJQ3wYLZPIFqd5NNKMn8VV32ppf0kQu+drsWqQrVXbYECDYZABeeY
+	tP51M59xIT1EzZwYRHxla9UE0oTGqEvEFYbc/pfT7me23CSrzKPxoPjsB9fFG2Vgdk+lQp
+	UsaGNE4mjkH455f0C8c3ruC2Py8Prb7gq+578ZFxVdBFyohUXHm3lFdubJnG/5dyG5brZB
+	wWLDJlIhGG8vzKaiPYnbg4Kp9GMux+9GaEA+rMqNIMmUT7E9+WrYmdQhtk9XjA==
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Stephan Mueller <smueller@chronox.de>
+Cc: Manuel Ebner <manuelebner@mailbox.org>,
+	linux-crypto@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: fix bracket
+Date: Thu,  9 Jul 2026 16:38:37 +0200
+Message-ID: <20260709143837.405758-2-manuelebner@mailbox.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-AuthUser: calestyo@scientia.org
+Content-Transfer-Encoding: 8bit
+X-MBO-RS-ID: 78dd1a326d509db60c4
+X-MBO-RS-META: 3e9gqk1jxiax9ytow16ok41tk5jgr96c
 
-Hey=2E
+Remove needless ')' from code block.
 
-Am 9=2E Juli 2026 12:47:06 MESZ schrieb Milan Broz <gmazyland@gmail=2Ecom>=
-:
->On 7/8/26 5:01 AM, Eric Biggers wrote:
->See my explanation here
->https://gitlab=2Ecom/cryptsetup/cryptsetup/-/merge_requests/420#note_2520=
-172869
+Fixes: 3b72c814a8e8 ("crypto: doc - convert crypto API documentation to Sphinx")
+Signed-off-by: Manuel Ebner <manuelebner@mailbox.org>
+---
+ Documentation/crypto/architecture.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Do you strictly need an RFC?
+diff --git a/Documentation/crypto/architecture.rst b/Documentation/crypto/architecture.rst
+index 249b54d0849f..ec2e99d99aff 100644
+--- a/Documentation/crypto/architecture.rst
++++ b/Documentation/crypto/architecture.rst
+@@ -95,7 +95,7 @@ additional templates may enclose other templates, such as
+ 
+ ::
+ 
+-        template1(template2(single block cipher)))
++        template1(template2(single block cipher))
+ 
+ 
+ The kernel crypto API may provide multiple implementations of a template
+-- 
+2.54.0
 
-Nevertheless, I've mailed to the author of draft-irtf-cfrg-xchacha whether=
- he has still any plans with it=2E
-At least then we'd know if it's worth waiting=2E
-
-
->> We probably should add XAES-256-GCM support at some point, which takes
->> 192-bit nonces=2E  Historically it hasn't been feasible to do anything
->> that uses per-request AES keys in the kernel, since the kernel's crypto
->> API wasn't designed for that=2E  But we're now moving to a simpler API
->> where the algorithms including AES-GCM are implemented using regular
->> functions=2E  We can build XAES-256-GCM support on top of that=2E
->
->That would be nice=2E
-
-Indeed=2E Would be great if that could come in the foreseeable future=2E=
-=2E=2E in particular with the uncertain future of XChaha=2E
-
-Also, blindly assuming that so far people mostly used integrity support in=
- dm-crypt for testing and not production (due to the algos), it might take =
-a while until enough trust[0] has built up for seeing broad use=2E
-
-
-I guess it might also help end users if cryptsetup might give recommendati=
-ons on which algo to use for what (like most secure vs=2E secure enough but=
- better performance, or so)=2E
-
-With non AEAD, this had been rather easy, and aes-xts-plain64 with 256 bit=
- keys was simply like the gold standard=2E
-
-
-Cheers,
-Chris=2E
-
-
-[0] Not that I'd think the contributing developers weren't capable,=2E=2E=
-=2E but you know=2E=2E=2E if one puts all precious data in it (including fo=
-r backups), one doesn't want any surprises=2E
