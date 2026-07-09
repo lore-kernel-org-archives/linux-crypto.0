@@ -1,43 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 060EC29994B;
-	Thu,  9 Jul 2026 15:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5345D37F755
+	for <linux-crypto@vger.kernel.org>; Thu,  9 Jul 2026 15:27:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783610429; cv=none; b=qHvJrzLQJNxCdBKo0KIxi9kneqwsaxo8tg017aJHDe25OZlqItLTxGrrspJXpq2+hxoysC88WOxcQ9CRWVHBXXstL4Xu5+F5bwfwLgvUPIMUtY6ijEPhvEb/u/TeZ4jX9s9KereVastbvpkaEpUPYxAy2I45IvXA+P3+w5ZF5LA=
+	t=1783610847; cv=none; b=bdwf+vxA8mMHuKwoRfvuNiOZo68RoQqKy88K5hFWbEov9DCENe+vgk1du8v5DAwzqJRjysCXUvzEZEz8DWT1bYoMp/3AB3y9HfeJVtGFV0Dr+97bJgvMANXOot29Gl8zQ2qL8Fs6sgXFII58Ham31kEnPEUjG1smw8OxwCqhE8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783610429; c=relaxed/simple;
-	bh=l+O/N7/Sfo+OIJ29+vq2Ncy6LI0rpLCq7cdZnMdfmFE=;
+	s=arc-20240116; t=1783610847; c=relaxed/simple;
+	bh=ABwhp410kKyCXET/wnxdJ5t5QT1XbP5Bx0W21iMax/Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fCCK9OYPwZWWi/Qzh/NWk5Q8zB50avGLsaWByoWMlxpdy98Lq9DQ5KJGxGYnFvpKk2XT41pBEop3A/BN415kdw/L5Mca4vZsZbErpmfs4MkrjSah33ZG5nTVel6zxml0gn/ul8Cv86kTg8mYkwrblQ92SunzUpBcBC0nSGmuWPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uty3H4Ne; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=ljh3Rti0DON9DJ1GLrpGddZREhCnnDIiE1wPNDvBOvnw1ak+crF0UQbJILSkoVSNxfkKN4jkhVIg/HRJCq1CV5T93e9pr1Kfmjisr0bJfVcSQNjqBnhFDLmrOd3UIumyJT1HSphyz1nrCmxhKXnW9yIvqTE4CfTFT/Ghdd+YD74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e8XPsNvy; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uty3H4Ne"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A4FA1F000E9;
-	Thu,  9 Jul 2026 15:20:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e8XPsNvy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C4951F000E9;
+	Thu,  9 Jul 2026 15:27:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783610427;
-	bh=4l8lY6Q6Go3CcxEyF3ceEniIs1l0TP4SkSw4jvr90+8=;
+	s=k20260515; t=1783610842;
+	bh=0sP/MjSLcB/7GCXYU7a/ogplGBFTPfKJpRq3p8Kmc3s=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Uty3H4Ne/CuhS2WYsssWWEiDnAPo/3Irw0Q23jiEBXAo8vl7QsH2WdIdYC8cZACF3
-	 z+pgtQ/HR8P4jVlbRrhLAO+/DdAWFeDn+/USeIi/ZeiRyM4VvNDt6KqMlLsJQ/ZGGQ
-	 qMsKQNmFOEEvEr2k1uWV6Iv0SZV1opAthgNYCMfi9ECvG/rJqPgDkgdTw2/gm9aby9
-	 Z4Jp4HvtMyGxFGARtY4oE7MznkM7e+AZqjFErpViZa2InRhC7UDFLkUV968H5v4Nrf
-	 HG90HaTBB7QihEIVelvG36sTBA89p3OpL8taOYX/ZTqNRUF86lnOYiK7WDKIJv6Rbq
-	 ZtRiKrolsMQyw==
-Date: Thu, 9 Jul 2026 11:20:25 -0400
+	b=e8XPsNvyhQ+BiCOFCFeddNHpswfnN4NGdl/FVqjTX68phTlv2/LWjVWwbMmM6MxM+
+	 XuNPX5zWjQKfrmaslTM4TEf9TWz4+gEpM3lh3mFJ2LZnyKqECc2V0zfaR+fvxUrUkR
+	 PM51WnV3GZk1U2iRmceyp2nQHeF3Fn88t+l3pabWl/o89EpJB+mhW0B6jx8xLw1Hht
+	 JlLPdXdDpKBuDk4bMFpyM1w6YWWkrtN5PEdr/gQBAqMD7J1I10+EDxI7twmxgnOFYH
+	 as44FF6z8Rr91V9kYRSpHBrBoE15901bkJupX+MLhIM4En8XVPkGjHQQEm7jalwnmL
+	 x+4pYXemrLD9A==
+Date: Thu, 9 Jul 2026 11:27:20 -0400
 From: Eric Biggers <ebiggers@kernel.org>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: linux-wireless@vger.kernel.org,
-	Jouni Malinen <jouni.malinen@oss.qualcomm.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] wifi: mac80211: Fix cryptographic MAC comparison to be
- constant-time
-Message-ID: <20260709152025.GA3342@quark>
-References: <20260709024443.58132-1-ebiggers@kernel.org>
- <3e8e6ff58a0809b0346d133c01eda720367eb511.camel@sipsolutions.net>
+To: Christoph Anton Mitterer <calestyo@scientia.org>
+Cc: Milan Broz <gmazyland@gmail.com>, linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: AF_ALG deprecation fallout
+Message-ID: <20260709152720.GB3342@quark>
+References: <27816cc353731e8e5484adad7d0fc447777727d8.camel@scientia.org>
+ <20260708011112.GA3890@sol>
+ <04fbbc8611699e469f44edbccdf3cf1ac65075d3.camel@scientia.org>
+ <20260708030153.GA14700@sol>
+ <aac82bdd-6a28-4e65-97f4-3d5942d2a6af@gmail.com>
+ <5B8D2771-3FBD-4FF0-A2A0-A57120A53F5A@scientia.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -46,56 +47,23 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3e8e6ff58a0809b0346d133c01eda720367eb511.camel@sipsolutions.net>
+In-Reply-To: <5B8D2771-3FBD-4FF0-A2A0-A57120A53F5A@scientia.org>
 
-On Thu, Jul 09, 2026 at 08:45:35AM +0200, Johannes Berg wrote:
-> On Wed, 2026-07-08 at 22:44 -0400, Eric Biggers wrote:
-> > To prevent timing attacks, the comparison of cryptographic message
-> > authentication codes (MACs) needs to have data-independent timing.
-> > Replace the memcmp() with the correct function, crypto_memneq().
-> > 
-> > Fixes: 39404feee691 ("mac80211: FILS AEAD protection for station mode association frames")
-> > Cc: stable@vger.kernel.org
+On Thu, Jul 09, 2026 at 02:38:50PM +0200, Christoph Anton Mitterer wrote:
+> Hey.
 > 
-> I guess I'll apply (a variant of) this patch for -next, but that commit
-> log really makes it sound like something is actually broken and needs
-> fixing, and I don't think that's true in this specific context.
+> Am 9. Juli 2026 12:47:06 MESZ schrieb Milan Broz <gmazyland@gmail.com>:
+> >On 7/8/26 5:01 AM, Eric Biggers wrote:
+> >See my explanation here
+> >https://gitlab.com/cryptsetup/cryptsetup/-/merge_requests/420#note_2520172869
 > 
-> What happens is that the frame is validated and then we associate
-> successfully (upon success) or drop the frame (upon failure). Only the
-> failure case is relevant for the timing issue, but in that case we
-> simply drop the frame and there isn't really an observable signal -
-> nothing else happens, at least not immediately, we may retry the request
-> later after a timer.
+> Do you strictly need an RFC?
 > 
-> So sure, it looks better to have a crypto_memneq() in AES-SIV related
-> code, but in practice I don't see how it would make a difference now,
-> and it's even unlikely this code will ever matter for anything else in
-> the future, given that things are moving more and more towards full
-> frame encryption, including association request/response now.
+> Nevertheless, I've mailed to the author of draft-irtf-cfrg-xchacha whether he has still any plans with it.
+> At least then we'd know if it's worth waiting.
 
-Surely the other end of the connection could observe a difference in
-timing at some point?  Even if only a very small amount and not right
-away?  A timing attack doesn't take much.
-
-It's safest to assume that this is a bug fix.
-
-We've gone through similar crypto_memneq() conversions in other
-subsystems, where maintainers try to come up with some heuristic
-argument that timing attacks don't apply.  Those arguments tend to have
-holes.  I'm not sure why people are so eager to risk it.
-
-> I saw you originally had this in the "use libraries" patch [1], I'm also
-> good with you just keeping the change there. This might even be better
-> if you're planning to have this in -next soon, where it would otherwise
-> conflict if I keep this to -next.
-> 
-> [1] https://lore.kernel.org/linux-crypto/20260707053503.209874-24-ebiggers@kernel.org/
-
-I just figured this is a bug fix worth splitting out.
-
-Only patches 1-13 of that series are intended for 7.3, so this would be
-a good time to get any preliminary fixes in to code that is going to get
-converted to use the library later.
+XChaCha is seeing significant use in practice, both in the kernel
+already and in the broader community.  It is secure if ChaCha is secure.
+An RFC would be nice but I would not consider it necessary.
 
 - Eric
