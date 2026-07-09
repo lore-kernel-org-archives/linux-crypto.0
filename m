@@ -1,93 +1,101 @@
-Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0671536CE03;
-	Thu,  9 Jul 2026 14:39:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 060EC29994B;
+	Thu,  9 Jul 2026 15:20:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783607968; cv=none; b=ujSgvRX8E83xEq6TLn1gfhHcg6ABtJNnUlw2zCW6xVjgV3YsObU2Nr9+GSauXxUFAbJmVh656yQcGXaireoDlALqTRer9Lw/YOSsvCXis58a1KL4k35/ETAmxjH4TLuJ0855Z03SlKrFjjnN3jbr5TdWnN3Qz2/ixTMzaJcEQ9U=
+	t=1783610429; cv=none; b=qHvJrzLQJNxCdBKo0KIxi9kneqwsaxo8tg017aJHDe25OZlqItLTxGrrspJXpq2+hxoysC88WOxcQ9CRWVHBXXstL4Xu5+F5bwfwLgvUPIMUtY6ijEPhvEb/u/TeZ4jX9s9KereVastbvpkaEpUPYxAy2I45IvXA+P3+w5ZF5LA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783607968; c=relaxed/simple;
-	bh=49zOOt5+xEk9/lTP2PmM+mws9UQunmmAuhg/nSTLDRA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mSb0bgI30WhMX14rJvKPGDo9Bj4LneZu9ZsSrycCpX4JBy+PeLo363RsFqSBxlsChh8lQJk8W7XNaRBMjfwJh4xhdXqBafVa5hnBilUKjaCW/aF87JbCJqEoltFaBFTcfkl7eTruQ52HKD1uOkrBP79ww1Kje7CkKDJBUXtWXc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=dRhx9Vg5; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=k4Cl4FVG; arc=none smtp.client-ip=80.241.56.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+	s=arc-20240116; t=1783610429; c=relaxed/simple;
+	bh=l+O/N7/Sfo+OIJ29+vq2Ncy6LI0rpLCq7cdZnMdfmFE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fCCK9OYPwZWWi/Qzh/NWk5Q8zB50avGLsaWByoWMlxpdy98Lq9DQ5KJGxGYnFvpKk2XT41pBEop3A/BN415kdw/L5Mca4vZsZbErpmfs4MkrjSah33ZG5nTVel6zxml0gn/ul8Cv86kTg8mYkwrblQ92SunzUpBcBC0nSGmuWPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uty3H4Ne; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="dRhx9Vg5";
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="k4Cl4FVG"
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA512)
-	(No client certificate requested)
-	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4gwyK91bs2zKvv5;
-	Thu, 09 Jul 2026 16:39:25 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1783607965;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=gccvbgfpf+svZIfM1dyBRepcYv+RTgI55mHg15KJzOY=;
-	b=dRhx9Vg5XMMaNFWJxU6loVPHKXRgx76ulJ4aNmbnw/TFAikPLPvCsKnmoGb6MqsU7MqsRB
-	EKvwM7G1PVrbog4awVRT/tb1FXgKSA2EdChJ+wJQzS7y+6kKnTdfTumtkn7vzF3/cLs8v4
-	LvhSZwanT2f8ljrcABuR1xbbHykqtM1+dd/hVEoIhpku3DRaLZyYcyPlibysj/mzV9lNil
-	3Ay4JvV//zsm8vor4ZDf4l/ZI93upTMcENCK4HvfyZz3Q8gJGABThATGu63UmBlEXRvbGN
-	jt71CVnXcSg5viLL4U9HeqW4O9FIPrQU8qd0u+kEW665MDM9JsusGuOg84fd+w==
-From: Manuel Ebner <manuelebner@mailbox.org>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1783607963;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=gccvbgfpf+svZIfM1dyBRepcYv+RTgI55mHg15KJzOY=;
-	b=k4Cl4FVGxyhYi+jtAQI3/DLHP5ZVnJxXj9xuIuKtJ1u7CygKjlNHFgcW0iWb/KVhByrXc6
-	PEOQNGDeRz115of/FfJQ3wYLZPIFqd5NNKMn8VV32ppf0kQu+drsWqQrVXbYECDYZABeeY
-	tP51M59xIT1EzZwYRHxla9UE0oTGqEvEFYbc/pfT7me23CSrzKPxoPjsB9fFG2Vgdk+lQp
-	UsaGNE4mjkH455f0C8c3ruC2Py8Prb7gq+578ZFxVdBFyohUXHm3lFdubJnG/5dyG5brZB
-	wWLDJlIhGG8vzKaiPYnbg4Kp9GMux+9GaEA+rMqNIMmUT7E9+WrYmdQhtk9XjA==
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Stephan Mueller <smueller@chronox.de>
-Cc: Manuel Ebner <manuelebner@mailbox.org>,
-	linux-crypto@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: fix bracket
-Date: Thu,  9 Jul 2026 16:38:37 +0200
-Message-ID: <20260709143837.405758-2-manuelebner@mailbox.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uty3H4Ne"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A4FA1F000E9;
+	Thu,  9 Jul 2026 15:20:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783610427;
+	bh=4l8lY6Q6Go3CcxEyF3ceEniIs1l0TP4SkSw4jvr90+8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=Uty3H4Ne/CuhS2WYsssWWEiDnAPo/3Irw0Q23jiEBXAo8vl7QsH2WdIdYC8cZACF3
+	 z+pgtQ/HR8P4jVlbRrhLAO+/DdAWFeDn+/USeIi/ZeiRyM4VvNDt6KqMlLsJQ/ZGGQ
+	 qMsKQNmFOEEvEr2k1uWV6Iv0SZV1opAthgNYCMfi9ECvG/rJqPgDkgdTw2/gm9aby9
+	 Z4Jp4HvtMyGxFGARtY4oE7MznkM7e+AZqjFErpViZa2InRhC7UDFLkUV968H5v4Nrf
+	 HG90HaTBB7QihEIVelvG36sTBA89p3OpL8taOYX/ZTqNRUF86lnOYiK7WDKIJv6Rbq
+	 ZtRiKrolsMQyw==
+Date: Thu, 9 Jul 2026 11:20:25 -0400
+From: Eric Biggers <ebiggers@kernel.org>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: linux-wireless@vger.kernel.org,
+	Jouni Malinen <jouni.malinen@oss.qualcomm.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] wifi: mac80211: Fix cryptographic MAC comparison to be
+ constant-time
+Message-ID: <20260709152025.GA3342@quark>
+References: <20260709024443.58132-1-ebiggers@kernel.org>
+ <3e8e6ff58a0809b0346d133c01eda720367eb511.camel@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-MBO-RS-ID: 78dd1a326d509db60c4
-X-MBO-RS-META: 3e9gqk1jxiax9ytow16ok41tk5jgr96c
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3e8e6ff58a0809b0346d133c01eda720367eb511.camel@sipsolutions.net>
 
-Remove needless ')' from code block.
+On Thu, Jul 09, 2026 at 08:45:35AM +0200, Johannes Berg wrote:
+> On Wed, 2026-07-08 at 22:44 -0400, Eric Biggers wrote:
+> > To prevent timing attacks, the comparison of cryptographic message
+> > authentication codes (MACs) needs to have data-independent timing.
+> > Replace the memcmp() with the correct function, crypto_memneq().
+> > 
+> > Fixes: 39404feee691 ("mac80211: FILS AEAD protection for station mode association frames")
+> > Cc: stable@vger.kernel.org
+> 
+> I guess I'll apply (a variant of) this patch for -next, but that commit
+> log really makes it sound like something is actually broken and needs
+> fixing, and I don't think that's true in this specific context.
+> 
+> What happens is that the frame is validated and then we associate
+> successfully (upon success) or drop the frame (upon failure). Only the
+> failure case is relevant for the timing issue, but in that case we
+> simply drop the frame and there isn't really an observable signal -
+> nothing else happens, at least not immediately, we may retry the request
+> later after a timer.
+> 
+> So sure, it looks better to have a crypto_memneq() in AES-SIV related
+> code, but in practice I don't see how it would make a difference now,
+> and it's even unlikely this code will ever matter for anything else in
+> the future, given that things are moving more and more towards full
+> frame encryption, including association request/response now.
 
-Fixes: 3b72c814a8e8 ("crypto: doc - convert crypto API documentation to Sphinx")
-Signed-off-by: Manuel Ebner <manuelebner@mailbox.org>
----
- Documentation/crypto/architecture.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Surely the other end of the connection could observe a difference in
+timing at some point?  Even if only a very small amount and not right
+away?  A timing attack doesn't take much.
 
-diff --git a/Documentation/crypto/architecture.rst b/Documentation/crypto/architecture.rst
-index 249b54d0849f..ec2e99d99aff 100644
---- a/Documentation/crypto/architecture.rst
-+++ b/Documentation/crypto/architecture.rst
-@@ -95,7 +95,7 @@ additional templates may enclose other templates, such as
- 
- ::
- 
--        template1(template2(single block cipher)))
-+        template1(template2(single block cipher))
- 
- 
- The kernel crypto API may provide multiple implementations of a template
--- 
-2.54.0
+It's safest to assume that this is a bug fix.
 
+We've gone through similar crypto_memneq() conversions in other
+subsystems, where maintainers try to come up with some heuristic
+argument that timing attacks don't apply.  Those arguments tend to have
+holes.  I'm not sure why people are so eager to risk it.
+
+> I saw you originally had this in the "use libraries" patch [1], I'm also
+> good with you just keeping the change there. This might even be better
+> if you're planning to have this in -next soon, where it would otherwise
+> conflict if I keep this to -next.
+> 
+> [1] https://lore.kernel.org/linux-crypto/20260707053503.209874-24-ebiggers@kernel.org/
+
+I just figured this is a bug fix worth splitting out.
+
+Only patches 1-13 of that series are intended for 7.3, so this would be
+a good time to get any preliminary fixes in to code that is going to get
+converted to use the library later.
+
+- Eric
