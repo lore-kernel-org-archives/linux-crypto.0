@@ -1,44 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E5F23EA97
-	for <linux-crypto@vger.kernel.org>; Thu,  9 Jul 2026 15:35:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1581154723;
+	Thu,  9 Jul 2026 15:47:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783611329; cv=none; b=UsoFUyMxK44JUjtC1FKL+Elk72kfJU4fuUXDSdEjm8/JBMjDdXT08MeCSvyIg282IqE6DU89iJxpiITrl6BB/Q4Tg1b7lpdrspF+lhmGS1X1MxwHD6XHob/fLKtFVjm/1GV78cRVJTe7vPvyUjKYzum5ce7Tu3oZIEOFQqg683M=
+	t=1783612036; cv=none; b=TH6vX6pQKRop0POy9opkDYtiHMaoH8z8vfeBUq8rXB+CpWatXB+d/P/glpBHdC6ZcnCziDjIpLjLcwUm2SzvpvjQ2jUIDmdVOHjDqSzIcy6vieGCgQGxkzNCJR1wxBJ9SewMEtj+c8tUoFb4P0/hcslxexYXxlxa48KKyegpan4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783611329; c=relaxed/simple;
-	bh=39xfaljgl0gfI/LA+64AvAG3ZZgzjVm+dpob5hcuWE4=;
+	s=arc-20240116; t=1783612036; c=relaxed/simple;
+	bh=GVCbjF+A4VSV4RiKd3PnGb4Zfkm9Eg/koEAbHJbvzDw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NZmF7xXx02nxVXrqFzO16uV6rjYhxuc+UtSnpzCp/HpwvKtFuSSAW6z0TNDsLIfwa+J5KOPAISSlGWe+4jdR8daYBzWkwn2F2SyN5mE6gazH5Ue6fxZlaJo5cJ3rMiGD3zki+D/wN0rj5iwrXRfKHzZtKdhQcUlEILu+howTdlY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NXGfb7u3; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=i8eDhFYx66qc0n1vkurUelbVvgy6IirewabWw+MR+dFqTI5gWJIZUEMzPvrimG9n7pj9LH4rhM6WX8lEBtnjBqrdu/YMDpLUnDtsBXVYTlHrSTwmbSsAcsagEGjNwZfh6DvqWIgEGQd78j/XznEJA8wLFVmXqhJORHt0rnpo7oQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LKsuqrl4; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NXGfb7u3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8993B1F000E9;
-	Thu,  9 Jul 2026 15:35:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LKsuqrl4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A68991F000E9;
+	Thu,  9 Jul 2026 15:47:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783611327;
-	bh=hJ12/Y+Kpni0Xzsi9fIAojbU42sSAcWsBlUBoEmM50U=;
+	s=k20260515; t=1783612035;
+	bh=DDBTZE6NaalyA2hbP+96rCdb52x67RTX0930I1VznkI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=NXGfb7u3WDO0+PNMjZjoITUOgCzCfcZiwBhJYD1PZhA0Ly+iVJ4u1CaRfIY2sFBYJ
-	 iRry3HPf+W7eKC17e8UV5ffcEDhMoWnClcV7askuQVNBgko5zesRT2Pe2SrflpBkfE
-	 sYhvw/8YtYiCie1f1pfPpTFanQrlwZR1qaVhUSdePhOh+ZNyddWeP33osJwM8u7UWZ
-	 5JWQ/gH2O5Y4otpMlarhvgsuc85ooAnLWT5u8j7ECwZtXhu9uRlIguURl2VkGIxA2K
-	 NCuly08ViQ8xlpAseHbRe5uVHP7ZJ7i+ILtzH9hCzECRSzASVUAc6uaVUK6vdsRdJB
-	 9VJbwCrYkEbMQ==
-Date: Thu, 9 Jul 2026 11:35:25 -0400
+	b=LKsuqrl4VNkM812QBSwyAAHx/zksQk3ssvSSg3/kI/w9H31LFOxTc2VKsgfu0e9+C
+	 Mu+BdBTgWHTKZrOKtoOKX5Hzc0zR9c+Zw7j1sY6qEbVkxTC++FVzwCqOBlQ9A0+H1o
+	 wYKZVaiYx65iVT55zK41q8Awp6jfpSx4tZdRXNHGqFzhVEUUBqVxp4cpnaHOiZdSh4
+	 ZoHILkAp7HW2KCxaOLdYZUjC8EyFdjz8bmEqdMsrYovHdibrWaBRkxLIZzKZvgXoji
+	 QvdxNewJYwMsmaaYiA08P3Czom3nqctQ0Zo+/C2PvnoA16VCKB66pNjBGBumOzYSid
+	 j+z67Am5ElW0g==
+Date: Thu, 9 Jul 2026 11:47:13 -0400
 From: Eric Biggers <ebiggers@kernel.org>
-To: Milan Broz <gmazyland@gmail.com>
-Cc: Christoph Anton Mitterer <calestyo@scientia.org>,
-	linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: AF_ALG deprecation fallout
-Message-ID: <20260709153525.GA6853@quark>
-References: <27816cc353731e8e5484adad7d0fc447777727d8.camel@scientia.org>
- <20260708011112.GA3890@sol>
- <04fbbc8611699e469f44edbccdf3cf1ac65075d3.camel@scientia.org>
- <20260708030153.GA14700@sol>
- <aac82bdd-6a28-4e65-97f4-3d5942d2a6af@gmail.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	bpf <bpf@vger.kernel.org>
+Subject: Re: [PATCH 29/33] bpf: crypto: Use AES-CBC and AES-ECB libraries
+Message-ID: <20260709154713.GB6853@quark>
+References: <20260707053503.209874-1-ebiggers@kernel.org>
+ <20260707053503.209874-30-ebiggers@kernel.org>
+ <10eafa42-1142-4ed2-a485-f46c496bddfb@linux.dev>
+ <20260707182049.GA2238@quark>
+ <d1cdfc23-b336-49a9-8833-29f05b5b9fec@linux.dev>
+ <20260707231652.GA2264445@google.com>
+ <5f9c3aab-5339-463c-a86d-edac297e1e95@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,78 +48,28 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aac82bdd-6a28-4e65-97f4-3d5942d2a6af@gmail.com>
+In-Reply-To: <5f9c3aab-5339-463c-a86d-edac297e1e95@linux.dev>
 
-On Thu, Jul 09, 2026 at 12:47:06PM +0200, Milan Broz wrote:
-> On 7/8/26 5:01 AM, Eric Biggers wrote:
-> > On Wed, Jul 08, 2026 at 04:14:04AM +0200, Christoph Anton Mitterer wrote:
-> > > [X]Chacha, IIRC, would anyway be used without XTS...
-> > 
-> > It's possible that some of the "aead" ciphers will need to continue to
-> > be supported in AF_ALG too (in addition to privileged use of "ccm(aes)",
-> > which already is on the list since bluez uses it).
-> > 
-> > But we need a specific list.
-> 
-> Cryptsetup can use AF_ALG to check if AEAD is supported, but it tries to use
-> it later anyway, just error messages are more cryptic (hidden in DM kernel log).
-> 
-> So we should not depend on AEAD AF_ALG support.
-
-What about the keyslot encryption?
-
-> > > Well, I personally don't use any others, but of course other might.
-> > > What about all these legacy modes that were used for years in examples,
-> > > like cast5-cbc-essiv, aes-cbc-essiv, etc.?
-> > 
-> > First, the essiv component is not relevant, as far as I can tell.
-> > algif_skcipher actually does have essiv support, but it's a relatively
-> > recent addition and cryptsetup doesn't use it.
-> > 
-> > So the potential AF_ALG uses there would be "cbc(cast5)" and "cbc(aes)".
-> > 
-> > > Does your list have any effects on things like chained algos (which I
-> > > think cryptsetup allows to use for tcrypt).
-> > 
-> > AF_ALG has never supported cipher cascades itself.
-> 
-> TCRYPT (Truecrypt/Veractypt compatible) supports it, but it handles chain in own code,
-> calling always only one cipher to decryot.
-> For activation it stacks several dm-crypt devices, so no chain in crypto API is needed.
-> 
-> My intention was to support all, even historic, combinations, because people
-> have old containers. (Note, we only support existing container, we cannot create it.)
-> 
-> Current Veracrypt supports these individual ciphers (and some chains of them),
-> that is what we can use through AF_ALG:
-> 
-> - AES, Serpent, Twofish, Camellia, Kuznyechik (not in mainline only as external
-> package, in Debian as gost-crypto-dkms package), all in XTS mode.
-> 
-> Historic containers (TrueCrypt) can use:
-> - AES, Serpent, Twofish in LRW mode
-> - AES, Serpent, Twofish, Cast5, in CBC mode
-
-So all of those need to be allowed in AF_ALG (minus Kuznyechik which
-doesn't exist in mainline)?  Can we at least make them privileged only?
-
-> > 
-> > > I've wrote just before on the cryptsetup mailing list, that we have the
-> > > nice integrity support in cryptsetup for quite some years now, but I
-> > > guess only few people actually use it because all the available
-> > > algorithms/modes were kinda recommended against[0].
+On Wed, Jul 08, 2026 at 12:47:43PM +0100, Vadim Fedorenko wrote:
+> On 08/07/2026 00:16, Eric Biggers wrote:
+> > On Tue, Jul 07, 2026 at 11:50:33PM +0100, Vadim Fedorenko wrote:
+> > > > Does this mean the AES-ECB support is unnecessary and can be dropped?
 > > > 
-> > > I think XChacha20+Poly1305 might be in reach (but still not actually
-> > > usable?), having finally a large enough nonce (192bits?).
+> > > Let's keep it if it doesn't hurt.
 > > 
-> > The kernel has had XChaCha20Poly1305 support internally since 2019, but
-> > support for it hasn't been added to dm-crypt yet.
+> > It kind of does.  It is "bad" crypto that would have to continue to be
+> > maintained, and someone might start using it accidentally.
 > 
-> See my explanation here
-> https://gitlab.com/cryptsetup/cryptsetup/-/merge_requests/420#note_2520172869
+> AES-ECB was introduced as a cipher to use in QUIC-LB draft,
+> draft-ietf-quic-load-balancers-21
+> 
+> I know it is expired draft, but it may be worth keeping this cipher
+> as QUIC WG github is still active
 
-Again, the kernel supports XChaCha20Poly1305 internally since 2019.
-WireGuard uses it.  It's just not supported in dm-crypt yet (or AF_ALG
-for that matter).
+Sigh.  We shouldn't implement Internet-Drafts that have clear issues
+with how they use cryptography.  They're likely to change when they
+undergo cryptography review.  We went through this same thing with
+TCP-AO, where I ended up joining the tcpm working group and getting the
+draft fixed.  Do I need to do the same with this one too?
 
 - Eric
