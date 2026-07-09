@@ -1,332 +1,201 @@
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC7C943801F
-	for <linux-crypto@vger.kernel.org>; Thu,  9 Jul 2026 17:00:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24191397AEF
+	for <linux-crypto@vger.kernel.org>; Thu,  9 Jul 2026 17:07:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783616423; cv=none; b=EKBn4eh/fG8CgByFcBlW93M06Btpi6ehrONxx3Qj/zPLaOhDAZ98DunlYp+Ha3ZpcXtB8rpFTEZk5o+5M25yJR66/syh6UqMSBPyxxx6NnPvXzpwA8joFPrpXq11FBcwzMXkE9gIOvuEU9apRMcbBpdnouUX12rypJplZrQWOTQ=
+	t=1783616860; cv=none; b=rA8SiYKd69V4khEKTK7U/VRLVvTJ+z13/YLmht5FySbJppDKPKOX7Z/vUhxVocWFMt+P3yFyxwOwu+zFG4TWTPiG2p+QbuR6MOgqUgnu6kM5aRjnLxGAa985vv4TiXXoqE4nBvQfUGftavrqXI0XUA07RBehwZx0otLJc4zvs60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783616423; c=relaxed/simple;
-	bh=TkTGMnesvFFd2t1ImlsHzihfrszC5JGjADA5VYMS/Ns=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BoLUiGBE3GzupWdfPg0CWWfLa1ewFrc1R8CQJPZlyj9neUhCdBPlccyiDcrTBVkdZkaD/va1TE6/FxeUR3QTNlBnXcb8cYTxOFVrhKblX369r+Isps4PAXad+rJ1u6SYhk9YHEQvMXLOJiQBbQIMz+WVzIWu5k9obyVGwVgP1hk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b=NrZVGb3n; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+	s=arc-20240116; t=1783616860; c=relaxed/simple;
+	bh=K9AAKYK0xxz1GMGRtHAdVMohj3KPRaD87RUmpAlYNiQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kofdlaGN4wh2H+ZhcPFA/fYtlm9Ra0Kv/lrhzbUeL+4x0RuCY0It/H4Ni/GsbYnW97f1XdK8QT1ci92czjg38KQ1jKGBbDOr8SyuLQb98bUz/zJCd4gWRlF1FvYfvoTl3PI3yuMpHSoJSMzJExR6WwygN7PwO+op4v7rA3+ZuAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aLB9Gdg+; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b="NrZVGb3n"
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-493bf73ec2aso114075e9.2
-        for <linux-crypto@vger.kernel.org>; Thu, 09 Jul 2026 10:00:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aLB9Gdg+"
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-476a130c138so179039f8f.0
+        for <linux-crypto@vger.kernel.org>; Thu, 09 Jul 2026 10:07:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre.com; s=google; t=1783616419; x=1784221219; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=JAmRF9mTaJatDYc7qm7JFzLCBNYq1vSrvVh5zN0/f+8=;
-        b=NrZVGb3n5fI64YoAMPWIUedK4s6o2uS86JKr4udYZgREKArf3pBRoQQvinFaEOnjla
-         XltMpjwfnymWu5vqGWaDn4u6+rXyTXavVySt5kmKQ4b0ryUwpxoByH/QdzDHWvr59Jsj
-         zcpzwQaz37tKW2hO+3/5w+f2hg6fcL/evr9T6dfD+cgYEI0KDb7qPeDODdQ1lHTYVkPw
-         Tzy4WBgqpvWN/AofWGVrUsOnWoTNCNXRKEwpSr/OxAEZOb+U+cmEXglct0XpQnlv8dkd
-         ax6a/HVM3CNRORbEMthXzErpIWARKYxDq50V0kSg1mvYRO2kxOV3ccnFtukC/CXM4qg8
-         p+dQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783616419; x=1784221219;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+        d=gmail.com; s=20251104; t=1783616857; x=1784221657; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=JAmRF9mTaJatDYc7qm7JFzLCBNYq1vSrvVh5zN0/f+8=;
-        b=BDp8+J9eUHoXoLsK+npEp1E7Xh90tnNYli16QiPfJhI+wUfKA6WB3secjIkDQog2Fl
-         I6nG5SUKG5VObg28HPTinerFoaKfb4gqJIOZKkDFS2EA6bIrNFw/cAz2B8nnlWvsbwqa
-         ycPwWYEJjYo5JARSreXyHnEDObHDacpHg7LxGPdXSX3SXeBj3ZQuoJI3qpAIMESRalPS
-         Fne/Q8uOADq0TrBQSo72uBEH8e80M4Jr7bnTWMErj8sH3idgbAmHoaChDWT3CntJvgIB
-         20D/9NfSMIWtmsj8Uu6tc1mVIycyY7KUSmrzH+WuvjvGLk2bh2vtqaKpxnfr6cKi7WzT
-         XBDA==
-X-Forwarded-Encrypted: i=1; AHgh+Rohnu5sTp+Rj82kg3LSCzgWPRoyUVQjaI3rjrLxS5upVlMCTr+ZXjnP/obpTwF39zwq3bA799KztlVIhYo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx13GnTdCs/Y//NoL9gZE04yNJqcFsXlWqENDoNOmy+JQQlvg95
-	grH/jbbCQaHv8dJeHEjq7hc8CYqPI/Ws3ilKhJpRiet+JtPR1MjToQmum3vucjUMDpE=
-X-Gm-Gg: AfdE7ckO/074HkGrw7Z8nAUcIFXz/NITEr+ZK5yr21Ic6lYbfruTn8/WMFUMWxzIzIV
-	y0FwHvBILxfXQIFr/gMjEdEeMhpUFS70vrvTPz8gJfmGT/2YuKlcSS99ZwO4aigoJwmlQS60kMc
-	AhDaOtendkBB4KmRTY7NSZaD9QfqVBiPulUJRzjJq2P1y22k1jBIF6x7LzpP7b5IzwFQlva6zG1
-	EeDqWP/xziCHrSRYqKlsgvHNmhNFGlq5LKs1LbS7GfwAJ5wg/rEfxVXhVfl6TS1U+GzLT+eURLQ
-	gFwA9yTc4PPTV7yprA3uZdz6EMD78JSVm6a3VepeN/RVem5NsRf4IAZKvTULuP04aFe4sWS5PwI
-	koPMiqEdkYQcW5HmHoWT271ZQbuULZNbFzVRv8ByzgG7r6TdI/V3ZtemYa9k5vkZkV8vIujgg5U
-	HyqgYeSkBnj4QXj2cAsAq1qebeIeJz+r73ZoieNxQcqau0D7+d+Bp412vcROhb3uUbdvGpUvurf
-	qWO
-X-Received: by 2002:a05:600c:4fc6:b0:490:b00c:8e6a with SMTP id 5b1f17b1804b1-493e68ce3b2mr82123025e9.28.1783616419283;
-        Thu, 09 Jul 2026 10:00:19 -0700 (PDT)
-Received: from localhost (p200300f65f47db043de98c19b374aa68.dip0.t-ipconnect.de. [2003:f6:5f47:db04:3de9:8c19:b374:aa68])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-493e5a6240fsm110766575e9.2.2026.07.09.10.00.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jul 2026 10:00:17 -0700 (PDT)
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig=20=28The=20Capable=20Hub=29?= <u.kleine-koenig@baylibre.com>
-To: Lee Jones <lee@kernel.org>
-Cc: David Rhodes <david.rhodes@cirrus.com>,
-	Richard Fitzgerald <rf@opensource.cirrus.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Mika Westerberg <mika.westerberg@linux.intel.com>,
-	Zha Qipeng <qipeng.zha@intel.com>,
-	Qunqin Zhao <zhaoqunqin@loongson.cn>,
-	Thomas Richard <thomas.richard@bootlin.com>,
-	linux-sound@vger.kernel.org,
-	patches@opensource.cirrus.com,
-	mfd@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	Charles Keepax <ckeepax@opensource.cirrus.com>
-Subject: [PATCH v3 11/23] mfd: Use named initializers for acpi_device_id arrays
-Date: Thu,  9 Jul 2026 18:58:30 +0200
-Message-ID:  <84158ad2bfe67169913c42fe132307362330a6d9.1783615311.git.u.kleine-koenig@baylibre.com>
-X-Mailer: git-send-email 2.55.0.11.g153666a7d9bb
-In-Reply-To: <cover.1783615311.git.u.kleine-koenig@baylibre.com>
-References: <cover.1783615311.git.u.kleine-koenig@baylibre.com>
+        bh=/tA5XaLN8sLPIWMHf3eGKCgy4towy6ImhdoRTl/KulE=;
+        b=aLB9Gdg+8iFlCKq8le4uVYfBrT6BOsveel5n9AQAvC4z7b9gaQV9KlzsgB0el2MfX+
+         TmanWdPklYIgvVFlSYKTocNrHjhcu73cKopngU3Ra+6jqMCnb3CjgzOTiXXBHmsiBZpi
+         1YvSzt7Gq9XizK0QAHGViyng7MArWWariMQxXjiVjRg/dh1A3p8x5b6yzV5BaAjg38pZ
+         jyhhe4LfO0HAJL0PZd61tREPUerE+EMlpgPhX9UpfKN1m6uLTg2Zg7uy/cx9ipaL4/EX
+         Lp7kVSPoPDN5gTph1LLirPQy8w+slHY10E56aj1n8UEM24OpDB4c79WdHUL3k6U+kfqb
+         7VUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783616857; x=1784221657;
+        h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=/tA5XaLN8sLPIWMHf3eGKCgy4towy6ImhdoRTl/KulE=;
+        b=G5PH4EExjJ2Svm93bKNGrVnv9vlAQrVOnhGAoVkeKeJM3BMnm3vfCOOvXzN4/vAvh+
+         JqexM/Vxp8H8MYLirNjh4DaXrJ8p2T0mkfxJ3yvp/F4REPEaSc0gqxYmiUVEC1ukaU1d
+         uitH/0QB9T+1t5pgJkwH7WnqJCU79ggWk+QXFxrbKzV01hEeCyGr/BnXfLbZfAoYGdTV
+         iqdIJBT6BnE7rVKt7HcANPwtl3Mo+vUo9Bz4BveMHqSsEk/n5/wwa9GoUugsDtUvGq+r
+         igVuiau3ha2Dg8koTN9+RsJ9dI4tIrlOcrl95DspVGdgI8tfzskZsMN39/QEAXyRFR0+
+         HFOw==
+X-Forwarded-Encrypted: i=1; AHgh+Rp153v4A9xRYjUsjnyYV6fmH7klAcboxw4AWqg/p2FYG7n18bLtWMq1ReFCekO94QrNLq/lRII9S+f5Gpc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLau8PzvigSzNGmcZXEMv8fqd+X8an+gIH/e+UCZ+gxI4sDM0h
+	5h/WTrjmwbIJt2augS1fPLoCnDKpwONttJshokXsw6BEo9fEI9AK5UxpNqGdZQ==
+X-Gm-Gg: AfdE7cnVUxRAStHOnnBZ8yV9Utod46Owwec3Rw7nphz2VHbV89xWxdDfV665OqP16Tq
+	D/66qBdHyKPV8hUfVtEJlX6mZKw4eXhDX6CCHvLvi6b4jAUAPbxTSOlHDy8dlKmKXfBF6fGi9Om
+	qq2QvoEkeJB3fdRKNLxKa/SaXTM0fXhrgLm6mmXLDNbHWhmALOywdEKZmVkas/qvXNATfA8YSeD
+	hJQ1nGOZExbK8Fx+hrmxryHRuh6Yuz7TREI2d/o1J3r1BeOigEKmL+ctcGKbEuLZcPcisBpU3iJ
+	2f9yZWiBHyE+lc3skL0Y2XnZKtT6joFVxF+NMTLq6ms4Jl1irhk1iPTrpFWuB4/JtkEYETiKyuH
+	b6JSJxo5DZGHykOmYu3iDfSTmzdIuGcU735Tc8Ij1/h31yeBeEQFpJ1RUv6EBPEDw56amglvqgu
+	Iioice4bqdJKfoa2GK1lLoCmdL9UGUiQtooTcfeg==
+X-Received: by 2002:a05:6000:1861:b0:47d:edb2:a4ab with SMTP id ffacd0b85a97d-47df07670c6mr8671036f8f.43.1783616857265;
+        Thu, 09 Jul 2026 10:07:37 -0700 (PDT)
+Received: from [192.168.2.14] (85-70-151-113.rcd.o2.cz. [85.70.151.113])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9e4d780csm53244262f8f.11.2026.07.09.10.07.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Jul 2026 10:07:36 -0700 (PDT)
+Message-ID: <4e3f9d98-b64c-4628-892a-8a71ef9c8ae4@gmail.com>
+Date: Thu, 9 Jul 2026 19:07:36 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=10219; i=u.kleine-koenig@baylibre.com; h=from:subject:message-id; bh=TkTGMnesvFFd2t1ImlsHzihfrszC5JGjADA5VYMS/Ns=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBqT9NMSOx027Cqcd0B9sr1Mrb3t1b6uvzAwvJrs 46/ixM2aBuJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCak/TTAAKCRCPgPtYfRL+ TvEAB/4uxa/rUO6zMcHVxiU/9eiEerzYJbNmHKI0pSHReEnx1nxUN8BuMxLwk2sPOuyYCkVB8tU ZjUkfk5oBapVX5ctV/ARNuUd3UoWOlemRwXm6IEKjKrfgEGdVJBXGp6yb5NjyLylsVC9P04ejyK fq7qvU8uD2d4b1vdQ5Txl0ta88a2jznDBinoBo+BM4jQdHp+JpSEPNgFkP+FZHd7xhGrg1sxcNG db4Y5TSm+JAeMTy+y6Rjoh+eHXz/tQanqXEaR9bW+k8tOF9OfDhPXfDefil7WOBDacnylqm9JfN AjXsyhD6ejowmGh4+02dTXYZwJ/T84czepskgkhXwVd7iOBg
-X-Developer-Key: i=u.kleine-koenig@baylibre.com; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: AF_ALG deprecation fallout
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Christoph Anton Mitterer <calestyo@scientia.org>,
+ linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>
+References: <27816cc353731e8e5484adad7d0fc447777727d8.camel@scientia.org>
+ <20260708011112.GA3890@sol>
+ <04fbbc8611699e469f44edbccdf3cf1ac65075d3.camel@scientia.org>
+ <20260708030153.GA14700@sol> <aac82bdd-6a28-4e65-97f4-3d5942d2a6af@gmail.com>
+ <20260709153525.GA6853@quark>
+Content-Language: en-US
+From: Milan Broz <gmazyland@gmail.com>
+Autocrypt: addr=gmazyland@gmail.com; keydata=
+ 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
+In-Reply-To: <20260709153525.GA6853@quark>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-While being less compact, using named initializers allows to more easily
-see which members of the structs are assigned which value without having
-to lookup the declaration of the struct. And it's also more robust
-against changes to the struct definition.
+On 7/9/26 5:35 PM, Eric Biggers wrote:
+> On Thu, Jul 09, 2026 at 12:47:06PM +0200, Milan Broz wrote:
+>> On 7/8/26 5:01 AM, Eric Biggers wrote:
+>>> On Wed, Jul 08, 2026 at 04:14:04AM +0200, Christoph Anton Mitterer wrote:
+>>>> [X]Chacha, IIRC, would anyway be used without XTS...
+>>>
+>>> It's possible that some of the "aead" ciphers will need to continue to
+>>> be supported in AF_ALG too (in addition to privileged use of "ccm(aes)",
+>>> which already is on the list since bluez uses it).
+>>>
+>>> But we need a specific list.
+>>
+>> Cryptsetup can use AF_ALG to check if AEAD is supported, but it tries to use
+>> it later anyway, just error messages are more cryptic (hidden in DM kernel log).
+>>
+>> So we should not depend on AEAD AF_ALG support.
+> 
+> What about the keyslot encryption?
 
-The mentioned robustness is relevant for a planned change to struct
-acpi_device_id that replaces .driver_data by an anonymous union.
+AEAD cannot be used for LUKS keyslot encryption. Decrypted key is validated
+against external digest.
 
-This patch doesn't modify the compiled arrays, only their representation
-in source form benefits.
+If you use AEAD for data, keyslot encryption will fallback to aes-xts (or
+whatever length-preserving mode user selects at CLI).
 
-Reviewed-by: Charles Keepax <ckeepax@opensource.cirrus.com>
-Signed-off-by: Uwe Kleine-König (The Capable Hub) <u.kleine-koenig@baylibre.com>
----
- drivers/mfd/cs42l43-i2c.c             |  4 +-
- drivers/mfd/intel-lpss-acpi.c         | 58 +++++++++++++--------------
- drivers/mfd/intel_pmc_bxt.c           |  2 +-
- drivers/mfd/intel_soc_pmic_bxtwc.c    |  2 +-
- drivers/mfd/intel_soc_pmic_chtdc_ti.c |  2 +-
- drivers/mfd/intel_soc_pmic_chtwc.c    |  2 +-
- drivers/mfd/intel_soc_pmic_crc.c      |  2 +-
- drivers/mfd/intel_soc_pmic_mrfld.c    |  2 +-
- drivers/mfd/kempld-core.c             |  4 +-
- drivers/mfd/loongson-se.c             |  2 +-
- drivers/mfd/upboard-fpga.c            |  4 +-
- 11 files changed, 42 insertions(+), 42 deletions(-)
+...
+> 
+>>>> Well, I personally don't use any others, but of course other might.
+>>>> What about all these legacy modes that were used for years in examples,
+>>>> like cast5-cbc-essiv, aes-cbc-essiv, etc.?
+>>>
+>>> First, the essiv component is not relevant, as far as I can tell.
+>>> algif_skcipher actually does have essiv support, but it's a relatively
+>>> recent addition and cryptsetup doesn't use it.
+>>>
+>>> So the potential AF_ALG uses there would be "cbc(cast5)" and "cbc(aes)".
+>>>
+>>>> Does your list have any effects on things like chained algos (which I
+>>>> think cryptsetup allows to use for tcrypt).
+>>>
+>>> AF_ALG has never supported cipher cascades itself.
+>>
+>> TCRYPT (Truecrypt/Veractypt compatible) supports it, but it handles chain in own code,
+>> calling always only one cipher to decryot.
+>> For activation it stacks several dm-crypt devices, so no chain in crypto API is needed.
+>>
+>> My intention was to support all, even historic, combinations, because people
+>> have old containers. (Note, we only support existing container, we cannot create it.)
+>>
+>> Current Veracrypt supports these individual ciphers (and some chains of them),
+>> that is what we can use through AF_ALG:
+>>
+>> - AES, Serpent, Twofish, Camellia, Kuznyechik (not in mainline only as external
+>> package, in Debian as gost-crypto-dkms package), all in XTS mode.
+>>
+>> Historic containers (TrueCrypt) can use:
+>> - AES, Serpent, Twofish in LRW mode
+>> - AES, Serpent, Twofish, Cast5, in CBC mode
+> 
+> So all of those need to be allowed in AF_ALG (minus Kuznyechik which
+> doesn't exist in mainline)?  Can we at least make them privileged only?
 
-diff --git a/drivers/mfd/cs42l43-i2c.c b/drivers/mfd/cs42l43-i2c.c
-index cbe05c3ea910..e9cb4fb9854a 100644
---- a/drivers/mfd/cs42l43-i2c.c
-+++ b/drivers/mfd/cs42l43-i2c.c
-@@ -65,8 +65,8 @@ MODULE_DEVICE_TABLE(of, cs42l43_of_match);
- 
- #if IS_ENABLED(CONFIG_ACPI)
- static const struct acpi_device_id cs42l43_acpi_match[] = {
--	{ "CSC4243", CS42L43_DEVID_VAL },
--	{ "CSC2A3B", CS42L43B_DEVID_VAL },
-+	{ .id = "CSC4243", .driver_data = CS42L43_DEVID_VAL },
-+	{ .id = "CSC2A3B", .driver_data = CS42L43B_DEVID_VAL },
- 	{}
- };
- MODULE_DEVICE_TABLE(acpi, cs42l43_acpi_match);
-diff --git a/drivers/mfd/intel-lpss-acpi.c b/drivers/mfd/intel-lpss-acpi.c
-index d4b24a717848..19fc36164d89 100644
---- a/drivers/mfd/intel-lpss-acpi.c
-+++ b/drivers/mfd/intel-lpss-acpi.c
-@@ -135,38 +135,38 @@ static const struct intel_lpss_platform_info cnl_i2c_info = {
- 
- static const struct acpi_device_id intel_lpss_acpi_ids[] = {
- 	/* SPT */
--	{ "INT3440", (kernel_ulong_t)&spt_info },
--	{ "INT3441", (kernel_ulong_t)&spt_info },
--	{ "INT3442", (kernel_ulong_t)&spt_i2c_info },
--	{ "INT3443", (kernel_ulong_t)&spt_i2c_info },
--	{ "INT3444", (kernel_ulong_t)&spt_i2c_info },
--	{ "INT3445", (kernel_ulong_t)&spt_i2c_info },
--	{ "INT3446", (kernel_ulong_t)&spt_i2c_info },
--	{ "INT3447", (kernel_ulong_t)&spt_i2c_info },
--	{ "INT3448", (kernel_ulong_t)&spt_uart_info },
--	{ "INT3449", (kernel_ulong_t)&spt_uart_info },
--	{ "INT344A", (kernel_ulong_t)&spt_uart_info },
-+	{ .id = "INT3440", .driver_data = (kernel_ulong_t)&spt_info },
-+	{ .id = "INT3441", .driver_data = (kernel_ulong_t)&spt_info },
-+	{ .id = "INT3442", .driver_data = (kernel_ulong_t)&spt_i2c_info },
-+	{ .id = "INT3443", .driver_data = (kernel_ulong_t)&spt_i2c_info },
-+	{ .id = "INT3444", .driver_data = (kernel_ulong_t)&spt_i2c_info },
-+	{ .id = "INT3445", .driver_data = (kernel_ulong_t)&spt_i2c_info },
-+	{ .id = "INT3446", .driver_data = (kernel_ulong_t)&spt_i2c_info },
-+	{ .id = "INT3447", .driver_data = (kernel_ulong_t)&spt_i2c_info },
-+	{ .id = "INT3448", .driver_data = (kernel_ulong_t)&spt_uart_info },
-+	{ .id = "INT3449", .driver_data = (kernel_ulong_t)&spt_uart_info },
-+	{ .id = "INT344A", .driver_data = (kernel_ulong_t)&spt_uart_info },
- 	/* CNL */
--	{ "INT34B0", (kernel_ulong_t)&cnl_info },
--	{ "INT34B1", (kernel_ulong_t)&cnl_info },
--	{ "INT34B2", (kernel_ulong_t)&cnl_i2c_info },
--	{ "INT34B3", (kernel_ulong_t)&cnl_i2c_info },
--	{ "INT34B4", (kernel_ulong_t)&cnl_i2c_info },
--	{ "INT34B5", (kernel_ulong_t)&cnl_i2c_info },
--	{ "INT34B6", (kernel_ulong_t)&cnl_i2c_info },
--	{ "INT34B7", (kernel_ulong_t)&cnl_i2c_info },
--	{ "INT34B8", (kernel_ulong_t)&spt_uart_info },
--	{ "INT34B9", (kernel_ulong_t)&spt_uart_info },
--	{ "INT34BA", (kernel_ulong_t)&spt_uart_info },
--	{ "INT34BC", (kernel_ulong_t)&cnl_info },
-+	{ .id = "INT34B0", .driver_data = (kernel_ulong_t)&cnl_info },
-+	{ .id = "INT34B1", .driver_data = (kernel_ulong_t)&cnl_info },
-+	{ .id = "INT34B2", .driver_data = (kernel_ulong_t)&cnl_i2c_info },
-+	{ .id = "INT34B3", .driver_data = (kernel_ulong_t)&cnl_i2c_info },
-+	{ .id = "INT34B4", .driver_data = (kernel_ulong_t)&cnl_i2c_info },
-+	{ .id = "INT34B5", .driver_data = (kernel_ulong_t)&cnl_i2c_info },
-+	{ .id = "INT34B6", .driver_data = (kernel_ulong_t)&cnl_i2c_info },
-+	{ .id = "INT34B7", .driver_data = (kernel_ulong_t)&cnl_i2c_info },
-+	{ .id = "INT34B8", .driver_data = (kernel_ulong_t)&spt_uart_info },
-+	{ .id = "INT34B9", .driver_data = (kernel_ulong_t)&spt_uart_info },
-+	{ .id = "INT34BA", .driver_data = (kernel_ulong_t)&spt_uart_info },
-+	{ .id = "INT34BC", .driver_data = (kernel_ulong_t)&cnl_info },
- 	/* BXT */
--	{ "80860AAC", (kernel_ulong_t)&bxt_i2c_info },
--	{ "80860ABC", (kernel_ulong_t)&bxt_info },
--	{ "80860AC2", (kernel_ulong_t)&bxt_info },
-+	{ .id = "80860AAC", .driver_data = (kernel_ulong_t)&bxt_i2c_info },
-+	{ .id = "80860ABC", .driver_data = (kernel_ulong_t)&bxt_info },
-+	{ .id = "80860AC2", .driver_data = (kernel_ulong_t)&bxt_info },
- 	/* APL */
--	{ "80865AAC", (kernel_ulong_t)&apl_i2c_info },
--	{ "80865ABC", (kernel_ulong_t)&bxt_info },
--	{ "80865AC2", (kernel_ulong_t)&bxt_info },
-+	{ .id = "80865AAC", .driver_data = (kernel_ulong_t)&apl_i2c_info },
-+	{ .id = "80865ABC", .driver_data = (kernel_ulong_t)&bxt_info },
-+	{ .id = "80865AC2", .driver_data = (kernel_ulong_t)&bxt_info },
- 	{ }
- };
- MODULE_DEVICE_TABLE(acpi, intel_lpss_acpi_ids);
-diff --git a/drivers/mfd/intel_pmc_bxt.c b/drivers/mfd/intel_pmc_bxt.c
-index e405d7513ca1..6a9ad1f135c7 100644
---- a/drivers/mfd/intel_pmc_bxt.c
-+++ b/drivers/mfd/intel_pmc_bxt.c
-@@ -414,7 +414,7 @@ static int intel_pmc_create_devices(struct intel_pmc_dev *pmc)
- }
- 
- static const struct acpi_device_id intel_pmc_acpi_ids[] = {
--	{ "INT34D2" },
-+	{ .id = "INT34D2" },
- 	{ }
- };
- MODULE_DEVICE_TABLE(acpi, intel_pmc_acpi_ids);
-diff --git a/drivers/mfd/intel_soc_pmic_bxtwc.c b/drivers/mfd/intel_soc_pmic_bxtwc.c
-index 117517c171b5..08fedf3d3fee 100644
---- a/drivers/mfd/intel_soc_pmic_bxtwc.c
-+++ b/drivers/mfd/intel_soc_pmic_bxtwc.c
-@@ -606,7 +606,7 @@ static int bxtwc_resume(struct device *dev)
- static DEFINE_SIMPLE_DEV_PM_OPS(bxtwc_pm_ops, bxtwc_suspend, bxtwc_resume);
- 
- static const struct acpi_device_id bxtwc_acpi_ids[] = {
--	{ "INT34D3", },
-+	{ .id = "INT34D3" },
- 	{ }
- };
- MODULE_DEVICE_TABLE(acpi, bxtwc_acpi_ids);
-diff --git a/drivers/mfd/intel_soc_pmic_chtdc_ti.c b/drivers/mfd/intel_soc_pmic_chtdc_ti.c
-index 6daf33e07ea0..ff6223d6f54b 100644
---- a/drivers/mfd/intel_soc_pmic_chtdc_ti.c
-+++ b/drivers/mfd/intel_soc_pmic_chtdc_ti.c
-@@ -162,7 +162,7 @@ static int chtdc_ti_resume(struct device *dev)
- static DEFINE_SIMPLE_DEV_PM_OPS(chtdc_ti_pm_ops, chtdc_ti_suspend, chtdc_ti_resume);
- 
- static const struct acpi_device_id chtdc_ti_acpi_ids[] = {
--	{ "INT33F5" },
-+	{ .id = "INT33F5" },
- 	{ },
- };
- MODULE_DEVICE_TABLE(acpi, chtdc_ti_acpi_ids);
-diff --git a/drivers/mfd/intel_soc_pmic_chtwc.c b/drivers/mfd/intel_soc_pmic_chtwc.c
-index aa71a7d83fcd..413d2fd4f86a 100644
---- a/drivers/mfd/intel_soc_pmic_chtwc.c
-+++ b/drivers/mfd/intel_soc_pmic_chtwc.c
-@@ -261,7 +261,7 @@ static const struct i2c_device_id cht_wc_i2c_id[] = {
- };
- 
- static const struct acpi_device_id cht_wc_acpi_ids[] = {
--	{ "INT34D3", },
-+	{ .id = "INT34D3" },
- 	{ }
- };
- 
-diff --git a/drivers/mfd/intel_soc_pmic_crc.c b/drivers/mfd/intel_soc_pmic_crc.c
-index 627a89334908..d3db727c08de 100644
---- a/drivers/mfd/intel_soc_pmic_crc.c
-+++ b/drivers/mfd/intel_soc_pmic_crc.c
-@@ -252,7 +252,7 @@ static int crystal_cove_resume(struct device *dev)
- static DEFINE_SIMPLE_DEV_PM_OPS(crystal_cove_pm_ops, crystal_cove_suspend, crystal_cove_resume);
- 
- static const struct acpi_device_id crystal_cove_acpi_match[] = {
--	{ "INT33FD" },
-+	{ .id = "INT33FD" },
- 	{ },
- };
- MODULE_DEVICE_TABLE(acpi, crystal_cove_acpi_match);
-diff --git a/drivers/mfd/intel_soc_pmic_mrfld.c b/drivers/mfd/intel_soc_pmic_mrfld.c
-index 77121775c1a3..9d7e1881d693 100644
---- a/drivers/mfd/intel_soc_pmic_mrfld.c
-+++ b/drivers/mfd/intel_soc_pmic_mrfld.c
-@@ -139,7 +139,7 @@ static int bcove_probe(struct platform_device *pdev)
- }
- 
- static const struct acpi_device_id bcove_acpi_ids[] = {
--	{ "INTC100E" },
-+	{ .id = "INTC100E" },
- 	{}
- };
- MODULE_DEVICE_TABLE(acpi, bcove_acpi_ids);
-diff --git a/drivers/mfd/kempld-core.c b/drivers/mfd/kempld-core.c
-index 839328bce150..3370a13d581b 100644
---- a/drivers/mfd/kempld-core.c
-+++ b/drivers/mfd/kempld-core.c
-@@ -438,8 +438,8 @@ static void kempld_remove(struct platform_device *pdev)
- }
- 
- static const struct acpi_device_id kempld_acpi_table[] = {
--	{ "KEM0000" },
--	{ "KEM0001" },
-+	{ .id = "KEM0000" },
-+	{ .id = "KEM0001" },
- 	{}
- };
- MODULE_DEVICE_TABLE(acpi, kempld_acpi_table);
-diff --git a/drivers/mfd/loongson-se.c b/drivers/mfd/loongson-se.c
-index 4c668e2d2241..49a95b8e4ca3 100644
---- a/drivers/mfd/loongson-se.c
-+++ b/drivers/mfd/loongson-se.c
-@@ -233,7 +233,7 @@ static int loongson_se_probe(struct platform_device *pdev)
- }
- 
- static const struct acpi_device_id loongson_se_acpi_match[] = {
--	{ "LOON0011" },
-+	{ .id = "LOON0011" },
- 	{ }
- };
- MODULE_DEVICE_TABLE(acpi, loongson_se_acpi_match);
-diff --git a/drivers/mfd/upboard-fpga.c b/drivers/mfd/upboard-fpga.c
-index 9a9599dcb0a1..6674f4a1d2fe 100644
---- a/drivers/mfd/upboard-fpga.c
-+++ b/drivers/mfd/upboard-fpga.c
-@@ -300,8 +300,8 @@ static int upboard_fpga_probe(struct platform_device *pdev)
- }
- 
- static const struct acpi_device_id upboard_fpga_acpi_match[] = {
--	{ "AANT0F01", (kernel_ulong_t)&upboard_up2_fpga_data },
--	{ "AANT0F04", (kernel_ulong_t)&upboard_up_fpga_data },
-+	{ .id = "AANT0F01", .driver_data = (kernel_ulong_t)&upboard_up2_fpga_data },
-+	{ .id = "AANT0F04", .driver_data = (kernel_ulong_t)&upboard_up_fpga_data },
- 	{}
- };
- MODULE_DEVICE_TABLE(acpi, upboard_fpga_acpi_match);
--- 
-2.55.0.11.g153666a7d9bb
+Well, the whole point was that it does not need root and it was documented as such from the
+beginning. So, no. But I am not saying it must to support everything, Veracrypt
+removed old modes - but that makes cryptsetup even more useful for legacy containers.
+
+And this is one place where dmcrypt fallback is not supported - but we possibly could add it.
+(It is just different API - tcrypt support was written years before, actually I think
+it predates most of AF_ALG users including libckapi...)
+
+Milan
 
