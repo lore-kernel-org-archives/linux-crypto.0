@@ -1,153 +1,172 @@
-Received: from sender4-op-o11.zoho.com (sender4-op-o11.zoho.com [136.143.188.11])
+Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012058.outbound.protection.outlook.com [52.101.48.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF25D39021C;
-	Wed,  8 Jul 2026 23:56:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23D922F8E8C;
+	Thu,  9 Jul 2026 02:03:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.58
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783554989; cv=pass; b=MBHSwYiuAibP1iILvt/+TcxO2p+ACi5uddGPe43f5MU+Fb+sTunHgY49R2CfNPoszfeuKyIt+5445p+fGxk+vuewyrGNYspmzWSmMtnVd/jDArNeYGw0x7GqH3JYjtunBWRHWjlHOJZkGfctf/1L74DNgnc6yATirIGzD0hxRLg=
+	t=1783562603; cv=fail; b=PvJfCFmnOaxCkIFhX5MmCACQvhwcZePLfA/jNU7/lsKshBSpjO1Z62T+eFuaga7q+m40tLsoMPg6ZVENbdrMjEnJJVtF8+Tqb5f31+ocvc32IrOoHDstIki1PAEvouo1QUPZxOUN1/Obl4nIAi3awPF3YY7Qg5O6YR/fHgtqJqM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783554989; c=relaxed/simple;
-	bh=1S0123Ko3TwwqEYz9+NFJGMEEcDCr/jiCUfmFtGOsJM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gtLmL1R68i6kx5IWJkA2TcO58oEtVb5yPzsH3DfsObSD7p5/8swTmqlpyMVI6NTD1m7F7JU8VF+pn+4u79FWHltwcux2SCyjQ+FY8KqwMjPIkGyFWxYuKsj4sZGWhEYdolvzzrXI3rAmQK6byhMqmYpHGk1p9s/eYOkWj14nbMs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=sebastian.reichel@collabora.com header.b=F2b67eCg; arc=pass smtp.client-ip=136.143.188.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1783562603; c=relaxed/simple;
+	bh=8F+dPOHBnlxIaKTVL0tYNSMQR82Qzks1arK4P+12eUY=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=sWRxAdxblg5JGSjvJoEILl34laH85Ho+xNRA2/vNXgqOcR/DOb2+lciJISRdjmnOMRWWReU6c3t+C8/F/o189mVoW20JPGrHGwes66Urr+3ku5Pr4dCuVweFWTNTCQfiYPB3FAlk2yL6Wuld+ytUCMV805MvkFP0qi2lSs4cXTc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=BA4vgtNw; arc=fail smtp.client-ip=52.101.48.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=sebastian.reichel@collabora.com header.b="F2b67eCg"
-ARC-Seal: i=1; a=rsa-sha256; t=1783554977; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=XFb4GppKjEilY55ygRsHWBLOhnNKpUcm1DkzM5BcMD3KdJ0BG9a2LVDTRquH33zAmRW6wy3en2cJy+R7a4uBEyQaTtKaKnf8L0ym4D0vZnjfts9y7VmDBErGqJYq7mPC5+rVNi+/iR1Qs6HZqPSmYNxmlHAjZ7T1uAa7wua0oqE=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1783554977; h=Content-Type:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=CbB3C9UwRHwJz8l8h3m0DtvM1ARd9imbzXPsvbNCwWY=; 
-	b=PS4tCHROjJk2PrBhFzM1Ve3trFDTdtcsasKSNYaZNYXE7Cj+gUoC7ldhlQgFvmAv/2TKwI5G94JhBA2I8Oq58SPfvwm4R4EG6WAuyijiSwFFbpPI09n2iMj8Qfng4sdN2DfbeJu9q2gJqQc7x5AnVZnCXGIxE0eY0y+KP7yzr3I=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=sebastian.reichel@collabora.com;
-	dmarc=pass header.from=<sebastian.reichel@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1783554977;
-	s=zohomail; d=collabora.com; i=sebastian.reichel@collabora.com;
-	h=Date:Date:From:From:To:To:Cc:Cc:Subject:Subject:Message-ID:References:MIME-Version:Content-Type:In-Reply-To:Message-Id:Reply-To;
-	bh=CbB3C9UwRHwJz8l8h3m0DtvM1ARd9imbzXPsvbNCwWY=;
-	b=F2b67eCg2Gk8F9eawFiscCcCs/KpYLYJLV0/6xrQwCWeA9UZc5/1swtcHIKL+fAh
-	UxiuKT/3C6m5eTplA6T64ww6m7o3KhjXpsR8sjxNzAyBqGqZXTd/Lmcr4HDFaiOFrsN
-	SZ+5e6MJyDfbs4gNMS1UmJ4j8KMHYi6S5F6w4D78=
-Received: by mx.zohomail.com with SMTPS id 1783554974300771.8410971279968;
-	Wed, 8 Jul 2026 16:56:14 -0700 (PDT)
-Received: by venus (Postfix, from userid 1000)
-	id 2C4631806CA; Thu, 09 Jul 2026 01:56:10 +0200 (CEST)
-Date: Thu, 9 Jul 2026 01:56:10 +0200
-From: Sebastian Reichel <sebastian.reichel@collabora.com>
-To: Dawid Olesinski <dawidro@gmail.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S . Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Heiko Stuebner <heiko@sntech.de>, Corentin Labbe <clabbe@baylibre.com>, 
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 3/4] arm64: dts: rockchip: Add crypto node to
- rk356x-base
-Message-ID: <ak7jEYTAGgeDdi1W@venus>
-References: <20260708175837.1718437-1-dawidro@gmail.com>
- <20260708175837.1718437-4-dawidro@gmail.com>
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="BA4vgtNw"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=D3C6UBAjGvsdrDpzCEtH+885Ye+QphMtNO+OY5nWtRu8DOAXgYX6beLpQC2vdAjibOwr7GwfPlUI3GvAixGAV4K8MWP555m4s8TqNNp4m62ZINQxkhkZk50hLTQszPdBbAGp7rVxXa+/yWgmuepYbtyDYFjGyM8uuNWotpVWltkJBogKNZzBrnyqabH+jlMQSjJnWEB68nSCtHpITGSJY9rZH5aQg1qPHLYtob9yenOFmEtPjk7YaAWMM6ZC1oSj5NMljIOkDK3Aj/b1+Y56v1GNVDyNHT/4WIHbdFdI4ec/pc0eBldPpBb3sPdAD+jmhNtnSwgVpXI18R5N+g0rSw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=D/LiVCckba+tuo9wErnXL0a33uBkLlm1UoxO7RUSCSc=;
+ b=Lu0nMux7HTE2PzBucef8jfw518nW7/vt8zAmUNFRLq9uC4Oru1n+5CMRxVonPzIyWTKEhRVVfCNUTt2Qx1GARfxS4U7XCX5b5YLI6UUZUe/NCU6x68JFGsg+ES2sgp1yH6b9U0YwyusBqMl4OwNCWmfaqVOGmXFqitsa7eZtvxqwsFVlHoH+v6HkkdfyF9jkX3hQlHRTnmvOlnWFH6aqZOemI1HVBn+9LxPZuxN9MkXOsDcZhb6HpsdNEbR8I+6bTDvRnXwTMOb2jmK6GRuv4ZJbNT87bZnDogSpN1y/18PTKXVxsDx8gShjGj6DJkFBP55x2PB1DdkBG3UVFiK5Ww==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=D/LiVCckba+tuo9wErnXL0a33uBkLlm1UoxO7RUSCSc=;
+ b=BA4vgtNwJ31MhYvALzdAJnBvs+ihKaWi8ODP1ZtRpFfYV1aVUocYgqk7O4LMeZxpcfOk3bU2DjbOx/W9t8isXZ3EKb7gq0bukmT8tr9w5drVQz6agkDrftfr0G6Eefj5g9lGjEOFejC9MUkeIAXVO6icGphQKM+I/HveAKj+RJzEZA+4Bo9tiAXdoWjygmFgnQvVR3CWLsVOifkp2iUFjx0zEp0ONzXAoaPDIyEzHIKVzz2McNTxWRMMXWlthgb7WhoEbxm6ZteLHU6xfzffL8TGOS8OO5UcEtKxsKwxChdSR8Az5/IxBN3A88CdcjUrPIgQOjsJLkMe5uTIvhZcjQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV3PR12MB9356.namprd12.prod.outlook.com (2603:10b6:408:20c::21)
+ by DS4PR12MB9818.namprd12.prod.outlook.com (2603:10b6:8:2a9::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.10; Thu, 9 Jul
+ 2026 02:03:16 +0000
+Received: from LV3PR12MB9356.namprd12.prod.outlook.com
+ ([fe80::1c36:31b4:c420:6286]) by LV3PR12MB9356.namprd12.prod.outlook.com
+ ([fe80::1c36:31b4:c420:6286%5]) with mapi id 15.21.0181.014; Thu, 9 Jul 2026
+ 02:03:16 +0000
+From: Yury Norov <ynorov@nvidia.com>
+To: Russell King <linux@armlinux.org.uk>,
+	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Andrzej Hajda <andrzej.hajda@intel.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Douglas Anderson <dianders@chromium.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	John Allen <john.allen@amd.com>,
+	Kees Cook <kees@kernel.org>,
+	Leon Romanovsky <leon@kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Yury Norov <yury.norov@gmail.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org
+Cc: Yury Norov <ynorov@nvidia.com>,
+	sunyi <279644543@qq.com>
+Subject: [PATCH 0/5] bitmap: align bitmap_find_next_zero_area_off() output with the rest of the API
+Date: Wed,  8 Jul 2026 22:03:06 -0400
+Message-ID: <20260709020312.133977-1-ynorov@nvidia.com>
+X-Mailer: git-send-email 2.53.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BY3PR03CA0007.namprd03.prod.outlook.com
+ (2603:10b6:a03:39a::12) To LV3PR12MB9356.namprd12.prod.outlook.com
+ (2603:10b6:408:20c::21)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="nchjsrkyo2s4nb4j"
-Content-Disposition: inline
-In-Reply-To: <20260708175837.1718437-4-dawidro@gmail.com>
-X-Zoho-Virus-Status: 1
-X-Zoho-AV-Stamp: zmail-av-0.2.10.1.5.2/283.531.57
-X-ZohoMailClient: External
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV3PR12MB9356:EE_|DS4PR12MB9818:EE_
+X-MS-Office365-Filtering-Correlation-Id: b92c3024-f948-40fa-43cb-08dedd5e3d93
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|7416014|376014|23010399003|921020|18002099003|6133799003|11063799006|56012099006;
+X-Microsoft-Antispam-Message-Info:
+	ZaPqwJCDqAoZ3fiBPNoiXSl6zYbpfQsTmMl3tgfCmhs8jjTASqVESS5rARQ67T875Bl2PRDGQPe482zRhh7iq3/pSRtm5P+6bRlfPbZYqo+JyogxtBnvi8U2nAsMpsK0KPAVs+5uHDIvlbsACwrx/aaik2+6KtOYs+vjjsZCJW483pG2GOsSZra5kbNH0bnq3SPsO79GnxTGTxtqcKVSGpLpbLXw6MMOSrmZZFlKB0uwc+VLnppmHvEZwQjyrc+BZCJpWV3Ce1F+Rd4bsPFdyaTywyl/VkVFiwXmLqAQnes7pc42zzfqh6h7u/b2eChNGP0B/SPdnwWbWUnVHbiyV5cH3Zj+VDABJkshgX52MN3fGCBYoEfKTzTWGXLgZK4PcIu092gL1FxEKTfqoC4Jbge47jxBjq+Er1TnvcpZqIXLmUhdZJCcmMeAyl6HuCjlvgWDpeyqjFDmk8dAo9RunKu/TFsEtJThmml3+ScPlw/YTqRDcjMsasRWweb/y9WLC1N5J0Dko80qK2lDYhl9UekUyenIpyNCZWQa523O7P9JMPVetE8MJcviPuGteMRsHhvyx8kA6Al63ANVE5HF8dmgKR++TlzmkTzkcs13e7LnN2rk6qgZsGBD0+L59RLZP9x3W+NU3w+bA6Qg7tRFvYMxbxxHqT1OY3Df7FHMgqORsTvUdUAaWgdJj+26+Wa5nrHGfJa8u67CAtd/dRg+7w==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9356.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(23010399003)(921020)(18002099003)(6133799003)(11063799006)(56012099006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?XZFPS/GtgCRcdwEdoIHvySuBetanCUwTqqON3Xs4ctiLiiGfeKJ+IHwk0PGi?=
+ =?us-ascii?Q?1QGySD958FomaHYlfBcA/GFonNwNxOvAHHq525bepkGMuY3CLnpbvNCLQGWb?=
+ =?us-ascii?Q?p6Ojh8/x1vBc1GgaYlsVJLz6qQT0ZfOnGcMU29tsjWiyGsdtG0kmX+aIzV1M?=
+ =?us-ascii?Q?TS8BseODZfEuyhqztTXs908HLknkTsYyL9jKGYQY68vDFNaJKoVyw8dGK1Q1?=
+ =?us-ascii?Q?AkiM0QMgsdMduaJZBYIGyilDKYOaUDqUbvF7S1m2yVLcaPR2wUoU9GtLXQSM?=
+ =?us-ascii?Q?ly9ujYcCFTxKEs6mKSPZ1RyxvSY/S/tzPbjXqGY2LIXg0ORvJvEdTEGhxqWy?=
+ =?us-ascii?Q?r807yk3/YI198VRd/4kFk46C0PJpNP0uvRe3GHrNAwjw1K/EwLQ6S4Mw3rDs?=
+ =?us-ascii?Q?vh9AAKx272WwqjS71NJJO6/Iv5SOr9x+EcvfysqYSbUm2lnhfWe9x8Os88lt?=
+ =?us-ascii?Q?5t1liGQdyVIRTUPsszIfc3wGqZ5kjVfOvCRNB+UqkGEEXq87/rNbgiICITcu?=
+ =?us-ascii?Q?C47isUg9QCmGxyRgxYumJsdYCtabyg9i9WsFUSg8Ca+UVIXlWLfO3Ztw8Cz5?=
+ =?us-ascii?Q?wvx88H6wVE00eqlvKHxkYJFLkNarW5BU+HZDJdswBJ2FvgLQvViFqVT6J90d?=
+ =?us-ascii?Q?7t3c8hh8z/9Z35FQJX1ilCs/CJBMEJKiVdVcp1OY3qO0E1Uumezks/XB8e0j?=
+ =?us-ascii?Q?k0aDov+VryTMv29ooSGgGuoDTFU/DX09Z6F3SjIz9r/0B4GSeEEKcBtntYJE?=
+ =?us-ascii?Q?iNprtz51W6t/EQdOivV0otFCZpMDpl7xhmcSKSpmKLuO+nC8yyI0QjgOVu9q?=
+ =?us-ascii?Q?FWkcZZb3uR4C3Vee2CD9LBtxcXIZnnycrfjTm0XbDBYWFUzb4qabQ0xOyQDD?=
+ =?us-ascii?Q?LWKeavdLaPecqFNIMaNyKrfjHKXULXh7a42B5ZymAMyzQHeLNAy/dbpOjEQ2?=
+ =?us-ascii?Q?mOfluAtcnAs8PtsvQdPcZYz9OUD/mWLU1GlR2dExrJumyPSUGJk+DvLoq6rk?=
+ =?us-ascii?Q?aYxev4SnUfDw7ZymqFXcuXYIFapyXCa9blOvV47hYNRSWH9ZWM3O6P1dCcV7?=
+ =?us-ascii?Q?li/5bgAe9bJwKCD+g+9jE6LW9pv062eQOjlXSSuHtUmtHKDUVUoAPiYuWgeF?=
+ =?us-ascii?Q?0IIrWxa7wIHI5FgiAL3bpSWeJkQDGIF+ZI3xUBK5XauGUlfp3wVQxp9/qB30?=
+ =?us-ascii?Q?/r0QNvr/60Zj4UHABG/ObWA7wUKm8qxfJF7OpER8Xbvkw339UbmnKuX5IBTh?=
+ =?us-ascii?Q?S3WIaPtKNpfptFXVbNEHGgCVE0em/ynzSitwE8G1ehIxMRNXZ6fmKKmjiLYq?=
+ =?us-ascii?Q?6zFxK+LQXnNx3ZFegvnXfdxbWcvGqbALspEISu/FCcbbveOYk3gVXmlxwwtL?=
+ =?us-ascii?Q?PnB+4widUxJlUIq+SRdmy4OFWoLGrA4qVL7GHRqgjKqKRb4oKmrtgVn0hyko?=
+ =?us-ascii?Q?mU6oAmqsH9CW1OUI2OvO89jz1TMBriEs5CcU5IY0o5drCVJMJCAn5GdOou9v?=
+ =?us-ascii?Q?fSjKpzVWcQWQd2EFjXKStQxcFBGKtBq5DdZ/N0GXKCS0OjtB/6kaLcR6/0M8?=
+ =?us-ascii?Q?WxjT5MBD6dO6sKUrkLVdI3kVMWnSWe+oc0tZBtgrQg/4sTGw/ZTLk/b8YFhw?=
+ =?us-ascii?Q?caxV4a+JSJeobb/pddeSA9bDajvha+7T/Vbea+yxwEIi3y9ZLO2sru9cENAL?=
+ =?us-ascii?Q?Z+G3njFROCCQhQanZl0emHiYAsSJ6OzXlJplO63/9jRH+HU2CqQ6ItBG0rBw?=
+ =?us-ascii?Q?kkJLTvgPWg=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b92c3024-f948-40fa-43cb-08dedd5e3d93
+X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9356.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2026 02:03:16.4497
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: eJrAnOLxCpc2iE4Io5yFxIY80n3frGMC3PBMWTBbRLVoR5wTtwaMlWl0Vj0i+/kC+FrfARaIGSXdTo8poWKV4A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PR12MB9818
 
+Bitmap search functions return a value greater than or equal to nbits when
+no suitable bits are found. bitmap_find_next_zero_area_off() is an
+exception: it returns a value greater than nbits.
 
---nchjsrkyo2s4nb4j
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v2 3/4] arm64: dts: rockchip: Add crypto node to
- rk356x-base
-MIME-Version: 1.0
+Align the function with the rest of the API and adjust the affected callers
+accordingly.
 
-Hi,
+Patches 1-4 are sent only to their respective maintainers and mailing
+lists. Patch 5 and the cover letter are sent to all recipients.
 
-On Wed, Jul 08, 2026 at 06:58:24PM +0100, Dawid Olesinski wrote:
-> Add the device tree node for the V2 cryptographic hardware accelerator
-> on RK356x SoCs (RK3566, RK3568).
->=20
-> The IP block sits in the non-secure peripheral domain. Its three clocks
-> (core, aclk, hclk) and reset line are accessible directly through the
-> main non-secure CRU, so no firmware intermediary is required.
->=20
-> The node is disabled by default; board files that wish to use hardware
-> crypto offload must enable it.
+On top of -next. I plan to carry the series with bitmap-for-next.
 
-Why is it disabled by default? It doesn't seem to be board specific
-at all to me (the same question applies to the RK3588 DT).
+Yury Norov (5):
+  ARM: dma-mapping: Treat bitmap size as allocation failure
+  powerpc/msi: Treat bitmap size as allocation failure
+  crypto: ccp: Treat bitmap size as allocation failure
+  media: s5p-mfc: Treat bitmap size as allocation failure
+  bitmap: Return size when no zero area is found
 
-Greetings,
+ arch/arm/mm/dma-mapping.c                            |  4 ++--
+ arch/powerpc/sysdev/msi_bitmap.c                     |  2 +-
+ drivers/crypto/ccp/ccp-dev-v3.c                      |  2 +-
+ drivers/crypto/ccp/ccp-dev-v5.c                      |  6 +++---
+ drivers/media/platform/samsung/s5p-mfc/s5p_mfc_opr.c |  2 +-
+ include/linux/bitmap.h                               |  3 +++
+ lib/bitmap.c                                         | 10 ++++------
+ 7 files changed, 15 insertions(+), 14 deletions(-)
 
--- Sebastian
-
->=20
-> Signed-off-by: Dawid Olesinski <dawidro@gmail.com>
-> ---
->  arch/arm64/boot/dts/rockchip/rk356x-base.dtsi | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
->=20
-> diff --git a/arch/arm64/boot/dts/rockchip/rk356x-base.dtsi b/arch/arm64/b=
-oot/dts/rockchip/rk356x-base.dtsi
-> index a5832895bd39..9de7e7487ca1 100644
-> --- a/arch/arm64/boot/dts/rockchip/rk356x-base.dtsi
-> +++ b/arch/arm64/boot/dts/rockchip/rk356x-base.dtsi
-> @@ -1112,6 +1112,18 @@ sdhci: mmc@fe310000 {
->  		status =3D "disabled";
->  	};
-> =20
-> +	crypto: crypto@fe380000 {
-> +		compatible =3D "rockchip,rk3568-crypto";
-> +		reg =3D <0x0 0xfe380000 0x0 0x2000>;
-> +		interrupts =3D <GIC_SPI 4 IRQ_TYPE_LEVEL_HIGH>;
-> +		clocks =3D <&cru CLK_CRYPTO_NS_CORE>, <&cru ACLK_CRYPTO_NS>,
-> +			 <&cru HCLK_CRYPTO_NS>;
-> +		clock-names =3D "core", "aclk", "hclk";
-> +		resets =3D <&cru SRST_CRYPTO_NS_CORE>;
-> +		reset-names =3D "core";
-> +		status =3D "disabled";
-> +	};
-> +
->  	/*
->  	 * Testing showed that the HWRNG found in RK3566 produces unacceptably
->  	 * low quality of random data, so the HWRNG isn't enabled for all RK356x
-> --=20
-> 2.47.3
->=20
->=20
-
---nchjsrkyo2s4nb4j
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAmpO45kACgkQ2O7X88g7
-+pqdGhAAnuYg7zLjumByWrVauxAbYdeNH1NJ0MFQCIsxYyhDCl9PVKc27oFP6/Ev
-Xtwp8RQDB0Aq1AHuGPnmhy9UOTBwOi0I6uaOtdRjPKT/pEOATJY5UvpdGsHe9c+/
-/HFlMJdEykULZjzULWjyFNAxON/gc5qGAfPKaaMKryJgRKVBu2girSp1ky+YSoAx
-GeWAf2WvTf0jrSbrrxcCbRrUVVs5Ni9TMTgijp2rNNKEW98MiJSj8FnWYmmhfbIO
-WRJz/r5/NgGZwXiL/FE50wV8p+p5s2OvFER4NBcuKao6rVDyrBtuxX0Nfgq68qqU
-DqJXzfHTBSn9zq/Wxp1VTGDm0IYShRFQ6qDHPWzEl817WBs8JDy+9i5qCSDtVXli
-lLwZOKqEiuYJj1IKSLJcePomtilj8v+VJr2CJM5TezKaTAZN82rruqr7PX16ubdC
-oV96WMMqeEYOObrN2tfzCGjq+cF7MciSGnvMNVSmCxF5laD7AQXihQo/fxhw1P/c
-MZnz8K1lFD1qUU9Yx7T0zjmvFVvmfY8/mrp/gcGtYQ53f+U9Lfe3B4sK50kEyBdS
-bcgaWJL1R+X/DDdH0AUqAs+jLPwXYDk93DqV4F/PPwUUlvFJVnFs5wsk6wtawIXn
-P2wdhmkYnCwD5DBgk1MVyWFGCMfS8ur91pGWCctlXLRWkwIAJiw=
-=xw6V
------END PGP SIGNATURE-----
-
---nchjsrkyo2s4nb4j--
+-- 
+2.53.0
