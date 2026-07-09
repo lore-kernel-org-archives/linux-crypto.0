@@ -1,86 +1,86 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA5E92F49FD
-	for <linux-crypto@vger.kernel.org>; Thu,  9 Jul 2026 06:12:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C52813B47E6
+	for <linux-crypto@vger.kernel.org>; Thu,  9 Jul 2026 06:19:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783577569; cv=none; b=VVjGQ9FZwz8IkTCDRdD0MYIwEUhsYBl6bHMMlVvbHl0UOc3Rmuyzc/RZKmgQuizdjWSIRsYI/a15RARuhMA3uelvf9u+ymj4hPRhkzSlVG/VLtG+i87aCMQ2+M7a/mW0580FKbuI8pws4ZoQXWfdQ7ijq3UDuQwUNE1ujamrUyA=
+	t=1783577989; cv=none; b=qgNT+mwwrus+FLElmVxC5UXN5Mx0XIv1rmsc3aGn0DfFRwIMRLjs4xinGyBM70dOHQeHqWYhAo/yOC8dkNKBkbN9xUMz9LLEyDX1Kf8DwSPQdlKG1kmnrvz3OET9XtmNrX/F7ggDPK7qWmriDOz2oAghCKngoUmV4nHCZmZrwok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783577569; c=relaxed/simple;
-	bh=UQgUiICEoYX7KypyjdGPMDkKNZYp44gGMyOoT4NY8jk=;
+	s=arc-20240116; t=1783577989; c=relaxed/simple;
+	bh=lA5oC7wfzNgO9eg+QpgDGee5/cyUa7Fj5mHmFhaVEN4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Qc6X9lnWVIEYIcrl6LSOIdEBCzlB2raOILsFebC7oW1hDklfquztEwN4JiA412hD5sVuueQR1GGAAqhQm2i59VsPEj2qzGIq3hX0SQrHTYEK5eS8NOHmr8/fEC2UANsq/IcIprZE6uJCBK4tu03ZorA/YlQj20A6NJ41uv1VKaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JuQIn8jk; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=l5snGDnt; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=uNmobuxe6479k8+wHWScPUT2bQjkmJme0hWFz0H3tJyWTL6LuH6rgV5fTy85TnBdMcV6+T/6oUK73bW+1yVR+tia1qlMxffp1zBs9WbGQzKAaDG9+1fF9iW4f/bPqwQZykGzsefxGfXQSiOzJuUycoVCo9/a2qSFSPvKv2spfVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ee/4igzL; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=hiAgNrdK; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JuQIn8jk";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="l5snGDnt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ee/4igzL";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="hiAgNrdK"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1783577566;
+	s=mimecast20190719; t=1783577986;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=GdsLEjUUbsQ2OocBAbAJ5juaZkKQkkljxxgPRCvbL4A=;
-	b=JuQIn8jk8+2CXcBSvYEppqaUftQjsFdwZIglrNoEYZO9es0NLLUtpc25jvqk3s+j3oNFUA
-	gUmZ9CI+qyWgGGRhM1ax6MuKoSg+1QFrcfVg5rVk3hgwdBZu/whMqI+XDMlRDvOhHCcKx/
-	pfd1LebyNJlio5GbEnXSNTC/5g/Edi4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=qpxYAiPSaSnLcsbZMbEmZWD1GqxQDX+qAlfBTgCD48k=;
+	b=Ee/4igzLhNp3uEgzvEuNkOlWJ+/sOvAPKPF/kRG4+MR7P1ryBwPXJdRniQDm4jjL3UAOii
+	QmHcMJG0e6QPsbgwl2UZ5kg8/fevdvsP3Cf2rMU6uCDr0VCWYyPLUGJrenLPaqY+PD17Sm
+	Ao3kUqmm/ELb7o8yBuu74raT8omClqI=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-461-ee4JZo4zMKmx0Ylp8PY13Q-1; Thu, 09 Jul 2026 02:12:45 -0400
-X-MC-Unique: ee4JZo4zMKmx0Ylp8PY13Q-1
-X-Mimecast-MFC-AGG-ID: ee4JZo4zMKmx0Ylp8PY13Q_1783577564
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-492488f8583so5381595e9.2
-        for <linux-crypto@vger.kernel.org>; Wed, 08 Jul 2026 23:12:45 -0700 (PDT)
+ us-mta-478-oM5ld3iuOYOOHwuG6bLgfQ-1; Thu, 09 Jul 2026 02:19:45 -0400
+X-MC-Unique: oM5ld3iuOYOOHwuG6bLgfQ-1
+X-Mimecast-MFC-AGG-ID: oM5ld3iuOYOOHwuG6bLgfQ_1783577984
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-493e0042895so8866125e9.1
+        for <linux-crypto@vger.kernel.org>; Wed, 08 Jul 2026 23:19:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1783577564; x=1784182364; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1783577984; x=1784182784; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:in-reply-to:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=GdsLEjUUbsQ2OocBAbAJ5juaZkKQkkljxxgPRCvbL4A=;
-        b=l5snGDnthFZXNU9hFqSrTXq8lINP/paK5JxeMRaK41TwSDMEC+3jqhnNUze6oiMeNQ
-         K06EZMAjmZ9XL4xLRbuYDkI+9ugh4srJmQDrZLu8S810Sqsnzwn2UoY/0jSMcHJyaLJm
-         rFXVGYxf1+4kVlKpd1aZgfRM9KtqPBtzPxTxFlCJRb55aQwFjxRiz7qqVxU196qz1EIB
-         i6OQXYVa6xqTIbrO5NAHLxYvQhU8JF15rZZSfkXDWwvDbhdyM1MdcVPhYBkM01Evft/z
-         lNGVbtv7E0YdvBYOJi6hDL5VYjTBGv+i3nxEbB4J5VNo3+QXIcaSaBpW0zoE3OjUKvf0
-         oTmQ==
+        bh=qpxYAiPSaSnLcsbZMbEmZWD1GqxQDX+qAlfBTgCD48k=;
+        b=hiAgNrdKgInPAcXIw+FrgGUPufvvlQh/eK4XdVimVrEbiJ0d7C2+pG1aj2tKitjzxP
+         HxwuD6nl+T1EBdUOezkDm4N65ATAHABiRoB7xb98vA8rNEZ2Vu72UonZKIH551l3tX3b
+         ECyNBVrshmstyGGEG8rSSc2uOW9eHCZYV0XQjdsz8vgmS7I0AKAGTIB/jhq8yBWX592P
+         zZf/reGKYVaJ8D65lc2rIuYpZGzk0HraI150Sm+XoxFC7g4g4OPg/bDybZpDJ8Mz9gno
+         VPHAA4Y4/tv8j1GTatiiFyStp4Bkz3EJ9eaCbLUuUX2Pp7NFv2Q+O9i4UlfUvP8hQq/y
+         2BLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783577564; x=1784182364;
+        d=1e100.net; s=20251104; t=1783577984; x=1784182784;
         h=content-transfer-encoding:content-type:in-reply-to:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=GdsLEjUUbsQ2OocBAbAJ5juaZkKQkkljxxgPRCvbL4A=;
-        b=B1HcRrQtkF0TpUJMc8enIVJVn9vkbi7dfm8h2GaBPFLcPGbetvetOaXaGZjY5rbPWB
-         t7JERrwoUrAdBOhOVU4yvzF85reL0i57jhOg2YBXEP3VWldwW2bneTkWHDC2EFdmkKca
-         OOYJvQC1xnbBG+87PiM2j8qpOlQWdZn2a+RqX7bWQ3NZas5E3tmR1US9/PGuVfQGZRty
-         03jQsVn4C+ycxjlnTw0ghM/Y42W5IvS7otxGVsqvD8JcURM+r1xNyJWpwThs+iShjeoB
-         pIoJVyI1vyD9C/nRei7aBOkS1a0wdw3uUfFlcJh8D8hGVc/b3Us9p8NQxsNeSGvEuCg6
-         z3Ww==
-X-Forwarded-Encrypted: i=1; AHgh+RoqFI42SQBR8zCug3BibOtXiWqy6OVRXIp4LjwmpG3Tn6vXAtHAEhYLJFSTQGCMzbDuukFtyUK87zFxYzI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXOyOsgZ6KbTugi8aKAx2AXL70V9I1CqLd1N+IWc9Qk8rTHz76
-	01VPM/XT7Gi7KzuceDscffyOq0JPBI+4wgPAUc/LS+uvokluQi2nc4GTqFmIxij1rgr2bfyftHr
-	UQYP3XZpsFWKT683kk2WjvA8TCH7AaDHlll+fZ3SXkvsihKM08Xc8TX0z9LjM2BWHbQ==
-X-Gm-Gg: AfdE7cltcPJsOFXztk0POVRcGvxBS5DMntxBQJeDNFdhJI6DaWcRGgF3V7JI8LrwEI9
-	k9RJScjHj3MBXJ6emRJtewrtmCLB61PEOP3XOShhl9hu+0Z4Iyb0vgeITjgNJJJmq3MCLuFNnQp
-	6IaC2HEGfbl/h+BvkjlogG8B4tABVP3RYkCeWl8+b6vazxvq0naPalgqd29eD1BjUltqKKKifys
-	vNCZ+QEaRg+0b7WK47oSt7vJavQjZO75GYBX+C20VJ+vUdJDSNteuRav+A6YqhnxrlD06cPYo/p
-	9dSIVbcxYxFqxiw8K5Y2rr0HkR84yDsYo2w5jn415YbEZxx/sHVsvPtmqpy4yigkU9JgvfFkc1R
-	auNYzOPwS
-X-Received: by 2002:a05:600c:528e:b0:493:c2cc:aecb with SMTP id 5b1f17b1804b1-493e68ef712mr57929095e9.38.1783577564433;
-        Wed, 08 Jul 2026 23:12:44 -0700 (PDT)
-X-Received: by 2002:a05:600c:528e:b0:493:c2cc:aecb with SMTP id 5b1f17b1804b1-493e68ef712mr57928845e9.38.1783577564019;
-        Wed, 08 Jul 2026 23:12:44 -0700 (PDT)
+        bh=qpxYAiPSaSnLcsbZMbEmZWD1GqxQDX+qAlfBTgCD48k=;
+        b=WP4W7rwn4n6YwYKagTd/2xSYQz2ISsmwJt4I8THARRwheNejBCa2g2U92fNdqAamRt
+         +AyCTqVe/zrVL3P94xRig+YcAiP9D6duKlgUGO7cAmNnWNusxv7rh4SnaMoN2YCxXxEM
+         SmZBlWZZMwIyMHC2U7a8uwe/ZuO6E6mYupPEQlsuSNscVmQ9cs+/4PRoeubvqPktHrnx
+         Kl88BQJ9+bRu6Wt8IuL8BUpimD5Zy/OscmyS5QTfwtm3l+1t0+8lQMoLJKAyJjZCotzn
+         1SFRM1zdBkWO/aObYAcnsrI2MxVAqxD1+5Hi1xOXwu0bvwlxD7KzkaJ0ECIwUVbWnR6K
+         EC8Q==
+X-Forwarded-Encrypted: i=1; AHgh+Rrw5P7V3WsdpsYscL05o6aEfPbT5KGB847j2W4pFKfXjRV0cWMtcI3kM432TxErpAYZyPDsVf3RLWmsvz8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlYoBfNP73S5fqTfHoQQXU6Hxn9OPE3W3QIas+U59lUhPy50Ok
+	W5VfdDACK7XG5wfUj/Kt33qWczhowM0gTjAEObMboS/YJM0h08TgCFeiCxPcBu2pOIsp0X013YI
+	AwjkzjrD3Ctt9aqdwszvRVBfSMlzIIYb6ETpuXUYLEiYCEP7W+kcmVn5sb/5ZNGYXvQ==
+X-Gm-Gg: AfdE7cmeFVEC0dRjH0C8WWG1oMGofKm/Nq+exBUG+qqbbLawC15c4w8JHHT6mNLvKzJ
+	MeVopYhU4WrD5GwDcksPEh0H1aWd+4SfIG7DQobBxmJUh7qZfWeqv2JMAxQNarAiCECvRvmRl2S
+	7Tby9oeukqPLninppCfUh1yIB7h7CTWiGCxg5oUQ32mAY8T4dVZ3/qxLW9cWQsXBRYoFeyakOJg
+	jpdhxmPriCUhj88EDF1IOIkoditUYasr3hrk0lepTL3OLy3Hu96x8NbZ73aeJ0aIf23tLrOJvF1
+	ui9vTtF1a/saKzr7PyTgZwmxAcaBzDYQYq5B15D0lgn/YJm04qSgsyK9fHMViBF4+xdDsO+MB8G
+	jSJqFr3/p
+X-Received: by 2002:a05:600c:8b17:b0:493:e6f7:ad75 with SMTP id 5b1f17b1804b1-493e6f7afb1mr49809175e9.11.1783577984254;
+        Wed, 08 Jul 2026 23:19:44 -0700 (PDT)
+X-Received: by 2002:a05:600c:8b17:b0:493:e6f7:ad75 with SMTP id 5b1f17b1804b1-493e6f7afb1mr49808885e9.11.1783577983859;
+        Wed, 08 Jul 2026 23:19:43 -0700 (PDT)
 Received: from [192.168.0.9] ([47.64.114.244])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493eb6df6d9sm41399435e9.7.2026.07.08.23.12.42
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493eb742d0esm34679365e9.13.2026.07.08.23.19.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Jul 2026 23:12:43 -0700 (PDT)
-Message-ID: <fa5ec5b5-3dfe-42a5-ab7a-b6204a223252@redhat.com>
-Date: Thu, 9 Jul 2026 08:12:41 +0200
+        Wed, 08 Jul 2026 23:19:42 -0700 (PDT)
+Message-ID: <aa109637-0102-4341-8bb3-02bf2a90a170@redhat.com>
+Date: Thu, 9 Jul 2026 08:19:41 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -88,12 +88,12 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] lib/crypto: docs: Fix some sentence fragments
+Subject: Re: [PATCH] lib/crypto: docs: Improve introduction sentence
 To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
  "Jason A . Donenfeld" <Jason@zx2c4.com>,
  Herbert Xu <herbert@gondor.apana.org.au>
-References: <20260709022651.44216-1-ebiggers@kernel.org>
+References: <20260709022747.44635-1-ebiggers@kernel.org>
 From: Thomas Huth <thuth@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -138,23 +138,32 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20260709022651.44216-1-ebiggers@kernel.org>
+In-Reply-To: <20260709022747.44635-1-ebiggers@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 09/07/2026 04.26, Eric Biggers wrote:
-> Currently, the section about the library API for each algorithm begins
-> with a noun phrase that was intended to serve as an elaboration on the
-> title.  It's better to use complete sentences.
+On 09/07/2026 04.27, Eric Biggers wrote:
+> Make it clear that lib/crypto/ is a kernel-internal library.  It's easy
+> for people to come across this page, especially the HTML version online,
+> without that context.
 > 
-> Suggested-by: Thomas Huth <thuth@redhat.com>
 > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 > ---
->   .../crypto/libcrypto-blockcipher.rst          |  6 +--
->   Documentation/crypto/libcrypto-hash.rst       | 38 ++++++++++---------
->   Documentation/crypto/libcrypto-signature.rst  |  2 +-
->   3 files changed, 24 insertions(+), 22 deletions(-)
-Thank you very much, it sounds much better this way to me!
-
+>   Documentation/crypto/libcrypto.rst | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/Documentation/crypto/libcrypto.rst b/Documentation/crypto/libcrypto.rst
+> index a1557d45b0e5..0733e603d229 100644
+> --- a/Documentation/crypto/libcrypto.rst
+> +++ b/Documentation/crypto/libcrypto.rst
+> @@ -4,8 +4,9 @@
+>   Crypto library
+>   ==============
+>   
+> -``lib/crypto/`` provides faster and easier access to cryptographic algorithms
+> -than the traditional crypto API.
+> +The Linux kernel's crypto library (``lib/crypto/``) provides kernel-internal
+> +users of cryptographic algorithms with faster and easier access to those
+> +algorithms than the traditional kernel crypto API.
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 
