@@ -1,75 +1,86 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1581154723;
-	Thu,  9 Jul 2026 15:47:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE914343E8;
+	Thu,  9 Jul 2026 16:08:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783612036; cv=none; b=TH6vX6pQKRop0POy9opkDYtiHMaoH8z8vfeBUq8rXB+CpWatXB+d/P/glpBHdC6ZcnCziDjIpLjLcwUm2SzvpvjQ2jUIDmdVOHjDqSzIcy6vieGCgQGxkzNCJR1wxBJ9SewMEtj+c8tUoFb4P0/hcslxexYXxlxa48KKyegpan4=
+	t=1783613324; cv=none; b=QY/3PwvD/A7xt1ERaMe5u5BwC41CTh5j7DaMRFdbbMxmyKzW+iCZk6YdLaFuU4m5rB/DNu3RMMO95bYTbPZMHtnU2+eGFPMrhJ6koRmMSSq0gVBwCjxNJcLosnB5H4bJN0eAb3slqLMdJHvO42ZNsHLZsyGoDA65nxmosV/kDLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783612036; c=relaxed/simple;
-	bh=GVCbjF+A4VSV4RiKd3PnGb4Zfkm9Eg/koEAbHJbvzDw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i8eDhFYx66qc0n1vkurUelbVvgy6IirewabWw+MR+dFqTI5gWJIZUEMzPvrimG9n7pj9LH4rhM6WX8lEBtnjBqrdu/YMDpLUnDtsBXVYTlHrSTwmbSsAcsagEGjNwZfh6DvqWIgEGQd78j/XznEJA8wLFVmXqhJORHt0rnpo7oQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LKsuqrl4; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1783613324; c=relaxed/simple;
+	bh=QkUqyxWcolWjRqaLftymnFLP2qJPjNeHWeySSYT0rUs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pe7LkCCwSR5fSt1bjhjNkXWThqk843TyW9jZTU4u5wREID1WJ6l0hHpjieBLYXaQ/IqSxQfZNfjADHefMGjrHvbP1FiX86QZxwGi0YSoBHtbcdCvk4ONqguGfHTSzdgusLvEuNq5jetN/rexFR+SoqjesqburlTJjflYuYY88fc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Q5FaBwdY; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LKsuqrl4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A68991F000E9;
-	Thu,  9 Jul 2026 15:47:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783612035;
-	bh=DDBTZE6NaalyA2hbP+96rCdb52x67RTX0930I1VznkI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=LKsuqrl4VNkM812QBSwyAAHx/zksQk3ssvSSg3/kI/w9H31LFOxTc2VKsgfu0e9+C
-	 Mu+BdBTgWHTKZrOKtoOKX5Hzc0zR9c+Zw7j1sY6qEbVkxTC++FVzwCqOBlQ9A0+H1o
-	 wYKZVaiYx65iVT55zK41q8Awp6jfpSx4tZdRXNHGqFzhVEUUBqVxp4cpnaHOiZdSh4
-	 ZoHILkAp7HW2KCxaOLdYZUjC8EyFdjz8bmEqdMsrYovHdibrWaBRkxLIZzKZvgXoji
-	 QvdxNewJYwMsmaaYiA08P3Czom3nqctQ0Zo+/C2PvnoA16VCKB66pNjBGBumOzYSid
-	 j+z67Am5ElW0g==
-Date: Thu, 9 Jul 2026 11:47:13 -0400
-From: Eric Biggers <ebiggers@kernel.org>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bpf <bpf@vger.kernel.org>
-Subject: Re: [PATCH 29/33] bpf: crypto: Use AES-CBC and AES-ECB libraries
-Message-ID: <20260709154713.GB6853@quark>
-References: <20260707053503.209874-1-ebiggers@kernel.org>
- <20260707053503.209874-30-ebiggers@kernel.org>
- <10eafa42-1142-4ed2-a485-f46c496bddfb@linux.dev>
- <20260707182049.GA2238@quark>
- <d1cdfc23-b336-49a9-8833-29f05b5b9fec@linux.dev>
- <20260707231652.GA2264445@google.com>
- <5f9c3aab-5339-463c-a86d-edac297e1e95@linux.dev>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Q5FaBwdY"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=AbexU8wuLAQE7KwfR5cfT5k1M8jwsa0MO1b35YL3hOY=; b=Q5FaBwdYU0gd211CGSryq11/s0
+	wVzXfZarzpRJ2wFlsDBtKReICrVu+e/x2AV2tUyTzKi65QuMCsZcfwHhm0oYtU+b5KSc7Cte8cntE
+	qjwCCxvNw7pO3Wrth9NFsUOBkCOFMAzWip5jrJi9rchWecs1lV3OITpFRomjjVt3Mvm5afflc9Tpp
+	R4wVMbjaW7rUEEUGlmK9H6xgg0Hi8DMrTvDcGpUTECblGKgMAKcZ0Rqun3Nxv5nAosjRK2V+Y4UGC
+	9xhtFmJ2XTLv32GQOeyVfI73ln/9ZOY6fmxIggJwso7przybCar0w9HS0BrKF5PTt2dw9VADLXv26
+	s4QcYCgQ==;
+Received: from [50.53.43.113] (helo=[192.168.254.34])
+	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1whrIj-0000000303q-09KH;
+	Thu, 09 Jul 2026 16:08:37 +0000
+Message-ID: <e51cd836-ea07-4901-bf16-7e1e0ac8f0a2@infradead.org>
+Date: Thu, 9 Jul 2026 09:08:36 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5f9c3aab-5339-463c-a86d-edac297e1e95@linux.dev>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: fix bracket
+To: Manuel Ebner <manuelebner@mailbox.org>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, Jonathan Corbet <corbet@lwn.net>,
+ Shuah Khan <skhan@linuxfoundation.org>, Stephan Mueller <smueller@chronox.de>
+Cc: linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260709143837.405758-2-manuelebner@mailbox.org>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20260709143837.405758-2-manuelebner@mailbox.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jul 08, 2026 at 12:47:43PM +0100, Vadim Fedorenko wrote:
-> On 08/07/2026 00:16, Eric Biggers wrote:
-> > On Tue, Jul 07, 2026 at 11:50:33PM +0100, Vadim Fedorenko wrote:
-> > > > Does this mean the AES-ECB support is unnecessary and can be dropped?
-> > > 
-> > > Let's keep it if it doesn't hurt.
-> > 
-> > It kind of does.  It is "bad" crypto that would have to continue to be
-> > maintained, and someone might start using it accidentally.
+
+
+On 7/9/26 7:38 AM, Manuel Ebner wrote:
+> Remove needless ')' from code block.
 > 
-> AES-ECB was introduced as a cipher to use in QUIC-LB draft,
-> draft-ietf-quic-load-balancers-21
+> Fixes: 3b72c814a8e8 ("crypto: doc - convert crypto API documentation to Sphinx")
+> Signed-off-by: Manuel Ebner <manuelebner@mailbox.org>
+
+Acked-by: Randy Dunlap <rdunlap@infradead.org>
+Thanks.
+
+> ---
+>  Documentation/crypto/architecture.rst | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> I know it is expired draft, but it may be worth keeping this cipher
-> as QUIC WG github is still active
+> diff --git a/Documentation/crypto/architecture.rst b/Documentation/crypto/architecture.rst
+> index 249b54d0849f..ec2e99d99aff 100644
+> --- a/Documentation/crypto/architecture.rst
+> +++ b/Documentation/crypto/architecture.rst
+> @@ -95,7 +95,7 @@ additional templates may enclose other templates, such as
+>  
+>  ::
+>  
+> -        template1(template2(single block cipher)))
+> +        template1(template2(single block cipher))
+>  
+>  
+>  The kernel crypto API may provide multiple implementations of a template
 
-Sigh.  We shouldn't implement Internet-Drafts that have clear issues
-with how they use cryptography.  They're likely to change when they
-undergo cryptography review.  We went through this same thing with
-TCP-AO, where I ended up joining the tcpm working group and getting the
-draft fixed.  Do I need to do the same with this one too?
-
-- Eric
+-- 
+~Randy
