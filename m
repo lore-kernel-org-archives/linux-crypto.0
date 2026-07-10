@@ -1,62 +1,63 @@
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8760C3EF0AC;
-	Fri, 10 Jul 2026 09:35:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82F663F164E;
+	Fri, 10 Jul 2026 09:48:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783676133; cv=none; b=utuVTK8oTUME6dZaCR0Y91Il+59u+5Pd7T1VViCZ3pUHLcAtjEdqesaX1ZHizWnRyoAykDViifia9Ie5UkfWbDpsSCBaT3Ld9vcFq/azHeVYL4NuG4Jt4u2M3O74oda8BuHcAReF5O7yRmmKgIn1KcFYIdVM0fVsI4Xzu0oMG4w=
+	t=1783676930; cv=none; b=tGdBT29alBeA1CyfTmQdI+cJ9PKZZcXn9DHTj/g0tY0p8jiQaGNMj2d6OSfOQeEq8EnI3xuSGmPYrOZvCO7kMsfZhItJXourbRKdDFgefD8KQ/KHMhaqRiC/JcKcUpQ40Ajeh0wE1OjiF1YbFWnysFJ9QaGu1fFAlmMMKGzzQ/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783676133; c=relaxed/simple;
-	bh=Y7o2uOQnU0O45QUBV45x3iTyOBBL2VrU2Fr3Mt5Lnm4=;
+	s=arc-20240116; t=1783676930; c=relaxed/simple;
+	bh=wuG2shP5X+UkXSmhr4knH5rocVOOk/BakyEWwoAFI/0=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=TJeprdZZpCTs+HlfaGmi1llSASJnH7B77GIUYczm48JAj6P5vr4G6wz/y+kU7JIE/v31PThKPvJ9XydZYP//vXdbCo6AG9NEDVJl4gpJRnfMp3lzkVJgAUMLSFFL1wo2El0AYdUV7NEvLWYtWu8rN7Yk8gGRVnUaevcqVphZWfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=gv9PQac6; arc=none smtp.client-ip=185.171.202.116
+	 MIME-Version:Content-Type; b=h/Fc8cwg0XpqisHisD4Uoa0SEE+DVd+3Z59Ixun8Jee6jx9L9O0nbzRxn2O2QPhkQ7bemOa+yoF0gAvbvDP6QZT3UsV5dsz+9eSKPyVO9qkd5zQAt8OSZUuThfJ0shkiSiriLE/xKFYra9WE5we+ZuY2aziMJwOXQlii/DRkQpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ffO+0698; arc=none smtp.client-ip=185.246.85.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="gv9PQac6"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ffO+0698"
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 71AB0C2F4FE;
-	Fri, 10 Jul 2026 09:35:44 +0000 (UTC)
+	by smtpout-03.galae.net (Postfix) with ESMTPS id EE7704E40D3C;
+	Fri, 10 Jul 2026 09:48:45 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id B30B560341;
-	Fri, 10 Jul 2026 09:35:29 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id AF11811BD18F0;
-	Fri, 10 Jul 2026 11:35:24 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id ACA1360341;
+	Fri, 10 Jul 2026 09:48:45 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A21C611BD2834;
+	Fri, 10 Jul 2026 11:48:39 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1783676128; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1783676924; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=04Ye3yuYTISol3ighYQm4DeZ4Ndw6daOs3zln0ZTqVc=;
-	b=gv9PQac6Cswbuf/VoBnruoDjQWwYMTlucUsqx40kUWzZ5ktNrgRd+MPtfW/9l7ubHyUmYZ
-	8u3jkWgGbTY1PfgQM3jRJFJfP8F5AAzafDkptKGIqPzgIeaK2GYk43SUlnxmoUGuEEkY3Z
-	ozRpF3pKamd/OztCVZVQhIb9rir1TtnbS/m8JCL51rdVN0FNNNY8W0TKgQa6rgc/HzMwZU
-	6YObTMvFrC3PIg9gjFy9/znDIb9ciiZ9oAhsUjtOFm4GwOoWyAPi3ZjAW8PouL+cOR3iJQ
-	fJBmYhE9Z4XSNJkuLfMgoIt6bVaTh/aTAATG5PA0H/5jscF/A7q/JM4rTsBqWg==
+	bh=S8k4iLzkxJVSSUQQwc8HGDvZ17LYlFShfGvdGTUVWi8=;
+	b=ffO+0698dM6X34VENvE0Cje5NMC4UCdo5a7VKBYCqDDJFmSorUxab4kQs7JbvzFyYURbcv
+	jTwk1gynEPETItolgJXuY0ZTtmn/jbcpEXq+ip3OLqPaOhyK16EgKQFGQFuquH2uf5F52m
+	J6WZTychwmy5vzMTENDNgSuFjl0pgprv0h1iOM9ZGzElyDo4By8qCmfqGZL/lOW5ZhOBTm
+	TshJisWrE6WbOzwCGGEDbxU9vtLiQ5GW5u/WIkf4RVB5FId3rIdJN7rrxB026RgN1sAavk
+	3LxOHW3vk1FVgZPcgmmYNap0tUz1NvwrxangAvzwdh/FZZFRTiOKEAYRthfaow==
 From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Rob Herring <robh@kernel.org>
+To: Aleksander Jan Bajkowski <olek2@wp.pl>
 Cc: Michael Turquette <mturquette@baylibre.com>,  Stephen Boyd
- <sboyd@kernel.org>,  Krzysztof Kozlowski <krzk+dt@kernel.org>,  Conor
- Dooley <conor+dt@kernel.org>,  Thomas Gleixner <tglx@kernel.org>,  Olivia
- Mackall <olivia@selenic.com>,  Herbert Xu <herbert@gondor.apana.org.au>,
-  Jayesh Choudhary <j-choudhary@ti.com>,  "David S. Miller"
- <davem@davemloft.net>,  Christian Marangi <ansuelsmth@gmail.com>,  Antoine
- Tenart <atenart@kernel.org>,  Geert Uytterhoeven
- <geert+renesas@glider.be>,  Magnus Damm <magnus.damm@gmail.com>,  Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>,  Pascal EBERHARD
- <pascal.eberhard@se.com>,  Wolfram Sang
+ <sboyd@kernel.org>,  Rob Herring <robh@kernel.org>,  Krzysztof Kozlowski
+ <krzk+dt@kernel.org>,  Conor Dooley <conor+dt@kernel.org>,  Thomas
+ Gleixner <tglx@kernel.org>,  Olivia Mackall <olivia@selenic.com>,  Herbert
+ Xu <herbert@gondor.apana.org.au>,  Jayesh Choudhary <j-choudhary@ti.com>,
+  "David S. Miller" <davem@davemloft.net>,  Christian Marangi
+ <ansuelsmth@gmail.com>,  Antoine Tenart <atenart@kernel.org>,  Geert
+ Uytterhoeven <geert+renesas@glider.be>,  Magnus Damm
+ <magnus.damm@gmail.com>,  Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+  Pascal EBERHARD <pascal.eberhard@se.com>,  Wolfram Sang
  <wsa+renesas@sang-engineering.com>,  linux-clk@vger.kernel.org,
   devicetree@vger.kernel.org,  linux-kernel@vger.kernel.org,
   linux-crypto@vger.kernel.org,  linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH 01/16] dt-bindings: clock: Introduce nexus nodes
-In-Reply-To: <20260407192900.GA3531350-robh@kernel.org> (Rob Herring's message
-	of "Tue, 7 Apr 2026 14:29:00 -0500")
+Subject: Re: [PATCH 02/16] dt-bindings: interrupt-controller: Describe
+ EIP-201 AIC
+In-Reply-To: <444b4349-3873-4da6-aadd-3605e738ad0d@wp.pl> (Aleksander Jan
+	Bajkowski's message of "Thu, 16 Apr 2026 20:04:03 +0200")
 References: <20260327-schneider-v7-0-rc1-crypto-v1-0-5e6ff7853994@bootlin.com>
-	<20260327-schneider-v7-0-rc1-crypto-v1-1-5e6ff7853994@bootlin.com>
-	<20260407192900.GA3531350-robh@kernel.org>
+	<20260327-schneider-v7-0-rc1-crypto-v1-2-5e6ff7853994@bootlin.com>
+	<444b4349-3873-4da6-aadd-3605e738ad0d@wp.pl>
 User-Agent: mu4e 1.12.7; emacs 30.2
-Date: Fri, 10 Jul 2026 11:35:23 +0200
-Message-ID: <874ii7i3vo.fsf@bootlin.com>
+Date: Fri, 10 Jul 2026 11:48:38 +0200
+Message-ID: <87y0fjgop5.fsf@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -67,46 +68,49 @@ Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-Last-TLS-Session-Version: TLSv1.3
 
-Hello Rob,
+Hello,
 
->> +title: Clock Nexus
+>> --- /dev/null
+>> +++ b/include/dt-bindings/interrupt-controller/inside-secure,safexcel-ei=
+p201.h
+>> @@ -0,0 +1,14 @@
+>> +/* SPDX-License-Identifier: (GPL-2.0-only OR MIT) */
 >> +
->> +description: >
->> +  A nexus node allows to remap a phandle list in a consumer node throug=
-h a
->> +  container or a connector node in a generic way. With this remapping,
->> +  the consumer node needs to know only about the nexus node. Resources
->> +  behind the nexus node are decoupled by the nexus node itself.
+>> +#ifndef _DT_BINDINGS_IRQ_SAFEXCEL_EIP201_AIC_H
+>> +#define _DT_BINDINGS_IRQ_SAFEXCEL_EIP201_AIC_H
 >> +
->> +maintainers:
->> +  - Miquel Raynal <miquel.raynal@bootlin.com>
+>> +#define AIC_PKA_INT0 0
+>> +#define AIC_PKA_INT1 1
+>> +#define AIC_PKA_INT2 2
+>> +#define AIC_TRNG_INT 3
+>> +#define AIC_RESERVED 4
+>> +#define AIC_SL_ERR_INT  5
+>> +#define AIC_PROTECTION_INT 6
 >> +
->> +select: true
->> +
->> +properties:
->> +  '#clock-cells': true
+>> +#endif
 >
-> No need for this.
+> This interrupt mapping is specific to the EIP-150. The EIP-201 is also
+> integrated
+> into other accelerators, such as the EIP-97, EIP-196, and EIP-197, and the
+> interrupt mapping is likely different there. Maybe it would be better to =
+use
+> eip150 name instead of eip201?
 
-I wasn't sure, I'll drop it.
+I was about to rename the file (and the ifndef/define section), but in
+the end I feel like it does not actually make sense to do that, because
+it would require to include one header per container in the
+driver. Instead, I propose another way: let's keep the file name as-is,
+but mention with a comment above the definitions that these are specific
+to the EIP-150 implementation. This way, if someone want to reuse the
+controller for another integration, they can just add their own
+interrupt names/numbers below, with another comment stating the name of
+the container they apply to.
 
->> +  clock-map:
->> +    $ref: /schemas/types.yaml#/definitions/uint32-matrix
->> +
->> +  clock-map-mask:
->> +    $ref: /schemas/types.yaml#/definitions/uint32-array
->> +
->> +  clock-map-pass-thru:
->> +    $ref: /schemas/types.yaml#/definitions/uint32-array
->
-> I think this can be omitted because there aren't common cell definitions=
-=20
-> for clocks like there are for GPIO and PWM.
-
-I agree, same here I wanted to mimic the existing nexus, but I agree it
-is not super useful for clocks. It can be added later anyway, if ever
-needed. I assume you mean here that we must drop both clock-map-mask and
-clock-map-pass-thru, but obviously not clock-map.
+For future people who would like to extend this driver to another
+container: mind that there is currently a list of "unused" interrupts in
+the v2 of the driver (in the generic chip structure). This list may
+simply go away if one needs one of the three interrupts currently
+listed.
 
 Thanks,
 Miqu=C3=A8l
