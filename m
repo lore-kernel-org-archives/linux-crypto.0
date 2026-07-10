@@ -1,119 +1,92 @@
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3228B6FC3;
-	Fri, 10 Jul 2026 01:04:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98F9A3CF695
+	for <linux-crypto@vger.kernel.org>; Fri, 10 Jul 2026 07:42:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783645501; cv=none; b=oMxzKt/nDwmHmpf9QvlAYGbpDEk9nMeT/h9jJ4dj5BJastGx8UbkvX6/tq6NxQMTURA4a5FZlP5dv97vppLh0c2Nh7B//tqlPXjRMLVvw/eok5XoemxuhBYCU8pba9WdH13uMLOl54ue5eSfdWQffb6i+iHGSNsPV7gxMQ+ghQQ=
+	t=1783669381; cv=none; b=CUUitt5NyP+X4ptdwftUHFP1nHzI+3FE2M+jv7me4BaJdeB0KS+pmC/8tzccoC9u+AsBkqe1GBK9nCoYgJzAYHWKJoTq0d282ZZDgGtDCLVGeB8xDA9MUgM6qNmG/AP5SFQD42tF+Tk/9ORAudoJ7j+A8t2R4dE2khVC9M+qm/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783645501; c=relaxed/simple;
-	bh=vSI/6JH46QRuCk7VHxcBTsb2eFB7aXDQvaCGhbXab18=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cpBN+UmhsI1xY9kwVSgXxgP+xGnH7T8borEPrcPM/RN9iydKb9OJnZ9zfPbUdbONDcICtejWecM8XNmTqrYEkXmS6HMncnkRay2ReTq8x90blNizWWgGricFioxGjk42YLj7GlEYgG5Z5GAM8f0uJp+PI51RMdTyZIXuaSreZuQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=cIf5N81i; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1783669381; c=relaxed/simple;
+	bh=Qih+LP3/egjYrLR7EBVMJajAdXN04WaqHWQ9otOcoB8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=htjmevG6zXCaleOvN6cZcYC6q8YJKkQdMGF/81vYnwWJp8SThwwhCu9ZyAbC87BZhV3JFbQDJG97uBDdSOVpwevB6GNwiV6c5NAwFkyz59qRwmei5E6PUJ9Vpyn/ikFSJELGBmBfsdTU3QmcRD8j+k89Dxejy2NM6Q1DFJ89ov0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Gr7NmQjx; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="cIf5N81i"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=r0em5pMNZ4xKYprueCCCRKfXhTmoQMeSgXfGFULzODo=; b=cIf5N81iy//LNUKpfZ2HOlkcRK
-	8OA05pKoaYtr720datPqjB+ls/s6YXte8CR6FvzePOyuSql/y1U92bp9Zn9poUR7eI0yKf4A/uQ0I
-	hkjv2Imdk+fudyI10U2oGtPa3UmTH6nJkGysIaDAMApxxBgdJrgw4weijDwKSIJXAqHLLNe/5XV9/
-	jvJeiYV7eolYFfISs+gD4ExEIMRKxBm+nUuLrFZPCrW7xP3yCmzZegIS7YN7dymDA2f4vgFum/r9U
-	qb24QdtoSndJpEyVbn1AkRvXkc0ZDH3CUMiwexB/Gmg5VGI1fmsmk2KSuxeILXjEAr2W9e3K/ojoP
-	7o/eTqcg==;
-Received: from [50.53.43.113] (helo=[192.168.254.34])
-	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
-	id 1whzfe-00000003twW-1ujf;
-	Fri, 10 Jul 2026 01:04:50 +0000
-Message-ID: <fd2e3b89-339a-4964-9b0c-e24ed7f7b31f@infradead.org>
-Date: Thu, 9 Jul 2026 18:04:49 -0700
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Gr7NmQjx"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1783669367;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=c3e6oZbc6F773Qir26Sc0QNFGUCJZN+wEbH26HH5gZw=;
+	b=Gr7NmQjxqvseruVX3aV9qclTAMbBP4n2z/NSk2XHQZGBb5Ud20Qfj7hXtsYTDys9kspgUM
+	AXJzAUVXQ8d0e2XfOpf4aCCS4Z2rR5+LWBYpXGNn2Yhg09B3R4z29UCeooKrLPo+n68NN3
+	YziHs9gwWqJ4ejxXKbh8QctRVVNSGCY=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Corentin Labbe <clabbe@baylibre.com>,
+	Hans Ulli Kroll <ulli.kroll@googlemail.com>,
+	Linus Walleij <linusw@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: sl3516 - drop invalid sg_dma_len checks before DMA mapping
+Date: Fri, 10 Jul 2026 09:42:17 +0200
+Message-ID: <20260710074216.734849-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 19/19] MAINTAINERS: add Rambus CryptoManager Hub (CMH)
-To: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>,
- Albert Ou <aou@eecs.berkeley.edu>,
- Alex Ousherovitch <aousherovitch@rambus.com>,
- Conor Dooley <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Herbert Xu <herbert@gondor.apana.org.au>, Jonathan Corbet <corbet@lwn.net>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Palmer Dabbelt
- <palmer@dabbelt.com>, Paul Walmsley <pjw@kernel.org>,
- Rob Herring <robh@kernel.org>, Shuah Khan <shuah@kernel.org>,
- Ninad Palsule <ninad@linux.ibm.com>, linux-hwmon@vger.kernel.org
-Cc: Alexandre Ghiti <alex@ghiti.fr>, devicetree@vger.kernel.org,
- Joel Wittenauer <Joel.Wittenauer@cryptography.com>,
- linux-api@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-riscv@lists.infradead.org,
- Shuah Khan <skhan@linuxfoundation.org>, Thi Nguyen <thin@rambus.com>
-References: <20260709203037.1884436-1-skrishnamoorthy@rambus.com>
- <20260709203037.1884436-20-skrishnamoorthy@rambus.com>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20260709203037.1884436-20-skrishnamoorthy@rambus.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1485; i=thorsten.blum@linux.dev; h=from:subject; bh=Qih+LP3/egjYrLR7EBVMJajAdXN04WaqHWQ9otOcoB8=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFkBiyJkW1f1nI9hfXkntCj45V7BbTE/ct01506vOe05+ /lWa8/LHaUsDGJcDLJiiiwPZv2Y4VtaU7nJJGInzBxWJpAhDFycAjCRFcmMDMu2+/sYnuP9PtXk I/eUsoZ5Ulf69llNOFbQ8WHOi1m7PwkwMrR1snAkGslWvxGeVsP88dahm3+X3llfF7ouR9ph+ps /0xkB
+X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
+sg_dma_len() is only valid after mapping the scatterlist with
+dma_map_sg(). However, sl3516_ce_need_fallback() checks it before the
+source and destination scatterlists are mapped. Thus, a stale DMA length
+that is not a multiple of 16 could incorrectly force a software fallback
+when CONFIG_NEED_SG_DMA_LENGTH=y.
 
+Remove the invalid checks; the existing scatterlist length checks are
+sufficient.
 
-On 7/9/26 1:30 PM, Saravanakrishnan Krishnamoorthy wrote:
-> From: Alex Ousherovitch <aousherovitch@rambus.com>
-> 
-> Add MAINTAINERS entry for the CRI CryptoManager Hub (CMH) hardware
-> crypto accelerator driver under drivers/crypto/cmh/.
-> 
-> Co-developed-by: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
-> Signed-off-by: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
-> Signed-off-by: Alex Ousherovitch <aousherovitch@rambus.com>
-> Reviewed-by: Joel Wittenauer <Joel.Wittenauer@cryptography.com>
-> Reviewed-by: Thi Nguyen <thin@rambus.com>
-> ---
->  MAINTAINERS | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index d1dbf2f07104..1c153a84f70f 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -6891,6 +6891,23 @@ F:	kernel/cred.c
->  F:	rust/kernel/cred.rs
->  F:	Documentation/security/credentials.rst
->  
-> +CRI CRYPTOMANAGER HUB (CMH) HARDWARE CRYPTO ACCELERATOR
-> +M:	Alex Ousherovitch <aousherovitch@rambus.com>
-> +M:	Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
-> +R:	Joel Wittenauer <Joel.Wittenauer@cryptography.com>
-> +R:	Thi Nguyen <thin@rambus.com>
-> +L:	linux-crypto@vger.kernel.org
-> +S:	Maintained
-> +F:	Documentation/ABI/testing/cmh-mgmt
-> +F:	Documentation/ABI/testing/debugfs-driver-cmh
-> +F:	Documentation/ABI/testing/sysfs-driver-cmh
-> +F:	Documentation/crypto/device_drivers/cmh.rst
-> +F:	Documentation/devicetree/bindings/crypto/cri,cmh.yaml
-> +F:	Documentation/userspace-api/ioctl/cmh_mgmt.rst
-> +F:	drivers/crypto/cmh/
-> +F:	include/uapi/linux/cmh_mgmt_ioctl.h
-> +F:	tools/testing/selftests/drivers/crypto/cmh/
-> +
+Fixes: 46c5338db7bd ("crypto: sl3516 - Add sl3516 crypto engine")
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+ drivers/crypto/gemini/sl3516-ce-cipher.c | 8 --------
+ 1 file changed, 8 deletions(-)
 
-Hm, I thought for a moment there that this new CRI entry was out of
-place (alphabetically). No, it's the next entry that is so far
-out of place. :(
-
->  INTEL CRPS COMMON REDUNDANT PSU DRIVER
->  M:	Ninad Palsule <ninad@linux.ibm.com>
->  L:	linux-hwmon@vger.kernel.org
-
--- 
-~Randy
-
+diff --git a/drivers/crypto/gemini/sl3516-ce-cipher.c b/drivers/crypto/gemini/sl3516-ce-cipher.c
+index 583010b2d007..02ec4282333b 100644
+--- a/drivers/crypto/gemini/sl3516-ce-cipher.c
++++ b/drivers/crypto/gemini/sl3516-ce-cipher.c
+@@ -56,10 +56,6 @@ static bool sl3516_ce_need_fallback(struct skcipher_request *areq)
+ 			ce->fallback_mod16++;
+ 			return true;
+ 		}
+-		if ((sg_dma_len(sg) % 16) != 0) {
+-			ce->fallback_mod16++;
+-			return true;
+-		}
+ 		if (!IS_ALIGNED(sg->offset, 16)) {
+ 			ce->fallback_align16++;
+ 			return true;
+@@ -72,10 +68,6 @@ static bool sl3516_ce_need_fallback(struct skcipher_request *areq)
+ 			ce->fallback_mod16++;
+ 			return true;
+ 		}
+-		if ((sg_dma_len(sg) % 16) != 0) {
+-			ce->fallback_mod16++;
+-			return true;
+-		}
+ 		if (!IS_ALIGNED(sg->offset, 16)) {
+ 			ce->fallback_align16++;
+ 			return true;
