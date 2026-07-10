@@ -1,140 +1,177 @@
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from TYDPR03CU002.outbound.protection.outlook.com (mail-japaneastazon11013036.outbound.protection.outlook.com [52.101.127.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E8A2E7377;
-	Fri, 10 Jul 2026 10:36:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783679780; cv=none; b=k9yfHTd4fUpRLdw5RMLB6I3++J3WwgPnbwLxHNVAUyjB5vt0thOwZKtaHAWca9+bVm8QVAUiHWQPq1+vMa0WN+s01BYevpuOT7LMa9SzWEwjNuJ+P9DkwwVFwolH2hvg9+apQ08gFmZZ+QH46hUZApQjKheuFweN9FWn48g14x0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783679780; c=relaxed/simple;
-	bh=s8e719fI1lh4iwu6ag1ePU0Hg7fs4+ScAlrOQK5mJEY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=mfRg+TvRzpqmDCmgse7csasDt7c5KzbAvoJ00sf3CeYYvDqFg4nGkMIo++YmqlcNG1VJbX0rjpviTS5wMr6jVhEBtIKPoc62NOrt0boEc9KwYWU7rNMsZ/2PAl2d0fbP8HVU84PZUuhOYnY7kkQs2aynBnVvUkq9LWzaa6+yhYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ivn/hFi6; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 750EC411662;
+	Fri, 10 Jul 2026 10:53:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.127.36
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783680834; cv=fail; b=HiUhGMI1Hmx7hXa2NuUySYZltPjsnTghH9g9BT4mtIM7oqSKGhnFAcVOR/vCWhhtndE9+/88Zwl2NGPC1L43D0VSk3WaJdPEYuu1U3KVJ3HoXuWIfTI5yFQ8ER5rbcrN652DyKeknPH3fyCxvjf1uhprgJj7GSE/ftzO7UfiL2I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783680834; c=relaxed/simple;
+	bh=6rIgodERjOnxji0VxDYkzvPsdoEcfjDOqQr+rk3Gc7k=;
+	h=From:To:Subject:Date:Message-Id:Content-Type:MIME-Version; b=Ceo8zcO3GbO0eOIGVi9bnLUAbMQ7uYdPGUWPS6zav1umaZ6yizzO7uzZQ5PQrjNTUMhMh5yZssIJtIW/satqWqjt+zHfRY1k7zPc6fliTcegU2ULV1Q9VUwluo/go/unWwTw2qAh/wCCnm8leVp8JmWrmfrHiV+se4g0nTsq9bo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=nFrqmHsY; arc=fail smtp.client-ip=52.101.127.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivo.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ivn/hFi6"
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 92E63C2F4FE;
-	Fri, 10 Jul 2026 10:36:23 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id A5AC560342;
-	Fri, 10 Jul 2026 10:36:08 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 61FA011BD295D;
-	Fri, 10 Jul 2026 12:35:58 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1783679766; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=6+ULItnJf1sGBisnEhPjjWTOmY5NUXBuwBhmcIC8+UQ=;
-	b=ivn/hFi6a/lBi80O3yMvQB+B5mpswIxbNWWE0pYlbkVMWfvJ0d53+YTLfaOeqhKHYWy1Lv
-	IsOt5buug5pmXbjNeNF/MTreiCyObz2CGX2MhHx1i/34ziBh73lVxNvc0OOVdW2bF7k9jh
-	mAQ7grUpbxuTFL5Q3Em+P2MfzyCNoJxXVeXtlypBY4aMBNHCJZXoSfR+VnMQo8m/8iIC1F
-	OLt0pP5DlOs7wKDSQzWCNDPMyig2+5dli64tvbJ8L+oOteUTjVV95+9+Xo+BADYmzXipJL
-	YLV1ForjqpmWJgDfcjxSBKiEV2r2yvRJBCZNCfG7TwQZ0Far/7ghqNcJOxWglQ==
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Stephen Boyd <sboyd@kernel.org>
-Cc: Antoine Tenart <atenart@kernel.org>,  Christian Marangi
- <ansuelsmth@gmail.com>,  Conor Dooley <conor+dt@kernel.org>,  David S.
- Miller <davem@davemloft.net>,  Geert Uytterhoeven
- <geert+renesas@glider.be>,  Herbert Xu <herbert@gondor.apana.org.au>,
-  Jayesh Choudhary <j-choudhary@ti.com>,  Krzysztof Kozlowski
- <krzk+dt@kernel.org>,  Magnus Damm <magnus.damm@gmail.com>,  Michael
- Turquette <mturquette@baylibre.com>,  Olivia Mackall <olivia@selenic.com>,
-  Rob Herring <robh@kernel.org>,  Thomas Gleixner <tglx@kernel.org>,
-  Thomas Petazzoni <thomas.petazzoni@bootlin.com>,  Pascal EBERHARD
- <pascal.eberhard@se.com>,  Wolfram Sang
- <wsa+renesas@sang-engineering.com>,  linux-clk@vger.kernel.org,
-  devicetree@vger.kernel.org,  linux-kernel@vger.kernel.org,
-  linux-crypto@vger.kernel.org,  linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH 11/16] clk: tests: Add Kunit testing for nexus nodes
-In-Reply-To: <177595802905.5403.1342882536380309490@lazor> (Stephen Boyd's
-	message of "Sat, 11 Apr 2026 18:40:29 -0700")
-References: <20260327-schneider-v7-0-rc1-crypto-v1-0-5e6ff7853994@bootlin.com>
-	<20260327-schneider-v7-0-rc1-crypto-v1-11-5e6ff7853994@bootlin.com>
-	<177595802905.5403.1342882536380309490@lazor>
-User-Agent: mu4e 1.12.7; emacs 30.2
-Date: Fri, 10 Jul 2026 12:35:57 +0200
-Message-ID: <87se5rgmia.fsf@bootlin.com>
+	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="nFrqmHsY"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=RUyOlhSuFJNDyGGt070vfDY+iD6cmVfqa5Oz2RlaSJ1fXmQS6Ylkd3Oi7E4XDeb1W7Yf4h6HqKRVgx4s8P/IqxWSSHeKiCYiSofkYxbRMtwv3a8crkX7Vlwm5E+Ai59p20DKW+GzUYCS9MsEBH+iDNE5yPn3k1QXpuvhbDH6O4KAJNp1nHFOPtN36YvX/1Z5WIcYYjnGJltNXWlLjFYejIMImf7nB2QnzLOx/k5TpTc9MB/cpELyT5soxM44iouZFgL02yk61L33R1V0LKV5aTKqSquBzDEc8hAc3sJNYtqr45xmVht8VfwPDC/ODYr/VflKNYR+QU1v40P8U+AY9A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mtUIIIkUEO0/7dcww6thEuMNyIG/zSJjR9J9+Tn2ARY=;
+ b=uU2z2OkKHdTfm3zlMGH0Ax+bLA7zkx3NTcPQyMDgmcv9DK0aI02MOquJw1mvLYD27P3AhszP7lGY7jivbgkY6IOh7ugz+bsf8cZehTRzYIF0E9cZGz5+Jp691kfkVF1Zuaz9AsI+KZzFMXxzCmLW0AU5V/uzAtJfmJ+bBZKSfJxQ/c68RFK441EJb3p8+rzoak/dexEjq1wJ/Vrsgn2o4DEL/mGw8QIRvOlCUkEL3YAXTDMWJMtdlWEZtpM+uAXwiDL91/8WWjVSOMnds2HqJdseU9qPYN6yMJFrsRs5/PaiICvCJwJS9X0prdZTKnYb3SatHV6qJHUJHKYA5PXOGg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mtUIIIkUEO0/7dcww6thEuMNyIG/zSJjR9J9+Tn2ARY=;
+ b=nFrqmHsY7W1d2qa3s2z8tBfqHeyhxkuyD4uNAgM2EZK6TRFD6hVnDn6yAD8NFguLGMrLKGM9NLlYNmOGtR5yxaziR/EEAT2t9AqFX6tXRRV8Gd3lHS55CMwe65gSn3ecUtrCQ8ORn4UMdNat2k5XF/0i5evtmdYdmdATqP09boAcCJ9O6dnIfkcGIUOU9itKfTrlggPvxEgZ+GoJfIWMCkxc6rGDGJQzjdicK9OdNEbIsVT2vb6ZtmVcrBrBzU37a5Uvw7X2GM1ZGtOt3PBzJLwawnmx38Z6pQcydVTeRCgfriO26GBLbkT0o79lb/FJHjNWDORg455NKx3suxtTXg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+Received: from SEZPR06MB5832.apcprd06.prod.outlook.com (2603:1096:101:c8::12)
+ by SG2PR06MB5264.apcprd06.prod.outlook.com (2603:1096:4:1dc::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.17; Fri, 10 Jul
+ 2026 10:53:45 +0000
+Received: from SEZPR06MB5832.apcprd06.prod.outlook.com
+ ([fe80::f98:5e32:4ccb:d07b]) by SEZPR06MB5832.apcprd06.prod.outlook.com
+ ([fe80::f98:5e32:4ccb:d07b%6]) with mapi id 15.21.0181.016; Fri, 10 Jul 2026
+ 10:53:45 +0000
+From: Pan Chuang <panchuang@vivo.com>
+To: Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Hadar Gat <hadar.gat@arm.com>,
+	Frank Li <Frank.Li@nxp.com>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Jia Jie Ho <jiajie.ho@starfivetech.com>,
+	Deepak Saxena <dsaxena@plexity.net>,
+	Peter Huewe <peterhuewe@gmx.de>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Eli Billauer <eli.billauer@gmail.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Aleksander Jan Bajkowski <olek2@wp.pl>,
+	Takashi Sakamoto <o-takashi@sakamocchi.jp>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Pan Chuang <panchuang@vivo.com>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig=20=28The=20Capable=20Hub=29?= <u.kleine-koenig@baylibre.com>,
+	Alper Ak <alperyasinak1@gmail.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	linux-crypto@vger.kernel.org (open list:HARDWARE RANDOM NUMBER GENERATOR CORE),
+	linux-kernel@vger.kernel.org (open list),
+	imx@lists.linux.dev (open list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE),
+	linux-arm-kernel@lists.infradead.org (moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE),
+	linux-integrity@vger.kernel.org (open list:TPM DEVICE DRIVER)
+Subject: [PATCH 0/3] char: Remove redundant error messages on IRQ request failure
+Date: Fri, 10 Jul 2026 18:53:05 +0800
+Message-Id: <20260710105318.376496-1-panchuang@vivo.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: TP0P295CA0021.TWNP295.PROD.OUTLOOK.COM
+ (2603:1096:910:5::12) To SEZPR06MB5832.apcprd06.prod.outlook.com
+ (2603:1096:101:c8::12)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SEZPR06MB5832:EE_|SG2PR06MB5264:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3452e3ee-cc03-4b57-ebe6-08dede718329
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|23010399003|366016|52116014|1800799024|7416014|376014|921020|38350700014|11063799006|56012099006|6133799003|18002099003;
+X-Microsoft-Antispam-Message-Info:
+	BDvtLmdyweEICNaNtp/VZt931HWUHSSw+omgv8/tlFmGosQM6puiloiCKzUC0jd64nxortTEFk5sDXX7m1LB6L1oIeC69RF3MqapesnMHrNXqU0sAzCgnaakPQ1N7OubgRVQaN2I1nYol15wl180b4cns6Dwr1zx45Tvt1/0LVjILdY/zRrVbQKElTihK75fvCF0TisDfYAT9FC2M98XIYzv2yEAcCL9bFbvdVSXZ/fzbp6Mvt7oHzQXgIU9wbX6qKTnVsaYRN/uADHgXwLpG7yusYyLSdIgntsMLcH3Khfp8QLEbTTQEZFVfn7YjKpruZG8NYg0mFjXctmq18xsSZdsjPTLTy8xnd/V2L230TEjWZ+9keY2F+h8BPzIAv2LqDV0XHDKAz/qo9V9XMETvahh6LayWze/HRtMAfk7/74mSOjAgXdkymVN0F3nOW2zKTwXJUbvJzG7vbTpojBjFUIq50CcOMnRnOCrAxSMsg82Nel3YXVZAZbdafIBqc918To87pjsN2FKsxsdcVKz31IxtMczLLZlan0azDYdC9o8ulh75w7lfJIK861u8q1ZGzPReqOaX1p8jzMz0VOLmG4GckCxgLBPJhGE9eMYBTq0CUsVyk3xD78aJDzEgBaCuceuPYXKbFcjFXFZ4e7wqKOYm0+F5nbZ3T0iHy8AiuFXHaAitoAdPD6tB1/IxOlfaiUHSeKvqgLBtTn6gElhPt1WF0BSGzcQIIS+MiPXRedsu6gWm2RqPi8MnIM5RyoL
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SEZPR06MB5832.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(366016)(52116014)(1800799024)(7416014)(376014)(921020)(38350700014)(11063799006)(56012099006)(6133799003)(18002099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?FmPnunQaMiOvoX40x7ILvl+sH7VNlu7Ud0uihMPliw0dBakxlKKzf4b2lUBM?=
+ =?us-ascii?Q?tkcHsBZlEIPrMD75pksuQnUUwXkRSS8mQ6FyOFxIg20yqE28FwytzGRL3dmt?=
+ =?us-ascii?Q?jKVVO/Kev3FfCOoCe4vFSTOKkLyiuCWreu3I1NZr1xMOcD5vw/kfKUh6xulU?=
+ =?us-ascii?Q?cchrJqKC/0IVLx1CdM60sW+uUDHTGdHapgBTWNqBtBwaM716ozeQxdeOk9F+?=
+ =?us-ascii?Q?4eDxYTM2Xy+HC27TSx+86s4Pivh227FJ5IuFfHWrcU2iuIjYaDtLzpHTKokq?=
+ =?us-ascii?Q?s3acUUgOBq/dFCIwLBVwOxQYvcIVsEvEkDyXCLKsUtAnEUAeq7IoGCvuVAeA?=
+ =?us-ascii?Q?CDWAVoiQxVCoxJFKuepsG+LPCBaVazD7nM5a5FXpG/BmX+F6yoyF3nw9Ntfl?=
+ =?us-ascii?Q?uN2/CSMpnBZYm188yKMjSmReLnXu4yzsX7Vch6+XsIT+5HUTehzhHb9Bxq8c?=
+ =?us-ascii?Q?U5oNTpczGEV0bNnL2IyH8chX5PvrC+cvUAMfLB8lXhnJP29/sNwU/30le3Gr?=
+ =?us-ascii?Q?GaTfAgrPfDbVwOgarmG8B7ysuF+1CGauTSsQsI3bKPY79Ayc22MSWsoDR0KS?=
+ =?us-ascii?Q?H3pW6NqVgZUIpxxtSL0fOLLDqKACshqTmopI1AMp0k4RZhYcSH4oxf2WLeuq?=
+ =?us-ascii?Q?sqR4egf078XvE6I1Ibctb084R4Y9tX8O/m/4TnPHgqmDMw6Q4/OKUCmtsHli?=
+ =?us-ascii?Q?O8WKsB936ufmYc2ExfTuoSb2lm7BvnrNLNfjrJbmDdQksdoKVMsGRPphatd/?=
+ =?us-ascii?Q?mYrnJPbhMjMzpUMhnGO3iETUFBWDPiEe3she2Ufu19ecA59x0sVeBOdBPBxw?=
+ =?us-ascii?Q?lBrsjVPFbYi/EsCeKKJMvurJ/dAk32ov+YQ+18U7UEvVMXv4vCjOwkh6SyYq?=
+ =?us-ascii?Q?9xUc1uk7+S5ngRXoKFqqwKA688jHiIuHKiytzAM6NzVy63Uh5Z/j5h6zKkF7?=
+ =?us-ascii?Q?eFi8rgFz+xtz99OqghDwVifUdVxp6staXIvfNm7s+wZeX6DaTbJ/ZGY+NKyf?=
+ =?us-ascii?Q?gsTn8usukYIf1YWbXdUCUd3RPdyY1zi07VPkO82S6pDAh2Bf77/NchFJg5Sx?=
+ =?us-ascii?Q?oH+EORbbbra4zOnF2jNH5b2QUN+anxtp8gX1LYy8Fpe02tEeZL2T6qrqikDY?=
+ =?us-ascii?Q?bSXbUosFTiJlssLjPYbJU4Jn9je0V2Bc12b8+dLI1677fzSo/+mkZY1xggX4?=
+ =?us-ascii?Q?c/kfdKYVt12ffathaW28sZSqrCjRq2ihkfXgi6gtkFn5iU9h47UzoC/KNvIV?=
+ =?us-ascii?Q?RPFM4KdAx+IqRbhR8s1Lf4e7r3Hni6/9PRC5r4LJb+rrGABFrYzXCh0ERcSr?=
+ =?us-ascii?Q?V8tP9YSCfzlZnHN6G6LQUOPZ71EFXP/S7iFWfoiBJrkV+B5evArnDZn+Hwvk?=
+ =?us-ascii?Q?0uJxT+0HKtOVcbWF1Vp6nRDsN407pZILk4grNHTL2ruu9wUOwQq0JWwaA4Cj?=
+ =?us-ascii?Q?efunN5nl1OHpC+NX5zq303dcPzD67uElewNjDt1aAiVV6ZacIQ0+fCR0H0PM?=
+ =?us-ascii?Q?ATh6OqkBgeJHnwpbsDsEzNlLksNflMlmbLb5Z5NKneAzyTPSMTaSPPZUeKHm?=
+ =?us-ascii?Q?PN4ZdABiI8j7CxsM8ZCQCqqOluj6F3pjtQGoAEkeUpm9K6kxzAAVUNp6nT5T?=
+ =?us-ascii?Q?2e07YYmpsQfAiNp3116TdQEMskH0CJ1KQ7pEmrh3QUWXcCm/j85UTojkjYiN?=
+ =?us-ascii?Q?hGlkeM9l78EjA8/CMBPtGPmxuJNl62TknXYWOCGjDQfFOnvLlQEORvgeGP65?=
+ =?us-ascii?Q?VabZxQq5pg=3D=3D?=
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3452e3ee-cc03-4b57-ebe6-08dede718329
+X-MS-Exchange-CrossTenant-AuthSource: SEZPR06MB5832.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2026 10:53:44.9211
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: N/2Df5X4Glvj08aPNPQvpJe/yXe3nbAZuR9+rkTkaSrP1N1Aaxs+6SGvJk1q/BdJmHnEQrrAl8eKUf/GLILBqA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SG2PR06MB5264
 
-Hi Stephen,
+Commit 55b48e23f5c4 ("genirq/devres: Add error handling in
+devm_request_*_irq()") added automatic error logging to
+devm_request_threaded_irq() and devm_request_any_context_irq()
+via the new devm_request_result() helper, which prints device
+name, IRQ number, handler functions, and error code on failure.
 
-On 11/04/2026 at 18:40:29 -07, Stephen Boyd <sboyd@kernel.org> wrote:
+Since devm_request_irq() is a static inline wrapper around
+devm_request_threaded_irq(), it also benefits from this
+automatic logging.
 
-> Quoting Miquel Raynal (Schneider Electric) (2026-03-27 13:09:33)
->> Add a nexus node with a child requesting a mapped clock in the fake DT
->> overlay to verify that the parsing is also correctly working.
->>=20
->> Suggested-by: Stephen Boyd <sboyd@kernel.org>
->> Signed-off-by: Miquel Raynal (Schneider Electric) <miquel.raynal@bootlin=
-.com>
->> ---
->>  drivers/clk/clk_test.c                   | 20 ++++++++++++++++++++
->>  drivers/clk/kunit_clk_parse_clkspec.dtso | 10 ++++++++++
->>  2 files changed, 30 insertions(+)
->>=20
->> diff --git a/drivers/clk/clk_test.c b/drivers/clk/clk_test.c
->> index 8a17ad0d185f..cb0071955146 100644
->> --- a/drivers/clk/clk_test.c
->> +++ b/drivers/clk/clk_test.c
->> @@ -3660,10 +3660,30 @@ static void clk_parse_and_get_parent_name(struct=
- kunit *test)
->>                            clk_parse_clkspec_1_init_data.name);
->>  }
->>=20=20
->> +static void clk_parse_and_get_nexus(struct kunit *test)
->
-> of_clk_get_hw_maps_thru_nexus()
->
->> +{
->> +       struct clk_parse_clkspec_ctx *ctx =3D test->priv;
->> +       struct clk_hw *hw1, *hw2;
->> +       struct device_node *np;
->> +
->> +       /* Get clocks by index */
->> +       np =3D of_find_node_by_name(NULL, "kunit-clock-nexus-child");
->> +       KUNIT_ASSERT_NOT_ERR_OR_NULL(test, np);
->> +       hw1 =3D of_clk_get_hw(np, 0, NULL);
->> +       KUNIT_EXPECT_NOT_ERR_OR_NULL(test, hw1);
->> +
->> +       hw2 =3D of_clk_get_hw(ctx->cons_np, 1, NULL);
->> +       KUNIT_EXPECT_NOT_ERR_OR_NULL(test, hw2);
->> +       KUNIT_EXPECT_PTR_EQ(test, hw1, hw2);
->
-> I think hw2 is expected? Rewrite it like this?
+Remove the now-redundant dev_err() and dev_err_probe() calls
+in char drivers that follow these devm_request_*_irq()
+functions, as the core now provides more detailed diagnostic
+information on failure.
 
-Correct.
+Pan Chuang (3):
+  hwrng: drivers - Remove redundant dev_err()/dev_err_probe()
+  tpm: Remove redundant dev_err()
+  char: xillybus: Remove redundant dev_err()
 
-> 	struct clk_parse_clkspec_ctx *ctx =3D test->priv;
-> 	struct clk_hw *expected;
-> 	struct device_node *np;
->=20=09
-> 	np =3D of_find_node_by_name(NULL, "kunit-clock-nexus-child");
-> 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, np);
-> 	expected =3D of_clk_get_hw(ctx->cons_np, 1, NULL);
-> 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, expected);
->
-> 	KUNIT_EXPECT_PTR_EQ(test, expected, of_clk_get_hw(np, 0, NULL));
+ drivers/char/hw_random/airoha-trng.c  | 4 +---
+ drivers/char/hw_random/cctrng.c       | 2 +-
+ drivers/char/hw_random/imx-rngc.c     | 2 +-
+ drivers/char/hw_random/jh7110-trng.c  | 3 +--
+ drivers/char/hw_random/omap-rng.c     | 5 +----
+ drivers/char/hw_random/xgene-rng.c    | 2 +-
+ drivers/char/tpm/st33zp24/st33zp24.c  | 5 +----
+ drivers/char/tpm/tpm_i2c_nuvoton.c    | 2 --
+ drivers/char/tpm/tpm_tis_i2c_cr50.c   | 4 +---
+ drivers/char/xillybus/xillybus_of.c   | 5 +----
+ drivers/char/xillybus/xillybus_pcie.c | 5 +----
+ 11 files changed, 10 insertions(+), 29 deletions(-)
 
-I took your proposal.
+-- 
+2.34.1
 
-> We're also leaking the of_node if an assert triggers so we need to use a
-> kunit wrapper version of of_find_node_by_name() or do a hand code
-> version of putting the node when kunit asserts.
-
-Indeed, I just create the _kunit() variant to handle it. I see most
-other similar cases in the test file are handled like that and it looks
-pretty neat afterwards.
-
-Thanks for the suggestions,
-Miqu=C3=A8l
