@@ -1,188 +1,163 @@
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0940B41B36C;
-	Fri, 10 Jul 2026 12:59:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 143AD349CC9
+	for <linux-crypto@vger.kernel.org>; Fri, 10 Jul 2026 14:30:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783688382; cv=none; b=O+GBMZGVOHNXvWty9aXQp5mAfLcFbjrvo8nFMUGvbGxNlPlaI+DabcoMU4S3R6CHTVRTm3zCmlUMfba8+pLfJItWH9KKxgOmoxqAlDU32OKm/1VBWTuYBLYzhntRxomSfzOQW8pU81DxeFXnK4/0uzniR7GQCEdU5nViH8TtoVk=
+	t=1783693818; cv=none; b=Uw0pReI4Jp6FJoCA9Sbsw+LwLn2bbWAfQYsMoUaHi9WG/0FWLbYv2K9d6j+0R+06h+mhZ/ax2qW8HbYRkv33DrOwntLysWuxt1bsiQa9nEjrWXh3xhhC/+1SgVH6H5Hm6KZLwqU/pTtIFuJWyjnE4xYIi734hRSSzlUFO22ufY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783688382; c=relaxed/simple;
-	bh=/6sXJuUOctndqmdSaxuO2kvNa2414Xs031qJp2Qo3/0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=G5EUHOa1P3FuNQAp+44oi2ldbnITYxNlXHFz9SJzG2+bLFfzJ6bmqavv2imTLzit5rnpTSfcUmdbePc+GXgqf4rZwe42ZA0IL9dNQFwrcMnQUczxs3zKSSgGe+LMZEkbGjVFNS9ANH77gNfH7+iGNdcGLHZ1x0YPBZZJSW7OW4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=eBUf2nVN; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	s=arc-20240116; t=1783693818; c=relaxed/simple;
+	bh=QbIprqUJhBFIuepNWkO4kN5miXRoPAViL44TdYA8PTM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WmQINda2G5ATCotNPNpTKHnb/XjGF/Zbz0JL5A2+8IJ5ludNYqDiUBxOGV1YcJ8rCGqG1NkXmY4kIeiKLTcsER6qVjq6SKnEkMt5tvU5RocyPd1tqFszyxETtTAhRDuzXM4ADs6PdSBrZTs+GH8NyLzbjjF0Y2yQ2hndsmyQsjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ju3LOh6k; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="eBUf2nVN"
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id E2652C2C644;
-	Fri, 10 Jul 2026 12:59:49 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 1629960342;
-	Fri, 10 Jul 2026 12:59:35 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7EEEB11BD041E;
-	Fri, 10 Jul 2026 14:59:26 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1783688373; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=tVE3k2wNc11oGNnWAyHGoU5XfSdc5JYzcD9eXOmLp6c=;
-	b=eBUf2nVN8AVKC6kOJnhTuK/k1N66T/yVJ/bHVl3sko1ofApykwoi8BTLKdwU8HriZh9YsS
-	zJynoQn9LOafgWeqL29qT9ogxPZGhp+EhHgD6oMDDCEMjj97E/FbLfMCaa9KT6OefQ4jm/
-	8IpPdMtr7Wbag7M4Tpv3pgyUYMvS/EyTAmO0PJFUGqUrJzu2/I2YIDHcQv1U9KWvGq56P2
-	/naUd+n9+sIYYhAjAWI0bNvHa9uygtCYzyCnWMZE4S2LJ9jscI3aItLSvm1kvO8FdG4smz
-	kiyq7TvXWb79NO9mRBWB3GnW/rqAQR2400EF5ZK9djy6Mf13KuXeRXKAE7oHmA==
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Rob Herring <robh@kernel.org>
-Cc: Michael Turquette <mturquette@baylibre.com>,  Stephen Boyd
- <sboyd@kernel.org>,  Krzysztof Kozlowski <krzk+dt@kernel.org>,  Conor
- Dooley <conor+dt@kernel.org>,  Thomas Gleixner <tglx@kernel.org>,  Olivia
- Mackall <olivia@selenic.com>,  Herbert Xu <herbert@gondor.apana.org.au>,
-  Jayesh Choudhary <j-choudhary@ti.com>,  "David S. Miller"
- <davem@davemloft.net>,  Christian Marangi <ansuelsmth@gmail.com>,  Antoine
- Tenart <atenart@kernel.org>,  Geert Uytterhoeven
- <geert+renesas@glider.be>,  Magnus Damm <magnus.damm@gmail.com>,  Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>,  Pascal EBERHARD
- <pascal.eberhard@se.com>,  Wolfram Sang
- <wsa+renesas@sang-engineering.com>,  linux-clk@vger.kernel.org,
-  devicetree@vger.kernel.org,  linux-kernel@vger.kernel.org,
-  linux-crypto@vger.kernel.org,  linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH 05/16] dt-bindings: bus: eip150: Describe the EIP-150
- container node
-In-Reply-To: <20260407194449.GA3542959-robh@kernel.org> (Rob Herring's message
-	of "Tue, 7 Apr 2026 14:44:49 -0500")
-References: <20260327-schneider-v7-0-rc1-crypto-v1-0-5e6ff7853994@bootlin.com>
-	<20260327-schneider-v7-0-rc1-crypto-v1-5-5e6ff7853994@bootlin.com>
-	<20260407194449.GA3542959-robh@kernel.org>
-User-Agent: mu4e 1.12.7; emacs 30.2
-Date: Fri, 10 Jul 2026 14:59:25 +0200
-Message-ID: <875x2ngfv6.fsf@bootlin.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ju3LOh6k"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-493b27c7451so26044375e9.0
+        for <linux-crypto@vger.kernel.org>; Fri, 10 Jul 2026 07:30:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783693815; x=1784298615; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=VI6XbHCkQw0BYyxRAEJxXVAGqyrCldWfR9mQ71QbnBw=;
+        b=Ju3LOh6kmVcq3bIcXdw+8GnFA37/pfmKAUg5iJoTeB9bO+k+cqgMzoqe9yfnVrwIAb
+         4G7OV/Qaiji4fhG+EsIAjnpxJSa7k5f7NLUlKU8a3/Tx+WoZq/E//Puzr/G9Znhl4o3A
+         govQXcvjuPDvZ34MCJdbzYR41ekglvJGdM65Ifh+MppzbkhcuxAX6FpZ+v/vDdNbnX/b
+         39H+TE3bqTpuh3yAxQTYmwuHNg+LeZ4VRDnks7oxAVdty2qoVgijogY4E3bhEtDH/rqa
+         nI/2IGolKrpT8UBHPtxiofMDwJ3dh3MaPKs65aEMrtvYbgesJ+jYgzPyFQQRfm8fWGg7
+         vqQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783693815; x=1784298615;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=VI6XbHCkQw0BYyxRAEJxXVAGqyrCldWfR9mQ71QbnBw=;
+        b=keWUaXpV+LGkvbLoUcI1tDJn40i+NNJdhEwBQEA3jOo4rwharAthf4qYJr98M50mVr
+         h7XZffdopEPC1n6ElK9PPYypV5IKsXlg8A3qsCUJs+bBlXZ9QWxSwJcmq0eJdnWU/s25
+         MxEm0rcgNIv7Sf1PkReuN18K1LKK36COz+TawesUoM7H6euskWi0tTeSSS6Z79o+NVU+
+         9WFJC3ZWpuu5rFxP+ofJ1XTPbDUfsipeQ6Es8dq9Z+j6vE2Yxj18KRSY64JUnI3JxY6B
+         eutk1j+Lt9H8lS25LRwTkEhO998eWRYZZSHt5SUUEQ9wTXjAM/JymZbfIxUDS7jSdg4O
+         2eoA==
+X-Forwarded-Encrypted: i=1; AHgh+RrHw0fLf06C2uxT5r3wR7ZXPJ4i8bM8pGhYnREGnOh7t4C1dLBVKy3b/9EOVkFCYgH0WSV2O15+i2lI2u4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwwmIMqcTEinx/MF/0+3EcwY60yBQWz2ao4fwOY7pQaTSel5qcp
+	9anbx+3PEGHkbImmJqjQiiNddobGnmQL5wANI5KxnYbef9qEXD69RS1n
+X-Gm-Gg: AfdE7ck5xBdRI7rl8JhpYkeETi4947SFeV8Vz8ZUFFOh4t+aEeIHsASvNjcmzlUqk+5
+	Q+kuX6GIrsrbNZMcabd4YtpJ1NEmb5z/S7gz5++0rlFBTgDNPH2EpLMG8BcHOKK6Bsa9G7VMYKY
+	seZtUlxZLw0E0YOMrqPKTSTSI/d9K3ZBIUscMsa8IyC96E7+stCTITeWv2Xs/f4aPhHizig4ooU
+	yzJIlRmg0j3vBj+s82wYAQ6vLB78AbWrkdnETXXTYPv/b9+gKtZCteHCi+rIkSl2l1/vKCNJWdB
+	c/pfqgWxTkxM2fdISGxRdnzYfFA1OOoMo+JdXx/zwN+J6U5W/1uekz/CTyTqghsz9UVY13jN40d
+	shaEkyoJtTtzhRRdSMUAyPS90prxUx2nSx2pRrCE4GhTE5DDZ22j2+vxJGlrWJJvCDSi/VPTtYl
+	ZbyQ==
+X-Received: by 2002:a05:600c:1908:b0:493:c566:7bd6 with SMTP id 5b1f17b1804b1-493f2b4baa1mr35892515e9.18.1783693814906;
+        Fri, 10 Jul 2026 07:30:14 -0700 (PDT)
+Received: from enyo ([2a0a:ef40:ea3:3f01:ca44:4cd5:cfae:605b])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493f2d88698sm65315605e9.1.2026.07.10.07.30.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Jul 2026 07:30:14 -0700 (PDT)
+Date: Fri, 10 Jul 2026 15:30:12 +0100
+From: Dawid Olesinski <dawidro@gmail.com>
+To: Heiko =?UTF-8?B?U3TDvGJuZXI=?= <heiko@sntech.de>
+Cc: Sebastian Reichel <sebastian.reichel@collabora.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Corentin Labbe <clabbe@baylibre.com>,
+ linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 3/4] arm64: dts: rockchip: Add crypto node to
+ rk356x-base
+Message-ID: <20260710153012.0a840512@enyo>
+In-Reply-To: <4011768.FjKLVJYuhi@diego>
+References: <20260708175837.1718437-1-dawidro@gmail.com>
+	<20260708175837.1718437-4-dawidro@gmail.com>
+	<ak7jEYTAGgeDdi1W@venus>
+	<4011768.FjKLVJYuhi@diego>
+X-Mailer: Claws Mail 4.4.0 (GTK 3.24.52; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
 
-On 07/04/2026 at 14:44:49 -05, Rob Herring <robh@kernel.org> wrote:
+On Thu, 09 Jul 2026 09:07:23 +0200
+Heiko St=C3=BCbner <heiko@sntech.de> wrote:
 
-> On Fri, Mar 27, 2026 at 09:09:27PM +0100, Miquel Raynal (Schneider Electr=
-ic) wrote:
->> Part of Inside-Secure's SafeXcel family, the EIP-150 is some kind of
->> container node composed of:
->> - a public key accelerator,
->> - random number generator,
->> - an interrupt controller.
->>=20
->> It also acts as proxy for the clocks.
->>=20
->> Signed-off-by: Miquel Raynal (Schneider Electric) <miquel.raynal@bootlin=
-.com>
->> ---
->>  .../bus/inside-secure,safexcel-eip150.yaml         | 58 +++++++++++++++=
-+++++++
->>  1 file changed, 58 insertions(+)
->>=20
->> diff --git a/Documentation/devicetree/bindings/bus/inside-secure,safexce=
-l-eip150.yaml b/Documentation/devicetree/bindings/bus/inside-secure,safexce=
-l-eip150.yaml
->> new file mode 100644
->> index 000000000000..1b3d83a852f5
->> --- /dev/null
->> +++ b/Documentation/devicetree/bindings/bus/inside-secure,safexcel-eip15=
-0.yaml
->> @@ -0,0 +1,58 @@
->> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
->> +%YAML 1.2
->> +---
->> +$id: http://devicetree.org/schemas/bus/inside-secure,safexcel-eip150.ya=
-ml#
->> +$schema: http://devicetree.org/meta-schemas/core.yaml#
->> +
->> +title: Inside-Secure SafeXcel EIP-150 container
->> +
->> +maintainers:
->> +  - Miquel Raynal <miquel.raynal@bootlin.com>
->> +
->> +description:
->> +  The EIP-150 is a hardware container, it has its own interrupt
->> +  controller inside to which a random number generator and a public key
->> +  accelerator are wired.
->> +
->> +allOf:
->> +  - $ref: simple-pm-bus.yaml#
->> +  - $ref: /schemas/clock/clock-nexus-node.yaml#
->
-> Generally, if a schema has 'select: true', you don't reference it as it=20
-> has already been applied. And you have to list the properties here=20
-> anyways because you need to define how many #clock-cells for example.
+> Am Donnerstag, 9. Juli 2026, 01:56:10 Mitteleurop=C3=A4ische Sommerzeit
+> schrieb Sebastian Reichel:
+> > Hi,
+> >=20
+> > On Wed, Jul 08, 2026 at 06:58:24PM +0100, Dawid Olesinski wrote: =20
+> > > Add the device tree node for the V2 cryptographic hardware
+> > > accelerator on RK356x SoCs (RK3566, RK3568).
+> > >=20
+> > > The IP block sits in the non-secure peripheral domain. Its three
+> > > clocks (core, aclk, hclk) and reset line are accessible directly
+> > > through the main non-secure CRU, so no firmware intermediary is
+> > > required.
+> > >=20
+> > > The node is disabled by default; board files that wish to use
+> > > hardware crypto offload must enable it. =20
+> >=20
+> > Why is it disabled by default? It doesn't seem to be board specific
+> > at all to me (the same question applies to the RK3588 DT). =20
+>=20
+> You're definitly right about that ... there are no board specific
+> resources needed, so Dawid please drop the status from both nodes.
+>=20
+>=20
+> Heiko
+>=20
 
-I see, I'll drop that line. Thanks for the explanation, very appreciated.
+I'll drop the `status =3D "disabled";`=20
+lines from both the RK356x and RK3588 device trees in v3.
 
->> +properties:
->> +  compatible:
->> +    items:
->> +      - const: inside-secure,safexcel-eip150
->> +      - {} # simple-pm-bus, but not listed here to avoid false select
->> +
->> +  clocks:
->> +    minItems: 1
+Thanks for the review!
 
-Should be:
+Dawid
 
-       maxItems: 1
+> > >=20
+> > > Signed-off-by: Dawid Olesinski <dawidro@gmail.com>
+> > > ---
+> > >  arch/arm64/boot/dts/rockchip/rk356x-base.dtsi | 12 ++++++++++++
+> > >  1 file changed, 12 insertions(+)
+> > >=20
+> > > diff --git a/arch/arm64/boot/dts/rockchip/rk356x-base.dtsi
+> > > b/arch/arm64/boot/dts/rockchip/rk356x-base.dtsi index
+> > > a5832895bd39..9de7e7487ca1 100644 ---
+> > > a/arch/arm64/boot/dts/rockchip/rk356x-base.dtsi +++
+> > > b/arch/arm64/boot/dts/rockchip/rk356x-base.dtsi @@ -1112,6
+> > > +1112,18 @@ sdhci: mmc@fe310000 { status =3D "disabled";
+> > >  	};
+> > > =20
+> > > +	crypto: crypto@fe380000 {
+> > > +		compatible =3D "rockchip,rk3568-crypto";
+> > > +		reg =3D <0x0 0xfe380000 0x0 0x2000>;
+> > > +		interrupts =3D <GIC_SPI 4 IRQ_TYPE_LEVEL_HIGH>;
+> > > +		clocks =3D <&cru CLK_CRYPTO_NS_CORE>, <&cru
+> > > ACLK_CRYPTO_NS>,
+> > > +			 <&cru HCLK_CRYPTO_NS>;
+> > > +		clock-names =3D "core", "aclk", "hclk";
+> > > +		resets =3D <&cru SRST_CRYPTO_NS_CORE>;
+> > > +		reset-names =3D "core";
+> > > +		status =3D "disabled";
+> > > +	};
+> > > +
+> > >  	/*
+> > >  	 * Testing showed that the HWRNG found in RK3566
+> > > produces unacceptably
+> > >  	 * low quality of random data, so the HWRNG isn't
+> > > enabled for all RK356x =20
+> >  =20
+>=20
+>=20
+>=20
+>=20
 
-I did the error once, and copy-pasted it two more times in this series.
-
-> Seems to me you are adding this to satisfy simple-pm-bus. Maybe this=20
-> should just be simple-bus?
-
-I really need that clock, it feeds my container and is then populated
-through the child nodes. I actually selected simple-pm-bus on purpose,
-as my use case seems to really fit the description?
-
->> +  "#address-cells":
->> +    const: 1
->> +
->> +  "#size-cells":
->> +    const: 1
->> +
->> +  ranges: true
->> +
->> +patternProperties:
->> +  "^interrupt-controller@[0-9a-f]+$":
->> +    type: object
->> +    $ref: /schemas/interrupt-controller/inside-secure,safexcel-eip201.y=
-aml#
->
-> Better to just list a compatible you require. Like this, the schema is=20
-> applied twice.
-
-Mmmh, ok!
-
->> +  "^rng@[0-9a-f]+$":
->> +    type: object
->> +    $ref: /schemas/rng/inside-secure,safexcel-eip76.yaml#
->> +
->> +  "^crypto@[0-9a-f]+$":
->> +    type: object
->> +    $ref: /schemas/crypto/inside-secure,safexcel-eip28.yaml#
->> +
->> +required:
->> +  - compatible
->> +  - clocks
->
->> +  - "#address-cells"
->> +  - "#size-cells"
->> +  - ranges
->
-> The bus schema requires all these already.
-
-I'll drop them.
-
-Thanks!
-Miqu=C3=A8l
