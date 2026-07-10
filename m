@@ -1,104 +1,188 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF1841168E
-	for <linux-crypto@vger.kernel.org>; Fri, 10 Jul 2026 12:27:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0940B41B36C;
+	Fri, 10 Jul 2026 12:59:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783686449; cv=none; b=nfLXm62Tw1MspbEnSiOnYxBo5WFRNug57R3TTKTuZ1g2+H1fW9j0IVCx51BvnMSq3MyxFYGcBkhMBZiabLW+hxgSGLRb7SvMyyAHmaFo/ge8U8zaYVf30sZgH4GzNAH1kqa923zqtx1NjnjEXpJkHs+uZPQiSXgVHGKF/8RqfC4=
+	t=1783688382; cv=none; b=O+GBMZGVOHNXvWty9aXQp5mAfLcFbjrvo8nFMUGvbGxNlPlaI+DabcoMU4S3R6CHTVRTm3zCmlUMfba8+pLfJItWH9KKxgOmoxqAlDU32OKm/1VBWTuYBLYzhntRxomSfzOQW8pU81DxeFXnK4/0uzniR7GQCEdU5nViH8TtoVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783686449; c=relaxed/simple;
-	bh=rLKCmjRVf9KOpumyHtF+VxJdc7P58Nvlzs8HElmoXlc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bvEe5tRyCDI6SY+30aXSANyru+0xb+7+bWUmla8gYoXNvELFM60Ty1u03hTVZU88F+kYd/h3j0yeKcluMs70A2qyAc+IxMi5eYreProZ+p4lfZLPNoe4hsqdcF25GdlIdMHl9wjot3wwN6Z2b2R6fkrlBNy21492Y4wxRRYnfBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JsutOSIg; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1783688382; c=relaxed/simple;
+	bh=/6sXJuUOctndqmdSaxuO2kvNa2414Xs031qJp2Qo3/0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=G5EUHOa1P3FuNQAp+44oi2ldbnITYxNlXHFz9SJzG2+bLFfzJ6bmqavv2imTLzit5rnpTSfcUmdbePc+GXgqf4rZwe42ZA0IL9dNQFwrcMnQUczxs3zKSSgGe+LMZEkbGjVFNS9ANH77gNfH7+iGNdcGLHZ1x0YPBZZJSW7OW4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=eBUf2nVN; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JsutOSIg"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-493f45e206dso2715075e9.1
-        for <linux-crypto@vger.kernel.org>; Fri, 10 Jul 2026 05:27:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783686447; x=1784291247; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=WuKkt4ZATcS2uEH6twVx2vS+GDU8r/hOeP29ybwJqOw=;
-        b=JsutOSIg+W6NbOGtl1Td0s4GDsVPt0D9i73z0vHyLM02eUHXEGvNLfaDJKR+HIfpDc
-         vT1kk8AQQvtixCPqWlInaAhWxOONGGuxU6XG4UThcVTvWlQt1sy2zc8/7zyFzN4dzBhG
-         tb5Ult6qC166ZGh/vj8QrtaWGC0XMizZTXKu1Iuv9lG8HiAnATzItkK3yPt2wqCKAtWA
-         nGkgdKBoSbEH8zkRyaafj+aNDF6U+9sDy0wmdLyBVLyNyKZ1ccv5S6mNGvp18sypbo9q
-         ZJCZ73Nn5KWJCNMOUZ0tGXFYQnuxwdM1yJ5imozp8EuxGcMAYOsASnOFk55UwbNaRGNz
-         /i+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783686447; x=1784291247;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=WuKkt4ZATcS2uEH6twVx2vS+GDU8r/hOeP29ybwJqOw=;
-        b=pB6dVtKLpM4FdvhcWBeNYOvEHDm0NfVy0HH8oyjjEZ7SZVSegvSfJ90Z7zNT+uz1Mk
-         hMRLavaqcDCVbW/TBdbFf2Z4LwWBicvQo3XevfxSNpFUn/0v05JaT3dgIgp4Ianycr69
-         QLzEsKKKuIMEhW7tHXGGXIrOnY7nuHinDm7at2y+71u9SS0g0ACRBwGXSBw9z4BVFJmP
-         dGXSTUSfwBg7UbGcyPnZya9vE0pRafXZ6Q4aKdqiuhzJtxr3vZsxdR9NQEVymklBxf8g
-         nl77VF2OOKGS4qUC4gYBj4BJvDYsjzFlZ+Eb9Q9jzm8pnHkpIeAb8rKrnRTkT/JVKpP/
-         LSXg==
-X-Forwarded-Encrypted: i=1; AHgh+Roc398G8HNmmL3k2D2ywcKzqebUGffQpZUDpMWFje3qpbWFhRPy1taHh/p8badrq37XESdGn6rIFgYTZMs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKYQxUeglZ7rkwsWYmreGNKUh2YsOL1zyjPJvHVJe+9NO/RZTD
-	oMBa61DWm6aEzccuDd2uOcyV7H+bb+gObS5WbIoDkITi6LiDxoatUy56
-X-Gm-Gg: AfdE7cldcNq2zk2mE4CNFmqlvh0FElU2jYde9Gjh9cZZoc3icLH5YDsGwhEo7A0RKzv
-	m05Wv7NDRrPl9q1jd5YCf6ysXhSShSbB2cWww61dDoWtT8qZddOJF0X/9AWI/mVoD3AL/aI1Fyc
-	wjWJ46rr2e5ZIAYIkoPWrUNhRKBNydyrJNWdTkAsLxwhY6B86cjoUv2tKcHPALpvoCSftY4YPXJ
-	5qvyBAT8jiY85oSwwM9pRKYMD28/sFdpbeWrHxWIZ1IKJW1QRJGq9+Ty2cVA+wT7BtnvcsqjvRi
-	cky4Mv1Y1WSw5R228ENvgSk5aUH8ROrb5o82matCB6DLODFJoL1mNY57V+d2QIH1h0PV2aE3caG
-	brbR4lLs6k9RAQzFKot3Kk0oqwYrTvKjt1vLmxuLF3sySfgK9+z7qnwWNJ+ePlFpbwxwNzq2dLr
-	e4w9No1rZ1FlnKZzPtV7PckdsKYROg9uAmINvjJig25L801u9aITnJhVNBGi2JyGPZgKk3fviG7
-	8iNKCAO
-X-Received: by 2002:a05:600d:6447:10b0:493:c991:8e56 with SMTP id 5b1f17b1804b1-493f2b24cfbmr24906515e9.4.1783686446545;
-        Fri, 10 Jul 2026 05:27:26 -0700 (PDT)
-Received: from [10.128.11.240] (195-23-151-163.net.novis.pt. [195.23.151.163])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493eb6ff432sm130984125e9.4.2026.07.10.05.27.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Jul 2026 05:27:26 -0700 (PDT)
-Sender: Julian Braha <julian.braha@gmail.com>
-Message-ID: <5ca48a5f-086d-4372-ab3c-1535dcdbe5fc@gmail.com>
-Date: Fri, 10 Jul 2026 13:27:25 +0100
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="eBUf2nVN"
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id E2652C2C644;
+	Fri, 10 Jul 2026 12:59:49 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 1629960342;
+	Fri, 10 Jul 2026 12:59:35 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7EEEB11BD041E;
+	Fri, 10 Jul 2026 14:59:26 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1783688373; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=tVE3k2wNc11oGNnWAyHGoU5XfSdc5JYzcD9eXOmLp6c=;
+	b=eBUf2nVN8AVKC6kOJnhTuK/k1N66T/yVJ/bHVl3sko1ofApykwoi8BTLKdwU8HriZh9YsS
+	zJynoQn9LOafgWeqL29qT9ogxPZGhp+EhHgD6oMDDCEMjj97E/FbLfMCaa9KT6OefQ4jm/
+	8IpPdMtr7Wbag7M4Tpv3pgyUYMvS/EyTAmO0PJFUGqUrJzu2/I2YIDHcQv1U9KWvGq56P2
+	/naUd+n9+sIYYhAjAWI0bNvHa9uygtCYzyCnWMZE4S2LJ9jscI3aItLSvm1kvO8FdG4smz
+	kiyq7TvXWb79NO9mRBWB3GnW/rqAQR2400EF5ZK9djy6Mf13KuXeRXKAE7oHmA==
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Rob Herring <robh@kernel.org>
+Cc: Michael Turquette <mturquette@baylibre.com>,  Stephen Boyd
+ <sboyd@kernel.org>,  Krzysztof Kozlowski <krzk+dt@kernel.org>,  Conor
+ Dooley <conor+dt@kernel.org>,  Thomas Gleixner <tglx@kernel.org>,  Olivia
+ Mackall <olivia@selenic.com>,  Herbert Xu <herbert@gondor.apana.org.au>,
+  Jayesh Choudhary <j-choudhary@ti.com>,  "David S. Miller"
+ <davem@davemloft.net>,  Christian Marangi <ansuelsmth@gmail.com>,  Antoine
+ Tenart <atenart@kernel.org>,  Geert Uytterhoeven
+ <geert+renesas@glider.be>,  Magnus Damm <magnus.damm@gmail.com>,  Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>,  Pascal EBERHARD
+ <pascal.eberhard@se.com>,  Wolfram Sang
+ <wsa+renesas@sang-engineering.com>,  linux-clk@vger.kernel.org,
+  devicetree@vger.kernel.org,  linux-kernel@vger.kernel.org,
+  linux-crypto@vger.kernel.org,  linux-renesas-soc@vger.kernel.org
+Subject: Re: [PATCH 05/16] dt-bindings: bus: eip150: Describe the EIP-150
+ container node
+In-Reply-To: <20260407194449.GA3542959-robh@kernel.org> (Rob Herring's message
+	of "Tue, 7 Apr 2026 14:44:49 -0500")
+References: <20260327-schneider-v7-0-rc1-crypto-v1-0-5e6ff7853994@bootlin.com>
+	<20260327-schneider-v7-0-rc1-crypto-v1-5-5e6ff7853994@bootlin.com>
+	<20260407194449.GA3542959-robh@kernel.org>
+User-Agent: mu4e 1.12.7; emacs 30.2
+Date: Fri, 10 Jul 2026 14:59:25 +0200
+Message-ID: <875x2ngfv6.fsf@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v16 4/4] crypto: spacc - Add SPAcc Kconfig and Makefile
-To: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org, herbert@gondor.apana.org.au, robh@kernel.org
-Cc: krzk@kernel.org, conor+dt@kernel.org, Ruud.Derwig@synopsys.com,
- rbannerm@synopsys.com, manjunath.hadli@vayavyalabs.com,
- adityak@vayavyalabs.com, navami.telsang@vayavyalabs.com,
- bhoomikak@vayavyalabs.com
-References: <20260707125311.2398031-1-pavitrakumarm@vayavyalabs.com>
- <20260707125311.2398031-5-pavitrakumarm@vayavyalabs.com>
-Content-Language: en-US
-From: Julian Braha <julianbraha@gmail.com>
-In-Reply-To: <20260707125311.2398031-5-pavitrakumarm@vayavyalabs.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
-Hi Pavitrakumar,
+On 07/04/2026 at 14:44:49 -05, Rob Herring <robh@kernel.org> wrote:
 
-On 7/7/26 13:53, Pavitrakumar Managutte wrote:
-> +config CRYPTO_DEV_SPACC_CONFIG_DEBUG
-> +	bool "Enable SPAcc debug logs"
-> +	default n
-> +	help
-> +          Say y to enable additional debug prints and diagnostics in the
-> +	  SPAcc driver. Disable this for production builds.
+> On Fri, Mar 27, 2026 at 09:09:27PM +0100, Miquel Raynal (Schneider Electr=
+ic) wrote:
+>> Part of Inside-Secure's SafeXcel family, the EIP-150 is some kind of
+>> container node composed of:
+>> - a public key accelerator,
+>> - random number generator,
+>> - an interrupt controller.
+>>=20
+>> It also acts as proxy for the clocks.
+>>=20
+>> Signed-off-by: Miquel Raynal (Schneider Electric) <miquel.raynal@bootlin=
+.com>
+>> ---
+>>  .../bus/inside-secure,safexcel-eip150.yaml         | 58 +++++++++++++++=
++++++++
+>>  1 file changed, 58 insertions(+)
+>>=20
+>> diff --git a/Documentation/devicetree/bindings/bus/inside-secure,safexce=
+l-eip150.yaml b/Documentation/devicetree/bindings/bus/inside-secure,safexce=
+l-eip150.yaml
+>> new file mode 100644
+>> index 000000000000..1b3d83a852f5
+>> --- /dev/null
+>> +++ b/Documentation/devicetree/bindings/bus/inside-secure,safexcel-eip15=
+0.yaml
+>> @@ -0,0 +1,58 @@
+>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+>> +%YAML 1.2
+>> +---
+>> +$id: http://devicetree.org/schemas/bus/inside-secure,safexcel-eip150.ya=
+ml#
+>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>> +
+>> +title: Inside-Secure SafeXcel EIP-150 container
+>> +
+>> +maintainers:
+>> +  - Miquel Raynal <miquel.raynal@bootlin.com>
+>> +
+>> +description:
+>> +  The EIP-150 is a hardware container, it has its own interrupt
+>> +  controller inside to which a random number generator and a public key
+>> +  accelerator are wired.
+>> +
+>> +allOf:
+>> +  - $ref: simple-pm-bus.yaml#
+>> +  - $ref: /schemas/clock/clock-nexus-node.yaml#
+>
+> Generally, if a schema has 'select: true', you don't reference it as it=20
+> has already been applied. And you have to list the properties here=20
+> anyways because you need to define how many #clock-cells for example.
 
-This help text still has the indentation formatting issue that I pointed
-out on v15:
-https://lore.kernel.org/all/deb73385-a7a9-4ea9-8338-b7da999a5e9c@gmail.com/
+I see, I'll drop that line. Thanks for the explanation, very appreciated.
 
-- Julian Braha
+>> +properties:
+>> +  compatible:
+>> +    items:
+>> +      - const: inside-secure,safexcel-eip150
+>> +      - {} # simple-pm-bus, but not listed here to avoid false select
+>> +
+>> +  clocks:
+>> +    minItems: 1
+
+Should be:
+
+       maxItems: 1
+
+I did the error once, and copy-pasted it two more times in this series.
+
+> Seems to me you are adding this to satisfy simple-pm-bus. Maybe this=20
+> should just be simple-bus?
+
+I really need that clock, it feeds my container and is then populated
+through the child nodes. I actually selected simple-pm-bus on purpose,
+as my use case seems to really fit the description?
+
+>> +  "#address-cells":
+>> +    const: 1
+>> +
+>> +  "#size-cells":
+>> +    const: 1
+>> +
+>> +  ranges: true
+>> +
+>> +patternProperties:
+>> +  "^interrupt-controller@[0-9a-f]+$":
+>> +    type: object
+>> +    $ref: /schemas/interrupt-controller/inside-secure,safexcel-eip201.y=
+aml#
+>
+> Better to just list a compatible you require. Like this, the schema is=20
+> applied twice.
+
+Mmmh, ok!
+
+>> +  "^rng@[0-9a-f]+$":
+>> +    type: object
+>> +    $ref: /schemas/rng/inside-secure,safexcel-eip76.yaml#
+>> +
+>> +  "^crypto@[0-9a-f]+$":
+>> +    type: object
+>> +    $ref: /schemas/crypto/inside-secure,safexcel-eip28.yaml#
+>> +
+>> +required:
+>> +  - compatible
+>> +  - clocks
+>
+>> +  - "#address-cells"
+>> +  - "#size-cells"
+>> +  - ranges
+>
+> The bus schema requires all these already.
+
+I'll drop them.
+
+Thanks!
+Miqu=C3=A8l
