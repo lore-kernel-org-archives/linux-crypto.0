@@ -1,192 +1,248 @@
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11022127.outbound.protection.outlook.com [40.93.195.127])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AEA9340A46;
-	Fri, 10 Jul 2026 23:14:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.127
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D97EF2E285C
+	for <linux-crypto@vger.kernel.org>; Sat, 11 Jul 2026 02:14:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.182
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783725260; cv=fail; b=jZepRbUBxmQ0TZi4d/PWH0ul2zIBEgMJCcuxgY8LPqMcZBNf28h4KV0vLJEF8KezVMSa74rOiI5gw25KvlnqIbsZ8g9vboexO29US7nC9gxRVjZUSc3Lq4Aw1aVc9nV+PneOl6BFKbDSOZ0aPTuE64LMGI463Q4H0E41qhc96oE=
+	t=1783736090; cv=pass; b=hhN80Gf4m11MgtcMMC5A+B7esOpweH4zrf/mf9R8nhGGXENgGnWxjkAaqm9I+E+sWovIha8eCxlzTGEGZ0zOyeSTqZwQksV0dGznaDPtNXCM9A1ZjLZtJtuCzpbVGpDDTRrbTsXJNH5YqWiv5JN8UvIccwVIr6J8brpueENMr7w=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783725260; c=relaxed/simple;
-	bh=JI1nOgpMbHbZz9QBC7nmNhlcJEMqsGjSWesFDJnuluM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=UtMI4cg+394DQKhj4J13Ij87jtfHffXh6fTDYxWyV1W7gJPq8awzWr5v5ofoohut9WEkna/zPFaXjh3G6OAQJ04v8eIVhIU42Zeavkqxp5qVbVbTHSCj1DXEsqOPxJduukBV7+yiX7eyxmxewIceJUt+aUOpwRjB9OYXo7nHeL8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rambus.com; spf=fail smtp.mailfrom=rambus.com; dkim=pass (2048-bit key) header.d=rambus.com header.i=@rambus.com header.b=1B/q9c7Q; arc=fail smtp.client-ip=40.93.195.127
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rambus.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=rambus.com
+	s=arc-20240116; t=1783736090; c=relaxed/simple;
+	bh=FrBzqvvpfoMK6y0mKSyWneI2m4CYwpCTAgS+X62gfi8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=r7L4p67W25VT2LN7T9KXzXz9sP7UMAqAneCn6IgiG/3hIDvtUkrdxW8ePb+xqw9KCROMlStkwyyRs/bXQicSGm11NmV2dn96SVfgDXPy4MNgPso+5FqOKbQJ52/y3D65YKuWm0yda2PWQs3zvHM1UY9rRpVSPNLeONEGWgBwU+0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CnbbcyLS; arc=pass smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rambus.com header.i=@rambus.com header.b="1B/q9c7Q"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fMB7nhjXOkqAu+fWCaQf6UKRAOu+eWxSJySUSfffkCdWpcjXElbgAyLhREL6syuQ4TVYC8tr/xrFdCgsnbRC0z9GbSb2Ep7/G7AX2jhVkI5Rp9ndAKYFFI208usgN566X1SU08Zp9dACxK5hzj/ltq1AG7p6BYQjAKCZ6VDVSWR3KGsaO+hOKMosV8fmw00fLax/gfSjbUjlw7STFH2qrZcvddbOKT70RzzzH7yWIIK7bqnOG3rWYsUfTUg/okCp2x4bZzX+lHSWfaW82cNniYH02MtlqmMCNUXQy5jjeDWvVPUCEGwUV/4OF9HS+a1ZCxqeI7w4rPhz3tKFfb7R6g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JI1nOgpMbHbZz9QBC7nmNhlcJEMqsGjSWesFDJnuluM=;
- b=Hy3xmbh25gIvdFWtSXEYEF0FlfNkQ8403KWtunhuZyhkyhVxW8uWOqqYJ6VCa1gvjhC1PalSNfL8NeKI/0lTgwHzMGYM9UeB/CAJAFCcxTWEda3hL4KYe8L7/8yKFi1W2HoPP8rOqtlkj1PfWxjFdXR8OBt3MgIvtYNqMnJDMwNlj8B9DNpQOhn+agcSyms7fZD7/FVjLGdKCzHg5f+/qb1YywFESYgF71zcVpF1JsPRMKa6BnbpT1mdVxMPjLN1RdnaXuakZIEbTY4jcVEk15Xh28BVoxKC+prQsam/4mVRSULQ2Wr/odovQnX9D2S80ASwfdG8OnNiEImEXWvj1w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=rambus.com; dmarc=pass action=none header.from=rambus.com;
- dkim=pass header.d=rambus.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rambus.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JI1nOgpMbHbZz9QBC7nmNhlcJEMqsGjSWesFDJnuluM=;
- b=1B/q9c7Q4c9YqYDyr3O40QaFPu3AWlyeBKWGuZKp8pFYiEekr0Zm+1aZSPZ+OlNQkaknb66qQSV9J14qNK+Y0+n/+pfLjPCD7iRwFMYXzjcsZlaHYJbEJFnJF3HTSuXP703kvH0CLfEDb+8rosz92XR/ILWfMbTb5L5f/G5mTzzyCKFCcNPOuOYFA21Uc+E0nCXxOjVCNuTMKqyGMdHrL6yI8VONx1DK3OhRlRtT7w85ejRtiruk6r8wO3uV8vlnzhxBBsKiU0c/lkWEnrf1SYxQXTr7dM4Nu6neTFR68BXg07Ggz0+kIGhmLYHH6swuEAOi/HbpjE6VQhwo625MaA==
-Received: from SA3PR04MB9001.namprd04.prod.outlook.com (2603:10b6:806:398::17)
- by PH0PR04MB8279.namprd04.prod.outlook.com (2603:10b6:510:105::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.181.18; Fri, 10 Jul
- 2026 23:14:12 +0000
-Received: from SA3PR04MB9001.namprd04.prod.outlook.com
- ([fe80::3da3:45d7:8860:e196]) by SA3PR04MB9001.namprd04.prod.outlook.com
- ([fe80::3da3:45d7:8860:e196%6]) with mapi id 15.21.0181.017; Fri, 10 Jul 2026
- 23:14:12 +0000
-From: "Ousherovitch, Alex" <aousherovitch@rambus.com>
-To: Conor Dooley <conor.dooley@microchip.com>, "Krishnamoorthy,
- Saravanakrishnan" <skrishnamoorthy@rambus.com>
-CC: Albert Ou <aou@eecs.berkeley.edu>, Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>, Herbert Xu
-	<herbert@gondor.apana.org.au>, Jonathan Corbet <corbet@lwn.net>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Paul
- Walmsley <pjw@kernel.org>, Rob Herring <robh@kernel.org>, Shuah Khan
-	<shuah@kernel.org>, Alexandre Ghiti <alex@ghiti.fr>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "Wittenauer, Joel"
-	<Joel.Wittenauer@cryptography.com>, "linux-api@vger.kernel.org"
-	<linux-api@vger.kernel.org>, "linux-crypto@vger.kernel.org"
-	<linux-crypto@vger.kernel.org>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-kselftest@vger.kernel.org"
-	<linux-kselftest@vger.kernel.org>, "linux-riscv@lists.infradead.org"
-	<linux-riscv@lists.infradead.org>, Shuah Khan <skhan@linuxfoundation.org>,
-	"Nguyen, Thi" <thin@rambus.com>
-Subject: RE: [PATCH v2 01/19] dt-bindings: crypto: add Rambus CryptoManager
- Hub
-Thread-Topic: [PATCH v2 01/19] dt-bindings: crypto: add Rambus CryptoManager
- Hub
-Thread-Index: AQHdD+HshuImNmj2q0GDF9X/lpOPwbZmdM8AgADs7vA=
-Date: Fri, 10 Jul 2026 23:14:11 +0000
-Message-ID:
- <SA3PR04MB9001E7DC9B2D4788EDCE2390D7FD2@SA3PR04MB9001.namprd04.prod.outlook.com>
-References: <20260709203037.1884436-1-skrishnamoorthy@rambus.com>
- <20260709203037.1884436-2-skrishnamoorthy@rambus.com>
- <20260710-siding-unmatched-5e066fbe4c01@wendy>
-In-Reply-To: <20260710-siding-unmatched-5e066fbe4c01@wendy>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-dlp-product: dlpe-windows
-dlp-version: 11.11.2.117
-dlp-reaction: no-action
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=rambus.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA3PR04MB9001:EE_|PH0PR04MB8279:EE_
-x-ms-office365-filtering-correlation-id: 3d81d6f3-1286-4f69-8186-08deded8f3f9
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|23010399003|7416014|376014|366016|1800799024|38070700021|56012099006|4143699003|11063799006|22082099003|18002099003;
-x-microsoft-antispam-message-info:
- cKElAf2hElcTrc30MNdglEnoajQqDxXtzsqfpiiB6zBA3K2g0M6hNpR4UFd/cKLDwCYEBeVRYNZPCiGhuZgVB+BzitikIwNaZQdgT+5opstrLBwFIb4MkyNY3WWGo9KPEWzoc2PG9fWEShtznbFoauBUJO3gFh+czFcv81zjo8bE3690uLJ8TB3bMFNh7wI5rakJc1sMviOE+XTIAQgCUDmH8BzzqHeCKM8oFVMOKM0vHHlyO/DeA8UNFY97J22ufIVdCQVB5p6Rda0kXkhzTiL7Z/INLUCiCFtEg1h+4CPhbdBSxb5W1yMRN4XJEeAIrO0TwEjrXSsgmXQD+/twsMiGoslUjSkyhhCaMkjSxwTseJ3YM+B5JwBhQ7AGk9cl+2Ic1DYu3iTtsY3s2vrhVvsd0vcaUQYqhmvvZ2kSmozkolFyrKw3ky/zYP6fXIgdvkfFHkmZIYAiytRl4HA8VKDqxDi8NIxaeT5WWgYLe4nDk4EUhVk5SoWgzfqNNNH6ASduclEgL0YkiMeCOwQgDNWimk6DQhqc2pw8dnMB1XZzpXSq1nunWyhs5Vk+6gFa2THfgBc3jDH3Fqz6eu42zkA6+Xze+vprTYJr+5VMAmWiK97p+j+UiXha5mjlGstv2w/3U/rlNOpR/mxvzWF5jDoqXgO4w9kHb0oPqcwmoAdrbaMdw9Mwib5oJRx99fGkleGBtK1At8L5Yl6SBVuaICwwYoiMIkXb5Ro7I8g86AA=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR04MB9001.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(7416014)(376014)(366016)(1800799024)(38070700021)(56012099006)(4143699003)(11063799006)(22082099003)(18002099003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?zg89MWmfEpDkNexMjoRsJdbDAbiDg59nAjSJZL/4vLiKPs/K5GovK0idWtno?=
- =?us-ascii?Q?4nSMfxUCwvA1TVD7iKV+Avi/5LijHxI8f5ttY2xIQajFseQYJY/lweqgpBf1?=
- =?us-ascii?Q?5XD/NDJ+9CsUJgQAOvGsXKIvSc/TYtWFO856mem+VGktwddsjD9mw/Wq75Tp?=
- =?us-ascii?Q?1MwpBJQgW6tHwiVqNULyZVRwTgdjjg3A4EN67hVcQvVTIiVM5+kOo6QsM0Oy?=
- =?us-ascii?Q?LADcM4oP7U9V1MPcUeweSXRFqHdoyv1KS2OL0MTtCcBnGytEVwlF2ePw07Gs?=
- =?us-ascii?Q?IRG5Dz4D3Ao70AyRfFkiiefqWXbpoh931arzNADL4tc/6n/RrMfJHx6bpZHV?=
- =?us-ascii?Q?aNOiu+to3V22jd9c37VYoyGlfFFGmzzoNTLO2R+cku58bv5TanBClbFh2Mq6?=
- =?us-ascii?Q?DsN4/w5QtANSKeYad/KQTD31O331EvhqxWNsILV4y17WpOFV7zntMutvNKkx?=
- =?us-ascii?Q?waTrbMrIo4eSBcW24qUlca+NDP6GQ8EDFPigfaKceVbjwX+kNPzV0D9q50UH?=
- =?us-ascii?Q?bAxQ2zoPBQkDOJ/g4ahbBqKxLAhy4KBRFx69SfD/g5WvyrYQ7i1LxBJHPzRY?=
- =?us-ascii?Q?9PRGCU+L9jrEuOfN2k4UFA+UtWbMamLVLDkn+ED0ouwD2r5+6uVz1BQuD3Xy?=
- =?us-ascii?Q?W35/kd5Ih8G1r3BqwcoEFBBBKMGJQExiULeT8bVsf6tZmLcvJR4c/uISaAIy?=
- =?us-ascii?Q?MU3mh9nRJuyTtDhB1us2YYryGPGG9B3Doi8xnSbJygh7KX16ER+Z1pFf/P7V?=
- =?us-ascii?Q?7ffFvafdDDwp8XFPeW1QJDkxHwpIXhKB527JG/AA30R84M8cMy+VC53KSuZU?=
- =?us-ascii?Q?ZNkyh1syLyMCCUAuC/Bm9CpUX3qoQTo9T/Wz5Kpm4foPlBE+VRXpnkIfD2nA?=
- =?us-ascii?Q?xMOUthOVfBoVhJ7YZchoU/AiQGrOvOch1wAgV9Q0jFKJAh0i5cC2IoBUkDwQ?=
- =?us-ascii?Q?PQ0B2j7xkbOuzCfpGjAfRvPMsTl2Qu/5Cv8SUhR/ZJhnF/52cTRB5ndhVUIY?=
- =?us-ascii?Q?fIkfSh62DisxoVjPH0V+c6jg9f82NhaP1bhxHmITWkRfOWiGdrmQxBbFnadW?=
- =?us-ascii?Q?WZSR8+wRvAl/4MLQAm6o5h38qX9WicA1NNaxIcvM7pPFV8mEZQoSrqGqSWEV?=
- =?us-ascii?Q?WMmxOLsj+n6ZI/hwwRqk97JxF92EOAqKrfBT0qO+oJf6ghFZoIzeYC6epEMs?=
- =?us-ascii?Q?3POYDEz26IsG5xQl3NKB1xc9hVaH8wQMroPocRYBh/DGcOTzKSh6/Mo1wBZH?=
- =?us-ascii?Q?QLoF1oxIZ9KI/kXWrvsCBAkgraGjbEf3/D0xsNeHEvc3YC1x28Gs4a3AcEvK?=
- =?us-ascii?Q?2ekWP7f/jWuV5F+EvTdPAxKzgKnn3qeS8LyE2hXgrerNpWOYERUmbb6KpXBH?=
- =?us-ascii?Q?2OGDgY3Ny7ZkPh6acz+f/QHslJkRQQDl5dpJWXcDqdIvAwR4/nW2KSL88DIM?=
- =?us-ascii?Q?B7ueiDdmQobBIdVxSTEE8Y8k6nuHTu8Qk5ZC6Tpn5Ho6eABCFy/gtCadTgJX?=
- =?us-ascii?Q?KATdgwpQg7UWpBealJvsRsEa6HU3M+2UrvS4fLDMapz4oAAa/yKNTaxw7gDR?=
- =?us-ascii?Q?AnPPkmyVkvvTygo7j0hO6wwa5bt9fDmFg07VUCRZK0IFJbMZQWp1oIVaAhBG?=
- =?us-ascii?Q?4FFRdw2Jv6CNDoxrFX69XUoRpyZ42fNYBOIJMHG4uXMzhCSaDT/OuBBFjnN6?=
- =?us-ascii?Q?QWRE8s03zHrbJhZM/ri/GIcgm+FUsl60ktfgCF2bmjPTDWguiMs0eWolWKo2?=
- =?us-ascii?Q?GoA6ZCjkWg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CnbbcyLS"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-51c1805b8a7so15492481cf.3
+        for <linux-crypto@vger.kernel.org>; Fri, 10 Jul 2026 19:14:48 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1783736087; cv=none;
+        d=google.com; s=arc-20260327;
+        b=jPN9zRfgxdpKWeLmo5i97CYbjLo3y4JxKpZRVvR0KoHgaLAqQ2+dHjAf9+iYQdYF2h
+         58JoxdN7d2XTqag8i7FHo4yvQLtpuBG6vIJOEdW/YI60yjf79LBhMFTh1b5fXjIJ0Kv2
+         /3vXVezwWPPfPihUUU7O8spgmYK/MpaNIgT4auso3MUCFqeeKm5m/EeH9ZGw9iuHH3TR
+         +f+8/90nt8VvcShLK1bC6zljy5F7uwymUFgTvIYyg+NJ/N9OxdN1iZWTdM13p6biZrII
+         7VAzgLnhllSgNlh1C5PBbf1qnu3XagTPIYIWThAGzC1aMOJ4AU55Uz4yWaAskgVSfPFG
+         0ucQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=MhfPzZLV5yhxCKhSH5aaGFL3mdzmDor2bbuA3Q3b6kY=;
+        fh=2BOD+MKxrEa74Q+jNaSI0qtfGhnpx4NmLQxLQ81JZR8=;
+        b=SeIbDZXPTrR4Ihn0pmu97gJDHkVjhDErXwcwHhEC1Adrwa9qCwY14wsEqZvQua+3Hh
+         u0XfdV6kfAJfHbTzMEl8rLmCp3w8XFKHgRgcwtJpFWP1cJaYqbqnn2UeXTkyafw+SAjm
+         aReJpGQS34XxMzvy907SujC+QackQNsdcNbX4f4OYo+1IkI6iXWtspE8Rs8kiGIl/uSl
+         Ig1cd5VxyUSz+w8GqVRo9B52euAytICN4xS0J8LCi6dYergmQ717sYKj6Cxrdz045dop
+         Ii2cZkZkpF/j7I1UBQOGaopxAbrxxniUcedCw02SAknYQbw+2A7E7ZoBtvMmTcrwVsgO
+         qhPw==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1783736087; x=1784340887; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=MhfPzZLV5yhxCKhSH5aaGFL3mdzmDor2bbuA3Q3b6kY=;
+        b=CnbbcyLS8SkDMUBSFijObXOWcjllf3bab0nnbpIkV+yIUiTmGl5HHBJl7rwjz10taq
+         zSaw2opdQ0JXansENwfbmgkRHMZkL05XoRqy+fO9GFFv5JAuSIjh8FY9j+QmEpMgvKya
+         6pMYlwjuKrBVeH2NfQxsYlG20863MRFfhXwPtz0GTPI9sCZoS/NuQBx04Dpkuov5BD+o
+         CL/8IMi56qhY2oNvZ4aMf8iuIDzABmLE5XikLVeBf3lSGk3INCeEb2EAqVovZlfH49GH
+         MLlwRXUJE7mFEOD0iI8bQp6fNAKs/3dtjbCBeLI9Nd9js0ZZq/zhZV4roRPbSDymHqJr
+         gtzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1783736087; x=1784340887;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=MhfPzZLV5yhxCKhSH5aaGFL3mdzmDor2bbuA3Q3b6kY=;
+        b=VXY8wrdeAGSepC4IWn4vN/eG6e7EhvmIE1CjYJx/BVCZZhB6xER7CEfYG6aBe+NoYL
+         w0WCJnF6RNE7QJ3x+Jr/WmYRLox+XEU11RgKgaipM6baqDtJ3IiZx4oTidfZbeKZxEWF
+         wNlmHeSRrt8RRjoDLsFdtGWvIP918m76X0pwucbeMvLWJI17YWZk1ehBmYC0VThtjGvr
+         XJDAo8m7rP5yATdIZ5qCY0km7SRxzfXk6gYvzk6RLYPi18BmB30WWS5KelYyNSW4E6gx
+         U1hAZpMzQElEt0k1JGZWIFJbCogaAqptR73GyRqA6Jb+WumPP4T6R8Qan39T1amqWu9H
+         OwAw==
+X-Forwarded-Encrypted: i=1; AHgh+RqOZ/98TUY93/FtTrlpNiXmr/c1SneICCzgjUZoi9XSIyU5OY1AvF218EMyrkgljxcaEg9L5L69M5KDs10=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzMxr6XHkBlGrp3KQUDeizWIoh28pCyhhH904Mip0bpooqBRMLo
+	2CNKWB3cP95xZVOGvdIxD9jImwEVTVLWEWrXpA/E+7fstfCUAC799ILvOmulT+5QBm+A8tem7yH
+	K0I8xdJP7OsF+YivOLF9b16wBuW8flPw=
+X-Gm-Gg: AfdE7cnaKvYpz6HNNb3mlWSVhlZRwH+4TvR/5VtZhUaEZTz2h5nkDQoG5BTmZcEJPe1
+	aI8i+3pvOeXky4KDat56TTqiVoyTYY2sljeiFedtGYhGFu9PVmIcHQ7TaXIfcrsVdSHub4jA5m8
+	D0Q7WiZOSEmXuvczEIJYCXrLRlBjq66IpFe33lKu/l5aMG2uoEMUcwW0hKBOUixmCoHkNfXePTD
+	LReZL6RcwGvLNaEipXAYTzHoqfJoROcp61OmK3I/o5uSANOUedos5NNz/oxgHbXXy3pi5kH
+X-Received: by 2002:a05:622a:1390:b0:51c:f8f:13e with SMTP id
+ d75a77b69052e-51cbf243d11mr14867551cf.40.1783736087468; Fri, 10 Jul 2026
+ 19:14:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: rambus.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR04MB9001.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3d81d6f3-1286-4f69-8186-08deded8f3f9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jul 2026 23:14:12.0688
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bd0ba799-c2b9-413c-9c56-5d1731c4827c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: PUbuGh22NwrSEbGxQqb2+hwmWkaheiiISUQ8ylUhdelsOjElDbM0FbVMigZjFzINUBnkeJj7OqrWYznYHFlV+FYSj8fERMV8aNA1c+J/394=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB8279
+References: <20260708092247.4188498-1-yuantan098@gmail.com> <2026070828-carried-extortion-789e@gregkh>
+In-Reply-To: <2026070828-carried-extortion-789e@gregkh>
+From: Yuan Tan <yuantan098@gmail.com>
+Date: Fri, 10 Jul 2026 19:14:36 -0700
+X-Gm-Features: AVVi8CeeSm2x2HB2RYTorhmqUX6nraUWur4McQiSyR0-fU2gppNNR_t3udJjEnE
+Message-ID: <CAPuPA7Kdy_wghauOH5pggq+woLmtp4-BEyn8LoBJ2UhRExF+Xw@mail.gmail.com>
+Subject: Re: [RFC] VEGA: a syzbot-like workflow for LLM-found kernel bugs
+To: Greg KH <gregkh@linuxfoundation.org>, andrew@lunn.ch, 
+	Paolo Abeni <pabeni@redhat.com>, laurent.pinchart@ideasonboard.com, hdanton@sina.com
+Cc: linux-kernel@vger.kernel.org, workflows@vger.kernel.org, jhs@mojatatu.com, 
+	sven@narfation.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, Yuan Tan <yuantan098@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 10, 2026 at 1:59 AM, Conor Dooley <conor.dooley@microchip.com> =
-wrote:
+Hi All,
 
-> This company no longer exists, you should probably introduce a rambus
-> vendor prefix instead.
+Thanks for the thoughtful feedback, and apologies for the delayed reply.
 
-Cryptography Research, Inc. does still exist -- it's now a wholly-owned
-subsidiary of Rambus (our co-maintainer is @cryptography.com). The
-prefix names the IP originator, which is consistent with existing
-subsidiary/acquired-vendor prefixes in the tree (e.g. al =3D Annapurna
-Labs under Amazon, mstar noted as acquired by MediaTek, fsl, cavium,
-xlnx). We'd prefer to keep "cri" on that basis, and can annotate the
-description as "Cryptography Research, Inc. (a Rambus company)" to make
-the ownership explicit. Happy to switch if you feel strongly.
+1. Regarding Paolo's question, a bit more context about who we are.
 
-> This property seems like it could be replaced by having a reg entry
-> for each mailbox.
+I first got involved in the kernel community during undergrad with
+guidance from Zhangjin Wu <falcon@tinylab.org>.
+I started building VEGA earlier this year while I was a PhD student at
+UC Riverside. I recently dropout and start a company called Nebula
+Security with my labmates. We want to help fix bugs in open source
+software.
 
-Agreed -- v3 will make each mailbox a subnode with its own reg window
-and drop cri,mbx-instances.
+The volunteer bug-fixing group that mainly includes students from
+Lanzhou University, where I did my undergraduate studies, and UC
+Riverside.
 
-> This looks like it should be deducible from a device-specific
-> compatible. [slots/strides]
+I will be at NetDev as well. See you there :)
 
-These aren't fixed per silicon -- they're the per-mailbox layout of the
-VCQ rings in host DMA memory, chosen at platform integration and
-programmed by the driver into the mailbox QUEUE/SLOTS/STRIDE registers.
-They can differ per mailbox on the same silicon, so a compatible can't
-encode them. v3 will keep them as optional, defaulted properties on the
-per-mailbox subnodes.
 
-> This whole subnode thing seems like it is only required because you
-> don't have device-specific compatibles [cores].
+2. To answer Laurent's question: All bug reports are human-reviewed.
+For the past four months, we have been including a human-written and
+reviewed patch when reporting bugs, with LLMs used only as an
+assistive tool. However, because the volume is large and there are
+some bugs we do not know how to fix well, we would like to make some
+bug reports public in the interest of transparency.
 
-Core presence is actually discoverable at runtime from the CORE_ENABLE
-register, so v3 will drop the per-core child nodes entirely and probe
-for enabled cores -- no per-variant compatible needed.
 
-> this could probably be handled via reg-names? [affinity]
+3. To Hillf's point: if we start sending reports, the initial volume
+will stay well below that level.
 
-Yes -- v3 will express affinity per mailbox (a "role" of a specific core
-type for a dedicated mailbox, or "generic" for the round-robin pool),
-which is the subnode analog of your reg-names idea. One caveat: this
-cleanly covers 1:1 core-to-mailbox dedication plus a shared pool; a
-mailbox dedicated to several specific cores would need multiple role
-tokens.
 
-Thanks -- this restructures nicely.
+4. Regarding Andrew's point: Early on, we used syzbot config for
+scanning and validation, and that did lead us to spend time on code
+paths and features that may not matter much in practice. We should
+definitely prioritize fixing bugs in actively maintained code.
+
+
+5. And to Greg's point:
+
+On Wed, Jul 8, 2026 at 7:55=E2=80=AFAM Greg KH <gregkh@linuxfoundation.org>=
+ wrote:
+>
+> On Wed, Jul 08, 2026 at 02:22:47AM -0700, Yuan Tan wrote:
+> > Hi all,
+> >
+> > We would like to ask for feedback on a proposed workflow for reporting =
+Linux
+> > kernel bugs found by an LLM-assisted code auditing tool that we have
+> > been developing since earlier this year.
+> >
+> > Since February, we have been developing an LLM-driven kernel code audit=
+ing
+> > tool called VEGA. It started as a side project, but the results became =
+much
+> > substantial than we expected: VEGA has found hundreds of valid bugs in =
+Linux
+> > kernel.
+> >
+> > That immediately created a practical problem: we do not want to dump a =
+large
+> > pile of bug reports onto mail lists and annoy the maintainers.
+>
+> True, which is why we all end up with long lists of issues/patches at
+> the moment.  The initial reaction is "we need a dashboard for everyone
+> to collab around!" like you did here, but I'd like to say this is not
+> the best thing to do at all.
+>
+> syzbot can get away with a dashboard because someone is tending to it,
+> triaging the "serious" bugs before they become public, and only letting
+> the "would be nice to fix one day" type issues remain.  That's a huge
+> resource commitment that Google has made here, and that's great, but I
+> doubt that anyone else will have those resources to do this type of
+> thing.
+>
+> Instead, let's just work to get these things fixed.  We all have
+> hundreds of patches/reports in our internal systems right now,
+> attempting to triage/rank/coordinate would just waste time.  In other
+> words, just grind through them, send patches out, and get these fixed.
+>
+> I'm doing this now, and I know many others are as well.  We are all
+> running "different" tools, and so we find different issues, so we can
+> all just keep sending patches as we get them done.  It's going to take a
+> lot of effort (I've somehow convinced 8 interns to help me out with this
+> this summer), but once we get it done, we'll be much better off.
+
+Yes, getting bugs fixed is the most important thing. The reason we
+considered a syzbot-like workflow is that there are some validated
+bugs which we currently do not know how to fix well ourselves. For
+those cases we thought the community might have simpler ideas once the
+report is made reproducible and concrete.
+
+But we agree that any process around this should help move fixes
+forward, not create another layer of overhead.
+
+>
+> > The first thing we tried was to fix as many as we could ourselves. We
+> > started working with a group of student volunteers. Most of them are
+> > college students, so we have been training them, reviewing their patche=
+s,
+> > and trying to build an internal review process before anything is sent =
+to
+> > the mailing list. The goal is to turn these findings into useful fixes,=
+ and
+> > also to help new contributors grow into people who can reduce maintaine=
+r
+> > workload instead of adding to it.
+> >
+> > The process was not perfect. Some patches were not good enough, and we =
+also
+> > made some mistakes early on when deciding what should be called a secur=
+ity
+> > issue.  Our internal review process has been improving with the help of=
+ the
+> > community.
+>
+> That's great, keep it up!
+>
+> > But the remaining queue is still too large for us to handle.
+> >
+> > Recently Jamal pointed out problems around our tags. That made me reali=
+ze
+> > that we should probably stop treating this as an ad-hoc patch effort an=
+d
+> > build something closer to syzbot: public, reproducible, trackable,
+> > deduplicated, and useful to maintainers.
+>
+> Again, I think that effort is going to be larger than just getting the
+> patches fixed and pushed out.  It also turns into a central
+> point-of-failure, which is what we do not want to have at all for the
+> kernel.
+>
+> But hey, I could be totally wrong.  Maybe some generous company that is
+> involved in unleashing this hell on us would be so kind as to pony up to
+> do the work to create this and help fix the issues that their tools are
+> finding.  Just like Google did in the past, there is precedent, but for
+> some reason people don't like learning from history...
+
+We have also received some bug bounty rewards from Google, which gives
+us some resources to put back into this effort.
+We are prepared to invest more engineering time in fixing these bugs,
+and we are also considering hiring engineers to help.
+
+Will you also be attending NetDev in person? If so, perhaps we can chat the=
+re :)
+
+>
+> It's going to be a long 18 months...
+>
+> greg k-h
