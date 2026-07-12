@@ -1,51 +1,62 @@
-Received: from mail.zeus03.de (zeus03.de [194.117.254.33])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5EC1372EC6
-	for <linux-crypto@vger.kernel.org>; Sun, 12 Jul 2026 08:13:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41D4AE56A;
+	Sun, 12 Jul 2026 13:15:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783844015; cv=none; b=qhPI/qkkpYIYtW3cm5/mAMf/W/9FSaa9eOBJ5YP4nLvgBu/z81akV8cuTwVJ+3TKtAfNdBBwVz3h/DTlTyLuCDDp2k5SSI7IlwGgWt62zPm9c8bDVJboqxW7KnPJMphuHVtHFIpFqCZF5Zmxj1GU9HR0d0wQCwnCEgpsdCe0O60=
+	t=1783862144; cv=none; b=PI/GVTtH93zRZJYfmlgPE/IPYyeQAfSEW/SpUcD4YS6BlFV/G+qsru23QTHFqEjmRkNeAbTGMKDyDZjKgLaxayhsahR42tTb6Zu5Eu2KBJcWXyLBiJ99tS9bTMy4JyJjfdWNfcGMNXBrSnGj3gv95aGKwUyOyVEyoadVd8QGGYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783844015; c=relaxed/simple;
-	bh=HJd/iyE1L08rvgqBeJSEVBvoYo+Y5iwJ7CrdeDu+mQo=;
+	s=arc-20240116; t=1783862144; c=relaxed/simple;
+	bh=Nh88LM8tcn4ASu2ZHG0sNKD7t6K3lGnx5oaEMxt0uO8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MDpHn9GSdtfV9gExhCIKeaBYOQb6/NvZl6ZWt9JiUQ0hcdxf7NJ/m1KFWe04OYkOTlmQQ2jHx9BO5xDdLy70B4EUyeT0d6qflqZWf2nx4bVcQrmcwxNd7/ak2xEmRN16gCWIBcy9kwyQ42Q+bzmv+XUVv8ZIC3IwkojApwWjp+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=mearCb4N; arc=none smtp.client-ip=194.117.254.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=a6+aNsdaNJRfyXo5YywUGhi45NcZbY6n8OQuGXn1HWQWzv5rotvomX4fJxhKzNf2t0ZDaQtIrXoERY8tu7gazfJpZtsxUtcHr6ADLOqdWXHCqrB68BuKiVX3aZnnU9j7n5ExpLul4e3cTVcON1q/bf2s8jXIPFUM6FsT9XoaC9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VNEtcsuL; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="mearCb4N"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	sang-engineering.com; h=date:from:to:cc:subject:message-id
-	:references:mime-version:content-type:in-reply-to; s=k1; bh=HJd/
-	iyE1L08rvgqBeJSEVBvoYo+Y5iwJ7CrdeDu+mQo=; b=mearCb4NG7+DUb1Zp5EZ
-	BcesaZp9IZ/wDmjuxZ3Ev9hA//yR3u10f4qYzQmU3ld2nq04ir41T70vHjyOAtGz
-	1sQhB/3XDWji9QSg5SebEt1ESkcSfcOckQ2sqGwZujSN3Mfwe8C8j0HzgqQLJokY
-	kPk0awVwGeu1iH3kxE18+nuNG6uIoXPa+X7HGPdkjKY+fhM+zp2gp9x43yEI6aTQ
-	k1COp5N71ws16cQ4URCiOgecUIZmGEHf8IUhujtAN4CESReXkYpb5Zir8l+H/SZi
-	IUtFAtCxeRhq+FVT9UBVJGMJYDNJnW6jN5dOb4pM3tl3RR5ZUpDu4JDFz7g79PKB
-	uQ==
-Received: (qmail 2159428 invoked from network); 12 Jul 2026 10:13:30 +0200
-Received: by mail.zeus03.de with ESMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 12 Jul 2026 10:13:30 +0200
-X-UD-Smtp-Session: l3s3148p1@x+eQjGVW6Lsujnun
-Date: Sun, 12 Jul 2026 10:13:30 +0200
-From: Wolfram Sang <wsa+renesas@sang-engineering.com>
-To: "Miquel Raynal (Schneider Electric)" <miquel.raynal@bootlin.com>
-Cc: Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VNEtcsuL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 923901F000E9;
+	Sun, 12 Jul 2026 13:15:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783862142;
+	bh=Nh88LM8tcn4ASu2ZHG0sNKD7t6K3lGnx5oaEMxt0uO8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=VNEtcsuLTmU2ucIIDm9TU0aOrgLG0PmCJHk9PDUon1AljI1F9FSR9LpQDVRUf+7qk
+	 mgoU55c86qZCVDWkmdFQ8EMVU9zzS+lyg39dHwDfuEt0lyiZnIZN1ln2xyKpgaenGB
+	 1Y2727IZNQLM6VZGXxCQ61q4lq4S7Lhw8TJAPrzGVverjXFvff/WoZBPjKCiqSd8AB
+	 PzO2NVD8dVg2RkiBjK3Ps9x/u8HE9LkND7+WE21L/Zzx5p2saUMs7W5bdC2yyL5AyN
+	 QfRmoMiFqPmlhSDsF1SJs8Fa3LmWQlgD+YMkIHm2TPCdqKy1fM9X/zs/nekbo1cyxa
+	 9RoBKqvGPRffw==
+Date: Sun, 12 Jul 2026 14:15:36 +0100
+From: Conor Dooley <conor@kernel.org>
+To: "Ousherovitch, Alex" <aousherovitch@rambus.com>
+Cc: Conor Dooley <conor.dooley@microchip.com>,
+	"Krishnamoorthy, Saravanakrishnan" <skrishnamoorthy@rambus.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
 	Conor Dooley <conor+dt@kernel.org>,
-	Jayesh Choudhary <j-choudhary@ti.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	Pascal EBERHARD <pascal.eberhard@se.com>,
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] hwrng: omap: Enable on Renesas RZ/N1D
-Message-ID: <alNMqvOy5DEz_4nf@shikoro>
-References: <20260710-schneider-v7-2-rc1-eip76-upstream-v2-0-4eab557b0e70@bootlin.com>
- <20260710-schneider-v7-2-rc1-eip76-upstream-v2-2-4eab557b0e70@bootlin.com>
+	"David S. Miller" <davem@davemloft.net>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <pjw@kernel.org>,
+	Rob Herring <robh@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	Alexandre Ghiti <alex@ghiti.fr>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"Wittenauer, Joel" <Joel.Wittenauer@cryptography.com>,
+	"linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	"Nguyen, Thi" <thin@rambus.com>
+Subject: Re: [PATCH v2 01/19] dt-bindings: crypto: add Rambus CryptoManager
+ Hub
+Message-ID: <20260712-washable-clapping-5dfb79d1bdef@spud>
+References: <20260709203037.1884436-1-skrishnamoorthy@rambus.com>
+ <20260709203037.1884436-2-skrishnamoorthy@rambus.com>
+ <20260710-siding-unmatched-5e066fbe4c01@wendy>
+ <SA3PR04MB9001E7DC9B2D4788EDCE2390D7FD2@SA3PR04MB9001.namprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,52 +64,109 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="HvtI8ZeixoIEYXu9"
+	protocol="application/pgp-signature"; boundary="pwarKFrPpjCIAVeL"
 Content-Disposition: inline
-In-Reply-To: <20260710-schneider-v7-2-rc1-eip76-upstream-v2-2-4eab557b0e70@bootlin.com>
+In-Reply-To: <SA3PR04MB9001E7DC9B2D4788EDCE2390D7FD2@SA3PR04MB9001.namprd04.prod.outlook.com>
 
-
---HvtI8ZeixoIEYXu9
+--pwarKFrPpjCIAVeL
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 10, 2026 at 08:20:33PM +0200, Miquel Raynal (Schneider Electric=
-) wrote:
-> The Kconfig symbol and associated seem to be badly named as they have
-> nothing OMAP specific but instead refer to Inside Secure Safexcel
-> devices which have been used in many SoCs from different
-> manufacturers (like OMAP, Marvell but also eg. Renesas).
+On Fri, Jul 10, 2026 at 11:14:11PM +0000, Ousherovitch, Alex wrote:
+> On Fri, Jul 10, 2026 at 1:59 AM, Conor Dooley <conor.dooley@microchip.com=
+> wrote:
 >=20
-> The Renesas RZ/N1D features this IP, so add this architecture to the
-> dependency allow list. In practice this dependency list does not seem
-> very relevant and could be entirely dropped, given the fact that this IP
-> has been implemented by many different vendors and seems to be
-> architecture agnostic.
+> > This company no longer exists, you should probably introduce a rambus
+> > vendor prefix instead.
 
-I thought the same. But I am also fine with adding one more:
+Please fix your quoting, you need to retain context beyond what I said
+so that people who get 100s of mails per day (me) remember what it was
+in response to.
 
-Reviewed-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
+>=20
+> Cryptography Research, Inc. does still exist -- it's now a wholly-owned
+> subsidiary of Rambus (our co-maintainer is @cryptography.com). The
+> prefix names the IP originator, which is consistent with existing
+> subsidiary/acquired-vendor prefixes in the tree (e.g. al =3D Annapurna
+> Labs under Amazon, mstar noted as acquired by MediaTek, fsl, cavium,
+> xlnx). We'd prefer to keep "cri" on that basis, and can annotate the
+
+I'm not sure that these examples actually aid your cause.
+al has been replaced by amazon, fsl is not used for new devices, new xlnx
+devices use amd (only example for now is the riscv stuff I think),
+cavium has had nothing added in donkey's years etc. mstar I don't see
+anything new in years either.
+
+> description as "Cryptography Research, Inc. (a Rambus company)" to make
+> the ownership explicit. Happy to switch if you feel strongly.
+>=20
+> > This property seems like it could be replaced by having a reg entry
+> > for each mailbox.
+>=20
+> Agreed -- v3 will make each mailbox a subnode with its own reg window
+> and drop cri,mbx-instances.
+>=20
+> > This looks like it should be deducible from a device-specific
+> > compatible. [slots/strides]
+>=20
+> These aren't fixed per silicon -- they're the per-mailbox layout of the
+> VCQ rings in host DMA memory, chosen at platform integration and
+> programmed by the driver into the mailbox QUEUE/SLOTS/STRIDE registers.
+> They can differ per mailbox on the same silicon, so a compatible can't
+
+I'm not sure. Unless there's more than one instance, this definitely
+sounds like something that you can determine from the compatible.
+Generally these kinds of accelerators tend not to have multiple
+instances though, so each platform will have a different compatible,
+and the driver can store an array of mailbox configurations.
 
 
---HvtI8ZeixoIEYXu9
-Content-Type: application/pgp-signature; name="signature.asc"
+> encode them. v3 will keep them as optional, defaulted properties on the
+> per-mailbox subnodes.
+>=20
+> > This whole subnode thing seems like it is only required because you
+> > don't have device-specific compatibles [cores].
+>=20
+> Core presence is actually discoverable at runtime from the CORE_ENABLE
+> register, so v3 will drop the per-core child nodes entirely and probe
+> for enabled cores -- no per-variant compatible needed.
+
+No, per-variant compatibles (for the devices/socs that this IP is
+integrated into) are a requirement. While it would have been handy for
+detecting capabilities, it's a requirement for other reasons:
+differences between integrations be that functional or enforcing the
+correct constraints on properties, issues only present on select
+devices, etc.
+
+On that note, I see there's no clocks or resets properties added by your
+patch. While the IP may not have a reset (although I suspect it
+probably does) there's no way it functions without a clock.
+
+Cheers,
+Conor.
+
+>=20
+> > this could probably be handled via reg-names? [affinity]
+>=20
+> Yes -- v3 will express affinity per mailbox (a "role" of a specific core
+> type for a dedicated mailbox, or "generic" for the round-robin pool),
+> which is the subnode analog of your reg-names idea. One caveat: this
+> cleanly covers 1:1 core-to-mailbox dedication plus a shared pool; a
+> mailbox dedicated to several specific cores would need multiple role
+> tokens.
+>=20
+> Thanks -- this restructures nicely.
+
+--pwarKFrPpjCIAVeL
+Content-Type: application/pgp-signature; name=signature.asc
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmpTTKoACgkQFA3kzBSg
-KbaTMw//cwOJonuD2ZlfeuRusk00ZjdhM/N/aDKZxt/JTatIS4kWvQDwZwQSzdMD
-h+HJstrlCW8MseQ4k12KJOpqs2H7Qd7wVvaNUTDJnSIeb6JqiRobqq59HItwTfp7
-6EP7JuDtX8VCXaUf+WdNg90zpGn4BQ6IshiuWJJuuVceHNlnTbVywMl90CjX2VVl
-IQiyuSEOuV5K37bvSmldtnfdqikin6k5tl+adi6dtWXsw/MkIwE5DwSBs6b6vahW
-2ydth49rXR1qPY+TuMFfSs10aHl5Jm8AfADZNv6RMrTyJ/wi5K5EBRrYYP5imfV1
-oMnFGmWwxIqjRZpKvvdhX7OvFLmZc+zvw3fdSKF2sq06Iv2Udaa+VuFw/CsqJu4/
-YZ4l8t7vgrUBTBk6Tc6wESKIzygKSCdCrorA41KwFYI05Borcm0IOhSHaF+/fehB
-RSD/tzH9X3h/4O/GnjVFK91gt/7AjOMzJV3nbi8UmqjBDIt3G7UVTqF+rL5MGbfB
-jUkfr/6pUiayDJ3YBxaylc1ac2kgMJs8xuGnhsqduOi/T5PBble9uQa81W8jFynK
-agWs3QC80bvpJVzmsJf7wUUrqKD28DTSNvitwA44g5G0ICdE7iVdiSMXze/OskwD
-tyn8VNwLNoa82ooQPfegiCUHo+cSA1MA6aOL//Tk1uJh1iaYN54=
-=0RyS
+iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCalOTdAAKCRB4tDGHoIJi
+0lBLAQCfKTJZqqNJen0s99xi2ILKiuhHavFoxTEtPcq0kWgfegEAhX1S0vi0KgKV
+HVl4wR7EAY3dKcF5wQElXIiRRSMQVgM=
+=gP2T
 -----END PGP SIGNATURE-----
 
---HvtI8ZeixoIEYXu9--
+--pwarKFrPpjCIAVeL--
