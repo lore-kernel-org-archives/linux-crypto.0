@@ -1,126 +1,89 @@
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 083943E558F
-	for <linux-crypto@vger.kernel.org>; Mon, 13 Jul 2026 11:28:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.219.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783942097; cv=pass; b=bHy7LqqgSCJkuCEVC7ar+uG7FPWd5phfgOYFbMsKEVMo16TJRcREwRWaqyoZsxMkJUfmJOMr81XZqRCNx8a3FA4+Y4VFORD+UJMJqPy4dZdgN+e+lt2EKoiR2LqFYxEROot//Gipy3EIYfmL+3AiYtNqWv+vbqrNHL0qUCFrFVc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783942097; c=relaxed/simple;
-	bh=CsOQmBvWHRYBm4uU/y67MELpLs3ohV+u3s6To31MyAU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FS41j2pFVt1EmbuaBDw8y5bviqnDxnzrWMFYLGzJ8TY++iTn+1Cvq9RZrXFVWQYWOOPkVZ4UL4npnaJLGC7UegeoYH6hAKJMzerRTF8yKMapq2DQUj0A2BXvF9tVIENurCQQcJQsbTl59nAG+Jo1PrjDe5j/zhCfIxX8VrZsA+s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=Enq4eVeC; arc=pass smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 637F613B584;
+	Mon, 13 Jul 2026 11:58:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1783943905; cv=none; b=s0IH9FR3wceW0LEQ1yb+doseOCj4J3wYiTyscCh8WGVfSmnrPXovbfYX+xvo72IU8DD37H59egqLc+D1syKfCIi1QljRLYCTB+5ZuKsQ5CswkwHmVD5wY24dfQQxBMyeqNBNNq8rIfqFu6fQxuWqyWCR42L1W8w6rhHGxMvoQ1I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1783943905; c=relaxed/simple;
+	bh=ohwl+NNZhM3tc2Svo5D4PPwHbHssItFhLlreVZUvKhk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JM1bQrv9k2DCKe/FU09QULpgHdfbjKA0fjDkEwtsAuBnbEH8siL4E8z5Ll3+1JE9r6QLIUVYG+J0K4fVy1Bej8hS2BXQTyzwhGPSnshyHPt0NgfQ3kKa8mqGW8wv7q5smSVGNPdkTeK4N9kO+mBPoM4gHgnYVBMjPnMovsClK80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b=XapGZfWf; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="Enq4eVeC"
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-8ef7b7651ecso31971536d6.1
-        for <linux-crypto@vger.kernel.org>; Mon, 13 Jul 2026 04:28:15 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1783942095; cv=none;
-        d=google.com; s=arc-20260327;
-        b=Mj6fibgAMqQDi0Jtfq2AmzWfRmfZXa1OfywpKqc+Lz5UnIhMx/UCi88hsANnX51Ti5
-         2X+yEv3P2lCY+aXjU6gcz/pes/t7/I8TpTe7yEl/F6jF+77nNTsU6J29vadIXznic5H6
-         UjK/lFYxLH/FNl1skDxkRFRYexomeb20EokJtQOU6gU/cxOZKSuo41YK3fHjqfrj+LC2
-         1j3EdbgxUvC1JTL2omHbgovHyGzLTMUiWL0CdHjP/ArJVBoqjc8y1bLFXLYGtx25JElW
-         dD3z8e+NnvbBIvzSWGChwtg8GN2Kz60Y8wyUDulFE+vXnSzZ3AG1WnAI+Wd4b9Ovcugs
-         lvjw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=st85seCDQwEjU3U5r3+4UcGdfGWDn3g9mE+v4yLDsIU=;
-        fh=L2YGrALHz9HfOH2MmkVpHEpTqcVafO8aNmjINja4FdU=;
-        b=o+EqGSrrlZYYUWMOMTsIdF6rLJ4r3EdtKYYELevnHQVF+phAadqUz2NDP2uv1naTCJ
-         Tdz299PDcG3PfXkGObivNphlASDElB4akQHVg+6exiyGzjF2SSVn+3XhGWeTSHRCxtGY
-         CJptQtbKnKo0QcwGJBOYsplVbvAW1ebcwtl2CjfVGUTNnDbZaq/2iGgV/ZdcjoNQwbR+
-         vDFIE/rCPN4bgMek2x9WHsIFxE9tVaZPScPN1lqakqebZFTTUJX864k2bX6cV4d+7bKJ
-         LVMm2nZ6AmLeEy9R/49JT2reXwQPNzZp/9lPX2G1CZkWQ0/KSnnfFKnI7bXWIRicmO/O
-         Titg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1783942095; x=1784546895; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=st85seCDQwEjU3U5r3+4UcGdfGWDn3g9mE+v4yLDsIU=;
-        b=Enq4eVeCkOzKqbJjk6D7a/97bEzyCu6FfHzlVFvbRPquQXZ1Ik/upWeOlBGTuFcryK
-         9oAlVUP7AxzD5zZomvy0Z47s64Vqeew4qbTwvBkMNYexEeJdn/XFgudLtwMoTzBFTvXI
-         CKdveI+FdAqghKrYREm6frvdbFo9FuXj0BgNU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783942095; x=1784546895;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=st85seCDQwEjU3U5r3+4UcGdfGWDn3g9mE+v4yLDsIU=;
-        b=tUL0XxkY6BTJzInYQF58niN5PDrZ79Cpwc3CXe6FsaLXDj5Tp5trIGtNNLY609qIH4
-         qObFeJV7Zgq7xmSZZm1KPRZxrSzZ1dW0jLdPCIPGmKxlF8kxw7NMZxN3pI/oZK9rjA4B
-         4B/1G1y1Svl9Puii1mRdDzO/6st290Kz7baJpYsANhfjpbg2BuCbVmdsWc9jjwBIuxvS
-         Z8x0rFxNyp2Y3L+2sf+PeFmOsme6rDGUDxtbh8fPzgubnRIcD8o92oMAZg/l4D5MJCa+
-         t3P5L7bLuymHp3HcWnFL0227cxOuJ5n+rOptp8UuibRq4sk3BDd0VfYXqGXy1m9sN02J
-         55Mw==
-X-Gm-Message-State: AOJu0YybYLy/VXcSH4ZnujdTLz0YTjBlyR7Vin7j4dZSiWrkx7EZ6G/w
-	i9rpwUHcBDvNApVX1qMlc4gMI9mUnmGYBw5m1d2FpPVa5fGDNXuD8tSGUHclrlahOW/5qzl86Ma
-	a0P48GZGoTDUBww6zVu4V052bxF9gT6NEiETFdHUrIg==
-X-Gm-Gg: AfdE7clRSzMmha5lUHiGV7xUMHbETkm9Rv+HZCJ9rumI1I3yKuDRD/zN2++lVO84ena
-	21Twp/Weucm+en2EhrFVVtmVUX8yq7sirlBDS+zFEopxWf8Gi2bX3aWhZGPYTRxA9nm8ci808uw
-	QPvnDZYmyna/NEglHawhF+xPsxGyR1NHsdt8kdoX4WqFuXM5Jvg1UuBRdlEMReEaABlvrCgXQVt
-	22MuewckinTruh7gpawFyLeqnwT+ADj0/wvC+7QltIeGRv4XqOeWIsSNOaEuL8twjfvwx7/2CEl
-	+EPAPQV8OlA9DZa+QXsguStRPSD1X7mn20IlguWb4nvHJMRaHdAX97W0fQIudGXWROwOwWmdtCL
-	Xuchr1fRaxmVBsg==
-X-Received: by 2002:a05:6214:8012:b0:8e9:51b7:2d49 with SMTP id
- 6a1803df08f44-902345906a0mr148749056d6.2.1783942095017; Mon, 13 Jul 2026
- 04:28:15 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=arm.com header.i=@arm.com header.b="XapGZfWf"
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6B97A1576;
+	Mon, 13 Jul 2026 04:58:18 -0700 (PDT)
+Received: from [10.2.212.23] (e121345-lin.cambridge.arm.com [10.2.212.23])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 900F03F7B4;
+	Mon, 13 Jul 2026 04:58:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=arm.com; s=foss;
+	t=1783943902; bh=ohwl+NNZhM3tc2Svo5D4PPwHbHssItFhLlreVZUvKhk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=XapGZfWfK9osfIfcG32IEYSYOtQGC+I2rtd4HPYv7Gtyl9/QcllKwTsDOCxmfGyam
+	 URrOHMTqmPs5DUgUuriFWgHphPzgHY4BLCsM3Krg7FwPTMWyX34DuatMpcpzJIZyTe
+	 +8EWKL996I63gGJqAnlqTbYWuA5nRJ0KBA/YsbO8=
+Message-ID: <3d606437-ab63-41e7-88d3-fb6e47014a8a@arm.com>
+Date: Mon, 13 Jul 2026 12:58:19 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260707125311.2398031-1-pavitrakumarm@vayavyalabs.com>
- <20260707125311.2398031-5-pavitrakumarm@vayavyalabs.com> <5ca48a5f-086d-4372-ab3c-1535dcdbe5fc@gmail.com>
-In-Reply-To: <5ca48a5f-086d-4372-ab3c-1535dcdbe5fc@gmail.com>
-From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Date: Mon, 13 Jul 2026 16:58:03 +0530
-X-Gm-Features: AUfX_mxxRYylWlJQx3AiA3TRbsGOMz5d4Ea_gZ0i5xT0xueRWcdr-xwk7DjwwJY
-Message-ID: <CALxtO0=0y=FBpB7h0v6q+w=bovtpGuiqyoxoWGVyiuGxphf7zQ@mail.gmail.com>
-Subject: Re: [PATCH v16 4/4] crypto: spacc - Add SPAcc Kconfig and Makefile
-To: Julian Braha <julianbraha@gmail.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	devicetree@vger.kernel.org, herbert@gondor.apana.org.au, robh@kernel.org, 
-	krzk@kernel.org, conor+dt@kernel.org, Ruud.Derwig@synopsys.com, 
-	rbannerm@synopsys.com, manjunath.hadli@vayavyalabs.com, 
-	adityak@vayavyalabs.com, navami.telsang@vayavyalabs.com, 
-	bhoomikak@vayavyalabs.com, Nazim Khan <nazim.khan@vayavyalabs.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: cesa: check for sram_dma NULL
+To: Rosen Penev <rosenp@gmail.com>, linux-crypto@vger.kernel.org
+Cc: Srujana Challa <schalla@marvell.com>,
+ Bharat Bhushan <bbhushan2@marvell.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>,
+ Boris Brezillon <bbrezillon@kernel.org>,
+ open list <linux-kernel@vger.kernel.org>
+References: <20260713050740.3687230-1-rosenp@gmail.com>
+From: Robin Murphy <robin.murphy@arm.com>
+Content-Language: en-GB
+In-Reply-To: <20260713050740.3687230-1-rosenp@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Julian,
-  Ack. I missed that in V16, I have fixed it and will push the update
-as part of V17.
+On 13/07/2026 6:07 am, Rosen Penev wrote:
+> dma_map_resource() might fail. In such a case, don't call
+> dma_unmap_resource()
 
-Thanks and Warm regards,
-PK
+Hmm, AFAICS it's more that if *anything* in mv_cesa_get_sram() fails, we 
+could end up calling dma_unmap_resource() via the cleanup path for 
+subsequent engines which never had their mv_cesa_get_sram() call at all 
+(and thus all of engine->pool, engine->sram and engine->sram_dma will be 
+unset). While for one where dma_map_resource() itself did fail, 
+engine->sram_dma will be non-NULL here (but still invalid to unmap). I 
+think this needs a bit more work to differentiate between the 
+successfully initialised state which needs cleanup, and the partially or 
+fully-uninitialised states which don't.
 
-On Fri, Jul 10, 2026 at 5:57=E2=80=AFPM Julian Braha <julianbraha@gmail.com=
-> wrote:
->
-> Hi Pavitrakumar,
->
-> On 7/7/26 13:53, Pavitrakumar Managutte wrote:
-> > +config CRYPTO_DEV_SPACC_CONFIG_DEBUG
-> > +     bool "Enable SPAcc debug logs"
-> > +     default n
-> > +     help
-> > +          Say y to enable additional debug prints and diagnostics in t=
-he
-> > +       SPAcc driver. Disable this for production builds.
->
-> This help text still has the indentation formatting issue that I pointed
-> out on v15:
-> https://lore.kernel.org/all/deb73385-a7a9-4ea9-8338-b7da999a5e9c@gmail.co=
-m/
->
-> - Julian Braha
+Thanks,
+Robin.
+
+> Fixes: 37d728f76c41 ("crypto: marvell/cesa - Fix DMA API misuse")
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> ---
+>   drivers/crypto/marvell/cesa/cesa.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/crypto/marvell/cesa/cesa.c b/drivers/crypto/marvell/cesa/cesa.c
+> index 57c9295be711..bcbb909c48d8 100644
+> --- a/drivers/crypto/marvell/cesa/cesa.c
+> +++ b/drivers/crypto/marvell/cesa/cesa.c
+> @@ -406,7 +406,7 @@ static void mv_cesa_put_sram(struct platform_device *pdev, int idx)
+>   	if (engine->pool)
+>   		gen_pool_free(engine->pool, (unsigned long)engine->sram_pool,
+>   			      cesa->sram_size);
+> -	else
+> +	else if (engine->sram_dma)
+>   		dma_unmap_resource(cesa->dev, engine->sram_dma,
+>   				   cesa->sram_size, DMA_BIDIRECTIONAL, 0);
+>   }
+
