@@ -1,48 +1,42 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 098D22D063E;
-	Mon, 13 Jul 2026 02:56:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1E8A33F598;
+	Mon, 13 Jul 2026 02:57:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783911376; cv=none; b=FGukwPBiv0uchO+SrE9pQ5iW/YrL9pFko65GzBhK3GFHst8y6bm/81PtgL7WRyJHYV3w/JvHVp8Bkq4zezv8HJNDB3t/zedzf5e6zpb6xCt9Gzy5Mpi742bHQZCfZPZxAiJRzK6nX3HYVCQL/9HbdvMvxcROCl4jw8vW4IqNmyA=
+	t=1783911475; cv=none; b=kdO0dm0ga6ouX1MTSPcbfU5qUNtxriVULXO6Rls71W7yMd6fmUTtHz1WUVJB24eUvPwMxgGIQKymW2kGHJqOpHvd3tH3scp/mMH7vJwffP+VUpNHuDafnwRnB3I7HUWDDIV2MktaV7O+OpeIWpBWqrnHLKa5mC0rQnKnZxVIvsM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783911376; c=relaxed/simple;
-	bh=Q3VWxP2Aosr38s+o78mvDbTOTJjPSbzrpK8aDT7fTqI=;
+	s=arc-20240116; t=1783911475; c=relaxed/simple;
+	bh=1j1ktiudgVP+BmyH45G9e/PokfKl4lKPJgW30o5nsno=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o/088iotdP4cJXCSJgHJz8+/NMkOOROuUNA3OeVJCiNybrGMzuKDWHVRv983mOGnZlv5iAmz6tEnjXRHz7oV5vZ4aKBJafc6/vQf0IXCbeA2LcOJtmaG/JpNBq3WKenJnlP8KNQocyoD/rZZEi0UCA+bsmfIHyQC/8KQpUo/qtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=iMR60PEG; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=N8twoO98p6MDHOwg3HoFFoi+L/AKUyTz/7DtQblDZHbFkjPJBtBqZ16qDuppqTIQSx3CFKbmbFomUdziIoboIv+8X0nAU7rpjqXRJMxLFye02DF4W9XQ9FbtT40w6kG4KF+tzd8pydmDkOQn0qVO3ay0xeFMKefJEbRdsiopVZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cG28i22f; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="iMR60PEG"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=HTHF4UFEv4mimtOWDGeAgbcciT0GXjtdrHlVT3qzmBk=; 
-	b=iMR60PEGodnvL5dNrFJbQIusp0RKmOj8ribL12jP5h+o0Odo7pQl1tIfFiACk4lbi1vpOkrivMA
-	Rvb08q1HvJPDU1Ad4ADY4UYhrXorULumSWZQEWcwxMK8mLisNmw29yBKcxB8qVlQahnmltWv5sOlE
-	moR2OTtO2pSggJH5LUo6xoUzZgjFF7cFfW4oYtfPDlv+l970KP9Z2b+E6v1eLBuY5L9H8opnRma8e
-	n0fB3H9A/2Rk/aGpqXNpPkOp/EiJfnpSgd3o8LaRCe5DR/jmL4gK9xLi9Md+nmeoMEUWC528XLzBL
-	IpXQXXapMTixr1WpyBjrUP4fJ5ZDC7FgOBpw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wj6pw-0000000Cxlu-07QQ;
-	Mon, 13 Jul 2026 10:56:05 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 13 Jul 2026 12:56:04 +1000
-Date: Mon, 13 Jul 2026 12:56:04 +1000
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Thomas Huth <thuth@redhat.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cG28i22f"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E390A1F000E9;
+	Mon, 13 Jul 2026 02:57:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783911474;
+	bh=/hRnTUulKPiYornA9CIY0YUDODR0Yv2On60iD5z+Ovw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=cG28i22fpIZ9ePz2SOq4tK5Q2IBQh5aMchvOUFHUtm57MLqZkzCUNNxakiFVRMQEy
+	 20JdUtNB3Sbbm/QamvF99sFUFy3J7LMocPnufg3Yez4nFaLE39ZoB7UeDy0/QOhPqh
+	 a9MITHEmltMmi+Hyba5xGV4yNwt8eaAtrGuAEvYACfCPYqZM7gqHTexbjKyCoMHDsa
+	 ZMyCtqlYfr7Xxl37jRRgqwzFPu/wzE9gBJ1K6ID4Jms6xpYZBSQ014GSUP3l3DhdHQ
+	 n4teOvJqClQgWLxBmKDJcPwv1/63Mw1+9avBygJe+dgmtKJFKOpIQk0bP0JarAemz3
+	 RSx0Z07Rr03WA==
+Date: Sun, 12 Jul 2026 22:57:52 -0400
+From: Eric Biggers <ebiggers@kernel.org>
+To: demiobenour@gmail.com
+Cc: Russell King <linux@armlinux.org.uk>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH] crypto: pcrypt - Disallow nesting of the pcrypt
- wrapper
-Message-ID: <alRTxL8UaKaI4qS4@gondor.apana.org.au>
-References: <20260701143947.944593-1-thuth@redhat.com>
- <alRNusgXIT06hTow@gondor.apana.org.au>
- <20260713024654.GE4362@quark>
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v2] drivers/crypto: Mark QCE as BROKEN
+Message-ID: <20260713025752.GF4362@quark>
+References: <20260712-qce-broken-v2-1-b2dfff47f7f5@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,25 +45,37 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260713024654.GE4362@quark>
+In-Reply-To: <20260712-qce-broken-v2-1-b2dfff47f7f5@gmail.com>
 
-On Sun, Jul 12, 2026 at 10:46:54PM -0400, Eric Biggers wrote:
->
-> Could we just delete pcrypt instead of continuing to try to fix all the
-> weird problems it has?  A web search for pcrypt just finds CVEs and
-> advice not to use it, e.g.
-> https://github.com/libreswan/libreswan/wiki/Internals:-Cryptographic-Acceleration#obsoleted-ipsec-accelerations
+On Sun, Jul 12, 2026 at 05:31:31PM -0400, Demi Marie Obenour via B4 Relay wrote:
+> From: Demi Marie Obenour <demiobenour@gmail.com>
 > 
-> What is the rationale for keeping it?  Who cares about it, other than
-> people looking for vulnerabilities?
+> This driver is harmful:
+> 
+> - It is much slower than the CPU [1] [2].
+> - It Has a history of bugs [2] [3].
+> - It does not have exclusive access to the hardware [4], causing races
+>   with the secure world.
+> - It register its implementations with too low a cra_priority for them
+>   to be actually used [5].
+> 
+> Therefore, disable it to ensure that nobody builds it into kernels they
+> intend to ship.
+> 
+> In the future, the driver will be used for processing restricted media
+> content.  However, the kernel does not currently support this.  Since
+> the driver will have future uses, allow building it if COMPILE_TEST is
+> enabled.
+> 
+> [1]: https://lore.kernel.org/r/20250704070322.20692-1-ebiggers@kernel.org/
+> [2]: https://lore.kernel.org/r/20250615031807.GA81869@sol/
+> [3]: https://lore.kernel.org/r/20260706-qce-fix-self-tests-v5-0-86f461ff1829@oss.qualcomm.com/
+> [4]: https://lore.kernel.org/r/20260629-qcom-qce-cmd-descr-v20-0-56f67da84c05@oss.qualcomm.com/
+> [5]: https://lore.kernel.org/r/20260524204537.GB110177@quark/
+> 
+> Fixes: ec8f5d8f6f76 ("crypto: qce - Qualcomm crypto engine driver")
+> Signed-off-by: Demi Marie Obenour <demiobenour@gmail.com>
 
-I wouldn't object.  Last time I tried it the start-up time was
-about 20,000 cycles, which is just pointless these days.
+Acked-by: Eric Biggers <ebiggers@kernel.org>
 
-Please send a patch.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+- Eric
