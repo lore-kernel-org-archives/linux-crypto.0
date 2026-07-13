@@ -1,45 +1,40 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDC7F33F38B;
-	Mon, 13 Jul 2026 03:46:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F392B340A6F;
+	Mon, 13 Jul 2026 04:47:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783914397; cv=none; b=ijynaNrZQWP5YhKCbs8AUBaxV+aIkCFxQdIqHlfygXKwekQJ1GaLPUYg9WoJJSmW6eeuhHJ8DP7Erjx1BBOR3XM/Y7lkG4vCpMwivuW6/X0U8WGfac8oSkfwCvXVcKlA8QRXUFXjCsif/GyFBRZjzSUjaea6do+Xf05VsoxzXvE=
+	t=1783918034; cv=none; b=eXbsBAmGWeZpfF17kbmchZ1pzSU6h6FePZXCfdOi/dDyWNbwfNT9ZmdUxjzLOdxiG59/Jy8D6IEgTtcPbZKugI7pD3xvQq5vWExj/4BrFMPsEUF7R6Ol1QLScPAublCzHQDNszW8w7301PFg01HWpogqmgiEmpU/gSgg0I5CsL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783914397; c=relaxed/simple;
-	bh=Uvr2Fd/lnagmF+gNNQIGQS7YNcf4dy2hX1qS4zqmqxc=;
+	s=arc-20240116; t=1783918034; c=relaxed/simple;
+	bh=JIypKOIXxa8D99JWB1t2xz0jlYRBSgOjoMtuoBHEY6o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GTvhk7xEkO2i8Qtax2CZFxj/iS1yHTSYrNofKc4EKDOOntB+P1ob/RB6OKa6uTQn5YYIe/ohVPN3XHH6MtphnVZTuxYrzDwrzGoR296gebR6sxj22PxWQKyj5O4Owah7V106LwVm7DT6LYHPe328BLA2avn+/1XeNTci9sKeG/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=MIivsQAv; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=b/e1E475hP3mEcyS9nB6kH0idPs2a5cEwYAid/bFz7TfQ+wIstx9g9UaXerHOZHw+zI2rRtFWV4J75GJ/0Pjf8XR5KWRDHVAQo7iuxk8eqzKJNNgkeFnJwePg80GXZExuuNxWt5edY13MG2tR30BMaAgxyIAkmWSdRb8QWZsJpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=0mMAEGUu; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="MIivsQAv"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=IV4qlhj0eWVV13eQM7LMrxiETB767e9EAWhq8ihnBHY=; 
-	b=MIivsQAvEx/0c0RIKb33C0eme5xtd8+73kusaFdmhzGLZL0bPpqNZv0EQoTIKGCbEQfFLJBf1ok
-	hrLlq089g0WbWrM6/9E64VGBnUMujyQo+0qvhWF3GGp5wFcP3I4ye50JSUr/SB56DLRozAdW9PKzu
-	LBgxDriZpoIq+dum4Yw3DltjJvyZb0O2V6tr2KFrsA6V5ipqoKadEmzgvPxjRrnKzs77Oos/F2/Bl
-	8zsTKc8eVjQJB2yk44SC+0jnrdrask6P5+jWfL7j5FO4KyZyob/S0SawHydjOXFSHZKb2P6nrK3bP
-	dF/L//HAAv7KApoNmzLZ9gV8FfliQezgkoLg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wj7cj-0000000CyIZ-0fU7;
-	Mon, 13 Jul 2026 11:46:30 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 13 Jul 2026 13:46:29 +1000
-Date: Mon, 13 Jul 2026 13:46:29 +1000
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Pengpeng Hou <pengpeng@iscas.ac.cn>
-Cc: Prabhjot Khurana <prabhjot.khurana@intel.com>,
-	Mark Gross <mgross@linux.intel.com>,
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="0mMAEGUu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1190F1F000E9;
+	Mon, 13 Jul 2026 04:47:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxfoundation.org;
+	s=korg; t=1783918032;
+	bh=9PAJlGm06FdpPNE7UoP/ZDlHwM5ZAN6RmcnqlknM3U8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=0mMAEGUuZ+pvom+KPpTGZ/jy2dn31zcecZPV462JSSnQOYNsGMieQl7Qs8RG99wDe
+	 ysif8cOHHXdhAKuohY0T/tomxmuYxDjz+GBytCjV/RTSQ7BK+b/JpJBv7nDy1J95gr
+	 oHnQWFGN9XqHHtwZPrtQKnV8hkfpAhuF0LA/vzJg=
+Date: Mon, 13 Jul 2026 06:47:07 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: demiobenour@gmail.com
+Cc: Russell King <linux@armlinux.org.uk>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: keembay: add missing MODULE_DEVICE_TABLE()
-Message-ID: <alRflcX52b0e6Q2V@gondor.apana.org.au>
-References: <20260704124609.16628-1-pengpeng@iscas.ac.cn>
+	Eric Biggers <ebiggers@kernel.org>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v2] drivers/crypto: Mark QCE as BROKEN
+Message-ID: <2026071312-uncover-refining-8cac@gregkh>
+References: <20260712-qce-broken-v2-1-b2dfff47f7f5@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -48,26 +43,32 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260704124609.16628-1-pengpeng@iscas.ac.cn>
+In-Reply-To: <20260712-qce-broken-v2-1-b2dfff47f7f5@gmail.com>
 
-On Sat, Jul 04, 2026 at 08:46:09PM +0800, Pengpeng Hou wrote:
-> The driver has an OF match table wired to .of_match_table, but does
-> not export the table with MODULE_DEVICE_TABLE().
+On Sun, Jul 12, 2026 at 05:31:31PM -0400, Demi Marie Obenour via B4 Relay wrote:
+> From: Demi Marie Obenour <demiobenour@gmail.com>
 > 
-> Add the missing MODULE_DEVICE_TABLE(of, ...) entry so module alias
-> information is generated for OF based module autoloading.
+> This driver is harmful:
 > 
-> This is a source-level fix.  It does not claim dynamic hardware
-> reproduction; the evidence is the driver-owned match table, its use by
-> the platform driver, and the missing module alias publication.
+> - It is much slower than the CPU [1] [2].
+> - It Has a history of bugs [2] [3].
+> - It does not have exclusive access to the hardware [4], causing races
+>   with the secure world.
+> - It register its implementations with too low a cra_priority for them
+>   to be actually used [5].
 > 
-> Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
-> ---
->  drivers/crypto/intel/keembay/keembay-ocs-ecc.c | 1 +
->  1 file changed, 1 insertion(+)
+> Therefore, disable it to ensure that nobody builds it into kernels they
+> intend to ship.
+> 
+> In the future, the driver will be used for processing restricted media
+> content.  However, the kernel does not currently support this.  Since
+> the driver will have future uses, allow building it if COMPILE_TEST is
+> enabled.
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Why not just delete it now, and then bring it back when it is needed in
+the future?  Otherwise this will just trip up the static code checkers
+who will attempt to "fix" things in it.
+
+thanks,
+
+greg k-h
