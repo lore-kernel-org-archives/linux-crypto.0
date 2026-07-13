@@ -1,46 +1,45 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A1C2DF68;
-	Mon, 13 Jul 2026 03:46:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDC7F33F38B;
+	Mon, 13 Jul 2026 03:46:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783914394; cv=none; b=Imz3uLExjZWEbPFi7ODi121o/SQ5DOZ1S8zmoBvMgMHVrnrgSkkXt9Cg3fFJvi9Zw9zbZfyL0IlP0iIYpVXnnlnDFkOLybFWtzm9FZNVm37bflRtqK3kOxO7VKMxQAtPBonlHpkRajcdqSBPM+/3zrNQzksBeAZORyTtqltb7cM=
+	t=1783914397; cv=none; b=ijynaNrZQWP5YhKCbs8AUBaxV+aIkCFxQdIqHlfygXKwekQJ1GaLPUYg9WoJJSmW6eeuhHJ8DP7Erjx1BBOR3XM/Y7lkG4vCpMwivuW6/X0U8WGfac8oSkfwCvXVcKlA8QRXUFXjCsif/GyFBRZjzSUjaea6do+Xf05VsoxzXvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783914394; c=relaxed/simple;
-	bh=qtEoogvxKGJ76i4M6IiQnJGcbXNjG5+fh4/1XzPPeS8=;
+	s=arc-20240116; t=1783914397; c=relaxed/simple;
+	bh=Uvr2Fd/lnagmF+gNNQIGQS7YNcf4dy2hX1qS4zqmqxc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z4nVDIfl7lnfcKWNm2miDaP3vZcZVMXFZUo+INBRv8m3mye2KDCUeypLFb81e3BKQHppjBx/9fIXlHjLN8NBXFNqkUHlHVuwGaYI9GbQcgEbucnhEDieplozm4tokeENpnMaG3WjXuqqE5viCnPprw8IzTOU6r+MTZ69El31lu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=K9dMVVF+; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=GTvhk7xEkO2i8Qtax2CZFxj/iS1yHTSYrNofKc4EKDOOntB+P1ob/RB6OKa6uTQn5YYIe/ohVPN3XHH6MtphnVZTuxYrzDwrzGoR296gebR6sxj22PxWQKyj5O4Owah7V106LwVm7DT6LYHPe328BLA2avn+/1XeNTci9sKeG/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=MIivsQAv; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="K9dMVVF+"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="MIivsQAv"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=7mSwWawINr+yQ3GlhEeqmNy45YB9kP71mUDFm0s9/Xg=; 
-	b=K9dMVVF+QxMdhpzGsbpa2/ZjEntH68QJxbXRSnkVvZlLr8qkWv6V49Y6j4Wupf0VlFGIVVBfowK
-	3cFRKqJvQMqVrn24EB7NP72skkhG/7ZFOHbHXaD7gNKuB+sOKhDTvJV4ammNaRmRuBsrPYQK2EYmP
-	Iyn2xWVjUvY8/1dxiD2se/6Om+cfza1c1s/mfM0bPjw0e8w4Qv8iL8Ifby2qZBIZGu7ed0cnCWXDR
-	SZOkC3zPzGav6ECS0Sp3PD3gv5oQM5FtidLunl3Ehuu5LcAA3KtjBvXbUOQ3W1C9VvL0QGILvWgK0
-	0TMPKMannKPDOgrUyldb1GpkC1RDVvk6xvsQ==;
+	from:content-type:reply-to; bh=IV4qlhj0eWVV13eQM7LMrxiETB767e9EAWhq8ihnBHY=; 
+	b=MIivsQAvEx/0c0RIKb33C0eme5xtd8+73kusaFdmhzGLZL0bPpqNZv0EQoTIKGCbEQfFLJBf1ok
+	hrLlq089g0WbWrM6/9E64VGBnUMujyQo+0qvhWF3GGp5wFcP3I4ye50JSUr/SB56DLRozAdW9PKzu
+	LBgxDriZpoIq+dum4Yw3DltjJvyZb0O2V6tr2KFrsA6V5ipqoKadEmzgvPxjRrnKzs77Oos/F2/Bl
+	8zsTKc8eVjQJB2yk44SC+0jnrdrask6P5+jWfL7j5FO4KyZyob/S0SawHydjOXFSHZKb2P6nrK3bP
+	dF/L//HAAv7KApoNmzLZ9gV8FfliQezgkoLg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wj7cY-0000000CyI2-3jM8;
-	Mon, 13 Jul 2026 11:46:19 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 13 Jul 2026 13:46:18 +1000
-Date: Mon, 13 Jul 2026 13:46:18 +1000
+	id 1wj7cj-0000000CyIZ-0fU7;
+	Mon, 13 Jul 2026 11:46:30 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 13 Jul 2026 13:46:29 +1000
+Date: Mon, 13 Jul 2026 13:46:29 +1000
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: Pengpeng Hou <pengpeng@iscas.ac.cn>
-Cc: Linus Walleij <linusw@kernel.org>, Imre Kaloz <kaloz@openwrt.org>,
-	Corentin Labbe <clabbe@baylibre.com>,
+Cc: Prabhjot Khurana <prabhjot.khurana@intel.com>,
+	Mark Gross <mgross@linux.intel.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: ixp4xx: add missing MODULE_DEVICE_TABLE()
-Message-ID: <alRfim2lYMuJhlni@gondor.apana.org.au>
-References: <20260704121524.42229-1-pengpeng@iscas.ac.cn>
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: keembay: add missing MODULE_DEVICE_TABLE()
+Message-ID: <alRflcX52b0e6Q2V@gondor.apana.org.au>
+References: <20260704124609.16628-1-pengpeng@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,9 +48,9 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260704121524.42229-1-pengpeng@iscas.ac.cn>
+In-Reply-To: <20260704124609.16628-1-pengpeng@iscas.ac.cn>
 
-On Sat, Jul 04, 2026 at 08:15:24PM +0800, Pengpeng Hou wrote:
+On Sat, Jul 04, 2026 at 08:46:09PM +0800, Pengpeng Hou wrote:
 > The driver has an OF match table wired to .of_match_table, but does
 > not export the table with MODULE_DEVICE_TABLE().
 > 
@@ -64,7 +63,7 @@ On Sat, Jul 04, 2026 at 08:15:24PM +0800, Pengpeng Hou wrote:
 > 
 > Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
 > ---
->  drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c | 1 +
+>  drivers/crypto/intel/keembay/keembay-ocs-ecc.c | 1 +
 >  1 file changed, 1 insertion(+)
 
 Patch applied.  Thanks.
