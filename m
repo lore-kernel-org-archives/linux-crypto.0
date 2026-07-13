@@ -1,96 +1,86 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8ACE35C19B;
-	Mon, 13 Jul 2026 05:18:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9480425C804;
+	Mon, 13 Jul 2026 05:46:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783919924; cv=none; b=OsxefgqdBcvYSgND8Rm8eUOAjCFSFFIU2djJQkkKZoMVdSYljdAiUJynmysrjVulxX1iW5ez2NtdCciKCiy0J68CzcineP8ZAXkolbIB+sTa74bgr4Zv6Vp1V1UH2Kw5lwI8JdPusHfYhXS8uK0yjXxi+IqQ0j/SUFdyqMAJlao=
+	t=1783921591; cv=none; b=qQeyyJE5t0NaqAIrh95RK3SZYUvKTDZ1a5WMsiDUly4DNiXjTSLQhjYkKupvAEBCNxVep7dydNjKB+2HdCZywzuG1Rd+6X947hQAeKMSqYspBUIEaAdWjPNcr1OIeShZYzXvGq6zQz+fzUWRsax+dfdX9HglVYB2sVJ0bvrQZzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783919924; c=relaxed/simple;
-	bh=4fwXoZadB/hIQjBRRzXdNKpYHZkGLpFc6Etmmhb/2DI=;
+	s=arc-20240116; t=1783921591; c=relaxed/simple;
+	bh=IH9+XhLTCg2d0PsasILExIUhxCLy1Xq4zpUtShtN4w0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PO/IkZjAj0IC+G/AWs829/LHuR4tkgob5eRsBHN1lJxkVwR/w9YO6v4VMC6n+2IKlytM88uOzfzK9Qx7R6Qkh1FsB7GRzIzNYTypFoImr+KCnGTIewiAsLN0lTI77UlTyqXfCkQbIGNQODCxRhnj+oBsfcUGslK0pelV4QD3ziE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=O9GvKxEY; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=SEUtssrySdgIe9uE5oNbihDMxs5j2zxeGu31eU87sUBF94Mfq7O6KbshSwiXQ13NkQLafN5mrIsG8WcgtqC+C6CwEdR821iSzuGdNCtZemsd4o4sSLC/10fLpFnyhKekMdD/AL19TRezd7RTf0ZGibIjNm05QjEjZmbzJ6vRhwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iVQ9EyNA; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="O9GvKxEY"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=fYZz6TfHnUdNxCual9jQ9UNrmQt8A02dTTjENI4uzkU=; 
-	b=O9GvKxEYcBO52O4lj4Tsc2114cqHMztOaNF6LpLvU+j30E65rNJI1SX41q1CqQA7bsV2/Ux2rXX
-	PkCsgSzJnUk52eP6AAM4XXnxMQaIcifPYYPjJO9hVBzSi4HrMUsJA8RoVj0g1ZGwG/LrXrFWI9UYJ
-	PA01K6dLwjkvSZ7Icaek6NSMe8jhJpfzsOuA3X9zU2fJOGkBRTYcE7r7am4um/RBNLgtpUEM60a0Y
-	9mJQfKNGzd9ujwb2QYVHnmg7nbLXlKb7HsxJSYB0ZeSg7d8vxeefkvsnQZt1qenutM88G7MS5v9no
-	VNNDPFlH+2mqm6ssdKS3YPUd2IM40ike5tWQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wj93u-0000000Cyz5-38Ef;
-	Mon, 13 Jul 2026 13:18:39 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 13 Jul 2026 15:18:38 +1000
-Date: Mon, 13 Jul 2026 15:18:38 +1000
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: "Cen Zhang (Microsoft)" <blbllhy@gmail.com>
-Cc: tgraf@suug.ch, akpm@linux-foundation.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, AutonomousCodeSecurity@microsoft.com,
-	tgopinath@linux.microsoft.com, kys@microsoft.com
-Subject: Re: [PATCH v3] lib/rhashtable: clear stale iter->p on table restart
-Message-ID: <alR1LokGnmW-qTMm@gondor.apana.org.au>
-References: <20260707164115.4979-1-blbllhy@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iVQ9EyNA"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 734D91F000E9;
+	Mon, 13 Jul 2026 05:46:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1783921590;
+	bh=TslgJxPDu2FoohwrHHfEY80wcLwj5lAHu6Z5tKoMi4w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=iVQ9EyNAiglnejOK6JjxXr9UuEqXtokYOdkR+LNDbmo0LjyVuV0w4Bsu4Mlygf73u
+	 CxCwSW3nlEKkeLcT8HAeucvqwgM7U17faBa0yqsHLIWYX/qRfHjA+x4Bw1dH/wRjL1
+	 yZT5Bgtb6TY5D7rJ7A4z4HSQNl9okgTjCjIHRXuwvAaXn6A9v9SprjEhTNyPDq31tA
+	 p93HP8ZutPwKtdS3yi336PUujTbOJDSlpPOqs19TtHFWbrnUPMPFEdrkZPU24vkqDs
+	 YeklAdUCIbZUkzYi5e0dxxJjxVxBVsXa/HkAB1I+NH6G0UctPAfed6AWGtBXf0isRO
+	 C1T+YVlW6uEjQ==
+Date: Mon, 13 Jul 2026 07:46:26 +0200
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <ukleinek@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Andrew Morton <akpm@linux-foundation.org>, 
+	Mark Gross <markgross@kernel.org>, Konstantin Ryabitsev <konstantin@linuxfoundation.org>, 
+	linux-edac@vger.kernel.org, Borislav Petkov <bp@alien8.de>, Tony Luck <tony.luck@intel.com>, 
+	"David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-kernel@vger.kernel.org, 
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: Re: [PATCH v3] MAINTAINERS: Drop Mark Gross
+Message-ID: <alR7WaRFM25AcvJh@monoceros>
+References: <20260703173803.3589003-2-ukleinek@kernel.org>
+ <alRfWpuiEiRC72u3@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="j4bc4txee6jzbdzs"
 Content-Disposition: inline
-In-Reply-To: <20260707164115.4979-1-blbllhy@gmail.com>
+In-Reply-To: <alRfWpuiEiRC72u3@gondor.apana.org.au>
 
-On Tue, Jul 07, 2026 at 12:41:15PM -0400, Cen Zhang (Microsoft) wrote:
-> rhashtable_walk_start_check() has two restart paths when resuming a walk.
-> When iter->walker.tbl is valid, it re-validates iter->p against the table
-> and sets iter->p = NULL if the object is gone.  When iter->walker.tbl is
-> NULL (table was freed during resize), it resets slot and skip but forgets
-> to clear iter->p.
-> 
-> rhashtable_walk_next() then dereferences the stale iter->p, reading
-> freed memory.  This is a use-after-free.
-> 
-> Any caller that does multi-fragment rhashtable walks across
-> walk_stop/walk_start boundaries is affected.  Concrete cases include
-> netlink_diag (__netlink_diag_dump in net/netlink/diag.c) and TIPC
-> (tipc_nl_sk_walk in net/tipc/socket.c).
-> 
-> Crash stack (netlink_diag):
->   BUG: KASAN: slab-use-after-free in rhashtable_walk_next+0x365/0x3c0
->   Read of size 8 at addr ffff88801a9d2438 (freed kmalloc-2k, offset 1080)
->   Call Trace:
->    rhashtable_walk_next+0x365/0x3c0 (lib/rhashtable.c:1016)
->    __netlink_diag_dump+0x160/0x760 (net/netlink/diag.c:122)
->    netlink_diag_dump+0xc2/0x240
->    netlink_dump+0x5bc/0x1270
->    netlink_recvmsg+0x7a3/0x980
->    sock_recvmsg+0x1bc/0x200
->    __sys_recvfrom+0x1d4/0x2c0
-> 
-> Fixes: 5d240a8936f6 ("rhashtable: improve rhashtable_walk stability when
-> stop/start used.")
-> Reported-by: AutonomousCodeSecurity@microsoft.com
-> Closes: https://lore.kernel.org/linux-crypto/CAB8m9Wh559e+=n8z51gB8DrbEyCc2mc0MgGjrRR6_VXBmU=2AQ@mail.gmail.com
-> Signed-off-by: Cen Zhang (Microsoft) <blbllhy@gmail.com>
-> ---
-> v3: Solved patch format issue
-> v2: Fix commit subject in Fixes tag
-> Link: https://lore.kernel.org/linux-crypto/CAB8m9Wh559e+=n8z51gB8DrbEyCc2mc0MgGjrRR6_VXBmU=2AQ@mail.gmail.com
-> 
->  lib/rhashtable.c | 1 +
->  1 file changed, 1 insertion(+)
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+--j4bc4txee6jzbdzs
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Subject: Re: [PATCH v3] MAINTAINERS: Drop Mark Gross
+MIME-Version: 1.0
+
+Hello Herbert,
+
+On Mon, Jul 13, 2026 at 01:45:30PM +1000, Herbert Xu wrote:
+> Patch applied.  Thanks.
+
+Note that Boris already took this patch. It's already in next for a
+while as 97dfcb871ba776ba0e1ded1cdcbe94a357c2817e.
+
+Best regards
+Uwe
+
+--j4bc4txee6jzbdzs
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmpUe7AACgkQj4D7WH0S
+/k4Luwf7BmhMfqLK1e7DXmVCka6JcVYawnOTTaSY9uV1MDjTklYTCLvgYnyBXmra
+6ajrv9bd12XpwMKukx4cZ+raB50wDP2o8XQPsKIlRHco5xgi4MLkk9W/mRFtodZP
+S66q474WR7z/8ar8rM9O+9KjcnbvqkW+/VM8xiFFkdPIzo1fI4fWmDMZVHVgeK0K
+Rzj+4VjMwstHbnHoLcOH0Rk0rfATsTp5Ldv70gjFcJo7S+MyDvkV3BgfXEWdumOB
+pSCOYwwtBko06zcydXT2VOrE/67kUIlG35+S9l/63fpjnBYM7Y3KtnFJYNKrxTKr
+PH25Ki09UWrC3sEALqfpxBMoSZWq/w==
+=XP2N
+-----END PGP SIGNATURE-----
+
+--j4bc4txee6jzbdzs--
