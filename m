@@ -1,55 +1,51 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D2F61F3BA4;
-	Mon, 13 Jul 2026 03:41:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BADAC1F3BA4;
+	Mon, 13 Jul 2026 03:42:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783914065; cv=none; b=NqOto5j4qh03019EraTXVQtHB8Civ06WAyj/UfeqZFRyYZsSt9keF+YSkxCHd9B6BCP6eR0dLBVbiV0qypzze4kcv/TC7J46vhkfqeQje6FubPASK3j1tG4tlBgZBqjxHUpOEXh/SAJ4b+lxrXrEWB3/jZulX8zR2wbVX48WX8I=
+	t=1783914139; cv=none; b=Bg6KOGFUXi1nKciSoIdFdQ8z5MLBTiDvGthv2sdBNyjMWyM3zuk74GC2JGIbb5u2z+E66503kSkVuRl5bpRe86EA3tEoOB4uKzAqzg8HLnvXBk4a+99Eop15iI/gK3EZOe02CDEbkOjpLv6mXbTt7w0GIm0QaV89+NAETCLUbeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783914065; c=relaxed/simple;
-	bh=2lWPq+LxCQ4jip7mCPrH6UY6ix+Hu/dNxPY24Am30Ac=;
+	s=arc-20240116; t=1783914139; c=relaxed/simple;
+	bh=viFaBWiMYiXNWA4jLXpBiJLpNrYbbMfjMI1CIpubu4c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h7wDw4eYWdIqpLNt2lMCkzL9S6NUeomU8BFV815a9+NeLu3Wivj7Dh8CvPESgOyvw8p6CNUySBE2poNo80j3G1LwNFdrr8lWolcVDz1uHuv/PruakrxPZueMeKwK9oYRPEYOXa6w3BmHDtepgSuyB2V+YvXlJ/QYbVE0kPxTBLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=dPig2rrk; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=NVgTCtVtv8SYyLkyKmWbyuETpfml/lkgZ1WmWVQcvkAA0aA9/mKPA98BaVOesyYMOD5NSNCdO6ijJOysd0/578+C+MitO/G6pw+3vGycidzneex0MuWGKQiqPeATXmnRFp9QGtlkXJeLKzOzF7qhmnU+zZ2jzqjU7GMyN7VR+d0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Qb2bWov7; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="dPig2rrk"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Qb2bWov7"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=9yHLLXFfJ/KSmu77sGL1iM4dJlKPxha4+7ZmMnXuIcQ=; 
-	b=dPig2rrkCu+Sd6R+AcfkSQLRq7cDrH9BGKcTiO1VN17R3sunt8FHZ7RVXexkAU5gTpZeH9w81Dz
-	jyH9kDFaEej41SBL+pk8nDpztEn7rl/NjkOnuIVFEVfIlYwIdhw1eYtlmfj0kpcR0+d4yI1daAJKa
-	az756ZR3/V9VbP6S5VzJbgjqj65vYUt/VU58qPSlZTsYwamm6iMLpiBf999Pbujkl/7iEgD+DJ4nf
-	YBymYBHeRKSXEkVWFJuBWuAR/2dkxg6f9eQeTif9P791z5oXnVMYNXY7U4lFlzUKdaEiqVJgVKaz0
-	da/6Fk4iyDtDaih5XpoMCyqDKWk6hjNMudAA==;
+	from:content-type:reply-to; bh=89rWfb/GKA0YbwlF/rC1Uqb+AHHDfcTsgnf6prS00ms=; 
+	b=Qb2bWov7fDBLJ4II8sHjsLbeIXS4BXEzwIlOgSn1BDBcp1Vkbk9yo6voNd5z1BnQaDm8W8bfCHd
+	6oWRW1VN1NYQYo93R6N9AsmmaOoB3y1Oo77s1Z4cyz0khXh+AnHUmHOKi8URHGJhKGnu7F7lXgtAM
+	U2spVQE/Ax9CwwX1VQF9iUSRDTTyXpHpWLpb9aqQqnIOWDJ5gVTcQfNwBzRztQ2ZFmVEoAakRC5AD
+	nz9LzgWWhBTq+8UuLXPQ17GIcDCVFRMopIY0NkTkHwICMORLitb42bdHqebl4sPB/vZpmoKlm5qgo
+	fjWbWEw6hABQ1T1+auOa2NMplNFQ2I5NJLMw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wj7XO-0000000CyDl-3pnw;
-	Mon, 13 Jul 2026 11:40:59 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 13 Jul 2026 13:40:58 +1000
-Date: Mon, 13 Jul 2026 13:40:58 +1000
+	id 1wj7Yb-0000000CyEH-3axH;
+	Mon, 13 Jul 2026 11:42:14 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 13 Jul 2026 13:42:13 +1000
+Date: Mon, 13 Jul 2026 13:42:13 +1000
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: T Pratham <t-pratham@ti.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Manorit Chawdhry <m-chawdhry@ti.com>,
-	Kamlesh Gurudasani <kamlesh@ti.com>,
-	Shiva Tripathi <s-tripathi1@ti.com>,
-	Kavitha Malarvizhi <k-malarvizhi@ti.com>,
-	Vishal Mahaveer <vishalm@ti.com>,
-	Praneeth Bajjuri <praneeth@ti.com>, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v4 1/3] crypto: ti - Add support for SHA224/256/384/512
- in DTHEv2 driver
-Message-ID: <alReSoxtZcSPLIKO@gondor.apana.org.au>
-References: <20260526094355.555712-1-t-pratham@ti.com>
- <20260526094355.555712-2-t-pratham@ti.com>
- <aiKgs8ipDLPlz6c4@gondor.apana.org.au>
- <e0aec964-3303-4ca2-8d96-6a5d8f5ec9e5@ti.com>
- <aiKsFNoXryzWul0y@gondor.apana.org.au>
- <8502c0bf-5cf8-4042-a1e1-4665d8fa4057@ti.com>
+To: Jingyi Wang <jingyi.wang@oss.qualcomm.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>, aiqun.yu@oss.qualcomm.com,
+	tingwei.zhang@oss.qualcomm.com, trilok.soni@oss.qualcomm.com,
+	yijie.yang@oss.qualcomm.com, linux-arm-msm@vger.kernel.org,
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+Subject: Re: [PATCH v2 0/3] dt-bindings: crypto: Add Qualcomm Maili crypto
+ support
+Message-ID: <alRelRyJDvTdNTgJ@gondor.apana.org.au>
+References: <20260628-maili-crypto-v2-0-f8ce760f71d6@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -58,29 +54,33 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8502c0bf-5cf8-4042-a1e1-4665d8fa4057@ti.com>
+In-Reply-To: <20260628-maili-crypto-v2-0-f8ce760f71d6@oss.qualcomm.com>
 
-On Fri, Jun 26, 2026 at 06:27:42PM +0530, T Pratham wrote:
->
-> However, this sounds contradictory to the stated purpose of the flag
-> itself. Commit 7650f826f7b2 ("crypto: shash - Handle partial blocks in
-> API"), in which you introduced FINAL_NONZERO, says:
+On Sun, Jun 28, 2026 at 11:44:34PM -0700, Jingyi Wang wrote:
+> Add crypto(ICE and TRNG) dt-binding support for Qualcomm upcoming Maili
+> SoC. Meanwhile fix the power-domain and clk missing on Hawi.
 > 
-> "This will come in handy when this is extended to ahash where hardware
-> often can't deal with a zero-length final."
+> Signed-off-by: Jingyi Wang <jingyi.wang@oss.qualcomm.com>
+> ---
+> Changes in v2:
+> - add power-domain and clk constraint
+> - add acked-by tag
+> - Link to v1: https://lore.kernel.org/r/20260609-maili-crypto-v1-0-0f577df56a61@oss.qualcomm.com
+> 
+> ---
+> Jingyi Wang (3):
+>       dt-bindings: crypto: qcom,prng: Document Maili TRNG
+>       dt-bindings: crypto: qcom,inline-crypto-engine: Document Maili ICE
+>       dt-bindings: crypto: qcom,ice: Fix missing power-domain and iface clk on Hawi
+> 
+>  .../devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml          | 3 +++
+>  Documentation/devicetree/bindings/crypto/qcom,prng.yaml                | 1 +
+>  2 files changed, 4 insertions(+)
+> ---
+> base-commit: a87737435cfa134f9cdcc696ba3080759d04cf72
+> change-id: 20260609-maili-crypto-5d612f629acf
 
-That was the intention.
- 
-> This looks to me like a gap in the framework; the implementation of the
-> feature does not exactly match the intention. What do you suggest should
-> be the approach here, and going forward?
-
-The issue is that to make it easier for the hardware, with the
-existing frame-work we would have to penalise the software implementation
-and make it withhold an extra block too.  Because software is so much
-faster than hardware, it makes no sense to do that.
-
-Cheers,
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
