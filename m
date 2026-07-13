@@ -1,104 +1,66 @@
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 841C52750FB
-	for <linux-crypto@vger.kernel.org>; Mon, 13 Jul 2026 05:07:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 232493546C7;
+	Mon, 13 Jul 2026 05:15:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783919265; cv=none; b=OxwgM5DLeyS2Wg5CKmj4f0uGfvrTTDjeN+mwfUztoDslUMvEqbvhaq9IhPpIziTuFSbPrqtNjx51EoYCdIqt7v/pUgniZVBlROW4tbIVV3pcAWJANKTHD7GMKdxAFMTyi6k5lPzxU6U2k0jCQQc3wrMmgZ6Covv7/iilNjyskRs=
+	t=1783919729; cv=none; b=C2tkbR8v5sAXgAfgtol7BrjqY0HG6RDWXmGCuHCT1nhzKp7YbH4Tea8S+bOUZBVMUh0ZohPmLotrVFUJQ+2tQmLgY806Wb2JfIYIDjEC0AUZS0DXNzzlBGbBZBIkglI7BTWEeh3TvyXeTUO7Q6/KccpRxWgV10zju4I2wNVUb8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783919265; c=relaxed/simple;
-	bh=efoJ5cAyPmCfC621cs0FhvyiGTUzcPIDbsIrKQKb+ZE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fGAZSTG1Kc9Lu6R5MORzQ4f09sy7toBG0ku/HbcRoUbBYMNqZrxGdpcEJV5T2a+3Qx/BL3Vt9rUkm5z8kDeh3WX2D4RzpiBEL9o5rVeMAL2clcfB6vW208T0ezuBWGwYiDaUIi6wOWa9r+Xsrm8uArzDJtr/iSp5kbfwW0yHta8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MMytH6wt; arc=none smtp.client-ip=209.85.128.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1783919729; c=relaxed/simple;
+	bh=FMwoXKgt/66LmyVRP8/Blbd2HF2YsjDyH0jX1MI6WVw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CUNNoh+O9lWrwGVwJX1OU7we2LwTwNe+ksmZMnn0gTzzyrmH+NZc3iVjvjnpjWx+7oKcsxUa0aQ/ssEuVQdeePj4SSc4uoS8KAAv38I2B2QEqsK8CoxfY+l7BKFd160ym7+KxilVQh7RjgypKueXcc2pt6h96v2PFSeK/c+FiXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=r1qpNT6z; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MMytH6wt"
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-8051ad12d23so29068507b3.3
-        for <linux-crypto@vger.kernel.org>; Sun, 12 Jul 2026 22:07:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1783919263; x=1784524063; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=p/VdgrZQOd7lEvrg+1tcs7ObaEih5szIwnSr6YpOhNg=;
-        b=MMytH6wt1VjPzwkKsEFlpqGojxj9Cnw5PqYe3mAcVE7l5GSKj4VS4T3D9yW8yqFFyQ
-         Ne+Xd+UoTeyKvWv8weKCYx+qsd/UUmrJKfggIreV9sF0vfknEysL+5nrQykpEPDxryp3
-         IN5kuKoA6lTCjbShaSxJIxdCDvDIdGT+OIp8KFcaetH8ynoP4nV9SiGCHtLd0l7fyiEl
-         OaWhuDYhTYnhQ/s9D/3B2lm7QbCt2cZJeQ2t6ueXYcLbKnqy77raIDGK6Hw0mrxLTRDS
-         gqd1S2SVzZbAXWTLMjUWkyjQjfYnCK9A5fdbgE2ZYnXCrTIc5MGIKSZLBFO2j0/kTPRh
-         uNBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783919263; x=1784524063;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=p/VdgrZQOd7lEvrg+1tcs7ObaEih5szIwnSr6YpOhNg=;
-        b=RieumR/yXVTu3BjKF5m9Q5D+x2JAztVzZaZDEreRZlp/yr2BF6i/XmdcfPvEnkHPyr
-         RAsUmvKaThVbG5zWXIcNzNYCg3fO49ZDh5aowWilhKW08jtcR8/0i0gLwX4wmRNTTt7Z
-         KAAwIgEyW4GDiX2MgnLpb3ynW/59f7A99IPQVNNUldfwxUO0SyXhJSP0FLsorwSEybt1
-         QnZUa1vd6MYWtKnyULeGg6wRaYVjaeR3xktY7PDOpLVlsXNZvmUaYbjHd5GbNObufi+B
-         yN8kuLzAAsab26BqCJN+xUEKJ8GlWCNJwOBBWu5KZPmBxFRDu6CxwoM+SoDmzRWuvPfy
-         YgRw==
-X-Gm-Message-State: AOJu0YwAJ1i8c0xZJ+cdfjYz6YzsYBBXx+sKY37+8iLbq13fI5mn4+hl
-	7033A0X37MFFK6ivQRKBRQogmTqNoR1sNnzcGny3Ty4EeBx5r15VMUuRd1p3ziBZ
-X-Gm-Gg: AfdE7ck4RZzNpvyNf9DyPogE1B4qcqaKGgU7uKY0E+GX/N6rPepUhho6mMbbPm5aIWL
-	g6SJtlWHKG4LZqKMSBAt+kldwvAIEByLnU1IHrwrnTHYDE/LMpPzzInJvw7up8R5VLDoVkTBFjp
-	fllKYaDYpOK/9oQ6pmITV6F03cF1zRhv96GkGZ4dNFEjDkUTiZIRUcIzOq0XsjsVZ9CRly0JqkF
-	eIyh9FpVdyp/ksWQSojK31LsiuLvTwCmX02EoPaqIAOc6aLthvF1ZEPA00KLKbAAJi+/SdWhDDU
-	EAi59IrKDrxcGZF95nObHfIB4B7qxJ1lBMT1fqg5SHk2jCqZBT/6CL/hn1YXgXziNW9AU4oJsob
-	nFyYS/+FzwtG77hfpxg0753zOkyoeQSEEUBnBtGiBykKPxdH8ciMfyBZ2kg8ACOITst2fzGr7+j
-	nflzYpJtwj+7k3RDRTrXkWHtJHR2OBJxiVyMfpSna0IWwq2IyJCMqoLoBmjWwEaw5zUx+OinEF1
-	3SR34lDoyh5JSAsmFHRrXTN2rRgesCPyMZ4QvyH3ILHZMmoWFN9iPmgtaiUh7xQrw==
-X-Received: by 2002:a05:690c:4b8c:b0:81e:6d84:8027 with SMTP id 00721157ae682-81e90033c25mr55816767b3.22.1783919263535;
-        Sun, 12 Jul 2026 22:07:43 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8000:7a86::e35])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-81e6c22ed8esm105489487b3.44.2026.07.12.22.07.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Jul 2026 22:07:42 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: linux-crypto@vger.kernel.org
-Cc: Srujana Challa <schalla@marvell.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Boris Brezillon <bbrezillon@kernel.org>,
-	Robin Murphy <robin.murphy@arm.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH] crypto: cesa: check for sram_dma NULL
-Date: Sun, 12 Jul 2026 22:07:40 -0700
-Message-ID: <20260713050740.3687230-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="r1qpNT6z"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=W3A/KaKrG9kFNeF/9Jpjyh+rlFeZTpLWeLsBrxYd7/Q=; 
+	b=r1qpNT6z2MeUG28TKQntSINtHBj9mHUpQDDX4jPjdk7pi+BFTFxfZMp3wDXFAraMdlHb61j8gGW
+	swP8siMmTvfisEAX8FbpjcqyXeiAe8DT7DQW9hokSV1UWLfXZOlWHb5GaNZSwkCZTinhkmXv0n7pb
+	1/j39LERZHHmd+Jft3fURJi7J4DDoWKrNmPLFiqtjC7OjSU+LdE6QT1tEpauo92OdM4B1FRyyX55R
+	6tjEAP6hFk0aaF0A50SYwsXJgQJTEiK6niBYqGG+oigMWuozhNjwHq1mKom9MA3FGnnDNO9vNIsho
+	ezAPGsKq6qJEkrykDomkyvJX4F09WLoPQo1A==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1wj90i-0000000CyxY-3jTC;
+	Mon, 13 Jul 2026 13:15:21 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 13 Jul 2026 15:15:20 +1000
+Date: Mon, 13 Jul 2026 15:15:20 +1000
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: NeilBrown <neil@brown.name>
+Cc: "Cen Zhang (Microsoft)" <blbllhy@gmail.com>, tgraf@suug.ch,
+	akpm@linux-foundation.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, AutonomousCodeSecurity@microsoft.com,
+	tgopinath@linux.microsoft.com, kys@microsoft.com
+Subject: Re: [PATCH v3] lib/rhashtable: clear stale iter->p on table restart
+Message-ID: <alR0aECzoQyjBuhY@gondor.apana.org.au>
+References: <20260707164115.4979-1-blbllhy@gmail.com>
+ <alMDzpDrUzdB8e0r@gondor.apana.org.au>
+ <178391853109.3371781.15191213695629915459@noble.neil.brown.name>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <178391853109.3371781.15191213695629915459@noble.neil.brown.name>
 
-dma_map_resource() might fail. In such a case, don't call
-dma_unmap_resource()
+On Mon, Jul 13, 2026 at 02:55:31PM +1000, NeilBrown wrote:
+>
+> I think that patch is good and fixes a problem that needs fixing.
 
-Fixes: 37d728f76c41 ("crypto: marvell/cesa - Fix DMA API misuse")
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- drivers/crypto/marvell/cesa/cesa.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Oh I get it now.  It was rhashtable_walk_next that was dereferencing
+iter->p, not rhashtable_walk_start_check.
 
-diff --git a/drivers/crypto/marvell/cesa/cesa.c b/drivers/crypto/marvell/cesa/cesa.c
-index 57c9295be711..bcbb909c48d8 100644
---- a/drivers/crypto/marvell/cesa/cesa.c
-+++ b/drivers/crypto/marvell/cesa/cesa.c
-@@ -406,7 +406,7 @@ static void mv_cesa_put_sram(struct platform_device *pdev, int idx)
- 	if (engine->pool)
- 		gen_pool_free(engine->pool, (unsigned long)engine->sram_pool,
- 			      cesa->sram_size);
--	else
-+	else if (engine->sram_dma)
- 		dma_unmap_resource(cesa->dev, engine->sram_dma,
- 				   cesa->sram_size, DMA_BIDIRECTIONAL, 0);
- }
+Thanks,
 -- 
-2.55.0
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
