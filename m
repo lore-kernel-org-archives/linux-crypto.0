@@ -1,51 +1,45 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BADAC1F3BA4;
-	Mon, 13 Jul 2026 03:42:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15CD72116F4;
+	Mon, 13 Jul 2026 03:44:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783914139; cv=none; b=Bg6KOGFUXi1nKciSoIdFdQ8z5MLBTiDvGthv2sdBNyjMWyM3zuk74GC2JGIbb5u2z+E66503kSkVuRl5bpRe86EA3tEoOB4uKzAqzg8HLnvXBk4a+99Eop15iI/gK3EZOe02CDEbkOjpLv6mXbTt7w0GIm0QaV89+NAETCLUbeQ=
+	t=1783914298; cv=none; b=JV3foBFEkBsp4a7v2q5K1HOe7qHds0yhDiitNw+DYc43oaFvoHDkLYM1W6yiCrr0NcNORct4ByHoBIr/b8996cKaF7fA5y+XRNg+nrqkB+MZKl/LALhQctwp37KyEGhkUXhv30xbcVncvqM44tjek90tSmWvqzo0zckY/d1iOKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783914139; c=relaxed/simple;
-	bh=viFaBWiMYiXNWA4jLXpBiJLpNrYbbMfjMI1CIpubu4c=;
+	s=arc-20240116; t=1783914298; c=relaxed/simple;
+	bh=r8sfdbqN1zs6K8NiXsx1BVuNZ9M2YhYO4Ctgpt76Edw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NVgTCtVtv8SYyLkyKmWbyuETpfml/lkgZ1WmWVQcvkAA0aA9/mKPA98BaVOesyYMOD5NSNCdO6ijJOysd0/578+C+MitO/G6pw+3vGycidzneex0MuWGKQiqPeATXmnRFp9QGtlkXJeLKzOzF7qhmnU+zZ2jzqjU7GMyN7VR+d0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Qb2bWov7; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=GDRxFOO27bRHI8rD3i/i1Rg7ozufg8S5uhQoYtozHV3kIeBRqru8mCpRnn8QMOcAMIURQGDD4A4h6NngI/dxGBAiecfArtZgK5IpX0cb4XcheDnFzSoT+YduDwgGmKVjqcLdoW6rwZuQ1O51Vs1TFqkxU1X/mZpItzr4F6OqABY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=l//rRRH1; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Qb2bWov7"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="l//rRRH1"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=89rWfb/GKA0YbwlF/rC1Uqb+AHHDfcTsgnf6prS00ms=; 
-	b=Qb2bWov7fDBLJ4II8sHjsLbeIXS4BXEzwIlOgSn1BDBcp1Vkbk9yo6voNd5z1BnQaDm8W8bfCHd
-	6oWRW1VN1NYQYo93R6N9AsmmaOoB3y1Oo77s1Z4cyz0khXh+AnHUmHOKi8URHGJhKGnu7F7lXgtAM
-	U2spVQE/Ax9CwwX1VQF9iUSRDTTyXpHpWLpb9aqQqnIOWDJ5gVTcQfNwBzRztQ2ZFmVEoAakRC5AD
-	nz9LzgWWhBTq+8UuLXPQ17GIcDCVFRMopIY0NkTkHwICMORLitb42bdHqebl4sPB/vZpmoKlm5qgo
-	fjWbWEw6hABQ1T1+auOa2NMplNFQ2I5NJLMw==;
+	from:content-type:reply-to; bh=RREQle099gdxdz7gtCoh4ys0y9zML3oLj26BLgi/8GE=; 
+	b=l//rRRH1MwZXJiVab728G6psnKp8my4yzdw2/SuqSldp8ojJWtpcuhpnDRxZ+sELPkfaaL35CSJ
+	CGslQQUJygsEP47uRZ6iFY8p1jvBGnOKGsf54VoaD6/HhI6I6DPWZJh6LVhnTF26xcJYnbuniZjmE
+	hVw3IkJdV2uQeIhRLq97EFB3FdviM+9lJIMk18nRNotBCOqlfcnCsvo6GcP8bbU6ZHBuIO+KwuHGG
+	Z2KqxHgRdJq3PVwh8RWEY+0IRUs6/+8jnj29YX76zIHBBixOpWQXG1w1OfL4HfS+di15P1e0l80HI
+	zmQxCbof8LCLLvRA9IfWCVEoSs8TIhRMyAWA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wj7Yb-0000000CyEH-3axH;
-	Mon, 13 Jul 2026 11:42:14 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 13 Jul 2026 13:42:13 +1000
-Date: Mon, 13 Jul 2026 13:42:13 +1000
+	id 1wj7b9-0000000CyH7-3rWD;
+	Mon, 13 Jul 2026 11:44:52 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 13 Jul 2026 13:44:51 +1000
+Date: Mon, 13 Jul 2026 13:44:51 +1000
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Jingyi Wang <jingyi.wang@oss.qualcomm.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>, aiqun.yu@oss.qualcomm.com,
-	tingwei.zhang@oss.qualcomm.com, trilok.soni@oss.qualcomm.com,
-	yijie.yang@oss.qualcomm.com, linux-arm-msm@vger.kernel.org,
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
-Subject: Re: [PATCH v2 0/3] dt-bindings: crypto: Add Qualcomm Maili crypto
- support
-Message-ID: <alRelRyJDvTdNTgJ@gondor.apana.org.au>
-References: <20260628-maili-crypto-v2-0-f8ce760f71d6@oss.qualcomm.com>
+To: Yuho Choi <dbgh9129@gmail.com>
+Cc: Olivia Mackall <olivia@selenic.com>,
+	Alexander Sverdlin <alex@sverdlin.org>, Nishanth Menon <nm@ti.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1] hwrng: ks-sa: Fix runtime PM cleanup on registration
+ failure
+Message-ID: <alRfM-Ygtmk1UNa2@gondor.apana.org.au>
+References: <20260702233921.100478-1-dbgh9129@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -54,33 +48,23 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260628-maili-crypto-v2-0-f8ce760f71d6@oss.qualcomm.com>
+In-Reply-To: <20260702233921.100478-1-dbgh9129@gmail.com>
 
-On Sun, Jun 28, 2026 at 11:44:34PM -0700, Jingyi Wang wrote:
-> Add crypto(ICE and TRNG) dt-binding support for Qualcomm upcoming Maili
-> SoC. Meanwhile fix the power-domain and clk missing on Hawi.
+On Thu, Jul 02, 2026 at 07:39:21PM -0400, Yuho Choi wrote:
+> ks_sa_rng_probe() enables runtime PM and resumes the device before
+> registering the hwrng. If devm_hwrng_register() fails, probe returns
+> without dropping the runtime PM usage count or disabling runtime PM.
 > 
-> Signed-off-by: Jingyi Wang <jingyi.wang@oss.qualcomm.com>
-> ---
-> Changes in v2:
-> - add power-domain and clk constraint
-> - add acked-by tag
-> - Link to v1: https://lore.kernel.org/r/20260609-maili-crypto-v1-0-0f577df56a61@oss.qualcomm.com
+> Unwind the runtime PM state on the registration failure path, matching
+> the cleanup done by remove().
 > 
+> Fixes: e9009fb227fa ("hwrng: ks-sa - Use pm_runtime_resume_and_get() to replace open coding")
+> Signed-off-by: Yuho Choi <dbgh9129@gmail.com>
 > ---
-> Jingyi Wang (3):
->       dt-bindings: crypto: qcom,prng: Document Maili TRNG
->       dt-bindings: crypto: qcom,inline-crypto-engine: Document Maili ICE
->       dt-bindings: crypto: qcom,ice: Fix missing power-domain and iface clk on Hawi
-> 
->  .../devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml          | 3 +++
->  Documentation/devicetree/bindings/crypto/qcom,prng.yaml                | 1 +
->  2 files changed, 4 insertions(+)
-> ---
-> base-commit: a87737435cfa134f9cdcc696ba3080759d04cf72
-> change-id: 20260609-maili-crypto-5d612f629acf
+>  drivers/char/hw_random/ks-sa-rng.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
