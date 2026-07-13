@@ -1,86 +1,87 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44AB9381E86
-	for <linux-crypto@vger.kernel.org>; Mon, 13 Jul 2026 06:36:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 839013B637A
+	for <linux-crypto@vger.kernel.org>; Mon, 13 Jul 2026 08:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783924596; cv=none; b=J+NgViuX/PlvXl8IY4VnPtRR4HjiKNZ/kxotxkuo/tUHTWu7iZYmZ/7j66tQXXiGf/gOOML1NbrAzaHlB8uA33NE/4J6psk0Alvx8kQlWM2kgdzMUTNyN8U3ES7TJNlEY7izZ6UJNEopO2sYjaa3arVDd5GYtxu7f752WZgTPNc=
+	t=1783932004; cv=none; b=hG/3KOCiNx2cprI64NN3kMl/a63Kw4chfK8R0tp9Cpyy/90cA7ZUJRsewzMklqOHU3t+8jnlOvCmrKNQvI8khiwTdv1J/iR/oaQa4+qwPUW+Rul5LW0k5eOaBufICUQnhZZ3yv3qCL7wNOv0y0Iwr2mz5SHbh47+nDMaqOBflRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783924596; c=relaxed/simple;
-	bh=Vc4u4HRzID6Fv2WL6ZDfoR80p9pWUurSOy7bn8WXlmw=;
+	s=arc-20240116; t=1783932004; c=relaxed/simple;
+	bh=+Mtn3X0BHI6s8bs8ek6FaCiutueHC06mLtlMxdFtuhI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tpCHCIfbPWoo+UMU6cI2P++mSyO+MC/p5y40Nc61ZV7G7mmWdyTA/5aFfSUGCDfeDmseCANm5IxsyMXItiX55Sr48iNLef681dwYluDdvrGYaA3o0ITZ21AYrc8QpCU0FY9TR4zXTTagYThZq/I0fIbASlEN4H/Z6gyIU4wjLac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D8X4t8j7; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=DQgKZSWL; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=EesU51IBz/QxJaeJeUAT3mat94ZbD06m7j5xN1E614jQOZ+eost/gu2H9oaUUoBtxUbEYOdbS3dKAwWxRKGVCMGKj1s2GVHXdQSKPSjsvbGC/iHqBt8UfGUh4uAJSrIKcTVgVcbgrVRSDzMtjnDKrro3eZV/SuakRHr09vTici4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FmintECx; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=SR+LaoWb; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D8X4t8j7";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="DQgKZSWL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FmintECx";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="SR+LaoWb"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1783924594;
+	s=mimecast20190719; t=1783931999;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=K1nC1RCZXY372njdd6nbwpD+24kS6cgV1fUa231Xig0=;
-	b=D8X4t8j7QC9DN1w4LXfFuGncp780v0dML6jdSLSdt9UfmebVF09ZJybqMtxmnQMS1z0Srk
-	vqrLc1tb31zKfvIuZZ676CMuktfoZJDIPQrqzaULFc+wBijaGcAyXAo6anxNws6B8PFrE+
-	gXjJBY//sUAOQJQCUdnfbD/BXtyIPYo=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=TK7R3ngWTxCx7Mzn1bDl7P4Mutu3LWaKMkHVF3wBuj4=;
+	b=FmintECx0gOGKJN0FSOttU7uQGEzfEz99oMJIcf21ROdYCFuP/q/5jpSS5q+JcfPuDyOUh
+	zOqwVMddAqmk140Fjh1EK1BJ1yfMEFhXwn2vrvgp2ltrvfSxjRGb65wn4dyMS7XRyHbOuL
+	LNNM6s/f+CzCilWIe3SfrJmnEedFxWg=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-599-Z2aHahsoPEaRdymvBeCDCA-1; Mon, 13 Jul 2026 02:36:32 -0400
-X-MC-Unique: Z2aHahsoPEaRdymvBeCDCA-1
-X-Mimecast-MFC-AGG-ID: Z2aHahsoPEaRdymvBeCDCA_1783924591
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-475de65009dso2498711f8f.0
-        for <linux-crypto@vger.kernel.org>; Sun, 12 Jul 2026 23:36:31 -0700 (PDT)
+ us-mta-371-GCLiyZITP9GgWyRY6JvL2g-1; Mon, 13 Jul 2026 04:39:57 -0400
+X-MC-Unique: GCLiyZITP9GgWyRY6JvL2g-1
+X-Mimecast-MFC-AGG-ID: GCLiyZITP9GgWyRY6JvL2g_1783931996
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-4731a357b0aso2945191f8f.2
+        for <linux-crypto@vger.kernel.org>; Mon, 13 Jul 2026 01:39:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1783924591; x=1784529391; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1783931996; x=1784536796; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=K1nC1RCZXY372njdd6nbwpD+24kS6cgV1fUa231Xig0=;
-        b=DQgKZSWLgjF0FXWAGjuHGyOVtaTDLTDl6uEViDeH4E0gL3V9IXv/hLeQrVisuGkoeG
-         m8zYa/81PePPbM8Fcooi9jC+Fg7Eimfm7gIdhTeWKAKTxWorufqoi6j5KJATAe1VdcmA
-         FMcpzfhsktO6UtArvW15SymixQhgnZneUxh74oEP7+OpocOT5E+aA35U2t+oTwL08xBf
-         EePfJTdO6dz5Q431Ae0RFNc4bYZB3qkamISd87DfEqgRG7SJDZ4zWWXWQrAAJyGlrpyJ
-         j5N+F3n5ZTaJh/EEFiDPy4d40cyh5RNFhDpTnz6nkRwqXT28O3ua+ZV0/qBFetDxk9X1
-         C8SQ==
+        bh=TK7R3ngWTxCx7Mzn1bDl7P4Mutu3LWaKMkHVF3wBuj4=;
+        b=SR+LaoWb6/t25XXQL8Ar5CSZQJB3Z09UNGdwa8qVDsNX8UFWbbr2RzBPVQiFvUfNyr
+         zXUBlCmY4Uie5BmN9ntaSQncx17rM/Ih+yRlIaamXW7aTfWCQlGBVmFxUm/Heu0/N+6x
+         VVQaqYgH3zXhczvnojDgr+Zihkgudg2jMJU7LSEuRSdcnKeE6wunTZoP43f44/Z8JKQv
+         izMlfbigGnlqx2rMfG/h1s7vrWUAqjv9l9U1JxFysANlEbT7CBEadQHMhcYLt0kfqwD5
+         omMxzWzGkp0aZS8huu4+y9qbZyzT5WfaL1pJAOMtB3DtxVtfgWj03nhwKb50I3bc9HKs
+         4EzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1783924591; x=1784529391;
+        d=1e100.net; s=20251104; t=1783931996; x=1784536796;
         h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=K1nC1RCZXY372njdd6nbwpD+24kS6cgV1fUa231Xig0=;
-        b=bF+kEka75ndp1ZhwaTQPxDc677xUyRZJ6JSsbdJ01+BpUPzMqSRj7lF1v6lw2ROEdI
-         1kg3SJPOOgHN5bDGkimWjRpXGrdRQy2I+v9sw44PW2CKLa+GBH51MIvzXwxTvbjnq2+E
-         4chVtlQd5WMT9Vr3+86CR5bBlgiYAbVx9gMRUPndwLttB293TAvrrhvx6KMF0xnpFflv
-         yzOluccHWN1AUJBV5hgRrrAx3lvunGfY8cS6jJps0qQB5bKHgJ5SwzC+0XhHXA3TiadV
-         SDKNbPUHNlwL/V1xSNBeJz2gEofSlTCATscmvS3C8jSPQY4dNDx254uMkITHivynCr3F
-         gb9g==
-X-Forwarded-Encrypted: i=1; AHgh+RrCgo84fLCQH+23u/wz9NG79769ZuQcTx4v37NI/hRLxd3QQbUlxoJsF0d9snqjtc4HQI8m7jccDV0rvlI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxH5GyO+8qQr5mH2TVECpWn8BMMqyuwj9rkHS1S9F4SI6kzfFBv
-	E1MW7JtYzAPUBCM+isoUTvC9NRqalYqPFnD0A4Y4LnI0b4sKuzQhmPQSqsRltzQEfPlUTAt0TO0
-	2A9luCQiz3kvML7k1PexxnLNWKl8CdaJ8eKLHLJLsGlLXcjBtpR4l8aeUV6BE9she6w==
-X-Gm-Gg: AfdE7cnmXKNWHQ4CDuke2DAhJ2eMrswMUkgwVPBcSviTpc5idnoEC1S8i1+5uI+bnyD
-	N4S9CALLt0oXisI+KtN8QLfhnsnJQ2XieN11Jkw42AdW0jYhomF3LmB3HDOzj9sW1oFMHBYU5+K
-	WTcXOH0QQTG3195BYh7oQXydVZo2FbtMvlx/fqZNCjuB+LSl3jUkIYLFrWANkBVT/z/yGKcI8UK
-	iIEuTUEvbD61eMpwa1Ia78+ROgym0oVhVaYDVrWCABnCxlMrorlW/deKU4cHJmu9niW+HYNSXSK
-	WlE8SAQ9rny1z4/ehkZQz1om7AhJTFdIJDrMp2FdHUOQjyy4AOLFvw/rThaX9w+rBamlT/EV8Eb
-	N4Q4tu7s1
-X-Received: by 2002:a05:600c:a14:b0:493:bb29:af40 with SMTP id 5b1f17b1804b1-493f87e6c28mr82429995e9.14.1783924590849;
-        Sun, 12 Jul 2026 23:36:30 -0700 (PDT)
-X-Received: by 2002:a05:600c:a14:b0:493:bb29:af40 with SMTP id 5b1f17b1804b1-493f87e6c28mr82429685e9.14.1783924590408;
-        Sun, 12 Jul 2026 23:36:30 -0700 (PDT)
+        bh=TK7R3ngWTxCx7Mzn1bDl7P4Mutu3LWaKMkHVF3wBuj4=;
+        b=JWnjd5/Nteq4LVW22BD5Hi/Ok0nTORE9KhYM3bA9jFh2Q+AseWMSJaxCkjhwgkczuw
+         6m/KCog7RNu6pOrcU7+K1UzE4cVmVI+eOlYJqABoMT+Fo6qIw83diCHOitkk6ISxwEjr
+         VUQj5f0BS1aLegF1f9/oDf/9WgpY+//AQ2U16X/B8m8XFgZU5ZMhTqxqoDEK6qrcJC5q
+         UpC8E/uBgCb6xlhx/pP7c+tff5FjHLdybRr7fhHTEVBqFH5HyOOiWqmEonzXMKJtvLih
+         gdIcUAIiEQqoE4CDv2RyxLkfoauXJEY53le4mo+ChPxRONpzju9sDQ8qNTrpCwe16qmp
+         DMzg==
+X-Forwarded-Encrypted: i=1; AHgh+RpEs2Bl9KYNqRImxYgU+w0dLnm8MGcTh9nLIv1saVAY0Pd5k79Ngg8V3Lo/nnfjDuA8v/dmlk57meOCUNs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzu3ZbhIhyiPPh7V7R33zobLtQSMzqndx1CgNn8c3NE1xEOepnW
+	mCgxXkeN9jMVKzZYp6h/rCh2/uaKqS5mQXYRjdNAozZdgMN5DQpdJDyVP+dI+tSfT7eNi5qsDwW
+	zEUiwnGtLIGwECJ1XTf/Oz62n6IvfZZ4KnQuR5IFvu/ZgZKYT4OTr8ivjX2LYsS0S48GP1cm9wg
+	==
+X-Gm-Gg: AfdE7cmH7hPKE6F7TSCZircE5+bN7q8vPrN17g+Nm50rTZ0j3bwOJt2WisbvwK91Rm8
+	eTp1lRbttt9nmn1mMKs/HnmPeWvvT8mt+JPXuxBNh8RfwMrFvuhVQ0OgszVAldeUGz0HB1zSV8G
+	9FqmM6Dc9Xb6EpLSh25CJ26fCBk/p2/xA2+0LGRlm+SO6isQGVwn6/v20oPg+Sv1nqhtY3s/odp
+	iSSbphBFvB/piSKOTBoY5Orn3UEYIPRrib1VTvkq3JZVivsSu35XncBL8cVpEBMOnfiCYtJHS50
+	hpD0PfFVk+Mo5NaY3IyNZYfqiKq+WvaQV+ePnHIRF0UOGYZp7myTIvSVX7V8gfw8PUE+f+4+YI1
+	hWAdber+8
+X-Received: by 2002:a5d:5887:0:b0:47f:28e3:3f7e with SMTP id ffacd0b85a97d-47f2dd1f389mr8491831f8f.34.1783931996142;
+        Mon, 13 Jul 2026 01:39:56 -0700 (PDT)
+X-Received: by 2002:a5d:5887:0:b0:47f:28e3:3f7e with SMTP id ffacd0b85a97d-47f2dd1f389mr8491797f8f.34.1783931995618;
+        Mon, 13 Jul 2026 01:39:55 -0700 (PDT)
 Received: from [192.168.0.9] ([47.64.114.244])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-493f2dad65fsm171802045e9.1.2026.07.12.23.36.28
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47a9b4d850dsm83995367f8f.0.2026.07.13.01.39.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 12 Jul 2026 23:36:28 -0700 (PDT)
-Message-ID: <ab58f16b-f2b8-4d37-9db7-30c2482c4088@redhat.com>
-Date: Mon, 13 Jul 2026 08:36:27 +0200
+        Mon, 13 Jul 2026 01:39:55 -0700 (PDT)
+Message-ID: <40932e40-a909-4b95-b739-c4727c1cc153@redhat.com>
+Date: Mon, 13 Jul 2026 10:39:53 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -88,12 +89,11 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: pcrypt - Remove pcrypt
-To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
- Herbert Xu <herbert@gondor.apana.org.au>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Steffen Klassert <steffen.klassert@secunet.com>
-References: <20260713032600.44355-1-ebiggers@kernel.org>
+Subject: Re: [PATCH 04/33] lib/crypto: aes: Add CTR and XCTR support
+To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+References: <20260707053503.209874-1-ebiggers@kernel.org>
+ <20260707053503.209874-5-ebiggers@kernel.org>
 Content-Language: en-US
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -138,71 +138,280 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20260713032600.44355-1-ebiggers@kernel.org>
+In-Reply-To: <20260707053503.209874-5-ebiggers@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 13/07/2026 05.26, Eric Biggers wrote:
-> pcrypt was originally intended to improve IPsec performance.  However,
-> it's no longer useful for that.  Reports from the rare cases that anyone
-> has actually tried to use it over the years indicate that it actually
-> reduces IPsec performance, e.g.:
+On 07/07/2026 07.34, Eric Biggers wrote:
+> Add support for AES-CTR and AES-XCTR to the crypto library.
 > 
-> * https://github.com/libreswan/libreswan/wiki/Internals:-Cryptographic-Acceleration#obsoleted-ipsec-accelerations
-> * https://users.strongswan.narkive.com/liqTaTq8/strongswan-problem-with-pcrypt
-> * https://unix.stackexchange.com/questions/594336/ipsec-multithreading-via-pcrypt-worse-than-single-thread
+> These will be used to provide streamlined implementations of the
+> "ctr(aes)" and "xctr(aes)" crypto_skcipher algorithms.  Most users of
+> "ctr(aes)" will also be able to switch to the library, which as usual
+> will be simpler and faster, e.g.:
 > 
-> It's also undocumented and quite difficult to actually use.  Its design
-> is also broken, in that any unprivileged program can enable pcrypt
-> systemwide at any time (by instantiating it using AF_ALG).
+>    - net/mac80211/fils_aead.c
+>    - net/mac802154/llsec.c
 > 
-> Meanwhile, pcrypt has been a regular source of bugs, including at least
-> four that have received CVEs.
+> As usual, the architecture-optimized AES-CTR and AES-XCTR code will be
+> migrated into the library as well (using the hooks provided in this
+> commit), eliminating lots of repetitive boilerplate code.
 > 
-> Let's just remove it.  No one seems to care about it anymore other than
-> people looking for vulnerabilities.
+> This is also a prerequisite for supporting AES-GCM, AES-CCM, and
+> AES-HCTR2 in the crypto library.
 > 
-> Cc: Steffen Klassert <steffen.klassert@secunet.com>
+> Initial test coverage is provided by the crypto_skcipher support added
+> in a later commit.  I'm planning a KUnit test suite as well.
+> 
 > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 > ---
+>   .../crypto/libcrypto-unauth-encryption.rst    |  7 ++
+>   include/crypto/aes-ctr.h                      | 56 +++++++++++
+>   lib/crypto/Kconfig                            |  6 ++
+>   lib/crypto/aes.c                              | 93 +++++++++++++++++++
+>   lib/crypto/tests/Kconfig                      |  1 +
+>   5 files changed, 163 insertions(+)
+>   create mode 100644 include/crypto/aes-ctr.h
 > 
-> This patch is targeting cryptodev/master
-> 
->   Documentation/core-api/padata.rst           |   6 +-
->   MAINTAINERS                                 |   7 -
->   arch/loongarch/configs/loongson32_defconfig |   1 -
->   arch/loongarch/configs/loongson64_defconfig |   1 -
->   arch/s390/configs/debug_defconfig           |   1 -
->   arch/s390/configs/defconfig                 |   1 -
->   crypto/Kconfig                              |  10 -
->   crypto/Makefile                             |   1 -
->   crypto/pcrypt.c                             | 394 --------------------
->   include/crypto/pcrypt.h                     |  39 --
->   tools/crypto/tcrypt/tcrypt_speed_compare.py |   7 +-
->   11 files changed, 5 insertions(+), 463 deletions(-)
->   delete mode 100644 crypto/pcrypt.c
->   delete mode 100644 include/crypto/pcrypt.h
-
-Thanks for the patch, I think it's a good idea!
-
-> diff --git a/Documentation/core-api/padata.rst b/Documentation/core-api/padata.rst
-> index 05b73c6c105f..b50df9768a5d 100644
-> --- a/Documentation/core-api/padata.rst
-> +++ b/Documentation/core-api/padata.rst
-> @@ -55,9 +55,9 @@ processors are allowed to be used as the serialization callback processor.
->   cpumask specifies the new cpumask to use.
+> diff --git a/Documentation/crypto/libcrypto-unauth-encryption.rst b/Documentation/crypto/libcrypto-unauth-encryption.rst
+> index fb8106034089..6aca01d715da 100644
+> --- a/Documentation/crypto/libcrypto-unauth-encryption.rst
+> +++ b/Documentation/crypto/libcrypto-unauth-encryption.rst
+> @@ -27,6 +27,13 @@ Support for AES in the CBC and CBC-CTS modes of operation.
 >   
->   There may be sysfs files for an instance's cpumasks.  For example, pcrypt's
-> -live in /sys/kernel/pcrypt/<instance-name>.  Within an instance's directory
-> -there are two files, parallel_cpumask and serial_cpumask, and either cpumask
-> -may be changed by echoing a bitmask into the file, for example::
-> +used to live in /sys/kernel/pcrypt/<instance-name>.  Within an instance's
-> +directory there are two files, parallel_cpumask and serial_cpumask, and either
-> +cpumask may be changed by echoing a bitmask into the file, for example::
+>   .. kernel-doc:: include/crypto/aes-cbc.h
 >   
->       echo f > /sys/kernel/pcrypt/pencrypt/parallel_cpumask
-I'd rather not keep examples for a non-existing sysfs entry around. Could 
-you maybe change it to use e.g. /sys/devices/virtual/workqueue/cpumask instead?
+> +AES-CTR and AES-XCTR
+> +--------------------
+> +
+> +Support for AES in the CTR and XCTR modes of operation.
+
+I guess you already have this on your radar, but just in case: It would be 
+nice to turn this into a full sentence, too.
+
+> +.. kernel-doc:: include/crypto/aes-ctr.h
+> +
+>   AES-ECB
+>   -------
+>   
+> diff --git a/include/crypto/aes-ctr.h b/include/crypto/aes-ctr.h
+> new file mode 100644
+> index 000000000000..fa2b7d303e55
+> --- /dev/null
+> +++ b/include/crypto/aes-ctr.h
+> @@ -0,0 +1,56 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * AES-CTR and AES-XCTR stream ciphers
+> + *
+> + * Copyright 2026 Google LLC
+> + */
+> +#ifndef _CRYPTO_AES_CTR_H
+> +#define _CRYPTO_AES_CTR_H
+> +
+> +#include <crypto/aes.h>
+> +
+> +/**
+> + * aes_ctr() - AES-CTR en/decryption
+> + * @dst: The destination buffer.  Can be in-place or out-of-place.  For other
+> + *	 overlaps the behavior is unspecified.
+> + * @src: The source data
+> + * @len: Number of bytes to en/decrypt
+> + * @ctr: The counter.  It will be incremented by ceil(@len / AES_BLOCK_SIZE).
+> + * @key: The key
+> + *
+> + * This implements AES in counter mode with a 128-bit big endian counter.
+> + *
+> + * This supports incremental en/decryption.  The length of each non-final chunk
+> + * must be a multiple of AES_BLOCK_SIZE, and the updated @ctr must be passed in
+> + * each time.
+
+Maybe add some wording that ctr ideally should not be 0 for the first call, 
+i.e. a "nonce" value?
+
+> + * Context: Any context.
+> + */
+> +void aes_ctr(u8 *dst, const u8 *src, size_t len,
+> +	     u8 ctr[at_least AES_BLOCK_SIZE], aes_encrypt_arg key);
+> +
+> +/**
+> + * aes_xctr() - AES-XCTR en/decryption
+> + * @dst: The destination buffer.  Can be in-place or out-of-place.  For other
+> + *	 overlaps the behavior is unspecified.
+> + * @src: The source data
+> + * @len: Number of bytes to en/decrypt
+> + * @ctr: The block counter.  For the first call, set it to 1.  It will be
+> + *	 incremented by ceil(@len / AES_BLOCK_SIZE).
+> + * @iv: The initialization vector
+> + * @key: The key
+> + *
+> + * This implements AES in XOR Counter mode, as specified in the paper
+> + * "Length-preserving encryption with HCTR2"
+> + * (https://eprint.iacr.org/2021/1441.pdf).
+> + *
+> + * This supports incremental en/decryption.  The length of each non-final chunk
+> + * must be a multiple of AES_BLOCK_SIZE, and the updated @ctr must be passed in
+> + * each time.
+> + *
+> + * Context: Any context.
+> + */
+> +void aes_xctr(u8 *dst, const u8 *src, size_t len, u64 *ctr,
+> +	      const u8 iv[at_least AES_BLOCK_SIZE], aes_encrypt_arg key);
+> +
+> +#endif /* _CRYPTO_AES_CTR_H */
+> diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
+> index c64cc3e12b57..96febc3df6d6 100644
+> --- a/lib/crypto/Kconfig
+> +++ b/lib/crypto/Kconfig
+> @@ -47,6 +47,12 @@ config CRYPTO_LIB_AES_ECB
+>   	help
+>   	  The AES-ECB library functions.
+>   
+> +config CRYPTO_LIB_AES_CTR
+> +	tristate
+> +	select CRYPTO_LIB_AES
+> +	help
+> +	  The AES-CTR and AES-XCTR library functions.
+> +
+>   config CRYPTO_LIB_AESGCM
+>   	tristate
+>   	select CRYPTO_LIB_AES
+> diff --git a/lib/crypto/aes.c b/lib/crypto/aes.c
+> index 3635fbe946f3..9da274a72221 100644
+> --- a/lib/crypto/aes.c
+> +++ b/lib/crypto/aes.c
+> @@ -6,6 +6,7 @@
+>   
+>   #include <crypto/aes-cbc-macs.h>
+>   #include <crypto/aes-cbc.h>
+> +#include <crypto/aes-ctr.h>
+>   #include <crypto/aes-ecb.h>
+>   #include <crypto/aes.h>
+>   #include <crypto/utils.h>
+> @@ -967,6 +968,98 @@ void aes_cbc_cts_decrypt(u8 *dst, const u8 *src, size_t len,
+>   EXPORT_SYMBOL_GPL(aes_cbc_cts_decrypt);
+>   #endif /* CONFIG_CRYPTO_LIB_AES_CBC */
+>   
+> +#if IS_ENABLED(CONFIG_CRYPTO_LIB_AES_CTR)
+> +/*
+> + * Hooks for optimized AES-CTR and AES-XCTR implementations, overridable by the
+> + * architecture.  They are called with any len >= 0.  Returning false causes the
+> + * fallback implementation to be used instead.
+> + */
+> +#ifndef aes_ctr_arch
+> +static bool aes_ctr_arch(u8 *dst, const u8 *src, size_t len,
+> +			 u8 ctr[AES_BLOCK_SIZE], const struct aes_enckey *key)
+> +{
+> +	return false;
+> +}
+> +#endif
+> +#ifndef aes_xctr_arch
+> +static bool aes_xctr_arch(u8 *dst, const u8 *src, size_t len, u64 *ctr,
+> +			  const u8 iv[AES_BLOCK_SIZE],
+> +			  const struct aes_enckey *key)
+> +{
+> +	return false;
+> +}
+> +#endif
+> +
+> +static __always_inline void inc_be128_ctr(u8 ctr[AES_BLOCK_SIZE])
+> +{
+> +	/* Casts to u8 are needed because of the implicit integer promotion. */
+> +	if (((u8)++ctr[AES_BLOCK_SIZE - 1]) != 0)
+> +		return;
+
+Why do you handle the first value separately here? The code could be 
+simplified to start with "int i = AES_BLOCK_SIZE -1" in the for-loop instead?
+
+> +	for (int i = AES_BLOCK_SIZE - 2; i >= 0; i--) {
+> +		if ((u8)++ctr[i] != 0)
+> +			break;
+> +	}
+> +}
+> +
+> +void aes_ctr(u8 *dst, const u8 *src, size_t len, u8 ctr[AES_BLOCK_SIZE],
+> +	     aes_encrypt_arg key)
+> +{
+> +	u8 keystream[AES_BLOCK_SIZE] __aligned(__alignof__(long));
+> +
+> +	if (likely(aes_ctr_arch(dst, src, len, ctr, key.enc_key)))
+> +		return;
+> +
+> +	/* Handle the full blocks. */
+> +	for (; len >= AES_BLOCK_SIZE; len -= AES_BLOCK_SIZE) {
+> +		aes_encrypt(key, keystream, ctr);
+> +		crypto_xor_cpy(dst, src, keystream, AES_BLOCK_SIZE);
+> +		inc_be128_ctr(ctr);
+> +		dst += AES_BLOCK_SIZE;
+> +		src += AES_BLOCK_SIZE;
+> +	}
+> +	/* Handle any partial block at the end. */
+> +	if (len) {
+> +		aes_encrypt(key, keystream, ctr);
+> +		crypto_xor_cpy(dst, src, keystream, len);
+> +		/* Counter is incremented even with just a partial block. */
+> +		inc_be128_ctr(ctr);
+> +	}
+> +	memzero_explicit(keystream, sizeof(keystream));
+> +}
+> +EXPORT_SYMBOL_GPL(aes_ctr);
+> +
+> +void aes_xctr(u8 *dst, const u8 *src, size_t len, u64 *ctr,
+> +	      const u8 iv[AES_BLOCK_SIZE], aes_encrypt_arg key)
+> +{
+> +	const __le64 iv0 = get_unaligned((const __le64 *)&iv[0]);
+> +	__le64 aes_input[2];
+> +	u8 keystream[AES_BLOCK_SIZE] __aligned(__alignof__(long));
+> +
+> +	if (likely(aes_xctr_arch(dst, src, len, ctr, iv, key.enc_key)))
+> +		return;
+> +
+> +	aes_input[1] = get_unaligned((const __le64 *)&iv[8]);
+> +	/* Handle the full blocks. */
+> +	for (; len >= AES_BLOCK_SIZE; len -= AES_BLOCK_SIZE) {
+> +		aes_input[0] = iv0 ^ cpu_to_le64((*ctr)++);
+
+Do we want to have a BUG_ON or WARN_ON_ONCE somewhere to check that ctr does 
+not wrap around (i.e. to make sure that ctr was really 1 for the first 
+call)? Something like:
+
+	WARN_ON_ONCE((s64)(cpu_to_le64(*ctr) + len / AES_BLOCK_SIZE) < 0)
+
+at the beginning of the function?
+
+> +		aes_encrypt(key, keystream, (const u8 *)aes_input);
+> +		crypto_xor_cpy(dst, src, keystream, AES_BLOCK_SIZE);
+> +		dst += AES_BLOCK_SIZE;
+> +		src += AES_BLOCK_SIZE;
+> +	}
+> +	/* Handle any partial block at the end. */
+> +	if (len) {
+> +		/* Counter is incremented even with just a partial block. */
+> +		aes_input[0] = iv0 ^ cpu_to_le64((*ctr)++);
+> +		aes_encrypt(key, keystream, (const u8 *)aes_input);
+> +		crypto_xor_cpy(dst, src, keystream, len);
+> +	}
+> +	memzero_explicit(keystream, sizeof(keystream));
+> +	memzero_explicit(aes_input, sizeof(aes_input));
+> +}
+> +EXPORT_SYMBOL_GPL(aes_xctr);
+> +#endif /* CONFIG_CRYPTO_LIB_AES_CTR */
+> +
+>   static int __init aes_mod_init(void)
+>   {
+>   #ifdef aes_mod_init_arch
+> diff --git a/lib/crypto/tests/Kconfig b/lib/crypto/tests/Kconfig
+> index e78086f3c954..9284d0134d77 100644
+> --- a/lib/crypto/tests/Kconfig
+> +++ b/lib/crypto/tests/Kconfig
+> @@ -146,6 +146,7 @@ config CRYPTO_LIB_ENABLE_ALL_FOR_KUNIT
+>   	depends on KUNIT
+>   	select CRYPTO_LIB_AES_CBC
+>   	select CRYPTO_LIB_AES_CBC_MACS
+> +	select CRYPTO_LIB_AES_CTR
+>   	select CRYPTO_LIB_AES_ECB
+>   	select CRYPTO_LIB_BLAKE2B
+>   	select CRYPTO_LIB_CHACHA20POLY1305
 
   Thomas
 
