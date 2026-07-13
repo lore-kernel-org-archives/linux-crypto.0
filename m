@@ -1,40 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAD0235C193;
-	Mon, 13 Jul 2026 23:37:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5DBE388E51;
+	Mon, 13 Jul 2026 23:54:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783985881; cv=none; b=jN2DF6THXfa3m8inlLJh1ZUe9E/XKhKb2GnX0dHlt4K+Jb3GQyCrO32p1gkU//VyaaOVLy9ilfA2O7dodMFYqkZ3WxdE1OCcNYvQtrb05eFOxo1euDKvIKiT/0kXoQHjpmNq8HFedfByz+PMt8kGGw1Zghv1YRnO5gz4xXa+oUU=
+	t=1783986882; cv=none; b=HcKUKW3wAr+xSbixuNqnzPFHYpj+f1hhnickOjm+BN7ND7/qAgL/AcU+ITlYzHlwjAcTUyKVaNEkxcQFFZo/eBl+BUcLSuAJT396yBYRQtlzeWBdry5uSfNNR6+LagmiirVGOJ8ru74N0TYAmGewZFdw09+jAvAj/UHDalOeeVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783985881; c=relaxed/simple;
-	bh=aie/e6QWHi7Lkahi+k51njfqugr3fUsirwejXCbUGMM=;
+	s=arc-20240116; t=1783986882; c=relaxed/simple;
+	bh=Q3fv/QGllSmNlQc112W52OMYL+8ZvWtlH4c2Ix/uAoU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pzJ0/qRgN607UCoHnQCgMXX3XQEXsh4veZKXfdvakP97pdC+j0KQyQD6ovTDCSGE/lsVzHDElW6SXva3ra+svWcUE6qBCzlvd8DecbcpnNUCDs+QURzH9M+F/3kSgxlwhBdQmDNE8JjaCZwmvMDpihx5SJk0eJdbiVFFplhd9Fk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YgS8C3B1; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=JLX6TqKnRQ3P2PTIPvkoCOrGfsGRoFeYHhXVeQAw5Sw5eZRf9pQaSgGV7BI+oQcbxUgvqF8+j2407pym5D0NpaF1QHo1aMBm/pifPeptl/JgGHbpZNAas9WtQo6b1hWh0xFe1+z9nAC7snaxL3YyzYfWBjLTTA9thmD5ry+cDVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LaxUmI0h; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YgS8C3B1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51A2D1F000E9;
-	Mon, 13 Jul 2026 23:37:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LaxUmI0h"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5A7A1F000E9;
+	Mon, 13 Jul 2026 23:54:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1783985879;
-	bh=dQZxIocQ/FM4iU3WHgnq2vLxLp2hH8yLHsbTBcVXpvw=;
+	s=k20260515; t=1783986881;
+	bh=8+Mv6mEfJeXy9JpCdgv28fdyV5R8UKgbwGVh6rPlpqE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=YgS8C3B1pSfIdQTo1HSXvwvCcUD6aJf+t6+nJ4vJ3qEBSeoB8XEcddL52t96GyXlv
-	 holqMBAD2SBt0oJpA1UcJEsMLPpxnndR8WyZp1Jy32drzRPSHCHcJnrcJjbcheS7HN
-	 10if1r1pmfbJcd04taq6ArYF1nkTG7T6qFKAILLhFzwG31d9XAuShdw/Wyj/lF9JJE
-	 jm+vlWJVLSji3rXnz1ipe/cRgG920m/7Uq1O/HQ68Xme7pXk1iew8x8rmNG+Dg0/Uf
-	 qH0HI8vTxB9RMD9/FndoAFjpb8vSAep7MkJX5a6qvno4j+mI+raOnHCDhGMoSNJm5h
-	 5qcZ6o6r0gF8A==
-Date: Mon, 13 Jul 2026 19:37:57 -0400
+	b=LaxUmI0hFRZfWLiVESBb+y4x6ERK/J7x0dAH0aM7/us0pMFpi4fP8MGu1QiT8gbgf
+	 5coaU19RF0AVpY19msfolopvcxSKmuMTUdcYKXYbiH1WIYuGhkQBxtyIXJgrd2kR5l
+	 LOWEyIyxwHzUFZjSqv5L1bfs0BzH9XHsvvtLt6t9tbsWSIr04hgL7NOEL37IlLdDIK
+	 2PM6KE/uyvgAB1tRDb8RIp/fja8PSi1jXyOu8QZ/OEmVgKMc1HqhylL6NgLAnxuJnO
+	 Uk2PPEgAQLS6+m0/iz2cA6/GilvAkgf1V+CL5s7bpIN4Xt7kkTsDbMqEtnERsTShm5
+	 n7jG1OPqQl4qQ==
+Date: Mon, 13 Jul 2026 19:54:39 -0400
 From: Eric Biggers <ebiggers@kernel.org>
 To: Thomas Huth <thuth@redhat.com>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 03/33] lib/crypto: aes: Add CBC and CBC-CTS support
-Message-ID: <20260713233757.GA24654@quark>
+Subject: Re: [PATCH 04/33] lib/crypto: aes: Add CTR and XCTR support
+Message-ID: <20260713235439.GB24654@quark>
 References: <20260707053503.209874-1-ebiggers@kernel.org>
- <20260707053503.209874-4-ebiggers@kernel.org>
- <2bbc6563-3328-4153-97fb-2d0a10ceefaf@redhat.com>
+ <20260707053503.209874-5-ebiggers@kernel.org>
+ <40932e40-a909-4b95-b739-c4727c1cc153@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -43,78 +43,90 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2bbc6563-3328-4153-97fb-2d0a10ceefaf@redhat.com>
+In-Reply-To: <40932e40-a909-4b95-b739-c4727c1cc153@redhat.com>
 
-On Thu, Jul 09, 2026 at 03:06:03PM +0200, Thomas Huth wrote:
-> On 07/07/2026 07.34, Eric Biggers wrote:
-> > Add support for AES-CBC and AES-CBC-CTS to the crypto library.
-> > 
-> > These will be used to provide streamlined implementations of the
-> > "cbc(aes)" and "cts(cbc(aes))" crypto_skcipher algorithms.  Most users
-> > of these crypto_skcipher algorithms will also be able to switch to the
-> > library, which as usual will be simpler and faster, e.g.:
-> > 
-> >      - block/blk-crypto-fallback.c (for AES-128-CBC-ESSIV)
-> >      - fs/crypto/crypto.c (for AES-128-CBC-ESSIV)
-> >      - fs/crypto/fname.c (for AES-256-CTS and AES-128-CBC)
-> >      - kernel/bpf/crypto.c
-> >      - net/ceph/crypto.c
-> >      - security/keys/encrypted-keys/encrypted.c
-> > 
-> > As usual, the architecture-optimized AES-CBC and AES-CBC-CTS code will
-> > be migrated into the library as well (using the hooks provided in this
-> > commit), eliminating lots of repetitive boilerplate code.
-> > 
-> > Initial test coverage is provided by the crypto_skcipher support added
-> > in a later commit.  I'm planning a KUnit test suite as well.
-> > 
-> > Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> > ---
-> >   .../crypto/libcrypto-unauth-encryption.rst    |   7 +
-> >   include/crypto/aes-cbc.h                      |  77 ++++++++
-> >   lib/crypto/Kconfig                            |   6 +
-> >   lib/crypto/aes.c                              | 174 ++++++++++++++++++
-> >   lib/crypto/tests/Kconfig                      |   1 +
-> >   5 files changed, 265 insertions(+)
-> >   create mode 100644 include/crypto/aes-cbc.h
-> ...
-> > +void aes_cbc_cts_decrypt(u8 *dst, const u8 *src, size_t len,
-> > +			 u8 iv[AES_BLOCK_SIZE], const struct aes_key *key)
+On Mon, Jul 13, 2026 at 10:39:53AM +0200, Thomas Huth wrote:
+> > diff --git a/Documentation/crypto/libcrypto-unauth-encryption.rst b/Documentation/crypto/libcrypto-unauth-encryption.rst
+> > index fb8106034089..6aca01d715da 100644
+> > --- a/Documentation/crypto/libcrypto-unauth-encryption.rst
+> > +++ b/Documentation/crypto/libcrypto-unauth-encryption.rst
+> > @@ -27,6 +27,13 @@ Support for AES in the CBC and CBC-CTS modes of operation.
+> >   .. kernel-doc:: include/crypto/aes-cbc.h
+> > +AES-CTR and AES-XCTR
+> > +--------------------
+> > +
+> > +Support for AES in the CTR and XCTR modes of operation.
+> 
+> I guess you already have this on your radar, but just in case: It would be
+> nice to turn this into a full sentence, too.
+
+Yes, I'm making all of them full sentences.
+
+> > +/**
+> > + * aes_ctr() - AES-CTR en/decryption
+> > + * @dst: The destination buffer.  Can be in-place or out-of-place.  For other
+> > + *	 overlaps the behavior is unspecified.
+> > + * @src: The source data
+> > + * @len: Number of bytes to en/decrypt
+> > + * @ctr: The counter.  It will be incremented by ceil(@len / AES_BLOCK_SIZE).
+> > + * @key: The key
+> > + *
+> > + * This implements AES in counter mode with a 128-bit big endian counter.
+> > + *
+> > + * This supports incremental en/decryption.  The length of each non-final chunk
+> > + * must be a multiple of AES_BLOCK_SIZE, and the updated @ctr must be passed in
+> > + * each time.
+> 
+> Maybe add some wording that ctr ideally should not be 0 for the first call,
+> i.e. a "nonce" value?
+
+It depends on the usage.  If a distinct key is used for each message for
+example, always starting at 0 is perfectly fine.
+
+I'm not sure how far we should go to document the proper use of each
+algorithm.  Really the AES-CTR support is just for internal use by
+AES-GCM and AES-CCM, and a few odd users that implement specific other
+protocols that need AES-CTR.  It's not intended to be a place to go to
+receive an introduction to CTR mode.
+
+> > +static __always_inline void inc_be128_ctr(u8 ctr[AES_BLOCK_SIZE])
 > > +{
-> > +	/* Offset to P[n] and C[n] (last plaintext and ciphertext block) */
-> > +	size_t pn_offset = round_down(len - 1, AES_BLOCK_SIZE);
-> > +	/* Length of P[n] and C[n], 1 <= pn_len <= AES_BLOCK_SIZE */
-> > +	size_t pn_len = len - pn_offset;
-> > +	u8 *pad;
-> > +
-> > +	if (WARN_ON_ONCE(len < AES_BLOCK_SIZE))
+> > +	/* Casts to u8 are needed because of the implicit integer promotion. */
+> > +	if (((u8)++ctr[AES_BLOCK_SIZE - 1]) != 0)
 > > +		return;
-> > +
-> > +	if (len == AES_BLOCK_SIZE) {
-> > +		aes_cbc_decrypt(dst, src, len, iv, key);
-> > +		return;
-> > +	}
-> > +	if (likely(aes_cbc_cts_decrypt_arch(dst, src, len, iv, key)))
-> > +		return;
-> > +
-> > +	/* Compute P[0]..P[n - 2]. */
-> > +	aes_cbc_decrypt(dst, src, pn_offset - AES_BLOCK_SIZE, iv, key);
-> > +
-> > +	/* Compute P[n] and P[n - 1], considering that src may equal dst. */
-> > +	pad = &dst[pn_offset - AES_BLOCK_SIZE];
-> > +	aes_decrypt(key, pad, &src[pn_offset - AES_BLOCK_SIZE]);
-> > +	crypto_xor_cpy(&dst[pn_offset], &src[pn_offset], pad,
-> > +		       pn_len); /* P[n] */
-> > +	crypto_xor(pad, &dst[pn_offset], pn_len);
 > 
-> Took me a while to understand why you'd use the above xor instead of a
-> memcpy(pad, &src[pn_offset], pn_len) here, but that's because src and dst
-> might point to the same buffer, right?
-> 
-> Anyway, patch looks good to me, so:
-> 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Why do you handle the first value separately here? The code could be
+> simplified to start with "int i = AES_BLOCK_SIZE -1" in the for-loop
+> instead?
 
-Yes, the write to &dst[pn_offset] can overwrite &src[pn_offset].
+Just a trick to optimize performance by unrolling the first iteration,
+since 255 times out of 256 the first iteration is enough.
+
+> > +void aes_xctr(u8 *dst, const u8 *src, size_t len, u64 *ctr,
+> > +	      const u8 iv[AES_BLOCK_SIZE], aes_encrypt_arg key)
+> > +{
+> > +	const __le64 iv0 = get_unaligned((const __le64 *)&iv[0]);
+> > +	__le64 aes_input[2];
+> > +	u8 keystream[AES_BLOCK_SIZE] __aligned(__alignof__(long));
+> > +
+> > +	if (likely(aes_xctr_arch(dst, src, len, ctr, iv, key.enc_key)))
+> > +		return;
+> > +
+> > +	aes_input[1] = get_unaligned((const __le64 *)&iv[8]);
+> > +	/* Handle the full blocks. */
+> > +	for (; len >= AES_BLOCK_SIZE; len -= AES_BLOCK_SIZE) {
+> > +		aes_input[0] = iv0 ^ cpu_to_le64((*ctr)++);
+> 
+> Do we want to have a BUG_ON or WARN_ON_ONCE somewhere to check that ctr does
+> not wrap around (i.e. to make sure that ctr was really 1 for the first
+> call)? Something like:
+> 
+> 	WARN_ON_ONCE((s64)(cpu_to_le64(*ctr) + len / AES_BLOCK_SIZE) < 0)
+> 
+> at the beginning of the function?
+
+Maybe.  Since the counter is a u64, and this function isn't going to be
+called from very many places, I don't think it would be a particularly
+valuable WARN_ON_ONCE.  It shouldn't be BUG_ON.
 
 - Eric
