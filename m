@@ -1,113 +1,128 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F47141A92C
-	for <linux-crypto@vger.kernel.org>; Tue, 14 Jul 2026 18:41:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34A153358CA;
+	Tue, 14 Jul 2026 21:53:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784054521; cv=none; b=B6giA1dNdWjMp2CnIEpUsF+gvb75DwjWJz7Q3Jj3CCmshUK7ZN/zPPMfCillUL6L3HOt08lZJKQY9bPLoMZkYV8RZ00tVIBWFDTn11FvF+woen+o/Fn37DrLAe0GYK+suLWHtS5QfvHFrxMlJbi+bZWnWMB6RD6nIREyMtqhNqI=
+	t=1784065992; cv=none; b=OeByRz5mGyX7QgcWOydjdGuckwiHkCYzkE3RgrVG+FRXdTWxOYSNagSfwgdegY8Z3NWbjPvsSn6amgg2kF0Mqw8XApWG7tODZrNPuXKe/gZwg7Tktd+wADYAqCKzKyxvHB1rA0swoFInxJKATjqBoyw6x8mTgQ2cxZWcsoF+B5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784054521; c=relaxed/simple;
-	bh=PaQBkS90a4rPCv/dq+YRWwLuz5fATYts+TOoZzoPZj4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dp2o7FXtyNrG+Iif8kPIC5Ngt+qhIsdLxqezFYr5hQe27dpIfGDExNSiRxXcdHIcLROLEoWSXQBFoplpHBmwWt8eIsPTdCpPUWLGDKjwHGAuP7dLF81uUjfJVN3bzDV3bj4ZHw3Q90Z0GtEZvdYwSbHX5KK3XxhsTohse7+Vkog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rNCK1ue6; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1784065992; c=relaxed/simple;
+	bh=nBJF1huhfRnkLuP6nsnzKOJ93Pj9BiHpUVzk9hZpPWc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ufaTef+pkIDx1quOg0uzc+scQX8li9zW7oMSpV9+zSJ4JwPAz5Pxc9/6l70qC1V3ecjEt+5qFB2eJX2CtmM/B1FMB5V51Exy6zDc/90l4OLBZB1QE5+tZd8URRmTfs44y3yY4gnR84euRDFRT0Uxnlb8ly0ywjKmhUwbwXmWGco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U074G6fS; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rNCK1ue6"
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-848860def2cso4842343b3a.2
-        for <linux-crypto@vger.kernel.org>; Tue, 14 Jul 2026 11:41:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1784054517; x=1784659317; darn=vger.kernel.org;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=4QSNMOG9WUYsnTrdiXuaPBwAZEBhxka1gM9x6zaBmSM=;
-        b=rNCK1ue6708Vv/JHVtlGRjDGmBg7q7721OgtbVuL7BIIm4HkNGVJG1vYzTGM9MDe5z
-         1OUpxXC0cOGbLG+Jzn1WMctTPA+1IfA1i77sPtNKFgOEjmuSt06dIks3incEeubf428m
-         zSITgaZnP86MMavZ181GykbtaURT2oBdYUpnDPxXERg/EWu+mul+RMoxZll7Pjf9AEfo
-         Vm/SyCa5dOmFVfkZOWFptvYLO38cjr/ZZBMFQdzRv6KzEGbecMfb8ryqEBDI8RTMYfZS
-         mZjgu9H3fKEOon8Rr9RbYgQaJAGn8urwRUCOqbTNxWJAs0meHhowCK3PmlfZYDb8nqci
-         pYWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784054517; x=1784659317;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=4QSNMOG9WUYsnTrdiXuaPBwAZEBhxka1gM9x6zaBmSM=;
-        b=iHyerWcuEeSUsPE7bn1FXSsTs2gr83xM3uzj7Xs+mGAgHnZD0YHEw72+lG+2dRa/YZ
-         nyi2i/vCkmeG8BaLtuBFmXLpynWCY1SbhZAmiuWtGckPM2mK7c9N/UHQKc1VNduOQBjN
-         62GGSzdKmeRIBZnZz86BxLpMOefKuPX3TP9+MrS2pUtt1ubQ4RNX37Uee8hfYV4QIQTT
-         YezLdF0IZQi/ZdvrGoVBLu2lnFuKzTuHcfzqg9ZEJ6IKjdaBPWSvPcUqrRbP3vmZMbrs
-         w1CAq62G0M3bR3RUFTQspk2KvHz5AElrGyTw67L7BsbSv68NtV9ra3bKujeQb3S80g0b
-         H2OA==
-X-Forwarded-Encrypted: i=1; AHgh+RpvjP7Rd2jc8cCV2MGsoTT3MTFFhNnspgk+O0VbxKIEliffPekcotaYcUHWklBPVVLqkaFKbeRZY1ONCAk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwX+21Id3pTmqzjN2BqETjNDljD7wvr3WJAU0TGGbRqSO7R1ggw
-	dKmRvyTPlJPbZZZvqXufl49+5vxLkXKeu9FExJpoEJXEjhHZZpLCygfBivju8nV7y6BPLVmRrS6
-	Ng8I38Q==
-X-Received: from pfmy4.prod.google.com ([2002:aa7:8044:0:b0:848:56a2:f6a9])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:9289:b0:848:2ae4:d2ba
- with SMTP id d2e1a72fcca58-84889687b36mr12770821b3a.28.1784054516663; Tue, 14
- Jul 2026 11:41:56 -0700 (PDT)
-Date: Tue, 14 Jul 2026 11:41:01 -0700
-In-Reply-To: <20260602-sev_snp_fixes-v3-0-24bfd3ae047c@meta.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U074G6fS"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1784065990; x=1815601990;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=nBJF1huhfRnkLuP6nsnzKOJ93Pj9BiHpUVzk9hZpPWc=;
+  b=U074G6fSqdyQXAP1emnGjAfl1q/ZU6kgmbhflICm7J2/DGGHTklCit3c
+   mjSMv7ozP7A3KDhs1r0ZcRFGLsJrMRUAgRP+UUrQmsEkECZAlLc2/ah3i
+   G5l1+lLcpqsDY1LELl2EXka3mPWNALfLxgVCBkn6sbKCfkElM5bkOFnuM
+   +/mxTQwSHn1QXK3wNk6M8N+3mfTmUSCa2iBHEaj667RkXpGH2Y/9sjVn3
+   6gLlrzWwjyBLP3bwU7ofUPJ4Ex1p8s7jeldq2CVW4iIAPF+a8a1YN8muL
+   Uuul8dcLxUymvwtxYYayDLZcaGuqpTJZEc5Q4KAKAYmtSysE6hMBWfsKz
+   g==;
+X-CSE-ConnectionGUID: 7LPUXCQdTICTPPc6wZOnhg==
+X-CSE-MsgGUID: H9iEgEJHSGOqtLMeDdhFyw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11847"; a="84579724"
+X-IronPort-AV: E=Sophos;i="6.25,164,1779174000"; 
+   d="scan'208";a="84579724"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2026 14:53:08 -0700
+X-CSE-ConnectionGUID: yKJJ/6CmTr6Jk8v61QImzw==
+X-CSE-MsgGUID: X7xhfKPoTYOcNRDF5XST1A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,164,1779174000"; 
+   d="scan'208";a="252595874"
+Received: from aschende-mobl.amr.corp.intel.com (HELO [10.125.108.131]) ([10.125.108.131])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2026 14:53:07 -0700
+Message-ID: <90c8d0e8-99fc-4fd8-bdfd-f3093ffac256@intel.com>
+Date: Tue, 14 Jul 2026 14:53:06 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260602-sev_snp_fixes-v3-0-24bfd3ae047c@meta.com>
-X-Mailer: git-send-email 2.55.0.141.g00534a21ce-goog
-Message-ID: <178405419095.3137257.15966365152304045590.b4-ty@google.com>
-Subject: Re: [PATCH v3 0/4] KVM: Miscellaneous SEV/SNP related fixes
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Tom Lendacky <thomas.lendacky@amd.com>, Peter Gonda <pgonda@google.com>, 
-	Brijesh Singh <brijesh.singh@amd.com>, Youngjae Lee <youngjaelee@meta.com>, 
-	Ashish Kalra <ashish.kalra@amd.com>, Michael Roth <michael.roth@amd.com>, 
-	John Allen <john.allen@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Atish Patra <atish.patra@linux.dev>
-Cc: clm@meta.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, stable@vger.kernel.org, 
-	Atish Patra <atishp@meta.com>, Sashiko <sashiko-bot@kernel.org>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/4] dmaengine: idxd: assign all engines to group 0 in IAA
+ defaults
+To: Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+ Vinod Koul <vkoul@kernel.org>, Frank Li <Frank.Li@kernel.org>,
+ Kristen Accardi <kristen.c.accardi@intel.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>,
+ Andrew Morton <akpm@linux-foundation.org>, Yosry Ahmed <yosry@kernel.org>,
+ Nhat Pham <nphamcs@gmail.com>
+Cc: dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org, Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+References: <20260713-iaa-crypto-fixes-zswap-v1-0-65cac23c684d@intel.com>
+ <20260713-iaa-crypto-fixes-zswap-v1-1-65cac23c684d@intel.com>
+Content-Language: en-US
+From: Dave Jiang <dave.jiang@intel.com>
+In-Reply-To: <20260713-iaa-crypto-fixes-zswap-v1-1-65cac23c684d@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, 02 Jun 2026 15:36:31 -0700, Atish Patra wrote:
-> This series addresses a few issues found during code audit of the
-> KVM SEV/SNP and CCP driver code. The fixes include a incorrect lock state
-> and incomplete state handling during intra-host migration for SNP VMs.
+
+
+On 7/13/26 9:10 PM, Vinicius Costa Gomes wrote:
+> From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 > 
-> To: Sean Christopherson <seanjc@google.com>
-> To: Paolo Bonzini <pbonzini@redhat.com>
-> To: Borislav Petkov <bp@alien8.de>
-> To: Dave Hansen <dave.hansen@linux.intel.com>
-> To: x86@kernel.org
-> To: H. Peter Anvin <hpa@zytor.com>
-> To: Tom Lendacky <thomas.lendacky@amd.com>
-> To: Peter Gonda <pgonda@google.com>
-> To: Brijesh Singh <brijesh.singh@amd.com>
-> To: Youngjae Lee <youngjaelee@meta.com>
-> To: Ashish Kalra <ashish.kalra@amd.com>
-> To: Michael Roth <michael.roth@amd.com>
-> To: John Allen <john.allen@amd.com>
-> To: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: clm@meta.com
-> Cc: kvm@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: linux-crypto@vger.kernel.org
-> Cc: stable@vger.kernel.org
+> The IAA device defaults only assigned engine 0 to group 0, leaving
+> engines 1 through max_engines-1 unassigned (group_id = -1). This means
+> that by default only a single engine processed descriptors, limiting
+> throughput to one engine's capacity.
 > 
-> [...]
+> Assign all available engines to group 0 so that the full hardware
+> parallelism is used out of the box without requiring manual
+> accel-config setup.
+> 
+> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 
-Applied patches 1 and 2 to kvm-x86 fixes, thanks!
+Reviewed-by: Dave Jiang <dave.jiang@intel.com>
 
-[1/4] KVM: SEV: Do not allow intra-host migration/mirroring of SNP VMs
-      https://github.com/kvm-x86/linux/commit/6ee414078823
-[2/4] KVM: selftests: Verify SNP VMs are rejected from migration and mirroring
-      https://github.com/kvm-x86/linux/commit/df371f2c6244
 
---
-https://github.com/kvm-x86/linux/tree/next
+> ---
+>  drivers/dma/idxd/defaults.c | 12 +++++++-----
+>  1 file changed, 7 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/dma/idxd/defaults.c b/drivers/dma/idxd/defaults.c
+> index 2bbbcd02a0da..26ebfa2ca144 100644
+> --- a/drivers/dma/idxd/defaults.c
+> +++ b/drivers/dma/idxd/defaults.c
+> @@ -8,6 +8,7 @@ int idxd_load_iaa_device_defaults(struct idxd_device *idxd)
+>  	struct idxd_engine *engine;
+>  	struct idxd_group *group;
+>  	struct idxd_wq *wq;
+> +	int i;
+>  
+>  	if (!test_bit(IDXD_FLAG_CONFIGURABLE, &idxd->flags))
+>  		return 0;
+> @@ -41,11 +42,12 @@ int idxd_load_iaa_device_defaults(struct idxd_device *idxd)
+>  	/* set driver_name to "crypto" */
+>  	strscpy_pad(wq->driver_name, "crypto");
+>  
+> -	engine = idxd->engines[0];
+> -
+> -	/* set engine group to 0 */
+> -	engine->group = idxd->groups[0];
+> -	engine->group->num_engines++;
+> +	/* assign all engines to group 0 */
+> +	for (i = 0; i < idxd->max_engines; i++) {
+> +		engine = idxd->engines[i];
+> +		engine->group = group;
+> +		group->num_engines++;
+> +	}
+>  
+>  	return 0;
+>  }
+> 
+
