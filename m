@@ -1,52 +1,52 @@
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 401E533260D;
-	Tue, 14 Jul 2026 04:11:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9A4E36AB77;
+	Tue, 14 Jul 2026 04:11:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784002272; cv=none; b=B2Ysij2V36CXoFH2YSk/SVwH55IPznoAESF2U/Xe2OK6xqtBnUkxcfnNaW9vJ5eAa9Oz6z/E8pRveZOLw01npChrs1AflOBy6+AEXaGtwfTRSjm2AXtdWFHb+xh6z5WbP24hkaBkkcKHp1rxumlyeVd2kXG38RqBvJsMIQxQQ8c=
+	t=1784002273; cv=none; b=Q5VeEBNrkhDLZzdEHwQohrlTKBER4mF0o03d2z3nq1l7t//TMv5I9RapklxvD2CCkA1RjvzHyXPuYBwRkKue4THoEKSwcmCuDuNgFEztoe9Ot+Gj2b9rLoz1jwzHHpe926Mj3UXaSTHAPthGi9LM6cssC2oLadt6wWHXI5fblsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784002272; c=relaxed/simple;
-	bh=L3Y/ZhlIUAdgtnzQ8lUOWFMcEcKiOgfI+ea8lVssSmA=;
+	s=arc-20240116; t=1784002273; c=relaxed/simple;
+	bh=DimQniesOwePrAQW8cknWA9ZqhNGU3Pe01x+pNQhS2w=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=h//ydWTU/hZhPT3EFMfFkiXLT6467kbcpYJ2Jffs8di4aZCN7jQ6+kmoUUOiLOsD1JprNWkCEsYgaIvCWTWBEu8ziR13s8FgqwibkTYWa6pLtYoxWKGW+fmj7rAXObpXW/qAtS2cnYdxhHJSf9yQy/J73FrN5O9lAPrbp9aVo3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AaehM/n+; arc=none smtp.client-ip=198.175.65.11
+	 In-Reply-To:To:Cc; b=r/mxyEsyUg7Zl5dCrzH0HIXZc2h59v+1BZFbyj9GTYQFuTmBux5v04+VVeXecVyA4lJXAGNQhoia3CAHm6UJzBZWMPZecd4sGpOj6jcWu3GscnQdC/maesz+0tea3xBFA4onduciOuFPdxfyjYxsLQw6A9yUFhMW0GDaa82PU00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CSmEQYGz; arc=none smtp.client-ip=198.175.65.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AaehM/n+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CSmEQYGz"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1784002271; x=1815538271;
+  t=1784002272; x=1815538272;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=L3Y/ZhlIUAdgtnzQ8lUOWFMcEcKiOgfI+ea8lVssSmA=;
-  b=AaehM/n+B2n8hEnathO+HSjTdP/rI0tDVuhR4xnNjzlV8PVgNxAEgE2v
-   X7DoCmcJLoLrxNOkPeZ8SlijZ9jZpjgFKnif0mNwbMF+13mKNqZ4I9Guz
-   gIBRRwQPBfNVIviO2eR2g+TCFhkp2AgewhKUze9ud/+RxSA7CfLMcSmte
-   M4jwOm7MDLwjn5c9ZBVnj+f9NPHq7MmYTDe02H2ukaeQ1BZ3hLpUjfFnV
-   xwyHFnMmAN7g1BW68ULvtT8vj0Qk65KOFBypVopjyNGSS9xSR7ZlkhgAD
-   BwLMjSIpW8VUr6WlEdK60u54aP0BHgfeiXJ2ZlgAW10b7kWVhT4w1A8+Z
-   Q==;
-X-CSE-ConnectionGUID: miEbIP2xR9epszjUC4zuvQ==
-X-CSE-MsgGUID: EvGUMusRSJqyfUcSYAHWcg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11841"; a="94970475"
+  bh=DimQniesOwePrAQW8cknWA9ZqhNGU3Pe01x+pNQhS2w=;
+  b=CSmEQYGzIq8IHCPxhqzhl6IutPivQMinfoTw2H9DeN/HdZN6aZVXq0xR
+   ixjP3lognvdl5MyvUCdtT/Sf0CwiOUARqHtNJhVR0DZVb8Sy771mQcSTV
+   sz2Dk02MBhhdEidlLDgrZJEJbI917NKeEv60D9yy0yA7VRipOuT7c1aqS
+   YmBKnMJPWnE9arEUw80LOhx1eZhMEu/AJNQAf1F1ateV2m1EOsIdC800t
+   gsFcxTjrwupvBOHmbDZ4icTjE/ck7ED7+vE107lV5mulK0HkLeRXvq4Km
+   heFWYaisVBeymDVHnymW7HKNe4aplf9uuaXzcG1Mf7CXs3gKpy6UpSE4A
+   A==;
+X-CSE-ConnectionGUID: VICxpeFRSM2UOKjnxTni7w==
+X-CSE-MsgGUID: dthsovrtSoeIqIJpmwWd0w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11841"; a="94970487"
 X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
-   d="scan'208";a="94970475"
+   d="scan'208";a="94970487"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2026 21:11:09 -0700
-X-CSE-ConnectionGUID: odysYgFMRKOoBMNAGYmqaw==
-X-CSE-MsgGUID: P+KZyl3DTPCvt9IndM10Sg==
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2026 21:11:10 -0700
+X-CSE-ConnectionGUID: JYn3O0UXR0KxeqAW3xbqaA==
+X-CSE-MsgGUID: df/vGAT3S42mrFH0iBy5TA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
-   d="scan'208";a="249383514"
+   d="scan'208";a="249383520"
 Received: from vcostago-desk1.jf.intel.com (HELO [10.88.27.144]) ([10.88.27.144])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2026 21:11:08 -0700
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2026 21:11:09 -0700
 From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Date: Mon, 13 Jul 2026 21:10:53 -0700
-Subject: [PATCH 1/4] dmaengine: idxd: assign all engines to group 0 in IAA
- defaults
+Date: Mon, 13 Jul 2026 21:10:55 -0700
+Subject: [PATCH 3/4] crypto: iaa - avoid counting fallback decompression
+ bytes
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -55,7 +55,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260713-iaa-crypto-fixes-zswap-v1-1-65cac23c684d@intel.com>
+Message-Id: <20260713-iaa-crypto-fixes-zswap-v1-3-65cac23c684d@intel.com>
 References: <20260713-iaa-crypto-fixes-zswap-v1-0-65cac23c684d@intel.com>
 In-Reply-To: <20260713-iaa-crypto-fixes-zswap-v1-0-65cac23c684d@intel.com>
 To: Dave Jiang <dave.jiang@intel.com>, Vinod Koul <vkoul@kernel.org>, 
@@ -70,60 +70,74 @@ Cc: dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
  Vinicius Costa Gomes <vinicius.gomes@intel.com>, 
  Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 X-Mailer: b4 0.16-dev-4217c
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1784002267; l=1499;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1784002267; l=1906;
  i=vinicius.gomes@intel.com; s=20230921; h=from:subject:message-id;
- bh=xEF5rE7vTRk6IDCo/9ghupdOtafn6T+gs8mY4/r6VAw=;
- b=N6Mw9Q1NKOEhwmlGvfA96K5AEcH6ElUOu9RTH1fesoeFaQrwVNyXc9ioi1SsD2gRhppk7AHRO
- SCUVYSb0rH3BZZi8A101C/N3/ZNEhrAOooUX5iujkeHsSVTGY8kqBPA
+ bh=Bzzsxw3x1+Awdq1YVut9OLn/yRKJ1WIjPIJmOnYqEXs=;
+ b=jcqR1EHjhR2o3aNkqtGmNPbjADHFM/OXYYkPRUBbe8ylwoaFOvv+3NpmqKMgiTsJ+2RWgFNSp
+ yi3C0wYFidkCEWTrr+IEC+9EyxeqBdCYuyt1hXv9EpwvWYijnmRXq5/
 X-Developer-Key: i=vinicius.gomes@intel.com; a=ed25519;
  pk=aJkrtgqgT6TZ8iIHSG8/rTPsmlYnjMrUjCsMYvCzntk=
 
 From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 
-The IAA device defaults only assigned engine 0 to group 0, leaving
-engines 1 through max_engines-1 unassigned (group_id = -1). This means
-that by default only a single engine processed descriptors, limiting
-throughput to one engine's capacity.
+When decompression falls back to deflate-generic after an analytics
+error, the request no longer completes through IAA.
 
-Assign all available engines to group 0 so that the full hardware
-parallelism is used out of the box without requiring manual
-accel-config setup.
+Move decompression byte accounting into the successful IAA completion
+path in both the synchronous and asynchronous flows so decomp_bytes only
+reflects bytes actually processed by IAA.
 
 Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- drivers/dma/idxd/defaults.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+ drivers/crypto/intel/iaa/iaa_crypto_main.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/dma/idxd/defaults.c b/drivers/dma/idxd/defaults.c
-index 2bbbcd02a0da..26ebfa2ca144 100644
---- a/drivers/dma/idxd/defaults.c
-+++ b/drivers/dma/idxd/defaults.c
-@@ -8,6 +8,7 @@ int idxd_load_iaa_device_defaults(struct idxd_device *idxd)
- 	struct idxd_engine *engine;
- 	struct idxd_group *group;
- 	struct idxd_wq *wq;
-+	int i;
+diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
+index fb154959c2aa..8f68b1478476 100644
+--- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
++++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
+@@ -1084,15 +1084,17 @@ static void iaa_desc_complete(struct idxd_desc *idxd_desc,
+ 		}
+ 	} else {
+ 		ctx->req->dlen = idxd_desc->iax_completion->output_size;
++
++		if (!ctx->compress) {
++			update_total_decomp_bytes_in(ctx->req->slen);
++			update_wq_decomp_bytes(iaa_wq->wq, ctx->req->slen);
++		}
+ 	}
  
- 	if (!test_bit(IDXD_FLAG_CONFIGURABLE, &idxd->flags))
- 		return 0;
-@@ -41,11 +42,12 @@ int idxd_load_iaa_device_defaults(struct idxd_device *idxd)
- 	/* set driver_name to "crypto" */
- 	strscpy_pad(wq->driver_name, "crypto");
+ 	/* Update stats */
+ 	if (ctx->compress) {
+ 		update_total_comp_bytes_out(ctx->req->dlen);
+ 		update_wq_comp_bytes(iaa_wq->wq, ctx->req->dlen);
+-	} else {
+-		update_total_decomp_bytes_in(ctx->req->slen);
+-		update_wq_decomp_bytes(iaa_wq->wq, ctx->req->slen);
+ 	}
  
--	engine = idxd->engines[0];
+ 	if (ctx->compress && compression_ctx->verify_compress) {
+@@ -1475,16 +1477,16 @@ static int iaa_decompress(struct crypto_tfm *tfm, struct acomp_req *req,
+ 		}
+ 	} else {
+ 		req->dlen = idxd_desc->iax_completion->output_size;
++
++		/* Update stats */
++		update_total_decomp_bytes_in(slen);
++		update_wq_decomp_bytes(wq, slen);
+ 	}
+ 
+ 	*dlen = req->dlen;
+ 
+ 	if (!ctx->async_mode)
+ 		idxd_free_desc(wq, idxd_desc);
 -
--	/* set engine group to 0 */
--	engine->group = idxd->groups[0];
--	engine->group->num_engines++;
-+	/* assign all engines to group 0 */
-+	for (i = 0; i < idxd->max_engines; i++) {
-+		engine = idxd->engines[i];
-+		engine->group = group;
-+		group->num_engines++;
-+	}
- 
- 	return 0;
- }
+-	/* Update stats */
+-	update_total_decomp_bytes_in(slen);
+-	update_wq_decomp_bytes(wq, slen);
+ out:
+ 	return ret;
+ err:
 
 -- 
 2.55.0
