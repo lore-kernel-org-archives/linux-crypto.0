@@ -1,86 +1,85 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 620172D7DEF
-	for <linux-crypto@vger.kernel.org>; Tue, 14 Jul 2026 04:29:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4882A28B7DA
+	for <linux-crypto@vger.kernel.org>; Tue, 14 Jul 2026 04:53:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784003347; cv=none; b=fkmcs+t0NqTDy9q9kMl7p+1IGj8uqnr4ArH6Z5/C3xR8kKHwV1bTqfZKNj95NK22kcbxgG7TQD2huyjyM9Ab5r9JZi2pMvJhit3KJ2SSmpPvPUTaO4SohbiiWmj8PTTwLHBG19NZM9Ot5O+TqtyWeVu763YQ7NNSOkRxs7yOVjA=
+	t=1784004820; cv=none; b=OjqBUTE/jN5adt9n9aZVGQqocQ20lnmjbNc7sY1SBsct9zCBdiT393/BHxDIibwFY6EnDpTWZne/ESrb63WcdqZS5GIa2jeQuiB0S42PtfLalN08mCCzR6ALiVmhRIFTJuNId36gHSMYNlAd3JCN9z9/uDoJMtQ3neCfOwSj6gI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784003347; c=relaxed/simple;
-	bh=4QfcCRLcU0kNhBP6p/zkXE5wTlb1ErHRgMVmRNnSlkU=;
+	s=arc-20240116; t=1784004820; c=relaxed/simple;
+	bh=u6YLWUyyIdbLFxF+WFxSXJMexzKAp/sPfV5ZScdgyoA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=k2TjJrbiykQ43/OhJCDZHtL8Ke0nMpaGql1bbUYh2TQcpHpKdQrPiYHgn4jLh+2Ha54KdwYbkn6L8L202XjXlUDkmFMNJ5QyF/bc8JHGM8q9e+a3xC6e14nnTqdRVJkzI4x/3l+C613HgWOG86KsDrVd12lLU+uVrhus7fdYSQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gdi+YAnD; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=eryeoF8p; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=J4iHIYrkpd23Yk9sGMc8zycxZZtxnnr9/nzzXwfdYvHs3OOrmQrG8Q9IyYdVDHx+d5+KiqL+KUbhfRNpWwOHHydu+G/Gp4OhmQNbnY+akz0tOozhHxynazOtEAykRzmDkkQD696h6R1qFpic7TJbqbpb/teE6CNL9/YO+170Qs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Jexu2kqS; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=MDIvEo2W; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gdi+YAnD";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="eryeoF8p"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jexu2kqS";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="MDIvEo2W"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1784003345;
+	s=mimecast20190719; t=1784004817;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=SmIZ4DZ5UHZkChftLBOyBJmLHvpi5F5/b2ljO8TtHaY=;
-	b=gdi+YAnD5CwuhDRukfEjmVm0qOHFaF8v+rt48vO0ix0LNQiuTWSMC7QbmvklzXTfyaQz4e
-	e8hoz3tsIqtFReQNrlqJvKVXtCJomQWHxpHVDqxiQAWRB2roA+tSi/4gOvPH8Hh2KWUGeh
-	ynSqX0wHc35VbQQGfSwxR7e1o6m0FS4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=xaFdyJwBLJkWqD0ZGlWFrq7M4WnI/aHFfQgpUPAtLAE=;
+	b=Jexu2kqSqYULn11GqqMEXkRZaDVNHfGcmebS9ktfLpeZ34Kr7xxbyBJClrYe+UNR1G+yTR
+	gySje+tQZoAiahcDMZT3DvGWfr5SjjMwYDFeC6d6w6zVeSBEWPSyKA7FZ5Y12EsVK95AFF
+	VJ1sWZ37GeNSMx4sXUEpGrhaBh3Djrw=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-255-mx1qPVHDPRax10jMdtdu9Q-1; Tue, 14 Jul 2026 00:29:03 -0400
-X-MC-Unique: mx1qPVHDPRax10jMdtdu9Q-1
-X-Mimecast-MFC-AGG-ID: mx1qPVHDPRax10jMdtdu9Q_1784003342
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-47f2b84db9eso2566448f8f.0
-        for <linux-crypto@vger.kernel.org>; Mon, 13 Jul 2026 21:29:03 -0700 (PDT)
+ us-mta-14-fVmSxgBEP6OWghV3WOILgw-1; Tue, 14 Jul 2026 00:53:35 -0400
+X-MC-Unique: fVmSxgBEP6OWghV3WOILgw-1
+X-Mimecast-MFC-AGG-ID: fVmSxgBEP6OWghV3WOILgw_1784004814
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-493c20d0468so6433925e9.1
+        for <linux-crypto@vger.kernel.org>; Mon, 13 Jul 2026 21:53:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1784003342; x=1784608142; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=SmIZ4DZ5UHZkChftLBOyBJmLHvpi5F5/b2ljO8TtHaY=;
-        b=eryeoF8pGvyfA6mea9ANmWJ7S82GGHLjqkFv9xQjet5y6P6lxXFSzxJe8e/CbSJmqG
-         gNF1qmvecaNqMCaVMV7vN36PfhzeSPvFu5Asl3+jvdoUrU9qIcZbNPcTgY4h3W4VxuaT
-         55bXyaUGPnRv25jVgoUcBN00dFK+1111WL1xIGV/E+ywsAakHCvnhx7qPrbnVNV7n/0r
-         nV0Jb1KnGSCOhq5z4YNHFmd90GIZllpEwQoUcwvOlLC0maJEfibpiwbfshIKdU8B3uOS
-         qeC2L51Ii80pyFSrvKxFtQyi9XjFvb/nN8mMlSQlDCwdMOwgpgUGaQmHr8yfqbrDus56
-         HqaA==
+        d=redhat.com; s=google; t=1784004814; x=1784609614; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=xaFdyJwBLJkWqD0ZGlWFrq7M4WnI/aHFfQgpUPAtLAE=;
+        b=MDIvEo2WrQn8J+FuPE8Nf1ANc+4HDD+9iazkoGJcrit3BV7aw71SNSIx/41vClL5sa
+         kVsRoyjt9FmP1PO1YKk3CzIEU+VesY6vVbqdhJxIML3vqXMyxKBoFm93T8HjsMQVfv8Z
+         jvQH4VSuKLV4iedSlQnFN/bTgm8BRiVpisxZwn76vdNHRTHg73st0YpZBq5TIKSxrGns
+         JFWvVfJZ2YSn1AsPiqNaQccmrgmqS3Ss4MU/uJuswFGRPXcj/DoVxAmUzR+9U5qOnecO
+         Q23jYhq2q1dc0CHLW+T13dhRUMl3VQaDLM02a+6Qfya4v1TlBH7EPIRbqGV2F2rXyP4O
+         tuNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784003342; x=1784608142;
-        h=content-transfer-encoding:content-type:in-reply-to:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=SmIZ4DZ5UHZkChftLBOyBJmLHvpi5F5/b2ljO8TtHaY=;
-        b=PM2Nl/OVC2TYerbQp9H6pUfG89fQbiFG6EwU2BQu7xkVAgAK4dUnFlbQKyM9ahskNZ
-         yzKmXCjf+Sv+Th+YBZquXMRt40C3BbFP1mwT2Ce7txooSD7e+Ayg9ryVimkUWAFGtLiO
-         v4BU/lz71Jl/O/WLDq7oK/WS8Fjk2l4AlKC/0E0e8jQ24SB/sCTl3mBV4byAAwcsyg0e
-         /NBUKmE7go0x9Y9TepUkFXRScgwLSI/Ze+YsUc/PHs2roK8leATE3GlipILN57nU+w1h
-         /Q8F92k5emjKBc7qAQNAnHAAqJBsJ72Gxkdzys6lYoWw25cU/d+zyGMoIoi5MQYwQJcy
-         SpTQ==
-X-Forwarded-Encrypted: i=1; AHgh+Rpra4/jqBivJDxM8KOXbO3Mvxlkzei5WOluMWEKPj2d50fZXA8lkcPcViyyTiST/KwImwepbDpCYtOrvCg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxoPdumHjTdSYZccyJ1dQ50xSuTx1yotewG0CuT8GflMw3koS/H
-	4zVCjV8ghzuM+47B9qqjbPMohPw+jHZhIn2IYqM/N28eCkb+vtLtEv47biIKA6hseRYeHs5GkW9
-	tIrv3z3PU8w63Yp6/7EQg5a/BDx9kOC/KPuwl6z7icExoM7uGQsuKmJSWkxUNJSLr9Q==
-X-Gm-Gg: AfdE7ck7nuncqt8Y6yLlMg2aXt/VWgvrffwnK9MLqVzk3My+5tp7xWKVyA9evPfitaj
-	d3rTP1tOVQ3zloWzjmDBi4632hiLi1T+Uuw1fbbeModZ9Xd+4Z8AjZtAF3AvwDXLEqb71ixdafs
-	OzFCWBW8mgPb1CbQfvwGzijJrIASH0s6oN5kZ4Z+MG7jdQvp7Dk5U5amABpGeSXccrJ7VB/yx8Z
-	php+hNqZ4NT/lmJ+57NieHFH0pDTdpptYcBXFO+krdcRkc+6naaCwkqHr4WMceJffmLtMKhRs7p
-	2WtmyG5ftAowVROfPkklLZ5s1O7LnfhM/x+cRu1tQn6CZXX6x6+o1j6mG3lgdE36PXgRaoy0eOV
-	AlNjASYSP
-X-Received: by 2002:a5d:6e52:0:b0:47f:4602:66e9 with SMTP id ffacd0b85a97d-47f46386a9dmr1707322f8f.40.1784003342338;
-        Mon, 13 Jul 2026 21:29:02 -0700 (PDT)
-X-Received: by 2002:a5d:6e52:0:b0:47f:4602:66e9 with SMTP id ffacd0b85a97d-47f46386a9dmr1707305f8f.40.1784003342045;
-        Mon, 13 Jul 2026 21:29:02 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1784004814; x=1784609614;
+        h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=xaFdyJwBLJkWqD0ZGlWFrq7M4WnI/aHFfQgpUPAtLAE=;
+        b=NEnEQ7vHcaDP+CDt7Ee6KyVEikPOivCy2ZygvVMqt+K5/+uvsM/ftvjPq9No+ZjWFF
+         uQUF2oaM+zhKF4To85LdmCjQUIWcBHSeoJQEvBmay9Gj30ElSweSjGd++0C1cRaLY/6x
+         ttuNyQ3odZP6bsZ1x0Fn4kTJLrc7ApNwPpNcAodh1aTW0K+D7N6K9Pn4zXKY2aXDnyhz
+         F8vmiQ6JzZIPSxbTxZ5Rn/N12GUb6tmXM9fUy2zEvSDtZjXW/1lYwmrJXj9i5gUZLOEU
+         YynIg7sv7ctvU/XCn22zhBPTsAmnLNtcNeu3NHfjmI4Im9BsgzXqy5fEFAib4f2Xg/Ct
+         n//Q==
+X-Gm-Message-State: AOJu0Yx+1YZf9PA0JY/3uyuvitEnz4tGq/ubGysC010nHtS/KON4fVQb
+	QjiLIlHG9C4VcZnYJN+jgR5BVkwMjueNyDu/+Q4SvLHmX1ofYglEqrbkJzpiUJygoX0y1iVS4hd
+	iwMb09Z6Xd0j4LKY3fdDLhF8O/zrxfOjuTd9BerKcX+Xna1v57d7Oza2La6Bqh+BFEg==
+X-Gm-Gg: AfdE7cnAgZIl0ux+YF3pok4bU6BZC3pjqPRADqOWFHpd3BGiUS8jzrWC+wMlmggqQId
+	KDfmVfLGj786w5pmZ22asvQ8L3FXdprsdJJoUbBs+TgU1hz3vigtcJNKw/LzqFE5WItH0njz8mL
+	bFHBRQDqukifijGEQvyBZJBEikd7X/fdYBzOYDKZQsWxqvkTO9x8Ac5TgKFYJJXrh0e9XjuL9LZ
+	sscF7adXbPmdNUCC1whcXq3izDEeajGlA84SNQ7wM3ScP2o7vgyPze83G36tCW26IM17UAxANYc
+	KEEvY75yVHh8asJAGFsY0m+K0WV6JisZffFECeQpIVVDoXeIQIntNu5GGXq1tq2+9/UsM+QxhEU
+	SGfqU0yvO
+X-Received: by 2002:a05:600c:1f87:b0:493:f870:fbf0 with SMTP id 5b1f17b1804b1-493f88b3693mr146191185e9.34.1784004814471;
+        Mon, 13 Jul 2026 21:53:34 -0700 (PDT)
+X-Received: by 2002:a05:600c:1f87:b0:493:f870:fbf0 with SMTP id 5b1f17b1804b1-493f88b3693mr146190875e9.34.1784004814144;
+        Mon, 13 Jul 2026 21:53:34 -0700 (PDT)
 Received: from [192.168.0.9] ([47.64.112.144])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f464a9879sm5451047f8f.22.2026.07.13.21.29.00
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49510c8e220sm36853905e9.15.2026.07.13.21.53.33
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Jul 2026 21:29:00 -0700 (PDT)
-Message-ID: <f1d4197d-55e4-423d-bb18-edebc773075a@redhat.com>
-Date: Tue, 14 Jul 2026 06:28:59 +0200
+        Mon, 13 Jul 2026 21:53:33 -0700 (PDT)
+Message-ID: <34db35e3-7d6e-4ce2-bd3c-cbe74b321bc4@redhat.com>
+Date: Tue, 14 Jul 2026 06:53:32 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -88,15 +87,15 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] padata: Remove serialized job support
-To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
- Herbert Xu <herbert@gondor.apana.org.au>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Steffen Klassert <steffen.klassert@secunet.com>
-References: <20260713223234.24812-1-ebiggers@kernel.org>
- <20260713223234.24812-3-ebiggers@kernel.org>
-From: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH 04/33] lib/crypto: aes: Add CTR and XCTR support
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20260707053503.209874-1-ebiggers@kernel.org>
+ <20260707053503.209874-5-ebiggers@kernel.org>
+ <40932e40-a909-4b95-b739-c4727c1cc153@redhat.com>
+ <20260713235439.GB24654@quark>
 Content-Language: en-US
+From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
  yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
@@ -139,22 +138,107 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20260713223234.24812-3-ebiggers@kernel.org>
+In-Reply-To: <20260713235439.GB24654@quark>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 14/07/2026 00.32, Eric Biggers wrote:
-> Now that pcrypt has been removed, also remove all the code in padata
-> whose only user was pcrypt.
+On 14/07/2026 01.54, Eric Biggers wrote:
+> On Mon, Jul 13, 2026 at 10:39:53AM +0200, Thomas Huth wrote:
+>>> diff --git a/Documentation/crypto/libcrypto-unauth-encryption.rst b/Documentation/crypto/libcrypto-unauth-encryption.rst
+>>> index fb8106034089..6aca01d715da 100644
+>>> --- a/Documentation/crypto/libcrypto-unauth-encryption.rst
+>>> +++ b/Documentation/crypto/libcrypto-unauth-encryption.rst
+>>> @@ -27,6 +27,13 @@ Support for AES in the CBC and CBC-CTS modes of operation.
+>>>    .. kernel-doc:: include/crypto/aes-cbc.h
+>>> +AES-CTR and AES-XCTR
+>>> +--------------------
+>>> +
+>>> +Support for AES in the CTR and XCTR modes of operation.
+>>
+>> I guess you already have this on your radar, but just in case: It would be
+>> nice to turn this into a full sentence, too.
 > 
-> Cc: Steffen Klassert <steffen.klassert@secunet.com>
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
->   Documentation/core-api/padata.rst | 145 +----
->   include/linux/padata.h            | 145 +----
->   kernel/padata.c                   | 902 +-----------------------------
->   3 files changed, 16 insertions(+), 1176 deletions(-)
-Nice clean-up!
+> Yes, I'm making all of them full sentences.
+> 
+>>> +/**
+>>> + * aes_ctr() - AES-CTR en/decryption
+>>> + * @dst: The destination buffer.  Can be in-place or out-of-place.  For other
+>>> + *	 overlaps the behavior is unspecified.
+>>> + * @src: The source data
+>>> + * @len: Number of bytes to en/decrypt
+>>> + * @ctr: The counter.  It will be incremented by ceil(@len / AES_BLOCK_SIZE).
+>>> + * @key: The key
+>>> + *
+>>> + * This implements AES in counter mode with a 128-bit big endian counter.
+>>> + *
+>>> + * This supports incremental en/decryption.  The length of each non-final chunk
+>>> + * must be a multiple of AES_BLOCK_SIZE, and the updated @ctr must be passed in
+>>> + * each time.
+>>
+>> Maybe add some wording that ctr ideally should not be 0 for the first call,
+>> i.e. a "nonce" value?
+> 
+> It depends on the usage.  If a distinct key is used for each message for
+> example, always starting at 0 is perfectly fine.
+> 
+> I'm not sure how far we should go to document the proper use of each
+> algorithm.  Really the AES-CTR support is just for internal use by
+> AES-GCM and AES-CCM, and a few odd users that implement specific other
+> protocols that need AES-CTR.  It's not intended to be a place to go to
+> receive an introduction to CTR mode.
+> 
+>>> +static __always_inline void inc_be128_ctr(u8 ctr[AES_BLOCK_SIZE])
+>>> +{
+>>> +	/* Casts to u8 are needed because of the implicit integer promotion. */
+>>> +	if (((u8)++ctr[AES_BLOCK_SIZE - 1]) != 0)
+>>> +		return;
+>>
+>> Why do you handle the first value separately here? The code could be
+>> simplified to start with "int i = AES_BLOCK_SIZE -1" in the for-loop
+>> instead?
+> 
+> Just a trick to optimize performance by unrolling the first iteration,
+> since 255 times out of 256 the first iteration is enough.
+Ok, but then maybe add a comment here. Otherwise people will wonder why it 
+has been done like this when reading the code later.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+FWIW, I doubt that this really makes a big difference here. Looking at a 
+function that contains your code, the disassembly currently looks like this 
+(with -O2):
+
+0000000000000000 <inc_be128_ctr>:
+    0:   80 47 0f 01             addb   $0x1,0xf(%rdi)
+    4:   48 8d 57 0e             lea    0xe(%rdi),%rdx
+    8:   74 0a                   je     14 <inc_be128_ctr+0x14>
+    a:   c3                      ret
+    b:   0f 1f 44 00 00          nopl   0x0(%rax,%rax,1)
+   10:   48 83 ea 01             sub    $0x1,%rdx
+   14:   80 02 01                addb   $0x1,(%rdx)
+   17:   75 05                   jne    1e <inc_be128_ctr+0x1e>
+   19:   48 39 d7                cmp    %rdx,%rdi
+   1c:   75 f2                   jne    10 <inc_be128_ctr+0x10>
+   1e:   c3                      ret
+
+So that's 3 assembly instructions 'til you reach the "ret".
+
+When you drop the optimization, it looks like this:
+
+0000000000000000 <inc_be128_ctr>:
+    0:   48 8d 57 0f             lea    0xf(%rdi),%rdx
+    4:   eb 0e                   jmp    14 <inc_be128_ctr+0x14>
+    6:   66 2e 0f 1f 84 00 00    cs nopw 0x0(%rax,%rax,1)
+    d:   00 00 00
+   10:   48 83 ea 01             sub    $0x1,%rdx
+   14:   80 02 01                addb   $0x1,(%rdx)
+   17:   75 05                   jne    1e <inc_be128_ctr+0x1e>
+   19:   48 39 d7                cmp    %rdx,%rdi
+   1c:   75 f2                   jne    10 <inc_be128_ctr+0x10>
+   1e:   c3                      ret
+
+That's 4 assembly instructions 'til you reach the "ret". Not such a big 
+difference...?
+
+And with -O3, both variants end up with the same code.
+
+  Thomas
 
