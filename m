@@ -1,92 +1,126 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FB74346ACE;
-	Tue, 14 Jul 2026 03:30:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C30C31C56D;
+	Tue, 14 Jul 2026 04:11:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1783999830; cv=none; b=LYEA9+08Uu5Eo1Jwhk6Mbt5UQHS19NioYBR6Dk83O3OQvJr6xEOZEJjqHfHRfRr3jRSSbWAmnnDJhs2xhgi6Reik/5gyELF3hpfhWzbuWv6a/Pje5YI0RuSxVuKL1TOMA7B7noKOn0cEdS//YsS9Up4HDsaN8CgnyEiU9NwgqKw=
+	t=1784002271; cv=none; b=JCktXjD+QVRuA0KxNflJySFVGNMx/wxcNZ3HSmQ2QNzGi3LmnNfe2HQII9+M1Qhv1SIGoJCQmn24R4HPudkstu8wfo5gzatRNGFD1lYEk9Qy4hxfoLuXO06gnarSeU/aSqe+HmCJDgDmkvc/ZU6XOv724VLwtx6KN0CsR/pqAgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1783999830; c=relaxed/simple;
-	bh=mmfe9gHLB7ePjJaWewz42odhVYbujfsWX2CtiAlM1cw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=X7evGkZMLX6F5ZTLSu2d3Lu88kpm/IGALWC6Y4kYD4ca5N2Dwn4hS5Vc0rNHuv+T3jm11gfaoBL9Ir7PxubrsC+g/VgHtcUqJFeyjN6qlrZs4d0eZvXvUTKIDAk3fm0FV4vCv9VNt53HFJf5dnXr9NB1V3oItYhl7h4kz1qOLEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 56a8479a7f3411f1aa26b74ffac11d73-20260714
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:17f74601-b71b-4c08-b219-f95fcdb5c2e5,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:e7bac3a,CLOUDID:0383adb66ba4ddb5412cc554729f5811,BulkI
-	D:nil,BulkQuantity:0,Recheck:0,SF:102|136|850|865|898,TC:nil,Content:0|15|
-	50,EDM:-3,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0
-	,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 56a8479a7f3411f1aa26b74ffac11d73-20260714
-X-User: lilinmao@kylinos.cn
-Received: from localhost.localdomain [(10.44.16.150)] by mailgw.kylinos.cn
-	(envelope-from <lilinmao@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1138076989; Tue, 14 Jul 2026 11:30:19 +0800
-From: Linmao Li <lilinmao@kylinos.cn>
-To: herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Linmao Li <lilinmao@kylinos.cn>
-Subject: [PATCH] crypto: keembay - Initialize completion before requesting IRQ
-Date: Tue, 14 Jul 2026 11:30:15 +0800
-Message-Id: <20260714033015.367735-1-lilinmao@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1784002271; c=relaxed/simple;
+	bh=EkMrq2fq+kdV/RvjKR48hty+vUzZfNwFC7L29I8jEjE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=j1jPx4cHAwCRYZlEvupY6FkyUOJ5j3Y8mQDOWPYvEFL98Na8+sNOpqKrJEn48p4cXuU+tcKCaq3Ra9v5JkkMkwqNpnQjqs2CQLkXNhyO9reJFMmKgtwmUVZt0bfb0zrMF4if+oe1hyfgmIFTElq45FMJD8QiLtS1b/85fvDaf5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cZKudavU; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cZKudavU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1784002270; x=1815538270;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=EkMrq2fq+kdV/RvjKR48hty+vUzZfNwFC7L29I8jEjE=;
+  b=cZKudavUNa5jVHfiZuCqaC89C4J/GMnZ3wGSC+AdPVkgf7+98gY0l3e1
+   hyeXyxCr+9DK4Qdcm/tSQiB93AcHk0NepmEPyEP1Iu1Cy7vq4cSaYTiMm
+   W2/0cawRvubzdBCEvbyDzBLbEs/6rjhtSPnHqiLdhQAvl2l8cT4GtDVq6
+   PJh+ZvXWlnTmbhVepkkPUQSOQKRcCA8/dZqL0w2py5UFX+CoyCjHVoZHO
+   OhyYkbNeyCnj64CGiVzzk3zgc3JIFGQQ3L4Pn4JS6ZTpaRw6dM5Q08JiA
+   OdYdjmlST0joGeCZfaYtJJ5NRwSGW7cPl2QYNITuQW1sv6I+VPZyajK6k
+   w==;
+X-CSE-ConnectionGUID: IlOg9RR0S7SEoz9x6/JfOQ==
+X-CSE-MsgGUID: iMKno+jgR6OwrF85NeNQvQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11841"; a="94970471"
+X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
+   d="scan'208";a="94970471"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2026 21:11:09 -0700
+X-CSE-ConnectionGUID: 5tmtqeLTRY6+6KzlpEmOwA==
+X-CSE-MsgGUID: fIV8zmubSaOlJ6p/83A+9A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,154,1779174000"; 
+   d="scan'208";a="249383510"
+Received: from vcostago-desk1.jf.intel.com (HELO [10.88.27.144]) ([10.88.27.144])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jul 2026 21:11:08 -0700
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Subject: [PATCH 0/4] crypto: iaa - Fixes for multi entry SG lists
+Date: Mon, 13 Jul 2026 21:10:52 -0700
+Message-Id: <20260713-iaa-crypto-fixes-zswap-v1-0-65cac23c684d@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/yXMywqDQAyF4VeRrA0YRQt9ldJFHDM2XegwsV4qv
+ nvHuvw4/GcHk6hicM92iDKr6TgkUJ6Be/HQC2qXDGVRNsWNKlRmdHEL04heVzH82sIBva9bZqm
+ IOoIUhyj/ObWP52X7tG9x0/kGx/EDXCZXRXoAAAA=
+X-Change-ID: 20260713-iaa-crypto-fixes-zswap-ff5baae311d1
+To: Dave Jiang <dave.jiang@intel.com>, Vinod Koul <vkoul@kernel.org>, 
+ Frank Li <Frank.Li@kernel.org>, 
+ Kristen Accardi <kristen.c.accardi@intel.com>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Andrew Morton <akpm@linux-foundation.org>, Yosry Ahmed <yosry@kernel.org>, 
+ Nhat Pham <nphamcs@gmail.com>
+Cc: dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-crypto@vger.kernel.org, 
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>, 
+ Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+X-Mailer: b4 0.16-dev-4217c
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1784002267; l=1925;
+ i=vinicius.gomes@intel.com; s=20230921; h=from:subject:message-id;
+ bh=EkMrq2fq+kdV/RvjKR48hty+vUzZfNwFC7L29I8jEjE=;
+ b=VXL0glBcu49y0XSDNxfckPJ4DcurDH/Pajc594Rz9rPh4ZE6rMbZC3jJ1XB9ipoE2UE6O8rnM
+ VkFb1KfFnzOBcEiezRttOMVS+HzGX8r9ud84iWfljiNwlh6GUewpjrB
+X-Developer-Key: i=vinicius.gomes@intel.com; a=ed25519;
+ pk=aJkrtgqgT6TZ8iIHSG8/rTPsmlYnjMrUjCsMYvCzntk=
 
-kmb_ocs_aes_probe() requests the device IRQ before initializing
-irq_completion. Once the handler is registered it can run immediately,
-and ocs_aes_irq_handler() unconditionally calls complete(). An
-interrupt in this window would therefore use an uninitialized
-completion.
+Since commit e2c3b6b21c77 ("mm: zswap: use SG list decompression APIs
+from zsmalloc"), iaa_crypto started seeing some failures with
+multi-entry scatter lists.
 
-Initialize the completion before requesting the IRQ, as the sibling
-OCS HCU and ECC drivers already do.
+For that we introduce software fallback, in patch 2/4, to iaa-crypto
+when SG lists have more than one entry, for both input and output.
+Patch 4/4 adds a bounce buffer so small/simple requests can be
+linearized and sent to the hardware. This recovers most of the
+performance.
 
-Fixes: 885743324513 ("crypto: keembay - Add support for Keem Bay OCS AES/SM4")
-Signed-off-by: Linmao Li <lilinmao@kylinos.cn>
+Patch 1/4 updates the default resources reserved to iaa-crypto so more
+engines are associated to the iaa_crypto group, resulting in better
+utilization by default. Patch 3/4 fixes so software requests are not
+double counted. As the idxd changes only affect iaa_crypto, sending
+them here makes more sense.
+
+It should be noted that as the software and hardware implementations
+have different expectations for the window size, something like patch
+[1] or the future 'set_params()' API are needed to verify that patch
+2/4 works without patch 4/4.
+
+[1] https://lore.kernel.org/linux-crypto/20260326100433.57324-1-giovanni.cabiddu@intel.com/
+
+Cheers,
+
+Signed-off-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
 ---
- drivers/crypto/intel/keembay/keembay-ocs-aes-core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Giovanni Cabiddu (4):
+      dmaengine: idxd: assign all engines to group 0 in IAA defaults
+      crypto: iaa - fall back to software for multi-entry scatterlists
+      crypto: iaa - avoid counting fallback decompression bytes
+      crypto: iaa - use bounce buffer for multi-sg decompress input
 
-diff --git a/drivers/crypto/intel/keembay/keembay-ocs-aes-core.c b/drivers/crypto/intel/keembay/keembay-ocs-aes-core.c
-index 8a8f6c81e010..4496f1e64adc 100644
---- a/drivers/crypto/intel/keembay/keembay-ocs-aes-core.c
-+++ b/drivers/crypto/intel/keembay/keembay-ocs-aes-core.c
-@@ -1602,6 +1602,8 @@ static int kmb_ocs_aes_probe(struct platform_device *pdev)
- 	if (IS_ERR(aes_dev->base_reg))
- 		return PTR_ERR(aes_dev->base_reg);
- 
-+	init_completion(&aes_dev->irq_completion);
-+
- 	/* Get and request IRQ */
- 	aes_dev->irq = platform_get_irq(pdev, 0);
- 	if (aes_dev->irq < 0)
-@@ -1619,8 +1621,6 @@ static int kmb_ocs_aes_probe(struct platform_device *pdev)
- 	list_add_tail(&aes_dev->list, &ocs_aes.dev_list);
- 	spin_unlock(&ocs_aes.lock);
- 
--	init_completion(&aes_dev->irq_completion);
--
- 	/* Initialize crypto engine */
- 	aes_dev->engine = crypto_engine_alloc_init(dev, true);
- 	if (!aes_dev->engine) {
--- 
-2.25.1
+ drivers/crypto/intel/iaa/iaa_crypto_main.c  | 236 ++++++++++++++++++++--------
+ drivers/crypto/intel/iaa/iaa_crypto_stats.c |  11 +-
+ drivers/crypto/intel/iaa/iaa_crypto_stats.h |   2 +
+ drivers/dma/idxd/defaults.c                 |  12 +-
+ 4 files changed, 186 insertions(+), 75 deletions(-)
+---
+base-commit: b73b71df4cb4ca241165ad31218c82dfe489147c
+change-id: 20260713-iaa-crypto-fixes-zswap-ff5baae311d1
+
+Best regards,
+--  
+Vinicius
 
