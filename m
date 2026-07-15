@@ -1,135 +1,100 @@
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DA81370ACE
-	for <linux-crypto@vger.kernel.org>; Wed, 15 Jul 2026 01:15:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D43E42BC2D;
+	Wed, 15 Jul 2026 01:38:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784078138; cv=none; b=FE0K51jAUmYg0PHcwOzGu8QmkxQ+TqD0w6kT6DwUqA5JERIiYT919+Ab03qQ5vwg1acw0RnENf8w0GbNZ7Ba5g3o54oH/bCNRpZPW8PEUST2ydn/OOYaFICGagVgI8yoA72r+s/UAQIq6wQ6i8NjECAE8JUllAL5RFq6vf1A+Ok=
+	t=1784079523; cv=none; b=uo2sOnTbTfZnBJRwC4lVkzzYjAppLap63raZjAnO6Dh8PsymBk42vq8BeItmvsuZoStZuc+hbo3SgWx150lmZTF+iu1IdHfGwH8jFoitBEd0rBRpHZejLSbxAagoDKYD9uMHTdCo7VBBcCZqt/mX22p3gbG0sUM+ewSSg5/4muA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784078138; c=relaxed/simple;
-	bh=rsXZicNA6CgICpzQ4UlJMXAShtqDyxeuEyA3g+edfNE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DHFJYX368eCUKDOShklgdaS3m2xfznd2peqkY49PVcjTkXfBDM9nPP4Dytjb303KZ5d5/B/KQHa0i3Q+rcP1dQsgw//0q3bE1+h4I/10E5TpLR6DVbwlkUU45snOopyNTyyuvFhQoKhsYXVeOPVIT8ll3h0WSMSWrIWNuG754+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OLvBOWNl; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1784079523; c=relaxed/simple;
+	bh=H6o9M3cTUc3hhTR6B77yuvL8RpMhrRRa7oC5lhzb64U=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=b4A776x8UF5q7WZ8AoHK/FaUT4nxmhTjGNN56CIjs/hlzQtyOiK+9xxlmK2lJaRt581+lL3W1tb0KfTayzNtiAFo47ROmPzbAk51MYs6WaJ9IbYAGk0qv+XasL5baZH+4GqbFNbSWX5/WbJfT373t3yhPH1Az7cw/ZHxlnKNB2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Oisg3Q+6; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OLvBOWNl"
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-38e041ea211so2249724a91.0
-        for <linux-crypto@vger.kernel.org>; Tue, 14 Jul 2026 18:15:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784078136; x=1784682936; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=jcGjK0t9D92tDFqE5kgmtmyyKNtamGW2f/Lgn1+ZlUM=;
-        b=OLvBOWNl0pYQx9/zPqrD/sX1yUdS114/Nme2gYqwbqzm3SvfAT88tvntNqIF3BCyZF
-         nvJG3SrLn6Y4UcuIxI7ZTGaFjT4jANX1WWVbIPuK6Q6slkl45Z4b3wMQNdKVanH1hiEt
-         82XviDQax+mQiZJHGS9vosKKDp2PHUTXbvwVM/dPsz2KNN1nQsI5pHTsMvnQ9q27awjh
-         7Kbby73NlWpGUgUuRDaNEF9L/s+DWQdsjFt+oe0BwGHWvVFKTl7KSX1egjypXq5AEF/u
-         rNN3o+GRdW9eaVpgdQ2FQWrzt1wLhIAJfAoSYw0vTkuDF0iFHzpca9GSUBJwFDPNRt1c
-         0R0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784078136; x=1784682936;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=jcGjK0t9D92tDFqE5kgmtmyyKNtamGW2f/Lgn1+ZlUM=;
-        b=BkbjkuMrsr/1GQWfYzmcZQb27/F6FxtQ3uSQ+UKg8RX+wc7K0sU+cjCNHWXJJ6vMi/
-         KZs9NS1vahJ4TSWaxvnDHumwI2ekTQthKzGJtgRL7JHvAjqFV8aVgRxZJNYMr2hprS/W
-         9Fco2/+rCJpv6UsO2Dn1Y/ZqO4zjT6l5nQQOjyZeQ7LQRAS0rWgxlo0+8izdUuNmN6uE
-         TFz/VzK2Gc2aK0iRrnwjmnG/HJR51dMYuAJGd6rpwd9TdWEFuamSlXSU+IBKJNKleq/2
-         N70jjmT6SJf4XMtmNR7PztjkmrA7CMraO91hyTTggQ4wASqu9XwIc5bhAMtdtKvHRDQr
-         IoAw==
-X-Gm-Message-State: AOJu0Yxv2+Z3RpgCBrsb0qFImzjylwBG5gBxmDnkS0AJgretbkJx01vV
-	JMrUVEOsHeO2Mahcukgm0QHoEbWTptZOz1zh7qYJ3KmgV6YM9TelIT6nfpousseK
-X-Gm-Gg: AfdE7ckTr+iJzgZtbrtg7+ZrPr0tu/hcrO4EMEMjaVG1uUw82iRJcFe4bAVz7enh96U
-	NCEKRH0E+2+rtHelN5757gHfu1/3pUzNOsqQ/1MbF6z+55wX3sITVRZBaX3dxsSKJUPUY+oKj+E
-	sxaI4b9Rznwfc0Dyt2LHmj9K7tIfJwk5Vgsr11l6teUYkHcy+AnEWmk8UvKb392dF9cQIA7TIGu
-	+lTcFjWWXA9R5Bu8JvXvIqOZ+YNKeIP4btVPP9AAfQqmS9dm8Ew9VLmucwoS5poLUN9Tz3aveg8
-	OP2P/1QElZ9+tgFwKcqeouQFVpLHfZjhonxIWEF3crNbtli4cxm7ptmJJYNhc/yaTnO7tq72DFw
-	Q0n9EMCDz67u4CGiYAocDk2i74nYr3imzvUFZW8C2evmGrBM8Q0qd6RAnmCvH1Ref6JPHleGvAF
-	ze5UhvOxt5BpOaXRUyLOYfP3Hx0lGbHeUfkH3PexPe8biTY8RKcnERtEBIRK3w7FXAV2h4au+iF
-	h58WCqCnkSj1KuxpNWJ50/xUK76oHrQ8/D22csTYb3wpr2FMpFZODTK0J8eySt7HQ==
-X-Received: by 2002:a17:90b:4cc5:b0:38e:2524:7272 with SMTP id 98e67ed59e1d1-38e25247950mr2152483a91.39.1784078136280;
-        Tue, 14 Jul 2026 18:15:36 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8000:7a86::e34])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-31198cb2b99sm58425447eec.26.2026.07.14.18.15.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jul 2026 18:15:35 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: linux-crypto@vger.kernel.org
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	linux-kernel@vger.kernel.org (open list),
-	llvm@lists.linux.dev (open list:CLANG/LLVM BUILD SUPPORT:Keyword:\b(?i:clang|llvm)\b)
-Subject: [PATCH] crypto: hisilicon/sec: use devm_platform_ioremap_resource in sec_map_io
-Date: Tue, 14 Jul 2026 18:15:33 -0700
-Message-ID: <20260715011533.1278258-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Oisg3Q+6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1784079522; x=1815615522;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=H6o9M3cTUc3hhTR6B77yuvL8RpMhrRRa7oC5lhzb64U=;
+  b=Oisg3Q+6xirKkS1P1iUoSxRuoEI2IyRLJjEXWy/6wmYt3QxJG9s1YxEU
+   Ac4vJCFyHmHt98mLioawPK9ow82jgA2rSjzrE6aRfAOTKAdfRl5bfV7ad
+   UoDDz1doe3pAZTMcHtLQSkE0xHBb09sNwJIX2IAiRsOUU22FsDzcBvp2k
+   vtyy+hNwVmCxLBMGAzLJTFyBb3eopMnZ+jWkighCIfAAhnw0NVq2FE8v2
+   PwZCSuqREeQoag+wSadAqvjjRiPI2+p+zfVj9AkmoJCzWvUe7pz1g1VCD
+   24UcU/RXRP71MeTDLYfYuzh3TCsNTyjXskfABSJcloEakmKQXOtzJj9nD
+   A==;
+X-CSE-ConnectionGUID: d1mu8S0JQS2w0mdkv8DU4A==
+X-CSE-MsgGUID: mkV2xtO3So2eujOR440MAQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11847"; a="84799693"
+X-IronPort-AV: E=Sophos;i="6.25,164,1779174000"; 
+   d="scan'208";a="84799693"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2026 18:38:42 -0700
+X-CSE-ConnectionGUID: uY/TCLgMS+m4grNmiAYdrQ==
+X-CSE-MsgGUID: +s1uJOVaQrm5XjjUCn8xmg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,164,1779174000"; 
+   d="scan'208";a="252056728"
+Received: from bradocaj-mobl.ger.corp.intel.com (HELO vcostago-mobl3) ([10.125.108.174])
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2026 18:38:41 -0700
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Dave Jiang <dave.jiang@intel.com>, Vinod Koul <vkoul@kernel.org>, Frank
+ Li <Frank.Li@kernel.org>, Kristen Accardi <kristen.c.accardi@intel.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
+ <davem@davemloft.net>, Andrew Morton <akpm@linux-foundation.org>, Yosry
+ Ahmed <yosry@kernel.org>, Nhat Pham <nphamcs@gmail.com>
+Cc: dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org, Giovanni Cabiddu
+ <giovanni.cabiddu@intel.com>
+Subject: Re: [PATCH 1/4] dmaengine: idxd: assign all engines to group 0 in
+ IAA defaults
+In-Reply-To: <1caa4de2-0aff-4281-8e5a-402b3278cb20@intel.com>
+References: <20260713-iaa-crypto-fixes-zswap-v1-0-65cac23c684d@intel.com>
+ <20260713-iaa-crypto-fixes-zswap-v1-1-65cac23c684d@intel.com>
+ <90c8d0e8-99fc-4fd8-bdfd-f3093ffac256@intel.com>
+ <1caa4de2-0aff-4281-8e5a-402b3278cb20@intel.com>
+Date: Tue, 14 Jul 2026 18:38:40 -0700
+Message-ID: <87y0fdowv3.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Replace the open-coded platform_get_resource() plus devm_ioremap()
-sequence in the SEC_NUM_ADDR_REGIONS loop with
-devm_platform_ioremap_resource(), which fetches the resource, requests
-the region and maps it in one call. Switch the error check to
-IS_ERR()/PTR_ERR() and drop the now-unused struct resource pointer.
+Dave Jiang <dave.jiang@intel.com> writes:
 
-The driver only maps indices 0 and 1 (SEC_COMMON, SEC_SAA). On hip07 the
-corresponding reg regions (0xd0000000, 0xd2000000) are 0x10000 each and
-disjoint, so the region reservation added by devm_ioremap_resource() is
-exclusive and does not introduce overlap failures.
+> On 7/14/26 2:53 PM, Dave Jiang wrote:
+>> 
+>> 
+>> On 7/13/26 9:10 PM, Vinicius Costa Gomes wrote:
+>>> From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+>>>
+>>> The IAA device defaults only assigned engine 0 to group 0, leaving
+>>> engines 1 through max_engines-1 unassigned (group_id = -1). This means
+>>> that by default only a single engine processed descriptors, limiting
+>>> throughput to one engine's capacity.
+>>>
+>>> Assign all available engines to group 0 so that the full hardware
+>>> parallelism is used out of the box without requiring manual
+>>> accel-config setup.
+>>>
+>>> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+>> 
+>
+> Just noticed it's missing Vinicius sign off. 
+>
 
-Built for arm64 (drivers/crypto/hisilicon/sec/sec_drv.o) with LLVM=1.
+Ugh, forgot those, will add for v2. Thank you.
 
-Assisted-by: opencode:hy3-free
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- drivers/crypto/hisilicon/sec/sec_drv.c | 19 +++----------------
- 1 file changed, 3 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/sec/sec_drv.c b/drivers/crypto/hisilicon/sec/sec_drv.c
-index 129cb6faa0b7..2514a5e1f9b4 100644
---- a/drivers/crypto/hisilicon/sec/sec_drv.c
-+++ b/drivers/crypto/hisilicon/sec/sec_drv.c
-@@ -1010,25 +1010,12 @@ static void sec_queue_base_init(struct sec_dev_info *info,
- 
- static int sec_map_io(struct sec_dev_info *info, struct platform_device *pdev)
- {
--	struct resource *res;
- 	int i;
- 
- 	for (i = 0; i < SEC_NUM_ADDR_REGIONS; i++) {
--		res = platform_get_resource(pdev, IORESOURCE_MEM, i);
--
--		if (!res) {
--			dev_err(info->dev, "Memory resource %d not found\n", i);
--			return -EINVAL;
--		}
--
--		info->regs[i] = devm_ioremap(info->dev, res->start,
--					     resource_size(res));
--		if (!info->regs[i]) {
--			dev_err(info->dev,
--				"Memory resource %d could not be remapped\n",
--				i);
--			return -EINVAL;
--		}
-+		info->regs[i] = devm_platform_ioremap_resource(pdev, i);
-+		if (IS_ERR(info->regs[i]))
-+			return PTR_ERR(info->regs[i]);
- 	}
- 
- 	return 0;
+Cheers,
 -- 
-2.55.0
-
+Vinicius
