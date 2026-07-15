@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E69B43CFF6C;
-	Wed, 15 Jul 2026 22:12:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92EDD3D3CF0;
+	Wed, 15 Jul 2026 22:12:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784153564; cv=none; b=sE0Rhzp3jtv8wNzfmqISxAjpsTkyxLzrPmB2XyDeHBkeLBHYhieO9/mLJsiq+TO2DathdNTSxmEvuypRuTaU4bRTMItrkxOMFplbsGX34V/gT4TTH6LpS8NlUADN3mMkTPDNHGhZccIMVJa8WeXSltkPo0k0l3bl8B8vMUWFicY=
+	t=1784153565; cv=none; b=dWePCowd7HOgDDyIIsPOFC+T7zBl7jhQpyw8RNOGYQZuWmgUAdqI5f/EP8VCjOJZI5xcQFKRrwyuZcn5SkUxCeGSscjTLlECT8qXLlJ/r49VaM48wgAhzf1vvU/qu84C2OS3ILGhYjKhhhurVOlC9DlcjtI+q+ASGXVJrWItY4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784153564; c=relaxed/simple;
-	bh=B0fztXzIR2xwOw4aMHpGcVof/C+9ZXCQWotLBdlAd4g=;
+	s=arc-20240116; t=1784153565; c=relaxed/simple;
+	bh=Ca4CrJrkQ2Bnfl9e7FCuhFHjdYOZoOCc5V58ff4gtiw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ldyxnOp5fZK/z81VgNOOxKMUWzajejj/3HpnSXEteE5hh+aCUD5b316pg3QjGfN28uxl//bA/fe02SyxZ11ie6KhIIJEOXj8sXi0aetVwHXREsYtyvNm7W1ijcO+Nze1kveYHf1WfiTd7iXC8JVz756CpG8KRzwj8njeI7q8uYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=olgoeN/9; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=DSFtnAQF7/3KUfiUj0x76ynGLzjpNESO/+KX/INiIE4HH3yO7vbziHpV/BXk2R2xOUIHZxPU9U0vfixap5Ma2s8y+5djxPuVhVqhFIF8coJtxSa+arTEV785jxUvuE6JweOEEASOb1rAjqFRmH+FhFfIhG4x15RUyTWkFrrvWFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GKKOZfgb; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="olgoeN/9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D9A71F00A3E;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GKKOZfgb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F03A11F00A3F;
 	Wed, 15 Jul 2026 22:12:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784153562;
-	bh=oayr9qowYYpJzWDTfZs2bh+aLpd0OH9jYde0Q3W/KBg=;
+	s=k20260515; t=1784153563;
+	bh=nObfJ38BsTk+XbkXUp3ucFttRRIcq2nTdzH7HOOKPCU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=olgoeN/9A5CnE6COO8KTgqa8zMNhGHzThbXIldWdbBeZEGYFA3qc8dZti8z2W2zht
-	 ew2Hg/1BFP1OkD7DlJwAS+3Ru6h2LNsm/ULLX/tjkqnrZQnOOTvUBt3m8ON4Y0Oux4
-	 m6nKN+ecmLrF1LJWYbIXPWd42wvvPGczQiFaT9VJek8/CyQwXr4VcEzTCNF5+JiPWv
-	 pB42SqIy1nNXeBgM5HbWMKo68xhfUSdLkenjybdA2RUYa4qcirAu3GlppuUEd+aniC
-	 JZluR0aF4PVyybPxbpcX7D4jjM6oKhMnRUp13ZyYIOOS02nCk+YbtEvfZkHbxXJZG/
-	 UEtyqD7LDhIYQ==
+	b=GKKOZfgbPbAxqseG7LbdxZXDqLX7OYZ5OtbNdH6vgrCzRzNJcR2nCFA+OQcEINk/s
+	 TqQkp3d5YquBQarL1BnArPx1UDjrEu9Ccp7JTH2Af9J5MrN8jubci7dSi0KT+14SZb
+	 5ywDJiHGGcDeH+o2Tnr6gt6x9F2uOvNJgJbFDLgtPA9PoO5EvP5pWInSUrWT6Fp02z
+	 nNp6meQ1+YyXumc34IuFhcscdRnza41jFD15bZ0XYRpAjwsl/YwptVwYhyVwtn8pKQ
+	 pgaYU4wJRUUGejEyp566Lx/8BFHsFMHN51MFKmfLaJLv/8yCYPOSB0AQZ4ciA+mOXR
+	 aiCqubvi5gdPA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -34,9 +34,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Thomas Huth <thuth@redhat.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v2 04/13] lib/crypto: aes: Add CTR and XCTR support
-Date: Wed, 15 Jul 2026 15:11:44 -0700
-Message-ID: <20260715221153.246410-5-ebiggers@kernel.org>
+Subject: [PATCH v2 05/13] lib/crypto: aes: Add XTS support
+Date: Wed, 15 Jul 2026 15:11:45 -0700
+Message-ID: <20260715221153.246410-6-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260715221153.246410-1-ebiggers@kernel.org>
 References: <20260715221153.246410-1-ebiggers@kernel.org>
@@ -48,268 +48,426 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add support for AES-CTR and AES-XCTR to the crypto library.
+Add support for AES-XTS to the crypto library.
 
-These will be used to provide streamlined implementations of the
-"ctr(aes)" and "xctr(aes)" crypto_skcipher algorithms.  Most users of
-"ctr(aes)" will also be able to switch to the library, which as usual
-will be simpler and faster, e.g.:
+This will be used to provide a streamlined implementation of the
+"xts(aes)" crypto_skcipher algorithm.  I'm also planning to use this
+directly in fscrypt and blk-crypto-fallback.
 
-  - net/mac80211/fils_aead.c
-  - net/mac802154/llsec.c
-
-As usual, the architecture-optimized AES-CTR and AES-XCTR code will be
-migrated into the library as well (using the hooks provided in this
-commit), eliminating lots of repetitive boilerplate code.
-
-This is also a prerequisite for supporting AES-GCM, AES-CCM, and
-AES-HCTR2 in the crypto library.
+As usual, the architecture-optimized AES-XTS code will be migrated into
+the library as well (using the hooks provided in this commit),
+eliminating lots of repetitive boilerplate code.  Compared to direct
+implementation of "xts(aes)", I've also eliminated the requirement for
+architectures to implement ciphertext stealing, as the library just
+handles it portably instead.  That will simplify things considerably.
 
 Initial test coverage is provided by the crypto_skcipher support added
 in a later commit.  I'm planning a KUnit test suite as well.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- .../crypto/libcrypto-unauth-encryption.rst    |  7 ++
- include/crypto/aes-ctr.h                      | 65 +++++++++++++
- lib/crypto/Kconfig                            |  6 ++
- lib/crypto/aes.c                              | 96 +++++++++++++++++++
- lib/crypto/tests/Kconfig                      |  1 +
- 5 files changed, 175 insertions(+)
- create mode 100644 include/crypto/aes-ctr.h
+ .../crypto/libcrypto-unauth-encryption.rst    |   7 +
+ include/crypto/aes-xts.h                      |  94 +++++++
+ lib/crypto/Kconfig                            |   6 +
+ lib/crypto/aes.c                              | 231 ++++++++++++++++++
+ lib/crypto/tests/Kconfig                      |   1 +
+ 5 files changed, 339 insertions(+)
+ create mode 100644 include/crypto/aes-xts.h
 
 diff --git a/Documentation/crypto/libcrypto-unauth-encryption.rst b/Documentation/crypto/libcrypto-unauth-encryption.rst
-index 82bdb0d1b93e..4d3555ee81b7 100644
+index 4d3555ee81b7..b4639b8927c6 100644
 --- a/Documentation/crypto/libcrypto-unauth-encryption.rst
 +++ b/Documentation/crypto/libcrypto-unauth-encryption.rst
-@@ -27,6 +27,13 @@ This API provides support for AES in the CBC and CBC-CTS modes of operation.
+@@ -40,3 +40,10 @@ AES-ECB
+ This API provides support for AES in the ECB mode of operation.
  
- .. kernel-doc:: include/crypto/aes-cbc.h
- 
-+AES-CTR and AES-XCTR
-+--------------------
+ .. kernel-doc:: include/crypto/aes-ecb.h
 +
-+This API provides support for AES in the CTR and XCTR modes of operation.
++AES-XTS
++-------
 +
-+.. kernel-doc:: include/crypto/aes-ctr.h
++This API provides support for AES in the XTS mode of operation.
 +
- AES-ECB
- -------
- 
-diff --git a/include/crypto/aes-ctr.h b/include/crypto/aes-ctr.h
++.. kernel-doc:: include/crypto/aes-xts.h
+diff --git a/include/crypto/aes-xts.h b/include/crypto/aes-xts.h
 new file mode 100644
-index 000000000000..8e214a85716b
+index 000000000000..b9e828265e58
 --- /dev/null
-+++ b/include/crypto/aes-ctr.h
-@@ -0,0 +1,65 @@
++++ b/include/crypto/aes-xts.h
+@@ -0,0 +1,94 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +/*
-+ * AES-CTR and AES-XCTR stream ciphers
++ * AES-XTS unauthenticated encryption and decryption
 + *
 + * Copyright 2026 Google LLC
 + */
-+#ifndef _CRYPTO_AES_CTR_H
-+#define _CRYPTO_AES_CTR_H
++#ifndef _CRYPTO_AES_XTS_H
++#define _CRYPTO_AES_XTS_H
 +
 +#include <crypto/aes.h>
++#include <crypto/xts.h>
 +
 +/**
-+ * aes_ctr() - AES-CTR en/decryption
++ * struct aes_xts_key - A key prepared for AES-XTS encryption and decryption
++ *
++ * Note that (depending on the architecture) this typically is around 768 bytes,
++ * which makes it a bit too large to allocate on the stack in most cases.
++ */
++struct aes_xts_key {
++	/* private: */
++	struct aes_key main_key;
++	struct aes_enckey tweak_key;
++};
++
++/**
++ * aes_xts_preparekey() - Prepare a key for AES-XTS encryption and decryption
++ * @key: (output) The key structure to initialize
++ * @in_key: The raw AES-XTS key
++ * @key_len: Length of the raw key in bytes
++ * @flags: Optional flag XTS_FORBID_WEAK_KEYS to forbid keys whose two halves
++ *	   are the same.
++ *
++ * Users should use memzero_explicit() to zeroize the key struct at the end of
++ * its lifetime.  (But if this function fails, zeroization is unnecessary.)
++ *
++ * Context: Any context.
++ * Return:
++ * * 0 on success
++ * * -EINVAL if the key is rejected because its length isn't 32, 64, or (when
++ *   FIPS mode isn't enabled) 48; or because its two halves are the same and
++ *   either XTS_FORBID_WEAK_KEYS is given or FIPS mode is enabled.
++ */
++int __must_check aes_xts_preparekey(struct aes_xts_key *key, const u8 *in_key,
++				    size_t key_len, int flags);
++
++/**
++ * aes_xts_encrypt() - Encrypt data using AES-XTS
 + * @dst: The destination buffer.  Can be in-place or out-of-place.  For other
 + *	 overlaps the behavior is unspecified.
 + * @src: The source data
-+ * @len: Number of bytes to en/decrypt
-+ * @ctr: The counter.  It will be incremented by ceil(@len / AES_BLOCK_SIZE).
-+ * @key: The key, already prepared using aes_preparekey() or aes_prepareenckey()
++ * @len: Number of bytes to encrypt.  On non-final calls it must be a nonzero
++ *	 multiple of AES_BLOCK_SIZE.  On the final call it can be any value >=
++ *	 AES_BLOCK_SIZE, i.e. ciphertext stealing is supported.
++ * @tweak: The tweak.  It is updated with the next value, unless @len isn't a
++ *	   multiple of AES_BLOCK_SIZE in which case the value is unspecified.
++ * @key: The key, already prepared using aes_xts_preparekey()
++ * @cont: %false to begin encrypting a new message (do the tweak encryption);
++ *	  %true to continue encrypting a message (skip tweak encryption)
 + *
-+ * This implements AES in counter mode with a 128-bit big endian counter.
-+ *
-+ * This exists only for use by the implementation of modes built on top of CTR
-+ * (e.g., GCM and CCM) and some legacy protocols that use CTR mode directly.
-+ * Callers are expected to know how to use CTR mode appropriately, including
-+ * choosing (key, counter) pairs appropriately to avoid keystream reuse.
-+ *
-+ * This supports incremental en/decryption.  The length of each non-final chunk
-+ * must be a multiple of AES_BLOCK_SIZE, and the updated @ctr must be passed in
-+ * each time.
++ * This supports both one-shot and incremental encryption.  On the first call,
++ * pass @cont = %false.  On any later calls, pass @cont = %true and the updated
++ * @tweak; all earlier @len must have been multiples of AES_BLOCK_SIZE.
 + *
 + * Context: Any context.
 + */
-+void aes_ctr(u8 *dst, const u8 *src, size_t len,
-+	     u8 ctr[at_least AES_BLOCK_SIZE], aes_encrypt_arg key);
++void aes_xts_encrypt(u8 *dst, const u8 *src, size_t len,
++		     u8 tweak[at_least AES_BLOCK_SIZE],
++		     const struct aes_xts_key *key, bool cont);
 +
 +/**
-+ * aes_xctr() - AES-XCTR en/decryption
++ * aes_xts_decrypt() - Decrypt data using AES-XTS
 + * @dst: The destination buffer.  Can be in-place or out-of-place.  For other
 + *	 overlaps the behavior is unspecified.
 + * @src: The source data
-+ * @len: Number of bytes to en/decrypt
-+ * @ctr: The block counter (in host endianness).  For the first call, set it to
-+ *	 1.  It will be incremented by ceil(@len / AES_BLOCK_SIZE).
-+ * @iv: The initialization vector
-+ * @key: The key, already prepared using aes_preparekey() or aes_prepareenckey()
++ * @len: Number of bytes to decrypt.  On non-final calls it must be a nonzero
++ *	 multiple of AES_BLOCK_SIZE.  On the final call it can be any value >=
++ *	 AES_BLOCK_SIZE, i.e. ciphertext stealing is supported.
++ * @tweak: The tweak.  It is updated with the next value, unless @len isn't a
++ *	   multiple of AES_BLOCK_SIZE in which case the value is unspecified.
++ * @key: The key, already prepared using aes_xts_preparekey()
++ * @cont: %false to begin decrypting a new message (do the tweak encryption);
++ *	  %true to continue decrypting a message (skip tweak encryption)
 + *
-+ * This implements AES in XOR Counter mode, as specified in the paper
-+ * "Length-preserving encryption with HCTR2"
-+ * (https://eprint.iacr.org/2021/1441.pdf).
-+ *
-+ * This exists only for use by the implementation of modes built on top of XCTR.
-+ * Callers are expected to know how to use XCTR mode appropriately, including
-+ * choosing (key, IV) pairs appropriately to avoid keystream reuse.
-+ *
-+ * This supports incremental en/decryption.  The length of each non-final chunk
-+ * must be a multiple of AES_BLOCK_SIZE, and the updated @ctr must be passed in
-+ * each time.
++ * This supports both one-shot and incremental decryption.  On the first call,
++ * pass @cont = %false.  On any later calls, pass @cont = %true and the updated
++ * @tweak; all earlier @len must have been multiples of AES_BLOCK_SIZE.
 + *
 + * Context: Any context.
 + */
-+void aes_xctr(u8 *dst, const u8 *src, size_t len, u64 *ctr,
-+	      const u8 iv[at_least AES_BLOCK_SIZE], aes_encrypt_arg key);
++void aes_xts_decrypt(u8 *dst, const u8 *src, size_t len,
++		     u8 tweak[at_least AES_BLOCK_SIZE],
++		     const struct aes_xts_key *key, bool cont);
 +
-+#endif /* _CRYPTO_AES_CTR_H */
++#endif /* _CRYPTO_AES_XTS_H */
 diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-index c64cc3e12b57..67a44e82309d 100644
+index 67a44e82309d..6ec47cc328c8 100644
 --- a/lib/crypto/Kconfig
 +++ b/lib/crypto/Kconfig
-@@ -41,6 +41,12 @@ config CRYPTO_LIB_AES_CBC_MACS
- 	  this if your module uses any of the functions from
- 	  <crypto/aes-cbc-macs.h>.
+@@ -53,6 +53,12 @@ config CRYPTO_LIB_AES_ECB
+ 	help
+ 	  The AES-ECB library functions.
  
-+config CRYPTO_LIB_AES_CTR
++config CRYPTO_LIB_AES_XTS
 +	tristate
 +	select CRYPTO_LIB_AES
 +	help
-+	  The AES-CTR and AES-XCTR library functions.
++	  The AES-XTS library functions.
 +
- config CRYPTO_LIB_AES_ECB
+ config CRYPTO_LIB_AESGCM
  	tristate
  	select CRYPTO_LIB_AES
 diff --git a/lib/crypto/aes.c b/lib/crypto/aes.c
-index 6710e8291504..84384582b5bb 100644
+index 84384582b5bb..03c80f4fe176 100644
 --- a/lib/crypto/aes.c
 +++ b/lib/crypto/aes.c
-@@ -6,6 +6,7 @@
- 
- #include <crypto/aes-cbc-macs.h>
+@@ -8,7 +8,9 @@
  #include <crypto/aes-cbc.h>
-+#include <crypto/aes-ctr.h>
+ #include <crypto/aes-ctr.h>
  #include <crypto/aes-ecb.h>
++#include <crypto/aes-xts.h>
  #include <crypto/aes.h>
++#include <crypto/gf128mul.h>
  #include <crypto/utils.h>
-@@ -980,6 +981,101 @@ void aes_cbc_cts_decrypt(u8 *dst, const u8 *src, size_t len,
- EXPORT_SYMBOL_GPL(aes_cbc_cts_decrypt);
- #endif /* CONFIG_CRYPTO_LIB_AES_CBC */
+ #include <linux/cache.h>
+ #include <linux/crypto.h>
+@@ -1076,6 +1078,235 @@ void aes_xctr(u8 *dst, const u8 *src, size_t len, u64 *ctr,
+ EXPORT_SYMBOL_GPL(aes_xctr);
+ #endif /* CONFIG_CRYPTO_LIB_AES_CTR */
  
-+#if IS_ENABLED(CONFIG_CRYPTO_LIB_AES_CTR)
++#if IS_ENABLED(CONFIG_CRYPTO_LIB_AES_XTS)
++int aes_xts_preparekey(struct aes_xts_key *key, const u8 *in_key,
++		       size_t key_len, int flags)
++{
++	int err;
++
++	err = __xts_verify_key(in_key, key_len, flags);
++	if (unlikely(err))
++		goto out_zeroize;
++	/* First half of XTS key is the main key */
++	err = aes_preparekey(&key->main_key, in_key, key_len / 2);
++	if (unlikely(err))
++		goto out_zeroize;
++	/* Second half of XTS key is the tweak key */
++	err = aes_prepareenckey(&key->tweak_key, &in_key[key_len / 2],
++				key_len / 2);
++	if (unlikely(err))
++		goto out_zeroize;
++	return 0;
++
++out_zeroize:
++	memzero_explicit(key, sizeof(*key));
++	return err;
++}
++EXPORT_SYMBOL_GPL(aes_xts_preparekey);
++
 +/*
-+ * Hooks for optimized AES-CTR and AES-XCTR implementations, overridable by the
-+ * architecture.  They are called with any len >= 0.  Returning false causes the
-+ * fallback implementation to be used instead.
++ * Hooks for optimized AES-XTS implementations, overridable by the architecture.
++ * They are called with len > 0 && len % AES_BLOCK_SIZE == 0.  In other words,
++ * they aren't expected to handle ciphertext stealing or empty inputs.
++ * Returning false causes the fallback implementation to be used instead.
++ *
++ * (Currently, all users of AES-XTS in the kernel seem to en/decrypt whole
++ * numbers of blocks anyway, with len >= 512.  So there's no need to heavily
++ * optimize ciphertext stealing for short messages.)
 + */
-+#ifndef aes_ctr_arch
-+static bool aes_ctr_arch(u8 *dst, const u8 *src, size_t len,
-+			 u8 ctr[AES_BLOCK_SIZE], const struct aes_enckey *key)
++#ifndef aes_xts_encrypt_arch
++static bool aes_xts_encrypt_arch(u8 *dst, const u8 *src, size_t len,
++				 u8 tweak[AES_BLOCK_SIZE],
++				 const struct aes_xts_key *key, bool cont)
 +{
 +	return false;
 +}
 +#endif
-+#ifndef aes_xctr_arch
-+static bool aes_xctr_arch(u8 *dst, const u8 *src, size_t len, u64 *ctr,
-+			  const u8 iv[AES_BLOCK_SIZE],
-+			  const struct aes_enckey *key)
++#ifndef aes_xts_decrypt_arch
++static bool aes_xts_decrypt_arch(u8 *dst, const u8 *src, size_t len,
++				 u8 tweak[AES_BLOCK_SIZE],
++				 const struct aes_xts_key *key, bool cont)
 +{
 +	return false;
 +}
 +#endif
 +
-+static __always_inline void inc_be128_ctr(u8 ctr[AES_BLOCK_SIZE])
++static noinline void aes_xts_crypt_nocts_blockbyblock(
++	u8 *dst, const u8 *src, size_t len, u8 tweak[AES_BLOCK_SIZE],
++	const struct aes_xts_key *key, bool cont, bool enc)
 +{
++	le128 t;
++
++	if (cont)
++		memcpy(&t, tweak, sizeof(t));
++	else
++		aes_encrypt(&key->tweak_key, (u8 *)&t, tweak);
++	do {
++		crypto_xor_cpy(dst, src, (const u8 *)&t, AES_BLOCK_SIZE);
++		if (enc)
++			aes_encrypt(&key->main_key, dst, dst);
++		else
++			aes_decrypt(&key->main_key, dst, dst);
++		crypto_xor(dst, (const u8 *)&t, AES_BLOCK_SIZE);
++		gf128mul_x_ble(&t, &t);
++		dst += AES_BLOCK_SIZE;
++		src += AES_BLOCK_SIZE;
++		len -= AES_BLOCK_SIZE;
++	} while (len);
++	memcpy(tweak, &t, sizeof(t));
++	memzero_explicit(&t, sizeof(t));
++}
++
++/* Requires len > 0 && len % AES_BLOCK_SIZE == 0 */
++static __always_inline void aes_xts_encrypt_nocts(u8 *dst, const u8 *src,
++						  size_t len,
++						  u8 tweak[AES_BLOCK_SIZE],
++						  const struct aes_xts_key *key,
++						  bool cont)
++{
++	if (likely(aes_xts_encrypt_arch(dst, src, len, tweak, key, cont)))
++		return;
++
 +	/*
-+	 * 255 times out of 256 the first iteration is enough, so unroll the
-+	 * first iteration as a micro-optimization.
++	 * For the fallback, just go block-by-block.  It could be implemented on
++	 * top of AES-ECB, which could be significantly faster than this if the
++	 * arch has optimized AES-ECB code but not AES-XTS.  However, AES-XTS
++	 * performance is important enough that it needs to be (and has been)
++	 * implemented directly by every non-obsolete arch anyway.
 +	 */
-+	if ((++ctr[AES_BLOCK_SIZE - 1]) != 0)
-+		return;
-+	for (int i = AES_BLOCK_SIZE - 2; i >= 0; i--) {
-+		if (++ctr[i] != 0)
-+			break;
-+	}
++	aes_xts_crypt_nocts_blockbyblock(dst, src, len, tweak, key, cont,
++					 /* enc= */ true);
 +}
 +
-+void aes_ctr(u8 *dst, const u8 *src, size_t len, u8 ctr[AES_BLOCK_SIZE],
-+	     aes_encrypt_arg key)
++/* Requires len > 0 && len % AES_BLOCK_SIZE == 0 */
++static __always_inline void aes_xts_decrypt_nocts(u8 *dst, const u8 *src,
++						  size_t len,
++						  u8 tweak[AES_BLOCK_SIZE],
++						  const struct aes_xts_key *key,
++						  bool cont)
 +{
-+	u8 keystream[AES_BLOCK_SIZE] __aligned(__alignof__(long));
-+
-+	if (likely(aes_ctr_arch(dst, src, len, ctr, key.enc_key)))
++	if (likely(aes_xts_decrypt_arch(dst, src, len, tweak, key, cont)))
 +		return;
 +
-+	/* Handle the full blocks. */
-+	for (; len >= AES_BLOCK_SIZE; len -= AES_BLOCK_SIZE) {
-+		aes_encrypt(key, keystream, ctr);
-+		crypto_xor_cpy(dst, src, keystream, AES_BLOCK_SIZE);
-+		inc_be128_ctr(ctr);
-+		dst += AES_BLOCK_SIZE;
-+		src += AES_BLOCK_SIZE;
-+	}
-+	/* Handle any partial block at the end. */
-+	if (len) {
-+		aes_encrypt(key, keystream, ctr);
-+		crypto_xor_cpy(dst, src, keystream, len);
-+		/* Counter is incremented even with just a partial block. */
-+		inc_be128_ctr(ctr);
-+	}
-+	memzero_explicit(keystream, sizeof(keystream));
++	/* Just go block-by-block.  See comment in aes_xts_encrypt_nocts(). */
++	aes_xts_crypt_nocts_blockbyblock(dst, src, len, tweak, key, cont,
++					 /* enc= */ false);
 +}
-+EXPORT_SYMBOL_GPL(aes_ctr);
 +
-+void aes_xctr(u8 *dst, const u8 *src, size_t len, u64 *ctr,
-+	      const u8 iv[AES_BLOCK_SIZE], aes_encrypt_arg key)
++static noinline void aes_xts_encrypt_cts(u8 *dst, const u8 *src, size_t len,
++					 u8 tweak[AES_BLOCK_SIZE],
++					 const struct aes_xts_key *key,
++					 bool cont)
 +{
-+	const __le64 iv0 = get_unaligned((const __le64 *)&iv[0]);
-+	__le64 aes_input[2];
-+	u8 keystream[AES_BLOCK_SIZE] __aligned(__alignof__(long));
++	size_t partial_len = len % AES_BLOCK_SIZE; /* Length of partial block */
++	size_t nocts_len = round_down(len, AES_BLOCK_SIZE);
++	u8 tmp_block[AES_BLOCK_SIZE] __aligned(__alignof__(long));
 +
-+	if (likely(aes_xctr_arch(dst, src, len, ctr, iv, key.enc_key)))
++	/* Encrypt all full blocks. */
++	aes_xts_encrypt_nocts(dst, src, nocts_len, tweak, key, cont);
++	dst += nocts_len - AES_BLOCK_SIZE;
++	src += nocts_len - AES_BLOCK_SIZE;
++
++	/*
++	 * Swap the partial block with the first 'partial_len' bytes of the
++	 * encrypted last full block.  Note that a temporary buffer is needed to
++	 * support in-place encryption.
++	 */
++	memcpy(tmp_block, src + AES_BLOCK_SIZE, partial_len);
++	memcpy(dst + AES_BLOCK_SIZE, dst, partial_len);
++	memcpy(dst, tmp_block, partial_len);
++
++	/* Encrypt the last full block again. */
++	crypto_xor(dst, tweak, AES_BLOCK_SIZE);
++	aes_encrypt(&key->main_key, dst, dst);
++	crypto_xor(dst, tweak, AES_BLOCK_SIZE);
++	memzero_explicit(tmp_block, sizeof(tmp_block));
++}
++
++static noinline void aes_xts_decrypt_cts(u8 *dst, const u8 *src, size_t len,
++					 u8 tweak[AES_BLOCK_SIZE],
++					 const struct aes_xts_key *key,
++					 bool cont)
++{
++	size_t partial_len = len % AES_BLOCK_SIZE; /* Length of partial block */
++	size_t nocts_len = round_down(len, AES_BLOCK_SIZE) - AES_BLOCK_SIZE;
++	union {
++		u8 block[AES_BLOCK_SIZE];
++		le128 tweak;
++	} tmp __aligned(__alignof__(long));
++
++	/*
++	 * Decrypt all blocks except the last full block and the partial block.
++	 * The last full block has to be handled specially because decryption
++	 * ciphertext stealing uses the last two tweaks in reverse order.
++	 *
++	 * nocts_len == 0 is possible here, which aes_xts_decrypt_nocts()
++	 * doesn't handle (so that the length doesn't get checked redundantly in
++	 * the fast path).  So handle that case specially as well.
++	 */
++	if (nocts_len)
++		aes_xts_decrypt_nocts(dst, src, nocts_len, tweak, key, cont);
++	else if (!cont)
++		aes_encrypt(&key->tweak_key, tweak, tweak);
++	dst += nocts_len;
++	src += nocts_len;
++
++	/* Copy the tweak, advance it again, then decrypt last full block. */
++	memcpy(&tmp.tweak, tweak, AES_BLOCK_SIZE);
++	gf128mul_x_ble(&tmp.tweak, &tmp.tweak);
++	crypto_xor_cpy(dst, src, tmp.block, AES_BLOCK_SIZE);
++	aes_decrypt(&key->main_key, dst, dst);
++	crypto_xor(dst, tmp.block, AES_BLOCK_SIZE);
++
++	/*
++	 * Swap the partial block with the first 'partial_len' bytes of the
++	 * decrypted last full block.  Note that a temporary buffer is needed to
++	 * support in-place decryption.
++	 */
++	memcpy(tmp.block, src + AES_BLOCK_SIZE, partial_len);
++	memcpy(dst + AES_BLOCK_SIZE, dst, partial_len);
++	memcpy(dst, tmp.block, partial_len);
++
++	/* Decrypt the last full block again. */
++	crypto_xor(dst, tweak, AES_BLOCK_SIZE);
++	aes_decrypt(&key->main_key, dst, dst);
++	crypto_xor(dst, tweak, AES_BLOCK_SIZE);
++	memzero_explicit(&tmp, sizeof(tmp));
++}
++
++void aes_xts_encrypt(u8 *dst, const u8 *src, size_t len,
++		     u8 tweak[AES_BLOCK_SIZE], const struct aes_xts_key *key,
++		     bool cont)
++{
++	if (WARN_ON_ONCE(len < AES_BLOCK_SIZE))
 +		return;
 +
-+	aes_input[1] = get_unaligned((const __le64 *)&iv[8]);
-+	/* Handle the full blocks. */
-+	for (; len >= AES_BLOCK_SIZE; len -= AES_BLOCK_SIZE) {
-+		aes_input[0] = iv0 ^ cpu_to_le64((*ctr)++);
-+		aes_encrypt(key, keystream, (const u8 *)aes_input);
-+		crypto_xor_cpy(dst, src, keystream, AES_BLOCK_SIZE);
-+		dst += AES_BLOCK_SIZE;
-+		src += AES_BLOCK_SIZE;
++	if (unlikely(len % AES_BLOCK_SIZE)) {
++		aes_xts_encrypt_cts(dst, src, len, tweak, key, cont);
++		return;
 +	}
-+	/* Handle any partial block at the end. */
-+	if (len) {
-+		/* Counter is incremented even with just a partial block. */
-+		aes_input[0] = iv0 ^ cpu_to_le64((*ctr)++);
-+		aes_encrypt(key, keystream, (const u8 *)aes_input);
-+		crypto_xor_cpy(dst, src, keystream, len);
-+	}
-+	memzero_explicit(keystream, sizeof(keystream));
-+	memzero_explicit(aes_input, sizeof(aes_input));
++
++	aes_xts_encrypt_nocts(dst, src, len, tweak, key, cont);
 +}
-+EXPORT_SYMBOL_GPL(aes_xctr);
-+#endif /* CONFIG_CRYPTO_LIB_AES_CTR */
++EXPORT_SYMBOL_GPL(aes_xts_encrypt);
++
++void aes_xts_decrypt(u8 *dst, const u8 *src, size_t len,
++		     u8 tweak[AES_BLOCK_SIZE], const struct aes_xts_key *key,
++		     bool cont)
++{
++	if (WARN_ON_ONCE(len < AES_BLOCK_SIZE))
++		return;
++
++	if (unlikely(len % AES_BLOCK_SIZE)) {
++		aes_xts_decrypt_cts(dst, src, len, tweak, key, cont);
++		return;
++	}
++
++	aes_xts_decrypt_nocts(dst, src, len, tweak, key, cont);
++}
++EXPORT_SYMBOL_GPL(aes_xts_decrypt);
++#endif /* CONFIG_CRYPTO_LIB_AES_XTS */
 +
  static int __init aes_mod_init(void)
  {
  #ifdef aes_mod_init_arch
 diff --git a/lib/crypto/tests/Kconfig b/lib/crypto/tests/Kconfig
-index e78086f3c954..9284d0134d77 100644
+index 9284d0134d77..b559e7c79e76 100644
 --- a/lib/crypto/tests/Kconfig
 +++ b/lib/crypto/tests/Kconfig
-@@ -146,6 +146,7 @@ config CRYPTO_LIB_ENABLE_ALL_FOR_KUNIT
- 	depends on KUNIT
- 	select CRYPTO_LIB_AES_CBC
+@@ -148,6 +148,7 @@ config CRYPTO_LIB_ENABLE_ALL_FOR_KUNIT
  	select CRYPTO_LIB_AES_CBC_MACS
-+	select CRYPTO_LIB_AES_CTR
+ 	select CRYPTO_LIB_AES_CTR
  	select CRYPTO_LIB_AES_ECB
++	select CRYPTO_LIB_AES_XTS
  	select CRYPTO_LIB_BLAKE2B
  	select CRYPTO_LIB_CHACHA20POLY1305
+ 	select CRYPTO_LIB_CURVE25519
 -- 
 2.55.0
 
