@@ -1,69 +1,64 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F6F928640B;
-	Fri, 17 Jul 2026 02:20:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEED217BED0;
+	Fri, 17 Jul 2026 02:46:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784254819; cv=none; b=mjFtYLrKd5rd97r98d4lLgwV/WLBIx7KemOXLpgyIw5E63PU0gTxZgKsUUkuN31DBxHHCURNkPE67XAfsZ+IbrjINLg0mZ4J5nX8NL2QK3XVaXNP2Z6PWt3VtfVmfkkmpLIh0B+TNn2wx4x7cg3JE4xqhSBgXK3u+j9NCJHBT3k=
+	t=1784256371; cv=none; b=TUEzXkluGfhQxLxgNnMHfkWq6ginQWpm7rwRMuqag1hCRXS31jrR9uYKuDouY++TI0Rlc/MZv2acCWiKAqfkTzXGpaZ+yImwthTsmZZ+TZ03OV+TlFIxPteNUxbdFBYDKkKkN/w3E1J/qCh2eCV0mNY1JKz0MlegBgHi7w/SgOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784254819; c=relaxed/simple;
-	bh=hrEn/OZi/9jwMhLu80r6hicvtIuedUbqlnCPMAlbb6Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pt+QnqfQ1PWwKLwOw3tqXgfX43ydX2W7wQZxn1Jy5pLt9v7Pmd+HN0tSvDalKf4Bk4DNRwfIiBwyKw9K8zSfltctWVEXxhaIn89QcqCshWr2VltzPlKUiIDvpRjwgtKqbfC4DE6gJOpEu99shPaXIaFSVb1fKACcrRGa4DfRokQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vlu9igKl; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784256371; c=relaxed/simple;
+	bh=Uc6tPL40TXXmZZR9CjCKOs7PopY39nssFNhHzdNdDAE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IWRGYok8TX+uGykwr1RMyQHTyNk0wXAHUIvLudtZ+D6Lj0TrkaxpzU9UNMZIOVNrz4yYBwyQ+3VN5pk1hDx1gfxSH+AMYPlrcfQZ4+69oAK/QyqR0K3ZO1XC5gY0YLxVSmxuAkd4L+a+vbnp7oq0ZVcqZQnlkApAxk2/97LlfKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UrSnIZoC; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vlu9igKl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D03CF1F000E9;
-	Fri, 17 Jul 2026 02:20:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UrSnIZoC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72AAA1F000E9;
+	Fri, 17 Jul 2026 02:46:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784254818;
-	bh=ULKhLFxHQvXb/t97SQ4ARnMCFQ4+Jwi3pjyCy1GBllI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Vlu9igKlZKletzZhjdPK/w7AzD1SbtzCwAXIhwv7ePMWG+ehpCSvTyY2jxCs6pAfJ
-	 56X9ng1rXWfFnfQfJx4WtJGLHwqu9ucB+zziGtGw5zwtvGHn0iGgcq2B42/0vnR1Xw
-	 VlfAYJoE5jJUcRuxFLH9F5OxLGg/6VQmPnWnvXdf7KhwWBdJRKZb/q+krGnozi2vm/
-	 uHy7FPbaDPSjPb5Xl0FCaJ6YJqg/ANmliD3DbpMDBpPv1nS/mIvKizMBD7j7htlVmR
-	 XEl34u/i0WON8K+XrRt4HigCv2pBERKXxVkPsfx4pVTesA/Fbijh4YCPJAbKZ0BuJ5
-	 fqSBZTi+/QJEA==
-Date: Thu, 16 Jul 2026 19:18:31 -0700
+	s=k20260515; t=1784256370;
+	bh=fOvHHw3n97SUlAqvXqIhB1vz79abbW269vIWOc4MQ2Y=;
+	h=From:To:Cc:Subject:Date;
+	b=UrSnIZoCdaAF6xnGHla530707ZVTmPR2bTcLfVC8Kso1+D6Fasj54im3ZZEQeu7c+
+	 oIwNCk7wKFwpV8dcLzc9ZosetPPTahlGfin2kwEuxcKwP27kfjzIRGgw+IZKz+gWPn
+	 pVdz7JWoa5+KBBJwJIw/kzje3T+miGABOD9xOWIEIRcBKk2G+bpzA0QQ5EPuVipqHH
+	 krZWjIafAndo3QTKHm4cJSmDU25TkvQZyg/GEltXfqGh8B2n/r3DkRmbWJFi8xufCS
+	 QLQ1yAkbHJOx6GwuwWzqE9nvVtX2hoDSV5N/Ue5lICX4GRrvu+JvgdPYkBUrEJB+Id
+	 P0TEGHAps1u1g==
 From: Eric Biggers <ebiggers@kernel.org>
-To: gregkh@linuxfoundation.org
-Cc: herbert@gondor.apana.org.au, stable@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: FAILED: patch "[PATCH] crypto: xilinx-trng - Remove crypto_rng
- interface" failed to apply to 7.1-stable tree
-Message-ID: <20260717021831.GA1847@sol>
-References: <2026071501-handstand-curtain-592d@gregkh>
+To: stable@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH 6.12,6.6,6.1,5.15 0/2] crypto4xx stable backports
+Date: Thu, 16 Jul 2026 19:44:01 -0700
+Message-ID: <20260717024403.87052-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2026071501-handstand-curtain-592d@gregkh>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jul 15, 2026 at 12:16:01PM +0200, gregkh@linuxfoundation.org wrote:
-> 
-> The patch below does not apply to the 7.1-stable tree.
-> If someone wants it applied there, or to any other stable or longterm
-> tree, then please email the backport, including the original git commit
-> id to <stable@vger.kernel.org>.
-> 
-> To reproduce the conflict and resubmit, you may use the following commands:
-> 
-> git fetch https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/ linux-7.1.y
-> git checkout FETCH_HEAD
-> git cherry-pick -x 32b4d29280ed2a991dc196d5845b892acedc63b8
-> # <resolve conflicts, build, test, etc.>
-> git commit -s
-> git send-email --to '<stable@vger.kernel.org>' --in-reply-to '2026071501-handstand-curtain-592d@gregkh' --subject-prefix 'PATCH 7.1.y' 'HEAD^..'
-> 
-> Possible dependencies:
+This series backports "crypto: crypto4xx - Remove ahash-related code" in
+order to make "crypto: crypto4xx - Remove insecure and unused rng_alg"
+cherry-pick more cleanly.  Then it backports that commit too.
 
-It actually cherry-picks cleanly.   And you also failed to Cc the
-subsystem mailing list.
+Eric Biggers (1):
+  crypto: crypto4xx - Remove insecure and unused rng_alg
 
-- Eric
+Herbert Xu (1):
+  crypto: crypto4xx - Remove ahash-related code
+
+ drivers/crypto/amcc/crypto4xx_alg.c     | 106 -------------------
+ drivers/crypto/amcc/crypto4xx_core.c    | 130 +-----------------------
+ drivers/crypto/amcc/crypto4xx_core.h    |  11 --
+ drivers/crypto/amcc/crypto4xx_reg_def.h |  11 --
+ 4 files changed, 1 insertion(+), 257 deletions(-)
+
+
+base-commit: 296aabce459470a4c1b68ffd0c0c0920e563aaad
+-- 
+2.55.0
+
