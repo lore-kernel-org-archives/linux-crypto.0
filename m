@@ -1,51 +1,51 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A432F2EEE94;
-	Fri, 17 Jul 2026 07:45:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CECD538D3F2;
+	Fri, 17 Jul 2026 07:52:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784274338; cv=none; b=sExJ+Svv7HJvMH2w97M2vYI+CLCgHKEYC9YLhDBNQ9uS36ivYkNmSv3FigFdPMXMLW31y+Ljyfg8tyTs4sgWpGENVBo2pF0UzYAtmj4x5RRW6jE5b1xVghea8wRBc/qQd4csJyaPkSQMiVL7r4HQZzu3OWPUPIYYRh0HdaXBHQA=
+	t=1784274740; cv=none; b=PBdoNqIv9U2y7BZ+7YLyvLyXtZlSmsg3OvSLT5lvpWa9H8JKK2lqGizf3ygkchQmugFuyUxEfr1dhuv3FnOd7ieqfm5TWhyZeuy3buP76mBJjuVCmyzacLCTKXaBS+Q7FOxYonH58yuuAuS8h7kl79+F1yvdI3p3/17t6TXnQUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784274338; c=relaxed/simple;
-	bh=wMwMzb/E8bpvHWyoLwAsjrOKGxAhEc4/y2WQhOKEALg=;
+	s=arc-20240116; t=1784274740; c=relaxed/simple;
+	bh=MAiMSBSwUisF6BFlXbffP1Yu3wHgZSv/LTUj/qukT0o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J8oEy1I+Iu5uUFc01mu3v8xenxaDR3+607LVzJ6PYCaGvs5l2OV2gW5NfDpJawVVkCt0454SUYbMqNRFyAsTPbcrtM/p8CdcpPbYBOXrUz+Bpyn9yqax4nPl6zzF9W2j5E+y6/+Vu3Y5x36h0CEirAmbhhQ4i6hMQbRkYNOfwZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=qFS3WRgf; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=maozZalNAe/B7TNY/2XIJK0DtZ3ucR0ngrEYFyt55nuK8tnFs4uQaQ7JcFDbibFQtIiFkfyZVhy+2JNwJKnH8HQS0diOG8VAVOYm+pf7jETCCWdFNf7t02IdeKXWiynsbTJR2vlJhsQEBJkbisUoW3OM3NzCfw2JA3UszbNSK6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=lhZCOLLO; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="qFS3WRgf"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="lhZCOLLO"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=zXLlo12uGh+Q43CGcDppKId8OmLaUv2wT03uxv6KRcI=; 
-	b=qFS3WRgfQ75IjLIkKY4mwsrNIAcKUG005CDrQV5D8CtWn20F0oxQclbKQL7qPnaIFqgGj0kjuzb
-	laqsxGyC3B1OpP9Quvmd1W8AvICQhFYXFs9B+y/QLhF1zhd1fACFIXxn0ouintf6ijeJ1zcobNTw7
-	t5Mt1dERYEwqxgE0o7IryPo51qq4PfltkHtI/VIB7jemyre23nUh8H2Gnn8F8kAY8BBpRRigLfAeY
-	8ZKd5Uy52zA73uR18gXytRgHT1IHcVLljHqYlxXB1w3WvOI94nYooGOCw6FpcYbUrvnNRF054sfJc
-	8cDh3sIQ3ZPhL9mXdoeP9mTnJg6kzgbHMktw==;
+	from:content-type:reply-to; bh=5U7c8tWt6k422BbmITKu4Ii4R9579krAxUNVe8Ab9To=; 
+	b=lhZCOLLOWnQy81cB7sTTPRI5qVgEImq3bYEOll8zO0ey9a2sEO8FmJiu7xGSLxSGljH1wism/QN
+	WiBnxYlpNtz7YhBKq5vmh1pwiSFJLjXOLc4msDcg9FwQ3E3JieTdEbcIPLXNqXRkVMJVP6VQWixWr
+	VvH5BnXDbdpZNKMYMgguHzisexLonSvhFqxsvoPVLFdHSzZ+MVsUSCvkswu96YVE6WpuumiCMDXM7
+	WrS46aRofVtZr2kaYbD64ngzKcje8cLeQibiquC6IGFxqvx+k+t8BKREBEUA2rGt2hoFbfldTD06S
+	P8ks328SyUORXME3uHDhYiRnDXugSVULauxw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wkdG0-0000000ENR6-0V3T;
-	Fri, 17 Jul 2026 15:45:17 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Jul 2026 17:45:16 +1000
-Date: Fri, 17 Jul 2026 17:45:16 +1000
+	id 1wkdMh-0000000ENXr-2JaP;
+	Fri, 17 Jul 2026 15:52:12 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 17 Jul 2026 17:52:11 +1000
+Date: Fri, 17 Jul 2026 17:52:11 +1000
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Cc: Thara Gopinath <thara.gopinath@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Stanimir Varbanov <svarbanov@mm-sol.com>,
-	Eneas U de Queiroz <cotequeiroz@gmail.com>,
-	Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
-	Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	brgl@kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v5 1/7] crypto: qce - Fix HMAC self-test failures for
- empty messages
-Message-ID: <alndjORIwYXPxU-C@gondor.apana.org.au>
-References: <20260706-qce-fix-self-tests-v5-0-86f461ff1829@oss.qualcomm.com>
- <20260706-qce-fix-self-tests-v5-1-86f461ff1829@oss.qualcomm.com>
+To: Jihong Min <hurryman2212@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Antoine Tenart <atenart@kernel.org>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Richard van Schagen <vschagen@icloud.com>,
+	Benjamin Larsson <benjamin.larsson@genexis.eu>,
+	Mieczyslaw Nalewaj <namiltd@yahoo.com>,
+	Aleksander Jan Bajkowski <olek2@wp.pl>
+Subject: Re: [PATCH v2 1/5] crypto: eip93: guard DMA cleanup on uninitialized
+ mappings
+Message-ID: <alnfK4PRK4rkDfoZ@gondor.apana.org.au>
+References: <20260707171537.467608-1-hurryman2212@gmail.com>
+ <20260707171537.467608-2-hurryman2212@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -54,31 +54,26 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260706-qce-fix-self-tests-v5-1-86f461ff1829@oss.qualcomm.com>
+In-Reply-To: <20260707171537.467608-2-hurryman2212@gmail.com>
 
-On Mon, Jul 06, 2026 at 03:53:52PM +0200, Bartosz Golaszewski wrote:
+On Wed, Jul 08, 2026 at 02:15:33AM +0900, Jihong Min wrote:
 >
-> @@ -280,6 +299,8 @@ static int qce_ahash_final(struct ahash_request *req)
->  		if (tmpl->hash_zero)
->  			memcpy(req->result, tmpl->hash_zero,
->  					tmpl->alg.ahash.halg.digestsize);
-> +		else if (IS_SHA_HMAC(rctx->flags))
-> +			return qce_ahash_hmac_zero(req);
->  		return 0;
->  	}
+> @@ -534,8 +536,10 @@ int eip93_send_req(struct crypto_async_request *async,
+>  	memcpy(iv, reqiv, rctx->ivsize);
+>  
+>  	rctx->sa_state = kzalloc(sizeof(*rctx->sa_state), GFP_KERNEL);
+> -	if (!rctx->sa_state)
+> -		return -ENOMEM;
+> +	if (!rctx->sa_state) {
+> +		err = -ENOMEM;
+> +		goto free_sa_state;
+> +	}
 
-This is still broken because the user can import a non-zero partial
-hash state with no buffer held for your hardware.  So you need to make
-the driver able to handle the case of finalization with no extra
-data.
+What kind of non-sense is this?
 
-The easiest is to re-import the partial hash state into the fallback
-and finalize that instead.
+Please stop wasting my time.
 
-IOW change this so that it handles all zero-length finalizations and
-not just the empty hash case.
-
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
