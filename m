@@ -1,39 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6589C2BE035;
-	Fri, 17 Jul 2026 03:45:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4643131AAA3;
+	Fri, 17 Jul 2026 03:53:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784259935; cv=none; b=rthU6eM1nP1ZAcb4PbARTKITOT+DI+0bGdcLey8W9zVSBM/0Un2ffEuMfPwnDqG7rB24JAyFvh/eMb1Voab700zpbUmDlQbIp8GXmcBPQs02JOEftBfn/YEXo8/IFhATm4Ie0l2tvgF5B66OO3EQuznYXqlLRVKyzYmqAoVshYU=
+	t=1784260408; cv=none; b=TFBMEg7SfcyZHWmjEzTBdJkOqmyzDkwmcH707KDmxLzprBXDWg89YpBuUiwAaRoQfwPH/38xGK9EKTrdWoswbazGd2gq+p0UP0+9XUxuhPujLAuLmlNpzdrrHAHA5N4bXgXdDIP1lBuOuhQ/15a4lclwZSa3JLbUW/Pd5iCTSLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784259935; c=relaxed/simple;
-	bh=92YsZLkZ77ICCaJORj8gIWeWOZfiRVSVxtlCQhTcqaw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h8JNRacCH3tVBAVgKt0NVDJvnA/DRmilBj1Dagjcc5IAKa1t3N/e5WuTQ7kaKzgIE1/Vtp7/ztSqJXxtRrmwbL4CB3jZv8QjGuH5eF2XQIGsSeCM6tljeX/dlB72wAE+uYBTSMprJhCZAXLDrAx004y5v0WQ0dgOscUB2cPRgec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hfyxwy+c; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784260408; c=relaxed/simple;
+	bh=kg8wTpyKJcycHALKQ28TnoUsjxMZPc5InWegFCNQNHA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rczr218ayy3gLawOf7lOnLdArnfKrdOjyRh1n85b8i3zBrEuTkod+DNO8sLVPo9GpmiOj2thMIO64TUDZBEoWeDzHLkvrE6RnwKawIa5l83VSmzz9ih2Z9fYTLPe5utxh1f2awqiU2yycUZmDlUNCzd/UIyyaXiixD40Awb9BDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a4TBJqu9; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hfyxwy+c"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12C3F1F000E9;
-	Fri, 17 Jul 2026 03:45:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a4TBJqu9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B39521F000E9;
+	Fri, 17 Jul 2026 03:53:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784259934;
-	bh=nBI3yy7Uw2/e1RHxfnV8BfWVGQ3P1P23PPCMjQ+4t0A=;
+	s=k20260515; t=1784260406;
+	bh=xeMBgFFZuSuHc7d5PQhWpxIImykXqEb+Xvzouxvl2k8=;
 	h=From:To:Cc:Subject:Date;
-	b=Hfyxwy+cAE2s6fbFMagG5OS+h7x87rCoRrkXs1kF36LWhh5hQ/1z3xfC+H33XDqpS
-	 ojb3YqaT609j7Z05DmmQTj54x6NR7bZAm4Z9K6/HaKMLrjHyR1vjPo/HcHqmtB2Lxt
-	 VzAdRxTlmpqWhqb+bqm1pJ2PLMIy/13XdcTM2BNYRyQ11uULRjlfGfYt6t5AxFeJZr
-	 lJ5MmaJXPTkzfv0jr1zpBdJuxyRXVKVeiQpXfqMc9dCxzBvMPMS73ghC8FdLUh/5no
-	 Sj02IqLN6cUFDoGVVADS+H7hHf5w+4uVhrpoaYjAPN5Xd/C85OGh96ZZctPkJ/TAhk
-	 cA82RHUZWvGpQ==
+	b=a4TBJqu9yuJUEHnlglb/VYl8j2SqK/g+3PZRWaKvZPg8TZmqxeJnu4vkeFVwEk1jy
+	 zcpOXrIl3kFYiyBrzP/bCXKbYZ1UoWGRPIj80PDIUoW/rZ+QFtws2neOdZsvABe9hy
+	 kVIPc9tEpuVJzTm8DGS6uELs5Ot8TZeuX/runweZUCcFifBsH3PFUG/82hVVIcxOBy
+	 D7imp0z21bE1PS66sDti4ELFI0MxzgH3cyZC5RxT/7wBiSscmfHiKV83+L80I760Q2
+	 XzsNUV56OlVjMclNz+lZA6H+20mq498KYKIBpbTg0BKhkoTBZrykbyBDX96hnVlqP2
+	 7UE6NpkfTWwYQ==
 From: Eric Biggers <ebiggers@kernel.org>
 To: stable@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
-	Weili Qian <qianweili@huawei.com>,
+	linux-sunxi@lists.linux.dev,
 	Eric Biggers <ebiggers@kernel.org>,
+	Tianchu Chen <flynnnchen@tencent.com>,
+	Corentin LABBE <clabbe.montjoie@gmail.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 6.6,6.1,5.15] crypto: hisi-trng - Remove crypto_rng interface
-Date: Thu, 16 Jul 2026 20:42:54 -0700
-Message-ID: <20260717034254.328204-1-ebiggers@kernel.org>
+Subject: [PATCH 7.1,6.18,6.12,6.6,6.1] crypto: sun4i-ss - Remove insecure and unused rng_alg
+Date: Thu, 16 Jul 2026 20:50:58 -0700
+Message-ID: <20260717035058.352737-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -43,410 +45,311 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-commit 216a7795ec210bdabd5dad42323eee70bbfc8d90 upstream.
+commit b2c41fa9dd8fc740c489e060b199165771f268d1 upstream.
 
-drivers/crypto/hisilicon/trng/trng.c exposes the same hardware through
-two completely separate interfaces, crypto_rng and hwrng.  However, the
-implementation of this is buggy because it permits generation operations
-from these interfaces to run concurrently with each other, accessing the
-same registers.  That is, hisi_trng_generate() synchronizes with itself
-but not with hisi_trng_read().  This results in potential repetition of
-output from the RNG, output of non-random values, etc.
+Remove sun4i_ss_rng, as it is insecure and unused:
 
-Fortunately, there's actually no point in hardware RNG drivers
-implementing the crypto_rng interface.  It's not actually used by
-anything besides the "rng" algorithm type of AF_ALG, which in turn is
-not actually used in practice.  Other crypto_rng hardware drivers are
-likewise being phased out, leaving just the hwrng support.
+- It has multiple vulnerabilities.  sun4i_ss_prng_seed() is missing
+  locking and has a buffer overflow.  sun4i_ss_prng_generate() fails to
+  fill the entire buffer with cryptographic random bytes, because it
+  rounds the destination length down and also doesn't actually wait for
+  the hardware to be ready before pulling bytes from it.
 
-Thus, remove it to simplify the code and avoid conflict (and confusion)
-with the hwrng interface which is the one that actually matters.
+- No user of this code is known.  It's usable only theoretically via the
+  "rng" algorithm type of AF_ALG.  But userspace actually just uses the
+  actual Linux RNG (/dev/random etc) instead.  And rng_algs don't
+  contribute entropy to the actual Linux RNG either.  (This may have
+  been confused with hwrng, which does contribute entropy.)
 
-Fixes: e4d9d10ef4be ("crypto: hisilicon/trng - add support for PRNG")
+The sun4i_ss_prng_seed() buffer overflow was reported by Tianchu Chen
+and discovered by Atuin - Automated Vulnerability Discovery Engine
+
+There's no point in fixing all these vulnerabilities individually when
+this is unused code, so let's just remove it.
+
+Fixes: b8ae5c7387ad ("crypto: sun4i-ss - support the Security System PRNG")
 Cc: stable@vger.kernel.org
+Reported-by: Tianchu Chen <flynnnchen@tencent.com>
+Closes: https://lore.kernel.org/r/af749a8447bd7f0e9dd26ca6c87e9c6afecb09d9@linux.dev/
+Acked-by: Corentin LABBE <clabbe.montjoie@gmail.com>
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- drivers/crypto/hisilicon/Kconfig     |   1 -
- drivers/crypto/hisilicon/trng/trng.c | 298 +--------------------------
- 2 files changed, 2 insertions(+), 297 deletions(-)
+ arch/arm/configs/sunxi_defconfig              |  1 -
+ drivers/crypto/allwinner/Kconfig              |  8 ---
+ drivers/crypto/allwinner/sun4i-ss/Makefile    |  1 -
+ .../crypto/allwinner/sun4i-ss/sun4i-ss-core.c | 36 ----------
+ .../crypto/allwinner/sun4i-ss/sun4i-ss-prng.c | 69 -------------------
+ drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h  | 20 ------
+ 6 files changed, 135 deletions(-)
+ delete mode 100644 drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c
 
-diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
-index 4137a8bf131f..107bfffaead2 100644
---- a/drivers/crypto/hisilicon/Kconfig
-+++ b/drivers/crypto/hisilicon/Kconfig
-@@ -79,6 +79,5 @@ config CRYPTO_DEV_HISI_TRNG
- 	tristate "Support for HISI TRNG Driver"
- 	depends on ARM64 && ACPI
- 	select HW_RANDOM
+diff --git a/arch/arm/configs/sunxi_defconfig b/arch/arm/configs/sunxi_defconfig
+index a83d29fed175..f4b8d8f7dbef 100644
+--- a/arch/arm/configs/sunxi_defconfig
++++ b/arch/arm/configs/sunxi_defconfig
+@@ -170,7 +170,6 @@ CONFIG_ROOT_NFS=y
+ CONFIG_NLS_CODEPAGE_437=y
+ CONFIG_NLS_ISO8859_1=y
+ CONFIG_CRYPTO_DEV_SUN4I_SS=y
+-CONFIG_CRYPTO_DEV_SUN4I_SS_PRNG=y
+ CONFIG_CRYPTO_DEV_SUN8I_CE=y
+ CONFIG_CRYPTO_DEV_SUN8I_SS=y
+ CONFIG_DMA_CMA=y
+diff --git a/drivers/crypto/allwinner/Kconfig b/drivers/crypto/allwinner/Kconfig
+index 7270e5fbc573..1048f8e95ba8 100644
+--- a/drivers/crypto/allwinner/Kconfig
++++ b/drivers/crypto/allwinner/Kconfig
+@@ -25,14 +25,6 @@ config CRYPTO_DEV_SUN4I_SS
+ 	  To compile this driver as a module, choose M here: the module
+ 	  will be called sun4i-ss.
+ 
+-config CRYPTO_DEV_SUN4I_SS_PRNG
+-	bool "Support for Allwinner Security System PRNG"
+-	depends on CRYPTO_DEV_SUN4I_SS
 -	select CRYPTO_RNG
- 	help
- 	  Support for HiSilicon TRNG Driver.
-diff --git a/drivers/crypto/hisilicon/trng/trng.c b/drivers/crypto/hisilicon/trng/trng.c
-index b2d9b5310b78..6584ed051e09 100644
---- a/drivers/crypto/hisilicon/trng/trng.c
-+++ b/drivers/crypto/hisilicon/trng/trng.c
-@@ -1,234 +1,27 @@
- // SPDX-License-Identifier: GPL-2.0
- /* Copyright (c) 2019 HiSilicon Limited. */
- 
--#include <crypto/internal/rng.h>
- #include <linux/acpi.h>
--#include <linux/crypto.h>
- #include <linux/err.h>
- #include <linux/hw_random.h>
- #include <linux/io.h>
- #include <linux/iopoll.h>
- #include <linux/kernel.h>
--#include <linux/list.h>
- #include <linux/module.h>
--#include <linux/mutex.h>
- #include <linux/platform_device.h>
- #include <linux/random.h>
- 
- #define HISI_TRNG_REG		0x00F0
- #define HISI_TRNG_BYTES		4
- #define HISI_TRNG_QUALITY	512
--#define HISI_TRNG_VERSION	0x01B8
--#define HISI_TRNG_VER_V1	GENMASK(31, 0)
- #define SLEEP_US		10
- #define TIMEOUT_US		10000
--#define SW_DRBG_NUM_SHIFT	2
--#define SW_DRBG_KEY_BASE	0x082C
--#define SW_DRBG_SEED(n)         (SW_DRBG_KEY_BASE - ((n) << SW_DRBG_NUM_SHIFT))
--#define SW_DRBG_SEED_REGS_NUM	12
--#define SW_DRBG_SEED_SIZE	48
--#define SW_DRBG_BLOCKS		0x0830
--#define SW_DRBG_INIT		0x0834
--#define SW_DRBG_GEN		0x083c
--#define SW_DRBG_STATUS		0x0840
--#define SW_DRBG_BLOCKS_NUM	4095
--#define SW_DRBG_DATA_BASE	0x0850
--#define SW_DRBG_DATA_NUM	4
--#define SW_DRBG_DATA(n)		(SW_DRBG_DATA_BASE - ((n) << SW_DRBG_NUM_SHIFT))
--#define SW_DRBG_BYTES		16
--#define SW_DRBG_ENABLE_SHIFT	12
--#define SEED_SHIFT_24		24
--#define SEED_SHIFT_16		16
--#define SEED_SHIFT_8		8
--#define SW_MAX_RANDOM_BYTES	65520
+-	help
+-	  Select this option if you want to provide kernel-side support for
+-	  the Pseudo-Random Number Generator found in the Security System.
 -
--struct hisi_trng_list {
--	struct mutex lock;
--	struct list_head list;
--	bool is_init;
--};
- 
- struct hisi_trng {
- 	void __iomem *base;
--	struct hisi_trng_list *trng_list;
--	struct list_head list;
- 	struct hwrng rng;
--	u32 ver;
--	u32 ctx_num;
--	/* The bytes of the random number generated since the last seeding. */
--	u32 random_bytes;
--	struct mutex lock;
--};
--
--struct hisi_trng_ctx {
--	struct hisi_trng *trng;
+ config CRYPTO_DEV_SUN4I_SS_DEBUG
+ 	bool "Enable sun4i-ss stats"
+ 	depends on CRYPTO_DEV_SUN4I_SS
+diff --git a/drivers/crypto/allwinner/sun4i-ss/Makefile b/drivers/crypto/allwinner/sun4i-ss/Makefile
+index c0a2797d3168..06a9ae81f9f8 100644
+--- a/drivers/crypto/allwinner/sun4i-ss/Makefile
++++ b/drivers/crypto/allwinner/sun4i-ss/Makefile
+@@ -1,4 +1,3 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ obj-$(CONFIG_CRYPTO_DEV_SUN4I_SS) += sun4i-ss.o
+ sun4i-ss-y += sun4i-ss-core.o sun4i-ss-hash.o sun4i-ss-cipher.o
+-sun4i-ss-$(CONFIG_CRYPTO_DEV_SUN4I_SS_PRNG) += sun4i-ss-prng.o
+diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c
+index 58a76e2ba64e..35ef0930e77f 100644
+--- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c
++++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c
+@@ -213,23 +213,6 @@ static struct sun4i_ss_alg_template ss_algs[] = {
+ 		}
+ 	}
+ },
+-#ifdef CONFIG_CRYPTO_DEV_SUN4I_SS_PRNG
+-{
+-	.type = CRYPTO_ALG_TYPE_RNG,
+-	.alg.rng = {
+-		.base = {
+-			.cra_name		= "stdrng",
+-			.cra_driver_name	= "sun4i_ss_rng",
+-			.cra_priority		= 300,
+-			.cra_ctxsize		= 0,
+-			.cra_module		= THIS_MODULE,
+-		},
+-		.generate               = sun4i_ss_prng_generate,
+-		.seed                   = sun4i_ss_prng_seed,
+-		.seedsize               = SS_SEED_LEN / BITS_PER_BYTE,
+-	}
+-},
+-#endif
  };
  
--static atomic_t trng_active_devs;
--static struct hisi_trng_list trng_devices;
--static int hisi_trng_read(struct hwrng *rng, void *buf, size_t max, bool wait);
--
--static int hisi_trng_set_seed(struct hisi_trng *trng, const u8 *seed)
--{
--	u32 val, seed_reg, i;
--	int ret;
--
--	writel(0x0, trng->base + SW_DRBG_BLOCKS);
--
--	for (i = 0; i < SW_DRBG_SEED_SIZE;
--	     i += SW_DRBG_SEED_SIZE / SW_DRBG_SEED_REGS_NUM) {
--		val = seed[i] << SEED_SHIFT_24;
--		val |= seed[i + 1UL] << SEED_SHIFT_16;
--		val |= seed[i + 2UL] << SEED_SHIFT_8;
--		val |= seed[i + 3UL];
--
--		seed_reg = (i >> SW_DRBG_NUM_SHIFT) % SW_DRBG_SEED_REGS_NUM;
--		writel(val, trng->base + SW_DRBG_SEED(seed_reg));
--	}
--
--	writel(SW_DRBG_BLOCKS_NUM | (0x1 << SW_DRBG_ENABLE_SHIFT),
--	       trng->base + SW_DRBG_BLOCKS);
--	writel(0x1, trng->base + SW_DRBG_INIT);
--	ret = readl_relaxed_poll_timeout(trng->base + SW_DRBG_STATUS,
--					 val, val & BIT(0), SLEEP_US, TIMEOUT_US);
--	if (ret) {
--		pr_err("failed to init trng(%d)\n", ret);
--		return -EIO;
--	}
--
--	trng->random_bytes = 0;
--
--	return 0;
--}
--
--static int hisi_trng_seed(struct crypto_rng *tfm, const u8 *seed,
--			  unsigned int slen)
--{
--	struct hisi_trng_ctx *ctx = crypto_rng_ctx(tfm);
--	struct hisi_trng *trng = ctx->trng;
--	int ret;
--
--	if (slen < SW_DRBG_SEED_SIZE) {
--		pr_err("slen(%u) is not matched with trng(%d)\n", slen,
--			SW_DRBG_SEED_SIZE);
--		return -EINVAL;
--	}
--
--	mutex_lock(&trng->lock);
--	ret = hisi_trng_set_seed(trng, seed);
--	mutex_unlock(&trng->lock);
--
--	return ret;
--}
--
--static int hisi_trng_reseed(struct hisi_trng *trng)
--{
--	u8 seed[SW_DRBG_SEED_SIZE];
--	int size;
--
--	if (!trng->random_bytes)
--		return 0;
--
--	size = hisi_trng_read(&trng->rng, seed, SW_DRBG_SEED_SIZE, false);
--	if (size != SW_DRBG_SEED_SIZE)
--		return -EIO;
--
--	return hisi_trng_set_seed(trng, seed);
--}
--
--static int hisi_trng_get_bytes(struct hisi_trng *trng, u8 *dstn, unsigned int dlen)
--{
--	u32 data[SW_DRBG_DATA_NUM];
--	u32 currsize = 0;
--	u32 val = 0;
--	int ret;
--	u32 i;
--
--	ret = hisi_trng_reseed(trng);
--	if (ret)
--		return ret;
--
--	do {
--		ret = readl_relaxed_poll_timeout(trng->base + SW_DRBG_STATUS,
--						 val, val & BIT(1), SLEEP_US, TIMEOUT_US);
--		if (ret) {
--			pr_err("failed to generate random number(%d)!\n", ret);
+ static int sun4i_ss_debugfs_show(struct seq_file *seq, void *v)
+@@ -247,12 +230,6 @@ static int sun4i_ss_debugfs_show(struct seq_file *seq, void *v)
+ 				   ss_algs[i].stat_req, ss_algs[i].stat_opti, ss_algs[i].stat_fb,
+ 				   ss_algs[i].stat_bytes);
+ 			break;
+-		case CRYPTO_ALG_TYPE_RNG:
+-			seq_printf(seq, "%s %s reqs=%lu tsize=%lu\n",
+-				   ss_algs[i].alg.rng.base.cra_driver_name,
+-				   ss_algs[i].alg.rng.base.cra_name,
+-				   ss_algs[i].stat_req, ss_algs[i].stat_bytes);
 -			break;
--		}
+ 		case CRYPTO_ALG_TYPE_AHASH:
+ 			seq_printf(seq, "%s %s reqs=%lu\n",
+ 				   ss_algs[i].alg.hash.halg.base.cra_driver_name,
+@@ -471,13 +448,6 @@ static int sun4i_ss_probe(struct platform_device *pdev)
+ 				goto error_alg;
+ 			}
+ 			break;
+-		case CRYPTO_ALG_TYPE_RNG:
+-			err = crypto_register_rng(&ss_algs[i].alg.rng);
+-			if (err) {
+-				dev_err(ss->dev, "Fail to register %s\n",
+-					ss_algs[i].alg.rng.base.cra_name);
+-			}
+-			break;
+ 		}
+ 	}
+ 
+@@ -497,9 +467,6 @@ static int sun4i_ss_probe(struct platform_device *pdev)
+ 		case CRYPTO_ALG_TYPE_AHASH:
+ 			crypto_unregister_ahash(&ss_algs[i].alg.hash);
+ 			break;
+-		case CRYPTO_ALG_TYPE_RNG:
+-			crypto_unregister_rng(&ss_algs[i].alg.rng);
+-			break;
+ 		}
+ 	}
+ error_pm:
+@@ -520,9 +487,6 @@ static void sun4i_ss_remove(struct platform_device *pdev)
+ 		case CRYPTO_ALG_TYPE_AHASH:
+ 			crypto_unregister_ahash(&ss_algs[i].alg.hash);
+ 			break;
+-		case CRYPTO_ALG_TYPE_RNG:
+-			crypto_unregister_rng(&ss_algs[i].alg.rng);
+-			break;
+ 		}
+ 	}
+ 
+diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c
+deleted file mode 100644
+index 491fcb7b81b4..000000000000
+--- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c
++++ /dev/null
+@@ -1,69 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-or-later
+-#include "sun4i-ss.h"
 -
--		for (i = 0; i < SW_DRBG_DATA_NUM; i++)
--			data[i] = readl(trng->base + SW_DRBG_DATA(i));
--
--		if (dlen - currsize >= SW_DRBG_BYTES) {
--			memcpy(dstn + currsize, data, SW_DRBG_BYTES);
--			currsize += SW_DRBG_BYTES;
--		} else {
--			memcpy(dstn + currsize, data, dlen - currsize);
--			currsize = dlen;
--		}
--
--		trng->random_bytes += SW_DRBG_BYTES;
--		writel(0x1, trng->base + SW_DRBG_GEN);
--	} while (currsize < dlen);
--
--	return ret;
--}
--
--static int hisi_trng_generate(struct crypto_rng *tfm, const u8 *src,
--			      unsigned int slen, u8 *dstn, unsigned int dlen)
+-int sun4i_ss_prng_seed(struct crypto_rng *tfm, const u8 *seed,
+-		       unsigned int slen)
 -{
--	struct hisi_trng_ctx *ctx = crypto_rng_ctx(tfm);
--	struct hisi_trng *trng = ctx->trng;
--	unsigned int currsize = 0;
--	unsigned int block_size;
--	int ret;
+-	struct sun4i_ss_alg_template *algt;
+-	struct rng_alg *alg = crypto_rng_alg(tfm);
 -
--	if (!dstn || !dlen) {
--		pr_err("output is error, dlen %u!\n", dlen);
--		return -EINVAL;
--	}
--
--	do {
--		block_size = min_t(unsigned int, dlen - currsize, SW_MAX_RANDOM_BYTES);
--		mutex_lock(&trng->lock);
--		ret = hisi_trng_get_bytes(trng, dstn + currsize, block_size);
--		mutex_unlock(&trng->lock);
--		if (ret)
--			return ret;
--		currsize += block_size;
--	} while (currsize < dlen);
+-	algt = container_of(alg, struct sun4i_ss_alg_template, alg.rng);
+-	memcpy(algt->ss->seed, seed, slen);
 -
 -	return 0;
 -}
 -
--static int hisi_trng_init(struct crypto_tfm *tfm)
+-int sun4i_ss_prng_generate(struct crypto_rng *tfm, const u8 *src,
+-			   unsigned int slen, u8 *dst, unsigned int dlen)
 -{
--	struct hisi_trng_ctx *ctx = crypto_tfm_ctx(tfm);
--	struct hisi_trng *trng;
--	u32 ctx_num = ~0;
+-	struct sun4i_ss_alg_template *algt;
+-	struct rng_alg *alg = crypto_rng_alg(tfm);
+-	int i, err;
+-	u32 v;
+-	u32 *data = (u32 *)dst;
+-	const u32 mode = SS_OP_PRNG | SS_PRNG_CONTINUE | SS_ENABLED;
+-	size_t len;
+-	struct sun4i_ss_ctx *ss;
+-	unsigned int todo = (dlen / 4) * 4;
 -
--	mutex_lock(&trng_devices.lock);
--	list_for_each_entry(trng, &trng_devices.list, list) {
--		if (trng->ctx_num < ctx_num) {
--			ctx_num = trng->ctx_num;
--			ctx->trng = trng;
--		}
--	}
--	ctx->trng->ctx_num++;
--	mutex_unlock(&trng_devices.lock);
+-	algt = container_of(alg, struct sun4i_ss_alg_template, alg.rng);
+-	ss = algt->ss;
 -
--	return 0;
--}
+-	err = pm_runtime_resume_and_get(ss->dev);
+-	if (err < 0)
+-		return err;
 -
--static void hisi_trng_exit(struct crypto_tfm *tfm)
--{
--	struct hisi_trng_ctx *ctx = crypto_tfm_ctx(tfm);
--
--	mutex_lock(&trng_devices.lock);
--	ctx->trng->ctx_num--;
--	mutex_unlock(&trng_devices.lock);
--}
--
- static int hisi_trng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
- {
- 	struct hisi_trng *trng;
-@@ -260,42 +53,6 @@ static int hisi_trng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
- 	return currsize;
- }
- 
--static struct rng_alg hisi_trng_alg = {
--	.generate = hisi_trng_generate,
--	.seed =	hisi_trng_seed,
--	.seedsize = SW_DRBG_SEED_SIZE,
--	.base = {
--		.cra_name = "stdrng",
--		.cra_driver_name = "hisi_stdrng",
--		.cra_priority = 300,
--		.cra_ctxsize = sizeof(struct hisi_trng_ctx),
--		.cra_module = THIS_MODULE,
--		.cra_init = hisi_trng_init,
--		.cra_exit = hisi_trng_exit,
--	},
--};
--
--static void hisi_trng_add_to_list(struct hisi_trng *trng)
--{
--	mutex_lock(&trng_devices.lock);
--	list_add_tail(&trng->list, &trng_devices.list);
--	mutex_unlock(&trng_devices.lock);
--}
--
--static int hisi_trng_del_from_list(struct hisi_trng *trng)
--{
--	int ret = -EBUSY;
--
--	mutex_lock(&trng_devices.lock);
--	if (!trng->ctx_num) {
--		list_del(&trng->list);
--		ret = 0;
--	}
--	mutex_unlock(&trng_devices.lock);
--
--	return ret;
--}
--
- static int hisi_trng_probe(struct platform_device *pdev)
- {
- 	struct hisi_trng *trng;
-@@ -305,70 +62,20 @@ static int hisi_trng_probe(struct platform_device *pdev)
- 	if (!trng)
- 		return -ENOMEM;
- 
--	platform_set_drvdata(pdev, trng);
--
- 	trng->base = devm_platform_ioremap_resource(pdev, 0);
- 	if (IS_ERR(trng->base))
- 		return PTR_ERR(trng->base);
- 
--	trng->ctx_num = 0;
--	trng->random_bytes = SW_MAX_RANDOM_BYTES;
--	mutex_init(&trng->lock);
--	trng->ver = readl(trng->base + HISI_TRNG_VERSION);
--	if (!trng_devices.is_init) {
--		INIT_LIST_HEAD(&trng_devices.list);
--		mutex_init(&trng_devices.lock);
--		trng_devices.is_init = true;
+-	if (IS_ENABLED(CONFIG_CRYPTO_DEV_SUN4I_SS_DEBUG)) {
+-		algt->stat_req++;
+-		algt->stat_bytes += todo;
 -	}
 -
--	hisi_trng_add_to_list(trng);
--	if (trng->ver != HISI_TRNG_VER_V1 &&
--	    atomic_inc_return(&trng_active_devs) == 1) {
--		ret = crypto_register_rng(&hisi_trng_alg);
--		if (ret) {
--			dev_err(&pdev->dev,
--				"failed to register crypto(%d)\n", ret);
--			atomic_dec_return(&trng_active_devs);
--			goto err_remove_from_list;
+-	spin_lock_bh(&ss->slock);
+-
+-	writel(mode, ss->base + SS_CTL);
+-
+-	while (todo > 0) {
+-		/* write the seed */
+-		for (i = 0; i < SS_SEED_LEN / BITS_PER_LONG; i++)
+-			writel(ss->seed[i], ss->base + SS_KEY0 + i * 4);
+-
+-		/* Read the random data */
+-		len = min_t(size_t, SS_DATA_LEN / BITS_PER_BYTE, todo);
+-		readsl(ss->base + SS_TXFIFO, data, len / 4);
+-		data += len / 4;
+-		todo -= len;
+-
+-		/* Update the seed */
+-		for (i = 0; i < SS_SEED_LEN / BITS_PER_LONG; i++) {
+-			v = readl(ss->base + SS_KEY0 + i * 4);
+-			ss->seed[i] = v;
 -		}
 -	}
 -
- 	trng->rng.name = pdev->name;
- 	trng->rng.read = hisi_trng_read;
- 	trng->rng.quality = HISI_TRNG_QUALITY;
-+
- 	ret = devm_hwrng_register(&pdev->dev, &trng->rng);
--	if (ret) {
-+	if (ret)
- 		dev_err(&pdev->dev, "failed to register hwrng: %d!\n", ret);
--		goto err_crypto_unregister;
--	}
+-	writel(0, ss->base + SS_CTL);
+-	spin_unlock_bh(&ss->slock);
 -
--	return ret;
--
--err_crypto_unregister:
--	if (trng->ver != HISI_TRNG_VER_V1 &&
--	    atomic_dec_return(&trng_active_devs) == 0)
--		crypto_unregister_rng(&hisi_trng_alg);
--
--err_remove_from_list:
--	hisi_trng_del_from_list(trng);
- 	return ret;
- }
- 
--static int hisi_trng_remove(struct platform_device *pdev)
--{
--	struct hisi_trng *trng = platform_get_drvdata(pdev);
--
--	/* Wait until the task is finished */
--	while (hisi_trng_del_from_list(trng))
--		;
--
--	if (trng->ver != HISI_TRNG_VER_V1 &&
--	    atomic_dec_return(&trng_active_devs) == 0)
--		crypto_unregister_rng(&hisi_trng_alg);
+-	pm_runtime_put(ss->dev);
 -
 -	return 0;
 -}
--
- static const struct acpi_device_id hisi_trng_acpi_match[] = {
- 	{ "HISI02B3", 0 },
- 	{ }
-@@ -377,7 +84,6 @@ MODULE_DEVICE_TABLE(acpi, hisi_trng_acpi_match);
+diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h
+index 6c5d4aa6453c..f7d1c79ac677 100644
+--- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h
++++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h
+@@ -31,8 +31,6 @@
+ #include <crypto/internal/skcipher.h>
+ #include <crypto/aes.h>
+ #include <crypto/internal/des.h>
+-#include <crypto/internal/rng.h>
+-#include <crypto/rng.h>
  
- static struct platform_driver hisi_trng_driver = {
- 	.probe		= hisi_trng_probe,
--	.remove         = hisi_trng_remove,
- 	.driver		= {
- 		.name	= "hisi-trng-v2",
- 		.acpi_match_table = ACPI_PTR(hisi_trng_acpi_match),
+ #define SS_CTL            0x00
+ #define SS_KEY0           0x04
+@@ -62,10 +60,6 @@
+ 
+ /* SS_CTL configuration values */
+ 
+-/* PRNG generator mode - bit 15 */
+-#define SS_PRNG_ONESHOT		(0 << 15)
+-#define SS_PRNG_CONTINUE	(1 << 15)
+-
+ /* IV mode for hash */
+ #define SS_IV_ARBITRARY		(1 << 14)
+ 
+@@ -94,14 +88,10 @@
+ #define SS_OP_3DES		(2 << 4)
+ #define SS_OP_SHA1		(3 << 4)
+ #define SS_OP_MD5		(4 << 4)
+-#define SS_OP_PRNG		(5 << 4)
+ 
+ /* Data end bit - bit 2 */
+ #define SS_DATA_END		(1 << 2)
+ 
+-/* PRNG start bit - bit 1 */
+-#define SS_PRNG_START		(1 << 1)
+-
+ /* SS Enable bit - bit 0 */
+ #define SS_DISABLED		(0 << 0)
+ #define SS_ENABLED		(1 << 0)
+@@ -128,9 +118,6 @@
+ #define SS_RXFIFO_EMP_INT_ENABLE	(1 << 2)
+ #define SS_TXFIFO_AVA_INT_ENABLE	(1 << 0)
+ 
+-#define SS_SEED_LEN 192
+-#define SS_DATA_LEN 160
+-
+ /*
+  * struct ss_variant - Describe SS hardware variant
+  * @sha1_in_be:		The SHA1 digest is given by SS in BE, and so need to be inverted.
+@@ -151,9 +138,6 @@ struct sun4i_ss_ctx {
+ 	char buf[4 * SS_RX_MAX];/* buffer for linearize SG src */
+ 	char bufo[4 * SS_TX_MAX]; /* buffer for linearize SG dst */
+ 	spinlock_t slock; /* control the use of the device */
+-#ifdef CONFIG_CRYPTO_DEV_SUN4I_SS_PRNG
+-	u32 seed[SS_SEED_LEN / BITS_PER_LONG];
+-#endif
+ 	struct dentry *dbgfs_dir;
+ 	struct dentry *dbgfs_stats;
+ };
+@@ -164,7 +148,6 @@ struct sun4i_ss_alg_template {
+ 	union {
+ 		struct skcipher_alg crypto;
+ 		struct ahash_alg hash;
+-		struct rng_alg rng;
+ 	} alg;
+ 	struct sun4i_ss_ctx *ss;
+ 	unsigned long stat_req;
+@@ -231,6 +214,3 @@ int sun4i_ss_des_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 			unsigned int keylen);
+ int sun4i_ss_des3_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 			 unsigned int keylen);
+-int sun4i_ss_prng_generate(struct crypto_rng *tfm, const u8 *src,
+-			   unsigned int slen, u8 *dst, unsigned int dlen);
+-int sun4i_ss_prng_seed(struct crypto_rng *tfm, const u8 *seed, unsigned int slen);
 
-base-commit: da47cbc254661aa66d61ef061485a7080305c4be
+base-commit: 199c9959d3a9b53f346c221757fc7ac507fbac50
 -- 
 2.55.0
 
