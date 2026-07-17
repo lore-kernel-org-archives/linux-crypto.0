@@ -1,38 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEED217BED0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE8825776;
 	Fri, 17 Jul 2026 02:46:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784256371; cv=none; b=TUEzXkluGfhQxLxgNnMHfkWq6ginQWpm7rwRMuqag1hCRXS31jrR9uYKuDouY++TI0Rlc/MZv2acCWiKAqfkTzXGpaZ+yImwthTsmZZ+TZ03OV+TlFIxPteNUxbdFBYDKkKkN/w3E1J/qCh2eCV0mNY1JKz0MlegBgHi7w/SgOk=
+	t=1784256372; cv=none; b=YV2p7Ih/zGge+RS+z0eK99X+HcH12tx4rVeFJRb9+MaP/V4gC4eUa8BJKraI3P3N7PoF6Z5Vy+nLyUwgHkZbiG0ka0a7NqPfzJlRevDJMVL+0D74gO1KfDfuDtv7dYGEhIbRW/jsp3Pqhvm9cR4J1uS/eKo9HOJ2f6ODle30CV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784256371; c=relaxed/simple;
-	bh=Uc6tPL40TXXmZZR9CjCKOs7PopY39nssFNhHzdNdDAE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IWRGYok8TX+uGykwr1RMyQHTyNk0wXAHUIvLudtZ+D6Lj0TrkaxpzU9UNMZIOVNrz4yYBwyQ+3VN5pk1hDx1gfxSH+AMYPlrcfQZ4+69oAK/QyqR0K3ZO1XC5gY0YLxVSmxuAkd4L+a+vbnp7oq0ZVcqZQnlkApAxk2/97LlfKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UrSnIZoC; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784256372; c=relaxed/simple;
+	bh=KrdbSYh8gbYorkJ5tps1gn346KvbS9rbP/KmdlvKAsI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=LHYwIb6wUyETG1efH320hsj9Zgb1ij5eJNPjIlOmjwW+nt8otVFFjAc2mJFj7jMc152hRIoaDmH1ZvF+t7yvmnqimUgxYdWOM6Rm41cNKMRWbue7ASKs5MJv/cq+xeXGxbvOQDDgyzG4xNe35TNy66PoqssD1tcxlNwd3adOFYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZeFqUnir; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UrSnIZoC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72AAA1F000E9;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZeFqUnir"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5C2A1F00A3D;
 	Fri, 17 Jul 2026 02:46:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1784256370;
-	bh=fOvHHw3n97SUlAqvXqIhB1vz79abbW269vIWOc4MQ2Y=;
-	h=From:To:Cc:Subject:Date;
-	b=UrSnIZoCdaAF6xnGHla530707ZVTmPR2bTcLfVC8Kso1+D6Fasj54im3ZZEQeu7c+
-	 oIwNCk7wKFwpV8dcLzc9ZosetPPTahlGfin2kwEuxcKwP27kfjzIRGgw+IZKz+gWPn
-	 pVdz7JWoa5+KBBJwJIw/kzje3T+miGABOD9xOWIEIRcBKk2G+bpzA0QQ5EPuVipqHH
-	 krZWjIafAndo3QTKHm4cJSmDU25TkvQZyg/GEltXfqGh8B2n/r3DkRmbWJFi8xufCS
-	 QLQ1yAkbHJOx6GwuwWzqE9nvVtX2hoDSV5N/Ue5lICX4GRrvu+JvgdPYkBUrEJB+Id
-	 P0TEGHAps1u1g==
+	bh=aFISdyOnrjEc3ltLgP2M2S4IRn9vpVDrja8F56cmhGE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=ZeFqUnirUiqGcAqAHTcttfFk3HJH0uYAA43NGbNXXVzzMkgafXRHXw1e4JH14MUrC
+	 OHBEOtUZu36pqcyq4pCAwHtCDZvEOVLVkpqn0WW5v/DFOKrvPfaXQuk8MzTvEg5+co
+	 t2XvDCxCRssNoYTndzHypVROA06fs4ajwBWJQcXXreMOWFTFjd9UosY5w56NEbU+pu
+	 hjBBhEiWaByOCH+HXBnRcYoKrQXV3SB5k4nDqflWU6cx092PcN2+nrCcDHseoSjrgC
+	 Up8lE/0881u4nM+2dzWDHSoxke2YMpqou2E/7pgBQ7cfc23AO3a/6Cx5N7DHM/+BBT
+	 Uh5TAoD8jbMCQ==
 From: Eric Biggers <ebiggers@kernel.org>
 To: stable@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 6.12,6.6,6.1,5.15 0/2] crypto4xx stable backports
-Date: Thu, 16 Jul 2026 19:44:01 -0700
-Message-ID: <20260717024403.87052-1-ebiggers@kernel.org>
+Subject: [PATCH 6.12,6.6,6.1,5.15 1/2] crypto: crypto4xx - Remove ahash-related code
+Date: Thu, 16 Jul 2026 19:44:02 -0700
+Message-ID: <20260717024403.87052-2-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260717024403.87052-1-ebiggers@kernel.org>
+References: <20260717024403.87052-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -41,24 +45,263 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series backports "crypto: crypto4xx - Remove ahash-related code" in
-order to make "crypto: crypto4xx - Remove insecure and unused rng_alg"
-cherry-pick more cleanly.  Then it backports that commit too.
+From: Herbert Xu <herbert@gondor.apana.org.au>
 
-Eric Biggers (1):
-  crypto: crypto4xx - Remove insecure and unused rng_alg
+commit 97855e7f1ccf4917f305baab199edb9f2595ff5b upstream.
 
-Herbert Xu (1):
-  crypto: crypto4xx - Remove ahash-related code
+The hash implementation in crypto4xx has been disabled since 2009.
+As nobody has tried to fix this remove all the dead code.
 
- drivers/crypto/amcc/crypto4xx_alg.c     | 106 -------------------
- drivers/crypto/amcc/crypto4xx_core.c    | 130 +-----------------------
- drivers/crypto/amcc/crypto4xx_core.h    |  11 --
- drivers/crypto/amcc/crypto4xx_reg_def.h |  11 --
- 4 files changed, 1 insertion(+), 257 deletions(-)
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ drivers/crypto/amcc/crypto4xx_alg.c  | 106 ---------------------------
+ drivers/crypto/amcc/crypto4xx_core.c |  43 +----------
+ drivers/crypto/amcc/crypto4xx_core.h |   7 --
+ 3 files changed, 1 insertion(+), 155 deletions(-)
 
-
-base-commit: 296aabce459470a4c1b68ffd0c0c0920e563aaad
+diff --git a/drivers/crypto/amcc/crypto4xx_alg.c b/drivers/crypto/amcc/crypto4xx_alg.c
+index e0af611a95d8..04a68622ec09 100644
+--- a/drivers/crypto/amcc/crypto4xx_alg.c
++++ b/drivers/crypto/amcc/crypto4xx_alg.c
+@@ -12,9 +12,6 @@
+ #include <linux/interrupt.h>
+ #include <linux/spinlock_types.h>
+ #include <linux/scatterlist.h>
+-#include <linux/crypto.h>
+-#include <linux/hash.h>
+-#include <crypto/internal/hash.h>
+ #include <linux/dma-mapping.h>
+ #include <crypto/algapi.h>
+ #include <crypto/aead.h>
+@@ -602,106 +599,3 @@ int crypto4xx_decrypt_aes_gcm(struct aead_request *req)
+ {
+ 	return crypto4xx_crypt_aes_gcm(req, true);
+ }
+-
+-/*
+- * HASH SHA1 Functions
+- */
+-static int crypto4xx_hash_alg_init(struct crypto_tfm *tfm,
+-				   unsigned int sa_len,
+-				   unsigned char ha,
+-				   unsigned char hm)
+-{
+-	struct crypto_alg *alg = tfm->__crt_alg;
+-	struct crypto4xx_alg *my_alg;
+-	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(tfm);
+-	struct dynamic_sa_hash160 *sa;
+-	int rc;
+-
+-	my_alg = container_of(__crypto_ahash_alg(alg), struct crypto4xx_alg,
+-			      alg.u.hash);
+-	ctx->dev   = my_alg->dev;
+-
+-	/* Create SA */
+-	if (ctx->sa_in || ctx->sa_out)
+-		crypto4xx_free_sa(ctx);
+-
+-	rc = crypto4xx_alloc_sa(ctx, sa_len);
+-	if (rc)
+-		return rc;
+-
+-	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
+-				 sizeof(struct crypto4xx_ctx));
+-	sa = (struct dynamic_sa_hash160 *)ctx->sa_in;
+-	set_dynamic_sa_command_0(&sa->ctrl, SA_SAVE_HASH, SA_NOT_SAVE_IV,
+-				 SA_NOT_LOAD_HASH, SA_LOAD_IV_FROM_SA,
+-				 SA_NO_HEADER_PROC, ha, SA_CIPHER_ALG_NULL,
+-				 SA_PAD_TYPE_ZERO, SA_OP_GROUP_BASIC,
+-				 SA_OPCODE_HASH, DIR_INBOUND);
+-	set_dynamic_sa_command_1(&sa->ctrl, 0, SA_HASH_MODE_HASH,
+-				 CRYPTO_FEEDBACK_MODE_NO_FB, SA_EXTENDED_SN_OFF,
+-				 SA_SEQ_MASK_OFF, SA_MC_ENABLE,
+-				 SA_NOT_COPY_PAD, SA_NOT_COPY_PAYLOAD,
+-				 SA_NOT_COPY_HDR);
+-	/* Need to zero hash digest in SA */
+-	memset(sa->inner_digest, 0, sizeof(sa->inner_digest));
+-	memset(sa->outer_digest, 0, sizeof(sa->outer_digest));
+-
+-	return 0;
+-}
+-
+-int crypto4xx_hash_init(struct ahash_request *req)
+-{
+-	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
+-	int ds;
+-	struct dynamic_sa_ctl *sa;
+-
+-	sa = ctx->sa_in;
+-	ds = crypto_ahash_digestsize(
+-			__crypto_ahash_cast(req->base.tfm));
+-	sa->sa_command_0.bf.digest_len = ds >> 2;
+-	sa->sa_command_0.bf.load_hash_state = SA_LOAD_HASH_FROM_SA;
+-
+-	return 0;
+-}
+-
+-int crypto4xx_hash_update(struct ahash_request *req)
+-{
+-	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
+-	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
+-	struct scatterlist dst;
+-	unsigned int ds = crypto_ahash_digestsize(ahash);
+-
+-	sg_init_one(&dst, req->result, ds);
+-
+-	return crypto4xx_build_pd(&req->base, ctx, req->src, &dst,
+-				  req->nbytes, NULL, 0, ctx->sa_in,
+-				  ctx->sa_len, 0, NULL);
+-}
+-
+-int crypto4xx_hash_final(struct ahash_request *req)
+-{
+-	return 0;
+-}
+-
+-int crypto4xx_hash_digest(struct ahash_request *req)
+-{
+-	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
+-	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
+-	struct scatterlist dst;
+-	unsigned int ds = crypto_ahash_digestsize(ahash);
+-
+-	sg_init_one(&dst, req->result, ds);
+-
+-	return crypto4xx_build_pd(&req->base, ctx, req->src, &dst,
+-				  req->nbytes, NULL, 0, ctx->sa_in,
+-				  ctx->sa_len, 0, NULL);
+-}
+-
+-/*
+- * SHA1 Algorithm
+- */
+-int crypto4xx_sha1_alg_init(struct crypto_tfm *tfm)
+-{
+-	return crypto4xx_hash_alg_init(tfm, SA_HASH160_LEN, SA_HASH_ALG_SHA1,
+-				       SA_HASH_MODE_HASH);
+-}
+diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
+index 6006703fb6d7..0795ced8ba2c 100644
+--- a/drivers/crypto/amcc/crypto4xx_core.c
++++ b/drivers/crypto/amcc/crypto4xx_core.c
+@@ -485,18 +485,6 @@ static void crypto4xx_copy_pkt_to_dst(struct crypto4xx_device *dev,
+ 	}
+ }
+ 
+-static void crypto4xx_copy_digest_to_dst(void *dst,
+-					struct pd_uinfo *pd_uinfo,
+-					struct crypto4xx_ctx *ctx)
+-{
+-	struct dynamic_sa_ctl *sa = (struct dynamic_sa_ctl *) ctx->sa_in;
+-
+-	if (sa->sa_command_0.bf.hash_alg == SA_HASH_ALG_SHA1) {
+-		memcpy(dst, pd_uinfo->sr_va->save_digest,
+-		       SA_HASH_ALG_SHA1_DIGEST_SIZE);
+-	}
+-}
+-
+ static void crypto4xx_ret_sg_desc(struct crypto4xx_device *dev,
+ 				  struct pd_uinfo *pd_uinfo)
+ {
+@@ -549,23 +537,6 @@ static void crypto4xx_cipher_done(struct crypto4xx_device *dev,
+ 	skcipher_request_complete(req, 0);
+ }
+ 
+-static void crypto4xx_ahash_done(struct crypto4xx_device *dev,
+-				struct pd_uinfo *pd_uinfo)
+-{
+-	struct crypto4xx_ctx *ctx;
+-	struct ahash_request *ahash_req;
+-
+-	ahash_req = ahash_request_cast(pd_uinfo->async_req);
+-	ctx = crypto_ahash_ctx(crypto_ahash_reqtfm(ahash_req));
+-
+-	crypto4xx_copy_digest_to_dst(ahash_req->result, pd_uinfo, ctx);
+-	crypto4xx_ret_sg_desc(dev, pd_uinfo);
+-
+-	if (pd_uinfo->state & PD_ENTRY_BUSY)
+-		ahash_request_complete(ahash_req, -EINPROGRESS);
+-	ahash_request_complete(ahash_req, 0);
+-}
+-
+ static void crypto4xx_aead_done(struct crypto4xx_device *dev,
+ 				struct pd_uinfo *pd_uinfo,
+ 				struct ce_pd *pd)
+@@ -642,9 +613,6 @@ static void crypto4xx_pd_done(struct crypto4xx_device *dev, u32 idx)
+ 	case CRYPTO_ALG_TYPE_AEAD:
+ 		crypto4xx_aead_done(dev, pd_uinfo, pd);
+ 		break;
+-	case CRYPTO_ALG_TYPE_AHASH:
+-		crypto4xx_ahash_done(dev, pd_uinfo);
+-		break;
+ 	}
+ }
+ 
+@@ -915,8 +883,7 @@ int crypto4xx_build_pd(struct crypto_async_request *req,
+ 	}
+ 
+ 	pd->pd_ctl.w = PD_CTL_HOST_READY |
+-		((crypto_tfm_alg_type(req->tfm) == CRYPTO_ALG_TYPE_AHASH) ||
+-		 (crypto_tfm_alg_type(req->tfm) == CRYPTO_ALG_TYPE_AEAD) ?
++		((crypto_tfm_alg_type(req->tfm) == CRYPTO_ALG_TYPE_AEAD) ?
+ 			PD_CTL_HASH_FINAL : 0);
+ 	pd->pd_ctl_len.w = 0x00400000 | (assoclen + datalen);
+ 	pd_uinfo->state = PD_ENTRY_INUSE | (is_busy ? PD_ENTRY_BUSY : 0);
+@@ -1022,10 +989,6 @@ static int crypto4xx_register_alg(struct crypto4xx_device *sec_dev,
+ 			rc = crypto_register_aead(&alg->alg.u.aead);
+ 			break;
+ 
+-		case CRYPTO_ALG_TYPE_AHASH:
+-			rc = crypto_register_ahash(&alg->alg.u.hash);
+-			break;
+-
+ 		case CRYPTO_ALG_TYPE_RNG:
+ 			rc = crypto_register_rng(&alg->alg.u.rng);
+ 			break;
+@@ -1051,10 +1014,6 @@ static void crypto4xx_unregister_alg(struct crypto4xx_device *sec_dev)
+ 	list_for_each_entry_safe(alg, tmp, &sec_dev->alg_list, entry) {
+ 		list_del(&alg->entry);
+ 		switch (alg->alg.type) {
+-		case CRYPTO_ALG_TYPE_AHASH:
+-			crypto_unregister_ahash(&alg->alg.u.hash);
+-			break;
+-
+ 		case CRYPTO_ALG_TYPE_AEAD:
+ 			crypto_unregister_aead(&alg->alg.u.aead);
+ 			break;
+diff --git a/drivers/crypto/amcc/crypto4xx_core.h b/drivers/crypto/amcc/crypto4xx_core.h
+index 3adcc5e65694..0cafce828aac 100644
+--- a/drivers/crypto/amcc/crypto4xx_core.h
++++ b/drivers/crypto/amcc/crypto4xx_core.h
+@@ -16,7 +16,6 @@
+ #include <linux/ratelimit.h>
+ #include <linux/mutex.h>
+ #include <linux/scatterlist.h>
+-#include <crypto/internal/hash.h>
+ #include <crypto/internal/aead.h>
+ #include <crypto/internal/rng.h>
+ #include <crypto/internal/skcipher.h>
+@@ -135,7 +134,6 @@ struct crypto4xx_alg_common {
+ 	u32 type;
+ 	union {
+ 		struct skcipher_alg cipher;
+-		struct ahash_alg hash;
+ 		struct aead_alg aead;
+ 		struct rng_alg rng;
+ 	} u;
+@@ -177,11 +175,6 @@ int crypto4xx_encrypt_noiv_block(struct skcipher_request *req);
+ int crypto4xx_decrypt_noiv_block(struct skcipher_request *req);
+ int crypto4xx_rfc3686_encrypt(struct skcipher_request *req);
+ int crypto4xx_rfc3686_decrypt(struct skcipher_request *req);
+-int crypto4xx_sha1_alg_init(struct crypto_tfm *tfm);
+-int crypto4xx_hash_digest(struct ahash_request *req);
+-int crypto4xx_hash_final(struct ahash_request *req);
+-int crypto4xx_hash_update(struct ahash_request *req);
+-int crypto4xx_hash_init(struct ahash_request *req);
+ 
+ /*
+  * Note: Only use this function to copy items that is word aligned.
 -- 
 2.55.0
 
