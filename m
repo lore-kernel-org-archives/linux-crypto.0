@@ -1,64 +1,106 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFEC143F08A;
-	Fri, 17 Jul 2026 22:42:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5F6828A72F
+	for <linux-crypto@vger.kernel.org>; Fri, 17 Jul 2026 22:58:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784328150; cv=none; b=UxCM35PiyD8y6bsnYWOB71UwT9yWHGmCpQDQtUWk8zt2asaSSaXSV4UkKPP8LSgw3Zgxmezamhe67ICCBAf/k7R/Ve3b0BS9/Kj5GS/pN6/klRGSq35gZsTo7BnzcHprrUE67+ewXchDJ2cU4mcLy/9FFoprJ788EaqWwos0/KI=
+	t=1784329115; cv=none; b=JQY1iHbqVMH5Ai+xbGybvCqe6fYCRxOgZI1emLjJ23MfbIko0DRBMegOwuk7u3YYPwv4ZFStl+zMa43rqbljTe7qhYg1/LZszBCAYfMK8J9KQy05jKqBJ1LiKQnda00998GrZouB92yyCLLQVltGwCpNyPKIAG4WL/E+CEn7ZiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784328150; c=relaxed/simple;
-	bh=uLGxnBI4R5yW8J5bqhwh+69zyr4djIsj5sijVy+NZ1c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rgE9xA2I3dfJdrQoy+OfWHThY3y+kkibTfSjKFU5/Y+c6TRW9/gbbRCOXDwDBEh2n8925BMxBPpoJEZ+zk9nR7e3QyfA24SbZ0dguMyjWeSokm49xt0mBpkIRqlDyH/bE1pn+5GjH4RFitvR63KKRCplxTWXLkdgl/+6IrcIT2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hSB0iMLk; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784329115; c=relaxed/simple;
+	bh=i5rzGLbaHmcpYCp4yWAJmCYHbxhKEVphmq5HETmEYQU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NiWziUBx7Qg7CsL4QmqI6JWU4sNou/gXBbGUuJ+MywVZI17nHfR/HB6LoddQ1bCeEDp2hLduhB39R6hN+djMXoaBU1C0n34TLv2GwLcEKmxFAVDloV6rTJ5KeogTvnX6fNNnmS1jsBS60Em5/kKEsBTrP7oRBM0qrWbqu90y5SM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=n2nMU2pV; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hSB0iMLk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67A3C1F000E9;
-	Fri, 17 Jul 2026 22:42:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784328149;
-	bh=uy2sm5e/XFoUQCA2FZ+us4l0YRDwlLA7mLelC5mZjeA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=hSB0iMLkTuBgnNIsI2DBcnr9NT5Rim0v/hQv5g1ntSni0w0vVNC8/Npd8h9XL3Z2T
-	 InbJWiS/Tx3IQZ2dddieNsHLKwwj2Ybww3DtFAnv0hzphNJ8v9Z89gaIhcMlb5iGYH
-	 fa/bK8nx+UsAFL8EK7KyFahIMKnCCJcaHKzCN86GWsNoIV72mp2QcIbf+6xojA+c+n
-	 0Qz3FSzzQp4eZkvV2C6wXd7+HharX+Ylvc7uskhtuyVynsdeKYvK23QuwRvw5VyOLO
-	 0Xr0PRclnFThTmk4N9CX3Lnvfo1ojQCwvmhn+FDcEMFLI3gk9/ywkMybqhPWXDx7Fz
-	 81VFH39aWNOxg==
-Date: Fri, 17 Jul 2026 15:42:27 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] padata: Replace bottom-half spinlock variants
-Message-ID: <20260717224227.GA95995@quark>
-References: <20260717205028.63847-1-daniel.m.jordan@oracle.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n2nMU2pV"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2cf41bab353so8502715ad.0
+        for <linux-crypto@vger.kernel.org>; Fri, 17 Jul 2026 15:58:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784329113; x=1784933913; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=/XrDsJ0SzvBMeDkq9z30iaPl9hIHDzpkzv1JYRjxa1s=;
+        b=n2nMU2pVMQ22ZFod6MwvnSfaYwtJ8SVV8EviA5qa+nCCZb0G0BzGgYuy2U8d8x4lAL
+         tHplF+LvDJlL91wzL8ZTh0M0gxuTlwqBDbuNydgL7w7nlnElK3WluX8LaM7CtOMnR1Jy
+         rTglGtyLu8uz0lu4MZ9NroyTKunWLmLhhQ12w3hZcewKHo2erUoLoI+9bz6d+f4/AHiV
+         W+QA17mC6yMNjkPvmf6rVEAAHUU4csUtaeqynn6ipLeNYJjOWqixoEJaePqMts8rBuAs
+         JwekaggJPActtSj+SEajiBRgwR/nl0A2/70Z61loE6HnMVxRqTdkmlVfs8iL9MWryMVg
+         zeDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784329113; x=1784933913;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=/XrDsJ0SzvBMeDkq9z30iaPl9hIHDzpkzv1JYRjxa1s=;
+        b=NhOEv/apRVGSpD3BOLTV98ySXkr5h2IAUucvUji72kCQL3EeiffUgZZU4UZu/B3mV8
+         42y2+zU2dot4YP7uflt9h/Xr5/tYOVtvp2hDg9uxhqWasT3zFnAqvPKo0sEvAzCAAqII
+         HUB673vWXU838H++gqUUM3fACd83KCwpDQQOSRfaw4muTdYVl0rGaJc/jAj5VrykgtEs
+         6KI8bbXvsyjiP0VnEsp4Fgn7c6R1QLNWRCq3KgHFqdKz5xb23wMcc4GqKlqVNks/B40U
+         5O0qQdlYwAjKQweOawZSmOkEOd2GShjPr1rMEvL16zDy2HNPFBiA1VglI9+Ces9HqIls
+         a+HA==
+X-Gm-Message-State: AOJu0YwQEDDRDL4xzdhxProjiv5nP/V1WZAlSoICMmZmZxWeKN7SaGee
+	kUPR0/IhhI+54MWgWVNaVhw4pzWqzpLMMim5Z97bg06frpMuHHJWvgi3cv7n9w==
+X-Gm-Gg: AfdE7cn8/vPweGh98ltmMX3R4cujK715X9NbJRQ2NhEWbmhroukqIYwinvM4nsWq3f4
+	bvzur1GrM/JvmUyQWF6FdeLTZMH8wY2Rwe3RBBY7oJr7CdONNHXdL8okqCKXMRHUYfKSWORwigk
+	fHeoV1zuM5KUFYV47xbEelAhQHzCNouE5Sl8SwYaCxjdH6AudKqkM2UbZdTZ/8HECEwlHK4fyTA
+	FYidn+NponiAtqCcVO+wPVy32xLRIDlJfLauZFVbjMp3Y5bw6AkcnsG3so41mGcbh6YTIfFg7xz
+	LfOrTHsO3jTkC2LO2fXDJH2nDWSPbpsUjnost+dydBi7Zt6LwiJLTGM8EW6y4Lc0oSqP7YEKiWL
+	0TAhDt3QvK3qkO0KSZi/UGggSwp3nBIWrtTWRqA6m53kRsycdC8a2I+Q/Xyu/ZthxZZH/DoVfEn
+	zYL1FqXYbt9IDxsHWpcJtAeq+kE7TJ03G1De4JHhHkrQz+2INgGBstjYo9F5FCTkwHvEcquLCeX
+	UBC50HtBFa135vuhwZ9/j5VgkqSmLKeq2sfYK5C4O/czgHaSsOTjoEXBt74fN8kdg==
+X-Received: by 2002:a17:902:d48f:b0:2cc:d807:369c with SMTP id d9443c01a7336-2cf34a3000cmr53616075ad.45.1784329113166;
+        Fri, 17 Jul 2026 15:58:33 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8000:7a86::e35])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2cf3471f42csm17929265ad.61.2026.07.17.15.58.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Jul 2026 15:58:32 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: linux-crypto@vger.kernel.org
+Cc: Srujana Challa <schalla@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Boris Brezillon <bbrezillon@kernel.org>,
+	Robin Murphy <robin.murphy@arm.com>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCHv2] crypto: cesa: check for sram_dma error
+Date: Fri, 17 Jul 2026 15:58:31 -0700
+Message-ID: <20260717225831.1085313-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260717205028.63847-1-daniel.m.jordan@oracle.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jul 17, 2026 at 04:50:28PM -0400, Daniel Jordan wrote:
-> Padata no longer runs in softirq context, so normal non-bottom-half
-> spinlock calls will suffice.
-> 
-> Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
-> ---
-> 
-> Based on latest upstream plus Eric's four padata changes from
->     https://lore.kernel.org/linux-crypto/20260713223234.24812-1-ebiggers@kernel.org/
->     https://lore.kernel.org/all/20260717171831.27994-1-ebiggers@kernel.org/
-> 
->  kernel/padata.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+dma_map_resource() might fail. In such a case, don't call
+dma_unmap_resource()
 
-Reviewed-by: Eric Biggers <ebiggers@kernel.org>
+Fixes: 37d728f76c41 ("crypto: marvell/cesa - Fix DMA API misuse")
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ v2: use dma_mapping_error(). Fix Fixes tag.
+ drivers/crypto/marvell/cesa/cesa.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-- Eric
+diff --git a/drivers/crypto/marvell/cesa/cesa.c b/drivers/crypto/marvell/cesa/cesa.c
+index 75d8ba23d9a2..92e977027c8a 100644
+--- a/drivers/crypto/marvell/cesa/cesa.c
++++ b/drivers/crypto/marvell/cesa/cesa.c
+@@ -406,7 +406,8 @@ static void mv_cesa_put_sram(struct platform_device *pdev, int idx)
+ 	if (engine->pool)
+ 		gen_pool_free(engine->pool, (unsigned long)engine->sram_pool,
+ 			      cesa->sram_size);
+-	else
++	else if (engine->sram &&
++		 !dma_mapping_error(cesa->dev, engine->sram_dma))
+ 		dma_unmap_resource(cesa->dev, engine->sram_dma,
+ 				   cesa->sram_size, DMA_BIDIRECTIONAL, 0);
+ }
+-- 
+2.55.0
+
