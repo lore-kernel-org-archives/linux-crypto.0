@@ -1,39 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEE8825776;
-	Fri, 17 Jul 2026 02:46:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C2419E992;
+	Fri, 17 Jul 2026 02:46:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784256372; cv=none; b=YV2p7Ih/zGge+RS+z0eK99X+HcH12tx4rVeFJRb9+MaP/V4gC4eUa8BJKraI3P3N7PoF6Z5Vy+nLyUwgHkZbiG0ka0a7NqPfzJlRevDJMVL+0D74gO1KfDfuDtv7dYGEhIbRW/jsp3Pqhvm9cR4J1uS/eKo9HOJ2f6ODle30CV0=
+	t=1784256372; cv=none; b=q9C7GXsDuJP9LfQ0wBR26pBpwLIS62GnGdf06S5XCluoTYBq5DZGEHTKAjz8+/sRS/oU2GH1zk7Uo94RLce/bxHclcLIs/ZVkc6PJ4GxHPjunlSlicSFXPBmK+9Lly8o8ypu/Lc1yN4qLqeO8cf7GaHEIzap7D78wKxB280n6Ek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1784256372; c=relaxed/simple;
-	bh=KrdbSYh8gbYorkJ5tps1gn346KvbS9rbP/KmdlvKAsI=;
+	bh=ZP4+9rROjIveJXc+vjoIxKgbx2sLyqDjUn4rorXZ6zA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LHYwIb6wUyETG1efH320hsj9Zgb1ij5eJNPjIlOmjwW+nt8otVFFjAc2mJFj7jMc152hRIoaDmH1ZvF+t7yvmnqimUgxYdWOM6Rm41cNKMRWbue7ASKs5MJv/cq+xeXGxbvOQDDgyzG4xNe35TNy66PoqssD1tcxlNwd3adOFYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZeFqUnir; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=mu29jeoLyjBsZ1y5JFrA8yaWwmRZkiSiXHTws3NK2uaQySqbVSn05jnRsn8MRkWbjFxVsXTbeZUQUBynATrMVjc8GNAWcJWFeHAFbxxWuXvZ22snljHnESAgsZRgwEjYdafTIS6AZHvZNY0IvQrSTQzzN4StuGaGJ5dHNHU2Huc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oU5qSuh/; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZeFqUnir"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5C2A1F00A3D;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oU5qSuh/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0020E1F00A3A;
 	Fri, 17 Jul 2026 02:46:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784256370;
-	bh=aFISdyOnrjEc3ltLgP2M2S4IRn9vpVDrja8F56cmhGE=;
+	s=k20260515; t=1784256371;
+	bh=dQt209g5ZoODzBoZ0VG22lgQS53czPIP+50Urb4qDIE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=ZeFqUnirUiqGcAqAHTcttfFk3HJH0uYAA43NGbNXXVzzMkgafXRHXw1e4JH14MUrC
-	 OHBEOtUZu36pqcyq4pCAwHtCDZvEOVLVkpqn0WW5v/DFOKrvPfaXQuk8MzTvEg5+co
-	 t2XvDCxCRssNoYTndzHypVROA06fs4ajwBWJQcXXreMOWFTFjd9UosY5w56NEbU+pu
-	 hjBBhEiWaByOCH+HXBnRcYoKrQXV3SB5k4nDqflWU6cx092PcN2+nrCcDHseoSjrgC
-	 Up8lE/0881u4nM+2dzWDHSoxke2YMpqou2E/7pgBQ7cfc23AO3a/6Cx5N7DHM/+BBT
-	 Uh5TAoD8jbMCQ==
+	b=oU5qSuh/fJ+tbYbHlj+k3K7Or8pKLim0BAfzb1qL0yZ8uX0wN0KX2eemclKKL24Is
+	 bGC81SbwW4ZpFbeGBhLv9+jVvKWFTlROw9wOFwUReN3d/7tUYMIdNyAONUn9U5wMKL
+	 +rh3XJKOFXSwsFTcXxAavN/x95YPlDJ3Jg35qyP3/6hpkWF0xK4RFDjCgTa+UeRcMC
+	 XcbP/VYJf+i+hTzQuqZvNVHDgEZWx5n0iAxjuEuGdnd3RbGgImH39nIGps9pfJq4Q9
+	 LjCdWtYb6gUt5c0orP4Jlb3RBb71Y7BT/VQ9LThgFQZkE8r47oztRATidsRroTTMJx
+	 /gjMsDS+8AX2w==
 From: Eric Biggers <ebiggers@kernel.org>
 To: stable@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 6.12,6.6,6.1,5.15 1/2] crypto: crypto4xx - Remove ahash-related code
-Date: Thu, 16 Jul 2026 19:44:02 -0700
-Message-ID: <20260717024403.87052-2-ebiggers@kernel.org>
+	Eric Biggers <ebiggers@kernel.org>,
+	Christian Lamparter <chunkeey@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH 6.12,6.6,6.1,5.15 2/2] crypto: crypto4xx - Remove insecure and unused rng_alg
+Date: Thu, 16 Jul 2026 19:44:03 -0700
+Message-ID: <20260717024403.87052-3-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260717024403.87052-1-ebiggers@kernel.org>
 References: <20260717024403.87052-1-ebiggers@kernel.org>
@@ -45,263 +46,234 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
+commit 7811ec9e973d2c9e465083699f0c8240b98cb8c4 upstream.
 
-commit 97855e7f1ccf4917f305baab199edb9f2595ff5b upstream.
+Remove crypto4xx_rng, as it is insecure and unused:
 
-The hash implementation in crypto4xx has been disabled since 2009.
-As nobody has tried to fix this remove all the dead code.
+- It has only a 64-bit security strength, which is highly inadequate.
+  This can be seen by the fact that crypto4xx_hw_init() seeds it with
+  only 64 bits of entropy, and the fact that the original commit
+  mentions that it implements ANSI X9.17 Annex C.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+  Another issue was that this driver didn't implement the crypto_rng API
+  correctly, as crypto4xx_prng_generate() didn't return 0 on success.
+
+- No user of this code is known.  It's usable only theoretically via the
+  "rng" algorithm type of AF_ALG.  But userspace actually just uses the
+  actual Linux RNG (/dev/random etc) instead.  And rng_algs don't
+  contribute entropy to the actual Linux RNG either.  (This may have
+  been confused with hwrng, which does contribute entropy.)
+
+Fixes: d072bfa48853 ("crypto: crypto4xx - add prng crypto support")
+Cc: stable@vger.kernel.org
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+Acked-by: Christian Lamparter <chunkeey@gmail.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- drivers/crypto/amcc/crypto4xx_alg.c  | 106 ---------------------------
- drivers/crypto/amcc/crypto4xx_core.c |  43 +----------
- drivers/crypto/amcc/crypto4xx_core.h |   7 --
- 3 files changed, 1 insertion(+), 155 deletions(-)
+ drivers/crypto/amcc/crypto4xx_core.c    | 87 -------------------------
+ drivers/crypto/amcc/crypto4xx_core.h    |  4 --
+ drivers/crypto/amcc/crypto4xx_reg_def.h | 11 ----
+ 3 files changed, 102 deletions(-)
 
-diff --git a/drivers/crypto/amcc/crypto4xx_alg.c b/drivers/crypto/amcc/crypto4xx_alg.c
-index e0af611a95d8..04a68622ec09 100644
---- a/drivers/crypto/amcc/crypto4xx_alg.c
-+++ b/drivers/crypto/amcc/crypto4xx_alg.c
-@@ -12,9 +12,6 @@
- #include <linux/interrupt.h>
- #include <linux/spinlock_types.h>
- #include <linux/scatterlist.h>
--#include <linux/crypto.h>
--#include <linux/hash.h>
--#include <crypto/internal/hash.h>
- #include <linux/dma-mapping.h>
- #include <crypto/algapi.h>
- #include <crypto/aead.h>
-@@ -602,106 +599,3 @@ int crypto4xx_decrypt_aes_gcm(struct aead_request *req)
- {
- 	return crypto4xx_crypt_aes_gcm(req, true);
- }
--
--/*
-- * HASH SHA1 Functions
-- */
--static int crypto4xx_hash_alg_init(struct crypto_tfm *tfm,
--				   unsigned int sa_len,
--				   unsigned char ha,
--				   unsigned char hm)
--{
--	struct crypto_alg *alg = tfm->__crt_alg;
--	struct crypto4xx_alg *my_alg;
--	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(tfm);
--	struct dynamic_sa_hash160 *sa;
--	int rc;
--
--	my_alg = container_of(__crypto_ahash_alg(alg), struct crypto4xx_alg,
--			      alg.u.hash);
--	ctx->dev   = my_alg->dev;
--
--	/* Create SA */
--	if (ctx->sa_in || ctx->sa_out)
--		crypto4xx_free_sa(ctx);
--
--	rc = crypto4xx_alloc_sa(ctx, sa_len);
--	if (rc)
--		return rc;
--
--	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
--				 sizeof(struct crypto4xx_ctx));
--	sa = (struct dynamic_sa_hash160 *)ctx->sa_in;
--	set_dynamic_sa_command_0(&sa->ctrl, SA_SAVE_HASH, SA_NOT_SAVE_IV,
--				 SA_NOT_LOAD_HASH, SA_LOAD_IV_FROM_SA,
--				 SA_NO_HEADER_PROC, ha, SA_CIPHER_ALG_NULL,
--				 SA_PAD_TYPE_ZERO, SA_OP_GROUP_BASIC,
--				 SA_OPCODE_HASH, DIR_INBOUND);
--	set_dynamic_sa_command_1(&sa->ctrl, 0, SA_HASH_MODE_HASH,
--				 CRYPTO_FEEDBACK_MODE_NO_FB, SA_EXTENDED_SN_OFF,
--				 SA_SEQ_MASK_OFF, SA_MC_ENABLE,
--				 SA_NOT_COPY_PAD, SA_NOT_COPY_PAYLOAD,
--				 SA_NOT_COPY_HDR);
--	/* Need to zero hash digest in SA */
--	memset(sa->inner_digest, 0, sizeof(sa->inner_digest));
--	memset(sa->outer_digest, 0, sizeof(sa->outer_digest));
--
--	return 0;
--}
--
--int crypto4xx_hash_init(struct ahash_request *req)
--{
--	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
--	int ds;
--	struct dynamic_sa_ctl *sa;
--
--	sa = ctx->sa_in;
--	ds = crypto_ahash_digestsize(
--			__crypto_ahash_cast(req->base.tfm));
--	sa->sa_command_0.bf.digest_len = ds >> 2;
--	sa->sa_command_0.bf.load_hash_state = SA_LOAD_HASH_FROM_SA;
--
--	return 0;
--}
--
--int crypto4xx_hash_update(struct ahash_request *req)
--{
--	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
--	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
--	struct scatterlist dst;
--	unsigned int ds = crypto_ahash_digestsize(ahash);
--
--	sg_init_one(&dst, req->result, ds);
--
--	return crypto4xx_build_pd(&req->base, ctx, req->src, &dst,
--				  req->nbytes, NULL, 0, ctx->sa_in,
--				  ctx->sa_len, 0, NULL);
--}
--
--int crypto4xx_hash_final(struct ahash_request *req)
--{
--	return 0;
--}
--
--int crypto4xx_hash_digest(struct ahash_request *req)
--{
--	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
--	struct crypto4xx_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
--	struct scatterlist dst;
--	unsigned int ds = crypto_ahash_digestsize(ahash);
--
--	sg_init_one(&dst, req->result, ds);
--
--	return crypto4xx_build_pd(&req->base, ctx, req->src, &dst,
--				  req->nbytes, NULL, 0, ctx->sa_in,
--				  ctx->sa_len, 0, NULL);
--}
--
--/*
-- * SHA1 Algorithm
-- */
--int crypto4xx_sha1_alg_init(struct crypto_tfm *tfm)
--{
--	return crypto4xx_hash_alg_init(tfm, SA_HASH160_LEN, SA_HASH_ALG_SHA1,
--				       SA_HASH_MODE_HASH);
--}
 diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
-index 6006703fb6d7..0795ced8ba2c 100644
+index 0795ced8ba2c..ab3ab130eeee 100644
 --- a/drivers/crypto/amcc/crypto4xx_core.c
 +++ b/drivers/crypto/amcc/crypto4xx_core.c
-@@ -485,18 +485,6 @@ static void crypto4xx_copy_pkt_to_dst(struct crypto4xx_device *dev,
- 	}
- }
- 
--static void crypto4xx_copy_digest_to_dst(void *dst,
--					struct pd_uinfo *pd_uinfo,
--					struct crypto4xx_ctx *ctx)
--{
--	struct dynamic_sa_ctl *sa = (struct dynamic_sa_ctl *) ctx->sa_in;
--
--	if (sa->sa_command_0.bf.hash_alg == SA_HASH_ALG_SHA1) {
--		memcpy(dst, pd_uinfo->sr_va->save_digest,
--		       SA_HASH_ALG_SHA1_DIGEST_SIZE);
--	}
--}
--
- static void crypto4xx_ret_sg_desc(struct crypto4xx_device *dev,
- 				  struct pd_uinfo *pd_uinfo)
- {
-@@ -549,23 +537,6 @@ static void crypto4xx_cipher_done(struct crypto4xx_device *dev,
- 	skcipher_request_complete(req, 0);
- }
- 
--static void crypto4xx_ahash_done(struct crypto4xx_device *dev,
--				struct pd_uinfo *pd_uinfo)
--{
--	struct crypto4xx_ctx *ctx;
--	struct ahash_request *ahash_req;
--
--	ahash_req = ahash_request_cast(pd_uinfo->async_req);
--	ctx = crypto_ahash_ctx(crypto_ahash_reqtfm(ahash_req));
--
--	crypto4xx_copy_digest_to_dst(ahash_req->result, pd_uinfo, ctx);
--	crypto4xx_ret_sg_desc(dev, pd_uinfo);
--
--	if (pd_uinfo->state & PD_ENTRY_BUSY)
--		ahash_request_complete(ahash_req, -EINPROGRESS);
--	ahash_request_complete(ahash_req, 0);
--}
--
- static void crypto4xx_aead_done(struct crypto4xx_device *dev,
- 				struct pd_uinfo *pd_uinfo,
- 				struct ce_pd *pd)
-@@ -642,9 +613,6 @@ static void crypto4xx_pd_done(struct crypto4xx_device *dev, u32 idx)
- 	case CRYPTO_ALG_TYPE_AEAD:
- 		crypto4xx_aead_done(dev, pd_uinfo, pd);
- 		break;
--	case CRYPTO_ALG_TYPE_AHASH:
--		crypto4xx_ahash_done(dev, pd_uinfo);
--		break;
- 	}
- }
- 
-@@ -915,8 +883,7 @@ int crypto4xx_build_pd(struct crypto_async_request *req,
- 	}
- 
- 	pd->pd_ctl.w = PD_CTL_HOST_READY |
--		((crypto_tfm_alg_type(req->tfm) == CRYPTO_ALG_TYPE_AHASH) ||
--		 (crypto_tfm_alg_type(req->tfm) == CRYPTO_ALG_TYPE_AEAD) ?
-+		((crypto_tfm_alg_type(req->tfm) == CRYPTO_ALG_TYPE_AEAD) ?
- 			PD_CTL_HASH_FINAL : 0);
- 	pd->pd_ctl_len.w = 0x00400000 | (assoclen + datalen);
- 	pd_uinfo->state = PD_ENTRY_INUSE | (is_busy ? PD_ENTRY_BUSY : 0);
-@@ -1022,10 +989,6 @@ static int crypto4xx_register_alg(struct crypto4xx_device *sec_dev,
+@@ -31,11 +31,9 @@
+ #include <crypto/ctr.h>
+ #include <crypto/gcm.h>
+ #include <crypto/sha1.h>
+-#include <crypto/rng.h>
+ #include <crypto/scatterwalk.h>
+ #include <crypto/skcipher.h>
+ #include <crypto/internal/aead.h>
+-#include <crypto/internal/rng.h>
+ #include <crypto/internal/skcipher.h>
+ #include "crypto4xx_reg_def.h"
+ #include "crypto4xx_core.h"
+@@ -989,10 +987,6 @@ static int crypto4xx_register_alg(struct crypto4xx_device *sec_dev,
  			rc = crypto_register_aead(&alg->alg.u.aead);
  			break;
  
--		case CRYPTO_ALG_TYPE_AHASH:
--			rc = crypto_register_ahash(&alg->alg.u.hash);
+-		case CRYPTO_ALG_TYPE_RNG:
+-			rc = crypto_register_rng(&alg->alg.u.rng);
 -			break;
 -
- 		case CRYPTO_ALG_TYPE_RNG:
- 			rc = crypto_register_rng(&alg->alg.u.rng);
+ 		default:
+ 			rc = crypto_register_skcipher(&alg->alg.u.cipher);
  			break;
-@@ -1051,10 +1014,6 @@ static void crypto4xx_unregister_alg(struct crypto4xx_device *sec_dev)
- 	list_for_each_entry_safe(alg, tmp, &sec_dev->alg_list, entry) {
- 		list_del(&alg->entry);
- 		switch (alg->alg.type) {
--		case CRYPTO_ALG_TYPE_AHASH:
--			crypto_unregister_ahash(&alg->alg.u.hash);
--			break;
--
- 		case CRYPTO_ALG_TYPE_AEAD:
+@@ -1018,10 +1012,6 @@ static void crypto4xx_unregister_alg(struct crypto4xx_device *sec_dev)
  			crypto_unregister_aead(&alg->alg.u.aead);
  			break;
-diff --git a/drivers/crypto/amcc/crypto4xx_core.h b/drivers/crypto/amcc/crypto4xx_core.h
-index 3adcc5e65694..0cafce828aac 100644
---- a/drivers/crypto/amcc/crypto4xx_core.h
-+++ b/drivers/crypto/amcc/crypto4xx_core.h
-@@ -16,7 +16,6 @@
- #include <linux/ratelimit.h>
- #include <linux/mutex.h>
- #include <linux/scatterlist.h>
--#include <crypto/internal/hash.h>
- #include <crypto/internal/aead.h>
- #include <crypto/internal/rng.h>
- #include <crypto/internal/skcipher.h>
-@@ -135,7 +134,6 @@ struct crypto4xx_alg_common {
- 	u32 type;
- 	union {
- 		struct skcipher_alg cipher;
--		struct ahash_alg hash;
- 		struct aead_alg aead;
- 		struct rng_alg rng;
- 	} u;
-@@ -177,11 +175,6 @@ int crypto4xx_encrypt_noiv_block(struct skcipher_request *req);
- int crypto4xx_decrypt_noiv_block(struct skcipher_request *req);
- int crypto4xx_rfc3686_encrypt(struct skcipher_request *req);
- int crypto4xx_rfc3686_decrypt(struct skcipher_request *req);
--int crypto4xx_sha1_alg_init(struct crypto_tfm *tfm);
--int crypto4xx_hash_digest(struct ahash_request *req);
--int crypto4xx_hash_final(struct ahash_request *req);
--int crypto4xx_hash_update(struct ahash_request *req);
--int crypto4xx_hash_init(struct ahash_request *req);
+ 
+-		case CRYPTO_ALG_TYPE_RNG:
+-			crypto_unregister_rng(&alg->alg.u.rng);
+-			break;
+-
+ 		default:
+ 			crypto_unregister_skcipher(&alg->alg.u.cipher);
+ 		}
+@@ -1080,69 +1070,6 @@ static irqreturn_t crypto4xx_ce_interrupt_handler_revb(int irq, void *data)
+ 		PPC4XX_TMO_ERR_INT);
+ }
+ 
+-static int ppc4xx_prng_data_read(struct crypto4xx_device *dev,
+-				 u8 *data, unsigned int max)
+-{
+-	unsigned int i, curr = 0;
+-	u32 val[2];
+-
+-	do {
+-		/* trigger PRN generation */
+-		writel(PPC4XX_PRNG_CTRL_AUTO_EN,
+-		       dev->ce_base + CRYPTO4XX_PRNG_CTRL);
+-
+-		for (i = 0; i < 1024; i++) {
+-			/* usually 19 iterations are enough */
+-			if ((readl(dev->ce_base + CRYPTO4XX_PRNG_STAT) &
+-			     CRYPTO4XX_PRNG_STAT_BUSY))
+-				continue;
+-
+-			val[0] = readl_be(dev->ce_base + CRYPTO4XX_PRNG_RES_0);
+-			val[1] = readl_be(dev->ce_base + CRYPTO4XX_PRNG_RES_1);
+-			break;
+-		}
+-		if (i == 1024)
+-			return -ETIMEDOUT;
+-
+-		if ((max - curr) >= 8) {
+-			memcpy(data, &val, 8);
+-			data += 8;
+-			curr += 8;
+-		} else {
+-			/* copy only remaining bytes */
+-			memcpy(data, &val, max - curr);
+-			break;
+-		}
+-	} while (curr < max);
+-
+-	return curr;
+-}
+-
+-static int crypto4xx_prng_generate(struct crypto_rng *tfm,
+-				   const u8 *src, unsigned int slen,
+-				   u8 *dstn, unsigned int dlen)
+-{
+-	struct rng_alg *alg = crypto_rng_alg(tfm);
+-	struct crypto4xx_alg *amcc_alg;
+-	struct crypto4xx_device *dev;
+-	int ret;
+-
+-	amcc_alg = container_of(alg, struct crypto4xx_alg, alg.u.rng);
+-	dev = amcc_alg->dev;
+-
+-	mutex_lock(&dev->core_dev->rng_lock);
+-	ret = ppc4xx_prng_data_read(dev, dstn, dlen);
+-	mutex_unlock(&dev->core_dev->rng_lock);
+-	return ret;
+-}
+-
+-
+-static int crypto4xx_prng_seed(struct crypto_rng *tfm, const u8 *seed,
+-			unsigned int slen)
+-{
+-	return 0;
+-}
+-
+ /*
+  * Supported Crypto Algorithms
+  */
+@@ -1272,18 +1199,6 @@ static struct crypto4xx_alg_common crypto4xx_alg[] = {
+ 			.cra_module	= THIS_MODULE,
+ 		},
+ 	} },
+-	{ .type = CRYPTO_ALG_TYPE_RNG, .u.rng = {
+-		.base = {
+-			.cra_name		= "stdrng",
+-			.cra_driver_name        = "crypto4xx_rng",
+-			.cra_priority		= 300,
+-			.cra_ctxsize		= 0,
+-			.cra_module		= THIS_MODULE,
+-		},
+-		.generate               = crypto4xx_prng_generate,
+-		.seed                   = crypto4xx_prng_seed,
+-		.seedsize               = 0,
+-	} },
+ };
  
  /*
-  * Note: Only use this function to copy items that is word aligned.
+@@ -1361,7 +1276,6 @@ static int crypto4xx_probe(struct platform_device *ofdev)
+ 	core_dev->dev->core_dev = core_dev;
+ 	core_dev->dev->is_revb = is_revb;
+ 	core_dev->device = dev;
+-	mutex_init(&core_dev->rng_lock);
+ 	spin_lock_init(&core_dev->lock);
+ 	INIT_LIST_HEAD(&core_dev->dev->alg_list);
+ 	ratelimit_default_init(&core_dev->dev->aead_ratelimit);
+@@ -1439,7 +1353,6 @@ static void crypto4xx_remove(struct platform_device *ofdev)
+ 	tasklet_kill(&core_dev->tasklet);
+ 	/* Un-register with Linux CryptoAPI */
+ 	crypto4xx_unregister_alg(core_dev->dev);
+-	mutex_destroy(&core_dev->rng_lock);
+ 	/* Free all allocated memory */
+ 	crypto4xx_stop_all(core_dev);
+ }
+diff --git a/drivers/crypto/amcc/crypto4xx_core.h b/drivers/crypto/amcc/crypto4xx_core.h
+index 0cafce828aac..d6a6a5699b41 100644
+--- a/drivers/crypto/amcc/crypto4xx_core.h
++++ b/drivers/crypto/amcc/crypto4xx_core.h
+@@ -14,10 +14,8 @@
+ #define __CRYPTO4XX_CORE_H__
+ 
+ #include <linux/ratelimit.h>
+-#include <linux/mutex.h>
+ #include <linux/scatterlist.h>
+ #include <crypto/internal/aead.h>
+-#include <crypto/internal/rng.h>
+ #include <crypto/internal/skcipher.h>
+ #include "crypto4xx_reg_def.h"
+ #include "crypto4xx_sa.h"
+@@ -111,7 +109,6 @@ struct crypto4xx_core_device {
+ 	u32 irq;
+ 	struct tasklet_struct tasklet;
+ 	spinlock_t lock;
+-	struct mutex rng_lock;
+ };
+ 
+ struct crypto4xx_ctx {
+@@ -135,7 +132,6 @@ struct crypto4xx_alg_common {
+ 	union {
+ 		struct skcipher_alg cipher;
+ 		struct aead_alg aead;
+-		struct rng_alg rng;
+ 	} u;
+ };
+ 
+diff --git a/drivers/crypto/amcc/crypto4xx_reg_def.h b/drivers/crypto/amcc/crypto4xx_reg_def.h
+index 1038061224da..73d626308a84 100644
+--- a/drivers/crypto/amcc/crypto4xx_reg_def.h
++++ b/drivers/crypto/amcc/crypto4xx_reg_def.h
+@@ -90,20 +90,9 @@
+ #define CRYPTO4XX_BYTE_ORDER_CFG 		0x000600d8
+ #define CRYPTO4XX_ENDIAN_CFG			0x000600d8
+ 
+-#define CRYPTO4XX_PRNG_STAT			0x00070000
+-#define CRYPTO4XX_PRNG_STAT_BUSY		0x1
+ #define CRYPTO4XX_PRNG_CTRL			0x00070004
+ #define CRYPTO4XX_PRNG_SEED_L			0x00070008
+ #define CRYPTO4XX_PRNG_SEED_H			0x0007000c
+-
+-#define CRYPTO4XX_PRNG_RES_0			0x00070020
+-#define CRYPTO4XX_PRNG_RES_1			0x00070024
+-#define CRYPTO4XX_PRNG_RES_2			0x00070028
+-#define CRYPTO4XX_PRNG_RES_3			0x0007002C
+-
+-#define CRYPTO4XX_PRNG_LFSR_L			0x00070030
+-#define CRYPTO4XX_PRNG_LFSR_H			0x00070034
+-
+ /*
+  * Initialize CRYPTO ENGINE registers, and memory bases.
+  */
 -- 
 2.55.0
 
