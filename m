@@ -1,121 +1,63 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 943803438BD;
-	Fri, 17 Jul 2026 17:19:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5627537FF7A;
+	Fri, 17 Jul 2026 20:17:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784308749; cv=none; b=XlPYwRmsaaQ+Erkws9YkW6IoPjGj0tVra0sj7eb1FzbqOeI8OrO/FQ8UXfmXPY9jks9sGVFBcAgLGIEnrm/Ugf8U4VgsHKsXbDB5+UvjENJMFCLB8L3sv0AShMFPpKtDSl3fV5/S5OaZ8O+0MJo8JhkaqkX+wxiXvVh71aLTBBQ=
+	t=1784319463; cv=none; b=VmROA9zREIiLtF82FB4GWCLELdtbZiXyk8HLzfNNxk903gkrFW99EizTK55gjAvd3TKNWVRQp94/hyDAP29x16JoWIIln113C0BW0LSg7BQfpDnpgT2NETkd3xcp4xIE0OcKWWNof1TcUPSaTr2lwA6dAYhR/cS8FA5JBnrSefE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784308749; c=relaxed/simple;
-	bh=gy2q0RK7WDIkIOGW93hsTcCDqk61g8WyUGqOEI/CueU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ObTfHd2OLp4A/W3fCUqpAuaq8CPaY5EgTjkFiijsnr00Pk8tzw5JmqvgQ1X6WtrykEofdv+kI6WHGZ1MF5OyUAXpSfDjQugIc4HBvF4cBLJaDKpzep+44tOwZpwtiUkM7VJOTZs9jHtoY7N1WypkqKt5h41/pIJScEe+pyTUl1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kRf0u4qE; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784319463; c=relaxed/simple;
+	bh=Ujaf15x6/zFiNiZQK9lbAb0Xa2IDEIiX/4ukAgGcQm8=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=fBJtLm/fCWAlSFRePqIzSG+rT0zUERz9/su1YBL7U11wET0B0yfIdLN7n6sFbtZNTB2i7BDqng1r98u6+bS4CIbE+2BcwDqJN9sT+z/mVIwc6vef9uu6UWyz+4ZMtg5Phnm7RfprUhjBjAc9wvM2rKW+ZjTNWhhwF+Pfn2CIpN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oNba8DN7; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kRf0u4qE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA9811F00A3A;
-	Fri, 17 Jul 2026 17:19:07 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oNba8DN7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B6841F000E9;
+	Fri, 17 Jul 2026 20:17:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784308748;
-	bh=UnHkVLMCAQLQ4+B9er/X7SytQ44lCRGiRd6XPR5oP94=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=kRf0u4qE80aV1ogajGbTyHdXWPlHKbE/VDn6x8aVweD54mvFOkEHhUTXxOFlJx7TF
-	 38wNt/63GXdBRVHUq+8rkUzmgcBrVH7/zYeCkmi5ovM2ZSiMOU2v2HiSzHWpRhA7aX
-	 P/xzZfB12XnJ7K2G3IBa3UFxi8q/j4gd/k9z/o90d451S1pAw4C0uo6wQ90XC8bY4z
-	 fcJBzDTkCASxwiTspwIsq2jrywly81dyDcAvZK+w9sT4VyLNzRyIu/jUJ480umW5Ly
-	 Eji2UGevleFA1PobcZzS7lmRyKgib0I4c5Jx+O8gRRQRKenUWu/5kzi709ygeG0PSH
-	 XHaBIP0fzQh9A==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-kernel@vger.kernel.org,
-	Daniel Jordan <daniel.m.jordan@oracle.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 1/2] padata: Mark remaining code as __init and data as __initdata
-Date: Fri, 17 Jul 2026 10:18:30 -0700
-Message-ID: <20260717171831.27994-2-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260717171831.27994-1-ebiggers@kernel.org>
-References: <20260717171831.27994-1-ebiggers@kernel.org>
+	s=k20260515; t=1784319461;
+	bh=sboNH7c9evuIPN+QZbHw11wakR9EZSplwacBGdc7Q88=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc;
+	b=oNba8DN7gyE/djqq+OAByE9CzJLpPUa71GWxDAvt7a9ZGN2xe9lt8/tY9fqru8D08
+	 BqOqeUtHhvRZqKUQfnFLR2vml0+/mitfYYHgzoGniBGAwQsI2mf9MWmcnU6LevW7ho
+	 IAkMgByq2kcaIbD/7c5CTqv7S2zsPajxc2uOOSxjvsIsZtxexFGAo3St2UUMZ3frR+
+	 EcanIWq8F2brP6ELGMM/5ejtoMJxqf8jyLJg+igYk8nX8KjCWOiTNl8Rryh4WoHm5v
+	 ymZEPAok9Fa4HsRqtXks/LWbvflIr8ZkyxzLP5Bxf0p2oTSdu5FVqImIFGJScGYiKq
+	 T38FgSiPl+VMg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 93B9B380CFED;
+	Fri, 17 Jul 2026 20:17:14 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto library fixes for v7.2-rc4
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20260717160746.GA2046@quark>
+References: <20260717160746.GA2046@quark>
+X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20260717160746.GA2046@quark>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-for-linus
+X-PR-Tracked-Commit-Id: e073f1238ecaea366f53e98724c40b31856da56a
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 0dde292a4c23090459655ada697e948ff4adc7c3
+Message-Id: <178431943320.1854741.4995862756718009789.pr-tracker-bot@kernel.org>
+Date: Fri, 17 Jul 2026 20:17:13 +0000
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>, Herbert Xu <herbert@gondor.apana.org.au>, Thomas Huth <thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Since the serialized job support was removed from padata, the remaining
-code is used only by the multithreaded job support, whose public
-functions are __init.
+The pull request you sent on Fri, 17 Jul 2026 09:07:46 -0700:
 
-Therefore, also mark the internal functions as __init and the internal
-data as __initdata.
+> https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git tags/libcrypto-for-linus
 
-This makes them be discarded after the kernel boots.  It also eliminates
-the need to mark padata_work_init() as __ref.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/0dde292a4c23090459655ada697e948ff4adc7c3
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- kernel/padata.c | 22 +++++++---------------
- 1 file changed, 7 insertions(+), 15 deletions(-)
+Thank you!
 
-diff --git a/kernel/padata.c b/kernel/padata.c
-index 6eb130d31024..e7f89e3e44e9 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -31,9 +31,9 @@ struct padata_work {
- 	void			*pw_data;
- };
- 
--static DEFINE_SPINLOCK(padata_works_lock);
--static struct padata_work *padata_works;
--static LIST_HEAD(padata_free_works);
-+static __initdata DEFINE_SPINLOCK(padata_works_lock);
-+static __initdata struct padata_work *padata_works;
-+static __initdata LIST_HEAD(padata_free_works);
- 
- struct padata_mt_job_state {
- 	spinlock_t		lock;
-@@ -46,7 +46,7 @@ struct padata_mt_job_state {
- 
- static void __init padata_mt_helper(struct work_struct *work);
- 
--static struct padata_work *padata_work_alloc(void)
-+static struct padata_work *__init padata_work_alloc(void)
- {
- 	struct padata_work *pw;
- 
-@@ -60,16 +60,8 @@ static struct padata_work *padata_work_alloc(void)
- 	return pw;
- }
- 
--/*
-- * This function is marked __ref because this function may be optimized in such
-- * a way that it directly refers to work_fn's address, which causes modpost to
-- * complain when work_fn is marked __init. This scenario was observed with clang
-- * LTO, where padata_work_init() was optimized to refer directly to
-- * padata_mt_helper() because the calls to padata_work_init() with other work_fn
-- * values were eliminated or inlined.
-- */
--static void __ref padata_work_init(struct padata_work *pw, work_func_t work_fn,
--				   void *data, int flags)
-+static void __init padata_work_init(struct padata_work *pw, work_func_t work_fn,
-+				    void *data, int flags)
- {
- 	if (flags & PADATA_WORK_ONSTACK)
- 		INIT_WORK_ONSTACK(&pw->pw_work, work_fn);
-@@ -98,7 +90,7 @@ static int __init padata_work_alloc_mt(int nworks, void *data,
- 	return i;
- }
- 
--static void padata_work_free(struct padata_work *pw)
-+static void __init padata_work_free(struct padata_work *pw)
- {
- 	lockdep_assert_held(&padata_works_lock);
- 	list_add(&pw->pw_list, &padata_free_works);
 -- 
-2.55.0
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
