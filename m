@@ -1,43 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4E8B31E831;
-	Fri, 17 Jul 2026 02:48:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D1DD285CBC;
+	Fri, 17 Jul 2026 03:35:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784256508; cv=none; b=pcgcMN2cZ4XC/D/pz6OBfAua6Rj2+GhDuoBqPV3SsEhU3fjXOCT0EznQCW14dOPrp3ZEdTBMZJKIdmhRn7wrDQPDDPoWni8wPl3cwCtxkopEuWsy/fxn+99FIENrGtKyWGaVYb4pYfh6mRHuEaB4htLfU/52LwBXofSkVE++ExU=
+	t=1784259331; cv=none; b=CFZGO3cXxrB840XXrtUCwtgdOMq0gVYTRzvtyZN//FjlAu0jLxYEB1coPPq/kMaS7ORzi6nCRrCUhDv1WPTIo7Xj+LfhaLxuc8C19+id4pyXFUsKkFqYcwclVEuyR45vYx5sClZbgVpfKa6VsI6IikYbXY+NXmiTu0Jrb6N2ulg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784256508; c=relaxed/simple;
-	bh=IqygerktyTEPyLEiokq9VxE6GDX7wRzJHIK46ETWviI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GleX/ifGAw9Qd5orMTWssRkzd+AB/xOzX/z+3e0/iJ6ePC6GpaD3p6yc9SPY+1jIPzkHynj6BcP0/exBUCv/2Td0B5sO4jZlr0Irmngg6CYMY+Zo+jT3W9fXn58eVshrLhfg94bi3uVQ2TH1CquiuUWS6F3ZBneoKklTCyEcGl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DGHciYM1; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784259331; c=relaxed/simple;
+	bh=/nqISnjRSdY8yl5A6Erb2R0yQrZKbvZHOAKtbfRbttQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QRSiMOVB/d/4XyEP2vPxHWx5ByUK9DqXaIGp/uv12iUPshligkQkknXFxRtvWNyfEgKOxMH2yscuLPtzgNTj+As5bQ3vB4GV52SwgZpRNQPX/w9ZGhgvOa6ZqpgnsMhBN03bru0l/OhcNUhbaI6iWYmAAqaLdi83uWLoZXYUvKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KBlwVepO; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DGHciYM1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69F941F00A3E;
-	Fri, 17 Jul 2026 02:48:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KBlwVepO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 062891F000E9;
+	Fri, 17 Jul 2026 03:35:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784256506;
-	bh=rMf1AkGg6ZAVO5CXXISnGnNmfYJhNNFj6Yjj2NwEEjc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=DGHciYM1wlaaQ9cuHdf5j6wyHU4W3RSSTok+6qeLB1JogDefbtwZQv+V1Ql4LmQip
-	 6PxseYcWB0CcvLVU3NCQBR52BYEIxZt5ugztwmVaD0iHc+ynXOH7JL95add+fw3NJr
-	 vhXAXdspxVI8xvTRQnabzVcpaObWhMLL7twNGo6VHynvtVb/wbEsENORIQmZi0ko5w
-	 qhUWl7N697gX+0rELz+ex/oQTMFfvluCHBpqE1D/4xiAjFPVWV3qHq5XhEJMi7gUlv
-	 WpQm/D1R1o6qktqIsESFrpgW62mquNiba7R/xIF+BM/vBOdb7s9pUFRUWlQoKvwvBp
-	 aZ2vM6uEgsKjQ==
+	s=k20260515; t=1784259330;
+	bh=8EZzffEuvQNY3nQ5bnoWmw87kaWIly/NBux4nTDDPPM=;
+	h=From:To:Cc:Subject:Date;
+	b=KBlwVepOu76kFYm+CNHvSDEHDOPyDzKscPoXO3wZd7a53JXANhhNWEE6JHHvj/nWm
+	 koekDstxW+qj++kjnFwiu9+Rs7QfGSi8F98pWSLqxEBTYBTkLM/FPZ9KCS36fwj21D
+	 mqO6TkE13qs5Q9tbUMImQ3ztsL5E850d0+RlTS6HFZ+CObspTwmEU4DXyN8dWmnwoN
+	 /38emXmYNJ9baXi2qX5ta0VYIGqHBsGae6PAGzQRDzdcQobKxhPDOo7gIbXgUxMr7g
+	 m+CeV+IC764VeGOr2Jbiwo64cYDXCpagUMCkEmPiVKc8tcRHx5p93CZc6ysOCVXIGs
+	 zIMDvw9nq+x2w==
 From: Eric Biggers <ebiggers@kernel.org>
 To: stable@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
 	Eric Biggers <ebiggers@kernel.org>,
-	Christian Lamparter <chunkeey@gmail.com>,
+	Taeyang Lee <0wn@theori.io>,
+	Feng Ning <feng@innora.ai>,
+	Demi Marie Obenour <demiobenour@gmail.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 5.10 3/3] crypto: crypto4xx - Remove insecure and unused rng_alg
-Date: Thu, 16 Jul 2026 19:46:05 -0700
-Message-ID: <20260717024605.87486-4-ebiggers@kernel.org>
+Subject: [PATCH 6.1] crypto: af_alg - Remove zero-copy support from skcipher and aead
+Date: Thu, 16 Jul 2026 20:33:12 -0700
+Message-ID: <20260717033312.285557-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260717024605.87486-1-ebiggers@kernel.org>
-References: <20260717024605.87486-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -46,234 +46,120 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-commit 7811ec9e973d2c9e465083699f0c8240b98cb8c4 upstream.
+commit ffdd2bc378953b525aca61902534e753f1f8e734 upstream.
 
-Remove crypto4xx_rng, as it is insecure and unused:
+The zero-copy support is one of the riskiest aspects of AF_ALG.  It
+allows userspace to request cryptographic operations directly on
+pagecache pages of files like the 'su' binary.  It also allows userspace
+to concurrently modify the memory which is being operated on, a recipe
+for TOCTOU vulnerabilities.
 
-- It has only a 64-bit security strength, which is highly inadequate.
-  This can be seen by the fact that crypto4xx_hw_init() seeds it with
-  only 64 bits of entropy, and the fact that the original commit
-  mentions that it implements ANSI X9.17 Annex C.
+While zero-copy support is more valuable in other areas of the kernel
+like the frequently used networking and file I/O code, it has far less
+value in AF_ALG, which is a niche UAPI.  AF_ALG primarily just exists
+for backwards compatibility with a small set of userspace programs such
+as 'iwd' that haven't yet been fixed to use userspace crypto code.
 
-  Another issue was that this driver didn't implement the crypto_rng API
-  correctly, as crypto4xx_prng_generate() didn't return 0 on success.
+Originally AF_ALG was intended to be used to access hardware crypto
+accelerators.  However, it isn't an efficient interface for that anyway,
+and it turned out to be rarely used in this way in practice.
 
-- No user of this code is known.  It's usable only theoretically via the
-  "rng" algorithm type of AF_ALG.  But userspace actually just uses the
-  actual Linux RNG (/dev/random etc) instead.  And rng_algs don't
-  contribute entropy to the actual Linux RNG either.  (This may have
-  been confused with hwrng, which does contribute entropy.)
+Thus, the risks of the zero-copy support in AF_ALG vastly outweigh its
+benefits.  Let's just remove it.
 
-Fixes: d072bfa48853 ("crypto: crypto4xx - add prng crypto support")
+This commit removes it from the "skcipher" and "aead" algorithm types.
+"hash" will be handled separately.
+
+This is a soft break, not a hard break.  Even after this commit, it
+still works to use splice() or sendfile() to transfer data to an AF_ALG
+request socket from a pipe or any file, respectively.  What changes is
+just that the kernel now makes an internal, stable copy of the data
+before doing the crypto operation.  So performance is slightly reduced,
+but the UAPI isn't broken.  And, very importantly, it's much safer.
+
+Tested with libkcapi/test.sh.  All its test cases still pass.  I also
+verified that this would have prevented the copy.fail exploit as well.
+I also used a custom test program to verify that sendfile() still works.
+
+Fixes: 8ff590903d5f ("crypto: algif_skcipher - User-space interface for skcipher operations")
+Fixes: 400c40cf78da ("crypto: algif - add AEAD support")
+Reported-by: Taeyang Lee <0wn@theori.io>
+Link: https://copy.fail/
+Reported-by: Feng Ning <feng@innora.ai>
+Closes: https://lore.kernel.org/r/afYcc-tZFwvZZo76@ans-MacBook-Pro.local
+Reviewed-by: Demi Marie Obenour <demiobenour@gmail.com>
 Cc: stable@vger.kernel.org
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-Acked-by: Christian Lamparter <chunkeey@gmail.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+[Backport-notes: this actually does nothing on 6.1, since zero-copy
+ support was already removed from skcipher and aead accidentally on 6.1.
+ Namely, a commit that changed af_alg_sendpage() to use MSG_SPLICE_PAGES
+ was backported, but the actual implementation of MSG_SPLICE_PAGES
+ wasn't backported.  I'm including this commit anyway since people might
+ think this is missing on 6.1 if it's the only LTS kernel without this.]
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- drivers/crypto/amcc/crypto4xx_core.c    | 87 -------------------------
- drivers/crypto/amcc/crypto4xx_core.h    |  4 --
- drivers/crypto/amcc/crypto4xx_reg_def.h | 11 ----
- 3 files changed, 102 deletions(-)
+ Documentation/crypto/userspace-if.rst | 31 ++++-----------------------
+ crypto/af_alg.c                       |  2 +-
+ 2 files changed, 5 insertions(+), 28 deletions(-)
 
-diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
-index b0841b3504a5..d370e707dbdd 100644
---- a/drivers/crypto/amcc/crypto4xx_core.c
-+++ b/drivers/crypto/amcc/crypto4xx_core.c
-@@ -31,11 +31,9 @@
- #include <crypto/ctr.h>
- #include <crypto/gcm.h>
- #include <crypto/sha.h>
--#include <crypto/rng.h>
- #include <crypto/scatterwalk.h>
- #include <crypto/skcipher.h>
- #include <crypto/internal/aead.h>
--#include <crypto/internal/rng.h>
- #include <crypto/internal/skcipher.h>
- #include "crypto4xx_reg_def.h"
- #include "crypto4xx_core.h"
-@@ -989,10 +987,6 @@ static int crypto4xx_register_alg(struct crypto4xx_device *sec_dev,
- 			rc = crypto_register_aead(&alg->alg.u.aead);
- 			break;
+diff --git a/Documentation/crypto/userspace-if.rst b/Documentation/crypto/userspace-if.rst
+index b45dabbf69d6..90dbbd56c4e3 100644
+--- a/Documentation/crypto/userspace-if.rst
++++ b/Documentation/crypto/userspace-if.rst
+@@ -328,33 +328,10 @@ CRYPTO_USER_API_RNG_CAVP option:
+ Zero-Copy Interface
+ -------------------
  
--		case CRYPTO_ALG_TYPE_RNG:
--			rc = crypto_register_rng(&alg->alg.u.rng);
--			break;
+-In addition to the send/write/read/recv system call family, the AF_ALG
+-interface can be accessed with the zero-copy interface of
+-splice/vmsplice. As the name indicates, the kernel tries to avoid a copy
+-operation into kernel space.
 -
- 		default:
- 			rc = crypto_register_skcipher(&alg->alg.u.cipher);
- 			break;
-@@ -1018,10 +1012,6 @@ static void crypto4xx_unregister_alg(struct crypto4xx_device *sec_dev)
- 			crypto_unregister_aead(&alg->alg.u.aead);
- 			break;
+-The zero-copy operation requires data to be aligned at the page
+-boundary. Non-aligned data can be used as well, but may require more
+-operations of the kernel which would defeat the speed gains obtained
+-from the zero-copy interface.
+-
+-The system-inherent limit for the size of one zero-copy operation is 16
+-pages. If more data is to be sent to AF_ALG, user space must slice the
+-input into segments with a maximum size of 16 pages.
+-
+-Zero-copy can be used with the following code example (a complete
+-working example is provided with libkcapi):
+-
+-::
+-
+-    int pipes[2];
+-
+-    pipe(pipes);
+-    /* input data in iov */
+-    vmsplice(pipes[1], iov, iovlen, SPLICE_F_GIFT);
+-    /* opfd is the file descriptor returned from accept() system call */
+-    splice(pipes[0], NULL, opfd, NULL, ret, 0);
+-    read(opfd, out, outlen);
++AF_ALG used to have zero-copy support, but it was removed due to it being a
++frequent source of vulnerabilities.  For backwards compatibility the splice()
++and sendfile() system calls are still supported, but the kernel will make an
++internal copy of the data before passing it to the crypto code.
  
--		case CRYPTO_ALG_TYPE_RNG:
--			crypto_unregister_rng(&alg->alg.u.rng);
--			break;
--
- 		default:
- 			crypto_unregister_skcipher(&alg->alg.u.cipher);
- 		}
-@@ -1080,69 +1070,6 @@ static irqreturn_t crypto4xx_ce_interrupt_handler_revb(int irq, void *data)
- 		PPC4XX_TMO_ERR_INT);
- }
  
--static int ppc4xx_prng_data_read(struct crypto4xx_device *dev,
--				 u8 *data, unsigned int max)
--{
--	unsigned int i, curr = 0;
--	u32 val[2];
--
--	do {
--		/* trigger PRN generation */
--		writel(PPC4XX_PRNG_CTRL_AUTO_EN,
--		       dev->ce_base + CRYPTO4XX_PRNG_CTRL);
--
--		for (i = 0; i < 1024; i++) {
--			/* usually 19 iterations are enough */
--			if ((readl(dev->ce_base + CRYPTO4XX_PRNG_STAT) &
--			     CRYPTO4XX_PRNG_STAT_BUSY))
--				continue;
--
--			val[0] = readl_be(dev->ce_base + CRYPTO4XX_PRNG_RES_0);
--			val[1] = readl_be(dev->ce_base + CRYPTO4XX_PRNG_RES_1);
--			break;
--		}
--		if (i == 1024)
--			return -ETIMEDOUT;
--
--		if ((max - curr) >= 8) {
--			memcpy(data, &val, 8);
--			data += 8;
--			curr += 8;
--		} else {
--			/* copy only remaining bytes */
--			memcpy(data, &val, max - curr);
--			break;
--		}
--	} while (curr < max);
--
--	return curr;
--}
--
--static int crypto4xx_prng_generate(struct crypto_rng *tfm,
--				   const u8 *src, unsigned int slen,
--				   u8 *dstn, unsigned int dlen)
--{
--	struct rng_alg *alg = crypto_rng_alg(tfm);
--	struct crypto4xx_alg *amcc_alg;
--	struct crypto4xx_device *dev;
--	int ret;
--
--	amcc_alg = container_of(alg, struct crypto4xx_alg, alg.u.rng);
--	dev = amcc_alg->dev;
--
--	mutex_lock(&dev->core_dev->rng_lock);
--	ret = ppc4xx_prng_data_read(dev, dstn, dlen);
--	mutex_unlock(&dev->core_dev->rng_lock);
--	return ret;
--}
--
--
--static int crypto4xx_prng_seed(struct crypto_rng *tfm, const u8 *seed,
--			unsigned int slen)
--{
--	return 0;
--}
--
- /*
-  * Supported Crypto Algorithms
-  */
-@@ -1312,18 +1239,6 @@ static struct crypto4xx_alg_common crypto4xx_alg[] = {
- 			.cra_module	= THIS_MODULE,
- 		},
- 	} },
--	{ .type = CRYPTO_ALG_TYPE_RNG, .u.rng = {
--		.base = {
--			.cra_name		= "stdrng",
--			.cra_driver_name        = "crypto4xx_rng",
--			.cra_priority		= 300,
--			.cra_ctxsize		= 0,
--			.cra_module		= THIS_MODULE,
--		},
--		.generate               = crypto4xx_prng_generate,
--		.seed                   = crypto4xx_prng_seed,
--		.seedsize               = 0,
--	} },
- };
+ Setsockopt Interface
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index ca54f2927063..80a8d3a4a3cf 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -977,7 +977,7 @@ ssize_t af_alg_sendpage(struct socket *sock, struct page *page,
+ {
+ 	struct bio_vec bvec;
+ 	struct msghdr msg = {
+-		.msg_flags = flags | MSG_SPLICE_PAGES,
++		.msg_flags = flags,
+ 	};
  
- /*
-@@ -1393,7 +1308,6 @@ static int crypto4xx_probe(struct platform_device *ofdev)
- 	core_dev->dev->core_dev = core_dev;
- 	core_dev->dev->is_revb = is_revb;
- 	core_dev->device = dev;
--	mutex_init(&core_dev->rng_lock);
- 	spin_lock_init(&core_dev->lock);
- 	INIT_LIST_HEAD(&core_dev->dev->alg_list);
- 	ratelimit_default_init(&core_dev->dev->aead_ratelimit);
-@@ -1471,7 +1385,6 @@ static int crypto4xx_remove(struct platform_device *ofdev)
- 	tasklet_kill(&core_dev->tasklet);
- 	/* Un-register with Linux CryptoAPI */
- 	crypto4xx_unregister_alg(core_dev->dev);
--	mutex_destroy(&core_dev->rng_lock);
- 	/* Free all allocated memory */
- 	crypto4xx_stop_all(core_dev);
- 
-diff --git a/drivers/crypto/amcc/crypto4xx_core.h b/drivers/crypto/amcc/crypto4xx_core.h
-index 0d83cde84cca..d8224bbe89ca 100644
---- a/drivers/crypto/amcc/crypto4xx_core.h
-+++ b/drivers/crypto/amcc/crypto4xx_core.h
-@@ -14,10 +14,8 @@
- #define __CRYPTO4XX_CORE_H__
- 
- #include <linux/ratelimit.h>
--#include <linux/mutex.h>
- #include <linux/scatterlist.h>
- #include <crypto/internal/aead.h>
--#include <crypto/internal/rng.h>
- #include <crypto/internal/skcipher.h>
- #include "crypto4xx_reg_def.h"
- #include "crypto4xx_sa.h"
-@@ -111,7 +109,6 @@ struct crypto4xx_core_device {
- 	u32 irq;
- 	struct tasklet_struct tasklet;
- 	spinlock_t lock;
--	struct mutex rng_lock;
- };
- 
- struct crypto4xx_ctx {
-@@ -135,7 +132,6 @@ struct crypto4xx_alg_common {
- 	union {
- 		struct skcipher_alg cipher;
- 		struct aead_alg aead;
--		struct rng_alg rng;
- 	} u;
- };
- 
-diff --git a/drivers/crypto/amcc/crypto4xx_reg_def.h b/drivers/crypto/amcc/crypto4xx_reg_def.h
-index 1038061224da..73d626308a84 100644
---- a/drivers/crypto/amcc/crypto4xx_reg_def.h
-+++ b/drivers/crypto/amcc/crypto4xx_reg_def.h
-@@ -90,20 +90,9 @@
- #define CRYPTO4XX_BYTE_ORDER_CFG 		0x000600d8
- #define CRYPTO4XX_ENDIAN_CFG			0x000600d8
- 
--#define CRYPTO4XX_PRNG_STAT			0x00070000
--#define CRYPTO4XX_PRNG_STAT_BUSY		0x1
- #define CRYPTO4XX_PRNG_CTRL			0x00070004
- #define CRYPTO4XX_PRNG_SEED_L			0x00070008
- #define CRYPTO4XX_PRNG_SEED_H			0x0007000c
--
--#define CRYPTO4XX_PRNG_RES_0			0x00070020
--#define CRYPTO4XX_PRNG_RES_1			0x00070024
--#define CRYPTO4XX_PRNG_RES_2			0x00070028
--#define CRYPTO4XX_PRNG_RES_3			0x0007002C
--
--#define CRYPTO4XX_PRNG_LFSR_L			0x00070030
--#define CRYPTO4XX_PRNG_LFSR_H			0x00070034
--
- /*
-  * Initialize CRYPTO ENGINE registers, and memory bases.
-  */
+ 	if (flags & MSG_SENDPAGE_NOTLAST)
+
+base-commit: 090666d3cc906176fc47363520eb746b94c7d578
 -- 
 2.55.0
 
