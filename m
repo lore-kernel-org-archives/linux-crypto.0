@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4643131AAA3;
-	Fri, 17 Jul 2026 03:53:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815D9285CBC;
+	Fri, 17 Jul 2026 03:54:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784260408; cv=none; b=TFBMEg7SfcyZHWmjEzTBdJkOqmyzDkwmcH707KDmxLzprBXDWg89YpBuUiwAaRoQfwPH/38xGK9EKTrdWoswbazGd2gq+p0UP0+9XUxuhPujLAuLmlNpzdrrHAHA5N4bXgXdDIP1lBuOuhQ/15a4lclwZSa3JLbUW/Pd5iCTSLk=
+	t=1784260459; cv=none; b=hT+TVDQvanA6fKABrfs1ccs+eWK1Bsw30DXSsbq40dWpEcDrHqiW19gIZD/27l5lOCJ8VYSgNfWOyuW3Wl4r6WtVre69G3qqnAc5Oo9FNWtsJJwLmy2aE5aGRBVjwTrEjfREWuCqCuUAx4Diba+XLwRcSWuS3/KKX3qM2av3CAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784260408; c=relaxed/simple;
-	bh=kg8wTpyKJcycHALKQ28TnoUsjxMZPc5InWegFCNQNHA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rczr218ayy3gLawOf7lOnLdArnfKrdOjyRh1n85b8i3zBrEuTkod+DNO8sLVPo9GpmiOj2thMIO64TUDZBEoWeDzHLkvrE6RnwKawIa5l83VSmzz9ih2Z9fYTLPe5utxh1f2awqiU2yycUZmDlUNCzd/UIyyaXiixD40Awb9BDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a4TBJqu9; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784260459; c=relaxed/simple;
+	bh=koRV9Cqa94Z/R9M49VR8b2+MjFUWK0KFx9EE8zJNFfg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=H3JWpCKlnItkF0jYO8P313Qx8wPNRYz8+0IathQzszoaVQg8R1wEyBtcGBOd8bkPomY1j9KhhdGwE/UY6GpZrlLsy0fTQ56QiUJ+MUk+cSKjO8Mye6BX8dKy2SyTyNXgz/gTBQsbjtQrgkX7au0dV+IWVLBktP4ivAbzYYnyks8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UebmFNwy; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a4TBJqu9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B39521F000E9;
-	Fri, 17 Jul 2026 03:53:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UebmFNwy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AA421F000E9;
+	Fri, 17 Jul 2026 03:54:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784260406;
-	bh=xeMBgFFZuSuHc7d5PQhWpxIImykXqEb+Xvzouxvl2k8=;
+	s=k20260515; t=1784260458;
+	bh=cQIUaPJpZPemqexXtZ24ZIrPA+Q6N4rQII+dEOStoYg=;
 	h=From:To:Cc:Subject:Date;
-	b=a4TBJqu9yuJUEHnlglb/VYl8j2SqK/g+3PZRWaKvZPg8TZmqxeJnu4vkeFVwEk1jy
-	 zcpOXrIl3kFYiyBrzP/bCXKbYZ1UoWGRPIj80PDIUoW/rZ+QFtws2neOdZsvABe9hy
-	 kVIPc9tEpuVJzTm8DGS6uELs5Ot8TZeuX/runweZUCcFifBsH3PFUG/82hVVIcxOBy
-	 D7imp0z21bE1PS66sDti4ELFI0MxzgH3cyZC5RxT/7wBiSscmfHiKV83+L80I760Q2
-	 XzsNUV56OlVjMclNz+lZA6H+20mq498KYKIBpbTg0BKhkoTBZrykbyBDX96hnVlqP2
-	 7UE6NpkfTWwYQ==
+	b=UebmFNwyrxhanYnFFt0ni2dVYR6nI/vyLSUhTbU6FTEYfoweU7kuIvLWRt4vKhVd0
+	 aJTPtkUZ5qQOQbhWGtQJzdo745hgy9EsnDZNXQnwOLv8dzvgrGkaHstocwKoL23JJK
+	 uU8rxLMHDr15z/fx+sDoMeWiTl0ap0mrWKZG+XYZel31mAoC4UrnngtiDo4JTW0xHx
+	 cMlvoPnqyNeSrufnFbxkQ5MoO3HFwD8s5gxYQ+/qFMh0KKlxyZbk2xywSloM0DnoP2
+	 470D2uuKvihxpRXgLm4oDPhj2kGPG9KgnQAlRrvk7zCf9BL87WCP6Wy2hWBmPUAaus
+	 JDEYadN/kP63Q==
 From: Eric Biggers <ebiggers@kernel.org>
 To: stable@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
@@ -33,9 +33,9 @@ Cc: linux-crypto@vger.kernel.org,
 	Tianchu Chen <flynnnchen@tencent.com>,
 	Corentin LABBE <clabbe.montjoie@gmail.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 7.1,6.18,6.12,6.6,6.1] crypto: sun4i-ss - Remove insecure and unused rng_alg
-Date: Thu, 16 Jul 2026 20:50:58 -0700
-Message-ID: <20260717035058.352737-1-ebiggers@kernel.org>
+Subject: [PATCH 5.15] crypto: sun4i-ss - Remove insecure and unused rng_alg
+Date: Thu, 16 Jul 2026 20:52:28 -0700
+Message-ID: <20260717035228.353051-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -85,10 +85,10 @@ Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
  delete mode 100644 drivers/crypto/allwinner/sun4i-ss/sun4i-ss-prng.c
 
 diff --git a/arch/arm/configs/sunxi_defconfig b/arch/arm/configs/sunxi_defconfig
-index a83d29fed175..f4b8d8f7dbef 100644
+index a60c134c5e04..5127c937b485 100644
 --- a/arch/arm/configs/sunxi_defconfig
 +++ b/arch/arm/configs/sunxi_defconfig
-@@ -170,7 +170,6 @@ CONFIG_ROOT_NFS=y
+@@ -168,7 +168,6 @@ CONFIG_ROOT_NFS=y
  CONFIG_NLS_CODEPAGE_437=y
  CONFIG_NLS_ISO8859_1=y
  CONFIG_CRYPTO_DEV_SUN4I_SS=y
@@ -97,10 +97,10 @@ index a83d29fed175..f4b8d8f7dbef 100644
  CONFIG_CRYPTO_DEV_SUN8I_SS=y
  CONFIG_DMA_CMA=y
 diff --git a/drivers/crypto/allwinner/Kconfig b/drivers/crypto/allwinner/Kconfig
-index 7270e5fbc573..1048f8e95ba8 100644
+index b8e75210a0e3..06ea0e9fe6f2 100644
 --- a/drivers/crypto/allwinner/Kconfig
 +++ b/drivers/crypto/allwinner/Kconfig
-@@ -25,14 +25,6 @@ config CRYPTO_DEV_SUN4I_SS
+@@ -24,14 +24,6 @@ config CRYPTO_DEV_SUN4I_SS
  	  To compile this driver as a module, choose M here: the module
  	  will be called sun4i-ss.
  
@@ -125,10 +125,10 @@ index c0a2797d3168..06a9ae81f9f8 100644
  sun4i-ss-y += sun4i-ss-core.o sun4i-ss-hash.o sun4i-ss-cipher.o
 -sun4i-ss-$(CONFIG_CRYPTO_DEV_SUN4I_SS_PRNG) += sun4i-ss-prng.o
 diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c
-index 58a76e2ba64e..35ef0930e77f 100644
+index 44b8fc4b786d..0520cc6447e2 100644
 --- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c
 +++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c
-@@ -213,23 +213,6 @@ static struct sun4i_ss_alg_template ss_algs[] = {
+@@ -216,23 +216,6 @@ static struct sun4i_ss_alg_template ss_algs[] = {
  		}
  	}
  },
@@ -151,8 +151,8 @@ index 58a76e2ba64e..35ef0930e77f 100644
 -#endif
  };
  
- static int sun4i_ss_debugfs_show(struct seq_file *seq, void *v)
-@@ -247,12 +230,6 @@ static int sun4i_ss_debugfs_show(struct seq_file *seq, void *v)
+ static int sun4i_ss_dbgfs_read(struct seq_file *seq, void *v)
+@@ -250,12 +233,6 @@ static int sun4i_ss_dbgfs_read(struct seq_file *seq, void *v)
  				   ss_algs[i].stat_req, ss_algs[i].stat_opti, ss_algs[i].stat_fb,
  				   ss_algs[i].stat_bytes);
  			break;
@@ -165,7 +165,7 @@ index 58a76e2ba64e..35ef0930e77f 100644
  		case CRYPTO_ALG_TYPE_AHASH:
  			seq_printf(seq, "%s %s reqs=%lu\n",
  				   ss_algs[i].alg.hash.halg.base.cra_driver_name,
-@@ -471,13 +448,6 @@ static int sun4i_ss_probe(struct platform_device *pdev)
+@@ -486,13 +463,6 @@ static int sun4i_ss_probe(struct platform_device *pdev)
  				goto error_alg;
  			}
  			break;
@@ -179,7 +179,7 @@ index 58a76e2ba64e..35ef0930e77f 100644
  		}
  	}
  
-@@ -497,9 +467,6 @@ static int sun4i_ss_probe(struct platform_device *pdev)
+@@ -512,9 +482,6 @@ static int sun4i_ss_probe(struct platform_device *pdev)
  		case CRYPTO_ALG_TYPE_AHASH:
  			crypto_unregister_ahash(&ss_algs[i].alg.hash);
  			break;
@@ -189,7 +189,7 @@ index 58a76e2ba64e..35ef0930e77f 100644
  		}
  	}
  error_pm:
-@@ -520,9 +487,6 @@ static void sun4i_ss_remove(struct platform_device *pdev)
+@@ -535,9 +502,6 @@ static int sun4i_ss_remove(struct platform_device *pdev)
  		case CRYPTO_ALG_TYPE_AHASH:
  			crypto_unregister_ahash(&ss_algs[i].alg.hash);
  			break;
@@ -275,7 +275,7 @@ index 491fcb7b81b4..000000000000
 -	return 0;
 -}
 diff --git a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h
-index 6c5d4aa6453c..f7d1c79ac677 100644
+index 0fee6f4e2d90..e1a849ce11b1 100644
 --- a/drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h
 +++ b/drivers/crypto/allwinner/sun4i-ss/sun4i-ss.h
 @@ -31,8 +31,6 @@
@@ -341,7 +341,7 @@ index 6c5d4aa6453c..f7d1c79ac677 100644
  	} alg;
  	struct sun4i_ss_ctx *ss;
  	unsigned long stat_req;
-@@ -231,6 +214,3 @@ int sun4i_ss_des_setkey(struct crypto_skcipher *tfm, const u8 *key,
+@@ -230,6 +213,3 @@ int sun4i_ss_des_setkey(struct crypto_skcipher *tfm, const u8 *key,
  			unsigned int keylen);
  int sun4i_ss_des3_setkey(struct crypto_skcipher *tfm, const u8 *key,
  			 unsigned int keylen);
@@ -349,7 +349,7 @@ index 6c5d4aa6453c..f7d1c79ac677 100644
 -			   unsigned int slen, u8 *dst, unsigned int dlen);
 -int sun4i_ss_prng_seed(struct crypto_rng *tfm, const u8 *seed, unsigned int slen);
 
-base-commit: 199c9959d3a9b53f346c221757fc7ac507fbac50
+base-commit: c86c4726e7f044ab73b493c6f00527aafef640cd
 -- 
 2.55.0
 
