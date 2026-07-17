@@ -1,30 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D1DD285CBC;
-	Fri, 17 Jul 2026 03:35:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ED1631AAA3;
+	Fri, 17 Jul 2026 03:36:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784259331; cv=none; b=CFZGO3cXxrB840XXrtUCwtgdOMq0gVYTRzvtyZN//FjlAu0jLxYEB1coPPq/kMaS7ORzi6nCRrCUhDv1WPTIo7Xj+LfhaLxuc8C19+id4pyXFUsKkFqYcwclVEuyR45vYx5sClZbgVpfKa6VsI6IikYbXY+NXmiTu0Jrb6N2ulg=
+	t=1784259395; cv=none; b=eTe7zd6u6WEpm8eTEA+A2j6LeLlHMqvhO/62NxDBnZyI5cYqOQvUfC3rLDro3wKnAnYshDyB4Y8z9c6/iEhJKDd/+/6AeFJhsOPmxM4AnU5cut1UcgoqglyYRtVv8fE2v2uPbnWrQbixs2j1wqjrV8ID3f/xiwx4dk8OlYQAOy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784259331; c=relaxed/simple;
-	bh=/nqISnjRSdY8yl5A6Erb2R0yQrZKbvZHOAKtbfRbttQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QRSiMOVB/d/4XyEP2vPxHWx5ByUK9DqXaIGp/uv12iUPshligkQkknXFxRtvWNyfEgKOxMH2yscuLPtzgNTj+As5bQ3vB4GV52SwgZpRNQPX/w9ZGhgvOa6ZqpgnsMhBN03bru0l/OhcNUhbaI6iWYmAAqaLdi83uWLoZXYUvKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KBlwVepO; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784259395; c=relaxed/simple;
+	bh=b4hq/DE9KjU+Wgl9Isjbt/gCcQ+fpp2TgeM27O6A1jw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CCxlbHU32flCcATJR+J+JKL94PGeKMzCjOd8jK+jwfIojW6fiR63QSret1p2y+uvhoF6OZ/XRNvIBhIMO92ulaD71FM8iD+O3QI+zb7uCNVsSFciEikHBXYZA1g1mPUrud1/s8XTnLfduD3GTifV1BfCvL+sQ48SuOanh+ZXNLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ktHsWx19; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KBlwVepO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 062891F000E9;
-	Fri, 17 Jul 2026 03:35:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ktHsWx19"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEE9C1F000E9;
+	Fri, 17 Jul 2026 03:36:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784259330;
-	bh=8EZzffEuvQNY3nQ5bnoWmw87kaWIly/NBux4nTDDPPM=;
+	s=k20260515; t=1784259394;
+	bh=6zX/L8PSXUr41wSgynTLiTeTcXVr6cEgkuhU1lLFvJo=;
 	h=From:To:Cc:Subject:Date;
-	b=KBlwVepOu76kFYm+CNHvSDEHDOPyDzKscPoXO3wZd7a53JXANhhNWEE6JHHvj/nWm
-	 koekDstxW+qj++kjnFwiu9+Rs7QfGSi8F98pWSLqxEBTYBTkLM/FPZ9KCS36fwj21D
-	 mqO6TkE13qs5Q9tbUMImQ3ztsL5E850d0+RlTS6HFZ+CObspTwmEU4DXyN8dWmnwoN
-	 /38emXmYNJ9baXi2qX5ta0VYIGqHBsGae6PAGzQRDzdcQobKxhPDOo7gIbXgUxMr7g
-	 m+CeV+IC764VeGOr2Jbiwo64cYDXCpagUMCkEmPiVKc8tcRHx5p93CZc6ysOCVXIGs
-	 zIMDvw9nq+x2w==
+	b=ktHsWx194O7SraCulngwYrY3sO+C9soxJ95L5d88wCp4iCIdCP3Gx4DUyf7hjMStl
+	 AMSpL4dmX+AEljo4s4dX3ls4i9q+1WEvHrDEm9E1xagJ41FglpfvrznbweOjGDkVfm
+	 kwFVtdK90ozoW6tENephnd+s/DlntXgBQfOLp7SEBgk5iPtReCQSveTbToX9+Blvjm
+	 G/RrASp8xwJGoO5cSekTrKZhkNIVJULqbHpmVZV2gNfJUioZK1R2xQjuUFbLCL9Pnf
+	 910zyGE2b3aN8uk+bxgszi9Dmy+y2RRSJ9ZAl3FgTO0zMHgJeqo4g97XDWj6Bh2EX+
+	 f86SmrREYEPSA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: stable@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
@@ -34,9 +34,9 @@ Cc: linux-crypto@vger.kernel.org,
 	Feng Ning <feng@innora.ai>,
 	Demi Marie Obenour <demiobenour@gmail.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 6.1] crypto: af_alg - Remove zero-copy support from skcipher and aead
-Date: Thu, 16 Jul 2026 20:33:12 -0700
-Message-ID: <20260717033312.285557-1-ebiggers@kernel.org>
+Subject: [PATCH 5.15,5.10] crypto: af_alg - Remove zero-copy support from skcipher and aead
+Date: Thu, 16 Jul 2026 20:34:03 -0700
+Message-ID: <20260717033403.285821-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -91,17 +91,10 @@ Reviewed-by: Demi Marie Obenour <demiobenour@gmail.com>
 Cc: stable@vger.kernel.org
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-[Backport-notes: this actually does nothing on 6.1, since zero-copy
- support was already removed from skcipher and aead accidentally on 6.1.
- Namely, a commit that changed af_alg_sendpage() to use MSG_SPLICE_PAGES
- was backported, but the actual implementation of MSG_SPLICE_PAGES
- wasn't backported.  I'm including this commit anyway since people might
- think this is missing on 6.1 if it's the only LTS kernel without this.]
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- Documentation/crypto/userspace-if.rst | 31 ++++-----------------------
- crypto/af_alg.c                       |  2 +-
- 2 files changed, 5 insertions(+), 28 deletions(-)
+ Documentation/crypto/userspace-if.rst | 31 ++-------------
+ crypto/af_alg.c                       | 54 +++++----------------------
+ 2 files changed, 14 insertions(+), 71 deletions(-)
 
 diff --git a/Documentation/crypto/userspace-if.rst b/Documentation/crypto/userspace-if.rst
 index b45dabbf69d6..90dbbd56c4e3 100644
@@ -146,20 +139,75 @@ index b45dabbf69d6..90dbbd56c4e3 100644
  
  Setsockopt Interface
 diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index ca54f2927063..80a8d3a4a3cf 100644
+index bbd47d04f89d..8dfb94aa9928 100644
 --- a/crypto/af_alg.c
 +++ b/crypto/af_alg.c
-@@ -977,7 +977,7 @@ ssize_t af_alg_sendpage(struct socket *sock, struct page *page,
+@@ -972,53 +972,19 @@ EXPORT_SYMBOL_GPL(af_alg_sendmsg);
+ ssize_t af_alg_sendpage(struct socket *sock, struct page *page,
+ 			int offset, size_t size, int flags)
  {
- 	struct bio_vec bvec;
- 	struct msghdr msg = {
--		.msg_flags = flags | MSG_SPLICE_PAGES,
+-	struct sock *sk = sock->sk;
+-	struct alg_sock *ask = alg_sk(sk);
+-	struct af_alg_ctx *ctx = ask->private;
+-	struct af_alg_tsgl *sgl;
+-	int err = -EINVAL;
++	struct bio_vec bvec;
++	struct msghdr msg = {
 +		.msg_flags = flags,
- 	};
++	};
  
  	if (flags & MSG_SENDPAGE_NOTLAST)
+-		flags |= MSG_MORE;
+-
+-	lock_sock(sk);
+-	if (!ctx->more && ctx->used)
+-		goto unlock;
+-
+-	if (!size)
+-		goto done;
+-
+-	if (!af_alg_writable(sk)) {
+-		err = af_alg_wait_for_wmem(sk, flags);
+-		if (err)
+-			goto unlock;
+-	}
+-
+-	err = af_alg_alloc_tsgl(sk);
+-	if (err)
+-		goto unlock;
+-
+-	ctx->merge = 0;
+-	sgl = list_entry(ctx->tsgl_list.prev, struct af_alg_tsgl, list);
+-
+-	if (sgl->cur)
+-		sg_unmark_end(sgl->sg + sgl->cur - 1);
+-
+-	sg_mark_end(sgl->sg + sgl->cur);
+-
+-	get_page(page);
+-	sg_set_page(sgl->sg + sgl->cur, page, size, offset);
+-	sgl->cur++;
+-	ctx->used += size;
+-
+-done:
+-	ctx->more = flags & MSG_MORE;
+-
+-unlock:
+-	af_alg_data_wakeup(sk);
+-	release_sock(sk);
++		msg.msg_flags |= MSG_MORE;
+ 
+-	return err ?: size;
++	bvec.bv_page = page;
++	bvec.bv_len = size;
++	bvec.bv_offset = offset;
++	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bvec, 1, size);
++	return sock_sendmsg(sock, &msg);
+ }
+ EXPORT_SYMBOL_GPL(af_alg_sendpage);
+ 
 
-base-commit: 090666d3cc906176fc47363520eb746b94c7d578
+base-commit: c86c4726e7f044ab73b493c6f00527aafef640cd
 -- 
 2.55.0
 
