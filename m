@@ -1,39 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F152E1E511;
-	Fri, 17 Jul 2026 03:41:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6589C2BE035;
+	Fri, 17 Jul 2026 03:45:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784259684; cv=none; b=BSPpdd3E6mr5DQP2z2fX7UtenrhDJuU7BbjSyXhxpYWPI9HKDzJDUuX3FI9hJ56xvjZ9PGcH3w8hjEur57aeGunOntrHAliSCPIsY+s5/m7n7oDxBPty76Ob+nFMINk0IJFikPG8Vwc3PNEkTZhGM0g6KaaMPBfi1zgUN6NYWVY=
+	t=1784259935; cv=none; b=rthU6eM1nP1ZAcb4PbARTKITOT+DI+0bGdcLey8W9zVSBM/0Un2ffEuMfPwnDqG7rB24JAyFvh/eMb1Voab700zpbUmDlQbIp8GXmcBPQs02JOEftBfn/YEXo8/IFhATm4Ie0l2tvgF5B66OO3EQuznYXqlLRVKyzYmqAoVshYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784259684; c=relaxed/simple;
-	bh=BTN8JENIqPhOtkc7ToDvaTlhZlno9igJBPd+mv3fBJ8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RM4QaB96ekZR4HtkX76A4gdAEISED3/bwyV/N8FC3wwLsaCgg0nFxeKC2ESflN+wkVyV4LMarUnd3TkkSyLuChUXzpzVlscD1Le0/YW/xYvmIXruVDqy7uFM5hoUTNswQZ/S9QoP6x+XZG3vp6a248EvD+vu7HLL5tCH2fyjyo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KiZPNeZg; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784259935; c=relaxed/simple;
+	bh=92YsZLkZ77ICCaJORj8gIWeWOZfiRVSVxtlCQhTcqaw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h8JNRacCH3tVBAVgKt0NVDJvnA/DRmilBj1Dagjcc5IAKa1t3N/e5WuTQ7kaKzgIE1/Vtp7/ztSqJXxtRrmwbL4CB3jZv8QjGuH5eF2XQIGsSeCM6tljeX/dlB72wAE+uYBTSMprJhCZAXLDrAx004y5v0WQ0dgOscUB2cPRgec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hfyxwy+c; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KiZPNeZg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81BD21F000E9;
-	Fri, 17 Jul 2026 03:41:22 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hfyxwy+c"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12C3F1F000E9;
+	Fri, 17 Jul 2026 03:45:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784259682;
-	bh=XhEJBisTI4KWi3pjqEna+qeLK9Caqy+0SK7QYRzB0eM=;
+	s=k20260515; t=1784259934;
+	bh=nBI3yy7Uw2/e1RHxfnV8BfWVGQ3P1P23PPCMjQ+4t0A=;
 	h=From:To:Cc:Subject:Date;
-	b=KiZPNeZg9BBgg3Ju3tlS3S4HnIagysBFdivhBIlLHfK5cfXK8h0z7b4f4zLwxkaFa
-	 1tMrBNtc2dRv4ytkLqrAedWiBjDMGinP4i7EOUBwmg6l3jK8DQ4vzSoacfsmePctTn
-	 gHvwEn13bRb9vQjwfOAb5Ln6PkjTHqUqSMN1L7/1Y7F8nnUsHUkdHMF6d7NExsOY5L
-	 e6Ksl+PZztWJOOXA7293dY9M6LBASrO+0A759/rCFEKbLMYns9ShLxLv989G5Ia4lJ
-	 ZiEgSfibYCSDcbQU2ewgkQAkiePIGX5kg9Rj+gbtI7SciS5LGnSpMQlLmL1fGhgHXL
-	 UnSX+EBBQRMhA==
+	b=Hfyxwy+cAE2s6fbFMagG5OS+h7x87rCoRrkXs1kF36LWhh5hQ/1z3xfC+H33XDqpS
+	 ojb3YqaT609j7Z05DmmQTj54x6NR7bZAm4Z9K6/HaKMLrjHyR1vjPo/HcHqmtB2Lxt
+	 VzAdRxTlmpqWhqb+bqm1pJ2PLMIy/13XdcTM2BNYRyQ11uULRjlfGfYt6t5AxFeJZr
+	 lJ5MmaJXPTkzfv0jr1zpBdJuxyRXVKVeiQpXfqMc9dCxzBvMPMS73ghC8FdLUh/5no
+	 Sj02IqLN6cUFDoGVVADS+H7hHf5w+4uVhrpoaYjAPN5Xd/C85OGh96ZZctPkJ/TAhk
+	 cA82RHUZWvGpQ==
 From: Eric Biggers <ebiggers@kernel.org>
 To: stable@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
 	Weili Qian <qianweili@huawei.com>,
 	Eric Biggers <ebiggers@kernel.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 6.12] crypto: hisi-trng - Remove crypto_rng interface
-Date: Thu, 16 Jul 2026 20:39:07 -0700
-Message-ID: <20260717033907.295395-1-ebiggers@kernel.org>
+Subject: [PATCH 6.6,6.1,5.15] crypto: hisi-trng - Remove crypto_rng interface
+Date: Thu, 16 Jul 2026 20:42:54 -0700
+Message-ID: <20260717034254.328204-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -68,8 +68,8 @@ Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
  drivers/crypto/hisilicon/Kconfig     |   1 -
- drivers/crypto/hisilicon/trng/trng.c | 296 +--------------------------
- 2 files changed, 2 insertions(+), 295 deletions(-)
+ drivers/crypto/hisilicon/trng/trng.c | 298 +--------------------------
+ 2 files changed, 2 insertions(+), 297 deletions(-)
 
 diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
 index 4137a8bf131f..107bfffaead2 100644
@@ -83,7 +83,7 @@ index 4137a8bf131f..107bfffaead2 100644
  	help
  	  Support for HiSilicon TRNG Driver.
 diff --git a/drivers/crypto/hisilicon/trng/trng.c b/drivers/crypto/hisilicon/trng/trng.c
-index 85a4b99f9055..6584ed051e09 100644
+index b2d9b5310b78..6584ed051e09 100644
 --- a/drivers/crypto/hisilicon/trng/trng.c
 +++ b/drivers/crypto/hisilicon/trng/trng.c
 @@ -1,234 +1,27 @@
@@ -364,7 +364,7 @@ index 85a4b99f9055..6584ed051e09 100644
  static int hisi_trng_probe(struct platform_device *pdev)
  {
  	struct hisi_trng *trng;
-@@ -305,68 +62,20 @@ static int hisi_trng_probe(struct platform_device *pdev)
+@@ -305,70 +62,20 @@ static int hisi_trng_probe(struct platform_device *pdev)
  	if (!trng)
  		return -ENOMEM;
  
@@ -419,7 +419,7 @@ index 85a4b99f9055..6584ed051e09 100644
  	return ret;
  }
  
--static void hisi_trng_remove(struct platform_device *pdev)
+-static int hisi_trng_remove(struct platform_device *pdev)
 -{
 -	struct hisi_trng *trng = platform_get_drvdata(pdev);
 -
@@ -430,21 +430,23 @@ index 85a4b99f9055..6584ed051e09 100644
 -	if (trng->ver != HISI_TRNG_VER_V1 &&
 -	    atomic_dec_return(&trng_active_devs) == 0)
 -		crypto_unregister_rng(&hisi_trng_alg);
+-
+-	return 0;
 -}
 -
  static const struct acpi_device_id hisi_trng_acpi_match[] = {
  	{ "HISI02B3", 0 },
  	{ }
-@@ -375,7 +84,6 @@ MODULE_DEVICE_TABLE(acpi, hisi_trng_acpi_match);
+@@ -377,7 +84,6 @@ MODULE_DEVICE_TABLE(acpi, hisi_trng_acpi_match);
  
  static struct platform_driver hisi_trng_driver = {
  	.probe		= hisi_trng_probe,
--	.remove_new     = hisi_trng_remove,
+-	.remove         = hisi_trng_remove,
  	.driver		= {
  		.name	= "hisi-trng-v2",
  		.acpi_match_table = ACPI_PTR(hisi_trng_acpi_match),
 
-base-commit: 296aabce459470a4c1b68ffd0c0c0920e563aaad
+base-commit: da47cbc254661aa66d61ef061485a7080305c4be
 -- 
 2.55.0
 
