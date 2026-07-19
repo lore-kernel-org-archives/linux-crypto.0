@@ -1,259 +1,113 @@
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E704C3B1B4
-	for <linux-crypto@vger.kernel.org>; Sat, 18 Jul 2026 18:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D61F352C2C
+	for <linux-crypto@vger.kernel.org>; Sun, 19 Jul 2026 10:08:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784397692; cv=none; b=RHHhwmSEi2G/T0x+YmN5MvT8dTBeldFw5BoTpWO73x4nRQQnwQK4mNGcvse1xijz5VZcCn/k12TcIAHHyunnFX3INaM9sfKFPb4XIfsjG1xLk+R6fidnY4awAGdADhjFm9lvHT5r258QA6rvx2kVv1ScyVXJDDgiyatqpABfEbc=
+	t=1784455681; cv=none; b=Vthh1A7u/WwatsdO2gSUs5njJzd4v3493HtIlJdx1xuEId/VoBghP1RhSq3V5ZhCPxM/YrauwwKS9BiUXSDSpjEzH1495tdVVI3WpWeuNIFf8e3SMSddeMWkF0XbdF1XTfAm2sxggXxAqg0MSWj2TIYa3DmHZtxkQixn3U93Ofo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784397692; c=relaxed/simple;
-	bh=prkQ1DTy3si3wGcQ+MBkaECtthq55+8rqXe08cc0j3I=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=C5BewF5Lf5VdASz1KaDfeWNXk/zTDE8+mx1rPwEjJXnUZtqwt8w2BCp5bT+o+/00qFmIlvV5BX1fPlewbOGQM6iZqVB1eOER7KYOphwth/SrZQoxq5w0RfESR6lpZOCITTCgGRgJwTd9WRQD2/b7cM0BsHC5Y5GXMSLn/tW2PcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kPACf1NM; arc=none smtp.client-ip=209.85.210.178
+	s=arc-20240116; t=1784455681; c=relaxed/simple;
+	bh=yjRcmnZfb2kLZm9aP0lOoXt1lRhIlp9aP+QqXrfSuKc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XUnCxhFE0gcWXfBxjJR05mPLU6HOp0qUeAGpatlx6VErUJYOcBF1/Ou/XrP/doebQ05Eq1+WiE5LkPKZtgcW0YnNlbafKR1DOC0SkMTFEFCK6qGM/24zRFy4piQ1cbDbi41hckaOSthfavGLsIVRQDJwBQgDcdFqgzzWFG5t9Ps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fUgAJF63; arc=none smtp.client-ip=209.85.216.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kPACf1NM"
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-84a2dcede83so7631375b3a.3
-        for <linux-crypto@vger.kernel.org>; Sat, 18 Jul 2026 11:01:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fUgAJF63"
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-385ea3ce80dso9223558a91.2
+        for <linux-crypto@vger.kernel.org>; Sun, 19 Jul 2026 03:08:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784397690; x=1785002490; darn=vger.kernel.org;
-        h=content-disposition:content-type:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Cx4evW55kOIFpMHCa3lO8FPO0o8+50jLU8+L3sFmdTo=;
-        b=kPACf1NMHXCWeu2GW7B8evEMm2a9ePmegF/wb8SDIvoyvpsxU6ki2tu9GebyfhFDFx
-         0kaoSw34UwGaMsWULzsgRowLntyFJ8vFi1a8uFFEk0u6BApkjomaihjve3Ft88lIW21r
-         dW0+CnJW+NVWJEC/bHKqNKBq64XMbn+Qni19lsxf8S4Lp7Pa15ZChJh+RnZF5wmC0rnF
-         TLSysSftvDN/LIN3A/vZVUxXtnOWDRZX2N3Ay7z2CXEn/YxH0O3cDAdVwIxWEqGDoRl+
-         0674wxBRyL1gUNHpbhLxa3xGRjTsyfUUwloU/8TgCMgctcfTHUpOAlAG8j6gW5z2DIll
-         tJCw==
+        d=gmail.com; s=20251104; t=1784455680; x=1785060480; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=9k0atJ8sZ7gOgp05cpC7VBRSHrbDcTYbS+DZ/M/wVxc=;
+        b=fUgAJF63R+C3fyaEJrDjUO5JF6kVL8JS7kcKPreSkuoH/6au8mQkpGpvntQ0VFjCSc
+         TgqcUCITJc0xHLBLEY+1eT0KFJzT6emYFLoW0dGJNcvvRcFsv0vxFALnjOc1InPAtwpW
+         vCigfOQTfXNQAcVIC781Kson+jb1UPQ715TDvSx7NKFwxP7Dih1DPS/K1m30SpMjRF1M
+         HADwN9xAY7tvBvKq+uqE2Fykub/WXr4OEP5+Kjyuq+PK9PhiWXimJM9KZRYzg1QVnn3M
+         RK+xSbebkv/RLqEsETSvzxHLwd11dofjxOj9ouO2WUf6bs7hPls2Yxy6HqO9/9Jd2tIb
+         9RzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784397690; x=1785002490;
-        h=content-disposition:content-type:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1784455680; x=1785060480;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=Cx4evW55kOIFpMHCa3lO8FPO0o8+50jLU8+L3sFmdTo=;
-        b=oaandLVWOfsQfaSwfcMNGaD9HhpMcLsxkJlPTUaqpM5ivmxYtbPScwAj7yPkLzqoHH
-         Dx5DAwn+LNo236AzwYBIQb32PeVXcaK+QmaXxpZ0kHVyx7e5eDF8unhKVJKLGJR0afXk
-         zQLX7ZOlZQcLXZbt30K3rXZKrrDY61pl1I/Eq2LSXXoo9sgi4cYHqduAU/qobQa2aXsz
-         NIPp5RQlCCxbDQFs6RhJOC3pVWwBjVWwWvWUR23B53QRSqwpdXUo1k7jKzbFe7isz3HI
-         yaSno4y50+m5G3EdS7n1R8bZ2LAecMUWQW/R57EHiH0had/CsqPPEWZvx67Qbxv73fEr
-         Hmdw==
-X-Forwarded-Encrypted: i=1; AHgh+RoUolV/tJmxGh2+xe8QhELnxUSLmfEGDppZn69TlwTpQBCyGJC+cEfvls1AOvZmxwpvdTgRya1Pn6evHUU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1VdxBxdjQo5kgmO2Oo+rtApk8byY3xN8kZ0kIRShHCwv8tV2b
-	Wgxaod2ufIFb9iMAl7uiamOGzq4+k0+l5eum69gvr5hRlUbxgSyRGVAz
-X-Gm-Gg: AfdE7ckboPq604CLMVbYEyP7nOmBeN1j8ro+g4koMAhMqHjurxI9tlIvVbNmSI1EV/I
-	ApT91+gJ1iLUjuMw//agi4FsZFxzgs171RYnhHw8VyJ2K7ed8lQqFHeKeqTSdcVJfcAq/igccpe
-	hdWOoYiXySWYvQzfskXmcdcpuLg64j8N8ePtz60AqVlqRZPUUtEjF9YF0VXhN4ffVNlgKQd/eMU
-	WgD2Ankl4SSQbE/R5vHfHYmyqSeK0cVUYTfUxY27/NIyzZHi1bu098ohQbiQTgWaH/iGKBDgKY8
-	9iaGQVAQMztnBF9VdFnznfP/zKLn6upi3ks4q3DIZ0KiD1WDvdFWC/aNYZ/j8JUSA3/KlXReKbc
-	zUP8UKx2XEI4WtxAmBDwexxEqwqILWC0LWQyJQjCSjTitHpBSYm3R2MUBYH7NVxfpruGQKR5zjz
-	8AoUWNCJ3ohVxKkLFv6lORBw==
-X-Received: by 2002:a05:6a00:6c81:b0:847:8b11:5966 with SMTP id d2e1a72fcca58-84c292730eamr8915242b3a.1.1784397690011;
-        Sat, 18 Jul 2026 11:01:30 -0700 (PDT)
-Received: from DESKTOP-SF55S0Q.localdomain ([116.38.218.197])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84c2e68e7b8sm2808749b3a.35.2026.07.18.11.01.28
+        bh=9k0atJ8sZ7gOgp05cpC7VBRSHrbDcTYbS+DZ/M/wVxc=;
+        b=smbMbw9l2SwIXMrOH1kUzkPo4+/rubhUMFNVKB4XPMzmWhynucHpvNklVxSJYxNI6t
+         3XfWCz4TkPQ5nV2rbZO+LomQoF4+/jl4yXXmGif8JENdrT8miDgzz9PU2ipHQKJhQ5wV
+         bFNL2PvduqUc6nncGUXOapSdyS2e13++R/ELYJhftmRNysBkid8oG0kL0Z5doIUY1SUW
+         AiD0M724sEb0k0NP5Zos2XnlQfhuQKHfBnEoYG0QiETz1jueiA3aa+ue548Gadn4kwG7
+         k+TNeEUCksf+2gYmla05KxOL/+nbQWxt1CvuKg5totkpaqQ3cQQc6vo7RSQXdIMOCA4D
+         QXGg==
+X-Gm-Message-State: AOJu0YyhAuQ846Rxd6etgJFBaSYu3ZyVOOqJ6bKoL51Dejsu/OA9LKn9
+	KBpygb/96/U15qCyTKK4IZ/iI3y23tx9LQWkLU2AORfYTa55NpAu5xYxSMwPZbKd
+X-Gm-Gg: AfdE7ckyn7A1AbpTQpq9Y9vmD3qUiwZHNo3NqZIfj0R/xNoP0b7UEWwduillrr3dP01
+	87EKDEJIIpwQl5awi4AyC0KXQocLzDdLbArF/UIkb4/x/qfdrYDGmKiM3gBmn+yyX8oHL+oXKBS
+	XMdxZJ/dPnuxmEXvfCAYtZtsyMhG8cVEZNRTvsAVluDg9wEZPp2iA2yGicVeU84Hg6zOFKLGp7P
+	SoHtdnb6XGN2ggGGfIB+oV2mnOyhyz8q+w7FZqJdE3cXuYAM6JowyRQumMUHzv+8Og/sAr0CSKd
+	LgYuDBmCR8GIFckdVtTceLwTENB1IYcAYgHN0wFkHFcHKcOs2nQ9jO9NZmWxcUxEQA6eO0F064c
+	k3F2VD84HM87Actxy3AUoNxxfEP0tZkujIOEzKvM1tMgKL1g6bA9t0yBIl1uE2wILv3d/BMVDjz
+	aqRnUKoxNk/KKqi/DfDrxjuSsWHimD
+X-Received: by 2002:a17:90b:52c4:b0:381:85c0:1d88 with SMTP id 98e67ed59e1d1-38e4b417454mr10805096a91.9.1784455679538;
+        Sun, 19 Jul 2026 03:07:59 -0700 (PDT)
+Received: from debian.localdomain ([103.190.41.50])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13ce2cd6e6esm20902590c88.13.2026.07.19.03.07.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 18 Jul 2026 11:01:29 -0700 (PDT)
-Date: Sun, 19 Jul 2026 03:01:25 +0900
-From: Seohyeon Maeng <bioloidgp@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [BUG] crypto: rfc4309 default authsize mismatch causes unprivileged
- AF_ALG panic
-Message-ID: <alu_daaywAIZXKZm@DESKTOP-SF55S0Q.localdomain>
+        Sun, 19 Jul 2026 03:07:58 -0700 (PDT)
+From: unassigned <unassigned.56@gmail.com>
+To: herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	unassigned <unassigned.56@gmail.com>
+Subject: [PATCH 1/2] crypto: Update cleanup path to use kfree_sensitive()
+Date: Sun, 19 Jul 2026 11:07:50 +0100
+Message-ID: <20260719100750.13867-1-unassigned.56@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Hello,
+---
+ drivers/crypto/xilinx/zynqmp-aes-gcm.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
-I found an output-length contract mismatch in the RFC4309 AEAD template.
-An unprivileged user can reach it through AF_ALG and panic the kernel.
+diff --git a/drivers/crypto/xilinx/zynqmp-aes-gcm.c b/drivers/crypto/xilinx/zynqmp-aes-gcm.c
+index d54c268dfe34..551726aac806 100644
+--- a/drivers/crypto/xilinx/zynqmp-aes-gcm.c
++++ b/drivers/crypto/xilinx/zynqmp-aes-gcm.c
+@@ -230,10 +230,8 @@ static int zynqmp_aes_aead_cipher(struct aead_request *req)
+ 	}
+ 
+ freemem:
+-	memzero_explicit(kbuf, dma_size);
+-	kfree(kbuf);
+-	memzero_explicit(dmabuf, sizeof(struct zynqmp_aead_hw_req) + GCM_AES_IV_SIZE);
+-	kfree(dmabuf);
++	kfree_sensitive(kbuf);
++	kfree_sensitive(dmabuf);
+ 
+ 	return ret;
+ }
+@@ -364,11 +362,9 @@ static int versal_aes_aead_cipher(struct aead_request *req)
+ 	if (unlikely(dma_addr_hw_req))
+ 		dma_unmap_single(dev, dma_addr_hw_req, dmabuf_size, DMA_BIDIRECTIONAL);
+ buf2_free:
+-	memzero_explicit(dmabuf, dmabuf_size);
+-	kfree(dmabuf);
++	kfree_sensitive(dmabuf);
+ buf1_free:
+-	memzero_explicit(kbuf, kbuf_size);
+-	kfree(kbuf);
++	kfree_sensitive(kbuf);
+ err:
+ 	return ret;
+ }
+-- 
+2.47.3
 
-Summary
--------
-
-crypto_rfc4309_init_tfm() spawns its child AEAD but does not synchronize the
-child's initial authsize with the RFC4309 parent's initial authsize.
-
-The generic AEAD initialization code initializes each transform's authsize to
-that algorithm's own maxauthsize.  RFC4309 hardcodes maxauthsize to 16, while
-the template accepts any child AEAD with IV size 16 and block size 1.  The
-parent and child can therefore start with different authsizes until an
-explicit crypto_aead_setauthsize() call is made.
-
-AF_ALG does not require ALG_SET_AEAD_AUTHSIZE, so the inconsistent default
-state is reachable without capabilities or user namespaces.
-
-I confirmed two directions of the mismatch:
-
-1. Child authsize larger than the parent
-
-   rfc4309(authenc(hmac(sha256),ctr(aes)))
-
-   - RFC4309 parent authsize: 16
-   - AUTHENC child authsize: 32
-
-   During encryption, AF_ALG creates the receive scatterlist using the
-   parent's 16-byte expansion, but AUTHENC appends a 32-byte tag.  The first
-   16 tag bytes fit and the scatterlist walker then dereferences the NULL
-   entry after the marked end of the receive scatterlist.
-
-2. Child authsize smaller than the parent
-
-   rfc4309(authenc(michael_mic,ctr(aes)))
-
-   - RFC4309 parent authsize: 16
-   - AUTHENC child authsize: 8
-
-   During decryption, the parent computes the plaintext length by subtracting
-   16, while the child subtracts only 8.  With a valid child authentication
-   tag, the child attempts to decrypt eight bytes more than the destination
-   scatterlist represents.  The CTR slow path copies the represented bytes
-   and then dereferences the NULL entry after the destination SG end.
-
-Affected code
--------------
-
-crypto/ccm.c:
-
-  static int crypto_rfc4309_init_tfm(struct crypto_aead *tfm)
-  {
-          ...
-          aead = crypto_spawn_aead(spawn);
-          if (IS_ERR(aead))
-                  return PTR_ERR(aead);
-
-          ctx->child = aead;
-          ...
-  }
-
-crypto_rfc4309_setauthsize() would synchronize the child, but it is only
-called when a consumer explicitly sets an authsize.
-
-The RFC4309 instance creation code verifies the child IV size and block size,
-but does not verify that its inherited/default authsize is compatible:
-
-  if (crypto_aead_alg_ivsize(alg) != 16)
-          goto err_free_inst;
-  if (alg->base.cra_blocksize != 1)
-          goto err_free_inst;
-  ...
-  inst->alg.maxauthsize = 16;
-
-Reachability
-------------
-
-The reproducers drop to UID/GID 65534 before opening AF_ALG sockets.
-
-No capability, user namespace, io_uring, network configuration, or device node
-is required.  The relevant configuration options are enabled in the tested
-kernel:
-
-  CONFIG_CRYPTO_AUTHENC=y
-  CONFIG_CRYPTO_AES=y
-  CONFIG_CRYPTO_CTR=y
-  CONFIG_CRYPTO_CCM=y
-  CONFIG_CRYPTO_HMAC=y
-  CONFIG_CRYPTO_SHA256=y
-  CONFIG_CRYPTO_MICHAEL_MIC=y
-  CONFIG_CRYPTO_USER_API_AEAD=y
-
-Runtime results
----------------
-
-The small-child decryption case was reproduced on the official Linux 6.12.95
-kernel image.
-
-Control, with ALG_SET_AEAD_AUTHSIZE set to 8:
-
-  uid=65534 gid=65534 mode=control
-  sendmsg op=1 returned 32; recv capacity=40
-  recv op=1 returned 40
-  sendmsg op=0 returned 40; recv capacity=32
-  recv op=0 returned 32
-
-Trigger, leaving the RFC4309 parent and child at their defaults:
-
-  uid=65534 gid=65534 mode=trigger
-  sendmsg op=1 returned 32; recv capacity=40
-  recv op=1 returned 40
-  sendmsg op=0 returned 40; recv capacity=32
-  BUG: kernel NULL pointer dereference, address: 0000000000000008
-  CPU: 1 UID: 65534 PID: 129 Comm: repro_rfc4309_s
-  RIP: scatterwalk_copychunks+0xd6/0x150
-  Call Trace:
-    skcipher_walk_done+0x231/0x240
-    crypto_ctr_crypt+0x100/0x280
-    aead_recvmsg+0x3d4/0x510
-    sock_recvmsg+0x8e/0x90
-    __sys_recvfrom+0xc3/0x140
-  Kernel panic - not syncing: Fatal exception
-
-The large-child encryption case was also reproduced as UID/GID 65534.  It
-faults while AUTHENC copies the oversized tag beyond the parent-sized receive
-scatterlist.
-
-Version status
---------------
-
-The vulnerable initialization shape was present when checked in:
-
-  - Torvalds master: 1229e2e57a5c2980ccd457b9b53ea0eed5a22ab3
-  - crypto maintainer master: 8173f7e2ce67e6ca1d4763f3da14e5b01ce77456
-  - Linux 6.12.96: 6d15a1029d425b15c59463910ebdccc4afe760d6
-  - tested Linux 6.12.95: 296aabce459470a4c1b68ffd0c0c0920e563aaad
-
-The standard RFC4309 test coverage does not expose this state: testmgr covers
-rfc4309(ccm(aes)), and the AEAD test path calls crypto_aead_setauthsize()
-before executing each vector.
-
-Impact
-------
-
-Confirmed impact is an unprivileged local kernel panic/denial of service on a
-PANIC_ON_OOPS kernel.
-
-I have not demonstrated an adjacent-object write or privilege-escalation
-primitive.  The AF_ALG receive path marks the exact parent-sized destination
-SG as ended, so the tested software walkers fault at the NULL next entry
-instead of continuing into adjacent memory.
-
-Suggested fix direction
------------------------
-
-RFC4309 initialization should apply the parent's inherited authsize to the
-newly spawned child and fail transform initialization if the child rejects
-that size.  Conceptually:
-
-  aead = crypto_spawn_aead(spawn);
-  if (IS_ERR(aead))
-          return PTR_ERR(aead);
-
-  err = crypto_aead_setauthsize(aead, crypto_aead_authsize(tfm));
-  if (err) {
-          crypto_free_aead(aead);
-          return err;
-  }
-
-  ctx->child = aead;
-
-This preserves compatible children and rejects child algorithms whose output
-contract cannot represent RFC4309's inherited default.
-
-This issue was found with AI-assisted source review.  Both paths and the
-runtime results above were manually validated.  Minimal source reproducers are
-available privately on request, but are not attached to this public report.
-
-Regards,
-Seohyeon Maeng
