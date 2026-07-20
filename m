@@ -1,73 +1,63 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39E6A21FF2E
-	for <linux-crypto@vger.kernel.org>; Sun, 19 Jul 2026 17:46:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 421814C6D;
+	Mon, 20 Jul 2026 00:13:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784483205; cv=none; b=qkgmTw0fnNwVznHr5RNuq5RokOlNl3Kc6Tgum71K8Qk+he4/HftmDbWauuhokoBuYYbOvCyQTToVdR0wnralglYwkX3TMtcMZronyb60ng32S+742lJmff0sQi85Y1tvYEFye9PveNOdQHFezcFbwCHn8QxnjhvOQV9cKDocot0=
+	t=1784506423; cv=none; b=s+iwPbXb7IcgItikYLKCAb56xcEnqaKpjXkjPPwzNav9T6B9mxqEe0Kvb3+eUlSyUk2gvwfP0XAkjYDz7qnYgbrcq4tLHfddPWFsOQ9f1M1jc4UyRC5Dwqhtzl5OzlwrK9claXVJXPU8Ok+HlEH5ph3QyiCCPjPqvqXksqtyNXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784483205; c=relaxed/simple;
-	bh=DOIXaoEFYLavHuWOZwuOq81SQbLBhX8+3kIFqB5iqnc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=s/19JkrRwfG970z5sV+5pEIZFAifmctlL6QisMcc54I1GDC/oHRQHlOf5wHj/k3ChTTjscmmf0ehvmvg4pQ7OY8sp8/CbdsvIwtYRex8M5WV3/84MCsYw2MVctUr2h3+z3N7JgFHEKRphzcd/o4HYIOQFYb9cJIYX5J9FIzEcW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UWDIFAAT; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1784506423; c=relaxed/simple;
+	bh=4qx3lYBKFcLAF9CEfySUJcSBxFmNc9isR8xYQcUDmro=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h7Hcnq+DI0vI8tFZou046Y+A1E4Z7NZKGEJUCyFsO7qjVKFBzO2bKtNJ5jR/FGYdSCjz86T+iTKM0Sgtxi/xbD0xurLqrtSQ3BxZcaRv2QhV6CumwJJV9/9XXESDpYNw6zdQPyiKhlErRMLUlYw210RYIhOVrVwS5PHveG2nDZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Dro15UIN; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UWDIFAAT"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1784483203;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DOIXaoEFYLavHuWOZwuOq81SQbLBhX8+3kIFqB5iqnc=;
-	b=UWDIFAAT3m9/aXjFwdDNlZdnR0SlUWo0plHh6ofjxuFjAEzy6O+n0UWNU7jzPHx70k7SCE
-	TAyczOPco9taj8SiqDoizkaLaeekqY2p/n6bHwwznYXIFKIHfwnvxUhPPgJuwIszFmwkT5
-	C9RdIwcvGQgFdtuhIN43NsEwBrX0OqU=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-160-rUAdgQ2iOLaH1aq-GoJIug-1; Sun,
- 19 Jul 2026 13:46:39 -0400
-X-MC-Unique: rUAdgQ2iOLaH1aq-GoJIug-1
-X-Mimecast-MFC-AGG-ID: rUAdgQ2iOLaH1aq-GoJIug_1784483198
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D3A86195608D;
-	Sun, 19 Jul 2026 17:46:37 +0000 (UTC)
-Received: from rules.brq.redhat.com (unknown [10.44.24.2])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2541C30002D6;
-	Sun, 19 Jul 2026 17:46:33 +0000 (UTC)
-From: Vladislav Dronov <vdronov@redhat.com>
-To: Akhil R <akhilrajeev@nvidia.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Thierry Reding <thierry.reding@kernel.org>,
-	Jonathan Hunter <jonathanh@nvidia.com>
-Cc: linux-crypto@vger.kernel.org,
-	linux-tegra@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	vdronov@redhat.com
-Subject: Re: [PATCH] crypto: tegra - fix rctx->cryptlen in tegra_gcm_do_one_req()
-Date: Sun, 19 Jul 2026 19:46:18 +0200
-Message-ID: <20260719174618.17483-1-vdronov@redhat.com>
-In-Reply-To: <20260719171302.15078-1-vdronov@redhat.com>
-References: <20260719171302.15078-1-vdronov@redhat.com>
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Dro15UIN"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=2+V9OXdDe9F3+SH3nYBx3sTM5SgQT9TJIxeZqXBiwuY=; 
+	b=Dro15UINYpN8WJqevyQBz75uBsczOR4DFnDu6f4HjiLNosuQDCN4tsdYngmMsxX7MtkWMLJ6ozk
+	IgeUH8h0d2KRPbbK4FfitJDV5KGb4br89sErRV8hVUk7tT+XN9Pf/UC9yta4tUpzYXgSBSaIwjdpJ
+	4yoSnJ7QRmpZ5X9zrNsZkNJ/FjP92RYe82KOHlDI4EutXS1AeTxtbwOhIGFu4q3bR7Iao39Qp+yNZ
+	nZbTfeKTznBlMVYEJbYNiiGZjarecx6DSlIZ2UVC2GvUxq/xmL9RkWX2HUpJ0JeRI49Jf/09cnzI0
+	hKBoeiQU6IsFxhyZCxHKG3JnmXhsi8PQcP5w==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1wlbdO-0000000ExgZ-42mp;
+	Mon, 20 Jul 2026 08:13:28 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 20 Jul 2026 10:13:26 +1000
+Date: Mon, 20 Jul 2026 10:13:26 +1000
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: unassigned <unassigned.56@gmail.com>
+Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] crypto: Update cleanup path to use kfree_sensitive()
+Message-ID: <al1oJlPR6kaWSKjq@gondor.apana.org.au>
+References: <20260719100750.13867-1-unassigned.56@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260719100750.13867-1-unassigned.56@gmail.com>
 
-Ahem, missed the fixes: tag, could you please append:
+On Sun, Jul 19, 2026 at 11:07:50AM +0100, unassigned wrote:
+> ---
+>  drivers/crypto/xilinx/zynqmp-aes-gcm.c | 12 ++++--------
+>  1 file changed, 4 insertions(+), 8 deletions(-)
 
-Fixes: 0880bb3b00c8 ("crypto: tegra - Add Tegra Security Engine driver")
+Please read Documentation/process/submitting-patches.rst and
+follow the instructions.
 
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
