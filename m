@@ -1,44 +1,48 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5B01155C82;
-	Mon, 20 Jul 2026 00:51:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD2E71862;
+	Mon, 20 Jul 2026 01:20:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784508707; cv=none; b=qeIuyYg8r9JqREZtuu3Ms4K/aZKrKugZtlxjDFA0jEInTb160vYHw5i4dxmQDgVm80wSji+3RrwPDRWpdWUjfCc/s4Ht5OwjqCpawXW5ckj/lT4Z1UJ5rWhc1GGxW+ZCyn9POv77x4DHR1Ay7Asj3mnczkD8hc6ycFBjR+PkeFs=
+	t=1784510449; cv=none; b=AyYyKuJx7iO/7fUsF6Zm/+3rHTbDRsIKrltuB36zpsR4Kbai5tdT7Z/GnGRbZ/CfC12jkJL5YAvJqaVIaLCkEAOwDhijYuxee8m+r6LefLUXES8fKc78xU6Zr3MECgKPkQNtnMEuXCxvJZ4ssGZZtcSzb7DwL/a84xkcVO6rO3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784508707; c=relaxed/simple;
-	bh=LFbEsyxA1KuKGuSliYdLfO36Cw1dzSSX0prXBoVOd0I=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mz1PQs29a6GM4GLnqGhdJOU1h8ikfhWzzNRdrIetNKLW7uJKrB9YcRSc2R2M2se9t+lEq6rNLhzeki82GCE5Fn68RoHmwawqunSYpkf6nR5ibPm+b2fBhMx8FHhPUtOd/q6AZSen5E6y2ySDx8f/vUHuRwg4GManf4wUBEXAWsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=rfPWOS0f; arc=none smtp.client-ip=180.181.231.80
+	s=arc-20240116; t=1784510449; c=relaxed/simple;
+	bh=gIoLXvoLR3PGjEglC5P3oJlvkZ7yqW5U1sq3ZKmkZkY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ak5a2E9t7QV+RX5Nhx0RxmRVaf7sg7cSdtpzC6nH9nZlmVENli2y5HHMiP2OdbGebxiDrLejQ6GiKhBLFl5QzzsCe5zNJK0xCMbgI4wCw4YRmBqazL7nTe7UxUZNRP2xYaTenWzLTMPdOIQ85n0UGZZeTrYa+3+fsmnmIjCgbUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=kSCNF/K2; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="rfPWOS0f"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="kSCNF/K2"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:To:From:Date:cc:to:subject:message-id:date:from
-	:content-type:reply-to; bh=+/QlPkWndMeWDkZm2GL060ebxR50BCetvjFvCm8os3E=; b=rf
-	PWOS0fNsPhE1Ovb2pj8Ox4do49GmFiB82oaBFgS4vREHeaEZAaS1o9OBgDh15JGsJBy2eRWAFVIku
-	eb7RFA7GwipOmKG0vFweNi8JDwSb8rF4Ib15uR8Agco2uDLd1zlpp13doEuKm524i2sCyrIZ9sAco
-	JdHhWo5ADBTqAJScOgwsGafKIZwS+PFTxYwFbeJ/EHF6ZwArNRCC46moo0x/NzxfwVuPv7H/HZCJC
-	94x7OItABUmhoUI0sqG9Q35B+IhgAt4Q2hZ2gdhKqE4KPspOFJSwbQXN034pxcn2fhRrCkisvxYLW
-	cU2wjEFKG87NAo0gu3SOFVTVukhkjnPA==;
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=+WNTOP19hSxd9LtjWUtrMGiOZ9xlFIJgiLKC8Et7ISw=; 
+	b=kSCNF/K2dVJ1Tn9RcBWuxKQEJE6EflQW1gMNM+G5uepKzQC/7cH4THl8agczyMvIx3H2iiToV68
+	2iHm394wB8NVN3YcFtEXKvp9QGao16PBngKHNcZXAnH9/U/3pPvSqYAOLPgwpJgHoBvv0XUrzflYQ
+	SOZbB8ZdkbQSBpED58n9TBChw3QIfuF+FmYpWLeXFsARUFj8cqWcvQKpv1BqxdkYporri5Js1YR+0
+	7ni9Hk8oO4kZ3U6m2t0XUs2qRjbTNaD0J4IVQTFviHMIeEIDhjUZwrbo6c4q1nSqN7/uwzr2UqknF
+	9XLGOpdoOQg2G0uzHeiq/Auszqi/auT9+aSQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wlcEO-0000000Extd-0fiO;
-	Mon, 20 Jul 2026 08:51:41 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 20 Jul 2026 10:51:40 +1000
-Date: Mon, 20 Jul 2026 10:51:40 +1000
+	id 1wlcgO-0000000Ey8z-1Mv3;
+	Mon, 20 Jul 2026 09:20:37 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 20 Jul 2026 11:20:36 +1000
+Date: Mon, 20 Jul 2026 11:20:36 +1000
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linus Torvalds <torvalds@linux-foundation.org>,
+To: Vladislav Dronov <vdronov@redhat.com>
+Cc: Akhil R <akhilrajeev@nvidia.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [GIT PULL] Crypto Fixes for 7.2
-Message-ID: <al1xHJ44X6qhXFTy@gondor.apana.org.au>
-References: <aiZWfDt54UazaMJ0@gondor.apana.org.au>
+	Thierry Reding <thierry.reding@kernel.org>,
+	Jonathan Hunter <jonathanh@nvidia.com>,
+	linux-crypto@vger.kernel.org, linux-tegra@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: tegra - fix rctx->cryptlen in
+ tegra_gcm_do_one_req()
+Message-ID: <al135EQMcdtTnHxZ@gondor.apana.org.au>
+References: <20260719171302.15078-1-vdronov@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,35 +51,26 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aiZWfDt54UazaMJ0@gondor.apana.org.au>
+In-Reply-To: <20260719171302.15078-1-vdronov@redhat.com>
 
-Hi Linus:
+On Sun, Jul 19, 2026 at 07:13:02PM +0200, Vladislav Dronov wrote:
+> Perform rctx->cryptlen calculation in tegra_gcm_do_one_req() the same way
+> it is done in tegra_ccm_crypt_init(). The current formulae may lead to a
+> crash if a caller does not call tegra_gcm_setauthsize() and so ctx->authsize
+> remains zero. Then a decrypt operation with incorrect rctx->cryptlen will
+> lead to a write beyound rctx->dst_sg buffer.
+> 
+> Signed-off-by: Vladislav Dronov <vdronov@redhat.com>
+> ---
+>  drivers/crypto/tegra/tegra-se-aes.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-The following changes since commit dc59e4fea9d83f03bad6bddf3fa2e52491777482:
+Thanks Vladis.
 
-  Linux 7.2-rc1 (2026-06-28 12:01:31 -0700)
+Please also do a follow-up cleanup that deletes ctx->authsize since
+it appears to be completely unused.
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6 tags/v7.2-p2
-
-for you to fetch changes up to 8173f7e2ce67e6ca1d4763f3da14e5b01ce77456:
-
-  rhashtable: clear stale iter->p on table restart (2026-07-17 09:04:45 +1000)
-
-----------------------------------------------------------------
-This push contains the following changes:
-
-- Fix potential crash in rhashtable walk.
-----------------------------------------------------------------
-
-Cen Zhang (Microsoft) (1):
-      rhashtable: clear stale iter->p on table restart
-
- lib/rhashtable.c | 1 +
- 1 file changed, 1 insertion(+)
-
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
