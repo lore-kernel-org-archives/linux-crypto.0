@@ -1,123 +1,184 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010005.outbound.protection.outlook.com [52.101.84.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E86838B7A7
-	for <linux-crypto@vger.kernel.org>; Mon, 20 Jul 2026 19:15:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784574938; cv=none; b=TZ2/L6MBx4qvU5UIKUmUsP9RdYdaWk0yg3T2fV3Qz9obVgbobaPugLF1nfOp3u+RkIOnvx/8qxMiM+Xu6Iw5r+R2CCAid4QYCfVrC5CDDEqpisGTRvtpdoDo2gOyx+U94t1Z8KNp72y3u8yNu+r0j+vdrIdEonYd3QHYN16IOmM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784574938; c=relaxed/simple;
-	bh=n4rtoVBivuuxT8maYZ6GjwI9IH0POieenNXxUQeibjk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aAh077UVRiYTOKOmxELGl7TKow3sf0CUnF9yaYyC8bEoEAaUbVjahMBDyjxbQv/YoMYHCx5kRdA353fg2n14l/AUokOfySrNo7TAj2TEYkKX4DcQsGeFu+D7e7yhMbeKd3ihSv2mQkZ/nVJR02YrCpW9Bpb3qDdNPlobxROLwuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai; spf=pass smtp.mailfrom=0sec.ai; dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b=u9lMWM72; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=0sec.ai
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=0sec.ai
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6C8934A794;
+	Mon, 20 Jul 2026 19:53:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.5
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784577235; cv=fail; b=tQZHndrb3yTHHsbWHHlcZZlWKQ7asmuS4u8ZFVHdovanmzFD7Mqo4djZq0trmCH7cse0OdilJJB3pwH3qHCSRlCUycBy3Z6ok/vIFLey3ozAjI58echGUG9vnQsXMLO5MGZHkahR7MCLHlkZK40S6X2YwP12NnWt4huGfWNZ6pY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784577235; c=relaxed/simple;
+	bh=3+VgoBmggbAcrk8hwtYnMAAQgWditUSo47cvlRCguEM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=aCiQJ+GJaMcg7jCief8l+94r+Z9JzAJE5wrSOrpsZNCS0QpMu1WwTPusu1LVdaam93GvDhJjdhndan2HgJCYGfS3M043MZDFCMkhAYXfOnuqD6/sumTasWLRcdhlsPmF4UY24YG4YlLVNJ2+VFLW9luv7qEpvFWyt7yyjOtUfDg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=fail (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=amo2DfQP reason="signature verification failed"; arc=fail smtp.client-ip=52.101.84.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=0sec.ai header.i=@0sec.ai header.b="u9lMWM72"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4953e04ef16so46605755e9.2
-        for <linux-crypto@vger.kernel.org>; Mon, 20 Jul 2026 12:15:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=0sec.ai; s=google; t=1784574936; x=1785179736; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=7MPEl8CVn5sXC9/GdUGvs1DC58WkPmH4mOB5joq72dw=;
-        b=u9lMWM72G/OAeZj78uLjzvqNXEjN7oH/OyKK6cZkqzBt/cbhh/BapH4YoEkuUBZLzQ
-         278JUNxVn5eDSq+DHDkc1q5HaJzd4YDqZT68/sEsFO9zNirEtT1xGRA+zt8BpY6wLS1n
-         a5kYY75Bklki2CzDMux+kJsbbo3CC8AMl6Oei23JXm4WBI/t4udQzvEn40pm5tlZOjWA
-         c81+Y+FdHqKNjnlGX71tqpdQhsUqBi38+WnbbvbesIfAsblqj63AXtJ6KpK4j1BGUu2I
-         IAhANa07xu8ELHGjOqWFMHcHBazaWUQKaLcAHtqnB4YknNrKR744glFWs5dkw30jEwiB
-         0y5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784574936; x=1785179736;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=7MPEl8CVn5sXC9/GdUGvs1DC58WkPmH4mOB5joq72dw=;
-        b=baDYzbvckM6IcvFRpw1BzbLpeSNocAtqQ2Wr3OBYivQ5Nb3IumX/09tXlrUa/XGmOt
-         FnxYWr050j0JAayIaGR10ZOwEvhu+T2BAuMQHSwFErr5RtpafoXxHyBLjX4Y56n0EJrc
-         bpmZkeUBcwxdSeTJ8nN0AgrdON5UqBfcY81q9kJ2GjTBR2johyknjJeJkPYBzjEJJnUp
-         ePoeLJgNgdfiZowF0iv93edWi53ZIthbKAaDY3VwoSm+yOJ5HXalEG7iKTDnD7lta7Sn
-         1xNQFqizhnw8Wf9V+aW71U9ljHNdAlcWC9Qcbq/jSM1dEMaoTv7u9i/W4G5URRaZmaqq
-         fHGg==
-X-Forwarded-Encrypted: i=1; AHgh+RqA4JYSd/N14FX46z1bc1X17FVcnFX9O3ujCuTk6VfUc4MudI59J/+c2VszTSTGp83cmsIZPu6mkx3uUsU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyP6BqhcpepaCo4nDO/QjcFPPPYX9GBZz+89WtwkFb4p19mL7zq
-	DU6PC8xP2M2PnqGj25GnXqK5A+OPIhkl7lxecADL5fOWAoqJeCvubNlfdjmvIb+VLVX2
-X-Gm-Gg: AfdE7clChxCWMYHeiBAJt6s+ZgineYBArdkeOYCli9Ennb5ToZauM7s4SJBftjScfGF
-	LQyDovMOx1ZtqUV3Bq6MTywgF9JLTsToXNVD9Fc8krOKxuH71r5w2mkZsjsaN4G9eFJNcc5OiKP
-	Xb5e+qilYcVgA1ByRgEQQPGYveQnJpP+F3fvNtJrcdVDJ5BNbcz5HR18yvWo7BqHUOM6RzDQOkS
-	J7gD7ECpdRLg7qvHW/2MNNmQr8G4Cbabt6ZXUnfryuOJX/MxB8pYTXXcQHBP1FcRLuRUpU3EBeN
-	y47vcUoddBOIhJVeOFM3hwLDFGXI5wpTcM3vtYnD0w9IFo0gGMAM3PFoxVPenu0Bg0aC+Tr6D/g
-	6sFPWlmALiU3esaIOs+dBvkW2/m6+0HGA4HA1CXVqvsqisBxQWqqjn2NRfoxgrLt+MWzmxAslLs
-	ecQbg5vPJEYeyH+spRGpOPzzClV7cyvMECD9Q9c1BskYvOSAApz+MEcb4ioJs6uFbeedcuD3P9m
-	EgAVZRxKqU+7TsrEjoBJXUlVwTMmP8ns3KfxCTRNzscMg==
-X-Received: by 2002:a05:600c:3153:b0:493:e97c:216e with SMTP id 5b1f17b1804b1-4954a41382fmr186525145e9.39.1784574935532;
-        Mon, 20 Jul 2026 12:15:35 -0700 (PDT)
-Received: from PeakBook-Mini.tail8e484.ts.net ([178.197.218.14])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f63e49500sm34232061f8f.2.2026.07.20.12.15.34
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 20 Jul 2026 12:15:35 -0700 (PDT)
-From: Doruk Tan Ozturk <doruk@0sec.ai>
-To: stable@vger.kernel.org
-Cc: herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Doruk Tan Ozturk <doruk@0sec.ai>
-Subject: [PATCH 5.10/5.15.y] crypto: rsa-pkcs1pad: Don't WARN on an empty digest
-Date: Mon, 20 Jul 2026 21:15:33 +0200
-Message-ID: <20260720191533.15971-1-doruk@0sec.ai>
-X-Mailer: git-send-email 2.53.0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="amo2DfQP"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=etedaOicgVrrOk3L1UL5ZLSIdl2k3W5Ua81BMUyOMJuPMUN7Targvxx1oNsN9/mR9zVKLgU/4UZYWpvxg2xAekT48UH7DSFVM2k/TFGR7TXqkF/Th4kKdn3NDbLWbsMsGXFTGbgZ+Wrs7XVny2NyhHiiJ098EYiqOkMivEvnEG8EDPAWgYghSd//HNB7/+DgPmbYfOYh20OqOwV8kBFlLuc/ytCK8DOqVLVaXFM+vdsYQU9ijHc1iA9KO+3jpDyn6GrkjCVDPqcEg0DsSrKo/yDD7r5U8sfjujlw5oZOmTrcQbCPHC8x5dt3LEABJA9wXAw2xoyVObqLOKco46BL8Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=eASXw8brNXX5WtpSsbpnAp5fFggx5dOLFbYa4NTQw5o=;
+ b=ko6gmKlk7AZqcQ/mNMAzkqpxEEIoE2UXpQBy4ppzhZB4s4yd4FwOOGA43uKGlWcis0jJrpuUkX+YdckZdA8wX1UTXlyIHTmNDO1bgs0zDkM/miyZlMJrcrTgWZX/7D9+Y9FDIwZ2IV54gdp+3XhYdVdA2x4ZWXDr57EWbZZVUJe9BIbnmb/aPEThkZX/n6cud/CPkchqYCwNUrk9sr3Isqv8ldQ8EMO4LiZoSKa+zvMMjLneAKtzPRAypYW9oAfmTdRk9nuShN1IuJnxPICeBMjZZoHtKMvt5G/1N+JsdaGZELjzRjdr+k9QnfPpszlwiMdYze5FfRKX/FP+A8yFIA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector1-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eASXw8brNXX5WtpSsbpnAp5fFggx5dOLFbYa4NTQw5o=;
+ b=amo2DfQPIoezWoSqfVoDPN6ebXzNC4FaodNIT/xxhC3QwaR/mH6CX3Z+jviK7GOYaJynQDYXblrYlgbCxglUtuxw/v4BgCwDrhq2t7BFSiJ70bLFRiISvEKzLL5y9N1sDWq7t8CRjQjrBqu6nP4unk2mRu0HK8P6RAL2AUAxqNV+a89FQhCWTg9CeH2rZvLzy+x6WXN1nz/qkaXeAZG2aHS21DgfctaVH5lsJRI7kztGmfhIA4Is52ICO945hWKnFKE6IDvOyWyIHVoPZX4jjViFxQb2wKP0aBc+OuPFrwxLZ5Xw3l+Nrz+98XpSJci1W73t7/cJXNSdnNnx7ioXig==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=oss.nxp.com;
+Received: from GV2PR04MB11799.eurprd04.prod.outlook.com (2603:10a6:150:2cf::9)
+ by PAWPR04MB11707.eurprd04.prod.outlook.com (2603:10a6:102:509::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.223.18; Mon, 20 Jul
+ 2026 19:53:50 +0000
+Received: from GV2PR04MB11799.eurprd04.prod.outlook.com
+ ([fe80::2146:83a2:5329:b7c]) by GV2PR04MB11799.eurprd04.prod.outlook.com
+ ([fe80::2146:83a2:5329:b7c%6]) with mapi id 15.21.0223.017; Mon, 20 Jul 2026
+ 19:53:50 +0000
+Date: Mon, 20 Jul 2026 15:53:40 -0400
+From: Frank Li <Frank.li@oss.nxp.com>
+To: Miquel Raynal <miquel.raynal@bootlin.com>
+Cc: Stephen Boyd <sboyd@kernel.org>, Brian Masney <bmasney@redhat.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Thomas Gleixner <tglx@kernel.org>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jayesh Choudhary <j-choudhary@ti.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Antoine Tenart <atenart@kernel.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	Pascal EBERHARD <pascal.eberhard@se.com>,
+	Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	Herve Codina <herve.codina@bootlin.com>
+Subject: Re: [PATCH 10/16] clk: Add support for clock nexus dt bindings
+Message-ID: <al58xBD6B1i3Yt3S@lizhi-Precision-Tower-5810>
+References: <20260327-schneider-v7-0-rc1-crypto-v1-0-5e6ff7853994@bootlin.com>
+ <20260327-schneider-v7-0-rc1-crypto-v1-10-5e6ff7853994@bootlin.com>
+ <acqT3Dh03y3JiLLc@redhat.com>
+ <87y0j76p8o.fsf@bootlin.com>
+ <177595635458.5403.1619739189587608339@lazor>
+ <87jyr3gjbe.fsf@bootlin.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87jyr3gjbe.fsf@bootlin.com>
+X-ClientProxiedBy: SA0PR11CA0102.namprd11.prod.outlook.com
+ (2603:10b6:806:d1::17) To GV2PR04MB11799.eurprd04.prod.outlook.com
+ (2603:10a6:150:2cf::9)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: GV2PR04MB11799:EE_|PAWPR04MB11707:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2ef09f67-4dfd-435f-e35a-08dee6989e49
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|19092799006|1800799024|376014|23010399003|7416014|18002099003|22082099003|4143699003|56012099006|11063799006|10067099003;
+X-Microsoft-Antispam-Message-Info:
+	f6RmAJmRWQOW0K+u8L5EsxCuEI3IorrYYI9lAkk499pZXnhUWu5IHT7OykBhVYYkvTNwFNib+f4AkFdLBLJbTQ9OLSNjGzwQyM7Yao10Ap2RToKmU9IYynYBWICf6Zac1pag1iZ5/pCOG2B+aop4Vlp16wterWslFjzHt4QF02mkstq6r3D/t8Z+lBctvjsEW38RBwa3hhNdEBFgePqslEx4hSdyDgku+zC2l6SZU8Jsd8V/PmOhAb25bUXrYkVbgQXPefh9HSn8kxrOIeN6kWRNAa/RmNDZV1+gZ5dRfBvGcK7cryUprHY3elHFtV5fVzZdgusgJHPmN64RJEXDhbIRfHidwnF+7/3z+nGErsNnkkWhiFHagnmxQol9C9/WFWWlaihgSE5FCsFu199OzvUoEbBPTDjMtmfj8ScigLCOXLI/KrFyhW5zeb7A7jRw6twTrgOgUqTPB9AYFrKe7kVmWhBGGDWb9owxNpqQv8PYuePVS5RJ6StWBlNsQ1JYKP40p84maj6LABuMvH2A6tEKvTrMGKEIW7ovAhf626fyfPG+KCo8GbKl7AbnWJZyomjrTS1Op5ct39gP0yOWZUm3dQsjOSu4Jx6zKYbeyQ4wnHw3P7RZpVhncMR0nrC0Ld6e2OTUcYrZX6/khyZuKdVBrNzY/SlASKvkhO3HVgU=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV2PR04MB11799.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(19092799006)(1800799024)(376014)(23010399003)(7416014)(18002099003)(22082099003)(4143699003)(56012099006)(11063799006)(10067099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?iso-8859-1?Q?JwT/UgKdPgz1XeeWnyI1OjRlxXFcDiI6OY+sHtJHhYIkQAX3IZjM83820X?=
+ =?iso-8859-1?Q?DXU0ULj1dfNx1ctWs493tzDE+8Ot+gDIKWk76AX/ghI+ML6H6ng7YJkBqF?=
+ =?iso-8859-1?Q?n7IYCwOG/U7pRt8VJVxRf9c0+B0B+9BuykG1Rcunb8pep/VP1aqA7hyZUS?=
+ =?iso-8859-1?Q?t6ds9/P/bZjIQvwLVaZK321iEG7n1RnRTGtOU1hu77mHwocDRQ7Rf9xSjK?=
+ =?iso-8859-1?Q?b/mu31jMRlMLv73Xk5UdX3vMWSHZ3wlr7r81ERblWYqpoDymcCkLSXis/M?=
+ =?iso-8859-1?Q?EpzrC/WCZLHswN/jIB7momczcxT+WpcPGfNN8VKD2atf3rzBGqNBImH3Up?=
+ =?iso-8859-1?Q?+oEXuvJ9BM6UBNIBgg1n254hJ4utg/0c07MTkt7Uvh3ggRFPI0xPreAiVc?=
+ =?iso-8859-1?Q?Vn+CwDOqHojAQMTcvynhy0XbnvVDlWVv0MPxh/m0IBiLvMIfY5PBYZRnoM?=
+ =?iso-8859-1?Q?j7k+R+lPEMhP7kZ4GVxgvM73EZodRH+6xVMDPgE5nWERE35fh+J8Lj4tS8?=
+ =?iso-8859-1?Q?a3MVYBLR8UFYXPHGqfzvd6ch6lCCiKFGt3ooRZottsHExe1mfBCFCwVHB2?=
+ =?iso-8859-1?Q?lzoKESIgZghe79eUIqJKnC9kPMGLp/TAKL6Ejax5AHYByj6m9sqtUvX9Is?=
+ =?iso-8859-1?Q?Zi4vCd8OsvJveBrsAcKerY5BzbHgC0nabkP9D84X+5sXSewHCqCZFlTWNO?=
+ =?iso-8859-1?Q?DznsXMnk3HZrhU9AzdAlkZAxE7Cu2nCMt2EYcTJvb9mMZrpCzlVYniwHzE?=
+ =?iso-8859-1?Q?wUfpIH0Y58ls1rpNNWqjcgOx4ndGoX+VFAof5mbqiSu1HZrF7nJZrAsuBE?=
+ =?iso-8859-1?Q?XmMJKrqSlJH4y+uGNR+BudSjhiHG3khy6ysE8hac5hOl+hUZM6x1M65w2Q?=
+ =?iso-8859-1?Q?LA41qnJaGI/r6lBB2Mg0QknvkG7P4KKl3ZctXm11MV1z6LyvGEKH9l0w2y?=
+ =?iso-8859-1?Q?Tjj2IzxsJ1aAz4WZ3Zhy0TAtX/IDIyIzjysm9hFT0xORSJzI/qq+wsXPwR?=
+ =?iso-8859-1?Q?kq0qEZALX4XPHKKTx2YrHF26yQynXSDvxd+dxRXWWjwjdHnj5tBLZxhzAM?=
+ =?iso-8859-1?Q?Ctm1xDXTck2hTJiSRkOuPu6VfsslTuv2CJnQu/GWwKd+M5c9N6t39Tggzq?=
+ =?iso-8859-1?Q?77kOmHyn98XwuxKbAY3I8S15v/zc3rVycxb23wWQrMwkzig0Uz39v1CGfF?=
+ =?iso-8859-1?Q?3zDL8t/zfwQ3q1uQleb1ea2/a2I3zuB7GbTK53k34lNsVTcO6FquDVUmRw?=
+ =?iso-8859-1?Q?jYZiBbD+tZEBNZv77VLQY5sHr+HipsB6lU2lU5jWILgVjfhWJIpzE/pTOd?=
+ =?iso-8859-1?Q?jUDeBgtlWPJTa68kR/Umy3n2TRL89qMJ9YvFTHofcrD/dm7STJthF84fgp?=
+ =?iso-8859-1?Q?P4neZ/Cy/5QLzeJXKAtjt/GZOY8AORX+bx+3vyZQ+sC3O6BPatoFO7uBej?=
+ =?iso-8859-1?Q?i1XICeoMACKg5fKzsPllTI5VDFn51jBvgKu60LlWFFFU53gnvsc7vXYsOz?=
+ =?iso-8859-1?Q?i/pxt9AzCcjeYkloq4OdgGDMoIjbDFi3gqQ459A4te2vuu36CLIrPII8eZ?=
+ =?iso-8859-1?Q?KRb7f7nGnULOMXMC451BHXHB6IxhQ9V2soYKiwuZ7qsz1x15uAXdeBnOGj?=
+ =?iso-8859-1?Q?m6K58ZM/XwPFuwnHiXCOCS0R65Ycw1Aj+ESpVdHjdFUCtjQE/celinIQF+?=
+ =?iso-8859-1?Q?UPkSDKL18IvybPfv0WOI4VyU4AhQkvZVw4umoeUdxraWAShZ/ekNelXZWm?=
+ =?iso-8859-1?Q?WnKcb7K1aMPegMC/zyHt03Tcef2OwCDk/kmvJmJiSkVcGEvOGPU5mtIaTw?=
+ =?iso-8859-1?Q?cOcJifcqAwBTJOZVj0zG0TXRVOkbCVRE99ufgDaTrRSdqlt1JmeR?=
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2ef09f67-4dfd-435f-e35a-08dee6989e49
+X-MS-Exchange-CrossTenant-AuthSource: GV2PR04MB11799.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2026 19:53:50.1673
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: KAt00BCde7xxKQPEvrjV1ms6aoR5j9qVEnO2qayaQtligVNtMHq7XcEZJwqZBDez6jeDA1qiYy0iRbQOInzyQZI24YZ3kXOBKecPFvk3eT2c7Bi20SDjSDs7JpYNBIXO
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR04MB11707
 
-KEYCTL_PKEY_VERIFY lets an unprivileged caller supply a zero-length
-digest (in_len == 0).  keyctl_pkey_params_get_2() accepts the zero
-length and the request reaches pkcs1pad_verify(), where the empty
-digest is rejected but only after being passed through
-WARN_ON(!req->dst_len).  The warning is therefore directly
-user-triggerable, and on kernels built with panic_on_warn=1 an
-unprivileged process can panic the machine -- a local denial of
-service.  Reproduced as UID 65534 in a setuid sandbox.
+On Fri, Jul 10, 2026 at 01:44:53PM +0200, Miquel Raynal wrote:
+> Hello,
+>
+> >> > Before I left my Reviewed-by, I should have double checked Sashiko. It
+> >> > has several questions about this patch. The first is:
+> >> >
+> >> >     Are there other places in the clock framework that need to transition to the
+> >> >     new map API to ensure assigned clocks work?
+> >> >
+> >> >     For instance, assigned-clocks and assigned-clock-parents are parsed in
+> >> >     drivers/clk/clk-conf.c using of_parse_phandle_with_args(). If a device
+> >> >     specifies an assigned clock that routes through a nexus node, will it fail
+> >> >     to configure because the map is not traversed?
+> >>
+> >> The goal of the nexus node is to isolate what is behind. Are
+> >> assigned-clocks et al. supposed to traverse a nexus node? I am tempted
+> >> to say "no", but I'm open to discussing this ofc.
+> >
+> > Why would assigned-clocks not traverse the nexus node? If I'm a DT
+> > author I would think any clock specifier should be routed properly
+> > through the nexus node.
+>
+> Ok, giving this another thought, it may indeed be relevant to apply a
+> default frequency which needs to traverse the nexus to be active. I've
+> done the same change in the clk-conf.c file and tested with a dummy
+> example, it just works.
 
-Keep rejecting the invalid request with -EINVAL, but do not emit a
-warning for the user-controlled length.
+Any progress about this? we are trying to use it at
 
-This is the 5.10.y/5.15.y form of the fix, where the length is read
-directly from req->dst_len rather than cached in a digest_size local.
-Mainline does not contain this code path; commit 1e562deacecc
-("crypto: rsassa-pkcs1 - Migrate to sig_alg backend") removed
-pkcs1pad_verify() in v6.13-rc1.  This is a minimal fix for the
-affected stable branches.  The 6.1.y/6.6.y/6.12.y form
-(WARN_ON(!digest_size)) is sent as a separate patch.
+https://lore.kernel.org/imx/20260629074734.3643227-2-chancel.liu@oss.nxp.com/
 
-Found by 0sec automated security-research tooling (https://0sec.ai).
+This is quite useful. Is it possible to split clock part to make it
+progress?
 
-Fixes: c7381b012872 ("crypto: akcipher - new verify API for public key algorithms")
-Cc: stable@vger.kernel.org
-Assisted-by: 0sec:multi-model
-Signed-off-by: Doruk Tan Ozturk <doruk@0sec.ai>
----
- crypto/rsa-pkcs1pad.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Frank
 
-diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
-index e2f4ccbd71dd..d10076bb6ec2 100644
---- a/crypto/rsa-pkcs1pad.c
-+++ b/crypto/rsa-pkcs1pad.c
-@@ -535,7 +535,7 @@ static int pkcs1pad_verify(struct akcipher_request *req)
- 	int err;
- 
- 	if (WARN_ON(req->dst) ||
--	    WARN_ON(!req->dst_len) ||
-+	    !req->dst_len ||
- 	    !ctx->key_size || req->src_len != ctx->key_size)
- 		return -EINVAL;
- 
--- 
-2.43.0
-
+>
+> Thanks,
+> Miquèl
