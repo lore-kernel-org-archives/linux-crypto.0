@@ -1,51 +1,51 @@
 Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AAF73C109B;
-	Mon, 20 Jul 2026 21:13:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 024883B27E9;
+	Mon, 20 Jul 2026 22:18:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784582032; cv=none; b=J7SyhJ1eVWShLzh9NCCzyaO86KuhfrVZqmSSfRtZynBQDfBOD8jxumZV8RblKlRTv4Nb9YG1vVSCtgYlf8wOMUA7s+LAQ2YsBvn6YNNwGAjR1DaIAs3ny8CLbEYbqADjNsr3+Ibhj/dz1fC1IVXoqNAFfibPravp7ksbNdzxJNA=
+	t=1784585901; cv=none; b=H9X8K6aJ2wgt9GMWypiwy/iPUzjJHc7ZG7WuhiIdy/5QYw+wbp6ZFVAVIWFOFbJanjJMp+MYjJIMfaV0vQHyV3bQ1B01/jyE2RpWYZyycJhOKnpRNxw1PpwM5YfE6L0SM0buYYGHAyuLxgizI8WuH01yZ5ZnPMkJKTqJtLDl+Gc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784582032; c=relaxed/simple;
-	bh=+7EsZQ8MDtE3n+BMw5DQDYJgHwNK5QFlPRkzuS7rRhE=;
+	s=arc-20240116; t=1784585901; c=relaxed/simple;
+	bh=xaAacfcSw/SR5JFFESJUe2l8bEdWu7XN9+4m4Sb9tWY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kuv5Iu2/ekm7tLZoqV7YwqPJr/smyat9xilXPgnHBmCrNVjb7Pn10gWVsNRjsba+TX9kuEuG346+WQq3tlhHSRBJuJRVyZzaFFNNHi0Ie9yN/4aG+xCw71VFFISQtIXp0OXgj8o5EWr20Q5GYxP7KjXvCBNaIMP3PPG3SjWrxLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Sb/ukags; arc=none smtp.client-ip=65.109.113.108
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z5a6SDEH6OQKKDbDMedLop1+tN4tgDL0eJqqqsUkM//SyYD+wFp5wgE+pTaY6KGT1jIJIWRKsLHm/08QyWMLlgTwPhkMVjC0nDHylGaSG0QQNo1tmWitJcRKrEq6CU4a2/7l/tnOUYdf/0ARvKBvwxr9qU5W2LZNc1picP1ahw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Txl9XdbW; arc=none smtp.client-ip=65.109.113.108
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Sb/ukags"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Txl9XdbW"
 Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id E201F40E00DC;
-	Mon, 20 Jul 2026 21:13:48 +0000 (UTC)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id A73E440E00C3;
+	Mon, 20 Jul 2026 22:18:13 +0000 (UTC)
 X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
 Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
 	header.d=alien8.de
 Received: from mail.alien8.de ([127.0.0.1])
 	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id a5T32fnu6LtK; Mon, 20 Jul 2026 21:13:39 +0000 (UTC)
+	with ESMTP id h-WYldXAHExt; Mon, 20 Jul 2026 22:18:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1784582018; bh=FGhFoRLhMbDrReFu95uGs+7QWPhZ6jTH09K1AIvqN5k=;
+	t=1784585883; bh=ZKHdWLva2raujNfRG1gDninMW1KAIemEDky52gRjDbE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Sb/ukagsUyi4GM2q6P/SrsLtdzWGAnGx1Lpl839b9tRGxuJjy7xu0DWWGEUqmgPZv
-	 WbAIB+ypFG8f8YTps9VTGwSQM/Nw5ktmDSv4xH4I+hKaBp7wv2sHxHaabQ8DtH4K+D
-	 6DzkazqOqnllfs4ohiAkP058hINWeUxFEPeOXacx0wgQLWW2v4CU5qsklXFEGrl+fA
-	 VQiPELYB3vlqtovK+p1DL1lKKHRMTeSAvbhyAAktO6yt/XKrDu9gQuMe7wxRhGR4E5
-	 2vpRy8jpF7BRRooCmTRBBhanLX/fyo2x5Sgzb/qHrdzxkREa//U3FeGn5z8mlBJN3Z
-	 apgHBLr3VWB7wqaQU004rjZysEniKDhQhkxcPwsqra4Ygig0vPS1vCrJnH3P8JZ/tB
-	 e/M1lqfx8cuGZxvhZy+Yvlr+UsOubCQDMGV4meiSxf7tRTZcLPTjZJBDgU6g7Zjarn
-	 YiNSpInFuNiVX27OnLN812ze9/gX+u2YZlJOwKivxBF+/xyC03LZMjmsVwvTV+DEZs
-	 qZwwD8G/3ZLwXQdvYqRADfY8Qrpaa/xU05UBWSq5x/MFUXJoqe/O8HGdVo6Nhu6rQ7
-	 XwqNvmaEUOfqTRvQmNywDyBsIYNSprXRknTjPg7Dgho5Q1gtgwmZDnrO9QJDT22p6S
-	 HrO8lI6jPlQtjYgKZ7tABZ6Q=
+	b=Txl9XdbWDm0BxS4H+8V3TUtAc/pOzDGhgJVRPNvhVAm21VDLvQRHuorPYMzNZp1d1
+	 3V2lE4AUQFY/I7yBbwQmBDJD1+tiOcWLodvQynOwL0lBiu2DV+z+fiogF8u24iyxML
+	 w/bEFEpNgx8LGyG/f7wVCeA9wnPiMixVXX3Hbqd1XbGpghlDr0cEAZKxpqwOwBvzwo
+	 8h7C+eY2qxmTh+P1GqoC+Pk90vxXvUFI+ywkpY3GX1FnD8n6EzfVCc+PngjLJ2AL/2
+	 I58pbXKRt+SwLhxMDHFWKe+YMP5JGVmzLE6uxpHHWms02KN+fm0Tk6Pr+7sHW1HaZt
+	 DNzCNrNVG6qUCJ6O2nps9hIyBafsmb8lt5wvVSjTTOiloOm3fGw9VBsmg8sp89aFYK
+	 Pp50cw1nIl3YtFMdA4CFH8pCoRepkiD80glBhusm5v89O27H+cznm5nVcP1udtB7A5
+	 HC87gpDZWM2BN6Ub5b5pca5ujyxUcSEb0GTW2+c9A5KWG1G8Vev1xitI7sJB9S4hQb
+	 J2ONhHbOoq80zfdlKXbW4EopsekAFDpumuG/xSyhSzZqkUNPe1HwD0I/8ntc/sro7Z
+	 P0XtRFczezP+TK8jlJXBvhe2j8lD0SGg9zDU7AOTu11VLVdsG1xJbTCJp5buxcjAE6
+	 //XbcjO5UdihdGYobWN9fyE0=
 Received: from stx.tnic (unknown [IPv6:2600:1700:38ca:c00::40])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 3EC9E40E00E6;
-	Mon, 20 Jul 2026 21:13:03 +0000 (UTC)
-Date: Mon, 20 Jul 2026 14:12:59 -0700
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id CB40240E00B8;
+	Mon, 20 Jul 2026 22:17:28 +0000 (UTC)
+Date: Mon, 20 Jul 2026 15:17:25 -0700
 From: Borislav Petkov <bp@alien8.de>
 To: Ashish Kalra <Ashish.Kalra@amd.com>
 Cc: tglx@kernel.org, mingo@redhat.com, dave.hansen@linux.intel.com,
@@ -61,11 +61,10 @@ Cc: tglx@kernel.org, mingo@redhat.com, dave.hansen@linux.intel.com,
 	john.allen@amd.com, darwi@linutronix.de,
 	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
 	kvm@vger.kernel.org, linux-coco@lists.linux.dev
-Subject: Re: [PATCH v10 1/6] x86/cpufeatures: Add X86_FEATURE_RMPOPT feature
- flag
-Message-ID: <20260720211259.GCal6PW5aCGieR5j3W@fat_crate.local>
+Subject: Re: [PATCH v10 2/6] x86/sev: Initialize RMPOPT configuration MSRs
+Message-ID: <20260720221725.GDal6edYI3uHrDruHj@fat_crate.local>
 References: <cover.1782841284.git.ashish.kalra@amd.com>
- <39e9ee269a572c516a3f4e937bfe12d00697d5e6.1782841284.git.ashish.kalra@amd.com>
+ <8518e02c46d6edf1f37a180569c708a3cfa7c413.1782841284.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -74,67 +73,28 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <39e9ee269a572c516a3f4e937bfe12d00697d5e6.1782841284.git.ashish.kalra@amd.com>
+In-Reply-To: <8518e02c46d6edf1f37a180569c708a3cfa7c413.1782841284.git.ashish.kalra@amd.com>
 
-On Tue, Jun 30, 2026 at 06:09:44PM +0000, Ashish Kalra wrote:
->  arch/x86/include/asm/cpufeatures.h       | 2 +-
->  arch/x86/kernel/cpu/scattered.c          | 1 +
->  tools/arch/x86/include/asm/cpufeatures.h | 2 +-
+On Tue, Jun 30, 2026 at 06:10:13PM +0000, Ashish Kalra wrote:
+> @@ -490,6 +494,11 @@ static bool __init setup_rmptable(void)
+>  	if (rmp_cfg & MSR_AMD64_SEG_RMP_ENABLED) {
+>  		if (!setup_segmented_rmptable())
+>  			return false;
+> +		/*
+> +		 * RMPOPT requires a segmented RMP, so indicate that the
+> +		 * system is capable of configuring and running RMPOPT.
+> +		 */
+> +		rmpopt_capable = true;
 
-Yeah, apparently we don't do the tools/ change anymore:
+So we're capable of doing RMPOPT when setup_segmented_rmptable() has
+succeeded. Which means, when rmp_segment_table is not NULL, i.e., when we have
+a segmented table.
 
-https://lore.kernel.org/r/0af5122c-20df-4aea-8ab4-cba63f71dc3b@amd.com
+Which means that instead of testing rmpopt_capable, you need to test
+CC_ATTR_HOST_SEV_SNP and rmp_segment_table != NULL and you can put that in
+a helper local to arch/x86/virt/svm/sev.c
 
-Final version:
-
-Author: Ashish Kalra <ashish.kalra@amd.com>
-Date:   Tue Jun 30 18:09:44 2026 +0000
-
-    x86/cpufeatures: Add X86_FEATURE_RMPOPT feature flag
-    
-    Add a flag indicating whether RMPOPT instruction is supported.
-    
-    RMPOPT is a new instruction that reduces the performance overhead of RMP
-    checks for the hypervisor and non-SNP guests by allowing those checks to be
-    skipped when 1-GB memory regions are known to contain no SEV-SNP guest memory.
-    
-    For more information on the RMPOPT instruction, see the AMD64 RMPOPT
-    technical documentation.
-    
-      [ bp: Zap respective tools/ change. ]
-    
-    Suggested-by: Borislav Petkov (AMD) <bp@alien8.de>
-    Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-    Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
-    Reviewed-by: Dave Hansen <dave.hansen@linux.intel.com>
-    Reviewed-by: Ackerley Tng <ackerleytng@google.com>
-    Link: https://patch.msgid.link/39e9ee269a572c516a3f4e937bfe12d00697d5e6.1782841284.git.ashish.kalra@amd.com
-
-diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-index 3d0940a3b9f3..dbccde9ee5cd 100644
---- a/arch/x86/include/asm/cpufeatures.h
-+++ b/arch/x86/include/asm/cpufeatures.h
-@@ -76,7 +76,7 @@
- #define X86_FEATURE_K8			( 3*32+ 4) /* Opteron, Athlon64 */
- #define X86_FEATURE_ZEN5		( 3*32+ 5) /* CPU based on Zen5 microarchitecture */
- #define X86_FEATURE_ZEN6		( 3*32+ 6) /* CPU based on Zen6 microarchitecture */
--/* Free                                 ( 3*32+ 7) */
-+#define X86_FEATURE_RMPOPT		( 3*32+ 7) /* Support for AMD RMPOPT instruction */
- #define X86_FEATURE_CONSTANT_TSC	( 3*32+ 8) /* "constant_tsc" TSC ticks at a constant rate */
- /* free: was #define X86_FEATURE_UP	( 3*32+ 9) * "up" SMP kernel running on UP */
- #define X86_FEATURE_ART			( 3*32+10) /* "art" Always running timer (ART) */
-diff --git a/arch/x86/kernel/cpu/scattered.c b/arch/x86/kernel/cpu/scattered.c
-index 937129ce6a96..021c0bf22de2 100644
---- a/arch/x86/kernel/cpu/scattered.c
-+++ b/arch/x86/kernel/cpu/scattered.c
-@@ -67,6 +67,7 @@ static const struct cpuid_bit cpuid_bits[] = {
- 	{ X86_FEATURE_PERFMON_V2,		CPUID_EAX,  0, 0x80000022, 0 },
- 	{ X86_FEATURE_AMD_LBR_V2,		CPUID_EAX,  1, 0x80000022, 0 },
- 	{ X86_FEATURE_AMD_LBR_PMC_FREEZE,	CPUID_EAX,  2, 0x80000022, 0 },
-+	{ X86_FEATURE_RMPOPT,			CPUID_EDX,  0, 0x80000025, 0 },
- 	{ X86_FEATURE_AMD_HTR_CORES,		CPUID_EAX, 30, 0x80000026, 0 },
- 	{ 0, 0, 0, 0, 0 }
- };
+Which means, you don't need that bool.
 
 -- 
 Regards/Gruss,
