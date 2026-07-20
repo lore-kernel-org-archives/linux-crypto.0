@@ -1,85 +1,102 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E21657C9F;
-	Mon, 20 Jul 2026 01:34:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D03EA72623;
+	Mon, 20 Jul 2026 02:14:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784511268; cv=none; b=rObLnBV3w+rWp00A39GaqesbX/pU41ypAwLrc1dFA9yJbrxPDmFDJwfsdKnaJOKgdlIutxtOX1ZhOMK4Mu8hzU114RKRYAnTg8y41EZxeQZ5DUWGp+0AVTky3oa2rS6aKcrZ6+2euJAXX1ri5j+jL0mbfYZzy/3+8sLloF7BdSU=
+	t=1784513655; cv=none; b=L1JMVOwrzC/SN0l6Sj6Ri/vxcEshxyaXfLRTCpcX7B2aNr6vnBH9Y/ypNFNL0UY6SN/lk4lsLPpWWy5i+CwVmM31UlewsV/QCQ0xtpUT7z7k4bgFKX7XoQ0GoV7FPrusn9+Ul5Yp2qR2JMOzrCVJ7jF0qNlIBxvaSxD4I9vhShY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784511268; c=relaxed/simple;
-	bh=fWpwIuutCJNlCfpgY/ox2afO+VZ2j0HI8gTTU87pii4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lrykw4ybX2eaY5AZzQnXlAkEWIFIxDhL9NsJglXl6ayAubi4IkgzZkaDblWP4Ja5Y3Lylqv+Y3skxEMzMdF7VodG/pl/NuMtRjzoQPWZ8LemB6v8p9DBDWR/eyHVXtAXhao4QZDQUI2SHRTDTf8R57H3/fRHzMT/CBtQHQaaeY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=AWpmHdmj; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="AWpmHdmj"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=KM5jQZEYZF6Eaq4lAPyXwZvXfG8a6EsvVKFxpvP6xhY=; 
-	b=AWpmHdmj0owphm84F7YkN3KI/12T1AJ2gnl/XaQc6GRJhhTluZMDMEfrWjRhwoMTo9Qogp+c1n2
-	HyTWvx7uQWKdBX3sqVs0ULiZvkvjQe8t90OvbpNPJjr5yYyGp7MqQia8MMfyr4YCV8Dh/Kw7PZWvz
-	me5MSavYi/hzltxY/j/3BtLVT9xAOfXvFZrq9Lkd/MPklRgM8VPnMsRETY7A/nCzozcX/zdFKNVQL
-	pG3hxQCtqUqsX6R7JWy9sTps5yLgXev5BUQG0U6B+zABtwI134zZnxlpv9SOHUHbqS/bHAau6OIjD
-	Qj2CDMNRxa8+a+NYOTP22eoDEGUeaNNfmwQQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wlcth-0000000EyMB-3Cj0;
-	Mon, 20 Jul 2026 09:34:22 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 20 Jul 2026 11:34:21 +1000
-Date: Mon, 20 Jul 2026 11:34:21 +1000
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Seohyeon Maeng <bioloidgp@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: ccm - Set rfc4309 maxauthsize from child
-Message-ID: <al17HaL8wNd_fuDc@gondor.apana.org.au>
-References: <alu_daaywAIZXKZm@DESKTOP-SF55S0Q.localdomain>
+	s=arc-20240116; t=1784513655; c=relaxed/simple;
+	bh=SrWleWXqhe9ZAaOZLDCbF/+5e+by+hmpkLG9x9qAqTs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eyW4xkGcdNgtRCWbj+Sz4VZoj3VQYYPczF04Xagc/AP7eH4Dir+AkPq4vG1gwejypIBhGCXVygEfur7klbmfNnAVw5arTv5EaNrAwFX4u0V8AoYgfqEu1lS9Fmxwz3Oqf5rULBnL6ccukAiMlJGI/GlIgdGRk7PsvelBCA4V+cc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: b02e5cb883e011f1aa26b74ffac11d73-20260720
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
+	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
+	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
+	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
+	HR_TO_NO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_EXISTED
+	SN_EXISTED, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS, CIE_GOOD
+	CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO, GTI_C_BU, AMN_GOOD
+	ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.12,REQID:7fcd9d23-5882-46a9-ac6c-a8f12cda6b17,IP:15,
+	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:15
+X-CID-INFO: VERSION:1.3.12,REQID:7fcd9d23-5882-46a9-ac6c-a8f12cda6b17,IP:15,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
+	elease,TS:15
+X-CID-META: VersionHash:e7bac3a,CLOUDID:e9db82c961f5bb119f0c487871581647,BulkI
+	D:260720101408BWPN2JAN,BulkQuantity:0,Recheck:0,SF:10|38|66|78|102|127|850
+	|865|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:ni
+	l,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE
+	:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: b02e5cb883e011f1aa26b74ffac11d73-20260720
+X-User: yijiangshan@kylinos.cn
+Received: from localhost.localdomain [(116.128.244.171)] by mailgw.kylinos.cn
+	(envelope-from <yijiangshan@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 322931628; Mon, 20 Jul 2026 10:14:07 +0800
+From: Jiangshan Yi <yijiangshan@kylinos.cn>
+To: lukas@wunner.de,
+	ignat@linux.win,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	13667453960@163.com,
+	Jiangshan Yi <yijiangshan@kylinos.cn>
+Subject: [PATCH] crypto: rsassa-pkcs1 - Use constant-time digest comparison
+Date: Mon, 20 Jul 2026 10:13:22 +0800
+Message-Id: <20260720021322.122784-1-yijiangshan@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alu_daaywAIZXKZm@DESKTOP-SF55S0Q.localdomain>
+Content-Transfer-Encoding: 8bit
 
-On Sun, Jul 19, 2026 at 03:01:25AM +0900, Seohyeon Maeng wrote:
->
-> Summary
-> -------
-> 
-> crypto_rfc4309_init_tfm() spawns its child AEAD but does not synchronize the
-> child's initial authsize with the RFC4309 parent's initial authsize.
+The digest comparison in rsassa_pkcs1_verify() uses memcmp(), whose
+execution time depends on the position of the first mismatched byte.
+This creates a timing side-channel that could allow an attacker to
+forge RSA PKCS#1 v1.5 signatures byte by byte.
 
-Thanks for the report.  It should do the same thing as GCM and use
-the child's maxauthsize.
+Notably, the same function already uses crypto_memneq() for the hash
+prefix comparison (line 287), making the memcmp() at line 294 an
+inconsistent oversight.
 
----8<---
-Set the maxauthsize of rfc4309 using that of the child algorithm.
+Replace memcmp() with crypto_memneq() to perform a constant-time
+comparison, consistent with the rest of the function and the crypto
+subsystem (gcm, ccm, chacha20poly1305, krb5enc, etc.).
 
-Fixes: 4a49b499dfa0 ("[CRYPTO] ccm: Added CCM mode")
-Reported-by: Seohyeon Maeng <bioloidgp@gmail.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Jiangshan Yi <yijiangshan@kylinos.cn>
+---
+ crypto/rsassa-pkcs1.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/crypto/ccm.c b/crypto/ccm.c
-index 2ae929ffdef8..916441e4f2b8 100644
---- a/crypto/ccm.c
-+++ b/crypto/ccm.c
-@@ -747,7 +747,7 @@ static int crypto_rfc4309_create(struct crypto_template *tmpl,
+diff --git a/crypto/rsassa-pkcs1.c b/crypto/rsassa-pkcs1.c
+index 94fa5e9600e7..a612a9eef2dd 100644
+--- a/crypto/rsassa-pkcs1.c
++++ b/crypto/rsassa-pkcs1.c
+@@ -291,7 +291,7 @@ static int rsassa_pkcs1_verify(struct crypto_sig *tfm,
+ 	/* RFC 8017 sec 8.2.2 step 4 - comparison of digest with out_buf */
+ 	if (dlen != dst_len - pos)
+ 		return -EKEYREJECTED;
+-	if (memcmp(digest, out_buf + pos, dlen) != 0)
++	if (crypto_memneq(digest, out_buf + pos, dlen))
+ 		return -EKEYREJECTED;
  
- 	inst->alg.ivsize = 8;
- 	inst->alg.chunksize = crypto_aead_alg_chunksize(alg);
--	inst->alg.maxauthsize = 16;
-+	inst->alg.maxauthsize = crypto_aead_alg_maxauthsize(alg);
- 
- 	inst->alg.base.cra_ctxsize = sizeof(struct crypto_rfc4309_ctx);
- 
+ 	return 0;
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.25.1
+
