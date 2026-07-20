@@ -1,227 +1,411 @@
-Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011006.outbound.protection.outlook.com [40.107.208.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f207.google.com (mail-oi1-f207.google.com [209.85.167.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC29B3C07A;
-	Mon, 20 Jul 2026 22:38:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.208.6
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784587097; cv=fail; b=Sbhha1opZqENoJ2WUzqXbiw1X9RjAqYzacx8xCHIvNgbBadTdaxnB3SpdlWUL3Ee9NC2+clp7SxGbXUbf4mIrNqYgtwSdhuNvlfP54jy2P9Sbnfi7a0B/odNKcJCD1fRd8LJZ9nQMcLSasW9F3j4sY6GjTUqaaflXO629UzkXa4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784587097; c=relaxed/simple;
-	bh=KOuYYzPh8tO0ViM4p6QIp2w/L09uz4fb9Jd6P38PCqg=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=gKc6Dx/LoOpErPOYi6I6Bi1xP0BGzsHoTIfOj+9C3gz5whr6f16WKPDzMXGovGGS5Cb2SbSNfIWBdFB1TcY9dhDl4wu3cd6R0Hh11/LDJECbofXY+IbQyeNKC2d53PI+zdFcMB/GtWQ9n7tRD+m7en7HMU9+dj+f0u66dlHVU/U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=VHoFtEYT; arc=fail smtp.client-ip=40.107.208.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="VHoFtEYT"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dboVhEgtoIZ3tLXlFquDz03UCy4bGCkdZFGrS41yibvdReBDbXwfGoW9HquH+ybjFSf9CFFywXkNr92wK48swDPZ72hoH5wTG/PPYnZdDRn4gzqOYStmD8nCPO5ASWF3wwBHSKssdsE6nPgYGXnBYxXyLf3YvuvNaL4UjahaKlntYIGy8+OIoG7U7isEVSeml12LrRcWVDVHL+PNupXISArkqLoaJrQpiypckK0kCwjQWl4dcMg+OgmOmFrSWNX6xVUdnPiUFOxsHR6wR9I+mfbKiSBPAxltAGn3enymyjDZiWo5KGxZV4PrRoP2tW/up7BhWxwQw9uG3WgAUNJAYA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pvCi1LV+3Q0WoaCfNyV72Yt2H3O89+ExSXDRDTQ0E1w=;
- b=PMOIJbtG46P0E4Uy3PGhHxehHcgFDLmGRX03FLRMXjCWJeYmWq6CwN6WVutYtWODvc66o7byfTFjtmuVfiB11fB8D3HXpkNZcn+jqDGm8wzcvUMY3AKzXsfEub/5natF8ZRqdjFDnzNM9gftLYBMPPxqQ9vi1/RYSguXP51IoxY8CL1LQ8/LzbgZxAVzu2CRISCVxuarc0GneEjgDSILUBdzXfTkP1L1SYYF53iRYX/de9zh9yuIiAZYp+OYHYwJSi8HCGP2pWPD2lL2v4onHCNRdVvpuxnl9k6AyYAAHwhr7fvyyniEa3eH8YQ4X53Hyrzihh4OLi+80y2SgyNwAw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pvCi1LV+3Q0WoaCfNyV72Yt2H3O89+ExSXDRDTQ0E1w=;
- b=VHoFtEYT+nq8U9KP+iiVFvQnjIKH1ArKyDQuYD7koMe4J6VCSNi6tMyalgWEcYjNHZYyuCNZl59BuovI54AbLd1gK+e1kHqPV4yiJ1NIzefKNMYQ526MW02ePLS9ThmEBfq2+X522kIWiIa6ERCg/lP3sryDiagtbOgEanJGo/Y=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
- by SA3PR12MB8763.namprd12.prod.outlook.com (2603:10b6:806:312::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.223.18; Mon, 20 Jul
- 2026 22:38:09 +0000
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::ae6a:9bdd:af5b:e9ad]) by BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::ae6a:9bdd:af5b:e9ad%7]) with mapi id 15.21.0223.017; Mon, 20 Jul 2026
- 22:38:09 +0000
-Message-ID: <5168d3d3-c31c-4f80-be91-c964a5cee674@amd.com>
-Date: Mon, 20 Jul 2026 17:38:05 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 2/6] x86/sev: Initialize RMPOPT configuration MSRs
-To: Borislav Petkov <bp@alien8.de>
-Cc: tglx@kernel.org, mingo@redhat.com, dave.hansen@linux.intel.com,
- x86@kernel.org, hpa@zytor.com, seanjc@google.com, peterz@infradead.org,
- thomas.lendacky@amd.com, herbert@gondor.apana.org.au, davem@davemloft.net,
- ardb@kernel.org, pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
- KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com,
- ackerleytng@google.com, jackyli@google.com, pgonda@google.com,
- rientjes@google.com, jacobhxu@google.com, xin@zytor.com,
- pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com, dyoung@redhat.com,
- nikunj@amd.com, john.allen@amd.com, darwi@linutronix.de,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
- kvm@vger.kernel.org, linux-coco@lists.linux.dev
-References: <cover.1782841284.git.ashish.kalra@amd.com>
- <8518e02c46d6edf1f37a180569c708a3cfa7c413.1782841284.git.ashish.kalra@amd.com>
- <20260720221725.GDal6edYI3uHrDruHj@fat_crate.local>
-Content-Language: en-US
-From: "Kalra, Ashish" <ashish.kalra@amd.com>
-Autocrypt: addr=ashish.kalra@amd.com; keydata=
- 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
-In-Reply-To: <20260720221725.GDal6edYI3uHrDruHj@fat_crate.local>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: CH2PR08CA0023.namprd08.prod.outlook.com
- (2603:10b6:610:5a::33) To BL3PR12MB9049.namprd12.prod.outlook.com
- (2603:10b6:208:3b8::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC833EA949
+	for <linux-crypto@vger.kernel.org>; Mon, 20 Jul 2026 22:51:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.207
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784587891; cv=none; b=R5sWcT8dN1qD3K8K1ARDlpHl3Ndp+rNIAt9GixpWxRho3Ox5Zde7yB4FwZlPtdm2YGhbTtlwjifK9blxrSxfRFXrNSm9yoH3L27UA/WZ1ZIeIASSpMh2VwzNayDLJ+t0XYN7eAEZF7WpayuX27XgnPpPNp5xXVLbW0weR91ngQU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784587891; c=relaxed/simple;
+	bh=mzXkBKeMUHMrqLp8+yeu+sKDUWlHPQ/F9UGDYvUx4ik=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=L2p60qO1UbDtVh6zbbmcHDT1uO72RYWJHsxrBuXdWkFgSLhDpwJOCYIMul6+PL+wwSq+FNf+evs4jGbw9Z3KnDfayLDUoajUFrZOb6+qJG5in+vM1myVAeHzZYgomlOYER61acJh/YjxnelJuCtdmQgH5NFdj5jtzbCr4EC+ePg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi1-f207.google.com with SMTP id 5614622812f47-4a49f09233dso5941516b6e.2
+        for <linux-crypto@vger.kernel.org>; Mon, 20 Jul 2026 15:51:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784587888; x=1785192688;
+        h=content-type:to:from:subject:message-id:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=/4H/e5Xa9neimMWvXsSAb9oWXY/qj2xEbVw5H7rrwgw=;
+        b=Doy1Yo+cuhfjCBu8SwKblmcG9G/5zQTz7kHdO8AnebVbryRcox2aAVesQggpWKfbSv
+         soXiqg4kmYpWPKBrxz2Xslmhn8zd3qyiM8HFfGD8nVU7r58Jf8fVVrnd4Zdj5ujZQCvH
+         Vm9aDnVXCdQp7yNtw+awfL3DaafG6LR+7Yo9TGAnG4TINXqrGvTP1r66cG/1j2aLagcG
+         +j7OLn8qocumclgkDB9ELlBOJnbiNCRYIQAhMmKqwSMITRBKdt88GR8KA8BZD7WiFBA4
+         lbDzj7vkwZyHKXVDek1C4Aure+NjgE7wy81DOdqMKdhL4x8mpUr96HB1oNSzxMFDVWrO
+         7pTw==
+X-Forwarded-Encrypted: i=1; AHgh+RrTkwWjwEx/knEfYM7L4lPfuwkJUu1Qaxvv45c7/WONXp/Ev+W3tZLfP/iN03srihh18m0xovrCEBso7mo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxm+SR8aKV/iGfF3UQRbSBWGPZy56XnFjr9ce68T/G4pkg4Tbvr
+	ly7Qc+beMGzHd8JaGuFgURtVWl6xQrtq9g+jTQ0OdQfdWvXE8VEsPeyWOl6xcqtNGCm4/mBxXVu
+	MoZEOslNmRO5pzzMf4aAhGZGrBhoxG0Kgo/ybz3AA0Hfk6ijiGOZgTMqJz9E=
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|SA3PR12MB8763:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0b6b5ca6-a3b3-4f4c-5c7e-08dee6af92bb
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|23010399003|376014|7416014|366016|22082099003|18002099003|56012099006|5023799004|11063799006|4143699003|10067099003;
-X-Microsoft-Antispam-Message-Info:
-	rlmFZLwKjLddYisOddR5wtsjTRU1UIslD9HplwzAUZYu0uGP9NCbGQCYQdU8BEm+na6f2XOHgynxEN1yv/gY/4c++aLCSOJeD7tObmOP5CIUpH1w2Aox+HWCYNvc1UQorDlIhRK+mcmVO9wXd/g/RlUElJ2ZohjcdqfefkbeNe2b5G9HlWsS+JhGTj3BruxdYJQNgNu1+3P3k2sAPZ+oCDOIIN8Qbt9guQr5QowpK/lU4x6iwQ2Tt2lV1IDzpl+QbHjcj8bUnqWzdS5e2MIacvVTwwEhuIR0Y21ZuAkhSk1hIrZSLOwrPZlJv+4tKiDihyHr1Y9M/84PuebF2UDdlMe6EK/y4h/aWywjKPAWn351whJxo9dIId+zUuD5YnJF8MGxEy1K7h1cjKCa0/eL9R4iD+TXZB/bg7yi5slAEBvZG1DG2Z0hCW8NHmMvy7GUghaZ/gN8V8gPB1a2XJFnz9qUT3Qeno0dZ+BwZAl1bAUrPt+BgTw3xscIo1ps7Q91YirEbFNVzr8Kv6f8JYyuxpgof0ayUEBbE0xeRrduKeer/mM0ePWuTKKn3W4V3zLJp9HOptpU6TcbXalj24zhnxSXRgrhQaWUBh8RYY1BffY5emHjHsmW6jzaM1wFtsrsjJxtIPQaQSM8xD0lPaKeSiL6WlsKLgGEKuoOZ4MWCeE=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(23010399003)(376014)(7416014)(366016)(22082099003)(18002099003)(56012099006)(5023799004)(11063799006)(4143699003)(10067099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?YjJKMGpZUkgrR00yMHhrTUJWOUhhcU9aRTIxeVdBVmRuSmIrK1RjcElTNU9Q?=
- =?utf-8?B?TE83WEpickZkVFZIRmtTaEhFQzlWRlJoUnMwT045Mkw0VW02ZjdpM1I5cEMw?=
- =?utf-8?B?LzZOVk11Y2ZidkkvaGxZNVZ6eVBZN3AzM0piMkVWd1JWQU1KcXRjUE9RRkJy?=
- =?utf-8?B?UzE0c1NsSlQyYXY3OEVkWnVTRnBYSldrK3VwOVViNVBCR2tJdUtiK1k4dmR2?=
- =?utf-8?B?UWR3cnV1bTNGMndWc1JvZEdQazFkZVBPZURvSExkaTlVTHp1V3BabW1GWVFT?=
- =?utf-8?B?V0RYdlFsQzdpa2V5WXdEaGFoNXNvRDIwYm5RRFIrQlR6TG5OUExQeUVRa1ZD?=
- =?utf-8?B?d3M4ZEVFbTBrVGkwQnFhZDlQeksyUnExOWJBc0F2RndreFY1VmZpaEkzRFZ4?=
- =?utf-8?B?VnI5eG5wK3h6NDJDamJEa05BN2d5Vk85b3hmUUoxWHoxZzNuWEFoZGtIN253?=
- =?utf-8?B?QmRydEhmUW1zNnBGVStwMUJRTUNPMlBxdlhCVTZFN0tnUGN4eFpvdER0SFRK?=
- =?utf-8?B?eEdZUEhNNitZVTdoa1NMbHJQVWg0Y3F4UGQ3R1EwSGRzcGUrWXRlQlhJbVpN?=
- =?utf-8?B?OFNYQ0ZCeWYydkF3UXpKTXVuekxHVjVCYWE1R2RVcHBzNlZQaUlCQjNNbm53?=
- =?utf-8?B?YU9mc2lZK1VMR1JXZmN3VmM2ancwVVBhL2luL2tQRm5FZlJyVHNWWmtvNmxt?=
- =?utf-8?B?Z3lybHFwVm5kMWhZa29uNXFHWkd5dnZIck9TZktaSDZsd2lkSmoxVUNTOFQ1?=
- =?utf-8?B?Uy94WTNRektIWUJ3QUtvZGVjTzFFc0QwNFdBemVJQXU0RHFtSGRVNmF3Uzh2?=
- =?utf-8?B?YVQzeS82V0pSQmkwMVJFdG5zbnZoVVJxb3lGV3BDa3lmTEtvdVJZd1llc2p4?=
- =?utf-8?B?VmM4dDZxWlF2ajZhV0tiaDhPdG9VNUwybjU0V3A5OHM3MEI5TmtOdDdTaG0y?=
- =?utf-8?B?ZEk4eE1DVUlLb3QyRFpjcitGVzRVTGkyRXA3c2hYbVVKUGQwY2lFTExrNXNy?=
- =?utf-8?B?a2RFeFZGT0MvcXUxRlNrcDUza3hSZStlOUZqdTByNGhEOWZ1bkduY3N6bEht?=
- =?utf-8?B?Q3ROQmR5OEhia2RsV2hiZzZHenlQOU1hRlpoL0hMeSswMGhQWHU1ZnZmVDB2?=
- =?utf-8?B?anRHdDh6Y05zT3pqRWd3VVpYZys0cXJxVkJ5cGpRaHZTbVhSc0hLb20rcWdl?=
- =?utf-8?B?NGd6ckM2TlZ1akdiTGx2NjQzWVdIQmYrWVZTMVlwRkFLdFFneFBYUTB1Y2ti?=
- =?utf-8?B?R0hWMW8zb29Gd0pTaHkyd25nUjcyUzljU1BGZFhGQUNOMEZrZWYycGFrZVVU?=
- =?utf-8?B?ell5dU95bkR0ZWR2WEl3ZkFoRDkxS2xNQjdUcS9IZWdka2gyRDk0YytqN2Fy?=
- =?utf-8?B?SDNZT3F2bUl5c1ROOFJzYTF1R21mYjZmL25DR2lJWlNRanFjVElaZHRpUEs5?=
- =?utf-8?B?cmNkelRWcFZxUEE1aWdsY0M1OWcwQjMwS1FvMFBROE5xc25oY1o2N2pwRXVn?=
- =?utf-8?B?N1lNejRwTFZLMjludHlhQTJYc1RIVjB2MEMwUzRKRjZOYmNsOEdrRk9yRU1u?=
- =?utf-8?B?UmFhL0JiZWZnSVZZNXc0MFltNXYxdEZyUVFsV0pieFc0SlFLNkJwUVMyY2NV?=
- =?utf-8?B?UWRlaUtkM2FsOEZiNjBaejFMMFhJQXc5Z3BGSlk3WG1lS1FaeVZtMkUrYk1S?=
- =?utf-8?B?NE0xOXc3SjQwYi9BaVZpZk80d0FLOE5oclZiNDZYakRPWU5STVNKMWxJQUlr?=
- =?utf-8?B?UkZzcUtVVXphYy9FYlIvOU1zdUFzK0Rqa3BPZDE4Qm13VzUvbmlnMFlwQi9R?=
- =?utf-8?B?aFhBei9jRmRnNkRvcllrQlNGODRibHhzQlhJeW81czBMZFBNVzc4S052Tlpv?=
- =?utf-8?B?N09PUmN4OUdiK1hJaEN0RHNYa0NGTnkrdVRUaFRHb1VFUkp0bWFEdGN1NFJP?=
- =?utf-8?B?RWgvYmZNa202SEx6VjRTZ3NYSEZSTUs0YzBNMFNkUUVGQitYTklDRm43Mkda?=
- =?utf-8?B?dmRRczAvUlNMQlZXM0Y1THE1Y0t5b2tCZnhhMEV3OWxNUTRXZkt6VmROeCt0?=
- =?utf-8?B?cjFBM3I1VTl1UzBnZkFEcldqSEZzYklSVHJ4U1BmcTMrTXRhR0tIY1hLN1NB?=
- =?utf-8?B?bi9malAxQ0ZVZFNTTXNKNURDSGZMV0RBcmwvN28rK1U0R29EYzM2TUF0UDVq?=
- =?utf-8?B?VkRyanhXa2JXbFZrMy9FTk56ZStUSWE0MVN1VjRnVnhpNzZ0ZERxUjZZb1Nq?=
- =?utf-8?B?dk96ZlFvdDljRFN1cTlLanRtQ3VaOUpOVzZvbnZMSUxLbVQxajRlaGJ1U25Q?=
- =?utf-8?Q?9HkrEs155p2tUd5vad?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0b6b5ca6-a3b3-4f4c-5c7e-08dee6af92bb
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jul 2026 22:38:09.2773
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: eKcKWDhj60Hvc9jCyUxP0D8AdmJ7IncXTqHNalcbcsSftjClzu7YgTtVUz5N+UiddMUkbcfY+eOR7lFlUc16fw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB8763
+X-Received: by 2002:a05:6808:15a3:b0:4a4:cf25:baf8 with SMTP id
+ 5614622812f47-4a4d039a6abmr8739278b6e.34.1784587888024; Mon, 20 Jul 2026
+ 15:51:28 -0700 (PDT)
+Date: Mon, 20 Jul 2026 15:51:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6a5ea670.f1649fcc.2a4208.0576.GAE@google.com>
+Subject: [syzbot] [crypto?] possible deadlock in __alloc_workqueue (3)
+From: syzbot <syzbot+5f117b3024eab6a14c35@syzkaller.appspotmail.com>
+To: daniel.m.jordan@oracle.com, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	steffen.klassert@secunet.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hello Boris,
+Hello,
 
-On 7/20/2026 5:17 PM, Borislav Petkov wrote:
-> On Tue, Jun 30, 2026 at 06:10:13PM +0000, Ashish Kalra wrote:
->> @@ -490,6 +494,11 @@ static bool __init setup_rmptable(void)
->>  	if (rmp_cfg & MSR_AMD64_SEG_RMP_ENABLED) {
->>  		if (!setup_segmented_rmptable())
->>  			return false;
->> +		/*
->> +		 * RMPOPT requires a segmented RMP, so indicate that the
->> +		 * system is capable of configuring and running RMPOPT.
->> +		 */
->> +		rmpopt_capable = true;
-> 
-> So we're capable of doing RMPOPT when setup_segmented_rmptable() has
-> succeeded. Which means, when rmp_segment_table is not NULL, i.e., when we have
-> a segmented table.
-> 
-> Which means that instead of testing rmpopt_capable, you need to test
-> CC_ATTR_HOST_SEV_SNP and rmp_segment_table != NULL and you can put that in
-> a helper local to arch/x86/virt/svm/sev.c
-> 
-> Which means, you don't need that bool.
-> 
+syzbot found the following issue on:
 
-Agreed on dropping the bool — I'll derive it in a local helper.
+HEAD commit:    f6f3b36c15ed net: ethernet: qualcomm: remove unneeded 'fas..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=152cacb9580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=5c4196ba0e33631d
+dashboard link: https://syzkaller.appspot.com/bug?extid=5f117b3024eab6a14c35
+compiler:       Debian clang version 22.1.8 (++20260613092233+e80beda6e255-1~exp1~20260613092250.77), Debian LLD 22.1.8
 
-One issue though: rmp_segment_table != NULL isn't segmented-only. setup_contiguous_rmptable() also allocates rmp_segment_table
-(the contiguous RMP is stored as a single segment in the same table), so it's non-NULL for the contiguous case too.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-To keep it segmented-only, I'll also need to gate on the segmented-RMP mode, something like: 
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/47ae09206bf6/disk-f6f3b36c.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/9e3daf94ae30/vmlinux-f6f3b36c.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c266cfd24092/bzImage-f6f3b36c.xz
 
-  static bool rmpopt_capable(void)
-  {
-        return cpu_feature_enabled(X86_FEATURE_RMPOPT) &&
-               cc_platform_has(CC_ATTR_HOST_SEV_SNP) &&
-               (rmp_cfg & MSR_AMD64_SEG_RMP_ENABLED) &&
-               rmp_segment_table;
-  }
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+5f117b3024eab6a14c35@syzkaller.appspotmail.com
 
-The CC_ATTR_HOST_SEV_SNP check also handles SNP being disabled at runtime, so snp_clear_rmpopt_capable() and its caller go away as well.
+wlan1 speed is unknown, defaulting to 1000
+wlan1 speed is unknown, defaulting to 1000
+wlan1 speed is unknown, defaulting to 1000
+infiniband syz1: set down
+infiniband syz1: added wlan1
+======================================================
+WARNING: possible circular locking dependency detected
+syzkaller #0 Not tainted
+------------------------------------------------------
+syz.1.835/9438 is trying to acquire lock:
+ffffffff8ec848a0 (fs_reclaim){+.+.}-{0:0}, at: might_alloc include/linux/sched/mm.h:317 [inline]
+ffffffff8ec848a0 (fs_reclaim){+.+.}-{0:0}, at: slab_pre_alloc_hook mm/slub.c:4565 [inline]
+ffffffff8ec848a0 (fs_reclaim){+.+.}-{0:0}, at: slab_alloc_node mm/slub.c:4925 [inline]
+ffffffff8ec848a0 (fs_reclaim){+.+.}-{0:0}, at: __do_kmalloc_node mm/slub.c:5361 [inline]
+ffffffff8ec848a0 (fs_reclaim){+.+.}-{0:0}, at: __kmalloc_noprof+0xbc/0x720 mm/slub.c:5387
 
-Thanks,
-Ashish
+but task is already holding lock:
+ffffffff8e9f6d00 (wq_pool_mutex){+.+.}-{4:4}, at: __alloc_workqueue+0xa9c/0x2060 kernel/workqueue.c:5895
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #7 (wq_pool_mutex){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+       __mutex_lock+0x19d/0x1550 kernel/locking/mutex.c:821
+       __alloc_workqueue+0xa9c/0x2060 kernel/workqueue.c:5895
+       alloc_workqueue_va kernel/workqueue.c:5946 [inline]
+       alloc_workqueue_noprof+0xe3/0x210 kernel/workqueue.c:5962
+       padata_alloc+0xbe/0x360 kernel/padata.c:964
+       pcrypt_init_padata+0x27/0x100 crypto/pcrypt.c:335
+       pcrypt_init+0x60/0xc0 crypto/pcrypt.c:360
+       do_one_initcall+0x250/0x870 init/main.c:1347
+       do_initcall_level+0x10a/0x1a0 init/main.c:1409
+       do_initcalls+0x59/0xa0 init/main.c:1425
+       kernel_init_freeable+0x29d/0x3e0 init/main.c:1658
+       kernel_init+0x1d/0x1d0 init/main.c:1548
+       ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+-> #6 (cpu_hotplug_lock){++++}-{0:0}:
+       percpu_down_read_internal include/linux/percpu-rwsem.h:53 [inline]
+       percpu_down_read include/linux/percpu-rwsem.h:77 [inline]
+       cpus_read_lock+0x42/0x160 kernel/cpu.c:490
+       static_key_slow_inc+0x12/0x30 kernel/jump_label.c:190
+       nbd_reconnect_socket drivers/block/nbd.c:1379 [inline]
+       nbd_genl_reconfigure+0x1301/0x1e80 drivers/block/nbd.c:2468
+       genl_family_rcv_msg_doit+0x233/0x340 net/netlink/genetlink.c:1114
+       genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
+       genl_rcv_msg+0x614/0x7a0 net/netlink/genetlink.c:1209
+       netlink_rcv_skb+0x226/0x4a0 net/netlink/af_netlink.c:2556
+       genl_rcv+0x28/0x40 net/netlink/genetlink.c:1218
+       netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
+       netlink_unicast+0x7bb/0x940 net/netlink/af_netlink.c:1345
+       netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1900
+       sock_sendmsg_nosec+0x13a/0x180 net/socket.c:775
+       __sock_sendmsg net/socket.c:790 [inline]
+       ____sys_sendmsg+0x54e/0x850 net/socket.c:2684
+       ___sys_sendmsg+0x2a5/0x360 net/socket.c:2738
+       __sys_sendmsg net/socket.c:2770 [inline]
+       __do_sys_sendmsg net/socket.c:2775 [inline]
+       __se_sys_sendmsg net/socket.c:2773 [inline]
+       __x64_sys_sendmsg+0x1b1/0x290 net/socket.c:2773
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0x174/0x580 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #5 (&nsock->tx_lock){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+       __mutex_lock+0x19d/0x1550 kernel/locking/mutex.c:821
+       nbd_handle_cmd drivers/block/nbd.c:1143 [inline]
+       nbd_queue_rq+0x373/0x1150 drivers/block/nbd.c:1207
+       blk_mq_dispatch_rq_list+0x499/0x1990 block/blk-mq.c:2117
+       __blk_mq_do_dispatch_sched block/blk-mq-sched.c:168 [inline]
+       blk_mq_do_dispatch_sched block/blk-mq-sched.c:182 [inline]
+       __blk_mq_sched_dispatch_requests+0xd36/0x1580 block/blk-mq-sched.c:307
+       blk_mq_sched_dispatch_requests+0xd7/0x190 block/blk-mq-sched.c:329
+       blk_mq_run_work_fn+0x16c/0x300 block/blk-mq.c:2532
+       process_one_work kernel/workqueue.c:3322 [inline]
+       process_scheduled_works+0xa8e/0x14e0 kernel/workqueue.c:3405
+       worker_thread+0xa47/0xfb0 kernel/workqueue.c:3486
+       kthread+0x388/0x470 kernel/kthread.c:436
+       ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+-> #4 (&cmd->lock){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+       __mutex_lock+0x19d/0x1550 kernel/locking/mutex.c:821
+       nbd_queue_rq+0xc1/0x1150 drivers/block/nbd.c:1199
+       blk_mq_dispatch_rq_list+0x499/0x1990 block/blk-mq.c:2117
+       __blk_mq_do_dispatch_sched block/blk-mq-sched.c:168 [inline]
+       blk_mq_do_dispatch_sched block/blk-mq-sched.c:182 [inline]
+       __blk_mq_sched_dispatch_requests+0xd36/0x1580 block/blk-mq-sched.c:307
+       blk_mq_sched_dispatch_requests+0xd7/0x190 block/blk-mq-sched.c:329
+       blk_mq_run_work_fn+0x16c/0x300 block/blk-mq.c:2532
+       process_one_work kernel/workqueue.c:3322 [inline]
+       process_scheduled_works+0xa8e/0x14e0 kernel/workqueue.c:3405
+       worker_thread+0xa47/0xfb0 kernel/workqueue.c:3486
+       kthread+0x388/0x470 kernel/kthread.c:436
+       ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+-> #3 (set->srcu){.+.+}-{0:0}:
+       srcu_lock_sync include/linux/srcu.h:199 [inline]
+       __synchronize_srcu+0xc9/0x2f0 kernel/rcu/srcutree.c:1481
+       elevator_switch+0x1e8/0x7b0 block/elevator.c:576
+       elevator_change+0x2fa/0x480 block/elevator.c:681
+       elevator_set_default+0x375/0x440 block/elevator.c:754
+       blk_register_queue+0x3f3/0x4e0 block/blk-sysfs.c:992
+       __add_disk+0x6cb/0xe30 block/genhd.c:528
+       add_disk_fwnode+0xfb/0x4b0 block/genhd.c:597
+       add_disk include/linux/blkdev.h:800 [inline]
+       nbd_dev_add+0x733/0xb60 drivers/block/nbd.c:2021
+       nbd_init+0x15f/0x1e0 drivers/block/nbd.c:2729
+       do_one_initcall+0x250/0x870 init/main.c:1347
+       do_initcall_level+0x10a/0x1a0 init/main.c:1409
+       do_initcalls+0x59/0xa0 init/main.c:1425
+       kernel_init_freeable+0x29d/0x3e0 init/main.c:1658
+       kernel_init+0x1d/0x1d0 init/main.c:1548
+       ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+-> #2 (&q->elevator_lock){+.+.}-{4:4}:
+       __mutex_lock_common kernel/locking/mutex.c:646 [inline]
+       __mutex_lock+0x19d/0x1550 kernel/locking/mutex.c:821
+       elevator_change+0x1af/0x480 block/elevator.c:679
+       elevator_set_none+0xb5/0x140 block/elevator.c:769
+       blk_mq_elv_switch_none block/blk-mq.c:5101 [inline]
+       __blk_mq_update_nr_hw_queues block/blk-mq.c:5146 [inline]
+       blk_mq_update_nr_hw_queues+0x5ef/0x19f0 block/blk-mq.c:5211
+       nbd_start_device+0x189/0xb30 drivers/block/nbd.c:1526
+       nbd_genl_connect+0x1597/0x1c10 drivers/block/nbd.c:2276
+       genl_family_rcv_msg_doit+0x233/0x340 net/netlink/genetlink.c:1114
+       genl_family_rcv_msg net/netlink/genetlink.c:1194 [inline]
+       genl_rcv_msg+0x614/0x7a0 net/netlink/genetlink.c:1209
+       netlink_rcv_skb+0x226/0x4a0 net/netlink/af_netlink.c:2556
+       genl_rcv+0x28/0x40 net/netlink/genetlink.c:1218
+       netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
+       netlink_unicast+0x7bb/0x940 net/netlink/af_netlink.c:1345
+       netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1900
+       sock_sendmsg_nosec+0x13a/0x180 net/socket.c:775
+       __sock_sendmsg net/socket.c:790 [inline]
+       ____sys_sendmsg+0x54e/0x850 net/socket.c:2684
+       ___sys_sendmsg+0x2a5/0x360 net/socket.c:2738
+       __sys_sendmsg net/socket.c:2770 [inline]
+       __do_sys_sendmsg net/socket.c:2775 [inline]
+       __se_sys_sendmsg net/socket.c:2773 [inline]
+       __x64_sys_sendmsg+0x1b1/0x290 net/socket.c:2773
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0x174/0x580 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #1 (&q->q_usage_counter(io)#50){++++}-{0:0}:
+       blk_alloc_queue+0x544/0x690 block/blk-core.c:504
+       blk_mq_alloc_queue block/blk-mq.c:4420 [inline]
+       __blk_mq_alloc_disk+0x194/0x390 block/blk-mq.c:4467
+       nbd_dev_add+0x494/0xb60 drivers/block/nbd.c:1991
+       nbd_init+0x15f/0x1e0 drivers/block/nbd.c:2729
+       do_one_initcall+0x250/0x870 init/main.c:1347
+       do_initcall_level+0x10a/0x1a0 init/main.c:1409
+       do_initcalls+0x59/0xa0 init/main.c:1425
+       kernel_init_freeable+0x29d/0x3e0 init/main.c:1658
+       kernel_init+0x1d/0x1d0 init/main.c:1548
+       ret_from_fork+0x514/0xb70 arch/x86/kernel/process.c:158
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+-> #0 (fs_reclaim){+.+.}-{0:0}:
+       check_prev_add kernel/locking/lockdep.c:3165 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3284 [inline]
+       validate_chain kernel/locking/lockdep.c:3908 [inline]
+       __lock_acquire+0x1520/0x2cf0 kernel/locking/lockdep.c:5237
+       lock_acquire+0x106/0x350 kernel/locking/lockdep.c:5868
+       __fs_reclaim_acquire mm/page_alloc.c:4329 [inline]
+       fs_reclaim_acquire+0x71/0x100 mm/page_alloc.c:4343
+       might_alloc include/linux/sched/mm.h:317 [inline]
+       slab_pre_alloc_hook mm/slub.c:4565 [inline]
+       slab_alloc_node mm/slub.c:4925 [inline]
+       __do_kmalloc_node mm/slub.c:5361 [inline]
+       __kmalloc_noprof+0xbc/0x720 mm/slub.c:5387
+       _kmalloc_noprof include/linux/slab.h:973 [inline]
+       _kzalloc_noprof include/linux/slab.h:1290 [inline]
+       apply_wqattrs_prepare+0xee/0xdc0 kernel/workqueue.c:5410
+       apply_workqueue_attrs_locked kernel/workqueue.c:5495 [inline]
+       alloc_and_link_pwqs kernel/workqueue.c:5645 [inline]
+       __alloc_workqueue+0x117c/0x2060 kernel/workqueue.c:5897
+       alloc_workqueue_va kernel/workqueue.c:5946 [inline]
+       alloc_workqueue_noprof+0xe3/0x210 kernel/workqueue.c:5962
+       ib_mad_port_open drivers/infiniband/core/mad.c:3252 [inline]
+       ib_mad_init_device+0x993/0x2150 drivers/infiniband/core/mad.c:3339
+       add_client_context+0x37c/0x7b0 drivers/infiniband/core/device.c:732
+       enable_device_and_get+0x19c/0x3e0 drivers/infiniband/core/device.c:1341
+       ib_register_device+0x10af/0x1380 drivers/infiniband/core/device.c:1468
+       rxe_register_device+0x1e3/0x350 drivers/infiniband/sw/rxe/rxe_verbs.c:1543
+       rxe_net_add+0x81/0x110 drivers/infiniband/sw/rxe/rxe_net.c:625
+       rxe_newlink+0xf4/0x1c0 drivers/infiniband/sw/rxe/rxe.c:243
+       nldev_newlink+0x5bc/0x650 drivers/infiniband/core/nldev.c:1816
+       rdma_nl_rcv_msg drivers/infiniband/core/netlink.c:-1 [inline]
+       rdma_nl_rcv_skb drivers/infiniband/core/netlink.c:239 [inline]
+       rdma_nl_rcv+0x6ef/0xa40 drivers/infiniband/core/netlink.c:259
+       netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
+       netlink_unicast+0x7bb/0x940 net/netlink/af_netlink.c:1345
+       netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1900
+       sock_sendmsg_nosec+0x13a/0x180 net/socket.c:775
+       __sock_sendmsg net/socket.c:790 [inline]
+       ____sys_sendmsg+0x54e/0x850 net/socket.c:2684
+       ___sys_sendmsg+0x2a5/0x360 net/socket.c:2738
+       __sys_sendmsg net/socket.c:2770 [inline]
+       __do_sys_sendmsg net/socket.c:2775 [inline]
+       __se_sys_sendmsg net/socket.c:2773 [inline]
+       __x64_sys_sendmsg+0x1b1/0x290 net/socket.c:2773
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0x174/0x580 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+other info that might help us debug this:
+
+Chain exists of:
+  fs_reclaim --> cpu_hotplug_lock --> wq_pool_mutex
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(wq_pool_mutex);
+                               lock(cpu_hotplug_lock);
+                               lock(wq_pool_mutex);
+  lock(fs_reclaim);
+
+ *** DEADLOCK ***
+
+6 locks held by syz.1.835/9438:
+ #0: ffffffff9ab1b1a8 (&rdma_nl_types[idx].sem){.+.+}-{4:4}, at: rdma_nl_rcv_msg drivers/infiniband/core/netlink.c:164 [inline]
+ #0: ffffffff9ab1b1a8 (&rdma_nl_types[idx].sem){.+.+}-{4:4}, at: rdma_nl_rcv_skb drivers/infiniband/core/netlink.c:239 [inline]
+ #0: ffffffff9ab1b1a8 (&rdma_nl_types[idx].sem){.+.+}-{4:4}, at: rdma_nl_rcv+0x33d/0xa40 drivers/infiniband/core/netlink.c:259
+ #1: ffffffff8fd8ae28 (link_ops_rwsem){++++}-{4:4}, at: nldev_newlink+0x429/0x650 drivers/infiniband/core/nldev.c:1806
+ #2: ffffffff8fd7c308 (devices_rwsem){++++}-{4:4}, at: enable_device_and_get+0xff/0x3e0 drivers/infiniband/core/device.c:1331
+ #3: ffffffff8fd7c608 (clients_rwsem){++++}-{4:4}, at: enable_device_and_get+0x165/0x3e0 drivers/infiniband/core/device.c:1339
+ #4: ffff888020ea0620 (&device->client_data_rwsem){++++}-{4:4}, at: add_client_context+0x33e/0x7b0 drivers/infiniband/core/device.c:730
+ #5: ffffffff8e9f6d00 (wq_pool_mutex){+.+.}-{4:4}, at: __alloc_workqueue+0xa9c/0x2060 kernel/workqueue.c:5895
+
+stack backtrace:
+CPU: 1 UID: 0 PID: 9438 Comm: syz.1.835 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/25/2026
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0xe8/0x150 lib/dump_stack.c:120
+ print_circular_bug+0x2e1/0x300 kernel/locking/lockdep.c:2043
+ check_noncircular+0x12e/0x150 kernel/locking/lockdep.c:2175
+ check_prev_add kernel/locking/lockdep.c:3165 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3284 [inline]
+ validate_chain kernel/locking/lockdep.c:3908 [inline]
+ __lock_acquire+0x1520/0x2cf0 kernel/locking/lockdep.c:5237
+ lock_acquire+0x106/0x350 kernel/locking/lockdep.c:5868
+ __fs_reclaim_acquire mm/page_alloc.c:4329 [inline]
+ fs_reclaim_acquire+0x71/0x100 mm/page_alloc.c:4343
+ might_alloc include/linux/sched/mm.h:317 [inline]
+ slab_pre_alloc_hook mm/slub.c:4565 [inline]
+ slab_alloc_node mm/slub.c:4925 [inline]
+ __do_kmalloc_node mm/slub.c:5361 [inline]
+ __kmalloc_noprof+0xbc/0x720 mm/slub.c:5387
+ _kmalloc_noprof include/linux/slab.h:973 [inline]
+ _kzalloc_noprof include/linux/slab.h:1290 [inline]
+ apply_wqattrs_prepare+0xee/0xdc0 kernel/workqueue.c:5410
+ apply_workqueue_attrs_locked kernel/workqueue.c:5495 [inline]
+ alloc_and_link_pwqs kernel/workqueue.c:5645 [inline]
+ __alloc_workqueue+0x117c/0x2060 kernel/workqueue.c:5897
+ alloc_workqueue_va kernel/workqueue.c:5946 [inline]
+ alloc_workqueue_noprof+0xe3/0x210 kernel/workqueue.c:5962
+ ib_mad_port_open drivers/infiniband/core/mad.c:3252 [inline]
+ ib_mad_init_device+0x993/0x2150 drivers/infiniband/core/mad.c:3339
+ add_client_context+0x37c/0x7b0 drivers/infiniband/core/device.c:732
+ enable_device_and_get+0x19c/0x3e0 drivers/infiniband/core/device.c:1341
+ ib_register_device+0x10af/0x1380 drivers/infiniband/core/device.c:1468
+ rxe_register_device+0x1e3/0x350 drivers/infiniband/sw/rxe/rxe_verbs.c:1543
+ rxe_net_add+0x81/0x110 drivers/infiniband/sw/rxe/rxe_net.c:625
+ rxe_newlink+0xf4/0x1c0 drivers/infiniband/sw/rxe/rxe.c:243
+ nldev_newlink+0x5bc/0x650 drivers/infiniband/core/nldev.c:1816
+ rdma_nl_rcv_msg drivers/infiniband/core/netlink.c:-1 [inline]
+ rdma_nl_rcv_skb drivers/infiniband/core/netlink.c:239 [inline]
+ rdma_nl_rcv+0x6ef/0xa40 drivers/infiniband/core/netlink.c:259
+ netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
+ netlink_unicast+0x7bb/0x940 net/netlink/af_netlink.c:1345
+ netlink_sendmsg+0x813/0xb40 net/netlink/af_netlink.c:1900
+ sock_sendmsg_nosec+0x13a/0x180 net/socket.c:775
+ __sock_sendmsg net/socket.c:790 [inline]
+ ____sys_sendmsg+0x54e/0x850 net/socket.c:2684
+ ___sys_sendmsg+0x2a5/0x360 net/socket.c:2738
+ __sys_sendmsg net/socket.c:2770 [inline]
+ __do_sys_sendmsg net/socket.c:2775 [inline]
+ __se_sys_sendmsg net/socket.c:2773 [inline]
+ __x64_sys_sendmsg+0x1b1/0x290 net/socket.c:2773
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x174/0x580 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f8013f9de59
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 e8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f8014d82028 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f8014225fa0 RCX: 00007f8013f9de59
+RDX: 0000000004000000 RSI: 00002000000002c0 RDI: 000000000000000d
+RBP: 00007f8014033e6f R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f8014226038 R14: 00007f8014225fa0 R15: 00007ffc03c3f938
+ </TASK>
+smbdirect: ib_dev[syz1]: added: IB_CA max_fast_reg_page_list_len=512 device_cap_flags=0x1c001223c76 kernel_cap_flags=0x14 page_size_cap=0xfffff000
+smbdirect: ib_dev[syz1]: num_ports=1 max_qp_rd_atom=128 max_qp_init_rd_atom=128 max_sgl_rd=0 max_sge_rd=32 max_cqe=32767 max_qp_wr=1048576 max_send_sge=32 max_recv_sge=32
+smbdirect: ib_dev[syz1]PORT[1]: iwarp=0 ib=0 roce=1 v1=0 v2=1 core_cap_flags=0x803005
+RDS/IB: syz1: added
+smc: adding ib device syz1 with port count 1
+smc:    ib device syz1 port 1 has no pnetid
+wlan1 speed is unknown, defaulting to 1000
+wlan1 speed is unknown, defaulting to 1000
+wlan1 speed is unknown, defaulting to 1000
+wlan1 speed is unknown, defaulting to 1000
+wlan1 speed is unknown, defaulting to 1000
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
