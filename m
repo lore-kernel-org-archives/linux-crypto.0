@@ -1,294 +1,172 @@
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 869B7374A12
-	for <linux-crypto@vger.kernel.org>; Tue, 21 Jul 2026 13:45:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 892E73793CA;
+	Tue, 21 Jul 2026 13:54:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784641533; cv=none; b=rbGJN4XT8lN/ywJ9kF4qLVRP6wXHRBIF1rjOv9rfek8fkobyzJVyfLh3KGHZO/CxXaekfeUUyBUZdvvrMraVqUYVTon9lMyZgNGPljQdDLtk2V9YXjdjbUi1M80nZkRA1e7UxWG4e+pAE9F8/mhQ6k2jo/KIkRxxuYZzZX5wWlM=
+	t=1784642074; cv=none; b=H1I9+z48iQvIociAFwMpNe99Ig++pM79fi4ZKlCLE8PfZh/T1ZocbRAce/y8L36h2coyVnPmMtZTuzT48ox2blVHU5YPDU6DKWo4FdgAcnugWqPhqblyQ/7Mnz88wTewFFLkTYIpgBjXmlOOj0O0639KsY+Fji/C/g8RlrOt+tk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784641533; c=relaxed/simple;
-	bh=CVdDSuYexNtNl6N+cqyzxUpW849YisOVb/g0EdpbuDc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=RwCi4R5liGW7roAjVTle3fprF5g5ou/Afa+oWT0qXzpE78q+0RRkF4YqLZmay+O3JGis4EJbX/L/VWk4wS6bA5+bgGwhtWJv9AeNlIn1xNweI648VisDDURG/JWGldAW6d0pWSoR8kG5h0jSNNBjP4J/oCj4iPVt8iFWBo4KhiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=wC666Hd0; arc=none smtp.client-ip=185.246.84.56
+	s=arc-20240116; t=1784642074; c=relaxed/simple;
+	bh=KuIR2OSYWi7Ee3W0VJNUoIjsKfYpstGhIn43+Gk8aRM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MPvJVFCuhXMAtP4HWVSPga4hBHDK6F+NN9Y5oyVumG+076DBWMRrNk4v5zcZyYjhX6RMAe+n587KA0gPtm8fY8AWFM3VSeH1uO08J7bI5374ePoqp7CwDKdTpf8s5eV4Ndj8AXcKkW7QoHVdc828P+lCsgr5hdYgdlNxklHzBLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hiHcM4I2; arc=none smtp.client-ip=185.246.85.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="wC666Hd0"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hiHcM4I2"
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id C4C641A113B;
-	Tue, 21 Jul 2026 13:45:29 +0000 (UTC)
+	by smtpout-03.galae.net (Postfix) with ESMTPS id DEEB84E40EA3;
+	Tue, 21 Jul 2026 13:54:29 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 8FCA360373;
-	Tue, 21 Jul 2026 13:45:29 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B844711BD3002;
-	Tue, 21 Jul 2026 15:45:24 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id B2F8060368;
+	Tue, 21 Jul 2026 13:54:29 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3D30411BD0B36;
+	Tue, 21 Jul 2026 15:54:27 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1784641529; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=dWY8dsRH+pL6ibWTKb6Vw9bchOZ0iZbpl5Sm2Mb8eyo=;
-	b=wC666Hd0oCdYyqm+Ku9ghBvqKKA31+i+rcUHfJi5IAmJ7E/J1jn5T2ZArUG7N1Uc0HDaFn
-	7IjIU/BLRX9x7g/y8KCUfBS/jZQtG+kgY+3tgqoT9Ga0kNx36RTZ1/jvaubNZMVn477zvy
-	qwnABxQEwOnFD/bbTGcD3TS1NqG8CBQ5limFj/oKpWaeltWrYjDEgXy+oYkaOWVvcun9fs
-	+hRXBiegw1Eb/ZfJhcHoy5xZ+syxaOIScYjRlxWwIW+0fBOPGrdnRELWDJbWTUiYDFp/6G
-	JFkUREWqzcz4OF4G5g6gkeKCwZLm6o9Vsxt03zhHD0cQcrdfVVhWb97GUstdHA==
-From: Paul Louvel <paul.louvel@bootlin.com>
-Date: Tue, 21 Jul 2026 15:43:39 +0200
-Subject: [PATCH v3 04/19] crypto: talitos/hwrng - Move into separate file
+	t=1784642069; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=YMlyzCE9U4b2/JDvprzsZg5b/5Vp40jiMB5uvXtd9ng=;
+	b=hiHcM4I2jsCkDbTZ5BwsiVa+5O8vm3IZbQq6QDRo2YdpWYtWgLK7W53NWcmaFo0MtE715O
+	NIht5PIgmIYt/HmrDRxNO5OXAe1N8DI/KoBZ0jCX3hftKCu/5e3PBIXZys7cjBDFifuyt2
+	m0HdCzfn7hZYs1ZkeEBk3ur2Z5CsnHI3FFsA+silFb1Vq9k67cEhFH+DVzTxnWOExIyA/Z
+	4woFAgcIFHKshuu7uWbe3ezSg4JzlLZd33YVRQKETZZtvdE4H+tuUAxlXifIwGKpM9BoOf
+	YM79sa4alkk/3Cwe0KLwogOvs3Ae4sKtC8dJ2iNvoqaaaMOkWwUNyJFJoJmxQA==
+Message-ID: <291e6fd8-e96a-40da-8542-762365bd55af@bootlin.com>
+Date: Tue, 21 Jul 2026 15:54:26 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260721-7-1-rc1_talitos_cleanup-v3-4-c602fa4d00e1@bootlin.com>
-References: <20260721-7-1-rc1_talitos_cleanup-v3-0-c602fa4d00e1@bootlin.com>
-In-Reply-To: <20260721-7-1-rc1_talitos_cleanup-v3-0-c602fa4d00e1@bootlin.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>, 
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 00/19] crypto: talitos - Driver cleanup
+To: Herbert Xu <herbert@gondor.apana.org.au>,
  "David S. Miller" <davem@davemloft.net>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- Herve Codina <herve.codina@bootlin.com>, 
- Christophe Leroy <chleroy@kernel.org>, linux-crypto@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Paul Louvel <paul.louvel@bootlin.com>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1784641453; l=6422;
- i=paul.louvel@bootlin.com; s=20260313; h=from:subject:message-id;
- bh=CVdDSuYexNtNl6N+cqyzxUpW849YisOVb/g0EdpbuDc=;
- b=UKfeBUVsWHPwXpSjm9GJ3HXWMRf1gv6v3xX+dZFLpIJY1IRvjY4RF1bNElXnE/wLRXcmfdadr
- /gcrQTV0gskA1mvkR8tWUky+tZL0Gs+YuHxSM6Ru699vh0W62Dx8ggw
-X-Developer-Key: i=paul.louvel@bootlin.com; a=ed25519;
- pk=eLW50NT18UAvUT5cAcYf88zNbBCZDLFXuptpyLVhVIU=
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ Herve Codina <herve.codina@bootlin.com>,
+ Christophe Leroy <chleroy@kernel.org>, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260721-7-1-rc1_talitos_cleanup-v3-0-6e94359bf72d@bootlin.com>
+Content-Language: en-US
+From: Paul Louvel <paul.louvel@bootlin.com>
+In-Reply-To: <20260721-7-1-rc1_talitos_cleanup-v3-0-6e94359bf72d@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Last-TLS-Session-Version: TLSv1.3
 
-Move the hardware random number generator implementation from
-talitos.c into a dedicated talitos-rng.c file.
+Hi,
 
-Signed-off-by: Paul Louvel <paul.louvel@bootlin.com>
----
- drivers/crypto/talitos/Makefile      |  2 +
- drivers/crypto/talitos/talitos-rng.c | 93 ++++++++++++++++++++++++++++++++++++
- drivers/crypto/talitos/talitos.c     | 83 --------------------------------
- drivers/crypto/talitos/talitos.h     |  5 ++
- 4 files changed, 100 insertions(+), 83 deletions(-)
+Sorry, I forgot to write and close by cover letter before sending it --'
 
-diff --git a/drivers/crypto/talitos/Makefile b/drivers/crypto/talitos/Makefile
-index fcc5db5e63c2..901ec681f010 100644
---- a/drivers/crypto/talitos/Makefile
-+++ b/drivers/crypto/talitos/Makefile
-@@ -1 +1,3 @@
- obj-$(CONFIG_CRYPTO_DEV_TALITOS) += talitos.o
-+
-+talitos-y := talitos.o talitos-rng.o
-diff --git a/drivers/crypto/talitos/talitos-rng.c b/drivers/crypto/talitos/talitos-rng.c
-new file mode 100644
-index 000000000000..3aa00de33b25
---- /dev/null
-+++ b/drivers/crypto/talitos/talitos-rng.c
-@@ -0,0 +1,93 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+
-+/*
-+ * Freescale SEC (talitos) device hardware random number generator implementation
-+ *
-+ * Copyright (c) 2006-2011 Freescale Semiconductor, Inc.
-+ */
-+
-+#include <linux/delay.h>
-+#include <linux/io.h>
-+
-+#include "talitos.h"
-+
-+static int talitos_rng_data_present(struct hwrng *rng, int wait)
-+{
-+	struct device *dev = (struct device *)rng->priv;
-+	struct talitos_private *priv = dev_get_drvdata(dev);
-+	u32 ofl;
-+	int i;
-+
-+	for (i = 0; i < 20; i++) {
-+		ofl = in_be32(priv->reg_rngu + TALITOS_EUSR_LO) &
-+		      TALITOS_RNGUSR_LO_OFL;
-+		if (ofl || !wait)
-+			break;
-+		udelay(10);
-+	}
-+
-+	return !!ofl;
-+}
-+
-+static int talitos_rng_data_read(struct hwrng *rng, u32 *data)
-+{
-+	struct device *dev = (struct device *)rng->priv;
-+	struct talitos_private *priv = dev_get_drvdata(dev);
-+
-+	/* rng fifo requires 64-bit accesses */
-+	*data = in_be32(priv->reg_rngu + TALITOS_EU_FIFO);
-+	*data = in_be32(priv->reg_rngu + TALITOS_EU_FIFO_LO);
-+
-+	return sizeof(u32);
-+}
-+
-+static int talitos_rng_init(struct hwrng *rng)
-+{
-+	struct device *dev = (struct device *)rng->priv;
-+	struct talitos_private *priv = dev_get_drvdata(dev);
-+	unsigned int timeout = TALITOS_TIMEOUT;
-+
-+	setbits32(priv->reg_rngu + TALITOS_EURCR_LO, TALITOS_RNGURCR_LO_SR);
-+	while (!(in_be32(priv->reg_rngu + TALITOS_EUSR_LO)
-+		 & TALITOS_RNGUSR_LO_RD)
-+	       && --timeout)
-+		cpu_relax();
-+	if (timeout == 0) {
-+		dev_err(dev, "failed to reset rng hw\n");
-+		return -ENODEV;
-+	}
-+
-+	/* start generating */
-+	setbits32(priv->reg_rngu + TALITOS_EUDSR_LO, 0);
-+
-+	return 0;
-+}
-+
-+int talitos_register_rng(struct device *dev)
-+{
-+	struct talitos_private *priv = dev_get_drvdata(dev);
-+	int err;
-+
-+	priv->rng.name		= dev_driver_string(dev);
-+	priv->rng.init		= talitos_rng_init;
-+	priv->rng.data_present	= talitos_rng_data_present;
-+	priv->rng.data_read	= talitos_rng_data_read;
-+	priv->rng.priv		= (unsigned long)dev;
-+
-+	err = hwrng_register(&priv->rng);
-+	if (!err)
-+		priv->rng_registered = true;
-+
-+	return err;
-+}
-+
-+void talitos_unregister_rng(struct device *dev)
-+{
-+	struct talitos_private *priv = dev_get_drvdata(dev);
-+
-+	if (!priv->rng_registered)
-+		return;
-+
-+	hwrng_unregister(&priv->rng);
-+	priv->rng_registered = false;
-+}
-diff --git a/drivers/crypto/talitos/talitos.c b/drivers/crypto/talitos/talitos.c
-index 753481d3189a..074f399b6327 100644
---- a/drivers/crypto/talitos/talitos.c
-+++ b/drivers/crypto/talitos/talitos.c
-@@ -820,89 +820,6 @@ DEF_TALITOS2_INTERRUPT(ch0_2, TALITOS2_ISR_CH_0_2_DONE, TALITOS2_ISR_CH_0_2_ERR,
- DEF_TALITOS2_INTERRUPT(ch1_3, TALITOS2_ISR_CH_1_3_DONE, TALITOS2_ISR_CH_1_3_ERR,
- 		       1)
- 
--/*
-- * hwrng
-- */
--static int talitos_rng_data_present(struct hwrng *rng, int wait)
--{
--	struct device *dev = (struct device *)rng->priv;
--	struct talitos_private *priv = dev_get_drvdata(dev);
--	u32 ofl;
--	int i;
--
--	for (i = 0; i < 20; i++) {
--		ofl = in_be32(priv->reg_rngu + TALITOS_EUSR_LO) &
--		      TALITOS_RNGUSR_LO_OFL;
--		if (ofl || !wait)
--			break;
--		udelay(10);
--	}
--
--	return !!ofl;
--}
--
--static int talitos_rng_data_read(struct hwrng *rng, u32 *data)
--{
--	struct device *dev = (struct device *)rng->priv;
--	struct talitos_private *priv = dev_get_drvdata(dev);
--
--	/* rng fifo requires 64-bit accesses */
--	*data = in_be32(priv->reg_rngu + TALITOS_EU_FIFO);
--	*data = in_be32(priv->reg_rngu + TALITOS_EU_FIFO_LO);
--
--	return sizeof(u32);
--}
--
--static int talitos_rng_init(struct hwrng *rng)
--{
--	struct device *dev = (struct device *)rng->priv;
--	struct talitos_private *priv = dev_get_drvdata(dev);
--	unsigned int timeout = TALITOS_TIMEOUT;
--
--	setbits32(priv->reg_rngu + TALITOS_EURCR_LO, TALITOS_RNGURCR_LO_SR);
--	while (!(in_be32(priv->reg_rngu + TALITOS_EUSR_LO)
--		 & TALITOS_RNGUSR_LO_RD)
--	       && --timeout)
--		cpu_relax();
--	if (timeout == 0) {
--		dev_err(dev, "failed to reset rng hw\n");
--		return -ENODEV;
--	}
--
--	/* start generating */
--	setbits32(priv->reg_rngu + TALITOS_EUDSR_LO, 0);
--
--	return 0;
--}
--
--static int talitos_register_rng(struct device *dev)
--{
--	struct talitos_private *priv = dev_get_drvdata(dev);
--	int err;
--
--	priv->rng.name		= dev_driver_string(dev);
--	priv->rng.init		= talitos_rng_init;
--	priv->rng.data_present	= talitos_rng_data_present;
--	priv->rng.data_read	= talitos_rng_data_read;
--	priv->rng.priv		= (unsigned long)dev;
--
--	err = hwrng_register(&priv->rng);
--	if (!err)
--		priv->rng_registered = true;
--
--	return err;
--}
--
--static void talitos_unregister_rng(struct device *dev)
--{
--	struct talitos_private *priv = dev_get_drvdata(dev);
--
--	if (!priv->rng_registered)
--		return;
--
--	hwrng_unregister(&priv->rng);
--	priv->rng_registered = false;
--}
- 
- /*
-  * crypto alg
-diff --git a/drivers/crypto/talitos/talitos.h b/drivers/crypto/talitos/talitos.h
-index 56e36a65ddcc..fa8c71b1f90f 100644
---- a/drivers/crypto/talitos/talitos.h
-+++ b/drivers/crypto/talitos/talitos.h
-@@ -431,3 +431,8 @@ static inline bool has_ftr_sec1(struct talitos_private *priv)
- #define DESC_PTR_LNKTBL_JUMP			0x80
- #define DESC_PTR_LNKTBL_RET			0x02
- #define DESC_PTR_LNKTBL_NEXT			0x01
-+
-+/* Hardware RNG */
-+
-+int talitos_register_rng(struct device *dev);
-+void talitos_unregister_rng(struct device *dev);
-
+On 7/21/26 3:40 PM, Paul Louvel wrote:
+> The Freescale Integrated Security Engine (SEC) aka "Talitos" driver
+> implementation is a monolithic ~3800-line file that mixes SEC1 and SEC2
+> hardware variants with hash, skcipher, aead and hwrng algorithm.
+>
+> This series reorganises the driver to improve readability and
+> maintainability:
+>
+> - Split the driver into a dedicated directory with separate files for
+>    hash, skcipher, aead, and hwrng implementations.
+>
+> - Modernise the crypto API usage: adopt {init,exit}_tfm (deprecated
+>    cra_init/cra_exit), use CRYPTO_AHASH_ALG_BLOCK_ONLY to eliminate
+>    manual partial-block buffering, and use macros to deduplicate
+>    algorithm definitions.
+>
+> - Introduce a is_sec1() helper to get rid of is_sec1 variables /
+>    parameters.
+>
+> - Define descriptor/pointer structures for each hardware version,
+>    instead of using a single structure and anonymous union.
+>
+> No functional changes are intended except for patch 1.
+>
+> This series depends on the "crypto: talitos - bug fixes" series :
+> https://patch.msgid.link/20260507-bootlin_test-7-1-rc1_sec_bugfix-v3-0-c98d7589b942@bootlin.com
+>
+> Signed-off-by: Paul Louvel <paul.louvel@bootlin.com>
+> ---
+> Changes in v3:
+> - EDITME: describe what is new in this series revision.
+> - EDITME: use bulletpoints and terse descriptions.
+> - Link to v2: https://patch.msgid.link/20260611-7-1-rc1_talitos_cleanup-v2-0-aa4a813ce69b@bootlin.com
+>
+> Changes in v2:
+> - Fixed compilation warnings and errors.
+> - Instead of using ops to dispatch SEC1/SEC2 variants, keep the small
+>    helpers, and introduce is_sec1() inline function that can use static
+>    key branching in case both hardware version are compiled.
+> - Dropped the SEC1/SEC2 function variants inside the core driver file.
+> - Reworded the cover letter for clarity.
+> - Link to v1: https://patch.msgid.link/20260528-7-1-rc1_talitos_cleanup-v1-0-cb1ad6cdea49@bootlin.com
+>
+> To: Herbert Xu <herbert@gondor.apana.org.au>
+> To: "David S. Miller" <davem@davemloft.net>
+> Cc: linux-crypto@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+>
+> ---
+> Paul Louvel (19):
+>        crypto: talitos/hash - Use CRYPTO_AHASH_BLOCK_ONLY API
+>        crypto: talitos - Move driver into dedicated directory
+>        crypto: talitos - Add missing includes to driver header file
+>        crypto: talitos/hwrng - Move into separate file
+>        crypto: talitos - Prepare crypto implementation file splitting
+>        crypto: talitos/hash - Move into separate file
+>        crypto: talitos/skcipher - Move into separate file
+>        crypto: talitos/aead - Move into separate file
+>        crypto: talitos/hash - Convert to {init,exit}_tfm type-specific API
+>        crypto: talitos/skcipher - Convert to {init,exit}_tfm type-specific API
+>        crypto: talitos/aead - Convert to {init,exit}_tfm type-specific API
+>        crypto: talitos/hash - Use macro for algorithm definitions
+>        crypto: talitos/skcipher - Use macro for algorithm definitions
+>        crypto: talitos/aead - Use macro for algorithm definitions
+>        crypto: talitos - Remove alg settings in talitos_register_common()
+>        crypto: talitos - Introduce is_sec1() helper with static key support
+>        crypto: talitos - Replace has_ftr_sec1() with is_sec1() static key helper
+>        crypto: talitos - Introduce per-SEC-version descriptor and pointer structures
+>        crypto: talitos - Remove TALITOS_DESC_SIZE macro
+>
+>   drivers/crypto/Kconfig                    |   38 +-
+>   drivers/crypto/Makefile                   |    2 +-
+>   drivers/crypto/talitos.c                  | 3640 -----------------------------
+>   drivers/crypto/talitos/Kconfig            |   36 +
+>   drivers/crypto/talitos/Makefile           |    3 +
+>   drivers/crypto/talitos/talitos-aead.c     |  657 ++++++
+>   drivers/crypto/talitos/talitos-hash.c     |  695 ++++++
+>   drivers/crypto/talitos/talitos-rng.c      |   93 +
+>   drivers/crypto/talitos/talitos-skcipher.c |  356 +++
+>   drivers/crypto/talitos/talitos.c          | 1337 +++++++++++
+>   drivers/crypto/{ => talitos}/talitos.h    |  316 ++-
+>   11 files changed, 3467 insertions(+), 3706 deletions(-)
+> ---
+> base-commit: db8b9f227833e729faf44a512aa1e88a625b5ad8
+> change-id: 20260518-7-1-rc1_talitos_cleanup-9231a64e29fa
+> prerequisite-change-id: 20260504-bootlin_test-7-1-rc1_sec_bugfix-13169ed07ddc:v3
+> prerequisite-patch-id: 7b364911e4b8d1c1033eb14e67ed24dac6a4bc13
+> prerequisite-patch-id: 2c1cd7fdd003d9a116a697efa25d1716d548389f
+> prerequisite-patch-id: b12bdbf565747609e0cfe0609a42cf69b5d816a1
+> prerequisite-patch-id: 72cb2bc0fc2a48a5a029b049c199f4c86085cf04
+> prerequisite-patch-id: 5f1f5ad6add760161bd48875df48c0893aa12613
+> prerequisite-patch-id: 934931086968229434d15a2f2358aeb7e6975a1d
+> prerequisite-patch-id: 8a0b4828fc0690e0c841bc9adcc6568bb522e0e8
+> prerequisite-patch-id: 1d870f32e7dbf9a8bd3b8979558544107693e0f4
+> prerequisite-patch-id: 758c18d7c9fabb14bd90df62e5e8a62a6f880db4
+> prerequisite-patch-id: ce6e9e585f8edc1861ae6bb8fbdd836c20cbd290
+> prerequisite-patch-id: 9446dc03e442ea81c5f5b39e802e01b37da29971
+>
+> Best regards,
+> --
+> Paul Louvel, Bootlin
+> Embedded Linux and Kernel engineering
+> https://bootlin.com
+>
 -- 
-2.55.0
+Paul Louvel, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
