@@ -1,80 +1,114 @@
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB9A13DE420
-	for <linux-crypto@vger.kernel.org>; Mon, 20 Jul 2026 23:27:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360E4368D65;
+	Tue, 21 Jul 2026 01:49:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784590061; cv=none; b=E9WoWgdV8smjRWaVljbjJOlX1lV7qQjwvU2oophTW/P7j+Mdp2JxEfPpQ78ciAzHvRA2T5ggV15ic9Dm+D5IFnTSJVktXxcbsCfih+K3x2NiRDwJ9N2T6ZyxhWfNHhUo1Ad+DKhXRLCXaQX3zAvQR1ZYvQ9/v8sRhaU4/4AzBAI=
+	t=1784598574; cv=none; b=aM7HD/yhEGdnVF2pwvBtuApNzd1PJGNrwWYoXiZbguSCdUMVWINPm3y/YMARtIECXfLNZAvmJV00njwqtvJTsrj91QlgkmevOlahrP7nhKF1/HFD07E50Qxa8xfNlkwGfeTMvlmQy8dHmhbhoYC4ABPeNes6qDo9t0bcKENo5do=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784590061; c=relaxed/simple;
-	bh=w5qJ5xKc6F0gLLloe/++ujKHZqOxbmoF7geFsTeso6c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TaH1uDtBJhPQzoX6yqxsbEMXu1t5HE6mrZ+aanAtECoZt7npqrfTXCKSDYYhyPSq7pWMArl6uuPDNHnvA+dWVU6fA1qfsGGgrQAKYWmG+c5DyFfAR0h2fHdWhiMEhemkSbf0WOHbXBWuBD1GKj+8qH9cPq78hsS2S4cO/N5uBm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=K17dJ8nB; arc=none smtp.client-ip=95.215.58.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1784598574; c=relaxed/simple;
+	bh=mGesBaURCSkK73cNSPDNDbtvQ8PN0fZjtgrnpn68PVY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KCaMG6vpIn9qRQAf3Uy1daj6rEptEo8SVzrI4eTrairva0PoM7QUq8xMniLCOdW61ShRRd/yYAotL5jcxsOwQPV6jNTebgDhvXBoGtSzVAg9lPpfz+2hUxZU7ovAqt5jyJK4JdtsolaB6wfv64XVCO2SEFNoF6hVEUxAX9Zys4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=fail (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Ooas6kTy reason="signature verification failed"; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="K17dJ8nB"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784590057;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=/D51zmWb6cwAgaiE11RzcSwgENxkyqBDcdSlFWIeU94=;
-	b=K17dJ8nB3ah54CiIfibUy0pK0AhsUdKb3JN7MUs4Sq/KVlmxep0vrfkMPrDjM6OxEPF1N6
-	rM8sGM+1T+g+86tkyKrbwF/Gj5He8eMm6ebqIkA8EY3Xjvk8V00YALMwPqvUncrCQYvvR5
-	3wFaTBO5i8iBqjh3WxqzHOLMItz7b8s=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Bartosz Golaszewski <brgl@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	linux-crypto@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: qce - drop redundant variable in qce_skcipher_done
-Date: Tue, 21 Jul 2026 01:27:17 +0200
-Message-ID: <20260720232716.118402-3-thorsten.blum@linux.dev>
+	dkim=fail reason="signature verification failed" (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Ooas6kTy"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id C65E540E00C3;
+	Tue, 21 Jul 2026 01:49:29 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=fail (4096-bit key)
+	reason="fail (body has been altered)" header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 0jZWPBlYwiYe; Tue, 21 Jul 2026 01:49:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1784598559; bh=6+CHJtCLMfBSzPUlrxDyYfscRk0QokkmTeoDqHNlJ7w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ooas6kTyh5LyKRcWrAbdolUy7U7v1vKPBiMoHUcqAU7eZ2/q2SfrRhwkY2KfmpUsX
+	 OcEM146v/5mP50zADtLNvfo2B3k5Ooilyj8rt7pq5JCU4i/f0PEMQFum4MhdlR5LmK
+	 mOdPw2q4smgwIMv63D3mRPvZFVDJ4Rv/03Vecy0YlTyUXkq2gLsxSM57ppJHvK22DM
+	 v1zG+G/NU7e6NsyVyV2Yy0yrRSL5TGIQ8+736zS3sMlj/OaW2SWG1OsC1UhXHDg4MS
+	 1SkD3pYzhtYuVhb1DK53uD7xQyMetIp0T9t2+IRV0OXLhb9L802FcCaa3cMnww1k41
+	 ZgI3x2bS2rqlpTHt7QanCTdCUJKQF6eC1YSxtl93wbF7FUqOfqKBKA3g9YZKF775t2
+	 tHWKfsmV4LbltFACT4e0f975Jf4ban/yr5hJ4DdhfGU/d7QmX436P79hqGG+3YvLDz
+	 puY3GBypDOOg65KY3WTyqCFSOyxPNMdVi3XzBxCS1h3iY9hUn2iMzoP9cU8KsAVls4
+	 bZgafqPUrNJYtI2XzfztjLX+/OY+JNHfPWbM4gLkOQzUSSDIOnHiv50tAVRsY6lsoI
+	 x1Q/s1A4EpVyDzZVX7rX9ecl95aQG/Fo63i3WlHzmTySpBXjKsT92OBEgk0LTb9D1h
+	 hueEQl7j19pFzng6IZw67EdM=
+Received: from stx.tnic (unknown [IPv6:2600:1700:38ca:c00::40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id B318840E00DC;
+	Tue, 21 Jul 2026 01:48:44 +0000 (UTC)
+Date: Mon, 20 Jul 2026 18:48:41 -0700
+From: Borislav Petkov <bp@alien8.de>
+To: "Kalra, Ashish" <ashish.kalra@amd.com>
+Cc: tglx@kernel.org, mingo@redhat.com, dave.hansen@linux.intel.com,
+	x86@kernel.org, hpa@zytor.com, seanjc@google.com,
+	peterz@infradead.org, thomas.lendacky@amd.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org,
+	pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
+	KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com,
+	Nathan.Fontenot@amd.com, ackerleytng@google.com, jackyli@google.com,
+	pgonda@google.com, rientjes@google.com, jacobhxu@google.com,
+	xin@zytor.com, pawan.kumar.gupta@linux.intel.com,
+	babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com,
+	john.allen@amd.com, darwi@linutronix.de,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	kvm@vger.kernel.org, linux-coco@lists.linux.dev
+Subject: Re: [PATCH v10 2/6] x86/sev: Initialize RMPOPT configuration MSRs
+Message-ID: <20260721014841.GCal7P-f3ZBHQzR-0_@fat_crate.local>
+References: <cover.1782841284.git.ashish.kalra@amd.com>
+ <8518e02c46d6edf1f37a180569c708a3cfa7c413.1782841284.git.ashish.kalra@amd.com>
+ <20260720221725.GDal6edYI3uHrDruHj@fat_crate.local>
+ <5168d3d3-c31c-4f80-be91-c964a5cee674@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1299; i=thorsten.blum@linux.dev; h=from:subject; bh=w5qJ5xKc6F0gLLloe/++ujKHZqOxbmoF7geFsTeso6c=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFlx667cneErX/Zuu/TDG1pvfwl7bMi4/kt068nnqWFla gkJPVxrO0pZGMS4GGTFFFkezPoxw7e0pnKTScROmDmsTCBDGLg4BWAik5czMry81ytYzLz2/rU1 /5+836lisei0YuBh3lPsVyIVVPRS7u1g+Gf4UkSrmPe0zWzLorxVQR/mJMRwV0ycbx7wVM5Gbuf 8bmYA
-X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <5168d3d3-c31c-4f80-be91-c964a5cee674@amd.com>
+Content-Transfer-Encoding: quoted-printable
 
-Remove the local ret variable and return the result directly.
+On Mon, Jul 20, 2026 at 05:38:05PM -0500, Kalra, Ashish wrote:
+> Agreed on dropping the bool =E2=80=94 I'll derive it in a local helper.
+>=20
+> One issue though: rmp_segment_table !=3D NULL isn't segmented-only. set=
+up_contiguous_rmptable() also allocates rmp_segment_table
+> (the contiguous RMP is stored as a single segment in the same table), s=
+o it's non-NULL for the contiguous case too.
+>=20
+> To keep it segmented-only, I'll also need to gate on the segmented-RMP =
+mode, something like:=20
+>=20
+>   static bool rmpopt_capable(void)
+>   {
+>         return cpu_feature_enabled(X86_FEATURE_RMPOPT) &&
+>                cc_platform_has(CC_ATTR_HOST_SEV_SNP) &&
+>                (rmp_cfg & MSR_AMD64_SEG_RMP_ENABLED) &&
+>                rmp_segment_table;
+>   }
+>=20
+> The CC_ATTR_HOST_SEV_SNP check also handles SNP being disabled at runti=
+me, so snp_clear_rmpopt_capable() and its caller go away as well.
 
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- drivers/crypto/qce/skcipher.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+Ok, you can simply do:
 
-diff --git a/drivers/crypto/qce/skcipher.c b/drivers/crypto/qce/skcipher.c
-index ffb334eb5b34..7e67d33fb48e 100644
---- a/drivers/crypto/qce/skcipher.c
-+++ b/drivers/crypto/qce/skcipher.c
-@@ -261,7 +261,6 @@ static int qce_skcipher_crypt(struct skcipher_request *req, int encrypt)
- 	struct qce_alg_template *tmpl = to_cipher_tmpl(tfm);
- 	unsigned int blocksize = crypto_skcipher_blocksize(tfm);
- 	int keylen;
--	int ret;
- 
- 	rctx->flags = tmpl->alg_flags;
- 	rctx->flags |= encrypt ? QCE_ENCRYPT : QCE_DECRYPT;
-@@ -299,9 +298,8 @@ static int qce_skcipher_crypt(struct skcipher_request *req, int encrypt)
- 					      req->base.data);
- 		skcipher_request_set_crypt(&rctx->fallback_req, req->src,
- 					   req->dst, req->cryptlen, req->iv);
--		ret = encrypt ? crypto_skcipher_encrypt(&rctx->fallback_req) :
--				crypto_skcipher_decrypt(&rctx->fallback_req);
--		return ret;
-+		return encrypt ? crypto_skcipher_encrypt(&rctx->fallback_req) :
-+				 crypto_skcipher_decrypt(&rctx->fallback_req);
- 	}
- 
- 	return tmpl->qce->async_req_enqueue(tmpl->qce, &req->base);
+	setup_clear_cpu_cap(X86_FEATURE_RMPOPT)
+
+and clear our internal representation of RMPOPT support and make it a lot
+simpler.
+
+--=20
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
