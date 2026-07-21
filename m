@@ -1,66 +1,43 @@
-Received: from mail-yx1-f47.google.com (mail-yx1-f47.google.com [74.125.224.47])
+Received: from os-cillation.de (mx.os-c.de [213.165.83.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0866F46C4B9
-	for <linux-crypto@vger.kernel.org>; Tue, 21 Jul 2026 18:29:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 561C4471250;
+	Tue, 21 Jul 2026 19:08:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.165.83.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784658600; cv=none; b=YmlTzdUWz3XbCWKKs5XuquyGl5WNciDYqylfOkVH7jpcHE5JBCex3Ny1M2iOLAVa/NxzIrXc4YGPgy8xgf3GQa+Svp9VWeDDIHhtucN5KR2YTi0urRxb78kYR6ykiL5I0xj0yQZaiY5pbW7NM39xGiUrNqQ3L9KQjC3yMtyrYp8=
+	t=1784660902; cv=none; b=DP74FQQ+w1kUTQjgfFuy2PuMxmloxkqRF1r9Z5a3wuM0N90+JqpT+c72luVBV69WsV5kxjPU1AtGh8n2eAkVT/stmUT+jSjdrkEi5XaZZnVMdDl9aZWRsd5rjyWjYBv/KSJgbxHjgJVw7AlEQnEMK7MOuwuMpnd150u0ZiD0M4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784658600; c=relaxed/simple;
-	bh=LNdnzpazzuv6KgNDSO5w75/e63ZEaUyhEq0HWDIPJLY=;
+	s=arc-20240116; t=1784660902; c=relaxed/simple;
+	bh=nggXzHJGGwPfJU60aXZiAJsN8HzsZBsOPEzvy7eLLqE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IOsdTozKUNnDog7uT1swe/nT+ghYBGayQVQL7ejIG/qlcsxzfY7G4suRn8WmzDEHZRzr6sXWovary8XMuE74EJMRKVc+qMKT8RmUH7JIhN1XYfhdKIsSTUmoEHvpZzveYjZqgDEAPB+O9ysQ3XYm4Gu88PIlCUdyBXNwcTKnReI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lkllFWal; arc=none smtp.client-ip=74.125.224.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 In-Reply-To:Content-Type; b=AJR86/BtTPN7hY6cg1CL2gy3GDvVBwKBS7zBKAa7aira4nidvIMGRI93tHdGlSHfdEhrqmlQY5WkrHZUMu5zrcBOiJuw5QuEu0aNjvdncH4dhkI+vCdBc/P1iXS5+PbM6nJ2RC5s000unYNMrRNFC+r1kE2Hb92/5JTzrPyzaDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=os-cillation.de; spf=pass smtp.mailfrom=os-cillation.de; dkim=pass (2048-bit key) header.d=os-cillation.de header.i=@os-cillation.de header.b=VgQfBAUh; arc=none smtp.client-ip=213.165.83.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=os-cillation.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os-cillation.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lkllFWal"
-Received: by mail-yx1-f47.google.com with SMTP id 956f58d0204a3-667923d86a7so5824940d50.0
-        for <linux-crypto@vger.kernel.org>; Tue, 21 Jul 2026 11:29:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784658597; x=1785263397; darn=vger.kernel.org;
-        h=content-type:in-reply-to:autocrypt:from:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=yr++tEeY/mG9S6zA/+0OKmjDd8N/tDAdIfu+UBfLIk4=;
-        b=lkllFWalxCYHjEb74mkWLiiGwKAasH0yAHoVVabExONjJQs1pN4HIlsV/MaeBjdoAi
-         hwqgaFWjXpRs8p0dfH86H4guMSBQAf2dInaMLxFqWibFS550bXFZnMflLCFMWMolBLac
-         wKW4LdGAEvWKXQwWGPt5Sxvp3IK0HqbM2vu7lNwdEHZulQuA0jya9J6QbYgXvop0T0Sm
-         3FHpjANjiO+35TBSKQF5/mH6XqIFVk7SMxvBHEw3Fbzj6kqoU4/hNBkBiqlooCTBms4J
-         kcH523vZA1ZtzQPLNbZTSPoxtUMyuUsx7MfkZbNQ0W0ZTcAgNYidZB5da0BC9RwRfQQ5
-         rCvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784658597; x=1785263397;
-        h=content-type:in-reply-to:autocrypt:from:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=yr++tEeY/mG9S6zA/+0OKmjDd8N/tDAdIfu+UBfLIk4=;
-        b=rnEyQek+eo3gNEWlFq6XGot8LOoaBlDpB+ChpcY/pl/Yze+8qDj4VfMA1qD0MxALmX
-         aFSCcvg4zMNUPB79tE+fNLlxoBVqxClwqwLzEaHjuoZ0fmSgOpxgoMWnGi28LxuObZN/
-         JqRGwWo2yWVMPGd+DgTXTIKda9RB1fTL7iSF7UM8voHHxDnlmaJt1cby16SFGal4InAE
-         /Z8eNss36BH5fmejeTJgD2mWmWCydcywctViM8U2SPIP4EHTtpylkFIwwOYs5Wi4Z9T2
-         myjaA0e7Gy84hExFzhVChrL9PSIG14Q6IoVprq9XqD2SKdGqRr75pR0xqQj2xpdv5s6O
-         LtLg==
-X-Forwarded-Encrypted: i=1; AHgh+Rq9LG0PNMQXUqOmMG1KnIWSwoySEI+xcv82ksO4YIoXKNo8nDTH3TwGXRlXaICfYy0x5uwh/4N0mEL9ZhI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxVH0luZYYEh1zNNZ7dEg+suCQe42K2ZyuMO7Vy/73ZxJ/dtuYi
-	ZnsxcwGC+sS3ylxW56zes+J5oTzCq6GpDqUXYHJII/fm6gabUNOdneSG
-X-Gm-Gg: AR+sD118gdKpHb+1/F5w7ejFDcbduN3qTdX1x6eg94JXm0uPg06hZdeDTPtJaWNkIy8
-	PQA1KoK/oljT8hNBxVjnGWt01arEu6RYntJ4p50Lsfglt/L08CLDFVZwShBhURpAXrGke/AscOH
-	Nz6xghVY7fowsx0xYwwqFaHEaSrR4uGKkP0NuLn57tVJ72xhe0j5ZzjhzWwg1lxn94YRp+zo2WF
-	TQdx4Xj82Ka1jtxKn9chfRgQ/MMW5oBnP6GtULWDs8XM859tbWM0pIi33ctZ76wC3q2peULrSLP
-	pur4qRD9tidKJbVF6lOmDn9rEVtIHNbZR1pSu4DRcY6HqjxtM0rAQvCy9azcmEMnWu2PU9aX/5s
-	KkVkaxxYSCfPXo+l5aiDaUErungeav8upK/vYWHYbtJhZ1IMyOjZepEFZw/p4W0wKzAc6wmNsLb
-	eea2cZ
-X-Received: by 2002:a53:bb05:0:b0:667:7bd5:f01a with SMTP id 956f58d0204a3-6688e29239bmr219594d50.0.1784658596750;
-        Tue, 21 Jul 2026 11:29:56 -0700 (PDT)
-Received: from [10.138.10.6] ([185.98.168.14])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-6689052164esm36384d50.4.2026.07.21.11.29.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Jul 2026 11:29:54 -0700 (PDT)
-Message-ID: <c826b73d-6307-4237-a065-b7a8487350ce@gmail.com>
-Date: Tue, 21 Jul 2026 14:29:39 -0400
+	dkim=pass (2048-bit key) header.d=os-cillation.de header.i=@os-cillation.de header.b="VgQfBAUh"
+Received: from core2024.osc.gmbh (ip-094-079-177-042.um30.pools.vodafone-ip.de [94.79.177.42])
+	by os-cillation.de (Postfix) with ESMTPSA id 7CEA7C06A3;
+	Tue, 21 Jul 2026 20:59:22 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=os-cillation.de;
+	s=202409; t=1784660362;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=n+NvtWjXqYSBNs91MMg0FWobhS1iqXzjeR5NZr7FyGQ=;
+	b=VgQfBAUhVHEDqrn/VV0aVu6VTkFd+nWIzIMNOkfzBD2POnoA72RbGon4D3wJ178KlIHOqK
+	UoVkTnENXkcZUt5OGd9ofbu7Ss6I0JfKh0rP6EpOdvqtnnlr8tnW/1n6A+y0WT/ru9/BVg
+	1vqeRE85fWS0TfXOzRoo6KZ+Jqa8O6Cjk9wvn73o1baIhUM7iEPt09dOpPU6meZsivY2hb
+	Ki3yJ/GoQ5cM9GtAqwkxEmjuWAzSntkhPeFbg0jwWh2P7VUpJwXoOrjMMV7NmN+rd439n1
+	eWe1ELfqWhXY9YN+USKsecLdBeoXClWqG/9Qg3zAE0FZ3Z+h/xRUTMb97G3zEA==
+Authentication-Results: os-cillation.de;
+	auth=pass smtp.auth=os-c@schweissgut.net smtp.mailfrom=hd@os-cillation.de
+Received: from [192.168.3.45] (hd2022.osc.gmbh [192.168.3.45])
+	by core2024.osc.gmbh (Postfix) with ESMTPSA id C395F200736;
+	Tue, 21 Jul 2026 20:59:21 +0200 (CEST)
+Message-ID: <37ecba68-947a-45ad-9ec4-361facc06a05@os-cillation.de>
+Date: Tue, 21 Jul 2026 20:59:21 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -68,256 +45,707 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] drivers/crypto: Mark QCE as BROKEN
-To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
+Subject: Re: [PATCH 1/2] crypto: pcrypt - Remove pcrypt
+To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
  Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Russell King <linux@armlinux.org.uk>,
- "David S. Miller" <davem@davemloft.net>, Eric Biggers <ebiggers@kernel.org>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- stable@vger.kernel.org, brgl@kernel.org
-References: <20260712-qce-broken-v2-1-b2dfff47f7f5@gmail.com>
- <alnlaCXmoLRAlr96@gondor.apana.org.au>
- <20260721082501.6128-1-bartosz.golaszewski@oss.qualcomm.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Steffen Klassert <steffen.klassert@secunet.com>,
+ Thomas Huth <thuth@redhat.com>
+References: <20260713223234.24812-1-ebiggers@kernel.org>
+ <20260713223234.24812-2-ebiggers@kernel.org>
 Content-Language: en-US
-From: Demi Marie Obenour <demiobenour@gmail.com>
-Autocrypt: addr=demiobenour@gmail.com; keydata=
- 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
- +MYSfkEjBz0E8CLOcAw7JIwAaeBT
-In-Reply-To: <20260721082501.6128-1-bartosz.golaszewski@oss.qualcomm.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------bwB4FvPIOQoH8HIWNe7kb9Th"
+From: Hendrik Donner <hd@os-cillation.de>
+Autocrypt: addr=hd@os-cillation.de; keydata=
+ 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 li+2
+In-Reply-To: <20260713223234.24812-2-ebiggers@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------bwB4FvPIOQoH8HIWNe7kb9Th
-Content-Type: multipart/mixed; boundary="------------WhrSX0Mdw2MzSwiD3n5At4Du";
- protected-headers="v1"; hp="clear"
-Message-ID: <c826b73d-6307-4237-a065-b7a8487350ce@gmail.com>
-Date: Tue, 21 Jul 2026 14:29:39 -0400
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] drivers/crypto: Mark QCE as BROKEN
-To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
- Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Russell King <linux@armlinux.org.uk>,
- "David S. Miller" <davem@davemloft.net>, Eric Biggers <ebiggers@kernel.org>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- stable@vger.kernel.org, brgl@kernel.org
-References: <20260712-qce-broken-v2-1-b2dfff47f7f5@gmail.com>
- <alnlaCXmoLRAlr96@gondor.apana.org.au>
- <20260721082501.6128-1-bartosz.golaszewski@oss.qualcomm.com>
-Content-Language: en-US
-From: Demi Marie Obenour <demiobenour@gmail.com>
-Autocrypt: addr=demiobenour@gmail.com; keydata=
- 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
- +MYSfkEjBz0E8CLOcAw7JIwAaeBT
-In-Reply-To: <20260721082501.6128-1-bartosz.golaszewski@oss.qualcomm.com>
+Hello,
 
---------------WhrSX0Mdw2MzSwiD3n5At4Du
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+On 7/14/26 00:32, Eric Biggers wrote:
+> pcrypt was originally intended to improve IPsec performance.  However,
+> it's no longer useful for that.  Reports from the rare cases that anyone
+> has actually tried to use it over the years indicate that it actually
+> reduces IPsec performance, e.g.:
+> 
+> * https://github.com/libreswan/libreswan/wiki/Internals:-Cryptographic-Acceleration#obsoleted-ipsec-accelerations
+> * https://users.strongswan.narkive.com/liqTaTq8/strongswan-problem-with-pcrypt
+> * https://unix.stackexchange.com/questions/594336/ipsec-multithreading-via-pcrypt-worse-than-single-thread
+> 
+> It's also undocumented and quite difficult to actually use.  Its design
+> is also broken, in that any unprivileged program can enable pcrypt
+> systemwide at any time (by instantiating it using AF_ALG).
+> 
+> Meanwhile, pcrypt has been a regular source of bugs, including at least
+> four that have received CVEs.
+> 
+> Let's just remove it.  No one seems to care about it anymore other than
+> people looking for vulnerabilities.
+> 
 
-On 7/21/26 04:24, Bartosz Golaszewski wrote:
-> On Fri, Jul 17, 2026 at 06:18:48PM +1000, Herbert Xu wrote:
->> On Sun, Jul 12, 2026 at 05:31:31PM -0400, Demi Marie Obenour via B4 Re=
-lay wrote:
->>> From: Demi Marie Obenour <demiobenour@gmail.com>
->>>
->>> This driver is harmful:
->>>
->>> - It is much slower than the CPU [1] [2].
->>> - It Has a history of bugs [2] [3].
->>> - It does not have exclusive access to the hardware [4], causing race=
-s
->>>   with the secure world.
->>> - It register its implementations with too low a cra_priority for the=
-m
->>>   to be actually used [5].
->>>
->>> Therefore, disable it to ensure that nobody builds it into kernels th=
-ey
->>> intend to ship.
->>>
->>> In the future, the driver will be used for processing restricted medi=
-a
->>> content.  However, the kernel does not currently support this.  Since=
+my company is a user. We have a hardware platform based on an IMX6 SoC
+using IPSec and configure pcrypt using crconf. Current performance
+difference:
 
->>> the driver will have future uses, allow building it if COMPILE_TEST i=
-s
->>> enabled.
->>>
->>> [1]: https://lore.kernel.org/r/20250704070322.20692-1-ebiggers@kernel=
-=2Eorg/
->>> [2]: https://lore.kernel.org/r/20250615031807.GA81869@sol/
->>> [3]: https://lore.kernel.org/r/20260706-qce-fix-self-tests-v5-0-86f46=
-1ff1829@oss.qualcomm.com/
->>> [4]: https://lore.kernel.org/r/20260629-qcom-qce-cmd-descr-v20-0-56f6=
-7da84c05@oss.qualcomm.com/
->>> [5]: https://lore.kernel.org/r/20260524204537.GB110177@quark/
->>>
->>> Fixes: ec8f5d8f6f76 ("crypto: qce - Qualcomm crypto engine driver")
->>> Signed-off-by: Demi Marie Obenour <demiobenour@gmail.com>
->>> ---
->>> Changes in v2:
->>> - Add Fixes: ec8f5d8f6f76 ("crypto: qce - Qualcomm crypto engine driv=
-er")
->>> - Add Cc: stable@vger.kernel.org
->>> - Link to v1: https://lore.kernel.org/r/20260712-qce-broken-v1-1-85e2=
-bff17871@gmail.com
->>> ---
->>>  arch/arm/configs/multi_v7_defconfig | 1 -
->>>  arch/arm64/configs/defconfig        | 1 -
->>>  drivers/crypto/Kconfig              | 6 +++++-
->>>  3 files changed, 5 insertions(+), 3 deletions(-)
->>
->> Patch applied.  Thanks.
->=20
-> Hi Herbert,
->=20
-> I'd like to ask you to back this patch out. Admittedly I should have NA=
-Ked this
-> under the v1 thread but I thought the discussion we had under the Shikr=
-a series
-> and the subsequent patch making myself the maintainer of this driver (n=
-ote: Demi
-> did not Cc me on this nor the Qcom mailing list at linux-arm-msm) as we=
-ll as the
-> pending series[1] fixing the QCE issues was enough to imply we should n=
-ot mark
-> it as broken. Please consider applying [1] if the fixes in v6 are corre=
-ct.
->=20
-> Bartosz
->=20
-> [1] https://lore.kernel.org/all/20260717-qce-fix-self-tests-v6-0-455775=
-fe5f6c@oss.qualcomm.com/
+iperf3 -c <IP> --time 60 -R
 
-Is the BAM locking patchset also needed?  My understanding is that
-without it, the QCE driver can still produce wrong results due to races
-with the TrustZone firmware.  Until it is merged and the self-tests
-are fixed, the driver definitely needs to be marked BROKEN.
+pcrypt:
+Download: 107 Mbits/sec
 
-Also, what can the current driver do that cannot be done better using
-software crypto?  I understand that you have future plans to add more
-features to the driver, but those are not relevant to this discussion.
+No pcrypt:
+Download: 59.3 Mbits/sec
 
-Finally, I very much appreciate the work you have done.  I don't
-expect that the QCE driver will stay BROKEN forever.  This patch is
-purely a reflection of the current state of the driver, the speed of
-CPU-accelerated crypto, and the small message sizes used by the kernel.
+iperf3 -c <IP> --time 60
 
-That said, is drivers/crypto really the right place for a restricted
-content driver?  A driver that uses dmabufs might be a better
-alternative, and would be easier to integrate with the Direct Rendering
-Manager (DRM) and Video for Linux 2 (V4L2) subsystems.
---=20
-Sincerely,
-Demi Marie Obenour (she/her/hers)
+pcrypt:
+Upload: 65.9 Mbits/sec
 
---------------WhrSX0Mdw2MzSwiD3n5At4Du--
+No pcrypt:
+Upload: 52.0 Mbits/sec
 
---------------bwB4FvPIOQoH8HIWNe7kb9Th
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+The relevant crypto templates are configured in early userspace and
+since i got curious, that has been the case since 2017.
 
------BEGIN PGP SIGNATURE-----
+Mostly using
 
-iQIzBAEBCgAdFiEEopQtqVJW1aeuo9/sszaHOrMp8lMFAmpfup0ACgkQszaHOrMp
-8lNIXA/8DrW/cEc/ISZNa5QRt1B4PVHPRp8ZF3WxLeXZ00x5yOpjJXw9NNKnQJKC
-hI2VGY2b4lD2Yyd9gBc69s8RQJSXT/+rx2oc2C3J2ZxZdrgecBmXzo1dEnIb8RTO
-tlkeOZ1nReACCYJGIDOLI1aAxahoaiMJ1j8xeG+8Lu9nZDzmgnITSRrmmbUUEnuD
-JPkms3Wlbo9VQ4FzD9MHXJM1GY8SLOqmIw/HvR10c8cH2hdSM2l9GkLx2qkeTP0I
-TUqj3eXLEHoxk60mdAf7VXtLekEzeYKyfQGyOd8jzhUGU0ehMOalryP5crKJ+MBd
-XaJ4gM7Yk6otL1IWmgoMAUaMFeuO5e5wY4/9HURkIKckwbqAG6qHVA5idi7RwPn+
-qpcAAsXExnH3Djx/PwTPmbi2hMg+fvqwzCmlkbRlGyZeYIB/2rMCDHjF4sTob38o
-uHlxxDQBQVl82nPU4VRY1pQfWPIWiB4X9zjZBrPjmvNUd+Cu9MY2xWt09LNbqrHG
-8Kc27b6TWHVHaF+sTM8BpyWtsQWulCoyEfPV2faJnW1xkAZ8ulLJVhesE8Cu6GsA
-Hx1+rxchrmRrpMORSDopi8jsBIthth/DGZvFlosSItHhY1mcQkyGGIqdyNNoWkOS
-8oXYeIL0sOUryCxEva2j1fmeRzsjgq+MMt8U5cVj9J9gkF7/dqo=
-=eQgX
------END PGP SIGNATURE-----
+pcrypt(gcm_base(ctr-aes-neonbs,ghash-generic))
 
---------------bwB4FvPIOQoH8HIWNe7kb9Th--
+nowadays, AES-CBC in the past/as a fallback option.
+
+So at least on some platforms there is still a significant performance
+boots, at least for downloads in this case.
+
+Regards,
+Hendrik
+
+
+> Cc: Steffen Klassert <steffen.klassert@secunet.com>
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> ---
+>   MAINTAINERS                                 |   7 -
+>   arch/loongarch/configs/loongson32_defconfig |   1 -
+>   arch/loongarch/configs/loongson64_defconfig |   1 -
+>   arch/s390/configs/debug_defconfig           |   1 -
+>   arch/s390/configs/defconfig                 |   1 -
+>   crypto/Kconfig                              |  10 -
+>   crypto/Makefile                             |   1 -
+>   crypto/pcrypt.c                             | 394 --------------------
+>   include/crypto/pcrypt.h                     |  39 --
+>   tools/crypto/tcrypt/tcrypt_speed_compare.py |   7 +-
+>   10 files changed, 2 insertions(+), 460 deletions(-)
+>   delete mode 100644 crypto/pcrypt.c
+>   delete mode 100644 include/crypto/pcrypt.h
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 806bd2d80d15..260b3bdc7614 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -21085,13 +21085,6 @@ L:	netdev@vger.kernel.org
+>   S:	Maintained
+>   F:	drivers/net/ethernet/amd/pcnet32.c
+>   
+> -PCRYPT PARALLEL CRYPTO ENGINE
+> -M:	Steffen Klassert <steffen.klassert@secunet.com>
+> -L:	linux-crypto@vger.kernel.org
+> -S:	Maintained
+> -F:	crypto/pcrypt.c
+> -F:	include/crypto/pcrypt.h
+> -
+>   PDS DSC VIRTIO DATA PATH ACCELERATOR
+>   R:	Brett Creeley <brett.creeley@amd.com>
+>   F:	drivers/vdpa/pds/
+> diff --git a/arch/loongarch/configs/loongson32_defconfig b/arch/loongarch/configs/loongson32_defconfig
+> index 7c8f01513ed2..cf97f4493573 100644
+> --- a/arch/loongarch/configs/loongson32_defconfig
+> +++ b/arch/loongarch/configs/loongson32_defconfig
+> @@ -1063,7 +1063,6 @@ CONFIG_SECURITY_YAMA=y
+>   CONFIG_DEFAULT_SECURITY_DAC=y
+>   CONFIG_CRYPTO_USER=m
+>   CONFIG_CRYPTO_SELFTESTS=y
+> -CONFIG_CRYPTO_PCRYPT=m
+>   CONFIG_CRYPTO_CRYPTD=m
+>   CONFIG_CRYPTO_ANUBIS=m
+>   CONFIG_CRYPTO_BLOWFISH=m
+> diff --git a/arch/loongarch/configs/loongson64_defconfig b/arch/loongarch/configs/loongson64_defconfig
+> index 8e3906d3bd70..d0ece7920f21 100644
+> --- a/arch/loongarch/configs/loongson64_defconfig
+> +++ b/arch/loongarch/configs/loongson64_defconfig
+> @@ -1096,7 +1096,6 @@ CONFIG_SECURITY_YAMA=y
+>   CONFIG_DEFAULT_SECURITY_DAC=y
+>   CONFIG_CRYPTO_USER=m
+>   CONFIG_CRYPTO_SELFTESTS=y
+> -CONFIG_CRYPTO_PCRYPT=m
+>   CONFIG_CRYPTO_CRYPTD=m
+>   CONFIG_CRYPTO_ANUBIS=m
+>   CONFIG_CRYPTO_BLOWFISH=m
+> diff --git a/arch/s390/configs/debug_defconfig b/arch/s390/configs/debug_defconfig
+> index 54637be87fb7..15f51cb924db 100644
+> --- a/arch/s390/configs/debug_defconfig
+> +++ b/arch/s390/configs/debug_defconfig
+> @@ -765,7 +765,6 @@ CONFIG_CRYPTO_USER=m
+>   CONFIG_CRYPTO_SELFTESTS=y
+>   CONFIG_CRYPTO_SELFTESTS_FULL=y
+>   CONFIG_CRYPTO_NULL=y
+> -CONFIG_CRYPTO_PCRYPT=m
+>   CONFIG_CRYPTO_CRYPTD=m
+>   CONFIG_CRYPTO_BENCHMARK=m
+>   CONFIG_CRYPTO_DH=m
+> diff --git a/arch/s390/configs/defconfig b/arch/s390/configs/defconfig
+> index 5f5114a253cf..88257ff3c2c6 100644
+> --- a/arch/s390/configs/defconfig
+> +++ b/arch/s390/configs/defconfig
+> @@ -749,7 +749,6 @@ CONFIG_CRYPTO_FIPS=y
+>   CONFIG_CRYPTO_USER=m
+>   CONFIG_CRYPTO_SELFTESTS=y
+>   CONFIG_CRYPTO_NULL=y
+> -CONFIG_CRYPTO_PCRYPT=m
+>   CONFIG_CRYPTO_CRYPTD=m
+>   CONFIG_CRYPTO_BENCHMARK=m
+>   CONFIG_CRYPTO_DH=m
+> diff --git a/crypto/Kconfig b/crypto/Kconfig
+> index f1e372195273..228a7ac9f063 100644
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -201,16 +201,6 @@ config CRYPTO_NULL
+>   	help
+>   	  These are 'Null' algorithms, used by IPsec, which do nothing.
+>   
+> -config CRYPTO_PCRYPT
+> -	tristate "Parallel crypto engine"
+> -	depends on SMP
+> -	select PADATA
+> -	select CRYPTO_MANAGER
+> -	select CRYPTO_AEAD
+> -	help
+> -	  This converts an arbitrary crypto algorithm into a parallel
+> -	  algorithm that executes in kernel threads.
+> -
+>   config CRYPTO_CRYPTD
+>   	tristate "Software async crypto daemon"
+>   	select CRYPTO_AEAD
+> diff --git a/crypto/Makefile b/crypto/Makefile
+> index 8386d55a9755..2e487c946e63 100644
+> --- a/crypto/Makefile
+> +++ b/crypto/Makefile
+> @@ -120,7 +120,6 @@ CFLAGS_aegis128-neon-inner.o += $(aegis128-cflags-y)
+>   aegis128-$(CONFIG_CRYPTO_AEGIS128_SIMD) += aegis128-neon.o aegis128-neon-inner.o
+>   endif
+>   
+> -obj-$(CONFIG_CRYPTO_PCRYPT) += pcrypt.o
+>   obj-$(CONFIG_CRYPTO_CRYPTD) += cryptd.o
+>   obj-$(CONFIG_CRYPTO_DES) += des_generic.o
+>   obj-$(CONFIG_CRYPTO_BLOWFISH) += blowfish_generic.o
+> diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
+> deleted file mode 100644
+> index 9f372442981e..000000000000
+> --- a/crypto/pcrypt.c
+> +++ /dev/null
+> @@ -1,394 +0,0 @@
+> -// SPDX-License-Identifier: GPL-2.0-only
+> -/*
+> - * pcrypt - Parallel crypto wrapper.
+> - *
+> - * Copyright (C) 2009 secunet Security Networks AG
+> - * Copyright (C) 2009 Steffen Klassert <steffen.klassert@secunet.com>
+> - */
+> -
+> -#include <crypto/algapi.h>
+> -#include <crypto/internal/aead.h>
+> -#include <linux/atomic.h>
+> -#include <linux/err.h>
+> -#include <linux/init.h>
+> -#include <linux/module.h>
+> -#include <linux/slab.h>
+> -#include <linux/kobject.h>
+> -#include <linux/cpu.h>
+> -#include <crypto/pcrypt.h>
+> -
+> -static struct padata_instance *pencrypt;
+> -static struct padata_instance *pdecrypt;
+> -static struct kset           *pcrypt_kset;
+> -
+> -struct pcrypt_instance_ctx {
+> -	struct crypto_aead_spawn spawn;
+> -	struct padata_shell *psenc;
+> -	struct padata_shell *psdec;
+> -	atomic_t tfm_count;
+> -};
+> -
+> -struct pcrypt_aead_ctx {
+> -	struct crypto_aead *child;
+> -	unsigned int cb_cpu;
+> -};
+> -
+> -static inline struct pcrypt_instance_ctx *pcrypt_tfm_ictx(
+> -	struct crypto_aead *tfm)
+> -{
+> -	return aead_instance_ctx(aead_alg_instance(tfm));
+> -}
+> -
+> -static int pcrypt_aead_setkey(struct crypto_aead *parent,
+> -			      const u8 *key, unsigned int keylen)
+> -{
+> -	struct pcrypt_aead_ctx *ctx = crypto_aead_ctx(parent);
+> -
+> -	return crypto_aead_setkey(ctx->child, key, keylen);
+> -}
+> -
+> -static int pcrypt_aead_setauthsize(struct crypto_aead *parent,
+> -				   unsigned int authsize)
+> -{
+> -	struct pcrypt_aead_ctx *ctx = crypto_aead_ctx(parent);
+> -
+> -	return crypto_aead_setauthsize(ctx->child, authsize);
+> -}
+> -
+> -static void pcrypt_aead_serial(struct padata_priv *padata)
+> -{
+> -	struct pcrypt_request *preq = pcrypt_padata_request(padata);
+> -	struct aead_request *req = pcrypt_request_ctx(preq);
+> -
+> -	aead_request_complete(req->base.data, padata->info);
+> -}
+> -
+> -static void pcrypt_aead_done(void *data, int err)
+> -{
+> -	struct aead_request *req = data;
+> -	struct pcrypt_request *preq = aead_request_ctx(req);
+> -	struct padata_priv *padata = pcrypt_request_padata(preq);
+> -
+> -	if (err == -EINPROGRESS)
+> -		return;
+> -
+> -	padata->info = err;
+> -
+> -	padata_do_serial(padata);
+> -}
+> -
+> -static void pcrypt_aead_enc(struct padata_priv *padata)
+> -{
+> -	struct pcrypt_request *preq = pcrypt_padata_request(padata);
+> -	struct aead_request *req = pcrypt_request_ctx(preq);
+> -	int ret;
+> -
+> -	ret = crypto_aead_encrypt(req);
+> -
+> -	if (ret == -EINPROGRESS || ret == -EBUSY)
+> -		return;
+> -
+> -	padata->info = ret;
+> -	padata_do_serial(padata);
+> -}
+> -
+> -static int pcrypt_aead_encrypt(struct aead_request *req)
+> -{
+> -	int err;
+> -	struct pcrypt_request *preq = aead_request_ctx(req);
+> -	struct aead_request *creq = pcrypt_request_ctx(preq);
+> -	struct padata_priv *padata = pcrypt_request_padata(preq);
+> -	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+> -	struct pcrypt_aead_ctx *ctx = crypto_aead_ctx(aead);
+> -	u32 flags = aead_request_flags(req);
+> -	struct pcrypt_instance_ctx *ictx;
+> -
+> -	ictx = pcrypt_tfm_ictx(aead);
+> -
+> -	memset(padata, 0, sizeof(struct padata_priv));
+> -
+> -	padata->parallel = pcrypt_aead_enc;
+> -	padata->serial = pcrypt_aead_serial;
+> -
+> -	aead_request_set_tfm(creq, ctx->child);
+> -	aead_request_set_callback(creq, flags & ~CRYPTO_TFM_REQ_MAY_SLEEP,
+> -				  pcrypt_aead_done, req);
+> -	aead_request_set_crypt(creq, req->src, req->dst,
+> -			       req->cryptlen, req->iv);
+> -	aead_request_set_ad(creq, req->assoclen);
+> -
+> -	err = padata_do_parallel(ictx->psenc, padata, &ctx->cb_cpu);
+> -	if (!err)
+> -		return -EINPROGRESS;
+> -	if (err == -EBUSY) {
+> -		/* try non-parallel mode */
+> -		aead_request_set_callback(creq, flags, req->base.complete,
+> -					  req->base.data);
+> -		return crypto_aead_encrypt(creq);
+> -	}
+> -
+> -	return err;
+> -}
+> -
+> -static void pcrypt_aead_dec(struct padata_priv *padata)
+> -{
+> -	struct pcrypt_request *preq = pcrypt_padata_request(padata);
+> -	struct aead_request *req = pcrypt_request_ctx(preq);
+> -	int ret;
+> -
+> -	ret = crypto_aead_decrypt(req);
+> -
+> -	if (ret == -EINPROGRESS || ret == -EBUSY)
+> -		return;
+> -
+> -	padata->info = ret;
+> -	padata_do_serial(padata);
+> -}
+> -
+> -static int pcrypt_aead_decrypt(struct aead_request *req)
+> -{
+> -	int err;
+> -	struct pcrypt_request *preq = aead_request_ctx(req);
+> -	struct aead_request *creq = pcrypt_request_ctx(preq);
+> -	struct padata_priv *padata = pcrypt_request_padata(preq);
+> -	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+> -	struct pcrypt_aead_ctx *ctx = crypto_aead_ctx(aead);
+> -	u32 flags = aead_request_flags(req);
+> -	struct pcrypt_instance_ctx *ictx;
+> -
+> -	ictx = pcrypt_tfm_ictx(aead);
+> -
+> -	memset(padata, 0, sizeof(struct padata_priv));
+> -
+> -	padata->parallel = pcrypt_aead_dec;
+> -	padata->serial = pcrypt_aead_serial;
+> -
+> -	aead_request_set_tfm(creq, ctx->child);
+> -	aead_request_set_callback(creq, flags & ~CRYPTO_TFM_REQ_MAY_SLEEP,
+> -				  pcrypt_aead_done, req);
+> -	aead_request_set_crypt(creq, req->src, req->dst,
+> -			       req->cryptlen, req->iv);
+> -	aead_request_set_ad(creq, req->assoclen);
+> -
+> -	err = padata_do_parallel(ictx->psdec, padata, &ctx->cb_cpu);
+> -	if (!err)
+> -		return -EINPROGRESS;
+> -	if (err == -EBUSY) {
+> -		/* try non-parallel mode */
+> -		aead_request_set_callback(creq, flags, req->base.complete,
+> -					  req->base.data);
+> -		return crypto_aead_decrypt(creq);
+> -	}
+> -
+> -	return err;
+> -}
+> -
+> -static int pcrypt_aead_init_tfm(struct crypto_aead *tfm)
+> -{
+> -	int cpu_index;
+> -	struct aead_instance *inst = aead_alg_instance(tfm);
+> -	struct pcrypt_instance_ctx *ictx = aead_instance_ctx(inst);
+> -	struct pcrypt_aead_ctx *ctx = crypto_aead_ctx(tfm);
+> -	struct crypto_aead *cipher;
+> -
+> -	cpu_index = (unsigned int)atomic_inc_return(&ictx->tfm_count) %
+> -		    cpumask_weight(cpu_online_mask);
+> -
+> -	ctx->cb_cpu = cpumask_nth(cpu_index, cpu_online_mask);
+> -	cipher = crypto_spawn_aead(&ictx->spawn);
+> -
+> -	if (IS_ERR(cipher))
+> -		return PTR_ERR(cipher);
+> -
+> -	ctx->child = cipher;
+> -	crypto_aead_set_reqsize(tfm, sizeof(struct pcrypt_request) +
+> -				     sizeof(struct aead_request) +
+> -				     crypto_aead_reqsize(cipher));
+> -
+> -	return 0;
+> -}
+> -
+> -static void pcrypt_aead_exit_tfm(struct crypto_aead *tfm)
+> -{
+> -	struct pcrypt_aead_ctx *ctx = crypto_aead_ctx(tfm);
+> -
+> -	crypto_free_aead(ctx->child);
+> -}
+> -
+> -static void pcrypt_free(struct aead_instance *inst)
+> -{
+> -	struct pcrypt_instance_ctx *ctx = aead_instance_ctx(inst);
+> -
+> -	crypto_drop_aead(&ctx->spawn);
+> -	padata_free_shell(ctx->psdec);
+> -	padata_free_shell(ctx->psenc);
+> -	kfree(inst);
+> -}
+> -
+> -static int pcrypt_init_instance(struct crypto_instance *inst,
+> -				struct crypto_alg *alg)
+> -{
+> -	if (snprintf(inst->alg.cra_driver_name, CRYPTO_MAX_ALG_NAME,
+> -		     "pcrypt(%s)", alg->cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
+> -		return -ENAMETOOLONG;
+> -
+> -	memcpy(inst->alg.cra_name, alg->cra_name, CRYPTO_MAX_ALG_NAME);
+> -
+> -	inst->alg.cra_priority = alg->cra_priority + 100;
+> -	inst->alg.cra_blocksize = alg->cra_blocksize;
+> -	inst->alg.cra_alignmask = alg->cra_alignmask;
+> -
+> -	return 0;
+> -}
+> -
+> -static int pcrypt_create_aead(struct crypto_template *tmpl, struct rtattr **tb,
+> -			      struct crypto_attr_type *algt)
+> -{
+> -	struct pcrypt_instance_ctx *ctx;
+> -	struct aead_instance *inst;
+> -	struct aead_alg *alg;
+> -	u32 mask = crypto_algt_inherited_mask(algt);
+> -	int err;
+> -
+> -	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
+> -	if (!inst)
+> -		return -ENOMEM;
+> -
+> -	err = -ENOMEM;
+> -
+> -	ctx = aead_instance_ctx(inst);
+> -	ctx->psenc = padata_alloc_shell(pencrypt);
+> -	if (!ctx->psenc)
+> -		goto err_free_inst;
+> -
+> -	ctx->psdec = padata_alloc_shell(pdecrypt);
+> -	if (!ctx->psdec)
+> -		goto err_free_inst;
+> -
+> -	err = crypto_grab_aead(&ctx->spawn, aead_crypto_instance(inst),
+> -			       crypto_attr_alg_name(tb[1]), 0, mask);
+> -	if (err)
+> -		goto err_free_inst;
+> -
+> -	alg = crypto_spawn_aead_alg(&ctx->spawn);
+> -	err = pcrypt_init_instance(aead_crypto_instance(inst), &alg->base);
+> -	if (err)
+> -		goto err_free_inst;
+> -
+> -	inst->alg.base.cra_flags |= CRYPTO_ALG_ASYNC;
+> -
+> -	inst->alg.ivsize = crypto_aead_alg_ivsize(alg);
+> -	inst->alg.maxauthsize = crypto_aead_alg_maxauthsize(alg);
+> -
+> -	inst->alg.base.cra_ctxsize = sizeof(struct pcrypt_aead_ctx);
+> -
+> -	inst->alg.init = pcrypt_aead_init_tfm;
+> -	inst->alg.exit = pcrypt_aead_exit_tfm;
+> -
+> -	inst->alg.setkey = pcrypt_aead_setkey;
+> -	inst->alg.setauthsize = pcrypt_aead_setauthsize;
+> -	inst->alg.encrypt = pcrypt_aead_encrypt;
+> -	inst->alg.decrypt = pcrypt_aead_decrypt;
+> -
+> -	inst->free = pcrypt_free;
+> -
+> -	err = aead_register_instance(tmpl, inst);
+> -	if (err) {
+> -err_free_inst:
+> -		pcrypt_free(inst);
+> -	}
+> -	return err;
+> -}
+> -
+> -static int pcrypt_create(struct crypto_template *tmpl, struct rtattr **tb)
+> -{
+> -	struct crypto_attr_type *algt;
+> -
+> -	algt = crypto_get_attr_type(tb);
+> -	if (IS_ERR(algt))
+> -		return PTR_ERR(algt);
+> -
+> -	switch (algt->type & algt->mask & CRYPTO_ALG_TYPE_MASK) {
+> -	case CRYPTO_ALG_TYPE_AEAD:
+> -		return pcrypt_create_aead(tmpl, tb, algt);
+> -	}
+> -
+> -	return -EINVAL;
+> -}
+> -
+> -static int pcrypt_sysfs_add(struct padata_instance *pinst, const char *name)
+> -{
+> -	int ret;
+> -
+> -	pinst->kobj.kset = pcrypt_kset;
+> -	ret = kobject_add(&pinst->kobj, NULL, "%s", name);
+> -	if (!ret)
+> -		kobject_uevent(&pinst->kobj, KOBJ_ADD);
+> -
+> -	return ret;
+> -}
+> -
+> -static int pcrypt_init_padata(struct padata_instance **pinst, const char *name)
+> -{
+> -	int ret = -ENOMEM;
+> -
+> -	*pinst = padata_alloc(name);
+> -	if (!*pinst)
+> -		return ret;
+> -
+> -	ret = pcrypt_sysfs_add(*pinst, name);
+> -	if (ret)
+> -		padata_free(*pinst);
+> -
+> -	return ret;
+> -}
+> -
+> -static struct crypto_template pcrypt_tmpl = {
+> -	.name = "pcrypt",
+> -	.create = pcrypt_create,
+> -	.module = THIS_MODULE,
+> -};
+> -
+> -static int __init pcrypt_init(void)
+> -{
+> -	int err = -ENOMEM;
+> -
+> -	pcrypt_kset = kset_create_and_add("pcrypt", NULL, kernel_kobj);
+> -	if (!pcrypt_kset)
+> -		goto err;
+> -
+> -	err = pcrypt_init_padata(&pencrypt, "pencrypt");
+> -	if (err)
+> -		goto err_unreg_kset;
+> -
+> -	err = pcrypt_init_padata(&pdecrypt, "pdecrypt");
+> -	if (err)
+> -		goto err_deinit_pencrypt;
+> -
+> -	return crypto_register_template(&pcrypt_tmpl);
+> -
+> -err_deinit_pencrypt:
+> -	padata_free(pencrypt);
+> -err_unreg_kset:
+> -	kset_unregister(pcrypt_kset);
+> -err:
+> -	return err;
+> -}
+> -
+> -static void __exit pcrypt_exit(void)
+> -{
+> -	crypto_unregister_template(&pcrypt_tmpl);
+> -
+> -	padata_free(pencrypt);
+> -	padata_free(pdecrypt);
+> -
+> -	kset_unregister(pcrypt_kset);
+> -}
+> -
+> -module_init(pcrypt_init);
+> -module_exit(pcrypt_exit);
+> -
+> -MODULE_LICENSE("GPL");
+> -MODULE_AUTHOR("Steffen Klassert <steffen.klassert@secunet.com>");
+> -MODULE_DESCRIPTION("Parallel crypto wrapper");
+> -MODULE_ALIAS_CRYPTO("pcrypt");
+> diff --git a/include/crypto/pcrypt.h b/include/crypto/pcrypt.h
+> deleted file mode 100644
+> index 234d7cf3cf5e..000000000000
+> --- a/include/crypto/pcrypt.h
+> +++ /dev/null
+> @@ -1,39 +0,0 @@
+> -/* SPDX-License-Identifier: GPL-2.0-only */
+> -/*
+> - * pcrypt - Parallel crypto engine.
+> - *
+> - * Copyright (C) 2009 secunet Security Networks AG
+> - * Copyright (C) 2009 Steffen Klassert <steffen.klassert@secunet.com>
+> - */
+> -
+> -#ifndef _CRYPTO_PCRYPT_H
+> -#define _CRYPTO_PCRYPT_H
+> -
+> -#include <linux/container_of.h>
+> -#include <linux/crypto.h>
+> -#include <linux/padata.h>
+> -
+> -struct pcrypt_request {
+> -	struct padata_priv	padata;
+> -	void			*data;
+> -	void			*__ctx[] CRYPTO_MINALIGN_ATTR;
+> -};
+> -
+> -static inline void *pcrypt_request_ctx(struct pcrypt_request *req)
+> -{
+> -	return req->__ctx;
+> -}
+> -
+> -static inline
+> -struct padata_priv *pcrypt_request_padata(struct pcrypt_request *req)
+> -{
+> -	return &req->padata;
+> -}
+> -
+> -static inline
+> -struct pcrypt_request *pcrypt_padata_request(struct padata_priv *padata)
+> -{
+> -	return container_of(padata, struct pcrypt_request, padata);
+> -}
+> -
+> -#endif
+> diff --git a/tools/crypto/tcrypt/tcrypt_speed_compare.py b/tools/crypto/tcrypt/tcrypt_speed_compare.py
+> index f3f5783cdc06..0bf38c073dbc 100755
+> --- a/tools/crypto/tcrypt/tcrypt_speed_compare.py
+> +++ b/tools/crypto/tcrypt/tcrypt_speed_compare.py
+> @@ -28,19 +28,16 @@ num_mb=8
+>   mode=211
+>   
+>   # base speed test
+> -lsmod | grep pcrypt && modprobe -r pcrypt
+>   dmesg -C
+> -modprobe tcrypt alg="pcrypt(rfc4106(gcm(aes)))" type=3
+> +modprobe tcrypt alg="rfc4106(gcm(aes))" type=3
+>   modprobe tcrypt mode=${mode} sec=${sec} num_mb=${num_mb}
+>   dmesg > ${seq_num}_base_dmesg.log
+>   
+>   # new speed test
+> -lsmod | grep pcrypt && modprobe -r pcrypt
+>   dmesg -C
+> -modprobe tcrypt alg="pcrypt(rfc4106(gcm(aes)))" type=3
+> +modprobe tcrypt alg="rfc4106(gcm(aes))" type=3
+>   modprobe tcrypt mode=${mode} sec=${sec} num_mb=${num_mb}
+>   dmesg > ${seq_num}_new_dmesg.log
+> -lsmod | grep pcrypt && modprobe -r pcrypt
+>   
+>   tools/crypto/tcrypt/tcrypt_speed_compare.py \
+>       ${seq_num}_base_dmesg.log \
+
