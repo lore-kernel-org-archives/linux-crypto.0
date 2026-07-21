@@ -1,111 +1,240 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0ABC46AA6B;
-	Tue, 21 Jul 2026 15:33:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45D5D449B2B
+	for <linux-crypto@vger.kernel.org>; Tue, 21 Jul 2026 18:07:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784647999; cv=none; b=fyUwguv8wm3x5x5+jUPCmrf9IzA5Ges6ihxzIekMxwN8MXjpB9uNtNT92jj9ytEohh8HtvyfB4WQlb+8p3Fn3KN7po6/yWEQC+csjeu5yUzOgvoGiqxs2Vp7RCijPd62GfnmGcu4m0gJUdxCQGmbxbChc/L5fIoI4zSC87WD/8Q=
+	t=1784657254; cv=none; b=YY+wZRvch3H1tZZNvAPOGsU0H4/MxL5AAvQ8f6qEBh3eJCaRckFO5cyJI9lvPU6TPM1MstByX2wkqwDi5DMejdy2ZLoshD1cCrOmQqWgSkZ67AdEIrjyPsQ+Xu41o89vcENGRMQ1Tktrnun/LI9EKuQXB5SOIU6VdCfwGiYGf9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784647999; c=relaxed/simple;
-	bh=p42FdDG3W2PcF9gjZDhHjj0UxkMFq9DZNUm9D+Yq2wk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GbSYebM/OrHO+auKmbdC/8aQSfQzLF0GOHrzrw9w/dVIx5B4fSbra7BRza8qX3nAV/u9mOqm28mJLaQf0USzuXLWq0NSNIqqgzkZnlwdkcuOAvIMNHlqkdGtMEqzjUPfPQ+MkMx0ryybjJyqWLnWz4Sggu7Yn6bTzD7PkrgGtJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=jBY0WGGL; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	s=arc-20240116; t=1784657254; c=relaxed/simple;
+	bh=x7ZJS3f0xRb8AdncArsAbjSOaFWnv6AX4C01srI9uQY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Opj/ZMu4iJKf2Oee6eIYMO+Spu5wTpbHc2jgxgxwfhcBHcUHclPkMRB/XzqoIxKtT7FoadGzngS9RVeGMo129j390OO7M9sonKECru+b/z32+BJkhL9eQ1xSHDr7mM8+kDnMOmX+VY1fmq6dOFF/oW6WIne1jtWkqXWJuHD+C2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=dfw0BPiD; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=BtkWQwaE; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="jBY0WGGL"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 4362E40E014C;
-	Tue, 21 Jul 2026 15:33:14 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id qlpVAtYpdz8I; Tue, 21 Jul 2026 15:33:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1784647984; bh=gfaFDf5tJQ9koeSUXrEkCo3jxffhhLyj8C7mTBh7tfg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jBY0WGGLmBbXUc5tvnv8754Mv7jBcWHpeYf1hKruMd1drFq4JIuzhweuI6s53xPIZ
-	 THDWkO6QhM1TJpP0kC1GaUTUoJDc1+efHzBZkRnBbknCT0HIeHoCa5xjWuMhV9hkIe
-	 vwq//fHgE+glkom2B8ynImLlecW14X6kkyavBttS51wCVKwJ83euISl+vYLv23ybTU
-	 Yhxoyb+dmW3KJ5Hd4xsWignJDBUH2kPOCXvSAO1PQkTn8nudibkKIMmXoXpk2DbvTI
-	 +ApRx7apy5P1bwBrDwUh9RzVQyfNNz170M8MUvTa8p9P3P/JPm/HI/F7lUzuNlwEyF
-	 n7zOthdykyonRPgjDvnKDpbBzl1lfALFm2yNWjHvTM4AnTjzuk4EYDeCAPapQQDPhP
-	 fpU3fSajZjK+4q7XqhYZPhbS3Is3LoQsihyhST8gSQwnrCi398F8y45f+ERKzPDTBd
-	 qNAv92J1f2LyXY8VLKxgJ9MBqMlnYrHJhdZfWZFQ7PEf4DtTzZncoROp0XsI5jJkXX
-	 62MX0Zj5kQlKhTzCMUa7BmrNR4fhVLyWSUAQtXYH0S96XStojBw+JixsxmouFm/xgb
-	 iPuiZVedPMxu4UNiUA2DJz03dbTF2ZFcktPX/CYSAJEv8m6EjBHgA8gTI2xcu9sU6R
-	 WCxvgaU72GLrUtLFwsgK/M48=
-Received: from stx.tnic (unknown [IPv6:2600:1700:38ca:c00::2b])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 6E6F340E00E6;
-	Tue, 21 Jul 2026 15:32:29 +0000 (UTC)
-Date: Tue, 21 Jul 2026 08:32:25 -0700
-From: Borislav Petkov <bp@alien8.de>
-To: "Kalra, Ashish" <ashish.kalra@amd.com>
-Cc: tglx@kernel.org, mingo@redhat.com, dave.hansen@linux.intel.com,
-	x86@kernel.org, hpa@zytor.com, seanjc@google.com,
-	peterz@infradead.org, thomas.lendacky@amd.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org,
-	pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
-	KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com,
-	Nathan.Fontenot@amd.com, ackerleytng@google.com, jackyli@google.com,
-	pgonda@google.com, rientjes@google.com, jacobhxu@google.com,
-	xin@zytor.com, pawan.kumar.gupta@linux.intel.com,
-	babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com,
-	john.allen@amd.com, darwi@linutronix.de,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	kvm@vger.kernel.org, linux-coco@lists.linux.dev
-Subject: Re: [PATCH v10 2/6] x86/sev: Initialize RMPOPT configuration MSRs
-Message-ID: <20260721153225.GFal-RCQdG54tNiPGb@fat_crate.local>
-References: <cover.1782841284.git.ashish.kalra@amd.com>
- <8518e02c46d6edf1f37a180569c708a3cfa7c413.1782841284.git.ashish.kalra@amd.com>
- <20260720221725.GDal6edYI3uHrDruHj@fat_crate.local>
- <5168d3d3-c31c-4f80-be91-c964a5cee674@amd.com>
- <20260721014841.GCal7P-f3ZBHQzR-0_@fat_crate.local>
- <9a183dfc-91fa-4a08-9168-8ea0e53f708c@amd.com>
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="dfw0BPiD";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="BtkWQwaE"
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66LHRTuT1926637
+	for <linux-crypto@vger.kernel.org>; Tue, 21 Jul 2026 18:07:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	pvgrk0JD8puxwL9uCDMq26QW3QE0+BHmqpodlHbEJE8=; b=dfw0BPiDNUu0Gi6Z
+	bWZ3/fyFqObxL29UiXVFnI/KCl+2rr8TGeyYQZjQabD4ckCreCjBTPgx3egEwyvQ
+	HUp4GxBfAysNYgFdVArI/zJeIyAdHryaFXC8PAme6e1CRNA66zQpra3j5T1atC2R
+	XGhGKcIygx4OeLyJotMKrlXoGD39Q7HauokoDHMitgaIrkIUgRoD0rjmoHrU6YK3
+	P2VxMU7kRFR8UHIS0q7ENORA3m824sbBGu612WYq+Ngq7Zstai+EPm4heyT0vE/o
+	LYKby0qSnfBmvUvqIe0zUmESvWxtOXYo7y/zQFIPpkWWOVGXF5oyhHDYDrzwTmAv
+	MI7oIA==
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com [209.85.215.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fjd6fr6wj-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Tue, 21 Jul 2026 18:07:32 +0000 (GMT)
+Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-c89704da8c7so16811196a12.0
+        for <linux-crypto@vger.kernel.org>; Tue, 21 Jul 2026 11:07:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1784657252; x=1785262052; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=pvgrk0JD8puxwL9uCDMq26QW3QE0+BHmqpodlHbEJE8=;
+        b=BtkWQwaEuVZ43hW9tLmB31J4XV3xQ61dN8Gs6rLOCwWt9yrSi1peqcOB3+PLOEw6Qi
+         jGGCD09VeAQFakEPoSspipLAHF702ZSx2DC8I/NFW6J4V+zDK5Wau2JSoAEdEcmZp4C2
+         Mz2yP0MUfvTVv4LvE/bUNBzk/bS4pNkbcksHjZCE7bGm5m5s6n6b1sI+eVrbru5EFuAi
+         y32477uR1jtw5bqB5VOFfD1h4KQz8coZ63AdUDTAiaT65YRYe0PlF+TsAHyaYVKOwEiB
+         9/uV2vWW1YvMCdzSJWZMVNAcv+r1DIvQm1zSrrnwtEFbJlSrSCt6pq/s7AWixt96expc
+         aikw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784657252; x=1785262052;
+        h=content-transfer-encoding:content-type:in-reply-to:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=pvgrk0JD8puxwL9uCDMq26QW3QE0+BHmqpodlHbEJE8=;
+        b=C99K3kHpvoxEvk5ynkt12XEDVyrCbvv63/nu0cLLe3IMH6qb4YwPHaShiDmJyN4lYg
+         B4CGZzt8dVOAEFNbtW62swAWO4DepUnpomdtQQ0FtkmX6+WOvBlwxEJXbiC5RaE3YQws
+         vgDX9f9zIjUq6nSfmApkYpeqajGfvnVMqNDdh8mv+l0U0ruCuCwqErPYMhJG2b6d6D+C
+         puEopKqmJYyxjronXn4Ve6X+jvHfT1p1A2rM6JRY7Ml+kStDKWpRiLlomQfj+k9puLZT
+         EW6yc2bqXW15ecy8XDeEgmDPH7WWyiFfTnRLj9qm6W+BcUmyR7mM6AiqzS025OKsOUvM
+         Jerw==
+X-Forwarded-Encrypted: i=1; AHgh+RpKP2gqj5b03xTanhqfsxBldSLJ9zpJ/VHNbIIyQ6uGFNz+WY2DbdnyaIGBknQoSTa4d88sbGS3bF69rAI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzjeDpOSPsfjjK/UYzBmUgBxM4jiAwlDfyvEntgjES5cu+D5VpW
+	3idHQhlUP8K6VABdkgJP3jvOC88HgVvD+DPXNkWHezc14L/SIH/SgEtC5PNZoUjqOhRPq1LaNL7
+	VGkIuzH+BGLKF+p8WAjPdJvj0odbPP1tmKniJ5KDAGQE8KWaoEC0bjpRh/ts/8zwqY7g=
+X-Gm-Gg: AR+sD12EfR9SdH6BSuXql2vLZ2hqC5OOCScDZbdl2BiWIrzbO8QbLK/RuvvcAHAEpUi
+	5egOcllBOxo4ZZPPjgXe/VSz5Wy8Hp9aTEKdEOYb9+7Bqk0tRK+6m4n07Z16O9uPQMUiMwDLf/d
+	bDwOvedNvnPiTOpGs70osRYtM+TPuziyL7zBDNV8QOVftqYPbBpyYJ88nyren4B5tJZ811QRHGk
+	mvBWkV2OHndYDco5QhLzVlmdhKpf+dizaB7PNRyEdf7hqMWQ0fXWHL6U888Wi5VMHMcJPIqgN3q
+	dwfbBEYMvxTjR9uEgcb7TPoR3x6hlZ1QzY47dRUm70T8kdR9eODRnGbldr+69hu1+2ASE2UI3Jh
+	oklnDukF3zeGbV3FSUBKnPg9AJnbEQlduaJ0=
+X-Received: by 2002:a05:6a20:6a0a:b0:3c3:8041:89f5 with SMTP id adf61e73a8af0-3c3ad9e597fmr23899582637.66.1784657251648;
+        Tue, 21 Jul 2026 11:07:31 -0700 (PDT)
+X-Received: by 2002:a05:6a20:6a0a:b0:3c3:8041:89f5 with SMTP id adf61e73a8af0-3c3ad9e597fmr23899525637.66.1784657251224;
+        Tue, 21 Jul 2026 11:07:31 -0700 (PDT)
+Received: from [192.168.1.8] ([106.222.235.145])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3147e088d3fsm908106eec.25.2026.07.21.11.07.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Jul 2026 11:07:30 -0700 (PDT)
+Message-ID: <bc7854a8-1dd4-4e0a-83bd-a8c9dd95645d@oss.qualcomm.com>
+Date: Tue, 21 Jul 2026 23:37:21 +0530
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <9a183dfc-91fa-4a08-9168-8ea0e53f708c@amd.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v23 06/14] dmaengine: qcom: bam_dma: add support for BAM
+ locking
+To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
+        Vinod Koul <vkoul@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+        Thara Gopinath <thara.gopinath@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Udit Tiwari <quic_utiwari@quicinc.com>,
+        Md Sadre Alam <mdalam@qti.qualcomm.com>,
+        Dmitry Baryshkov
+ <lumag@kernel.org>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        Stephan Gerhold <stephan.gerhold@linaro.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Peter Ujfalusi <peter.ujfalusi@gmail.com>,
+        Michal Simek <michal.simek@amd.com>, Frank Li <Frank.Li@kernel.org>,
+        Andy Gross <agross@codeaurora.org>,
+        Neil Armstrong <neil.armstrong@linaro.org>,
+        Vignesh Raghavendra <vigneshr@ti.com>
+Cc: dmaengine@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        brgl@kernel.org, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+References: <20260721-qcom-qce-cmd-descr-v23-0-1be02deffda9@oss.qualcomm.com>
+ <20260721-qcom-qce-cmd-descr-v23-6-1be02deffda9@oss.qualcomm.com>
+Content-Language: en-US
+From: Mukesh Savaliya <mukesh.savaliya@oss.qualcomm.com>
+In-Reply-To: <20260721-qcom-qce-cmd-descr-v23-6-1be02deffda9@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-GUID: EMWSpgiOHEhdsO1vXciwHashv1VC1Om1
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzIxMDE5MSBTYWx0ZWRfX3fKUn1w2TRdp
+ vazB1rM0d8zkAQveUEzuNj6xK4ArjYXNfzU7gjSEzzIQ8kkWKenRpZdl7xQG1xAmQDZmzrrXFik
+ S9XULfpTyL6OysCbCa2VNODD1rR4DqnC17OZt+//WOs8lzvOy09au5MKsGmen5ahIxVGu6Wg7XC
+ jkGR6gP0o0mK3ZdH0u8DlRIi+ZTgHqfoD3xSIDrEJhOplh5R9owWdgkdLwh0IomEOPfxv3ZyhtX
+ NYeaz8WiEI89Gq1+1xOz4qBCKdWogWJVz3dhosIHwxI/3prI16O21qRctPfDbVR7vQAZexIVkhU
+ iW28EGtnXCLJQhTYcvA2uLW+LLuMMfb3eA4Sv6TixAkHDr5X34gTCjbcACROfPSi/lqiJukQNnR
+ vX70GIBSunRxfVmspQcgyHLE2EDCnJH1j5XBC1XXdvTsSiQFafpQHYz5wK1W8Ibtr8SCf1G96zU
+ +QridK2CruykA8j2rng==
+X-Authority-Analysis: v=2.4 cv=e/o2j6p/ c=1 sm=1 tr=0 ts=6a5fb564 cx=c_pps
+ a=Oh5Dbbf/trHjhBongsHeRQ==:117 a=nYgDJefOb7ZtON2RxEtQrg==:17
+ a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=DJpcGTmdVt4CTyJn9g5Z:22
+ a=5tee5T0z8aEC-XiIPRgA:9 a=QEXdDO2ut3YA:10 a=_Vgx9l1VpLgwpw_dHYaR:22
+X-Proofpoint-ORIG-GUID: EMWSpgiOHEhdsO1vXciwHashv1VC1Om1
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzIxMDE5MSBTYWx0ZWRfX7wHe0Dcbi57R
+ GOL3KeZ7lf1CvDuEMvjXGSvjnkj1wa4ls3HiVFYuzn5aGpAa27DfXFi7g8vE+AW+JBTRb8W+Fl3
+ xQ0W7nR6s64CYM19IcDnX27tHJ2+PMA=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-21_03,2026-07-21_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 suspectscore=0 spamscore=0 bulkscore=0 priorityscore=1501
+ impostorscore=0 lowpriorityscore=0 phishscore=0 clxscore=1011 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607210191
 
-On Tue, Jul 21, 2026 at 09:26:48AM -0500, Kalra, Ashish wrote:
-> That's why v7 moved to a runtime check. In v11 (as i mentioned) this will be a small local helper,  it will also handles two things
-> the cap-clear can't:
->   - a contiguous (non-segmented) RMP, where RMPOPT isn't usable even with X86_FEATURE_RMPOPT set.
+Hi Bartosz,
 
-That's the point of clearing the flag - to mark it non-usable.
+On 7/21/2026 7:03 PM, Bartosz Golaszewski wrote:
+[...]
 
->   - SNP being disabled at runtime (CC_ATTR_HOST_SEV_SNP).
-
-Same as RMPOPT being not usable follows from disabled SNP.
-
->   static bool rmpopt_capable(void)
+> @@ -676,13 +691,26 @@ static void bam_free_chan(struct dma_chan *chan)
+>   static int bam_slave_config(struct dma_chan *chan,
+>   			    struct dma_slave_config *cfg)
 >   {
->         return cpu_feature_enabled(X86_FEATURE_RMPOPT) &&
->                cc_platform_has(CC_ATTR_HOST_SEV_SNP) &&
->                (rmp_cfg & MSR_AMD64_SEG_RMP_ENABLED) &&
->                rmp_segment_table;
+> +	struct bam_config *peripheral_cfg = cfg->peripheral_config;
+>   	struct bam_chan *bchan = to_bam_chan(chan);
+> +	const struct bam_device_data *bdata = bchan->bdev->dev_data;
+>   
+>   	guard(spinlock_irqsave)(&bchan->vc.lock);
+>   
+>   	memcpy(&bchan->slave, cfg, sizeof(*cfg));
+>   	bchan->reconfigure = 1;
+>   
+> +	/*
+> +	 * This is required to setup the pipe locking and must be done even
+> +	 * before the first call to bam_start_dma().
+> +	 */
+> +	if (bdata->pipe_lock_supported && peripheral_cfg) {
+> +		if (cfg->direction != DMA_MEM_TO_DEV)
+> +			return -EINVAL;
+> +
+> +		bchan->lock_scratchpad_addr = peripheral_cfg->lock_scratchpad_addr;
+IIUC, peripheral_cfg will be filled by the client driver of BAM right ? 
+if not, who actually passes it ?
+> +	}
+> +
+>   	return 0;
 >   }
+>   
+> @@ -802,6 +830,7 @@ static int bam_dma_terminate_all(struct dma_chan *chan)
+>   		}
 
-But yes, this is a local helper so that's good enough.
+[...]
 
-We can always change it later if needed.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+>   static void bam_start_dma(struct bam_chan *bchan)
+>   {
+> -	struct virt_dma_desc *vd = vchan_next_desc(&bchan->vc);
+> +	struct virt_dma_desc *vd;
+>   	struct bam_device *bdev = bchan->bdev;
+>   	struct bam_async_desc *async_desc = NULL;
+>   	struct bam_desc_hw *desc;
+> @@ -1064,6 +1197,7 @@ static void bam_start_dma(struct bam_chan *bchan)
+>   
+>   	lockdep_assert_held(&bchan->vc.lock);
+>   
+> +	vd = vchan_next_desc(&bchan->vc);
+>   	if (!vd)
+>   		return;
+>   
+> @@ -1072,6 +1206,24 @@ static void bam_start_dma(struct bam_chan *bchan)
+>   		return;
+>   
+>   	while (vd && !IS_BUSY(bchan)) {
+> +		/*
+> +		 * Open a LOCK/UNLOCK bracket around each fresh sequence.
+> +		 * Sentinels inserted by bam_setup_pipe_lock() are skipped: they
+> +		 * already have bam_locked set and must not trigger a second pair.
+> +		 */
+> +		if (!bchan->bam_locked) {
+> +			ret = bam_setup_pipe_lock(bchan);
+Hence, overall you meant to lock bam pipe once during the starting of 
+the bam dma engine ? is it ?
+> +			if (ret) {
+> +				dev_err_ratelimited(bdev->dev,
+> +					"failed to setup the pipe lock, deferring transfer: %d\n",
+> +					ret);
+> +				queue_work(system_bh_highpri_wq, &bdev->work);
+> +				break;
+> +			}
+> +			if (bchan->bam_locked)
+> +				vd = vchan_next_desc(&bchan->vc);
+> +		}
+> +
+>   		list_del(&vd->node);
+>   
+>   		async_desc = container_of(vd, struct bam_async_desc, vd);
+> @@ -1133,6 +1285,10 @@ static void bam_start_dma(struct bam_chan *bchan)
+>   		bchan->tail += async_desc->xfer_len;
+>   		bchan->tail %= MAX_DESCRIPTORS;
+>   		list_add_tail(&async_desc->desc_node, &bchan->desc_list);
+> +
+> +		if (async_desc->is_lock_desc &&
+> +		    (le16_to_cpu(async_desc->desc->flags) & DESC_FLAG_UNLOCK))
+> +			bchan->bam_locked = false;
+>   	}
+>   
+[...]
