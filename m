@@ -1,42 +1,42 @@
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B645437475E
-	for <linux-crypto@vger.kernel.org>; Tue, 21 Jul 2026 13:45:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 082213749E0;
+	Tue, 21 Jul 2026 13:45:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784641526; cv=none; b=SVjeLZ4l/5ICiTN1ffa3DefOrcMBpXHkc6cMk/7NIrDghEhrOLOf/zK4Y7nlXaCdptN5rGWHixadngI1ddYV/K/DGQnOdd8tFmruteO2CX1yfFPa09yP6zmY0Lrip/24lrgXGIvGsO46k6R0sEHbyNfJwH/oMBgluXBKIEVZta8=
+	t=1784641527; cv=none; b=C42fVxRVCXbdn8aqtDYup9otMghnHvdZWjt9ULVVFsqo5eyDExUgPMEdQK5Zf8BtpPUEaA/JipqU5Y7tOgn/wSHuMNRMeTNMWmwD8MNCPJf8471kHeBA/MMe5p9VcPIMbT3z0ZrRoWe28/PMvBk/bspkEuAzwcIdgGuYdnTbnX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784641526; c=relaxed/simple;
-	bh=yaXKr3O9oVwNeilhdumgiN2IKJ43A5ZRpI27evZYZUA=;
+	s=arc-20240116; t=1784641527; c=relaxed/simple;
+	bh=VvWmItoUQiGewUC2IELznrd9XVVzduHJxyDnp+f+yvA=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=YuiOKc4iNqDzykMyJ9rC264cFLtaRDxOBPomAA02NqB0v0PqPZi2JTy35QziFUi9PVJ6AVmdLOyl94SZO6etUMYb+UOTOv8JEo9O+Y6GSrK08gkTbOjpL/YIH+G68bthDhnpwfmdBlLqcuEItCMj/99YUUNP8X0NvGnblsaIgL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=z6c5SwRd; arc=none smtp.client-ip=185.246.84.56
+	 In-Reply-To:To:Cc; b=inOJTRdkS/dEDdRRHh3UvI/Y7/DEYsesIAvmAyECE090kr+ENlCIBMn2ShFkc11kPh+n9AsCXGp6RAyPfIy2u160PulTALnFG1bIvs+tXE2biomWjlnjwanoExT5XYpG/2lHOsRRK8qKOmTJ5Qyhx33/I+5enFH1k0Kc0bErqHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=mKbdTCr6; arc=none smtp.client-ip=185.246.85.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="z6c5SwRd"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mKbdTCr6"
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 39AEC1A113A;
-	Tue, 21 Jul 2026 13:45:23 +0000 (UTC)
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 86B104E40EA4;
+	Tue, 21 Jul 2026 13:45:24 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 0DF4960368;
-	Tue, 21 Jul 2026 13:45:23 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D376A11BD3A98;
-	Tue, 21 Jul 2026 15:45:20 +0200 (CEST)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 5BFE260368;
+	Tue, 21 Jul 2026 13:45:24 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id DE31C11BD0D07;
+	Tue, 21 Jul 2026 15:45:22 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1784641522; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1784641523; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=96+ugB1tJDCl1moMfOVYZVvOsc93ChgjShCEQRyijOM=;
-	b=z6c5SwRda7fhhyNMOZ91BomTlSMnSEKLsrSyo544VOQ53Pyo/PUs+0+CNMfzfbQpASl3Cd
-	84pPKfrEItiKrUjgeVUAq/hCE69w+bK2s5PGBxK+YthqF6I+XUyNKHXhS4BXKMuHrurbng
-	qE89AWnyyK/otew3j74j81tiuBQ1oMf/hqYb0j+lWsij85tXgVGQxVQXusNzypPsdk1SYn
-	PNVKbKRY5qwTWn3MsNsfBg3euDhn7qfk1sBFN1cWAk7qPRWl7poKT0YLWveURsGMiIu2BV
-	jCNkL8GnWz8RfJlAFGulk14s3PRzcrrxFXbdqastpyX461wIklA3xFar1ufvxw==
+	bh=Pe9Emy5v5mPIfmU1/Rd8sQfQzmZN0jQSVhfcNdPKtIE=;
+	b=mKbdTCr6S53fmZUc3DnYyN7xOO7eVoH576pQblR4INW5Zz3LumLQzuwvb70gvni4Pvv/eD
+	RDFCTAkctEIxEhnLr1rHsmophE97kvVWMmWujOV66Zc4L+L0SOJ9rjDUh4nO1vLnN88dxg
+	YzsAqCrf+LwPgez96ILuunVGefs1pHs9u5ddiKOjgUmRgT6yy+PSM6LA5cyikDfan56jZe
+	arVu+L/dnYeNr8anDGH8YEmV8J0ptYov6elRNHTfChTsFQ1jVL1++kcWS0dnwCIEtjngSz
+	Wx0Uv88loQC51O7sE1GJiE6Pxc+s5C5HLN35gbUioXUlOoIUHYIiM5EPbpB36A==
 From: Paul Louvel <paul.louvel@bootlin.com>
-Date: Tue, 21 Jul 2026 15:43:37 +0200
-Subject: [PATCH v3 02/19] crypto: talitos - Move driver into dedicated
- directory
+Date: Tue, 21 Jul 2026 15:43:38 +0200
+Subject: [PATCH v3 03/19] crypto: talitos - Add missing includes to driver
+ header file
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -45,7 +45,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20260721-7-1-rc1_talitos_cleanup-v3-2-c602fa4d00e1@bootlin.com>
+Message-Id: <20260721-7-1-rc1_talitos_cleanup-v3-3-c602fa4d00e1@bootlin.com>
 References: <20260721-7-1-rc1_talitos_cleanup-v3-0-c602fa4d00e1@bootlin.com>
 In-Reply-To: <20260721-7-1-rc1_talitos_cleanup-v3-0-c602fa4d00e1@bootlin.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>, 
@@ -55,148 +55,56 @@ Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
  Christophe Leroy <chleroy@kernel.org>, linux-crypto@vger.kernel.org, 
  linux-kernel@vger.kernel.org, Paul Louvel <paul.louvel@bootlin.com>
 X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1784641453; l=4762;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1784641453; l=1415;
  i=paul.louvel@bootlin.com; s=20260313; h=from:subject:message-id;
- bh=yaXKr3O9oVwNeilhdumgiN2IKJ43A5ZRpI27evZYZUA=;
- b=xaJpMrW93lO62CuxAnKX7c38+q9/4kPsqzaTrLC21obqmsrlpmcgcjslzVu++EKUCQPbDTED8
- xkDOfXnRe40Abcuqszk5NT0TUott135NeHlrobdoQnT5/hPivd/yFnO
+ bh=VvWmItoUQiGewUC2IELznrd9XVVzduHJxyDnp+f+yvA=;
+ b=YAn14qPGYjoQATr0cJX82eomT8TLMQpg3aDHxoqkrlAdHSgkPWpPStIWc9tkJgQ/iX39G/WaE
+ g+jRMVRN3LKBcELTwzBkkmooD+94HYHcl9Kqnc6g8gCTR52SLEo44j2
 X-Developer-Key: i=paul.louvel@bootlin.com; a=ed25519;
  pk=eLW50NT18UAvUT5cAcYf88zNbBCZDLFXuptpyLVhVIU=
 X-Last-TLS-Session-Version: TLSv1.3
 
-Move the talitos driver files from drivers/crypto/ into
-drivers/crypto/talitos/ to accommodate upcoming code
-reorganization.
+Add explicit includes for types used by the header file to make
+it self-contained and fix implicit include dependencies.
 
 Signed-off-by: Paul Louvel <paul.louvel@bootlin.com>
 ---
- drivers/crypto/Kconfig                 | 38 +---------------------------------
- drivers/crypto/Makefile                |  2 +-
- drivers/crypto/talitos/Kconfig         | 36 ++++++++++++++++++++++++++++++++
- drivers/crypto/talitos/Makefile        |  1 +
- drivers/crypto/{ => talitos}/talitos.c |  0
- drivers/crypto/{ => talitos}/talitos.h |  0
- 6 files changed, 39 insertions(+), 38 deletions(-)
+ drivers/crypto/talitos/talitos.c | 3 ---
+ drivers/crypto/talitos/talitos.h | 6 ++++++
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index d23b58b81ca3..783b5dc42a42 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -253,43 +253,7 @@ config CRYPTO_DEV_HIFN_795X_RNG
- 	  on the HIFN 795x crypto adapters.
+diff --git a/drivers/crypto/talitos/talitos.c b/drivers/crypto/talitos/talitos.c
+index 99853faf20e8..753481d3189a 100644
+--- a/drivers/crypto/talitos/talitos.c
++++ b/drivers/crypto/talitos/talitos.c
+@@ -15,10 +15,7 @@
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/mod_devicetable.h>
+-#include <linux/device.h>
+-#include <linux/interrupt.h>
+ #include <linux/crypto.h>
+-#include <linux/hw_random.h>
+ #include <linux/of.h>
+ #include <linux/of_irq.h>
+ #include <linux/platform_device.h>
+diff --git a/drivers/crypto/talitos/talitos.h b/drivers/crypto/talitos/talitos.h
+index d4ff8d589f46..56e36a65ddcc 100644
+--- a/drivers/crypto/talitos/talitos.h
++++ b/drivers/crypto/talitos/talitos.h
+@@ -5,6 +5,12 @@
+  * Copyright (c) 2006-2011 Freescale Semiconductor, Inc.
+  */
  
- source "drivers/crypto/caam/Kconfig"
--
--config CRYPTO_DEV_TALITOS
--	tristate "Talitos Freescale Security Engine (SEC)"
--	select CRYPTO_AEAD
--	select CRYPTO_AUTHENC
--	select CRYPTO_SKCIPHER
--	select CRYPTO_HASH
--	select CRYPTO_LIB_DES
--	select HW_RANDOM
--	depends on FSL_SOC
--	help
--	  Say 'Y' here to use the Freescale Security Engine (SEC)
--	  to offload cryptographic algorithm computation.
--
--	  The Freescale SEC is present on PowerQUICC 'E' processors, such
--	  as the MPC8349E and MPC8548E.
--
--	  To compile this driver as a module, choose M here: the module
--	  will be called talitos.
--
--config CRYPTO_DEV_TALITOS1
--	bool "SEC1 (SEC 1.0 and SEC Lite 1.2)"
--	depends on CRYPTO_DEV_TALITOS
--	depends on PPC_8xx || PPC_82xx
--	default y
--	help
--	  Say 'Y' here to use the Freescale Security Engine (SEC) version 1.0
--	  found on MPC82xx or the Freescale Security Engine (SEC Lite)
--	  version 1.2 found on MPC8xx
--
--config CRYPTO_DEV_TALITOS2
--	bool "SEC2+ (SEC version 2.0 or upper)"
--	depends on CRYPTO_DEV_TALITOS
--	default y if !PPC_8xx
--	help
--	  Say 'Y' here to use the Freescale Security Engine (SEC)
--	  version 2 and following as found on MPC83xx, MPC85xx, etc ...
-+source "drivers/crypto/talitos/Kconfig"
- 
- config CRYPTO_DEV_PPC4XX
- 	tristate "Driver AMCC PPC4xx crypto accelerator"
-diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-index 283bbc650b5b..a059139d4a75 100644
---- a/drivers/crypto/Makefile
-+++ b/drivers/crypto/Makefile
-@@ -35,7 +35,7 @@ obj-$(CONFIG_CRYPTO_DEV_SA2UL) += sa2ul.o
- obj-$(CONFIG_CRYPTO_DEV_SAHARA) += sahara.o
- obj-$(CONFIG_CRYPTO_DEV_SL3516) += gemini/
- obj-y += stm32/
--obj-$(CONFIG_CRYPTO_DEV_TALITOS) += talitos.o
-+obj-$(CONFIG_CRYPTO_DEV_TALITOS) += talitos/
- obj-$(CONFIG_CRYPTO_DEV_TEGRA) += tegra/
- obj-$(CONFIG_CRYPTO_DEV_VIRTIO) += virtio/
- obj-$(CONFIG_CRYPTO_DEV_BCM_SPU) += bcm/
-diff --git a/drivers/crypto/talitos/Kconfig b/drivers/crypto/talitos/Kconfig
-new file mode 100644
-index 000000000000..c3470553a966
---- /dev/null
-+++ b/drivers/crypto/talitos/Kconfig
-@@ -0,0 +1,36 @@
-+config CRYPTO_DEV_TALITOS
-+	tristate "Talitos Freescale Security Engine (SEC)"
-+	select CRYPTO_AEAD
-+	select CRYPTO_AUTHENC
-+	select CRYPTO_SKCIPHER
-+	select CRYPTO_HASH
-+	select CRYPTO_LIB_DES
-+	select HW_RANDOM
-+	depends on FSL_SOC
-+	help
-+	  Say 'Y' here to use the Freescale Security Engine (SEC)
-+	  to offload cryptographic algorithm computation.
++#include <linux/device.h>
++#include <linux/hw_random.h>
++#include <linux/interrupt.h>
++#include <linux/scatterlist.h>
++#include <linux/types.h>
 +
-+	  The Freescale SEC is present on PowerQUICC 'E' processors, such
-+	  as the MPC8349E and MPC8548E.
-+
-+	  To compile this driver as a module, choose M here: the module
-+	  will be called talitos.
-+
-+config CRYPTO_DEV_TALITOS1
-+	bool "SEC1 (SEC 1.0 and SEC Lite 1.2)"
-+	depends on CRYPTO_DEV_TALITOS
-+	depends on PPC_8xx || PPC_82xx
-+	default y
-+	help
-+	  Say 'Y' here to use the Freescale Security Engine (SEC) version 1.0
-+	  found on MPC82xx or the Freescale Security Engine (SEC Lite)
-+	  version 1.2 found on MPC8xx
-+
-+config CRYPTO_DEV_TALITOS2
-+	bool "SEC2+ (SEC version 2.0 or upper)"
-+	depends on CRYPTO_DEV_TALITOS
-+	default y if !PPC_8xx
-+	help
-+	  Say 'Y' here to use the Freescale Security Engine (SEC)
-+	  version 2 and following as found on MPC83xx, MPC85xx, etc ...
-diff --git a/drivers/crypto/talitos/Makefile b/drivers/crypto/talitos/Makefile
-new file mode 100644
-index 000000000000..fcc5db5e63c2
---- /dev/null
-+++ b/drivers/crypto/talitos/Makefile
-@@ -0,0 +1 @@
-+obj-$(CONFIG_CRYPTO_DEV_TALITOS) += talitos.o
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos/talitos.c
-similarity index 100%
-rename from drivers/crypto/talitos.c
-rename to drivers/crypto/talitos/talitos.c
-diff --git a/drivers/crypto/talitos.h b/drivers/crypto/talitos/talitos.h
-similarity index 100%
-rename from drivers/crypto/talitos.h
-rename to drivers/crypto/talitos/talitos.h
+ #define TALITOS_TIMEOUT 100000
+ #define TALITOS1_MAX_DATA_LEN 32768
+ #define TALITOS2_MAX_DATA_LEN 65535
 
 -- 
 2.55.0
