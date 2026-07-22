@@ -1,30 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F3B03911A2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6482F9DA1;
 	Wed, 22 Jul 2026 02:57:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784689025; cv=none; b=edVS12WI6+LFG4jyNQv7ZiDguAI8cyE1X8MjetWmQIzKXnFSrRP3X+RY2Ao+tzn3rZR3imHeJ8PJzfbJu0J+VKDtwW4egDQLczujjrLZ2KXgkTPCJYFGbOaN15Cdz/bQMzrQSlD0Sjinwpn0J15b8l5m1er8EP9qc7/cphxa6ig=
+	t=1784689026; cv=none; b=FagxaAri4qrnC1jQLV0Fo6lh0sWOyt7gM3ZkEq7hLpHO3zSzC3VfYWwCFHJCLZQc2WH3kc+sgLuwqC85qANL23dnv5kK4Oe7MMowXGXY+iSNfj1xVCMKtnFyYdnwIg4TULTh29VrlIS5AYqIcUPLAWXu8330x0m1LDjYwcTavT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784689025; c=relaxed/simple;
-	bh=X+zkaMw01Mv4odh0AfDTXHLTGwCBLjDX9AfjvKLr+7I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R1dDrSw5WPVayNcLO5632OeQWH1s1iJf5XI78ktvxOwIQPOU+hsNgrdK9M/v6ZrHzG/23plg7i0uWwiGS6wSzcWXdQLej3Gi/OllD2hw/bvb8IL0CTBqFGu7OEJ1ELcmK9dRLwC+OreDR3PI+8T3ddsNHts8yXP7nRxtOV9ZnWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GogiBELg; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784689026; c=relaxed/simple;
+	bh=VwJapekecAXHgGnnfP97mMYGCse/AU5iXOGSSkwy9KM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=pihwo8JXaLqymu79yDlhRFzrS/YNeegEs++s/xXhiOLqUhQ+8eh8YI06K7YLU2yQqTjWjJTMEQNdLNc3j4ddfhmFejsV0WtnS/KrxEISWV1nolqYdNsmnOLY84lL1l+AXtVBouAa+HlTDMGUwbQW+4q1hdzvAzSwSCFRjVmCKPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UFDWfWv6; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GogiBELg"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38A5F1F000E9;
-	Wed, 22 Jul 2026 02:57:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UFDWfWv6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16AD51F00A3A;
+	Wed, 22 Jul 2026 02:57:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784689022;
-	bh=ZbtGGIXJpFieb+pSJwSiirglBC0xWaE8482qBRF+TWg=;
-	h=From:To:Cc:Subject:Date;
-	b=GogiBELgfWH160mBBxbtOc29ZjU4MCETMRWJitUkEmjhjwejh5HGroFDoRrbldmPY
-	 jRDsm/BQFmBJvt2eRgSI9O1wwVUyvyU+W/PWT87SMJtppFqWT0tbbbY4RrwTibC+h+
-	 vRoIwSYNpZ4emNsZBYaD7EfBsBqWch3B3H/LtMxlajqsuUoyxPxBS6zuI4HGtPojNu
-	 8+r5Z4Lyq4ejkyumhrE8z7NXeB2g1YKyCraP5gp6qhIJIp9uCvJY4oNMtyd4a8vlpm
-	 Zxmmn55Dimo/LkHYldzkbMyHmaf5C0TDJiBzu2QZfpXdAAJJBwgR9qVtLUY4CzeL7D
-	 ivgkI+mVOjRqw==
+	s=k20260515; t=1784689023;
+	bh=oL6B5yPI6RwB5+xPva+ODmso/yiH1ltTXoqrZzoHznU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=UFDWfWv69ybbfOfa1zOvIZFDT+fkK/woXMaYNn9stCiuyLO5eTEZy03GgR/W051JA
+	 aze22L4emlU3viROLhJuSJyyg3Vl6G1Akxy/NnaZI4l3x+x5a8vRMF80IUWy81fhLX
+	 feF1dYuVyxvNByXgfIFJy4DwKew+PhlEzArVAsCoFYYQatb0R8DIFNsVUo43EHe9wx
+	 c832KyMRvPsLELPG1cNPk/RyQe3aZlrKfo3ccmkmLuynK4eWpZhPTi6cLcslCnPqCM
+	 5jUXBw2YQRe31ms6VLNzElFPtBKJ7wNgpP8/X8wXpZX2TNIh+Q8RN3/RDIrH2TVEYd
+	 B5kxiYWPpYk3g==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -36,10 +37,12 @@ Cc: linux-kernel@vger.kernel.org,
 	=?UTF-8?q?Carlos=20L=C3=B3pez?= <clopez@suse.de>,
 	Alexey Kardashevskiy <aik@amd.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 0/3] Remove old AES-GCM library
-Date: Tue, 21 Jul 2026 19:53:35 -0700
-Message-ID: <20260722025338.33354-1-ebiggers@kernel.org>
+Subject: [PATCH 2/3] x86/sev: Remove obsolete virtual address check
+Date: Tue, 21 Jul 2026 19:53:37 -0700
+Message-ID: <20260722025338.33354-3-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260722025338.33354-1-ebiggers@kernel.org>
+References: <20260722025338.33354-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -48,35 +51,36 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The old AES-GCM library code is being replaced as part of an overhaul
-that is adding support for all the common AES encryption modes with
-consistent conventions
-(https://lore.kernel.org/linux-crypto/20260715221153.246410-1-ebiggers@kernel.org/).
+Virtual addresses used with the AES-GCM library don't have to be in the
+linear mapping.  Remove the virt_addr_valid() checks from
+snp_send_guest_request(), which were a workaround left over from when
+this code used crypto_aead, which required scatterlists.
 
-The SEV code is the only user of the old API.  Update it to use the new
-API instead.  Then remove the old API.
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ arch/x86/coco/sev/core.c | 9 ---------
+ 1 file changed, 9 deletions(-)
 
-This applies to libcrypto-next.  If possible I'd like to take this
-through libcrypto-next for 7.3.  Acks are appreciated.
-
-Eric Biggers (3):
-  x86/sev: Use new AES-GCM library
-  x86/sev: Remove obsolete virtual address check
-  lib/crypto: aesgcm: Remove old AES-GCM library
-
- arch/x86/Kconfig                        |   2 +-
- arch/x86/coco/sev/core.c                |  53 +-
- arch/x86/include/asm/sev.h              |   2 +-
- drivers/virt/coco/sev-guest/sev-guest.c |   7 +-
- include/crypto/gcm.h                    |  21 -
- lib/crypto/Kconfig                      |   6 -
- lib/crypto/Makefile                     |   3 -
- lib/crypto/aesgcm.c                     | 721 ------------------------
- 8 files changed, 26 insertions(+), 789 deletions(-)
- delete mode 100644 lib/crypto/aesgcm.c
-
-
-base-commit: e4f23159c8d09b6b15d47f2c95e0a3e7c62f52a2
+diff --git a/arch/x86/coco/sev/core.c b/arch/x86/coco/sev/core.c
+index 54b122f6ef96a..cc292d7c6fd1e 100644
+--- a/arch/x86/coco/sev/core.c
++++ b/arch/x86/coco/sev/core.c
+@@ -1867,15 +1867,6 @@ int snp_send_guest_request(struct snp_msg_desc *mdesc, struct snp_guest_req *req
+ 	u64 seqno;
+ 	int rc;
+ 
+-	/*
+-	 * enc_payload() calls aesgcm_encrypt(), which can potentially offload to HW.
+-	 * The offload's DMA SG list of data to encrypt has to be in linear mapping.
+-	 */
+-	if (!virt_addr_valid(req->req_buf) || !virt_addr_valid(req->resp_buf)) {
+-		pr_warn("AES-GSM buffers must be in linear mapping");
+-		return -EINVAL;
+-	}
+-
+ 	guard(mutex)(&snp_cmd_mutex);
+ 
+ 	/* Check if the VMPCK is not empty */
 -- 
 2.55.0
 
