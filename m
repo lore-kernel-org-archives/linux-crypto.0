@@ -1,225 +1,569 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mail.codelabs.ch (mail.codelabs.ch [109.202.192.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E62843BDBF
-	for <linux-crypto@vger.kernel.org>; Wed, 22 Jul 2026 15:37:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EAD43D1CAA
+	for <linux-crypto@vger.kernel.org>; Wed, 22 Jul 2026 15:42:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.202.192.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784734644; cv=none; b=YL6Y62nmXEqfHrdKFCxy1kvg2NJrtGQLzF+GlVCgf/e+qhr3vIUpSEDNjVed6g6VY5TOB8gQK/lItE6UOR+y0EdtA6QiLkRP6xw72bOfpUlK7dDTQ0PMab5NOMk92Lu69cj/PGZQfxheY1rn1oHtZBzzID7R2FgSjb2+VxAUUjA=
+	t=1784734954; cv=none; b=lfLMHQoMSyHXjGh8jj3vQrgDeFznGDQxT2sk1NyPvUBbUsTcY1R9CTCh/U78pQVgmK0PiwQcwsTov/O0vVMMFEOl6oOIgXP3T0rgN02cUrV/Zv0SDC7XwMEJk+C8Q1nuqbGaf752QTPJtC0I6QByHckZgC3byQpzdIT5fXQT09c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784734644; c=relaxed/simple;
-	bh=UloBQ8Ez6MOjDxcfoVY4Udfg1eK6fAx1N25vx7IHZAo=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=J5guNkCXbr4Cf6KfKhuuMIh3MBwNq9OdJXqQAXxLT9fcT3O/oVZtEtb00qHBKNTPDvSFmWFObDwxUbrya3j8hE4dPals/mw00XjXcrBettd15GnwREa3ExLtORs3drgZYqSThmuAdbCA6/HEVL5eLwiv+eSwxkFVZ+jTqbdHrLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lFi8Rf1I; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784734954; c=relaxed/simple;
+	bh=PNbeJWa//sC9MKmIEe2yX63ELnFYhs/JtHfKvihHmwA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e6YB54OpxYI3hY8FsG/NuQp7IxNWqB9HmfDbPjzaFiUZOVkMxPhXSZADFAr4n3rsqD6wuojpKWYalic3ftO+P+lhjROJHvdqgiKbuMcWQfLyrOrKbjRmF4nWYVcb1OYOxKygraZ6hU/aBJ1UHxnkTw9nxZYKF1ZHHRI/vlx85uI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=strongswan.org; spf=pass smtp.mailfrom=strongswan.org; dkim=pass (2048-bit key) header.d=strongswan.org header.i=@strongswan.org header.b=tMT/fO4W; arc=none smtp.client-ip=109.202.192.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=strongswan.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strongswan.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lFi8Rf1I"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 282CE1F00A3A
-	for <linux-crypto@vger.kernel.org>; Wed, 22 Jul 2026 15:37:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784734643;
-	bh=HaoajPDNv29VaTIIf6GrfEb1E+GCgrFVcWpJuxlF4Rw=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=lFi8Rf1IsOXJpIOubPX98Zty9P9JVlsID0tAar9u3iKPprH9il6ipE3Fz1O0aWr5K
-	 PNcKrwD6oUrMol+TbiMeIthev6fyQWsaqENJmb9fbOQYRcU4sK1/Lm1M+gF7D8Dyb2
-	 3ZGPwfq5ullfZM3mmPFc5z5HZ9bQlVMmQy4bFtjUb481MNdxzlC9m2+nP1zv3BiNEk
-	 t2zVL0qjrMqRZoPrMe6rOUWQQRVoZO1oWIudPPMN9V1fRh2YXPT/LL30mMFQVDju5A
-	 2US7Cmx4bPQSGjRJ0+WKBhaHfLqKJQK4KM5epckitYuPtxBSsjNZUFJR2dPMHzp5cl
-	 YwAggJZIs3/4A==
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-39dbe684115so46437291fa.1
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Jul 2026 08:37:23 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RoG1CbwcZLY/H+t6PMpG4W3XAvnNGQnxOy4TDk3UG33tI5jwAZeazYDAwC1lPEqHgzj5b+6NEVo4aCAFEI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxt+vsDclxkp7ZWoZ/WIz4gRSTwk4dU7o6DEww7AzVYFUUO2Olc
-	lvjFdwsZel+B2pQHAnn0jGpILMQGDtL9cBEsPUxQZ2reLFUEa8OM/Jn9tXM/i+GRI3QmbR3cBfW
-	A3yfpytaYTiNkbtFpbCUBxqt5UfkBasDatSNrB5awhg==
-X-Received: by 2002:a05:6512:2c8c:b0:5b0:6343:a298 with SMTP id
- 2adb3069b0e04-5b2a9b6b30fmr903822e87.7.1784734641868; Wed, 22 Jul 2026
- 08:37:21 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Wed, 22 Jul 2026 08:37:19 -0700
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Wed, 22 Jul 2026 08:37:19 -0700
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <amDRxPkdvbA-iVer@linaro.org>
+	dkim=pass (2048-bit key) header.d=strongswan.org header.i=@strongswan.org header.b="tMT/fO4W"
+Received: from localhost (localhost [127.0.0.1])
+	by mail.codelabs.ch (Postfix) with ESMTP id 1B7585A0005;
+	Wed, 22 Jul 2026 17:33:18 +0200 (CEST)
+Received: from mail.codelabs.ch ([127.0.0.1])
+ by localhost (fenrir.codelabs.ch [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id dKOXXAnqrf2f; Wed, 22 Jul 2026 17:33:16 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=strongswan.org;
+	s=default; t=1784734396;
+	bh=PNbeJWa//sC9MKmIEe2yX63ELnFYhs/JtHfKvihHmwA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=tMT/fO4W5S9AoKo6QL3KIDRV1QMj2QFSEQhHAcXGaPy/nlHukOYSADgneBzb/M1yo
+	 g2F25P9iUa3BfDkkRmxUvCV+C1g374HoYVSrR3K+x6Kcb3V+r/qa1B6KtJhBmtS7zw
+	 wKUV6GYCcsaCk/kmTViTlvYjXzWrAMqHVRZlWZEvSdCOmPam7eyJabyslAp6Mn3Zz5
+	 FoZd7MjU3VYsFKJjDpLAhWnbZHHVwFdJOhQBk+aAf/MDChOGvwqe7U1orpUvfsxIkh
+	 ZPuM+hsLHuFyRCIBtz7xWGJWfBgqpMfjRarn6PdWoGvEMO7oX8dchaKazYnD6xw1mN
+	 ZOlgoOSGcAgZw==
+Received: from ee00200a.home (unknown [185.12.128.224])
+	by mail.codelabs.ch (Postfix) with ESMTPSA id A60E45A0004;
+	Wed, 22 Jul 2026 17:33:16 +0200 (CEST)
+From: Martin Willi <martin@strongswan.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	linux-crypto@vger.kernel.org
+Subject: [PATCH] lib/crypto: x86/chacha: Add a 16-block AVX-512 variant
+Date: Wed, 22 Jul 2026 17:32:47 +0200
+Message-ID: <20260722153247.630519-1-martin@strongswan.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260721-qcom-qce-cmd-descr-v23-0-1be02deffda9@oss.qualcomm.com>
- <20260721-qcom-qce-cmd-descr-v23-6-1be02deffda9@oss.qualcomm.com>
- <20260721134853.2B2401F000E9@smtp.kernel.org> <amCGXUUd4VmuQRGD@linaro.org>
- <CAMRc=MfBNB0pvv1kPPcswE4Y2m7PXBO49bwJg=v0+aY=JmJKWw@mail.gmail.com>
- <amC7_M-HjVZ3sQuT@linaro.org> <CAMRc=MdnSyPmbK0skMx686=wSe52nnuWgCNJ0uSoKs_=HyAq-Q@mail.gmail.com>
- <amDRxPkdvbA-iVer@linaro.org>
-Date: Wed, 22 Jul 2026 08:37:19 -0700
-X-Gmail-Original-Message-ID: <CAMRc=Me523xQbfJvML9taJ-fR128SJurJS4eX9N9E9WtHF5W5Q@mail.gmail.com>
-X-Gm-Features: AUfX_mxQ1adakAy8nL_SM-KsxZbJKd9YkddzHJ2sI4McTRRY2kICnwBZ3NzCrbU
-Message-ID: <CAMRc=Me523xQbfJvML9taJ-fR128SJurJS4eX9N9E9WtHF5W5Q@mail.gmail.com>
-Subject: Re: [PATCH v23 06/14] dmaengine: qcom: bam_dma: add support for BAM locking
-To: Stephan Gerhold <stephan.gerhold@linaro.org>
-Cc: Vinod Koul <vkoul@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Thara Gopinath <thara.gopinath@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Udit Tiwari <quic_utiwari@quicinc.com>, 
-	Md Sadre Alam <mdalam@qti.qualcomm.com>, Dmitry Baryshkov <lumag@kernel.org>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Mukesh Kumar Savaliya <mukesh.savaliya@oss.qualcomm.com>, 
-	Peter Ujfalusi <peter.ujfalusi@gmail.com>, Michal Simek <michal.simek@amd.com>, 
-	Frank Li <Frank.Li@kernel.org>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	Vignesh Raghavendra <vigneshr@ti.com>, dmaengine@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	sashiko-reviews@lists.linux.dev, 
-	Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, 
-	Bartosz Golaszewski <brgl@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Wed, 22 Jul 2026 16:20:52 +0200, Stephan Gerhold
-<stephan.gerhold@linaro.org> said:
-> On Wed, Jul 22, 2026 at 07:11:10AM -0700, Bartosz Golaszewski wrote:
->> On Wed, 22 Jul 2026 14:47:56 +0200, Stephan Gerhold
->> <stephan.gerhold@linaro.org> said:
->> > On Wed, Jul 22, 2026 at 02:34:52AM -0700, Bartosz Golaszewski wrote:
->> >> On Wed, 22 Jul 2026 10:59:09 +0200, Stephan Gerhold
->> >> <stephan.gerhold@linaro.org> said:
->> >> > On Tue, Jul 21, 2026 at 01:48:52PM +0000, sashiko-bot@kernel.org wrote:
->> >> >> Thank you for your contribution! Sashiko AI review found 5 potential issue(s) to consider:
->> >> >> - [High] State leak causing hardware misconfiguration on channel reuse due to uncleared `lock_scratchpad_addr` and hardcoded direction.
->> >> >> - [High] Channel state corruption when `bam_slave_config` fails validation.
->> >> >> - [High] Infinite BH workqueue loop and unratelimited log flood on memory allocation failure.
->> >> >> - [High] DMA API violation: `lock_ce` buffer shares a cacheline with frequently CPU-modified struct members.
->> >> >> - [Low] Unused assignment of `hdesc` in IRQ handler.
->> >> >> --
->> >> >>
->> >> >> --- Patch [6]: [PATCH v23 06/14] dmaengine: qcom: bam_dma: add support for BAM locking ---
->> >> >> commit 8b44c5e4935cbb61832adb3262df00b3b606a283
->> >> >> Author: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
->> >> >>
->> >> >> dmaengine: qcom: bam_dma: add support for BAM locking
->> >> >>
->> >> >> This commit adds support for BAM pipe locking by prepending and appending
->> >> >> dummy command descriptors with LOCK/UNLOCK bits when starting DMA on a TX
->> >> >> channel. It uses a peripheral-local scratchpad address communicated via slave
->> >> >> config for the dummy writes.
->> >> >>
->> >> >> > diff --git a/drivers/dma/qcom/bam_dma.c b/drivers/dma/qcom/bam_dma.c
->> >> >> > index f3e713a5259c2..411c60c4433e2 100644
->> >> >> > --- a/drivers/dma/qcom/bam_dma.c
->> >> >> > +++ b/drivers/dma/qcom/bam_dma.c
->> >> [...]
->> >> >> [ ... ]
->> >> >> > @@ -1064,6 +1197,7 @@ static void bam_start_dma(struct bam_chan *bchan)
->> >> >> >
->> >> >> >  	lockdep_assert_held(&bchan->vc.lock);
->> >> >> >
->> >> >> > +	vd = vchan_next_desc(&bchan->vc);
->> >> >> >  	if (!vd)
->> >> >> >  		return;
->> >> >> >
->> >> >> > @@ -1072,6 +1206,24 @@ static void bam_start_dma(struct bam_chan *bchan)
->> >> >> >  		return;
->> >> >> >
->> >> >> >  	while (vd && !IS_BUSY(bchan)) {
->> >> >> > +		/*
->> >> >> > +		 * Open a LOCK/UNLOCK bracket around each fresh sequence.
->> >> >> > +		 * Sentinels inserted by bam_setup_pipe_lock() are skipped: they
->> >> >> > +		 * already have bam_locked set and must not trigger a second pair.
->> >> >> > +		 */
->> >> >> > +		if (!bchan->bam_locked) {
->> >> >> > +			ret = bam_setup_pipe_lock(bchan);
->> >> >> > +			if (ret) {
->> >> >> > +				dev_err_ratelimited(bdev->dev,
->> >> >> > +					"failed to setup the pipe lock, deferring transfer: %d\n",
->> >> >> > +					ret);
->> >> >> > +				queue_work(system_bh_highpri_wq, &bdev->work);
->> >> >> > +				break;
->> >> >> > +			}
->> >> >>
->> >> >> [Severity: High]
->> >> >> Does requeuing to a high-priority BH workqueue upon ENOMEM cause CPU
->> >> >> starvation? Because system_bh_highpri_wq executes in softirq context,
->> >> >> requeuing immediately without sleeping prevents the memory reclaim needed
->> >> >> to resolve the GFP_NOWAIT failure, leading to an infinite spin loop.
->> >> >>
->> >> >
->> >> > It looks like my suggestion to queue_work() again in the error path of
->> >> > bam_start_dma() wasn't great if we end up causing an infinite spin loop.
->> >> > We do need to retry somehow or report an error though, I don't think
->> >> > aborting and leaving the desccriptors completely unhandled is an option
->> >> > either... :(
->> >> >
->> >> > One option would be to try to avoid the allocation and write the lock
->> >> > descriptors directly into the FIFO, but this will probably get really
->> >> > messy as well, since you would need to carefully modify the FIFO
->> >> > management in several functions ...
->> >> >
->> >> > I don't have a good spontaenous idea how to solve this right now. :/
->> >> >
->> >>
->> >> Pre-allocate the lock descriptors (if needed) in bam_prep_slave_sg()? As in:
->> >> call bam_make_lock_desc() in bam_prep_slave_sg(), store the descriptors and
->> >> make bam_setup_pipe_lock() return void as it will no longer be possible for it
->> >> to fail? It would just grab the preallocated descriptors.
->> >>
->> >
->> > I considered suggesting this, but how do you know which descriptor needs
->> > it in bam_prep_slave_sg()? It's just the allocation, afaict it doesn't
->> > tell you anything about the order in which they will be submitted. :/
->> >
->> > We could always allocate the extra lock descriptors and waste the extra
->> > memory for the descriptors that won't need it. That should work, but is
->> > also not great ...
->> >
->>
->> Oh, I was thinking about having pointers to lock/unlock descriptors in struct
->> bam_chan and to just grab them in bam_setup_pipe_lock() when needed and then
->> next time we enter bam_slave_prep_sg(), we see we consumed them so let's
->> re-allocate them. And of course: don't do it at all if pipe locking is not
->> supported.
->>
->
-> Sadly, I think(?) from the API perspective it is valid to
-> dmaengine_prep_slave_*() a couple of buffers and them issue them
-> separately, e.g.:
->
-> 	desc1= dmaengine_prep_slave_*();
-> 	desc2 = dmaengine_prep_slave_*();
->
-> 	dmaengine_submit(desc1);
-> 	dma_async_issue_pending(chan);
->
-> 	// do a bunch of other random stuff
-> 	// bam_setup_pipe_lock() consumes lock descriptors
->
-> 	dmaengine_submit(desc2);
-> 	dma_async_issue_pending(chan);
->
-> In this situation, we wouldn't have any lock descriptors allocated
-> anymore?
->
-> Thanks,
-> Stephan
->
+The existing AVX-512VL code processes at most eight blocks at a time
+using 256-bit ymm registers. This width was chosen deliberately to
+avoid the heavy core down-clocking that 512-bit zmm instructions
+triggered on Skylake-X.
 
-I'm not really sure this is correct. From:
+That penalty is gone on more recent AVX-512 microarchitectures, where
+full 512-bit zmm registers can encrypt sixteen blocks per invocation
+and roughly double the data-level parallelism for bulk traffic. Add
+such a 16-block variant and dispatch to it for inputs larger than
+eight blocks, ahead of the AVX-512VL path which still handles the
+remainder.
 
-    https://www.kernel.org/doc/html/latest/driver-api/dmaengine/client.html
+On a Zen 5, the tcrypt speed test for chacha20 with 1024-byte blocks
+reports 7.5 GB/s with the new variant versus 4.2 GB/s for the
+AVX-512VL path, roughly a 1.8x improvement.
 
-"Some DMA engine drivers may hold a spinlock between a successful preparation
-and submission so it is important that these two operations are closely
-paired."
+Enable it only on CPUs advertising AVX-512F with full zmm XSAVE state,
+and keep it disabled when X86_FEATURE_PREFER_YMM is set so
+down-clocking parts continue to use the ymm-based AVX-512VL path.
 
-What you presented above looks like abuse of the DMA engine API in light of
-this statement. I also haven't found any place in the kernel where this would
-happen.
+Signed-off-by: Martin Willi <martin@strongswan.org>
+---
+Eric,
 
-What the docs say is legal is preparing/submitting a new transaction from
-a completion callback but in this case the lock/unlock descriptors will be
-refilled by the call to prep_slave_sg().
+This will conflict with your cpu_has_xfeatures() removal [1]. Let me know
+if I shall drop the cpu_has_xfeatures(XFEATURE_MASK_AVX512) line.
 
-I would go with pre-allocated descriptors references from bam_chan,
-re-allocated (if needed) on each prep_slave_sg() and just WARN() or even BUG()
-if we ever end up not having any descriptors ready.
+[1] https://lore.kernel.org/all/20260626043731.319287-5-ebiggers@kernel.org/
+---
+ lib/crypto/Makefile                   |   1 +
+ lib/crypto/x86/chacha-avx512-x86_64.S | 403 ++++++++++++++++++++++++++
+ lib/crypto/x86/chacha.h               |  30 +-
+ 3 files changed, 433 insertions(+), 1 deletion(-)
+ create mode 100644 lib/crypto/x86/chacha-avx512-x86_64.S
 
-Bart
+diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
+index f1e9bf89785f..6b9668d414c2 100644
+--- a/lib/crypto/Makefile
++++ b/lib/crypto/Makefile
+@@ -118,6 +118,7 @@ libchacha-$(CONFIG_RISCV) += riscv/chacha-riscv64-zvkb.o
+ libchacha-$(CONFIG_S390) += s390/chacha-s390.o
+ libchacha-$(CONFIG_X86) += x86/chacha-ssse3-x86_64.o \
+ 			   x86/chacha-avx2-x86_64.o \
++			   x86/chacha-avx512-x86_64.o \
+ 			   x86/chacha-avx512vl-x86_64.o
+ endif # CONFIG_CRYPTO_LIB_CHACHA_ARCH
+ 
+diff --git a/lib/crypto/x86/chacha-avx512-x86_64.S b/lib/crypto/x86/chacha-avx512-x86_64.S
+new file mode 100644
+index 000000000000..c7e35fa3a5e7
+--- /dev/null
++++ b/lib/crypto/x86/chacha-avx512-x86_64.S
+@@ -0,0 +1,403 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * ChaCha 256-bit cipher algorithm, x64 AVX-512 functions
++ *
++ * Copyright (C) 2026 Martin Willi
++ */
++
++#include <linux/linkage.h>
++
++.section	.rodata.cst64.CTR16BL, "aM", @progbits, 64
++.align 64
++CTR16BL:	.octa 0x00000003000000020000000100000000
++		.octa 0x00000007000000060000000500000004
++		.octa 0x0000000b0000000a0000000900000008
++		.octa 0x0000000f0000000e0000000d0000000c
++
++.text
++
++SYM_FUNC_START(chacha_16block_xor_avx512)
++	# %rdi: Input state matrix, s
++	# %rsi: up to 16 data blocks output, o
++	# %rdx: up to 16 data blocks input, i
++	# %rcx: input/output length in bytes
++	# %r8d: nrounds
++
++	# This function encrypts sixteen consecutive ChaCha blocks by loading
++	# the state matrix in 512-bit AVX-512 (zmm) registers sixteen times.
++	# Compared to AVX-512VL, this doubles the data-level parallelism using
++	# full-width zmm registers, which pays off on CPUs that do not throttle
++	# on 512-bit instructions.
++
++	vzeroupper
++
++	# x0..15[0-15] = s[0..15]
++	vpbroadcastd	0x00(%rdi),%zmm0
++	vpbroadcastd	0x04(%rdi),%zmm1
++	vpbroadcastd	0x08(%rdi),%zmm2
++	vpbroadcastd	0x0c(%rdi),%zmm3
++	vpbroadcastd	0x10(%rdi),%zmm4
++	vpbroadcastd	0x14(%rdi),%zmm5
++	vpbroadcastd	0x18(%rdi),%zmm6
++	vpbroadcastd	0x1c(%rdi),%zmm7
++	vpbroadcastd	0x20(%rdi),%zmm8
++	vpbroadcastd	0x24(%rdi),%zmm9
++	vpbroadcastd	0x28(%rdi),%zmm10
++	vpbroadcastd	0x2c(%rdi),%zmm11
++	vpbroadcastd	0x30(%rdi),%zmm12
++	vpbroadcastd	0x34(%rdi),%zmm13
++	vpbroadcastd	0x38(%rdi),%zmm14
++	vpbroadcastd	0x3c(%rdi),%zmm15
++
++	# x12 += counter values 0-15
++	vpaddd		CTR16BL(%rip),%zmm12,%zmm12
++
++	# Only x12 carries a per-block value (the counter), so only it needs a
++	# saved copy for the final state add. The other fifteen words are scalar
++	# broadcasts of s[], re-added at the end via {1to16} embedded broadcast
++	# straight from the state matrix, dropping fifteen vmovdqa64 copies.
++	vmovdqa64	%zmm12,%zmm28
++
++.Ldoubleround16:
++	# x0 += x4, x12 = rotl32(x12 ^ x0, 16)
++	vpaddd		%zmm0,%zmm4,%zmm0
++	vpxord		%zmm0,%zmm12,%zmm12
++	vprold		$16,%zmm12,%zmm12
++	# x1 += x5, x13 = rotl32(x13 ^ x1, 16)
++	vpaddd		%zmm1,%zmm5,%zmm1
++	vpxord		%zmm1,%zmm13,%zmm13
++	vprold		$16,%zmm13,%zmm13
++	# x2 += x6, x14 = rotl32(x14 ^ x2, 16)
++	vpaddd		%zmm2,%zmm6,%zmm2
++	vpxord		%zmm2,%zmm14,%zmm14
++	vprold		$16,%zmm14,%zmm14
++	# x3 += x7, x15 = rotl32(x15 ^ x3, 16)
++	vpaddd		%zmm3,%zmm7,%zmm3
++	vpxord		%zmm3,%zmm15,%zmm15
++	vprold		$16,%zmm15,%zmm15
++
++	# x8 += x12, x4 = rotl32(x4 ^ x8, 12)
++	vpaddd		%zmm12,%zmm8,%zmm8
++	vpxord		%zmm8,%zmm4,%zmm4
++	vprold		$12,%zmm4,%zmm4
++	# x9 += x13, x5 = rotl32(x5 ^ x9, 12)
++	vpaddd		%zmm13,%zmm9,%zmm9
++	vpxord		%zmm9,%zmm5,%zmm5
++	vprold		$12,%zmm5,%zmm5
++	# x10 += x14, x6 = rotl32(x6 ^ x10, 12)
++	vpaddd		%zmm14,%zmm10,%zmm10
++	vpxord		%zmm10,%zmm6,%zmm6
++	vprold		$12,%zmm6,%zmm6
++	# x11 += x15, x7 = rotl32(x7 ^ x11, 12)
++	vpaddd		%zmm15,%zmm11,%zmm11
++	vpxord		%zmm11,%zmm7,%zmm7
++	vprold		$12,%zmm7,%zmm7
++
++	# x0 += x4, x12 = rotl32(x12 ^ x0, 8)
++	vpaddd		%zmm0,%zmm4,%zmm0
++	vpxord		%zmm0,%zmm12,%zmm12
++	vprold		$8,%zmm12,%zmm12
++	# x1 += x5, x13 = rotl32(x13 ^ x1, 8)
++	vpaddd		%zmm1,%zmm5,%zmm1
++	vpxord		%zmm1,%zmm13,%zmm13
++	vprold		$8,%zmm13,%zmm13
++	# x2 += x6, x14 = rotl32(x14 ^ x2, 8)
++	vpaddd		%zmm2,%zmm6,%zmm2
++	vpxord		%zmm2,%zmm14,%zmm14
++	vprold		$8,%zmm14,%zmm14
++	# x3 += x7, x15 = rotl32(x15 ^ x3, 8)
++	vpaddd		%zmm3,%zmm7,%zmm3
++	vpxord		%zmm3,%zmm15,%zmm15
++	vprold		$8,%zmm15,%zmm15
++
++	# x8 += x12, x4 = rotl32(x4 ^ x8, 7)
++	vpaddd		%zmm12,%zmm8,%zmm8
++	vpxord		%zmm8,%zmm4,%zmm4
++	vprold		$7,%zmm4,%zmm4
++	# x9 += x13, x5 = rotl32(x5 ^ x9, 7)
++	vpaddd		%zmm13,%zmm9,%zmm9
++	vpxord		%zmm9,%zmm5,%zmm5
++	vprold		$7,%zmm5,%zmm5
++	# x10 += x14, x6 = rotl32(x6 ^ x10, 7)
++	vpaddd		%zmm14,%zmm10,%zmm10
++	vpxord		%zmm10,%zmm6,%zmm6
++	vprold		$7,%zmm6,%zmm6
++	# x11 += x15, x7 = rotl32(x7 ^ x11, 7)
++	vpaddd		%zmm15,%zmm11,%zmm11
++	vpxord		%zmm11,%zmm7,%zmm7
++	vprold		$7,%zmm7,%zmm7
++
++	# x0 += x5, x15 = rotl32(x15 ^ x0, 16)
++	vpaddd		%zmm0,%zmm5,%zmm0
++	vpxord		%zmm0,%zmm15,%zmm15
++	vprold		$16,%zmm15,%zmm15
++	# x1 += x6, x12 = rotl32(x12 ^ x1, 16)
++	vpaddd		%zmm1,%zmm6,%zmm1
++	vpxord		%zmm1,%zmm12,%zmm12
++	vprold		$16,%zmm12,%zmm12
++	# x2 += x7, x13 = rotl32(x13 ^ x2, 16)
++	vpaddd		%zmm2,%zmm7,%zmm2
++	vpxord		%zmm2,%zmm13,%zmm13
++	vprold		$16,%zmm13,%zmm13
++	# x3 += x4, x14 = rotl32(x14 ^ x3, 16)
++	vpaddd		%zmm3,%zmm4,%zmm3
++	vpxord		%zmm3,%zmm14,%zmm14
++	vprold		$16,%zmm14,%zmm14
++
++	# x10 += x15, x5 = rotl32(x5 ^ x10, 12)
++	vpaddd		%zmm15,%zmm10,%zmm10
++	vpxord		%zmm10,%zmm5,%zmm5
++	vprold		$12,%zmm5,%zmm5
++	# x11 += x12, x6 = rotl32(x6 ^ x11, 12)
++	vpaddd		%zmm12,%zmm11,%zmm11
++	vpxord		%zmm11,%zmm6,%zmm6
++	vprold		$12,%zmm6,%zmm6
++	# x8 += x13, x7 = rotl32(x7 ^ x8, 12)
++	vpaddd		%zmm13,%zmm8,%zmm8
++	vpxord		%zmm8,%zmm7,%zmm7
++	vprold		$12,%zmm7,%zmm7
++	# x9 += x14, x4 = rotl32(x4 ^ x9, 12)
++	vpaddd		%zmm14,%zmm9,%zmm9
++	vpxord		%zmm9,%zmm4,%zmm4
++	vprold		$12,%zmm4,%zmm4
++
++	# x0 += x5, x15 = rotl32(x15 ^ x0, 8)
++	vpaddd		%zmm0,%zmm5,%zmm0
++	vpxord		%zmm0,%zmm15,%zmm15
++	vprold		$8,%zmm15,%zmm15
++	# x1 += x6, x12 = rotl32(x12 ^ x1, 8)
++	vpaddd		%zmm1,%zmm6,%zmm1
++	vpxord		%zmm1,%zmm12,%zmm12
++	vprold		$8,%zmm12,%zmm12
++	# x2 += x7, x13 = rotl32(x13 ^ x2, 8)
++	vpaddd		%zmm2,%zmm7,%zmm2
++	vpxord		%zmm2,%zmm13,%zmm13
++	vprold		$8,%zmm13,%zmm13
++	# x3 += x4, x14 = rotl32(x14 ^ x3, 8)
++	vpaddd		%zmm3,%zmm4,%zmm3
++	vpxord		%zmm3,%zmm14,%zmm14
++	vprold		$8,%zmm14,%zmm14
++
++	# x10 += x15, x5 = rotl32(x5 ^ x10, 7)
++	vpaddd		%zmm15,%zmm10,%zmm10
++	vpxord		%zmm10,%zmm5,%zmm5
++	vprold		$7,%zmm5,%zmm5
++	# x11 += x12, x6 = rotl32(x6 ^ x11, 7)
++	vpaddd		%zmm12,%zmm11,%zmm11
++	vpxord		%zmm11,%zmm6,%zmm6
++	vprold		$7,%zmm6,%zmm6
++	# x8 += x13, x7 = rotl32(x7 ^ x8, 7)
++	vpaddd		%zmm13,%zmm8,%zmm8
++	vpxord		%zmm8,%zmm7,%zmm7
++	vprold		$7,%zmm7,%zmm7
++	# x9 += x14, x4 = rotl32(x4 ^ x9, 7)
++	vpaddd		%zmm14,%zmm9,%zmm9
++	vpxord		%zmm9,%zmm4,%zmm4
++	vprold		$7,%zmm4,%zmm4
++
++	sub		$2,%r8d
++	jnz		.Ldoubleround16
++
++	# x0..15[0-15] += s[0..15]; all but x12 broadcast straight from s[]
++	vpaddd		0x00(%rdi){1to16},%zmm0,%zmm0
++	vpaddd		0x04(%rdi){1to16},%zmm1,%zmm1
++	vpaddd		0x08(%rdi){1to16},%zmm2,%zmm2
++	vpaddd		0x0c(%rdi){1to16},%zmm3,%zmm3
++	vpaddd		0x10(%rdi){1to16},%zmm4,%zmm4
++	vpaddd		0x14(%rdi){1to16},%zmm5,%zmm5
++	vpaddd		0x18(%rdi){1to16},%zmm6,%zmm6
++	vpaddd		0x1c(%rdi){1to16},%zmm7,%zmm7
++	vpaddd		0x20(%rdi){1to16},%zmm8,%zmm8
++	vpaddd		0x24(%rdi){1to16},%zmm9,%zmm9
++	vpaddd		0x28(%rdi){1to16},%zmm10,%zmm10
++	vpaddd		0x2c(%rdi){1to16},%zmm11,%zmm11
++	vpaddd		%zmm28,%zmm12,%zmm12
++	vpaddd		0x34(%rdi){1to16},%zmm13,%zmm13
++	vpaddd		0x38(%rdi){1to16},%zmm14,%zmm14
++	vpaddd		0x3c(%rdi){1to16},%zmm15,%zmm15
++
++	# Transpose the 16x16 dword matrix: register n holds word n of all 16
++	# blocks, but we need register n to hold all 16 words of block n. This
++	# is the 8-block (vperm2i128) transpose extended by one level, since a
++	# zmm holds four 128-bit lanes instead of two.
++
++	# interleave 32-bit words in state n, n+1 -> zmm16..31
++	vpunpckldq	%zmm1,%zmm0,%zmm16
++	vpunpckhdq	%zmm1,%zmm0,%zmm17
++	vpunpckldq	%zmm3,%zmm2,%zmm18
++	vpunpckhdq	%zmm3,%zmm2,%zmm19
++	vpunpckldq	%zmm5,%zmm4,%zmm20
++	vpunpckhdq	%zmm5,%zmm4,%zmm21
++	vpunpckldq	%zmm7,%zmm6,%zmm22
++	vpunpckhdq	%zmm7,%zmm6,%zmm23
++	vpunpckldq	%zmm9,%zmm8,%zmm24
++	vpunpckhdq	%zmm9,%zmm8,%zmm25
++	vpunpckldq	%zmm11,%zmm10,%zmm26
++	vpunpckhdq	%zmm11,%zmm10,%zmm27
++	vpunpckldq	%zmm13,%zmm12,%zmm28
++	vpunpckhdq	%zmm13,%zmm12,%zmm29
++	vpunpckldq	%zmm15,%zmm14,%zmm30
++	vpunpckhdq	%zmm15,%zmm14,%zmm31
++
++	# interleave 64-bit words in state n, n+2 -> zmm0..15
++	vpunpcklqdq	%zmm18,%zmm16,%zmm0
++	vpunpckhqdq	%zmm18,%zmm16,%zmm1
++	vpunpcklqdq	%zmm19,%zmm17,%zmm2
++	vpunpckhqdq	%zmm19,%zmm17,%zmm3
++	vpunpcklqdq	%zmm22,%zmm20,%zmm4
++	vpunpckhqdq	%zmm22,%zmm20,%zmm5
++	vpunpcklqdq	%zmm23,%zmm21,%zmm6
++	vpunpckhqdq	%zmm23,%zmm21,%zmm7
++	vpunpcklqdq	%zmm26,%zmm24,%zmm8
++	vpunpckhqdq	%zmm26,%zmm24,%zmm9
++	vpunpcklqdq	%zmm27,%zmm25,%zmm10
++	vpunpckhqdq	%zmm27,%zmm25,%zmm11
++	vpunpcklqdq	%zmm30,%zmm28,%zmm12
++	vpunpckhqdq	%zmm30,%zmm28,%zmm13
++	vpunpcklqdq	%zmm31,%zmm29,%zmm14
++	vpunpckhqdq	%zmm31,%zmm29,%zmm15
++
++	# At this point lane L of zmm{r}, zmm{4+r}, zmm{8+r}, zmm{12+r} holds
++	# word groups 0-3, 4-7, 8-11, 12-15 of block (4*L + r). Gather the four
++	# 128-bit lanes of a block into one register with two levels of 128-bit
++	# lane shuffles.
++
++	# interleave 128-bit lanes in state n, n+4 -> zmm16..31
++	vshufi64x2	$0x88,%zmm4,%zmm0,%zmm16
++	vshufi64x2	$0x88,%zmm12,%zmm8,%zmm20
++	vshufi64x2	$0xdd,%zmm4,%zmm0,%zmm24
++	vshufi64x2	$0xdd,%zmm12,%zmm8,%zmm28
++	vshufi64x2	$0x88,%zmm5,%zmm1,%zmm17
++	vshufi64x2	$0x88,%zmm13,%zmm9,%zmm21
++	vshufi64x2	$0xdd,%zmm5,%zmm1,%zmm25
++	vshufi64x2	$0xdd,%zmm13,%zmm9,%zmm29
++	vshufi64x2	$0x88,%zmm6,%zmm2,%zmm18
++	vshufi64x2	$0x88,%zmm14,%zmm10,%zmm22
++	vshufi64x2	$0xdd,%zmm6,%zmm2,%zmm26
++	vshufi64x2	$0xdd,%zmm14,%zmm10,%zmm30
++	vshufi64x2	$0x88,%zmm7,%zmm3,%zmm19
++	vshufi64x2	$0x88,%zmm15,%zmm11,%zmm23
++	vshufi64x2	$0xdd,%zmm7,%zmm3,%zmm27
++	vshufi64x2	$0xdd,%zmm15,%zmm11,%zmm31
++
++	# Fuse the final 256-bit interleave into the xor/store ladder.
++	vshufi64x2	$0x88,%zmm20,%zmm16,%zmm0
++	cmp		$0x0040,%rcx
++	jl		.Lxorpart16
++	vpxord		0x0000(%rdx),%zmm0,%zmm0
++	vmovdqu64	%zmm0,0x0000(%rsi)
++
++	vshufi64x2	$0x88,%zmm21,%zmm17,%zmm0
++	cmp		$0x0080,%rcx
++	jl		.Lxorpart16
++	vpxord		0x0040(%rdx),%zmm0,%zmm0
++	vmovdqu64	%zmm0,0x0040(%rsi)
++
++	vshufi64x2	$0x88,%zmm22,%zmm18,%zmm0
++	cmp		$0x00c0,%rcx
++	jl		.Lxorpart16
++	vpxord		0x0080(%rdx),%zmm0,%zmm0
++	vmovdqu64	%zmm0,0x0080(%rsi)
++
++	vshufi64x2	$0x88,%zmm23,%zmm19,%zmm0
++	cmp		$0x0100,%rcx
++	jl		.Lxorpart16
++	vpxord		0x00c0(%rdx),%zmm0,%zmm0
++	vmovdqu64	%zmm0,0x00c0(%rsi)
++
++	vshufi64x2	$0x88,%zmm28,%zmm24,%zmm0
++	cmp		$0x0140,%rcx
++	jl		.Lxorpart16
++	vpxord		0x0100(%rdx),%zmm0,%zmm0
++	vmovdqu64	%zmm0,0x0100(%rsi)
++
++	vshufi64x2	$0x88,%zmm29,%zmm25,%zmm0
++	cmp		$0x0180,%rcx
++	jl		.Lxorpart16
++	vpxord		0x0140(%rdx),%zmm0,%zmm0
++	vmovdqu64	%zmm0,0x0140(%rsi)
++
++	vshufi64x2	$0x88,%zmm30,%zmm26,%zmm0
++	cmp		$0x01c0,%rcx
++	jl		.Lxorpart16
++	vpxord		0x0180(%rdx),%zmm0,%zmm0
++	vmovdqu64	%zmm0,0x0180(%rsi)
++
++	vshufi64x2	$0x88,%zmm31,%zmm27,%zmm0
++	cmp		$0x0200,%rcx
++	jl		.Lxorpart16
++	vpxord		0x01c0(%rdx),%zmm0,%zmm0
++	vmovdqu64	%zmm0,0x01c0(%rsi)
++
++	vshufi64x2	$0xdd,%zmm20,%zmm16,%zmm0
++	cmp		$0x0240,%rcx
++	jl		.Lxorpart16
++	vpxord		0x0200(%rdx),%zmm0,%zmm0
++	vmovdqu64	%zmm0,0x0200(%rsi)
++
++	vshufi64x2	$0xdd,%zmm21,%zmm17,%zmm0
++	cmp		$0x0280,%rcx
++	jl		.Lxorpart16
++	vpxord		0x0240(%rdx),%zmm0,%zmm0
++	vmovdqu64	%zmm0,0x0240(%rsi)
++
++	vshufi64x2	$0xdd,%zmm22,%zmm18,%zmm0
++	cmp		$0x02c0,%rcx
++	jl		.Lxorpart16
++	vpxord		0x0280(%rdx),%zmm0,%zmm0
++	vmovdqu64	%zmm0,0x0280(%rsi)
++
++	vshufi64x2	$0xdd,%zmm23,%zmm19,%zmm0
++	cmp		$0x0300,%rcx
++	jl		.Lxorpart16
++	vpxord		0x02c0(%rdx),%zmm0,%zmm0
++	vmovdqu64	%zmm0,0x02c0(%rsi)
++
++	vshufi64x2	$0xdd,%zmm28,%zmm24,%zmm0
++	cmp		$0x0340,%rcx
++	jl		.Lxorpart16
++	vpxord		0x0300(%rdx),%zmm0,%zmm0
++	vmovdqu64	%zmm0,0x0300(%rsi)
++
++	vshufi64x2	$0xdd,%zmm29,%zmm25,%zmm0
++	cmp		$0x0380,%rcx
++	jl		.Lxorpart16
++	vpxord		0x0340(%rdx),%zmm0,%zmm0
++	vmovdqu64	%zmm0,0x0340(%rsi)
++
++	vshufi64x2	$0xdd,%zmm30,%zmm26,%zmm0
++	cmp		$0x03c0,%rcx
++	jl		.Lxorpart16
++	vpxord		0x0380(%rdx),%zmm0,%zmm0
++	vmovdqu64	%zmm0,0x0380(%rsi)
++
++	vshufi64x2	$0xdd,%zmm31,%zmm27,%zmm0
++	cmp		$0x0400,%rcx
++	jl		.Lxorpart16
++	vpxord		0x03c0(%rdx),%zmm0,%zmm0
++	vmovdqu64	%zmm0,0x03c0(%rsi)
++
++.Ldone16:
++	vzeroupper
++	RET
++
++.Lxorpart16:
++	# xor remaining bytes from partial register into output
++	mov		%rcx,%rax
++	and		$0x3f,%rcx
++	jz		.Ldone16
++	mov		%rax,%r9
++	and		$~0x3f,%r9
++
++	mov		$1,%rax
++	shld		%cl,%rax,%rax
++	sub		$1,%rax
++	kmovq		%rax,%k1
++
++	vmovdqu8	(%rdx,%r9),%zmm1{%k1}{z}
++	vpxord		%zmm0,%zmm1,%zmm1
++	vmovdqu8	%zmm1,(%rsi,%r9){%k1}
++
++	jmp		.Ldone16
++
++SYM_FUNC_END(chacha_16block_xor_avx512)
+diff --git a/lib/crypto/x86/chacha.h b/lib/crypto/x86/chacha.h
+index 10cf8f1c569d..a42b3f45c281 100644
+--- a/lib/crypto/x86/chacha.h
++++ b/lib/crypto/x86/chacha.h
+@@ -39,9 +39,14 @@ asmlinkage void chacha_8block_xor_avx512vl(const struct chacha_state *state,
+ 					   u8 *dst, const u8 *src,
+ 					   unsigned int len, int nrounds);
+ 
++asmlinkage void chacha_16block_xor_avx512(const struct chacha_state *state,
++					  u8 *dst, const u8 *src,
++					  unsigned int len, int nrounds);
++
+ static __ro_after_init DEFINE_STATIC_KEY_FALSE(chacha_use_simd);
+ static __ro_after_init DEFINE_STATIC_KEY_FALSE(chacha_use_avx2);
+ static __ro_after_init DEFINE_STATIC_KEY_FALSE(chacha_use_avx512vl);
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(chacha_use_avx512);
+ 
+ static unsigned int chacha_advance(unsigned int len, unsigned int maxblocks)
+ {
+@@ -52,6 +57,23 @@ static unsigned int chacha_advance(unsigned int len, unsigned int maxblocks)
+ static void chacha_dosimd(struct chacha_state *state, u8 *dst, const u8 *src,
+ 			  unsigned int bytes, int nrounds)
+ {
++	if (static_branch_likely(&chacha_use_avx512)) {
++		while (bytes >= CHACHA_BLOCK_SIZE * 16) {
++			chacha_16block_xor_avx512(state, dst, src, bytes,
++						  nrounds);
++			bytes -= CHACHA_BLOCK_SIZE * 16;
++			src += CHACHA_BLOCK_SIZE * 16;
++			dst += CHACHA_BLOCK_SIZE * 16;
++			state->x[12] += 16;
++		}
++		if (bytes > CHACHA_BLOCK_SIZE * 8) {
++			chacha_16block_xor_avx512(state, dst, src, bytes,
++						  nrounds);
++			state->x[12] += chacha_advance(bytes, 16);
++			return;
++		}
++	}
++
+ 	if (static_branch_likely(&chacha_use_avx512vl)) {
+ 		while (bytes >= CHACHA_BLOCK_SIZE * 8) {
+ 			chacha_8block_xor_avx512vl(state, dst, src, bytes,
+@@ -170,7 +192,13 @@ static void chacha_mod_init_arch(void)
+ 		static_branch_enable(&chacha_use_avx2);
+ 
+ 		if (boot_cpu_has(X86_FEATURE_AVX512VL) &&
+-		    boot_cpu_has(X86_FEATURE_AVX512BW)) /* kmovq */
++		    boot_cpu_has(X86_FEATURE_AVX512BW)) { /* kmovq */
+ 			static_branch_enable(&chacha_use_avx512vl);
++
++			if (boot_cpu_has(X86_FEATURE_AVX512F) &&
++			    !boot_cpu_has(X86_FEATURE_PREFER_YMM) &&
++			    cpu_has_xfeatures(XFEATURE_MASK_AVX512, NULL))
++				static_branch_enable(&chacha_use_avx512);
++		}
+ 	}
+ }
+-- 
+2.53.0
+
