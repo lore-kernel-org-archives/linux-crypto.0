@@ -1,168 +1,191 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9198043F8CF
-	for <linux-crypto@vger.kernel.org>; Wed, 22 Jul 2026 08:33:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F12E23E2751;
+	Wed, 22 Jul 2026 08:54:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784709240; cv=none; b=ckySDD2nOh3Jj0/Ahxnn0DoNLrXfIgnuFWYhcaQ0N3k5BhOe8ZVwbmvTUoLJvKQE8D37Yy4uu05Q+kjkYDlsVI+OkEOSYDnFudphZnu54SEmf2VAiH871QZezBEMPi/CdHPgS5tYVUhAIlzawa4cKjUXovBEZoTSQYuyMwbgUCU=
+	t=1784710474; cv=none; b=nGa6VvG0HPlZnsQxUbF0sPMZ6pP/gGtxnngF8wNsbv0UCB5qnWh8xKl1NN6CbipIODXMo30ZdtGV87uOAK986UuuhOMffqd61DqtDRs5/jhB5tnGmaItn1+EJhyXEopLVrGn96IdLj21z+g8BYF5AdJHqloCObCY0a5R6AoAu8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784709240; c=relaxed/simple;
-	bh=aXdU+V5rldF0JQS37txWsMh+gLQswGj4yazTp6LwgdM=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lGS1roYRDmxNn4JGETNS8aXJxysrPWzulHpBvn0nIG13Zxo1cckgy5S+SV/L+CedzgDFJgZQYSAANR65up7dKWOwIdPrAR4bHIjbchTlj4a4fWcTiA6uLjqECL1RdmcQLrFfy0VaNL6ijU4qvJ0xn9LgJJGpNP5WcSf3yRGCiMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cgzEjcrm; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784710474; c=relaxed/simple;
+	bh=CSB/EU6/q2GTyUYMKuYf+xPog0VCyfl+LunNPgpIMeE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Dq6J9NwqoSnLtOMalV9EZYNC1aj3/zOiEgDYuuac8ow28sD3XzgYhHNTltKuwRLZoD1eMLUGkgGtleqBrGACzU9pL4LB2FYnjkDJAm2MGXUn4x3741LWoUsJHB8+v4N0O16cz9r6Q53ma55/dBeHIedfdsmTijHHO/YUxixebCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=j4YrEMRd; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cgzEjcrm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 674F91F00A3A
-	for <linux-crypto@vger.kernel.org>; Wed, 22 Jul 2026 08:33:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784709234;
-	bh=yOiMdhLhv0SVgfXHE2R9QZzVJ1NasACYuBsrPinmcjQ=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=cgzEjcrmH5PlLCpCElB1OBH6pZDb9tcKKSjkHE96/QtQnGgzkATjdho95Yq4JnPdP
-	 4bseFJVqO6K/UqwJsvayCPfsj31vo72qmJADaYpyPsUaeoJUk9Y3VvB3zBQ9MFfVnl
-	 Pgo+9tW3d2+aZ5W8ByPS3K29Zgbs9gUBnPODvG3nF2Lce2jWb3QM9qJQ2x07OUOUbT
-	 ydCXQY5bkLo6n9jGWTTJKuhI3LOVbhcqvFEH5fuNYjWMURiweOrbFt/O0vJokKT+4f
-	 2FKeQDbQVm6xRgf3UebCQkv6nB+JS+ZzMHSmhYGtWV6s3SzG+ashfYsw6Vf9Q/2X6H
-	 aY92W1h16xTHg==
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5b28c91fba5so6927883e87.1
-        for <linux-crypto@vger.kernel.org>; Wed, 22 Jul 2026 01:33:54 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RqTg1I9bId9pngoQEXj4oFar0n+PHjznGBoPodIEcG5Nh2N8SxfiET0e468qIB+AiSnjGqyeq+OupyDyMA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTjmx7QPYV0Jxop5g7Hysiy4QiZfyOaNmh3ApeAlNQ0J17cJNJ
-	A+y5Cdgei8AHPH/NoDpac1/hfzn3Wlp/QkmgpM2N4XPFWvlH8Jp4Dxn1/iDPh4BgtT2mCNQtOVu
-	23rp06O/iBBY4pNoEPqtwKOSSMZXm6KVhiFngzunNng==
-X-Received: by 2002:a05:6512:a90:b0:5ae:a4a4:b6ca with SMTP id
- 2adb3069b0e04-5b2a9b8bf28mr697065e87.14.1784709233027; Wed, 22 Jul 2026
- 01:33:53 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Wed, 22 Jul 2026 01:33:51 -0700
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Wed, 22 Jul 2026 01:33:51 -0700
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <c826b73d-6307-4237-a065-b7a8487350ce@gmail.com>
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="j4YrEMRd"
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 600C71A1151;
+	Wed, 22 Jul 2026 08:54:28 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 26DEF60388;
+	Wed, 22 Jul 2026 08:54:28 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id AA9C311BD18BC;
+	Wed, 22 Jul 2026 10:54:23 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1784710467; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=nsQBpSf9/RR9P2P+9RQkmWgkWn30X2o27Koyh66z4u8=;
+	b=j4YrEMRdIOWv3lE2iExcQtzXDC8GsN9k0aqf/Wlrz4/CxK1ZzafSEVrfBMkmQTxU28IakK
+	ZJDqBHGQAj5JiUkjSBBRdfsVzcWe0koUIo1MR1/JiHBI26xP7jIe+w+2d8HrSswULJfEe7
+	7V0lBtByFOeZJYYyNvjxJR1OLbDsBYb91hTH5SUL+zKjhLfUvUM4KucpMf3NiRcYCFVYHy
+	rwLMYdlHJvU4QtTp8CQh8kjHza9qhYChcEieFldGbbpiLCGBOPlGOC7CfMi/Um91Whaali
+	K9pjZ0ZE26WhFI9AATzsfpPI5Q08cIH1OWkDKUJ+9+ixlMmKDMT9HDgyMTV64A==
+From: Paul Louvel <paul.louvel@bootlin.com>
+Subject: [PATCH v4 00/19] crypto: talitos - Driver cleanup
+Date: Wed, 22 Jul 2026 10:53:44 +0200
+Message-Id: <20260722-7-1-rc1_talitos_cleanup-v4-0-81d1ed2ad911@bootlin.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260712-qce-broken-v2-1-b2dfff47f7f5@gmail.com>
- <alnlaCXmoLRAlr96@gondor.apana.org.au> <20260721082501.6128-1-bartosz.golaszewski@oss.qualcomm.com>
- <c826b73d-6307-4237-a065-b7a8487350ce@gmail.com>
-Date: Wed, 22 Jul 2026 01:33:51 -0700
-X-Gmail-Original-Message-ID: <CAMRc=Me55rUmjjR+ZzdWd2ss9JJMZzJch0zKd4GqONBjCzFMYQ@mail.gmail.com>
-X-Gm-Features: AUfX_myVMTKcbCAssDxc43I4GIfVcXmrNN22ieXBDI4_jU6w43vodvQh9W2ZppY
-Message-ID: <CAMRc=Me55rUmjjR+ZzdWd2ss9JJMZzJch0zKd4GqONBjCzFMYQ@mail.gmail.com>
-Subject: Re: [PATCH v2] drivers/crypto: Mark QCE as BROKEN
-To: Demi Marie Obenour <demiobenour@gmail.com>
-Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Russell King <linux@armlinux.org.uk>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Biggers <ebiggers@kernel.org>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	stable@vger.kernel.org, brgl@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/33Q0U7DIBQG4FdpuBbTA7TQXvkexjQHON0wWzsLb
+ TTL3l3WLk5j9PJPDt/5D2cWaQoUWVuc2URLiGEcclAPBXN7HHbEg8+ZiVLUZQWGaw58ctAlPIQ
+ 0xs4dCIf5xBshAWtFoumR5denifrwvsrPL1uOs30ll67cbWKitzmvTNsYsxiJu/F4DKktvDW26
+ YXQRkrSV7ZXCisQiEDGYC0qW6E37HvVttiKlorbcUyHMHQZT1+tI7nOzrvcjIOEuiFfau9du0h
+ 2LbkPMY3Tx/obC6ydNk/8ffgCvOTOAvraeULVPN02P+ZLVnURd6kG+FsSWUJUaEA6qhv7W5J3S
+ Yt/JJkl7TSgsFo7I39Kl8vlE7zgE8r5AQAA
+X-Change-ID: 20260518-7-1-rc1_talitos_cleanup-9231a64e29fa
+To: Herbert Xu <herbert@gondor.apana.org.au>, 
+ "David S. Miller" <davem@davemloft.net>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ Herve Codina <herve.codina@bootlin.com>, 
+ Christophe Leroy <chleroy@kernel.org>, linux-crypto@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Paul Louvel <paul.louvel@bootlin.com>
+X-Mailer: b4 0.15.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1784710463; l=6122;
+ i=paul.louvel@bootlin.com; s=20260313; h=from:subject:message-id;
+ bh=CSB/EU6/q2GTyUYMKuYf+xPog0VCyfl+LunNPgpIMeE=;
+ b=pCm5+D1ACLdHDyiCvrGwirKtmcsKqff3+qfOVN9HJ8bTf7PyJi/JtplZ9gPPGgpg8w+XOrZ/A
+ FOJygeqZ8Y7CXqETPkR0zN0rN03b/heo27yfahKElCrMfMXhOoIvVnt
+X-Developer-Key: i=paul.louvel@bootlin.com; a=ed25519;
+ pk=eLW50NT18UAvUT5cAcYf88zNbBCZDLFXuptpyLVhVIU=
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Tue, 21 Jul 2026 20:29:39 +0200, Demi Marie Obenour
-<demiobenour@gmail.com> said:
-> On 7/21/26 04:24, Bartosz Golaszewski wrote:
->> On Fri, Jul 17, 2026 at 06:18:48PM +1000, Herbert Xu wrote:
->>> On Sun, Jul 12, 2026 at 05:31:31PM -0400, Demi Marie Obenour via B4 Relay wrote:
->>>> From: Demi Marie Obenour <demiobenour@gmail.com>
->>>>
->>>> This driver is harmful:
->>>>
->>>> - It is much slower than the CPU [1] [2].
->>>> - It Has a history of bugs [2] [3].
->>>> - It does not have exclusive access to the hardware [4], causing races
->>>>   with the secure world.
->>>> - It register its implementations with too low a cra_priority for them
->>>>   to be actually used [5].
->>>>
->>>> Therefore, disable it to ensure that nobody builds it into kernels they
->>>> intend to ship.
->>>>
->>>> In the future, the driver will be used for processing restricted media
->>>> content.  However, the kernel does not currently support this.  Since
->>>> the driver will have future uses, allow building it if COMPILE_TEST is
->>>> enabled.
->>>>
->>>> [1]: https://lore.kernel.org/r/20250704070322.20692-1-ebiggers@kernel.org/
->>>> [2]: https://lore.kernel.org/r/20250615031807.GA81869@sol/
->>>> [3]: https://lore.kernel.org/r/20260706-qce-fix-self-tests-v5-0-86f461ff1829@oss.qualcomm.com/
->>>> [4]: https://lore.kernel.org/r/20260629-qcom-qce-cmd-descr-v20-0-56f67da84c05@oss.qualcomm.com/
->>>> [5]: https://lore.kernel.org/r/20260524204537.GB110177@quark/
->>>>
->>>> Fixes: ec8f5d8f6f76 ("crypto: qce - Qualcomm crypto engine driver")
->>>> Signed-off-by: Demi Marie Obenour <demiobenour@gmail.com>
->>>> ---
->>>> Changes in v2:
->>>> - Add Fixes: ec8f5d8f6f76 ("crypto: qce - Qualcomm crypto engine driver")
->>>> - Add Cc: stable@vger.kernel.org
->>>> - Link to v1: https://lore.kernel.org/r/20260712-qce-broken-v1-1-85e2bff17871@gmail.com
->>>> ---
->>>>  arch/arm/configs/multi_v7_defconfig | 1 -
->>>>  arch/arm64/configs/defconfig        | 1 -
->>>>  drivers/crypto/Kconfig              | 6 +++++-
->>>>  3 files changed, 5 insertions(+), 3 deletions(-)
->>>
->>> Patch applied.  Thanks.
->>
->> Hi Herbert,
->>
->> I'd like to ask you to back this patch out. Admittedly I should have NAKed this
->> under the v1 thread but I thought the discussion we had under the Shikra series
->> and the subsequent patch making myself the maintainer of this driver (note: Demi
->> did not Cc me on this nor the Qcom mailing list at linux-arm-msm) as well as the
->> pending series[1] fixing the QCE issues was enough to imply we should not mark
->> it as broken. Please consider applying [1] if the fixes in v6 are correct.
->>
->> Bartosz
->>
->> [1] https://lore.kernel.org/all/20260717-qce-fix-self-tests-v6-0-455775fe5f6c@oss.qualcomm.com/
->
-> Is the BAM locking patchset also needed?  My understanding is that
-> without it, the QCE driver can still produce wrong results due to races
-> with the TrustZone firmware.  Until it is merged and the self-tests
-> are fixed, the driver definitely needs to be marked BROKEN.
->
+The Freescale Integrated Security Engine (SEC) aka "Talitos" driver
+implementation is a monolithic ~3800-line file that mixes SEC1 and SEC2
+hardware variants with hash, skcipher, aead and hwrng algorithm.
 
-No, we currently don't ship TZ firmware that could cause such interactions.
-The only driver that currently suffers from such races is the NAND driver
-which races with the modem firmware and it too will use the BAM locking
-feature once it's upstream. However we do plan to support DRM using this IP
-and this is when it'll need to account for possible races. IOW: BAM locking
-is not strictly required to fix the QCE.
+This series reorganises the driver to improve readability and
+maintainability:
 
-> Also, what can the current driver do that cannot be done better using
-> software crypto?  I understand that you have future plans to add more
-> features to the driver, but those are not relevant to this discussion.
->
+- Split the driver into a dedicated directory with separate files for
+  hash, skcipher, aead, and hwrng implementations.
 
-We can offload crypto operations to the QCE saving CPU cycles but more
-importantly, the QCE provides HW based isolation which some vendors care
-about.
+- Modernise the crypto API usage: adopt {init,exit}_tfm (deprecated
+  cra_init/cra_exit), use CRYPTO_AHASH_ALG_BLOCK_ONLY to eliminate
+  manual partial-block buffering, and use macros to deduplicate
+  algorithm definitions.
 
-> Finally, I very much appreciate the work you have done.  I don't
-> expect that the QCE driver will stay BROKEN forever.  This patch is
-> purely a reflection of the current state of the driver, the speed of
-> CPU-accelerated crypto, and the small message sizes used by the kernel.
->
+- Introduce a is_sec1() helper to get rid of is_sec1 variables /
+  parameters.
 
-That may have been true when you sent the v1 but with a set of proposed fixes
-it'll no longer be the case.
+- Define descriptor/pointer structures for each hardware version,
+  instead of using a single structure and anonymous union.
 
-> That said, is drivers/crypto really the right place for a restricted
-> content driver?  A driver that uses dmabufs might be a better
-> alternative, and would be easier to integrate with the Direct Rendering
-> Manager (DRM) and Video for Linux 2 (V4L2) subsystems.
-> --
+No functional changes are intended except for patch 1.
 
-These are future plans, yes. But right now we do have active users of this
-IP and now also a maintainer - yours truly - who stepped up and is actively
-working on this module. With the fixes applied, the driver will again pass
-crypto self-tests and should not be BROKEN.
+This series depends on the "crypto: talitos - bug fixes" series :
+https://patch.msgid.link/20260507-bootlin_test-7-1-rc1_sec_bugfix-v3-0-c98d7589b942@bootlin.com
 
-Thanks,
-Bartosz
+Signed-off-by: Paul Louvel <paul.louvel@bootlin.com>
+---
+Changes in v4:
+- The modification I did in v3 in PATCH 1 was incomplete. message_size
+  was not initialized in ahash_init(), and not incremented in
+  ahash_process_req().
+- Link to v3: https://patch.msgid.link/20260721-7-1-rc1_talitos_cleanup-v3-0-7c71a2b77c83@bootlin.com
+
+Changes in v3:
+- Upon Herbert's remark on FINAL_NONZERO flag not working with algorithms
+  like md5, I removed the flag entirely for all algorithms.
+  Only the SEC1 revision is buggy when sending 0 byte descriptor
+  : the hardware yield an error. On the SEC2, this bug is not present
+  and can accept zero byte descriptor if the hardware auto-pad.
+  This bug is mitigated for SEC1 with software padding in
+  talitos_handle_buggy_hash().
+  It had to be slightly change in PATCH 1 because of the removal of
+  FINAL_NONZERO : the message length in bits was always zero. Now, a
+  zero byte request can happen after a handful of non-zero byte
+  requests.
+  Keep track of the message length in the request context, and put the
+  message length in bits as a 64-bit big endian integer at the end of
+  the padding.
+  Allocate a buffer per ahash request instead of using a static buffer,
+  since it is now written to.
+- Link to v2: https://patch.msgid.link/20260611-7-1-rc1_talitos_cleanup-v2-0-aa4a813ce69b@bootlin.com
+
+Changes in v2:
+- Fixed compilation warnings and errors.
+- Instead of using ops to dispatch SEC1/SEC2 variants, keep the small
+  helpers, and introduce is_sec1() inline function that can use static
+  key branching in case both hardware version are compiled.
+- Dropped the SEC1/SEC2 function variants inside the core driver file.
+- Reworded the cover letter for clarity.
+- Link to v1: https://patch.msgid.link/20260528-7-1-rc1_talitos_cleanup-v1-0-cb1ad6cdea49@bootlin.com
+
+To: Herbert Xu <herbert@gondor.apana.org.au>
+To: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+
+---
+Paul Louvel (19):
+      crypto: talitos/hash - Use CRYPTO_AHASH_BLOCK_ONLY API
+      crypto: talitos - Move driver into dedicated directory
+      crypto: talitos - Add missing includes to driver header file
+      crypto: talitos/hwrng - Move into separate file
+      crypto: talitos - Prepare crypto implementation file splitting
+      crypto: talitos/hash - Move into separate file
+      crypto: talitos/skcipher - Move into separate file
+      crypto: talitos/aead - Move into separate file
+      crypto: talitos/hash - Convert to {init,exit}_tfm type-specific API
+      crypto: talitos/skcipher - Convert to {init,exit}_tfm type-specific API
+      crypto: talitos/aead - Convert to {init,exit}_tfm type-specific API
+      crypto: talitos/hash - Use macro for algorithm definitions
+      crypto: talitos/skcipher - Use macro for algorithm definitions
+      crypto: talitos/aead - Use macro for algorithm definitions
+      crypto: talitos - Remove alg settings in talitos_register_common()
+      crypto: talitos - Introduce is_sec1() helper with static key support
+      crypto: talitos - Replace has_ftr_sec1() with is_sec1() static key helper
+      crypto: talitos - Introduce per-SEC-version descriptor and pointer structures
+      crypto: talitos - Remove TALITOS_DESC_SIZE macro
+
+ drivers/crypto/Kconfig                    |   38 +-
+ drivers/crypto/Makefile                   |    2 +-
+ drivers/crypto/talitos.c                  | 3640 -----------------------------
+ drivers/crypto/talitos/Kconfig            |   36 +
+ drivers/crypto/talitos/Makefile           |    3 +
+ drivers/crypto/talitos/talitos-aead.c     |  657 ++++++
+ drivers/crypto/talitos/talitos-hash.c     |  697 ++++++
+ drivers/crypto/talitos/talitos-rng.c      |   93 +
+ drivers/crypto/talitos/talitos-skcipher.c |  356 +++
+ drivers/crypto/talitos/talitos.c          | 1337 +++++++++++
+ drivers/crypto/{ => talitos}/talitos.h    |  316 ++-
+ 11 files changed, 3469 insertions(+), 3706 deletions(-)
+---
+base-commit: db8b9f227833e729faf44a512aa1e88a625b5ad8
+change-id: 20260518-7-1-rc1_talitos_cleanup-9231a64e29fa
+prerequisite-change-id: 20260504-bootlin_test-7-1-rc1_sec_bugfix-13169ed07ddc:v3
+prerequisite-patch-id: 7b364911e4b8d1c1033eb14e67ed24dac6a4bc13
+prerequisite-patch-id: 2c1cd7fdd003d9a116a697efa25d1716d548389f
+prerequisite-patch-id: b12bdbf565747609e0cfe0609a42cf69b5d816a1
+prerequisite-patch-id: 72cb2bc0fc2a48a5a029b049c199f4c86085cf04
+prerequisite-patch-id: 5f1f5ad6add760161bd48875df48c0893aa12613
+prerequisite-patch-id: 934931086968229434d15a2f2358aeb7e6975a1d
+prerequisite-patch-id: 8a0b4828fc0690e0c841bc9adcc6568bb522e0e8
+prerequisite-patch-id: 1d870f32e7dbf9a8bd3b8979558544107693e0f4
+prerequisite-patch-id: 758c18d7c9fabb14bd90df62e5e8a62a6f880db4
+prerequisite-patch-id: ce6e9e585f8edc1861ae6bb8fbdd836c20cbd290
+prerequisite-patch-id: 9446dc03e442ea81c5f5b39e802e01b37da29971
+
+Best regards,
+--  
+Paul Louvel, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+
