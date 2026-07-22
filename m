@@ -1,176 +1,175 @@
-Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011029.outbound.protection.outlook.com [52.101.57.29])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAC7835AC3C;
-	Wed, 22 Jul 2026 19:31:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.57.29
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784748687; cv=fail; b=O6WSQTa+w63zeUU4JQ/oITPOHaRFxtJF04lYvWdkob0T69pCWh57UM56znZrjqHD2CxP4AXW5AUeSPRZ0ECllX5mUOEy2YKOTB9M4df9rapZSSGczouni51g1JXTRHSvqEYltwk7KacViZN+zNYhq4+9B1xt0kK2+XV+itwwpXk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784748687; c=relaxed/simple;
-	bh=7GsT4mkKXHIRxMmiPrRLSVAzuC2kWTKzK0QrxDGP87g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=GOA7GU2vMR3AE08O4WfMpb+FkmYnPKXQXQ/A9gtpeVCumDrPSAVO/EMiGvaLC/fiW1ZOcs824OuPqzVHPcXdnR8QliFxRGf2DUJi9RRuiLTkAc4bbdDb30Q9MbGogjXdhsRAkVSu80FFWJEbqJkIHDWW3Tu0FgSKT5YARr6hXjQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=M0Ik0ADI; arc=fail smtp.client-ip=52.101.57.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0FC1345EB1;
+	Wed, 22 Jul 2026 19:40:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784749227; cv=none; b=kS7WxQ+EeW3gMtZ+aSYbV39hqWC0VAAkx2mz3Wlh0cJiCSXFlLn90JNR9F0o81ucyAG8o3/hKH29q+M4Hqrfj2w9JV5ppjJ8tyu1NnswVVTy51eezrg1O/DnlhZgnNSk+p8muN5fCHTypSeMIgU9jJOJXnJmiGawb6zhyLg47LQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784749227; c=relaxed/simple;
+	bh=+5Ej9HMaoiaMW8sS+tlVbcLnWKY4n4f3MTd9ILnt9TA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HrYk71Lx6kqv1lmE1QCiukb69NCOmNXKOssFyaLGbOzOZL9R4bqH2GCX1aWcCVLvNS1Um8jJrSksic7J1OTBelGn1aLom3OA1GvQQ5hAwCyoFUia81tUmS41fiMnCYWvvqVUaZ0DvdqPYT36cu6IKZPONstfLsAeY1ZbufU7rrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K79vcf2D; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="M0Ik0ADI"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Rr1nkOxCiJ14kE4Q0ETysXrhRc8cMyjGOO8BIePd2/PNNYywtfPdH8nGxGQ7LQmDtjkIoC9Y+64h+pZDpSVepyKzcxDvSEv9Omwq7cHrDJnZyO8DFeCnSESyWZ3D21Piz8v/hckLlXhVS2uHptOUIVEXyUghAUwZ+V75UYx05oqUuIlGE20xj+oJ+JWOcC2CfFi/BSAwXkKfACRjnCqb5NEvMMEGV78mUkekq9c79qbeEDTRlxODk1dTkAJCn/XZYJD+pXblfWCKfzvdgIu3uMjCKTrAbgAJIKzxx6wSI0MJFM3dE9Iz5+k6b3Nzq3r08/uh1KdIyYXWPaHdQaLz2g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=O0+VZdEOqANgO7pyLaK7INuAmo5wjtv8EwKI8iqwh7w=;
- b=pgiwJB5Olis2wRs0zk/9wopcye7kaZuESEY74ahMv0LzoKSYmcgY3imtKuAHVbe9FWwaFI5z44eVIWaqhuDAT8b3Mx/AMrej6aEELa2C+NsPPaT0FfM9nBqKCmL2elK3HVoIFsWeimBaYAozblOeYedMjRMtJzvON177BanyY7KxZxXuI3Jq7js7QC7v97DdtV/9iEHOscQ1AC9azMNwEQI0GVpKSwjRT9TR189CZhly+Eae86uwHAjUWQi3WyC2ebtqteEAxqtPvki8/GieOFjaCvM2fCAfbogOSCLB40ECNIqe+qiB8uGtqpgAAZX5+guDUU3Opo3nQg0W5EMFCQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=O0+VZdEOqANgO7pyLaK7INuAmo5wjtv8EwKI8iqwh7w=;
- b=M0Ik0ADI2TBQNKShOl2wtXkatVWpB7gBlpJcaPHWUAMTM4kX8HdApIbj4fIl0kyXwmNpCG/qp8gWpmarg3kDwS4eXdjbVc2ZnxjO6tgECgclz3znWS4VMCR9LVhj8DD30FlHCMRr0Q+OfHmnB1UfDiFkezVrmy5QzgbA+31gL3Xp6gzRyKWyXnMoxKIU+g+kgP6MxxSU15B02BtQr3lCj2dwRLiPTsnJ3/OEOpMM/mwoXNM7+v/hRQFphqfGM6Zx6AGXnkIXvQqe0aFeG46GPdl2SUtrkYc4bZTdJwt9+uNSIwm5/uus31D9FVdJhoBTyajMSVYQ9rIAkGeovuzARA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV3PR12MB9356.namprd12.prod.outlook.com (2603:10b6:408:20c::21)
- by MN0PR12MB5906.namprd12.prod.outlook.com (2603:10b6:208:37a::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.245.10; Wed, 22 Jul
- 2026 19:31:08 +0000
-Received: from LV3PR12MB9356.namprd12.prod.outlook.com
- ([fe80::1c36:31b4:c420:6286]) by LV3PR12MB9356.namprd12.prod.outlook.com
- ([fe80::1c36:31b4:c420:6286%5]) with mapi id 15.21.0245.009; Wed, 22 Jul 2026
- 19:31:08 +0000
-Date: Wed, 22 Jul 2026 15:31:07 -0400
-From: Yury Norov <ynorov@nvidia.com>
-To: Russell King <linux@armlinux.org.uk>,
-	"Christophe Leroy (CS GROUP)" <chleroy@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Andrzej Hajda <andrzej.hajda@intel.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Douglas Anderson <dianders@chromium.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Jason Gunthorpe <jgg@ziepe.ca>, John Allen <john.allen@amd.com>,
-	Kees Cook <kees@kernel.org>, Leon Romanovsky <leon@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Yury Norov <yury.norov@gmail.com>,
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org
-Cc: sunyi <279644543@qq.com>
-Subject: Re: [PATCH 0/5] bitmap: align bitmap_find_next_zero_area_off()
- output with the rest of the API
-Message-ID: <amEaewg9HgUKL0ml@yury>
-References: <20260709020312.133977-1-ynorov@nvidia.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260709020312.133977-1-ynorov@nvidia.com>
-X-ClientProxiedBy: MN0P221CA0024.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:208:52a::24) To LV3PR12MB9356.namprd12.prod.outlook.com
- (2603:10b6:408:20c::21)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K79vcf2D"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 162CF1F000E9;
+	Wed, 22 Jul 2026 19:40:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784749225;
+	bh=V3HoiIU9m6qlnn4KOEG4TuTVKNis5K4xt/jfPqB0tRo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=K79vcf2DRF2lcd+B0VM55vx8ZWOoLEjq9lkggL/qpSdx6uQSXlLDPTD/7Ps6VIU6u
+	 8/Y1O/JJPLqWYFcVLtJQ6HQEjCxkROQCQIX5FFgOSvKADHNoZ942L9pSqUiE25HJAo
+	 0NEoprtqgDWkXEzbheSFsNBGBMjyZtQVLq4rfWQlGgq1fzt6xHqqPKw53dJ5OlnZ/T
+	 XQ7VzgbS/CarcBrJPIorbu47LP68AM3XzApL9saNUiVkfAiH9FXUdGYYC/Mopmpz2/
+	 tRXlbJxACKTN/wPsiu3bdXB2BQnvOpWcWsl2a2cEdp5zJO6F/+sm5yiDEho8bPy+Rj
+	 Pq+n4w7y5B9wg==
+Date: Wed, 22 Jul 2026 12:40:23 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Hendrik Donner <hd@os-cillation.de>
+Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH 1/2] crypto: pcrypt - Remove pcrypt
+Message-ID: <20260722194023.GB2118@quark>
+References: <20260713223234.24812-1-ebiggers@kernel.org>
+ <20260713223234.24812-2-ebiggers@kernel.org>
+ <37ecba68-947a-45ad-9ec4-361facc06a05@os-cillation.de>
+ <20260721195004.GA3383223@google.com>
+ <19613c3e-9756-45fc-84b6-b650ba3723a7@os-cillation.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV3PR12MB9356:EE_|MN0PR12MB5906:EE_
-X-MS-Office365-Filtering-Correlation-Id: a6c16df1-86be-4cca-513a-08dee827c788
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|366016|1800799024|23010399003|6133799003|11063799006|10067099003|56012099006|22082099003|18002099003|921020;
-X-Microsoft-Antispam-Message-Info:
-	ZEF502ZqI6ZpATaGMZ9KYiQmgxpBRgNQmjE7JaU7aWcKS1qNZcKxAqHPeh8VBNvmOTaDt7TojFMj3c9vpW37grhtKhno9y7oyG6xRERnYjRYTIZnKFbd3RzSaNtQfu9d8gSccnzAHsiBMxmpyZpertpTolRkIHl9jtKQ3Yqd/0TMw8cik/reRtvtihxt6Cm1vUWrFq1j3UgAxg+6h37ReoJMBauGHi8GAYHyhzMyAks8U7DemoUGTeCFYglR8QsrFkKefnBXDPm64y1Qy66inZDj3wVdlV7V6LEv1osIPVbs/GtstOS3Je/MLw5/M6DBtX/Qi4IEHWAg2Aux8aWd3XGAr0mDtBeV87JZc31XyikPM23A1CoTC7MAxz5YP0OwYXZB5GzbbrbIzHqawyxDwg4tDBi0bziCp9+S5p8TCoX+owAEsHeP8mSYgu62uPY0D1YkP2phO4TKljMcl9JOVMbcVp5WOVSsSFmP8aSHPPCBEXv29ENDUZSbTc6bKZiQX8LfzZKQO0oVctL4uLBHPEOGQygmqYx85KLf2QTskoj6IACKJ8Q2csbCx9mZIPIjTWzqPhAlkHHe8nN+Ze6j///UbnyHM0lTgrl6PQ7kih/VOK83ipDURG1dlMRa02KnrN1kGdWYFomyTiGQFOCjZX2Qgja4U65fTgQ4YEukAsLHWzZK2cjsn4ceRRYvm9mtDqk5K+EfrK6nAdf/N4498w==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9356.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(23010399003)(6133799003)(11063799006)(10067099003)(56012099006)(22082099003)(18002099003)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?otIvzF09iBbzcHD7+B+EO7qXo9+x7YxB9aJD/zjDjY/6MVjpKJnPFSw+xKrn?=
- =?us-ascii?Q?zLNJusjbgbP9Uqz8ERrGI6xLwHMybOYz72j+gE+rlBik6XDeCQhdBUpdQAlO?=
- =?us-ascii?Q?U58jqkBjSBlDqJ6bLVvn7Bj95SnpXo2EtG8/X2CycQjFdacICLD1+0FA+vbB?=
- =?us-ascii?Q?7lt5yefBmeGJRGYe1lUEImU8RdzenTuzpyGZOhWI4VWyOAr1JYzofpCD43dO?=
- =?us-ascii?Q?2YggB1rFV/xLNWEiluCWL3CRSSNJvC1kXe/97bRr7HgsYm5ypNi6zrsQ8YSa?=
- =?us-ascii?Q?ymw1uM6krZq99Folhu0DPrsFmUhpAoEDEst/Hu80hSCHe28u0JsfE/ltu1P2?=
- =?us-ascii?Q?GJjlWEsCKwXuiwSL7kvyx3r1zLB9ExD+XyTDIYfvuK1mmT1aAYCDHtzFTSx0?=
- =?us-ascii?Q?4Tzw9pZ/TYPgDV3pFoqaRVscn2myKGnzWEMJ2GQ2+aGJmGsC/C3vA153X7Yf?=
- =?us-ascii?Q?d+8Lvw4X2h3zd/1hwYIMCOoY8tPcOpt5xEJP/SjMJsc7vqG8BmrSxzrtxV9E?=
- =?us-ascii?Q?boW0Hh1dbbmOzy2qRL6petVXUyUM/tAOlQJ9c8NP37QNUzeMHfZsZfkbmgs6?=
- =?us-ascii?Q?o1reFao2tyIFSWNKrurHMJdxbeV0H6ihngjcNRkIKAcYYT5EHvq/4Am3b5Jm?=
- =?us-ascii?Q?1lJkXGSKEkimGI4CdIpBgGC5xPudhoS1sjr3kVWccpyEuOJe7sq8hGAXh+U8?=
- =?us-ascii?Q?a4xllUlySNkz+J4qk8JXCbnSPP+d+xf5OFOW4UNJc6Es6lWmTiy8Iv7HtuU2?=
- =?us-ascii?Q?u9SrW9VHXWYUP7NskgeccpuJLACIfwYbSlQn9Gzadg7hHXw5PDlkCO2oenMa?=
- =?us-ascii?Q?lxSy0AsILOiPSbRm4xWdei6yjpeJiOJYi93HaI4Jmuvwoc0bdyz7WqBGkFUN?=
- =?us-ascii?Q?JvcSYLuNvlWgcrMLs4xMCXdwtTCceX9ggMyNKuH4T//AMTM8OYIF1IYCSEOr?=
- =?us-ascii?Q?l2jU20pcBi2QvPq+s1kvyP1zXM9ELD0oZA1ZHaRFVED7eV7Ah242L43RBHvf?=
- =?us-ascii?Q?uNhcrPC3f3MU/AFQN7Qu+hOFIO0htllykcCtkkTQGIwDfpKg8K4BXqbfsSYH?=
- =?us-ascii?Q?FW0mWvWmHdGTQPA3dRpvoYkT2YN5VeKM0WzTgcF3ud8cqMsQkCykTRanPxUD?=
- =?us-ascii?Q?75pdsqk5pJQ/YNS1tnunwYSmk9eMlOkRvcK65wzDuqggkqQZ84CBExog8fb7?=
- =?us-ascii?Q?PKrEqxKDVZnY1Ba1anDKGVEz4/6xGpbviqCF8FPP1HrDG75rLn/QbtKnFEYb?=
- =?us-ascii?Q?C47poVIGVTSQ4SzaqyrL/QbMhsxleQe/14jXMyIlOAuApiFsNg5CP2gYq1Ed?=
- =?us-ascii?Q?DNY/7SZxJgTNioCyVF+WAbFLl1s90sAFbAJiK8zi3uRUI9mQH+0TESIp7Eak?=
- =?us-ascii?Q?RPLH83duuwcgvrZuihP/4GWvJWg5A03+G8dMoT9JL5cx7pgz1hpzQTbyfWxe?=
- =?us-ascii?Q?QHv3MnB5b4w6or/t7zlEK3Bn2e1iwHHBEt753WFlCanZUwJeTM1eiYoa7x7Q?=
- =?us-ascii?Q?gTQ1hGJ1jUIR30EaYDJ5SlZ0iMnGnxBU/zSnZdy1RogfFrAiCY48mkuuJW9G?=
- =?us-ascii?Q?u0i/7MG46TtXkIowvALY/AqDSIp+QCcSMcD/Gzca3h7+8A/bIKMPNmgENLdu?=
- =?us-ascii?Q?sX4o3cpU3Q/DutlWcWK88qGtMEKbOr6dJytCx7P01agWQVkKMqlkCVA82L2/?=
- =?us-ascii?Q?q10gaLSDX644FLmMe9iMKSETLsu2YyO+WgdzpwwL9bCHc4rhlu6RpSqZjsYW?=
- =?us-ascii?Q?bLJCbtFxQA=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a6c16df1-86be-4cca-513a-08dee827c788
-X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9356.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jul 2026 19:31:08.4673
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: l+n7J6gtw2Otrv0Py+0hI8y/Gr2lWAE8eJ+TlTDdOgDm3flQnYITuKW1RDzdn2KsjsMLP5aDP63jxTvDFnD+9Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5906
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <19613c3e-9756-45fc-84b6-b650ba3723a7@os-cillation.de>
 
-OK, adding in bitmap-for-next. Thanks everyone for review!
+On Wed, Jul 22, 2026 at 06:12:16PM +0200, Hendrik Donner wrote:
+> Hello,
+> 
+> On 7/21/26 21:50, Eric Biggers wrote:
+> > On Tue, Jul 21, 2026 at 08:59:21PM +0200, Hendrik Donner wrote:
+> > > Hello,
+> > > 
+> > > On 7/14/26 00:32, Eric Biggers wrote:
+> > > > pcrypt was originally intended to improve IPsec performance.  However,
+> > > > it's no longer useful for that.  Reports from the rare cases that anyone
+> > > > has actually tried to use it over the years indicate that it actually
+> > > > reduces IPsec performance, e.g.:
+> > > > 
+> > > > * https://github.com/libreswan/libreswan/wiki/Internals:-Cryptographic-Acceleration#obsoleted-ipsec-accelerations
+> > > > * https://users.strongswan.narkive.com/liqTaTq8/strongswan-problem-with-pcrypt
+> > > > * https://unix.stackexchange.com/questions/594336/ipsec-multithreading-via-pcrypt-worse-than-single-thread
+> > > > 
+> > > > It's also undocumented and quite difficult to actually use.  Its design
+> > > > is also broken, in that any unprivileged program can enable pcrypt
+> > > > systemwide at any time (by instantiating it using AF_ALG).
+> > > > 
+> > > > Meanwhile, pcrypt has been a regular source of bugs, including at least
+> > > > four that have received CVEs.
+> > > > 
+> > > > Let's just remove it.  No one seems to care about it anymore other than
+> > > > people looking for vulnerabilities.
+> > > > 
+> > > 
+> > > my company is a user. We have a hardware platform based on an IMX6 SoC
+> > > using IPSec and configure pcrypt using crconf. Current performance
+> > > difference:
+> > > 
+> > > iperf3 -c <IP> --time 60 -R
+> > > 
+> > > pcrypt:
+> > > Download: 107 Mbits/sec
+> > > 
+> > > No pcrypt:
+> > > Download: 59.3 Mbits/sec
+> > > 
+> > > iperf3 -c <IP> --time 60
+> > > 
+> > > pcrypt:
+> > > Upload: 65.9 Mbits/sec
+> > > 
+> > > No pcrypt:
+> > > Upload: 52.0 Mbits/sec
+> > > 
+> > > The relevant crypto templates are configured in early userspace and
+> > > since i got curious, that has been the case since 2017.
+> > > 
+> > > Mostly using
+> > > 
+> > > pcrypt(gcm_base(ctr-aes-neonbs,ghash-generic))
+> > > 
+> > > nowadays, AES-CBC in the past/as a fallback option.
+> > > 
+> > > So at least on some platforms there is still a significant performance
+> > > boots, at least for downloads in this case.
+> > 
+> > Thanks for bringing up your use case.
+> > 
+> > Have you looked into alternative solutions such as Receive Side Scaling
+> > (https://docs.kernel.org/networking/scaling.html#rss-receive-side-scaling)?
+> > AFAIK it's not just the crypto performance that makes pcrypt unnecessary
+> > these days, but also the design of the networking layer.
+> 
+> I'm looking into this more, the IMX.6 is a bit limited with IRQ handling and
+> queue distribution.
 
-Thanks,
-Yury
+Thanks!  Maybe Steffen and the other IPsec folks would have some advice
+too.
 
-On Wed, Jul 08, 2026 at 10:03:06PM -0400, Yury Norov wrote:
-> Bitmap search functions return a value greater than or equal to nbits when
-> no suitable bits are found. bitmap_find_next_zero_area_off() is an
-> exception: it returns a value greater than nbits.
+> > I understand that i.MX6 doesn't have the ARMv8 crypto extensions.
+> > However, surely you could at least use the NEON-optimized GHASH code?
+> > Is there a reason you're not using it?
 > 
-> Align the function with the rest of the API and adjust the affected callers
-> accordingly.
+> I think it was historically not working well for us, retested:
 > 
-> Patches 1-4 are sent only to their respective maintainers and mailing
-> lists. Patch 5 and the cover letter are sent to all recipients.
+> NEON GHASH with pcrypt:
 > 
-> On top of -next. I plan to carry the series with bitmap-for-next.
+> Download: 116 Mbits/sec
+> Upload: 74.3 Mbits/sec
 > 
-> Yury Norov (5):
->   ARM: dma-mapping: Treat bitmap size as allocation failure
->   powerpc/msi: Treat bitmap size as allocation failure
->   crypto: ccp: Treat bitmap size as allocation failure
->   media: s5p-mfc: Treat bitmap size as allocation failure
->   bitmap: Return size when no zero area is found
+> NEON GHASH baseline:
 > 
->  arch/arm/mm/dma-mapping.c                            |  4 ++--
->  arch/powerpc/sysdev/msi_bitmap.c                     |  2 +-
->  drivers/crypto/ccp/ccp-dev-v3.c                      |  2 +-
->  drivers/crypto/ccp/ccp-dev-v5.c                      |  6 +++---
->  drivers/media/platform/samsung/s5p-mfc/s5p_mfc_opr.c |  2 +-
->  include/linux/bitmap.h                               |  3 +++
->  lib/bitmap.c                                         | 10 ++++------
->  7 files changed, 15 insertions(+), 14 deletions(-)
+> Download: 90.7 Mbits/sec
+> Upload: 60.8 Mbits/sec
 > 
-> -- 
-> 2.53.0
+> Looks better, still a ~15 Mbit improvement with pcrypt.
+> 
+> I want to point out that without IPSec our baseline is:
+> 
+> Download: 942 Mbits/sec
+> Upload: 942 Mbits/sec
+> 
+> Intel IGB ethernet.
+
+That already shows that about two-thirds of the improvement you were
+getting from pcrypt can be gotten just by using the correct GHASH
+implementation for the platform (59.3 => 90.7 download, vs 59.3 => 107;
+and 52.0 => 60.8 upload, vs 52.0 => 65.9).
+
+And with that new baseline, for downloads, pcrypt adds just 28% more
+throughput (90.7 => 116) rather than 80% as it did before (59.3 => 107).
+
+It seems clear that the usefulness of pcrypt rapidly decreases as the
+actual crypto gets faster.
+
+Note: we've been enabling crypto optimizations by default in recent
+kernels, so that people can no longer use the generic code by accident.
+For example in v7.1 and later, GHASH optimizations are always enabled.
+
+I'm working on further optimizations to the AES-GCM code as well,
+specifically implementing AES-GCM directly on all platforms without the
+inefficient gcm_base template that is being used here.
+
+So while maybe pcrypt does still help a bit on this platform for now,
+the approach does seem quite dated and largely a workaround for
+inefficiencies elsewhere in the stack (including systems where the
+optimized crypto code is accidentally not enabled).
+
+- Eric
