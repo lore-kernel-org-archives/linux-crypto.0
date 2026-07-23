@@ -1,62 +1,120 @@
-Received: from CHN02-SH0-obe.outbound.protection.partner.outlook.cn (mail-sh0chn02on2121.outbound.protection.partner.outlook.cn [139.219.146.121])
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012031.outbound.protection.outlook.com [40.93.195.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1C583F328A;
-	Thu, 23 Jul 2026 07:52:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.146.121
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7F303EBF18;
+	Thu, 23 Jul 2026 08:00:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.31
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784793157; cv=fail; b=e6ch2unHycMAoD8nbKl2ea5xwrNnUvCuXVm8bxifH4/8ZBqV7iguU8VqYE+gCAjMt4vT6PAetc4nqShMLdaf9BHXPhjQnXBPqbJtmQurEuTDxtdMt99W2rtgjXPceqUaI0gXJq7908aoVFQ8QCW19oHby2w/YsegC81GLjicpvw=
+	t=1784793633; cv=fail; b=glbFv0nNb95Swl3UEJHe74fQCudlMBLVahQdzTlSg91wZ4wKbNdvZW9ENbdIiQZDtG+ja4BA0hGPln4Lpfjeg2QtQdvNpzKfw5GrTx7RuZSdkIeCXdFpyDgPSTZb655kEVuNHkAdRBYQB2AszzsJMF9Crr3YB830tVUnqRV5lTg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784793157; c=relaxed/simple;
-	bh=LOkxN9jNz/wvHUIB5X5kONMI8Y26duySrVqima8P20k=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=VEPWhiKvYrtlsb8e43xrn+Xab0BRTyhQiWH3CvIGlTrFXJuHdet2kK/Vov2+ibxUAjpErRL3Y21gJt8KPmpRi9wEin53NXDw2fac4srQ34T+sV0Yw+Q9/JcuuMR7KCz53WbFDLKECVvbHP/8sA/Ii2aKSr9trZW1HKtfNZcesCg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.146.121
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mVrTjxDydQS53ySoWCe2tr9IDwmjqIL+Z8DCdqMB1vmSCYz4dbt0oCt+CB38pc3pYliOP1IgY/fmKkViMolJiI8+AawBtgNbNc/HarmiNfGebSZEDgewpKauztgNj4zFDaaGXig3qtZO3Ihr6qoLhNYNdba+obw3WQssopvd3gGVMk3s9tqci6iRl4migcUjNRF4b0bW6hw8UxkCEdv03aV65ufVdyu0Itpvnk2EttBhh5OHf5dE8X7np+YrcCkdCJquvF2oZZBCoWmJnwR03Qlf/Yjscfpz0j5gW7PFjcSf5hVVRcufjn1NLQbP+InOwLFvVdhiTlQwGpH20Yj+SQ==
+	s=arc-20240116; t=1784793633; c=relaxed/simple;
+	bh=+IEwh1Q1wVZR+t70RhH8I+mazcvJp7kmx/xBaYmLJiY=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=oQ8dTraVnQsmtQ/ANZNdMdzYh7M5wwQa/Scr7nZi23jK7IUkPujoXgUJ0MKiz4A0FHvSCmC6kU+Je0T4QsK4F3fiVSjV7CWkvXAIeCFquqC79SIrnEf7kVHCSxOSOleiExB2HEie86nFnf6GMlwngKaEyoNn6HW1tR0cAYQsOzM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=zJQL+awn; arc=fail smtp.client-ip=40.93.195.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="zJQL+awn"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=MUuuyNXlbqoEam1lio8af+5P05TV9NKJDPbrHbT3oMemUNGnApnajl1G+pYACdmfZ3Rl6GdurJilTeYyZnCmpnO5bB01Jd1jyDgcfC2uMQSzTKkcNHLKhOkARj7KZHOLMc6B3qybC51v8rMvYdZ3WkYLDbfL5BZDYeJk+8R4LIC9mRbZANfdSwkGY3E1eFYVshdC0zpPY2slXerfugHF3bvZzoO3ftC1PvM6Q/K1C5OpmXvlUi1pNaEVTLdU/xfbx6F59vzXzDcWMU0KSusT2lQBYC7o+6CXvSl+BFuwp9nhGMfWflEg50eYP8hHIibds+vne5OmHavBvROslA/IOA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
+ s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=F5PIwx/8c+BGx0+cQLmmAwp1bbm7ublwiGGnuuEsHmY=;
- b=ZRU9EPfpRrQhMN/gBbXVX17Hz2KqRr7Fsa5fAwMi6905Xo6SrMv7regZz8D190Xkljqe2f7ZDWJvUUpp/7W006Gsqa+9jkyzi1GomjAlS1N8oDNAiJH55EWDJQIXKqI1dSIWZCVVg6dphSZFNCKjLDOcxryBvrKP8G9iUFm6K0aPeYpvjN1F4Va+FxQSq7uY9VE/1wbrjiigYlLz1oQgGlzBKvjZKV7BUtDk9w5NbPDigdcW8s7n26eRgLp1ovb6oc7ATHeX9Q49w2H3bVP+4HPKTYgBO0fRBUSZXHFVJlS1om1Zj2N1m3mZ9JtLvJY020jChMqcCRgIR7ve4FbQhA==
+ bh=MbkE+uSwyaWRfX2qw+q3LZpRZBeGSOTib8Odfk2Y70o=;
+ b=EcH+W0ACPtiI4nMZMsweqadg4xNTXDCOVfhPKLgeoVrHgLzI5q7JJ+UjAB3gnTkL63WwCq4+Nsr2FGxUNDVVuRqmLcC76Qbu+mDGgaUSqeY+/RIGD83I6AEkfl3HJH2EXMPn4gI0Yv/KvH1/R/6EK1D/Ie6SloR39Pj64AqTmmK9JMOcRae394dKc7tjhb9WEUUpOWCEvONDz8JFM5B+LaLF2CzdQyf+4h52aVyvY802wYcQ38iLxU3Fe5mmM8SK7QBxNoE8GxtfxeZQcrIB0O2JkWWG0o+WP9UVGG9XRfLoV9R9Gp3hDmxvPEQVBvCV3yMUgP7pHWli3G6um31p5Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=starfivetech.com; dmarc=pass action=none
- header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MbkE+uSwyaWRfX2qw+q3LZpRZBeGSOTib8Odfk2Y70o=;
+ b=zJQL+awnhkuQi889MVnQredYoxlg4DZPMxyiKoBXEglNvbSx9ebaOIRNTA6O7zqnQLHAK3DRR2HcHHryUB5dOCWwSBIVNj4sRmDSdabexBA3bs5Ab2uRpdIsHIxfCOFcgHptC+go+zDx+mN4ZcHpuyLQzDBei1U6nTi4kuthQng=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=starfivetech.com;
-Received: from ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c550:18::6) by ZQ0PR01MB1126.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c550:1::9) with Microsoft SMTP Server (version=TLS1_2,
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
+ by DS7PR12MB6311.namprd12.prod.outlook.com (2603:10b6:8:94::10) with
+ Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.245.10; Thu, 23 Jul
- 2026 07:52:16 +0000
-Received: from ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn
- ([fe80::973:272c:ab11:7570]) by ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn
- ([fe80::973:272c:ab11:7570%4]) with mapi id 15.21.0245.009; Thu, 23 Jul 2026
- 07:52:16 +0000
-From: "lianfeng.ouyang" <lianfeng.ouyang@starfivetech.com>
-To: Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>
-Cc: linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Lianfeng Ouyang <lianfeng.ouyang@starfivetech.com>
-Subject: [PATCH v6 2/2] hwrng: starfive: rework clk/reset teardown order for JHB100
-Date: Thu, 23 Jul 2026 15:52:06 +0800
-Message-Id: <20260723075206.3032-3-lianfeng.ouyang@starfivetech.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260723075206.3032-1-lianfeng.ouyang@starfivetech.com>
-References: <20260723075206.3032-1-lianfeng.ouyang@starfivetech.com>
+ 2026 08:00:26 +0000
+Received: from BL3PR12MB9049.namprd12.prod.outlook.com
+ ([fe80::ae6a:9bdd:af5b:e9ad]) by BL3PR12MB9049.namprd12.prod.outlook.com
+ ([fe80::ae6a:9bdd:af5b:e9ad%7]) with mapi id 15.21.0245.009; Thu, 23 Jul 2026
+ 08:00:25 +0000
+Message-ID: <2d482d4d-b0f7-4da6-b08f-f7b5bfe3265a@amd.com>
+Date: Thu, 23 Jul 2026 03:00:21 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v10 2/6] x86/sev: Initialize RMPOPT configuration MSRs
+To: K Prateek Nayak <kprateek.nayak@amd.com>, Borislav Petkov <bp@alien8.de>
+Cc: tglx@kernel.org, mingo@redhat.com, dave.hansen@linux.intel.com,
+ x86@kernel.org, hpa@zytor.com, seanjc@google.com, peterz@infradead.org,
+ thomas.lendacky@amd.com, herbert@gondor.apana.org.au, davem@davemloft.net,
+ ardb@kernel.org, pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
+ Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com, ackerleytng@google.com,
+ jackyli@google.com, pgonda@google.com, rientjes@google.com,
+ jacobhxu@google.com, xin@zytor.com, pawan.kumar.gupta@linux.intel.com,
+ babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com, john.allen@amd.com,
+ darwi@linutronix.de, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev
+References: <cover.1782841284.git.ashish.kalra@amd.com>
+ <8518e02c46d6edf1f37a180569c708a3cfa7c413.1782841284.git.ashish.kalra@amd.com>
+ <20260723011031.GGamFqB1i4zt4Zlsx6@fat_crate.local>
+ <9cfe76f4-8e16-4b21-a414-126a06859489@amd.com>
+ <20260723051422.GGamGjLhlTqRDcFlee@fat_crate.local>
+ <70580cfc-8625-4f35-a77b-7154a52e10a5@amd.com>
+ <6b284f81-3551-471b-bdaa-5c5f8203bdab@amd.com>
+ <535c2a43-47b9-45ac-be9f-d0c53f9f01cc@amd.com>
+Content-Language: en-US
+From: "Kalra, Ashish" <ashish.kalra@amd.com>
+Autocrypt: addr=ashish.kalra@amd.com; keydata=
+ xsFNBGnyeG8BEADrp4EWc3KHI3tz7Lnw4HgRJRG6U+IJKAp6EBnQA5uimlJspSAr+jf23I2a
+ T0mr1uiTnZG0JkfgFpTgwBYcR+d8J96WP9LDeId9z6R7b5jyB64fhYqX8Hpich3lon2Woijn
+ azEZ++sSUtAU75m2j9ZE6lkkPM2Ti9YWSBsSg92KDVVROXLO9n6U80lzudJrKAKHE0/PagzV
+ D5gjV/s7lb9PX8khKVK3ockGRuy97lw2mAcw17EV8GE5cuToOOzpP8ESXBt1g7xoXVcbHYol
+ yuX1ljHEfqy7cCtTsBk1+LzPuhZ7532MIfVmFtDcNUSwCGeGgwNRZno7lAJ9xd6fLkZPTEZ4
+ UNsaViyzmJ22P7xMiZqXWQWSk1LohnGhZZdTaIwidWT12c8RX+qVUCzesaFXGqKt0PNTipTp
+ L39iEZO8m/+lC1BmTo0EoYtsNfrlngwNPsSU7rtd/t00RuW4YHhXALT2JUbulLCHGK1w9isH
+ E7dJXprYjUiZRVF3SaeTF4zg5AzkWRB+0yL2KzWQPumDx1gscLNFev8J1EbdrYClcpUuNxKG
+ MMG95wPqWtZm/HaNyG08alXDZcnq8hhxA7AbJLnPYpqWd108p0qp3Vr0UrvuekBKZ6Y7be+m
+ Hb4A1xRX3hE2kB971lsVp0lXSEGFHB9TJw7FH/S8paITH58y4wARAQABzSNBc2hpc2ggS2Fs
+ cmEgPGFzaGlzaC5rYWxyYUBhbWQuY29tPsLBkQQTAQoAOxYhBOnNssdBmZnznITYhaE6KKJw
+ lji/BQJp8nhvAhsDBQsJCAcCAiICBhUKCQgLAgQWAgMBAh4HAheAAAoJEKE6KKJwlji/q7AP
+ +wfg5wOWq+f7eB3uh0agX5Ax/o5r5hlK0EMyl+srJ4jc+NmNKKuVPwx0EwZEpuEcbDLlQuO3
+ JIyi13wm6n6FvIBOCfWjvndpaci1QGTMtZDnxueXM8UeFST3KjIEWFXbvgiAyiZBE+lHaSBp
+ 7UfAL19icIomKdCVCRtnqOsTvv7mcyPL8qs+OAOu8akvp3NlGsqLrkSB/YTEBKmh8oOR0aXz
+ 4VBIHpfTIppIu+F5l5PxOQGwNv/AfQ/oN+Aeo+o8i3s57gViqP8uVlVcI/vi1S4hngmc87Ah
+ 3p7KdbrxxPzahD+p1fMXsCwEf0dyJIRduDgAkpktmSLoRzBGkjtOX5nvs75QgA3r0WsvcfxF
+ zly+nnhu2GsptY+uu/ZzW6PCz6p0pHMiDfPAL1cfizY8eTMFJN5fnOW9rwXvKbM+DHbowfkw
+ NtF0DecH3qjmqAzGg2srE9XJxwOotS1JgeBp1TZsah8pXBaY+Z7s1iaY58H2TrdiDbz88DD+
+ TGX4ZHPjocpqeUuwxn7gTCKQq3K1fjt6IKY0A1ocxQEK33pjQMRTJ8lwy4z37V6EohmvCs9w
+ 5qyvI9D1gnMnFrqpbry1Jz7z1HB4sFFYxIxyMh86uOcUxGmHRrCiII3YqiSmzizvq4aUmHxd
+ YE1Wy+pKx2HVobhnuKIKoSJj2JgYV0+O5dk6zsFNBGnyeG8BEAC+BGciGUt4ODNq38ouK/6E
+ jlkJPpnxlksBhlhwce/p1vvARFceifVbawkM8ePHyIXrzxho0PUDjteGFFDjP1o/N0rQzgbf
+ 0INfkbJpHME+SYETxrkm+j9oe8DiHXZhdatY5rupZoypodNQJDD1G/HoT7bBQxPj6xDBgHWH
+ OyZbg1jjQXSWESgVX118uiQ5M9RdO+gc/YGLt5FDvN892uWs8899QBm804SdSlwkZGMKXZXv
+ 12qKw+swQoVzBdCqSLOOtIhGevkl6Ul5+N8iT7xeKMVZffAxkz7DF1yDovhJhrYtgKyUMQqW
+ qCINhtp9wHvPt+wfutzYsCLVJvVLMIj3fPtfYBSPXQu2FP0z2Nx6oUxQR/LjilP4UezSdXt9
+ WWpb+mvDLmelNuoA7WUxRauQBKu6tR1zoFl3zTdW4ZiSqZRgKInSfaVhINUMv8gqcLlAzkVS
+ seOwRrwNDUosSW3gVwj28m/T9JSfGR62i58WmH0sFQG42yuIbq/uE4crf2oQDrpFNzTJgx6+
+ Ede711weViGHEQz5vsgERmQrJDddRTgl/SlGtkAYNpVFJgYV2N/jYjiz98hgE2MYgZ2Kd8WL
+ T8dvswsQguvkDMpWJZ2BunYhRLGIpyVDhepu05qyFuNYA50GX/qcj7POBSEx/6mBaIQC7oXI
+ ffsirWGyL5WEVQARAQABwsF2BBgBCgAgFiEE6c2yx0GZmfOchNiFoTooonCWOL8FAmnyeG8C
+ GwwACgkQoTooonCWOL/tdA//RIcNr6dB4ZZaKWDe5SSw0KD7hKExIIiBkxIv5XILcazPK21x
+ LlDbXUHxWWaG+9wezceRRBe3GjRo2aKEpQzuAOgR5Ix5tRe5yJAFozO/CCGixiBzQ2I2TGIv
+ rp8xZqqvmgogckqz3RE9Rx5VF7bqKriuGbF+WciPU6+YSuN1rH+esS40yoFu2skbYAMfm+Av
+ AvEMDAmkR1o+weVZZAZMjm+2ZpCm2xXk5bjAqPQ+GoH70x/kPVv+TXjTN68xIjmP6gwA7c1P
+ qozwWzaA2Q2HO5D76clT3tmHbtzMuYt3cfwbWbCpNaqycaHvktATiRjy60Bz9FvRL8cMt0+4
+ jumtJoa0nAEmx88QzaMOK3QDW6KoDKzV8bqAHBPtrwH+jhOKId07yHmWCZxIGJAkhwqsdEx8
+ bXpP3nTer40r1tvds54lxhKxOlVvf5iBoxa3kC8f6cTNJeGm5ettvD5iFSR+fwAUDEyZEtxQ
+ f3Brs3CLkBfijS0zCw9rWqlZJGSst5xwV8UdfppsPWkU9lAUR8UZFsO+g1xCxtBc0nucygzh
+ O+mvU01WFeZGTnW7INdP+eDIvj4XYmVSjwCSNvDphJkPccAn2KFcPxYh8PJAqCDw++nfNDrc
+ BXA1uh2XzCnnzbc62A+AjwXB89wvlctBLptKlnKBVtrsKEFIoLugtmfIsa4=
+In-Reply-To: <535c2a43-47b9-45ac-be9f-d0c53f9f01cc@amd.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: ZQ0PR01CA0013.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c550:5::8) To ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c550:18::6)
+X-ClientProxiedBy: CH5P222CA0002.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:610:1ee::22) To BL3PR12MB9049.namprd12.prod.outlook.com
+ (2603:10b6:208:3b8::21)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -64,579 +122,128 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: ZQ0PR01MB1269:EE_|ZQ0PR01MB1126:EE_
-X-MS-Office365-Filtering-Correlation-Id: 09d2cbc8-15e6-44c1-16df-08dee88f50ac
+X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|DS7PR12MB6311:EE_
+X-MS-Office365-Filtering-Correlation-Id: 00571478-2676-4f03-7185-08dee8907407
 X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|376014|52116014|23010399003|38350700014|22082099003|18002099003|6133799003|10067099003|56012099006;
+	BCL:0;ARA:13230040|1800799024|23010399003|366016|7416014|376014|4143699003|5023799004|11063799006|56012099006|10067099003|18002099003|22082099003;
 X-Microsoft-Antispam-Message-Info:
-	k3xtuB3c5UlOaQGBo/dPe1CGADjIvxC3qCX+Pp8cqqYy9lHk9UbvXCGU07ktfv6xf4AUEVefTn/tajMJ7LdJ0JN/8L6bSbrwP0k3xoS76wPDL6XiaL38kT8ESnglpFNqNNzELxPW+KJg48Z3axGhShWa8a2S++TrhTmkg1DQmQHsEtGtDQQVT7oZeEgMOHc/84aaCIHKhJLavfsxTEPVLE4H0m0H5nHxyrOZg93Ggp6J4BZzpP52hHlTnr3cpWlM0xWwKyCKKsazUai8JN+yKEYaZDsgAoOOamonsySF6GAdS539SuFDEMYwZmel4XYVMBNa/mPyGyg8ebOVk6/rabp9E2H5LNZp4NoCjzTfclLlZGbtM7haYcJMauPz5o4RdsjojpkU0v3LvoDwkZa+pjd7pvnEndFv0v6/0ZS0zkHtEhLTf96Xzo+S7H6NZm49YPD74rh2bJGG666YPol6gGEz9/gw+MKG3yIJ0Z4IG8/NTci0+tXMTz+wNGrkk8WiJyDk7s1a/NhUwu1oi3WLa5K3Voriio+vsyXfiXYFCMCtstpuQgnVcurS/gFV3dZF
+	LP+FJLC5DhuUZIHryCTXCuLqijsByAF/6XTVHVSxCB2NsXvE6UiuHQCZP+iYx0SZ138CPpUWozqIBC2yvuhV+t5eESuTMMAfF4Yen1j7NjQ5dseDe4ulAp4Wh/JdpDr+W0C08rSAMLRV1UaZAzsVP3RjO4ijlnDTQiWyTgoj4FMyZQv4S5iynwU9XNK6SqcJhVI34V8EbvvFTGPR6zKsbC3ovqWYmFqoyglgYmrlySe50UD8hIXB7AOADsgqBW4Qi2pD65iRebOCCZr+fQwT2/IOCQoJoxPVdH4UQpXi4C52A1/Cf0afoa3GCN8FzaqNWh4V0i92qUIf2d95McniSzbN66F4dZBkLgtSlnzEBtQ4yrG1rQXGMUYiFPJ1NGR+ROM/+fnu4myGMsW3uS7vIDP3wdOhLtiBGDhX97xIlQjTr68mQ7iR7cpPzPnl11/TjDWkHQFAxQZE3WNJ7EotjJdrsCVPUCNwLZsGpALubH5KddoFIK86wY8I3dJdeMUdnl7cUxg7bPh+biI41x2nj2ut9Cwqk+EPv3VZV+1NgdbGC71aLrR/c/b+ImrAYvCdUQy1kGj2o/MbKhlKMz9Ygy7Omtxaddy0b4soDFLQW3Pexp+BT79YJQ5S8q4ykycevmL14tLNIAwChXYPR1ajB4LutpY6DxIT7mR3kXE6nKg=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(52116014)(23010399003)(38350700014)(22082099003)(18002099003)(6133799003)(10067099003)(56012099006);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(23010399003)(366016)(7416014)(376014)(4143699003)(5023799004)(11063799006)(56012099006)(10067099003)(18002099003)(22082099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?iRGIWF0evDMsIIn3WIkX+EaXG+5RkCNOZrZbz4c70YlLsQIxxcnGep1aHCzL?=
- =?us-ascii?Q?W+dMXLBQCKzlvpivOTos391KMCa4i3Yv/i2UA8gf3HmmDuWroHIqOKZ+NlKJ?=
- =?us-ascii?Q?0vBkjCEcpPaRv3eC3ylaYe8aN2xs7O7RAjsVKq/u5h8g6ccYT3a/UttIt9kF?=
- =?us-ascii?Q?dFLAWihBPCjSwZrm1oH2+/pR5gPWQifV6udANs0XKgWTbqTkriVfJQSQWrV/?=
- =?us-ascii?Q?WqEA50gJGUmVvsFQg4ZXeVJM2hFGH/dKHl0tHUnu9cq49ulT+zhcHvNMlHcA?=
- =?us-ascii?Q?2yvlGVLr888gDTMkVbAxrRHCHETm/K+cm/v8ostxMtlGtocerI+Mm7X1hNBZ?=
- =?us-ascii?Q?rP382l3VE5VoBgFlmGMjrpR3Jq/akE6Dl7njgSdRO6nhhCkzC+RUqtgH2wGD?=
- =?us-ascii?Q?L2sdJwfANAPbhMQ9wiFhhRHo3odVBNzWmYhG/c6TmS6TESJCtUegbyifBJO/?=
- =?us-ascii?Q?OIYMxsdeb2YCceW3oUqFIsoEfPGeNqAk9o14eYjmcqq05L2Lmu+Vs32yZIXW?=
- =?us-ascii?Q?vafgle7bizbsDNSH0eKHXvxqtPx6TB45OEdrbhTEWnvDVqPHXGbREl52f1B5?=
- =?us-ascii?Q?7zRR0pWONQ2MRA1ihdNZbiOy1Oe4nVTw659veByybXL+I2iPTDDLuagq1J/e?=
- =?us-ascii?Q?wVD7AqOIxyQQ2R6S8rZbjQGWUFbbn//IbzT3beZX++edbya0TNYhWZYyhgVa?=
- =?us-ascii?Q?LsCuo7rSkhfsHKkAvhd3/ZXLoppLMccCmO9DyteOp/kOsGqDRf8LW+CGhS05?=
- =?us-ascii?Q?Gl6Q9hBvC3M65ChAhQ+qTptAaQW98uVC8ZFF8nVdJsR9l8atZmm9aZK9F17X?=
- =?us-ascii?Q?9uikCJGbVO0PJxpA3ALiHjDJMqK7w5HrzNNoyJJO34tHOfK+AhYhKWFygNYs?=
- =?us-ascii?Q?321sKogHp0Jr72cr2ZYKfwkm+Qb/V/OJonu8nXQUJjqTjsDCqw6N4yCILuAj?=
- =?us-ascii?Q?oaBwSRamQ1BGNefroY/sQb8jxaIkW6izQrOIK9YUnBAAuakpWb7WZqXs0oT8?=
- =?us-ascii?Q?AKLVwdlJNTrluthW/OZ6ek0nHHmBTCV7pcNhGejEbOHGmVDcoZe+3Ng1YrP0?=
- =?us-ascii?Q?rG75r0rSI6QD/o3wzP5gku/9r5bns2J3KGq+ZlYgwr4cMbkYPqLqYdZoX9NG?=
- =?us-ascii?Q?sRroq3KlSvmCB5M7/+fN7Zzl0Y05NLIDbIanbdmO8lqZsv3gZe35fKoQTDPy?=
- =?us-ascii?Q?KibfcKwYVfIfr8TeHZsN6sUTAGiBb686ruPfWjgg3VTtU/Oa0+ZV0Ng91zmv?=
- =?us-ascii?Q?GrkhPJkqlFFh/c6RsWNy5nUclMRrrhdD52FoxwjOHoC+c4htxUa7qls8HJET?=
- =?us-ascii?Q?odFf0d/7h42znuiDURqA+oH5QIh2krbsk9ZqzPHPLmBTKC/AYo+yiZJomu40?=
- =?us-ascii?Q?3wvhFsIMbYilvUbIqJ4ovly1sHgaabgtuhW631/GzOfb7ePD4RI5MVoJIH9W?=
- =?us-ascii?Q?FGYE8JUxnLmct+momnMfb0/Sdoz7PsbkflLhWMO5fAJQ1Yztft+98R4VBKLT?=
- =?us-ascii?Q?Xk/HBp0YTDextUbr9HubfVhSaS8F0ssFVahSQo6IBLeV0h7DzHvq2H6f3qR+?=
- =?us-ascii?Q?DBZQm4WHqT9W3JhOivNSWgjMwPiULMLwodUuYgl5ogFglE4WkswnTP1U7Tpm?=
- =?us-ascii?Q?Uyih4Y5w2hkp6J76be9eOZtXImE5LnelRvzVLONSZoAPmbgmmccImAVri2OH?=
- =?us-ascii?Q?skLVuVw8o+1f5iDgnrpcRaH5tiCAq5hGaWrpgB13/0HqXa8+Y29TsSPx0hA9?=
- =?us-ascii?Q?0LJnu+7/dXTTXLAtV8prCNuJN2gkU6xQAFOXQg13ALktUnxc5Uga?=
-X-OriginatorOrg: starfivetech.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 09d2cbc8-15e6-44c1-16df-08dee88f50ac
-X-MS-Exchange-CrossTenant-AuthSource: ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn
+	=?utf-8?B?cmt0QlJaaGkxRHNzaUMrdjF6UkwvOWpoK2xYUTFyRnVSNjFNUU9WcVBQckRI?=
+ =?utf-8?B?ZzdLVFg0VGdVYWdBR1dpSXBndFlBQUNXckZNWmVJRW9PNXVJdjh4dWJNeWdK?=
+ =?utf-8?B?SW1xNWQvazlBZ1pwd09UR2VqSmY2aDdWZjZmL2pzeHdJOWgweEt4YzBpUzVt?=
+ =?utf-8?B?c29SdkxGNWV3OW5tN3R3L0VseGMyR3NpSTJ4cUtKZjRCVEFnd1Q4QzBIa0My?=
+ =?utf-8?B?VWI3Z2c4ZUc3UVlNMUMwQWJvT1I5T3ZiOWhBQk9ZVDIwWFVUeXEyNWk2Wjk2?=
+ =?utf-8?B?UHdkemRZY0pUSmtFWkZsbmp5Ymh3ZXNvZHRMVTBoeEN1cnhDTXhBaUFicW5x?=
+ =?utf-8?B?OEJ5dkdVbnhjNzdOa3AvQjR4T29JMTRjb1BmcjAxbEpZTTk4WU1BM001dUhU?=
+ =?utf-8?B?SzAvRzZLNTZDYVdIenlURC9JKzVKZ3dPcTFuS3VvSTBGWjJnbk1ZZnVxY1BQ?=
+ =?utf-8?B?MC9LOG5GNlFmY0cvRTlDakZ2azAwSkg1S2lLUEtnRGp4b0cxYjcvdU8xVDFN?=
+ =?utf-8?B?c1JWKzdzZWhsNWxWWWZpMHkrWVNIRStoRkhEcG9ja0g3OWhhd3hON2tIY0xr?=
+ =?utf-8?B?UVB1YmdUYUhRTHpEYlZIcFI1TWM3WjhnbkVqVHFhTGtUUWVKY1FBUE9PMm5Z?=
+ =?utf-8?B?cHNVaXozWHdYc2FmVVF5L0h4S2lLbzZaSmZFQlNmeHNxQ2t4QnVtS0RZK1JG?=
+ =?utf-8?B?OVlxcUdhREpCTy9TK1RpSXVscngwVldLK3U1VW15Q0JuNVVrdk81a1YvQkN0?=
+ =?utf-8?B?WWxtdkJUYlhabVBkeXAzTWZjc0dkRzF4OEphWTRTaUY0V3ZwOEdrb2FEQkVR?=
+ =?utf-8?B?djdJeUo5aEkwYnF1WWI5M1p2TC83d2VZQ3lhcU15Z0pTTXE0MzR3TndPb3Y4?=
+ =?utf-8?B?K01EeXFzT013MlpucDVPMjRsRFlDM0d5M1JmOHJNME1NdlpWblUvZkNza1pK?=
+ =?utf-8?B?eWNyNnRYOW5iaU1RSW9aYkhpS0ZzdkdDNjF2QUw2WGFjVWdKUjZhZ09pa0dp?=
+ =?utf-8?B?RFMvWE9lTU0yN3RWR1FySnpBbWRnU0lrTEJPbUxKV0UvV1U1WkJNcDgvVGl3?=
+ =?utf-8?B?aUZDUm80Sk92aEJ3ZHJXR0xoejkvY0dFanFyQkxjMVBIOFh5c2E5Ny9HN1JN?=
+ =?utf-8?B?Qjloend1eDJ1OWU4M0hodFpjQ05TcVFESlVVc09qeFcxaXhSVko5d2Q0Zmtm?=
+ =?utf-8?B?dGFydVVHQi9KTFc1Ukdhd3dGSEJOTmdNeFJVVXRWWFcrdWxqaVlpclNaZURh?=
+ =?utf-8?B?dml0NHI3ejRrSzNxUjdIRnJSZXZPSnVLZUQ1Sk9pZks4R0FmM1NNbjNPaVQ0?=
+ =?utf-8?B?eUNBU3pjSUZVcDhZQkJqSzdBZm82UnZRZVlBQ1JZRVFhdmllRWJaeURkNkdn?=
+ =?utf-8?B?T2tRU2QzR0hiSGIwNkdsY2d0bDVDcit3NnlvanFsaTlzRENaaEZtM3FVRVBr?=
+ =?utf-8?B?YkZkSlRVYU4xY2JHcDZ0M240N3pTOW04RnUxU3E3QVNZS3lXUDcxWEdjZWox?=
+ =?utf-8?B?SzFTalF3L0NJdzN3OFZGVzFyVGUrUVZDMHdMa1ZNZ2FadytsZmZUMHlGdXdT?=
+ =?utf-8?B?REErTHI1aStwNkpKS0tPeTUxSitsdDY3QmNqZHdqOTNYNVhRNXhRVlU4RDZI?=
+ =?utf-8?B?Ly9WRjBzNmJYbGpBY3hlUENjZXVXME9kS0FVNUsvNXRLR1JZRndWR3dOcmtt?=
+ =?utf-8?B?WDAxZjYvaHorMGNiaUVObS9vMTNYZWZ3UTQvbzRZYllaVkpXWXVpY2N3b1Z3?=
+ =?utf-8?B?S2ZkZTdtV1paNS85ZTJObTNZQWkrdERKREgyRWJuUjJiWlAxb01VSmxyeXp6?=
+ =?utf-8?B?cUs1a3FmZTg5ZGFFZ21VQThHb3orQmpTSUgrSmFLYlZneXFpU1l5NTd2RnY2?=
+ =?utf-8?B?SjJCMTErTEhVU3QxekV5T1EwS0VjZ3V4dy83c2JIY040Wnh6a01DUDhOYTg2?=
+ =?utf-8?B?MG50dWdyU29DcmF3aUc5L0V2UU9FQ2lxSzFnVXVZL1RpZkFLeEZWYUhmYitP?=
+ =?utf-8?B?ek1wZUlZVElybE1mYXJyOWxDMEx4WGpUeitQdStINnVkMlMvdUJNVlZSQnAy?=
+ =?utf-8?B?RWxpeURiZnlFbW8vV1JockhiV2lWOVMyTytWTjA5QWxlUnVpazZ2YkNFQU1P?=
+ =?utf-8?B?dlkzMXFFK2VXK2J2VFFCbnJmVlYyOTlsOGRScCsyRjNqc0pvSnVwdGZURmli?=
+ =?utf-8?B?ZlZZNXM4R0VZNTRmdDlLbnREMUF2Tkw5UExEd2NvRkFtRVZiUGI5c3RyblEr?=
+ =?utf-8?B?SXV5YVI0LzdEVUhHM2VyakZPWGZFbXVTSVgrcnlhOC9CTWJBbmxmb3JBUGNa?=
+ =?utf-8?Q?ttG84j2zlTZF1y5Dwr?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 00571478-2676-4f03-7185-08dee8907407
+X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jul 2026 07:52:16.5543
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jul 2026 08:00:25.4404
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mMrWGvALhzYFxLcUkgrsJgmt7q7UfYW/NsBxuYSJAXHM+MDMRgxKteDreE8t7ddDg0UJeM+bs3LOMOD73bRiCPFeDpDxK+abDsJ3cUspcY3PqJfxlKpJ2FC7fOzdJl+s
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: ZQ0PR01MB1126
+X-MS-Exchange-CrossTenant-UserPrincipalName: iwk17N4ndsHurqfDhvnmWtKSRCyIjlGVWmDhlGPbDmT5zHOfa/RM3k0P/7ZU5SUI4CD9WHpOuzrN/uvr73IK0g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6311
 
-From: Lianfeng Ouyang <lianfeng.ouyang@starfivetech.com>
 
-Rework the StarFive TRNG driver to address hardware-specific requirements
-  for JHB100 SoC. To avoid reset-domain crossing glitches, the driver now
-  ensures clocks are gated before asserting reset during teardown for
-  JHB100, while JH7110 retains the original reset-first sequence.
+On 7/23/2026 2:16 AM, K Prateek Nayak wrote:
+> Hello Ashish,
+> 
+> On 7/23/2026 12:33 PM, Kalra, Ashish wrote:
+>> Hello Prateek,
+>>
+>> On 7/23/2026 12:58 AM, K Prateek Nayak wrote:
+>>> Hello Boris,
+>>>
+>>> On 7/23/2026 10:44 AM, Borislav Petkov wrote:
+>>>> On Thu, Jul 23, 2026 at 10:23:56AM +0530, K Prateek Nayak wrote:
+>>>>> The offline cores will remain offline since hotplug is disabled. RMPOPT
+>>>>> is simply a performance optimization for RMP checks and leaving the
+>>>>> offline cores (that will never exit idle) unoptimized should be
+>>>>> acceptable.
+>>>>
+>>>> What happens if you boot with a subset of cores, the boot flow enables RMPOPT
+>>>> and then you online the rest?
+>>>
+>>> RMPOPT happens at __sev_snp_init_locked() for all online cores. Until
+>>> then, SnpEn is still 0 and we don't need RMPOPT because RMP checks
+>>> haven't been enabled yet.
+>>>
+>>>>
+>>>> Have we tried that?
+>>>
+>>> That said, Ashish, should snp_rmptable_init() do a
+>>> snp_rmpopt_all_physmem() (or something equivalent) when it finds SNP_EN
+>>> set in MSR_AMD64_SYSCFG after a kexec?
+>>>
+>>
+>> It already happens, just later in the sequence. On kexec __sev_snp_init_locked() still runs: snp_prepare() returns early
+>> (SnpEn set), SNP_INIT re-initializes the firmware context, and then snp_setup_rmpopt() is called.
+> 
+> But that only happens when the first SNP guest is created right? Until
+> then RMP checks are enforced but no confidential guest is running and
+> the CPUs are paying price for those checks.
 
-Add per-compatible match data (struct starfive_trng_data) describing the
-  clock/reset teardown order, a new "starfive,jhb100-trng" compatible, and
-  select the ordering from it.
+Typically, on RMPOPT-capable platforms SnpEn isn't inherited across kexec. 
 
-Fix the runtime-PM get/put balancing across the init/read/reseed/cleanup
-  paths, manage PM and the clk/reset teardown via devm so all error paths
-  unwind correctly, run the SEU-triggered reseed from a workqueue instead
-  of hard IRQ, and serialise the command sequences with a mutex.
+As i mentioned earlier (on v9 thread), kexec with SNP active currently requires
+a full SNP shutdown before the kexec. SNP_SHUTDOWN_EX (and the IOMMU SNP shutdown it performs)
+fail if there are any active SNP guests or assigned ASIDs, so a working kexec has to terminate
+all SNP guests and run a full shutdown first (via systemctl kexec). 
 
-Signed-off-by: Lianfeng Ouyang <lianfeng.ouyang@starfivetech.com>
----
- MAINTAINERS                          |   2 +-
- drivers/char/hw_random/jh7110-trng.c | 293 +++++++++++++++++++++------
- 2 files changed, 237 insertions(+), 58 deletions(-)
+Now, on any platform that supports the x86 SNP shutdown, that issues SNP_SHUTDOWN_EX with x86_snp_shutdown=1, 
+the firmware clears SnpEn before the kexec. The kexec kernel boots with SnpEn clear, exactly like a normal boot. (The
+only case SnpEn survives kexec is the legacy shutdown path, and those platforms don't support RMPOPT anyway.)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index d3a6b3f6b6a0..729b20ecc697 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -25280,7 +25280,7 @@ F:	Documentation/devicetree/bindings/perf/starfive,jh8100-starlink-pmu.yaml
- F:	drivers/perf/starfive_starlink_pmu.c
- 
- STARFIVE TRNG DRIVER
--M:	Jia Jie Ho <jiajie.ho@starfivetech.com>
-+M:	Lianfeng Ouyang <lianfeng.ouyang@starfivetech.com>
- S:	Supported
- F:	Documentation/devicetree/bindings/rng/starfive*
- F:	drivers/char/hw_random/jh7110-trng.c
-diff --git a/drivers/char/hw_random/jh7110-trng.c b/drivers/char/hw_random/jh7110-trng.c
-index 9776f4daa044..ba56b71ec202 100644
---- a/drivers/char/hw_random/jh7110-trng.c
-+++ b/drivers/char/hw_random/jh7110-trng.c
-@@ -92,22 +92,44 @@ enum mode {
- 	PRNG_256BIT,
- };
- 
-+/*
-+ * For JHB100, assert reset after disabling clocks to avoid
-+ * reset-domain crossing (RDC) induced glitches that can affect
-+ * downstream IPs.
-+ */
-+enum seq_rst_clk {
-+	SEQ_RST_FIRST,
-+	SEQ_CLK_FIRST,
-+};
-+
-+struct starfive_trng_data {
-+	enum seq_rst_clk	seq_rst_clk;
-+};
-+
- struct starfive_trng {
- 	struct device		*dev;
- 	void __iomem		*base;
-+	int			irq;
- 	struct clk		*hclk;
- 	struct clk		*ahb;
- 	struct reset_control	*rst;
- 	struct hwrng		rng;
- 	struct completion	random_done;
- 	struct completion	reseed_done;
-+	struct work_struct	work;
-+	const struct starfive_trng_data *data;
- 	u32			mode;
-+	u32			cleanup;
- 	u32			mission;
- 	u32			reseed;
--	/* protects against concurrent write to ctrl register */
--	spinlock_t		write_lock;
-+	struct mutex		lock; /* protect trng cmd seq */
- };
- 
-+static inline struct starfive_trng *work_to_trng(struct work_struct *work)
-+{
-+	return container_of(work, struct starfive_trng, work);
-+}
-+
- static u16 autoreq;
- module_param(autoreq, ushort, 0);
- MODULE_PARM_DESC(autoreq, "Auto-reseeding after random number requests by host reaches specified counter:\n"
-@@ -130,7 +152,7 @@ static inline int starfive_trng_wait_idle(struct starfive_trng *trng)
- 					  10, 100000);
- }
- 
--static inline void starfive_trng_irq_mask_clear(struct starfive_trng *trng)
-+static inline void starfive_trng_irq_clear(struct starfive_trng *trng)
- {
- 	/* clear register: ISTAT */
- 	u32 data = readl(trng->base + STARFIVE_ISTAT);
-@@ -138,6 +160,28 @@ static inline void starfive_trng_irq_mask_clear(struct starfive_trng *trng)
- 	writel(data, trng->base + STARFIVE_ISTAT);
- }
- 
-+static void starfive_trng_release(void *data)
-+{
-+	struct starfive_trng *trng = data;
-+
-+	if (!pm_runtime_status_suspended(trng->dev)) {
-+		writel(0, trng->base + STARFIVE_IE);
-+		starfive_trng_irq_clear(trng);
-+
-+		if (trng->irq >= 0)
-+			synchronize_irq(trng->irq);
-+
-+		if (trng->data->seq_rst_clk == SEQ_RST_FIRST)
-+			reset_control_assert(trng->rst);
-+
-+		clk_disable_unprepare(trng->ahb);
-+		clk_disable_unprepare(trng->hclk);
-+
-+		if (trng->data->seq_rst_clk == SEQ_CLK_FIRST)
-+			reset_control_assert(trng->rst);
-+	}
-+}
-+
- static int starfive_trng_cmd(struct starfive_trng *trng, u32 cmd, bool wait)
- {
- 	int wait_time = 1000;
-@@ -149,17 +193,13 @@ static int starfive_trng_cmd(struct starfive_trng *trng, u32 cmd, bool wait)
- 	switch (cmd) {
- 	case STARFIVE_CTRL_GENE_RANDNUM:
- 		reinit_completion(&trng->random_done);
--		spin_lock_irq(&trng->write_lock);
- 		writel(cmd, trng->base + STARFIVE_CTRL);
--		spin_unlock_irq(&trng->write_lock);
- 		if (!wait_for_completion_timeout(&trng->random_done, usecs_to_jiffies(wait_time)))
- 			return -ETIMEDOUT;
- 		break;
- 	case STARFIVE_CTRL_EXEC_RANDRESEED:
- 		reinit_completion(&trng->reseed_done);
--		spin_lock_irq(&trng->write_lock);
- 		writel(cmd, trng->base + STARFIVE_CTRL);
--		spin_unlock_irq(&trng->write_lock);
- 		if (!wait_for_completion_timeout(&trng->reseed_done, usecs_to_jiffies(wait_time)))
- 			return -ETIMEDOUT;
- 		break;
-@@ -174,13 +214,24 @@ static int starfive_trng_init(struct hwrng *rng)
- {
- 	struct starfive_trng *trng = to_trng(rng);
- 	u32 mode, intr = 0;
-+	int ret;
-+
-+	ret = pm_runtime_resume_and_get(trng->dev);
-+	if (ret < 0) {
-+		dev_warn(trng->dev, "Failed to wake device for init: %d\n", ret);
-+		return ret;
-+	}
-+
-+	mutex_lock(&trng->lock);
-+
-+	WRITE_ONCE(trng->cleanup, 0);
- 
- 	/* setup Auto Request/Age register */
- 	writel(autoage, trng->base + STARFIVE_AUTO_AGE);
- 	writel(autoreq, trng->base + STARFIVE_AUTO_RQSTS);
- 
- 	/* clear register: ISTAT */
--	starfive_trng_irq_mask_clear(trng);
-+	starfive_trng_irq_clear(trng);
- 
- 	intr |= STARFIVE_IE_ALL;
- 	writel(intr, trng->base + STARFIVE_IE);
-@@ -201,45 +252,105 @@ static int starfive_trng_init(struct hwrng *rng)
- 
- 	writel(mode, trng->base + STARFIVE_MODE);
- 
--	return starfive_trng_cmd(trng, STARFIVE_CTRL_EXEC_RANDRESEED, 1);
-+	ret = starfive_trng_cmd(trng, STARFIVE_CTRL_EXEC_RANDRESEED, 1);
-+
-+	mutex_unlock(&trng->lock);
-+
-+	pm_runtime_put_autosuspend(trng->dev);
-+
-+	return ret;
-+}
-+
-+static void starfive_trng_randreseed_work(struct work_struct *work)
-+{
-+	struct starfive_trng *trng = work_to_trng(work);
-+	int ret;
-+
-+	ret = pm_runtime_resume_and_get(trng->dev);
-+	if (ret < 0) {
-+		dev_warn(trng->dev, "Failed to wake device for reseed: %d\n", ret);
-+		return;
-+	}
-+
-+	mutex_lock(&trng->lock);
-+
-+	if (READ_ONCE(trng->cleanup))
-+		goto unlock;
-+
-+	reinit_completion(&trng->reseed_done);
-+	writel(STARFIVE_CTRL_EXEC_RANDRESEED, trng->base + STARFIVE_CTRL);
-+
-+unlock:
-+	mutex_unlock(&trng->lock);
-+
-+	pm_runtime_put_autosuspend(trng->dev);
- }
- 
- static irqreturn_t starfive_trng_irq(int irq, void *priv)
- {
-+	int ret;
- 	u32 status;
- 	struct starfive_trng *trng = (struct starfive_trng *)priv;
- 
-+	ret = pm_runtime_get_if_active(trng->dev);
-+	if (ret <= 0) {
-+		dev_err_ratelimited(trng->dev, "pm is inactive in irq\n");
-+		return IRQ_NONE;
-+	}
-+
- 	status = readl(trng->base + STARFIVE_ISTAT);
--	if (status & STARFIVE_ISTAT_RAND_RDY) {
-+	if (status & STARFIVE_ISTAT_RAND_RDY)
- 		writel(STARFIVE_ISTAT_RAND_RDY, trng->base + STARFIVE_ISTAT);
--		complete(&trng->random_done);
--	}
- 
--	if (status & STARFIVE_ISTAT_SEED_DONE) {
-+	if (status & STARFIVE_ISTAT_SEED_DONE)
- 		writel(STARFIVE_ISTAT_SEED_DONE, trng->base + STARFIVE_ISTAT);
--		complete(&trng->reseed_done);
--	}
- 
- 	if (status & STARFIVE_ISTAT_LFSR_LOCKUP) {
- 		writel(STARFIVE_ISTAT_LFSR_LOCKUP, trng->base + STARFIVE_ISTAT);
- 		/* SEU occurred, reseeding required*/
--		spin_lock(&trng->write_lock);
--		writel(STARFIVE_CTRL_EXEC_RANDRESEED, trng->base + STARFIVE_CTRL);
--		spin_unlock(&trng->write_lock);
-+		schedule_work(&trng->work);
- 	}
- 
-+	if (status & STARFIVE_ISTAT_RAND_RDY)
-+		complete(&trng->random_done);
-+
-+	if (status & STARFIVE_ISTAT_SEED_DONE)
-+		complete(&trng->reseed_done);
-+
-+	pm_runtime_put_noidle(trng->dev);
-+
- 	return IRQ_HANDLED;
- }
- 
- static void starfive_trng_cleanup(struct hwrng *rng)
- {
- 	struct starfive_trng *trng = to_trng(rng);
-+	int ret;
-+
-+	ret = pm_runtime_resume_and_get(trng->dev);
-+	if (ret < 0) {
-+		dev_warn(trng->dev, "Failed to wake device for cleanup: %d\n", ret);
-+		goto end;
-+	}
-+
-+	mutex_lock(&trng->lock);
-+
-+	writel(0, trng->base + STARFIVE_IE);
-+	starfive_trng_irq_clear(trng);
-+
-+	if (trng->irq >= 0)
-+		synchronize_irq(trng->irq);
- 
- 	writel(0, trng->base + STARFIVE_CTRL);
- 
--	reset_control_assert(trng->rst);
--	clk_disable_unprepare(trng->hclk);
--	clk_disable_unprepare(trng->ahb);
-+	WRITE_ONCE(trng->cleanup, 1);
-+
-+	mutex_unlock(&trng->lock);
-+
-+	pm_runtime_put_sync(trng->dev);
-+
-+end:
-+	cancel_work_sync(&trng->work);
- }
- 
- static int starfive_trng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
-@@ -247,7 +358,16 @@ static int starfive_trng_read(struct hwrng *rng, void *buf, size_t max, bool wai
- 	struct starfive_trng *trng = to_trng(rng);
- 	int ret;
- 
--	pm_runtime_get_sync(trng->dev);
-+	ret = pm_runtime_resume_and_get(trng->dev);
-+	if (ret < 0) {
-+		dev_warn(trng->dev, "Failed to wake device for read: %d\n", ret);
-+		return ret;
-+	}
-+
-+	if (!wait && !mutex_trylock(&trng->lock))
-+		return -EAGAIN;
-+
-+	mutex_lock(&trng->lock);
- 
- 	if (trng->mode == PRNG_256BIT)
- 		max = min_t(size_t, max, (STARFIVE_RAND_LEN * 8));
-@@ -257,24 +377,28 @@ static int starfive_trng_read(struct hwrng *rng, void *buf, size_t max, bool wai
- 	if (wait) {
- 		ret = starfive_trng_wait_idle(trng);
- 		if (ret)
--			return -ETIMEDOUT;
-+			goto end;
- 	}
- 
- 	ret = starfive_trng_cmd(trng, STARFIVE_CTRL_GENE_RANDNUM, wait);
- 	if (ret)
--		return ret;
-+		goto end;
- 
- 	memcpy_fromio(buf, trng->base + STARFIVE_RAND0, max);
- 
--	pm_runtime_put_sync_autosuspend(trng->dev);
-+	ret = max;
-+
-+end:
-+	mutex_unlock(&trng->lock);
-+
-+	pm_runtime_put_autosuspend(trng->dev);
- 
--	return max;
-+	return ret;
- }
- 
- static int starfive_trng_probe(struct platform_device *pdev)
- {
- 	int ret;
--	int irq;
- 	struct starfive_trng *trng;
- 
- 	trng = devm_kzalloc(&pdev->dev, sizeof(*trng), GFP_KERNEL);
-@@ -282,27 +406,22 @@ static int starfive_trng_probe(struct platform_device *pdev)
- 		return -ENOMEM;
- 
- 	platform_set_drvdata(pdev, trng);
-+
- 	trng->dev = &pdev->dev;
-+	trng->data = of_device_get_match_data(&pdev->dev);
-+	if (!trng->data)
-+		return -EINVAL;
-+
-+	if (trng->data->seq_rst_clk != SEQ_RST_FIRST && trng->data->seq_rst_clk != SEQ_CLK_FIRST) {
-+		dev_err(&pdev->dev, "Unknown seq_rst_clk value\n");
-+		return -EINVAL;
-+	}
- 
- 	trng->base = devm_platform_ioremap_resource(pdev, 0);
- 	if (IS_ERR(trng->base))
- 		return dev_err_probe(&pdev->dev, PTR_ERR(trng->base),
- 				     "Error remapping memory for platform device.\n");
- 
--	irq = platform_get_irq(pdev, 0);
--	if (irq < 0)
--		return irq;
--
--	init_completion(&trng->random_done);
--	init_completion(&trng->reseed_done);
--	spin_lock_init(&trng->write_lock);
--
--	ret = devm_request_irq(&pdev->dev, irq, starfive_trng_irq, 0, pdev->name,
--			       (void *)trng);
--	if (ret)
--		return dev_err_probe(&pdev->dev, ret,
--				     "Failed to register interrupt handler\n");
--
- 	trng->hclk = devm_clk_get(&pdev->dev, "hclk");
- 	if (IS_ERR(trng->hclk))
- 		return dev_err_probe(&pdev->dev, PTR_ERR(trng->hclk),
-@@ -318,9 +437,14 @@ static int starfive_trng_probe(struct platform_device *pdev)
- 		return dev_err_probe(&pdev->dev, PTR_ERR(trng->rst),
- 				     "Error getting hardware reset line\n");
- 
--	clk_prepare_enable(trng->hclk);
--	clk_prepare_enable(trng->ahb);
--	reset_control_deassert(trng->rst);
-+	init_completion(&trng->random_done);
-+	init_completion(&trng->reseed_done);
-+	mutex_init(&trng->lock);
-+	INIT_WORK(&trng->work, starfive_trng_randreseed_work);
-+
-+	trng->irq = platform_get_irq(pdev, 0);
-+	if (trng->irq < 0)
-+		return trng->irq;
- 
- 	trng->rng.name = dev_driver_string(&pdev->dev);
- 	trng->rng.init = starfive_trng_init;
-@@ -331,40 +455,86 @@ static int starfive_trng_probe(struct platform_device *pdev)
- 	trng->mission = 1;
- 	trng->reseed = RANDOM_RESEED;
- 
--	pm_runtime_use_autosuspend(&pdev->dev);
--	pm_runtime_set_autosuspend_delay(&pdev->dev, 100);
--	pm_runtime_enable(&pdev->dev);
-+	ret = clk_prepare_enable(trng->hclk);
-+	if (ret) {
-+		dev_err(&pdev->dev, "hclk clk_enable failed: %d\n", ret);
-+		return ret;
-+	}
- 
--	ret = devm_hwrng_register(&pdev->dev, &trng->rng);
-+	ret = clk_prepare_enable(trng->ahb);
- 	if (ret) {
--		pm_runtime_disable(&pdev->dev);
-+		clk_disable_unprepare(trng->hclk);
-+		dev_err(&pdev->dev, "ahb clk_enable failed: %d\n", ret);
-+		return ret;
-+	}
- 
--		reset_control_assert(trng->rst);
-+	ret = reset_control_deassert(trng->rst);
-+	if (ret) {
- 		clk_disable_unprepare(trng->ahb);
- 		clk_disable_unprepare(trng->hclk);
-+		dev_err(&pdev->dev, "failed to deassert trng\n");
-+		return ret;
-+	}
- 
--		return dev_err_probe(&pdev->dev, ret, "Failed to register hwrng\n");
-+	pm_runtime_use_autosuspend(&pdev->dev);
-+	pm_runtime_set_autosuspend_delay(&pdev->dev, 100);
-+	devm_pm_runtime_set_active_enabled(&pdev->dev);
-+
-+	ret = devm_request_irq(&pdev->dev, trng->irq, starfive_trng_irq, 0, pdev->name,
-+			       (void *)trng);
-+	if (ret) {
-+		starfive_trng_release(trng);
-+		return dev_err_probe(&pdev->dev, ret, "Failed to register interrupt handler\n");
- 	}
- 
-+	ret = devm_add_action_or_reset(&pdev->dev, starfive_trng_release, trng);
-+	if (ret)
-+		return ret;
-+
-+	ret = devm_hwrng_register(&pdev->dev, &trng->rng);
-+	if (ret)
-+		return dev_err_probe(&pdev->dev, ret, "Failed to register hwrng\n");
-+
- 	return 0;
- }
- 
- static int __maybe_unused starfive_trng_suspend(struct device *dev)
- {
- 	struct starfive_trng *trng = dev_get_drvdata(dev);
-+	bool cleanup = READ_ONCE(trng->cleanup);
-+
-+	if (cleanup && trng->data->seq_rst_clk == SEQ_RST_FIRST)
-+		reset_control_assert(trng->rst);
- 
--	clk_disable_unprepare(trng->hclk);
- 	clk_disable_unprepare(trng->ahb);
-+	clk_disable_unprepare(trng->hclk);
-+
-+	if (cleanup && trng->data->seq_rst_clk == SEQ_CLK_FIRST)
-+		reset_control_assert(trng->rst);
- 
- 	return 0;
- }
- 
- static int __maybe_unused starfive_trng_resume(struct device *dev)
- {
-+	int ret;
- 	struct starfive_trng *trng = dev_get_drvdata(dev);
- 
--	clk_prepare_enable(trng->hclk);
--	clk_prepare_enable(trng->ahb);
-+	ret = clk_prepare_enable(trng->hclk);
-+	if (ret) {
-+		dev_err(trng->dev, "hclk clk_enable failed: %d\n", ret);
-+		return ret;
-+	}
-+
-+	ret = clk_prepare_enable(trng->ahb);
-+	if (ret) {
-+		clk_disable_unprepare(trng->hclk);
-+		dev_err(trng->dev, "ahb clk_enable failed: %d\n", ret);
-+		return ret;
-+	}
-+
-+	if (READ_ONCE(trng->cleanup))
-+		reset_control_deassert(trng->rst);
- 
- 	return 0;
- }
-@@ -376,8 +546,17 @@ static const struct dev_pm_ops starfive_trng_pm_ops = {
- 			   starfive_trng_resume, NULL)
- };
- 
--static const struct of_device_id trng_dt_ids[] __maybe_unused = {
--	{ .compatible = "starfive,jh7110-trng" },
-+static const struct starfive_trng_data jh7110_data = {
-+	.seq_rst_clk = SEQ_RST_FIRST,
-+};
-+
-+static const struct starfive_trng_data jhb100_data = {
-+	.seq_rst_clk = SEQ_CLK_FIRST,
-+};
-+
-+static const struct of_device_id trng_dt_ids[] = {
-+	{ .compatible = "starfive,jh7110-trng", .data = &jh7110_data },
-+	{ .compatible = "starfive,jhb100-trng", .data = &jhb100_data },
- 	{ }
- };
- MODULE_DEVICE_TABLE(of, trng_dt_ids);
-@@ -387,7 +566,7 @@ static struct platform_driver starfive_trng_driver = {
- 	.driver	= {
- 		.name		= "jh7110-trng",
- 		.pm		= &starfive_trng_pm_ops,
--		.of_match_table	= of_match_ptr(trng_dt_ids),
-+		.of_match_table	= trng_dt_ids,
- 	},
- };
- 
--- 
-2.43.0
+Thanks,
+Ashish
 
+> 
+>> On the fresh kexec kernel, rmpopt_wq is NULL, so snp_setup_rmpopt() does the full setup — programs the per-CPU RMPOPT_BASE MSRs and
+>> queues the initial all-physmem optimization pass. So RMPOPT is re-applied on kexec through the normal path.
+>>
+>> Doing it in snp_rmptable_init() would be too early: the per-CPU RMPOPT_BASE MSRs aren't programmed until
+>> snp_setup_rmpopt(), so a pass there would have no base configured.
+> 
+> Ack! Which is why I mentioned something equivalent ;-)
+> 
