@@ -1,169 +1,188 @@
-Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010009.outbound.protection.outlook.com [52.101.201.9])
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C22442AFA9;
-	Thu, 23 Jul 2026 14:29:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784816965; cv=fail; b=HzPVANb7cBcTFQgtbXBLaThUwcQwMZQ4Kbd+pDOn3oPyujRPOBS8/33Vownm79QwCDoauje8uYK/IcmZmylgR6IWHiwuXHOv84zR56kmc6bhJbD2x9TKyAKZT7IuwFMBiPyv/7Q8oN8R5m1uymBV5B3JcEp2srnjAUKnKs2T15s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784816965; c=relaxed/simple;
-	bh=CvbTMbrdGJ0HiRIHl+soP8/VPjvGn+yYLSSGT/27s+E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=G12z2ygTwmRSIE7n5ywHrS9PwclzmYwYNQ1cTrvD2KXaZIyiXDIKe6m89H6xSLh3rFY3ktY0jmLHKbOyl2+c+5jQM4Uqu/K/nJvDeuK6IRMc3avD//Sx6dUcJKWkIXLr25FgCbEaKNg2B+SKH/ro4xVKZ0ytrop+WDVMGUG6Rno=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=HnPWuAM9; arc=fail smtp.client-ip=52.101.201.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2147733A029
+	for <linux-crypto@vger.kernel.org>; Thu, 23 Jul 2026 15:01:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1784818883; cv=none; b=tvXxTtQ7ijZBZ0unCg0O4t4kYuBthdtWdjWTu8CfJn730TeczJ7Nc5Gh8l2DflNUABTl9cAaSkxKU6ca8ut4QMsko2YAmit9GWZ6epQ45kg7nxdzvTHypv72BU+fw/TT8atvgfesLGoeldWarDGdI6/pWwjDfokLo51woCRJSVo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1784818883; c=relaxed/simple;
+	bh=qhc8y1t7l2U3SC+fCFgvoGHLPrbpQK1AUYxe4zLkDcA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AGX7ARF6ndbsYT+7JVKDZJHqVSDnyLVh1n5r48ApMqPkeOv3Bc3ynqEiLA2dokxNZudofspGZx3vkUn8VQPrqAqP0EDWwRMY6WP8U47wMFSDH7knGvLj8eDMhEMtQ/NwQZlPF78Y4BEXsQWKUko8xSLUgz2SMmtlW0sNRl9Bk2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=QVaZ/ITt; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="HnPWuAM9"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NU10SxLu0Y2pALfbZr6qqkiLjKUadJFhOKPq+M9Mmt/+OU1sQFxrCHnyOyLpbi4VUDXvhQiqpjhVKYjSFiMqcKxXQjwCwZG3YTcev8IyATcU2xKRra4PqzwnU3l4CTmfTGXM0RCGPoC3iE6HfkQCZ88rhbZXY94yc24eU+qgwJ4ZD8OoGtUKUy9OTwk18D1PNTgkbLvR+hkJL+db+1Rxkx/l2goZNz/55vrHfHIlu1aIPqvUolI1wKGVs6APZO8SYfr8DZuwNNB4RQOCQcwCeOqMEHcJY78GtQrbky6q0a54BBHzSdaBXUJdlx83TKI2UOpe500jzPq+xfi9SkT/cw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AatbAmX4wYe+c6XLd2Sbb0+pzdW2CFrKV5uheDWo7VI=;
- b=d99jwXb/L9G8h6PwSk+HHRr515+T4jYOmRqu6qVeUzOpkn8KgBtJdJYtfHPncBg/g6kV8VtTOnHq8wWH5ct3LX/Gmd+9nM2j76Yb/Tjvy4MSEFQdJfg8pkjyFFm+/EjHtkzrsroOozkkTVtf0pbybbdq6i+J8IxqM+Rsv8L9sBfPMCy9Llu6Zgk8ZK6X7nXPXw12QrTL7s0XmgAtFj4qAjmb0W+AlBxjBn5SCk34t8XRSpRxJYoYOaFVWn+j0uO6Bu8MxBuyaxCHx/8q3Ro9IxlcCKx3co5aXFjMLeabVAs9lGiTvcu3fwVDWIl86Ey+0XxMZw5vwLP8TKWVMSjSVQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=alien8.de smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AatbAmX4wYe+c6XLd2Sbb0+pzdW2CFrKV5uheDWo7VI=;
- b=HnPWuAM9MaGAjb9R5sDooyNyISqvzRVARxDyVIwYLMFg2SuhEuIF/rDG2bHfZu/7Wu/3aXhIwK1X0sGwVTRGbbSuNnSpvnQweoxDUjFPMuMYJpLC6M+U7hJLJCMjGu1OmVpGj5EGaai9fO9rYf4Y4rMBVMs3AOeX21Vdteym9Ww=
-Received: from SJ0PR03CA0120.namprd03.prod.outlook.com (2603:10b6:a03:333::35)
- by DS4PR12MB999100.namprd12.prod.outlook.com (2603:10b6:8:2f9::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.245.10; Thu, 23 Jul
- 2026 14:29:18 +0000
-Received: from SJ1PEPF00002325.namprd03.prod.outlook.com
- (2603:10b6:a03:333:cafe::64) by SJ0PR03CA0120.outlook.office365.com
- (2603:10b6:a03:333::35) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.245.10 via Frontend Transport; Thu,
- 23 Jul 2026 14:29:18 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb08.amd.com; pr=C
-Received: from satlexmb08.amd.com (165.204.84.17) by
- SJ1PEPF00002325.mail.protection.outlook.com (10.167.242.88) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.270.5 via Frontend Transport; Thu, 23 Jul 2026 14:29:17 +0000
-Received: from satlexmb07.amd.com (10.181.42.216) by satlexmb08.amd.com
- (10.181.42.217) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.41; Thu, 23 Jul
- 2026 09:29:12 -0500
-Received: from [172.31.184.125] (10.180.168.240) by satlexmb07.amd.com
- (10.181.42.216) with Microsoft SMTP Server id 15.2.2562.41 via Frontend
- Transport; Thu, 23 Jul 2026 09:29:04 -0500
-Message-ID: <f7bfaa21-a572-428b-9de0-51fb06b5f44a@amd.com>
-Date: Thu, 23 Jul 2026 19:59:03 +0530
+	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="QVaZ/ITt"
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com [209.85.215.199])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id C784E3F9A4
+	for <linux-crypto@vger.kernel.org>; Thu, 23 Jul 2026 15:01:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20251003; t=1784818877;
+	bh=rmn4iCRgd2W2Q1p9YGZBP63yr2RQlfKU8yIifwUIXo8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
+	b=QVaZ/ITtT2vKBdsXssnfQ2y9lfFQMYoLL7gDgJbtvbbUGbHGG+1GrnYAR5GqOZniv
+	 ZWmEqE6FpmNRpsaeSxZF2lCGJW1PJ/2KTNHbJQJGMAxoR7dFtU6YJ/2+h4SZmsZfT9
+	 a4LuD7vOSVz0Mrwams/3IgAUm2ZJKLWuckuyUwWF6OPIjJErV+9KBO2eNpAkjsxRnV
+	 JaawxXtUE+NmxncEUfatXsaKuG3dDaUwsyOMsdrms+JI4171iY3/a7H1+4ZuknQBrj
+	 H0sIFbZncCisrQ6iujLK1sBtJ9YT8jRN7M2jNzc7RGRwdjPLSyabL6LpciMNHWK8VE
+	 niDPBadUgll590YV+4gC/GivFkVQ1/eBlx7GN/kTQlIU4K1L/E/4jeHxKWRqHeDrxU
+	 SUNYsVqE1we2y8GaEFL4zTXHxgN0IJLG9GilVXcU1xc8kxcTVmlWj4tjuD/l781EbW
+	 acBAE6j0Katip2p3711f4pkW0jA98SIwhLEO2wYoXGAJ488l5oFj2nmNcuxM/1+FoC
+	 3+DUs5i8lpHv894RU/hmzaajpb6Y6aMnIu4zq7nVrL6pb47PFv0YRQg7Td4Wrh7KUe
+	 DCoI0OIVVK8alwtMMXn9K5IqnaA3KE7XAS1qx6gpe4+J5QGpiPqQJOkX60PdzNyP9+
+	 +k2sc5phoLlxfcOO9C8rSTUw=
+Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-cb5ea36f969so949626a12.2
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Jul 2026 08:01:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784818876; x=1785423676;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=rmn4iCRgd2W2Q1p9YGZBP63yr2RQlfKU8yIifwUIXo8=;
+        b=Q7tCB1F21ktEABQjRwhxuBoxjxK0OKXVwGTLEKBEe+h48gF0El+pImEKzvhKlPJTWs
+         JalwkXQ1G4vikgJ18uo3nkIUb/hU9wZhZwnMFnfDngkmGJSolGI5U+U2on650S/wYZAt
+         E/52KPqme5Frb+O1G3D0z1V/FMRIU9ReioRWyBSkJFXwEfcV36llkjHII5v/+5qrh5tL
+         uqSUCf5EdoH51pgbeHqwvILCSv2X2wDbRjyj89Ogmna9WulOeuEjNyj+LS5V/i8FDRXp
+         PNuPcW7UCtCHTrh6Rm8t3JLQZRpwTLOQUDGX7ypcFQ0KUePKqDqWOT4kp6ALNN+b5qKr
+         hcqw==
+X-Forwarded-Encrypted: i=1; AHgh+RrNEG+3VJV1B4Fx4pY/1UsQwHW2eCJ8f+S3RIP7UQJBsmuOFZsJrVJOGUCl+OYDZVS2CGnQ2bRsEoFuMjs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzuIqnmIMglJSo67PuUQk0htPK4g1f+LhFpBzK9bGeMjdTTKR0m
+	ROIiVp0zpijdIbjU6qWBxSrQ/MJeoEnCHtnizpWoGzTUHSqwrTDJ+C1BMdJJ7wGCB0JVD7iMPNK
+	SELDQqeeEoFd/EduNKSwLF+Y7SDdg29JBmIPntypxXlnYSvyXFHH3y5xOJ/m4rPKI8WhmkYKtEx
+	zvh35Zjw==
+X-Gm-Gg: AR+sD139ic2ssKfJRzvSUdm2qZ21hIPTm89z3CNKH/n8vdUqS3wbv6Dg4vtX+0Ab+Z3
+	NLMdtcHfPN25CaMQZtNpojSwJwkLQN0XZh57uWwUALTNBW0N2y7VVmq5kJKEr+XFCl21wNamtWb
+	SHdJzyWseUJ3drQRiKpofTte3j6VIUV7Z7OZh0Fv3XfyhFHWAU36qPEpP4tuNYFReMaWEBx/tfF
+	KBXpEBPS/9sSsRI9GyKqdEbjCe8rS924fX4sFRcruo1uLnUkilVz8vqsYQEXHj7n9ntHLkaclga
+	JM5g97YNfHU0qRaA6d1Jqihtm0+DMcip+wMJRPY5r5JeIcTkRfPG9du755ENeQed9q/gF5HsgP7
+	1Ujf0oGwe1+4=
+X-Received: by 2002:a17:90b:184c:b0:38e:8021:2ea9 with SMTP id 98e67ed59e1d1-38ec652455cmr4000004a91.19.1784818875928;
+        Thu, 23 Jul 2026 08:01:15 -0700 (PDT)
+X-Received: by 2002:a17:90b:184c:b0:38e:8021:2ea9 with SMTP id 98e67ed59e1d1-38ec652455cmr3999946a91.19.1784818875309;
+        Thu, 23 Jul 2026 08:01:15 -0700 (PDT)
+Received: from ZBook.gateway ([123.208.39.53])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-13d12f267fdsm17077445c88.0.2026.07.23.08.01.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jul 2026 08:01:14 -0700 (PDT)
+From: Changwei Zou <changwei.zou@canonical.com>
+To: herbert@gondor.apana.org.au,
+	lukas@wunner.de,
+	ignat@linux.win
+Cc: changwei.zou@canonical.com,
+	davem@davemloft.net,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: rsassa-pkcs1: fix in-place DMA aliasing in rsassa_pkcs1_verify()
+Date: Fri, 24 Jul 2026 01:01:07 +1000
+Message-ID: <20260723150107.33546-1-changwei.zou@canonical.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 2/6] x86/sev: Initialize RMPOPT configuration MSRs
-To: "Kalra, Ashish" <ashish.kalra@amd.com>, Borislav Petkov <bp@alien8.de>
-CC: <tglx@kernel.org>, <mingo@redhat.com>, <dave.hansen@linux.intel.com>,
-	<x86@kernel.org>, <hpa@zytor.com>, <seanjc@google.com>,
-	<peterz@infradead.org>, <thomas.lendacky@amd.com>,
-	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <ardb@kernel.org>,
-	<pbonzini@redhat.com>, <aik@amd.com>, <Michael.Roth@amd.com>,
-	<Tycho.Andersen@amd.com>, <Nathan.Fontenot@amd.com>,
-	<ackerleytng@google.com>, <jackyli@google.com>, <pgonda@google.com>,
-	<rientjes@google.com>, <jacobhxu@google.com>, <xin@zytor.com>,
-	<pawan.kumar.gupta@linux.intel.com>, <babu.moger@amd.com>,
-	<dyoung@redhat.com>, <nikunj@amd.com>, <john.allen@amd.com>,
-	<darwi@linutronix.de>, <linux-kernel@vger.kernel.org>,
-	<linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
-	<linux-coco@lists.linux.dev>
-References: <cover.1782841284.git.ashish.kalra@amd.com>
- <8518e02c46d6edf1f37a180569c708a3cfa7c413.1782841284.git.ashish.kalra@amd.com>
- <20260723011031.GGamFqB1i4zt4Zlsx6@fat_crate.local>
- <9cfe76f4-8e16-4b21-a414-126a06859489@amd.com>
- <20260723051422.GGamGjLhlTqRDcFlee@fat_crate.local>
- <5460b946-b511-4060-8951-264d17a2b21b@amd.com>
- <0b471f38-8c96-4d6b-869a-44a3684ebdd7@amd.com>
-Content-Language: en-US
-From: K Prateek Nayak <kprateek.nayak@amd.com>
-In-Reply-To: <0b471f38-8c96-4d6b-869a-44a3684ebdd7@amd.com>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00002325:EE_|DS4PR12MB999100:EE_
-X-MS-Office365-Filtering-Correlation-Id: a0e59956-e51e-4d93-a7b5-08dee8c6c765
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|376014|7416014|82310400026|36860700016|1800799024|56012099006|10067099003|5023799004|4143699003|11063799006|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	NE2MgY6lVpqR/90pw8O8c+o1pdtUTVKBxXhwbUNE2/r4HVnrPUi9lfgBVXRfFyLn8GyBULJS4goDaLL6iIbWIgvH7k3kvugNKWtsxGJgGqwwwS06sS0FPfYXzLcM4Byo0+0olzGDL49c63TCcLShU6rJCM5fTgZ1Kaq5XWdApf8Ga+Hdb+cWPNy18cwXk1bLMsHuGed+q+Heh9wssfINxIU2GZ65Q4loSVUNtTraQHAPO3mbxZEbXmnJEvAh8ma9BcJnGXv4grWuhbFrUcqDPHd5CZ9Rigp6gYufYIRsScZgLybd6Z5INH3Al+hNVm4jHQv0r8hQRRmAygvVPou26LdXINosOS+MGljLpa3grvkv2SpBwKi9tZYG9T6lFWUOL3gxIueQIiV1F5QITYflvIjuaD3kX5bXi3F+jNrcjQzwdTC2pOnKaesIYoLh6wnUOa2fbZ2puanuEz0G6lvT5V+dGMIqvA7IaY+5rINGrAbWZm3GxiVEn705eGfw2/q66F4IatqNkSejqcRggFatTJgysJNs3+ya6SHIdwnnrO0jA4VKJb1XgFHs2eII48YuZmaf53AHnczrkZReHvE1iW21HCbLTmAvECKqT+RfeSmFeif2a1ow0v06JDd0AokxLPaLMLCwL1/pxO5GE3i1nMWe98KpVxikmXoVisTd1FWhYcZSmD4/WA+u9e/r4LCStCYAdHzhNYdyonSNm04yBw==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb08.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(23010399003)(376014)(7416014)(82310400026)(36860700016)(1800799024)(56012099006)(10067099003)(5023799004)(4143699003)(11063799006)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	oIUAnuyquT48SrISl6y4sxXCQH3M+/G2opQn5HePRHc/URGrsPYSv5rm0i8kiBleibu2Glpdgj+3Q7lLGUuiq5kvnEhcwJ5ptscSNF4P6LZ/YIisSAF9L06z9IlejOR4BVVIXulY0WQei4ajHl8FhXsiAtkwyA0s/TY14fneZ3puuY6LKAI2jJAzt3MLAdoTLREAkuW1JsPlZLJr+CMGZTnpTjPYKIz6fjLyiiyHDw6GOZy1Zbc+nvghT/2wezjpkoEzAR8Z7nCFibJWfr/8hLTM49K8Wz3vzb63JJn5FwE7vCCGgmATlHcA128xXcDMK+bdV71kzLwae5Sg70oLx3+DAAirGhazv24IU/QfHjYYN7CaMMz7PAspYToaltW3YKfMJe8knDzJe0iW2d8m038QOgRcpObJNW+RT3i9m5vPXfqb8L2aSKYa4JRnaVKJ
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jul 2026 14:29:17.8308
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a0e59956-e51e-4d93-a7b5-08dee8c6c765
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb08.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00002325.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS4PR12MB999100
 
-Hello Ashish,
+rsassa_pkcs1_verify() passes the same scatterlist as both src and dst
+to akcipher_request_set_crypt():
 
-On 7/23/2026 6:54 PM, Kalra, Ashish wrote:
-> 
-> On 7/23/2026 1:50 AM, Kalra, Ashish wrote:
->> Hello Boris,
->>
->> On 7/23/2026 12:14 AM, Borislav Petkov wrote:
->>> On Thu, Jul 23, 2026 at 10:23:56AM +0530, K Prateek Nayak wrote:
->>>> The offline cores will remain offline since hotplug is disabled. RMPOPT
->>>> is simply a performance optimization for RMP checks and leaving the
->>>> offline cores (that will never exit idle) unoptimized should be
->>>> acceptable.
->>>
->>> What happens if you boot with a subset of cores, the boot flow enables RMPOPT
->>> and then you online the rest?
->>>
->>> Have we tried that?
->>>
->>
->>  It can't happen here. snp_prepare() does the following, in order:
->>
->>   1. cpu_hotplug_disable() — freeze the CPU set.
->>   2. fail SNP init (-EOPNOTSUPP) unless every present CPU is online (cpumask_equal(cpu_online_mask, cpu_present_mask).
->>   3. enable SNP.
->>
->>   snp_setup_rmpopt() runs only after snp_prepare() succeeds, so all present CPUs are online and stay online (hotplug is
->>   disabled). No core's primary thread can be offline at this point.
->>
->>   (The kexec path is the one exception — snp_prepare() returns early there — which I'm handling in the other thread.)
->>
->>   Thanks,
->>   Ashish
->>
-> 
-> Additionally for kexec considerations: on RMPOPT-capable platforms kexec clears SnpEn (full SNP_SHUTDOWN_EX, x86_snp_shutdown=1),
-> so snp_prepare() re-runs its cpumask_equal() all-online check on the kexec boot exactly as on a normal boot.
-> 
-> So no kexec-specific case where RMPOPT gets set up with a partial CPU set.
+    sg_init_one(&sg, out_buf, slen);
+    akcipher_request_set_crypt(child_req, &sg, &sg, slen, slen);
 
-Thank you for clarifying! Much appreciated _/\_
+This causes the underlying hardware driver to DMA-map the same
+physical buffer twice with incompatible directions (DMA_TO_DEVICE and
+DMA_FROM_DEVICE), which is undefined behaviour on non-coherent
+architectures and leads to intermittent cache-coherency failures.
 
+    dma_map_sg(dev, fixup_src, src_nents, DMA_TO_DEVICE);
+    dma_map_sg(dev, req->dst,  dst_nents, DMA_FROM_DEVICE);
+
+On non-coherent ARM64 platforms (e.g. i.MX8 with CAAM), the
+DMA_FROM_DEVICE mapping invalidates CPU cache lines covering the buffer
+after the DMA_TO_DEVICE mapping has flushed them but before the hardware
+reads the data. This produces a race that intermittently corrupts the
+RSA input, causing the EMSA-PKCS1-v1_5 structure check or digest
+comparison to fail with -EKEYREJECTED.
+
+Fix by allocating separate input and output buffers so each DMA mapping
+covers a distinct physical region, matching the approach used by the
+predecessor pkcs1pad template.
+
+The intermittent error 'Key was rejected by service' on i.MX8 with CAAM
+can be triggered when running the command below.
+
+    for i in $(seq 1 100); do
+        sudo modprobe xfs 2>&1 && echo "SUCCESS on attempt $i" \
+        && sudo rmmod xfs || echo "FAILED on attempt $i"
+    done
+
+Fixes: 8552cb04e083 ("crypto: rsassa-pkcs1 - Copy source data for SG list")
+Signed-off-by: Changwei Zou <changwei.zou@canonical.com>
+---
+ crypto/rsassa-pkcs1.c | 29 ++++++++++++++++++++---------
+ 1 file changed, 20 insertions(+), 9 deletions(-)
+
+diff --git a/crypto/rsassa-pkcs1.c b/crypto/rsassa-pkcs1.c
+index 94fa5e9600e7..63bce31ac446 100644
+--- a/crypto/rsassa-pkcs1.c
++++ b/crypto/rsassa-pkcs1.c
+@@ -224,10 +224,10 @@ static int rsassa_pkcs1_verify(struct crypto_sig *tfm,
+ 	unsigned int child_reqsize = crypto_akcipher_reqsize(ctx->child);
+ 	struct akcipher_request *child_req __free(kfree_sensitive) = NULL;
+ 	struct crypto_wait cwait;
+-	struct scatterlist sg;
++	struct scatterlist sg_src, sg_dst;
+ 	unsigned int dst_len;
+ 	unsigned int pos;
+-	u8 *out_buf;
++	u8 *in_buf, *out_buf;
+ 	int err;
+ 
+ 	/* RFC 8017 sec 8.2.2 step 1 - length checking */
+@@ -236,19 +236,30 @@ static int rsassa_pkcs1_verify(struct crypto_sig *tfm,
+ 	    rsassa_pkcs1_invalid_hash_len(dlen, hash_prefix))
+ 		return -EINVAL;
+ 
+-	/* RFC 8017 sec 8.2.2 step 2 - RSA verification */
+-	child_req = kmalloc(sizeof(*child_req) + child_reqsize + ctx->key_size,
+-			    GFP_KERNEL);
++	/*
++	 * RFC 8017 sec 8.2.2 step 2 - RSA verification
++	 *
++	 * Allocate separate input and output buffers within the child_req
++	 * allocation.  Using the same buffer for both src and dst (in-place)
++	 * would cause it to be DMA-mapped twice with incompatible directions
++	 * (DMA_TO_DEVICE and DMA_FROM_DEVICE), which is undefined behaviour on
++	 * non-coherent architectures such as ARM64 with hardware accelerators
++	 * like CAAM, leading to intermittent cache-coherency failures.
++	 */
++	child_req = kmalloc(sizeof(*child_req) + child_reqsize +
++			    2 * ctx->key_size, GFP_KERNEL);
+ 	if (!child_req)
+ 		return -ENOMEM;
+ 
+-	out_buf = (u8 *)(child_req + 1) + child_reqsize;
+-	memcpy(out_buf, src, slen);
++	in_buf  = (u8 *)(child_req + 1) + child_reqsize;
++	out_buf = in_buf + ctx->key_size;
++	memcpy(in_buf, src, slen);
+ 
+ 	crypto_init_wait(&cwait);
+-	sg_init_one(&sg, out_buf, slen);
++	sg_init_one(&sg_src, in_buf,  slen);
++	sg_init_one(&sg_dst, out_buf, slen);
+ 	akcipher_request_set_tfm(child_req, ctx->child);
+-	akcipher_request_set_crypt(child_req, &sg, &sg, slen, slen);
++	akcipher_request_set_crypt(child_req, &sg_src, &sg_dst, slen, slen);
+ 	akcipher_request_set_callback(child_req, CRYPTO_TFM_REQ_MAY_SLEEP,
+ 				      crypto_req_done, &cwait);
+ 
 -- 
-Thanks and Regards,
-Prateek
+2.43.0
 
