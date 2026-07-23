@@ -1,143 +1,189 @@
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCAE348380A
-	for <linux-crypto@vger.kernel.org>; Thu, 23 Jul 2026 18:46:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C5DA488767;
+	Thu, 23 Jul 2026 18:54:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784832415; cv=none; b=M5lidPsdK6RPte1QMPFLkq+tvLzpQpV+WkviXWlGiwNJT4YUSYtJetd8DKZvBoe/Zw99HU+TuQaZAMreu8jveWLp+FxDKlziFP1kLFwftiHn7P0BZ7uEPkktXX8PTBJ7qwLB2oO8oCD28/Vye/EhAJul+uOwCreesjz0Q8v1cQ8=
+	t=1784832863; cv=none; b=B7p2WYV66rvr+Ouwmex8MTaBTTG9lOdsPQXjVsxHg5wY75ROzYMraof1Sp/amvpCCiN3MTKA5eAhuDz2t0zXgZ9dk8oMg4YVlVy9bqCYKT1EJCJH8etrm7HQHpRujw+txwnOqo6XD4hMemnJDpL6qyNqfldY2GpihRq9hEw9TgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784832415; c=relaxed/simple;
-	bh=2XerIORtjYT6lU/QCxj94nR/+mthwLJM8r1lYonXQgY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=J7/DPocGh1db040beKbstWu8Y5br+R8ScSHexYCPMwQyPSqDXuhB80BhCNh5ld2QW3eLfzQoKRYGwEQu4J5Ffo+p3GUioJd6piKp1LHs3irYDM0DbnmiYLFmC47d2EHjQDP8nE4CSj0aCSymE370uQtsChNnsxoS80wHkHzvGQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CQvez56A; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1784832863; c=relaxed/simple;
+	bh=h9OtEV4qVHAlX9KQYjihbUFKtfO6sstnIeiFiDgoNVs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hPmeFl/G4FQrsNDPsFmkmi1xCh6yQAarAriW66oDzDt8Ksv1WK1Zs271Ecuzw6a4u5EAJgpzANEYgzZFIN9kqPh5CliX4OHJvdbsMSHl9A4nSd+mprXQ7x/LgNKs/8Q8j+hfnzh69P4dAjaT6UbqeDWqQwLK67q4QD6Vj4cmkXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=JsGnJrZ2; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CQvez56A"
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-38759bcd877so917833a91.2
-        for <linux-crypto@vger.kernel.org>; Thu, 23 Jul 2026 11:46:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1784832406; x=1785437206; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=MvMxjqNvpASivPiDAcPmI8PwBsKAarLbQdQ8wRHMWv0=;
-        b=CQvez56A9PDOxPPkjW5dr+x5rcO2ncfLNjk2XekL77va8AYlax4uwKC+xoCZJFyldM
-         9vXsoTXkWPSFVSM4MdfBePJi6fZvBAL5HmB5g1wE+uOXC9uE84R+lgGI5ZetHTHgdw/X
-         r0iFOg1smVEQIxmlVQEjPpJabbo0FLkky0ntrUSTvgZzAN9dl/1EiOig0CvQ4nbcEwJs
-         aun1+YDL2wPVMTrkRGSiprOEqbJMNZaq+vpIaGhrMMmUjKtqBLBd2uiRZO8OZxg5CnQ8
-         6MRIol28m6RCnLrt0OwdUdIq1I4EEuqXcAVd3aYayTm5u8GSqCk+SkqQD2mUiU86TWTj
-         gSKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1784832406; x=1785437206;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=MvMxjqNvpASivPiDAcPmI8PwBsKAarLbQdQ8wRHMWv0=;
-        b=XWwNENMuuKmk27/yN5rVBXXoRQsZ3gGOcUQvs7L/7mXinFqAhVtywGpZCHxbrDa5hz
-         /duUvwOnHg80PL1QBTclTgw2KTUub1ezqcHfz2CQ3+sc8zfob9HzxMYXO2rbLbE16z57
-         br6fwkomhC4ZIfXl95h5RgOW0+bbPcAelCMuG+Jwpgnwbwx/ngj0sEZwg//AwSu6MKSi
-         3yfEG2pBalyauiJQdh86P5U3Y7qaAOzUWRQ9l9MCH0frcudXRASKeBdXRa/Gq+39c58j
-         Z+oN2s9JIKw46CUXKIozEhT0cRkf8Q2kkNWlQvWwAMB7AXR7fghdiqFs/0axL3HLxo0g
-         cDMw==
-X-Forwarded-Encrypted: i=1; AHgh+RryQ1wVzBIl9cx+x0A/kHY2JMhNPvVbqx9VDWfCFhkJ4Yc3k+pCbI1y3vh+sr/RL6eD5lUHYgpDz+n5yZ4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGajujFsjppG7iTb8/LlLLPBXlMm33b2Q7uz7tAog15y74DLsW
-	nwNjjKX24DvOB5WEdsTGhWqNy80gUHCptHqirXQJiAHid7fOTvZGLcJV
-X-Gm-Gg: AR+sD13QMDVjZIBB2cLStRQ5jPcJHJQTxiV6wiQ8tckig2q4mCLkWmnEo/OH9nxOt3z
-	8j4ZPH+0emBZwuCs+B91z+sVZXRrnEMRKPCe7JY5TkCaxDt5XOJK4PxP5+Ytwow69syRf2k7/f8
-	6jxyHAvTk74jBUl1MIRdyUjqzTklgHvzSqggMBcVzfIprHrio8zPy2H4kCXZchsYXRvp8OmjaB6
-	2DgCXtXH+FT1GhjHyfO47SxUQVTwczybdXlxo2GkCTjzholtbF+LtRhd6olTG0EfHNc3rljcQk1
-	hk8mH2v91YV3fH86K6JQOWyst30uggYE3nct5f3IkRgPpigUK5587IJlb6HNBdqP6YbhmGWjI2S
-	QVlbg59t2wgDXXH+AmPPDSIhji2H92Svbv3lr/0F5uC+U7BV3BCLKCIkVyR5olcP8EWBD9wGu
-X-Received: by 2002:a17:90b:3904:b0:38e:584f:2515 with SMTP id 98e67ed59e1d1-38ec6aae88emr4263344a91.37.1784832406282;
-        Thu, 23 Jul 2026 11:46:46 -0700 (PDT)
-Received: from ubuntu.. ([110.9.142.4])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38f03af8a45sm308155a91.10.2026.07.23.11.46.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jul 2026 11:46:45 -0700 (PDT)
-From: Sang-Heon Jeon <ekffu200098@gmail.com>
-To: Julia.Lawall@inria.fr,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Srujana Challa <schalla@marvell.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>
-Cc: cocci@inria.fr,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	qat-linux@intel.com
-Subject: [PATCH 18/36] crypto: drivers - remove conditional return with no effect
-Date: Fri, 24 Jul 2026 03:45:20 +0900
-Message-ID: <20260723184538.3888637-19-ekffu200098@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260723184538.3888637-1-ekffu200098@gmail.com>
-References: <20260723184538.3888637-1-ekffu200098@gmail.com>
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="JsGnJrZ2"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id C153C40E00DC;
+	Thu, 23 Jul 2026 18:54:12 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 4AZIU2mSZdwn; Thu, 23 Jul 2026 18:54:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1784832841; bh=VjYfDXADIh0xhQ+fjHF1Jv01qoDx2xMCSHhEriUi0Hs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JsGnJrZ2/7sUYiUCIv2KOCQj1PrDOJvK4e83jLp7okg4LGN5J/RmmLUesfD5fr5I3
+	 Mt5JYFHoNNWR4EzQNU127WyWMP2BGomGxaXMiPzEevVfpeDPrAwp9uZZo/gp12pc4X
+	 wcdpHCT4jZ3XmCmFhpMgl4vTQwwxYyLMrTPTJwArefHleMRep1JN2t0zagEz8SOZDa
+	 78XL3vCkRXRAD6zQPAMPRyS6bvF6/HPAHteaLDXrkojsKYDNbuHQd/0nHVSNHujasT
+	 b3tbg+39biHsy66Q/XN1eHd2/5e7JweFSypSONu5Wt6+SIxcmfigN1xs2SsiyYl6kV
+	 QTqEqq7lAqamE+mWduGefQ326mSlIqq1rToAd+6VDpmivnmtZOwaaEc6H8oCidIKsv
+	 rhbkKvnV3zU+tMT1nFv8OJYnZQX/I2UIUmNL6rEfGLl6hjBsGw68Gf+s7yT/QkCrhf
+	 mhQ/3JZXcGoqWN7FbqGvm5danDFL68OzlDKcHlYQd/rc5QWmqZ80NXwnBGsnRYClza
+	 Wx/jQ9cBJEk+ecJEutmM+DDtRKNNQCu8gM/kMgFndV7N0ibCvRG7rzF+BhhBX1uJbR
+	 QZpcjgYT94C8+FgnhdKdFiRnz+zN7v6Y3YbXOiNk85yBn3lQsA7gVCkLK49M5zjFgY
+	 mOxi5lQM5Gy6jwIH2wOuJJ1M=
+Received: from stx.tnic (unknown [IPv6:2600:1700:38ca:c00::1b])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id DE7A340E00E6;
+	Thu, 23 Jul 2026 18:53:26 +0000 (UTC)
+Date: Thu, 23 Jul 2026 11:53:23 -0700
+From: Borislav Petkov <bp@alien8.de>
+To: Ashish Kalra <Ashish.Kalra@amd.com>
+Cc: tglx@kernel.org, mingo@redhat.com, dave.hansen@linux.intel.com,
+	x86@kernel.org, hpa@zytor.com, seanjc@google.com,
+	peterz@infradead.org, thomas.lendacky@amd.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org,
+	pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
+	KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com,
+	Nathan.Fontenot@amd.com, ackerleytng@google.com, jackyli@google.com,
+	pgonda@google.com, rientjes@google.com, jacobhxu@google.com,
+	xin@zytor.com, pawan.kumar.gupta@linux.intel.com,
+	babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com,
+	john.allen@amd.com, darwi@linutronix.de,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	kvm@vger.kernel.org, linux-coco@lists.linux.dev
+Subject: Re: [PATCH v10 3/6] x86/sev: Disable CPU hotplug while SNP is active
+Message-ID: <20260723185323.GAamJjI2HoM1gZmExw@fat_crate.local>
+References: <cover.1782841284.git.ashish.kalra@amd.com>
+ <205a5259f9fd353dc0ca6b00565c8175a96768c7.1782841284.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <205a5259f9fd353dc0ca6b00565c8175a96768c7.1782841284.git.ashish.kalra@amd.com>
 
-Both branches of the check return the same value, so the check has
-no effect. Remove it and return the value directly.
+On Tue, Jun 30, 2026 at 06:11:03PM +0000, Ashish Kalra wrote:
+> From: Ashish Kalra <ashish.kalra@amd.com>
+> 
+> While SNP is active, every memory write is checked against the RMP to
+> protect SEV-SNP guest memory.  A core performs these RMP checks only once
+> ...
 
-This is the result of running the Coccinelle script from
-scripts/coccinelle/misc/cond_return_no_effect.cocci.
+Use this commit message for your next revision. The idea is to split it into
+smaller paragraphs for easier parsing, do simple formulations and not talk
+about future patches because git history is not always linear:
 
-Signed-off-by: Sang-Heon Jeon <ekffu200098@gmail.com>
----
- drivers/crypto/intel/qat/qat_common/adf_gen2_config.c   | 8 ++------
- drivers/crypto/marvell/octeontx2/otx2_cpt_mbox_common.c | 7 +------
- 2 files changed, 3 insertions(+), 12 deletions(-)
+"While SNP is active, every memory write is checked against the RMP to
+protect SEV-SNP guest memory.  A core performs these RMP checks only once SNP
+has been initialized via SNP_INIT and the SNP-enable bit in SYSCFG is set on
+that core; the firmware requires the SNP-enable bit to be set on every present
+CPU before SNP initialization.
 
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen2_config.c b/drivers/crypto/intel/qat/qat_common/adf_gen2_config.c
-index c27ff6d18e11..57025bffee73 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_gen2_config.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_gen2_config.c
-@@ -155,12 +155,8 @@ static int adf_gen2_comp_dev_config(struct adf_accel_dev *accel_dev)
- 	}
- 
- 	val = i;
--	ret = adf_cfg_add_key_value_param(accel_dev, ADF_KERNEL_SEC, ADF_NUM_DC,
--					  &val, ADF_DEC);
--	if (ret)
--		return ret;
--
--	return ret;
-+	return adf_cfg_add_key_value_param(accel_dev, ADF_KERNEL_SEC,
-+					   ADF_NUM_DC, &val, ADF_DEC);
- 
- err:
- 	dev_err(&GET_DEV(accel_dev), "Failed to add configuration for compression\n");
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cpt_mbox_common.c b/drivers/crypto/marvell/octeontx2/otx2_cpt_mbox_common.c
-index 95f3de3a34eb..1542a110ba37 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cpt_mbox_common.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cpt_mbox_common.c
-@@ -235,7 +235,6 @@ int otx2_cpt_lf_reset_msg(struct otx2_cptlfs_info *lfs, int slot)
- 	struct otx2_mbox *mbox = lfs->mbox;
- 	struct pci_dev *pdev = lfs->pdev;
- 	struct cpt_lf_rst_req *req;
--	int ret;
- 
- 	req = (struct cpt_lf_rst_req *)otx2_mbox_alloc_msg_rsp(mbox, 0, sizeof(*req),
- 							       sizeof(struct msg_rsp));
-@@ -248,11 +247,7 @@ int otx2_cpt_lf_reset_msg(struct otx2_cptlfs_info *lfs, int slot)
- 	req->hdr.sig = OTX2_MBOX_REQ_SIG;
- 	req->hdr.pcifunc = 0;
- 	req->slot = slot;
--	ret = otx2_cpt_send_mbox_msg(mbox, pdev);
--	if (ret)
--		return ret;
--
--	return ret;
-+	return otx2_cpt_send_mbox_msg(mbox, pdev);
- }
- EXPORT_SYMBOL_NS_GPL(otx2_cpt_lf_reset_msg, "CRYPTO_DEV_OCTEONTX2_CPT");
- 
+A core that is not SNP-enabled and not SNP-initialized performs no RMP checks
+at all, so there is no valid configuration with SNP active and any CPU exempt
+from RMP checks.
+
+The firmware determines which CPUs are present from the processor and the
+BIOS/UEFI configuration (e.g. SMT disabled in the BIOS) and enumerates them at
+SNP init; it is not aware of the OS bringing CPUs online or offline
+afterwards.
+
+SNP_INIT fails unless SnpEn is set on all CPUs, so a CPU that is offline when
+SNP_INIT is issued, does not have SnpEn set, SNP_INIT fails, and there can be
+no SNP guest memory.  OS CPU hotplug can thus diverge from the firmware's
+expectations and break SNP.
+
+Tie CPU hotplug to the SNP-enable bit: disable it in snp_prepare() before
+SNP is enabled, and re-enable it in snp_shutdown() once the firmware has
+disabled SNP.
+
+If snp_prepare() fails before enabling SNP it re-enables hotplug itself; once
+SNP is enabled hotplug stays disabled, including across a failed SNP_INIT and
+across the legacy SNP_SHUTDOWN_EX path, both of which leave SNP enabled.
+
+A kexec target that boots with SNP already enabled, disables hotplug once in
+snp_rmptable_init(), since snp_prepare() bails when SNP is already enabled."
+
+> 
+> Suggested-by: Thomas Lendacky <thomas.lendacky@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> ---
+>  arch/x86/virt/svm/sev.c | 31 +++++++++++++++++++++++++++++++
+>  1 file changed, 31 insertions(+)
+> 
+> diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
+> index dab6e1c290bc..04a58ac4339c 100644
+> --- a/arch/x86/virt/svm/sev.c
+> +++ b/arch/x86/virt/svm/sev.c
+> @@ -535,6 +535,15 @@ int snp_prepare(void)
+>  
+>  	clear_rmp();
+>  
+> +	/*
+> +	 * Disable CPU hotplug before enabling SNP, so no CPU can come online
+> +	 * without SnpEn while SNP is enabled; it is re-enabled in snp_shutdown()
+> +	 * once SNP is disabled.  Must be before cpus_read_lock():
+> +	 * cpu_hotplug_disable() takes cpu_add_remove_lock, which nests above
+> +	 * cpu_hotplug_lock.
+> +	 */
+> +	cpu_hotplug_disable();
+> +
+>  	cpus_read_lock();
+
+What's the point of grabbing the hotplug lock if you just disabled hotplug?
+
+>  	if (!cpumask_equal(cpu_online_mask, cpu_present_mask)) {
+> @@ -560,6 +569,10 @@ int snp_prepare(void)
+>  unlock:
+>  	cpus_read_unlock();
+
+ditto.
+
+>  
+> +	/* Re-enable CPU hotplug; SnpEn was never set. */
+
+
+^ Superfluous comment.
+
+> +	if (ret)
+> +		cpu_hotplug_enable();
+> +
+>  	return ret;
+>  }
+>  EXPORT_SYMBOL_FOR_MODULES(snp_prepare, "ccp");
+> @@ -587,6 +600,13 @@ void snp_shutdown(void)
+>  
+>  	rmpopt_cleanup();
+>  
+> +	/*
+> +	 * Re-enable CPU hotplug now that the firmware has disabled SNP; CPU
+> +	 * hotplug is not re-enabled for a legacy SNP shutdown.  After
+> +	 * rmpopt_cleanup() so RMPOPT_BASE is cleared with hotplug still disabled.
+> +	 */
+
+I can't parse that comment.
+
+> +	cpu_hotplug_enable();
+> +
+>  	clear_rmp();
+>  	on_each_cpu(mfd_reconfigure, NULL, 1);
+>  }
+
 -- 
-2.43.0
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
