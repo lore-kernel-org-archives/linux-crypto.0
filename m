@@ -1,63 +1,97 @@
-Received: from psionic.psi5.com (psionic.psi5.com [185.187.169.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A150844CF22;
-	Wed, 22 Jul 2026 23:31:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.187.169.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BDF227707
+	for <linux-crypto@vger.kernel.org>; Thu, 23 Jul 2026 00:04:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784763066; cv=none; b=lmhKEvAQfidLxUvrmDF0XkfnhUieiVqq+xJ4MxmkGfU453D/IIBCVKF3udtzb87QNbTO9gXtxpO3+BZsL9OlXo14E+Pe1nhFdljPUv4uCUeFm4qaVdYoqjG1ZnJua2rEJYIRs3jjTKpL8dJN58jKSVvo6Hyceek8Y/agUlKdqZI=
+	t=1784765091; cv=none; b=siB0pYCcYrrQRRYNnVuXP9JLB7xOJ2SCT5E68pO6z7BOP5NDq0YGYDNPI8qV0iA1en6HCcOUKCR6ZfUNo03EazhYoWsMchwdXYc7ILp8JLXjJlBYWlQr+3VyUACW/wkgf2LhBi3cyfuuaqQaQCkatfRBwiiNUOqND5sbvOPphuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784763066; c=relaxed/simple;
-	bh=hWmSvVA4k7ETmCZuvmtqctvCGfhe3XMocDFOc1x0/7k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UOB+VwCddI8J3+5Gqw9+je7uQwyFPzEWOiUmmn9ElOkHwxidhtuBtirnIzU1A9BiXvxL9+9JX6NuwIAZYL51esfsHBtMpNfVDQAf7024gonZ+m4JsV0jY61YiwjmA2lf1zxLZslk29GnV6iY/BuMdn4rYKWxo8ql3otbbmWKKDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de; spf=pass smtp.mailfrom=hogyros.de; arc=none smtp.client-ip=185.187.169.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hogyros.de
-Received: from [IPV6:2400:2410:b120:f200:a1f3:73da:3a04:160d] (unknown [IPv6:2400:2410:b120:f200:a1f3:73da:3a04:160d])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by psionic.psi5.com (Postfix) with ESMTPSA id B9BBE3F53F;
-	Thu, 23 Jul 2026 01:30:50 +0200 (CEST)
-Message-ID: <d45ed4a1-da22-44a3-9f9e-78041dd338b1@hogyros.de>
-Date: Thu, 23 Jul 2026 08:30:47 +0900
+	s=arc-20240116; t=1784765091; c=relaxed/simple;
+	bh=ZP//XMZ7JCb/uHzLK9Z1FXYMo5tDITZi8CuuW9mXdh4=;
+	h=Message-ID:From:To:Subject:Date:MIME-Version:Content-Type; b=Nb2yB55BxPpP2o3FwehbLG/KRKvmN3XTyJu1yY6FCwdQSowuO/9To8iHU7QIFtb3gRLWApQrIrEts40URKzVu217jEPvL9n+PvAnD6xePdlQFeX0v9GEBag0zpjRaVzRtjA3dcbVMn93J10+GeVwERw2xodSHnP8ZpMDhqKgCfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gosalescloserapp.com; spf=pass smtp.mailfrom=gosalescloserapp.com; dkim=pass (2048-bit key) header.d=gosalescloserapp.com header.i=@gosalescloserapp.com header.b=xJ96yWmQ; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gosalescloserapp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gosalescloserapp.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gosalescloserapp.com header.i=@gosalescloserapp.com header.b="xJ96yWmQ"
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-51c2808dbc3so271801cf.1
+        for <linux-crypto@vger.kernel.org>; Wed, 22 Jul 2026 17:04:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gosalescloserapp.com; s=google; t=1784765089; x=1785369889; darn=vger.kernel.org;
+        h=content-type:mime-version:date:content-transfer-encoding:subject:to
+         :from:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=ZP//XMZ7JCb/uHzLK9Z1FXYMo5tDITZi8CuuW9mXdh4=;
+        b=xJ96yWmQTIyODC3GikebkmdrlRZwbQ9jTepje8/HLfUX4AjkWOzYp72yMydc7XeU9q
+         3vw0Gq6RrLwyo9HPgn4rg9MHRjTJTJZmWsJb/hO/AOQZeRri+Nn0cvXNahWjHPe/Rms+
+         W15h79fuIMipDD1grmemgbrRO8zQu7gOIwdQUUyCOkwctAsa2Iy8OZsC5+xJy3N7CQ6U
+         sF8+6QutHWZBz5QOi4hHm/xUmjiii+8tuV2v9ywJ5sDq4dAFcpXPdV+4AjP7UDsrPhZF
+         hdUW7KJBxSPGjbvXnBrZsp3+ugqTkOwQAt65mva0AsQzOvTeCydwQ8ifqtEyJDUzw4hl
+         PmNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784765089; x=1785369889;
+        h=content-type:mime-version:date:content-transfer-encoding:subject:to
+         :from:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=ZP//XMZ7JCb/uHzLK9Z1FXYMo5tDITZi8CuuW9mXdh4=;
+        b=C7mHGeaJHQQp4LAS9lBK9MkQjeXsC1+lJXlgdHOxzYjzN62fz6sPIP2rRZcsrg30ka
+         XjFTzbmjx2qdRp8zcqOh6r3iiZyN42RiQD/31M0PIq93PTvQ3nH98IEHELrd3fTHLVY3
+         uESiH808U9edvZjdhmcnyM2E4hsthMbiIq7s27VUTz1y0rgGikVYkB7kndzoa+Fvwdyl
+         lCuZ60XNP8n7a8Z3UChtdUNnRu+DwnziMiZxJcZ8X6WT+kkLbIpg9a+bPObQnr8GmAdm
+         qH32r7jkldyuN8FsJTQ4NgStSIUkHObD1BN/NWwFFkbEebxeZt/RCBCOzop1F7LJ0Kcf
+         go6g==
+X-Gm-Message-State: AOJu0YyjmnpIAxiWfnB0Zg3WrAS6Yvb+Ru+6S1satxEimZSBLdA54Afi
+	qVXtqiUP5Uj7KZIh8kCPas91IP9gAl5LOMGAReTtLZRayJ28hH+G4tV9mwwvfXIm1+m2xIpctge
+	93bQ9Xg==
+X-Gm-Gg: AR+sD130OgC1MRtV1Z5ngGFr3WQLWoYPDxxU1SuQG6eFNSy+qjtn3O6wOLd1n0jrBS5
+	YUtv0TK9bTXJeGaClNyH29rO3kTFSYEa+8djz/zmgRBZTj9j6HlLugItCEdx9c/qUvsu2gFjqcQ
+	WJty7rE6BbciHboQzAgd+jclaGcWx5sW+STS5G9DuGkMCdN2WYZzozuPT5zV3zVanBaJ7XRaSOl
+	E1L/HGM3jtn1ZHWvf24z6eqAZWdTOAgOrX+tl1dUjfg9sUZ5YktIL5ZBhlAHI8Jq+4088u4rNmY
+	f56pqLBkphGmsCxQzaDau+8vBD6UYRsZFIHpWJlz28ufrSAJdnEt6EHPqshYojeLyHzEc94nsbd
+	jcRSYkLRojm7BBTBBx7Ljr+LgTcXZfnbYDRs+dd8r82QtnwdkYoRzKdOMwho97KeD1JrsA8mtYw
+	5c3jGOpvoqMzBBgL8ZwhJHJd4YkcUSUHkZm/bfjCVzycehgsHj7PuSn6SJZQalBpSW3OG/vrpAu
+	mrDJx17lKBcr5hpwysQ3BSfzolX1pge2WdCCr/j
+X-Received: by 2002:ac8:7dc4:0:b0:51c:7b12:5fec with SMTP id d75a77b69052e-5283e036049mr7356251cf.88.1784765089152;
+        Wed, 22 Jul 2026 17:04:49 -0700 (PDT)
+Received: from 019f8c49-5228-7909-b3ee-a449a6f1c14b.local (ec2-54-173-11-139.compute-1.amazonaws.com. [54.173.11.139])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-527d2e77004sm24788381cf.14.2026.07.22.17.04.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Jul 2026 17:04:48 -0700 (PDT)
+Message-ID: <019f8c49-5228-7909-b3ee-a449a6f1c14b@gosalescloserapp.com>
+X-Mail-Abuse-Inquiries:
+ https://app.instantly.ai/privacy/report-abuse/019f8c49-5228-7909-b3ee-a449a6f1c14b
+From: Emily Cooper <emilycooper@gosalescloserapp.com>
+To: linux-crypto@vger.kernel.org
+Subject: Yale Blockchain Initiative sales
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 23 Jul 2026 00:04:47 +0000
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] crypto: pcrypt - Remove pcrypt
-To: Eric Biggers <ebiggers@kernel.org>, Hendrik Donner <hd@os-cillation.de>
-Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Steffen Klassert <steffen.klassert@secunet.com>,
- Thomas Huth <thuth@redhat.com>
-References: <20260713223234.24812-1-ebiggers@kernel.org>
- <20260713223234.24812-2-ebiggers@kernel.org>
- <37ecba68-947a-45ad-9ec4-361facc06a05@os-cillation.de>
- <20260721195004.GA3383223@google.com>
- <19613c3e-9756-45fc-84b6-b650ba3723a7@os-cillation.de>
- <20260722194023.GB2118@quark>
-Content-Language: en-US
-From: Simon Richter <Simon.Richter@hogyros.de>
-In-Reply-To: <20260722194023.GB2118@quark>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
 
 Hi,
 
-On 7/23/26 4:40 AM, Eric Biggers wrote:
+I noticed how the volatility of Bitcoin=E2=80=99s price can make it =
+tough to stay on top of client communications and leads in the crypto space=
+.
 
-> So while maybe pcrypt does still help a bit on this platform for now,
-> the approach does seem quite dated and largely a workaround for
-> inefficiencies elsewhere in the stack (including systems where the
-> optimized crypto code is accidentally not enabled).
+An AI-driven platform can help manage calls and meetings smoothly =
+without stretching your current resources.
 
-There is one additional aspect: offloading frees the CPU to do something 
-else -- and that is where even offload engines that are slower than the 
-CPU can still be beneficial in the big picture.
+One of our users in fintech =
+found it easier to keep prospects engaged and schedule appointments even =
+during market swings.
 
-    Simon
+Would you be open to exploring how this kind of =
+support could fit into your workflow?=C2=A0
+
+
+Best
+-Emily
+
+P.S: let me know if irrelevant.
