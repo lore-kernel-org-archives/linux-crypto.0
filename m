@@ -1,107 +1,344 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAAAD47D45B;
-	Thu, 23 Jul 2026 18:34:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 290AD4756BB
+	for <linux-crypto@vger.kernel.org>; Thu, 23 Jul 2026 18:45:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784831684; cv=none; b=cT/0lwLjOzkUb4s7RsGWYOh4GcN8DBSODan+eT98DnZFmATJaxZlM2KVIwJ0RCsDI1BRKH6J4QBy8j/RO5axo6VtwVdniH6KlY9/YseekpsyE65e2kBmmE9QuqWB0hOSHxu4pC7JvmXHMHfJvl8p/cbbyl8+LjqVkVgIBrwQ2yE=
+	t=1784832368; cv=none; b=SeBiKMc1UwhRT1EeQRGrR1WyXYOSwVYjHZ+2Y1aHCxDYjg2ET9l3QQPJ8Zky3QguJchillLHXiHlA7RwBNbQ4RmVNPLTuoZiHizxBOr4w9O/bmlTMcVEzZXgORtK5ToE1NlbxWrc8+JzGEYC83CA0LOhGUhYyNbmjQexmwIaoJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784831684; c=relaxed/simple;
-	bh=u/kNO7lqSpiD/7rkaWPsgbQzJdaALeDH8Hehr94V1wo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OWWgInRDzrjA+ByHST+OY8vuIKjRf6TeVjwk171WkaPUq1QS9lcvQ38cN4ptRO2bo605+qhu2KUcVEvkSe7wwUSybXiU0oPITfNi5BPdtmGzEXl3Fv2+A8MASkDECwReRxQ7lQ31ROA4g6vCooxES2Q6x6/Q52cP7kYxS8nnCH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63D291F00A3A;
-	Thu, 23 Jul 2026 18:34:40 +0000 (UTC)
-Date: Thu, 23 Jul 2026 11:34:38 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Cc: Thara Gopinath <thara.gopinath@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+	s=arc-20240116; t=1784832368; c=relaxed/simple;
+	bh=0DUXMETFOiPrjHj0I+f8Jjf1hUhgRxwBlToSkMOuX8E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QS2+5+aMUSHq3n+Sc7rXiKrMyBrhcSzs3nsHOjScDprBM56qSudQkPEQfV8Hqy9gNDW9KT/ADPXUTo+lvhGTnVjzc+pTIRKmC3oCKdUI0by29nemH0aOkjJQ+u+w55q7gYyt/9hoaJe238BncCyJzkbRd0aDUIzKVgNCBXA3mYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UcuaoKRQ; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UcuaoKRQ"
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-382ef647e20so1065706a91.1
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Jul 2026 11:45:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784832355; x=1785437155; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=+cqQ6sQJkvsR3VtIbpEjUXStuHRs0SJj4jk7Uojzitk=;
+        b=UcuaoKRQCbsReVhzJf/ZGJlXbh64b3U6AAC/KmroIrAb+XqaMu03L72UQmO1UfiKoH
+         v5t8SdZGnnvGRm0kSFNoBBew4GakZFP6aUp0kui6MrYim7VuZY25y/41yO+xQdCUuVSt
+         AYyG4u/HZr03V71uuN4Tg/H5roah86A3Hs7n7D/0j87fgcqbgrsjvKIgirqEL8EVhOiX
+         7gOxTc3j6W0PsrZth3785bq/XUTCNFWLPQqtgqJpSDa8IKj5CH876rkjW/PMTVdQUJ0V
+         ZoxYoGuEX+u+JYgBv4Zw44W3wGn4VBag2holCYN7hZ6yV5iHWiGOKFKN5GFOZqwlTJyB
+         wTzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784832355; x=1785437155;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=+cqQ6sQJkvsR3VtIbpEjUXStuHRs0SJj4jk7Uojzitk=;
+        b=eD4SleKO9cvlOVJ/6mgHPHBi27em1E7TFp1K1tGr/5h4pSf9UbU13vt7Lmy7/wFxa2
+         vxmlKt8bQ4XG36oocQrmf1tyh7/C7em0NDaGLudCcuOaoW9QcAykhU0FeUdzDmwqPvmT
+         sA3e0eMh+CWPLal0tOfLdn9+ZHM2ubhnQnicrbFnl74rqXa8Ut/9/eHjtsCz26dReprw
+         WIeazV9wxb6fpRFEwnx6A8fIs1Pw+cGxnElUP/hU/DCouMA/XGsZYUuS6xmlwfdE8/7z
+         yUxutSHDBu/f0lYpShupvSLiaJjBXP49NreJ9ADfPaZ7idS/Kcc1YNcAh3FXdcuQS91X
+         0+QQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rq09KleovAGEhMpOFQXnqorJgBmz7QYq3xx+a7MLaAd30bTmXwcov/hiD8CyeRqsB3wKHCvhwNhrlj9eNc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw60Lsdd6usXbAVaqDu0L+KuEodnYlxW6V0Ee1pLEF7GWiIVZB/
+	DgGoI67L3JIKTIkn5Bj7i8Zzf8rHMH/1SkuKZ6D+/o7tGU2Tl17E9jeT
+X-Gm-Gg: AR+sD11ZV99LTdFX4NBOR0YScJvQv0NXIpptmwSPUoc2FGicZUP90eUc9NC0PVIXjTZ
+	l+FKNSi52s9U4GG7od+NUod7fGfA0tM/Ql0Ch9PhlDha+7A6OP/k9K7XYe72ufoazLpqLedzMNa
+	JjEVXGiRB6JyJkd2wkX1UXtdo+0b9Q9w3Q1sawD7RRFNcvLQzVZXuSHchdXK6agYw1OKMSa4w/L
+	11aRKF/qbplyTfCLiQmR7tFr03Gs9B2+el648RQalG1X7anXaZGGrqikOo+zyFXbZp/MYEf78YY
+	TxA2L+kdFbt7eE83nFEo2A4Vus5yMwURU5/WbZeTBNWWBvX/3EcL0TYbTt8CvfILD1tslP9gwp/
+	BXAvV6uTsvGzvpP9UnYvOBl15iAs42dgu5l4nVEzcZRG85jhGlyMmVByT8gw8al1Wx99YZqD7
+X-Received: by 2002:a17:90b:1350:b0:36d:66d4:270e with SMTP id 98e67ed59e1d1-38ec6455120mr4430242a91.5.1784832354540;
+        Thu, 23 Jul 2026 11:45:54 -0700 (PDT)
+Received: from ubuntu.. ([110.9.142.4])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38f03af8a45sm308155a91.10.2026.07.23.11.45.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jul 2026 11:45:53 -0700 (PDT)
+From: Sang-Heon Jeon <ekffu200098@gmail.com>
+To: Julia.Lawall@inria.fr,
+	Alex Deucher <alexander.deucher@amd.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Borislav Petkov <bp@alien8.de>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+	Daniel Lezcano <daniel.lezcano@kernel.org>,
+	David Airlie <airlied@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Stanimir Varbanov <svarbanov@mm-sol.com>,
-	Eneas U de Queiroz <cotequeiroz@gmail.com>,
-	Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
-	linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, brgl@kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v6 7/8] crypto: qce - Use a fallback for CCM with a
- partial final block
-Message-ID: <20260723183438.GB93534@quark>
-References: <20260717-qce-fix-self-tests-v6-0-455775fe5f6c@oss.qualcomm.com>
- <20260717-qce-fix-self-tests-v6-7-455775fe5f6c@oss.qualcomm.com>
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Westphal <fw@strlen.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Hans de Goede <hansg@kernel.org>,
+	Hans Verkuil <hverkuil@kernel.org>,
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	=?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Jaroslav Kysela <perex@perex.cz>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Jiri Pirko <jiri@resnulli.us>,
+	"Joerg Roedel (AMD)" <joro@8bytes.org>,
+	Johan Hovold <johan@kernel.org>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Julian Anastasov <ja@ssi.bg>,
+	Leon Romanovsky <leon@kernel.org>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Linus Walleij <linusw@kernel.org>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Mark Brown <broonie@kernel.org>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Matthew Sakai <msakai@redhat.com>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Maxime Ripard <mripard@kernel.org>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Mike Rapoport <rppt@kernel.org>,
+	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+	Nicolas Palix <nicolas.palix@imag.fr>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Ping-Ke Shih <pkshih@realtek.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Sebastian Reichel <sre@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Simona Vetter <simona@ffwll.ch>,
+	Simon Horman <horms@verge.net.au>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Steve French <sfrench@samba.org>,
+	Takashi Iwai <tiwai@suse.com>,
+	Thomas Renninger <trenn@suse.com>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Tony Luck <tony.luck@intel.com>,
+	Tvrtko Ursulin <tursulin@ursulin.net>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Vinod Koul <vkoul@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	Yazen Ghannam <Yazen.Ghannam@amd.com>
+Cc: cocci@inria.fr,
+	amd-gfx@lists.freedesktop.org,
+	dmaengine@vger.kernel.org,
+	dm-devel@lists.linux.dev,
+	dri-devel@lists.freedesktop.org,
+	intel-gfx@lists.freedesktop.org,
+	intel-wired-lan@lists.osuosl.org,
+	iommu@lists.linux.dev,
+	linux-cifs@vger.kernel.org,
+	linux-clk@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-edac@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	linux-iio@vger.kernel.org,
+	linux-input@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-pm@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-rtc@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-sound@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	lvs-devel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	nouveau@lists.freedesktop.org,
+	platform-driver-x86@vger.kernel.org
+Subject: [PATCH 00/36] treewide: remove conditional returns with no effect
+Date: Fri, 24 Jul 2026 03:45:02 +0900
+Message-ID: <20260723184538.3888637-1-ekffu200098@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260717-qce-fix-self-tests-v6-7-455775fe5f6c@oss.qualcomm.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jul 17, 2026 at 05:53:36PM +0200, Bartosz Golaszewski wrote:
-> CCM builds on AES-CTR for encryption, and the crypto engine stalls on a
-> partial final block just as it does for plain ctr(aes): a payload whose
-> length is not a multiple of the AES block size leaves the operation
-> incomplete and fails with a hardware operation error. This was caught by
-> the ccm(aes) crypto self-tests.
-> 
-> Force the software fallback for CCM requests whose message length is not
-> block aligned, reusing the driver's existing need_fallback mechanism.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 9363efb4181c ("crypto: qce - Add support for AEAD algorithms")
-> Tested-by: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-> ---
->  drivers/crypto/qce/aead.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/drivers/crypto/qce/aead.c b/drivers/crypto/qce/aead.c
-> index 336614a11377e0be246817da584296124f4de5d8..4fa018204cb628c112f64c45ff6c7407df73b945 100644
-> --- a/drivers/crypto/qce/aead.c
-> +++ b/drivers/crypto/qce/aead.c
-> @@ -514,6 +514,14 @@ static int qce_aead_crypt(struct aead_request *req, int encrypt)
->  			ctx->need_fallback = true;
->  	}
->  
-> +	/*
-> +	 * CCM uses AES-CTR internally and the CE stalls on a partial final
-> +	 * block, so a payload that is not a multiple of the block size has to
-> +	 * be handled by the fallback.
-> +	 */
-> +	if (IS_CCM(rctx->flags) && !IS_ALIGNED(rctx->cryptlen, AES_BLOCK_SIZE))
-> +		ctx->need_fallback = true;
-> +
->  	/* If fallback is needed, schedule and exit */
->  	if (ctx->need_fallback) {
+Hello,
 
-Here, the driver is storing per-request state ('need_fallback') in the
-transformation context, which is a shared structure.  This can cause the
-driver to produce incorrect results if used for multiple concurrent
-requests with the same algorithm.
+While reading mm/memblock, I found a conditional return where both
+branches return the same value:
 
-On the topic of CCM, there's also a memory leak and buffer overread in
-qce_aead_ccm_prepare_buf_assoclen().  It allocates a buffer of length
-ALIGN(assoclen,16)+6, then treats it as a buffer of length
-ALIGN(assoclen+6,16).  That can be greater than the allocated length,
-for example if assoclen = 15.  Then it never frees the buffer.
+	err = do_something();
+	if (err)
+		return err;
+	return err;
 
-The allocation is also being done using GFP_ATOMIC, which is
-failure-prone.  Users need crypto operations to be reliable.
+Such code is usually a leftover from removing a statement between
+the two returns, and the tree has about a hundred of these.
 
-This driver's CCM implementation also fails to validate that the message
-length is allowed for the specified nonce length.
+Patch 1 adds a Coccinelle script that matches the pattern, including
+negation and constant-comparison variants. Where a local variable is
+assigned right before the check, the assignment and the two returns
+turn into a single return of the assigned expression.
 
-The error handling in qce_aead_async_req_handle() is also incorrect: it
-calls dma_unmap_sg() on req->src instead of the actual mapped
-scatterlist rctx->src_sg, which differ when assoclen > 0.  It also uses
-< 0 to check for failures from dma_map_sg(), when it actually returns an
-unsigned int and returns 0 on failure.
+Patches 2-36 are generated by the script, with hand fixes to restore
+unexpectedly removed comments and to fix the formatting checkpatch.pl
+complained about.
 
-Note that the ARMv8 CE implementation of AES-CCM is much faster and does
-not have these issues.
+The patches are grouped by subsystem instead of split per file. If
+you would rather split, merge or drop your part, just let me know
+and I will address it in the next version.
 
-- Eric
+All patches are independent and can be applied separately, but for
+everyone's convenience, it would be nice if they were merged through
+a single tree.
+
+The series is based on next-20260721.
+
+Sang-Heon Jeon (36):
+  coccinelle: misc: add cond_return_no_effect.cocci
+  drm/amd: remove conditional return with no effect
+  drm/radeon: remove conditional return with no effect
+  dpll: zl3073x: remove conditional return with no effect
+  drm/i915: remove conditional return with no effect
+  drm: remove conditional return with no effect
+  net: ethernet: remove conditional return with no effect
+  net: remove conditional return with no effect
+  net: intel: remove conditional return with no effect
+  wifi: remove conditional return with no effect
+  ipvs: remove conditional return with no effect
+  media: remove conditional return with no effect
+  ALSA: remove conditional return with no effect
+  ASoC: remove conditional return with no effect
+  iio: remove conditional return with no effect
+  Input: remove conditional return with no effect
+  clk: remove conditional return with no effect
+  crypto: drivers - remove conditional return with no effect
+  dmaengine: qcom_hidma: remove conditional return with no effect
+  stm class: remove conditional return with no effect
+  RDMA/ocrdma: remove conditional return with no effect
+  iommu/s390: remove conditional return with no effect
+  dm vdo: remove conditional return with no effect
+  pinctrl: mediatek: remove conditional return with no effect
+  platform/x86: toshiba_haps: remove conditional return with no effect
+  power: supply: pm8916_lbc: remove conditional return with no effect
+  RAS/AMD/ATL: remove conditional return with no effect
+  regulator: wm831x-isink: remove conditional return with no effect
+  rtc: pcf2127: remove conditional return with no effect
+  scsi: mpt3sas: remove conditional return with no effect
+  thermal/drivers/k3_bandgap: remove conditional return with no effect
+  USB: serial: ch341: remove conditional return with no effect
+  usb: typec: fusb302: remove conditional return with no effect
+  smb: client: remove conditional return with no effect
+  cpupower: remove conditional return with no effect
+  memblock: remove conditional return with no effect
+
+ drivers/clk/clk-cs2000-cp.c                   |   6 +-
+ drivers/clk/clk-lmk04832.c                    |  12 +-
+ .../intel/qat/qat_common/adf_gen2_config.c    |   8 +-
+ .../marvell/octeontx2/otx2_cpt_mbox_common.c  |   7 +-
+ drivers/dma/qcom/hidma_ll.c                   |   6 +-
+ drivers/dpll/zl3073x/dpll.c                   |   6 +-
+ drivers/dpll/zl3073x/out.c                    |   8 +-
+ drivers/gpu/drm/amd/amdgpu/gfx_v7_0.c         |   6 +-
+ drivers/gpu/drm/amd/amdgpu/gfx_v9_0.c         |   6 +-
+ drivers/gpu/drm/amd/amdgpu/gfx_v9_4_3.c       |   6 +-
+ drivers/gpu/drm/amd/amdgpu/sdma_v4_4_2.c      |   6 +-
+ drivers/gpu/drm/amd/amdgpu/sdma_v5_0.c        |   6 +-
+ drivers/gpu/drm/amd/amdgpu/sdma_v5_2.c        |   6 +-
+ drivers/gpu/drm/amd/amdgpu/sdma_v6_0.c        |   6 +-
+ drivers/gpu/drm/amd/amdgpu/uvd_v4_2.c         |   6 +-
+ drivers/gpu/drm/amd/amdgpu/uvd_v5_0.c         |   6 +-
+ drivers/gpu/drm/amd/amdgpu/uvd_v7_0.c         |   6 +-
+ drivers/gpu/drm/amd/amdgpu/vce_v4_0.c         |   6 +-
+ drivers/gpu/drm/amd/pm/legacy-dpm/kv_dpm.c    |  32 ++---
+ drivers/gpu/drm/amd/pm/legacy-dpm/si_dpm.c    |   6 +-
+ drivers/gpu/drm/amd/pm/swsmu/amdgpu_smu.c     |   6 +-
+ .../gpu/drm/amd/pm/swsmu/smu11/arcturus_ppt.c |   6 +-
+ .../gpu/drm/amd/pm/swsmu/smu11/navi10_ppt.c   |   6 +-
+ .../gpu/drm/amd/pm/swsmu/smu11/smu_v11_0.c    |  19 +--
+ .../gpu/drm/amd/pm/swsmu/smu11/vangogh_ppt.c  |   7 +-
+ .../gpu/drm/amd/pm/swsmu/smu12/renoir_ppt.c   |   7 +-
+ .../drm/amd/pm/swsmu/smu13/aldebaran_ppt.c    |   6 +-
+ .../gpu/drm/amd/pm/swsmu/smu13/smu_v13_0.c    |  19 +--
+ .../drm/amd/pm/swsmu/smu13/smu_v13_0_0_ppt.c  |   6 +-
+ .../drm/amd/pm/swsmu/smu13/smu_v13_0_6_ppt.c  |  10 +-
+ .../drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c  |   6 +-
+ .../gpu/drm/amd/pm/swsmu/smu14/smu_v14_0.c    |  19 +--
+ .../drm/amd/pm/swsmu/smu14/smu_v14_0_2_ppt.c  |   6 +-
+ .../gpu/drm/amd/pm/swsmu/smu15/smu_v15_0.c    |   9 +-
+ .../drm/amd/pm/swsmu/smu15/smu_v15_0_8_ppt.c  |  16 +--
+ drivers/gpu/drm/i915/display/intel_hdmi.c     |   7 +-
+ drivers/gpu/drm/i915/gvt/gtt.c                |   8 +-
+ drivers/gpu/drm/imx/ipuv3/imx-drm-core.c      |   6 +-
+ drivers/gpu/drm/nouveau/dispnv50/disp.c       |  14 +-
+ .../drm/panel/panel-osd-osd101t2587-53ts.c    |   7 +-
+ drivers/gpu/drm/radeon/ci_dpm.c               |   6 +-
+ drivers/gpu/drm/radeon/kv_dpm.c               |  30 ++---
+ drivers/gpu/drm/radeon/si_dpm.c               |  14 +-
+ drivers/gpu/drm/tilcdc/tilcdc_drv.c           |   6 +-
+ drivers/hwtracing/stm/core.c                  |   8 +-
+ drivers/iio/light/isl29028.c                  |   6 +-
+ drivers/iio/light/tsl2583.c                   |  14 +-
+ drivers/iio/magnetometer/ak8974.c             |   6 +-
+ drivers/infiniband/hw/ocrdma/ocrdma_verbs.c   |   7 +-
+ drivers/input/keyboard/pmic8xxx-keypad.c      |   8 +-
+ drivers/input/mouse/synaptics_i2c.c           |   6 +-
+ drivers/input/rmi4/rmi_smbus.c                |   7 +-
+ drivers/iommu/s390-iommu.c                    |   8 +-
+ drivers/md/dm-vdo/encodings.c                 |   8 +-
+ drivers/media/i2c/mt9p031.c                   |   6 +-
+ .../microchip/microchip-sama7g5-isc.c         |   7 +-
+ .../media/platform/qcom/iris/iris_resources.c |   6 +-
+ .../media/platform/qcom/venus/pm_helpers.c    |   7 +-
+ drivers/media/platform/renesas/rcar-csi2.c    |   6 +-
+ .../platform/samsung/s3c-camif/camif-core.c   |   7 +-
+ drivers/media/usb/dvb-usb-v2/mxl111sf.c       |  12 +-
+ drivers/media/usb/gspca/jl2005bcd.c           |   7 +-
+ drivers/net/ethernet/amazon/ena/ena_netdev.c  |   6 +-
+ .../ethernet/aquantia/atlantic/aq_macsec.c    |   6 +-
+ .../ethernet/freescale/dpaa2/dpaa2-switch.c   |   6 +-
+ drivers/net/ethernet/freescale/gianfar.c      |   6 +-
+ drivers/net/ethernet/intel/i40e/i40e_main.c   |   8 +-
+ drivers/net/ethernet/intel/igb/e1000_i210.c   |   6 +-
+ drivers/net/ethernet/intel/igc/igc_phy.c      |   6 +-
+ .../ethernet/qlogic/netxen/netxen_nic_hw.c    |   7 +-
+ .../ethernet/qlogic/qlcnic/qlcnic_83xx_init.c |   6 +-
+ drivers/net/ethernet/renesas/rtsn.c           |   7 +-
+ drivers/net/phy/microchip_t1.c                |   6 +-
+ drivers/net/pse-pd/tps23881.c                 |   6 +-
+ drivers/net/wireless/ath/ath6kl/init.c        |   6 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/link.c |   6 +-
+ .../wireless/realtek/rtlwifi/rtl8821ae/hw.c   |   7 +-
+ drivers/net/wireless/realtek/rtw89/mac.c      |   6 +-
+ drivers/net/wireless/realtek/rtw89/mac_be.c   |   6 +-
+ .../pinctrl/mediatek/pinctrl-mtk-common-v2.c  |   6 +-
+ drivers/platform/x86/toshiba_haps.c           |   6 +-
+ drivers/power/supply/pm8916_lbc.c             |   8 +-
+ drivers/ras/amd/atl/map.c                     |   6 +-
+ drivers/regulator/wm831x-isink.c              |   6 +-
+ drivers/rtc/rtc-pcf2127.c                     |   7 +-
+ drivers/scsi/mpt3sas/mpt3sas_base.c           |   6 +-
+ drivers/thermal/k3_bandgap.c                  |   7 +-
+ drivers/usb/serial/ch341.c                    |   8 +-
+ drivers/usb/typec/tcpm/fusb302.c              |  14 +-
+ fs/smb/client/smb1maperror.c                  |   6 +-
+ mm/memblock.c                                 |   7 +-
+ net/netfilter/ipvs/ip_vs_sync.c               |   7 +-
+ .../misc/cond_return_no_effect.cocci          | 121 ++++++++++++++++++
+ sound/pci/echoaudio/echoaudio_dsp.c           |   6 +-
+ sound/pci/echoaudio/layla24_dsp.c             |   6 +-
+ sound/pci/riptide/riptide.c                   |   5 +-
+ sound/soc/amd/acp/acp-mach-common.c           |  11 +-
+ sound/soc/intel/atom/sst-mfld-platform-pcm.c  |   7 +-
+ sound/soc/samsung/smdk_spdif.c                |   8 +-
+ sound/soc/sof/intel/hda-dsp.c                 |   6 +-
+ sound/usb/mixer_scarlett.c                    |  26 ++--
+ tools/power/cpupower/utils/powercap-info.c    |   2 -
+ 102 files changed, 295 insertions(+), 643 deletions(-)
+ create mode 100644 scripts/coccinelle/misc/cond_return_no_effect.cocci
+
+--
+2.43.0
+
