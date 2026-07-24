@@ -1,124 +1,75 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7BE12FD694
-	for <linux-crypto@vger.kernel.org>; Fri, 24 Jul 2026 07:36:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 009C23CF1E1
+	for <linux-crypto@vger.kernel.org>; Fri, 24 Jul 2026 08:16:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784878589; cv=none; b=EVFYHUcjl20N6+dP+WihEbwzFXO2dYKQZN2QLV98Hb5sGqeNFABRCkA8sSqD+jLlboZVQkcQlKMxZoQtQetC3KBwvA37DTWj2d1htP6XXsWf+D4SUH4mzQqcekyn9uqcJ7ONwTXypgQfi/N0DRG06mHW+OV8hPEVosVbiG7Yn9w=
+	t=1784880986; cv=none; b=RU2DQnptZfkW82LcNEyDTIBy6o8VzPfMenIVrAqr7MF3RwgspHrFY2e1n/hoDB0pFj7o3vlYV6RzXWL6EUp6ZJEewKBcl6oKVRplbalR3m/mdZSbTVFntJXWLia7rzmOYeZL4HqBc43CZYSa2k2mHGPXuKLnc0cErpPgU2FktK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784878589; c=relaxed/simple;
-	bh=5FtLBMpQqcwilJSh6kla1fOiGISZIbkb6Rq7aIZtlFc=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pKudbfwJPEtTB+M9fe+hYsnarAhULtIadwnQkGzsH4T8Qclge1GS1d4ebPpM5x5ktFmPrtIKm1Bo0yqWvpqK1e/LrmJQdbYVQBFnGATY5SRQR00NGz4sWGdjA1g4asC23Yp31lblAr7nMc9yvkVTKWJUqXeOGyNKXMGO/8vT9pk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MLy06/I0; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1784880986; c=relaxed/simple;
+	bh=q+e76o01AE2ElZ7QyaOg2YKqkDt5bYWXXYMGTCvUWqA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=V5vV41wxz7s5NTWuqzgyTRM5/JGPNIpAXu26nPNfy+wcdBPNpWvS7orPoxxKg0v9w5rncG41OxaP3gffS1Wq+GuYwAmA9cL7F14IwaVuisGUOcbUBLRsA3ejK2pqAJTaEve2+izeCSgiri7JMTaCaWk3p+8N5igCbHqHtTbrxns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lmn9cknH; arc=none smtp.client-ip=95.215.58.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MLy06/I0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B88771F00ADF
-	for <linux-crypto@vger.kernel.org>; Fri, 24 Jul 2026 07:36:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1784878587;
-	bh=eFnDdKu3Hxl7FTSkySekyyZQVF8xWD+m4hHcrRsAWRQ=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=MLy06/I0fd8Uq55S3u0uGmXIyTABIzm9KivElpqsecq90DoPS/uGrgW/wgMMUKGa0
-	 NUI9lKLp2yOC3a61ntTBsbFGIiXyj+dOWY0vewNZr2FO3VMeWJ+lhpJ8WIGWOfmF53
-	 qN/Gkv29CIf3B5XvZYifZGSgfKNSSqNGF7JfrxLQbWBp4HYKyvHzV5Xofyza72pxrd
-	 iH39CspY+C/5EM74xFsFleT9Xmp3ToX79d03DbO1pxV2sIkxB3a/bvQhkaTA5kqo3R
-	 Hm1CmGQq8x4mio7bTIzIwMHpPlLx/V7zPio5tZBeGKd+IEJGwSPrkUIeVZX848FNY5
-	 i/RxPFrLD+xRA==
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-39da69c5ba3so983181fa.1
-        for <linux-crypto@vger.kernel.org>; Fri, 24 Jul 2026 00:36:27 -0700 (PDT)
-X-Gm-Message-State: AOJu0Yxi6exZlVWgUoRLBuCBT/5Nfz3j9hFnpieLb9HGABxy0PnMiazw
-	j4HT1jTgrl9X7yf22MvE1n84SlXVEvOXyJN4GxLl6sxTwqRsPSof1n3MxbAEqr5CPJe/I9v+Lip
-	F4UAIX5EQioIdDs3wRi0nB81mFMy5xTdIhSMas2u7wg==
-X-Received: by 2002:a05:651c:b1f:b0:39b:4371:dbeb with SMTP id
- 38308e7fff4ca-39f07f1978cmr14723081fa.36.1784878586411; Fri, 24 Jul 2026
- 00:36:26 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Fri, 24 Jul 2026 00:36:24 -0700
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Fri, 24 Jul 2026 00:36:24 -0700
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <2026072410-drained-acts-3502@gregkh>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lmn9cknH"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1784880962;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=VlrNlXLOdZeEezxbt+EtAbDHkQiiEwhfGxCf1fhl1LI=;
+	b=lmn9cknHrvyzmkXRpUPkP4p2Bu/zNXwMv5vN6TtZVXKmaDaKDBw1gvcFyMd2VUUyCz+Mby
+	gOT8169eITSokw5oEY7wJh2tR3S5yA7Dzk4yOiQ44d4oX//KUJQiaPCbwj3PP3Q6ysbED+
+	k42gLoIwj2gLRqVhR9ByMqR60tMgHwk=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Bartosz Golaszewski <brgl@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Neil Armstrong <neil.armstrong@linaro.org>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	stable@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: qce - fix error path in devm_qce_register_algs
+Date: Fri, 24 Jul 2026 10:15:38 +0200
+Message-ID: <20260724081537.191992-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260724050645.223799-1-ebiggers@kernel.org> <2026072410-drained-acts-3502@gregkh>
-Date: Fri, 24 Jul 2026 00:36:24 -0700
-X-Gmail-Original-Message-ID: <CAMRc=MdJTFokXLEbJMQW3V4FAMQid50Vx3fDB+CaNGUrzX-Pwg@mail.gmail.com>
-X-Gm-Features: AUfX_my5XZyE7UqXKRq4QXkQ89HpYi6P6qHi08NgO2eVL5ur0W8C7gKD-xXnu0M
-Message-ID: <CAMRc=MdJTFokXLEbJMQW3V4FAMQid50Vx3fDB+CaNGUrzX-Pwg@mail.gmail.com>
-Subject: Re: [PATCH] crypto: qce - Remove driver
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, 
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, Demi Marie Obenour <demiobenour@gmail.com>, 
-	Bartosz Golaszewski <brgl@kernel.org>, Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>, 
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, Eric Biggers <ebiggers@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=912; i=thorsten.blum@linux.dev; h=from:subject; bh=q+e76o01AE2ElZ7QyaOg2YKqkDt5bYWXXYMGTCvUWqA=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFnJ8pp7Nh18/FXI+/5mrvMPDi67dTnEbJY+U7xJSXrsj t6L2n9EOkpZGMS4GGTFFFkezPoxw7e0pnKTScROmDmsTCBDGLg4BWAiUTsZ/pk18nUcdlxlf9ba tO09Q/pyRxVZs6aph2JmCGUFLZh2V4WRYY3oXou2z4wGHZfnHNHPvhrirG7uaSN3TOVl09v76ge mcwEA
+X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, 24 Jul 2026 07:28:53 +0200, Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> said:
-> On Thu, Jul 23, 2026 at 10:06:45PM -0700, Eric Biggers wrote:
->> This obsolete driver was already marked as BROKEN.  However, keeping
->> BROKEN code around in the tree is unnecessary and causes problems.  It's
->> much better to just remove it entirely.  Let's do that.
->>
->> Crypto acceleration remains well-supported on Qualcomm SoCs via the
->> Qualcomm Inline Crypto Engine and the ARMv8 Crypto Extensions, which are
->> what Linux actually uses in practice.  The obsolete QCE driver is a
->> dead-end approach.  It's extremely slow and just doesn't work well.
->>
->> While there's been discussion around using QCE for restricted media
->> content protection, that functionality has very little to do with the
->> current crypto API driver and belongs in a separate, clean proposal
->> (likely under a different subsystem/directory).
->>
->> The extensive reasons for marking this driver as BROKEN were already
->> documented in commit df373d39c6f0 ("crypto: qce - Mark QCE as BROKEN").
->>
->> Since then, it's also been found that under realistic workloads, the
->> driver is not only ~48x slower than ARMv8 CE, but due to massive driver
->> overhead it actually consumes significantly *more* CPU cycles than doing
->> the hashing directly on the CPU -- with much of that time spent in
->> non-preemptible hardirq and softirq contexts
->> (https://lore.kernel.org/linux-crypto/20260724020608.GA51735@sol/).  The
->> proposed BAM locking fixes would only further degrade performance.
->>
->> Additional bugs have been found as well
->> (https://lore.kernel.org/linux-crypto/20260723205801.GD110634@quark/).
->> Pending fixes for some bugs don't change the big picture.  Nor have
->> security-related claims held up.  Of course, these issues are largely
->> moot anyway when this driver's functionality isn't being used in
->> practice, beyond the module loading due to it being in the kconfig.
->>
->> Note that this removal does *not* imply that various other drivers in
->> drivers/crypto/ don't have similar issues.  They do.  Rather, the
->> evidence is just exceptionally clear for this one, in part because
->> hardware availability has enabled independent testing.
->>
->> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
->
-> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
->
+If ops->register_algs() fails, the error path repeatedly calls the same
+ops->unregister_algs() from the failed registration. Use the loop index
+to unregister the previously registered algorithms instead.
 
-Greg,
+Fixes: e80cf84b6087 ("crypto: qce - unregister previously registered algos in error path")
+Cc: stable@vger.kernel.org
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+ drivers/crypto/qce/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I'm against removing this driver but I have a kernel driver policy question
-before I start arguing the case: If I say that I do use this driver and that
-I volunteer to maintain it and had already started sending out fixes, can
-Eric still force its removal? Because in this case I can name a whole lot of
-drivers that I deem useless that we still keep around.
-
-The alg priority of this driver has been decreased below that of ARM CE and
-since CRYPTO_ALG_KERN_DRIVER_ONLY it can no longer be used accidentally by
-user-space either.
-
-Even if in practice the driver is used for testing purposes - does this warrant
-its removal?
-
-Thanks,
-Bartosz
+diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
+index ac74f69914d6..ea5b9689ce68 100644
+--- a/drivers/crypto/qce/core.c
++++ b/drivers/crypto/qce/core.c
+@@ -58,7 +58,7 @@ static int devm_qce_register_algs(struct qce_device *qce)
+ 		ret = ops->register_algs(qce);
+ 		if (ret) {
+ 			for (j = i - 1; j >= 0; j--)
+-				ops->unregister_algs(qce);
++				qce_ops[j]->unregister_algs(qce);
+ 			return ret;
+ 		}
+ 	}
