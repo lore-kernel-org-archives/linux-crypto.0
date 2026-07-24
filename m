@@ -1,132 +1,115 @@
-Received: from submarine.notk.org (submarine.notk.org [62.210.214.84])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66C72360ECE;
-	Fri, 24 Jul 2026 15:36:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.210.214.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D330282F25;
+	Fri, 24 Jul 2026 15:53:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784907396; cv=none; b=mo2lkRj76sSu2biDnsO7gsaV3Vgd92NOJ8WN0NlhJ6LRIHPYsr+WFDq6FtQO1pxbOnKI9rtu7L1DfftGthFW5dCBWiH+cS8L9mrjf4CPSQyttH9diny4XOM4ogJzkKiSlasJEYu854AZdOd1SbOGkJPDLljUSIG6Q3WttIeQADo=
+	t=1784908418; cv=none; b=UeOij8EA8NX67NNLDWEYW6ctNbMzWNqGtrMZ3mMpoGJwP09e4MvxMrgk8qRfMN9Qnj5sBEDrMujiXkCyYs2bj8WevVOqngbrtejzvZUjGTmzHrQXjxKySryRQxejt7uicuZJmK2ktOcDKzFUnYbIYESvHivdT3E+dYq2kRWhDTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784907396; c=relaxed/simple;
-	bh=v2uizrb49ng4W8H09GOxCH7086EukcsXISjNHh4+VZE=;
+	s=arc-20240116; t=1784908418; c=relaxed/simple;
+	bh=MpXbUV4lFgyWeBbyAsl2A8uBOIeasIflkGfpAfI6vb4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=smXHfNPNvDTZqAjftW74qyA8b5gS/5MGgfUfLO6GNdyqWG9nVK2rW1dLPW5OoouSkq0gati1o8xSyIrVb0wpMxEUefoSqJnpOzgICo4/Utfnu4XneblLMRh0QykfoVUIEmO18tLgyxFvVqSlrw9W7Uzu7WdTOfSfXCPwh4dgEMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org; spf=pass smtp.mailfrom=codewreck.org; dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b=tKaX3VIm; arc=none smtp.client-ip=62.210.214.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewreck.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=gz9O3CIHEH1uYfXv46Irj/AlzaLgw0ClPhx5IcgPSHJUPIbLypzpvWX7e3raQ05M6Y5SMycl3fD5yjG36WmqqEMa17Uz3vPBvp87pKeomcMQcSoSDEHshaGcrfzOX07GCEbTuBKVUAzhL62QXofYsxvWXzJdwtKbe3+jJDE2yOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KDmoa1B+; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="tKaX3VIm"
-Received: from gaia.codewreck.org (localhost [127.0.0.1])
-	by submarine.notk.org (Postfix) with ESMTPS id 7DF9314C2D6;
-	Fri, 24 Jul 2026 17:36:12 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org;
-	s=2; t=1784907381;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3DJPFRwghjW/OGMxJodaEoxseBzxbt0JIBUsvIGFSX8=;
-	b=tKaX3VImhXPyYMLecEORXCFrxXRlcs9KVLCxJzwZrEJJyOG0v75vBiU1+8bluw7OW5eLO5
-	LXqBJVCNJ3S5pMXQFUU+BfmtHW8K3ausocnEs0GwovayqN/NMujrH2urrrdpOOsKJUem4f
-	FQPcMhUpwUvKSH2LvW6MLJWlsqEq+6NZCI8eYCyE+QhhNvElIqdVM6iDQ9MK64rH5y/Qhi
-	Bviag3Q5TnwKdi6zaV/H3WAp753geUvJHgvS+cK7lgKRJlH6QM0GSTBpyVco45B2WqHZpw
-	30iVpTVD0eCERjoYw8OEho18Y8H+lflch8QzA4OPmyv/IMVf5BnzXJrLgsGHVw==
-Received: from localhost (gaia.codewreck.org [local])
-	by gaia.codewreck.org (OpenSMTPD) with ESMTPA id 50527fce;
-	Fri, 24 Jul 2026 15:36:10 +0000 (UTC)
-Date: Sat, 25 Jul 2026 00:35:55 +0900
-From: Dominique Martinet <asmadeus@codewreck.org>
-To: demiobenour@gmail.com
-Cc: Harald Freudenberger <freude@linux.ibm.com>, acme@kernel.org,
-	adrian.hunter@intel.com, alexander.shishkin@linux.intel.com,
-	ardb@kernel.org, axboe@kernel.dk, corbet@lwn.net,
-	davem@davemloft.net, ebiggers@google.com, edumazet@google.com,
-	herbert@gondor.apana.org.au, horms@kernel.org,
-	io-uring@vger.kernel.org, irogers@google.com,
-	james.clark@linaro.org, jolsa@kernel.org, kuba@kernel.org,
-	kuniyu@google.com, linux-crypto@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org, mark.rutland@arm.com,
-	mingo@redhat.com, namhyung@kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, peterz@infradead.org, skhan@linuxfoundation.org,
-	willemb@google.com, linux-s390@vger.kernel.org
-Subject: Re: [PATCH 2/3] AF_ALG: Drop support for off-CPU cryptography
-Message-ID: <amOGWwdjnJqyxH5L@codewreck.org>
-References: <20260523-af-alg-harden-v1-2-c76755c3a5c5@gmail.com>
- <20260603133312.12848-1-freude@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KDmoa1B+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 714891F000E9;
+	Fri, 24 Jul 2026 15:53:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784908416;
+	bh=2pkg/l0Fg6KNScIDEKDJlmLyaPEVAH54Yt5weFxUR+A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=KDmoa1B+Gj6qoarRUqhbGgjYjd4YwbQOMHypVrttD5ZBcUzGoHr6EooKSSd6xFQoP
+	 6s5yVuLB6QFB0fMpjUywcfAPXtTcEbnurC6PmYF3M7bofTN6DJaLHVuTgc4Qkw/mm+
+	 9PrGDGSbYmxSjgqEp1UcLzhcusI74r/chB0aoU8Ldh5aXF8Zm+nysj3ruDV0GVV+m7
+	 6LGj6EjygJNrNggV6LVwcTl9u1xH+FzluoIXOpvvTB/wsXDd1e4+XnQSB+sdbwGLvG
+	 XiePFDIrbL5jIMwD6dVSXy46BWgvG13GxnyH0eAdMMyBQgs2IVO1W4lgQ6H6bjSnAa
+	 ZavO9ULmYSLhw==
+Date: Fri, 24 Jul 2026 08:51:44 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Bartosz Golaszewski <brgl@kernel.org>, linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Demi Marie Obenour <demiobenour@gmail.com>,
+	Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Subject: Re: [PATCH] crypto: qce - Remove driver
+Message-ID: <20260724155144.GA2032@sol>
+References: <20260724050645.223799-1-ebiggers@kernel.org>
+ <2026072410-drained-acts-3502@gregkh>
+ <CAMRc=MdJTFokXLEbJMQW3V4FAMQid50Vx3fDB+CaNGUrzX-Pwg@mail.gmail.com>
+ <2026072412-decrease-sandbag-70a1@gregkh>
+ <CAMRc=MeFoG0UXYOAqYhCiKBTs12EjX2-Bz4wDnbeYXmQA3-OaQ@mail.gmail.com>
+ <20260724141414.GB1876@sol>
+ <CAMRc=MfU1egvJwmgPEN-GXPbz8_JL2XnP-LV0T2+jG-drfXYwg@mail.gmail.com>
+ <2026072455-subtly-prayer-0a8a@gregkh>
+ <20260724150932.GA6763@sol>
+ <2026072428-ungodly-outsource-b20c@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260603133312.12848-1-freude@linux.ibm.com>
+In-Reply-To: <2026072428-ungodly-outsource-b20c@gregkh>
 
-Harald Freudenberger wrote on Wed, Jun 03, 2026 at 03:33:12PM +0200:
-> > AF_ALG is deprecated and exposed to unprivileged userspace.  Only
-> > use the least buggy algorithm implementations: the pure software ones.
-> >
+On Fri, Jul 24, 2026 at 05:25:46PM +0200, Greg Kroah-Hartman wrote:
+> On Fri, Jul 24, 2026 at 08:09:32AM -0700, Eric Biggers wrote:
+> > On Fri, Jul 24, 2026 at 05:04:46PM +0200, Greg Kroah-Hartman wrote:
+> > > On Fri, Jul 24, 2026 at 02:47:48PM +0000, Bartosz Golaszewski wrote:
+> > > > On Fri, 24 Jul 2026 16:14:14 +0200, Eric Biggers <ebiggers@kernel.org> said:
+> > > > >
+> > > > > And with the defaults QCE is *never* used.
+> > > > >
+> > > > 
+> > > > It's almost EOD here and I'm going to disconnect for the weekend but I just
+> > > > wanted to say before I leave: this has never been a reason for an aggresive
+> > > > removal of any driver. We remove drivers when we stop supporting entire
+> > > > platforms, not mostly unused drivers on actively *supported* platforms where
+> > > > they can still be used for experimentation and testing. I'm fine with dropping
+> > > > this from arm64 defconfig but with fixes, the BROKEN tag should be removed
+> > > > and I definitely object to removing it from the tree. How many people still
+> > > > use greybus? Should we drop it from the kernel too? And I'm saying it as
+> > > > a project ARA alumni. :)
+> > > 
+> > > I agree, if someone is willing to maintain it, and there are actual
+> > > in-kernel uses of it (meaning not just a stand-alone library that can
+> > > never be called either by userspace or hardware), it should stay.
+> > 
+> > What would we be considering the in-kernel uses to be, then?  Just
+> > wiring it up to the framework is enough, regardless of actual use?
 > 
-> I thought AF_ALG is marked as deprecated but still usable. This patch
-> now actively disables groups of crypto implementations. Also it just
-> assumes that all algorithms which are asynchronously implemented or
-> do not have a fallback are to be disabled via AF_ALG.
+> I was meaning that we just don't want to have code lying around that is
+> impossible to use.
 > 
-> There are may reasons for not having a synchronous implementation. For
-> example if you need to fetch (asynch) some information from a HSM before
-> doing the job of the algorithm. Also all secure key operations can't
-> by definition run directly on the CPU but need to be fed into some
-> hardware. Same is true with just acceleration - and acceleration via
-> special hardware (crypto hw, or AI hardware for example) is very common
-> on platforms priced by CPU cycles.
+> I'll defer to the subsystem maintainer if they want to remove it or not
+> here, as that's their call, not mine.
 > 
-> I also can't find any arguments for the statement 'Hardware accelerator
-> drivers are frequently buggy.' Does this mean that the linux kernel
-> from now on will not accept any hardware accelerator drivers any more?
-> Statements about code quality should be addressed to the driver
-> maintainer but not lead to tagging of groups of drivers.
-> 
-> I can understand that the AF_ALG shall be deprecated and fade away.
-> But this patch out of the sudden disables the long standing AF_ALG
-> interface at least for testing purpose and causes some failures in
-> the s390 crypto test area without any chance to react at all.
+> But really, if someone wants to maintain it, no matter how slow it might
+> be, I don't see the harm in keeping it if it's not causing any other
+> problems.
 
-I've also stumbled upon this for our embedded use case: we use CAAM
-"blob" keys on NXP socs (specifically i.MX8MP and i.MX8ULP at least),
-which pretty much requires af_alg, because the key material is just not
-available: it's not a matter of performance (we actually only
-encrypt/decrypt a few KB that will be used for LUKS key or similar), the
-hardware is required to perform the operation, and the only API
-available is through the kernel afaik.
+It is consuming a lot of the community's time to help maintain,
+including dealing with LLM-found bugs, with no clear benefit to anyone.
+Even considering *just today* we can see someone sent a bug fix:
+https://lore.kernel.org/linux-crypto/20260724081537.191992-2-thorsten.blum@linux.dev/
 
-The tool source is available here:
-https://github.com/nxp-imx/crypto_af_alg
-(which now fails with:
-bind(3, {sa_family=AF_ALG, salg_type="skcipher", salg_feat=0, salg_mask=0, salg_name="tk(cbc(aes))"}, 88) = -1 ENOENT (No such file or directory)
-)
+It definitely *was* causing problems before it was disabled via the
+crypto priority system (which made it unused in the kernel) and dropped
+it from AF_ALG (which removed most of the unprivileged attack surface).
+When anyone accidentally used it, it caused at least a huge performance
+problem, and sometimes other problems too like filesystem hangs.  It was
+an issue for years.
 
+If the justification for keeping it is that it is disabled anyway, then
+I hope there's not going to be a contradictory push to enable it again.
 
-I don't particularily care for the API used as long as we can keep using
-the hardware key, but as far as I can see there's no alternative API --
-what's the path forward?
+I don't think we should keep crypto drivers around just for
+"experimentation and testing".
 
-Short term would it make sense to re-enable and make it a sysctl knob
-like af_alg_restrict[1]?
-[1] https://lore.kernel.org/linux-crypto/20260622234803.6982-1-ebiggers@kernel.org/T/#u
-
-Longer term we don't need many algorithm (the tool only supports
-AES-256-CBC), so a much simpler API would do, but some replacement would
-be greatly appreciated.. Embedded being embedded we can always kludge
-something in, but I'd rather not fall back to that.
-
-
-(I also second this felt sudden, I only noticed because the sysctl knob
-made noise on fedora lists and I wanted to try, and it didn't
-cherry-pick cleanly without this patch so that made me try, but I
-probably wouldn't have noticed until much later otherwise...)
-
-
-Thanks,
--- 
-Dominique Martinet | Asmadeus
+- Eric
