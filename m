@@ -1,43 +1,66 @@
-Received: from os-cillation.de (mx.os-c.de [213.165.83.196])
+Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 441E938AC88;
-	Fri, 24 Jul 2026 19:12:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.165.83.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A46013AFB13
+	for <linux-crypto@vger.kernel.org>; Fri, 24 Jul 2026 20:35:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784920380; cv=none; b=bX+XxZ+GrIrkDT+fgcsf6bJvID0kBjmiovFUs4NWdBNXZRsw2CTT89OShGGQ1UxWj/wHwCUDvrRVv9fUyHOKgIi96yFO8uqbIX7zMGI54EDWuE0nsSkSKrqMo/BacYbczNdMnRfmr0AV78DwHLdwng2vsNVYSeYPCj+dK+RH8Lw=
+	t=1784925333; cv=none; b=CFxaWcyzhb1cJZWCuI+3OgRln5qpr5JSUycBC0yA795Y813vTb/NZb3ASB3/ar2n84Q7kCnoyojXlcXWCp0jLlg2KDLSFlCQ1K/mZhXZ6STKti5tbiYlCkcONETCrkfeLa+ySEVoXXm6mvPNlIhX01K7IEZal5W/oTrITVQFj6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784920380; c=relaxed/simple;
-	bh=sa9rLcmj31NVq/qF+eBU0MswrMLIolVsI2/RTadHn0I=;
+	s=arc-20240116; t=1784925333; c=relaxed/simple;
+	bh=TIdb+PrmPRPIJerRy/ogzvQiQrvIOHY0y1wo5UN9DMM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SS8gdj6CHd7ASWg4U2mSlyLgnbSMRQmKNbWBv49JWtkpws7mT10acA2RlGBgbCf/kArGdG6bGtZ7jWddrUimEbrTKYwYYcpDEgPwLPwuuB50KbUJ/UV5mZwuEmm+83Ue0teMN/BaPHPTBZNpb98pCopR2lnA5Nj/UVBqEJrMVRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=os-cillation.de; spf=pass smtp.mailfrom=os-cillation.de; dkim=pass (2048-bit key) header.d=os-cillation.de header.i=@os-cillation.de header.b=VBakHQ9S; arc=none smtp.client-ip=213.165.83.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=os-cillation.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os-cillation.de
+	 In-Reply-To:Content-Type; b=akXkoLjZblPPiNOprKqG/NubGq4Wn7UW9I7Gb2aeCHq700x32h1p+dRkUINg+WVrwBL6Dui/rqO9VrMLnpFgoUDKgCWwFu5na8mvp6gtvw6lKb0a88XpGdrZdpZ4Xeg60Lv0Y8bKda0jCAxY892lSahg/tpSBXRAuTRhuy4yNwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MxbopMaS; arc=none smtp.client-ip=74.125.224.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=os-cillation.de header.i=@os-cillation.de header.b="VBakHQ9S"
-Received: from core2024.osc.gmbh (ip-094-079-177-042.um30.pools.vodafone-ip.de [94.79.177.42])
-	by os-cillation.de (Postfix) with ESMTPSA id F0FDDC0381;
-	Fri, 24 Jul 2026 21:12:55 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=os-cillation.de;
-	s=202409; t=1784920376;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Qki56/0rJqhGdoQVgC7oeD6qgG42mAGRt9AiirHKEl0=;
-	b=VBakHQ9SUtViopQofAqkzI+/Gy1OPwBotn1r6pZKO0CWOqqpMhm+F2OD317UwK2r3Ia/dU
-	2OsunUIBVpMg3BHihf42m6/LMBgTfn77iUcn/RaodS0+Zwra5d6Mcak52JkF3Y4d5RlqDT
-	cKApezkXK1Q/7jCo/U34GUbZqauH0ey8gGh5TgN9tE8vcu9LDX8xDDlvaXuMSD9cX3RjdB
-	QW+cYQNYZG+t6Sfh6ANMtRJdhytDTARWCYbhP7TXWj+f23kCGXRKYna5y7y2pjQtdL4kTY
-	9aWdlJJFJnsUoJw9ifKVuSuVmVCkid7gCptLw9EcarwyKCB4IBxTQ0NFSMbHHQ==
-Authentication-Results: os-cillation.de;
-	auth=pass smtp.auth=os-c@schweissgut.net smtp.mailfrom=hd@os-cillation.de
-Received: from [192.168.3.45] (hd2022.osc.gmbh [192.168.3.45])
-	by core2024.osc.gmbh (Postfix) with ESMTPSA id 8B01D200952;
-	Fri, 24 Jul 2026 21:12:55 +0200 (CEST)
-Message-ID: <d3f65083-896e-4f79-87fe-95cace11c5eb@os-cillation.de>
-Date: Fri, 24 Jul 2026 21:12:55 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MxbopMaS"
+Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-668c1b780e5so497291d50.2
+        for <linux-crypto@vger.kernel.org>; Fri, 24 Jul 2026 13:35:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1784925330; x=1785530130; darn=vger.kernel.org;
+        h=content-type:in-reply-to:autocrypt:from:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=q/8kImmPB4tQ/JHFIpayA/JIm7PmQB1mt4kK24yFpjU=;
+        b=MxbopMaSEbgL+KxR9/xyT+gM5Om4AmEFUsVi+9Zcfgeh3CENNroRbgjkSiMDradbEH
+         K8rdviMh2pQu0L7YZuy4VD8RIoDfwPhZthlQiXOMOF+KQICTGUyhwaGScBn2iS5qMLfp
+         bmKb0/TCM+08yYsrmTurrllrPtABMC6S4jMdni9A3ne/KnQ9IsTBqFqVUuF1taaYKPlh
+         KbwV4RCeWhKVq0WoDXIWc2+TYS07Z/qAHbAbOsQvkpjae9ZiQWtMMcfH2U31Rpe2bMk8
+         JjN9xHKufsKQ7OwSOudVktKdi9WwtlWKBiqLdcsXH0eB++4xcUSMicZ/372h57f44Dnx
+         eceQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1784925330; x=1785530130;
+        h=content-type:in-reply-to:autocrypt:from:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=q/8kImmPB4tQ/JHFIpayA/JIm7PmQB1mt4kK24yFpjU=;
+        b=lowkWfjiAOsFKa2fRo65o8Q9AsDqWmy8RE2tKSNHEGn8tFDtA4pM48JK2QQmoM4lKP
+         z5agslnoZH7w7DIHOgSL1PU0pZ7n+cnV12HH703c86hRPZUqF9G5U/b0TZ8YAi35tcMw
+         Ivv1vqLSM4gtKwBmR4gMKjQuSabjM45Cfn5hpzoSjqW8pWQmpgux5yyaHXBHmSJiDX1n
+         3Maig+EZabiZIFh4c+6vnxxjjrivUxRsnJj44Ug68RVnZuPlGiPugeoWNklkUlwq4jLF
+         OYNcpAhAcoL0NkzfLks6YJ2znTtzs4hY2EGkXor5waFOZ3fEGVDMsSlCLo90f7G9a0CH
+         M33Q==
+X-Forwarded-Encrypted: i=1; AHgh+RpB59+bKq5FUSI9q1sOkv1Q9EmhCF02nrMC1cabEBoZA/w8Jo61hAwgBEDkVUVSG++GMZVUjvhXkFXc8jA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxpUzZ45iPNpV41ahFoYU7s5ERz0Vc3cvSEkJnBagvEnzKmUQ+1
+	uXarYGGZH9d0xO0oBkZckexpAkVtSyag2IdX+KZE1he1vrxZvL3lEkRQ
+X-Gm-Gg: AR+sD10ENxZnGOBWVwkxWSsmZ+3fzyBZIsO8vThuGDakJOc21BCL3AKfcaa+531Gv+i
+	Gvj/OcHx8PRNzQfrfNUFVT2wBfI6d3fpOesse2MOUq0g+3ktJO9KYtjo2xrJMx+/ZTdGDrB2Hex
+	OedGmzQkWm+bMDHuQ4HV2xW75uWp/r62jS1JZ3XkEmBIpD4lbO7fTAMHfcOR5d4ixFeqdVFoJ59
+	h/fPwuL47UaTZh8TRwz/TdY1W+vxeg6Eli+vneQRXw2meAYGXzu/Jdbre1PEycd6e5k7kUsgcyO
+	FEwKB4BGjNjUx6pEcwGl/QPmMDAeIFYqxdMAH/uyLtMDvj52NJKQX+dF+oKQJDEeFkIZ3uVbiAm
+	Chxrtl8GuhMesKwY2EBH5AREGmx598YilYr6fzwP++ODPtLDq2i7rbCQExpspZ6Rb2zthQQQZcn
+	O5fpd6
+X-Received: by 2002:a05:690e:43da:b0:662:ebb0:36fa with SMTP id 956f58d0204a3-668a4bb68b6mr1963039d50.20.1784925330394;
+        Fri, 24 Jul 2026 13:35:30 -0700 (PDT)
+Received: from [10.138.10.6] ([185.98.168.14])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-668c6dd57a0sm108d50.8.2026.07.24.13.35.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Jul 2026 13:35:29 -0700 (PDT)
+Message-ID: <0ccda05f-077c-4661-b852-e6bf9bf40be3@gmail.com>
+Date: Fri, 24 Jul 2026 16:35:13 -0400
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -45,143 +68,267 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] crypto: pcrypt - Remove pcrypt
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Steffen Klassert <steffen.klassert@secunet.com>,
- Thomas Huth <thuth@redhat.com>
-References: <20260713223234.24812-1-ebiggers@kernel.org>
- <20260713223234.24812-2-ebiggers@kernel.org>
- <37ecba68-947a-45ad-9ec4-361facc06a05@os-cillation.de>
- <20260721195004.GA3383223@google.com>
- <19613c3e-9756-45fc-84b6-b650ba3723a7@os-cillation.de>
- <20260722194023.GB2118@quark>
- <10430138-05b6-46b8-b9d2-7cad5c371fc4@os-cillation.de>
- <20260724185116.GB1572592@google.com>
+Subject: Re: [PATCH 2/3] AF_ALG: Drop support for off-CPU cryptography
+To: Dominique Martinet <asmadeus@codewreck.org>,
+ Eric Biggers <ebiggers@kernel.org>
+Cc: Harald Freudenberger <freude@linux.ibm.com>, acme@kernel.org,
+ adrian.hunter@intel.com, alexander.shishkin@linux.intel.com,
+ ardb@kernel.org, axboe@kernel.dk, corbet@lwn.net, davem@davemloft.net,
+ edumazet@google.com, herbert@gondor.apana.org.au, horms@kernel.org,
+ io-uring@vger.kernel.org, irogers@google.com, james.clark@linaro.org,
+ jolsa@kernel.org, kuba@kernel.org, kuniyu@google.com,
+ linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ mark.rutland@arm.com, mingo@redhat.com, namhyung@kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, peterz@infradead.org,
+ skhan@linuxfoundation.org, willemb@google.com, linux-s390@vger.kernel.org
+References: <20260523-af-alg-harden-v1-2-c76755c3a5c5@gmail.com>
+ <20260603133312.12848-1-freude@linux.ibm.com>
+ <amOGWwdjnJqyxH5L@codewreck.org> <20260724160034.GB2032@sol>
+ <amOTjPW__CNZui3_@codewreck.org>
 Content-Language: en-US
-From: Hendrik Donner <hd@os-cillation.de>
-Autocrypt: addr=hd@os-cillation.de; keydata=
- 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 li+2
-In-Reply-To: <20260724185116.GB1572592@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Demi Marie Obenour <demiobenour@gmail.com>
+Autocrypt: addr=demiobenour@gmail.com; keydata=
+ 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
+ +MYSfkEjBz0E8CLOcAw7JIwAaeBT
+In-Reply-To: <amOTjPW__CNZui3_@codewreck.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------8JNKQ02asdP8sqLTJjoHdKEp"
 
-Hello,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------8JNKQ02asdP8sqLTJjoHdKEp
+Content-Type: multipart/mixed; boundary="------------tHcDdCFADMuM4KeFqlrbc8bo";
+ protected-headers="v1"; hp="clear"
+Message-ID: <0ccda05f-077c-4661-b852-e6bf9bf40be3@gmail.com>
+Date: Fri, 24 Jul 2026 16:35:13 -0400
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/3] AF_ALG: Drop support for off-CPU cryptography
+To: Dominique Martinet <asmadeus@codewreck.org>,
+ Eric Biggers <ebiggers@kernel.org>
+Cc: Harald Freudenberger <freude@linux.ibm.com>, acme@kernel.org,
+ adrian.hunter@intel.com, alexander.shishkin@linux.intel.com,
+ ardb@kernel.org, axboe@kernel.dk, corbet@lwn.net, davem@davemloft.net,
+ edumazet@google.com, herbert@gondor.apana.org.au, horms@kernel.org,
+ io-uring@vger.kernel.org, irogers@google.com, james.clark@linaro.org,
+ jolsa@kernel.org, kuba@kernel.org, kuniyu@google.com,
+ linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ mark.rutland@arm.com, mingo@redhat.com, namhyung@kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, peterz@infradead.org,
+ skhan@linuxfoundation.org, willemb@google.com, linux-s390@vger.kernel.org
+References: <20260523-af-alg-harden-v1-2-c76755c3a5c5@gmail.com>
+ <20260603133312.12848-1-freude@linux.ibm.com>
+ <amOGWwdjnJqyxH5L@codewreck.org> <20260724160034.GB2032@sol>
+ <amOTjPW__CNZui3_@codewreck.org>
+Content-Language: en-US
+From: Demi Marie Obenour <demiobenour@gmail.com>
+Autocrypt: addr=demiobenour@gmail.com; keydata=
+ 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
+ +MYSfkEjBz0E8CLOcAw7JIwAaeBT
+In-Reply-To: <amOTjPW__CNZui3_@codewreck.org>
 
-On 7/24/26 20:51, Eric Biggers wrote:
-> On Fri, Jul 24, 2026 at 08:19:02PM +0200, Hendrik Donner wrote:
+--------------tHcDdCFADMuM4KeFqlrbc8bo
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+On 7/24/26 12:32, Dominique Martinet wrote:
+> Eric Biggers wrote on Fri, Jul 24, 2026 at 09:00:34AM -0700:
+>> On Sat, Jul 25, 2026 at 12:35:55AM +0900, Dominique Martinet wrote:
+>>> The tool source is available here:
+>>> https://github.com/nxp-imx/crypto_af_alg
+>>> (which now fails with:
+>>> bind(3, {sa_family=3DAF_ALG, salg_type=3D"skcipher", salg_feat=3D0, s=
+alg_mask=3D0, salg_name=3D"tk(cbc(aes))"}, 88) =3D -1 ENOENT (No such fil=
+e or directory)
+>>> )
+>>>
+>>>
+>>> I don't particularily care for the API used as long as we can keep us=
+ing
+>>> the hardware key, but as far as I can see there's no alternative API =
+--
+>>> what's the path forward?
 >>
->> so i'm now on 7.1.4 with
->>
->>    PCI: imx6: Keep i.MX6 Root Port MSI/MSI-X Capabilities with iMSI-RX to
->> work around hardware bug
->>
->> on top to be able to tune queue settings. And to have a working ethernet
->> in the first place, without the patch the NETDEV WATCHDOG resets the
->> card all the time due to queues stalling. But now more than 1 CPU are
->> serving IRQs.
->>
->> With pcrypt
->> (seqiv(rfc4106(pcrypt(gcm_base(ctr-aes-neonbs,ghash-lib))))):
->>
->> Upload:
->> [  4]   0.00-60.00  sec   901 MBytes   126 Mbits/sec
->>
->> Download:
->> [  4]   0.00-60.00  sec  1.23 GBytes   177 Mbits/sec
->>
->> Without pcrypt
->> (seqiv(rfc4106(gcm_base(ctr-aes-neonbs,ghash-lib)))):
->>
->> Upload:
->> [  4]   0.00-60.00  sec   679 MBytes  94.9 Mbits/sec
->>
->> Download:
->> [  4]   0.00-60.00  sec   674 MBytes  94.3 Mbits/sec
->>
->> So counterintuitively pcrypt matters more again. I repeated the tests a
->> few times, those numbers are fairly representative. Every run is over a
->> 60 sec window.
-> 
-> Thanks for trying it.  Perhaps this is related to the iperf3 test using
-> only a single flow?  Does that reflect the real-world case for you?
+>> There's no "tk(cbc(aes))" algorithm in the upstream kernel.  So, it's
+>> not possible that this ever worked with upstream.  Given that, there's=
 
-probably flow related, i would need a different test setup to create
-different flows, but for example single file downloads matter to our
-userbase.
+>> no regression in upstream for this program, and it wouldn't be
+>> appropriate to consider a sysctl knob in upstream at this time.
+>=20
+> Bleh, you are correct, it's an NXP patch in
+> drivers/crypto/caam/caamalg.c that they've been carrying in their
+> tree(s) since 2018[1] and has apparently never been upstreamed...
+> [1] https://github.com/nxp-imx/linux-imx/commit/6868c9e49c1854028fb4602=
+2daac3b1b10ca2c70
+>=20
+> Sorry for not having checked, I was hoping for better.
+> (I should be used to it by now...)
+>=20
+>=20
+> Regardless of the specific algorithm, most recent SoCs flaunt some
+> "secure element" or similiar hardware-backed keys (so one wouldn't be
+> able to decrypt $whatever without running on the specific board it was
+> intended for); I'm sure _some_ of them are upstream?
+> (Never used it so not sure if they are reachable from af_alg, but for
+> example drivers/crypto/ccree/cc_cipher.c talks about hardware key...)
+>=20
+> There's not much I can do about the vendor's kernel I'm stuck with, but=
 
-> 
-> I'm also curious whether you're particularly attached to AES-GCM, or
-> whether you've considered switching to ChaCha20Poly1305 which would be
-> much faster on that CPU.  This could be done either by switching to
-> "rfc7539esp(chacha20,poly1305)" within IPsec, or by just switching to
-> WireGuard.
-> 
+> that doesn't make having encryption material not accessible to userspac=
+e
+> useless as a concept;
+> forgetting about the sysctl for now, what are the alternatives API this=
 
-Unfortunately the technical specification the system has to comply to
-says IPSec and AES-GCM and/or AES-CBC with HMAC-SHA256. CBC is on its
-way out though and barely seen in production anymore.
+> kind of implementations could be based on?
+>=20
+> I guess I should start looking at how tpm backed encryption works,
+> some other day, it's getting late here...
 
-> If none of those are options for you and you do want pcrypt to be kept
-> around, could you confirm that you're solely using 'crconf' (run as
-> root) to enable it, and in particular you're not relying on the
-> misfeature of also being able to enable it as an unprivileged user using
-> AF_ALG?  We can keep it around for a bit longer if really needed, but
-> the unprivileged stuff definitely has to go.  We should also keep in
-> mind that pcrypt does not get tested very well (as the crypto self-tests
-> just test serial use) and historically has had a lot of issues.
-> 
+I actually had this thought myself, though with a different
+use-case: preventing long-term keys (like TLS and SSH keys and
+cookie signing/encryption keys) from being accidentally leaked.
 
-For configuring the IPSec related templates only crconf is used in
-production. On that kernel configuration AF_ALG is completely off.
+I came up with a much simpler API than AF_ALG:
 
-Test environments use CONFIG_CRYPTO_USER_API_RNG only, everything else 
-concerning AF_ALG is disabled.
+1. Generate a file descriptor and a wrapping key.  The wrapping key
+   is used to encrypt data that will be imported.
 
-Regards,
-Hendrik
+2. Import an encrypted secret key.  The key contains both the secret
+   key and the algorithm it will be used with.
 
-> - Eric
+3. Optionally, attach a restriction policy that requires data to
+   be signed to start with a certain prefix.  This provides domain
+   separation in contexts where the same key is used for multiple
+   purposes.
 
+4. Pass the file descriptor to another process via SCM_RIGHTS.
+
+5. The receiving process can use ioctls to perform secret-key
+   operations, such as ML-KEM, ML-DSA, XChaCha20-Poly1305, and
+   XAES-256-GCM.
+
+6. When the file descriptor is closed, the secret key is securely
+   deleted.
+  =20
+Compared to AF_ALG, the kernel attack surface is very small.  It's not
+quite a "hello world" character device driver, but compared to many
+of the other drivers in the kernel, it is tiny.  Furthermore, the
+whole thing should be able to be written in safe Rust.
+
+To keep the attack surface minimal, this would only use library
+functions, so there would be no support for hardware-wrapped keys.
+
+I don't plan to work on this myself, but I think it's of potential
+value in the future.  For asymmetric algorithms, the overhead of a
+system call should be fairly small compared to the operation itself.
+--=20
+Sincerely,
+Demi Marie Obenour (she/her/hers)
+
+--------------tHcDdCFADMuM4KeFqlrbc8bo--
+
+--------------8JNKQ02asdP8sqLTJjoHdKEp
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEopQtqVJW1aeuo9/sszaHOrMp8lMFAmpjzIsACgkQszaHOrMp
+8lNPug/+IDHRwaftOISwVsC+WuuG9FgGOwTLlQjjABKkrEhHZObZ/mWU4BpfL+Ek
+ujcELLLDD1+ewxFwJoh9hynjIG9XDJEwXB7dLJuOYCiMLBWFk/Gujjh2YK2Pd+La
+VGBc9XNcz96+3O8jQtwTbu1P5kQBg5+5WUOPTmONUetB2pzwACQUuRrtMW3g2LrU
+PA9IyEB2n3i/D74GD5L0ca5RVzqf6YrUMrQ9qeMXGLCehhyZecnsMeweBWR6ikIT
+b1s8wFFMD2V0/A5mWhoCnFmmfiyFR3zZQ14ZuxJ1/rhwZVUYgtMnsC6L8zjJLsVm
+pNxg7iXUTnzVjL8467eLCS2Cl3r02dXgvSHt2/xxlpKjPiexOcb5DCzr1ecPlHuh
+TvX19LaVBuITkjtzOlyvzQ0EvBKVqUh3B6btKfyYQ3NEP57Khbjp71rSICESPqdv
+j6fv7iJMmYVPPsIb4yPYowfIHBm7baekQfml+0o+/8Wkmj62T2Cd0dUS7yEGJRIz
+WSiK+99wi6ucfbVEEJNR5vckddmPfpYOasHohP3IhTM89G3FLxmuwfO+2WBJPPXo
+2NcfEWnlp7l8+QaZzvqnTqIVrqEPrfTuMIR421Z+OoDYCzdaP/hz+SLLPyZXBjF0
+eISqWWtGWHVcK7u8UNxBEkFZFbj5385JeXjl4UhysytbZVCK9v0=
+=cZKJ
+-----END PGP SIGNATURE-----
+
+--------------8JNKQ02asdP8sqLTJjoHdKEp--
