@@ -1,235 +1,143 @@
-Received: from psionic.psi5.com (psionic.psi5.com [185.187.169.70])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 239A1392C46;
-	Sat, 25 Jul 2026 10:18:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.187.169.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A726E16A395
+	for <linux-crypto@vger.kernel.org>; Sat, 25 Jul 2026 14:14:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784974733; cv=none; b=hyQLNa1CYpbazm+dBwOqwPAAuABfHRggSOqM80G9O4PIOX5r3DvX5TPMQkYXasJ0UeDnlg7if29lwtnqFWdkPg3rrPHKlyWWs+afzgFafrpV0Zga+2QATRAWtZCJRYwMY3Jf6FnHG/ifK/no0nFYuNT68Ha+Xarlwytf37PGS1Q=
+	t=1784988855; cv=none; b=J4iNNOdkIWOahB7qOzxSLtipAppmYnOlEoHtsiDHW5rhzreBlYrMYFtwmUFpQ5iR23KTP8NqOFccDn2aC+O7UNWZRx9kZ03K7U/YACdF0ZKZ/YIwDMOcWRTf5wn+vSv7MtzEjdgQ3WSX/BF1C+HWB+SM5qfZong5FQiJVU8/d4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784974733; c=relaxed/simple;
-	bh=8gylFXiRDgX3u7HCxBJyDhWqt5vNOVmXtZo5ooJmvzo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qoLjFEBH2eWLTXZrxcKntBDE+75ZMuWNh4YKpiBWOpCF83xVTuaWjjrmy7L1RjTDnvaQqfnEyVpmBmQ34Y0W2GoWcWG7pG/g9o4Xc1VcsRMylkN87F691P6DFP4MrOL+Srb0M8TX9XRMsS9krwS/Rnud0d8JOtphcvKQOVsPf9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de; spf=pass smtp.mailfrom=hogyros.de; arc=none smtp.client-ip=185.187.169.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hogyros.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hogyros.de
-Received: from [IPV6:2400:2410:b120:f200:9e5c:8eff:fec0:ee40] (unknown [IPv6:2400:2410:b120:f200:9e5c:8eff:fec0:ee40])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by psionic.psi5.com (Postfix) with ESMTPSA id E0E7B3F1BA;
-	Sat, 25 Jul 2026 12:18:30 +0200 (CEST)
-Message-ID: <10bad5ef-1897-402e-8f08-003680f1eed0@hogyros.de>
-Date: Sat, 25 Jul 2026 19:18:26 +0900
+	s=arc-20240116; t=1784988855; c=relaxed/simple;
+	bh=XaiiDgwrOlI8vEMiMyKkT+LVbivn03Etl8oTlsYtgs8=;
+	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
+	 References:In-Reply-To; b=P/8CqtgnTkoIJHK6li68ZZWtzs9t6kuCSxHwz5GSge2zLT5RfQcoTNrTmuNbCjx67yHf78GQx4it8iASZEyeuco62eTi6467klL+dLZhIvHDCFLGmlFibhMzmDa0Tgb6UwGhnp16K6nQhm3byugUkKoQ9kPidY/qaEgj+l0P3qQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow-tech.com; spf=pass smtp.mailfrom=cknow-tech.com; dkim=pass (2048-bit key) header.d=cknow-tech.com header.i=@cknow-tech.com header.b=da3/HJr1; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow-tech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cknow-tech.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=cknow-tech.com header.i=@cknow-tech.com header.b="da3/HJr1"
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] AF_ALG: Drop support for off-CPU cryptography
-To: Dominique Martinet <asmadeus@codewreck.org>,
- Eric Biggers <ebiggers@kernel.org>,
- Demi Marie Obenour <demiobenour@gmail.com>
-Cc: Harald Freudenberger <freude@linux.ibm.com>, acme@kernel.org,
- adrian.hunter@intel.com, alexander.shishkin@linux.intel.com,
- ardb@kernel.org, axboe@kernel.dk, corbet@lwn.net, davem@davemloft.net,
- edumazet@google.com, herbert@gondor.apana.org.au, horms@kernel.org,
- io-uring@vger.kernel.org, irogers@google.com, james.clark@linaro.org,
- jolsa@kernel.org, kuba@kernel.org, kuniyu@google.com,
- linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
- mark.rutland@arm.com, mingo@redhat.com, namhyung@kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, peterz@infradead.org,
- skhan@linuxfoundation.org, willemb@google.com, linux-s390@vger.kernel.org
-References: <amRntEmCUK-8wXcw@codewreck.org>
-Content-Language: en-US
-From: Simon Richter <Simon.Richter@hogyros.de>
-In-Reply-To: <amRntEmCUK-8wXcw@codewreck.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------W6z5XQ6lOGPY4r3nWk7DRVwS"
+Mime-Version: 1.0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cknow-tech.com;
+	s=key1; t=1784988826;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aurhGwZBtBlsxKOKCfqWZVexhQ9NLkHWaOYsLZ76OpY=;
+	b=da3/HJr1HSGbmZyx2j9hWWmH/1NxbPWVXq53bqxfd0z44gcBfNWmUIIA6poL2n64I8AuhQ
+	uRHFtQfiyIIfxu8b/wyNuRkBxvQN3BM0BJfvHvei1IPRL4KeXvslOUP9ZiE66TA+Otldtv
+	hRIQf1bPl6eVm6eCP6JLYkI4iPPpCAG4g1JCSP9zKpHY0ubdI06qGvyfrPkGNyIR5aDcBu
+	nCjm1OdSU9fHObwgOmGP+BVHPMGnGxKbOyZygf/C3kQjZ1gSMQCRPRuew+tMnCp2EHx4cY
+	fTuUI51v5ibUUcc94fhxhBG8aXJlReALfZbHTprdNh640ubIcPrefCADtSLD0g==
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Sat, 25 Jul 2026 16:13:20 +0200
+Message-Id: <DK7PPYNCUU5F.31BXH4215WDKI@cknow-tech.com>
+To: "Dawid Olesinski" <dawidro@gmail.com>, =?utf-8?q?Heiko_St=C3=BCbner?=
+ <heiko@sntech.de>
+Cc: "Sebastian Reichel" <sebastian.reichel@collabora.com>, "Herbert Xu"
+ <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
+ "Rob Herring" <robh@kernel.org>, "Krzysztof Kozlowski"
+ <krzk+dt@kernel.org>, "Conor Dooley" <conor+dt@kernel.org>, "Corentin
+ Labbe" <clabbe@baylibre.com>, <linux-crypto@vger.kernel.org>,
+ <devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+ <linux-rockchip@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 3/4] arm64: dts: rockchip: Add crypto node to
+ rk356x-base
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Diederik de Haas" <diederik@cknow-tech.com>
+References: <20260708175837.1718437-1-dawidro@gmail.com>
+ <20260708175837.1718437-4-dawidro@gmail.com> <ak7jEYTAGgeDdi1W@venus>
+ <4011768.FjKLVJYuhi@diego> <20260710153012.0a840512@enyo>
+In-Reply-To: <20260710153012.0a840512@enyo>
+X-Migadu-Flow: FLOW_OUT
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------W6z5XQ6lOGPY4r3nWk7DRVwS
-Content-Type: multipart/mixed; boundary="------------HAhYqwI7DTNpOGeMh824BomC";
- protected-headers="v1"
-From: Simon Richter <Simon.Richter@hogyros.de>
-To: Dominique Martinet <asmadeus@codewreck.org>,
- Eric Biggers <ebiggers@kernel.org>,
- Demi Marie Obenour <demiobenour@gmail.com>
-Cc: Harald Freudenberger <freude@linux.ibm.com>, acme@kernel.org,
- adrian.hunter@intel.com, alexander.shishkin@linux.intel.com,
- ardb@kernel.org, axboe@kernel.dk, corbet@lwn.net, davem@davemloft.net,
- edumazet@google.com, herbert@gondor.apana.org.au, horms@kernel.org,
- io-uring@vger.kernel.org, irogers@google.com, james.clark@linaro.org,
- jolsa@kernel.org, kuba@kernel.org, kuniyu@google.com,
- linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-perf-users@vger.kernel.org,
- mark.rutland@arm.com, mingo@redhat.com, namhyung@kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, peterz@infradead.org,
- skhan@linuxfoundation.org, willemb@google.com, linux-s390@vger.kernel.org
-Message-ID: <10bad5ef-1897-402e-8f08-003680f1eed0@hogyros.de>
-Subject: Re: [PATCH 2/3] AF_ALG: Drop support for off-CPU cryptography
-References: <amRntEmCUK-8wXcw@codewreck.org>
-In-Reply-To: <amRntEmCUK-8wXcw@codewreck.org>
-Autocrypt-Gossip: addr=demiobenour@gmail.com; keydata=
- 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
- +MYSfkEjBz0E8CLOcAw7JIwAaeBT
+On Fri Jul 10, 2026 at 4:30 PM CEST, Dawid Olesinski wrote:
+> On Thu, 09 Jul 2026 09:07:23 +0200
+> Heiko St=C3=BCbner <heiko@sntech.de> wrote:
+>
+>> Am Donnerstag, 9. Juli 2026, 01:56:10 Mitteleurop=C3=A4ische Sommerzeit
+>> schrieb Sebastian Reichel:
+>> > Hi,
+>> >=20
+>> > On Wed, Jul 08, 2026 at 06:58:24PM +0100, Dawid Olesinski wrote: =20
+>> > > Add the device tree node for the V2 cryptographic hardware
+>> > > accelerator on RK356x SoCs (RK3566, RK3568).
+>> > >=20
+>> > > The IP block sits in the non-secure peripheral domain. Its three
+>> > > clocks (core, aclk, hclk) and reset line are accessible directly
+>> > > through the main non-secure CRU, so no firmware intermediary is
+>> > > required.
+>> > >=20
+>> > > The node is disabled by default; board files that wish to use
+>> > > hardware crypto offload must enable it. =20
+>> >=20
+>> > Why is it disabled by default? It doesn't seem to be board specific
+>> > at all to me (the same question applies to the RK3588 DT). =20
+>>=20
+>> You're definitly right about that ... there are no board specific
+>> resources needed, so Dawid please drop the status from both nodes.
+>>=20
+>
+> I'll drop the `status =3D "disabled";`=20
+> lines from both the RK356x and RK3588 device trees in v3.
 
---------------HAhYqwI7DTNpOGeMh824BomC
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+That also means you can drop the label/phandle as there's no longer a need
+to reference it in board files.
 
-SGksDQoNCk9uIDcvMjUvMjYgMTY6MzcsIERvbWluaXF1ZSBNYXJ0aW5ldCB3cm90ZToNCg0K
-PiBTbyBiZWluZyBzZWxmaXNoIEknZCB2ZXJ5IG11Y2ggYXBwcmVjaWF0ZSBzb21lIGVmZm9y
-dCB0byBoYXZlIGEgc3RhbmRhcmQNCj4gQVBJIGV2ZXJ5b25lIGNvdWxkIHVzZSB0byBzaW1w
-bGlmeSBteSB1c2Vyc3BhY2UsIGJ1dCBnaXZlbiB2ZW5kb3JzIHdpbGwNCj4gbmV2ZXIgc3Bl
-bmQgdGhpcyBraW5kIG9mIHRpbWUgSSBndWVzcyBpdCdzIGEgcGlwZSBkcmVhbSBhbmQgSSds
-bCBiZQ0KPiBzdHVjayB3aXRoIGN1c3RvbSBkcml2ZXJzIGFuZC9vciBmcmFtZXdvcmsgZm9y
-IHRoZSBmb3JzZWVhYmxlIGZ1dHVyZS4uLg0KDQpUaGUgdGhpbmcgaXM6IHN1Y2ggYW4gQVBJ
-IHdvdWxkIGhhdmUgdG8gbG9vayBjb21wbGV0ZWx5IGRpZmZlcmVudCBmcm9tIA0KdGhlIEFQ
-SSB3ZSBoYXZlIG5vdywgYW5kIGFsbCB0aGUgZXhpc3RpbmcgZHJpdmVycyB3b3VsZCBuZWVk
-IHRvIGJlIA0KcG9ydGVkIHRvIGl0Lg0KDQpUaGUgY3VycmVudCBBUEkgaXMgZGVzaWduZWQg
-YXJvdW5kIHRoZSBhc3N1bXB0aW9uIHRoYXQgdGhlIGhhcmR3YXJlIGNhbiANCmJlIGludGVy
-ZmFjZWQgd2l0aCBtaW5pbWFsIG92ZXJoZWFkLiBUaGlzIGFzc3VtcHRpb24gaXMgbm8gbG9u
-Z2VyIHRydWUgDQpmb3IgYW55IGhhcmR3YXJlIGJ1aWx0IGluIHRoZSBsYXN0IHRlbiB5ZWFy
-cyBhdCBsZWFzdC4NCg0KT25lIGV4YW1wbGUgZm9yIHRoaXMgYXNzdW1wdGlvbiBpcyB0aGUg
-ImltcG9ydCIgYW5kICJleHBvcnQiIGZ1bmN0aW9ucyANCmluIGFoYXNoOiB0aGVzZSBhcmUg
-c3luY2hyb25vdXMgZXZlbiB0aG91Z2ggdGhlIGhhc2ggaXMgc3VwcG9zZWQgdG8gYmUgDQph
-c3luY2hyb25vdXMuIFRoYXQgaXMgbm90IGEgcHJvYmxlbSBmb3IgdGhlIG9sZCBoYXJkd2Fy
-ZSwgc2luY2Ugd2UgY2FuIA0KanVzdCBncmFiIHRoZSBoYXNoIHN0YXRlIHZpYSBkaXJlY3Qg
-cmVnaXN0ZXIgYWNjZXNzLCBidXQgaXQgbWFrZXMgaXQgDQpjbG9zZSB0byBpbXBvc3NpYmxl
-IHRvIHdyaXRlIGEgY29uZm9ybWluZyBpbXBsZW1lbnRhdGlvbiBvbiBhbnl0aGluZyANCm1v
-cmUgbW9kZXJuLg0KDQpJJ3ZlIHRyaWVkIG9uIGFuIEZQR0EsIGJ1dCBldmVuIHdpdGggZnVs
-bCBjb250cm9sIG92ZXIgdGhlIGhhcmR3YXJlIA0KaW1wbGVtZW50YXRpb24sIEkgbmVlZCB0
-byBlaXRoZXIgc2VyaWFsaXplIGFsbCByZXF1ZXN0cyBhbmQgcmVkdWNlIA0KcGVyZm9ybWFu
-Y2UsIG9yIGltcGxlbWVudCBhbiBlbGFib3JhdGUgc3lzdGVtIHdoZXJlIGVhY2ggcmVxdWVz
-dCBjb250ZXh0IA0KZ29lcyBpbnRvIGEgc2VwYXJhdGUgdmlydHVhbCBxdWV1ZSB0aGF0IGNh
-biBiZSBzeW5jaHJvbml6ZWQgd2l0aG91dCANCmFmZmVjdGluZyBvdGhlciBpbi1mbGlnaHQg
-cmVxdWVzdHMuIE9uIHRoZSBvdGhlciBoYW5kLCBJIG5lZWQgdGhhdCANCm1lY2hhbmlzbSBh
-bnl3YXksIGJlY2F1c2UgYWhhc2ggaXMgbm90IGV4cGVjdGVkIHRvIHJldHVybiB0aGUgcmVz
-dWx0IHZpYSANCkRNQSAtLSBpbnN0ZWFkLCB3ZSBhcmUgc3VwcG9zZWQgdG8gdXNlIGFuIGlu
-dGVycnVwdCB0aGF0IGNvbGxlY3RzIHRoZSANCnJlc3VsdCBhbmQgc3RhcnRzIHRoZSBuZXh0
-IHF1ZXVlZCByZXF1ZXN0IGlmIHRoZXJlIGlzIGFueS4NCg0KSSBkb24ndCBiZWxpZXZlIGFo
-YXNoL2Fjb21wL2FjcnlwdCBpcyBzYWx2YWdlYWJsZSwgYmVjYXVzZSBpdCBpcyBub3QgDQpv
-bmx5IGEgcHJvYmxlbSBvbiB0aGUgaGFyZHdhcmUgc2lkZSwgYnV0IGFsc28gb24gdGhlIGNs
-aWVudCBzaWRlLiBUaGUgDQp3b3JkcyAiaWYgdGhlcmUgaXMgYW55IiBhcmUgZG9pbmcgYSBs
-b3Qgb2YgaGVhdnkgbGlmdGluZyBoZXJlLCBiZWNhdXNlIA0KbW9zdCBjbGllbnRzIHN1Ym1p
-dCByZXF1ZXN0cyBzZXF1ZW50aWFsbHkgYmVjYXVzZSB0aGUgY29udGV4dCBjYW5ub3QgYmUg
-DQpyZXVzZWQgdW50aWwgaXQgaXMgaWRsZSwgZXhjZXB0IGZvciBxdWV1aW5nIG1vcmUgZGF0
-YSBmb3Igc3RyZWFtaW5nIC0tIA0Kc28geW91J2QgYWxzbyBuZWVkIGEgcmVxdWVzdCBwb29s
-Lg0KDQpXZSBuZWVkIHRvIGJvdGggaGlkZSB0aGF0IGNvbXBsZXhpdHkgZnJvbSB0aGUgY2xp
-ZW50cywgYW5kIG1ha2UgaXQgYWxzbyANCm9wdGlvbmFsIGFuZCBzdWJqZWN0IHRvIG5lZ290
-aWF0aW9uLCBiZWNhdXNlIHRoZSBtYWpvcml0eSBvZiBtYWNoaW5lcyANCm91dCB0aGVyZSBz
-aW1wbHkgZG8gbm90IGhhdmUgY3J5cHRvIGhhcmR3YXJlLCBzbyB3ZSB3YW50IHRvIHNraXAg
-dGhlIA0KZXh0cmEgb3ZlcmhlYWQgdGhlcmUgYW5kIGp1c3QgdXNlIHRoZSBDUFUuDQoNClNv
-LCBmb3IgYSBuZXcgY29tbW9uIEFQSSwgYSBuYXBraW4gZGVzaWduIHdvdWxkIGxvb2sgbGlr
-ZQ0KDQogIC0gbWVyZ2VkIHN5bmMgYW5kIGFzeW5jIGludGVyZmFjZXMNCiAgICAoY29tcGxl
-dGlvbiB0aHJvdWdoIGEgY2FsbGJhY2ssIHdoaWNoIGNhbiBiZSBhIHRhaWwgY2FsbCkNCiAg
-LSBzYW1lIGZvciB1c2VyIEFQSQ0KICAtIGNvbnRleHQgc3dpdGNoZXMgb3B0aW9uYWwNCiAg
-ICAtIENQVSBpbXBsZW1lbnRhdGlvbiBydW5zIGluIHVzZXJzcGFjZSB2aWEgdkRTTw0KICAg
-IC0gaGFyZHdhcmUgdGhhdCBzdXBwb3J0cyB1c2VyIHZpcnR1YWwgYWRkcmVzc2VzIChPcGVu
-Q0FQSSwgSUJNIE5YKSANCmlzIHByb2dyYW1tZWQgZnJvbSB1c2Vyc3BhY2UNCiAgLSBuZWdv
-dGlhdGlvbiBvZiBETUEgcmVxdWlyZW1lbnRzDQogICAgLSBDUFU6IG5vbmUNCiAgICAtIG1v
-c3QgZW5naW5lczogNjQgYml0DQogICAgLSBzb21lIGVuZ2luZXM6IDMyIGJpdA0KICAtIGNo
-ZWFwIGJhdGNoIHN1Ym1pc3Npb24NCiAgICAtIGNhbmNlbGxhdGlvbiBvZiBpbi1mbGlnaHQg
-cmVxdWVzdHMNCiAgICAtIHN1Ym1pc3Npb24gb2YgYWRkaXRpb25hbCByZXF1ZXN0cyB3aGls
-ZSBhIGJhdGNoIGlzIHVuZGVyIHdheQ0KICAgIC0gbmVnb3RpYXRlZCBmYWxsYmFjayB0byBz
-aW5nbGUtcmVxdWVzdCBzdWJtaXNzaW9uIChmb3IgQ1BVIGFsZ3MpDQogIC0gbGlnaHR3ZWln
-aHQgY29udGV4dHMgd2l0aCBhc3luY2hyb25vdXMgY3JlYXRpb24NCiAgICAtIGRpZmZlcmVu
-dCBrZXlzIG9yIElWcw0KICAgIC0gY29waWVzIG9mIG90aGVyIGNvbnRleHRzDQoNClNvLCB0
-aGUgKG5vcm1hbCkgQ1BVIGZhbGxiYWNrIGNhc2Ugd291bGQgaGF2ZSB0aGUgY2xpZW50IGNv
-ZGUgZ2V0IGEgDQooaGVhdnl3ZWlnaHQpIGNvbnRleHQgZm9yIHRoZSBjaG9zZW4gYWxnb3Jp
-dGhtLCB3aGljaCBoYXMgYSBmbGFnIHRoYXQgDQpzYXlzICJiYXRjaCBzdWJtaXNzaW9uIGlz
-IG5vdCBiZW5lZmljaWFsIiwgdGhlIGNsaWVudCBjb2RlIHdvdWxkIGNhbGwgDQppbnRvIGEg
-ZnVuY3Rpb24gaW5zaWRlIHRoaXMgY29udGV4dCwgc3VibWl0dGluZyBhIHNpbmdsZSByZXF1
-ZXN0IGFuZCBhIA0KY29tcGxldGlvbiBjYWxsYmFjaywgdGhlIGhhbmRsZXIgZnVuY3Rpb24g
-d291bGQgY2FsbCBpbnRvIHRoZSBjcnlwdG8gDQpsaWJyYXJ5IGFuZCBzdWJzZXF1ZW50bHkg
-dGFpbCBjYWxsIGludG8gdGhlIGNvbXBsZXRpb24gZnVuY3Rpb24NCg0KSWYgdGhlIGNhbGxi
-YWNrIGNvZGUgaXMgdGhlIG9ubHkgcHJvY2Vzc2luZyBuZWVkZWQsIHRoZW4gdGhlIGNhbGwg
-aW50byANCnRoZSBmdW5jdGlvbiBwcm92aWRlZCBieSB0aGUgY29udGV4dCBjb3VsZCBiZSBh
-IHRhaWwgY2FsbCBhbHJlYWR5IChzbyANCnRoZSByZXR1cm4gdHlwZSBvZiB0aGUgY2FsbGJh
-Y2sgYW5kIG9mIHRoZSBjcnlwdG8gZnVuY3Rpb24gd291bGQgaGF2ZSB0byANCmJlIHRoZSBz
-YW1lLCBhbmQgdGhlIGNhbGxiYWNrIHdvdWxkIGhhdmUgdG8gcGlua3kgcHJvbWlzZSB0byBh
-bHdheXMgDQpyZXR1cm4gc3VjY2VzcykuDQoNClRoZSBvZmZsb2FkIGNhc2Ugd291bGQgaGF2
-ZSBkaWZmZXJlbnQgaW1wbGVtZW50YXRpb25zIGRlcGVuZGluZyBvbiANCndoZXRoZXIgdGhl
-IGhhcmR3YXJlIHN1cHBvcnRzIG9uLWRldmljZSBxdWV1ZXMgb3Igbm90LCBidXQgaXQgd291
-bGQgDQpsaWtlbHkgYXNrIGNsaWVudHMgdG8gc3VibWl0IGEgbGFyZ2UgYmF0Y2ggaWYgcG9z
-c2libGUgKHNvIGlmIHdlIGhhdmUgYW4gDQoxIE1CIHJlcXVlc3QgZm9yIGZpbGUgc3lzdGVt
-IGRhdGEsIHdlIHNlZSBtb3JlIHRoYW4gNCBrQiBvZiBpdCkuDQoNCkl0IG1heSBldmVuIGJl
-IHBvc3NpYmxlIHRvIG1ha2UgdGhlIGVudHJ5IHBvaW50cyBsaWdodHdlaWdodCBlbm91Z2gg
-dGhhdCANCnN1Ym1pc3Npb24gb2YgYmF0Y2hlcyBkb2VzIG5vdCBldmVuIG5lZWQgYSBzZXBh
-cmF0ZSBpbnRlcmZhY2UsIGp1c3QgDQpjYWxsaW5nIHRoZSBlbnRyeSBmb3IgYSBzaW5nbGUg
-cmVxdWVzdCByZXBlYXRlZGx5IChhbmQgbWF5YmUgYW5vdGhlciANCiJmbHVzaCIgZnVuY3Rp
-b24gYXQgdGhlIGVuZCkgbWF5IHR1cm4gb3V0IHRvIGJlIHN1ZmZpY2llbnQuDQoNClRoYXQg
-aXMgcHJldHR5IG11Y2ggdGhlIG9ubHkgYXBwcm9hY2ggSSBjYW4gY29tZSB1cCB3aXRoIHRo
-YXQgY2FuIA0KYWJzdHJhY3QgYXdheSB0aGUgaGFyZHdhcmUgZGlmZmVyZW5jZXMgYW5kIHN0
-aWxsIGJlIHNvbWV3aGF0IHVzYWJsZSBvbiANCnRoZSBjbGllbnQgc2lkZS4gQXMgSSBzYWlk
-LCB0aGlzIGlzIGEgbmFwa2luIGRlc2lnbiwgYW5kIGl0IHdvdWxkIG5lZWQgYSANCmxvdCBv
-ZiB0aG91Z2h0cyBvbiB0aGUgc2VjdXJpdHkgYXNwZWN0cyAtLSBJJ3ZlIGJlZW4gbG9va2lu
-ZyBhdCBpdCBmcm9tIA0KYSAiaG93IHRvIGtlZXAgdGhlIHBpcGVsaW5lIGZlZCIgcG9pbnQg
-b2Ygdmlldy4NCg0KICAgIFNpbW9uDQo=
+Cheers,
+  Diederik
 
---------------HAhYqwI7DTNpOGeMh824BomC--
+> Thanks for the review!
+>
+> Dawid
+>
+>> > >=20
+>> > > Signed-off-by: Dawid Olesinski <dawidro@gmail.com>
+>> > > ---
+>> > >  arch/arm64/boot/dts/rockchip/rk356x-base.dtsi | 12 ++++++++++++
+>> > >  1 file changed, 12 insertions(+)
+>> > >=20
+>> > > diff --git a/arch/arm64/boot/dts/rockchip/rk356x-base.dtsi
+>> > > b/arch/arm64/boot/dts/rockchip/rk356x-base.dtsi index
+>> > > a5832895bd39..9de7e7487ca1 100644 ---
+>> > > a/arch/arm64/boot/dts/rockchip/rk356x-base.dtsi +++
+>> > > b/arch/arm64/boot/dts/rockchip/rk356x-base.dtsi @@ -1112,6
+>> > > +1112,18 @@ sdhci: mmc@fe310000 { status =3D "disabled";
+>> > >  	};
+>> > > =20
+>> > > +	crypto: crypto@fe380000 {
+>> > > +		compatible =3D "rockchip,rk3568-crypto";
+>> > > +		reg =3D <0x0 0xfe380000 0x0 0x2000>;
+>> > > +		interrupts =3D <GIC_SPI 4 IRQ_TYPE_LEVEL_HIGH>;
+>> > > +		clocks =3D <&cru CLK_CRYPTO_NS_CORE>, <&cru
+>> > > ACLK_CRYPTO_NS>,
+>> > > +			 <&cru HCLK_CRYPTO_NS>;
+>> > > +		clock-names =3D "core", "aclk", "hclk";
+>> > > +		resets =3D <&cru SRST_CRYPTO_NS_CORE>;
+>> > > +		reset-names =3D "core";
+>> > > +		status =3D "disabled";
+>> > > +	};
+>> > > +
+>> > >  	/*
+>> > >  	 * Testing showed that the HWRNG found in RK3566
+>> > > produces unacceptably
+>> > >  	 * low quality of random data, so the HWRNG isn't
+>> > > enabled for all RK356x =20
+>> >  =20
+>>=20
+>>=20
+>>=20
+>>=20
+>
+>
+> _______________________________________________
+> Linux-rockchip mailing list
+> Linux-rockchip@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-rockchip
 
---------------W6z5XQ6lOGPY4r3nWk7DRVwS
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEtjuqOJSXmNjSiX3Tfr04e7CZCBEFAmpkjXIACgkQfr04e7CZ
-CBEnLAf/QQexxDg8Lko+pyjk8HWv3J3WYOv8Jt9kQV3TndxKO83tde6N+CsA/Y/6
-2oSI1edpsQ4OwCgB/lL06mfJ8XZGX2KtB4J1ABJwVIFi85c+FX6WAT8oe6YE6Wxf
-BPYGCOpHbD1kUM1stcBtGkbBiWsrHOkguLiODu6ZwLGJWOlfWLu9DrEfizLNc92b
-1ZokyzOmDu83pcXYfpN+0ExiwkAskucgraBDQVaJdcRR6Ddf2tWmgZbI7C50/Tj8
-Gr6AYhY/cXvTl/7GmD1eMqM41cBrpY+5+UX388MNXHdk1SMgpJ9O9mmOL+fzFTVO
-3wFLSWRWdEbHIyDnGso6BPTrEMkedA==
-=y69I
------END PGP SIGNATURE-----
-
---------------W6z5XQ6lOGPY4r3nWk7DRVwS--
