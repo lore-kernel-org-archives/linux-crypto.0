@@ -1,77 +1,90 @@
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA15F2E7386;
-	Sat, 25 Jul 2026 09:07:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F1630E0F8
+	for <linux-crypto@vger.kernel.org>; Sat, 25 Jul 2026 09:10:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1784970447; cv=none; b=VAuSaCa6IRloKzpdhfXB1FTnj3UhnhZhtboJZzOc417k4GPTg9AmxuP96Um6WclJS8WbtQ40Uo6YT7/TNdn5aQjmqcSGKei8teaGcSkRWNybpnLkwud+oSBk+gW4T2IPFvszo9BclpbXuywtU4OgJOhF9bSp4Y+3Su5CFf3uWP0=
+	t=1784970636; cv=none; b=cC2gbAgmbnks3hxCdxBsHvzg3OUoxGzP7TO7McBcA70Ttymq4qALmSM6+hodnpmS5kfUbJ4LSwUdfLCkR6sUisuHCeAaRClDbWL33Kv8YGv/FGFIZysvLr/fDJ+2LTRAPYxYEL8GbXK/wpoHP2Xau7Wdv0XdWpa9EYNMOnRcwVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1784970447; c=relaxed/simple;
-	bh=XHk3xK0e7rN2lgrsOKyF+DrhjB5vAm5BvFbaegF/d7w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cdqqWirDRAhnkPk4HCyuBJjWpHN4tx/WdwoxHX+JLkO2Z8FJtmgZ+fX2aY6tJx1+/PoDk7K7W2tbVth9GmlIjCcQT5iRhvTYeCINxjH2h1XJ+SYUBjW31H5VcdkPOEeRn/bYPd2xzQ3b/L4ZBHqF3llhrKkFEJQPLmmhNB6iGbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eotM34mr; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1784970636; c=relaxed/simple;
+	bh=AhCPhNc9a/U5wLKgysHB0Kn2KnDD7w6pjrLvtRC4YoE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MnPPb/6Rb87FnazEFHo9SNuOx2Y71whg1C56D34lUETyzEUAIfnrolxzPVGSru28m9kEwsSb7Vkff0vPfwP+zbSxv6NU2xNGkqRVMANCyGm+Wcv1kZXJFsc8hxtH4XI8tseWsH8Q3MN9UVDLPik7MuvqWmaXYsEKBdn9A91P48U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O448WL0T; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eotM34mr"
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1784970441;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=jS4EmPE++JlYoj9INElOECDtHahsaUK8Ksb6sIQ1Ds0=;
-	b=eotM34mr78IJiW56UIh82tGAnbmFOc46amXLsTjHVttagpPTg6uGMCrc2qoEflF6rvJYZr
-	Hq9OcSRLFt9VfGs06uJu8Cb9JDz7q8jWVOfIE0rl1yR6C8m5IhLQx6wOGyhp3HaJ9C1Dvz
-	kbsbNj5FgurlclGcb8A/bzSBR/9CoS0=
-From: Thorsten Blum <thorsten.blum@linux.dev>
-To: Jia Jie Ho <jiajie.ho@starfivetech.com>,
-	William Qiu <william.qiu@starfivetech.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	stable@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: starfive - use scatterlist length before DMA mapping
-Date: Sat, 25 Jul 2026 11:06:10 +0200
-Message-ID: <20260725090609.315812-2-thorsten.blum@linux.dev>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O448WL0T"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 733801F00A3A
+	for <linux-crypto@vger.kernel.org>; Sat, 25 Jul 2026 09:10:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1784970634;
+	bh=AhCPhNc9a/U5wLKgysHB0Kn2KnDD7w6pjrLvtRC4YoE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=O448WL0T5x1Zh0OMQi9iRlZwPh0fZiFxzhjRWWu0EW57dDBI9RV4q27LHGrs5BL+6
+	 H4GKRULAAaYMpIJejW/rGtFEl5mo6XXITHZ+asMxRsT02OBBedoicBciWZaAJbo1HN
+	 UvT4cMd8aX8qGOU9zFZXTWVYqzbabCA6tugKr1n2op26vf7O3ZOkp1/X2l6dJqT0OH
+	 hI6Qod10W3XtE+UxUhd1RZfRtpaWw7TYSLmsSJw9CuHDKsd5EwItmbZ4mZEZwtX6NA
+	 08vyeguxIywjiFYLqL+6haWSRSguNLRuQ5yyCj9ftCFBGZ1ojqabazhd66+FXf7IGz
+	 uCq68P+VZILJg==
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5b28c91fba5so1389286e87.1
+        for <linux-crypto@vger.kernel.org>; Sat, 25 Jul 2026 02:10:34 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+RoMs8yF/HWa5+C10QBnsRAlvJd2QT8A9xPiebT9VLu0KV1iMLum0jbn0TyYHN57ZLBXU7bdqCOVtegp8Z8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7CN53Q7iynMRc9eL7yI7nuhUfJa1aJpmODPN/bXEGjlYZyNf1
+	0YIauFM43DHwg1wIhv3Y5dgy+ismr4MHCrOyCbs2gNHJrgTT5mUZj8quDvq+H/TIT3PmIquNgFl
+	W+jtH7H6fhdqKpSIEFJz0vgNfj4//m0I=
+X-Received: by 2002:a05:6512:3d07:b0:5ae:b6cf:c745 with SMTP id
+ 2adb3069b0e04-5b2c1a3c746mr282806e87.17.1784970633111; Sat, 25 Jul 2026
+ 02:10:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1102; i=thorsten.blum@linux.dev; h=from:subject; bh=XHk3xK0e7rN2lgrsOKyF+DrhjB5vAm5BvFbaegF/d7w=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFkpNY2bSnzY5kUtY2y5XyU0Zcnm8A+l1w6uf2FZE/XyT uB2Xz/ujlIWBjEuBlkxRZYHs37M8C2tqdxkErETZg4rE8gQBi5OAZhI/CJGhlNWvYtefTAsP7Xq wCUB0Q3z3q2Un7Tt6iY+kb0TmLvm3/nN8JOROzrGXnmCo1qa7MU5aw1Wt6dVrrFca+QTFq/1Uyf IkA8A
-X-Developer-Key: i=thorsten.blum@linux.dev; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20260718032937.420561-1-pengcan@kylinos.cn>
+In-Reply-To: <20260718032937.420561-1-pengcan@kylinos.cn>
+From: Linus Walleij <linusw@kernel.org>
+Date: Sat, 25 Jul 2026 11:10:20 +0200
+X-Gmail-Original-Message-ID: <CAD++jLke1q2DX1EQTHysPKrvy8mtnFtbnLwfQ-wEvRE2MNsECA@mail.gmail.com>
+X-Gm-Features: AUfX_mwx6iFHSQ9ss2kJ9CSpvbTA4MTcHZwsUdEhUsOwa3V2e4PZJUoBdtU7nvw
+Message-ID: <CAD++jLke1q2DX1EQTHysPKrvy8mtnFtbnLwfQ-wEvRE2MNsECA@mail.gmail.com>
+Subject: Re: [PATCH] hwrng: stm32 - Fix runtime PM cleanup on registration failure
+To: Can Peng <pengcan@kylinos.cn>
+Cc: olivia@selenic.com, herbert@gondor.apana.org.au, mcoquelin.stm32@gmail.com, 
+	alexandre.torgue@foss.st.com, danielt@kernel.org, 
+	linux-crypto@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Using sg_dma_len() is only valid after mapping a scatterlist with
-dma_map_sg(). However, starfive_aes_aead_do_one_req() uses it before
-mapping the scatterlist.
+Hi Can,
 
-Use the original scatterlist length because the DMA length has not been
-populated yet when CONFIG_NEED_SG_DMA_LENGTH=y.
+thanks for your patch!
 
-Fixes: 7467147ef9bf ("crypto: starfive - Use dma for aes requests")
-Cc: stable@vger.kernel.org
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
----
- drivers/crypto/starfive/jh7110-aes.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Sat, Jul 18, 2026 at 5:30=E2=80=AFAM Can Peng <pengcan@kylinos.cn> wrote=
+:
 
-diff --git a/drivers/crypto/starfive/jh7110-aes.c b/drivers/crypto/starfive/jh7110-aes.c
-index a0713aa21250..f59adb2a5651 100644
---- a/drivers/crypto/starfive/jh7110-aes.c
-+++ b/drivers/crypto/starfive/jh7110-aes.c
-@@ -677,7 +677,7 @@ static int starfive_aes_aead_do_one_req(struct crypto_engine *engine, void *areq
- 
- 	if (cryp->total_in)
- 		sg_zero_buffer(rctx->in_sg, sg_nents(rctx->in_sg),
--			       sg_dma_len(rctx->in_sg) - cryp->total_in,
-+			       rctx->in_sg->length - cryp->total_in,
- 			       cryp->total_in);
- 
- 	ctx->rctx = rctx;
+> stm32_rng_probe() enables autosuspend and runtime PM before registering t=
+he
+> hwrng. If devm_hwrng_register() fails, probe returns with runtime PM left
+> enabled and autosuspend still selected.
+>
+> The remove callback also only disables runtime PM and does not undo
+> pm_runtime_use_autosuspend().
+>
+> Use devm_pm_runtime_enable() so runtime PM is unwound automatically on
+> probe failure and driver detach. Since the managed cleanup also disables
+> runtime PM,drop the remove callback.
+>
+> Fixes: c6a97c42e399 ("hwrng: stm32 - add support for STM32 HW RNG")
+> Cc: stable@vger.kernel.org
+
+Ah come on, it's not that serious.
+
+> Signed-off-by: Can Peng <pengcan@kylinos.cn>
+
+Reviewed-by: Linus Walleij <linusw@kernel.org>
+
+Yours,
+Linus Walleij
