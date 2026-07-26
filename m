@@ -1,33 +1,33 @@
 Received: from lithops.sigma-star.at (mailout.nod.at [116.203.167.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3BF6364024;
-	Sun, 26 Jul 2026 08:15:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB08175A8D;
+	Sun, 26 Jul 2026 08:15:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.167.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785053736; cv=none; b=H9MOnit1EIapIXphtYxcJoFoYfJwkf3oJnwdV2Yc8kocCwV2loCtIgtd/vh0M53Pl4C+icp+L/eOHy81fADcogNnTMFx218U4VU8vnhe7npescKnpTXl3iuql0k2lw3bsVZUItCc8kgnzUY41FKIdqjzqCmCNPIIUmx8I8e7/PI=
+	t=1785053737; cv=none; b=q+LeMDAz9Mp9Ib/sRj5Cmy8W0SYaNJaURYJ+1M2Jozgx3DD27oY4hzruGVfAJm2uyt5oShkfHDNYpciFB5c+O257U9H2VIfVao2Y8N7dnVA6+NhOFvX0jyBQdXLqLba8UbdOyhFYMSIcCC8fwSuxOUMSLU4bEsaJ0MJE9fqYcW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785053736; c=relaxed/simple;
-	bh=AnzrU0GLecXQKXN1Rxhja6TknYVVrk7BRPHrzhrn/Iw=;
+	s=arc-20240116; t=1785053737; c=relaxed/simple;
+	bh=Zgq5KPhSq/Z9E3E2rL3Iq0hhgMf7Rf2g/ESAQD2ocVQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=E6oPVMhoPX/uLAZ8w86py0BSWguzf2Gazj3GjdpcnNnw9LwOoYeekJuioyegc1Qp1DtUwZLjZtxNrwTX0hPpcVy2iQVGuteeXC2VZuSthsM8z1WwwDC2r8GGiBwPv6Vepa2BnvzwENc9Bf9cdVTowvg+wQOrvMSdzSWeqizbYIk=
+	 MIME-Version; b=CatAO5F1NYZ5M/bnAPZpr6eNHfxz5rESmhcTw3wRewIq5NGsBOYXE+bvwNsgaXUF5uDqliDoGLP6JQN0xSTRBdDsrGPR5eF0vEIiO//nbjfLrZ2pXmROZoDSSc3lg44B63M/FeBnYUFQTJ3PKkRGEFeiycRBPmWpaYIdanxe6hQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nod.at; spf=fail smtp.mailfrom=nod.at; arc=none smtp.client-ip=116.203.167.152
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nod.at
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nod.at
 Received: from localhost (localhost [127.0.0.1])
-	by lithops.sigma-star.at (Postfix) with ESMTP id 65C352698C0;
+	by lithops.sigma-star.at (Postfix) with ESMTP id B5B822698C3;
 	Sun, 26 Jul 2026 10:15:18 +0200 (CEST)
 Received: from lithops.sigma-star.at ([127.0.0.1])
 	by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10032)
-	with ESMTP id 3NfMJODKZMM7; Sun, 26 Jul 2026 10:15:17 +0200 (CEST)
+	with ESMTP id LIuLv-xWzz1V; Sun, 26 Jul 2026 10:15:18 +0200 (CEST)
 Received: from localhost (localhost [127.0.0.1])
-	by lithops.sigma-star.at (Postfix) with ESMTP id DF6282698C3;
-	Sun, 26 Jul 2026 10:15:17 +0200 (CEST)
+	by lithops.sigma-star.at (Postfix) with ESMTP id 4C3C52698C2;
+	Sun, 26 Jul 2026 10:15:18 +0200 (CEST)
 Received: from lithops.sigma-star.at ([127.0.0.1])
 	by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id EbUY2Z9MJbWp; Sun, 26 Jul 2026 10:15:17 +0200 (CEST)
+	with ESMTP id EunRVLkL_aCp; Sun, 26 Jul 2026 10:15:18 +0200 (CEST)
 Received: from nailgun.corp.sigma-star.at (85-127-105-26.dsl.dynamic.surfer.at [85.127.105.26])
-	by lithops.sigma-star.at (Postfix) with ESMTPSA id 78D2F2698C1;
+	by lithops.sigma-star.at (Postfix) with ESMTPSA id DDF3F2698C0;
 	Sun, 26 Jul 2026 10:15:17 +0200 (CEST)
 From: Richard Weinberger <richard@nod.at>
 To: linux-kernel@vger.kernel.org
@@ -40,9 +40,9 @@ Cc: linux-crypto@vger.kernel.org,
 	ebiggers@kernel.org,
 	upstream+linux@sigma-star.at,
 	Richard Weinberger <richard@nod.at>
-Subject: [PATCH 2/3] crypto: caam: Map the paes protected key once per tfm
-Date: Sun, 26 Jul 2026 10:15:03 +0200
-Message-ID: <20260726081504.2182951-2-richard@nod.at>
+Subject: [PATCH 3/3] crypto: caam: Validate the protected key header in setkey
+Date: Sun, 26 Jul 2026 10:15:04 +0200
+Message-ID: <20260726081504.2182951-3-richard@nod.at>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20260726081504.2182951-1-richard@nod.at>
 References: <20260726081504.2182951-1-richard@nod.at>
@@ -54,135 +54,102 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-paes_skcipher_setkey() maps ctx->protected_key on every call, without
-checking for failure, and nothing unmaps it: a later setkey() overwrites
-the address and caam_exit_common() only releases caam_init_common()'s
-mapping. cbc(paes) is reachable through AF_ALG, so an unprivileged
-bind()/setkey()/close() loop leaks one mapping per iteration.
+paes_skcipher_setkey() trusts struct caam_pkey_info as supplied by the
+caller, which for AF_ALG means userspace. plain_key_sz is never checked
+against the key material passed in, yet the blob length the hardware
+reads from ctx->key is derived from it, so a short blob makes it read
+data a previous key left behind, outside the range synced for the
+device. Require the two to agree, and reject non-protected keys.
 
-The buffer is a fixed-size member of the tfm context, so map it once in
-caam_cra_init() and release it in caam_exit_common(), bidirectionally as
-the hardware writes the black key and reads it back through the KEY
-command. A new is_paes flag marks the algorithm needing it.
+key_cmd_opt is OR'ed into and never reset, so KEY_EKT survives a re-key
+with an ECB key. Assign it instead.
+
+Nothing accounts for the CAAM_CCM_OVERHEAD bytes an EKT black key adds:
+AES-256 CCM blobs exceed max_keysize, AES-128 ones are decapsulated
+truncated, and caam_process_blob() encapsulates only part of the key.
+Reject CCM until the length arithmetic is fixed end to end.
 
 Assisted-by: Claude-Code:claude-fable-5
 Reported-by: Eric Biggers <ebiggers@kernel.org>
 Signed-off-by: Richard Weinberger <richard@nod.at>
 ---
- drivers/crypto/caam/caamalg.c | 60 +++++++++++++++++++++++++----------
- 1 file changed, 44 insertions(+), 16 deletions(-)
+ drivers/crypto/caam/caamalg.c | 52 +++++++++++++++++++++++++++--------
+ 1 file changed, 40 insertions(+), 12 deletions(-)
 
 diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.=
 c
-index c83d28509..8826797dc 100644
+index 8826797dc..d00caa9cd 100644
 --- a/drivers/crypto/caam/caamalg.c
 +++ b/drivers/crypto/caam/caamalg.c
-@@ -98,6 +98,7 @@ struct caam_alg_entry {
- 	bool rfc3686;
- 	bool geniv;
- 	bool nodkp;
-+	bool is_paes;
- };
-=20
- struct caam_aead_alg {
-@@ -823,19 +824,6 @@ static int paes_skcipher_setkey(struct crypto_skciph=
+@@ -797,6 +797,45 @@ static int paes_skcipher_setkey(struct crypto_skciph=
 er *skcipher,
- 	dma_sync_single_for_device(jrdev, ctx->key_dma, keylen, DMA_TO_DEVICE);
- 	ctx->cdata.key_dma =3D ctx->key_dma;
 =20
+ 	keylen =3D keylen - CAAM_PKEY_HEADER;
+=20
++	if (pkey_info->is_pkey !=3D 1) {
++		dev_dbg(jrdev, "not a protected key\n");
++		return -EINVAL;
++	}
++
++	/*
++	 * An EKT (CCM) black key occupies plain_key_sz + CAAM_CCM_OVERHEAD
++	 * bytes, which neither the key size range of this algorithm, nor the
++	 * blob length computed by cnstr_desc_protected_blob_decap(), nor the
++	 * KEY command length in cnstr_desc_skcipher_enc_dec() account for.
++	 * Encapsulation has the same problem: caam_process_blob() stores only
++	 * input_len bytes of an input_len + CAAM_CCM_OVERHEAD byte black key.
++	 * Reject such keys instead of submitting a job that is bound to fail
++	 * or, worse, to derive a key from a truncated blob.
++	 */
++	if (pkey_info->key_enc_algo !=3D CAAM_ENC_ALGO_ECB) {
++		dev_dbg(jrdev, "unsupported protected key encoding %u\n",
++			pkey_info->key_enc_algo);
++		return -EOPNOTSUPP;
++	}
++
++	/* Validate key length for AES algorithms */
++	err =3D aes_check_keylen(pkey_info->plain_key_sz);
++	if (err) {
++		dev_dbg(jrdev, "bad key length\n");
++		return err;
++	}
++
++	/*
++	 * plain_key_sz comes straight from userspace and determines how much
++	 * data the hardware reads out of ctx->key, so it has to agree with the
++	 * amount of key material actually supplied.
++	 */
++	if (keylen !=3D pkey_info->plain_key_sz + CAAM_BLOB_OVERHEAD) {
++		dev_dbg(jrdev, "blob length %u does not match key size %u\n",
++			keylen, pkey_info->plain_key_sz);
++		return -EINVAL;
++	}
++
+ 	/* Retrieve the length of key */
+ 	ctx->cdata.plain_keylen =3D pkey_info->plain_key_sz;
+=20
+@@ -806,19 +845,8 @@ static int paes_skcipher_setkey(struct crypto_skciph=
+er *skcipher,
+ 	/* Retrieve the address of the blob */
+ 	ctx->cdata.key_virt =3D pkey_info->key_buf;
+=20
+-	/* Validate key length for AES algorithms */
+-	err =3D aes_check_keylen(ctx->cdata.plain_keylen);
+-	if (err) {
+-		dev_err(jrdev, "bad key length\n");
+-		return err;
+-	}
+-
+ 	/* set command option */
+-	ctx->cdata.key_cmd_opt |=3D KEY_ENC;
+-
+-	/* check if the Protected-Key is CCM key */
 -	if (pkey_info->key_enc_algo =3D=3D CAAM_ENC_ALGO_CCM)
--		ctx->protected_key_dma =3D dma_map_single(jrdev, ctx->protected_key,
--							ctx->cdata.plain_keylen +
--							CAAM_CCM_OVERHEAD,
--							DMA_FROM_DEVICE);
--	else
--		ctx->protected_key_dma =3D dma_map_single(jrdev, ctx->protected_key,
--							ctx->cdata.plain_keylen,
--							DMA_FROM_DEVICE);
--
--	ctx->cdata.protected_key_dma =3D ctx->protected_key_dma;
--	ctx->is_blob =3D true;
--
- 	return 0;
- }
+-		ctx->cdata.key_cmd_opt |=3D KEY_EKT;
++	ctx->cdata.key_cmd_opt =3D KEY_ENC;
 =20
-@@ -2013,6 +2001,7 @@ static struct caam_skcipher_alg driver_algs[] =3D {
- 			.do_one_request =3D skcipher_do_one_req,
- 		},
- 		.caam.class1_alg_type =3D OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
-+		.caam.is_paes =3D true,
- 	},
- 	{
- 		.skcipher.base =3D {
-@@ -3746,6 +3735,8 @@ static int caam_init_common(struct caam_ctx *ctx, s=
-truct caam_alg_entry *caam,
- 	return 0;
- }
-=20
-+static void caam_exit_common(struct caam_ctx *ctx);
-+
- static int caam_cra_init(struct crypto_skcipher *tfm)
- {
- 	struct skcipher_alg *alg =3D crypto_skcipher_alg(tfm);
-@@ -3775,10 +3766,43 @@ static int caam_cra_init(struct crypto_skcipher *=
-tfm)
- 	}
-=20
- 	ret =3D caam_init_common(ctx, &caam_alg->caam, false);
--	if (ret && ctx->fallback)
--		crypto_free_skcipher(ctx->fallback);
-+	if (ret) {
-+		if (ctx->fallback)
-+			crypto_free_skcipher(ctx->fallback);
-+		return ret;
-+	}
-=20
--	return ret;
-+	if (caam_alg->caam.is_paes) {
-+		/*
-+		 * The hardware writes the decapsulated black key here and reads
-+		 * it back through the KEY command, so map it bidirectionally,
-+		 * once, for the lifetime of the tfm. Mapping it per setkey()
-+		 * leaks the mapping.
-+		 *
-+		 * All requests of a tfm share this buffer, which is safe only
-+		 * because the key cannot change while requests can be issued:
-+		 * AF_ALG refuses ALG_SET_KEY once an op socket exists, so
-+		 * concurrent jobs all decapsulate the same blob into the same
-+		 * black key.
-+		 */
-+		ctx->protected_key_dma =3D dma_map_single(ctx->jrdev,
-+							ctx->protected_key,
-+							AES_MAX_KEY_SIZE,
-+							DMA_BIDIRECTIONAL);
-+		if (dma_mapping_error(ctx->jrdev, ctx->protected_key_dma)) {
-+			dev_err(ctx->jrdev, "unable to map protected key\n");
-+			ctx->protected_key_dma =3D 0;
-+			if (ctx->fallback)
-+				crypto_free_skcipher(ctx->fallback);
-+			caam_exit_common(ctx);
-+			return -ENOMEM;
-+		}
-+
-+		ctx->cdata.protected_key_dma =3D ctx->protected_key_dma;
-+		ctx->is_blob =3D true;
-+	}
-+
-+	return 0;
- }
-=20
- static int caam_aead_init(struct crypto_aead *tfm)
-@@ -3795,6 +3819,10 @@ static int caam_aead_init(struct crypto_aead *tfm)
-=20
- static void caam_exit_common(struct caam_ctx *ctx)
- {
-+	if (ctx->protected_key_dma)
-+		dma_unmap_single(ctx->jrdev, ctx->protected_key_dma,
-+				 AES_MAX_KEY_SIZE, DMA_BIDIRECTIONAL);
-+
- 	dma_unmap_single_attrs(ctx->jrdev, ctx->sh_desc_enc_dma,
- 			       offsetof(struct caam_ctx, sh_desc_enc_dma) -
- 			       offsetof(struct caam_ctx, sh_desc_enc),
+ 	memcpy(ctx->key, ctx->cdata.key_virt, keylen);
+ 	dma_sync_single_for_device(jrdev, ctx->key_dma, keylen, DMA_TO_DEVICE);
 --=20
 2.55.0
 
