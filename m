@@ -1,80 +1,80 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57285377AA6
-	for <linux-crypto@vger.kernel.org>; Sun, 26 Jul 2026 07:28:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4E8937C0F8
+	for <linux-crypto@vger.kernel.org>; Sun, 26 Jul 2026 07:31:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.210.177
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785050909; cv=pass; b=CVSluKfOX1Si7UvxpCq+nbA+Hz6yI1faQGD3gDNWeE6BFLunTKfjf8xGMzNZzOlbbgwQpzz5eOaSKM/+IlnXB9+vlh46En4YBTFUDgmZFeqATnlC937SlbqJe+QkS/7BxaPX0/QzIxR3fvN6Nayk/WjBSrjMs9o6lDPxqKxSCQA=
+	t=1785051068; cv=pass; b=QsmouZuPyXCsMnRqHalBokt6sn486S34wjVOjhJQYN1NlguoBeMNEZG31nZDxXtWAg9Z3Di5GLfrQJBVOdDrE5s2zttLZUFrY0B1bjTkc9vCEZ7/owNV3XOG6LNNnrBG883FpWnF6msZkOvnYPL4kO3NR84TZ47rCJL+FMeCcHU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785050909; c=relaxed/simple;
-	bh=YnQSxA6vOc4L3vy7N3SIEFndSmFrtTsw7Yc0V12H9AE=;
+	s=arc-20240116; t=1785051068; c=relaxed/simple;
+	bh=i0lh72d2nmu3uu3VDQoHujJQG0QNixt9o8QmQUrkaDc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mBtqa/iVUgGZQpoT6XmdCUh3JNEn4iLU4ZbZQ7vKa/K8SAshdrzn7whOG/67JufiKcSkcO9VVbmOgdD86r8mKfjGCl7kjcoVA3uYryrKX1acLEqKoDe2V8XzikEMyIS9uW8EaWEjCQE+0ZEB+/nyAfalPyV7R8XjVSWC0RO7WYY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KCgAiTVI; arc=pass smtp.client-ip=209.85.214.182
+	 To:Cc:Content-Type; b=CHecj8tBUd0whn9Qmyz2+UosVT8wGqxXxLXvgpTw1daq2FiZOFYRWBSeGrNDxX/xBpC5bnTN3uv2+ptjg9KWWyxWnQUF2bT4LQ/E9yA5yHAfKCg9m+pKKlSrGPvGzlxvERekuBWhJy3bWGSwTrpDKfItLZJ+qeW7gVtkFb2WB4c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZrK5Lp6W; arc=pass smtp.client-ip=209.85.210.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KCgAiTVI"
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2cab973140bso24059885ad.3
-        for <linux-crypto@vger.kernel.org>; Sun, 26 Jul 2026 00:28:28 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1785050907; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZrK5Lp6W"
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-84862b0d5aeso1761831b3a.2
+        for <linux-crypto@vger.kernel.org>; Sun, 26 Jul 2026 00:31:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1785051065; cv=none;
         d=google.com; s=arc-20260327;
-        b=EKK2Kw09lzf9VtpjXTWGqJBfv3yS4LjgA1IHBqMDQq6/H2FRW5uZvfKiWh4keAOsCd
-         o+/ZXtORp8Be5toYMLt1dCnYA8ciTbyR+gXFDg9t8Ocve1nmLbzY42UirWeDqLS9vezH
-         kp0JEtdgldXn0Mf+EUyb+9BAolAGPwCzFiaKMBg0FXTqMn7kR4utNBo529et0i0BOL55
-         F6DT23HhHeHSIPBNm27F35NGevGTrgt74bXna03JFzrDWjmsfS5S0AhAgWTd7r2ipHHk
-         PLnJwEXgb3iMa+k+v8Cd9dCX6BzyYUpm7DIx9U1qN7OoA+2dSMjVQ46ejbxn3uc46Vxv
-         JVow==
+        b=dgFDwqNf5kTIRS2mvNbt10s5l8b+h0liYLfdLckYM3uro/c6XsybFc8BnVo4VgJABJ
+         34BoOyJv06tQamzBmbcnmcUPaZU8Xv3G3g03wVZ91tlibp3RystG+8+Kqd9jm3sQg7JC
+         dRpnDHVAl0a3BXoksq0cpNrQnoB/IteioGP2aRGn28Yeov3lozISxcScjK7859Y0II6B
+         a80d3VO929EgCqir/2efedHoCH7rd1purYQZRFRlINCBCrHzL7NnmmcdYNF+hdtD5jYK
+         59NPUZmBeLhfg1kC5Z9OgQwNgMNVmQ5+8V12dk/TZnvOaPSGU+mKgSZM6sutn6rAxmkt
+         ePJA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=MeZgOjZ9fB6EjuAkf8ccBhVqZofI6hKeYPctz9DlCKk=;
-        fh=4Aea/1zTUvOgT3kQQC7pEHhe17JwGbl0oXljVoxyoZo=;
-        b=P1snkhg5xjDIKiQtiP5wM9p46lEIn5HaSc0ldC9wFn4d0kQXxVheocrBHvE1xnz8DN
-         6SUST7msklnSKeEfhzc4Y0y+k7uPKn0A15sY8QniC30bqAf9MyXl4vQ+h2DsFBRkJNa8
-         T97xq/ml+2g0/sbkBE2TX9XQMl/xSR3OAZkY8GWpmnVabC6X3tKsKRuz+ODWeSU9oiXf
-         ZD9sXl514vr/x2U8ys6uiy6yGM0KY0VJaK7qsu7fY7xUJ50h/dtBioLtAIRJRGJDM5zy
-         YgI+3aLOx8tpeMeHGqLynkYZ8gpu+ilI72DdjslutvaLeu0EOZB6+oKt42ftCmXBQmYR
-         SfjQ==;
+        bh=LZTVSxKYFzxJZaYDAFPYkohl9eRKYUawYCXhr4l0HQQ=;
+        fh=SYdZk1TxW6sCDJ7pU08FGloJp78B6rso39fJIKlfC2I=;
+        b=mvt8I/mgJBuyj/8OZxmaXRZeqBBn7xXrYV1kPj7+VFnqRaGLEoSuIJZO+TusZL0Rbn
+         SIJSy9rcUwr03utDVzPPclbRsu9xSDbM2pNY95SqCyU/d6fPY4/qK/QWAesT+waijc+k
+         yKoVDlETC2mVYDRgsneRQ2b8Qs682gDbuE8wg3DTbywhy9EcQD1tttmvEXinoGq6NvsD
+         M0uwdKXyom2zX20N7oMsWh6kMjQsXrmAppxn5VWIEmt5lyf5Dx7bUFwRK/jQnXRrxtfs
+         TnGRLbSjA1Au/dQ4TAVj8RYzvyy0tC2rUG/RnOpFb1XY5aLKcDSMB4MIps0S5VrwKEmx
+         GkTw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785050907; x=1785655707; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1785051065; x=1785655865; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:from:to:cc:subject
          :date:message-id:reply-to:content-type;
-        bh=MeZgOjZ9fB6EjuAkf8ccBhVqZofI6hKeYPctz9DlCKk=;
-        b=KCgAiTVID2AWkA9m75V+zxXT29r04XQpF7RlSRr4DulTCQlPVuF6g+fhBz5uAEwP88
-         3nx7H39EQ46RtQoGay2Ha5WH5RdymQhLFjL3zhPML+a3KwbuH/pIesFHF44W7ZBIcqxy
-         9hIgscEaQdiKlFiNXc4aAh/wcgChbti+lWKrJGZBI9XqkJC5F0qhj1flptgZF6qkliOA
-         m7zNc7uCQa5ztbZ0RuKzKuDAKO79CRNqO680uD2mPTgKFe5llFI8ptgOrVSOfAEyuQsp
-         FHX9q7+Ogsx59azlmplfow0oVmm0OAalcrgLiMgagcZntvjAPGljTNaz2VEatDTwt4bc
-         KaOA==
+        bh=LZTVSxKYFzxJZaYDAFPYkohl9eRKYUawYCXhr4l0HQQ=;
+        b=ZrK5Lp6WqJQ4AYEUExlJ96qEozJu712C5w53xvpoTOGRL96QqYfaHp2RmF753iN5bo
+         SpbMiuR/Rrr6NF/cirypL9oH5ccFJu5bTk5LzZmmXhUqeg7FVeM4fTLlYxpoITkSGNR3
+         I2Um1YzhaO7tB+9iew+TAmbV46K8WlZPKgh13IKI/eze+xalGjRmg2DPm7Yb1PTuegy/
+         MxmXX75YGz7gvyBYyFHTMjrtevUQ63b9cQ+XCIYw2mH1awAMLl2FHoDGAuf6Q59GTmyB
+         e/a4KhMt4VrfzGIH4psfiIcGyicDjqv+g4+ML8pvR1lnV4M+UuNinfYSKlsY9SespX06
+         E0fQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785050907; x=1785655707;
+        d=1e100.net; s=20251104; t=1785051065; x=1785655865;
         h=content-transfer-encoding:content-type:cc:to:subject:message-id
          :date:from:in-reply-to:references:mime-version:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=MeZgOjZ9fB6EjuAkf8ccBhVqZofI6hKeYPctz9DlCKk=;
-        b=cWB+AlXo62CyrwrO/+x2wAXUwDVu3YBF0rbUp5iRLCv0w4qQstvH1p7My2koRL7Iij
-         KiqYW8La3hhOrGyGoga5LhLUJYCKnDJH8Zo+1pMfdWdfftlYdRuQVEq0Jo63AO8ik1Di
-         MjVkVwaNZ/2aV3sNTayicACGxW7eYUZKZpSgRS405GOXzKLRrq6SHqHg+j+GM8i+icAT
-         tfIDZuYufzTZiHFPa+CbqZrOIOjTcwCl67zH0bcamt6tgOJGy1ZrXx+Y4bw7BPoF8u0T
-         5BAmgMM3+RM4gNDTpnZVJr9815yjmtYw/Jyl7Fu39zOa6AlxlUlD7627w8oGJD3/VZx5
-         xHBw==
-X-Forwarded-Encrypted: i=1; AHgh+Rp+hiSVvEBDxoJ46gKzCVc2HE/YOiC6gFLUVn1+SAuJfcolNJQ/Uvzotpn3h3Y1E4PyLSg5N4xJHRov+Ks=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3rv20eiz3SopHWSxyKzxWVnEorRo2fFT84nkpd4f7dhFA3eSR
-	RJuL2VmDuDKiDH4Um5LK+0S/YoF7B89b/JpU82R6MmnI9d+eB7XDw+gIwBPaGY9vDQDQ3TKIAmu
-	GcK4vNjgELE05G9L/JGaC0JGj4SQsN2/mRDn152Q=
-X-Gm-Gg: AR+sD13JIiCcfv3BzmekldiHtq9+2YRyhD5HrHx5CFSstdNt/2+o2DZBUluewk2Wzmp
-	JOPJ1u3njDcxoTGXq2I6YgzpZe8qCfbA6jURKC8Za+CQKN0uHnN/qQlcnJJ7mX86zCOCHT4N5lX
-	rFnIi4wEh7QhzLIKClJ7BBfjqSOyKhN23NUOq1NCIkpZuilKMFcUaCLZCCrqHJ4trwWFUSbjCHh
-	9TY03s0hh3MX426/2CeqcC8n7ua/3UkYz6SU3jPY/rKbnIbTD/R/nzDE+EK2X5cEgk6h0vL
-X-Received: by 2002:a17:902:e804:b0:2ca:d172:7228 with SMTP id
- d9443c01a7336-2cfde7a73a4mr46103665ad.11.1785050907492; Sun, 26 Jul 2026
- 00:28:27 -0700 (PDT)
+        bh=LZTVSxKYFzxJZaYDAFPYkohl9eRKYUawYCXhr4l0HQQ=;
+        b=QKyG/x4EsPbRQSIE8TgOTuOAsKfwd1uF1SvWI/V6gUDsj/VPEPVR820mHqGIm9DaU/
+         uaN1JZupEFpdoMlNt4imw9Wu6D7wJYVyH0qpLsM2aTDGvEQemnAqaqWGHfg3ch/HQ+0J
+         R07Opu1nEXN50P6a3O8SmAIrgf6pwO5V2AtA5E5EiO4z9WGCqgO5/GvdVuDO+QIUZPdY
+         uxGMsQOJ0d1ipDG82HAr1kuISwUtdlcjcbeNXzGXs3g10vTuhuWo7KwcOMvdZoUoJbpP
+         JhkpWwVEfi7V8vZgG/yR3KQPKjDZwwBf1Lt0dMt1t2MEpTMzmKOGJPbkhb6cSaFmsA3A
+         hSdQ==
+X-Forwarded-Encrypted: i=1; AHgh+RrpFs2ubdpDQ2QLCSgm2vqtAizQqYzE9gHxO45dgar0v9Cf+zmyohs13Xf+zCTmv9N4mhVMXNBrCRGFJAM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxUOEAcLznzsPEylrXt0AJdE/coCFOiHanWOS40a5/QLipIdzQR
+	n2ySXNbsoPXY2UZCOFCxOaGWv+raBmD6LfMCGoy1NjMqNnfEvLR+fHkZlhN7Hjkj1HN3Yrojyys
+	Tatpgefp3EHwU7Q3iidKyd8GEHkEDynC1+fPY
+X-Gm-Gg: AR+sD13RgGsGPGoTHUgMdca52Sv4SX130T5aUJ9rwmvd3Ny0MGyy5ETLoBfriTULyPp
+	4O7H4Bc9lrRg7xbh3Smb10dLgXXFEovmH3RO1CExUkV4qcREp5aSYX/gqrnzP2TcyWvK5Yiptnd
+	HfukArhB+WcKPZNKGjjW8SmrkP4miwVj/SbfH3aBxd3Ex2hpKnW1Kf6gKDU6DmIZsjHiIbC/LTo
+	WGhup+2FIv6NpCAD9uU8bw4ZEerF+xU/ZNygH94a/HiocLX8e2m2MmNVcVLUQ==
+X-Received: by 2002:a05:6a00:4213:b0:84c:4d9a:ae42 with SMTP id
+ d2e1a72fcca58-84e59498487mr3719808b3a.27.1785051064667; Sun, 26 Jul 2026
+ 00:31:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -84,12 +84,13 @@ MIME-Version: 1.0
 References: <20260523-af-alg-harden-v1-2-c76755c3a5c5@gmail.com>
  <20260603133312.12848-1-freude@linux.ibm.com> <amOGWwdjnJqyxH5L@codewreck.org>
  <20260724160034.GB2032@sol> <amOTjPW__CNZui3_@codewreck.org>
- <CAFLxGvy+ec3nQLrQtwFZgGELhT2pKBDnHdD0pMvEGh-Mf3rjgQ@mail.gmail.com> <20260725220443.GA41199@quark>
-In-Reply-To: <20260725220443.GA41199@quark>
+ <CAFLxGvy+ec3nQLrQtwFZgGELhT2pKBDnHdD0pMvEGh-Mf3rjgQ@mail.gmail.com>
+ <20260725220443.GA41199@quark> <20260725230922.GB41199@quark>
+In-Reply-To: <20260725230922.GB41199@quark>
 From: Richard Weinberger <richard.weinberger@gmail.com>
-Date: Sun, 26 Jul 2026 09:28:14 +0200
-X-Gm-Features: AUfX_mzf8K1M0e1Vg7IaGl-nBN4a4aellAj-_sCLX-Ln3es0XP2ZaWEmYseqOmw
-Message-ID: <CAFLxGvyBGzfwh61F5YkYqctNPCQJCpFOwTtKfDs4L+iK8WJZpQ@mail.gmail.com>
+Date: Sun, 26 Jul 2026 09:30:50 +0200
+X-Gm-Features: AUfX_mwtxGS7a6c5QzhlmY01HvejyEPiuukikmfTBc_9wA_H1fyNyxlq8igMsLA
+Message-ID: <CAFLxGvzT7jO+dxLSUgw0SOViuV7suY+Tz8m-RE6DBVfF-WbRUA@mail.gmail.com>
 Subject: Re: [PATCH 2/3] AF_ALG: Drop support for off-CPU cryptography
 To: Eric Biggers <ebiggers@kernel.org>
 Cc: Dominique Martinet <asmadeus@codewreck.org>, demiobenour@gmail.com, 
@@ -106,67 +107,26 @@ Cc: Dominique Martinet <asmadeus@codewreck.org>, demiobenour@gmail.com,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jul 26, 2026 at 12:04=E2=80=AFAM Eric Biggers <ebiggers@kernel.org>=
- wrote:
-> > You can create a CAAM BLOB (a generated and sealed key) using the
-> > trusted keys subsystem and use this BLOB
-> > later in AF_ALG to perform AES with a key invisible to userspace.
-> >
-> > e.g.
-> > kid=3D$(keyctl add trusted mykey "new 32 pk" @s)
-> > keyctl print $kid | xxd -r -p > blob.bin
-> > Then just create a caam_pkey_info in userspace and feed it into AF_ALG
-> > and perform AES with it.
+On Sun, Jul 26, 2026 at 1:09=E2=80=AFAM Eric Biggers <ebiggers@kernel.org> =
+wrote:
+> > You've only mentioned that it "can" be used in this way in upstream.
+> > Can you confirm that it *is* used, and with an actual upstream algorith=
+m
+> > name, and if so which one(s)?  And if so, would you also be able to
+> > share whether this is for dm-crypt or not?  We should remember that
+> > dm-crypt accepts keys directly and AF_ALG is not needed to use it.
 >
-> Well, specifically AES-CBC.  That's the only one that is in the driver.
-
-Yes.
-
-> > So, pretty please,  if you kill AF_ALG and all this, offer some way to
-> > achieve the same in userspace.
+> We'd also need to know whether the user (if there is one) requires
+> unprivileged use.
 >
-> If needed, "cbc(paes)" and/or "cbc-paes-caam" (whichever name it is
-> being accessed as) can be allowed as a special case, as a stop-gap.
+> Hopefully not: these sorts of hardware crypto drivers have lots of bugs.
+> Indeed, the CAAM "cbc(paes)" doesn't validate the key length correctly,
+> leaks DMA mappings, concurrent requests race with each other, etc...
 
-Would be great.
-
-> This would need confirmed use of that specific algorithm with upstream,
-> which we don't quite have yet.  Dominique had a confirmed use of
-> "tk(cbc(aes))", but that has never existed upstream in the first place,
-> so it's not something that could be allowlisted upstream.
-
-It's "cbc(paes)".
-
-From one of my demo applications:
-
-struct sockaddr_alg sa =3D {
-       .salg_family =3D AF_ALG,
-       .salg_type =3D "skcipher",
-       .salg_name =3D "cbc(paes)",
-};
-
-> You've only mentioned that it "can" be used in this way in upstream.
-> Can you confirm that it *is* used, and with an actual upstream algorithm
-> name, and if so which one(s)?  And if so, would you also be able to
-> share whether this is for dm-crypt or not?  We should remember that
-> dm-crypt accepts keys directly and AF_ALG is not needed to use it.
-
-Well, if you require me to point to some open source application, sorry I c=
-an't.
-
-But no, the use cases I know about are not dm-crypt.
-It's more allowing to encrypt/decrypt data in userspace without being able =
-to
-extract the key from the device. Since the key is hardware bound too,
-it is device
-specific and you cannot decrypt on device B what you have encrypted on A, e=
-ven
-if you share the BLOB.
-So, it's more like a building block for a poor man's secure element.
-
-At $dayjob we've been recommending AF_ALG because it's a standard interface=
-.
-Not like other ad-hoc horrors via sysfs or worse we've seen on some BSPs.
+Uff, you're right. There are some nasty bugs.
+I guess nobody noticed so far because the algorithm is only used a few time=
+s
+at bootup (as root).
 
 --=20
 Thanks,
