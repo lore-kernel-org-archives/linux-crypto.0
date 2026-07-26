@@ -1,170 +1,112 @@
-Received: from lithops.sigma-star.at (mailout.nod.at [116.203.167.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A627837B02E;
-	Sun, 26 Jul 2026 08:15:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.167.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69A13750D5
+	for <linux-crypto@vger.kernel.org>; Sun, 26 Jul 2026 11:12:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785053741; cv=none; b=KcjxPeX0JPRs4GKeh4hgAN4hdTwd5sgE0e0dlE4ROHL0MT7oMQb5ZbyNqkQF5hySwYe19qX/Np4ifJByyxb3o9uMpw8uB05kUmaMLPgh9IBrA+3qBPjPwJQT/0wOyg+BEXZFPp+pWTrJjFNSo1dAkOr+bkjcbDshTp+RIgmLSAE=
+	t=1785064361; cv=none; b=QPl3D9QhTW3//GrrVeOTS/RsfoJAPzgZerT2LvAFBDxodHf9iefoSdHTku8itQwByc/jScK+HDO/lfQbu/blIUfXhuDtFVKATxEuM+iVUlqZK5zjZHdT5tBaIYXjTl233s2UVwP8ZdR2QMwQwQcTamayq3/hzM7EnCoetPnRkA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785053741; c=relaxed/simple;
-	bh=qFDTchyUHpjS4tPMT1rg6kIpUKJsEwRkeOwrIUhd1j8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CgQN3BypXt3CdpihCRhblHnHhshD4ZDR4fWSI4PvD3nkGoBO610xzQBkPEtlsWmpNkifoedGGpy93zUrEz3vcK1iXEUVxk8TEq9FFHMPSQL6dhYGxTKei8McoH6fcpCSUjrlXzy2MkhEqSulqR9qkj4+dAZPsJw9BgO1F2Ohoos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nod.at; spf=fail smtp.mailfrom=nod.at; arc=none smtp.client-ip=116.203.167.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nod.at
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nod.at
-Received: from localhost (localhost [127.0.0.1])
-	by lithops.sigma-star.at (Postfix) with ESMTP id 0C4382698C1;
-	Sun, 26 Jul 2026 10:15:18 +0200 (CEST)
-Received: from lithops.sigma-star.at ([127.0.0.1])
-	by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10032)
-	with ESMTP id UfAQ8uz0xiIN; Sun, 26 Jul 2026 10:15:17 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by lithops.sigma-star.at (Postfix) with ESMTP id 85AA62698C2;
-	Sun, 26 Jul 2026 10:15:17 +0200 (CEST)
-Received: from lithops.sigma-star.at ([127.0.0.1])
-	by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id jzb6PTqNa37D; Sun, 26 Jul 2026 10:15:17 +0200 (CEST)
-Received: from nailgun.corp.sigma-star.at (85-127-105-26.dsl.dynamic.surfer.at [85.127.105.26])
-	by lithops.sigma-star.at (Postfix) with ESMTPSA id 1716C2698C0;
-	Sun, 26 Jul 2026 10:15:17 +0200 (CEST)
-From: Richard Weinberger <richard@nod.at>
-To: linux-kernel@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org,
-	davem@davemloft.net,
-	herbert@gondor.apana.org.au,
-	gaurav.jain@nxp.com,
-	pankaj.gupta@nxp.com,
-	horia.geanta@nxp.com,
-	ebiggers@kernel.org,
-	upstream+linux@sigma-star.at,
-	Richard Weinberger <richard@nod.at>
-Subject: [PATCH 1/3] crypto: caam: Fix DMA mapping leak in the cbc(paes) job path
-Date: Sun, 26 Jul 2026 10:15:02 +0200
-Message-ID: <20260726081504.2182951-1-richard@nod.at>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1785064361; c=relaxed/simple;
+	bh=XzQobWmT2uLdetHlTB4zijkUllZNjW0ZntXhW1a6Xo0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bs/k/jsrIEjt5kmzthV4QVPEQyaZEKisjFtQgyjdg5CoW3lYFayi0YLvcqkZ3+es7pBCvxZDcH3Yy5NkmA5Z4sRh5/hzWFo+o+6ndb7KIMwO3CLueJiVTKWMv2QPWqXq6YcG2WPK5wJYioZM31hEOeCOqP+GAVDahyUhPGvX9SU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sigma-star.at; spf=pass smtp.mailfrom=sigma-star.at; dkim=pass (2048-bit key) header.d=sigma-star.at header.i=@sigma-star.at header.b=pN/aEfuz; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sigma-star.at
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sigma-star.at
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=sigma-star.at header.i=@sigma-star.at header.b="pN/aEfuz"
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-47362928f65so1677002f8f.2
+        for <linux-crypto@vger.kernel.org>; Sun, 26 Jul 2026 04:12:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sigma-star.at; s=google; t=1785064355; x=1785669155; darn=vger.kernel.org;
+        h=content-type:content-transfer-encoding:mime-version:references
+         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=N4TllNOSfiRDrdoI3q6LmQWb/e4SG8bRRKJlhRG5rrI=;
+        b=pN/aEfuzChd8lDdFwO5qfihEcPCOgTZ7ze8/RuKzfXUent+uRrB2vq+Qn3HNpw8dTc
+         w1DSUdmg1Isz5JMQjU8eyw2k3cuuHVTcRw4QU3/k7kut45HAsRHGuOvth7wGKIkVcmEB
+         ymQx6U3CrJrsIJVdu5e27F8/KAouklj/COd463yreiW6xpOltQpnnlD9DMLmI6f3dqST
+         2D/1pqrqjzpQRN+EpHOPEbPi5y/wVvq0L3RTNCx9JMx1idsNAkCJYQM039ZqZs9YnO6N
+         k6eiOsvk/LfmKQ++klzxG+bjuU7pfotOkdYofTHZLw93bh29m5IKh+mztzby+VfICAw+
+         F3Qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785064355; x=1785669155;
+        h=content-type:content-transfer-encoding:mime-version:references
+         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=N4TllNOSfiRDrdoI3q6LmQWb/e4SG8bRRKJlhRG5rrI=;
+        b=mbT4+TElHH1p1XkBdCI86KN0AgStpf7W3MdM0idRFt7t1XNvR7hpFECXgQ+QhOqDYT
+         lrVV4iaDrrgS27UqhKAq6V59U/bA735KJYseTtk3Wq5BfuGWTJLtzHo6cNU7wTcauCAN
+         Tllzru59rdfPPi/DEddFsqnDHCXbRe/yrQx2nvFLfGEWffFBqqkRdWDUB9k+Tv7BmJwo
+         ABjpkOQZXuvVEOR7Yko9+dFadigla8NHpUM+PhDKTjfKyMdCdMKyh50LZjGBQM07VIGf
+         CaLfuvtPPZO8v7tmgoB6xu28QIek7OMzKRFPBZ3PDh0FfrqBataUcizQa8hUNWXmoBD2
+         P8Xw==
+X-Gm-Message-State: AOJu0YxsTnmDiyBz0PVovyWUkwXNmApdar7V3wQHFueKkFxRwaYSoME5
+	YgPwuD14KcTztx16+jdMOAIb4WskY7AP7CVWKGhyMgNp7jgIZ+VXwvlLKxHwlrT8LCg=
+X-Gm-Gg: AR+sD10ytvACvt0/Ka7rxADfZXB4E2oL/V7HAInjvP3dUlSeHyMR8ghk6xwX0Gq4LJJ
+	yNyK8ledCnMhDzjDUai3FfBW5nKpLF/iJpatcei7TfnJW9D2P3p2mbgb1Z2fFI7qp0ngLb2RuDq
+	n7dfrO46nvgsZ1MqpsBFMl2q6fC+lZsaGRGZR1HtNzyy7Qc3Z1VPIyWVOZ4HpEb9AdquQyBs7xU
+	DJBkZuP5MIkZbUpQKhoTvFWAE4YKSxjDgRXBAjvTfVEnHRnNiZ72pef47jUU+2WVZ5uQi5q15um
+	YqGDTqfC/ag5/oKvmeg82g2nFYk7pXZudJckJHwQFy/RSJdXmEfd3RFaIZzDk7IS6wkQMGJcf/G
+	dRM6MiTeM3JML1vfE4coPzKMHqCyslHwA3hrC6xz5auoWi3GF4CHI6O5rj4kt4wWICtJ4onb/gI
+	YgoX3MClFZixnRzIijpd+yhOLe9wFkZPMebvl8DhZYq6s=
+X-Received: by 2002:a05:6000:290b:b0:47f:4d7d:4fb8 with SMTP id ffacd0b85a97d-47f9fea4274mr5143845f8f.30.1785064354413;
+        Sun, 26 Jul 2026 04:12:34 -0700 (PDT)
+Received: from somecomputer (85-127-105-26.dsl.dynamic.surfer.at. [85.127.105.26])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47f85c6ef25sm36581256f8f.36.2026.07.26.04.12.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 26 Jul 2026 04:12:34 -0700 (PDT)
+From: Richard Weinberger <richard@sigma-star.at>
+To: Christoph Anton Mitterer <calestyo@scientia.org>,
+ Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+ Milan Broz <gmazyland@gmail.com>
+Subject: Re: AF_ALG deprecation fallout
+Date: Sun, 26 Jul 2026 13:12:32 +0200
+Message-ID: <4065668.hXSD6JRtRq@nailgun>
+In-Reply-To: <20260708011112.GA3890@sol>
+References:
+ <27816cc353731e8e5484adad7d0fc447777727d8.camel@scientia.org>
+ <20260708011112.GA3890@sol>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"
 
-For a protected key, init_skcipher_job() maps the second job descriptor
-so that the blob decapsulation descriptor can jump to it, but keeps the
-address in a local variable. Nothing can ever unmap it, and the buffer
-it covers lives in edesc, which skcipher_crypt_done() frees while the
-mapping is still live. The mapping error is not checked either.
+On Mittwoch, 8. Juli 2026 03:11 Eric Biggers wrote:
+> Note that cryptsetup 2.8.7 will further reduce the cases in which it
+> even needs AF_ALG at all.  So just because you are using a particular
+> algorithm doesn't necessarily mean you need it in AF_ALG.
+> 
+> No algorithms have been proposed to be dropped from dm-crypt (which is
+> *not* the same thing as AF_ALG), by the way.  Given that dm-crypt allows
+> some "interesting" algorithms like RC4, DES-ECB, and even the null
+> cipher, I do think we can expect an allowlist for it at some point as
+> well.  But that would be separate.
+> 
+> I'd indeed like to remove AF_ALG entirely eventually.  But that's a long
+> term thing that would be many years from now and would occur only after
+> iwd, bluez, cryptsetup etc. have all fully migrated to userspace crypto.
 
-cbc(paes) is reachable through AF_ALG, so an unprivileged process leaks
-one mapping per request, exhausting IOVA space or swiotlb buffers.
+Since I got already mails from alerted clients, I'd like to highlight
+one particular use case on (deeply) embedded systems and make sure
+this use case is known.
 
-Store the mapping in the extended descriptor, release it in
-skcipher_unmap() and propagate mapping failures to the caller.
+On systems with very little space, like a few megabytes of flash,
+utilizing dm-crypt with LUKS can be a challenge. Adding a crypto
+library to userspace (e.g. initramfs) is a huge burden.
 
-Assisted-by: Claude-Code:claude-fable-5
-Reported-by: Eric Biggers <ebiggers@kernel.org>
-Signed-off-by: Richard Weinberger <richard@nod.at>
----
- drivers/crypto/caam/caamalg.c | 31 +++++++++++++++++++++++++++----
- 1 file changed, 27 insertions(+), 4 deletions(-)
+cryptsetup's --with-crypto_backend=kernel helps a lot here.
+So, by completely removing AF_ALG these systems would unnecessarily
+suffer. Please keep both AF_ALG and --with-crypto_backend=kernel around.
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.=
-c
-index ddbd60cf3..c83d28509 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -983,6 +983,9 @@ struct aead_edesc {
-  * @sec4_sg_bytes: length of dma mapped sec4_sg space
-  * @bklog: stored to determine if the request needs backlog
-  * @sec4_sg_dma: bus physical mapped address of h/w link table
-+ * @desc_dma: bus physical mapped address of the cipher job descriptor t=
-he
-+ *	      blob decapsulation descriptor jumps to (protected key only)
-+ * @desc_dma_bytes: length of the mapping at @desc_dma
-  * @sec4_sg: pointer to h/w link table
-  * @hw_desc: the h/w job descriptor followed by any referenced link tabl=
-es
-  *	     and IV
-@@ -996,6 +999,8 @@ struct skcipher_edesc {
- 	int sec4_sg_bytes;
- 	bool bklog;
- 	dma_addr_t sec4_sg_dma;
-+	dma_addr_t desc_dma;
-+	unsigned int desc_dma_bytes;
- 	struct sec4_sg_entry *sec4_sg;
- 	u32 hw_desc[];
- };
-@@ -1037,6 +1042,10 @@ static void skcipher_unmap(struct device *dev, str=
-uct skcipher_edesc *edesc,
- 	struct crypto_skcipher *skcipher =3D crypto_skcipher_reqtfm(req);
- 	int ivsize =3D crypto_skcipher_ivsize(skcipher);
-=20
-+	if (edesc->desc_dma)
-+		dma_unmap_single(dev, edesc->desc_dma, edesc->desc_dma_bytes,
-+				 DMA_TO_DEVICE);
-+
- 	caam_unmap(dev, req->src, req->dst,
- 		   edesc->src_nents, edesc->dst_nents,
- 		   edesc->iv_dma, ivsize,
-@@ -1313,9 +1322,9 @@ static void init_authenc_job(struct aead_request *r=
-eq,
- /*
-  * Fill in skcipher job descriptor
-  */
--static void init_skcipher_job(struct skcipher_request *req,
--			      struct skcipher_edesc *edesc,
--			      const bool encrypt)
-+static int init_skcipher_job(struct skcipher_request *req,
-+			     struct skcipher_edesc *edesc,
-+			     const bool encrypt)
- {
- 	struct crypto_skcipher *skcipher =3D crypto_skcipher_reqtfm(req);
- 	struct caam_ctx *ctx =3D crypto_skcipher_ctx_dma(skcipher);
-@@ -1365,6 +1374,13 @@ static void init_skcipher_job(struct skcipher_requ=
-est *req,
- 					    ivsize, encrypt);
-=20
- 		desc_dma =3D dma_map_single(jrdev, desc, desc_bytes(desc), DMA_TO_DEVI=
-CE);
-+		if (dma_mapping_error(jrdev, desc_dma)) {
-+			dev_err(jrdev, "unable to map cipher job descriptor\n");
-+			return -ENOMEM;
-+		}
-+
-+		edesc->desc_dma =3D desc_dma;
-+		edesc->desc_dma_bytes =3D desc_bytes(desc);
-=20
- 		cnstr_desc_protected_blob_decap(edesc->hw_desc, &ctx->cdata, desc_dma)=
-;
- 	} else {
-@@ -1377,6 +1393,8 @@ static void init_skcipher_job(struct skcipher_reque=
-st *req,
-=20
- 		append_seq_out_ptr(desc, dst_dma, req->cryptlen + ivsize, out_options)=
-;
- 	}
-+
-+	return 0;
- }
-=20
- /*
-@@ -1933,7 +1951,12 @@ static inline int skcipher_crypt(struct skcipher_r=
-equest *req, bool encrypt)
- 		return PTR_ERR(edesc);
-=20
- 	/* Create and submit job descriptor*/
--	init_skcipher_job(req, edesc, encrypt);
-+	ret =3D init_skcipher_job(req, edesc, encrypt);
-+	if (ret) {
-+		skcipher_unmap(jrdev, edesc, req);
-+		kfree(edesc);
-+		return ret;
-+	}
-=20
- 	print_hex_dump_debug("skcipher jobdesc@" __stringify(__LINE__)": ",
- 			     DUMP_PREFIX_ADDRESS, 16, 4, edesc->hw_desc,
---=20
-2.55.0
+Thanks,
+//richard 
+
 
