@@ -1,108 +1,137 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 488EF37E5F7
-	for <linux-crypto@vger.kernel.org>; Sun, 26 Jul 2026 15:39:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76DBF3BC69C;
+	Sun, 26 Jul 2026 15:52:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785080370; cv=none; b=HwOk+vyjTCoV+MskeAjxtS6gYyn+1qAVHdZeGpgiV8Hl+F+JUq5w0NnuOj7sol3r2juaqcrVxWaJT554GH+y7uMoUuyZ5e72EldQWVg+Jg4lKnv7becKZhss+dbmqXz4vK1LFHExkWYTpqtUDqcsiwvhPjZfE4i8TaY3oGEuqhM=
+	t=1785081139; cv=none; b=ENI4mOf2Ly0llgKteOIcqzknNGnZhvOAHVT/H/BbseWjZJB7SjdmcnkLi2nntZu3PovVLSeHXy3gUMIa0BYLNz8sVCXoH3n1RLfyZa+E3WvuWYtxP+XHBEBzB5PkLXFgrsSNMzT5dq3ClQa3vSn2fUUSYAycgHBIaEeJQTegJlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785080370; c=relaxed/simple;
-	bh=iL72KkABiKesKfq1XhZvdKEG/0Ct+oCKov/XGE0Zi3c=;
+	s=arc-20240116; t=1785081139; c=relaxed/simple;
+	bh=CntcIonM9I0QlK+PLIkdPKTiyF1MW70gGi74k+GC07Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H2Vj5NWVbHY8Q5wgw2aarqyH/dJfC9fb/lxC1UryQsdez6Ufkkr0GqeScXePvQRl+0ZiiMVMVgZrhy78mABiZmQvgh9QfmCRaq+1G/hJyef27YF8HEslC4Zr6ApK2OF12zmFgNr7XTQr3xpToBWLc7tQmHpt4vQ2XDb8Ni5Op4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CcqO/7ba; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=fx+Z6+MDtqI0WpZL73WEDUZKNP21LIpmjRl7C9ZHc2FRNCFkh/M2TZIY4TSdGDoF3L7proQLlof8+r91pM3TH2nNJK90c1rFzf/9OWm7080slCDwOwoWhXPBwpoQWcPIKhOxCG1y8vSdnWncaC3IkX1Dv0bEgPcLt8Aaf2iHwag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ro1iKTqb; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CcqO/7ba"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A25711F000E9;
-	Sun, 26 Jul 2026 15:39:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ro1iKTqb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 091A41F000E9;
+	Sun, 26 Jul 2026 15:52:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785080368;
-	bh=vZuTm44FcGJdQZ2c+a4IFLBGkkgDg+rbCxJuQpjlBz0=;
+	s=k20260515; t=1785081138;
+	bh=uqkCckTZP/oUm6TGK+F/qrjFgcat1+M2w/YXj+9Q7CY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=CcqO/7bayj8PiXKcZJculq/zSTr6cRHttFeux7/e1TTiklPFtVntvcMgHUyk8Dg1m
-	 aQ0yF9cFe+dEDcQX5uh+auHxkePkYv2/hgMkA2dCK7S0+2l4qsU6LMNIxBvpECGeHD
-	 TBoL9RW6IHTHArKiIMFse/Qd/F86PRJ2/+j4729E270mODEuUepPAiCZlJTlvGLU/F
-	 RTS0VygWlr62G0biZZTYmFvhQX5TjpqA3DTq1jzBC5I8sz9RU7eFNZG0wBQwsgqxlq
-	 3sWEKtQYcGJCc7EO7XIMP93uLbJ7Sk9BmlrlEK5YkyRC/cTjmkqjPOxY/R2nN7FQeV
-	 XoLTstajlUfIA==
-Date: Sun, 26 Jul 2026 08:37:36 -0700
+	b=Ro1iKTqbVdCghKAp3LD2qNRnM8OFPuPVcJVrOVpsRp4enPKNhAQd1VGnEPAwu21X9
+	 vQJyolh2oLHkTFP9Uta7KZTRwYDZKsM2LxNCz1aLhrOSfo0B2cfbYRj/L+3mfZIi6s
+	 sArefMy/nJEJG24qthmObCx7dIw2ot/2OqAR0egYfwK1b2CI4rAchuNyx2nCqmTii3
+	 goc1hAaej7Gsf0+/9By6FQd6qrQRjgiZQYFw2F5mqpmJ/tbzNyVFoiJKbqNE/54CTo
+	 u3cJWjH9LceRJ6uMQ4+NLjMhGI3QbclggsiJz5U3tfG4nJsvnodXgTMyfjtatq2yRL
+	 BpmSxESC4VmqQ==
+Date: Sun, 26 Jul 2026 08:50:24 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: Richard Weinberger <richard@sigma-star.at>
-Cc: Christoph Anton Mitterer <calestyo@scientia.org>,
-	linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Milan Broz <gmazyland@gmail.com>,
-	Demi Marie Obenour <demiobenour@gmail.com>
-Subject: Re: AF_ALG deprecation fallout
-Message-ID: <20260726153736.GA1673@sol>
-References: <27816cc353731e8e5484adad7d0fc447777727d8.camel@scientia.org>
- <20260708011112.GA3890@sol>
- <4065668.hXSD6JRtRq@nailgun>
+To: Richard Weinberger <richard.weinberger@gmail.com>
+Cc: Dominique Martinet <asmadeus@codewreck.org>, demiobenour@gmail.com,
+	Harald Freudenberger <freude@linux.ibm.com>, acme@kernel.org,
+	adrian.hunter@intel.com, alexander.shishkin@linux.intel.com,
+	ardb@kernel.org, axboe@kernel.dk, corbet@lwn.net,
+	davem@davemloft.net, edumazet@google.com,
+	herbert@gondor.apana.org.au, horms@kernel.org,
+	io-uring@vger.kernel.org, irogers@google.com,
+	james.clark@linaro.org, jolsa@kernel.org, kuba@kernel.org,
+	kuniyu@google.com, linux-crypto@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org, mark.rutland@arm.com,
+	mingo@redhat.com, namhyung@kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, peterz@infradead.org, skhan@linuxfoundation.org,
+	willemb@google.com, linux-s390@vger.kernel.org
+Subject: Re: [PATCH 2/3] AF_ALG: Drop support for off-CPU cryptography
+Message-ID: <20260726155024.GB1673@sol>
+References: <20260523-af-alg-harden-v1-2-c76755c3a5c5@gmail.com>
+ <20260603133312.12848-1-freude@linux.ibm.com>
+ <amOGWwdjnJqyxH5L@codewreck.org>
+ <20260724160034.GB2032@sol>
+ <amOTjPW__CNZui3_@codewreck.org>
+ <CAFLxGvy+ec3nQLrQtwFZgGELhT2pKBDnHdD0pMvEGh-Mf3rjgQ@mail.gmail.com>
+ <20260725220443.GA41199@quark>
+ <CAFLxGvyBGzfwh61F5YkYqctNPCQJCpFOwTtKfDs4L+iK8WJZpQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <4065668.hXSD6JRtRq@nailgun>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAFLxGvyBGzfwh61F5YkYqctNPCQJCpFOwTtKfDs4L+iK8WJZpQ@mail.gmail.com>
 
-On Sun, Jul 26, 2026 at 01:12:32PM +0200, Richard Weinberger wrote:
-> On Mittwoch, 8. Juli 2026 03:11 Eric Biggers wrote:
-> > Note that cryptsetup 2.8.7 will further reduce the cases in which it
-> > even needs AF_ALG at all.  So just because you are using a particular
-> > algorithm doesn't necessarily mean you need it in AF_ALG.
-> > 
-> > No algorithms have been proposed to be dropped from dm-crypt (which is
-> > *not* the same thing as AF_ALG), by the way.  Given that dm-crypt allows
-> > some "interesting" algorithms like RC4, DES-ECB, and even the null
-> > cipher, I do think we can expect an allowlist for it at some point as
-> > well.  But that would be separate.
-> > 
-> > I'd indeed like to remove AF_ALG entirely eventually.  But that's a long
-> > term thing that would be many years from now and would occur only after
-> > iwd, bluez, cryptsetup etc. have all fully migrated to userspace crypto.
+On Sun, Jul 26, 2026 at 09:28:14AM +0200, Richard Weinberger wrote:
+> On Sun, Jul 26, 2026 at 12:04 AM Eric Biggers <ebiggers@kernel.org> wrote:
+> > > You can create a CAAM BLOB (a generated and sealed key) using the
+> > > trusted keys subsystem and use this BLOB
+> > > later in AF_ALG to perform AES with a key invisible to userspace.
+> > >
+> > > e.g.
+> > > kid=$(keyctl add trusted mykey "new 32 pk" @s)
+> > > keyctl print $kid | xxd -r -p > blob.bin
+> > > Then just create a caam_pkey_info in userspace and feed it into AF_ALG
+> > > and perform AES with it.
+> >
+> > Well, specifically AES-CBC.  That's the only one that is in the driver.
 > 
-> Since I got already mails from alerted clients, I'd like to highlight
-> one particular use case on (deeply) embedded systems and make sure
-> this use case is known.
+> Yes.
 > 
-> On systems with very little space, like a few megabytes of flash,
-> utilizing dm-crypt with LUKS can be a challenge. Adding a crypto
-> library to userspace (e.g. initramfs) is a huge burden.
+> > > So, pretty please,  if you kill AF_ALG and all this, offer some way to
+> > > achieve the same in userspace.
+> >
+> > If needed, "cbc(paes)" and/or "cbc-paes-caam" (whichever name it is
+> > being accessed as) can be allowed as a special case, as a stop-gap.
 > 
-> cryptsetup's --with-crypto_backend=kernel helps a lot here.
-> So, by completely removing AF_ALG these systems would unnecessarily
-> suffer. Please keep both AF_ALG and --with-crypto_backend=kernel around.
+> Would be great.
+> 
+> > This would need confirmed use of that specific algorithm with upstream,
+> > which we don't quite have yet.  Dominique had a confirmed use of
+> > "tk(cbc(aes))", but that has never existed upstream in the first place,
+> > so it's not something that could be allowlisted upstream.
+> 
+> It's "cbc(paes)".
+> 
+> From one of my demo applications:
+> 
+> struct sockaddr_alg sa = {
+>        .salg_family = AF_ALG,
+>        .salg_type = "skcipher",
+>        .salg_name = "cbc(paes)",
+> };
+> 
+> > You've only mentioned that it "can" be used in this way in upstream.
+> > Can you confirm that it *is* used, and with an actual upstream algorithm
+> > name, and if so which one(s)?  And if so, would you also be able to
+> > share whether this is for dm-crypt or not?  We should remember that
+> > dm-crypt accepts keys directly and AF_ALG is not needed to use it.
+> 
+> Well, if you require me to point to some open source application, sorry I can't.
+> 
+> But no, the use cases I know about are not dm-crypt.
+> It's more allowing to encrypt/decrypt data in userspace without being able to
+> extract the key from the device. Since the key is hardware bound too,
+> it is device
+> specific and you cannot decrypt on device B what you have encrypted on A, even
+> if you share the BLOB.
+> So, it's more like a building block for a poor man's secure element.
+> 
+> At $dayjob we've been recommending AF_ALG because it's a standard interface.
+> Not like other ad-hoc horrors via sysfs or worse we've seen on some BSPs.
 
-I assume the key on these systems tends not to come from user input
-(such as a passphrase).  So do you know why cryptsetup and LUKS is being
-used at all, instead of just using dm-crypt directly?
+Then I would suggest that skcipher_bind() should check if the name is
+"cbc(paes)", and if so use 0 instead of AF_ALG_CRYPTOAPI_MASK.  Please
+go ahead and send a patch against mainline (for v7.2-rc6) if you're
+interested.
 
-Even if LUKS is used, it should be feasible to implement with neither
-AF_ALG nor an external userspace crypto library, saving space over your
-requested solution which bloats the kernel with AF_ALG.  Indeed, in
-cryptsetup, LUKS keyslot en/decryption already falls back to a temporary
-dm-crypt mapping; see lib/utils_storage_wrappers.c.  I understand this
-wasn't done consistently in old versions, but in v2.8.7 it is.
+On cryptodev/master (future 7.3) it should get an entry in the new
+skcipher_allowlist as well: { "cbc(paes)", true }.  That would be a
+separate patch.
 
-For key derivation, assuming the LUKS2 defaults are used, cryptsetup
-already has built-in Argon2 code, including an implementation of the
-BLAKE2b hash function; see lib/crypto_backend/argon2/blake2/.
-
-So it seems the only missing piece for LUKS is actually the metadata
-checksums.  (I'll assume that 'cryptsetup benchmark' and support for
-formatting a file in LUKS format as non-root users aren't needed here;
-those seem to be for testing purposes.)  For LUKS2 that's SHA-256.
-Built-in SHA-256 could be added to cryptsetup; this would be much
-smaller than the code for AF_ALG.  Alternatively, for new volumes,
-support for configuring these to use BLAKE2b could be added, simply
-reusing the BLAKE2b code that is already built-in for key derivation...
-
-So it seems quite feasible.  But I strongly suspect that direct use of
-dm-crypt would be a better solution for these systems, which would
-eliminate the need for cryptsetup entirely.
+With those it will keep working as root.  (And you mentioned in your
+other email it's used only as root anyway.)
 
 - Eric
