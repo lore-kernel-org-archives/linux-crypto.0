@@ -1,156 +1,163 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from submarine.notk.org (submarine.notk.org [62.210.214.84])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E0E431ED80;
-	Mon, 27 Jul 2026 22:56:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E45B9345CCE;
+	Mon, 27 Jul 2026 23:40:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.210.214.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785192965; cv=none; b=U47DxFXbM4HSYkKH1TZ2axzuplxkbkf8KKI8o1YJlm97sd6Vkubuxi8O654JlElW0yvVMZzBYkSuCr/NebeLhb2YdPtHCZrDD7LLM/ubRugmef+vTmzSCKxUYUwXXIsPXodYrFJ6Y+1EMO6jKxWheLj50mPo595YuRGvLB71gDE=
+	t=1785195653; cv=none; b=mmNvYj2m6dz/+6zKqUTf5vKsN0FZa0TPOpOQTWFQ5egzKK/VeZ1Cb0eY86/thMcFuofpUZxC5udVCVg4AJuvgMu0MUiauR4yIj7miABusRnOzQbWLJ/q8wZ1kQOWBzDmSHKTJa/RkvUxHPJfpC3sxYPHrSH57jJf2vuBKHoHzxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785192965; c=relaxed/simple;
-	bh=oEgoEtojyQ9PC8g7uhG7viM9B7fGAJubrsCe9lk5/YY=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=DIUMCMU2SIQHdp3QhJBxNx+FOc7dtpZh/E2wUrQZvOXlkSOCbHcf1/2BOUUe0jVtPq7Su0hSdgrWmxjKIeQQu1q/E/Tl6qozvJU2kZidb6zjqZGsFuVg61zAcbaZzOtFBM5Or0IMMa3V9lkaygGaDwUriiaKa2QrMZIm+0LQ1gY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iwaG5uRX; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785195653; c=relaxed/simple;
+	bh=EAeQaVCZoyYBBbBb7GlL9KLXJcDEZbsSwPyFx4TdMZ4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fXqSIe/9pEFc3FX9Bjbgik7565ucQ8pYoYnIv3cCuUkQEAu4noyP4Oow+g8XmbNjktnLBFXrChovMvxtiBxSJOy4zGUIlUy9GHFNZOlIV0t1v52OwSxE4kCJ6nPyl+bVzN1WoAeAgfOYBeWJVGwYFj+JsMZUrXhDQps8P9tjQG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org; spf=pass smtp.mailfrom=codewreck.org; dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b=EEIsbV8Z; arc=none smtp.client-ip=62.210.214.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codewreck.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codewreck.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iwaG5uRX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04CDB1F000E9;
-	Mon, 27 Jul 2026 22:55:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785192964;
-	bh=QggSvxtNQ67iS+XUwqrDlrH2xraHrxGb+vgcG7y0WsY=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date;
-	b=iwaG5uRX32rTgcSQn1oI8cDhvVdBgF7xNVMcmwA5nB2roQEpjWkBM9/elDUKMWR+e
-	 A0p9zb+3tSs36tELwjTyibEs5znVgnOoeBgaUwvlk+h9jnbCN1e+v9elShDExZRawl
-	 S9FIBGMRZSowIq2RtsqIUQJ/GKy2epEJEkS13zWkXc/uH+dFvxm4jWJtqykilYp8FZ
-	 n/dZuVVGnI4Oh8Jv/TOV8zbNHWDjAXhVQbUPhHErbAZOrGNAAwjAULYVaj3h2kBbW9
-	 ED2feS2pNPbAGb5xCgo1ctL4J3aD2Ir+AJmF+Wa3lGIyvJ/mNC9waIoSbc3rE33Rm4
-	 vgzkKLQuteGUQ==
-From: Mark Brown <broonie@kernel.org>
-To: Julia.Lawall@inria.fr, Alex Deucher <alexander.deucher@amd.com>, 
- Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
- Alexandre Belloni <alexandre.belloni@bootlin.com>, 
- Andrew Lunn <andrew@lunn.ch>, Andrew Morton <akpm@linux-foundation.org>, 
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, 
- Borislav Petkov <bp@alien8.de>, 
- =?utf-8?q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
- Daniel Lezcano <daniel.lezcano@kernel.org>, 
- David Airlie <airlied@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
- Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
- Eric Dumazet <edumazet@google.com>, Florian Westphal <fw@strlen.de>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- Hans de Goede <hansg@kernel.org>, Hans Verkuil <hverkuil@kernel.org>, 
- Heikki Krogerus <heikki.krogerus@linux.intel.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>, 
- =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, 
- Jani Nikula <jani.nikula@linux.intel.com>, Jaroslav Kysela <perex@perex.cz>, 
- Jason Gunthorpe <jgg@ziepe.ca>, Jiri Pirko <jiri@resnulli.us>, 
- "Joerg Roedel (AMD)" <joro@8bytes.org>, Johan Hovold <johan@kernel.org>, 
- Jonathan Cameron <jic23@kernel.org>, 
- Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, 
- Julian Anastasov <ja@ssi.bg>, Leon Romanovsky <leon@kernel.org>, 
- Liam Girdwood <lgirdwood@gmail.com>, Linus Walleij <linusw@kernel.org>, 
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
- "Martin K. Petersen" <martin.petersen@oracle.com>, 
- Matthew Sakai <msakai@redhat.com>, 
- Mauro Carvalho Chehab <mchehab@kernel.org>, 
- Maxime Ripard <mripard@kernel.org>, 
- Michael Turquette <mturquette@baylibre.com>, 
- Mike Rapoport <rppt@kernel.org>, 
- Miri Korenblit <miriam.rachel.korenblit@intel.com>, 
- Nicolas Palix <nicolas.palix@imag.fr>, 
- Pablo Neira Ayuso <pablo@netfilter.org>, Paolo Abeni <pabeni@redhat.com>, 
- Ping-Ke Shih <pkshih@realtek.com>, "Rafael J. Wysocki" <rafael@kernel.org>, 
- Rodrigo Vivi <rodrigo.vivi@intel.com>, Sebastian Reichel <sre@kernel.org>, 
- Shuah Khan <shuah@kernel.org>, Simona Vetter <simona@ffwll.ch>, 
- Simon Horman <horms@verge.net.au>, Stephen Boyd <sboyd@kernel.org>, 
- Steve French <sfrench@samba.org>, Takashi Iwai <tiwai@suse.com>, 
- Thomas Renninger <trenn@suse.com>, Thomas Zimmermann <tzimmermann@suse.de>, 
- Tony Luck <tony.luck@intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>, 
- Vadim Fedorenko <vadim.fedorenko@linux.dev>, Vinod Koul <vkoul@kernel.org>, 
- Will Deacon <will@kernel.org>, Yazen Ghannam <Yazen.Ghannam@amd.com>, 
- Sang-Heon Jeon <ekffu200098@gmail.com>
-Cc: cocci@inria.fr, amd-gfx@lists.freedesktop.org, 
- dmaengine@vger.kernel.org, dm-devel@lists.linux.dev, 
- dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, 
- intel-wired-lan@lists.osuosl.org, iommu@lists.linux.dev, 
- linux-cifs@vger.kernel.org, linux-clk@vger.kernel.org, 
- linux-crypto@vger.kernel.org, linux-edac@vger.kernel.org, 
- linux-gpio@vger.kernel.org, linux-iio@vger.kernel.org, 
- linux-input@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-media@vger.kernel.org, linux-mm@kvack.org, linux-pm@vger.kernel.org, 
- linux-rdma@vger.kernel.org, linux-rtc@vger.kernel.org, 
- linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org, 
- linux-sound@vger.kernel.org, linux-usb@vger.kernel.org, 
- linux-wireless@vger.kernel.org, lvs-devel@vger.kernel.org, 
- netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
- nouveau@lists.freedesktop.org, platform-driver-x86@vger.kernel.org
-In-Reply-To: <20260723184538.3888637-1-ekffu200098@gmail.com>
-References: <20260723184538.3888637-1-ekffu200098@gmail.com>
-Subject: Re: (subset) [PATCH 00/36] treewide: remove conditional returns
- with no effect
-Message-Id: <178515520105.50339.6347304746485042237.b4-ty@b4>
-Date: Mon, 27 Jul 2026 13:26:41 +0100
+	dkim=pass (2048-bit key) header.d=codewreck.org header.i=@codewreck.org header.b="EEIsbV8Z"
+Received: from gaia.codewreck.org (localhost [127.0.0.1])
+	by submarine.notk.org (Postfix) with ESMTPS id 3332B14C2D6;
+	Tue, 28 Jul 2026 01:40:28 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=codewreck.org;
+	s=2; t=1785195637;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lMlWo5how2yP2LkX157nvL7ML7A/giyuGrY1FbX3qag=;
+	b=EEIsbV8Zsc85N25iSg5NAjJ1Pn5rviuilE44H62DMYuVTaydPNt6SrcClH0GjyAWnvskaN
+	3MXQMbeOSm4bgfRN4PlXSj23BGYEJk9jfKt7MJfXFzVWe77ung/6s+WsHPL7Hsl9zgheF6
+	zDsnJEaqwtbDFPyNo+KsHENIlJ6Qn3j35SshIImCrq1JXbyn/DQbx2z5q7Rhp6VV7ze4eL
+	I7ThghcMwaGvXuOb0LAFyX4l3GIqgci4W5YKp7aSg2EdNQfqtgUZR551yUCXuOrgmevUHu
+	GM4xlJY2O6Fqq04lTPcTux5jy6cE+0KZk14Pqf8MXgnM5nklK3Q+IS+hxGv3bQ==
+Received: from localhost (gaia.codewreck.org [local])
+	by gaia.codewreck.org (OpenSMTPD) with ESMTPA id 4565e1af;
+	Mon, 27 Jul 2026 23:40:27 +0000 (UTC)
+Date: Tue, 28 Jul 2026 08:40:12 +0900
+From: Dominique Martinet <asmadeus@codewreck.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Demi Marie Obenour <demiobenour@gmail.com>,
+	Harald Freudenberger <freude@linux.ibm.com>, acme@kernel.org,
+	adrian.hunter@intel.com, alexander.shishkin@linux.intel.com,
+	ardb@kernel.org, axboe@kernel.dk, corbet@lwn.net,
+	davem@davemloft.net, edumazet@google.com,
+	herbert@gondor.apana.org.au, horms@kernel.org,
+	io-uring@vger.kernel.org, irogers@google.com,
+	james.clark@linaro.org, jolsa@kernel.org, kuba@kernel.org,
+	kuniyu@google.com, linux-crypto@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-perf-users@vger.kernel.org, mark.rutland@arm.com,
+	mingo@redhat.com, namhyung@kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, peterz@infradead.org, skhan@linuxfoundation.org,
+	willemb@google.com, linux-s390@vger.kernel.org
+Subject: Re: [PATCH 2/3] AF_ALG: Drop support for off-CPU cryptography
+Message-ID: <amfsXHoeOH71b1Bs@codewreck.org>
+References: <0ccda05f-077c-4661-b852-e6bf9bf40be3@gmail.com>
+ <20260724180951.GA1572592@google.com>
+ <amRntEmCUK-8wXcw@codewreck.org>
+ <20260725174903.GA150173@quark>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.16-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1395; i=broonie@kernel.org;
- h=from:subject:message-id; bh=oEgoEtojyQ9PC8g7uhG7viM9B7fGAJubrsCe9lk5/YY=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBqZ+HxlIWhtS7M/+/D/kSsIotZNE7ycdvTNKMa6
- lyMcsUy1YGJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCamfh8QAKCRAk1otyXVSH
- 0NGoB/9aZSWKSSxB+DoiO9o+r0R7LvQ0b9P0b+u/ow+7Ti4Va043c7UzGI2RzCGdUpf18XgLn6f
- SgEv95GzlB+upqVsxmPG9VHhXWw4Ho9J4p/hSGXTDgAS8ErF8GjIkiAzWtWwlF1NwqBzKdr1HBU
- 4bzLooMHmkm+sRhw0K+K8vYxKzoIVIF4rw3OtvuVpbcnMjoni4zgFcLTc5cd+g7gZ+ms/PpNPge
- 1bCGwvXOdpSE1Sx0RqUVVFnzDZUByQ/Qgq4t95aAwkznICTyGzRGtCagn7hNdby/Adb/VqLQiGG
- EXfGwi5kgCay4GMGfP+CcNTcNXARRSisUOfJQUCdGh8to0xz
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260725174903.GA150173@quark>
 
-On Fri, 24 Jul 2026 03:45:02 +0900, Sang-Heon Jeon wrote:
-> treewide: remove conditional returns with no effect
+Eric Biggers wrote on Sat, Jul 25, 2026 at 10:49:03AM -0700:
+> > "Inline crypto engine" seems to be a qualcomm marketing term, but from
+> > looking at their doc the API seems to be PKCS#11 smart card?
+> > Having worked on these for some other hardware I can't say I find it
+> > easier to use than af alg, but it's definitely something that can be
+> > worked out.
 > 
-> Hello,
+> I guess I should have written "inline encryption hardware", which is the
+> vendor-independent term we've been using in the kernel, just in case
+> anyone thinks "inline crypto engine" means the "Qualcomm Inline Crypto
+> Engine" specifically (but really, IMO they are just descriptive phrases
+> that mean the same thing).  There are many different hardware vendors
+> that have inline encryption hardware for UFS and/or eMMC.
+>
+> Their interface is quite simple and doesn't use PKCS#11 at all.  I don't
+> know where you're seeing anything about PKCS#11.
+
+PKCS#11 is something I (wrongly) picked up from Qualcomm doc here:
+https://docs.qualcomm.com/doc/80-70018-11/topic/key-management.html#key-management
+
+But honestly I hadn't read up all that much, and I had been confused as
+the previous page talked about their inline crypto engine but this seems
+to be more general.
+It's been a busy weekend/week/month/year...
+
+> See also the documentation in Documentation/block/inline-encryption.rst
+
+Thanks for this pointer as well; this is much more clear to me, and also
+seems to cover keys generated directly on hardware that are not
+accessible so it pretty much covers what we're doing manually as well
+(once I finally realized that this sits on the SoC side, not the
+UFS/eMMC side, as key generation didn't make sense there)
+
+> > I was just curious about the double-take approach taken with these two patches:
+> >  crypto: af_alg - Drop support for off-CPU cryptography (this)
+> >  crypto: af_alg - Add af_alg_restrict sysctl, defaulting to 1 ([4])
+> > [4] https://lore.kernel.org/linux-crypto/20260622234803.6982-1-ebiggers@kernel.org/T/#u
+> > 
+> > I assume part of it was just that the whitelist wasn't ready yet when
+> > this patch was merged, but as far as I understand if the whitelist
+> > sysctl is implemented this is basically noop?
+> > (Well, I guess it'll allow code simplification over time, but these
+> > hopefully won't be backported to stable kernels too aggressively.. While
+> > I fully expect to see this "Drop support for off-CPU crypto" patch to
+> > show up in a couple of weeks in older stable trees; and for practical
+> > purposes I don't see much way around just reverting it for now)
 > 
-> While reading mm/memblock, I found a conditional return where both
-> branches return the same value:
-> 
-> [...]
+> Neither of these patches is tagged with 'Cc stable', and I don't expect
+> them to be backported to stable kernels soon.  That being said, it seems
+> the people using LLMs to find vulnerabilities haven't focused much on
+> drivers/crypto/ yet.  Once they do, well, they will of course find
+> vulnerabilities everywhere (accessible from unprivileged userspace via
+> AF_ALG), and when that happens there may be little choice.
 
-Applied to
+From my 9p maintainer hat I see plenty of patches without 'Cc stable'
+get backported every merge window, but this is a potential breakage so
+I guess it might not have made it (my patches merged in v7.2-rc1 (same
+time as this) were backported last week)
 
-   https://git.kernel.org/pub/scm/linux/kernel/git/broonie/regulator.git for-7.3
+I generally agree with your assessement of vulnerabilities everywhere so
+would have expected it to make the cut, time will tell.
 
-Thanks!
+> The addition of the af_alg_restrict sysctl (and the possibility of
+> userspace explicitly choosing to disable restrictions by setting
+> af_alg_restrict=0) doesn't necessarily mean that problematic
+> functionality should be, or should have been, moved under
+> af_alg_restrict=0 rather than removed outright.  It's just an option
+> that can be used if needed for compatibility reasons, if actual user
+> reports come in.  If something is not needed at all it can just be
+> dropped right away.  This actually happens way more often than people
+> might think, due to the immense amount of unnecessary functionality that
+> AF_ALG has: *many* crypto algorithms have been removed from AF_ALG over
+> the years without any complaints, since they were never used.
 
-[14/36] ASoC: remove conditional return with no effect
-        https://git.kernel.org/broonie/misc/c/ca9b51f41c9d
-[28/36] regulator: wm831x-isink: remove conditional return with no effect
-        https://git.kernel.org/broonie/misc/c/9396a1d9e142
+Right, I can definitely relate to this, and it's hard to know who
+actually uses what especially when vendors add their own sauce on top of
+it and don't seem to bother about updating much...
 
-All being well this means that it will be integrated into the linux-next
-tree (usually sometime in the next 24 hours) and sent to Linus during
-the next merge window (or sooner if it is a bug fix), however if
-problems are discovered then the patch may be dropped or reverted.
+> I'll also note that hardware crypto "decelerator" driver authors are
+> actually now *depending* on the drivers no longer being usable from
+> AF_ALG in mainline in order to argue for more relaxed driver inclusion
+> criteria.  I don't think they can have it both ways!
 
-You may get further e-mails resulting from automated or manual testing
-and review of the tree, please engage with people reporting problems and
-send followup patches addressing any issues that are reported if needed.
+FWIW I'm not affiliated with NXP or any SoC vendor (we're making
+embedded boards and providing an OS for it); I'm just bouncing around
+between a rock and a hard place trying to ensure my users can keep
+updating their kernel without losing access to their data :)
 
-If any updates are required or you are submitting further changes they
-should be sent as incremental updates against current git, existing
-patches will not be replaced.
+The discussion has been enlightening anyway, and thanks to Richard I've
+seen a way forward if we get a backport (or even possibly even move
+forward with it ahead of stable), it's appreciated.
 
-Please add any relevant lists and maintainers to the CCs when replying
-to this mail.
-
-Thanks,
-Mark
-
+Thanks again,
+-- 
+Dominique Martinet
