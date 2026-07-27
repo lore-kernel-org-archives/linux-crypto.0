@@ -1,174 +1,140 @@
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6B625677F
-	for <linux-crypto@vger.kernel.org>; Mon, 27 Jul 2026 00:53:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8DC137B00E;
+	Mon, 27 Jul 2026 08:30:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785113630; cv=none; b=Yvbyi5NzTPU2a3SZhKEwepeI/hPe1mAKFGTfxu3M+Q9lsxFYsoAh9oPJVMcDgog1SYyy3d+Ns7uWEPVA8po+Yn8fEOQh7LkwAV3voABAtMRLtuBx1G7WDnBA85I99mVjgB2g+0CRUZcmeU39HVi1NA1ZHZCC/jE6EZDlvXnggvU=
+	t=1785141041; cv=none; b=VKI5bW6DwjrdrPlLz+R1G58m3Jg+vjdxNOOKhEQ5z1ySQ+rhzzgh+DCSrN7sihfFjvfkO1DqECWSvcKw7oMJCCygguMXpTS8SNkAy/d/w9orowKIjpZqqHtdqo6dr9QbBSuToy2nyjc7rtB3y+PtStaEGaH7OwOPSLfIoPS/8jo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785113630; c=relaxed/simple;
-	bh=H5d/2IpDJ5mSbV2nCWBAdW/aONLsYHfxTefAkVqKfqE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WP0lUS1HGqxX3XnfGB7fXBz/KxIuuE7EMHXiaTAeSLkltqx0GVhHdIUTiiuZ8pHhWl8nSrEl+5yNU6PsF9jf9OXiDhwm6pS71xkxPPZ4JCCwxLIrcLDryMmS9xKIIbgVaJCotdlVz4cHrQC6M3h5+FODAOyPJMtE7guVw+zlV/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XIET52Wu; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1785141041; c=relaxed/simple;
+	bh=qWnqu6VCUiwZWG189ixa/W9uGeC6PMG4tY9t7kvdnXI=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=h8LKZ8EVsai8wMrYj/fT0xVSgPTrl6DOh04/nUgZtFoRkGUPmdEqBdwE+VdRVHNKYYPYr8u+qMLJeJGWgH7glJdNWS6Amw1ytL7A1XMPHxgDaVTsiau46edgGKidGiYhptvON8UGHYeJRIfP1yJhpgmVpJCTvFCOacKBXdHd9K4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bn7dLIip; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XIET52Wu"
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-51c0006ea8eso16644371cf.1
-        for <linux-crypto@vger.kernel.org>; Sun, 26 Jul 2026 17:53:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785113627; x=1785718427; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=D8hT5YG9osvX+mj6IYiZum/vN/YOieTcuoDvay1/Cqs=;
-        b=XIET52Wu3dzb0JZvRL23GvsO2IrVARGQPzROLqb9+rIFaaZ6PI2TCm6xSXI2jceMOh
-         EbiOLtWo+uX3qOF7Txb77ZMui+xlTRP8QcoavpfVG9R67rbC1BbsWm8fgNFYouMwH8WT
-         dE7iGlHbpUa454xGkyBTSZP5J1sMpM19reo3lxOk0jrTtx9+HM+Auy28BoE5MV1LmC5d
-         ffdHXi+7XwZkw8cKiFEBWp5M9WLRCQImqYtF9JLKks/xHAzFgxBnuPXpN7a6Kkz5SGs7
-         r/XJUp/JtF2/UkUrlac+JYH7gJS3n+Dcmv2/t1vcN39SXAEL0mC4sdolnrYUNXSa674v
-         QtWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785113627; x=1785718427;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=D8hT5YG9osvX+mj6IYiZum/vN/YOieTcuoDvay1/Cqs=;
-        b=Px0CNTYKVtu1CYPbDBt3PuqY9X+22AmIp4rm5ad9SOeJrQCJdRQlFAks5VkE2OVT09
-         lEK704CfODwI15pRlyc/kAjNGROqaLeexOLagokW7mbhCsr/MMrYCcZqr3AbH+LAvVFP
-         PYDDGoI5+Q1KbnUIvapz5eDEOun6o5o6wxXzmJ2EgMKbKu9kEFJYUi0t0RSm1L2ZYGSb
-         ei1cgubWbakj4JRgN6qClC8sW/e0sH2wTW/s0s7HiIqiP768CcR5r0yc10NaSNHSZfRE
-         RnCVInZuqpG5NrrC8Ecw0gRurnpn236r9yKBWwH2EoGKkYVDT/RGUqlOq6ezGBFCztYV
-         YokQ==
-X-Gm-Message-State: AOJu0Ywgnt9nE7A3UvD+SKfbmqv4aQ5OrNQzwz9aNC7dtBNmSHEvU7fX
-	baFKq3Jptsr+GLvtaAJn/+e1hJDtVTx+PxOU+cuqBOJhW/LXD3rhFbNZqruXww==
-X-Gm-Gg: AR+sD11W5bHJSGnZAEzAhF/Mk6jTfRePvm4y1ZA/Batpn8hCGGvajTdNrkLSHMdCSUR
-	qyTDvndAEFzwVog6YTLj/gIV0atA5kj3/Z4betcJuU/NesTGxPoFDs/C/8Xwj95w/XtXjf6saQJ
-	bA67uvpT6GtfkWQCwUMCwaXjtnizECp/K8SMk7wFRfpFPKb6qfViGJuwEKzssMCDIkWlojp3VrH
-	CGKwwDjf4vPMUafSf3FaVuxCjMfFIF7jGWE93a5IJCt7OkiaSZpw+ig6vIELCGH3n05yd33tIAr
-	+5WriB2pS8rckl6PF5hbB8Pud3O61Wi5vn9JZ7lg3CbaLFJNYvkNlcjM/g3LN6Luj/MHMA6zgVD
-	4f2DDEVUjjz3hRs0Qq4It0q9jsj9ryxS9RAh4dTIX7G5aws+HzB1LtfWYQxfR5LP0ZQT7p/cBeH
-	fcr7Gg7buVnZ5kwSI95GMGYmkQW2NsEGQ7F5wYgrGTQDnT/DrxmxihrOotbtHumnzYQc1PK/ZOm
-	p3/Txuy09VkGDtr7Yi5shy/RcLS6PrrkfSAXjvXcSFcLOMUUYLw4SET5sNYqAS6fw==
-X-Received: by 2002:a05:622a:2586:b0:51c:d1c:474d with SMTP id d75a77b69052e-529a84b9a6emr73328471cf.19.1785113627516;
-        Sun, 26 Jul 2026 17:53:47 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8000:7a86::e35])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-529a27f2dedsm42949171cf.7.2026.07.26.17.53.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Jul 2026 17:53:46 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: linux-crypto@vger.kernel.org
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH] crypto: talitos: Use platform_get_irq() to retrieve interrupt
-Date: Sun, 26 Jul 2026 17:53:44 -0700
-Message-ID: <20260727005344.166124-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bn7dLIip"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1785141039; x=1816677039;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=qWnqu6VCUiwZWG189ixa/W9uGeC6PMG4tY9t7kvdnXI=;
+  b=bn7dLIipZCNqvW289b61vT4b6u+LiCajh52WIL+tFfRrmJloKWtUXBG+
+   ZVDoonEWBjxGTWB+TpaP1dMgq905yih2+PZN8ueg2IgP/evaSIknEaQAL
+   sOKMLvBHqFYLDjGevHnwVch9P4Ys6B6dOm9LdKPySPt8mEYMMGnH2QoJC
+   aF5JBvyQDaYcJ0j4N4y7zOns8t8E4CNEzASqkc1P8xkX3THpp4bsMdc1r
+   4+3C/8LmINhYo2vRvUxZOSY6tooBcFJdahJfewgCAoBHpOnR3ol8IO/Kg
+   t6VRYs0MkffinszzXhu5i2/2b1QBE07PokaNo3Am7W/dJ1Y/8SCMhSsNn
+   Q==;
+X-CSE-ConnectionGUID: mgZgOQ5BQgGfhlx+0PVe4w==
+X-CSE-MsgGUID: I0V/57TmQ1qX9+TI9szaWA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11857"; a="85573917"
+X-IronPort-AV: E=Sophos;i="6.25,188,1779174000"; 
+   d="scan'208";a="85573917"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2026 01:30:34 -0700
+X-CSE-ConnectionGUID: zuBRshsISau4U4oJl9pq1g==
+X-CSE-MsgGUID: S6JnVra9Qs26laDkF7yO1A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,188,1779174000"; 
+   d="scan'208";a="259417611"
+Received: from rvuia-mobl.ger.corp.intel.com (HELO localhost) ([10.245.245.197])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2026 01:30:04 -0700
+From: Jani Nikula <jani.nikula@linux.intel.com>
+To: Jakub Kicinski <kuba@kernel.org>, Sang-Heon Jeon <ekffu200098@gmail.com>
+Cc: Julia.Lawall@inria.fr, Alex Deucher <alexander.deucher@amd.com>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>, Alexandre Belloni
+ <alexandre.belloni@bootlin.com>, Andrew Lunn <andrew@lunn.ch>, Andrew
+ Morton <akpm@linux-foundation.org>, Arkadiusz Kubalewski
+ <arkadiusz.kubalewski@intel.com>, Borislav Petkov <bp@alien8.de>,
+ Christian =?utf-8?Q?K=C3=B6nig?= <christian.koenig@amd.com>, Daniel Lezcano
+ <daniel.lezcano@kernel.org>, David Airlie <airlied@gmail.com>, "David S.
+ Miller" <davem@davemloft.net>, Dmitry Torokhov
+ <dmitry.torokhov@gmail.com>, Eric Dumazet <edumazet@google.com>, Florian
+ Westphal <fw@strlen.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Hans de Goede <hansg@kernel.org>, Hans Verkuil <hverkuil@kernel.org>,
+ Heikki Krogerus <heikki.krogerus@linux.intel.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>, Ilpo =?utf-8?Q?J=C3=A4rvinen?=
+ <ilpo.jarvinen@linux.intel.com>, "James E.J. Bottomley"
+ <James.Bottomley@HansenPartnership.com>, Jaroslav Kysela <perex@perex.cz>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Jiri Pirko <jiri@resnulli.us>, "Joerg
+ Roedel
+ (AMD)" <joro@8bytes.org>, Johan Hovold <johan@kernel.org>, Jonathan Cameron
+ <jic23@kernel.org>, Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+ Julian Anastasov <ja@ssi.bg>, Leon Romanovsky <leon@kernel.org>, Liam
+ Girdwood <lgirdwood@gmail.com>, Linus Walleij <linusw@kernel.org>, Maarten
+ Lankhorst <maarten.lankhorst@linux.intel.com>, Mark Brown
+ <broonie@kernel.org>, "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Matthew Sakai <msakai@redhat.com>, Mauro Carvalho Chehab
+ <mchehab@kernel.org>, Maxime Ripard <mripard@kernel.org>, Michael
+ Turquette <mturquette@baylibre.com>, Mike Rapoport <rppt@kernel.org>, Miri
+ Korenblit <miriam.rachel.korenblit@intel.com>, Nicolas Palix
+ <nicolas.palix@imag.fr>, Pablo Neira Ayuso <pablo@netfilter.org>, Paolo
+ Abeni <pabeni@redhat.com>, Ping-Ke Shih <pkshih@realtek.com>, "Rafael J.
+ Wysocki" <rafael@kernel.org>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ Sebastian Reichel <sre@kernel.org>, Shuah Khan <shuah@kernel.org>, Simona
+ Vetter <simona@ffwll.ch>, Simon Horman <horms@verge.net.au>, Stephen Boyd
+ <sboyd@kernel.org>, Steve French <sfrench@samba.org>, Takashi Iwai
+ <tiwai@suse.com>, Thomas Renninger <trenn@suse.com>, Thomas Zimmermann
+ <tzimmermann@suse.de>, Tony Luck <tony.luck@intel.com>, Tvrtko Ursulin
+ <tursulin@ursulin.net>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, Vinod
+ Koul <vkoul@kernel.org>, Will
+ Deacon <will@kernel.org>, Yazen Ghannam <Yazen.Ghannam@amd.com>,
+ cocci@inria.fr, amd-gfx@lists.freedesktop.org, dmaengine@vger.kernel.org,
+ dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
+ intel-gfx@lists.freedesktop.org, intel-wired-lan@lists.osuosl.org,
+ iommu@lists.linux.dev, linux-cifs@vger.kernel.org,
+ linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-edac@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-mm@kvack.org, linux-pm@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-rtc@vger.kernel.org, linux-s390@vger.kernel.org,
+ linux-scsi@vger.kernel.org, linux-sound@vger.kernel.org,
+ linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+ lvs-devel@vger.kernel.org, netdev@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, nouveau@lists.freedesktop.org,
+ platform-driver-x86@vger.kernel.org
+Subject: Re: [PATCH 00/36] treewide: remove conditional returns with no effect
+In-Reply-To: <20260724144822.6af8213f@kernel.org>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park,
+ 6 krs Bertel Jungin Aukio 5, 02600 Espoo, Finland
+References: <20260723184538.3888637-1-ekffu200098@gmail.com>
+ <20260724144822.6af8213f@kernel.org>
+Date: Mon, 27 Jul 2026 11:30:01 +0300
+Message-ID: <0ee1ef4aa7daa908bf28397ccc639c89b6aabd9c@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Remove the need to call irq_dispose_mapping as needed by
-irq_of_parse_and_map().
+On Fri, 24 Jul 2026, Jakub Kicinski <kuba@kernel.org> wrote:
+> On Fri, 24 Jul 2026 03:45:02 +0900 Sang-Heon Jeon wrote:
+>> Patch 1 adds a Coccinelle script that matches the pattern, including
+>> negation and constant-comparison variants. Where a local variable is
+>> assigned right before the check, the assignment and the two returns
+>> turn into a single return of the assigned expression.
+>
+> Huh, I thought we already had such script. Various script children have
+> been sending such "cleanups" in the past.
 
-Simplify the function as a result. No need for gotos anymore.
+We did, and it was removed, I believe in 1a617a8475e8 ("coccinelle:
+misc: remove "complex return code" warnings"), because people just don't
+want this constant churn.
 
-Add a missing free_irq.
+It's perfectly fine to have the error case and happy day scenario
+separated.
 
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- drivers/crypto/talitos.c | 43 +++++++++++++---------------------------
- 1 file changed, 14 insertions(+), 29 deletions(-)
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 3a3fd21d2c4d..bff653b87941 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -3241,10 +3241,8 @@ static void talitos_remove(struct platform_device *ofdev)
- 		talitos_unregister_rng(dev);
- 
- 	for (i = 0; i < 2; i++)
--		if (priv->irq[i]) {
-+		if (priv->irq[i])
- 			free_irq(priv->irq[i], dev);
--			irq_dispose_mapping(priv->irq[i]);
--		}
- 
- 	tasklet_kill(&priv->done_task[0]);
- 	if (priv->irq[1])
-@@ -3353,54 +3351,41 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
- static int talitos_probe_irq(struct platform_device *ofdev)
- {
- 	struct device *dev = &ofdev->dev;
--	struct device_node *np = ofdev->dev.of_node;
- 	struct talitos_private *priv = dev_get_drvdata(dev);
- 	int err;
- 	bool is_sec1 = has_ftr_sec1(priv);
- 
--	priv->irq[0] = irq_of_parse_and_map(np, 0);
--	if (!priv->irq[0]) {
--		dev_err(dev, "failed to map irq\n");
--		return -EINVAL;
--	}
--	if (is_sec1) {
--		err = request_irq(priv->irq[0], talitos1_interrupt_4ch, 0,
-+	priv->irq[0] = platform_get_irq(ofdev, 0);
-+	if (priv->irq[0] < 0)
-+		return priv->irq[0];
-+
-+	if (is_sec1)
-+		return request_irq(priv->irq[0], talitos1_interrupt_4ch, 0,
- 				  dev_driver_string(dev), dev);
--		goto primary_out;
--	}
- 
--	priv->irq[1] = irq_of_parse_and_map(np, 1);
-+	priv->irq[1] = platform_get_irq_optional(ofdev, 1);
-+	if (priv->irq[1] == -EPROBE_DEFER)
-+		return priv->irq[1];
- 
- 	/* get the primary irq line */
--	if (!priv->irq[1]) {
--		err = request_irq(priv->irq[0], talitos2_interrupt_4ch, 0,
-+	if (priv->irq[1] < 0)
-+		return request_irq(priv->irq[0], talitos2_interrupt_4ch, 0,
- 				  dev_driver_string(dev), dev);
--		goto primary_out;
--	}
- 
- 	err = request_irq(priv->irq[0], talitos2_interrupt_ch0_2, 0,
- 			  dev_driver_string(dev), dev);
- 	if (err)
--		goto primary_out;
-+		return err;
- 
- 	/* get the secondary irq line */
- 	err = request_irq(priv->irq[1], talitos2_interrupt_ch1_3, 0,
- 			  dev_driver_string(dev), dev);
- 	if (err) {
- 		dev_err(dev, "failed to request secondary irq\n");
--		irq_dispose_mapping(priv->irq[1]);
-+		free_irq(priv->irq[0], dev);
- 		priv->irq[1] = 0;
- 	}
- 
--	return err;
--
--primary_out:
--	if (err) {
--		dev_err(dev, "failed to request primary irq\n");
--		irq_dispose_mapping(priv->irq[0]);
--		priv->irq[0] = 0;
--	}
--
- 	return err;
- }
- 
+BR,
+Jani.
+
+
 -- 
-2.55.0
-
+Jani Nikula, Intel
