@@ -1,49 +1,44 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 727632264D6;
-	Mon, 27 Jul 2026 00:33:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3BF219A8A;
+	Mon, 27 Jul 2026 00:34:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785112439; cv=none; b=hwFAPof8Ug9M0XW5VCr0+REj+c4xwixyio8oH1p+xEVLgxmGwI00KUomlQAq9yJSlZuudW8HOsqJXA5tts4yT2mouUypLUS16sMF7KxzE0d++gUDsNJfSMPN2K9cNuacPJT/o6XDDjcIJ8WatGGOxx0sefEjhfeYw4H+CVuN95U=
+	t=1785112456; cv=none; b=sI9BAO6Fm5QU9LL7EU4thKIxUVIPihs7D6BPogquYYNMLsmMYm3lo6P2je/ww0NaH41ot1rrZ1gSWeKvDynv52fMiY7fPmiAFiv808RfeX0/Rit+YhsXhCU5zRplwJz74if+nVDhfuI+99V/OUWHtl4/vlPq95kED5ZKIW43jWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785112439; c=relaxed/simple;
-	bh=4QHEwUQ9CtR0wm4uo5THUS63KGGT0Hl2vDI2eMIK7ew=;
+	s=arc-20240116; t=1785112456; c=relaxed/simple;
+	bh=/stAEnUsALIQe4aGWZl8xSB7pvQQQyzMNx5bhvr7QR8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s1pSPbmKFSWsPuRg84Ommq48NTweK0iffalLeVuMP/vy+vjcysD6oxZLN2l+wxSgOSRqDYsRjrhZ+WcCk7jxChNF79VCm7Cvvev7A0sb6Gz3OcwMBv8WDAlUCuhWwYAWyDB3CzE7O58wHokEpGmmi1BvfCo4MAWEFo9ewGWFBlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=EWWFdUIo; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=L7Fe5RJkJ18+TbNqsIiPRgBaz5cZ4drDDJQCVayt2t7EtikJ0HNbHA2BL5JJunF8MUfQ4uB1rWC0XINsON1UvSvvcDWCozsV2E77jjoo5e285rwQbihnIVwHEJiwTsAJAVXZoP0LBw8Os7wJg4WqeDHTnoeAzBfI1z+QakwZeoU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=MxVuFBd4; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="EWWFdUIo"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="MxVuFBd4"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=UoQXp0iTJIxcODNsRhcd7TMJ7fB8RQAityfIDT0KhF4=; 
-	b=EWWFdUIoCL8lqWUGohudRjF0aLM4J7oXAbs0T1gqeXpGMT2z09JfSHRrcZnmoGg69Yvuopouy8c
-	9+Ndbc7XpQXRnzLEl9Zvt+5WBcZ+TTXsVAt6dqOlnWPBlkgmok+aPwfF7uEkCy/zc4l6O/xrgPI8c
-	eoRMiXOToY645ky30ZVU1y9B+Ae/K4xF20aNF6EnwqPMe9uhul45NlanXim485sWEcT88G1zY3sqf
-	9AjW/LGsz7hnjMvHzC+nLqo5FZ21i7QmAbYzq0fmvziF4xivUAhVxD46leOVGyAhT1r16lp2RIdD6
-	gu1+s/iCJOLFTcOwbRUhczWMG7R0fehtWY6g==;
+	from:content-type:reply-to; bh=3fyfllA+R03i6FnaVrgJld9P8d2aBVaN8jFttLwLF5g=; 
+	b=MxVuFBd4qypLAAe+SaQeGV7lQjUicsxDa0ZvhYZmggN+2KDztjG+II1J5T/uUPS1eMn3rl+tphL
+	4PAt7cWKcNP0P5wiR5sH836vI1PL33pB7ofSE7R+PCDQI/E53i5CxCNeqrS49RuA7z9GiWOxAfi8u
+	h+YfSap2wsrPYxLwAxl4AryPtK0x6R+4fky8abQE9ThL5W4Fp8sVDEpNDFURt77KZSFNySVnSL8fA
+	vTUVC9SuaXIfpEns7nwTJyGfUtHDfwQGsLR5mOHJqqt7DQ3TSFjRaisNS13Mgwh6lNvuvOVB1P1dV
+	hS3rszImHi+90Pq5KEKfoRSGPM7ICJhLitJA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wo9Hy-0000000Gyxn-3dbg;
-	Mon, 27 Jul 2026 08:33:52 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 27 Jul 2026 10:33:50 +1000
-Date: Mon, 27 Jul 2026 10:33:50 +1000
+	id 1wo9II-0000000GyyL-3tVX;
+	Mon, 27 Jul 2026 08:34:12 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 27 Jul 2026 10:34:10 +1000
+Date: Mon, 27 Jul 2026 10:34:10 +1000
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: Rosen Penev <rosenp@gmail.com>
 Cc: linux-crypto@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:CLANG/LLVM BUILD SUPPORT:Keyword:b(?i:clang|llvm)b" <llvm@lists.linux.dev>
-Subject: Re: [PATCH] crypto: hisilicon/sec: use
- devm_platform_ioremap_resource in sec_map_io
-Message-ID: <amanbome-FrXnImA@gondor.apana.org.au>
-References: <20260715011533.1278258-1-rosenp@gmail.com>
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] crypto: omap-aes: use
+ devm_platform_get_and_ioremap_resource
+Message-ID: <amangvQzsgdLq6Eo@gondor.apana.org.au>
+References: <20260715215848.410011-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,27 +47,21 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260715011533.1278258-1-rosenp@gmail.com>
+In-Reply-To: <20260715215848.410011-1-rosenp@gmail.com>
 
-On Tue, Jul 14, 2026 at 06:15:33PM -0700, Rosen Penev wrote:
-> Replace the open-coded platform_get_resource() plus devm_ioremap()
-> sequence in the SEC_NUM_ADDR_REGIONS loop with
-> devm_platform_ioremap_resource(), which fetches the resource, requests
-> the region and maps it in one call. Switch the error check to
-> IS_ERR()/PTR_ERR() and drop the now-unused struct resource pointer.
-> 
-> The driver only maps indices 0 and 1 (SEC_COMMON, SEC_SAA). On hip07 the
-> corresponding reg regions (0xd0000000, 0xd2000000) are 0x10000 each and
-> disjoint, so the region reservation added by devm_ioremap_resource() is
-> exclusive and does not introduce overlap failures.
-> 
-> Built for arm64 (drivers/crypto/hisilicon/sec/sec_drv.o) with LLVM=1.
+On Wed, Jul 15, 2026 at 02:58:48PM -0700, Rosen Penev wrote:
+> Replace the open-coded omap_aes_get_res_of()/omap_aes_get_res_pdev()
+> helpers and the #ifdef CONFIG_OF machinery with the managed
+> devm_platform_get_and_ioremap_resource(), platform_get_irq() and
+> device_get_match_data() helpers. The omap_aes_pdata_omap2 fallback is
+> kept for the non-DT (legacy platform_device) case, and the now-unused
+> err_res label is removed.
 > 
 > Assisted-by: opencode:hy3-free
 > Signed-off-by: Rosen Penev <rosenp@gmail.com>
 > ---
->  drivers/crypto/hisilicon/sec/sec_drv.c | 19 +++----------------
->  1 file changed, 3 insertions(+), 16 deletions(-)
+>  drivers/crypto/omap-aes.c | 84 ++++++---------------------------------
+>  1 file changed, 12 insertions(+), 72 deletions(-)
 
 Patch applied.  Thanks.
 -- 
