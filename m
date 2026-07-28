@@ -1,63 +1,63 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58D2E412C14
-	for <linux-crypto@vger.kernel.org>; Tue, 28 Jul 2026 08:44:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 921914156CC
+	for <linux-crypto@vger.kernel.org>; Tue, 28 Jul 2026 08:44:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785228246; cv=none; b=TqJQJVouozzfrCFup5P3f4msfjomGOBnoeAYWZa8HQ31HPI5lOIvGEm928ep6e+nTPZusB2lmqWdJHUNXbPtofoOnZ9Ts1Fh3+ktvX1LwW6lfy98sOHrR5PvGyVDFfvr3rBQXVvM9HLdYGRnyoi40T8d2dwAj77wp7WXTjaCJhY=
+	t=1785228250; cv=none; b=X+RVDBd5JZiZqHVmvRUD/KxBzbW64kc6ofF4N+RbG2HUNUP3+/db2AlXZaJWNfAXRRgEwpl5Kj1+WAUdPiWD0JtJVPWPs0TeiRTqPbkQvtnptclQrwwxoW2s1lfN7J1/BtThPHfK4jrmxTk9MmbJpDS4OCqxNabd4ajH2nqvbbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785228246; c=relaxed/simple;
-	bh=azMmEoFiUdEQmPw92upzvMoKhiNCMouur7MehU89fbA=;
+	s=arc-20240116; t=1785228250; c=relaxed/simple;
+	bh=vylKhHUKoIzenEJuAkM2Tibvi8aMtkGvvicVnyqV6JU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=G2FMITy/Aak0xOqQGeHOF8hF8UhZioVe8dpi8o9KLi1pq4XeqB86TGF9Qb6Qni5t8QmlXxuYcnmX2IKP1Mgu4zpk5+wJCSq+Ynt+Cm9F+G+iDe/QzEAPs3ccuOuahrxg4+JCLny81jYk1yjrw5NKq44Bab1wzLK9tY5OzieQZz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XKSPhqGD; arc=none smtp.client-ip=209.85.214.178
+	 MIME-Version; b=oo8qjblpTmOnkr8jNgb+fcUgQX9nz3ljPUeVIdWgLi3PgDiTkIMuHXLjk0J7BplBzLdnw8jU2C1tO1j4b2lh1vzdc4yhdTqs+N6kUhJncCVWY40+JeUrKMTmI+ORY4oxdpLkYU3WsASCj4wNjTM4KhqqC800gOENiNCromThtS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AQHY5yig; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XKSPhqGD"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2d01663d816so3458015ad.1
-        for <linux-crypto@vger.kernel.org>; Tue, 28 Jul 2026 01:44:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AQHY5yig"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2cc7e86e7aeso40168125ad.2
+        for <linux-crypto@vger.kernel.org>; Tue, 28 Jul 2026 01:44:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785228244; x=1785833044; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1785228247; x=1785833047; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=+ZhY4ex1aTAjiE+PVMiJFUKWM9IxWX54ffsV/gAsSm8=;
-        b=XKSPhqGD93CPG3ZUlFzyhaqGm7e80NskgVfMkLzyl3I0p1BAfTcGOHRisB2P6dksh5
-         Fgu6FL8D78BgzWCiAh38VnlvetCpiqhNZK6+bPvli6AKbtC4Zk3nNE8uaLem4RfqJ6KA
-         X2igVLjqFIrsANQdMCn9rGrldyYWldCvFHEo/x+1jaEKLS0xp1ccS0xQAwAfwZj/uM/x
-         /WEEytqxZSLtrJ3GL+FcXB8F9l4jCjuS2RVKM5l9Z7cEPb0FWBen9L4Lv2mPVjbIet/2
-         540vtc1ruZO4CKQ3SKtUK5Ujydv0aj2R3m3TjI2huv3nh3jIW7k/baC3dLAwfEk87hBp
-         vQVg==
+        bh=TjYDFJmL3TI99i86jNGN24InJdDZMui5gYU+C2FS4uU=;
+        b=AQHY5yigiMr0FotAz354mnfie/HjCCFz1s4f5kcif7891DZhtFCQeWLnS8dvMWx2M6
+         tygbO+0+rWCXgMtY68vS09hODz6/Xo0TI0a+3zMdRBwk91DdZpZYO/JcHD5FGWCEsW13
+         SK+igfvI2I2se6iOS1uziBqGuBajcarv9dbsHOLceF27UayvAOcW90m57WFWotH1OPoE
+         bJCfd33fYH/7sJy8Qrx7jZcDQlBVkca9mVTv4aLPjRXJnHR/xifhBprB3kwlqKLF/Kgd
+         yqiyuAQfhxRxjdLEVy78gIFS49fbGPEcUIO1HQ4jaoRKa2Qa+iwWFDCr3F3v8sf7usl3
+         Dj8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785228244; x=1785833044;
+        d=1e100.net; s=20251104; t=1785228247; x=1785833047;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=+ZhY4ex1aTAjiE+PVMiJFUKWM9IxWX54ffsV/gAsSm8=;
-        b=rAvr3MzHmok/snms2zHrVrdwDv2Q7MXgqabmFAjVKAtg2UHfyxN+l0lbAh5l04ofBa
-         5SoxChcUbTpM1wJG8v4Hp7kInGGAxszP/TlfNynVFsstDJE8U2N+1fE2MlrJ9BfWTuAc
-         BjG0wDqjLqoodS7VI9VwbCEIK+gmJi/j+S0xip4B+G+Us0X5toFOxXBnhCLJAIzCPXgK
-         /hTaDyO68elzF3YnRg3BXSiiDe8Mzch/PeA/xB+BB8saGC05UjVGha7oHtITjRaMW/EB
-         W+A8yDpb8tKdESRYAQw5n7quQ5fk7NyUiHpAvRM/igKE8y+PQxVNnqB2XRPaIzRM7g6W
-         M7kw==
-X-Forwarded-Encrypted: i=1; AHgh+Rpp7TJiG+dBfJZIP3uCFgdaafpt0RS44VKHwyEIqjCcLQVaYWchEOyb/rsx/xUGl83tS+rt2A+WQYjk+3M=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+Onhun1DEGpOZLSYpeITN/Sp812L3ITY+wk6intFjm+67GIpK
-	OfD/f83fQVOdb0Z9l3yr1Vx8DLw/4bJe2NuQdIRBIOK2Y02XlhAlalbB
-X-Gm-Gg: AR+sD13XdMdDBJntW4utjaP4BukShAZrColO6XWMjcR+Q2P7tBwxphfPLhsQYzlT42h
-	ugc+T4L6eoh4OaeWrkfYq1ZWG9IrkM+rKg729zXdvw73U4GDDPPOz+e+r6IV7PMMQ8eW2/tP7xi
-	tjj5uIsKzXI+TWGKb1C6d9ty1bDTEfbxjNM+rsKzo0NjpcAuHYlwUYVndpp9Y6V/6eyXF7+Kmdg
-	RBvtzW+UAyfiDl82nxqBUO3OKMzzwyCC7QtX8GOTaBu8cp1MYUi3jqT8GntURw5ptXVfnR241qE
-	hNUTzIkeomAgJZNEhPf6rYbGs+TmVAzQU2WgYAaPPLRoMXPFUDs+URN5CS+c1tPJcYXGfoprcC6
-	XSUhU+/oYgO5Cbb7HfxO6rh8G+IEYWYCNnSzMa0kQaSNz8T9xuJM/K0CvmIrYrJaD+yb34T70x5
-	rN
-X-Received: by 2002:a17:902:f709:b0:2b2:67ca:5ff9 with SMTP id d9443c01a7336-2d015902adfmr19995905ad.0.1785228243662;
-        Tue, 28 Jul 2026 01:44:03 -0700 (PDT)
+        bh=TjYDFJmL3TI99i86jNGN24InJdDZMui5gYU+C2FS4uU=;
+        b=C043kN5UDQonPIEvvKd6WFyBztjjAlzRkm+GhDONhoMavx8SiaYXTB7KKWu6P714PO
+         zBdSgltelcn2phem9y+gfSTpd+3RjPcxXLiAv9TmiUFRpxVuQVfi5qRfDdtjVwLBBabg
+         zkJOYR5Ya9ueTihMOHxRDt3OVfqbXYGAN1rFOM9E4+3TX0HueI4YH2+XauFEt3zvu4nc
+         qvmRDrjCnOMUS+i61wfOU0KdRdBBqgnDmRzioW0K5iA4+YO8phBA13fF+hYblDo6aNDO
+         ypIBxQ2TDbYS3xJ6XJABT27k9M4ilDm2N9ALRzR+kynanKenk5xobLZ8vPMBVvgbgFfJ
+         klHg==
+X-Forwarded-Encrypted: i=1; AHgh+Rpk6ORJz2nwbaHNeOa2Q6MWjX1nxwYXOf+E74y2jNRi2Ey1trrpTvYxo/j4TrO+kixzRAaCLGSiYM6mky4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxuebhcfQ8EZ6xn0HyORDRRoQyYhr6of7pyrEjZHnDaVnipLSrQ
+	JGJ/oqix5Z8po+ACthjD9cu12dNCRfNbiQaq0y9JbqhB103IxS3OEShb
+X-Gm-Gg: AR+sD1249DzAconUxJX/ebHZBlK7HPogNs1xfQ7z7r90Um/6/4smyQocMFYz38zv5LG
+	taZxnjF9A3ko2Qcq4voK0ZIXRjraBThxWHKms/Sr4yAy9X4ZUdYMz1wWLXBzDDKMBGKpE0QDPFp
+	lhdSoB3Xt/dDWKU+rO3s2GKJtjcBhz9q0WUaudahwbhRyXy6Y9G43hpKqH/lw+FKmnA57GGbZUI
+	x03txbhaQ1snDol59wKDh6nbcsB/U7/Zr+cms0rE3rzTUcm32KcPhaeTjoJ2R50jbqLNj0MI6qM
+	TsfRJHE7C7RczRS4rSbStjuj6aGsqYsC+O4u489m9B9mHw90yQJ4XJhVeDb2f84oBmfc+mgZrrz
+	8tM3y8huUT5KHczP+JrmQW3UQ44J4mNWx5/XSmVnHFBlNRBrnuBCWYFzEHsJdYKM8iCEZQfYzGe
+	ta
+X-Received: by 2002:a17:903:b8f:b0:2ca:3e3f:4956 with SMTP id d9443c01a7336-2d015d43f76mr16661845ad.44.1785228246665;
+        Tue, 28 Jul 2026 01:44:06 -0700 (PDT)
 Received: from mincom1 ([175.235.236.1])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2cfde7bc585sm48168505ad.51.2026.07.28.01.44.01
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2cfde7bc585sm48168505ad.51.2026.07.28.01.44.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Jul 2026 01:44:02 -0700 (PDT)
+        Tue, 28 Jul 2026 01:44:05 -0700 (PDT)
 From: Jihong Min <hurryman2212@gmail.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	Christian Marangi <ansuelsmth@gmail.com>,
@@ -66,9 +66,9 @@ Cc: Jihong Min <hurryman2212@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Antoine Tenart <atenart@kernel.org>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/4] crypto: move cycle benchmark helpers out of tcrypt
-Date: Tue, 28 Jul 2026 17:43:29 +0900
-Message-ID: <e0ce93088c1d9772e928fcbd113a446b7fb7442f.1785226804.git.hurryman2212@gmail.com>
+Subject: [PATCH 2/4] crypto: introduce dynamic software fallback
+Date: Tue, 28 Jul 2026 17:43:30 +0900
+Message-ID: <b70a811c7ea66ef9dca3acd1bd9290b06ce7a15e.1785226804.git.hurryman2212@gmail.com>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <cover.1785226804.git.hurryman2212@gmail.com>
 References: <cover.1785226804.git.hurryman2212@gmail.com>
@@ -80,546 +80,1504 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Move the reusable AEAD, ahash, and skcipher cycle measurement loops
-into a dedicated benchmark module. Preserve tcrypt's existing output
-and benchmark behavior while allowing crypto drivers to use the same
-helpers for runtime comparisons.
+Add an opt-in framework that lets crypto drivers compare hardware and
+software implementations for algorithm groups whose members share
+similar hardware scaling characteristics. Benchmark each group at fixed
+block sizes from 16 to 16384 bytes, then expose the resulting per-device
+CPU fallback thresholds through sysfs.
 
+Use four warm-up runs and eight measured runs for each implementation.
+Extend results within ten percent with sixteen additional runs. Treat
+equal totals as a software win. After any software win, continue with
+the next block size if one remains; otherwise select software-only
+fallback. Select software or hardware per request using the threshold
+computed at sysfs (re-)enablement for each crypto device.
+
+Assisted-by: Codex:gpt-5.6
 Signed-off-by: Jihong Min <hurryman2212@gmail.com>
 ---
- crypto/Kconfig             |  15 ++-
- crypto/Makefile            |   2 +
- crypto/benchmark.c         | 180 +++++++++++++++++++++++++++++++
- crypto/tcrypt.c            | 213 +++++--------------------------------
- include/crypto/benchmark.h |  24 +++++
- 5 files changed, 242 insertions(+), 192 deletions(-)
- create mode 100644 crypto/benchmark.c
- create mode 100644 include/crypto/benchmark.h
+ crypto/Kconfig            |    9 +
+ crypto/Makefile           |    1 +
+ crypto/fallback.c         | 1335 +++++++++++++++++++++++++++++++++++++
+ include/crypto/fallback.h |   96 +++
+ 4 files changed, 1441 insertions(+)
+ create mode 100644 crypto/fallback.c
+ create mode 100644 include/crypto/fallback.h
 
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index f1e372195273..0cba261e3b88 100644
+index 0cba261e3b88..c14b00768788 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -244,13 +244,22 @@ config CRYPTO_KRB5ENC
- 	  profile.  This is required for Kerberos 5-style encryption, used by
- 	  sunrpc/NFS and rxrpc/AFS.
+@@ -267,6 +267,15 @@ config CRYPTO_BENCHMARK
+ 	  algorithms in the kernel.  It should not be enabled in production
+ 	  kernels.
  
--config CRYPTO_BENCHMARK
--	tristate "Crypto benchmarking module"
--	depends on m || EXPERT
-+config CRYPTO_BENCHMARK_LIB
++config CRYPTO_DYNAMIC_FALLBACK
 +	tristate
- 	select CRYPTO_AEAD
- 	select CRYPTO_HASH
- 	select CRYPTO_MANAGER
- 	select CRYPTO_SKCIPHER
-+	help
-+	  Build reusable benchmark helpers for Crypto API algorithms.  This
-+	  internal library is shared by tcrypt and drivers that select
-+	  implementations from measurements made while their devices are
-+	  initialized.
-+
-+config CRYPTO_BENCHMARK
-+	tristate "Crypto benchmarking module"
-+	depends on m || EXPERT
 +	select CRYPTO_BENCHMARK_LIB
- 	help
- 	  Quick & dirty crypto benchmarking module.
- 
++	help
++	  Build generic support for selecting software fallback thresholds
++	  from Crypto API benchmark results.  Crypto drivers select this
++	  internal library when they support runtime fallback tuning for
++	  their hardware implementations.
++
+ config CRYPTO_SIMD
+ 	tristate
+ 	select CRYPTO_AEAD
 diff --git a/crypto/Makefile b/crypto/Makefile
-index 8386d55a9755..77720b746503 100644
+index 77720b746503..babbd7c6e984 100644
 --- a/crypto/Makefile
 +++ b/crypto/Makefile
-@@ -165,6 +165,8 @@ UBSAN_SANITIZE_jitterentropy.o = n
- jitterentropy_rng-y := jitterentropy.o jitterentropy-kcapi.o
- obj-$(CONFIG_CRYPTO_JITTERENTROPY_TESTINTERFACE) += jitterentropy-testing.o
+@@ -167,6 +167,7 @@ obj-$(CONFIG_CRYPTO_JITTERENTROPY_TESTINTERFACE) += jitterentropy-testing.o
  obj-$(CONFIG_CRYPTO_BENCHMARK) += tcrypt.o
-+obj-$(CONFIG_CRYPTO_BENCHMARK_LIB) += crypt-benchmark.o
-+crypt-benchmark-y := benchmark.o
+ obj-$(CONFIG_CRYPTO_BENCHMARK_LIB) += crypt-benchmark.o
+ crypt-benchmark-y := benchmark.o
++obj-$(CONFIG_CRYPTO_DYNAMIC_FALLBACK) += fallback.o
  obj-$(CONFIG_CRYPTO_USER_API) += af_alg.o
  obj-$(CONFIG_CRYPTO_USER_API_HASH) += algif_hash.o
  obj-$(CONFIG_CRYPTO_USER_API_SKCIPHER) += algif_skcipher.o
-diff --git a/crypto/benchmark.c b/crypto/benchmark.c
+diff --git a/crypto/fallback.c b/crypto/fallback.c
 new file mode 100644
-index 000000000000..ad27cdaa7491
+index 000000000000..af8830f1077c
 --- /dev/null
-+++ b/crypto/benchmark.c
-@@ -0,0 +1,180 @@
++++ b/crypto/fallback.c
+@@ -0,0 +1,1335 @@
 +// SPDX-License-Identifier: GPL-2.0
 +
-+#include <crypto/aead.h>
++#include <crypto/authenc.h>
 +#include <crypto/benchmark.h>
-+#include <crypto/hash.h>
-+#include <crypto/skcipher.h>
++#include <crypto/fallback.h>
++#include <crypto/internal/aead.h>
++#include <crypto/internal/hash.h>
++#include <crypto/internal/skcipher.h>
++#include <linux/device.h>
++#include <linux/err.h>
++#include <linux/kernel.h>
++#include <linux/limits.h>
 +#include <linux/module.h>
-+#include <linux/timex.h>
++#include <linux/mutex.h>
++#include <linux/random.h>
++#include <linux/rtnetlink.h>
++#include <linux/scatterlist.h>
++#include <linux/slab.h>
++#include <linux/string.h>
++#include <linux/sysfs.h>
 +
-+int crypto_benchmark_aead_cycles(struct aead_request *req, bool encrypt,
-+				 unsigned int warmup_runs, unsigned int runs,
-+				 u64 *total_cycles)
++static const unsigned int crypto_fallback_block_sizes[] = {
++	16, 64, 128, 256, 512, 1024, 1420, 2048, 4096, 8192, 16384,
++};
++
++enum crypto_fallback_implementation {
++	CRYPTO_FALLBACK_HARDWARE,
++	CRYPTO_FALLBACK_SOFTWARE,
++};
++
++struct fallback_threshold {
++	int value;
++};
++
++struct fallback_alg;
++
++struct crypto_fallback_group_state {
++	struct fallback_threshold threshold;
++	int value;
++	struct crypto_fallback_group group;
++	struct crypto_fallback *fallback;
++	struct device_attribute dev_attr;
++};
++
++struct crypto_fallback {
++	struct device *dev;
++	struct crypto_fallback_group_state *groups;
++	struct attribute_group sysfs_group;
++	struct attribute **sysfs_attrs;
++	struct device_attribute enabled_attr;
++	struct mutex lock; /* Serializes tuning and sysfs writes. */
++	struct fallback_alg *algs;
++	unsigned int num_groups;
++	unsigned int num_algs;
++	bool enabled;
++};
++
++static const char *
++crypto_fallback_alg_name(const struct crypto_fallback_benchmark *alg,
++			 enum crypto_fallback_implementation implementation)
 +{
-+	struct crypto_wait *wait;
++	if (implementation == CRYPTO_FALLBACK_HARDWARE)
++		return alg->driver_name;
++
++	return alg->name;
++}
++
++static u32
++crypto_fallback_alg_mask(enum crypto_fallback_implementation implementation)
++{
++	if (implementation == CRYPTO_FALLBACK_HARDWARE)
++		return 0;
++
++	return CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK;
++}
++
++static int fallback_bench_skcipher(const struct crypto_fallback_benchmark *alg,
++				   enum crypto_fallback_implementation impl,
++				   unsigned int block_size,
++				   unsigned int warmup_runs, unsigned int runs,
++				   u64 *total_cycles)
++{
++	struct skcipher_request *req = NULL;
++	struct crypto_skcipher *tfm;
++	struct crypto_wait wait;
++	struct scatterlist sg;
++	unsigned int ivsize;
++	unsigned int len;
++	u8 *data = NULL;
++	u8 *iv = NULL;
++	int err;
++
++	tfm = crypto_alloc_skcipher(crypto_fallback_alg_name(alg, impl), 0,
++				    crypto_fallback_alg_mask(impl));
++	if (IS_ERR(tfm))
++		return PTR_ERR(tfm);
++
++	err = crypto_skcipher_setkey(tfm, alg->key, alg->keylen);
++	if (err)
++		goto out_free_tfm;
++
++	len = round_up(block_size, crypto_skcipher_blocksize(tfm));
++	ivsize = crypto_skcipher_ivsize(tfm);
++	data = kmalloc(len, GFP_KERNEL);
++	iv = kzalloc(ivsize, GFP_KERNEL);
++	if (!data || (ivsize && !iv)) {
++		err = -ENOMEM;
++		goto out_free_buffers;
++	}
++
++	get_random_bytes(data, len);
++	sg_init_one(&sg, data, len);
++
++	req = skcipher_request_alloc(tfm, GFP_KERNEL);
++	if (!req) {
++		err = -ENOMEM;
++		goto out_free_buffers;
++	}
++
++	crypto_init_wait(&wait);
++	skcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++				      crypto_req_done, &wait);
++	skcipher_request_set_crypt(req, &sg, &sg, len, iv);
++	err = crypto_benchmark_skcipher_cycles(req, true, warmup_runs, runs,
++					       total_cycles);
++
++out_free_buffers:
++	skcipher_request_free(req);
++	kfree(iv);
++	kfree(data);
++out_free_tfm:
++	crypto_free_skcipher(tfm);
++
++	return err;
++}
++
++static int fallback_bench_ahash(const struct crypto_fallback_benchmark *alg,
++				enum crypto_fallback_implementation impl,
++				unsigned int block_size,
++				unsigned int warmup_runs, unsigned int runs,
++				u64 *total_cycles)
++{
++	struct ahash_request *req = NULL;
++	struct crypto_ahash *tfm;
++	struct crypto_wait wait;
++	struct scatterlist src;
++	u8 *input = NULL;
++	u8 *output = NULL;
++	int err;
++
++	tfm = crypto_alloc_ahash(crypto_fallback_alg_name(alg, impl), 0,
++				 crypto_fallback_alg_mask(impl));
++	if (IS_ERR(tfm))
++		return PTR_ERR(tfm);
++
++	if (alg->keylen) {
++		err = crypto_ahash_setkey(tfm, alg->key, alg->keylen);
++		if (err)
++			goto out_free_tfm;
++	}
++
++	input = kmalloc(block_size, GFP_KERNEL);
++	output = kmalloc(crypto_ahash_digestsize(tfm), GFP_KERNEL);
++	if (!input || !output) {
++		err = -ENOMEM;
++		goto out_free_buffers;
++	}
++
++	get_random_bytes(input, block_size);
++	sg_init_one(&src, input, block_size);
++
++	req = ahash_request_alloc(tfm, GFP_KERNEL);
++	if (!req) {
++		err = -ENOMEM;
++		goto out_free_buffers;
++	}
++
++	crypto_init_wait(&wait);
++	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++				   crypto_req_done, &wait);
++	ahash_request_set_crypt(req, &src, output, block_size);
++	err = crypto_benchmark_ahash_cycles(req, block_size, block_size,
++					    warmup_runs, runs, total_cycles);
++
++out_free_buffers:
++	ahash_request_free(req);
++	kfree(output);
++	kfree(input);
++out_free_tfm:
++	crypto_free_ahash(tfm);
++
++	return err;
++}
++
++static int
++crypto_fallback_aead_setkey(struct crypto_aead *tfm,
++			    const struct crypto_fallback_benchmark *alg)
++{
++	struct crypto_authenc_key_param *param;
++	struct rtattr *rta;
++	unsigned int len;
++	u8 *key;
++	int err;
++
++	if (!alg->authkeylen)
++		return crypto_aead_setkey(tfm, alg->key, alg->keylen);
++
++	len = RTA_LENGTH(sizeof(*param)) + alg->authkeylen + alg->keylen;
++	key = kzalloc(len, GFP_KERNEL);
++	if (!key)
++		return -ENOMEM;
++
++	rta = (struct rtattr *)key;
++	rta->rta_type = CRYPTO_AUTHENC_KEYA_PARAM;
++	rta->rta_len = RTA_LENGTH(sizeof(*param));
++	param = RTA_DATA(rta);
++	param->enckeylen = cpu_to_be32(alg->keylen);
++	memcpy(key + rta->rta_len, alg->authkey, alg->authkeylen);
++	memcpy(key + rta->rta_len + alg->authkeylen, alg->key, alg->keylen);
++
++	err = crypto_aead_setkey(tfm, key, len);
++	kfree_sensitive(key);
++
++	return err;
++}
++
++static int fallback_bench_aead(const struct crypto_fallback_benchmark *alg,
++			       enum crypto_fallback_implementation impl,
++			       unsigned int block_size,
++			       unsigned int warmup_runs, unsigned int runs,
++			       u64 *total_cycles)
++{
++	struct aead_request *req = NULL;
++	struct crypto_aead *tfm;
++	struct crypto_wait wait;
++	struct scatterlist src;
++	struct scatterlist dst;
++	unsigned int ivsize;
++	unsigned int len;
++	u8 *input = NULL;
++	u8 *output = NULL;
++	u8 *iv = NULL;
++	int err;
++
++	tfm = crypto_alloc_aead(crypto_fallback_alg_name(alg, impl), 0,
++				crypto_fallback_alg_mask(impl));
++	if (IS_ERR(tfm))
++		return PTR_ERR(tfm);
++
++	err = crypto_aead_setauthsize(tfm, alg->authsize);
++	if (err)
++		goto out_free_tfm;
++	err = crypto_fallback_aead_setkey(tfm, alg);
++	if (err)
++		goto out_free_tfm;
++
++	len = round_up(block_size, crypto_aead_blocksize(tfm));
++	ivsize = crypto_aead_ivsize(tfm);
++	input = kmalloc(len, GFP_KERNEL);
++	output = kmalloc(len + alg->authsize, GFP_KERNEL);
++	iv = kzalloc(ivsize, GFP_KERNEL);
++	if (!input || !output || (ivsize && !iv)) {
++		err = -ENOMEM;
++		goto out_free_buffers;
++	}
++
++	get_random_bytes(input, len);
++	sg_init_one(&src, input, len);
++	sg_init_one(&dst, output, len + alg->authsize);
++
++	req = aead_request_alloc(tfm, GFP_KERNEL);
++	if (!req) {
++		err = -ENOMEM;
++		goto out_free_buffers;
++	}
++
++	crypto_init_wait(&wait);
++	aead_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++				  crypto_req_done, &wait);
++	aead_request_set_crypt(req, &src, &dst, len, iv);
++	aead_request_set_ad(req, 0);
++	err = crypto_benchmark_aead_cycles(req, true, warmup_runs, runs,
++					   total_cycles);
++
++out_free_buffers:
++	aead_request_free(req);
++	kfree(iv);
++	kfree(output);
++	kfree(input);
++out_free_tfm:
++	crypto_free_aead(tfm);
++
++	return err;
++}
++
++static int fallback_bench(const struct crypto_fallback_benchmark *alg,
++			  enum crypto_fallback_implementation impl,
++			  unsigned int block_size, unsigned int warmup_runs,
++			  unsigned int runs, u64 *total_cycles)
++{
++	switch (alg->type) {
++	case CRYPTO_FALLBACK_SKCIPHER:
++		return fallback_bench_skcipher(alg, impl, block_size,
++					       warmup_runs, runs, total_cycles);
++	case CRYPTO_FALLBACK_AHASH:
++		return fallback_bench_ahash(alg, impl, block_size, warmup_runs,
++					    runs, total_cycles);
++	case CRYPTO_FALLBACK_AEAD:
++		return fallback_bench_aead(alg, impl, block_size, warmup_runs,
++					   runs, total_cycles);
++	}
++
++	return -EINVAL;
++}
++
++static ssize_t fallback_threshold_show(struct device *dev,
++				       struct device_attribute *attr, char *buf)
++{
++	struct crypto_fallback_group_state *group;
++
++	group = container_of(attr, struct crypto_fallback_group_state,
++			     dev_attr);
++
++	return sysfs_emit(buf, "%d\n", READ_ONCE(group->value));
++}
++
++static ssize_t fallback_threshold_store(struct device *dev,
++					struct device_attribute *attr,
++					const char *buf, size_t count)
++{
++	struct crypto_fallback_group_state *group;
++	int threshold;
++	int err;
++
++	err = kstrtoint(buf, 0, &threshold);
++	if (err)
++		return err;
++	if (threshold < -1)
++		return -ERANGE;
++
++	group = container_of(attr, struct crypto_fallback_group_state,
++			     dev_attr);
++	mutex_lock(&group->fallback->lock);
++	WRITE_ONCE(group->value, threshold);
++	if (group->fallback->enabled)
++		WRITE_ONCE(group->threshold.value, threshold);
++	mutex_unlock(&group->fallback->lock);
++
++	return count;
++}
++
++static int crypto_fallback_tune_group(const struct crypto_fallback_group *group,
++				      int *threshold)
++{
++	u64 hardware_cycles;
++	u64 software_cycles;
 +	unsigned int i;
-+	u64 cycles = 0;
-+	int ret;
++	int err;
 +
-+	if (!req || !req->base.data || !runs || !total_cycles)
-+		return -EINVAL;
++	for (i = 0; i < ARRAY_SIZE(crypto_fallback_block_sizes); i++) {
++		u64 difference;
++		u64 lower;
 +
-+	wait = req->base.data;
-+	*total_cycles = 0;
++		err = fallback_bench(&group->benchmark,
++				     CRYPTO_FALLBACK_HARDWARE,
++				     crypto_fallback_block_sizes[i], 4, 8,
++				     &hardware_cycles);
++		if (err)
++			return err;
 +
-+	for (i = 0; i < warmup_runs; i++) {
-+		if (encrypt)
-+			ret = crypto_wait_req(crypto_aead_encrypt(req), wait);
-+		else
-+			ret = crypto_wait_req(crypto_aead_decrypt(req), wait);
-+		if (ret)
-+			return ret;
++		err = fallback_bench(&group->benchmark,
++				     CRYPTO_FALLBACK_SOFTWARE,
++				     crypto_fallback_block_sizes[i], 4, 8,
++				     &software_cycles);
++		if (err)
++			return err;
++		if (!hardware_cycles || !software_cycles)
++			return -EOPNOTSUPP;
++
++		difference = hardware_cycles > software_cycles ?
++				     hardware_cycles - software_cycles :
++				     software_cycles - hardware_cycles;
++		lower = min(hardware_cycles, software_cycles);
++
++		/* Extend results whose initial averages differ by at most 10%. */
++		if (difference <= lower / 10) {
++			u64 extra_cycles;
++
++			err = fallback_bench(&group->benchmark,
++					     CRYPTO_FALLBACK_HARDWARE,
++					     crypto_fallback_block_sizes[i], 0,
++					     16, &extra_cycles);
++			if (err)
++				return err;
++			if (!extra_cycles)
++				return -EOPNOTSUPP;
++			hardware_cycles += extra_cycles;
++
++			err = fallback_bench(&group->benchmark,
++					     CRYPTO_FALLBACK_SOFTWARE,
++					     crypto_fallback_block_sizes[i], 0,
++					     16, &extra_cycles);
++			if (err)
++				return err;
++			if (!extra_cycles)
++				return -EOPNOTSUPP;
++			software_cycles += extra_cycles;
++		}
++
++		/*
++		 * Both totals contain the same number of samples, so comparing
++		 * them is equivalent to comparing their arithmetic averages.
++		 */
++		if (hardware_cycles < software_cycles) {
++			*threshold = i ? crypto_fallback_block_sizes[i - 1] : 0;
++			return 0;
++		}
 +	}
 +
-+	for (i = 0; i < runs; i++) {
-+		cycles_t start, end;
-+
-+		start = get_cycles();
-+		if (encrypt)
-+			ret = crypto_wait_req(crypto_aead_encrypt(req), wait);
-+		else
-+			ret = crypto_wait_req(crypto_aead_decrypt(req), wait);
-+		end = get_cycles();
-+		if (ret)
-+			return ret;
-+
-+		cycles += end - start;
-+	}
-+
-+	*total_cycles = cycles;
++	*threshold = -1;
 +
 +	return 0;
 +}
-+EXPORT_SYMBOL_GPL(crypto_benchmark_aead_cycles);
 +
-+int crypto_benchmark_ahash_cycles(struct ahash_request *req,
-+				  unsigned int block_size,
-+				  unsigned int update_size,
-+				  unsigned int warmup_runs, unsigned int runs,
-+				  u64 *total_cycles)
++static ssize_t fallback_enabled_show(struct device *dev,
++				     struct device_attribute *attr, char *buf)
 +{
-+	struct crypto_wait *wait;
-+	unsigned int processed;
++	struct crypto_fallback *fallback;
++
++	fallback = container_of(attr, struct crypto_fallback, enabled_attr);
++
++	return sysfs_emit(buf, "%u\n", READ_ONCE(fallback->enabled));
++}
++
++static ssize_t fallback_enabled_store(struct device *dev,
++				      struct device_attribute *attr,
++				      const char *buf, size_t count)
++{
++	struct crypto_fallback *fallback;
++	bool enabled;
 +	unsigned int i;
-+	u64 cycles = 0;
-+	int ret;
++	int err;
 +
-+	if (!req || !req->base.data || !block_size || !update_size ||
-+	    block_size % update_size || !runs || !total_cycles)
-+		return -EINVAL;
++	err = kstrtobool(buf, &enabled);
++	if (err)
++		return err;
 +
-+	wait = req->base.data;
-+	*total_cycles = 0;
++	fallback = container_of(attr, struct crypto_fallback, enabled_attr);
++	mutex_lock(&fallback->lock);
++	if (!enabled && !fallback->enabled)
++		goto out_unlock;
 +
-+	for (i = 0; i < warmup_runs; i++) {
-+		if (update_size == block_size) {
-+			ret = crypto_wait_req(crypto_ahash_digest(req), wait);
-+			if (ret)
-+				return ret;
-+			continue;
-+		}
++	if (enabled) {
++		for (i = 0; i < fallback->num_groups; i++)
++			WRITE_ONCE(fallback->groups[i].threshold.value, 0);
 +
-+		ret = crypto_wait_req(crypto_ahash_init(req), wait);
-+		if (ret)
-+			return ret;
-+		for (processed = 0; processed < block_size;
-+		     processed += update_size) {
-+			ret = crypto_wait_req(crypto_ahash_update(req), wait);
-+			if (ret)
-+				return ret;
-+		}
-+		ret = crypto_wait_req(crypto_ahash_final(req), wait);
-+		if (ret)
-+			return ret;
-+	}
++		for (i = 0; i < fallback->num_groups; i++) {
++			struct crypto_fallback_group_state *state;
++			int threshold;
 +
-+	for (i = 0; i < runs; i++) {
-+		cycles_t start, end;
-+
-+		start = get_cycles();
-+		if (update_size == block_size) {
-+			ret = crypto_wait_req(crypto_ahash_digest(req), wait);
-+		} else {
-+			ret = crypto_wait_req(crypto_ahash_init(req), wait);
-+			if (ret)
-+				goto measure_end;
-+			for (processed = 0; processed < block_size;
-+			     processed += update_size) {
-+				ret = crypto_wait_req(crypto_ahash_update(req),
-+						      wait);
-+				if (ret)
-+					goto measure_end;
++			state = &fallback->groups[i];
++			err = crypto_fallback_tune_group(&state->group,
++							 &threshold);
++			if (err) {
++				dev_warn(fallback->dev,
++					"%s benchmark failed: %d; using hardware\n",
++					state->group.name, err);
++				threshold = 0;
 +			}
-+			ret = crypto_wait_req(crypto_ahash_final(req), wait);
++			WRITE_ONCE(state->value, threshold);
++			dev_info(fallback->dev,
++				 "%s CPU fallback threshold: %d\n",
++				 state->group.name, threshold);
 +		}
-+measure_end:
-+		end = get_cycles();
-+		if (ret)
-+			return ret;
 +
-+		cycles += end - start;
++		for (i = 0; i < fallback->num_groups; i++)
++			WRITE_ONCE(fallback->groups[i].threshold.value,
++				   fallback->groups[i].value);
++	} else {
++		for (i = 0; i < fallback->num_groups; i++)
++			WRITE_ONCE(fallback->groups[i].threshold.value, 0);
 +	}
++	WRITE_ONCE(fallback->enabled, enabled);
 +
-+	*total_cycles = cycles;
++out_unlock:
++	mutex_unlock(&fallback->lock);
 +
-+	return 0;
++	return count;
 +}
-+EXPORT_SYMBOL_GPL(crypto_benchmark_ahash_cycles);
 +
-+int crypto_benchmark_skcipher_cycles(struct skcipher_request *req, bool encrypt,
-+				     unsigned int warmup_runs,
-+				     unsigned int runs, u64 *total_cycles)
++static void crypto_fallback_free(struct crypto_fallback *fallback)
 +{
-+	struct crypto_wait *wait;
 +	unsigned int i;
-+	u64 cycles = 0;
-+	int ret;
 +
-+	if (!req || !req->base.data || !runs || !total_cycles)
-+		return -EINVAL;
++	if (!fallback)
++		return;
 +
-+	wait = req->base.data;
-+	*total_cycles = 0;
++	for (i = 0; i < fallback->num_groups; i++)
++		kfree_const(fallback->groups[i].group.name);
++	kfree(fallback->algs);
++	kfree(fallback->sysfs_attrs);
++	kfree(fallback->groups);
++	mutex_destroy(&fallback->lock);
++	put_device(fallback->dev);
++	kfree(fallback);
++}
 +
-+	for (i = 0; i < warmup_runs; i++) {
-+		if (encrypt)
-+			ret = crypto_wait_req(crypto_skcipher_encrypt(req),
-+					      wait);
-+		else
-+			ret = crypto_wait_req(crypto_skcipher_decrypt(req),
-+					      wait);
-+		if (ret)
-+			return ret;
++static struct crypto_fallback *
++fallback_alloc(struct device *dev, const struct crypto_fallback_group *groups,
++	       unsigned int num_groups)
++{
++	struct crypto_fallback *fallback;
++	unsigned int i;
++	int err;
++
++	if (!dev || !groups || !num_groups)
++		return ERR_PTR(-EINVAL);
++
++	fallback = kzalloc_obj(*fallback, GFP_KERNEL);
++	if (!fallback)
++		return ERR_PTR(-ENOMEM);
++
++	mutex_init(&fallback->lock);
++	fallback->dev = get_device(dev);
++	fallback->num_groups = num_groups;
++	fallback->groups =
++		kcalloc(num_groups, sizeof(*fallback->groups), GFP_KERNEL);
++	fallback->sysfs_attrs =
++		kcalloc(num_groups + 2, sizeof(*fallback->sysfs_attrs),
++			GFP_KERNEL);
++	if (!fallback->groups || !fallback->sysfs_attrs) {
++		err = -ENOMEM;
++		goto err_free;
 +	}
 +
-+	for (i = 0; i < runs; i++) {
-+		cycles_t start, end;
++	for (i = 0; i < num_groups; i++) {
++		struct crypto_fallback_group_state *state;
 +
-+		start = get_cycles();
-+		if (encrypt)
-+			ret = crypto_wait_req(crypto_skcipher_encrypt(req),
-+					      wait);
-+		else
-+			ret = crypto_wait_req(crypto_skcipher_decrypt(req),
-+					      wait);
-+		end = get_cycles();
-+		if (ret)
-+			return ret;
++		if (!groups[i].name || !groups[i].name[0] ||
++		    !strcmp(groups[i].name, "enabled") ||
++		    !groups[i].benchmark.name ||
++		    !groups[i].benchmark.driver_name ||
++		    groups[i].benchmark.type > CRYPTO_FALLBACK_AEAD ||
++		    (groups[i].benchmark.keylen && !groups[i].benchmark.key) ||
++		    (groups[i].benchmark.authkeylen &&
++		     !groups[i].benchmark.authkey) ||
++		    (groups[i].benchmark.type == CRYPTO_FALLBACK_AEAD &&
++		     !groups[i].benchmark.authsize)) {
++			err = -EINVAL;
++			goto err_free;
++		}
 +
-+		cycles += end - start;
++		state = &fallback->groups[i];
++		state->fallback = fallback;
++		state->group = groups[i];
++		state->group.name = kstrdup_const(groups[i].name, GFP_KERNEL);
++		if (!state->group.name) {
++			err = -ENOMEM;
++			goto err_free;
++		}
++
++		sysfs_attr_init(&state->dev_attr.attr);
++		state->dev_attr.attr.name = state->group.name;
++		state->dev_attr.attr.mode = 0644;
++		state->dev_attr.show = fallback_threshold_show;
++		state->dev_attr.store = fallback_threshold_store;
++		fallback->sysfs_attrs[i + 1] = &state->dev_attr.attr;
 +	}
 +
-+	*total_cycles = cycles;
++	sysfs_attr_init(&fallback->enabled_attr.attr);
++	fallback->enabled_attr.attr.name = "enabled";
++	fallback->enabled_attr.attr.mode = 0644;
++	fallback->enabled_attr.show = fallback_enabled_show;
++	fallback->enabled_attr.store = fallback_enabled_store;
++	fallback->sysfs_attrs[0] = &fallback->enabled_attr.attr;
++
++	fallback->sysfs_group.name = "cpu_fallback_thresholds";
++	fallback->sysfs_group.attrs = fallback->sysfs_attrs;
++	err = sysfs_create_group(&dev->kobj, &fallback->sysfs_group);
++	if (err)
++		goto err_free;
++
++	return fallback;
++
++err_free:
++	crypto_fallback_free(fallback);
++
++	return ERR_PTR(err);
++}
++
++static void fallback_release(struct crypto_fallback *fallback)
++{
++	if (!fallback || IS_ERR(fallback))
++		return;
++
++	sysfs_remove_group(&fallback->dev->kobj, &fallback->sysfs_group);
++	crypto_fallback_free(fallback);
++}
++
++static bool fallback_use_software(const struct fallback_threshold *threshold,
++				  unsigned int input_size)
++{
++	int value = READ_ONCE(threshold->value);
++
++	return value < 0 || (value > 0 && input_size <= value);
++}
++
++struct fallback_skcipher_ctx {
++	struct crypto_skcipher *hardware;
++	struct crypto_skcipher *software;
++};
++
++struct fallback_aead_ctx {
++	struct crypto_aead *hardware;
++	struct crypto_aead *software;
++};
++
++struct fallback_ahash_ctx {
++	struct crypto_ahash *hardware;
++	struct crypto_ahash *software;
++};
++
++struct fallback_ahash_reqctx {
++	bool use_software;
++	struct ahash_request subreq;
++};
++
++struct fallback_ahash_state {
++	bool use_software;
++	u8 state[] CRYPTO_MINALIGN_ATTR;
++};
++
++struct fallback_alg {
++	const struct fallback_threshold *threshold;
++	char driver_name[CRYPTO_MAX_ALG_NAME];
++	enum crypto_fallback_alg_type type;
++	union {
++		struct skcipher_alg skcipher;
++		struct aead_alg aead;
++		struct ahash_alg ahash;
++	} alg;
++};
++
++static struct fallback_alg *fallback_skcipher_alg(struct crypto_skcipher *tfm)
++{
++	return container_of(crypto_skcipher_alg(tfm), struct fallback_alg,
++			    alg.skcipher);
++}
++
++static struct fallback_alg *fallback_aead_alg(struct crypto_aead *tfm)
++{
++	return container_of(crypto_aead_alg(tfm), struct fallback_alg,
++			    alg.aead);
++}
++
++static struct fallback_alg *fallback_ahash_alg(struct crypto_ahash *tfm)
++{
++	return container_of(crypto_ahash_alg(tfm), struct fallback_alg,
++			    alg.ahash);
++}
++
++static int fallback_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
++				    unsigned int keylen)
++{
++	struct fallback_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
++	u32 flags = crypto_skcipher_get_flags(tfm) & CRYPTO_TFM_REQ_MASK;
++	int err;
++
++	crypto_skcipher_clear_flags(ctx->software, CRYPTO_TFM_REQ_MASK);
++	crypto_skcipher_set_flags(ctx->software, flags);
++	err = crypto_skcipher_setkey(ctx->software, key, keylen);
++	if (err)
++		return err;
++
++	crypto_skcipher_clear_flags(ctx->hardware, CRYPTO_TFM_REQ_MASK);
++	crypto_skcipher_set_flags(ctx->hardware, flags);
++
++	return crypto_skcipher_setkey(ctx->hardware, key, keylen);
++}
++
++static int fallback_skcipher_crypt(struct skcipher_request *req, bool encrypt)
++{
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct fallback_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
++	struct fallback_alg *alg = fallback_skcipher_alg(tfm);
++	struct crypto_skcipher *child = ctx->hardware;
++	struct skcipher_request *subreq = skcipher_request_ctx(req);
++
++	if (fallback_use_software(alg->threshold, req->cryptlen))
++		child = ctx->software;
++
++	skcipher_request_set_tfm(subreq, child);
++	skcipher_request_set_callback(subreq, req->base.flags,
++				      req->base.complete, req->base.data);
++	skcipher_request_set_crypt(subreq, req->src, req->dst, req->cryptlen,
++				   req->iv);
++
++	if (encrypt)
++		return crypto_skcipher_encrypt(subreq);
++
++	return crypto_skcipher_decrypt(subreq);
++}
++
++static int fallback_skcipher_encrypt(struct skcipher_request *req)
++{
++	return fallback_skcipher_crypt(req, true);
++}
++
++static int fallback_skcipher_decrypt(struct skcipher_request *req)
++{
++	return fallback_skcipher_crypt(req, false);
++}
++
++static int fallback_skcipher_init(struct crypto_skcipher *tfm)
++{
++	struct fallback_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
++	struct fallback_alg *alg = fallback_skcipher_alg(tfm);
++	struct crypto_skcipher *hardware;
++	struct crypto_skcipher *software;
++	const char *name;
++	u32 mask = CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK;
++
++	hardware = crypto_alloc_skcipher(alg->driver_name, 0, 0);
++	if (IS_ERR(hardware))
++		return PTR_ERR(hardware);
++
++	name = crypto_tfm_alg_name(crypto_skcipher_tfm(tfm));
++	software = crypto_alloc_skcipher(name, 0, mask);
++	if (IS_ERR(software)) {
++		crypto_free_skcipher(hardware);
++		return PTR_ERR(software);
++	}
++
++	ctx->hardware = hardware;
++	ctx->software = software;
++	crypto_skcipher_set_reqsize(tfm,
++				    sizeof(struct skcipher_request) +
++					    max(crypto_skcipher_reqsize(hardware),
++						crypto_skcipher_reqsize(software)));
 +
 +	return 0;
 +}
-+EXPORT_SYMBOL_GPL(crypto_benchmark_skcipher_cycles);
++
++static void fallback_skcipher_exit(struct crypto_skcipher *tfm)
++{
++	struct fallback_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
++
++	crypto_free_skcipher(ctx->software);
++	crypto_free_skcipher(ctx->hardware);
++}
++
++static int fallback_aead_setkey(struct crypto_aead *tfm, const u8 *key,
++				unsigned int keylen)
++{
++	struct fallback_aead_ctx *ctx = crypto_aead_ctx(tfm);
++	u32 flags = crypto_aead_get_flags(tfm) & CRYPTO_TFM_REQ_MASK;
++	int err;
++
++	crypto_aead_clear_flags(ctx->software, CRYPTO_TFM_REQ_MASK);
++	crypto_aead_set_flags(ctx->software, flags);
++	err = crypto_aead_setkey(ctx->software, key, keylen);
++	if (err)
++		return err;
++
++	crypto_aead_clear_flags(ctx->hardware, CRYPTO_TFM_REQ_MASK);
++	crypto_aead_set_flags(ctx->hardware, flags);
++
++	return crypto_aead_setkey(ctx->hardware, key, keylen);
++}
++
++static int fallback_aead_setauthsize(struct crypto_aead *tfm,
++				     unsigned int authsize)
++{
++	struct fallback_aead_ctx *ctx = crypto_aead_ctx(tfm);
++	int err;
++
++	err = crypto_aead_setauthsize(ctx->software, authsize);
++	if (err)
++		return err;
++
++	return crypto_aead_setauthsize(ctx->hardware, authsize);
++}
++
++static int fallback_aead_crypt(struct aead_request *req, bool encrypt)
++{
++	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
++	struct fallback_aead_ctx *ctx = crypto_aead_ctx(tfm);
++	struct fallback_alg *alg = fallback_aead_alg(tfm);
++	struct crypto_aead *child = ctx->hardware;
++	struct aead_request *subreq = aead_request_ctx(req);
++	unsigned int input_size = req->cryptlen;
++
++	if (!encrypt) {
++		unsigned int authsize = crypto_aead_authsize(tfm);
++
++		if (input_size < authsize)
++			return -EINVAL;
++		input_size -= authsize;
++	}
++
++	if (fallback_use_software(alg->threshold, input_size))
++		child = ctx->software;
++
++	aead_request_set_tfm(subreq, child);
++	aead_request_set_callback(subreq, req->base.flags, req->base.complete,
++				  req->base.data);
++	aead_request_set_crypt(subreq, req->src, req->dst, req->cryptlen,
++			       req->iv);
++	aead_request_set_ad(subreq, req->assoclen);
++
++	if (encrypt)
++		return crypto_aead_encrypt(subreq);
++
++	return crypto_aead_decrypt(subreq);
++}
++
++static int fallback_aead_encrypt(struct aead_request *req)
++{
++	return fallback_aead_crypt(req, true);
++}
++
++static int fallback_aead_decrypt(struct aead_request *req)
++{
++	return fallback_aead_crypt(req, false);
++}
++
++static int fallback_aead_init(struct crypto_aead *tfm)
++{
++	struct fallback_aead_ctx *ctx = crypto_aead_ctx(tfm);
++	struct fallback_alg *alg = fallback_aead_alg(tfm);
++	struct crypto_aead *hardware;
++	struct crypto_aead *software;
++
++	hardware = crypto_alloc_aead(alg->driver_name, 0, 0);
++	if (IS_ERR(hardware))
++		return PTR_ERR(hardware);
++
++	software =
++		crypto_alloc_aead(crypto_tfm_alg_name(crypto_aead_tfm(tfm)), 0,
++				  CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK);
++	if (IS_ERR(software)) {
++		crypto_free_aead(hardware);
++		return PTR_ERR(software);
++	}
++
++	ctx->hardware = hardware;
++	ctx->software = software;
++	crypto_aead_set_reqsize(tfm,
++				sizeof(struct aead_request) +
++					max(crypto_aead_reqsize(hardware),
++					    crypto_aead_reqsize(software)));
++
++	return 0;
++}
++
++static void fallback_aead_exit(struct crypto_aead *tfm)
++{
++	struct fallback_aead_ctx *ctx = crypto_aead_ctx(tfm);
++
++	crypto_free_aead(ctx->software);
++	crypto_free_aead(ctx->hardware);
++}
++
++static struct ahash_request *fallback_ahash_subreq(struct ahash_request *req,
++						   bool reset)
++{
++	struct fallback_ahash_reqctx *rctx = ahash_request_ctx(req);
++	struct fallback_ahash_ctx *ctx =
++		crypto_ahash_ctx(crypto_ahash_reqtfm(req));
++	struct crypto_ahash *child = rctx->use_software ? ctx->software :
++							  ctx->hardware;
++	struct ahash_request *subreq = &rctx->subreq;
++
++	if (reset)
++		memset(subreq, 0, sizeof(*subreq));
++	ahash_request_set_tfm(subreq, child);
++	ahash_request_set_callback(subreq, req->base.flags, req->base.complete,
++				   req->base.data);
++	if (ahash_request_isvirt(req))
++		ahash_request_set_virt(subreq, req->svirt, req->result,
++				       req->nbytes);
++	else
++		ahash_request_set_crypt(subreq, req->src, req->result,
++					req->nbytes);
++
++	return subreq;
++}
++
++static int fallback_ahash_setkey(struct crypto_ahash *tfm, const u8 *key,
++				 unsigned int keylen)
++{
++	struct fallback_ahash_ctx *ctx = crypto_ahash_ctx(tfm);
++	u32 flags = crypto_ahash_get_flags(tfm) & CRYPTO_TFM_REQ_MASK;
++	int err;
++
++	crypto_ahash_clear_flags(ctx->software, CRYPTO_TFM_REQ_MASK);
++	crypto_ahash_set_flags(ctx->software, flags);
++	err = crypto_ahash_setkey(ctx->software, key, keylen);
++	if (err)
++		return err;
++
++	crypto_ahash_clear_flags(ctx->hardware, CRYPTO_TFM_REQ_MASK);
++	crypto_ahash_set_flags(ctx->hardware, flags);
++
++	return crypto_ahash_setkey(ctx->hardware, key, keylen);
++}
++
++static int fallback_ahash_init_req(struct ahash_request *req)
++{
++	struct fallback_ahash_reqctx *rctx = ahash_request_ctx(req);
++	struct fallback_alg *alg = fallback_ahash_alg(crypto_ahash_reqtfm(req));
++
++	rctx->use_software = fallback_use_software(alg->threshold, UINT_MAX);
++
++	return crypto_ahash_init(fallback_ahash_subreq(req, true));
++}
++
++static int fallback_ahash_update(struct ahash_request *req)
++{
++	return crypto_ahash_update(fallback_ahash_subreq(req, false));
++}
++
++static int fallback_ahash_final(struct ahash_request *req)
++{
++	return crypto_ahash_final(fallback_ahash_subreq(req, false));
++}
++
++static int fallback_ahash_finup(struct ahash_request *req)
++{
++	return crypto_ahash_finup(fallback_ahash_subreq(req, false));
++}
++
++static int fallback_ahash_digest(struct ahash_request *req)
++{
++	struct fallback_ahash_reqctx *rctx = ahash_request_ctx(req);
++	struct fallback_alg *alg = fallback_ahash_alg(crypto_ahash_reqtfm(req));
++
++	rctx->use_software = fallback_use_software(alg->threshold, req->nbytes);
++
++	return crypto_ahash_digest(fallback_ahash_subreq(req, true));
++}
++
++static int fallback_ahash_export(struct ahash_request *req, void *out)
++{
++	struct fallback_ahash_reqctx *rctx = ahash_request_ctx(req);
++	struct fallback_ahash_state *state = out;
++
++	state->use_software = rctx->use_software;
++
++	return crypto_ahash_export(fallback_ahash_subreq(req, false),
++				   state->state);
++}
++
++static int fallback_ahash_import(struct ahash_request *req, const void *in)
++{
++	const struct fallback_ahash_state *state = in;
++	struct fallback_ahash_reqctx *rctx = ahash_request_ctx(req);
++
++	rctx->use_software = state->use_software;
++
++	return crypto_ahash_import(fallback_ahash_subreq(req, true),
++				   state->state);
++}
++
++static int fallback_ahash_init(struct crypto_ahash *tfm)
++{
++	struct fallback_ahash_ctx *ctx = crypto_ahash_ctx(tfm);
++	struct fallback_alg *alg = fallback_ahash_alg(tfm);
++	struct crypto_ahash *hardware;
++	struct crypto_ahash *software;
++
++	hardware = crypto_alloc_ahash(alg->driver_name, 0, 0);
++	if (IS_ERR(hardware))
++		return PTR_ERR(hardware);
++
++	software = crypto_alloc_ahash(crypto_ahash_alg_name(tfm),
++				      CRYPTO_ALG_REQ_VIRT,
++				      CRYPTO_ALG_ASYNC | CRYPTO_ALG_REQ_VIRT |
++					      CRYPTO_ALG_NEED_FALLBACK);
++	if (IS_ERR(software)) {
++		crypto_free_ahash(hardware);
++		return PTR_ERR(software);
++	}
++
++	ctx->hardware = hardware;
++	ctx->software = software;
++	crypto_ahash_set_reqsize(tfm,
++				 sizeof(struct fallback_ahash_reqctx) +
++					 max(crypto_ahash_reqsize(hardware),
++					     crypto_ahash_reqsize(software)));
++	crypto_ahash_set_statesize(tfm,
++				   offsetof(struct fallback_ahash_state, state) +
++					   max(crypto_ahash_statesize(hardware),
++					       crypto_ahash_statesize(software)));
++
++	return 0;
++}
++
++static void fallback_ahash_exit(struct crypto_ahash *tfm)
++{
++	struct fallback_ahash_ctx *ctx = crypto_ahash_ctx(tfm);
++
++	crypto_free_ahash(ctx->software);
++	crypto_free_ahash(ctx->hardware);
++}
++
++static int fallback_alg_name(struct crypto_alg *alg, const char *name,
++			     const char *driver_name)
++{
++	if (strscpy(alg->cra_name, name, CRYPTO_MAX_ALG_NAME) < 0)
++		return -ENAMETOOLONG;
++
++	if (snprintf(alg->cra_driver_name, CRYPTO_MAX_ALG_NAME, "fallback(%s)",
++		     driver_name) >= CRYPTO_MAX_ALG_NAME)
++		return -ENAMETOOLONG;
++
++	return 0;
++}
++
++static void fallback_init_base(struct crypto_alg *alg,
++			       const struct crypto_alg *hardware,
++			       const struct crypto_alg *software,
++			       struct module *owner)
++{
++	alg->cra_flags =
++		CRYPTO_ALG_ASYNC | CRYPTO_ALG_NO_FALLBACK |
++		((hardware->cra_flags | software->cra_flags) &
++		 (CRYPTO_ALG_ALLOCATES_MEMORY | CRYPTO_ALG_KERN_DRIVER_ONLY));
++	alg->cra_priority = hardware->cra_priority + 1;
++	alg->cra_blocksize = hardware->cra_blocksize;
++	alg->cra_alignmask =
++		max(hardware->cra_alignmask, software->cra_alignmask);
++	alg->cra_module = owner;
++}
++
++static int fallback_register_skcipher(struct fallback_alg *entry,
++				      struct module *owner)
++{
++	struct crypto_skcipher *hardware;
++	struct crypto_skcipher *software;
++	struct skcipher_alg *alg = &entry->alg.skcipher;
++	struct skcipher_alg_common *hcommon;
++	struct skcipher_alg_common *scommon;
++	int err;
++
++	hardware = crypto_alloc_skcipher(entry->driver_name, 0, 0);
++	if (IS_ERR(hardware))
++		return PTR_ERR(hardware);
++
++	hcommon = crypto_skcipher_alg_common(hardware);
++	software = crypto_alloc_skcipher(hcommon->base.cra_name, 0,
++					 CRYPTO_ALG_ASYNC |
++						 CRYPTO_ALG_NEED_FALLBACK);
++	if (IS_ERR(software)) {
++		err = PTR_ERR(software);
++		goto out_free_hardware;
++	}
++	scommon = crypto_skcipher_alg_common(software);
++
++	if (hcommon->base.cra_blocksize != scommon->base.cra_blocksize ||
++	    hcommon->ivsize != scommon->ivsize) {
++		err = -EINVAL;
++		goto out_free_software;
++	}
++
++	err = fallback_alg_name(&alg->base, hcommon->base.cra_name,
++				entry->driver_name);
++	if (err)
++		goto out_free_software;
++	fallback_init_base(&alg->base, &hcommon->base, &scommon->base, owner);
++	alg->min_keysize = max(hcommon->min_keysize, scommon->min_keysize);
++	alg->max_keysize = min(hcommon->max_keysize, scommon->max_keysize);
++	if (alg->min_keysize > alg->max_keysize) {
++		err = -EINVAL;
++		goto out_free_software;
++	}
++	alg->ivsize = hcommon->ivsize;
++	alg->chunksize = max(hcommon->chunksize, scommon->chunksize);
++	alg->walksize = alg->chunksize;
++	alg->base.cra_ctxsize = sizeof(struct fallback_skcipher_ctx);
++	alg->init = fallback_skcipher_init;
++	alg->exit = fallback_skcipher_exit;
++	alg->setkey = fallback_skcipher_setkey;
++	alg->encrypt = fallback_skcipher_encrypt;
++	alg->decrypt = fallback_skcipher_decrypt;
++
++	err = crypto_register_skcipher(alg);
++
++out_free_software:
++	crypto_free_skcipher(software);
++out_free_hardware:
++	crypto_free_skcipher(hardware);
++
++	return err;
++}
++
++static int fallback_register_aead(struct fallback_alg *entry,
++				  struct module *owner)
++{
++	struct crypto_aead *hardware;
++	struct crypto_aead *software;
++	struct aead_alg *alg = &entry->alg.aead;
++	struct aead_alg *halg;
++	struct aead_alg *salg;
++	int err;
++
++	hardware = crypto_alloc_aead(entry->driver_name, 0, 0);
++	if (IS_ERR(hardware))
++		return PTR_ERR(hardware);
++	halg = crypto_aead_alg(hardware);
++
++	software =
++		crypto_alloc_aead(halg->base.cra_name, 0,
++				  CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK);
++	if (IS_ERR(software)) {
++		err = PTR_ERR(software);
++		goto out_free_hardware;
++	}
++	salg = crypto_aead_alg(software);
++
++	if (halg->base.cra_blocksize != salg->base.cra_blocksize ||
++	    halg->ivsize != salg->ivsize) {
++		err = -EINVAL;
++		goto out_free_software;
++	}
++
++	err = fallback_alg_name(&alg->base, halg->base.cra_name,
++				entry->driver_name);
++	if (err)
++		goto out_free_software;
++	fallback_init_base(&alg->base, &halg->base, &salg->base, owner);
++	alg->ivsize = halg->ivsize;
++	alg->maxauthsize = min(halg->maxauthsize, salg->maxauthsize);
++	alg->chunksize = max(halg->chunksize, salg->chunksize);
++	alg->base.cra_ctxsize = sizeof(struct fallback_aead_ctx);
++	alg->init = fallback_aead_init;
++	alg->exit = fallback_aead_exit;
++	alg->setkey = fallback_aead_setkey;
++	alg->setauthsize = fallback_aead_setauthsize;
++	alg->encrypt = fallback_aead_encrypt;
++	alg->decrypt = fallback_aead_decrypt;
++
++	err = crypto_register_aead(alg);
++
++out_free_software:
++	crypto_free_aead(software);
++out_free_hardware:
++	crypto_free_aead(hardware);
++
++	return err;
++}
++
++static int fallback_register_ahash(struct fallback_alg *entry,
++				   struct module *owner)
++{
++	struct crypto_ahash *hardware;
++	struct crypto_ahash *software;
++	struct ahash_alg *alg = &entry->alg.ahash;
++	struct hash_alg_common *hcommon;
++	struct hash_alg_common *scommon;
++	int err;
++
++	hardware = crypto_alloc_ahash(entry->driver_name, 0, 0);
++	if (IS_ERR(hardware))
++		return PTR_ERR(hardware);
++	hcommon = crypto_hash_alg_common(hardware);
++
++	software = crypto_alloc_ahash(hcommon->base.cra_name,
++				      CRYPTO_ALG_REQ_VIRT,
++				      CRYPTO_ALG_ASYNC | CRYPTO_ALG_REQ_VIRT |
++					      CRYPTO_ALG_NEED_FALLBACK);
++	if (IS_ERR(software)) {
++		err = PTR_ERR(software);
++		goto out_free_hardware;
++	}
++	scommon = crypto_hash_alg_common(software);
++
++	if (hcommon->base.cra_blocksize != scommon->base.cra_blocksize ||
++	    hcommon->digestsize != scommon->digestsize) {
++		err = -EINVAL;
++		goto out_free_software;
++	}
++
++	err = fallback_alg_name(&alg->halg.base, hcommon->base.cra_name,
++				entry->driver_name);
++	if (err)
++		goto out_free_software;
++	fallback_init_base(&alg->halg.base, &hcommon->base, &scommon->base,
++			   owner);
++	alg->halg.base.cra_flags |= CRYPTO_ALG_REQ_VIRT;
++	alg->halg.base.cra_flags |= hcommon->base.cra_flags &
++				    CRYPTO_ALG_OPTIONAL_KEY;
++	alg->halg.digestsize = hcommon->digestsize;
++	alg->halg.statesize = offsetof(struct fallback_ahash_state, state) +
++			      max(crypto_ahash_statesize(hardware),
++				  crypto_ahash_statesize(software));
++	alg->halg.base.cra_ctxsize = sizeof(struct fallback_ahash_ctx);
++	alg->init_tfm = fallback_ahash_init;
++	alg->exit_tfm = fallback_ahash_exit;
++	alg->init = fallback_ahash_init_req;
++	alg->update = fallback_ahash_update;
++	alg->final = fallback_ahash_final;
++	alg->finup = fallback_ahash_finup;
++	alg->digest = fallback_ahash_digest;
++	alg->export = fallback_ahash_export;
++	alg->import = fallback_ahash_import;
++	if (crypto_hash_alg_has_setkey(hcommon))
++		alg->setkey = fallback_ahash_setkey;
++
++	err = crypto_register_ahash(alg);
++
++out_free_software:
++	crypto_free_ahash(software);
++out_free_hardware:
++	crypto_free_ahash(hardware);
++
++	return err;
++}
++
++static int fallback_register_alg(struct fallback_alg *alg, struct module *owner)
++{
++	switch (alg->type) {
++	case CRYPTO_FALLBACK_SKCIPHER:
++		return fallback_register_skcipher(alg, owner);
++	case CRYPTO_FALLBACK_AHASH:
++		return fallback_register_ahash(alg, owner);
++	case CRYPTO_FALLBACK_AEAD:
++		return fallback_register_aead(alg, owner);
++	}
++
++	return -EINVAL;
++}
++
++static void fallback_unregister_alg(struct fallback_alg *alg)
++{
++	switch (alg->type) {
++	case CRYPTO_FALLBACK_SKCIPHER:
++		crypto_unregister_skcipher(&alg->alg.skcipher);
++		break;
++	case CRYPTO_FALLBACK_AHASH:
++		crypto_unregister_ahash(&alg->alg.ahash);
++		break;
++	case CRYPTO_FALLBACK_AEAD:
++		crypto_unregister_aead(&alg->alg.aead);
++		break;
++	}
++}
++
++struct crypto_fallback *
++crypto_fallback_register(struct module *owner, struct device *dev,
++			 const struct crypto_fallback_group *groups,
++			 unsigned int num_groups)
++{
++	struct crypto_fallback *fallback;
++	unsigned int num_algs = 0;
++	unsigned int i, j;
++	int err;
++
++	if (!dev || !groups || !num_groups)
++		return ERR_PTR(-EINVAL);
++
++	for (i = 0; i < num_groups; i++) {
++		if (!groups[i].algs || !groups[i].num_algs)
++			return ERR_PTR(-EINVAL);
++		if (groups[i].num_algs > UINT_MAX - num_algs)
++			return ERR_PTR(-EOVERFLOW);
++		num_algs += groups[i].num_algs;
++	}
++
++	fallback = fallback_alloc(dev, groups, num_groups);
++	if (IS_ERR(fallback))
++		return fallback;
++
++	fallback->algs = kcalloc(num_algs, sizeof(*fallback->algs), GFP_KERNEL);
++	if (!fallback->algs) {
++		err = -ENOMEM;
++		goto err_release;
++	}
++	for (i = 0; i < num_groups; i++) {
++		const struct fallback_threshold *threshold;
++
++		threshold = &fallback->groups[i].threshold;
++		for (j = 0; j < groups[i].num_algs; j++) {
++			const char *driver_name = groups[i].algs[j];
++			struct fallback_alg *alg =
++				&fallback->algs[fallback->num_algs];
++
++			if (!driver_name) {
++				err = -EINVAL;
++				goto err_unregister_algs;
++			}
++
++			alg->type = groups[i].benchmark.type;
++			alg->threshold = threshold;
++			if (strscpy(alg->driver_name, driver_name,
++				    sizeof(alg->driver_name)) < 0) {
++				err = -ENAMETOOLONG;
++				goto err_unregister_algs;
++			}
++
++			err = fallback_register_alg(alg, owner);
++			if (err == -ENOENT)
++				continue;
++			if (err)
++				goto err_unregister_algs;
++			fallback->num_algs++;
++		}
++	}
++
++	return fallback;
++
++err_unregister_algs:
++	while (fallback->num_algs)
++		fallback_unregister_alg(&fallback->algs[--fallback->num_algs]);
++err_release:
++	fallback_release(fallback);
++
++	return ERR_PTR(err);
++}
++EXPORT_SYMBOL_GPL(crypto_fallback_register);
++
++void crypto_fallback_unregister(struct crypto_fallback *fallback)
++{
++	if (!fallback || IS_ERR(fallback))
++		return;
++
++	while (fallback->num_algs)
++		fallback_unregister_alg(&fallback->algs[--fallback->num_algs]);
++	fallback_release(fallback);
++}
++EXPORT_SYMBOL_GPL(crypto_fallback_unregister);
 +
 +MODULE_AUTHOR("Jihong Min <hurryman2212@gmail.com>");
-+MODULE_DESCRIPTION("Crypto API benchmark helpers");
++MODULE_DESCRIPTION("Crypto API dynamic fallback support");
 +MODULE_LICENSE("GPL");
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 61a2501bfe9b..81c77f3d7a17 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -20,6 +20,7 @@
- #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
- 
- #include <crypto/aead.h>
-+#include <crypto/benchmark.h>
- #include <crypto/hash.h>
- #include <crypto/skcipher.h>
- #include <linux/err.h>
-@@ -473,48 +474,6 @@ static int test_aead_jiffies(struct aead_request *req, int enc,
- 	return 0;
- }
- 
--static int test_aead_cycles(struct aead_request *req, int enc, int blen)
--{
--	unsigned long cycles = 0;
--	int ret = 0;
--	int i;
--
--	/* Warm-up run. */
--	for (i = 0; i < 4; i++) {
--		if (enc)
--			ret = do_one_aead_op(req, crypto_aead_encrypt(req));
--		else
--			ret = do_one_aead_op(req, crypto_aead_decrypt(req));
--
--		if (ret)
--			goto out;
--	}
--
--	/* The real thing. */
--	for (i = 0; i < 8; i++) {
--		cycles_t start, end;
--
--		start = get_cycles();
--		if (enc)
--			ret = do_one_aead_op(req, crypto_aead_encrypt(req));
--		else
--			ret = do_one_aead_op(req, crypto_aead_decrypt(req));
--		end = get_cycles();
--
--		if (ret)
--			goto out;
--
--		cycles += end - start;
--	}
--
--out:
--	if (ret == 0)
--		pr_cont("1 operation in %lu cycles (%d bytes)\n",
--			(cycles + 4) / 8, blen);
--
--	return ret;
--}
--
- static void test_aead_speed(const char *algo, int enc, unsigned int secs,
- 			    struct aead_speed_template *template,
- 			    unsigned int tcount, u8 authsize,
-@@ -669,7 +628,13 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
- 							secs);
- 				cond_resched();
- 			} else {
--				ret = test_aead_cycles(req, enc, bs);
-+				u64 cycles;
-+
-+				ret = crypto_benchmark_aead_cycles(req, enc, 4,
-+								   8, &cycles);
-+				if (!ret)
-+					pr_cont("1 operation in %llu cycles (%d bytes)\n",
-+						(cycles + 4) / 8, bs);
- 			}
- 
- 			if (ret) {
-@@ -768,101 +733,6 @@ static int test_ahash_jiffies(struct ahash_request *req, int blen,
- 	return 0;
- }
- 
--static int test_ahash_cycles_digest(struct ahash_request *req, int blen,
--				    char *out)
--{
--	unsigned long cycles = 0;
--	int ret, i;
--
--	/* Warm-up run. */
--	for (i = 0; i < 4; i++) {
--		ret = do_one_ahash_op(req, crypto_ahash_digest(req));
--		if (ret)
--			goto out;
--	}
--
--	/* The real thing. */
--	for (i = 0; i < 8; i++) {
--		cycles_t start, end;
--
--		start = get_cycles();
--
--		ret = do_one_ahash_op(req, crypto_ahash_digest(req));
--		if (ret)
--			goto out;
--
--		end = get_cycles();
--
--		cycles += end - start;
--	}
--
--out:
--	if (ret)
--		return ret;
--
--	pr_cont("%6lu cycles/operation, %4lu cycles/byte\n",
--		cycles / 8, cycles / (8 * blen));
--
--	return 0;
--}
--
--static int test_ahash_cycles(struct ahash_request *req, int blen,
--			     int plen, char *out)
--{
--	unsigned long cycles = 0;
--	int i, pcount, ret;
--
--	if (plen == blen)
--		return test_ahash_cycles_digest(req, blen, out);
--
--	/* Warm-up run. */
--	for (i = 0; i < 4; i++) {
--		ret = do_one_ahash_op(req, crypto_ahash_init(req));
--		if (ret)
--			goto out;
--		for (pcount = 0; pcount < blen; pcount += plen) {
--			ret = do_one_ahash_op(req, crypto_ahash_update(req));
--			if (ret)
--				goto out;
--		}
--		ret = do_one_ahash_op(req, crypto_ahash_final(req));
--		if (ret)
--			goto out;
--	}
--
--	/* The real thing. */
--	for (i = 0; i < 8; i++) {
--		cycles_t start, end;
--
--		start = get_cycles();
--
--		ret = do_one_ahash_op(req, crypto_ahash_init(req));
--		if (ret)
--			goto out;
--		for (pcount = 0; pcount < blen; pcount += plen) {
--			ret = do_one_ahash_op(req, crypto_ahash_update(req));
--			if (ret)
--				goto out;
--		}
--		ret = do_one_ahash_op(req, crypto_ahash_final(req));
--		if (ret)
--			goto out;
--
--		end = get_cycles();
--
--		cycles += end - start;
--	}
--
--out:
--	if (ret)
--		return ret;
--
--	pr_cont("%6lu cycles/operation, %4lu cycles/byte\n",
--		cycles / 8, cycles / (8 * blen));
--
--	return 0;
--}
--
- static void test_ahash_speed_common(const char *algo, unsigned int secs,
- 				    struct hash_speed *speed, unsigned mask)
- {
-@@ -931,8 +801,15 @@ static void test_ahash_speed_common(const char *algo, unsigned int secs,
- 						 speed[i].plen, output, secs);
- 			cond_resched();
- 		} else {
--			ret = test_ahash_cycles(req, speed[i].blen,
--						speed[i].plen, output);
-+			u64 cycles;
-+
-+			ret = crypto_benchmark_ahash_cycles(req, speed[i].blen,
-+							    speed[i].plen, 4, 8,
-+							    &cycles);
-+			if (!ret)
-+				pr_cont("%6llu cycles/operation, %4llu cycles/byte\n",
-+					cycles / 8,
-+					cycles / (8 * speed[i].blen));
- 		}
- 
- 		if (ret) {
-@@ -1249,53 +1126,6 @@ static int test_acipher_jiffies(struct skcipher_request *req, int enc,
- 	return 0;
- }
- 
--static int test_acipher_cycles(struct skcipher_request *req, int enc,
--			       int blen)
--{
--	unsigned long cycles = 0;
--	int ret = 0;
--	int i;
--
--	/* Warm-up run. */
--	for (i = 0; i < 4; i++) {
--		if (enc)
--			ret = do_one_acipher_op(req,
--						crypto_skcipher_encrypt(req));
--		else
--			ret = do_one_acipher_op(req,
--						crypto_skcipher_decrypt(req));
--
--		if (ret)
--			goto out;
--	}
--
--	/* The real thing. */
--	for (i = 0; i < 8; i++) {
--		cycles_t start, end;
--
--		start = get_cycles();
--		if (enc)
--			ret = do_one_acipher_op(req,
--						crypto_skcipher_encrypt(req));
--		else
--			ret = do_one_acipher_op(req,
--						crypto_skcipher_decrypt(req));
--		end = get_cycles();
--
--		if (ret)
--			goto out;
--
--		cycles += end - start;
--	}
--
--out:
--	if (ret == 0)
--		pr_cont("1 operation in %lu cycles (%d bytes)\n",
--			(cycles + 4) / 8, blen);
--
--	return ret;
--}
--
- static void test_skcipher_speed(const char *algo, int enc, unsigned int secs,
- 				struct cipher_speed_template *template,
- 				unsigned int tcount, u8 *keysize, bool async)
-@@ -1405,8 +1235,13 @@ static void test_skcipher_speed(const char *algo, int enc, unsigned int secs,
- 							   bs, secs);
- 				cond_resched();
- 			} else {
--				ret = test_acipher_cycles(req, enc,
--							  bs);
-+				u64 cycles;
-+
-+				ret = crypto_benchmark_skcipher_cycles(req, enc, 4,
-+								       8, &cycles);
-+				if (!ret)
-+					pr_cont("1 operation in %llu cycles (%d bytes)\n",
-+						(cycles + 4) / 8, bs);
- 			}
- 
- 			if (ret) {
-diff --git a/include/crypto/benchmark.h b/include/crypto/benchmark.h
+diff --git a/include/crypto/fallback.h b/include/crypto/fallback.h
 new file mode 100644
-index 000000000000..09dc0fb38483
+index 000000000000..6b6f35bb20e4
 --- /dev/null
-+++ b/include/crypto/benchmark.h
-@@ -0,0 +1,24 @@
++++ b/include/crypto/fallback.h
+@@ -0,0 +1,96 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _CRYPTO_BENCHMARK_H
-+#define _CRYPTO_BENCHMARK_H
++#ifndef _CRYPTO_FALLBACK_H
++#define _CRYPTO_FALLBACK_H
 +
++#include <linux/stddef.h>
 +#include <linux/types.h>
 +
-+struct aead_request;
-+struct ahash_request;
-+struct skcipher_request;
++struct crypto_fallback;
++struct device;
++struct module;
 +
-+/* Requests must use crypto_req_done() with struct crypto_wait callback data. */
-+int crypto_benchmark_aead_cycles(struct aead_request *req, bool encrypt,
-+				 unsigned int warmup_runs, unsigned int runs,
-+				 u64 *total_cycles);
-+int crypto_benchmark_ahash_cycles(struct ahash_request *req,
-+				  unsigned int block_size,
-+				  unsigned int update_size,
-+				  unsigned int warmup_runs, unsigned int runs,
-+				  u64 *total_cycles);
-+int crypto_benchmark_skcipher_cycles(struct skcipher_request *req, bool encrypt,
-+				     unsigned int warmup_runs,
-+				     unsigned int runs, u64 *total_cycles);
++/**
++ * enum crypto_fallback_alg_type - algorithm API used for benchmarking
++ * @CRYPTO_FALLBACK_SKCIPHER: symmetric key cipher
++ * @CRYPTO_FALLBACK_AHASH: asynchronous hash
++ * @CRYPTO_FALLBACK_AEAD: authenticated encryption
++ */
++enum crypto_fallback_alg_type {
++	CRYPTO_FALLBACK_SKCIPHER,
++	CRYPTO_FALLBACK_AHASH,
++	CRYPTO_FALLBACK_AEAD,
++};
 +
-+#endif /* _CRYPTO_BENCHMARK_H */
++/**
++ * struct crypto_fallback_benchmark - benchmark algorithm description
++ * @type: algorithm API
++ * @name: generic algorithm name used to allocate software
++ * @driver_name: hardware implementation driver name
++ * @key: cipher or hash key
++ * @keylen: length of @key
++ * @authkey: authentication key for an authenc AEAD, or NULL
++ * @authkeylen: length of @authkey
++ * @authsize: AEAD authentication tag size
++ */
++struct crypto_fallback_benchmark {
++	enum crypto_fallback_alg_type type;
++	const char *name;
++	const char *driver_name;
++	const u8 *key;
++	unsigned int keylen;
++	const u8 *authkey;
++	unsigned int authkeylen;
++	unsigned int authsize;
++};
++
++/**
++ * struct crypto_fallback_group - algorithms sharing one fallback threshold
++ * @name: unique sysfs name for the group
++ * @benchmark: representative algorithm used to find the threshold
++ * @algs: hardware algorithms using the threshold
++ * @num_algs: number of algorithms in @algs
++ */
++struct crypto_fallback_group {
++	const char *name;
++	struct crypto_fallback_benchmark benchmark;
++	const char *const *algs;
++	unsigned int num_algs;
++};
++
++#define __CRYPTO_FALLBACK_GROUP(_name, _type, _alg_name, _driver, _key,  \
++				_authkey, _authkeylen, _authsize, _algs, \
++				_num_algs)                               \
++	{                                                                    \
++		.name = (_name),                                              \
++		.benchmark = {                                                \
++			.type = (_type),                                      \
++			.name = (_alg_name),                                  \
++			.driver_name = (_driver),                             \
++			.key = (_key),                                        \
++			.keylen = sizeof(_key),                               \
++			.authkey = (_authkey),                                \
++			.authkeylen = (_authkeylen),                          \
++			.authsize = (_authsize),                              \
++		},                                                              \
++		.algs = (_algs),                                                \
++		.num_algs = (_num_algs),                                        \
++	}
++
++#define CRYPTO_FALLBACK_GROUP(_name, _type, _alg_name, _driver, _key, _algs,  \
++			      _num_algs)                                      \
++	__CRYPTO_FALLBACK_GROUP(_name, _type, _alg_name, _driver, _key, NULL, \
++				0, 0, _algs, _num_algs)
++
++#define CRYPTO_FALLBACK_GROUP_AUTHENC(_name, _alg_name, _driver, _key,       \
++				      _authkey, _authsize, _algs, _num_algs) \
++	__CRYPTO_FALLBACK_GROUP(_name, CRYPTO_FALLBACK_AEAD, _alg_name,      \
++				_driver, _key, _authkey, sizeof(_authkey),   \
++				_authsize, _algs, _num_algs)
++
++struct crypto_fallback *
++crypto_fallback_register(struct module *owner, struct device *dev,
++			 const struct crypto_fallback_group *groups,
++			 unsigned int num_groups);
++void crypto_fallback_unregister(struct crypto_fallback *fallback);
++
++#endif /* _CRYPTO_FALLBACK_H */
 -- 
 2.53.0
