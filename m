@@ -1,97 +1,121 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9A942466D;
-	Tue, 28 Jul 2026 22:35:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD07231E831
+	for <linux-crypto@vger.kernel.org>; Tue, 28 Jul 2026 22:42:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785278127; cv=none; b=XAdYt47Ow6prDZstfoCJT7QUG7ZOaW45FrejgfDDQSD5lTBD5vD0bW6fAqauhsmpAxaFvo0BPxdKVuiCNdMuOHFlhnfjGSFJ3nUqeFY6UVvOOXRJnWN3sKdsdazAwm7rWx6Yc/VV6QZOkACDEu6H1xvwai45DUszUR9/4UnXTRw=
+	t=1785278548; cv=none; b=m67oQeX8+bnhJ0v8Tx20/TSOgeJizugpBmJm/9BdQn8nHbXvReMZWHhpw2vYn7DpIjhhjdx4mgUds6SQ4VrDdZA5gJub8ftrWEUkvMDjnbbQQrvP0rtgxm/8aL78YSO6nD9+45TlOypjS7enNxaYVIv1CQhUq1lC0K1RgNdhjoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785278127; c=relaxed/simple;
-	bh=bmuNQQmlrOGn31gH/n1Z1fIlUGYITNk7g1MEGeRcVZc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=NtlpDzYWj69CwNeJR1nJxK+s09vBve7HVB7mQz3r5twPg5ECTo107Lcrg9HxtyyVvsv85xtvGJEVyhLwOIoxgErldQ1X7sRer+U8I/pW0MTjZ+tGU1Lr53nw66qlOBV1nyZqMmI7HZlU4ojNf6ezeiLUS5jFOZxgCORhQCPPHoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Whqt1K+/; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785278548; c=relaxed/simple;
+	bh=AIaB5I76MWLkDaE51/hOPv4UytZ0f8Ty3GAVN9lTEBI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SWYn2Fj2FErjnR3lPrUXDbCoCTKTOs2weVgoIA48iZh+bZlEs+OB5QPVF7mkOaBsQkvy94zc5hRkd5Y+y4vSIvf5FJ9/jeOMJSn/yspK0/0uBBs8djCqn66MiHcaL/jPlQbbLwUkOB0t21Jbnmjqgu8F/+ZM5GwZSgh7xBYHm3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cwQ30XWI; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Whqt1K+/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A9451F00A3A;
-	Tue, 28 Jul 2026 22:35:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785278125;
-	bh=2dECJoqDvj4NsK+08JPKeYoArhUSVLNfBOHa/8BAcXA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=Whqt1K+/CUV9Mh3XC8eca+9SCZtLe5sElQd/5GbDmVQ2zsVeg0iTsWidtKNnQqTm9
-	 46+mFHOEJz9FrrejwzX9WRD8JHEpHjyihMxqomzDT9E5h5NO0TyfFTP2P7fAJyrjYr
-	 QuZRtXFwYggWUie3bmocmDlk5UFcWRMM5uGu1OFWTgHLutyctbDC3Nh5Rhc544TAwo
-	 CGtTryd+B+4TJpt+S0haGPy0MKEmm6t0yCKkcBylRKdZ1jsIx09eR9iBtMp81FOxIe
-	 ytuTvAdtUFW3VxHThpyr2OrdS9TddcxTIq0LTLmZ6YW7Sa0Fj85Fknu40rnKYipvBB
-	 UJB3luW1/DNrQ==
-From: Thomas Gleixner <tglx@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>, x86@kernel.org
-Cc: linux-um@lists.infradead.org, linux-raid@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, Christoph
- Hellwig <hch@lst.de>, Andrew Morton <akpm@linux-foundation.org>, Eric
- Biggers <ebiggers@kernel.org>
-Subject: Re: [PATCH v2 1/8] x86/fpu: Check for missing AVX and AVX-512
- xstate bits
-In-Reply-To: <20260728021603.79870-2-ebiggers@kernel.org>
-References: <20260728021603.79870-1-ebiggers@kernel.org>
- <20260728021603.79870-2-ebiggers@kernel.org>
-Date: Wed, 29 Jul 2026 00:35:22 +0200
-Message-ID: <87fr12hhed.ffs@fw13>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cwQ30XWI"
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2caed617615so4743075ad.3
+        for <linux-crypto@vger.kernel.org>; Tue, 28 Jul 2026 15:42:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785278546; x=1785883346; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=DzP3draKYRTj1F850nyh0ki//dsuTjC4ly33CxuMaFs=;
+        b=cwQ30XWIPb73p/eTv5TFVMimo8pL8bke4tGDaOJCOsK2m+V4B/IzJQZLgqZWGz/tsO
+         jqcaleBTOGf/FAm6+CB3GX8jbg4/lYFlLMtemw2IGXfUAL3hjjBiCXIATMfLPF5x2Ghf
+         6xtahu0hRabsPGZFiDtjQUcz7qeqn6uXi2E35kWvWyWZl6X7Midd2f2dTj0D3w6PkoZj
+         BGG1O9sZ2t4IcXy8PlePyOFTmOJqMzp6brFaPZMkai8n7xMRxa3YtwXECbztwUj78pK8
+         1iwabrNj0zlXbC0HevTE8vxRh/32eWfhD9Vq7wqAUUjrdKUYHtoJD+rtpvQ/Le7keuLx
+         U35w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785278546; x=1785883346;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=DzP3draKYRTj1F850nyh0ki//dsuTjC4ly33CxuMaFs=;
+        b=e132EnHkz9edqMncmUm4PPriNvH+ZaGrUxMKSHDr8kNMwUg3K76pkmJqv/Haqcnsi3
+         xCtTpL0zffSSSzyCRfzuBuX99I2s/Df0HaPOQEIzjDe2VMX006tOj/63hjDrJCPGRr6x
+         V5JYZTSrq966QzpmV5uw8eThAz+S7SAjwwTjeTm/S30EJUrUTLyj7hNaRo7uEjyJT5EV
+         w+bNJdCltOSmj1xwzO/mfTzQHeMvrw3neGjZSGzwMLbxQI14U2pBC1CGr0vqKP+Mqmf2
+         WAIBrkuEcfOJWusfAHrvWtytCMtfxMxt6j0ysovTCNDxfK97aRlMts/mEb7hRrwrUIrg
+         LS3Q==
+X-Gm-Message-State: AOJu0Ywgrli0xcv0tl7xmYiUyo9Q8nka0k3eRl1t1x+5wP5Eg/z7sCdd
+	sE7MUfK0Wk5jUBW+TtEoB8U+hx284zZr7rPqpQOc/IynF3rPXKztN/z54uihd2SF
+X-Gm-Gg: AR+sD11VOG0zSPBdRuzGU7cgKO+iRM8NFWuVMCd7wtowTeL04fPqs7JD+q+iqhaEvgM
+	UjFKfzyWjNpsvM8HlMeGkwhsi8+6xzS8NClbB0IEkVeJeLYh6DLJC8kQii78oGfPHbRDZBG37p+
+	nlP7rPm0tHw5xYXIDenQSknPLtHZC1btxmS7I7/Am5as6VHqcdfJl+JkXWPHg9cQnQYLLwLMU7l
+	aIKq8MtrrAHGgk2Pw9UTsV4RNgnTOh+lGEyhxOTgBUvqwErDYF2nHr+KsjKBBfQh2C+/LGoAIpR
+	JeQwPqbcHOUKvx4OcVU1ugr8+SWevKYt6Rff6M5lQokA7y0DUvozFy31kMcQ8TwZqQorQLZk56y
+	HUfhJ08DKQ42h3ApOy3bzAW03eAlrZlg3biQwXyNpiGC1mkw+vfsObHI7e6Q2v0kIGTiwO0Es4F
+	ydQsBZO8C3lO21GaGhNfMt3svMM8P8KH6kOsUGWO8gQh61GvGI/4+qY9t/3SFpFmJIhjxWQYgW2
+	zzujqUwPIe0/6LUy0Um92LgTqk2oCau/V49tyirKOAU45EndYf2mKqw3pb3beaIwobmuhR9l4uF
+	5TZODU9/E4m2sugGc32UKlXa5VLNZ1wm0UQuNg==
+X-Received: by 2002:a17:903:1b24:b0:2c9:d8c6:1dc3 with SMTP id d9443c01a7336-2d01598435emr49118595ad.0.1785278546164;
+        Tue, 28 Jul 2026 15:42:26 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8000:7a86::e35])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2d022bfa240sm2317495ad.65.2026.07.28.15.42.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Jul 2026 15:42:25 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: linux-crypto@vger.kernel.org
+Cc: Srujana Challa <schalla@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH] crypto: cesa: clear cesa_dev on _remove
+Date: Tue, 28 Jul 2026 15:42:23 -0700
+Message-ID: <20260728224223.82278-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jul 27 2026 at 19:15, Eric Biggers wrote:
-> If the CPU declares AVX or AVX-512 support, verify that the
-> corresponding xstate bits are also set.  If not, warn and clear them.
+This is already done on probe failure.
 
-That's clearly a firmware bug which has to be treated as all other
-inconsistencies of that sort.
+cesa_dev should be set to NULL as the driver checks that it is not and
+errors saying that only one device is authorized.
 
-> This eliminates the perceived need for AVX and AVX-512 optimized code in
-> the kernel to call cpu_has_xfeatures().  That has never been universally
-> done, which strongly suggests that it has never really been needed in
-> practice, but this should remove any remaining doubt.
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ drivers/crypto/marvell/cesa/cesa.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-Indeed it is inconsistent all over the place. While looking at the
-follow up patches I wondered how many of these remaining nested
-conditions are redundant. Most of them should be covered by the
-dependency checks. If they are not, then we should add them.
+diff --git a/drivers/crypto/marvell/cesa/cesa.c b/drivers/crypto/marvell/cesa/cesa.c
+index 75d8ba23d9a2..f0da4676b15f 100644
+--- a/drivers/crypto/marvell/cesa/cesa.c
++++ b/drivers/crypto/marvell/cesa/cesa.c
+@@ -527,13 +527,11 @@ static int mv_cesa_probe(struct platform_device *pdev)
+ 		INIT_LIST_HEAD(&engine->complete_queue);
+ 	}
+ 
+-	cesa_dev = cesa;
+-
+ 	ret = mv_cesa_add_algs(cesa);
+-	if (ret) {
+-		cesa_dev = NULL;
++	if (ret)
+ 		goto err_cleanup;
+-	}
++
++	cesa_dev = cesa;
+ 
+ 	dev_info(dev, "CESA device successfully registered\n");
+ 
+@@ -551,6 +549,8 @@ static void mv_cesa_remove(struct platform_device *pdev)
+ 	struct mv_cesa_dev *cesa = platform_get_drvdata(pdev);
+ 	int i;
+ 
++	cesa_dev = NULL;
++
+ 	mv_cesa_remove_algs(cesa);
+ 
+ 	for (i = 0; i < cesa->caps->nengines; i++)
+-- 
+2.55.0
 
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
->  arch/x86/kernel/fpu/xstate.c | 21 +++++++++++++++++++++
->  1 file changed, 21 insertions(+)
->
-> diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
-> index a7b6524a9dea2..904ff933c0d88 100644
-> --- a/arch/x86/kernel/fpu/xstate.c
-> +++ b/arch/x86/kernel/fpu/xstate.c
-> @@ -799,6 +799,23 @@ static u64 __init guest_default_mask(void)
->  	return ~(u64)XFEATURE_MASK_USER_DYNAMIC;
->  }
->  
-> +/* Clear any X86_FEATURE_* used by the kernel whose xfeatures are missing. */
-> +static void __init clear_cpu_caps_with_missing_xfeatures(u64 xfeatures)
-> +{
-> +	u64 mask;
-> +
-> +	mask = XFEATURE_MASK_FPSSE | XFEATURE_MASK_YMM;
-> +	if (boot_cpu_has(X86_FEATURE_AVX) && (xfeatures & mask) != mask) {
-> +		pr_err("x86/fpu: Disabling AVX support due to missing xstate features\n");
-
-Please make these
-
-       pr_err(FW_BUG "...")
-
-As that's what it is.
-
-Thanks,
-
-        tglx
