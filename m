@@ -1,47 +1,83 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from out162-62-57-87.mail.qq.com (out162-62-57-87.mail.qq.com [162.62.57.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE73313552;
-	Tue, 28 Jul 2026 02:19:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 877982BEC43;
+	Tue, 28 Jul 2026 03:05:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785205161; cv=none; b=NGxSntW82DHdnSoB9HokNXPY7KNxuITeUDSQi1RRBGj3wTbBOhXrp66pUDs208FJ1sfgaM2o+qBQB1ZD1yRjXxRnM/VFGC08/fYwAtNrDUiac73Jtp2QgkyR0/ncuV9I+PBQRl7ksCok62j8kgmul6pSRmfueYSv0jMapiAWTmc=
+	t=1785207939; cv=none; b=uW2qGyyimOXnvT0LA+ayekEHBGbPYyfZ112qTMUd1uPxKQF5AOgWWwUrY27dNXDrEQ7hapBiG155SbN3FzRG0gomrluio4JkaQPLFLoq4vUUJEWhK0TQnarNfygqPjWvHNtgtKGEUrmNoDHw1Ww3EwgxIH4F5skhWsbzr3p4gdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785205161; c=relaxed/simple;
-	bh=ah/AW+3j5Xn2nRIUc83CVX9eA0m6pMsMuWvnLHT3qfU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dUx0pq9AHouD2XglmgAnWJBfUdUIWHmH2+bO15MTZC8TkCV3TgwfL/uGfTfkLYx4k68aURspz1uaZd7ZgpHaMHYT1Vg202Hw6ergJvdNPfgE7uJe7Gz6vNwPj+u9H/HivzB4G/FQPfZG5b8+ZTbCLry7Ohk8RyzRLVA/Us2ioDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RHpaeRM2; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785207939; c=relaxed/simple;
+	bh=O4bUHubmAwEd5MDNybLhtW6/9jOeTADPKepVDnG6a5A=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=qj0ejqMbn0uEe1N3CVwPjryXNHJWHnXRUy0b8izCeqriQ1pZ8gFjtMRsupdueyjaFrONZtDCAkUilAuEsOXHgwBEQZSSLGfU7zJUvmfHq8J7xEimF4EsaA7yaAUc9S0c9U1vlZPc/VAHLvP3TjJkr/AomkgR0MQfbjPP3j42Gz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=CmafMry4; arc=none smtp.client-ip=162.62.57.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RHpaeRM2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5100C1F00ACF;
-	Tue, 28 Jul 2026 02:19:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785205159;
-	bh=zOvGjA1rA+f7leLYamAm3+vbaCk4Q3hv4aH/rznS/vY=;
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="CmafMry4"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1785207924; bh=YnRcQ7cU8pyEx4dSK7zQyOxb8Aouz8WcbrMEasQibXc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=RHpaeRM2xA1wTgxAAzmzdCqpQ6EDfUJdcm96xpk63ZOn8jxAYeuOWBqqMRpeHsBLr
-	 xLkuZoFXWiB+GnSUqIZ0s2+syZumzIAnwJG9CcP5DcwjFc0O32YJIMCik+P7wntGnx
-	 6u7dFaGYeDbr0om5Vo0rXJYJgFRy5SjOhzScRWhEn7ljEPYmqJ+dOnlasOACDaaZFP
-	 Hx2eFtaJ79YhoEvq37UUG/28ddSg3tzXKb6Vwx39D0/mwO2i9UtfnAsSEQOVXEFhEr
-	 UgMro4LhwdmynXiso2FbLy8I1lwKyXhxMaIeCr9yHvghf4MRs+OJznEMfOOi1ckg/C
-	 imvd6kfzOKpsA==
-From: Eric Biggers <ebiggers@kernel.org>
-To: x86@kernel.org
-Cc: linux-um@lists.infradead.org,
-	linux-raid@vger.kernel.org,
+	b=CmafMry4/quM8POgF1S8qbIgpjsStTg+sB3Ex+JNmf1Yj5ieK768LVB1ZU3OgzUUC
+	 aNN7b2jc7DDrhCFT+Ii3IvRrO9HACst/w6cR8xcWFklg4XaD1PtaBJQvXwB9dSBrSz
+	 DkeGMwUPeiyXhl9gYLKrVgwOxh3Xqr7/kEDdX5JM=
+Received: from LAPTOP-ALARVMHL.localdomain ([139.159.170.90])
+	by newxmesmtplogicsvrszb51-1.qq.com (NewEsmtp) with SMTP
+	id 153874BC; Tue, 28 Jul 2026 11:05:19 +0800
+X-QQ-mid: xmsmtpt1785207919tqwwl33xx
+Message-ID: <tencent_381E310D1F05DE327C2607824BFCDCFA1806@qq.com>
+X-QQ-XMAILINFO: Mk/FYBttBrlYNA9keDMRg3/WnxvXyxOMjRyQYpTXHGGjQFaXQUM/qqXvz/eLQ4
+	 lcATL5YY9qfmmiBa7vxq30P94tTsVbk7E5sw1yWdq63BeSE28tLss4GAV9I0o1Nb+MTLPN6qx7Ka
+	 aRTDsl9cQQfp45SJm3R6u6wAZFWNDQqyYZVOoExaatSphL+AubeMCj819nVS1fq6UTvWB6pL0Oc8
+	 q6BXygcby7jjUVGt31nclcwZxXxIj95dPrHetnnfOVQwOpkRpus4T5Bm9Ptr8IqMKThTZBbAvf/U
+	 XQYn/uHfNe2+fEyvP/78R2w0xLX82lL+ELxAqxeVx0NCBR91+OljluwaYKNLzv3ycpN1u3iyw4xx
+	 W57S/jVreNkKEiun5QXt7lfJm67e3hRJOUSCe5LHeoy9eqYZ/jJ7UcfJD+vbmH9mWcU418/LIJ17
+	 zmLtiu3PxR0DgELlXjou52XVIB/w1tuBmRDOtd5Bw2ngA+y8aKrE618soR5yGQ/5muBDgz3HwlwH
+	 KuKehJePBRYi+hZsvuf/asF2xhK6GV4w2Cb5lM4qvuaBZb4wwDZmRGFIQCA3U7cDCnkpuG4oUThC
+	 xRnCI7KvZlyiwwT9WMfMwd1qt5IItZtnOgOgYtfUgzPsCIEsS0pNQDJGm3KedQsRosmGrTFLvcyK
+	 gJISHK4l/Z5sT+Be1ChGAjlEuffulCZVWJUKjgz1d8GVyXKqziWzi3Z0zXBx23ete4mMoymGGw4x
+	 YY86bAbwhNWQm6U9lTq2HSDwka/7hnogvALdKeP1gskr97j7RZAGEi5uTxjD2ZuyvD/0qnIJHVTq
+	 OXn6qV+aaSpYqNsvdgYF7DAI9JlGVCi76awmutNROMZUNMuJo1Czc6FUn5KxrkIXZfeySDSy+THY
+	 cW41l2jaauN9E9g2676O1v3Tzicc/3WELVCwVPmrW8msodR2BxC6Gp+g4tY+s0zEBd6DAj/lI6OV
+	 nwXG6TvhE1sIvmbnM8xclQz+rUDbpfz06PJJWr9CEgfYTe/AbeAJbt4G9mEo4nzuW/D+/8IsJhot
+	 Et+n2o1bfcHSHh5gj7pHoa9ic71AOfpM94PVvVsyq/CdM28F5C7+kYUaoEhDs+a1pv+31XDiIzHe
+	 I+cX+1za+CsCrkzBc8iLe7azYs4A6v726CIh3SNmpfAanIcEQvrI8dWhvYDPZfYAnAGsIXuM+IZr
+	 6uqDA=
+X-QQ-XMRINFO: OD9hHCdaPRBwH5bRRRw8tsiH4UAatJqXfg==
+From: He Jixin <1270243756@qq.com>
+To: kanchana.p.sridhar@intel.com
+Cc: 21cnbao@gmail.com,
+	akpm@linux-foundation.org,
+	ardb@kernel.org,
+	chengming.zhou@linux.dev,
+	clabbe@baylibre.com,
+	davem@davemloft.net,
+	ebiggers@google.com,
+	giovanni.cabiddu@intel.com,
+	hannes@cmpxchg.org,
+	herbert@gondor.apana.org.au,
+	kasong@tencent.com,
+	kristen.c.accardi@intel.com,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	David Laight <david.laight.linux@gmail.com>
-Subject: [PATCH v2 8/8] lib/raid/xor: x86: Add AVX-512 optimized xor_gen()
-Date: Mon, 27 Jul 2026 19:16:03 -0700
-Message-ID: <20260728021603.79870-9-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260728021603.79870-1-ebiggers@kernel.org>
-References: <20260728021603.79870-1-ebiggers@kernel.org>
+	linux-mm@kvack.org,
+	nphamcs@gmail.com,
+	ryan.roberts@arm.com,
+	senozhatsky@chromium.org,
+	sj@kernel.org,
+	surenb@google.com,
+	usamaarif642@gmail.com,
+	vinicius.gomes@intel.com,
+	wajdi.k.feghali@intel.com,
+	ying.huang@linux.alibaba.com,
+	yosry.ahmed@linux.dev
+Subject: Re: [PATCH v14 26/26] mm: zswap: Batched zswap_compress() for compress batching of large folios.
+Date: Tue, 28 Jul 2026 11:05:19 +0800
+X-OQ-MSGID: <20260728030519.269154-1-1270243756@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260125033537.334628-27-kanchana.p.sridhar@intel.com>
+References: <20260125033537.334628-27-kanchana.p.sridhar@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,229 +86,45 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add an implementation of xor_gen() using AVX-512.
+On Sat, 24 Jan 2026 19:35:37 -0800, Kanchana P Sridhar wrote:
+> +                        if (dlen < 0) {
+> +                                dlen = PAGE_SIZE;
+> +                                dst = kmap_local_page(folio_page(folio,
+> +                                                      folio_start + batch_iter));
+> +                        }
+> +
+> +                        handle = zs_malloc(zs_pool, dlen, gfp, nid);
+> +
+> +                        if (unlikely(IS_ERR_VALUE(handle))) {
+> +                                if (PTR_ERR((void *)handle) == -ENOSPC)
+> +                                        zswap_reject_compress_poor++;
+> +                                else
+> +                                        zswap_reject_alloc_fail++;
+> +
+> +                                goto err_unlock;
+> +                        }
+> ...
+> +err_unlock:
+>          mutex_unlock(&acomp_ctx->mutex);
+> -        return comp_ret == 0 && alloc_ret == 0;
+> +        return false;
 
-It uses 512-bit vectors, i.e. ZMM registers.  It also uses the
-vpternlogq instruction to do three-input XORs when applicable.
+I think there might be a resource leak when both conditions below happen:
 
-It's enabled on x86_64 CPUs that have AVX512F && !PREFER_YMM.  In
-practice that means:
+1. `dlen < 0` enters the first if block and does `kmap_local_page()` into `dst`
+2. Then `zs_malloc()` fails, hitting the `IS_ERR_VALUE(handle)` path and jumping to `err_unlock`
 
-    - AMD Zen 4 and later (client and server)
-    - Intel Sapphire Rapids and later (server)
-    - Intel Rocket Lake (client)
-    - Intel Nova Lake and later (client)
+In this path, `dst` points to a kmapped page that does not appear to get `kunmap_local()` before `err_unlock`.
+The old code had a `mapped` flag and a common unlock path, so kunmap_local() was called on all exits after kmap_local_page().
+After the batching rewrite, the successful path still unmaps `dst`, but the zs_malloc() failure path appears to bypass that cleanup.
 
-The !PREFER_YMM condition excludes the older AVX-512 implementations in
-Intel Skylake Server and Intel Ice Lake.  They could run this code, but
-they're known to have overly-eager downclocking when ZMM registers are
-used.  This is the same policy that the crypto and CRC code uses.
+If my understanding is correct, the fix could be either:
 
-Benchmark on AMD Ryzen 9 9950X (Zen 5):
+- Option A: Add `kunmap_local(dst)` right before `goto err_unlock` when `dlen < 0` was taken.
+- Option B: Restructure so that `kmap_local_page()` happens after `zs_malloc()` succeeds, only for the compression-failed entries.
 
-    src_cnt    avx          avx512       Improvement
-    =======    ==========   ==========   ===========
-    1          56353 MB/s   75388 MB/s   33%
-    2          54274 MB/s   68409 MB/s   26%
-    3          44649 MB/s   64042 MB/s   43%
-    4          41315 MB/s   55002 MB/s   33%
+I'm new to the mm subsystem, so please let me know if I missed something that makes this safe.
 
-Reviewed-by: David Laight <david.laight.linux@gmail.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- lib/raid/xor/Makefile         |   2 +-
- lib/raid/xor/x86/xor-avx512.c | 121 ++++++++++++++++++++++++++++++++++
- lib/raid/xor/x86/xor_arch.h   |  30 ++++++---
- 3 files changed, 142 insertions(+), 11 deletions(-)
- create mode 100644 lib/raid/xor/x86/xor-avx512.c
-
-diff --git a/lib/raid/xor/Makefile b/lib/raid/xor/Makefile
-index e8ecec3c09f9f..4a0e5c6d8298f 100644
---- a/lib/raid/xor/Makefile
-+++ b/lib/raid/xor/Makefile
-@@ -29,7 +29,7 @@ xor-$(CONFIG_SPARC32)		+= sparc/xor-sparc32.o
- xor-$(CONFIG_SPARC64)		+= sparc/xor-sparc64.o sparc/xor-sparc64-glue.o
- xor-$(CONFIG_S390)		+= s390/xor.o
- xor-$(CONFIG_X86_32)		+= x86/xor-avx.o x86/xor-sse.o x86/xor-mmx.o
--xor-$(CONFIG_X86_64)		+= x86/xor-avx.o x86/xor-sse.o
-+xor-$(CONFIG_X86_64)		+= x86/xor-avx.o x86/xor-sse.o x86/xor-avx512.o
- obj-y				+= tests/
- 
- CFLAGS_xor-neon.o		+= $(CC_FLAGS_FPU) -I$(src)/$(SRCARCH)
-diff --git a/lib/raid/xor/x86/xor-avx512.c b/lib/raid/xor/x86/xor-avx512.c
-new file mode 100644
-index 0000000000000..17f57900d8274
---- /dev/null
-+++ b/lib/raid/xor/x86/xor-avx512.c
-@@ -0,0 +1,121 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * AVX-512 optimized implementation of xor_gen()
-+ *
-+ * Copyright 2026 Google LLC
-+ */
-+
-+#include <linux/types.h>
-+#include <asm/fpu/api.h>
-+#include "xor_impl.h"
-+#include "xor_arch.h"
-+
-+/*
-+ * Implementation notes:
-+ *
-+ * Unrolling by the number of buffers (2-5) is very important.
-+ *
-+ * Unrolling by length is less important, especially when using register-indexed
-+ * addressing with negative indices from the end of the buffers.  That approach
-+ * results in just two loop control instructions being needed per iteration,
-+ * regardless of the number of buffers.
-+ *
-+ * In fact, benchmarks showed that the 2 and 3 buffer cases require only 2x
-+ * unrolling by length, while the 4 and 5 buffer cases don't require any
-+ * unrolling by length.  Benchmarks also showed that the register-indexed
-+ * addressing isn't a bottleneck either; i.e., we can't do any better by
-+ * incrementing the pointers as we go along, even with more unrolling.
-+ */
-+
-+static void xor_avx512_2(long bytes, u8 *p1, const u8 *p2)
-+{
-+	long i = -bytes;
-+
-+	asm volatile("1: vmovdqa64 (%1,%0), %%zmm0\n"
-+		     "vmovdqa64 64(%1,%0), %%zmm1\n"
-+		     "vpxorq (%2,%0), %%zmm0, %%zmm0\n"
-+		     "vpxorq 64(%2,%0), %%zmm1, %%zmm1\n"
-+		     "vmovdqa64 %%zmm0, (%1,%0)\n"
-+		     "vmovdqa64 %%zmm1, 64(%1,%0)\n"
-+		     "add $128, %0\n"
-+		     "jnz 1b\n"
-+		     : "+&r"(i)
-+		     : "r"(p1 + bytes), "r"(p2 + bytes)
-+		     : "memory", "cc");
-+}
-+
-+static void xor_avx512_3(long bytes, u8 *p1, const u8 *p2, const u8 *p3)
-+{
-+	long i = -bytes;
-+
-+	asm volatile("1: vmovdqa64 (%1,%0), %%zmm0\n"
-+		     "vmovdqa64 64(%1,%0), %%zmm1\n"
-+		     "vmovdqa64 (%2,%0), %%zmm2\n"
-+		     "vmovdqa64 64(%2,%0), %%zmm3\n"
-+		     "vpternlogq $0x96, (%3,%0), %%zmm2, %%zmm0\n"
-+		     "vpternlogq $0x96, 64(%3,%0), %%zmm3, %%zmm1\n"
-+		     "vmovdqa64 %%zmm0, (%1,%0)\n"
-+		     "vmovdqa64 %%zmm1, 64(%1,%0)\n"
-+		     "add $128, %0\n"
-+		     "jnz 1b\n"
-+		     : "+&r"(i)
-+		     : "r"(p1 + bytes), "r"(p2 + bytes), "r"(p3 + bytes)
-+		     : "memory", "cc");
-+}
-+
-+static void xor_avx512_4(long bytes, u8 *p1, const u8 *p2, const u8 *p3,
-+			 const u8 *p4)
-+{
-+	long i = -bytes;
-+
-+	asm volatile("1: vmovdqa64 (%1,%0), %%zmm0\n"
-+		     "vmovdqa64 (%2,%0), %%zmm1\n"
-+		     "vpxorq (%3,%0), %%zmm0, %%zmm0\n"
-+		     "vpternlogq $0x96, (%4,%0), %%zmm1, %%zmm0\n"
-+		     "vmovdqa64 %%zmm0, (%1,%0)\n"
-+		     "add $64, %0\n"
-+		     "jnz 1b\n"
-+		     : "+&r"(i)
-+		     : "r"(p1 + bytes), "r"(p2 + bytes), "r"(p3 + bytes),
-+		       "r"(p4 + bytes)
-+		     : "memory", "cc");
-+}
-+
-+static void xor_avx512_5(long bytes, u8 *p1, const u8 *p2, const u8 *p3,
-+			 const u8 *p4, const u8 *p5)
-+{
-+	long i = -bytes;
-+
-+	asm volatile("1: vmovdqa64 (%1,%0), %%zmm0\n"
-+		     "vmovdqa64 (%2,%0), %%zmm1\n"
-+		     "vpternlogq $0x96, (%3,%0), %%zmm1, %%zmm0\n"
-+		     "vmovdqa64 (%4,%0), %%zmm1\n"
-+		     "vpternlogq $0x96, (%5,%0), %%zmm1, %%zmm0\n"
-+		     "vmovdqa64 %%zmm0, (%1,%0)\n"
-+		     "add $64, %0\n"
-+		     "jnz 1b\n"
-+		     : "+&r"(i)
-+		     : "r"(p1 + bytes), "r"(p2 + bytes), "r"(p3 + bytes),
-+		       "r"(p4 + bytes), "r"(p5 + bytes)
-+		     : "memory", "cc");
-+}
-+
-+DO_XOR_BLOCKS(avx512_inner, xor_avx512_2, xor_avx512_3, xor_avx512_4,
-+	      xor_avx512_5);
-+
-+/*
-+ * Preconditions: bytes is a nonzero multiple of 512, and all buffers are
-+ * 64-byte aligned.
-+ */
-+static void xor_gen_avx512(void *dest, void **srcs, unsigned int src_cnt,
-+			   unsigned int bytes)
-+{
-+	kernel_fpu_begin();
-+	xor_gen_avx512_inner(dest, srcs, src_cnt, bytes);
-+	kernel_fpu_end();
-+}
-+
-+struct xor_block_template xor_block_avx512 = {
-+	.name = "avx512",
-+	.xor_gen = xor_gen_avx512,
-+};
-diff --git a/lib/raid/xor/x86/xor_arch.h b/lib/raid/xor/x86/xor_arch.h
-index 991abe3f4bbda..ed5921d2e2aad 100644
---- a/lib/raid/xor/x86/xor_arch.h
-+++ b/lib/raid/xor/x86/xor_arch.h
-@@ -6,21 +6,31 @@ extern struct xor_block_template xor_block_p5_mmx;
- extern struct xor_block_template xor_block_sse;
- extern struct xor_block_template xor_block_sse_pf64;
- extern struct xor_block_template xor_block_avx;
-+extern struct xor_block_template xor_block_avx512;
- 
--/*
-- * When SSE is available, use it as it can write around L2.  We may also be able
-- * to load into the L1 only depending on how the cpu deals with a load to a line
-- * that is being prefetched.
-- *
-- * When AVX2 is available, force using it as it is better by all measures.
-- *
-- * 32-bit without MMX can fall back to the generic routines.
-- */
- static __always_inline void __init arch_xor_init(void)
- {
--	if (boot_cpu_has(X86_FEATURE_AVX)) {
-+	if (IS_ENABLED(CONFIG_X86_64) && boot_cpu_has(X86_FEATURE_AVX512F) &&
-+	    !boot_cpu_has(X86_FEATURE_PREFER_YMM)) {
-+		/*
-+		 * Use the AVX-512 code on CPUs that support AVX-512 without
-+		 * overly-eager downclocking.  On such CPUs the AVX-512 code
-+		 * should always work at least as well as the AVX code, so
-+		 * runtime selection is unnecessary.
-+		 *
-+		 * The AVX-512 code can work on X86_32.  However, due to lack of
-+		 * use case for that, for now it's built only for X86_64.
-+		 */
-+		xor_force(&xor_block_avx512);
-+	} else if (boot_cpu_has(X86_FEATURE_AVX)) {
-+		/* AVX will be the best; no need to try others. */
- 		xor_force(&xor_block_avx);
- 	} else if (IS_ENABLED(CONFIG_X86_64) || boot_cpu_has(X86_FEATURE_XMM)) {
-+		/*
-+		 * When SSE is available, use it as it can write around L2.  We
-+		 * may also be able to load into the L1 only depending on how
-+		 * the cpu deals with a load to a line that is being prefetched.
-+		 */
- 		xor_register(&xor_block_sse);
- 		xor_register(&xor_block_sse_pf64);
- 	} else if (boot_cpu_has(X86_FEATURE_MMX)) {
--- 
-2.55.0
+Thanks,
+He Jixin
 
