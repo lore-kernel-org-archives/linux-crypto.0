@@ -1,190 +1,190 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FDF954774;
-	Wed, 29 Jul 2026 02:16:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E8F130C158
+	for <linux-crypto@vger.kernel.org>; Wed, 29 Jul 2026 03:02:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785291376; cv=none; b=GX5vhGX7r22NUBntRFPpFA5JXqZmzR6a3gU3uZB30B6xNffxDKGWb3Sth8T5Z5ZF1M/Pvkapb2gp0wvpJtGWjbmdnI50PXNFCrc4TVyD+DRnj5mS0nAG603p/8SLFDvwM9WOlORlACJ0IAA0DNvGvQSbPSA60aTWY8M4Y0CdRNA=
+	t=1785294155; cv=none; b=TP+rVz3Ax8VfJ/mqumeu+xknB6hV8SQ36IivV8NKzZ9mtvwLLmeBBPbCn85sKGrhT8uA7tJ6sh4Ptg7FFwzJD1ui/oXLbWlIWhFHbnXf2t3zpX+OX7SakQ2DanYwZhv3BLhzFTtrqmHxVPLqBM9RqbOxB1VQ2HFgKVSmRj6Ngo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785291376; c=relaxed/simple;
-	bh=0JvL2EJkmjxe6MoWdRRwkgeS+DWKuQ4Q0ppQJFfPxxo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ye7PmRNayRZSwQ+UIThC6hiIkPS9N4SNOxTlCGTesl/fJH5ejQFWx8jCtO5bfFHleTXlW7h09U2hoAyfOPnDt8kYoCs7eyO80hzBqXC811fELXmOn/aP+zZGYo+erlM/WP0wsQkKozjywlZYfHOuwNXGa2Rc3V57uYssZDMfOy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=B+IJ3BqB; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	s=arc-20240116; t=1785294155; c=relaxed/simple;
+	bh=Gwcemrq0zRj8ieopVo+zg7dXfV4WwvBbIExYY8p7MyU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HJGc4IOzz1YiOejnXOxWynq/y03+/myjyV/1qOEeQABgFv3HY1A+kH3jqrlK6lov0AG+klUhXqMAI4LWpbXZxE0K7m3Xvoc8X2q4E4O+z1KnEyM/SfGpPRNqKSEoNfkD6NGPK8Nsma0V0qzFYQ4lH53PCUNIRDXu6tlnhsX0Vb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rxu6vdiV; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="B+IJ3BqB"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id D8EB140E014C;
-	Wed, 29 Jul 2026 02:16:11 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id ekmS4jWMetaX; Wed, 29 Jul 2026 02:16:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1785291360; bh=jYfxf+bhIzET99jS5jMhQB/Sinp36qMgGjtIV02FVKs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=B+IJ3BqBpkgyUnNVfzq01FuEVm9RTlVM2StZKdXSlcRxQGAPZIyaRzfnLNer2oSU6
-	 s41IKy9EdZKerJA8veMdwatFlv+kBIeTHHBj+Ul5bWvMAVifZBo5H4zMsW02+oWgXN
-	 UP52G5qdTebPn+Q4eHCp9ELAzYK7RX2xUvjvatLwT5iyCBa5ugWSDJbclNfGbjRr+U
-	 CyivcJgJdXLXsWa/2gLwhFnyahUpOPvjkmdA33MDR/1Zq9nP/DeRK/oH2WvQvQm2d0
-	 bfqZpht/WptGD92ptaMOYhKrPAhHMjWxCYLDijrQD7ccfUyFO4g7uabasRj9cEUo+s
-	 iGduwwFLQj6Dwr3nwcPeGw0D4tK4V/7pNsEcEOWsuVWtyy/IPyld/5RNN1n1zkiRTl
-	 l5TJP534IWCi/97KhIFK99i0kh+/wZfeaK7GILPCfZ6YjknsX3KEqvOp+ew0EwVuiW
-	 qhxf4/eIFi19HcCNvQL8JtGiGpXeNYELh3z4wFTBu4g/VFTEVFootYp832+exzXFTt
-	 e+02YfzWz0PszwXocnhbkBj9lphp8GOGSmDyDtxVImHOyQGVFUcjiBSxNnBLk1Mbog
-	 3HoLS91l+nTd3u/o9RRpHlrDETLviRw+SlmCB8Oyily0wp8oDJVQHzHwbx33qghaf9
-	 /h+g4r0vrfqTLfx45fk09elk=
-Received: from stx.tnic (unknown [IPv6:2600:1700:38ca:c00::43])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 491CB40E00C4;
-	Wed, 29 Jul 2026 02:15:25 +0000 (UTC)
-Date: Tue, 28 Jul 2026 19:15:20 -0700
-From: Borislav Petkov <bp@alien8.de>
-To: Ashish Kalra <Ashish.Kalra@amd.com>
-Cc: tglx@kernel.org, mingo@redhat.com, dave.hansen@linux.intel.com,
-	x86@kernel.org, hpa@zytor.com, seanjc@google.com,
-	peterz@infradead.org, thomas.lendacky@amd.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org,
-	pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
-	KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com,
-	Nathan.Fontenot@amd.com, ackerleytng@google.com, jackyli@google.com,
-	pgonda@google.com, rientjes@google.com, jacobhxu@google.com,
-	xin@zytor.com, pawan.kumar.gupta@linux.intel.com,
-	babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com,
-	john.allen@amd.com, darwi@linutronix.de,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	kvm@vger.kernel.org, linux-coco@lists.linux.dev
-Subject: Re: [PATCH v11 2/6] x86/sev: Disable CPU hotplug while SNP is active
-Message-ID: <20260729021520.GEamliOMT67p8svCoM@fat_crate.local>
-References: <cover.1784844080.git.ashish.kalra@amd.com>
- <e1631971b3862bcd6043199feba3df51f3ba336c.1784844080.git.ashish.kalra@amd.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rxu6vdiV"
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-3810c5d691bso416134a91.1
+        for <linux-crypto@vger.kernel.org>; Tue, 28 Jul 2026 20:02:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785294154; x=1785898954; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=0FbzdGwphzv4AdO9FD6SO4LnnJOCSj6BESmpj8f8T1M=;
+        b=Rxu6vdiV2fUDvty9O2HuL1BV2Qk/XFNt1aLCCBT3t5x+aftCEn7ycoHAoD5WeUsM8K
+         BpC49p7nc7Oxyh9Tm3pACbamla1RT42xeLbfUZe4Sfdeg+2poaDhpnIxYe5pKp4e0zJC
+         pmV1gQpE3DwKY702qU9o2yc5lYljeqnq696WxpoaTvhA8V55FREWYf82/pK3AkuvdZxq
+         JncjGk07AgZya2Pm4CbsUJesKQQ+FGqXXZyVet4pkVmT00/j+wtyWVwA41hVgGm6nmQX
+         rtpf0E/VRm4oZGqU4mVR1vtGogmRHdmmlcf+JbFuycA5SDeNdtmExn6hd7o7R5wYC9RU
+         fz9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785294154; x=1785898954;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=0FbzdGwphzv4AdO9FD6SO4LnnJOCSj6BESmpj8f8T1M=;
+        b=Cmu4yrWhdkSElnfM1VJDd94X0/4njy21IWPoYvSxxC7eurO969ikcQQoDkXRxHXoGO
+         4AgHn9P7zIWjQ59c4B8x9WAkzZqZrCuRJMex/B5KMIWMO9a3JthV8up4Fvxix5Y9CemY
+         BsH3J9kOTVuE0Dck3i0eZaYp+Hn6Qgs4+VQItVT6vYDkhCE+JGf8FWkyK+sXrQ0a+gWB
+         7wU6qT1nBMp1H1djgHHV6WGXGWE4yqJ5IclnORqzOOGPJhR+DpsehhZQCl1NZNXP+Hf/
+         NjeTGWL86LfpgRIxvi4U6k2n3Zn/J5xr5I89LcGCcJHkutKJuEJ5e5Ji4+yxf0EdUgDB
+         060w==
+X-Gm-Message-State: AOJu0YxY+aAsscez68kpRrFRcamN0LoskzyKTxD/Kx2Mxu7XZZFbYZrX
+	BzMF5CrXcjdO178OPEr6m8B/iGQQVEqCr41kZCvFR6yrWTN85D2zp7C0nQepWw==
+X-Gm-Gg: AR+sD12ph/a7qJg3FjPyl04e0nU4ONVSV1mGIkXuyM9g1cS+DKnDf7C03ZLUQsnXLQC
+	9R+ysepAiRwjuukeWKno+M3nFFJPX61w0gIKimQTA/pMacnkcHrQQQXLUrFPmjHvahaJNgLgBWG
+	1DFR2DIyXFoG20ZYWGaI4aZnY52yE+9otlZtoYRPbde4I8rrnnzVf0T7HubkwOE2rflQ7PuJ37l
+	3KaZr30nOmzO03kbT5xHD9/fUP+IVLZ8duKyN02p7iboryUt3CSEvAiTzpsMR5D7Bd0MFgmwMsj
+	eC7WO1fJ6x+IdU15s0sCQg+1eqttaDnghwoA0hVjRgza2f7Q+Borza57/7giWo7JMK5QJ3GzSXL
+	vyObUehYt+aEcldvs9pt6OfWO2vR+OibNY56QSw85XdD8Dgrxpq/vJYAsvZw1qDB1Ci8NOFAd7w
+	PMlmvQEY8CvZag7ZhB0DtNjFveASZlrt9ialdofD/5Ys2sCf19lDUZ28HoqdpCrC4alnf2Itedg
+	b1LsCSuu0HdPKdxyCgpCJExYuOVHfexxbfVTzNAp4xUYqakxHKV1ykb8uej4HQATg+CblLnJ2kd
+	T8eNtED7w5TkRaYjAptOBoPbN7CazLEzq7ZMP3evtlgSRsWC9g==
+X-Received: by 2002:a17:90b:5883:b0:38d:f5bb:e0f4 with SMTP id 98e67ed59e1d1-38f6a33de7fmr5022122a91.1.1785294153498;
+        Tue, 28 Jul 2026 20:02:33 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8000:7a86::e35])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38f7f292af9sm627807a91.11.2026.07.28.20.02.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Jul 2026 20:02:32 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: linux-crypto@vger.kernel.org
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCHv2] crypto: talitos: Use platform_get_irq() to retrieve interrupt
+Date: Tue, 28 Jul 2026 20:02:31 -0700
+Message-ID: <20260729030231.642651-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <e1631971b3862bcd6043199feba3df51f3ba336c.1784844080.git.ashish.kalra@amd.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jul 27, 2026 at 07:04:31PM +0000, Ashish Kalra wrote:
-> With CPU hotplug now disabled while SNP is active, the online CPU mask is
-> stable, so the cpus_read_lock() previously taken in snp_prepare() to
-> iterate it is redundant.  Drop cpus_read_lock()/cpus_read_unlock() here.
-> The RMPOPT setup and cleanup added later are introduced after this patch
-> and never take the lock for the same reason.
+Remove the need to call irq_dispose_mapping as needed by
+irq_of_parse_and_map().
 
-Why do I even bother writing it?
+Simplify the function as a result. No need for gotos anymore.
 
-"do ... not talk about future patches because git history is not always
-linear"
+Add a missing free_irq.
 
-> Suggested-by: Thomas Lendacky <thomas.lendacky@amd.com>
-> Suggested-by: Borislav Petkov (AMD) <bp@alien8.de>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> ---
->  arch/x86/virt/svm/sev.c | 39 +++++++++++++++++++++++++++++----------
->  1 file changed, 29 insertions(+), 10 deletions(-)
-> 
-> diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-> index cff285d8ad8e..e2f69fba0938 100644
-> --- a/arch/x86/virt/svm/sev.c
-> +++ b/arch/x86/virt/svm/sev.c
-> @@ -513,7 +513,6 @@ static void clear_hsave_pa(void *arg)
->  
->  int snp_prepare(void)
->  {
-> -	int ret;
->  	u64 val;
->  
->  	/*
-> @@ -526,14 +525,21 @@ int snp_prepare(void)
->  
->  	clear_rmp();
->  
-> -	cpus_read_lock();
-> +	/*
-> +	 * Disable CPU hotplug before enabling SNP: no CPU may come online
-> +	 * without SnpEn while SNP is active, and none may go offline during
-> +	 * enable.  This keeps cpu_online_mask stable for the check and the
-> +	 * on_each_cpu() calls below, so cpus_read_lock() is not needed.  It is
-> +	 * re-enabled in snp_shutdown() once the firmware disables SNP.
-> +	 */
-> +	cpu_hotplug_disable();
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ v2: change irq checks as a result
+ drivers/crypto/talitos.c | 30 +++++++++++++-----------------
+ 1 file changed, 13 insertions(+), 17 deletions(-)
 
-No need for too much splainin' and besides, that comment'll grow out-of-whack
-sooner than you think:
-
-diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-index e2f69fba0938..731ea25fba37 100644
---- a/arch/x86/virt/svm/sev.c
-+++ b/arch/x86/virt/svm/sev.c
-@@ -528,9 +528,7 @@ int snp_prepare(void)
-        /*
-         * Disable CPU hotplug before enabling SNP: no CPU may come online
-         * without SnpEn while SNP is active, and none may go offline during
--        * enable.  This keeps cpu_online_mask stable for the check and the
--        * on_each_cpu() calls below, so cpus_read_lock() is not needed.  It is
--        * re-enabled in snp_shutdown() once the firmware disables SNP.
-+        * enable.
-         */
-        cpu_hotplug_disable();
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index 3a3fd21d2c4d..fa96b6bf17e3 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -191,7 +191,7 @@ static int reset_device(struct device *dev)
+ 	       && --timeout)
+ 		cpu_relax();
  
->  	if (!cpumask_equal(cpu_online_mask, cpu_present_mask)) {
-> -		ret = -EOPNOTSUPP;
-> +		cpu_hotplug_enable();
->  		pr_warn("SNP init failed: not all CPUs online. (%*pbl online <-> %*pbl present masks).\n",
->  			cpumask_pr_args(cpu_online_mask),
->  			cpumask_pr_args(cpu_present_mask));
-> -		goto unlock;
-> +		return -EOPNOTSUPP;
->  	}
->  
->  	wbinvd_on_all_cpus();
-> @@ -548,12 +554,7 @@ int snp_prepare(void)
->  	/* SNP_INIT requires MSR_VM_HSAVE_PA to be cleared on all CPUs. */
->  	on_each_cpu(clear_hsave_pa, NULL, 1);
->  
-> -	ret = 0;
-> -
-> -unlock:
-> -	cpus_read_unlock();
-> -
-> -	return ret;
-> +	return 0;
->  }
->  EXPORT_SYMBOL_FOR_MODULES(snp_prepare, "ccp");
->  
-> @@ -565,6 +566,13 @@ void snp_shutdown(void)
->  	if (syscfg & MSR_AMD64_SYSCFG_SNP_EN)
->  		return;
->  
-> +	/*
-> +	 * The firmware has disabled SNP (SnpEn is clear), so re-enable CPU
-> +	 * hotplug.  A legacy SNP shutdown returns above with SnpEn still set and
-> +	 * leaves hotplug disabled.
-> +	 */
-> +	cpu_hotplug_enable();
-
-What happens if CPUs get offlined here after hotplug has been enabled and...
-
->  	clear_rmp();
->  	on_each_cpu(mfd_reconfigure, NULL, 1);
-
-... they miss the mfd_reconfigure()?
-
->  }
-
+-	if (priv->irq[1]) {
++	if (priv->irq[1] > 0) {
+ 		mcr = TALITOS_MCR_RCA1 | TALITOS_MCR_RCA3;
+ 		setbits32(priv->reg + TALITOS_MCR, mcr);
+ 	}
+@@ -3241,13 +3241,11 @@ static void talitos_remove(struct platform_device *ofdev)
+ 		talitos_unregister_rng(dev);
+ 
+ 	for (i = 0; i < 2; i++)
+-		if (priv->irq[i]) {
++		if (priv->irq[i] > 0)
+ 			free_irq(priv->irq[i], dev);
+-			irq_dispose_mapping(priv->irq[i]);
+-		}
+ 
+ 	tasklet_kill(&priv->done_task[0]);
+-	if (priv->irq[1])
++	if (priv->irq[1] > 0)
+ 		tasklet_kill(&priv->done_task[1]);
+ }
+ 
+@@ -3353,26 +3351,26 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
+ static int talitos_probe_irq(struct platform_device *ofdev)
+ {
+ 	struct device *dev = &ofdev->dev;
+-	struct device_node *np = ofdev->dev.of_node;
+ 	struct talitos_private *priv = dev_get_drvdata(dev);
+ 	int err;
+ 	bool is_sec1 = has_ftr_sec1(priv);
+ 
+-	priv->irq[0] = irq_of_parse_and_map(np, 0);
+-	if (!priv->irq[0]) {
+-		dev_err(dev, "failed to map irq\n");
+-		return -EINVAL;
+-	}
++	priv->irq[0] = platform_get_irq(ofdev, 0);
++	if (priv->irq[0] < 0)
++		return priv->irq[0];
++
+ 	if (is_sec1) {
+ 		err = request_irq(priv->irq[0], talitos1_interrupt_4ch, 0,
+ 				  dev_driver_string(dev), dev);
+ 		goto primary_out;
+ 	}
+ 
+-	priv->irq[1] = irq_of_parse_and_map(np, 1);
++	priv->irq[1] = platform_get_irq_optional(ofdev, 1);
++	if (priv->irq[1] == -EPROBE_DEFER)
++		return priv->irq[1];
+ 
+ 	/* get the primary irq line */
+-	if (!priv->irq[1]) {
++	if (priv->irq[1] < 0) {
+ 		err = request_irq(priv->irq[0], talitos2_interrupt_4ch, 0,
+ 				  dev_driver_string(dev), dev);
+ 		goto primary_out;
+@@ -3388,7 +3386,6 @@ static int talitos_probe_irq(struct platform_device *ofdev)
+ 			  dev_driver_string(dev), dev);
+ 	if (err) {
+ 		dev_err(dev, "failed to request secondary irq\n");
+-		irq_dispose_mapping(priv->irq[1]);
+ 		priv->irq[1] = 0;
+ 	}
+ 
+@@ -3397,7 +3394,6 @@ static int talitos_probe_irq(struct platform_device *ofdev)
+ primary_out:
+ 	if (err) {
+ 		dev_err(dev, "failed to request primary irq\n");
+-		irq_dispose_mapping(priv->irq[0]);
+ 		priv->irq[0] = 0;
+ 	}
+ 
+@@ -3498,7 +3494,7 @@ static int talitos_probe(struct platform_device *ofdev)
+ 			tasklet_init(&priv->done_task[0], talitos1_done_4ch,
+ 				     (unsigned long)dev);
+ 	} else {
+-		if (priv->irq[1]) {
++		if (priv->irq[1] > 0) {
+ 			tasklet_init(&priv->done_task[0], talitos2_done_ch0_2,
+ 				     (unsigned long)dev);
+ 			tasklet_init(&priv->done_task[1], talitos2_done_ch1_3,
+@@ -3516,7 +3512,7 @@ static int talitos_probe(struct platform_device *ofdev)
+ 
+ 	for (i = 0; i < priv->num_channels; i++) {
+ 		priv->chan[i].reg = priv->reg + stride * (i + 1);
+-		if (!priv->irq[1] || !(i & 1))
++		if (priv->irq[1] < 0 || !(i & 1))
+ 			priv->chan[i].reg += TALITOS_CH_BASE_OFFSET;
+ 
+ 		spin_lock_init(&priv->chan[i].head_lock);
 -- 
-Regards/Gruss,
-    Boris.
+2.55.0
 
-https://people.kernel.org/tglx/notes-about-netiquette
