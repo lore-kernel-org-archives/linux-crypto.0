@@ -1,140 +1,190 @@
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5CA1282F35
-	for <linux-crypto@vger.kernel.org>; Wed, 29 Jul 2026 00:42:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FDF954774;
+	Wed, 29 Jul 2026 02:16:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785285737; cv=none; b=nz25rNQZYG4gj5Uld2E4fd2OsrZU++cvDHNmp4OQMvC2dPQNgnJkL4AhjM9JzgDYTLA7dWSGAb5jLPExH3D2/g0GGBLN0PNVMcABD6QBpkjbiwdfTWtybmjevE0k8F95P7dFtx1XOlpOMCebNcDKK4txQ/avTEew4ArEVRdBI04=
+	t=1785291376; cv=none; b=GX5vhGX7r22NUBntRFPpFA5JXqZmzR6a3gU3uZB30B6xNffxDKGWb3Sth8T5Z5ZF1M/Pvkapb2gp0wvpJtGWjbmdnI50PXNFCrc4TVyD+DRnj5mS0nAG603p/8SLFDvwM9WOlORlACJ0IAA0DNvGvQSbPSA60aTWY8M4Y0CdRNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785285737; c=relaxed/simple;
-	bh=o+7v+TEu5ghY+2FA5SCYrCH2NtB/YDNwhFxthLjJVp4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iPF57DzhfpyhixljBA2NXQGGJBe6GUyeP8UdncsoG5seg0ToY6D80YLc3g7XpKRca/6LJ0vDfhgzqeoM0rMtozpICkdkcsyKur/QJjPeo8xokKeto6x5jFnoy/FkDBStJOePFgG0Unx2UqR+tP2JprPlobBHk4LjvY0h651SV/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=TaKq12a3; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+	s=arc-20240116; t=1785291376; c=relaxed/simple;
+	bh=0JvL2EJkmjxe6MoWdRRwkgeS+DWKuQ4Q0ppQJFfPxxo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ye7PmRNayRZSwQ+UIThC6hiIkPS9N4SNOxTlCGTesl/fJH5ejQFWx8jCtO5bfFHleTXlW7h09U2hoAyfOPnDt8kYoCs7eyO80hzBqXC811fELXmOn/aP+zZGYo+erlM/WP0wsQkKozjywlZYfHOuwNXGa2Rc3V57uYssZDMfOy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=B+IJ3BqB; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="TaKq12a3"
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="B+IJ3BqB"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id D8EB140E014C;
+	Wed, 29 Jul 2026 02:16:11 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id ekmS4jWMetaX; Wed, 29 Jul 2026 02:16:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1785291360; bh=jYfxf+bhIzET99jS5jMhQB/Sinp36qMgGjtIV02FVKs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=B+IJ3BqBpkgyUnNVfzq01FuEVm9RTlVM2StZKdXSlcRxQGAPZIyaRzfnLNer2oSU6
+	 s41IKy9EdZKerJA8veMdwatFlv+kBIeTHHBj+Ul5bWvMAVifZBo5H4zMsW02+oWgXN
+	 UP52G5qdTebPn+Q4eHCp9ELAzYK7RX2xUvjvatLwT5iyCBa5ugWSDJbclNfGbjRr+U
+	 CyivcJgJdXLXsWa/2gLwhFnyahUpOPvjkmdA33MDR/1Zq9nP/DeRK/oH2WvQvQm2d0
+	 bfqZpht/WptGD92ptaMOYhKrPAhHMjWxCYLDijrQD7ccfUyFO4g7uabasRj9cEUo+s
+	 iGduwwFLQj6Dwr3nwcPeGw0D4tK4V/7pNsEcEOWsuVWtyy/IPyld/5RNN1n1zkiRTl
+	 l5TJP534IWCi/97KhIFK99i0kh+/wZfeaK7GILPCfZ6YjknsX3KEqvOp+ew0EwVuiW
+	 qhxf4/eIFi19HcCNvQL8JtGiGpXeNYELh3z4wFTBu4g/VFTEVFootYp832+exzXFTt
+	 e+02YfzWz0PszwXocnhbkBj9lphp8GOGSmDyDtxVImHOyQGVFUcjiBSxNnBLk1Mbog
+	 3HoLS91l+nTd3u/o9RRpHlrDETLviRw+SlmCB8Oyily0wp8oDJVQHzHwbx33qghaf9
+	 /h+g4r0vrfqTLfx45fk09elk=
+Received: from stx.tnic (unknown [IPv6:2600:1700:38ca:c00::43])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 4C6763F677
-	for <linux-crypto@vger.kernel.org>; Wed, 29 Jul 2026 00:42:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1785285726;
-	bh=YP+6wrlQaSGx7RuJqwRMUdE3V+ruvBfPJx2GlyHwNNQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
-	b=TaKq12a3ytZgp8mS29oMsN1bpwM03uJKFdxMd13xl8nhPO2EBI+dtKWYOfteyuj9r
-	 Wh6LVp+HSLMnb098nXyyPCNY4NWjtre317QdrQESKOcYWOg9O2sIZhfV3tBUdIp40q
-	 ZXqgjopCEZiExFYs0g43dKm1BYYAGq5RmeMxaEz+gnR8u4+fhHpCmHpuQRGNm/tr9d
-	 lA4rGk8pPF4ZePd6jKQ0gYDBJs2d0j1X11jp3dpmMBLKjCmYY2anTbK4KaN3LgjT5c
-	 x+5cstfpWoVzyxGweKKwl5VHEq0nN3k3G2ripjVxR3iwHHVMhLwCStda2eEQxFI+8S
-	 QQ/jCVeuIiNx0rZX0d98qxkZ5mEhBnTBOlahm84wd3SCejJ+K7L+/x+gdUhuEcLrOb
-	 S9zDnmzJ2Fv6YRmV1wRUo++Uo2R5z9yoydYyOsBNPmklPifWWwTWBrzcyjnwT9atg/
-	 UmJo1gfLYNSnpB6lZe+RBp5yZUMn4onJXJMw9NRkikd38zdYwsFuNT+5mX2KKC4XZs
-	 ukW2IFazRTsgXYsoSuM0Q/pRHXbEBE7kCYLi8u1yzS2BIKMDQ2ngAp6mZsuVndxbl5
-	 Li1+0IF5CNznkHnzMlDU13d8FDeoEeEafunrGU03ESFcTF3o7o3/zRsKlRkFBWdILO
-	 ksrhE2LoGPfCVImWk7y6DAKA=
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2d001671a54so9081175ad.2
-        for <linux-crypto@vger.kernel.org>; Tue, 28 Jul 2026 17:42:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785285724; x=1785890524;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=YP+6wrlQaSGx7RuJqwRMUdE3V+ruvBfPJx2GlyHwNNQ=;
-        b=ri7Z+qnDuu/KpFfOHzfZGStB6aLXKZ7sdLgJYXa4F/gt1iTClp6N8G8vji3FVQEgG2
-         OTPBQ9B4r0YUh57NE80bd8RtnrQDiPwsO77dnaDXaapLlV36+lFHT4aH0DuXDXtbEOTG
-         kOF3lIlcxzsR7+74+fFuRMWGocWMUQIHCrzAfN3lLpD6N7UPRMFW9jZM1qmotnXaUbRX
-         bqAZvELUrXLvt0y/A4Yg9CjbuUEccnVKD78fa7/D9XQ6NwuEBnR8XR6ZbzNmdQcGJ9pQ
-         DW62dhMjBwIfJLcakrzB5wvwRkhH8DLu1aW8zTF2GAQxCaC34y1bntOTSkhUau5VmoVo
-         TSHw==
-X-Forwarded-Encrypted: i=1; AHgh+Ro2t0J7Pi9ypfNRQvOKWjU4WLaHGcpbE3KV8ZqT6bR8Q4/XHq078dC1ogKg6kprbZBFO9Lug2Kr8ymd21c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6Zo1ESQhMF1k2mU0GdKPk6gyUgaOw24cl1k2IN//p25gG7CMv
-	7R3xfhrT83eGV2ctdNjhy2KGtMmlf1J9USEJRkcrc0GLXlRrQRKHAFTd0tSbLgBLFKskNXxvkXr
-	Bo8ywjv02+iRoXmaqATWiH0lumX3PwrSFpb+AyWVYKEx3aVzMm/EBtlM2e2JxmpqCTUmplY2JjS
-	Osbm2UkA==
-X-Gm-Gg: AR+sD11HHor3r51Nb5LhYowe0o4/W+8u4t7Baff1+IPeVQRecGDITTn68WQsRvPiT8W
-	lPb+HH0KjqFX4THz08W7fTLueV3rhslDZMRLEJIoTlkAJAJ02SdbTg96p6qXgcIB4472V67+ZHh
-	RrK3h1YoJCDd3cyH9ITff8kNbPmCPcwRI1qLRMKfwOiY7qFexb84Ttdp79WICk19k1XeySr5B+E
-	q10R2Ou2+i9VGUofFRADa2e32sgO3bCVt9ktkGwKbv4LLcy15PXBypNI4QJOO4iHJ9Ln52hf/bA
-	Od/uiLXpkCbRu9LJT5sSqpcSB6P4lKbFSaCfll2xpcQN9djy8rXg71j6BS3YxO74p9uywlnOfiC
-	K3lOyz8KaRk4=
-X-Received: by 2002:a17:903:2a88:b0:2c9:ae0b:61e3 with SMTP id d9443c01a7336-2d015b145bcmr55232565ad.2.1785285724397;
-        Tue, 28 Jul 2026 17:42:04 -0700 (PDT)
-X-Received: by 2002:a17:903:2a88:b0:2c9:ae0b:61e3 with SMTP id d9443c01a7336-2d015b145bcmr55232355ad.2.1785285724066;
-        Tue, 28 Jul 2026 17:42:04 -0700 (PDT)
-Received: from ZBook.gateway ([123.208.39.53])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-31504b15f77sm3566229eec.4.2026.07.28.17.42.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Jul 2026 17:42:03 -0700 (PDT)
-From: Changwei Zou <changwei.zou@canonical.com>
-To: lukas@wunner.de
-Cc: Martin.Kepplinger-Novakovic@ginzinger.com,
-	changwei.zou@canonical.com,
-	davem@davemloft.net,
-	herbert@gondor.apana.org.au,
-	ignat@linux.win,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	martink@posteo.de
-Subject: [PATCH v3] crypto: rsassa-pkcs1 - Align DMA buffer to CRYPTO_DMA_ALIGN
-Date: Wed, 29 Jul 2026 10:41:56 +1000
-Message-ID: <20260729004156.11925-1-changwei.zou@canonical.com>
-X-Mailer: git-send-email 2.43.0
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 491CB40E00C4;
+	Wed, 29 Jul 2026 02:15:25 +0000 (UTC)
+Date: Tue, 28 Jul 2026 19:15:20 -0700
+From: Borislav Petkov <bp@alien8.de>
+To: Ashish Kalra <Ashish.Kalra@amd.com>
+Cc: tglx@kernel.org, mingo@redhat.com, dave.hansen@linux.intel.com,
+	x86@kernel.org, hpa@zytor.com, seanjc@google.com,
+	peterz@infradead.org, thomas.lendacky@amd.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org,
+	pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
+	KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com,
+	Nathan.Fontenot@amd.com, ackerleytng@google.com, jackyli@google.com,
+	pgonda@google.com, rientjes@google.com, jacobhxu@google.com,
+	xin@zytor.com, pawan.kumar.gupta@linux.intel.com,
+	babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com,
+	john.allen@amd.com, darwi@linutronix.de,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	kvm@vger.kernel.org, linux-coco@lists.linux.dev
+Subject: Re: [PATCH v11 2/6] x86/sev: Disable CPU hotplug while SNP is active
+Message-ID: <20260729021520.GEamliOMT67p8svCoM@fat_crate.local>
+References: <cover.1784844080.git.ashish.kalra@amd.com>
+ <e1631971b3862bcd6043199feba3df51f3ba336c.1784844080.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <e1631971b3862bcd6043199feba3df51f3ba336c.1784844080.git.ashish.kalra@amd.com>
 
-out_buf is used as a DMA buffer for the RSA verification operation.
-If out_buf is not aligned to CRYPTO_DMA_ALIGN, cacheline sharing
-problems (data corruption) would occur on CPUs with DMA-incoherent caches,
-leading to -EKEYREJECTED.
+On Mon, Jul 27, 2026 at 07:04:31PM +0000, Ashish Kalra wrote:
+> With CPU hotplug now disabled while SNP is active, the online CPU mask is
+> stable, so the cpus_read_lock() previously taken in snp_prepare() to
+> iterate it is redundant.  Drop cpus_read_lock()/cpus_read_unlock() here.
+> The RMPOPT setup and cleanup added later are introduced after this patch
+> and never take the lock for the same reason.
 
-Fix by aligning out_buf to CRYPTO_DMA_ALIGN using PTR_ALIGN(), and
-allocating CRYPTO_DMA_ALIGN - 1 extra bytes in the child_req allocation
-to accommodate the alignment padding as child_reqsize is a variable.
+Why do I even bother writing it?
 
-The intermittent error 'Key was rejected by service' on i.MX8 with CAAM
-can be triggered when loading signed kernel modules.
+"do ... not talk about future patches because git history is not always
+linear"
 
-    for i in $(seq 1 100); do
-        sudo modprobe xfs 2>&1 && echo "SUCCESS on attempt $i" \
-        && sudo rmmod xfs || echo "FAILED on attempt $i"
-    done
+> Suggested-by: Thomas Lendacky <thomas.lendacky@amd.com>
+> Suggested-by: Borislav Petkov (AMD) <bp@alien8.de>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> ---
+>  arch/x86/virt/svm/sev.c | 39 +++++++++++++++++++++++++++++----------
+>  1 file changed, 29 insertions(+), 10 deletions(-)
+> 
+> diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
+> index cff285d8ad8e..e2f69fba0938 100644
+> --- a/arch/x86/virt/svm/sev.c
+> +++ b/arch/x86/virt/svm/sev.c
+> @@ -513,7 +513,6 @@ static void clear_hsave_pa(void *arg)
+>  
+>  int snp_prepare(void)
+>  {
+> -	int ret;
+>  	u64 val;
+>  
+>  	/*
+> @@ -526,14 +525,21 @@ int snp_prepare(void)
+>  
+>  	clear_rmp();
+>  
+> -	cpus_read_lock();
+> +	/*
+> +	 * Disable CPU hotplug before enabling SNP: no CPU may come online
+> +	 * without SnpEn while SNP is active, and none may go offline during
+> +	 * enable.  This keeps cpu_online_mask stable for the check and the
+> +	 * on_each_cpu() calls below, so cpus_read_lock() is not needed.  It is
+> +	 * re-enabled in snp_shutdown() once the firmware disables SNP.
+> +	 */
+> +	cpu_hotplug_disable();
 
-Fixes: 8552cb04e083 ("crypto: rsassa-pkcs1 - Copy source data for SG list")
-Signed-off-by: Changwei Zou <changwei.zou@canonical.com>
----
- crypto/rsassa-pkcs1.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+No need for too much splainin' and besides, that comment'll grow out-of-whack
+sooner than you think:
 
-diff --git a/crypto/rsassa-pkcs1.c b/crypto/rsassa-pkcs1.c
-index 94fa5e9600e7..c683f3c61528 100644
---- a/crypto/rsassa-pkcs1.c
-+++ b/crypto/rsassa-pkcs1.c
-@@ -237,12 +237,13 @@ static int rsassa_pkcs1_verify(struct crypto_sig *tfm,
- 		return -EINVAL;
+diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
+index e2f69fba0938..731ea25fba37 100644
+--- a/arch/x86/virt/svm/sev.c
++++ b/arch/x86/virt/svm/sev.c
+@@ -528,9 +528,7 @@ int snp_prepare(void)
+        /*
+         * Disable CPU hotplug before enabling SNP: no CPU may come online
+         * without SnpEn while SNP is active, and none may go offline during
+-        * enable.  This keeps cpu_online_mask stable for the check and the
+-        * on_each_cpu() calls below, so cpus_read_lock() is not needed.  It is
+-        * re-enabled in snp_shutdown() once the firmware disables SNP.
++        * enable.
+         */
+        cpu_hotplug_disable();
  
- 	/* RFC 8017 sec 8.2.2 step 2 - RSA verification */
--	child_req = kmalloc(sizeof(*child_req) + child_reqsize + ctx->key_size,
--			    GFP_KERNEL);
-+	child_req = kmalloc(sizeof(*child_req) + child_reqsize +
-+			    ctx->key_size + CRYPTO_DMA_ALIGN - 1, GFP_KERNEL);
- 	if (!child_req)
- 		return -ENOMEM;
- 
--	out_buf = (u8 *)(child_req + 1) + child_reqsize;
-+	out_buf = PTR_ALIGN((u8 *)(child_req + 1) + child_reqsize,
-+			    CRYPTO_DMA_ALIGN);
- 	memcpy(out_buf, src, slen);
- 
- 	crypto_init_wait(&cwait);
+>  	if (!cpumask_equal(cpu_online_mask, cpu_present_mask)) {
+> -		ret = -EOPNOTSUPP;
+> +		cpu_hotplug_enable();
+>  		pr_warn("SNP init failed: not all CPUs online. (%*pbl online <-> %*pbl present masks).\n",
+>  			cpumask_pr_args(cpu_online_mask),
+>  			cpumask_pr_args(cpu_present_mask));
+> -		goto unlock;
+> +		return -EOPNOTSUPP;
+>  	}
+>  
+>  	wbinvd_on_all_cpus();
+> @@ -548,12 +554,7 @@ int snp_prepare(void)
+>  	/* SNP_INIT requires MSR_VM_HSAVE_PA to be cleared on all CPUs. */
+>  	on_each_cpu(clear_hsave_pa, NULL, 1);
+>  
+> -	ret = 0;
+> -
+> -unlock:
+> -	cpus_read_unlock();
+> -
+> -	return ret;
+> +	return 0;
+>  }
+>  EXPORT_SYMBOL_FOR_MODULES(snp_prepare, "ccp");
+>  
+> @@ -565,6 +566,13 @@ void snp_shutdown(void)
+>  	if (syscfg & MSR_AMD64_SYSCFG_SNP_EN)
+>  		return;
+>  
+> +	/*
+> +	 * The firmware has disabled SNP (SnpEn is clear), so re-enable CPU
+> +	 * hotplug.  A legacy SNP shutdown returns above with SnpEn still set and
+> +	 * leaves hotplug disabled.
+> +	 */
+> +	cpu_hotplug_enable();
+
+What happens if CPUs get offlined here after hotplug has been enabled and...
+
+>  	clear_rmp();
+>  	on_each_cpu(mfd_reconfigure, NULL, 1);
+
+... they miss the mfd_reconfigure()?
+
+>  }
+
 -- 
-2.43.0
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
