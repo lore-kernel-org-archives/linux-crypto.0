@@ -1,381 +1,207 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mx0a-0002e601.pphosted.com (mx0a-0002e601.pphosted.com [148.163.150.75])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CB153290D2
-	for <linux-crypto@vger.kernel.org>; Wed, 29 Jul 2026 11:05:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785323114; cv=none; b=XdhbbS7JqqcYGDv/oWsnPuiIGAnBEtmfDdrmkTyS2BG7BwBQZTxvEFm01K/yEr9/JwkliYJGZwsh6tsQ5K4wHmp6di9Nejzh72BWi6MMkQp9LKSWEYoOPdnWtS1FVv4m7qh7xLW+ahyi/VO95Tv8QHrZzm+2zkj9mL0pbpPZyzU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785323114; c=relaxed/simple;
-	bh=DCYAuRCp7+nFFvsRBZG572UOAg8pxukDJF9q5ZWLlG4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hkSDjWK3fP2bW+2RdzfVrfWgG7zs+QejqqL54S/BVVWW1iMqvCrG/bVNsmrD+JqGmRrcCwg5Pz8M0n9ooy+/otRaBQ2FkcSB+J8VF30wWMdpvYSMSy8ls9k6sZv4u//tkCiFlOz7EqoY/isIL9LaxehZpF5ZS7KBbW2amyd+mwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ZHCufFi1; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=VOZUmvWP; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BB994756C2;
+	Wed, 29 Jul 2026 11:56:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.150.75
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785326170; cv=fail; b=lg6hnYa2xjCRu4G7cU7DD6TV0zGnrMrir3ZvvErbrDy7JR+RbD1Y2Z2IunDC4RyDGLwA6u+FlYjT34dvt0QfZldK+Jg3Tqvj80aIT7RTdVEp7vvb47M3wd+ThtYDWCnDy7KKM8L7XO77rRU18AjYzfQXv1I8jUWaa/qzTt1RTTc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785326170; c=relaxed/simple;
+	bh=6Mj+2YI2NIQIqeD2sKwboNSlsPliEko9UIo7aOVc3Eg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=MGpzHRW7s+73uBLDeTiyAEDNivH9E/EkWnShoVbYvLphzpBuKa9rEyswSM+spe/dRDqHgmHuqfj5xXpvuapbilc8psaOarCteCiS4t33gCWZvH3a4qS/bppOvS071XyV8dw38RAgdyU+Xdqz6SzbW/eOd0zu4gIddynFwGaCAZo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (2048-bit key) header.d=ti.com header.i=@ti.com header.b=HduiZHVq; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=tyYHERj/; arc=fail smtp.client-ip=148.163.150.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="ZHCufFi1";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="VOZUmvWP"
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66T8htjl1484320
-	for <linux-crypto@vger.kernel.org>; Wed, 29 Jul 2026 11:05:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=qcppdkim1; bh=NmgLYHzD9b2zNdVwSu933xgMmRm2WlC125I
-	YHk8Hzy8=; b=ZHCufFi1BDre8ucimgwUnPhiJMW2FebPiasIpBWwHrgJqgnanc8
-	y0xc5FNlkSId3Kb3EUD+EvtwdmENimSV7QbSnhjvVP8nJ1dz0KFxDrPTibjoDGLM
-	bQfefK+cikMwD2jHhelle2h7cuIy9HJuWXs5TRPLKM5UWjwch4fd/opTjkBLKv2n
-	KWy4GbjWDVL5u61XasLspyShM9OGZjMhIqpO9X2cDPxloQgzkSu98UeJCMqbqqmL
-	aQIu4Dt4GCAIRq0t+PGA0Z5ZZhxx5u82GpuSfNc+G7Pk5QSLwF0jF3nJHaQkccVu
-	vmPo5hoqJgb6e7xhw7Jk6TWpeAXRCFjZcHg==
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com [209.85.216.70])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fqe920md4-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Wed, 29 Jul 2026 11:05:11 +0000 (GMT)
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-38e1118e4abso1480521a91.0
-        for <linux-crypto@vger.kernel.org>; Wed, 29 Jul 2026 04:05:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1785323111; x=1785927911; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=NmgLYHzD9b2zNdVwSu933xgMmRm2WlC125IYHk8Hzy8=;
-        b=VOZUmvWPiv4fPu3oAIO02e6n+BpzUg7E32Lbk/SKCygVA8bbwlYD1y3e2jogy6f4II
-         l1EvGoA9Uc/WXViWOhki4/+CGFo9dd9INOjdshkAk3GiMh7PXUu8HYxeVOh4efifTecY
-         6N6DmMrctygv/SCQ630PMiM/xE+5d2zaRUjv+1f66408Q1Bj4JyVtF3KkF0s/dP9lQUf
-         /vGHPqM68DR3Gh4qqRgbMel799E7ufl1z7fwxuqk4iJrJb1UOBD2l8t2gWIyIfXKSsOU
-         bLZ9x2vb19Y3VAvglkkJaeUSB6QNHl9qgAXuU3+89+AMik9KLPS8IGFOwrY+ir7JfCOa
-         dxlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785323111; x=1785927911;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=NmgLYHzD9b2zNdVwSu933xgMmRm2WlC125IYHk8Hzy8=;
-        b=eiShigbA+6r+I23Sxkl0jqCdi7Gkn4z1hnxQRMOgjitZWwRkCETxIt5SBuVd+bGKH1
-         pOCCUndCbR/1CTYhEhbpEgCc8ElfsCEEPuD0eXa9rZStWVYf6IhJMQCG4XV8AGkeNsug
-         q1xGWWY4wz1eWOa2MHDQ0c3dAIMYyxPn5PEKD/zRqhMhRQ9bdtc5Jjtm/mrY+4zXK7A8
-         wHD2+vqa5vUasoYFeZkCdH69H+nei1jzxl5b18xsvFyqmv2NcldFbSs5gdNS+c4SRzjv
-         LgFglbOnILaPjpQJ2+fSDDOmXefc5c06F9/D8Mol0N//Bn6lqL+SLDHjTLm4zT97CxYD
-         5bhQ==
-X-Gm-Message-State: AOJu0YwvKjECrkN1e+SZ0nKqKP7lI7CKDOJGk3eXL8x5ujI8B7Oq7Ki1
-	F8nx1UoztFHggKvFj7EjUxOegVxzZGo+2hBuItI8NrbqnaLlzttMc//kkqxuIu6hBgyAay5qX2X
-	XdYWh+g52x9TZ45zER+O9Yk3zLKE3z+4i2QMNeAX2iO6WEqfSQBrofxn4zDGAdVzQ+Mc=
-X-Gm-Gg: AR+sD12lfpVINqdZAiN8I3qPed8j8YwD5HaKdlzIYCB4z3kBxTQQRI5FS5b1oQragGq
-	c0+BIQMfOhFDH6H74KOTh1LQmiEqYdDeJ+X/QeukZJxCt6iTqII8c47HnysVFEGkY1FGSoMuepX
-	MVMzXH+AtrzIu/hJwtdZkos6jbonhU+QkgcCkXs2uieXGUVgbkFk+TLp7XYkozbzQ0GDFLTuWaH
-	1d9FnYEN37joQi1GY8Pc9DD+Br7f25OaA2LfRloZDUU7DAmYC/friQ590QMoOTZe/mq8oRAi+7i
-	kX3ej4LFIlaVznIjtawB4eP1ewJ1f/mEHsi1dQl+CBAe0G97LD8X5vPXg2N6gGvDT37m4ARJ+Lz
-	FvSwP64gf0iAOiLKqrV964LDRjeyciqIJeQ==
-X-Received: by 2002:a17:90b:3e4b:b0:38f:1dc:672f with SMTP id 98e67ed59e1d1-38f6a4597bamr5832824a91.18.1785323110849;
-        Wed, 29 Jul 2026 04:05:10 -0700 (PDT)
-X-Received: by 2002:a17:90b:3e4b:b0:38f:1dc:672f with SMTP id 98e67ed59e1d1-38f6a4597bamr5832792a91.18.1785323110332;
-        Wed, 29 Jul 2026 04:05:10 -0700 (PDT)
-Received: from hu-kuldsing-hyd.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38f6412a92bsm2660968a91.5.2026.07.29.04.05.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jul 2026 04:05:09 -0700 (PDT)
-From: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
-To: Bartosz Golaszewski <brgl@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Udit Tiwari <udit.tiwari@oss.qualcomm.com>,
-        Pankaj Patil <pankaj.patil@oss.qualcomm.com>,
-        Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
-Subject: [Patch v9] crypto: qce - Add runtime PM and interconnect bandwidth scaling support
-Date: Wed, 29 Jul 2026 16:34:55 +0530
-Message-Id: <20260729110455.641256-1-kuldeep.singh@oss.qualcomm.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=ti.com header.i=@ti.com header.b="HduiZHVq";
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="tyYHERj/"
+Received: from pps.filterd (m0384305.ppops.net [127.0.0.1])
+	by m0384305.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 66TBox6X4021729;
+	Wed, 29 Jul 2026 06:55:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	proofpoint-05-2026; bh=Yfy/npWwdnJrYxb8A2HxqKaUKs4QM83MOSBLvS0tG
+	Ec=; b=HduiZHVqgohe52IUkzjxjV/NCq9cY+B1/zFBMrE2B2VtEUkKkifqda9f5
+	sQlfG+jb4zP9OJj4ZSMChuKMxxhxSrlNEOBCeGiA8rmUTlUxijg2Lhk5GiQ+Ti5F
+	k06rZQ8hiS0OIhhfYMeqjbAt0sK1vv0DZO1uzulXl4EoX6snUUpI3tY9/U3cXLhK
+	vs0nEGApbVMDzs/jj7lTo2Fe2FtLzls/6S8ORt8q1jF104klur0qFzLNeL/wxjvJ
+	k1Zb9EgjkPm62OtLq1NQJbPyjMABNAdnAXtorxUq+vrV2vrxsNxW3dNszawer7OT
+	EuscqETSYPnBbBEigaTSush6Leciw==
+Received: from cy3pr05cu001.outbound.protection.outlook.com (mail-westcentralusazon11013067.outbound.protection.outlook.com [40.93.201.67])
+	by m0384305.ppops.net (PPS) with ESMTPS id 4fqh0p00pb-1
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Wed, 29 Jul 2026 06:55:55 -0500 (CDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=AAxISoFBV0lyzN5+u8rHGWZwBOWVEhmTxWcYFxvNOUeNyJ+FTQ8i6btza63a41ovm0OWOBof//wPbrJ0AJkWW6grlq9u4pmYJCdxvu76WmXYUadGEewpWyqSVD+yRKmwjfrU33P3cmIx3414f+QgVUGOCN6WbgveqnE8Uht38O7CzVpUy7B9PkDcVWl+z3t0bydsNJheSU8ZzKt08Z8hH8Mrw0xAnpX+am1Ye8muMiTCJvGziYwqlnJCwt7myn91acdqxgEy2uVWYo/VPr22tmyj+9oTvO+9efv6z63v8VOiBWQkaq6WzwHm4k3u1KflCzVK5CIXKSBHyzKIgaQjIg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Yfy/npWwdnJrYxb8A2HxqKaUKs4QM83MOSBLvS0tGEc=;
+ b=Q9JjMPglSudm5OxWUKzLinw3ptZnyXSFGJgJJ+xoq3SCwNTCyhqY1lloTBCTOcLS0LwBUNBEeAF5NMX1fBymFfNhOikBt2Hn/PD+SUvizzWSbKPlnr1wAY4hRNGCOEaMq1jX+kApLic2okX54RyzFwIGN1O6ES+XkSGUgXEnw0Q/l9N6l32iDoOdaKHj1WsG7u209iuTdDbtxiSO/se6PHnDvjE/LHXE2itX1B3j3s0lV0v/HPk3iEWnGJ8kV9An35XLn5tOTaWzvBZpqwz1bAGA6BIcR6Re2LWN8TnNPblaSuL2V+oDXT33lwu5zLICAV24iWoDVvfY7xB+fob2ng==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 198.47.23.194) smtp.rcpttodomain=intel.com smtp.mailfrom=ti.com; dmarc=pass
+ (p=quarantine sp=none pct=100) action=none header.from=ti.com; dkim=none
+ (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Yfy/npWwdnJrYxb8A2HxqKaUKs4QM83MOSBLvS0tGEc=;
+ b=tyYHERj/yj2mPd6m5+8cRHZ7NVAPHFJ12Vsk6kKc94KGEQ253qxmJ1Xpl6XreKXm9qQx0lYSfkiLxK2P8OvrxD3uOdLQ41QvdzHRgaFXadcAi3BO9l3RI/Bj9r7wRBc3s2DPQPtAW8vl4RpFpurmhFtkw3BUFz3Efcy8YCInbMo=
+Received: from DM6PR07CA0116.namprd07.prod.outlook.com (2603:10b6:5:330::13)
+ by PH8PR10MB997954.namprd10.prod.outlook.com (2603:10b6:510:3d2::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.270.12; Wed, 29 Jul
+ 2026 11:55:50 +0000
+Received: from SN1PEPF0002BA51.namprd03.prod.outlook.com
+ (2603:10b6:5:330:cafe::97) by DM6PR07CA0116.outlook.office365.com
+ (2603:10b6:5:330::13) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.270.13 via Frontend Transport; Wed,
+ 29 Jul 2026 11:55:50 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.194)
+ smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
+ action=none header.from=ti.com;
+Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
+ 198.47.23.194 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.23.194; helo=lewvzet200.ext.ti.com; pr=C
+Received: from lewvzet200.ext.ti.com (198.47.23.194) by
+ SN1PEPF0002BA51.mail.protection.outlook.com (10.167.242.74) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.21.270.5 via Frontend Transport; Wed, 29 Jul 2026 11:55:49 +0000
+Received: from DLEE214.ent.ti.com (157.170.170.117) by lewvzet200.ext.ti.com
+ (10.4.14.103) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Wed, 29 Jul
+ 2026 06:55:49 -0500
+Received: from DLEE205.ent.ti.com (157.170.170.85) by DLEE214.ent.ti.com
+ (157.170.170.117) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37; Wed, 29 Jul
+ 2026 06:55:48 -0500
+Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE205.ent.ti.com
+ (157.170.170.85) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.37 via Frontend
+ Transport; Wed, 29 Jul 2026 06:55:49 -0500
+Received: from [10.24.53.205] (pratham-workstation-pc.dhcp.ti.com [10.24.53.205])
+	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 66TBtknW1223007;
+	Wed, 29 Jul 2026 06:55:47 -0500
+Message-ID: <f985e848-cc87-44b5-95ee-0533447e67f7@ti.com>
+Date: Wed, 29 Jul 2026 17:25:46 +0530
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzI5MDA5MSBTYWx0ZWRfX4N0g1S3djjZU
- iXP9AwazIniwhnpUT2I0mPXz55LI9s5Ihc2GiDmSCjW9rCZKiGirTX8yRl0N7e2/cPdtDjORU2S
- oxMKlsCsG0a+3O6vM8v7RYcj1tAmS0U=
-X-Proofpoint-GUID: E9Dpqjbo_5iKCQnBC1yKfM83lvELXRMH
-X-Proofpoint-ORIG-GUID: E9Dpqjbo_5iKCQnBC1yKfM83lvELXRMH
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzI5MDA5MSBTYWx0ZWRfX5Q40joAXziWM
- iFvQCG+Sa7mGaqLUvgjPzV5yXgP2eSpvlwPFQn71XV7cRqwyIoIvGxyFFounYimpU0hus4BR1DE
- 5pLCBHzS3Aubw/S2EMaZlF6Rcbsg2Xl12uKlkDY0R41EgZT9yqD+PsLIzT6N1w4Gy26JeL9XC5j
- GFO/utrOBlikcJZm5x0s2tVy1+H+NNI+HeLjN/lSA+BRG/Szb1mp5mvz2SOc7/y3lofaERQVcZY
- dTyTvdMl+thJWFXtP7KvxIf9hNxVRgT5qSePO7YgUpwODZ5hfS6qJpOTSy4iyy4J6/ZeCFpIkFq
- IbsiMaiA4983j8o9YDeQsW314d5a+wh0KoVBJKaElLBO6bsbe/E5Y74nGhIuYPMFZ5zWdVMLdpZ
- kr4CYMdtngdqrorIETdzQsqDB2dFYrOfGLIZTvbyvMNFZPFtTFFjq4ZAca0lO+Lgj7aTpAE3WB4
- vquPcjg9vqvyu/srDdA==
-X-Authority-Analysis: v=2.4 cv=JeiMa0KV c=1 sm=1 tr=0 ts=6a69de67 cx=c_pps
- a=0uOsjrqzRL749jD1oC5vDA==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
- a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=u7WPNUs3qKkmUXheDGA7:22 a=yOCtJkima9RkubShWh1s:22 a=VwQbUJbxAAAA:8
- a=EUspDBNiAAAA:8 a=COk6AnOGAAAA:8 a=OR-uRB0iQuogYzU8RssA:9
- a=mQ_c8vxmzFEMiUWkPHU9:22 a=TjNXssC_j7lpFel5tvFf:22
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: ti - Use list_first_entry_or_null() in
+ dthe_get_dev()
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Mert Seftali
+	<mertsftl@gmail.com>
+CC: "David S . Miller" <davem@davemloft.net>,
+        Dan Carpenter
+	<error27@gmail.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, kernel test robot <lkp@intel.com>
+References: <20260613085858.32580-1-mertsftl@gmail.com>
+ <akd0zGzVZSG_45hK@gondor.apana.org.au>
+Content-Language: en-US
+From: T Pratham <t-pratham@ti.com>
+In-Reply-To: <akd0zGzVZSG_45hK@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF0002BA51:EE_|PH8PR10MB997954:EE_
+X-MS-Office365-Filtering-Correlation-Id: b1e10692-f9f7-4c71-8088-08deed68557b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|82310400026|23010399003|36860700016|376014|10067099003|4143699003|56012099006|22082099003|18002099003|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	2FqwV3wSyUKeH5fwe7zOZt4vmICR7dn5Atp0O39gTupwfxHa8d0+HUFQyzyHQRwzHvbQpSDAaKN8MWTx/XBZ71L3CdWx1XJsjhCMnda1d3XKOv/zYWEGNreZPpjtwvfvH+rX8E12oyO9j7kL3D9k6KPwLf4M1ZepvAmDWHn3jKdiDzon6ObGgXlUbUyWuqe7UcXom3jNtmIw5lfbXqV2AzgGib0WYtTcy68h99O6MwsAvjLn4detZpzjm30iXgsLamccGafBM/AsqimkYUx4vuRLOkRaOYr+VyLc1lkRrCGgiMBPWiivMmnikxV0KOyL03yoCfgZwZi3EuwbJy+tVs06xT4P3qIt5+ZEgHFdclLxsmIgjeUNmu54nD7O8XBzt+99KvrXeRXu1MM3H2CqKte3FwdhrpnFnky63gP5zdkU/tN1fFTSzyloL0HLPCf8O+zOirAP3JwDzBEp4wrr2V/ID9Sw89gYCfCWqoDkeqy5AO9oumeo6TuMvHAlFZ8ABu1p3ZCjpiRTpL/LucpbEU3v+TWYEwW3RNwgSGx9MS0YxOrFOXkgOWKZjaGYlL2z+kSY61TH4pNZvk1AnFVLvL5YomUTt7PvV8DdAMjJKDrmi5e75ZemekFl8hitM4USYDhOHGEdgdpZ6uB9B8bXDpqGXVePVgmw3weWrcF023QNeqjRTQlPMPj0vujOVkOzRviyg+bZ/gVir8H669VPog==
+X-Forefront-Antispam-Report:
+	CIP:198.47.23.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet200.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(23010399003)(36860700016)(376014)(10067099003)(4143699003)(56012099006)(22082099003)(18002099003)(13003099007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	blAvnVxI418XyudcgJ0k8CwKh5qME8vRAev4/nDhDH2zM79IHo8k/OxOMkH0W7spTLAIMvbsx/kM29at+506DABeZrfTPNhLuLLjrAOWMcwtt4HquI4dbOETJcXdR6sZSNhf0Chi2DAUbyLbMw9BNEFdggxYMGRbXw0UxF+Br+ayCex8aL1q3vzalxwRYea/KmI6sPjGGquee0IjY1jstlka2Dat4x7YmuwITcl0YkkuGcYexS2V1hzbUs+2+3gZaPMjar12EmAMpviF2KUimxHJAvFmpVjZ4LfPrVpqy2NgsFPZcLRFvKCAEZ1n/DIa8Z1GjCyq/Y8HicyivLUyCXOjHE1ev/nCMrH0cPHhcFc9jGwihj23w2XZGNx4oDCIS2QPtLYUPwxHz/9IjeAKOE6fY7/REiDC1/GgBmzH8onwN62xGcJY/b1ku5QPOzsQ
+X-Exchange-RoutingPolicyChecked:
+	KRrf2ipe2q2t2kgsPZ+ApkuTNjNnQoYs0CqrBunPb/ZdmqFUBbcLGSijTPuf/6VZGlP5fNhc/dK5TUVE917otcnPiWf775MkOBIIDLfTbJ54PY19V9DJmgnWCvnd3Ny1wV1mJTb5PojJJptzJkQ85veKNs7dguf3wpv/HaBNIWOjhHLmoBpdnt25nwmcsnWZ/F+ts2WunPbzBPdMvpZVF2LBe3sUsAAHTJx5Opm1iubmsM5VF/lNWE7wEiRpNQStYwPN/JgIIqDxooQdx8WepmTcvaR9EXvijfI+PsCP+h88WeU8R1fm3bJElYH6YTlGk0AqnwaYaZpJz7BCA/lVxg==
+X-OriginatorOrg: ti.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jul 2026 11:55:49.8994
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b1e10692-f9f7-4c71-8088-08deed68557b
+X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.194];Helo=[lewvzet200.ext.ti.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF0002BA51.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR10MB997954
+X-Proofpoint-ORIG-GUID: KOliPXf4orVxkNvJkvXOT5hwoPBVvmAq
+X-Proofpoint-GUID: KOliPXf4orVxkNvJkvXOT5hwoPBVvmAq
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzI5MDA5OCBTYWx0ZWRfX+zozmlOAuT9n
+ rIPpHBs2IsxqlFwX7EeNPJ/mQAvvMVh6z/KI9brvpxFzCXzhxQhyV++vo5k6ZHEHE+n6HIcLr8M
+ km/AdOm7IKe0+CILzyRpFVqa8xDtsuQ=
+X-Authority-Analysis: v=2.4 cv=dtvrzVg4 c=1 sm=1 tr=0 ts=6a69ea4b cx=c_pps
+ a=R3Nq4yRH+PcKhTCrdXTq7w==:117 a=WotqVVQAdb04rnGuttW3Kw==:17
+ a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10
+ a=s63m1ICgrNkA:10 a=V5UXEbMT0ywA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=Z8NIEmU8O1QQgoT56wFK:22 a=taLDd7a_hP9WKsMzeGRc:22 a=VwQbUJbxAAAA:8
+ a=QyXUC8HyAAAA:8 a=pGLkceISAAAA:8 a=sozttTNsAAAA:8 a=YanmO4Q36i9NzQjYVZ4A:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzI5MDA5OCBTYWx0ZWRfXw2CXlLJI/lML
+ X1h7pobI69uj5FxtTShmmegXRh5f0Qpgod/OwskPTlcNlC6B3t6JgipWCPedZ2ni4jph2ckdSIi
+ v38SX9H43VeV3Bu97yDEDye0+ACFsBkH9X6SdwKIUTpwd94pk7pUFvOq/hBRL4urEp0Yywz+kvr
+ /xeW8QdUmNDQ8GeAvR3oRHGk+onbAlmCgkAA0psDUFuQU8/G3ZhxUeXr5JacQPMJOk4JUFj31O1
+ TD8mNqCX+IUKXg2f9fRQwfUrHtmKd7rLXw05dRZe/5nYjbz3UP+mERihjRMVWMmDt0lbXScycbv
+ h1pubOc5ULxQ9RMno6X+3ZUNRD5uT1yunjDGjtYW9+lrXIgcS1pcFg/K2KeJUew7VArXz1fUQJH
+ P1F9epo67UmwFsaddI477SY0HlXimf2bZ+XO38QIhOWIzXUK/9JMK2IglXqYtA20Jr8VtTU49Tu
+ R/RjiL2bjSlNpshhltw==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-29_03,2026-07-28_02,2025-10-01_01
+ definitions=2026-07-29_04,2026-07-28_02,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 lowpriorityscore=0 impostorscore=0 clxscore=1015
- priorityscore=1501 malwarescore=0 spamscore=0 adultscore=0 bulkscore=0
- suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2607290091
+ malwarescore=0 adultscore=0 impostorscore=0 bulkscore=0 priorityscore=1501
+ clxscore=1011 suspectscore=0 lowpriorityscore=0 phishscore=0 spamscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607290098
 
-From: Udit Tiwari <udit.tiwari@oss.qualcomm.com>
+On 7/3/26 14:07, Herbert Xu wrote:
+> On Sat, Jun 13, 2026 at 10:58:58AM +0200, Mert Seftali wrote:
+>> dthe_get_dev() fetches a device from the global device list with
+>> list_first_entry() and then checks the result for NULL. However,
+>> list_first_entry() never returns NULL: on an empty list it returns a
+>> bogus pointer computed from the list head. The NULL check is therefore
+>> dead code, and an empty list would be treated as a valid entry and
+>> moved around as if it were a real device.
+>>
+>> Use list_first_entry_or_null() so the existing NULL check works as
+>> intended and an empty list is handled gracefully.
+>>
+>> Fixes: 52f641bc63a4 ("crypto: ti - Add driver for DTHE V2 AES Engine (ECB, CBC)")
+>> Reported-by: kernel test robot <lkp@intel.com>
+>> Reported-by: Dan Carpenter <error27@gmail.com>
+>> Closes: https://lore.kernel.org/r/202606111933.69GGTKxr-lkp@intel.com/
+>> Signed-off-by: Mert Seftali <mertsftl@gmail.com>
+>> ---
+>>  drivers/crypto/ti/dthev2-common.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> This only fixes the symptom of the problem.  But the root goes
+> deeper.
+> 
+> The main issue is that the device can go away in the middle of
+> an operation.  The driver needs to be handle it gracefully, and
+> certainly not by crashing the system because the associated memory
+> has been freed.
+> 
+> Thanks,
 
-The Qualcomm Crypto Engine (QCE) driver currently lacks support for
-runtime power management (PM) and interconnect bandwidth control.
-As a result, the hardware remains fully powered and clocks stay
-enabled even when the device is idle. Additionally, static
-interconnect bandwidth votes are held indefinitely, preventing the
-system from reclaiming unused bandwidth.
+This is not possible here as the device is part of the SoC. That being
+said, I'll implement this handling to have a more correct driver. In the
+meanwhile, the above empty list fix can be applied.
 
-Address this by enabling runtime PM and dynamic interconnect
-bandwidth scaling to allow the system to suspend the device when idle
-and scale interconnect usage based on actual demand. Improve overall
-system efficiency by reducing power usage and optimizing interconnect
-resource allocation.
-
-Signed-off-by: Udit Tiwari <udit.tiwari@oss.qualcomm.com>
-Tested-by: Pankaj Patil <pankaj.patil@oss.qualcomm.com>
-Signed-off-by: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
----
-I am taking care of follow-up of this patch from the original author,
-with their consent, while preserving the original authorship.
-
-Changes in v9:
-- Rebase to latest linux-next/master(tag: next-20260728).
-- Link to v8:
-  https://lore.kernel.org/linux-arm-msm/20260517105233.807935-1-udit.tiwari@oss.qualcomm.com/
-
-Changes in v8:
-- Drop pm_clk framework (devm_pm_clk_create/pm_clk_add/pm_clk_suspend/
-  pm_clk_resume); use devm_clk_get_optional() and direct
-  clk_prepare_enable()/clk_disable_unprepare() in runtime PM callbacks.
-  This removes the CONFIG_PM_CLK dependency and the build error reported
-  by the kernel test robot.
-- Replace icc_disable() with icc_set_bw(path, 0, 0) in runtime suspend
-  to avoid corrupting the internal 'enabled' flag, which would cause
-  subsequent icc_set_bw() calls in resume to be silently skipped during
-  aggregation.
-- Fix ICC vote ordering: cast bandwidth vote before enabling clocks in
-  resume; disable clocks before dropping ICC vote in suspend.
-- Use PM_RUNTIME_ACQUIRE_AUTOSUSPEND()/PM_RUNTIME_ACQUIRE_ERR() wrapper
-  macros instead of raw ACQUIRE() in both qce_handle_queue() and probe.
-- Drop __maybe_unused from runtime PM callbacks; use RUNTIME_PM_OPS /
-  SYSTEM_SLEEP_PM_OPS (non-SET_ prefix) and pm_ptr(&qce_crypto_pm_ops).
-- Drop unnecessary ret = 0 initializations in qce_handle_queue() and
-  qce_runtime_resume().
-- Extend probe comment to explain ICC + clock ordering rationale.
-- Link to v7:
-  https://lore.kernel.org/lkml/20260220072818.2921517-1-quic_utiwari@quicinc.com/
-
-Changes in v7:
-- Use ACQUIRE guard in probe to simplify runtime PM management and error
-  paths.
-- Drop redundant icc_enable() call in runtime resume path.
-- Explicitly call pm_clk_suspend(dev) and pm_clk_resume(dev) within the
-  custom runtime PM callbacks. Since custom callbacks are provided to
-  handle interconnect scaling, the standard PM clock helpers must be
-  invoked manually to ensure clocks are gated/ungated.
-- Link to v6:
- https://lore.kernel.org/lkml/20260210061437.2293654-1-quic_utiwari@quicinc.com/
-
-Changes in v6:
-- Adopt ACQUIRE(pm_runtime_active_try, ...) for scoped runtime PM
-  management in qce_handle_queue(). This removes the need for manual
-  put calls and goto labels in the error paths, as suggested by Konrad.
-- Link to v5:
-  https://lore.kernel.org/lkml/20251120062443.2016084-1-quic_utiwari@quicinc.com/
-
-Changes in v5:
-- Drop Reported-by and Closes tags for kernel test robot W=1 warnings,
-  as the issue was fixed within the same patch series.
-- Fix a minor comment indentation/style issue.
-- Link to v4:
-  https://lore.kernel.org/lkml/20251117062737.3946074-1-quic_utiwari@quicinc.com/
-
-Changes in v4:
-- Annotate runtime PM callbacks with __maybe_unused to silence W=1
-  warnings.
-- Add Reported-by and Closes tags for kernel test robot warning.
-- Link to v3:
-  https://lore.kernel.org/lkml/20251115084851.2750446-1-quic_utiwari@quicinc.com/
-
-Changes in v3:
-- Switch from manual clock management to PM clock helpers
-  (devm_pm_clk_create() + pm_clk_add()); no direct clk_* enable/disable
-  in runtime callbacks.
-- Replace pm_runtime_get_sync() with pm_runtime_resume_and_get(); remove
-  pm_runtime_put_noidle() on error.
-- Define PM ops using helper macros and reuse runtime callbacks for
-  system sleep via pm_runtime_force_suspend()/pm_runtime_force_resume().
-- Link to v2:
-  https://lore.kernel.org/lkml/20250826110917.3383061-1-quic_utiwari@quicinc.com/
-
-Changes in v2:
-- Extend suspend/resume support to include runtime PM and ICC scaling.
-- Register dev_pm_ops and implement runtime_suspend/resume callbacks.
-- Link to v1:
-  https://lore.kernel.org/lkml/20250606105808.2119280-1-quic_utiwari@quicinc.com/
----
- drivers/crypto/qce/core.c | 99 ++++++++++++++++++++++++++++++++++++---
- 1 file changed, 92 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
-index ac74f69914d6..b6edca5f1663 100644
---- a/drivers/crypto/qce/core.c
-+++ b/drivers/crypto/qce/core.c
-@@ -11,6 +11,8 @@
- #include <linux/interrupt.h>
- #include <linux/module.h>
- #include <linux/platform_device.h>
-+#include <linux/pm.h>
-+#include <linux/pm_runtime.h>
- #include <linux/types.h>
- #include <crypto/algapi.h>
- #include <crypto/internal/hash.h>
-@@ -87,7 +89,12 @@ static int qce_handle_queue(struct qce_device *qce,
- 			    struct crypto_async_request *req)
- {
- 	struct crypto_async_request *async_req, *backlog;
--	int ret = 0, err;
-+	int ret, err;
-+
-+	PM_RUNTIME_ACQUIRE_AUTOSUSPEND(qce->dev, pm);
-+	ret = PM_RUNTIME_ACQUIRE_ERR(&pm);
-+	if (ret)
-+		return ret;
- 
- 	scoped_guard(mutex, &qce->lock) {
- 		if (req)
-@@ -206,23 +213,33 @@ static int qce_crypto_probe(struct platform_device *pdev)
- 	if (ret < 0)
- 		return ret;
- 
--	qce->core = devm_clk_get_optional_enabled(qce->dev, "core");
-+	qce->core = devm_clk_get_optional(qce->dev, "core");
- 	if (IS_ERR(qce->core))
- 		return PTR_ERR(qce->core);
- 
--	qce->iface = devm_clk_get_optional_enabled(qce->dev, "iface");
-+	qce->iface = devm_clk_get_optional(qce->dev, "iface");
- 	if (IS_ERR(qce->iface))
- 		return PTR_ERR(qce->iface);
- 
--	qce->bus = devm_clk_get_optional_enabled(qce->dev, "bus");
-+	qce->bus = devm_clk_get_optional(qce->dev, "bus");
- 	if (IS_ERR(qce->bus))
- 		return PTR_ERR(qce->bus);
- 
--	qce->mem_path = devm_of_icc_get(qce->dev, "memory");
-+	qce->mem_path = devm_of_icc_get(dev, "memory");
- 	if (IS_ERR(qce->mem_path))
- 		return PTR_ERR(qce->mem_path);
- 
--	ret = icc_set_bw(qce->mem_path, QCE_DEFAULT_MEM_BANDWIDTH, QCE_DEFAULT_MEM_BANDWIDTH);
-+	/*
-+	 * Enable runtime PM after clocks and ICC path are acquired so that
-+	 * the resume callback can enable clocks and apply the ICC bandwidth
-+	 * vote before any hardware access takes place.
-+	 */
-+	ret = devm_pm_runtime_enable(dev);
-+	if (ret)
-+		return ret;
-+
-+	PM_RUNTIME_ACQUIRE_AUTOSUSPEND(dev, pm);
-+	ret = PM_RUNTIME_ACQUIRE_ERR(&pm);
- 	if (ret)
- 		return ret;
- 
-@@ -244,9 +261,76 @@ static int qce_crypto_probe(struct platform_device *pdev)
- 	qce->async_req_enqueue = qce_async_request_enqueue;
- 	qce->async_req_done = qce_async_request_done;
- 
--	return devm_qce_register_algs(qce);
-+	ret = devm_qce_register_algs(qce);
-+	if (ret)
-+		return ret;
-+
-+	/* Configure autosuspend after successful init */
-+	pm_runtime_set_autosuspend_delay(dev, 100);
-+	pm_runtime_use_autosuspend(dev);
-+	pm_runtime_mark_last_busy(dev);
-+
-+	return 0;
-+}
-+
-+static int qce_runtime_suspend(struct device *dev)
-+{
-+	struct qce_device *qce = dev_get_drvdata(dev);
-+	int ret;
-+
-+	clk_disable_unprepare(qce->core);
-+	clk_disable_unprepare(qce->iface);
-+	clk_disable_unprepare(qce->bus);
-+
-+	ret = icc_set_bw(qce->mem_path, 0, 0);
-+	if (ret) {
-+		clk_prepare_enable(qce->bus);
-+		clk_prepare_enable(qce->iface);
-+		clk_prepare_enable(qce->core);
-+		return ret;
-+	}
-+
-+	return 0;
- }
- 
-+static int qce_runtime_resume(struct device *dev)
-+{
-+	struct qce_device *qce = dev_get_drvdata(dev);
-+	int ret;
-+
-+	ret = icc_set_bw(qce->mem_path, QCE_DEFAULT_MEM_BANDWIDTH,
-+			 QCE_DEFAULT_MEM_BANDWIDTH);
-+	if (ret)
-+		return ret;
-+
-+	ret = clk_prepare_enable(qce->core);
-+	if (ret)
-+		goto err_core;
-+
-+	ret = clk_prepare_enable(qce->iface);
-+	if (ret)
-+		goto err_iface;
-+
-+	ret = clk_prepare_enable(qce->bus);
-+	if (ret)
-+		goto err_bus;
-+
-+	return 0;
-+
-+err_bus:
-+	clk_disable_unprepare(qce->iface);
-+err_iface:
-+	clk_disable_unprepare(qce->core);
-+err_core:
-+	icc_set_bw(qce->mem_path, 0, 0);
-+	return ret;
-+}
-+
-+static const struct dev_pm_ops qce_crypto_pm_ops = {
-+	RUNTIME_PM_OPS(qce_runtime_suspend, qce_runtime_resume, NULL)
-+	SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend, pm_runtime_force_resume)
-+};
-+
- static const struct of_device_id qce_crypto_of_match[] = {
- 	{ .compatible = "qcom,crypto-v5.1", },
- 	{ .compatible = "qcom,crypto-v5.4", },
-@@ -260,6 +344,7 @@ static struct platform_driver qce_crypto_driver = {
- 	.driver = {
- 		.name = KBUILD_MODNAME,
- 		.of_match_table = qce_crypto_of_match,
-+		.pm = pm_ptr(&qce_crypto_pm_ops),
- 	},
- };
- module_platform_driver(qce_crypto_driver);
 -- 
-2.34.1
-
+Regards
+T Pratham <t-pratham@ti.com>
