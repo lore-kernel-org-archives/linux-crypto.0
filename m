@@ -1,143 +1,253 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF9D443A7F4
-	for <linux-crypto@vger.kernel.org>; Wed, 29 Jul 2026 08:56:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33C194279FD
+	for <linux-crypto@vger.kernel.org>; Wed, 29 Jul 2026 10:26:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785315373; cv=none; b=OELS5am4dic5MRQBq5GcqGwQWVE7PEAUq7FY/K/9I3BUNCZ35Z5abl9pLt1K+v7UzfFhAyyAOQLvLO9XbkTwjjiWLPxgIq0j9LSSn0mjH0pZIx+zfdggg2c7Va6nv/07WT9d7fXxiAivDdbG80+670cTz9gM/Lb+DinIYPCNeNw=
+	t=1785320814; cv=none; b=PeWeFKbVFvf9J+YX9kRwJt4zJ+0JHG7WoYno4zZ6eIRdZG6Jzu1eHGYCgQLwb2SAdyidRwowqn+eGQGwzqfD9Ah/SbamrVZphtYhcCUiw8rOiG+IC6KB264Kgt+qjnpiol8pOaWf0ZccllYJx6t7XgR1zgRd2mGftgoLtAsIuq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785315373; c=relaxed/simple;
-	bh=FLgawzuiib38/bmMwP47vHuIgdaIxTcjNnI6O8d7RIo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RS4bbqNFZVVr071PI2Xf0w/iwxBUu6s9vQwWENYlXJYjctKyp46gEA/r0zJIaMkBaN9wH12A76G8j7cUSxagjBPdn9zoy2lPACDk0Fo0bFEeUwhjV+DxU/357BOSIFTMbBL7s31hfCOeyisMVbYuNbixo6Q8gIS2VGoz3ZCB6Bc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=FoOoQbfZ; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=KW3omwDY; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1785320814; c=relaxed/simple;
+	bh=CygJ8T4Zb7XQcQUADszHxMX7rpY4dYAVC5v2dsy5VpQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mKAZ9g0BKdG1AheXTkdU8miYHuZb0frDJUF0COlEW3Dzt2Ajr45fnTo077+bzfF8MyY49+3qI4xbIUAPI8ZSvGn1V6ZCQcwlNNCDh0mexmrEGQcSsYCNQfVY8W8arTQ1Es5OwD+DfKdQ7ooTQz8/J442zu+bWUDMatxcuy4pVw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=SD151rD/; arc=none smtp.client-ip=209.85.215.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="FoOoQbfZ";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="KW3omwDY"
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66T7etVr2326509
-	for <linux-crypto@vger.kernel.org>; Wed, 29 Jul 2026 08:56:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	pxZfcIc/FcVFHb6JANdHjj0w/Cgi98STqjq6SMmiLi8=; b=FoOoQbfZvQA8W+1v
-	KbBOY6zXdaiy4hF85WJh754oG3TGReXqFo0V3MKNtM+5AEcziBCvXXJlRCl4JEE6
-	Gy7TYTYXNVZzmDNTfjxumhDP7TF6ipuJ5NO8aK6ZR9I/Udhwb6mDWov6zvS5DtC1
-	kgl0Pdo77dy4wwJWru9LM6hpoF+uzErdpLZv9EYBfiouzeAeI6LtywwkEIup76M1
-	ZJWXYdUGHYW9Rk2SYuizll/EuQWEq9YD0sUPVe4D/aaDiSAG4OZyn5npM4KUSWAA
-	KjWDQ0F7N/5TZlCI4lkTfFtMqhPjCuda+g7DpiyiFp9RZg1Vp4NXR5tJpHGYjUbq
-	qPj5Ig==
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4fqbm1grax-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Wed, 29 Jul 2026 08:56:11 +0000 (GMT)
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-2d001671a54so16622585ad.2
-        for <linux-crypto@vger.kernel.org>; Wed, 29 Jul 2026 01:56:10 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="SD151rD/"
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-c9d1fff21edso430713a12.1
+        for <linux-crypto@vger.kernel.org>; Wed, 29 Jul 2026 03:26:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1785315370; x=1785920170; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=pxZfcIc/FcVFHb6JANdHjj0w/Cgi98STqjq6SMmiLi8=;
-        b=KW3omwDYxI3D3CGlAqz0+3/1iNs24rusX89FhxqjQQxLiR4YfYxKxnGa1JBRv6TJe5
-         j4hv5ou/aMPDi7Quob2BJeS+ihFR5BWjHjf+v7yCcMTT6xnFsvf8tNs30VbmJLr+r8yR
-         ZVQ8tDacIuK6/rWqj0KNrbOi2x9pghz/YFzOqJ/VeZygjn5WP2EYpTLIxRf6upFpRQ1B
-         R0mUwB5hcoRS/CEB1WXcegCcT6isa5JiyesFTHtjfMr68epDhjAoxLfZQszaAXCsuQho
-         NwYgv0VOY0V4cEQ8if1Arb2qkSORXrOtpu9FD9coxlJchD/DCONrNGtUv7RP5myxODBb
-         FmgA==
+        d=vayavyalabs.com; s=google; t=1785320812; x=1785925612; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=4xKoJRB4NEHLYh+2Y3EmCp7IEodO8atnxKBQr+cph94=;
+        b=SD151rD/8nSJlEEu8b7A+U5985VBFumEwxBn2flvIJVokBLCt1MZvrGPiW4QVVtTh/
+         l3LcCHStTN7DQA9KZtjx2sKhOqyDk/tO6fUMQbWPI7LuIxwojcpf95Q/1xy8z80quBW1
+         81OKkcfOaYmIv7Gdi0s3MkeLmvGHsY1C1NceM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785315370; x=1785920170;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20251104; t=1785320812; x=1785925612;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=pxZfcIc/FcVFHb6JANdHjj0w/Cgi98STqjq6SMmiLi8=;
-        b=SpduFry8e5H4GHSqD39MVcEitj5D8M4hJe8x8YwNs0y0eHD2XRSeFnOGSFUz3JGmiw
-         WyqwMuEca3ZLGVj9tpk8MhBny0qYFQCn5HKWVyRq7NzLS0wMXY8kie+UnshrZkYEap0Y
-         n8PG753MIjhUHcCS5SNNDxTOQ21pr1Cd/DDIOG8hS3ZYxOMFcVTxEXMR8KHCZHnTHqpA
-         67WnBPJSmfuuT924MgQZqdaDVOwn4dWJPJ+maK9EjwG1IFkKGDdLHGNaxxz/PfYH19rG
-         T5DzSoHEgzaFgzu9P32nW2J+mbtqK2xtLtE/G6wNH8Px8VeBBQ25AeICN2x5DmCF8g4O
-         OXzg==
-X-Gm-Message-State: AOJu0YyRtSpeOByW1ONiSrwUTmWyUtbC3qtsIIiUaLHV4jypmDMX6nbz
-	Rb0jtHWogXFinh7qiTocKfqK3clTXvH1Xc79IWNMJwN5Z8269CasFFmE4ZqgTPLl/cCLsVAGU0w
-	s5TyWRVbfxBPDSOQyRhJ7c6gW0exdVPqt8QVu6/hztJOtsJwLYbt2DssSypO8Nq0kGO8=
-X-Gm-Gg: AR+sD12VnSSWFuD5PRr2W4yTYyDz6swvxTSc7NM6AascFRXDomYe6tlgwrW1PTwGjXE
-	1uVZ2L02inuA4vbiIlDQPcLMJAadRjmntWZh/Vj8LPq7S1q9jCoi1DNEptVvZQjo7uoNg59UBoP
-	pG/TS4edamKqCHk9ivUFuxZzjC0DkzAyc5HtiF4SZ43xlALNhcH3J1XS22KXj+SjELjb5yQbQEN
-	DPJhOyz2H3A2By4sX7CTbl/C2QE+1a863clVW3hY9EDTAikYwqHQXyIV+pXZHfDufni+FvoBZaQ
-	GGsre6Lr/skZoUG/1MDZac4plQXNPpLaAl6xbikbmX98qMqfyVhHkGJYYYKl9AucWrRnAzGJHF/
-	X4Q7o9bL8Jivg7ZDlvBT/NvQpFoAQJiA=
-X-Received: by 2002:a17:903:166e:b0:2cf:7d44:e14f with SMTP id d9443c01a7336-2d015d44a72mr67845205ad.26.1785315370381;
-        Wed, 29 Jul 2026 01:56:10 -0700 (PDT)
-X-Received: by 2002:a17:903:166e:b0:2cf:7d44:e14f with SMTP id d9443c01a7336-2d015d44a72mr67844945ad.26.1785315369947;
-        Wed, 29 Jul 2026 01:56:09 -0700 (PDT)
-Received: from [10.218.31.125] ([202.46.22.19])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2d022bf39b5sm7969865ad.57.2026.07.29.01.56.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Jul 2026 01:56:09 -0700 (PDT)
-Message-ID: <1455590d-ac61-4f8c-ae0b-7cbb2c38ab76@oss.qualcomm.com>
-Date: Wed, 29 Jul 2026 14:26:05 +0530
+        bh=4xKoJRB4NEHLYh+2Y3EmCp7IEodO8atnxKBQr+cph94=;
+        b=ryRUmBoVbtGPbgJi4FYQmBgkOpNOBs/A4nmZoAJN63WbhFDNGlRyUrxZE8YN5aNae3
+         V+6OkYOppQAB7Xa28KV9UzynmmOJQp4rxlplF1aktYtAMQ7scWB8Wpb/QLR9Gc05JvWl
+         s4oRxOg3lDeeAYRKZBAgeJHAYMDjT/CNqcZTQbs7lO4MYEVGW94LpEec6Pgq82Ach1kA
+         nlXnSgEVZDql+cNWq6zLQd8glkUvHCUYmHuhl6ok03RgOjOr6r09kKsUouC81Uj8mZVx
+         EqMVmV9Bk6oubzD2E3alRiCoorMbojU+/dYX++9xW55HlMf2yHma3in19A14k3N1CNie
+         v+/A==
+X-Gm-Message-State: AOJu0YzVSKyDWKccWvrmI8mGpglovh/HahZ8Hk2uTwg57mCckxDDIR4X
+	UMKbEK9POt3UJvJ0umlg1sOrk8kqD1bsONWKO4oYGKm+lRwn+0o0ZJXlb/emcDtnJ8OpM99DCYX
+	/AQcx7G0=
+X-Gm-Gg: AR+sD10tMiS5aOU9l4GTSRW5yeBfX+HH/eIjbGvycmm/dEVZDNC/iqNUGWrNSHFp9/E
+	zRODSV2Es5j5b/8mgG6PKuSBcq7jQ2HSzfADyHo/QamW3W/N2eP1gXNU4ub92xnPP63haXZZltm
+	5s7GXlRpX9s0M+vqgoj/6l5IEMDoeplWeowWCqjHI+jNKUxdR3ym3E65PmY9zBUadKdUOmMccdf
+	jlDRtYq/TiznZiDxcG2SZWxTCtF9um3j7HZ8oRR4spaupTOo2x9ajmd4NJOtbVpeH3IN1Ubl2NU
+	MOLDMyWnO9daiudJOmyZGdWv2PXhU+FxoS9+jBzHZ8WhINWpgcwjqmNh0tp478KKDeMoCSwhmcd
+	gCDvpQO48OA5ggeDZTyW3WVtw2tviC528+T1GmUkYfbQ+xdHk6EO1psLqo/bWVAV3bh0qmCtkeZ
+	/0IgZ/zyvU1NeoYKjOEdFsjRD9ocOpgmHQ1bbxAcHbSoF1Te5PZo9FisE9GdKQ/EFS4a/lS87uG
+	hdxw48xHSgJVNBICufmhDDPb+hrhC21QxrFf8soWbCytwsWaTyf42a6jn4CQWGHRaiPSTsGtt1h
+	z1gSAcd37x1JBbq+sKmMn8MO8a7b
+X-Received: by 2002:a05:6a20:748c:b0:3b4:5c70:ca3e with SMTP id adf61e73a8af0-3c8ab0e16d6mr7808703637.25.1785320812201;
+        Wed, 29 Jul 2026 03:26:52 -0700 (PDT)
+Received: from localhost.localdomain ([103.108.57.9])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-31504b15f77sm9238958eec.4.2026.07.29.03.26.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Jul 2026 03:26:50 -0700 (PDT)
+From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+To: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	herbert@gondor.apana.org.au,
+	robh@kernel.org
+Cc: krzk@kernel.org,
+	conor+dt@kernel.org,
+	ruud.derwig@gf.com,
+	rbannerm@synopsys.com,
+	manjunath.hadli@vayavyalabs.com,
+	adityak@vayavyalabs.com,
+	navami.telsang@vayavyalabs.com,
+	bhoomikak@vayavyalabs.com,
+	nazim.khan@vayavyalabs.com,
+	Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+Subject: [PATCH v19 0/4] crypto: spacc - Add SPAcc Crypto Driver
+Date: Wed, 29 Jul 2026 15:55:43 +0530
+Message-Id: <20260729102547.159890-1-pavitrakumarm@vayavyalabs.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8] crypto: qce - Add runtime PM and interconnect
- bandwidth scaling support
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-        Udit Tiwari <udit.tiwari@oss.qualcomm.com>,
-        herbert@gondor.apana.org.au, thara.gopinath@gmail.com,
-        davem@davemloft.net
-Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, quic_neersoni@quicinc.com
-References: <20260517105233.807935-1-udit.tiwari@oss.qualcomm.com>
- <d5de5a55-eb35-4ad5-8d53-12e188e156cb@oss.qualcomm.com>
- <f19fa79b-82c6-4cb7-87fe-43c9b92907de@oss.qualcomm.com>
-Content-Language: en-US
-From: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
-In-Reply-To: <f19fa79b-82c6-4cb7-87fe-43c9b92907de@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzI5MDA3MiBTYWx0ZWRfX5HrB74IVu7wN
- oeWCXO9NBY5Zwno4TkfSqIpXmsJYAMd1V0AmUM+TvYH+SW8i6TcIRum9MXvjjyW8ioh7cd77HTU
- YBCfy37cD5BpyhnaK88oGuDNzVZEpuRxvAyslj6GCvSXrraHmmf9I3SPkM1oP60DQ1h1W5tfoct
- gQKdku2aMgV/5gWjaUFS84j8Vhhpic8Dh7AXVRPE0UQlAwU4FvCbYULZev6vughO0lp+UVFvSUF
- kxhEF4CLNT+hPaFw4bxY0dWbF/pSUZcOFXVfc1BqLa/FLg4DnyTI+wAfNw6NNQoFbBK6bh7FPvY
- 8SYgyFq1EXPFmBgoo12F6/fw05mP4q3g+OKk7imK4laXfhruUBrOiE1pmNaA0A4hcCWJGQBAjS8
- IpxmQ3h+Ry2NqavkzOwsiLn58c8rqXX9/fkVMYkSM51/Es6AZI3kkM2XhbJ3aSzPiN5y+xC4tfD
- SFYLZE7Bi84LHy3zoqw==
-X-Proofpoint-GUID: C5IHuEWBakxhOobint_dmfvxutoDPbnq
-X-Authority-Analysis: v=2.4 cv=R7Az39RX c=1 sm=1 tr=0 ts=6a69c02b cx=c_pps
- a=cmESyDAEBpBGqyK7t0alAg==:117 a=fChuTYTh2wq5r3m49p7fHw==:17
- a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=eoimf2acIAo5FJnRuUoq:22
- a=hkcS3Ldj-Qh5X0bBtzIA:9 a=QEXdDO2ut3YA:10 a=1OuFwYUASf3TG4hYMiVC:22
-X-Proofpoint-ORIG-GUID: C5IHuEWBakxhOobint_dmfvxutoDPbnq
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzI5MDA3MiBTYWx0ZWRfX9t/uGGFj2pEk
- Y6tiFMmbqk27Ng+Dvg9ufQzzySUcsv9vfXvOsGZuqX6zFDPRcFAVHJnE8uDXbu8ACYaOgMVjWm9
- wgdZOcqgxz5m/FT/2l9zTtJ3dnsB25Y=
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-29_03,2026-07-28_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 malwarescore=0 bulkscore=0 priorityscore=1501 phishscore=0
- adultscore=0 lowpriorityscore=0 impostorscore=0 suspectscore=0 clxscore=1015
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607290072
+Content-Transfer-Encoding: 8bit
 
-> This needs to be rebased on linux-next/master
+Add the driver for SPAcc(Security Protocol Accelerator), which is a
+crypto acceleration IP from Synopsys. The SPAcc supports multiple ciphers,
+hashes and AEAD algorithms with various modes. The driver currently supports
+below
 
-This patch is floating for a long time with no reviews/feedbacks.
-I can rebase and send v9 hoping this will be picked up soon for merge
-window if everything seems good.
+hash:
+- cmac(aes)
+- xcbc(aes)
+- cmac(sm4)
+- xcbc(sm4)
+- hmac(md5)
+- md5
+- hmac(sha1)
+- sha1
+- sha224
+- sha256
+- sha384
+- sha512
+- hmac(sha224)
+- hmac(sha256)
+- hmac(sha384)
+- hmac(sha512)
+- sha3-224
+- sha3-256
+- sha3-384
+- sha3-512
 
--- 
-Regards
-Kuldeep
+changelog:
+  v1->v2 changes:
+    - Added local_bh_disable() and local_bh_enable() for the below calls.
+      a. for ciphers skcipher_request_complete()
+      b. for aead aead_request_complete()
+      c. for hash ahash_request_complete()
+    - dt-bindings updates
+      a. removed snps,vspacc-priority and made it into config option
+      b. renamed snps,spacc-wdtimer to snps,spacc-internal-counter
+      c. Added description to all properties
+    - Updated corresponding dt-binding changes to code
+
+  v2->v3 changes:
+    - cra_init and cra_exit replaced with init_tfm and exit_tfm for hashes.
+    - removed mutex_lock/unlock for spacc_skcipher_fallback call
+    - dt-bindings updates
+     a. updated SOC related information
+     b. renamed compatible string as per SOC
+   - Updated corresponding dt-binding changes to code
+
+  v3->v4 changes:
+   - removed snps,vspacc-id from the dt-bindings
+   - removed mutex_lock from ciphers
+   - replaced magic numbers with macros
+   - removed sw_fb variable from struct mode_tab and associated code from the
+     hashes
+   - polling code is replaced by wait_event_interruptible
+
+  v4->v5 changes:
+   - Updated to register with the crypto-engine
+   - Used semaphore to manage SPAcc device hardware context pool
+   - This patchset supports Hashes only
+   - Dropping the support for Ciphers and AEADs in this patchset
+   - Added Reviewed-by tag on the Device tree patch since it was reviewed on
+     v4 patch by Krzysztof Kozlowski and Rob Herring (Arm)
+
+  v5->v6 changes:
+   - Removed CRYPTO_DEV_SPACC_CIPHER and CRYPTO_DEV_SPACC_AEAD Kconfig options,
+     since the cipher and aead support is not part of this patchset
+   - Dropped spacc_skcipher.o and spacc_aead.o from Makefile to fix build errors
+     reported by kernel test robot
+   - Added Reported-by and Closes tags as suggested
+
+  v6->v7 changes:
+   - Fixed build error reported by Kernel test robot
+   - Added Reported-by and Closes tags as suggested
+
+  v7->v8 changes:
+   - Fixed misleading comment: Clarified that only HMAC key pre-processing
+     is done in software, while the actual HMAC operation is performed by
+     hardware
+   - Simplified do_shash() function signature by removing unused parameters
+   - Updated all do_shash() call sites to use new simplified signature
+   - Fixed commit message formatting by adding "crypto: spacc - <subject>" to
+     all patches
+   - used __free() for scope based resource management
+
+  v8->v9 changes:
+   - Updated the software fallback implementation to use HASH_FBREQ_ON_STACK
+   - Corrected dynamic allocation of statesize and reqsize in init_tfm
+   - Fixed synchronization issues in the digest request
+
+  v9->v10 changes:
+   - Fixed unused variable warning
+
+  v10->v11 changes:
+   - Removed the redundant crypto_alloc_ahash in the init_tfm function
+   - Removed the redundant crypto_free_ahash in exit_tfm function
+   - Removed the redundant crypto_ahash_setkey call in setkey function
+
+  v11->v12 changes:
+   - Removed do_shash() and switched to lib/crypto API in spacc_hash_setkey
+   - Dropped support for SM3 algorithm
+   - Improved multi-device safety by encapsulating handling within priv
+   - Added memzero_explicit() in sensitive paths
+   - Minor code cleanups and style fixes
+   - Algorithm registration cleanups
+
+  v12->v13 changes:
+   - Removed all the sleep function from setkey function
+   - Added shash implemntation for aes algorthims
+
+  v13->v14 changes:
+   -Added fixes based on the reports by Sashiko
+   -Removed the spacc_is_mode_keysize_supported call from do_one_request
+
+  v14->v15 changes:
+   -Added fixes based on the reports by Sashiko on 19/jun/2026
+   -Fixed styling in the Kconfig
+
+  v15->v16 changes:
+   -Added fixes based on the reports by Sashiko
+
+  v16->v17 changes:
+   -Added fixes based on the reports by Sashiko
+
+  v17->v18 changes:
+   -Added fixes based on the reports by Sashiko
+
+  v18->v19 changes:
+   -Added fixes based on the reports by Sashiko
+
+Pavitrakumar Managutte (4):
+  dt-bindings: crypto: Document support for SPAcc
+  crypto: spacc - Add SPAcc ahash support
+  crypto: spacc - Add SPAcc AUTODETECT Support
+  crypto: spacc - Add SPAcc Kconfig and Makefile
+
+ .../bindings/crypto/snps,dwc-spacc.yaml       |   50 +
+ drivers/crypto/Kconfig                        |    1 +
+ drivers/crypto/Makefile                       |    1 +
+ drivers/crypto/dwc-spacc/Kconfig              |   82 +
+ drivers/crypto/dwc-spacc/Makefile             |    7 +
+ drivers/crypto/dwc-spacc/spacc_ahash.c        | 1001 +++++++
+ drivers/crypto/dwc-spacc/spacc_core.c         | 2561 +++++++++++++++++
+ drivers/crypto/dwc-spacc/spacc_core.h         |  857 ++++++
+ drivers/crypto/dwc-spacc/spacc_device.c       |  288 ++
+ drivers/crypto/dwc-spacc/spacc_device.h       |  242 ++
+ drivers/crypto/dwc-spacc/spacc_hal.c          |  344 +++
+ drivers/crypto/dwc-spacc/spacc_hal.h          |  118 +
+ drivers/crypto/dwc-spacc/spacc_interrupt.c    |  324 +++
+ drivers/crypto/dwc-spacc/spacc_manager.c      |  665 +++++
+ 14 files changed, 6541 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml
+ create mode 100644 drivers/crypto/dwc-spacc/Kconfig
+ create mode 100644 drivers/crypto/dwc-spacc/Makefile
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_ahash.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_core.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_core.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_device.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_device.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_interrupt.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_manager.c
+
+
+base-commit: 1163a476a568f6c0f852d469c8e4c5a5f805adac
+--
+2.25.1
 
