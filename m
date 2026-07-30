@@ -1,149 +1,66 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B10CE3B0591;
-	Thu, 30 Jul 2026 05:29:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EC0C1E515;
+	Thu, 30 Jul 2026 06:36:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785389372; cv=none; b=fKJrGp73AVrykRAfEiW7pwhoQtXusSNOqfe8wkXSiU4v9K+jkwyIOozxjAn39aXnQHbuwFN5UwFWfT1ryMDMcv+HK0rYaCngvczGFWkrwt/mbqruvLi7K7uCyHH/FVPfqrIKuspT9anOkfwhn5lUpEBuJPop6rXcLAFSsF8OYo8=
+	t=1785393370; cv=none; b=X+5eL8RuBh9VFemQ2Gax3BL7Uyp1/a9aLToRtdLax9TqVvegdkg6KtU6xx/SEQvkUvdcAH14OAruEDb44ffDKGMoxBSQdMrfGR2mE1MW9yFt89O/aEuKVjPwoeEF7rKkS6MpbnCuxpWEg9g/OqkQ9pYiwVH1FEbWuGjUUZfumY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785389372; c=relaxed/simple;
-	bh=+48OdW2c+eMcu7qH9gjWRZnUcX90oCow45HZ5Uma/8E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KdVfMHDhJJLZ4ch6jOc0THiJUu/EwLJvUKhrjO9/iMM644l7xWr3YbmJ5hl7AAJtS/tj8zu7A6tMgCcawf1STueIfTdl1dGHZITtsAo0mGNu76DaIxbmC/mMiaTdGPB0ahf7HKn+POrd2Gh/uIYHUdKeWW/P/ORQqdsCiXd7XxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=RVMLSTev; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1785393370; c=relaxed/simple;
+	bh=0BHfa9/esMOPARJ9h+TGO4/fIH9I0oB6kjngm2ERuW4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g3zo4qNkZBhaVTHkXhQy3pYgkCdKGVFgtVMU+C2LNZyNghkW5d9forcGlxblRvkZNqhH+HETXVihlCVOEw6Vt6hNhLLOAwBn4Wae5EUrZnoJXuVUTc8vuB2JBGgvxeYF7/Q9nmFe7h2DtCRXtjef+SzOsC/8QRsZ5fSwvtTIsCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R/jdMbXJ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="RVMLSTev"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66U3lbAV037522;
-	Thu, 30 Jul 2026 05:29:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=GsS/PcaiZHkSIqKAt
-	n0OpAFt9rSX4OlSrapO6SOezxA=; b=RVMLSTev/6WJX4w+df3G8sJf8lznLSCzu
-	y3vLDzKjD4ZrFyWIAAErv+s3sjeZ++egFJ1mnTBHuHBHkB6x/7Ta8aB7G9csDalW
-	KUIpNTrUEldMBe9/ts/QusgqLkM9lSyFQMSL8ZeGKewlhcGajGxrqhTVJ1sSQw0N
-	TG/emgyHih2CYRzvT1kFbnwVnuOS9ZaqEd3WZy94buKQk5wshz1uIpCT+u5kCQO1
-	mLWwqYYnQcV/DR19WIZMOqOccCcr94HJe8wvb1jFDyOMyHqkIuQW1rH65MNiZYFy
-	89Cre1EDIjGHPfCeCypeLStpvmZ6/m7nV6QFrfynL53+Tz99j8dsg==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fmuycp379-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 30 Jul 2026 05:29:14 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 66U5QJNN005190;
-	Thu, 30 Jul 2026 05:29:13 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4fn8yhht4c-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 30 Jul 2026 05:29:12 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 66U5T89426280218
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 30 Jul 2026 05:29:08 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C6EF320040;
-	Thu, 30 Jul 2026 05:29:08 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8F9732004D;
-	Thu, 30 Jul 2026 05:29:08 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 30 Jul 2026 05:29:08 +0000 (GMT)
-From: Heiko Carstens <hca@linux.ibm.com>
-To: Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Holger Dengler <dengler@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH v3 4/4] s390/cio: Remove cond_resched() calls
-Date: Thu, 30 Jul 2026 07:29:07 +0200
-Message-ID: <20260730052907.2607026-5-hca@linux.ibm.com>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260730052907.2607026-1-hca@linux.ibm.com>
-References: <20260730052907.2607026-1-hca@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R/jdMbXJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1ACEC1F000E9;
+	Thu, 30 Jul 2026 06:36:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785393369;
+	bh=uqfoNFBJ9FFItfmhvuet1AGsE8BMVfg5ig2Ih1eTV+o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=R/jdMbXJCWy/phffXtJHlICuOIIg7ky/c/jkC96VWiu7FVghB/4pny1Xt+pmFQZJX
+	 PLV7Z/ZSy7Nr1/HnVIR2zt+QE6H+362ftcLx6ekmHrYN8dSYXhERXQ9apgBpA8lRaZ
+	 5VfMYGIJ9mIRgimkwsOUjmv4mc2kJaXoW2REIVmggbBfObUPorx/3ceAhsJofwbW9X
+	 VryNjHWmWIrE8zh7td87aHsVdpzjtp5xUJWH8RZ4mEDTYPUwfhDMhg5lLebrqNOBYc
+	 yzWcClzW6JEXuj5qH7PSDdeGPeLOvH411jgYWarAolhMS4ndAVztNL4I0Tybn8ZWeI
+	 wEkLuY9zKKqoA==
+Date: Thu, 30 Jul 2026 08:36:05 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Wenjia Zhang <wenjia.zhang@oss.qualcomm.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 1/2] dt-bindings: crypto: qcom,inline-crypto-engine:
+ Add x1e80100 support
+Message-ID: <20260730-eminent-innocent-quoll-cb2d26@quoll>
+References: <20260728-hamoa_ufs_ice_change-v3-0-293c7c6c2ae5@oss.qualcomm.com>
+ <20260728-hamoa_ufs_ice_change-v3-1-293c7c6c2ae5@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 8B7U-78mlGFTjwtsAt3a0tWbBIPUeUMA
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzMwMDAzMyBTYWx0ZWRfX+sAlQljUvAAw
- 4I1/75GA5ZgrmHxSjzkZf5twRDRsDY/bN/W0rg0ft1MVcrtSxAWdmI8YR3Yt5aQ7d+xijqcJSCD
- 66BfrsQeiz9wDsaLDnY55qTJ2PPB1MrcCiBxu9hf6KxQ6Bc3avvut2i6RA0m1uH7R/+RmF90dM6
- AKCeLXtX2bJ+cJRKNeGBzyUjjLGGJKzUW2iHvJBvZM/Hb6XnEYd8Gy4Zf9f9StpOjj+D1umnBN7
- UeXk8WUaY0aTiZOZMgO3GCoUxljIaKOGAjaHv6HBEALpJ/LfpfHG9Q5RXI+Xnu4CdrCsMkZFG9M
- sX9XgTRp+9f/WbVWoRHMzQYJSEdUn0soelOZe6F0NaX+CJBRU5TTO1ZP2FybiHlOYjtlX+fvtou
- 2EBvtmr9uL9ONi6+HIcyeaVgqrp3A6ePmDCYnSmL9MGDjp59hra+hoMNl6jB5AJLyhCNO90Dz4R
- 7csFJHEifkTthFNlkqA==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzMwMDAzMyBTYWx0ZWRfXwcaopS+HXSiC
- Z5y07MsAwuQnyCbPK++Qe57I6t+uxvLhymmc1wm7Mx9HBa5ds4GDcSfGIvwV0ApYhg5Lv7VHBY4
- iBREfg374ihP8IKHp2dZdt3cp/CXvsk=
-X-Authority-Analysis: v=2.4 cv=AZeB2XXG c=1 sm=1 tr=0 ts=6a6ae12a cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8 a=yDFob_ultygKJmZAZNUA:9
- a=O8hF6Hzn-FEA:10
-X-Proofpoint-GUID: 8B7U-78mlGFTjwtsAt3a0tWbBIPUeUMA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-30_01,2026-07-29_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 priorityscore=1501 phishscore=0 adultscore=0 impostorscore=0
- clxscore=1015 malwarescore=0 suspectscore=0 lowpriorityscore=0 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607300033
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260728-hamoa_ufs_ice_change-v3-1-293c7c6c2ae5@oss.qualcomm.com>
 
-Since [1] cond_resched() is a no-op on s390. Remove all calls.
+On Tue, Jul 28, 2026 at 05:53:55PM +0800, Wenjia Zhang wrote:
+> Document the compatible string for inline crypto engine found
+> on the Qualcomm X1E80100 SoC, used by the Hamoa IoT EVK board.
+> 
+> Signed-off-by: Wenjia Zhang <wenjia.zhang@oss.qualcomm.com>
+> ---
+>  Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml | 1 +
+>  1 file changed, 1 insertion(+)
 
-[1] commit 7dadeaa6e851 ("sched: Further restrict the preemption modes")
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
 
-Reviewed-by: Peter Oberparleiter <oberpar@linux.ibm.com>
-Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
----
- drivers/s390/cio/css.c | 8 --------
- 1 file changed, 8 deletions(-)
-
-diff --git a/drivers/s390/cio/css.c b/drivers/s390/cio/css.c
-index e5a0ec6b4e3e..54b8b8639694 100644
---- a/drivers/s390/cio/css.c
-+++ b/drivers/s390/cio/css.c
-@@ -618,11 +618,6 @@ static int slow_eval_known_fn(struct subchannel *sch, void *data)
- 		rc = css_evaluate_known_subchannel(sch, 1);
- 		if (rc == -EAGAIN)
- 			css_schedule_eval(sch->schid);
--		/*
--		 * The loop might take long time for platforms with lots of
--		 * known devices. Allow scheduling here.
--		 */
--		cond_resched();
- 	}
- 	return 0;
- }
-@@ -654,9 +649,6 @@ static int slow_eval_unknown_fn(struct subchannel_id schid, void *data)
- 		default:
- 			rc = 0;
- 		}
--		/* Allow scheduling here since the containing loop might
--		 * take a while.  */
--		cond_resched();
- 	}
- 	return rc;
- }
--- 
-2.53.0
+Best regards,
+Krzysztof
 
