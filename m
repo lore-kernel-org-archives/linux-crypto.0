@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA9E3630BF;
-	Thu, 30 Jul 2026 01:35:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 979AA35C68A;
+	Thu, 30 Jul 2026 01:35:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785375323; cv=none; b=cLviOSBjaCuPlfmPgU5+lKX5FKxZRm8D89X3uhrnusInNc5NwMklW6nP1LRTuo0z5F4MvDcqhHqD0G2/kkqK7UiDT+sgLkHrlJik8RNojutIIteXCFTG65qIQalczmeSTHleNV/H5fld0gqaz7gBqFDsKk/Nlkfp6AupzH4GZDA=
+	t=1785375324; cv=none; b=KBipVcQhB07kCrXPCbZqev6Akq5+HmkeYHNhwf5Els2HOYSQQeM414qPGn9mktnXYagfUnN8N1p/dQeYfZvTcOJGvynzgYKosAwgqztQ/dwdii0KVdqV3f154Z0uMoP3tSTgPAX/eHwhETS6nzC+k4kO41dsxbIXsSCrdutlJNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785375323; c=relaxed/simple;
-	bh=DhzH0rrEzluD6DjLRFKEPz9iVCeuSt9oqSBRsB1CjZs=;
+	s=arc-20240116; t=1785375324; c=relaxed/simple;
+	bh=ZoqFrp0SpEcqhMbhNUGTG+LN0l9lnWQB1G/HURwqNa8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LzON52j4tHGIgolR8IUIvUEMUn3kmUIBWh63AWdromXmNBp6BfF4wVdbzm3TzphpV8anD29eV36tcwgSrboNYQWK+gldddkXHrq7ShAWR0BkbgxXeXRMHGUOCuX7BisD2ehXjX1n14nPUnRz1FLUBQXe8mhnwgVopXSlOKFSxeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A/bLa8wo; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=Tf3FCySWl4FRd6JreHZTRoOK55zu1URAG7zvzYIKN9BH6Uws0vxMtNKfnCA9Rba1XpyxoVYtIxbklTAnxwW8zI9+6qXy+6X1pwCn34Tj5CyUjJkmTMBYN12aSIEPExk5ZndaVSiJI39MpJaDZsc/qy4Qe9pjRRmO4M1RWRD8QCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DYxAi3KS; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A/bLa8wo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE5421F00ACF;
-	Thu, 30 Jul 2026 01:35:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DYxAi3KS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFF7F1F00AC4;
+	Thu, 30 Jul 2026 01:35:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1785375319;
-	bh=tk71y4s9JkE8hKB0OIg10Y/koqxOIYQMT9b0BmO90jA=;
+	bh=fRfmNrciqYE5Y6SparpX00w5ZpyzQywIOWHaAbkYqLE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=A/bLa8woryhcemDNKxBBikT+Q8FMWTNrR5kRyjV+1cTZ822hk1M/uA7aGrGH8dN+f
-	 1Vqh1lb+UDOUXANV0Q8H9ynrSd2zKQ2y8OrKqNDK0gR9ZTPboKNrcF3ViQ0HOERIcR
-	 Zrz51tniVleR21vzmnoYupuUKeZ2WJEfqMB15fTj0XxA54Jo8oe4wg3e4S4rcvXm3v
-	 ZXhMZ8EJyz4PwaNC6+8izjBR/tT2+C5Y0T0HR0r7/DcTgFfh0V2J3AN11XV8wOMmM3
-	 66e9W1Rfc6+fwkFFyRQNP1P5gJeeaFs1v7mYg0Leuto86CujnjBQ9q/YZvBdiptQLb
-	 dBAP2r0ph0ARw==
+	b=DYxAi3KS0lJCB/2OWZfEJc/yqyct2X/4zgAIibZ3cPWKJhbhWY8Bzgb2BkM0nZoLf
+	 GWs1rm98d1EB+/6fHxOIDkeJ1bgAO2unJl9hAoAEXz27FyyqVHKRb+LbIwBx3w+4wc
+	 UTMwNJF17PdZnaOBfT8EZm7GJYYQDs7hoAPL31NnInez0Bwdc/PUNyvYqichnwFyu7
+	 7DRk8YpozfAhRO2LC7ZAF/q3we5LnENcNnrLLSU6j6tN0LDNbbdg09ioqThPbugUjz
+	 a4NLxMoLMiKuqCiIQYd0CMRadXm8yRXncHKdacNjOu6i7D46EuesgaEe5M6c9iT5Df
+	 xUk7h6RwXxoVw==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -34,9 +34,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Thomas Huth <thuth@redhat.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 5/5] lib/crypto: tests: Add KUnit test suite for AES-GCM
-Date: Wed, 29 Jul 2026 18:33:00 -0700
-Message-ID: <20260730013301.160203-6-ebiggers@kernel.org>
+Subject: [PATCH 3/5] lib/crypto: tests: Add aead-test-template.h
+Date: Wed, 29 Jul 2026 18:32:58 -0700
+Message-ID: <20260730013301.160203-4-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260730013301.160203-1-ebiggers@kernel.org>
 References: <20260730013301.160203-1-ebiggers@kernel.org>
@@ -48,578 +48,1067 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a KUnit test suite for the AES-GCM library API.
+Add aead-test-template.h which contains shared test logic for AEAD
+algorithms.  It's similar to the existing hash-test-template.h, which
+contains shared test logic for hash algorithms.
 
-It consists of:
+The initial use cases for this will be AES-CCM and AES-GCM.
 
-- All the shared test cases from aead-test-template.h.  These include
-  extensive consistency tests, a "Monte-Carlo test", and a benchmark.
-
-- Tests against hardcoded AES-GCM test vectors from external sources.
+It may be used by the existing ChaCha20Poly1305 test suite in the future
+as well, though the ChaCha20Poly1305 API currently lacks some of the
+functionality that the "template" expects to be present.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- lib/crypto/.kunitconfig             |   1 +
- lib/crypto/tests/Kconfig            |   9 +
- lib/crypto/tests/Makefile           |   1 +
- lib/crypto/tests/aes_gcm_kunit.c    | 472 ++++++++++++++++++++++++++++
- scripts/crypto/gen-aead-testvecs.py |  13 +-
- 5 files changed, 494 insertions(+), 2 deletions(-)
- create mode 100644 lib/crypto/tests/aes_gcm_kunit.c
+ lib/crypto/tests/aead-test-template.h | 1039 +++++++++++++++++++++++++
+ 1 file changed, 1039 insertions(+)
+ create mode 100644 lib/crypto/tests/aead-test-template.h
 
-diff --git a/lib/crypto/.kunitconfig b/lib/crypto/.kunitconfig
-index f0237e602f28..60e0a77f9889 100644
---- a/lib/crypto/.kunitconfig
-+++ b/lib/crypto/.kunitconfig
-@@ -4,6 +4,7 @@ CONFIG_CRYPTO_LIB_ENABLE_ALL_FOR_KUNIT=y
- 
- CONFIG_CRYPTO_LIB_AES_CBC_MACS_KUNIT_TEST=y
- CONFIG_CRYPTO_LIB_AES_CCM_KUNIT_TEST=y
-+CONFIG_CRYPTO_LIB_AES_GCM_KUNIT_TEST=y
- CONFIG_CRYPTO_LIB_BLAKE2B_KUNIT_TEST=y
- CONFIG_CRYPTO_LIB_BLAKE2S_KUNIT_TEST=y
- CONFIG_CRYPTO_LIB_CHACHA20POLY1305_KUNIT_TEST=y
-diff --git a/lib/crypto/tests/Kconfig b/lib/crypto/tests/Kconfig
-index 320236e996b1..e121114624da 100644
---- a/lib/crypto/tests/Kconfig
-+++ b/lib/crypto/tests/Kconfig
-@@ -18,6 +18,15 @@ config CRYPTO_LIB_AES_CCM_KUNIT_TEST
- 	help
- 	  KUnit tests for the AES-CCM authenticated encryption algorithm.
- 
-+config CRYPTO_LIB_AES_GCM_KUNIT_TEST
-+	tristate "KUnit tests for AES-GCM" if !KUNIT_ALL_TESTS
-+	depends on KUNIT && CRYPTO_LIB_AES_GCM
-+	default KUNIT_ALL_TESTS
-+	select CRYPTO_LIB_BENCHMARK_VISIBLE
-+	# This test uses BLAKE2s, but that's always built-in.
-+	help
-+	  KUnit tests for the AES-GCM authenticated encryption algorithm.
-+
- config CRYPTO_LIB_BLAKE2B_KUNIT_TEST
- 	tristate "KUnit tests for BLAKE2b" if !KUNIT_ALL_TESTS
- 	depends on KUNIT && CRYPTO_LIB_BLAKE2B
-diff --git a/lib/crypto/tests/Makefile b/lib/crypto/tests/Makefile
-index 085852ba008b..c97c1d78784a 100644
---- a/lib/crypto/tests/Makefile
-+++ b/lib/crypto/tests/Makefile
-@@ -2,6 +2,7 @@
- 
- obj-$(CONFIG_CRYPTO_LIB_AES_CBC_MACS_KUNIT_TEST) += aes_cbc_macs_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_AES_CCM_KUNIT_TEST) += aes_ccm_kunit.o
-+obj-$(CONFIG_CRYPTO_LIB_AES_GCM_KUNIT_TEST) += aes_gcm_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_BLAKE2B_KUNIT_TEST) += blake2b_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_BLAKE2S_KUNIT_TEST) += blake2s_kunit.o
- obj-$(CONFIG_CRYPTO_LIB_CHACHA20POLY1305_KUNIT_TEST) += chacha20poly1305_kunit.o
-diff --git a/lib/crypto/tests/aes_gcm_kunit.c b/lib/crypto/tests/aes_gcm_kunit.c
+diff --git a/lib/crypto/tests/aead-test-template.h b/lib/crypto/tests/aead-test-template.h
 new file mode 100644
-index 000000000000..6959d86b316a
+index 000000000000..0c0138d2fa8a
 --- /dev/null
-+++ b/lib/crypto/tests/aes_gcm_kunit.c
-@@ -0,0 +1,472 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
++++ b/lib/crypto/tests/aead-test-template.h
+@@ -0,0 +1,1039 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
 +/*
-+ * KUnit test suite for AES-GCM
++ * Shared KUnit test cases for AEAD algorithms, including a benchmark
 + *
 + * Copyright 2026 Google LLC
 + */
-+#include <crypto/aes-gcm.h>
-+#include <crypto/blake2s.h>
-+#include "test-utils.h"
-+
-+/* The kernel's AES-GCM implementation supports only 12-byte nonces. */
-+#define AES_GCM_NONCE_LEN 12
 +
 +/*
-+ * AES-GCM test vectors from the original paper "The Galois/Counter Mode of
-+ * Operation (GCM)" by McGrew & Viega.  Vectors with nonce lengths other than 12
-+ * bytes are excluded.
++ * This file implements KUnit test cases shared by the different KUnit test
++ * suites for Authenticated Encryption with Associated Data (AEAD) algorithms.
++ *
++ * Test suites including this file must #define the following:
++ *
++ * Data structs:
++ * - AEAD_KEY: name of key struct
++ * - AEAD_CTX: name of context for incremental computation
++ *
++ * Constants:
++ * - AEAD_VALID_KEY_LENS: array of all valid key lengths in bytes
++ * - AEAD_VALID_NONCE_LENS: array of all valid nonce lengths in bytes
++ * - AEAD_VALID_TAG_LENS: array of all valid authtag lengths in bytes
++ * - AEAD_MAX_KEY_LEN: max key length in bytes (assumed to fit on stack)
++ * - AEAD_MAX_NONCE_LEN: max nonce length in bytes (assumed to fit on stack)
++ * - AEAD_MAX_TAG_LEN: max authtag length in bytes (assumed to fit on stack)
++ * - AEAD_MONTE_CARLO_CHECKSUM: checksum of a deterministically generated series
++ *   of (ciphertext, authtag) pairs (see test_aead_monte_carlo())
++ *
++ * Functions:
++ * - AEAD_PREPAREKEY: key preparation
++ * - AEAD_ENCRYPT and AEAD_DECRYPT: one-shot encryption and decryption
++ * - AEAD_INIT, AEAD_AUTH_UPDATE, AEAD_ENCRYPT_UPDATE, AEAD_ENCRYPT_FINAL,
++ *   AEAD_DECRYPT_UPDATE, AEAD_DECRYPT_FINAL: functions for incremental
++ *   encryption and decryption
++ *
++ * Function prototypes and their behavior must match the AES-CCM API.
 + */
-+static const struct aes_gcm_testvec {
-+	const char *name;
-+	const char *key;
-+	size_t key_len;
-+	const char *nonce;
-+	size_t nonce_len;
-+	const char *ad;
-+	size_t ad_len;
-+	const char *ptext;
-+	const char *ctext;
-+	size_t data_len;
-+	const char *tag;
-+	size_t tag_len;
-+} aes_gcm_testvecs[] = {
-+	/* AES-128 Test Vectors */
-+	{
-+		.name = "McGrew & Viega Test Case 1",
-+		.key = "\x00\x00\x00\x00\x00\x00\x00\x00"
-+		       "\x00\x00\x00\x00\x00\x00\x00\x00",
-+		.key_len = 16,
-+		.nonce = "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			 "\x00\x00\x00\x00",
-+		.nonce_len = 12,
-+		.ptext = "",
-+		.ctext = "",
-+		.data_len = 0,
-+		.ad = "",
-+		.ad_len = 0,
-+		.tag = "\x58\xe2\xfc\xce\xfa\x7e\x30\x61"
-+		       "\x36\x7f\x1d\x57\xa4\xe7\x45\x5a",
-+		.tag_len = 16,
-+	},
-+	{
-+		.name = "McGrew & Viega Test Case 2",
-+		.key = "\x00\x00\x00\x00\x00\x00\x00\x00"
-+		       "\x00\x00\x00\x00\x00\x00\x00\x00",
-+		.key_len = 16,
-+		.nonce = "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			 "\x00\x00\x00\x00",
-+		.nonce_len = 12,
-+		.ptext = "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			 "\x00\x00\x00\x00\x00\x00\x00\x00",
-+		.ctext = "\x03\x88\xda\xce\x60\xb6\xa3\x92"
-+			 "\xf3\x28\xc2\xb9\x71\xb2\xfe\x78",
-+		.data_len = 16,
-+		.ad = "",
-+		.ad_len = 0,
-+		.tag = "\xab\x6e\x47\xd4\x2c\xec\x13\xbd"
-+		       "\xf5\x3a\x67\xb2\x12\x57\xbd\xdf",
-+		.tag_len = 16,
-+	},
-+	{
-+		.name = "McGrew & Viega Test Case 3",
-+		.key = "\xfe\xff\xe9\x92\x86\x65\x73\x1c"
-+		       "\x6d\x6a\x8f\x94\x67\x30\x83\x08",
-+		.key_len = 16,
-+		.nonce = "\xca\xfe\xba\xbe\xfa\xce\xdb\xad"
-+			 "\xde\xca\xf8\x88",
-+		.nonce_len = 12,
-+		.ptext = "\xd9\x31\x32\x25\xf8\x84\x06\xe5"
-+			 "\xa5\x59\x09\xc5\xaf\xf5\x26\x9a"
-+			 "\x86\xa7\xa9\x53\x15\x34\xf7\xda"
-+			 "\x2e\x4c\x30\x3d\x8a\x31\x8a\x72"
-+			 "\x1c\x3c\x0c\x95\x95\x68\x09\x53"
-+			 "\x2f\xcf\x0e\x24\x49\xa6\xb5\x25"
-+			 "\xb1\x6a\xed\xf5\xaa\x0d\xe6\x57"
-+			 "\xba\x63\x7b\x39\x1a\xaf\xd2\x55",
-+		.ctext = "\x42\x83\x1e\xc2\x21\x77\x74\x24"
-+			 "\x4b\x72\x21\xb7\x84\xd0\xd4\x9c"
-+			 "\xe3\xaa\x21\x2f\x2c\x02\xa4\xe0"
-+			 "\x35\xc1\x7e\x23\x29\xac\xa1\x2e"
-+			 "\x21\xd5\x14\xb2\x54\x66\x93\x1c"
-+			 "\x7d\x8f\x6a\x5a\xac\x84\xaa\x05"
-+			 "\x1b\xa3\x0b\x39\x6a\x0a\xac\x97"
-+			 "\x3d\x58\xe0\x91\x47\x3f\x59\x85",
-+		.data_len = 64,
-+		.ad = "",
-+		.ad_len = 0,
-+		.tag = "\x4d\x5c\x2a\xf3\x27\xcd\x64\xa6"
-+		       "\x2c\xf3\x5a\xbd\x2b\xa6\xfa\xb4",
-+		.tag_len = 16,
-+	},
-+	{
-+		.name = "McGrew & Viega Test Case 4",
-+		.key = "\xfe\xff\xe9\x92\x86\x65\x73\x1c"
-+		       "\x6d\x6a\x8f\x94\x67\x30\x83\x08",
-+		.key_len = 16,
-+		.nonce = "\xca\xfe\xba\xbe\xfa\xce\xdb\xad"
-+			 "\xde\xca\xf8\x88",
-+		.nonce_len = 12,
-+		.ptext = "\xd9\x31\x32\x25\xf8\x84\x06\xe5"
-+			 "\xa5\x59\x09\xc5\xaf\xf5\x26\x9a"
-+			 "\x86\xa7\xa9\x53\x15\x34\xf7\xda"
-+			 "\x2e\x4c\x30\x3d\x8a\x31\x8a\x72"
-+			 "\x1c\x3c\x0c\x95\x95\x68\x09\x53"
-+			 "\x2f\xcf\x0e\x24\x49\xa6\xb5\x25"
-+			 "\xb1\x6a\xed\xf5\xaa\x0d\xe6\x57"
-+			 "\xba\x63\x7b\x39",
-+		.ctext = "\x42\x83\x1e\xc2\x21\x77\x74\x24"
-+			 "\x4b\x72\x21\xb7\x84\xd0\xd4\x9c"
-+			 "\xe3\xaa\x21\x2f\x2c\x02\xa4\xe0"
-+			 "\x35\xc1\x7e\x23\x29\xac\xa1\x2e"
-+			 "\x21\xd5\x14\xb2\x54\x66\x93\x1c"
-+			 "\x7d\x8f\x6a\x5a\xac\x84\xaa\x05"
-+			 "\x1b\xa3\x0b\x39\x6a\x0a\xac\x97"
-+			 "\x3d\x58\xe0\x91",
-+		.data_len = 60,
-+		.ad = "\xfe\xed\xfa\xce\xde\xad\xbe\xef"
-+		      "\xfe\xed\xfa\xce\xde\xad\xbe\xef"
-+		      "\xab\xad\xda\xd2",
-+		.ad_len = 20,
-+		.tag = "\x5b\xc9\x4f\xbc\x32\x21\xa5\xdb"
-+		       "\x94\xfa\xe9\x5a\xe7\x12\x1a\x47",
-+		.tag_len = 16,
-+	},
 +
-+	/* AES-192 Test Vectors */
-+	{
-+		.name = "McGrew & Viega Test Case 7",
-+		.key = "\x00\x00\x00\x00\x00\x00\x00\x00"
-+		       "\x00\x00\x00\x00\x00\x00\x00\x00"
-+		       "\x00\x00\x00\x00\x00\x00\x00\x00",
-+		.key_len = 24,
-+		.nonce = "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			 "\x00\x00\x00\x00",
-+		.nonce_len = 12,
-+		.ptext = "",
-+		.ctext = "",
-+		.data_len = 0,
-+		.ad = "",
-+		.ad_len = 0,
-+		.tag = "\xcd\x33\xb2\x8a\xc7\x73\xf7\x4b"
-+		       "\xa0\x0e\xd1\xf3\x12\x57\x24\x35",
-+		.tag_len = 16,
-+	},
-+	{
-+		.name = "McGrew & Viega Test Case 8",
-+		.key = "\x00\x00\x00\x00\x00\x00\x00\x00"
-+		       "\x00\x00\x00\x00\x00\x00\x00\x00"
-+		       "\x00\x00\x00\x00\x00\x00\x00\x00",
-+		.key_len = 24,
-+		.nonce = "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			 "\x00\x00\x00\x00",
-+		.nonce_len = 12,
-+		.ptext = "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			 "\x00\x00\x00\x00\x00\x00\x00\x00",
-+		.ctext = "\x98\xe7\x24\x7c\x07\xf0\xfe\x41"
-+			 "\x1c\x26\x7e\x43\x84\xb0\xf6\x00",
-+		.data_len = 16,
-+		.ad = "",
-+		.ad_len = 0,
-+		.tag = "\x2f\xf5\x8d\x80\x03\x39\x27\xab"
-+		       "\x8e\xf4\xd4\x58\x75\x14\xf0\xfb",
-+		.tag_len = 16,
-+	},
-+	{
-+		.name = "McGrew & Viega Test Case 9",
-+		.key = "\xfe\xff\xe9\x92\x86\x65\x73\x1c"
-+		       "\x6d\x6a\x8f\x94\x67\x30\x83\x08"
-+		       "\xfe\xff\xe9\x92\x86\x65\x73\x1c",
-+		.key_len = 24,
-+		.nonce = "\xca\xfe\xba\xbe\xfa\xce\xdb\xad"
-+			 "\xde\xca\xf8\x88",
-+		.nonce_len = 12,
-+		.ptext = "\xd9\x31\x32\x25\xf8\x84\x06\xe5"
-+			 "\xa5\x59\x09\xc5\xaf\xf5\x26\x9a"
-+			 "\x86\xa7\xa9\x53\x15\x34\xf7\xda"
-+			 "\x2e\x4c\x30\x3d\x8a\x31\x8a\x72"
-+			 "\x1c\x3c\x0c\x95\x95\x68\x09\x53"
-+			 "\x2f\xcf\x0e\x24\x49\xa6\xb5\x25"
-+			 "\xb1\x6a\xed\xf5\xaa\x0d\xe6\x57"
-+			 "\xba\x63\x7b\x39\x1a\xaf\xd2\x55",
-+		.ctext = "\x39\x80\xca\x0b\x3c\x00\xe8\x41"
-+			 "\xeb\x06\xfa\xc4\x87\x2a\x27\x57"
-+			 "\x85\x9e\x1c\xea\xa6\xef\xd9\x84"
-+			 "\x62\x85\x93\xb4\x0c\xa1\xe1\x9c"
-+			 "\x7d\x77\x3d\x00\xc1\x44\xc5\x25"
-+			 "\xac\x61\x9d\x18\xc8\x4a\x3f\x47"
-+			 "\x18\xe2\x44\x8b\x2f\xe3\x24\xd9"
-+			 "\xcc\xda\x27\x10\xac\xad\xe2\x56",
-+		.data_len = 64,
-+		.ad = "",
-+		.ad_len = 0,
-+		.tag = "\x99\x24\xa7\xc8\x58\x73\x36\xbf"
-+		       "\xb1\x18\x02\x4d\xb8\x67\x4a\x14",
-+		.tag_len = 16,
-+	},
-+	{
-+		.name = "McGrew & Viega Test Case 10",
-+		.key = "\xfe\xff\xe9\x92\x86\x65\x73\x1c"
-+		       "\x6d\x6a\x8f\x94\x67\x30\x83\x08"
-+		       "\xfe\xff\xe9\x92\x86\x65\x73\x1c",
-+		.key_len = 24,
-+		.nonce = "\xca\xfe\xba\xbe\xfa\xce\xdb\xad"
-+			 "\xde\xca\xf8\x88",
-+		.nonce_len = 12,
-+		.ptext = "\xd9\x31\x32\x25\xf8\x84\x06\xe5"
-+			 "\xa5\x59\x09\xc5\xaf\xf5\x26\x9a"
-+			 "\x86\xa7\xa9\x53\x15\x34\xf7\xda"
-+			 "\x2e\x4c\x30\x3d\x8a\x31\x8a\x72"
-+			 "\x1c\x3c\x0c\x95\x95\x68\x09\x53"
-+			 "\x2f\xcf\x0e\x24\x49\xa6\xb5\x25"
-+			 "\xb1\x6a\xed\xf5\xaa\x0d\xe6\x57"
-+			 "\xba\x63\x7b\x39",
-+		.ctext = "\x39\x80\xca\x0b\x3c\x00\xe8\x41"
-+			 "\xeb\x06\xfa\xc4\x87\x2a\x27\x57"
-+			 "\x85\x9e\x1c\xea\xa6\xef\xd9\x84"
-+			 "\x62\x85\x93\xb4\x0c\xa1\xe1\x9c"
-+			 "\x7d\x77\x3d\x00\xc1\x44\xc5\x25"
-+			 "\xac\x61\x9d\x18\xc8\x4a\x3f\x47"
-+			 "\x18\xe2\x44\x8b\x2f\xe3\x24\xd9"
-+			 "\xcc\xda\x27\x10",
-+		.data_len = 60,
-+		.ad = "\xfe\xed\xfa\xce\xde\xad\xbe\xef"
-+		      "\xfe\xed\xfa\xce\xde\xad\xbe\xef"
-+		      "\xab\xad\xda\xd2",
-+		.ad_len = 20,
-+		.tag = "\x25\x19\x49\x8e\x80\xf1\x47\x8f"
-+		       "\x37\xba\x55\xbd\x6d\x27\x61\x8c",
-+		.tag_len = 16,
-+	},
++#include <crypto/blake2s.h>
++#include <kunit/run-in-irq-context.h>
++#include <kunit/test.h>
++#include <linux/ktime.h>
++#include <linux/preempt.h>
++#include "test-utils.h"
 +
-+	/* AES-256 Test Vectors */
-+	{
-+		.name = "McGrew & Viega Test Case 13",
-+		.key = "\x00\x00\x00\x00\x00\x00\x00\x00"
-+		       "\x00\x00\x00\x00\x00\x00\x00\x00"
-+		       "\x00\x00\x00\x00\x00\x00\x00\x00"
-+		       "\x00\x00\x00\x00\x00\x00\x00\x00",
-+		.key_len = 32,
-+		.nonce = "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			 "\x00\x00\x00\x00",
-+		.nonce_len = 12,
-+		.ptext = "",
-+		.ctext = "",
-+		.data_len = 0,
-+		.ad = "",
-+		.ad_len = 0,
-+		.tag = "\x53\x0f\x8a\xfb\xc7\x45\x36\xb9"
-+		       "\xa9\x63\xb4\xf1\xc4\xcb\x73\x8b",
-+		.tag_len = 16,
-+	},
-+	{
-+		.name = "McGrew & Viega Test Case 14",
-+		.key = "\x00\x00\x00\x00\x00\x00\x00\x00"
-+		       "\x00\x00\x00\x00\x00\x00\x00\x00"
-+		       "\x00\x00\x00\x00\x00\x00\x00\x00"
-+		       "\x00\x00\x00\x00\x00\x00\x00\x00",
-+		.key_len = 32,
-+		.nonce = "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			 "\x00\x00\x00\x00",
-+		.nonce_len = 12,
-+		.ptext = "\x00\x00\x00\x00\x00\x00\x00\x00"
-+			 "\x00\x00\x00\x00\x00\x00\x00\x00",
-+		.ctext = "\xce\xa7\x40\x3d\x4d\x60\x6b\x6e"
-+			 "\x07\x4e\xc5\xd3\xba\xf3\x9d\x18",
-+		.data_len = 16,
-+		.ad = "",
-+		.ad_len = 0,
-+		.tag = "\xd0\xd1\xc8\xa7\x99\x99\x6b\xf0"
-+		       "\x26\x5b\x98\xb5\xd4\x8a\xb9\x19",
-+		.tag_len = 16,
-+	},
-+	{
-+		.name = "McGrew & Viega Test Case 15",
-+		.key = "\xfe\xff\xe9\x92\x86\x65\x73\x1c"
-+		       "\x6d\x6a\x8f\x94\x67\x30\x83\x08"
-+		       "\xfe\xff\xe9\x92\x86\x65\x73\x1c"
-+		       "\x6d\x6a\x8f\x94\x67\x30\x83\x08",
-+		.key_len = 32,
-+		.nonce = "\xca\xfe\xba\xbe\xfa\xce\xdb\xad"
-+			 "\xde\xca\xf8\x88",
-+		.nonce_len = 12,
-+		.ptext = "\xd9\x31\x32\x25\xf8\x84\x06\xe5"
-+			 "\xa5\x59\x09\xc5\xaf\xf5\x26\x9a"
-+			 "\x86\xa7\xa9\x53\x15\x34\xf7\xda"
-+			 "\x2e\x4c\x30\x3d\x8a\x31\x8a\x72"
-+			 "\x1c\x3c\x0c\x95\x95\x68\x09\x53"
-+			 "\x2f\xcf\x0e\x24\x49\xa6\xb5\x25"
-+			 "\xb1\x6a\xed\xf5\xaa\x0d\xe6\x57"
-+			 "\xba\x63\x7b\x39\x1a\xaf\xd2\x55",
-+		.ctext = "\x52\x2d\xc1\xf0\x99\x56\x7d\x07"
-+			 "\xf4\x7f\x37\xa3\x2a\x84\x42\x7d"
-+			 "\x64\x3a\x8c\xdc\xbf\xe5\xc0\xc9"
-+			 "\x75\x98\xa2\xbd\x25\x55\xd1\xaa"
-+			 "\x8c\xb0\x8e\x48\x59\x0d\xbb\x3d"
-+			 "\xa7\xb0\x8b\x10\x56\x82\x88\x38"
-+			 "\xc5\xf6\x1e\x63\x93\xba\x7a\x0a"
-+			 "\xbc\xc9\xf6\x62\x89\x80\x15\xad",
-+		.data_len = 64,
-+		.ad = "",
-+		.ad_len = 0,
-+		.tag = "\xb0\x94\xda\xc5\xd9\x34\x71\xbd"
-+		       "\xec\x1a\x50\x22\x70\xe3\xcc\x6c",
-+		.tag_len = 16,
-+	},
-+	{
-+		.name = "McGrew & Viega Test Case 16",
-+		.key = "\xfe\xff\xe9\x92\x86\x65\x73\x1c"
-+		       "\x6d\x6a\x8f\x94\x67\x30\x83\x08"
-+		       "\xfe\xff\xe9\x92\x86\x65\x73\x1c"
-+		       "\x6d\x6a\x8f\x94\x67\x30\x83\x08",
-+		.key_len = 32,
-+		.nonce = "\xca\xfe\xba\xbe\xfa\xce\xdb\xad"
-+			 "\xde\xca\xf8\x88",
-+		.nonce_len = 12,
-+		.ptext = "\xd9\x31\x32\x25\xf8\x84\x06\xe5"
-+			 "\xa5\x59\x09\xc5\xaf\xf5\x26\x9a"
-+			 "\x86\xa7\xa9\x53\x15\x34\xf7\xda"
-+			 "\x2e\x4c\x30\x3d\x8a\x31\x8a\x72"
-+			 "\x1c\x3c\x0c\x95\x95\x68\x09\x53"
-+			 "\x2f\xcf\x0e\x24\x49\xa6\xb5\x25"
-+			 "\xb1\x6a\xed\xf5\xaa\x0d\xe6\x57"
-+			 "\xba\x63\x7b\x39",
-+		.ctext = "\x52\x2d\xc1\xf0\x99\x56\x7d\x07"
-+			 "\xf4\x7f\x37\xa3\x2a\x84\x42\x7d"
-+			 "\x64\x3a\x8c\xdc\xbf\xe5\xc0\xc9"
-+			 "\x75\x98\xa2\xbd\x25\x55\xd1\xaa"
-+			 "\x8c\xb0\x8e\x48\x59\x0d\xbb\x3d"
-+			 "\xa7\xb0\x8b\x10\x56\x82\x88\x38"
-+			 "\xc5\xf6\x1e\x63\x93\xba\x7a\x0a"
-+			 "\xbc\xc9\xf6\x62",
-+		.data_len = 60,
-+		.ad = "\xfe\xed\xfa\xce\xde\xad\xbe\xef"
-+		      "\xfe\xed\xfa\xce\xde\xad\xbe\xef"
-+		      "\xab\xad\xda\xd2",
-+		.ad_len = 20,
-+		.tag = "\x76\xfc\x6e\xce\x0f\x4e\x17\x68"
-+		       "\xcd\xdf\x88\x53\xbb\x2d\x55\x1b",
-+		.tag_len = 16,
-+	},
-+};
-+
-+static void test_aes_gcm_one_test_vector(struct kunit *test,
-+					 const struct aes_gcm_testvec *tv)
++/*
++ * Allocate a KUnit-managed struct AEAD_KEY and prepare it with a random key,
++ * using a random key length and random authentication tag length.
++ */
++static struct AEAD_KEY *aead_alloc_random_key(struct kunit *test,
++					      size_t *tag_len_ret)
 +{
-+	u8 *ctext = alloc_buf(test, tv->data_len);
-+	u8 *decrypted = alloc_buf(test, tv->data_len);
-+	u8 *tag = alloc_buf(test, tv->tag_len);
-+	struct aes_gcm_key key;
++	size_t key_len =
++		AEAD_VALID_KEY_LENS[rand32() % ARRAY_SIZE(AEAD_VALID_KEY_LENS)];
++	size_t tag_len =
++		AEAD_VALID_TAG_LENS[rand32() % ARRAY_SIZE(AEAD_VALID_TAG_LENS)];
++	u8 raw_key[AEAD_MAX_KEY_LEN];
++	struct AEAD_KEY *key = alloc_buf(test, sizeof(*key));
 +	int err;
 +
-+	KUNIT_ASSERT_EQ(test, AES_GCM_NONCE_LEN, tv->nonce_len);
-+
-+	err = aes_gcm_preparekey(&key, tv->key, tv->key_len, tv->tag_len);
-+	KUNIT_ASSERT_EQ_MSG(test, 0, err, "Failed to prepare key for %s",
-+			    tv->name);
-+
-+	aes_gcm_encrypt(ctext, tv->ptext, tv->data_len, tag, tv->ad, tv->ad_len,
-+			tv->nonce, &key);
-+	KUNIT_ASSERT_MEMEQ_MSG(test, tv->ctext, ctext, tv->data_len,
-+			       "Wrong ciphertext for %s", tv->name);
-+	KUNIT_ASSERT_MEMEQ_MSG(test, tag, tv->tag, tv->tag_len,
-+			       "Wrong tag for %s", tv->name);
-+
-+	err = aes_gcm_decrypt(decrypted, ctext, tv->data_len, tag, tv->ad,
-+			      tv->ad_len, tv->nonce, &key);
-+	KUNIT_ASSERT_EQ_MSG(test, 0, err, "Decryption failed for %s", tv->name);
-+	KUNIT_ASSERT_MEMEQ_MSG(test, tv->ptext, decrypted, tv->data_len,
-+			       "Wrong plaintext for %s", tv->name);
++	rand_bytes(raw_key, key_len);
++	err = AEAD_PREPAREKEY(key, raw_key, key_len, tag_len);
++	KUNIT_ASSERT_EQ(test, 0, err);
++	*tag_len_ret = tag_len;
++	return key;
 +}
 +
-+static void test_aes_gcm_test_vectors(struct kunit *test)
++/*
++ * Allocate a KUnit-managed slab buffer of length @len bytes and initialize it
++ * with random data.
++ */
++static u8 *aead_alloc_random_data(struct kunit *test, size_t len)
 +{
-+	for (size_t i = 0; i < ARRAY_SIZE(aes_gcm_testvecs); i++)
-+		test_aes_gcm_one_test_vector(test, &aes_gcm_testvecs[i]);
++	u8 *buf = alloc_buf(test, len);
++
++	rand_bytes(buf, len);
++	return buf;
 +}
 +
-+static int aes_gcm_init_test(struct aes_gcm_ctx *ctx, u64 data_len, u64 ad_len,
-+			     const u8 *nonce, size_t nonce_len,
-+			     const struct aes_gcm_key *key)
++/*
++ * Allocate a KUnit-managed guarded buffer of length @len bytes and initialize
++ * it with random data.
++ */
++static u8 *aead_alloc_random_data_guarded(struct kunit *test, size_t len)
 +{
-+	if (nonce_len != AES_GCM_NONCE_LEN)
-+		return -EINVAL;
++	u8 *buf = alloc_guarded_buf(test, len);
++
++	rand_bytes(buf, len);
++	return buf;
++}
++
++/* Process the given associated data using a random incremental strategy. */
++static size_t aead_auth_incrementally(struct AEAD_CTX *ctx, const u8 *ad,
++				      size_t ad_len)
++{
++	size_t num_parts = 0;
++	size_t pos = 0;
++
++	while (rand_bool()) {
++		size_t part_len = rand_length(ad_len - pos);
++
++		AEAD_AUTH_UPDATE(ctx, &ad[pos], part_len);
++		pos += part_len;
++		num_parts++;
++	}
++	if (pos < ad_len || rand_bool()) {
++		AEAD_AUTH_UPDATE(ctx, &ad[pos], ad_len - pos);
++		num_parts++;
++	}
++	return num_parts;
++}
++
++/* Process the given en/decrypted data using a random incremental strategy. */
++static size_t aead_crypt_incrementally(struct AEAD_CTX *ctx, u8 *dst,
++				       const u8 *src, size_t data_len, bool enc)
++{
++	size_t num_parts = 0;
++	size_t pos = 0;
++
++	while (rand_bool()) {
++		size_t part_len = rand_length(data_len - pos);
++
++		if (enc)
++			AEAD_ENCRYPT_UPDATE(ctx, &dst[pos], &src[pos],
++					    part_len);
++		else
++			AEAD_DECRYPT_UPDATE(ctx, &dst[pos], &src[pos],
++					    part_len);
++		pos += part_len;
++		num_parts++;
++	}
++	if (pos < data_len || rand_bool()) {
++		if (enc)
++			AEAD_ENCRYPT_UPDATE(ctx, &dst[pos], &src[pos],
++					    data_len - pos);
++		else
++			AEAD_DECRYPT_UPDATE(ctx, &dst[pos], &src[pos],
++					    data_len - pos);
++		num_parts++;
++	}
++	return num_parts;
++}
++
++struct aead_incremental_info {
++	size_t num_data_parts;
++	size_t num_ad_parts;
++};
++
++static const char *aead_incr_info_str(struct kunit *test,
++				      const struct aead_incremental_info *info)
++{
++	const size_t max_str_len = 64;
++	char *str = alloc_buf(test, max_str_len);
++
++	snprintf(str, max_str_len, "num_data_parts=%zu num_ad_parts=%zu",
++		 info->num_data_parts, info->num_ad_parts);
++	return str;
++}
++
++/*
++ * Encrypt data using a random incremental strategy.
++ * Return information about the incremental strategy used.
++ */
++static struct aead_incremental_info
++aead_encrypt_incrementally(struct kunit *test, struct AEAD_CTX *ctx, u8 *dst,
++			   const u8 *src, size_t data_len, u8 *tag,
++			   const u8 *ad, size_t ad_len, const u8 *nonce,
++			   size_t nonce_len, const struct AEAD_KEY *key)
++{
++	struct aead_incremental_info info;
++	int err;
++
++	err = AEAD_INIT(ctx, data_len, ad_len, nonce, nonce_len, key);
++	KUNIT_ASSERT_EQ(test, 0, err);
++	info.num_ad_parts = aead_auth_incrementally(ctx, ad, ad_len);
++	info.num_data_parts = aead_crypt_incrementally(ctx, dst, src, data_len,
++						       /* enc= */ true);
++	AEAD_ENCRYPT_FINAL(ctx, tag);
++	KUNIT_ASSERT_TRUE_MSG(test, mem_is_zero(ctx, sizeof(*ctx)),
++			      "encrypt_final didn't zeroize context");
++	return info;
++}
++
++/*
++ * Decrypt authentic data using a random incremental strategy.
++ * Return information about the incremental strategy used.
++ */
++static struct aead_incremental_info
++aead_decrypt_incrementally(struct kunit *test, struct AEAD_CTX *ctx, u8 *dst,
++			   const u8 *src, size_t data_len, const u8 *tag,
++			   const u8 *ad, size_t ad_len, const u8 *nonce,
++			   size_t nonce_len, const struct AEAD_KEY *key)
++{
++	struct aead_incremental_info info;
++	int err;
++
++	err = AEAD_INIT(ctx, data_len, ad_len, nonce, nonce_len, key);
++	KUNIT_ASSERT_EQ(test, 0, err);
++	info.num_ad_parts = aead_auth_incrementally(ctx, ad, ad_len);
++	info.num_data_parts = aead_crypt_incrementally(ctx, dst, src, data_len,
++						       /* enc= */ false);
++	err = AEAD_DECRYPT_FINAL(ctx, tag);
++	KUNIT_ASSERT_EQ(test, 0, err);
++	KUNIT_ASSERT_TRUE_MSG(test, mem_is_zero(ctx, sizeof(*ctx)),
++			      "decrypt_final didn't zeroize context");
++	return info;
++}
++
++/* Return true if key_len is declared to be a valid key length. */
++static bool aead_is_key_len_expected_valid(size_t key_len)
++{
++	for (size_t i = 0; i < ARRAY_SIZE(AEAD_VALID_KEY_LENS); i++) {
++		if (AEAD_VALID_KEY_LENS[i] == key_len)
++			return true;
++	}
++	return false;
++}
++
++/* Return true if nonce_len is declared to be a valid nonce length. */
++static bool aead_is_nonce_len_expected_valid(size_t nonce_len)
++{
++	for (size_t i = 0; i < ARRAY_SIZE(AEAD_VALID_NONCE_LENS); i++) {
++		if (AEAD_VALID_NONCE_LENS[i] == nonce_len)
++			return true;
++	}
++	return false;
++}
++
++/* Return true if tag_len is declared to be a valid tag length. */
++static bool aead_is_tag_len_expected_valid(size_t tag_len)
++{
++	for (size_t i = 0; i < ARRAY_SIZE(AEAD_VALID_TAG_LENS); i++) {
++		if (AEAD_VALID_TAG_LENS[i] == tag_len)
++			return true;
++	}
++	return false;
++}
++
++struct aead_basic_validation_test_ctx {
++	struct AEAD_KEY key;
++	struct AEAD_CTX ctx;
++	u8 *raw_key_buf_end;
++	u8 *nonce_buf_end;
++	u8 *tag_buf_end;
++	u8 pt[64]; /* plaintext */
++	u8 ct[64]; /* ciphertext */
++	u8 decrypted[64];
++	u8 ad[16]; /* associated data */
++	u8 *unused_buf;
++	size_t data_len;
++	size_t ad_len;
++};
++
++static struct aead_basic_validation_test_ctx *
++aead_alloc_basic_validation_test_ctx(struct kunit *test)
++{
++	struct aead_basic_validation_test_ctx *ctx =
++		alloc_buf(test, sizeof(*ctx));
++
++	memset(ctx, 0, sizeof(*ctx));
++	ctx->raw_key_buf_end =
++		aead_alloc_random_data_guarded(test, AEAD_MAX_KEY_LEN) +
++		AEAD_MAX_KEY_LEN;
++	ctx->nonce_buf_end =
++		aead_alloc_random_data_guarded(test, AEAD_MAX_NONCE_LEN) +
++		AEAD_MAX_NONCE_LEN;
++	ctx->tag_buf_end =
++		aead_alloc_random_data_guarded(test, AEAD_MAX_TAG_LEN) +
++		AEAD_MAX_TAG_LEN;
++
 +	/*
-+	 * Ignore data_len and ad_len.  Incremental AES-GCM doesn't need them at
-+	 * initialization time.
++	 * A pointer to this buffer is passed when passing a length that is
++	 * expected to be invalid.  It should never actually be accessed.
 +	 */
-+	aes_gcm_init(ctx, nonce, key);
-+	return 0;
++	ctx->unused_buf =
++		alloc_buf(test, max3(AEAD_MAX_KEY_LEN, AEAD_MAX_NONCE_LEN,
++				     AEAD_MAX_TAG_LEN));
++
++	ctx->data_len = sizeof(ctx->pt);
++	ctx->ad_len = sizeof(ctx->ad);
++	return ctx;
 +}
 +
-+static int aes_gcm_encrypt_test(u8 *dst, const u8 *src, size_t data_len,
-+				u8 *authtag, const u8 *ad, size_t ad_len,
-+				const u8 *nonce, size_t nonce_len,
-+				const struct aes_gcm_key *key)
++/*
++ * Given an expected-valid key_len, nonce_len, and tag_len, verify round-trip
++ * encryption and decryption with them.  Use guarded buffers for each of the raw
++ * key, nonce, and tag to detect any buffer overruns in them.  Also, verify that
++ * every byte of the tag is actually checked.
++ */
++static void aead_do_basic_checks(struct kunit *test,
++				 struct aead_basic_validation_test_ctx *ctx,
++				 size_t key_len, size_t nonce_len,
++				 size_t tag_len)
 +{
-+	if (nonce_len != AES_GCM_NONCE_LEN)
-+		return -EINVAL;
-+	/* aes_gcm_encrypt() returns void. */
-+	aes_gcm_encrypt(dst, src, data_len, authtag, ad, ad_len, nonce, key);
-+	return 0;
++	/* Set up exact-size guarded buffers for (raw_key, nonce, tag). */
++	const u8 *raw_key = ctx->raw_key_buf_end - key_len;
++	const u8 *nonce = ctx->nonce_buf_end - nonce_len;
++	u8 *tag = ctx->tag_buf_end - tag_len;
++	int err;
++
++	/* Key preparation should succeed. */
++	err = AEAD_PREPAREKEY(&ctx->key, raw_key, key_len, tag_len);
++	KUNIT_ASSERT_EQ_MSG(test, 0, err,
++			    "key_len=%zu, tag_len=%zu wasn't accepted", key_len,
++			    tag_len);
++
++	/* Encryption should succeed. */
++	err = AEAD_ENCRYPT(ctx->ct, ctx->pt, ctx->data_len, tag, ctx->ad,
++			   ctx->ad_len, nonce, nonce_len, &ctx->key);
++	KUNIT_ASSERT_EQ_MSG(
++		test, 0, err,
++		"Encryption failed with key_len=%zu, nonce_len=%zu, tag_len=%zu",
++		key_len, nonce_len, tag_len);
++
++	/* Decryption should succeed and give the original data. */
++	err = AEAD_DECRYPT(ctx->decrypted, ctx->ct, ctx->data_len, tag, ctx->ad,
++			   ctx->ad_len, nonce, nonce_len, &ctx->key);
++	KUNIT_ASSERT_EQ_MSG(
++		test, 0, err,
++		"Decryption failed with key_len=%zu, nonce_len=%zu, tag_len=%zu",
++		key_len, nonce_len, tag_len);
++	KUNIT_ASSERT_MEMEQ_MSG(
++		test, ctx->pt, ctx->decrypted, ctx->data_len,
++		"Decryption gave wrong output with key_len=%zu, nonce_len=%zu, tag_len=%zu",
++		key_len, nonce_len, tag_len);
++
++	/*
++	 * Every byte of the tag should actually be checked.
++	 * And on authentication failure, the dst buffer should be cleared.
++	 */
++	for (size_t i = 0; i < tag_len; i++) {
++		memset(ctx->decrypted, 0xff, ctx->data_len);
++		tag[i] ^= 1;
++		err = AEAD_DECRYPT(ctx->decrypted, ctx->ct, ctx->data_len, tag,
++				   ctx->ad, ctx->ad_len, nonce, nonce_len,
++				   &ctx->key);
++		KUNIT_ASSERT_EQ_MSG(
++			test, -EBADMSG, err,
++			"Decryption with bad auth tag with key_len=%zu, nonce_len=%zu, tag_len=%zu didn't fail with -EBADMSG",
++			key_len, nonce_len, tag_len);
++		KUNIT_ASSERT_TRUE_MSG(
++			test, mem_is_zero(ctx->decrypted, ctx->data_len),
++			"dst wasn't cleared on authentication failure");
++		tag[i] ^= 1;
++	}
 +}
 +
-+static int aes_gcm_decrypt_test(u8 *dst, const u8 *src, size_t data_len,
-+				const u8 *authtag, const u8 *ad, size_t ad_len,
-+				const u8 *nonce, size_t nonce_len,
-+				const struct aes_gcm_key *key)
++/* Verify that the given expected-invalid key_len is actually rejected. */
++static void
++aead_verify_invalid_key_len(struct kunit *test,
++			    struct aead_basic_validation_test_ctx *ctx,
++			    size_t key_len)
 +{
-+	if (nonce_len != AES_GCM_NONCE_LEN)
-+		return -EINVAL;
-+	return aes_gcm_decrypt(dst, src, data_len, authtag, ad, ad_len, nonce,
-+			       key);
++	int err;
++
++	/*
++	 * The preparekey function should reject the key_len.  It should do so
++	 * before writing to the key struct.
++	 */
++	memset(&ctx->key, 0, sizeof(ctx->key));
++	err = AEAD_PREPAREKEY(&ctx->key, ctx->unused_buf, key_len,
++			      AEAD_MAX_TAG_LEN);
++	KUNIT_ASSERT_EQ_MSG(test, -EINVAL, err,
++			    "key_len=%zu wasn't rejected with -EINVAL",
++			    key_len);
++	KUNIT_ASSERT_TRUE_MSG(
++		test, mem_is_zero(&ctx->key, sizeof(ctx->key)),
++		"Key struct was written to before length validation");
 +}
 +
-+static const size_t aes_gcm_valid_key_lens[] = { 16, 24, 32 };
-+#define AEAD_MAX_KEY_LEN 32
-+#define AEAD_VALID_KEY_LENS aes_gcm_valid_key_lens
++/*
++ * Test that every valid key length is accepted and basic checks pass with it,
++ * and test that invalid key lengths are rejected.
++ */
++static void test_aead_all_key_lens(struct kunit *test)
++{
++	struct aead_basic_validation_test_ctx *ctx =
++		aead_alloc_basic_validation_test_ctx(test);
 +
-+static const size_t aes_gcm_valid_nonce_lens[] = { AES_GCM_NONCE_LEN };
-+#define AEAD_MAX_NONCE_LEN AES_GCM_NONCE_LEN
-+#define AEAD_VALID_NONCE_LENS aes_gcm_valid_nonce_lens
++	for (size_t key_len = 0; key_len <= AEAD_MAX_KEY_LEN; key_len++) {
++		if (aead_is_key_len_expected_valid(key_len))
++			aead_do_basic_checks(test, ctx, key_len,
++					     AEAD_MAX_NONCE_LEN,
++					     AEAD_MAX_TAG_LEN);
++		else
++			aead_verify_invalid_key_len(test, ctx, key_len);
++	}
++	aead_verify_invalid_key_len(test, ctx, AEAD_MAX_KEY_LEN + 1);
++	aead_verify_invalid_key_len(test, ctx, AEAD_MAX_KEY_LEN * 2);
++	aead_verify_invalid_key_len(test, ctx, U32_MAX);
++	aead_verify_invalid_key_len(test, ctx, SIZE_MAX);
++}
 +
-+static const size_t aes_gcm_valid_tag_lens[] = { 4, 8, 12, 13, 14, 15, 16 };
-+#define AEAD_MAX_TAG_LEN 16
-+#define AEAD_VALID_TAG_LENS aes_gcm_valid_tag_lens
++/* Verify that the given expected-invalid nonce_len is actually rejected. */
++static void
++aead_verify_invalid_nonce_len(struct kunit *test,
++			      struct aead_basic_validation_test_ctx *ctx,
++			      size_t nonce_len)
++{
++	static const u8 raw_key[AEAD_MAX_KEY_LEN];
++	int err;
 +
-+#define AEAD_KEY aes_gcm_key
-+#define AEAD_CTX aes_gcm_ctx
-+#define AEAD_PREPAREKEY aes_gcm_preparekey
-+#define AEAD_ENCRYPT aes_gcm_encrypt_test
-+#define AEAD_DECRYPT aes_gcm_decrypt_test
++	/* Key preparation should succeed, as nonce_len isn't given yet. */
++	err = AEAD_PREPAREKEY(&ctx->key, raw_key, sizeof(raw_key),
++			      AEAD_MAX_TAG_LEN);
++	KUNIT_ASSERT_EQ(test, 0, err);
 +
-+#define AEAD_INIT aes_gcm_init_test
-+#define AEAD_AUTH_UPDATE aes_gcm_auth_update
-+#define AEAD_ENCRYPT_UPDATE aes_gcm_encrypt_update
-+#define AEAD_DECRYPT_UPDATE aes_gcm_decrypt_update
-+#define AEAD_ENCRYPT_FINAL aes_gcm_encrypt_final
-+#define AEAD_DECRYPT_FINAL aes_gcm_decrypt_final
++	/* The init function should reject the nonce_len. */
++	memset(&ctx->ctx, 0, sizeof(ctx->ctx));
++	err = AEAD_INIT(&ctx->ctx, ctx->data_len, ctx->ad_len, ctx->unused_buf,
++			nonce_len, &ctx->key);
++	KUNIT_ASSERT_EQ_MSG(test, -EINVAL, err,
++			    "nonce_len=%zu wasn't rejected with -EINVAL (init)",
++			    nonce_len);
++	KUNIT_ASSERT_TRUE_MSG(
++		test, mem_is_zero(&ctx->ctx, sizeof(ctx->ctx)),
++		"Context struct was written to before length validation");
 +
-+/* This value was generated by gen-aead-testvecs.py. */
-+static const u8 aes_gcm_monte_carlo_checksum[BLAKE2S_HASH_SIZE] = {
-+	0x6d, 0xd0, 0x6e, 0x6b, 0xde, 0x3e, 0x92, 0x9f, 0xae, 0x1f, 0xf1,
-+	0x84, 0x99, 0x5a, 0x9e, 0x7b, 0xfe, 0x20, 0x9e, 0x22, 0x7c, 0x5f,
-+	0x15, 0xb3, 0x59, 0x89, 0xd0, 0xb7, 0x74, 0x5d, 0xd2, 0xa5,
++	/* The encrypt function should reject the nonce_len. */
++	err = AEAD_ENCRYPT(ctx->ct, ctx->pt, ctx->data_len, ctx->unused_buf,
++			   ctx->ad, ctx->ad_len, ctx->unused_buf, nonce_len,
++			   &ctx->key);
++	KUNIT_ASSERT_EQ_MSG(
++		test, -EINVAL, err,
++		"nonce_len=%zu wasn't rejected with -EINVAL (encrypt)",
++		nonce_len);
++
++	/* The decrypt function should reject the nonce_len. */
++	err = AEAD_DECRYPT(ctx->pt, ctx->ct, ctx->data_len, ctx->unused_buf,
++			   ctx->ad, ctx->ad_len, ctx->unused_buf, nonce_len,
++			   &ctx->key);
++	KUNIT_ASSERT_EQ_MSG(
++		test, -EINVAL, err,
++		"nonce_len=%zu wasn't rejected with -EINVAL (decrypt)",
++		nonce_len);
++}
++
++/*
++ * Test that every valid nonce length is accepted and basic checks pass with it,
++ * and test that invalid nonce lengths are rejected.
++ */
++static void test_aead_all_nonce_lens(struct kunit *test)
++{
++	struct aead_basic_validation_test_ctx *ctx =
++		aead_alloc_basic_validation_test_ctx(test);
++
++	for (size_t nonce_len = 0; nonce_len <= AEAD_MAX_NONCE_LEN;
++	     nonce_len++) {
++		if (aead_is_nonce_len_expected_valid(nonce_len))
++			aead_do_basic_checks(test, ctx, AEAD_MAX_KEY_LEN,
++					     nonce_len, AEAD_MAX_TAG_LEN);
++		else
++			aead_verify_invalid_nonce_len(test, ctx, nonce_len);
++	}
++	aead_verify_invalid_nonce_len(test, ctx, AEAD_MAX_NONCE_LEN + 1);
++	aead_verify_invalid_nonce_len(test, ctx, AEAD_MAX_NONCE_LEN * 2);
++	aead_verify_invalid_nonce_len(test, ctx, U32_MAX);
++	aead_verify_invalid_nonce_len(test, ctx, SIZE_MAX);
++}
++
++/* Verify that the given expected-invalid tag_len is actually rejected. */
++static void
++aead_verify_invalid_tag_len(struct kunit *test,
++			    struct aead_basic_validation_test_ctx *ctx,
++			    size_t tag_len)
++{
++	static const u8 raw_key[AEAD_MAX_KEY_LEN];
++	int err;
++
++	/*
++	 * The preparekey function should reject the tag_len.  It should do so
++	 * before writing to the key struct.
++	 */
++	memset(&ctx->key, 0, sizeof(ctx->key));
++	err = AEAD_PREPAREKEY(&ctx->key, raw_key, sizeof(raw_key), tag_len);
++	KUNIT_ASSERT_EQ_MSG(test, -EINVAL, err,
++			    "tag_len=%zu wasn't rejected with -EINVAL",
++			    tag_len);
++	KUNIT_ASSERT_TRUE_MSG(
++		test, mem_is_zero(&ctx->key, sizeof(ctx->key)),
++		"Key struct was written to before length validation");
++}
++
++/*
++ * Test that every valid authentication tag length is accepted and basic checks
++ * pass with it, and test that invalid authentication tag lengths are rejected.
++ */
++static void test_aead_all_tag_lens(struct kunit *test)
++{
++	struct aead_basic_validation_test_ctx *ctx =
++		aead_alloc_basic_validation_test_ctx(test);
++
++	for (size_t tag_len = 0; tag_len <= AEAD_MAX_TAG_LEN; tag_len++) {
++		if (aead_is_tag_len_expected_valid(tag_len))
++			aead_do_basic_checks(test, ctx, AEAD_MAX_KEY_LEN,
++					     AEAD_MAX_NONCE_LEN, tag_len);
++		else
++			aead_verify_invalid_tag_len(test, ctx, tag_len);
++	}
++	aead_verify_invalid_tag_len(test, ctx, AEAD_MAX_TAG_LEN + 1);
++	aead_verify_invalid_tag_len(test, ctx, AEAD_MAX_TAG_LEN * 2);
++	aead_verify_invalid_tag_len(test, ctx, U32_MAX);
++	aead_verify_invalid_tag_len(test, ctx, SIZE_MAX);
++}
++
++/*
++ * Test that one-shot encryption and decryption are consistent with each other
++ * and with incremental encryption and decryption.
++ */
++static void test_aead_incremental_updates(struct kunit *test)
++{
++	const size_t max_data_len = 1024;
++	const size_t max_ad_len = 512;
++	const size_t nonce_len = AEAD_MAX_NONCE_LEN;
++	size_t tag_len;
++	struct AEAD_KEY *key = aead_alloc_random_key(test, &tag_len);
++	struct AEAD_CTX *ctx = alloc_buf(test, sizeof(*ctx));
++	u8 *pt = aead_alloc_random_data(test, max_data_len);
++	u8 *ad = aead_alloc_random_data(test, max_ad_len);
++	u8 *nonce = aead_alloc_random_data(test, nonce_len);
++	u8 *ct = alloc_buf(test, max_data_len);
++	u8 *ct2 = alloc_buf(test, max_data_len);
++	u8 *decrypted = alloc_buf(test, max_data_len);
++	u8 *tag = alloc_buf(test, tag_len);
++	u8 *tag2 = alloc_buf(test, tag_len);
++	int err;
++
++	for (int i = 0; i < 500; i++) {
++		/* Select the lengths to test. */
++		const size_t data_len = rand_length(max_data_len);
++		const size_t ad_len = rand_length(max_ad_len);
++		struct aead_incremental_info incr_info;
++
++		/* Try one-shot encryption and decryption. */
++		err = AEAD_ENCRYPT(ct, pt, data_len, tag, ad, ad_len, nonce,
++				   nonce_len, key);
++		KUNIT_ASSERT_EQ(test, 0, err);
++		err = AEAD_DECRYPT(decrypted, ct, data_len, tag, ad, ad_len,
++				   nonce, nonce_len, key);
++		KUNIT_ASSERT_EQ(test, 0, err);
++		KUNIT_ASSERT_MEMEQ_MSG(
++			test, pt, decrypted, data_len,
++			"Decryption didn't invert encryption; data_len=%zu, ad_len=%zu",
++			data_len, ad_len);
++
++		/* Try incremental encryption and decryption. */
++		incr_info = aead_encrypt_incrementally(test, ctx, ct2, pt,
++						       data_len, tag2, ad,
++						       ad_len, nonce, nonce_len,
++						       key);
++		KUNIT_ASSERT_MEMEQ_MSG(
++			test, ct, ct2, data_len,
++			"One-shot and incremental encryption gave different ciphertexts; data_len=%zu ad_len=%zu %s",
++			data_len, ad_len, aead_incr_info_str(test, &incr_info));
++		KUNIT_ASSERT_MEMEQ_MSG(
++			test, tag, tag2, tag_len,
++			"One-shot and incremental encryption gave different auth tags; data_len=%zu ad_len=%zu %s",
++			data_len, ad_len, aead_incr_info_str(test, &incr_info));
++		incr_info = aead_decrypt_incrementally(test, ctx, decrypted,
++						       ct2, data_len, tag2, ad,
++						       ad_len, nonce, nonce_len,
++						       key);
++		KUNIT_ASSERT_MEMEQ_MSG(
++			test, pt, decrypted, data_len,
++			"One-shot and incremental decryption gave different plaintexts; data_len=%zu ad_len=%zu %s",
++			data_len, ad_len, aead_incr_info_str(test, &incr_info));
++	}
++}
++
++/*
++ * Test using guarded buffers for the plaintext, ciphertext, and associated
++ * data.  This detects out-of-bounds accesses, even in assembly code.
++ *
++ * Note: other test cases cover overrun of raw_key, nonce, and tag.
++ */
++static void test_aead_data_buffer_overruns(struct kunit *test)
++{
++	const size_t max_data_len = 1024;
++	const size_t max_ad_len = 512;
++	const size_t nonce_len = AEAD_MAX_NONCE_LEN;
++	size_t tag_len;
++	struct AEAD_KEY *key = aead_alloc_random_key(test, &tag_len);
++	const u8 *nonce = aead_alloc_random_data(test, nonce_len);
++	const u8 *pt_end = aead_alloc_random_data_guarded(test, max_data_len) +
++			   max_data_len;
++	const u8 *ad_end =
++		aead_alloc_random_data_guarded(test, max_ad_len) + max_ad_len;
++	u8 *ct_end = alloc_guarded_buf(test, max_data_len) + max_data_len;
++	u8 *decrypted_end =
++		alloc_guarded_buf(test, max_data_len) + max_data_len;
++	u8 *tag = alloc_buf(test, tag_len);
++
++	for (int i = 0; i < 200; i++) {
++		/* Select the lengths to test. */
++		const size_t data_len = rand_length(max_data_len);
++		const size_t ad_len = rand_length(max_ad_len);
++		/* Set up exact-size guarded buffers. */
++		const u8 *pt = pt_end - data_len;
++		const u8 *ad = ad_end - ad_len;
++		u8 *ct = ct_end - data_len;
++		u8 *decrypted = decrypted_end - data_len;
++		int err;
++
++		/* Encrypt and decrypt. */
++		err = AEAD_ENCRYPT(ct, pt, data_len, tag, ad, ad_len, nonce,
++				   nonce_len, key);
++		KUNIT_ASSERT_EQ(test, 0, err);
++		err = AEAD_DECRYPT(decrypted, ct, data_len, tag, ad, ad_len,
++				   nonce, nonce_len, key);
++		KUNIT_ASSERT_EQ(test, 0, err);
++		KUNIT_ASSERT_MEMEQ_MSG(
++			test, pt, decrypted, data_len,
++			"Decryption didn't invert encryption; data_len=%zu, ad_len=%zu",
++			data_len, ad_len);
++	}
++}
++
++/*
++ * Test that encryption and decryption produce the same results regardless of
++ * how the buffers are aligned in memory.
++ */
++static void test_aead_alignment_consistency(struct kunit *test)
++{
++	const size_t max_data_len = 4096;
++	const size_t max_ad_len = 4096;
++	const size_t max_offset = 128;
++	const size_t nonce_len = AEAD_MAX_NONCE_LEN;
++	const size_t key_len = AEAD_MAX_KEY_LEN;
++	const size_t tag_len = AEAD_MAX_TAG_LEN;
++	u8 *raw_key1_buf = alloc_buf(test, key_len + max_offset);
++	u8 *raw_key2_buf = alloc_buf(test, key_len + max_offset);
++	u8 *nonce1_buf = alloc_buf(test, nonce_len + max_offset);
++	u8 *nonce2_buf = alloc_buf(test, nonce_len + max_offset);
++	u8 *pt1_buf = alloc_buf(test, max_data_len);
++	u8 *pt2_buf = alloc_buf(test, max_data_len);
++	u8 *ct1_buf = alloc_buf(test, max_data_len);
++	u8 *ct2_buf = alloc_buf(test, max_data_len);
++	u8 *ad1_buf = alloc_buf(test, max_ad_len);
++	u8 *ad2_buf = alloc_buf(test, max_ad_len);
++	u8 *tag1_buf = alloc_buf(test, tag_len + max_offset);
++	u8 *tag2_buf = alloc_buf(test, tag_len + max_offset);
++	struct AEAD_KEY *key = alloc_buf(test, sizeof(*key));
++	int err;
++
++	for (int i = 0; i < 100; i++) {
++		/* Generate lengths. */
++		size_t data_len = rand_length(max_data_len);
++		size_t ad_len = rand_length(max_ad_len);
++
++		/* Generate two sets of alignments. */
++		u8 *raw_key1 = raw_key1_buf + rand_offset(max_offset);
++		u8 *raw_key2 = raw_key2_buf + rand_offset(max_offset);
++		u8 *nonce1 = nonce1_buf + rand_offset(max_offset);
++		u8 *nonce2 = nonce2_buf + rand_offset(max_offset);
++		u8 *pt1 = pt1_buf + rand_offset(max_data_len - data_len);
++		u8 *pt2 = pt2_buf + rand_offset(max_data_len - data_len);
++		u8 *ct1 = ct1_buf + rand_offset(max_data_len - data_len);
++		u8 *ct2 = ct2_buf + rand_offset(max_data_len - data_len);
++		u8 *ad1 = ad1_buf + rand_offset(max_ad_len - ad_len);
++		u8 *ad2 = ad2_buf + rand_offset(max_ad_len - ad_len);
++		u8 *tag1 = tag1_buf + rand_offset(max_offset);
++		u8 *tag2 = tag2_buf + rand_offset(max_offset);
++
++		/*
++		 * Generate inputs in the first set of buffers using the first
++		 * set of alignments.
++		 */
++		rand_bytes(raw_key1, key_len);
++		rand_bytes(nonce1, nonce_len);
++		rand_bytes(pt1, data_len);
++		rand_bytes(ad1, ad_len);
++
++		/*
++		 * Copy the inputs to the second set of buffers using the second
++		 * set of alignments.
++		 */
++		memcpy(raw_key2, raw_key1, key_len);
++		memcpy(nonce2, nonce1, nonce_len);
++		memcpy(pt2, pt1, data_len);
++		memcpy(ad2, ad1, ad_len);
++
++		/* Verify encryption consistency. */
++
++		err = AEAD_PREPAREKEY(key, raw_key1, key_len, tag_len);
++		KUNIT_ASSERT_EQ(test, 0, err);
++		err = AEAD_ENCRYPT(ct1, pt1, data_len, tag1, ad1, ad_len,
++				   nonce1, nonce_len, key);
++		KUNIT_ASSERT_EQ(test, 0, err);
++
++		err = AEAD_PREPAREKEY(key, raw_key2, key_len, tag_len);
++		KUNIT_ASSERT_EQ(test, 0, err);
++		err = AEAD_ENCRYPT(ct2, pt2, data_len, tag2, ad2, ad_len,
++				   nonce2, nonce_len, key);
++		KUNIT_ASSERT_EQ(test, 0, err);
++
++		KUNIT_ASSERT_MEMEQ(test, ct1, ct2, data_len);
++		KUNIT_ASSERT_MEMEQ(test, tag1, tag2, tag_len);
++
++		/* Verify decryption consistency. */
++
++		err = AEAD_PREPAREKEY(key, raw_key1, key_len, tag_len);
++		KUNIT_ASSERT_EQ(test, 0, err);
++		err = AEAD_DECRYPT(pt1, ct1, data_len, tag1, ad1, ad_len,
++				   nonce1, nonce_len, key);
++		KUNIT_ASSERT_EQ(test, 0, err);
++
++		err = AEAD_PREPAREKEY(key, raw_key2, key_len, tag_len);
++		KUNIT_ASSERT_EQ(test, 0, err);
++		err = AEAD_DECRYPT(pt2, ct2, data_len, tag2, ad2, ad_len,
++				   nonce2, nonce_len, key);
++		KUNIT_ASSERT_EQ(test, 0, err);
++
++		KUNIT_ASSERT_MEMEQ(test, pt1, pt2, data_len);
++	}
++}
++
++static void test_aead_inplace(struct kunit *test)
++{
++	const size_t max_data_len = 1024;
++	const size_t max_ad_len = 512;
++	const size_t nonce_len = AEAD_MAX_NONCE_LEN;
++	size_t tag_len;
++	struct AEAD_KEY *key = aead_alloc_random_key(test, &tag_len);
++	u8 *data = aead_alloc_random_data(test, max_data_len + tag_len);
++	u8 *data2 = alloc_buf(test, max_data_len + tag_len);
++	u8 *ad = aead_alloc_random_data(test, max_ad_len);
++	const u8 *nonce = aead_alloc_random_data(test, nonce_len);
++
++	for (int i = 0; i < 100; i++) {
++		size_t data_len = rand_length(max_data_len);
++		size_t ad_len = rand_length(max_ad_len);
++		int err;
++
++		/* Encrypt out-of-place. */
++		err = AEAD_ENCRYPT(data2, data, data_len, data2 + data_len, ad,
++				   ad_len, nonce, nonce_len, key);
++		KUNIT_ASSERT_EQ(test, 0, err);
++
++		/* Encrypt in-place. */
++		err = AEAD_ENCRYPT(data, data, data_len, data + data_len, ad,
++				   ad_len, nonce, nonce_len, key);
++		KUNIT_ASSERT_EQ(test, 0, err);
++
++		/* Compare the results. */
++		KUNIT_ASSERT_MEMEQ(test, data2, data, data_len + tag_len);
++
++		/* Decrypt out-of-place. */
++		err = AEAD_DECRYPT(data2, data, data_len, data + data_len, ad,
++				   ad_len, nonce, nonce_len, key);
++		KUNIT_ASSERT_EQ(test, 0, err);
++
++		/* Decrypt in-place. */
++		err = AEAD_DECRYPT(data, data, data_len, data + data_len, ad,
++				   ad_len, nonce, nonce_len, key);
++		KUNIT_ASSERT_EQ(test, 0, err);
++
++		/* Compare the results. */
++		KUNIT_ASSERT_MEMEQ(test, data2, data, data_len);
++	}
++}
++
++/*
++ * Monte-Carlo test for AEAD algorithms.  This deterministically generates
++ * random AEAD inputs, encrypts them, verifies decryption, and computes and
++ * verifies the checksum of all computed (ciphertext, tag) pairs.
++ */
++static void test_aead_monte_carlo(struct kunit *test)
++{
++	const size_t max_data_len = 1024;
++	const size_t max_ad_len = 293;
++	u8 raw_key[AEAD_MAX_KEY_LEN];
++	u8 nonce[AEAD_MAX_NONCE_LEN];
++	u8 tag[AEAD_MAX_TAG_LEN];
++	u8 *pt = alloc_buf(test, max_data_len);
++	u8 *ct = alloc_buf(test, max_data_len);
++	u8 *decrypted = alloc_buf(test, max_data_len);
++	u8 *ad = alloc_buf(test, max_ad_len);
++	struct AEAD_KEY *key = alloc_buf(test, sizeof(*key));
++	struct blake2s_ctx checksum_ctx;
++	u8 actual_checksum[BLAKE2S_HASH_SIZE];
++	int err;
++
++	blake2s_init(&checksum_ctx, BLAKE2S_HASH_SIZE);
++
++	for (size_t data_len = 0; data_len <= max_data_len; data_len++) {
++		size_t ad_len = data_len % max_ad_len;
++		size_t key_len =
++			AEAD_VALID_KEY_LENS[data_len %
++					    ARRAY_SIZE(AEAD_VALID_KEY_LENS)];
++		size_t nonce_len =
++			AEAD_VALID_NONCE_LENS[data_len %
++					      ARRAY_SIZE(AEAD_VALID_NONCE_LENS)];
++		size_t tag_len =
++			AEAD_VALID_TAG_LENS[data_len %
++					    ARRAY_SIZE(AEAD_VALID_TAG_LENS)];
++
++		rand_bytes_seeded_from_len(pt, data_len);
++		rand_bytes_seeded_from_len(ad, ad_len);
++		rand_bytes_seeded_from_len(raw_key, key_len);
++		rand_bytes_seeded_from_len(nonce, nonce_len);
++
++		err = AEAD_PREPAREKEY(key, raw_key, key_len, tag_len);
++		KUNIT_ASSERT_EQ(test, 0, err);
++
++		err = AEAD_ENCRYPT(ct, pt, data_len, tag, ad, ad_len, nonce,
++				   nonce_len, key);
++		KUNIT_ASSERT_EQ_MSG(
++			test, 0, err,
++			"Encryption failed with data_len=%zu, ad_len=%zu",
++			data_len, ad_len);
++		err = AEAD_DECRYPT(decrypted, ct, data_len, tag, ad, ad_len,
++				   nonce, nonce_len, key);
++		KUNIT_ASSERT_EQ_MSG(
++			test, 0, err,
++			"Decryption failed with data_len=%zu, ad_len=%zu",
++			data_len, ad_len);
++		KUNIT_ASSERT_MEMEQ_MSG(
++			test, pt, decrypted, data_len,
++			"Decryption didn't invert encryption; data_len=%zu, ad_len=%zu",
++			data_len, ad_len);
++
++		blake2s_update(&checksum_ctx, ct, data_len);
++		blake2s_update(&checksum_ctx, tag, tag_len);
++	}
++
++	blake2s_final(&checksum_ctx, actual_checksum);
++	KUNIT_EXPECT_MEMEQ_MSG(test, actual_checksum, AEAD_MONTE_CARLO_CHECKSUM,
++			       BLAKE2S_HASH_SIZE,
++			       "Monte-Carlo checksum mismatch");
++}
++
++#define IRQ_TEST_DATA_LEN 256
++#define IRQ_TEST_NUM_BUFFERS 3 /* matches max concurrency level */
++
++struct aead_irq_test_slot {
++	/* Fields written only at test case initialization time */
++	u8 raw_key[AEAD_MAX_KEY_LEN];
++	u8 nonce[AEAD_MAX_NONCE_LEN];
++	u8 pt[IRQ_TEST_DATA_LEN];
++	u8 ct[IRQ_TEST_DATA_LEN + AEAD_MAX_TAG_LEN];
++	u8 ad[IRQ_TEST_DATA_LEN];
++
++	/* Fields written throughout the test case */
++	struct AEAD_KEY key;
++	u8 scratch_buf[IRQ_TEST_DATA_LEN + AEAD_MAX_TAG_LEN];
++	int phase;
++	atomic_t in_use;
 +};
-+#define AEAD_MONTE_CARLO_CHECKSUM aes_gcm_monte_carlo_checksum
 +
-+#include "aead-test-template.h"
-+
-+static struct kunit_case aes_gcm_test_cases[] = {
-+	KUNIT_CASE(test_aes_gcm_test_vectors),
-+	AEAD_KUNIT_CASES,
-+	{},
++struct aead_irq_test_state {
++	struct aead_irq_test_slot slots[IRQ_TEST_NUM_BUFFERS];
 +};
 +
-+static struct kunit_suite aes_gcm_test_suite = {
-+	.name = "aes_gcm",
-+	.test_cases = aes_gcm_test_cases,
-+};
-+kunit_test_suite(aes_gcm_test_suite);
++static bool aead_irq_test_func(void *state_)
++{
++	struct aead_irq_test_state *state = state_;
++	struct aead_irq_test_slot *slot;
++	size_t data_len;
++	bool ok = true;
 +
-+MODULE_DESCRIPTION("KUnit tests and benchmark for AES-GCM");
-+MODULE_LICENSE("GPL");
-diff --git a/scripts/crypto/gen-aead-testvecs.py b/scripts/crypto/gen-aead-testvecs.py
-index 048043735819..d77d646f75b5 100755
---- a/scripts/crypto/gen-aead-testvecs.py
-+++ b/scripts/crypto/gen-aead-testvecs.py
-@@ -41,6 +41,15 @@ def gen_monte_carlo_checksum(alg):
-                 key, tag_length=tag_len
-             )
-             ct_and_tag = ccm.encrypt(nonce, pt, ad)
-+        elif alg == "aes-gcm":
-+            key_len = [16, 24, 32][data_len % 3]
-+            key = rand_bytes(key_len)
-+            nonce = rand_bytes(12)
-+            tag_len = [4, 8, 12, 13, 14, 15, 16][data_len % 7]
-+            gcm = cryptography.hazmat.primitives.ciphers.aead.AESGCM(key)
-+            # python-cryptography supports only 16-byte GCM tags.  However, in
-+            # GCM, shorter tags are simply truncated.  Do that below.
-+            ct_and_tag = gcm.encrypt(nonce, pt, ad)[: data_len + tag_len]
- 
-         blake2s.update(ct_and_tag)
- 
-@@ -53,8 +62,8 @@ def gen_monte_carlo_checksum(alg):
-     print("};")
- 
- 
--if len(sys.argv) != 2 or sys.argv[1] not in ("aes-ccm"):
--    sys.stderr.write("Usage: gen-aead-testvecs.py [aes-ccm]\n")
-+if len(sys.argv) != 2 or sys.argv[1] not in ("aes-ccm", "aes-gcm"):
-+    sys.stderr.write("Usage: gen-aead-testvecs.py [aes-ccm|aes-gcm]\n")
-     sys.exit(1)
- 
- gen_monte_carlo_checksum(sys.argv[1])
++	/*
++	 * Find a free slot.  This should always succeed, since the number of
++	 * slots is equal to the max concurrency level of kunit_run_irq_test().
++	 */
++	for (slot = &state->slots[0];
++	     slot < &state->slots[ARRAY_SIZE(state->slots)]; slot++) {
++		if (atomic_cmpxchg(&slot->in_use, 0, 1) == 0)
++			break;
++	}
++	if (WARN_ON_ONCE(slot == &state->slots[ARRAY_SIZE(state->slots)]))
++		return false;
++	/*
++	 * This execution context now has exclusive access to 'slot'.
++	 * Next, execute the next operation that the slot is set to perform.
++	 */
++
++	data_len = sizeof(slot->pt);
++	if (slot->phase == 0) {
++		/* Phase 0: Prepare slot's key in current context. */
++		ok = ok && AEAD_PREPAREKEY(&slot->key, slot->raw_key,
++					   sizeof(slot->raw_key),
++					   AEAD_MAX_TAG_LEN) == 0;
++	} else if (slot->phase == 1) {
++		/*
++		 * Phase 1: Encrypt plaintext using key that may have been
++		 * prepared in a different context.
++		 */
++		ok = ok && AEAD_ENCRYPT(slot->scratch_buf, slot->pt, data_len,
++					&slot->scratch_buf[data_len], slot->ad,
++					sizeof(slot->ad), slot->nonce,
++					sizeof(slot->nonce), &slot->key) == 0;
++		/* Verify the ciphertext (with concatenated auth tag) matches */
++		ok = ok &&
++		     memcmp(slot->scratch_buf, slot->ct, sizeof(slot->ct)) == 0;
++	} else {
++		/*
++		 * Phase 2: Decrypt ciphertext using key that may have been
++		 * prepared in a different context.
++		 */
++		ok = ok && AEAD_DECRYPT(slot->scratch_buf, slot->ct, data_len,
++					&slot->ct[data_len], slot->ad,
++					sizeof(slot->ad), slot->nonce,
++					sizeof(slot->nonce), &slot->key) == 0;
++		/* Verify the plaintext matches. */
++		ok = ok && memcmp(slot->scratch_buf, slot->pt, data_len) == 0;
++	}
++	slot->phase = (slot->phase + 1) % 3;
++	atomic_set_release(&slot->in_use, 0);
++	return ok;
++}
++
++/*
++ * Test that encryption and decryption produce the correct results in task,
++ * softirq, and hardirq contexts running concurrently -- including with keys
++ * prepared in other contexts.  This is needed to cover fallback code paths that
++ * execute in contexts where FPU or vector registers cannot be used.
++ */
++static void test_aead_interrupt_context(struct kunit *test)
++{
++	struct aead_irq_test_state *state = alloc_buf(test, sizeof(*state));
++
++	memset(state, 0, sizeof(*state));
++
++	/*
++	 * For each slot, generate a set of AEAD inputs: a key, a nonce, a
++	 * plaintext, and some associated data.  Then generate the corresponding
++	 * ciphertext with concatenated auth tag.
++	 */
++	for (int i = 0; i < IRQ_TEST_NUM_BUFFERS; i++) {
++		struct aead_irq_test_slot *slot = &state->slots[i];
++		int err;
++
++		rand_bytes(slot->raw_key, sizeof(slot->raw_key));
++		rand_bytes(slot->nonce, sizeof(slot->nonce));
++		rand_bytes(slot->pt, sizeof(slot->pt));
++		rand_bytes(slot->ad, sizeof(slot->ad));
++		err = AEAD_PREPAREKEY(&slot->key, slot->raw_key,
++				      sizeof(slot->raw_key), AEAD_MAX_TAG_LEN);
++		KUNIT_ASSERT_EQ(test, 0, err);
++		err = AEAD_ENCRYPT(slot->ct, slot->pt, sizeof(slot->pt),
++				   &slot->ct[sizeof(slot->pt)], slot->ad,
++				   sizeof(slot->ad), slot->nonce,
++				   sizeof(slot->nonce), &slot->key);
++		KUNIT_ASSERT_EQ(test, 0, err);
++	}
++
++	kunit_run_irq_test(test, aead_irq_test_func, 100000, state);
++}
++
++/* Benchmark AEAD encryption and decryption on various data lengths. */
++static void benchmark_aead(struct kunit *test)
++{
++	static const size_t data_lens_to_test[] = {
++		16, 64, 128, 256, 512, 1024, 1420, 4096, 16384,
++	};
++	const size_t max_data_len = 16384;
++	const size_t ad_len = 16;
++	const size_t key_len = AEAD_MAX_KEY_LEN;
++	const size_t nonce_len = AEAD_MAX_NONCE_LEN;
++	const size_t tag_len = AEAD_MAX_TAG_LEN;
++	const u8 *raw_key, *nonce, *ad;
++	u8 *pt, *ct, *tag;
++	struct AEAD_KEY *key;
++	int err;
++
++	if (!IS_ENABLED(CONFIG_CRYPTO_LIB_BENCHMARK))
++		kunit_skip(test, "not enabled");
++
++	raw_key = aead_alloc_random_data(test, key_len);
++	nonce = aead_alloc_random_data(test, nonce_len);
++	ad = aead_alloc_random_data(test, ad_len);
++	pt = aead_alloc_random_data(test, max_data_len);
++	ct = alloc_buf(test, max_data_len);
++	tag = alloc_buf(test, tag_len);
++
++	key = alloc_buf(test, sizeof(*key));
++	err = AEAD_PREPAREKEY(key, raw_key, key_len, tag_len);
++	KUNIT_ASSERT_EQ(test, 0, err);
++
++	/* Warm-up */
++	for (size_t i = 0; i < 10000000; i += max_data_len) {
++		err = AEAD_ENCRYPT(ct, pt, max_data_len, tag, ad, ad_len, nonce,
++				   nonce_len, key);
++		KUNIT_ASSERT_EQ(test, 0, err);
++		err = AEAD_DECRYPT(pt, ct, max_data_len, tag, ad, ad_len, nonce,
++				   nonce_len, key);
++		KUNIT_ASSERT_EQ(test, 0, err);
++	}
++
++	for (size_t i = 0; i < ARRAY_SIZE(data_lens_to_test); i++) {
++		size_t data_len = data_lens_to_test[i];
++		size_t num_iters = 10000000 / (data_len + 128);
++		u64 t_enc, t_dec;
++		bool ok = true;
++
++		KUNIT_ASSERT_LE(test, data_len, max_data_len);
++
++		preempt_disable();
++
++		t_enc = ktime_get_ns();
++		for (size_t j = 0; j < num_iters; j++) {
++			err = AEAD_ENCRYPT(ct, pt, data_len, tag, ad, ad_len,
++					   nonce, nonce_len, key);
++			ok &= (err == 0);
++		}
++		t_enc = ktime_get_ns() - t_enc;
++
++		t_dec = ktime_get_ns();
++		for (size_t j = 0; j < num_iters; j++) {
++			err = AEAD_DECRYPT(pt, ct, data_len, tag, ad, ad_len,
++					   nonce, nonce_len, key);
++			ok &= (err == 0);
++		}
++		t_dec = ktime_get_ns() - t_dec;
++
++		preempt_enable();
++
++		KUNIT_ASSERT_TRUE_MSG(test, ok, "data_len=%zu", data_len);
++
++		kunit_info(test, "data_len=%zu: enc %llu MB/s, dec %llu MB/s",
++			   data_len,
++			   div64_u64((u64)data_len * num_iters * 1000,
++				     t_enc ?: 1),
++			   div64_u64((u64)data_len * num_iters * 1000,
++				     t_dec ?: 1));
++	}
++}
++
++/* clang-format off */
++#define AEAD_KUNIT_CASES				\
++	KUNIT_CASE(test_aead_all_key_lens),		\
++	KUNIT_CASE(test_aead_all_nonce_lens),		\
++	KUNIT_CASE(test_aead_all_tag_lens),		\
++	KUNIT_CASE(test_aead_incremental_updates),	\
++	KUNIT_CASE(test_aead_data_buffer_overruns),	\
++	KUNIT_CASE(test_aead_alignment_consistency),	\
++	KUNIT_CASE(test_aead_inplace),			\
++	KUNIT_CASE(test_aead_monte_carlo),		\
++	KUNIT_CASE(test_aead_interrupt_context),	\
++	KUNIT_CASE(benchmark_aead)
 -- 
 2.55.0
 
