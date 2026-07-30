@@ -1,79 +1,103 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 463003F54CA;
-	Wed, 29 Jul 2026 23:34:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DCB734DCE4;
+	Thu, 30 Jul 2026 01:35:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785368083; cv=none; b=utSmlI4fHLP3jPMrUkeyU+FY0b7lGFlzLaxysShQL9FP8csE2nP5VdR06PGIEohrmN0/ObxjaTa1jyFFvIBHkHBXdc2fAoFFVrItdeR6TaPEmcRUnX93Oe83cVDBcslzGhFam/cA5SgwfnItmBCv9W3+9KuKV/G5eYJ/7XDiFK0=
+	t=1785375319; cv=none; b=ap1R6GYOU+njzywcQnChQfGjn/OtGpLZtrNfYn/GFyDRlFN6zfTtt+ytWbCk5+6kEPnyZkpSBKZJYR4KuamwJM0tT4qtFWYWEJrVo5YfM34Gs/O/z/E1YkokyufW7r45YvJcM0hnYrCgxtuHhokKMB9Z0E2OU3i7Zx6dDmEj3AM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785368083; c=relaxed/simple;
-	bh=9TA4Q42wPeEoztP/oR9flftoIXiwM7xwDJYKVApotxE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dKWpfpx3IWrNPup4cBxlNF33IV91yH/PVAHHcSInb6G10LdbHg/MDkL7WgSmJgTaJ15Ar3JerDn54psxAoQxnwAML4m390Ezlqn2TFKBNTG1vqpPKHycJPGd3D5VF1dW6miF+dVmG8dFE8XqHfCpdUb4jId4ooTQDltpGdauSTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=UxAOJa+0; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1785375319; c=relaxed/simple;
+	bh=oSAvuk6XAnjzDvhOtKxFecXXZYHM/Y/XMr2jVvd7JcQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u3VCodUCWrEvDi04MgUfQtQJtIQxDVHSrNLJiu4tIVbINy3rnEAicW4vwmsODpXCOP99/RqrXHC0jbXuuDrnmN4hZulWBCd109B6vly8vuZ7i36LG7gKTvEFxLXVcha7u3Z1DRLY2zJozZrt7QL0toQ9slNlmUCQnYZQm8+IisU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mV9JM9kG; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="UxAOJa+0"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=p+E3OqcuAO+Ary9QIeZJCfzT1RgDNranH4TRL6oY18Q=; 
-	b=UxAOJa+0qn/DxXSmRY+SeXg8+9yWQEpDs+4z4vbT+i+rvvzwy+/lXsMdJdvHOoH1hEB00JoQQxx
-	ih2lVyQW1QrAJg6Y2DDtz6i8H7U9aJBhckiyYZ4JrAptXIOgCIvTuh3EZv3HHaz/IFxsn2vs2NuKK
-	O9RQlXFZxskVDgtNR+ix1IP4LiVj8uAykqHFc55vn9ZeZG19/j8A2IFNcJPn2kkbgUak6h6BrWGC5
-	kcvMbfj2lvIk5MOwle/26ByyWz8Hm0G3hIA99rmAKJB9BfP3FPNElividVinveJYzLxRXvTfj9JR8
-	uNUtS2iQETZ8Q59yI1/Zbs7wr/gNwfA5+2Wg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wpDn0-00000000MMx-2Gzn;
-	Thu, 30 Jul 2026 07:34:19 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 30 Jul 2026 09:34:18 +1000
-Date: Thu, 30 Jul 2026 09:34:18 +1000
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Lukas Wunner <lukas@wunner.de>
-Cc: Changwei Zou <changwei.zou@canonical.com>,
-	Martin.Kepplinger-Novakovic@ginzinger.com, davem@davemloft.net,
-	ignat@linux.win, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, martink@posteo.de
-Subject: Re: [PATCH v3] crypto: rsassa-pkcs1 - Align DMA buffer to
- CRYPTO_DMA_ALIGN
-Message-ID: <amqN-vSF0ZmWBNJ8@gondor.apana.org.au>
-References: <20260729004156.11925-1-changwei.zou@canonical.com>
- <ampT0ZVFqOgxKFa6@wunner.de>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mV9JM9kG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF31D1F00A3A;
+	Thu, 30 Jul 2026 01:35:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785375318;
+	bh=lxmbBsD7EI9Fd72gCleG/k3i96DR7zE49wBeoZZybfk=;
+	h=From:To:Cc:Subject:Date;
+	b=mV9JM9kGWbtyNODHpp5+FiW9tknqz9y0IKVcLVMKlIz1vxnRld3q7jfC18x+KBzXs
+	 HClabp3nBcrORssFBRDno0OHGKAgHehB23DSXXETOmWPC4oY3oeRHJSD85wZIkx1Yc
+	 xH82czJhgssxOU9YzwQRBCdrHb1vaLamNyTCoaOti/YtKkG4XR88QxR5+ElHOOipga
+	 lq8gOt+dowHfutA3d+633zP5OaUBybn8GvhrbOYAVGc7TwSllGijUsZd42ykZFoYby
+	 k2SwCOIBOwEqpViVZ7ENmypc8l+eDCkJZ6NTO2WZkRmp9fLIfAlXLnolBL+ne89jX0
+	 8LVuNb2ZkVV9g==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Thomas Huth <thuth@redhat.com>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH 0/5] lib/crypto: KUnit tests for AES-CCM and AES-GCM
+Date: Wed, 29 Jul 2026 18:32:55 -0700
+Message-ID: <20260730013301.160203-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ampT0ZVFqOgxKFa6@wunner.de>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jul 29, 2026 at 09:26:09PM +0200, Lukas Wunner wrote:
->
-> That crypto_akcipher_alignmask() doesn't exist yet, but can
-> easily be copy-pasted from crypto_skcipher_alignmask()
-> except it invokes crypto_akcipher_tfm() instead of
-> crypto_skcipher_tfm().
+This series applies to libcrypto-next.  It can also be retrieved from:
 
-I don't think we should create crypto_akcipher_alignmask.  In fact
-alignmask is being phased out everywhere else too.
+    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git gcm-ccm-kunit-v1
 
-The general rule is for the driver to ensure that the data is
-aligned, possibly by copying if necessary.
+This series adds comprehensive KUnit test suites for the AES-CCM and
+AES-GCM library APIs.
 
-Even when alignmask is used it's still the driver's responsibility
-to copy the data when it isn't aligned.
+This is a follow-up to the series 
+"[PATCH v2 00/13] Library APIs for AES encryption modes"
+(https://lore.kernel.org/linux-crypto/20260715221153.246410-1-ebiggers@kernel.org/)
 
-So the bug isn't really in rsa but it's the fault of the underlying
-driver if it didn't check alignment before supplying the buffer
-to the hardware.
+Eric Biggers (5):
+  lib/crypto: tests: Create test-utils.h
+  lib/crypto: tests: Use per-test-case buffers in hash tests
+  lib/crypto: tests: Add aead-test-template.h
+  lib/crypto: tests: Add KUnit test suite for AES-CCM
+  lib/crypto: tests: Add KUnit test suite for AES-GCM
 
-Cheers,
+ lib/crypto/.kunitconfig                   |    2 +
+ lib/crypto/tests/Kconfig                  |   18 +
+ lib/crypto/tests/Makefile                 |    2 +
+ lib/crypto/tests/aead-test-template.h     | 1039 +++++++++++++++++++++
+ lib/crypto/tests/aes_cbc_macs_kunit.c     |   12 +-
+ lib/crypto/tests/aes_ccm_kunit.c          |  352 +++++++
+ lib/crypto/tests/aes_gcm_kunit.c          |  472 ++++++++++
+ lib/crypto/tests/blake2b_kunit.c          |   33 +-
+ lib/crypto/tests/blake2s_kunit.c          |   33 +-
+ lib/crypto/tests/chacha20poly1305_kunit.c |    9 +-
+ lib/crypto/tests/ghash_kunit.c            |   37 +-
+ lib/crypto/tests/hash-test-template.h     |  249 ++---
+ lib/crypto/tests/md5_kunit.c              |    2 -
+ lib/crypto/tests/mldsa_kunit.c            |   19 +-
+ lib/crypto/tests/nh_kunit.c               |    5 +-
+ lib/crypto/tests/poly1305_kunit.c         |   21 +-
+ lib/crypto/tests/polyval_kunit.c          |   38 +-
+ lib/crypto/tests/sha1_kunit.c             |    2 -
+ lib/crypto/tests/sha224_kunit.c           |    2 -
+ lib/crypto/tests/sha256_kunit.c           |   48 +-
+ lib/crypto/tests/sha384_kunit.c           |    2 -
+ lib/crypto/tests/sha3_kunit.c             |   30 +-
+ lib/crypto/tests/sha512_kunit.c           |    2 -
+ lib/crypto/tests/sm3_kunit.c              |    2 -
+ lib/crypto/tests/test-utils.h             |  111 +++
+ scripts/crypto/gen-aead-testvecs.py       |   69 ++
+ 26 files changed, 2271 insertions(+), 340 deletions(-)
+ create mode 100644 lib/crypto/tests/aead-test-template.h
+ create mode 100644 lib/crypto/tests/aes_ccm_kunit.c
+ create mode 100644 lib/crypto/tests/aes_gcm_kunit.c
+ create mode 100644 lib/crypto/tests/test-utils.h
+ create mode 100755 scripts/crypto/gen-aead-testvecs.py
+
+
+base-commit: f70ad727d1d60a4dfcb1a22152d4169f9a205af9
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.55.0
+
