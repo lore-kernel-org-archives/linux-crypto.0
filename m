@@ -1,119 +1,210 @@
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78226411A18
-	for <linux-crypto@vger.kernel.org>; Thu, 30 Jul 2026 12:06:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6EC53AFB18
+	for <linux-crypto@vger.kernel.org>; Thu, 30 Jul 2026 12:37:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785413189; cv=none; b=H3Q0y8IFT83ghnC1vbm3fm8NyOVEgMC4Y1uzjgCAI9YmhTXzZVBdxPOLGcK8e1YokH77feCSxH7uLYmbUpfeV5fD0pB52tIC0igF7Azq/7SQOVz1oYY/EaMZKYyNe1a3Q5zwln78K10LZN5fXzB9epzirKOLIVT8hbMGLjDIJd8=
+	t=1785415053; cv=none; b=tA0BDdewYUwr9P7UFoNZWEjJxKMMHB723u6MbCIXVswEY5ZO6uL8mCfFroyToXs2oQAAZWwa6yVH7roiFmFQT4Wil0YWVjgr4vSQUBhZSDYjmIC3BfZqf0ubV45ZhbM2HTuKZnaJbZPRn2Hd/eisTly03rOg8NJhzzCWwY4eV1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785413189; c=relaxed/simple;
-	bh=IjHYRt3b6XbO3uSNBzE3Dn9FEQqz39BkAW/8SpRq9Z0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dTeOiZEGBP09WxtaUhIq4GUp5TX1jXu/UgF6lZKo14lShSP4ZDfCykGnyOFdcMSBSF7/+rZoR1dkS2T/fg0UiyBZqhNpvqSW9XFOs0ZrQUcOTqjyH56OTXOfKMTyrppff2ieGPk7us+h/8N2qEfXicZnitTqI69s97p4p9geqCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=U9Rge4+Q; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+	s=arc-20240116; t=1785415053; c=relaxed/simple;
+	bh=DHVZc6Q2g7fFidpehsXl0+aHf092QeZz+fx4jRsuXZk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jrmuvkS08M3DS7iOhdDLWqH+Rb7izz3+DTNzLZPAbE9PWNLCOQItvuwAzLskQbSD+TXzzVULHltD78bUmiEBscXZIW+P5uJFgvJZSO8eiQVhj+aM53BBtwngL4KEa5eQIbiq2tNnH7rHoMpyVok5FUEC4pX3yYudaZ7ApsqzpaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=racasWCw; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="U9Rge4+Q"
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com [209.85.216.70])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id C05923F9A6
-	for <linux-crypto@vger.kernel.org>; Thu, 30 Jul 2026 12:06:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1785413184;
-	bh=JZ0Ni4k/nro/sujtQqSou/DbTDAlKfldBstQVC17mJI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version;
-	b=U9Rge4+Qv03f9Hz2rN7VM7LekyIB8pjXMQ/DnNj28uHFBbKDkf5RtlTL3+dgV3tVA
-	 hPus5CHqGYIhQ7yR33ybwLrPRBARmwgjq/GZOtgKnyyk/LgurjZCX9CPLdFg2cQTQG
-	 ofOWvcXb9lT3EKX/RsChzeEUEgbQJFioEFqquMIRZPYHBWAbQA7QhvbR7qF6jSbt7l
-	 BSi0wJ2XJwS9ilG/Xsz+FGap5qHbILbAsKusJaYPK2s7u1Yg6pnEdyK7L3VqDcG+3P
-	 K6+ic6ffpEKTrt+wGq6PZAC6WaHHCVxNz8GSZAXKQknZaH2aK2+CpKHm2lC4D0eJPM
-	 7aovCJmYz6jjInieZLFg4xvbOQXau2K/OIW3LJOYVYjLRGTlyUMUFxdfv+dqGcHRFW
-	 s4bLJqYQ+wuj+XA/ROGUPybKMLS8orAsh8gZUFF/ndmwoGbNow1NbG8vBbLT9sv0kJ
-	 yGvHASl3wCoWsCRKglwoKYNV0+owS17IvaeXgDKE6Xx4ni3kIn/r/G2lmjlzh2aPQU
-	 rQ3rWx1wmyjRqasV1Mkyae+EgJnjYC/7MlLAwAmG1LK+Wc9xfNUIjxXkzUyJjPwLT2
-	 6UTHZTVOto2OZeQCzRERe33kTl0nlka3OKKZHIcj5rbpOFIbZ9iMppfTqkgGapZO9+
-	 7FJiDKWk62QO52AcC5g3Ge6s=
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-388cfc4848dso2648891a91.3
-        for <linux-crypto@vger.kernel.org>; Thu, 30 Jul 2026 05:06:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="racasWCw"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-493b966dd74so12415695e9.3
+        for <linux-crypto@vger.kernel.org>; Thu, 30 Jul 2026 05:37:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785415050; x=1786019850; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=dT02AVOhJF4DtO5AKa37lS8Oi3+0GF2VjriUvi1Tu4s=;
+        b=racasWCw2dptKN/82e5mXnczQqnseiFVpjtbaC+6DmxXr+OmU5MXWKMOOvVgSt3mDz
+         J/iIzHhpWU2l17NLBLXp2eA8FRv7MfvYOzeqR4MxWgS+2G83XP95Bgvcpc+t4lxJOQ3s
+         VBCsmZeLvLlfn6qFEQRePkyBFL59GZ//+OlA08q6YJ2LizTHCFmSel9oJel/P5DdZtBJ
+         gHkmMo0yT0s9Pbc4j8pbsQHskeJp3qugj3PawDgaI+fqs5ltY21orCU1Fbh+Tr46I3ZA
+         5dgi32YXlMNhhNH3YD+rQ7vUIs6q54GDp8mfXRsZcVliPmR7FjJ2ZRKkiWsHJYB8fn45
+         MkLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785413183; x=1786017983;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=JZ0Ni4k/nro/sujtQqSou/DbTDAlKfldBstQVC17mJI=;
-        b=aIqc6sbsXudMtaPz+oOu6bPTg9F+WJNM8PmZLrdbtZpJHUWSRgxkM9hBydNjBzDB1p
-         ruvvppvInajknpIDToPR1vGgcuZ3L4jNVwGYbW1k61HqsTwUFOrjZeAqlYnF+iIs7i1S
-         DosKpEZOZECi2D8pAM9Cbfi9EX8Vcl3Gq5XDBSqycODk9HmL/wfk19NUTV4ieu8V/8VI
-         AWlg/qKcfRhDJ5tDxigWCHqbGHnCzKStNe5HSjm4YJAN4O3e+8DuEb7S0wqBYWKWoMQh
-         S3C9LyzfmOxes7l961FLpssS4BRLoPkslg1hK4pEwe5Ko3VE8Rt59SHP66tsWOHH/kZ3
-         pLgA==
-X-Forwarded-Encrypted: i=1; AHgh+Ro17ixiZ/EPJQb+hVEn/FIZnplmDj7rrTK2xz3GFbaV6aqtPByioe/ZRF5x2sXp/LF8lBRpQjp5QctQgAE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQnHNULMIJTNRpbCqeOB36VOGrI7egSAZPlsQlNxX5LH2RWcQr
-	DwrVuyJYYA1YwAjXhqnBM3SZFTupZgqW7NN6SRHiP287o5tMvohM96LSbw2nWmOl4EJtb96pwm+
-	l4viK3q8xehnp9HOIOeAF2awj9y0OmW6X8VUh8p73cY7oCJqeNCOtuqUGTIjWsG0NeylxvDhh/S
-	SaHkxAJw==
-X-Gm-Gg: AR+sD118dty2I7CyhLcrf5hyo6KzqbJOabtK1DpywjIfUrHqmE+W5+OSoUoFA/0qUTs
-	Ey6/CtQW+0VEn011MMMMnTLLNjSwlA5FJ3Q2bBJ8u3hcALRt9CZjrohbgZP7HHNu9EuEBZi2REV
-	/qbBoRX+oIuBdjM0DD4xi7+rsu1KIM+1qCOUH1j1Ik+GJU6rPC5vRSky885lhWzbOfa1t0SznvZ
-	esfnqA53IsYDGp47DoMSrAtJrGnRDGLHXduBCEHZx1Pf2OtgNok03BVBcQOd4wntZBWOjJy4SKP
-	KO1zSb2HrJCT8utVrdUy0Wf5g5rxR3RIqBz1uEtXdAOtNvqFY+0BS1IKwzE+aa7aCb+35d2fq+b
-	COTjoBu9O01k=
-X-Received: by 2002:a17:90b:4cc6:b0:37f:bfd6:8b40 with SMTP id 98e67ed59e1d1-38f9bd6d19emr2115102a91.5.1785413183074;
-        Thu, 30 Jul 2026 05:06:23 -0700 (PDT)
-X-Received: by 2002:a17:90b:4cc6:b0:37f:bfd6:8b40 with SMTP id 98e67ed59e1d1-38f9bd6d19emr2115070a91.5.1785413182566;
-        Thu, 30 Jul 2026 05:06:22 -0700 (PDT)
-Received: from ZBook.gateway ([123.208.39.53])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-38f9b99639csm972428a91.11.2026.07.30.05.06.18
+        d=1e100.net; s=20251104; t=1785415050; x=1786019850;
+        h=content-transfer-encoding:content-type:mime-version:message-id:date
+         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=dT02AVOhJF4DtO5AKa37lS8Oi3+0GF2VjriUvi1Tu4s=;
+        b=QbOhnX3Pm3OYYf6UqGKThhua4qqI+7Mv64ivlTqWEWFXprdTSp3XBIPs0Q4gL8KWwA
+         O2eX2LVxgYhO6oJE5UeLUqSfwUhG0U3oOY9ExcqKHy8dP+PSaBZwAaPKUj+JIx/CCGaz
+         ISiB84V1I93vVHbwFWTDtPfEigEd/yNrm3f5+/sQz55CDBrpqpu5f3IsMqM7pBBsSzbZ
+         NbzUMjn7nqOSimSzmJwzKRe+2JF5kfGn5FEkRqmJ9OMlGx3bm2QZl63/YdHnzwaFqSKD
+         bsGNpJXazIQ0r9FcVGSxEMP768/5ZNqLew2ZzAWiAcaxsD+7KaY24XFxvwRWsoA/OEX/
+         Xxug==
+X-Forwarded-Encrypted: i=1; AHgh+Rp+8XgqdHEBJoFqE13fmGMdPl1KlfngxJ1QeWwAuTZ5qRAupJD4rwrC4KffGZMk+v0nnWXrsSRx0yZKHek=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKn/A9s1Mnao8SO4aSiyaR5RXmbZQt9HorI1zpLbV4pJecwzSs
+	h+WL+M268RwgrdN6tadLPjCxmdwlRSL3DKIfKWcku/5/YtdAUFj7xkjv
+X-Gm-Gg: AR+sD12b/kDf0EUVWzOWd6qWRn9jXCXZiBI3CMHoMRW+V08K3ZNZIz503oIVRh1Lh7w
+	2UfK6T87REwKWXDMGmZMo2ad7SjSVGY0Ah+mlY/GoSbm14fFi3I1asWnOEMkavp376abJiXSze3
+	YBs15IK+k7aqMtePsDKAlWYUvEW5Rgq5XpHjyHVjFGpJkFQkQBY8S0K38a6PqPg+dC3XU2QnOX3
+	y4UJSuZMu4LM2+1QMvYahSlVOumuSiQLfPJcCcOJMCcqc4csrB+55yq8zJRtbUBPQ7uz99FG2QY
+	WGHMkthx9bbfSQ4LTU2DtUW425C6qZ9D83vl4GowzJcaNGK+BBazT9Jbie6a9jjJPwBlSe3lc3W
+	0t7v9D/e6fbAjIhA4nB2Ys6LMVwiv3sPlXrOYZ4jhtd9kzRVhcAClIbT8X8I5aBXinNHZvlxWRs
+	Bw+dmItVEXNzuRyDYTsJB2nN8/KXfo87EeLdccjSVWWW9HIDU/1IzQ5wd/dDyeKh+9iJqLXf0hr
+	e2gxw==
+X-Received: by 2002:a05:600c:4e94:b0:496:bbcb:b0bb with SMTP id 5b1f17b1804b1-49800ea0252mr34597875e9.18.1785415049675;
+        Thu, 30 Jul 2026 05:37:29 -0700 (PDT)
+Received: from arbab-X395.dbs.corp ([110.93.227.54])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47fc88e439asm5406646f8f.11.2026.07.30.05.37.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jul 2026 05:06:22 -0700 (PDT)
-From: Changwei Zou <changwei.zou@canonical.com>
-To: lukas@wunner.de
-Cc: Martin.Kepplinger-Novakovic@ginzinger.com,
-	changwei.zou@canonical.com,
-	davem@davemloft.net,
-	herbert@gondor.apana.org.au,
-	ignat@linux.win,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	martink@posteo.de
-Subject: Re: [PATCH v4] crypto: rsassa-pkcs1 - Avoid cacheline sharing with underlying driver
-Date: Thu, 30 Jul 2026 22:06:14 +1000
-Message-ID: <20260730120614.1615780-1-changwei.zou@canonical.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <ams3ED05SiobrDap@wunner.de>
-References: <ams3ED05SiobrDap@wunner.de>
+        Thu, 30 Jul 2026 05:37:29 -0700 (PDT)
+From: Arbab Haider <arbabhaider649@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Arbab Haider <arbabhaider649@gmail.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	John Garry <john.g.garry@oracle.com>,
+	linux-crypto@vger.kernel.org
+Subject: [PATCH] crypto: hisilicon/sec - Fix use-after-free and unchecked kfifo_put in sec_send_request()
+Date: Thu, 30 Jul 2026 17:37:18 +0500
+Message-ID: <20260730123718.283971-1-arbabhaider649@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi Lukas,
+The capacity check in sec_alg_skcipher_crypto() only verified that the
+hardware queue could accept all elements or that the software queue had
+enough space, but failed to account for the case where the software
+queue already had pending entries. When the software queue is non-empty,
+all new entries must go to the software queue to preserve cipher
+chaining ordering, even if the hardware queue has available capacity.
 
-I will move the new declaration up below the one for child_req.
+This could lead to two issues:
 
-Since out_buf is incremented later in the function rsassa_pkcs1_verify(),
-key_buf was introduced to preserve the original address returned by kmalloc().
+1. Elements silently dropped from the software queue if
+   kfifo_put() returns 0 (queue full), causing the request to never
+   complete.
 
-I tried the following approach, but it would require replacing all existing
-occurrences of out_buf with ptr.
+2. Use-after-free if sec_queue_send() returns -EAGAIN after some
+   elements were already queued to hardware or software — the error
+   path in sec_send_request() returns -EBUSY, and the caller's
+   err_free_elements path frees all elements, including those
+   referenced by the hardware queue or software queue.
 
-	u8 *out_buf __free(kfree_sensitive) = NULL;
-	
-	u8 *ptr;
+Fix by:
 
-	ptr = out_buf;
+- Checking the return value of kfifo_put() and returning -ENOSPC on
+  failure, with a WARN_ON_ONCE since this should not happen with the
+  corrected capacity check.
 
-Could you please give me some advice on this?
-Thanks a lot.
+- Catching all errors from sec_queue_send() (not just -EAGAIN) with a
+  WARN_ON_ONCE, as this path is unreachable with proper capacity
+  accounting.
 
-Kind regards,
-Changwei
+- Replacing the capacity check with correct logic that accounts for
+  the three possible queueing scenarios:
+  * Software queue has entries or hardware queue is non-empty: all
+    entries go to the software queue → verify software queue capacity
+    for all steps.
+  * Both queues empty: first entry goes to hardware, rest to software
+    → verify hardware can take 1 and software can take steps - 1.
+  * No software queue configured: all to hardware → verify hardware
+    capacity for all steps.
+
+Fixes: 915e4e8413da ("crypto: hisilicon - SEC security accelerator driver")
+Signed-off-by: Arbab Haider <arbabhaider649@gmail.com>
+---
+ drivers/crypto/hisilicon/sec/sec_algs.c | 51 +++++++++++++++++--------
+ 1 file changed, 35 insertions(+), 16 deletions(-)
+
+diff --git a/drivers/crypto/hisilicon/sec/sec_algs.c b/drivers/crypto/hisilicon/sec/sec_algs.c
+index 85eecbb40e7e..6cc08e9a07d0 100644
+--- a/drivers/crypto/hisilicon/sec/sec_algs.c
++++ b/drivers/crypto/hisilicon/sec/sec_algs.c
+@@ -402,14 +402,17 @@ static int sec_send_request(struct sec_request *sec_req, struct sec_queue *queue
+ 		    (kfifo_is_empty(&queue->softqueue) &&
+ 		     sec_queue_empty(queue))) {
+ 			ret = sec_queue_send(queue, &el->req, sec_req);
+-			if (ret == -EAGAIN) {
+-				/* Wait unti we can send then try again */
+-				/* DEAD if here - should not happen */
++			if (ret) {
++				WARN_ON_ONCE(ret == -EAGAIN);
+ 				ret = -EBUSY;
+ 				goto err_unlock;
+ 			}
+ 		} else {
+-			kfifo_put(&queue->softqueue, el);
++			if (!kfifo_put(&queue->softqueue, el)) {
++				WARN_ON_ONCE(1);
++				ret = -ENOSPC;
++				goto err_unlock;
++			}
+ 		}
+ 	}
+ err_unlock:
+@@ -790,28 +793,44 @@ static int sec_alg_skcipher_crypto(struct skcipher_request *skreq,
+ 
+ 	/*
+ 	 * Only attempt to queue if the whole lot can fit in the queue -
+-	 * we can't successfully cleanup after a partial queing so this
++	 * we can't successfully cleanup after a partial queuing so this
+ 	 * must succeed or fail atomically.
+ 	 *
+-	 * Big hammer test of both software and hardware queues - could be
+-	 * more refined but this is unlikely to happen so no need.
++	 * When the softqueue has pending entries, all new entries must
++	 * go to the softqueue to preserve ordering.  When both queues
++	 * are empty the first entry goes to hardware and the rest to
++	 * the softqueue (if enabled).
+ 	 */
+ 
+ 	/* Grab a big lock for a long time to avoid concurrency issues */
+ 	spin_lock_bh(&queue->queuelock);
+ 
+ 	/*
+-	 * Can go on to queue if we have space in either:
+-	 * 1) The hardware queue and no software queue
+-	 * 2) The software queue
+-	 * AND there is nothing in the backlog.  If there is backlog we
+-	 * have to only queue to the backlog queue and return busy.
++	 * Can go on to queue if we have space for everything upfront.
++	 * If there is backlog we must queue to the backlog and return busy.
+ 	 */
+-	if ((!sec_queue_can_enqueue(queue, steps) &&
+-	     (!queue->havesoftqueue ||
+-	      kfifo_avail(&queue->softqueue) > steps)) ||
+-	    !list_empty(&ctx->backlog)) {
++	if (!list_empty(&ctx->backlog)) {
+ 		ret = -EBUSY;
++		goto backlog;
++	}
++
++	if (!queue->havesoftqueue) {
++		if (!sec_queue_can_enqueue(queue, steps))
++			ret = -EBUSY;
++	} else if (!kfifo_is_empty(&queue->softqueue) ||
++		   !sec_queue_empty(queue)) {
++		/* All entries must go to the softqueue */
++		if (kfifo_avail(&queue->softqueue) <= steps)
++			ret = -EBUSY;
++	} else {
++		/* First to hardware, rest to softqueue */
++		if (!sec_queue_can_enqueue(queue, 1) ||
++		    kfifo_avail(&queue->softqueue) < steps - 1)
++			ret = -EBUSY;
++	}
++
++	if (ret) {
++backlog:
+ 		if ((skreq->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)) {
+ 			list_add_tail(&sec_req->backlog_head, &ctx->backlog);
+ 			spin_unlock_bh(&queue->queuelock);
+-- 
+2.53.0
 
