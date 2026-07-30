@@ -1,108 +1,116 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B453B3D5645;
-	Thu, 30 Jul 2026 09:33:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1C69400991
+	for <linux-crypto@vger.kernel.org>; Thu, 30 Jul 2026 10:00:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785404028; cv=none; b=dnT0E9nv5hJpA9T3Qfec+N73J2mM26Wy0RR5ngdFaeUFmcwKG+WZ+Cc/YyAtnXlIMOP7h3g2P9Sx2kp9NvxecFgefWzKPXZzW4GHuhWdd2T51uZUXfPo9e0i18zfDndzLk3EycLMJgenP5oc1X23HB2EoWD0uSgj25wBBLwKw4U=
+	t=1785405657; cv=none; b=D/WSaaurmjGVvw79pEMkR2pUshXwrtXXbCRcFmZxd27DeCCV6rvWhgtxKsCYpIhZjXR8qtpHYmZAeoQbKqitSCSk94z1gD9UvoiNT5FaOVk1pDberWiiT9Ahjr/nuGp0mGlESASm6pKULXe+4eBv8akfbtfPAsx87Ml/wIItYmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785404028; c=relaxed/simple;
-	bh=jiClCBMXuRDUCJhU8Sw2OgaHfipmtUP9SKW3wlgyCso=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BfkObKu5lOND0idCQXWFDcFK2zau45T0h9G0OhJA0emiCA0u1VnPZw3xz37ow72EuyXghG1qThfSZCfJ0plfCFMH4bHnGALbikZSdkLIHR7b1Is61uid9Q4E1ikNxTbrih/f9vnPDw9I09h4cNNQaHwr7ZTMIIfC0WSjf3A+AgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: bd408eaa8bf911f1aa26b74ffac11d73-20260730
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NO_NAME, HR_CTE_8B, HR_CTT_MISS
-	HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME, HR_SJ_DIGIT_LEN
-	HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM, HR_SJ_PHRASE
-	HR_SJ_PHRASE_LEN, HR_SJ_PRE_RE, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
-	HR_TO_NO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_EXISTED
-	SN_EXISTED, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS, CIE_BAD
-	CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO, GTI_C_BU
-	AMN_GOOD, ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.12,REQID:3768946b-c9ed-463a-a7f0-9d0ea9ce697a,IP:15,
-	URL:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:40
-X-CID-INFO: VERSION:1.3.12,REQID:3768946b-c9ed-463a-a7f0-9d0ea9ce697a,IP:15,UR
-	L:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:40
-X-CID-META: VersionHash:e7bac3a,CLOUDID:b543d294aa0835470d514bb5922cd1db,BulkI
-	D:260730173340EOWZ2KO5,BulkQuantity:0,Recheck:0,SF:10|66|78|81|82|83|102|1
-	27|850|865|898,TC:nil,Content:0|15|50,EDM:5,IP:-2,URL:0,File:nil,RT:nil,Bu
-	lk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:
-	0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: bd408eaa8bf911f1aa26b74ffac11d73-20260730
-X-User: yijiangshan@kylinos.cn
-Received: from localhost.localdomain [(116.128.244.171)] by mailgw.kylinos.cn
-	(envelope-from <yijiangshan@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1541964972; Thu, 30 Jul 2026 17:33:36 +0800
-From: Jiangshan Yi <yijiangshan@kylinos.cn>
-To: herbert@gondor.apana.org.au
-Cc: 13667453960@163.com,
-	davem@davemloft.net,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	yijiangshan@kylinos.cn
-Subject: Re: Re: [PATCH] crypto: krb5 - Use constant-time checksum comparison
-Date: Thu, 30 Jul 2026 17:33:05 +0800
-Message-Id: <20260730093305.491689-1-yijiangshan@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <amr3cTpCcPd7PYna@gondor.apana.org.au>
-References: <amr3cTpCcPd7PYna@gondor.apana.org.au>
+	s=arc-20240116; t=1785405657; c=relaxed/simple;
+	bh=2aE4/gtJEqYKaBgbtT+vxFpTATlUhDBcRco2daW2WsA=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
+	 References:In-Reply-To; b=jdsbmSStBioDiJON1wzMqFoetEvrr8CpdPCIT4r/bXh1gRqJlkm20IMDv9XEREnFCOtZBaOX701of935Xtz8FFiJKdh84DnI4XtmeNXXtW6YgJYFcvSHJnYsG5oIduob/miCy6sqM3IXGwkJZLEG9DybKoEEsV//SGPIGfgAHds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=gi1JUl/s; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="gi1JUl/s"
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 444984E41001;
+	Thu, 30 Jul 2026 10:00:48 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 1822E602B8;
+	Thu, 30 Jul 2026 10:00:48 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 1BE6911C1597E;
+	Thu, 30 Jul 2026 12:00:39 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1785405643; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=AyNjJKOPhsbLACNRJAnmbwDNBITLgF9GlmNSRZLg7f4=;
+	b=gi1JUl/sDV7SYUOVFaA/clBCPgj6qkfADZdRfMIy3jYGQCRMHyyKGgFuQmvNNQl76y4HeH
+	PUM1UkmUKvckie/+Wl2witpFTMZ+MBnG+ALMkJHZWmto003h+a55wWi31ILxRXlwWmGOET
+	krJ0zso5qEfH2USACY4CJttmG2i8a/0I/SwH+Te7z3ipd/5SHRxU6AFrolwQq7DBBriSLF
+	zzy2mtx+j04p7jMSMB905yj2rjdUkGAWS/sS0H1TV5aXUIOMaTou1s+Qi8EEfSnwePJgnb
+	8XA1GXC2a8qlrEbl+x5XNAJ2k7Fwu7/6q0OgSu+NlYCN8wYc+qmX25e3wz23xw==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-
-On Thu, Jul 30, 2026 at 05:04:17PM +1000, Herbert Xu wrote:
-> Please explain exactly what secret information might be leaked by
-> the timing attack.
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 30 Jul 2026 12:00:38 +0200
+Message-Id: <DKBTH7CXUX2R.S62IGDGU9MJZ@bootlin.com>
+From: "Paul Louvel" <paul.louvel@bootlin.com>
+To: "Herbert Xu" <herbert@gondor.apana.org.au>, "Paul Louvel"
+ <paul.louvel@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>, "Thomas Petazzoni"
+ <thomas.petazzoni@bootlin.com>, "Herve Codina" <herve.codina@bootlin.com>,
+ "Christophe Leroy" <chleroy@kernel.org>, <linux-crypto@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v4 00/19] crypto: talitos - Driver cleanup
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20260722-7-1-rc1_talitos_cleanup-v4-0-81d1ed2ad911@bootlin.com>
+ <amr62AUAifNXVIns@gondor.apana.org.au>
+In-Reply-To: <amr62AUAifNXVIns@gondor.apana.org.au>
+X-Last-TLS-Session-Version: TLSv1.3
 
 Hi Herbert,
 
-Thanks for the review and the question.
+On Thu Jul 30, 2026 at 9:18 AM CEST, Herbert Xu wrote:
+> On Wed, Jul 22, 2026 at 10:53:44AM +0200, Paul Louvel wrote:
+>>
+>> Changes in v4:
+>> - The modification I did in v3 in PATCH 1 was incomplete. message_size
+>>   was not initialized in ahash_init(), and not incremented in
+>>   ahash_process_req().
+>> - Link to v3: https://patch.msgid.link/20260721-7-1-rc1_talitos_cleanup-=
+v3-0-7c71a2b77c83@bootlin.com
+>
+> Please check the Sashiko comments:
+>
+> https://sashiko.dev/#/patchset/20260722-7-1-rc1_talitos_cleanup-v4-0-81d1=
+ed2ad911%40bootlin.com
+>
+> Thanks,
 
-The leaked secret is the correct MIC checksum value, not the key Kc
-itself.
+Thanks for notifying, I tend to forget to check it if they are not automati=
+cally
+send in my mailbox.
 
-In rfc3961_verify_mic(), memcmp() compares:
+On the following remarks:
 
-  - cksum:  the correct MIC = MIC_{Kc}(metadata || data), computed
-            with the session checksum key Kc
-  - cksum2: the claimed MIC from the incoming packet (attacker-controlled)
+> Also regarding -EAGAIN, if talitos_submit() returns -EAGAIN to the generi=
+c=20
+> core, does the core handle it safely?
+> Since we are now relying on CRYPTO_AHASH_ALG_BLOCK_ONLY, the generic core
+> handles negative errors in ahash_update_finish(). If it sees an error lik=
+e
+> -EAGAIN, it clears the internal buffer length.
+> Will this erase previously buffered partial blocks and silently corrupt t=
+he
+> hash stream under high load?
 
-memcmp() returns at the first mismatching byte, so its timing reveals
-how many leading bytes of the attacker's guess match the real cksum.
+This is a non-issue, because such error make the core abandon the current
+request, right ?
 
-Because Kc is fixed for the session and the attacker chooses the
-message M, the target cksum is a constant across repeated attempts.
-The attacker can then recover it byte by byte: try all 256 values for
-cksum2[0], observe which takes longest (meaning it matched and
-memcmp proceeded to the next byte), fix it, repeat for cksum2[1],
-etc. Once cksum is fully recovered, submitting (M, cksum) passes
-verification -- a forged MIC.
+> MD5 mandates little-endian padding length, and HMAC also requires the inn=
+er
+> iPad length to be handled. Will this cause incorrect hash digests for=20
+> messages whose length is an exact multiple of the block size?
 
-Kc itself is not exposed, since cksum is a one-way function of Kc.
-But recovering cksum is enough to defeat integrity for that message,
-which is the secret worth protecting with constant-time comparison.
+Agreeing on MD5, and indeed with MD5 hash digests for message whose length =
+is an
+exact multiple of the block size, the hash is wrong.
 
-This matches what krb5enc.c:255 already does with crypto_memneq() for
-the equivalent comparison.
+The comment on HMAC seems wrong to me. The hardware performs IPAD and OPAD
+operations automatically on the key data when required.
+After some testing, I also don't found any obvious issue.
 
-If you agree this justifies the change, I will resend with this explanation folded into the commit message.
+--=20
+Paul Louvel, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
-Thanks,
-Jiangshan
