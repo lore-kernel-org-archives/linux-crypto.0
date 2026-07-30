@@ -1,149 +1,189 @@
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 637C33E0C7A
-	for <linux-crypto@vger.kernel.org>; Thu, 30 Jul 2026 11:20:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A92F410D24;
+	Thu, 30 Jul 2026 11:34:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785410442; cv=none; b=iun6u3rgUCiyaY2SyizOxUe7VYf4r0J8i1n+ZkKJGJ8dfoqYoydbizm1WjWi9lmPHpOfXJFeZlDemRtX4MfAl1u9cEnPxPg8umFW096QC21Q6gPv5xOU4gPxMPntcXgC378dsQVCja1HZlmoc88WuoYFL5YcvN7d1Z0mnyr2A2Y=
+	t=1785411287; cv=none; b=re9yCJx5aXRff25ahm/HP7HiAibXOqRBxFkXMwW2/Tie5nAefdStBOslDSz3+7YYUCaH5d4P+8xBY+xfAiZI/S8qGr2oCTrNzfkCG1oQkzFocfYG4wxv4mmAAB7SRr0W9XHN66wY5VVFxCYzh/31B7ZfKRI3pcLq3DY4R8Vf+3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785410442; c=relaxed/simple;
-	bh=a51/JbmjomePrg3BD83fj4YRlxf0Ru/rIXYOjUehCZI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NwQ68npOALvsSOEemkjhmL1J56Fq81j9B7JRu6g5hMPH6ZtM8TYUyhHfF9ZOysORMLfsLPRVEcM6OqVsHUsLi0L9aadD4l3MCZK0JeGP7OKVVEtOnMpnXNtSNNJm/iP45G607auQxipPBVjaWS3pTuT66bH0XkYVYzDhINA9GNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=eEVmiUQl; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+	s=arc-20240116; t=1785411287; c=relaxed/simple;
+	bh=fZV59fNhXu4Wh0j6giBgv27AD6aj39rpSIuWb5WBfEs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fdrlcsOILEgt8iYS67rlFeQ8474B4BXFfQbYbArCBTaAuk+hqynvd7lBvCCN1XPo9s9bGBWFzi1we3wwMA2wK4HK5Da885RLQBkN5uwV7j9tOiksBtdiYc3FVR8mY7hiPCvbULgk09rlvkPARIsu5IK/zn9nk5WgS9h1l+ow/A0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qnQB5Xl0; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="eEVmiUQl"
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com [209.85.210.197])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id A3F353F9A6
-	for <linux-crypto@vger.kernel.org>; Thu, 30 Jul 2026 11:20:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1785410436;
-	bh=emWGlwCR096Tp0952lwWV6p+kGuauKQ78d5fk1DQuOk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
-	b=eEVmiUQlZSbBA6R8b4o7vASX7wr4ErIe3PkNnhUTF6VBnOCdVt958nbWHXJeeenX8
-	 d9c6tER9P/hAi4PMLPafurTyyli+8u+WmFQJF45Qek8sKR2bkce8JuOUQbs6QJ1W6N
-	 HFQw9c3LR9fuCGf/YM1zoFzGUbnnPGz6DB90Hf0o0StADj9PweuOCqrQySltHW0DL6
-	 T0M0AHIwp4XEDYW9+Sbh6QNDyhN0jAVtUSvzqJQ5ydOfNcpAmSZGUs8Y4JH1s918rk
-	 Y/O9PfCybjMlHp/GSoT+diA9hpGWLpvD6S+f/AxmlAzIUOtw38VOqcT/Fm9k2D0i3W
-	 cD3ZsjVc6GRko0xStVTiTdRY8sjzWb95tUZHDbVGFkMofbwM5bAoJiaTBuS/hWaAEa
-	 iiNnber6it99DK2tEvQIiUv3uvCn5RaMVKYeXISN2/q6b690C7Fas6eijBbNo26IeL
-	 SPfkYw4lVhkF2nDS7N6TRmqWR7f5+fPi1DCJx0ZtL7kRWEmGHWu4uVGfEljn8iML0U
-	 8G9anB8OkO+52iJWgOqMKuD5szkzgQLuhQYis6Xlp1R+bqS0SmOKjVjYH/6JEcMUQh
-	 Xm5JvFaZy39ea/kJBp1WM9j9Q8HX180xndy1TSASRLkxqBn7FY8lxe+Iy+5iyOqLH3
-	 s/CxeMA8mvTpjOimLrsTNqLA=
-Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-8485b7e18b4so3487560b3a.1
-        for <linux-crypto@vger.kernel.org>; Thu, 30 Jul 2026 04:20:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785410435; x=1786015235;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=emWGlwCR096Tp0952lwWV6p+kGuauKQ78d5fk1DQuOk=;
-        b=dW6pGqZUL27MvECQuiZvVO2/GH61CMoPjKEPa/LgJG248aNetq/pL6EMsLkMDjv6WO
-         ZNEbAQkWsw4tQLHD2N5biIZ4/KyLi8KWikIMvBG7EuJ9x/GoQY3ZjnVumSoE3wqXjunv
-         EDYTF9zQjXqYmpvttnTnaqO9PXBKLiH4dLPFe27jga1WlD+Z2MsFT/hPetn39uIA7LW3
-         mjsF0MWVZUv98PukK0HXIp8wn1eMNyulvq5R4WTFpozdXXJbQIOxHJ75AotmRV+8LrPj
-         ANo9zuoJD9f0BPWjiVWMZio5FxMOeJpjU8rBM2/bMaAV3UbGacZD+P/7V6ze6tGnckLH
-         QGnA==
-X-Forwarded-Encrypted: i=1; AHgh+RpExH1NSg8o8c7XsfYfM9Pr5mSj5CHR7OYWcFgTfVyYYbNYPg0OqOC+sazfROE+zSwAW7E5Q1v3TSKK7VA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzm8j5ehCDHxGFcAvi1k7IRJ47BhX8wSiCD4j3h6oi6/fHQvWHP
-	2+HGVEU5DFw6A2d+Cs7kdf1oZVz7Cjhvr5k3m7RHlg0IyeRtDgVXedMd9uF9EgtmFD1tqCdL960
-	spdbXAPwEWsuFKhu/0BHWp6eq7xCDxYlSrCljbBarOOpz/T+1Y4ttZGJjWrWCCYsoV1KUJryhlz
-	JOvza6Sg==
-X-Gm-Gg: AR+sD13QHfPfGjYa4rJwjfA+UGlTM2dAKIuQ2Ps0DU8+qXz/+aTj51iqjvVf9NLBv9a
-	h5Z9rGEMs9VzXpKLBugyUXocNSk/HyckZ9eB5rv96qUPPWF71cqqzzSoPNXzGd8/JIc6NLqQg00
-	xVqEzx3ifylFnZA6OK9I1P5Ah0oV/wYJh0kcs7JBGYyeV/Dx4JdkK5DbW8vbYJue89Jd0KeFAW8
-	zrnRNHIreI0GuEWy1R5uq47AB5Zi49kttobGJEpajzJ5/M3v0HwmKZ2UezFo3IX3aS+QwuGdcq8
-	taW17Kfsg8FSo1E99elYago11frxR9lltCKWVbOpNrrwi4Nk+RAH/f4l1KvkuPpvr9H+UIU6KfB
-	Y+QYVS+ZAL54=
-X-Received: by 2002:a05:6a00:4003:b0:84e:a0b:1a4c with SMTP id d2e1a72fcca58-84ebc432c42mr2188860b3a.62.1785410435026;
-        Thu, 30 Jul 2026 04:20:35 -0700 (PDT)
-X-Received: by 2002:a05:6a00:4003:b0:84e:a0b:1a4c with SMTP id d2e1a72fcca58-84ebc432c42mr2188828b3a.62.1785410434591;
-        Thu, 30 Jul 2026 04:20:34 -0700 (PDT)
-Received: from ZBook.gateway ([123.208.39.53])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84ea7344ca8sm2562185b3a.21.2026.07.30.04.20.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jul 2026 04:20:34 -0700 (PDT)
-From: Changwei Zou <changwei.zou@canonical.com>
-To: lukas@wunner.de
-Cc: Martin.Kepplinger-Novakovic@ginzinger.com,
-	changwei.zou@canonical.com,
-	davem@davemloft.net,
-	herbert@gondor.apana.org.au,
-	ignat@linux.win,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	martink@posteo.de
-Subject: [PATCH v4] crypto: rsassa-pkcs1 - Avoid cacheline sharing with underlying driver
-Date: Thu, 30 Jul 2026 21:20:26 +1000
-Message-ID: <20260730112026.1612066-1-changwei.zou@canonical.com>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qnQB5Xl0"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66UAHxNp846258;
+	Thu, 30 Jul 2026 11:34:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=82/Iz9
+	QOAM773M75QL8FheOWFaPVv13KCdaeeO8EOag=; b=qnQB5Xl0UgHiwbaPD2b70j
+	03r+ZBhZoLmFmFfiJ8x5P5QOhPAF4pL0ZYJ6ghcspcaUEc/H9Up+ba6V+3DkNYQS
+	Pmk8hZIxIQwAqBzxxq/rFFpoCpEMYsNktQUIdsXXuH+j2Ybt6OOEbyHmyB8gNNmp
+	nbLOhwzuSmYPiAG7kXmv33DBxYqt+BDRdT3Dg/Kzakcru6R7Hv2Y3msoVraYwQZk
+	xjAvq12ABVslOaiqosz5pPZBmzNSvVje8dSUOznuCki4D1Ep9TwWbx78HoHdime/
+	qL/L5pqKwXa5M+wIpQgjo215nBsX39ggUX9tQUfFmWC05iRkiarlNHoZXBVD0w7w
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fmuycqcdh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 30 Jul 2026 11:34:36 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 66UBQJxA016526;
+	Thu, 30 Jul 2026 11:34:35 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fn9pgjwu6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 30 Jul 2026 11:34:35 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 66UBYWgO13500688
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 30 Jul 2026 11:34:32 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EFD7A20043;
+	Thu, 30 Jul 2026 11:34:31 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9AE0220040;
+	Thu, 30 Jul 2026 11:34:31 +0000 (GMT)
+Received: from [9.224.91.220] (unknown [9.224.91.220])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 30 Jul 2026 11:34:31 +0000 (GMT)
+Message-ID: <39570813-27b0-40f9-89c5-8e2dce05e2f0@linux.ibm.com>
+Date: Thu, 30 Jul 2026 13:34:31 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/4] s390/crypto: Replace cond_resched() with msleep(1)
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Heiko Carstens <hca@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+References: <20260730052907.2607026-1-hca@linux.ibm.com>
+ <20260730052907.2607026-2-hca@linux.ibm.com>
+ <20260730101157.GQ49951@noisy.programming.kicks-ass.net>
+From: Holger Dengler <dengler@linux.ibm.com>
+Content-Language: en-US, de-DE
+In-Reply-To: <20260730101157.GQ49951@noisy.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: hiqQkvn8PvBnI17F-vxIjYpzSOMyp8Bo
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzMwMDA4NCBTYWx0ZWRfXx1vtqZPeqfXu
+ COYGtKwcC2hD0UGlzC9fkJnTKnsQeK/cTd5aqbnajkzMhwDw67WRI2KAzrtNjRA93c2OP8P7lMK
+ rIgr4gNvefp3xzaHmCRbUCJ9vdvfJx2T3pYKAuH+W7wXtrHzGH8uZMwia3pt12pDH3bIMSHf419
+ QTGF13Vo/DMAOv0YyPidOX1al0qfG89LOJkaA6VHeWo0Ua15xTzFx7U2B5wXZR+NzsSY2AJGyAI
+ r1gtMLv70r327VczkA6G0OdlY3ekOV7yDjq6IUWkprO490BZuf8c/zSHpohk0D2RPfrMEWsa1N+
+ DmScpiPBTrZ/4nmVFr6YKfr4j+j0EVCYelWIvl6hsRUqnzK3yLCXvcEJvPI7KZcWJWuJeXzk/PB
+ UA1SOLMthWdyQbMO5N2AXKd0lqlzAPDM0x2VCE0QNAUpeLCfIqY67U2eJwVOAepRoxDyozWKHry
+ KXMclZRUHeGaDo9A01Q==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzMwMDA4NCBTYWx0ZWRfX//qOuzKBorKB
+ 6Z2cm0lR+qiOogkJJ9oXs1IFK3BISaMFhSes/wPFjr42OQVPX5iQHgDdFfe5c9IeGFAW5jBysUj
+ 4mNAXq7ZkKFygm7VxgvLjGRTiHK1lK8=
+X-Authority-Analysis: v=2.4 cv=AZeB2XXG c=1 sm=1 tr=0 ts=6a6b36cc cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8
+ a=ZkYAL_Nd9JtXCKDLLNsA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: hiqQkvn8PvBnI17F-vxIjYpzSOMyp8Bo
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-30_03,2026-07-29_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 priorityscore=1501 phishscore=0 adultscore=0 impostorscore=0
+ clxscore=1015 malwarescore=0 suspectscore=0 lowpriorityscore=0 bulkscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607300084
 
-out_buf is used as a DMA buffer for the RSA verification operation.
-If out_buf is not aligned to CRYPTO_DMA_ALIGN, cacheline sharing
-problems (data corruption) would occur on CPUs with DMA-incoherent caches,
-leading to -EKEYREJECTED.
+Peter,
 
-Allocate out_buf separately via kmalloc(), which guarantees cacheline
-alignment on architectures without fully coherent DMA.
-This acts as a defensive measure, and avoids the need for an extra copy
-in the underlying driver, which should check alignment before supplying
-buffers to the hardware.
+On 7/30/26 12:11, Peter Zijlstra wrote:
+> On Thu, Jul 30, 2026 at 07:29:04AM +0200, Heiko Carstens wrote:
+>> With [1] cond_resched() is always compiled away and becomes a no-op.
+>>
+>> The comments for all cond_resched() calls in crypto code however indicate
+>> that the current process should be scheduled away to avoid instant
+>> re-invocation of a callback. This is not what cond_resched() would do or
+>> did.
+>>
+>> Instead of just removing the cond_resched() calls, replace them with
+>> msleep() calls, as suggested by Holger Dengler. This forces the current
+>> task to be scheduled away (sleeps) like originally intended.
+>>
+>> [1] commit 7dadeaa6e851 ("sched: Further restrict the preemption modes")
+>>
+>> Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
+>> ---
+>>  arch/s390/crypto/paes_s390.c  | 8 ++++----
+>>  arch/s390/crypto/phmac_s390.c | 4 ++--
+>>  2 files changed, 6 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/arch/s390/crypto/paes_s390.c b/arch/s390/crypto/paes_s390.c
+>> index 8cfe6166c193..511cb6105436 100644
+>> --- a/arch/s390/crypto/paes_s390.c
+>> +++ b/arch/s390/crypto/paes_s390.c
+>> @@ -555,7 +555,7 @@ static int ecb_paes_do_one_request(struct crypto_engine *engine, void *areq)
+>>  		 * To avoid immediately re-invocation of this callback,
+>>  		 * tell the scheduler to voluntarily give up the CPU here.
+>>  		 */
+>> -		cond_resched();
+>> +		msleep(1);
+>>  		pr_debug("rescheduling request\n");
+>>  		return -ENOSPC;
+>>  	} else if (rc) {
+> 
+> I am somewhat conflicted on this. It will add a 'random' delay to this
+> crypto user (which might be real-time task) that is not related to the
+> actual event this is waiting for.
+> 
+> That is, it could be that this key expiration thing is sorted way faster
+> than this one milisecond.
+> 
+> Is there nothing the crypto layer can do that is more clever; like a
+> condition variable on the key update when -ENOSPC is returned or
+> something.
 
-The intermittent error 'Key was rejected by service' on i.MX8 with CAAM
-can be triggered when loading signed kernel modules.
+Let me give a bit of background here: The protected key can only get
+invalid, if the linux instance (z/VM or KVM guest) is moved to another
+hypervisor on a different machine (aka life guest relocation). In such a
+case, the crypto accelerator card and the host has to exchange the "real
+key", which is wrapped by the host and handed back to the guest as the
+re-newed protected key. Unfortunately there is no asynchronous trigger
+on completion, you have to re-try (and maybe get another "in progress"
+return).
 
-    for i in $(seq 1 100); do
-        sudo modprobe xfs 2>&1 && echo "SUCCESS on attempt $i" \
-        && sudo rmmod xfs || echo "FAILED on attempt $i"
-    done
+And as if that weren't bad enough, if this key exchange between card and
+host is the first one, card and host has to instanciate a secure
+communication channel (including a key exchange for the transport layer).
 
-Signed-off-by: Changwei Zou <changwei.zou@canonical.com>
----
- crypto/rsassa-pkcs1.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+I agree, this sounds rally bad for real-time tasks. But we're talking
+about 2nd-level virtualization (with non-real-time hypervisors below)
+and about cases, which can only happen right after a guest relocation to
+another machine. Would the current solution be acceptable under these
+circumstances?
 
-diff --git a/crypto/rsassa-pkcs1.c b/crypto/rsassa-pkcs1.c
-index 94fa5e9600e7..cbd76394ebf0 100644
---- a/crypto/rsassa-pkcs1.c
-+++ b/crypto/rsassa-pkcs1.c
-@@ -227,6 +227,7 @@ static int rsassa_pkcs1_verify(struct crypto_sig *tfm,
- 	struct scatterlist sg;
- 	unsigned int dst_len;
- 	unsigned int pos;
-+	u8 *key_buf __free(kfree_sensitive) = NULL;
- 	u8 *out_buf;
- 	int err;
- 
-@@ -237,12 +238,12 @@ static int rsassa_pkcs1_verify(struct crypto_sig *tfm,
- 		return -EINVAL;
- 
- 	/* RFC 8017 sec 8.2.2 step 2 - RSA verification */
--	child_req = kmalloc(sizeof(*child_req) + child_reqsize + ctx->key_size,
--			    GFP_KERNEL);
--	if (!child_req)
-+	child_req = kmalloc(sizeof(*child_req) + child_reqsize, GFP_KERNEL);
-+	key_buf = kmalloc(ctx->key_size, GFP_KERNEL);
-+	if (!child_req || !key_buf)
- 		return -ENOMEM;
- 
--	out_buf = (u8 *)(child_req + 1) + child_reqsize;
-+	out_buf = key_buf;
- 	memcpy(out_buf, src, slen);
- 
- 	crypto_init_wait(&cwait);
+> This all sounds like a horrible hack one way or the other.
+
+Ähh, yes... :)
+
 -- 
-2.43.0
+Mit freundlichen Grüßen / Kind regards
+Holger Dengler
 
