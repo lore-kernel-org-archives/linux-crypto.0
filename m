@@ -1,118 +1,94 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F6691A9FA0;
-	Thu, 30 Jul 2026 03:39:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9BDD3BB48;
+	Thu, 30 Jul 2026 05:17:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785382800; cv=none; b=mKowxahRGPfHuF/DG0dz/YLJM3EBkCG+EGxibNkqmvoJBXl4mgYbdJG97e/AqUrdziu3tZF0Z/PUYE9gpPg45fjopVI/sAY67TxY/2Ns614qGbVqKxVsc3nIRXssyvXokM1ugeun8vhJ+J/jDM7iaZ8hXySeZPuCCln9jEAI04E=
+	t=1785388636; cv=none; b=MPvVx5XC/V9L9qDOh5Gi5D6T4BaoctJb/ycjQuQsSUAi4AbhVXJubpMMaJqvw1P8rjRqBV8Kcpx1FWjutvHQffXWDx+OXtFUMuKoZhkQzyuPnjkpFknsNOOGGvq3O8szay6h5tECvElSSlRUnAcX+69UA0hdlpBVgyFlZVREmA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785382800; c=relaxed/simple;
-	bh=pI6dHHb7J0ImYITur1BKCoOjWnnLgWpciKwQLbsDc8c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MvFTelnsejIzjtE8FU56oz5IVLYnsxHBjOVC8Fagejn+GShFFgowgjkqqnLBE2i/D/I5Ax4MI1xi7Py71sIQmZSAWPLmK2XaWYEvbXMwScON73P/+HJpEOBG+SxeRJpo3yDPGRviavmMldjzW95pecz3qkxzGG0Vlq5gWtLnTdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=B+SpsjD9; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	s=arc-20240116; t=1785388636; c=relaxed/simple;
+	bh=xH+lO4m1/jAidVUcSkvROmhYmNilQBtep+tMK9yT2zY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RmyTMfY/hikGQQVFUCibsENzDqA1oD+xzHjH3Og2sPudYoTY4MDLI9CQUZ0sycn/nO8DPwgc1ybv1xRTO5VBYU71/YZ2XV+QECGT5peKn7hlMn1fUXeYwQN0w0k2L0ImAfuiJPZBHEwlSuuHgT1qEIGtbJmVGOp8YDbMntTzhAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=DatcV8eG; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="B+SpsjD9"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 8DC0B40E0140;
-	Thu, 30 Jul 2026 03:39:55 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id 4CaphDkmoge7; Thu, 30 Jul 2026 03:39:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1785382785; bh=HCL/bk3E2UobBUGwlMQYN8koub9izSikmLau/bwU66s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=B+SpsjD9zg8A1QmEKGj3YjxpVKGcVM9I7dPXK9uoC90pmuAoPQbIRSdmcdO/popt5
-	 9uNeDo2e1gnf60GQI/WqCpi6BNTPzLd4I281tPN1HYUxAoWhOMH0IV+8MdKdQoycwf
-	 OZEdDwYqoNWR4DHPz7ULISnSAZ+XjMR0XgwXT4+IS8vXWuJEnE9qpxn7rBaDGl4WAO
-	 xgzpeudfe5zsyv8z9dLr7pA07/BNRhvVwdCV2jVy+YqBoGCGmP/kj0beKrcCl6gr1c
-	 4xx5Ho82QLHDp9BqE+zuBy8x9sOwODb3dQg6CLwrpJcCfahn3FFFWKS8fuB5zJGPQI
-	 zBTR0UtSX56sUDqS1ovYRV4RN5ub+n3ONNeU1DA+YVrnO5go8moqy327w97pJxB4ba
-	 ATCuKI45GRJA2FhQ5f47TzSNJD99nUvgZKvWKw6ydYzNtJoA2MCNlxJvxfP/lMTChX
-	 nDKRTkdRLnEJAYGuPuPDwoyOQ1uP2H+Tv06SYwo4oA/N2QjB/sVet5/ZFe9ED7e5wY
-	 EpqFMEZueVenV/0KPyaVRqmwjGv6k/ew5q+5Zr8Ozq3vgyTDDuLpRIAqGjcExTQQzL
-	 AG5Eah1uEAmmfbE1rNAhW21O0Hzq6WPYs6oi2/PlpZdhET2JB8DwpVd1jJna6C7RWo
-	 Zm0FsjyizfQ3oMn4GtGav7v8=
-Received: from stx.tnic (unknown [IPv6:2600:1700:38ca:c00::1b])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 9A7D640E014C;
-	Thu, 30 Jul 2026 03:39:10 +0000 (UTC)
-Date: Wed, 29 Jul 2026 20:39:07 -0700
-From: Borislav Petkov <bp@alien8.de>
-To: K Prateek Nayak <kprateek.nayak@amd.com>
-Cc: Ashish Kalra <Ashish.Kalra@amd.com>, tglx@kernel.org, mingo@redhat.com,
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-	seanjc@google.com, peterz@infradead.org, thomas.lendacky@amd.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org,
-	pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
-	Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com,
-	ackerleytng@google.com, jackyli@google.com, pgonda@google.com,
-	rientjes@google.com, jacobhxu@google.com, xin@zytor.com,
-	pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com,
-	dyoung@redhat.com, nikunj@amd.com, john.allen@amd.com,
-	darwi@linutronix.de, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
-	linux-coco@lists.linux.dev
-Subject: Re: [PATCH v11 3/6] x86/sev: Initialize RMPOPT configuration MSRs
-Message-ID: <20260730033907.GFamrHW3v3dbb0UmFL@fat_crate.local>
-References: <cover.1784844080.git.ashish.kalra@amd.com>
- <ff346ea1770cf996e1623270a085ac08d21888c6.1784844080.git.ashish.kalra@amd.com>
- <20260730020704.GGamqxyPy5oJAmC5Oy@fat_crate.local>
- <7f837674-786a-42b7-a289-4c048fbec6b8@amd.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="DatcV8eG"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=2nU1fayUxpKBpDAhWHLkwXY4o3NewCz9mcbe6PgX0J0=; b=DatcV8eGpZvtp+Z9pYt/mOpmof
+	H77Ugbfh4Pb4mqdl0vyB8ItR+26IWauXAYFPre3zr/DiPSAEIO9o86MsUSiJFxSn41TgeDvrZBoW3
+	jhmDqfPBPgOE8YDeAPiYv0kT+mD4CVVo4nU9kD2mO4e9A6Qj3iajo93sKn6tIcXwiHGqI9SjPfcAl
+	INcioqIPSlYabCnSo7+c/97vH2B4XUOJeXT/pcqlLMjH1vF2+o4LfOER6AiWyqnBoijL2p+ZvV1sR
+	0dWPCLUJy/7GuoknbRI5hbY4L6q5DXvNw1ubex0VyjBDZZcy3PCDT3LtUSyuoFh0NDXxI+Lv6Ef7b
+	CqZG5Vuw==;
+Received: from [50.53.43.113] (helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wpJ8p-00000009XNt-2NnC;
+	Thu, 30 Jul 2026 05:17:11 +0000
+From: Randy Dunlap <rdunlap@infradead.org>
+To: linux-kernel@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>,
+	Ashish Kalra <ashish.kalra@amd.com>,
+	"Borislav Petkov (AMD)" <bp@alien8.de>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+Subject: [PATCH] crypto: ccp - don't abuse kernel-doc comment format
+Date: Wed, 29 Jul 2026 22:17:10 -0700
+Message-ID: <20260730051710.1412969-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <7f837674-786a-42b7-a289-4c048fbec6b8@amd.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jul 30, 2026 at 08:25:37AM +0530, K Prateek Nayak wrote:
-> I believe there can be cases where CPUID advertises
-> X86_FEATURE_SEGMENTED_RMP but rmf_cfg doesn't set
-> MSR_AMD64_SEG_RMP_ENABLED because otherwise checking rmp_cfg in
-> addition to the feature bit makes no sense.
-> 
-> In that case we should attempt a probe_contiguous_rmptable_info() even
-> for X86_FEATURE_SEGMENTED_RMP.
-> 
-> Essentially drop that "else" and do something like:
-> 
-> bool snp_probe_rmptable_info(void)
-> {
-> 	if (cpu_feature_enabled(X86_FEATURE_SEGMENTED_RMP)) {
-> 		rdmsrq(MSR_AMD64_RMP_CFG, rmp_cfg);
-> 
-> 		if (rmp_cfg & MSR_AMD64_SEG_RMP_ENABLED)
-> 			return probe_segmented_rmptable_info();
-> 	}
-> 
-> 	/*
-> 	 * Segmented RMP is either not supported on the platform or
-> 	 * is disabled by the firmware. RMPOPT is not not supported
-> 	 * without segmented RMP.
-> 	 */
-> 	setup_clear_cpu_cap(X86_FEATURE_RMPOPT);
-> 
-> 	return probe_contiguous_rmptable_info();
-> }
+Use plain C "/*" notation for comments that are not in kernel-doc format
+to avoid kernel-doc warnings:
 
-That makes sense.
+Warning: include/uapi/linux/psp-sfs.h:18 expecting prototype for SFS().
+ Prototype was for PAYLOAD_NAME_SIZE() instead
+Warning: include/uapi/linux/psp-sfs.h:46 This comment starts with '/**',
+ but isn't a kernel-doc comment.
+ * Seamless Firmware Support (SFS) IOC
 
-Thx.
+Fixes: 648dbccc03a0 ("crypto: ccp - Add AMD Seamless Firmware Servicing (SFS) driver")
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+---
+Cc: Ashish Kalra <ashish.kalra@amd.com>
+Cc: Borislav Petkov (AMD) <bp@alien8.de>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
 
--- 
-Regards/Gruss,
-    Boris.
+ include/uapi/linux/psp-sfs.h |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-https://people.kernel.org/tglx/notes-about-netiquette
+--- linux-next-20260729.orig/include/uapi/linux/psp-sfs.h
++++ linux-next-20260729/include/uapi/linux/psp-sfs.h
+@@ -12,7 +12,7 @@
+ 
+ #include <linux/types.h>
+ 
+-/**
++/*
+  * SFS: AMD Seamless Firmware Support (SFS) interface
+  */
+ 
+@@ -43,7 +43,7 @@ struct sfs_user_update_package {
+ 	__u32	sfs_extended_status;
+ } __packed;
+ 
+-/**
++/*
+  * Seamless Firmware Support (SFS) IOC
+  *
+  * possible return codes for all SFS IOCTLs:
