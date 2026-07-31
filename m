@@ -1,56 +1,57 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4877C2DC76A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B314630C371;
 	Fri, 31 Jul 2026 16:50:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785516621; cv=none; b=LIMzNYLY2t1Vs6pzXVML57ns2Ib4S6o+arI1ksQZKYeu7/wH6ZIiwO9buOnVJKNRSkCnoGGAy+m3QQPu5c/I6CIF5WYr8floKavUjD5VkW//4MklxDX/co8lXv7xhH3HVkvBG1kKjc30pYcl3S01rYiaxgTNxyI8b8m9ksyojgE=
+	t=1785516622; cv=none; b=UxHs9Jrw6E913z5SIU6giTCNcX8W27dUH4fAew1bRpKIch95HtaPR4M2SKJzYi9KUCxUIW0t2B3nU1qQXF0wu2DWJ+vnwvkLChkZx+Zj0+OCtjP5axk+S7Zx4z6EXsuwfwns4Hj9nQTENrKDyfitlSBEBMjwsIBP7AZ064slOiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785516621; c=relaxed/simple;
-	bh=Z97yF8Q1u1qO0m1GpK36D4aBK0XPxOUrAVghs980lbg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GYCi0Tkerbl7BhPLDgVsbMDnMzMyCR3plPWi9XoCGcYDcUuJ5sykCMQDWfjEISZlKgr1yfLUdDPI+38f/2Fr8ocOR50lgn2HfWYiiTKuhMmO8PQD/+hPxL6gbRcUxpzIE5PQqV2J+kc6mFT1yaAwgufaxrbXUgf2wzmt4gziCdo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=kA2OOXZq; arc=none smtp.client-ip=148.163.158.5
+	s=arc-20240116; t=1785516622; c=relaxed/simple;
+	bh=pQrbf13ZZw6TEaBMQCVXPSLhWi2PYKh0c4e2CT2olnA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=KlGBbSBPaTlSeHkrYW6d4e3PoIFb9q9M0FK+umoSex4/hwPZ/JZLZPFw8AugjxdIQSOc7+IAcEC/sSy8HU/xZlVdnSbxsmjpwlO8NsWqZV8CYaNtkBwF+jk13S2NPbJE3gT8n3dnc2fFFn12a6xwaNSPOZ1na5pQE78OQmc8g9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=kAv/rndi; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="kA2OOXZq"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66VFlrTs2192683;
-	Fri, 31 Jul 2026 16:50:10 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="kAv/rndi"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66VFlY51402318;
+	Fri, 31 Jul 2026 16:50:11 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=TkQuuD9IGExAR+KBkwqv143fCtYGlXzTpxflQFPrO
-	Qo=; b=kA2OOXZq/3kzTrJJcewMK2Ry+JKX5ubJ1II7Rgr4Ioi3GA5VPCVq1ImOu
-	YHS8FpbqL8GUdYa+25Q/ztQIeZp7mxy2DK0aBwsQrVSPK1n2D42pdcMLYUDGKJNj
-	ipiMi+jJuZExU1zJgv84XLjoG3VETrJLByKP8CvLdH+UFoffvzZ/JUVkhjyDXncU
-	WqWkp7oQjSTz6zHxt40JFpB484bQAz6N4lWzqvN+LZTx26NJ/9oEu+6TCTHmVnw9
-	5myZcq96UjLTJC6i0wnBCAuNweeAZhvHbUSl0QMb79FZ1qzlQrrDiwVsTQABSQNN
-	ONqU34g/FphKiSYEnPJIbs1R050Qw==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fmuyjn1y7-1
+	:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=pp1; bh=+2RVMc2ni8gyNc+aC
+	VLiIlr1CE9R4CzWE12uCn+7OLE=; b=kAv/rndi2+e2waUIiwtcxKEp5s/YdTJ51
+	2UtXqFtdWPnFnE0lp9SKNcPfSCDcQC0Z3mZH9Y9rfqx+FTuseXg5a89phoeQa5EX
+	C6hsHBUGrks2t04MThseKPaRDEAPE++4ng4Ps79/GnuRS0oo00SznCUGfAvEHB57
+	ex0WC816CSziGKh7Y5EuoIv7L1WfZIvnlMSq2SJbl59023Ht/4b6PMOt1DD1HHGj
+	pCKSyNvTcyeGf100nStSX7r4fQCovL3En3vTMu/ALSofPcvV5xUDOWiPRcFs9z8Y
+	chZXHjWT+wF/ySE4QlJaehoNrtg0BodnvmjMHNDATB7DhCkFygeGA==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fmuycx1bu-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Fri, 31 Jul 2026 16:50:10 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 66VGfKun002896;
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 66VGfKLY029047;
 	Fri, 31 Jul 2026 16:50:09 GMT
 Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4fn8yhrnbt-1
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fn7fqrw5w-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Fri, 31 Jul 2026 16:50:09 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 66VGo5cw41419234
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 66VGo5TB41419242
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
 	Fri, 31 Jul 2026 16:50:05 GMT
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0A9F320040;
+	by IMSVA (Postfix) with ESMTP id 47CE020040;
 	Fri, 31 Jul 2026 16:50:05 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CB4F02004B;
-	Fri, 31 Jul 2026 16:50:04 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 0EEAC20043;
+	Fri, 31 Jul 2026 16:50:05 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
 	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 31 Jul 2026 16:50:04 +0000 (GMT)
+	Fri, 31 Jul 2026 16:50:05 +0000 (GMT)
 From: Heiko Carstens <hca@linux.ibm.com>
 To: Alexander Gordeev <agordeev@linux.ibm.com>,
         Sven Schnelle <svens@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
@@ -66,10 +67,12 @@ To: Alexander Gordeev <agordeev@linux.ibm.com>,
         Herbert Xu <herbert@gondor.apana.org.au>
 Cc: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-crypto@vger.kernel.org
-Subject: [PATCH v4 0/4] s390: Remove or replace cond_resched() calls
-Date: Fri, 31 Jul 2026 18:50:00 +0200
-Message-ID: <20260731165004.2758105-1-hca@linux.ibm.com>
+Subject: [PATCH v4 1/4] s390/crypto: Replace cond_resched() with msleep(1)
+Date: Fri, 31 Jul 2026 18:50:01 +0200
+Message-ID: <20260731165004.2758105-2-hca@linux.ibm.com>
 X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260731165004.2758105-1-hca@linux.ibm.com>
+References: <20260731165004.2758105-1-hca@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -78,81 +81,228 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzMxMDEyOCBTYWx0ZWRfX9AT27oST34ca
- oifnWOlzBXVcELBB4ClGvxlDR/nM2Y46//Maqp8e9a2SY8uNRqA7v4c1UPs4vhjRvDmHsf2VSjX
- s5WD/D+fBqEcG97F0C0Sh6wrSDRhgI8=
-X-Proofpoint-GUID: p7y0sIaGKDtF8SoCUC21G9VmDrvNYYV-
-X-Proofpoint-ORIG-GUID: p7y0sIaGKDtF8SoCUC21G9VmDrvNYYV-
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzMxMDEyOCBTYWx0ZWRfX1YMx7NPxOecg
- REqjq9dR6G8b03Egf5KqMt4Ujr9umEtvXkQ33+BlAUxVRs6in7cdePLVrXT9i2mLc7AV3XMeBLj
- vq+RNvXHkxw9se2XH/ygTfbZ0Qycvahm+eH7/vLStPQNc8P/Vw6porVo3E/EokjvlycdUMeDuI6
- TlzOfT+GJOok0dMDS0hWe/5RRqRFXWsFwfPCnF83jdL+ZBPGtHekdQrFroJ4qOE3yX9gkXsXwb9
- BIwiV7WFKBqhF333r6tbwij5MQGI5sQUANh7RDp0O9JPz9RnYmQFCNmqj0v+diRcGg5xDGXt+sk
- PrNhGCSSPC5w+itR5l7GCdqwZzA0aQ2J8D8/rdB6ghQ0hJTb3orhhzDXHwSn6tK2qse5eDhTd5m
- hmmSmxNHFj2z0f7qfvzJsJbxgrN/cPnj/U5cG17hEkX7vaqS+8PZbqpaXz1kO1snwVZ9U17ZhPW
- 7SX1onVorkW/Qeq5hBA==
-X-Authority-Analysis: v=2.4 cv=X5Vi7mTe c=1 sm=1 tr=0 ts=6a6cd242 cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+X-Proofpoint-ORIG-GUID: jJSHv5Om7-RWBjcc_jjkUv5Boksr6wBT
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzMxMDEyOCBTYWx0ZWRfX7HPxPsnHjbKv
+ GC5dje0NPg+iC2FzkJQm2GkUwntPgsf1NYSQRrrpmn0550YqSfNVYXSF+yr3PREk5TcJf+QBftq
+ vnSNSYYI9QNx560ePKIFHv44B1Qk/ZvdFvfJKdcY7X/s3J0Dta2vtROs59VnZZ7sJ7vf9/KHGeU
+ 57eRFFNh+zNHc+3PbEywStWtKJ7sMlFE/ALIv1sTvweVg6sQgHEah4FOmENzt6B4lWHLTdwHvPs
+ PYUcipnL8BKqdZbiZ8yARSqAh+bbT0fcJeQRdOLaRvanY5L2ziAO59yDwLvSOS2eDCVkIWpcuJO
+ AYLPzATCRK3CrPWhvUdfowv/fIYH7vn0fGQIXtSPJRW1k7Fbt2FJnabkgsWV9llhczWDLqFhSx/
+ mhBz2Ds2pkDnX3/6o35razWB1JyAD8s4iMEEx7vy6OtxDhMSuMcOZYL7vFXgJ57E+3ojYiZboIL
+ 47DbDjkMaAftxmN0xxg==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzMxMDEyOCBTYWx0ZWRfX9K8oadAix1J+
+ 4RSfMttErCK7nWL9nNBxzVSuto3cBM2hyGudwiSTw/Uqw9sa9I1ne1kdS+CwJ8RpN7KcGtqV/QV
+ G+z2hChgPU49FGTlBXETwHSB15LRX2M=
+X-Authority-Analysis: v=2.4 cv=AZeB2XXG c=1 sm=1 tr=0 ts=6a6cd242 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
  a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=Y2IxJ9c9Rs8Kov3niI8_:22 a=Fs_qYlmMC0Zql47DM_AA:9
+ a=uAbxVGIbfxUO_5tXvNgY:22 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=WsHKUha7AAAA:8
+ a=JfrnYn6hAAAA:8 a=DKx5s9VkpjxxvdiG65UA:9 a=H4LAKuo8djmI0KOkngUh:22
+ a=1CNFftbPRP8L7MoqJWF3:22
+X-Proofpoint-GUID: jJSHv5Om7-RWBjcc_jjkUv5Boksr6wBT
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-07-31_05,2026-07-30_01,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1015 impostorscore=0 lowpriorityscore=0 phishscore=0
- priorityscore=1501 malwarescore=0 spamscore=0 suspectscore=0 bulkscore=0
- adultscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2607310128
+ spamscore=0 priorityscore=1501 phishscore=0 adultscore=0 impostorscore=0
+ clxscore=1015 malwarescore=0 suspectscore=0 lowpriorityscore=0 bulkscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607310128
 
-v4:
-- Replaced first patch with version from Peter Zijlstra
+From: Peter Zijlstra <peterz@infradead.org>
 
-v3:
-- Drop uv_call_sched() [Claudio Imbrenda]
+With [1] cond_resched() is always compiled away and becomes a no-op.
 
-v2:
-- Use msleep() in crypto code (Holger Dengler)
-- Add Reviewed-by tag from Peter Oberparleiter
+The comments for all cond_resched() calls in crypto code however indicate
+that the current process should be scheduled away to avoid instant
+re-invocation of a callback. This is not what cond_resched() would do or
+did.
 
-v1:
-Since [1] it is only possible to select the PREEMPT or PREEMPT_LAZY
-preemption models for s390. This has caused some minor problems, but
-everything has been addressed.
+Instead of just removing the cond_resched() calls, replace them with
+msleep() calls, as suggested by Holger Dengler. This forces the current
+task to be scheduled away (sleeps) like originally intended.
 
-Given that for both preemption models cond_resched() is a no-op remove
-or replace it everywhere.
+Holger provided information why this intended [2]:
+"
+Let me give a bit of background here: The protected key can only get
+invalid, if the Linux instance (z/VM or KVM guest) is moved to another
+hypervisor on a different machine (aka life guest relocation). In such a
+case, the crypto accelerator card and the host has to exchange the "real
+key", which is wrapped by the host and handed back to the guest as the
+re-newed protected key. Unfortunately there is no asynchronous trigger
+on completion, you have to re-try (and maybe get another "in progress"
+return).
+
+And as if that weren't bad enough, if this key exchange between card and
+host is the first one, card and host has to instantiate a secure
+communication channel (including a key exchange for the transport layer).
+"
 
 [1] commit 7dadeaa6e851 ("sched: Further restrict the preemption modes")
+[2] https://lore.kernel.org/all/39570813-27b0-40f9-89c5-8e2dce05e2f0@linux.ibm.com/
+[3] https://lore.kernel.org/all/20260731084027.GE776954@noisy.programming.kicks-ass.net/
 
-Heiko Carstens (3):
-  KVM: s390: Remove cond_resched() calls
-  s390: Remove cond_resched() calls
-  s390/cio: Remove cond_resched() calls
+[hca@linux.ibm.com: took Peter's patch [3] and provided commit message]
 
-Peter Zijlstra (1):
-  s390/crypto: Replace cond_resched() with msleep(1)
+Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
+---
+ arch/s390/crypto/paes_s390.c  | 44 ++++-------------------------------
+ arch/s390/crypto/phmac_s390.c | 25 +++-----------------
+ arch/s390/include/asm/pkey.h  | 16 +++++++++++++
+ 3 files changed, 23 insertions(+), 62 deletions(-)
 
- arch/s390/crypto/paes_s390.c    | 44 +++------------------------------
- arch/s390/crypto/phmac_s390.c   | 25 +++----------------
- arch/s390/include/asm/pkey.h    | 16 ++++++++++++
- arch/s390/include/asm/uv.h      | 16 ++----------
- arch/s390/kernel/perf_cpum_cf.c |  1 -
- arch/s390/kernel/uv.c           |  2 +-
- arch/s390/kvm/gaccess.c         |  8 ++----
- arch/s390/kvm/gmap.c            |  4 ---
- arch/s390/kvm/kvm-s390.c        |  1 -
- arch/s390/kvm/pv.c              | 11 ++++-----
- arch/s390/kvm/vsie.c            |  1 -
- arch/s390/mm/cmm.c              |  2 --
- arch/s390/mm/gmap_helpers.c     |  1 -
- arch/s390/mm/pageattr.c         |  5 ----
- arch/s390/mm/pgalloc.c          |  1 -
- arch/s390/pci/pci.c             |  4 +--
- drivers/s390/char/uvdevice.c    |  6 ++---
- drivers/s390/cio/css.c          |  8 ------
- 18 files changed, 37 insertions(+), 119 deletions(-)
-
+diff --git a/arch/s390/crypto/paes_s390.c b/arch/s390/crypto/paes_s390.c
+index 8cfe6166c193..973436592318 100644
+--- a/arch/s390/crypto/paes_s390.c
++++ b/arch/s390/crypto/paes_s390.c
+@@ -548,16 +548,7 @@ static int ecb_paes_do_one_request(struct crypto_engine *engine, void *areq)
+ 
+ 	rc = ecb_paes_do_crypt(ctx, req_ctx, tested, true);
+ 	if (rc == -EKEYEXPIRED) {
+-		/*
+-		 * Protected key expired, conversion is in process.
+-		 * Trigger a re-schedule of this request by returning
+-		 * -ENOSPC ("hardware queue is full") to the crypto engine.
+-		 * To avoid immediately re-invocation of this callback,
+-		 * tell the scheduler to voluntarily give up the CPU here.
+-		 */
+-		cond_resched();
+-		pr_debug("rescheduling request\n");
+-		return -ENOSPC;
++		return pkey_handle_expired();
+ 	} else if (rc) {
+ 		skcipher_walk_done(walk, rc);
+ 	}
+@@ -814,16 +805,7 @@ static int cbc_paes_do_one_request(struct crypto_engine *engine, void *areq)
+ 
+ 	rc = cbc_paes_do_crypt(ctx, req_ctx, tested, true);
+ 	if (rc == -EKEYEXPIRED) {
+-		/*
+-		 * Protected key expired, conversion is in process.
+-		 * Trigger a re-schedule of this request by returning
+-		 * -ENOSPC ("hardware queue is full") to the crypto engine.
+-		 * To avoid immediately re-invocation of this callback,
+-		 * tell the scheduler to voluntarily give up the CPU here.
+-		 */
+-		cond_resched();
+-		pr_debug("rescheduling request\n");
+-		return -ENOSPC;
++		return pkey_handle_expired();
+ 	} else if (rc) {
+ 		skcipher_walk_done(walk, rc);
+ 	}
+@@ -1122,16 +1104,7 @@ static int ctr_paes_do_one_request(struct crypto_engine *engine, void *areq)
+ 
+ 	rc = ctr_paes_do_crypt(ctx, req_ctx, tested, true);
+ 	if (rc == -EKEYEXPIRED) {
+-		/*
+-		 * Protected key expired, conversion is in process.
+-		 * Trigger a re-schedule of this request by returning
+-		 * -ENOSPC ("hardware queue is full") to the crypto engine.
+-		 * To avoid immediately re-invocation of this callback,
+-		 * tell the scheduler to voluntarily give up the CPU here.
+-		 */
+-		cond_resched();
+-		pr_debug("rescheduling request\n");
+-		return -ENOSPC;
++		return pkey_handle_expired();
+ 	} else if (rc) {
+ 		skcipher_walk_done(walk, rc);
+ 	}
+@@ -1565,16 +1538,7 @@ static int xts_paes_do_one_request(struct crypto_engine *engine, void *areq)
+ 
+ 	rc = xts_paes_do_crypt(ctx, req_ctx, tested, true);
+ 	if (rc == -EKEYEXPIRED) {
+-		/*
+-		 * Protected key expired, conversion is in process.
+-		 * Trigger a re-schedule of this request by returning
+-		 * -ENOSPC ("hardware queue is full") to the crypto engine.
+-		 * To avoid immediately re-invocation of this callback,
+-		 * tell the scheduler to voluntarily give up the CPU here.
+-		 */
+-		cond_resched();
+-		pr_debug("rescheduling request\n");
+-		return -ENOSPC;
++		return pkey_handle_expired();
+ 	} else if (rc) {
+ 		skcipher_walk_done(walk, rc);
+ 	}
+diff --git a/arch/s390/crypto/phmac_s390.c b/arch/s390/crypto/phmac_s390.c
+index 03ca33ffe6cc..020a1beb2e22 100644
+--- a/arch/s390/crypto/phmac_s390.c
++++ b/arch/s390/crypto/phmac_s390.c
+@@ -887,16 +887,7 @@ static int phmac_do_one_request(struct crypto_engine *engine, void *areq)
+ 	case OP_FINUP:
+ 		rc = phmac_kmac_update(req, true);
+ 		if (rc == -EKEYEXPIRED) {
+-			/*
+-			 * Protected key expired, conversion is in process.
+-			 * Trigger a re-schedule of this request by returning
+-			 * -ENOSPC ("hardware queue full") to the crypto engine.
+-			 * To avoid immediately re-invocation of this callback,
+-			 * tell scheduler to voluntarily give up the CPU here.
+-			 */
+-			pr_debug("rescheduling request\n");
+-			cond_resched();
+-			return -ENOSPC;
++			return pkey_handle_expired();
+ 		} else if (rc) {
+ 			hwh_advance(hwh, rc);
+ 			goto out;
+@@ -907,18 +898,8 @@ static int phmac_do_one_request(struct crypto_engine *engine, void *areq)
+ 		fallthrough;
+ 	case OP_FINAL:
+ 		rc = phmac_kmac_final(req, true);
+-		if (rc == -EKEYEXPIRED) {
+-			/*
+-			 * Protected key expired, conversion is in process.
+-			 * Trigger a re-schedule of this request by returning
+-			 * -ENOSPC ("hardware queue full") to the crypto engine.
+-			 * To avoid immediately re-invocation of this callback,
+-			 * tell scheduler to voluntarily give up the CPU here.
+-			 */
+-			pr_debug("rescheduling request\n");
+-			cond_resched();
+-			return -ENOSPC;
+-		}
++		if (rc == -EKEYEXPIRED)
++			return pkey_handle_expired();
+ 		break;
+ 	default:
+ 		/* unknown/unsupported/unimplemented asynch op */
+diff --git a/arch/s390/include/asm/pkey.h b/arch/s390/include/asm/pkey.h
+index 0af5ac4f646b..82e403322e89 100644
+--- a/arch/s390/include/asm/pkey.h
++++ b/arch/s390/include/asm/pkey.h
+@@ -13,6 +13,7 @@
+ 
+ #include <linux/ioctl.h>
+ #include <linux/types.h>
++#include <linux/delay.h>
+ #include <uapi/asm/pkey.h>
+ 
+ /*
+@@ -44,4 +45,19 @@ int pkey_key2protkey(const u8 *key, u32 keylen,
+  */
+ #define PKEY_XFLAG_NOCLEARKEY 0x0002
+ 
++static inline int pkey_handle_expired(void)
++{
++	/*
++	 * Protected key expired due to relocation to another host. The long
++	 * running re-wrap has no asynchronous completion notification, so
++	 * polling is required. Trigger a re-schedule of this request by
++	 * returning -ENOSPC ("hardware queue full") to the crypto engine.
++	 * To avoid immediately re-invocation of this callback,
++	 * tell the scheduler to voluntarily give up the CPU here.
++	 */
++	msleep(1);
++	pr_debug("rescheduling request\n");
++	return -ENOSPC;
++}
++
+ #endif /* _KAPI_PKEY_H */
 -- 
 2.53.0
 
