@@ -1,144 +1,131 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4652E37AA87
-	for <linux-crypto@vger.kernel.org>; Fri, 31 Jul 2026 20:40:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DD5625A645
+	for <linux-crypto@vger.kernel.org>; Fri, 31 Jul 2026 21:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785530410; cv=none; b=O4YmPwv1Ejkp3ZBrClZR7a3fA8BisS+5X/mzst0uKSD9qQRBHjb3Yopsvt8R+/Gga0ZYNow/R/J8jSGMpB7Fe1Ruhd2aatBNhsxypjD+TNjm7NSekDa8YustM4QosMUcwrSeyXCoqAMZL3gAuavm3K/pWixfFc5YFkDy/S3YzyI=
+	t=1785532845; cv=none; b=FIhhgMjtfogEf8+HsEbKWPrTZe86YsHu8PHrGNA9WBiYE139sJMYnFRH/Goyg2BSh9ra4C0ULsPCZMa7s2u55Xohw9782pQRkfnM6Xn5QVq6rdobvPOIqYkD76waduGvRwBqpzszvby6Ew+AV4LDdAhnDZBVfclS6GHh6eN/Fuk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785530410; c=relaxed/simple;
-	bh=6mYe3jqOi0M6Xn+VyM0LLp7zc54Z8kTjN1Y1zm6tmqY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UTqPt8+fuGH/FF183mbOj3Hq9ZE8oP4C4rug7hXUNYEVkkI6o+FNgwAgKAHGO1FRgLz0JWlAOJT/52ZG1U51uyLtXD6OE/6tvAfUgjdg/rRM5zYJm/VbCPdkkfF5a/pZMuvu6UkvGxaTHw/OVJB6VzODaDrI/8DluA8lzuaI9/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UQmHsYnn; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1785532845; c=relaxed/simple;
+	bh=9FQDOlU1gledsJqoFg9ZYijhrVegoEUbjHlCF9abtqk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=U0bF6tFgn68YiZ6dfx2cl7N25CKgetia85DENyQCw2eMEYXiAtZ3JAwewE0az5Knos8xbnkWTLzKPBjZZnvrO/d+oyfb8th+T6fTcQwKj4HX11YTApnhcLOEuLOJdlrt4xuyz1TNz+SAwxkPh1P+iGE8PayQ50j+qFDDra5GNdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TvKNUd32; arc=none smtp.client-ip=209.85.210.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UQmHsYnn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1785530409; x=1817066409;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=6mYe3jqOi0M6Xn+VyM0LLp7zc54Z8kTjN1Y1zm6tmqY=;
-  b=UQmHsYnnykz/f9bwbqs+k/DNLKTh1lBKbPHq4K8I8BsKIBPE1VoY4wyU
-   kVH69yfHQjG+1AzGMUjNh03jOwCfymyEh0CGifwC27h1PlnyafdKw1mM7
-   OCGD4CWZ7V5OJqLnsMAFyBAlgRamiQCccA71YTUJVNzuX0qFsyHW+3aA+
-   2q08YPdWH8543LHbJf84wccSmVlEXpe2NOgB/BYULQazBFDFM9bN73Slg
-   imGYnmvqT0stzqSgCZYiH/E0du0w+X6g2pg1JfYinbzvHtvC5BesCVxt1
-   aa+IeNoGjT9Uy7RjM7croE0YdBrBpRy7J8KjrbUJe9yFdOuEpMhAckHMR
-   Q==;
-X-CSE-ConnectionGUID: /qsfK83WSUWyn/yh796wfQ==
-X-CSE-MsgGUID: YiW3pRf8QEWhg3Y7tdNwhA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11861"; a="86021089"
-X-IronPort-AV: E=Sophos;i="6.25,197,1779174000"; 
-   d="scan'208";a="86021089"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jul 2026 13:40:08 -0700
-X-CSE-ConnectionGUID: 3hRSjK/ZRY2zB84NvBbGtQ==
-X-CSE-MsgGUID: 1f9ct3fhRjOVP8SBkynCVg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,197,1779174000"; 
-   d="scan'208";a="264483800"
-Received: from lkp-server01.sh.intel.com (HELO 6eda058d650d) ([10.239.97.150])
-  by orviesa004.jf.intel.com with ESMTP; 31 Jul 2026 13:40:07 -0700
-Received: from kbuild by 6eda058d650d with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wpu1T-000000002Cv-43W5;
-	Fri, 31 Jul 2026 20:40:03 +0000
-Date: Sat, 1 Aug 2026 04:39:54 +0800
-From: kernel test robot <lkp@intel.com>
-To: Arbab Haider <arbabhaider649@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: oe-kbuild-all@lists.linux.dev, Arbab Haider <arbabhaider649@gmail.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	John Garry <john.g.garry@oracle.com>, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] crypto: hisilicon/sec - Fix element drop and UAF in
- sec_send_request()
-Message-ID: <202608010642.kGjbBrg7-lkp@intel.com>
-References: <20260730215449.299311-1-arbabhaider649@gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TvKNUd32"
+Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-7ee125ec926so1009127a34.2
+        for <linux-crypto@vger.kernel.org>; Fri, 31 Jul 2026 14:20:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785532843; x=1786137643; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=n4JOK41iwaTAdDnA7te0VNHLVG0HdhI8vu6z3ZFBIoE=;
+        b=TvKNUd32SD8F/dh5xsvaQ0udJM+1cHSo/qtZnVPywOOtVejbG0jz1chqdQvt8doQua
+         V2+UZTme2ed7L0nLq9PyTMKUZOxvJ1WUsu0CcBcui0rq9UskHgUCVh+uGdycl/QrELhC
+         6tZIDkIxXxt3KVeR9aCdWF54XpIcUjB5mSYIkXG8gqQ4uczYUsc0uj3wuhVN/fJ0fV2u
+         X1nJ+5uI0VFN0xCKs0gGImwb2htbUXMEXB5XzLwb8GUsiKUbEgMM6kVlaUa2mjcCy9u/
+         mjwU+nksyWEmZWScGvVo0lMuf/FRutP0/QILGacth0T4fTk10nTW0gcc+GWAI4RQARNL
+         luhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785532843; x=1786137643;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=n4JOK41iwaTAdDnA7te0VNHLVG0HdhI8vu6z3ZFBIoE=;
+        b=BaaeOeTSDy+F45Wbp/RA18K539/pqZT8lnaD8sKFL9m+054+pIhCABSNjE6NDXa42v
+         USIIlSttEclMBuegywU88uIohkyWdD72SOQ9Bnoxwfho17dpLOqhO5IIVuK5qaK08lRQ
+         MOuoc25EjAQ/zyGuheGLYBSxrMuXQPXzaZqheggDAo8C+t5XXudhURxM8N/UIM1VBrYX
+         Nhj+eWfOJ2VX9hfeXuICHJ84d/xV06Er1YNCxcgTLLmoXdj1L1CUOvUiWNMto6bvWMIm
+         ZmLu0YScvv5RIf8z+9OkfgREvMPYdalva8pi7NTLwAa5np6uSC9DcAejkm5e2uo8UFZp
+         oGpw==
+X-Gm-Message-State: AOJu0YzxNMbNMpXfVYJgj0nj3BNgrlkGU+rxJgti4dQ15zSyAU4tOXu0
+	e6pkjsIhqqDMBHkxSR15ieCR76xc0lq1yKFk5rMJZTiLRP7X6P1SB7GJHdosOA==
+X-Gm-Gg: AR+sD12qknr7o8QjUMEIAfBhWTPbfD2lCyLMj2cyGQfMOPe7R/p0ofzr4fzzr1LyETB
+	3hfQtf5vmC+jCCdS+5qLTdkAVwehj4/hQugMIyd28f/kADFYHTeFLFzdL6BYdqq40H2vVDE3uqy
+	S0R6ZyiySg7dmhyooDm4b3eUMzfhF0xYx73MM36WuiXibkTpmvdH8yqf9XEbbEHKp+y3g7z02Fk
+	UCD3Ie4zBxn9tnOTRT39EvElnC1P0RMs84mrmeheoMMhzYqdRmGnh3qiyMVxLZJxT5goqcrjWfU
+	b80B8ZK/d1pCSwPRwP5TURT8/+OJRU3pZ6JhlzfMroQPKKj8WiX4kW3NJSimkmFGZh820pR4HzJ
+	BbUheo62JH9y8RhrJAyq/jjnIhNWMZVqrn6LH4AqwwBmk1H+jo1/AFsYKq+J3Oyl0+oXM5BXGHO
+	tsiT3lK8KHDvWS9LM5riJofDkACcto8vV1przAA1GKgvRzC0zEI9mmRVLQWgi0KyPN6EGdlicbU
+	jcwVk/442f+lxtki04vvvjxx6IkfA3S4iPfsonKXLg7smbomvOO4ZbO97qIn/5WikwpOzBevUww
+	om5oxkjYPThpaWZ07fw0wRsYIusU8niq2h+EwFcYcpjm2r1S
+X-Received: by 2002:a05:6820:5047:b0:6a1:8125:ffd with SMTP id 006d021491bc7-6ae43372e90mr2647420eaf.30.1785532842916;
+        Fri, 31 Jul 2026 14:20:42 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8000:7a86::e34])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-458f66c1d89sm2055758fac.13.2026.07.31.14.20.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 31 Jul 2026 14:20:42 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: linux-crypto@vger.kernel.org
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH] crypto: amcc - fix missing DMA memory barriers in descriptor handling
+Date: Fri, 31 Jul 2026 14:20:40 -0700
+Message-ID: <20260731212040.22764-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260730215449.299311-1-arbabhaider649@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Arbab,
+Fix two memory ordering bugs in the AMCC crypto driver:
 
-kernel test robot noticed the following build warnings:
+1. In crypto4xx_bh_tasklet_cb(), add a dma_rmb() between reading the
+   PD_CTL_PE_DONE bit (with READ_ONCE) and reading the descriptor and DMA
+   buffer data in crypto4xx_pd_done().  Without it, the CPU on a
+   weakly-ordered architecture could read stale descriptor data before the
+   hardware's writes are globally visible.
 
-[auto build test WARNING on herbert-cryptodev-2.6/master]
-[also build test WARNING on herbert-crypto-2.6/master linus/master v7.2-rc5 next-20260731]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+2. In crypto4xx_build_pd(), add a dma_wmb() before writing
+   PD_CTL_HOST_READY to ensure all descriptor and SA data is visible to
+   the device before the ownership handover bit.  Also fix the descriptor
+   field ordering: pd_ctl_len.w must be written before pd_ctl.w (which
+   contains HOST_READY), not after, to prevent the hardware from fetching
+   uninitialized length data.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Arbab-Haider/crypto-hisilicon-sec-Fix-element-drop-and-UAF-in-sec_send_request/20260731-234619
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/20260730215449.299311-1-arbabhaider649%40gmail.com
-patch subject: [PATCH] crypto: hisilicon/sec - Fix element drop and UAF in sec_send_request()
-config: alpha-allmodconfig (https://download.01.org/0day-ci/archive/20260801/202608010642.kGjbBrg7-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 16.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260801/202608010642.kGjbBrg7-lkp@intel.com/reproduce)
+Fixes: f6c48b76daa6 (crypto: amcc - Add crypto4xx-aead cryptographic
+  AEAD accelerator driver)
+Cc: stable@vger.kernel.org
+Assisted-by: opencode:big-pickle
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ drivers/crypto/amcc/crypto4xx_core.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202608010642.kGjbBrg7-lkp@intel.com/
+diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
+index 0271b5e4d923..851bf075d769 100644
+--- a/drivers/crypto/amcc/crypto4xx_core.c
++++ b/drivers/crypto/amcc/crypto4xx_core.c
+@@ -876,11 +876,13 @@ int crypto4xx_build_pd(struct crypto_async_request *req,
+ 		}
+ 	}
+ 
++	pd->pd_ctl_len.w = 0x00400000 | (assoclen + datalen);
++	pd_uinfo->state = PD_ENTRY_INUSE | (is_busy ? PD_ENTRY_BUSY : 0);
++
++	dma_wmb();
+ 	pd->pd_ctl.w = PD_CTL_HOST_READY |
+ 		((crypto_tfm_alg_type(req->tfm) == CRYPTO_ALG_TYPE_AEAD) ?
+ 			PD_CTL_HASH_FINAL : 0);
+-	pd->pd_ctl_len.w = 0x00400000 | (assoclen + datalen);
+-	pd_uinfo->state = PD_ENTRY_INUSE | (is_busy ? PD_ENTRY_BUSY : 0);
+ 
+ 	wmb();
+ 	/* write any value to push engine to read a pd */
+@@ -1031,6 +1033,7 @@ static void crypto4xx_bh_tasklet_cb(unsigned long data)
+ 		     ((READ_ONCE(pd->pd_ctl.w) &
+ 		       (PD_CTL_PE_DONE | PD_CTL_HOST_READY)) ==
+ 		       PD_CTL_PE_DONE)) {
++			dma_rmb();
+ 			crypto4xx_pd_done(core_dev->dev, tail);
+ 			tail = crypto4xx_put_pd_to_pdr(core_dev->dev, tail);
+ 		} else {
+-- 
+2.55.0
 
-All warnings (new ones prefixed by >>):
-
-   drivers/crypto/hisilicon/sec/sec_algs.c: In function 'sec_send_request':
->> drivers/crypto/hisilicon/sec/sec_algs.c:406:33: warning: suggest braces around empty body in an 'if' statement [-Wempty-body]
-     406 |                                 ;
-         |                                 ^
-   drivers/crypto/hisilicon/sec/sec_algs.c:410:33: warning: suggest braces around empty body in an 'if' statement [-Wempty-body]
-     410 |                                 ;
-         |                                 ^
-
-
-vim +/if +406 drivers/crypto/hisilicon/sec/sec_algs.c
-
-   382	
-   383	/* queuelock must be held */
-   384	static void sec_send_request(struct sec_request *sec_req, struct sec_queue *queue)
-   385	{
-   386		struct sec_request_el *el, *temp;
-   387	
-   388		mutex_lock(&sec_req->lock);
-   389		list_for_each_entry_safe(el, temp, &sec_req->elements, head) {
-   390			/*
-   391			 * Add to hardware queue only under following circumstances
-   392			 * 1) Software and hardware queue empty so no chain dependencies
-   393			 * 2) No dependencies as new IV - (check software queue empty
-   394			 *    to maintain order)
-   395			 * 3) No dependencies because the mode does no chaining.
-   396			 *
-   397			 * In other cases first insert onto the software queue which
-   398			 * is then emptied as requests complete
-   399			 */
-   400			if (!queue->havesoftqueue ||
-   401			    (kfifo_is_empty(&queue->softqueue) &&
-   402			     sec_queue_empty(queue))) {
-   403				if (WARN_ON_ONCE(sec_queue_send(queue, &el->req,
-   404								sec_req)))
-   405					/* Should not happen with proper capacity check */
- > 406					;
-   407			} else {
-   408				if (WARN_ON_ONCE(!kfifo_put(&queue->softqueue, el)))
-   409					/* Should not happen with proper capacity check */
-   410					;
-   411			}
-   412		}
-   413		mutex_unlock(&sec_req->lock);
-   414	}
-   415	
-
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
