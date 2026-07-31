@@ -1,338 +1,344 @@
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39A7E3563D4
-	for <linux-crypto@vger.kernel.org>; Fri, 31 Jul 2026 05:32:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74D473537C7;
+	Fri, 31 Jul 2026 05:45:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785475953; cv=none; b=SWetkRVrcBTIHoLRV2bkgsdPw7mwGrYadv9vltntd8lehriyKF8meer6j93P+enHtMXi2mYlxfbEIoqNhs6Lw+qmDd+co0haktQL0TQeLs62aBY/ac+qkQMAUPqUOnC7qE752ijsySJnOtIBhZA31fmjDNd298F3AQtenIDwyP0=
+	t=1785476722; cv=none; b=irinYsP3EemQ2ilnXE4jP8S5b6jK8rNy/WZkmfwRSAYMFFl/oFOzJjF3fK6n9hzJ809H7h8MJU+9gGPG5BeI8JQLGblvPYpyQQTMZxHxpEaA13tsWK8M4WcB5WQfRbQZWe4DBsD7Vis3MWAdhFsSooBtRq/a/CnWPDaBY6YlrWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785475953; c=relaxed/simple;
-	bh=iOHzM2M4piEKEYzHGFGLCDrdx0S5Yz+VmEc4oRmDh04=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t0SdWiCfoOx5leKsIciY7OnS1IbCfWVMh7H8g+lmPPW5YaoeCTJO6gzR+UIxyzplkiguT+/PFvAOS6RsWf1vgsLLQC4maBwglnBGQhYcrgcSRXvzr2+q8rrZ10NGBUMav/sRSSZWJBbR7SIBtUqbU1JwZdiaqHPxxjbw6L7+kgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=htYN18bx; arc=none smtp.client-ip=209.85.128.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1785476722; c=relaxed/simple;
+	bh=zOOJ8DeOnYEfhyleSa0bO9fdEyUdlWPrWt3by1HgCV8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QUCgPlvHXCZ6nhu52C948Ovh5+i7eBlCymW18tGq17z/AbsS+JZFSz56/2dO988TpG0Nz4uh+xfFTBRiWAO10l4R5ac65ij0bWLKeYroN8UsuYlT2AFLKk9HoG8gK7qWGc4l1kGWjZ6taDp8foL1ZfCmKW90q8a2xPM/wAONn58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Wu6aBahq; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="htYN18bx"
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-81f3b227a4aso9378457b3.1
-        for <linux-crypto@vger.kernel.org>; Thu, 30 Jul 2026 22:32:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785475951; x=1786080751; darn=vger.kernel.org;
-        h=content-type:in-reply-to:autocrypt:from:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=OeBALyhsov2NLs00r6InPbscizzSCCVjkUFaijF0MxY=;
-        b=htYN18bxFj2WxmLo6gWPeydYc9AwK8Y4z8/goexO0sjHfhRG5W/otfI21f9RLJuJEB
-         2ZWm55bHS2tLxawXjLszxnJ3FY7ThgFHgH/+A2Crio+9taXbU91Y3UOggcs2ycPYZs76
-         4U0pr3Wjt0iyAD//T2kDTwBLOct4Sfvf9X8Cu1g5pdNM68LGMKD1DWgf7kAw8avuYrxJ
-         FHyys6STgQRNdCIcsRx3F+ViwGVH/aMEOtSTV0N3i5e0ukrqhqPQ3d3bGAv83zXLw3EO
-         0e7TYafkrEQ0wBiiXfbSkylizqobC9ZQmBVaqRMDAM995XnOkD8WG4LTymGeEbUT78qj
-         Q6wg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785475951; x=1786080751;
-        h=content-type:in-reply-to:autocrypt:from:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=OeBALyhsov2NLs00r6InPbscizzSCCVjkUFaijF0MxY=;
-        b=lj0QRQ5yhKVW2gNFHlwtj4ddiT90ahYoO6FzR+Ljn7bnxkf0OGCi7VZwRwjzS8cLMw
-         7sDvzu8cYKMLyh7Dfn/VZ/y0RiysiwGNPH+y230s1vrOF8TmYGoP7HIRUUnMXy3UbN81
-         9iLXryql/+mc063uGcFbmIj0GUqkKyh7uAtnpcw4kWb5LACKIWTO07grHGWpTBAD/gQf
-         lvaS9LcbsF6uk6LWopRz1QpkVnbQ9uAU++aOq3jjHGXVkeAU90NThC9dSvv7zcpvexv0
-         1KmnvBfZcxnoQwa6EroAQW1FxcgECGQa5jHM09Jz7Ac/myYCW0ULGdBucuVGnJdjfa3s
-         wUKw==
-X-Forwarded-Encrypted: i=1; AHgh+RqKBWddZZFfbQwF0oWQV3Qpgn/UttiuhWbnmQaWihIg9UNR2gnt6M65aeKZ3Q3wNOc3r+Z1M8pxvx1ZFC4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxo6XCK2euP4gwXioPR4gNEoPAVyIhwxizuOmtAzdWQFtkEKlZK
-	PMvFPZ90UFbg9K+c8YbRT2pJFuJb4qI5v6Yu0iDTcuAj8vXHKn8iclMn
-X-Gm-Gg: AR+sD10zGgkbbwTlk8dxSXe3zitk1/1IW0Dnu6d+ZwTb5iWp9MdxeczyVVji8A5dQvW
-	3TM2Qtptfb23bkEHdfDdO8oN1MvVR2RGow2jWoiGDqIJbFzgrxAGnZfgVQdpr5xbj6OUZx5QdYj
-	R41B3grH8l79L/HgCvKyz/8cRgVIdiaw+aogAUBGWlh8m8nwLWpXtqqWUhGPCem9BMxTJ/KhSwt
-	f09sUZLkuJ2hSl5aY81YzXXKLAf3vEStrNnGZJoo+RZ8CmktfEFJdUT9kgVbrnYB4XISnIw5MlT
-	CSM84YnmD+ppJjckykFn3Kp+IYHddVrRwqGYZ85ktj2mrzhURve9cDmsLCbw7vYx52ty24yjJMb
-	0Q912N/8ll63p1lXkDZofpviLkexX7ySFOY7JSBYIjM5K5K+3QJQ84YfYrCRZxItcL9GGWDqp2b
-	INHbdpnFffSwk4fAsob5BsTrM4h3x45iIf8FsI73lIeyZgA7UuNfiM2LX/GI73Z5o=
-X-Received: by 2002:a05:690c:310:b0:81e:a425:fe88 with SMTP id 00721157ae682-81fcbac3e90mr3433897b3.33.1785475951029;
-        Thu, 30 Jul 2026 22:32:31 -0700 (PDT)
-Received: from [10.138.10.6] ([185.98.168.14])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-81fcd0fd97dsm1266127b3.34.2026.07.30.22.32.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Jul 2026 22:32:30 -0700 (PDT)
-Message-ID: <c1594714-5cc5-4370-bba3-9af886a9c8d7@gmail.com>
-Date: Fri, 31 Jul 2026 01:32:11 -0400
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Wu6aBahq"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id F16C140E01CE;
+	Fri, 31 Jul 2026 05:45:17 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 8_PwlhpFGBNE; Fri, 31 Jul 2026 05:45:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1785476703; bh=G7VWzTnNmnNc6vhXzTYbTJEpS6/d3XUsM+DmxJ+z4VM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Wu6aBahqgkgJsXoi5HEueysdb2eC1wxyelov+kGWWcB5Z7bcUFrE1U9XqUfNkUz6q
+	 iezceb1dvqkpxhd7Ywn+0zFzfW6Fdbo/1974qlRlQ+eSfkbzT01O3D9hB+35PEnyQ5
+	 YJ1t41XypyN3Pz8/iNgW3BbdRYu9ciBhaDr0v7t8wW2T2dZxRlYzarWKBWV27W4ufF
+	 lWv+ro9CdLsNud7xPDqkwnp5e3P3Ze4NG+RVAmu5krMgttVLhWXiyufEBUIAGaUFfR
+	 1rRwmheov/iXkrBZn26IS365QaRCjrrqowUaH26xNjhXqBJpiOoG0aYuogZ6Mhvj5P
+	 t+qVdJVniXRpElv1Yq3Z4MYaaUq3wuwprgVE33xzcgcHDOPIQBXTmbseSn/O9ZdQwm
+	 tfLLVSh9wfZIEmyJi+rYeJYGgASEe7Ie61DzgeoOJihRreRipN5T7eGhLhQRxh8UEU
+	 sL0XwnyCZTZJfKWYsMg/bJ6m6hgzLfC/LeOdoE9H2bvqTXP1Icc4gpY+R0VmRrBji2
+	 wMykaVRpj0RwDK5V6j/ywsDEju2FC4N4sPeE3quznsUIrKit1Womtq5dIJJ8XisTHe
+	 BDmoSpIAI7M0o01/HjFjNnjvlUCqX/jMCW1EbVhclczaW7Bz9YYcs80/gN42GJ7yB2
+	 jNyV27vJTuFWw/fpyG4Qe3Bg=
+Received: from stx.tnic (unknown [IPv6:2600:1700:38ca:c00::1b])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7169340E014C;
+	Fri, 31 Jul 2026 05:44:28 +0000 (UTC)
+Date: Thu, 30 Jul 2026 22:44:25 -0700
+From: Borislav Petkov <bp@alien8.de>
+To: Ashish Kalra <Ashish.Kalra@amd.com>
+Cc: tglx@kernel.org, mingo@redhat.com, dave.hansen@linux.intel.com,
+	x86@kernel.org, hpa@zytor.com, seanjc@google.com,
+	peterz@infradead.org, thomas.lendacky@amd.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org,
+	pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
+	KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com,
+	Nathan.Fontenot@amd.com, ackerleytng@google.com, jackyli@google.com,
+	pgonda@google.com, rientjes@google.com, jacobhxu@google.com,
+	xin@zytor.com, pawan.kumar.gupta@linux.intel.com,
+	babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com,
+	john.allen@amd.com, darwi@linutronix.de,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	kvm@vger.kernel.org, linux-coco@lists.linux.dev
+Subject: Re: [PATCH v11 4/6] x86/sev: Add support to perform RMP
+ optimizations asynchronously
+Message-ID: <20260731054425.GNamw2OelKuNhVwnrU@fat_crate.local>
+References: <cover.1784844080.git.ashish.kalra@amd.com>
+ <7f582569acea933c3045be604a81975e29b5ee2b.1784844080.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: qce - Replace with stub driver
-To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
- Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Bartosz Golaszewski <brgl@kernel.org>,
- Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
- Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
- Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-References: <20260731050838.158825-1-ebiggers@kernel.org>
-Content-Language: en-US
-From: Demi Marie Obenour <demiobenour@gmail.com>
-Autocrypt: addr=demiobenour@gmail.com; keydata=
- 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
- +MYSfkEjBz0E8CLOcAw7JIwAaeBT
-In-Reply-To: <20260731050838.158825-1-ebiggers@kernel.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------8Y1ZwW6gByfOgAxE8eSRugEz"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <7f582569acea933c3045be604a81975e29b5ee2b.1784844080.git.ashish.kalra@amd.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------8Y1ZwW6gByfOgAxE8eSRugEz
-Content-Type: multipart/mixed; boundary="------------92vHKN2OdgGoaT10ogyC5U4F";
- protected-headers="v1"; hp="clear"
-Message-ID: <c1594714-5cc5-4370-bba3-9af886a9c8d7@gmail.com>
-Date: Fri, 31 Jul 2026 01:32:11 -0400
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: qce - Replace with stub driver
-To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
- Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Bartosz Golaszewski <brgl@kernel.org>,
- Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
- Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
- Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-References: <20260731050838.158825-1-ebiggers@kernel.org>
-Content-Language: en-US
-From: Demi Marie Obenour <demiobenour@gmail.com>
-Autocrypt: addr=demiobenour@gmail.com; keydata=
- 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
- +MYSfkEjBz0E8CLOcAw7JIwAaeBT
-In-Reply-To: <20260731050838.158825-1-ebiggers@kernel.org>
+On Mon, Jul 27, 2026 at 07:05:29PM +0000, Ashish Kalra wrote:
+> From: Ashish Kalra <ashish.kalra@amd.com>
+> 
+> When SEV-SNP is enabled, all writes to memory are checked to ensure
+> integrity of SNP guest memory. This imposes performance overhead on the
 
---------------92vHKN2OdgGoaT10ogyC5U4F
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+s/SNP//
 
-On 7/31/26 01:08, Eric Biggers wrote:
-> None of the algorithms the QCE driver registers with the crypto API are=
+The checks are done not only on SNP guest memory but on *all* memory, as your
+next paragraph suggests.
 
-> even close to being useful.  They're massively outperformed by the
-> CPU-based crypto (even actually using far more CPU cycles than the
-> CPU-based crypto, due to the massive driver overhead), don't provide an=
-y
-> security benefits over the CPU-based crypto, and have various other
-> issues.  They're also unrelated to the Inline Crypto Engine which works=
+> whole system.
+> 
+> RMPOPT is a new instruction that minimizes the performance overhead of
+> RMP checks on the hypervisor and on non-SNP guests by allowing RMP
+> checks to be skipped for 1GB regions of memory that are known not to
+> contain any SEV-SNP guest memory.
 
-> far better and is what is actually being used these days.
->=20
-> Due to the major performance problems people experienced when
-> accidentally using this driver, the algorithms were already demoted to
-> below the priority of ARMv8 CE in the crypto API several years ago.
-> Regardless of priority, these algorithms also aren't compatible with th=
-e
-> most common uses of in-kernel crypto; for example, they don't support
-> dm-crypt because they allocate memory, and they don't support IPsec
-> since they take a mutex which isn't compatible with softirq context.
->=20
-> It's time to move on and just drop this obsolete functionality entirely=
-=2E
->=20
-> However, the driver does serve one purpose which is to bind to the
-> devicetree node and allow the interconnects to scale down (though even
-> that part is broken, as it holds static interconnect bandwidth votes).
->=20
-> Thus, clear out the crypto functionality, leaving just a stub driver
-> that drops the interconnection bandwidth votes to zero.
->=20
-> Tested on the SM8650 HDK.
->=20
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+Let's tone down the abbreviations. "SNP guest memory" is enough and let's
+stick to that.
 
-Some thoughts:
+> Add support for performing RMP optimizations asynchronously using a
+> dedicated workqueue.
+> 
+> Enable RMPOPT optimizations for up to 2TB of system RAM starting from
+> the lowest physical memory address aligned down to a 1GB boundary at
+> RMP initialization time. RMP checks can initially be skipped for 1GB
 
-1. Should this be put under a different subdirectory?  This
-   is now a power management driver, not a crypto driver.
-   IMO it should just fall under ARCH_QCOM, without a separate
-   Kconfig entry (or at least a "default y" one).
+Why "initially"? What are you trying to say here?
 
-2. Should it be re-added to the defconfigs?  Most distros
-   will want to turn it on, as it saves power and is minuscule.
+> memory ranges that do not contain SEV-SNP guest memory (excluding
+> preassigned pages such as the RMP table and firmware pages). As SNP
+> guests are launched, RMPUPDATE will disable the corresponding RMPOPT
+> optimizations.
 
-3. Will this the smallest driver in the whole kernel?
+Because it will add pages to the RMP table?
+
+This paragraph needs clarification.
+
+> Suggested-by: Thomas Lendacky <thomas.lendacky@amd.com>
+> Suggested-by: Dave Hansen <dave.hansen@linux.intel.com>
+> Suggested-by: K Prateek Nayak <kprateek.nayak@amd.com>
+> Reviewed-by: Ackerley Tng <ackerleytng@google.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 > ---
->  drivers/crypto/Kconfig        | 117 +----
->  drivers/crypto/qce/Makefile   |   7 -
->  drivers/crypto/qce/aead.c     | 787 ----------------------------------=
+>  arch/x86/virt/svm/sev.c | 160 +++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 158 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
+> index 8bfd80284836..04b19e64f832 100644
+> --- a/arch/x86/virt/svm/sev.c
+> +++ b/arch/x86/virt/svm/sev.c
+> @@ -19,6 +19,7 @@
+>  #include <linux/iommu.h>
+>  #include <linux/amd-iommu.h>
+>  #include <linux/nospec.h>
+> +#include <linux/workqueue.h>
+>  
+>  #include <asm/sev.h>
+>  #include <asm/processor.h>
+> @@ -125,7 +126,18 @@ static void *rmp_bookkeeping __ro_after_init;
+>  static u64 probed_rmp_base, probed_rmp_size;
+>  
+>  static cpumask_var_t rmpopt_cpumask;
+> -static phys_addr_t rmpopt_pa_start;
+> +static phys_addr_t rmpopt_pa_start, rmpopt_pa_end;
+> +
+> +enum rmpopt_function {
 
->  drivers/crypto/qce/aead.h     |  56 ---
->  drivers/crypto/qce/cipher.h   |  56 ---
->  drivers/crypto/qce/common.c   | 564 ------------------------
->  drivers/crypto/qce/common.h   |  94 ----
->  drivers/crypto/qce/core.c     | 271 ------------
->  drivers/crypto/qce/core.h     |  64 ---
->  drivers/crypto/qce/dma.c      | 135 ------
->  drivers/crypto/qce/dma.h      |  47 --
->  drivers/crypto/qce/qcrypto.c  |  43 ++
->  drivers/crypto/qce/regs-v5.h  | 322 --------------
->  drivers/crypto/qce/sha.c      | 498 ---------------------
->  drivers/crypto/qce/sha.h      |  71 ---
->  drivers/crypto/qce/skcipher.c | 434 -------------------
->  16 files changed, 50 insertions(+), 3516 deletions(-)
->  delete mode 100644 drivers/crypto/qce/aead.c
->  delete mode 100644 drivers/crypto/qce/aead.h
->  delete mode 100644 drivers/crypto/qce/cipher.h
->  delete mode 100644 drivers/crypto/qce/common.c
->  delete mode 100644 drivers/crypto/qce/common.h
->  delete mode 100644 drivers/crypto/qce/core.c
->  delete mode 100644 drivers/crypto/qce/core.h
->  delete mode 100644 drivers/crypto/qce/dma.c
->  delete mode 100644 drivers/crypto/qce/dma.h
->  create mode 100644 drivers/crypto/qce/qcrypto.c
->  delete mode 100644 drivers/crypto/qce/regs-v5.h
->  delete mode 100644 drivers/crypto/qce/sha.c
->  delete mode 100644 drivers/crypto/qce/sha.h
->  delete mode 100644 drivers/crypto/qce/skcipher.c
->=20
-> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-> index 0189dfdcbbe1..03113ad3467c 100644
-> --- a/drivers/crypto/Kconfig
-> +++ b/drivers/crypto/Kconfig
-> @@ -527,119 +527,16 @@ source "drivers/crypto/marvell/Kconfig"
->  source "drivers/crypto/intel/Kconfig"
-> =20
->  config CRYPTO_DEV_QCE
-> -	tristate "Qualcomm crypto engine accelerator"
-> -	depends on (BROKEN && ARCH_QCOM) || COMPILE_TEST
-> +	tristate "Qualcomm crypto engine"
-> +	depends on ARCH_QCOM || COMPILE_TEST
->  	depends on HAS_IOMEM
->  	help
-> -	  This driver supports Qualcomm crypto engine accelerator
-> -	  hardware. To compile this driver as a module, choose M here. The
-> -	  module will be called qcrypto.
-> -
-> -	  This driver does not have exclusive access to the
-> -	  hardware, causing races with the secure world.  It
-> -	  is also slower than the CPU.
-> +	  This driver provides a stub for the Qualcomm crypto engine. It exis=
-ts
-> +	  only to bind to the devicetree node and allow interconnects to scal=
-e
-> +	  down, saving power. It doesn't expose any cryptographic functionali=
-ty.
+	rmpopt_op_type
 
-Should this mention why the cryptographic functionality
-available in the hardware has been proven unsuitable for use?
---=20
-Sincerely,
-Demi Marie Obenour (she/her/hers)
+> +	RMPOPT_FUNC_VERIFY_AND_REPORT_STATUS,
+> +	RMPOPT_FUNC_REPORT_STATUS
 
---------------92vHKN2OdgGoaT10ogyC5U4F--
+RMPOPT_OP_VERIFY...
 
---------------8Y1ZwW6gByfOgAxE8eSRugEz
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+> +};
+> +
 
------BEGIN PGP SIGNATURE-----
+/*
+ * This timeout was selected this way because...
+ */
 
-iQIzBAEBCgAdFiEEopQtqVJW1aeuo9/sszaHOrMp8lMFAmpsM2gACgkQszaHOrMp
-8lMpZQ//XmVsj3tB3HhWXcYdo+MuFGqo0LEB/WLs84lQS9j/8jPpEEXLR2LBjNff
-pd8Oip7/yDaN6I5K7bSUKBHFjVZYZ1EuAP89pgQGk3zkUdTz6q7gpop65PbU1+nO
-55YRhqbDOeD3PDue2JswDg2gVljwqCjbifxHiQBTl0UsTWv2aMJ4u30Ca9ml9DCy
-0UCr2C8bjjLcY3m8NTpJSglU3biU7JOOBlw4ie/mQcmKk+LlvLjNWam/hQpDfU4Z
-xNOva6EVAQ6q5fwy/AeZ3BP0ItDaoxcjjb0pfO2VNe9Cj/JO2pXp5LzlujaD7EAi
-eBFjCFlzNKkrOvwTuaeDUf0hXS/fpr44VxURHjz5RWl5ygSjIktmCFMvA8GK1+SM
-39xoAE1VsTCG+jCRM/fou4MbtBZPLgqNGE8g6KPoItKYJqb2cMRWZOVxHge/6ex1
-FBKyITbYiuYmazv0obKDSwuJO9h+D+a2gg8hBLyliTap+/d846gQMxQ9fhDWOGhQ
-kspyE+OnneI2zQzURHpd5rxvqIMPhmwi0PLCzQYCHhwjF13wVnxsJg2qOarpzT41
-qOE+XazlsoxTJjsARymKMd3SfReNKmJYMpqSDi+5gX4LDe1CK3Dqb3JuA1lvsWzf
-e3AQeZuL/67+fbt5rYZ2hoUpnFRMXqijqH8gR4ThSVpQ2Fnjypc=
-=5vyR
------END PGP SIGNATURE-----
+> +#define RMPOPT_WORK_TIMEOUT	10000
+> +
+> +static struct workqueue_struct *rmpopt_wq;
+> +static struct delayed_work rmpopt_delayed_work;
+> +static DEFINE_MUTEX(rmpopt_wq_mutex);
+>  
+>  static LIST_HEAD(snp_leaked_pages_list);
+>  static DEFINE_SPINLOCK(snp_leaked_pages_list_lock);
+> @@ -565,11 +577,20 @@ static void snp_cleanup_rmpopt(void)
+>  {
+>  	int cpu;
+>  
+> +	guard(mutex)(&rmpopt_wq_mutex);
+> +
+> +	if (!rmpopt_wq)
+> +		return;
 
---------------8Y1ZwW6gByfOgAxE8eSRugEz--
+If there's no workqueue, you skip all the rest, including undoing things which
+are not workqueue-related?
+
+That workqueue pointer must be magical and special. Yet, I don't see anything
+explaining that.
+
+> +
+> +	cancel_delayed_work_sync(&rmpopt_delayed_work);
+> +	destroy_workqueue(rmpopt_wq);
+> +
+>  	for_each_cpu(cpu, rmpopt_cpumask)
+>  		wrmsrq_on_cpu(cpu, MSR_AMD64_RMPOPT_BASE, 0);
+>  
+>  	free_cpumask_var(rmpopt_cpumask);
+> -	rmpopt_pa_start = 0;
+> +	rmpopt_pa_start = rmpopt_pa_end = 0;
+> +	rmpopt_wq = NULL;
+>  }
+>  
+>  void snp_shutdown(void)
+> @@ -599,6 +620,96 @@ static bool rmpopt_capable(void)
+>  	       cc_platform_has(CC_ATTR_HOST_SEV_SNP);
+>  }
+>  
+> +/*
+> + * RMPOPT: F2 0F 01 FC
+> + *   Input:  RAX = system physical address (1GB aligned)
+> + *           RCX = operation type
+> + *   Output: CF set if the range was optimized
+> + */
+> +static inline bool __rmpopt(u64 pa_start, u64 op_type)
+> +{
+> +	bool optimized;
+> +
+
+	/*
+	 * needs a comment here which says which binutils version
+	 * supports the RMPOPT mnemonic.
+	 */
+> +	asm volatile(".byte 0xf2, 0x0f, 0x01, 0xfc"
+> +		     : "=@ccc" (optimized)
+> +		     : "a" (pa_start), "c" (op_type)
+> +		     : "memory", "cc");
+> +
+> +	return optimized;
+> +}
+> +
+> +static void rmpopt(u64 pa)
+> +{
+> +	u64 pa_start = ALIGN_DOWN(pa, SZ_1G);
+> +	u64 op_type = RMPOPT_FUNC_VERIFY_AND_REPORT_STATUS;
+
+	enum rmpopt_op_type op = ...
+
+> +
+> +	__rmpopt(pa_start, op_type);
+
+Looks like the __rmpopt() carve out is not really necessary and you can merge
+it back into rmpopt().
+
+> +}
+> +
+> +/*
+> + * 'val' is a system physical address.
+> + */
+> +static void rmpopt_smp(void *val)
+
+You don't need that one - you can use rmpopt(). But keep on reading...
+
+> +{
+> +	rmpopt((u64)val);
+> +}
+> +
+> +/*
+> + * RMPOPT optimizations skip RMP checks at 1GB granularity if this
+> + * range of memory does not contain any SNP guest memory.
+> + */
+
+Put that comment above rmpopt().
+
+> +static void rmpopt_work_handler(struct work_struct *work)
+> +{
+> +	cpumask_var_t follower_mask;
+> +	phys_addr_t pa;
+
+So either phys_addr_t or u64 but not both for a pa.
+
+> +	int this_cpu;
+> +
+> +	pr_info("Attempt RMP optimizations on physical address range @1GB alignment [0x%016llx - 0x%016llx]\n",
+> +		rmpopt_pa_start, rmpopt_pa_end);
+
+This is going to spam dmesg every time the workqueue runs?
+
+Nope, zap it.
+
+> +	if (!alloc_cpumask_var(&follower_mask, GFP_KERNEL)) {
+> +		pr_warn("RMP optimization pass skipped: cpumask allocation failed\n");
+> +		return;
+> +	}
+
+Why? Why isn't the follower mask allocated once at init time?
+
+> +
+> +	/*
+> +	 * RMPOPT scans the RMP table, stores the result of the scan in the
+> +	 * reserved processor memory. The RMP scan is the most expensive
+> +	 * part. If a second RMPOPT occurs, it can skip the expensive scan
+> +	 * if they can see a cached result in the reserved processor memory.
+> +	 *
+> +	 * Do RMPOPT on one CPU alone. Then, follow that up with RMPOPT
+> +	 * on every other primary thread. Followers are "designed to"
+> +	 * skip the scan if they see the "cached" scan results.
+> +	 *
+> +	 * Pin the worker to the current CPU for the leader loop so that
+
+Isn't worker == leader here?
+
+> +	 * this_cpu remains valid and the RMPOPT instruction executes on
+> +	 * the correct CPU. 
+
+> Use migrate_disable() rather than get_cpu() to
+> +	 * prevent migration while still allowing preemption.
+
+No need to explain that.
+
+> +	 */
+> +	migrate_disable();
+> +	this_cpu = smp_processor_id();
+> +
+> +	cpumask_andnot(follower_mask, rmpopt_cpumask,
+> +		       topology_sibling_cpumask(this_cpu));
+> +
+> +	for (pa = rmpopt_pa_start; pa < rmpopt_pa_end; pa += SZ_1G)
+> +		rmpopt(pa);
+> +
+> +	migrate_enable();
+> +
+> +	/*
+> +	 * Followers: run RMPOPT on the remaining cores.  cpus_read_lock() is
+> +	 * intentionally not held here: CPU hotplug is disabled for the entire
+> +	 * time SNP is active (see snp_prepare()), and this work only runs while
+> +	 * SNP is active, so the follower set stays valid across the whole scan.
+> +	 */
+> +	for (pa = rmpopt_pa_start; pa < rmpopt_pa_end; pa += SZ_1G)
+> +		on_each_cpu_mask(follower_mask, rmpopt_smp, (void *)pa, true);
+
+An IPI per 1G pa?!?!? On each CPU?!
+
+Instead of IPIing each CPU and inside the handler, doing the loop?
+
+Nope.
+
+> +
+> +	free_cpumask_var(follower_mask);
+> +}
+
+Ok, enough for this part. Part II coming up later.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
