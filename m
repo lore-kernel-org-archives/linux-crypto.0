@@ -1,60 +1,66 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F56544C641;
-	Fri, 31 Jul 2026 18:31:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B9ED477983
+	for <linux-crypto@vger.kernel.org>; Fri, 31 Jul 2026 18:32:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785522720; cv=none; b=Rck+IC9OWBFqDozK1hNNItIrX6Csp7GTcEns0yXTWHDDqCLbp7FQ/pPmP8OqztwMti5g0qsuMcvY4yTQRwJQZ9pcXtLGldpd0yIf8gaYkWUwAVGJzMzpPFh5cA3JOH9j96FGr46bRSxjDrdDCV1rYZq/At78pImJfoyS4K8+6Rc=
+	t=1785522724; cv=none; b=AzUW2n22x2EjbgFiAtzg89YUvdifgfA3fxsEAhx/69Bg6E8fs/7tejA46UI7qNcVrdpHMsQvH1c4K3bSqLKtUxJHBVvFbSDDw6UbukE0UNBLkx/0vvwmGv8kJGsYD6Il5cECWNJCxsJPmRpbLBrZxJA/SVLFlimFKn4jNaO77t4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785522720; c=relaxed/simple;
-	bh=8t6FGRmqZ3w/otFpd6LcXsk/5g3F9di4dDavEUSQGJs=;
+	s=arc-20240116; t=1785522724; c=relaxed/simple;
+	bh=WtJ5MLapSs/5+OHOfelAdhfT+m5cHtdwpiikQ9In/tI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Qn78mEyCl6K4xxj+1gOJgQhWlt9EAVH3Lx4zzlDZs++aayyTAr0K70VJ2i9441Mgu2vMPuyq9IoGfdiKn+NY2WJXKx0hsi0oJvGhuRElGpCV/v+ZxNjJ4nR0dnDPZwLuAIUt64XSqqE5Rk4H9osYcob3aDyTH9HPpMOELRXWcm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=WrlSsg2D; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	 In-Reply-To:Content-Type; b=Tt5yGks8bBkQEP3k1MCiww3MFKAhW2F0EFpJkMJLmBZ0T62wQF1GUQisoc2fAAsGePnGmfPf1J/rIoN/nNRdFZe6oiSRFRMEd/sJTpz8RpkPxwRmC9h9Ok8y/54m0gGrvHsEQ5yth5olyxrT8X8m7puFDGQTw/+jFzHA/2Dla5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LegumlpE; arc=none smtp.client-ip=74.125.224.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WrlSsg2D"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66VFlWdf402301;
-	Fri, 31 Jul 2026 18:31:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=N8atrp
-	DnKaW3CfL8zzEr1ep4hhFrwON0IQJE41M0dVM=; b=WrlSsg2DJ53awHcSAZoNEe
-	Tee2kNNX390OpoHNhF71ilcxuA3O7/ENgmhBTrw09JewVsdegduAzsTkT1dgtZYQ
-	avb4VjRfDStZvEEtZCmbj1Onziz9W1wmoBGZJVPWC7qNMeKpYj2RTcOOLJ53Q5Qp
-	wFyswfZiEv/h9+uNIfS0EqX+VDSIpV+8rGMvXvljvG1tz0BaBs98OCuyjMZzqliE
-	PavuoPCqWN4H/PgliHNCkPurnnBf2/48kE8nadqvPo9u/DBgGw224Bk2TaFfAmd4
-	yCP4d7R+ym98g7+cCrNHcEiJGG89g5YV5BNfPkbcrNE9nTjoTpVXiqgfpHFaLztA
-	==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fmuycxffy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 31 Jul 2026 18:31:46 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 66VIQE9B000694;
-	Fri, 31 Jul 2026 18:31:45 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fna5ygvve-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 31 Jul 2026 18:31:45 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 66VIVfJH15335832
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 31 Jul 2026 18:31:41 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 24B7220040;
-	Fri, 31 Jul 2026 18:31:41 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8BFFD20043;
-	Fri, 31 Jul 2026 18:31:40 +0000 (GMT)
-Received: from [9.111.59.130] (unknown [9.111.59.130])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 31 Jul 2026 18:31:40 +0000 (GMT)
-Message-ID: <be21ec15-c4f2-4aee-9e8a-99ac08e8d94d@linux.ibm.com>
-Date: Fri, 31 Jul 2026 20:31:40 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LegumlpE"
+Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-6681e7911b0so1648451d50.0
+        for <linux-crypto@vger.kernel.org>; Fri, 31 Jul 2026 11:32:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785522722; x=1786127522; darn=vger.kernel.org;
+        h=content-type:in-reply-to:autocrypt:from:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=1pgvz5gAD7Hw+MqfudMvXhhl6EBpJRyIn40riGMqdVs=;
+        b=LegumlpE+ea8c8V6Xy2aYV3NinlSwoFwk+Z4+UAHyVYZ12e2hL8ExYAAdSbMGDYWKs
+         sTd16EmWhpSHktOvShUUnpnuYuJ+MsdhJo56yXsL196Q6WBHd/mQNkRmCQMsUSCVBj4R
+         ruez2/ggAxxMv6JbrqhYzRDerk54Raq+Fz6cBzq2MJUb2+daLo9to6bC7CbgE3pTf7IY
+         CPk1v15ytecQ12k33afdvZ+5CHN4H6MBnm1NOInxB/dIfRk8G1hVbQsg8cPLExiqSVi2
+         VS5Wlt+T9rzc9EBjTEaOSZscwv7Np/Yxm6dkNzEvfG76SIsTzzASKYGaZPu1UHEMk+6D
+         Ji7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785522722; x=1786127522;
+        h=content-type:in-reply-to:autocrypt:from:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=1pgvz5gAD7Hw+MqfudMvXhhl6EBpJRyIn40riGMqdVs=;
+        b=oOwYqZhtvFf11WZoW54PhRCCWVYsdQ9Yml6rwsQZbZ/Lxe19r+z7K3UzgEEBPazf1X
+         O6Gv7xJ95sBi7c0qxRZ9yIwaYJYkQ3yNgikPGZNTbPrGsM3GCiKyz8BTb+9LSHNwC8do
+         I1A7Qe5raasil5nwVV8sprv0iQ0u5c5ENBcIXbXYCV5TVIDAwBqzqT+LIWWECHjKRM6m
+         pg6RkDyHJqYArrJsNhnzIYsuQcriob2Dpyc2x631i6wg2FgTyRo/afK0zvyKRQ4pdLwn
+         7StLB3URzkeAobHQH4bVCscDNILlc/WUxA9hTgXHWcb+QL3nsWLm7M9MwDAMI6UcwCYV
+         ciQg==
+X-Forwarded-Encrypted: i=1; AHgh+Rp0p34USVQJnNBhKuUnJEOKIbE3o/MmV2G/Vbmsan64vH/iCqpZ8zG4BsimfW9/iGA7IvfQVuGDh3QSQvg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxu4oLktL8Nc1HW1CjfBJE72lTPi/FSM2+BwHNsHlNV4COg2uE4
+	mgwjo9K7eFBZjAMrVapcC6MIdXtZuD0It2JWE7papSCvM5ySXLGYjQJR
+X-Gm-Gg: AR+sD111gYbetFLirJOUf/cuf1tIz5vyAFZd4BlxkqG8COvn3FKOZEnpsbuTE6JL/5l
+	xinQtV/tXVq1pM5hwZIA2SMkUWYa7CodloZp8ozNYya5/zLgGMXKLyFqPAysKpoDFoy8IA1z15e
+	Pg8flB+FYeyFr5p/UgXeqNP/RKc+6tFoykfB7SlrPt10Z+WEWWFStFb38KvHZMn1s+ZRHLoc3wd
+	xjXA00pwC+vPi6io+YCXlEKn956CjS8CmSsEO3sq5KrvaLvBOcaOoNcq52WSmaODBgXYMrtLi7h
+	HNMBZYBWWe9LWnwvFXGC/cyWM33j81UU18ZBaQNibDvcJ6wkCH/0/wvJXDdEGhKnh8jKZZvl/Cf
+	n4KMKkWkfFd3mC3djgzBXplM26MqRAjVMEB1CbvUUCYgN9CECsProu/tbIImEvIqC1NTeXg7j4X
+	T1YHOq5VwL9utBt9qYGN5SDkrAPzofChAyLS5p21qhln1PvIj86z3H+WZiRsySkY8=
+X-Received: by 2002:a05:690e:4811:b0:652:5567:b3ec with SMTP id 956f58d0204a3-6694f1baaeamr929342d50.37.1785522721944;
+        Fri, 31 Jul 2026 11:32:01 -0700 (PDT)
+Received: from [10.138.10.6] ([185.98.168.14])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-66948cff660sm1073441d50.3.2026.07.31.11.31.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 31 Jul 2026 11:32:00 -0700 (PDT)
+Message-ID: <3ba57269-3305-4d80-b3f2-aa82fa59b59d@gmail.com>
+Date: Fri, 31 Jul 2026 14:31:45 -0400
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -62,99 +68,250 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/4] s390/crypto: Replace cond_resched() with msleep(1)
-To: Heiko Carstens <hca@linux.ibm.com>
-Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-References: <20260731165004.2758105-1-hca@linux.ibm.com>
- <20260731165004.2758105-2-hca@linux.ibm.com>
-From: Holger Dengler <dengler@linux.ibm.com>
-Content-Language: en-US, de-DE
-In-Reply-To: <20260731165004.2758105-2-hca@linux.ibm.com>
+Subject: Re: [PATCH] crypto: qce - Replace with stub driver
+To: Krzysztof Kozlowski <krzk@kernel.org>, Eric Biggers
+ <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
+ Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Bartosz Golaszewski <brgl@kernel.org>,
+ Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
+ Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+ Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+References: <20260731050838.158825-1-ebiggers@kernel.org>
+ <a28c2903-0976-4559-b870-4de5553ba9ab@kernel.org>
+Content-Language: en-US
+From: Demi Marie Obenour <demiobenour@gmail.com>
+Autocrypt: addr=demiobenour@gmail.com; keydata=
+ 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
+ +MYSfkEjBz0E8CLOcAw7JIwAaeBT
+In-Reply-To: <a28c2903-0976-4559-b870-4de5553ba9ab@kernel.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------HdbkbXaosHtNrC3ZM5XYZQZq"
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------HdbkbXaosHtNrC3ZM5XYZQZq
+Content-Type: multipart/mixed; boundary="------------xNPkSkf7BAKQGc6JdueYE4T0";
+ protected-headers="v1"; hp="clear"
+Message-ID: <3ba57269-3305-4d80-b3f2-aa82fa59b59d@gmail.com>
+Date: Fri, 31 Jul 2026 14:31:45 -0400
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: qce - Replace with stub driver
+To: Krzysztof Kozlowski <krzk@kernel.org>, Eric Biggers
+ <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
+ Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Bartosz Golaszewski <brgl@kernel.org>,
+ Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
+ Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+ Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+References: <20260731050838.158825-1-ebiggers@kernel.org>
+ <a28c2903-0976-4559-b870-4de5553ba9ab@kernel.org>
+Content-Language: en-US
+From: Demi Marie Obenour <demiobenour@gmail.com>
+Autocrypt: addr=demiobenour@gmail.com; keydata=
+ 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
+ +MYSfkEjBz0E8CLOcAw7JIwAaeBT
+In-Reply-To: <a28c2903-0976-4559-b870-4de5553ba9ab@kernel.org>
+
+--------------xNPkSkf7BAKQGc6JdueYE4T0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: qmNpm7Yff2khN1KKGzLtRSER5HcD9M5E
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzMxMDE0MCBTYWx0ZWRfX01MnrqXmJddI
- rMvHvL2y48s0QW/B8+jqw1qdXr6pkLj+IMXoHjoXQJ8fNXprmytDOYVPIzfgtnyQpdehq22G5xH
- ocX43oA/wHuW4Ku7V0HL464w9C9k1PlT0CIaa2aaQTa9Wf9bi5Q9bU6HgBxukLoLWgpgMSWtChB
- hynUACoX1rdbc4bR1YNESyWcTtqrGgCekPqnQwQbCkxZo4ijAigzgUKlsKov1kdQv+rXTWBn39p
- g15+slC85cTlNQczQmpMrdJjlB98Z2xCYp9/I3t+lSnfa4rEUiovt7jmXzsAC9PYRx/CcKcKGBc
- 0xuQN2GvVFa8RvvNcE5W3kvrUnprnNsYDfHX6vwda0+n1v3q3XFC+HQYIm6oiKtsT1JgHRVeFWd
- 1l7q9fKSNWk/lLkSVRnhNzA+boLjmi/oLFJB7Zu9usCHHH7/+8F5g5FGZyze4I9uXSDMeEiCB5N
- fJvCxYVXTwWAex76C0Q==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwNzMxMDE0MCBTYWx0ZWRfXxObk9OS7aMNP
- Xoed+hLmYxFQGtdXaGkNTfnq1xtP1oe0cc1qFSvGv091Xa+/Jr4U9Nx1VjkQFNZqMMAfhAfFoZd
- Fsk8AHfGOR5ofUcS0VHdqY0+h0vPfeo=
-X-Authority-Analysis: v=2.4 cv=AZeB2XXG c=1 sm=1 tr=0 ts=6a6cea12 cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=IkcTkHD0fZMA:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=VwQbUJbxAAAA:8
- a=VnNF1IyMAAAA:8 a=WsHKUha7AAAA:8 a=JfrnYn6hAAAA:8 a=_3GpxjzQIKxmPKiwiJwA:9
- a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=H4LAKuo8djmI0KOkngUh:22
- a=1CNFftbPRP8L7MoqJWF3:22
-X-Proofpoint-GUID: qmNpm7Yff2khN1KKGzLtRSER5HcD9M5E
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-07-31_05,2026-07-30_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 priorityscore=1501 phishscore=0 adultscore=0 impostorscore=0
- clxscore=1015 malwarescore=0 suspectscore=0 lowpriorityscore=0 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2607310140
+Content-Transfer-Encoding: quoted-printable
 
-On 7/31/26 18:50, Heiko Carstens wrote:
-> From: Peter Zijlstra <peterz@infradead.org>
-> 
-> With [1] cond_resched() is always compiled away and becomes a no-op.
-> 
-> The comments for all cond_resched() calls in crypto code however indicate
-> that the current process should be scheduled away to avoid instant
-> re-invocation of a callback. This is not what cond_resched() would do or
-> did.
-> 
-> Instead of just removing the cond_resched() calls, replace them with
-> msleep() calls, as suggested by Holger Dengler. This forces the current
-> task to be scheduled away (sleeps) like originally intended.
-> 
-> Holger provided information why this intended [2]:
-> "
-> Let me give a bit of background here: The protected key can only get
-> invalid, if the Linux instance (z/VM or KVM guest) is moved to another
-> hypervisor on a different machine (aka life guest relocation). In such a
-> case, the crypto accelerator card and the host has to exchange the "real
-> key", which is wrapped by the host and handed back to the guest as the
-> re-newed protected key. Unfortunately there is no asynchronous trigger
-> on completion, you have to re-try (and maybe get another "in progress"
-> return).
-> 
-> And as if that weren't bad enough, if this key exchange between card and
-> host is the first one, card and host has to instantiate a secure
-> communication channel (including a key exchange for the transport layer).
-> "
-> 
-> [1] commit 7dadeaa6e851 ("sched: Further restrict the preemption modes")
-> [2] https://lore.kernel.org/all/39570813-27b0-40f9-89c5-8e2dce05e2f0@linux.ibm.com/
-> [3] https://lore.kernel.org/all/20260731084027.GE776954@noisy.programming.kicks-ass.net/
-> 
-> [hca@linux.ibm.com: took Peter's patch [3] and provided commit message]
-> 
-> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-> Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
+On 7/31/26 05:06, Krzysztof Kozlowski wrote:
+> On 31/07/2026 07:08, Eric Biggers wrote:
+>> None of the algorithms the QCE driver registers with the crypto API ar=
+e
+>> even close to being useful.  They're massively outperformed by the
+>=20
+> The amount of patches you send towards removal of QCE is really
+> stunning. Or rather worrying. This is like third approach or so.
+>=20
+> Your previous approaches received valid feedback, including even fixes
+> and committment of new maintainer.
+>=20
+> But you even complained that it does receive fixes! [1]
+>=20
+> We removed the driver temporarily from typical configurations, so no on=
+e
+> will be affected, by whatever is found now and not yet fixed. Still not=
 
-Reviewed-by: Holger Dengler <dengler@linux.ibm.com>
+> enough! For you this was reason to remove the driver (AGAIN!) [2]
 
--- 
-Mit freundlichen Grüßen / Kind regards
-Holger Dengler
+A stub driver needs to be added for power management reasons.  It turns
+out that if there is no driver, power consumption is very high.
 
+> This is beyond comprehension and very unpleasant, because you actively
+> work against the community with this approach.
+
+I trust that Bartosz can fix the driver with enough work.  However,
+even if the QCE driver had never had a single bug, it would still not
+be worth using.  Its performance is so poor that one should always
+use CPU-based crypto instead.  In the default configuration, that is
+in fact what happens.
+
+The QCE's algorithm implementations only provide a way people can
+misconfigure their systems and ruin their performance.  There are
+debug options that also severely harm performance, but they have
+legitimate uses during development.  The current QCE driver doesn't.
+
+I have no problem with a driver for the QCE that does something actually
+useful.  While there are disagreements about whether restricted media
+processing is a feature or an anti-feature, my view is that it is
+better for it to be implemented upstream than in an out-of-tree driver.
+However, the driver as it currently exists does not implement this.
+
+I expect that such a driver would not use the crypto API at all.
+Instead, I suspect it would use dmabufs for source and destination
+buffers and integrate with the secure world firmware in some way.
+That means that the driver doesn't belong under drivers/crypto.
+
+These are the reasons I submitted a patch to mark the driver as BROKEN,
+which Herbert Xu has since accepted.
+
+> NAK
+>=20
+> Nacked-by: Krzysztof Kozlowski <krzk@kernel.org>
+>=20
+>=20
+> [1] https://lore.kernel.org/all/20260728152241.GA4281@quark/
+> [2] https://lore.kernel.org/all/20260724050645.223799-1-ebiggers@kernel=
+=2Eorg/
+>=20
+>> CPU-based crypto (even actually using far more CPU cycles than the
+>> CPU-based crypto, due to the massive driver overhead), don't provide a=
+ny
+>> security benefits over the CPU-based crypto, and have various other
+>> issues.  They're also unrelated to the Inline Crypto Engine which work=
+s
+>> far better and is what is actually being used these days.
+>>
+>> Due to the major performance problems people experienced when
+>> accidentally using this driver, the algorithms were already demoted to=
+
+>> below the priority of ARMv8 CE in the crypto API several years ago.
+>> Regardless of priority, these algorithms also aren't compatible with t=
+he
+>> most common uses of in-kernel crypto; for example, they don't support
+>> dm-crypt because they allocate memory, and they don't support IPsec
+>> since they take a mutex which isn't compatible with softirq context.
+>>
+>> It's time to move on and just drop this obsolete functionality entirel=
+y.
+>=20
+> Best regards,
+> Krzysztof
+
+
+--=20
+Sincerely,
+Demi Marie Obenour (she/her/hers)
+
+--------------xNPkSkf7BAKQGc6JdueYE4T0--
+
+--------------HdbkbXaosHtNrC3ZM5XYZQZq
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEopQtqVJW1aeuo9/sszaHOrMp8lMFAmps6hsACgkQszaHOrMp
+8lNwUBAAptSx+21WOpvepRQf2mxAoPgmKhOGw1fC0yyfvoukdVfEZyHnJIDWgy5V
+S7pRzbRzJo4rCQh5G8pkdCQFWm3HAT2O9rG3t4KT1NF8Rag3s8G38TsTVzaaOzae
+V5HYh8JxgImWPMP2pS087NR97KbQR+WfyYEjCXIERuMc9dW3ksM6fXj0Des36KpW
+6hfqwmZWNThhThoAJqr5j/8nPNk/FCPyhMi6vuZlzFuMlsv2kgWxKhZjEpHYnYak
+oopcGAQMPuqX2/lKblSeKEbW1fSa9faTcmDeH152e7p/fw/WRq5XSsK+DIhiP3ie
+wyWSNTBbGhLgH84rdIfBhNsSA6NchJFMYfMe0hfLIhFmv2mjtlOX/YW53nHzqZ0+
+8K847CDDhrz79DhYxhyYhGjmUhTxteaAei+gO1vzY49Ysf/9+6Vccc8YIDMdcoAS
+22PMQkYJkTjzIfHLcYToxu38LoDJPQy3neM9XUvsLSYp2uQTb/TJSoy+HoPYXy6+
+kS8zb3jTMJ3iCCOdM9CabOUplA5Rgxa92Gy87OEBZwPcRWf9w1LYI4Cob4XHEuub
+41dku0PWGWuas8MKLH2NTRctKrvLvC9BClbC165SiQRm6QsgnJja+L9IvZzRqtfw
+V55UjORv9Il8pY96/wo+0lg2UamEkcInsTMULyFdlelhPQe/02g=
+=D3dI
+-----END PGP SIGNATURE-----
+
+--------------HdbkbXaosHtNrC3ZM5XYZQZq--
