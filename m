@@ -1,138 +1,145 @@
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9A613CF204
-	for <linux-crypto@vger.kernel.org>; Fri, 31 Jul 2026 11:45:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 948003CB567;
+	Fri, 31 Jul 2026 11:57:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785498326; cv=none; b=oXl/s+/73tveEnFSOHcjwYQtMxyRqku985Z92sdHU8SPkZNuUsdiY+7sp+8/6PwyPgZx2au4316n2re9yz15FdND1m76OfmuxAW5CGKs2u9QPeBrWJPQuTQIBNzVJe/sMBVW+9aiQU1O9xKlBNVr0TbbsHrkM5srh7BlxHjTD3s=
+	t=1785499022; cv=none; b=NqmFfTb2q7nxSnCMkHc2pTgKH8dvcFxClQ6o7EA56D6Kn5ejH9PZGqCehC1jffL29lJ3Swq+Et5Ak1PM98G1Em3TDiw4Yj02UsPhJEjUPS5UTLbK8U1rnOdvN8v4NPJALkv96w9Htftzq4aC9vqGtBtyIZhO8AYnW5xxcsy2cIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785498326; c=relaxed/simple;
-	bh=FXAhG4vJqgCaP+SaD+oigXn7L+3ul44ZqBjXWjjgnO4=;
-	h=Message-ID:In-Reply-To:References:From:To:Subject:Date:
-	 MIME-Version:Content-Type; b=l2tsGSt3LfrWbdsgMro2aqBPMP8sQjtAOz1w03lNJpm8F+TT4Lj25vcyVbNjvIEODW+Wm/08E201yhJyk6LcLhwY9YLONuopo+t/T9iNPxOVB+q2mLNMEymbuxv4cwqg4eR/tjblm4HXBlu0bqnWbq81zYpEWjfAaFLsEyJKWoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gosalescloserapp.com; spf=pass smtp.mailfrom=gosalescloserapp.com; dkim=pass (2048-bit key) header.d=gosalescloserapp.com header.i=@gosalescloserapp.com header.b=k6KGwlzt; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gosalescloserapp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gosalescloserapp.com
+	s=arc-20240116; t=1785499022; c=relaxed/simple;
+	bh=Wf4kDabg62/t3QOZJCcU6tcPZRhbmX4EHrVdOMQEETY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FNW+VjNMTKSarLD3EkEip+msspd2p1hesrad04Bd3rGiBiQLS6gEZGfetcCLZGzyasGNupUxVSJgPB0xOVhKiu21oI/OpICBu40LVKL9ObkAdpgcVyF+oK1twAtOaq+cdpqMWGon1mck296T+zWi6wyTwxx0P9T+jzDDJQ1q9iw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fe3qVzP0; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gosalescloserapp.com header.i=@gosalescloserapp.com header.b="k6KGwlzt"
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-51c8e2e39easo7233571cf.0
-        for <linux-crypto@vger.kernel.org>; Fri, 31 Jul 2026 04:45:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gosalescloserapp.com; s=google; t=1785498323; x=1786103123; darn=vger.kernel.org;
-        h=content-type:mime-version:date:content-transfer-encoding:subject:to
-         :from:references:in-reply-to:message-id:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=FXAhG4vJqgCaP+SaD+oigXn7L+3ul44ZqBjXWjjgnO4=;
-        b=k6KGwlzttMkHdGHa9wwb2Gw0vqc0b6NFa955/n0GlstO34ZrtVz2jvkbgEDhzvKCu0
-         I4wE+xCwi3E4sQg82xzgDabbN0nIIiatODIc0JzkgQsHCLP0t2byVulRvw3kkCl3ZIjf
-         50DaY/Um0+FaEhMZqDFFlHuNCoifAa2c+XA02YV5tV3GCTSZI5FNPK9nVzdkIhdKqr1I
-         PcqoWnCUe74NAdAEugRmn29oGuWQgrc2IgDWSNn/jNQd+QKbUFvRC4+hZPgHD7IJSLyv
-         3DHbeqAutta8+QX072tpU5NVk/5oJvI6ZyZv7u4lgbfmgOl0rxmKK1vhTVDr8sUdKrqp
-         KuQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785498323; x=1786103123;
-        h=content-type:mime-version:date:content-transfer-encoding:subject:to
-         :from:references:in-reply-to:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=FXAhG4vJqgCaP+SaD+oigXn7L+3ul44ZqBjXWjjgnO4=;
-        b=Wy8KRv3HPF3MCBosgHd0MJUr+saJWMsPaC8JaZO2cL77uYzUvJ4weytfOpZSKAo7iu
-         RpPHfHH6/jRS2r4g4uAfXtx9XIK249BgfljIfbqTvLGzyTDcLPWHVlD494lx5i7JeYiM
-         KZAYmIQQ5ldJR8nsthq88Zqssncm1NL9Inu8CgcIyJCV/E/QoHCd/GHvNL1tVB/Irmfl
-         Cifz/k6BZCza46mEspwqyHIhGnKw0Z62k2jcks8bauIQBmPMKL6E5jVdomg0B7CRHNbx
-         aLyAixcam9CKlc3uO6fU7nMIpH92dDuyQkWlsbiGfvdoXSjm8KuY6fYO9XJn/tFYId9G
-         Gs6w==
-X-Gm-Message-State: AOJu0YwzPabn0ZAcr7Kx+zEbAW7hBRrFIu7fpWRnsMHGWrCYFtf1WhWb
-	z4iTMe00pfIgZ7mMyOxCdtMyRAHmO7NOJI7QBylMBYNTzItrxkxffryHn+33emN6WdSr9za60RD
-	LXrrPCA==
-X-Gm-Gg: AR+sD10ftFHhVDFytrA0po9qHPFOyjeBEkuE2t2SmkQ6YcHFmM2t6DaJ+2rt4ELuAoY
-	m4tM07f3m6cNKnCSWfHPSx/zgrDgzEcX/NYvMKoyt80eEsnPd/K7tWA+D2kbR1kItHcBU+kYGO4
-	5G72iD4ABcdhbRPcGXUpfwGDimJ7+QmvpXNMOAcUuzG1pktLXsykUJE0ikdpDGnJMxsfWJ3+arZ
-	1UE0tBFwS2qL/Sok1+FrOM/Wx8eUdlAtn+GKqKrP5NC+2AtwYiajJ56TZclstbvEWz2wTZ59G9I
-	Yy18TvYCkBAr7jFnkS3+f05aW0TgaW5t6QEQUlxW18QoffiQKoulLbExEK1lj4ACzjWt97BorkC
-	PdQmLVUKbOd0KB6KTJcq/2BuVZ1/OJ9iGUU6wiphoHAYs+abjDFXLclTmz3auImYiYehjd8jx9P
-	p6dEX8rsXz4D017wjLbhI681lPJ8tEJ3Lohq5ca0SPTZDCXHTjSTRb5JQ2wowWtQNmI4c4Ta3pK
-	q17mZ8+2/mIA/sE7Dk/NwkLon8jUDSJj5IeCsE5dHXddd+xmKuWvaO/ut9GE21h08cSEqkUAqkO
-	p3dQdkJtj5rTddVnTSPGmsDW08BY8anzh891nPKN
-X-Received: by 2002:a05:622a:17c5:b0:51c:f04:4aa9 with SMTP id d75a77b69052e-52b4af2b25bmr24058551cf.32.1785498323447;
-        Fri, 31 Jul 2026 04:45:23 -0700 (PDT)
-Received: from 019fb7fe-45e4-74f8-8902-d177df85f972.local (ec2-44-222-217-204.compute-1.amazonaws.com. [44.222.217.204])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-52b4e7ee1b7sm6221631cf.5.2026.07.31.04.45.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Jul 2026 04:45:22 -0700 (PDT)
-Message-ID: <019fb7fe-45e4-74f8-8902-d177df85f972@gosalescloserapp.com>
-In-Reply-To: <019fa884-d5bc-7b61-a635-8158a97459d5@gosalescloserapp.com>
-References: <019fa884-d5bc-7b61-a635-8158a97459d5@gosalescloserapp.com>
-X-Mail-Abuse-Inquiries:
- https://app.instantly.ai/privacy/report-abuse/019fb7fe-45e4-74f8-8902-d177df85f972
-From: Emily Cooper <emilycooper@gosalescloserapp.com>
-To: linux-crypto@vger.kernel.org
-Subject: Re: Yale Blockchain Initiative sales
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 31 Jul 2026 11:45:22 +0000
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fe3qVzP0"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 66VBlg4N1670344;
+	Fri, 31 Jul 2026 11:56:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=ZiHYm0Vn6iPnB7kC1HP6qjZTUWsk7r
+	eyzByGz3nxnSE=; b=fe3qVzP0DXBctFT9nOHsgoJ9Lz7ajWtFp5Yw8gAlT0W7AJ
+	Er84am/XBGT0Jybtr7VDBQPydm9FCMGQX2ZuAXynXO5chbFf9IZeS6VbQCju9FEB
+	aMj5rhdDmm0aGkZBEkNkX1Q48V+ueE0utHhIYnap8Zmd2yDCjszRuNu7SqeKeKB2
+	eP9XZvZCijaktZI2a/GT7fnjUq4LaxdlPRSEWo0+8jV8X4j/jlFZEhrJy1aEls8M
+	wt1IFbGqpoNuF0j9FzbzJ4evdnD0U1EqwVAWM8xow1ibRMivbJoU2hxW4NfOOhIO
+	6tEUvSF37KKXGM8iknVVyoPLJUYhBTqeP7/C5Ufw==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fmuyjkte9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 31 Jul 2026 11:56:48 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 66VBfFWY031991;
+	Fri, 31 Jul 2026 11:56:47 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fn7fqqwax-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 31 Jul 2026 11:56:47 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 66VBuhuv27656762
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 31 Jul 2026 11:56:43 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3DD9020043;
+	Fri, 31 Jul 2026 11:56:43 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AA18820040;
+	Fri, 31 Jul 2026 11:56:42 +0000 (GMT)
+Received: from osiris (unknown [9.111.91.157])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Fri, 31 Jul 2026 11:56:42 +0000 (GMT)
+Date: Fri, 31 Jul 2026 13:56:41 +0200
+From: Heiko Carstens <hca@linux.ibm.com>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Holger Dengler <dengler@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v3 1/4] s390/crypto: Replace cond_resched() with msleep(1)
+Message-ID: <20260731115641.8638C01-hca@linux.ibm.com>
+References: <20260730052907.2607026-1-hca@linux.ibm.com>
+ <20260730052907.2607026-2-hca@linux.ibm.com>
+ <20260730101157.GQ49951@noisy.programming.kicks-ass.net>
+ <39570813-27b0-40f9-89c5-8e2dce05e2f0@linux.ibm.com>
+ <20260730124819.GA776954@noisy.programming.kicks-ass.net>
+ <18c36e42-8f96-479c-8152-2da3f5034f04@linux.ibm.com>
+ <20260731084027.GE776954@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260731084027.GE776954@noisy.programming.kicks-ass.net>
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Info: AW1haW4tMjYwNzMxMDA5MCBTYWx0ZWRfX0x2YBMvCcPNp
+ IjBirJ+3LTKdraG7U2MwwPZp5UxRJI0vJ/jir9vewGYa90eO8yzcmx+HLtbZkELwfXUaB6ParVK
+ crDgIRfa6hil5aZgrtG59X3DCxtoZAs=
+X-Proofpoint-GUID: -MpqO2u1bSHw4qQK_5ZrNqFZ1YI0cPbR
+X-Proofpoint-ORIG-GUID: -MpqO2u1bSHw4qQK_5ZrNqFZ1YI0cPbR
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwNzMxMDA5MCBTYWx0ZWRfXwI9SXSmGzTWl
+ JoqC5bOcbHPntMe8Mw/bCXyBKv6l3reBFtATftZkLbf1mKB3Qy+80iFMATicVDCwEvCFEjDXo3Q
+ jNY7PpdTfdS4M4zpw9AImBzuNkdraxaY37S1dklzHqvZod2Z/T21ygX8k5x/+Bohk9KB4QAxIKo
+ No5FIMnPGOWbLjPiWtst+37djz6Rkx/reomLV4+kkX4idBZ5Hd2ZENh5Ti6h/gZ1/NBVZrIvyev
+ E6ty+mqjpLrq+oJHLDOB0b3aI+HccfzWpNCWOoecidjBpT6ViV9LL4TO9G/kcQL+erRN0ptypJ9
+ zP7ooVO7sh7g2z+t3uwfj2vCqoU0UA5tPAOdT9DmKzQnvW5R90ye7imxIwmgbLN9rwJpmkggH4O
+ bBPdnIz/Whq3/IXbJp1B0bpJ6FDf8NEJxYHzxiFQ76K/WlHo0Bj2cgt275KskHY+fKsVTibs/3M
+ B5e/VCBTUCgEor0Fh8w==
+X-Authority-Analysis: v=2.4 cv=X5Vi7mTe c=1 sm=1 tr=0 ts=6a6c8d80 cx=c_pps
+ a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
+ a=kj9zAlcOel0A:10 a=RAioF0-LDSMA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=3mNmA6R7fTEV-jVun7UA:9
+ a=CjuIK1q_8ugA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-07-31_04,2026-07-30_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 impostorscore=0 lowpriorityscore=0 phishscore=0
+ priorityscore=1501 malwarescore=0 spamscore=0 suspectscore=0 bulkscore=0
+ adultscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2607310090
 
-Hi,
+On Fri, Jul 31, 2026 at 10:40:27AM +0200, Peter Zijlstra wrote:
+> On Fri, Jul 31, 2026 at 09:44:57AM +0200, Holger Dengler wrote:
+> 
+> > > Yes, guest migration is very likely far more disruptive than most
+> > > anything else. Perhaps clarify the code comment to include some of this
+> > > explanation?
+> > 
+> > I agree, the comment is not telling all main key points. What about the
+> > following?
+> > 
+> > /*
+> >  * Protected key expired due to relocation to another
+> >  * host. The long runnning re-wrap has no asynchronous
+> >  * completion notification, so polling is required.
+> >  * Trigger a re-schedule of this request by returning
+> >  * -ENOSPC ("hardware queue full") to the crypto engine.
+> >  * To avoid immediately re-invocation of this callback,
+> >  * tell scheduler to voluntarily give up the CPU here.
+> >  */
+> > 
+> > (I would leave it up to Heiko to merge the comment in his series, or let
+> > Harald/me do it in a separate patch)
+> 
+> Right, perhaps something like so, avoiding the endless copy/paste ?
 
-Still curious if managing client calls during volatile markets is a =
-challenge for you.
+I guess there won't be any disagreement. I'll merge your patch, and
+add Holger's explanation to the commit message.
 
-Happy to share a quick example of how fintech teams =
-solved this.
-=C2=A0
-
-On Tue, July 28, 2026 11:38 AM, Emily Cooper =
-<emilycooper@gosalescloserapp.com>
-[emilycooper@gosalescloserapp.com]> =
-wrote:
-
-> Hi,
->=20
-> I know schedules get packed fast.
->=20
-> Would a short call this week make sense to explore how others in crypto =
-use AI for smoother client handling?
->=20
-> On Sat, July 25, 2026 12:13 AM,=
- Emily Cooper <emilycooper@gosalescloserapp.com>
-> [emilycooper@gosalesclos=
-erapp.com]> wrote:
->=20
-> > Hi,
-> >=20
-> > Just checking if you had a =
-chance to think about the AI platform I mentioned.
-> >=20
-> > Would you be open to a quick chat to see if it fits your setup?
-> >=20
-> > On Thu, July 23, 2026 12:04 AM, Emily Cooper <emilycooper@gosalescloser=
-app.com>
-> > [emilycooper@gosalescloserapp.com]> wrote:
-> >=20
-> > > Hi,
-> > >=20
-> > > I noticed how the volatility of Bitcoin=E2=80=99s price can =
-make it tough to stay on top of client communications and leads in the =
-crypto space.
-> > >=20
-> > > An AI-driven platform can help manage calls =
-and meetings smoothly without stretching your current resources.
-> > >=20
-> > > One of our users in fintech found it easier to keep prospects engaged=
- and schedule appointments even during market swings.
-> > >=20
-> > > Would you be open to exploring how this kind of support could fit =
-into your workflow?
-> > >=20
-> > >=20
-> > > Best
-> > > -Emily
-> > >=20
-> > > P.S: let me know if irrelevant.
-> > >
+Thanks!
