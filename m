@@ -1,94 +1,246 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E138F3CB2D2
-	for <linux-crypto@vger.kernel.org>; Fri, 31 Jul 2026 08:38:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BB543C1D77;
+	Fri, 31 Jul 2026 08:40:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785487088; cv=none; b=bI6p4WpdDs/ZzuTeywduxc1/BDdIhqHjJiFXFCm1eoztu0stQX/lSPg+C9hbjGmKMXCL4Yicj5g48XSK2WFplVE1Ms/WgPe5zBYDs1kwz5ggZOBL1y6OF0H1AMwrc4/QixSlA6tIRfR0LE83KXnBFwYQtojU7l3jTlsFDtwsD1U=
+	t=1785487233; cv=none; b=hv3G/f7SUaAwRYGh+nQOwvv7U/Tz+Ae+a0/p4bLqonp5G9q1wu+JOTQbhmYWXe4xY8+uBoJtSPDkhng1xygpd9+IlveGT38RfwClteL0547pESRo3V0aPtOMYMy8dxc1S92ivVSLEZLBsCK2o+Hs6WodGgoa7Ph1PaTifB6NZwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785487088; c=relaxed/simple;
-	bh=8O6OMh3BopzW2o5MbwDKX3oMfe0s8U6FTgbLxMjawwI=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TzOO6IXVwT05I0fgLCXgpzSq5pW1se+E6DJH9pQvIsYDwl1V2/yEKZ2Vt3HZC9zohJUavO5GBwXr9FEybsd3kgbunshxftia6NUqQLKb4M2nOaQvy3AXEr37stHWqSzZuYQqvRUt+4sVM1tGzLIwkLO6ubwP0ZqqQlTjQwOmIoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gtSYGoIT; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785487233; c=relaxed/simple;
+	bh=ds44iI28Wc4D66IfcDT8c4FdgbnPw77gSmI1wjKpFiQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kLdzsxzeFE74TnMDW5H2FZY3rnATigzkJZPVjULyAWRXKedepmFodNzLx3e7WAFjpu+NFTtfyAMefCcapsQniMTD7tgOms0A3bpwt0m+RdrtT1pIgNQiEAR5FYlv/720n6IyYTZxrpiKnXpEnZojNktx2f5psThcsHelSa1b3lA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=uAUBq1iF; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gtSYGoIT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B1291F00ACA
-	for <linux-crypto@vger.kernel.org>; Fri, 31 Jul 2026 08:38:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785487086;
-	bh=8O6OMh3BopzW2o5MbwDKX3oMfe0s8U6FTgbLxMjawwI=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=gtSYGoITe3b22MHTzNq/v3fJEAsuCbWl95oa+4+Vzf6Che4BW5MACzBZYDZS3Kfev
-	 qUjCUyDj1gY1p/uW8zCdUiqEjsxZgvyK9ECz/DMGOkw8CThQsqXoweQqANwoPf7yf9
-	 3iLxuUV5TmsM9fhFIuWLByOgf2GfJtBDdIIjE6xj0bG0BWmO6DUrIdRB7gUMB3CUor
-	 IoOX8vXm/A9rJX00XVkkyaSq9DZTGJkdp9IXmE2hyoNjhAtkqohK9vzVH7LnVbVThX
-	 mSii7zo+WLqPl8FuzhkbbO4rmIxFmUoGmWeuBvuPxzTgcAdzCG7ytPzB0aU353Ft4w
-	 ZTV129mksJmoQ==
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-39f75e0a2f1so5461951fa.2
-        for <linux-crypto@vger.kernel.org>; Fri, 31 Jul 2026 01:38:06 -0700 (PDT)
-X-Gm-Message-State: AOJu0YzQrj6yq06OPxg8JbhgcaJHe35ox1nAprRJhN+wpMAt6h02/w9L
-	+WtRp86y7Ptub3spX6P5AT5WtgWS/BmgkMJOHeVINcFCogX/aAA36MyW59n81eXi2DhLeDvF0hy
-	FFLYbD95aAD+lDfSMNRJDMKjNaQUG8bvCihf8o5mxgw==
-X-Received: by 2002:a05:651c:a210:10b0:39e:ed52:cfdf with SMTP id
- 38308e7fff4ca-39f7e3e8a4emr1674701fa.20.1785487085323; Fri, 31 Jul 2026
- 01:38:05 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Fri, 31 Jul 2026 08:38:03 +0000
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Fri, 31 Jul 2026 08:38:03 +0000
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20260729110455.641256-1-kuldeep.singh@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="uAUBq1iF"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=r/qGoNIohrY8ij2fwbNJ/9+VeZ6hLMfnsAJ2pWL10YM=; b=uAUBq1iFgqWHEFFMCTFLwNHiRU
+	yI4/VNxp4SvmfMJpz3uUiHSCwRPdqDyGDe5eeQmfYjkm//ybxnr4sd1iOpxRRGdXMr702jsahK2id
+	R+rCuijl6eRizt6Gk1vvDILFOkKFrjoKaDCbLaDJlu+5yjkn1nXZ+hcvxnpBREpOua5k/163x/ulv
+	ne2D67ZtwcJwCB3uRi/tLHgAJKrX9moXMD1fxiybzaOGQZ3UKSy9FMChBZasepC+8q65IgT5jadoR
+	7YjEVUR0aC5C/BQp5TBBKdvoaZpY+KHcZCld6lEm6eRXldGuJL9m8WIR86dksZ0/JID4wJ+PrtrG6
+	sTdM6GGQ==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1wpin5-0000000FUqI-2l2R;
+	Fri, 31 Jul 2026 08:40:27 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 11CD83004C9; Fri, 31 Jul 2026 10:40:27 +0200 (CEST)
+Date: Fri, 31 Jul 2026 10:40:27 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Holger Dengler <dengler@linux.ibm.com>
+Cc: Heiko Carstens <hca@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Harald Freudenberger <freude@linux.ibm.com>,
+	Vineeth Vijayan <vneethv@linux.ibm.com>,
+	Peter Oberparleiter <oberpar@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v3 1/4] s390/crypto: Replace cond_resched() with msleep(1)
+Message-ID: <20260731084027.GE776954@noisy.programming.kicks-ass.net>
+References: <20260730052907.2607026-1-hca@linux.ibm.com>
+ <20260730052907.2607026-2-hca@linux.ibm.com>
+ <20260730101157.GQ49951@noisy.programming.kicks-ass.net>
+ <39570813-27b0-40f9-89c5-8e2dce05e2f0@linux.ibm.com>
+ <20260730124819.GA776954@noisy.programming.kicks-ass.net>
+ <18c36e42-8f96-479c-8152-2da3f5034f04@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260729110455.641256-1-kuldeep.singh@oss.qualcomm.com>
-Date: Fri, 31 Jul 2026 08:38:03 +0000
-X-Gmail-Original-Message-ID: <CAMRc=MfYYCE7XhUWsaQbsFpeWf3HGhRqhb9gmcUJcHz77YUuhA@mail.gmail.com>
-X-Gm-Features: AUfX_mxy7QItm5GTEtQowQ4yrii-Id3OiyLlizpmaw3u7Qdo6Dyo3jCNfq241Oo
-Message-ID: <CAMRc=MfYYCE7XhUWsaQbsFpeWf3HGhRqhb9gmcUJcHz77YUuhA@mail.gmail.com>
-Subject: Re: [Patch v9] crypto: qce - Add runtime PM and interconnect
- bandwidth scaling support
-To: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
-Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Udit Tiwari <udit.tiwari@oss.qualcomm.com>, 
-	Pankaj Patil <pankaj.patil@oss.qualcomm.com>, Bartosz Golaszewski <brgl@kernel.org>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <18c36e42-8f96-479c-8152-2da3f5034f04@linux.ibm.com>
 
-On Wed, 29 Jul 2026 13:04:55 +0200, Kuldeep Singh
-<kuldeep.singh@oss.qualcomm.com> said:
-> From: Udit Tiwari <udit.tiwari@oss.qualcomm.com>
->
-> The Qualcomm Crypto Engine (QCE) driver currently lacks support for
-> runtime power management (PM) and interconnect bandwidth control.
-> As a result, the hardware remains fully powered and clocks stay
-> enabled even when the device is idle. Additionally, static
-> interconnect bandwidth votes are held indefinitely, preventing the
-> system from reclaiming unused bandwidth.
->
-> Address this by enabling runtime PM and dynamic interconnect
-> bandwidth scaling to allow the system to suspend the device when idle
-> and scale interconnect usage based on actual demand. Improve overall
-> system efficiency by reducing power usage and optimizing interconnect
-> resource allocation.
->
-> Signed-off-by: Udit Tiwari <udit.tiwari@oss.qualcomm.com>
-> Tested-by: Pankaj Patil <pankaj.patil@oss.qualcomm.com>
-> Signed-off-by: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
-> ---
+On Fri, Jul 31, 2026 at 09:44:57AM +0200, Holger Dengler wrote:
 
-This works and looks correct to me. I'd like to see it applied but I guess we
-need to first settle the debate about this driver's fate.
+> > Yes, guest migration is very likely far more disruptive than most
+> > anything else. Perhaps clarify the code comment to include some of this
+> > explanation?
+> 
+> I agree, the comment is not telling all main key points. What about the
+> following?
+> 
+> /*
+>  * Protected key expired due to relocation to another
+>  * host. The long runnning re-wrap has no asynchronous
+>  * completion notification, so polling is required.
+>  * Trigger a re-schedule of this request by returning
+>  * -ENOSPC ("hardware queue full") to the crypto engine.
+>  * To avoid immediately re-invocation of this callback,
+>  * tell scheduler to voluntarily give up the CPU here.
+>  */
+> 
+> (I would leave it up to Heiko to merge the comment in his series, or let
+> Harald/me do it in a separate patch)
 
-FWIW:
+Right, perhaps something like so, avoiding the endless copy/paste ?
 
-Acked-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-Tested-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
-
-Thanks,
-Bartosz
+---
+diff --git a/arch/s390/crypto/paes_s390.c b/arch/s390/crypto/paes_s390.c
+index 8cfe6166c193..973436592318 100644
+--- a/arch/s390/crypto/paes_s390.c
++++ b/arch/s390/crypto/paes_s390.c
+@@ -548,16 +548,7 @@ static int ecb_paes_do_one_request(struct crypto_engine *engine, void *areq)
+ 
+ 	rc = ecb_paes_do_crypt(ctx, req_ctx, tested, true);
+ 	if (rc == -EKEYEXPIRED) {
+-		/*
+-		 * Protected key expired, conversion is in process.
+-		 * Trigger a re-schedule of this request by returning
+-		 * -ENOSPC ("hardware queue is full") to the crypto engine.
+-		 * To avoid immediately re-invocation of this callback,
+-		 * tell the scheduler to voluntarily give up the CPU here.
+-		 */
+-		cond_resched();
+-		pr_debug("rescheduling request\n");
+-		return -ENOSPC;
++		return pkey_handle_expired();
+ 	} else if (rc) {
+ 		skcipher_walk_done(walk, rc);
+ 	}
+@@ -814,16 +805,7 @@ static int cbc_paes_do_one_request(struct crypto_engine *engine, void *areq)
+ 
+ 	rc = cbc_paes_do_crypt(ctx, req_ctx, tested, true);
+ 	if (rc == -EKEYEXPIRED) {
+-		/*
+-		 * Protected key expired, conversion is in process.
+-		 * Trigger a re-schedule of this request by returning
+-		 * -ENOSPC ("hardware queue is full") to the crypto engine.
+-		 * To avoid immediately re-invocation of this callback,
+-		 * tell the scheduler to voluntarily give up the CPU here.
+-		 */
+-		cond_resched();
+-		pr_debug("rescheduling request\n");
+-		return -ENOSPC;
++		return pkey_handle_expired();
+ 	} else if (rc) {
+ 		skcipher_walk_done(walk, rc);
+ 	}
+@@ -1122,16 +1104,7 @@ static int ctr_paes_do_one_request(struct crypto_engine *engine, void *areq)
+ 
+ 	rc = ctr_paes_do_crypt(ctx, req_ctx, tested, true);
+ 	if (rc == -EKEYEXPIRED) {
+-		/*
+-		 * Protected key expired, conversion is in process.
+-		 * Trigger a re-schedule of this request by returning
+-		 * -ENOSPC ("hardware queue is full") to the crypto engine.
+-		 * To avoid immediately re-invocation of this callback,
+-		 * tell the scheduler to voluntarily give up the CPU here.
+-		 */
+-		cond_resched();
+-		pr_debug("rescheduling request\n");
+-		return -ENOSPC;
++		return pkey_handle_expired();
+ 	} else if (rc) {
+ 		skcipher_walk_done(walk, rc);
+ 	}
+@@ -1565,16 +1538,7 @@ static int xts_paes_do_one_request(struct crypto_engine *engine, void *areq)
+ 
+ 	rc = xts_paes_do_crypt(ctx, req_ctx, tested, true);
+ 	if (rc == -EKEYEXPIRED) {
+-		/*
+-		 * Protected key expired, conversion is in process.
+-		 * Trigger a re-schedule of this request by returning
+-		 * -ENOSPC ("hardware queue is full") to the crypto engine.
+-		 * To avoid immediately re-invocation of this callback,
+-		 * tell the scheduler to voluntarily give up the CPU here.
+-		 */
+-		cond_resched();
+-		pr_debug("rescheduling request\n");
+-		return -ENOSPC;
++		return pkey_handle_expired();
+ 	} else if (rc) {
+ 		skcipher_walk_done(walk, rc);
+ 	}
+diff --git a/arch/s390/crypto/phmac_s390.c b/arch/s390/crypto/phmac_s390.c
+index 03ca33ffe6cc..020a1beb2e22 100644
+--- a/arch/s390/crypto/phmac_s390.c
++++ b/arch/s390/crypto/phmac_s390.c
+@@ -887,16 +887,7 @@ static int phmac_do_one_request(struct crypto_engine *engine, void *areq)
+ 	case OP_FINUP:
+ 		rc = phmac_kmac_update(req, true);
+ 		if (rc == -EKEYEXPIRED) {
+-			/*
+-			 * Protected key expired, conversion is in process.
+-			 * Trigger a re-schedule of this request by returning
+-			 * -ENOSPC ("hardware queue full") to the crypto engine.
+-			 * To avoid immediately re-invocation of this callback,
+-			 * tell scheduler to voluntarily give up the CPU here.
+-			 */
+-			pr_debug("rescheduling request\n");
+-			cond_resched();
+-			return -ENOSPC;
++			return pkey_handle_expired();
+ 		} else if (rc) {
+ 			hwh_advance(hwh, rc);
+ 			goto out;
+@@ -907,18 +898,8 @@ static int phmac_do_one_request(struct crypto_engine *engine, void *areq)
+ 		fallthrough;
+ 	case OP_FINAL:
+ 		rc = phmac_kmac_final(req, true);
+-		if (rc == -EKEYEXPIRED) {
+-			/*
+-			 * Protected key expired, conversion is in process.
+-			 * Trigger a re-schedule of this request by returning
+-			 * -ENOSPC ("hardware queue full") to the crypto engine.
+-			 * To avoid immediately re-invocation of this callback,
+-			 * tell scheduler to voluntarily give up the CPU here.
+-			 */
+-			pr_debug("rescheduling request\n");
+-			cond_resched();
+-			return -ENOSPC;
+-		}
++		if (rc == -EKEYEXPIRED)
++			return pkey_handle_expired();
+ 		break;
+ 	default:
+ 		/* unknown/unsupported/unimplemented asynch op */
+diff --git a/arch/s390/include/asm/pkey.h b/arch/s390/include/asm/pkey.h
+index 0af5ac4f646b..9c5f31b50bc8 100644
+--- a/arch/s390/include/asm/pkey.h
++++ b/arch/s390/include/asm/pkey.h
+@@ -13,6 +13,7 @@
+ 
+ #include <linux/ioctl.h>
+ #include <linux/types.h>
++#include <linux/delay.h>
+ #include <uapi/asm/pkey.h>
+ 
+ /*
+@@ -44,4 +45,20 @@ int pkey_key2protkey(const u8 *key, u32 keylen,
+  */
+ #define PKEY_XFLAG_NOCLEARKEY 0x0002
+ 
++static inline int pkey_handle_expired(void)
++{
++	/*
++	 * Protected key expired due to relocation to another
++	 * host. The long runnning re-wrap has no asynchronous
++	 * completion notification, so polling is required.
++	 * Trigger a re-schedule of this request by returning
++	 * -ENOSPC ("hardware queue full") to the crypto engine.
++	 * To avoid immediately re-invocation of this callback,
++	 * tell scheduler to voluntarily give up the CPU here.
++	 */
++	msleep(1);
++	pr_debug("rescheduling request\n");
++	return -ENOSPC;
++}
++
+ #endif /* _KAPI_PKEY_H */
