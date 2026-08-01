@@ -1,90 +1,111 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D543232BF24;
-	Sat,  1 Aug 2026 06:37:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF72736215F
+	for <linux-crypto@vger.kernel.org>; Sat,  1 Aug 2026 08:44:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785566277; cv=none; b=NhvIP5aUsyc1RDpOjvXWOopifF7aQmOpBSon5/EpFO10QSf1+PDKAjJLCgW+VE3HsTnMfGLA8AZk8SvL6KxiBQk/ZSYco6gcMbIA/DMm+v5Zb5ZOgPU9B+UDcEBVv48OZOSgvEmxrjhm6OFAGEyuo7V4ocuFjd28nwzA+p8Fy6w=
+	t=1785573883; cv=none; b=X7Bw7gTnuEP9aOeYNNgeUL1p57iUux/UPxHNf6bX8/uCtd58gpW8P79unyGawAVe5q8sSsxzxDJqj7d0sZ/WNNm00VCX4+TqI4ShHTnM8sz9MnV5f3bFtaK04EkYp3xDrlvo7zVeT9pghVpQNA1oNUds8b06q7bO9hX2Ss3HHaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785566277; c=relaxed/simple;
-	bh=1RDZmT/kS0KFC+9rNt2wvTATXiq502viz8PdaPVBZXI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fuxZRgudHEFxJIEmyzsxy8S32di6RmlGePdMiOauSagoM0vuPPuR2ZGxja+Ff+d/oKkcTaEqanwpREbrs/uAmEvfdoAQZoQj3oYC4KSPOZLlb+2wslhs6zpd7TI6oJb2zCaYC0WgnGePI8D9RhnEy+An5mu45nsPf1lijT93okE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Cs2qS1IJ; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1785573883; c=relaxed/simple;
+	bh=niUIx/UFHwrX4oD4miH2nO6hyJUo39LBaahdeKa4TwQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=QnMxnPQ12oEgzfT/+f2UWVFSVBSFCuz60j8jszCUyoTk4zstHzTSZ6ln7CHeyeIBKn3inYhzszyI7dWBvuGxtRtcPDmsmZ4nTxRJRSRlMn7uQF1fVAoWhxckuoVpOjyAPME1t/PXTeDRPXvpay4fa7kMIrcZYhC9Pa/Nz3rMLY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=fNOWo+Kj; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Cs2qS1IJ"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=A8LvQdS8Pj1q8fc7C1zUYWf8H3KJfOVv18nl+GhEBZw=; 
-	b=Cs2qS1IJjnos+ihwzJh4ZYphgHJGN0AY1Pk5D8kGTdbHtyD2TQxlb7SgtPh4HcEl/Y2q1RjxVUy
-	vKvE7pWHBnlJZSW+5pVFwIu+zdkCQROktV4xAdpT8Hw57rhWZSK80eEH1Ra2bC3CS/5DHuF/OdrBc
-	sH9va4/PkvaQqSYXmp2Fiv34HDziQEC32tCduRaUz44vv681qEdm94r+Z9iQhl8PDDzF6Qh/nqy6Z
-	zy1ujqihT+HLNxgOnULrictWKcf2D6AXJHGU8UyYNH+M/qmjwdc87olqyKK2LWDkdDRsl4yBQKAup
-	eEvw+EQLhBerNcxTGUm03itXPf/pgHWWa/Jg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wq3Lm-000000015kP-1Vm1;
-	Sat, 01 Aug 2026 14:37:39 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 01 Aug 2026 16:37:38 +1000
-Date: Sat, 1 Aug 2026 16:37:38 +1000
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Changwei Zou <changwei.zou@canonical.com>
-Cc: lukas@wunner.de, Martin.Kepplinger-Novakovic@ginzinger.com,
-	davem@davemloft.net, ignat@linux.win, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, martink@posteo.de
-Subject: Re: [PATCH v5] crypto: rsassa-pkcs1 - Avoid cacheline sharing with
- underlying driver
-Message-ID: <am2UMhd5CAhDiKBF@gondor.apana.org.au>
-References: <20260731024446.786329-1-changwei.zou@canonical.com>
+	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="fNOWo+Kj"
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 623293FC06
+	for <linux-crypto@vger.kernel.org>; Sat,  1 Aug 2026 08:44:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20251003; t=1785573873;
+	bh=T5Xrw7hWprPHD+K8Ys/wZmplEop9g7+IGzu4/Ejaun8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version;
+	b=fNOWo+KjW8W2tz6++VaLy1HrUXPRP5ztf+AH8Gx7rc6yD9f2e9YsJOE3sd8q06QhG
+	 fAfnl1+sGCqT5LCQbyyVWCO4yy8f9ioxcATM7PL0tl8bE8bteMM8ExQnuTRr8PF/4L
+	 3iKJcaHrL2SyOLOHi/vVikQZPo/UKy1ILkEoGJMA9hmpmfzKv64RhnK8myG9VZUQ0s
+	 DGAfV850VrxVEdt30RY4yoGhvc4Ny7n1ogQ+X4rR3g4evX4qmMX4xKF4dtmaIW5p9A
+	 lh4/1AT7/zbJijmzfw5tT2RMPA3pIw6XLrllH4b3QOCVZSEgLnhSLXgqpcMqeuwdf3
+	 7P4lZU1RAbXe2nvbxV2yCTInckaQ17cVei/teKKsUg+U774HVbJznP0uqGSc/7rV2A
+	 It+6Y3Pep4Jkn5bJ76hwOBJL+FWRb/D/B8BsowVyZLJIG6BrWf7b7TVAMr3N1ERTMg
+	 MsXSfSy9nLFmBjeGaLbIhp7O9mEt7RVNARUA9PhXR1gQKRrbjo1FgUCXws9FWzfKdA
+	 imhx9IlaENUl2Ew4QuRYDflH1yIA3E8hOePlG/MOHDkmaTy+89E3gOQujayeZNqQ08
+	 NzZqkuVuDQ1rnvI32HnC8/+Wgi56/qxuhmcLRASvZhctOohG7Qd8EAY5ZAzb/+43Z8
+	 Gfqk0Ei5N5KY3J2cOXCQMh+s=
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2cce14a21faso22394025ad.0
+        for <linux-crypto@vger.kernel.org>; Sat, 01 Aug 2026 01:44:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785573871; x=1786178671;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=T5Xrw7hWprPHD+K8Ys/wZmplEop9g7+IGzu4/Ejaun8=;
+        b=NhUAPmGLO5Hi6ucard2e/Yq9ZzXVOoTJFLEJOrdINTnvmVgSwhx5H9B8Y80VAq7K7S
+         Pw8fRx7cf6JrSrjduRkHCQI17HPnz0tTtnRFoqXioFpHFIq0GwzGXLeppPcZdK4U/3SF
+         kT5Xunbck11EbgkY3CIBC7NpKLtsCh1wUodBB1jfvi0HIqT4JLZPP6r9hmYlkBTiT9md
+         nLNkJjD4n66GN+bjXg9s3AHL/7aSEUDt6Xv7ndnyvyoP2yyfaM7IoA1Efyg9+rxQIbsZ
+         PWMxVKBXfC0HnfFEdLE7KSRPbZuSGgfprR78sxFDxC6UfNxuIK80ijKsWGZsEwQvd74Z
+         igHQ==
+X-Forwarded-Encrypted: i=1; AHgh+RrsIEENuuUlj1Hvr1aToCei3hOjG0UFlC/oz1ItEm4uPDy1vdeL6u0oGv5FvSTKFdTtTdabO8Eg1SouI8g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJ4UZBmnpyJXiZs7CySR09POKSCKodrhoQ94/b9iISIyKQ2Ih4
+	7W/07Y3spbQUJJchvEkr+fRQmvuZ4MQticDOm3k7FPDWgwS/NupEQnqEJDABGLvTWagYvrXIsmU
+	OPacY7gFGSzfvCkyKHriG+9D83eBMB8j4eBAT75ZEE7QZ4vVNlMK0wJ9JpFhfjdarKaOh0eRzXl
+	ctm1CrTQ==
+X-Gm-Gg: AR+sD11BkKJzb9onL1WE5EG2qHSjl5+pslm4VMc5NfseiN+V4Hk6wbFnOuE9P938BUh
+	tYqHGNXjwVJkclAhbJPGmE1LBcz0J131BQDqV7RD9idlFGhorjdIiEx9HmGn3kuX5/AwWeeCaGT
+	xMJVkSpzDH00t8unUYmhB2NO4kNZcMUm7tC8e6cWWvjtWTAC/Ea5O2OigCZ/CN8RzBRtOgPsbEO
+	Q5J6BZm8OMyRamAxAdLcektQ8JmGfLO3HuvjXdrDJ85GLFgFaegYZygNjRw0+8DyvQR52gTjWy2
+	5VbYEldM0PaYqs7BR/3/TH8ai/y8drNK5mVRpXDRK5R8XOvryHS8Fao4BG30qwtxe6InT0hRJLm
+	jm5IKWCSzT1M=
+X-Received: by 2002:a17:902:e551:b0:2cc:92ae:b36 with SMTP id d9443c01a7336-2d047e88baemr43813785ad.24.1785573871525;
+        Sat, 01 Aug 2026 01:44:31 -0700 (PDT)
+X-Received: by 2002:a17:902:e551:b0:2cc:92ae:b36 with SMTP id d9443c01a7336-2d047e88baemr43813655ad.24.1785573871108;
+        Sat, 01 Aug 2026 01:44:31 -0700 (PDT)
+Received: from ZBook.gateway ([123.208.39.53])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3153dd9c1casm14633037eec.10.2026.08.01.01.44.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 01 Aug 2026 01:44:30 -0700 (PDT)
+From: Changwei Zou <changwei.zou@canonical.com>
+To: herbert@gondor.apana.org.au
+Cc: Martin.Kepplinger-Novakovic@ginzinger.com,
+	changwei.zou@canonical.com,
+	davem@davemloft.net,
+	ignat@linux.win,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lukas@wunner.de,
+	martink@posteo.de
+Subject: Re: [PATCH v5] crypto: rsassa-pkcs1 - Avoid cacheline sharing with underlying driver
+Date: Sat,  1 Aug 2026 18:44:23 +1000
+Message-ID: <20260801084423.10948-1-changwei.zou@canonical.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <am2UMhd5CAhDiKBF@gondor.apana.org.au>
+References: <am2UMhd5CAhDiKBF@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260731024446.786329-1-changwei.zou@canonical.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jul 31, 2026 at 12:44:46PM +1000, Changwei Zou wrote:
-> out_buf is used as a DMA buffer for the RSA verification operation.
-> If it is not aligned to CRYPTO_DMA_ALIGN, cacheline sharing
-> problems (data corruption) would occur on CPUs with DMA-incoherent caches,
-> leading to -EKEYREJECTED.
-> 
-> Rename out_buf to buf, as it serves as both the input and output buffer.
-> Add a buf_ptr pointer to track its position.
-> 
-> Allocate the buffer separately via kmalloc(), which guarantees cacheline
-> alignment on architectures without fully coherent DMA.
-> This acts as a defensive measure, and avoids the need for an extra copy
-> in the underlying driver, which should check alignment before supplying
-> buffers to the hardware.
-> 
-> The intermittent error 'Key was rejected by service' on i.MX8 with CAAM
-> can be triggered when loading signed kernel modules.
-> 
->     for i in $(seq 1 100); do
->         sudo modprobe xfs 2>&1 && echo "SUCCESS on attempt $i" \
->         && sudo rmmod xfs || echo "FAILED on attempt $i"
->     done
-> 
-> Signed-off-by: Changwei Zou <changwei.zou@canonical.com>
-> ---
->  crypto/rsassa-pkcs1.c | 31 ++++++++++++++++---------------
->  1 file changed, 16 insertions(+), 15 deletions(-)
+Hi Herbert,
 
-In the Crypto API we don't ask the user to provide aligned data.
+Please see the CAAM driver shown below.
+Thank you very much for your guidance and support.
 
-In general it's the driver's responsibility to ensure proper
-alignment.  Which driver are we talking about here?
+	(gdb) bt
+	#0  rsa_edesc_alloc () at drivers/crypto/caam/caampkc.c:294
+	#1  caam_rsa_enc () at drivers/crypto/caam/caampkc.c:733
+	#2  crypto_akcipher_encrypt () at include/crypto/akcipher.h:279
+	#3  rsassa_pkcs1_verify () at crypto/rsassa-pkcs1.c:266
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Kind regards,
+Changwei
+
