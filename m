@@ -1,131 +1,90 @@
-Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DD5625A645
-	for <linux-crypto@vger.kernel.org>; Fri, 31 Jul 2026 21:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D543232BF24;
+	Sat,  1 Aug 2026 06:37:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785532845; cv=none; b=FIhhgMjtfogEf8+HsEbKWPrTZe86YsHu8PHrGNA9WBiYE139sJMYnFRH/Goyg2BSh9ra4C0ULsPCZMa7s2u55Xohw9782pQRkfnM6Xn5QVq6rdobvPOIqYkD76waduGvRwBqpzszvby6Ew+AV4LDdAhnDZBVfclS6GHh6eN/Fuk=
+	t=1785566277; cv=none; b=NhvIP5aUsyc1RDpOjvXWOopifF7aQmOpBSon5/EpFO10QSf1+PDKAjJLCgW+VE3HsTnMfGLA8AZk8SvL6KxiBQk/ZSYco6gcMbIA/DMm+v5Zb5ZOgPU9B+UDcEBVv48OZOSgvEmxrjhm6OFAGEyuo7V4ocuFjd28nwzA+p8Fy6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785532845; c=relaxed/simple;
-	bh=9FQDOlU1gledsJqoFg9ZYijhrVegoEUbjHlCF9abtqk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=U0bF6tFgn68YiZ6dfx2cl7N25CKgetia85DENyQCw2eMEYXiAtZ3JAwewE0az5Knos8xbnkWTLzKPBjZZnvrO/d+oyfb8th+T6fTcQwKj4HX11YTApnhcLOEuLOJdlrt4xuyz1TNz+SAwxkPh1P+iGE8PayQ50j+qFDDra5GNdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TvKNUd32; arc=none smtp.client-ip=209.85.210.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1785566277; c=relaxed/simple;
+	bh=1RDZmT/kS0KFC+9rNt2wvTATXiq502viz8PdaPVBZXI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fuxZRgudHEFxJIEmyzsxy8S32di6RmlGePdMiOauSagoM0vuPPuR2ZGxja+Ff+d/oKkcTaEqanwpREbrs/uAmEvfdoAQZoQj3oYC4KSPOZLlb+2wslhs6zpd7TI6oJb2zCaYC0WgnGePI8D9RhnEy+An5mu45nsPf1lijT93okE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=Cs2qS1IJ; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TvKNUd32"
-Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-7ee125ec926so1009127a34.2
-        for <linux-crypto@vger.kernel.org>; Fri, 31 Jul 2026 14:20:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785532843; x=1786137643; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=n4JOK41iwaTAdDnA7te0VNHLVG0HdhI8vu6z3ZFBIoE=;
-        b=TvKNUd32SD8F/dh5xsvaQ0udJM+1cHSo/qtZnVPywOOtVejbG0jz1chqdQvt8doQua
-         V2+UZTme2ed7L0nLq9PyTMKUZOxvJ1WUsu0CcBcui0rq9UskHgUCVh+uGdycl/QrELhC
-         6tZIDkIxXxt3KVeR9aCdWF54XpIcUjB5mSYIkXG8gqQ4uczYUsc0uj3wuhVN/fJ0fV2u
-         X1nJ+5uI0VFN0xCKs0gGImwb2htbUXMEXB5XzLwb8GUsiKUbEgMM6kVlaUa2mjcCy9u/
-         mjwU+nksyWEmZWScGvVo0lMuf/FRutP0/QILGacth0T4fTk10nTW0gcc+GWAI4RQARNL
-         luhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785532843; x=1786137643;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=n4JOK41iwaTAdDnA7te0VNHLVG0HdhI8vu6z3ZFBIoE=;
-        b=BaaeOeTSDy+F45Wbp/RA18K539/pqZT8lnaD8sKFL9m+054+pIhCABSNjE6NDXa42v
-         USIIlSttEclMBuegywU88uIohkyWdD72SOQ9Bnoxwfho17dpLOqhO5IIVuK5qaK08lRQ
-         MOuoc25EjAQ/zyGuheGLYBSxrMuXQPXzaZqheggDAo8C+t5XXudhURxM8N/UIM1VBrYX
-         Nhj+eWfOJ2VX9hfeXuICHJ84d/xV06Er1YNCxcgTLLmoXdj1L1CUOvUiWNMto6bvWMIm
-         ZmLu0YScvv5RIf8z+9OkfgREvMPYdalva8pi7NTLwAa5np6uSC9DcAejkm5e2uo8UFZp
-         oGpw==
-X-Gm-Message-State: AOJu0YzxNMbNMpXfVYJgj0nj3BNgrlkGU+rxJgti4dQ15zSyAU4tOXu0
-	e6pkjsIhqqDMBHkxSR15ieCR76xc0lq1yKFk5rMJZTiLRP7X6P1SB7GJHdosOA==
-X-Gm-Gg: AR+sD12qknr7o8QjUMEIAfBhWTPbfD2lCyLMj2cyGQfMOPe7R/p0ofzr4fzzr1LyETB
-	3hfQtf5vmC+jCCdS+5qLTdkAVwehj4/hQugMIyd28f/kADFYHTeFLFzdL6BYdqq40H2vVDE3uqy
-	S0R6ZyiySg7dmhyooDm4b3eUMzfhF0xYx73MM36WuiXibkTpmvdH8yqf9XEbbEHKp+y3g7z02Fk
-	UCD3Ie4zBxn9tnOTRT39EvElnC1P0RMs84mrmeheoMMhzYqdRmGnh3qiyMVxLZJxT5goqcrjWfU
-	b80B8ZK/d1pCSwPRwP5TURT8/+OJRU3pZ6JhlzfMroQPKKj8WiX4kW3NJSimkmFGZh820pR4HzJ
-	BbUheo62JH9y8RhrJAyq/jjnIhNWMZVqrn6LH4AqwwBmk1H+jo1/AFsYKq+J3Oyl0+oXM5BXGHO
-	tsiT3lK8KHDvWS9LM5riJofDkACcto8vV1przAA1GKgvRzC0zEI9mmRVLQWgi0KyPN6EGdlicbU
-	jcwVk/442f+lxtki04vvvjxx6IkfA3S4iPfsonKXLg7smbomvOO4ZbO97qIn/5WikwpOzBevUww
-	om5oxkjYPThpaWZ07fw0wRsYIusU8niq2h+EwFcYcpjm2r1S
-X-Received: by 2002:a05:6820:5047:b0:6a1:8125:ffd with SMTP id 006d021491bc7-6ae43372e90mr2647420eaf.30.1785532842916;
-        Fri, 31 Jul 2026 14:20:42 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8000:7a86::e34])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-458f66c1d89sm2055758fac.13.2026.07.31.14.20.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Jul 2026 14:20:42 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: linux-crypto@vger.kernel.org
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH] crypto: amcc - fix missing DMA memory barriers in descriptor handling
-Date: Fri, 31 Jul 2026 14:20:40 -0700
-Message-ID: <20260731212040.22764-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="Cs2qS1IJ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=A8LvQdS8Pj1q8fc7C1zUYWf8H3KJfOVv18nl+GhEBZw=; 
+	b=Cs2qS1IJjnos+ihwzJh4ZYphgHJGN0AY1Pk5D8kGTdbHtyD2TQxlb7SgtPh4HcEl/Y2q1RjxVUy
+	vKvE7pWHBnlJZSW+5pVFwIu+zdkCQROktV4xAdpT8Hw57rhWZSK80eEH1Ra2bC3CS/5DHuF/OdrBc
+	sH9va4/PkvaQqSYXmp2Fiv34HDziQEC32tCduRaUz44vv681qEdm94r+Z9iQhl8PDDzF6Qh/nqy6Z
+	zy1ujqihT+HLNxgOnULrictWKcf2D6AXJHGU8UyYNH+M/qmjwdc87olqyKK2LWDkdDRsl4yBQKAup
+	eEvw+EQLhBerNcxTGUm03itXPf/pgHWWa/Jg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1wq3Lm-000000015kP-1Vm1;
+	Sat, 01 Aug 2026 14:37:39 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 01 Aug 2026 16:37:38 +1000
+Date: Sat, 1 Aug 2026 16:37:38 +1000
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Changwei Zou <changwei.zou@canonical.com>
+Cc: lukas@wunner.de, Martin.Kepplinger-Novakovic@ginzinger.com,
+	davem@davemloft.net, ignat@linux.win, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, martink@posteo.de
+Subject: Re: [PATCH v5] crypto: rsassa-pkcs1 - Avoid cacheline sharing with
+ underlying driver
+Message-ID: <am2UMhd5CAhDiKBF@gondor.apana.org.au>
+References: <20260731024446.786329-1-changwei.zou@canonical.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260731024446.786329-1-changwei.zou@canonical.com>
 
-Fix two memory ordering bugs in the AMCC crypto driver:
+On Fri, Jul 31, 2026 at 12:44:46PM +1000, Changwei Zou wrote:
+> out_buf is used as a DMA buffer for the RSA verification operation.
+> If it is not aligned to CRYPTO_DMA_ALIGN, cacheline sharing
+> problems (data corruption) would occur on CPUs with DMA-incoherent caches,
+> leading to -EKEYREJECTED.
+> 
+> Rename out_buf to buf, as it serves as both the input and output buffer.
+> Add a buf_ptr pointer to track its position.
+> 
+> Allocate the buffer separately via kmalloc(), which guarantees cacheline
+> alignment on architectures without fully coherent DMA.
+> This acts as a defensive measure, and avoids the need for an extra copy
+> in the underlying driver, which should check alignment before supplying
+> buffers to the hardware.
+> 
+> The intermittent error 'Key was rejected by service' on i.MX8 with CAAM
+> can be triggered when loading signed kernel modules.
+> 
+>     for i in $(seq 1 100); do
+>         sudo modprobe xfs 2>&1 && echo "SUCCESS on attempt $i" \
+>         && sudo rmmod xfs || echo "FAILED on attempt $i"
+>     done
+> 
+> Signed-off-by: Changwei Zou <changwei.zou@canonical.com>
+> ---
+>  crypto/rsassa-pkcs1.c | 31 ++++++++++++++++---------------
+>  1 file changed, 16 insertions(+), 15 deletions(-)
 
-1. In crypto4xx_bh_tasklet_cb(), add a dma_rmb() between reading the
-   PD_CTL_PE_DONE bit (with READ_ONCE) and reading the descriptor and DMA
-   buffer data in crypto4xx_pd_done().  Without it, the CPU on a
-   weakly-ordered architecture could read stale descriptor data before the
-   hardware's writes are globally visible.
+In the Crypto API we don't ask the user to provide aligned data.
 
-2. In crypto4xx_build_pd(), add a dma_wmb() before writing
-   PD_CTL_HOST_READY to ensure all descriptor and SA data is visible to
-   the device before the ownership handover bit.  Also fix the descriptor
-   field ordering: pd_ctl_len.w must be written before pd_ctl.w (which
-   contains HOST_READY), not after, to prevent the hardware from fetching
-   uninitialized length data.
+In general it's the driver's responsibility to ensure proper
+alignment.  Which driver are we talking about here?
 
-Fixes: f6c48b76daa6 (crypto: amcc - Add crypto4xx-aead cryptographic
-  AEAD accelerator driver)
-Cc: stable@vger.kernel.org
-Assisted-by: opencode:big-pickle
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- drivers/crypto/amcc/crypto4xx_core.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
-index 0271b5e4d923..851bf075d769 100644
---- a/drivers/crypto/amcc/crypto4xx_core.c
-+++ b/drivers/crypto/amcc/crypto4xx_core.c
-@@ -876,11 +876,13 @@ int crypto4xx_build_pd(struct crypto_async_request *req,
- 		}
- 	}
- 
-+	pd->pd_ctl_len.w = 0x00400000 | (assoclen + datalen);
-+	pd_uinfo->state = PD_ENTRY_INUSE | (is_busy ? PD_ENTRY_BUSY : 0);
-+
-+	dma_wmb();
- 	pd->pd_ctl.w = PD_CTL_HOST_READY |
- 		((crypto_tfm_alg_type(req->tfm) == CRYPTO_ALG_TYPE_AEAD) ?
- 			PD_CTL_HASH_FINAL : 0);
--	pd->pd_ctl_len.w = 0x00400000 | (assoclen + datalen);
--	pd_uinfo->state = PD_ENTRY_INUSE | (is_busy ? PD_ENTRY_BUSY : 0);
- 
- 	wmb();
- 	/* write any value to push engine to read a pd */
-@@ -1031,6 +1033,7 @@ static void crypto4xx_bh_tasklet_cb(unsigned long data)
- 		     ((READ_ONCE(pd->pd_ctl.w) &
- 		       (PD_CTL_PE_DONE | PD_CTL_HOST_READY)) ==
- 		       PD_CTL_PE_DONE)) {
-+			dma_rmb();
- 			crypto4xx_pd_done(core_dev->dev, tail);
- 			tail = crypto4xx_put_pd_to_pdr(core_dev->dev, tail);
- 		} else {
+Thanks,
 -- 
-2.55.0
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
