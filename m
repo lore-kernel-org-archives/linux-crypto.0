@@ -1,175 +1,118 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91628331EC2
-	for <linux-crypto@vger.kernel.org>; Sun,  2 Aug 2026 22:20:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F4BA25B090
+	for <linux-crypto@vger.kernel.org>; Sun,  2 Aug 2026 22:23:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785709246; cv=none; b=X6lK9/nIDrM4ET0GqRFnYHWAhcvrpvdOn89Dbg5MeqQ7cHIM9NiVJrwEoqERbbKs/VrWfqUGmnWBFYywJZmw7WeIMgVY7ZKrsyqm10T/qMPYLFu8oszb1kL/6My480gkdh0dPlW/RoCwQrFHDQbCogqp79uw3Rz9Vf5XNuT53cw=
+	t=1785709391; cv=none; b=VjGfuaButntWqA94mxDFx7o7RSePUQmb0kQ3ZCbkwAxqSZq1JSHpMDpe3KBAAY26ypMu7BgidR85ZmyLomw9IJdJfAcmNdW2emv7HDjwZ7iVX+XsKA3m6Z/Fc+l8XgA9IPFVjj+QvLzmWo7ce+2i1wsTX9joi/+/orkguX2YKDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785709246; c=relaxed/simple;
-	bh=K/2jAp6khRcklPkNtuC/joaYI5lCI1uQRDZekKuvXIc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E2a6zhLs6RqI0Hzshpuesls8ZF8xo42dISs5VTc8NYDRNMCyjbj9u30Ewp0CT3/G6/8dkY0VTDPkEjeiK9J3Ty/TzqJjMeIi7RcOVgGeO6T7wPlqirs2dsaqj+Ww9wAWzmLNQsm8F0pZJUA9LjqdWJpbcTnQQDHJyTRkZQbBoBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b=KucLgUYr; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+	s=arc-20240116; t=1785709391; c=relaxed/simple;
+	bh=k/PWOQgo1p4Yp1h5/yZGB51G2UQvJK1mFc6oQmkpaxM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bWzKOtwFcUEGE7/hWCPyswz3gFbfo1mBgQGI+5Mw9pLYiAhwj2AVCH9PDh5tiQ7aYPoi3/Dr5ZG/aJigK2ItqQ7LxQi6Zs3dtUx+xLNwI1WIUb30xHTfOn/FuRQN1Vnr69AackJ0IRGJ6RvWFwt065Bn/hOdV5qCmqg29zbjiik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sRfACfKi; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre.com header.i=@baylibre.com header.b="KucLgUYr"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4954d29264cso7319105e9.2
-        for <linux-crypto@vger.kernel.org>; Sun, 02 Aug 2026 15:20:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sRfACfKi"
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-51c2a818fc4so16210031cf.2
+        for <linux-crypto@vger.kernel.org>; Sun, 02 Aug 2026 15:23:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre.com; s=google; t=1785709244; x=1786314044; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=i9RUjiVyXXCN2eHfX1I53hQWCYFwzgd7w4b5P9lpT/E=;
-        b=KucLgUYrXLYkqFnnrB+OswFPm43aE4h+rQLBGHyCrPaPHwHsOg0wXRAX2KQJrPx3h+
-         EGAv8BsR0jrLauQPLWS1a0aaETpcngmntxISpqgHs0Cc7q/9ysdMNtzxqp0pnbrd02ct
-         ON34Lyg/Vc9ZJc+PkqeucW5X3bXGI/L5Ma4tdm9jlQrvvgDXTuVCoxZAZHLs1XKnx6UX
-         YAmNueUDeTPOBOkv8IqfCznAn/ncOvQOwC63Ylzc/7CwN/toh1OIrTntYZ0osH3BpGXa
-         wdLuDJg44HljRBy3GWId3xSRUDjM7JMnm1pr7ZBiRSKUgsvxgQTKz5dQBVrl2yD6+4OY
-         wv7Q==
+        d=gmail.com; s=20251104; t=1785709389; x=1786314189; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=K+YpikDeGg3PaK1+XecbhoXs6xNS16wdVuw+OggeHyc=;
+        b=sRfACfKiKm7bcvKniB6pPlh1WSURAQoXATW8CfMD3ns4FoGgtO4yppEJx2SUIkBBmO
+         ho5zdGccfBz1jkM1ss698f6nRgDM8mhpjzIgC7Sa1j00oBVDlfnzSWeo8UKDMSyXVlOe
+         u7i7X4VfX0+QIi2SaAv8PlEVNCIBLw4gzJmLTQpaPN8I/4eqfj+CidYDLimEJj5YdrJI
+         dfhJI4BppFDGCdKT7LVDR2SDvfaO8PJxtmVfMh0wIuJkYqKsgD+w+MHwnb3HG0BXxDuc
+         fuxgd1f9lriNvRDYaxKiWb3orEpEphCdnQ1Reis1gaFmeOm2dL7G2+3G4mG2rJ/gjSxJ
+         0SUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785709244; x=1786314044;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=i9RUjiVyXXCN2eHfX1I53hQWCYFwzgd7w4b5P9lpT/E=;
-        b=NGlN4ENRgYG0+Sab377x9yVFj/IRbhxHfA8vWKlUB6cJjvgraGaIUTKSQopZWTbBOR
-         fPI9/5CtWAFO22AJc9z9Lod3YhcBz6MBbFTZYji74wTzpUnDri2TMIVWizlqnv3vEnIB
-         GsYo31hFti/eE1u66c7xP1P69gUgzoiXnmuStXgVYbMQ3CcYyAH6EcP3GCTu8aB4yFgh
-         fdbl647+njIhvTg/68OZnskLkTQtMLhrymlOLxsHemb4oBxz4VhsOpp5rTdasnrMTIkd
-         3xkpIm4u/Q53WSYp4jMgUP1nMDiwKZSe++duww8RjpgiYcYLDb9pd9XHTyFGaWlpfnQJ
-         2oSQ==
-X-Gm-Message-State: AOJu0YweTqmpq3D6xeI2RSwVsg1F/m4mCWroDGpKd7azTZkG/dDCxeww
-	1Wd8Ajfel6H0UGwvVZqk8RyvKEd2JLXG1Y4UNGUw6rjQbFh6+Ae4crUxaPt3N9p42ls=
-X-Gm-Gg: AR+sD13bFz+fffep6zxPVR+NwQVO+BBL8iw7QwbTlzhwqq7Qo34uRVgtqiG4/JVmver
-	CHNiY1nImwIvYAkFUalrS12WveFj1fTs8GgkdoCdXCPHBGCy9qvsfNLWGDYXbNUByQ8AhFvyKZZ
-	9FB495fKC1mPpjSTSJ2ievhYzkF3i5nv6k+fRdQIkgppXrTwJI27DNyqT/eYo5YyRb95ymcB0Rh
-	SbQ15LueLfYxPQnkSi/0TVQMbHqU1SgXPzRt/+omHYmCnUmdvuGcnRjP5baNqAANGiY0EotQp5b
-	NDWEGNj2DwrN43zqDDRx5n8Kq52gGqROMRwrsJzrZFGVHyALPUH4GOh22zgwZN4TOxw7xlUu4dK
-	W6QFs0HzBxdzocarTh72ewxU/L/Yj0Sbp5pnAuBpbEHW68NlGbKwtGrNGqQ1QI2rgDecX34u8Og
-	FvyqkQNLU13mjWJm7pwI/VSt1L14fpuw5DLWKC1SwLQC+LbpLKnV0irfDdOBXl29S80g==
-X-Received: by 2002:a05:600c:564b:b0:495:52dc:73a9 with SMTP id 5b1f17b1804b1-4980c675370mr125127215e9.11.1785709243887;
-        Sun, 02 Aug 2026 15:20:43 -0700 (PDT)
-Received: from localhost ([2a02:8071:56d1:2de0:1d24:d58d:2b65:c291])
-        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-47fd456a6besm25058203f8f.22.2026.08.02.15.20.40
+        d=1e100.net; s=20251104; t=1785709389; x=1786314189;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=K+YpikDeGg3PaK1+XecbhoXs6xNS16wdVuw+OggeHyc=;
+        b=RMaKRJzcSq2MKFcKOO5QDHYWgGtMqstHYmP4p9uIPPyQKCIkAussBKiavcW3mJ0rhM
+         f5wdOu25Kg3dvr8QR0DoDYDRl6yS1AFr1N06Hoaoyb1dYY9pdpBCj4hFaG24h3Tm0GW1
+         kaMpdRqTGxgcGPw64kDoXzjZ8jj8A9oarKCA+ew+JP3mB20ULtg0oAygL+M5+O25MEZo
+         vx/xhObEkzfC6gMtbsXqOMRWri9Z9u8PAXECkZjpTfApjZfIfmcLx+Z+L7udc+h9pgmW
+         +IibRf2axuHezkYrQw86vMYUQjcoiht3GiS57lZH44n8bHOyar7/xHn35HbtGenJ1tMk
+         absg==
+X-Forwarded-Encrypted: i=1; AHgh+RrJMyTRgFc6KenWRAALbyc0i1MmmEIMPttGXTDrDTrVACkJyUpvnjEY3bH9WaLLlORsKBXUXWVx66g0noc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyuw4i8meWGIqZ0Gimg5L4W00sSHaBkUikfM8qfi0sLGbUwh7MA
+	OahLKmWc2uuPFRkYq2/fPfjBfmaVqmwEtR4SDo+a6mEROlkDAh5uIWZnpicdIoPlDK0=
+X-Gm-Gg: AR+sD10h8htUz+5T+1BU6pOqlAf737BHkhh3OFm9jMizqy03QmB9FXvIjQCzbZUiC7d
+	DJmi+4LDKoMcV3jtHmgTpo6I+ExqiVf7IXpJEcz7jcOj1EZKE0ePeFieLoLQWlXIc6qMy0vx9gr
+	Ic4f4GjKuDf7GqBVdNtqzi8/wEaKDf2ClV3JHwmUOJOQCgaBnD74hpUcswYpwzJb2YeuZkPUo9C
+	gmU0+kjs8OomaERsPxo/odUsg/aJpC73YBy/huaZ6ULA2Mf2UnmbfbgfLy08BsJxgDKIaG/cN2l
+	XZ3nPRVIhWlFrDHzSQJuVbk5j99+jY+L09O2xLL+EPGzdFBQhsEdhL+A1fN2POXNmuU/ul/cmJf
+	K2agAcgMPBpT7fco0kO0frvXxtcI4lRv39kVH7IQbhPFliwXEHjnZy5zWHWzM4v4rUjghl4gKa1
+	ixLFQqkzhMVmwwttypSw9+gW9U6ShtDx8CV1ttoMsfylLYOIH5nGw4upcvNoug+6VDe+tGsiugf
+	pLwEMptTBLuqInCs55NODmCJE06Ka4kPe32nL4VBhdhyM+R8aCrcgsfa47OWTw=
+X-Received: by 2002:a05:622a:2612:b0:517:642c:8196 with SMTP id d75a77b69052e-52b566db0admr173984281cf.12.1785709389063;
+        Sun, 02 Aug 2026 15:23:09 -0700 (PDT)
+Received: from i4-gl-tmk5904.ad.psu.edu ([130.203.156.186])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-908434a250csm61249026d6.13.2026.08.02.15.23.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 02 Aug 2026 15:20:41 -0700 (PDT)
-Date: Mon, 3 Aug 2026 00:20:39 +0200
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, 
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, Demi Marie Obenour <demiobenour@gmail.com>, 
-	Bartosz Golaszewski <brgl@kernel.org>, Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>, 
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH] crypto: qce - Replace with stub driver
-Message-ID: <am_CG_kR24lpos6D@monoceros>
-References: <20260731050838.158825-1-ebiggers@kernel.org>
+        Sun, 02 Aug 2026 15:23:08 -0700 (PDT)
+From: Yuho Choi <dbgh9129@gmail.com>
+To: olivia@selenic.com,
+	herbert@gondor.apana.org.au,
+	Frank.Li@nxp.com,
+	s.hauer@pengutronix.de
+Cc: kernel@pengutronix.de,
+	festevam@gmail.com,
+	linux-crypto@vger.kernel.org,
+	imx@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	dakr@kernel.org,
+	o-takashi@sakamocchi.jp,
+	bhelgaas@google.com,
+	Yuho Choi <dbgh9129@gmail.com>
+Subject: [PATCH v1] hwrng: imx-rngc: Disable clock on registration failure
+Date: Sun,  2 Aug 2026 18:22:59 -0400
+Message-ID: <20260802222259.577200-1-dbgh9129@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ll56pjw5fggcc5xl"
-Content-Disposition: inline
-In-Reply-To: <20260731050838.158825-1-ebiggers@kernel.org>
+Content-Transfer-Encoding: 8bit
 
+The RNGC clock is enabled manually before runtime PM is configured. If
+devm_hwrng_register() fails, probe returns without disabling the clock.
+The devm_pm_runtime_enable() cleanup only disables runtime PM and does not
+call imx_rngc_suspend().
 
---ll56pjw5fggcc5xl
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Subject: Re: [PATCH] crypto: qce - Replace with stub driver
-MIME-Version: 1.0
+Disable the clock before returning from this failure path.
 
-Hello,
+Fixes: 7a96a64e8689 ("hwrng: imx-rngc - add runtime pm")
+Signed-off-by: Yuho Choi <dbgh9129@gmail.com>
+---
+ drivers/char/hw_random/imx-rngc.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-On Thu, Jul 30, 2026 at 10:08:38PM -0700, Eric Biggers wrote:
-> diff --git a/drivers/crypto/qce/qcrypto.c b/drivers/crypto/qce/qcrypto.c
-> new file mode 100644
-> index 000000000000..d526902b3060
-> --- /dev/null
-> +++ b/drivers/crypto/qce/qcrypto.c
-> @@ -0,0 +1,43 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (c) 2010-2014, The Linux Foundation. All rights reserved.
-> + */
-> +
-> +#include <linux/device.h>
-> +#include <linux/interconnect.h>
-> +#include <linux/module.h>
-> +#include <linux/mod_devicetable.h>
-> +#include <linux/platform_device.h>
+diff --git a/drivers/char/hw_random/imx-rngc.c b/drivers/char/hw_random/imx-rngc.c
+index 28c56c2d1bf6..a2db26d7f790 100644
+--- a/drivers/char/hw_random/imx-rngc.c
++++ b/drivers/char/hw_random/imx-rngc.c
+@@ -313,8 +313,10 @@ static int __init imx_rngc_probe(struct platform_device *pdev)
+ 	devm_pm_runtime_enable(&pdev->dev);
+ 
+ 	ret = devm_hwrng_register(&pdev->dev, &rngc->rng);
+-	if (ret)
++	if (ret) {
++		clk_disable_unprepare(rngc->clk);
+ 		return dev_err_probe(&pdev->dev, ret, "hwrng registration failed\n");
++	}
+ 
+ 	dev_info(&pdev->dev,
+ 		"Freescale RNG%c registered (HW revision %d.%02d)\n",
+-- 
+2.43.0
 
-<linux/platform_device.h> already makes sure that of_device_id is
-available, so don't include <linux/mod_devicetable.h> which will go away
-soon.
-
-Also I wonder why/if you need <linux/device.h> here.
-
-> +static int qce_crypto_probe(struct platform_device *pdev)
-> +{
-> +	struct icc_path *mem_path;
-> +
-> +	mem_path = devm_of_icc_get(&pdev->dev, "memory");
-> +	if (IS_ERR(mem_path))
-> +		return PTR_ERR(mem_path);
-> +
-> +	return icc_set_bw(mem_path, 0, 0);
-> +}
-> +
-> +static const struct of_device_id qce_crypto_of_match[] = {
-> +	{ .compatible = "qcom,crypto-v5.1", },
-
-No , before a closing } please
-
-> +	{ .compatible = "qcom,crypto-v5.4", },
-> +	{ .compatible = "qcom,qce", },
-> +	{}
-
-A single space between { and } is the most usual form, please stick to
-that.
-
-> +};
-> +MODULE_DEVICE_TABLE(of, qce_crypto_of_match);
-> +
-> +static struct platform_driver qce_crypto_driver = {
-> +	.probe = qce_crypto_probe,
-> +	.driver = {
-> +		.name = KBUILD_MODNAME,
-> +		.of_match_table = qce_crypto_of_match,
-> +	},
-> +};
-> +module_platform_driver(qce_crypto_driver);
-> +
-> +MODULE_LICENSE("GPL v2");
-> +MODULE_DESCRIPTION("Qualcomm crypto engine stub driver");
-> +MODULE_ALIAS("platform:" KBUILD_MODNAME);
-> +MODULE_AUTHOR("The Linux Foundation");
-
-Best regards
-Uwe
-
---ll56pjw5fggcc5xl
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmpvwrUACgkQj4D7WH0S
-/k67nQf+OehFcZIDtgFxkyFvQZvZvj8xuSmIv0XdUJH05uJUlrPzdkpGEIhFcanz
-X8NT6EKrJBiBvrf3pUe00j0mjuhrKvSlNwD/OIOfIyKO/vqCUA7I9I7Z2rytufiF
-ctDEwPQm1DhHjgqODVsHjkhxh8GL/DJRZfJI5rlD/owrDhjUVV23+9el/AnKy9Pa
-rbNI92rAQ0E6Oqn6PzhUz7szbSaZwNOIHHwEDSKza6Nz2ReOBoqmNzb+wtiSV0Zw
-ZU88/nUiGRYBZohrjw28Vog4+tLMFK5yqZunqMgevvJNdVSkJCt/6DSH0F5uI4py
-p1VS4MphWJzPY13zmlS5FUlxowzcFQ==
-=dBQw
------END PGP SIGNATURE-----
-
---ll56pjw5fggcc5xl--
