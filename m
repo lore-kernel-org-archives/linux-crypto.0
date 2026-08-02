@@ -1,30 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A71AC25B090;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAAFF265CA8;
 	Sun,  2 Aug 2026 22:24:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785709498; cv=none; b=qcv5BRMIRW1RORT1I259yTn2H64+yYm31O2R2Yoazh4yjljcSdVqhQMgQIvcffEdseesPiB58vA6RVQP2aOyolsb7ibDVz4pykad5NDvstbvZKrcneHrNdQb8Xj5osrG80hARie/e0JY3r/QboryRQbO1DGOnBikom5oZ6AwInY=
+	t=1785709499; cv=none; b=F3fUtPKMSJJU4X2ljogtSu1K3RyPXzpyQo/AIaJaqr6eHxVvhlbuJsFpUlmdtWEDy5/L4zZUUcuw6vP23DAdX9DTo3y+ZBv1aIbIJ6RALhrNxlFprpyOFWocCcyxRUeLQXZYdJur0bJTSWf7oRxJ09yNhXrZx4FgkRStZfq2iUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785709498; c=relaxed/simple;
-	bh=5VEojzyiuK/PHew9HHXrU+G7u9CQnCqhKEwnCeNH1Uo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pMG5UCnIfCHtmg3rKD23YT8pvHrBWPfxVZukBHHQt397Wp7YIUuV0BAUcQ0IcoUM5wAvwxJWBS89izy2d6S6RC7T9tMsc0+89qRpqppIA79Av7cKgLImkI0EyvBDSxClndFN3mVgo4ZZlCE5CXbZx1/w5g9yBiHP49YlfaB+9Io=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mZKXNWD3; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785709499; c=relaxed/simple;
+	bh=IK8KY9dg6DlobN5DM9Amg7uy3nUvmZSS0aD7FWd0a8A=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=A7HOYn5l9xNZQ3EdDQ6KurO7ancfKWP5SXWTlxzSjD5ZA1P50QRs8ECx/f2aGnvY+2IY1esdoayjGrxMM30SC+g7gWeyFBzVp/g5nbWL7HA8NgQ36H1LCZZ4XoghAUl4A6nNaWVkP2L+pyll/n0Uq6+iNfERiTVOo/cgODQDthU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k7vg7lmB; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mZKXNWD3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16FE41F000E9;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k7vg7lmB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 691A01F00A3E;
 	Sun,  2 Aug 2026 22:24:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1785709497;
-	bh=dQkDJZg8inSXJfTeNqicKEZyOqwzO4RcB79OzZozd0s=;
-	h=From:To:Cc:Subject:Date;
-	b=mZKXNWD3ehjpaFQ8q3ldJCRzo0J2y82xKPn7CkYBqvHmAVM6ITpIVwWgMjz00vo8P
-	 Kwryc9r4xHMQ9HfIyJWPbSR3ZBoex2doIUaf4j9OHAMX4WM1rZavK0Z6MhkXO6ufq8
-	 7/OMb4Bs87imPTg1clX3EftabBZCvyvdMno50ieWGrrDfo2NnQkkvekBKiMQl1QmqD
-	 HEGTgZxSijAJXUCnhPN06A6Jt9a2CX3Uginu2qGgW/jYBAP2z8zVmRVPMSHZe7D0J5
-	 mxB8Dks8XZZCfUo22lCd1qyAYzADZvzR324pY2krsAa5DUmYE5lvMakm9mjKzh2og5
-	 YUdLogpwpwSmg==
+	bh=mWHXek4T8sV8rsC6PTjZeiu/zvOnoWIldk2ujRgFahY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=k7vg7lmB3U6hwI1zjR5QeMtqKe6x5ltZaIfn0bS3mZv7/+xd7TXBBrqdLBbRRY4rz
+	 R0SKyUSez+5nDCgdJFQ90oBoSSL4GIEXyS5woqT7BhV/gCk5fAztkJt56mzE84wLaz
+	 rfIC5LzJCmO5JmF9N45LXtkkRjzjYiiMWOz7GQ+oPVe7lAFI+j2ABYDWPoO/Zkpo4U
+	 5DW2VAVRTrqGRxx3rRdWcfGdMzAuB7IWn+91pZa0CHUUtbBqAGscfM10l1DjJMUG/r
+	 1z2nHaNh3snqLpeJLvXWEnL9oJ/uaiorLb9p28w/V8Y7JJ+npgrSDLrnSZ9fV+AM2E
+	 ZZLRiz/QZpi6A==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
@@ -32,10 +33,12 @@ Cc: linux-kernel@vger.kernel.org,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 0/3] lib/crypto: FIPS self-tests for AES encryption modes
-Date: Sun,  2 Aug 2026 15:24:05 -0700
-Message-ID: <20260802222408.91757-1-ebiggers@kernel.org>
+Subject: [PATCH 1/3] lib/crypto: fips: Split fips.h into fips-aes.h and fips-sha.h
+Date: Sun,  2 Aug 2026 15:24:06 -0700
+Message-ID: <20260802222408.91757-2-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260802222408.91757-1-ebiggers@kernel.org>
+References: <20260802222408.91757-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -44,30 +47,250 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add FIPS self-tests for all the FIPS-approved AES modes implemented in
-aes.c.  These are needed to exercise the inverse direction of the block
-cipher, and to prepare for the planned integration of
-architecture-optimized implementations of individual modes.
+In preparation for adding FIPS self-tests for AES encryption modes,
+split fips.h into separate files for the AES and SHA test vectors.
 
-Eric Biggers (3):
-  lib/crypto: fips: Split fips.h into fips-aes.h and fips-sha.h
-  lib/crypto: aes: Add FIPS self-tests for unauthenticated modes
-  lib/crypto: aes: Add FIPS self-tests for GCM and CCM
+They are still generated by the same script, but this keeps things a bit
+more organized.
 
- lib/crypto/aes.c                    | 259 ++++++++++++++++++++++++++--
- lib/crypto/fips-aes.h               |  78 +++++++++
- lib/crypto/{fips.h => fips-sha.h}   |   6 +-
- lib/crypto/sha1.c                   |   2 +-
- lib/crypto/sha256.c                 |   2 +-
- lib/crypto/sha3.c                   |   2 +-
- lib/crypto/sha512.c                 |   2 +-
- scripts/crypto/gen-fips-testvecs.py | 164 ++++++++++++++----
- 8 files changed, 459 insertions(+), 56 deletions(-)
+Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+---
+ lib/crypto/aes.c                    |  2 +-
+ lib/crypto/fips-aes.h               | 20 +++++++
+ lib/crypto/{fips.h => fips-sha.h}   |  6 +-
+ lib/crypto/sha1.c                   |  2 +-
+ lib/crypto/sha256.c                 |  2 +-
+ lib/crypto/sha3.c                   |  2 +-
+ lib/crypto/sha512.c                 |  2 +-
+ scripts/crypto/gen-fips-testvecs.py | 93 +++++++++++++++++++----------
+ 8 files changed, 88 insertions(+), 41 deletions(-)
  create mode 100644 lib/crypto/fips-aes.h
  rename lib/crypto/{fips.h => fips-sha.h} (90%)
 
-
-base-commit: 6d22ec26295c1412d765e3d687e46224fc332928
+diff --git a/lib/crypto/aes.c b/lib/crypto/aes.c
+index 4222a4cec2f2..617c913d512e 100644
+--- a/lib/crypto/aes.c
++++ b/lib/crypto/aes.c
+@@ -19,7 +19,7 @@
+ #include <linux/export.h>
+ #include <linux/module.h>
+ #include <linux/unaligned.h>
+-#include "fips.h"
++#include "fips-aes.h"
+ 
+ static const u8 ____cacheline_aligned aes_sbox[] = {
+ 	0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5,
+diff --git a/lib/crypto/fips-aes.h b/lib/crypto/fips-aes.h
+new file mode 100644
+index 000000000000..b257cb216871
+--- /dev/null
++++ b/lib/crypto/fips-aes.h
+@@ -0,0 +1,20 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/* This file was generated by: gen-fips-testvecs.py */
++/* clang-format off */
++
++#include <linux/fips.h>
++
++static const u8 fips_test_data[] __initconst __maybe_unused = {
++	0x66, 0x69, 0x70, 0x73, 0x20, 0x74, 0x65, 0x73,
++	0x74, 0x20, 0x64, 0x61, 0x74, 0x61, 0x00, 0x00,
++};
++
++static const u8 fips_test_key[] __initconst __maybe_unused = {
++	0x66, 0x69, 0x70, 0x73, 0x20, 0x74, 0x65, 0x73,
++	0x74, 0x20, 0x6b, 0x65, 0x79, 0x00, 0x00, 0x00,
++};
++
++static const u8 fips_test_aes_cmac_value[] __initconst __maybe_unused = {
++	0xc5, 0x88, 0x28, 0x55, 0xd7, 0x2c, 0x00, 0xb6,
++	0x6a, 0xa7, 0xfc, 0x82, 0x90, 0x81, 0xcf, 0x18,
++};
+diff --git a/lib/crypto/fips.h b/lib/crypto/fips-sha.h
+similarity index 90%
+rename from lib/crypto/fips.h
+rename to lib/crypto/fips-sha.h
+index 9fc49747db64..68af7e14e09c 100644
+--- a/lib/crypto/fips.h
++++ b/lib/crypto/fips-sha.h
+@@ -1,5 +1,6 @@
+ /* SPDX-License-Identifier: GPL-2.0-or-later */
+ /* This file was generated by: gen-fips-testvecs.py */
++/* clang-format off */
+ 
+ #include <linux/fips.h>
+ 
+@@ -43,8 +44,3 @@ static const u8 fips_test_sha3_256_value[] __initconst __maybe_unused = {
+ 	0xba, 0x9b, 0xb6, 0xaa, 0x32, 0xa7, 0x97, 0x00,
+ 	0x98, 0xdb, 0xff, 0xe7, 0xc6, 0xde, 0xb5, 0x82,
+ };
+-
+-static const u8 fips_test_aes_cmac_value[] __initconst __maybe_unused = {
+-	0xc5, 0x88, 0x28, 0x55, 0xd7, 0x2c, 0x00, 0xb6,
+-	0x6a, 0xa7, 0xfc, 0x82, 0x90, 0x81, 0xcf, 0x18,
+-};
+diff --git a/lib/crypto/sha1.c b/lib/crypto/sha1.c
+index daf18c862fdf..b687b89d97cb 100644
+--- a/lib/crypto/sha1.c
++++ b/lib/crypto/sha1.c
+@@ -12,7 +12,7 @@
+ #include <linux/string.h>
+ #include <linux/unaligned.h>
+ #include <linux/wordpart.h>
+-#include "fips.h"
++#include "fips-sha.h"
+ 
+ static const struct sha1_block_state sha1_iv = {
+ 	.h = { SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4 },
+diff --git a/lib/crypto/sha256.c b/lib/crypto/sha256.c
+index 5d6b77e7e141..e8c346f563c5 100644
+--- a/lib/crypto/sha256.c
++++ b/lib/crypto/sha256.c
+@@ -17,7 +17,7 @@
+ #include <linux/string.h>
+ #include <linux/unaligned.h>
+ #include <linux/wordpart.h>
+-#include "fips.h"
++#include "fips-sha.h"
+ 
+ static const struct sha256_block_state sha224_iv = {
+ 	.h = {
+diff --git a/lib/crypto/sha3.c b/lib/crypto/sha3.c
+index 32b7074de792..286a2373c156 100644
+--- a/lib/crypto/sha3.c
++++ b/lib/crypto/sha3.c
+@@ -17,7 +17,7 @@
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/unaligned.h>
+-#include "fips.h"
++#include "fips-sha.h"
+ 
+ /*
+  * On some 32-bit architectures, such as h8300, GCC ends up using over 1 KB of
+diff --git a/lib/crypto/sha512.c b/lib/crypto/sha512.c
+index 605eab51aabd..0dd6fb4ca15b 100644
+--- a/lib/crypto/sha512.c
++++ b/lib/crypto/sha512.c
+@@ -17,7 +17,7 @@
+ #include <linux/string.h>
+ #include <linux/unaligned.h>
+ #include <linux/wordpart.h>
+-#include "fips.h"
++#include "fips-sha.h"
+ 
+ static const struct sha512_block_state sha384_iv = {
+ 	.h = {
+diff --git a/scripts/crypto/gen-fips-testvecs.py b/scripts/crypto/gen-fips-testvecs.py
+index 9f18bcb97412..aa6c0a81fbf8 100755
+--- a/scripts/crypto/gen-fips-testvecs.py
++++ b/scripts/crypto/gen-fips-testvecs.py
+@@ -1,7 +1,7 @@
+ #!/usr/bin/env python3
+ # SPDX-License-Identifier: GPL-2.0-or-later
+ #
+-# Script that generates lib/crypto/fips.h
++# Script that generates lib/crypto/fips-aes.h and lib/crypto/fips-sha.h
+ #
+ # Requires that python-cryptography be installed.
+ #
+@@ -12,35 +12,66 @@ import cryptography.hazmat.primitives.cmac
+ import hashlib
+ import hmac
+ 
+-fips_test_data = b"fips test data\0\0"
+-fips_test_key = b"fips test key\0\0\0"
+ 
+-def print_static_u8_array_definition(name, value):
+-    print('')
+-    print(f'static const u8 {name}[] __initconst __maybe_unused = {{')
++def print_static_u8_array_definition(file, name, value):
++    print("", file=file)
++    print(f"static const u8 {name}[] __initconst __maybe_unused = {{", file=file)
+     for i in range(0, len(value), 8):
+-        line = '\t' + ''.join(f'0x{b:02x}, ' for b in value[i:i+8])
+-        print(f'{line.rstrip()}')
+-    print('};')
+-
+-print('/* SPDX-License-Identifier: GPL-2.0-or-later */')
+-print(f'/* This file was generated by: gen-fips-testvecs.py */')
+-print()
+-print('#include <linux/fips.h>')
+-
+-print_static_u8_array_definition("fips_test_data", fips_test_data)
+-print_static_u8_array_definition("fips_test_key", fips_test_key)
+-
+-for alg in 'sha1', 'sha256', 'sha512':
+-    ctx = hmac.new(fips_test_key, digestmod=alg)
+-    ctx.update(fips_test_data)
+-    print_static_u8_array_definition(f'fips_test_hmac_{alg}_value', ctx.digest())
+-
+-print_static_u8_array_definition(f'fips_test_sha3_256_value',
+-                                 hashlib.sha3_256(fips_test_data).digest())
+-
+-aes = cryptography.hazmat.primitives.ciphers.algorithms.AES(fips_test_key)
+-aes_cmac = cryptography.hazmat.primitives.cmac.CMAC(aes)
+-aes_cmac.update(fips_test_data)
+-print_static_u8_array_definition('fips_test_aes_cmac_value',
+-                                 aes_cmac.finalize())
++        line = "\t" + "".join(f"0x{b:02x}, " for b in value[i : i + 8])
++        print(f"{line.rstrip()}", file=file)
++    print("};", file=file)
++
++
++def print_header(file):
++    print("/* SPDX-License-Identifier: GPL-2.0-or-later */", file=file)
++    print("/* This file was generated by: gen-fips-testvecs.py */", file=file)
++    print("/* clang-format off */", file=file)
++    print("", file=file)
++    print("#include <linux/fips.h>", file=file)
++
++
++def gen_aes_test_data(file):
++    fips_test_data = b"fips test data\0\0"
++    fips_test_key = b"fips test key\0\0\0"
++
++    print_header(file)
++    print_static_u8_array_definition(file, "fips_test_data", fips_test_data)
++    print_static_u8_array_definition(file, "fips_test_key", fips_test_key)
++
++    aes = cryptography.hazmat.primitives.ciphers.algorithms.AES(fips_test_key)
++    aes_cmac = cryptography.hazmat.primitives.cmac.CMAC(aes)
++    aes_cmac.update(fips_test_data)
++    print_static_u8_array_definition(
++        file, "fips_test_aes_cmac_value", aes_cmac.finalize()
++    )
++
++
++def gen_sha_test_data(file):
++    fips_test_data = b"fips test data\0\0"
++    fips_test_key = b"fips test key\0\0\0"
++
++    print_header(file)
++    print_static_u8_array_definition(file, "fips_test_data", fips_test_data)
++    print_static_u8_array_definition(file, "fips_test_key", fips_test_key)
++
++    for alg in "sha1", "sha256", "sha512":
++        ctx = hmac.new(fips_test_key, digestmod=alg)
++        ctx.update(fips_test_data)
++        print_static_u8_array_definition(
++            file, f"fips_test_hmac_{alg}_value", ctx.digest()
++        )
++
++    print_static_u8_array_definition(
++        file, "fips_test_sha3_256_value", hashlib.sha3_256(fips_test_data).digest()
++    )
++
++
++filename = "lib/crypto/fips-aes.h"
++with open(filename, "w") as file:
++    print(f"Generating {filename}")
++    gen_aes_test_data(file)
++
++filename = "lib/crypto/fips-sha.h"
++with open(filename, "w") as file:
++    print(f"Generating {filename}")
++    gen_sha_test_data(file)
 -- 
 2.55.0
 
