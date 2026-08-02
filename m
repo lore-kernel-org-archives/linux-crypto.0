@@ -1,43 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A153D34041C;
-	Sun,  2 Aug 2026 23:02:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 230BF48989D;
+	Sun,  2 Aug 2026 23:30:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785711725; cv=none; b=NMtF42lkoBtyyBYL9a+fHL2eXpmPsPfw5f+KS9eB1Wn5zj5aBpNdw12hTfW4FOv2GckL1qUnGMB7wtRPQJ0Tg+uzFkZtbmXfG6Sko1xR3AzBtKZvUv1HoXMLnVDQe0cTgeZ50y/yvGR+Z/nE08a7wKitJWoLNrZre8YB2CrQgN4=
+	t=1785713437; cv=none; b=XeXlsHbTtz6cPopuGa38AGXm2LkF8tLEL2b+fM4fz/FUQf2hwz4ycCMv8/8fOcD7Zbgux785JEZSsHOQ+62CfH0UK7N/a34ZLJyTILPpmjsO9igoXWPD8rHD6Ukl0Co2lEgzuNJT0Uq/+OcSBI5lR0EEKHBcF4IZ3YtiEy0VpgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785711725; c=relaxed/simple;
-	bh=lLal+leuJtehj+DFCsY8ciP1Hzfu6ttl8xq811k6TLI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=k1UT5NHKE8F/TQ0rVxThL3ukZ+oUyiNzYorcnPpg/xOy9edp8Myan2LIXoF1SAtVGpEhcI51ZOGEYRcecCxWcW6CFf3EuakKmA9XR84gd8LkQeZvWE6xc1sFG7sAm2AhssQX8xfV+qP7oLsc1J0GxSVR5zNdZQDH04I0OHYV9v0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KYek+Zlr; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1785713437; c=relaxed/simple;
+	bh=FkA01cKGY+2xNejz2ROPlzZ/ne7uTwtJMoMlbLVZM+g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Z+q1AV0+wyT4tX/H7aAyPKyT123fTUg7ZklZ4icWoHGAkNdcOIWT2uDF63b96Pj/XFnkrdmgttyQ4ELtCwJoI0yDNO+LgnGfMKdN+ohprX6udhXrKrNWUsNttDqZ2odkXZqM6nOKqu0r7Lsrq9ACWQQ4wBtQYFbgjbmPQOj26iw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TV3yWYVu; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KYek+Zlr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6D7C1F00AC4;
-	Sun,  2 Aug 2026 23:02:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TV3yWYVu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E2AE1F000E9;
+	Sun,  2 Aug 2026 23:30:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785711723;
-	bh=kIzg9GOQSA3QUe+ILmEeajJXxnc5iqX0Du1fki1bNxs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=KYek+ZlrywcFl67vo/OkdLnmgJGLFCEuQ8oAi2ahI+CPsyqSd1zLhlYRU6+R5sqo2
-	 JE9U3pABIFGOta6HSl2OFPkBb7/teb+bouDOGOROrKEtAp9FM9/Y4nXjxe4OPyJi7Z
-	 zkrrvLFIT+k8LdnCokUmjguN+f6Rq7PgRsRIAKm7LQM2Vb5qi8DxHsuK9CSj/yy+r1
-	 U8tNsKxt49K5tF5FOmVTinNrGNxIQReTbzVRTm9Kk65FLudPmF240smg1zYbLItVJO
-	 oHddGxNPw8K70wX+H7oeW7D4GTI5LJCNsTlW/rBkX8ScYbvuq3Dr4AC0Nvv467dUtA
-	 TkNdCTWoiM8Gg==
+	s=k20260515; t=1785713435;
+	bh=meck29DXuQAEURnyRRfrAQR20NbX70/2RNkNvR+NYE0=;
+	h=From:To:Cc:Subject:Date;
+	b=TV3yWYVub2IxNMQTkwIdYUgGBHK2bUk2YvqW/kuRIeX55It9rDfTEDZbdgLtbv4h4
+	 tMb9nbIQPf69oMuTpPKDSTEmSznngXCuPI+5fJvlrUlxSEAg55Defm1ix2hZVNMKEo
+	 7m+7kta57htaTBSL9+R0Z2GE9/ctowJwd0/rtdHvlzlPrHUtMj2Sg5VR/ugOR+9yjr
+	 9VSWbjFWbr0yV8VDKv6TtBw/gEJ+PZrsd+gqR4LG2O7Cqb868EwU93MfvSI7aNho7j
+	 O6q/Brgx/jCw6e5cLwWpmMql4WUAfvIRsF9KrYrvpdvtkOBEgVSuAtKc5ZKJdPepkO
+	 THwgklr3Q8y/Q==
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Richard Weinberger <richard@nod.at>,
-	linux-kernel@vger.kernel.org,
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Thomas Huth <thuth@redhat.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH 3/3] crypto: af_alg - Stop after finding name in allowlist
-Date: Sun,  2 Aug 2026 16:00:55 -0700
-Message-ID: <20260802230055.100746-4-ebiggers@kernel.org>
+Subject: [PATCH v2 0/5] lib/crypto: KUnit tests for AES-CCM and AES-GCM
+Date: Sun,  2 Aug 2026 16:30:00 -0700
+Message-ID: <20260802233005.161467-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260802230055.100746-1-ebiggers@kernel.org>
-References: <20260802230055.100746-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -46,37 +45,62 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If the algorithm name is found in the allowlist and the privilege check
-doesn't pass, there's no need to consider remaining entries since the
-list contains (and is intended to contain) at most one entry per name.
+This series applies to libcrypto-next.  It can also be retrieved from:
 
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- crypto/af_alg.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git gcm-ccm-kunit-v2
 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 1e5da61b315c..ab84c4488a15 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -145,10 +145,13 @@ int af_alg_check_restriction(const char *name,
- 	if (level == 1) {
- 		for (const struct af_alg_allowlist_entry *ent = allowlist;
- 		     ent->name; ent++) {
--			if (strcmp(name, ent->name) == 0 &&
--			    ((ent->flags & AF_ALG_UNPRIVILEGED) ||
--			     af_alg_capable()))
--				return 0;
-+			if (strcmp(name, ent->name) == 0) {
-+				if ((ent->flags & AF_ALG_UNPRIVILEGED) ||
-+				    af_alg_capable())
-+					return 0;
-+				/* List contains at most one entry per name. */
-+				break;
-+			}
- 		}
- 	}
- 	/*
+This series adds comprehensive KUnit test suites for the AES-CCM and
+AES-GCM library APIs.
+
+This is a follow-up to the series
+"[PATCH v2 00/13] Library APIs for AES encryption modes"
+(https://lore.kernel.org/linux-crypto/20260715221153.246410-1-ebiggers@kernel.org/)
+
+Changed in v2:
+  - Fixed crash in test_aes_ccm_data_len_too_large() on 32-bit kernels.
+
+Eric Biggers (5):
+  lib/crypto: tests: Create test-utils.h
+  lib/crypto: tests: Use per-test-case buffers in hash tests
+  lib/crypto: tests: Add aead-test-template.h
+  lib/crypto: tests: Add KUnit test suite for AES-CCM
+  lib/crypto: tests: Add KUnit test suite for AES-GCM
+
+ lib/crypto/.kunitconfig                   |    2 +
+ lib/crypto/tests/Kconfig                  |   18 +
+ lib/crypto/tests/Makefile                 |    2 +
+ lib/crypto/tests/aead-test-template.h     | 1039 +++++++++++++++++++++
+ lib/crypto/tests/aes_cbc_macs_kunit.c     |   12 +-
+ lib/crypto/tests/aes_ccm_kunit.c          |  356 +++++++
+ lib/crypto/tests/aes_gcm_kunit.c          |  472 ++++++++++
+ lib/crypto/tests/blake2b_kunit.c          |   33 +-
+ lib/crypto/tests/blake2s_kunit.c          |   33 +-
+ lib/crypto/tests/chacha20poly1305_kunit.c |    9 +-
+ lib/crypto/tests/ghash_kunit.c            |   37 +-
+ lib/crypto/tests/hash-test-template.h     |  249 ++---
+ lib/crypto/tests/md5_kunit.c              |    2 -
+ lib/crypto/tests/mldsa_kunit.c            |   19 +-
+ lib/crypto/tests/nh_kunit.c               |    5 +-
+ lib/crypto/tests/poly1305_kunit.c         |   21 +-
+ lib/crypto/tests/polyval_kunit.c          |   38 +-
+ lib/crypto/tests/sha1_kunit.c             |    2 -
+ lib/crypto/tests/sha224_kunit.c           |    2 -
+ lib/crypto/tests/sha256_kunit.c           |   48 +-
+ lib/crypto/tests/sha384_kunit.c           |    2 -
+ lib/crypto/tests/sha3_kunit.c             |   30 +-
+ lib/crypto/tests/sha512_kunit.c           |    2 -
+ lib/crypto/tests/sm3_kunit.c              |    2 -
+ lib/crypto/tests/test-utils.h             |  111 +++
+ scripts/crypto/gen-aead-testvecs.py       |   69 ++
+ 26 files changed, 2275 insertions(+), 340 deletions(-)
+ create mode 100644 lib/crypto/tests/aead-test-template.h
+ create mode 100644 lib/crypto/tests/aes_ccm_kunit.c
+ create mode 100644 lib/crypto/tests/aes_gcm_kunit.c
+ create mode 100644 lib/crypto/tests/test-utils.h
+ create mode 100755 scripts/crypto/gen-aead-testvecs.py
+
+
+base-commit: 6d22ec26295c1412d765e3d687e46224fc332928
 -- 
 2.55.0
 
