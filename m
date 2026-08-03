@@ -1,58 +1,58 @@
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F387402B8F;
-	Mon,  3 Aug 2026 11:35:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 010504028EE;
+	Mon,  3 Aug 2026 11:38:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785756940; cv=none; b=UMigM3V28KmnYEEnHE4U39TsDI0cUIZWDgxlutKb4nxHT0KTa/Z4bY/Fv9MRdR5OU754AkbqMoFTZ/DjCgyZjGkjpVyBfXRL8jc5+CqPLhUoLzj08WgwaqqcWyPGNDa9UU9Wrybs2DcNacfXIFUhfwD7h0xIcjkzJATHwP3QnfQ=
+	t=1785757113; cv=none; b=f1t1i5r61WmND6GVxXt4ZmmGQvfKRF7bEGYQqqOJejJcU7OXN8QXpnzELQVGAg+0iUu03Nd8Q8IVrQgU0olpdrCzSzBXR/Np5oJAGxzjQYOkOYHGt41ruO0JV0/Sz2PsP8t8+JcvXkQKAsjprXk6VrEH0dBctnx1P8pS1nyqy5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785756940; c=relaxed/simple;
-	bh=0W4xU/Zt4wxerYDPdGszSIOr3mWyBB/NAN07IyYSZOs=;
+	s=arc-20240116; t=1785757113; c=relaxed/simple;
+	bh=GY5YWYQyJy3BbgXwU8pSx/yzP24RBD0kX2M3BbVvyDM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A+1nUUNk9eHI1h5E3Eal3DqZm+6lK/MbCbKU2FNO73Hyt5aroJszgBF/Y21T4zg6Jm8ohEVhvZj9LOn+8pogP7ANb3EpIdzv52r4oE+ymejifO0lTmIY10mXkH7z7V4R0lFiwboSmp3jbxYBgDXv7akaHYC0rtEGBRXjoEBuwYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=CX0mBN68; arc=none smtp.client-ip=148.163.158.5
+	 Content-Type:Content-Disposition:In-Reply-To; b=jRA9LtewiD0xCAOc6yAqN9z3m/QNnjU2Q/TTqCj7Ww4381vQMMDkudR6CcPFZdw/ZtgRKTG2J5pVVLLsZmxoXW9Ss+PSap0+c4WfJ4Aj6+WCtJW1XpXuNJI5Ux4rcxGoX8kbHiL/QG6E+BYfEgMJ+AVkx+58D7QXYvh7xNFLVOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Pr2hQiZz; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="CX0mBN68"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Pr2hQiZz"
 Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 672Llloh159860;
-	Mon, 3 Aug 2026 11:35:27 GMT
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 672LlepU159787;
+	Mon, 3 Aug 2026 11:38:23 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=78juEHzstpBekaD9ScfeGc5nvzNB2b
-	6WJQs8UNFwsRo=; b=CX0mBN68J4oCSChQfqU4QeccFQXlhJWMluUB1H9I+GqvDq
-	jY41/XvDAw7riVmF2Ug++vWE7ADsLMn/TnY8HhHvBM3T2fwakQTkR8a7vstarcek
-	XCiQHOV18541QlJmKHU3jVGJxlc062ZBuXC2nlgzEJn1BrkjfgJmiEl+B/LsMDrD
-	qs23aynYuwks9gk47UGZ0w2BoOqY8t9LRbicAGBhwyPQVTNLGAHKeeetkCAlnKWE
-	/oazjEi3QBJk5xCVYGFO0qvRXj87Tlq+nj0heYyFONQ0ZolPHqZejh3DxIl2kDsM
-	+fhxuHq18Zp2FPE6TdF01jhFJbFvwLm55uJQanCA==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fs67hgejf-1
+	:references:subject:to; s=pp1; bh=xRAawKgKKSyq+gqpRznkn/pNIqLhVh
+	nWgH2UQbsXDYU=; b=Pr2hQiZzBTemNLIglGDlrlS6SqPjpmHkotm7o3SPkFpI/w
+	7twQDyNvGeOJNOSxEgHNhw+Jcv7Mb4NNNhEN8SPwcU2KZ6Bg3719b4sPh+lhB68J
+	PDdVGR/hThZq/RO4ioI0A2KZCmUt9OQKNuLsuUiRVru/NjaIC2ZJeHR24I/NyROZ
+	tBJGX4UJI5IFxTtiM4DWfjwj4+0oJKtgYjhTYRKw14y5SVKWewqnkex240EvVGll
+	YeQObuYLEVq84sHduBwTDR/gvyoQpStZsFVmkEzj4lSBIwhy0siW0YQjuqrQo3C+
+	GWKS7W6QeQBUSZ3S3ZGd4bSvoxiactUAr+n4temg==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fs67hgewm-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Aug 2026 11:35:27 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 673BBIS0001123;
-	Mon, 3 Aug 2026 11:35:26 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fswbg4x99-1
+	Mon, 03 Aug 2026 11:38:23 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 673BBIxu019454;
+	Mon, 3 Aug 2026 11:38:22 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4fsvmh539m-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Aug 2026 11:35:26 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 673BZMm648103688
+	Mon, 03 Aug 2026 11:38:22 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 673BcIhL14614932
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 3 Aug 2026 11:35:22 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7C6F62004B;
-	Mon,  3 Aug 2026 11:35:22 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 020CC20043;
-	Mon,  3 Aug 2026 11:35:22 +0000 (GMT)
+	Mon, 3 Aug 2026 11:38:18 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 999EF2004B;
+	Mon,  3 Aug 2026 11:38:18 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 213AC20043;
+	Mon,  3 Aug 2026 11:38:18 +0000 (GMT)
 Received: from localhost (unknown [9.87.133.185])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon,  3 Aug 2026 11:35:21 +0000 (GMT)
-Date: Mon, 3 Aug 2026 13:35:20 +0200
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Mon,  3 Aug 2026 11:38:18 +0000 (GMT)
+Date: Mon, 3 Aug 2026 13:38:16 +0200
 From: Vasily Gorbik <gor@linux.ibm.com>
 To: Heiko Carstens <hca@linux.ibm.com>
 Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
@@ -68,10 +68,9 @@ Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Herbert Xu <herbert@gondor.apana.org.au>, linux-s390@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v4 3/4] s390: Remove cond_resched() calls
-Message-ID: <ttj6yuw@ub.hpns>
+Subject: Re: [PATCH v4 0/4] s390: Remove or replace cond_resched() calls
+Message-ID: <ttj6yzs@ub.hpns>
 References: <20260731165004.2758105-1-hca@linux.ibm.com>
- <20260731165004.2758105-4-hca@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -80,26 +79,26 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260731165004.2758105-4-hca@linux.ibm.com>
+In-Reply-To: <20260731165004.2758105-1-hca@linux.ibm.com>
 X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODAzMDEwMSBTYWx0ZWRfX3o+owkVRY4Bf
- 140QTrRnQ7G/xcAG25QVZw6Ib+mhLVUdDqbaBtKY9GuA91jESkiAoemGftgsV7HOsa4QVVUwrsx
- E/Y+lQZGV34dHa5WhWyLdaEJ1R09T9o=
-X-Authority-Analysis: v=2.4 cv=I7VVgtgg c=1 sm=1 tr=0 ts=6a707cff cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODAzMDEwMSBTYWx0ZWRfX2J38FIiYHVl9
+ uvon9kaxXgf3di8/mkVK+iUfr5NdAMT1jmp1NdZxb54skoLQKhckLo0r6mpaMva7Bl6NQa3QA4g
+ tHvd7uKOJqb0pgS4o/UGpH4G486Wqtc=
+X-Authority-Analysis: v=2.4 cv=I7VVgtgg c=1 sm=1 tr=0 ts=6a707daf cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
  a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=VnNF1IyMAAAA:8
- a=aT64lE-xtiG-fBwKLyoA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODAzMDEwMSBTYWx0ZWRfX+1NnmsuQFeh7
- XDhm9anYF5XN0bfaxsU2+fDHT94fFaVTo4TZjUdD2BbbjqJq0QxmkjBYHKv+36aiF5Un/p9b2+y
- 5OGa+NsakR+aTxPgsW21cv18hYl1pbsxXHUVnvwwj9fvp9ZoxGuHBN6Ju5CBw/FkFHNG5G9qiff
- kjTaJ6JOhM5q0oNwbYj03dSPV4IliD0l/sVEizSXHan8ChsiGOlSrLLbYar/IareuhpHsMiD6Qe
- IjaL32/JZ/A3nh6pXyxnkam3DwPFWyhMa9P2NAknUCcOeEf9EmX3QY48D0t7NrfDcsC7ENhJTvF
- ZYDAr/taLotuR3BF8iI09GcL4VELEG7mRXCwlZDGux++s5labyecAzYe9J28R78nvWmQQxUu72o
- d+Uxxxgyp4T9yMM/dRF5T79G5cjf1YeBqQkLAFrEc774w7eOGFemPhyJ+6PQkzOkOaOQcbf0JID
- SPR6gi/d5vHQoeaYXFA==
-X-Proofpoint-ORIG-GUID: CI-uG5MkgplWTfo15vJw25FLg6DoC8pV
-X-Proofpoint-GUID: CI-uG5MkgplWTfo15vJw25FLg6DoC8pV
+ a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=hlTv3zeCCfZNwghm1VgA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODAzMDEwMSBTYWx0ZWRfXyhSEQNzf1u+L
+ /5UtqgDoGuP8xU3hbjdwLWXfN2ZnfDzLuNu+dc5zBpXfH2SxxHPhTj2gJUJFDzwUGKIfej2URM+
+ 46BPIz+u8fYTpImoCAShiM0FDIedzAinL0Eay/PXleHeO5M7m+Q5l1E+t62woLF5i8rzio6/WGB
+ 7b7bhR/Gb1d2dis/BXCuFfobNPEYQCWWapykx4F8B0S/pUhw8GAVVChYnORFbTxloVIaAj9fQXa
+ JMk7hv/39ORliBGrW+J5fcQbN9jRzVXOJirBMP+GMx2Og1f1gCOFYxY2AW9sGiZ2u1ZOHAYb9Qg
+ vs0AcsZthl/JwFjPIFQrTqoIIx2imeEp1YnSl1bygCad5WuCL7Ctvi4AgStFFp0g03hHRwOCDD5
+ nveMdVwXDAgXf+fKJI4yGNznPWtm2pb4JGZ7oEiuYLM0cOAUL7vLOX8ExbHqaHXIvuX97PaCBOA
+ XpWrTkrsd77IirJpMTg==
+X-Proofpoint-ORIG-GUID: 3-VbYSLjONI99MKwuUiEwIMc5bszb3HW
+X-Proofpoint-GUID: 3-VbYSLjONI99MKwuUiEwIMc5bszb3HW
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-08-02_06,2026-07-30_01,2025-10-01_01
@@ -109,18 +108,53 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
  reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608030101
 
-On Fri, Jul 31, 2026 at 06:50:03PM +0200, Heiko Carstens wrote:
-> Since [1] cond_resched() is a no-op on s390. Remove all calls.
+On Fri, Jul 31, 2026 at 06:50:00PM +0200, Heiko Carstens wrote:
+> v4:
+> - Replaced first patch with version from Peter Zijlstra
+> 
+> v3:
+> - Drop uv_call_sched() [Claudio Imbrenda]
+> 
+> v2:
+> - Use msleep() in crypto code (Holger Dengler)
+> - Add Reviewed-by tag from Peter Oberparleiter
+> 
+> v1:
+> Since [1] it is only possible to select the PREEMPT or PREEMPT_LAZY
+> preemption models for s390. This has caused some minor problems, but
+> everything has been addressed.
+> 
+> Given that for both preemption models cond_resched() is a no-op remove
+> or replace it everywhere.
 > 
 > [1] commit 7dadeaa6e851 ("sched: Further restrict the preemption modes")
 > 
-> Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
-> ---
->  arch/s390/kernel/perf_cpum_cf.c | 1 -
->  arch/s390/mm/cmm.c              | 2 --
->  arch/s390/mm/pageattr.c         | 5 -----
->  arch/s390/mm/pgalloc.c          | 1 -
->  arch/s390/pci/pci.c             | 4 +---
->  5 files changed, 1 insertion(+), 12 deletions(-)
+> Heiko Carstens (3):
+>   KVM: s390: Remove cond_resched() calls
+>   s390: Remove cond_resched() calls
+>   s390/cio: Remove cond_resched() calls
+> 
+> Peter Zijlstra (1):
+>   s390/crypto: Replace cond_resched() with msleep(1)
+> 
+>  arch/s390/crypto/paes_s390.c    | 44 +++------------------------------
+>  arch/s390/crypto/phmac_s390.c   | 25 +++----------------
+>  arch/s390/include/asm/pkey.h    | 16 ++++++++++++
+>  arch/s390/include/asm/uv.h      | 16 ++----------
+>  arch/s390/kernel/perf_cpum_cf.c |  1 -
+>  arch/s390/kernel/uv.c           |  2 +-
+>  arch/s390/kvm/gaccess.c         |  8 ++----
+>  arch/s390/kvm/gmap.c            |  4 ---
+>  arch/s390/kvm/kvm-s390.c        |  1 -
+>  arch/s390/kvm/pv.c              | 11 ++++-----
+>  arch/s390/kvm/vsie.c            |  1 -
+>  arch/s390/mm/cmm.c              |  2 --
+>  arch/s390/mm/gmap_helpers.c     |  1 -
+>  arch/s390/mm/pageattr.c         |  5 ----
+>  arch/s390/mm/pgalloc.c          |  1 -
+>  arch/s390/pci/pci.c             |  4 +--
+>  drivers/s390/char/uvdevice.c    |  6 ++---
+>  drivers/s390/cio/css.c          |  8 ------
+>  18 files changed, 37 insertions(+), 119 deletions(-)
 
-Reviewed-by: Vasily Gorbik <gor@linux.ibm.com>
+Applied, thank you!
