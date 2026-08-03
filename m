@@ -1,57 +1,58 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE61937C108
-	for <linux-crypto@vger.kernel.org>; Mon,  3 Aug 2026 09:45:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C431F37C916
+	for <linux-crypto@vger.kernel.org>; Mon,  3 Aug 2026 09:45:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785750328; cv=none; b=DzwPHnue4TRbUyOziNCDiWLihGFxkH35fooFRXRsPl7CHfVy6Bo/iJxO52vWUu0SazbybdORRqqZcvXc3yGBkvyAVhFlFzlNdwUMewK8qhEfMT1X0Nz6oHkj0cKZHwtV46PX8PoASrIE6uWlBD+K7McrSrJxWZmq5jcUcUqfoh4=
+	t=1785750330; cv=none; b=Cbeaszbccq5Er/DINxfUUpqxOIORQh7mVzKR8bVd0EI9P6ZMGbs6yihnul9dtulNGXCgzjCwzGTdPzf9oZ330HbuejAuqd6+xrWhZ+i2j1gIe4X5fABSnmQ9FfDzO2nJLCZYjxs4149tVDRPiIKx9ApyYo+SoNuZuuE74anU2fE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785750328; c=relaxed/simple;
-	bh=KxsvhumK4s3tw3Er5p0b5F38MiorgxJ4jQR1poItIjM=;
+	s=arc-20240116; t=1785750330; c=relaxed/simple;
+	bh=0LDHq7QdkqDReNPHALZn7cIcfQsp6FI/EqyFL/S+3O4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AnDGm0U9lDhXkZk3MpbU/V1gQxkBlFo6lUGdpEA54Ic0i4U6SkubriZjnEeMlimw3QTvr9U64QOPhp9uZn/4SWLIol0hTw7UOS6XtPnDqtHyKofoFwIQQRK8hS2U92WSpUIapOIWCrowSeWNUQmbyiCaNHzJ/bdpBpUOfyHq6UI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dGZu+dx8; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=CsEZjhaD3I8ppgZqAiw2JsrWWe7sRCQ0FZ59AHSjr+X68Qoiz4R8FmZaLYM5f5pId3DDDAcuM/zq2NhoANdAaMzOMtd34vYQr330mC6cWrXTDm+8BfvTTipxh84/aUzsR2XJ7UyRZPWGV13X3583OXCbIkfpjBWMpXdpnmP2P6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PpOVzrHp; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dGZu+dx8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PpOVzrHp"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1785750325;
+	s=mimecast20190719; t=1785750327;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0KQ0+OJ5RmnRaSRsooNlQiduy9YrkCjgJuqwW/tXaUM=;
-	b=dGZu+dx8+6Ad9yy+tvF054M2VtH1tv3BPFVEsaQiVz29I6wNcExeY7tb6dyig/nKH/W+ap
-	k2rXUuh3HfuvH5rr+40AOuGU3dQ1wS8UDtFYWW+CA1bvO5P8zuTg0oRfOp7U4opza6XWSz
-	vopoqlhqPDWlslo8BaJJtccZIsN9Wdw=
+	bh=dYwdk10fZS/RlXj0yQtqtdCG4riS9n+O4AarGWgwDs0=;
+	b=PpOVzrHpvzC9Jg60te9HZUguHxTnpGPGak0XgzqDMxcmr4e/7gmDCWVlknwAlNJunhHv30
+	Rb9bLJfiGdWpgEPvHa6w3xmsk4LShx+Tu/Zl8Lk0YLALxxTPV8GwaVUiYVwQvD26NC1Ckz
+	NTZNV3f4cSkt5sBdGr8QeMmRsGl82VE=
 Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-6-w65f0Gx6O7S8iK9U9Q_7nQ-1; Mon,
- 03 Aug 2026 05:45:19 -0400
-X-MC-Unique: w65f0Gx6O7S8iK9U9Q_7nQ-1
-X-Mimecast-MFC-AGG-ID: w65f0Gx6O7S8iK9U9Q_7nQ_1785750318
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-213-KTRdosnKOcmRdBGh9i5rJA-1; Mon,
+ 03 Aug 2026 05:45:24 -0400
+X-MC-Unique: KTRdosnKOcmRdBGh9i5rJA-1
+X-Mimecast-MFC-AGG-ID: KTRdosnKOcmRdBGh9i5rJA_1785750323
 Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0171819560B7;
-	Mon,  3 Aug 2026 09:45:18 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1E45819560BC;
+	Mon,  3 Aug 2026 09:45:23 +0000 (UTC)
 Received: from thuth-p1g4.redhat.com (unknown [10.44.48.213])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1F2461956087;
-	Mon,  3 Aug 2026 09:45:14 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 016C01956087;
+	Mon,  3 Aug 2026 09:45:18 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-kernel@vger.kernel.org,
 	linux-crypto@vger.kernel.org,
-	Antoine Tenart <atenart@kernel.org>
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	qat-linux@intel.com
 Cc: Simo Sorce <simo@redhat.com>
-Subject: [PATCH v2 8/9] crypto: safexcel - zeroize crypto_aes_ctx with __cleanup(aes_clear_ctx)
-Date: Mon,  3 Aug 2026 11:44:27 +0200
-Message-ID: <20260803094432.70505-9-thuth@redhat.com>
+Subject: [PATCH v2 9/9] crypto: qat - zeroize crypto_aes_ctx with __cleanup(aes_clear_ctx)
+Date: Mon,  3 Aug 2026 11:44:28 +0200
+Message-ID: <20260803094432.70505-10-thuth@redhat.com>
 In-Reply-To: <20260803094432.70505-1-thuth@redhat.com>
 References: <20260803094432.70505-1-thuth@redhat.com>
 Precedence: bulk
@@ -65,131 +66,39 @@ X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
 From: Thomas Huth <thuth@redhat.com>
 
-The code clears the crypto_aes_ctx in most cases already with
-memzero_explicit(), but two cases are missed:
+A recent patch by Giovanni Cabiddu already added a memzero_explicit()
+for the crypto_aes_ctx in the qat_alg_xts_reverse_key() function,
+but since we introduced __cleanup(aes_clear_ctx) markers in previous
+commits in many spots of the code already, let's use it here now, too,
+to have the same code pattern everywhere.
 
-1) safexcel_aead_setkey() never cleared it
-2) safexcel_skcipher_aesxts_setkey() runs aes_expandkey() twice, and in
-   case the second call fails, the context from the first call is leaked
-
-To fix these and to avoid future similar problems, let's use the new
-__cleanup(aes_clear_ctx) mechanism to make sure that we clear the
-crypto_aes_ctx everywhere.
-
-Cc: Antoine Tenart <atenart@kernel.org>
+Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- drivers/crypto/inside-secure/safexcel_cipher.c | 15 +++++----------
- drivers/crypto/inside-secure/safexcel_hash.c   |  3 +--
- 2 files changed, 6 insertions(+), 12 deletions(-)
+ drivers/crypto/intel/qat/qat_common/qat_algs.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index a8349b684693e..2d21ef388beaf 100644
---- a/drivers/crypto/inside-secure/safexcel_cipher.c
-+++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -375,7 +375,7 @@ static int safexcel_skcipher_aes_setkey(struct crypto_skcipher *ctfm,
- 	struct crypto_tfm *tfm = crypto_skcipher_tfm(ctfm);
- 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
- 	struct safexcel_crypto_priv *priv = ctx->base.priv;
--	struct crypto_aes_ctx aes;
-+	struct crypto_aes_ctx aes __cleanup(aes_clear_ctx);
- 	int ret, i;
- 
- 	ret = aes_expandkey(&aes, key, len);
-@@ -396,7 +396,6 @@ static int safexcel_skcipher_aes_setkey(struct crypto_skcipher *ctfm,
- 
- 	ctx->key_len = len;
- 
--	memzero_explicit(&aes, sizeof(aes));
- 	return 0;
- }
- 
-@@ -407,7 +406,7 @@ static int safexcel_aead_setkey(struct crypto_aead *ctfm, const u8 *key,
- 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
- 	struct safexcel_crypto_priv *priv = ctx->base.priv;
- 	struct crypto_authenc_keys keys;
--	struct crypto_aes_ctx aes;
-+	struct crypto_aes_ctx aes __cleanup(aes_clear_ctx);
- 	int err = -EINVAL, i;
- 	const char *alg;
- 
-@@ -1362,7 +1361,7 @@ static int safexcel_skcipher_aesctr_setkey(struct crypto_skcipher *ctfm,
- 	struct crypto_tfm *tfm = crypto_skcipher_tfm(ctfm);
- 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
- 	struct safexcel_crypto_priv *priv = ctx->base.priv;
--	struct crypto_aes_ctx aes;
-+	struct crypto_aes_ctx aes __cleanup(aes_clear_ctx);
- 	int ret, i;
- 	unsigned int keylen;
- 
-@@ -1388,7 +1387,6 @@ static int safexcel_skcipher_aesctr_setkey(struct crypto_skcipher *ctfm,
- 
- 	ctx->key_len = keylen;
- 
--	memzero_explicit(&aes, sizeof(aes));
- 	return 0;
- }
- 
-@@ -2542,7 +2540,7 @@ static int safexcel_skcipher_aesxts_setkey(struct crypto_skcipher *ctfm,
- 	struct crypto_tfm *tfm = crypto_skcipher_tfm(ctfm);
- 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
- 	struct safexcel_crypto_priv *priv = ctx->base.priv;
--	struct crypto_aes_ctx aes;
-+	struct crypto_aes_ctx aes __cleanup(aes_clear_ctx);
- 	int ret, i;
- 	unsigned int keylen;
- 
-@@ -2590,7 +2588,6 @@ static int safexcel_skcipher_aesxts_setkey(struct crypto_skcipher *ctfm,
- 
- 	ctx->key_len = keylen << 1;
- 
--	memzero_explicit(&aes, sizeof(aes));
- 	return 0;
- }
- 
-@@ -2756,12 +2753,11 @@ static int safexcel_aead_ccm_setkey(struct crypto_aead *ctfm, const u8 *key,
- 	struct crypto_tfm *tfm = crypto_aead_tfm(ctfm);
- 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
- 	struct safexcel_crypto_priv *priv = ctx->base.priv;
--	struct crypto_aes_ctx aes;
-+	struct crypto_aes_ctx aes __cleanup(aes_clear_ctx);
- 	int ret, i;
- 
- 	ret = aes_expandkey(&aes, key, len);
- 	if (ret) {
--		memzero_explicit(&aes, sizeof(aes));
- 		return ret;
- 	}
- 
-@@ -2790,7 +2786,6 @@ static int safexcel_aead_ccm_setkey(struct crypto_aead *ctfm, const u8 *key,
- 	else
- 		ctx->hash_alg = CONTEXT_CONTROL_CRYPTO_ALG_XCBC128;
- 
--	memzero_explicit(&aes, sizeof(aes));
- 	return 0;
- }
- 
-diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index 3402e570d045c..d3b701c96d871 100644
---- a/drivers/crypto/inside-secure/safexcel_hash.c
-+++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -1905,7 +1905,7 @@ static int safexcel_cbcmac_setkey(struct crypto_ahash *tfm, const u8 *key,
- 				 unsigned int len)
+diff --git a/drivers/crypto/intel/qat/qat_common/qat_algs.c b/drivers/crypto/intel/qat/qat_common/qat_algs.c
+index 91663805d9e60..9a56fcdedd579 100644
+--- a/drivers/crypto/intel/qat/qat_common/qat_algs.c
++++ b/drivers/crypto/intel/qat/qat_common/qat_algs.c
+@@ -388,7 +388,7 @@ static void qat_alg_skcipher_init_enc(struct qat_alg_skcipher_ctx *ctx,
+ static void qat_alg_xts_reverse_key(const u8 *key_forward, unsigned int keylen,
+ 				    u8 *key_reverse)
  {
- 	struct safexcel_ahash_ctx *ctx = crypto_tfm_ctx(crypto_ahash_tfm(tfm));
--	struct crypto_aes_ctx aes;
-+	struct crypto_aes_ctx aes __cleanup(aes_clear_ctx);
- 	int ret, i;
+-	struct crypto_aes_ctx aes_expanded;
++	struct crypto_aes_ctx aes_expanded __cleanup(aes_clear_ctx);
+ 	int nrounds;
+ 	u8 *key;
  
- 	ret = aes_expandkey(&aes, key, len);
-@@ -1928,7 +1928,6 @@ static int safexcel_cbcmac_setkey(struct crypto_ahash *tfm, const u8 *key,
+@@ -405,7 +405,6 @@ static void qat_alg_xts_reverse_key(const u8 *key_forward, unsigned int keylen,
+ 		memcpy(key_reverse + AES_BLOCK_SIZE, key - AES_BLOCK_SIZE,
+ 		       AES_BLOCK_SIZE);
  	}
- 	ctx->cbcmac  = true;
- 
--	memzero_explicit(&aes, sizeof(aes));
- 	return 0;
+-	memzero_explicit(&aes_expanded, sizeof(aes_expanded));
  }
  
+ static void qat_alg_skcipher_init_dec(struct qat_alg_skcipher_ctx *ctx,
 -- 
 2.55.0
 
