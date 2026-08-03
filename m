@@ -1,76 +1,75 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 010504028EE;
-	Mon,  3 Aug 2026 11:38:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E54940BCD8
+	for <linux-crypto@vger.kernel.org>; Mon,  3 Aug 2026 12:45:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785757113; cv=none; b=f1t1i5r61WmND6GVxXt4ZmmGQvfKRF7bEGYQqqOJejJcU7OXN8QXpnzELQVGAg+0iUu03Nd8Q8IVrQgU0olpdrCzSzBXR/Np5oJAGxzjQYOkOYHGt41ruO0JV0/Sz2PsP8t8+JcvXkQKAsjprXk6VrEH0dBctnx1P8pS1nyqy5M=
+	t=1785761101; cv=none; b=QyTCw9FTedtxNKPqnqtI9N9oiYYMeR/X4e4O/7oMS2tCzHKRydFfjg84BtLCtNd9x1IDRIi4LOhZaCU4R8NelE3//a8/4rcHoJwQ82SDNky9nfDm0vuQApQc8bcZiEK2Bkb3kxaBsbQIlTfOT72PAZyTTotsYAsxaZGUce1oVl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785757113; c=relaxed/simple;
-	bh=GY5YWYQyJy3BbgXwU8pSx/yzP24RBD0kX2M3BbVvyDM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jRA9LtewiD0xCAOc6yAqN9z3m/QNnjU2Q/TTqCj7Ww4381vQMMDkudR6CcPFZdw/ZtgRKTG2J5pVVLLsZmxoXW9Ss+PSap0+c4WfJ4Aj6+WCtJW1XpXuNJI5Ux4rcxGoX8kbHiL/QG6E+BYfEgMJ+AVkx+58D7QXYvh7xNFLVOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Pr2hQiZz; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1785761101; c=relaxed/simple;
+	bh=OgAhawLj2LuPuTBDhM8RVrn8M7VSu5vp+n2B/wMhiPA=;
+	h=Message-ID:In-Reply-To:References:From:To:Subject:Date:
+	 MIME-Version:Content-Type; b=PydQJc/mR0qVnnJ3KkQ9yGnJpl2latoC++8JNgBTF6Y88MVGwp3QtMWXge5qedT5Ua/KF+rcgJMUTJBrO8Yyew5ftL2NVMqTEUg7u5NytoMXYoLquTuNnDFtNN2o/MiZNgh3BAf/LB+WFn2mZy30xVan5f6QU/ZmHPrj4wEcCbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gosalescloserapp.com; spf=pass smtp.mailfrom=gosalescloserapp.com; dkim=pass (2048-bit key) header.d=gosalescloserapp.com header.i=@gosalescloserapp.com header.b=WX10KA3l; arc=none smtp.client-ip=209.85.222.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gosalescloserapp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gosalescloserapp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Pr2hQiZz"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 672LlepU159787;
-	Mon, 3 Aug 2026 11:38:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=xRAawKgKKSyq+gqpRznkn/pNIqLhVh
-	nWgH2UQbsXDYU=; b=Pr2hQiZzBTemNLIglGDlrlS6SqPjpmHkotm7o3SPkFpI/w
-	7twQDyNvGeOJNOSxEgHNhw+Jcv7Mb4NNNhEN8SPwcU2KZ6Bg3719b4sPh+lhB68J
-	PDdVGR/hThZq/RO4ioI0A2KZCmUt9OQKNuLsuUiRVru/NjaIC2ZJeHR24I/NyROZ
-	tBJGX4UJI5IFxTtiM4DWfjwj4+0oJKtgYjhTYRKw14y5SVKWewqnkex240EvVGll
-	YeQObuYLEVq84sHduBwTDR/gvyoQpStZsFVmkEzj4lSBIwhy0siW0YQjuqrQo3C+
-	GWKS7W6QeQBUSZ3S3ZGd4bSvoxiactUAr+n4temg==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fs67hgewm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Aug 2026 11:38:23 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 673BBIxu019454;
-	Mon, 3 Aug 2026 11:38:22 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4fsvmh539m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Aug 2026 11:38:22 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 673BcIhL14614932
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 3 Aug 2026 11:38:18 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 999EF2004B;
-	Mon,  3 Aug 2026 11:38:18 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 213AC20043;
-	Mon,  3 Aug 2026 11:38:18 +0000 (GMT)
-Received: from localhost (unknown [9.87.133.185])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon,  3 Aug 2026 11:38:18 +0000 (GMT)
-Date: Mon, 3 Aug 2026 13:38:16 +0200
-From: Vasily Gorbik <gor@linux.ibm.com>
-To: Heiko Carstens <hca@linux.ibm.com>
-Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Holger Dengler <dengler@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v4 0/4] s390: Remove or replace cond_resched() calls
-Message-ID: <ttj6yzs@ub.hpns>
-References: <20260731165004.2758105-1-hca@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=gosalescloserapp.com header.i=@gosalescloserapp.com header.b="WX10KA3l"
+Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-9773c6ea885so689612241.3
+        for <linux-crypto@vger.kernel.org>; Mon, 03 Aug 2026 05:45:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gosalescloserapp.com; s=google; t=1785761099; x=1786365899; darn=vger.kernel.org;
+        h=content-type:mime-version:date:content-transfer-encoding:subject:to
+         :from:references:in-reply-to:message-id:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=OgAhawLj2LuPuTBDhM8RVrn8M7VSu5vp+n2B/wMhiPA=;
+        b=WX10KA3lM7rm0eneVIn+YXhNnynzjEOjokYD6B6VH+qCiePc3YUC2Xu9oPBy85Z1ud
+         BhZ+SdBpgQDHy7k6+PmK/umBoximF7WR+eYyooBRsucLq/9TM59Mi8KNywp7pWPa58wK
+         pFHcGCVYe6xEVY3zbjhFS4JTMZWYZW3lSwB190pNhAyXyp5Vm8eIQZEEagPoX2Qw6wxz
+         dcff/4/D7CkqtGKruSuVTKTdVi+cPfbDRO09E0II9rLnbLHC13OR/npiRuHucHzJtUE4
+         5OlMvq+1aTrBhjuqWAqhcPvpeWQshDSDtesszofNd9Vz+rDFRz7vedEfiFLeaKBj8FTK
+         bbaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785761099; x=1786365899;
+        h=content-type:mime-version:date:content-transfer-encoding:subject:to
+         :from:references:in-reply-to:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=OgAhawLj2LuPuTBDhM8RVrn8M7VSu5vp+n2B/wMhiPA=;
+        b=I4w2dP3K0Of/3LDdkL6ffpL2YhZgHIiDd7wOlwB23YXlFHyLABDAxq5vGx4fwHErqN
+         96ULTIgeutwKvnP4hcNbVdKjupp9cYxg3QMv+X5qwi22+/bEZswzdbf8PAgThkmL8iUe
+         XSx0id+2iJF61mjg3TJEO0uBeU6nuCf3hDExMg6KjEZVzLtR6m3hEPKOI41OSISWal7H
+         +8hhKzAnHWHkLbYA/9ERHJ9VisZr2290+6HlWuCTEYRJWBgKb4cYQUBLZITLaA+Lg5D+
+         zZzMzraSpO8N34b6KzOkgjlciKzqFdrifvWGdSaTfsqKcVq/wl4OyzgaByXlUwwID9yu
+         zdew==
+X-Gm-Message-State: AOJu0Yw6GpjwDkQHqdcvyu9WWC5qX615C5B3/FMwdsAAqjtfS1RPIiLv
+	exuqnjR+lZa2GB6anK+a9hcwaMe7bR4YZ9rEMB41zjvPsmmPFCrHAU1X+j5PwtDy5IczEbnWaeU
+	8aw8tPA==
+X-Gm-Gg: AR+sD10Ld52avP6M3oDN6Fs267s4s+WARe7qU5yqU3pRBQ6Vy+uVOvtAPDh2iZXWKJm
+	zIXi9BAd4XDWul8PMPV2xPa+uQU60O/jQuVNB5bJSPyElDEXgZNN7YbGGRxeDB50CoKsNbO2oUW
+	E35N+REs5RczmSBLWKbFf+CY+dseRrFiM/7Q76UX1HCtcPBNdjn4go2np1AxbCD/RF9ltxYnQqV
+	TEDeTsSytwyHhjJfZGf08654CuvIhIho7nGulx8qfOh3pLsHg+hAy5sf/Q42hidexmR8jn1qcfa
+	jQtRVvKBBjxj9g/IQ3mmdjraiHdsaDQbLmSiZhn54JdoxJbLMq9Y6r0IMjwg7quaadH325owJaJ
+	MKD+XJqZZuVDLUaxl8MN7ezFbN9GJ1XKo/PM+dG8SLFreUJvW9gAUxnqev/um7mwLdhTJh16LGe
+	JvYGbNefyyY3SsH/ZMdmbrAZyADC24vVKv6uI2b71/aYgRnG8rM0L72Q18gzktg/1c5qXbj/qDu
+	/Sv6q4zAaZzp+dfdeDe5nL1fZoFcm0RLE2JAAf1+CLVtHi51tq6gk15HVJZcmQj1gX77msvccqe
+	caMVL0WyXQfQDHRCLgl7iN7pAAc=
+X-Received: by 2002:a05:6102:2d0c:b0:6f0:3ba3:7d84 with SMTP id ada2fe7eead31-75b21f63c05mr6840887137.5.1785761099168;
+        Mon, 03 Aug 2026 05:44:59 -0700 (PDT)
+Received: from 019fc7a7-ea1a-7347-a6d9-af68e1cf2ec3.local (ec2-54-163-66-194.compute-1.amazonaws.com. [54.163.66.194])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-759c955c3ecsm5929991137.12.2026.08.03.05.44.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Aug 2026 05:44:58 -0700 (PDT)
+Message-ID: <019fc7a7-ea1a-7347-a6d9-af68e1cf2ec3@gosalescloserapp.com>
+In-Reply-To: <019fb7fe-45e4-74f8-8902-d177df85f972@gosalescloserapp.com>
+References: <019fb7fe-45e4-74f8-8902-d177df85f972@gosalescloserapp.com>
+X-Mail-Abuse-Inquiries:
+ https://app.instantly.ai/privacy/report-abuse/019fc7a7-ea1a-7347-a6d9-af68e1cf2ec3
+From: Emily Cooper <emilycooper@gosalescloserapp.com>
+To: linux-crypto@vger.kernel.org
+Subject: Re: Yale Blockchain Initiative sales
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 03 Aug 2026 12:44:58 +0000
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -78,83 +77,74 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260731165004.2758105-1-hca@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODAzMDEwMSBTYWx0ZWRfX2J38FIiYHVl9
- uvon9kaxXgf3di8/mkVK+iUfr5NdAMT1jmp1NdZxb54skoLQKhckLo0r6mpaMva7Bl6NQa3QA4g
- tHvd7uKOJqb0pgS4o/UGpH4G486Wqtc=
-X-Authority-Analysis: v=2.4 cv=I7VVgtgg c=1 sm=1 tr=0 ts=6a707daf cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=hlTv3zeCCfZNwghm1VgA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODAzMDEwMSBTYWx0ZWRfXyhSEQNzf1u+L
- /5UtqgDoGuP8xU3hbjdwLWXfN2ZnfDzLuNu+dc5zBpXfH2SxxHPhTj2gJUJFDzwUGKIfej2URM+
- 46BPIz+u8fYTpImoCAShiM0FDIedzAinL0Eay/PXleHeO5M7m+Q5l1E+t62woLF5i8rzio6/WGB
- 7b7bhR/Gb1d2dis/BXCuFfobNPEYQCWWapykx4F8B0S/pUhw8GAVVChYnORFbTxloVIaAj9fQXa
- JMk7hv/39ORliBGrW+J5fcQbN9jRzVXOJirBMP+GMx2Og1f1gCOFYxY2AW9sGiZ2u1ZOHAYb9Qg
- vs0AcsZthl/JwFjPIFQrTqoIIx2imeEp1YnSl1bygCad5WuCL7Ctvi4AgStFFp0g03hHRwOCDD5
- nveMdVwXDAgXf+fKJI4yGNznPWtm2pb4JGZ7oEiuYLM0cOAUL7vLOX8ExbHqaHXIvuX97PaCBOA
- XpWrTkrsd77IirJpMTg==
-X-Proofpoint-ORIG-GUID: 3-VbYSLjONI99MKwuUiEwIMc5bszb3HW
-X-Proofpoint-GUID: 3-VbYSLjONI99MKwuUiEwIMc5bszb3HW
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1143,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-02_06,2026-07-30_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 impostorscore=0 clxscore=1011 priorityscore=1501 suspectscore=0
- malwarescore=0 adultscore=0 lowpriorityscore=0 phishscore=0 spamscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608030101
 
-On Fri, Jul 31, 2026 at 06:50:00PM +0200, Heiko Carstens wrote:
-> v4:
-> - Replaced first patch with version from Peter Zijlstra
-> 
-> v3:
-> - Drop uv_call_sched() [Claudio Imbrenda]
-> 
-> v2:
-> - Use msleep() in crypto code (Holger Dengler)
-> - Add Reviewed-by tag from Peter Oberparleiter
-> 
-> v1:
-> Since [1] it is only possible to select the PREEMPT or PREEMPT_LAZY
-> preemption models for s390. This has caused some minor problems, but
-> everything has been addressed.
-> 
-> Given that for both preemption models cond_resched() is a no-op remove
-> or replace it everywhere.
-> 
-> [1] commit 7dadeaa6e851 ("sched: Further restrict the preemption modes")
-> 
-> Heiko Carstens (3):
->   KVM: s390: Remove cond_resched() calls
->   s390: Remove cond_resched() calls
->   s390/cio: Remove cond_resched() calls
-> 
-> Peter Zijlstra (1):
->   s390/crypto: Replace cond_resched() with msleep(1)
-> 
->  arch/s390/crypto/paes_s390.c    | 44 +++------------------------------
->  arch/s390/crypto/phmac_s390.c   | 25 +++----------------
->  arch/s390/include/asm/pkey.h    | 16 ++++++++++++
->  arch/s390/include/asm/uv.h      | 16 ++----------
->  arch/s390/kernel/perf_cpum_cf.c |  1 -
->  arch/s390/kernel/uv.c           |  2 +-
->  arch/s390/kvm/gaccess.c         |  8 ++----
->  arch/s390/kvm/gmap.c            |  4 ---
->  arch/s390/kvm/kvm-s390.c        |  1 -
->  arch/s390/kvm/pv.c              | 11 ++++-----
->  arch/s390/kvm/vsie.c            |  1 -
->  arch/s390/mm/cmm.c              |  2 --
->  arch/s390/mm/gmap_helpers.c     |  1 -
->  arch/s390/mm/pageattr.c         |  5 ----
->  arch/s390/mm/pgalloc.c          |  1 -
->  arch/s390/pci/pci.c             |  4 +--
->  drivers/s390/char/uvdevice.c    |  6 ++---
->  drivers/s390/cio/css.c          |  8 ------
->  18 files changed, 37 insertions(+), 119 deletions(-)
+Hi,
 
-Applied, thank you!
+Wanted to close the loop on my earlier note.
+
+Is it worth a short talk=
+ to see if this AI tool could lighten your client workload?
+=C2=A0
+
+On Fri, July 31, 2026 11:45 AM, Emily Cooper <emilycooper@gosalescloserapp.=
+com>
+[emilycooper@gosalescloserapp.com]> wrote:
+
+> Hi,
+>=20
+> Still curious if managing client calls during volatile markets is a =
+challenge for you.
+>=20
+> Happy to share a quick example of how fintech =
+teams solved this.
+>=20
+> On Tue, July 28, 2026 11:38 AM, Emily Cooper =
+<emilycooper@gosalescloserapp.com>
+> [emilycooper@gosalescloserapp.com]> =
+wrote:
+>=20
+> > Hi,
+> >=20
+> > I know schedules get packed fast.
+> >=20
+> > Would a short call this week make sense to explore how others in crypto=
+ use AI for smoother client handling?
+> >=20
+> > On Sat, July 25, 2026 =
+12:13 AM, Emily Cooper <emilycooper@gosalescloserapp.com>
+> > [emilycooper@gosalescloserapp.com]> wrote:
+> >=20
+> > > Hi,
+> > >=20
+> > > Just checking if you had a chance to think about the AI platform I =
+mentioned.
+> > >=20
+> > > Would you be open to a quick chat to see if it =
+fits your setup?
+> > >=20
+> > > On Thu, July 23, 2026 12:04 AM, Emily =
+Cooper <emilycooper@gosalescloserapp.com>
+> > > [emilycooper@gosalesclosera=
+pp.com]> wrote:
+> > >=20
+> > > > Hi,
+> > > >=20
+> > > > I noticed how the =
+volatility of Bitcoin=E2=80=99s price can make it tough to stay on top of =
+client communications and leads in the crypto space.
+> > > >=20
+> > > > An AI-driven platform can help manage calls and meetings smoothly =
+without stretching your current resources.
+> > > >=20
+> > > > One of our users in fintech found it easier to keep prospects =
+engaged and schedule appointments even during market swings.
+> > > >=20
+> > > > Would you be open to exploring how this kind of support could fit =
+into your workflow?
+> > > >=20
+> > > >=20
+> > > > Best
+> > > > -Emily
+> > > >=20
+> > > > P.S: let me know if irrelevant.
+> > > >
