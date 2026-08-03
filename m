@@ -1,383 +1,339 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17DD13ACA6C
-	for <linux-crypto@vger.kernel.org>; Mon,  3 Aug 2026 08:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785744069; cv=none; b=X6hpUoH9NxwC8WtEZQI1q48nO7O0EORTiTZJdOweywSaXrfV27ARguGCKCnt68iiWCQIeO09yxFeWQUEH/gIMrX9KgOsw1hZ9fFtCWDf/+ARJriB9p66E4D8RuV5IarRIeBFCICgLii40K1ksaEuwHK+nODJvko4rOm0c6VyH70=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785744069; c=relaxed/simple;
-	bh=h5sg9DZwCkSNHbPIGJMwafaq4oq3yh479kR5y7of5GY=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D9A630BF4F
+	for <linux-crypto@vger.kernel.org>; Mon,  3 Aug 2026 08:32:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785745946; cv=pass; b=RS+lsUWfU1/h6NRwSEbRTaRexzqzfTtHY3NRyTHf/X3Mo8NcVC+GZFXe5Upitk9KpiV/em3Lr27fpLftghKG7LKVr+sQVUHSqua+0BVFntcNTXk2XGCcAgIY6oZCWM3/XXD+3WeKh5oohpqez+DcO0255L1UJmITQZX+71WRVQ4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785745946; c=relaxed/simple;
+	bh=xYYHChe17nP8+m29jDvjKXwh04GS3X3rOdU2gwJuP44=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DvmkL8PaKU1qfTqfZAouFksXAMFlnN5nzdCyoOjzXUBnKZ8dRHrZflqhkoGMAm+GpawJxMj7eYyhHHg71MT/b+AiCvdv6ZGTdWAAjj3ywDJtFalxp0kPitM6G/MaazQziwUHETWx1ylmcC3FkGKflkhAw+876+CaIjztYmwMAcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JOCvKnCx; arc=none smtp.client-ip=100.103.45.18
+	 To:Cc:Content-Type; b=jdQ8N36WPBvvRUar144Y2m1Dw/sbsZFEQCmVQ70PkhHpLTnQYiXR2k5srHtPVe3+oJ68jhdEfAXdzC4nF5IUjEa2Mi1GrCYKZ94RYCjDIcyrErrdaeB5sM0exQYhp1EaJGEJNB5O01AZ2mx4PIAbIZcDheqpUSnJEc5IMz7M7+E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jO38H2s2; arc=pass smtp.client-ip=74.125.224.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JOCvKnCx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 803811F00A3A
-	for <linux-crypto@vger.kernel.org>; Mon,  3 Aug 2026 08:01:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785744067;
-	bh=xV4Rx+36FglM5iHb2ywHipygTwiMFY5frV0+5rahrio=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=JOCvKnCxtyhav1tc8aqFB7Wzl5RXZY1PqGegHra9Cnm/iluR+ceoVPRzEoYZXIggu
-	 6KCHc0l45AOVT3w0Z5YJcFoEoBCIk81xaXSVmf8lRmpgqyiVExmOYASqYz334gPHHT
-	 SxuL4WJXSQdyUTVhTNar/j1T2vv3kSdR9cKLHA7A7dR7L0pFCdfOzMNS0JxG+68FnU
-	 wj8jfha9dFs3kmGG8MgPIgXaRj9dcZdw6cKz5nQdH0LxaUGOU7HqGIPEvCGI2iacj/
-	 VpOSzSg4WGfUBGpTn1av7ChJ3vIzxrHfmg+5r+yarQYYQFB2g1zPpHaLfa8y7iFoVE
-	 WfsuUgPCElVCw==
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-6a0cb6e96dcso1950935a12.0
-        for <linux-crypto@vger.kernel.org>; Mon, 03 Aug 2026 01:01:07 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+Rpg44KbtLmDCCEhDpJnLRJfel2MFfbuFlXprfXA3M3dkKxFBIw8OWOm9b/kfsEtz//JXblnNzqt4BfLikk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YybETTwPx9ru9l/2DqG/2sDRJodcHuTraDbDYc1RC2e0NXGeU5q
-	RBtxsFwPwV/Oz+G1jgZHFwALFECtCoIWFSqHtYIiwB8BgoIHuhzpAYBF5sC/MB2JtAxtifaBE5e
-	5j7mpTYj1sS6NZpPXTJ75WkyM305EGtA=
-X-Received: by 2002:a05:6402:5046:b0:699:fbe4:16d4 with SMTP id
- 4fb4d7f45d1cf-6a0a7cb31e1mr6349306a12.18.1785744065921; Mon, 03 Aug 2026
- 01:01:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jO38H2s2"
+Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-6679d88abdcso4385344d50.2
+        for <linux-crypto@vger.kernel.org>; Mon, 03 Aug 2026 01:32:24 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1785745943; cv=none;
+        d=google.com; s=arc-20260327;
+        b=HkCSnADkHox2suOUDzPI9OQH6sueNMFmcTtuV2DRI4iGrJC3WTxLUvMFsaFJyztZpa
+         hhxn3+uApvY5zktXqbjjKU4nnSVAdLbakqamAvDw2hZ0BJnwRoC9C76lyhSsC02/TjhU
+         p0dyqU67fJmLPB4+vxFN276TPqSQuWesigdtdE1r2ITQwUhuUjYOQdONDJc25dCOKoha
+         1xxVf0w8qbtuoh5vOgHW+VfD4Tc8HtWQYIivf+/GnI9LTZ0xQT+TU5bVzFc8agdNll9P
+         t7AuDap36sKYcUDSgLq0jzL42swGcrbTiz0kORssKfP+Dw6lGlg2D7TTYLNI4tGADc8R
+         M72w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature;
+        bh=XZ0D5QeK4G3jR4XXSuQ5o1U+5KXDkz0QLmZML4R0I1o=;
+        fh=O2ZAyWs7NG09bqGXz4DdPu3NH8hAQV89K8EkeBuoOAg=;
+        b=JUW1IOHtV3qeTfhS7SZ+O0WejrOL0eiw2X3kjvzYlWnSg3Od7buOBzNN0H9DD7tuVn
+         VMuS0GOFqZs41a5FppRZ1qbkGeo/7sRsm+5EtrzAO+FfjsXCBhg8/KRS3y9TdzU0s3C6
+         s6F3038tRWDDSjGTLxfHSaU1cvqR9x3ycRhtCPiFvJAHTni5WUSoNz+Xpt+TmmmER+dg
+         MKx8akcdKCsqA1lTU0AgQF136hkII99PCWbSt9ffLRmi4iU2QwiK4cUEUBRZi5f4U7Fq
+         Xx10M8dcFMLpppXsN7S7+1icKhNgH8+dKdaiKSxWxyNdTLcR7vIsUlBUExBq5WqVPkQU
+         fgLQ==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785745943; x=1786350743; darn=vger.kernel.org;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=XZ0D5QeK4G3jR4XXSuQ5o1U+5KXDkz0QLmZML4R0I1o=;
+        b=jO38H2s2VRSNHd6YhFq4Xw1OG3fUPCpqaG3UviEcHH15UBH23UyoHeJZg4pXqkPVi1
+         L6L2eKLohUzvtD3G9MRI4W//cWmshE96lpgfC4ZXROoSOv0y368faysGjVrrsj5NJTy4
+         jrk27MSg1gsx3kkuJkgUP+WJJg7LC5micBoUEosqjKDCexdu7SChFYXddBs28hOWIuQf
+         0uhTrIQfc3AAwmTRBbmtFfzeuowPrzjbEtprNTjRp0xh5o5wFPdJfJtqqPvYB+6shdDM
+         xVZ/kbSetfVVGavEqaMliyH5AE0gEM0IiV4i5DygslZQIWWGFAxO32ptNbDX6htQSJC7
+         dJrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785745943; x=1786350743;
+        h=content-type:cc:to:subject:message-id:date:from:in-reply-to
+         :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=XZ0D5QeK4G3jR4XXSuQ5o1U+5KXDkz0QLmZML4R0I1o=;
+        b=U2Giq1NMJWw+AA8yyBs10BFVXNPy4GsaqQ5HHknz60v1dRqLgcNG05dkn+i7LlcOk4
+         yNlvoqQ4l4LQ2PR0fGdegKI65zGKANdIT7AARs3ezNc95Jybuld6AeteCmXDslQqgL2L
+         aDuvPi/wvxOeuWhxFGus2gkOwifi6f+N4BfXxvxoU4v5ypBES2EwQfPZcQmI1lVnzGiS
+         171B3c5E8/8mRmu1OJQJxQx0RJdSm+6d5QE0N3BRUjhV+DLAnedfiPal+oyo/lhVw4hx
+         8deajZMLN846n8LK3gSRlbl32fCFSHW0ZFy67GIrXmDbG9mmESrc6HvfoWIuMMwP9nAZ
+         H5Dw==
+X-Forwarded-Encrypted: i=1; AHgh+RrbOJMkupHi+DnTswEQU3nRS/Z4qsudxrmMM3QUMlnq5VaQCvnZssh/ZSp1XFk1LWE1qeDnNpgxdB6qTp8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLC+TTItkyQeN5KDC6vXKwdUtzUOPdXXrAAkXDACpuk4oQGpNb
+	evkdmO1s92kWnvdvkphILsDUa8WquE2WafMyxetBTXTOb8SobZQdw4ilGegMxrVV9cq60DOjyez
+	cVOCCjKEVaGZuhOot88GFbyAbREVr8UI=
+X-Gm-Gg: AR+sD114PdZYwjlruAZLPpkAyzPcos4KqZBzDBNgMTb1/n2bbn6VY4M7oHSE3+FS6qA
+	sY3T7w2i+m69LC9tWvG/PfXIMjA9f1BeQ0CTqzB4Rzu5XcLX57Jzm4C/P+9hG7dknaZQadxFd2Z
+	pl8IqCWbG28vxhglyZvG1O/1ArxiuONxl+5mg/Nd0A+t1JHzb7sdxKUehWs9iEO8T7tXzT9vHuO
+	yqTHgXbziXTHCO2ekQVF1B8suX04r1efw9lJhlodwGR8eTFx8RKT6cimFS2ChuKfZ7DJwnuTx03
+	KQzTlGv5v10WgLuvXATQuiDn3hIb7VngpnrgxpfA0hyvjm7JaTg+U70wB1T/M1C1Xj+m3TR9L3e
+	eLxZ8H+ZQlCjReF0=
+X-Received: by 2002:a53:db0b:0:b0:668:568e:8618 with SMTP id
+ 956f58d0204a3-6694efde7fdmr8659151d50.1.1785745943383; Mon, 03 Aug 2026
+ 01:32:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260730082608.1929-1-zhaoqunqin@loongson.cn> <20260730082608.1929-3-zhaoqunqin@loongson.cn>
-In-Reply-To: <20260730082608.1929-3-zhaoqunqin@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Mon, 3 Aug 2026 16:01:30 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H4V6NWDcw1nVZzaXKJF_QS0sz5jTsrnwbq-xki2mJLVtQ@mail.gmail.com>
-X-Gm-Features: AUfX_mz0beBkinpveN76Fxyhrfx8V9PN3Mj2z0nrH4fWsnyXZf1ulyPC7ZymtK0
-Message-ID: <CAAhV-H4V6NWDcw1nVZzaXKJF_QS0sz5jTsrnwbq-xki2mJLVtQ@mail.gmail.com>
-Subject: Re: [PATCH v5 2/2] mfd: loongson-se: Fix miscellaneous issues
-To: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Cc: lee@kernel.org, linux-kernel@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-crypto@vger.kernel.org
+References: <20260607112435.42804-1-fabianblatter09@gmail.com> <aknsgpnZsjmLtcT_@gondor.apana.org.au>
+In-Reply-To: <aknsgpnZsjmLtcT_@gondor.apana.org.au>
+From: Fabian <fabianblatter09@gmail.com>
+Date: Mon, 3 Aug 2026 10:32:12 +0200
+X-Gm-Features: AUfX_mxdZiCM5ORsrRCViG7N96DwXFPFPFPAZkr8mByG9vHiIfCY4OUze3Tg6bA
+Message-ID: <CAGtAT=n+wEp+BLVBo57cx3nYX8Juj5NXvmhU=ueAVshSL1Bd6g@mail.gmail.com>
+Subject: Re: [PATCH] crypto: ecc - Optimize vli additive operations using
+ compiler builtins
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: lukas@wunner.de, ignat@linux.win, davem@davemloft.net, 
+	stefanb@linux.ibm.com, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi, Qunqin,
-
-On Thu, Jul 30, 2026 at 4:41=E2=80=AFPM Qunqin Zhao <zhaoqunqin@loongson.cn=
-> wrote:
+On Sun, 5 Jul 2026 at 07:33, Herbert Xu <herbert@gondor.apana.org.au> wrote:
 >
-> Address multiple historical driver issues discovered by the Sashiko
-> Automation system within the loongson_se_probe() initialization flow
-> and the driver's interrupt service routines [1].
+> On Sun, Jun 07, 2026 at 01:24:35PM +0200, Fabian Blatter wrote:
+> > Replace the software carry flag emulation with compiler builtins.
+> >
+> > Even the newest compilers struggle with taking advantage of the
+> > hardware carry flag. Compiler builtins allow the compiler to
+> > much more easily achieve this while still remaining constant-time.
+> >
+> > This yields an approximately 6-7% performance improvement
+> > on the ecc_gen_privkey, ecc_make_pub_key and crypto_ecdh_shared_secret
+> > functions on x86_64 on all curve sizes.
+> >
+> > Additionally, the code becomes much more readable.
+> >
+> > Signed-off-by: Fabian Blatter <fabianblatter09@gmail.com>
+> > ---
+> >
+> > Hi,
+> >
+> > I'd like to expand on the benchmarks, compare the generated assembly,
+> > and clarify some things.
+> >
+> >
+> > Use of compiler builtins:
+> >
+> > This patch uses __builtin_addcll, __builtin_subcll when available and
+> > otherwise __builtin_uaddll_overflow, __builtin_usubll_overflow. the
+> > latter have existed since ancient gcc versions, so no third fallback
+> > is needed.
+> >
+> > I have put the add_carry and sub_borrow inline functions with the
+> > preprocessor logic for builtin selection directly in crypto/ecc.c.
+> > Please let me know if you would like them to be somewhere else.
+> >
+> > They do not emit data-dependent branches, and so remain constant-time.
+> >
+> >
+> > Benchmarks:
+> >
+> > All benchmarks were run single-threaded on my AMD 7700X CPU limited to
+> > 5.6Ghz. I have measured both nanoseconds and clock cycles, since their
+> > combination can hint at downclocking issues and allows calculation of
+> > the clock speed during the benchmark.
+> >
+> > I have omitted the raw output from the benchmarking code, as they much
+> > exceed the 72 character limit.
+> >
+> > I have calculated the percent differences, included clock speed
+> > calculations and relevant summaries.
+> >
+> >
+> > Macro benchmarks:
+> >
+> > These were run in a virtualized environment using virtme-ng on the
+> > compiled linux kernel image compiled with default flags.
+> >
+> > (the first value is the original time per operation, the second the
+> > patched one. cc is short for clock cycles)
+> >
+> > Curve keypair generation (ecc_gen_privkey + ecc_make_pub_key):
+> >
+> > P256:
+> >  - 646963ns/op -> 600632ns/op = -7.71%
+> >  - 2911300cc/op -> 2702854cc/op = -7.71%
+> >  - 4.4999Ghz -> 4.5000Ghz = no difference
+> >
+> > P384:
+> >  - 1239160ns/op -> 1153940ns/op = -7.38%
+> >  - 5576250cc/op -> 5192749cc/op = -7.38%
+> >  - 4.5000Ghz -> 4.5000Ghz = no difference
+> >
+> > Shared secret generation (crypto_ecdh_shared_secret):
+> >
+> > P256:
+> >  - 320114ns/op -> 297548ns/op = -7.58%
+> >  - 1440521cc/op -> 1338972cc/op = -7.58%
+> >  - 4.5000Ghz -> 4.5000Ghz = no difference
+> >
+> > P384:
+> >  - 620768ns/op -> 582560ns/op = -6.55%
+> >  - 2793467cc/op -> 2621529cc/op = -6.55%
+> >  - 4.5000Ghz -> 4.5000Ghz = no difference
+> >
+> > The benchmarks clearly indicate a roughly 6-7% performance increase on
+> > the public API functions. It also appears that virtme-ng limited the
+> > clock speed to 4.5Ghz
+> >
+> >
+> > Micro benchmarks:
+> >
+> > Since the vli additive functions only rely on u64 being defined, these
+> > were run without virtualization and with varying compilers and
+> > compiler flags.
+> >
+> > The microbenchmarks show much more mixed results, depending
+> > heavily on the compiler and optimization level used.
+> >
+> > For instance, on gcc and O2, the vli_add present in the
+> > patch is actually 25.3% slower than the original one. I have tracked
+> > this down to gcc using a weird way to restore the carry flag after
+> > each iteration, causing way more dependent instructions, preventing
+> > ILP from executing multiple at once.
+> >
+> > This is quite interesting, since, as far as I know, the kernel compiles
+> > with gcc and O2 by default, yet the macro-level benchmarks still show a
+> > performance increase. The effect seems to be reversed when crypto/ecc.c
+> > gets compiled. Or maybe the linux kernel uses some additional
+> > optimization flags, I am unsure.
+> >
+> > However, most of the time, the patched version outperforms the original
+> > one by a wide margin:
+> >  - On clang -O2 or -O3, vli_add and vli_uadd show a 4.074x and 5.384x
+> >    speedup.
+> >  - On gcc, vli_uadd shows a 74% performance increase at O2,
+> >    and a 2.07x speedup at O3.
+> >
+> > The performance profile of vli_sub and vli_usub is almost identical to
+> > that of vli_add and vli_uadd.
+> >
+> >
+> > Assembly comparison:
+> >
+> > I have put together a piece of code on Compiler explorer, to make sure
+> > it compiles on old gcc versions, view instructions and play around with
+> > compiler settings.
+> >
+> > If you would like, you can play around yourself here:
+> > https://godbolt.org/z/1jT5zesz8
+> >
+> > When using clang 22.1 at -O3 -march=lunarlake, the difference between
+> > the patched and original version is particularly clear. The patched
+> > version produces this assembly in the unrolled vli_add loop:
+> >
+> > mov     rax, qword ptr [rsi + 8*rcx + 16]
+> > adc     rax, qword ptr [rdx + 8*rcx + 16]
+> > mov     qword ptr [rdi + 8*rcx + 16], rax
+> > mov     rax, qword ptr [rsi + 8*rcx + 24]
+> > adc     rax, qword ptr [rdx + 8*rcx + 24]
+> > mov     qword ptr [rdi + 8*rcx + 24], rax
+> > mov     rax, qword ptr [rsi + 8*rcx + 32]
+> > adc     rax, qword ptr [rdx + 8*rcx + 32]
+> > mov     qword ptr [rdi + 8*rcx + 32], rax
+> > mov     rax, qword ptr [rsi + 8*rcx + 40]
+> > adc     rax, qword ptr [rdx + 8*rcx + 40]
+> > mov     qword ptr [rdi + 8*rcx + 40], rax
+> > mov     rax, qword ptr [rsi + 8*rcx + 48]
+> > adc     rax, qword ptr [rdx + 8*rcx + 48]
+> >
+> > This is basically optimal for an inner loop. It's pure adc and mov
+> > instructions. The loop counting part is still nowhere near perfect,
+> > and still uses setc instructions. But it is still better than what
+> > the original version produces with the same compiler and flags:
+> >
+> > mov     r10, qword ptr [rsi + 8*rcx]
+> > lea     r11, [r10 + rax]
+> > add     r11, qword ptr [rdx + 8*rcx]
+> > xor     ebx, ebx
+> > cmp     r11, r10
+> > setb    bl
+> > cmove   rbx, rax
+> > mov     qword ptr [rdi + 8*rcx], r11
+> > mov     rax, qword ptr [rsi + 8*rcx + 8]
+> > lea     r10, [rax + rbx]
+> > add     r10, qword ptr [rdx + 8*rcx + 8]
+> > xor     r11d, r11d
+> > cmp     r10, rax
+> > setb    r11b
+> > cmove   r11, rbx
+> > mov     qword ptr [rdi + 8*rcx + 8], r10
+> > mov     rax, qword ptr [rsi + 8*rcx + 16]
+> > lea     r10, [rax + r11]
+> > add     r10, qword ptr [rdx + 8*rcx + 16]
+> > xor     ebx, ebx
+> > cmp     r10, rax
+> > setb    bl
+> > cmove   rbx, r11
+> > mov     qword ptr [rdi + 8*rcx + 16], r10
+> > mov     rax, qword ptr [rsi + 8*rcx + 24]
+> > lea     r10, [rax + rbx]
+> > add     r10, qword ptr [rdx + 8*rcx + 24]
+> > xor     r11d, r11d
+> > cmp     r10, rax
+> > setb    r11b
+> > cmove   r11, rbx
+> >
+> > This is downright horrendous. that entire block of processes only 4
+> > limbs, thats 8 instructions per limb! The add instructions
+> > are also not adc instructions, showing that the carry flag is
+> > being fully emulated. This demonstrates how even on the newest
+> > compilers and at the highest optimization level, still cannot
+> > generate hardware carry chains without explicit use of builtins.
+> >
+> > I should note that not just clang 22.1.0 with -O3 -march=lunarlake
+> > does this. Gcc and clang show this behaviour on every version i have
+> > tested, regardless of target architecture.
+> >
+> > I am not very familiar with ARM or RISC-V assembly, but looking at
+> > compiler explorer, the effect clearly persists, and in the case of
+> > RISC-V actually gets much worse.
+> >
+> > This affects all architectures across all compilers and compiler
+> > flags.
+> >
+> >
+> > If you have gotten this far, thank you for reading this and I am looking
+> > forward to any feedback! If you would like any changes to this patch,
+> > I am very happy to send a v2.
+> >
+> >  crypto/ecc.c | 98 ++++++++++++++++++++++++++++++++--------------------
+> >  1 file changed, 60 insertions(+), 38 deletions(-)
 >
-> - Add an explicit bounds check in se_irq_handler() before accessing
->   the engines array to prevent out-of-bounds memory writes.
->
-> - Switch from devm_kmalloc() to devm_kzalloc() and explicitly
->   initialize all engine completion structures in probe() to avoid a
->   kernel panic from complete() dereferencing a NULL wait head when a
->   spurious interrupt fires before child drivers call
->   loongson_se_init_engine().
->
-> - Replace engine_init_lock with a broader cmd_lock mutex that
->   serializes all command submissions, and move the lock into
->   loongson_se_send_controller_cmd() and
->   loongson_se_send_engine_cmd() to cover the full register write +
->   poll + wait sequence.
->
-> - Drop the spin_lock_irq from loongson_se_poll() so that interrupts
->   are not disabled for up to 10 ms during the poll.  Keep the
->   readl_relaxed_poll_timeout_atomic() busy-wait to avoid scheduling
->   latency for fast hardware completions.
->
-> - Add reinit_completion() to loongson_se_send_controller_cmd() and
->   loongson_se_send_engine_cmd() before waiting to prevent stale
->   completions from falsely returning success after a signal
->   interruption.
->
-> - Fix EPROBE_DEFER handling: propagate the error directly from
->   platform_irq_count() instead of overwriting it with ENODEV so that
->   probe deferral works when the interrupt provider is not yet ready.
->
-> - Validate dmam_size from firmware against the minimum required size
->   to prevent command buffers from pointing outside the allocated
->   DMA region.
->
-> - Return the error code from devm_request_irq() instead of silently
->   continuing to prevent an indefinite hang.
->
-> - Disable hardware interrupts in the probe error path when
->   loongson_se_init() fails to prevent an unhandled interrupt storm.
->
-> - Add a loongson_se_stop() cleanup handler registered with
->   devm_add_action_or_reset() to send SE_CMD_STOP to the controller
->   and mask all interrupts during device removal.  Using devres
->   ensures that child MFD devices are unbound before the controller
->   is stopped.  The STOP command uses a non-interruptible wait to
->   avoid leaving hardware running while DMA buffers are freed.
->
-> - Zero-initialize the local controller command structure in
->   loongson_se_init() to prevent uninitialized stack memory from
->   being written to device registers.
->
-> - Add the SE_CMD_STOP command definition.
->
-> Link: https://lore.kernel.org/all/20260618095949.GB1672911@google.com/ [1=
-]
-> Fixes: e551fa3159e3 ("mfd: Add support for Loongson Security Engine chip =
-controller")
-> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
-> ---
->  drivers/mfd/loongson-se.c       | 87 ++++++++++++++++++++++++++-------
->  include/linux/mfd/loongson-se.h |  1 +
->  2 files changed, 69 insertions(+), 19 deletions(-)
->
-> diff --git a/drivers/mfd/loongson-se.c b/drivers/mfd/loongson-se.c
-> index 7f552a8ee6..2c8afad1b0 100644
-> --- a/drivers/mfd/loongson-se.c
-> +++ b/drivers/mfd/loongson-se.c
-> @@ -28,7 +28,7 @@ struct loongson_se {
->         void *dmam_base;
->         int dmam_size;
->
-> -       struct mutex engine_init_lock;
-> +       struct mutex cmd_lock;
->         struct loongson_se_engine engines[SE_ENGINE_MAX];
->  };
->
-> @@ -42,8 +42,6 @@ static int loongson_se_poll(struct loongson_se *se, u32=
- int_bit)
->         u32 status;
->         int err;
->
-> -       spin_lock_irq(&se->dev_lock);
-You said you don't want to disable irq here, but I think the spinlock
-is still needed. That means you should use spin_lock/spin_unlock to
-replace spin_lock_irq/spin_unlock_irq.
-
-> -
->         /* Notify the controller that the engine needs to be started */
->         writel(int_bit, se->base + SE_L2SINT_SET);
->
-> @@ -52,8 +50,6 @@ static int loongson_se_poll(struct loongson_se *se, u32=
- int_bit)
->                                                 !(status & int_bit),
->                                                 1, LOONGSON_ENGINE_CMD_TI=
-MEOUT_US);
->
-> -       spin_unlock_irq(&se->dev_lock);
-> -
->         return err;
->  }
->
-> @@ -63,24 +59,40 @@ static int loongson_se_send_controller_cmd(struct loo=
-ngson_se *se,
->         u32 *send_cmd =3D (u32 *)cmd;
->         int err, i;
->
-> +       mutex_lock(&se->cmd_lock);
-> +
-> +       reinit_completion(&se->cmd_completion);
-> +
->         for (i =3D 0; i < SE_SEND_CMD_REG_LEN; i++)
->                 writel(send_cmd[i], se->base + SE_SEND_CMD_REG + i * 4);
->
->         err =3D loongson_se_poll(se, SE_INT_CONTROLLER);
->         if (err)
-> -               return err;
-> +               goto out;
-> +
-> +       err =3D wait_for_completion_interruptible(&se->cmd_completion);
->
-> -       return wait_for_completion_interruptible(&se->cmd_completion);
-> +out:
-> +       mutex_unlock(&se->cmd_lock);
-> +       return err;
->  }
->
->  int loongson_se_send_engine_cmd(struct loongson_se_engine *engine)
->  {
-> +       int err;
-> +
-> +       mutex_lock(&engine->se->cmd_lock);
-> +
-> +       reinit_completion(&engine->completion);
-> +
->         /*
->          * After engine initialization, the controller already knows
->          * where to obtain engine commands from. Now all we need to
->          * do is notify the controller that the engine needs to be starte=
-d.
->          */
-> -       int err =3D loongson_se_poll(engine->se, BIT(engine->id));
-> +       err =3D loongson_se_poll(engine->se, BIT(engine->id));
-> +
-> +       mutex_unlock(&engine->se->cmd_lock);
->
->         if (err)
->                 return err;
-> @@ -97,7 +109,7 @@ struct loongson_se_engine *loongson_se_init_engine(str=
-uct device *dev, int id)
->
->         engine->se =3D se;
->         engine->id =3D id;
-> -       init_completion(&engine->completion);
-> +       reinit_completion(&engine->completion);
-I'm not sure, but I think loongson_se_init_engine() is only called at
-init, so we need init_completion here.
-
-Huacai
-
->
->         /* Divide DMA memory equally among all engines */
->         engine->buffer_size =3D se->dmam_size / SE_ENGINE_MAX;
-> @@ -113,8 +125,6 @@ struct loongson_se_engine *loongson_se_init_engine(st=
-ruct device *dev, int id)
->         engine->command =3D se->dmam_base + id * (2 * SE_ENGINE_CMD_SIZE)=
-;
->         engine->command_ret =3D engine->command + SE_ENGINE_CMD_SIZE;
->
-> -       mutex_lock(&se->engine_init_lock);
-> -
->         /* Tell the controller where to find engine command */
->         cmd.command_id =3D SE_CMD_SET_ENGINE_CMDBUF;
->         cmd.info[0] =3D id;
-> @@ -124,8 +134,6 @@ struct loongson_se_engine *loongson_se_init_engine(st=
-ruct device *dev, int id)
->         if (loongson_se_send_controller_cmd(se, &cmd))
->                 engine =3D NULL;
->
-> -       mutex_unlock(&se->engine_init_lock);
-> -
->         return engine;
->  }
->  EXPORT_SYMBOL_GPL(loongson_se_init_engine);
-> @@ -155,7 +163,8 @@ static irqreturn_t se_irq_handler(int irq, void *dev_=
-id)
->         /* For engines */
->         while (int_status) {
->                 id =3D __ffs(int_status);
-> -               complete(&se->engines[id].completion);
-> +               if (id < SE_ENGINE_MAX)
-> +                       complete(&se->engines[id].completion);
->                 int_status &=3D ~BIT(id);
->                 writel(BIT(id), se->base + SE_S2LINT_CL);
->         }
-> @@ -167,7 +176,7 @@ static irqreturn_t se_irq_handler(int irq, void *dev_=
-id)
->
->  static int loongson_se_init(struct loongson_se *se, dma_addr_t addr, int=
- size)
->  {
-> -       struct loongson_se_controller_cmd cmd;
-> +       struct loongson_se_controller_cmd cmd =3D {0};
->         int err;
->
->         cmd.command_id =3D SE_CMD_START;
-> @@ -188,6 +197,30 @@ static const struct mfd_cell engines[] =3D {
->         { .name =3D "tpm_loongson" },
->  };
->
-> +static void loongson_se_stop(void *data)
-> +{
-> +       struct loongson_se *se =3D data;
-> +       struct loongson_se_controller_cmd cmd =3D {0};
-> +       u32 *send_cmd =3D (u32 *)&cmd;
-> +       int i;
-> +
-> +       mutex_lock(&se->cmd_lock);
-> +
-> +       cmd.command_id =3D SE_CMD_STOP;
-> +
-> +       reinit_completion(&se->cmd_completion);
-> +
-> +       for (i =3D 0; i < SE_SEND_CMD_REG_LEN; i++)
-> +               writel(send_cmd[i], se->base + SE_SEND_CMD_REG + i * 4);
-> +
-> +       if (!loongson_se_poll(se, SE_INT_CONTROLLER))
-> +               wait_for_completion(&se->cmd_completion);
-> +
-> +       writel(0, se->base + SE_S2LINT_EN);
-> +
-> +       mutex_unlock(&se->cmd_lock);
-> +}
-> +
->  static int loongson_se_probe(struct platform_device *pdev)
->  {
->         struct device *dev =3D &pdev->dev;
-> @@ -195,19 +228,25 @@ static int loongson_se_probe(struct platform_device=
- *pdev)
->         int nr_irq, irq, err, i;
->         dma_addr_t paddr;
->
-> -       se =3D devm_kmalloc(dev, sizeof(*se), GFP_KERNEL);
-> +       se =3D devm_kzalloc(dev, sizeof(*se), GFP_KERNEL);
->         if (!se)
->                 return -ENOMEM;
->
->         dev_set_drvdata(dev, se);
->         init_completion(&se->cmd_completion);
->         spin_lock_init(&se->dev_lock);
-> -       mutex_init(&se->engine_init_lock);
-> +       mutex_init(&se->cmd_lock);
-> +
-> +       for (i =3D 0; i < SE_ENGINE_MAX; i++)
-> +               init_completion(&se->engines[i].completion);
->
->         dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
->         if (device_property_read_u32(dev, "dmam_size", &se->dmam_size))
->                 return -ENODEV;
->
-> +       if (se->dmam_size < (SE_ENGINE_MAX * 2 * SE_ENGINE_CMD_SIZE))
-> +               return -EINVAL;
-> +
->         se->dmam_base =3D dmam_alloc_coherent(dev, se->dmam_size, &paddr,=
- GFP_KERNEL);
->         if (!se->dmam_base)
->                 return -ENOMEM;
-> @@ -217,21 +256,31 @@ static int loongson_se_probe(struct platform_device=
- *pdev)
->                 return PTR_ERR(se->base);
->
->         nr_irq =3D platform_irq_count(pdev);
-> -       if (nr_irq <=3D 0)
-> +       if (nr_irq =3D=3D 0)
->                 return -ENODEV;
-> +       if (nr_irq < 0)
-> +               return nr_irq;
->
->         writel(SE_INT_ALL, se->base + SE_S2LINT_CL);
->
->         for (i =3D 0; i < nr_irq; i++) {
->                 irq =3D platform_get_irq(pdev, i);
->                 err =3D devm_request_irq(dev, irq, se_irq_handler, IRQF_S=
-HARED, "loongson-se", se);
-> -               if (err)
-> +               if (err) {
->                         dev_err(dev, "failed to request IRQ: %d\n", irq);
-> +                       return err;
-> +               }
->         }
->
->         writel(SE_INT_ALL, se->base + SE_S2LINT_EN);
->
->         err =3D loongson_se_init(se, paddr, se->dmam_size);
-> +       if (err) {
-> +               writel(0, se->base + SE_S2LINT_EN);
-> +               return err;
-> +       }
-> +
-> +       err =3D devm_add_action_or_reset(dev, loongson_se_stop, se);
->         if (err)
->                 return err;
->
-> diff --git a/include/linux/mfd/loongson-se.h b/include/linux/mfd/loongson=
--se.h
-> index 07afa0c252..8237ccab7b 100644
-> --- a/include/linux/mfd/loongson-se.h
-> +++ b/include/linux/mfd/loongson-se.h
-> @@ -9,6 +9,7 @@
->  #define SE_SEND_CMD_REG_LEN            0x8
->  /* Controller command ID */
->  #define SE_CMD_START                   0x0
-> +#define SE_CMD_STOP                    0x1
->  #define SE_CMD_SET_DMA                 0x3
->  #define SE_CMD_SET_ENGINE_CMDBUF       0x4
->
+> Patch applied.  Thanks.
 > --
-> 2.47.3
->
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+
+Hi,
+
+So about the rewrite of crypto/ecc.c to a constant-time
+Montgomery ladder, I'd like to just make sure it is still on the table.
+
+I also have a few questions about the rewrite:
+
+The paper (https://eprint.iacr.org/2020/956.pdf), which is mentioned
+in the conversation Lukas sent, uses a different type of curve
+than the current implementation. Is a rewrite using entirely different
+elliptic curves intended, or is there some other algorithm that
+should be used with the existing NIST curves?
+
+The paper also talks about assembly and how to make
+it constant-time by avoiding memory operations
+and doing everything in registers. Is it intended
+to be an Assembly implementation or is C acceptable?
+If it is Assembly, I could only reasonably contribute an x64
+version.
+
+Regards,
+Fabian
