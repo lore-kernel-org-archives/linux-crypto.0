@@ -1,373 +1,383 @@
-Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F5A217F33;
-	Mon,  3 Aug 2026 02:00:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17DD13ACA6C
+	for <linux-crypto@vger.kernel.org>; Mon,  3 Aug 2026 08:01:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785722444; cv=none; b=rwmNNzFmrxOlPK5X7ZVdzKFSNByqI9Jc2m1V6irUMOMu5H3kBrvi0vR8O11h1BWW5dcRuAodhb/q15xeoEzMmPpwZYc+egP0fgbrjyx0FSIrWNZQWmHjRJBrZzLVQpR2uz5JJGJ+sKHtmzf3pvuEvFr1+uR/TKUVpT9xmibSneo=
+	t=1785744069; cv=none; b=X6hpUoH9NxwC8WtEZQI1q48nO7O0EORTiTZJdOweywSaXrfV27ARguGCKCnt68iiWCQIeO09yxFeWQUEH/gIMrX9KgOsw1hZ9fFtCWDf/+ARJriB9p66E4D8RuV5IarRIeBFCICgLii40K1ksaEuwHK+nODJvko4rOm0c6VyH70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785722444; c=relaxed/simple;
-	bh=nvD4SW1DHFbXdGCxxulpv4bE120QUqu/514uop8/hfw=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=pqE8wc0ng5qYP4rk2nHP8wEKW6K5U41DXzaeYUXTtP6M1FdHIQOoitZP56ahpqr3p09qeDCCorABeiN7mrf+/z9xzg/kmff1qhJlUTHOdmjwoqF1wlw14eVvA4b4q5Sf16Stgk1eTtkBG4JiAirkSIstF5ov7VE8XWSiAW+IN4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=WOeyUjVI; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=HdfMgR6R; arc=none smtp.client-ip=202.12.124.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
+	s=arc-20240116; t=1785744069; c=relaxed/simple;
+	bh=h5sg9DZwCkSNHbPIGJMwafaq4oq3yh479kR5y7of5GY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DvmkL8PaKU1qfTqfZAouFksXAMFlnN5nzdCyoOjzXUBnKZ8dRHrZflqhkoGMAm+GpawJxMj7eYyhHHg71MT/b+AiCvdv6ZGTdWAAjj3ywDJtFalxp0kPitM6G/MaazQziwUHETWx1ylmcC3FkGKflkhAw+876+CaIjztYmwMAcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JOCvKnCx; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="WOeyUjVI";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="HdfMgR6R"
-Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
-	by mailfout.stl.internal (Postfix) with ESMTP id 19BC81D00087;
-	Sun,  2 Aug 2026 22:00:41 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-12.internal (MEProxy); Sun, 02 Aug 2026 22:00:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to; s=fm3; t=
-	1785722440; x=1785808840; bh=b1csc0Bi9PssIdzSjfNC0ye07hb5G0sz0h8
-	wj5zyg8E=; b=WOeyUjVI7EBQOcLNRA/goHlilP2Ua2JVAZFaw+hyzUudasDNC3G
-	rLYKOqHVyJrkKRGLODSWOcOncYyMJnFCMsXjWHi/FNCmSRizX4M8Q81xzkP9afCj
-	fVRd1TPx68aL6Rn5ggbdjcI2F7Skl/zkekHcrjAzkKcwoTgiCLktHIMKBAV+5Wmx
-	Whn5fzRaWJ582Aco9qiPAl3Kfsyiaz7p8VlPa9itmDpejSSmNYR7u9xPp7vC4rNm
-	bEflGctSX1J6WjcMaMIV9Moq4jzU0CGFrf6i15b9gloDIvFnTOAQhgmfvWfDYOja
-	hWTViJKjvgLOz7hTXgcTBk+7ej+FKI6RpCQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1785722440; x=
-	1785808840; bh=b1csc0Bi9PssIdzSjfNC0ye07hb5G0sz0h8wj5zyg8E=; b=H
-	dfMgR6RatFgHD8hrLbXKurNyVelyCkblRHF/vuH3Wx6BjkHEvYuS/zGmtM3ECrbq
-	19x/D2FYEaF3pumTHk+jxn+8lWoVpJBYlP645aVAX+ATgAWfXxbCwCF+QTedUyZC
-	COBAfziM7zFgzJJzkXoMfEBmHX0ltzTeUG2MnxXuibqi2WJHgohfg2YGZb2SPno6
-	IE7HnatZJlHkCTCJmdq0VVt4w8+1McJ2U8TTFAV8jRHCeIzKTuYywi9PZ2JX83Dr
-	K/vdKKKW+GnhzvOJ3lOsDvQRUpYgh34joDA7MALClsJGR19pT7AqQi9nM8ceb02Q
-	i4unTrpekzuagioCwXwnQ==
-X-ME-Sender: <xms:R_ZvasHEfti39MGsY2oBcl4FG6P0R-H0uHbhKp1GfzPkGC3wkc3XTA>
-    <xme:R_ZvaqThN-AuSkTpY-cdhF_UNwLDF9v4Yu1VO5QIazWuBiAkyXmM4TgNJfb8lR8i-
-    Kn9ENJEIQGmquG77RuADDSHTpUtZBRp5y5EHMb_SnM6MGCX5FA>
-X-ME-Received: <xmr:R_ZvaqaaNGlFbZ-gb5Nlmau_W7T99AF5cRmtjDOhb3XytnyZFHiJlriCgXQrKs42KBwmXJ6Md0oHLgSLtlOU61vkkcn_2uU>
-X-ME-Proxy-Cause: dmFkZTEfxBXaQQ2c+J4kJFXYlS7IKH6MrdfIx3SMCIqo1UULebfNRTvW2KOc8md56fScSm
-    O2PvdzTvTuRZj8K2qgfCcvV+lYfCjN3LH3RNPK5NaUZw37qfVwex0fPM8Ayc8H/CfAfZPl
-    oqd/qN1UpmL4AUl6Gs6ttum5xU9UrIGI4y6okZSIK8a/xPYyBh6AkmeRVJoDEMzAWSUmkd
-    QdKaHKD0uheUeHD2IKul4f/9q2r7QpeVmyFKWXPx/WmulfuqwmPevCr+QMqkkue1/qItsj
-    6RuUUJL/JbZyF3MS17MNhxVVw7T5/352sUDFpfHSF2xxf1Nad9jAG4aXvZPjxK+gETLGV+
-    mIOXe90FztwjJgWeoIcm2e+nVtfGreF8LSaB1BJNq2T+btkV6ejXjj8PoQWOVgTHOcQLdK
-    vefYwDrSEM4wHrb3cuG+fErFXzaMG/IbFBhYYCtmmp7jZZJH0TVNZ+a/RQSXm3GeWOPTbC
-    enPKi9Dd5AsR9TSmH/v9+0Vhu8XEM231rgt7+31Do/GjvBMW8/plVRYHdP1Y31675oGlFV
-    WU78iO/rHzwL75kGpMsr8oz8FV48Ob8Q4hsEcGi4kWQ7uS3go1VdtRmMnp4oy3Dg5y/xMl
-    r+3NZKm90aAmIsF/A4MZ4h1ouxTlcIq7YPsknwam/as8Rp8vtIHgEtIWI4xw
-X-ME-Proxy: <xmx:R_Zvat2yAKVcyo3l7JcfZG5AKYCYNg6sr__cKeDnECOAPlB6K3HJaw>
-    <xmx:R_ZvalqywTSvollyIN4G1Z1pPKIxziU1ghFtOIaaLtRzOv_eEltOug>
-    <xmx:R_ZvakOzeWv4VIb2qfhEXsefjJ8ML4vMq-wz9eHSOOu3-8MRZ-ktqA>
-    <xmx:R_Zvamq-SelIgfNrtPrM36hD3re0PMaV4d21BETtjCxo4JBzY2lOqQ>
-    <xmx:SPZvarwLdRNg36lppqy7JtwuKBO44o0U7xjSqXJqKDURlo6USJcdzdAC>
-Feedback-ID: i9d664b8f:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 2 Aug 2026 22:00:35 -0400 (EDT)
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JOCvKnCx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 803811F00A3A
+	for <linux-crypto@vger.kernel.org>; Mon,  3 Aug 2026 08:01:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785744067;
+	bh=xV4Rx+36FglM5iHb2ywHipygTwiMFY5frV0+5rahrio=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=JOCvKnCxtyhav1tc8aqFB7Wzl5RXZY1PqGegHra9Cnm/iluR+ceoVPRzEoYZXIggu
+	 6KCHc0l45AOVT3w0Z5YJcFoEoBCIk81xaXSVmf8lRmpgqyiVExmOYASqYz334gPHHT
+	 SxuL4WJXSQdyUTVhTNar/j1T2vv3kSdR9cKLHA7A7dR7L0pFCdfOzMNS0JxG+68FnU
+	 wj8jfha9dFs3kmGG8MgPIgXaRj9dcZdw6cKz5nQdH0LxaUGOU7HqGIPEvCGI2iacj/
+	 VpOSzSg4WGfUBGpTn1av7ChJ3vIzxrHfmg+5r+yarQYYQFB2g1zPpHaLfa8y7iFoVE
+	 WfsuUgPCElVCw==
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-6a0cb6e96dcso1950935a12.0
+        for <linux-crypto@vger.kernel.org>; Mon, 03 Aug 2026 01:01:07 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+Rpg44KbtLmDCCEhDpJnLRJfel2MFfbuFlXprfXA3M3dkKxFBIw8OWOm9b/kfsEtz//JXblnNzqt4BfLikk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YybETTwPx9ru9l/2DqG/2sDRJodcHuTraDbDYc1RC2e0NXGeU5q
+	RBtxsFwPwV/Oz+G1jgZHFwALFECtCoIWFSqHtYIiwB8BgoIHuhzpAYBF5sC/MB2JtAxtifaBE5e
+	5j7mpTYj1sS6NZpPXTJ75WkyM305EGtA=
+X-Received: by 2002:a05:6402:5046:b0:699:fbe4:16d4 with SMTP id
+ 4fb4d7f45d1cf-6a0a7cb31e1mr6349306a12.18.1785744065921; Mon, 03 Aug 2026
+ 01:01:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: NeilBrown <neilb@ownmail.net>
-To: "Quanye Yang" <quanyemostima@gmail.com>
-Cc: "Thomas Graf" <tgraf@suug.ch>, "Herbert Xu" <herbert@gondor.apana.org.au>,
- "Andrew Morton" <akpm@linux-foundation.org>,
- "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- syzbot+ef8d17bae14efb960935@syzkaller.appspotmail.com
-Subject:
- Re: [PATCH] rhashtable: use per-init-site lockdep classes for bucket locks
-In-reply-to:
- <CABcBDJuSd=tjfcQoDxVgRrYw0UKu0HPcWDC4H10uOmR8--fE2Q@mail.gmail.com>
-References:
- <20260801-fix-rhashtable-bucket-lockdep-v1-1-15a0f8ae094c@gmail.com>
-  <178558275123.3252194.11769833511956588358@noble.neil.brown.name>
-  <CABcBDJuSd=tjfcQoDxVgRrYw0UKu0HPcWDC4H10uOmR8--fE2Q@mail.gmail.com>
-Date: Mon, 03 Aug 2026 12:00:32 +1000
-Message-id: <178572243204.3252194.4367547703856027885@noble.neil.brown.name>
-Reply-To: NeilBrown <neil@brown.name>
+References: <20260730082608.1929-1-zhaoqunqin@loongson.cn> <20260730082608.1929-3-zhaoqunqin@loongson.cn>
+In-Reply-To: <20260730082608.1929-3-zhaoqunqin@loongson.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Mon, 3 Aug 2026 16:01:30 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H4V6NWDcw1nVZzaXKJF_QS0sz5jTsrnwbq-xki2mJLVtQ@mail.gmail.com>
+X-Gm-Features: AUfX_mz0beBkinpveN76Fxyhrfx8V9PN3Mj2z0nrH4fWsnyXZf1ulyPC7ZymtK0
+Message-ID: <CAAhV-H4V6NWDcw1nVZzaXKJF_QS0sz5jTsrnwbq-xki2mJLVtQ@mail.gmail.com>
+Subject: Re: [PATCH v5 2/2] mfd: loongson-se: Fix miscellaneous issues
+To: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Cc: lee@kernel.org, linux-kernel@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, 02 Aug 2026, Quanye Yang wrote:
-> On Sat, Aug 01, 2026 at 07:12:00PM +0000, NeilBrown wrote:
-> > This seems like a band-aid rather than a proper fix.
-> >
-> > Surely attaching a BPF program to lock_release() has potential for
-> > causing all sorts of lockdep related problems.  Any lock that the BPF
-> > program takes can trigger something, and I find it unlikely that
-> > rhashtable is the only part of BPF code that takes a lock.
-> >
-> > Maybe the tracepoint needs to disable lockdep while the BPF handler is
-> > running, or something like that.
-> >
-> > But I would need a much stronger argument before I could be happy with
-> > this patch.
->=20
-> Thanks for the review.
->=20
-> I agree that attaching BPF to lock_release() is a sharp edge: the
-> tracepoint runs before __lock_release(), so the lock is still on the
-> lockdep held stack, and any lock taken by the BPF program becomes a
-> dependency edge.  Whether that instrumentation path should be isolated
-> from lockdep is a broader question, and I don't claim this patch solves
-> it.
->=20
-> But the syzbot warning at hand is not BPF-specific.  It is a false
-> positive from modeling every rhashtable bucket lock with one global
-> lock_class_key.  Different rhashtable instances have different physical
-> bitlocks; nesting them is not recursive locking of the same lock.
+Hi, Qunqin,
 
-This is common practice in the kernel.
-All dentries for all filesystems have a d_lock with the same lock_class.
-All block devices have a bd_holder_lock mutex with the same lock_class.
-All kobjects have a list_lock with the same lock_class.
+On Thu, Jul 30, 2026 at 4:41=E2=80=AFPM Qunqin Zhao <zhaoqunqin@loongson.cn=
+> wrote:
+>
+> Address multiple historical driver issues discovered by the Sashiko
+> Automation system within the loongson_se_probe() initialization flow
+> and the driver's interrupt service routines [1].
+>
+> - Add an explicit bounds check in se_irq_handler() before accessing
+>   the engines array to prevent out-of-bounds memory writes.
+>
+> - Switch from devm_kmalloc() to devm_kzalloc() and explicitly
+>   initialize all engine completion structures in probe() to avoid a
+>   kernel panic from complete() dereferencing a NULL wait head when a
+>   spurious interrupt fires before child drivers call
+>   loongson_se_init_engine().
+>
+> - Replace engine_init_lock with a broader cmd_lock mutex that
+>   serializes all command submissions, and move the lock into
+>   loongson_se_send_controller_cmd() and
+>   loongson_se_send_engine_cmd() to cover the full register write +
+>   poll + wait sequence.
+>
+> - Drop the spin_lock_irq from loongson_se_poll() so that interrupts
+>   are not disabled for up to 10 ms during the poll.  Keep the
+>   readl_relaxed_poll_timeout_atomic() busy-wait to avoid scheduling
+>   latency for fast hardware completions.
+>
+> - Add reinit_completion() to loongson_se_send_controller_cmd() and
+>   loongson_se_send_engine_cmd() before waiting to prevent stale
+>   completions from falsely returning success after a signal
+>   interruption.
+>
+> - Fix EPROBE_DEFER handling: propagate the error directly from
+>   platform_irq_count() instead of overwriting it with ENODEV so that
+>   probe deferral works when the interrupt provider is not yet ready.
+>
+> - Validate dmam_size from firmware against the minimum required size
+>   to prevent command buffers from pointing outside the allocated
+>   DMA region.
+>
+> - Return the error code from devm_request_irq() instead of silently
+>   continuing to prevent an indefinite hang.
+>
+> - Disable hardware interrupts in the probe error path when
+>   loongson_se_init() fails to prevent an unhandled interrupt storm.
+>
+> - Add a loongson_se_stop() cleanup handler registered with
+>   devm_add_action_or_reset() to send SE_CMD_STOP to the controller
+>   and mask all interrupts during device removal.  Using devres
+>   ensures that child MFD devices are unbound before the controller
+>   is stopped.  The STOP command uses a non-interruptible wait to
+>   avoid leaving hardware running while DMA buffers are freed.
+>
+> - Zero-initialize the local controller command structure in
+>   loongson_se_init() to prevent uninitialized stack memory from
+>   being written to device registers.
+>
+> - Add the SE_CMD_STOP command definition.
+>
+> Link: https://lore.kernel.org/all/20260618095949.GB1672911@google.com/ [1=
+]
+> Fixes: e551fa3159e3 ("mfd: Add support for Loongson Security Engine chip =
+controller")
+> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
+> ---
+>  drivers/mfd/loongson-se.c       | 87 ++++++++++++++++++++++++++-------
+>  include/linux/mfd/loongson-se.h |  1 +
+>  2 files changed, 69 insertions(+), 19 deletions(-)
+>
+> diff --git a/drivers/mfd/loongson-se.c b/drivers/mfd/loongson-se.c
+> index 7f552a8ee6..2c8afad1b0 100644
+> --- a/drivers/mfd/loongson-se.c
+> +++ b/drivers/mfd/loongson-se.c
+> @@ -28,7 +28,7 @@ struct loongson_se {
+>         void *dmam_base;
+>         int dmam_size;
+>
+> -       struct mutex engine_init_lock;
+> +       struct mutex cmd_lock;
+>         struct loongson_se_engine engines[SE_ENGINE_MAX];
+>  };
+>
+> @@ -42,8 +42,6 @@ static int loongson_se_poll(struct loongson_se *se, u32=
+ int_bit)
+>         u32 status;
+>         int err;
+>
+> -       spin_lock_irq(&se->dev_lock);
+You said you don't want to disable irq here, but I think the spinlock
+is still needed. That means you should use spin_lock/spin_unlock to
+replace spin_lock_irq/spin_unlock_irq.
 
->=20
-> I can reproduce the same "possible recursive locking detected" without
-> any BPF / lock tracepoint:
->=20
->   1. init two tables at distinct rhashtable_init() call sites (ht_a, ht_b)
->   2. prefill so the insert path walks a non-empty bucket chain
->   3. in ht_a's obj_cmpfn (called under ht_a's bucket bitlock), call
->      rhashtable_lookup_insert_key() on ht_b
+> -
+>         /* Notify the controller that the engine needs to be started */
+>         writel(int_bit, se->base + SE_L2SINT_SET);
+>
+> @@ -52,8 +50,6 @@ static int loongson_se_poll(struct loongson_se *se, u32=
+ int_bit)
+>                                                 !(status & int_bit),
+>                                                 1, LOONGSON_ENGINE_CMD_TI=
+MEOUT_US);
+>
+> -       spin_unlock_irq(&se->dev_lock);
+> -
+>         return err;
+>  }
+>
+> @@ -63,24 +59,40 @@ static int loongson_se_send_controller_cmd(struct loo=
+ngson_se *se,
+>         u32 *send_cmd =3D (u32 *)cmd;
+>         int err, i;
+>
+> +       mutex_lock(&se->cmd_lock);
+> +
+> +       reinit_completion(&se->cmd_completion);
+> +
+>         for (i =3D 0; i < SE_SEND_CMD_REG_LEN; i++)
+>                 writel(send_cmd[i], se->base + SE_SEND_CMD_REG + i * 4);
+>
+>         err =3D loongson_se_poll(se, SE_INT_CONTROLLER);
+>         if (err)
+> -               return err;
+> +               goto out;
+> +
+> +       err =3D wait_for_completion_interruptible(&se->cmd_completion);
+>
+> -       return wait_for_completion_interruptible(&se->cmd_completion);
+> +out:
+> +       mutex_unlock(&se->cmd_lock);
+> +       return err;
+>  }
+>
+>  int loongson_se_send_engine_cmd(struct loongson_se_engine *engine)
+>  {
+> +       int err;
+> +
+> +       mutex_lock(&engine->se->cmd_lock);
+> +
+> +       reinit_completion(&engine->completion);
+> +
+>         /*
+>          * After engine initialization, the controller already knows
+>          * where to obtain engine commands from. Now all we need to
+>          * do is notify the controller that the engine needs to be starte=
+d.
+>          */
+> -       int err =3D loongson_se_poll(engine->se, BIT(engine->id));
+> +       err =3D loongson_se_poll(engine->se, BIT(engine->id));
+> +
+> +       mutex_unlock(&engine->se->cmd_lock);
+>
+>         if (err)
+>                 return err;
+> @@ -97,7 +109,7 @@ struct loongson_se_engine *loongson_se_init_engine(str=
+uct device *dev, int id)
+>
+>         engine->se =3D se;
+>         engine->id =3D id;
+> -       init_completion(&engine->completion);
+> +       reinit_completion(&engine->completion);
+I'm not sure, but I think loongson_se_init_engine() is only called at
+init, so we need init_completion here.
 
-Yes you *can* do that, but why *would* you do that?
-The obj_cmpfn is meant to be an idempotent compare function.
-We make no particular promises about when it will be called.
-So making a change to anything in that function is ill-advised at best.
-I don't think we have any interest in making change which would allow
-an obj_cmpfn() to make changes to a different rhashtable.
+Huacai
 
->=20
-> That is enough to hit the warning on an unpatched kernel.  So disabling
-> lockdep around the BPF handler would only silence one trigger for this
-> class-modeling bug; it would not fix the underlying incorrect lock class
-> sharing, and it would also hide real lock-order problems on that path
-> (including the callback-under-bucket-lock cases that 149212f07856 wanted
-> lockdep to see).
-
-I think the main reason we added the lockdep tracking was to justify
-that switching from spinlocks to bitlock didn't lose anything important.
-It wouldn't be completely inappropriate to take a lock in an obj_cmpfn,
-but I wouldn't normally expect it.
-
->=20
-> The per-init-site bucket key follows the same approach as 060d4e94b8d4
-> did for ht->mutex: keep one class per init site (and across resize of
-> that table via SINGLE_DEPTH_NESTING), rather than one class for the
-> entire kernel.
-
-Hmmm.. I think that patch might have been a poor choice.
-
-Commit 09ae540e1d5c ("rhashtable: drop ht->mutex in rhashtable_free_and_destr=
-oy()")
-
-landed about the same time and removed the problem instead of hiding it.
-
-NeilBrown
-
-
->=20
-> Happy to share the small local reproducer if that helps.
->=20
-> On Sat, Aug 1, 2026 at 7:12=E2=80=AFPM NeilBrown <neilb@ownmail.net> wrote:
-> >
-> > On Sat, 01 Aug 2026, quanyemostima@gmail.com wrote:
-> > > From: quanyeyang <quanyemostima@gmail.com>
-> > >
-> > > All bucket tables currently share a single lockdep class. This makes
-> > > lockdep conflate bucket locks from unrelated rhashtable instances.
-> > >
-> > > A BPF program attached to lock_release can expose this when pidfs
-> > > inserts a pid. The tracepoint runs before lockdep removes the pidfs
-> > > bucket lock from the task's held-lock stack. Deleting an element from
-> > > a BPF RHASH map then acquires a bucket lock belonging to a different
-> > > rhashtable. Since both tables use the same class, lockdep reports
-> > > possible recursive locking.
-> >
-> > This seems like a band-aid rather than a proper fix.
-> >
-> > Surely attaching a BPF program to lock_release() has potential for
-> > causing all sorts of lockdep related problems.  Any lock that the BPF
-> > program takes can trigger something, and I find it unlikely that
-> > rhashtable is the only part of BPF code that takes a lock.
-> >
-> > Maybe the tracepoint needs to disable lockdep while the BPF handler is
-> > running, or something like that.
-> >
-> > But I would need a much stronger argument before I could be happy with
-> > this patch.
-> >
-> > NeilBrown
-> >
-> >
-> > >
-> > > Declare a separate bucket lock class key at each rhashtable_init() and
-> > > rhltable_init() call site, alongside the mutex class key. Store the
-> > > bucket key in struct rhashtable so tables created during resize keep
-> > > using the same class.
-> > >
-> > > A targeted reproducer triggers the warning reliably before this change.
-> > > After the change, the nested BPF RHASH deletion still executes, but
-> > > lockdep no longer reports recursive locking.
-> > >
-> > > Fixes: 149212f07856 ("rhashtable: add lockdep tracking to bucket bit-sp=
-in-locks.")
-> > > Reported-by: syzbot+ef8d17bae14efb960935@syzkaller.appspotmail.com
-> > > Closes: https://syzkaller.appspot.com/bug?extid=3Def8d17bae14efb960935
-> > > Assisted-by: Cursor:GPT-5.6 Sol
-> > > Signed-off-by: quanyeyang <quanyemostima@gmail.com>
-> > > ---
-> > >  include/linux/rhashtable-types.h | 20 ++++++++++++++------
-> > >  lib/rhashtable.c                 | 19 +++++++++++++------
-> > >  2 files changed, 27 insertions(+), 12 deletions(-)
-> > >
-> > > diff --git a/include/linux/rhashtable-types.h b/include/linux/rhashtabl=
-e-types.h
-> > > index 57c11ec9dc64..4dea91a49ec8 100644
-> > > --- a/include/linux/rhashtable-types.h
-> > > +++ b/include/linux/rhashtable-types.h
-> > > @@ -82,6 +82,7 @@ struct rhashtable_params {
-> > >   * @mutex: Mutex to protect current/future table swapping
-> > >   * @lock: Spin lock to protect walker list
-> > >   * @nelems: Number of elements in table
-> > > + * @bucket_lock_key: Per-init-site lockdep class for bucket bit-locks
-> > >   */
-> > >  struct rhashtable {
-> > >       struct bucket_table __rcu       *tbl;
-> > > @@ -94,6 +95,7 @@ struct rhashtable {
-> > >       struct mutex                    mutex;
-> > >       spinlock_t                      lock;
-> > >       atomic_t                        nelems;
-> > > +     struct lock_class_key           *bucket_lock_key;
-> > >  #ifdef CONFIG_MEM_ALLOC_PROFILING
-> > >       struct alloc_tag                *alloc_tag;
-> > >  #endif
-> > > @@ -138,23 +140,29 @@ struct rhashtable_iter {
-> > >
-> > >  int __rhashtable_init_noprof(struct rhashtable *ht,
-> > >                   const struct rhashtable_params *params,
-> > > -                 struct lock_class_key *key);
-> > > +                 struct lock_class_key *mutex_key,
-> > > +                 struct lock_class_key *bucket_key);
-> > >  #define rhashtable_init_noprof(ht, params)                           \
-> > >  ({                                                                   \
-> > > -     static struct lock_class_key __key;                             \
-> > > +     static struct lock_class_key __mutex_key;                       \
-> > > +     static struct lock_class_key __bucket_key;                      \
-> > >                                                                       \
-> > > -     __rhashtable_init_noprof(ht, params, &__key);                   \
-> > > +     __rhashtable_init_noprof(ht, params, &__mutex_key,              \
-> > > +                              &__bucket_key);                        \
-> > >  })
-> > >  #define rhashtable_init(...) alloc_hooks(rhashtable_init_noprof(__VA_A=
-RGS__))
-> > >
-> > >  int __rhltable_init_noprof(struct rhltable *hlt,
-> > >                 const struct rhashtable_params *params,
-> > > -               struct lock_class_key *key);
-> > > +               struct lock_class_key *mutex_key,
-> > > +               struct lock_class_key *bucket_key);
-> > >  #define rhltable_init_noprof(hlt, params)                            \
-> > >  ({                                                                   \
-> > > -     static struct lock_class_key __key;                             \
-> > > +     static struct lock_class_key __mutex_key;                       \
-> > > +     static struct lock_class_key __bucket_key;                      \
-> > >                                                                       \
-> > > -     __rhltable_init_noprof(hlt, params, &__key);                    \
-> > > +     __rhltable_init_noprof(hlt, params, &__mutex_key,               \
-> > > +                            &__bucket_key);                          \
-> > >  })
-> > >  #define rhltable_init(...)   alloc_hooks(rhltable_init_noprof(__VA_ARG=
-S__))
-> > >
-> > > diff --git a/lib/rhashtable.c b/lib/rhashtable.c
-> > > index d459bef245f4..e047ad912f0e 100644
-> > > --- a/lib/rhashtable.c
-> > > +++ b/lib/rhashtable.c
-> > > @@ -189,7 +189,6 @@ static struct bucket_table *bucket_table_alloc(stru=
-ct rhashtable *ht,
-> > >       struct bucket_table *tbl =3D NULL;
-> > >       size_t size;
-> > >       int i;
-> > > -     static struct lock_class_key __key;
-> > >
-> > >       tbl =3D alloc_hooks_tag(ht->alloc_tag,
-> > >                       kvmalloc_node_align_noprof(struct_size(tbl, bucke=
-ts, nbuckets),
-> > > @@ -205,7 +204,12 @@ static struct bucket_table *bucket_table_alloc(str=
-uct rhashtable *ht,
-> > >       if (tbl =3D=3D NULL)
-> > >               return NULL;
-> > >
-> > > -     lockdep_init_map(&tbl->dep_map, "rhashtable_bucket", &__key, 0);
-> > > +     /*
-> > > +      * Keep all bucket tables belonging to the same rhashtable in the
-> > > +      * per-init-site lock class, including tables created during resi=
-ze.
-> > > +      */
-> > > +     lockdep_init_map(&tbl->dep_map, "rhashtable_bucket",
-> > > +                      ht->bucket_lock_key, 0);
-> > >
-> > >       tbl->size =3D size;
-> > >
-> > > @@ -1162,7 +1166,8 @@ static u32 rhashtable_jhash2(const void *key, u32=
- length, u32 seed)
-> > >   */
-> > >  int __rhashtable_init_noprof(struct rhashtable *ht,
-> > >                   const struct rhashtable_params *params,
-> > > -                 struct lock_class_key *key)
-> > > +                 struct lock_class_key *mutex_key,
-> > > +                 struct lock_class_key *bucket_key)
-> > >  {
-> > >       struct bucket_table *tbl;
-> > >       size_t size;
-> > > @@ -1172,7 +1177,8 @@ int __rhashtable_init_noprof(struct rhashtable *h=
-t,
-> > >               return -EINVAL;
-> > >
-> > >       memset(ht, 0, sizeof(*ht));
-> > > -     mutex_init_with_key(&ht->mutex, key);
-> > > +     mutex_init_with_key(&ht->mutex, mutex_key);
-> > > +     ht->bucket_lock_key =3D bucket_key;
-> > >       spin_lock_init(&ht->lock);
-> > >       memcpy(&ht->p, params, sizeof(*params));
-> > >
-> > > @@ -1237,11 +1243,12 @@ EXPORT_SYMBOL_GPL(__rhashtable_init_noprof);
-> > >   */
-> > >  int __rhltable_init_noprof(struct rhltable *hlt,
-> > >                          const struct rhashtable_params *params,
-> > > -                        struct lock_class_key *key)
-> > > +                        struct lock_class_key *mutex_key,
-> > > +                        struct lock_class_key *bucket_key)
-> > >  {
-> > >       int err;
-> > >
-> > > -     err =3D __rhashtable_init_noprof(&hlt->ht, params, key);
-> > > +     err =3D __rhashtable_init_noprof(&hlt->ht, params, mutex_key, buc=
-ket_key);
-> > >       hlt->ht.rhlist =3D true;
-> > >       return err;
-> > >  }
-> > >
-> > > ---
-> > > base-commit: 0131b508c0e2489eac6e121135988f6eeb716f19
-> > > change-id: 20260801-fix-rhashtable-bucket-lockdep-95e25abebeea
-> > >
-> > > Best regards,
-> > > --
-> > > quanyeyang <quanyemostima@gmail.com>
-> > >
-> > >
-> > >
-> > >
-> >
->=20
-
+>
+>         /* Divide DMA memory equally among all engines */
+>         engine->buffer_size =3D se->dmam_size / SE_ENGINE_MAX;
+> @@ -113,8 +125,6 @@ struct loongson_se_engine *loongson_se_init_engine(st=
+ruct device *dev, int id)
+>         engine->command =3D se->dmam_base + id * (2 * SE_ENGINE_CMD_SIZE)=
+;
+>         engine->command_ret =3D engine->command + SE_ENGINE_CMD_SIZE;
+>
+> -       mutex_lock(&se->engine_init_lock);
+> -
+>         /* Tell the controller where to find engine command */
+>         cmd.command_id =3D SE_CMD_SET_ENGINE_CMDBUF;
+>         cmd.info[0] =3D id;
+> @@ -124,8 +134,6 @@ struct loongson_se_engine *loongson_se_init_engine(st=
+ruct device *dev, int id)
+>         if (loongson_se_send_controller_cmd(se, &cmd))
+>                 engine =3D NULL;
+>
+> -       mutex_unlock(&se->engine_init_lock);
+> -
+>         return engine;
+>  }
+>  EXPORT_SYMBOL_GPL(loongson_se_init_engine);
+> @@ -155,7 +163,8 @@ static irqreturn_t se_irq_handler(int irq, void *dev_=
+id)
+>         /* For engines */
+>         while (int_status) {
+>                 id =3D __ffs(int_status);
+> -               complete(&se->engines[id].completion);
+> +               if (id < SE_ENGINE_MAX)
+> +                       complete(&se->engines[id].completion);
+>                 int_status &=3D ~BIT(id);
+>                 writel(BIT(id), se->base + SE_S2LINT_CL);
+>         }
+> @@ -167,7 +176,7 @@ static irqreturn_t se_irq_handler(int irq, void *dev_=
+id)
+>
+>  static int loongson_se_init(struct loongson_se *se, dma_addr_t addr, int=
+ size)
+>  {
+> -       struct loongson_se_controller_cmd cmd;
+> +       struct loongson_se_controller_cmd cmd =3D {0};
+>         int err;
+>
+>         cmd.command_id =3D SE_CMD_START;
+> @@ -188,6 +197,30 @@ static const struct mfd_cell engines[] =3D {
+>         { .name =3D "tpm_loongson" },
+>  };
+>
+> +static void loongson_se_stop(void *data)
+> +{
+> +       struct loongson_se *se =3D data;
+> +       struct loongson_se_controller_cmd cmd =3D {0};
+> +       u32 *send_cmd =3D (u32 *)&cmd;
+> +       int i;
+> +
+> +       mutex_lock(&se->cmd_lock);
+> +
+> +       cmd.command_id =3D SE_CMD_STOP;
+> +
+> +       reinit_completion(&se->cmd_completion);
+> +
+> +       for (i =3D 0; i < SE_SEND_CMD_REG_LEN; i++)
+> +               writel(send_cmd[i], se->base + SE_SEND_CMD_REG + i * 4);
+> +
+> +       if (!loongson_se_poll(se, SE_INT_CONTROLLER))
+> +               wait_for_completion(&se->cmd_completion);
+> +
+> +       writel(0, se->base + SE_S2LINT_EN);
+> +
+> +       mutex_unlock(&se->cmd_lock);
+> +}
+> +
+>  static int loongson_se_probe(struct platform_device *pdev)
+>  {
+>         struct device *dev =3D &pdev->dev;
+> @@ -195,19 +228,25 @@ static int loongson_se_probe(struct platform_device=
+ *pdev)
+>         int nr_irq, irq, err, i;
+>         dma_addr_t paddr;
+>
+> -       se =3D devm_kmalloc(dev, sizeof(*se), GFP_KERNEL);
+> +       se =3D devm_kzalloc(dev, sizeof(*se), GFP_KERNEL);
+>         if (!se)
+>                 return -ENOMEM;
+>
+>         dev_set_drvdata(dev, se);
+>         init_completion(&se->cmd_completion);
+>         spin_lock_init(&se->dev_lock);
+> -       mutex_init(&se->engine_init_lock);
+> +       mutex_init(&se->cmd_lock);
+> +
+> +       for (i =3D 0; i < SE_ENGINE_MAX; i++)
+> +               init_completion(&se->engines[i].completion);
+>
+>         dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
+>         if (device_property_read_u32(dev, "dmam_size", &se->dmam_size))
+>                 return -ENODEV;
+>
+> +       if (se->dmam_size < (SE_ENGINE_MAX * 2 * SE_ENGINE_CMD_SIZE))
+> +               return -EINVAL;
+> +
+>         se->dmam_base =3D dmam_alloc_coherent(dev, se->dmam_size, &paddr,=
+ GFP_KERNEL);
+>         if (!se->dmam_base)
+>                 return -ENOMEM;
+> @@ -217,21 +256,31 @@ static int loongson_se_probe(struct platform_device=
+ *pdev)
+>                 return PTR_ERR(se->base);
+>
+>         nr_irq =3D platform_irq_count(pdev);
+> -       if (nr_irq <=3D 0)
+> +       if (nr_irq =3D=3D 0)
+>                 return -ENODEV;
+> +       if (nr_irq < 0)
+> +               return nr_irq;
+>
+>         writel(SE_INT_ALL, se->base + SE_S2LINT_CL);
+>
+>         for (i =3D 0; i < nr_irq; i++) {
+>                 irq =3D platform_get_irq(pdev, i);
+>                 err =3D devm_request_irq(dev, irq, se_irq_handler, IRQF_S=
+HARED, "loongson-se", se);
+> -               if (err)
+> +               if (err) {
+>                         dev_err(dev, "failed to request IRQ: %d\n", irq);
+> +                       return err;
+> +               }
+>         }
+>
+>         writel(SE_INT_ALL, se->base + SE_S2LINT_EN);
+>
+>         err =3D loongson_se_init(se, paddr, se->dmam_size);
+> +       if (err) {
+> +               writel(0, se->base + SE_S2LINT_EN);
+> +               return err;
+> +       }
+> +
+> +       err =3D devm_add_action_or_reset(dev, loongson_se_stop, se);
+>         if (err)
+>                 return err;
+>
+> diff --git a/include/linux/mfd/loongson-se.h b/include/linux/mfd/loongson=
+-se.h
+> index 07afa0c252..8237ccab7b 100644
+> --- a/include/linux/mfd/loongson-se.h
+> +++ b/include/linux/mfd/loongson-se.h
+> @@ -9,6 +9,7 @@
+>  #define SE_SEND_CMD_REG_LEN            0x8
+>  /* Controller command ID */
+>  #define SE_CMD_START                   0x0
+> +#define SE_CMD_STOP                    0x1
+>  #define SE_CMD_SET_DMA                 0x3
+>  #define SE_CMD_SET_ENGINE_CMDBUF       0x4
+>
+> --
+> 2.47.3
+>
