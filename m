@@ -1,96 +1,76 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from lithops.sigma-star.at (mailout.nod.at [116.203.167.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC52E3537FE;
-	Tue,  4 Aug 2026 02:39:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BDCB54788;
+	Tue,  4 Aug 2026 06:48:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.167.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785811151; cv=none; b=u4I2S76UycXUzW6r9V00LXrNIKYAkR8Rzgd5jJjv2LgkG5+OfCdxaKxtEFFn7rVSl53QBqVZd8vDZQn44BGoCInywgngqN/2sC0QarpA6Z4exticsQlJn/QtBZPmVNSQh/eOlCGvxy/YND7+rSUKxgnjAdnhD4ElRqeSYXrKdm8=
+	t=1785826120; cv=none; b=iTDm6CyshueLLjUfck1YmWM8owBYFZjzxDZyKn/zMncyW5EkazApKQgKLRJr4aMdaKh3TH3ldAEeIRgkBW5BD6bW0jY5GwkCVYIaIy+7v9n2lXQ0gzq/f/CQiSQzsvOEaqz/L3+f1sKr0qD5RVdExZXDivwHJGZ5ZRrlfWGef0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785811151; c=relaxed/simple;
-	bh=5Sz+UIzMJknJRCsScb18f+qEmeSvidcY5NImWB7y8No=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XE6so06QBNCiBCa1xIaa18eF1WiOYgyUJjkLqM+IUbWx0sWQKi0HM+WZInaPc9tBshTXp5d1R8C+QCPvBjXGADu3p+xbzGQ9F5rX7kzGkNJ5QhFSD4cEZAg0dKOLCHbF9okqTTQnft3NT06tUQ6Gz83mDBFjrOaWr44rhz0mKaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T2QB2kwF; arc=none smtp.client-ip=100.103.45.18
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T2QB2kwF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C9851F000E9;
-	Tue,  4 Aug 2026 02:39:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785811150;
-	bh=iEtDHlOQQGA//wjq9N2BKS6xSS6jZ9+JrUvB3oEe2Yc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=T2QB2kwFbsTVTKaiENfN8hbuT76A72SvuhaM03m5I84FGHKIYyZDj0dSQiE2QWf8K
-	 MqgbseWzzxSpyX2hxkcRcWF38uhiFWZgv8oGy0LlJGV6+ID4W9AbbCYQC5LjPeNqFA
-	 HW9hoDaMBHy2FWdUhFWZHe7C0f6YRk/0zNajapv0tzMnA77g/46CNJdFF2sh+tpRfQ
-	 Qlo1auT8LAZnalb7tq9gHzmLV+3vb39NVHbjuLTjQNd6UZIzqPExZdpT9ySJFRkk3o
-	 9Oklfe4lwKb6W4/fK+seJVlovS+oNrrQmnPkODW9pJG12kJoAjGhgKaFBuLULNN1Ab
-	 EMJ4DZwQ7+Iug==
-Date: Mon, 3 Aug 2026 19:37:14 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Simon Richter <Simon.Richter@hogyros.de>
-Cc: Thomas Huth <thuth@redhat.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Simo Sorce <simo@redhat.com>
-Subject: Re: [PATCH v2 1/9] crypto: Provide a wrapper for zeroizing
- crypto_aes_ctx
-Message-ID: <20260804023714.GA1940@sol>
-References: <20260803094432.70505-1-thuth@redhat.com>
- <20260803094432.70505-2-thuth@redhat.com>
- <20260803190540.GD2062@quark>
- <d7764cb3-152e-4b52-bed3-d23b45fce540@hogyros.de>
+	s=arc-20240116; t=1785826120; c=relaxed/simple;
+	bh=wyo0kNP2752aw+6vjr7ArizpX5AT0P6KYghiQmrEvFE=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=EsmOtWRRU0b3ZAA1DZao2etifhST2ARmYutDpLJZZRnB8nArHu7jCeLV8/QHj8ARbkAKwGRYikfMQH7tId24jwE/JGVFeKx91FSktI7dVwWv8JczpcUT+W48m1rDf1Kb68FRM9BX9/7kFsCUEfAVwqfF25KBPGZVkC+wxnNc+gc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nod.at; spf=fail smtp.mailfrom=nod.at; arc=none smtp.client-ip=116.203.167.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nod.at
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nod.at
+Received: from localhost (localhost [127.0.0.1])
+	by lithops.sigma-star.at (Postfix) with ESMTP id E6E1B2698E2;
+	Tue,  4 Aug 2026 08:39:05 +0200 (CEST)
+Received: from lithops.sigma-star.at ([127.0.0.1])
+	by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10032)
+	with ESMTP id yc6umqqUXnqv; Tue,  4 Aug 2026 08:39:03 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by lithops.sigma-star.at (Postfix) with ESMTP id CE2962698E5;
+	Tue,  4 Aug 2026 08:39:03 +0200 (CEST)
+Received: from lithops.sigma-star.at ([127.0.0.1])
+	by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id ZWxMHDt_nNgw; Tue,  4 Aug 2026 08:39:03 +0200 (CEST)
+Received: from lithops.sigma-star.at (lithops.sigma-star.at [195.201.40.130])
+	by lithops.sigma-star.at (Postfix) with ESMTP id AED862698E2;
+	Tue,  4 Aug 2026 08:39:03 +0200 (CEST)
+Date: Tue, 4 Aug 2026 08:39:03 +0200 (CEST)
+From: Richard Weinberger <richard@nod.at>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, 
+	linux-kernel <linux-kernel@vger.kernel.org>
+Message-ID: <630163276.8329.1785825543421.JavaMail.zimbra@nod.at>
+In-Reply-To: <20260802230055.100746-2-ebiggers@kernel.org>
+References: <20260802230055.100746-1-ebiggers@kernel.org> <20260802230055.100746-2-ebiggers@kernel.org>
+Subject: Re: [PATCH 1/3] crypto: af_alg - Make cbc(paes) privileged-only
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d7764cb3-152e-4b52-bed3-d23b45fce540@hogyros.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Zimbra 8.8.12_GA_3807 (ZimbraWebClient - FF153 (Linux)/8.8.12_GA_3809)
+Thread-Topic: crypto: af_alg - Make cbc(paes) privileged-only
+Thread-Index: ZL7G55OIxUV/IijvwIkal9O9HtMGhw==
 
-On Tue, Aug 04, 2026 at 11:21:30AM +0900, Simon Richter wrote:
-> Hi,
-> 
-> On 8/4/26 4:05 AM, Eric Biggers wrote:
-> 
-> > I guess we should start using __cleanup with type-specific zeroization
-> > functions like this more often.
-> Frame challenge: should key material be copied that often that we need a
-> mechanism to keep track of it?
+----- Urspr=C3=BCngliche Mail -----
+> Von: "Eric Biggers" <ebiggers@kernel.org>
+> An: "Linux Crypto Mailing List" <linux-crypto@vger.kernel.org>, "Herbert =
+Xu" <herbert@gondor.apana.org.au>
+> CC: "richard" <richard@nod.at>, "linux-kernel" <linux-kernel@vger.kernel.=
+org>, "Eric Biggers" <ebiggers@kernel.org>
+> Gesendet: Montag, 3. August 2026 01:00:53
+> Betreff: [PATCH 1/3] crypto: af_alg - Make cbc(paes) privileged-only
 
-This seems to be yet another case where you are responding to some
-thread and trying to start a mostly unrelated discussion.
+> So far the only reported use cases for cbc(paes) have involved processes
+> running as root.  Therefore, make af_alg_restrict=3D1 allow only
+> privileged use of this algorithm for now.
+>=20
+> Fixes: 947d62c09436 ("Merge
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6")
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 
-There are many cases where data on the stack can be sensitive, and this
-has always been the case.  If __cleanup helps to manage such data, it's
-probably worth using more often.
+Good catch, my intention was making it privileged only. :-S
 
-> My feeling is that this wasn't a conscious decision, but is the result of
-> two other decisions (that individually make sense): contexts need to be
-> self-contained (so need to include key material), and context creation
-> should be cheap (so stack contexts are allowed).
+Reviewed-by: Richard Weinberger <richard@nod.at>
 
-The entire point of "crypto_aes_ctx" is that it is an expanded AES key.
-The callers of it are using it to compute the round keys.
-
-If you're actually referring to the contexts for per-message incremental
-calculation (e.g. sha256_ctx) offered by the library API, those are a
-bit different.  Sometimes they contain key material, sometimes they
-don't.  Even if the algorithm is unkeyed, it may still contain key
-material, since the user could be hashing a key.  Either way, the
-finalization function for each algorithm zeroizes it.  The caller needs
-to zeroize only if it abandons a context without zeroizing it.
-
-> 2. allow contexts to refer to key material stored elsewhere to avoid the
-> copy. That opens the lifetime tracking can of worms, but the on-stack crypto
-> context is rather short-lived.
-
-That is already what is being done in most cases.  The exception is the
-HMAC library code since the 'ostate' is not very large.  But again the
-per-message contexts are supposed to be zeroized anyway.  Also, if the
-one-shot functions are used, then no context is exposed to the caller...
-
-- Eric
+Thanks,
+//richard
