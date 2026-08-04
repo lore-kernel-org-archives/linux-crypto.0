@@ -1,85 +1,85 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BACF3603F7
-	for <linux-crypto@vger.kernel.org>; Tue,  4 Aug 2026 07:42:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78F1A429033
+	for <linux-crypto@vger.kernel.org>; Tue,  4 Aug 2026 07:48:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785829377; cv=none; b=H2Skj41OadxPBnjESwV92TMblcJmPs2Sw5zjPTmFPMJPIc8YCNJQ50iVY0yZbhazOkJ2hyMz15hMhhrGoA8pb8ZiS418u0yj6ibB8FTH4NKETiRM8wEqEJ8mt9M49aPP0+Jw2tseYg2QH/LbIKxYHwt1jLmL1G7OGDE2TYzog44=
+	t=1785829691; cv=none; b=S5yeWvNuKaG7fXnY/Cw9QJj0uI+bfpUmNmUVNXUAclCbjy8O0mcy3IZ3GCMS4/cClW7Yrjjkl8G01cUh3Uaje+Mk+70SqwL67e06fw345X5+VC0QekAjuHPuoptP0afBh1awjyYibsxqGzk0udROL+TpTV6a/yuyJ6z1mxxlsoc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785829377; c=relaxed/simple;
-	bh=hc/KLoiXxVRkYrNqWwUeXVLvDfvQcw8+h6tPjXvUgjU=;
+	s=arc-20240116; t=1785829691; c=relaxed/simple;
+	bh=nU+W7SDGH97PdLGSIseaAXJGwba3CvLcyXPysdkGHSM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ge9FxmXTMy2Ad8xUG96efDzDPBTcqGPHIel/CpGS1h7MsFt0dhFxR58aMc8CR2AI31IL753di/gV8I61L969j1rdUfe99KVAdUN5dcc+XjCJZML0VcTbFquCbRFDZffbRzYahPlHGPdVi3yuRrH7NF/vFTukwhtKsfM7lVjyajQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=crqC5bHH; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=M8v3nqi2; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=FDJ3qZIHfTDFawGyUwOnng+wD59nnHuhsKiggdhIvHW6jJyT4tGhKARHj7idMsE4BAd6JMkNlVri7iPC9jLW2LiqxEvYe8tDjgqummKKeCluM7kgWjw5NUlrTA7L3A2WkTKE5VAKhZOtRUF4fOw1wJc/rQ56rHMbpqkqPcrKBSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RJa1Nn38; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZDDiLalw; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="crqC5bHH";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="M8v3nqi2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RJa1Nn38";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZDDiLalw"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1785829374;
+	s=mimecast20190719; t=1785829688;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=hL218+tFFRsvRbeZEwZ8U/3P+ghElNSwaHgpWQSt+ig=;
-	b=crqC5bHHcy6+mDY2X0Bl6WN99YP8PUkxExvD7aE4AXYjoe5DRRddprWguYPGGxx6/9GDhd
-	61+H+/UR2STYaPi2+stFcKB+9oSKgCF1uZkLl5vXpqEnfRIVvpPbYsjBpopEDm8LR04yly
-	NCP7wh319yLnJ5Zlts/lJ19+pB21Ngo=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=S2JCvWdBkPduFfWzd+eDY+HHzmDvS+I5il57IMK4KfU=;
+	b=RJa1Nn3867bFR7CzS2ifaMl+qma3KqZHKh98MJZnvESbl/+yV0bJgTuaPRxOAwjWFrxERz
+	jo8PIJDFB0La21X+PzDmVXYMQX3Xrh3FiFUgvdKlfjIo3RjiCwPwh2YhtfYqKKOh2zLMQc
+	e++lG1p3GEMCg+6nUQc7V0SX8nYyS/o=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-480-_Q_PYCekOyuGsHHZHsLYtw-1; Tue, 04 Aug 2026 03:42:38 -0400
-X-MC-Unique: _Q_PYCekOyuGsHHZHsLYtw-1
-X-Mimecast-MFC-AGG-ID: _Q_PYCekOyuGsHHZHsLYtw_1785829357
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-492488f8583so28007225e9.2
-        for <linux-crypto@vger.kernel.org>; Tue, 04 Aug 2026 00:42:38 -0700 (PDT)
+ us-mta-609-vFh-0a0FNU2_psvfo4zx1A-1; Tue, 04 Aug 2026 03:47:57 -0400
+X-MC-Unique: vFh-0a0FNU2_psvfo4zx1A-1
+X-Mimecast-MFC-AGG-ID: vFh-0a0FNU2_psvfo4zx1A_1785829676
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-472c330e555so2183438f8f.1
+        for <linux-crypto@vger.kernel.org>; Tue, 04 Aug 2026 00:47:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1785829357; x=1786434157; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=hL218+tFFRsvRbeZEwZ8U/3P+ghElNSwaHgpWQSt+ig=;
-        b=M8v3nqi2UDa4bXXJumqwszt6EIrT+axnoFrjv1VUodvfx+2l9dtEOQaF+lW+9oIZyd
-         X9vQ5sqCl7ptvabJyENBc6Rb4ql5p8Eurceo7O+PZ97yBDL1HIUTnnjGZFfSfORB4CtH
-         XmdsoZGcmIly/AfIs4ZJc0epq4yFe1hIPQPsQqOk8zmlpiSzJFShp8gsz76ZbH4jYQ0A
-         rj3Z+fsS3zhMADO0ESvcZT0aXQjgkQU+4F9q9AQTC2XyfNXegPYrl8CCE21f5Cu6sa9n
-         0zq1vhNIJIUfmLL31yVHNjWTSg27XD7vAGA1++WBQuToEn5o+Xu2W+I3/YbFGZd2Geg7
-         MBnA==
+        d=redhat.com; s=google; t=1785829676; x=1786434476; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=S2JCvWdBkPduFfWzd+eDY+HHzmDvS+I5il57IMK4KfU=;
+        b=ZDDiLalw8pJRqK2iy/r+CRdCpJ5MA9jaP3wMkhC9nBl8PzuvALjg3ARlZ0IKaMJZtv
+         Avy6MYCHMZqNI6iBQZigwdEGe1MJFmBnPLvDgiosGYslfyauB+8xIkttPWQFBAxNfXju
+         fe7hb+oF55xmRLOVa76FBhxxhbJIxl0iZ6+9jg8YQrmUfHwrQFpjrwGAfNsmWgci2Zno
+         qabSJbUMzIHkxfZfDOsPydBmPC2my5fgvmeHfZl9j6b+hyQG+SES/T+AcF4txQXMAG/Z
+         i80riJm8hMFvM8pp2J+/hQlCZW6T1OSRd8+p1X6UIrQH2mZ8YEgFDXHSN3QGnMvtB2cA
+         uBew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785829357; x=1786434157;
-        h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=hL218+tFFRsvRbeZEwZ8U/3P+ghElNSwaHgpWQSt+ig=;
-        b=leZ2kofuKPBYQXM5qUcrIc3ndIC1Oe3zZ5ksAYzV0lQPW+OQ82JgWKbR/UQY8nHNGG
-         7sDOvLGDhHKOtJKL3g4+zGAICzF8uWx94WgXPmxHiZ++MilTlLiQoQC1eFPFmRQsLVJJ
-         oS9KHl6/3HlKVpiU03VZySk3m1WmBKukppyN/zRNvRuOSWKPyl8Cy0GgD+GCHGlZ//ob
-         3lqGwllgZB7lGaDDe3KhM+CcX0yNaFHmstKep0Rhg5gzK5Nc8GGhvMy71Uti8W/r1Q+r
-         OC0k4L2rlkBL/QjnqpBpd99vCsOudnj/A3ZpIfc5F3jxwHxlI7lsQrJWF3oUaYkm1nlB
-         UiQA==
-X-Forwarded-Encrypted: i=1; AHgh+RqVNp6Y5NcP+baxA4rk3zOlF850WqGLKVs9Za6g/tzOU9/ZPQNumNBKxO7yFTS/nS8nLuVpofrOECjLwYg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzrzn27EIfQMqx3G17kND/54ufMtvldt4wS45RRmBt0Qh+kt0FY
-	Aam/hoUfFdLBc6hjGZCmtzOq6Yj9km3Y1+jt/8b+0d8grHoBZQifYYTFwVJzy3ujLvnvrZf1881
-	u2eZxKqZiyS/Kltfi+S1UVc/EbOLHyo1zNX7lZVHUY7pnzlkABk42MQ5lH25udzbBFQ==
-X-Gm-Gg: AR+sD13YgZO0ouPzhLyCFDDlKPiE9N5HJrKIZmDZt3dT8Gdxe5XoAwIkFEGiv9d8ZRD
-	rCjYLCvCl8/HZEYSyRG9hiamPHipUaiYGgptvuVA9Ln0jXsLRwRy4BkuU4jaB/IJv9jm0Sxw6+V
-	Ll0R17fjH/iQWh4FUlLdJlq96CF0VzFo0Z+ZI+lIKfXJFKMIzy6mc8Rp9fRZirtgS6E1ACb2Fuo
-	rzuUQ0IUBimuft4GyqMsC36krpkM4LUC9aLWedml/R+8OM8b6r3+e7xF7BrOgtSQwZfFAQKTPOP
-	czAESqU98rYPEP2CuE+UsFV5RWJpZ0LIcSEPsixcFTiK6fSNK23NCARjrHemj7BYQMleu2hC
-X-Received: by 2002:a05:600c:5914:b0:495:5cda:52ec with SMTP id 5b1f17b1804b1-4980c662d03mr260931425e9.16.1785829357222;
-        Tue, 04 Aug 2026 00:42:37 -0700 (PDT)
-X-Received: by 2002:a05:600c:5914:b0:495:5cda:52ec with SMTP id 5b1f17b1804b1-4980c662d03mr260930955e9.16.1785829356843;
-        Tue, 04 Aug 2026 00:42:36 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1785829676; x=1786434476;
+        h=content-transfer-encoding:content-type:in-reply-to:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=S2JCvWdBkPduFfWzd+eDY+HHzmDvS+I5il57IMK4KfU=;
+        b=PWGcSGhJCXITw7B/JySnRI691PZOxW9Da1jijc99NMJ5oA3FzvdTMNQgRou7wDk3ln
+         zeX86IuWUAVEzyAMUT+CGeVlJq+dNzS9IT2NCIOaA3o4GquchEd7PHKJlFBDkYcz/blr
+         aBmcX2kWQgtWY/M+ibI6rCipW1gooni0DMBx4BNoDwGl23mHMYb0VeAtkHxNHc6avHR6
+         0hxMG+CTqqzc0usStF/LjAHTUV9QY+EYOpRTSFgIPhl9WscDzV8b+t2DK2dbUqeTT3zQ
+         rfUyS3uXmigZAc/D0F0y9NyABCugRd4/Ik85KlI+LCUSC2txbJWXlN2C4jsW9xNjN39I
+         HRfg==
+X-Gm-Message-State: AOJu0YwNumLwPkV7sfpSRT6J01RtGMN22e6snmlUd6J0BCkburiPypME
+	zasdS83yMXaZic8fP+BHhK3ckq8lVqXZGvvMMdMGXz1dm93E7bjQ2X/ijsryvQRxr2o+HsrC50y
+	RBinkbDY/8yX4yaB9VpRjludXhC7uGEd1oK2Vs8+gmauVy4ZFNycc63+RNIPVOM+L0vx5OXgAYA
+	==
+X-Gm-Gg: AR+sD13hkge/Dl+LIfodj1eh9NxMl0IqHdEwEd+M/rGJiWN7Xczu9VM4hX53ZL4dPUE
+	Rv+wmOvE8P5msDuRQxyDG4q1vuLBTEzoweD1X1WjbKqqEvvn/1ZKsiIpbCSCTnSr4vnkPwzNplr
+	TQ6hla1DW7/rkBPKPxkjjguxQefbsVNiqsJYBoDiDwZqqgvDffFHjcwLwvXoTQB79BrBYw+6FOM
+	7RvMFiHTyiqJkMxUbElqmt6T7e+PMJPcczc1Nrvw1FljPtO3YY7wiVWAc6LP8VJyk4whunaUgmV
+	cI/mFP+IpvicJtTjPFwJDc/QGUPTrtVu0DA0eucq/rfd+2yTpDBntGgvy1MiMG2Pgw7fOIRL
+X-Received: by 2002:a05:6000:2208:b0:47f:d072:87d8 with SMTP id ffacd0b85a97d-47fd7257d77mr35665454f8f.0.1785829676112;
+        Tue, 04 Aug 2026 00:47:56 -0700 (PDT)
+X-Received: by 2002:a05:6000:2208:b0:47f:d072:87d8 with SMTP id ffacd0b85a97d-47fd7257d77mr35665375f8f.0.1785829675678;
+        Tue, 04 Aug 2026 00:47:55 -0700 (PDT)
 Received: from [192.168.0.9] ([47.64.115.28])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49949fcb46esm75080935e9.5.2026.08.04.00.42.34
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47fd41e2abbsm41552388f8f.9.2026.08.04.00.47.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Aug 2026 00:42:35 -0700 (PDT)
-Message-ID: <46104b3b-ae4b-4255-b7ab-c994a59c9882@redhat.com>
-Date: Tue, 4 Aug 2026 09:42:34 +0200
+        Tue, 04 Aug 2026 00:47:55 -0700 (PDT)
+Message-ID: <b4d28139-941d-4b36-808d-5c41d370a237@redhat.com>
+Date: Tue, 4 Aug 2026 09:47:53 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -87,16 +87,18 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/9] crypto: Provide a wrapper for zeroizing
- crypto_aes_ctx
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, Simo Sorce <simo@redhat.com>
-References: <20260803094432.70505-1-thuth@redhat.com>
- <20260803094432.70505-2-thuth@redhat.com> <20260803190540.GD2062@quark>
-Content-Language: en-US
+Subject: Re: [PATCH] crypto: eip93 - use struct_size() and flexible array for
+ ring allocation
+To: Rosen Penev <rosenp@gmail.com>
+Cc: linux-crypto@vger.kernel.org, Christian Marangi <ansuelsmth@gmail.com>,
+ Antoine Tenart <atenart@kernel.org>, Herbert Xu
+ <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
+ open list <linux-kernel@vger.kernel.org>
+References: <20260803224028.87631-1-rosenp@gmail.com>
+ <8e0dc8db-bfb7-40f4-b6f8-fc773e8b74f1@redhat.com>
+ <CAKxU2N9=qABcpCoQSJ+LeLu0nZj-XBdhetoecwsfRGky+Vgc9w@mail.gmail.com>
 From: Thomas Huth <thuth@redhat.com>
+Content-Language: en-US
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
  yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
@@ -139,79 +141,96 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20260803190540.GD2062@quark>
+In-Reply-To: <CAKxU2N9=qABcpCoQSJ+LeLu0nZj-XBdhetoecwsfRGky+Vgc9w@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 03/08/2026 21.05, Eric Biggers wrote:
-> On Mon, Aug 03, 2026 at 11:44:20AM +0200, Thomas Huth wrote:
->> From: Thomas Huth <thuth@redhat.com>
+On 04/08/2026 09.18, Rosen Penev wrote:
+> On Tue, Aug 4, 2026 at 12:11 AM Thomas Huth <thuth@redhat.com> wrote:
 >>
->> Several crypto drivers need to zeroize their local crypto_aes_ctx
->> structures after use to avoid leaking key material on the stack.
->> Currently some call sites do this with their own memzero_explicit()
->> call, which is error-prone since it is easy to miss a return path
->> (what already happened in some drivers). Some other call sites miss
->> to clear crypto_aes_ctx completely.
->>
->> Provide an aes_clear_ctx() helper that can be used with __cleanup()
->> to automatically zeroize the context when it goes out of scope.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>   include/crypto/aes.h | 13 +++++++++++++
->>   1 file changed, 13 insertions(+)
->>
->> diff --git a/include/crypto/aes.h b/include/crypto/aes.h
->> index 3279cfa546085..5ca7b1ab50e8c 100644
->> --- a/include/crypto/aes.h
->> +++ b/include/crypto/aes.h
->> @@ -159,6 +159,19 @@ static inline int aes_check_keylen(size_t keylen)
->>   int aes_expandkey(struct crypto_aes_ctx *ctx, const u8 *in_key,
->>   		  unsigned int key_len);
->>   
->> +/**
->> + * aes_clear_ctx - Zeroize a crypto_aes_ctx structure
->> + * @ctx:	The location of the context that should be zeroized
->> + *
->> + * Explicitly fills the crypto_aes_ctx with zeroes. This should be done
->> + * once the context is not required anymore to avoid that its contents
->> + * are leaked on the stack or heap.
->> + */
->> +static inline void aes_clear_ctx(struct crypto_aes_ctx *ctx)
->> +{
->> +	memzero_explicit(ctx, sizeof(*ctx));
->> +}
-> 
-> Acked-by: Eric Biggers <ebiggers@kernel.org>
-> 
-> I guess we should start using __cleanup with type-specific zeroization
-> functions like this more often.
+>> On 04/08/2026 00.40, Rosen Penev wrote:
+>>> Embed the single ring as a flexible array member in eip93_device
+>>> instead of allocating it separately. This simplifies the probe path
+>>> and uses struct_size() for a single allocation.
+>>>
+>>> Assisted-by: opencode:big-pickle
+>>> Signed-off-by: Rosen Penev <rosenp@gmail.com>
+>>> ---
+>>>    .../crypto/inside-secure/eip93/eip93-main.c   |  6 +----
+>>>    .../crypto/inside-secure/eip93/eip93-main.h   | 22 +++++++++----------
+>>>    2 files changed, 12 insertions(+), 16 deletions(-)
+>>>
+>>> diff --git a/drivers/crypto/inside-secure/eip93/eip93-main.c b/drivers/crypto/inside-secure/eip93/eip93-main.c
+>>> index 1a8dabc4ada4..e62785952b0d 100644
+>>> --- a/drivers/crypto/inside-secure/eip93/eip93-main.c
+>>> +++ b/drivers/crypto/inside-secure/eip93/eip93-main.c
+>>> @@ -415,7 +415,7 @@ static int eip93_crypto_probe(struct platform_device *pdev)
+>>>        u32 ver, algo_flags;
+>>>        int ret;
+>>>
+>>> -     eip93 = devm_kzalloc(dev, sizeof(*eip93), GFP_KERNEL);
+>>> +     eip93 = devm_kzalloc(dev, struct_size(eip93, ring, 1), GFP_KERNEL);
+>>>        if (!eip93)
+>>>                return -ENOMEM;
+>>>
+>>> @@ -436,10 +436,6 @@ static int eip93_crypto_probe(struct platform_device *pdev)
+>>>        if (ret)
+>>>                return ret;
+>>>
+>>> -     eip93->ring = devm_kcalloc(eip93->dev, 1, sizeof(*eip93->ring), GFP_KERNEL);
+>>> -     if (!eip93->ring)
+>>> -             return -ENOMEM;
+>>> -
+>>>        ret = eip93_desc_init(eip93);
+>>>        if (ret)
+>>>                return ret;
+>>> diff --git a/drivers/crypto/inside-secure/eip93/eip93-main.h b/drivers/crypto/inside-secure/eip93/eip93-main.h
+>>> index 990c2401b7ce..5f0f51081743 100644
+>>> --- a/drivers/crypto/inside-secure/eip93/eip93-main.h
+>>> +++ b/drivers/crypto/inside-secure/eip93/eip93-main.h
+>>> @@ -92,17 +92,6 @@
+>>>                                                    EIP93_HASH_SHA224 | \
+>>>                                                    EIP93_HASH_SHA256))
+>>>
+>>> -/**
+>>> - * struct eip93_device - crypto engine device structure
+>>> - */
+>>> -struct eip93_device {
+>>> -     void __iomem            *base;
+>>> -     struct device           *dev;
+>>> -     struct clk              *clk;
+>>> -     int                     irq;
+>>> -     struct eip93_ring               *ring;
+>>> -};
+>>> -
+>>>    struct eip93_desc_ring {
+>>>        void                    *base;
+>>>        void                    *base_end;
+>>> @@ -131,6 +120,17 @@ struct eip93_ring {
+>>>        struct idr                      crypto_async_idr;
+>>>    };
+>>>
+>>> +/**
+>>> + * struct eip93_device - crypto engine device structure
+>>> + */
+>>> +struct eip93_device {
+>>> +     void __iomem            *base;
+>>> +     struct device           *dev;
+>>> +     struct clk              *clk;
+>>> +     int                     irq;
+>>> +     struct eip93_ring       ring[];
+>>> +};
+>> This looks weird, too. If there is always only one "ring", why don't you
+>> embed it without the "[]" into the struct eip93_device directly?
+> keeps all callers the same. -> vs .
+So it's basically keeping the patch small and generating many WTFs for 
+future reviewers of the code vs. having a bigger patch now and better 
+understable code in the future. Not my decision (it's up to the 
+maintainers), but FWIW I'd rather go with option 2.
 
-Yes, and I already got some more patches for other structure in the works 
-already, just wanted to get review feedback on this series here first before 
-sending them out / continuing that work.
-
-> One gotcha is that __cleanup and 'goto'
-> should not be mixed in the same function; see the comment at
-> include/linux/cleanup.h line 148.  Patch 8 of this series doesn't follow
-> that in safexcel_aead_setkey().
-Ah, thanks for the hint, I wasn't aware of that recommendation yet!
-
-As for safexcel_aead_setkey(), I think the change should be fine since the 
-__cleanup() is declared at the very top of the function and not somewhere in 
-an inner scope, so there is no way that the "gotos" could skip the cleanup here.
-
-To get rid of the "gotos" here, I'd need to introduce another cleanup 
-function for crypto_authenc_keys first, so if you insist of not mixing the 
-__cleanup(aes_clear_ctx) with the gotos here, I think I'd rather drop that 
-hunk from the patch for now, and provide another patch series with a cleanup 
-for crypto_authenc_keys later that then adds the __cleanup() to both, struct 
-crypto_authenc_keys keys and struct crypto_aes_ctx aes here and removes the 
-gotos at the same time.
-
-So WDYT, drop the hunk here for now and send a v3 with that, or keep the 
-current v2 of this patch with its (hopefully unproblematic) ugliness?
+Anyway, if you want to keep it short, wouldn't it also be possible to 
+declare it as ring[1] instead and then keep the sizeof() instead of the 
+struct_size() ?
 
   Thomas
 
