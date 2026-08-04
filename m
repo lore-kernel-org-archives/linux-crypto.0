@@ -1,134 +1,349 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82C81367F4D;
-	Tue,  4 Aug 2026 11:37:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92DE23EFFC3
+	for <linux-crypto@vger.kernel.org>; Tue,  4 Aug 2026 14:30:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785843472; cv=none; b=T+s7eqENNP/BUD3UIwgXUeF556JhNp2iDd5F7mP5sqxS+oRdgJOGe8Ekbi5LousZwUpWPVl4rGFC1KZPCj/D5bpJf9bLniyLb0yEWRVjOres7gacHIBIzgBoQQBuw0YHlErfoFypf6t2JOvVu+c6Y4K9OFuWwGjCukheLO5KLRQ=
+	t=1785853826; cv=none; b=pWlA4zKykuwW10f+VQ3S3DD2QX6o3Z/R28duiipiNTU23UZa2kbvQP/CN9zV+0j2dyXjPLmViQO+rtU+HL5wc9yCWENzPluuQVoqrCVWvZEvt0ajTh9uL6jIj7Nv/47eTstcYR1m1Bning3P7sjNy27kS3ndT+gwpx8sEGffebQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785843472; c=relaxed/simple;
-	bh=FHe6+bniTGIA6/te60tBkTNFsSqn4CNCtlsDLMXxwNc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YN1auuXwOs5NA/iviajW6mu1YxQIiGZfezN5RPWK2RLDOOj9WcyL5srErbjhWQFDxHmZO1uN+7WGO9Vqv7/tPwChtc16fa98Jc9DO0jsPRZwTpdW+IYZ9I5CzNwPfraJ8haQKYb8zYRNgCOn8ZVclhiKr9VsdndYEiSub83kFkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=LwG52kne; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1785853826; c=relaxed/simple;
+	bh=/worik6565MmGqxB83xHC4oGsL7LqUXQzALqNM6g5s0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kkNNWulTYN2lokcfxU1UuXwTVNYUXrqW5deBQLT2Igz7XUVfzGPbbex866c4LNLUXuPN3M0KAnHG+wy/8OYJDz/Q3sVBqpemxdVaZSmL62SSUYS24leJcqBXEDp9FP2IVlyrpTljSKL+cX3s6M0sLELsS4X1fDtdk42f78EMJgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dh3UmXMA; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="LwG52kne"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 6748HgLC296047;
-	Tue, 4 Aug 2026 11:37:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=okt/xT/2stioj7MuG+YNK9GugJ3bLhUtObiKopWZa
-	ZE=; b=LwG52kneBXApYx0KKg772O37Q0mwe5b6aMZMQjGG8QRWcYLX7zzA4kBK8
-	Vz4PLO9S/8QkLP9XDoWAzTxi/lDd8wQMGONKe0DKKD38IxSnenX0iOBf7P6d7nwF
-	oJcsjsGcGmQpYDa5o7aouExhml/I/RVFtbnZpa3NxXbhIBzhzkBJspA6jjzE4hy/
-	wN8HzxZNZlr/dtvM+RvTGRwvvyWWw0yvTbAMaakyu31wmy9TJic2OxYTVgUYrKWM
-	WcoeTRTGhmYcot8xno457aK0P1MsZwt1HxYOPfCSU1GJ1WBWsupqIlrBWGLHq+3e
-	/kfN1OdBs3/RheYtQtkGNsPQcP0WA==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fs8a3wk0b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Aug 2026 11:37:41 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 674BBKXm020855;
-	Tue, 4 Aug 2026 11:37:40 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4fsugw1tpt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Aug 2026 11:37:40 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 674Bbae644171694
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 4 Aug 2026 11:37:36 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9D11F2004B;
-	Tue,  4 Aug 2026 11:37:36 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6196D20043;
-	Tue,  4 Aug 2026 11:37:36 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.87.85.9])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  4 Aug 2026 11:37:36 +0000 (GMT)
-From: Heiko Carstens <hca@linux.ibm.com>
-To: Harald Freudenberger <freude@linux.ibm.com>,
-        Holger Dengler <dengler@linux.ibm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH 0/3] s390/crypto: Enable CONTEXT_ANALYSIS
-Date: Tue,  4 Aug 2026 13:37:33 +0200
-Message-ID: <20260804113736.1423667-1-hca@linux.ibm.com>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dh3UmXMA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1948A1F00A3F
+	for <linux-crypto@vger.kernel.org>; Tue,  4 Aug 2026 14:30:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1785853803;
+	bh=TN+O16PcjDT2/zjFc4V9cDVHBtAUzFJCqlHG51a8Lvo=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc;
+	b=dh3UmXMAhpMYfZE6RWWeqC+IqXicIzqAKczm7wsYxDuL8SZxNSvwecMYzZm/IEzaF
+	 3khuLuwUwBIeKvJljnsR6HGQANmOyV5tXMMZxqzqDZxmuOq+F69wXvccaw4bTkt66S
+	 YNme0nvfV8Vnk1iMcLdniEEuecgJMIo708dqGEiFIZiC6aq75atkZzY52gr0MzMmAr
+	 uBIFSihTioKTkeMeJPa5kpSkI3wQ6Glqqi8nZ18pGijTm1h3sxHrJm25cwiLqNzl2Q
+	 0UWwUxcUgImR7T2bQgrsNX+LX7pWNPvLv6zxxKtcsnALhORUjuUa73sZEn32N20szQ
+	 HTsoMZHXqJBZA==
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-6a144c8eea2so421739a12.0
+        for <linux-crypto@vger.kernel.org>; Tue, 04 Aug 2026 07:30:03 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+RqqTROF8/gB8LKzCGOiVM+A+M80RukCidSmp/bwyOtTpx1yDywALtz2ABzV08t1OPBa0yhgH6idK7MlWaY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyqKkorwf51iZLGpGDscDZjXC7F+ctk2dVVvGM/sK7ByIn9ysFu
+	lU+hpg6EqB0n+3fQ4cKDnx2AMEXxQbRvb2txpBIusCTXCDMXuLj8RJ4L9aqAY1A9vlEAlAH0AX4
+	fCoDpEnX4VMIJfCkWXvVHqyxbhWc2zV8=
+X-Received: by 2002:a05:6402:21cf:b0:697:5140:a146 with SMTP id
+ 4fb4d7f45d1cf-6a0a7c60f80mr12328098a12.5.1785853801090; Tue, 04 Aug 2026
+ 07:30:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=E6P9Y6dl c=1 sm=1 tr=0 ts=6a71cf05 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=iQ6ETzBq9ecOQQE5vZCe:22 a=jW6YlCM5X9v_IRLvDUIA:9
-X-Proofpoint-ORIG-GUID: Xc_gt_hdy2Ufr2ErK1x_ajEsoNSdOLYc
-X-Proofpoint-GUID: Xc_gt_hdy2Ufr2ErK1x_ajEsoNSdOLYc
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODA0MDA5MCBTYWx0ZWRfX1IhkfubYQON+
- XgP2ypyda8mzJcD16isyUFQkuVUkRNSg/KXSpxjLnqCrNzEhteqtzysrfM7xxFbq2Buk/5dzqAZ
- yCbFalR8WAsGqiFJMKFgaSZ8KjSKVCs=
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODA0MDA5MCBTYWx0ZWRfX2fc/XMLYp9to
- 7tYs57pcaU73PZqV0515Oj9uJ9+rnCd/9Iwok4jPb/J+JUhfdfbcVopUqKrBW+f1s2XoV6LBpLg
- WRGHb5GbLDi8TO1mP57KdN3y+mCvmHR9vvcBLHxXmk0SbJVcLgSW0mB5tjsKQ2vSyVoKmXZiC0i
- +XlkzqkNk0LN/rfhOacqoEMygW2q9e+k94ckhscVqkXxs9M1LCO94eFT7G9De45OSJNP0kUEcjo
- mBuJHLNlyVF1XXHjhSLaNbe6doyHepL/aUfekYFZv7XH5eXXZW6HHA/6TDVR0uD/Sw6codBw0Vp
- oaLiRrVdnurL5KqcOJ3T7EZXIZ5pNMQ9sXKJD6tA4MbGsLf8b2pnJ0H4rOjkGBGe1ZBSAZIvORt
- iWWgMzycDEyJAPS0a8cWsYg08agOliU/fPIMuV5DNQivRePJ7QXG8jKPho0qxKw8CvImS9EE9/G
- ZAGaShRXbc8908Fg/qw==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-04_02,2026-08-03_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 clxscore=1015 lowpriorityscore=0 priorityscore=1501
- suspectscore=0 adultscore=0 spamscore=0 malwarescore=0 impostorscore=0
- phishscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2608040090
+References: <20260730082608.1929-1-zhaoqunqin@loongson.cn> <20260730082608.1929-3-zhaoqunqin@loongson.cn>
+ <CAAhV-H4V6NWDcw1nVZzaXKJF_QS0sz5jTsrnwbq-xki2mJLVtQ@mail.gmail.com> <b284a9a5-6f71-46c7-80f1-ed15276330da@loongson.cn>
+In-Reply-To: <b284a9a5-6f71-46c7-80f1-ed15276330da@loongson.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Tue, 4 Aug 2026 22:29:51 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H79JdBRmNpCKPEfHxMARr5zNVAnP3mJYOWo6zwBpF2q2Q@mail.gmail.com>
+X-Gm-Features: AUfX_mwaemQ5Zfj5LQECc_lmJjGuSKKQLXSC8JsWrz0Hlk2yLKHvGjQrzbl3zAo
+Message-ID: <CAAhV-H79JdBRmNpCKPEfHxMARr5zNVAnP3mJYOWo6zwBpF2q2Q@mail.gmail.com>
+Subject: Re: [PATCH v5 2/2] mfd: loongson-se: Fix miscellaneous issues
+To: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Cc: lee@kernel.org, linux-kernel@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Enable CONTEXT_ANALYSYS for s390's crypto code.
+On Tue, Aug 4, 2026 at 10:09=E2=80=AFAM Qunqin Zhao <zhaoqunqin@loongson.cn=
+> wrote:
+>
+>
+> =E5=9C=A8 2026/8/3 16:01, Huacai Chen =E5=86=99=E9=81=93:
+> > Hi, Qunqin,
+> >
+> > On Thu, Jul 30, 2026 at 4:41=E2=80=AFPM Qunqin Zhao <zhaoqunqin@loongso=
+n.cn> wrote:
+> >> Address multiple historical driver issues discovered by the Sashiko
+> >> Automation system within the loongson_se_probe() initialization flow
+> >> and the driver's interrupt service routines [1].
+> >>
+> >> - Add an explicit bounds check in se_irq_handler() before accessing
+> >>    the engines array to prevent out-of-bounds memory writes.
+> >>
+> >> - Switch from devm_kmalloc() to devm_kzalloc() and explicitly
+> >>    initialize all engine completion structures in probe() to avoid a
+> >>    kernel panic from complete() dereferencing a NULL wait head when a
+> >>    spurious interrupt fires before child drivers call
+> >>    loongson_se_init_engine().
+> >>
+> >> - Replace engine_init_lock with a broader cmd_lock mutex that
+> >>    serializes all command submissions, and move the lock into
+> >>    loongson_se_send_controller_cmd() and
+> >>    loongson_se_send_engine_cmd() to cover the full register write +
+> >>    poll + wait sequence.
+> >>
+> >> - Drop the spin_lock_irq from loongson_se_poll() so that interrupts
+> >>    are not disabled for up to 10 ms during the poll.  Keep the
+> >>    readl_relaxed_poll_timeout_atomic() busy-wait to avoid scheduling
+> >>    latency for fast hardware completions.
+> >>
+> >> - Add reinit_completion() to loongson_se_send_controller_cmd() and
+> >>    loongson_se_send_engine_cmd() before waiting to prevent stale
+> >>    completions from falsely returning success after a signal
+> >>    interruption.
+> >>
+> >> - Fix EPROBE_DEFER handling: propagate the error directly from
+> >>    platform_irq_count() instead of overwriting it with ENODEV so that
+> >>    probe deferral works when the interrupt provider is not yet ready.
+> >>
+> >> - Validate dmam_size from firmware against the minimum required size
+> >>    to prevent command buffers from pointing outside the allocated
+> >>    DMA region.
+> >>
+> >> - Return the error code from devm_request_irq() instead of silently
+> >>    continuing to prevent an indefinite hang.
+> >>
+> >> - Disable hardware interrupts in the probe error path when
+> >>    loongson_se_init() fails to prevent an unhandled interrupt storm.
+> >>
+> >> - Add a loongson_se_stop() cleanup handler registered with
+> >>    devm_add_action_or_reset() to send SE_CMD_STOP to the controller
+> >>    and mask all interrupts during device removal.  Using devres
+> >>    ensures that child MFD devices are unbound before the controller
+> >>    is stopped.  The STOP command uses a non-interruptible wait to
+> >>    avoid leaving hardware running while DMA buffers are freed.
+> >>
+> >> - Zero-initialize the local controller command structure in
+> >>    loongson_se_init() to prevent uninitialized stack memory from
+> >>    being written to device registers.
+> >>
+> >> - Add the SE_CMD_STOP command definition.
+> >>
+> >> Link: https://lore.kernel.org/all/20260618095949.GB1672911@google.com/=
+ [1]
+> >> Fixes: e551fa3159e3 ("mfd: Add support for Loongson Security Engine ch=
+ip controller")
+> >> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
+> >> ---
+> >>   drivers/mfd/loongson-se.c       | 87 ++++++++++++++++++++++++++-----=
+--
+> >>   include/linux/mfd/loongson-se.h |  1 +
+> >>   2 files changed, 69 insertions(+), 19 deletions(-)
+> >>
+> >> diff --git a/drivers/mfd/loongson-se.c b/drivers/mfd/loongson-se.c
+> >> index 7f552a8ee6..2c8afad1b0 100644
+> >> --- a/drivers/mfd/loongson-se.c
+> >> +++ b/drivers/mfd/loongson-se.c
+> >> @@ -28,7 +28,7 @@ struct loongson_se {
+> >>          void *dmam_base;
+> >>          int dmam_size;
+> >>
+> >> -       struct mutex engine_init_lock;
+> >> +       struct mutex cmd_lock;
+> >>          struct loongson_se_engine engines[SE_ENGINE_MAX];
+> >>   };
+> >>
+> >> @@ -42,8 +42,6 @@ static int loongson_se_poll(struct loongson_se *se, =
+u32 int_bit)
+> >>          u32 status;
+> >>          int err;
+> >>
+> >> -       spin_lock_irq(&se->dev_lock);
+> > You said you don't want to disable irq here, but I think the spinlock
+> > is still needed. That means you should use spin_lock/spin_unlock to
+> > replace spin_lock_irq/spin_unlock_irq.
+> Since loongson_se_poll always executes in the thread context, is it
+> better to use mutex_lock(
+> mutex_lock(&se->cmd_lock)  outside of loongson_se_poll) for
+> synchronization?
+If all callers have used mutex_lock(&se->cmd_lock), then spinlock is
+unnecessary.
 
-Static code checking for acquiring and releasing locks used to be done
-with sparse. That was removed with [1] and replaced with a clang based
-approach [2]. The new approach requires that each subsystem needs to be
-explicitly enabled for checking.
+> >
+> >> -
+> >>          /* Notify the controller that the engine needs to be started =
+*/
+> >>          writel(int_bit, se->base + SE_L2SINT_SET);
+> >>
+> >> @@ -52,8 +50,6 @@ static int loongson_se_poll(struct loongson_se *se, =
+u32 int_bit)
+> >>                                                  !(status & int_bit),
+> >>                                                  1, LOONGSON_ENGINE_CM=
+D_TIMEOUT_US);
+> >>
+> >> -       spin_unlock_irq(&se->dev_lock);
+> >> -
+> >>          return err;
+> >>   }
+> >>
+> >> @@ -63,24 +59,40 @@ static int loongson_se_send_controller_cmd(struct =
+loongson_se *se,
+> >>          u32 *send_cmd =3D (u32 *)cmd;
+> >>          int err, i;
+> >>
+> >> +       mutex_lock(&se->cmd_lock);
+> >> +
+> >> +       reinit_completion(&se->cmd_completion);
+> >> +
+> >>          for (i =3D 0; i < SE_SEND_CMD_REG_LEN; i++)
+> >>                  writel(send_cmd[i], se->base + SE_SEND_CMD_REG + i * =
+4);
+> >>
+> >>          err =3D loongson_se_poll(se, SE_INT_CONTROLLER);
+> >>          if (err)
+> >> -               return err;
+> >> +               goto out;
+> >> +
+> >> +       err =3D wait_for_completion_interruptible(&se->cmd_completion)=
+;
+> >>
+> >> -       return wait_for_completion_interruptible(&se->cmd_completion);
+> >> +out:
+> >> +       mutex_unlock(&se->cmd_lock);
+> >> +       return err;
+> >>   }
+> >>
+> >>   int loongson_se_send_engine_cmd(struct loongson_se_engine *engine)
+> >>   {
+> >> +       int err;
+> >> +
+> >> +       mutex_lock(&engine->se->cmd_lock);
+> >> +
+> >> +       reinit_completion(&engine->completion);
+> >> +
+> >>          /*
+> >>           * After engine initialization, the controller already knows
+> >>           * where to obtain engine commands from. Now all we need to
+> >>           * do is notify the controller that the engine needs to be st=
+arted.
+> >>           */
+> >> -       int err =3D loongson_se_poll(engine->se, BIT(engine->id));
+> >> +       err =3D loongson_se_poll(engine->se, BIT(engine->id));
+> >> +
+> >> +       mutex_unlock(&engine->se->cmd_lock);
+> >>
+> >>          if (err)
+> >>                  return err;
+> >> @@ -97,7 +109,7 @@ struct loongson_se_engine *loongson_se_init_engine(=
+struct device *dev, int id)
+> >>
+> >>          engine->se =3D se;
+> >>          engine->id =3D id;
+> >> -       init_completion(&engine->completion);
+> >> +       reinit_completion(&engine->completion);
+> > I'm not sure, but I think loongson_se_init_engine() is only called at
+> > init, so we need init_completion here.
+>
+> To prevent an spurious interrupt from completing an uninitialized object,
+> all objects have already been fully initialized with init_completion duri=
+ng the probe stage.
+In my opinion, if a function can be called multiple times, we need
+reinit_completion(), if it is only called for probe, we need
+init_completion(), and loongson_se_init_engine() looks like the later
+case.
 
-Do that for s390's crypto code. In order to avoid false positives the
-code has to be slightly reworked, since conditionally acquiring and
-releasing locks does not work with the checker (besides that this is
-sub optimal coding style).
+Huacai
 
-[1] 5b63d0ae94cc ("compiler-context-analysis: Remove Sparse support")
-[2] 3269701cb256 ("compiler-context-analysis: Add infrastructure for Context Analysis with Clang")
-
-Note:
-
-- "Pre-existing issues" reported by AI will not be addressed in the
-  context of this series
-
-Heiko Carstens (3):
-  s390/crypto: Rework ctr_aes_crypt() to remove conditional locking
-  s390/crypto: Rework ctr_paes_do_crypt() to remove conditional locking
-  s390/crypto: Enable CONTEXT_ANALYSIS
-
- arch/s390/crypto/Makefile    |   2 +
- arch/s390/crypto/aes_s390.c  |  54 +++++++++++-------
- arch/s390/crypto/paes_s390.c | 104 ++++++++++++++++++++---------------
- 3 files changed, 97 insertions(+), 63 deletions(-)
-
--- 
-2.53.0
-
+>
+> >
+> > Huacai
+> >
+> >>          /* Divide DMA memory equally among all engines */
+> >>          engine->buffer_size =3D se->dmam_size / SE_ENGINE_MAX;
+> >> @@ -113,8 +125,6 @@ struct loongson_se_engine *loongson_se_init_engine=
+(struct device *dev, int id)
+> >>          engine->command =3D se->dmam_base + id * (2 * SE_ENGINE_CMD_S=
+IZE);
+> >>          engine->command_ret =3D engine->command + SE_ENGINE_CMD_SIZE;
+> >>
+> >> -       mutex_lock(&se->engine_init_lock);
+> >> -
+> >>          /* Tell the controller where to find engine command */
+> >>          cmd.command_id =3D SE_CMD_SET_ENGINE_CMDBUF;
+> >>          cmd.info[0] =3D id;
+> >> @@ -124,8 +134,6 @@ struct loongson_se_engine *loongson_se_init_engine=
+(struct device *dev, int id)
+> >>          if (loongson_se_send_controller_cmd(se, &cmd))
+> >>                  engine =3D NULL;
+> >>
+> >> -       mutex_unlock(&se->engine_init_lock);
+> >> -
+> >>          return engine;
+> >>   }
+> >>   EXPORT_SYMBOL_GPL(loongson_se_init_engine);
+> >> @@ -155,7 +163,8 @@ static irqreturn_t se_irq_handler(int irq, void *d=
+ev_id)
+> >>          /* For engines */
+> >>          while (int_status) {
+> >>                  id =3D __ffs(int_status);
+> >> -               complete(&se->engines[id].completion);
+> >> +               if (id < SE_ENGINE_MAX)
+> >> +                       complete(&se->engines[id].completion);
+> >>                  int_status &=3D ~BIT(id);
+> >>                  writel(BIT(id), se->base + SE_S2LINT_CL);
+> >>          }
+> >> @@ -167,7 +176,7 @@ static irqreturn_t se_irq_handler(int irq, void *d=
+ev_id)
+> >>
+> >>   static int loongson_se_init(struct loongson_se *se, dma_addr_t addr,=
+ int size)
+> >>   {
+> >> -       struct loongson_se_controller_cmd cmd;
+> >> +       struct loongson_se_controller_cmd cmd =3D {0};
+> >>          int err;
+> >>
+> >>          cmd.command_id =3D SE_CMD_START;
+> >> @@ -188,6 +197,30 @@ static const struct mfd_cell engines[] =3D {
+> >>          { .name =3D "tpm_loongson" },
+> >>   };
+> >>
+> >> +static void loongson_se_stop(void *data)
+> >> +{
+> >> +       struct loongson_se *se =3D data;
+> >> +       struct loongson_se_controller_cmd cmd =3D {0};
+> >> +       u32 *send_cmd =3D (u32 *)&cmd;
+> >> +       int i;
+> >> +
+> >> +       mutex_lock(&se->cmd_lock);
+> >> +
+> >> +       cmd.command_id =3D SE_CMD_STOP;
+> >> +
+> >> +       reinit_completion(&se->cmd_completion);
+> >> +
+> >> +       for (i =3D 0; i < SE_SEND_CMD_REG_LEN; i++)
+> >> +               writel(send_cmd[i], se->base + SE_SEND_CMD_REG + i * 4=
+);
+> >> +
+> >> +       if (!loongson_se_poll(se, SE_INT_CONTROLLER))
+> >> +               wait_for_completion(&se->cmd_completion);
+> >> +
+> >> +       writel(0, se->base + SE_S2LINT_EN);
+> >> +
+> >> +       mutex_unlock(&se->cmd_lock);
+> >> +}
+> >> +
+> >>   static int loongson_se_probe(struct platform_device *pdev)
+> >>   {
+> >>          struct device *dev =3D &pdev->dev;
+> >> @@ -195,19 +228,25 @@ static int loongson_se_probe(struct platform_dev=
+ice *pdev)
+> >>          int nr_irq, irq, err, i;
+> >>          dma_addr_t paddr;
+> >>
+> >> -       se =3D devm_kmalloc(dev, sizeof(*se), GFP_KERNEL);
+> >> +       se =3D devm_kzalloc(dev, sizeof(*se), GFP_KERNEL);
+> >>          if (!se)
+> >>                  return -ENOMEM;
+> >>
+> >>          dev_set_drvdata(dev, se);
+> >>          init_completion(&se->cmd_completion);
+> >>          spin_lock_init(&se->dev_lock);
+> >> -       mutex_init(&se->engine_init_lock);
+> >> +       mutex_init(&se->cmd_lock);
+> >> +
+> >> +       for (i =3D 0; i < SE_ENGINE_MAX; i++)
+> >> +               init_completion(&se->engines[i].completion);
+> Thanks
+>
