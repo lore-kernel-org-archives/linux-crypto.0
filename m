@@ -1,168 +1,205 @@
-Received: from CHN02-SH0-obe.outbound.protection.partner.outlook.cn (mail-sh0chn02on2093.outbound.protection.partner.outlook.cn [139.219.146.93])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E17E74195A3;
-	Tue,  4 Aug 2026 07:57:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.146.93
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0572439F66
+	for <linux-crypto@vger.kernel.org>; Tue,  4 Aug 2026 08:47:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.52
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785830248; cv=fail; b=bxA53JeSfdU4i2EkZ33OVmEQWvGnIFXKsazxlh7uz9l0vH4z/IcShP2HBDyxHHmO/S8uyDm97PKwWMCUpsi+qEHD0XR+ob9vfPTBN0+ziVLBH257cTRIWXFlUT4pOXzETTqw/RiK2cOztmV+KiWE7pWjao4D/i/sEgTE4yT4AHY=
+	t=1785833267; cv=pass; b=lIHEfnr9+R5CKOajWkVmiCn4IcB3grridYSpBmbXRjlRAheH4/igpyJL3+SXxBRZe0JypXLZroNYwIBIsd3zmdV6Byu6v7n3x3xPVBQXFduT4wCqYDKifo02lMlK2QgaFbPlwni6+r3e3rpqqzLdlCvu9o/B8/v5f2JcCaAJG2o=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785830248; c=relaxed/simple;
-	bh=4yM4goIqE2PXhSoss69IJPvPSHlwsqRvC6pS2P2weRA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=sgnSS6Oc2Zp1BwI/ok5PHZ9dq/9dgHiB6X2qpvAWls10NpzLTmO4feEbnwGDkm0GQzovsX3ou2hTONs0w+EWk0R/69Blg91Sl9BabJkD2Oz+Uox2kIOrxTFvLOi87JYV2wCKKx/IUqD9Kw4upTVRADEuSW0dG03cfFo+qZ5uKtg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.146.93
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=starfivetech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Qkg0ygK7n08KXB6vGt8OVvH+9UXGOKs9BEVnzc0Vofx2Te/BEftd10Vj12GS3xzH0g0gT8qA7u3F7EeL3V2GMl9Uu4jdnaI+gVlMKsCdGbmk4lMxG7eLDY/b//5yTIf2X+R4/zkL90ckHdUtcL47BxrHfvRikinYOdnKl8CHFPLaMqVYEDk+wmXpLAbOFg+OrcGb4RqqqjNj+XSsZWGoRTuYg5JHYszV6bjIUaWXT9o9ezONS7DaV4izTqCaZTnbpL3WJesRsQn0K3eU/V8iiyKuqBpo9EVWPuHI4loYz/CRuHLY5Vc+HDfhVl3zMzz5EgbGGlTPh1kagh0HIf1snQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4yM4goIqE2PXhSoss69IJPvPSHlwsqRvC6pS2P2weRA=;
- b=ebwBWlkCI+ykdVjbqzw5OklvFFUmQSoJlNs7wRrX5CCAbQDNsl0LH5RlYNGxiBKNvkCtiyuhuqVsE0OberSNUVlYNQIydPmGpSR1fwzLxsmeP9aeRJLtuyMvASfNxlc0/1BgEAb/qjcqyZG2Rvj6A8+dbqDu2fjOjpdYbjT41kjEsgrzF2ZJEHJ/c3Z7gWt3Sl3003+kHkZ1syUfDyO8hu7NHW3ZCRtqfsWCJ5FB5228OQaki5DVW3FZ2QnIixN5BXu1HlLN+eiP2e/4jHAMGr093u1wGAORW1E41rjGvsGXT4NQHhjMbsc6hDuUH/yCv1sAeAGBt21Dc1kQlANcgQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=starfivetech.com; dmarc=pass action=none
- header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
-Received: from ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c550:18::6) by ZQ0PR01MB1173.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c550:1a::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.270.16; Tue, 4 Aug
- 2026 07:41:55 +0000
-Received: from ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn
- ([fe80::973:272c:ab11:7570]) by ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn
- ([fe80::973:272c:ab11:7570%4]) with mapi id 15.21.0270.017; Tue, 4 Aug 2026
- 07:41:55 +0000
-From: Lianfeng Ouyang <lianfeng.ouyang@starfivetech.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-CC: Olivia Mackall <olivia@selenic.com>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>, "linux-crypto@vger.kernel.org"
-	<linux-crypto@vger.kernel.org>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject:
- =?utf-8?B?5Zue5aSNOiBbUEFUQ0ggdjYgMi8yXSBod3JuZzogc3RhcmZpdmU6IHJld29y?=
- =?utf-8?Q?k_clk/reset_teardown_order_for_JHB100?=
-Thread-Topic: [PATCH v6 2/2] hwrng: starfive: rework clk/reset teardown order
- for JHB100
-Thread-Index: AQHdGnguUcDbbpJ+JUaY5OYwkcSlA7aFsUMAgAfgTDA=
-Date: Tue, 4 Aug 2026 07:41:55 +0000
-Message-ID:
- <ZQ0PR01MB126968B53B0EEA13786725E182D42@ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn>
-References: <20260723075206.3032-1-lianfeng.ouyang@starfivetech.com>
- <20260723075206.3032-3-lianfeng.ouyang@starfivetech.com>
- <amr55gfWKtJESwo9@gondor.apana.org.au>
-In-Reply-To: <amr55gfWKtJESwo9@gondor.apana.org.au>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=starfivetech.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: ZQ0PR01MB1269:EE_|ZQ0PR01MB1173:EE_
-x-ms-office365-filtering-correlation-id: 4e3af359-6cb6-4176-7d26-08def1fbdb9e
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|23010399003|1800799024|376014|4143699003|56012099006|10067099003|22082099003|18002099003|38070700021;
-x-microsoft-antispam-message-info:
- onmPhrbXyUzKC0xIPraHq4pxfslcEidpqCMcI/4ejkW1xg3KMiJMz/H/bosYMkWZBaHvqBM8LGh2ZNWoG3U5R5eUOZiNxBGzJzeo2p1zx2dSYgmbL1LCaCoohM+QW8vssPDzwz70/ThIgH0blGBTMQO0YoS+SqrwWQWGshcwMJnMPAHlfDeDCe0MHh+INLjSuyrOraBvNl0qQNvQyUFs1ivBkrghHJz1FStTRqH0FJcvC1B8aoiLyaMGVaXr5cFWP80HiMr/l8sqCRbX35TEmBRYMKCqyVJXjOFZNP0v3JDy674kYEQbO+QCJj8kGUyrSnU0zFQHsIopxEmLnxYVOWKZ8N6W/YaYkwYmkCWE6EcJ/kKCz+NRzXBjzQQZ24Jv+Bv2/oG+ttp/QB3aaOlkZuqag1oo7MPsfG6ZZbzOjD7idRXXFXnCdTHXP6VspwaX7pzQVcYNaBiFnHRZjZak4vPCJVNAXCNlb41wS5NWtHn0t3HMDH/NrcWas04YfmTZBBsqq0D6HO71kKpRrOeQw1RDCwx19+Ytl9xd7xBGQc+Z2DqPYVKSU8/CQd90QV0F
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:zh-cn;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(366016)(23010399003)(1800799024)(376014)(4143699003)(56012099006)(10067099003)(22082099003)(18002099003)(38070700021);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?WXJNOGFuYms2NDA1ZnljZ1BCbEJQR3N2cjAvZytGNHlJZGhIU29XSjMyUW5E?=
- =?utf-8?B?eDFDWHp4Zm5LUHEyOCtRc0NESXNxK0RKZ0QrYXR3QlhnZWhxUkw4ekcxcFpB?=
- =?utf-8?B?VkZwdVJYRkN5TmRhMkV5U0V0RHg3Y08xODZJeGVIR3pEVDhmMnJXUENXWU4y?=
- =?utf-8?B?ZlYzYlkybDVZclVxdERzTDM0aHdFbzFHaEQ1RnlaNVNHWFVCSDl3dDZsclJP?=
- =?utf-8?B?clJ4WjdtK3lvWGRCaWMrd09DVnpMSlhhWEZ0ZjltOVVFcGVNSzVLUEZRM1Zm?=
- =?utf-8?B?eGg1ZStFdFRwTXZRUllKKytvMmhDV21TSUtIWDVQZG0xcFMzdzM0eVpxUU53?=
- =?utf-8?B?N1g5b1FKeTR2K2ZydVFDWFNhTmpaK283MWFnSFB3RU44YjdwV2RFVmRGSW9H?=
- =?utf-8?B?SElXTjB4TXNGcno3NTlnVXpBRFl2eEhtczNEeEFjYTRHNlZZaDNIRitQN0s2?=
- =?utf-8?B?Rlo2T3oyY2hUVW5hZmprQXNTRUdiTjZMS2Y2NmFUNW5RSXU3KzYvd1RhTGRi?=
- =?utf-8?B?a0dsZlVKa2hwc0JmdTFlNjZuZUxYc1lvWWxvendnQjVTZ0JvRExHQUhjMDRy?=
- =?utf-8?B?RUw1R3cxSHVMMllWMGw3ZlhmQUhOcE1YdUY3S1kzSEFhcUo1T005YlIrMU5F?=
- =?utf-8?B?Y0RianhyZXZJQWxONVJaNCt1N3pSK25TYTJ0MmdTVG9XazZ5U284SEFyKzl5?=
- =?utf-8?B?aFhvT2xOU29UNVpBcm9xU3VubmlHeWJEM2lObjZKZTlpbHVCRWNKU0htNHUz?=
- =?utf-8?B?VXl3d2xTSkJtdjdVamlkbC9sekZscUlINGtaWE5lUmdNY1M5dmtoMVIrL2Na?=
- =?utf-8?B?SjdhS29hTnUrQXEvdkJyTGtRZm9naFZqSUFLSWdBMjNBbGdjQ2p0WjVDbnlE?=
- =?utf-8?B?N0JBWXAvTUZBWXZxZjBpTy9ia0Y2NlkyL0xkcXgzKzVJZWZsc3VJOTZxRGZw?=
- =?utf-8?B?TVc1cm9iV295N1hHUkdNcG8wVTZ1cVB6WHJHODI0Vy9tSDd5SlZlNUQrRDRu?=
- =?utf-8?B?WG8yaXlUT3dteHRCVUVPQUwxWDhWUys4UHNQRUJYdXNudS9ObWlsL1NyRDJX?=
- =?utf-8?B?Zldadk1qTFZtaE1DdTFjaEZSNlg3N0dtc2J4RVdHWkxLN0VRL09wZENQcnFD?=
- =?utf-8?B?emdzSmRmTk5iSEtwQWl1SURLOUVtYVNFS0xvL3ppNWRJRWtEc0hTb1RtdGhm?=
- =?utf-8?B?Mkp6YkNudlpoT1krc2E0NHhWMDNnaElHYmlveFFpVnMwT2ltZ1crT0hmY2tY?=
- =?utf-8?B?WFg1dFRTb2xNVklpUjErZmR6Y29ac1E2TGlBSDRnTzFYbnVGVTlGNU1JdHVa?=
- =?utf-8?B?QnNvZ2pGcWpsVnNMSTZsZFdBTlJFTzZORUkzU2ZvSU1jbUFEZHUzMlpGTEJF?=
- =?utf-8?B?bGVlS3R4K210VExDa2NPSlhackVwRDViZ2F2dkdzLzZjcDR6OWwrNHMxQTlD?=
- =?utf-8?B?MVY4SzlHMmxXZ1c1a1VlUFFIYXlEalBoU0tBbEFzOStNNzFqQTN2bVZpQjVU?=
- =?utf-8?B?TFoxMmNoSUZNNmE0WlBudTMxNlhUeVRCdTRoTHpYVVVzY1dEbkJRRGlpUkw5?=
- =?utf-8?B?VVZudFkzTzF0N1FFL1Z6WkZvWnVIUEZBYmRLdnZtZGw1VW96NFlvSmRGTXFC?=
- =?utf-8?B?TFY2TGkveHlGaERpOVNYa3JFQWI1SmxKc05yNzVBYW5kVzBBVGMwanBlMzdF?=
- =?utf-8?B?VTFDTEI2SzFqRTZqb2xNeVBFQnQrVExISHFIcDQ1RlRtRE15S0lrcmVxMXZ5?=
- =?utf-8?B?b1hINzJQQWY3MHVOeGxYdFhzOFlxWWFsYVcrdVVKMjA4VmlXSUl2OTh0WjZM?=
- =?utf-8?B?VVlSZkwra2k0ODJFUENMay96ZzVnNWN4ZWtEQ0UwWnBGRGZJNGVyMWJSdDZ1?=
- =?utf-8?B?RDdsaFh3Sk54YXlxWHZ0QnV3OXFnOTVxaTBMUnBpVWtFYU1JSzNGSFBYRk5H?=
- =?utf-8?B?UFVSQitQV1pmaHZtamk5L2Zhc3BUaklDY1lYNXBWdk94OVppUHMzVThzeWVZ?=
- =?utf-8?B?WUhPa1pVRk9YaUJnMGh1OE1CcmJXb1pVMlN0dHdVMXJWQTRHWm9ud3I0b0ll?=
- =?utf-8?B?bHdDZFVmak5BR3BJVndkWjFXY0ZmTm1MbjhlWlFrL05FeWxSdGNldlp4d0hH?=
- =?utf-8?B?Tlg1TFRzRTl3UUJvTDJhOVlrRUMrV01hNXB6YmZ3TjJXZ05qdWJ3SGliZ2N1?=
- =?utf-8?B?M1lYaVV1RUdMWlNrVExSNmNPYTQ0S1oxRDUxelRrOHNqczR4N21NSUs3ZTFU?=
- =?utf-8?B?d3FUNjk4VmNZaXl6NHJscTc4NEg3WmJ1U3JtY1JOY0xpZFF5a1VMS3FMNC9J?=
- =?utf-8?B?SjNxMmtMcm1pUEtaR2JlaWxPWWxEeDJEQzd6RFh0dXhXSSt0a3IvNjBkK3dS?=
- =?utf-8?Q?T9XvtGyrFY3G/dqU=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1785833267; c=relaxed/simple;
+	bh=EDsXnn8Di4gWusHH0L98J9lbJovO3WcIQcUtoghafX4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ba6dd+oPmhYNFMP0DTFBlSOSfpwDf7OfoltQYmpN+DeT2mpvEBiVMnJebS7jqNrebOKU4yFq2v4hm1lzv0gEiqY59hrlzfn3EstFOiqH58Jrlf+lsInuxVTPvOErLHki32kdXZAZuYs9vm11kD1mzqyOe1hw1Sy3by9+R6n9DdE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E2cR17DE; arc=pass smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E2cR17DE"
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-6a0ddef4e35so3149728a12.2
+        for <linux-crypto@vger.kernel.org>; Tue, 04 Aug 2026 01:47:45 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1785833264; cv=none;
+        d=google.com; s=arc-20260327;
+        b=imDR8OhiGoa3cnrNc9+0PDzmKFfkUWsfP3G0ZJ5VwggdN4fMhrvKfkhRMlbPjsWBu/
+         zKiGXsqaPe+B4wqyBmZAr3PYnDDyJNGN9VdQQ0dKORUnUjOVvZdltt+IPw0/APs3KncZ
+         gSOfx4xAhP7KHMgQNcL228Fkfh1gUkrLksAXVV8yZ19vsx1Z1HfwBRQQPN/xlG1r9xPV
+         njw3FrKvCDDvTawCT2wA3MU0Ldj2ty/F768C1JT6rl1BfXwbFwUIvRhlXJZ5my3H5D/K
+         MNSemjumw8ckkEOgnIXNDcaSlVVzrIK3lmV0xfKjqvMAnoDg3UgxswNSFBcpMqXXfSMd
+         jIKA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=PEqd+ZWTPxL49LxbuVR3ifbNbPtx5D5bB35ut3i3dWQ=;
+        fh=5K6/ghwykrH4po4NMcsMy4vch7JuwUzxT1Z2Z7gxVw4=;
+        b=OCSOuy3B18nIyeJDfgOBKdB3t7UmckEDd4ATUl7L4atZzH82XYNmTS1ijLMrb1u4Ny
+         4TsFJ5y6Qg+qNBde+TuGgvaNxHHPTsVucBPGwTA6CXPh0kuQEN9XKQfOgt8IhErcfom4
+         sCTiwzxrSlHWiCwVZa4G0zKgz6/mwEcp/opzRPGaJVdfqD7/CEvaHdyN5l3TDaK7tOnz
+         Nnq0IgEF7FehQ3+QmOhidEcRQKczD4IWTni3AAs24MOGol28tIr9+enT6Zy8GVxx3CH+
+         q9OU6O7H6b1LgHjZL6CubLUkk/6FIxhrvZevBEFzWdwh0RljTZvE92GDik0Sf/sw1C62
+         CATA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1785833264; x=1786438064; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=PEqd+ZWTPxL49LxbuVR3ifbNbPtx5D5bB35ut3i3dWQ=;
+        b=E2cR17DE42Mx9lggP15H++IrABmo34HQ1b1KlMQkQFhAxoOKHpMbmz/rHlSbH6HsKD
+         Qo7WSjpF9nGgNJeXuviQdkV2MKy5Sjv49AETtw0c8yzxzsGQy2LwRRqPddzbPjmTnaLI
+         SKg8u9DSP1BTbsSD+kmfjxZhJeBAZrGrL2wuDRl4o+pKXc9v9//4VsCfxvPP5kMxEM5M
+         cWu2LQcor7CsdNk7whS6DFvFWBOzRrS+lH4hm9VB0Fb1/MvythBpB41PudOtzMCrBxDH
+         UK+EO62Is/Vd6irmb7qbyG+WSJziyBQTrORNS10iiCREHLJuUbTFk7undcoI02nq/sMH
+         8d0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785833264; x=1786438064;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=PEqd+ZWTPxL49LxbuVR3ifbNbPtx5D5bB35ut3i3dWQ=;
+        b=Y8M/Drj6CvzjrQ4mOagBg5l7Vzq9Yny2fAPGZ5/2U6f6+bQzbOWhkh69TAlRM0SuoP
+         P/UOadlO9Ry5cIQlakGlE36F7XiglF2ghjpMVqU4v2KoncbpdtYQzDf1ZMsnSVVcGZhv
+         NaDiFXWaoVsFtwMObJxlwipAAXZPX9Mk4IAfxJr5hTZHsPlFxR0j9NKN8o4Ul+9A9ydA
+         jj6K4yQGBtlRAPhza67tsiV/CnNxCkvs55GR4cUhvuSzJy9zE5fw1Pr11h1YUn+VgZmx
+         oQJITvPgD0VfHErY6cD/42x+PgGaO8swHQ9Np5HIVpSSsBo1ghMbdBnacM199Mb38JOI
+         ZuoA==
+X-Gm-Message-State: AOJu0YyfzW/FVt5LgmrZXMgfmXya+FTHxnb4OiDWc2mMxpySirvMtFBV
+	ERuVE3ELlpUdiUSAU0w/KrRI3k464VYiGi6C/cRyTIez56NthraaClEDzZxBb01+jDPbsqqpyxH
+	Hkv8I7NVzEHSfsXmHLB65yz3Ni2CnYjHukg==
+X-Gm-Gg: AR+sD10F6WO67Q0gCZSyJdBq4MJq/3fphbQUACemDssE/CH9ZF32zyKX1+GtAR8QMa1
+	1MtBg7INUSoYmCO8nUqEk7mUyC50mj7qR9GquJFwu5SvaAX7PpeVSQFqLo64QYlx2FcuCfBUY8p
+	UWhVfE1ynjscwAs3K8KwEKzyC/OAADI2n5UIabaa7AIX849OHbMJKGH5LIMqW/YJgPg06zLDpbS
+	NCRZsKSEaYHoSCeMyh5PteBAnS+4wZLYWOu8YvQYNS9uBrM1chmzVUkIV+Xp5luy4BnGTrhGc5O
+	WzKNC+Sie1ERZ680hm5/Rb6c3RvBmPuARv3V5bOxyltqY3UWbY7F9BRUjXQLrvmvhsHaaQvEp14
+	zLbXO3GS8tJHi1LYXvVDp+iMuH5hitCcZ2gsiWBTgUt19rhNq2IFySsfaNcKLb5NdoMkchrIEeo
+	M2kfTMLkZr8bjCf4pMpT92DoqDn4FBMvg8Ufyt+BHM4PBvHrZmXCp33a4=
+X-Received: by 2002:a05:6402:52c2:b0:698:5f89:9a51 with SMTP id
+ 4fb4d7f45d1cf-6a0a7c60fa3mr10770360a12.5.1785833263890; Tue, 04 Aug 2026
+ 01:47:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: starfivetech.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: ZQ0PR01MB1269.CHNPR01.prod.partner.outlook.cn
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4e3af359-6cb6-4176-7d26-08def1fbdb9e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Aug 2026 07:41:55.6692
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: bKQXtEbhBf0/SIsw/FKBM5oMYKMffJXyDkU8Xx2KbkjgqDg5AbgblAQltJs4bRegA1UcO42FHQs7XWszCOOP5pr7kSfF1pvDnkQLusyAHGxAnA+QJysLzWc2aHtg70VF
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: ZQ0PR01MB1173
+References: <20260803224028.87631-1-rosenp@gmail.com> <8e0dc8db-bfb7-40f4-b6f8-fc773e8b74f1@redhat.com>
+ <CAKxU2N9=qABcpCoQSJ+LeLu0nZj-XBdhetoecwsfRGky+Vgc9w@mail.gmail.com> <b4d28139-941d-4b36-808d-5c41d370a237@redhat.com>
+In-Reply-To: <b4d28139-941d-4b36-808d-5c41d370a237@redhat.com>
+From: Rosen Penev <rosenp@gmail.com>
+Date: Tue, 4 Aug 2026 01:47:32 -0700
+X-Gm-Features: AUfX_mzNEAyoOHtQCIPW_HwakxjROKMWJD7od1R36oBJT0J9fGberv98m0h3rTo
+Message-ID: <CAKxU2N93kpikbASYSLvkSpLU3Sgd-U_SW8rypBVZD8mjfMypYQ@mail.gmail.com>
+Subject: Re: [PATCH] crypto: eip93 - use struct_size() and flexible array for
+ ring allocation
+To: Thomas Huth <thuth@redhat.com>
+Cc: linux-crypto@vger.kernel.org, Christian Marangi <ansuelsmth@gmail.com>, 
+	Antoine Tenart <atenart@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-DQoNCj4gLS0tLS3pgq7ku7bljp/ku7YtLS0tLQ0KPiDlj5Hku7bkuro6IEhlcmJlcnQgWHUgPGhl
-cmJlcnRAZ29uZG9yLmFwYW5hLm9yZy5hdT4NCj4g5Y+R6YCB5pe26Ze0OiAyMDI25bm0N+aciDMw
-5pelIDE1OjE1DQo+IOaUtuS7tuS6ujogTGlhbmZlbmcgT3V5YW5nIDxsaWFuZmVuZy5vdXlhbmdA
-c3RhcmZpdmV0ZWNoLmNvbT4NCj4g5oqE6YCBOiBPbGl2aWEgTWFja2FsbCA8b2xpdmlhQHNlbGVu
-aWMuY29tPjsgUm9iIEhlcnJpbmcgPHJvYmhAa2VybmVsLm9yZz47DQo+IEtyenlzenRvZiBLb3ps
-b3dza2kgPGtyemsrZHRAa2VybmVsLm9yZz47IENvbm9yIERvb2xleQ0KPiA8Y29ub3IrZHRAa2Vy
-bmVsLm9yZz47IFBoaWxpcHAgWmFiZWwgPHAuemFiZWxAcGVuZ3V0cm9uaXguZGU+Ow0KPiBsaW51
-eC1jcnlwdG9Admdlci5rZXJuZWwub3JnOyBkZXZpY2V0cmVlQHZnZXIua2VybmVsLm9yZzsNCj4g
-bGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZw0KPiDkuLvpopg6IFJlOiBbUEFUQ0ggdjYgMi8y
-XSBod3JuZzogc3RhcmZpdmU6IHJld29yayBjbGsvcmVzZXQgdGVhcmRvd24gb3JkZXIgZm9yDQo+
-IEpIQjEwMA0KPiANCj4gT24gVGh1LCBKdWwgMjMsIDIwMjYgYXQgMDM6NTI6MDZQTSArMDgwMCwg
-bGlhbmZlbmcub3V5YW5nIHdyb3RlOg0KPiA+DQo+ID4gKwlpZiAoIXdhaXQgJiYgIW11dGV4X3Ry
-eWxvY2soJnRybmctPmxvY2spKQ0KPiA+ICsJCXJldHVybiAtRUFHQUlOOw0KPiA+ICsNCj4gPiAr
-CW11dGV4X2xvY2soJnRybmctPmxvY2spOw0KPiANCj4gRGlkIHlvdSBhY3R1YWxseSB0ZXN0IHRo
-aXM/IElmIG11dGV4X3RyeWxvY2sgc3VjY2VlZHMgd291bGRuJ3QNCj4gdGhlIHN1YnNlcXVlbnQg
-bXV0ZXhfbG9jayBpbW1lZGlhdGVseSBkZWFkLWxvY2s/DQoNCnNvcnJ5LCB5b3UncmUgYWJzb2x1
-dGVseSByaWdodCDigJQgdGhpcyBpcyBhIGJ1Zy4gbXV0ZXhfdHJ5bG9jaygpIGFscmVhZHkgYWNx
-dWlyZXMgDQp0aGUgbG9jayBvbiBzdWNjZXNzLCBzbyB0aGUgc3Vic2VxdWVudCBtdXRleF9sb2Nr
-KCkgd291bGQgc2VsZi1kZWFkbG9jayBvbiB0aGUgDQpzYW1lIGV4ZWN1dGlvbiBmbG93IChrZXJu
-ZWwgbXV0ZXhlcyBhcmUgbm9uLXJlY3Vyc2l2ZSkuIFRoZSBjaGFuZ2Ugd2FzIHNtYWxsIA0KZW5v
-dWdoIHRoYXQgSSBkaWRuJ3QgcnVuIGEgdGVzdCAsIGJ1dCB0aGF0J3Mgbm8gZXhjdXNlIGZvciBt
-aXNzaW5nIGl0IGluIHJldmlldy4NCu+7vw0KSSB3aWxsIGZpeCBieSBtYWtpbmcgdGhlIHR3byBw
-YXRocyBtdXR1YWxseSBleGNsdXNpdmU6DQppZiAoIXdhaXQpIHsNCglpZiAoIW11dGV4X3RyeWxv
-Y2soJnRybmctPmxvY2spKQ0KCQlyZXR1cm4gLUVBR0FJTjsNCn0gZWxzZSB7DQoJbXV0ZXhfbG9j
-aygmdHJuZy0+bG9jayk7DQp9DQoNCj4gU29tZXRoaW5nJ3Mgd3Jvbmcgd2l0aCB5b3VyIHBhdGNo
-ZXMgYW5kIFNhc2hpa28gY291bGRuJ3QgYXBwbHkNCj4gdGhlbSBhdCBhbGw6DQo+IA0KPiBodHRw
-czovL3Nhc2hpa28uZGV2LyMvcGF0Y2hzZXQvMjAyNjA3MjMwNzUyMDYuMzAzMi0xLWxpYW5mZW5n
-Lm91eWFuZyU0MHN0DQo+IGFyZml2ZXRlY2guY29tDQo+IA0KPiBUaGFua3MsDQoNCkl0IHNlZW1z
-IHRoYXQgdGhpcyB3ZWJzaXRlIGRpZCBub3QgcHJvdmlkZSBhIHJlYXNvbiBmb3IgZmFpbGVkIHRv
-IGFwcGx5LiANCkl0IHdhcyBwb3NzaWJsZSBiZWZvcmUgdjQgdmVyc2lvbi4gSXMgdGhpcyBlcnJv
-ciByZWxhdGVkIHRvIG15IGNvZGU/DQoNCj4gLS0NCj4gRW1haWw6IEhlcmJlcnQgWHUgPGhlcmJl
-cnRAZ29uZG9yLmFwYW5hLm9yZy5hdT4NCj4gSG9tZSBQYWdlOiBodHRwOi8vZ29uZG9yLmFwYW5h
-Lm9yZy5hdS9+aGVyYmVydC8NCj4gUEdQIEtleTogaHR0cDovL2dvbmRvci5hcGFuYS5vcmcuYXUv
-fmhlcmJlcnQvcHVia2V5LnR4dA0KDQpCZXN0IFJlZ2FyZHMsDQpMaWFuZmVuZyBPdXlhbmcNCg0K
+On Tue, Aug 4, 2026 at 12:47=E2=80=AFAM Thomas Huth <thuth@redhat.com> wrot=
+e:
+>
+> On 04/08/2026 09.18, Rosen Penev wrote:
+> > On Tue, Aug 4, 2026 at 12:11=E2=80=AFAM Thomas Huth <thuth@redhat.com> =
+wrote:
+> >>
+> >> On 04/08/2026 00.40, Rosen Penev wrote:
+> >>> Embed the single ring as a flexible array member in eip93_device
+> >>> instead of allocating it separately. This simplifies the probe path
+> >>> and uses struct_size() for a single allocation.
+> >>>
+> >>> Assisted-by: opencode:big-pickle
+> >>> Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> >>> ---
+> >>>    .../crypto/inside-secure/eip93/eip93-main.c   |  6 +----
+> >>>    .../crypto/inside-secure/eip93/eip93-main.h   | 22 +++++++++------=
+----
+> >>>    2 files changed, 12 insertions(+), 16 deletions(-)
+> >>>
+> >>> diff --git a/drivers/crypto/inside-secure/eip93/eip93-main.c b/driver=
+s/crypto/inside-secure/eip93/eip93-main.c
+> >>> index 1a8dabc4ada4..e62785952b0d 100644
+> >>> --- a/drivers/crypto/inside-secure/eip93/eip93-main.c
+> >>> +++ b/drivers/crypto/inside-secure/eip93/eip93-main.c
+> >>> @@ -415,7 +415,7 @@ static int eip93_crypto_probe(struct platform_dev=
+ice *pdev)
+> >>>        u32 ver, algo_flags;
+> >>>        int ret;
+> >>>
+> >>> -     eip93 =3D devm_kzalloc(dev, sizeof(*eip93), GFP_KERNEL);
+> >>> +     eip93 =3D devm_kzalloc(dev, struct_size(eip93, ring, 1), GFP_KE=
+RNEL);
+> >>>        if (!eip93)
+> >>>                return -ENOMEM;
+> >>>
+> >>> @@ -436,10 +436,6 @@ static int eip93_crypto_probe(struct platform_de=
+vice *pdev)
+> >>>        if (ret)
+> >>>                return ret;
+> >>>
+> >>> -     eip93->ring =3D devm_kcalloc(eip93->dev, 1, sizeof(*eip93->ring=
+), GFP_KERNEL);
+> >>> -     if (!eip93->ring)
+> >>> -             return -ENOMEM;
+> >>> -
+> >>>        ret =3D eip93_desc_init(eip93);
+> >>>        if (ret)
+> >>>                return ret;
+> >>> diff --git a/drivers/crypto/inside-secure/eip93/eip93-main.h b/driver=
+s/crypto/inside-secure/eip93/eip93-main.h
+> >>> index 990c2401b7ce..5f0f51081743 100644
+> >>> --- a/drivers/crypto/inside-secure/eip93/eip93-main.h
+> >>> +++ b/drivers/crypto/inside-secure/eip93/eip93-main.h
+> >>> @@ -92,17 +92,6 @@
+> >>>                                                    EIP93_HASH_SHA224 =
+| \
+> >>>                                                    EIP93_HASH_SHA256)=
+)
+> >>>
+> >>> -/**
+> >>> - * struct eip93_device - crypto engine device structure
+> >>> - */
+> >>> -struct eip93_device {
+> >>> -     void __iomem            *base;
+> >>> -     struct device           *dev;
+> >>> -     struct clk              *clk;
+> >>> -     int                     irq;
+> >>> -     struct eip93_ring               *ring;
+> >>> -};
+> >>> -
+> >>>    struct eip93_desc_ring {
+> >>>        void                    *base;
+> >>>        void                    *base_end;
+> >>> @@ -131,6 +120,17 @@ struct eip93_ring {
+> >>>        struct idr                      crypto_async_idr;
+> >>>    };
+> >>>
+> >>> +/**
+> >>> + * struct eip93_device - crypto engine device structure
+> >>> + */
+> >>> +struct eip93_device {
+> >>> +     void __iomem            *base;
+> >>> +     struct device           *dev;
+> >>> +     struct clk              *clk;
+> >>> +     int                     irq;
+> >>> +     struct eip93_ring       ring[];
+> >>> +};
+> >> This looks weird, too. If there is always only one "ring", why don't y=
+ou
+> >> embed it without the "[]" into the struct eip93_device directly?
+> > keeps all callers the same. -> vs .
+> So it's basically keeping the patch small and generating many WTFs for
+> future reviewers of the code vs. having a bigger patch now and better
+> understable code in the future. Not my decision (it's up to the
+> maintainers), but FWIW I'd rather go with option 2.
+>
+> Anyway, if you want to keep it short, wouldn't it also be possible to
+> declare it as ring[1] instead and then keep the sizeof() instead of the
+> struct_size() ?
+No because [1] arrays are deprecated.
+>
+>   Thomas
+>
