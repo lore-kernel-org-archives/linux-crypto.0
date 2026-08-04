@@ -1,156 +1,317 @@
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568B730E85D
-	for <linux-crypto@vger.kernel.org>; Mon,  3 Aug 2026 22:40:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 614643F4845;
+	Tue,  4 Aug 2026 02:09:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785796833; cv=none; b=hicVgIEnyJ3KOPr/264n2YDxvLatbHFZxbbnf6X5bwhpb0fh3MhBhjAWhmrNcnbmC4IBsAGdKWIELLSY3g6dkfJ97FLYt6lKL+DzIN5DjuAycLaZHPETN1iLdyZ+ofgkqvXi4vusOVU3ta97LPavbulrFE6rnE5S5XTXho0bESA=
+	t=1785809400; cv=none; b=TqkzBrM0LlNpnZxaWfiN/YEUbYO+UlpUGiQQb81frN5a7mzyZ/NpkZJt9U07R8VdidzquHjcfr9XDbXYQfTRjkx0EdTC9rsR3FQ/QvgLQmoD14ti4i7w/T5t74eZKb1nF1a/PKBATS/G8nw85oQkgKpjkXnF8XFoapJlTAqF3i4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785796833; c=relaxed/simple;
-	bh=VBin3fKUCRlsDlkXw8qTaQ4uOqAhatoApOdan+EvJeo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WJM49JKufK6RywIA56J86cWcePO2NPJc/OFqNnp9GDOujZAJ3mjUM/focq2pkFaBj4+BXLyRVOcxZN46G2gDQKwjuuz7XFJ5toTjEGb/V7Wv4MFZtlLxP3n32+TwYp75X8z9ZxjQWAh89FLYvK+ySxDtQSfuA7gl/I+W+RsqGgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XVPUrb3L; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XVPUrb3L"
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-cbe6295f05bso310476a12.1
-        for <linux-crypto@vger.kernel.org>; Mon, 03 Aug 2026 15:40:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1785796832; x=1786401632; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=/b25x1MMUKD6WDX1Tuev6CJ34C4sSksygwaie5KO8Mk=;
-        b=XVPUrb3LixSw+ucseyFrSK4uw0+++NQo3hn3uOEn4o/1d6IFlPYiDqvG7N0icZSIst
-         YbG2C+H/DXvXmerNKawCcBc8yo/jLgox9WAbfenbk96qPk4+Hly7IbN4A78H5/7T0GDI
-         1DQbbOWtoJ5C5gE2gkI6Ik9eia7fXUMyKxnFDiRkx5/jeoXn6KpY9/yk+pQ9X3UhIN65
-         ZID39Ry8rQSUFLpKMgoOvCRpKTQeqWXPtqdQkINF8xf3Dq5NO3EH6DlSq3Ou+bgeSpac
-         0rHmiIxDGJ+5LMxCeHgcI8UJK6EiEHRT9sy8HUqnDrVD0m/y6TEoBVIfeXPsyiZLUvk5
-         HATw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785796832; x=1786401632;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=/b25x1MMUKD6WDX1Tuev6CJ34C4sSksygwaie5KO8Mk=;
-        b=K6XZnSTi94XI8I6TsxN8pzIGYaxjODv/mxB1ZBkLuHS2RQduVTsEQ38gBGy2YZBK5S
-         w9lMYnXUyhzL8ceVaq0mhCkHEPgFSckO3v9dsyAjkOzd8T8MyaFheG16G8/qO5nUDNKv
-         XvIHutZ0bqmg8n6uwPIUtGVYrSV/KNf+VCtcHbxGVJpe2T8KCTbf9mZQZyRdxBTKx0Pu
-         lFeR3dfJTqCYwjZLFlnlHAv1n6ikN7XRxCtNRykjPq7tdWf4jcmW8oN20gNYKE7zActv
-         Mr3J+6LqNJrup/V3pcJDm9aSqRWaQgeUOv78bZQ7JRv8XiLn/i3PNGIT2o2WiL7oIBNJ
-         PAlA==
-X-Gm-Message-State: AOJu0YxDNPWlLilxEmT54K48lMkyLXQwBTYyhTJIgXhjutc7mqgxp5j9
-	K7kxa1eKmh5DnQ0sEwCqjrGCjfwku8IqAnZnNVHVj2SKxKMrd0r9+ot1JseVZw==
-X-Gm-Gg: AR+sD13NZgKlNUdVvVGMLvkwAbHjWBUVoHV4PiNxWfRE7TH1nWgPk8fjGkdJ+94NGg/
-	qAyedXJXtYkUES06YnQgQpv2piw2mGmRkHeYuOT7+OrDgfTw//KMpa+RW+tEyOlKovJg3wqVJtG
-	PViEJoPbrTGYY/9AqpS95olZm1bTDeILXcc6yHr97QOsHNS0v64C3X6RtHSIjlfnIMBNEVHlNSn
-	oqsMk1iFc7TpXL1inLC16BksSNAhwGGqqRVfgza0PKzCj7pko5j+mY/fnonM6mP/JXnaroJVxXp
-	/97eolqEBkh2/bpXvubKMZ2U6JTGXhnXbnnBTbPObg5lf4ygiDayMEJdpxpZ+QddUc3q6PAP+lx
-	3Hw5AH8FVX/7MBiYhNAx9F1yY1FWOFs/PdbfWoWqT8yXB9zuAS3mPq9IFaSG/sbcWrxA0lZbklx
-	lVvTai85ea71NvUdXQGM2jtekYBIMAV0781xUbE06kOVDhnis08JRIPF0H3xgmFYnwJ2W+RNrFe
-	+647wVrEQ91Hddcl1ORgsuggwnY9XnSZBKlOaQwKqY1RAbe9Bzd+J8Z4UXv3zpmadyRTFINtEuL
-	ncbQvECtqN63CL4YwqbO8+seqjrHyak5MKd30Q==
-X-Received: by 2002:a05:6a21:1405:b0:3c6:3c5b:f7a7 with SMTP id adf61e73a8af0-3cb6c9d468amr1106262637.38.1785796831573;
-        Mon, 03 Aug 2026 15:40:31 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8000:7a86::e35])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cbe3963e2aasm4144468a12.2.2026.08.03.15.40.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Aug 2026 15:40:29 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: linux-crypto@vger.kernel.org
-Cc: Christian Marangi <ansuelsmth@gmail.com>,
-	Antoine Tenart <atenart@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH] crypto: eip93 - use struct_size() and flexible array for ring allocation
-Date: Mon,  3 Aug 2026 15:40:28 -0700
-Message-ID: <20260803224028.87631-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.55.0
+	s=arc-20240116; t=1785809400; c=relaxed/simple;
+	bh=u5Ja+CHHZJ/8T4aR6tPegJuCK+NMk1q4ttSifbJa7Ss=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dMowGUN8N4tgMOmA8zPVqsHS913Hdnho56yATVxAU/TqnzXnmS0Iuaz1PHHDvu2/lenHWvWGMlBaWIjv8M+Oq9VDDPm5i1KYnPJwLw4Tm99JPii6JLHqiKiw7YI8JB8593R10qnRkfrsHHB2wTbk7kg18rE3PVy1xdcerfRJZXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.102])
+	by gateway (Coremail) with SMTP id _____8BxJOjsSXFqfiMKAA--.10125S3;
+	Tue, 04 Aug 2026 10:09:48 +0800 (CST)
+Received: from [10.20.42.102] (unknown [10.20.42.102])
+	by front1 (Coremail) with SMTP id qMiowJBxEuTsSXFqI+IiAA--.57305S2;
+	Tue, 04 Aug 2026 10:09:48 +0800 (CST)
+Message-ID: <b284a9a5-6f71-46c7-80f1-ed15276330da@loongson.cn>
+Date: Tue, 4 Aug 2026 10:08:59 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 2/2] mfd: loongson-se: Fix miscellaneous issues
+To: Huacai Chen <chenhuacai@kernel.org>
+Cc: lee@kernel.org, linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-crypto@vger.kernel.org
+References: <20260730082608.1929-1-zhaoqunqin@loongson.cn>
+ <20260730082608.1929-3-zhaoqunqin@loongson.cn>
+ <CAAhV-H4V6NWDcw1nVZzaXKJF_QS0sz5jTsrnwbq-xki2mJLVtQ@mail.gmail.com>
+Content-Language: en-US
+From: Qunqin Zhao <zhaoqunqin@loongson.cn>
+In-Reply-To: <CAAhV-H4V6NWDcw1nVZzaXKJF_QS0sz5jTsrnwbq-xki2mJLVtQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJBxEuTsSXFqI+IiAA--.57305S2
+X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBj93XoW3Jr17WF4UuF4UCr47ArWDGFX_yoWfZw4kpF
+	WDuayYkr4jqr48uwsIq398ua4av3s5trZrCanaqF4xAFyDJr95WFy5tFyUurWrCrWDtF1I
+	qFWkGFs3u3WrA3gCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUU9Kb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Gr0_Gr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
+	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUXVWU
+	AwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMx
+	kF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4U
+	MxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI
+	0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE
+	14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20x
+	vaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWU
+	JVW8JbIYCTnIWIevJa73UjIFyTuYvjxU2pnQUUUUU
 
-Embed the single ring as a flexible array member in eip93_device
-instead of allocating it separately. This simplifies the probe path
-and uses struct_size() for a single allocation.
 
-Assisted-by: opencode:big-pickle
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- .../crypto/inside-secure/eip93/eip93-main.c   |  6 +----
- .../crypto/inside-secure/eip93/eip93-main.h   | 22 +++++++++----------
- 2 files changed, 12 insertions(+), 16 deletions(-)
+在 2026/8/3 16:01, Huacai Chen 写道:
+> Hi, Qunqin,
+>
+> On Thu, Jul 30, 2026 at 4:41 PM Qunqin Zhao <zhaoqunqin@loongson.cn> wrote:
+>> Address multiple historical driver issues discovered by the Sashiko
+>> Automation system within the loongson_se_probe() initialization flow
+>> and the driver's interrupt service routines [1].
+>>
+>> - Add an explicit bounds check in se_irq_handler() before accessing
+>>    the engines array to prevent out-of-bounds memory writes.
+>>
+>> - Switch from devm_kmalloc() to devm_kzalloc() and explicitly
+>>    initialize all engine completion structures in probe() to avoid a
+>>    kernel panic from complete() dereferencing a NULL wait head when a
+>>    spurious interrupt fires before child drivers call
+>>    loongson_se_init_engine().
+>>
+>> - Replace engine_init_lock with a broader cmd_lock mutex that
+>>    serializes all command submissions, and move the lock into
+>>    loongson_se_send_controller_cmd() and
+>>    loongson_se_send_engine_cmd() to cover the full register write +
+>>    poll + wait sequence.
+>>
+>> - Drop the spin_lock_irq from loongson_se_poll() so that interrupts
+>>    are not disabled for up to 10 ms during the poll.  Keep the
+>>    readl_relaxed_poll_timeout_atomic() busy-wait to avoid scheduling
+>>    latency for fast hardware completions.
+>>
+>> - Add reinit_completion() to loongson_se_send_controller_cmd() and
+>>    loongson_se_send_engine_cmd() before waiting to prevent stale
+>>    completions from falsely returning success after a signal
+>>    interruption.
+>>
+>> - Fix EPROBE_DEFER handling: propagate the error directly from
+>>    platform_irq_count() instead of overwriting it with ENODEV so that
+>>    probe deferral works when the interrupt provider is not yet ready.
+>>
+>> - Validate dmam_size from firmware against the minimum required size
+>>    to prevent command buffers from pointing outside the allocated
+>>    DMA region.
+>>
+>> - Return the error code from devm_request_irq() instead of silently
+>>    continuing to prevent an indefinite hang.
+>>
+>> - Disable hardware interrupts in the probe error path when
+>>    loongson_se_init() fails to prevent an unhandled interrupt storm.
+>>
+>> - Add a loongson_se_stop() cleanup handler registered with
+>>    devm_add_action_or_reset() to send SE_CMD_STOP to the controller
+>>    and mask all interrupts during device removal.  Using devres
+>>    ensures that child MFD devices are unbound before the controller
+>>    is stopped.  The STOP command uses a non-interruptible wait to
+>>    avoid leaving hardware running while DMA buffers are freed.
+>>
+>> - Zero-initialize the local controller command structure in
+>>    loongson_se_init() to prevent uninitialized stack memory from
+>>    being written to device registers.
+>>
+>> - Add the SE_CMD_STOP command definition.
+>>
+>> Link: https://lore.kernel.org/all/20260618095949.GB1672911@google.com/ [1]
+>> Fixes: e551fa3159e3 ("mfd: Add support for Loongson Security Engine chip controller")
+>> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
+>> ---
+>>   drivers/mfd/loongson-se.c       | 87 ++++++++++++++++++++++++++-------
+>>   include/linux/mfd/loongson-se.h |  1 +
+>>   2 files changed, 69 insertions(+), 19 deletions(-)
+>>
+>> diff --git a/drivers/mfd/loongson-se.c b/drivers/mfd/loongson-se.c
+>> index 7f552a8ee6..2c8afad1b0 100644
+>> --- a/drivers/mfd/loongson-se.c
+>> +++ b/drivers/mfd/loongson-se.c
+>> @@ -28,7 +28,7 @@ struct loongson_se {
+>>          void *dmam_base;
+>>          int dmam_size;
+>>
+>> -       struct mutex engine_init_lock;
+>> +       struct mutex cmd_lock;
+>>          struct loongson_se_engine engines[SE_ENGINE_MAX];
+>>   };
+>>
+>> @@ -42,8 +42,6 @@ static int loongson_se_poll(struct loongson_se *se, u32 int_bit)
+>>          u32 status;
+>>          int err;
+>>
+>> -       spin_lock_irq(&se->dev_lock);
+> You said you don't want to disable irq here, but I think the spinlock
+> is still needed. That means you should use spin_lock/spin_unlock to
+> replace spin_lock_irq/spin_unlock_irq.
+Since loongson_se_poll always executes in the thread context, is it 
+better to use mutex_lock(
+mutex_lock(&se->cmd_lock)  outside of loongson_se_poll) for 
+synchronization?
+>
+>> -
+>>          /* Notify the controller that the engine needs to be started */
+>>          writel(int_bit, se->base + SE_L2SINT_SET);
+>>
+>> @@ -52,8 +50,6 @@ static int loongson_se_poll(struct loongson_se *se, u32 int_bit)
+>>                                                  !(status & int_bit),
+>>                                                  1, LOONGSON_ENGINE_CMD_TIMEOUT_US);
+>>
+>> -       spin_unlock_irq(&se->dev_lock);
+>> -
+>>          return err;
+>>   }
+>>
+>> @@ -63,24 +59,40 @@ static int loongson_se_send_controller_cmd(struct loongson_se *se,
+>>          u32 *send_cmd = (u32 *)cmd;
+>>          int err, i;
+>>
+>> +       mutex_lock(&se->cmd_lock);
+>> +
+>> +       reinit_completion(&se->cmd_completion);
+>> +
+>>          for (i = 0; i < SE_SEND_CMD_REG_LEN; i++)
+>>                  writel(send_cmd[i], se->base + SE_SEND_CMD_REG + i * 4);
+>>
+>>          err = loongson_se_poll(se, SE_INT_CONTROLLER);
+>>          if (err)
+>> -               return err;
+>> +               goto out;
+>> +
+>> +       err = wait_for_completion_interruptible(&se->cmd_completion);
+>>
+>> -       return wait_for_completion_interruptible(&se->cmd_completion);
+>> +out:
+>> +       mutex_unlock(&se->cmd_lock);
+>> +       return err;
+>>   }
+>>
+>>   int loongson_se_send_engine_cmd(struct loongson_se_engine *engine)
+>>   {
+>> +       int err;
+>> +
+>> +       mutex_lock(&engine->se->cmd_lock);
+>> +
+>> +       reinit_completion(&engine->completion);
+>> +
+>>          /*
+>>           * After engine initialization, the controller already knows
+>>           * where to obtain engine commands from. Now all we need to
+>>           * do is notify the controller that the engine needs to be started.
+>>           */
+>> -       int err = loongson_se_poll(engine->se, BIT(engine->id));
+>> +       err = loongson_se_poll(engine->se, BIT(engine->id));
+>> +
+>> +       mutex_unlock(&engine->se->cmd_lock);
+>>
+>>          if (err)
+>>                  return err;
+>> @@ -97,7 +109,7 @@ struct loongson_se_engine *loongson_se_init_engine(struct device *dev, int id)
+>>
+>>          engine->se = se;
+>>          engine->id = id;
+>> -       init_completion(&engine->completion);
+>> +       reinit_completion(&engine->completion);
+> I'm not sure, but I think loongson_se_init_engine() is only called at
+> init, so we need init_completion here.
 
-diff --git a/drivers/crypto/inside-secure/eip93/eip93-main.c b/drivers/crypto/inside-secure/eip93/eip93-main.c
-index 1a8dabc4ada4..e62785952b0d 100644
---- a/drivers/crypto/inside-secure/eip93/eip93-main.c
-+++ b/drivers/crypto/inside-secure/eip93/eip93-main.c
-@@ -415,7 +415,7 @@ static int eip93_crypto_probe(struct platform_device *pdev)
- 	u32 ver, algo_flags;
- 	int ret;
- 
--	eip93 = devm_kzalloc(dev, sizeof(*eip93), GFP_KERNEL);
-+	eip93 = devm_kzalloc(dev, struct_size(eip93, ring, 1), GFP_KERNEL);
- 	if (!eip93)
- 		return -ENOMEM;
- 
-@@ -436,10 +436,6 @@ static int eip93_crypto_probe(struct platform_device *pdev)
- 	if (ret)
- 		return ret;
- 
--	eip93->ring = devm_kcalloc(eip93->dev, 1, sizeof(*eip93->ring), GFP_KERNEL);
--	if (!eip93->ring)
--		return -ENOMEM;
--
- 	ret = eip93_desc_init(eip93);
- 	if (ret)
- 		return ret;
-diff --git a/drivers/crypto/inside-secure/eip93/eip93-main.h b/drivers/crypto/inside-secure/eip93/eip93-main.h
-index 990c2401b7ce..5f0f51081743 100644
---- a/drivers/crypto/inside-secure/eip93/eip93-main.h
-+++ b/drivers/crypto/inside-secure/eip93/eip93-main.h
-@@ -92,17 +92,6 @@
- 						    EIP93_HASH_SHA224 | \
- 						    EIP93_HASH_SHA256))
- 
--/**
-- * struct eip93_device - crypto engine device structure
-- */
--struct eip93_device {
--	void __iomem		*base;
--	struct device		*dev;
--	struct clk		*clk;
--	int			irq;
--	struct eip93_ring		*ring;
--};
--
- struct eip93_desc_ring {
- 	void			*base;
- 	void			*base_end;
-@@ -131,6 +120,17 @@ struct eip93_ring {
- 	struct idr			crypto_async_idr;
- };
- 
-+/**
-+ * struct eip93_device - crypto engine device structure
-+ */
-+struct eip93_device {
-+	void __iomem		*base;
-+	struct device		*dev;
-+	struct clk		*clk;
-+	int			irq;
-+	struct eip93_ring	ring[];
-+};
-+
- enum eip93_alg_type {
- 	EIP93_ALG_TYPE_AEAD,
- 	EIP93_ALG_TYPE_SKCIPHER,
--- 
-2.55.0
+To prevent an spurious interrupt from completing an uninitialized object,
+all objects have already been fully initialized with init_completion during the probe stage.
+
+>
+> Huacai
+>
+>>          /* Divide DMA memory equally among all engines */
+>>          engine->buffer_size = se->dmam_size / SE_ENGINE_MAX;
+>> @@ -113,8 +125,6 @@ struct loongson_se_engine *loongson_se_init_engine(struct device *dev, int id)
+>>          engine->command = se->dmam_base + id * (2 * SE_ENGINE_CMD_SIZE);
+>>          engine->command_ret = engine->command + SE_ENGINE_CMD_SIZE;
+>>
+>> -       mutex_lock(&se->engine_init_lock);
+>> -
+>>          /* Tell the controller where to find engine command */
+>>          cmd.command_id = SE_CMD_SET_ENGINE_CMDBUF;
+>>          cmd.info[0] = id;
+>> @@ -124,8 +134,6 @@ struct loongson_se_engine *loongson_se_init_engine(struct device *dev, int id)
+>>          if (loongson_se_send_controller_cmd(se, &cmd))
+>>                  engine = NULL;
+>>
+>> -       mutex_unlock(&se->engine_init_lock);
+>> -
+>>          return engine;
+>>   }
+>>   EXPORT_SYMBOL_GPL(loongson_se_init_engine);
+>> @@ -155,7 +163,8 @@ static irqreturn_t se_irq_handler(int irq, void *dev_id)
+>>          /* For engines */
+>>          while (int_status) {
+>>                  id = __ffs(int_status);
+>> -               complete(&se->engines[id].completion);
+>> +               if (id < SE_ENGINE_MAX)
+>> +                       complete(&se->engines[id].completion);
+>>                  int_status &= ~BIT(id);
+>>                  writel(BIT(id), se->base + SE_S2LINT_CL);
+>>          }
+>> @@ -167,7 +176,7 @@ static irqreturn_t se_irq_handler(int irq, void *dev_id)
+>>
+>>   static int loongson_se_init(struct loongson_se *se, dma_addr_t addr, int size)
+>>   {
+>> -       struct loongson_se_controller_cmd cmd;
+>> +       struct loongson_se_controller_cmd cmd = {0};
+>>          int err;
+>>
+>>          cmd.command_id = SE_CMD_START;
+>> @@ -188,6 +197,30 @@ static const struct mfd_cell engines[] = {
+>>          { .name = "tpm_loongson" },
+>>   };
+>>
+>> +static void loongson_se_stop(void *data)
+>> +{
+>> +       struct loongson_se *se = data;
+>> +       struct loongson_se_controller_cmd cmd = {0};
+>> +       u32 *send_cmd = (u32 *)&cmd;
+>> +       int i;
+>> +
+>> +       mutex_lock(&se->cmd_lock);
+>> +
+>> +       cmd.command_id = SE_CMD_STOP;
+>> +
+>> +       reinit_completion(&se->cmd_completion);
+>> +
+>> +       for (i = 0; i < SE_SEND_CMD_REG_LEN; i++)
+>> +               writel(send_cmd[i], se->base + SE_SEND_CMD_REG + i * 4);
+>> +
+>> +       if (!loongson_se_poll(se, SE_INT_CONTROLLER))
+>> +               wait_for_completion(&se->cmd_completion);
+>> +
+>> +       writel(0, se->base + SE_S2LINT_EN);
+>> +
+>> +       mutex_unlock(&se->cmd_lock);
+>> +}
+>> +
+>>   static int loongson_se_probe(struct platform_device *pdev)
+>>   {
+>>          struct device *dev = &pdev->dev;
+>> @@ -195,19 +228,25 @@ static int loongson_se_probe(struct platform_device *pdev)
+>>          int nr_irq, irq, err, i;
+>>          dma_addr_t paddr;
+>>
+>> -       se = devm_kmalloc(dev, sizeof(*se), GFP_KERNEL);
+>> +       se = devm_kzalloc(dev, sizeof(*se), GFP_KERNEL);
+>>          if (!se)
+>>                  return -ENOMEM;
+>>
+>>          dev_set_drvdata(dev, se);
+>>          init_completion(&se->cmd_completion);
+>>          spin_lock_init(&se->dev_lock);
+>> -       mutex_init(&se->engine_init_lock);
+>> +       mutex_init(&se->cmd_lock);
+>> +
+>> +       for (i = 0; i < SE_ENGINE_MAX; i++)
+>> +               init_completion(&se->engines[i].completion);
+Thanks
 
