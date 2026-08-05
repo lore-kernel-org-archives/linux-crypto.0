@@ -1,58 +1,56 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CC8544BCAF
-	for <linux-crypto@vger.kernel.org>; Wed,  5 Aug 2026 11:58:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A5A44C66F
+	for <linux-crypto@vger.kernel.org>; Wed,  5 Aug 2026 11:58:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785931097; cv=none; b=GBSB4/99cUv7wfbVJKMij4UH/Mqq+rhu1dfBsU1vFCcMhUEKQfNRQ24oFXmX1UdTrKpkj+S9ZeXmpW+FN83drAY31aHkWrkcEvCXWgDj/WM51efInOXTIs8SY0itFFnPBuPfPSQ3iVOfw8QUZkiGs/nuM8eH62SZvys+11HrFf0=
+	t=1785931099; cv=none; b=G/sl9nPuI1ZF9ShXqI9qRtfyxqqxZMp3Oa4JDcx7c+rXkMt6hqZttmWgESYapBFp2TchypuDewi7NOoxOfu9k4wOVom030sdZ4Nzb0nYU9ki580TFKIFcNSYeNyB10EeyAYJOATdsyVTahSN9hDW9jExiSx5aOuIssef079lrCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785931097; c=relaxed/simple;
-	bh=b5aZNIDCHkvfoWtjbjEcQ7aD9yQG5oyRD+0JfQ4XMl8=;
+	s=arc-20240116; t=1785931099; c=relaxed/simple;
+	bh=rrHOeIvGuTbxvBxf0sD+S1Wa6q8TEDfmgAXE4+BZst4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eKNJ/3y9gs/WUXuBgvHl+AQXAwp6HQwYjg0NzsWSz0mFgG5JziwYgiAgU2p9n5OkLuZJ4fYDF4kyWcX0eZGIJzRt1SFT2qILXrkH6SNmtEi42sKqWgP997LCEllzNnAeeVyZzommto2R2RGK9dLJ1KkqMXBflIEXVuQyIyc2loU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J+Dmll2u; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=QJAx++qMp6//t9OLuwYwKiZjLNjs0FGewqbffz3M3054cUuRMjMd4FyjrPhNLwn9QUlyZbQw4kAHfuqbjkIbuLAUGHB1SWDWoTxHrodMWv1PNOzypSFOPwZweglBf4PwLcIekI9yJYsqa0aRhY+jkDNibJsJJ56g4YiJ4q3pbIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BWDwypgK; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J+Dmll2u"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BWDwypgK"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1785931095;
+	s=mimecast20190719; t=1785931097;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Vqj916x7IWEPwY8/O5oc6WAr80znZJ+nk/7CTdbfDAQ=;
-	b=J+Dmll2umCBtfSEJ1AlgzjKQEdvgVlrXto3Qul0RiIbUikVVqBRLPR8zmnArjRAUdK/hQQ
-	YIiHsFY7ETiKmpzCEUwhc6ml4vXMC+fxz7Bs/Q3ilHlqS30aMURd+ThXQBvdvnlrbFqeB/
-	3+v/zr4ghTqdCepSs2JhHc42I3FAp28=
+	bh=dFIxmKcUsq1WalhKwXv0wsQgLSJrF7IelNY2pEdEa3U=;
+	b=BWDwypgKZqCVsbLXrChhOSej5V3o29aWve47/p0mKHyX3Wy3PRR3LIXUVonIq2Htop5e0q
+	BykyrPDuBhTjtQFqJIwtR5Jee3i9nC3nLzfP9WJhn0F5LJ1aCJxU7eAs0r9wHbzc9zafPX
+	u9gnygn2kTUE6/T+akq+YZP+0yX26eg=
 Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-677-CL75TcqEN6SAvxm2cteRWw-1; Wed,
- 05 Aug 2026 07:58:14 -0400
-X-MC-Unique: CL75TcqEN6SAvxm2cteRWw-1
-X-Mimecast-MFC-AGG-ID: CL75TcqEN6SAvxm2cteRWw_1785931093
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-688-S3dhsJWwNV-vIPG2bC1I2w-1; Wed,
+ 05 Aug 2026 07:58:07 -0400
+X-MC-Unique: S3dhsJWwNV-vIPG2bC1I2w-1
+X-Mimecast-MFC-AGG-ID: S3dhsJWwNV-vIPG2bC1I2w_1785931086
 Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 463451956088;
-	Wed,  5 Aug 2026 11:58:12 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1163E19560AA;
+	Wed,  5 Aug 2026 11:58:06 +0000 (UTC)
 Received: from thuth-p1g4.redhat.com (unknown [10.44.48.202])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5665830001A2;
-	Wed,  5 Aug 2026 11:58:09 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 515F330001A2;
+	Wed,  5 Aug 2026 11:58:04 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org
+	linux-crypto@vger.kernel.org
 Cc: Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v3 06/10] crypto: arm/aes-neonbs - clear the crypto_aes_ctx when done
-Date: Wed,  5 Aug 2026 13:57:44 +0200
-Message-ID: <20260805115749.392672-7-thuth@redhat.com>
+Subject: [PATCH v3 04/10] crypto: padlock-aes - clear the crypto_aes_ctx when done
+Date: Wed,  5 Aug 2026 13:57:42 +0200
+Message-ID: <20260805115749.392672-5-thuth@redhat.com>
 In-Reply-To: <20260805115749.392672-1-thuth@redhat.com>
 References: <20260805115749.392672-1-thuth@redhat.com>
 Precedence: bulk
@@ -66,27 +64,62 @@ X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
 From: Thomas Huth <thuth@redhat.com>
 
-Clear the crypto_aes_ctx structure via __cleanup(aes_zeroize_ctx) when
-we're done with it to avoid that key data could leak on the stack.
+Clear the crypto_aes_ctx structure via __cleanup(aes_zeroize_ctx)
+when we're done with it to avoid that key data could leak on the
+stack.
+
+And since __cleanup() (and __free()) should not be mixed with
+"gotos" in the same function, turn the goto statement here
+into a proper block of the related if-statement.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- arch/arm/crypto/aes-neonbs-glue.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/padlock-aes.c | 22 ++++++++++------------
+ 1 file changed, 10 insertions(+), 12 deletions(-)
 
-diff --git a/arch/arm/crypto/aes-neonbs-glue.c b/arch/arm/crypto/aes-neonbs-glue.c
-index c49ddafc54f34..f0c8bfd2ac8fc 100644
---- a/arch/arm/crypto/aes-neonbs-glue.c
-+++ b/arch/arm/crypto/aes-neonbs-glue.c
-@@ -60,7 +60,7 @@ static int aesbs_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
- 			unsigned int key_len)
+diff --git a/drivers/crypto/padlock-aes.c b/drivers/crypto/padlock-aes.c
+index 1be549a07a219..400a889e924d7 100644
+--- a/drivers/crypto/padlock-aes.c
++++ b/drivers/crypto/padlock-aes.c
+@@ -109,7 +109,7 @@ static int aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
  {
- 	struct aesbs_ctx *ctx = crypto_skcipher_ctx(tfm);
--	struct crypto_aes_ctx rk;
-+	struct crypto_aes_ctx rk __cleanup(aes_zeroize_ctx);
- 	int err;
+ 	struct aes_ctx *ctx = aes_ctx(tfm);
+ 	const __le32 *key = (const __le32 *)in_key;
+-	struct crypto_aes_ctx gen_aes;
++	struct crypto_aes_ctx gen_aes __cleanup(aes_zeroize_ctx);
+ 	int cpu;
  
- 	err = aes_expandkey(&rk, in_key, key_len);
+ 	if (key_len % 8)
+@@ -137,20 +137,18 @@ static int aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
+ 	ctx->cword.decrypt.ksize = ctx->cword.encrypt.ksize;
+ 
+ 	/* Don't generate extended keys if the hardware can do it. */
+-	if (aes_hw_extkey_available(key_len))
+-		goto ok;
++	if (!aes_hw_extkey_available(key_len)) {
++		ctx->D = ctx->d_data;
++		ctx->cword.encrypt.keygen = 1;
++		ctx->cword.decrypt.keygen = 1;
+ 
+-	ctx->D = ctx->d_data;
+-	ctx->cword.encrypt.keygen = 1;
+-	ctx->cword.decrypt.keygen = 1;
++		if (aes_expandkey(&gen_aes, in_key, key_len))
++			return -EINVAL;
+ 
+-	if (aes_expandkey(&gen_aes, in_key, key_len))
+-		return -EINVAL;
+-
+-	memcpy(ctx->E, gen_aes.key_enc, AES_MAX_KEYLENGTH);
+-	memcpy(ctx->D, gen_aes.key_dec, AES_MAX_KEYLENGTH);
++		memcpy(ctx->E, gen_aes.key_enc, AES_MAX_KEYLENGTH);
++		memcpy(ctx->D, gen_aes.key_dec, AES_MAX_KEYLENGTH);
++	}
+ 
+-ok:
+ 	for_each_online_cpu(cpu)
+ 		if (&ctx->cword.encrypt == per_cpu(paes_last_cword, cpu) ||
+ 		    &ctx->cword.decrypt == per_cpu(paes_last_cword, cpu))
 -- 
 2.55.0
 
