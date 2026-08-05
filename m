@@ -1,237 +1,300 @@
-Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010045.outbound.protection.outlook.com [52.101.46.45])
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F2FA2F7EF6;
-	Wed,  5 Aug 2026 02:38:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785897498; cv=fail; b=aXXVL2glm8cMChJM78uqsAFnvviwTMuRp+ea8pfFP+7PeCUbacHr50Fk+Iif8TXbf9pCoLBA6vhp4MojoC8jAZJrW9BzT7JjvSZ8yHknWODKlp8gfI4IvItZiqup92hBnIVovICyl66MFoMthXJAlonxSDGZFhcOZ8QtxSDIfTg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785897498; c=relaxed/simple;
-	bh=q1ZbwsNt/EcAV+t954SQ1OWroJFK6/Raevvrg0Mq2wQ=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=BtuAGnWy4uMmouarjfnZYTO7rN6QUkMzpWxP7lOtGCeT9E+YwiXznwalVGRRSyxISUM7tft2YTLiVIFGQXybHNyP18Uk73GpAXBC7J3pu4jXJl/fMl9G01GaSPSh+tO3kTs5eE1HpjC6NDdXHpvmX4IW4oLJ76zdP4ER08o6aAc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=uLDVFV74; arc=fail smtp.client-ip=52.101.46.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 665EBEEA8
+	for <linux-crypto@vger.kernel.org>; Wed,  5 Aug 2026 04:19:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1785903566; cv=none; b=oK4p5DARNy5dEiF7NZO4dcg4MPqEJYxgMD/5cM1+IHpMdQooyOW8vvhEd5kg4ZcX8VZneou/uTDncY+Ug+JRuVW3CCzNFc511zZCCcf6THDQvR7iFY03NFbU5sfuuMLvvPN259xP/qB2RctSM6lTrJqhKuLCgxYnC+9McwUPH2U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1785903566; c=relaxed/simple;
+	bh=acdSyytHjwZTJFehevO0SuRxzkFkKqkqGATugYLlyjQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KqKvFZiwUQLMDJ5+S0swjDqviKVPYh5jPQZbzkuaUs9lDjBm6ujmCEIfJFBd6pCEmvTYkt6BSkZzE/86rUq6h6i6LAdavb9VuLQwKcRR/emB7gQtlGfmVp12Ocnqfmo9/oi9ExQ361OEEuSd31dnsteSqxyfHY/MSbb9e3kgG2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=J2BwAufe; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="uLDVFV74"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ma++QaPs7gAf7nNgwbPYQ+xBfZTyf/FeHd2ENRu7VqaXpcA1f912mQ7RwkcboI/Cy319IvF84ZbElRZnS1eExewx8FdM4K/QmbChLV51znRgcn0E1ww0IlTgxyA+ZnNUPq5V4Q9PQO1SphdJvEQ73bfZvcLJosAWiafX5zx7FNYNogCcDv/NjWiuaoH/SCbFIPWL7ujSsy9q4ynfxwi6gynB4+I82clChM51JnCvbHEwtApiDIMjHKWbiVQIzXeJ/s1AS2H6oW70H4+uTkuR3M5SHIPJg+KY3/zyBR6RM9SUHGBnbWwVGu8r0joCsm5vr3ml8ml9Wa8+1kX4xroQ3g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yA1UdTZHxAp1rO0nO0O/Sn8ep6hyA90g1ZqrN+wGp4w=;
- b=tuJfMRxaQu/ZM+lGp5lOPLrRIqG/tFUjy6faAjUsxTt6s5L2sZQa9TNRPiFlmEyMzJpn0zhLOfvhr0oTejvJgIJm6WI+oxlmnjQ8pNUE/kS7LGPK7W+mA9nBUe2GLj9/fouA0n1ASYzRN0siYvNh6KCfT2xa22R3M2BCzhHMRD1G1u4x5pSbFn0caZZ9UKJywMTpTeR6KKwc4OXXcDVOxnh7Hxlwp2AbSi0S7wASfP9PX6OYvG9fOXYyxqR0DLRyXwJihAS0gjVx+1y3FSJv4fZxrHwKB1sBxmUegRHbbnuLwGFa75YBK6HgDQ70CHkVZjO+7XcJwHiMvQtVc5bWNg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yA1UdTZHxAp1rO0nO0O/Sn8ep6hyA90g1ZqrN+wGp4w=;
- b=uLDVFV74Ise7yXBHKBRlia7CdPcspT/2WeDSC+4NiV/goRx5te7uyQQxbCxz/g4GHN2e/No1iIOyCzDpSpaBxgnLC0iqNhtG7I+DYQJt5C+61qZwiE7awJOdJirjF5DDxSOBABeMPmsa54HlBKxiHjpA/ESQw4onwgZXMg1PflE=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH7PR12MB9066.namprd12.prod.outlook.com (2603:10b6:510:1f6::5)
- by DM4PR12MB6061.namprd12.prod.outlook.com (2603:10b6:8:b3::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.270.18; Wed, 5 Aug 2026 02:38:11 +0000
-Received: from PH7PR12MB9066.namprd12.prod.outlook.com
- ([fe80::f71e:4264:146c:b356]) by PH7PR12MB9066.namprd12.prod.outlook.com
- ([fe80::f71e:4264:146c:b356%6]) with mapi id 15.21.0270.016; Wed, 5 Aug 2026
- 02:38:11 +0000
-Message-ID: <63867f3f-a7a3-4d6e-83b4-0683688512e9@amd.com>
-Date: Tue, 4 Aug 2026 21:38:05 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v11 4/6] x86/sev: Add support to perform RMP optimizations
- asynchronously
-To: Borislav Petkov <bp@alien8.de>
-Cc: tglx@kernel.org, mingo@redhat.com, dave.hansen@linux.intel.com,
- x86@kernel.org, hpa@zytor.com, seanjc@google.com, peterz@infradead.org,
- thomas.lendacky@amd.com, herbert@gondor.apana.org.au, davem@davemloft.net,
- ardb@kernel.org, pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
- KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com, Nathan.Fontenot@amd.com,
- ackerleytng@google.com, jackyli@google.com, pgonda@google.com,
- rientjes@google.com, jacobhxu@google.com, xin@zytor.com,
- pawan.kumar.gupta@linux.intel.com, babu.moger@amd.com, dyoung@redhat.com,
- nikunj@amd.com, john.allen@amd.com, darwi@linutronix.de,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
- kvm@vger.kernel.org, linux-coco@lists.linux.dev
-References: <748785f1-f176-4f0a-8b8d-eadf46b20960@amd.com>
- <178578506318.2377606.14791252769672870038@Ubuntu-2204-jammy-amd64-base>
- <df5f5f6f-7278-42e7-bc7d-8e56187d1438@amd.com>
- <8DAAEA48-F2FA-4D52-8E56-4B7213155F12@alien8.de>
- <d7a17bde-4af0-45ad-96bc-4717a1fa1545@amd.com>
- <60B4B369-19E7-44DF-BCCF-FC8DD851B2E7@alien8.de>
- <59e8b0cf-0ab0-4b7a-9e05-4de6f83c9a10@amd.com>
- <20260805004913.GBanKIiW-O3pDjIqjH@fat_crate.local>
-Content-Language: en-US
-From: "Kalra, Ashish" <ashish.kalra@amd.com>
-Autocrypt: addr=ashish.kalra@amd.com; keydata=
- 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
-In-Reply-To: <20260805004913.GBanKIiW-O3pDjIqjH@fat_crate.local>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: CH5P220CA0018.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:610:1ef::25) To PH7PR12MB9066.namprd12.prod.outlook.com
- (2603:10b6:510:1f6::5)
+	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="J2BwAufe"
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 176023FBAF
+	for <linux-crypto@vger.kernel.org>; Wed,  5 Aug 2026 04:19:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20251003; t=1785903553;
+	bh=IotapiTX6AHa/b6BpPv3QCPlwle1thAL9RRjZLrSjGM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
+	b=J2BwAufejxcLuqLbAhei0bWSxAaRh3gGyRyDIm9j6zYHLmfJhr/awy+bpEM/LkxV+
+	 dd6w7t1tGKYIHD0LmDaEEo1wfAeS56/kaWdGu6lsUVOU5JktdzqW5T0Ja6kLEwCSH+
+	 lhwutgYW/J01NSTOHh02ZE+BObDfgb+0KQ03/8HriYd1QF2+G4H0G10SAmeRXAD+zZ
+	 Cx+U7TYCpe5vwSa3JP8faym99szjRXPgpeUln+8WDhImovQRBwg11LQRIa76FvXRlv
+	 EpFAZ2EsqSifzjTIKpbkskzgPdmHF23pxbWHDg78n+SkRxNiBWsRxSNyaNiLPA7eKl
+	 DiVzM9RY0LCXYs2gph+tfYNkSbveE1rvG6xuThKRQPmBjfMuxEjegcLt00cainCWFU
+	 H3P3K69YfCdpDNCamMfrvsmBbZUF2uvE4f0ZXEc6svQC9EoQDRuGP/kdvEeOLImlye
+	 RPyEdzhrpFXS3eE3be5TenfuCzETaXl8laOajI3qmqSnhqsbHmMWdCZg0fipF1cfNK
+	 /mtRLMqE1K51tP9YaE35QdiLV2+nsAWZdRpup+ciLsLo/SoYz9Zk6TDeNr4cIpOl1j
+	 bszNIIwMHIhtfaBiQ4ngwtCSS4pmvgMkL86pkQZogiOkWM7uOY/eFa17SQjxkSGZky
+	 +O/hh478AYlJLbOlhxWTFMwQ=
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2cee1ec30f2so7263555ad.3
+        for <linux-crypto@vger.kernel.org>; Tue, 04 Aug 2026 21:19:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1785903551; x=1786508351;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=IotapiTX6AHa/b6BpPv3QCPlwle1thAL9RRjZLrSjGM=;
+        b=BdslJQ6m3cE7kqBVs5PO2fZV17A74INk12hZbRU+iDEO+XRW+lR7ozVsofBk2ZhBTm
+         24TfhjEDoUnYQWE8KIR9SNvN9MY54u5WwBaa0SuycHqY2bjDtHMVp0qtNJYOvJegYEm3
+         wAWHUsnC5trwYq17x0KAMgWjPgHXHqrGTRBynPJ4+SwiCdpyOBpUAhUDxEFjg7R+lYKz
+         luB7JgHKt38o6wRJdRXvJ7WAWNbgf4jrzX13X27dL3h7RNVGBT/HA4L2pfwbnB9sb6wQ
+         u4yq3hx+M5QRy20ue2t792vH05rVGSq9px/0GMAdcWTphAmvm9EeS4UDx9xOHuHLKyXv
+         A1dA==
+X-Gm-Message-State: AOJu0YzC4p7rm8arvFfUPa7LgQZWpKsDHgq9uGkdFo7pDiLXtr4UQoe2
+	fYuiwWvd4VsXo0tyVpXZIu/B0gIrXDUCd3Czbg6Egpwgm7EwrZXUHVnMp43EC1Pxfyd2xYY0poh
+	yuCvXHJ2HfLONMPmMWA304sy2fTpTVeFSdqV7YA2hqNMvIXZl/CIhKUygyb3ts9dbAI4bby6bSQ
+	Ek40K1PA==
+X-Gm-Gg: AR+sD10RQ5XZ1PnHbekUiQpo0Douc3thx34VsBBcU30kGb6qJ4d3MRS6rkNIqjMYX4M
+	7EkfqBU8Mk3jhO2m4cR2dqDOlB7dNR2/VL8zQsz14hUgoHy7dx26zQXhbI3C8qXrwJvBJJluVPi
+	gT5UY8FEJGuDvYV81nagf8DSeJdD7PpT1FLq/gYZlNIUGe8u6PaxHt2+VGLKanuE0GTtphvfCzs
+	Ux7Ywyi3NYYZbKj9Ev+yTurbEwSJb/dF3QhQLMsaLv1HKvQSZl2/J7isocinRXtQzHN2WQzAwVP
+	Xm8jxzRQrsz+PVH2jAP0mlvF7NurW/cbSxFz1ii+bJI8mQey/adcbnqyUkRx3W9RQaZYz1LMamo
+	P1WHlWVnYRPI=
+X-Received: by 2002:a17:903:1a6f:b0:2ce:d957:59c4 with SMTP id d9443c01a7336-2d0ca7afcb6mr33854465ad.6.1785903551086;
+        Tue, 04 Aug 2026 21:19:11 -0700 (PDT)
+X-Received: by 2002:a17:903:1a6f:b0:2ce:d957:59c4 with SMTP id d9443c01a7336-2d0ca7afcb6mr33854155ad.6.1785903550657;
+        Tue, 04 Aug 2026 21:19:10 -0700 (PDT)
+Received: from ZBook.gateway ([123.208.39.53])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-31586402e53sm15842163eec.11.2026.08.04.21.19.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Aug 2026 21:19:10 -0700 (PDT)
+From: Changwei Zou <changwei.zou@canonical.com>
+To: horia.geanta@nxp.com,
+	pankaj.gupta@nxp.com,
+	gaurav.jain@nxp.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lukas@wunner.de,
+	changwei.zou@canonical.com
+Subject: [PATCH] crypto: caam - Use bounce buffer for unaligned RSA destination buffers
+Date: Wed,  5 Aug 2026 14:19:02 +1000
+Message-ID: <20260805041902.1575170-1-changwei.zou@canonical.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB9066:EE_|DM4PR12MB6061:EE_
-X-MS-Office365-Filtering-Correlation-Id: c9d141bb-23d1-4a9e-d609-08def29a9748
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|376014|7416014|23010399003|6133799003|22082099003|18002099003|56012099006|5023799004|4143699003|10067099003|11063799006;
-X-Microsoft-Antispam-Message-Info:
-	dsRSIR4UB+T1CgyxVhmpRcnugjx94avWVi3Gx6RhS3YsVKfbUjV4iKR6DuPkxYWxv66Nw59kCWzecfov3ofILFdOZ9sgXnHLn69c4nKHISpguW/Z9od4FFUT70Kk84GvQpJUb/EzSxbun1xMCsBbKRBHVyYTRKZjfGIbV0Lyp773U0lbv6Agl7yzmlGsahs0BaSOcykBHq/wQu5IomIrmD/8zru14eKJ0qm1oxcujqRGVDqiLDDFg+IkaEMChLWv5gLu/qL5+oBUIlfBYM6gLo3sP0XJzRyVkiAaSLKpR2SnWbJtji7B0vpZwsaan7qgdc5VAlYZnRPi7QIj3rX3Vfq53gimpWmL9PTFY2N6fqHnFywJrv8mnD1Rno9IEEyTWBOvLfZAo8+y6YttVxgJ2ZlgoJsWNkBzp2kZBCF1PFUHzmiZCJ5EI/g14eiyIWUa9REmrU+Kt1LXKomI6Fr55o9TcSMeMmM7tmsE2/vO5yXs9fnp2ZeMm19x2NAWKvGo6NEDcLffgakXa1vQK48mnYb4Auq1IANNEdSNvIs8EViEz2M2WHyK92yQoN6tmQjIpcVVnYSr8rYVjM71aY3ZuPc3l75TKejynemyW2Gs0b8wAi6fVy3bCfM1h4kHDLR+3ffxzO0YINmfxZPNqwkuJyGTTXvHv+0bChxfo7N6V8s=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB9066.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(23010399003)(6133799003)(22082099003)(18002099003)(56012099006)(5023799004)(4143699003)(10067099003)(11063799006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?SlM3UU5IeVFuWkJEYlFjWDVrdTNGSWZwUHhHYXJ4ZENaM1RLRG1FTHRIN2hU?=
- =?utf-8?B?Z29CNHEranhxVE9hOFVNUjljbk1wT2NLZ1poeDdXWEpSRE1PTDBUZ29HU0l3?=
- =?utf-8?B?M3hQT0ZaVW5JQ0JOVjkycVRSL2tJOXgwQWc3aFRLcFp6K1pYdlVvWllrRFc4?=
- =?utf-8?B?SFE1VHN0d3A4VjNXdVp3ZEJLRjgwOEo0bVhZZ0tpY3pXTWdjaU11b00zWGRP?=
- =?utf-8?B?bTF6YWpXUTJyYkdrSDZmbHVYaGMzUmhmd0NiYkhzYWk1c3BNWWxiZkxnMFN2?=
- =?utf-8?B?Ly9MRkhzT1Jvd2R5aHZUcjMzcWlIcm0zWDdZUU1HcVI4aVVIeDh2cGIxbFE1?=
- =?utf-8?B?cnNQVXROQjhJNjVQbGxUS09zVWdFOUxrcUNhMU1SdTBFNnVrMlVqSVVkd0hl?=
- =?utf-8?B?U3M1T0x4TnBpK0JadFdTSEJDZHB0OHNVRGtFVGlieDdRN0xQUzFmakdTVEJs?=
- =?utf-8?B?NStVMTgxYXowaExYTGpKUzd3R1VrUUdQVDZRTmtkdEVKM3J5Tnk5YkZQaDBm?=
- =?utf-8?B?dG5UTUZ1QUg4TDl1M29ZU3FaaEFhZEtrekRCZk9GeEU3ZHplcUlrTm0zNzJl?=
- =?utf-8?B?aUwwZk1RODhEVjVPV3NoNTdwTXQvZFZBK3U5THhWbnNiS1FEcjRnVGU5KzRR?=
- =?utf-8?B?QTFCZWtUQVNucE1qMk82SmljUWNmY3pEcFRqOEZEVnB1ZHRreWhnSFdibGpK?=
- =?utf-8?B?aUhDRkI5UUhUNHRrTEwxcG9rNEx1ejVvWkJ4ZGxqVGN5aEZpN0ZHZmtLWTNS?=
- =?utf-8?B?d3dwdFVtQWhvdjIyT1NRYzNRY3RSZU9qWG1RYmpYN1NtL2lhMEJkRG1tOFVY?=
- =?utf-8?B?bXhqODU0aW10QUFIQVhOUFh6RlFTV2ZHNjNBNGhsMmF2dlJOYktqRzVsQ2ph?=
- =?utf-8?B?ZmI5WUNvVmtaN1M3bC9TTGptUVRoZzdGV2VIbkMyTXF1TEM2NUJjNW0zSXJV?=
- =?utf-8?B?MXFQZ2MvRGlwUzU5ZkpuKzhWQTVneVJncWdpdEFxb2RYN1Z2MzN1RUMwbDlr?=
- =?utf-8?B?aE41QUg1Tk5Sc2pWNXJNaUlqSzQ4a1EvN2daMEw3ZHVNRHEycGhQSU83clJQ?=
- =?utf-8?B?alp2T3dPT1dhNHdzT3JkdmJ6VmRrMm5PRVI3NHVGZEdxQXdaK3NHWFo4QVpR?=
- =?utf-8?B?MEhpdElJS3Y3MUl6TzZDK25kT01weGJrdlcwNWVMVHlDRUc5eVdtOGQybjln?=
- =?utf-8?B?bFBqQTdBZHBHNkVkMGlKWmN5eDNjZ2RTM2c1bnRNV1VPSG9QTTlLTXFTUlYw?=
- =?utf-8?B?SitzNTV0a2NNUHA3RlA2ZGM5a1kyUlRlTkxLUkdrcU5NQ3BaK0Z5cHZUbSt1?=
- =?utf-8?B?NnFSamZ2TytabS9YOGkyc1lsN09wVkl6REcxdU1SRkhla0JUaXRvTVYwWklN?=
- =?utf-8?B?dTYvSmFyYVQ3VUtNbFo2Y1dPTExvdzhZQ1hRWkNSOE85V25HMkpNVC9xMnN2?=
- =?utf-8?B?Vmo0TnFMTlFKQnBncTZMa3ZLRXgyN20wYTc2VEJpSTJRUy92bUxrQ3F2T2s1?=
- =?utf-8?B?VFdjT0NhMGMvcVdhMUhYVHJRVHlQNThLMVVRVGV3aXU2Ymp4ZDNUZHFKSHhN?=
- =?utf-8?B?V3RKZnNnbzBzTndSTldCL0ZDTk4ybjFaTHdtYkdFR1lUM3BkSXMzZmhzT1dl?=
- =?utf-8?B?dFpsQnJKVWpFVlpUbW9wNWZJOHdDOTRndDZ2cDdwYUplSVBjUnVWdzhrL1VV?=
- =?utf-8?B?NFk5K0tsdlk2UDJGdDZvMmptUDUzMUQxelYzMFRnQmxFZWc0Sjg5c0RMTFhs?=
- =?utf-8?B?SjV2bGs3d3VObWRuUm5QcFRPVjZQdnQveDhiWWU0ZzA4NnFGUG9vVTlET3k0?=
- =?utf-8?B?dXVmWkhGeTVqRGdHNzliNWJNNXR0aUNBU0ltR29vam8zdk5zU0pPbWxnN3NV?=
- =?utf-8?B?UUg5YVloSWZPTHM3TnlsSVBqdFpMQkp2V3BURUhHQ0loU05PUmJoM0RmZkFI?=
- =?utf-8?B?aEp1MkN4aC9wVUdvNzVuNVNDdTZSQXFwZExhdlNSSFVLNUxDUkVSWkl1Q2s0?=
- =?utf-8?B?OGRhU3ZmZHphY2ZqcnJlN2FxYmZFYjErOE8rcWRySlRpRkIrb0V6MmloS2hD?=
- =?utf-8?B?WC92d1MvcTFKTWtrbXpZaDN3cVh6blF3b3FQZGYvYTNqWWM0NWMyK1pDRGJ6?=
- =?utf-8?B?b2x4OGdyMzUzZVFPdE1tc0tzM3Jlb3lOVHZvUTNLeE05VGFVS3FnQ3dmaHpE?=
- =?utf-8?B?U0EwVW1GNW1va1BWZWE1WEgvdVpZUkZMdGNBR3ZJaXdqMTBKNVNNSkpoMUpk?=
- =?utf-8?B?ZmhCMkJ6Y0NBU3VRY3BEZEhBeEpTK0VnSXlJTEN3d3pTRGMwRmRuV1dHNVM0?=
- =?utf-8?Q?YOWi/Rp2w2hBuxe9LK?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c9d141bb-23d1-4a9e-d609-08def29a9748
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB9066.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Aug 2026 02:38:11.2929
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CwY2WZlyrx1g0NvVs3kHa69YmXoyp69Dt/bMaCkh4m084LXxHtF8jdVQe2JZew3kEYXb3ebBqdedCYmX9TTEng==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6061
+Content-Transfer-Encoding: 8bit
 
+The CAAM RSA driver directly DMA-maps the destination buffer supplied by
+the caller via req->dst without checking whether it meets the cacheline
+alignment requirements of DMA-incoherent hardware such as i.MX8.
 
-On 8/4/2026 7:49 PM, Borislav Petkov wrote:
-> On Mon, Aug 03, 2026 at 05:22:17PM -0500, Kalra, Ashish wrote:
->> Periodic re-optimization was already considered in an earlier RMPOPT series
-> 
-> Link?
+On CPUs with non-coherent DMA caches, if the destination buffer shares a
+cacheline with other data (i.e. it is not cacheline-aligned), cache
+writeback/invalidation during DMA can corrupt adjacent memory or cause
+stale data to be read back. This manifests as intermittent -EKEYREJECTED
+errors when loading signed kernel modules.
 
-Re-optimizing at guest termination rather than via a periodic/runtime interface was Dave Hansen's suggestion in the v2
-review — see https://lore.kernel.org/kvm/5102edd8-8eaa-4688-b3f7-3004c4cbc8f3@intel.com/"
+When any segment of req->dst is not cacheline-aligned, allocate a
+single contiguous aligned bounce buffer covering the full dst_len,
+redirect the operation to it, and scatter-copy the result back to the
+original destination once the hardware has completed the operation.
 
-> 
->> and dropped because of being too disruptive — a timer-based scan would run
->> on all cores every time it fires, even when no memory has been freed.
-> 
-> What if it ran very seldomly, say once an hour?
-> 
->> Running it at guest teardown (batched by the timeout) is a better fit:
->> teardown is when large contiguous regions actually go back to the
->> hypervisor, so the scan only runs when there's real work to do instead of on
->> a fixed timer. The case of a guest freeing a 1 GB region mid-life is then
->> handled by the 1 GB-hugetlb page-cleanup follow-on, not by a periodic scan.
-> 
-> Are you saying a periodic scan won't handle anything?
-> 
-> Because if it catches something, it will handle that something.
-A couple more reasons the event-driven trigger fits better than a fixed period:
+The intermittent error 'Key was rejected by service' on i.MX8 with CAAM
+can be triggered when loading signed kernel modules:
 
-- Under churn (many SNP guests terminating and respawning), an hourly scan is too coarse — freed regions would sit
-un-optimized for up to an hour. The teardown trigger re-optimizes right after each burst of terminations (batched by the
-timeout), so it's more responsive than a periodic scan exactly when there's the most optimization work to do.
-- When no SNP guests run, a periodic scan achieves nothing: the initial pass already optimized all of memory and
-nothing has changed, so it just re-scans physmem for zero benefit.
+    for i in $(seq 1 100); do
+        sudo modprobe xfs 2>&1 && echo "SUCCESS on attempt $i" \
+        && sudo rmmod xfs || echo "FAILED on attempt $i"
+    done
 
-So the event-driven approach self-scales with real work — it runs as often as memory is actually freed and not at all
-when the system is idle — whereas a fixed timer is both too slow under load and pure overhead when idle. The mid-life
-contiguous-1 GB case is then caught precisely by the 1 GB-hugetlb page-cleanup hook when that lands, rather than by a
-coarse sweep.
+Signed-off-by: Changwei Zou <changwei.zou@canonical.com>
+Assisted-by: OpenCode:claude-sonnet-4.6
+---
+ drivers/crypto/caam/caampkc.c | 66 ++++++++++++++++++++++++++++++++++-
+ drivers/crypto/caam/caampkc.h |  6 ++++
+ 2 files changed, 71 insertions(+), 1 deletion(-)
 
-Thanks,
-Ashish
+diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
+index cb001aa1de66..70300182f2ad 100644
+--- a/drivers/crypto/caam/caampkc.c
++++ b/drivers/crypto/caam/caampkc.c
+@@ -59,6 +59,37 @@ static void rsa_io_unmap(struct device *dev, struct rsa_edesc *edesc,
+ 				 DMA_TO_DEVICE);
+ }
+ 
++static int do_rsa_bounce_buf(struct akcipher_request *req)
++{
++	struct caam_rsa_req_ctx *req_ctx = akcipher_request_ctx(req);
++	int nents, err = 0;
++
++	if (!req_ctx->bounce_buf)
++		return 0;
++
++	/* Copy from aligned bounce buffer back to the original destination */
++	nents = sg_nents_for_len(req_ctx->orig_dst, req->dst_len);
++	if (nents < 0)
++		err = nents;
++	else if (sg_copy_from_buffer(req_ctx->orig_dst, nents,
++				     req_ctx->bounce_buf, req->dst_len) != req->dst_len)
++		err = -EFAULT;
++
++	kfree(req_ctx->bounce_buf);
++	req_ctx->bounce_buf = NULL;
++	req->dst = req_ctx->orig_dst;
++
++	return err;
++}
++
++static inline void rsa_bounce_buf_done(struct akcipher_request *req, int *err)
++{
++	int cperr = do_rsa_bounce_buf(req);
++
++	if (!*err)
++		*err = cperr;
++}
++
+ static void rsa_pub_unmap(struct device *dev, struct rsa_edesc *edesc,
+ 			  struct akcipher_request *req)
+ {
+@@ -138,6 +169,7 @@ static void rsa_pub_done(struct device *dev, u32 *desc, u32 err, void *context)
+ 	rsa_pub_unmap(dev, edesc, req);
+ 	rsa_io_unmap(dev, edesc, req);
+ 	kfree(edesc);
++	rsa_bounce_buf_done(req, &ecode);
+ 
+ 	/*
+ 	 * If no backlog flag, the completion of the request is done
+@@ -181,6 +213,7 @@ static void rsa_priv_f_done(struct device *dev, u32 *desc, u32 err,
+ 
+ 	rsa_io_unmap(dev, edesc, req);
+ 	kfree(edesc);
++	rsa_bounce_buf_done(req, &ecode);
+ 
+ 	/*
+ 	 * If no backlog flag, the completion of the request is done
+@@ -291,11 +324,32 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
+ 				     req_ctx->fixup_src_len);
+ 	dst_nents = sg_nents_for_len(req->dst, req->dst_len);
+ 
++	req_ctx->bounce_buf = NULL;
++	req_ctx->orig_dst = req->dst;
++	if (req->dst_len > 0) {
++		struct scatterlist *sg;
++		int i;
++
++		for_each_sg(req->dst, sg, dst_nents, i) {
++			if (!IS_ALIGNED((unsigned long)sg_virt(sg),
++					dma_get_cache_alignment())) {
++				req_ctx->bounce_buf = kmalloc(req->dst_len, flags);
++				if (!req_ctx->bounce_buf)
++					return ERR_PTR(-ENOMEM);
++				sg_init_one(&req_ctx->dst, req_ctx->bounce_buf,
++					    req->dst_len);
++				req->dst = &req_ctx->dst;
++				dst_nents = 1;
++				break;
++			}
++		}
++	}
++
+ 	mapped_src_nents = dma_map_sg(dev, req_ctx->fixup_src, src_nents,
+ 				      DMA_TO_DEVICE);
+ 	if (unlikely(!mapped_src_nents)) {
+ 		dev_err(dev, "unable to map source\n");
+-		return ERR_PTR(-ENOMEM);
++		goto bounce_fail;
+ 	}
+ 	mapped_dst_nents = dma_map_sg(dev, req->dst, dst_nents,
+ 				      DMA_FROM_DEVICE);
+@@ -368,6 +422,10 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
+ 	dma_unmap_sg(dev, req->dst, dst_nents, DMA_FROM_DEVICE);
+ src_fail:
+ 	dma_unmap_sg(dev, req_ctx->fixup_src, src_nents, DMA_TO_DEVICE);
++bounce_fail:
++	kfree(req_ctx->bounce_buf);
++	req_ctx->bounce_buf = NULL;
++	req->dst = req_ctx->orig_dst;
+ 	return ERR_PTR(-ENOMEM);
+ }
+ 
+@@ -394,6 +452,7 @@ static int akcipher_do_one_req(struct crypto_engine *engine, void *areq)
+ 		rsa_pub_unmap(jrdev, req_ctx->edesc, req);
+ 		rsa_io_unmap(jrdev, req_ctx->edesc, req);
+ 		kfree(req_ctx->edesc);
++		rsa_bounce_buf_done(req, &ret);
+ 	} else {
+ 		ret = 0;
+ 	}
+@@ -706,6 +765,7 @@ static int akcipher_enqueue_req(struct device *jrdev,
+ 		}
+ 		rsa_io_unmap(jrdev, edesc, req);
+ 		kfree(edesc);
++		rsa_bounce_buf_done(req, &ret);
+ 	}
+ 
+ 	return ret;
+@@ -747,6 +807,7 @@ static int caam_rsa_enc(struct akcipher_request *req)
+ init_fail:
+ 	rsa_io_unmap(jrdev, edesc, req);
+ 	kfree(edesc);
++	rsa_bounce_buf_done(req, &ret);
+ 	return ret;
+ }
+ 
+@@ -776,6 +837,7 @@ static int caam_rsa_dec_priv_f1(struct akcipher_request *req)
+ init_fail:
+ 	rsa_io_unmap(jrdev, edesc, req);
+ 	kfree(edesc);
++	rsa_bounce_buf_done(req, &ret);
+ 	return ret;
+ }
+ 
+@@ -805,6 +867,7 @@ static int caam_rsa_dec_priv_f2(struct akcipher_request *req)
+ init_fail:
+ 	rsa_io_unmap(jrdev, edesc, req);
+ 	kfree(edesc);
++	rsa_bounce_buf_done(req, &ret);
+ 	return ret;
+ }
+ 
+@@ -834,6 +897,7 @@ static int caam_rsa_dec_priv_f3(struct akcipher_request *req)
+ init_fail:
+ 	rsa_io_unmap(jrdev, edesc, req);
+ 	kfree(edesc);
++	rsa_bounce_buf_done(req, &ret);
+ 	return ret;
+ }
+ 
+diff --git a/drivers/crypto/caam/caampkc.h b/drivers/crypto/caam/caampkc.h
+index 96d03704c9be..efad91d6058f 100644
+--- a/drivers/crypto/caam/caampkc.h
++++ b/drivers/crypto/caam/caampkc.h
+@@ -103,6 +103,9 @@ struct caam_rsa_ctx {
+  * @src           : input scatterlist (stripped of leading zeros)
+  * @fixup_src     : input scatterlist (that might be stripped of leading zeros)
+  * @fixup_src_len : length of the fixup_src input scatterlist
++ * @dst           : destination scatterlist backed by bounce buffer (if needed)
++ * @bounce_buf    : DMA-aligned bounce buffer for destination (or NULL)
++ * @orig_dst      : original destination scatterlist (before bounce substitution)
+  * @edesc         : s/w-extended rsa descriptor
+  * @akcipher_op_done : callback used when operation is done
+  */
+@@ -110,6 +113,9 @@ struct caam_rsa_req_ctx {
+ 	struct scatterlist src[2];
+ 	struct scatterlist *fixup_src;
+ 	unsigned int fixup_src_len;
++	struct scatterlist dst;
++	u8 *bounce_buf;
++	struct scatterlist *orig_dst;
+ 	struct rsa_edesc *edesc;
+ 	void (*akcipher_op_done)(struct device *jrdev, u32 *desc, u32 err,
+ 				 void *context);
+-- 
+2.43.0
 
-> 
->> I will also like to avoid looping on this — periodic vs teardown was already
->> worked through in an earlier revision, and this is where we landed. Happy to
->> revisit if there's a specific new concern, but otherwise I'd prefer to keep
->> the current approach.
-> 
-> Sorry, this is not how upstream review works.
-> 
