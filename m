@@ -1,56 +1,57 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 607FF44C4F7
-	for <linux-crypto@vger.kernel.org>; Wed,  5 Aug 2026 11:58:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C31EA44C4E6
+	for <linux-crypto@vger.kernel.org>; Wed,  5 Aug 2026 11:58:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785931107; cv=none; b=Uxj8aNaq0tFHZb/V13LffPVzPLPGsVLyBO+pQc7addzdlDxwjFzJQa5P1RvzDmx6X+bEjCt+fwrJF2hJeQoL7g4aJBlV6dSNOBY3bOxh9PGXyj4oWBjTHKtKzL6Rur7grrgMZDG2d1cjTpl1CBHMu1vtZt8TPam+sBkTuyTDuM4=
+	t=1785931108; cv=none; b=GTB03tvgAYixwfbuU6Y92ZoR57qvriAF6/Sp57pXxWoL5MLHtEVbhGbRHDQ42JqUzUnvAT8Znd++QntedMkJxPZuvgzVurSHKouOamOJYwfe/yr5EkDmZfA3LrkCFaLJC3J/7qf3V8ueaMNdrEwhw9n4TyApUrC0IXEyi4UCD0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785931107; c=relaxed/simple;
-	bh=H51eEndb83vlMBdSKdQPCJs4a0NhTn4ra/iT1GUYwIc=;
+	s=arc-20240116; t=1785931108; c=relaxed/simple;
+	bh=IK4xsnh4ssKjWR3bDMNecBN2EiSBu8pzleD12h00ILo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IxbPxFZBIYIhiGQ9qqtiAKuaCp7L3EJblcxL7RfBT0FZC/3vJVoribejWK6UlOTmVkqnKhm7N4bkPDXJ3JEZTEBe19aPETXM85rAIhx/az5cXNw3ov2TdmPrTB/rG5VAkV16Sj5d7MxlbgQmlkwQBsCPpwyTwwR4kHllHwuTlDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FILxDIEt; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=fMKkpcX9Xde/z7RwEtlV27XIHl4NNGS8vwFbJwCroL0kj7btaQ1Bft5TrTVUZcgqEGgFv9LPRfUzatb4kbBXHGbl5tC8OqXM4cOD3scrNAnxoHHy2XiPAAi1teWN+sxA42pAJrQHnkMaVwh4sRFwIDGxwerimUahnbEiU7CNkcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cDY84tB7; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FILxDIEt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cDY84tB7"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1785931104;
+	s=mimecast20190719; t=1785931105;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UgOea8COfMWPGkNwdk17UcXroZGUrewDpcR0b9Y5VNk=;
-	b=FILxDIEt6munoPcBxYqNA0mPzrUvpL2il+s9bziYAHhDgnQM4xV9mgvfivsHgDHkHfAUio
-	+5Y1Q36Zf8206wo2mWq0qx7MCh45Wh0BgSP422i9F0RwkipQ5vpJnpfWnEd82yUorAfCE3
-	nuJ5czLTMUxBkl7duTBQyR+qZSKovOI=
+	bh=86lv8vKbl5o7itk5tJzGGW3/CxuVPVdslolT7Ezrhts=;
+	b=cDY84tB7P+WL2CLt4NTpfnfYLxq6j9xOJhCh03qDworuPv0dKC4U//nFSU4WtcGEGXetCs
+	G+P0QHxRM5Ere6J6SbBNboWiuDETPDxroJChqiYipvXo5UJvapAxnUBsUipGCtnblS5oAy
+	E6C6oK87Crw7CPvgM94zgtrG4UIjx/o=
 Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-270-2v7u31WwMPGBaCLd03fz4g-1; Wed,
- 05 Aug 2026 07:58:09 -0400
-X-MC-Unique: 2v7u31WwMPGBaCLd03fz4g-1
-X-Mimecast-MFC-AGG-ID: 2v7u31WwMPGBaCLd03fz4g_1785931088
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-220-m7q0VKqxPR-1-OkUGiiGxg-1; Wed,
+ 05 Aug 2026 07:58:22 -0400
+X-MC-Unique: m7q0VKqxPR-1-OkUGiiGxg-1
+X-Mimecast-MFC-AGG-ID: m7q0VKqxPR-1-OkUGiiGxg_1785931101
 Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C1F951956096;
-	Wed,  5 Aug 2026 11:58:08 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0CCD01955DC5;
+	Wed,  5 Aug 2026 11:58:21 +0000 (UTC)
 Received: from thuth-p1g4.redhat.com (unknown [10.44.48.202])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 06BBB30001A2;
-	Wed,  5 Aug 2026 11:58:06 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1B16730001A2;
+	Wed,  5 Aug 2026 11:58:18 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
+	linux-crypto@vger.kernel.org,
+	Antoine Tenart <atenart@kernel.org>
 Cc: Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v3 05/10] crypto: sa2ul - clear the crypto_aes_ctx when done
-Date: Wed,  5 Aug 2026 13:57:43 +0200
-Message-ID: <20260805115749.392672-6-thuth@redhat.com>
+Subject: [PATCH v3 09/10] crypto: safexcel - Rework cleanup of sensitive structs in safexcel_aead_setkey
+Date: Wed,  5 Aug 2026 13:57:47 +0200
+Message-ID: <20260805115749.392672-10-thuth@redhat.com>
 In-Reply-To: <20260805115749.392672-1-thuth@redhat.com>
 References: <20260805115749.392672-1-thuth@redhat.com>
 Precedence: bulk
@@ -64,27 +65,108 @@ X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
 From: Thomas Huth <thuth@redhat.com>
 
-Clear the crypto_aes_ctx structure via __cleanup(aes_zeroize_ctx) when
-we're done with it to avoid that key data could leak on the stack.
+The crypto_authenc_keys structure only contains pointers to keys,
+but not the key data itself. So explicitly clearing the structure
+at the end of safexcel_aead_setkey() is not really necessary.
 
+On the other hand, the crypto_aes_ctx might contain sensitive information,
+so this structure should be cleaned up at the end instead. Do this
+now via the new __cleanup(aes_zeroize_ctx) marker.
+
+Since __cleanup() and gotos should not be mixed in the same function,
+replace the gotos with early return statements, which is fine now
+that we dropped the memzero_explicit(&keys, sizeof(keys)) at the end.
+
+Suggested-by: Eric Biggers <ebiggers@kernel.org>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- drivers/crypto/sa2ul.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .../crypto/inside-secure/safexcel_cipher.c    | 27 ++++++++-----------
+ 1 file changed, 11 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/crypto/sa2ul.c b/drivers/crypto/sa2ul.c
-index d865fd4a098cb..f1a7c2cc7a1af 100644
---- a/drivers/crypto/sa2ul.c
-+++ b/drivers/crypto/sa2ul.c
-@@ -465,7 +465,7 @@ static void sa_prepare_iopads(struct algo_data *data, const u8 *key,
- /* Derive the inverse key used in AES-CBC decryption operation */
- static inline int sa_aes_inv_key(u8 *inv_key, const u8 *key, u16 key_sz)
- {
--	struct crypto_aes_ctx ctx;
-+	struct crypto_aes_ctx ctx __cleanup(aes_zeroize_ctx);
- 	int key_pos;
+diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
+index a8349b684693e..e94686490bb27 100644
+--- a/drivers/crypto/inside-secure/safexcel_cipher.c
++++ b/drivers/crypto/inside-secure/safexcel_cipher.c
+@@ -407,17 +407,17 @@ static int safexcel_aead_setkey(struct crypto_aead *ctfm, const u8 *key,
+ 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	struct safexcel_crypto_priv *priv = ctx->base.priv;
+ 	struct crypto_authenc_keys keys;
+-	struct crypto_aes_ctx aes;
+-	int err = -EINVAL, i;
++	struct crypto_aes_ctx aes __cleanup(aes_zeroize_ctx);
++	int err, i;
+ 	const char *alg;
  
- 	if (aes_expandkey(&ctx, key, key_sz)) {
+ 	if (unlikely(crypto_authenc_extractkeys(&keys, key, len)))
+-		goto badkey;
++		return -EINVAL;
+ 
+ 	if (ctx->mode == CONTEXT_CONTROL_CRYPTO_MODE_CTR_LOAD) {
+ 		/* Must have at least space for the nonce here */
+ 		if (unlikely(keys.enckeylen < CTR_RFC3686_NONCE_SIZE))
+-			goto badkey;
++			return -EINVAL;
+ 		/* last 4 bytes of key are the nonce! */
+ 		ctx->nonce = *(u32 *)(keys.enckey + keys.enckeylen -
+ 				      CTR_RFC3686_NONCE_SIZE);
+@@ -430,25 +430,25 @@ static int safexcel_aead_setkey(struct crypto_aead *ctfm, const u8 *key,
+ 	case SAFEXCEL_DES:
+ 		err = verify_aead_des_key(ctfm, keys.enckey, keys.enckeylen);
+ 		if (unlikely(err))
+-			goto badkey;
++			return err;
+ 		break;
+ 	case SAFEXCEL_3DES:
+ 		err = verify_aead_des3_key(ctfm, keys.enckey, keys.enckeylen);
+ 		if (unlikely(err))
+-			goto badkey;
++			return err;
+ 		break;
+ 	case SAFEXCEL_AES:
+ 		err = aes_expandkey(&aes, keys.enckey, keys.enckeylen);
+ 		if (unlikely(err))
+-			goto badkey;
++			return err;
+ 		break;
+ 	case SAFEXCEL_SM4:
+ 		if (unlikely(keys.enckeylen != SM4_KEY_SIZE))
+-			goto badkey;
++			return err;
+ 		break;
+ 	default:
+ 		dev_err(priv->dev, "aead: unsupported cipher algorithm\n");
+-		goto badkey;
++		return -EINVAL;
+ 	}
+ 
+ 	if (priv->flags & EIP197_TRC_CACHE && ctx->base.ctxr_dma) {
+@@ -486,24 +486,19 @@ static int safexcel_aead_setkey(struct crypto_aead *ctfm, const u8 *key,
+ 		break;
+ 	default:
+ 		dev_err(priv->dev, "aead: unsupported hash algorithm\n");
+-		goto badkey;
++		return -EINVAL;
+ 	}
+ 
+ 	if (safexcel_hmac_setkey(&ctx->base, keys.authkey, keys.authkeylen,
+ 				 alg, ctx->state_sz))
+-		goto badkey;
++		return -EINVAL;
+ 
+ 	/* Now copy the keys into the context */
+ 	for (i = 0; i < keys.enckeylen / sizeof(u32); i++)
+ 		ctx->key[i] = cpu_to_le32(((u32 *)keys.enckey)[i]);
+ 	ctx->key_len = keys.enckeylen;
+ 
+-	memzero_explicit(&keys, sizeof(keys));
+ 	return 0;
+-
+-badkey:
+-	memzero_explicit(&keys, sizeof(keys));
+-	return err;
+ }
+ 
+ static int safexcel_context_control(struct safexcel_cipher_ctx *ctx,
 -- 
 2.55.0
 
