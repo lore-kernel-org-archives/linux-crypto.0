@@ -1,42 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E3733E5A2B;
-	Wed,  5 Aug 2026 20:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0300C3C1977;
+	Wed,  5 Aug 2026 20:46:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785962257; cv=none; b=sBG2zLUsyiTqS/gdbaWWGd7UB+ouWlhWutkFyak7aczDVvPnYCVj6pqeg3v1Wl7h1pnCW6TLWgVWt6IP6rqWkPYtcb/qvpFtExJ0rhj8gKr6iQGetKEo7txQORADzr3BktcC0KFNaaqH4y5MN/qU4nx3kbrkcKImspvy5rA/jbU=
+	t=1785962777; cv=none; b=FQUmcDWqxHZJfM6JfWIUXptdCqlX21ZRlVb24ktyulny5WuzpnicQFysAWkOrIyK0EsNKAqZO52UttMF7WGvgQwfPAmxB/vvRNGz0YCvw5y+BrP79EQ1iQZjY0Le93LCwz2J6+C/7hIQI5mlTMnNczvl9CoWeIe5Wbk9Xe0GzG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785962257; c=relaxed/simple;
-	bh=pUlAXpmiS0ebZxuRgi7k58UccycbFv2zWRu6hDFfrMc=;
+	s=arc-20240116; t=1785962777; c=relaxed/simple;
+	bh=N02X1ThnyavGYjOEljxqRKDmUUrgPLL/DNj3xftFvTQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u/L+aEvcHFSvjbIn6M3bugITrF4AkfsOVXgaz9K8+GcPgUrpeZ8sf2AkOp+/bOT3C6Z5F9Re8ETwaFXJjMJ4yXzkHGAsplJuSEMSxgO9B6Xn+KlAP2KqgBs17zozm0mVZdwhTVCGIrekw8V+SR6NRINSt5b+thZaz4yNylvxfZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B55OTeJv; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=ofz35/tyvH0MaPrjg/KvCJeZuxlriB9ftRxWig8coqn4xgzajMysOxMnCwz45WgBypTvObVCzRdM71zQPf2Ur+RlHUsSkvaAEQP+Z6vTAFx7P6cNieCwYWhDW1SpYZHjEpwYKujbbroS6Yq0zHkHEd1vEXQ4oyDPsFkKRB2D1u0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bmYy1tu8; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B55OTeJv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D4771F000E9;
-	Wed,  5 Aug 2026 20:37:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bmYy1tu8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A2741F000E9;
+	Wed,  5 Aug 2026 20:46:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1785962255;
-	bh=B2Wi7wFOq/cqhSSoNG2UfdKLMCbz5UclJJvWFppwhHk=;
+	s=k20260515; t=1785962775;
+	bh=9kYsVQ4asjhuE6O129gzj+LK/bl3iPLokXo6xjuB/IQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=B55OTeJvlTf14GiubOZz07CucslUl6BZId92Lnd+tcU4f9DFc4hSc7eQM0D+isNQ1
-	 jnOnuY13YYoTP1h6cfhIs11/Ofierf3mOWgQ3eX66fF/0hMGoQJVnR7pAe0wzDaeWj
-	 ccYlF4jy64zipUmbARylyS9fSrrcS73fazA6piTI8PwfwgGdX4Hl7zWrN7Rl4ScoxD
-	 a9PJ3G3AVMSd2PgtZefT+ZsACXlE6ZGTFxOCn/9DMzt2KP4ZEk+VgnTVqQPcCpckPL
-	 puO8T7Jfwe0wqMz/CuzDAVa8isDFje5CJ98JIRD4KWJd1KMY5GnP0x0ZikVO3fD/h6
-	 3fYdRm00+Z2Zw==
-Date: Wed, 5 Aug 2026 13:37:34 -0700
+	b=bmYy1tu8DsWHda3jwOAE5SFf7o+N9W3YOPpIcFYV4EZUKFVJG9FwXiTKCla8fQT2H
+	 j273rhjIijd4WNeicc45WQIz/basCYwrksETYBwvWyhWUuZ/lSqyTmTHjpn3OvQv/Z
+	 Yb5sJuCZf6D4Z7fzifKwaWAvtE6DYTnv6Ne7egixisbNzdXxURCUwAKwEZ4lN3kbJY
+	 1CCFqvQeVVvs7tfzLYD30W/AG/deSnHCIjiJChJDogrUYTAUCVrJdMxZqa6ZlIh2RT
+	 e8yS6JLZYRTpSNsGvg/XDWce1xeHEmPuX467DWnzTcgBF6crNWs6M2SNRe1eqrQOHm
+	 4CeGaPiHQBUUw==
+Date: Wed, 5 Aug 2026 13:46:13 -0700
 From: Eric Biggers <ebiggers@kernel.org>
 To: Thomas Huth <thuth@redhat.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/6] crypto: Provide wrapper functions for zeroizing
- aes_cmac_key and aes_cmac_ctx
-Message-ID: <20260805203734.GF3438@quark>
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 4/6] Bluetooth: SMP: clear the aes_cmac_key when done
+Message-ID: <20260805204613.GG3438@quark>
 References: <20260805143611.818559-1-thuth@redhat.com>
- <20260805143611.818559-2-thuth@redhat.com>
+ <20260805143611.818559-5-thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -45,54 +47,44 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260805143611.818559-2-thuth@redhat.com>
+In-Reply-To: <20260805143611.818559-5-thuth@redhat.com>
 
-On Wed, Aug 05, 2026 at 04:36:04PM +0200, Thomas Huth wrote:
-> crypto: Provide wrapper functions for zeroizing aes_cmac_key and aes_cmac_ctx
+On Wed, Aug 05, 2026 at 04:36:07PM +0200, Thomas Huth wrote:
+> From: Thomas Huth <thuth@redhat.com>
+> 
+> Clear the local aes_cmac_key structure via __cleanup() function
+> when we're done with it to avoid that sensitive data could leak on
+> the stack.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  net/bluetooth/smp.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+> index 031d3022cb1e5..ed30ca0d773f1 100644
+> --- a/net/bluetooth/smp.c
+> +++ b/net/bluetooth/smp.c
+> @@ -164,7 +164,7 @@ static inline void swap_buf(const u8 *src, u8 *dst, size_t len)
+>  static int smp_aes_cmac(const u8 k[16], const u8 *m, size_t len, u8 mac[16])
+>  {
+>  	uint8_t tmp[16], mac_msb[16], msg_msb[CMAC_MSG_MAX];
+> -	struct aes_cmac_key key;
+> +	struct aes_cmac_key key __cleanup(aes_cmac_zeroize_key);
+>  	int err;
+>  
+>  	if (len > CMAC_MSG_MAX)
 
-    lib/crypto: aes-cmac: Add zeroization functions
+Well, the reason I didn't add a memzero_explicit() here when converting
+the code to use the AES-CMAC library is because this same function
+already puts the raw key on the stack without zeroizing it.
 
-> +/**
-> + * aes_cmac_zeroize_key - Clear a aes_cmac_key structure
+I guess the __cleanup trick makes zeroizing the struct trivial enough
+that we should just do it anyway.  But it is always a bit awkward to be
+"fixing" something when the same problem is still present.
 
-aes_cmac_zeroize_key() - Zeroize an aes_cmac_key structure
-
-> + * @ctx: The location of the key structure that should be zeroized
-> + *
-> + * Explicitly fills the aes_cmac_key with zeroes. This should be done once
-> + * the key is not required anymore to avoid that its contents are leaked
-> + * on the stack or heap.
-
-The mention of "heap" is kind of misleading, since normally
-kfree_sensitive() would be used in that case.  Maybe add: "Only required
-if not using kfree_sensitive()."
-
-> + */
-> +static inline void aes_cmac_zeroize_key(struct aes_cmac_key *key)
-> +{
-> +	memzero_explicit(key, sizeof(*key));
-> +}
-
-Also maybe put the function definition right after the definition of
-struct aes_cmac_key itself, and likewise for struct aes_cmac_ctx.  Then
-they would be closely paired with the corresponding structs.
-
-> /**                                                                              
-> * aes_cmac_zeroize_ctx - Clear a aes_cmac_ctx structure   
-
-aes_cmac_zeroize_ctx() - Zeroize an aes_cmac_ctx structure
-
-Could we also get notes in the kerneldoc for aes_cmac_preparekey() and
-aes_cmac_init()?  For example:
-
-    "On success, the caller should ensure that the prepared key is
-    zeroized at the end of its lifetime, e.g. by calling
-    aes_cmac_zeroize_key() or kfree_sensitive()."
-
-and
-
-    "The caller should ensure that the context is zeroized at the end of
-    its lifetime, e.g. by calling aes_cmac_final() or
-    aes_cmac_zeroize_ctx()."
+Perhaps you'd like to expand this patch a bit to zeroize the other data
+too?  (There is the 'tmp' array in this same function of course, but
+there may be other places that need "fixing" too.)
 
 - Eric
