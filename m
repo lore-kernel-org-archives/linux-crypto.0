@@ -1,108 +1,114 @@
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C56A526ED46
-	for <linux-crypto@vger.kernel.org>; Wed,  5 Aug 2026 04:29:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E36053F8EA7;
+	Wed,  5 Aug 2026 09:43:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1785904149; cv=none; b=usArZUJ1FFGAuy7aVHHiRx7FQC3kqS/85139YFycQKQZmVHo8VGAUQ0LHWPWKACpPpUKbYFr8DE78hawWasCM2FICgHAbsr49ETXx14zcVGXqn8tlZ+IwXy2K00GCUXfwL1yxVS301m6pP+usDJWgUh18/J01yeNiLEw9s9Y9QQ=
+	t=1785922997; cv=none; b=CYqrZzwxcLaoUc2IeCpF4UPY/3a2PrLbDdry6q3FQYxNY+GtMZjrebuHynreBbOPX/XN2p9LcbXRYi3Idw8PFnEOOenajp3yZSKuY3Pfrvk1c0vtU3XijT9GQIbrcAXxpGaDzHO7p+nDk+IStt080vjZusjqPIVOB8sZS+BmxZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1785904149; c=relaxed/simple;
-	bh=cPu0LtyeHLgBfiU3Q+8yJ1HERAGXYe6VlsTiEwoQR8c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qN3y6BavyuBYbhq/3ur0JxsFydBW1NWDYDSndk5gqWVEfu1BMaQR+zMusvAFVCK6qMqggwjvodJvION5ARIMDB+bieS9pERCPv71VfPSBBs02QMcMuZnaH0GGV1J6U+GkHHmCOhRI5gtrg5G1BCu5Qs+fid8MraQpj8cBUoW8v8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=fb4Sj7IN; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="fb4Sj7IN"
-Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com [209.85.215.199])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 144073FBCE
-	for <linux-crypto@vger.kernel.org>; Wed,  5 Aug 2026 04:29:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1785904146;
-	bh=cPu0LtyeHLgBfiU3Q+8yJ1HERAGXYe6VlsTiEwoQR8c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version;
-	b=fb4Sj7INqsD/rzyaOgV6mN0CpCno3uVYWA3+9K9QE+NiZDx9vLZZS0USvdEc0pM1K
-	 Re/T/8hTA/WYQMq/vTXpLmhDemhjN+gi8Ho8ho/t9rxKD3taFwomoIZZos4qzEMX7f
-	 7WAWIausZtLYldRwuROji/Qpop9/5UCcUpD3ZwQLBCOlFUTHVN+7MncUw42U9b8x5+
-	 BxYVZxcpkJWunG46utdcv6A/3BQLcQ6p+EslE4YuOGu6EL6H3x1RbLv16C0UD52pwa
-	 gLYdzi3jwpHdnb5XFRTZITdlfftOjmsmAmkmBuAUxT/cGl2MRgCKCg5Lad8Qc0WfaC
-	 opag8fRrp6W3iJiAd/SvA/GzBZ+l7xTnYeVfnmxn0lTdvKxbTn8NJjrnZpIPH0eHfM
-	 rAu+p4s3qi7LXLDc4vE9ni0Lx203u9tXLsQljVuLCL4vM+9VRsGYx1y6gqdeb0zFmT
-	 yCG3gUOjcseFIxBm95fmDKpTB1aDRmdA6q51cFrKDS/nzd6ZAYVI6CMo7lzhvP8/vO
-	 B2CpxtqSkQfQWIlLXw9YdvG7t+AIHM9h8JOE+LI7AnhryLGgcfIDyl/Sv9tYP0MPIN
-	 JvXhWqknbychU9f9Fq1IHO3NcCXcDd0bwMQzQKI8W38ItpcHtlm46O0aOc4Kk/YnCT
-	 V08+quwX76BsLr8vTEYlvibY=
-Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-ca6bd8a190cso732655a12.0
-        for <linux-crypto@vger.kernel.org>; Tue, 04 Aug 2026 21:29:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1785904144; x=1786508944;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=cPu0LtyeHLgBfiU3Q+8yJ1HERAGXYe6VlsTiEwoQR8c=;
-        b=BrQ17seAz6efpmBMBB9dO0A3ikYlUbGSCxzMrM/BkzA4gcMkKmIzOino7b59vN5l7l
-         Yp3PFMOZ1SjTDLtwIseM8dYEB6nBArzudewh6MkYrPiBygWYaepuhVmOEv31VSQ26qUa
-         NLGOaG/swt336DX1ysz996t0bXCX7AI183ZR+aoDshV7uzCE5qeRBXHuqgH0zOoFHuI0
-         UeLdjyctWuIT7MVPxLMFXgTP+wI34TwOOBZrEUaGVFYVRJbRP7jaB+TqVbIKF+lAxCTq
-         BuU3fjKnpjnrkzuKVDSCCsfV/ekuczNOpCaHn6TqfzbNDkyLuWSUOET7rQg9BqFWlKPO
-         Imfg==
-X-Forwarded-Encrypted: i=1; AHgh+RqTTO5llETQ1yu/N8gSFZ938PgRarWCqS66kS04Fdvklb3LoNf4bveIpPftIRbghrQwffDSFh7S/h0J6yI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyHFsj8P0+jV2CUkXC35bXojANnAOBn70QuFQa7jVKo54CfqHQE
-	+qsLpE07D7L4MeLgdK8f/e6901GSazy53B/qS97OKl/p0ww9IeUvRfVSq/ospt2jINH8LBFyUbH
-	VCs+mXhpgOI0yDEMpM3Wo2tZWKmVr9JBTpbuHjTU/0CuDrzjqp3gkFS+fla8KiJbQA2OyvPc8Jr
-	JjfEopXA==
-X-Gm-Gg: AR+sD120L9iERT0WM9Wlx+zR0NHqucwG+DWdZb+5THlCwgEmxmJZFabZq9qQ+GgqLUR
-	Tcj85wcpwnSLbX0NPa96ClA3lgVRYzzAEDbb8WiyQhxzbbjmFftQhkC2TPRHNK1dv8dMhQrcyWx
-	MhvcIm0Gjk3Jrk8yrXVbPd7jD8Q9b+L7sHMeVVzzqQ1CZd20lZMdZ7CDbhsXzcRanlDXOw38kqs
-	LIIL8jxZkOu8kTyHUIgTCnKLXLwkkhtjoobQdVfGjTlH/RprOSbGyUIfc2WISnJQmMVKzsWCaF+
-	H2/x5+7Z8to5ThKb19ZJli+wsh1nwTpEzusacBhCR6CTNsIhCZ+TT8Gm/u9TquTw/2D2ud7KaX6
-	/4/M+BmtjbEY=
-X-Received: by 2002:a05:6a20:da12:b0:3c3:856e:dccd with SMTP id adf61e73a8af0-3cb85e53c7dmr4510086637.23.1785904144487;
-        Tue, 04 Aug 2026 21:29:04 -0700 (PDT)
-X-Received: by 2002:a05:6a20:da12:b0:3c3:856e:dccd with SMTP id adf61e73a8af0-3cb85e53c7dmr4510044637.23.1785904144145;
-        Tue, 04 Aug 2026 21:29:04 -0700 (PDT)
-Received: from ZBook.gateway ([123.208.39.53])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-315867a96e4sm10404295eec.26.2026.08.04.21.28.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Aug 2026 21:29:03 -0700 (PDT)
-From: Changwei Zou <changwei.zou@canonical.com>
-To: herbert@gondor.apana.org.au
-Cc: Martin.Kepplinger-Novakovic@ginzinger.com,
-	changwei.zou@canonical.com,
-	davem@davemloft.net,
-	ignat@linux.win,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lukas@wunner.de,
-	martink@posteo.de
-Subject: Re: [PATCH v5] crypto: rsassa-pkcs1 - Avoid cacheline sharing with underlying driver
-Date: Wed,  5 Aug 2026 14:28:56 +1000
-Message-ID: <20260805042856.1576276-1-changwei.zou@canonical.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <am2UMhd5CAhDiKBF@gondor.apana.org.au>
-References: <am2UMhd5CAhDiKBF@gondor.apana.org.au>
+	s=arc-20240116; t=1785922997; c=relaxed/simple;
+	bh=PZ9qpgLXeYgqdznCFDrzlwXU084N8JPofmf+Oikc1Dk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QocXWrXuKbD3tkhBrWU7K2h/AlhUO6rnodNrV/vavTDrEPEid4cyYt1A16wiBvLFl1l+UKWKIkPprXc9mlJ6kbwWfKPfCjKPxoWqedwGdPHD5glwFfv1BD6To3YYHnzxc8n1kqhgweeW/xTWHTCBd9nCRYsZp5tZgHeHIjPSufg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.102])
+	by gateway (Coremail) with SMTP id _____8DxWqGvBXNqkJoKAA--.11289S3;
+	Wed, 05 Aug 2026 17:43:11 +0800 (CST)
+Received: from [10.20.42.102] (unknown [10.20.42.102])
+	by front1 (Coremail) with SMTP id qMiowJBxb8etBXNqA5UkAA--.3824S2;
+	Wed, 05 Aug 2026 17:43:11 +0800 (CST)
+Message-ID: <917e48ca-d0dc-4cb6-9399-4f5b9102c0a2@loongson.cn>
+Date: Wed, 5 Aug 2026 17:42:20 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 2/2] mfd: loongson-se: Fix miscellaneous issues
+To: Huacai Chen <chenhuacai@kernel.org>
+Cc: lee@kernel.org, linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-crypto@vger.kernel.org
+References: <20260730082608.1929-1-zhaoqunqin@loongson.cn>
+ <20260730082608.1929-3-zhaoqunqin@loongson.cn>
+ <CAAhV-H4V6NWDcw1nVZzaXKJF_QS0sz5jTsrnwbq-xki2mJLVtQ@mail.gmail.com>
+ <b284a9a5-6f71-46c7-80f1-ed15276330da@loongson.cn>
+ <CAAhV-H79JdBRmNpCKPEfHxMARr5zNVAnP3mJYOWo6zwBpF2q2Q@mail.gmail.com>
+Content-Language: en-US
+From: Qunqin Zhao <zhaoqunqin@loongson.cn>
+In-Reply-To: <CAAhV-H79JdBRmNpCKPEfHxMARr5zNVAnP3mJYOWo6zwBpF2q2Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowJBxb8etBXNqA5UkAA--.3824S2
+X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBj93XoW7CFy3uF17tw1UAFW3WF4rJFc_yoW8Aw15pF
+	WDG3W3CF4UXr4vkwnxX34jkF12v3sYgrZrC3Z5tF18AFykKrnaqryYqr4Uu3yUCw4vqF1I
+	qF4DKFWfu3WrC3gCm3ZEXasCq-sJn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUk0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx
+	1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv
+	67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41l42xK82IYc2Ij64
+	vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
+	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2I
+	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK
+	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I
+	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUzZ2-UUUUU
 
-Hi Herbert,
 
-An orthogonal driver-level patch can be found at the following link.
+在 2026/8/4 22:29, Huacai Chen 写道:
+> On Tue, Aug 4, 2026 at 10:09 AM Qunqin Zhao <zhaoqunqin@loongson.cn> wrote:
+>>
+>> 在 2026/8/3 16:01, Huacai Chen 写道:
+>>> Hi, Qunqin,
+>>>
+>>> On Thu, Jul 30, 2026 at 4:41 PM Qunqin Zhao <zhaoqunqin@loongson.cn> wrote:
+>>>    int loongson_se_send_engine_cmd(struct loongson_se_engine *engine)
+>>>    {
+>>> +       int err;
+>>> +
+>>> +       mutex_lock(&engine->se->cmd_lock);
+>>> +
+>>> +       reinit_completion(&engine->completion);
+>>> +
+>>>           /*
+>>>            * After engine initialization, the controller already knows
+>>>            * where to obtain engine commands from. Now all we need to
+>>>            * do is notify the controller that the engine needs to be started.
+>>>            */
+>>> -       int err = loongson_se_poll(engine->se, BIT(engine->id));
+>>> +       err = loongson_se_poll(engine->se, BIT(engine->id));
+>>> +
+>>> +       mutex_unlock(&engine->se->cmd_lock);
+>>>
+>>>           if (err)
+>>>                   return err;
+>>> @@ -97,7 +109,7 @@ struct loongson_se_engine *loongson_se_init_engine(struct device *dev, int id)
+>>>
+>>>           engine->se = se;
+>>>           engine->id = id;
+>>> -       init_completion(&engine->completion);
+>>> +       reinit_completion(&engine->completion);
+>>> I'm not sure, but I think loongson_se_init_engine() is only called at
+>>> init, so we need init_completion here.
+>> To prevent an spurious interrupt from completing an uninitialized object,
+>> all objects have already been fully initialized with init_completion during the probe stage.
+> In my opinion, if a function can be called multiple times, we need
+> reinit_completion(), if it is only called for probe, we need
+> init_completion(), and loongson_se_init_engine() looks like the later
+> case.
 
-https://lore.kernel.org/all/20260805041902.1575170-1-changwei.zou@canonical.com/T/#u
+I'm not sure. If init_completion twice works too, let's go with 
+init_completion then.
 
-Thanks a lot.
+Thanks
 
-Kind regards,
-Changwei
+>
+> Huacai
+>
 
