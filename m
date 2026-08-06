@@ -1,189 +1,174 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB5BD310652
-	for <linux-crypto@vger.kernel.org>; Thu,  6 Aug 2026 13:06:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC3294C77D1;
+	Thu,  6 Aug 2026 19:07:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786021584; cv=none; b=RGDeFQO4nFXl9huWh/mahQcWTs/Hh3jCK1VRKr5wprEETL1jfmtFPcJo/pwmzkQkAwwZHCijM2oLwkkl620NSIJiFK40NmnHrYK4ox+RIRW028okvZ2MyIvN7avsVl1XacbAmeNwybiLC4eNyKOdnM1kmuA/riVQ4SrA9p+9Vy4=
+	t=1786043241; cv=none; b=XA7yYFuFFFAEYu+M0Hx8Op5xzSjBE853LviW5VeC6mOdihp8C5/MkwcD4iGoZJDTYzhg1X08+eibzaJrd2b1lxxvYLrKpn8SNzHBsszDAXZE88ougZ8Uiw5GlrjAMDegtnknNtNSlAOQq/+Ht0AyCNKjYseQiijCorVYbUvVkdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786021584; c=relaxed/simple;
-	bh=OzAc1F2Y6Gcmxu2zII4YVzJyWZmAUlHTRSH7Z+pI/0M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EVT8rLISUhlFPruqHr3U/UuPF61scWSCM+GHSl5rev93iW0wDLtDuQXpfaC8UkYEMEkSqPBYJigXxvNUa2vkGp9IKcgZCp9OUB9FT8ft9IHKRp8Je6RlHTUaYnsBUQohpmzhbagpiXUHEJ+JmPGGFmMEYrEQfp5g5Yz0Ryj24jo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Sxsj+gDx; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=rGmQxQYd; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1786043241; c=relaxed/simple;
+	bh=WXcm2Yb5I04oLe14dcXdrEPwOR8hGoCD+QeGAqYfYQw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AEHc1hF25SowMbEOHH1pCtzo+9NhhXR8eZdjexjXEJITmo4nkfXlmFAGt1iIzc8D9d8ucOiSMcc8J+ZsgNaH6p36PVOAfJwd1Bn33oFKpmet3FB1qRxL7dTgXvVPFzmpP7Ah/od8cky199kShTwnh3+V41NlwUo//i2daPkIZe0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=nA1aUYEN; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sxsj+gDx";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="rGmQxQYd"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1786021579;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=qdrRzVBf5DG7sDXX93QUMBT7+/4/2gBMdmZZGH0xBog=;
-	b=Sxsj+gDxu7cauWhrJlSKDVYltzxvifGJEIQj5/d/SV4xzhboB+Numtsa4rITuc2k8FA9R7
-	mk47pX2kNkYu8Yl+g4gbbLpTFovpJ8CBYB2DuDsbHTG8HomjegTKFGXEZa4TCLbCKgqmVl
-	DZ97pvz23XJeszWc8XGRq83eqRD4cRQ=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-620-SGGpwEDWOZafhpkYKzzi3Q-1; Thu, 06 Aug 2026 09:06:18 -0400
-X-MC-Unique: SGGpwEDWOZafhpkYKzzi3Q-1
-X-Mimecast-MFC-AGG-ID: SGGpwEDWOZafhpkYKzzi3Q_1786021577
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-47f835ac1aeso1465677f8f.3
-        for <linux-crypto@vger.kernel.org>; Thu, 06 Aug 2026 06:06:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1786021577; x=1786626377; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=qdrRzVBf5DG7sDXX93QUMBT7+/4/2gBMdmZZGH0xBog=;
-        b=rGmQxQYdE8bgGzLcKnG87gYNbDHThEurbY+8dhMC/uUkObNLPNpp89dLR2K/OZjTLC
-         ES2guWCA6Umg0W3vFM18X5aYO2Nmy5wE3wGNYDMzxq9Og9FT4FOOY6oPMbnSqyjSOCSD
-         mIDIcGPeLYHIPKyYBuFHnSaj8M0XGtT+S18cqk/cmVucmuz1SvK2+1HdwWC1jQ4oBqM6
-         lmyKroQlENbFKqAJA3Mp4dK4Z2LCW5UnXntWaIZHxQ4vMuDATWtm5V5a/P0XIx+aPrFm
-         YnZr5RgSupQVqyzvtXtik8FS9xBrN9XnEJyS0vr7OdO8RImFxjE0SDbK9mPMhcDya5hX
-         33sQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786021577; x=1786626377;
-        h=content-transfer-encoding:content-type:in-reply-to:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=qdrRzVBf5DG7sDXX93QUMBT7+/4/2gBMdmZZGH0xBog=;
-        b=cVNVJFTim1GCABsri6d+XfntzQn1GMfsalhv3HNTdq4ur6Zzy0UNkd85qjRghZ+NGe
-         j+cjS1YZMO1/h03/+dcJ6F+S4unmk0jhPg6FjMJBJTQmQjGNNZC6k/58V3DwOF3QAIOx
-         IjqKFOTqHppFmUI39L6dBZbNjV2GOgVuza2zex8TefjGHC5+DoUkrnhoBBjR+NhJTm2D
-         FOU+rw3SEtjixdQe4ZAw6RojF1NLZIVZvf28bQelLmQxQCv8XnHsuBDmv0byLtEx5ICJ
-         qYnsGqp60nu2j6OCl1fwsglp8w0b2iPGxdquATiKW6YoQ4OTtTkKSIUvby2NjOgGmfFr
-         CzEg==
-X-Forwarded-Encrypted: i=1; AHgh+RrrfI+9wgLu+2iJhRDtfGNIXMW8qUkFsDv5gJ0ISo4qrkZ5lkxnTSZzULfJreDVqw34vyGF7l8fhzhFoNQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdNGFcLB6JSg0hjDZOl/nso22p31EfK6WNb1DZx3f4RkNWvHFy
-	ZCzNQ+wxyPrEkQMN/scJ1OeMJHFhC06yoMVmnLFdJdxFTKr6TMOwseDOgJQaG/pHNQ1DUEOAIGl
-	XNRiBVTcdY66RvM9ceZsQu38Qo70liO/YGQYunxPkhu5brwCUUh2ahc4e1X/43ZBkoA==
-X-Gm-Gg: AR+sD13C4EF8GbdHHjmFOu4syFt5Ox3D2iobgicTyEqW4WMN+J+cSsycxpe20GP+gOQ
-	MDMBUge0AvrcKkW1Vkbm0DV8v5IugIEoXX6lWdxjvIj5aOgsw13Lh7r/PA1EjWrPht+n8VCuzK0
-	a6/N2b7RM1wlZW74HN5OapN0OMJp07wgrk2wFtMEwNxBo/BlFKyjkA18Z97Qoo74/86Q6wb+GvW
-	tgZfLn0MCJuLpg9VQbOrnkb4WC6mOhMdLOFhlfehM3uZaj+iljGDbJF6eN4YBtjHHdNmDrcpcq0
-	nTuRWqHITkkzLxfxNf+gQ/TtVPdAMJoe7klaUlNYUGTJvsZYDhsCNTFSFZ2CEbO8rxNLHFfW
-X-Received: by 2002:adf:e012:0:20b0:47f:5b52:5579 with SMTP id ffacd0b85a97d-47fec532b8cmr19120061f8f.18.1786021577022;
-        Thu, 06 Aug 2026 06:06:17 -0700 (PDT)
-X-Received: by 2002:adf:e012:0:20b0:47f:5b52:5579 with SMTP id ffacd0b85a97d-47fec532b8cmr19119980f8f.18.1786021576640;
-        Thu, 06 Aug 2026 06:06:16 -0700 (PDT)
-Received: from [192.168.0.9] ([47.64.115.28])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47ff79a7f07sm6573381f8f.8.2026.08.06.06.06.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Aug 2026 06:06:15 -0700 (PDT)
-Message-ID: <3224cf7a-ae7c-45c8-82e5-126f2957fc79@redhat.com>
-Date: Thu, 6 Aug 2026 15:06:14 +0200
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="nA1aUYEN"
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 676Ftr4v4168306;
+	Thu, 6 Aug 2026 19:06:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	corp-2025-04-25; bh=85JNUC8SyfLYyGobZYpdZmxyQGF0qjVqbjDUd/Wkets=; b=
+	nA1aUYENomsR9p7hfDkQr6KalTZrWQW8NET0IkudX6kxW006ofYrtz87Qku7QfJU
+	1lbtfpVmJ42Q3AQE1tcbOw0dHj5dJSylYxq+m2+YcyLW9melEp/Zo40HFGHB54iG
+	OcTwtR+niQLcarL+4OWP5kUShgYJOMrLwxEqqSkY7Lj2zjgD/sgtw+C5rg7PDGAH
+	Gv3g1ppfRFvZh8DYeUX2gV+upEZO5qZ40tc03kMw1uUKshv2LOqjagJ3HbvFdCxa
+	5hBpF9vOLZ/60dXew31tSvX4uLcqli6uolj+khGTMmHGGzK/4pK/rJL+YY5xBUHb
+	pPRuZrwRVaPtUZ7W/V2+uA==
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4fs8ugpqtf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 06 Aug 2026 19:06:26 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.7/8.18.1.7) with ESMTP id 676J0b6k024663;
+	Thu, 6 Aug 2026 19:06:25 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4fs78w56e3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 06 Aug 2026 19:06:25 +0000 (GMT)
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.1.12) with ESMTP id 676J6LgY011247;
+	Thu, 6 Aug 2026 19:06:24 GMT
+Received: from ca-mkp2.ca.oracle.com.com (mpeterse-ol9.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.251.135])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 4fs78w56b9-3;
+	Thu, 06 Aug 2026 19:06:24 +0000 (GMT)
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+To: Julia.Lawall@inria.fr, Alex Deucher <alexander.deucher@amd.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Andrew Lunn <andrew@lunn.ch>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+        Borislav Petkov <bp@alien8.de>,
+        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+        Daniel Lezcano <daniel.lezcano@kernel.org>,
+        David Airlie <airlied@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Eric Dumazet <edumazet@google.com>, Florian Westphal <fw@strlen.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Hans de Goede <hansg@kernel.org>, Hans Verkuil <hverkuil@kernel.org>,
+        Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jaroslav Kysela <perex@perex.cz>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Jiri Pirko <jiri@resnulli.us>, "Joerg Roedel (AMD)" <joro@8bytes.org>,
+        Johan Hovold <johan@kernel.org>, Jonathan Cameron <jic23@kernel.org>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        Julian Anastasov <ja@ssi.bg>, Leon Romanovsky <leon@kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>, Linus Walleij <linusw@kernel.org>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Mark Brown <broonie@kernel.org>, Matthew Sakai <msakai@redhat.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Maxime Ripard <mripard@kernel.org>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Mike Rapoport <rppt@kernel.org>,
+        Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+        Nicolas Palix <nicolas.palix@imag.fr>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Paolo Abeni <pabeni@redhat.com>, Ping-Ke Shih <pkshih@realtek.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Sebastian Reichel <sre@kernel.org>, Shuah Khan <shuah@kernel.org>,
+        Simona Vetter <simona@ffwll.ch>, Simon Horman <horms@verge.net.au>,
+        Stephen Boyd <sboyd@kernel.org>, Steve French <sfrench@samba.org>,
+        Takashi Iwai <tiwai@suse.com>, Thomas Renninger <trenn@suse.com>,
+        Thomas Zimmermann <tzimmermann@suse.de>,
+        Tony Luck <tony.luck@intel.com>, Tvrtko Ursulin <tursulin@ursulin.net>,
+        Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+        Vinod Koul <vkoul@kernel.org>, Will Deacon <will@kernel.org>,
+        Yazen Ghannam <Yazen.Ghannam@amd.com>,
+        Sang-Heon Jeon <ekffu200098@gmail.com>
+Cc: "Martin K . Petersen" <martin.petersen@oracle.com>, cocci@inria.fr,
+        amd-gfx@lists.freedesktop.org, dmaengine@vger.kernel.org,
+        dm-devel@lists.linux.dev, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, intel-wired-lan@lists.osuosl.org,
+        iommu@lists.linux.dev, linux-cifs@vger.kernel.org,
+        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-edac@vger.kernel.org, linux-gpio@vger.kernel.org,
+        linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mm@kvack.org, linux-pm@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-rtc@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-sound@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-wireless@vger.kernel.org, lvs-devel@vger.kernel.org,
+        netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        nouveau@lists.freedesktop.org, platform-driver-x86@vger.kernel.org
+Subject: Re: (subset) [PATCH 00/36] treewide: remove conditional returns with no effect
+Date: Thu,  6 Aug 2026 15:06:08 -0400
+Message-ID: <178589207129.336697.9870225893827541543.b4-ty@oracle.com>
+X-Mailer: git-send-email 2.53.0
+In-Reply-To: <20260723184538.3888637-1-ekffu200098@gmail.com>
+References: <20260723184538.3888637-1-ekffu200098@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/6] net/tcp-ao: clear the aes_cmac_key when done
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Neal Cardwell <ncardwell@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, Kuniyuki Iwashima <kuniyu@google.com>,
- Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
-References: <20260805143611.818559-1-thuth@redhat.com>
- <20260805143611.818559-4-thuth@redhat.com> <20260805210259.GI3438@quark>
-From: Thomas Huth <thuth@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <20260805210259.GI3438@quark>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-08-06_02,2026-08-06_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
+ spamscore=0 malwarescore=0 bulkscore=0 lowpriorityscore=0 mlxscore=0
+ phishscore=0 mlxlogscore=672 suspectscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2606160000 definitions=main-2608060149
+X-Proofpoint-ORIG-GUID: XGMDaQGIFMb57T6Q2yvPQTQQt2debxfq
+X-Authority-Analysis: v=2.4 cv=XqnK/1F9 c=1 sm=1 tr=0 ts=6a74db32 b=1 cx=c_pps
+ a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17
+ a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=jiCTI4zE5U7BLdzWsZGv:22 a=BqU2WV_vvsyTyxaotp0D:22 a=VwQbUJbxAAAA:8
+ a=Br-j9HdbvUlrMjNZj6IA:9 a=QEXdDO2ut3YA:10 a=5yU3S35YU4bGjq-dph-N:22
+ a=Bho9c0fBagfJEIQBS7DQ:22 cc=ntf awl=host:13510
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODA2MDE0OSBTYWx0ZWRfX6uIK9jT+2Jev
+ rYS5Xc6Wjv9hMYRtyD0NY9wioUhY1o9ts8S44XrOIykROIC2fMM+q3H5rjkub44bNgkLDQ3tnSe
+ fkx9LiuU0Ioed9eVzRB8PP2qYuZIVaHGDH9Vr333gSb2ZgsHD92v
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODA2MDE0OSBTYWx0ZWRfX43FUiflrVixJ
+ FNgAKsr+fsfl0ktZltC3fvW6MVFcRQRy/oySHj8nQQDMOHwfS94QLWHrXArK3j62D1c6aNzQrnl
+ 2DtOuGbPQocnjuSCI1ny1WWYx/7jkkjlcfyl+lp7TEesEfkx307+KuCZo0OgIxbIwfa72MWD4em
+ tn6/hMd/QXx6zH3wP5OlhrMzlp2qKgIxJlelAMfUWIkruyj4hnvKzGUkqPoF4QRZ71As9I8pV2j
+ DMm/cMIaHufC6lXcsuKfUk0yiqWTx1Zr8LtQAR498eW34hEj3pAMHucta0+1CKmEnv9EN7lkU/M
+ FG7jgW8yHOjl2TgueMJFzovO4heKYSqjW47oC3CHVujyZPMUqifsWdUKFoxdhd+EKhXdCEJL9b0
+ LGCES5HP/CdGIqj2UaaWymZGJVFVJ4RBD/aEk7/710HO5x59Z+gVx3LZGgty2YUYCbgJE7oGTWH
+ QPXliDM2eYx5QgvaSSBlrfWn/1V9lBD33lbCDCaI=
+X-Proofpoint-GUID: XGMDaQGIFMb57T6Q2yvPQTQQt2debxfq
 
-On 05/08/2026 23.02, Eric Biggers wrote:
-> On Wed, Aug 05, 2026 at 04:36:06PM +0200, Thomas Huth wrote:
->> From: Thomas Huth <thuth@redhat.com>
->>
->> Clear the local aes_cmac_key structure via __cleanup() function
->> when we're done with it to avoid that sensitive data could leak on
->> the stack.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>   net/ipv4/tcp_ao.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
->> index a56bb79e15e0e..12c724fed8a26 100644
->> --- a/net/ipv4/tcp_ao.c
->> +++ b/net/ipv4/tcp_ao.c
->> @@ -141,7 +141,7 @@ void tcp_ao_calc_traffic_key(const struct tcp_ao_key *mkt, u8 *traffic_key,
->>   					traffic_key);
->>   		return;
->>   	case TCP_AO_ALGO_AES_128_CMAC: {
->> -		struct aes_cmac_key k;
->> +		struct aes_cmac_key k __cleanup(aes_cmac_zeroize_key);
->>   
->>   		aes_cmac_preparekey(&k, mkt->key, AES_KEYSIZE_128);
->>   		aes_cmac(&k, input, input_len, traffic_key);
+On Fri, 24 Jul 2026 03:45:02 +0900, Sang-Heon Jeon wrote:
+
+> While reading mm/memblock, I found a conditional return where both
+> branches return the same value:
 > 
-> Similar to the bluetooth patch: This is okay, but it seems the TCP-AO
-> code has never really tried to do key zeroization, which is why I didn't
-> include a memzero_explicit() here.  Lots of cases, like the various
-> traffic key buffers, have never been zeroized and still aren't.
+> 	err = do_something();
+> 	if (err)
+> 		return err;
+> 	return err;
 > 
-> The '__cleanup' trick makes this specific case trivial enough that sure,
-> it might as well be done anyway.  But it would be nice to have a more
-> comprehensive patch that actually tried to zeroize all TCP-AO keys.
-> Otherwise random individual fixes like this trickle in over time and it
-> takes a lot longer.
-Ok, I'll put this on my TODO list and will send a separate patch - for this 
-series here, I'd prefer to limit it to aes_cmac_key / aes_cmac_ctx.
+> [...]
 
-  Thomas
+Applied to 7.3/scsi-queue, thanks!
 
+[30/36] scsi: mpt3sas: remove conditional return with no effect
+        https://git.kernel.org/mkp/scsi/c/c79f9bf2d87f
+
+-- 
+Martin K. Petersen
