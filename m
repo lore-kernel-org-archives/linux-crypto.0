@@ -1,85 +1,85 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EBAD2E762C
-	for <linux-crypto@vger.kernel.org>; Thu,  6 Aug 2026 13:00:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB5BD310652
+	for <linux-crypto@vger.kernel.org>; Thu,  6 Aug 2026 13:06:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786021262; cv=none; b=RyaK57NfkMuCHI6z79Q3i0b9dLH0Uo9PUQiDb3pqNz+r0j6UAY1IsmdL05TqJkJkfjhNoRH2ZAl/kmCF8nHChnRyJpgh2YOYljCb0WHiSkzcc7ZV9aVKYXeM3BD5Bh7en+HBW6OM6yJBhpbn8iLh1iy2nCqeGC+0Yf/K5csv06w=
+	t=1786021584; cv=none; b=RGDeFQO4nFXl9huWh/mahQcWTs/Hh3jCK1VRKr5wprEETL1jfmtFPcJo/pwmzkQkAwwZHCijM2oLwkkl620NSIJiFK40NmnHrYK4ox+RIRW028okvZ2MyIvN7avsVl1XacbAmeNwybiLC4eNyKOdnM1kmuA/riVQ4SrA9p+9Vy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786021262; c=relaxed/simple;
-	bh=q1ZRPUvNDHV7iJdE58mQ/fIbmyHQnQmBFczO9z9Ajog=;
+	s=arc-20240116; t=1786021584; c=relaxed/simple;
+	bh=OzAc1F2Y6Gcmxu2zII4YVzJyWZmAUlHTRSH7Z+pI/0M=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=apIFzubOso2d5GHTzlvnAPe6thnu/JIm6EuWw0kleg5lTycR0+SIF2QLRq4xpMPskDPd1GxVJZR7PHwKb0Ifzm/0wDIdvcJIEubp4Iy00/mqosSkb9Rw1DsbSJ8LYoojYSmfPZ/4YF0+cHf4kJ9ltDPT70sFDQz0iWVdboUqN6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T7ln0GV8; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=teenWHTF; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=EVT8rLISUhlFPruqHr3U/UuPF61scWSCM+GHSl5rev93iW0wDLtDuQXpfaC8UkYEMEkSqPBYJigXxvNUa2vkGp9IKcgZCp9OUB9FT8ft9IHKRp8Je6RlHTUaYnsBUQohpmzhbagpiXUHEJ+JmPGGFmMEYrEQfp5g5Yz0Ryj24jo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Sxsj+gDx; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=rGmQxQYd; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T7ln0GV8";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="teenWHTF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sxsj+gDx";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="rGmQxQYd"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1786021253;
+	s=mimecast20190719; t=1786021579;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=yUjFkzRbsyRzHJFFuK6edRfWw7bg7Op3i8nbxFWHmEE=;
-	b=T7ln0GV8R3G1tIa1fxmFLeZ+2Cr5SG0wOcs9a12lsRgnzdnYZ5+vCkHw8H3WHS5SSgnv6x
-	U6vUzuPbRnKikLDnD40oiHPATseJnx5phoY/GxI76674+3Le7IJ1+69eRlQtv6Rr0ty7Hn
-	baVOg2uMaTHm2jXlYa71OAYAGnq4VGY=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=qdrRzVBf5DG7sDXX93QUMBT7+/4/2gBMdmZZGH0xBog=;
+	b=Sxsj+gDxu7cauWhrJlSKDVYltzxvifGJEIQj5/d/SV4xzhboB+Numtsa4rITuc2k8FA9R7
+	mk47pX2kNkYu8Yl+g4gbbLpTFovpJ8CBYB2DuDsbHTG8HomjegTKFGXEZa4TCLbCKgqmVl
+	DZ97pvz23XJeszWc8XGRq83eqRD4cRQ=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-553-JKPS2sqhMvWuZiPJh087aw-1; Thu, 06 Aug 2026 09:00:37 -0400
-X-MC-Unique: JKPS2sqhMvWuZiPJh087aw-1
-X-Mimecast-MFC-AGG-ID: JKPS2sqhMvWuZiPJh087aw_1786021236
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-c15fff01a30so161788566b.1
-        for <linux-crypto@vger.kernel.org>; Thu, 06 Aug 2026 06:00:37 -0700 (PDT)
+ us-mta-620-SGGpwEDWOZafhpkYKzzi3Q-1; Thu, 06 Aug 2026 09:06:18 -0400
+X-MC-Unique: SGGpwEDWOZafhpkYKzzi3Q-1
+X-Mimecast-MFC-AGG-ID: SGGpwEDWOZafhpkYKzzi3Q_1786021577
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-47f835ac1aeso1465677f8f.3
+        for <linux-crypto@vger.kernel.org>; Thu, 06 Aug 2026 06:06:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1786021236; x=1786626036; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1786021577; x=1786626377; darn=vger.kernel.org;
         h=content-transfer-encoding:content-type:in-reply-to:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:from:to:cc:subject:date:message-id
          :reply-to:content-type;
-        bh=yUjFkzRbsyRzHJFFuK6edRfWw7bg7Op3i8nbxFWHmEE=;
-        b=teenWHTFCj4ymK1Fxt1+1ddWMDhfhaNAwDrMzo9R/5snKNnCxPbJUBGGg3NtjTqL65
-         NyefOos8TTz1PooC6IfOZsv2CAuRQ441kqMiMYRt8v21wuG9qjzTJL0w0hmTTNWeY0HT
-         8NKhWF1nD4HRZxfDDVZIlmd9Gu2Bt0HqqXJz+6z4DySGAy1/oXNepBLouJL87xFl4Kds
-         F35ffsVahSzZtKi54YFwecL5qLefjl/ROeQDb1TqinikjivMeWHuOLB3hyt1mseDztAV
-         9eAfXRfrBFX4x7I8BNjcne33H/7iqfThpMZKooUwOLW9ja2w7kNcenKtopVUfgETjdtk
-         5OCQ==
+        bh=qdrRzVBf5DG7sDXX93QUMBT7+/4/2gBMdmZZGH0xBog=;
+        b=rGmQxQYdE8bgGzLcKnG87gYNbDHThEurbY+8dhMC/uUkObNLPNpp89dLR2K/OZjTLC
+         ES2guWCA6Umg0W3vFM18X5aYO2Nmy5wE3wGNYDMzxq9Og9FT4FOOY6oPMbnSqyjSOCSD
+         mIDIcGPeLYHIPKyYBuFHnSaj8M0XGtT+S18cqk/cmVucmuz1SvK2+1HdwWC1jQ4oBqM6
+         lmyKroQlENbFKqAJA3Mp4dK4Z2LCW5UnXntWaIZHxQ4vMuDATWtm5V5a/P0XIx+aPrFm
+         YnZr5RgSupQVqyzvtXtik8FS9xBrN9XnEJyS0vr7OdO8RImFxjE0SDbK9mPMhcDya5hX
+         33sQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786021236; x=1786626036;
+        d=1e100.net; s=20251104; t=1786021577; x=1786626377;
         h=content-transfer-encoding:content-type:in-reply-to:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=yUjFkzRbsyRzHJFFuK6edRfWw7bg7Op3i8nbxFWHmEE=;
-        b=rjxRjHj4rRYg9lzgZ6OSa72MziZldI7ei0xrmSf9+ZWp4sfe2nnMZnjNJBPjpMqp5S
-         MnbPKeijMcpDjW+oNQyLL+wfG5NBX0uk1fG7pJk1lZInrK85g9CZ+8ntJYP41OyZPj6c
-         s3DlHlLjKljD86Hm32vqU7gfy3iyrkZsat5x5w2QWTtdG6zGz5BKRAPaWtFwYItICy1X
-         6FPOhsJXgbHoDGGDX0aS9I5fjP/UP536Hw7QLIX77OkO0PCjAUj0fJ4mPHpANalACPNb
-         40kwxdAuuk8OzZcvN18ZKmpUh+IYjEr/Lcs+f7Wu1imwQDXieOBt4P/v+ekdSLm/HLOl
-         rkpA==
-X-Forwarded-Encrypted: i=1; AHgh+RoGSvq0T6TgAd0FUZI4VEcNIMNHcTNAVW1PlzkuiElaWc0Fmj56S+DNEKtZ+BXNDb5YcUTpst8xYS9cvdo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywq4QIMpXr2OUtFDW+kIgB3hr++BVFmI6K2+xGoSdH1Ww6kjMs0
-	o497yA0FWKSbCfebnHWYKFfML6cGzf4Ij8UQN4cconVq/wT/8mNsTU4vCoiPYlhSilTAJLLGFJm
-	bCAiXatQqpbCjno1LHejr/boirZCYaX+C8RMozo3FRysxFk2jDzNkHZRVEkwOZjilSg==
-X-Gm-Gg: AR+sD11+OECv/O2xGmn4GgU57Xp1fYXCP+5NZheF1g0uM772tupojFIekI3Rn5DRzwP
-	+b97UTDjOPJJru0P1k0k9s2bm3ubvaVxA4HAAxSsT2ImuLGeue662EyfUnxHB3lrxvhWIcJ3ZJz
-	voSD4cUtorIWarK0+/qcN8vVPFw8w4bzFly/t3CajrDdDY8BNjhMscQXIIXhonULFPEpsJUlWqi
-	PZF4DRYGZNhVTH2E3ioONqwu9ry4XdKh7WC6PneYklImr7v87n/rnc507Du29Hv+abvQxdr/MCC
-	aZjryJpAgNL75xlAJhtK+4NQ7NS+8nJooR6u0J6qomF6+eK9YPBkJkSWfRPc1ZCeqACzhkIo
-X-Received: by 2002:a17:906:9f85:b0:c19:6d4a:425b with SMTP id a640c23a62f3a-c2073364454mr67804166b.18.1786021235729;
-        Thu, 06 Aug 2026 06:00:35 -0700 (PDT)
-X-Received: by 2002:a17:906:9f85:b0:c19:6d4a:425b with SMTP id a640c23a62f3a-c2073364454mr67797166b.18.1786021235090;
-        Thu, 06 Aug 2026 06:00:35 -0700 (PDT)
+        bh=qdrRzVBf5DG7sDXX93QUMBT7+/4/2gBMdmZZGH0xBog=;
+        b=cVNVJFTim1GCABsri6d+XfntzQn1GMfsalhv3HNTdq4ur6Zzy0UNkd85qjRghZ+NGe
+         j+cjS1YZMO1/h03/+dcJ6F+S4unmk0jhPg6FjMJBJTQmQjGNNZC6k/58V3DwOF3QAIOx
+         IjqKFOTqHppFmUI39L6dBZbNjV2GOgVuza2zex8TefjGHC5+DoUkrnhoBBjR+NhJTm2D
+         FOU+rw3SEtjixdQe4ZAw6RojF1NLZIVZvf28bQelLmQxQCv8XnHsuBDmv0byLtEx5ICJ
+         qYnsGqp60nu2j6OCl1fwsglp8w0b2iPGxdquATiKW6YoQ4OTtTkKSIUvby2NjOgGmfFr
+         CzEg==
+X-Forwarded-Encrypted: i=1; AHgh+RrrfI+9wgLu+2iJhRDtfGNIXMW8qUkFsDv5gJ0ISo4qrkZ5lkxnTSZzULfJreDVqw34vyGF7l8fhzhFoNQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxdNGFcLB6JSg0hjDZOl/nso22p31EfK6WNb1DZx3f4RkNWvHFy
+	ZCzNQ+wxyPrEkQMN/scJ1OeMJHFhC06yoMVmnLFdJdxFTKr6TMOwseDOgJQaG/pHNQ1DUEOAIGl
+	XNRiBVTcdY66RvM9ceZsQu38Qo70liO/YGQYunxPkhu5brwCUUh2ahc4e1X/43ZBkoA==
+X-Gm-Gg: AR+sD13C4EF8GbdHHjmFOu4syFt5Ox3D2iobgicTyEqW4WMN+J+cSsycxpe20GP+gOQ
+	MDMBUge0AvrcKkW1Vkbm0DV8v5IugIEoXX6lWdxjvIj5aOgsw13Lh7r/PA1EjWrPht+n8VCuzK0
+	a6/N2b7RM1wlZW74HN5OapN0OMJp07wgrk2wFtMEwNxBo/BlFKyjkA18Z97Qoo74/86Q6wb+GvW
+	tgZfLn0MCJuLpg9VQbOrnkb4WC6mOhMdLOFhlfehM3uZaj+iljGDbJF6eN4YBtjHHdNmDrcpcq0
+	nTuRWqHITkkzLxfxNf+gQ/TtVPdAMJoe7klaUlNYUGTJvsZYDhsCNTFSFZ2CEbO8rxNLHFfW
+X-Received: by 2002:adf:e012:0:20b0:47f:5b52:5579 with SMTP id ffacd0b85a97d-47fec532b8cmr19120061f8f.18.1786021577022;
+        Thu, 06 Aug 2026 06:06:17 -0700 (PDT)
+X-Received: by 2002:adf:e012:0:20b0:47f:5b52:5579 with SMTP id ffacd0b85a97d-47fec532b8cmr19119980f8f.18.1786021576640;
+        Thu, 06 Aug 2026 06:06:16 -0700 (PDT)
 Received: from [192.168.0.9] ([47.64.115.28])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c203645a3b8sm241386266b.56.2026.08.06.06.00.33
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-47ff79a7f07sm6573381f8f.8.2026.08.06.06.06.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Aug 2026 06:00:34 -0700 (PDT)
-Message-ID: <e02abf8d-7cfe-4673-8764-9893183b81a1@redhat.com>
-Date: Thu, 6 Aug 2026 15:00:32 +0200
+        Thu, 06 Aug 2026 06:06:15 -0700 (PDT)
+Message-ID: <3224cf7a-ae7c-45c8-82e5-126f2957fc79@redhat.com>
+Date: Thu, 6 Aug 2026 15:06:14 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -87,15 +87,16 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/6] Bluetooth: SMP: clear the aes_cmac_key when done
+Subject: Re: [PATCH 3/6] net/tcp-ao: clear the aes_cmac_key when done
 To: Eric Biggers <ebiggers@kernel.org>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>,
- Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Neal Cardwell <ncardwell@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Kuniyuki Iwashima <kuniyu@google.com>,
+ Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
 References: <20260805143611.818559-1-thuth@redhat.com>
- <20260805143611.818559-5-thuth@redhat.com> <20260805204613.GG3438@quark>
+ <20260805143611.818559-4-thuth@redhat.com> <20260805210259.GI3438@quark>
 From: Thomas Huth <thuth@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -140,12 +141,12 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20260805204613.GG3438@quark>
+In-Reply-To: <20260805210259.GI3438@quark>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 05/08/2026 22.46, Eric Biggers wrote:
-> On Wed, Aug 05, 2026 at 04:36:07PM +0200, Thomas Huth wrote:
+On 05/08/2026 23.02, Eric Biggers wrote:
+> On Wed, Aug 05, 2026 at 04:36:06PM +0200, Thomas Huth wrote:
 >> From: Thomas Huth <thuth@redhat.com>
 >>
 >> Clear the local aes_cmac_key structure via __cleanup() function
@@ -154,42 +155,35 @@ On 05/08/2026 22.46, Eric Biggers wrote:
 >>
 >> Signed-off-by: Thomas Huth <thuth@redhat.com>
 >> ---
->>   net/bluetooth/smp.c | 2 +-
+>>   net/ipv4/tcp_ao.c | 2 +-
 >>   1 file changed, 1 insertion(+), 1 deletion(-)
 >>
->> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
->> index 031d3022cb1e5..ed30ca0d773f1 100644
->> --- a/net/bluetooth/smp.c
->> +++ b/net/bluetooth/smp.c
->> @@ -164,7 +164,7 @@ static inline void swap_buf(const u8 *src, u8 *dst, size_t len)
->>   static int smp_aes_cmac(const u8 k[16], const u8 *m, size_t len, u8 mac[16])
->>   {
->>   	uint8_t tmp[16], mac_msb[16], msg_msb[CMAC_MSG_MAX];
->> -	struct aes_cmac_key key;
->> +	struct aes_cmac_key key __cleanup(aes_cmac_zeroize_key);
->>   	int err;
+>> diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
+>> index a56bb79e15e0e..12c724fed8a26 100644
+>> --- a/net/ipv4/tcp_ao.c
+>> +++ b/net/ipv4/tcp_ao.c
+>> @@ -141,7 +141,7 @@ void tcp_ao_calc_traffic_key(const struct tcp_ao_key *mkt, u8 *traffic_key,
+>>   					traffic_key);
+>>   		return;
+>>   	case TCP_AO_ALGO_AES_128_CMAC: {
+>> -		struct aes_cmac_key k;
+>> +		struct aes_cmac_key k __cleanup(aes_cmac_zeroize_key);
 >>   
->>   	if (len > CMAC_MSG_MAX)
+>>   		aes_cmac_preparekey(&k, mkt->key, AES_KEYSIZE_128);
+>>   		aes_cmac(&k, input, input_len, traffic_key);
 > 
-> Well, the reason I didn't add a memzero_explicit() here when converting
-> the code to use the AES-CMAC library is because this same function
-> already puts the raw key on the stack without zeroizing it.
+> Similar to the bluetooth patch: This is okay, but it seems the TCP-AO
+> code has never really tried to do key zeroization, which is why I didn't
+> include a memzero_explicit() here.  Lots of cases, like the various
+> traffic key buffers, have never been zeroized and still aren't.
 > 
-> I guess the __cleanup trick makes zeroizing the struct trivial enough
-> that we should just do it anyway.  But it is always a bit awkward to be
-> "fixing" something when the same problem is still present.
-> 
-> Perhaps you'd like to expand this patch a bit to zeroize the other data
-> too?  (There is the 'tmp' array in this same function of course, but
-> there may be other places that need "fixing" too.)
-Sure, I can add a line to clear tmp[] here, too.
-
-And I agree, there are other spots in this file that likely need fixing, 
-e.g. smp_e() already clears struct aes_enckey aes, but misses to zeroize its 
-tmp[] array, too, that again contains key material, I think?
-
-But I think I'll rather tackle those in a separate patch series, since this 
-series here is clearly aimed at aes_cmac_key & aes_cmac_ctx.
+> The '__cleanup' trick makes this specific case trivial enough that sure,
+> it might as well be done anyway.  But it would be nice to have a more
+> comprehensive patch that actually tried to zeroize all TCP-AO keys.
+> Otherwise random individual fixes like this trickle in over time and it
+> takes a lot longer.
+Ok, I'll put this on my TODO list and will send a separate patch - for this 
+series here, I'd prefer to limit it to aes_cmac_key / aes_cmac_ctx.
 
   Thomas
 
