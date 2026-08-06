@@ -1,62 +1,42 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EADF3DCDBF
-	for <linux-crypto@vger.kernel.org>; Thu,  6 Aug 2026 07:40:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2BF038551D;
+	Thu,  6 Aug 2026 08:10:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786002061; cv=none; b=b9D0cvlHRC3grLYHoXURWtIAtx/PTBjcimuo+rhduICs3CgT4HbCWoOMlYysQGMdvlYND0QXa5MwbSIZ+ZrkrjeXXlt0bIDN9YRjk0w0rGWZ8SPHedm7OAF7jwW0W7AnX26enHEJ5rX8gIDJiorgx1cGa1sat+zubRG0z3ak65U=
+	t=1786003810; cv=none; b=DGjCIwAoIL4oJGEymwXPz3X6V7NuF4HQY/lF4Nbdh/rSq7c+Ezg2ehuAMZ/UqWXBYEhlVYZt/vFAjzW8fPfTMqJp/3fF19E+aUnISJi4P1Kv8CCp5CvSWCsD84jmX4fKXad3S7oN3Y58oRZ2TCefra4PgU7KtBsIS5eRYv05/CM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786002061; c=relaxed/simple;
-	bh=26sRbijV9paDzDIV8YKj7kZLRFLTzodiCZrBbgGLG0M=;
+	s=arc-20240116; t=1786003810; c=relaxed/simple;
+	bh=Qbq3lBJESX+Elg4OmX0AwrclWJfT4GeO6gkBZIJUIAA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OJ01hL5NEauX/xRWEavxzkv90lrcLJf+vrfQA15UnpJ4hcdsaJ7515I7ZDvLliHHo2/IGro9G7PGiQ23nzNRhyoZVsKRGh8g12f6aQr/lGhHgwgdJ4VVPR+giROtE2ejfOiiBmJK3M6XF5pd3mScM4lHbU4g5IukMmeFwry7A+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M2qZaobp; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=cxC1T3cOsh8XqTJrL6F3Nud7whlziFaN0hhNBU4OFRjhdnXICdMKmA43O706v/e1wPIK7xt7LwTNITeOvyuRelMITUFPY7uNm3mGQhYc5TBRAqR1HkXrldEIos/3LQYPbm2fdILXoccgX5ATv+PIeTFiVs9xlIKMj+21dnZba+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b/1R42+N; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M2qZaobp"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1786002059; x=1817538059;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=26sRbijV9paDzDIV8YKj7kZLRFLTzodiCZrBbgGLG0M=;
-  b=M2qZaobpYuPm6mYooi++el7LMksn5ucDgnoAp87L+AJLR4VB0kcIYT5T
-   gnfleUdhJQHPIczOUanGaQ682x312zMYE5stEkldBHyESZpiINOtZ5KR+
-   T1mAvbrHvb4dH+pr8pK959Ec5jT17m1kC4nqOS/eO8nwUXwft8QPUmsQf
-   78slbXBoKQjaODY+GzPNujZ7zlfqqXsnX3VoTPGZWm/ZqZykorsXnsRIn
-   NCNKbi9BlcgpZmovdZN35CmubaIaAgLhg+QcDLt6dh3IOshU5dlcjHUiQ
-   a2bBUiqL4YIQ7qDMfbKtk2TVIfbCN3roxUI+oY5E7rjNF59cSzoBk6R0H
-   Q==;
-X-CSE-ConnectionGUID: mK1KNcaNTc+kyvCjSIXw/g==
-X-CSE-MsgGUID: 8b4kOOkJTV2S65GjO3NYqA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11866"; a="86703138"
-X-IronPort-AV: E=Sophos;i="6.25,208,1779174000"; 
-   d="scan'208";a="86703138"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2026 00:40:59 -0700
-X-CSE-ConnectionGUID: a2KZJx+1Sxe6hYC2y3y2kA==
-X-CSE-MsgGUID: myCP7HSGQ6eMPmotnXREMA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,208,1779174000"; 
-   d="scan'208";a="260265075"
-Received: from lkp-server01.sh.intel.com (HELO 6eda058d650d) ([10.239.97.150])
-  by orviesa006.jf.intel.com with ESMTP; 06 Aug 2026 00:40:57 -0700
-Received: from kbuild by 6eda058d650d with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wrsik-00000000EWj-1D9B;
-	Thu, 06 Aug 2026 07:40:54 +0000
-Date: Thu, 6 Aug 2026 15:40:34 +0800
-From: kernel test robot <lkp@intel.com>
-To: Martin Willi <martin@strongswan.org>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b/1R42+N"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0629B1F000E9;
+	Thu,  6 Aug 2026 08:10:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786003809;
+	bh=ih7h6JIzTiRKtn0VjiPjDD9AEsbefI5PQ4Ob3mMLVVs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=b/1R42+Nog/giqa33ZLZ0IlQ3s5PHQhF2r3QAJiXXmTW/fQrb8Ah980nJAqwMIt4V
+	 4zmmXPUuB6GJpgcNSIBgwFfk4LPp8rOy0RnyHpt759eaQblmh/3S9rZ1H4M+KnviUX
+	 IfHKevw70Se6EZFRiKo8/Y9taJT2r/U76sUVIqc4LdLwcA/xW5Ao7ifak5lm+MKVUv
+	 Fr4F9g7tY2F9Okv7XfNr+ciZ8OltuRu5lYjdbvRGvkElDw+8pAAESeQWqC49XrctPi
+	 iG0hJuzPPhf3itx6z/xMIwp38152Pm+PhfPcFjRz04AkjS0YCYQpJSXNzOXPTXDodN
+	 lh0VUhkpdW+oA==
+Date: Thu, 6 Aug 2026 10:10:06 +0200
+From: Antoine Tenart <atenart@kernel.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
 	Eric Biggers <ebiggers@kernel.org>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] lib/crypto: x86/chacha: Add a 16-block AVX-512 variant
-Message-ID: <202608061529.D3FMYdiE-lkp@intel.com>
-References: <20260722153247.630519-1-martin@strongswan.org>
+Subject: Re: [PATCH v3 09/10] crypto: safexcel - Rework cleanup of sensitive
+ structs in safexcel_aead_setkey
+Message-ID: <anQ9UdZqmj39hfgD@kwain>
+References: <20260805115749.392672-1-thuth@redhat.com>
+ <20260805115749.392672-10-thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -65,59 +45,64 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260722153247.630519-1-martin@strongswan.org>
+In-Reply-To: <20260805115749.392672-10-thuth@redhat.com>
 
-Hi Martin,
+On Wed, Aug 05, 2026 at 01:57:47PM +0200, Thomas Huth wrote:
+> From: Thomas Huth <thuth@redhat.com>
+> 
+> The crypto_authenc_keys structure only contains pointers to keys,
+> but not the key data itself. So explicitly clearing the structure
+> at the end of safexcel_aead_setkey() is not really necessary.
+> 
+> On the other hand, the crypto_aes_ctx might contain sensitive information,
+> so this structure should be cleaned up at the end instead. Do this
+> now via the new __cleanup(aes_zeroize_ctx) marker.
 
-kernel test robot noticed the following build errors:
+Looking at other crypto drivers it seems zeroing the key pointers was
+explicitly added (sometimes later) and my impression is a good chunk of
+the users are zeroing it. I don't know whether removing that is fine or
+not, my limited understanding is that provides in-depth defense against
+leaking were the key reside in memory. Would love to see an explicit
+statement from someone with that knowledge.
 
-[auto build test ERROR on linux-review/Eric-Biggers/x86-fpu-Check-for-missing-AVX-and-AVX-512-xstate-bits/20260626-124221]
+(On the other hand mixing gotos and __cleanup is not advised but is that
+an issue here? Or if zeroing crypto_authenc_keys is actually important
+can we use __cleanup too?).
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Martin-Willi/lib-crypto-x86-chacha-Add-a-16-block-AVX-512-variant/20260805-221950
-base:   https://github.com/intel-lab-lkp/linux Eric-Biggers/x86-fpu-Check-for-missing-AVX-and-AVX-512-xstate-bits/20260626-124221
-patch link:    https://lore.kernel.org/r/20260722153247.630519-1-martin%40strongswan.org
-patch subject: [PATCH] lib/crypto: x86/chacha: Add a 16-block AVX-512 variant
-config: x86_64-randconfig-075-20260806 (https://download.01.org/0day-ci/archive/20260806/202608061529.D3FMYdiE-lkp@intel.com/config)
-compiler: clang version 22.1.3 (https://github.com/llvm/llvm-project e9846648fd6183ee6d8cbdb4502213fcf902a211)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260806/202608061529.D3FMYdiE-lkp@intel.com/reproduce)
+> --- a/drivers/crypto/inside-secure/safexcel_cipher.c
+> +++ b/drivers/crypto/inside-secure/safexcel_cipher.c
+> @@ -407,17 +407,17 @@ static int safexcel_aead_setkey(struct crypto_aead *ctfm, const u8 *key,
+>  	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
+>  	struct safexcel_crypto_priv *priv = ctx->base.priv;
+>  	struct crypto_authenc_keys keys;
+> -	struct crypto_aes_ctx aes;
+> -	int err = -EINVAL, i;
+> +	struct crypto_aes_ctx aes __cleanup(aes_zeroize_ctx);
+> +	int err, i;
+>  	const char *alg;
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202608061529.D3FMYdiE-lkp@intel.com/
+> @@ -430,25 +430,25 @@ static int safexcel_aead_setkey(struct crypto_aead *ctfm, const u8 *key,
+>  	case SAFEXCEL_DES:
+>  		err = verify_aead_des_key(ctfm, keys.enckey, keys.enckeylen);
+>  		if (unlikely(err))
+> -			goto badkey;
+> +			return err;
+>  		break;
+>  	case SAFEXCEL_3DES:
+>  		err = verify_aead_des3_key(ctfm, keys.enckey, keys.enckeylen);
+>  		if (unlikely(err))
+> -			goto badkey;
+> +			return err;
+>  		break;
+>  	case SAFEXCEL_AES:
+>  		err = aes_expandkey(&aes, keys.enckey, keys.enckeylen);
+>  		if (unlikely(err))
+> -			goto badkey;
+> +			return err;
+>  		break;
+>  	case SAFEXCEL_SM4:
+>  		if (unlikely(keys.enckeylen != SM4_KEY_SIZE))
+> -			goto badkey;
+> +			return err;
 
-All errors (new ones prefixed by >>):
-
-   In file included from lib/crypto/chacha.c:35:
->> lib/crypto/x86/chacha.h:199:8: error: call to undeclared function 'cpu_has_xfeatures'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     199 |                             cpu_has_xfeatures(XFEATURE_MASK_AVX512, NULL))
-         |                             ^
-   1 error generated.
-
-
-vim +/cpu_has_xfeatures +199 lib/crypto/x86/chacha.h
-
-   180	
-   181	#define chacha_mod_init_arch chacha_mod_init_arch
-   182	static void chacha_mod_init_arch(void)
-   183	{
-   184		if (!boot_cpu_has(X86_FEATURE_SSSE3))
-   185			return;
-   186	
-   187		static_branch_enable(&chacha_use_simd);
-   188	
-   189		if (boot_cpu_has(X86_FEATURE_AVX) &&
-   190		    boot_cpu_has(X86_FEATURE_AVX2)) {
-   191			static_branch_enable(&chacha_use_avx2);
-   192	
-   193			if (boot_cpu_has(X86_FEATURE_AVX512VL) &&
-   194			    boot_cpu_has(X86_FEATURE_AVX512BW)) { /* kmovq */
-   195				static_branch_enable(&chacha_use_avx512vl);
-   196	
-   197				if (boot_cpu_has(X86_FEATURE_AVX512F) &&
-   198				    !boot_cpu_has(X86_FEATURE_PREFER_YMM) &&
- > 199				    cpu_has_xfeatures(XFEATURE_MASK_AVX512, NULL))
-
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+'err' is uninitialized here. You can use '-EINVAL' instead.
