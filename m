@@ -1,67 +1,65 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0257476CC2
-	for <linux-crypto@vger.kernel.org>; Fri,  7 Aug 2026 12:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 764194119EF
+	for <linux-crypto@vger.kernel.org>; Fri,  7 Aug 2026 12:59:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786107557; cv=none; b=LKZMSkGVLD2XYLD4IFlyTccZ8vH7D0cqwlm/8vtpDkfy7Coyg4T9dn59XBNt9bj/Q6KDckefm9P1rHIW5dK47F4TCQTQmJ8v6272kUlBayHG3HiQK+HVjmZ8IjjRXetz8G1A/Cfq53sYszQV3q41OqD2nkxRvGHQ+BNTrQoqyCc=
+	t=1786107568; cv=none; b=AkWQ8zq+QZuKuyolp6BIPHWeb9rDBHLuFWQEvPVqTpyHpqOE+XCHCU0NNHPLIh+DpTceZJTyKYKP8ZXWI2muBHxhAHDTNJ2aV37eGvYRMMXR2nPVnOmvzlmsWzvX9mD+q/GSiExkuX3MSATKUBOhWcUVhW++Nu4crG1pTi4XFuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786107557; c=relaxed/simple;
-	bh=HY1fXOCc++pdACbCDsnbvo4DN0eMrHtPCYGnQ2C1K8U=;
+	s=arc-20240116; t=1786107568; c=relaxed/simple;
+	bh=nB9PeiYqtYxB59Cpiw4+izGx1h8kYfW2R3OcHeWgats=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NVopg7rd6ESX1Bv9AJMIV1rMb8fp8Cqz5KI0Gh1ZeBZWwFGR9RX9JxsERd3hntqS1Q27NY1jeR9QaTwtDqHcFoP0fa3C4S8f2KLCtTfD++Ub6SRVDSZs0NCSrckhH0VZoB2QoBk1jeDmn5ty17F4XkshalWH1qob3oG7YS6cuOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZesdjCg7; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=QY252IcNR5FZeFSOUiSIUTphnUI7kDDSut7KnqDLgokyN4swSSrVfe72ipKCD2e7u1DtBp9jcEac215b3b7IooVWdvBRn2Vj8Jk5QuvzWBSjiepO4A+ddIUbQ9b7ajDTIgVYmSVktoZCFyQcuXeWQyBw7v9nI3BOCpysKQN8dSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OlQOTixK; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZesdjCg7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OlQOTixK"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1786107545;
+	s=mimecast20190719; t=1786107548;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=EnK55USt5eYX4DKAb2D0n3Ly2M5DO0VV1eu2CGhl9ns=;
-	b=ZesdjCg77ldIeWAflY7dZDpIB/yW/EoYqXG8oaL2pTIIvcq6JIcgh3bwwVH0o+XsMxs9PV
-	OYi9rrObCsDwtHiSxRAq9S6ASk3kTTYxd4jjnOi1VknhuNXOdnmmWvONhgb/WyzzEDMiIG
-	ZTiYtMxYh6YvHx/PG5bBJLg7Szx+O8E=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	bh=8M7wXURrhkNZfyuEwKvTXxWNDng8ek7UYAiVlFhlORo=;
+	b=OlQOTixKGPEpP7p/CXf9DzmLtycDrMsqpIDylABsfXjv7Ssg5jhrpGrODFpwS6xa76A96Y
+	Npv6E+ErxlD7GlslS+64K3eO6x0qZZT4Ij9btxj3VRebps1huWkkju3AE7Ee3xvuEupiYw
+	Ld6yhVr95ibC2zo+/Sjc5mamA/ujIlw=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-357-sZsFBmd1O1Kh-2j3jyt2wg-1; Fri,
- 07 Aug 2026 08:59:02 -0400
-X-MC-Unique: sZsFBmd1O1Kh-2j3jyt2wg-1
-X-Mimecast-MFC-AGG-ID: sZsFBmd1O1Kh-2j3jyt2wg_1786107539
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-312-pasijFAYP1-GQ_F9r9GQxw-1; Fri,
+ 07 Aug 2026 08:59:05 -0400
+X-MC-Unique: pasijFAYP1-GQ_F9r9GQxw-1
+X-Mimecast-MFC-AGG-ID: pasijFAYP1-GQ_F9r9GQxw_1786107543
 Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 936481954B1B;
-	Fri,  7 Aug 2026 12:58:58 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 598A019560B2;
+	Fri,  7 Aug 2026 12:59:03 +0000 (UTC)
 Received: from thuth-p1g4.redhat.corp (headnet05.pony-001.prod.iad2.dc.redhat.com [10.2.32.117])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A88BB3000239;
-	Fri,  7 Aug 2026 12:58:53 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4E93A30001A2;
+	Fri,  7 Aug 2026 12:58:59 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: Eric Biggers <ebiggers@kernel.org>,
-	Steve French <sfrench@samba.org>,
-	Namjae Jeon <linkinjeon@kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	Eric Dumazet <edumazet@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
 	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Steve French <smfrench@gmail.com>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org
-Subject: [PATCH v2 2/6] smb: clear the aes_cmac_key and aes_cmac_ctx when done
-Date: Fri,  7 Aug 2026 14:58:39 +0200
-Message-ID: <20260807125845.1477067-3-thuth@redhat.com>
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org
+Subject: [PATCH v2 3/6] net/tcp-ao: clear the aes_cmac_key when done
+Date: Fri,  7 Aug 2026 14:58:40 +0200
+Message-ID: <20260807125845.1477067-4-thuth@redhat.com>
 In-Reply-To: <20260807125845.1477067-1-thuth@redhat.com>
 References: <20260807125845.1477067-1-thuth@redhat.com>
 Precedence: bulk
@@ -75,47 +73,28 @@ X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
 From: Thomas Huth <thuth@redhat.com>
 
-Clear the local crypto-related structures via __cleanup() functions
-when we're done with them to avoid that sensitive data could leak on
+Clear the local aes_cmac_key structure via __cleanup() function
+when we're done with it to avoid that sensitive data could leak on
 the stack.
-
-Note: cmac_ctx in ksmbd_sign_smb3_pdu() gets cleared in aes_cmac_final()
-already, so this does not need a __cleanup() marker.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- fs/smb/client/smb2transport.c | 4 ++--
- fs/smb/server/auth.c          | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ net/ipv4/tcp_ao.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
-index 1143ee52470a7..d23566da2ac81 100644
---- a/fs/smb/client/smb2transport.c
-+++ b/fs/smb/client/smb2transport.c
-@@ -464,8 +464,8 @@ smb3_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
- 	unsigned char smb3_signature[SMB2_CMACAES_SIZE];
- 	struct kvec *iov = rqst->rq_iov;
- 	struct smb2_hdr *shdr = (struct smb2_hdr *)iov[0].iov_base;
--	struct aes_cmac_key cmac_key;
--	struct aes_cmac_ctx cmac_ctx;
-+	struct aes_cmac_key cmac_key __cleanup(aes_cmac_zeroize_key);
-+	struct aes_cmac_ctx cmac_ctx __cleanup(aes_cmac_zeroize_ctx);
- 	struct smb_rqst drqst;
- 	u8 key[SMB3_SIGN_KEY_SIZE];
+diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
+index e4ec60a334963..0626cbf60620c 100644
+--- a/net/ipv4/tcp_ao.c
++++ b/net/ipv4/tcp_ao.c
+@@ -141,7 +141,7 @@ void tcp_ao_calc_traffic_key(const struct tcp_ao_key *mkt, u8 *traffic_key,
+ 					traffic_key);
+ 		return;
+ 	case TCP_AO_ALGO_AES_128_CMAC: {
+-		struct aes_cmac_key k;
++		struct aes_cmac_key k __cleanup(aes_cmac_zeroize_key);
  
-diff --git a/fs/smb/server/auth.c b/fs/smb/server/auth.c
-index 4e7b6f0e6b8cd..e8d1c068a43e8 100644
---- a/fs/smb/server/auth.c
-+++ b/fs/smb/server/auth.c
-@@ -509,7 +509,7 @@ void ksmbd_sign_smb2_pdu(struct ksmbd_conn *conn, char *key, struct kvec *iov,
- void ksmbd_sign_smb3_pdu(struct ksmbd_conn *conn, char *key, struct kvec *iov,
- 			 int n_vec, char *sig)
- {
--	struct aes_cmac_key cmac_key;
-+	struct aes_cmac_key cmac_key __cleanup(aes_cmac_zeroize_key);
- 	struct aes_cmac_ctx cmac_ctx;
- 	int i;
- 
+ 		aes_cmac_preparekey(&k, mkt->key, AES_KEYSIZE_128);
+ 		aes_cmac(&k, input, input_len, traffic_key);
 -- 
 2.55.0
 
