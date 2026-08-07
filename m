@@ -1,73 +1,73 @@
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46478354AE3
-	for <linux-crypto@vger.kernel.org>; Fri,  7 Aug 2026 16:13:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72DB542882B
+	for <linux-crypto@vger.kernel.org>; Fri,  7 Aug 2026 16:22:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786119237; cv=none; b=BC1LSISiwdRyAp1eIGGwcJTe3nu74l/dZ8AxcDzP4wfEmT9HpiSpvbyqBh85uLayGch2t+YBAxjApFM2LSkDFuT0rAJJPOjzf4t3yWFR5Zz1AGHlf2KfLHlJEGlh4ZIFFSv+j5c8CuqoEz0eA2AnpFBobBbYxracbvHgYaLfGLo=
+	t=1786119726; cv=none; b=ojezsNHe11Uiw99pf3c1fYJYIl4IwfVcztEuHedrYW67515wUFMc+qcGIzkRBomhgVqtGpcO94gjNgCxnb8HuLlob2UGEoHDri5zThUK3xx707r3MuBVSxeJs+Pcq0xHt1hGL1TzkvyoRgrOivmwy0OsdOdfN2lFEuCiezgPrR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786119237; c=relaxed/simple;
-	bh=t0Xer58sL6heqEqGaYvs7twJ2gJF7MKb+PJJ2R/T5uY=;
+	s=arc-20240116; t=1786119726; c=relaxed/simple;
+	bh=teP7pgs23k88Y65Zu23zwXDC3A6Sy8Lk1+ga+1XpcD8=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=clbaNxNcWVx1ZHre3kKzmUfbnQb2dxkAeJVjuVEsipFrJBaLnB8KkWXoiXDw3IgYRj3cyJgpgnHi4+ly7xrgo/QRqktnuJRNhwtXRoBuBc+PuUC6Uyi5b9wIEPoYUvi5cSWoEmesCDANh2AXzHUh08RI+hRjrI5Bvpur4HrX6IY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com; spf=pass smtp.mailfrom=googlemail.com; dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b=elixrAJh; arc=none smtp.client-ip=209.85.218.46
+	 Content-Disposition; b=qn1zTvcuHUSS5+tWe14gfvxQR63bAisTqF/0uzPsIijiBarJX9TFMbAUCONBDG3JVSWcd2izLeE/wfn76LuDf23hp3UWXXpbzP8Zl14xlbf2n+C3wJKaj1NNlCzJrl7rR4Svt/+ORl2zlHGQGL+X17h7YPfXxgKcFrbvlzu8QII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com; spf=pass smtp.mailfrom=googlemail.com; dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b=COC138kt; arc=none smtp.client-ip=209.85.218.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=googlemail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="elixrAJh"
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-c1f5208b38dso619793266b.0
-        for <linux-crypto@vger.kernel.org>; Fri, 07 Aug 2026 09:13:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="COC138kt"
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-c15cb6f5c12so583049466b.0
+        for <linux-crypto@vger.kernel.org>; Fri, 07 Aug 2026 09:22:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20251104; t=1786119234; x=1786724034; darn=vger.kernel.org;
+        d=googlemail.com; s=20251104; t=1786119723; x=1786724523; darn=vger.kernel.org;
         h=content-disposition:content-type:mime-version:message-id:subject:cc
          :to:from:date:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=TPEYjqEYnl2DLLI5hMOioqJc22NNsDcohHqI88LFN80=;
-        b=elixrAJhfFZBjQvB9BFwAYxZRZLB5oiQ+MqQzInJI6kiyT7wDYFHhIyizK5QqY7f/P
-         pb44atvf2CfeEskoPbAUig+czm/hrpMrUBPkGOn7X3qSg4CnlgFNj4Ktes3bSko/JSm1
-         OjclMrDyd5SEcTAflBQesBn6ESo2yYKn/oN/zn8yQB7DRuWP2tbsF78svY9eVuAukGdd
-         +to5d0CmwyPJQiPujbFltSSjdv6l26vZVyqAOycB/mrnRUxbpTipjnX2IegfVYR4m3vy
-         WRudRkIDTVevsSolMnc1JP/ra2zZV/eaTkhHt5LZQNvUEPDf2W3YI5m2G8LoQi4D+tgu
-         ePfg==
+        bh=h9HqpnV7RraA5YCdmhwSzTXcN/Huyip9SBv7EhjfAnU=;
+        b=COC138ktjupUXTLEOsT0fcB4UNdXkcJRAbOeGemwNNm4kWPIKHMXaVWs2zdeznTDZ0
+         Cv2WyPlbmtB8QV0+TAlCLFueR4oo/0AnaRhiYlkgPPgeRAurOjn8bdkji8B81jtusFbC
+         8R/yumYEXGjupDxg9IRkZ3I5dLqDQjghIOGjA0G9d6gbLD9QPx4mz+8SHpbTKOJLmq8a
+         y/9TUHNZnEdEs4K9M/PYZcuAsdxVSj7h3IqUqCEkYEILmG0+/Pe6JDBc/j0o4Tno9lHb
+         tBDH2b3FmqWvCf9BKyaGCP3Lng4rDTlgO0YdVv88YG1p9gpkilJDu0cV+qs2mc3LL4uM
+         v0AQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786119234; x=1786724034;
+        d=1e100.net; s=20251104; t=1786119723; x=1786724523;
         h=content-disposition:content-type:mime-version:message-id:subject:cc
          :to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=TPEYjqEYnl2DLLI5hMOioqJc22NNsDcohHqI88LFN80=;
-        b=pkZlwlcZBVXPpPHlbHRCfZimzSPDEnqIljbUzApu6J7EP3TvQYMfEcfxSVhB97nB8t
-         x8hhlVZ/V7HtteBDYXupBYdnFzD/nV8zMb0VPjYQ5KXMe4LH1Z7o7k1hZNnq2mc4uwzO
-         Bp3yyRLn0/2EQ3zhZOkSeAASOHBqqH1DlCyFRtLwcZ8MhGs2tUcdhPCyKkXqgmS1K6F4
-         rRJ3hXIzoel7HnsouB+0jzeY7CnybJK1zkkKFjOW6nRSg/+ZRzmzXDOrWWA6LQXketUV
-         vTX3R/UMCaCGAH8GPAI/edJ3+0lka9qTnd9bygRcud9O6sRUN3Jd64uwbVWJMOPzcz/q
-         vG1A==
-X-Forwarded-Encrypted: i=1; AHgh+RrsE5VeWISVdlF0c6Gx5WclDsyqA9e4g81hodiF7uvaatIiIxaxsPCVmtabREekdxAQdgcPBN8z/4/jYPk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwslkCao87BZLox3IzE0fpR5VusCazvwhDJt4oZAHx6eCKxJtMH
-	IjVeEpx0H98uqdTCY4Sk/IGQj9eKkOYV61Evp7ntxCaHPDhmShHTGmUA
-X-Gm-Gg: AR+sD13nsErqD/Jdk2aALcB4RKF8LvuCKO12aLPfhJazo1VKnzql+j8Lrt9Gqd036I8
-	cbsJt3vQQZkgwdpJ2tgZsy10yZhjFRIcANbzWS0LPhIwsUgnZPs9Nh6cyoH/9o4LsKTE16kmszP
-	G2JJpEu1rFzZAPqXFpHZ7xNdsWRJlmUdyVkxwie6HOPxTM32ZMHIk/lbrI1eFNYAjXoYubSCJj8
-	Tal7UBhiW8t70gg5xD5ARQWlM1nsFPEEegbTiyHHYSDa9Gh90qwgdsJUkhwCGmLOAxhgsM4Fx8I
-	6ZagGU8TMavQRW+MDtVeHIrFpDrQxsTcBGHlRS6HaOG3B53w7HQ3hYTcxFttAT7qsXP05tf3PHu
-	hKv0Q+Nb050pPSyRDrMQOXMifGSl5HjQJt74oIEWsuPHI7U2XcWNkxpA6zb/HYKdJwNzpsQ/tid
-	pnA3yGYAgvUbqr7YOOkJbp0gqXFLpGkotxNj+kGjZcQreysburI7cmvl3IVLxACGLqPTrks7OWa
-	A1MwpV9p9Lz+YFtWqM=
-X-Received: by 2002:a17:907:1ca7:b0:c1c:4adc:31a9 with SMTP id a640c23a62f3a-c2039e3fe56mr1214112566b.28.1786119234238;
-        Fri, 07 Aug 2026 09:13:54 -0700 (PDT)
+        bh=h9HqpnV7RraA5YCdmhwSzTXcN/Huyip9SBv7EhjfAnU=;
+        b=kzXIKI57j3QUkkqWiqL8Njppx3QMfR2aoZ6XyW9wJc1Ufu+0G3hozS+Tzapb73N/ua
+         2HDGMT+8VawnlKwyk51Sh6ooQ6cAYhTH4PkX5Bou8XrArc8AZJes1H4Gy4YdWfV43cmR
+         Cv6xKpUM10jCE3H8Jt7l5HdpIZt7B8qhkmdf+hL6kt/iLr6CgC5WSj7plCtKgu6v81xu
+         As9RA5GAGN7FKTVCKYaq8AYNebh07Fj8jCUvi7Qo7cWG490BYSAbCG8pkMJlzCpR1hSH
+         N01/Qp4jjomS6tvRzNu8i5UH3HRrzfmjPKvUoEBmCBJUxvcgEpqoyzl6qXiTRJMHrlfZ
+         Qd4w==
+X-Forwarded-Encrypted: i=1; AHgh+Rq9Cu6/nYQT59J1YMm+7Rb4U4wafUGOwO7JofKOWSLBF5trHN7aCgoAwLmJK7SnDWTlgyeXSuLFxG9M8Pk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzwm77h8UpJ0IFkRqU9QQ+c27juN+NBoKst1IdXt1XS/xfbVeZI
+	m6SRf78b1oTAqPAmHUevoI9FNGQnuk5CqZVgcO7SX6dMTNehKiKTnJ+R
+X-Gm-Gg: AR+sD11iZ/ZPw9WVFOltt+rQ/XbrSYqExfaCAXcdN3U2HxPxykCstliFMVHjGTm0O5L
+	CoYrxCx64mn6JPo232dVvXEnQM03MbRHETfdT0hCsoEsd+ZazLzr5GKs6BEfmspbTaiyh9SJZln
+	/f4k2Mw/buJIzf/PbrAR/Zam3ny25xRgBhoyCi7RPRJJdVACXzr4lqV59WZVEdqLGL746Roe1J8
+	ARqh0b1NPWXRfWVOVmSyPONo8q3JQNBWSoYUduQ4YI0zOTt/JXAD69EZllxXDldvXrRAt+MesDg
+	gB048PWw/7FkutuszrCuhF7LbdpZ/nOBy8vhbF7QhbWCg2TYxVEYTiJ9x3C/5+TYeWCev0Gbq9x
+	/4wuVjE5fU7316g1tP6ivzQcf4rtZVYkUSv77uXTJYn2vlvrTVF2Jsf27G3TKLdAt5awagKarYV
+	rD/9FL8kOg8o7WP6fHOOOx9mWSq0FHQCwcKGEIrLFmxrZ7orGqMh4PWVkV64DNjmIVg2DH9YHNZ
+	Vf6YjuZWMGug5xdelo=
+X-Received: by 2002:a17:907:1b16:b0:c16:72ba:d352 with SMTP id a640c23a62f3a-c208761d3f6mr93206066b.31.1786119722466;
+        Fri, 07 Aug 2026 09:22:02 -0700 (PDT)
 Received: from david.gall (k10193.upc-k.chello.nl. [62.108.10.193])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c2080cf749fsm72440166b.58.2026.08.07.09.13.53
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c2080cc3bdfsm69127066b.48.2026.08.07.09.22.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Aug 2026 09:13:53 -0700 (PDT)
-Date: Fri, 7 Aug 2026 18:13:52 +0200
+        Fri, 07 Aug 2026 09:22:02 -0700 (PDT)
+Date: Fri, 7 Aug 2026 18:22:00 +0200
 From: "David C.C.M. Gall" <david.ccm.gall@googlemail.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc: gregkh@linuxfoundation.org
-Subject: [PATCH 1/2] crypto: keembay - use crypto_memneq() to compare GCM
+Subject: [PATCH 2/2] crypto: keembay - use crypto_memneq() to compare CCM
  AEAD tags
-Message-ID: <anYEQOzunX0Lm3N1@david.gall>
+Message-ID: <anYGKPaCNBgACGqK@david.gall>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -79,38 +79,38 @@ Content-Disposition: inline
 
 Use crypto_memneq() for constant-time comparison.
 
-The GCM path in keembay-ocs-aes-core.c verifes the received
-authentication tag with memcmp(), which returns early on the first
-mismatched byte. This leaks valid-prefix length and allows for valid
-tag forgery which violates the INT-CTXT guarantee of AEAD.
+The CCM path in ocs-aes.c verifes the received authentication tag with
+memcmp(), which returns early on the first mismatched byte. This leaks
+valid-prefix length and allows for valid tag forgery which violates the
+INT-CTXT guarantee of AEAD.
 
 Assisted-by: gregkh_clanker_t1000
 Signed-off-by: David C.C.M. Gall <david.ccm.gall@googlemail.com>
 ---
- drivers/crypto/intel/keembay/keembay-ocs-aes-core.c | 3 ++-
+ drivers/crypto/intel/keembay/ocs-aes.c | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/intel/keembay/keembay-ocs-aes-core.c b/drivers/crypto/intel/keembay/keembay-ocs-aes-core.c
-index 8a8f6c81e010..f8f4517ccad0 100644
---- a/drivers/crypto/intel/keembay/keembay-ocs-aes-core.c
-+++ b/drivers/crypto/intel/keembay/keembay-ocs-aes-core.c
-@@ -11,6 +11,7 @@
- #include <crypto/internal/aead.h>
- #include <crypto/internal/skcipher.h>
- #include <crypto/scatterwalk.h>
-+#include <crypto/utils.h>
- #include <linux/clk.h>
- #include <linux/completion.h>
- #include <linux/dma-mapping.h>
-@@ -919,7 +920,7 @@ static int kmb_ocs_aead_run(struct aead_request *req)
+diff --git a/drivers/crypto/intel/keembay/ocs-aes.c b/drivers/crypto/intel/keembay/ocs-aes.c
+index bb6f33f6b4d3..13ba7573617f 100644
+--- a/drivers/crypto/intel/keembay/ocs-aes.c
++++ b/drivers/crypto/intel/keembay/ocs-aes.c
+@@ -17,6 +17,7 @@
  
- 	/* For GCM decrypt, we have to compare in_tag with out_tag. */
- 	if (rctx->instruction == OCS_DECRYPT) {
--		rc = memcmp(rctx->in_tag, rctx->out_tag, tag_size) ?
-+		rc = crypto_memneq(rctx->in_tag, rctx->out_tag, tag_size) ?
- 		     -EBADMSG : 0;
- 		goto exit;
+ #include <crypto/aes.h>
+ #include <crypto/gcm.h>
++#include <crypto/utils.h>
+ 
+ #include "ocs-aes.h"
+ 
+@@ -1283,7 +1284,7 @@ static inline int ccm_compare_tag_to_yr(struct ocs_aes_dev *aes_dev,
+ 				 (i * sizeof(u32)));
  	}
+ 
+-	return memcmp(tag, yr, tag_size_bytes) ? -EBADMSG : 0;
++	return crypto_memneq(tag, yr, tag_size_bytes) ? -EBADMSG : 0;
+ }
+ 
+ /**
 -- 
 2.43.0
 
