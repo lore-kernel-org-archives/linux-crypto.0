@@ -1,118 +1,108 @@
-Received: from fhigh-a5-smtp.messagingengine.com (fhigh-a5-smtp.messagingengine.com [103.168.172.156])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5531637DE99;
-	Fri,  7 Aug 2026 12:27:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05749471436
+	for <linux-crypto@vger.kernel.org>; Fri,  7 Aug 2026 12:58:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786105642; cv=none; b=k2YyWUK8IR0226Yr/hhu7rbPcEI1HYOXnfC/b+OMyEUmU3dt35pDRvk8QLc7hyfVRxzDngUVuovOIYLC6VblZZi+KEP/5Q4+UAr3sosLc9lQ8+fmLDgIYc4FtmcTM4zaDEQ/O9T1fQCaMe8GufUqr3yknNadrv5rDp7I1x5Dmww=
+	t=1786107545; cv=none; b=mgikHZqjcr44y3LepmDMTZhik9AJHsMhc7Fg+994zWNMW10qfQvy1SwewaRA8a0xMsUUbSGVj6hfqCC2y37xeX3yEiGm8gunOlu720FEkTQUEO55QcoYlmlM2Lbux5Bhjn2SeCaOQ+osW/kNAKE9QsxrI42dN6h8CPYtJSFgf84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786105642; c=relaxed/simple;
-	bh=WIxC+vKmjg76C+aQcMKORHky3ujecAQvgIOy1IMPz4s=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=X2J2ZwtKL6nlbFxYSNhftiVKfEa7b915R+KrAMy7uGgnySSg5pKlE5Fd1xZslLJLBvcEhEgRQOr50irYMDwhuWIqpGyWhCE/sVuOktz8sO0QpkxMazKp+2a/g1Tbs88g9tAyy+wZKVY+N7eSC4beMcrDAWsnSb1AOdSFv7YYUi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=S7itvOPy; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=INtMIaV3; arc=none smtp.client-ip=103.168.172.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1786107545; c=relaxed/simple;
+	bh=ic15TBQA87sZ6aCnKPTY/mG0uoAX/3RGeuPprGL2JCQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jKGTCnDpFbAKqV1HZDCBtHiULBT+KKx83mRQtQVGti/DCB1jkq4t3lTrp+xpG/6U5SnuGPw32hZpsbSF1ZltaKWYfP/FGvV+e10bIRrg+4DlOd+XjfQkpTNFcHXf9hCe29tjUnWJBIdJccWTDI++h7+iLoCakE7WXoBosS2bcuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SgE5oOJF; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="S7itvOPy";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="INtMIaV3"
-Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id AED2614000BD;
-	Fri,  7 Aug 2026 08:27:03 -0400 (EDT)
-Received: from ams-imap-03 ([10.64.2.23])
-  by ams-compute-02.internal (MEProxy); Fri, 07 Aug 2026 08:27:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1786105622;
-	 x=1786192022; bh=uhAGSaYFzl9r/Gnf/PXrh2wfAeFzZ54cEK24IBjNT2c=; b=
-	S7itvOPyFIvGmazaOG6snqDU+7RUee6mCaapufL6wDWryvtf/FrBpM0hdFQjF2qQ
-	7jOHjiG/k2NW/rwG9Psukp9DhbDS64v642uBxnd7X4BZqBC2kgYO9NPcFisnjWQm
-	rlgQoMjGjm42CyLcgHIDyT6sMG0z4j96zFzrMj4lMZs9b/TI9/YGd0MAR/cyv4Ro
-	o2WQ99565xKXI+v7u6Tew2svWNXJYqO7nGOE4Xz8X51Q4lraLfeIlYOKsim9lLLr
-	iygQdZ9kl66YIy7pPPnCEdv4GGlIRLQEEucD0J+zPB3TMIypWZieV7Y/TShdkVmz
-	6V80/I47rR5jleNDc3syMw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1786105622; x=
-	1786192022; bh=uhAGSaYFzl9r/Gnf/PXrh2wfAeFzZ54cEK24IBjNT2c=; b=I
-	NtMIaV3v60CwfCwbqx5JKjW20WF89d3IncWztGHKDcFmhXgz943ML8ceIyeb6+DF
-	tNUyt/Lpon7DRT5X6p+bJAcCkqIzt0f/HELM+MGglMIjw3vYl/2qWJeRC/8lTJVF
-	6yyN2BV38z4qTkPBzoYzqrwcuU8ynHKFknBfYRq6FRv1YU7TvMhJcszTvP2NDCMn
-	BnWjyaWvX61DZur1hBE6SlALFc9jTK5Pw5SgyHsFs8Fusl9uvHoF9y/CQjMRR7FJ
-	ToJrVuZtwHTJ4msc3KCsdYCQWveO3aH5ZUwlpzjUF4Pkz/9ZLvn05d0DBc+6NKSD
-	YUporlz0HTuQP77C0tQHw==
-X-ME-Sender: <xms:Dc91as1-cbd-2reN2yk59eCxu_RMCuvBEkVsjqjEltZavbekihUAwA>
-    <xme:Dc91ah7_yZk8eVmMNT42VKe9veRDTceUWOdikg3s6awBIsZqpYoQdwhUpetVJVg-j
-    Up6Cqsvl_Lk_WRo5tWExDE6Wy03955LvrcAsuMRMK7maD1c9TS4D20>
-X-ME-Proxy-Cause: dmFkZTGhGRORpDZ+OoWKb2tCiz2+79gJ4hQAdOsSkwXvfq2eg39t6mgGGGFqIk0XyzvUPT
-    ytaigb/isA+XLiIspmRjlKglQ/mcENWXHRuf4bnwNa4JaTZQQSE//bAesZEcGmM+3Bdkoy
-    C45nJnTbBTee7sNFJdwtd8aH4AkK5wQ/dGsKjqHXHsFnRwvorExjzNjU/7yGIj9oVRL54i
-    XxwU+BQZUx64GSA7p71+hO02pGCcih57FMktMxvYm/4zO6Lfv+sHgNxEw4qQmFsa0cYFUn
-    ZpBZW/27ZP1Tw0mBxGrYcuCOjD/WESKCdS4y1ONnyoqikUxQycz9mwOZmRVdFoOB3RI6e8
-    WPmwnDITPmBygaoyAs0YuwinKgHQJSE3t37kcbV8OB3uTguYICCiRzuxR/fHGQL+jfggfz
-    5JJqD4uIAf2WHyRbIpyQC6P1iDk2gm87F4JdRdAzRWQx21bJIWlnucdMJzn/q81gewe2L2
-    qgafy8K7fEm6S+5SjIa7rAM4BNBdEttyPBOzmn6E+NDp6RjEcnn5LkbGG4j4EoGnWmIX8N
-    8QGajDu67JDftWWXs4yf5yhtCmy6+SatK5LnY2TaH6gpPuwp03NiaBEIhoLhEvAGjZ33md
-    uzSFZLYmkKLX0kH8iSS0dvAuW04qaAM0yF1rGxUmSRydB1DzXYY0Tu31D+jA
-X-ME-Proxy: <xmx:EM91auvru_YTtzn-X7ypRBtovRsyleX9rWO3edqJuTAsmfxoF4Hw-Q>
-    <xmx:EM91auJtQk06CykE2S-l1DttvCNNDN7BPeWA0sfw6ihwENh72xzKng>
-    <xmx:EM91agaIGekyB6dp1fM2RQ4HWkpjtgeHz8UTLs7641_t8w27wwj5rQ>
-    <xmx:EM91akLqxGYg2vbUAbRLZrAp86261NgEpPWt3uA61y2jdhcfKdhWSQ>
-    <xmx:Fs91api7BVM2zRQYSVTbqnW1nXpPNEAJQR6u11fss_1m4jE1MZoIZVO2>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.ams.internal (Postfix, from userid 501)
-	id 39FA332A0066; Fri,  7 Aug 2026 08:26:53 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SgE5oOJF"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1786107534;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=q87bLIat8PUuHfoyR9lXtePJB5sfUijAF/hC2U03Goo=;
+	b=SgE5oOJFT/OHGF9eb+nPe1FS8d/LGgtkIcIb1w30vXD9ktVQBn6LDIW1CCNJq+QDWXM07S
+	F7QnaOhPAV5wsa6CgSrahwNtKHBNClv60B4Fq9PXa7u+TsOJs8C89DD1+c6+fdqR+er0Ho
+	TaGdhzAOZi5zu4rss0U/QLgsFBKeC3I=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-674-oe_4pOwHPoKTeK2Z1nPJEQ-1; Fri,
+ 07 Aug 2026 08:58:51 -0400
+X-MC-Unique: oe_4pOwHPoKTeK2Z1nPJEQ-1
+X-Mimecast-MFC-AGG-ID: oe_4pOwHPoKTeK2Z1nPJEQ_1786107530
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C409C19560AB;
+	Fri,  7 Aug 2026 12:58:49 +0000 (UTC)
+Received: from thuth-p1g4.redhat.corp (headnet05.pony-001.prod.iad2.dc.redhat.com [10.2.32.117])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 04A0530001A2;
+	Fri,  7 Aug 2026 12:58:46 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Steve French <smfrench@gmail.com>,
+	Namjae Jeon <linkinjeon@kernel.org>
+Subject: [PATCH v2 0/6] crypto: Add __cleanup functions for zeroizing aes_cmac_key & aes_cmac_ctx
+Date: Fri,  7 Aug 2026 14:58:37 +0200
+Message-ID: <20260807125845.1477067-1-thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: ALxQobv4MiGF
-Date: Fri, 07 Aug 2026 14:26:12 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: pzalewski@thegoodpenguin.co.uk, "Clemens Ladisch" <clemens@ladisch.de>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- "Mattia Dongili" <malattia@linux.it>, "Weili Qian" <qianweili@huawei.com>,
- "Olivia Mackall" <olivia@selenic.com>,
- "Herbert Xu" <herbert@gondor.apana.org.au>,
- "Corey Minyard" <corey@minyard.net>, "Peter Huewe" <peterhuewe@gmx.de>,
- "Jarkko Sakkinen" <jarkko@kernel.org>, "Jason Gunthorpe" <jgg@ziepe.ca>
-Cc: linux-kernel@vger.kernel.org, platform-driver-x86@vger.kernel.org,
- linux-crypto@vger.kernel.org, openipmi-developer@lists.sourceforge.net,
- linux-integrity@vger.kernel.org
-Message-Id: <60e25773-b3c6-4aae-a687-92e1ab3b141e@app.fastmail.com>
-In-Reply-To: <20260807-acpi-char-v1-1-742c450254dd@thegoodpenguin.co.uk>
-References: <20260807-acpi-char-v1-0-742c450254dd@thegoodpenguin.co.uk>
- <20260807-acpi-char-v1-1-742c450254dd@thegoodpenguin.co.uk>
-Subject: Re: [PATCH 1/4] char: use named initializers for acpi_device_id
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Fri, Aug 7, 2026, at 13:26, Pawel Zalewski via B4 Relay wrote:
-> From: "Pawel Zalewski (The Capable Hub)" <pzalewski@thegoodpenguin.co.uk>
->
-> Use a named initializer for the acpi_device_id fields which
-> makes the code more readable and consistent with how lists
-> are initialized in the rest of the kernel code base. Also
-> drop explicitly setting fields to 0 where it is redundant.
->
-> While we are at it - unify the list terminator to have
-> a single space between the brackets and no trailing
-> comma.
->
-> Signed-off-by: Pawel Zalewski (The Capable Hub) <pzalewski@thegoodpenguin.co.uk>
+Code that uses AES-CMAC might need to zeroize their local aes_cmac_key
+and/or aes_cmac_ctx structures after use to avoid leaking sensitive
+material on the stack.
 
-I don't think this is the right approach: I see around 1500 instances
-of acpi_device_id data with plain initializers and only about 50
-with named ones.  Converting all of them seems like a lot of
-extra work, and I'm fairly sure you can just change the 
-driver_data to an anonymous union without this.
+The first patch introduces an aes_cmac_zeroize_key() and an
+aes_cmac_zeroize_ctx() helper function that can be used with __cleanup()
+to automatically clear the key and context when they go out of scope.
 
-    Arnd
+Patches 2 - 4 add the __cleanup markers to spots in the code that
+missed to clean up the structures so far.
+
+The final two patches are just cosmetics and change some memzero_explicit()
+calls to use the __cleanup() way instead.
+
+Note: There are more spots in the smb, tcp-ao and bluetooth code that
+need some zeroization of sensitive data on the stack. I will tackle
+those in later patches, this series here focuses on the new __cleanup
+wrappers.
+
+v2:
+- Update comments and positions of the functions in the 1st patch
+- Also clear tmp[] in the bluetooth patch (the patch is pointless otherwise)
+
+Thomas Huth (6):
+  crypto: Provide wrapper functions for zeroizing aes_cmac_key and
+    aes_cmac_ctx
+  smb: clear the aes_cmac_key and aes_cmac_ctx when done
+  net/tcp-ao: clear the aes_cmac_key when done
+  Bluetooth: SMP: clear the aes_cmac_key when done
+  lib/crypto: aes: Use _cleanup() for aes_cmac_key instead of
+    memzero_explicit()
+  mac80211: fils_aead: Use _cleanup for aes_cmac_key instead of
+    memzero_explicit
+
+ fs/smb/client/smb2transport.c |  4 ++--
+ fs/smb/server/auth.c          |  2 +-
+ include/crypto/aes-cbc-macs.h | 34 ++++++++++++++++++++++++++++++++++
+ lib/crypto/aes.c              |  3 +--
+ net/bluetooth/smp.c           |  3 ++-
+ net/ipv4/tcp_ao.c             |  2 +-
+ net/mac80211/fils_aead.c      |  3 +--
+ 7 files changed, 42 insertions(+), 9 deletions(-)
+
+-- 
+2.55.0
+
