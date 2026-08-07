@@ -1,70 +1,58 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AACA3F23A4;
-	Fri,  7 Aug 2026 22:04:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40EE9376A1B;
+	Fri,  7 Aug 2026 22:22:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786140276; cv=none; b=p/IV7oecd/V2451XiBG+ON3DlCDeTOpvrYHfbRFQEPlm6KsVIG4IrX6LBwVrWsKq2RtrYOEbD54uloZbgXtQDS318FcvjMOy6sHjtHTvvrwztA5kY5bVtK0EftjuYsSCw8E0YDJVZRwJQwQOmbumzfc4UJTqpIbOGjZ3iDmRrak=
+	t=1786141354; cv=none; b=lGUN7qBOWtZK4vcRHscELkEPQHqoM98XAa6X8oMFkbYa27BmdygSE2+hO1kR04KCcLR+9no89ybkYg9PJD5Omsvl8SMxR6yvFaKsAnZm+i7+qGgq/nhxr9mCB0uzbNWqULjle4xZ8+hQu7KzzZshzUj8qnoGFk5fI8GRgAkd18U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786140276; c=relaxed/simple;
-	bh=OJIgscExKrGGFJ3hQvHyxf+CnysAv4x4Y3pGMGyG3Qs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r8dcD2Lu1PyaMss1edKSD74Y4puLaV15CGLW/X/skC+LriNRIqGMQNC8GSuc+lnADqAQUGa6v2DbhOPa5keDAJWzUdg0ea4qSdrRZUawInoCKP/+hjUFs/YV1YqmZcr8sQmuQWqtKsFlemSAv1i2IsBHRdBgC5jtIP7fTe7ImYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kX7Mg1F9; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786141354; c=relaxed/simple;
+	bh=tZBzml8Fw5L4Xn/55Noe+tck+4gGckfNXQ52G76MiVw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=F4/9kwYfd0JxvIunO1kPEvquX/Tb9+auPoxB0JAkjo9leOaQI3vzUs4J4X+DyeZ6tTooLoa93izgLoUMLdfWYwELMGkUCTaEeRF0ZufWVH6Qxf2f31XcX0HynlJVx+oVj8rkceqA/x1xYydsLVcNSAf7nFSBR3bM/7WWufsn+y4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VT0pPqu6; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kX7Mg1F9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8760F1F000E9;
-	Fri,  7 Aug 2026 22:04:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VT0pPqu6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78E531F000E9;
+	Fri,  7 Aug 2026 22:22:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786140274;
-	bh=E9GWry2DVfG52DXSwq2e+fI08HN4QyjkwoIlaLk0NQY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=kX7Mg1F9GE3NWXjrY9Phm7IK1RBRA8jNawgQEhYtjMwlxp2gZt4nX90PJEGcRuKED
-	 9Z0VfuGtarSRvGR0m9xO43e3ctJNsfCiNaxC4wtd/C7h1AizMPi3I6OOnbAXlrFoLf
-	 wp7FYOrEBjQw/O0tGWJMyKTnqUmMv5dPtsUrQJA8f+BqElXWFqu/3SX5/vEItmyhsg
-	 3/all5Y3IWX/VE9k2+/YEehRHP+RypOjk3hFEPHQhghWfWB7QzV4hlGjLGyfeGI32X
-	 /Z6uAF0yNvX2oFVKScaXLSH4XFDJGDBsFyACGt42h3EAag1mvgf2WxJZG3abguDCMf
-	 B0W9MkXzbYTAA==
-Date: Fri, 7 Aug 2026 15:04:33 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	kunit-dev@googlegroups.com,
-	Brendan Higgins <brendan.higgins@linux.dev>,
-	David Gow <david@davidgow.net>, Rae Moar <raemoar63@gmail.com>
-Subject: Re: [PATCH] kunit: irq: Unregister on-stack timer and work from
- debugobjects
-Message-ID: <20260807220433.GA2520@quark>
-References: <20260806053804.106724-1-ebiggers@kernel.org>
+	s=k20260515; t=1786141352;
+	bh=RQ7rhgB228BSgQ2eMeueLs7EwanBtWfovMtCVsvv++o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=VT0pPqu6SdZ6kIMCMoAIAFlwsB4VFGcoYIeH9oczqRldg1Fmfr1aZ1MIzfFqfSzWm
+	 I/Rm3C8uJnBjNDCLZegErzch1hPx2HSbETd2UNeUda5d/NVH4Vd4+AF8v3YI7MWddp
+	 q3S0ljHuF10Cxx8BWZcgKT/Nv4v614lqnlUMt8Pa2M1bQGZS11/kluBouWfFYkwLny
+	 /q7WGIkJmbtoxlKjluxX9OY3pySUcw+BtM5w7pIUokmdNYGL38fE+QGiP2AirGT2eE
+	 f83FDbGtQ4iG4M0tpm3NoYSvLd6YWJaZaUR6Tirwo0cbQRoGvrDhFCfcqOy1z5eCrg
+	 hgSqK662sl+IQ==
+Date: Fri, 7 Aug 2026 15:22:31 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Eric Biggers <ebiggers@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Neal Cardwell <ncardwell@google.com>, "David S. Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Steve French <smfrench@gmail.com>, Namjae
+ Jeon <linkinjeon@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, Simon
+ Horman <horms@kernel.org>, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 3/6] net/tcp-ao: clear the aes_cmac_key when done
+Message-ID: <20260807152231.15b33daf@kernel.org>
+In-Reply-To: <20260807125845.1477067-4-thuth@redhat.com>
+References: <20260807125845.1477067-1-thuth@redhat.com>
+	<20260807125845.1477067-4-thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260806053804.106724-1-ebiggers@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Aug 05, 2026 at 10:38:04PM -0700, Eric Biggers wrote:
-> In kunit_run_irq_test(), call destroy_hrtimer_on_stack() and
-> destroy_work_on_stack() to unregister the hrtimer and work from the
-> debugobjects infrastructure (when CONFIG_DEBUG_OBJECTS_TIMERS=y and
-> CONFIG_DEBUG_OBJECTS_WORK=y) before the function returns.
-> 
-> Found via code review; the lack of the unregistrations didn't actually
-> cause a warning, since the objects are inactive upon return anyway.  But
-> they should be there, otherwise debugobjects keeps tracking the objects.
-> 
-> Fixes: 950a81224e8b ("lib/crypto: tests: Add hash-test-template.h and gen-hash-testvecs.py")
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-> ---
-> 
-> This patch is targeting libcrypto-next
+On Fri,  7 Aug 2026 14:58:40 +0200 Thomas Huth wrote:
+> -		struct aes_cmac_key k;
+> +		struct aes_cmac_key k __cleanup(aes_cmac_zeroize_key);
 
-Applied to https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
-
-- Eric
+Nak, we don't like the auto-cleanup stuff in networking.
+If y'all need a garbage collector there're jobs programming in Java.
