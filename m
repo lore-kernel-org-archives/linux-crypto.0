@@ -1,169 +1,118 @@
-Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a5-smtp.messagingengine.com (fhigh-a5-smtp.messagingengine.com [103.168.172.156])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D1223C277C
-	for <linux-crypto@vger.kernel.org>; Fri,  7 Aug 2026 11:40:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5531637DE99;
+	Fri,  7 Aug 2026 12:27:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786102831; cv=none; b=D0MHd6voBTufd5lasN6sbxzrQlW20+/uxXpXRLLziItbRtED4kbl3euw2e8CYOKaaUl+Stn26LuOPchZ8wg7k53c2FUxxkFs7qjsGTpk9QJRJ23zpSwkmkqWCPLMbqsujDvibEBqKHQdPc4qBk1p5K1/OY/bn/Se4RnFZ6LO29Y=
+	t=1786105642; cv=none; b=k2YyWUK8IR0226Yr/hhu7rbPcEI1HYOXnfC/b+OMyEUmU3dt35pDRvk8QLc7hyfVRxzDngUVuovOIYLC6VblZZi+KEP/5Q4+UAr3sosLc9lQ8+fmLDgIYc4FtmcTM4zaDEQ/O9T1fQCaMe8GufUqr3yknNadrv5rDp7I1x5Dmww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786102831; c=relaxed/simple;
-	bh=N9knYDZBFNPryH7Rgx/98qENXC5GJq8BV/99VAlyTBo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CFeyiJm5FEe58KrC19pkEAKGP+GDPK22XRNP4awtXws2GW0v2PRT4VB+ehtsrkchJue1JINK0BLw58KkHcCvObrNFPvjHtT1IWTrPM7tjOnCgCRlzk+nyBK7rpKbkdtQIY6EnpTvsmi/7sxK7SE4wumO8U2+EMYc3+XeygFOj3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=minyard.net; spf=pass smtp.mailfrom=minyard.net; dkim=pass (2048-bit key) header.d=minyard.net header.i=@minyard.net header.b=ho+AG7QT; arc=none smtp.client-ip=209.85.167.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=minyard.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=minyard.net
+	s=arc-20240116; t=1786105642; c=relaxed/simple;
+	bh=WIxC+vKmjg76C+aQcMKORHky3ujecAQvgIOy1IMPz4s=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=X2J2ZwtKL6nlbFxYSNhftiVKfEa7b915R+KrAMy7uGgnySSg5pKlE5Fd1xZslLJLBvcEhEgRQOr50irYMDwhuWIqpGyWhCE/sVuOktz8sO0QpkxMazKp+2a/g1Tbs88g9tAyy+wZKVY+N7eSC4beMcrDAWsnSb1AOdSFv7YYUi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=S7itvOPy; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=INtMIaV3; arc=none smtp.client-ip=103.168.172.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=minyard.net header.i=@minyard.net header.b="ho+AG7QT"
-Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-49fa951b2c6so1920976b6e.1
-        for <linux-crypto@vger.kernel.org>; Fri, 07 Aug 2026 04:40:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=minyard.net; s=google; t=1786102825; x=1786707625; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:reply-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=EMmFXrjSrpeG4wnNrWhFFN4HfKJ+fxYW0scJBNmq2ko=;
-        b=ho+AG7QTq0tBcJO5iMiHZPcbuvMjiKbaKScbh/9yZZWegr6dvgITG69snkYO2dIFoQ
-         /d4iNi7CkQphEXYa3chPWwg4PyrIyGHpjqwXAdNxKU3GS5IJuxMtF6NpwDtfcgGazUst
-         XyXT9hXsZfusPVoCMHdZy4j1bKU93GQ9zG6q+q0+gGw/PXJGWDzztmwIcgMSheCuKCwi
-         nt0Ox8JXCQk6hpZ2i54sJylhFJZCGEJDI9T7OpmMYR7R96J+ec74H1CewTXECCyE0b4V
-         EsF6bUkUw2rLEs1Lkc54X1h41RSYJBZyYFkA6p6w++g6IMHcnV41mojOOnslIQ1sTEf3
-         /NFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786102825; x=1786707625;
-        h=in-reply-to:content-disposition:content-type:mime-version
-         :references:reply-to:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=EMmFXrjSrpeG4wnNrWhFFN4HfKJ+fxYW0scJBNmq2ko=;
-        b=SbqycROUttkKtFEean+wuMeVkDGLq8NO4iBmqM8Mc3Pr0ghvx0b2dNg7ZUVxUxasmS
-         0Sk7gNPC+lj28sTvLRYweMR114zWt0Tp7dmh0p48GCoTTu9Xx6f4SBdMykd9Y2SykBcQ
-         fiIiykXDKZo1hDcIJ0MKFgrIorZevTVHDgpKBCkQEsZVpT8RMnvTYJkC6+K7poVKgUgF
-         QhPsd6toakw/fgD+uS6WpJ+W6cNuno6cKaZBhRfb5erecdFbhFOtdY7sdUWVGTq7rXcl
-         is/BkGDGjXcqn9is2YkIR6200BxvbUduI4AgldoaV4tNErBWcgfYBOKfi3zKC7rCZvU5
-         DPFQ==
-X-Forwarded-Encrypted: i=1; AHgh+RqN2RGzKk/EdLact1h0PZVHlA8k0m4ZP4a3DU29aV0grVpBvSftROxT4EmkQPR2MXmmygYoIWSQiqJkYRY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywj0OuDAVGez1pc8FQG9FJY8zXaU4PRc59U48EVs5tlR+EyvTTT
-	WsRo0xR0obdfCDrYu454D3PnhAEn8cZoJTaJhlLKyfAewLMss3ZOoLrNYRJouUcD1Zw=
-X-Gm-Gg: AR+sD13pYeSRotIzeNAtmqZQtCLMsyLo9MEtSbzq623395LEyka/CbMd83lX/e+mEiI
-	GWCRWxxBY/WDXzWTn+Iz4VwoKRprPQtdhlErUejlZyett73/cRH0dRQy8VMa10Hq7Cwy5cDcY+Y
-	aWiLEYRDsTaY6kDnSq0o7AkBdluF7PYeTy0AndVz+GgDyZn+gMGR1BalWmZcxv2eVzk13bbcUtU
-	GmZn7ck80Dxk6vud5V5hkc566YmBuIpB1rrAp0MypXh81IVMfs3Ugu5FWBkHFX070QrTn6rir1J
-	YTJa3uSjn+Fs/fX3fPpzO1BKFwQ/7ODQ3nOewg1S1hAYicTnEVHTfDwIFM8mPsB6GGyQRkj9uLM
-	hb5nJjrYdrItzjP/kfbHEvqNN4IKe+n0wp9t/SKwfKpfceNY429aFTbdBPyczpSCEjgDI8lxa1R
-	/aTY/qCj2C7X4Xnev6Hidm+fZWGMH08B+6Z2R99HmoYUbkBfB5QHXajdn8sJMnGfVchNOdunvp7
-	TZELCwDdk1H20EyUL5hax5XdHHdJwiJxBzgdW4FrFf1ruLEo/wAV+eTtxt2tmL0XWQyTGiTjnqN
-	7BK33eKxhA==
-X-Received: by 2002:a05:6808:13cc:b0:497:deab:2bfe with SMTP id 5614622812f47-4afadecaaadmr11898057b6e.1.1786102825384;
-        Fri, 07 Aug 2026 04:40:25 -0700 (PDT)
-Received: from mail.minyard.net ([2001:470:b8f6:1b:f431:c4b8:c018:caf2])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-4afae1777d2sm7036162b6e.0.2026.08.07.04.40.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Aug 2026 04:40:24 -0700 (PDT)
-Date: Fri, 7 Aug 2026 06:40:20 -0500
-From: Corey Minyard <corey@minyard.net>
-To: pzalewski@thegoodpenguin.co.uk
-Cc: Clemens Ladisch <clemens@ladisch.de>, Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Mattia Dongili <malattia@linux.it>,
-	Weili Qian <qianweili@huawei.com>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Peter Huewe <peterhuewe@gmx.de>,
-	Jarkko Sakkinen <jarkko@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
-	linux-kernel@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	openipmi-developer@lists.sourceforge.net,
-	linux-integrity@vger.kernel.org
-Subject: Re: [PATCH 3/4] char: ipmi: use named initializers for acpi_device_id
-Message-ID: <anXEJOF27FiNOqWx@mail.minyard.net>
-Reply-To: corey@minyard.net
-References: <20260807-acpi-char-v1-0-742c450254dd@thegoodpenguin.co.uk>
- <20260807-acpi-char-v1-3-742c450254dd@thegoodpenguin.co.uk>
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="S7itvOPy";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="INtMIaV3"
+Received: from ams-compute-02.internal (ams-compute-02.internal [10.64.2.62])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id AED2614000BD;
+	Fri,  7 Aug 2026 08:27:03 -0400 (EDT)
+Received: from ams-imap-03 ([10.64.2.23])
+  by ams-compute-02.internal (MEProxy); Fri, 07 Aug 2026 08:27:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1786105622;
+	 x=1786192022; bh=uhAGSaYFzl9r/Gnf/PXrh2wfAeFzZ54cEK24IBjNT2c=; b=
+	S7itvOPyFIvGmazaOG6snqDU+7RUee6mCaapufL6wDWryvtf/FrBpM0hdFQjF2qQ
+	7jOHjiG/k2NW/rwG9Psukp9DhbDS64v642uBxnd7X4BZqBC2kgYO9NPcFisnjWQm
+	rlgQoMjGjm42CyLcgHIDyT6sMG0z4j96zFzrMj4lMZs9b/TI9/YGd0MAR/cyv4Ro
+	o2WQ99565xKXI+v7u6Tew2svWNXJYqO7nGOE4Xz8X51Q4lraLfeIlYOKsim9lLLr
+	iygQdZ9kl66YIy7pPPnCEdv4GGlIRLQEEucD0J+zPB3TMIypWZieV7Y/TShdkVmz
+	6V80/I47rR5jleNDc3syMw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1786105622; x=
+	1786192022; bh=uhAGSaYFzl9r/Gnf/PXrh2wfAeFzZ54cEK24IBjNT2c=; b=I
+	NtMIaV3v60CwfCwbqx5JKjW20WF89d3IncWztGHKDcFmhXgz943ML8ceIyeb6+DF
+	tNUyt/Lpon7DRT5X6p+bJAcCkqIzt0f/HELM+MGglMIjw3vYl/2qWJeRC/8lTJVF
+	6yyN2BV38z4qTkPBzoYzqrwcuU8ynHKFknBfYRq6FRv1YU7TvMhJcszTvP2NDCMn
+	BnWjyaWvX61DZur1hBE6SlALFc9jTK5Pw5SgyHsFs8Fusl9uvHoF9y/CQjMRR7FJ
+	ToJrVuZtwHTJ4msc3KCsdYCQWveO3aH5ZUwlpzjUF4Pkz/9ZLvn05d0DBc+6NKSD
+	YUporlz0HTuQP77C0tQHw==
+X-ME-Sender: <xms:Dc91as1-cbd-2reN2yk59eCxu_RMCuvBEkVsjqjEltZavbekihUAwA>
+    <xme:Dc91ah7_yZk8eVmMNT42VKe9veRDTceUWOdikg3s6awBIsZqpYoQdwhUpetVJVg-j
+    Up6Cqsvl_Lk_WRo5tWExDE6Wy03955LvrcAsuMRMK7maD1c9TS4D20>
+X-ME-Proxy-Cause: dmFkZTGhGRORpDZ+OoWKb2tCiz2+79gJ4hQAdOsSkwXvfq2eg39t6mgGGGFqIk0XyzvUPT
+    ytaigb/isA+XLiIspmRjlKglQ/mcENWXHRuf4bnwNa4JaTZQQSE//bAesZEcGmM+3Bdkoy
+    C45nJnTbBTee7sNFJdwtd8aH4AkK5wQ/dGsKjqHXHsFnRwvorExjzNjU/7yGIj9oVRL54i
+    XxwU+BQZUx64GSA7p71+hO02pGCcih57FMktMxvYm/4zO6Lfv+sHgNxEw4qQmFsa0cYFUn
+    ZpBZW/27ZP1Tw0mBxGrYcuCOjD/WESKCdS4y1ONnyoqikUxQycz9mwOZmRVdFoOB3RI6e8
+    WPmwnDITPmBygaoyAs0YuwinKgHQJSE3t37kcbV8OB3uTguYICCiRzuxR/fHGQL+jfggfz
+    5JJqD4uIAf2WHyRbIpyQC6P1iDk2gm87F4JdRdAzRWQx21bJIWlnucdMJzn/q81gewe2L2
+    qgafy8K7fEm6S+5SjIa7rAM4BNBdEttyPBOzmn6E+NDp6RjEcnn5LkbGG4j4EoGnWmIX8N
+    8QGajDu67JDftWWXs4yf5yhtCmy6+SatK5LnY2TaH6gpPuwp03NiaBEIhoLhEvAGjZ33md
+    uzSFZLYmkKLX0kH8iSS0dvAuW04qaAM0yF1rGxUmSRydB1DzXYY0Tu31D+jA
+X-ME-Proxy: <xmx:EM91auvru_YTtzn-X7ypRBtovRsyleX9rWO3edqJuTAsmfxoF4Hw-Q>
+    <xmx:EM91auJtQk06CykE2S-l1DttvCNNDN7BPeWA0sfw6ihwENh72xzKng>
+    <xmx:EM91agaIGekyB6dp1fM2RQ4HWkpjtgeHz8UTLs7641_t8w27wwj5rQ>
+    <xmx:EM91akLqxGYg2vbUAbRLZrAp86261NgEpPWt3uA61y2jdhcfKdhWSQ>
+    <xmx:Fs91api7BVM2zRQYSVTbqnW1nXpPNEAJQR6u11fss_1m4jE1MZoIZVO2>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.ams.internal (Postfix, from userid 501)
+	id 39FA332A0066; Fri,  7 Aug 2026 08:26:53 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260807-acpi-char-v1-3-742c450254dd@thegoodpenguin.co.uk>
+X-ThreadId: ALxQobv4MiGF
+Date: Fri, 07 Aug 2026 14:26:12 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: pzalewski@thegoodpenguin.co.uk, "Clemens Ladisch" <clemens@ladisch.de>,
+ "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+ "Mattia Dongili" <malattia@linux.it>, "Weili Qian" <qianweili@huawei.com>,
+ "Olivia Mackall" <olivia@selenic.com>,
+ "Herbert Xu" <herbert@gondor.apana.org.au>,
+ "Corey Minyard" <corey@minyard.net>, "Peter Huewe" <peterhuewe@gmx.de>,
+ "Jarkko Sakkinen" <jarkko@kernel.org>, "Jason Gunthorpe" <jgg@ziepe.ca>
+Cc: linux-kernel@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+ linux-crypto@vger.kernel.org, openipmi-developer@lists.sourceforge.net,
+ linux-integrity@vger.kernel.org
+Message-Id: <60e25773-b3c6-4aae-a687-92e1ab3b141e@app.fastmail.com>
+In-Reply-To: <20260807-acpi-char-v1-1-742c450254dd@thegoodpenguin.co.uk>
+References: <20260807-acpi-char-v1-0-742c450254dd@thegoodpenguin.co.uk>
+ <20260807-acpi-char-v1-1-742c450254dd@thegoodpenguin.co.uk>
+Subject: Re: [PATCH 1/4] char: use named initializers for acpi_device_id
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 07, 2026 at 12:26:10PM +0100, Pawel Zalewski via B4 Relay wrote:
+On Fri, Aug 7, 2026, at 13:26, Pawel Zalewski via B4 Relay wrote:
 > From: "Pawel Zalewski (The Capable Hub)" <pzalewski@thegoodpenguin.co.uk>
-> 
+>
 > Use a named initializer for the acpi_device_id fields which
 > makes the code more readable and consistent with how lists
 > are initialized in the rest of the kernel code base. Also
 > drop explicitly setting fields to 0 where it is redundant.
-> 
+>
 > While we are at it - unify the list terminator to have
 > a single space between the brackets and no trailing
 > comma.
-
-This is fine, it's in my next tree for next release.
-
-Thank you,
-
--corey
-
-> 
+>
 > Signed-off-by: Pawel Zalewski (The Capable Hub) <pzalewski@thegoodpenguin.co.uk>
-> ---
->  drivers/char/ipmi/ipmb_dev_int.c     | 4 ++--
->  drivers/char/ipmi/ipmi_si_platform.c | 4 ++--
->  drivers/char/ipmi/ipmi_ssif.c        | 4 ++--
->  3 files changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/char/ipmi/ipmb_dev_int.c b/drivers/char/ipmi/ipmb_dev_int.c
-> index 680ff15c30ab..d576a77df927 100644
-> --- a/drivers/char/ipmi/ipmb_dev_int.c
-> +++ b/drivers/char/ipmi/ipmb_dev_int.c
-> @@ -360,8 +360,8 @@ MODULE_DEVICE_TABLE(i2c, ipmb_id);
->  
->  #ifdef CONFIG_ACPI
->  static const struct acpi_device_id acpi_ipmb_id[] = {
-> -	{ "IPMB0001", 0 },
-> -	{},
-> +	{ .id = "IPMB0001" },
-> +	{ }
->  };
->  MODULE_DEVICE_TABLE(acpi, acpi_ipmb_id);
->  #endif
-> diff --git a/drivers/char/ipmi/ipmi_si_platform.c b/drivers/char/ipmi/ipmi_si_platform.c
-> index bdc481ce1302..fa221cbb4b3b 100644
-> --- a/drivers/char/ipmi/ipmi_si_platform.c
-> +++ b/drivers/char/ipmi/ipmi_si_platform.c
-> @@ -387,8 +387,8 @@ static int acpi_ipmi_probe(struct platform_device *pdev)
->  }
->  
->  static const struct acpi_device_id acpi_ipmi_match[] = {
-> -	{ "IPI0001", 0 },
-> -	{ },
-> +	{ .id = "IPI0001" },
-> +	{ }
->  };
->  MODULE_DEVICE_TABLE(acpi, acpi_ipmi_match);
->  #else
-> diff --git a/drivers/char/ipmi/ipmi_ssif.c b/drivers/char/ipmi/ipmi_ssif.c
-> index 07f1d2327bb7..2361103c5edc 100644
-> --- a/drivers/char/ipmi/ipmi_ssif.c
-> +++ b/drivers/char/ipmi/ipmi_ssif.c
-> @@ -2057,8 +2057,8 @@ static unsigned short *ssif_address_list(void)
->  
->  #ifdef CONFIG_ACPI
->  static const struct acpi_device_id ssif_acpi_match[] = {
-> -	{ "IPI0001", 0 },
-> -	{ },
-> +	{ .id = "IPI0001" },
-> +	{ }
->  };
->  MODULE_DEVICE_TABLE(acpi, ssif_acpi_match);
->  #endif
-> 
-> -- 
-> 2.55.0
-> 
-> 
+
+I don't think this is the right approach: I see around 1500 instances
+of acpi_device_id data with plain initializers and only about 50
+with named ones.  Converting all of them seems like a lot of
+extra work, and I'm fairly sure you can just change the 
+driver_data to an anonymous union without this.
+
+    Arnd
