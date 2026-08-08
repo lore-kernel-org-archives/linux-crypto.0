@@ -1,70 +1,67 @@
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB87A205E02
-	for <linux-crypto@vger.kernel.org>; Sat,  8 Aug 2026 09:38:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02B773370EC
+	for <linux-crypto@vger.kernel.org>; Sat,  8 Aug 2026 09:43:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786181933; cv=none; b=c22xtVziumldyFy7zDHE3WALvxyXzxFB9QynWnI/Vj618inL+CwmS5AJrFyBawL28N7s5nb9peRr6iNr9yy0eRT8oBOYiqZSaZM0g8RLxsGmmpRJze2h5mrmk2ZCpqEv5DiNB9QOC81LcMl/cfyfSmaSifyMGuoCPQ9cIVwEil8=
+	t=1786182213; cv=none; b=gg5znONuwzaI6eS6gKiTQdPfMc2hJN+n6tKeFjWQZqbs8lPjRqXcyJRPyCrrPtnIJJxYKA4RQrxf2SQVWIcd8x1naFWMdb8FNSUlIhmxf0ytFBjPXQsfpdUpWWA62ILToc+yeFH/vpAI3BqF+Wam3eoO1wI0dafvSVxwv+0afTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786181933; c=relaxed/simple;
-	bh=hD/EvuRY764RrsJx1wuEKYerRIdAetHJ9oH/4f0ywDs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KMXpxmUD/h9bi9EbpdotLc/8sI4iNAQ2uGywHju3CdhJzLec8tEmyZRP2WfjNfa1199GkR71UOasUVSfpka2KxJ1dxbiqGlG3P5GLwjsFNNA6VKoGvH/UqPdmwrROgGXa3xo1OagiRuCXmhgYRcQNChI72SpisYrjqT827WmuoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QGbb+jKv; arc=none smtp.client-ip=209.85.216.41
+	s=arc-20240116; t=1786182213; c=relaxed/simple;
+	bh=r6nfrHf9VWnHnAVX3pP+NYypBFwJru0XwFToKW5t2DY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=P9EjyuSuz7bFcA5woD4thEfhC7bQXAUY01t5hvMwNbDa/bGl9cqhnYU+//a3QtteRVgAfluTjEM8Wc71zjhUkGyPXtSiyTFsOqffprJBwM0d2Imd0H9/3WIcv6IDf93ahfy8GdIV/F6P6zjQfEmOndxEQQNl7d/ZoSpyo8Ojm3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hA6gL1nG; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QGbb+jKv"
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-38dd55ad76cso263635a91.1
-        for <linux-crypto@vger.kernel.org>; Sat, 08 Aug 2026 02:38:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hA6gL1nG"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2cace91f112so3526995ad.0
+        for <linux-crypto@vger.kernel.org>; Sat, 08 Aug 2026 02:43:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786181931; x=1786786731; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1786182211; x=1786787011; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=RX1DphTMSs3B4MvCbqjOAvkckybgUBneK6EG7I97Aec=;
-        b=QGbb+jKvMrc5EKkDBAwrR42oszFlRKcQMVpk1QTwWO0s4mhNBsIW06gS4d61J9nPj3
-         1h/K0Bn1soW0xe9KImLgPsaCyY3fJhuFwDyFDAaLXp6dSC1KKXwFY93xINVrvwifxULp
-         Z+5+9A0uGORET+U5pfujkfjXJRv8EWAeZ2V2u31WYzJt6lhfAuU1dEKzT3CVkzRJpR/h
-         Eor6bYOxaO/NJo/SSQZOgazGBHZGqtuxym5eCh69Mld/2Z+V/ZZodn2+c2pidvdXnnYO
-         54JKGW70snT2n8lMr9TOO55o/sJLvgVE/qYUqfB56XkvcF1Ow3u0edoz9fSM7hIgwudd
-         hJPQ==
+        bh=fDbi4zALnFhUD4L9Nk6WABMkAbrLbdj/pPHftS8rUB0=;
+        b=hA6gL1nGLJwB0r6Ykkti04RzpX9yCIaB8wtGoSLqt3PKQG6gb1KPvSg+UWMRiCtltW
+         ySLX2C2BnQcVwOCWPzrB4uZ9HM4Fc3NDKTpSbqGttN1xCxg7eJxSHreFx1tUpGRO2JcS
+         JCFEr2CiGryD6k5i7ZmQdj8HN4LVOhjM8lQHDyL656AEWHi3LDFyyEB8T2fTOjn05nAi
+         Ov2qSjCMbcG1O5+tZBY/zQv6RDIEfBvA7iXZ/gMl5MHF81hCW+f2lnnWHsLxd4nSjVmY
+         4/Lkck8R1bzFhNEA5dTsVmd5SoUqA1Q4xOW/NeyOg+HJt6sGp2/hr1izFz8AZphOt9vN
+         Euow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786181931; x=1786786731;
+        d=1e100.net; s=20251104; t=1786182211; x=1786787011;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=RX1DphTMSs3B4MvCbqjOAvkckybgUBneK6EG7I97Aec=;
-        b=tDUmg6NmMGQ4sRBgY/eXep0jeruhyox0/rmPD1Sbc5suXdm1SitrIBK6f4I0MDd73H
-         eaJGSrVc3CpSsomrufbIEfzi1JF4Y0mTcu5oIyk+dcUxMefJPhfUR6f4W/IAB0RKTqXY
-         2w9+xgx+Nv4Gk0cimt0mWgBKRtBstWya9IpM1Taj1H5AL9ZTr0aR1hqUyDoRAlGIZS6p
-         9X+NHISfEte9xxUF79ETV4k4heabk/G1wUtmebhNypSy77dBOlykeR7ZJrUP3Fwsu4x1
-         JekQoVfiQ2dsS6ambidDeM+BKLgQp+U2vOJltaf6AObP6TmJlZczHZ525jKegtXS6k92
-         th8g==
-X-Forwarded-Encrypted: i=1; AHgh+RoOvJK/uQqLYnOkC94DDpVtZEIZkqx/gdK+FuSPaSkB0BcOgRUZ+7UBB7AX7mJ9iC6JHLlihC5Pwte8QWE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFu0zQ/HF5DJ51LLCmfPRzT6pHS830v/qfSzZtLq7eYfApMj2R
-	QAAjiXaeyrgZOTZFVeqdHe1eXy+aeXN/AZ5NcfdiyletxkzNC6yUpY7z
-X-Gm-Gg: AR+sD11HxV323jzVNej+U8/fhbWJMwe7yWvdDPiMeNuN/CnLaMFXOYSJDA3FnNbBKAO
-	i2A1m/fS+84uN80xjJFlO30qiDwolgT6iaX+yx7uEWYvV4fM8H4DlS8thOG/r59OmJwv4zykA9Y
-	NNN1bfxwergtiobpK/1hbf9EPfZyXqWZVT6sBPqPRoVCMPqgRr3iW00tIPHiPg6yc+6P3FF0jSK
-	WeQAfZ91iT+2/92OcDYEZaF9ruoftqO9RgtL/v72pmtxzcgT5AGWY7jrR1hJMxyEdkLgvtgrMfT
-	C1C1O7SeGgoOfTBBG24GWBGCdVFqc4oSuxujeSC3iLHFxcw855esadvkluuktjC2Yvih33qunGW
-	yfUSDG/iDqrtuF7CZTKe44p8FkpovJBSphPTW9zP4mnL1enkveadWc5T4DyjjNcO8DbG+OaAEKW
-	XcUjQ7j38IFvyRJNDveu7AKRBHvkSOSF0EA6gOeehasykXQVU4fRLoQA==
-X-Received: by 2002:a17:90a:ec86:b0:390:b3c5:e2c9 with SMTP id 98e67ed59e1d1-392846fd57fmr1926782a91.17.1786181931093;
-        Sat, 08 Aug 2026 02:38:51 -0700 (PDT)
+        bh=fDbi4zALnFhUD4L9Nk6WABMkAbrLbdj/pPHftS8rUB0=;
+        b=fufrrYTLDg+/AJukbwDJh2xOKqGTFjkzcwbXtCMloKPRJ0CiFDVzdsmOU9IUdEOycP
+         thjZVnGfQyOYJK9D7oPLpHFpY/S45k0QD3ora9LO8oWaN06EPqO3nzQRUPecUYtbaYx3
+         BEUjl2GUUy0EKuRfNY0TWLkf7O+O49+o85DkhoD88ULf06T8qI69mtTpGVAgUdOL15Ci
+         bEZlAlAmK5Vq5V92BtfX6jQ4h1OLdhFt+PiKY9G0lkvHAgptKhLEj6C3xF1WfU1PS0b4
+         Wm/skAJqIm0f8I086uZj6mZkKAylO2pX/N3nmYihNg8kjYQQswmdrnoJERkuJoOMUtuP
+         DGiw==
+X-Forwarded-Encrypted: i=1; AHgh+RrybG+b+cPytX8wKFotTIxQi2lzTBfMr7mhN8e2OMfGD3bM5W1mrgF+qQ0WpQzesxADezDIGabrMivW8qo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHtxzdt+UxeWpKewlL4ZDqqNSvopf6XuI+oXTtZtaduOEpVNJM
+	qM9g0byiwUlrAPwz+wFQv8gIHXP68gTZsfeAlC9nPkd24x733akiZJwI
+X-Gm-Gg: AR+sD13AGoL5+V3EcSOBnBtQenLD/v8Jojq52LNHRARroKGpxFf9BdcJuPRAepYidw0
+	/OK2VlEh7XrTTpP55e1CpWB4pfsY4k2zy+IiIBjIeYEWnHiztwY5VWN4+MNs87LB1t9t7qLXzGE
+	KhQiU2CIQDyHtW8ZA77rA8IWn+0fXr2lUDpz8uZGmFGcOToSVFgVfQRE/lXWAf7vqueiVQTX905
+	N89Jvib88sY3SPz0W22v7EOr2tEOKbIEWpjfoT2XrFIwuNzrFEhfQOnD67S0WS4X1dYpxvfr9V0
+	PHb0w+Fyl75y0ImG5VlDmkN4AJufqXGgBfeLe5jmmam/ctKkBMETukwO5+5kwZ5Vl5fgo7sdavU
+	QpKdP16IymqoqwQfE7Rd8ssmHnbcK6RYLOjlnnlH2pcwnfHIuNvL/C6Rp3QxS44oUtaKAyT/GUo
+	0nqY/tA75KPfGeM1OQuJqVPvxzKtdY01uVDzJuGzrDNolx8qQ7kwGm/Q==
+X-Received: by 2002:a05:6a20:b598:b0:3c8:f342:132c with SMTP id adf61e73a8af0-3cb85e99264mr35264761637.11.1786182211362;
+        Sat, 08 Aug 2026 02:43:31 -0700 (PDT)
 Received: from lgs.. ([2001:250:5800:1000::f280])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3925fc6dab4sm5615231a91.3.2026.08.08.02.38.45
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cbe8f1b3eb2sm1707505a12.13.2026.08.08.02.43.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 08 Aug 2026 02:38:50 -0700 (PDT)
+        Sat, 08 Aug 2026 02:43:30 -0700 (PDT)
 From: Guangshuo Li <lgs201920130244@gmail.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
 	Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Thorsten Blum <thorsten.blum@linux.dev>,
-	Kees Cook <kees@kernel.org>,
-	=?UTF-8?q?Maxime=20M=C3=A9r=C3=A9?= <maxime.mere@foss.st.com>,
-	Colin Ian King <colin.i.king@gmail.com>,
 	Guangshuo Li <lgs201920130244@gmail.com>,
 	"lionel.debieve@st.com" <lionel.debieve@st.com>,
 	linux-crypto@vger.kernel.org,
@@ -72,9 +69,9 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
 Cc: stable@vger.kernel.org
-Subject: [PATCH] crypto: stm32/cryp: fix autosuspend cleanup during teardown
-Date: Sat,  8 Aug 2026 17:36:23 +0800
-Message-ID: <20260808093623.2744314-1-lgs201920130244@gmail.com>
+Subject: [PATCH] crypto: stm32/hash: fix autosuspend cleanup during teardown
+Date: Sat,  8 Aug 2026 17:41:14 +0800
+Message-ID: <20260808094114.2750088-1-lgs201920130244@gmail.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -84,8 +81,8 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-stm32_cryp_probe() calls pm_runtime_use_autosuspend(), but neither the
-probe failure path nor stm32_cryp_remove() calls the matching
+stm32_hash_probe() calls pm_runtime_use_autosuspend(), but neither the
+probe failure path nor stm32_hash_remove() calls the matching
 pm_runtime_dont_use_autosuspend() before disabling runtime PM.
 
 If the autosuspend delay is set to a negative value while autosuspend
@@ -99,32 +96,32 @@ probe failure and remove paths before disabling runtime PM.
 
 This issue was found by manual code inspection.
 
-Fixes: 65f9aa36ee47 ("crypto: stm32/cryp - Add power management support")
+Fixes: 8b4d566de6a5 ("crypto: stm32/hash - Add power management support")
 Cc: stable@vger.kernel.org
 Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
 ---
- drivers/crypto/stm32/stm32-cryp.c | 2 ++
+ drivers/crypto/stm32/stm32-hash.c | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/drivers/crypto/stm32/stm32-cryp.c b/drivers/crypto/stm32/stm32-cryp.c
-index b79877099942..74f6e329b1fa 100644
---- a/drivers/crypto/stm32/stm32-cryp.c
-+++ b/drivers/crypto/stm32/stm32-cryp.c
-@@ -2691,6 +2691,7 @@ static int stm32_cryp_probe(struct platform_device *pdev)
- 		dma_release_channel(cryp->dma_lch_out);
- err_dma:
- err_rst:
+diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
+index dada5951082c..12fa1a8f67eb 100644
+--- a/drivers/crypto/stm32/stm32-hash.c
++++ b/drivers/crypto/stm32/stm32-hash.c
+@@ -2456,6 +2456,7 @@ static int stm32_hash_probe(struct platform_device *pdev)
+ 	if (hdev->dma_lch)
+ 		dma_release_channel(hdev->dma_lch);
+ err_reset:
 +	pm_runtime_dont_use_autosuspend(dev);
  	pm_runtime_disable(dev);
  	pm_runtime_put_noidle(dev);
  
-@@ -2722,6 +2723,7 @@ static void stm32_cryp_remove(struct platform_device *pdev)
- 	if (cryp->dma_lch_out)
- 		dma_release_channel(cryp->dma_lch_out);
+@@ -2482,6 +2483,7 @@ static void stm32_hash_remove(struct platform_device *pdev)
+ 	if (hdev->dma_lch)
+ 		dma_release_channel(hdev->dma_lch);
  
-+	pm_runtime_dont_use_autosuspend(cryp->dev);
- 	pm_runtime_disable(cryp->dev);
- 	pm_runtime_put_noidle(cryp->dev);
++	pm_runtime_dont_use_autosuspend(hdev->dev);
+ 	pm_runtime_disable(hdev->dev);
+ 	pm_runtime_put_noidle(hdev->dev);
  
 -- 
 2.43.0
