@@ -1,163 +1,114 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 632F83CB577
-	for <linux-crypto@vger.kernel.org>; Sat,  8 Aug 2026 10:39:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE1E729BD87
+	for <linux-crypto@vger.kernel.org>; Sat,  8 Aug 2026 11:50:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786185545; cv=none; b=DL3d7Pbiml8XkXo/OP8wEp2tUde6QNNsJmdqYGDtfOQnT8m1rUAYPn5gHQtGeICWG6FIQe29giEfTLPppl5lVeigs0ZUXram/fRJemoZLaCaoeF88H5wts8Fy38Z4HqCTQU/vDWAU8tuHxFMUvPSlgitezPBNfVPa5pjJIaToWo=
+	t=1786189812; cv=none; b=Qf7ngCqN8YTJvcFvnsJUb+8wL7dbiAqwYsSHH9Z4VCOy6++5rEL3aSMJUhF0HU+LwisTJRiBa28J68YlHRCQw7in++a8X+Vm09TgnaMHHEoaAeEGBmf+o8vrSH1daQoo5qILEAlj5XTi11OVSDZs/cewHPABnN5ytMGXBTO/IHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786185545; c=relaxed/simple;
-	bh=ngVD+iZWR7jCh0MY5EC6oquQpUmXxcSQpH22Nvcg+LQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CKIrgOzs88m3QeJ3ydBF6Fx1GOuqQzDO3AoZjs9FCpNbClTXPi6k7S0fT+mt7h9QnFzluTByzMwP1kuPJ9Yuy+M1RGL5dT1HFD5N8yJQCFU7E/QkfvyqOaN1F6ccWUMGCRYzN9HpeLP6VE0ujYMoVQVQgzwZPUzRgmk+T3BvjE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QhGee+Qn; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=VKpWtcDZ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1786189812; c=relaxed/simple;
+	bh=tA28uoe9/JaeFzrkRmsJq0oKqgIaYOAI9C6nJZU2+3Q=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=a1QlxAae9II/Xq64Dq/ZQVOjpnVr6pMJ0bXIgjpV4JBP038/NsoDy/xf0bSicdn1K/Q7fNyf1cfXUSt3A7NLls/Js3SFwS7Gcp+FYe1MbsywDdFlxBdN4DaVx37NP34o8/BioKhPqLW5PVcqTCu6zTI20lSl4XNujx3tFHD0N/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mfz6jVGE; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QhGee+Qn";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="VKpWtcDZ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1786185543;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=avs/8vY6YPXcNnZBbOhG7aKpSljPvSAucckGDKnJ5sU=;
-	b=QhGee+QnxOdaNzxUAKm6VIGuyDW/oYm9K22hhi9VWvGvea8JKdS1szqZxTIZW2n+AZ8qiq
-	/72S6/2I8lG+Lb8/uaIKIIIgJe5eBldUu+AEj/ky6rIrwhN10XRFBxeSaSunN0ymn9T2+J
-	HZb/iUbeEc7HrgbnKrrgDbyiGcz6l+Y=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-613-VQfmH15MPMW5LJlgZ3xlRw-1; Sat, 08 Aug 2026 06:39:01 -0400
-X-MC-Unique: VQfmH15MPMW5LJlgZ3xlRw-1
-X-Mimecast-MFC-AGG-ID: VQfmH15MPMW5LJlgZ3xlRw_1786185541
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-473ac08a6a4so234797f8f.0
-        for <linux-crypto@vger.kernel.org>; Sat, 08 Aug 2026 03:39:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mfz6jVGE"
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4980dc26022so3592355e9.1
+        for <linux-crypto@vger.kernel.org>; Sat, 08 Aug 2026 04:50:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1786185540; x=1786790340; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to:content-type;
-        bh=avs/8vY6YPXcNnZBbOhG7aKpSljPvSAucckGDKnJ5sU=;
-        b=VKpWtcDZbut4hezhXMPoayPpOcoLbQzX3d+IUxeyY0soPiWR2tUkT2b27ZLIHLrAFz
-         rVNIDc9om2wDNTCS8YQVN9pVwvy6SkzjTpGhKQwutIG3z1FVlKmwfrvyy042Kp9ZJh/h
-         C8LozlU8LQ5j13r3BvT9BtOkxSzdPOnR2HCRAOxsq4ut6cj1ornS0Vob/KZb1QQVPN8f
-         c54TxNxtuJ/j/ypPQKdWuih97NfaJHUvsdiDfRgUQ1hYq8BHJhLB3G94ksGlb/AaDt/N
-         rDHw4trT9LgG0iP7FvDfSmwWvLOZkZnukgJDNER0jPt7YXstCC/jVOLvqw24B7qg79Td
-         HL8g==
+        d=gmail.com; s=20251104; t=1786189809; x=1786794609; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=DW2tDdMOslx4M3knW21+tMviVsy6n6Zzbi+lL0TdSvQ=;
+        b=mfz6jVGEFC2BwHSA/SvpoZrO3KZnuNJSUDuLJrl2+mSOyDDqqx/pIcbPit7V1NVD1i
+         qYwvwNKIL9/cHTIjTN1hzDE5eVvB2V/IBD5NHXPhbitevvUTAkoO+tXGaDDNQi/OEO3m
+         dN5hJDoJxpVnlLojpdkzAdkaEK79kGaXs/Op0AUf6yBe7RsTETV1+vWuSnFtGtLHXbOJ
+         NuaCuMTvfYHq4AJiDoRrDoAbAAO6pbri4llZx5VWoOJzzRGfatbq4tb3IHFjivkTV7sz
+         EaXqQ8EFAkbTHBNsUfDJDTng7Gk7m52wrHtvWpPAghmz/jC/Vns3KD65e+AFgUyoVV+f
+         Zh6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786185540; x=1786790340;
-        h=content-transfer-encoding:content-type:in-reply-to:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to:content-type;
-        bh=avs/8vY6YPXcNnZBbOhG7aKpSljPvSAucckGDKnJ5sU=;
-        b=iPF/2Iv7mu7LoZe0AHyHBj4PzJp9kgPpVpGf7156LuaB3mu3hduheeYKMUIasoBzE7
-         6nxqJEMJeyEf0AcEHxYNofkvoSRhZcAHpbLN5pDYhCvxGONTA+JNYXtXZURNqZRARQFa
-         gynTQxrBuJNX7PX83kwQL5Rj8dNyDRm+cvtoDw7h2X3n7L3kGyAXHOvJYZkfLnRpsJs5
-         E9fS4qz1rLFwi1TUrJlzQdkOWMOyK6Huy3pU7rqPV3G/iISFJGrE7Xf+YSy1fsXXAn/a
-         /MwTMRpy9Xesmg2XrcuOJH+MX2VPSxIEsLdTFAJNJ27WjSqDBbgYyuGMr6em0bnmsyrW
-         pdcg==
-X-Forwarded-Encrypted: i=1; AHgh+Ro7XzpJwVLHclA3zCkXkKlUaeMXufAQ+dXky86Kyqg1J0IBo0v9arMmxJtvGdUpxDMCf8IP9Gtn/16OmZE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7jpJIFPkc5aMUJQ74LIdpgTk4iciLPLdvlU1FBRZQiLkaPcmX
-	hIzhYbh8dlSHmAHhK+xrKHbtDBEg+gwHOwawLpyCHGes9yTEgQfaE8yThq4Z+6CLWEkHwmlskma
-	/aTyF1QQKNAzzYBEC0UwkLQCVlz9xQee4JKjTQDg3XjTxZmSzS0kTZrfod+khhoEomQ==
-X-Gm-Gg: AR+sD11CI9zcNedKPfoP+mgx+oqivgArh+pOPdODbsnaIh3nPbfPCXwGJqhprDMDJPe
-	3rTLCoOYI3dOjzwAbLYNIeM0vvV8siAkaHpYgwK7j0v2hQDnzD12Lidgsfo5fZdbuXFmofd6B7r
-	5/Ok+gjDNvgvYNOrBzhSrjxKa77u819keQ5qDHdl3Onw6MbiM5vKWO86fxpimfeZqHOXelKLooO
-	C8IDbfv9NcX1k8/YNoGrByBnb9pHRb4dqnErlZco4kBWtpZcZXa5Dt9fn2xh5a8lcMAmm/azrT1
-	PXOSyiKu9cUSaR3WVByB8VRMssGlxkL5HhvpneGfX7RB2sLyD1Vg3HpJyPa2fy7PTxVV/64J
-X-Received: by 2002:adf:e38f:0:b0:47f:83ee:e56f with SMTP id ffacd0b85a97d-48130ed8729mr6725821f8f.18.1786185540762;
-        Sat, 08 Aug 2026 03:39:00 -0700 (PDT)
-X-Received: by 2002:adf:e38f:0:b0:47f:83ee:e56f with SMTP id ffacd0b85a97d-48130ed8729mr6725785f8f.18.1786185540446;
-        Sat, 08 Aug 2026 03:39:00 -0700 (PDT)
-Received: from [192.168.0.9] ([47.64.115.28])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-480021f9182sm14217694f8f.28.2026.08.08.03.38.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 08 Aug 2026 03:38:59 -0700 (PDT)
-Message-ID: <995329a7-8980-4b5c-85c1-9c415b200804@redhat.com>
-Date: Sat, 8 Aug 2026 12:38:57 +0200
+        d=1e100.net; s=20251104; t=1786189809; x=1786794609;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=DW2tDdMOslx4M3knW21+tMviVsy6n6Zzbi+lL0TdSvQ=;
+        b=KdAnQcisNvn1aGmP55IkD+0AvcDufyr/hmXaXy0S0BadoYUiS5WVGXtjgtn00bCefc
+         E2tX308Bf1nrowXumbS838Ca5ithAs6zGAy2i8jy+FDqnRcIL+xjie2CrOLJWI2S34wi
+         2CXavSe6SO3ujuIqkhzc6XRbN2EGRkXo4HewQNdWqgyW0YZ18swwZEaSzFaizO8no327
+         Rs4LXpC3/P06g/iWg8pZxxDCRbSzWnnWA0oh8CO3HZVhyJzMmjq2VIzYRFJA0BCi5jXJ
+         C1WESs2PC3dp2mGke1XO5OLOsFBmbeWWq23Mt65GMlIiEzQRNM3aCIZEjO6Z09JobRaV
+         VwiQ==
+X-Forwarded-Encrypted: i=1; AHgh+RpGYEEAGxJA/k+wYK7mp2MrXVxvtTysBcg8AE7ZLBe/zTNieSx6ybwIhbDpUcUnt0JqLUMrLhoqWwzpHVo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+ib57XO+Iw5Hw/E9kAZHbmdUWKNiEMau4RbiYbBWAlAHyPEsZ
+	2odQHkaaBtbWZfagi4QGVO70/tadD7JWRwy5FFVN3MrP4ZHvwFrJ7vMe
+X-Gm-Gg: AR+sD12n6skf4SBd669xjHQBTr5Tvvc+f2PnUvijnh/mB+J+zQ5HSuTIvCHwmsOC1hx
+	wElls2m4H9AsQwSwTW4n3+JEpDoRIdSiukgVs5/6HGHh1rWZdJr06wH7KXjFLeWeDqvrMYCmkqS
+	1gMuUUiu/FDjkjQdwoDNz7+s/pfYR2jm1O3+BvVMBStW4Yi8MtJsfYoTKA81BiO8XFzLzn55xG/
+	DQse1g+sgqajGmmp5+0vtRcJuoTp4eavXnY+HAxjZlEGy4m+pLFuDmcA4EikxyH2wogvwQ53XTa
+	ohU6NsDbINfypP8h0XuF8tvrSGbCuBGMJrrz65GYmbjsv0e+4l50zTe3bI3qly7m6l6npD1R9iT
+	DwRJXVT9y5U7cdM+rfzMkOe3A/9HOaK9k0bhcTgdFTYD6RAatJau0a22J+GmtDXYjmPwZ2iKLCE
+	6GsKSL2XwBAg5X6PDJ4TtfJw0at5NP1IeSq7rX/0vv3gOvrusaUnB2dvEPaLsDQJc/3jnpdzj0p
+	t07CvkAn6tG4jhh7NFKIV6iU5r6HoUD5zwfXJbxOQ1wTAi0vruKeYbR7pFfbf/an7AcISj6We/c
+	dfeAxWGNECVOUQGb/PW5
+X-Received: by 2002:a05:600c:5251:b0:499:5b04:6920 with SMTP id 5b1f17b1804b1-4995b04695bmr156555135e9.16.1786189808989;
+        Sat, 08 Aug 2026 04:50:08 -0700 (PDT)
+Received: from localhost.localdomain (dynamic-077-007-004-134.77.7.pool.telefonica.de. [77.7.4.134])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-499542183b2sm241866935e9.4.2026.08.08.04.50.07
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sat, 08 Aug 2026 04:50:08 -0700 (PDT)
+From: Karl Mehltretter <kmehltretter@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Karl Mehltretter <kmehltretter@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: lskcipher - propagate errors from unaligned crypt
+Date: Sat,  8 Aug 2026 13:48:48 +0200
+Message-Id: <20260808114848.71342-1-kmehltretter@gmail.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/6] net/tcp-ao: clear the aes_cmac_key when done
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Eric Biggers <ebiggers@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Neal Cardwell <ncardwell@google.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, Steve French <smfrench@gmail.com>,
- Namjae Jeon <linkinjeon@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
- Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
-References: <20260807125845.1477067-1-thuth@redhat.com>
- <20260807125845.1477067-4-thuth@redhat.com>
- <20260807152231.15b33daf@kernel.org>
-From: Thomas Huth <thuth@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <20260807152231.15b33daf@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 08/08/2026 00.22, Jakub Kicinski wrote:
-> On Fri,  7 Aug 2026 14:58:40 +0200 Thomas Huth wrote:
->> -		struct aes_cmac_key k;
->> +		struct aes_cmac_key k __cleanup(aes_cmac_zeroize_key);
-> 
-> Nak, we don't like the auto-cleanup stuff in networking.
+The while loop declares a second err variable that shadows the outer
+one. When the crypt callback fails, the goto out path returns the outer
+err, which still holds the -ENOMEM value assigned before the successful
+allocation check. The real error from the cipher is discarded and the
+caller sees -ENOMEM instead.
 
-Ok, if you don't like it, then let's drop this patch.
+Drop the inner declaration so the callback error reaches the caller.
 
-> If y'all need a garbage collector there're jobs programming in Java.
-No need for derogatory statements, Jakub. That's really inappropriate.
+Verified with a test module that registers an lskcipher whose encrypt
+callback fails with -EIO and calls it through a misaligned buffer.
+An unpatched kernel returns -ENOMEM, a patched kernel returns -EIO.
 
-  Thomas
+Found with Clang's -Wshadow.
+
+Fixes: 31865c4c4db2b ("crypto: skcipher - Add lskcipher")
+Assisted-by: Claude:claude-fable-5
+Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+---
+ crypto/lskcipher.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/crypto/lskcipher.c b/crypto/lskcipher.c
+index e4328df6e26c0..a79c9a246e5d7 100644
+--- a/crypto/lskcipher.c
++++ b/crypto/lskcipher.c
+@@ -95,7 +95,6 @@ static int crypto_lskcipher_crypt_unaligned(
+ 
+ 	while (len >= bs) {
+ 		unsigned chunk = min((unsigned)PAGE_SIZE, len);
+-		int err;
+ 
+ 		if (chunk > cs)
+ 			chunk &= ~(cs - 1);
+-- 
+2.53.0
 
