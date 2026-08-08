@@ -1,72 +1,74 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92644369D5B
-	for <linux-crypto@vger.kernel.org>; Sat,  8 Aug 2026 06:53:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D609D323417
+	for <linux-crypto@vger.kernel.org>; Sat,  8 Aug 2026 07:25:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786172017; cv=none; b=lT35WICVEqxTm2Macjqz6UwavEvhIM9bxJyFKPGshvh/8UlJwMf28FMqs+kAH9gVbbuMBjyfiUwDI8eMc+Og5n8sJ3kSuhHzPDSbuewtngVV8uF0OrkeWIi7TugHlzuqhy0Lbl1wVn4tRQo35JKSAQTIexEPtU47A+3NfuA/gg4=
+	t=1786173936; cv=none; b=Piitl0o17lFiMnAt5qpxZ0GW7R9VrVfjBpgbxugOC3CGuZTxV+Bu/asPdAW2+a9fFaZ6IQYekIDUBhF0veiAZJbH3MFjPhFQvHz+TBlyMEoDSVPXly/sCOTuPDT6ADeEI+oOTty5/rK8cHvQLTVCjDfSNpRuVow4nyUStbw8JE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786172017; c=relaxed/simple;
-	bh=Yg5CbE960A1w7vxea9z+UV1mUCRNaxpr/Wq63BHbYNI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WNnqX+K9eQH+rTx5VUml1qivNqY5D5WwQhNCFaoL/cNZVS51MvrX09sRCMB08y+i8MR634ed+zkUeCBGeiYCV27hvsvajpR1F8oU/kMQJJKvpEcDEChrSNuBYOlEprg/n7XV8lYkpdHj81Jbq0PZH8mGeoQ52WN6+UirzzOLQ5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nJsf9DCe; arc=none smtp.client-ip=209.85.214.180
+	s=arc-20240116; t=1786173936; c=relaxed/simple;
+	bh=G1BNkX7MmoPkXUOj12zHxbfv+qVUKXjsfvBuX8CZIpg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YCqFtqephf+YVJ21PXEyNsDjBjyCaPV2QR838evsgYsg4YrT44AyTUlnbyr8ViZi+ijSiGUlrvoBnap+4wY2Yd1firc1nq3zhN0KwiowkV4AzB2N6uIrmgqyzFOTZXxHIqkoTbw3OQX/77OF5LyODXbGdMJtyCyr6Qwqsw3fthk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VIoltbUI; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nJsf9DCe"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2caea3f742bso5197525ad.0
-        for <linux-crypto@vger.kernel.org>; Fri, 07 Aug 2026 23:53:36 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VIoltbUI"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2caea3f742bso5434015ad.0
+        for <linux-crypto@vger.kernel.org>; Sat, 08 Aug 2026 00:25:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1786172016; x=1786776816; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1786173934; x=1786778734; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=Q8+qdfUNsFYx07WswywD1ui9gvhu1XyZ5pnsDk2yr+k=;
-        b=nJsf9DCeHKoimLQJ5p5bFdDH5Lq4oxyD6fvJDAT0z0usPuFgF5YGJpTa3HjxV0XF6q
-         RFIHQzHsIFmfcShd1zbJInDxWhh4ir2vnkD0S+ZV95iRP4QuFbBVQ6tFkR0Trwf4BqTo
-         5Tw8OFpDfL+k+onai+pniP14AOdJyA3R8bE5lBl0/2OGJ8ueLT/c1SxQjaVnXe+vaErN
-         vJxTO0IkjZw1eoduZvuycohPigeBBjDHm3jKI+dnWBl9pjInK9Pkny2wZtGrb4c9VI40
-         e2LGPff8KO4OhTqrZF1k9lxNX3Wmj+CXTTkxXB7J8UouZaNFF0bjH0jcDOHMx+ZAUkkN
-         +ZxQ==
+        bh=CwYH+YDI8SAmi2VA+WwpQ0qieT+uWBICR9XfrxWBjvg=;
+        b=VIoltbUIxZBN2xbH631/e9CVOlKJ50RupYU+JGJbnleLCmxbxoL/59T/N7UScnjGoZ
+         kpIe4ao4VPWLhlXpERnEnuzcnptBrvjQAPwTSUrXK2Snqi4rs08HMPXQK6hGDAhjtet7
+         lYLcHH12MXVWsxWy0ghQ1DabicaC3TwSnqdxVY2xVAfNR/QgQt/O1445eg2E65CqIUKq
+         VFkWtro+g2DnxcNLURf6+tjF8MBJdfXb4Mi3+nqAkZNO2Q9rfnt2c7e1H+sxIiaMSdya
+         4w1w7OfAQZlBX4St+tuPCfvBMKTQpwqgQKiwkOocn6MSpPzJE0G4EML8+HSZcwCsNuRH
+         uV2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786172016; x=1786776816;
+        d=1e100.net; s=20251104; t=1786173934; x=1786778734;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to:content-type;
-        bh=Q8+qdfUNsFYx07WswywD1ui9gvhu1XyZ5pnsDk2yr+k=;
-        b=Mt7h+CN6PSyGggetSx0xHjnarEpLt0KmezYvSDHeAeFn0uaLRTbYuHQphbAFKxtJzO
-         gYR4/hBoS79EHvWSKJGm9dJYOCwn7Al34QGE0O6j3sCccVwNxAxs5FMqaiBX/0Q6hAFZ
-         izEBZfIL3i+H7o3C+QqNB8nPnqQ/CSWfuoQ7UxY86d/q9gRGshRhwz0WPFZYXdlEz5g9
-         Y7ZY0gtvAnIfCuxif4u5HF8j8VPZC+54Hu2zH/BExOJPAkdSeRKb+LfQlF4mDcAuTv3J
-         qLwg+jXDtq40f9aLEmSbW1vepH7z2oZCVykZ6jCds2pU05i7LbTgH5a2NeaOSby61QFM
-         R25w==
-X-Forwarded-Encrypted: i=1; AHgh+Rp+ZpiBzqMvb8rD/V7SQMzY7hZMRz58Ip1JOm17o5AZnIwTQRhDa79opg7CBi4248Yj4myhvof2K6E/13I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSEW2c6+rVqYqZbmglo4rWatckzeYkZFM8KJR4UjlSKSS63Uq2
-	WMorK51U3aue8+I/tbnWIvKD4XZ2zAXhm6B+cZuOfP/ha2qt1wwTi5e5
-X-Gm-Gg: AR+sD137os7ydY5NHL6W+YxoP60POJLFndnGXyxi0TixUbclaoRZpmrwUpqercNZRf2
-	14TPcK1cWzkL315f3ynFFf6sbALhnDdTbVOj0dH+xlwGqny3UMyzzrF9GSuyW0A3oR29qW6VMKa
-	9SOMeGKTywypkF4cQnxVaCw8uKs+Hjv/KQfYuej1Yh13cWAr1uux7f213rfuNf0XHpZsXyXPyTl
-	HoPanlnfpf1FVdha8Z5Th4UHTKjvTUimMwt57mIfdxsrQymKKTFf4N253GoF23IT2bWC4oMbxCG
-	W3PbhAa3gRLr7QgWUj4Qk5lZQpMJpIivnp7kjd3ETf+h53SAb+VASEQmOBANFtt7EbdCTrY8SGm
-	2kvJoHt+ncJKNQo7zjGWw2l2v2Rvw8dTFgjHuB1XwuzBXmc0tFYGP3QD3ricVcbwY1sAozmVCn2
-	to1A7j7FWIq0yvj6YsRBf45F7BbJb2fJpPc2OtW1SwGYy6Ic6NJ1hu5g==
-X-Received: by 2002:a17:90b:4b84:b0:38e:8021:2ea9 with SMTP id 98e67ed59e1d1-3903c5f6482mr25708102a91.19.1786172015866;
-        Fri, 07 Aug 2026 23:53:35 -0700 (PDT)
-Received: from lgs.. ([2001:250:5800:1000::f280])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3925ff6658bsm5116933a91.14.2026.08.07.23.53.33
+        bh=CwYH+YDI8SAmi2VA+WwpQ0qieT+uWBICR9XfrxWBjvg=;
+        b=mVyfsQu+3zFUdjdjBtM8WJdDtAXbajxyhKzKEDyyTmaG0TDmkLH2Erk1DJilC9HUsN
+         mPu1cG80yl6MnhsgB6BxfBZWqQEXjorFtW5+uoovABxzRfnJSCgCPirok71GPByl9ilw
+         VC5iUfwF+/9kLwgD0cAulbgzEYZRH65WVJwuqHd/Le9OSCfOK0xfPwrfQ01U0rdnM0o7
+         JO6KmjYhcb2m7g0muOybJ/QdWKY4YmhFN+p5Vst2eyCs72Q2NoNVN5sTvLz99t8UlHcG
+         36EYAJt54Te6EEJx5VWyQUN3iXdBk8COT61MMXbadpHZBf3U54glCEcDjv9DkoCsQYu2
+         aO+g==
+X-Forwarded-Encrypted: i=1; AHgh+RoIzsJm8DjKS4ebB/HdaDWsQu7YIhqtOA2X/OP2eSD9/C6cgUMvXquRrJlqJyffh7k0Hp8gue/+qg8P4Ws=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyi1yAwvJbmN7Zs4e937Ozrc4f+EEnT0JVNdQ4BCUrMyvMmDA+5
+	wbPUy/JdOoErjcSVWlZd4f6+UYjRIN8kbmTd7JsXLScdgGiWtEyL01QF
+X-Gm-Gg: AR+sD13dwslpHlMoB0DTV3K4Q4WBxNboyx8ZGBkECkoioa47bYRBeQ3iSqPnceHeKvf
+	1yhVjTwAzW7PKlfyD/bHt2cmossicK9N2hnHhmLHh29e7S3ZNTeb7S8uaeRAHvufwpJelDX5AIX
+	lbbJQMi/sOeOFRFDmF0kNPqC+8koPNRhcbHo+S6Zvtntv7F9cEpDt1GUj3en25zzOPz7dPjP3wJ
+	8/Brq9cJqSYtiM8sDmLg3QLhotRl5PqUz3hhOSRHyeiQcdTGZ+FsLutySGxanMp2XTgsKMKh6qr
+	3kL7oQgeNaxL/j5t2CDx29JR+zG0tj37ADkBTGQq07mFW8xX05Lugi/GcoGfIkSDrc4fDI+BZ5z
+	8djnM8e1bY0lxMXn9ob0+qt1zuK3ahntP0yURD2RpS7NLJtIqB5TjnOyeQsHoX5VLFhjL4O6uFK
+	W9818b0ayDuO8vCXrMtzw8G/Hzsksp/3yiWGGhGdLbO7mRU3bJhg==
+X-Received: by 2002:a17:902:ccd1:b0:2d1:1a28:10d with SMTP id d9443c01a7336-2d11a280465mr159732205ad.18.1786173934103;
+        Sat, 08 Aug 2026 00:25:34 -0700 (PDT)
+Received: from lgs.. ([118.193.33.13])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2d14ccadef6sm16578155ad.11.2026.08.08.00.25.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Aug 2026 23:53:35 -0700 (PDT)
+        Sat, 08 Aug 2026 00:25:33 -0700 (PDT)
 From: Guangshuo Li <lgs201920130244@gmail.com>
-To: Hadar Gat <hadar.gat@arm.com>,
+To: Jia Jie Ho <jiajie.ho@starfivetech.com>,
 	Olivia Mackall <olivia@selenic.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Jenny Zhang <jenny.zhang@starfivetech.com>,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Cc: Guangshuo Li <lgs201920130244@gmail.com>,
 	stable@vger.kernel.org
-Subject: [PATCH] hwrng: cctrng: fix usage_count leak when autosuspend_delay is negative
-Date: Sat,  8 Aug 2026 14:41:45 +0800
-Message-ID: <20260808064145.2615010-1-lgs201920130244@gmail.com>
+Subject: [PATCH] hwrng: starfive: fix runtime PM autosuspend cleanup
+Date: Sat,  8 Aug 2026 15:25:16 +0800
+Message-ID: <20260808072516.2640658-1-lgs201920130244@gmail.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -76,40 +78,55 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-cc_trng_pm_init() calls pm_runtime_use_autosuspend(), but
-cc_trng_pm_fini() does not call the matching
-pm_runtime_dont_use_autosuspend() before disabling runtime PM.
+starfive_trng_probe() calls pm_runtime_use_autosuspend(), but runtime
+PM is enabled with pm_runtime_enable() without a corresponding
+pm_runtime_dont_use_autosuspend() during driver teardown.
 
 If the autosuspend delay is set to a negative value while autosuspend
 is enabled, the runtime PM core increments usage_count to prevent
-runtime suspend. Without calling pm_runtime_dont_use_autosuspend()
-during teardown, this reference is not dropped and usage_count remains
-unbalanced.
+runtime suspend. Without undoing the autosuspend setting during
+teardown, this reference can remain unbalanced.
 
-Add the missing pm_runtime_dont_use_autosuspend() call before disabling
-runtime PM.
+Use devm_pm_runtime_enable() so that runtime PM and the autosuspend
+setting are automatically cleaned up on probe failure and device
+removal. Remove the explicit pm_runtime_disable() from the hwrng
+registration failure path since the managed cleanup handles it.
 
 This issue was found by manual code inspection.
 
-Fixes: a583ed310bb6 ("hwrng: cctrng - introduce Arm CryptoCell driver")
+Fixes: c388f458bc34 ("hwrng: starfive - Add TRNG driver for StarFive SoC")
 Cc: stable@vger.kernel.org
 Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
 ---
- drivers/char/hw_random/cctrng.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/char/hw_random/jh7110-trng.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/char/hw_random/cctrng.c b/drivers/char/hw_random/cctrng.c
-index a5be9258037f..bed4b9876d09 100644
---- a/drivers/char/hw_random/cctrng.c
-+++ b/drivers/char/hw_random/cctrng.c
-@@ -126,6 +126,7 @@ static void cc_trng_pm_fini(struct cctrng_drvdata *drvdata)
- {
- 	struct device *dev = &(drvdata->pdev->dev);
+diff --git a/drivers/char/hw_random/jh7110-trng.c b/drivers/char/hw_random/jh7110-trng.c
+index 4712c3c530e4..34b2ec3e13b3 100644
+--- a/drivers/char/hw_random/jh7110-trng.c
++++ b/drivers/char/hw_random/jh7110-trng.c
+@@ -336,12 +336,18 @@ static int starfive_trng_probe(struct platform_device *pdev)
  
-+	pm_runtime_dont_use_autosuspend(dev);
- 	pm_runtime_disable(dev);
- }
+ 	pm_runtime_use_autosuspend(&pdev->dev);
+ 	pm_runtime_set_autosuspend_delay(&pdev->dev, 100);
+-	pm_runtime_enable(&pdev->dev);
++	ret = devm_pm_runtime_enable(&pdev->dev);
++	if (ret) {
++		reset_control_assert(trng->rst);
++		clk_disable_unprepare(trng->ahb);
++		clk_disable_unprepare(trng->hclk);
++
++		return dev_err_probe(&pdev->dev, ret,
++				     "Failed to enable runtime PM\n");
++	}
  
+ 	ret = devm_hwrng_register(&pdev->dev, &trng->rng);
+ 	if (ret) {
+-		pm_runtime_disable(&pdev->dev);
+-
+ 		reset_control_assert(trng->rst);
+ 		clk_disable_unprepare(trng->ahb);
+ 		clk_disable_unprepare(trng->hclk);
 -- 
 2.43.0
 
