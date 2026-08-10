@@ -1,106 +1,106 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF0FB3B5F63
-	for <linux-crypto@vger.kernel.org>; Mon, 10 Aug 2026 09:30:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19BF23B95F0
+	for <linux-crypto@vger.kernel.org>; Mon, 10 Aug 2026 10:23:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786354259; cv=none; b=M1XgoRrAyXTNGqnkbWPF/NgvlYkeHI37Yx7GxrxMr6zu7kYOVvyX3m9C4cdpTF3nDN/fwp+PunwPOJoONS6ZqPVnKwHNrR98p9p/tKLC0cyrfiUpkN7Z66O/Q+J64wEVXB0c9uQ+dARh9TYlrQxmdDSJx2NvQ076MZ0LwsIFd/U=
+	t=1786357435; cv=none; b=F8KGdVH5qi3uVVGocdZzsgeGUDppZBe61/P8KdoYZSequuqbMq1zRCwoELUAQtkyl8l/bVJT6PubuYyXbNaA1ZmisD7U9anS/Gj2fEvRTusFXyTECn2YJgVZvtAUB/l/EQp+ry6SfiPpfj5/lKBkM0yJSGqoy+10ZPknw0fV6o0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786354259; c=relaxed/simple;
-	bh=AvdIm6Ui0tKhNtJ8JmYLXzg5tYfY6zHY3E/mVVY4STI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Qn27eHQalCGegmSf+0qp2fO9n4ZasV/FR56aIj7snoHzDfEaYZjfgCtaVFOxirqJjFQn2rjf5Z/rvVHQRH35fMUVPEDzGDah/C+sHTLK/cqQaqFnyE/kfeHnGbDcn2cNlmYzzAHw2oWhGa+mWUeCyjWRrvIXwvenE95NhxIlQVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NPQnHbnz; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1786357435; c=relaxed/simple;
+	bh=wpv7yCZtqzGpymgIBpq2xprUOu/HO+Ii+2myekc94UQ=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KVk4MFQy42B0XAaIfEejpkobst661FPf2OZDw1OQ1YiIgMcizI8o90wnMGt2maPsJiUChrk4eXiZgDkG0YP1sbWdwpvAPwE8QCY+BBYtwM4L5JrjzQHcIkg9MLO4vlK5PS/zIr/FKT/knQBIPTHc4V7vhSNusigShpR/8auEbAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aVBWMh7U; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NPQnHbnz"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1786354256;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fllTULH2rQv7zAqX+LQLL7uPEeBIqqKHUflABxHkaxI=;
-	b=NPQnHbnzxCRSHZYLsdXKU7KzmmZZFEgRmr8/CgLSJ1TbR1XKYHNO+6GW/S11/7fOOcrOrV
-	1s0ltqPuJ4Fx6MNBb1xaYykXXzWe45XOwfRhEjKEOZqRty0NJiOunSx4YXITBI341AA3zG
-	OWY6PnnTqRbKimygukdC9zOReAnYXgc=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-264-Xp_sMOMDPSeBETgCHF5euA-1; Mon,
- 10 Aug 2026 05:30:52 -0400
-X-MC-Unique: Xp_sMOMDPSeBETgCHF5euA-1
-X-Mimecast-MFC-AGG-ID: Xp_sMOMDPSeBETgCHF5euA_1786354251
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0095D19560BB;
-	Mon, 10 Aug 2026 09:30:51 +0000 (UTC)
-Received: from thuth-p1g4.redhat.corp (headnet05.pony-001.prod.iad2.dc.redhat.com [10.2.32.117])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 987073001D38;
-	Mon, 10 Aug 2026 09:30:48 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Antoine Tenart <atenart@kernel.org>
-Cc: linux-crypto@vger.kernel.org,
-	Eric Biggers <ebiggers@kernel.org>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v5 10/10] crypto: eip93 - Simplify the check for a valid AES key
-Date: Mon, 10 Aug 2026 11:30:05 +0200
-Message-ID: <20260810093009.608090-11-thuth@redhat.com>
-In-Reply-To: <20260810093009.608090-1-thuth@redhat.com>
-References: <20260810093009.608090-1-thuth@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aVBWMh7U"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A82801F00ADB
+	for <linux-crypto@vger.kernel.org>; Mon, 10 Aug 2026 10:23:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786357431;
+	bh=VXlJ4MRsvdw0tt/TAbvwG9Xn7DOulcryLzjZ1Z/C30U=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc;
+	b=aVBWMh7URy4oytN7JSCODkv8dmyfCEXc/eyg5gaJLSib1XtThwSy6T5JB6WoeAf08
+	 qRGuFB4Ty3wuF5TcN+F35eDqp+zyqIezELUk3gF0S8cjbKQ5n1W6Jq4g2NLgCDF2jb
+	 LvWDmUqz8LGbNfQyFTVhkgBOFBA5Y9MLyVz7v8CEcKa6afg1u6WSDdJojWIzqNEdO4
+	 /1Mc+7qidTJb4fau096gBww36pHcV4s2ZXUv5J8Goxx7pFeYihwuMVvNuSpeBNkJ3p
+	 Q92YodrErGSIAKCBVew6gahb0f3Mmf2zhNI2cBaa0WDZ1ZT1VMNAPKnhz+kUb9zO54
+	 qMRDG6naw2ezQ==
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-39ca0a30148so13415861fa.3
+        for <linux-crypto@vger.kernel.org>; Mon, 10 Aug 2026 03:23:51 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AHgh+Rqr+nZziVVUv6flkcria3Ad3USYDDqSp65DOUCjGKCEkgFNnUTTv0F9V3cu4RvnRbJdKXfAVEs+m9PHtwg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJb4IoT++cxkmKoMURs+MxYv7t2wWN0glBvyHVWy/2lHtss639
+	F2P4JJw+bHb1VjNfoHb62T/E8sVaVtzBuf4bTWxl5CmyL4j3a1++PGaoHSzGYDV+SP8NNVtNFlY
+	Fg00zlXwWVZhADB7XRwPCgmGixJTtwIofAeUqThhK1w==
+X-Received: by 2002:a05:651c:a111:10b0:39c:f58e:5c74 with SMTP id
+ 38308e7fff4ca-3a00e9bf925mr750931fa.22.1786357430361; Mon, 10 Aug 2026
+ 03:23:50 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Mon, 10 Aug 2026 10:23:47 +0000
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Mon, 10 Aug 2026 10:23:47 +0000
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <20260807065454.1640815-1-md.alam@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+References: <20260807065454.1640815-1-md.alam@oss.qualcomm.com>
+Date: Mon, 10 Aug 2026 10:23:47 +0000
+X-Gmail-Original-Message-ID: <CAMRc=McDAt5G9-mJSY15oL6vQT+rcOFK0cj+bnx7kk93WooGPQ@mail.gmail.com>
+X-Gm-Features: AUfX_mwYz2T3Du22q1EW54KFvAX6iEvMhf5BShH-BcDYhDcpydM1MVdnkBjtNho
+Message-ID: <CAMRc=McDAt5G9-mJSY15oL6vQT+rcOFK0cj+bnx7kk93WooGPQ@mail.gmail.com>
+Subject: Re: [PATCH] crypto: qce: fix CCM AAD buffer underallocation
+To: Md Sadre Alam <md.alam@oss.qualcomm.com>
+Cc: varadarajan.narayanan@oss.qualcomm.com, brgl@kernel.org, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, thara.gopinath@linaro.org, 
+	linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-From: Thomas Huth <thuth@redhat.com>
+On Fri, 7 Aug 2026 08:54:54 +0200, Md Sadre Alam
+<md.alam@oss.qualcomm.com> said:
+> The AAD buffer allocated in qce_aead_ccm_prepare_buf_assoclen()
+> can be smaller than the length later programmed into the DMA
+> scatterlist.
+>
+> The allocation size is currently calculated as:
+>
+>   ALIGN(assoclen, 16) + MAX_CCM_ADATA_HEADER_LEN
+>
+> while the DMA length is set to:
+>
+>   ALIGN(assoclen + adata_header_len, 16)
+>
+> Since ALIGN() does not distribute over addition, the allocation
+> can be smaller than the DMA length. For example, when
+> assoclen = 32 and adata_header_len = 2:
+>
+>   allocation = ALIGN(32, 16) + 6 = 38
+>   DMA length = ALIGN(32 + 2, 16) = 48
+>
+> As a result, the QCE hardware can read beyond the allocated
+> buffer while computing the CBC-MAC over the associated data.
+> The extra bytes are folded into the authentication tag,
+> resulting in an incorrect tag and causing CCM self-test
+> failures such as:
+>
+>   alg: aead: ccm-aes-qce encryption test failed (wrong result)
+>   on test vector 8
+>
+> Fix the allocation by adding the maximum possible AAD header
+> length before alignment:
+>
+>   ALIGN(assoclen + MAX_CCM_ADATA_HEADER_LEN, 16)
+>
+> This guarantees that the allocated buffer is large enough
+> for the fully padded AAD data for all supported header sizes.
+>
+> Cc: stable@vger.kernel.org
+> Fixes: 9363efb4181c ("crypto: qce - Add support for AEAD algorithms")
+> Signed-off-by: Md Sadre Alam <md.alam@oss.qualcomm.com>
+> ---
 
-eip93_aead_setkey() currently uses aes_expandkey() to check for a valid
-AES key, but then does not use the crypto_aes_ctx afterwards anymore,
-i.e. this is just a wasteful way of checking the key length, and thus
-aes_check_keylen() should be used instead.
-This also fixes a potential leak of sensitive data via the stack, since
-this function forgot to zeroize crypto_aes_ctx before returning to the
-caller.
-
-Suggested-by: Antoine Tenart <atenart@kernel.org>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- drivers/crypto/inside-secure/eip93/eip93-aead.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/inside-secure/eip93/eip93-aead.c b/drivers/crypto/inside-secure/eip93/eip93-aead.c
-index 2bbd0af7b0e0e..0b7a899b14d76 100644
---- a/drivers/crypto/inside-secure/eip93/eip93-aead.c
-+++ b/drivers/crypto/inside-secure/eip93/eip93-aead.c
-@@ -92,7 +92,6 @@ static int eip93_aead_setkey(struct crypto_aead *ctfm, const u8 *key,
- 	struct crypto_tfm *tfm = crypto_aead_tfm(ctfm);
- 	struct eip93_crypto_ctx *ctx = crypto_tfm_ctx(tfm);
- 	struct crypto_authenc_keys keys;
--	struct crypto_aes_ctx aes;
- 	struct sa_record *sa_record = ctx->sa_record;
- 	u32 nonce = 0;
- 	int ret;
-@@ -126,7 +125,7 @@ static int eip93_aead_setkey(struct crypto_aead *ctfm, const u8 *key,
- 
- 		break;
- 	case EIP93_ALG_AES:
--		ret = aes_expandkey(&aes, keys.enckey, keys.enckeylen);
-+		ret = aes_check_keylen(keys.enckeylen);
- 		if (ret)
- 			return ret;
- 
--- 
-2.55.0
-
+Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
