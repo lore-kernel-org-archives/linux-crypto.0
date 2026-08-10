@@ -1,48 +1,44 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F395F360EF0;
-	Mon, 10 Aug 2026 08:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 462DF3A1D0C;
+	Mon, 10 Aug 2026 08:15:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786349432; cv=none; b=dpusXaOUTqshZQkzZhIRAeR21KYARtXbi/4WPwI3NZIyRAXB+D9UXZRaX+towJAiAjw57ZWdpFzz+hs+VSAb9/8H2qAggOaAUHBrkVVHIah9/0UV16L4fgz4yvbmBgvvydz5Jamy3Do+O/wot+D+/7ADlQlmgww9/oMupNymvk4=
+	t=1786349718; cv=none; b=udiKE2F5oQbzFfmXgx+TdqW9TD/i+RX/m8asjKmvYm43VHJmqE+LmNJZ6LJh4VgdwxIrIL60dOgQV+GZFiWUYcWZ6QIDOAhuPPmYOhD4Gv2wydZNaVK9HTX0mIhEWbY115R2l6LTuXPqr0RUCtiAsY59+uHam/tfdh5pbeVBUrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786349432; c=relaxed/simple;
-	bh=3IwBHSpT4E3u3eW97XB3arpoqPPxXkJIfhX8Zv8duYs=;
+	s=arc-20240116; t=1786349718; c=relaxed/simple;
+	bh=Jo9JoEttSI05kzEFTrr+sl23lNNQD3jZAwbd9f+c1cM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TgksF46OpsYF8udikRz1BtlALQEX6WUuU6w1OF+OBqU59el3qYKqpfd42rrayy0Dd8HCoSNuyhbxdRVZvgBZ0E8Cecob/KbaehfGTZ854VwrdmYOOEqsZxRaKTnHLmJYRwhkao8flUnGlth5EkK/dP1xg80pMDXa82FbeZW2Ws8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=qxXhgsWF; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=X43W9ThDmTFMAXrFyhFdnZqhx3HUs/3NTigeOJRSCsIUQdFvaUnQyzk3iMg6NFMsj0VWc6LjPKtgF1Oy8vFOLKsWtvzdHOV67xSnmpfpggjPk22aHS3KBzq3KHlJ35jQa71T1yED/RMTCmuDT9KLlhW14gxITQTSGrw92TThUaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=s+mQ1Uz9; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="qxXhgsWF"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="s+mQ1Uz9"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=I8g03HLjrI6MmppUhp5T17EUkXkbiNDiEyX0pw+P4cs=; 
-	b=qxXhgsWFsn0u8rWf9gKs3rkCJL/SzmiJgzpqyxN0tnc1VrkPoowV7ISlbOJnUqSPhxRR50fdJdN
-	GvCVj4dHuNI7OdNHBAt9LnItM8ZrEwwZaRdn0agt2cNurQMwv4UQOlLx2QIV/TvbgDZbOLD3rwfso
-	OxwW/vZbuqhkCm4s/9ioSSNAXEDOyNcJFUDPG3IBmgRlpEdw/sbCjgXF10Aqf0fdTddiOOSm9wwA/
-	jYxVGSKm9orfSeMrPgK5YWBQNIqFqE/wvQ64f195AFBn12LQs9Wi1QSQjRaKz6TwqEE19dJMvyC9n
-	14OWbjzrIJ5XWM4jhrpISqYkJCO7mxntWwQA==;
+	from:content-type:reply-to; bh=VNIoZfVWESI2bPCASpoykEbx0LEfjHjuUlUPX6VaO0Y=; 
+	b=s+mQ1Uz9fI+KU2d0ln701ckk9OV4hRrKRvnBN6+voduFoOwiQZZ9XadU1PRoInWcgzL6105ecGD
+	zZHuOPs+An98EdNXhtIjPboS7TDNTiGtpEyYhDlCiP9qIOpN4BNT3fH/YhjJU+Dx0EFt1KCb0RruK
+	R/DXDcHOmtnZ9WrTmOLnfFJlbF1jDMAV5PFlPo2WEN7PevLL/EUKSVd/Zd54VklZySM9+foJuOn6N
+	QY3OmrPVphZ84QPG+eQfEBkefiKgDmVTpJpEoNWronTCzMZiT1VItK8RZx2CHRTB1/fMUA3kHX7ni
+	ElZ66R5Yq0y4xwVe5W11Ixmc16p3imAlci0Q==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wtL5V-00000003WMA-2ulx;
-	Mon, 10 Aug 2026 16:10:26 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 10 Aug 2026 18:10:25 +1000
-Date: Mon, 10 Aug 2026 18:10:25 +1000
+	id 1wtLA2-00000003WQ8-1uBX;
+	Mon, 10 Aug 2026 16:15:07 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 10 Aug 2026 18:15:06 +1000
+Date: Mon, 10 Aug 2026 18:15:06 +1000
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: Rosen Penev <rosenp@gmail.com>
-Cc: linux-crypto@vger.kernel.org,
-	Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-	Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Gaurav Jain <gaurav.jain@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
+Cc: linux-crypto@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
 	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] crypto: caam/jr: fix use-after-free in interrupt handler
- teardown
-Message-ID: <anmHccSuAF5apZr2@gondor.apana.org.au>
-References: <20260730231603.1169539-1-rosenp@gmail.com>
+Subject: Re: [PATCH] crypto: amcc - fix missing DMA memory barriers in
+ descriptor handling
+Message-ID: <anmIiof2gsFT_LV0@gondor.apana.org.au>
+References: <20260731212040.22764-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,38 +47,41 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260730231603.1169539-1-rosenp@gmail.com>
+In-Reply-To: <20260731212040.22764-1-rosenp@gmail.com>
 
-On Thu, Jul 30, 2026 at 04:16:03PM -0700, Rosen Penev wrote:
-> caam_jr_shutdown() currently calls tasklet_kill() without freeing the
-> IRQ first, creating a window where the interrupt handler can fire and
-> schedule the tasklet after it has been killed.  Move from
-> devm_request_irq() to request_irq()/free_irq() so that the IRQ is
-> explicitly freed in caam_jr_shutdown() before the tasklet is killed.
-> 
-> As part of this change, pass jrp directly as the dev_id cookie to
-> request_irq() instead of the device pointer.  This lets the interrupt
-> handler obtain jrp directly from the cookie, eliminating the
-> dev_get_drvdata() call in the hot path.
-> 
-> Two related fixes:
-> - Use jrp->dev instead of the now-undefined dev local in the handler's
->   error path.
-> - Set jrpriv->dev before calling caam_jr_init() so that jrp->dev is
->   valid before the IRQ is registered and the handler can run.
-> 
-> Assisted-by: opencode:big-pickle
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> ---
->  drivers/crypto/caam/jr.c | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
+On Fri, Jul 31, 2026 at 02:20:40PM -0700, Rosen Penev wrote:
+>
+> diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
+> index 0271b5e4d923..851bf075d769 100644
+> --- a/drivers/crypto/amcc/crypto4xx_core.c
+> +++ b/drivers/crypto/amcc/crypto4xx_core.c
+> @@ -876,11 +876,13 @@ int crypto4xx_build_pd(struct crypto_async_request *req,
+>  		}
+>  	}
+>  
+> +	pd->pd_ctl_len.w = 0x00400000 | (assoclen + datalen);
+> +	pd_uinfo->state = PD_ENTRY_INUSE | (is_busy ? PD_ENTRY_BUSY : 0);
+> +
+> +	dma_wmb();
 
-I think we should fix the general problem of hardware removal
-in the middle of a crypto operation first before attempting these
-fixes.
+Please always add an accompanying comment explaining exactly which
+two writes are being ordered.
 
-The driver needs to be modified so that it can fail gracefully
-if the hardware is forcefully unbound while a crypto op is ongoing.
+>  	pd->pd_ctl.w = PD_CTL_HOST_READY |
+>  		((crypto_tfm_alg_type(req->tfm) == CRYPTO_ALG_TYPE_AEAD) ?
+>  			PD_CTL_HASH_FINAL : 0);
+> -	pd->pd_ctl_len.w = 0x00400000 | (assoclen + datalen);
+> -	pd_uinfo->state = PD_ENTRY_INUSE | (is_busy ? PD_ENTRY_BUSY : 0);
+>  
+>  	wmb();
+>  	/* write any value to push engine to read a pd */
+> @@ -1031,6 +1033,7 @@ static void crypto4xx_bh_tasklet_cb(unsigned long data)
+>  		     ((READ_ONCE(pd->pd_ctl.w) &
+>  		       (PD_CTL_PE_DONE | PD_CTL_HOST_READY)) ==
+>  		       PD_CTL_PE_DONE)) {
+> +			dma_rmb();
+
+Ditto.  Please add a comment explaining which two reads are being ordered.
 
 Thanks,
 -- 
