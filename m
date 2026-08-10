@@ -1,86 +1,103 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F08412FE59C
-	for <linux-crypto@vger.kernel.org>; Sun,  9 Aug 2026 22:15:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D43B37204E;
+	Mon, 10 Aug 2026 07:38:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786313731; cv=none; b=Q0sUOgS9OIr8+WFKG9CqF6ZmRfx5PjqLvyYl4/K0qfseglx4KUf4wd4GTBftEJbgeJ2/HqWzYID3PXLchzxkMB+IRL3fYiLWlxT0ivyYv1PhDIv4R1SESzEPCKvqy/iftTNLFUtpp1V7XVc86WA9DRJfqul85PIK4DKA+YxLxQI=
+	t=1786347521; cv=none; b=VbN182rIkHKbnpjz8Rv/CPiSQOLAhYTx9JiKBqpYqrMmrawFXnWwjOMrmslM9DNLucQYJ6Ie1nhJYVZTmDqruanFzLvNIDHDD/ShcykMzh9Nc4MLHwOrJxxSwPCf9i7O/Gqf0+Git1H8DBEPhIeB8b3fjO5WAo3bGrXa40JOvWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786313731; c=relaxed/simple;
-	bh=S9BX78DlPHt8S8INWN4bId3HyR/nFnQd4eQA2gbdEJU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MSMJ12WnVoUIbfNTLZd10T73hZwDVm7Dtn18vgkxFHJ0KM3nqzeeyjFGgqWv4QvyucgpbagylcdDQbb0fOe6imHocbc0TC3MSf3E7AdzGk195PT8UkueLY+Ob/CitpdSfB0HK444afjecUgJeM1L9ZqV1Bpqyq1HwqfFVjwhMCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=alJpLY4v; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786347521; c=relaxed/simple;
+	bh=98sELRT+ug83gGNKnZyvx4Zp2DbVlRPoAiw6/0Es2ik=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=P1oxWy5ZHt2YMNakuucld6lq3OW1qPIytko7vpPoUMQRma4CAD8jHoiFKQBIokpILMau3ZAlea7YFvcTspm76xuUUN1JAZrV5Gn8GCSSqStrs2Ko6mpvFt+i/N38LgsN3j4JbJEGGXX7I040nz+QO9kB6rqf4vjbaIw49xKVDxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=CTpU0ASj; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="alJpLY4v"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A26641F00ADB
-	for <linux-crypto@vger.kernel.org>; Sun,  9 Aug 2026 22:15:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786313729;
-	bh=S9BX78DlPHt8S8INWN4bId3HyR/nFnQd4eQA2gbdEJU=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=alJpLY4vqBtVvsJ20rrROXR1V2lNUYYMAd/pt4XYILZKuMrQDIKpT0/lh3yypHeRw
-	 6IXRP9qzg+iDmho06W3EvNbSOsYhi4g6cYvxBn621aDFqNLSuTbxq247uEKT7atRos
-	 G9fmrH3DMUyhlvQqNOrjcC+bqeDbFPeevy4UAKICv5rAQloavQpHQr2Vu1cz8czyf8
-	 yonPW3+GfjCo0cAQivRa/wkH7Z1WqCwFovG0C/vrof01C5NnpydYFkUgJEv2SmOdPQ
-	 2NBw7O8hvw9xkPSiQPqaYDKjo2n7+QY6KjBygeG8NyPjhZsF5Xe61XQomabpivnCjJ
-	 OU74rSF9XKxeg==
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5aec6360133so1005689e87.1
-        for <linux-crypto@vger.kernel.org>; Sun, 09 Aug 2026 15:15:29 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+Ro0RVFLYRMxTun/2yL8Hyp5WbjjLkp67Qw+ThjyVk69P8OMzzNDfdLWDzoBveSj2L3Gbq1XL6KgDWbBHwA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhPGFtndi/3jUcKWeJvxdW7GDlY8xKOtXCKfQ0KI4IUB1jhqP1
-	lEF+R9jB553m/Ng1t7/eHPkRpm/JdrxYF2J8Dr9gYoHe3jkRyb/7bTqivoHdJRC+5X4xL55S8LT
-	zEdeoyMt2DAZ7fxGoQKO8Myn6kk3qows=
-X-Received: by 2002:a05:6512:3257:b0:5b0:165f:17fd with SMTP id
- 2adb3069b0e04-5b2f4b885d3mr3739706e87.14.1786313728379; Sun, 09 Aug 2026
- 15:15:28 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="CTpU0ASj"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=Content-Type:MIME-Version:Message-ID:Subject:
+	To:From:Date:cc:to:subject:message-id:date:from:content-type:in-reply-to:
+	references:reply-to; bh=1F9z21xx108cwXYV/cgyVFJ9rW5fh6J7oe1SLAmKbFs=; b=CTpU0
+	ASjZEpKDIeftd6hkRjqDmQtbKVaYDxgG9QD0qfTmTMEKmVwUX63BJxCnSZoLWide2luZOhR9O7MUG
+	ZUumLKrRVySOpqOxJzk9LxcBnNkvvoWdcDs5BXdrsdTzYwgNnYgTuGLe1NwMsiKWuEWkgzz1cAnGq
+	9XGsqOuQ6u2mSuzALXSPu20GOlb4uEUL4DTEUUxVtZ5NJWkanORnTjTBNDDXnCzm42vk5H5oMe09m
+	B3fPB9xPi9Ul202wOx+uc3t6cAefSJLQhNqiyWcR5Dolv2i7GjHZus8IZRNQQeu0iP61haP5yCtU8
+	+A6srB9tTayuMm1u5bWRrpFLnZxxA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1wtK0p-00000003VLz-2zz3;
+	Mon, 10 Aug 2026 15:01:32 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 10 Aug 2026 17:01:31 +1000
+Date: Mon, 10 Aug 2026 17:01:31 +1000
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT PULL] Crypto Fixes for 7.2
+Message-ID: <anl3S6pbchyEAvzF@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260808092634.2734292-1-lgs201920130244@gmail.com>
-In-Reply-To: <20260808092634.2734292-1-lgs201920130244@gmail.com>
-From: Linus Walleij <linusw@kernel.org>
-Date: Mon, 10 Aug 2026 00:15:16 +0200
-X-Gmail-Original-Message-ID: <CAD++jLkcpHW-YKscKfMYRdD_T483jcUBYjz4gbP3EbV0fVLATg@mail.gmail.com>
-X-Gm-Features: AUfX_mxLzMOnoTQp5mJwejOlPlhyNTugg8h4U8BlsHNCbaahLgre1Sqq4KSyD6U
-Message-ID: <CAD++jLkcpHW-YKscKfMYRdD_T483jcUBYjz4gbP3EbV0fVLATg@mail.gmail.com>
-Subject: Re: [PATCH] crypto: sl3516: fix autosuspend cleanup during teardown
-To: Guangshuo Li <lgs201920130244@gmail.com>
-Cc: Corentin Labbe <clabbe@baylibre.com>, Hans Ulli Kroll <ulli.kroll@googlemail.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Sat, Aug 8, 2026 at 11:26=E2=80=AFAM Guangshuo Li <lgs201920130244@gmail=
-.com> wrote:
+Hi Linus:
 
-> sl3516_ce_pm_init() calls pm_runtime_use_autosuspend(), but the
-> autosuspend setting is not undone if pm_runtime_set_suspended() fails
-> or when runtime PM is later torn down by sl3516_ce_pm_exit().
->
-> If the autosuspend delay is set to a negative value while autosuspend
-> is enabled, the runtime PM core increments usage_count to prevent
-> runtime suspend. Without calling pm_runtime_dont_use_autosuspend()
-> during cleanup, this reference is not dropped and usage_count remains
-> unbalanced.
->
-> Undo the autosuspend setting when pm_runtime_set_suspended() fails and
-> in sl3516_ce_pm_exit() before disabling runtime PM.
->
-> This issue was found by manual code inspection.
->
-> Fixes: 46c5338db7bd ("crypto: sl3516 - Add sl3516 crypto engine")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
+The following changes since commit 8173f7e2ce67e6ca1d4763f3da14e5b01ce77456:
 
-Looks right to me!
-Reviewed-by: Linus Walleij <linusw@kernel.org>
+  rhashtable: clear stale iter->p on table restart (2026-07-17 09:04:45 +1000)
 
-Yours,
-Linus Walleij
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6 tags/v7.2-p3
+
+for you to fetch changes up to 285d8204638cf8be0dc304dc40f0290ada701340:
+
+  crypto: af_alg - Allow cbc(paes) (2026-07-30 17:44:21 +1000)
+
+----------------------------------------------------------------
+This push contains the following changes:
+
+- Fix lockdep warning regression in rhashtable.
+- Fix default authsize in rfc4309.
+- Fix gcm cryptlen calculation in tegra.
+- Fix qce registration error-path bug.
+- Fix incorrect use of sg_dma_len before mapping in starfive.
+- Allow cbc(paes) to be used with af_alg.
+----------------------------------------------------------------
+
+Florian Westphal (1):
+      rhashtable: fix false-positive lockdep splat on rhltable destruction
+
+Herbert Xu (1):
+      crypto: ccm - Set rfc4309 maxauthsize from child
+
+Richard Weinberger (1):
+      crypto: af_alg - Allow cbc(paes)
+
+Thorsten Blum (2):
+      crypto: qce - fix error path in devm_qce_register_algs
+      crypto: starfive - use scatterlist length before DMA mapping
+
+Vladislav Dronov (1):
+      crypto: tegra - fix rctx->cryptlen calculation in tegra_gcm_do_one_req()
+
+ crypto/algif_skcipher.c              |  8 +++++++-
+ crypto/ccm.c                         |  2 +-
+ drivers/crypto/qce/core.c            |  2 +-
+ drivers/crypto/starfive/jh7110-aes.c |  2 +-
+ drivers/crypto/tegra/tegra-se-aes.c  | 22 +++-------------------
+ lib/rhashtable.c                     |  2 +-
+ 6 files changed, 14 insertions(+), 24 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
