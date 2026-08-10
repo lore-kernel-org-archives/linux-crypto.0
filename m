@@ -1,46 +1,46 @@
-Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013054.outbound.protection.outlook.com [40.93.201.54])
+Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013046.outbound.protection.outlook.com [40.93.201.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 942A343FD18;
-	Mon, 10 Aug 2026 19:22:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 384A53AAF4F;
+	Mon, 10 Aug 2026 19:22:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.46
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786389766; cv=fail; b=VdQ2LGzW+oK7sle1Ds2YOmrrqgh08o0+HUqKPiVMt0LT0CDsXs/xrcFaX3yMJ7wdhlToMcY+HpOrgrygTqMVZIgCHEIJBC/VcCykXpwKTAEFBhxM22tWnVczjGwNKU4BbwkjpE+uXeoUAtwpotxQGL0KbWlKSEObVuim9W5ZsZk=
+	t=1786389787; cv=fail; b=KqReypsjx8CucbLElcPiAhNWnwjtDST0TXehTiG+bJeROHz7MqK0PhBxBOk/+SEmt3Bw4Htqu1fUiSY2IANC8uSuSGCqqpeJperwwlKtW6Nb/hjzx0bMVQT2fAFSpt9t2ai1YfIaFV3OFTfZ/cIMRcbX6L4dAEqRGpOTabrhyH0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786389766; c=relaxed/simple;
-	bh=y1wY5ohONIR7waG6vlY4dWszfChZAqCWOXSA8WhZC4U=;
+	s=arc-20240116; t=1786389787; c=relaxed/simple;
+	bh=8HHoV9G64Yx6NaWyyn+Ns6lZRbyazbcxSitaY3j1g3I=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=a2EDuqzQpBj0BXSAKbMm4ek8oUDy6LL0AgKS5vfoTfaC4zq5zuam1Dfc0IxrgkWDmOV+/TQ4CszHeKfz/5x7Gmv2fCEl1kUhUnNle+3AYXxGbdY8fAA9UXtdeSzqaESPEkcSZUCzWWluItasJrPHoDoiqwS7pUFeUSj/wQcppho=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=VFuCfUDk; arc=fail smtp.client-ip=40.93.201.54
+	 MIME-Version:Content-Type; b=gD552B8BRChuktxViugWjc+/o4VRWRR9SVEBFSMOctYaVXL/zCSaUZywv83n4Iza0oLvyWGoMhOOe1AEgKe3i93EXmLGxQ3lDHH1ANOiS7i7LKdFrYDPBadK8HbdzJeKBJU/1WxcPIy8ab0L03cKH/LtqQ29HDgR+hAgJ97+coY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=QNCpIfqg; arc=fail smtp.client-ip=40.93.201.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="VFuCfUDk"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="QNCpIfqg"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=pWajRPlRk4rbT3yGLV5xE7EnhcLMiX5oqnPMOqc5FXd0+WzmigCZ5xxCIvsDZcNZyPA7xAO/3k0BaRxX039Wcqqc2cVnC+fOOqPgbabr65UTBGXRPmHdzNwIBF+tcgwFvQ8/B5Ft5pjABafXJPtvaXIJOsqp5Jc1M73WIvyFxvEXqx1TTjJpx1E0bZ+KdFTfuq0cwYqpEzgQ0tYxBcl89LIoEuIPjgqrVfPy/lE3z6KAiBMTmCZgElDBPIz7i75tbaUn4P/vAHVCIwD/xPPrzsXQR1D4izlr0xddEEbcGdIU5sq5FwDmOi+oGveQA9xXIfZUhFkFJcu/J1Rb43P6GQ==
+ b=upgUm6sJx+82jozDPAorZkfwpTLzJnYqZEjykHZCteTRYPZojsRQOtuCTC/dHzfp8v2hlT/O/UREBJNoZIY3LsBzoT4X6v/AIiPhY+5+y3M54v530mXmOKxoTgD0X/TbdD4MV09LfcDcFkLRL0o/mO9YhLlsM3GVMuxJrr+/RLn4VbeK7uRDz4Xb3B9d7Ef+hcVWfBQjn/ZUkG8sqQ2DnV4nTds9CCuAUi95hkPpetVg+XIS1hzoSPXKbOCNzg5l9BVoaWGMHQtf+RURCsRFTUU/7aXZ1QiAXLp4IEBsP0gvJ2VR/apaphsQKHdo/fuzuJhQdDVees8OL1GmZ599Gg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BaL/FQkpwnouc3xiVR36RwGvWt6mCPBk3yl97bKctnc=;
- b=ebeA3Bd0HhbMRwPm/8FLpFT8OHCiVlYW2Rsolv/YK6yODZlXp+hEBr35iwXY1iQAManchuDBAnpNKvKC/Tp5lrbg6iJYLVIdGxVr21S9xVZi+pdtrkAuICChvPgmfwTMr8PwI9MsgJxla5hUysjBvvY1ilbgtJH+B9BnCS5vqyDMtCuQn3qPCQIzi1KD54uEvwZAUW5550cS/FSeMNpFrfFkmnyYNndInDgz2TLFrLJlZzXntAguehn19Wk8uTaCeXOqRCIKyPU1mwpEMs7y+VqkYfub+r6TfqZYpIFtH1BvbcRexl2kMq0v/3qaxsNbnyqnlmUBYn+vBeo+FJXN9w==
+ bh=iXtGHCBxcOtlEL1tpJoN39J9HEV4nKKk0Jjougxbfu0=;
+ b=dGHVYxyhWQfxOjWIux31iNc9tw6b/C6f/eOXbM4G+0/JVnZMQa2qiryzHqATicH6/yggodnyakvnpUKtEUGHTWLleIkK9Bmgx7IfleOPwAinPAy7l3eHzQGKevvEncC6j0mjwY0b1Qi+DcHd8gMVO4qc+a7F+1sMGPnpa+P0RtG5sfBNsEslUKhw2TubyQhioZ2T0AJ+Fs+0RXvZrWkWy9jVyQNTxVCyFsLGLsokfRxMlRPFjI2riHLtJhEUBMzw0LCe4FQhNHd4lvPdCJdanSwi10pXfO8srDZ6hv+wntpJjnefbv8OBGB9rN/urmys95Q+X9UhoY/kHsMVgmhwKQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BaL/FQkpwnouc3xiVR36RwGvWt6mCPBk3yl97bKctnc=;
- b=VFuCfUDkjgxLn3qf+6VTh+rI5eP7HPTJV7OmfLZuYB+qj8063kuwFgYYgWhRRcaqQDOGujlFynyYWyJfetJ6tAUbq57XNQ/mYwU/Nv72xJmBA4eFX5A6WXSgt5JYSce1fJgzuYA0GoBrzRPpMyNkj4RkXzQlvlS0+BGZ60VfbwE=
-Received: from DS1P220CA0017.NAMP220.PROD.OUTLOOK.COM (2603:10b6:8:44c::10) by
- PH7PR12MB6881.namprd12.prod.outlook.com (2603:10b6:510:1b7::10) with
+ bh=iXtGHCBxcOtlEL1tpJoN39J9HEV4nKKk0Jjougxbfu0=;
+ b=QNCpIfqgaR4vMxCWn0vlc7wzc23BwoJbF2rVNsVdPU5ts0CMtWjTu4CgezD346D2qrLRdpVSvUCvtE8pNCPjG+9haAraZHWpi7w6Nm5oRqG2vKp7qHM1DJcql7/tO115FfzIrTf21WELzKcg0u/9zHHKRTXlgeVOS00G9JEwCb8=
+Received: from DM6PR06CA0094.namprd06.prod.outlook.com (2603:10b6:5:336::27)
+ by CY8PR12MB7316.namprd12.prod.outlook.com (2603:10b6:930:50::11) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.292.25; Mon, 10 Aug
- 2026 19:22:28 +0000
-Received: from DS1PEPF0001709D.namprd05.prod.outlook.com
- (2603:10b6:8:44c:cafe::93) by DS1P220CA0017.outlook.office365.com
- (2603:10b6:8:44c::10) with Microsoft SMTP Server (version=TLS1_3,
+ 2026 19:22:48 +0000
+Received: from DS1PEPF00017098.namprd05.prod.outlook.com
+ (2603:10b6:5:336:cafe::16) by DM6PR06CA0094.outlook.office365.com
+ (2603:10b6:5:336::27) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.21.292.25 via Frontend Transport; Mon,
- 10 Aug 2026 19:22:28 +0000
+ 10 Aug 2026 19:22:48 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -48,13 +48,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
 Received: from satlexmb07.amd.com (165.204.84.17) by
- DS1PEPF0001709D.mail.protection.outlook.com (10.167.18.107) with Microsoft
+ DS1PEPF00017098.mail.protection.outlook.com (10.167.18.102) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.315.6 via Frontend Transport; Mon, 10 Aug 2026 19:22:27 +0000
+ 15.21.315.6 via Frontend Transport; Mon, 10 Aug 2026 19:22:48 +0000
 Received: from nigeria-2635-os.amd.com (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45; Mon, 10 Aug
- 2026 14:22:26 -0500
+ 2026 14:22:46 -0500
 From: Ashish Kalra <Ashish.Kalra@amd.com>
 To: <tglx@kernel.org>, <mingo@redhat.com>, <bp@alien8.de>,
 	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>,
@@ -69,9 +69,9 @@ CC: <pbonzini@redhat.com>, <aik@amd.com>, <Michael.Roth@amd.com>,
 	<darwi@linutronix.de>, <linux-kernel@vger.kernel.org>,
 	<linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
 	<linux-coco@lists.linux.dev>
-Subject: [PATCH v12 4/5] x86/sev: Add support to perform RMP optimizations asynchronously
-Date: Mon, 10 Aug 2026 19:22:10 +0000
-Message-ID: <9c9502278f68af9da19f0dd583ba303d0e6d66d2.1786389115.git.ashish.kalra@amd.com>
+Subject: [PATCH v12 5/5] x86/sev: Re-enable RMP optimizations on SNP guest shutdown
+Date: Mon, 10 Aug 2026 19:22:33 +0000
+Message-ID: <f5c65e48ccd8a31680f7808d49d09e85ad6f83b7.1786389115.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1786389115.git.ashish.kalra@amd.com>
 References: <cover.1786389115.git.ashish.kalra@amd.com>
@@ -87,279 +87,151 @@ X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF0001709D:EE_|PH7PR12MB6881:EE_
-X-MS-Office365-Filtering-Correlation-Id: f5a3ea00-575a-4ca5-32b8-08def714b74d
+X-MS-TrafficTypeDiagnostic: DS1PEPF00017098:EE_|CY8PR12MB7316:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2b578191-7629-42b8-bb19-08def714c373
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|23010399003|7416014|36860700016|82310400026|1800799024|6133799003|921020|10067099003|56012099006|5023799004|11063799006|22082099003|18002099003|3023799007;
+	BCL:0;ARA:13230040|36860700016|1800799024|82310400026|7416014|376014|23010399003|11063799006|5023799004|56012099006|10067099003|921020|22082099003|18002099003|6133799003;
 X-Microsoft-Antispam-Message-Info:
-	EYdhKK3xruS1RZqHtlbLe3IDMpPj5rIT/sH6chELMqlI2IibCf2vpwZzvRsdRi/ySVWQPjrqPwdc59Y2RA8TMjazaN4uXVolW+WuxpJaVqWXukQGgzUoX4DX+SGDF29OMmcce9/4PC0JiJNQVqGqntLF7j5rW3vLkzKD0ahl4BDoMrLxjRSBzetEtx+4YMe8AF/pmhEpggBqCbzyHADP019bqpryD74ke6JeC4D1fi3bTWE4y0Lq/2h8soVMe82OlxC05jEIWApk7K0uI5ANkSbOxGg3JJ/VmWTpFAQMpLKFstUIhkjgDFp9r0/A+t6gjRtnF/VqC5KUvnUsspdBkaMsCsPAiEs3FM46NsKZQn5NyMyXahuxBy8ZV4Yq1fESDQtWVl178lpiHf8bJQPXSdRly4gxuAi8TjwACIhUDTn8ILVZVVdNIGtc0QHXLfj+KZanRIEupzSmPfvUTekBSoHjgkZ3BL8aijZh4iZnNp7apaO9Q6tn3ZR26DmzJbTYVQVexBLYd2+fTGX4sfxM4x8XVikJXh0I5IT+iI9rQQWDezdLzRxjk82o+wHt0DCQuxC8fOZvKxDQwUcqsQRrj4chtXYujzGCyLeJecqApDT0CHt2FKNBGQnskehjB5oT3fow8WPzrfRmtUe0kp0MMs37rZk/66T9J9J21GG9YSLk0YU32KZQ3RqjkSk20ZWQ0eOeVG84+XnvfIZmLQyYvcNw3CE5Dcjns4kpoSYdgash3NvPDI8Oi89cAeQeYMut
+	6G6SelqKl7OKcyE/dPnli76+mRHAqkTQtJ31VJ/sSDR1OQFnmmjZueFTyf7NIsS2Crmqry4iksmrhMX+1Ne078JFLWYdLCX8qlGA3V2w5hLyF2hoJnB7ju+9AjwH1d1daXekdgbRZVCOvEHL4AxShyaJS4pmzJ9qqNq7uYJU66JTmXDRCeh2gvUXITpoAo4EDhVCHr4WzI7E0D7e0nhPy8R6XG9wgnAKlVCYYkukys0iIXGwF2+UzrFnkOk5ilrDy7N7n3gm5rlS2mSTcZS2JlwfdTwqGyAylmFRX4TQtJmGB/6a6AsZLJk4ucy+VsRzRpK2kyjlVymlnyTpxSEuPypWYaex++Tke07mREuKtYN3NDPs6vAtXu++peEqRHE6d4g8hWPLpJaV01aaii1rGPIB6yVfz03sfjbQ9j1YMcGn6Sh205VDj4UUyz+Bts1X9Ly7/M+qCvdl4RPSrCVAoST9DSv2/HPURd3bJJblCQwSj8JsTXm60AooUGl9GYWA7XXeI03hOL8KEhwIpX7vzyl9dyZVBJKZEqJKhbX/6f3fp1XtkFsK66gI5w5eWOYCgL3TZGVhosBN6rkr4KZA9drEdFTiC9A9lG0TIm4OR1Yfcjh3aDHdz6qq8zNrAbywj8FmNwBamF8bEXhcOxUq9SHLlpzW5YltaAp2UNvWHojsqrhU6Jov9MG5KC58GQ/4cLI2eADjHVVDpuH6M3+k+VUHyPaU7Lc9TYyQ0G8m0viQiB/HsCGJNJYt24dd20YK
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(23010399003)(7416014)(36860700016)(82310400026)(1800799024)(6133799003)(921020)(10067099003)(56012099006)(5023799004)(11063799006)(22082099003)(18002099003)(3023799007);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700016)(1800799024)(82310400026)(7416014)(376014)(23010399003)(11063799006)(5023799004)(56012099006)(10067099003)(921020)(22082099003)(18002099003)(6133799003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	A4tdqydfeCn5n1dPNrWY1iXzcMNNv5J+OkfSZQ0EoZddzVx0al9C4WXgKQkau/W7ytOTsR5vEz5kt87veAyZ7M3HeW+mcVUqNX350aVDhHWos5eC4Ezbyq0zCmg7AQ3CWgZakWAWipNG0JQOC7HDLGihKvn7XEZfWKpxlEC86WErdLDqM8t2vpTU5V0jFRgFe6/yMPs0ahJ6RJkZekhPqf/BES7KbEROCKkoIGUvb9mOJnK0HNHwulajQ3Kigzf3Ah3Ak34lu2+BU0BRYTpg/p20gZSRwbteJ02LbvjkI/8Gnx1r39pCoFlMmfMPoj7p4S163ADjJntT8udyei7crGt6C1djisEvjVBYkyCzVcgwcYC1RPeaGBQd028U+WLzk0ToUJbKlg0x09elOCd8hmMLfEnaVHi4z9N5y5HtiUoo94L6+yD3V8usMlsE8IUI
+	jXD/aMh32jRXXsCo+awe85GbQImLD3fOGq2xfTuxtuoHlE7n7HhK7ZelIxEw58j0UfjnnsxJNusi5hS1tXg4rlWuyKZtNhr0ZuqVcai1fjfLYpNcf0B+z41JGw3y1XILmI8AVmgQUh6mM3yBnP1pDGCmftzR6ELGfhlQTmHqd0NVVgxNx1kFrqrLvCXfzJMiDOga4fHeUMWs/yM0Y/gSCeWRb8IsT9U+b3fKx6akSZWCAFktp9EH9BU+p4tnGazxJG5EOJ/YHyV978oI62HK2RyVUhj95yQcJoqq0Ir+Xw8RrxgG4W+U2glUR5tRacknS03ZjV0QpFyEKfX3dPhmsnQGrGj6lYD/htD60EC3CBPp+ygjtIB86k3Fc2+N6D8vTJXJK87WPyECUWBDW7OIQf3mSAriAiO9GhPtTokxB4bLgOAPtG5/SgnzWaR43voE
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Aug 2026 19:22:27.9092
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Aug 2026 19:22:48.2938
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f5a3ea00-575a-4ca5-32b8-08def714b74d
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2b578191-7629-42b8-bb19-08def714c373
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DS1PEPF0001709D.namprd05.prod.outlook.com
+	DS1PEPF00017098.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6881
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7316
 
 From: Ashish Kalra <ashish.kalra@amd.com>
 
-When SNP is enabled, all writes to memory are checked to ensure memory
-integrity. This imposes performance overhead on the whole system.
+The RMPOPT table is a per-CPU table which indicates whether 1GB regions
+of physical memory are entirely hypervisor-owned.
 
-RMPOPT is a new instruction that minimizes the performance overhead of
-RMP checks on the hypervisor and on non-SNP guests by allowing RMP
-checks to be skipped for 1GB regions of memory that are known not to
-contain any SNP guest memory.
+When performing host memory accesses in hypervisor mode as well as
+non-SNP guest mode, the processor may consult the RMPOPT table to
+potentially skip an RMP access and improve performance.
 
-Add support for performing RMP optimizations asynchronously using a
-dedicated workqueue.
+Normal guest events disable RMP optimizations: pages are converted from
+shared to private as SNP guests are launched, and large pages are split
+and collapsed during guest operation -- both disable the RMPOPT
+optimizations for the affected 1GB regions.
 
-At RMP initialization time, run an optimization pass over all physical
-memory (up to 2TB of system RAM, starting from the lowest physical
-memory address aligned down to a 1GB boundary), skipping RMP checks for
-1GB regions that do not contain SNP guest memory (excluding preassigned
-pages such as the RMP table and firmware pages).
+When guests are torn down, their pages are converted back to shared, so
+those regions may become eligible for RMPOPT optimization again. Without
+some intervention, all RMP optimizations would eventually be lost, so
+re-optimize all of physical memory on SNP guest teardown.
 
-As SNP guests are launched, RMPUPDATE assigns their private pages to
-guest-owned state; when such a page falls within an optimized 1GB
-region, the hardware clears that region's RMPOPT optimization and RMP
-checks resume there to protect the guest memory.
+Perform the re-optimization after a delay, using mod_delayed_work() so
+that the delay timer is reset on each call. This batches multiple guest
+terminations into a single pass: the re-optimization runs 10 seconds
+after the *last* termination rather than after the first.
+mod_delayed_work() also re-queues work that is already in-flight, so a
+re-scan request during an active scan is not silently dropped.
 
-Since launching SNP guests clears these optimizations, perform them
-again asynchronously using the dedicated workqueue.
+Guest teardown is currently the only event that returns guest memory to
+hypervisor ownership: SNP guests do not support ballooning or memory
+hotplug, so pages freed during a guest's lifetime remain guest-owned.
+It is therefore the only point at which memory becomes eligible for RMP
+re-optimization, which is why re-optimization is driven by guest
+teardown rather than by a periodic scan.
 
-Suggested-by: Thomas Lendacky <thomas.lendacky@amd.com>
-Suggested-by: Dave Hansen <dave.hansen@linux.intel.com>
-Suggested-by: K Prateek Nayak <kprateek.nayak@amd.com>
-Suggested-by: Borislav Petkov (AMD) <bp@alien8.de>
 Reviewed-by: Ackerley Tng <ackerleytng@google.com>
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 ---
- arch/x86/virt/svm/sev.c | 159 +++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 156 insertions(+), 3 deletions(-)
+ arch/x86/include/asm/sev.h |  2 ++
+ arch/x86/kvm/svm/sev.c     | 10 ++++++++++
+ arch/x86/virt/svm/sev.c    | 27 +++++++++++++++++++++++++++
+ 3 files changed, 39 insertions(+)
 
+diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+index 6fd72a44a51e..09b1c5d33790 100644
+--- a/arch/x86/include/asm/sev.h
++++ b/arch/x86/include/asm/sev.h
+@@ -662,6 +662,7 @@ static inline void snp_leak_pages(u64 pfn, unsigned int pages)
+ 	__snp_leak_pages(pfn, pages, true);
+ }
+ int snp_prepare(void);
++void snp_rmpopt_all_physmem(void);
+ void snp_setup_rmpopt(void);
+ void snp_shutdown(void);
+ #else
+@@ -681,6 +682,7 @@ static inline void snp_leak_pages(u64 pfn, unsigned int npages) {}
+ static inline void kdump_sev_callback(void) { }
+ static inline void snp_fixup_e820_tables(void) {}
+ static inline int snp_prepare(void) { return -ENODEV; }
++static inline void snp_rmpopt_all_physmem(void) {}
+ static inline void snp_setup_rmpopt(void) {}
+ static inline void snp_shutdown(void) {}
+ #endif
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 427229347876..c574849b1587 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2992,6 +2992,16 @@ void sev_vm_destroy(struct kvm *kvm)
+ 		 */
+ 		if (snp_decommission_context(kvm))
+ 			return;
++
++		/*
++		 * Perform RMP optimizations on memory freed by terminating
++		 * guests.  The scan is deferred, so it normally runs after
++		 * sev_gmem_invalidate() has converted this guest's pages back to
++		 * shared, and picks them up then.  A very large guest whose
++		 * conversion has not finished by then is picked up by a later
++		 * teardown's scan.
++		 */
++		snp_rmpopt_all_physmem();
+ 	} else {
+ 		sev_unbind_asid(kvm, sev->handle);
+ 	}
 diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-index 923b7869acd1..b53a12baf4a3 100644
+index b53a12baf4a3..034ed547ac28 100644
 --- a/arch/x86/virt/svm/sev.c
 +++ b/arch/x86/virt/svm/sev.c
-@@ -19,6 +19,7 @@
- #include <linux/iommu.h>
- #include <linux/amd-iommu.h>
- #include <linux/nospec.h>
-+#include <linux/workqueue.h>
- 
- #include <asm/sev.h>
- #include <asm/processor.h>
-@@ -124,8 +125,17 @@ static void *rmp_bookkeeping __ro_after_init;
- 
- static u64 probed_rmp_base, probed_rmp_size;
- 
--static cpumask_var_t rmpopt_cpumask;
--static phys_addr_t rmpopt_pa_start;
-+static cpumask_var_t rmpopt_cpumask, rmpopt_follower_mask;
-+static u64 rmpopt_pa_start, rmpopt_pa_end;
-+
-+enum rmpopt_op_type {
-+	RMPOPT_OP_VERIFY_AND_REPORT_STATUS,
-+	RMPOPT_OP_REPORT_STATUS
-+};
-+
-+static struct workqueue_struct *rmpopt_wq;
-+static struct delayed_work rmpopt_delayed_work;
-+static DEFINE_MUTEX(rmpopt_wq_mutex);
- 
- static LIST_HEAD(snp_leaked_pages_list);
- static DEFINE_SPINLOCK(snp_leaked_pages_list_lock);
-@@ -562,11 +572,28 @@ static void snp_cleanup_rmpopt(void)
- {
- 	int cpu;
- 
-+	guard(mutex)(&rmpopt_wq_mutex);
-+
-+	/*
-+	 * rmpopt_wq is non-NULL only after RMPOPT has been fully set up: the
-+	 * workqueue and cpumasks are allocated and the RMPOPT_BASE MSRs are
-+	 * programmed.  snp_setup_rmpopt() resets it to NULL if any of those
-+	 * steps fail, so a NULL rmpopt_wq means nothing was set up and there is
-+	 * nothing to tear down.
-+	 */
-+	if (!rmpopt_wq)
-+		return;
-+
-+	cancel_delayed_work_sync(&rmpopt_delayed_work);
-+	destroy_workqueue(rmpopt_wq);
-+
- 	for_each_cpu(cpu, rmpopt_cpumask)
- 		wrmsrq_on_cpu(cpu, MSR_AMD64_RMPOPT_BASE, 0);
- 
- 	free_cpumask_var(rmpopt_cpumask);
--	rmpopt_pa_start = 0;
-+	free_cpumask_var(rmpopt_follower_mask);
-+	rmpopt_pa_start = rmpopt_pa_end = 0;
-+	rmpopt_wq = NULL;
- }
- 
- void snp_shutdown(void)
-@@ -598,6 +625,77 @@ static bool rmpopt_capable(void)
- 	       cc_platform_has(CC_ATTR_HOST_SEV_SNP);
+@@ -696,6 +696,33 @@ static void rmpopt_work_handler(struct work_struct *work)
+ 	on_each_cpu_mask(rmpopt_follower_mask, rmpopt_scan_range, NULL, true);
  }
  
 +/*
-+ * RMPOPT optimizations skip RMP checks at 1GB granularity if this range of
-+ * memory does not contain any SNP guest memory.
-+ *
-+ * @pa is a system physical address; RMPOPT operates on the containing 1GB.
++ * Delay, in milliseconds, before the RMP re-optimization pass runs after an
++ * SNP guest is torn down.  snp_rmpopt_all_physmem() re-arms the delayed work
++ * with mod_delayed_work() on each teardown, so the pass fires this long after
++ * the last teardown.  This coalesces a burst of teardowns into a single scan
++ * and gives each guest's pages time to be converted back to the shared,
++ * hypervisor-owned state before the scan re-optimizes their 1GB regions.  The
++ * 10 second value is a heuristic trading re-optimization latency against
++ * scanning too eagerly.
 + */
-+static void rmpopt(u64 pa)
++#define RMPOPT_WORK_TIMEOUT	(10 * MSEC_PER_SEC)
++
++void snp_rmpopt_all_physmem(void)
 +{
-+	u64 pa_start = ALIGN_DOWN(pa, SZ_1G);
-+	enum rmpopt_op_type op = RMPOPT_OP_VERIFY_AND_REPORT_STATUS;
++	if (!rmpopt_capable())
++		return;
 +
-+	/*
-+	 * RMPOPT (F2 0F 01 FC): RAX = 1GB-aligned SPA, RCX = op type, CF set if
-+	 * the range was optimized (result unused on this path).
-+	 *
-+	 * Binutils does not support the RMPOPT mnemonic yet, so the instruction
-+	 * is encoded with .byte.
-+	 */
-+	asm volatile(".byte 0xf2, 0x0f, 0x01, 0xfc"
-+		     :: "a" (pa_start), "c" (op)
-+		     : "memory", "cc");
++	guard(mutex)(&rmpopt_wq_mutex);
++
++	if (!rmpopt_wq)
++		return;
++
++	mod_delayed_work(rmpopt_wq, &rmpopt_delayed_work,
++			 msecs_to_jiffies(RMPOPT_WORK_TIMEOUT));
 +}
-+
-+/* on_each_cpu() callback: optimize the whole RMPOPT range on this CPU. */
-+static void rmpopt_scan_range(void *arg)
-+{
-+	u64 pa;
-+
-+	for (pa = rmpopt_pa_start; pa < rmpopt_pa_end; pa += SZ_1G)
-+		rmpopt(pa);
-+}
-+
-+static void rmpopt_work_handler(struct work_struct *work)
-+{
-+	int this_cpu;
-+
-+	/*
-+	 * RMPOPT scans the RMP table, stores the result of the scan in the
-+	 * reserved processor memory. The RMP scan is the most expensive
-+	 * part. If a second RMPOPT occurs, it can skip the expensive scan
-+	 * if they can see a cached result in the reserved processor memory.
-+	 *
-+	 * Run RMPOPT on one CPU first (the leader), then on every other primary
-+	 * thread (the followers).  A follower skips the expensive RMP scan by
-+	 * reusing the cached scan results the leader produced.
-+	 *
-+	 * migrate_disable() pins this work to the current CPU so it stays the
-+	 * leader for the whole leader loop: this_cpu remains valid and the
-+	 * RMPOPT instruction runs on it.
-+	 */
-+	migrate_disable();
-+	this_cpu = smp_processor_id();
-+
-+	cpumask_andnot(rmpopt_follower_mask, rmpopt_cpumask,
-+		       topology_sibling_cpumask(this_cpu));
-+
-+	rmpopt_scan_range(NULL);
-+
-+	migrate_enable();
-+
-+	/*
-+	 * Followers: one IPI per remaining core, each optimizing the whole
-+	 * range.  Each runs with interrupts disabled, but only issues cache-hit
-+	 * RMPOPTs (the leader populated the scan cache above), so the window is
-+	 * short.  cpus_read_lock() is intentionally not held: CPU hotplug is
-+	 * disabled the entire time SNP is active (see snp_prepare()), and this
-+	 * work only runs while SNP is active, so the follower set stays valid.
-+	 */
-+	on_each_cpu_mask(rmpopt_follower_mask, rmpopt_scan_range, NULL, true);
-+}
++EXPORT_SYMBOL_FOR_MODULES(snp_rmpopt_all_physmem, "kvm-amd");
 +
  void snp_setup_rmpopt(void)
  {
  	u64 rmpopt_base;
-@@ -606,8 +704,46 @@ void snp_setup_rmpopt(void)
- 	if (!rmpopt_capable())
- 		return;
- 
-+	guard(mutex)(&rmpopt_wq_mutex);
-+
-+	/*
-+	 * On re-initialization after a legacy SNP shutdown (SNP_SHUTDOWN_EX
-+	 * with x86_snp_shutdown=0), snp_shutdown() and thus snp_cleanup_rmpopt()
-+	 * are skipped, so the workqueue, delayed work, cpumask and per-CPU
-+	 * RMPOPT_BASE MSRs are still set up and valid (SnpEn stayed set and
-+	 * CPU hotplug stayed disabled).  Rather than re-doing the setup, which
-+	 * would leak the existing state, just re-queue the optimization pass
-+	 * to re-optimize any memory the previous SNP session de-optimized.
-+	 */
-+	if (rmpopt_wq) {
-+		queue_delayed_work(rmpopt_wq, &rmpopt_delayed_work, 0);
-+		return;
-+	}
-+
-+	/*
-+	 * Create an RMPOPT-specific workqueue to avoid scheduling
-+	 * RMPOPT workitem on the global system workqueue.
-+	 */
-+	rmpopt_wq = alloc_workqueue("rmpopt_wq", WQ_UNBOUND, 1);
-+	if (!rmpopt_wq) {
-+		pr_err("Failed to allocate RMPOPT workqueue\n");
-+		return;
-+	}
-+
-+	INIT_DELAYED_WORK(&rmpopt_delayed_work, rmpopt_work_handler);
-+
- 	if (!zalloc_cpumask_var(&rmpopt_cpumask, GFP_KERNEL)) {
- 		pr_err("Failed to allocate RMPOPT cpumask\n");
-+		destroy_workqueue(rmpopt_wq);
-+		rmpopt_wq = NULL;
-+		return;
-+	}
-+
-+	if (!zalloc_cpumask_var(&rmpopt_follower_mask, GFP_KERNEL)) {
-+		pr_err("Failed to allocate RMPOPT follower cpumask\n");
-+		free_cpumask_var(rmpopt_cpumask);
-+		destroy_workqueue(rmpopt_wq);
-+		rmpopt_wq = NULL;
- 		return;
- 	}
- 
-@@ -629,6 +765,23 @@ void snp_setup_rmpopt(void)
- 	 */
- 	for_each_cpu(cpu, rmpopt_cpumask)
- 		wrmsrq_on_cpu(cpu, MSR_AMD64_RMPOPT_BASE, rmpopt_base);
-+
-+	rmpopt_pa_end = ALIGN(PFN_PHYS(max_pfn), SZ_1G);
-+
-+	/* Limit memory scanning to 2TB of RAM */
-+	if ((rmpopt_pa_end - rmpopt_pa_start) > SZ_2T) {
-+		pr_info("RMPOPT coverage limited to 2TB; memory above 0x%llx not optimized\n",
-+			rmpopt_pa_start + SZ_2T);
-+		rmpopt_pa_end = rmpopt_pa_start + SZ_2T;
-+	}
-+
-+	/*
-+	 * Once all per-CPU RMPOPT tables have been configured, enable RMPOPT
-+	 * optimizations on all physical memory.
-+	 */
-+	queue_delayed_work(rmpopt_wq, &rmpopt_delayed_work, 0);
-+
-+	pr_info("RMPOPT optimizations enabled\n");
- }
- EXPORT_SYMBOL_FOR_MODULES(snp_setup_rmpopt, "ccp");
- 
 -- 
 2.43.0
 
