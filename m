@@ -1,106 +1,73 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19BF23B95F0
-	for <linux-crypto@vger.kernel.org>; Mon, 10 Aug 2026 10:23:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B2F03769E9;
+	Mon, 10 Aug 2026 10:24:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786357435; cv=none; b=F8KGdVH5qi3uVVGocdZzsgeGUDppZBe61/P8KdoYZSequuqbMq1zRCwoELUAQtkyl8l/bVJT6PubuYyXbNaA1ZmisD7U9anS/Gj2fEvRTusFXyTECn2YJgVZvtAUB/l/EQp+ry6SfiPpfj5/lKBkM0yJSGqoy+10ZPknw0fV6o0=
+	t=1786357488; cv=none; b=m+TFQB0gba+jDrf3ls0Z0WdA6dUocthsL5WWv0pyytuDsH/ZTM8IENr/zxehIq+TnagP5PwbvcylNgO1cJ2jGstUHd9XHdd+bpySz+CdrgygOnJ8oyuYYS4sQppPt2YI9YZ98hI9tC2oe0of51WTLzDrijl9eK77D7lYMOpzuSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786357435; c=relaxed/simple;
-	bh=wpv7yCZtqzGpymgIBpq2xprUOu/HO+Ii+2myekc94UQ=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KVk4MFQy42B0XAaIfEejpkobst661FPf2OZDw1OQ1YiIgMcizI8o90wnMGt2maPsJiUChrk4eXiZgDkG0YP1sbWdwpvAPwE8QCY+BBYtwM4L5JrjzQHcIkg9MLO4vlK5PS/zIr/FKT/knQBIPTHc4V7vhSNusigShpR/8auEbAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aVBWMh7U; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786357488; c=relaxed/simple;
+	bh=WazNDq4Z8LqvQHL2gXnm4xgXylJmDc+ma+/Exk0iOlw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=G9dzoQnBtNq+bDKV6Ifnhj4dCkW4QpEdLTTekR+EB59hvmVGrryMHcvZ0XmhrefGyXRPE8dIlFcjOwv3JphWSRjC+IdqblKx0Yy2al/T6ox5QPcbJF+r5eLSe4TNwgbzyaP7j6nHi8bsBu36UNAKeKVf8+TTe3siZLSbVbBjHJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=etsQ8MNT; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aVBWMh7U"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A82801F00ADB
-	for <linux-crypto@vger.kernel.org>; Mon, 10 Aug 2026 10:23:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="etsQ8MNT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CDB11F000E9;
+	Mon, 10 Aug 2026 10:24:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786357431;
-	bh=VXlJ4MRsvdw0tt/TAbvwG9Xn7DOulcryLzjZ1Z/C30U=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=aVBWMh7URy4oytN7JSCODkv8dmyfCEXc/eyg5gaJLSib1XtThwSy6T5JB6WoeAf08
-	 qRGuFB4Ty3wuF5TcN+F35eDqp+zyqIezELUk3gF0S8cjbKQ5n1W6Jq4g2NLgCDF2jb
-	 LvWDmUqz8LGbNfQyFTVhkgBOFBA5Y9MLyVz7v8CEcKa6afg1u6WSDdJojWIzqNEdO4
-	 /1Mc+7qidTJb4fau096gBww36pHcV4s2ZXUv5J8Goxx7pFeYihwuMVvNuSpeBNkJ3p
-	 Q92YodrErGSIAKCBVew6gahb0f3Mmf2zhNI2cBaa0WDZ1ZT1VMNAPKnhz+kUb9zO54
-	 qMRDG6naw2ezQ==
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-39ca0a30148so13415861fa.3
-        for <linux-crypto@vger.kernel.org>; Mon, 10 Aug 2026 03:23:51 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+Rqr+nZziVVUv6flkcria3Ad3USYDDqSp65DOUCjGKCEkgFNnUTTv0F9V3cu4RvnRbJdKXfAVEs+m9PHtwg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJb4IoT++cxkmKoMURs+MxYv7t2wWN0glBvyHVWy/2lHtss639
-	F2P4JJw+bHb1VjNfoHb62T/E8sVaVtzBuf4bTWxl5CmyL4j3a1++PGaoHSzGYDV+SP8NNVtNFlY
-	Fg00zlXwWVZhADB7XRwPCgmGixJTtwIofAeUqThhK1w==
-X-Received: by 2002:a05:651c:a111:10b0:39c:f58e:5c74 with SMTP id
- 38308e7fff4ca-3a00e9bf925mr750931fa.22.1786357430361; Mon, 10 Aug 2026
- 03:23:50 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 10 Aug 2026 10:23:47 +0000
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 10 Aug 2026 10:23:47 +0000
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20260807065454.1640815-1-md.alam@oss.qualcomm.com>
+	s=k20260515; t=1786357486;
+	bh=WazNDq4Z8LqvQHL2gXnm4xgXylJmDc+ma+/Exk0iOlw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=etsQ8MNTgwheodsLfdo2mfhxmVDM75H1cROYhRtJN4P0P4I2HAYJ/gLkhJ6/1cYco
+	 L9WpSdAeUqRPAe0F7BU6qz0KZYSpE+4k90++6fZdBK8WOXvd0b75jHz+KwTEsoEuNo
+	 NatQDbeqWLOHDX51PXKlk9TzrBARzGnoS8RSqnG/NshgLIe0J4iNsj7+Ga8rf5QB1k
+	 GEE6sKadlwvITmV8FY0YBi/4PmAF6ULDeXChDCuY783HihtyemCzE4dCxUCjUzh5D2
+	 h0uKcLaCyigjSrTF20EoeX4mkLvRFIVg7EQTi4azwjashAagMlSRJj/K4640Ll9fzb
+	 PI9fySMY3Lu4g==
+Date: Mon, 10 Aug 2026 11:24:41 +0100
+From: Daniel Thompson <danielt@kernel.org>
+To: Guangshuo Li <lgs201920130244@gmail.com>
+Cc: Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Linus Walleij <linusw@kernel.org>, linux-crypto@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] hwrng: stm32: fix usage_count leak when
+ autosuspend_delay is negative
+Message-ID: <anmm6X4MLpyIH8K1@aspen.lan>
+References: <20260808074510.2655473-1-lgs201920130244@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260807065454.1640815-1-md.alam@oss.qualcomm.com>
-Date: Mon, 10 Aug 2026 10:23:47 +0000
-X-Gmail-Original-Message-ID: <CAMRc=McDAt5G9-mJSY15oL6vQT+rcOFK0cj+bnx7kk93WooGPQ@mail.gmail.com>
-X-Gm-Features: AUfX_mwYz2T3Du22q1EW54KFvAX6iEvMhf5BShH-BcDYhDcpydM1MVdnkBjtNho
-Message-ID: <CAMRc=McDAt5G9-mJSY15oL6vQT+rcOFK0cj+bnx7kk93WooGPQ@mail.gmail.com>
-Subject: Re: [PATCH] crypto: qce: fix CCM AAD buffer underallocation
-To: Md Sadre Alam <md.alam@oss.qualcomm.com>
-Cc: varadarajan.narayanan@oss.qualcomm.com, brgl@kernel.org, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, thara.gopinath@linaro.org, 
-	linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260808074510.2655473-1-lgs201920130244@gmail.com>
 
-On Fri, 7 Aug 2026 08:54:54 +0200, Md Sadre Alam
-<md.alam@oss.qualcomm.com> said:
-> The AAD buffer allocated in qce_aead_ccm_prepare_buf_assoclen()
-> can be smaller than the length later programmed into the DMA
-> scatterlist.
+On Sat, Aug 08, 2026 at 03:45:10PM +0800, Guangshuo Li wrote:
+> stm32_rng_probe() calls pm_runtime_use_autosuspend(), but neither the
+> probe failure path nor stm32_rng_remove() calls the matching
+> pm_runtime_dont_use_autosuspend() before disabling runtime PM.
 >
-> The allocation size is currently calculated as:
->
->   ALIGN(assoclen, 16) + MAX_CCM_ADATA_HEADER_LEN
->
-> while the DMA length is set to:
->
->   ALIGN(assoclen + adata_header_len, 16)
->
-> Since ALIGN() does not distribute over addition, the allocation
-> can be smaller than the DMA length. For example, when
-> assoclen = 32 and adata_header_len = 2:
->
->   allocation = ALIGN(32, 16) + 6 = 38
->   DMA length = ALIGN(32 + 2, 16) = 48
->
-> As a result, the QCE hardware can read beyond the allocated
-> buffer while computing the CBC-MAC over the associated data.
-> The extra bytes are folded into the authentication tag,
-> resulting in an incorrect tag and causing CCM self-test
-> failures such as:
->
->   alg: aead: ccm-aes-qce encryption test failed (wrong result)
->   on test vector 8
->
-> Fix the allocation by adding the maximum possible AAD header
-> length before alignment:
->
->   ALIGN(assoclen + MAX_CCM_ADATA_HEADER_LEN, 16)
->
-> This guarantees that the allocated buffer is large enough
-> for the fully padded AAD data for all supported header sizes.
->
-> Cc: stable@vger.kernel.org
-> Fixes: 9363efb4181c ("crypto: qce - Add support for AEAD algorithms")
-> Signed-off-by: Md Sadre Alam <md.alam@oss.qualcomm.com>
-> ---
+> If the autosuspend delay is set to a negative value while autosuspend
+> is enabled, the runtime PM core increments usage_count to prevent
+> runtime suspend. Without calling pm_runtime_dont_use_autosuspend()
+> during teardown, this reference is not dropped and usage_count remains
+> unbalanced.
 
-Reviewed-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+If calls to pm_runtime_use_autosuspend() must be paired with
+pm_runtime_dont_use_autosuspend() then I wonder if having a
+devm_pm_runtime_use_autosuspend() would be worthwhile?
+
+That way stm32_rng_remove() could be entirely replaced with devres
+cleanup.
+
+
+Daniel.
