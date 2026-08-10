@@ -1,234 +1,63 @@
-Received: from oss.cyber.gouv.fr (oss.cyber.gouv.fr [51.159.188.251])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D354C357A3E;
-	Mon, 10 Aug 2026 15:40:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.159.188.251
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F549337BA4;
+	Mon, 10 Aug 2026 16:40:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786376443; cv=none; b=dIKNpb51mmmDF4auQA8ZV5gfVXd4zi104qs17i68xjyZ6HDXKXSMur+RDerhDy/L7SScFP3Rgz55ZupvDxe+KpKfXjNTPbZMR2+Vv7MBsoPrTtsF190hUxdf3MF3a3dwVzcdfNtvCydTYpUB/+cJMx3qxzkOsLqtBdeyLmtrU9k=
+	t=1786380046; cv=none; b=U1t0IJ1YRxDl1++3AP7xOv677yT/keSlAjBBuu0M73/jUnqJWD60hlcT6Dr3azo2ArMF0qwaLROP1Vwbyxi0E4bFQVbKxaXv7F2jp4Gh0FyvEjl5b4MiJDJFRLGUhMpnkQPFb73YqTMj8GMQ0fcnQWFsGN7WzwoqNK9hsYl1+E0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786376443; c=relaxed/simple;
-	bh=CPYYHQiFfTTpPJPyGQFKvPdzgOsZv7+YckMVDlGSqzY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lU6u64YN84VkVBhGBXIHyCm6Wuslb2PtBey39gnVAP8MmbIFgTOs5C0xTeGAqsV9yBjGXlzNWwP+O26woPb9pdSCJlwIVi16JOPQ6Oc81kGOmVulEGhx9V3fThSbeFtN1PkujoRXQtor4U+siqwnHDq0F1nxotKTz1s0gdjV/hY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr; spf=pass smtp.mailfrom=oss.cyber.gouv.fr; dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b=jHyGJUuj; arc=none smtp.client-ip=51.159.188.251
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.cyber.gouv.fr
+	s=arc-20240116; t=1786380046; c=relaxed/simple;
+	bh=tnHT2Y0FL2RpQBIiymB6PoSFEFvNyO0B04wLaZByMPw=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=M5QFc34sLAJ0KzL+XPX1AGTTRUlkOze3pfPsPt4P4x8Ye0Z13HEHJ7XhIKRQe5W1nIZ5NrdMpyrU2GYY2vCMsKB92B4Ll9m5+qHCVIU/LioKnU3ZMk4xxYA1DPh6GVRqoKIiLNVdKntfO7rx1D/QNiK1EMF9E6putMOGU8M84QI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dll4YPbU; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b="jHyGJUuj"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=oss.cyber.gouv.fr; s=default; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Hn3hhAhC5GGD9rNvx7O3kiOrCeNMaN93esUQBw7vIXU=; b=jHyGJUujOkcgGrqBzeNuJTcUzi
-	WMrqTiARKhKmARned2iymPDBOVKGnl6GjaZf8E5oNFAWepkRb7c/Tq2jgPiwOKm4phwlR3ob3Qsom
-	b5RWT9vT+c98bP/hR+P9MVhixyWr2+pFG3EszOUlL1Wuw59L06qU37YeZ2n+HnLMJWTzko6POn1Ih
-	nXgk6vSzVOWYcEXrzBSvwk9AzyWgGlWqkqkx3fKTmuFkxKE2nhgAd+4ml/D3EuczEMJxFQlpPwd2q
-	Z57G4IvL2SZd0UimVnbV+uUaOuiFZ5b5g8YGPpG1WWLBt6hj9/8nOQ4o5/qbjaa751f1p/sHiVi39
-	Y0Kzcjsw==;
-Received: from [151.115.150.205] (port=40820 helo=gepetto..)
-	by pf-012.whm.fr-par.scw.cloud with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.99.5)
-	(envelope-from <Jeremy.Jean@oss.cyber.gouv.fr>)
-	id 1wtS7B-0000000Evsp-36F4;
-	Mon, 10 Aug 2026 17:40:37 +0200
-From: =?UTF-8?q?J=C3=A9r=C3=A9my=20Jean?= <Jeremy.Jean@oss.cyber.gouv.fr>
-To: horia.geanta@nxp.com,
-	pankaj.gupta@nxp.com,
-	gaurav.jain@nxp.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	=?UTF-8?q?J=C3=A9r=C3=A9my=20Jean?= <Jeremy.Jean@oss.cyber.gouv.fr>
-Subject: [PATCH] crypto: caam - reject overlong RSA CRT parameters
-Date: Mon, 10 Aug 2026 15:40:24 +0000
-Message-ID: <20260810154024.3178145-1-Jeremy.Jean@oss.cyber.gouv.fr>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dll4YPbU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA53E1F000E9;
+	Mon, 10 Aug 2026 16:40:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786380044;
+	bh=EA4GBKNzs+FRSJHtyYU0nJKVM+bIvgzF3iCbm/z60gM=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc;
+	b=Dll4YPbUSvl4rsKQKW7Ojp9WBzWVYih6/sMCmyHDLgdfBf8vjkP4GnCJ8Loks3Sli
+	 Ly7RVpsL7umPQXHdHKPmsa9Xp5ovqur+BphM5444+RuHvcy2L+n6CBDhCrxQnQ6a2d
+	 91WXJdKTeYVcY3V2olu0rGnqjVBJA06of+yvtYy/9olHZ9vDXSC/bZSzBwmNH0Use+
+	 5/SfBjPBg31cLSp4ASxcynOKZ/Q3/CJc4iP928hY15SiEDx17c4dkW8WQ7MmmkrQXk
+	 3ZXgYPPJUlqfuBURa1ArXpw0gW3zA4KLzKMdHGWN6kGjcepUD2RBN8zXz9dFQAUo0H
+	 Ifnvmi9MBbj6Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id D0D1D39253F1;
+	Mon, 10 Aug 2026 16:40:02 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Fixes for 7.2
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <anl3S6pbchyEAvzF@gondor.apana.org.au>
+References: <anl3S6pbchyEAvzF@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <anl3S6pbchyEAvzF@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6 tags/v7.2-p3
+X-PR-Tracked-Commit-Id: 285d8204638cf8be0dc304dc40f0290ada701340
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 5eabf07a0bf317723da229376b4e910f12b4644b
+Message-Id: <178638000148.3867291.2696451407640071418.pr-tracker-bot@kernel.org>
+Date: Mon, 10 Aug 2026 16:40:01 +0000
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - pf-012.whm.fr-par.scw.cloud
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - oss.cyber.gouv.fr
-X-Get-Message-Sender-Via: pf-012.whm.fr-par.scw.cloud: authenticated_id: jeremy.jean@oss.cyber.gouv.fr
-X-Authenticated-Sender: pf-012.whm.fr-par.scw.cloud: jeremy.jean@oss.cyber.gouv.fr
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
 
-caam_read_rsa_crt() right-aligns dP, dQ, and qInv in buffers sized
-from the corresponding prime. rsa_parse_priv_key() only bounds these
-integers against n, so a malformed key can provide, for example, a
-two-byte dP with a one-byte p. dstlen - nbytes then underflows and
-memcpy() writes outside the allocation during set_priv_key(). KASAN
-reports a slab-out-of-bounds write in caam_read_rsa_crt().
+The pull request you sent on Mon, 10 Aug 2026 17:01:31 +1000:
 
-Reject empty or overlong CRT parameters after stripping leading zeros.
-qInv is consumed by CAAM as a p-sized value, so size it from p rather
-than q to match the DMA mapping in set_rsa_priv_f3_pdb(). Let the
-top-level key cleanup handle partial form-3 allocations and return the
-specific error to the caller.
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6 tags/v7.2-p3
 
-Also test nbytes before dereferencing it while stripping zeros, so an
-all-zero integer does not read one byte beyond its input.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/5eabf07a0bf317723da229376b4e910f12b4644b
 
-Fixes: 4a651b122adb ("crypto: caam - add support for RSA key form 3")
-Cc: stable@vger.kernel.org
-Assisted-by: Codex:gpt-5
-Signed-off-by: Jérémy Jean <Jeremy.Jean@oss.cyber.gouv.fr>
----
- drivers/crypto/caam/caampkc.c | 69 +++++++++++++++--------------------
- 1 file changed, 30 insertions(+), 39 deletions(-)
+Thank you!
 
-diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
-index cb001aa1de66..2082adaae585 100644
---- a/drivers/crypto/caam/caampkc.c
-+++ b/drivers/crypto/caam/caampkc.c
-@@ -880,7 +880,7 @@ static void caam_rsa_free_key(struct caam_rsa_key *key)
- 
- static void caam_rsa_drop_leading_zeros(const u8 **ptr, size_t *nbytes)
- {
--	while (!**ptr && *nbytes) {
-+	while (*nbytes && !**ptr) {
- 		(*ptr)++;
- 		(*nbytes)--;
- 	}
-@@ -896,22 +896,22 @@ static void caam_rsa_drop_leading_zeros(const u8 **ptr, size_t *nbytes)
-  * @ptr   : pointer to {dP, dQ, qInv} CRT member
-  * @nbytes: length in bytes of {dP, dQ, qInv} CRT member
-  * @dstlen: length in bytes of corresponding p or q prime factor
-+ * @dst   : pointer to the zero-padded output buffer
-  */
--static u8 *caam_read_rsa_crt(const u8 *ptr, size_t nbytes, size_t dstlen)
-+static int caam_read_rsa_crt(const u8 *ptr, size_t nbytes, size_t dstlen,
-+			     u8 **dst)
- {
--	u8 *dst;
--
- 	caam_rsa_drop_leading_zeros(&ptr, &nbytes);
--	if (!nbytes)
--		return NULL;
-+	if (!nbytes || nbytes > dstlen)
-+		return -EINVAL;
- 
--	dst = kzalloc(dstlen, GFP_KERNEL);
--	if (!dst)
--		return NULL;
-+	*dst = kzalloc(dstlen, GFP_KERNEL);
-+	if (!*dst)
-+		return -ENOMEM;
- 
--	memcpy(dst + (dstlen - nbytes), ptr, nbytes);
-+	memcpy(*dst + (dstlen - nbytes), ptr, nbytes);
- 
--	return dst;
-+	return 0;
- }
- 
- /**
-@@ -991,6 +991,7 @@ static int caam_rsa_set_priv_key_form(struct caam_rsa_ctx *ctx,
- 	size_t p_sz = raw_key->p_sz;
- 	size_t q_sz = raw_key->q_sz;
- 	unsigned aligned_size;
-+	int ret;
- 
- 	rsa_key->p = caam_read_raw_data(raw_key->p, &p_sz);
- 	if (!rsa_key->p)
-@@ -999,51 +1000,39 @@ static int caam_rsa_set_priv_key_form(struct caam_rsa_ctx *ctx,
- 
- 	rsa_key->q = caam_read_raw_data(raw_key->q, &q_sz);
- 	if (!rsa_key->q)
--		goto free_p;
-+		return -ENOMEM;
- 	rsa_key->q_sz = q_sz;
- 
- 	aligned_size = ALIGN(raw_key->p_sz, dma_get_cache_alignment());
- 	rsa_key->tmp1 = kzalloc(aligned_size, GFP_KERNEL);
- 	if (!rsa_key->tmp1)
--		goto free_q;
-+		return -ENOMEM;
- 
- 	aligned_size = ALIGN(raw_key->q_sz, dma_get_cache_alignment());
- 	rsa_key->tmp2 = kzalloc(aligned_size, GFP_KERNEL);
- 	if (!rsa_key->tmp2)
--		goto free_tmp1;
-+		return -ENOMEM;
- 
- 	rsa_key->priv_form = FORM2;
- 
--	rsa_key->dp = caam_read_rsa_crt(raw_key->dp, raw_key->dp_sz, p_sz);
--	if (!rsa_key->dp)
--		goto free_tmp2;
-+	ret = caam_read_rsa_crt(raw_key->dp, raw_key->dp_sz, p_sz,
-+				&rsa_key->dp);
-+	if (ret)
-+		return ret;
- 
--	rsa_key->dq = caam_read_rsa_crt(raw_key->dq, raw_key->dq_sz, q_sz);
--	if (!rsa_key->dq)
--		goto free_dp;
-+	ret = caam_read_rsa_crt(raw_key->dq, raw_key->dq_sz, q_sz,
-+				&rsa_key->dq);
-+	if (ret)
-+		return ret;
- 
--	rsa_key->qinv = caam_read_rsa_crt(raw_key->qinv, raw_key->qinv_sz,
--					  q_sz);
--	if (!rsa_key->qinv)
--		goto free_dq;
-+	ret = caam_read_rsa_crt(raw_key->qinv, raw_key->qinv_sz, p_sz,
-+				&rsa_key->qinv);
-+	if (ret)
-+		return ret;
- 
- 	rsa_key->priv_form = FORM3;
- 
- 	return 0;
--
--free_dq:
--	kfree_sensitive(rsa_key->dq);
--free_dp:
--	kfree_sensitive(rsa_key->dp);
--free_tmp2:
--	kfree_sensitive(rsa_key->tmp2);
--free_tmp1:
--	kfree_sensitive(rsa_key->tmp1);
--free_q:
--	kfree_sensitive(rsa_key->q);
--free_p:
--	kfree_sensitive(rsa_key->p);
--	return -ENOMEM;
- }
- 
- static int caam_rsa_set_priv_key(struct crypto_akcipher *tfm, const void *key,
-@@ -1061,6 +1050,8 @@ static int caam_rsa_set_priv_key(struct crypto_akcipher *tfm, const void *key,
- 	if (ret)
- 		return ret;
- 
-+	ret = -ENOMEM;
-+
- 	/* Copy key in DMA zone */
- 	rsa_key->d = kmemdup(raw_key.d, raw_key.d_sz, GFP_KERNEL);
- 	if (!rsa_key->d)
-@@ -1097,7 +1088,7 @@ static int caam_rsa_set_priv_key(struct crypto_akcipher *tfm, const void *key,
- 
- err:
- 	caam_rsa_free_key(rsa_key);
--	return -ENOMEM;
-+	return ret;
- }
- 
- static unsigned int caam_rsa_max_size(struct crypto_akcipher *tfm)
 -- 
-2.47.3
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
