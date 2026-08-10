@@ -1,46 +1,46 @@
-Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013066.outbound.protection.outlook.com [40.93.196.66])
+Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013068.outbound.protection.outlook.com [40.93.196.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DC933793BF;
-	Mon, 10 Aug 2026 19:21:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84E2F43B490;
+	Mon, 10 Aug 2026 19:21:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.68
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786389700; cv=fail; b=aeng+65ZllQpFPUw86ldWC+1qHS1LkphIZlvLa20cJjaidPyXbgLnstG2cvObxCVKPFHLgAKLOksEjGq2hvo+VWBXYNIjaMr41CpLVaUfXO0zE3qYun5OB3V1JghIdCpxMi3/EG8ohqhGW42dmlSYpVCX+PHeRYNDwE2hi7aejs=
+	t=1786389714; cv=fail; b=P96G7ZIYSlYLcWSX0SDX6c7TtQdlswO0YWYKzEqZeZBO1UvBI/S904fSWZBT/hRWEjEMdIjHmRduWTf5H7kCKWXPMjaZAAssTo7Ztxnr5C6zuN3zwtO4/7rsM+LBICBlFyApBsGVUQshzkAZy+K6Api3iQsV1/J0cuFFCh8xACw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786389700; c=relaxed/simple;
-	bh=qvWNai0ES7mTf7ZvjBPYqi8697xHSnfL4pgSt/GPAbs=;
+	s=arc-20240116; t=1786389714; c=relaxed/simple;
+	bh=jY3z40DjVJLZ4CePW95d/uhm/n+gkobXq77QBuJ+ybo=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uNATluNWdKLKt+38dzk2ZhmhiLX7HMDmXNAz21l83ayq5bpyeux2akFORwxivqF6jW7mRhezQD9TvBJvVdJhdDfzq4a5ebrw81tvZLn6KwjqustbuCXYsfNLxPeMTTC9f0GygE//OFl/6ofBgmndVG1b51peJIvJcL4B6w8JIL0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=TUWOq+o5; arc=fail smtp.client-ip=40.93.196.66
+	 MIME-Version:Content-Type; b=pmI6kWL8rxcQ2ZhUxfpuBGzXnsNis+TUPTPBYr/C8UAMDdHweAKXtk3/BMvsw3tmQO9Mxcu2XsMOXvWZilQIgkyPZ/DCBTfOPX8ZiLII3seHWw5POjRy/mnSblpG2//vgNracZx2v+7dZJfbc13WJC6cm6Ie9JYbZuj69+TypN4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=MJ1DVxvJ; arc=fail smtp.client-ip=40.93.196.68
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="TUWOq+o5"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="MJ1DVxvJ"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QgcTLKOqyc6vfj4BtIulbJ0KuqvJKrkV9UX6dwVApkZARhI0kgDGx2jlgm7LJiRjtM3WmZbmtrCVSzxbgf7H7VWdbZNP9Z4UPLLQHYIW8IF6yfHB0cb136/0oIPMHZMv23JyZTOPtjGmmKC2E3l6XjzHSv3v9yWe2ow8G38MU7D3IGybTzzoctXj3+VO1nVuibTU8YGt+4saVfacQmjfnj/c/07Fs74W0vHKur0CGq75NLNnugrTk6ZFSBzUGZ4sskJ9AsH7dICwOgLYKEIo2V8yWAERN55+HlL8TzpJDUCGzAsngfvoOA2pRH1AKylJlU5gaiGFpDhmH6Kedz575Q==
+ b=iTcApr2ooUT34mbmkIZ4EYaWfqLTTFh/2U/1UcU+RgjUU5ZHkEFh/gNUG4k0tm8myKsVUyq0QWDtopgOGATmRe9aFTrL58ruriNveA3LmfSBLwghH6iBPT2EAEHbVr27OlZd/dDb4j167Z7acvhbTfQ+EJkC+O4l1VVcqJExmSmkse7rce13ebg/tYLLfAl9rgxUrV0lLc0LSxMZ6xKKNqFnoJ8vnTHPtDfIYKi1VMG/8PXGZSsUpDwR4J8v2qaZv8nfm+nMz0Lah6lGK6DUcOnnUuXZWfFbNU1GQ2r2PY1kwnutxfAPFOVCXoIrmb5oatxfCNEn2kf5ieX9v9/p/g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=45qC+C/BLdjKkN1+fwWDM9N7hCT53EoYkRbcO57HcZM=;
- b=pw6cww3Qy2F6Ak37dZQ1qvZ5YALqqHE9iaMfIa99CAFFZCeV834ZZVYw2uF/ywX3YXiUBizw4h4Kw5CHycICMLD3W8+fSfGk1IpVZgZn/bfLX2k+xm3fs3lAl/YIJOQztujOLC9AA4f4fBYXzJlMmvZ9hBHGwCw39GKJMdQ5m0LjJyA00LCKz+bqiH+RElggbo2AMsL5+bj40klpBVW7/6OqVaW6UcGlEByEG6tsSnPJ+RebZcBRQCJ+MhakoWCfyueniOFwxVQjwJTOjgY4r0J1WFDuDEI0JU87EyxZyNQ6iNs5NGU0WGdY8KiN2CQzyG+spnIffV+qwB1NRAxyaA==
+ bh=cOHf6KY+l18R/AQnkUt27zNklO6hC7Yd+Mepub+RNME=;
+ b=eTF6nMLf6feiQOwaa8A/Sno3BTcSsLs/XilfRWUYf1bgKHLMQvXPTNogO27m/WJlevbPTj/6GCPxbc7o6pjd0nBik+G1d2rKK17Ig9HArftYdlI9+Ouspbd2e7MEcd1TtBO1Da2zz9WhqZlJtHFzSgBMEMNFLVd0K2QB6AIU5ju/r9AzclQJUyruiPFWIVXCf2wFDdSBcXCCWYetZLyCpINCC5L4LGPuUpyRa2MGqNXfsRzAKzFrFym4ZDrfTmUGE05wpWW74BUIdKQNzjcBQnUeUGcWJoI2M8EO6GWpDSHWDIHedTEIC7wnZCtN07p9C63LvsETohdnahBEW0ljJg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=45qC+C/BLdjKkN1+fwWDM9N7hCT53EoYkRbcO57HcZM=;
- b=TUWOq+o5YZECb5614m7pHHO2+CAzcp8GJiEhdmKixESYc0aqLodmWnXed8YounwKdknw8/ZUorttlNhahfrLywp2oQTpxuuRGe1/0bM+/wrrZ7CF3EdmD6yaNOoaGyGDm6ldaTH+oC4YPR+4zKcion91rrUgfZc16Y0OaDqMpcc=
-Received: from DS1P221CA0021.NAMP221.PROD.OUTLOOK.COM (2603:10b6:8:242::12) by
- SN7PR12MB8146.namprd12.prod.outlook.com (2603:10b6:806:323::10) with
+ bh=cOHf6KY+l18R/AQnkUt27zNklO6hC7Yd+Mepub+RNME=;
+ b=MJ1DVxvJkLYBNHNuaykCyCIhj2Bgvh/JdTya76EmdcHP5w0Rvs+p/KR5qKJBqDFaSTaQlmndricsQHvG4w6cIa+o3VjhtED5x4hPCqhp++wTjDzb/26kf6mouThu80/KQIVMfaOBI9HWlkrEPua47FEug0uJqXNs2iHEtEKSOA4=
+Received: from DM6PR21CA0023.namprd21.prod.outlook.com (2603:10b6:5:174::33)
+ by SA3PR12MB7832.namprd12.prod.outlook.com (2603:10b6:806:31f::10) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.292.25; Mon, 10 Aug
- 2026 19:21:29 +0000
-Received: from DS1PEPF0001709B.namprd05.prod.outlook.com
- (2603:10b6:8:242:cafe::5c) by DS1P221CA0021.outlook.office365.com
- (2603:10b6:8:242::12) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.21.292.25 via Frontend Transport; Mon,
- 10 Aug 2026 19:21:29 +0000
+ 2026 19:21:47 +0000
+Received: from DS1PEPF0001709C.namprd05.prod.outlook.com
+ (2603:10b6:5:174:cafe::1a) by DM6PR21CA0023.outlook.office365.com
+ (2603:10b6:5:174::33) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.21.339.1 via Frontend Transport; Mon, 10
+ Aug 2026 19:21:47 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -48,13 +48,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
 Received: from satlexmb07.amd.com (165.204.84.17) by
- DS1PEPF0001709B.mail.protection.outlook.com (10.167.18.105) with Microsoft
+ DS1PEPF0001709C.mail.protection.outlook.com (10.167.18.106) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.315.6 via Frontend Transport; Mon, 10 Aug 2026 19:21:29 +0000
+ 15.21.315.6 via Frontend Transport; Mon, 10 Aug 2026 19:21:46 +0000
 Received: from nigeria-2635-os.amd.com (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45; Mon, 10 Aug
- 2026 14:21:27 -0500
+ 2026 14:21:45 -0500
 From: Ashish Kalra <Ashish.Kalra@amd.com>
 To: <tglx@kernel.org>, <mingo@redhat.com>, <bp@alien8.de>,
 	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>,
@@ -69,9 +69,9 @@ CC: <pbonzini@redhat.com>, <aik@amd.com>, <Michael.Roth@amd.com>,
 	<darwi@linutronix.de>, <linux-kernel@vger.kernel.org>,
 	<linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
 	<linux-coco@lists.linux.dev>
-Subject: [PATCH v12 1/5] x86/cpufeatures: Add X86_FEATURE_RMPOPT feature flag
-Date: Mon, 10 Aug 2026 19:21:17 +0000
-Message-ID: <780266f690d89e32f911296b9b88d9f84d8c1796.1786389115.git.ashish.kalra@amd.com>
+Subject: [PATCH v12 2/5] x86/sev: Disable CPU hotplug while SNP is active
+Date: Mon, 10 Aug 2026 19:21:34 +0000
+Message-ID: <a56493497e76e0048c8f205e266ea8f2f3abe156.1786389115.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1786389115.git.ashish.kalra@amd.com>
 References: <cover.1786389115.git.ashish.kalra@amd.com>
@@ -87,80 +87,164 @@ X-ClientProxiedBy: satlexmb08.amd.com (10.181.42.217) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF0001709B:EE_|SN7PR12MB8146:EE_
-X-MS-Office365-Filtering-Correlation-Id: d264f53e-bfdd-4c6d-c8d3-08def7149460
+X-MS-TrafficTypeDiagnostic: DS1PEPF0001709C:EE_|SA3PR12MB7832:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4314a8eb-f73e-4186-5341-08def7149ee4
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|7416014|82310400026|36860700016|23010399003|22082099003|18002099003|11063799006|56012099006|3023799007|13003099007|6133799003|10067099003|921020;
+	BCL:0;ARA:13230040|376014|7416014|82310400026|1800799024|36860700016|23010399003|18002099003|22082099003|11063799006|56012099006|5023799004|3023799007|6133799003|10067099003|921020;
 X-Microsoft-Antispam-Message-Info:
-	sC0j54R/L+0WspVzRIjIdIk+g2GgcF/l+1F2Uick+Cjts1DcFPBMS2E7Gei41HMgfLil8hZLnmu4m935705qDSR5DRLdN5OLvUVQEUXe0EMdZ5tmqdyU2UPYsU82o26Qi76fci2Dwsias94QtAxlfPH8hdk30ldLw493A2KA32MAs/lVByI8yeQO1k3v/d/IWWSCDHGvBclEoH0v+6jNF/rfm82tUQBYFPo3PCvlNR9w55fv/iJintw301gpO+nNQvYAhJQrU4zWcW3I27ldJqAtskPUxiwPEC3hL9stUvC+4Jw9gvtmP2HCYXEaruHUVtXzZzppj/f6f69F5lq2YV3fQYJvOO3s9mkAJtLUZU2ocAJtn4w3gc1j/4vjF1V46SHcE75lW+DlJ9rEWpQZyhv8hptQFE7eyw9fJorqyN7y+y2O7sKvybDpuLxQqxfN/DDKS0jQZqFD1rYnr62kVdCEDsz4XnDscq5Y56sZ8XjZCnsV57ytfMddyH1kvavFrsrTbX1mK8BNsLdqGZG1TQ3IAx3AJadZBrO07nlt9V+3IB2np1H7jOgJ5W3U6nb+2y+VSAG5uhlsWyDCa4rKM+fXY01XNHmxGgBWgjuY/kl2ORYGaA1zIQ6YnyoaISYJ5I0LukPq/PtXwAedMpYRp8z8KHgeQXKWFQY3VplN8Yb/owx1f+AKe2dHzNyRO96JFsbeI+Kl6877F9NoOPpatA==
+	H13fpb1WTyOv7AT7pF7ltN7mpWORNZX02fZARDB/LDEXoYNpS94AIwanLvzMVZApTvBn3Vm0lqGPpAdohQKVCFH5SLu8aBdN3gFb5egnQL1koZzpA240zIrfWsIJ61O9g/EvoeMa16XzGa34dxRJLTZp/WEkQK9dqXYc527TCxvtB01qoawca0iBz/xvkvKuX8BPD0WlLgefsw9k/Pr0ElrHQ2ZF5nl3L7vRB9ozIp+rHsSnVRfH0TtOvyd5H22jdLNidJD+z7xWc+qNcLR8TR18oJDfpiJJLuGR8E9k9t+WBhQlIzgsGl/YdAQY+8sFU7x5yF10rJ0tuuOWk/LAubtThvt4owz1RA3uhEnjvtjHeeEjvrZx5VixA2ZqlLJhgobY8/JK+JnF10gm28T4CB662z8ZumaKH8uQM2inl/jiHlW4btr03uvFAzejMz2aIKFqFjkdbvFF8ZIWQV8udAWdlLT4kFsSK00FuCMPXRQ3rlFlhfYNC2gUNjDDysA7lwkScyzMTh5zVVlbpufvRHnyP4tYeUxQtf6+dthEcageqje9mnKGdOcEJbwkiVhxW8R7Nm6Q9BahboCeAcdBqClxlHpyfy6XBLLSYy8I92p6I6HvrPNfhOF9nsGYzBc27zMIA3FIVLSW5P8aRG1iQHFBi6UYA/5y4F1X6SCrL1l+rjZpT31PRdFAd/CbECPtIa8vboXJ2mwmqnsVCtUsQbR3kElQ9qOP+hg83S1d2eCt/TjJwZrBmllfo6xdvqDa
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(82310400026)(36860700016)(23010399003)(22082099003)(18002099003)(11063799006)(56012099006)(3023799007)(13003099007)(6133799003)(10067099003)(921020);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(82310400026)(1800799024)(36860700016)(23010399003)(18002099003)(22082099003)(11063799006)(56012099006)(5023799004)(3023799007)(6133799003)(10067099003)(921020);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	zu7hsjYlCk+5W2sXvkRC2LjZDakq0TanIb5ig1W/3UGcyn9Z1zmE3RhZQzpWHgzPyUPT4p+FJlqJyD4fF/RRqql+b02+SItH4vd5GiPeGVAPuiVtk0J0DhxE+yyC2QiB2SE9bxoADbWmYPNhhXhAKQAbcRx+SYP+vlmO8M9AFjRHnQTELJP4P0W3XUJAyXYDQkDqRlG2mka7kROHj/Kotw2UEe7RLmuhpvIALR0zyryQy4k/ebxb3TKLi10I/Ze6g9v9HdUC0e1qk3sAVuIhbf+JECwTOdcAN9wmn8YkpCvi3PScFM67lsRw20cmVucVmt1RtNYZUcuPf3QCWCvXvCx4byMKhL4tFjeglkxOk5Cj2G21zeyTv/oQNbMaxWbGfqIbaWH6L/Z2nlBhUpjwY4TGNlQ7o/AfW3jMQUZ7K3V7ab8E+NQ7Ib+bcYqpSAsd
+	IR7Hbvu/Su/p5n/94AnKs5pREyvz8Lz321M+UY5aJLW5rIJfcm8boin1v2JE7kTSjPh9mesugVrSb//VKxMK3qGmwrQh8zCtO3gMqoN1+WFlzd9czpnNNH0WKLzFubpQ17w/YyxQnSyXqY5fbqLVGhIzCgPL2X9Q91oFeasAit9XEzTqMOkHM3cbUiG9xqp0Vif0m7K+lttjuP3I6RkF16jztVr8tyCmacSx97TzUp9b4Ve/3Gzlt2eXMYEyhyyQBCktU3+jLiuuRDK8YzrzLpM2GkgJ5iFQ64p1evTBsdgjLecOrUoXoCc7CZo+kUS2pI1F5FD3nBuhMod9D7pldh7gAWr3DgYJoZfGXb5DQMtacP+NsGic9Uy9QXYg7wRzgoDkXDmHNi8FUK+E18D0tPT/yQUUSanYm81Hp3+4T7jTQNHfjjVwwSSaBg5/6sBn
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Aug 2026 19:21:29.3231
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Aug 2026 19:21:46.9552
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d264f53e-bfdd-4c6d-c8d3-08def7149460
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4314a8eb-f73e-4186-5341-08def7149ee4
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DS1PEPF0001709B.namprd05.prod.outlook.com
+	DS1PEPF0001709C.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB8146
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB7832
 
 From: Ashish Kalra <ashish.kalra@amd.com>
 
-Add a flag indicating whether RMPOPT instruction is supported.
+While SNP is active, every memory write is checked against the RMP to
+protect SNP guest memory.  A core performs these RMP checks only once
+SNP has been initialized via SNP_INIT and the SNP-enable bit in SYSCFG is
+set on that core; the firmware requires the SNP-enable bit to be set on
+every present CPU before SNP initialization.
 
-RMPOPT is a new instruction that reduces the performance overhead of RMP
-checks for the hypervisor and non-SNP guests by allowing those checks to be
-skipped when 1-GB memory regions are known to contain no SEV-SNP guest memory.
+A core that is not SNP-enabled and not SNP-initialized performs no RMP
+checks at all, so there is no valid configuration with SNP active and any
+CPU exempt from RMP checks.
 
-For more information on the RMPOPT instruction, see the AMD64 RMPOPT
-technical documentation.
+The firmware determines which CPUs are present from the processor and the
+BIOS/UEFI configuration (e.g. SMT disabled in the BIOS) and enumerates
+them at SNP init; it is not aware of the OS bringing CPUs online or
+offline afterwards.
 
-  [ bp: Zap respective tools/ change. ]
+SNP_INIT fails unless SnpEn is set on all CPUs, so a CPU that is offline
+when SNP_INIT is issued, does not have SnpEn set, SNP_INIT fails, and
+there can be no SNP guest memory.  OS CPU hotplug can thus diverge from
+the firmware's expectations and break SNP.
 
+Tie CPU hotplug to the SNP-enable bit: disable it in snp_prepare() before
+SNP is enabled, and re-enable it in snp_shutdown() once the firmware has
+disabled SNP.
+
+If snp_prepare() fails before enabling SNP it re-enables hotplug itself;
+once SNP is enabled hotplug stays disabled, including across a failed
+SNP_INIT and across the legacy SNP_SHUTDOWN_EX path, both of which leave
+SNP enabled.
+
+A kexec target that boots with SNP already enabled, disables hotplug once
+in snp_rmptable_init(), since snp_prepare() bails when SNP is already
+enabled.
+
+With CPU hotplug now disabled while SNP is active, the online CPU mask is
+stable, so the cpus_read_lock() previously taken in snp_prepare() to
+iterate it is redundant.  Drop cpus_read_lock()/cpus_read_unlock() here.
+
+Suggested-by: Thomas Lendacky <thomas.lendacky@amd.com>
 Suggested-by: Borislav Petkov (AMD) <bp@alien8.de>
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
-Reviewed-by: Dave Hansen <dave.hansen@linux.intel.com>
-Reviewed-by: Ackerley Tng <ackerleytng@google.com>
-Link: https://patch.msgid.link/39e9ee269a572c516a3f4e937bfe12d00697d5e6.1782841284.git.ashish.kalra@amd.com
 ---
- arch/x86/include/asm/cpufeatures.h | 2 +-
- arch/x86/kernel/cpu/scattered.c    | 1 +
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ arch/x86/virt/svm/sev.c | 36 ++++++++++++++++++++++++++----------
+ 1 file changed, 26 insertions(+), 10 deletions(-)
 
-diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-index 3d0940a3b9f3..dbccde9ee5cd 100644
---- a/arch/x86/include/asm/cpufeatures.h
-+++ b/arch/x86/include/asm/cpufeatures.h
-@@ -76,7 +76,7 @@
- #define X86_FEATURE_K8			( 3*32+ 4) /* Opteron, Athlon64 */
- #define X86_FEATURE_ZEN5		( 3*32+ 5) /* CPU based on Zen5 microarchitecture */
- #define X86_FEATURE_ZEN6		( 3*32+ 6) /* CPU based on Zen6 microarchitecture */
--/* Free                                 ( 3*32+ 7) */
-+#define X86_FEATURE_RMPOPT		( 3*32+ 7) /* Support for AMD RMPOPT instruction */
- #define X86_FEATURE_CONSTANT_TSC	( 3*32+ 8) /* "constant_tsc" TSC ticks at a constant rate */
- /* free: was #define X86_FEATURE_UP	( 3*32+ 9) * "up" SMP kernel running on UP */
- #define X86_FEATURE_ART			( 3*32+10) /* "art" Always running timer (ART) */
-diff --git a/arch/x86/kernel/cpu/scattered.c b/arch/x86/kernel/cpu/scattered.c
-index 937129ce6a96..021c0bf22de2 100644
---- a/arch/x86/kernel/cpu/scattered.c
-+++ b/arch/x86/kernel/cpu/scattered.c
-@@ -67,6 +67,7 @@ static const struct cpuid_bit cpuid_bits[] = {
- 	{ X86_FEATURE_PERFMON_V2,		CPUID_EAX,  0, 0x80000022, 0 },
- 	{ X86_FEATURE_AMD_LBR_V2,		CPUID_EAX,  1, 0x80000022, 0 },
- 	{ X86_FEATURE_AMD_LBR_PMC_FREEZE,	CPUID_EAX,  2, 0x80000022, 0 },
-+	{ X86_FEATURE_RMPOPT,			CPUID_EDX,  0, 0x80000025, 0 },
- 	{ X86_FEATURE_AMD_HTR_CORES,		CPUID_EAX, 30, 0x80000026, 0 },
- 	{ 0, 0, 0, 0, 0 }
- };
+diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
+index cff285d8ad8e..558f7924a3f8 100644
+--- a/arch/x86/virt/svm/sev.c
++++ b/arch/x86/virt/svm/sev.c
+@@ -513,7 +513,6 @@ static void clear_hsave_pa(void *arg)
+ 
+ int snp_prepare(void)
+ {
+-	int ret;
+ 	u64 val;
+ 
+ 	/*
+@@ -526,14 +525,18 @@ int snp_prepare(void)
+ 
+ 	clear_rmp();
+ 
+-	cpus_read_lock();
++	/*
++	 * No CPU may come online without SnpEn while SNP is active; disable
++	 * hotplug here and re-enable it in snp_shutdown().
++	 */
++	cpu_hotplug_disable();
+ 
+ 	if (!cpumask_equal(cpu_online_mask, cpu_present_mask)) {
+-		ret = -EOPNOTSUPP;
++		cpu_hotplug_enable();
+ 		pr_warn("SNP init failed: not all CPUs online. (%*pbl online <-> %*pbl present masks).\n",
+ 			cpumask_pr_args(cpu_online_mask),
+ 			cpumask_pr_args(cpu_present_mask));
+-		goto unlock;
++		return -EOPNOTSUPP;
+ 	}
+ 
+ 	wbinvd_on_all_cpus();
+@@ -548,12 +551,7 @@ int snp_prepare(void)
+ 	/* SNP_INIT requires MSR_VM_HSAVE_PA to be cleared on all CPUs. */
+ 	on_each_cpu(clear_hsave_pa, NULL, 1);
+ 
+-	ret = 0;
+-
+-unlock:
+-	cpus_read_unlock();
+-
+-	return ret;
++	return 0;
+ }
+ EXPORT_SYMBOL_FOR_MODULES(snp_prepare, "ccp");
+ 
+@@ -567,6 +565,13 @@ void snp_shutdown(void)
+ 
+ 	clear_rmp();
+ 	on_each_cpu(mfd_reconfigure, NULL, 1);
++
++	/*
++	 * The firmware has disabled SNP (SnpEn is clear), so re-enable CPU
++	 * hotplug.  A legacy SNP shutdown returns above with SnpEn still set and
++	 * leaves hotplug disabled.
++	 */
++	cpu_hotplug_enable();
+ }
+ EXPORT_SYMBOL_FOR_MODULES(snp_shutdown, "ccp");
+ 
+@@ -577,6 +582,8 @@ EXPORT_SYMBOL_FOR_MODULES(snp_shutdown, "ccp");
+  */
+ int __init snp_rmptable_init(void)
+ {
++	u64 val;
++
+ 	if (WARN_ON_ONCE(!cc_platform_has(CC_ATTR_HOST_SEV_SNP)))
+ 		return -ENOSYS;
+ 
+@@ -586,6 +593,15 @@ int __init snp_rmptable_init(void)
+ 	if (!setup_rmptable())
+ 		return -ENOSYS;
+ 
++	/*
++	 * On a kexec boot SNP may already be enabled (legacy firmware leaves
++	 * SnpEn set across shutdown), in which case snp_prepare() bails without
++	 * disabling CPU hotplug, so disable it here.
++	 */
++	rdmsrq(MSR_AMD64_SYSCFG, val);
++	if (val & MSR_AMD64_SYSCFG_SNP_EN)
++		cpu_hotplug_disable();
++
+ 	/*
+ 	 * Setting crash_kexec_post_notifiers to 'true' to ensure that SNP panic
+ 	 * notifier is invoked to do SNP IOMMU shutdown before kdump.
 -- 
 2.43.0
 
