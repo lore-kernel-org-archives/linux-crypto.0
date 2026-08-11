@@ -1,404 +1,321 @@
-Received: from flow-b7-smtp.messagingengine.com (flow-b7-smtp.messagingengine.com [202.12.124.142])
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11022111.outbound.protection.outlook.com [40.93.195.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E59A4352022;
-	Tue, 11 Aug 2026 17:54:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.142
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786470900; cv=none; b=SOWOQ/2psOIvwjLURNoGE5tuDNHyiO6LrrvjJBjYCqAVVkifypFUzINbyf58TpywG7tO6HUI0DOqEQLoJ7E0Ea1xiCbmPqKv4jjYXjdtU2+bHvN75Gn7t7uWbhABHcl35nwslbXBo00J/Myjk+AQmAlqf7z/GS3OIF77xypMrtQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786470900; c=relaxed/simple;
-	bh=T47lbZ/5Ik9XFF2I7gSkXtBswUfH4MhklVGOicIW3mg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=T8F7mpdJ7X1uuAPzu8fNjUZX09aqofBaxgnXTfUPCTJ8zASYksYcDHxo2WlUf+eW0+MaZ0BOOU6UE3TOu0+AhtdSqSX04drHaaIwYo4/05nuxylIXz3O0/tGz0ppOLHKA1GaM0nbrhB6oWoaYIJI0EXmCbOvDSrak4tQKmiI2XQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jaseg.de; spf=pass smtp.mailfrom=jaseg.de; dkim=pass (2048-bit key) header.d=jaseg.de header.i=@jaseg.de header.b=VxLE2qEQ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=SSkpNzd/; arc=none smtp.client-ip=202.12.124.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jaseg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jaseg.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E4B1369D6E;
+	Tue, 11 Aug 2026 18:19:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.111
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786472349; cv=fail; b=GaVp8Ft3W12h2SxYhK8/HE29lpfAbdjjkXyJnC2xnIxkXzHU8VqaN7N5hm38pJfX+JfrbkUthUgu2G4IQwHhF+hVt++GiAGB2qUKYOtTGLLia7qdCBkCAp2O/0j10gRfuKE3HyAEy98hi1ApCrDgkhmZvW6JP6OBYf7l/jkec9g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786472349; c=relaxed/simple;
+	bh=UWXE6/Z3zHhgJGXuR2mw7p9nMff248hT/WZ10KMIAUw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=BHpWO+K1wKaofoiw7IM8sfXCtuYBpU7lXHpyVwFHV18H3NJ7zgtrJVTCaHbHPnLVuvDEiSl9w5HGqvmD/R6LZ0d/KT6RsjvOAwUd30ElQ2s1nShLHWSDieMPkV4WqtE8VHPGnRGOAqrkpGHCy5AARCpdvdgmPqfTwIMgtp44ZCA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rambus.com; spf=fail smtp.mailfrom=rambus.com; dkim=pass (2048-bit key) header.d=rambus.com header.i=@rambus.com header.b=BTFqc7KF; arc=fail smtp.client-ip=40.93.195.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rambus.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=rambus.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jaseg.de header.i=@jaseg.de header.b="VxLE2qEQ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="SSkpNzd/"
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailflow.stl.internal (Postfix) with ESMTP id E4B6A13003B7;
-	Tue, 11 Aug 2026 13:54:56 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-05.internal (MEProxy); Tue, 11 Aug 2026 13:54:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jaseg.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1786470896;
-	 x=1786478096; bh=VywNlkxt81T21aE3I2g5wIsi8+Y5h/Z8ZTT1u80XjqQ=; b=
-	VxLE2qEQb7RhsyFopOdNb1xsSG9C6lDp17xIF/tW5fjKC1h018h/TlWsm/mt1Idn
-	ZSK2E16qh46bW4rFguHdnSDeoawg47gLExP576bp6CIE8pmJO1p3VJR4godaM57E
-	hegomH+Tm6aRDm7eapdKWDIRCOLutTQUOXkcdoqTQUYkPUlYwNK4AiE2GEjntV8D
-	nOZUZE1dsHD7l7B6o6I0E+Z7KOFHSCwfmpbVItkOnDXBlwdg/KI6LFsv1O4fgK8C
-	sNIXlyLHP/J1eRm5b34phMIq8G1I046mN12Eh2YjdyHKUEiWE8gOIdkKynoaeOtc
-	hry+Xrxf5w8noY46zpYPgQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1786470896; x=
-	1786478096; bh=VywNlkxt81T21aE3I2g5wIsi8+Y5h/Z8ZTT1u80XjqQ=; b=S
-	SkpNzd/1QrAjL9XQuiY+AkLt5lhLMYS3fgQngrswG+ix3NYfCF51zDhtGkf9E3it
-	EQyT+Rd7EOEwWw0vxrrZ4kZgKv2EaomfwB4Q4IfGJXY5OLdoKREMy6SWMXJE2hkQ
-	Gh27Q1huZYbWz0FezXE2ibsfSAkFa8EzFJTwZZvodEhUTI3ayQ1c1LlpFvNjnscD
-	eEMLauBLJnWFJ+YEiJrj4V6aLPml0dvZnT68l8/ygPykF6BpcpZvnPx1T3IY0Hx0
-	CyS6cPyQrBjHT9LKQGDvcLFnAxB0OmdCrqj6Y7qHTBK/z6ZMRmdQQkdO+AJ8uv2e
-	59gY7aIp+7XNH/xQlIfhA==
-X-ME-Sender: <xms:8GF7anDtUhMVogtIaF90eVohO54NG6fXU9fcJcr-PVrP6uV-EQMAsQ>
-    <xme:8GF7amXHPA-M36SqWIaoOOfC0KAXmAh8RqSljUWbXl5gA-ZdNXp3YnS24rY7uSAPZ
-    QzFeSW1aLArq1iVhVcarr_eR9r8_Ng7vq7v3QK5RebjW_stD86P>
-X-ME-Received: <xmr:8GF7apKRSA-4AtWEVZN0vEz0zHtt51ctuF2j_4YNkvmM_Ueovh_yp8kgTwn6TBnQO3FEzYRwb1ZL_InFNDWbb1Y>
-X-ME-Proxy-Cause: dmFkZTFz4vgNe8oY8QyUL0mlPqEECv57Qi7HCBIaM0H0fEpf1xbY2+8hZG6UpCbiC57xgk
-    VavagF0YgIkokz9w1ZYP1FsIKkSgwmPUkWwZZopzEj1hsTumYxogfZ8LsE2lIsmrvQrzxe
-    DNsAmjkffjDdnK7Hikwb1PBijPzdc+/pLDsJWa/G9io4Zr2WihJBScLGTtc/AAEph99TK7
-    KMYjrfPBzTMOGahPoGoXnc0LQ7Z6pMXIRNlA+PEZw+HSeBor1z9UME1MTUTi3zab2cdg5l
-    S2ygLFXboS6erW/oqrZ0wC4vZEyPuJEZAHdMIjRfMGBWirnE5Gt0LHQJATpVfpt20aHeqK
-    Vr9NQnZCOXNfk60Be2/UTgwxliwGfCsjAkA0QYgfJNinx6Wwn1xj1scz+ZOK1UcMfrRo3H
-    GCXnRzeaKRJs42Gl0t0l71rV4rTv2MuB04VclqcHrLKbriLjI7PchBKyX9kKyt8FtiadHn
-    kgkLCoKG8Tq29peNW3i083C3qqLlJiA31CXtZwOLh0hzkw0OD7PaCvxdbvZqcmgF/2MQXw
-    ok2S4ZpzbXxDIPa2svuYyCoOyztu/wUpLoiJbWVNlNpLTwmQbxnU0qlYkEMtS1gPXfoUt0
-    +shDuurgOLjLUdMZz5xGuS9e2Efp7ZYl0UQf/a+Ej/KDT1ub33VVQNiznkQA
-X-ME-Proxy: <xmx:8GF7anK8SnN8j0nsdIirDkp8C-b2cS0dQ1GW_PnwrjuEtqsmXmdx9w>
-    <xmx:8GF7al-Tm3NpfKZDQ_6NCnm_aTVZv1oKr_Ao3YmlaNotR-5SdCUNDA>
-    <xmx:8GF7alXfus4HujHBcwGz6nBKsHMbDL6OmwQa1ZKeZqSpAmYWSKHCtA>
-    <xmx:8GF7alIMOyKbcmgUZaZwY45TO6dUB6_p7zKIiIR4DbwJ7h6hJDPWHQ>
-    <xmx:8GF7asdY0A9ZOpiiTn5RpxE8VLjFbOKBq5nTSgG4p52Ol3XlmVKbNOhH>
-Feedback-ID: i60a14417:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 11 Aug 2026 13:54:50 -0400 (EDT)
-From: =?utf-8?q?Jan_Sebastian_G=C3=B6tte?= <linux@jaseg.de>
-Date: Tue, 11 Aug 2026 19:53:02 +0200
-Subject: [PATCH v2 13/13] dm crypt: wipe key material before kdump
+	dkim=pass (2048-bit key) header.d=rambus.com header.i=@rambus.com header.b="BTFqc7KF"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=iv4UT5Q7eFR4JZt6t/s4e0z6BedOZ7/sFccIfNS9wHSeioYhm1foKkyeGw9a5m8adknyEZz5kFY3E5wRq9YVA7cZyVlHWoRLxjeG0bXf3t7wRbs9d7s7w72Qrk3Wt5yNEA5uK4gJN2qR4p9mwm9vOT3e5gjNsR20h2LeuVikE14cBR7rzAN3LtgpZ9Ass9rJxEAG/IOeA3lzdIYiIDTVCv0nwclZ0c6sXwVnm+25NrNnov+gpMCl5P1/k5JM3u+lfkUjoctIryV8ujfVAbAd4dXs2e4/ysWvzXvVlvQZt0yQ9Mc713kmulSDfhCNcWVe0yXx3y/vPbVNNn2fo++g3g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yO/1D/hG6dScRBMHptmji7sp6uE3uSXEnL8We9AwRVs=;
+ b=FUlacm7M60Ur1J2ESv5mlXK1t47+pMY0rcU1c0nxfcHbMH6DQsTaOTvrAS/hY6no55PTlAnHJhh8gdV6PJpq5dbTQhP9lbb6H0QGy7shwgfNl6kEbRgXVsE5T5gghmmuWgaQODG3vjVrXINADiZ6IPv3mTRhR/uJlDb0LOr1tYbPeHRRhWin8iKrLmyAG/8obcBp+RuIcjW0VrWsQ4sxWINEkeU/1TUKrxBzh4vbN5NcQ8YP621MRzcnScBCt9xjX74l8ERybvJALMniKlIY/STFgMs5CNsFPe7ThO5oRABLqs3KE1syFuRX2fOVUk9HrBgYEBWSIH8PGpagrqdrig==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=rambus.com; dmarc=pass action=none header.from=rambus.com;
+ dkim=pass header.d=rambus.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rambus.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yO/1D/hG6dScRBMHptmji7sp6uE3uSXEnL8We9AwRVs=;
+ b=BTFqc7KFK1XsonqfZqxZyBXp3WI//k1xJ0gbH1fghfWHcbVMPcSek/l9zdXCtOMR5/EXscMCugUj8QuxGmCT24pChq06+pLrzAtnd2JF1f37p+NuB6czrEcanPrH/hogtdGei7mEVWwSmjJCUtAapXjwi/vmP6HlJFXObUnURPCgARtSfxpPVlaccaDYoYF664q6smSlwewdhVmkPhHg8/2nbmpZW4ybqCDQh1BXcGJvWox7mnH/XZBR99rFnN9SVVcdkhtUg24j/GHRrBApOLVlDk1OLAz7dWLJBUEwW0Ip4lXF3TZA+M3YAWynMNe2TBBwmZOnijve4gtyOZe5cQ==
+Received: from SA3PR04MB9001.namprd04.prod.outlook.com (2603:10b6:806:398::17)
+ by SA3PR04MB8692.namprd04.prod.outlook.com (2603:10b6:806:2f0::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.292.25; Tue, 11 Aug
+ 2026 18:19:01 +0000
+Received: from SA3PR04MB9001.namprd04.prod.outlook.com
+ ([fe80::3da3:45d7:8860:e196]) by SA3PR04MB9001.namprd04.prod.outlook.com
+ ([fe80::3da3:45d7:8860:e196%4]) with mapi id 15.21.0292.024; Tue, 11 Aug 2026
+ 18:19:01 +0000
+From: "Ousherovitch, Alex" <aousherovitch@rambus.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>, "Krishnamoorthy, Saravanakrishnan"
+	<skrishnamoorthy@rambus.com>
+CC: Albert Ou <aou@eecs.berkeley.edu>, Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>, Herbert Xu
+	<herbert@gondor.apana.org.au>, Jonathan Corbet <corbet@lwn.net>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Paul
+ Walmsley <pjw@kernel.org>, Rob Herring <robh@kernel.org>, Shuah Khan
+	<shuah@kernel.org>, Alexandre Ghiti <alex@ghiti.fr>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "Wittenauer, Joel"
+	<Joel.Wittenauer@cryptography.com>, "linux-api@vger.kernel.org"
+	<linux-api@vger.kernel.org>, "linux-crypto@vger.kernel.org"
+	<linux-crypto@vger.kernel.org>, "linux-doc@vger.kernel.org"
+	<linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-kselftest@vger.kernel.org"
+	<linux-kselftest@vger.kernel.org>, "linux-riscv@lists.infradead.org"
+	<linux-riscv@lists.infradead.org>, Shuah Khan <skhan@linuxfoundation.org>,
+	"Nguyen, Thi" <thin@rambus.com>
+Subject: RE: [PATCH v3 02/19] crypto: cmh - add core platform driver
+Thread-Topic: [PATCH v3 02/19] crypto: cmh - add core platform driver
+Thread-Index: AQHdJd2LtMX2FjDMV0GCzBlfTeqwP7aYi/aAgACgzIA=
+Date: Tue, 11 Aug 2026 18:19:01 +0000
+Message-ID:
+ <SA3PR04MB90014C87363F2C6258249673D7DD2@SA3PR04MB9001.namprd04.prod.outlook.com>
+References: <20260806195519.2703224-1-skrishnamoorthy@rambus.com>
+ <20260806195519.2703224-3-skrishnamoorthy@rambus.com>
+ <20260811-meerkat-of-excellent-satiation-d4c32f@quoll>
+In-Reply-To: <20260811-meerkat-of-excellent-satiation-d4c32f@quoll>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+dlp-product: dlpe-windows
+dlp-version: 11.11.2.117
+dlp-reaction: no-action
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=rambus.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA3PR04MB9001:EE_|SA3PR04MB8692:EE_
+x-ms-office365-filtering-correlation-id: 6df47571-6d87-4a26-231b-08def7d504b6
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|23010399003|7416014|376014|366016|11063799006|56012099006|10067099003|6133799003|4143699003|3023799007|18002099003|22082099003|38070700021;
+x-microsoft-antispam-message-info:
+ W6IRnCL0t4POTAfcAC5UOq4bs05wt3qZYbWtiMk8A35uWT/HtwCbojOqngGPHCCC1XYlT5DK6U8aY/YwMA0n5Vepnm8ihy2no2WV1/7JWP8eHyf19dZWjr+t7mXLLHmcWFRENBwUBDY44cfKaT6A2AkEIMwH5e/md6hmnqsMyo3qEPbAkBvywCirVuqggDcebyic2qJxSs9QQyHcHcPBlmH50ARi4LAsfG50bp3e4lt+tVpyeIh5Xpltc3AhXN6tNohaqxHEetvNXtW0OtLuR7zV/YuF9+rWzbLgWCumOfKaD8exnppt1JtnONUGZkdu9e9OtPSQJj2xnv7aP5gK1IqZITg9n6TXul/FYXmk+8dpGaFlow5+c8GIRYulmT38KcglEzqr/WMm5Jh82OtnzoriUXXK6rae02ykK6cM/8krOq3Vyj1JbVwcfkHKmvLcFQL8Fu3q24khOuwfwzhHeNu7SByFyGil4S+zIOWukeNGIa6Te/TRL2oQvDif3lK9Kmwi2gXpyKC/P2GzXu030SRYtLReXik0zer/tf3LuUznjx2pZOGuPzcp6egNiFEUyz4oidd4E5bP3StOIWrveg254D7NOpr7sPtLPU9h+SScgTsdp/Pg9blrYs1kXR6QrGYOkqkz1UVBbhpQr+DQnkdf6fOVOxgS1yS8yf0eckTMMe3DUUWKZyjRtZl9MtCTPoUddJvNGdKATUxj1isIezNHFkvhqCVSPQW2kU5T9MI=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR04MB9001.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(23010399003)(7416014)(376014)(366016)(11063799006)(56012099006)(10067099003)(6133799003)(4143699003)(3023799007)(18002099003)(22082099003)(38070700021);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?PpcYD/oAAXL3R0rqQBnJP11KDUpo5whELL8wKNklW6pXaG34vvnchXUzCP1q?=
+ =?us-ascii?Q?WOknhtJGFGIuHZ57PwKQAWHJBnCnVgyjYSUkkSYnyppBOIiZhSZgkKhLehV3?=
+ =?us-ascii?Q?5DpPhqqbMw0AS3SpNfe7TVs52wBe/kEhmvt8r7XgrYhpNbrVhDRy8sDLqGDa?=
+ =?us-ascii?Q?HPqJXJvfb2UWyF9Vpby7hhaV9GrJxrxoPl5bUTus6N8l1VYjFBkmK5CLFR+c?=
+ =?us-ascii?Q?96eIybo94I0soPDDaxmuodmzP8CadgPs+d0g7T1JtJQolOTnSBtxnrT+PLmk?=
+ =?us-ascii?Q?KyA6d9wXxeSXt5OoXsDwyekOzZZoiWNGr+wrrkt9WtU7nAL+MjizHc1mpKDu?=
+ =?us-ascii?Q?AerF+/mlQp1zaZvkS8m/a1ghF1Jbfi6ZEnDd+chwqNdsexefz2ei51aTJKyw?=
+ =?us-ascii?Q?/LHBTOQZhPZTDyxSrm7D2r0FIqCWKga+MkDVriRwbCSxzpb0WFE6isRym0lY?=
+ =?us-ascii?Q?SSW4x30GtUGX8mjKq4HjGQzCjGEN6ZswJhKKvxbD3tq4raBolQZexJ1h001y?=
+ =?us-ascii?Q?lxBKBav+QqlxBcp2epAPKvQO5QfFFUg7wdLdojFzwmwcbKeVyxHFR/bLAJfD?=
+ =?us-ascii?Q?xkWFN+pILw5lFkQrtqI1wXJzmPHOz0TfAgZ/YlTEsNtY7Mob+rggjRv0st4s?=
+ =?us-ascii?Q?r2zfWws+CrB7PTaNXQByfRJYtPs6nNvLb5nBA075LFwBPiiDk9c64NmYk85B?=
+ =?us-ascii?Q?zWF7pwJ8FXuUsBRC8jAoRPPUZGAII0yTZQsBWDAd+zJQvpXBjU4S1nmzVPu3?=
+ =?us-ascii?Q?rYePDADueC9do3OQXGWUVXmbiU7ORklr7WmcZKBZUfeHv2yi0eZoybR1LQVV?=
+ =?us-ascii?Q?9CXwlkV/8DTXKMb0KeQi5LSQvYSDP37gXMZaSjQkAkUY9ikT5FQ4OwDT5Hku?=
+ =?us-ascii?Q?WilcG9BaLO4xB9MxCMonwsqccNu5s8ryWfbV3RpxEHFvG4TgCHLyBbJcUZfJ?=
+ =?us-ascii?Q?xrrigpzP/wPwhkGtDdZhHptktO4U/Rouyc4XMD+vIkisFBIe2SmtoroMsP46?=
+ =?us-ascii?Q?gdoi+5+ZojPl/m/ZXEl/PgZdbwg1lN0++7ixxfEvyscy+cdOZiT/hC+0kGM0?=
+ =?us-ascii?Q?S9s2M5ftw1BdOsNw3nYuyB+v3ZG17BMsQ6DomRXSJbFx1NyCjbtRvniODI66?=
+ =?us-ascii?Q?RnQD5kM5iHo+pEKW2upbQNmfSueXh3aGO8Bq4GlfcNtlnPEDpIX3gg07XbLB?=
+ =?us-ascii?Q?+1ltK06iz5sd4QUZhxP+KvdmkfobpTd0w2zKVupBgaybvfmodPDCMhtQajiA?=
+ =?us-ascii?Q?bijyuE/LLKd9pXPsh42FvHKS6ALsnYAbY9cHFWAi809RHDG5vol6UQl0yQw4?=
+ =?us-ascii?Q?OTCDcMxeZeeFK0Mh7MnSBPawx1d7Tp6fx3bVxNY+5T8hX/fv7gjq94TFK6Po?=
+ =?us-ascii?Q?qUlG6SZ+FOnhe46WmAT0pMjM87PyKnrAJJ1ZNrJ4RFVlksHa4xb18gsGM4o6?=
+ =?us-ascii?Q?lU9RbFgiuIotZ+Kyitbief7fpTTpuUNvZaCiDbN9GJmEk9ii4OsX0KlGrA9B?=
+ =?us-ascii?Q?gfLZJ1pPRaNRN2WyRmeiAu4e5KLFmJ+BU47nGBkyrk5TMpgFbtcc57pezCri?=
+ =?us-ascii?Q?veAEIKH4hwugPT4rZOYKViXcz0D9Hssf8TMBce8uj03WppWaWn1HzAgLfocB?=
+ =?us-ascii?Q?FGIdGZci/HDv2H7b5O9Ib0XunPm461DhA+sx9OtUB04s164995ogJGTh27TF?=
+ =?us-ascii?Q?BnPmwvpxArr1aWGAEFarKO5GXxxLvIF4qmxX9L1xiOx4R5ZSg5S3490VVXcH?=
+ =?us-ascii?Q?3gjRaIPhqw=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20260811-crash-zeroize-rework-v2-13-9561d13c2340@jaseg.de>
-References: <20260811-crash-zeroize-rework-v2-0-9561d13c2340@jaseg.de>
-In-Reply-To: <20260811-crash-zeroize-rework-v2-0-9561d13c2340@jaseg.de>
-To: Andrew Morton <akpm@linux-foundation.org>,
-  Baoquan He <baoquan.he@linux.dev>, Mike Rapoport <rppt@kernel.org>,
-  Pasha Tatashin <pasha.tatashin@soleen.com>,
-  Pratyush Yadav <pratyush@kernel.org>,
- Dave Young <ruirui.yang@linux.dev>,
-  Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>,  David Howells <dhowells@redhat.com>,
- Jarkko Sakkinen <jarkko@kernel.org>,  Jonathan Corbet <corbet@lwn.net>,
- Shuah Khan <skhan@linuxfoundation.org>,
-  Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-  "Serge E. Hallyn" <serge@hallyn.com>, Lukas Wunner <lukas@wunner.de>,
-  Ignat Korchagin <ignat@linux.win>,
- Herbert Xu <herbert@gondor.apana.org.au>,
-  "David S. Miller" <davem@davemloft.net>,
- Keith Busch <kbusch@kernel.org>,  Jens Axboe <axboe@kernel.dk>,
- Christoph Hellwig <hch@lst.de>,  Sagi Grimberg <sagi@grimberg.me>,
- Trond Myklebust <trondmy@kernel.org>,  Anna Schumaker <anna@kernel.org>,
- Mimi Zohar <zohar@linux.ibm.com>,
-  James Bottomley <James.Bottomley@HansenPartnership.com>,
-  Marc Dionne <marc.dionne@auristor.com>,
- Eric Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,
- Eric Biggers <ebiggers@kernel.org>,  "Theodore Y. Ts'o" <tytso@mit.edu>,
- Jaegeuk Kim <jaegeuk@kernel.org>,
-  Alexander Viro <viro@zeniv.linux.org.uk>,
-  Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-  Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
-  Mikulas Patocka <mpatocka@redhat.com>,
-  Benjamin Marzinski <bmarzins@redhat.com>
-Cc: kexec@lists.infradead.org, linux-kernel@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org, 
- keyrings@vger.kernel.org, linux-doc@vger.kernel.org, 
- linux-security-module@vger.kernel.org, linux-crypto@vger.kernel.org, 
- linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org, 
- linux-integrity@vger.kernel.org, linux-afs@lists.infradead.org, 
- netdev@vger.kernel.org, linux-fscrypt@vger.kernel.org, 
- linux-fsdevel@vger.kernel.org, dm-devel@lists.linux.dev, 
- =?utf-8?q?Jan_Sebastian_G=C3=B6tte?= <linux@jaseg.de>
-X-Mailer: b4 0.15.2
+X-OriginatorOrg: rambus.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR04MB9001.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6df47571-6d87-4a26-231b-08def7d504b6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Aug 2026 18:19:01.2232
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bd0ba799-c2b9-413c-9c56-5d1731c4827c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: yIk1pwwQsGUeghmF1/nbseqDiE2KPAb42o4wlfrI0EwKpMVBlXG0y8UMeUg3zxxNef1bGJgaPgQUa7O43uhR2konL9NlpS6CVom7NwLh/Gg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR04MB8692
 
-Wipe volume key/iv copies kept by dm-crypt with
-CONFIG_CRASH_WIPE_SECRETS. The backend tfms are already handled
-separately.
+On Tue, Aug 11, 2026 at 10:31:47AM +0200, Krzysztof Kozlowski <krzk@kernel.=
+org> wrote:
+> > Reviewed-by: Joel Wittenauer <Joel.Wittenauer@cryptography.com>
+> > Reviewed-by: Thi Nguyen <thin@rambus.com>
+>
+> These two reviews did not happen, drop the tags. The code has trivial
+> mistakes from downstream code. Internal review would point these trivial
+> issues, so I do not believe you received valid, meaningful internal
+> review which would justify the tags.
 
-Add a list tracking struct crypt_config instances when
-CONFIG_CRASH_WIPE_SECRETS is set. Structs are tracked here to avoid
-having to enumerate them through some roundabout way before kdump, when
-we can't safely take locks anymore.
+We will drop them. Any future Reviewed-by will come from on-list review.
 
-Use custom wipe handlers even for things like ivs that have existing
-wipe functions elsewhere because we need to use crash_wipe_memzero
-instead of memzero_explicit. The crash_wipe helper memzero_explicit's
-the target buffers and flushes data caches. On ARM64, missing that cache
-flush could lead to the zeros not being written to DRAM before the kdump
-code turns off the data caches moments later.
+> > +MODULE_ALIAS("platform:cmh");
+>
+> Why?
 
-Signed-off-by: Jan Sebastian Götte <linux@jaseg.de>
----
- drivers/md/dm-crypt.c | 151 ++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 134 insertions(+), 17 deletions(-)
+Redundant with the OF match table; we will remove it.
 
-diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index 608b617fb817..86adb2f9b94c 100644
---- a/drivers/md/dm-crypt.c
-+++ b/drivers/md/dm-crypt.c
-@@ -9,12 +9,14 @@
-  */
- 
- #include <linux/completion.h>
-+#include <linux/crash_core.h>
- #include <linux/err.h>
- #include <linux/module.h>
- #include <linux/hex.h>
- #include <linux/init.h>
- #include <linux/kernel.h>
- #include <linux/key.h>
-+#include <linux/list.h>
- #include <linux/bio.h>
- #include <linux/blkdev.h>
- #include <linux/blk-integrity.h>
-@@ -234,6 +236,11 @@ struct crypt_config {
- 	struct mutex bio_alloc_lock;
- 
- 	u8 *authenc_key; /* space for keys in authenc() format (if used) */
-+
-+#ifdef CONFIG_CRASH_WIPE_SECRETS
-+	struct list_head wipe_list;
-+#endif
-+
- 	u8 key[] __counted_by(key_size);
- };
- 
-@@ -243,6 +250,12 @@ struct crypt_config {
- 
- static DEFINE_SPINLOCK(dm_crypt_clients_lock);
- static unsigned int dm_crypt_clients_n;
-+
-+#ifdef CONFIG_CRASH_WIPE_SECRETS
-+static LIST_HEAD(dm_crypt_wipe_list);
-+static DEFINE_SPINLOCK(dm_crypt_wipe_list_lock);
-+#endif
-+
- static volatile unsigned long dm_crypt_pages_per_client;
- #define DM_CRYPT_MEMORY_PERCENT			2
- #define DM_CRYPT_MIN_PAGES_PER_CLIENT		(BIO_MAX_VECS * 16)
-@@ -460,8 +473,7 @@ static void crypt_iv_lmk_dtr(struct crypt_config *cc)
- {
- 	struct iv_lmk_private *lmk = &cc->iv_gen_private.lmk;
- 
--	kfree_sensitive(lmk->seed);
--	lmk->seed = NULL;
-+	kfree_sensitive(xchg(&lmk->seed, NULL));
- }
- 
- static int crypt_iv_lmk_ctr(struct crypt_config *cc, struct dm_target *ti,
-@@ -582,10 +594,8 @@ static void crypt_iv_tcw_dtr(struct crypt_config *cc)
- {
- 	struct iv_tcw_private *tcw = &cc->iv_gen_private.tcw;
- 
--	kfree_sensitive(tcw->iv_seed);
--	tcw->iv_seed = NULL;
--	kfree_sensitive(tcw->whitening);
--	tcw->whitening = NULL;
-+	kfree_sensitive(xchg(&tcw->iv_seed, NULL));
-+	kfree_sensitive(xchg(&tcw->whitening, NULL));
- }
- 
- static int crypt_iv_tcw_ctr(struct crypt_config *cc, struct dm_target *ti,
-@@ -761,8 +771,7 @@ static void crypt_iv_elephant_dtr(struct crypt_config *cc)
- {
- 	struct iv_elephant_private *elephant = &cc->iv_gen_private.elephant;
- 
--	kfree_sensitive(elephant->key);
--	elephant->key = NULL;
-+	kfree_sensitive(xchg(&elephant->key, NULL));
- }
- 
- static int crypt_iv_elephant_ctr(struct crypt_config *cc, struct dm_target *ti,
-@@ -2547,8 +2556,7 @@ static int crypt_set_keyring_key(struct crypt_config *cc, const char *key_string
- 		goto free_new_key_string;
- 
- 	set_bit(DM_CRYPT_KEY_VALID, &cc->flags);
--	kfree_sensitive(cc->key_string);
--	cc->key_string = new_key_string;
-+	kfree_sensitive(xchg(&cc->key_string, new_key_string));
- 	return 0;
- 
- free_new_key_string:
-@@ -2612,8 +2620,7 @@ static int crypt_set_key(struct crypt_config *cc, char *key)
- 	clear_bit(DM_CRYPT_KEY_VALID, &cc->flags);
- 
- 	/* wipe references to any kernel keyring key */
--	kfree_sensitive(cc->key_string);
--	cc->key_string = NULL;
-+	kfree_sensitive(xchg(&cc->key_string, NULL));
- 
- 	/* Decode key from its hex representation. */
- 	if (cc->key_size && hex2bin(cc->key, key, cc->key_size) < 0)
-@@ -2641,14 +2648,97 @@ static int crypt_wipe_key(struct crypt_config *cc)
- 	if (cc->iv_gen_ops && cc->iv_gen_ops->wipe)
- 		cc->iv_gen_ops->wipe(cc);
- 
--	kfree_sensitive(cc->key_string);
--	cc->key_string = NULL;
-+	kfree_sensitive(xchg(&cc->key_string, NULL));
- 	r = crypt_setkey(cc);
- 	memset(&cc->key, 0, cc->key_size * sizeof(u8));
- 
- 	return r;
- }
- 
-+#ifdef CONFIG_CRASH_WIPE_SECRETS
-+static void crypt_crash_wipe_iv(struct crypt_config *cc)
-+{
-+	if (cc->iv_gen_ops == &crypt_iv_lmk_ops) {
-+		struct iv_lmk_private *lmk = &cc->iv_gen_private.lmk;
-+
-+		if (lmk->seed)
-+			crash_wipe_memzero(lmk->seed, LMK_SEED_SIZE);
-+	} else if (cc->iv_gen_ops == &crypt_iv_tcw_ops) {
-+		struct iv_tcw_private *tcw = &cc->iv_gen_private.tcw;
-+
-+		if (tcw->iv_seed)
-+			crash_wipe_memzero(tcw->iv_seed, cc->iv_size);
-+		if (tcw->whitening)
-+			crash_wipe_memzero(tcw->whitening, TCW_WHITENING_SIZE);
-+	} else if (cc->iv_gen_ops == &crypt_iv_elephant_ops) {
-+		struct iv_elephant_private *elephant =
-+			&cc->iv_gen_private.elephant;
-+
-+		if (elephant->key)
-+			crash_wipe_memzero(elephant->key,
-+					   sizeof(*elephant->key));
-+	}
-+}
-+
-+static int crypt_crash_wipe(struct notifier_block *nb, unsigned long action,
-+			    void *data)
-+{
-+	struct crypt_config *cc;
-+
-+	/* No locking: all other CPUs are stopped, and a cc is unlinked before
-+	 * it is freed, so the forward walk can't reach freed memory.
-+	 */
-+	list_for_each_entry(cc, &dm_crypt_wipe_list, wipe_list) {
-+		crash_wipe_memzero(cc->key, cc->key_size);
-+
-+		if (cc->authenc_key)
-+			crash_wipe_memzero(cc->authenc_key,
-+					   crypt_authenckey_size(cc));
-+
-+		if (cc->key_string)
-+			crash_wipe_memzero(cc->key_string,
-+					   strlen(cc->key_string));
-+
-+		crypt_crash_wipe_iv(cc);
-+	}
-+
-+	return NOTIFY_DONE;
-+}
-+
-+static struct notifier_block crypt_crash_wipe_nb = {
-+	.notifier_call = crypt_crash_wipe
-+};
-+
-+static void crypt_track_cc(struct crypt_config *cc)
-+{
-+	spin_lock(&dm_crypt_wipe_list_lock);
-+	list_add(&cc->wipe_list, &dm_crypt_wipe_list);
-+	spin_unlock(&dm_crypt_wipe_list_lock);
-+}
-+
-+static void crypt_untrack_cc(struct crypt_config *cc)
-+{
-+	spin_lock(&dm_crypt_wipe_list_lock);
-+	list_del(&cc->wipe_list);
-+	spin_unlock(&dm_crypt_wipe_list_lock);
-+}
-+
-+static void crypt_crash_wipe_init(void)
-+{
-+	crash_wipe_secrets_register(&crypt_crash_wipe_nb);
-+}
-+
-+static void crypt_crash_wipe_exit(void)
-+{
-+	crash_wipe_secrets_unregister(&crypt_crash_wipe_nb);
-+}
-+#else
-+static void crypt_track_cc(struct crypt_config *cc) { }
-+static void crypt_untrack_cc(struct crypt_config *cc) { }
-+static void crypt_crash_wipe_init(void) { }
-+static void crypt_crash_wipe_exit(void) { }
-+#endif /* CONFIG_CRASH_WIPE_SECRETS */
-+
- static void crypt_calculate_pages_per_client(void)
- {
- 	unsigned long pages = (totalram_pages() - totalhigh_pages()) * DM_CRYPT_MEMORY_PERCENT / 100;
-@@ -2729,12 +2819,15 @@ static void crypt_dtr(struct dm_target *ti)
- 		dm_put_device(ti, cc->dev);
- 
- 	kfree_sensitive(cc->cipher_string);
--	kfree_sensitive(cc->key_string);
-+	kfree_sensitive(xchg(&cc->key_string, NULL));
- 	kfree_sensitive(cc->cipher_auth);
--	kfree_sensitive(cc->authenc_key);
-+	kfree_sensitive(xchg(&cc->authenc_key, NULL));
- 
- 	mutex_destroy(&cc->bio_alloc_lock);
- 
-+	memzero_explicit(cc->key, cc->key_size);
-+	crypt_untrack_cc(cc);
-+
- 	/* Must zero key material before freeing */
- 	kfree_sensitive(cc);
- 
-@@ -3210,6 +3303,8 @@ static int crypt_ctr(struct dm_target *ti, unsigned int argc, char **argv)
- 
- 	ti->private = cc;
- 
-+	crypt_track_cc(cc);
-+
- 	spin_lock(&dm_crypt_clients_lock);
- 	dm_crypt_clients_n++;
- 	crypt_calculate_pages_per_client();
-@@ -3716,7 +3811,29 @@ static struct target_type crypt_target = {
- 	.iterate_devices = crypt_iterate_devices,
- 	.io_hints = crypt_io_hints,
- };
--module_dm(crypt);
-+
-+static int __init dm_crypt_init(void)
-+{
-+	int r;
-+
-+	crypt_crash_wipe_init();
-+
-+	r = dm_register_target(&crypt_target);
-+	if (r) {
-+		crypt_crash_wipe_exit();
-+		return r;
-+	}
-+
-+	return 0;
-+}
-+module_init(dm_crypt_init);
-+
-+static void __exit dm_crypt_exit(void)
-+{
-+	crypt_crash_wipe_exit();
-+	dm_unregister_target(&crypt_target);
-+}
-+module_exit(dm_crypt_exit);
- 
- MODULE_AUTHOR("Jana Saout <jana@saout.de>");
- MODULE_DESCRIPTION(DM_NAME " target for transparent encryption / decryption");
+> > +MODULE_IMPORT_NS("CRYPTO_INTERNAL");
+>
+> Why all this is in completely odd place, not next to the module init
+> code?
 
--- 
-2.53.0
+We will move it next to the module code.
 
+> > +static struct cmh_device *g_cmh_dev;
+>
+> Eh, no. Don't implement singletons.
+
+We will remove the singleton and use dev_get_drvdata() /
+platform_get_drvdata().
+
+> > +	dev_info(cmh_dev(), "CMH eSW fully operational ...\n", sw_boot);
+>
+> Drop
+
+We will remove the dev_info() logging across the driver,
+keeping only genuine error paths.
+
+> > +	if (g_cmh_dev)
+> > +		return -EBUSY;
+>
+> NAK
+
+We will drop the single-instance guard together with the singleton.
+
+> > +	dev_info(&pdev->dev, "loading v%s\n", CMH_VERSION);
+>
+> NAK and internal review should tell you that
+
+Will remove.
+
+> > +	dev_info(cmh_dev(), "sic_base=3D0x%llx size=3D0x%zx mbx_count=3D%u\n"=
+,
+>
+> How many dev_info are you going to print?
+
+Will remove.
+
+> > +		dev_info(cmh_dev(), "enabled %d clock(s)\n", ret);
+>
+> Again?
+
+Will remove.
+
+> > +		dev_err(cmh_dev(), "failed to acquire reset GPIO (rc=3D%d)\n", ret);
+>
+> Syntax is ret =3D dev_err_probe and internal review should tell you that.
+
+We will use return dev_err_probe(...) on the probe error paths.
+
+> > +	(void)cmh_debugfs_init(cfg);
+>
+> Why the cast?
+
+We will drop the cast and check the return.
+
+> > +	g_cmh_dev =3D dev;
+>
+> Nope (and we do not call things "g" from globals)
+
+Will be gone with the singleton removal.
+
+> > +	dev_info(cmh_dev(), "initialized successfully\n");
+>
+> NAK
+
+Will remove.
+
+> > +	dev_info(&pdev->dev, "unloaded successfully\n");
+>
+> NAK
+
+Will remove.
+
+> > +		.name           =3D CMH_DRV_NAME,
+>
+> Use name directly.
+
+We will use "cmh" directly.
+
+> > +	 * g_cmh_dev -- that would defeat deferred probe.
+> > +	 */
+>
+> Why do you need this? Why your driver is done differently than all
+> others?
+
+We will drop the custom init/exit and use module_platform_driver().
+
+> > +module_init(cmh_init);
+> > +module_exit(cmh_exit);
+>
+> And this is not module_platform_driver because...?
+
+Will switch to module_platform_driver() in v4.
+
+> > +	dev_info(cmh_dev(), "MQI init complete (%u mailboxes)\n", cfg->mbx_co=
+unt);
+>
+> NAK
+
+Will remove.
+
+> > +	dev_info(cmh_dev(), "MQI cleanup complete\n");
+>
+> NAK
+
+Will remove.
+
+> > +		dev_info(cmh_dev(), "rh: no mailbox IRQs -- polling mode\n");
+>
+> So a warning or info?
+
+Will remove -- polling is a normal configuration, not worth logging.
+
+> > +		dev_warn(cmh_dev(), "rh: no IRQs -- using watchdog polling ...\n",
+>
+> And here it is a warning?
+
+Will remove.
+
+> > +	{
+>
+> What is with this indentation?
+
+We will drop the naked block and restructure.
+
+> > +	dev_info(cmh_dev(), "rh: initialized (%u IRQs, ...)\n",
+>
+> One more dev_info....
+
+Will remove.
+
+> > +	dev_dbg(cmh_dev(), "rh: suspended\n");
+>
+> No, you cannot have even debug messages which re-implement and
+> duplicated standard tracing and standard debugging code.
+
+We will remove these debug messages.
+
+> > +static unsigned int backlog_max_depth =3D 1024;
+> > +module_param(backlog_max_depth, uint, 0444);
+>
+> Drop all module params, not really right way to do things.
+
+We will drop all module parameters and move the genuinely useful knobs
+to debugfs.
+
+> > +#define CMH_VERSION    "1.0.0"
+>
+> NAK, this is not allowed in Linux kernel code. Do you see drivers
+> (except complete junk from AMD) doing this?
+
+We will remove the driver-version define entirely.
+
+Thanks for the review.
+
+Regards,
+Alex
