@@ -1,89 +1,87 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB83634F27B
-	for <linux-crypto@vger.kernel.org>; Tue, 11 Aug 2026 10:32:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0165634A3BF;
+	Tue, 11 Aug 2026 10:53:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786444327; cv=none; b=D+5TmkDodzK/sGw2PrtOLZPHV6xTdDQd9mpq043wFhoLSeCgGE3DuLk0TJHkKyAKy6OMou3P8sd2fNF0UrpotLzifVRejwOrFsFv6sEgpZ+kgop7KKJgokgX3QSVSDRVYXITMVTfQbFfBD59N3C+351Do/FQlYE7rq226UAe8S0=
+	t=1786445641; cv=none; b=CVwTGh7moXcWcIrmbNC89gJFsE3jWxAGJYUKnAfEBhpabciuKoeReSVwR3HSnfw6QbeANXJdN9XC5OHQeQgLIeM8LKJLsjbMluNGimggtknJYsGoP2dqWT4d2CGo+OwS1mYDCQNbytn3KQ0gdUPucY8FLrNR9vZPvYLsts92woU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786444327; c=relaxed/simple;
-	bh=FdPSroC7ce+kAtD3T7bEB7mVsMeu/ZxDfA2/6aLIlbM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=D9TcLedglY9quZ+VkwizKjqG80HgF5M92pjlO528KPSEof0PkyC/xGtjJL4gldAUKUcQ9SOiE8oXWp+NfmOe7LUflYS3c2MWyj7XlumyGX4eEotmed156oJyVvsMdWFiqJWZ0NqyM44qFSZGP2Ntx+n9L7mICuohJjCbED3/Ue0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z51f/OK9; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786445641; c=relaxed/simple;
+	bh=Jfp/Nd+41qkFAW+YNp0hXQOIWAf/BDIR8Y2UrrdZjvA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TmaqvIR0VL4bmLUHOcObZJwsHEPYPqDESw0k4S1W0K5NDY3IwanL6VX6eRjvZDTwByc4g+0G03umqXjOfK5ZCNzqXlGpICrram/Petj0jW/tcJ7Sju61hPqf3Fb1sj7a2thFQ6sVUlj235Ssr6EjsYtD78SWYY25UNXZU0vCpt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QmtW2b55; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z51f/OK9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A2091F01558
-	for <linux-crypto@vger.kernel.org>; Tue, 11 Aug 2026 10:32:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QmtW2b55"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B5151F000E9;
+	Tue, 11 Aug 2026 10:53:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786444326;
-	bh=tcyjhxwWlllK6qutC+N1y/RvpNtsnXKy2Zqc1iFumV4=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=Z51f/OK9xgFLpv/lJ0L+bKMm+upU5P96V1h7CeAQDjjpjMaxHd8U103AA+VzPC3eh
-	 6P5y+dUKtQRON/QtxH8j3rGTe9KIQx1qpB1r5QFafeJBE9oDs29/Kb0R731f97Qqqp
-	 n729WgXRWqMc4orxGztxDYo3hurP6Ysq2daWNf03U9DGLHpk16qEIuj0lKyHKpyeE5
-	 e890D24l0Vih+GKYMFtQK/JiiWjCEJFIyFd7j293LyYjb/nB0nRYSARFHlKwkf/se/
-	 sWt3x/49ccxxqurVI8cWRCA9stGEStmEaFqtJhjixFZlm3hoyLjyUPd4UwcsEd1fXt
-	 HW8sv2YnPSKuQ==
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-c15e2dab83eso436965666b.1
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Aug 2026 03:32:06 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RqRSPN2HPos7PCOmJt6dXf5q303D2ClAIdtGpAw8/K+ZAkHqbLihF3M/aT5wnxqlxUl7a6Ux4WIxXuyo8E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPg3YJF9x1IlGR48F+D3q0JrnVaAX1uS+8cLVjtJHIbk3lo5tk
-	nEGq+hZ6VMYQPp5Xu0ZXuFIqqksr1KTxlGjQ4fN50y9J8Y6yQADUnccUlo+I+1krrLOQjt0f8Iq
-	PkRyn+TU2dwOFqM6yzte6hIsFH7iwHOY=
-X-Received: by 2002:a17:907:d1a:b0:c1f:bda0:a771 with SMTP id
- a640c23a62f3a-c20e60ad48dmr114349766b.13.1786444324874; Tue, 11 Aug 2026
- 03:32:04 -0700 (PDT)
+	s=k20260515; t=1786445639;
+	bh=p84j6vNUdfWQLML+rVOLy0aQPHO9hPxgm9Ft4y7d8Bg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=QmtW2b55hgO29VKv2qGxjfcfyioIEezWf3Megxtpk4um+hNPQq6DJFl9r+8N8IgHy
+	 qPvYPBNkg10jIoVMaoi/pus4HFohFKEy9sWGXqY/zjh5GFVCrRBQBTlKo17ZbvPwY3
+	 YFOiA2w/9TVK1IGzdsqU9Zz0ulb7kAAJC3BH35uAaaczo2be21Ao6cMKSTrkwc09kT
+	 AzihCcy6L9QmzxwWk4L+sRF5XVjXQ6cVRbrLhnk4qw31p8g5FE5+u1nJlaXDJGKcZj
+	 bm4Pr7CA/VqmN91Jw9VvY5ClXD1L+h9pNQOUT2loGes9jn/puoReglt/iOsHmdW0+r
+	 NLXJFrtqM+OlQ==
+Date: Tue, 11 Aug 2026 11:53:54 +0100
+From: Daniel Thompson <danielt@kernel.org>
+To: Guangshuo Li <lgs201920130244@gmail.com>
+Cc: Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Linus Walleij <linusw@kernel.org>, linux-crypto@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v2] hwrng: stm32: fix usage_count leak when
+ autosuspend_delay is negative
+Message-ID: <anr_Qu1GncWBDwCf@aspen.lan>
+References: <20260811063442.3058074-1-lgs201920130244@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260807125845.1477067-1-thuth@redhat.com> <20260807125845.1477067-3-thuth@redhat.com>
-In-Reply-To: <20260807125845.1477067-3-thuth@redhat.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 11 Aug 2026 19:31:53 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd_VJH8dFHofy2Jfk2172vDuU+XizXQf06w0oz81F1WDdQ@mail.gmail.com>
-X-Gm-Features: AUfX_mx_zSkaoj5nh7WflA2gKP8S9W47Zxrr5Dv4iawiccAXZBlrwDeYNI4JMqo
-Message-ID: <CAKYAXd_VJH8dFHofy2Jfk2172vDuU+XizXQf06w0oz81F1WDdQ@mail.gmail.com>
-Subject: Re: [PATCH v2 2/6] smb: clear the aes_cmac_key and aes_cmac_ctx when done
-To: Thomas Huth <thuth@redhat.com>
-Cc: Eric Biggers <ebiggers@kernel.org>, Steve French <sfrench@samba.org>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Paulo Alcantara <pc@manguebit.org>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, linux-cifs@vger.kernel.org, 
-	samba-technical@lists.samba.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260811063442.3058074-1-lgs201920130244@gmail.com>
 
-> diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.=
-c
-> index 1143ee52470a7..d23566da2ac81 100644
-> --- a/fs/smb/client/smb2transport.c
-> +++ b/fs/smb/client/smb2transport.c
-> @@ -464,8 +464,8 @@ smb3_calc_signature(struct smb_rqst *rqst, struct TCP=
-_Server_Info *server)
->         unsigned char smb3_signature[SMB2_CMACAES_SIZE];
->         struct kvec *iov =3D rqst->rq_iov;
->         struct smb2_hdr *shdr =3D (struct smb2_hdr *)iov[0].iov_base;
-> -       struct aes_cmac_key cmac_key;
-> -       struct aes_cmac_ctx cmac_ctx;
-> +       struct aes_cmac_key cmac_key __cleanup(aes_cmac_zeroize_key);
-> +       struct aes_cmac_ctx cmac_ctx __cleanup(aes_cmac_zeroize_ctx);
->         struct smb_rqst drqst;
->         u8 key[SMB3_SIGN_KEY_SIZE];
-Shouldn=E2=80=99t we also clear the raw key with memzero_explicit(key,
-sizeof(key)) immediately after aes_cmac_preparekey() ?
+On Tue, Aug 11, 2026 at 02:34:42PM +0800, Guangshuo Li wrote:
+> stm32_rng_probe() calls pm_runtime_use_autosuspend(), but runtime PM is
+> enabled with pm_runtime_enable() and the matching
+> pm_runtime_dont_use_autosuspend() is not called on driver teardown.
+>
+> If the autosuspend delay is set to a negative value while autosuspend
+> is enabled, the runtime PM core increments usage_count to prevent
+> runtime suspend. Without calling pm_runtime_dont_use_autosuspend()
+> during teardown, this reference is not dropped and usage_count remains
+> unbalanced.
+>
+> Use devm_pm_runtime_enable() so that pm_runtime_dont_use_autosuspend()
+> and pm_runtime_disable() are automatically called on probe failure and
+> driver teardown. With runtime PM cleanup handled by devres,
+> stm32_rng_remove() is no longer needed.
+>
+> This issue was found by manual code inspection.
+>
+> Fixes: c6a97c42e399 ("hwrng: stm32 - add support for STM32 HW RNG")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
+> ---
+> v2:
+>   - Replace pm_runtime_enable() with devm_pm_runtime_enable() to handle
+>     runtime PM cleanup through devres.
+>   - Remove stm32_rng_remove() and the manual cleanup on the probe failure
+>     path.
 
-        rc =3D aes_cmac_preparekey(&cmac_key, key, SMB2_CMACAES_SIZE);
-+        memzero_explicit(key, sizeof(key));
-        if (rc) {
-                cifs_server_dbg(VFS, "%s: Could not set key for cmac
-aes\n", __func__);
-                return rc;
-        }
+devres changes look great!
+
+Reviewed-by: Daniel Thompson (RISCstar) <danielt@kernel.org>
+
+
+Daniel.
