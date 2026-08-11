@@ -1,106 +1,92 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA674343E7
-	for <linux-crypto@vger.kernel.org>; Tue, 11 Aug 2026 13:43:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 580EC382298;
+	Tue, 11 Aug 2026 15:53:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786455791; cv=none; b=PE51Qigl51enaqRsoHywXYqtpyEtd3b70BaZJPSferBAJmWp9ussgR4x7iBUo3x4dAF51JCxJ7KPuFsIYf1TKsQRgTLjLekrBMnZa1/6lC2j1HjZvLsu2uQCF2ET77tu1YLtP8N8/97N8icThRdpk/jEXyJlAOoG8CQ0g13vlo4=
+	t=1786463596; cv=none; b=mHqiZjwQ7sLj21sOtjVkK3mD6lLaLUbvUsU1HY3Xy0tgXcvQ7p5WD/QKlkI+VbXIkivpf6Mn79WeBKg3clO+SqwzzUfqJM5SSAXJqD9EweY9tw6vdu6Vq0dIjnBVmmKjN+5O1XJHDJ6uyiWKrgHj7YfmDGtPDnxnPiUQReeUiec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786455791; c=relaxed/simple;
-	bh=sqHqnQEgb2eopnRchvARr5TfEBtuEQo7ezPtINDXkqg=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m19gYxkIkYzi/I07Vd9dj1n29RzQ/rBrL5PooA3KUAxctwV1r5h5ec3EnZ1USm+06TypflFUVRM8rH8v6UNecH+q0lPCTj1zXlmoW556lxfERpfGtmvJRIKIfsIoRB+5NcChLt2SjL6ktn7JlHWcsbPdUZ7glheAo2OgcRRtAi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BpB9+IN2; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786463596; c=relaxed/simple;
+	bh=DnF3aQdkXNx4oU+Fl+i9D15DW8KRXhFLW9FERxBFTB4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pf0KHz/HXir6hiHBh8EQCYWLAmM8nsnYEGLmNyDcgHNfqyeCodvDvwO/njwpYbgWBULQpwXgu9exwh9igBJ/qqfVIfDh712ck7FpyJ/bOj2+p9R7Bmy/hyN7tAos0ndRCmamC2CJYhNiY2NwgGrlafHXlIoBxzvHLrIZHfgUKqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AnBX8YUZ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BpB9+IN2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D4AA1F00A3D
-	for <linux-crypto@vger.kernel.org>; Tue, 11 Aug 2026 13:42:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AnBX8YUZ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B16171F000E9;
+	Tue, 11 Aug 2026 15:53:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786455779;
-	bh=oGL2ON+fY7rc/DLjrgmdVLzgpG4X0fa0OqzQfBqPl78=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=BpB9+IN2EktpZlwbaW/abyZTkq3FyAM1VgonyxsDOF6/vWRs3SHfwfjNAt8bK2Ta/
-	 IMqyeeJkKJw79rmkLM24A6nq+dpmQVF6hBzb9uqB3sXItxVseBCc7syz6av+nlFi+y
-	 +RNQnHhjD9yPsFEFMaJtwDCqS3uJ24sBLX+u8oX70nZ16PuWElWsqnqZj1nuXqL/tT
-	 fLIrV0nivVzPGe1affq32ALi59n4ep3U5sNuhd2vdFQCALX0yWMCfB9n17/eOWNCRV
-	 6xt8AT41D1+LZ86/COb6h/Ou9kn7E36EscZdprREsX9YQSEJ0uTjAG1B5+QVA3wExf
-	 vf6cXn4X7iq6g==
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-39c86945164so24612041fa.1
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Aug 2026 06:42:59 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+Rpah6fXL8spK2UrcySlhQxS2B50giDzTo/5AxiBFfypo8iYplalrgSJikD2wptukfXrl9AXSPZawAlfPNA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCHUHUdEOn221QekAXbZXFxYZOawlsOucLb6S0DLFPPeTHauJU
-	pg7WuwxSXZhT6mteIvTwALhjwUen2iD634j6s1BZujo4Y0VQdH3ub4AJcG4OKibkc81poY2EZxv
-	D6y4QV/iBkkzOZdLHVFwUkkQAVCdslcpumu9yAeNhoA==
-X-Received: by 2002:ac2:4c4a:0:b0:5b2:b004:ab9d with SMTP id
- 2adb3069b0e04-5b448633cccmr554909e87.34.1786455777968; Tue, 11 Aug 2026
- 06:42:57 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 11 Aug 2026 08:42:55 -0500
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 11 Aug 2026 08:42:55 -0500
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <20260801171242.GA3567@quark>
+	s=k20260515; t=1786463595;
+	bh=DnF3aQdkXNx4oU+Fl+i9D15DW8KRXhFLW9FERxBFTB4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=AnBX8YUZAaCz4DWFbJVo8gwN0rMr0SQ87izcGiOCA8nKHT0RqjFPMsRZojovf1ARD
+	 R5XkNTvGzeFQAU5mg2idWrFbIwVVzAD9RSLBSFdfsCWYwNHz4H+gjbsAPn88kJWRk+
+	 wveagclyOQ7huxROaH9sdj2yv6rNO1qXpteNII8BFYSFExL2MDPOcYxWHR7f3mm5LR
+	 /jU41Z3dF5zhd1omvwkQVRIy5/zaud7PaVIy3tHMqxf3jNtOXwVGNc/ZXUC3X6uwqq
+	 DjWjoFk+g0u02Vd8xPFPyxWH/V95eAmH0jPD/oqP3vkmOrLhHgrclkzlhC5O0382d6
+	 uCdkZ/wtPpeJA==
+Date: Tue, 11 Aug 2026 08:53:13 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Uwe =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?= <ukleinek@kernel.org>
+Cc: Vladislav Leonov <vlad@zlab.su>, linux-rockchip@lists.infradead.org,
+ linux-arm-kernel@lists.infradead.org, Simon Glass <sjg@chromium.org>,
+ linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Andi Shyti <andi.shyti@kernel.org>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, Aurelien Jarno <aurelien@aurel32.net>, Brian
+ Masney <bmasney@redhat.com>, Conor Dooley <conor+dt@kernel.org>, Daniel
+ Golle <daniel@makrotopia.org>, "David S. Miller" <davem@davemloft.net>,
+ David Wu <david.wu@rock-chips.com>, Eric Dumazet <edumazet@google.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Heiko Stuebner
+ <heiko@sntech.de>, Herbert Xu <herbert@gondor.apana.org.au>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Mark Brown <broonie@kernel.org>, Maxime
+ Chevallier <maxime.chevallier@bootlin.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Michael Turquette <mturquette@baylibre.com>,
+ Neil Armstrong <neil.armstrong@linaro.org>, Nicolas Frattaroli
+ <nicolas.frattaroli@collabora.com>, Olivia Mackall <olivia@selenic.com>,
+ Paolo Abeni <pabeni@redhat.com>, Philipp Zabel <p.zabel@pengutronix.de>,
+ Rob Herring <robh@kernel.org>, Stephen Boyd <sboyd@kernel.org>, Vinod Koul
+ <vkoul@kernel.org>, linux-crypto@vger.kernel.org,
+ linux-i2c@vger.kernel.org, linux-phy@lists.infradead.org,
+ linux-pwm@vger.kernel.org, linux-spi@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com, linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH 00/25] ARM: rockchip: Add peripheral support for RV1106
+Message-ID: <20260811085313.379ac489@kernel.org>
+In-Reply-To: <anq1ouUnKA02Eauj@monoceros>
+References: <20260810121121.210040-1-vlad@zlab.su>
+	<20260810113548.7fd24d56@kernel.org>
+	<anq1ouUnKA02Eauj@monoceros>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260731050838.158825-1-ebiggers@kernel.org> <a28c2903-0976-4559-b870-4de5553ba9ab@kernel.org>
- <3ba57269-3305-4d80-b3f2-aa82fa59b59d@gmail.com> <b9b655a9-c683-4c4e-ba0d-f98577dd2912@kernel.org>
- <20260801162900.GA2021@quark> <e7aeec9b-11aa-4635-bde9-fb8c7ca38260@kernel.org>
- <20260801171242.GA3567@quark>
-Date: Tue, 11 Aug 2026 08:42:55 -0500
-X-Gmail-Original-Message-ID: <CAMRc=McL5QQRk8C8zzkHm+FUj-SAVi5PLJr2pXo8eNpaxXuALg@mail.gmail.com>
-X-Gm-Features: AUfX_mxPZ9dCN1jSvjbQwqq_cAREJeltmA9cJmtfDea-v8VxD3gCP4H0x5h0r80
-Message-ID: <CAMRc=McL5QQRk8C8zzkHm+FUj-SAVi5PLJr2pXo8eNpaxXuALg@mail.gmail.com>
-Subject: Re: [PATCH] crypto: qce - Replace with stub driver
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Demi Marie Obenour <demiobenour@gmail.com>, linux-crypto@vger.kernel.org, 
-	Herbert Xu <herbert@gondor.apana.org.au>, linux-arm-msm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Bartosz Golaszewski <brgl@kernel.org>, Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>, 
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Krzysztof Kozlowski <krzk@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, 1 Aug 2026 19:12:42 +0200, Eric Biggers <ebiggers@kernel.org> said:
+On Tue, 11 Aug 2026 07:43:16 +0200 Uwe Kleine-K=C3=B6nig wrote:
+> On Mon, Aug 10, 2026 at 11:35:48AM -0700, Jakub Kicinski wrote:
+> > On Mon, 10 Aug 2026 15:10:51 +0300 Vladislav Leonov wrote: =20
+> > > Basic support for the Rockchip RV1106/RV1103 SoCs currently under rev=
+iew.
+> > > This series builds on top of that and enables the peripherals needed =
+to
+> > > bring up a board beyond a serial console: =20
+> >=20
+> > Don't expect maintainers to dig out patches for their subsystems
+> > from a big series. This is not how upstream development works. =20
+>=20
+> I see this from time to time and I personally think it's fine to have
+> these patches together. Also the only the patch that affects my
+> subsystem was Cc:d to me which is how I like it (but I think opinions
+> differ on that one, too).
+>=20
+> `b4 am -P _` is great!
 
-> Well, that again brings us back to the core issue which is the actual
-> current functionality of the driver, which is to register crypto_ahash,
-> crypto_skcipher, and crypto_aead algorithms with the crypto API.
->
-> It isn't useful functionality, but rather just a footgun that allows
-> users to misconfigure their systems, an issue I've seen happen multiple
-> times.  CPU-based implementations of *every one* of those algorithms
-> already exist.  On a typical SoC that has this hardware, the CPU-based
-> implementations are ~50x faster as shown in tests.  Pending patches make
-> the difference even greater at ~100x.  And the CPU-based implementations
-> actually use significantly less CPU time, as well.  There seems to be no
-> path forward for significantly fixing this issue, either.
->
-
-You've repeated your point about performance several times. Nobody ever said
-you're wrong. Performance is not the only reason for choosing one provider over
-another.
-
-> An alternative we could consider is dropping the cra_priority further,
-> to further decrease the chance that these algorithms are used.  But I
-> feel it's hard to justify why they're there at all, if the rationale for
-> keeping them is "we made sure that no one can actually use them, so they
-> can't be causing problems anymore"...
->
-
-No, the rationale has never been this. FWIW it can be that it's used for
-testing of the crypto module on a supported platform and that is already
-enough of a reason to keep it upstream.
-
-As I've said before: we don't just drop maintained drivers from linux.
-
-Herbert: it's been a while, would you mind chiming in and deciding one way
-or the other, as Greg seems to have deferred to your judgement?
-
-Thanks,
-Bartosz
+We have automation and CI systems which ignore anything that isn't
+scoped to networking to save cost. Not sure if there's a polite way=20
+to say this but the smaller the subsystem the more flexibility can=20
+be afforded? Let's stick to the existing process, please.
