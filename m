@@ -1,107 +1,90 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 177823F9F5B;
-	Tue, 11 Aug 2026 20:43:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0EC5367B93
+	for <linux-crypto@vger.kernel.org>; Tue, 11 Aug 2026 21:20:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786480988; cv=none; b=X9uL+++FWvp05XhbAwR/4wwwymoUplR6MkY425yLnkPSpnMIOGgXmhsrA4VJyrX45GNFdgZuiQyOEGuzVXTflXUiZXJpPWpD/j8SQQpkVctSwKE+XrzZ+Q0eLUuOIZQwYxTc40l+OS5sk83oLP9a5SlzLcPz4SEyY6waOwIrf1k=
+	t=1786483234; cv=none; b=It9xCWvUfHVj/BTx2PVG6dfrUyFI1wVwTL1EOuxn94lfCFMrma45Ymfe5XbIV/jMhFovK6upmsKIh4JZUZaK45P6wRdglnpFJT4bDOV5ZSvkvQAqsR963KiWk2Xh4tOChUwUHuV3Z9P6HEZg3WcfHvOd/ifrLqb5hhpP1+tvDvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786480988; c=relaxed/simple;
-	bh=HNWrA4Npyus9iEe5/qKE4hOoR7Pg96iHGa2EDjt2768=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uV2hskp5fWV5zMc0nYGid3L8r8bN+0DTxnBYhz4/oGKW1o0fUZfW078ggnsheVXU0j9+CWQ36YGbd9vXPi98G5xdmQh7CImMHGGmwL7JCBhOpoicLLSh+eVN5anJYsvzv6qP5DQBF5WXI4PMo2Z5m9tgbz6IbxP6DcumrwDnnik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YXLgdApM; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786483234; c=relaxed/simple;
+	bh=Ozv0qxakKBL0f7dmZSPxqJM5oFsARFE1Z75CSPTlKuc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DhcwGh0R1JIfGBDUVyY0LCmusBF44Qu1K+0xPIiukO812KdOHL75BNkvgR0tDfgro5/YJ3McJpyhS3cl5Sw2JoTqAy1gKjLUfRWi4TZUe9bZYGximjAGYJ05iHDOEYMKjRxZSPtSZRbfMmEy9aUXjXWHNDS0S+A9xQswPgo94qI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GSZmr2Ag; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YXLgdApM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 049C71F000E9;
-	Tue, 11 Aug 2026 20:43:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786480986;
-	bh=tmqgrBJxUvss5ev2qg4hR/y+Shhz4DNLrdh9R3vpGbM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=YXLgdApMQVjB8O5UsuRCftLgsXmP3cSJYvwGgrqZ6b+hB2edLW/uSBh3oj2DAKDLB
-	 6IioToKp+fdIkMueq1I/JRHsiwugXBDmJ97vp4UxyiCAtTlbgjkSl4kj3fA2aKAij5
-	 Qgg6Hbg7EYU+2aNCB4H6ya401I1ujfkQIF2fhblv0bLnVJ432LahjN1sFPCZeRdz14
-	 Cw5oUW8a78hswG6XALU3IdgCkVcHjig6EUfeU9hkjUA2GGFHo2hnqTAj7OaCds1AU4
-	 UNwXanpKaMexoPY5I1l0K/a0V8GThMm0LE5dEKAkZ0GBpRhjDX5FR/2e1tnXNyczMQ
-	 ftS06T2V5gAHQ==
-Date: Tue, 11 Aug 2026 13:41:01 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Jan Sebastian =?iso-8859-1?Q?G=F6tte?= <contact@jaseg.de>
-Cc: Jan Sebastian =?iso-8859-1?Q?G=F6tte?= <linux@jaseg.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Baoquan He <baoquan.he@linux.dev>, Mike Rapoport <rppt@kernel.org>,
-	Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Pratyush Yadav <pratyush@kernel.org>,
-	Dave Young <ruirui.yang@linux.dev>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, David Howells <dhowells@redhat.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Lukas Wunner <lukas@wunner.de>, Ignat Korchagin <ignat@linux.win>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GSZmr2Ag"
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2d049069377so3875275ad.0
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Aug 2026 14:20:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786483232; x=1787088032; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=70B88WFd3AQAm4VRQxLFNxtmaoLLrMV/Ems9Q7BZkrk=;
+        b=GSZmr2Agksw+OKnIWXnmZAaXK+/UWn5/GjgqaEJSPADE2UGU/oJU0yKEdrlEDMN/YZ
+         U2xevDhHltM7uH7wFZDjXSY4LCpBt3xpRU+tUKaGqaRu5XCWmeyyxFNb2FWKbyS/R9yD
+         WlqQpDS20PyWalBipJPvf/yba8d8QUdfq8t9wC5waZxeJMc4/zWR7Mh+grIkH0dh89Tt
+         96fgmGERljfxopk8uU/KTvylhXkU9t4gN7oXHq1NAaxy3JWp9aA9InUoMyJ3O+zxL336
+         QkqmhLKFkxkpa5TgotT/0jPJAb8cTKzOw9SUVVJeKZQPnK+AHz35JpvR/9jm5beuZ/SU
+         TX4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786483232; x=1787088032;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=70B88WFd3AQAm4VRQxLFNxtmaoLLrMV/Ems9Q7BZkrk=;
+        b=LlDlk78yWRXM6Xb+LKPINqyh3mbU++HucybVMGhAsOS2qK5iUxD9QcUStSjaKKAoS9
+         USqIwGAq0pUvEgMc4SCGE9AbuGvgjhrziWRUWdFipkUbGP/SEGtJP+fjYY19vdFDzRys
+         Xc6At2tHczPvpObhYa8yy1owKpDgPE7Zjt7ne2G4mGORKtx9qXFSO2FA/jiNehtq2P6y
+         HrTLkhfCfS8SjwjWVmm4qL3DjR0Uevt3GBF2Z/QkHcaaSY88/dyCQLnlXc07owEJvIRe
+         hiDKTGsPyCtJo/5XoD9tO8Ww81IKjMokdBRWgTfMxQgpKuA1wa3/TnOF9sqvk6sb76Z6
+         eHkw==
+X-Gm-Message-State: AOJu0YwxdhA+DWoaNfxy9DmmixWD5Pmsa2Qf6HQO8ze91mkl7SdqsE31
+	lU6bRsnxTo+Fq2jKnYzjcEzGDlL2J76YoeR8d9QFhoP526Tx+f4vBBt8G99R3A==
+X-Gm-Gg: AR+sD13wJRSZG6d1gCzHhXfbSDjBruHXL2BslPQnvJO7+GPouInFIf1yrCXJyfKeoxk
+	bKO1i+YjKowaTukW920ZVJvd+LVACz0WaW337KfngyNjsLAVEK0eiymgJHL4FBv7LU5PipJG/1R
+	WwPSa+3MgeV5fNXTIGn0qmUsdibcc4Urdhp8gjEoVgOaFOokDZKRepyfAgIhvkAqwFpQ8QHfPT/
+	n4DbjTNzkqH3qfn1U262R1xVvthdL1qNTpFuqr9WlQCur6FBURm4H9kW6MqiAgtDzQfd1PhgSim
+	AvCiamy3pwXICyRRcheFcKBcSFIVgzYfALmfwReJ8WP9LC50Uv4iM90Ak8vMnhYV8rlW6lnQeHW
+	wNb7Cl0d/szTfibQr3n0G1qvJvatk4rBeMDUE3JBve7KkSamHiOvMHzlg7Cy6pvXvfSB0QIeMgj
+	0JMHqkRdZrk3bb4FFlgyFjSQorjykyIPSEOpD+jc0QZyPXShUIokpt846eqPof6rpkVN5aVAf7q
+	NatdtmzOE7Tff++DaNEWZJ8kDa6K7MpP1bRAQdQS0bqIrhYVQipThWLMGsw7/qZ4q+x83hTkv6C
+	dMmSZR77YmnmVttapIdcVwIfextutQznNEju+g==
+X-Received: by 2002:a17:903:4b4c:b0:2ca:bf8e:35fe with SMTP id d9443c01a7336-2d3455b83d2mr5603775ad.16.1786483232100;
+        Tue, 11 Aug 2026 14:20:32 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8000:7a86::e35])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2d315f2e10dsm12605465ad.23.2026.08.11.14.20.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Aug 2026 14:20:31 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: linux-crypto@vger.kernel.org
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>, Mimi Zohar <zohar@linux.ibm.com>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, "Theodore Y. Ts'o" <tytso@mit.edu>,
-	Jaegeuk Kim <jaegeuk@kernel.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Benjamin Marzinski <bmarzins@redhat.com>, kexec@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mm@kvack.org, keyrings@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-security-module@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-nfs@vger.kernel.org, linux-integrity@vger.kernel.org,
-	linux-afs@lists.infradead.org, netdev@vger.kernel.org,
-	linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	dm-devel@lists.linux.dev
-Subject: Re: [PATCH v2 00/13] CRASH_WIPE_SECRETS: Wipe secrets before kdump
- (was: CRASH_ZEROIZE)
-Message-ID: <20260811204101.GA1905@sol>
-References: <20260811-crash-zeroize-rework-v2-0-9561d13c2340@jaseg.de>
- <20260811182012.GB2895176@google.com>
- <d242ab53-a39e-421d-ac39-4bee49be6ac0@jaseg.de>
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH 0/2] crypto: img-hash: clean up probe
+Date: Tue, 11 Aug 2026 14:20:28 -0700
+Message-ID: <20260811212030.20057-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <d242ab53-a39e-421d-ac39-4bee49be6ac0@jaseg.de>
 
-On Tue, Aug 11, 2026 at 09:38:20PM +0200, Jan Sebastian Götte wrote:
-> > Could you perhaps narrow the scope to one or two things that actually
-> > are useful and can reasonably be supported for the application?  For
-> > example, secretmem seems to be the only thing you mentioned that you're
-> > actually planning to use.
-> 
-> I'm open to whittling down the scope of this series. In my use case I need
-> at least secretmem as well as dm-crypt, which then pulls in the crypto tfm
-> stuff. Personally, I could live without the other bits, I just thought
-> they'd be easy enough to include.
+Move some devm calls early in order to avoid goto and return directly.
+Also use non devm request_irq so that free_irq can be called at the right
+time.
 
-Please do reduce the scope.
+Rosen Penev (2):
+  crypto: img-hash: fetch resources into locals before probe body
+  crypto: img-hash: fix IRQ teardown ordering and fetch clocks early
 
-Note that even if dm-crypt is in scope, "crypto: api - wipe tfm contexts
-before kdump" is neither required nor sufficient.  For one, dm-crypt has
-its own copy of the key.  The wiping should be done by the kernel
-feature(s) that need it, as they know what actually needs to be wiped,
-and they can do so without the bottleneck of a new global list.
+ drivers/crypto/img-hash.c | 75 +++++++++++++++++++++------------------
+ 1 file changed, 40 insertions(+), 35 deletions(-)
 
-- Eric
+-- 
+2.55.0
+
