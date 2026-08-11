@@ -1,213 +1,185 @@
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B42A439F76
-	for <linux-crypto@vger.kernel.org>; Tue, 11 Aug 2026 11:35:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EDB1283C9D
+	for <linux-crypto@vger.kernel.org>; Tue, 11 Aug 2026 12:57:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786448108; cv=none; b=TZUIV2bWoD7VTsbrEBPLbz93P8P9ywBcnQbUqQ6S5Uv9Ws6drynqJrkAKhBS3rYa0grDZ8skjNnZjFwdxlCgEm+ltphm5mNIgSM2NKONMHcn43hDcNRU9LpX2r4Ib/QEWnrKFWZJlegKGtnrazImeSEmRDgnbnbWZe/OxCd+HKM=
+	t=1786453062; cv=none; b=sXaiuDO4RcQ4IGu1FjpV0SwaH8ApJIJZbrSL/w3dTCA8A8BMC8qG9pVqIhqKKHPWZ4Qj/I49Rac/kCh5e4TUIGraB5olRpcVRWk9xy60sHuz4O/rAYFyn6QTDaqBCacRtxZbt7KZoDT71Dp+eDC9lt1to0foMTWvrx8WZVB4oYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786448108; c=relaxed/simple;
-	bh=+vYSXAdB7mdZUzzraaWojPzoKc/WyC01Fzwr3gps7GY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Mk6Z1eRd+MWizbTsQ3vG8m/Eq11VWD5dqS0v0FpEpYEKhyC9prWJwfEqqRjCscfIDxDjloO/6pTVy/tvgk9y6ZFoYTU+Rgz+zW58TIug71DKsMcD7KBrw8c+VlFEL0mxnNddjCisHUj67D30Xf3j9JcHfHgB2z9cfvGnk+T0jjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=Jhd2QMI5; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
+	s=arc-20240116; t=1786453062; c=relaxed/simple;
+	bh=gYdofRMujdzQOFJaSBNLQz1thCmXMhJyHxwSQzIPFr4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DWbRjIU5gOE+6o/EH8gon8yGZVbDfma1oPvtVncL6hF6jkTw1ctDtq/fpJH0FoH7RBYPh24xaUW3h1mJEBbgZaBLihw74CAEZf35EvAUzEnBHIvcrg4SrawKBuR2+BEirvvs2oPnPPhjUC9h7XYlGv3hzOGomNdlTLglId/+rSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GO4mSU+F; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=AxGd4kHJ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="Jhd2QMI5"
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-38fdeaed181so3818470a91.1
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Aug 2026 04:35:07 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GO4mSU+F";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="AxGd4kHJ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1786453060;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=0frBHjd61EyLYz0mPRsCOHDWT5ZKOwhF/npWzCbt6wI=;
+	b=GO4mSU+FP3l0C4xELEtz4rAM/0ohqo/+uWopu/tTdWM77nG4o+rHhpi7yiz0Y4N7skDIb1
+	3fjik6wmHncsUy0EYbkFuXDjbhxjZ6gT5QeGSa/1l1pWROA4XZpxGY8+ydm0yyaFRT53hc
+	9IaEPiBDKNIl8ItYhhM0e1pBvup5DNI=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-489-T6KLORwUP9eSKDwFC3em2Q-1; Tue, 11 Aug 2026 08:57:33 -0400
+X-MC-Unique: T6KLORwUP9eSKDwFC3em2Q-1
+X-Mimecast-MFC-AGG-ID: T6KLORwUP9eSKDwFC3em2Q_1786453052
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-47fd4ee0ac0so2368378f8f.2
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Aug 2026 05:57:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1786448106; x=1787052906; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=kfdZ+27dsteNmPPWYcAlJOh1CClxN+nuAUGat2n+hNU=;
-        b=Jhd2QMI52/iLcJ3lJcKkKxBYOB9v9d6Rf/aGf4IE0MIc2zuWK5dixHiqXP+lAqSYqL
-         zkU1nDTsS5VnG8Rzd6NphxdhupXkgSTwWdXz1UrTcALU/ig4Ri7Hi3sxTQPGjloWgQZC
-         U/6tmZUHcCRnfT8owi5qi4JU6uKBCtXxQVRow=
+        d=redhat.com; s=google; t=1786453052; x=1787057852; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=0frBHjd61EyLYz0mPRsCOHDWT5ZKOwhF/npWzCbt6wI=;
+        b=AxGd4kHJYRjjTPJLLkth7ToNFMT5ZKZJ0Eu6qy8eEvX46afijUXEZAnSKPR9+reldX
+         wxwDvlMdaDmLNQxB0lVhchvOb7L8cfeSl1boSkT5VnpDbldoJUZ9uKjqZYnQ5Uh1hZCL
+         KkOK0Kv4vDdWZTMNoaWEce005ELoAoAEQ1ZRqG+Grh8VJGNzsbJdgz9BzRFbtSO+z0WP
+         mcRM7gTCe8FRoHJLa/UItkwwIbGGNIHh02azI5GAlcFhFHFmjfo7RjEpKsRczQZHiy3Y
+         055FAVxJk3Nk3AzQai3pTwYfdwFgAUejayWcYYExY3GkOT6wjytpggqoYnXQrmA51DSc
+         qLHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786448106; x=1787052906;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=kfdZ+27dsteNmPPWYcAlJOh1CClxN+nuAUGat2n+hNU=;
-        b=lzUHfZ9kgjCZZnNHKMaecT3pgzHgq/3RnkPhFtqkkM5trgvfNgv+TgLzFxi7+oyrMy
-         MKec9Z1cZRtkAZJ9wNL6yX9mtGQPMaLk7R5YMwkKkwHyVSojJz3kZ1nYvB4MZl8JyooB
-         WhmicJgJOavrZhCJezE66UkNzet5Vo43/mOuh9EFezJbZS0qBZ1H2V7yVjrLWr6Lzg0D
-         r+voEgF7q94xRMaShX3rb58yBDd6cuaUqtpZNPH2qPecpPjY5ZBzfIVWoiGa9U7Mxq8V
-         ZcjWzFYaEhrLNNl4cMF8D2w5H+UGPTPc6dfKNfhJXP+DW/QXHgVz6j/qJG+UDWwMAWow
-         D3yg==
-X-Gm-Message-State: AOJu0YyhPsoD3fSZ/RL7BfUGSB+EWlKkOsFCwTFbbK3p5UyOaMGhM/p1
-	pueJxudaVcM2Lq7Q7d/MSBiOSRm9pBJWzPr/ZFcW+R5cMWrjFRu47T9POqnQuh69t3AdAJ786e2
-	QTXL2RVw=
-X-Gm-Gg: AR+sD11lBLQbnA6hsLfJRTlwnOplZBSkOQx/vJzXYFGyUQF8NjZ91m3NLKHb3nLl1FJ
-	7mwbxzFkVPQ5gXcOfwrKf7nCk/Ez9fYMD0ryOx13mLAAhcCvp4PX9t7kF7aMcOHFSMynrI1mSAD
-	ws2FYtHPsu4umjatTVKq0x/cLeYO3CXqqoGmXjZgeNKHEf+CpsN4vMbT1Gfr5UbWXm6DypxWRJi
-	deqHKfrlwyHx4iOmVwKlpCCdVweDlE49xla3nKAW+dcMAH6SV5TtCl/dP0ehhZnAAZ4lzd7E7H+
-	nQPEVp/H51Xsw/1tkpRnwl0Pk+EXHsQ4gusMzptthJzDfJsgIlESsWInUKiByMpam/iwycIEFp3
-	ZACvNGESHPYW2I2BwGdwKUl81o9yF//Qg5+mPkq8ZjeKwsPH09ddMo8w9u9vjWeZ+xjzxVosi9x
-	uP4EEeycVwMSyQCHB3MysCYgT2dwmfkXw1GsUif9jdgjE9q3fNw9Eq7BJfFyD9rXusoGVtBpg/E
-	pZhxIKg10Qj4D8kP8ZnSy/6mG8UcxQNAectdw3LdTnTivcx+gIsIljmDZ6Ld5HFvepvntUanEuM
-	ZkBMNfE/JBkJ1ucBx7vO1v5Pssgs
-X-Received: by 2002:a17:90b:5907:b0:38e:2524:724f with SMTP id 98e67ed59e1d1-392ec52b258mr3009969a91.12.1786448106483;
-        Tue, 11 Aug 2026 04:35:06 -0700 (PDT)
-Received: from localhost.localdomain ([103.108.57.9])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1412035e08dsm4983584c88.1.2026.08.11.04.35.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Aug 2026 04:35:05 -0700 (PDT)
-From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-To: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	herbert@gondor.apana.org.au,
-	robh@kernel.org
-Cc: krzk@kernel.org,
-	conor+dt@kernel.org,
-	ruud.derwig@gf.com,
-	rbannerm@synopsys.com,
-	manjunath.hadli@vayavyalabs.com,
-	adityak@vayavyalabs.com,
-	navami.telsang@vayavyalabs.com,
-	bhoomikak@vayavyalabs.com,
-	nazim.khan@vayavyalabs.com,
-	Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Subject: [PATCH v21 4/4] crypto: spacc - Add SPAcc Kconfig and Makefile
-Date: Tue, 11 Aug 2026 17:03:50 +0530
-Message-Id: <20260811113350.632737-5-pavitrakumarm@vayavyalabs.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20260811113350.632737-1-pavitrakumarm@vayavyalabs.com>
-References: <20260811113350.632737-1-pavitrakumarm@vayavyalabs.com>
+        d=1e100.net; s=20251104; t=1786453052; x=1787057852;
+        h=content-transfer-encoding:content-type:in-reply-to:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=0frBHjd61EyLYz0mPRsCOHDWT5ZKOwhF/npWzCbt6wI=;
+        b=Z9hrBO+Tbh357+9SeRGukDlAFmd0x/6AVdhJu1l6gscpK0bkxgMYdDrq8MuIoLYpE6
+         nl9rJyTpnmC1bfqMkLDffoC1ZiYxl/dPcxGFM66v4UnFCSp99FOJkDTPG3yYeMigKC8c
+         +Si89TSEVPfWJZCxNK9+ntnU/yTSvxswPQk2Eimkz0zA9LkBhbt4PtodbAV0lZ2fh9JE
+         IzTIv6hmb5IxLTroSuNrLyHkn3U94Kol2a002cs2k50gG7RFWxKX1tE9khAg5Pj4SxEH
+         pmfHPPxstOkszIP6HJNGwGfXDfwNIW0G6veIw6AyME4o+/IEp654zUluAdoUfIqeMAZR
+         zffw==
+X-Forwarded-Encrypted: i=1; AHgh+Rqcs/T3qkgTOp0HQwKqACrjE6IUPSYQ5kIElQFjca/bJWzLlQfy6YrBQiZZ3tB8l9ibeD2stZ9b93EZ/oc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQ2NtJnssR4YAUsiyJVQoloTaDg88bexwL0rsTh5XtXKvA2Y4q
+	chOzzP+0V5SewuCiZT2orD4MWnOYWM8cn4zKW/Wg3PNPMu2YbmDTGMpLSdiAZ9AcnUs99B0B92J
+	mlBbguXfuT3sUo1cRRae4qOd0yp3q56SRN2X8MV6pm8MmbwqdS9oAp7XTYVlC3faXcg==
+X-Gm-Gg: AR+sD12j4H2hMf+DnlOKe4zYU0j0KTFdOhilR55JkK7jUukBHKm8C2m4QTZssrMIPeZ
+	sJJdg23ApUlvbHqP0majIdKsj6OOumA8qyqXcMkUxrMutppMgHfUQQcv+dCyhs6LWlqglteQPHB
+	CJBNYs30GH2c6ZvH/tPGatw6faE+yKYLcPFARsgM9AmpNJM2mCA5/9W/PUH+AOdafZvLW5K0gJ5
+	f6CgnXBVO5nS0ctOBp7YqEOMfBdWSD4rcS/QQGOuGTAdcs6hr4OI/UfcmW1fs1xONVroIFf3Wy1
+	LBVjjTm7GHfBbjBNpvx8aR/mmWJJA3hyN9D6bHOuOzCfUlnhHddMf3a1p3FwnNva+7dcXYEK
+X-Received: by 2002:a05:6000:4a19:b0:47f:ec8a:214f with SMTP id ffacd0b85a97d-4814adc3281mr5811662f8f.15.1786453051991;
+        Tue, 11 Aug 2026 05:57:31 -0700 (PDT)
+X-Received: by 2002:a05:6000:4a19:b0:47f:ec8a:214f with SMTP id ffacd0b85a97d-4814adc3281mr5811584f8f.15.1786453051613;
+        Tue, 11 Aug 2026 05:57:31 -0700 (PDT)
+Received: from [192.168.0.9] ([47.64.114.24])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4814a709361sm4217694f8f.20.2026.08.11.05.57.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Aug 2026 05:57:30 -0700 (PDT)
+Message-ID: <e23dc8fd-67c5-4950-a598-13ff50a40d1c@redhat.com>
+Date: Tue, 11 Aug 2026 14:57:28 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/6] smb: clear the aes_cmac_key and aes_cmac_ctx when
+ done
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Eric Biggers <ebiggers@kernel.org>, Steve French <sfrench@samba.org>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Steve French <smfrench@gmail.com>,
+ Paulo Alcantara <pc@manguebit.org>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+ Bharath SM <bharathsm@microsoft.com>,
+ Sergey Senozhatsky <senozhatsky@chromium.org>, linux-cifs@vger.kernel.org,
+ samba-technical@lists.samba.org
+References: <20260807125845.1477067-1-thuth@redhat.com>
+ <20260807125845.1477067-3-thuth@redhat.com>
+ <CAKYAXd_VJH8dFHofy2Jfk2172vDuU+XizXQf06w0oz81F1WDdQ@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <CAKYAXd_VJH8dFHofy2Jfk2172vDuU+XizXQf06w0oz81F1WDdQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Add Makefile and Kconfig for SPAcc driver.
+On 11/08/2026 12.31, Namjae Jeon wrote:
+>> diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
+>> index 1143ee52470a7..d23566da2ac81 100644
+>> --- a/fs/smb/client/smb2transport.c
+>> +++ b/fs/smb/client/smb2transport.c
+>> @@ -464,8 +464,8 @@ smb3_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
+>>          unsigned char smb3_signature[SMB2_CMACAES_SIZE];
+>>          struct kvec *iov = rqst->rq_iov;
+>>          struct smb2_hdr *shdr = (struct smb2_hdr *)iov[0].iov_base;
+>> -       struct aes_cmac_key cmac_key;
+>> -       struct aes_cmac_ctx cmac_ctx;
+>> +       struct aes_cmac_key cmac_key __cleanup(aes_cmac_zeroize_key);
+>> +       struct aes_cmac_ctx cmac_ctx __cleanup(aes_cmac_zeroize_ctx);
+>>          struct smb_rqst drqst;
+>>          u8 key[SMB3_SIGN_KEY_SIZE];
+> Shouldn’t we also clear the raw key with memzero_explicit(key,
+> sizeof(key)) immediately after aes_cmac_preparekey() ?
+> 
+>          rc = aes_cmac_preparekey(&cmac_key, key, SMB2_CMACAES_SIZE);
+> +        memzero_explicit(key, sizeof(key));
+>          if (rc) {
+>                  cifs_server_dbg(VFS, "%s: Could not set key for cmac
+> aes\n", __func__);
+>                  return rc;
+>          }
+Yes, but I was planning to do all the scrubbing for such other spots in a 
+separate patch series (similar to what I've posted for the smb/server code 
+already) ... this patch series here focuses on aes_cmac_zeroize_key and 
+aes_cmac_zeroize_ctx only. I hope that's ok?
 
-Acked-by: Ross Bannerman <rbannerm@synopsys.com>
-Signed-off-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
----
- drivers/crypto/Kconfig            |  1 +
- drivers/crypto/Makefile           |  1 +
- drivers/crypto/dwc-spacc/Kconfig  | 65 +++++++++++++++++++++++++++++++
- drivers/crypto/dwc-spacc/Makefile |  7 ++++
- 4 files changed, 74 insertions(+)
- create mode 100644 drivers/crypto/dwc-spacc/Kconfig
- create mode 100644 drivers/crypto/dwc-spacc/Makefile
-
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 0189dfdcbbe11..e0a8de643d6fa 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -734,6 +734,7 @@ config CRYPTO_DEV_BCM_SPU
- 	  ahash, and aead algorithms with the kernel cryptographic API.
-
- source "drivers/crypto/stm32/Kconfig"
-+source "drivers/crypto/dwc-spacc/Kconfig"
-
- config CRYPTO_DEV_SAFEXCEL
- 	tristate "Inside Secure's SafeXcel cryptographic engine driver"
-diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-index 2c33b83f3cfa6..b80f211598bbc 100644
---- a/drivers/crypto/Makefile
-+++ b/drivers/crypto/Makefile
-@@ -40,6 +40,7 @@ obj-$(CONFIG_CRYPTO_DEV_BCM_SPU) += bcm/
- obj-y += inside-secure/
- obj-$(CONFIG_CRYPTO_DEV_ARTPEC6) += axis/
- obj-y += xilinx/
-+obj-y += dwc-spacc/
- obj-y += hisilicon/
- obj-$(CONFIG_CRYPTO_DEV_AMLOGIC_GXL) += amlogic/
- obj-y += intel/
-diff --git a/drivers/crypto/dwc-spacc/Kconfig b/drivers/crypto/dwc-spacc/Kconfig
-new file mode 100644
-index 0000000000000..82ea907a14635
---- /dev/null
-+++ b/drivers/crypto/dwc-spacc/Kconfig
-@@ -0,0 +1,65 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+
-+config CRYPTO_DEV_SPACC
-+	tristate "Support for dwc_spacc Security Protocol Accelerator"
-+	depends on HAS_DMA
-+	depends on HAS_IOMEM
-+	select CRYPTO_ENGINE
-+	select CRYPTO_HASH if CRYPTO_DEV_SPACC_HASH
-+	select CRYPTO_SHA1 if CRYPTO_DEV_SPACC_HASH
-+	select CRYPTO_MD5 if CRYPTO_DEV_SPACC_HASH
-+	select CRYPTO_SHA256 if CRYPTO_DEV_SPACC_HASH
-+	select CRYPTO_SHA512 if CRYPTO_DEV_SPACC_HASH
-+	select CRYPTO_SHA3 if CRYPTO_DEV_SPACC_HASH
-+	select CRYPTO_HMAC if CRYPTO_DEV_SPACC_HASH
-+	select CRYPTO_CMAC if CRYPTO_DEV_SPACC_HASH
-+	select CRYPTO_XCBC if CRYPTO_DEV_SPACC_HASH
-+	select CRYPTO_AES if CRYPTO_DEV_SPACC_HASH
-+	select CRYPTO_SM4_GENERIC if CRYPTO_DEV_SPACC_HASH
-+	default n
-+
-+	help
-+	  This enables support for SPAcc Hardware Accelerator.
-+
-+if CRYPTO_DEV_SPACC
-+
-+config CRYPTO_DEV_SPACC_HASH
-+	bool "Enable HASH functionality"
-+	default CRYPTO_DEV_SPACC
-+	help
-+	  Say y to enable Hash functionality of SPAcc.
-+
-+config CRYPTO_DEV_SPACC_AUTODETECT
-+	bool "Enable Autodetect functionality"
-+	default n
-+	help
-+	  Say y to enable Autodetect functionality of SPAcc.
-+
-+config CRYPTO_DEV_SPACC_DEBUG_TRACE_IO
-+	bool "Enable Trace MMIO reads/writes stats"
-+	default n
-+	help
-+	  Say y to enable Trace MMIO reads/writes stats.
-+	  To Debug and trace IO register read/write operations.
-+
-+config CRYPTO_DEV_SPACC_DEBUG_TRACE_DDT
-+	bool "Enable Trace DDT entries stats"
-+	default n
-+	help
-+	  Say y to enable Enable DDT entry stats.
-+	  To Debug and trace DDT operation
-+
-+config CRYPTO_DEV_SPACC_SECURE_MODE
-+	bool "Enable Spacc secure mode stats"
-+	default n
-+	help
-+	  Say y to enable SPAcc secure modes stats.
-+
-+config CRYPTO_DEV_SPACC_CONFIG_DEBUG
-+	bool "Enable SPAcc debug logs"
-+	default n
-+	help
-+	  Say y to enable additional debug prints and diagnostics in the
-+	  SPAcc driver. Disable this for production builds.
-+
-+endif # CRYPTO_DEV_SPACC
-diff --git a/drivers/crypto/dwc-spacc/Makefile b/drivers/crypto/dwc-spacc/Makefile
-new file mode 100644
-index 0000000000000..b7125a7797ba0
---- /dev/null
-+++ b/drivers/crypto/dwc-spacc/Makefile
-@@ -0,0 +1,7 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+obj-$(CONFIG_CRYPTO_DEV_SPACC) += snps-spacc.o
-+
-+snps-spacc-y := spacc_hal.o spacc_core.o \
-+spacc_manager.o spacc_interrupt.o spacc_device.o
-+
-+snps-spacc-$(CONFIG_CRYPTO_DEV_SPACC_HASH) += spacc_ahash.o
---
-2.25.1
+  Thomas
 
