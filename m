@@ -1,75 +1,39 @@
-Received: from flow-a7-smtp.messagingengine.com (flow-a7-smtp.messagingengine.com [103.168.172.142])
+Received: from ixit.cz (ixit.cz [84.42.129.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1ACC41379E;
-	Wed, 12 Aug 2026 10:08:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CA25435504;
+	Wed, 12 Aug 2026 11:40:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.42.129.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786529334; cv=none; b=DvpkIACyyJoTKelXJ9P4iw/1nXcC/ds96T8wBJTEGmEJSUS7P3sYscsL0j4vCy5bfe0JIo6IHRfbDJapsBmMwaK5m7F2kruqwqN4IF+jypIYPyi9701h00MXGp3//dTXApElA3i9luqNdXLQF7jC9WE2aT/ZLdzAu3BJDCep89E=
+	t=1786534828; cv=none; b=MYR0K2oDmXvpEz/hj+VYkImZvEe56JDzIf9v8HfP9pHnV0fg8+s1yOjPKfY/z2ToXQrfkeyChDAx/qy8D+lA5sTsAsOgOdYQuaohBTgHN3BCOAr5QK4oNmriWsR/62EI5OPL1sFAzYbxZaACNDu9euNE+hoW7C2C/ZXKe7Tgxdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786529334; c=relaxed/simple;
-	bh=g+DD3uHXa4UUhT/lPNztmr+/Ptgyo2Iymel1zvvVQDY=;
+	s=arc-20240116; t=1786534828; c=relaxed/simple;
+	bh=4h/0oLp2h7IE8pA6uZy4AQLNovG4Wqu1oVEvekedYSA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=f1/RAlCN4gAHfLQ1LPMyixT00GxZ818MzyN1/Ka9flSYG01GIcEdiYCyDP0QQY5t1cA9TT2zBCNx2z/RkV9u8/wxx8z+xzhCb189VdNSw46ExaVg9Vf1EU7y8qhZhL5ioGVofX9qn9OCtvXUdSy7D7vw8Fjo1UcTR4FRwYEot3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jaseg.de; spf=pass smtp.mailfrom=jaseg.de; dkim=pass (2048-bit key) header.d=jaseg.de header.i=@jaseg.de header.b=DcXGvPte; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=UjdjRg4+; arc=none smtp.client-ip=103.168.172.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jaseg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jaseg.de
+	 In-Reply-To:Content-Type; b=DMtnPU65fDILrYTo06tAmD6FYYIn1zJsAuJnegXnWuziHVXUQid6568tUFVNXgYy95C9ba9qWj4DkiDh5w4Wk33jomaRjzVkLi+qPcPeyTIu1LhxIZAldGbwT9uJ4Yx15P8QrJRiJ3XepybbmGbdWH4i6WvoFrW3a+cArlYqY08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz; spf=pass smtp.mailfrom=ixit.cz; dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b=GB7ysRj8; arc=none smtp.client-ip=84.42.129.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ixit.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jaseg.de header.i=@jaseg.de header.b="DcXGvPte";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="UjdjRg4+"
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailflow.phl.internal (Postfix) with ESMTP id BBF2A1380318;
-	Wed, 12 Aug 2026 06:08:51 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-05.internal (MEProxy); Wed, 12 Aug 2026 06:08:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jaseg.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1786529331;
-	 x=1786536531; bh=bW88MBwEWiHxXalK9p7mEtRxunSdhzNV0Ppwj/k9i1k=; b=
-	DcXGvPteCscZI/GwRFTH4mv+X4SBB/L2nxEuJXbaNHkr7F0smm74zCR8ytyfyDK2
-	deNYonkvGo9MorQPdzMgQpumMiqEhc8kh7MDjUKKqGqjt+dgXudLF2NAd+JuTt7x
-	UOp9kU5qnPaxYmSlfLw9SLn1YvREorfEChCB8Vdv59wlD+g3/yCoYgGcpIqSe4Rc
-	Qq1tBLIylDAWQwRLdfmoCCE0zKkoMgVOuw4NGvt6C++AcqG/yFKk+wuMQ/frzzUe
-	WpyHueUkS66e1tAjVlj6aRNRY0MVy/A61UttJXizY4zHHKHxwuCQ04mYK+JdJibV
-	BW5DkvddWVJNd+e4921zzA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1786529331; x=
-	1786536531; bh=bW88MBwEWiHxXalK9p7mEtRxunSdhzNV0Ppwj/k9i1k=; b=U
-	jdjRg4+0h4GBVHbZWuRmenc5MOZBfXytCFvmTozoVejQhqsVKAEMlXEwYPkPtGUf
-	ngjYTyAlntHn8cPfnVBmFXK6yymSNOQjVjq/zODcJ/9KAsZQleveajikxRPmdHh+
-	f0699mdyLBUNwQDcrQyRiireEzWnN1ycYuWE7UFyW7W5Vk+y62fJjCiUztDkiwHF
-	hSPudpSXapetWUF82JoBdX+pfYcfIkKdL7WAcPaR+mxL4Agav8Dq2b1FFMhPkhW0
-	HB0CWybFVT+kC+5ykPmgP4BfbRihc8/zeqNji8x9JptmpqNW06HCLUF8eo8SwZoq
-	IYnBLOl1NKyId+2gBMSzQ==
-X-ME-Sender: <xms:M0Z8agx7iq5l6vNO6xYCruRD2E00yv5vuI2Kb3O7lpjSeZknJuQQxg>
-    <xme:M0Z8atE67uJ8acOVlANAZcbJPqLF1EXgJHG8w-W29FC42CpoMUpPc6zJZrUmQ15pJ
-    vbAW4CmdwXunbNC3IL4ubajn9C7kB0m_c4Th5Y1NuVPh6cIuhZOS6A>
-X-ME-Received: <xmr:M0Z8ao6-Ga9RNzEg3L_Tve-n8wkgt46prWBGzOHpl3dDvS1SWuS8m7L0jyPxpVTOqCKd2Q0SAuTvsdN3islXKgI>
-X-ME-Proxy-Cause: dmFkZTFhXuUc5zonLNYLcZR1VVfiawIf/DLo3p0z5ttoTk/im5FO3AIzDhACbr4L+QCnil
-    kioW5B72/SP07lPyYbCILOUlCTgqnf/GMHpVt2rW3DvDsF8fWXLyV6Ac927tGENmhoEL+J
-    Z6CH2rvUSCSrM3xrC6dBhmoeT9oKOxUe4lTyzrsaEkFV1JXqZigC3Blmzh555hht6TIiKi
-    4nTF00vMvYIsG9kgYkE+A7k3OF7cYtOAnFjzfRjDuHBWPJ8P5jOo39HJ5TosgHthcL4QlG
-    P7LPfpZKOLHflDDP05PIzu6Ek0lvi9TNUbB3XsXC6/c/eoqN+joQ+KYmRU6qOJdnW6tfk2
-    b3LcfBVqFT/qDJEWQC1jHMYXTbxwbN1oIMefnFPjOiXoCu9W7XlYR2+Vi6xD+4IcDtaHDf
-    3Pk7JEFjV5aRi/7eHGIdN9qQLITdCzsUHDcCHNYmXmuCjX0de6WRjIKRBxkr9zr/UoSGMy
-    BNKaooHXOUsyG6uKaR7kNVptOhuOAnNTQ7wosLA3fxbSinTppxLVYVo701XXDmkSXpvxOt
-    2fnf6YwlDC373uXVWWSjQbW5oUSUiaeZBnj2S+q+kGyVEaXlZUP3YiSxUlbXsnbIPZIJSU
-    LpZLpLWNEokxMls5XhgH+3e+Mki9vSCEGaM/bL8SmICNy1uQbJHeVjIUfaAg
-X-ME-Proxy: <xmx:M0Z8ar5LFW4HLTNx65wrmfFVFhE9YUH4fWdaEbGOL_R2dQ7JIIx9kQ>
-    <xmx:M0Z8arveqDruVQu_W3KqNZ2-dNqOPrxild92m5A8icNTm2aZXyRXQQ>
-    <xmx:M0Z8aoGd6MFhQRaDPRdZ0DLf5Q5xuyIoonETpFoTn-LlvXMTUatv4g>
-    <xmx:M0Z8ag6NID7YDETuV96A4Hm8RKzm3lppAKyjDREHWTD8S7uA_ah42g>
-    <xmx:M0Z8ajPt2vz0J2SwGT_bgJZVQ8rEA86QoRBfb4QhSwW7QoKJpm_Hd2Xr>
-Feedback-ID: i60a14417:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 12 Aug 2026 06:08:41 -0400 (EDT)
-Message-ID: <9765f7ea-36bb-4c7b-a19b-7facec97b762@jaseg.de>
-Date: Wed, 12 Aug 2026 12:08:39 +0200
+	dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b="GB7ysRj8"
+Received: from [172.16.124.192] (ip-78-44-13-22.bb.vodafone.cz [78.44.13.22])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by ixit.cz (Postfix) with ESMTPSA id B6B8F53401E6;
+	Wed, 12 Aug 2026 13:40:23 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ixit.cz; s=dkim;
+	t=1786534824;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=KArXhTGikECnnXJBaKJQL5HiSiaclLz+gY4N4WdWjRA=;
+	b=GB7ysRj8pn9j8ajPfl9zs1ENqu8qTVII284Qf4FOevTFQfE6k//3GPYoLp5AlMyfiII8KF
+	bmiL05O4Yw4ptY+RPGmR1DHhpv3qai5XeDSN/rTPsAXphZx0FOsSqW7It7FR4+276wuubB
+	XtmhSyiGNND8ETSKmaPTKjjifL1M/ik=
+Message-ID: <cce3fe36-322e-49ed-8928-3aef813faad7@ixit.cz>
+Date: Wed, 12 Aug 2026 13:40:23 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -77,97 +41,109 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 01/13] kexec: add CRASH_WIPE_SECRETS to wipe secrets
- before kdump
-To: Baoquan He <baoquan.he@linux.dev>, =?UTF-8?Q?Jan_Sebastian_G=C3=B6tte?=
- <linux@jaseg.de>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- Mike Rapoport <rppt@kernel.org>,
- Pasha Tatashin <pasha.tatashin@soleen.com>,
- Pratyush Yadav <pratyush@kernel.org>, Dave Young <ruirui.yang@linux.dev>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- David Howells <dhowells@redhat.com>, Jarkko Sakkinen <jarkko@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
- Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
- "Serge E. Hallyn" <serge@hallyn.com>, Lukas Wunner <lukas@wunner.de>,
- Ignat Korchagin <ignat@linux.win>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Keith Busch <kbusch@kernel.org>,
- Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
- Sagi Grimberg <sagi@grimberg.me>, Trond Myklebust <trondmy@kernel.org>,
- Anna Schumaker <anna@kernel.org>, Mimi Zohar <zohar@linux.ibm.com>,
- James Bottomley <James.Bottomley@hansenpartnership.com>,
- Marc Dionne <marc.dionne@auristor.com>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Eric Biggers <ebiggers@kernel.org>, "Theodore Y. Ts'o" <tytso@mit.edu>,
- Jaegeuk Kim <jaegeuk@kernel.org>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
- Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
- Mikulas Patocka <mpatocka@redhat.com>,
- Benjamin Marzinski <bmarzins@redhat.com>, kexec@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mm@kvack.org, keyrings@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-security-module@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org,
- linux-integrity@vger.kernel.org, linux-afs@lists.infradead.org,
- netdev@vger.kernel.org, linux-fscrypt@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, dm-devel@lists.linux.dev
-References: <20260811-crash-zeroize-rework-v2-0-9561d13c2340@jaseg.de>
- <20260811-crash-zeroize-rework-v2-1-9561d13c2340@jaseg.de>
- <anw9ILJiO5xIjP4f@MiWiFi-R3L-srv>
+Subject: Re: [PATCH 00/33] Add support for Qualcomm Snapdragon SM7150 SoC and
+ Google Pixel 4a
+To: Jens Reidel <adrian@mainlining.org>, Danila Tikhonov
+ <danila@jiaxyga.com>, Miro Mraz <mraz.miro@seznam.cz>
+Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-pm@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-watchdog@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-phy@lists.infradead.org, linux-mmc@vger.kernel.org,
+ netdev@vger.kernel.org, linux-scsi@vger.kernel.org,
+ dmaengine@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-i2c@vger.kernel.org, linux-clk@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
+ linux-remoteproc@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ neil.armstrong@linaro.org, linux-hardening@vger.kernel.org,
+ linux@mainlining.org, Connor Mitchell <c.dog29@hotmail.com>
+References: <20250422-sm7150-upstream-v1-0-bf9a9081631d@jiaxyga.com>
+ <2ca2b774-fd7f-4612-b38d-f60e32ff6f9a@mainlining.org>
+ <283096ad-ae1b-42b8-8312-b192f735fc80@linaro.org>
 Content-Language: en-US
-From: =?UTF-8?Q?Jan_Sebastian_G=C3=B6tte?= <contact@jaseg.de>
-In-Reply-To: <anw9ILJiO5xIjP4f@MiWiFi-R3L-srv>
+From: David Heidelberg <david@ixit.cz>
+Autocrypt: addr=david@ixit.cz; keydata=
+ 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
+In-Reply-To: <283096ad-ae1b-42b8-8312-b192f735fc80@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 8/12/26 11:30, Baoquan He wrote:
-> On 08/11/26 at 07:52pm, Jan Sebastian Götte wrote:
-> .....snip...
->> @@ -142,6 +170,7 @@ void __noclone __crash_kexec(struct pt_regs *regs)
->>   			crash_save_vmcoreinfo();
->>   			machine_crash_shutdown(&fixed_regs);
->>   			crash_cma_clear_pending_dma();
->> +			crash_wipe_secrets();
+
+
+On 23/04/2025 09:26, Neil Armstrong wrote:
+> Hi,
 > 
-> I remember when crash_cma added this, we argued a lot about the risk,
-> finally it's added in with an added note to tell it's an opt-in feature
-> and risky. I don't know if it opens a Pandora box, I think anything
-> wanted being here need prove anything else has been tried, and the thing
-> is very very important. If we don't guard the door well, one day one guy
-> cold come and said I need ask Oracle database to do some transactions
-> before juming into kdump kernel because the actions will save billions
-> of dollar.
+> On 23/04/2025 00:07, Jens Reidel wrote:
+>> Hi everyone,
+>>
+>> apologies for the mess this created. Danila's mail provider ratelimited him 
+>> halfway through sending the series and the attempt to re-try sending the 
+>> second half an hour later ended up with a new message ID (I think due to not 
+>> using --in-reply-to).
+>> He asked me to let you know that this will be resolved later and the whole 
+>> series will be re-sent once the problems are resolved.
+> 
+> The b4 web submission is a great alternative when the mail provider is rate 
+> limited:
+> https://b4.docs.kernel.org/en/latest/contributor/send.html#web-endpoint
+> 
 
-I see your point.
+I see people interested in moving Pixel 4a forward, but it seems this was never 
+upstreamed? I looked at sm7150 repository [1] where I see FROMLIST, but these 
+patches never arrived to the list and this series is from 2025.
 
-> And what does security people say about this wiping? Is it very
-> important information and wiping is mandotary? There's no any other way
-> to wipe it or pollute it, no way in kdump kernel?
+Should we expect v2 (re)based on recent tree?
 
-I'm doing both - my kdump kernel does a linear memzero of all of DRAM. 
-However, that's too slow - it takes several hundred milliseconds, and I 
-want these cryptographic keys gone within no more than 10 ms.
+Thanks
+David
 
-Doing this in the original kernel is cleanest I think, because to do a 
-targeted erase in the kdump kernel, that kernel would have to know all 
-the original kernel's symbols, and it would have to forensically 
-reconstruct it's memory content similar to the crash utility. I think 
-that's too complex and error-prone to do in this use case.
+[1] 
+https://github.com/sm7150-mainline/linux/commit/7ea41523c678e94a7c048936052b5b1b1b109cdd
 
-I can imagine one alternative way to approach this, tell me what you 
-think: Instead of registering wipe handlers that memzero places on 
-panic, I could put an optional registry of (addr, len) descriptors into 
-crashkernel memory that the original kernel populates with the PAs of 
-buffers to clear ahead of time. Then the kdump kernel could do the 
-actual memzero. This would remove all code from the actual kdump path 
-here. The registry could be made per-core to avoid locks.
-
-> I noticed it's
-> happening on en embedded target, is it possible you do this on your
-> embedded kernel tree, but not mainline tree?
-
-I could keep it in a vendor tree, but I think the functionality is 
-useful beyond my particular use case.
+> Neil
+> 
+>>
+>> Best regards,
+>> Jens
+> 
+> 
