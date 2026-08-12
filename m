@@ -1,263 +1,262 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B970B29D294;
-	Wed, 12 Aug 2026 17:48:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3526B41D234
+	for <linux-crypto@vger.kernel.org>; Wed, 12 Aug 2026 17:50:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786556935; cv=none; b=qt+ML0dqajXZvjwq1z0KF3FDDRZUDDUHeaJ+32bFiqI5JG+bDK3anno2UZD43mz6DmqaaRWIljv6toHh1jUwmNxmWGGaasdafMedQnX+cIEeWvEP7LLmiMXFvY4s+4HARUzxGi3O1+wZcx5g+zo1xhwNfpe05dGZiOUL0STtA7Y=
+	t=1786557057; cv=none; b=JIynwF8KPJymlnZj2KezAzPqOnZyxgw8eW451xYvSnjiogWs9kefDXtqxMWs1OKa0CrbAxYVyYheKwtaxGa5/fYKVIjmEXMftQ1k6bpd+HHZTsCGIiAqeZyj61URpCQmq8FzlyQ5vZr3ojmCqEtZeUUm37/S316Xvz0zcxMNXzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786556935; c=relaxed/simple;
-	bh=dGtJwDiCVav+3RKlsrTeyCjiRD3PJS3iJmYH8KIXFGo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gNV9bdKvifJ2Nwhy/Wzncfr8ErnoquS1ZxWXYlZKJ4wsstoeYR3KTiAK3QnTEPFHTIU9ja3QDU3M3Mdub43YASKJuPyt9KPOXx78wk4igN3P9hLL3wSiNown0PPXK8FP31w0ECyRdFEDMoJDvzH/psW46FPN8Juk3TVb07Dm6n0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=cVEMR4aG; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	s=arc-20240116; t=1786557057; c=relaxed/simple;
+	bh=LYIybXT/A0uaqpcRo0vdSMiljxqc25gCsD62rIW6xO4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kpboHHqpIMjNMHPDvARHnbn+0j3cdPNdfrpDfeUNN/N4BIbHTT2ETuh9oC+btAUWv057ZitIjPWTTyZCjHVMghJi1ACv4rZVDNpQbv8UPAkr7qOqGVLFA5b1sCmvOugDU+VQ30DsRITiDN97JWIuyb1eCeC3Xd/pEptCdxkDARI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=K1QnUpzn; arc=none smtp.client-ip=209.85.215.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="cVEMR4aG"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 3CEA240E019E;
-	Wed, 12 Aug 2026 17:48:48 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id FULEREqZXMOD; Wed, 12 Aug 2026 17:48:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1786556918; bh=U48iOVl2y8YHea7dTmsTayTNpKejzYbM9D3lEZvcH8o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cVEMR4aG/GixXaFyaMNYCrcxpMpYYnYAbSOkWzbX1UgF5kuAlKnfx+qn9eYFAziRC
-	 LfCpElyPW0KWg1aiND2L1PSAqDudJdiZ4EB0oic0Xnq8g7mhJfFAw+jJenvvVE7EVZ
-	 rAYjtCLhrv2ZZ4M2a9ZRRxkI0tZvwJ5X/g27QydKHlsWcBY46llYfqeNsDD2V8SPfd
-	 1Sjy2f+V5fSbeDCsyNqMehy/5d+5r1ONtfuPH5GgSbCcob/vY7sEWGLwn5nm/62bTx
-	 U5Tj4ERMhB8MGMuhEDeeP7J1ClmT2wRRITKrXwGl5Y0g4kI+B8LPZdk26l96zDuIjC
-	 1UqupJLacnCyf5DbekHZ3IrxIf5KRZ1sqTOvMirrEaAlDe6iWc5l5Ui463G8O0EHfc
-	 n8peQp80ahNS6QeKzDKgQF1BJlw/UrO6w1SFyNRcKdWSjShxuh3tZRG5O1OHlYQ8zV
-	 9NXbgFVdFxG/9/M/YfmsDpy1ZvKV7gdzcno62fOOVLooPTKjVOcxeI4c4Ktu1uZVM0
-	 NeZhpS24vswDl+cjdO4nnXdifsXBYbM3ZoAIDFLTDfrW2vmwNXqlW75nNBGx47AXdX
-	 dAYuS1yBcJBG8F/ZhuJc8RcZvv7RI2bTE5g3R6BDfQUsQSbpEnX06ldYlJdXiJi7PT
-	 Do0aHmmVsYAJnS/qJhe8cp2c=
-Received: from stx.tnic (unknown [IPv6:2600:1700:38ca:c00::1b])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 9544A40E014A;
-	Wed, 12 Aug 2026 17:48:29 +0000 (UTC)
-Date: Wed, 12 Aug 2026 10:48:26 -0700
-From: Borislav Petkov <bp@alien8.de>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: x86@kernel.org, linux-um@lists.infradead.org,
-	linux-raid@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v2 1/8] x86/fpu: Check for missing AVX and AVX-512 xstate
- bits
-Message-ID: <20260812174826.GAanyx6vUWv5GLX2AZ@fat_crate.local>
-References: <20260728021603.79870-1-ebiggers@kernel.org>
- <20260728021603.79870-2-ebiggers@kernel.org>
- <20260728052727.GCamg9v5WxNieTMUwE@fat_crate.local>
- <20260728054532.GA99797@sol>
- <20260728182007.GBamjy17zynlWm2gQT@fat_crate.local>
- <20260728183447.GB3355536@google.com>
- <20260728225936.GBamk0WK38PByPFkxz@fat_crate.local>
- <20260728233430.GA3277@quark>
- <20260728234726.GCamk_jnl3LtfGbxoC@fat_crate.local>
+	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="K1QnUpzn"
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-cb5b8572b70so1494635a12.2
+        for <linux-crypto@vger.kernel.org>; Wed, 12 Aug 2026 10:50:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=vayavyalabs.com; s=google; t=1786557054; x=1787161854; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=+ibuzEPrLozk3S2guDQCpsa0Zmqwbs5provsHgkwyYM=;
+        b=K1QnUpznZoQ4HAVhwLbaKbgxHZ5Sq4zfX2iYaMjpRaGrSXwbxSQbFo7sip/+hHVkmf
+         HxmKgpNlSrjKq5BT8NuszQBq+mMPp/k8tQEQhQ0XrXT8CR3DPKCF5T46r6fXvKWcrsNA
+         FHTQIYbtKvC2Hfv7BNJife+4msZ3dzYwp45Qo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786557054; x=1787161854;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=+ibuzEPrLozk3S2guDQCpsa0Zmqwbs5provsHgkwyYM=;
+        b=OeEtPDkHZHBXoHxYu+sKj/3J6XwaN+iNxUure151jSsrq078cEEpWIqe5Ujauvjzze
+         CdrKeqk+Fn2XTb/xAm5vr9PPmKvSs6lpDRIFypHkDRVBTv75ZQlgIvMJ1YEPalQH6YZh
+         tBuQUYkJOHdyc16lYSi5jVB6JtpcQfSSAxpRZoO8d5lEtrQXVpeKXyrYAm4zSEYtlvHa
+         ekY+oZ6MupeWFXzhkqM9BhK7wzZBw6Md0Ec8s0BSrIO7qD96DSGcg3FB1vCwJBdbxdvC
+         fkvJ0W5gRCiNf8n1qHhLxKn2ZD3bM3ckVufsKyOX/KJxyjyczlMKE1M4d6iTSj2th9LQ
+         +Ypw==
+X-Gm-Message-State: AOJu0YxpkseV46Mr6fnVbs3bZkkSjotni/hB3txpIXpzV8czn1qJ4KPe
+	JBGF22IbpWY2oKRSuL6VhUw+/4SePpygwXqQCdyi8JfjBEtpYHq3COdP3KdYdF+1aUMhOCzrvP3
+	wu9Z+BU8=
+X-Gm-Gg: AR+sD13xzh+9lysDH7GLgETvI7Hpc+J/A9mci91bRicMltHkWHFJ/icRF0aUlsxD3f6
+	1ujSovwT3oU81KdRQCeFyawI1qusBr4b4wQDQQ4+CARJvv5J1sBi717ixQjUzZNyt/9Laydwuyz
+	CSd/TbKckbUMDXrMr5fii/fkvjz4ykquOjbvDOpvaC4wC6PS6b30tgt8z09Pecr3SJHK6c44/Qz
+	N/o3v/CiV60gg/fEWwL8EmRLB89yyHZQZoIZ+aUBChX0oSPmyJ3bvg0IiHMStqHQo5f8HKqKBx/
+	DiSfvKZiFsZOnx6DpJAIhN5HnOL66PYVESJILrWi8LLPivYmPGuMAdklv6bhXgBHInIIVlcXR63
+	HBCLyslFfAoODfSNkDJu1+BURW4Bg8DwMo6IheQH1lAsYjHDC9aASlSNkWAyrqraiYpspSnlXbn
+	optD/bBPV9/KDQERjnGckH6GuWNn6AZx1wXBhxJqSRUF5VoeBwzWpk2zWX0vGJkj8IYBFahN50v
+	1rvUfy727d29Yxn8BGHhHoiw+aGiwxcbwnydobcLaOVAH2kUnd5yjDaCcUDdNR0kaCpZ77uhV+u
+	RME9Z+4Gdvj5w28KW7AVRsnHeQoN
+X-Received: by 2002:a05:6a21:2d8b:b0:3cb:b3fc:510f with SMTP id adf61e73a8af0-3cc552de999mr198773637.24.1786557054513;
+        Wed, 12 Aug 2026 10:50:54 -0700 (PDT)
+Received: from localhost.localdomain ([103.108.57.9])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-141245540fesm18482258c88.9.2026.08.12.10.50.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Aug 2026 10:50:52 -0700 (PDT)
+From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+To: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	herbert@gondor.apana.org.au,
+	robh@kernel.org
+Cc: krzk@kernel.org,
+	conor+dt@kernel.org,
+	ruud.derwig@gf.com,
+	rbannerm@synopsys.com,
+	manjunath.hadli@vayavyalabs.com,
+	adityak@vayavyalabs.com,
+	navami.telsang@vayavyalabs.com,
+	bhoomikak@vayavyalabs.com,
+	nazim.khan@vayavyalabs.com,
+	Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+Subject: [PATCH v22 0/4] crypto: spacc - Add SPAcc Crypto Driver
+Date: Wed, 12 Aug 2026 23:20:16 +0530
+Message-Id: <20260812175020.666558-1-pavitrakumarm@vayavyalabs.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20260728234726.GCamk_jnl3LtfGbxoC@fat_crate.local>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jul 28, 2026 at 04:47:26PM -0700, Borislav Petkov wrote:
-> On Tue, Jul 28, 2026 at 04:34:30PM -0700, Eric Biggers wrote:
-> > I don't know what your suggestion is.  Are you still asking for the
-> > function to be renamed to clear_cpu_caps_xft()?  Note that the
-> > abbreviation "xft" doesn't appear anywhere else in arch/x86/.  Maybe you
-> > want the argument inverted?  I don't know what you want, sorry.
-> 
-> That's fine - I'll take a look at the final version after having gone through
-> the whole pile and then holler if I still see a need.
+Add the driver for SPAcc(Security Protocol Accelerator), which is a
+crypto acceleration IP from Synopsys. The SPAcc supports multiple ciphers,
+hashes and AEAD algorithms with various modes. The driver currently supports
+below
 
-Ok, here's something ontop of yours. It is tested only in a guest but it
-should show the intention.
+hash:
+- cmac(aes)
+- xcbc(aes)
+- cmac(sm4)
+- xcbc(sm4)
+- hmac(md5)
+- md5
+- hmac(sha1)
+- sha1
+- sha224
+- sha256
+- sha384
+- sha512
+- hmac(sha224)
+- hmac(sha256)
+- hmac(sha384)
+- hmac(sha512)
+- sha3-224
+- sha3-256
+- sha3-384
+- sha3-512
 
-The first call in:
+changelog:
+  v1->v2 changes:
+    - Added local_bh_disable() and local_bh_enable() for the below calls.
+      a. for ciphers skcipher_request_complete()
+      b. for aead aead_request_complete()
+      c. for hash ahash_request_complete()
+    - dt-bindings updates
+      a. removed snps,vspacc-priority and made it into config option
+      b. renamed snps,spacc-wdtimer to snps,spacc-internal-counter
+      c. Added description to all properties
+    - Updated corresponding dt-binding changes to code
 
-	if (!boot_cpu_has(X86_FEATURE_FPU)) {
+  v2->v3 changes:
+    - cra_init and cra_exit replaced with init_tfm and exit_tfm for hashes.
+    - removed mutex_lock/unlock for spacc_skcipher_fallback call
+    - dt-bindings updates
+     a. updated SOC related information
+     b. renamed compatible string as per SOC
+   - Updated corresponding dt-binding changes to code
 
-is not needed because that is caught earlier:
+  v3->v4 changes:
+   - removed snps,vspacc-id from the dt-bindings
+   - removed mutex_lock from ciphers
+   - replaced magic numbers with macros
+   - removed sw_fb variable from struct mode_tab and associated code from the
+     hashes
+   - polling code is replaced by wait_event_interruptible
 
-[    0.553199] x86/fpu: Giving up, no FPU found and no math emulation present
+  v4->v5 changes:
+   - Updated to register with the crypto-engine
+   - Used semaphore to manage SPAcc device hardware context pool
+   - This patchset supports Hashes only
+   - Dropping the support for Ciphers and AEADs in this patchset
+   - Added Reviewed-by tag on the Device tree patch since it was reviewed on
+     v4 patch by Krzysztof Kozlowski and Rob Herring (Arm)
 
-and we stop there.
+  v5->v6 changes:
+   - Removed CRYPTO_DEV_SPACC_CIPHER and CRYPTO_DEV_SPACC_AEAD Kconfig options,
+     since the cipher and aead support is not part of this patchset
+   - Dropped spacc_skcipher.o and spacc_aead.o from Makefile to fix build errors
+     reported by kernel test robot
+   - Added Reported-by and Closes tags as suggested
 
-The second one can then simply do:
+  v6->v7 changes:
+   - Fixed build error reported by Kernel test robot
+   - Added Reported-by and Closes tags as suggested
 
-                /* Disable all dependent flags too */
-                setup_clear_cpu_cap(X86_FEATURE_XSAVE);
+  v7->v8 changes:
+   - Fixed misleading comment: Clarified that only HMAC key pre-processing
+     is done in software, while the actual HMAC operation is performed by
+     hardware
+   - Simplified do_shash() function signature by removing unused parameters
+   - Updated all do_shash() call sites to use new simplified signature
+   - Fixed commit message formatting by adding "crypto: spacc - <subject>" to
+     all patches
+   - used __free() for scope based resource management
 
-because that'll clear all dependent flags and we should be good there:
+  v8->v9 changes:
+   - Updated the software fallback implementation to use HASH_FBREQ_ON_STACK
+   - Corrected dynamic allocation of statesize and reqsize in init_tfm
+   - Fixed synchronization issues in the digest request
 
-[    0.560698] do_clear_cpu_cap: clearing 10:0 (xsaveopt)
-[    0.561697] do_clear_cpu_cap: clearing 10:1 (xsavec)
-[    0.562697] do_clear_cpu_cap: clearing 10:3 (xsaves)
-[    0.563697] do_clear_cpu_cap: clearing 4:28 (avx)
-[    0.564697] do_clear_cpu_cap: clearing 16:3 (pku)
-[    0.565697] do_clear_cpu_cap: clearing 9:14 (mpx)
-[    0.566697] do_clear_cpu_cap: clearing 10:2 (xgetbv1)
-[    0.567697] do_clear_cpu_cap: clearing 21:9 ((null))
-[    0.568698] do_clear_cpu_cap: clearing 12:4 (avx_vnni)
-[    0.569697] do_clear_cpu_cap: clearing 4:12 (fma)
-[    0.570697] do_clear_cpu_cap: clearing 16:9 (vaes)
-[    0.571697] do_clear_cpu_cap: clearing 16:10 (vpclmulqdq)
-[    0.572697] do_clear_cpu_cap: clearing 9:5 (avx2)
-[    0.573697] do_clear_cpu_cap: clearing 9:16 (avx512f)
-[    0.574697] do_clear_cpu_cap: clearing 9:21 (avx512ifma)
-[    0.575698] do_clear_cpu_cap: clearing 9:26 (avx512pf)
-[    0.576697] do_clear_cpu_cap: clearing 9:27 (avx512er)
-[    0.577697] do_clear_cpu_cap: clearing 9:28 (avx512cd)
-[    0.578697] do_clear_cpu_cap: clearing 9:17 (avx512dq)
-[    0.579697] do_clear_cpu_cap: clearing 9:30 (avx512bw)
-[    0.580697] do_clear_cpu_cap: clearing 9:31 (avx512vl)
-[    0.581697] do_clear_cpu_cap: clearing 16:1 (avx512vbmi)
-[    0.582697] do_clear_cpu_cap: clearing 16:6 (avx512_vbmi2)
-[    0.583697] do_clear_cpu_cap: clearing 16:11 (avx512_vnni)
-[    0.584697] do_clear_cpu_cap: clearing 16:12 (avx512_bitalg)
-[    0.585697] do_clear_cpu_cap: clearing 18:2 (avx512_4vnniw)
-[    0.586697] do_clear_cpu_cap: clearing 18:3 (avx512_4fmaps)
-[    0.587697] do_clear_cpu_cap: clearing 16:14 (avx512_vpopcntdq)
-[    0.588698] do_clear_cpu_cap: clearing 18:8 (avx512_vp2intersect)
-[    0.589698] do_clear_cpu_cap: clearing 12:5 (avx512_bf16)
-[    0.590697] do_clear_cpu_cap: clearing 18:23 (avx512_fp16)
-[    0.592697] do_clear_cpu_cap: clearing 16:29 (enqcmd)
-[    0.593697] do_clear_cpu_cap: clearing 10:4 ((null))
-[    0.594697] do_clear_cpu_cap: clearing 18:24 (amx_tile)
-[    0.595697] do_clear_cpu_cap: clearing 12:21 ((null))
-[    0.596697] do_clear_cpu_cap: clearing 18:22 (amx_bf16)
-[    0.597697] do_clear_cpu_cap: clearing 18:25 (amx_int8)
-[    0.598697] do_clear_cpu_cap: clearing 16:7 ((null))
+  v9->v10 changes:
+   - Fixed unused variable warning
 
-and then the rest is streamlined into fpu__init_system_xstate() where all
-sanity checking should be performed, as I mentioned intially.
+  v10->v11 changes:
+   - Removed the redundant crypto_alloc_ahash in the init_tfm function
+   - Removed the redundant crypto_free_ahash in exit_tfm function
+   - Removed the redundant crypto_ahash_setkey call in setkey function
 
-Full diff ontop:
+  v11->v12 changes:
+   - Removed do_shash() and switched to lib/crypto API in spacc_hash_setkey
+   - Dropped support for SM3 algorithm
+   - Improved multi-device safety by encapsulating handling within priv
+   - Added memzero_explicit() in sensitive paths
+   - Minor code cleanups and style fixes
+   - Algorithm registration cleanups
 
-diff --git a/arch/x86/kernel/cpu/cpuid-deps.c b/arch/x86/kernel/cpu/cpuid-deps.c
-index 99801e844b30..96c43ec164f7 100644
---- a/arch/x86/kernel/cpu/cpuid-deps.c
-+++ b/arch/x86/kernel/cpu/cpuid-deps.c
-@@ -142,6 +142,8 @@ static void do_clear_cpu_cap(struct cpuinfo_x86 *c, unsigned int feature)
- 				continue;
- 
- 			changed = true;
-+			pr_info("%s: clearing %d:%d (%s)\n",
-+				__func__, d->feature >> 5, d->feature & 31, x86_cap_flags[d->feature]);
- 			clear_feature(c, d->feature);
- 		}
- 	} while (changed);
-diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
-index 3c185b2828c7..406ae0841b5f 100644
---- a/arch/x86/kernel/fpu/xstate.c
-+++ b/arch/x86/kernel/fpu/xstate.c
-@@ -761,23 +761,6 @@ static u64 __init guest_default_mask(void)
- 	return ~(u64)XFEATURE_MASK_USER_DYNAMIC;
- }
- 
--/* Clear any X86_FEATURE_* used by the kernel whose xfeatures are missing. */
--static void __init clear_cpu_caps_with_missing_xfeatures(u64 xfeatures)
--{
--	u64 mask;
--
--	mask = XFEATURE_MASK_FPSSE | XFEATURE_MASK_YMM;
--	if (boot_cpu_has(X86_FEATURE_AVX) && (xfeatures & mask) != mask) {
--		pr_err("x86/fpu: Disabling AVX support due to missing xstate features\n");
--		setup_clear_cpu_cap(X86_FEATURE_AVX);
--	}
--	mask = XFEATURE_MASK_FPSSE | XFEATURE_MASK_YMM | XFEATURE_MASK_AVX512;
--	if (boot_cpu_has(X86_FEATURE_AVX512F) && (xfeatures & mask) != mask) {
--		pr_err("x86/fpu: Disabling AVX-512 support due to missing xstate features\n");
--		setup_clear_cpu_cap(X86_FEATURE_AVX512F);
--	}
--}
--
- /*
-  * Enable and initialize the xsave feature.
-  * Called once per system bootup.
-@@ -785,20 +768,20 @@ static void __init clear_cpu_caps_with_missing_xfeatures(u64 xfeatures)
- void __init fpu__init_system_xstate(unsigned int legacy_size)
- {
- 	unsigned int eax, ebx, ecx, edx;
--	u64 xfeatures;
-+	u64 xfeatures, mask;
- 	int err;
- 	int i;
- 
- 	if (!boot_cpu_has(X86_FEATURE_FPU)) {
- 		pr_info("x86/fpu: No FPU detected\n");
--		clear_cpu_caps_with_missing_xfeatures(0);
- 		return;
- 	}
- 
- 	if (!boot_cpu_has(X86_FEATURE_XSAVE)) {
- 		pr_info("x86/fpu: x87 FPU will use %s\n",
- 			boot_cpu_has(X86_FEATURE_FXSR) ? "FXSAVE" : "FSAVE");
--		clear_cpu_caps_with_missing_xfeatures(0);
-+		/* Disable all dependent flags too */
-+		setup_clear_cpu_cap(X86_FEATURE_XSAVE);
- 		return;
- 	}
- 
-@@ -814,7 +797,8 @@ void __init fpu__init_system_xstate(unsigned int legacy_size)
- 	cpuid_count(CPUID_LEAF_XSTATE, 1, &eax, &ebx, &ecx, &edx);
- 	fpu_kernel_cfg.max_features |= ecx + ((u64)edx << 32);
- 
--	if ((fpu_kernel_cfg.max_features & XFEATURE_MASK_FPSSE) != XFEATURE_MASK_FPSSE) {
-+	mask = XFEATURE_MASK_FPSSE;
-+	if ((fpu_kernel_cfg.max_features & mask) != mask) {
- 		/*
- 		 * This indicates that something really unexpected happened
- 		 * with the enumeration.  Disable XSAVE and try to continue
-@@ -825,6 +809,22 @@ void __init fpu__init_system_xstate(unsigned int legacy_size)
- 		goto out_disable;
- 	}
- 
-+	mask |= XFEATURE_MASK_YMM;
-+	if (boot_cpu_has(X86_FEATURE_AVX)) {
-+		if ((fpu_kernel_cfg.max_features & mask) != mask) {
-+			pr_err("x86/fpu: Disabling AVX support due to missing xstate features\n");
-+			setup_clear_cpu_cap(X86_FEATURE_AVX);
-+		}
-+	}
-+
-+	mask |= XFEATURE_MASK_AVX512;
-+	if (boot_cpu_has(X86_FEATURE_AVX512F)) {
-+		if ((fpu_kernel_cfg.max_features & mask) != mask) {
-+			pr_err("x86/fpu: Disabling AVX-512 support due to missing xstate features\n");
-+			setup_clear_cpu_cap(X86_FEATURE_AVX512F);
-+		}
-+	}
-+
- 	if (fpu_kernel_cfg.max_features & XFEATURE_MASK_APX &&
- 	    fpu_kernel_cfg.max_features & (XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR)) {
- 		/*
-@@ -836,8 +836,6 @@ void __init fpu__init_system_xstate(unsigned int legacy_size)
- 		goto out_disable;
- 	}
- 
--	clear_cpu_caps_with_missing_xfeatures(fpu_kernel_cfg.max_features);
--
- 	fpu_kernel_cfg.independent_features = fpu_kernel_cfg.max_features &
- 					      XFEATURE_MASK_INDEPENDENT;
- 
+  v12->v13 changes:
+   - Removed all the sleep function from setkey function
+   - Added shash implemntation for aes algorthims
 
--- 
-Regards/Gruss,
-    Boris.
+  v13->v14 changes:
+   -Added fixes based on the reports by Sashiko
+   -Removed the spacc_is_mode_keysize_supported call from do_one_request
 
-https://people.kernel.org/tglx/notes-about-netiquette
+  v14->v15 changes:
+   -Added fixes based on the reports by Sashiko on 19/jun/2026
+   -Fixed styling in the Kconfig
+
+  v15->v16 changes:
+   -Added fixes based on the reports by Sashiko
+
+  v16->v17 changes:
+   -Added fixes based on the reports by Sashiko
+
+  v17->v18 changes:
+   -Added fixes based on the reports by Sashiko
+
+  v18->v19 changes:
+   -Added fixes based on the reports by Sashiko
+
+  v19->v20 changes:
+   -Added fixes based on the reports by Sashiko
+
+  v20->v21 changes:
+   -Added fixes based on the reports by Sashiko
+
+  v21->v22 changes:
+   -Added fixes based on the reports by Sashiko
+
+Pavitrakumar Managutte (4):
+  dt-bindings: crypto: Document support for SPAcc
+  crypto: spacc - Add SPAcc ahash support
+  crypto: spacc - add spacc autodetect support
+  crypto: spacc - Add SPAcc Kconfig and Makefile
+
+ .../bindings/crypto/snps,dwc-spacc.yaml       |   50 +
+ drivers/crypto/Kconfig                        |    1 +
+ drivers/crypto/Makefile                       |    1 +
+ drivers/crypto/dwc-spacc/Kconfig              |   65 +
+ drivers/crypto/dwc-spacc/Makefile             |    7 +
+ drivers/crypto/dwc-spacc/spacc_ahash.c        | 1025 +++++++
+ drivers/crypto/dwc-spacc/spacc_core.c         | 2544 +++++++++++++++++
+ drivers/crypto/dwc-spacc/spacc_core.h         |  858 ++++++
+ drivers/crypto/dwc-spacc/spacc_device.c       |  289 ++
+ drivers/crypto/dwc-spacc/spacc_device.h       |  242 ++
+ drivers/crypto/dwc-spacc/spacc_hal.c          |  344 +++
+ drivers/crypto/dwc-spacc/spacc_hal.h          |  118 +
+ drivers/crypto/dwc-spacc/spacc_interrupt.c    |  325 +++
+ drivers/crypto/dwc-spacc/spacc_manager.c      |  665 +++++
+ 14 files changed, 6534 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml
+ create mode 100644 drivers/crypto/dwc-spacc/Kconfig
+ create mode 100644 drivers/crypto/dwc-spacc/Makefile
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_ahash.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_core.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_core.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_device.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_device.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_interrupt.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_manager.c
+
+
+base-commit: 68554337b4aa63d8299edd58f5059d8470bc721b
+--
+2.25.1
+
