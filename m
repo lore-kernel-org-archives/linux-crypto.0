@@ -1,143 +1,155 @@
-Received: from ixit.cz (ixit.cz [84.42.129.46])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A57B432D0F5;
-	Thu, 13 Aug 2026 09:20:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.42.129.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 804133BADB2
+	for <linux-crypto@vger.kernel.org>; Thu, 13 Aug 2026 11:53:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786612831; cv=none; b=pc9cq6Q0YmGs1plpSl7cb4qXT2mwP9BPVpA+O1vLLYIu/fRkkZppodZ5Wna29qPOKamntEdYkgzdmBuM1xwAyYss1ZGObQmF/ZAp67enW6XPKKY3M6pAS1Emil3A8E3qdKfZcMfjfhQhGAhS5jBFKS5dvWzDIU/k2k1YnO9ytXs=
+	t=1786621995; cv=none; b=rH/fRKaLMYaediOb7x6ql21I0RLsaZT6UH9c7Nfh9FfjOaG9+OYu+5MDShjw6c3Wyt6vhbljzTcI1X3oFDbrxcQ9/WXDHROR1qGr+HuapKpfr24M+CGNNFCx37M7xTYphEneOz+RGGi0Kx7PYwnWfPPV5HVixSCtTKs16xMHMZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786612831; c=relaxed/simple;
-	bh=XSbxuFNDxlXVpQ/cS578M2yFcGMkc7DG8pgNdZPizcw=;
-	h=Content-Type:From:Mime-Version:Subject:Date:Message-Id:References:
-	 Cc:In-Reply-To:To; b=r6MS6xcjUZisslsbzqA12opEBkddOi83zt8xbCOO2KUxk8K1Alxq1JFmsyNhRMdRcyA75EwzAqKvpz/KlsemzRLbfzwH5DeylfJdWt4h1YA/n8rMvHY9+HA5aCb+9rjrx28+gQPrEuxVEBcVNTTmU+qx3xxGv+Kn0vkYzDf9V54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz; spf=pass smtp.mailfrom=ixit.cz; dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b=LZXlAaqM; arc=none smtp.client-ip=84.42.129.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ixit.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ixit.cz
+	s=arc-20240116; t=1786621995; c=relaxed/simple;
+	bh=eLY7d3f0fRdJ0tg2Vni+U8UOOhNK1ExC1G/3KQ9o7Wc=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=In+zDJeG0nO6j4mcAG6w1HAQnx9pinrl9q6XNSyXJj7rUr91ouBJc9oiVGz1QuWQHbu26buagDx5fTd+NeXlNIxLlcSSI9bxQ1f3mED0/I75lX66Ox7HXLOqKs77cyztyASNw6U8x5EGgCnbhFNuhACkbi+wJ/088HjBjChYspY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UgV2RCTF; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ixit.cz header.i=@ixit.cz header.b="LZXlAaqM"
-Received: from smtpclient.apple (85-70-170-181.rcd.o2.cz [85.70.170.181])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by ixit.cz (Postfix) with ESMTPSA id BC3165340217;
-	Thu, 13 Aug 2026 11:20:21 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ixit.cz; s=dkim;
-	t=1786612821;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XSbxuFNDxlXVpQ/cS578M2yFcGMkc7DG8pgNdZPizcw=;
-	b=LZXlAaqMDuz1Eu1qoATS2mQYnT7CsZwlU8A/IXlgD06ajK8b+e6H1n9LYw4UJuCZm5U/K1
-	45EC+UwLTUEFW7hK5NTe7T8cn5/fV82S+8GeZjkxTS2flC4JayGWz1E96Y3dcIj8ur1J4R
-	hWWn2JaZ0EhUTvH7hyEn/4YiTGlPbJw=
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From: David Heidelberg <david@ixit.cz>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UgV2RCTF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38AA61F00A3A
+	for <linux-crypto@vger.kernel.org>; Thu, 13 Aug 2026 11:53:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786621994;
+	bh=+fm+CeLKS/2B3l8wNfarjP4MGGPunmU90uKBggPTChU=;
+	h=From:In-Reply-To:References:Date:Subject:To:Cc;
+	b=UgV2RCTFFoe8cwLWNUIuifb5WIdiXPPM+iHiuDr5ZPq8ELyvYb68lIF4yk9xDAscA
+	 RRj0FaaUn8MtYxfa+3KL2YuVm6AsqYRCy0ZG+CpE6kqGLweRa3LDBkpFmgYDBpahX0
+	 COJKUDCse9eswFdo0/fPFyQXIIIRh7b2tL/fE+pPvrDgTm4vgcnfevykwbaAzms+eT
+	 p+yBX+2wruAjjBivWwkVjbw1EsLyqzbTDL5CurY53cakXLv1EqeWhohDod/i5G0aSN
+	 oWYmg+o6xU0KnpUo7Phb6BpL7s7np2B5/FHrLup7a0Clf+Qpwin9W5YszwqKIbhUMF
+	 wfHDP6vh85i/Q==
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-3a115c08b0bso10183611fa.0
+        for <linux-crypto@vger.kernel.org>; Thu, 13 Aug 2026 04:53:14 -0700 (PDT)
+X-Gm-Message-State: AOJu0YxqNQEC9aa1FSwnkuS1beTT5Zs108Mmpjxbq2zbfaVqf4phPMtK
+	t2TFRTTs7ZvIx3ASz26X/QXedAjDXMnjIxpW7xvfs9xRv+E1uw+kYgffBEpnM0QqMhAUSbNb5Mx
+	/t2Y0VupnlVKROFC0yn3H/1ug2ff2DGZOLbjKRHJ7Sw==
+X-Received: by 2002:a2e:be05:0:b0:39f:bc94:eba1 with SMTP id
+ 38308e7fff4ca-3a11a6b7762mr7298321fa.16.1786621992909; Thu, 13 Aug 2026
+ 04:53:12 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Thu, 13 Aug 2026 06:53:11 -0500
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Thu, 13 Aug 2026 06:53:11 -0500
+From: Bartosz Golaszewski <brgl@kernel.org>
+In-Reply-To: <bc95e0b0-2cc5-4ad6-a319-ae4e159b92fe@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH 00/33] Add support for Qualcomm Snapdragon SM7150 SoC and Google Pixel 4a
-Date: Thu, 13 Aug 2026 11:20:11 +0200
-Message-Id: <7B026D92-3826-494D-B1A9-EF01D41B4461@ixit.cz>
-References: <b15b2687-0c2e-43b2-ac9e-78e04e77e065@mainlining.org>
-Cc: Jens Reidel <adrian@mainlining.org>,
- Danila Tikhonov <danila@jiaxyga.com>, Miro Mraz <mraz.miro@seznam.cz>,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-pm@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-watchdog@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-phy@lists.infradead.org, linux-mmc@vger.kernel.org,
- netdev@vger.kernel.org, linux-scsi@vger.kernel.org,
- dmaengine@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-i2c@vger.kernel.org, linux-clk@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
- linux-remoteproc@vger.kernel.org, dri-devel@lists.freedesktop.org,
- neil.armstrong@linaro.org, linux-hardening@vger.kernel.org,
- linux@mainlining.org, Connor Mitchell <c.dog29@hotmail.com>
-In-Reply-To: <b15b2687-0c2e-43b2-ac9e-78e04e77e065@mainlining.org>
-To: Danila Tikhonov <danila@mainlining.org>
-X-Mailer: iPhone Mail (23G71)
+MIME-Version: 1.0
+References: <20260731050838.158825-1-ebiggers@kernel.org> <a28c2903-0976-4559-b870-4de5553ba9ab@kernel.org>
+ <3ba57269-3305-4d80-b3f2-aa82fa59b59d@gmail.com> <b9b655a9-c683-4c4e-ba0d-f98577dd2912@kernel.org>
+ <20260801162900.GA2021@quark> <e7aeec9b-11aa-4635-bde9-fb8c7ca38260@kernel.org>
+ <20260801171242.GA3567@quark> <CAMRc=McL5QQRk8C8zzkHm+FUj-SAVi5PLJr2pXo8eNpaxXuALg@mail.gmail.com>
+ <20260811224110.GC1905@sol> <CAMRc=MfVqphaVsfcmUXjGmu6m+F6nJYXgAPuTVjZBwFnd48BkA@mail.gmail.com>
+ <bc95e0b0-2cc5-4ad6-a319-ae4e159b92fe@gmail.com>
+Date: Thu, 13 Aug 2026 06:53:11 -0500
+X-Gmail-Original-Message-ID: <CAMRc=Mcno_F2UuLXZ3ruaVSbYhssVK90m3KM=+dwskLMSp8TXg@mail.gmail.com>
+X-Gm-Features: AUfX_mxLj0BqXm4Ose-q9nkSpZaIi5poNDxpaETn2wXloBBECH8QMDb1EFqov7M
+Message-ID: <CAMRc=Mcno_F2UuLXZ3ruaVSbYhssVK90m3KM=+dwskLMSp8TXg@mail.gmail.com>
+Subject: Re: [PATCH] crypto: qce - Replace with stub driver
+To: Demi Marie Obenour <demiobenour@gmail.com>
+Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, 
+	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>, 
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Krzysztof Kozlowski <krzk@kernel.org>, 
+	Bartosz Golaszewski <brgl@kernel.org>, Eric Biggers <ebiggers@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
+On Wed, 12 Aug 2026 18:33:45 +0200, Demi Marie Obenour
+<demiobenour@gmail.com> said:
+> On 8/12/26 04:07, Bartosz Golaszewski wrote:
+>> On Wed, 12 Aug 2026 00:41:10 +0200, Eric Biggers <ebiggers@kernel.org> said:
+>>> On Tue, Aug 11, 2026 at 08:42:55AM -0500, Bartosz Golaszewski wrote:
+>>>
+>>>> No, the rationale has never been this. FWIW it can be that it's used for
+>>>> testing of the crypto module on a supported platform and that is already
+>>>> enough of a reason to keep it upstream.
+>>>>
+>>>> As I've said before: we don't just drop maintained drivers from linux.
+>>>
+>>> We definitely do if the drivers are not useful or appropriate for
+>>> inclusion in the kernel, though the policy varies by subsystem.  Even
+>>> just last month an entire filesystem got dropped despite someone wanting
+>>> to maintain it.
+>>>
+>>
+>> I suppose you're talking about EFS? A thing that can't even be tested on real
+>> hardware? This is a much more extreme case. Here you have several people
+>> representing the vendor saying they want to keep and maintain it. I'm fine
+>> having my own tree and sending PRs to Herbert if he agrees and you are of
+>> course entirely free to disregard any patches targetting it.
+>
+> Would you be okay with one of these options?
+>
+> 1. Make the stub driver as the default, with
+>    the real driver guarded by an off-by-default Kconfig option.
+>
+> 2. Keep the driver as is (with the power management issue fixed),
+>    but don't register any algorithm implementations with the crypto API.
+>
+> 3. Only register algorithm implementations with the crypto API if a
+>    non-default Kconfig option is selected.
+>
+> 4. Only register algorithm implementations with the crypto API if a
+>    non-default module parameter is selected.
+>
+> 5. Move the driver out of drivers/crypto, delete the algorithm
+>    registrations, and then add support for restricted media content
+>    decryption later.
+>
+> The last option would be my preferred one.
+>
 
-> On 12. 8. 2026, at 22:54, Danila Tikhonov <danila@mainlining.org> wrote:
->=20
-> =EF=BB=BFHi David,
->=20
-> Thank you for your comment.
->=20
->> On 12/08/2026 14:40, David Heidelberg wrote:
->>=20
->>=20
->>> On 23/04/2025 09:26, Neil Armstrong wrote:
->>> Hi,
->>>=20
->>> On 23/04/2025 00:07, Jens Reidel wrote:
->>>> Hi everyone,
->>>>=20
->>>> apologies for the mess this created. Danila's mail provider ratelimited=
- him halfway through sending the series and the attempt to re-try sending th=
-e second half an hour later ended up with a new message ID (I think due to n=
-ot using --in-reply-to).
->>>> He asked me to let you know that this will be resolved later and the wh=
-ole series will be re-sent once the problems are resolved.
->>>=20
->>> The b4 web submission is a great alternative when the mail provider is r=
-ate limited:
->>> https://b4.docs.kernel.org/en/latest/contributor/send.html#web-endpoint
->>>=20
->>=20
->> I see people interested in moving Pixel 4a forward, but it seems this was=
- never upstreamed? I looked at sm7150 repository [1] where I see FROMLIST, b=
-ut these patches never arrived to the list and this series is from 2025.
->>=20
->> Should we expect v2 (re)based on recent tree?
->>=20
->=20
-> I'd definitely like to get back to upstreaming SM7150 and the devices
-> based on it, but I don't think there's much value in continuing with
-> this particular series as-is. A lot has changed in the kernel over the
-> past year, which would require substantial changes throughout the series
-> and would effectively force the maintainers to review it from scratch
-> anyway.
+I actually have a slightly different spin on the stub driver. I'd like to
+keep the driver future-proof and avoid all kinds of needless churn when we
+do get to the secure dma bufs and restricted media playback (and we will get
+there eventually :) ).
 
-After longer period of time maintainers will have to do full review anyway. S=
-ure, the reviews needs to be addressed :)
+Can we make the QCE into an MFD driver with the core binding to the DT node
+and handling the interconnect bandwidth, while the part handling crypto
+algorithms becomes its cell and is moved into a separate module? This one can
+be disabled in defconfig by default and I don't even mind it being guarded with
+CONFIG_EXPERT. The core module would remain in arm64 defconfig.
 
->=20
-> I'd also like to split the series up to avoid targeting such a large
-> number of maintainers in a single submission.
+With that: any future extensions providing support for more functionalities of
+this IP can simply be implemented as more MFD cells while we can also keep
+chipping away at the existing code and use it for testing the BAM pipe locking.
 
-Yes, that=E2=80=99s exactly what=E2=80=99s needed (at least for the part pat=
-ches I saw).
+> Also, if Qualcomm has customers who use the QCE via the crypto API,
+> is Qualcomm aware of _why_ they made that choice?  From Eric's and
+> my perspective, that seems like a very strange decision, unless there
+> are factors that Eric and I are not aware of.
+>
 
-> Hopefully, I'll be able to
-> find some time to work on this in the near future.
+SM8650 with the QCE is FIPS 140-2 certified and apparently this makes
+a difference. Don't ask me if that makes sense, I don't claim to understand
+the legal aspects of it.
 
-Where the most recent patchset can be found? Just in case someone wanted to p=
-ush some bits in meantime.
+> Finally, would you be willing to have a group call to discuss this
+> at some point?  That might be a more suitable venue for this kind of
+> discussion, and could potentially lead to a conclusion faster.  Also,
+> while at least I couldn't sign any NDAs, there might be information that
+> you could discuss there that you cannot post to a public mailing list.
 
-Thanks
-David
+Sure, I'm fine to have a call. If you think about coming to Linux Plumbers this
+year, I'll be there all week and it's a good place for such a discussion too.
 
->=20
->=20
->> Thanks
->> David
->>=20
->> [1] https://github.com/sm7150-mainline/linux/commit/7ea41523c678e94a7c048=
-936052b5b1b1b109cdd
->>=20
->>> Neil
->>>=20
->>>>=20
->>>> Best regards,
->>>> Jens
->>>=20
->>>=20
-> ---
-> Best regards,
-> Danila
+FYI I've only been online for a couple days this week and I'm going offline
+again until the end of August with the exception of August 26th when I'll be
+able to chime in again. Any call would too have to happen in September at the
+earliest.
+
+Thanks,
+Bartosz
