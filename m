@@ -1,112 +1,72 @@
-Received: from mail.mainlining.org (mail.mainlining.org [5.75.144.95])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A0F03A8FE6;
-	Wed, 12 Aug 2026 20:55:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=5.75.144.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21C3F31F9B9;
+	Thu, 13 Aug 2026 01:10:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786568120; cv=none; b=SyqR4+pD39f+ruMhE6SfYX8N4v/uUQVLvwRI+HWwOCRD6i4UxP/eNaHthUMJjbHCJ66qBZAakmM1S5CJK0QJDU84QQatqWyhu01Wa3Zg9heBVohroxax9xBIsxta6+0UrcUleG75Oesdf4hkVpkMDV6gaMfoncOyigL6VZxF6Tk=
+	t=1786583415; cv=none; b=hApci8OWGo6TxFMBdxwXojSeqNHeEKSJpy2cj4WCoIhKGNSEq3E/Lt4I+3aqkVqMw8TQCljNd2HMEKk1f+TkgP9kEnRghsZjQL5MSAut3aIEuWAgUeuPTDfcu6Naa0WuYzqtotujkrnLe/5AxAA3WrhbpFSOqpyzgvOjTiPxnEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786568120; c=relaxed/simple;
-	bh=FrdqQ6kXNnNKfJVjZwswwcKEQOtgoDeMVrYYyQrDqpE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=G2RQoc+vbOnhCIa3WaSsCZSuZsb58bPHCs8WyB4Mdb9lg9RZ8irj5fEiOrSvMsHE/l7T8asZOYiHHgGhrsKHt1P4OGA3NMcD9keZPtQL54OVgxXn+UNqlteDRzf3U0Dkutx6yKGZ8r2PdkMIgvmygDKuYNdvEwdiSEfNPKm8Vx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mainlining.org; spf=pass smtp.helo=mail.mainlining.org; arc=none smtp.client-ip=5.75.144.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mainlining.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.helo=mail.mainlining.org
-Message-ID: <b15b2687-0c2e-43b2-ac9e-78e04e77e065@mainlining.org>
-Date: Wed, 12 Aug 2026 23:54:41 +0300
+	s=arc-20240116; t=1786583415; c=relaxed/simple;
+	bh=VkSGC0OU4VPw5S5dtdkBIVTB/XkClntAMpYkRYwVx00=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bNHWg1wIvEH03765AP6FpUIgWrBsk9beRbmgBRiCdwPLh1BpLVe6bFcbU6sY2GP4sDSshsbB2/ISv8/DhF6bPV6lPxiXJ4AslAM+ShEREFAdxin70oBhTFasyE+a9X2SdgkafCvBDscM7O067Gmb0ZBx9rjSupFxCJoqMExb/kE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=DklMtR0o; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="DklMtR0o"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=TYj4Q9MHLne3qqPIEYRKc5SmwMzj4mK82ZpLq0TjrxQ=; 
+	b=DklMtR0oa0l/eMCrImdAJP/YdUZy4pLSzvtYVY9LmRtddlV6toLc619Sy0eyIYfSr6lXE3KoK06
+	HdNevCY+B2c5rQ2FJ01U28hbQx3FQsr6tMz25wLLW5RQ+XO3Xn/vAnx58JCSzeyVAYCNtiZPuiHgy
+	C9G4oe40PzTl89czyY1ffJAqnnbHYl+Ba5Ls3eM6jbVHvkd91zKdMdgwwbkRJ73YB7wtPR9vnty0I
+	5eGytcaGKoRBM/BXbeQ2UmtU9NIfbsj3EwCj+G69ZXS8uUxHpTWpUaUjJUQs/p3O1HJf+COrtp4W+
+	Pocd1IS78FBHT0k7gCd73kQpQ+HoGLyQUfOA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1wuJxH-00000004SS9-1g2s;
+	Thu, 13 Aug 2026 09:10:00 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 13 Aug 2026 11:09:59 +1000
+Date: Thu, 13 Aug 2026 11:09:59 +1000
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: linux-crypto@vger.kernel.org,
+	Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+	Pankaj Gupta <pankaj.gupta@nxp.com>,
+	Gaurav Jain <gaurav.jain@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] crypto: caam/jr: fix use-after-free in interrupt handler
+ teardown
+Message-ID: <an0ZZ9JPSDY5y0MN@gondor.apana.org.au>
+References: <20260730231603.1169539-1-rosenp@gmail.com>
+ <anmHccSuAF5apZr2@gondor.apana.org.au>
+ <CAKxU2N9rmMAvnWLc1y7vGL4-md3kF4Bom_qnKEoHZE_k+xDvkw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/33] Add support for Qualcomm Snapdragon SM7150 SoC and
- Google Pixel 4a
-To: David Heidelberg <david@ixit.cz>, Jens Reidel <adrian@mainlining.org>,
- Danila Tikhonov <danila@jiaxyga.com>, Miro Mraz <mraz.miro@seznam.cz>
-Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-pm@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-watchdog@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-phy@lists.infradead.org, linux-mmc@vger.kernel.org,
- netdev@vger.kernel.org, linux-scsi@vger.kernel.org,
- dmaengine@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-i2c@vger.kernel.org, linux-clk@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
- linux-remoteproc@vger.kernel.org, dri-devel@lists.freedesktop.org,
- neil.armstrong@linaro.org, linux-hardening@vger.kernel.org,
- linux@mainlining.org, Connor Mitchell <c.dog29@hotmail.com>
-References: <20250422-sm7150-upstream-v1-0-bf9a9081631d@jiaxyga.com>
- <2ca2b774-fd7f-4612-b38d-f60e32ff6f9a@mainlining.org>
- <283096ad-ae1b-42b8-8312-b192f735fc80@linaro.org>
- <cce3fe36-322e-49ed-8928-3aef813faad7@ixit.cz>
-Content-Language: en-US
-From: Danila Tikhonov <danila@mainlining.org>
-In-Reply-To: <cce3fe36-322e-49ed-8928-3aef813faad7@ixit.cz>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKxU2N9rmMAvnWLc1y7vGL4-md3kF4Bom_qnKEoHZE_k+xDvkw@mail.gmail.com>
 
-Hi David,
-
-Thank you for your comment.
-
-On 12/08/2026 14:40, David Heidelberg wrote:
+On Wed, Aug 12, 2026 at 11:54:00AM -0700, Rosen Penev wrote:
 >
->
-> On 23/04/2025 09:26, Neil Armstrong wrote:
->> Hi,
->>
->> On 23/04/2025 00:07, Jens Reidel wrote:
->>> Hi everyone,
->>>
->>> apologies for the mess this created. Danila's mail provider 
->>> ratelimited him halfway through sending the series and the attempt 
->>> to re-try sending the second half an hour later ended up with a new 
->>> message ID (I think due to not using --in-reply-to).
->>> He asked me to let you know that this will be resolved later and the 
->>> whole series will be re-sent once the problems are resolved.
->>
->> The b4 web submission is a great alternative when the mail provider 
->> is rate limited:
->> https://b4.docs.kernel.org/en/latest/contributor/send.html#web-endpoint
->>
->
-> I see people interested in moving Pixel 4a forward, but it seems this 
-> was never upstreamed? I looked at sm7150 repository [1] where I see 
-> FROMLIST, but these patches never arrived to the list and this series 
-> is from 2025.
->
-> Should we expect v2 (re)based on recent tree?
->
+> > The driver needs to be modified so that it can fail gracefully
+> > if the hardware is forcefully unbound while a crypto op is ongoing.
+> That's a much bigger change than this one, which I cannot test.
 
-I'd definitely like to get back to upstreaming SM7150 and the devices
-based on it, but I don't think there's much value in continuing with
-this particular series as-is. A lot has changed in the kernel over the
-past year, which would require substantial changes throughout the series
-and would effectively force the maintainers to review it from scratch
-anyway.
+The thing is that as Sashiko has pointed out, if we apply fixes
+like this without solving the bigger problem, it'll just make that
+issue worse.
 
-I'd also like to split the series up to avoid targeting such a large
-number of maintainers in a single submission. Hopefully, I'll be able to
-find some time to work on this in the near future.
-
-
-> Thanks
-> David
->
-> [1] 
-> https://github.com/sm7150-mainline/linux/commit/7ea41523c678e94a7c048936052b5b1b1b109cdd
->
->> Neil
->>
->>>
->>> Best regards,
->>> Jens
->>
->>
----
-Best regards,
-Danila
-
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
