@@ -1,50 +1,43 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21C3F31F9B9;
-	Thu, 13 Aug 2026 01:10:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D476F29D26C;
+	Thu, 13 Aug 2026 02:01:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786583415; cv=none; b=hApci8OWGo6TxFMBdxwXojSeqNHeEKSJpy2cj4WCoIhKGNSEq3E/Lt4I+3aqkVqMw8TQCljNd2HMEKk1f+TkgP9kEnRghsZjQL5MSAut3aIEuWAgUeuPTDfcu6Naa0WuYzqtotujkrnLe/5AxAA3WrhbpFSOqpyzgvOjTiPxnEU=
+	t=1786586477; cv=none; b=i8AQ4lL7DCRfJMIzbckJD3EqZ7d1lfdu9+KbDQhpuv9840TfiqFShOxlDZd+tv+x0OI782h/mQQHjXkRwH3KlYRNxPDFBg4EfML+PWjUgI00eCV7S/+28s64/OR5oy6VSX5dAMeNTd+eJR2+UMUY61ms2pstZ8fg86S8PEaLkbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786583415; c=relaxed/simple;
-	bh=VkSGC0OU4VPw5S5dtdkBIVTB/XkClntAMpYkRYwVx00=;
+	s=arc-20240116; t=1786586477; c=relaxed/simple;
+	bh=q0fsHPJgMyKIvtdbUmgKsJtR9I7fcJsobBWGCSHmOO4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bNHWg1wIvEH03765AP6FpUIgWrBsk9beRbmgBRiCdwPLh1BpLVe6bFcbU6sY2GP4sDSshsbB2/ISv8/DhF6bPV6lPxiXJ4AslAM+ShEREFAdxin70oBhTFasyE+a9X2SdgkafCvBDscM7O067Gmb0ZBx9rjSupFxCJoqMExb/kE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=DklMtR0o; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=hXWkTG2yZks2QPPymS7uoR3FCutHiQnvGZ6U1jlFKa5t5pPRxtQHI7gRjaiErk7R9cOZT6OVGU7UbR59gh2muD8gfeu/bFkQSzh57Tgnoa8Ms/1y8KlDhqLyf1rPFDm+lRt/wjUEkZbNn/YzYsmKfZp4BOGodTGCIYvK9q67OPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I8+6EBmD; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="DklMtR0o"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=TYj4Q9MHLne3qqPIEYRKc5SmwMzj4mK82ZpLq0TjrxQ=; 
-	b=DklMtR0oa0l/eMCrImdAJP/YdUZy4pLSzvtYVY9LmRtddlV6toLc619Sy0eyIYfSr6lXE3KoK06
-	HdNevCY+B2c5rQ2FJ01U28hbQx3FQsr6tMz25wLLW5RQ+XO3Xn/vAnx58JCSzeyVAYCNtiZPuiHgy
-	C9G4oe40PzTl89czyY1ffJAqnnbHYl+Ba5Ls3eM6jbVHvkd91zKdMdgwwbkRJ73YB7wtPR9vnty0I
-	5eGytcaGKoRBM/BXbeQ2UmtU9NIfbsj3EwCj+G69ZXS8uUxHpTWpUaUjJUQs/p3O1HJf+COrtp4W+
-	Pocd1IS78FBHT0k7gCd73kQpQ+HoGLyQUfOA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wuJxH-00000004SS9-1g2s;
-	Thu, 13 Aug 2026 09:10:00 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 13 Aug 2026 11:09:59 +1000
-Date: Thu, 13 Aug 2026 11:09:59 +1000
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: linux-crypto@vger.kernel.org,
-	Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-	Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Gaurav Jain <gaurav.jain@nxp.com>,
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I8+6EBmD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48F871F000E9;
+	Thu, 13 Aug 2026 02:01:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786586476;
+	bh=A7hjQTcuVZ4M0U1GClWWJFjbMC97OmNQGWCTpYj4NKI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=I8+6EBmDAQOt+Jw78rRECxyQK1kV2ZtVw2m4wXX5cHHslFUhprUecZRjWws/5mNpZ
+	 /9JGQW6qJktyMYI9YDqA/J4MutZVtQo0ytaBM/tKB/a2tx14F8ShJskcLcaBOWIY0m
+	 w4uaud/7G6h6s4J6VwlfDzdffgsj+4FsgsoIVTQSZGksgfsqUOdP/tM1aT9hjNIM8M
+	 JbnvGn9nLaOQvW6z0gL0lSuLvOkAGkY9GllzYAen75dx2RuNbkWutGT+rvZj3ivoUK
+	 ZDxRk/i1IaLto2xDsT4IXLWgzDLW6sW43vvx81CfH7asR1LYaOw4VNTbZ+1yN7L1Oy
+	 rVrVJWQ4u+lvQ==
+Date: Wed, 12 Aug 2026 18:59:13 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] crypto: caam/jr: fix use-after-free in interrupt handler
- teardown
-Message-ID: <an0ZZ9JPSDY5y0MN@gondor.apana.org.au>
-References: <20260730231603.1169539-1-rosenp@gmail.com>
- <anmHccSuAF5apZr2@gondor.apana.org.au>
- <CAKxU2N9rmMAvnWLc1y7vGL4-md3kF4Bom_qnKEoHZE_k+xDvkw@mail.gmail.com>
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Steve French <smfrench@gmail.com>,
+	Namjae Jeon <linkinjeon@kernel.org>
+Subject: Re: [PATCH v2 0/6] crypto: Add __cleanup functions for zeroizing
+ aes_cmac_key & aes_cmac_ctx
+Message-ID: <20260813015913.GA28329@sol>
+References: <20260807125845.1477067-1-thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,20 +46,53 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAKxU2N9rmMAvnWLc1y7vGL4-md3kF4Bom_qnKEoHZE_k+xDvkw@mail.gmail.com>
+In-Reply-To: <20260807125845.1477067-1-thuth@redhat.com>
 
-On Wed, Aug 12, 2026 at 11:54:00AM -0700, Rosen Penev wrote:
->
-> > The driver needs to be modified so that it can fail gracefully
-> > if the hardware is forcefully unbound while a crypto op is ongoing.
-> That's a much bigger change than this one, which I cannot test.
+On Fri, Aug 07, 2026 at 02:58:37PM +0200, Thomas Huth wrote:
+> Code that uses AES-CMAC might need to zeroize their local aes_cmac_key
+> and/or aes_cmac_ctx structures after use to avoid leaking sensitive
+> material on the stack.
+> 
+> The first patch introduces an aes_cmac_zeroize_key() and an
+> aes_cmac_zeroize_ctx() helper function that can be used with __cleanup()
+> to automatically clear the key and context when they go out of scope.
+> 
+> Patches 2 - 4 add the __cleanup markers to spots in the code that
+> missed to clean up the structures so far.
+> 
+> The final two patches are just cosmetics and change some memzero_explicit()
+> calls to use the __cleanup() way instead.
+> 
+> Note: There are more spots in the smb, tcp-ao and bluetooth code that
+> need some zeroization of sensitive data on the stack. I will tackle
+> those in later patches, this series here focuses on the new __cleanup
+> wrappers.
+> 
+> v2:
+> - Update comments and positions of the functions in the 1st patch
+> - Also clear tmp[] in the bluetooth patch (the patch is pointless otherwise)
+> 
+> Thomas Huth (6):
+>   crypto: Provide wrapper functions for zeroizing aes_cmac_key and
+>     aes_cmac_ctx
+>   smb: clear the aes_cmac_key and aes_cmac_ctx when done
+>   net/tcp-ao: clear the aes_cmac_key when done
+>   Bluetooth: SMP: clear the aes_cmac_key when done
+>   lib/crypto: aes: Use _cleanup() for aes_cmac_key instead of
+>     memzero_explicit()
+>   mac80211: fils_aead: Use _cleanup for aes_cmac_key instead of
+>     memzero_explicit
+> 
+>  fs/smb/client/smb2transport.c |  4 ++--
+>  fs/smb/server/auth.c          |  2 +-
+>  include/crypto/aes-cbc-macs.h | 34 ++++++++++++++++++++++++++++++++++
+>  lib/crypto/aes.c              |  3 +--
+>  net/bluetooth/smp.c           |  3 ++-
+>  net/ipv4/tcp_ao.c             |  2 +-
+>  net/mac80211/fils_aead.c      |  3 +--
+>  7 files changed, 42 insertions(+), 9 deletions(-)
 
-The thing is that as Sashiko has pointed out, if we apply fixes
-like this without solving the bigger problem, it'll just make that
-issue worse.
+Applied all except patch 3 to
+https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=libcrypto-next
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+- Eric
