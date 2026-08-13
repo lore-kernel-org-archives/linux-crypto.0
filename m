@@ -1,155 +1,139 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 804133BADB2
-	for <linux-crypto@vger.kernel.org>; Thu, 13 Aug 2026 11:53:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9860C3BD225
+	for <linux-crypto@vger.kernel.org>; Thu, 13 Aug 2026 12:40:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786621995; cv=none; b=rH/fRKaLMYaediOb7x6ql21I0RLsaZT6UH9c7Nfh9FfjOaG9+OYu+5MDShjw6c3Wyt6vhbljzTcI1X3oFDbrxcQ9/WXDHROR1qGr+HuapKpfr24M+CGNNFCx37M7xTYphEneOz+RGGi0Kx7PYwnWfPPV5HVixSCtTKs16xMHMZQ=
+	t=1786624829; cv=none; b=Bne1GunD65b2SanW+x7KxAHGN9GEJbBOGVRc8RZc3R15MQS0trX/MNz7iWILJXWWwLwonGTeH/gxiYH2/mARUG8nanGLWR35AtwZwi0+Wp3jpPSjSH++3Sk/dgZWYUrgh9JZv2kPlt8y6o1rhB7PE3IVL3kP8DvCBwFalgSSUOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786621995; c=relaxed/simple;
-	bh=eLY7d3f0fRdJ0tg2Vni+U8UOOhNK1ExC1G/3KQ9o7Wc=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=In+zDJeG0nO6j4mcAG6w1HAQnx9pinrl9q6XNSyXJj7rUr91ouBJc9oiVGz1QuWQHbu26buagDx5fTd+NeXlNIxLlcSSI9bxQ1f3mED0/I75lX66Ox7HXLOqKs77cyztyASNw6U8x5EGgCnbhFNuhACkbi+wJ/088HjBjChYspY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UgV2RCTF; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1786624829; c=relaxed/simple;
+	bh=kZVXyLyM/GVc2wXcF2xaIfTYMUKFc8zlenZb+6U9AdQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Jc+v2bNZZnp7KZEpiY1ngLakeGgLfdc57Xn4H+tOXqyCsaSmOUpoonA4O8VhV+NSyxd06z5lJMtjCJ7qMlgsX2i1lBQOisShvqdfxY9fNs5d58yCCIcGBv8tnWys+aZN9k7xdIa8e+WF7NNcxnTUChW/umyijZopZ+xq8yxxtDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jetONqVl; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UgV2RCTF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38AA61F00A3A
-	for <linux-crypto@vger.kernel.org>; Thu, 13 Aug 2026 11:53:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786621994;
-	bh=+fm+CeLKS/2B3l8wNfarjP4MGGPunmU90uKBggPTChU=;
-	h=From:In-Reply-To:References:Date:Subject:To:Cc;
-	b=UgV2RCTFFoe8cwLWNUIuifb5WIdiXPPM+iHiuDr5ZPq8ELyvYb68lIF4yk9xDAscA
-	 RRj0FaaUn8MtYxfa+3KL2YuVm6AsqYRCy0ZG+CpE6kqGLweRa3LDBkpFmgYDBpahX0
-	 COJKUDCse9eswFdo0/fPFyQXIIIRh7b2tL/fE+pPvrDgTm4vgcnfevykwbaAzms+eT
-	 p+yBX+2wruAjjBivWwkVjbw1EsLyqzbTDL5CurY53cakXLv1EqeWhohDod/i5G0aSN
-	 oWYmg+o6xU0KnpUo7Phb6BpL7s7np2B5/FHrLup7a0Clf+Qpwin9W5YszwqKIbhUMF
-	 wfHDP6vh85i/Q==
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-3a115c08b0bso10183611fa.0
-        for <linux-crypto@vger.kernel.org>; Thu, 13 Aug 2026 04:53:14 -0700 (PDT)
-X-Gm-Message-State: AOJu0YxqNQEC9aa1FSwnkuS1beTT5Zs108Mmpjxbq2zbfaVqf4phPMtK
-	t2TFRTTs7ZvIx3ASz26X/QXedAjDXMnjIxpW7xvfs9xRv+E1uw+kYgffBEpnM0QqMhAUSbNb5Mx
-	/t2Y0VupnlVKROFC0yn3H/1ug2ff2DGZOLbjKRHJ7Sw==
-X-Received: by 2002:a2e:be05:0:b0:39f:bc94:eba1 with SMTP id
- 38308e7fff4ca-3a11a6b7762mr7298321fa.16.1786621992909; Thu, 13 Aug 2026
- 04:53:12 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 13 Aug 2026 06:53:11 -0500
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 13 Aug 2026 06:53:11 -0500
-From: Bartosz Golaszewski <brgl@kernel.org>
-In-Reply-To: <bc95e0b0-2cc5-4ad6-a319-ae4e159b92fe@gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jetONqVl"
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-84f3ab8750cso1841724b3a.0
+        for <linux-crypto@vger.kernel.org>; Thu, 13 Aug 2026 05:40:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786624825; x=1787229625; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=VWg4UYHkA9s33zhrk75mu6M5WGetZ/Z5iOlL+3QXDpk=;
+        b=jetONqVlCz20tnbHC4sZyvSD2omZhZF43anKQz0eiunP9GLAHvPO9YlJsWkbCDXXJ7
+         8gFAnbxMrBQIhtq1d94hVP+tFF3d2/JC0YhOqXsdJEWyo7SagHETzcHC0H8xN2WxDijI
+         cUCmBk0JdAqOLMkfAfZLo3vgPX+KV1N6mi08cRf+ktAJYbNtg3+oK0zL1hEGf53tZFHv
+         Ek20aUIB99oRKFfIDHwQBxjRwmJSRN5jTtUu3W/i1GZE0xcBxALAisKJK/gha7Glgfcb
+         dM2phfmHPoLFnqy+3jK6PRlheKASixnldI8O470/TLLupQzyyCTDFAVCz+5PpH9RjWnL
+         oh8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786624825; x=1787229625;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=VWg4UYHkA9s33zhrk75mu6M5WGetZ/Z5iOlL+3QXDpk=;
+        b=BsmPUO95KHvas3OMzS71csD2ZADAf6enQmnwFS1xyKjlQ9ziXn5gyDfWSrh1dx/mhf
+         0sBxbVv1eCJTFRJfyL5DXDGEKpqb8uqQohitTtMhiBpZhHmf+eawhez9g2BYLH4c+2+Y
+         103b49VHGC5FLvDr6qHGe6u0zqbRZOBcV+BtsVt7hmKm+nChepEQFV4q4RBuPK7Dott7
+         i8KYqd7nZZxpb8DPSNaN9inxUYE4BpZRrpq2eEpxiB0nNdCz1L1/p38y5dfCMpPpEqlX
+         Aqz6hMrJTMNRnNzNv8BE6QQsoWLTppzxtMUgcK5DJs9GCKuYeg/Kv5g4sChyzjheGzBe
+         slzQ==
+X-Forwarded-Encrypted: i=1; AHgh+Rp0OvoQ1PaMwoNiqjdxy2QoVNd9mXlQwewr8p7NdVCgqPCdjY6ivW5vbSvB6GFLKjWnOAF9gBKOXSWdHiQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2tPOqU77LLcPB7r2yGhpGY9iN7BMv3zHLYdNYUJ8jVimJyOPN
+	CUJaXkMGp+Yqtjkw+gf8BzEWGJ4Zij+PpANpL99w2KZ62oxJ7SYzTz2y
+X-Gm-Gg: AR+sD12luJV/NGcfnhThdKg6rE/Xf4Q6HMd0AusJS0H2EGsHH1KnXFxvl74aAOQSUk5
+	pkVzqud2/5cC0vewq/Uhj5893GO3JF3B+r4yO3ksa2NjAWhY0VU9TTqTX8VxWAw/uv4syeCVeAI
+	6AN3KkKo6aAlaZFGZrhJZ/zyaBjkh27HydD+zBFuH7U441PEl9f+mvCHUd+93OXX1xY8NTTPuyg
+	hE7cwa/Wbszz4uKVxCg22HSLEEdgz5O3SfJemSff/IDjr1Q00SjU/B4hk99j3Sd/3XkIL87UiVj
+	Zz/W4fNk9dH1DPcAdAVRXtSy0bUjYAYKyAl8eMAk9VdsTrOrCtXISPw3JaSSJXh9TrIW9ePyyki
+	NBBZCu8fdGuzrSF0GDcyV9EEmLhBrsSLc8I2MHc1tUerQdvQliGWxTx3HpkeF/5ncMzClTg9Hs1
+	Alb0XTJC0pYqYyD1jqEOj19cd4s3oWI0nI+a+bsr19/JtIhQzZ2Zl3Ae/9WbyeiFfSsMBJ+MVwf
+	SABU94BEhQ=
+X-Received: by 2002:a05:6a00:aa83:b0:845:363e:12d9 with SMTP id d2e1a72fcca58-84fc7492a10mr5851741b3a.3.1786624825151;
+        Thu, 13 Aug 2026 05:40:25 -0700 (PDT)
+Received: from ancienth-X870E-Nova-WiFi ([125.186.72.2])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-84fc5aaea05sm794718b3a.60.2026.08.13.05.40.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Aug 2026 05:40:24 -0700 (PDT)
+From: Daehyeon Ko <4ncienth@gmail.com>
+To: keyrings@vger.kernel.org,
+	David Howells <dhowells@redhat.com>
+Cc: Lukas Wunner <lukas@wunner.de>,
+	Ignat Korchagin <ignat@linux.win>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Mat Martineau <martineau@kernel.org>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Daehyeon Ko <4ncienth@gmail.com>
+Subject: [PATCH] KEYS: asymmetric: reject non-positive restriction keys
+Date: Thu, 13 Aug 2026 21:40:10 +0900
+Message-ID: <20260813124010.2546648-1-4ncienth@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260731050838.158825-1-ebiggers@kernel.org> <a28c2903-0976-4559-b870-4de5553ba9ab@kernel.org>
- <3ba57269-3305-4d80-b3f2-aa82fa59b59d@gmail.com> <b9b655a9-c683-4c4e-ba0d-f98577dd2912@kernel.org>
- <20260801162900.GA2021@quark> <e7aeec9b-11aa-4635-bde9-fb8c7ca38260@kernel.org>
- <20260801171242.GA3567@quark> <CAMRc=McL5QQRk8C8zzkHm+FUj-SAVi5PLJr2pXo8eNpaxXuALg@mail.gmail.com>
- <20260811224110.GC1905@sol> <CAMRc=MfVqphaVsfcmUXjGmu6m+F6nJYXgAPuTVjZBwFnd48BkA@mail.gmail.com>
- <bc95e0b0-2cc5-4ad6-a319-ae4e159b92fe@gmail.com>
-Date: Thu, 13 Aug 2026 06:53:11 -0500
-X-Gmail-Original-Message-ID: <CAMRc=Mcno_F2UuLXZ3ruaVSbYhssVK90m3KM=+dwskLMSp8TXg@mail.gmail.com>
-X-Gm-Features: AUfX_mxLj0BqXm4Ose-q9nkSpZaIi5poNDxpaETn2wXloBBECH8QMDb1EFqov7M
-Message-ID: <CAMRc=Mcno_F2UuLXZ3ruaVSbYhssVK90m3KM=+dwskLMSp8TXg@mail.gmail.com>
-Subject: Re: [PATCH] crypto: qce - Replace with stub driver
-To: Demi Marie Obenour <demiobenour@gmail.com>
-Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, 
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>, 
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>, 
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Krzysztof Kozlowski <krzk@kernel.org>, 
-	Bartosz Golaszewski <brgl@kernel.org>, Eric Biggers <ebiggers@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Wed, 12 Aug 2026 18:33:45 +0200, Demi Marie Obenour
-<demiobenour@gmail.com> said:
-> On 8/12/26 04:07, Bartosz Golaszewski wrote:
->> On Wed, 12 Aug 2026 00:41:10 +0200, Eric Biggers <ebiggers@kernel.org> said:
->>> On Tue, Aug 11, 2026 at 08:42:55AM -0500, Bartosz Golaszewski wrote:
->>>
->>>> No, the rationale has never been this. FWIW it can be that it's used for
->>>> testing of the crypto module on a supported platform and that is already
->>>> enough of a reason to keep it upstream.
->>>>
->>>> As I've said before: we don't just drop maintained drivers from linux.
->>>
->>> We definitely do if the drivers are not useful or appropriate for
->>> inclusion in the kernel, though the policy varies by subsystem.  Even
->>> just last month an entire filesystem got dropped despite someone wanting
->>> to maintain it.
->>>
->>
->> I suppose you're talking about EFS? A thing that can't even be tested on real
->> hardware? This is a much more extreme case. Here you have several people
->> representing the vendor saying they want to keep and maintain it. I'm fine
->> having my own tree and sending PRs to Herbert if he agrees and you are of
->> course entirely free to disregard any patches targetting it.
->
-> Would you be okay with one of these options?
->
-> 1. Make the stub driver as the default, with
->    the real driver guarded by an off-by-default Kconfig option.
->
-> 2. Keep the driver as is (with the power management issue fixed),
->    but don't register any algorithm implementations with the crypto API.
->
-> 3. Only register algorithm implementations with the crypto API if a
->    non-default Kconfig option is selected.
->
-> 4. Only register algorithm implementations with the crypto API if a
->    non-default module parameter is selected.
->
-> 5. Move the driver out of drivers/crypto, delete the algorithm
->    registrations, and then add support for restricted media content
->    decryption later.
->
-> The last option would be my preferred one.
->
+asymmetric_lookup_restriction() resolves the serial in a
+key_or_keyring restriction with key_lookup().  This can return a negative
+or uninstantiated key as well as a positive one, and the restriction then
+retains that key.
 
-I actually have a slightly different spin on the stub driver. I'd like to
-keep the driver future-proof and avoid all kinds of needless churn when we
-do get to the secure dma bufs and restricted media playback (and we will get
-there eventually :) ).
+When the key has the asymmetric type, key_or_keyring_common() treats it as
+a usable trust key and dereferences asymmetric_key_ids(trusted).  Negative
+asymmetric keys have no payload, so linking an asymmetric key to the
+restricted keyring causes a NULL pointer dereference.
 
-Can we make the QCE into an MFD driver with the core binding to the DT node
-and handling the interconnect bandwidth, while the part handling crypto
-algorithms becomes its cell and is moved into a separate module? This one can
-be disabled in defconfig by default and I don't even mind it being guarded with
-CONFIG_EXPERT. The core module would remain in arm64 defconfig.
+A process can retain a negative asymmetric key after a request_key() upcall
+fails and use its serial to restrict a keyring it owns.  Linking a valid
+X.509 key to that keyring then triggers the fault without special
+privileges.  On systems configured to panic on oops, this is a local denial
+of service.
 
-With that: any future extensions providing support for more functionalities of
-this IP can simply be implemented as more MFD cells while we can also keep
-chipping away at the existing code and use it for testing the BAM pipe locking.
+KASAN reports:
 
-> Also, if Qualcomm has customers who use the QCE via the crypto API,
-> is Qualcomm aware of _why_ they made that choice?  From Eric's and
-> my perspective, that seems like a very strange decision, unless there
-> are factors that Eric and I are not aware of.
->
+  KASAN: null-ptr-deref in range [0x0000000000000010-0x0000000000000017]
+  RIP: 0010:key_or_keyring_common+0x688/0x880
+  Call Trace:
+   key_link+0x1e1/0x300
+   keyctl_keyring_link+0x6e/0xc0
+   __do_sys_keyctl+0x299/0x530
 
-SM8650 with the QCE is FIPS 140-2 certified and apparently this makes
-a difference. Don't ask me if that makes sense, I don't claim to understand
-the legal aspects of it.
+Reject keys that have not been positively instantiated before installing
+the restriction.  The explicit NULL trust key used by
+key_or_keyring:0:chain remains unaffected.
 
-> Finally, would you be willing to have a group call to discuss this
-> at some point?  That might be a more suitable venue for this kind of
-> discussion, and could potentially lead to a conclusion faster.  Also,
-> while at least I couldn't sign any NDAs, there might be information that
-> you could discuss there that you cannot post to a public mailing list.
+Fixes: 7e3c4d22083f ("KEYS: Restrict asymmetric key linkage using a specific keychain")
+Cc: stable@vger.kernel.org
+Signed-off-by: Daehyeon Ko <4ncienth@gmail.com>
+---
+ crypto/asymmetric_keys/asymmetric_type.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Sure, I'm fine to have a call. If you think about coming to Linux Plumbers this
-year, I'll be there all week and it's a good place for such a discussion too.
+diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric_keys/asymmetric_type.c
+index 16a7ae16593c9e..ce78dbc8b8c1cc 100644
+--- a/crypto/asymmetric_keys/asymmetric_type.c
++++ b/crypto/asymmetric_keys/asymmetric_type.c
+@@ -553,6 +553,11 @@ static struct key_restriction *asymmetric_lookup_restriction(
+ 				ret = ERR_CAST(key);
+ 				goto out;
+ 			}
++			if (!key_is_positive(key)) {
++				key_put(key);
++				ret = ERR_PTR(-ENOKEY);
++				goto out;
++			}
+ 		}
+ 
+ 		ret = asymmetric_restriction_alloc(link_fn, key);
 
-FYI I've only been online for a couple days this week and I'm going offline
-again until the end of August with the exception of August 26th when I'll be
-able to chime in again. Any call would too have to happen in September at the
-earliest.
+base-commit: 3d6d817622b0a9721e3cc404df3469171582be13
+-- 
+2.54.0
 
-Thanks,
-Bartosz
