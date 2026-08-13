@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F2E52ED141;
-	Thu, 13 Aug 2026 02:20:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D5B433438F;
+	Thu, 13 Aug 2026 02:20:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786587620; cv=none; b=UUvWV/DKCepxyY9tagVfBa0mXkQf+MsbwtqpRN/mzGfbieVdBONWeo5aDo5rkbzpixJ/bt6bXCqqHfzj9mxyGcazEhGrZqVUGG3y20OixsHDrDrXR56cLX8yq0zwMbrHYj1a1ghMSKMS9wQ9rKFvYprzloenyqSCBWxUTIG3+xg=
+	t=1786587621; cv=none; b=RsM1S9/pApJHHEbkBo+6wQQVxQIa8k5tgWZ+DCUXIowI3uWHOqQ05O3YKl6mHhnfT2m1nreoxXhvBdJfik2nEHTEkLgYElJxbqCJYO6Y8qjGYoRXhsvpAGAxYTwAS/jgmuUE1ituyPSWRFTOdiDuzB9hFZjlyudlUAjYz9rb4bM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786587620; c=relaxed/simple;
-	bh=7Z5v95LGHs2mjLET21NVji2yunu/nW8nT1iilSCIx10=;
+	s=arc-20240116; t=1786587621; c=relaxed/simple;
+	bh=e0/5EyKvRR38AkedRTxpFtVqo23cOjcvx5sQexInGDU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=abnsaRQqRJDUJ79LKnQpHLN4s3hy5rCveMVu6Sku1dDcvUNkRNu+s5/Kw77aJOIiji1hVPvCrtnQhUFTu2DFbaxIIXYfokrbiwBay2ZiJYK+J4Blzm/fFfIJzmiyOme/szgsEGwt/3Xbox9zWAoQ/twTpnim45bEYqpIT5tiAVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=axPBaESm; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=IpHUW9BbrKDqZpjg6AAfH1ZVxU5F9MqBYXs0xVBnstftspVHx33hwlk8gSdKkmYkQj7M58NeypCgz5LzfNCqva2gyMquxJEgUwKs8dJMvChuMFoh4Y3wjwdN5c13dIn7AnDX8FT/zgUuXQ2T5hNW92IbrJbpMBrLtR3I69Wiy8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SblhIKAv; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="axPBaESm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E9AE1F00A3D;
-	Thu, 13 Aug 2026 02:20:19 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SblhIKAv"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10BDE1F00ACA;
+	Thu, 13 Aug 2026 02:20:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786587619;
-	bh=WCMvK5ohQOFymbdY0OzMDpa7FyF9XhAAUoMQkc808Wk=;
+	s=k20260515; t=1786587620;
+	bh=DdqWq0+mPRqIC9aeO4PAgts2wuJAHghXz/rr2+6DDJI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=axPBaESmVMptnpIxS/8qhUzNmdTdK4y6Ur/oNMoWkpl1HCNLKwK7jaPE/ad4k6RX9
-	 q/wrtaXEQAtYb0LAFhmlEvYEAtgz2hKHj17zXEYcuO7fxQ112BO3t+q6pkEHLKZ6Ef
-	 Oq9bZqeMgLm6A+nueM1H2MxChVPAHtCw3zXPa6sqJWuqzp2eeK9vUFz77nppsqAO6K
-	 nglfjCLmW5ajm03ybT5gasGo91QRlcyyISv4H74M7SOhHwqyB44xN4A3KdtmH9At6j
-	 bVwwFsvuslG0Im+JWXrN00i+v9Q1bKGL4o/MeaGJYdr0f0EIAzO6YZRmQ2oEutG671
-	 sWzGRiXbXW3Lg==
+	b=SblhIKAvDPFbxThcSToULUlkkW9tgmhISwNyPnS1saeizVRyKp2WK7nQZXcr2gAMC
+	 UnvJmir5nvhGBAxmTHqUmwu3SPBg5q0hfVzuKkDKJjLtijoC9kF/4Z2q6WHtuCxnFL
+	 kuunPXqJUa/vuruTt/oZUpnzS9WUP4yKR7L9yRzdFZBxSQf+7MwlQMmgEXdHiEXEd9
+	 908xob1KJ27beVI4yjTO3fh6G3WvJv969m3UovxCG1Wtq0hXPIDO3RXZUHgzh5E5K2
+	 zu2WCDsN7A5l42OVntbgho467McZ3gwlss1IkpZi9yeNpDE1lIWgddsVhec6tA4Zsw
+	 LcR3Ax2Dq3hzg==
 From: Eric Biggers <ebiggers@kernel.org>
 To: x86@kernel.org
 Cc: linux-um@lists.infradead.org,
@@ -35,9 +35,9 @@ Cc: linux-um@lists.infradead.org,
 	Christoph Hellwig <hch@lst.de>,
 	Andrew Morton <akpm@linux-foundation.org>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v3 2/8] um: Check for missing AVX and AVX-512 xstate bits
-Date: Wed, 12 Aug 2026 19:15:00 -0700
-Message-ID: <20260813021506.55129-3-ebiggers@kernel.org>
+Subject: [PATCH v3 4/8] lib/crypto: x86: Stop using cpu_has_xfeatures()
+Date: Wed, 12 Aug 2026 19:15:02 -0700
+Message-ID: <20260813021506.55129-5-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260813021506.55129-1-ebiggers@kernel.org>
 References: <20260813021506.55129-1-ebiggers@kernel.org>
@@ -49,118 +49,149 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If the CPU declares AVX or AVX-512 support, verify that all the
-corresponding bits are set in the XCR0 register.  If any are missing,
-warn and don't set the corresponding X86_FEATURE_* flags.
+Checking both boot_cpu_has() and cpu_has_xfeatures() has never really
+been needed in practice, and it's never been universally done (e.g.,
+lib/raid/ omits cpu_has_xfeatures()).  Nevertheless, both x86 and UML
+now explicitly clear the AVX and AVX-512 flags if their xfeatures are
+missing, which should remove any remaining doubts.
 
-This eliminates the perceived need for UML-supporting AVX and AVX-512
-optimized code in the kernel (that is, lib/raid/ currently) to start
-checking the XCR0 bits in addition to X86_FEATURE_AVX*.
-
-This aligns UML with the vast majority of userspace programs, which
-check the XCR0 bits before considering AVX and AVX-512 to be supported,
-as per the procedure documented in Intel's CPU manual.
+Thus, remove all the calls to cpu_has_xfeatures().
 
 Acked-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- arch/um/kernel/um_arch.c | 78 +++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 77 insertions(+), 1 deletion(-)
+ lib/crypto/x86/blake2s.h  | 4 +---
+ lib/crypto/x86/chacha.h   | 3 +--
+ lib/crypto/x86/nh.h       | 4 +---
+ lib/crypto/x86/poly1305.h | 7 ++-----
+ lib/crypto/x86/sha1.h     | 4 +---
+ lib/crypto/x86/sha256.h   | 4 +---
+ lib/crypto/x86/sha512.h   | 3 +--
+ lib/crypto/x86/sm3.h      | 3 +--
+ 8 files changed, 9 insertions(+), 23 deletions(-)
 
-diff --git a/arch/um/kernel/um_arch.c b/arch/um/kernel/um_arch.c
-index 2141f5f1f5a2..aafbaef2ae82 100644
---- a/arch/um/kernel/um_arch.c
-+++ b/arch/um/kernel/um_arch.c
-@@ -264,12 +264,88 @@ unsigned long brk_start;
+diff --git a/lib/crypto/x86/blake2s.h b/lib/crypto/x86/blake2s.h
+index f8eed6cb042e..0f7c51f055c8 100644
+--- a/lib/crypto/x86/blake2s.h
++++ b/lib/crypto/x86/blake2s.h
+@@ -55,8 +55,6 @@ static void blake2s_mod_init_arch(void)
+ 	if (boot_cpu_has(X86_FEATURE_AVX) &&
+ 	    boot_cpu_has(X86_FEATURE_AVX2) &&
+ 	    boot_cpu_has(X86_FEATURE_AVX512F) &&
+-	    boot_cpu_has(X86_FEATURE_AVX512VL) &&
+-	    cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM |
+-			      XFEATURE_MASK_AVX512, NULL))
++	    boot_cpu_has(X86_FEATURE_AVX512VL))
+ 		static_branch_enable(&blake2s_use_avx512);
+ }
+diff --git a/lib/crypto/x86/chacha.h b/lib/crypto/x86/chacha.h
+index 10cf8f1c569d..c79562aac56b 100644
+--- a/lib/crypto/x86/chacha.h
++++ b/lib/crypto/x86/chacha.h
+@@ -165,8 +165,7 @@ static void chacha_mod_init_arch(void)
+ 	static_branch_enable(&chacha_use_simd);
  
- #define MIN_VMALLOC (32 * 1024 * 1024)
+ 	if (boot_cpu_has(X86_FEATURE_AVX) &&
+-	    boot_cpu_has(X86_FEATURE_AVX2) &&
+-	    cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL)) {
++	    boot_cpu_has(X86_FEATURE_AVX2)) {
+ 		static_branch_enable(&chacha_use_avx2);
  
-+static u64 __init read_xcr0(void)
-+{
-+	u32 a, b, c, d;
-+
-+	asm volatile("cpuid"
-+		     : "=a"(a), "=b"(b), "=c"(c), "=d"(d)
-+		     : "a"(0), "c"(0));
-+	if (a >= 1) { /* max_leaf >= 1 */
-+		asm volatile("cpuid"
-+			     : "=a"(a), "=b"(b), "=c"(c), "=d"(d)
-+			     : "a"(1), "c"(0));
-+		if (c & (1 << 27)) { /* XSAVE enabled by OS */
-+			asm volatile("xgetbv" : "=d"(d), "=a"(a) : "c"(0));
-+			return ((u64)d << 32) | a;
-+		}
-+	}
-+	return 0;
-+}
-+
-+static void __init validate_and_set_cpu_cap(int cap, u64 xcr0)
-+{
-+	/*
-+	 * Check for missing xstate features right away, so that there's no
-+	 * perceived need for all optimized code in the kernel to do so.
-+	 */
-+	switch (cap) {
-+	case X86_FEATURE_AVX:
-+	case X86_FEATURE_AVX2:
-+	case X86_FEATURE_AVX_VNNI:
-+	case X86_FEATURE_FMA:
-+	case X86_FEATURE_VAES:
-+	case X86_FEATURE_VPCLMULQDQ:
-+		if ((xcr0 & 0x7) != 0x7) {
-+			static bool warned;
-+
-+			if (!warned) {
-+				os_warn("Disabling AVX support due to missing xstate features\n");
-+				warned = true;
-+			}
-+			return;
-+		}
-+		break;
-+	case X86_FEATURE_AVX512F:
-+	case X86_FEATURE_AVX512BW:
-+	case X86_FEATURE_AVX512CD:
-+	case X86_FEATURE_AVX512DQ:
-+	case X86_FEATURE_AVX512ER:
-+	case X86_FEATURE_AVX512IFMA:
-+	case X86_FEATURE_AVX512PF:
-+	case X86_FEATURE_AVX512VBMI:
-+	case X86_FEATURE_AVX512VL:
-+	case X86_FEATURE_AVX512_4FMAPS:
-+	case X86_FEATURE_AVX512_4VNNIW:
-+	case X86_FEATURE_AVX512_BF16:
-+	case X86_FEATURE_AVX512_BITALG:
-+	case X86_FEATURE_AVX512_FP16:
-+	case X86_FEATURE_AVX512_VBMI2:
-+	case X86_FEATURE_AVX512_VNNI:
-+	case X86_FEATURE_AVX512_VP2INTERSECT:
-+	case X86_FEATURE_AVX512_VPOPCNTDQ:
-+		if ((xcr0 & 0xe7) != 0xe7) {
-+			static bool warned;
-+
-+			if (!warned) {
-+				os_warn("Disabling AVX-512 support due to missing xstate features\n");
-+				warned = true;
-+			}
-+			return;
-+		}
-+		break;
-+	}
-+	set_cpu_cap(&boot_cpu_data, cap);
-+}
-+
- static void __init parse_host_cpu_flags(char *line)
+ 		if (boot_cpu_has(X86_FEATURE_AVX512VL) &&
+diff --git a/lib/crypto/x86/nh.h b/lib/crypto/x86/nh.h
+index 83361c2e9783..342636dcb750 100644
+--- a/lib/crypto/x86/nh.h
++++ b/lib/crypto/x86/nh.h
+@@ -37,9 +37,7 @@ static void nh_mod_init_arch(void)
  {
-+	u64 xcr0 = read_xcr0();
- 	int i;
-+
- 	for (i = 0; i < 32*NCAPINTS; i++) {
- 		if ((x86_cap_flags[i] != NULL) && strstr(line, x86_cap_flags[i]))
--			set_cpu_cap(&boot_cpu_data, i);
-+			validate_and_set_cpu_cap(i, xcr0);
+ 	if (boot_cpu_has(X86_FEATURE_XMM2)) {
+ 		static_branch_enable(&have_sse2);
+-		if (boot_cpu_has(X86_FEATURE_AVX2) &&
+-		    cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
+-				      NULL))
++		if (boot_cpu_has(X86_FEATURE_AVX2))
+ 			static_branch_enable(&have_avx2);
  	}
  }
- 
+diff --git a/lib/crypto/x86/poly1305.h b/lib/crypto/x86/poly1305.h
+index ee92e3740a78..b061b9926fa5 100644
+--- a/lib/crypto/x86/poly1305.h
++++ b/lib/crypto/x86/poly1305.h
+@@ -143,15 +143,12 @@ static void poly1305_emit(const struct poly1305_state *ctx,
+ #define poly1305_mod_init_arch poly1305_mod_init_arch
+ static void poly1305_mod_init_arch(void)
+ {
+-	if (boot_cpu_has(X86_FEATURE_AVX) &&
+-	    cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL))
++	if (boot_cpu_has(X86_FEATURE_AVX))
+ 		static_branch_enable(&poly1305_use_avx);
+-	if (boot_cpu_has(X86_FEATURE_AVX) && boot_cpu_has(X86_FEATURE_AVX2) &&
+-	    cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL))
++	if (boot_cpu_has(X86_FEATURE_AVX) && boot_cpu_has(X86_FEATURE_AVX2))
+ 		static_branch_enable(&poly1305_use_avx2);
+ 	if (boot_cpu_has(X86_FEATURE_AVX) && boot_cpu_has(X86_FEATURE_AVX2) &&
+ 	    boot_cpu_has(X86_FEATURE_AVX512F) &&
+-	    cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM | XFEATURE_MASK_AVX512, NULL) &&
+ 	    /* Skylake downclocks unacceptably much when using zmm, but later generations are fast. */
+ 	    boot_cpu_data.x86_vfm != INTEL_SKYLAKE_X)
+ 		static_branch_enable(&poly1305_use_avx512);
+diff --git a/lib/crypto/x86/sha1.h b/lib/crypto/x86/sha1.h
+index c48a0131fd12..6aff433466e7 100644
+--- a/lib/crypto/x86/sha1.h
++++ b/lib/crypto/x86/sha1.h
+@@ -59,9 +59,7 @@ static void sha1_mod_init_arch(void)
+ {
+ 	if (boot_cpu_has(X86_FEATURE_SHA_NI)) {
+ 		static_call_update(sha1_blocks_x86, sha1_blocks_ni);
+-	} else if (cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
+-				     NULL) &&
+-		   boot_cpu_has(X86_FEATURE_AVX)) {
++	} else if (boot_cpu_has(X86_FEATURE_AVX)) {
+ 		if (boot_cpu_has(X86_FEATURE_AVX2) &&
+ 		    boot_cpu_has(X86_FEATURE_BMI1) &&
+ 		    boot_cpu_has(X86_FEATURE_BMI2))
+diff --git a/lib/crypto/x86/sha256.h b/lib/crypto/x86/sha256.h
+index 0ee69d8e39fe..e98ffdaf4b14 100644
+--- a/lib/crypto/x86/sha256.h
++++ b/lib/crypto/x86/sha256.h
+@@ -104,9 +104,7 @@ static void sha256_mod_init_arch(void)
+ 		   boot_cpu_has(X86_FEATURE_PHE_EN) &&
+ 		   boot_cpu_data.x86 >= 0x07) {
+ 		static_call_update(sha256_blocks_x86, sha256_blocks_phe);
+-	} else if (cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM,
+-				     NULL) &&
+-		   boot_cpu_has(X86_FEATURE_AVX)) {
++	} else if (boot_cpu_has(X86_FEATURE_AVX)) {
+ 		if (boot_cpu_has(X86_FEATURE_AVX2) &&
+ 		    boot_cpu_has(X86_FEATURE_BMI2))
+ 			static_call_update(sha256_blocks_x86,
+diff --git a/lib/crypto/x86/sha512.h b/lib/crypto/x86/sha512.h
+index 0213c70cedd0..4e177b4606bd 100644
+--- a/lib/crypto/x86/sha512.h
++++ b/lib/crypto/x86/sha512.h
+@@ -37,8 +37,7 @@ static void sha512_blocks(struct sha512_block_state *state,
+ #define sha512_mod_init_arch sha512_mod_init_arch
+ static void sha512_mod_init_arch(void)
+ {
+-	if (cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL) &&
+-	    boot_cpu_has(X86_FEATURE_AVX)) {
++	if (boot_cpu_has(X86_FEATURE_AVX)) {
+ 		if (boot_cpu_has(X86_FEATURE_AVX2) &&
+ 		    boot_cpu_has(X86_FEATURE_BMI2))
+ 			static_call_update(sha512_blocks_x86,
+diff --git a/lib/crypto/x86/sm3.h b/lib/crypto/x86/sm3.h
+index 3834780f2f6a..e06d4a22e4fa 100644
+--- a/lib/crypto/x86/sm3.h
++++ b/lib/crypto/x86/sm3.h
+@@ -33,7 +33,6 @@ static void sm3_blocks(struct sm3_block_state *state,
+ #define sm3_mod_init_arch sm3_mod_init_arch
+ static void sm3_mod_init_arch(void)
+ {
+-	if (boot_cpu_has(X86_FEATURE_AVX) && boot_cpu_has(X86_FEATURE_BMI2) &&
+-	    cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL))
++	if (boot_cpu_has(X86_FEATURE_AVX) && boot_cpu_has(X86_FEATURE_BMI2))
+ 		static_call_update(sm3_blocks_x86, sm3_blocks_avx);
+ }
 -- 
 2.55.0
 
