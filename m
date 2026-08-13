@@ -1,174 +1,379 @@
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 832CF36B921
-	for <linux-crypto@vger.kernel.org>; Thu, 13 Aug 2026 18:26:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38F5E356A0D
+	for <linux-crypto@vger.kernel.org>; Thu, 13 Aug 2026 19:09:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786645592; cv=none; b=JeVDK1arhTwiKpsr1WD2Zc3Wloz35GdYdpP8/B6o1ZDcseo1E41r92zJX8ezm+XqT4yTmFgr2OgZn36OxpTCvGZ2X3C35qPv8rGaKQkxofD/KgN0wdOWf5DrO8OkeyqO9WZq+pTzamh7VOPvUryjNZDCMW+xlun5XWTH8igo7bo=
+	t=1786648196; cv=none; b=OhBTar1DZiPOih2FTfoGYs5Osn5RYqW++Y6aWAS62YthRrMqG77bm0pIsFiTCtPKQFQqBWWzqb5VQjJB7En0LpEHTFMQvWrxtZL8kQYZN3Rqudng8JehG9G0J7Wm1vcupC9Fj/3oZcbHyxn06g8v7tpp8tL0CpxTkUvIbnnwED4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786645592; c=relaxed/simple;
-	bh=qNr87o6e0Bb7wX22ASvFdidNIJuY9lsUYCsNJOlzTH4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=helS5k8gg1nfn3nXD/F33WOcF/iufgYd3ZqTal/svCrxobLhoDQjEDV8fDEZwstQw5FCFLhvZroc1PRTzbynYERr18A6AA+lw2vC+dSF3baZ0vphkcCDlN1wSuc+NwWBC62Rza820wIVJAvL2iOY7m6JbhYM2l7ybVWBdkRgpHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=ddd1oDHf; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+	s=arc-20240116; t=1786648196; c=relaxed/simple;
+	bh=J4JFqcLdedRU7+R6sdj8/jYF9LI6Fz5ZYLh2J12HKzw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ghr7UHdKXADcotl6hfl0YqSjUo1Urk4LohjA/hbG3N9RJWOlYC5Vn+YLQv8A8BQm1QEEyLKWknbtsblU428Z4Jf/76IQmtO4ovrElU9+yaZb+0zlh6ZptHJV+ck7TMtUapWE9EiGGEEAn41QI/nYeqbe4l3sSBupqxUNRfb0q4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZeogDSZV; arc=none smtp.client-ip=74.125.224.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="ddd1oDHf"
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id A4BBD3FBF7
-	for <linux-crypto@vger.kernel.org>; Thu, 13 Aug 2026 18:26:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1786645587;
-	bh=qCW1V67Ahu0HN7EbgMsfgf+m2evOSojVUf49w/6VGa0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
-	b=ddd1oDHfGwcOo5EHu8r1kSY5fl1nBvaT6vZL+fSNJo1Pw6cz5qMXrxQZJpkWl+wDu
-	 /WqwjNFipMGVghfYQ381WkojYeY9pOBWTGybUZqxahDnjmLTHRjTcMXh1DIRbgkzDu
-	 FWzlV4JX3ZLzFdrfn7WEIN7jBsDg9T8DoZ5NVfMmzi7tUUf/KNLe9FIN1+daxumwe5
-	 Dsj957jMuO0CHsL7FqQNZ9WcFmG7tTDjVNvmVjk9JPg0wcO8vsB5LwH9ho/1JESI9H
-	 +B2gnzx0bKkvG+INlBwA+8r/RCSDVGw3fMwJ/5G3uD3U07axp7BSK4GS8elm5oekf8
-	 lPcJ9ci+QB/DfsUVzxQsY3hvqd5581kZhy5EGPA+Mi6KgNO2JgimpMVR7MQKkBTfIw
-	 M/4Cxs8errL7OB2zisObeXDJ8UYR++oCnEeQahB/rEmqfTT7XXEECYNmbrEfDZf5Ul
-	 S6ASArJkNk7DBvvPhy3iTgCiRawlEptyx8avPRKH6QJIB9rpZGtuDVzaFuHm+9uKEj
-	 8Vx8EKV5DI6LGFtWNbQNP+FK4l7B8h3cuf3n0DG8jCxdGTXMUDdSYzwPaQaRXceK4H
-	 p+i6KvDA+tYLS/uL9pHLacfbD7L29IGXvh2ItERiMg4yHikZHzkFryEjW6qK9j2rs+
-	 c6SoeMujcZlURBwapQx3UFCc=
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-48000d75326so74735f8f.2
-        for <linux-crypto@vger.kernel.org>; Thu, 13 Aug 2026 11:26:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZeogDSZV"
+Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-66c711b7f2aso346778d50.3
+        for <linux-crypto@vger.kernel.org>; Thu, 13 Aug 2026 12:09:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786648194; x=1787252994; darn=vger.kernel.org;
+        h=content-type:in-reply-to:autocrypt:from:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=CH8QJWbiTZSTmOX6SA35bZzI1sSsujgIbdHxX53JqF8=;
+        b=ZeogDSZVs0aJxPAUxTFai42uL6gBJfQOcrZXFfcfyWv++9TXfaev8hCE2NRNj+zE/l
+         C7dMeGOF7fKzRwPTYdzZ5Wo+xiDgNpA9Myl7R0OuVLd7b4le5+FPYQEaelLyQOyMmXZ6
+         mvhuePurCdvcoxQweF5VDYAfpT+L+u2RDJ9DNvt+fkw6w0LlnvQlHOfVgqUBWtdHzxtD
+         RQpB1ILQmqdD4Gdu84kX9YBIrR5XQAIgddZjD96n0UmbC7CvCGyjg67J0DxX16b9xudH
+         DTIhe8FP+oq9PDbbsv2/Ns5BTIl/3ENHpoLNaJ6dfQwRot9rPf0uZzEXU0YzA4FROjY5
+         7nLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786645587; x=1787250387;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=qCW1V67Ahu0HN7EbgMsfgf+m2evOSojVUf49w/6VGa0=;
-        b=NdHxSeldDh2l0aCo5wHbPqXbTsXLeF5fAse3t1wQfgIElRmSj1Yv0VNuX1ze3aZBGI
-         Be+iP50STSxa1xvRwr8C/J5YyymhaF+VB6gx6qD0I7rbVnIPsiMBqUVhdSSrhwh7NZWW
-         uzXv0UI6I0hnHuIokcbfDf+xbYSMOhQwpER/I8B8pHjFo+F2XBkKbTehR9rqa0fxLjt5
-         sybb5gOkMyUJCfhpdV0Xg+a85lFGSX9k3xizU5oq2zxpoYnZTmAhXadusAYB2Wg+Jrbg
-         Qcq5BUx+L1Oc23Cz9ZN0VrLeS6rwQfzrYVKOdR2GjyQf2SFWphh0WSy8RxKBxN73VKj6
-         01FA==
-X-Forwarded-Encrypted: i=1; AHgh+RrQer9VEUhPzjK+yI/ZR8rjGMi8U1xKFHMYP3iretRPSpol3ncYN61Q6/MXa0EqP5vxxvVcSaRxrjN+x4I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7yOhRgEt0yoseeMG1S+pYCyWLSOrWQRO+8XFVeB26O63C0cQU
-	5sz8G5+RXMKOXJ79BzF0ZJTHKubvPDkrADrVTfgecsFFsqHUUwt40xxwJNQYnqVDP+LPVmMkCBS
-	p845iaC5DQIv1NDFaKpzDzD/8/zus6cqcVamFcoW/H2JpsJ4LEJ5MJm9iWT+cc5qvI2vChVinxu
-	OovVSJvQ==
-X-Gm-Gg: AR+sD131+bDx4R26iobr1O35wFwXTUKe5Chv0d8E632PGLqIIGqztgvxHLUtq1vIUbb
-	KlAqXnhzJ7HBKgdsmSo266eO6w7ApeGnBddjmQjZOiAH7MzNESnOSMsf+kSzISmfFiWQnnCZChP
-	7gqJDFKW0CJI1X3g3f5/sDwbAi4a9FuN64LeUdBvsS361pl6Cc0RDlJZOVf6yJENjIXK8Uy1n70
-	rA9kMo7FtILxtu+aLmMDn3MShSFWI06C3n/c/0bm4Ec/v0W5ydFlc4LWyatezUTNlRwB+wMsiyz
-	Rf0NkSBZp+vHPaiLfGftH9yHgtOjasnovSUApGclAXqOcdrzV5w1N5YQjaKSB0WRSOITMNxidll
-	d9Q3ec+X9dvJWHwQDFRU5ANDjcalAhgHex18/GNPZLiQ4gRIqCymMqI6MNQQe2ZO2ULwIoXzaeh
-	7KHhzhbBj/+gXDytTJ3Leu7//0
-X-Received: by 2002:a05:6000:460c:b0:47f:e886:6dff with SMTP id ffacd0b85a97d-481606f67e3mr361527f8f.4.1786645587199;
-        Thu, 13 Aug 2026 11:26:27 -0700 (PDT)
-X-Received: by 2002:a05:6000:460c:b0:47f:e886:6dff with SMTP id ffacd0b85a97d-481606f67e3mr361461f8f.4.1786645586742;
-        Thu, 13 Aug 2026 11:26:26 -0700 (PDT)
-Received: from t-14 (2a01cb00088323008940b17acf2a49f2.ipv6.abo.wanadoo.fr. [2a01:cb00:883:2300:8940:b17a:cf2a:49f2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4815f229681sm995577f8f.16.2026.08.13.11.26.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Aug 2026 11:26:26 -0700 (PDT)
-From: Fabrice Derepas <fabrice.derepas@canonical.com>
-To: David Howells <dhowells@redhat.com>,
-	Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@linux.win>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Fabrice Derepas <fabrice.derepas@canonical.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	kexec@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: asymmetric_keys - bound section data range in pefile_digest_pe_contents
-Date: Thu, 13 Aug 2026 20:25:36 +0200
-Message-ID: <20260813182546.138705-1-fabrice.derepas@canonical.com>
-X-Mailer: git-send-email 2.53.0
+        d=1e100.net; s=20251104; t=1786648194; x=1787252994;
+        h=content-type:in-reply-to:autocrypt:from:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=CH8QJWbiTZSTmOX6SA35bZzI1sSsujgIbdHxX53JqF8=;
+        b=hf/QczKZlrNn3pn7XXmpuZHTHgAJjCUBXDXd3k/cfJm/DNNslZancgSUKxLOmhU3B+
+         3eNNQAKwSdeetjY6ERKzK4eayWXKh2ZsOEaR1NR7Na0yxlDy14Y2rczFFg77u7zZqzew
+         CJwVjX3YWLSrnF8H+4m+BkI9xYZGuJ1oUtpMhhC0jx2X9/S72crDmI8aFUN6+1BfDxSE
+         SUDnuNA2LdAOG7Cg2i0zymRI5ZMOBpeLbi5pkT1XrYEIyUFRMifDt5x7z7OakLTB+Gwy
+         jzViwKhCnO2n7MgEPSpig+IwJRaKibm1OXtFqp3ewZlXZx+uGvJW4206cRWjYI8toGNa
+         3clw==
+X-Gm-Message-State: AOJu0YySMQiCN0QnFBs1Vouj2QZ0lLcCuYC6cZja2wOEBsLx60kk0ri7
+	4ZHXEtDoiP14fF97zLRnGdM3otVXhLjDKCOOWU74YJB85MLAJFKoHos5
+X-Gm-Gg: AR+sD11iACvtMVHLY5gtA47Z1NP+Rc+MyWWzwqIy/69Q+gl5AMI6fOrxbjXDUutou/C
+	3+OpQ3EQi+92QcYVP5uO0O/0xFLmKJQwR0FsnbETRff/VtWFnzfAhjoquhLws/b3kgW4jmSuEmK
+	x+vRklB2aQcl7R8iAm0JHGK7h0V+iYlWpY35ZgKgb5Bd/1Ur7Ck13cUMep03Vf65LtWGEks4Blg
+	XVeZeEUefdbyyH7//MaJroG9rrRR0f2HncMQzevEJQFoaCwFG1EobHd1wQ1GtPXV6pzxZKukgJE
+	s95ZPvNHSwS14WZuvUeo7CN/yU6ETase175hD/hS6XD4/MPYs5eRa2e9Z6slSOIvhSleYSuDKtW
+	zX6SOb2+7RHd9Hop2RciS0aMj6N9J0tAmvw0SrokJovXQ2NHqW2vL+Wu+582Q/J6+QMmDn3wi9g
+	/VBWsz/3vXud2xQRQkv+78iwUGpHrkELhV1Vj7QvnZNqU6BfhHZ6Xv5jB9zBxkK+W8ci9gc7ohK
+	A==
+X-Received: by 2002:a05:690e:d08:b0:66c:2d72:38d9 with SMTP id 956f58d0204a3-66c72b1d9e1mr353282d50.11.1786648193908;
+        Thu, 13 Aug 2026 12:09:53 -0700 (PDT)
+Received: from [10.138.10.6] ([185.98.168.14])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-836c1777930sm3475807b3.31.2026.08.13.12.09.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Aug 2026 12:09:52 -0700 (PDT)
+Message-ID: <0d2706c6-79fa-40fc-a24a-6d5ffbf02330@gmail.com>
+Date: Thu, 13 Aug 2026 15:09:36 -0400
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: qce - Replace with stub driver
+To: Bartosz Golaszewski <brgl@kernel.org>
+Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+ linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Kuldeep Singh
+ <kuldeep.singh@oss.qualcomm.com>,
+ Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+ Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Krzysztof Kozlowski <krzk@kernel.org>, Eric Biggers <ebiggers@kernel.org>
+References: <20260731050838.158825-1-ebiggers@kernel.org>
+ <a28c2903-0976-4559-b870-4de5553ba9ab@kernel.org>
+ <3ba57269-3305-4d80-b3f2-aa82fa59b59d@gmail.com>
+ <b9b655a9-c683-4c4e-ba0d-f98577dd2912@kernel.org>
+ <20260801162900.GA2021@quark>
+ <e7aeec9b-11aa-4635-bde9-fb8c7ca38260@kernel.org>
+ <20260801171242.GA3567@quark>
+ <CAMRc=McL5QQRk8C8zzkHm+FUj-SAVi5PLJr2pXo8eNpaxXuALg@mail.gmail.com>
+ <20260811224110.GC1905@sol>
+ <CAMRc=MfVqphaVsfcmUXjGmu6m+F6nJYXgAPuTVjZBwFnd48BkA@mail.gmail.com>
+ <bc95e0b0-2cc5-4ad6-a319-ae4e159b92fe@gmail.com>
+ <CAMRc=Mcno_F2UuLXZ3ruaVSbYhssVK90m3KM=+dwskLMSp8TXg@mail.gmail.com>
+Content-Language: en-US
+From: Demi Marie Obenour <demiobenour@gmail.com>
+Autocrypt: addr=demiobenour@gmail.com; keydata=
+ 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
+ +MYSfkEjBz0E8CLOcAw7JIwAaeBT
+In-Reply-To: <CAMRc=Mcno_F2UuLXZ3ruaVSbYhssVK90m3KM=+dwskLMSp8TXg@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------i894QC0fu9NisDOBnbo7myGW"
 
-pefile_digest_pe_contents() hashes each PE section with
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------i894QC0fu9NisDOBnbo7myGW
+Content-Type: multipart/mixed; boundary="------------iw28fzqMn9Gj0JhxTrO2tL3G";
+ protected-headers="v1"; hp="clear"
+Message-ID: <0d2706c6-79fa-40fc-a24a-6d5ffbf02330@gmail.com>
+Date: Thu, 13 Aug 2026 15:09:36 -0400
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: qce - Replace with stub driver
+To: Bartosz Golaszewski <brgl@kernel.org>
+Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+ linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Kuldeep Singh
+ <kuldeep.singh@oss.qualcomm.com>,
+ Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+ Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Krzysztof Kozlowski <krzk@kernel.org>, Eric Biggers <ebiggers@kernel.org>
+References: <20260731050838.158825-1-ebiggers@kernel.org>
+ <a28c2903-0976-4559-b870-4de5553ba9ab@kernel.org>
+ <3ba57269-3305-4d80-b3f2-aa82fa59b59d@gmail.com>
+ <b9b655a9-c683-4c4e-ba0d-f98577dd2912@kernel.org>
+ <20260801162900.GA2021@quark>
+ <e7aeec9b-11aa-4635-bde9-fb8c7ca38260@kernel.org>
+ <20260801171242.GA3567@quark>
+ <CAMRc=McL5QQRk8C8zzkHm+FUj-SAVi5PLJr2pXo8eNpaxXuALg@mail.gmail.com>
+ <20260811224110.GC1905@sol>
+ <CAMRc=MfVqphaVsfcmUXjGmu6m+F6nJYXgAPuTVjZBwFnd48BkA@mail.gmail.com>
+ <bc95e0b0-2cc5-4ad6-a319-ae4e159b92fe@gmail.com>
+ <CAMRc=Mcno_F2UuLXZ3ruaVSbYhssVK90m3KM=+dwskLMSp8TXg@mail.gmail.com>
+Content-Language: en-US
+From: Demi Marie Obenour <demiobenour@gmail.com>
+Autocrypt: addr=demiobenour@gmail.com; keydata=
+ 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
+ +MYSfkEjBz0E8CLOcAw7JIwAaeBT
+In-Reply-To: <CAMRc=Mcno_F2UuLXZ3ruaVSbYhssVK90m3KM=+dwskLMSp8TXg@mail.gmail.com>
 
-	crypto_shash_update(desc, pebuf + ctx->secs[i].data_addr,
-			    ctx->secs[i].raw_data_size);
+--------------iw28fzqMn9Gj0JhxTrO2tL3G
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-where both data_addr and raw_data_size come straight from the untrusted PE
-section table. pefile_parse_binary() bounds only the section table's
-location, never the sections' data ranges, and nothing else on the path
-checks them. A section with data_addr and/or raw_data_size pointing outside
-the image therefore reads past the pelen-byte buffer (CWE-125); a large
-raw_data_size makes it read far past the end and fault.
+On 8/13/26 07:53, Bartosz Golaszewski wrote:
+> On Wed, 12 Aug 2026 18:33:45 +0200, Demi Marie Obenour
+> <demiobenour@gmail.com> said:
+>> On 8/12/26 04:07, Bartosz Golaszewski wrote:
+>>> On Wed, 12 Aug 2026 00:41:10 +0200, Eric Biggers <ebiggers@kernel.org=
+> said:
+>>>> On Tue, Aug 11, 2026 at 08:42:55AM -0500, Bartosz Golaszewski wrote:=
 
-Commit f7dd32c5179d ("crypto: asymmetric_keys - fix OOB read in
-pefile_digest_pe_contents") recently fixed a sibling underflow in this same
-function (the hashed_bytes + certs_size trailer computation); the
-per-section read below was left unchecked.
+>>>>
+>>>>> No, the rationale has never been this. FWIW it can be that it's use=
+d for
+>>>>> testing of the crypto module on a supported platform and that is al=
+ready
+>>>>> enough of a reason to keep it upstream.
+>>>>>
+>>>>> As I've said before: we don't just drop maintained drivers from lin=
+ux.
+>>>>
+>>>> We definitely do if the drivers are not useful or appropriate for
+>>>> inclusion in the kernel, though the policy varies by subsystem.  Eve=
+n
+>>>> just last month an entire filesystem got dropped despite someone wan=
+ting
+>>>> to maintain it.
+>>>>
+>>>
+>>> I suppose you're talking about EFS? A thing that can't even be tested=
+ on real
+>>> hardware? This is a much more extreme case. Here you have several peo=
+ple
+>>> representing the vendor saying they want to keep and maintain it. I'm=
+ fine
+>>> having my own tree and sending PRs to Herbert if he agrees and you ar=
+e of
+>>> course entirely free to disregard any patches targetting it.
+>>
+>> Would you be okay with one of these options?
+>>
+>> 1. Make the stub driver as the default, with
+>>    the real driver guarded by an off-by-default Kconfig option.
+>>
+>> 2. Keep the driver as is (with the power management issue fixed),
+>>    but don't register any algorithm implementations with the crypto AP=
+I.
+>>
+>> 3. Only register algorithm implementations with the crypto API if a
+>>    non-default Kconfig option is selected.
+>>
+>> 4. Only register algorithm implementations with the crypto API if a
+>>    non-default module parameter is selected.
+>>
+>> 5. Move the driver out of drivers/crypto, delete the algorithm
+>>    registrations, and then add support for restricted media content
+>>    decryption later.
+>>
+>> The last option would be my preferred one.
+>>
+>=20
+> I actually have a slightly different spin on the stub driver. I'd like =
+to
+> keep the driver future-proof and avoid all kinds of needless churn when=
+ we
+> do get to the secure dma bufs and restricted media playback (and we wil=
+l get
+> there eventually :) ).
+>=20
+> Can we make the QCE into an MFD driver with the core binding to the DT =
+node
+> and handling the interconnect bandwidth, while the part handling crypto=
 
-This loop runs only after verify_pkcs7_signature() succeeds, so it requires
-a validly signed image -- but not an attacker signing key. The PKCS#7
-signature covers the SpcIndirectDataContent (a self-contained digest in the
-certificate table), not the live section bytes, so tampering data_addr in a
-publicly available signed image leaves the signature valid at that step
-while the out-of-bounds read fires when this function recomputes the
-digest. It is thus reachable by a local CAP_SYS_BOOT user via
-kexec_file_load() with a tampered signed image; the access is an
-out-of-bounds read only, but a large raw_data_size faults, which is a
-denial of service when panic_on_oops is set.
+> algorithms becomes its cell and is moved into a separate module? This o=
+ne can
+> be disabled in defconfig by default and I don't even mind it being guar=
+ded with
+> CONFIG_EXPERT. The core module would remain in arm64 defconfig.
+>=20
+> With that: any future extensions providing support for more functionali=
+ties of
+> this IP can simply be implemented as more MFD cells while we can also k=
+eep
+> chipping away at the existing code and use it for testing the BAM pipe =
+locking.
 
-Reject a section whose data range does not lie within the image before
-hashing it.
+I'm not familiar with MFD drivers, but this sounds like the best
+of both worlds.  The driver stays upstream, but anyone who doesn't
+explicitly need it can ignore it.
 
-Fixes: af316fc442ef ("pefile: Digest the PE binary and compare to the PKCS#7 data")
-Assisted-by: copilot-cli:claude-opus-4-6 frama-c
-Signed-off-by: Fabrice Derepas <fabrice.derepas@canonical.com>
----
-Note: f7dd32c5179d, which fixed the sibling underflow in this function, was
-assigned CVE-2026-64544; this closes the per-section read it did not cover.
+>> Also, if Qualcomm has customers who use the QCE via the crypto API,
+>> is Qualcomm aware of _why_ they made that choice?  From Eric's and
+>> my perspective, that seems like a very strange decision, unless there
+>> are factors that Eric and I are not aware of.
+>>
+>=20
+> SM8650 with the QCE is FIPS 140-2 certified and apparently this makes
+> a difference. Don't ask me if that makes sense, I don't claim to unders=
+tand
+> the legal aspects of it.
 
-Reproduced under KASAN (CONFIG_KASAN_GENERIC, x86-64). Two things were shown:
+That sounds like the kind of thing that would cause someone to use
+a worse implementation of cryptographic algorithms =F0=9F=99=82.
 
-  1. The defect + fix: a KUnit case calls pefile_digest_pe_contents() with a
-     crafted context whose section has data_addr = pelen. Unpatched:
-     slab-out-of-bounds read; patched: -ELIBBAD before the hash.
+For what it is worth, many common uses of kernel cryptography can't
+use the QCE.  This notably applies to the CSPRNG (/dev/urandom etc),
+storage encryption, and AF_ALG.  Therefore, I expect that anyone who
+needs FIPS 140 compliance with Linux needs to ensure that the software
+crypto is certified, as that's what actually gets used in most cases.
+>> Finally, would you be willing to have a group call to discuss this
+>> at some point?  That might be a more suitable venue for this kind of
+>> discussion, and could potentially lead to a conclusion faster.  Also,
+>> while at least I couldn't sign any NDAs, there might be information th=
+at
+>> you could discuss there that you cannot post to a public mailing list.=
 
-  2. The reachability, end-to-end against a real trusted keyring: a real EFI
-     binary was signed with a test key embedded via CONFIG_SYSTEM_TRUSTED_KEYS,
-     then its section data_addr was tampered (leaving the PKCS#7 byte-identical).
-     Results from verify_pefile_signature(): the untampered image verifies (0),
-     one signed by an untrusted key is rejected at verify_pkcs7_signature()
-     (-ENOKEY), and the tampered-but-trusted image passes that step and takes
-     the OOB read in pefile_digest_pe_contents(). So no signing key is required.
+>=20
+> Sure, I'm fine to have a call. If you think about coming to Linux Plumb=
+ers this
+> year, I'll be there all week and it's a good place for such a discussio=
+n too.
+>=20
+> FYI I've only been online for a couple days this week and I'm going off=
+line
+> again until the end of August with the exception of August 26th when I'=
+ll be
+> able to chime in again. Any call would too have to happen in September =
+at the
+> earliest.
+That's fine.
+--=20
+Sincerely,
+Demi Marie Obenour (she/her/hers)
 
-The KUnit case (item 1) is easy to package and I can submit it separately; the
-end-to-end setup (item 2) needs an embedded trusted key and signed images, so
-it is harder to ship standalone. Neither is included here.
+--------------iw28fzqMn9Gj0JhxTrO2tL3G--
 
- crypto/asymmetric_keys/verify_pefile.c | 5 +++++
- 1 file changed, 5 insertions(+)
+--------------i894QC0fu9NisDOBnbo7myGW
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
-diff --git a/crypto/asymmetric_keys/verify_pefile.c b/crypto/asymmetric_keys/verify_pefile.c
-index cec99db..4e84fcf 100644
---- a/crypto/asymmetric_keys/verify_pefile.c
-+++ b/crypto/asymmetric_keys/verify_pefile.c
-@@ -292,6 +292,11 @@ static int pefile_digest_pe_contents(const void *pebuf, unsigned int pelen,
- 		i = canon[loop];
- 		if (ctx->secs[i].raw_data_size == 0)
- 			continue;
-+		if (ctx->secs[i].data_addr > pelen ||
-+		    ctx->secs[i].raw_data_size > pelen - ctx->secs[i].data_addr) {
-+			kfree(canon);
-+			return -ELIBBAD;
-+		}
- 		ret = crypto_shash_update(desc,
- 					  pebuf + ctx->secs[i].data_addr,
- 					  ctx->secs[i].raw_data_size);
-base-commit: 3d6d817622b0a9721e3cc404df3469171582be13
--- 
-2.53.0
+-----BEGIN PGP SIGNATURE-----
 
+iQIzBAEBCgAdFiEEopQtqVJW1aeuo9/sszaHOrMp8lMFAmp+FnsACgkQszaHOrMp
+8lMIfw/+Kqprcz6oo8QmpcPVroEZnU8mBZm1kTqPFF+gxGc26IAQJGGXHb/yrvfx
+VIidixfHFA26THV6qcQsgygKHEKsJsgboUximTQZoMs3jW2PACfU43CJf+puDbsp
+WeBpYme2gDmPuWONQStHDyUPX8IoIM4H3uu8I8swnmqcFbug6UJ9GHQ2aPbkxMcO
+5SX9AxB9pSoMwPXrdEH5jhGNKxKzmZ6wLoA76JMBzny+/8QvYQPSuAFM/b2FXJO+
+KayMYCXYIodfolW7+jt9kEv5cf33qLDzfvLMiJRjnAG8/amEMTnAHjgCh3w3DqlO
+2Mh+RY6W495XGMU4zTHbZxUENPhd0FB4hs7ZeelA2sHtMjr6/Rc1uEbWFmLSJAmH
+DtX9atgq4cU311LpqAEVxCeGQl9K/Xstvk44ke9p4xDjLM8PVmkt/dBHW5YoCScF
+lCKkyVfVlE+BIIPu6LYs6HMzl10QxI1bDDol5EjUYJDwu5b0phMgrKykxAbz6/Qf
+lQJBbNb6fHX8WAPm9zZN0+GyXARuQrv3zZn3tU8R0S9w5/GvMF/kT1SX999coXmQ
+V/yjzkxwJEaiXq7xb7ulNcR0l+61LMq8daThzyyDLcc0hqMyLTAbYygRiHxNs6Hl
+xdnpw7Zn8UPo4BZ+UkLlVG74V0U4gYzsGLlNcD23vAsfnaI3RTQ=
+=Of7Y
+-----END PGP SIGNATURE-----
+
+--------------i894QC0fu9NisDOBnbo7myGW--
