@@ -1,190 +1,134 @@
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94AA2343890
-	for <linux-crypto@vger.kernel.org>; Fri, 14 Aug 2026 13:54:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D04935C683;
+	Fri, 14 Aug 2026 14:20:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786715645; cv=none; b=rTXjG4+H/LfZpPQ3uXMOZeyi5ch+hCDlRM/c1njlO2ct94Rnpn20ctLL1LWKmb5dpmp7JXPVXNXBxMOMDE8vvfCxBLvUQqU0dR6kJ0YlyskSK/XWKt8M9MalBUE8ElQOda2JhKsRnNMBnkncnQC1rrupVq4eDdlcmWme1Fv3/eI=
+	t=1786717239; cv=none; b=EW2j2DRGqjBpvKA0cZfCqst1ac1ZLr3H0ReRwcK+Us/XN1ARww0pMdHR2gX06Qt0nkPPTYaErl8arXm5PAa6iYtL1A0nW2vup3iTYjN6j2Exw3Dd53XH9tJ2k09vPn9k9ZIcTd9c79gjFmKhgfrnKDpNtlsOrdJC1oWKyDTnNqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786715645; c=relaxed/simple;
-	bh=HW4yLSvoZYZvQWXm5wsfQ6gd3IabSYpAM3gCA+OgMSQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=H9sfmUpjcu+bH76G42j1qqKoJq8KXFkJKXbT+qpmAl0TiMIWUolWB948zigWxPh84Vl0J/ElO4CWfYag63mytXXBdzKptkpMkYsB5t1lWttWuP6vzqsf4GSQ25bErWk9bFsufEgGR+9z0fWZkcMTEjKOe5Ry/8DkVJ+xmYd+VzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.win; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux.win
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-6a10b20634fso1783305a12.3
-        for <linux-crypto@vger.kernel.org>; Fri, 14 Aug 2026 06:54:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786715640; x=1787320440;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=32UXxjqR1VKYvNK68Dz7f7JjofaG/JzH3ImA8OxnCM0=;
-        b=sSrVjfdCL6m82YoLcj140EfkaXvtXHDzz+4Qp9zGUWuYd55AKSJaIK1Br0psv2qEtA
-         0EzOEVglL1bQBc/hT9mbiliVY7/2viI0hTLwjshGafkiooUtw+houbES+I0HM6ZwZ15g
-         S1cZTfLNCXQ3v4ETkwwyzgVd1v9pHeh4HizUQFRaV/6w4cPun/w/ce5zdS5rYHaFym5w
-         LrsIomd6MRhISvwLSISEaj6JxDoSHT2nLgCRIk9f4Lm27dxyXAVqpEkxtwNQe94ZIZdd
-         9aply1j6II24AbXVetuSLzZyx7EYT9i0mQTRuOz9ySuvTpSlJ7yVZC+KFKwIi1JKogux
-         pN6Q==
-X-Forwarded-Encrypted: i=1; AHgh+RolOMSZu/JSOfu4FiyKsQSfiPQ4aky329P8TcYnxEBRAdKlnEIMJGu3BEGMZ/BlIXX40WS+us+i3gOBsd4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNNOaX2lSUdkaCB9M6feYIRzmrj1VmHReFvS0NFuoZmcXrmmU/
-	GdaCkHITuhLG6jU4r67s7tb05+fNBdgBEEDDEEfFUnBPh9LBfH+xQjqI1xfVbT1rmkM=
-X-Gm-Gg: AR+sD10N7wkmjcwT0KMVPz3zwTBtNopxOdlHYATJ/nQLFPQ9LcBZ/TS2DU91NpguVS7
-	c/Z+Z6T68LnsIx8KjGAq/gGdK/sx2VhR5HOgGDP9T4tfubXF2VDmYz48G9moOExKmRoLSrie5Vt
-	isLg67xITKGQndU7YQjp+03TuVGvCrfyx2ZJ84oAowHVQEteFfU7yHLasRZKnuSkKGTRNJjCkCr
-	QTuD/MsPxRjAMAKYKLxSMzJqfc2IJECMOdynO9LYCwDjJMfs5q1yDvX3APyLkjoMgqXyv7H7IOX
-	kF5y4i5v821xr379JTDl/Asidnl3mAgz/YI/Zs/DNqpl9xej+Tsnz3lnVI1mHDnpquVNaNe77ER
-	oY7HxyDmNo8y3bzbFZvaqZ9XMf4ZJl63BvuS0hJVYUSB3CTC20DcPdzir5YE0xdGTmsupawDG3Y
-	0J+doENchoF2lX4+kn31bpPMc8iaITA3Mtbebkzvp+3EA49BALzCkD5Bq/JNVFsycQ41yay2uzE
-	yKp0xtoNEs7KjW+XTngoxCVdQXMeg==
-X-Received: by 2002:a17:907:a01:b0:c12:713b:e199 with SMTP id a640c23a62f3a-c212a208e57mr260909466b.25.1786715640428;
-        Fri, 14 Aug 2026 06:54:00 -0700 (PDT)
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com. [209.85.218.46])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c2123839c22sm100301166b.55.2026.08.14.06.53.59
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Aug 2026 06:53:59 -0700 (PDT)
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-c15ba3a2b4bso131207666b.1
-        for <linux-crypto@vger.kernel.org>; Fri, 14 Aug 2026 06:53:59 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AHgh+RrA6HtgtgbK3N1rr+lFkjFSn5GyCzqZDzTLWkCg31owXrP1+Q4Kh8IErmqv3J1L8AdpekuI/Yy5Zf4TLeo=@vger.kernel.org
-X-Received: by 2002:a17:906:730f:b0:c12:aaec:342a with SMTP id
- a640c23a62f3a-c212a113efdmr280357366b.16.1786715639417; Fri, 14 Aug 2026
- 06:53:59 -0700 (PDT)
+	s=arc-20240116; t=1786717239; c=relaxed/simple;
+	bh=9TaXT0TGFb4E48im/77qDXEc7Egz0lt6eTH60qW+RYY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=mHSwSU0O46tI1gGPpIBpjtV8HtfnxP4fC+9H5xlJ515ba1QpGXmxNGNh4wb81XdJnYqwR+BPU9eorgjEzOPXE1tWbW1k/K+gmjmKEYgz5OMUSwxKSFlKmttZ0GwdayaFz7TI4hB9n7hWGYKHoum5qD1FGJB80IaFqdGtYQSea4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=msn7grBA; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="msn7grBA"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67EE5jOL1370431;
+	Fri, 14 Aug 2026 14:20:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=pp1; bh=SIZ2QJMuuroOTH9O+
+	zJYJyVm1b+8IY+AoHh4qontoOU=; b=msn7grBAm8dLcmYCAp1Rb7xJbKI/NXnDW
+	0DTr6his+e7BdbQ+5BMrkGYCAQbxGSLbk5TUqOykcV5J0TQoFH7bFZbI3INbMhhE
+	Hwzo9/fksTh5eOtbqkQXjueXwKv+pa4iky7sJKCK7NkDavTMk6oYu8LEC1JG/+Qe
+	oXHGIZR8/Gt6D53vrGZuDCbmEYnWX+FFY7FW4Tdjp6LjmrjcR7grtNhQXW3VofDW
+	S/HpZBb4Zu1IGKv+qvFmsmDlDxIPwYlx4pED/aOsYCQmrHLH01V1u1FtdWaadR8V
+	blAXrJwiqm8i+XCh0A9wpa85n8clHF4vB/CIjs5TOLL0ZSU0ujbJw==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fwvnwm01p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 14 Aug 2026 14:20:16 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 67EDuO9Z012860;
+	Fri, 14 Aug 2026 14:20:15 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4fxh0gqfgs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 14 Aug 2026 14:20:15 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67EEKCFs40436070
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 14 Aug 2026 14:20:12 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 120822004F;
+	Fri, 14 Aug 2026 14:20:12 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9B1022005A;
+	Fri, 14 Aug 2026 14:20:11 +0000 (GMT)
+Received: from ibm.com (unknown [9.111.74.75])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 14 Aug 2026 14:20:11 +0000 (GMT)
+From: Holger Dengler <dengler@linux.ibm.com>
+To: Harald Freudenberger <freude@linux.ibm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc: dengler@linux.ibm.com, linux-s390@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
+        ifranzki@linux.ibm.com
+Subject: [PATCH v1 1/1] s390/crypto: Generate intermediate CV for API partial block handling
+Date: Fri, 14 Aug 2026 16:20:10 +0200
+Message-ID: <20260814142010.259918-2-dengler@linux.ibm.com>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260814142010.259918-1-dengler@linux.ibm.com>
+References: <20260814142010.259918-1-dengler@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260813182546.138705-1-fabrice.derepas@canonical.com>
-In-Reply-To: <20260813182546.138705-1-fabrice.derepas@canonical.com>
-From: Ignat Korchagin <ignat@linux.win>
-Date: Fri, 14 Aug 2026 14:53:48 +0100
-X-Gmail-Original-Message-ID: <CAOs+rJXZ++7_o4L6LuT567FjdYsa=6NEki3qcFSRX+ehJxpoVg@mail.gmail.com>
-X-Gm-Features: AUfX_mwuLx2aJR43wVpuS27IhjyS7MfpE6qQTDN1bU1nAQBlqaS068ZzBhfmWrg
-Message-ID: <CAOs+rJXZ++7_o4L6LuT567FjdYsa=6NEki3qcFSRX+ehJxpoVg@mail.gmail.com>
-Subject: Re: [PATCH] crypto: asymmetric_keys - bound section data range in pefile_digest_pe_contents
-To: Fabrice Derepas <fabrice.derepas@canonical.com>
-Cc: David Howells <dhowells@redhat.com>, Lukas Wunner <lukas@wunner.de>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	kexec@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=RsP16imK c=1 sm=1 tr=0 ts=6a7f2420 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
+ a=RzCfie-kr_QcCd8fBx8p:22 a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8
+ a=EzrveUIq3cTPK2vlegIA:9
+X-Proofpoint-GUID: PBfmAq86EmmKmOmYO82l4occ9fWQYBvs
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODE0MDEwNyBTYWx0ZWRfX83GlV5+YvjPT
+ kij7Yh/f11dI7kmUQ/eBwyPxw4e4Cp3KFXJFCxOr4PiJfSutpwjRRHhC1sV8mW0wA9xJlRBcHQW
+ yOb16cXaOFRF3ULeCMt9eL9hAaLmohZV0qnjEg4+jbb8serK6hKgt6uhkUidz3QNsD6qFxxDZCq
+ APLIX9tzGtjs8TOUBIGKFrFCX3BVYlSjNNBLLoKw+cQXrGp+e2/icPcorLkIIVp7KfqrkT2+vI7
+ 3E/XciRpaRZgZkJ7BkS7cWRmkb2+CWOOyahaGoXuS8F7Zdwy3hnVbeMwU6LhyoQsEXnl9YH0EpU
+ cfJ0Yrzl3XVCCB+pbnOUzV9EmdU4tIveC+lzE7G1LQ5TltujSQlIHT5BFQir96kRPdPojlvV1rs
+ cYsxEd7cqMmSZR5vkFg4K6n0zPENNaYtqy2EJiNXh3o1Ay94LTcgO/eq58D9adXjLLAp2q1yfi9
+ +h01C6/g20sOpsIMzIw==
+X-Proofpoint-ORIG-GUID: PBfmAq86EmmKmOmYO82l4occ9fWQYBvs
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODE0MDEwNyBTYWx0ZWRfX/bYHJVW4LBnD
+ lNelSE3tmHpadoeslZIcEDSY3HpgG5PRId92yL+q30+0/Xe/iJFCLt3T4qA6fCVLBiOV4PN3D+0
+ 5XXIjoLsR7YXELT+iTybtQXyDWkAWpI=
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-08-14_05,2026-08-12_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 impostorscore=0 suspectscore=0 clxscore=1015 malwarescore=0
+ phishscore=0 adultscore=0 lowpriorityscore=0 priorityscore=1501 bulkscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608140107
 
-On Thu, Aug 13, 2026 at 7:26=E2=80=AFPM Fabrice Derepas
-<fabrice.derepas@canonical.com> wrote:
->
-> pefile_digest_pe_contents() hashes each PE section with
->
->         crypto_shash_update(desc, pebuf + ctx->secs[i].data_addr,
->                             ctx->secs[i].raw_data_size);
->
-> where both data_addr and raw_data_size come straight from the untrusted P=
-E
-> section table. pefile_parse_binary() bounds only the section table's
-> location, never the sections' data ranges, and nothing else on the path
-> checks them. A section with data_addr and/or raw_data_size pointing outsi=
-de
-> the image therefore reads past the pelen-byte buffer (CWE-125); a large
-> raw_data_size makes it read far past the end and fault.
->
-> Commit f7dd32c5179d ("crypto: asymmetric_keys - fix OOB read in
-> pefile_digest_pe_contents") recently fixed a sibling underflow in this sa=
-me
-> function (the hashed_bytes + certs_size trailer computation); the
-> per-section read below was left unchecked.
->
-> This loop runs only after verify_pkcs7_signature() succeeds, so it requir=
-es
-> a validly signed image -- but not an attacker signing key. The PKCS#7
-> signature covers the SpcIndirectDataContent (a self-contained digest in t=
-he
-> certificate table), not the live section bytes, so tampering data_addr in=
- a
-> publicly available signed image leaves the signature valid at that step
-> while the out-of-bounds read fires when this function recomputes the
-> digest. It is thus reachable by a local CAP_SYS_BOOT user via
-> kexec_file_load() with a tampered signed image; the access is an
-> out-of-bounds read only, but a large raw_data_size faults, which is a
-> denial of service when panic_on_oops is set.
->
-> Reject a section whose data range does not lie within the image before
-> hashing it.
->
-> Fixes: af316fc442ef ("pefile: Digest the PE binary and compare to the PKC=
-S#7 data")
-> Assisted-by: copilot-cli:claude-opus-4-6 frama-c
-> Signed-off-by: Fabrice Derepas <fabrice.derepas@canonical.com>
-> ---
-> Note: f7dd32c5179d, which fixed the sibling underflow in this function, w=
-as
-> assigned CVE-2026-64544; this closes the per-section read it did not cove=
-r.
->
-> Reproduced under KASAN (CONFIG_KASAN_GENERIC, x86-64). Two things were sh=
-own:
->
->   1. The defect + fix: a KUnit case calls pefile_digest_pe_contents() wit=
-h a
->      crafted context whose section has data_addr =3D pelen. Unpatched:
->      slab-out-of-bounds read; patched: -ELIBBAD before the hash.
->
->   2. The reachability, end-to-end against a real trusted keyring: a real =
-EFI
->      binary was signed with a test key embedded via CONFIG_SYSTEM_TRUSTED=
-_KEYS,
->      then its section data_addr was tampered (leaving the PKCS#7 byte-ide=
-ntical).
->      Results from verify_pefile_signature(): the untampered image verifie=
-s (0),
->      one signed by an untrusted key is rejected at verify_pkcs7_signature=
-()
->      (-ENOKEY), and the tampered-but-trusted image passes that step and t=
-akes
->      the OOB read in pefile_digest_pe_contents(). So no signing key is re=
-quired.
->
-> The KUnit case (item 1) is easy to package and I can submit it separately=
-; the
-> end-to-end setup (item 2) needs an embedded trusted key and signed images=
-, so
-> it is harder to ship standalone. Neither is included here.
->
->  crypto/asymmetric_keys/verify_pefile.c | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/crypto/asymmetric_keys/verify_pefile.c b/crypto/asymmetric_k=
-eys/verify_pefile.c
-> index cec99db..4e84fcf 100644
-> --- a/crypto/asymmetric_keys/verify_pefile.c
-> +++ b/crypto/asymmetric_keys/verify_pefile.c
-> @@ -292,6 +292,11 @@ static int pefile_digest_pe_contents(const void *peb=
-uf, unsigned int pelen,
->                 i =3D canon[loop];
->                 if (ctx->secs[i].raw_data_size =3D=3D 0)
->                         continue;
-> +               if (ctx->secs[i].data_addr > pelen ||
-> +                   ctx->secs[i].raw_data_size > pelen - ctx->secs[i].dat=
-a_addr) {
+The API partial block handling requires a intermediate chaining
+value (CV). The internal function hash_data() sets the function code
+correctly, so also call cpacf_kimd() instruction for intermediate CV
+generation, as cpacf_klmd() always generate the final hash value.
 
-Can we do this validation earlier? Perhaps in pefile_parse_binary()?
-The idea is that if the data is malformed we should probably not start
-hashing at all. You could also reuse chaddr() macro for the check.
+Cc: stable@vger.kernel.org # 6.15+
+Fixes: 08811169ac01 ("crypto: s390/hmac - Use API partial block handling")
+Signed-off-by: Holger Dengler <dengler@linux.ibm.com>
+---
+ arch/s390/crypto/hmac_s390.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-> +                       kfree(canon);
-> +                       return -ELIBBAD;
-> +               }
->                 ret =3D crypto_shash_update(desc,
->                                           pebuf + ctx->secs[i].data_addr,
->                                           ctx->secs[i].raw_data_size);
-> base-commit: 3d6d817622b0a9721e3cc404df3469171582be13
-> --
-> 2.53.0
->
->
+diff --git a/arch/s390/crypto/hmac_s390.c b/arch/s390/crypto/hmac_s390.c
+index f8cd09f341d4..445fa7bbd958 100644
+--- a/arch/s390/crypto/hmac_s390.c
++++ b/arch/s390/crypto/hmac_s390.c
+@@ -150,7 +150,10 @@ static int hash_data(const u8 *in, unsigned int inlen,
+ 
+ #undef PARAM_INIT
+ 
+-	cpacf_klmd(func, &param, in, inlen);
++	if (final)
++		cpacf_klmd(func, &param, in, inlen);
++	else
++		cpacf_kimd(func, &param, in, inlen);
+ 
+ 	memcpy(digest, &param, digestsize);
+ 
+-- 
+2.55.0
 
-Ignat
