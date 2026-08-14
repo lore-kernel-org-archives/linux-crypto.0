@@ -1,96 +1,99 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B97803AA9F4
-	for <linux-crypto@vger.kernel.org>; Fri, 14 Aug 2026 08:37:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9999A3E9584;
+	Fri, 14 Aug 2026 10:19:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786696632; cv=none; b=La6N2cUD7Hu1bVaUukkiQLDUdeU3QxVcOlGv6fV2cPSSTPEaYx1smGMkDoN8DsvwmoxDI9qd21bIVYqdhlaNj2YokCChwwtA7MYDg0ylmDwivx5IdFLCAiX4b2eRS48vKQL7YLBK/8u0nxzYdXQDRcnMW1NhToCuD4XWhoV7uGY=
+	t=1786702753; cv=none; b=bRL00gk6/9efycoSqdxzeGA7T8Lt3e79wb09HEbOF7yQ332zMRxJdue4Lc/q8R6c4c4KjmsSokwmJKV8j89hFbMT2Zzs+dRU+fnkLdgIgPEWZC4YBoIlZx9yJkaLe33Z3oomsuV06NS/dmEQXIYE3HhIYHJiThwJofG6cisbJb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786696632; c=relaxed/simple;
-	bh=jOoGKYtPzZBmJ4GpQuVNqJq1TN+TdKqL5Vn0GGXMxPQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p3EQnBhDAXICwxTvHVtiwzR9zDPrtvlHz2hM7/+U49vZlIeSFQ7dJio0su+6310r/YXIH0K1xRzOcgbaPZYmd/sghzlqGyp2yZjFG+E9dC20Ns0wWIhQtJTh2cfiT8Il3adMwJATVzSAo/k7QQTY/65egQ5pUk8a1ambZqXblPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bFnZjB6R; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1786702753; c=relaxed/simple;
+	bh=K/JybFN4RV/75dALSWrTrUgHeP544FPa/fH1D6v5AEQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IReUELg9MbgRlxUK9xaQPLC43WFqYypJM1eCfxZ+gVBwp+7ShzFtFmJn/Em9F8XoD5qYJ7R+S8j+H6EJ4Ad2ixwlSDpXAdBZ5k2IxoqX3hoBNML37b9DIi5764pLbMtpUntx5okRqHfS464T7NnRGTFgdN92/In2ynw2QATYCt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E/QXCTjI; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bFnZjB6R"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1786696621;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=HqdTSi5AjPQGrWLAzKmiczmwiOW3iMCRJfHHj7QRQZc=;
-	b=bFnZjB6RKYdvFXc39Zw1kfpdi4pGHjcsSBk4fJU3nFOz/OrFme4b5zgtZ7/G2Mckor3P2v
-	LmQAsXSipzAMjsx99pUrvZGemtLw2uImySkzA12ThMBYoc/Q5J9RbdlQ0HDJK3x9ZMr+vi
-	gztSZgOkckwVByeYkhvj1B8QzPX9gZs=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-392-6q6mfqqJPMiuHyoQFPxqXw-1; Fri,
- 14 Aug 2026 04:36:57 -0400
-X-MC-Unique: 6q6mfqqJPMiuHyoQFPxqXw-1
-X-Mimecast-MFC-AGG-ID: 6q6mfqqJPMiuHyoQFPxqXw_1786696615
-Received: from mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.95])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BFD381955F7E;
-	Fri, 14 Aug 2026 08:36:55 +0000 (UTC)
-Received: from thuth-p1g4.redhat.corp (headnet04.pony-001.prod.iad2.dc.redhat.com [10.2.32.116])
-	by mx-prod-int-10.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 74402423;
-	Fri, 14 Aug 2026 08:36:53 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Antoine Tenart <atenart@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: inside-secure - Zeroize temporary arrays on stack with sensitive data
-Date: Fri, 14 Aug 2026 10:36:51 +0200
-Message-ID: <20260814083651.59535-1-thuth@redhat.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E/QXCTjI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B73A1F000E9;
+	Fri, 14 Aug 2026 10:18:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786702742;
+	bh=NXdGXpEaeSzo6LucHd30eYR/GtpdrDPatB4CgfYUQF4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=E/QXCTjI36E8mBXEr6GvChfoeqasCRqIBQhD+HHSxLkNy/ZkATKjNyVKWxSFnDy3R
+	 o01xFHf7H63TWszeKcUx7lJTvk6qMIXPWPoBzJ0h+EbMzWr9dH+9Qd9GE1k7YFp2TH
+	 1sPCvaVkqjB7uR5mqkCfGoaaqNsu7Ki3477kNdUXzrn8/OMane3Gl+7vb5UHmJAvyp
+	 tFmN/agBMSAAgKSRAth53CIWXe/CE7KXsmUdELHOi4gIJnxwIpn0l1InPUPcP0IFW6
+	 jVhFtxWsRp0/vyYrS8gXqIVkj88/r3e3OoAwlgujhMK+I00XX6qpxww0bQsGeAptdA
+	 Of4GkzD49p0Dg==
+Date: Fri, 14 Aug 2026 12:18:45 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <ukleinek@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Vladislav Leonov <vlad@zlab.su>, 
+	linux-rockchip@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
+	Simon Glass <sjg@chromium.org>, linux-clk@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Andi Shyti <andi.shyti@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Aurelien Jarno <aurelien@aurel32.net>, Brian Masney <bmasney@redhat.com>, 
+	Conor Dooley <conor+dt@kernel.org>, Daniel Golle <daniel@makrotopia.org>, 
+	"David S. Miller" <davem@davemloft.net>, David Wu <david.wu@rock-chips.com>, 
+	Eric Dumazet <edumazet@google.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Heiko Stuebner <heiko@sntech.de>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Mark Brown <broonie@kernel.org>, 
+	Maxime Chevallier <maxime.chevallier@bootlin.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Michael Turquette <mturquette@baylibre.com>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	Nicolas Frattaroli <nicolas.frattaroli@collabora.com>, Olivia Mackall <olivia@selenic.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Philipp Zabel <p.zabel@pengutronix.de>, 
+	Rob Herring <robh@kernel.org>, Stephen Boyd <sboyd@kernel.org>, Vinod Koul <vkoul@kernel.org>, 
+	linux-crypto@vger.kernel.org, linux-i2c@vger.kernel.org, linux-phy@lists.infradead.org, 
+	linux-pwm@vger.kernel.org, linux-spi@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-usb@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 00/25] ARM: rockchip: Add peripheral support for RV1106
+Message-ID: <20260814-vivacious-nickel-copperhead-c746f6@quoll>
+References: <20260810121121.210040-1-vlad@zlab.su>
+ <20260810113548.7fd24d56@kernel.org>
+ <anq1ouUnKA02Eauj@monoceros>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.6 on 10.30.177.95
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <anq1ouUnKA02Eauj@monoceros>
 
-This issue has been found by the Sashiko bot while reviewing another
-patch: key_tmp[] in safexcel_xcbcmac_setkey() and consts[] / _const[]
-in safexcel_cmac_setkey() contain crypto key material that should not
-get exposed to the outside once the function is done. Scrub the arrays
-with memzero_explicit() to avoid that the data could leak via the stack.
+On Tue, Aug 11, 2026 at 07:43:16AM +0200, Uwe Kleine-K=C3=B6nig wrote:
+> On Mon, Aug 10, 2026 at 11:35:48AM -0700, Jakub Kicinski wrote:
+> > On Mon, 10 Aug 2026 15:10:51 +0300 Vladislav Leonov wrote:
+> > > Basic support for the Rockchip RV1106/RV1103 SoCs currently under rev=
+iew.
+> > > This series builds on top of that and enables the peripherals needed =
+to
+> > > bring up a board beyond a serial console:
+> >=20
+> > Don't expect maintainers to dig out patches for their subsystems
+> > from a big series. This is not how upstream development works.
+>=20
+> I see this from time to time and I personally think it's fine to have
+> these patches together. Also the only the patch that affects my
+> subsystem was Cc:d to me which is how I like it (but I think opinions
+> differ on that one, too).
+>=20
+> `b4 am -P _` is great!
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- drivers/crypto/inside-secure/safexcel_hash.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Yeah, and with DTS being patch 3, patch 6, 10 ...  and so on, it is
+every easy to review and pick up.
 
-diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index 3402e570d045c..1ae6fbec31298 100644
---- a/drivers/crypto/inside-secure/safexcel_hash.c
-+++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -1993,6 +1993,7 @@ static int safexcel_xcbcmac_setkey(struct crypto_ahash *tfm, const u8 *key,
- 	ret = aes_prepareenckey(ctx->aes,
- 				(u8 *)key_tmp + 2 * AES_BLOCK_SIZE,
- 				AES_MIN_KEY_SIZE);
-+	memzero_explicit(key_tmp, sizeof(key_tmp));
- 	if (ret)
- 		return ret;
- 
-@@ -2104,6 +2105,9 @@ static int safexcel_cmac_setkey(struct crypto_ahash *tfm, const u8 *key,
- 	}
- 	ctx->cbcmac = false;
- 
-+
-+	memzero_explicit(consts, sizeof(consts));
-+	memzero_explicit(_const, sizeof(_const));
- 	return 0;
- }
- 
--- 
-2.55.0
+No, there is only one case of combining multiple subsystems together -
+upstreaming new SoC vendor. All other cases are wrong and spreading DTS
+all over is just proof that this is poorly readable and poorly
+reviewable.
+
+Not even mentioning the rules of dependency on DTS expressed in
+submitting patches.
+
+Best regards,
+Krzysztof
 
