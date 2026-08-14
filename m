@@ -1,69 +1,43 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 313F6399CF5;
-	Fri, 14 Aug 2026 19:28:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CDEE3D811B;
+	Fri, 14 Aug 2026 19:59:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786735689; cv=none; b=iPuCLe9Izo1cPnhIxrLY6OlsopIRCP+sSAnrjdplge3/y1caI1PcWGX8f6VyfwCa0lRVU3hpfNBUc7jY5kG0uzbMH1JX3i6EImglyv7nGZIQiO1JEwsMh7uiAnnU+VnERFcp7urTBEuZeT/Thublyf409anSGIcOmKiAc/KpZU4=
+	t=1786737582; cv=none; b=uiYLXTCEH5QtQ8LrUADpZySE/YBPYAa2d6nBJGOlijjQgvh2bfLCdZV5P+/a+UKinMIQEmSIAT977uGDkSEqfhApys7jJAIlbzQ4OFntYxAr82/BOaBTJSf5p7pSQJb76474tGEcxhUTKwNeoLqyqy/DNmlQpx18BjHIP4bX/nY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786735689; c=relaxed/simple;
-	bh=SSYQsbj6ZEE7A8qSrmzJSebTXjoAlcHbG+fX1kbjcus=;
+	s=arc-20240116; t=1786737582; c=relaxed/simple;
+	bh=gBYbZS/IQXYm8iJyWFiD3V2skqgTbClvVtR0QhCbF6M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AZBzNm6sI9W237rO1NxXTMTQdP9lFynIH61k/P235HfugvZ40xFqDwMu9woxivdNNh/4bTqtCUrBJ6aC6kAYWF5kuoyIpfUyfDrsCvsmHmtJzMdWrM5V5lqBqVvsGR0ytHgcoKv2wFgkJF/5is7y3Y1ODtWa+bFYEDQcTDG2DNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I1zh5fMT; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=R/v4TK1WxVvc3yK0/ATF1/InZEUv2syJPoeeNkjUbo9XNN+4k9EVel5p4EXV0WUbxjISg4OmFjFSVuqsOFYVNt7Z8FqhmF+olODcmpudNYQrKSVVsnHcceeNHTRp5vOt5mj2yY4E/mCsU7s33SA3V77WTnd7t0bh/Q17GQlTwMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f41BHtEY; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I1zh5fMT"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1786735687; x=1818271687;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=SSYQsbj6ZEE7A8qSrmzJSebTXjoAlcHbG+fX1kbjcus=;
-  b=I1zh5fMT72ICw3Kx1LO9tIXWDhwuV6N+ZyAixlpKs0nsjyFEVE3CuTCy
-   7baHO09gtskjB+l7yIm6nB+rtHRa6zfkRzUwFTB1eG704Xg1EEbHjvI/2
-   TLmLLdFKwuzbp3rHZ7a1w781khU3eanIoaxGoS7txjRwoOBwYmUJhbTE6
-   1+ubcAWvjq54lwZeo1Iwo0BaxJbus/Hbw85hzYCRqBZldKpgwG2Vp/A/H
-   A7vYCHkd0Oj+uT2ri/DL9x+rIN7ESlGirnS65A1Ngeaa1Gf/pUDhnAoW8
-   mj6MInzG8VArqhE+AcGkRiehw8KQeC0HxneWtxarbJHVCqIjysE4TsDby
-   w==;
-X-CSE-ConnectionGUID: 2ggSCd+nT5maU73D+iSxPw==
-X-CSE-MsgGUID: z/br76cTQR+FWAGEQoVkzw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11875"; a="87242107"
-X-IronPort-AV: E=Sophos;i="6.25,222,1779174000"; 
-   d="scan'208";a="87242107"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2026 12:28:06 -0700
-X-CSE-ConnectionGUID: OMexIP8XSU6gEBTmQA43ew==
-X-CSE-MsgGUID: AVHscax6R4+PYxKolsurZQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,222,1779174000"; 
-   d="scan'208";a="260066757"
-Received: from lkp-server01.sh.intel.com (HELO 6eda058d650d) ([10.239.97.150])
-  by fmviesa006.fm.intel.com with ESMTP; 14 Aug 2026 12:28:03 -0700
-Received: from kbuild by 6eda058d650d with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1wuxZQ-00000000Zwg-2PaZ;
-	Fri, 14 Aug 2026 19:28:00 +0000
-Date: Sat, 15 Aug 2026 03:27:38 +0800
-From: kernel test robot <lkp@intel.com>
-To: quanyeyang via B4 Relay <devnull+quanyemostima.gmail.com@kernel.org>,
-	Thomas Graf <tgraf@suug.ch>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	NeilBrown <neilb@suse.com>, "David S. Miller" <davem@davemloft.net>
-Cc: oe-kbuild-all@lists.linux.dev,
-	Linux Memory Management List <linux-mm@kvack.org>,
-	netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+ef8d17bae14efb960935@syzkaller.appspotmail.com,
-	quanyeyang <quanyemostima@gmail.com>
-Subject: Re: [PATCH] rhashtable: use per-init-site lockdep classes for bucket
- locks
-Message-ID: <202608150357.9LheVOQg-lkp@intel.com>
-References: <20260801-fix-rhashtable-bucket-lockdep-v1-1-15a0f8ae094c@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f41BHtEY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB6C91F000E9;
+	Fri, 14 Aug 2026 19:59:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786737581;
+	bh=KNy3zowlMT+tLsRA+SoZOmN7eNITguXwatnKmgFbVTI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=f41BHtEY9QWcfs5mZVZMBXQG7ERql2GZ+deFnkGy94qFdgOo6EW5gSKtcdYhvdHxo
+	 kFsbsDPp98t3kdnJkqATSzHvwzyRzwtKuWyYcs2P1BM6CdMw4QaMpci49U+SD3X1BT
+	 GbOUdGjxTbqva58+ptL2I06qvBJh/msKrGtS8qWqO3FWNbHaUJDdqdZEHi3h46T/pU
+	 hFqZEQ4xFhi7A1+Y1kNphctSsCHFJ03DVDGgS14eXeEostHhOCORGHYMp8sE/HUBA0
+	 9x5ZuaORj5TASD/rklHrOcdf99MY6HyBA2d01mKXVRZb0JtofGiOz15Es6adIeLWGX
+	 tFk423eVKtN9g==
+Date: Fri, 14 Aug 2026 19:59:39 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: Borislav Petkov <bp@alien8.de>
+Cc: x86@kernel.org, linux-um@lists.infradead.org,
+	linux-raid@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v3 0/8] x86: Remove cpu_has_xfeatures() and add AVX-512
+ xor_gen()
+Message-ID: <20260814195939.GB2644249@google.com>
+References: <20260813021506.55129-1-ebiggers@kernel.org>
+ <20260814003517.GBan5ixaTArd0Sf6X3@fat_crate.local>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -72,36 +46,32 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260801-fix-rhashtable-bucket-lockdep-v1-1-15a0f8ae094c@gmail.com>
+In-Reply-To: <20260814003517.GBan5ixaTArd0Sf6X3@fat_crate.local>
 
-Hi quanyeyang,
+On Thu, Aug 13, 2026 at 05:35:17PM -0700, Borislav Petkov wrote:
+> On Wed, Aug 12, 2026 at 07:14:58PM -0700, Eric Biggers wrote:
+> > This series consolidates and cleans up how the kernel handles CPU
+> > feature flags for AVX and AVX-512 when the underlying OS or hypervisor
+> > (if any) doesn't enable the required xstate features in XCR0.
+> > 
+> > Specifically, it makes the checks for xstate features be done in a
+> > single place at boot time for both UML and native x86, instead of
+> > everywhere kernel code wants to check for AVX or AVX-512 support.
+> > 
+> > Patch 8 then adds an AVX-512 optimized implementation of xor_gen() for
+> > RAID, which had been blocked on confusion around cpu_has_xfeatures() and
+> > its lack of implementation on UML.
+> 
+> Sashiko complains about a missing VZEROUPPER there in patch 8:
+> 
+> https://sashiko.dev/#/patchset/20260813021506.55129-1-ebiggers%40kernel.org
 
-kernel test robot noticed the following build warnings:
+Yeah, missing vzeroupper is a common mistake...  All the other code in
+lib/raid/ that uses ymm and zmm registers misses it too.  I've fixed
+various instances of this in the crypto code before, but no one ever
+checked the RAID code.  I guess I'll send out a v4 that fixes patch 8,
+and also separate patches that try to fix all the existing instances of
+missing vzeroupper.  Besides lib/raid/, some also have slipped in in
+arch/x86/crypto/aria-* and net/netfilter/nft_set_pipapo_avx2.c.
 
-[auto build test WARNING on 0131b508c0e2489eac6e121135988f6eeb716f19]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/quanyeyang-via-B4-Relay/rhashtable-use-per-init-site-lockdep-classes-for-bucket-locks/20260815-014140
-base:   0131b508c0e2489eac6e121135988f6eeb716f19
-patch link:    https://lore.kernel.org/r/20260801-fix-rhashtable-bucket-lockdep-v1-1-15a0f8ae094c%40gmail.com
-patch subject: [PATCH] rhashtable: use per-init-site lockdep classes for bucket locks
-config: alpha-allmodconfig (https://download.01.org/0day-ci/archive/20260815/202608150357.9LheVOQg-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 16.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20260815/202608150357.9LheVOQg-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202608150357.9LheVOQg-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> Warning: lib/rhashtable.c:1170 function parameter 'mutex_key' not described in '__rhashtable_init'
->> Warning: lib/rhashtable.c:1170 function parameter 'bucket_key' not described in '__rhashtable_init'
-   Warning: lib/rhashtable.c:1170 expecting prototype for rhashtable_init(). Prototype was for __rhashtable_init() instead
->> Warning: lib/rhashtable.c:1247 function parameter 'mutex_key' not described in '__rhltable_init'
->> Warning: lib/rhashtable.c:1247 function parameter 'bucket_key' not described in '__rhltable_init'
-   Warning: lib/rhashtable.c:1247 expecting prototype for rhltable_init(). Prototype was for __rhltable_init() instead
-
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+- Eric
