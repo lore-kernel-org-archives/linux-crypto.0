@@ -1,215 +1,336 @@
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 047CB43AB0
-	for <linux-crypto@vger.kernel.org>; Fri, 14 Aug 2026 05:18:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.222.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786684714; cv=pass; b=Kwesu97mnxAevDMNNk9EbBZhMtWHD6wrt6ygZWUJIiePvfSuaROiA6X+mV5AjqJPMEVjqU5WbvggISE45su+0ZfuH+TD4Do5WI1LmwntWjPPTV/w2Yie/z3vcE87SWrV6jRLAmJ9SYAH+CjAg/Ohi0aNfjhJ0TLzz2r42tXDTnk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786684714; c=relaxed/simple;
-	bh=on93K6lma23rN/3lK+z8nIO+e/iuUrJxETMFOVFdIF8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A6wugxwfoEk43X5jhcbp8we/uat3r8yIRohHSyjXGYG6aFWKzEKABvYkNlCgGo2YB13ptaIU9+xLBCmvM2EhYcg/CwVJUYEO5NFDocuev/NI2WXCzTJmbiQe8VU6Xi0y+uRRosXafil8TADO9o8boEH7ulMySbBfNeOLtf6IZW8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=Ns49wixr; arc=pass smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16A02F12A1
+	for <linux-crypto@vger.kernel.org>; Fri, 14 Aug 2026 05:29:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1786685382; cv=none; b=oFlcDWBCcg7bNZ/hudIx2O1m8UOProVLY7/8rtiyPjPDRQ1ZRDL1mPfrWNRyFC9Sr9AHuuaI3MfOyISClZrmKlk6U1D5klEru7IMc6ZWPMWQVFPKgsLKdnK3mbuM3IqnRQK4ptFVaMf/A2w4QhyKL8Ppo4SfXR5jS1B3RYW1xq4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1786685382; c=relaxed/simple;
+	bh=5nGb1HWimcZ0bANvB0d0hNtjQhTI4NyloQ6RR+WQhBc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bAMlH9qQXt0jxuXzrItgKUTIbu2sB12+CN65QNvyhrCiTZmiXzs9j8wdQEcE2w316YcGuj8ZXbP9FAT7gwRsIznItpy9VZj7TJJ8OTx7WDoLXONEKKHp6fW3CPpitdnp11LqUCMb/sWOt9qAIJU16fGdxwPqeJrvaFbkemp+hkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SuB6Y2OR; arc=none smtp.client-ip=74.125.224.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="Ns49wixr"
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-92f03daaa97so37926585a.2
-        for <linux-crypto@vger.kernel.org>; Thu, 13 Aug 2026 22:18:32 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1786684712; cv=none;
-        d=google.com; s=arc-20260327;
-        b=Anuf1XEek9Y8MFCckGhi4knwm78SC14J1ZMDS2We/e1gGrcssbe0gDCvVewTuIL2qz
-         hppdBPZbSb7OD9T/Zdb+GgriQny08Vs0MDZ13LumLo71hcO9A6unhE+D4mYiqpgHToK3
-         rUULCxwdGRYIktX61fcZNToGtydXwZSZUl3OkyCBTcXzkIzLe0ky3m4mk7vFhHErs+pa
-         riPfap624HO82A1aOkwn5M4fqajEEw4aBq3Wu7DLXZ5Lr0XvHy6p/lkHKFONztoCxK6r
-         HA8CvMxFpHlVLMb3t3Y11CEgJYwjlC9geBT1Y/YSL5j1vIcrS3fOmFdGwKv4eZrcJloc
-         aEvg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=J1faoTi2s3N5+IeFjQDzLXc3uQSNXm3T5bOqFSwJTB0=;
-        fh=Vi82qe5hJ2sFgJYfrFwdROCbkoZPC4wj4/e2179blJY=;
-        b=oB/gCmF0x+Iweh/QuctAdxfnONgenPaxU7ppUdPnmwuiRxGl6AG5oc0JPaDHFxGqN+
-         b3bOr3f+6DLJd+YdNfq+oyoXbqI0NqZ4fbYhZ551lvm4dPGqp951OkId5YYTQEC1zSpf
-         VodQi7gnY8nMKdqfb/m4yql6EMDaC3w2Sv8r87A/jvGUHkNQSzIK4eUdjCL9QtUZQxgi
-         xjEJG2s3+ULyjCiZ1SmH1fIBr1qVymO7cfX0cXcEVxlwc6kabYYy/uHxDG0tT9vFMDxA
-         xsqUPxOSfffy5+P2y6YpUE5bCZvLv8rf8rydRxJn6HhDln0Yn/PJi95PvzIajGMcJ3PK
-         +Xdg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SuB6Y2OR"
+Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-66c711b7f2aso923063d50.3
+        for <linux-crypto@vger.kernel.org>; Thu, 13 Aug 2026 22:29:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1786684712; x=1787289512; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=J1faoTi2s3N5+IeFjQDzLXc3uQSNXm3T5bOqFSwJTB0=;
-        b=Ns49wixrtljVbke0JhmYOTm57X+nNbIRZ4u3jQJozTWoKkScY+m7WU0j0T+PLS5w7w
-         fvFEU1JSqIFVY2KiwyXZExUJNtSbj8IxKB5jIG5XQKz4whoAmmFbTM7GYmrzFVwwNyw/
-         mG+XwgmHgoEL8KQb4UwAvBSFVsxWOcFYW1F8c=
+        d=gmail.com; s=20251104; t=1786685380; x=1787290180; darn=vger.kernel.org;
+        h=content-type:in-reply-to:autocrypt:from:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=iImNcxG8fLabmPC1MwSt+Jl02Q/TG6TAosyGy3jBnk4=;
+        b=SuB6Y2ORBC/7DmSf6A7LZcgPmOtrVxa2Ag7OeQfZk+dNhUiaJHvD6fiF/QvhzpKEXf
+         5lJZYmHVmHISJ6Z72fp0XFwbmD3TQQTyJ9HOpXLCJgXrIUKUm4POcOzYsCyukoJ3fUQK
+         PnUN/Tvqy29KJCbFAA6wjNF3+FWJTqQG5BECqxbXoPadiZZfSA/8pIH9Wrn+gXBy7HBM
+         /9NJgCI193vGw3Ga1BbKkcdwc+fYcErM5a2OXsyzLBHniDPQv3HSwkAILX6fy6MOVYJS
+         znTZ2XNFEoYEBTP+RK0Z2ueREvELhq+42gc2pK+5D+PgEdr/b/bmSU/hmVHS8ZljeSat
+         uvvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786684712; x=1787289512;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
+        d=1e100.net; s=20251104; t=1786685380; x=1787290180;
+        h=content-type:in-reply-to:autocrypt:from:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=J1faoTi2s3N5+IeFjQDzLXc3uQSNXm3T5bOqFSwJTB0=;
-        b=LccczEFPA967syvGhLW3+PhfvMuoqlK342uadjgQ8H6049mK50Cz39HWNNZRGdEtEC
-         Iy6RjbdTHBCSBXvhctLFrH/Lxh2PJirLhGbzSqzp4ulFGejICUKLKdelPgSg2jZSI7gC
-         RCqmVtQ7hYNkAxRCB+GTU7UWdNvTrzhL0ffJjon18PeB3XKmnz8PMrS+5luaqOVGDtEq
-         NUCd2b6+JXK1FT1HgQ21/677NR1gbEKH2261cVvt5Is78iT6F2HIx45TZJCVNchh6mkn
-         2uo9XWgTfCZPTEURk8bnFf6KrRbATIHKMrW6jKyonnf5/LeNC41M0RQnVjNiAvSIrPvr
-         3d5A==
-X-Forwarded-Encrypted: i=1; AHgh+RrP4V/MC+dYUdGelV1/bff+kK3Y9GQwFJ6URoU1J5o6Jwyv0+r6ZSo6hSRaN1RF5wZfScpCWLVy5SEk5LU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwnzA0NjZOyevLy4oS2J8bb1sZ7Pv3BF6qVVU5Kybd02Yluo87k
-	NBRKMOVamqKtrpvCFvMU01gUwwh44dviEmq3RuZP19nu8H9PL2wVPqqnSq5M4LG/NOYN1XC2sfF
-	tVZyRZ+7mOI5BmzNidqJ4KZ2ksbNh6y1OpI2yJAozNZC8s251PN0xdg8=
-X-Gm-Gg: AR+sD12cwMOSjPVHsXT3TrlQaexcbkOZ12gt9RDZ1WYcQGQpmxRyxN1OHi51UkTEuVd
-	uwCMjfWfRfDWRp9iu+KBrz4dUlO5mLOQvzkL7gRfJIWo7OLua4RwSuZEu2ohdVvT2hzVdZFoBH4
-	tr7tcUhI1PJ/OkzQrajZ0sus0A+h0Dv+AV0Himld+UYH0TZKUq/rj0YQy8+Bi4wCh54kZhjhczT
-	DajXj1QS3KyBAtM0e7PVRXeVEQTJGGYjTs2NMx1biCDpNLENjhrPnCi+5Fw/nl2P31GVog0P/MJ
-	kGe0HSDstMOFFGv9NgBsTG0S2yCm8SWSZXysNMkFiMq+U6s6voLozAicI/75MXNx3AsIaCQk+5J
-	9jAaPUPVLGpbU7kpslnQetB07FhpCRdBs6nusJx0mF6H9wD1ioL8fMEeJwDtzrHQ4uGWT+3iWZp
-	PBfDQ7gXh/Cr3Y9VgWAwyg
-X-Received: by 2002:a05:6214:130b:b0:8fe:40a0:7cbb with SMTP id
- 6a1803df08f44-90a91d481cfmr33029076d6.15.1786684711839; Thu, 13 Aug 2026
- 22:18:31 -0700 (PDT)
+        bh=iImNcxG8fLabmPC1MwSt+Jl02Q/TG6TAosyGy3jBnk4=;
+        b=pK5/ZvOqs/l1iup9PefSQG0cCW76yuMB+t8far0DI5HeJstdW2s7fys98c9S2dMw+Z
+         +V14cTOh++6GvOG2qI+DdlD6Ko1E6X8CDktvzRTIjHor1mae/QXEKCI1wxli185L5rU9
+         z8mDJunU9HCYDY8dsRE9xHbIJUv9+olODJNaBUIpgpPc8QnXGb0bdXscbuBJATj6XONv
+         nLYgRez9ZizdhIKtntKyg8SGgqvakzzHgqZwJvdZKcpHMr1EKGg2MK1OGv7M8jkQF9W3
+         E/qwhsHCNegQxctXAc7S9o2XwtH1DK4dD+WgfSbptU2WwPbfxTCq871r8S9e+jvQQ1As
+         3B2g==
+X-Forwarded-Encrypted: i=1; AHgh+Rro6wkWJJc5RWfUMNfFqBQ996duAR3w1FoIHJ7VQHo3w2GQE5dSzT0g+LeBk8PN7We48fk/5GbA8S6aMtI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw00hhT2SSMMmhm3kxjvNbpYx1ivN81nZJeaSVtfJgihj3E0hck
+	Y/R6vBiFEwmcHYnfuVfcl9z4PjF40Txj7oGj8fb2ewussW0Xak7TwgrP
+X-Gm-Gg: AR+sD10aa6wKdWI+YIsYyn0afcTYrW0rxsVBvWl/WW84pCuWJzQ3hBxvMs7C5euRiTw
+	T8bKe6YBMWdqYqfBICsY1BWM5H992Yl8oeZk7AiVNmVSZwyzzNlAaO9+nRC6gNScgzEkJzIdu0r
+	szvq6Qt1DdeS8u42KukLdtD8UJDt5hXW3QXIMbK0+LHWKL/RWJV8peOD+zqU0xPUy5sZCN2zhsX
+	+6hlu9HCDkW5y6XecQAMX/GexcKZtPqo8sn/c5kb7I60NpDsl2i2AXs6fFjNAoGXOs8b6R1on5T
+	DB2Q08P61RqgkxFs/inn8ya5gRXjAQu+tA8U37JBlFWeVmhA6kdCL8vB6IPtZea1tnaMQM9uulQ
+	L9BIAL9n9vDJV83N5ai/cu/3ST/O2E/sSrHx/JOUqxdXS7gHcb8u/Dflp7MR44Nb+h5/BI+kEKs
+	/6ZlWZA8SzPtxxdbTSWZ65+d/8zdLfV6Zp7cAi5+2aNNCdWQmFHJfJXICEwx3pu98=
+X-Received: by 2002:a05:690e:dc1:b0:668:15aa:4f79 with SMTP id 956f58d0204a3-66c72b20bdcmr1534551d50.2.1786685379829;
+        Thu, 13 Aug 2026 22:29:39 -0700 (PDT)
+Received: from [10.138.10.6] ([185.98.168.14])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-66c79390ae7sm382697d50.20.2026.08.13.22.29.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Aug 2026 22:29:37 -0700 (PDT)
+Message-ID: <df2a9e02-0ebe-401a-84b5-b0f404711521@gmail.com>
+Date: Fri, 14 Aug 2026 01:29:17 -0400
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260812175020.666558-1-pavitrakumarm@vayavyalabs.com>
- <20260812175020.666558-4-pavitrakumarm@vayavyalabs.com> <20260812180500.A68871F000E9@smtp.kernel.org>
-In-Reply-To: <20260812180500.A68871F000E9@smtp.kernel.org>
-From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Date: Fri, 14 Aug 2026 10:48:20 +0530
-X-Gm-Features: AUfX_mwymJ1UYin3kIQb6gK4umeWSdWimoVjM-7z_cta-d6UZMOCr_o0Lz0sYUU
-Message-ID: <CALxtO0kvQp333oRZ5axaSG1-8y7E9T_q5zQX6RcsFwQb=_rdBw@mail.gmail.com>
-Subject: Fwd: [PATCH v22 3/4] crypto: spacc - add spacc autodetect support
-To: Herbert Xu <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org, 
-	LKML <linux-kernel@vger.kernel.org>
-Cc: ruud.derwig@gf.com, rbannerm@synopsys.com, 
-	Manjunath Hadli <manjunath.hadli@vayavyalabs.com>, 
-	Navami R Telsang <navami.telsang@vayavyalabs.com>, Nazim Khan <nazim.khan@vayavyalabs.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: qce - Replace with stub driver
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Bartosz Golaszewski <brgl@kernel.org>, linux-crypto@vger.kernel.org,
+ Herbert Xu <herbert@gondor.apana.org.au>, linux-arm-msm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
+ Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+ Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Krzysztof Kozlowski <krzk@kernel.org>
+References: <e7aeec9b-11aa-4635-bde9-fb8c7ca38260@kernel.org>
+ <20260801171242.GA3567@quark>
+ <CAMRc=McL5QQRk8C8zzkHm+FUj-SAVi5PLJr2pXo8eNpaxXuALg@mail.gmail.com>
+ <20260811224110.GC1905@sol>
+ <CAMRc=MfVqphaVsfcmUXjGmu6m+F6nJYXgAPuTVjZBwFnd48BkA@mail.gmail.com>
+ <bc95e0b0-2cc5-4ad6-a319-ae4e159b92fe@gmail.com>
+ <CAMRc=Mcno_F2UuLXZ3ruaVSbYhssVK90m3KM=+dwskLMSp8TXg@mail.gmail.com>
+ <0d2706c6-79fa-40fc-a24a-6d5ffbf02330@gmail.com>
+ <20260813201019.GA987015@google.com>
+ <b7e697ee-ce3b-4c81-afb8-00205c2997f3@gmail.com>
+ <20260813213448.GB987015@google.com>
+Content-Language: en-US
+From: Demi Marie Obenour <demiobenour@gmail.com>
+Autocrypt: addr=demiobenour@gmail.com; keydata=
+ xsFNBFp+A0oBEADffj6anl9/BHhUSxGTICeVl2tob7hPDdhHNgPR4C8xlYt5q49yB+l2nipd
+ aq+4Gk6FZfqC825TKl7eRpUjMriwle4r3R0ydSIGcy4M6eb0IcxmuPYfbWpr/si88QKgyGSV
+ Z7GeNW1UnzTdhYHuFlk8dBSmB1fzhEYEk0RcJqg4AKoq6/3/UorR+FaSuVwT7rqzGrTlscnT
+ DlPWgRzrQ3jssesI7sZLm82E3pJSgaUoCdCOlL7MMPCJwI8JpPlBedRpe9tfVyfu3euTPLPx
+ wcV3L/cfWPGSL4PofBtB8NUU6QwYiQ9Hzx4xOyn67zW73/G0Q2vPPRst8LBDqlxLjbtx/WLR
+ 6h3nBc3eyuZ+q62HS1pJ5EvUT1vjyJ1ySrqtUXWQ4XlZyoEFUfpJxJoN0A9HCxmHGVckzTRl
+ 5FMWo8TCniHynNXsBtDQbabt7aNEOaAJdE7to0AH3T/Bvwzcp0ZJtBk0EM6YeMLtotUut7h2
+ Bkg1b//r6bTBswMBXVJ5H44Qf0+eKeUg7whSC9qpYOzzrm7+0r9F5u3qF8ZTx55TJc2g656C
+ 9a1P1MYVysLvkLvS4H+crmxA/i08Tc1h+x9RRvqba4lSzZ6/Tmt60DPM5Sc4R0nSm9BBff0N
+ m0bSNRS8InXdO1Aq3362QKX2NOwcL5YaStwODNyZUqF7izjK4QARAQABzTxEZW1pIE1hcmll
+ IE9iZW5vdXIgKGxvdmVyIG9mIGNvZGluZykgPGRlbWlvYmVub3VyQGdtYWlsLmNvbT7CwXgE
+ EwECACIFAlp+A0oCGwMGCwkIBwMCBhUIAgkKCwQWAgMBAh4BAheAAAoJELKItV//nCLBhr8Q
+ AK/xrb4wyi71xII2hkFBpT59ObLN+32FQT7R3lbZRjVFjc6yMUjOb1H/hJVxx+yo5gsSj5LS
+ 9AwggioUSrcUKldfA/PKKai2mzTlUDxTcF3vKx6iMXKA6AqwAw4B57ZEJoMM6egm57TV19kz
+ PMc879NV2nc6+elaKl+/kbVeD3qvBuEwsTe2Do3HAAdrfUG/j9erwIk6gha/Hp9yZlCnPTX+
+ VK+xifQqt8RtMqS5R/S8z0msJMI/ajNU03kFjOpqrYziv6OZLJ5cuKb3bZU5aoaRQRDzkFIR
+ 6aqtFLTohTo20QywXwRa39uFaOT/0YMpNyel0kdOszFOykTEGI2u+kja35g9TkH90kkBTG+a
+ EWttIht0Hy6YFmwjcAxisSakBuHnHuMSOiyRQLu43ej2+mDWgItLZ48Mu0C3IG1seeQDjEYP
+ tqvyZ6bGkf2Vj+L6wLoLLIhRZxQOedqArIk/Sb2SzQYuxN44IDRt+3ZcDqsPppoKcxSyd1Ny
+ 2tpvjYJXlfKmOYLhTWs8nwlAlSHX/c/jz/ywwf7eSvGknToo1Y0VpRtoxMaKW1nvH0OeCSVJ
+ itfRP7YbiRVc2aNqWPCSgtqHAuVraBRbAFLKh9d2rKFB3BmynTUpc1BQLJP8+D5oNyb8Ts4x
+ Xd3iV/uD8JLGJfYZIR7oGWFLP4uZ3tkneDfYzsFNBFp+A0oBEAC9ynZI9LU+uJkMeEJeJyQ/
+ 8VFkCJQPQZEsIGzOTlPnwvVna0AS86n2Z+rK7R/usYs5iJCZ55/JISWd8xD57ue0eB47bcJv
+ VqGlObI2DEG8TwaW0O0duRhDgzMEL4t1KdRAepIESBEA/iPpI4gfUbVEIEQuqdqQyO4GAe+M
+ kD0Hy5JH/0qgFmbaSegNTdQg5iqYjRZ3ttiswalql1/iSyv1WYeC1OAs+2BLOAT2NEggSiVO
+ txEfgewsQtCWi8H1SoirakIfo45Hz0tk/Ad9ZWh2PvOGt97Ka85o4TLJxgJJqGEnqcFUZnJJ
+ riwoaRIS8N2C8/nEM53jb1sH0gYddMU3QxY7dYNLIUrRKQeNkF30dK7V6JRH7pleRlf+wQcN
+ fRAIUrNlatj9TxwivQrKnC9aIFFHEy/0mAgtrQShcMRmMgVlRoOA5B8RTulRLCmkafvwuhs6
+ dCxN0GNAORIVVFxjx9Vn7OqYPgwiofZ6SbEl0hgPyWBQvE85klFLZLoj7p+joDY1XNQztmfA
+ rnJ9x+YV4igjWImINAZSlmEcYtd+xy3Li/8oeYDAqrsnrOjb+WvGhCykJk4urBog2LNtcyCj
+ kTs7F+WeXGUo0NDhbd3Z6AyFfqeF7uJ3D5hlpX2nI9no/ugPrrTVoVZAgrrnNz0iZG2DVx46
+ x913pVKHl5mlYQARAQABwsFfBBgBAgAJBQJafgNKAhsMAAoJELKItV//nCLBwNIP/AiIHE8b
+ oIqReFQyaMzxq6lE4YZCZNj65B/nkDOvodSiwfwjjVVE2V3iEzxMHbgyTCGA67+Bo/d5aQGj
+ gn0TPtsGzelyQHipaUzEyrsceUGWYoKXYyVWKEfyh0cDfnd9diAm3VeNqchtcMpoehETH8fr
+ RHnJdBcjf112PzQSdKC6kqU0Q196c4Vp5HDOQfNiDnTf7gZSj0BraHOByy9LEDCLhQiCmr+2
+ E0rW4tBtDAn2HkT9uf32ZGqJCn1O+2uVfFhGu6vPE5qkqrbSE8TG+03H8ecU2q50zgHWPdHM
+ OBvy3EhzfAh2VmOSTcRK+tSUe/u3wdLRDPwv/DTzGI36Kgky9MsDC5gpIwNbOJP2G/q1wT1o
+ Gkw4IXfWv2ufWiXqJ+k7HEi2N1sree7Dy9KBCqb+ca1vFhYPDJfhP75I/VnzHVssZ/rYZ9+5
+ 1yDoUABoNdJNSGUYl+Yh9Pw9pE3Kt4EFzUlFZWbE4xKL/NPno+z4J9aWemLLszcYz/u3XnbO
+ vUSQHSrmfOzX3cV4yfmjM5lewgSstoxGyTx2M8enslgdXhPthZlDnTnOT+C+OTsh8+m5tos8
+ HQjaPM01MKBiAqdPgksm1wu2DrrwUi6ChRVTUBcj6+/9IJ81H2P2gJk3Ls3AVIxIffLoY34E
+ +MYSfkEjBz0E8CLOcAw7JIwAaeBT
+In-Reply-To: <20260813213448.GB987015@google.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------nXzoSzcLz1089Ey4q1hbHcJh"
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------nXzoSzcLz1089Ey4q1hbHcJh
+Content-Type: multipart/mixed; boundary="------------b2lmVs5wJKpQS07vcN45h9uV";
+ protected-headers="v1"; hp="clear"
+Message-ID: <df2a9e02-0ebe-401a-84b5-b0f404711521@gmail.com>
+Date: Fri, 14 Aug 2026 01:29:17 -0400
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: qce - Replace with stub driver
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Bartosz Golaszewski <brgl@kernel.org>, linux-crypto@vger.kernel.org,
+ Herbert Xu <herbert@gondor.apana.org.au>, linux-arm-msm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
+ Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+ Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Krzysztof Kozlowski <krzk@kernel.org>
+References: <e7aeec9b-11aa-4635-bde9-fb8c7ca38260@kernel.org>
+ <20260801171242.GA3567@quark>
+ <CAMRc=McL5QQRk8C8zzkHm+FUj-SAVi5PLJr2pXo8eNpaxXuALg@mail.gmail.com>
+ <20260811224110.GC1905@sol>
+ <CAMRc=MfVqphaVsfcmUXjGmu6m+F6nJYXgAPuTVjZBwFnd48BkA@mail.gmail.com>
+ <bc95e0b0-2cc5-4ad6-a319-ae4e159b92fe@gmail.com>
+ <CAMRc=Mcno_F2UuLXZ3ruaVSbYhssVK90m3KM=+dwskLMSp8TXg@mail.gmail.com>
+ <0d2706c6-79fa-40fc-a24a-6d5ffbf02330@gmail.com>
+ <20260813201019.GA987015@google.com>
+ <b7e697ee-ce3b-4c81-afb8-00205c2997f3@gmail.com>
+ <20260813213448.GB987015@google.com>
+Content-Language: en-US
+From: Demi Marie Obenour <demiobenour@gmail.com>
+Autocrypt: addr=demiobenour@gmail.com; keydata=
+ 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
+ +MYSfkEjBz0E8CLOcAw7JIwAaeBT
+In-Reply-To: <20260813213448.GB987015@google.com>
+
+--------------b2lmVs5wJKpQS07vcN45h9uV
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-Hi Herbert,
-  I need your input on the issue below in the SPAcc driver related to
-the DDT (scatter-gather) DMA.
-  I detailed the issue in the inline comment below.
+On 8/13/26 17:34, Eric Biggers wrote:
+> On Thu, Aug 13, 2026 at 05:00:28PM -0400, Demi Marie Obenour wrote:
+>> On 8/13/26 16:10, Eric Biggers wrote:
+>>> On Thu, Aug 13, 2026 at 03:09:36PM -0400, Demi Marie Obenour wrote:
+>>>>> SM8650 with the QCE is FIPS 140-2 certified and apparently this mak=
+es
+>>>>> a difference. Don't ask me if that makes sense, I don't claim to un=
+derstand
+>>>>> the legal aspects of it.
+>>>>
+>>>> That sounds like the kind of thing that would cause someone to use
+>>>> a worse implementation of cryptographic algorithms =F0=9F=99=82.
+>>>>
+>>>> For what it is worth, many common uses of kernel cryptography can't
+>>>> use the QCE.  This notably applies to the CSPRNG (/dev/urandom etc),=
 
-Warm regards,
-PK
+>>>> storage encryption, and AF_ALG.  Therefore, I expect that anyone who=
 
-
----------- Forwarded message ---------
-From: <sashiko-bot@kernel.org>
-Date: Wed, Aug 12, 2026 at 11:35=E2=80=AFPM
-Subject: Re: [PATCH v22 3/4] crypto: spacc - add spacc autodetect support
-To: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Cc: <devicetree@vger.kernel.org>, <conor+dt@kernel.org>, <robh@kernel.org>
-
-
-Thank you for your contribution! Sashiko AI review found 1 potential
-issue(s) to consider:
-- [High] Unkillable wait without a timeout in hardware autodetection
-can permanently hang the kernel.
---
-
---- Patch [3]: [PATCH v22 3/4] crypto: spacc - add spacc autodetect support=
- ---
-commit 1b02ffd964af3b1927d2fca1ccd5966f8d928e2e
-Author: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-crypto: spacc - add spacc autodetect support
-
-This commit adds autodetection support to the SPAcc driver to determine
-supported cryptographic algorithms. It runs test vectors through the hardwa=
+>>>> needs FIPS 140 compliance with Linux needs to ensure that the softwa=
 re
-during initialization and disables algorithms that fail to produce the
-expected output.
+>>>> crypto is certified, as that's what actually gets used in most cases=
+=2E
+>>>
+>>> Well there's that, and also the Inline Crypto Engine (which is actual=
+ly
+>>> being used and is unrelated to QCE) has its own FIPS certification.
+>>>
+>>> Which upstream kernel feature, if any, is QCE being used with?  I hav=
+e
+>>> asked this multiple times and still not gotten an answer.
+>> Historically AF_ALG has been used to access FIPS-certified crypto
+>> from userspace, but that no longer can be used with QCE.  Most kernel
+>> features reject CRYPTO_ALG_ASYNC, CRYPTO_ALG_ALLOCATES_MEMORY, or both=
+=2E
+>> If I exclude tests and fallback paths of other drivers, that leaves
+>> crypto/asymmetric_keys/public_key.c (hashing), BPF, MACsec, OpenVPN
+>> data channel offload, ecryptfs, Ceph, SMB, IPsec, mac802154, TIPC, TLS=
+,
+>> and crypto/kpp.c.  AF_ALG only allows offload drivers for cbc(paes),
+>> which QCE doesn't implement.  QCE is broken with IPsec and probably
+>> some other networking protocols, as it would wind up taking a mutex
+>> in softirq context.
+>=20
+> It's a far more narrow list than even that.  asymmetric_keys uses the
+> shash API, so it cannot use QCE.  BPF crypto uses the lskcipher API, so=
 
-> diff --git a/drivers/crypto/dwc-spacc/spacc_core.c b/drivers/crypto/dwc-s=
-pacc/spacc_core.c
-> index b72d5072ccc58..3287e9e61b1c0 100644
-> --- a/drivers/crypto/dwc-spacc/spacc_core.c
-> +++ b/drivers/crypto/dwc-spacc/spacc_core.c
-[ ... ]
-> @@ -579,6 +1480,275 @@ int spacc_close(struct spacc_device *dev, int hand=
-le)
-[ ... ]
-> +#if IS_ENABLED(CONFIG_CRYPTO_DEV_SPACC_AUTODETECT)
-[ ... ]
-> +static int spacc_check_modes(struct spacc_device *spacc, int algo_mode,
-> +                           int keysz_idx, void *virt, char *key,
-> +                           struct pdu_ddt *ddt)
-> +{
-[ ... ]
-> +     err =3D spacc_packet_enqueue_ddt(spacc, rc, ddt, ddt, proclen, 0,
-> +                                    aadlen, 0, 0, 0);
-> +     job =3D &spacc->job[rc];
-> +
-> +     if (err =3D=3D 0) {
-> +             /*
-> +              * No timeout, not interruptible: this only returns once
-> +              * job_done is actually true, i.e. the hardware has
-> +              * genuinely relinquished the job. That guarantees it is
-> +              * always safe to close the job/context and (via the
-> +              * caller) free the DMA buffer immediately below --
-> +              * there is no "unconfirmed" case left to handle.
-> +              *
-> +              * Tradeoff: if the hardware ever genuinely fails to
-> +              * complete a submitted job, this hangs here
-> +              * unkillably (TASK_UNINTERRUPTIBLE, no timeout) for the
-> +              * rest of probe. Accepted deliberately in place of the
-> +              * abandoned-job/UAF risk of giving up early with no
-> +              * hardware cancel available.
-> +              */
-> +             wait_event(job->waitq, job->job_done);
+> it cannot use QCE.  MACsec uses AES-GCM which QCE driver doesn't have.
+> OpenVPN uses AES-GCM or ChaCha20Poly1305, neither of which the QCE
+> driver has.  The non-legacy Ceph protocol uses AES-GCM, which again the=
 
-[Severity: High]
-Can this wait_event() cause a permanent kernel thread hang?
+> QCE driver doesn't have.  IPsec does decryption in softirq context,
+> which the QCE driver doesn't support.  QCE driver does not implement kp=
+p
+> algorithms.  SMB, TIPC, TLS, all usually use AES-GCM as well.  Until
+> just a couple months ago ksmbd crashed if passed an async algorithm,
+> which proves it was never used with QCE.  There is really not much left=
+,
+> maybe ecryptfs AES-CBC file contents encryption?  But even for that the=
 
-If the hardware fails to respond or trigger the completion interrupt, this
-uninterruptible wait will never complete. If the driver is built-in and
-probes synchronously, couldn't this stall the entire system boot process,
-or otherwise result in hung task panics?
+> cra_priority makes it not actually used.
+>=20
+> But we are going into the weeds here with trying to theorize some way
+> the code could theoretically be reached.  It seems it's really just not=
+=2E
+> Or at least if there is a use it is not upstream and/or is not actually=
 
-While the comment notes this as a deliberate tradeoff to avoid DMA
-use-after-free risks upon abandoning the job, is it possible to implement a
-safe hardware cancellation or reset path and use wait_event_timeout()
-instead of relying on an unkillable wait?
+> the appropriate code to be using.
+At this point I think it is quite clear that the following algorithms
+provided by QCE are unusable no matter what userspace does:
 
-PK: SPAcc DDT(scatter-gather) DMA has a design limitation: we can't
-kill or reset an in-flight DDT DMA operation programmatically.
+- SHA256
+- HMAC-SHA256
+- AES-XTS
+- authenc(hmac(sha256),cbc(aes))
 
-Once a DDT DMA operation begins, it runs-to-completion with either
-  - successful DMA transfer or
-  - errors out with proper error codes
+Those should all be deleted as unreachable or unused code.  There are
+also a lot of algorithms in other drivers that can also be removed.
 
-Sashiko bot review has problem with both ("wait_event" &
-"wait_event_timeout" usage) in code.
-1. With "wait_event" the bot raises hang issue.
-2. With "wait_event_timeout" it raises the 'no option to stop
-in-flight DMA operation' issue.
+If the driver was actually used, I _suspect_ it was by requesting it
+explicitly via AF_ALG.  AF_ALG won't let you do that anymore, though.
+The other possibilities I can think of are messing with priorities via
+NETLINK_CRYPTO or somehow not building any software implementations
+with a higher cra_priority than QCE.
 
-I have tried both options, and the driver works perfectly fine, but
-Sashiko bot flags issues with both variations. I need your input to
-resolve this, as I'm stuck with this Sashiko bot issue. I prefer
-"wait_event" since I want the DMA operation to run-to-completion.
-Please suggest.
+Splitting the driver up would be much better than the current status
+quo, though.
+--=20
+Sincerely,
+Demi Marie Obenour (she/her/hers)
 
+--------------b2lmVs5wJKpQS07vcN45h9uV--
 
-> +
-> +             job->job_done =3D 0;
-> +             err =3D job->job_err;
-> +     }
-[ ... ]
+--------------nXzoSzcLz1089Ey4q1hbHcJh
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
---
-Sashiko AI review =C2=B7
-https://sashiko.dev/#/patchset/20260812175020.666558-1-pavitrakumarm@vayavy=
-alabs.com?part=3D3
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEopQtqVJW1aeuo9/sszaHOrMp8lMFAmp+p7kACgkQszaHOrMp
+8lO4Ng/+Oat+SL0D3pc+KRTBhovFWMYo6JusJNlUNDqAl2X6LlQuI0BtFeOQ2R0B
+Ei4KHe0R3Nv2ucbV52uzM+DaP/CpDPJVCcPZlkjegIQ6om1L1UvBWdJNrN5hdBzk
+pmHyWBlZjO+1risApvLyvsfbAJu4UP5iKJ/A2GQ8/86ILNoNuf4XjkftTer156VV
+WLRWkLo70FC+y5aqXZis3ca+dRHdwMp9oea45eBe0AAPt69KF5EH/CcoOyjQYYr7
+CuhyY03LixxHB/Tp6FiZJpUH/OQhIoZQJSueH4Hp7/sbW5OSZRFKywggi5+IrCOP
+HHngA4qycTGcOb/2RIWiDud2ssUWfzCLWoz2fkxkBhzFOTtUAfjBhp7lKRevRFJ2
+gNgyuYhrC2Vv0j6d+d0ZRNRKNsLavVw0R2GJtHh10Bn3OMwMOvDexjvT+jrK4y3y
+Xgof6cBhyhLCdPU2/jmWhzmITCdo3QzAGisJok1TgcgblmpiVmnWz9w3f1eAPGDS
+eS4CjEb2I9XLs+7vj6Avj7c26QiWXYMICNwJA7SfWhRi3PrFQXizN5ZfeVH4HcDW
+ym7OdWDBbNeiRdrv4VHpsCYb9ELq5jBkHaBf3G1kbWdM++rlSPI7yFtzmCckwAZR
+GIRPq8iTu4vMSfSvs0mt8yMxLJxfebIO+c+Oles0wKwfNt/IyCw=
+=69KI
+-----END PGP SIGNATURE-----
+
+--------------nXzoSzcLz1089Ey4q1hbHcJh--
