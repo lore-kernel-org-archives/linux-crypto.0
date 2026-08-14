@@ -1,131 +1,116 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA6E247010F;
-	Fri, 14 Aug 2026 13:32:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B1CA43D501
+	for <linux-crypto@vger.kernel.org>; Fri, 14 Aug 2026 13:39:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786714351; cv=none; b=FHiQcHQ/Qk/OYz7K2dzL6UZZdCnBi74Hy/t38yKacsiFE5lqNHldV9/BLpcjoqLlTr10o7hbxgmlRKgddXOOuOTKeVtXzagCtwXflqXhzLJ6uRIbxlwcazNknflCFf+qF4uJBHFEwXbbEMQltfYHoiRj4YfnU3fdZIBMpQgpN5I=
+	t=1786714780; cv=none; b=MJBIur6Gvid5VM+h4e0PFusbNqA4ocL1RgAoU2vxqEacQvtbYtw4mGZ6BM/ldvwQjtk3T5QXwdObBDf2+i5Lzhcqg5R1a7jDmTOFrEj+CieInAv7GRZT02MUs507Zpvf5V+6EZQdaFs4mXE1x4wIGeLt3/FCAG/L73eL86f4plM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786714351; c=relaxed/simple;
-	bh=gxHgPKKDsp4s3j3aspbb4eL5vC7P03+RgGdgXoNRdw0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mD8/VJlEmeQv7X/6DafPUMCdZ+U7kLD7qcPt5lZfTBqHDwL+2MlkuS8XuXU5qb0RWdbBCf9/CwNNTfVAF0V8f5m+YWJwCnKxAIAhyfrYKHvNykktxmJEA1eveZ9P3oIaouS86silBtwDqtRCDcJkBNo8dD1jFtznueAi+ZJA5tI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Y/mrSmdD; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1786714780; c=relaxed/simple;
+	bh=s6stw3qekj32gPO2Cbo5W9gIsKVEW343T7LTAMhAC2c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WJqC4lb34FGjnlV0+tJW3w0pVVpOK1/usb5WbafUuY3c3xRW8Q0VjrzBW7RUicuSW/BSrYGuzh/tygkjqE20f8NCoJvcyPpu82HPKQ/Q0WVhKq56ObGsCeA/3nBumKx9YJ/Fr1QXI8btl54VECVoqMC+gUrUUdGvjPImv4J2hJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hk2MVYQc; arc=none smtp.client-ip=209.85.215.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Y/mrSmdD"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67EB1jIW984647;
-	Fri, 14 Aug 2026 13:32:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=7/kSo6
-	htA/H+CcZPauBm8is3eicsWLT+4E+xjNW9Gb0=; b=Y/mrSmdDLJvoSFHeLd5zsS
-	rK6UqI/v0c8AY2E9EYJDOcAydbJzw2GMUXx24hCW8dbdQUF9ykz7RAi4ABtGPc+Y
-	lY2VDndm563h3gXB+kNJFajRZj6fTnr0/TUDPsCjcwLqfF1PKEpoJQFkVas58LRu
-	JLYR150gxIIZS9pe2SNSCrJzhyI1F8TgEQGCAYWuzFFa3wBAtwuIDI9uTZYRtDfn
-	mcOcb5hBVw4x7c6NfAAZtKvJrpQIHjp5rRhg3Qd9lCZm/3iYvZUqQao0tmc18EFi
-	8ZrONkLtG1WNcUXKV+4H4ZEQJA8kQeg0rzzdN9DCkcLQOK3RpCzsjwUkujEhd0gg
-	==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4fwvnwktam-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Aug 2026 13:32:26 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 67EDQqxR028332;
-	Fri, 14 Aug 2026 13:32:25 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4fxg9hfcn7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Aug 2026 13:32:25 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67EDWLSl42402164
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 14 Aug 2026 13:32:21 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5603020043;
-	Fri, 14 Aug 2026 13:32:21 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EE53820040;
-	Fri, 14 Aug 2026 13:32:20 +0000 (GMT)
-Received: from [9.111.74.75] (unknown [9.111.74.75])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 14 Aug 2026 13:32:20 +0000 (GMT)
-Message-ID: <b19ea855-9909-49f4-867f-67dc3357d719@linux.ibm.com>
-Date: Fri, 14 Aug 2026 15:32:20 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hk2MVYQc"
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-c966b9ee9cbso609649a12.1
+        for <linux-crypto@vger.kernel.org>; Fri, 14 Aug 2026 06:39:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786714778; x=1787319578; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=q56pSemoPlmRoOMF/Kg5BWEkXRAm+Wr9UjJACPvLbeo=;
+        b=hk2MVYQc1l9bofdSGVqrnTxtOQG71zqNPgu9sWrh+km7bZ/RkwM5/Q0fay/zq6l4Qo
+         EVCyaRb6vc8k4IqbUNiu7ZyqG2459uKGiyaU6HJip8G2Rh2Z9M45UeH/uN0keKwVo4Lf
+         ZQkdKcoeQQCBwNq24KKcegvrNMO9Is9ApqcQUN/2owe+wS3+BDKzY2Vqw067KUZeFzm6
+         9DXrH7ytcBmypWqHrtK3JhLDU0FE33SLB+jZybs7rodHC0aZdGyX5U7qcaXY1FcM7ARJ
+         88ZBn4EHa7nQ/jwdzwKx+kk1NrzFsLzyaTZcRuT41cyh5JFWn+8x5b1w42SGcIBbkSdY
+         j0dQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786714778; x=1787319578;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=q56pSemoPlmRoOMF/Kg5BWEkXRAm+Wr9UjJACPvLbeo=;
+        b=MnhbIRDRpGQAdm6boOM3voEFhvGSXT+jywCPM7DVJ3czPAKf648yD0daX6hxQXWwTZ
+         aQoRK0CEK5ls7t88OC0wha7bib9aCyK71nE2ruBjx4br9xwG/qtJgi3rnYNVB2ObvAp4
+         cy6lX8T9pJVQUhc7RCBG4x5P8vCQ4uxi8w+MU/ZsHNZy9xqfCNO/msuNdi52gZesNeUs
+         k7NUcpxOrZe9iFZG5/djabAd0Mqq91RvysNygOXwFaAq26rAYtjxF9w7601Iic3v0CiX
+         7yUCwXzrrwMYWM2FLAe0lh0aFGGZ/cLgmypfRfL3N6J/APJDxEPMePcTFa6mkVvVxQ/W
+         za5Q==
+X-Gm-Message-State: AOJu0YxD+yk3Ng6604qjOgVbMBobw+pp5vBlbzv2jvedB3F6AIJhFqCO
+	oW2TGZNwOBdGl9xoBNX9FTrEMbDOknwEsckVX0WrFT2FUAFEUSR9clib
+X-Gm-Gg: AR+sD11IBE2axd2PZbwdDCkxiGynjs1BxpSbQXa9cHoZ2+TAyPvlNzm9q1m5el2MMJM
+	XnR7e5tKnsmSRABxKR9gUBvVSm2d2bMA1VNfo85SHVyzAYw0AW9/Ocwtkx8gXEJJXxp9UE6JPVG
+	Q1LxjMZyYRMJe/rTKTUKI/c4tDm6/SqKpbhBIxIuJmCNnI5kk0piqHC9jrGjG9RN3U+VDlNrSIy
+	rThZGKEboNPkM5sJZyNMpj/mtTgcLIdaA5UIGrN5cFD+Wk+Xe+7sYnNj630BcqTej7BtF69NJwV
+	ARuXCy5cRRi0KNH3MB75xNqdW+YrEPtpbPFNPqo3aRrFqREiqJE3Qc3pd9iv/tqKJ2yHKs7+Kqm
+	XKhbVNnuSGCxXPfteXmYX4YoqLo8pnUIP5QsWiz1/Q0bhHCYESOvfVpaW6i4RiibRsXwo12RNLW
+	eXghDYzOUmSZep/cBzpO9fXEN38DqJJAZuy5Ck6nmY2AkEqjRU2RkODXy3KVWYLe7ac/cU+NqGe
+	obDHpAv
+X-Received: by 2002:a05:6a21:3281:b0:3cc:56be:a559 with SMTP id adf61e73a8af0-3cc71fa8c5dmr5670551637.23.1786714778197;
+        Fri, 14 Aug 2026 06:39:38 -0700 (PDT)
+Received: from haichao.tail057a43.ts.net ([2001:da8:e000:1206:e9af:7c0e:be31:2c3f])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cc08f388bf9sm608922a12.5.2026.08.14.06.39.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Aug 2026 06:39:37 -0700 (PDT)
+From: Ruoyu Wang <ruoyuw560@gmail.com>
+To: Hadar Gat <hadar.gat@arm.com>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ruoyu Wang <ruoyuw560@gmail.com>
+Subject: [PATCH] hwrng: cctrng - Fix runtime PM usage counter leak
+Date: Fri, 14 Aug 2026 21:39:33 +0800
+Message-ID: <20260814133933.1385764-1-ruoyuw560@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/3] s390/crypto: Fix missing scrub of temp buffers
- with AES ctr and gcm algorithm
-To: Harald Freudenberger <freude@linux.ibm.com>
-Cc: fcallies@linux.ibm.com, ifranzki@linux.ibm.com, linux-s390@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        linux-crypto@vger.kernel.org
-References: <20260814123711.61145-1-freude@linux.ibm.com>
- <20260814123711.61145-3-freude@linux.ibm.com>
-From: Holger Dengler <dengler@linux.ibm.com>
-Content-Language: en-US, de-DE
-In-Reply-To: <20260814123711.61145-3-freude@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=RsP16imK c=1 sm=1 tr=0 ts=6a7f18ea cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=RzCfie-kr_QcCd8fBx8p:22 a=VnNF1IyMAAAA:8
- a=VwQbUJbxAAAA:8 a=T_O0lcmcSonZr7JI6ZAA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=zZCYzV9kfG8A:10
-X-Proofpoint-GUID: br52cBdbb5dzQkubuq5iWBEDVUBroc4D
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODE0MDEwMyBTYWx0ZWRfX6jVPHiZNigB+
- HsZmIu/L8PdcxahqYrS4L9PSNsFgUEWo7VZpyJ5rZH24QBFD6CQf0i7MTeUoQahliluwfGpu/vG
- oQuG4VJAUXr6aFDyml/8z/y/4tFXdbK7n+ODpDITwYzxUEA6gVORD9ga82jTmTODEdgrX+wkix1
- 1Xljy/rJH807F2qXQQP0zMGbgWNFXWdAFuwD5my7o6Uh7CWRVnNpTj0OWWxnNCdtV/UdZKeq8rM
- mPsvvntCvmF6qFFutiNBddgAG1s5+J7F27NDw9OWTc7CuLzkE8sv8M8Iv1g8N4UB2Y3k5tECzQ2
- 7JvQOQnIB8luO9xbb1s/eQTiBahyscX2Cmr05p0smZtfANLLBVPSj/a6548nDZXJzzlFKkRkwv1
- F8KwbDdWmX1vMpflb9qjkqdEVFqoruipRj340eg7ep/I6zAvASICwLu8XhFLvB0c9XMLk9pY/vB
- nJAGna7u7/+KBEW0tIg==
-X-Proofpoint-ORIG-GUID: br52cBdbb5dzQkubuq5iWBEDVUBroc4D
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODE0MDEwMyBTYWx0ZWRfXzEeIimMvMqOw
- GEJ6HKNNbxuKygr62Teu2drUVnBMDxy3jRr58fqc31yvhjUfcAkRBI7bNdOM9+msteed9env0ZE
- 1H5YnIIejvmx8YI3taOmFacdI7zsb+Q=
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-14_04,2026-08-12_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 impostorscore=0 suspectscore=0 clxscore=1015 malwarescore=0
- phishscore=0 adultscore=0 lowpriorityscore=0 priorityscore=1501 bulkscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608140103
 
-On 8/14/26 14:37, Harald Freudenberger wrote:
-> In function ctr_aes_crypt() there is a buffer used to process
-> remaining bytes < AES_BLOCK_SIZE. This buffer was not scrubbed and
-> thus could lead to expose of unwanted data. When the buffer is used
-> explicitly scrub it at the end of the code block to avoid exposure of
-> maybe sensitive data.
-> 
-> In a similar way the function gcm_aes_crypt() hat an error path where
-> the CPACF param block was not scrubbed. Instead of return early now
-> these error paths go to end of function where explicit scrubbing is
-> done. Similar with the buffers which are part of the gcm_sg_walk
-> structs from the variables gw_in and gw_out.
-> 
-> Fixes: d07f951903fa ("crypto: s390/aes - Fix buffer overread in CTR mode")
-> Signed-off-by: Harald Freudenberger <freude@linux.ibm.com>
-> Cc: stable@vger.kernel.org # 6.8+
+pm_runtime_get_sync() increments the device usage counter even when
+runtime resume fails. cctrng_read() propagates errors from
+cc_trng_pm_get() without scheduling the work that later drops the
+counter, so a clock or reset-completion failure in cctrng_resume()
+leaves the counter elevated.
 
-Reviewed-by: Holger Dengler <dengler@linux.ibm.com>
+Use pm_runtime_resume_and_get(), which drops the usage counter when
+resume fails and returns zero on success. This preserves the existing
+success path while balancing the error path.
 
+This issue was found by a static analysis checker and confirmed by
+manual source review.
+
+Fixes: a583ed310bb6 ("hwrng: cctrng - introduce Arm CryptoCell driver")
+Signed-off-by: Ruoyu Wang <ruoyuw560@gmail.com>
+---
+ drivers/char/hw_random/cctrng.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/drivers/char/hw_random/cctrng.c b/drivers/char/hw_random/cctrng.c
+index a5be9258037f8..41c338a768ce9 100644
+--- a/drivers/char/hw_random/cctrng.c
++++ b/drivers/char/hw_random/cctrng.c
+@@ -86,12 +86,7 @@ static inline u32 cc_ioread(struct cctrng_drvdata *drvdata, u32 reg)
+ 
+ static int cc_trng_pm_get(struct device *dev)
+ {
+-	int rc = 0;
+-
+-	rc = pm_runtime_get_sync(dev);
+-
+-	/* pm_runtime_get_sync() can return 1 as a valid return code */
+-	return (rc == 1 ? 0 : rc);
++	return pm_runtime_resume_and_get(dev);
+ }
+ 
+ static void cc_trng_pm_put_suspend(struct device *dev)
 -- 
-Mit freundlichen Grüßen / Kind regards
-Holger Dengler
-
+2.51.0
