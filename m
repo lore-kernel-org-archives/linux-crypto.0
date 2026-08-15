@@ -1,45 +1,54 @@
 Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD8FB2EA732;
-	Sat, 15 Aug 2026 01:29:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 788C8156F45;
+	Sat, 15 Aug 2026 01:31:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786757374; cv=none; b=Lr+k9eKPBh1Byod2KgbAEVPRU3IJkfVRc85oW5X8mjLXjZzhQ3r9f27i4nW7EzUGtvL3lLrA4UrInp97b3j4aKihS/g+ZJO/08OyPSx8wuQecvigHEnx4h+IDoQB8W4W91OGcgtxdByz8iEQa5LCFUOKpCeLUtIiAFr+heRtBXw=
+	t=1786757475; cv=none; b=QFZH7paGz+gWa5eInPPZOoTJ+BRnip+2XobXbKcbEHHR0NrYRzZ4jr0qOhZVhyW6XHrqaQKF3efq7YEVIau/LdheE+Cju5AFt08gQz+mHyEOOehRZyiegFHQQTWvC8w8ofr4LjBazqdBdS1yM7YgejdTBlagtTW1d/c8WK/66NQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786757374; c=relaxed/simple;
-	bh=75x3FYMu6RPT5C9banVQ+giOfwegPCbAFDAMCqUlGa0=;
+	s=arc-20240116; t=1786757475; c=relaxed/simple;
+	bh=YDFTkQHt8HnJARMi6gDcRoWwjeA5/O638hK/VLKSipY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EVLM/gSwCY1sl768z5T9Ydn+s+DoDX7VI+QIlb65XBkEuVGIT8KiJN3C1i1s+9SmCxBE0RMVUjLN/4puGN6ak5WPXfxCSCCxMCZt/lcofOPg2chKdTMowd/8/VpqVm7Zo8e/iVog+e+AuumGulUwBHkOgUFdlvLP65zLsrkJLJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=PezA0FeX; arc=none smtp.client-ip=180.181.231.80
+	 Content-Type:Content-Disposition:In-Reply-To; b=B3w02Gay9HWwILY4Fp/g8k/gz0Jpv0X6TnCxW6rR3h99MVhwh5kQ0LkYHqIuWwJKektoa7mX2vbjAQlEYcGM4Thyc3rfYKOVveYOmAW73sH2t6sifSgupufejOpN+jQ4IY73YUo0I9yJ67mjainugx4toSg64n5cLK+NmDTPp18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=cAOJ6Gmx; arc=none smtp.client-ip=180.181.231.80
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="PezA0FeX"
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="cAOJ6Gmx"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=/lRxqFIy57wr0rIvp/SJiwwkRKQoz+OECrLvNZgu9Bc=; 
-	b=PezA0FeXkVqohyW1JhGvjjl+szzrYfGuJoRFmgvNYWEqeCrcqUBYgbCSYtp/SSJ5CBsORWRqi/B
-	QRkpy2M3KfGAfS/M+PGiFmAVAAA4HFio+/jUPOc7E6xwPQx32PnkxsidqsLqCVPcVzY4/A5i994bQ
-	uxdJwauvdmH3kgDq5PdNGfp5ArtWGocOIwXfFFS+rt5bKlQ+s7msykLUiN5ushGU0BTsk20F6KZCm
-	cXbNqB9eqN/tJQ/f7mJ+nuEgjzgsnCYX9f+MMp/Zg06ccCq/c/9WnENHdH5Xp2lELKB2ksNMRlfwn
-	gKH/j+B4gcDa5rIkta5+NtZ0QYhOa1mAttVA==;
+	from:content-type:reply-to; bh=4jNghAtZwFig/xlQiovRnBECwDlgnSHSfon4Uu5rLD0=; 
+	b=cAOJ6Gmx8d5QK57AOfxVWxEQ6xlBu8EIAP+5ZY8Ksm6o5+FcnmgqgQiOYnOpFiqvZmCrJgqQC+b
+	FYgk3XtPrf91mGh18JpR/1SDx2s08I72NYgxFgYwJ9X2Hhpn8KxHt9PtXkAUyJTCa63+5F+NT8zn9
+	wzEQYyhzTj2WHjxSdbh/v6er5G9MNpvJfRRNdfaZK8JXDB7VuaC2IlxojutRx8IZ+CaIdh7ZBZ6S8
+	4bTWmC5Y3BxIpQ3m6lHF/xNXPS6slH4KrBrW500vg4u0vbVZMfgp7rlt7a6u8XXsqeA3MryLEYOUp
+	YZ8fGi3TF7czcPHEAJbJ8tpmao002sL0Mrcw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1wv3DE-00000005507-2Kgy;
-	Sat, 15 Aug 2026 09:29:29 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 15 Aug 2026 11:29:28 +1000
-Date: Sat, 15 Aug 2026 11:29:28 +1000
+	id 1wv3Ec-0000000552w-0fvi;
+	Sat, 15 Aug 2026 09:30:55 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 15 Aug 2026 11:30:54 +1000
+Date: Sat, 15 Aug 2026 11:30:54 +1000
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Md Sadre Alam <md.alam@oss.qualcomm.com>
-Cc: brgl@kernel.org, davem@davemloft.net, thara.gopinath@linaro.org,
-	linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	varadarajan.narayanan@oss.qualcomm.com
-Subject: Re: [PATCH] crypto: qce: fix CCM AAD buffer underallocation
-Message-ID: <an_A-IUOL0yPFAKE@gondor.apana.org.au>
-References: <20260807065454.1640815-1-md.alam@oss.qualcomm.com>
+To: pzalewski@thegoodpenguin.co.uk
+Cc: Clemens Ladisch <clemens@ladisch.de>, Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Mattia Dongili <malattia@linux.it>,
+	Weili Qian <qianweili@huawei.com>,
+	Olivia Mackall <olivia@selenic.com>,
+	Corey Minyard <corey@minyard.net>, Peter Huewe <peterhuewe@gmx.de>,
+	Jarkko Sakkinen <jarkko@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	linux-kernel@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	openipmi-developer@lists.sourceforge.net,
+	linux-integrity@vger.kernel.org
+Subject: Re: [PATCH 2/4] char: hw_random: use named initializers for
+ acpi_device_id
+Message-ID: <an_BTvo8t80rPGIW@gondor.apana.org.au>
+References: <20260807-acpi-char-v1-0-742c450254dd@thegoodpenguin.co.uk>
+ <20260807-acpi-char-v1-2-742c450254dd@thegoodpenguin.co.uk>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -48,51 +57,21 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260807065454.1640815-1-md.alam@oss.qualcomm.com>
+In-Reply-To: <20260807-acpi-char-v1-2-742c450254dd@thegoodpenguin.co.uk>
 
-On Fri, Aug 07, 2026 at 12:24:54PM +0530, Md Sadre Alam wrote:
-> The AAD buffer allocated in qce_aead_ccm_prepare_buf_assoclen()
-> can be smaller than the length later programmed into the DMA
-> scatterlist.
+On Fri, Aug 07, 2026 at 12:26:09PM +0100, Pawel Zalewski via B4 Relay wrote:
+> From: "Pawel Zalewski (The Capable Hub)" <pzalewski@thegoodpenguin.co.uk>
 > 
-> The allocation size is currently calculated as:
+> Use a named initializer for the acpi_device_id fields which
+> makes the code more readable and consistent with how lists
+> are initialized in the rest of the kernel code base. Also
+> drop explicitly setting fields to 0 where it is redundant.
 > 
->   ALIGN(assoclen, 16) + MAX_CCM_ADATA_HEADER_LEN
-> 
-> while the DMA length is set to:
-> 
->   ALIGN(assoclen + adata_header_len, 16)
-> 
-> Since ALIGN() does not distribute over addition, the allocation
-> can be smaller than the DMA length. For example, when
-> assoclen = 32 and adata_header_len = 2:
-> 
->   allocation = ALIGN(32, 16) + 6 = 38
->   DMA length = ALIGN(32 + 2, 16) = 48
-> 
-> As a result, the QCE hardware can read beyond the allocated
-> buffer while computing the CBC-MAC over the associated data.
-> The extra bytes are folded into the authentication tag,
-> resulting in an incorrect tag and causing CCM self-test
-> failures such as:
-> 
->   alg: aead: ccm-aes-qce encryption test failed (wrong result)
->   on test vector 8
-> 
-> Fix the allocation by adding the maximum possible AAD header
-> length before alignment:
-> 
->   ALIGN(assoclen + MAX_CCM_ADATA_HEADER_LEN, 16)
-> 
-> This guarantees that the allocated buffer is large enough
-> for the fully padded AAD data for all supported header sizes.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 9363efb4181c ("crypto: qce - Add support for AEAD algorithms")
-> Signed-off-by: Md Sadre Alam <md.alam@oss.qualcomm.com>
+> Signed-off-by: Pawel Zalewski (The Capable Hub) <pzalewski@thegoodpenguin.co.uk>
 > ---
->  drivers/crypto/qce/aead.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  drivers/char/hw_random/hisi-trng-v2.c | 2 +-
+>  drivers/char/hw_random/xgene-rng.c    | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 
 Patch applied.  Thanks.
 -- 
