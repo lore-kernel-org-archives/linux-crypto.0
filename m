@@ -1,71 +1,71 @@
-Received: from fhigh-a8-smtp.messagingengine.com (fhigh-a8-smtp.messagingengine.com [103.168.172.159])
+Received: from fout-b8-smtp.messagingengine.com (fout-b8-smtp.messagingengine.com [202.12.124.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFB684964F;
-	Sat, 15 Aug 2026 04:57:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 460A0361976;
+	Sat, 15 Aug 2026 06:24:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786769829; cv=none; b=A3Oz3sOeY6IqgKufnz6dD3dM+BIvlh7wA0JEr+iz6bVQKHy9zn5J1csbrBfSPiQeFf74imca/H1jmffULtmgfQRkHoOG8+RVvmKtWZqXIs9EbA3jU0nxTpPmYeaOAgIgaU48rVhjdkWsAvqiOpWODjMBqT9vPbCBRoK4ftF2klk=
+	t=1786775056; cv=none; b=f9b/m6baRjcSblUeW/pHdoqdQEryyLWOSzPyCz0ASJdElBrOvYnWg/9yFkhJn7zh2o1G34eQFYBauvhkS2MA+W7RWFHTT8dJHyWyZd3yh1RQgI2Dk786SaeL3/cGFHR5dzUaV7a9hfpnfBFrndR4tCCvdKZ8LWMG7w9ivbnsQlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786769829; c=relaxed/simple;
-	bh=4T0ix+q8kznq+1wwuJATrtbN/PAw3QOdUwC3wGX7jWs=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:Date:Message-id; b=fMpATTL6I62BNWdqo0reoXVSjvcWyPZ8MawNF0es/47bbTRZAqYBIGU1hXM2gpyv8dy45vJag+jSqtSEEYh+epjLBToz7aSBOYrU3nP8WtG8uCsw5ELQbgM5P93KgSi0U662azhw5DrYfWCqwW6fsyJOIySaoRTzZ5o1r2CU82g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=UAgzn17w; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=agrWfoPI; arc=none smtp.client-ip=103.168.172.159
+	s=arc-20240116; t=1786775056; c=relaxed/simple;
+	bh=Zc/gP89bo5PWtNpdz40BdQns+8bAGkJdJQrBbFkUOsE=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:Date:Message-id; b=f+RRylx5TCXKyEpawP6wReP+zUh8AzckGcF0sezpMw5WPMENtfXoG4IfaBgkfNhoLMsX0uNojpuSMdZW1tsWtZPhvrb3otCAga1vPeQYz7+2DJuwIxOUrvh856Sn1W1FDyD2uoRe7fidBXZRdY7gUYYdlv4qThk+C3DkT+DcDaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=GBcGg8fm; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=VLJ+kX44; arc=none smtp.client-ip=202.12.124.151
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="UAgzn17w";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="agrWfoPI"
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id D70501400155;
-	Sat, 15 Aug 2026 00:57:06 -0400 (EDT)
-Received: from phl-frontend-03 ([10.202.2.162])
-  by phl-compute-04.internal (MEProxy); Sat, 15 Aug 2026 00:57:06 -0400
+	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="GBcGg8fm";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="VLJ+kX44"
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfout.stl.internal (Postfix) with ESMTP id 7262D1D00066;
+	Sat, 15 Aug 2026 02:24:14 -0400 (EDT)
+Received: from phl-frontend-04 ([10.202.2.163])
+  by phl-compute-02.internal (MEProxy); Sat, 15 Aug 2026 02:24:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
 	cc:cc:content-transfer-encoding:content-type:content-type:date
 	:date:from:from:in-reply-to:message-id:mime-version:reply-to
-	:reply-to:subject:subject:to:to; s=fm3; t=1786769826; x=
-	1786856226; bh=wVmXDmHcEURTsEPo2xr5FvYCGQo/GWBjjbW9Do4jviU=; b=U
-	Agzn17wOgbFZrRy+wqHLbcd1gmGEcUAq6yN1rjK3eyQ8kMy9KGLVvCUTPABVHubR
-	GEdFs3g5s+DWAlIG57e4M62Jm7KwWw8JD7UwWCMijkmysONI12eW0wqOf2YqT9vs
-	8O97uUmTAtNHj6iW+xGcVrPOkjk2iwBPRsnLCRcKw3Fj7WgEc6c3xCjNALTgpZAp
-	NFiXL+ytvjvSDXpNBTYHyUliqG1D2knPj9xXI8lSQEnPyICQiyb/p/IYVFgv+HD6
-	thn6KrZNYaUcv5DK0h2mxTUY0kdfl60jU4lT3L/7I50eeXQ8zZG0OZYdl06/2eT+
-	MbcLxW/DWJdVc76scaogw==
+	:reply-to:subject:subject:to:to; s=fm3; t=1786775054; x=
+	1786861454; bh=jKvxr63tWeJ1GLbaD7d6MjJ3As5YYyxyA2IvzkPjdPw=; b=G
+	BcGg8fmGrJ37t/sje3M1e8P2n9tvQO9fK2B1wY1FWXmPRs4diHYDjZ6JRsgvb6bB
+	a7nhu7Qi5uy05WW0UcjJf6o1WpVrVdXit98KXWfbzvBrjWLpXsXxQ6+MVsSBEvqY
+	gBQB2Vu7eHTngWfi0eX4a1dKTugmrdSUtuLflz5WdW13iEbrYkYiHTPsIwRv0W7x
+	vsrxqhUBHSp22Osz9pzWDIUWLMX7cYvYReQDWg3QeMjZc8x5t9bxHU+X1dj1otWP
+	HtkrlPGpTpzxNb9DGA7NDR/Nc9g1sypjyDjEPHYZhE1gcBITKelCgWKROnIThF5q
+	MT5ctHCX9Ng+YzrUCJ1Cw==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:cc:content-transfer-encoding
 	:content-type:content-type:date:date:feedback-id:feedback-id
 	:from:from:in-reply-to:message-id:mime-version:reply-to:reply-to
 	:subject:subject:to:to:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm3; t=1786769826; x=1786856226; bh=wVmXDmHcEURTs
-	EPo2xr5FvYCGQo/GWBjjbW9Do4jviU=; b=agrWfoPIFMheXSDmsGS6ghNNvRpo1
-	RSca4r6+GT1jHQWssqJn9VwLeUy0wUJX9LRfJ1oBHCdlLriV3PxifE6w+blJdDj2
-	1XPxCSp4umiS/qeEktP7U8jBYK+en3+CUAPc/AjWmY+XBZNyFO0WLJZE7EvG2Kj9
-	0hXWIV++fFogRkT7asY0NhtLf/cq5SsErxONOnZQSz0iYHRS7S9qaSd6WOzkgDNS
-	7ByGrn1Wgdpo5EwC2flH1+IrnlYadqlUz4ACpPLfQNzo6QGnS2qEnVe45tePTtuo
-	wA9ihmxbnn9akHZmGLTqtB2znZ+8j7v6UvOfvvFWMb0Yyp7kInOMdStYQ==
-X-ME-Sender: <xms:ovF_ahfPWAXzohQJkPcIUNtUVF82VoABORfFX1ZoBcuj2pT-HaL8Yw>
-    <xme:ovF_av5Ewnr-GtOlHB1yZBsGcDlhV2i0jy894VYK5OGlNaRoegp9j02aP0DbSV-Hq
-    dJ6veM50k5aXhZJODCYf0bmW3wBmWaq0zEpCZ_XfUNb57nDmw>
-X-ME-Received: <xmr:ovF_aotokPTCqed6PCusDTCs7IetGHLc1aUTjPv-yigVM4ocAaS9DzEVJGfcjdJbXmVAIjMkDHbzZijlp4P_yheaoj8EsnI>
-X-ME-Proxy-Cause: dmFkZTFRcu+UscIoleLUHOjuMYizrHRkJ1zFpOCYh4VXHVhdWJn6XCZ5fIFXiZ+RKU6dG8
-    FdPCRW02Qgp0SiyI4iWTJDqq/OH7h7fPr8nAlAEljYAf6oznZUFT41wpPKzrfSk/71Azv3
-    rd7XWRsllbR3Tua1jiUG5x7V5w3k8VJGLT0bXY4UQ/YFAzepL1AmBQK4fuCzTY8vPEpo2N
-    yEW8NphB91/BXvi1aDFO4YaZpATxSfCDHChQbrT12fQMWdzyFy11D+h78Plw+rUDHhkYiI
-    Q3CmSg4caTugqG7fPogzvJK/b70bhKNXaeMxb2MkWyIl+DE39yUS5yX0TQWC+swcFY4QNz
-    iLY4UfZ67vnxJXpUoPnYsTmiU2w+NPLnhwonS+8W/j2N71qp4Iuo3rn8z0g9/vdbwcTqev
-    BSMapiEhid8yfBwCj0Y+HWQycPs1r85sPpuYa5jFCN3FMk/AT6aOrlgbnZOlbwRJvu1Iwa
-    55YbjQk59bjEc4Qwavt7uMc5f8+KNspzrvq34vz/O7B4oiUsyvBc5GjJNHZNiiG16ZUZh5
-    QrMIIb+I3Kexjk97wfKrVfm29pmZ65FvhmupNDJyYGPpeeuIdrVn2pL2ycrwzS7H5CWiFt
-    XkjjHNxhsKSVUqQG6yMVvWRNv9BQ8UK4ikeT8UIvyfj8+m1cF5Tf0xH/cckw
-X-ME-Proxy: <xmx:ovF_avjE2htRuO2ubRUpBMTvlhHjbUeR4abUqx8rLojjvYnGsVKTrA>
-    <xmx:ovF_ajoJl4EBpgBfE-m4uG1pjbx465MPtEt-WUezEqMKycGLI7PcSg>
-    <xmx:ovF_assEejuniuAtkmfC-AnHvQgnhgSfSZ4otA-EeiMUbEvZj0Xh5Q>
-    <xmx:ovF_amYq8_suce9TVe2xpIO2nXjOVEo6IfG_u_O1KOzx2Agwuit7Pg>
-    <xmx:ovF_avyRPPA-vFEI3OHOQyRAcLM-rbrqFAN8OVLMTh3N9BGB2ef4Z_b6>
+	:x-sasl-enc; s=fm3; t=1786775054; x=1786861454; bh=jKvxr63tWeJ1G
+	LbaD7d6MjJ3As5YYyxyA2IvzkPjdPw=; b=VLJ+kX44KatXyAy1hM0K490deGWBl
+	R5q57x5T1vd8rqezCgXj/N3KHaN5p0860DgOqhAzc/KPc7xrM++jzVOFAKGbORM3
+	YH9zgP1ioMrzElNWlvSvfWRLUjn6uN39YpAQnM89R+9VbIyaIt0PzhuemkziWjlq
+	MHOq0rsXR6tbpiTFkPZ8kx8rI+/0aNaNdYBwvJqX9tzc2UzB5KXyHGqw8wx0FIud
+	2lWkteNcBxQIRjBttG0yzzMgaQRDDLa1RXysQ9LGe9dEcJhL2xDI9gil3K1JgEiA
+	1CZ4xUIlBw7ntli0NPhzMizuuV9mo4Ae+kiV5EIYbZB0hUW4RO/j6dBXw==
+X-ME-Sender: <xms:DQaAai-GwED0qe7QG7fnbL3y6ZLHlr38UFSCoxtqw14c_XvAQ3LmNg>
+    <xme:DQaAajbKio7QPORqrD-LNq8p-f6WfRAb-OtuIAUHQT6g66aAbth2VkcXnAb6KSKyF
+    yXepH_ld-S3mkXkkmQh--dJbtRPyjpfHYk1yEctvJp4qpvIRA>
+X-ME-Received: <xmr:DQaAamNxQej5yCVR9NjhcoHCVXIf1YJEKyjaH2vCEO5QcHGsYVCOvEqo_4sw_K8he0FDKyUBsKx4HbY5pemG4sqS8-dV_8s>
+X-ME-Proxy-Cause: dmFkZTF6xAgtxGa0A94kixAwV2NxRaNDNU0m2ArwWEUTy51H6Ps+uiqIi8uun6P3o1qru7
+    LJ7hNT7IbOmbI99TxVh3nytbmGhGbhK/fFZ/0ukmBfaDoFkh9xeO3Gd3Zbwtt5CEO3wZy7
+    C1KmuaQZy1IMOBqW4Z4V1tC3lMwVRBCCwrzo3Bu0pRCLHCCkp5VmLqR1LUTXZQWUCyIhdT
+    34/G1fxvydMO7v/QK8u1m+0jdmQtDBdJZVlCcsZ9aHMNkW17kklvXu234akvV7lrJ+/Y9h
+    2NkHYkqg2Kgy51MkKG0uHffNoFnQzG2Qj8BlcJepNa9cdg/isIicofq+DgIBPD2e3SxuCk
+    tFPbEWH8p4HIH+y8Tqiok02JwqycQYKSepXxgiWSI2vuQEzwwOJ4AxXsDSq5zm+4kbKwBK
+    MCnM/Auz1rT+VaEoRjcK2IxeJ77ToXLOBt8AbP3abQfJ/leaW1o9l7IVS4hbk8FyCvaiq/
+    6B4UFxnlCpip2x3xL/xbsa9TFWDiBAmVOhtcI7SAqwgo+2Vz3lcCt3QyYj4ObD3WeUuUe3
+    WCRImxZnti1ycf2dikApopwPOP0LuBSCux+bMH82kIkGq8phonXnuP85TNnpSLdmhDKB6H
+    wkz4loC/Ls9S6CiU9Fie49tDjMAFL36YWqF0FSnCnFg2ynxSHewZqAdG19Og
+X-ME-Proxy: <xmx:DQaAavCYTWPvBBXvUP2XkT3f3Kk2YYPyjWqyI3rTvLY7x_k081UMig>
+    <xmx:DQaAatIZjJASaPp82Hj5m7bxLgOoQWtON77ArIqRqwtrfbI5IOCyIQ>
+    <xmx:DQaAaoOl2uKg4CnT1HHkFv-foOqGizApZXMOIspHUu_Y6tBYCp0szw>
+    <xmx:DQaAar7oHMokVQXh9zdLtYaSwhYWE3OWDVkfY8Jz4p6U5DZSx7j2XQ>
+    <xmx:DgaAanVGz-YU9dLmytUGXRHc33JL2JW_I88cs77iGeReYKGej_rYjrms>
 Feedback-ID: i9d664b8f:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 15 Aug 2026 00:57:04 -0400 (EDT)
+ 15 Aug 2026 02:24:11 -0400 (EDT)
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -76,13 +76,13 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: NeilBrown <neilb@ownmail.net>
 To: "Herbert Xu" <herbert@gondor.apana.org.au>,
-  "quanyeyang" <quanyemostima@gmail.com>
-Cc: Thomas Graf <tgraf@suug.ch>, linux-crypto@vger.kernel.org,
+ "quanyeyang" <quanyemostima@gmail.com>
+Cc: "Thomas Graf" <tgraf@suug.ch>, linux-crypto@vger.kernel.org,
  linux-kernel@vger.kernel.org,
  syzbot+ef8d17bae14efb960935@syzkaller.appspotmail.com
-Subject: [PATCH] rhashtable: use private lockdep class for all locks.
-Date: Sat, 15 Aug 2026 14:57:00 +1000
-Message-id: <178676982027.2852630.3806887491595359260@noble.neil.brown.name>
+Subject: [PATCH v2] rhashtable: use private lockdep class for all locks.
+Date: Sat, 15 Aug 2026 16:24:07 +1000
+Message-id: <178677504716.2852630.10509837046652973246@noble.neil.brown.name>
 Reply-To: NeilBrown <neil@brown.name>
 
 
@@ -114,10 +114,16 @@ Closes: https://syzkaller.appspot.com/bug?extid=3Def8d17bae14efb960935
 Tested-by: quanyeyang <quanyeyang@proton.me>
 Signed-off-by: NeilBrown <neil@brown.name>
 ---
+
+v2 includes a change to test_rhashtable.c as advised by sashiko.dev
+NeilBrown
+
+
  include/linux/rhashtable-types.h |  3 +++
  include/linux/rhashtable.h       | 22 +++++++++-------------
  lib/rhashtable.c                 | 14 +++++++++++---
- 3 files changed, 23 insertions(+), 16 deletions(-)
+ lib/test_rhashtable.c            |  2 +-
+ 4 files changed, 24 insertions(+), 17 deletions(-)
 
 diff --git a/include/linux/rhashtable-types.h b/include/linux/rhashtable-type=
 s.h
@@ -229,6 +235,19 @@ ashtable *ht,
  	memcpy(&ht->p, params, sizeof(*params));
 =20
  	alloc_tag_record(ht->alloc_tag);
+diff --git a/lib/test_rhashtable.c b/lib/test_rhashtable.c
+index b767a38a74f9..85a615e74591 100644
+--- a/lib/test_rhashtable.c
++++ b/lib/test_rhashtable.c
+@@ -477,7 +477,7 @@ static unsigned int __init print_ht(struct rhltable *rhlt)
+=20
+ 	ht =3D &rhlt->ht;
+ 	/* Take the mutex to avoid RCU warning */
+-	mutex_lock(&ht->mutex);
++	mutex_lock_nested(&ht->mutex, 1);
+ 	tbl =3D rht_dereference(ht->tbl, ht);
+ 	for (i =3D 0; i < tbl->size; i++) {
+ 		struct rhash_head *pos, *next;
 
 base-commit: dac3e89a2c90c2feeb471e1f22a2512ad424b792
 --=20
