@@ -1,77 +1,77 @@
 Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEC881EB1AA
-	for <linux-crypto@vger.kernel.org>; Sat, 15 Aug 2026 14:00:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC60242D88
+	for <linux-crypto@vger.kernel.org>; Sat, 15 Aug 2026 14:00:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786802441; cv=none; b=WH9hbKD9a80aMZWYLf3x82Z/EPeyzubCoI2GLptSQh9+/ILzbtd3SYevXpRQgTKOvfruUPp2rmj2ywuttG7On2Th3EIlmqtC8vmAaf7pKlrCU1B8Ymfr8VgWRcWzLV1vU4Ao0dFto3r7ftGvws5Fw2T0urH84oDuC1q3vPknzsc=
+	t=1786802445; cv=none; b=YB0B4ymT0L779nowlitYCafFZr+9bkC7HWsGY+ep9Dr7HO8Rz6T+UNY0LN7KREA/EREf7BM5pL65qCIitBPtv01TWjuoHVKTGdm4zE1tdcjx7UycYJewqwxrgCRXgqU/HuTZhlKIAH/Nhytikcus9jktcroWzxxvs26b4ZjMQuo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786802441; c=relaxed/simple;
-	bh=4Wp+l0UIg5R0C0xs4vbLkewmvCtRKpnLLeBwc2c15gM=;
+	s=arc-20240116; t=1786802445; c=relaxed/simple;
+	bh=ejr+Ezvx0GfpWrz3IPZtiIpCLkRqRKO2Wr37PAjbg+Y=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OKqV31Fv0QbbwUDssaYGrWlif2jKG8Q+X6GQ097oZr2VgyX6NazCAGd/ETz4cOWrWmBXEwnKLorPMB1R6sE0obqW4paaSCeRkzBdzrKGeAOZf/pOB/u27P+TUUJJ5hC//XWyLgLSF8O8UPRz/HYdlQ+SxwKE12DTdzUox7SQeFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=FL2avUEs; arc=none smtp.client-ip=185.125.188.122
+	 MIME-Version; b=LnLtEGQprQefqr/mTyUJShrXQKRt+x6pF8bbDxtdwxPRgCYAEDlMSEOFQNLAorYgp2SKKnOhP6ZLva6kU+zvdF3MM8o64+Gw4tIeiEeZ/BzyOWPgCZm1CQKnPxgxFIFlKtZVVvPdgPBwRTtA/5sbogjK5+giV+QR/0QUQjV48vM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=q7DbWkas; arc=none smtp.client-ip=185.125.188.122
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="FL2avUEs"
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
+	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="q7DbWkas"
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id C32053F5A1
-	for <linux-crypto@vger.kernel.org>; Sat, 15 Aug 2026 14:00:35 +0000 (UTC)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 4BE7A3F5A1
+	for <linux-crypto@vger.kernel.org>; Sat, 15 Aug 2026 14:00:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1786802435;
-	bh=86RGpNX2OsGBlms7o5V2IbYeBS1f1PX4b53IjP+9t+M=;
+	s=20251003; t=1786802442;
+	bh=xf+ocxeCJgdee/7hRS+EL0NVdP4x1nusrTTdX8m6N0g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
 	 MIME-Version;
-	b=FL2avUEsrTQ/SDLW1lpoI0ogMVFDl4OpObelcIcR/aO5h6/GE3qpLGVwQliIlXy0o
-	 A2PrEtEVeyDca76SoMgwKeA7ESwpYVpAY1vsYaCtFLplYc6dLjXg+ABixMdvAlIdfY
-	 Qf3SWLxzfi0FYtyGvYTT6l4ntXw9DyPluLiMUUaNefYGVTosvVSHvE1tceXx8tNnH7
-	 SFQJqKGL4qw7ejzCYkA/IjX7I0pZdsl9oDD8IgDH+iI34I+1QyQ8F7+88R4FB6LWO8
-	 2WnJLE14bu3DST5S+tKpkrVmxCQNl6Bh8MvVOyQ11QLpiqKDoOfBZJMRcsUPHfXBr3
-	 YQZzExH74wksvrOKtUlDLMhcUXw5y/8tF9j/7w2Jc4/K8pPmPvLfraYe2IZplddqfE
-	 H2oJpCx+qya4jjboWbKJy8HX3WUt0MhH73OL2en0OU/e3OI+C5i5+UuNTLryUpbcL8
-	 K8TYzCJk/LbN/RN4IkCFhobBVKdN1WwWUrJG6nkf/qN21yYi+UhZo959w/CUgYuc+0
-	 eLQHEES3Q+2t35AV43sEe1vEkxmSDUrxADmFxSi/zWs3OXD0aQY0cJQNQD2Z91FHCd
-	 tR8LDVrFtXVsMysHQrNkJyyxVwJ6WimEadXfDLVYC2BQPlDCAMmqfYwrTeVOXyYdvW
-	 IH1fqKrXuZEzB6gDi+7AJ/Nw=
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-48000d75326so1225889f8f.2
-        for <linux-crypto@vger.kernel.org>; Sat, 15 Aug 2026 07:00:35 -0700 (PDT)
+	b=q7DbWkas0KM+4CPBeZ/DjuXTe/yAyO7a9Y9SmdwdcTYThurYlJ9X97nbW8isu3hN8
+	 wx8fkCneT7bTIjWCZ6j1ZVYMm6qe2KPXqG36XZ06cImBOQHsN+SzLUYwXNO/8Zdert
+	 VK1rjDWa8uGJ6H/8RfHzhGVZZ4p3r3zgC95GrtNzo4TO1xyfyCu+lBHjRrGbzT3nVH
+	 qnT5fhxBOQOANTmN5cCMwLkHEsi79eVf1ps/8gwqUne46+nVSw00fVyWadv7uMj7dN
+	 yAyuCTDthJ6vKKeRV/xz7tfw7+pfgsiT8EzgodC8DR+jxfiCJrBAh26Ki32IiE7TvI
+	 pCqLFPNwlBTZDRIiepp9YX8j4gExSici26n7qAKQY95lXy81MJ3Y/8L0Um3+kC3i4F
+	 dCMZXPlZCE2GZDcF5eKXH3ULCtyhq0t0gVnXIQ8nIeWhSoqzMEN3rhfY+oSVOYA4az
+	 jpKo1tD9xQ7tj4xaa+XROoY6uvYxKmVTfsr5Jxhoq1UkJT9ccR7a0+Y1bmBkOeHcXi
+	 u4fO4abvnYPzp1yQRjeWHuufdnBeRMGZhb53K6AxTHZf6WDn240WcjWH/3eRN6Ts9y
+	 8XuN6X0+/JyheUGXZjFRLFGj0n2UT1KhTH39KC/rm2IjFXvc9gWwYNQYQf4d8Ttrae
+	 VMcW20YFq7Di55AvXosuOUGw=
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-47eaa4006a1so701394f8f.0
+        for <linux-crypto@vger.kernel.org>; Sat, 15 Aug 2026 07:00:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786802435; x=1787407235;
+        d=1e100.net; s=20251104; t=1786802442; x=1787407242;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to:content-type;
-        bh=86RGpNX2OsGBlms7o5V2IbYeBS1f1PX4b53IjP+9t+M=;
-        b=mqNu1BoeSWtx+gYz5Pl4zUugFKx4WePk+oZobONSsNTot0y45VmRSs7n+nWlDob7pO
-         rpZOs4BUp0kulWaSMDkpPQ1KLZB1VG9vErFI38tpQmk+mQPzsPShzc4kKo0RmTzYuuYO
-         ALV70VHUkY0epTwrJaTJ6bJiPeob9wxmhIjft0lrdLgQb2pAKQMBAN5R1vKITE/6atR8
-         OOoyUg+K1pKKNa2YfPHN382E06nnvFOJp2pqk542z/bzLWJVknt9IbnwX5b4EO4YKPHP
-         CxRgC1Cgy/xXwatyK7w8vzNuPYOQ3J3daWvqEDaBuibFbCTJBxaaxbS1y5BIP139ILRu
-         oeiA==
-X-Forwarded-Encrypted: i=1; AHgh+RpdzcliDpNo+zcnBLQZKzmbYe/CjW4AKGHgiGN1LDn12ix5H5iEpWJBBmVokw75XaY1DGgT78dx/vvxXkE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvYanHTenpHDO5FP/86Bmhun1CtMDk5NDmDI1+S/uD49Q1Iquy
-	gPpUZCMcZNPVaZAw8N9qveGO5g0UoBWmp3I1LDTNTppe5qQ4cvoT+nX7gncr/JDowr0mvtJJh0J
-	1TEbeAV7ngHDf5mWqSntztu2OnQGZum6RfX3ubteA6QJuLiO531dcsb0FE8Ktzt7kiYqKub/bt2
-	3XaJP79w==
-X-Gm-Gg: AR+sD11T9PVXrqFzY8OrWzApEHv69sOsQcybmZEO45HQws9fffFqesIFyKo4pSxvG+s
-	HfnSoRaMNd+rdGqbYjSqi5NoUTlNYB44xXKzifHz6O9T1iHAta1dYYhl8zz2MHRWETEhiaUNYYs
-	LtWLbJc/0JV/RqSfZ7RF8DpW+BSTjFqzCnx2hh2kv6Bm7hffAH+G9Aww2gkCBkJ73SGNtYCQAbm
-	NAOgGNU/OsfeLZ0rvWxqCLf3ibWf3l1QE8zfM/4FSfkGBW9v4mRwGNlJy1BjBFBpFeYq5LGY4QE
-	XqQHFjWU2HjnZ9XOLWsRjr8QK7KmW1modCHZDC5kKNLXEb9cPVI0GdaKqGZzi9BuYPTrbJ2t0yU
-	lJlYYCJ5qQGxHxaPPrQdcHyy98YlNd25Sp+2UOwYvOMEiOXjFmc641tBdMng+6/Brjgc3mmeQ73
-	zvczMfpEPF6kri1O2BbHmThzzF94Fs3Kc=
-X-Received: by 2002:a5d:5f4a:0:b0:481:51b5:7503 with SMTP id ffacd0b85a97d-48160708252mr21357137f8f.7.1786802435397;
-        Sat, 15 Aug 2026 07:00:35 -0700 (PDT)
-X-Received: by 2002:a5d:5f4a:0:b0:481:51b5:7503 with SMTP id ffacd0b85a97d-48160708252mr21357037f8f.7.1786802434963;
-        Sat, 15 Aug 2026 07:00:34 -0700 (PDT)
+        bh=xf+ocxeCJgdee/7hRS+EL0NVdP4x1nusrTTdX8m6N0g=;
+        b=D5OCWKeFO+7WJSnJ8zoRUIf4+JvaycXxa2/MxCYIKnnTFBIWUTcVTiqJR35mfYiWKz
+         9ZUq/xHUr4BtjzcQ7Y5j9+4a3Z8g/QpJ6uX7CCtVpc0w5gwtWbWduCFSb2Zj0sU4ytF9
+         63Sx1g+AS0WRHhdru9wXysIzJWM+lXnZNY7VMp1AE2TrX/Bqyt8TilHpI0GJI9borEZ1
+         fgXOrpmSNH3eAYo36grM99NCXKzSsMy98+tmpPBMtwWS2NvObKsESCfnjsliST9gcb5+
+         NZgNrfGLMQ8MZBMwyr7Wg8S2QPKcLCPhKBVyH1FiCSSXuF+vTIqb7ebsZxJ2lSDTpfR6
+         mAtg==
+X-Forwarded-Encrypted: i=1; AHgh+RqRMbkX5TUAJFGs5ZGb0/uYs7psrQkzj1HY2geNqi+dWcIuWKinYAcBAjqHr2qaSWzR/rF8n2JBwjNYepw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1wDpR4mNx8yHJg+aKosHdA28ZmU4G8tgqLdMUHa066wjr+/3d
+	A5fb58ddi5wRmIElwCkMmmhoyz8y4N6GBrQhvIzjQ08aJmzSWNffJ5LGhbbAYgZVhNI59M/WC+g
+	Xsmkn+pdnf7U/MVC0vM2V36OjzAgqQZRHBC9DTbur0y9SZHEEOHEz3+KEzmJWHKD9V4QQSn7ntA
+	TGZHWNlw==
+X-Gm-Gg: AR+sD108iiNzNFpbJggu2FxrMcVV2YW/7pSk/Ne7sGIeRzLPNO4BBotYWxlgsflXENE
+	/mTH9wo1rGuQcT0+J4cBTwDrB2xJWW2mXSJavC/fpvzN3Xab8RemCu5W+j/jxy1Zaogo54gGQGk
+	viLoktPd1cRwPQUUdKX7+E9bTGcT2rnNQ/xePkLAOpakv5BIMjNcPPGYGHJPRYOSbxVYP1E3kcE
+	eeXnRzGLHYYcM1lLNQhtTeVq/w1AJGN3w6FwmMUlgaU5AogkLVGCNZlyojIRCaZJYWtqsvGo9LE
+	YP059cFp9D5Z3AZKCAkDl/GC1E5Bg0GKQzabihu74kuB5tpAVMkHmtcZg8wraZhOJ243ILhGWNh
+	4lQ+JJlW8HaRNIffrwMc0pplj9hCxKIxzNZui8+E1t2Yb5m9hakpzWDJ1fq9BmMTqCVpTRZEH+u
+	UmNvM2dRDJKAClmuQO59a8hF+9URcqjLA=
+X-Received: by 2002:a05:6000:1a8c:b0:481:562d:6fb1 with SMTP id ffacd0b85a97d-4816075be23mr18511398f8f.6.1786802441749;
+        Sat, 15 Aug 2026 07:00:41 -0700 (PDT)
+X-Received: by 2002:a05:6000:1a8c:b0:481:562d:6fb1 with SMTP id ffacd0b85a97d-4816075be23mr18511293f8f.6.1786802441260;
+        Sat, 15 Aug 2026 07:00:41 -0700 (PDT)
 Received: from t-14.home (2a01cb000883230031a3fd8213e7cff4.ipv6.abo.wanadoo.fr. [2a01:cb00:883:2300:31a3:fd82:13e7:cff4])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4815f20051esm18433563f8f.7.2026.08.15.07.00.33
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4815f20051esm18433563f8f.7.2026.08.15.07.00.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 15 Aug 2026 07:00:34 -0700 (PDT)
+        Sat, 15 Aug 2026 07:00:40 -0700 (PDT)
 From: Fabrice Derepas <fabrice.derepas@canonical.com>
 To: David Howells <dhowells@redhat.com>,
 	Lukas Wunner <lukas@wunner.de>,
@@ -83,12 +83,12 @@ Cc: Fabrice Derepas <fabrice.derepas@canonical.com>,
 	linux-crypto@vger.kernel.org,
 	kexec@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/2] crypto: asymmetric_keys - fix OOB read in pefile_parse_binary
-Date: Sat, 15 Aug 2026 16:00:19 +0200
-Message-ID: <fcbc6b4d5855ba42a0fccf335b2604ef0b36f092.1786802052.git.fabrice.derepas@canonical.com>
+Subject: [PATCH v2 2/2] crypto: asymmetric_keys - add KUnit tests for the PE parser
+Date: Sat, 15 Aug 2026 16:00:20 +0200
+Message-ID: <73155550248025620873094809432c88ffa4c3d6.1786802052.git.fabrice.derepas@canonical.com>
 X-Mailer: git-send-email 2.53.0
-In-Reply-To: <CAOs+rJVztmvHSkNxP_voc7E=girsstCKmqxG37pvO2kTaEk1TQ@mail.gmail.com>
-References: <CAOs+rJVztmvHSkNxP_voc7E=girsstCKmqxG37pvO2kTaEk1TQ@mail.gmail.com>
+In-Reply-To: <fcbc6b4d5855ba42a0fccf335b2604ef0b36f092.1786802052.git.fabrice.derepas@canonical.com>
+References: <CAOs+rJVztmvHSkNxP_voc7E=girsstCKmqxG37pvO2kTaEk1TQ@mail.gmail.com> <fcbc6b4d5855ba42a0fccf335b2604ef0b36f092.1786802052.git.fabrice.derepas@canonical.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -97,66 +97,165 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-pefile_parse_binary() reads the size field of the certificate table's
-data-directory entry, which sits at fixed index 4 of the PE optional
-header's data directory:
+Add self-contained KUnit tests for pefile_parse_binary(), exercised
+through verify_pefile_signature() -- which parses the image before any
+signature check, so no keyring or real signature is needed. The cases
+build small malformed PE images in memory:
 
-	ctx->certs_size = ddir->certs.size;
+  - a PE declaring 0 data-directory entries: the certificate table entry
+    at fixed index 4 is absent and must be rejected (-ELIBBAD), not read
+    out of bounds;
+  - a PE declaring 5 entries with a zero (unsigned) certificate entry
+    gets past the directory bound and is rejected as unsigned (-ENODATA).
 
-but nothing ensures index 4 is present. n_data_dirents (the untrusted
-NumberOfRvaAndSizes) is only upper-bounded against header_size and may be
-0, and header_size need only satisfy cursor < header_size < datalen. A
-crafted PE with n_data_dirents = 0 and a tiny header_size therefore causes
-the ddir->certs.size read to land past the end of the image (CWE-125). The
-chkaddr() that bounds the certificate blob runs only after this read.
+verify_pefile_signature() is not exported, so the test is built-in only
+(bool, not tristate).
 
-verify_pefile_signature() is reached from kexec_file_load() (the
-lockdown/secure-boot enforced PE-image signature path), and the image is
-parsed before its signature is checked. The trigger needs CAP_SYS_BOOT and
-the access is out-of-bounds read only (no write).
-
-Require the certificate table's data-directory entry (index 4) to be
-present; the existing upper-bound check then keeps ddir->certs within
-[cursor, header_size).
-
-Fixes: 26d1164be37f ("pefile: Parse a PE binary to find a key and a signature contained therein")
-Assisted-by: copilot-cli:claude-opus-4-6 frama-c
 Signed-off-by: Fabrice Derepas <fabrice.derepas@canonical.com>
 ---
-v2: express the "index 4" bound as
-    offsetof(struct data_directory, certs) / sizeof(*dde) rather than a
-    literal 4, per Ignat Korchagin's review [1] -- self-documenting and it
-    tracks the struct layout. It is the same value (offsetof is 32,
-    sizeof(*dde) is 8, so the bound is 4). A KUnit test is added as 2/2.
+ crypto/asymmetric_keys/Kconfig              |  12 +++
+ crypto/asymmetric_keys/Makefile             |   2 +
+ crypto/asymmetric_keys/verify_pefile_test.c | 100 ++++++++++++++++++++
+ 3 files changed, 114 insertions(+)
+ create mode 100644 crypto/asymmetric_keys/verify_pefile_test.c
 
-[1] https://lore.kernel.org/all/CAOs+rJVztmvHSkNxP_voc7E=girsstCKmqxG37pvO2kTaEk1TQ@mail.gmail.com/
-
-Reproduced under KASAN (CONFIG_KASAN_GENERIC, x86-64) with the KUnit case in
-2/2: a crafted PE with data_dirs = 0 takes a slab-out-of-bounds read in
-pefile_parse_binary() on an unpatched kernel, and is rejected with -ELIBBAD
-(no KASAN report) with this patch.
-
- crypto/asymmetric_keys/verify_pefile.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/crypto/asymmetric_keys/verify_pefile.c b/crypto/asymmetric_keys/verify_pefile.c
-index cec99db14..1efd5c0d0 100644
---- a/crypto/asymmetric_keys/verify_pefile.c
-+++ b/crypto/asymmetric_keys/verify_pefile.c
-@@ -87,6 +87,11 @@ static int pefile_parse_binary(const void *pebuf, unsigned int pelen,
- 	if (ctx->n_data_dirents > (ctx->header_size - cursor) / sizeof(*dde))
- 		return -ELIBBAD;
+diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
+index 6a2f66404..c73979b2e 100644
+--- a/crypto/asymmetric_keys/Kconfig
++++ b/crypto/asymmetric_keys/Kconfig
+@@ -114,4 +114,16 @@ config FIPS_SIGNATURE_SELFTEST_ECDSA
+ 	depends on CRYPTO_SHA256=y || CRYPTO_SHA256=FIPS_SIGNATURE_SELFTEST
+ 	depends on CRYPTO_ECDSA=y || CRYPTO_ECDSA=FIPS_SIGNATURE_SELFTEST
  
-+	/* the certificate table entry must be present in the data directory */
-+	if (ctx->n_data_dirents <=
-+	    offsetof(struct data_directory, certs) / sizeof(*dde))
-+		return -ELIBBAD;
++config VERIFY_PEFILE_KUNIT_TEST
++	bool "KUnit tests for signed PE file parsing" if !KUNIT_ALL_TESTS
++	depends on KUNIT=y && SIGNED_PE_FILE_VERIFICATION
++	default KUNIT_ALL_TESTS
++	help
++	  Enable KUnit tests for the PE binary parser used by signed PE file
++	  signature verification.  The tests build small malformed PE images in
++	  memory and check that pefile_parse_binary() rejects them instead of
++	  reading out of bounds.
 +
- 	ddir = pebuf + cursor;
- 	cursor += sizeof(*dde) * ctx->n_data_dirents;
++	  If unsure, say N.
++
+ endif # ASYMMETRIC_KEY_TYPE
+diff --git a/crypto/asymmetric_keys/Makefile b/crypto/asymmetric_keys/Makefile
+index bc65d3b98..35172685c 100644
+--- a/crypto/asymmetric_keys/Makefile
++++ b/crypto/asymmetric_keys/Makefile
+@@ -79,3 +79,5 @@ verify_signed_pefile-y := \
  
-
-base-commit: d58772d8520c7ef247c4b95c9bd76d3a25da9ff5
+ $(obj)/mscode_parser.o: $(obj)/mscode.asn1.h $(obj)/mscode.asn1.h
+ $(obj)/mscode.asn1.o: $(obj)/mscode.asn1.c $(obj)/mscode.asn1.h
++
++obj-$(CONFIG_VERIFY_PEFILE_KUNIT_TEST) += verify_pefile_test.o
+diff --git a/crypto/asymmetric_keys/verify_pefile_test.c b/crypto/asymmetric_keys/verify_pefile_test.c
+new file mode 100644
+index 000000000..8b42eb41e
+--- /dev/null
++++ b/crypto/asymmetric_keys/verify_pefile_test.c
+@@ -0,0 +1,100 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * KUnit tests for the signed PE binary parser in verify_pefile.c.
++ *
++ * The cases build small malformed PE images in memory and call
++ * verify_pefile_signature(), which parses the image before any signature
++ * check, so the parser is exercised without a keyring or a real signature.
++ */
++#include <kunit/test.h>
++#include <linux/slab.h>
++#include <linux/pe.h>
++#include <linux/verification.h>
++
++/*
++ * Build a minimal PE32 image whose optional header declares @data_dirs data
++ * directory entries.  header_size is sized to hold them and the image is a few
++ * bytes larger.  With @data_dirs < 5 the certificate table entry (fixed index
++ * 4) lies outside the declared directory.
++ */
++static void *build_pe32(u16 data_dirs, unsigned int *out_len)
++{
++	size_t cursor = sizeof(struct mz_hdr) + sizeof(struct pe_hdr) +
++			sizeof(struct pe32_opt_hdr);
++	size_t header_size = cursor + ((size_t)data_dirs + 1) *
++				      sizeof(struct data_dirent);
++	size_t pelen = header_size + 8;
++	struct mz_hdr *mz;
++	struct pe_hdr *pe;
++	struct pe32_opt_hdr *opt;
++	void *buf = kzalloc(pelen, GFP_KERNEL);
++
++	if (!buf)
++		return NULL;
++
++	mz = buf;
++	mz->magic = IMAGE_DOS_SIGNATURE;
++	mz->peaddr = sizeof(struct mz_hdr);
++
++	pe = buf + sizeof(struct mz_hdr);
++	pe->magic = IMAGE_NT_SIGNATURE;
++
++	opt = buf + sizeof(struct mz_hdr) + sizeof(struct pe_hdr);
++	opt->magic = IMAGE_NT_OPTIONAL_HDR32_MAGIC;
++	opt->header_size = header_size;
++	opt->data_dirs = data_dirs;
++
++	*out_len = pelen;
++	return buf;
++}
++
++/*
++ * data_dirs = 0: the certificate table entry (index 4) is absent, so the
++ * parser must reject the image instead of reading ddir->certs past the end.
++ */
++static void pefile_missing_certs_dirent(struct kunit *test)
++{
++	unsigned int len;
++	void *buf = build_pe32(0, &len);
++	int ret;
++
++	KUNIT_ASSERT_NOT_NULL(test, buf);
++	ret = verify_pefile_signature(buf, len, NULL,
++				      VERIFYING_KEXEC_PE_SIGNATURE);
++	KUNIT_EXPECT_EQ(test, ret, -ELIBBAD);
++	kfree(buf);
++}
++
++/*
++ * data_dirs = 5: the certificate table entry is present (and zero, i.e.
++ * unsigned), so the parser gets past the directory bound and rejects the image
++ * as unsigned (-ENODATA) rather than -ELIBBAD.
++ */
++static void pefile_present_certs_dirent(struct kunit *test)
++{
++	unsigned int len;
++	void *buf = build_pe32(5, &len);
++	int ret;
++
++	KUNIT_ASSERT_NOT_NULL(test, buf);
++	ret = verify_pefile_signature(buf, len, NULL,
++				      VERIFYING_KEXEC_PE_SIGNATURE);
++	KUNIT_EXPECT_EQ(test, ret, -ENODATA);
++	kfree(buf);
++}
++
++static struct kunit_case verify_pefile_cases[] = {
++	KUNIT_CASE(pefile_missing_certs_dirent),
++	KUNIT_CASE(pefile_present_certs_dirent),
++	{}
++};
++
++static struct kunit_suite verify_pefile_suite = {
++	.name = "verify_pefile",
++	.test_cases = verify_pefile_cases,
++};
++
++kunit_test_suite(verify_pefile_suite);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("KUnit tests for the signed PE binary parser");
 -- 
 2.53.0
 
