@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9199B42642D;
-	Sat, 15 Aug 2026 18:12:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB626429CC5;
+	Sat, 15 Aug 2026 18:12:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786817558; cv=none; b=MkEOsqJbUpnlkc2rzAr/onvqp9R8rcHF6gB1Z4mIXhirX+Fv8JBVaGeM0g2wWrFCHvpZ3wRXH/uni8iEmZnHX2XbO1epem7PZuV2+sMz9oXHv5t726BnICX8ekQb32HI0TT46aSIkGd6t46Hvpp7c23McccNpqCQ1HUZXbkjaR4=
+	t=1786817559; cv=none; b=TUym6EyCZI3epDRjX30CGyrMgOBYjDnJhDcY9fgABFzet8VV2K7hLCkLCyq2KImiYhhEIDDyarH23IpjeCTueO67SqgfUI+I2MAGl87+rJXDyXBmoorZRF+c0W5Q2QPtrfDtLu8EhSKYXEIIfZdk/OzjR8jpiTmySSCkFYTxzOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786817558; c=relaxed/simple;
-	bh=8EtIjUyWp+Owf958VUqMsdagPce6VSl8WYVhBIP0kNU=;
+	s=arc-20240116; t=1786817559; c=relaxed/simple;
+	bh=mF5Si+fJ2SqCKuU/60v4aWm6TNcVfLmMHZQC50LpG1A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WNV6SArXfVDb0BlQM3Q8AXIvSg/5jlTmLdL0B70lmwemMlgVjxaYGDn8/OP7S5xWSqXX3nZ8SSEclbDzHiiSQsB6dwBBHKG3S9cH9G+nhPOXMJsySGPf2FfR3ki7UgXMx7hbV2oixzJuXqioFhXsnlZjdnDdx/AZxFXp/yX3NkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ED6NroIY; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version; b=Nh4snxaYgzS4gvsFkVluWtmhzZz2dsrF8yq3HPvSRkTHcriy+HxT6kyg64df4GjJ9sQ0L+FbGF36RgOKl8cJkbIz3Y54Q+3mFQuheXcqU2anFQKMDQYs46lL/TNoIaWS1QIK+4KZVIBp9cYHz3us3wqhyowGYj6xwsueNIFg628=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c4wGJ8Vh; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ED6NroIY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2757D1F00AC4;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c4wGJ8Vh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D58F01F00A3D;
 	Sat, 15 Aug 2026 18:12:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1786817555;
-	bh=r4lrJRkT6oIO9uz4byVKnhiX3ckXssiVruBvq7U+FfI=;
+	s=k20260515; t=1786817556;
+	bh=Q2A0VpZ3jEW63u/fB0uqkGhkDFeSh86cNwd3FvE985o=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=ED6NroIYBJzgy6GwIXX/cesOeyUD3VDuuZyQIjm2HwR6sb+3QteysdUjScX1ftRxI
-	 Hgp14z/4FXsQ/2Uhuw/3GuxKs7HGwPtmLmt9Xxz8wTH8Oc7NBsOQxOdNlkTLKvAylE
-	 JbpJJ6FoLsYjja1a88ouhRH2roiid2VsyU1Dyr0WuqGj3WJkJvulSIbyQPS01w4XsK
-	 VgciHopL+mGOoS5XvwQymfKOW7tKjammPIxPKdTepdtZiYaK1v6bzbK8CuX2/FT01Q
-	 tvBzaj6V9UyJnAsywJwSO5rVyybgfHgwfqeXMgg8XQLmUngpLhsias4TN0CMrFjBmV
-	 UdNgCrnd5UTyg==
+	b=c4wGJ8VhfbWJcDXsBWiYh+o+RaU1oHSwqYO5XkKUDm3SwYB1bM/Jig7ny6pjVCX+z
+	 LWYigBVe0JYLa+bZdolB7OrxOskpY0bDqWsIDBSVS7BrxMuE7l85gE94/PM/ipaLSZ
+	 5h8ZjdKFDpA4HAWuoqogtJvw3SvlVVzrC9h61NdU6w71A/bgrQ9+vwqGDnoZO3OUAi
+	 pZkHG+lww+sKuVNmgFH4BcNLtj1gZnEgB2k4aSaJ31HFAesK6PBHb5n34NPfj14glr
+	 oa89nzefpeYK5UAs++FLPAUJT4ZkbvGFMu2BlW/oOUIHNaDF/g2BszZ66R34poxAmg
+	 ZZu4eY3eouuww==
 From: Eric Biggers <ebiggers@kernel.org>
 To: x86@kernel.org
 Cc: linux-um@lists.infradead.org,
@@ -35,9 +35,9 @@ Cc: linux-um@lists.infradead.org,
 	Christoph Hellwig <hch@lst.de>,
 	Andrew Morton <akpm@linux-foundation.org>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v4 5/8] lib/crc: x86: Stop using cpu_has_xfeatures()
-Date: Sat, 15 Aug 2026 11:10:21 -0700
-Message-ID: <20260815181024.28924-6-ebiggers@kernel.org>
+Subject: [PATCH v4 6/8] x86/fpu: Remove cpu_has_xfeatures()
+Date: Sat, 15 Aug 2026 11:10:22 -0700
+Message-ID: <20260815181024.28924-7-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260815181024.28924-1-ebiggers@kernel.org>
 References: <20260815181024.28924-1-ebiggers@kernel.org>
@@ -49,43 +49,113 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Checking both boot_cpu_has() and cpu_has_xfeatures() has never really
-been needed in practice, and it's never been universally done (e.g.,
-lib/raid/ omits cpu_has_xfeatures()).  Nevertheless, both x86 and UML
-now explicitly clear the AVX and AVX-512 flags if their xfeatures are
-missing, which should remove any remaining doubts.
+The only remaining caller of cpu_has_xfeatures() is
+print_xstate_features(), which uses it only to check and get the name of
+a single feature.
 
-Thus, remove all the calls to cpu_has_xfeatures().
+Remove it and just inline the needed code into print_xstate_features().
+
+This also makes the "unknown xstate feature" entry at index XFEATURE_MAX
+of xfeature_names[] unnecessary, so remove that too.
 
 Acked-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- lib/crc/x86/crc-pclmul-template.h | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ arch/x86/include/asm/fpu/api.h |  9 -------
+ arch/x86/kernel/fpu/xstate.c   | 44 +++-------------------------------
+ 2 files changed, 3 insertions(+), 50 deletions(-)
 
-diff --git a/lib/crc/x86/crc-pclmul-template.h b/lib/crc/x86/crc-pclmul-template.h
-index 02744831c6fa..893119bb7c07 100644
---- a/lib/crc/x86/crc-pclmul-template.h
-+++ b/lib/crc/x86/crc-pclmul-template.h
-@@ -27,16 +27,14 @@ DEFINE_STATIC_CALL(prefix##_pclmul, prefix##_pclmul_sse)
- static inline bool have_vpclmul(void)
- {
- 	return boot_cpu_has(X86_FEATURE_VPCLMULQDQ) &&
--	       boot_cpu_has(X86_FEATURE_AVX2) &&
--	       cpu_has_xfeatures(XFEATURE_MASK_YMM, NULL);
-+	       boot_cpu_has(X86_FEATURE_AVX2);
- }
+diff --git a/arch/x86/include/asm/fpu/api.h b/arch/x86/include/asm/fpu/api.h
+index 90c63fe19c0f..cfed8b24d64f 100644
+--- a/arch/x86/include/asm/fpu/api.h
++++ b/arch/x86/include/asm/fpu/api.h
+@@ -99,15 +99,6 @@ static inline void fpregs_assert_state_consistent(void) { }
+  */
+ extern void switch_fpu_return(void);
  
- static inline bool have_avx512(void)
- {
- 	return boot_cpu_has(X86_FEATURE_AVX512BW) &&
- 	       boot_cpu_has(X86_FEATURE_AVX512VL) &&
--	       !boot_cpu_has(X86_FEATURE_PREFER_YMM) &&
--	       cpu_has_xfeatures(XFEATURE_MASK_AVX512, NULL);
-+	       !boot_cpu_has(X86_FEATURE_PREFER_YMM);
- }
+-/*
+- * Query the presence of one or more xfeatures. Works on any legacy CPU as well.
+- *
+- * If 'feature_name' is set then put a human-readable description of
+- * the feature there as well - this can be used to print error (or success)
+- * messages.
+- */
+-extern int cpu_has_xfeatures(u64 xfeatures_mask, const char **feature_name);
+-
+ /* Trap handling */
+ extern int  fpu__exception_code(struct fpu *fpu, int trap_nr);
+ extern void fpu_sync_fpstate(struct fpu *fpu);
+diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
+index 97cfd4fb6cc0..0b17452d1788 100644
+--- a/arch/x86/kernel/fpu/xstate.c
++++ b/arch/x86/kernel/fpu/xstate.c
+@@ -66,8 +66,8 @@ static const char *xfeature_names[] =
+ 	"AMX Tile config",
+ 	"AMX Tile data",
+ 	"APX registers",
+-	"unknown xstate feature",
+ };
++static_assert(ARRAY_SIZE(xfeature_names) == XFEATURE_MAX);
  
- /*
+ static unsigned short xsave_cpuid_features[] __initdata = {
+ 	[XFEATURE_FP]				= X86_FEATURE_FPU,
+@@ -122,44 +122,6 @@ static inline unsigned int next_xfeature_order(unsigned int i, u64 mask)
+ #define XSTATE_FLAG_SUPERVISOR	BIT(0)
+ #define XSTATE_FLAG_ALIGNED64	BIT(1)
+ 
+-/*
+- * Return whether the system supports a given xfeature.
+- *
+- * Also return the name of the (most advanced) feature that the caller requested:
+- */
+-int cpu_has_xfeatures(u64 xfeatures_needed, const char **feature_name)
+-{
+-	u64 xfeatures_missing = xfeatures_needed & ~fpu_kernel_cfg.max_features;
+-
+-	if (unlikely(feature_name)) {
+-		long xfeature_idx, max_idx;
+-		u64 xfeatures_print;
+-		/*
+-		 * So we use FLS here to be able to print the most advanced
+-		 * feature that was requested but is missing. So if a driver
+-		 * asks about "XFEATURE_MASK_SSE | XFEATURE_MASK_YMM" we'll print the
+-		 * missing AVX feature - this is the most informative message
+-		 * to users:
+-		 */
+-		if (xfeatures_missing)
+-			xfeatures_print = xfeatures_missing;
+-		else
+-			xfeatures_print = xfeatures_needed;
+-
+-		xfeature_idx = fls64(xfeatures_print)-1;
+-		max_idx = ARRAY_SIZE(xfeature_names)-1;
+-		xfeature_idx = min(xfeature_idx, max_idx);
+-
+-		*feature_name = xfeature_names[xfeature_idx];
+-	}
+-
+-	if (xfeatures_missing)
+-		return 0;
+-
+-	return 1;
+-}
+-EXPORT_SYMBOL_GPL(cpu_has_xfeatures);
+-
+ static bool xfeature_is_aligned64(int xfeature_nr)
+ {
+ 	return xstate_flags[xfeature_nr] & XSTATE_FLAG_ALIGNED64;
+@@ -302,9 +264,9 @@ static void __init print_xstate_features(void)
+ 
+ 	for (i = 0; i < XFEATURE_MAX; i++) {
+ 		u64 mask = BIT_ULL(i);
+-		const char *name;
++		const char *name = xfeature_names[i];
+ 
+-		if (cpu_has_xfeatures(mask, &name))
++		if (fpu_kernel_cfg.max_features & mask)
+ 			pr_info("x86/fpu: Supporting XSAVE feature 0x%03Lx: '%s'\n", mask, name);
+ 	}
+ }
 -- 
 2.55.0
 
