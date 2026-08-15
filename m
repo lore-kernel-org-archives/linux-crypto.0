@@ -1,107 +1,122 @@
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4B26331ECC
-	for <linux-crypto@vger.kernel.org>; Sat, 15 Aug 2026 17:10:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFEE0371CFF;
+	Sat, 15 Aug 2026 18:12:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786813806; cv=none; b=aWBY9FpKglolg6my/3e86yf7Qx6SC8YL7dDfUcFNrMGUUIn975K7E9HsSuKKzgI6pgqRkETh1FMjskdp420ZosLepX3h60JYjFQyr/IyquvFK4vh+M+KyrF6EZAS0DoGA6sKYTGtlFdywmzyuwXOwmd5yzDTO410IaI4pbmS6D8=
+	t=1786817553; cv=none; b=mcCSL6EtT6n6bswcafkQXJS6ai5dsFq0OzpzYQ5QRV2bc1qCveUO4T2EC3E8Gpan16Id42whLajfpBjO752zqhXL3WxJ96aI30ih/jBAMWY685YGmh6TpdKscWq4CP0eWUrtxi5xtKt30gq5O5AykpYzJTsCPO0Rq9Zqr9tGRFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786813806; c=relaxed/simple;
-	bh=A5cMqtx4OcUeiHcl+Ll5ywa/XhjXm6ZgG6SDd8eXoBg=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=GsZ4ckSJ7dh8s1zgXoQBvOocaAMAysdsqpBQ02RoVB4hcCNSNGV8u5F2BUFjI8ufCsLT4FyZpYy2oz6V+p6JkrE/+Lub5XEXYdaMfkUaBA91QbZSgYp15yojLxOFgkGW2QUYBGsZ0mIlh+qVBDMSSIt+Wi59gypkIR5wdwj9ZCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com; spf=pass smtp.mailfrom=googlemail.com; dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b=RgiUkYLL; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=googlemail.com
+	s=arc-20240116; t=1786817553; c=relaxed/simple;
+	bh=pmjuG1AODIqpOq+1jh2NCV+yqn53Zvw3O2+evDIojjg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=g+AdI/uDYv6zlsQopIoCs3Vg4xMUVTgowJ5HWiNDpxJcCfQkCLgb2tXKQE6m8fMEO6rJoO0Hk8f+yphxjAvL3nStrE7bpFFcDE5EoavTxztkE8SvVfDAG68DXekzNltUcY/EpbJg9PxD+gZmn4IVtGQ6hrUSi+TAeh5o9v6t3mI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kUJy6BdX; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="RgiUkYLL"
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-c15f020a223so289166366b.1
-        for <linux-crypto@vger.kernel.org>; Sat, 15 Aug 2026 10:10:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20251104; t=1786813803; x=1787418603; darn=vger.kernel.org;
-        h=content-disposition:content-type:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=f8FtYQNvh07cjnyWUEvGsLzktiNV3stpCYLWKZzqamA=;
-        b=RgiUkYLLL0EjcGgBg2tMAXCZe55pmJr+QB8dqX6s9ji/KL/6l8+PyyCNySWlIUhmT7
-         ds16OH1Kh89BdtdcSnNyePO72tyz1ZBzS1NBAlqLVlhx6zQuUeGOpz9tIfqvpTY0H9uA
-         aoJebSEZ8GCPB/Cglmv6BZV/xziGYRW8bV1tSkGjrfoU54lk+B75wykkIBmZoUlbExWe
-         iYDFsWCyjEHhJ7FoZDParrg12XzbX0eU0pR7IcuiS70/V1HkZAo8clTc1a/WCWPnuxAZ
-         bBDovJmNPQeUzbalp41jV9Y99L09ZRcWJMvRfKYsMYkfyKBXOXlM0SoX3HGYcNJNtAcq
-         ETpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1786813803; x=1787418603;
-        h=content-disposition:content-type:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=f8FtYQNvh07cjnyWUEvGsLzktiNV3stpCYLWKZzqamA=;
-        b=VkY3p+OFGJsu1xwct0iP9E6JC1E7t/D0Mu39q8+OnTRskg+2UCSsmsjOWIPBadqsJx
-         swtXyOdrVjyzt7DcKx8IrN5dvKK9TdyBNnKKJGTtDEW51W1N0WCfsjy405ceB67WlslI
-         rxsIt7+eS0KghYiuX4wtzZBgr65fK/V2DGuy91FQJI2QLrO5H1aL6wBT0QvStujZhjLa
-         ugh7tHBu4vPq86m/isPVM8n5h/6pQv20zAGd+yRz1zRBvebRvkeTwnOcH2aLKcBF5fs3
-         vmO822OffivqSLzy58wuFRvIscltbOmZIbLGTy0eClutFDY3XLJLr7WObNXRdYXG6qun
-         Lrkw==
-X-Forwarded-Encrypted: i=1; AHgh+RqEVyz1I4IHppF/4wYNpdqD671f7B8Qz56uK1Z/zRJMt7a0ERrBcQeyowSRJ+CIsp7s43VGnHvA6/Si1Qc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMFmNnZUB6+Rl57PrcPitXH4fsawl5AOLfNgXVemZoTWUJY9Ar
-	uTtbl1VPXGvkh4aIRisxe8mQiWU5riwyJeIeKaWrc2/UP/34+BHAXnsU87FiC5OaBz0=
-X-Gm-Gg: AR+sD10SgOlkxVt9RyjlL+5+//M6ZZ/is8MlcTAbZYZZuhkb2qgzyQHtY04AQOT4yKf
-	AhYRfUIdM2rPKwkv13pKWt4Mt0etwWoe9+cXjRBsxhE+k37Y0cdwjASUujxrw/HizsZXAihw4lx
-	WE1jAnDWJ+75gXkweCpeeZDjlpBOVv/uzXqY1F40+z+WxSOBMZ5guzNsCmw0enbADDm1hBiR40H
-	Q3HnIzP4on/1YKmvdgEGqv8INkiPVyqew/Q6FQrC/UHQTQcnQjBg6w5msWrn4YPmfhHSmToOw+l
-	1YXLI4oX46xkr3fr1v3AZ1iFNv5J0Zu/UCyZkelDoP9yR5V+dvjUJL2dIEVLSitgzJSCOHlZP+E
-	//hAZTSxHPUEim2nU3J1DLbSUqdT4+IMiLX1o/ARJzylimBfuvVMjevc7nKnwPNbUMx60UjqhA3
-	FSSUvywsmY+ZNeL9JuZFRnv4dabse/LUk/KxKH2DWu9IdEP1Tw0Lt86gMC2P0OoEtFmjZ3jZk8Q
-	ydzo5KhPWv74Dh4fN4=
-X-Received: by 2002:a17:907:fdca:b0:c08:417e:3696 with SMTP id a640c23a62f3a-c212a0f2e5fmr569257866b.20.1786813803080;
-        Sat, 15 Aug 2026 10:10:03 -0700 (PDT)
-Received: from david.gall (k10193.upc-k.chello.nl. [62.108.10.193])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-c2140a8d4a1sm155920866b.26.2026.08.15.10.10.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 15 Aug 2026 10:10:01 -0700 (PDT)
-Date: Sat, 15 Aug 2026 19:09:58 +0200
-From: "David C.C.M. Gall" <david.ccm.gall@googlemail.com>
-To: Gilad Ben-Yossef <gilad@benyossef.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: gregkh@linuxfoundation.org
-Subject: [PATCH] crypto: ccree - use crypto_memneq() to compare AEAD tag
-Message-ID: <aoCdZiqJjb5XDHHz@david.gall>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kUJy6BdX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FA801F000E9;
+	Sat, 15 Aug 2026 18:12:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1786817551;
+	bh=boGlZUbppWi28M8Be+twFNXFg8XXlVmUCtGBCUWWS5o=;
+	h=From:To:Cc:Subject:Date;
+	b=kUJy6BdXdx5DKNkIvJymTxL58RedkTTZIU5BFRV25ttL6v+w/WaZAlLrpKLxR03XG
+	 73YVqI+S9ky60SA/jOTdC7EcAdHNrd6RNA4OmL5u/zxyxZqCtyYagV+ZXaUE07IMnl
+	 EfSCX9Gre/JLuLrwoiELhDiWvqa+l3O5/TV7sU1Phg5NiccYYAwEdF8iEyL7OIuTG5
+	 3nC11IMzHfpDTaxBygLLcKtLy6zw4YIvf44Ho+vr/kzrUX9PAlpMCGQ+1uORcxtCPg
+	 WG9oJLtg80jvBrcfpXzQgIuSVF9C+lv46dyeut0ZYM2jGk7hXmRxMevuO86rNVguPS
+	 ZvZPq7KSeXYNA==
+From: Eric Biggers <ebiggers@kernel.org>
+To: x86@kernel.org
+Cc: linux-um@lists.infradead.org,
+	linux-raid@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH v4 0/8] x86: Remove cpu_has_xfeatures() and add AVX-512 xor_gen()
+Date: Sat, 15 Aug 2026 11:10:16 -0700
+Message-ID: <20260815181024.28924-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-cc_aead_complete() compares the computed MAC against the received ICV
-with memcmp(), which short-circuits on the first differing byte and
-leaks tag-match length via timing. Use crypto_memneq() instead.
+This series consolidates and cleans up how the kernel handles CPU
+feature flags for AVX and AVX-512 when the underlying OS or hypervisor
+(if any) doesn't enable the required xstate features in XCR0.
 
-Assisted-by: gregkh_clanker_t1000
-Signed-off-by: David C.C.M. Gall <david.ccm.gall@googlemail.com>
----
- drivers/crypto/ccree/cc_aead.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Specifically, it makes the checks for xstate features be done in a
+single place at boot time for both UML and native x86, instead of
+everywhere kernel code wants to check for AVX or AVX-512 support.
 
-diff --git a/drivers/crypto/ccree/cc_aead.c b/drivers/crypto/ccree/cc_aead.c
-index 088c4603047f..d57a98f89e53 100644
---- a/drivers/crypto/ccree/cc_aead.c
-+++ b/drivers/crypto/ccree/cc_aead.c
-@@ -226,8 +226,8 @@ static void cc_aead_complete(struct device *dev, void *cc_req, int err)
- 		goto done;
- 
- 	if (areq_ctx->gen_ctx.op_type == DRV_CRYPTO_DIRECTION_DECRYPT) {
--		if (memcmp(areq_ctx->mac_buf, areq_ctx->icv_virt_addr,
--			   ctx->authsize) != 0) {
-+		if (crypto_memneq(areq_ctx->mac_buf, areq_ctx->icv_virt_addr,
-+				  ctx->authsize)) {
- 			dev_dbg(dev, "Payload authentication failure, (auth-size=%d, cipher=%d)\n",
- 				ctx->authsize, ctx->cipher_mode);
- 			/* In case of payload authentication failure, MUST NOT
+Patch 8 then adds an AVX-512 optimized implementation of xor_gen() for
+RAID, which had been blocked on confusion around cpu_has_xfeatures() and
+its lack of implementation on UML.
+
+Changed in v4:
+  - Added missing vzeroupper instructions in xor-avx512.c
+
+Changed in v3:
+  - Updated the implementation of fpu__init_system_xstate() as suggested
+    by Borislav
+  - Added Acked-by tags
+  - Used "xor:" commit subject
+
+Changed in v2:
+  - Made x86 clear the AVX* bits if FPU or XSAVE features are missing.
+  - Updated comment in x86 arch_xor_init().
+  - Updated commit message for the UML commit to clarify that checking
+    XCR0 is standard practice in userspace
+
+Eric Biggers (8):
+  x86/fpu: Check for missing AVX and AVX-512 xstate bits
+  um: Check for missing AVX and AVX-512 xstate bits
+  crypto: x86 - Stop using cpu_has_xfeatures()
+  lib/crypto: x86: Stop using cpu_has_xfeatures()
+  lib/crc: x86: Stop using cpu_has_xfeatures()
+  x86/fpu: Remove cpu_has_xfeatures()
+  xor: Remove redundant X86_FEATURE_OSXSAVE check
+  xor: Add AVX-512 optimized xor_gen()
+
+ arch/um/kernel/um_arch.c                   |  78 ++++++++++++-
+ arch/x86/crypto/aegis128-aesni-glue.c      |   3 +-
+ arch/x86/crypto/aesni-intel_glue.c         |   7 +-
+ arch/x86/crypto/aria_aesni_avx2_glue.c     |  11 +-
+ arch/x86/crypto/aria_aesni_avx_glue.c      |  11 +-
+ arch/x86/crypto/aria_gfni_avx512_glue.c    |  11 +-
+ arch/x86/crypto/camellia_aesni_avx2_glue.c |  11 +-
+ arch/x86/crypto/camellia_aesni_avx_glue.c  |  11 +-
+ arch/x86/crypto/cast5_avx_glue.c           |   7 +-
+ arch/x86/crypto/cast6_avx_glue.c           |   7 +-
+ arch/x86/crypto/serpent_avx2_glue.c        |   9 +-
+ arch/x86/crypto/serpent_avx_glue.c         |   7 +-
+ arch/x86/crypto/sm4_aesni_avx2_glue.c      |  11 +-
+ arch/x86/crypto/sm4_aesni_avx_glue.c       |  11 +-
+ arch/x86/crypto/twofish_avx_glue.c         |   6 +-
+ arch/x86/include/asm/fpu/api.h             |   9 --
+ arch/x86/kernel/fpu/xstate.c               |  69 +++++-------
+ lib/crc/x86/crc-pclmul-template.h          |   6 +-
+ lib/crypto/x86/blake2s.h                   |   4 +-
+ lib/crypto/x86/chacha.h                    |   3 +-
+ lib/crypto/x86/nh.h                        |   4 +-
+ lib/crypto/x86/poly1305.h                  |   7 +-
+ lib/crypto/x86/sha1.h                      |   4 +-
+ lib/crypto/x86/sha256.h                    |   4 +-
+ lib/crypto/x86/sha512.h                    |   3 +-
+ lib/crypto/x86/sm3.h                       |   3 +-
+ lib/raid/xor/Makefile                      |   2 +-
+ lib/raid/xor/x86/xor-avx512.c              | 125 +++++++++++++++++++++
+ lib/raid/xor/x86/xor_arch.h                |  31 +++--
+ 29 files changed, 279 insertions(+), 196 deletions(-)
+ create mode 100644 lib/raid/xor/x86/xor-avx512.c
+
+
+base-commit: db2ddb87143519e20a95aa36c60b36107b736a58
 -- 
-2.43.0
+2.55.0
 
