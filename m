@@ -1,102 +1,131 @@
-Received: from mailout1.hostsharing.net (mailout1.hostsharing.net [83.223.95.204])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED8C345EBA;
-	Sun, 16 Aug 2026 12:13:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 406A83B05B6
+	for <linux-crypto@vger.kernel.org>; Sun, 16 Aug 2026 15:14:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786882426; cv=none; b=jekaVCww04tpVOr9pao50VOJb8Nhmdgp5PUmvPPCMjkrxZoQunRAYZdQw8gFOQ1RtZFhsVOT+ls+8r76nxL3t+y9x/CYEkoHZHzJe2EP4ixvvOKDQEFye5s0IH3YOvCgz6jvdaHDv2XgvCnxR9i41NZsS5DC4Tijfb0Fhb84qPs=
+	t=1786893295; cv=none; b=cUEuyq+IqFsuH6hZSRjHFZQ2mJwnxAN5RLnlOU+n+c4cBACgVDopmKrBFp1lVohRQzJrV0MhuK1ACTaaBFBZ9EDMSPp3Z9ZM5vHul1WH0LhpF6pw/FiVzN/oG8+6DpQMT7gWloSDr5SlHD0rt90LmGD33BgHNJ/01Hx7s9f135Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786882426; c=relaxed/simple;
-	bh=Cn0zUN/hrMLQAPmuNzHmIPISGC8g6oolk9qIb89TBIU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gWjAvYULUYbNHsUaT3DZRqHwY+gZJKRDF53SvgQP2oOtRvyfnhIRt4S3bLEgIb+cAlLsjUe6qGVUWbaKH1VaEjN8wIdhGg2z7C77Xz3MisWDrfFcvqi9DDd5eRDGtsW+zjqNQHnW1TPXOKfdM8roTl7oMVS5hnPoh7g7e6Gpkn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=83.223.95.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384
-	 client-signature ECDSA (secp384r1) client-digest SHA384)
-	(Client CN "*.hostsharing.net", Issuer "GlobalSign GCC R6 AlphaSSL CA 2025" (verified OK))
-	by mailout1.hostsharing.net (Postfix) with ESMTPS id 83A3F3BC;
-	Sun, 16 Aug 2026 14:13:37 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 61BAE629CE27; Sun, 16 Aug 2026 14:13:37 +0200 (CEST)
-Date: Sun, 16 Aug 2026 14:13:37 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: Jan Sebastian =?iso-8859-1?Q?G=F6tte?= <contact@jaseg.de>
-Cc: Baoquan He <baoquan.he@linux.dev>,
-	Jan Sebastian =?iso-8859-1?Q?G=F6tte?= <linux@jaseg.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Mike Rapoport <rppt@kernel.org>,
-	Pasha Tatashin <pasha.tatashin@soleen.com>,
-	Pratyush Yadav <pratyush@kernel.org>,
-	Dave Young <ruirui.yang@linux.dev>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, David Howells <dhowells@redhat.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Ignat Korchagin <ignat@linux.win>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>, Mimi Zohar <zohar@linux.ibm.com>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Eric Biggers <ebiggers@kernel.org>,
-	"Theodore Y. Ts'o" <tytso@mit.edu>,
-	Jaegeuk Kim <jaegeuk@kernel.org>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>,
-	Benjamin Marzinski <bmarzins@redhat.com>, kexec@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mm@kvack.org, keyrings@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-security-module@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-nvme@lists.infradead.org,
-	linux-nfs@vger.kernel.org, linux-integrity@vger.kernel.org,
-	linux-afs@lists.infradead.org, netdev@vger.kernel.org,
-	linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	dm-devel@lists.linux.dev
-Subject: Re: [PATCH v2 01/13] kexec: add CRASH_WIPE_SECRETS to wipe secrets
- before kdump
-Message-ID: <aoGpcczo5GkBsPwt@wunner.de>
-References: <20260811-crash-zeroize-rework-v2-0-9561d13c2340@jaseg.de>
- <20260811-crash-zeroize-rework-v2-1-9561d13c2340@jaseg.de>
- <anw9ILJiO5xIjP4f@MiWiFi-R3L-srv>
- <9765f7ea-36bb-4c7b-a19b-7facec97b762@jaseg.de>
+	s=arc-20240116; t=1786893295; c=relaxed/simple;
+	bh=oHad1wyox8qdDpY81HM8XfWbSH7UCwe0GLxzkyCErM4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jgZ0d2Gggnag/CUYfRvI8cxwaMQX7hRheBKhUuopFMAIuStLlM+6NqDAB/6s/L8e2GL5e5UIBSgix9NGgHVTAuJO+y5qKI8OsLSbI2n5pjDVsoWArjFZ6vp3eFb1FNynR72Ii8RTBo5DU39r55orvL6AP1imBeHz7TQP+XBuK7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bfv+1QI4; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bfv+1QI4"
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-47fe377a217so1663504f8f.1
+        for <linux-crypto@vger.kernel.org>; Sun, 16 Aug 2026 08:14:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1786893292; x=1787498092; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:subject:cc:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=oDn1zkAJTAhRzfQXoiRfUNpmt/wvhx4bAoFeaZmIx14=;
+        b=bfv+1QI4UV37TIKxa1TGhmFpcxlnBRLXA3kdutOATbmkmxGlaVPInNN7+AJ/aywRBQ
+         h9zunZb2XN2eK5jSWcZMZHo+tM0A+Yw5gYyjr8hCuzt9kWLFxsz2ATY7un6PO4sJz23t
+         d2wFNByaLUh9s7W+1mi3dLFSnBjbwvrElqjBnA8V06L/SrfPaujtc10tRlb/F4Fkr9F2
+         de3HaQM1KhFuBk6SxL8tgAK1zbxOaRb8Apqu8xo28DVJpHVHPE7F/+d9m+wKMhhbsFYq
+         05Lh0y89uoNWSLMI+tv9hquMOn6QEJp4+fqoo00S+gb5yrTY7+nx1JNnYYM3CCAoJXem
+         /Nkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1786893292; x=1787498092;
+        h=content-transfer-encoding:content-type:mime-version:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=oDn1zkAJTAhRzfQXoiRfUNpmt/wvhx4bAoFeaZmIx14=;
+        b=eeX+qx/FUg49CoTRI1jNzwdjPNj0SPmQw4ebnLiihyXbqGA0rJyp4MVPEAoAoiqStR
+         TAgxhnj8Ya1aIh+XNdV4xuvwnFb91TMLKPIPj+KZnX1RNwM1+j6Rhq4LCFD70anqc40K
+         n0MIaodtRhxEhjXl2SVmceLxGwgeBItIl8jIg/oojRtFRy9cBngPyAVtEfk2jqk1ynSW
+         qhA6Vt25vVtXCnXde7tl112xoZCY4SzinHk6QlLYEmmj5l0FiM53A056UsjH7RMSDr4Q
+         Bt3DdVUNKg/Z4j58V8P1xnLko8AWx0WABE0+7ZW6SF6wGoI+UT2ExBDXhiefC7HckBS2
+         empg==
+X-Forwarded-Encrypted: i=1; AHgh+RpvEyITf9UZlM/ZAj5KLXwDBF87micoz0HA5dYk2HDwIMA+i8h+yfYqsUXmDY/lrWSCMuPv1wnki1djjFY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyMClSQoRNTSwXaWqaQ1MuaHIfXiWrqBkRn/jMlE2543w920/MT
+	hTeX0QcxxHLK584wLBylFrRcjOgsH/BhiAvwWVlKPKnDf0ZzZw1wfzVj
+X-Gm-Gg: AR+sD12D5kaXxjPv5zYHGT9XYi5XbVhMvYTqIwzYHZ7i2r3W87TFlZd+B3o2tjgkmeE
+	S6+XAYj11elcTfWjGqHehpjRi/fiI/ndEIdvELkCN1ZT6YleKj0FCMCRUlBL43800xm6wSDfLv4
+	WHaftQ4B7PXGcgN8q8VVogpIS+ZgH+bfucSLvD3uKbY58gWT9sBZYQuopGH22LrxZgGS1o50jcG
+	nD2XUr2u8MbFGsqVxPmFYtWS+ig/31QzMEG7ZOuFgsfmYk4NttETYTmOlqHtzNB1Pha18DB4V11
+	verq/pJEibUHWCzRixLZQqO08h1imHTlK8YfQRCMr5AiAm7EUMtUZZuWhMh86kg5OHYHUH86who
+	h/M8alFjwxM6GH2HuUHeXNunf9OlPy7ZnUCBjqhodaWvGFAzRNAogdb2B35y6gy7yOIv2cpFQ1g
+	RmJ4e7y46MQLHLq6+vK8pUW+LkCrS6jV6TdF6OglNFoJY9iE5/sjsWZ3GxzXIMkEUip7ISbYpMG
+	pmSFrQW7+1YvGX2Srt78+2l8g==
+X-Received: by 2002:a05:600c:6a10:b0:499:79ba:a754 with SMTP id 5b1f17b1804b1-49987973094mr241171505e9.11.1786893292329;
+        Sun, 16 Aug 2026 08:14:52 -0700 (PDT)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49987b2a176sm223938615e9.4.2026.08.16.08.14.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 16 Aug 2026 08:14:52 -0700 (PDT)
+Date: Sun, 16 Aug 2026 16:14:50 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: x86@kernel.org, linux-kernel@vger.kernel.org,
+ linux-raid@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+ linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+ Taehee Yoo <ap420073@gmail.com>, netfilter-devel@vger.kernel.org, Pablo
+ Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>, Phil
+ Sutter <phil@nwl.cc>
+Subject: Re: [PATCH 0/6] x86: add missing vzeroupper instructions
+Message-ID: <20260816161450.05fd24f2@pumpkin>
+In-Reply-To: <20260815205750.169336-1-ebiggers@kernel.org>
+References: <20260815205750.169336-1-ebiggers@kernel.org>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <9765f7ea-36bb-4c7b-a19b-7facec97b762@jaseg.de>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Aug 12, 2026 at 12:08:39PM +0200, Jan Sebastian Götte wrote:
-> I can imagine one alternative way to approach this, tell me what you think:
-> Instead of registering wipe handlers that memzero places on panic, I could
-> put an optional registry of (addr, len) descriptors into crashkernel memory
-> that the original kernel populates with the PAs of buffers to clear ahead of
-> time. Then the kdump kernel could do the actual memzero. This would remove
-> all code from the actual kdump path here. The registry could be made
-> per-core to avoid locks.
+On Sat, 15 Aug 2026 13:57:44 -0700
+Eric Biggers <ebiggers@kernel.org> wrote:
 
-Or create a dedicated mempool from which all sensitive data is allocated,
-then call mempool_free_bulk() on kexec to poison everything in that pool?
+> Assembly code using YMM or ZMM registers is supposed to end with the
+> vzeroupper instruction in order to avoid degrading the performance of
+> any later SSE code.  Since this only affects performance and not
+> correctness, it is sometimes overlooked.  Most kernel code does it
+> correctly, but a few cases were missed.  This series fixes them.
+> 
+> It should be easiest to take the full series through the x86 tree.
 
-Thanks,
+Would it be better to an an unconditional vzeroupper in kernel_fpu_end()?
+It could go in kernel_fpu_start() but that might have a bigger effect
+on latency.
+(I assume there is one in kernel_fpu_start() if it actually saves
+the user registers?)
 
-Lukas
+Looking the latency/uops seems reasonably on everything 'recent' except
+zen-1 and knights-landing.
+Although the microcode patch for zen-2 might make that a lot worse.
+
+	David  
+
+
+> 
+> Eric Biggers (6):
+>   xor: add missing vzeroupper to AVX code
+>   raid6: add missing vzeroupper to AVX2 code
+>   raid6: add missing vzeroupper to AVX-512 code
+>   crypto: x86/aria - add missing vzeroupper in AVX2 code
+>   crypto: x86/aria - add missing vzeroupper in AVX-512 code
+>   netfilter: nft_set_pipapo_avx2: add missing vzeroupper
+> 
+>  arch/x86/crypto/aria-aesni-avx2-asm_64.S  |  6 ++++++
+>  arch/x86/crypto/aria-gfni-avx512-asm_64.S |  3 +++
+>  lib/raid/raid6/x86/avx2.c                 |  6 ++++++
+>  lib/raid/raid6/x86/avx512.c               |  6 ++++++
+>  lib/raid/raid6/x86/recov_avx2.c           |  2 ++
+>  lib/raid/raid6/x86/recov_avx512.c         |  2 ++
+>  lib/raid/xor/x86/xor-avx.c                |  1 +
+>  net/netfilter/nft_set_pipapo_avx2.c       | 17 ++++++++---------
+>  8 files changed, 34 insertions(+), 9 deletions(-)
+> 
+> 
+> base-commit: db2ddb87143519e20a95aa36c60b36107b736a58
+
