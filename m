@@ -1,212 +1,158 @@
-Received: from mta0.migadu.com (out-26.mta0.migadu.com [91.218.175.26])
+Received: from mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B05C43BE141
-	for <linux-crypto@vger.kernel.org>; Mon, 17 Aug 2026 08:15:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.26
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43F93C197F
+	for <linux-crypto@vger.kernel.org>; Mon, 17 Aug 2026 08:25:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786954516; cv=none; b=Q3RyO81Js8QbXBiMctiww7CpJL2OJIYf2wLXnohOeGc1N5y0EZazftJMlJ5rpzXD8s0OLRWAn6h2fnl9s/5UzwLS0oBn48yxYJsLn4/NVzqC3mwjrcxCaxiqVTQUulhtp4Ccqu1fDipCkd5CT2Q7QtcTf5r/tY80aR2fSQV0srM=
+	t=1786955125; cv=none; b=oTkEc5cDydIUvGENxu/1/bfSowGObPsJcutWSkfGIKlmnFS+MIlrph3jhvEJQA885KCTyrtBpJt/59z8yq8/mxDh9fXby1YZb2wt8w+6JG6T0OdHWXHsfgw0radAhS/YF6R+0Memd0AVI/dhukEbwe4zliLZKeKts37vH2byjnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786954516; c=relaxed/simple;
-	bh=C0O0F0T5Khr4i9evrKR9qQ1b3ukNc51FfJbV+j3oy3Q=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
-	 References:In-Reply-To; b=sgfCr+PpF50enoXxuDmkKpILp1TfOXvhddmfMXYl9qeacyfoejV7tMsLtPROu4X5w/qk7vFKdVeB9EqvxBTu8/2l2Y3sztD81YLeqjvk4Jlx5NNPWDtfNQ61eoWGhS1cgYpGi0XCb/xxOgrcNxct1lu9pzMBJnYzHYBzz9Nv0rU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow-tech.com; spf=pass smtp.mailfrom=cknow-tech.com; dkim=pass (2048-bit key) header.d=cknow-tech.com header.i=@cknow-tech.com header.b=hhVhQJO6; arc=none smtp.client-ip=91.218.175.26
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow-tech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cknow-tech.com
+	s=arc-20240116; t=1786955125; c=relaxed/simple;
+	bh=eYNadUi07A8AhvVYvTwlB5KEurgeLlJSPKo7wDdWLLE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fZCy4W8yCp4wh2NSXhB+TvqZL9jXLDeseFb09ZiJtrnhtGRYWkEySv9yUrnAXxpX+JfFBCaG4l2fjTQluMkAD4Gygjr12muSqseGx/731Pu5dfyo85AUoCoTj/3mkDWghuGXJvW+A5IZxhxN5WKtwVaYtp4M14hqOnjS+8VVenY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LjSgLYly; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cknow-tech.com header.i=@cknow-tech.com header.b="hhVhQJO6"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LjSgLYly"
 X-Envelope-To: linux-crypto@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=C0O0F0T5Khr4i9evrKR9qQ1b3ukNc51FfJbV+j3oy3Q=;
- c=simple/simple; d=cknow-tech.com;
+DKIM-Signature: a=rsa-sha256; bh=eYNadUi07A8AhvVYvTwlB5KEurgeLlJSPKo7wDdWLLE=;
+ c=simple/simple; d=linux.dev;
  h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1786954510; v=1; x=1787559310;
- b=hhVhQJO6LkgnZbGnPrn8ZOEQmZ7vWhS+ZVrfUmUxrqh+qv0Lrw3p1WOmQTwfA3WY2wTf5SBI
- 0tDB9rb2tHUdFs9DxdaIjJJiMseOo/TUH43zMy4zDmw1i8uKCuhHLYknSM1JWHe94JQi4ZJRJOl
- y7DSQa1EYuOWLuLa5i3Yz4UuPqb4mxRmshbPhrWy2sBSremdXLazCLaAGqrt1wul74Ls8UgjAtQ
- FJ4oOXzu1Jy8RBfSiUyvZ2ZovLXnBlMoKdC6erXOqhkS5UNWGDOJMEIg1TMH8bEd6GJ/N3O0lsO
- 95LPnVzzotiEKHIhkkGTkzVOYwfef25S4fEIDjh5vtdNg==
+ t=1786955118; v=1; x=1787559918;
+ b=LjSgLYlyre7Bl9wzcfiwZnMLoGsyIYf9q8avtbrrLh4qRigtQGJCLkGEhRdOzNjEtR0FDJ2V
+ wqeQAlf5nV6ZloadOxF0iTp92ncJJ7FcPM5OlPTDlNLFY02HJU5jaKQJRU/UIJzYS/uda5GT0qV
+ xLqAy0diEUnzSweW7JvbwBgg=
 X-Envelope-To: linux-crypto@vger.kernel.org
-Received: from localhost (92.254.112.55)
-	by smtp.migadu.com with ESMTPS id 54f7be6b0ec37d4f;
-	Mon, 17 Aug 2026 08:15:00 +0000
+Received: from localhost (3.112.29.171)
+	by mta10.migadu.com with ESMTPS id 5d0fb72b720b7f63;
+	Mon, 17 Aug 2026 08:25:17 +0000
 X-Migadu-Flow: FLOW_OUT
+Date: Mon, 17 Aug 2026 16:25:14 +0800
+From: Baoquan He <baoquan.he@linux.dev>
+To: Lukas Wunner <lukas@wunner.de>,
+	Jan Sebastian =?iso-8859-1?Q?G=F6tte?= <contact@jaseg.de>
+Cc: Jan Sebastian =?iso-8859-1?Q?G=F6tte?= <linux@jaseg.de>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Mike Rapoport <rppt@kernel.org>,
+	Pasha Tatashin <pasha.tatashin@soleen.com>,
+	Pratyush Yadav <pratyush@kernel.org>,
+	Dave Young <ruirui.yang@linux.dev>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, David Howells <dhowells@redhat.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Ignat Korchagin <ignat@linux.win>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>, Mimi Zohar <zohar@linux.ibm.com>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Eric Biggers <ebiggers@kernel.org>,
+	"Theodore Y. Ts'o" <tytso@mit.edu>,
+	Jaegeuk Kim <jaegeuk@kernel.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Benjamin Marzinski <bmarzins@redhat.com>, kexec@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mm@kvack.org, keyrings@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-security-module@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-nfs@vger.kernel.org, linux-integrity@vger.kernel.org,
+	linux-afs@lists.infradead.org, netdev@vger.kernel.org,
+	linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	dm-devel@lists.linux.dev
+Subject: Re: [PATCH v2 01/13] kexec: add CRASH_WIPE_SECRETS to wipe secrets
+ before kdump
+Message-ID: <aoLFai0gzzH2bGgy@MiWiFi-R3L-srv>
+References: <20260811-crash-zeroize-rework-v2-0-9561d13c2340@jaseg.de>
+ <20260811-crash-zeroize-rework-v2-1-9561d13c2340@jaseg.de>
+ <anw9ILJiO5xIjP4f@MiWiFi-R3L-srv>
+ <9765f7ea-36bb-4c7b-a19b-7facec97b762@jaseg.de>
+ <aoGpcczo5GkBsPwt@wunner.de>
+ <aoK6jXA-tF9qfKOZ@MiWiFi-R3L-srv>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 17 Aug 2026 10:14:58 +0200
-Message-Id: <DKR2I3X521F8.J6H7KW07GDD0@cknow-tech.com>
-Subject: Re: [PATCH v3 1/4] dt-bindings: crypto: rockchip: Add RK356x/RK3588
- crypto engine binding
-From: "Diederik de Haas" <diederik@cknow-tech.com>
-To: "Dawid Olesinski" <dawidro@gmail.com>, "Herbert Xu"
- <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
- "Rob Herring" <robh@kernel.org>, "Krzysztof Kozlowski"
- <krzk+dt@kernel.org>, "Heiko Stuebner" <heiko@sntech.de>
-Cc: "Diederik de Haas" <diederik@cknow-tech.com>, "Eric Biggers"
- <ebiggers@kernel.org>, "Sebastian Reichel"
- <sebastian.reichel@collabora.com>, "Philipp Zabel"
- <p.zabel@pengutronix.de>, "Conor Dooley" <conor+dt@kernel.org>, "Corentin
- Labbe" <clabbe@baylibre.com>, <linux-crypto@vger.kernel.org>,
- <devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
- <linux-rockchip@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-X-Mailer: aerc 0.22.0
-References: <20260708175837.1718437-1-dawidro@gmail.com>
- <20260816194112.552100-1-dawidro@gmail.com>
- <20260816194112.552100-2-dawidro@gmail.com>
-In-Reply-To: <20260816194112.552100-2-dawidro@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aoK6jXA-tF9qfKOZ@MiWiFi-R3L-srv>
 
-Hi Dawid,
+On 08/17/26 at 03:38pm, Baoquan He wrote:
+> On 08/16/26 at 02:13pm, Lukas Wunner wrote:
+> > On Wed, Aug 12, 2026 at 12:08:39PM +0200, Jan Sebastian Götte wrote:
+> > > I can imagine one alternative way to approach this, tell me what you think:
+> > > Instead of registering wipe handlers that memzero places on panic, I could
+> > > put an optional registry of (addr, len) descriptors into crashkernel memory
+> > > that the original kernel populates with the PAs of buffers to clear ahead of
+> > > time. Then the kdump kernel could do the actual memzero. This would remove
+> > > all code from the actual kdump path here. The registry could be made
+> > > per-core to avoid locks.
 
-On Sun Aug 16, 2026 at 9:39 PM CEST, Dawid Olesinski wrote:
-> Add a YAML device tree binding for the Rockchip second-generation (V2)
-> cryptographic hardware accelerator present on the RK3568 and RK3588 SoCs.
->
-> The IP block exposes AES-ECB, AES-CBC, AES-XTS block ciphers, SHA-1,
-> SHA-224, SHA-256, SHA-384, SHA-512, MD5, and SM3 hash algorithms, each
-> with a hardware DMA engine controlled via linked-list descriptors.
->
-> The binding covers two compatible strings:
->
->   - rockchip,rk3568-crypto: clocks and resets are driven directly by the
->     non-secure CRU (accessible to Linux at EL1).
->   - rockchip,rk3588-crypto: clocks and resets live in SECURECRU, a
->     register bank sandboxed to TrustZone. Linux must request them through
->     the ARM SCMI firmware interface (scmi_clk / scmi_reset), as direct
->     MMIO access to SECURECRU from EL1 triggers a bus fault.
->
-> Co-developed-by: Corentin Labbe <clabbe@baylibre.com>
-> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> Signed-off-by: Dawid Olesinski <dawidro@gmail.com>
-> Tested-by: Diederik de Haas <diederik@cknow-tech.com>  # Quartz64-B,
-> NanoPi R5S, NanoPC-T6 LTS
+If this has to be done in kernel, your (addr, len) registry idea is a
+better direction, and we can make it a bit more general.
 
-AFAIK these lines should not have a line break, ie must be on one line.
+Instead of a secrets-only wipe registry, consider a small "crash memory
+region" table with an action per entry:
 
-Cheers,
-  Diederik
+enum crash_region_action {
+    CRASH_REG_WIPE,   /* memzero, then dump normally (leave zeros) */
+    CRASH_REG_SKIP,   /* do not include in the vmcore at all */
+};
 
-> ---
->  .../crypto/rockchip,rk3588-crypto.yaml        | 83 +++++++++++++++++++
->  MAINTAINERS                                   |  2 +
->  2 files changed, 85 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/crypto/rockchip,rk3=
-588-crypto.yaml
->
-> diff --git a/Documentation/devicetree/bindings/crypto/rockchip,rk3588-cry=
-pto.yaml b/Documentation/devicetree/bindings/crypto/rockchip,rk3588-crypto.=
-yaml
-> new file mode 100644
-> index 000000000000..32d241c19453
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/crypto/rockchip,rk3588-crypto.yam=
-l
-> @@ -0,0 +1,83 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/crypto/rockchip,rk3588-crypto.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Rockchip cryptographic offloader
-> +
-> +maintainers:
-> +  - Heiko Stuebner <heiko@sntech.de>
-> +  - Corentin Labbe <clabbe@baylibre.com>
-> +  - Dawid Olesinski <dawidro@gmail.com>
-> +
-> +properties:
-> +  compatible:
-> +    oneOf:
-> +      - const: rockchip,rk3568-crypto
-> +      - items:
-> +          - enum:
-> +              - rockchip,rk3588-crypto
-> +          - const: rockchip,rk3568-crypto
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  interrupts:
-> +    maxItems: 1
-> +
-> +  clocks:
-> +    items:
-> +      - description: Core clock for the crypto IP internal logic
-> +      - description: AXI interconnect clock interface
-> +      - description: AHB interface clock
-> +
-> +  clock-names:
-> +    items:
-> +      - const: core
-> +      - const: aclk
-> +      - const: hclk
-> +
-> +  resets:
-> +    minItems: 1
-> +    maxItems: 3
-> +
-> +  reset-names:
-> +    minItems: 1
-> +    items:
-> +      - const: core
-> +      - const: aclk
-> +      - const: hclk
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - interrupts
-> +  - clocks
-> +  - clock-names
-> +  - resets
-> +  - reset-names
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
-> +    #include <dt-bindings/clock/rockchip,rk3588-cru.h>
-> +    #include <dt-bindings/reset/rockchip,rk3588-cru.h>
-> +
-> +    bus {
-> +      #address-cells =3D <2>;
-> +      #size-cells =3D <2>;
-> +
-> +      crypto@fe370000 {
-> +        compatible =3D "rockchip,rk3588-crypto", "rockchip,rk3568-crypto=
-";
-> +        reg =3D <0x0 0xfe370000 0x0 0x2000>;
-> +        interrupts =3D <GIC_SPI 209 IRQ_TYPE_LEVEL_HIGH 0>;
-> +        clocks =3D <&scmi_clk SCMI_CRYPTO_CORE>, <&scmi_clk SCMI_ACLK_SE=
-CURE_NS>,
-> +                 <&scmi_clk SCMI_HCLK_SECURE_NS>;
-> +        clock-names =3D "core", "aclk", "hclk";
-> +        resets =3D <&scmi_reset SCMI_SRST_CRYPTO_CORE>;
-> +        reset-names =3D "core";
-> +      };
-> +    };
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index c8d4b913f26c..50b77a750db3 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -23131,9 +23131,11 @@ F:	drivers/media/platform/rockchip/rkcif/
-> =20
->  ROCKCHIP CRYPTO DRIVERS
->  M:	Corentin Labbe <clabbe@baylibre.com>
-> +M:	Dawid Olesinski <dawidro@gmail.com>
->  L:	linux-crypto@vger.kernel.org
->  S:	Maintained
->  F:	Documentation/devicetree/bindings/crypto/rockchip,rk3288-crypto.yaml
-> +F:	Documentation/devicetree/bindings/crypto/rockchip,rk3588-crypto.yaml
->  F:	drivers/crypto/rockchip/
-> =20
->  ROCKCHIP I2S TDM DRIVER
+struct crash_region {
+    phys_addr_t addr;
+    size_t      len;
+    enum crash_region_action action;
+};
 
+void crash_reg_add(phys_addr_t addr, size_t len,
+                   enum crash_region_action action);
+void crash_reg_del(phys_addr_t addr, size_t len);
 
+Two actions because the use cases differ:
+
+- WIPE is what you need: zero the secret, 
+- SKIP covers things people do not want in the dump at all
+   — Registering as SKIP reduce dump size. I have been considering how
+     to shrink vmcore size on some big system with huge memory, the
+     vmcore size usually is several or tens of GB.
+
+If this is OK to you, you can start a regiestry table
+infrastructure with wiping secrets, we can add SKIP later and plus some
+driver used memory.
+
+I am not sure if it's satisfactory, but you can give it a shot to show
+what it looks like.
+
+Thanks
+Baoquan
+
+> 
+> Since there are a lot of security expert in CC, I am wondering what's
+> the risk if we wipe secrets during dumping. System is located in
+> user's place, and vmcore is dumped and collected in user's place. If we
+> filter out secrets memory when we dumping, what could be leaked out?
+> 
+> > 
+> > Or create a dedicated mempool from which all sensitive data is allocated,
+> > then call mempool_free_bulk() on kexec to poison everything in that pool?
+> > 
+> > Thanks,
+> > 
+> > Lukas
