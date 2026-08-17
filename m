@@ -1,157 +1,116 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-222.mta0.migadu.com [91.218.175.222])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18C0639CCFD;
-	Mon, 17 Aug 2026 07:35:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 168FA24E4AF
+	for <linux-crypto@vger.kernel.org>; Mon, 17 Aug 2026 07:38:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.222
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1786952122; cv=none; b=u0KQp/q4JYwSCqTTLgTCfAhT2Th+n0ZKp9SKFiMKhBFXokt9rao6C70CSmYK6lcK4u3p3vK687mcMm3YLN6KB9j1u4Jj8QSz+iwufvMHwV6O9pulLlAvVTICQsBjNy/u6MEQfutLrEjaXGXHnyBZEj+A6iDxxNAwjG+YnKGfGC0=
+	t=1786952342; cv=none; b=Md+dO1yxRjHjZKXO+Zd1FFNoyhzfYv68KuxIUjujQqgmyZhp2cetQwCyQHXo49WbybREVHOfsV3MMq1C2rwObUGFPSqp4LbZJYX4mw+svVbwlxAZLKDSQ35WqSsxlNcMRGJz/T+MaNZmCQ7atjLz3FeHt9uvr4/mkajYgZQwbRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1786952122; c=relaxed/simple;
-	bh=5vbeY0mbpFpNKkWFJ9hNdzWcg3Oj0MUXiHzXO9QncKc=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=FII8l+lDXblr/NpPo7hn3AWqVE374oFAq1sIxt334YeX/9Fcl640qhdFRGvcbYGHGf+OyJIoJJSMtIyl+Revoy6KvOUE1AUh9gcbls2PHbGIrRRzNAPq23rO5b+rxGvjs1ypfkHBlKfMD8uygzCQ/ZKAGmkBXq6wZbMtG5FUfLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=sAl4HkrD; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1786952342; c=relaxed/simple;
+	bh=4YGgPm1wRAd8vr5pINF7lmz4ylld4f9QdvgoaXgstqU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=je6ICXD1RtLuVNLiiMRII0hHuS8wmgJsMxI0YLD3NncRqqwAk14IMD2bxXyFj/0eEL+iiT4V0CN/SrAyjOkYmnlkyVhFWGJzWlOSvuV2bsN2p1r2TlnizBvZo3NKGYMReZPsKOOJrgS5dZaRH4IF7SJU09R2oWYnkRyU8DuiH44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=drKkCzKS; arc=none smtp.client-ip=91.218.175.222
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="sAl4HkrD"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67GLWFpa3685640;
-	Mon, 17 Aug 2026 07:35:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:to; s=pp1;
-	 bh=IjmGaT5RplUtKzXJdtauv0pXlgxnSgWPVJ31zpzpfMQ=; b=sAl4HkrDcQTs
-	K7QJUI+dqbWdcyc05wlNEKcT+UClE2WQ1loekg1JuM2MfWUZBArSJ+5GX7YG1LcT
-	vYOU7IPXyX+uL0b4eTN62KZUZXX/4vbSInztoyiPXV9ELVOkyuWzQz1eGK93mIWg
-	gIcYhD5WWDd6Ga4TobcbhQ1kW7j9uBz1RX2VEUp/9pbLNcGG5LO7wBQKw9K6O6wG
-	Up58eVCfcjFBz68TWctq2E16rXy+p8IRLBsZWAzri7NRkzX84P0tFiAPZZetskoy
-	gHmM3VsQYE847WdXTlDKZo4Vj7w3W3G6sFr42ztoCeOKwsJZxbIJDwqFlrpTM5Zt
-	UYAe2ZpiMg==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4g2fm3gx5u-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 17 Aug 2026 07:35:17 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 67H7QKw8032353;
-	Mon, 17 Aug 2026 07:35:16 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4g354y4mak-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 17 Aug 2026 07:35:16 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67H7ZFv533358434
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 17 Aug 2026 07:35:15 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 490BC58059;
-	Mon, 17 Aug 2026 07:35:15 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6521658053;
-	Mon, 17 Aug 2026 07:35:14 +0000 (GMT)
-Received: from ltc.linux.ibm.com (unknown [9.5.196.140])
-	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 17 Aug 2026 07:35:14 +0000 (GMT)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="drKkCzKS"
+X-Envelope-To: linux-crypto@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=4YGgPm1wRAd8vr5pINF7lmz4ylld4f9QdvgoaXgstqU=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1786952338; v=1; x=1787557138;
+ b=drKkCzKSsin9zuHKenvfN9Z2FT92faus9G8LzAbDREnbR3c36ZnwAZwQ92sXsS+0GRnErubh
+ jak7uy/R270dwWU2uNt0CkImdFXguvI2TIumQCaIJyEBLAIyuyEDzuo49xBXaGmyuG+Zalx6zp6
+ sUzdcJHuBYYvj+Fdx2BMVJ9g=
+X-Envelope-To: linux-crypto@vger.kernel.org
+Received: from localhost (3.112.29.171)
+	by mta12.migadu.com with ESMTPS id 17e9312474d067d5;
+	Mon, 17 Aug 2026 07:38:57 +0000
+X-Migadu-Flow: FLOW_OUT
+Date: Mon, 17 Aug 2026 15:38:53 +0800
+From: Baoquan He <baoquan.he@linux.dev>
+To: Lukas Wunner <lukas@wunner.de>,
+	Jan Sebastian =?iso-8859-1?Q?G=F6tte?= <contact@jaseg.de>
+Cc: Jan Sebastian =?iso-8859-1?Q?G=F6tte?= <linux@jaseg.de>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Mike Rapoport <rppt@kernel.org>,
+	Pasha Tatashin <pasha.tatashin@soleen.com>,
+	Pratyush Yadav <pratyush@kernel.org>,
+	Dave Young <ruirui.yang@linux.dev>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, David Howells <dhowells@redhat.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Ignat Korchagin <ignat@linux.win>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>, Mimi Zohar <zohar@linux.ibm.com>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Eric Biggers <ebiggers@kernel.org>,
+	"Theodore Y. Ts'o" <tytso@mit.edu>,
+	Jaegeuk Kim <jaegeuk@kernel.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	Benjamin Marzinski <bmarzins@redhat.com>, kexec@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mm@kvack.org, keyrings@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-security-module@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-nvme@lists.infradead.org,
+	linux-nfs@vger.kernel.org, linux-integrity@vger.kernel.org,
+	linux-afs@lists.infradead.org, netdev@vger.kernel.org,
+	linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	dm-devel@lists.linux.dev
+Subject: Re: [PATCH v2 01/13] kexec: add CRASH_WIPE_SECRETS to wipe secrets
+ before kdump
+Message-ID: <aoK6jXA-tF9qfKOZ@MiWiFi-R3L-srv>
+References: <20260811-crash-zeroize-rework-v2-0-9561d13c2340@jaseg.de>
+ <20260811-crash-zeroize-rework-v2-1-9561d13c2340@jaseg.de>
+ <anw9ILJiO5xIjP4f@MiWiFi-R3L-srv>
+ <9765f7ea-36bb-4c7b-a19b-7facec97b762@jaseg.de>
+ <aoGpcczo5GkBsPwt@wunner.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Mon, 17 Aug 2026 09:35:13 +0200
-From: Harald Freudenberger <freude@linux.ibm.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Heiko Carstens <hca@linux.ibm.com>,
-        Holger Dengler
- <dengler@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven
- Schnelle <svens@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian
- Borntraeger <borntraeger@linux.ibm.com>,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 0/3] s390/crypto: Enable CONTEXT_ANALYSIS
-Reply-To: freude@linux.ibm.com
-Mail-Reply-To: freude@linux.ibm.com
-In-Reply-To: <an-56jLbR6bfPwvk@gondor.apana.org.au>
-References: <20260804113736.1423667-1-hca@linux.ibm.com>
- <an-56jLbR6bfPwvk@gondor.apana.org.au>
-Message-ID: <3e82cddea4a64cbc4b02c3a017d1afa7@linux.ibm.com>
-X-Sender: freude@linux.ibm.com
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: nngj9clPQRRJYXzP50wPRtUiav4zHx-_
-X-Proofpoint-ORIG-GUID: nngj9clPQRRJYXzP50wPRtUiav4zHx-_
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODE3MDA1NSBTYWx0ZWRfX9kjbxcQAwbIE
- 7p4TJ6jHGAE3gJoAVf18jTkIdiXVADnPhaqGZfHioaFEe+IoMuWSFl88EQ2o4mpOFWuyz13Q68e
- is+VbTJktLCjDh3SdZcoJThumzc3kUo=
-X-Authority-Analysis: v=2.4 cv=WtQb99fv c=1 sm=1 tr=0 ts=6a82b9b5 cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=kj9zAlcOel0A:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=HCDunGb_p82Y6W5z8UgA:9
- a=CjuIK1q_8ugA:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODE3MDA1NSBTYWx0ZWRfX+xs/+Z0R/2ox
- 8GJeMqzVhk8t7OYVoO26qeeGvRkB1JykbUq5PTRtyQ6u4UTDgexJBpMBMhnRdJYG63Q7f9esTuQ
- +XJd7kYzPfjxjHQz8XQqHIfQ+KRD8ToGo8MNtLQ83wIBXdxCbwUjRhbWSzd2YOgYHqwDv9Zx4u2
- Bpy0zXqIFB4bcrCXrRFcGGO4HdbdBzOg38KliDreRFJoWWlZQZGzWKdkn1NMRE06UcnvoGTM8Bp
- oVOUhlEtaJvU9PVIV3J8kNF21z4RvplNyEAOhg2lWtVk6P7D5hsu88Aso3IzvlTGkQxPtrxUXlW
- xYO/K1Ge33qYmdFNuZZ1fCSi324il27lZ5XJ+/hJbuOg5GS8nt1OgGrtYkpOg/k1PV2lowyl6Kw
- vDXGJRcOq5sfdu/TU0cKU4iTlAkEMsFKmzDrjVFuqx6orgqR5jfl7niTdLyZf4aQII3dVAaryR4
- 5jSvAw9dLY1hyptnIIw==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-16_06,2026-08-12_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 spamscore=0 malwarescore=0 suspectscore=0 phishscore=0
- lowpriorityscore=0 clxscore=1015 adultscore=0 priorityscore=1501
- impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2608170055
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aoGpcczo5GkBsPwt@wunner.de>
 
-On 2026-08-15 02:59, Herbert Xu wrote:
-> On Tue, Aug 04, 2026 at 01:37:33PM +0200, Heiko Carstens wrote:
->> Enable CONTEXT_ANALYSYS for s390's crypto code.
->> 
->> Static code checking for acquiring and releasing locks used to be done
->> with sparse. That was removed with [1] and replaced with a clang based
->> approach [2]. The new approach requires that each subsystem needs to 
->> be
->> explicitly enabled for checking.
->> 
->> Do that for s390's crypto code. In order to avoid false positives the
->> code has to be slightly reworked, since conditionally acquiring and
->> releasing locks does not work with the checker (besides that this is
->> sub optimal coding style).
->> 
->> [1] 5b63d0ae94cc ("compiler-context-analysis: Remove Sparse support")
->> [2] 3269701cb256 ("compiler-context-analysis: Add infrastructure for 
->> Context Analysis with Clang")
->> 
->> Note:
->> 
->> - "Pre-existing issues" reported by AI will not be addressed in the
->>   context of this series
->> 
->> Heiko Carstens (3):
->>   s390/crypto: Rework ctr_aes_crypt() to remove conditional locking
->>   s390/crypto: Rework ctr_paes_do_crypt() to remove conditional 
->> locking
->>   s390/crypto: Enable CONTEXT_ANALYSIS
->> 
->>  arch/s390/crypto/Makefile    |   2 +
->>  arch/s390/crypto/aes_s390.c  |  54 +++++++++++-------
->>  arch/s390/crypto/paes_s390.c | 104 
->> ++++++++++++++++++++---------------
->>  3 files changed, 97 insertions(+), 63 deletions(-)
-> 
-> I presume this is going through the s390 tree?
-> 
-> Cheers,
+On 08/16/26 at 02:13pm, Lukas Wunner wrote:
+> On Wed, Aug 12, 2026 at 12:08:39PM +0200, Jan Sebastian Götte wrote:
+> > I can imagine one alternative way to approach this, tell me what you think:
+> > Instead of registering wipe handlers that memzero places on panic, I could
+> > put an optional registry of (addr, len) descriptors into crashkernel memory
+> > that the original kernel populates with the PAs of buffers to clear ahead of
+> > time. Then the kdump kernel could do the actual memzero. This would remove
+> > all code from the actual kdump path here. The registry could be made
+> > per-core to avoid locks.
 
-We can do this via s390 subsystem. I anyway wanted to suggest this.
-Thanks
+Since there are a lot of security expert in CC, I am wondering what's
+the risk if we wipe secrets during dumping. System is located in
+user's place, and vmcore is dumped and collected in user's place. If we
+filter out secrets memory when we dumping, what could be leaked out?
+
+> 
+> Or create a dedicated mempool from which all sensitive data is allocated,
+> then call mempool_free_bulk() on kexec to poison everything in that pool?
+> 
+> Thanks,
+> 
+> Lukas
