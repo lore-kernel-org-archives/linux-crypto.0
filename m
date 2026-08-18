@@ -1,84 +1,132 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D26B3AE6F4
-	for <linux-crypto@vger.kernel.org>; Tue, 18 Aug 2026 04:28:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ACC14B048C;
+	Tue, 18 Aug 2026 07:11:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787027309; cv=none; b=eNbrxcZ52NbHNX4fKstGVU9TFbHkOZ8PI/ehyMTWCFaPW71AFTbMRRqaRiX7nhsSKktoacCw6C1XwY0y2e6izE8lBloBf+2yVUpluo89YA7XXdMNLvqKMal7LjBJTBqJBOtTythxL94coUzNtwfQDFJfn+ElwtUl2y+3yV09H5k=
+	t=1787037108; cv=none; b=O4G8w3HvPe/mN/mQjwUtgvs6vTk2LqR2JwuDtTphhG3ncR+16bBUTtMCdEbr8pMsagIBwuTqXHjJfF8FJFMTjNzEK/OKdh/o/vydYRZr1MYc7pcB43zU4lYS2kqIP7kkWHejo6hCRGDRTrb4PwsF2z7o5KcWWR9xnS1Es6iGSWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787027309; c=relaxed/simple;
-	bh=3s1wefT+Wvz5UdnvC5/+5H3jWHtxXuh+/O18PSykZiw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SknmeNI5rIfVEmO7UmcGtoz5x0DacCv3lmcSixmepsSLnaQN0B7ZFmiFKaZPSnzgWZiGy1QJqJTCB8tAPs1Oo+RRUFxz/b1NzZjaYWFc2pftUHzT/wmn908Vqofb2FP85mfKUjMD3BdXtSGMAar6kxLrbtWFO86irlTBDhxUQhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WatR0tnY; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1787037108; c=relaxed/simple;
+	bh=J7ACfF6RypKB13iQCO82k0NWpsRWhh7YMW1/jcG1xkk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uGkqyh9nNJ798tMdOhS7t7KLjjiZOCzWwVeTgr1S6h16O/OMW7VmRQ27lUXd3XU+m0r2UEhSmyyhSrdgI4gI4hdmINxje5GBghw7VA7R5l2L2fL7iErr2G/o1ppuxulfnYTA70euaGb0FX9I0EnhujvSD1O5KZHj6fbEucbNvBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=npeEkTwY; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WatR0tnY"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1787027307; x=1818563307;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=3s1wefT+Wvz5UdnvC5/+5H3jWHtxXuh+/O18PSykZiw=;
-  b=WatR0tnYK3pMR8ZCbmI9bZmHQfSJ4doTGDcFBw5LtdKDdkJRNtPTiUiB
-   WretGQ2QuKhEgqq/a6rQruP9naGoVV3etlWr5g1dGcTk3pPUsFTmNQ9gI
-   h9Vf9vHNTUBFVFrUkas4EjnS4mYrrMRI5n4vpmld0mIuZ8Yv2zmzhwTDV
-   NtmqQSlgDC2rPZzdRrLMtOhz0xyvoL6rFtXKpbCxRInykB5+fzjOlG+7H
-   TfupmAsE+drPAKrOBP2uYQ/1rBomwf0DWwTlD9/JDZvHoI/7jxgR/0LVT
-   dYW4Ahnwniy+Jn6cqgTcV/A4aFpG8YdxcXO09ctKSj+fT0IMbZs82TmNL
-   w==;
-X-CSE-ConnectionGUID: hFqNlipQQmeqiGlrENBXdQ==
-X-CSE-MsgGUID: 7hr1TIVxQme3/KnzTfD6CA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11878"; a="104891221"
-X-IronPort-AV: E=Sophos;i="6.25,230,1779174000"; 
-   d="scan'208";a="104891221"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2026 21:28:27 -0700
-X-CSE-ConnectionGUID: F/fHRdOGQr2eB5/fY9Rs4Q==
-X-CSE-MsgGUID: xug39NTeRS2ge/1781rXIg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,230,1779174000"; 
-   d="scan'208";a="289922469"
-Received: from pgcooper-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.245.209])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2026 21:28:25 -0700
-Date: Tue, 18 Aug 2026 07:28:22 +0300
-From: Andy Shevchenko <andriy.shevchenko@intel.com>
-To: Ahsan Atta <ahsan.atta@intel.com>
-Cc: linux-drivers-review@eclists.intel.com, herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org, qat-linux@intel.com,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Svyatoslav Pankratov <svyatoslav.pankratov@intel.com>
-Subject: Re: [linux-drivers-review] [PATCH] crypto: qat - remove dead ADF_HEX
- code
-Message-ID: <aoPfZihxkjUPEmxC@ashevche-desk.local>
-References: <20260731124832.159453-1-ahsan.atta@intel.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="npeEkTwY"
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67HM1WUM758632;
+	Tue, 18 Aug 2026 07:11:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=dnD2eY
+	GRY06SEFxEmVSmqU1vYcLVXwx6S++ATCDN53A=; b=npeEkTwY6P7SJ0CNF4eLLA
+	zZY60ac++RMLwN7k/huT2Q0Zm6hsoCyU0DtmLPGN/IGmGmz/seiqxEAUqqXGijdZ
+	7GMJDqjuVMnE/k2hBidzXQwdZnNljKZ/ENmpXn4hsdBHE2wQ6vj1JLCrCkxZ7Eip
+	2479FT/VjGsCYgT4uneSc6uLoVxwwHGh1FZ1GeKkW0sBAJiSEtrRbSAnfJuTlbXJ
+	34pFZCTa6OjKO6CahHm5Sr0bP4W/UeaUQREjcPqPJTKn2Wh/5q/YdY3GdhJ7sMcf
+	ch3sAmWzZeEiFlzXXONFcvPs20emuDLVcMvWOIjC70dqkTurfYECURhyaYd48E3A
+	==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4g2fsqpmxf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 18 Aug 2026 07:11:46 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 67I7BN6g015186;
+	Tue, 18 Aug 2026 07:11:45 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4g354y9nqm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 18 Aug 2026 07:11:45 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67I7Bfwf42402094
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 18 Aug 2026 07:11:41 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AB3DF20043;
+	Tue, 18 Aug 2026 07:11:41 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7A11920040;
+	Tue, 18 Aug 2026 07:11:41 +0000 (GMT)
+Received: from [9.224.91.220] (unknown [9.224.91.220])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 18 Aug 2026 07:11:41 +0000 (GMT)
+Message-ID: <70657af2-a5ef-4d09-be35-37fd6f4a9f67@linux.ibm.com>
+Date: Tue, 18 Aug 2026 09:11:41 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260731124832.159453-1-ahsan.atta@intel.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/6] s390/crypto: Fix return code handling at
+ skcipher_walk_done in PAES algorithms
+To: Harald Freudenberger <freude@linux.ibm.com>
+Cc: fcallies@linux.ibm.com, ifranzki@linux.ibm.com, linux-s390@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        linux-crypto@vger.kernel.org
+References: <20260817141654.77940-1-freude@linux.ibm.com>
+ <20260817141654.77940-2-freude@linux.ibm.com>
+From: Holger Dengler <dengler@linux.ibm.com>
+Content-Language: en-US, de-DE
+In-Reply-To: <20260817141654.77940-2-freude@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODE4MDA1MSBTYWx0ZWRfX0cYAquRxSOnq
+ qSmH1BiVXY9rwozh+zUM+p91jk+doCQoHcsrUMZsZaTKKsrfyaJYh4h5tI7eTKvZTji3xXyypeB
+ VpzJ7vsvVIIJjmuuFlaS8h5XM3+LJAf97bgh8kZoHftKkqTg5NLDdr7sRu2fWAMY3p+KCNDqGwm
+ Iqk/gVJikGwKHwjGFiGewspB3CehTY5nfZ40sOLKKGVPbErmZDb/nGqh+/GLg8UC37FzV0g91wg
+ jSCleGTHibrUicOEZZyaNDk4JxgMGBoEMMAwkN3H+3VXSZw1zzqRSC6JkbDvI6gleOHDJe2aUfY
+ rHPP/KatSQ5y/ORoXf5YMLNS6/fhwKVrSz2xfKRS0fO6C+WaX8vdJgh7vQ3ZjCHOWYLJzAHR2TZ
+ LJblcR+HAfVE0gBrI5ZtCzx+dt+h1VWvOukCO0D761ApOptN097VYPpQx+wmeeE1nZj/9xQX4NN
+ zsp0oCcbFRwZQnW0RZQ==
+X-Proofpoint-ORIG-GUID: DaWreHJ_581a-knkw2x6MMZcPy0y1hLH
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODE4MDA1MSBTYWx0ZWRfX8IyXAmtJ7v0c
+ QX6evTSf6P/td31FIFVV+VQ8W7xgLhP2P4cfd8kCeaiwYhtaz/v6BUC1K9i1LyUhOzhdATqwHlz
+ rA7D2TudTkpsm6DpQgqgQkdhIbBRG2A=
+X-Authority-Analysis: v=2.4 cv=DJe/JSNb c=1 sm=1 tr=0 ts=6a8405b2 cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=uAbxVGIbfxUO_5tXvNgY:22 a=VnNF1IyMAAAA:8
+ a=VwQbUJbxAAAA:8 a=mGMtxAEF_H-nh_TH674A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: DaWreHJ_581a-knkw2x6MMZcPy0y1hLH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-08-17_04,2026-08-12_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501 impostorscore=0 spamscore=0 clxscore=1015 bulkscore=0
+ suspectscore=0 malwarescore=0 phishscore=0 adultscore=0 lowpriorityscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608180051
 
-On Fri, Jul 31, 2026 at 01:48:32PM +0100, Ahsan Atta wrote:
-> The ADF_HEX value type is defined in the adf_cfg_val_type enum and
-> handled in adf_cfg_add_key_value_param(), but no caller in the tree
-> uses it.
+On 8/17/26 16:16, Harald Freudenberger wrote:
+> All the 4 PAES cipher processing loops were not checking the return
+> value of skcipher_walk_done() immediately after calling it. This could
+> lead to error masking when both the walk operation failed and a
+> subsequent key conversion was needed (k < n condition).
 > 
-> Remove the unused ADF_HEX enum value and its dead handling code.
+> Add immediate error checks after skcipher_walk_done() in all main
+> processing loops (ECB, CBC, CTR, XTS modes) to ensure walk errors are
+> properly propagated and not masked by subsequent operations.
 > 
-> Fixes: d8cba25d2c68 ("crypto: qat - Intel(R) QAT driver framework")
+> With that comes a slight rework around the skcipher_walk_done()
+> invocation. It is now necessary to check if the walk has already been
+> finalized (walk->nbytes is then 0) or not to avoid double
+> de-allocation of resources held by the walk.
+> 
+> Fixes: 6cd87cb5ef6c ("s390/crypto: Rework protected key AES for true asynch support")
+> Signed-off-by: Harald Freudenberger <freude@linux.ibm.com>
+> Cc: stable@vger.kernel.org # 6.16+
 
-Why is this a fix? Is there any security threat?
+Reviewed-by: Holger Dengler <dengler@linux.ibm.com>
 
 -- 
-With Best Regards,
-Andy Shevchenko
-
+Mit freundlichen Grüßen / Kind regards
+Holger Dengler
 
