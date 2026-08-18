@@ -1,244 +1,80 @@
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6F5A3AAF65;
-	Tue, 18 Aug 2026 15:09:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1091B3A16A8;
+	Tue, 18 Aug 2026 17:28:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787065761; cv=none; b=KK52DvZBQoKqi4pG0q2iFKkqOqHFem3QPHCzHOCNNISjdu9ZMHKAJoYPXanf5x02/+hNtTMqOlaoRPBjkOZvSUS70t8GP1F/EzAt286qcKK3biLLjgCgO9nNw3uIH5Dzxxc09xsroayAohVe2yUILUCf+TAw8uLlUrsh2sTqa9o=
+	t=1787074134; cv=none; b=qmuFy5h+76CD9byn5+v6NV/1rupGRATg/J1zESE1JQZzas8FYkaPTKOkph0YSZDLtqsHHur5p9R5eYGHOM6yj8nRKxuTo9XUhyJrP1+MmhMCHrTYtacERRX7QS2qOu+wQlPOXMyzNXRrbiZ5kkZxw8eyC4b3FEKFGxuxtFoHKNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787065761; c=relaxed/simple;
-	bh=8r8ATR9ygIbjjKyhtEPIiReb0qgATLz5U8RqiELlZpY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=G+g8Szo88B0EhKNcJccXL37/9dm1Nndsst0uReUemOQ+PLcv0rdfhKX6lOZi0WhOub0fRUQsbT+xEBrPQr4osviz4N01wcJKxTBuUBzhsEJXc+Jw8Kjqv7LqCo4nIMk8l/T+HhFA3BODcEp2kleHGL0NVR5u9eGHCPbsySM11SA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yoseli.org; spf=pass smtp.mailfrom=yoseli.org; dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b=nlXUJEF6; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yoseli.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yoseli.org
+	s=arc-20240116; t=1787074134; c=relaxed/simple;
+	bh=aKjBOxJtOHKblwAzAWzMUqs1vCve5EaCbczrRaM6B/k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ObarHDcunJvGMhpWIEKNRIdKHF07V9pjrUVpBl3dwwvoLFdFc7DK/GdWcxdN1qarAjNpvCEfDOlJTatIzpMVH1SC10hB8KGZQLOCgx8xlDES3KZMvtuq5NdFMh5ecdeVIdg/dSnVWUhUbHglVFe3UavyjZ83SFu3+HwzhJmexFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=REKqc2iY; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yoseli.org header.i=@yoseli.org header.b="nlXUJEF6"
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 073713EDF7;
-	Tue, 18 Aug 2026 15:09:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yoseli.org; s=gm1;
-	t=1787065756;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1HEORH5xQKD3xAagCv48cPmJt85qUOLS0mSV17EcIJY=;
-	b=nlXUJEF6GS5z6kHjeafT4VZnxCMqb9L6UA+/lN6VFodbpvbwdg0/1SSVWaftLosM5OAQak
-	pYCHysmJTrauqr+gXuqQnSk/EEJ0KymfSAVAvrAVddllrVx8JSRx+lxQW+YvDNKXY5ob7K
-	rk2iwwX1h1+rLnl8pmCm1TTOf2Ef1FDGE4n4yShY3qH9lGYkxMrAAK6lRN5clMAWANYWUJ
-	/X8jlif8SM44rGLycnEHSoYYqJUt/dYj0YHMYJ4EsFmqUuykFi9X0TpJ7cq/dnDNJs1zKD
-	tqS+2UiXt0WS1h03jpkgOTaHdsaWUdpRfQdR8VrhtIL6MObIdLp7WGQ9+/1r3A==
-Message-ID: <ddf0ab32-5b66-453e-b7aa-1722aeaf2aa0@yoseli.org>
-Date: Tue, 18 Aug 2026 17:09:10 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="REKqc2iY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B1501F000E9;
+	Tue, 18 Aug 2026 17:28:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1787074132;
+	bh=AMvLvIwbvWaYzLcJbfayRyV/WoDk+sWkmCQsUDLN0n8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=REKqc2iY/htqJhgqKsL8pcaEqAhF7auDkGxai0FDSb6fO8y3KkGYBRJy61J1TO/R/
+	 tAnSkgFglOjcrU1a+dCTUE0Ib+pUsccgBRrusylJ1olxB1bPsWnwqNudOH1T0ALLJn
+	 HFJwJBEY6yrXYlS2ZHc1Ex7kitcNxsVArxhaMRUGDuFwpkMldd90E0Fiw4AwA/NUqb
+	 2KB/9sdWA2i6HdFGzGF/3fmWARD8Ch8DdyFnINiYPm8JhAEJ4ziiI8nN9TDo/dbazX
+	 wQWlXRUvcf1NdJIAObEMe5ACOWTWPtkFOhXWK6Tm6VGl3vjgwE1O0AB5IjzgcpO9px
+	 74gyENQhlRBIw==
+Date: Tue, 18 Aug 2026 10:28:50 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Chenghai Huang <huangchenghai2@huawei.com>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	xuwei5@huawei.com, prime.zeng@hisilicon.com, liulongfang@huawei.com,
+	qianweili@huawei.com, wangzhou1@hisilicon.com
+Subject: Re: [PATCH] crypto: hisilicon/sec - remove SEC crypto block cipher
+ accelerator
+Message-ID: <20260818172850.GC2249@quark>
+References: <20260818083132.1860726-1-huangchenghai2@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/2] m68k: coldfire: Add RNG support for MCF54418
-To: Greg Ungerer <gerg@linux-m68k.org>,
- Geert Uytterhoeven <geert@linux-m68k.org>,
- Olivia Mackall <olivia@selenic.com>, Herbert Xu
- <herbert@gondor.apana.org.au>, Shawn Guo <shawnguo@kernel.org>,
- Sascha Hauer <s.hauer@pengutronix.de>,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>
-Cc: linux-m68k@lists.linux-m68k.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, imx@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, Frank Li <Frank.Li@nxp.com>
-References: <20251126-b4-m5441x-add-rng-support-v4-0-5309548c9555@yoseli.org>
- <20251126-b4-m5441x-add-rng-support-v4-2-5309548c9555@yoseli.org>
- <bd25e903-30fc-4905-986c-96d1b42e9f02@linux-m68k.org>
-Content-Language: fr-FR, en-US, en-GB
-From: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
-In-Reply-To: <bd25e903-30fc-4905-986c-96d1b42e9f02@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: jeanmichel.hautbois@yoseli.org
-X-GND-Cause: dmFkZTF0GOZonn7fzNqAfnCUw2jviVr9cVO2aEOq2qqvySqTZqejiEHo3UZPhg2MYpG0dEz22m19qjaWiJ+gFXyju6P8uP35WU04mRCTz1h5qF1U2T0B4e8SXglMjUV+6E4JIpxLceYh1TXAKV2KVZrH27yvb2I++Ps4QSs/Y98Pevs9zSwyqhWuilvPay+BM1+NvTEkZbclWUhDRk0mA1Uelx9dLJr+OSzL6e3kL+hclwdRGjaKpb1Fl/6p4B15H/CwBGN2OVg1jWX4KBRF4o5XeDXLDb0SIzzPmnVeDmZu2MVD2AsUuk78siG8K7gR7AgyIwl0O0EpA2gfmo5A77grrDmIbcMrj1ZGdElxP096FvmpVfTY97+paGqeIuonISjquivsEM9AQK+HpH+rTdtuvamL86b37TpBmaMteZyWrzTRpAVCh8XEEuWugxC5my141VbUxnevX2kHIu3lBD7pLDS+2PLmgzmZ3MotjzF8zaXGCCJFXBUo1sSHeuXCmGTOvaz03GF9KjgKnbLvLmAj6tTF4Dc49VIruCYH7oEf4lx+7Om6EIkPLcsOshOkHn/9Uymm0IMz5FzuYU17SKfC69iG2ERxoo3x/8zAXjMfyr5r9oaK9HWAqsxdFAGD043lc3iC9YUMB1iDYz/PXp9QnKaPiJBhwDj78i8U68LCNEXvVg
-X-GND-State: clean
-X-GND-Score: -100
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260818083132.1860726-1-huangchenghai2@huawei.com>
 
-Hi Greg,
+On Tue, Aug 18, 2026 at 04:31:32PM +0800, Chenghai Huang wrote:
+> The Hisilicon SEC crypto cipher accelerator has been superseded
+> by the newer SEC2 driver (drivers/crypto/hisilicon/sec2/). SEC2
+> provides wider algorithm coverage and is the maintained path forward,
+> and users have migrated to it.
+> 
+> The legacy SEC driver has had no active users for some time, and its
+> primary maintainer, Jonathan Cameron, has moved on from Huawei and
+> is no longer in a position to maintain it. With thanks to Jonathan
+> for his contributions to this driver over the years, and with no one
+> left to keep it up to date, remove it from the tree.
+> 
+> This drops the legacy SEC driver together with all of its residual
+> configuration, devicetree binding and board description references:
+> 
+>   - drivers/crypto/hisilicon/sec/
+>   - CONFIG_CRYPTO_DEV_HISI_SEC Kconfig option
+>   - sec/ entry from drivers/crypto/hisilicon/Makefile
+>   - Documentation/devicetree/bindings/crypto/hisilicon,hip06-sec.yaml
+>   - hisilicon,hip07-sec device nodes and their supporting mbigen_alg /
+>     smmu_alg infrastructure from arch/arm64/boot/dts/hisilicon/hip07.dtsi
+> 
+> Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
 
-Sorry for the very long silence on this one, it fell off my radar...
+Acked-by: Eric Biggers <ebiggers@kernel.org>
 
-Le 03/12/2025 à 13:15, Greg Ungerer a écrit :
-> Hi Jean-Michel,
-> 
-> On 26/11/25 17:08, Jean-Michel Hautbois via B4 Relay wrote:
->> From: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
->>
->> Add support for the hardware Random Number Generator (RNGB) found on
->> MCF54418 ColdFire processors with clock enabled at platform
->> initialization.
->>
->> The RNGB block is compatible with the imx-rngc driver.
->>
->> Reviewed-by: Frank Li <Frank.Li@nxp.com>
->> Signed-off-by: Jean-Michel Hautbois <jeanmichel.hautbois@yoseli.org>
->> ---
->>   arch/m68k/coldfire/device.c       | 28 ++++++++++++++++++++++++++++
->>   arch/m68k/coldfire/m5441x.c       |  2 +-
->>   arch/m68k/include/asm/m5441xsim.h |  9 +++++++++
->>   drivers/char/hw_random/Kconfig    |  3 ++-
->>   drivers/char/hw_random/imx-rngc.c |  7 +++++++
->>   5 files changed, 47 insertions(+), 2 deletions(-)
-> 
-> I am happy with the ColdFire arch parts, so from me:
-> 
->      Acked-by: Greg Ungerer <gerg@linux-m68k.org>
-> 
-> I don't mind taking this commit via the m68knommu git tree if the hw_rng
-> maintainers are ok with that. Otherwise if you break out the arch/m68k
-> parts I can apply those on their own.
+You might also need an ack from a devicetree maintainer for dropping the
+devicetree binding, though.  They sometimes like to keep the bindings
+around even with no driver for some reason.
 
-I think Herbert acked ?
-Do you need another ack ?
-
-Thanks !
-JM
-
-> Regards
-> Greg
-> 
-> 
-> 
->> diff --git a/arch/m68k/coldfire/device.c b/arch/m68k/coldfire/device.c
->> index b6958ec2a220..9d8f844e319a 100644
->> --- a/arch/m68k/coldfire/device.c
->> +++ b/arch/m68k/coldfire/device.c
->> @@ -622,6 +622,31 @@ static struct platform_device mcf_flexcan0 = {
->>   };
->>   #endif /* MCFFLEXCAN_SIZE */
->> +#ifdef MCF_RNG_BASE
->> +/*
->> + * Random Number Generator (RNG) - only on MCF54418
->> + */
->> +static struct resource mcf_rng_resource[] = {
->> +    {
->> +        .start = MCF_RNG_BASE,
->> +        .end   = MCF_RNG_BASE + MCF_RNG_SIZE - 1,
->> +        .flags = IORESOURCE_MEM,
->> +    },
->> +    {
->> +        .start = MCF_IRQ_RNG,
->> +        .end   = MCF_IRQ_RNG,
->> +        .flags = IORESOURCE_IRQ,
->> +    },
->> +};
->> +
->> +static struct platform_device mcf_rng = {
->> +    .name           = "imx-rngc",
->> +    .id             = -1,
->> +    .num_resources  = ARRAY_SIZE(mcf_rng_resource),
->> +    .resource       = mcf_rng_resource,
->> +};
->> +#endif /* MCF_RNG_BASE */
->> +
->>   static struct platform_device *mcf_devices[] __initdata = {
->>       &mcf_uart,
->>   #ifdef MCFFEC_BASE0
->> @@ -660,6 +685,9 @@ static struct platform_device *mcf_devices[] 
->> __initdata = {
->>   #ifdef MCFFLEXCAN_SIZE
->>       &mcf_flexcan0,
->>   #endif
->> +#ifdef MCF_RNG_BASE
->> +    &mcf_rng,
->> +#endif
->>   };
->>   /*
->> diff --git a/arch/m68k/coldfire/m5441x.c b/arch/m68k/coldfire/m5441x.c
->> index 7a25cfc7ac07..ab5b00637237 100644
->> --- a/arch/m68k/coldfire/m5441x.c
->> +++ b/arch/m68k/coldfire/m5441x.c
->> @@ -158,6 +158,7 @@ static struct clk * const enable_clks[] 
->> __initconst = {
->>       &__clk_0_33, /* pit.1 */
->>       &__clk_0_37, /* eport */
->>       &__clk_0_48, /* pll */
->> +    &__clk_0_49, /* rng */
->>       &__clk_0_51, /* esdhc */
->>       &__clk_1_36, /* CCM/reset module/Power management */
->> @@ -179,7 +180,6 @@ static struct clk * const disable_clks[] 
->> __initconst = {
->>       &__clk_0_44, /* usb otg */
->>       &__clk_0_45, /* usb host */
->>       &__clk_0_47, /* ssi.0 */
->> -    &__clk_0_49, /* rng */
->>       &__clk_0_50, /* ssi.1 */
->>       &__clk_0_53, /* enet-fec */
->>       &__clk_0_54, /* enet-fec */
->> diff --git a/arch/m68k/include/asm/m5441xsim.h b/arch/m68k/include/ 
->> asm/m5441xsim.h
->> index f48cf63bd782..dd64cdfcad3e 100644
->> --- a/arch/m68k/include/asm/m5441xsim.h
->> +++ b/arch/m68k/include/asm/m5441xsim.h
->> @@ -198,6 +198,15 @@
->>   #define MCFRTC_SIZE        (0xfc0a8840 - 0xfc0a8000)
->>   #define MCF_IRQ_RTC        (MCFINT2_VECBASE + MCFINT2_RTC)
->> +/*
->> + *  Random Number Generator (RNG) Module.
->> + *  Note: Only present in MCF54418, not in MCF54410/54415/54417
->> + */
->> +#define MCF_RNG_BASE        0xfc0c4000
->> +#define MCF_RNG_SIZE        0x1c
->> +#define MCFINT2_RNG        28
->> +#define MCF_IRQ_RNG        (MCFINT2_VECBASE + MCFINT2_RNG)
->> +
->>   /*
->>    *  GPIO Module.
->>    */
->> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/ 
->> Kconfig
->> index 492a2a61a65b..2f301e43db84 100644
->> --- a/drivers/char/hw_random/Kconfig
->> +++ b/drivers/char/hw_random/Kconfig
->> @@ -270,12 +270,13 @@ config HW_RANDOM_MXC_RNGA
->>   config HW_RANDOM_IMX_RNGC
->>       tristate "Freescale i.MX RNGC Random Number Generator"
->>       depends on HAS_IOMEM
->> -    depends on SOC_IMX25 || SOC_IMX6SL || SOC_IMX6SLL || SOC_IMX6UL 
->> || COMPILE_TEST
->> +    depends on SOC_IMX25 || SOC_IMX6SL || SOC_IMX6SLL || SOC_IMX6UL 
->> || COLDFIRE || COMPILE_TEST
->>       default HW_RANDOM
->>       help
->>         This driver provides kernel-side support for the Random Number
->>         Generator Version C hardware found on some Freescale i.MX
->>         processors. Version B is also supported by this driver.
->> +      Also supports RNGB on Freescale MCF54418 (Coldfire V4e).
->>         To compile this driver as a module, choose M here: the
->>         module will be called imx-rngc.
->> diff --git a/drivers/char/hw_random/imx-rngc.c b/drivers/char/ 
->> hw_random/imx-rngc.c
->> index d6a847e48339..44f20a05de0a 100644
->> --- a/drivers/char/hw_random/imx-rngc.c
->> +++ b/drivers/char/hw_random/imx-rngc.c
->> @@ -353,12 +353,19 @@ static const struct of_device_id 
->> imx_rngc_dt_ids[] = {
->>   };
->>   MODULE_DEVICE_TABLE(of, imx_rngc_dt_ids);
->> +static const struct platform_device_id imx_rngc_devtype[] = {
->> +    { .name = "imx-rngc" },
->> +    { /* sentinel */ }
->> +};
->> +MODULE_DEVICE_TABLE(platform, imx_rngc_devtype);
->> +
->>   static struct platform_driver imx_rngc_driver = {
->>       .driver = {
->>           .name = KBUILD_MODNAME,
->>           .pm = pm_ptr(&imx_rngc_pm_ops),
->>           .of_match_table = imx_rngc_dt_ids,
->>       },
->> +    .id_table = imx_rngc_devtype,
->>   };
->>   module_platform_driver_probe(imx_rngc_driver, imx_rngc_probe);
->>
-> 
-
+- Eric
