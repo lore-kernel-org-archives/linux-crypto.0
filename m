@@ -1,123 +1,91 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from out203-205-221-164.mail.qq.com (out203-205-221-164.mail.qq.com [203.205.221.164])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6356F3B71C6;
-	Tue, 18 Aug 2026 10:48:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89FF3148850;
+	Tue, 18 Aug 2026 13:25:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.164
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787050127; cv=none; b=o/+CWVJW1i4rhIj4gyKBGEH7mO4UR2ZtnP878f4z5sPWqVXYjXTpQcq0Ulj3BD9AaKEjqWYYF9J7fMegNguHHTfnucPII5U+wbjwSmo7pTJGWfHB11uw6yyhpBuolWrrEdT+OmbR1fu5dLhj+dOIufjJbnME4NutSBTZIokdpVo=
+	t=1787059551; cv=none; b=R4m3WyuDUn0f781KpO3LsYEbd2Hcop20z+vI+ldJ3GqAJOXOobUfFM4H/L+aYO47btWdDnS/K6pTYP4fK6/hWdRZt2Z1LrZ/j2G2jMW7HVz9Z9X/JVFFqPcEC9ucZRnw6CnJ6v1p5q2qV+hWsiQp1XH6dqqp/YnaNqran5LBG4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787050127; c=relaxed/simple;
-	bh=S2M4yWLL/P+a0cQwCFXmor7/IXa63t8PNQLjGws3vYQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TlFyqvnFG62Yg4Ku3lvwnHLz5RblAwTZzksKkFH5q7pU5Poc3q5q+myq4fQlSP/g+Y4hV/0G3Figj2KAkirmZyTTH5uSMudgjPZw6YfoGEuPFEs+zgiI4cxms0Qz5/uvQHr3BMQfVfZFUE9Qn05nBYvexDkxnLffXpJeE4PmqSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=jX7rHjiK; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1787059551; c=relaxed/simple;
+	bh=x2Gq6ZO0vbGyepv457ltYLaDwTngzLGa3jp5goV4yMk=;
+	h=Message-ID:From:Subject:To:Date; b=Ej9M4FxzvI5duePQIJy47tqOV56drbrZ5gi549HVgyApiw4BjjphWFPNdOQJluZBgtjHNP6y6Iv31irBTWOuepwLn+SxzYrBFwucebW+Rxtr3VQI5oxKRrt+IY4LsHQSZnUdII0/LPonud9D9KSrO1ppWesNTiL8ERm4MrbcuAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=X8UIxL3U; arc=none smtp.client-ip=203.205.221.164
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jX7rHjiK"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67IAW9Uk4174625;
-	Tue, 18 Aug 2026 10:48:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=5RP4ou
-	JYee/sR6dXzt41LaQi9czUFlekxi9n+yHYWJU=; b=jX7rHjiKj1KaB+dNxqbU9V
-	EKDHbAw8uPlmAsegSktqnTxyL9CAJbPXPueZHmhIrOCnfnot9QCgNCmnJCMwtB1S
-	j1Z3fxtFY1h86BUQvAp3+/f5Ul3a3bJO+tu16JSy70ukzHgOAWqtJQXb4ncQlO4k
-	4HpWF/ooFVtcEWR0b+EYON8WX2WP+j7fRbr4COawag+ryLCsstyQEkjczT2LYVlD
-	onANUg3RCNJV+aimAzXVha4A9t5OhtsRyzi+zIos1MuBmVUbbVX/nJwjWP3MjzWq
-	llSFA/y5Rfmy1PrcFhl5bpZsgDHvyhX4EWgrb0R2hqYdIjlwI9ewdvFuMjHYBERg
-	==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4g2fm3qnbc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 18 Aug 2026 10:48:45 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 67IAfO0C019868;
-	Tue, 18 Aug 2026 10:48:44 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4g34ngajep-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 18 Aug 2026 10:48:44 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67IAmeSP44368172
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 18 Aug 2026 10:48:41 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D421620043;
-	Tue, 18 Aug 2026 10:48:40 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A89E020040;
-	Tue, 18 Aug 2026 10:48:40 +0000 (GMT)
-Received: from [9.224.91.220] (unknown [9.224.91.220])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 18 Aug 2026 10:48:40 +0000 (GMT)
-Message-ID: <d260517f-948d-4e51-a1d7-2556ca9e2ee7@linux.ibm.com>
-Date: Tue, 18 Aug 2026 12:48:40 +0200
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="X8UIxL3U"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1787059546; bh=2F/FCwUhK/xtyrbhv+LkJ2j8JMdVdXutdWJNDSeGu7U=;
+	h=From:Subject:To:Date;
+	b=X8UIxL3Ubgd34sKHJxQd3Qu43UfTvH8TlpcjCX0VzPGNe/DfsR+hynmxL+dVVLNm7
+	 rzfbZvTX8mJ3XOTJdAoeHmwyJb2FVBqFAuvefgLAw+6tphmy89p6LWtoWROmDBu02Z
+	 PLWOlvA5BIhE24hxv4XfpuNU6anRg/uWTLKiIIKg=
+Received: from [127.0.1.1] ([5.195.0.150])
+	by newxmesmtplogicsvrsza63-0.qq.com (NewEsmtp) with SMTP
+	id 1721C6D8; Tue, 18 Aug 2026 21:05:50 +0800
+X-QQ-mid: xmsmtpt1787059454tl3aef3y3
+Message-ID: <tencent_3C130FE0F8AF7CA544FD44D113E4966E8E06@qq.com>
+X-QQ-XMAILINFO: NsBBv6AnqV8O289bjiYpkvYxUeiQz53Cl4bAVSHUX0xfpZ2IVDOQxwA+hzpT8i
+	 jb6RKrqXHlFm+surPL00VXJlHzZBJ3xdLqIH2oX1A+k7kjO1nRndzc0SvSx0ivUwSRaG6hXIQ0r7
+	 WXrnaos11A2jaJ0py1IYVR4CQ6Sfx44YpxN6gWG86ZEZrcNSjJi5RpcJ2nohNTjxU0WLdSZqtp+V
+	 XbN2bvSdXRwrp1eU1Pn+SVam7DDnGO6heo3e/MNGPuNeJXsQP+/eOSH2+AjiyyRgbxGa/1mKgiDl
+	 +kk1Z37Vh+6TdNbSbCkCEXvAz9Wlf+OL/Fdd10ls4Zu3rnqU6lOklZ3m8MLSs6S/zWnOgiun19Xs
+	 GK8xLKlbb9ZAQlT4X17ifsMSeDse+5ne1rmRlq/TCiUy0ghG/CoE3LBxscy2LdRY3YqkqLc440E7
+	 eptUqiSjU9l/UY3rE+2YIKkSWVsHgkkeHdk2e2jD1vwLhbBX7bfWSCjtLbkkz5mZUlVnXBUPtB1I
+	 b8ecMKw2VTqMm2uS1Jmp4r9psrcwq3KuqUYv1dVWHIxnRaqz4RwoDFlV6TqOxPaMop4C7BLW08++
+	 xyfNaZBw1O5bQs/AgtF8cWKKIBuPFgaerKwDEazbvBVct9iWu+y93j7tDbbg4bUMC6WcSCmWoRbD
+	 m0ukGzJujzHxfVEHIhMjMvjI90gApA6eaVbOcytz67XiI6MG6/dU/Ndqi0fykW/9i8+ntC6/jD9s
+	 L+oTH7BIDivc67NUrMYV9BleAr60GwT6u1jWqPOFHDtlSCJBK0BzshXG/C4Ifv4zlZ9i5qpAi05H
+	 ZturNoYXP4n8oCRiRSGZ9ZCSy76VjTlGTAPv/Hb2ayiqK8j7FjpKeAbkD4Np2BL+OhpettpHRZV/
+	 DJZVzPsn4wL1gCdcmEJ3CJnyTnv9aaJz+44V+3hwu6uepym7hL/xcDQjlNmFoFdMONzFQ77vKsz4
+	 tZrCqGDx4g2di7HbzKteZMI0kygWSB7eyTv73/FaQzXIcaJpofJgdjakw/38CHJz/4CIOnQvkIdp
+	 eXBXzAuAsp2OdfK1rODquwsIUHuzuBTgyZR/NI6I7qYcfavwM4NvVSio82haQ=
+X-QQ-XMRINFO: NyFYKkN4Ny6FuXrnB5Ye7Aabb3ujjtK+gg==
+From: Jiawen Liu <1298662399@qq.com>
+Subject: [PATCH] crypto: jh7110-cryp: handle clock enable failures
+To: Jia Jie Ho <jiajie.ho@starfivetech.com>,
+ William Qiu <william.qiu@starfivetech.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Date: Tue, 18 Aug 2026 17:25:44 +0400
+X-OQ-MSGID: <178705954426.291840.1469840571578822725@qq.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 5/6] s390/crypto: Fix handling of EBUSY in PAES when
- req is pushed to crypto engine
-To: Harald Freudenberger <freude@linux.ibm.com>
-Cc: fcallies@linux.ibm.com, ifranzki@linux.ibm.com, linux-s390@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        linux-crypto@vger.kernel.org
-References: <20260817141654.77940-1-freude@linux.ibm.com>
- <20260817141654.77940-6-freude@linux.ibm.com>
-From: Holger Dengler <dengler@linux.ibm.com>
-Content-Language: en-US, de-DE
-In-Reply-To: <20260817141654.77940-6-freude@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 4SQ4UmRNjj6eD98t6ileeGvVxr-SRnpQ
-X-Proofpoint-ORIG-GUID: 4SQ4UmRNjj6eD98t6ileeGvVxr-SRnpQ
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODE4MDA3NyBTYWx0ZWRfX+QCVxZ1vQU8y
- mRTFIco88EciPQk073BzN2LkWQ9VDpgwWyTOGTwepp0FzgdnqZLqiWcwNsf8N/efjBtYi9XOWP6
- fSP08G4ByoimZ7K+5EsgW/8AHL51G0Q=
-X-Authority-Analysis: v=2.4 cv=WtQb99fv c=1 sm=1 tr=0 ts=6a84388d cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=YZS7CHmu1dlvhWUSdaMA:9
- a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=ZXulRonScM0A:10
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODE4MDA3NyBTYWx0ZWRfX38W0VO8TtRxH
- X5yzjcJe+dUUGVcy+g3WzTgEX4HBYUnROVSIfKkHPRRqBwHzyhJs9+J9qUhBehsqwOaXec2xdtJ
- YPqDjybjHqKVZg+VOw8r0OjdC+fchqmeFT4kUwwT4mU6zUK9Rk3HVg4HWriwhsfQgjC9rn1YBKj
- oVonbzP+FDyt7UVAnL59vQBGzQm5aSsRvMD7xUt4CkMs/Ny/bsaH+dLkSjMWdWtkI/uTGpNSIyq
- ATguYb3o2aoPyuLIdxGGzzhDWztqOfHCfwXSnJoRiHf8IYYEKaBY/HsmGrG1LwIbXD7psLSRNw2
- FiSd+jKy9AKPWrrdXFkjY6jEq5e14dXJl2qXKMgKKXyYwN45GumX/QBX2Q1NcoOYQmoRx52f7lf
- 5FJ4xDUegfI5AAJ2oJUnb3mba+Zc4I5K2O5qWFc1Rd+4PEyxgh5noOovK2DWRTr0+8XxaYUxVSl
- jjhFWKZo1zdhl12BrBg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-18_01,2026-08-12_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 spamscore=0 malwarescore=0 suspectscore=0 phishscore=0
- lowpriorityscore=0 clxscore=1015 adultscore=0 priorityscore=1501
- impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
- definitions=main-2608180077
 
-On 8/17/26 16:16, Harald Freudenberger wrote:
-> When a request is transferred to the engine via
-> crypto_transfer_skcipher_request_to_engine() there are two return
-> codes signaling a successful transfer: EINPROGRESS and EBUSY. However
-> the correct handling of EBUSY was missing and has been added as a
-> return code indicating a successful transfer to the crypto engine.
+Return error from failed clock enable.
 
-Please rework 5/6 and 6/6 again, as the handling of rc in the
-synchronous and asynchronous path differ. As discussed, you may split
-both paths in separate functions or so.
+starfive_cryp_probe ignores clk_prepare_enable return for hclk/ahb, then
+remove/error paths unconditionally clk_disable_unprepare both clocks.
 
--- 
-Mit freundlichen Grüßen / Kind regards
-Holger Dengler
+Check consecutive clk_prepare_enable(cryp->hclk)/cryp->ahb returns in
+starfive_cryp_probe.
+
+Signed-off-by: jiawen <1298662399@qq.com>
+---
+diff --git a/drivers/crypto/starfive/jh7110-cryp.c b/drivers/crypto/starfive/jh7110-cryp.c
+--- a/drivers/crypto/starfive/jh7110-cryp.c
++++ b/drivers/crypto/starfive/jh7110-cryp.c
+@@ -120,8 +120,15 @@
+ 		return dev_err_probe(&pdev->dev, PTR_ERR(cryp->rst),
+ 				     "Error getting hardware reset line\n");
+ 
+-	clk_prepare_enable(cryp->hclk);
+-	clk_prepare_enable(cryp->ahb);
++	ret = clk_prepare_enable(cryp->hclk);
++	if (ret)
++		return ret;
++
++	ret = clk_prepare_enable(cryp->ahb);
++	if (ret) {
++		clk_disable_unprepare(cryp->hclk);
++		return ret;
++	}
+ 	reset_control_deassert(cryp->rst);
+ 
+ 	spin_lock(&dev_list.lock);
 
