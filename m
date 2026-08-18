@@ -1,75 +1,60 @@
-Received: from flow-a8-smtp.messagingengine.com (flow-a8-smtp.messagingengine.com [103.168.172.143])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E2533B9D95;
-	Tue, 18 Aug 2026 09:03:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.143
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6356F3B71C6;
+	Tue, 18 Aug 2026 10:48:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787043814; cv=none; b=RQp1z+84goryEOkNPklXK/X3aThlt5joJjTroNTIdFFbXayTc/fRFRzqzuIAfFavz0VMKbxN9NEcqgUVr18mPND7MYAJpKT6BUmGouymDeD9wpplnh6jrM9W/3BiHSLL609leErehN+Lsn/0FXLHTPiHPJ9wjY9D6gG+1EkZY+w=
+	t=1787050127; cv=none; b=o/+CWVJW1i4rhIj4gyKBGEH7mO4UR2ZtnP878f4z5sPWqVXYjXTpQcq0Ulj3BD9AaKEjqWYYF9J7fMegNguHHTfnucPII5U+wbjwSmo7pTJGWfHB11uw6yyhpBuolWrrEdT+OmbR1fu5dLhj+dOIufjJbnME4NutSBTZIokdpVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787043814; c=relaxed/simple;
-	bh=WO3NGxY4syeZ2ZD3BmzUXP3M7Bt0QwU8LVneEp3Vn2Q=;
+	s=arc-20240116; t=1787050127; c=relaxed/simple;
+	bh=S2M4yWLL/P+a0cQwCFXmor7/IXa63t8PNQLjGws3vYQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cz+F5X1e+4l3SWhl6sK/5X+hcxIza7yu0U35SROpWcS5TbbOrJPsQwsre52fnk/yUALu3VcQQfvt4d9MZEGu2pw0eRlVlVNRPzY/ixCoApLAyPv2N7b6o8syx2i5tzaRhI39sJaoMZkXFGwdZ/YZSyzb+BolexK8CQXknUMsKkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jaseg.de; spf=pass smtp.mailfrom=jaseg.de; dkim=pass (2048-bit key) header.d=jaseg.de header.i=@jaseg.de header.b=WPZZoKGM; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=NYaRi+TS; arc=none smtp.client-ip=103.168.172.143
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jaseg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jaseg.de
+	 In-Reply-To:Content-Type; b=TlFyqvnFG62Yg4Ku3lvwnHLz5RblAwTZzksKkFH5q7pU5Poc3q5q+myq4fQlSP/g+Y4hV/0G3Figj2KAkirmZyTTH5uSMudgjPZw6YfoGEuPFEs+zgiI4cxms0Qz5/uvQHr3BMQfVfZFUE9Qn05nBYvexDkxnLffXpJeE4PmqSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=jX7rHjiK; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jaseg.de header.i=@jaseg.de header.b="WPZZoKGM";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="NYaRi+TS"
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailflow.phl.internal (Postfix) with ESMTP id 5C82F1380244;
-	Tue, 18 Aug 2026 05:03:31 -0400 (EDT)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-01.internal (MEProxy); Tue, 18 Aug 2026 05:03:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jaseg.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1787043811;
-	 x=1787051011; bh=ZX1CnQZZsg94K1w9ifnkc6/NmgcRySaktgXNfBgb7AQ=; b=
-	WPZZoKGM/D3I5ywu6hWxeUzIxxVJ8JaogWauiMKsZIA9L+2KD8F1opSZimhHAVKL
-	5a0sb6E7AE1N+ZTNYCeJQBZ+m2FEM4CV7GMsqbHBUWfOHXeEjAaQ1OAiBbBbW59J
-	b1PhzIsGrQ2x+2Dni2rvrHfHUrqMx08mPCwM/2bfa9SldiuOZjcpcWOlGE1HpOcd
-	G0YIdXoV0HVGd4L+mxlNmNNDIhof5BifyFVcHuhiep66N7ofIvUZTm6prDYrlyWK
-	zAEmkzqJ+outKDKC0CHUxyq53gCJ6k58wqWemTPbG92+4A3wfTcxtWmA675wMRHC
-	QYOZU0KDnVhgr69AP0V0Bg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1787043811; x=
-	1787051011; bh=ZX1CnQZZsg94K1w9ifnkc6/NmgcRySaktgXNfBgb7AQ=; b=N
-	YaRi+TSIddvpqgRTVgxa6VkeBfERJbKBvbyZhIzfXNJys/mMTEU1csXrJL5DGzbN
-	PCKZKgL431iiunzQQDBvFuzWW69BqYCSsFA5vAr0RhpoL1B1z9aPTFCNw7/QA19A
-	saZ0S0t62u9ilibZlZt1i/7WvU/qVXs+q65oY7JWrtfuouhLYcwOK4sxpw9so70V
-	0/BgQw+DhldDFVQAVyvQgDYSDnmVHgBz/o60QfvZIbIrNu09JczWI0nsBqGFZNEN
-	5UPYGIzCosYhlot0IWvFxAqjKXNQIIe5Nc3jckxMBZ736pOuOvMzIar47qPI4WKI
-	FVKhOCCNDBW0c2jXhd1ZA==
-X-ME-Sender: <xms:4B-EauM8Y-WoFhcHV7CDKlTqAXtB-K4KRmaH8Ji1IGVdeubq9ketyQ>
-    <xme:4B-Ealztkx_kES_mWsN78pZXU9JB54Mew-argE8U363HXR6ZZcMDZrZ1r7KLZayGA
-    VUMOnw_bfE8_HFBnwIY6yzIzSIEfLRM4kpRnIw3jK-F75RiMw1zRw>
-X-ME-Received: <xmr:4B-Ear2lM4JA7KsBrcTQX5tTYYYgKvP9cy4R-UIHarqqQ6wJIAuSBmfYB-cMSSdOV5yu6OXNk-afOhj4igKm>
-X-ME-Proxy-Cause: dmFkZTFpA2CAQ9HsB/cHX0jgjtdDSxrlNaH1N5XdMBpyCH9Ywi6Hdh5ucTA96FWQa4HkQJ
-    FvEd7sRFuzES1QTCCXc72OlhgrTRDpI/mv/2h44E6mQB5bIPt7uKTuP2q0GgZRoIvFIf7T
-    TMZ3/nzGVeOohp8c3ZE54qSC9/YJNe9f6CUcVKmuTPT1A2+XUIsIivDdrhAHumwFv6AQfa
-    NNzoFOD5IVmP3t/+TNxvkur2XMEg96QOc5X07R9jGlcw1D3FBObbnwVn6TapmMDjTj8mel
-    XF3EW9HqD7I9ZDaJuBDS4ARPRSLFsySvU1MjYl98Znh+hLcqka5PZ2lKMDy4GytU3qjXHP
-    98DJem6QpOGqfB3BYBGJDTFsCAtPWcw71a1t0bx+yVXLzQg/zX2eANVIW+Pof9QleQxvN9
-    P/N2zoRmGcsxnzVAX9yilz5Hf18JYw9RDeTkD0e4hVVYoyZ9d7hMxsqFj8qpAc09VhOuqd
-    r9AoF++WkVV8iSPyIp43mJ0TdeQR0JQhCzxLX9LtVsEaNESQdPbIT8kPTvzqYUZ7lqGq/k
-    PEaZa2BEeR2Eln3RH9rkvTn6MqyAurRLUbA+ihdv70Bc4xu6lg5mm9xC/+Pb5HPANA2dOd
-    Ytxl5ozIB8gbREK41rFGTIGGQ9URIpBxDMvfEg9AUeTxj19lPYQvx6jTJGSQ
-X-ME-Proxy: <xmx:4B-EasH0JHdfdUJp3cw75hmN4JbAktp9qP7MbFjC7JV7n6UctIxhEg>
-    <xmx:4B-EagKH8JC384TlH3cR7ulRAHL02wkXnaDo1V9ztrqMfX9MoWhZwg>
-    <xmx:4B-EarwND5OYC8e2x_4D5dXRVAx5TKWwG_rdZqfJdmokI7UUzMRH2Q>
-    <xmx:4B-Eai1Yt3SDtzatr_bnVyQU5MFRORQZ930EDB5uwIJ17WKuX-K8FQ>
-    <xmx:4x-EahEHf5VCv1VRvxU22t6K4tWi1wKnPfuGOHSqlSCXyfMxLQLJcyjV>
-Feedback-ID: i60a14417:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 18 Aug 2026 05:03:21 -0400 (EDT)
-Message-ID: <9071e03b-a633-43e4-ac77-3b05291c1f66@jaseg.de>
-Date: Tue, 18 Aug 2026 11:03:19 +0200
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jX7rHjiK"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67IAW9Uk4174625;
+	Tue, 18 Aug 2026 10:48:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=5RP4ou
+	JYee/sR6dXzt41LaQi9czUFlekxi9n+yHYWJU=; b=jX7rHjiKj1KaB+dNxqbU9V
+	EKDHbAw8uPlmAsegSktqnTxyL9CAJbPXPueZHmhIrOCnfnot9QCgNCmnJCMwtB1S
+	j1Z3fxtFY1h86BUQvAp3+/f5Ul3a3bJO+tu16JSy70ukzHgOAWqtJQXb4ncQlO4k
+	4HpWF/ooFVtcEWR0b+EYON8WX2WP+j7fRbr4COawag+ryLCsstyQEkjczT2LYVlD
+	onANUg3RCNJV+aimAzXVha4A9t5OhtsRyzi+zIos1MuBmVUbbVX/nJwjWP3MjzWq
+	llSFA/y5Rfmy1PrcFhl5bpZsgDHvyhX4EWgrb0R2hqYdIjlwI9ewdvFuMjHYBERg
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4g2fm3qnbc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 18 Aug 2026 10:48:45 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 67IAfO0C019868;
+	Tue, 18 Aug 2026 10:48:44 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4g34ngajep-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 18 Aug 2026 10:48:44 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67IAmeSP44368172
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 18 Aug 2026 10:48:41 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D421620043;
+	Tue, 18 Aug 2026 10:48:40 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A89E020040;
+	Tue, 18 Aug 2026 10:48:40 +0000 (GMT)
+Received: from [9.224.91.220] (unknown [9.224.91.220])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 18 Aug 2026 10:48:40 +0000 (GMT)
+Message-ID: <d260517f-948d-4e51-a1d7-2556ca9e2ee7@linux.ibm.com>
+Date: Tue, 18 Aug 2026 12:48:40 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -77,103 +62,62 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 01/13] kexec: add CRASH_WIPE_SECRETS to wipe secrets
- before kdump
-To: Baoquan He <baoquan.he@linux.dev>, Lukas Wunner <lukas@wunner.de>
-Cc: =?UTF-8?Q?Jan_Sebastian_G=C3=B6tte?= <linux@jaseg.de>,
- Andrew Morton <akpm@linux-foundation.org>,
- Mike Rapoport <rppt@kernel.org>,
- Pasha Tatashin <pasha.tatashin@soleen.com>,
- Pratyush Yadav <pratyush@kernel.org>, Dave Young <ruirui.yang@linux.dev>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- David Howells <dhowells@redhat.com>, Jarkko Sakkinen <jarkko@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Shuah Khan <skhan@linuxfoundation.org>,
- Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
- "Serge E. Hallyn" <serge@hallyn.com>, Ignat Korchagin <ignat@linux.win>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Keith Busch <kbusch@kernel.org>,
- Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
- Sagi Grimberg <sagi@grimberg.me>, Trond Myklebust <trondmy@kernel.org>,
- Anna Schumaker <anna@kernel.org>, Mimi Zohar <zohar@linux.ibm.com>,
- James Bottomley <James.Bottomley@hansenpartnership.com>,
- Marc Dionne <marc.dionne@auristor.com>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Eric Biggers <ebiggers@kernel.org>, "Theodore Y. Ts'o" <tytso@mit.edu>,
- Jaegeuk Kim <jaegeuk@kernel.org>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
- Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
- Mikulas Patocka <mpatocka@redhat.com>,
- Benjamin Marzinski <bmarzins@redhat.com>, kexec@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mm@kvack.org, keyrings@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-security-module@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org,
- linux-integrity@vger.kernel.org, linux-afs@lists.infradead.org,
- netdev@vger.kernel.org, linux-fscrypt@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, dm-devel@lists.linux.dev
-References: <20260811-crash-zeroize-rework-v2-0-9561d13c2340@jaseg.de>
- <20260811-crash-zeroize-rework-v2-1-9561d13c2340@jaseg.de>
- <anw9ILJiO5xIjP4f@MiWiFi-R3L-srv>
- <9765f7ea-36bb-4c7b-a19b-7facec97b762@jaseg.de> <aoGpcczo5GkBsPwt@wunner.de>
- <aoK6jXA-tF9qfKOZ@MiWiFi-R3L-srv> <aoLFai0gzzH2bGgy@MiWiFi-R3L-srv>
-Content-Language: en-US
-From: =?UTF-8?Q?Jan_Sebastian_G=C3=B6tte?= <contact@jaseg.de>
-In-Reply-To: <aoLFai0gzzH2bGgy@MiWiFi-R3L-srv>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: Re: [PATCH v3 5/6] s390/crypto: Fix handling of EBUSY in PAES when
+ req is pushed to crypto engine
+To: Harald Freudenberger <freude@linux.ibm.com>
+Cc: fcallies@linux.ibm.com, ifranzki@linux.ibm.com, linux-s390@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        linux-crypto@vger.kernel.org
+References: <20260817141654.77940-1-freude@linux.ibm.com>
+ <20260817141654.77940-6-freude@linux.ibm.com>
+From: Holger Dengler <dengler@linux.ibm.com>
+Content-Language: en-US, de-DE
+In-Reply-To: <20260817141654.77940-6-freude@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 4SQ4UmRNjj6eD98t6ileeGvVxr-SRnpQ
+X-Proofpoint-ORIG-GUID: 4SQ4UmRNjj6eD98t6ileeGvVxr-SRnpQ
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODE4MDA3NyBTYWx0ZWRfX+QCVxZ1vQU8y
+ mRTFIco88EciPQk073BzN2LkWQ9VDpgwWyTOGTwepp0FzgdnqZLqiWcwNsf8N/efjBtYi9XOWP6
+ fSP08G4ByoimZ7K+5EsgW/8AHL51G0Q=
+X-Authority-Analysis: v=2.4 cv=WtQb99fv c=1 sm=1 tr=0 ts=6a84388d cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=RnoormkPH1_aCDwRdu11:22 a=iQ6ETzBq9ecOQQE5vZCe:22 a=YZS7CHmu1dlvhWUSdaMA:9
+ a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=ZXulRonScM0A:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODE4MDA3NyBTYWx0ZWRfX38W0VO8TtRxH
+ X5yzjcJe+dUUGVcy+g3WzTgEX4HBYUnROVSIfKkHPRRqBwHzyhJs9+J9qUhBehsqwOaXec2xdtJ
+ YPqDjybjHqKVZg+VOw8r0OjdC+fchqmeFT4kUwwT4mU6zUK9Rk3HVg4HWriwhsfQgjC9rn1YBKj
+ oVonbzP+FDyt7UVAnL59vQBGzQm5aSsRvMD7xUt4CkMs/Ny/bsaH+dLkSjMWdWtkI/uTGpNSIyq
+ ATguYb3o2aoPyuLIdxGGzzhDWztqOfHCfwXSnJoRiHf8IYYEKaBY/HsmGrG1LwIbXD7psLSRNw2
+ FiSd+jKy9AKPWrrdXFkjY6jEq5e14dXJl2qXKMgKKXyYwN45GumX/QBX2Q1NcoOYQmoRx52f7lf
+ 5FJ4xDUegfI5AAJ2oJUnb3mba+Zc4I5K2O5qWFc1Rd+4PEyxgh5noOovK2DWRTr0+8XxaYUxVSl
+ jjhFWKZo1zdhl12BrBg==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-08-18_01,2026-08-12_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 spamscore=0 malwarescore=0 suspectscore=0 phishscore=0
+ lowpriorityscore=0 clxscore=1015 adultscore=0 priorityscore=1501
+ impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2608180077
 
-On 8/17/26 10:25, Baoquan He wrote:
-> On 08/17/26 at 03:38pm, Baoquan He wrote:
->> On 08/16/26 at 02:13pm, Lukas Wunner wrote:
->>> On Wed, Aug 12, 2026 at 12:08:39PM +0200, Jan Sebastian Götte wrote:
->>>> I can imagine one alternative way to approach this, tell me what you think:
->>>> Instead of registering wipe handlers that memzero places on panic, I could
->>>> put an optional registry of (addr, len) descriptors into crashkernel memory
->>>> that the original kernel populates with the PAs of buffers to clear ahead of
->>>> time. Then the kdump kernel could do the actual memzero. This would remove
->>>> all code from the actual kdump path here. The registry could be made
->>>> per-core to avoid locks.
-> 
-> If this has to be done in kernel, your (addr, len) registry idea is a
-> better direction, and we can make it a bit more general.
-> 
-> Instead of a secrets-only wipe registry, consider a small "crash memory
-> region" table with an action per entry:
-> 
-> enum crash_region_action {
->      CRASH_REG_WIPE,   /* memzero, then dump normally (leave zeros) */
->      CRASH_REG_SKIP,   /* do not include in the vmcore at all */
-> };
-> 
-> struct crash_region {
->      phys_addr_t addr;
->      size_t      len;
->      enum crash_region_action action;
-> };
-> 
-> void crash_reg_add(phys_addr_t addr, size_t len,
->                     enum crash_region_action action);
-> void crash_reg_del(phys_addr_t addr, size_t len);
-> 
-> Two actions because the use cases differ:
-> 
-> - WIPE is what you need: zero the secret,
-> - SKIP covers things people do not want in the dump at all
->     — Registering as SKIP reduce dump size. I have been considering how
->       to shrink vmcore size on some big system with huge memory, the
->       vmcore size usually is several or tens of GB.
-> 
-> If this is OK to you, you can start a regiestry table
-> infrastructure with wiping secrets, we can add SKIP later and plus some
-> driver used memory.
-> 
-> I am not sure if it's satisfactory, but you can give it a shot to show
-> what it looks like.
-I think that's a good idea. I'll post a patch adding that registry this 
-or next week.
+On 8/17/26 16:16, Harald Freudenberger wrote:
+> When a request is transferred to the engine via
+> crypto_transfer_skcipher_request_to_engine() there are two return
+> codes signaling a successful transfer: EINPROGRESS and EBUSY. However
+> the correct handling of EBUSY was missing and has been added as a
+> return code indicating a successful transfer to the crypto engine.
 
-Thanks,
-Jan
+Please rework 5/6 and 6/6 again, as the handling of rc in the
+synchronous and asynchronous path differ. As discussed, you may split
+both paths in separate functions or so.
+
+-- 
+Mit freundlichen Grüßen / Kind regards
+Holger Dengler
 
