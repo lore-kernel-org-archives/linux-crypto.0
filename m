@@ -1,91 +1,115 @@
-Received: from out203-205-221-164.mail.qq.com (out203-205-221-164.mail.qq.com [203.205.221.164])
+Received: from out203-205-221-245.mail.qq.com (out203-205-221-245.mail.qq.com [203.205.221.245])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89FF3148850;
-	Tue, 18 Aug 2026 13:25:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.164
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F1472B9B7;
+	Tue, 18 Aug 2026 13:28:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787059551; cv=none; b=R4m3WyuDUn0f781KpO3LsYEbd2Hcop20z+vI+ldJ3GqAJOXOobUfFM4H/L+aYO47btWdDnS/K6pTYP4fK6/hWdRZt2Z1LrZ/j2G2jMW7HVz9Z9X/JVFFqPcEC9ucZRnw6CnJ6v1p5q2qV+hWsiQp1XH6dqqp/YnaNqran5LBG4E=
+	t=1787059736; cv=none; b=RqLKTqyqdFS6ifDa2wF4/3s641279TpLVMbdYm/SbjQO9w1mJq6n+mQ9o91FLqetF5iD97tjFErnepjEoZxGssFukIkst7YVJLZmSwtNerFpO83s2BHP9fyQpO77XexSmkR+DgbEr9w/hCM7FJJCp5QtVUn5oCZ/gb9jLi8i5oU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787059551; c=relaxed/simple;
-	bh=x2Gq6ZO0vbGyepv457ltYLaDwTngzLGa3jp5goV4yMk=;
-	h=Message-ID:From:Subject:To:Date; b=Ej9M4FxzvI5duePQIJy47tqOV56drbrZ5gi549HVgyApiw4BjjphWFPNdOQJluZBgtjHNP6y6Iv31irBTWOuepwLn+SxzYrBFwucebW+Rxtr3VQI5oxKRrt+IY4LsHQSZnUdII0/LPonud9D9KSrO1ppWesNTiL8ERm4MrbcuAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=X8UIxL3U; arc=none smtp.client-ip=203.205.221.164
+	s=arc-20240116; t=1787059736; c=relaxed/simple;
+	bh=w+vN8HIpXoFEr/B/BIERtfqwf1Wih/j+7pUZTpdkNHQ=;
+	h=Message-ID:From:Subject:To:Date; b=WUx4CdU6ar0eHmzxXmY+fVagFW6IVAkA7cjH3BmJ1WDu1z9QF9+v7SxLarsUiC6DByiAbbgVhb/ZS+BpdtZK2twmo1mioKNGVuSJDA76GEb4PPdQKZgnghYcJ+RtDF0u7Dm5mtGjK+5BONuMChM7qZKafUB8Kny/1FT6elv/UIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=eIipD9Kg; arc=none smtp.client-ip=203.205.221.245
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="X8UIxL3U"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="eIipD9Kg"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1787059546; bh=2F/FCwUhK/xtyrbhv+LkJ2j8JMdVdXutdWJNDSeGu7U=;
+	t=1787059730; bh=zlCMDPgouDyD8iUH3iFlNzl8ETNsxMGJix6EiM0iCoo=;
 	h=From:Subject:To:Date;
-	b=X8UIxL3Ubgd34sKHJxQd3Qu43UfTvH8TlpcjCX0VzPGNe/DfsR+hynmxL+dVVLNm7
-	 rzfbZvTX8mJ3XOTJdAoeHmwyJb2FVBqFAuvefgLAw+6tphmy89p6LWtoWROmDBu02Z
-	 PLWOlvA5BIhE24hxv4XfpuNU6anRg/uWTLKiIIKg=
+	b=eIipD9KgenWT99NHU9Ij5+96pEEVTUEgiU/mioR90VwEhjSMR7bG11VC/gFxYTKXa
+	 B+JkM7dmZgA2z31zZDMuEIDcDPJxxOfZceh2UQnBxsWnfcyhKAojxAX1oz2eeEaiXM
+	 eUbu0RuytAzRmp7436teUajJEcNCwrFpbYiLdEik=
 Received: from [127.0.1.1] ([5.195.0.150])
 	by newxmesmtplogicsvrsza63-0.qq.com (NewEsmtp) with SMTP
 	id 1721C6D8; Tue, 18 Aug 2026 21:05:50 +0800
-X-QQ-mid: xmsmtpt1787059454tl3aef3y3
-Message-ID: <tencent_3C130FE0F8AF7CA544FD44D113E4966E8E06@qq.com>
-X-QQ-XMAILINFO: NsBBv6AnqV8O289bjiYpkvYxUeiQz53Cl4bAVSHUX0xfpZ2IVDOQxwA+hzpT8i
-	 jb6RKrqXHlFm+surPL00VXJlHzZBJ3xdLqIH2oX1A+k7kjO1nRndzc0SvSx0ivUwSRaG6hXIQ0r7
-	 WXrnaos11A2jaJ0py1IYVR4CQ6Sfx44YpxN6gWG86ZEZrcNSjJi5RpcJ2nohNTjxU0WLdSZqtp+V
-	 XbN2bvSdXRwrp1eU1Pn+SVam7DDnGO6heo3e/MNGPuNeJXsQP+/eOSH2+AjiyyRgbxGa/1mKgiDl
-	 +kk1Z37Vh+6TdNbSbCkCEXvAz9Wlf+OL/Fdd10ls4Zu3rnqU6lOklZ3m8MLSs6S/zWnOgiun19Xs
-	 GK8xLKlbb9ZAQlT4X17ifsMSeDse+5ne1rmRlq/TCiUy0ghG/CoE3LBxscy2LdRY3YqkqLc440E7
-	 eptUqiSjU9l/UY3rE+2YIKkSWVsHgkkeHdk2e2jD1vwLhbBX7bfWSCjtLbkkz5mZUlVnXBUPtB1I
-	 b8ecMKw2VTqMm2uS1Jmp4r9psrcwq3KuqUYv1dVWHIxnRaqz4RwoDFlV6TqOxPaMop4C7BLW08++
-	 xyfNaZBw1O5bQs/AgtF8cWKKIBuPFgaerKwDEazbvBVct9iWu+y93j7tDbbg4bUMC6WcSCmWoRbD
-	 m0ukGzJujzHxfVEHIhMjMvjI90gApA6eaVbOcytz67XiI6MG6/dU/Ndqi0fykW/9i8+ntC6/jD9s
-	 L+oTH7BIDivc67NUrMYV9BleAr60GwT6u1jWqPOFHDtlSCJBK0BzshXG/C4Ifv4zlZ9i5qpAi05H
-	 ZturNoYXP4n8oCRiRSGZ9ZCSy76VjTlGTAPv/Hb2ayiqK8j7FjpKeAbkD4Np2BL+OhpettpHRZV/
-	 DJZVzPsn4wL1gCdcmEJ3CJnyTnv9aaJz+44V+3hwu6uepym7hL/xcDQjlNmFoFdMONzFQ77vKsz4
-	 tZrCqGDx4g2di7HbzKteZMI0kygWSB7eyTv73/FaQzXIcaJpofJgdjakw/38CHJz/4CIOnQvkIdp
-	 eXBXzAuAsp2OdfK1rODquwsIUHuzuBTgyZR/NI6I7qYcfavwM4NvVSio82haQ=
-X-QQ-XMRINFO: NyFYKkN4Ny6FuXrnB5Ye7Aabb3ujjtK+gg==
+X-QQ-mid: xmsmtpt1787059638tnnznmvvy
+Message-ID: <tencent_1DBD00BAFF365506D40F166D40DEE8F63B0A@qq.com>
+X-QQ-XMAILINFO: NGZp1yYNf7Y+8M5j8ototF3WV1fj+kjU0LOU5IJfmN1ZgbiYhETmgWW/2g8qw3
+	 fU58lD+Hpl6kEkTOXhOeBYD5dMOTWyGXdEn8UXTUhLi9kSMhIO0EWqnN8fIxhUsFCVVngIrSyFUZ
+	 S6h4DnD1DZB1oL/CHoe0PwOVHBlxSfGkk32Uf6nsSgD4WqLk4s/d1Cmq6CSgLn40adaWKWJ7WUMP
+	 4dB7xOk78mTaqfKqOtODY+V/b6EuTgEEevrh/Hl5ljFuWC8OA+e5fm2dcfLCyYdL8gqIa8+W+c4e
+	 1idUBXmE8bE9WtYHGJKW0GqFvv4Ry2y/6HYd6YWE+4jNPkTHy59Vx6J1Hy9o33K4IlDyGsEzVMNv
+	 F5yrAo76oplKqVCUOd6T6OFcWA+K853q5fb+GbAgg5wnCzgpq9dJv3PLbKvX6MnvTsUujXGjzC20
+	 kaTVt4ILmGP4jcJuZzJmkHy7j3CstEvG2vtpSamN4bP4cUYyUVvz7YiCDgt2S0ScwSkdt1bTYYsq
+	 6iLy33S1oTXkRgkgG9X81cGaZFsXzJ3eTa+kpzsl3nhVlGhiVKCv7JlO9iimxzTkU6WNOuBclAK1
+	 IGrcxLzdKHL4lZLZ5StS8EUDIH6dNY0v+Ox+18lnZLrSgVjgf1pOFeMjTjfMZlaDJTnX49x1Bw+D
+	 A5gBU2kn2E8lIuY7mcg6AmJjE7nwGnO7+Xy8W+ReJv3EBa9GDtSYYEdowzWRqoSOPoJlaN9NDjpW
+	 uF3fzzlw59IQnBMHVgJpYLJgUptXfy6Epxh+M272mfvhMjAlF4zNyAo5smzji/9wE95j8cSNiNU4
+	 NbacIwe2HyB0aM5/BVCfr74//N9V+AkhjGsZO8Tgmheu5q0xp/qwjRFje1EwTqGwZd1ObSUnMKdp
+	 N48kxwkAKZQXK8qgO4FIIX63a7lHObYvIWKrD5Q3CUFPNVG3h8uBoJMTBJMvNIHqb5Ot8lYJqCQy
+	 vx26NTpOHWIt2/IGsp1WKeFQZ8xY4ujufB40VNi9nrjB69Uxmc+oSD+GUtQM0AiWKLRp6JrSQPlM
+	 ozmByRMiiyTuzRfkt3E13DbFn1kmPaGdQBAHMDmtzHj4zt+JB4CeMZFXrYRbGTyBFlbo6msw==
+X-QQ-XMRINFO: N+gupeqCsbX2VDY1MJ80Zvm2Nd9q8sTYww==
 From: Jiawen Liu <1298662399@qq.com>
-Subject: [PATCH] crypto: jh7110-cryp: handle clock enable failures
-To: Jia Jie Ho <jiajie.ho@starfivetech.com>,
- William Qiu <william.qiu@starfivetech.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
+Subject: [PATCH] char: omap-rng: fix runtime PM cleanup
+To: Deepak Saxena <dsaxena@plexity.net>, Olivia Mackall <olivia@selenic.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org,
  linux-kernel@vger.kernel.org
-Date: Tue, 18 Aug 2026 17:25:44 +0400
-X-OQ-MSGID: <178705954426.291840.1469840571578822725@qq.com>
+Date: Tue, 18 Aug 2026 17:28:48 +0400
+X-OQ-MSGID: <178705972862.291840.5611231794927964618@qq.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
-Return error from failed clock enable.
+Clean up runtime PM on deferred probe.
 
-starfive_cryp_probe ignores clk_prepare_enable return for hclk/ahb, then
-remove/error paths unconditionally clk_disable_unprepare both clocks.
+omap_rng_probe leaks runtime PM state if devm_clk_get returns
+-EPROBE_DEFER after pm_runtime_resume_and_get succeeds. Direct return
+skips put/disable.
 
-Check consecutive clk_prepare_enable(cryp->hclk)/cryp->ahb returns in
-starfive_cryp_probe.
+Route -EPROBE_DEFER paths through resource-matched runtime PM cleanup in
+omap_rng_probe.
 
 Signed-off-by: jiawen <1298662399@qq.com>
 ---
-diff --git a/drivers/crypto/starfive/jh7110-cryp.c b/drivers/crypto/starfive/jh7110-cryp.c
---- a/drivers/crypto/starfive/jh7110-cryp.c
-+++ b/drivers/crypto/starfive/jh7110-cryp.c
-@@ -120,8 +120,15 @@
- 		return dev_err_probe(&pdev->dev, PTR_ERR(cryp->rst),
- 				     "Error getting hardware reset line\n");
+diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
+--- a/drivers/char/hw_random/omap-rng.c
++++ b/drivers/char/hw_random/omap-rng.c
+@@ -459,8 +459,10 @@
+ 	}
  
--	clk_prepare_enable(cryp->hclk);
--	clk_prepare_enable(cryp->ahb);
-+	ret = clk_prepare_enable(cryp->hclk);
-+	if (ret)
-+		return ret;
-+
-+	ret = clk_prepare_enable(cryp->ahb);
-+	if (ret) {
-+		clk_disable_unprepare(cryp->hclk);
-+		return ret;
+ 	priv->clk = devm_clk_get(&pdev->dev, NULL);
+-	if (PTR_ERR(priv->clk) == -EPROBE_DEFER)
+-		return -EPROBE_DEFER;
++	if (PTR_ERR(priv->clk) == -EPROBE_DEFER) {
++		ret = -EPROBE_DEFER;
++		goto err_pm_runtime;
 +	}
- 	reset_control_deassert(cryp->rst);
+ 	if (!IS_ERR(priv->clk)) {
+ 		ret = clk_prepare_enable(priv->clk);
+ 		if (ret) {
+@@ -471,8 +473,10 @@
+ 	}
  
- 	spin_lock(&dev_list.lock);
+ 	priv->clk_reg = devm_clk_get(&pdev->dev, "reg");
+-	if (PTR_ERR(priv->clk_reg) == -EPROBE_DEFER)
+-		return -EPROBE_DEFER;
++	if (PTR_ERR(priv->clk_reg) == -EPROBE_DEFER) {
++		ret = -EPROBE_DEFER;
++		goto err_pm_runtime_clock_1;
++	}
+ 	if (!IS_ERR(priv->clk_reg)) {
+ 		ret = clk_prepare_enable(priv->clk_reg);
+ 		if (ret) {
+@@ -497,6 +501,16 @@
+ 
+ 	return 0;
+ 
++err_pm_runtime_clock_1:
++	if (!IS_ERR(priv->clk))
++		clk_disable_unprepare(priv->clk);
++	goto err_pm_runtime;
++
++err_pm_runtime:
++	pm_runtime_put_sync(&pdev->dev);
++	pm_runtime_disable(&pdev->dev);
++	goto err_ioremap;
++
+ err_register:
+ 	priv->base = NULL;
+ 	pm_runtime_put_sync(&pdev->dev);
 
