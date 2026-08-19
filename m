@@ -1,50 +1,85 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40C8B53E0B;
-	Wed, 19 Aug 2026 14:40:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 804F93BFAD0
+	for <linux-crypto@vger.kernel.org>; Wed, 19 Aug 2026 15:16:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787150418; cv=none; b=eHgs3ujsxTtNTSyCrdEn/DBasPjbY7zR+XvIhwd1yjKOJlsJvhhgIfzu5fDwJv6jQsivPq4K/73mHsAeA+ne0WWuTk7WiwtXAArzFx+t1uFf5AlNZJdkBqU+KDTQ8r81Ng9NhqFcxvKdvlG6gAr2sG67tgtJLAfevpXnXWEHxk8=
+	t=1787152595; cv=none; b=ORk9p3gt/a3tYYZJbQiczISPL1HtDjhsqK/ClneDC40d0XippLBgNAB0eHX0FGkz8yFNJ/ER08HjuzWf96RWYQ49Af+J0UUmp+2988WbBffCB8+OPWBnhaOLSUcgkgQYZpR4r1sZFD/cQePMQQyVRPhNL145EdRXm7LIh+giq5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787150418; c=relaxed/simple;
-	bh=vymarJZh4YqC2L7NKmpGaLSs+LwWBnjm4Ga1t8pq/Yg=;
+	s=arc-20240116; t=1787152595; c=relaxed/simple;
+	bh=c7SNQbihKrV1BvcLCqZktQ6R4fuRJM0LWhSnFjZtQq4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ExQ/KyznIg4qaaj+JvaTOS0N8T5Uhfx1AurFCPH1PxVj+Plvlv7/B45hEPK0cyeMR8q6uACakqYSLRykLpUK1cYPNku4EJB/peVg0yPWF4XTI2DF01TC0YMePr4j8Dq9NGcCkFbtsSv1hiWShtr8xzz3jT7OaMzcN9jtVFTP+VM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BqxIIF1N; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 In-Reply-To:Content-Type; b=KltM18fzJJZeNzY2E/DjZgZ8mus6+4MwczZh5qAvJDwzBeADeZ0f8f+zZ4xNwzAN/Zk0b1Qk+AOBk/da3rj8vY2OShBQzUmcVkW916i/t1Q2MqI/a2Cw3btsuahQbeawPJhpGTBMJ9U66eRv8kRH+HQlWOAVZPuSrZvzadwWato=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cVjL+Lju; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=p7eMd5EP; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BqxIIF1N"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1787150416; x=1818686416;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=vymarJZh4YqC2L7NKmpGaLSs+LwWBnjm4Ga1t8pq/Yg=;
-  b=BqxIIF1N7ZEtZI/U81G4LAHZ8TlBuQw8ktsi3zd56DDXMEmOd+rSh+XG
-   5erVVRW8MmGrwhW0X7cHZ9bV+LF2ysIN6PQbH3YNDKLN3KPyRjmKck/MU
-   7OTy64lYkYdZVVx8VftOPO8556H2RpjtGzt9GgnZUgLo/YBpXtxWR2Evu
-   nRrKSJB4skJHmBD53viN0TyK4pd8z/oGGaFAuk66v2KtPEqjse5jbrmNI
-   tB2NiBT+b4mARkx9oWHzRZxbVkyc/0ek52YGcqllxKUj+FhmnVW9CF4wn
-   RlCJeKTGzLIpS1a4mG7XcpmDgadYfjSE6RNoaqMSGUgmsJy8SHxDhr5b2
-   g==;
-X-CSE-ConnectionGUID: RRqddFy+R6uhUWWJmwNQvw==
-X-CSE-MsgGUID: 4A1WBr72TNeX7PQ3c89Ieg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11880"; a="86787556"
-X-IronPort-AV: E=Sophos;i="6.25,231,1779174000"; 
-   d="scan'208";a="86787556"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2026 07:40:14 -0700
-X-CSE-ConnectionGUID: DLD05uXOSQS3eQ3eQ3POPA==
-X-CSE-MsgGUID: nBdVyMTXSn+BXYA1OEkKQA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,231,1779174000"; 
-   d="scan'208";a="261366363"
-Received: from bradocaj-mobl.ger.corp.intel.com (HELO [10.125.111.233]) ([10.125.111.233])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Aug 2026 07:40:10 -0700
-Message-ID: <bd9e5b6e-07f2-459d-bca6-e290585060aa@intel.com>
-Date: Wed, 19 Aug 2026 07:40:09 -0700
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cVjL+Lju";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="p7eMd5EP"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1787152592;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=/pCp01H5q14BGWDagpRfB3mWzEt3z0AEMKWpYdOxzSo=;
+	b=cVjL+LjuMeNFx+fSvXsdM3rUNj9DriKX4omsWxTYjKMaQwVShM7A66QbhgZXxxc8vzkDP4
+	odQAOSldRbZKx71zlwrmdTSj1pD7qYFuDtJvcM7OT3eMtL1Y87KDFb5yv4W0QUUgiDSZ3z
+	ZdR4adEndq+d5kshtVw3LaYTwgLsshs=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-404-kzK1OshmPiCgJJNsgf7KwQ-1; Wed, 19 Aug 2026 11:16:21 -0400
+X-MC-Unique: kzK1OshmPiCgJJNsgf7KwQ-1
+X-Mimecast-MFC-AGG-ID: kzK1OshmPiCgJJNsgf7KwQ_1787152580
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-47485fde05aso655213f8f.0
+        for <linux-crypto@vger.kernel.org>; Wed, 19 Aug 2026 08:16:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1787152580; x=1787757380; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=/pCp01H5q14BGWDagpRfB3mWzEt3z0AEMKWpYdOxzSo=;
+        b=p7eMd5EPSyqj9hrwSvmFonpXtcSBzuxpBOaQ8llHPut6Uf++iwQLB6ziJz0fyByCl+
+         i7COPR7SfgCsifGbTlZzEqvs/ypDcLJN4HLoCR07A2zTHaJT2mGBQLyVik7jNTK5l5kC
+         HdjeMEreaqSxg3ead+t0M8KjqHz3W1w2E+MyyGi6WE+jteTz3V5CtR4XGPRzveZol8Rk
+         W65h5xvsIeEBHIIrC5Va9i3l3ILGgtAShV7Q/lJkCcb7pDLrjEx5Iekk87LShm174r3d
+         UredxkxsVy3tGlHwBMhTygtwzXvHTjvfrChVYeVAWCVz2AYbEhEvqul2G0R914957hkv
+         k5tg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787152580; x=1787757380;
+        h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=/pCp01H5q14BGWDagpRfB3mWzEt3z0AEMKWpYdOxzSo=;
+        b=MKFAmWMUhatNV1v0dXmSrbXGJPXyZ3rc4fUX1jFr/LlAFvhbGX6ldIxigUGjttutYn
+         fwgagx67vd39yZHob4pUhNcSbigX/KvShSJZA1v6U0L1G2ZgVzUvZPNNx9uqCjsNMkW0
+         c+00w0fwKFw5X2QHNiWR8enWz1k3fK7m0HsAwoVn1odHp5xc+shlQ4oSFHpK5k5eUhWc
+         /ngQAZ6ozZchtP9UsNqIn4d1PDtdSZ45/2rBfFF84uLBKMpqukhFL88JQsc8ZWKKyA5Q
+         LA+XTrZm74Jx6AjETAeUJ+dWN5ML/gIzJdVG9+lc8G1N1f4NDmZJrpzyupXZ98u8pBTP
+         W2sw==
+X-Forwarded-Encrypted: i=1; AHgh+RpcedQibbEVqcg0an1iDpvWD/jixSJg3/7t0YCKgxrnkQFGvXVY3bMbJ5NyuwGcwW5L67Jgeu3JCJ8qWV8=@vger.kernel.org
+X-Gm-Message-State: AFuF++mDikBh0xL/+/pwVSdqNYWbtnhQIgBPru1Ahn9FWqlOJza3k6tx
+	QkD3MDD67YahCgujJrXkca8FzBP+ttjTrtkU6g7q0tDz1g2+dpuXG3gDLYNauu5fh1OkEeKjmr3
+	dKZRjEm8aMxeBFk2eOXKprim7xiNvyZ7TFgeNXsP3C+vIwGEX6LB4O1dbEHHvHngbQQ==
+X-Gm-Gg: AR+sD11gBNqwYrd8XNL5EJoCmF3ZpJojLfhhX/ya9V2qGXRIQjkAa9t41IoseWram0B
+	cSCRN3oC4vEbZbUJilpEn0qwEtVmUZYir5xDykarBHyjP3/fLjxUxAe4+KmNxogssjOyYJpGNv/
+	tf/1uCwXFFQrn9hkMPpxCm/e+nvJ5Pt6udSjwjSavne4JpDZpGfTaPMwax5Mc2gF3ErEDyPrOU0
+	REZ+p5RXqvy7AJMFCU6m5Zs7LkKqMyQCn6IihphpusKg36EW+h8qjzQRvZ3Afe1y9M0KJnAFRuV
+	VhqXunKPyP2KqN3czLUqhQytv4+3KsbSuuX4kOq4PIGY6h8oOKF8wX/um6vueWcUCips0vUb
+X-Received: by 2002:a05:6000:98d:b0:47f:95e8:2ebf with SMTP id ffacd0b85a97d-482b1fd7137mr10553414f8f.12.1787152579795;
+        Wed, 19 Aug 2026 08:16:19 -0700 (PDT)
+X-Received: by 2002:a05:6000:98d:b0:47f:95e8:2ebf with SMTP id ffacd0b85a97d-482b1fd7137mr10553301f8f.12.1787152579445;
+        Wed, 19 Aug 2026 08:16:19 -0700 (PDT)
+Received: from [192.168.0.9] ([47.64.113.47])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-482b14514d5sm6455707f8f.10.2026.08.19.08.16.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Aug 2026 08:16:18 -0700 (PDT)
+Message-ID: <0ab5030d-7740-4c3c-af7d-e488d124bf16@redhat.com>
+Date: Wed, 19 Aug 2026 17:16:16 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,128 +87,104 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 00/13] x86/msr: Drop 32-bit MSR interfaces
-To: Juergen Gross <jgross@suse.com>, linux-kernel@vger.kernel.org,
- x86@kernel.org, virtualization@lists.linux.dev, linux-ide@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-perf-users@vger.kernel.org, linux-hyperv@vger.kernel.org,
- kvm@vger.kernel.org, linux-edac@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-pm@vger.kernel.org, linux-coco@lists.linux.dev,
- linux-acpi@vger.kernel.org, linux-hwmon@vger.kernel.org,
- linux-mtd@lists.infradead.org, platform-driver-x86@vger.kernel.org
-Cc: Thomas Gleixner <tglx@kernel.org>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- "H. Peter Anvin" <hpa@zytor.com>, Ajay Kaher <ajay.kaher@broadcom.com>,
- Alexey Makhalov <alexey.makhalov@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Damien Le Moal
- <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
- David Airlie <airlied@redhat.com>, Helge Deller <deller@gmx.de>,
- linux-geode@lists.infradead.org, Olivia Mackall <olivia@selenic.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, Linus Walleij <linusw@kernel.org>,
- Bartosz Golaszewski <brgl@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Peter Zijlstra <peterz@infradead.org>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Jiri Olsa <jolsa@kernel.org>, Ian Rogers <irogers@google.com>,
- Adrian Hunter <adrian.hunter@intel.com>, James Clark
- <james.clark@linaro.org>, "K. Y. Srinivasan" <kys@microsoft.com>,
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
- Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Josh Poimboeuf <jpoimboe@kernel.org>,
- Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Pu Wen <puwen@hygon.cn>,
- Tony Luck <tony.luck@intel.com>, Reinette Chatre
- <reinette.chatre@intel.com>, Dave Martin <Dave.Martin@arm.com>,
- James Morse <james.morse@arm.com>, Babu Moger <babu.moger@amd.com>,
- Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>,
- Vitaly Kuznetsov <vkuznets@redhat.com>, Andy Lutomirski <luto@kernel.org>,
- Bjorn Helgaas <bhelgaas@google.com>, "Rafael J. Wysocki"
- <rafael@kernel.org>, Pavel Machek <pavel@kernel.org>,
- Kiryl Shutsemau <kas@kernel.org>, Rick Edgecombe
- <rick.p.edgecombe@intel.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- Len Brown <lenb@kernel.org>, Viresh Kumar <viresh.kumar@linaro.org>,
- Huang Rui <ray.huang@amd.com>, Mario Limonciello
- <mario.limonciello@amd.com>, Perry Yuan <perry.yuan@amd.com>,
- K Prateek Nayak <kprateek.nayak@amd.com>,
- Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
- Yazen Ghannam <yazen.ghannam@amd.com>, Guenter Roeck <linux@roeck-us.net>,
- Artem Bityutskiy <artem.bityutskiy@linux.intel.com>,
- Artem Bityutskiy <dedekind1@gmail.com>,
- Miquel Raynal <miquel.raynal@bootlin.com>,
- Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
- Ashok Raj <ashok.raj.linux@gmail.com>, Hans de Goede <hansg@kernel.org>,
- =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
- David E Box <david.e.box@intel.com>,
- Daniel Lezcano <daniel.lezcano@kernel.org>, Zhang Rui <rui.zhang@intel.com>,
- Lukasz Luba <lukasz.luba@arm.com>, xen-devel@lists.xenproject.org
-References: <20260819102314.1499258-1-jgross@suse.com>
-From: Dave Hansen <dave.hansen@intel.com>
+Subject: Re: [PATCH v2] crypto: inside-secure - Zeroize temporary arrays on
+ stack with sensitive data
+To: Antoine Tenart <atenart@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>,
+ Pascal van Leeuwen <pascalvanl@gmail.com>, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20260819105836.156251-1-thuth@redhat.com>
+ <aoWWgixBpVypLoWx@kwain>
 Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <20260819102314.1499258-1-jgross@suse.com>
-Content-Type: text/plain; charset=UTF-8
+From: Thomas Huth <thuth@redhat.com>
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <aoWWgixBpVypLoWx@kwain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hey Juergen,
+On 19/08/2026 13.43, Antoine Tenart wrote:
+> On Wed, Aug 19, 2026 at 12:58:36PM +0200, Thomas Huth wrote:
+>> key_tmp[] in safexcel_xcbcmac_setkey() and consts[] / _const[] in
+>> safexcel_cmac_setkey() contain crypto key material that should not
+>> get exposed to the outside once the function is done. Scrub the
+>> arrays with memzero_explicit() to avoid that the data could leak
+>> via the stack.
+>>
+>> Reported-by: Sashiko <sashiko-bot@kernel.org>
+>> Link: https://sashiko.dev/#/patchset/20260813134953.979481-1-thuth%40redhat.com
+>> Fixes: 38f21b4bab11f ("crypto: inside-secure - Added support for the AES XCBC ahash")
+>> Fixes: 7a627db9cafdb ("crypto: inside-secure - Added support for the AES-CMAC ahash")
+>> Acked-by: Antoine Tenart <atenart@kernel.org>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>   v2: Added "Fixes:" and "Reported-by:" tags
+>>   
+>>   drivers/crypto/inside-secure/safexcel_hash.c | 4 ++++
+>>   1 file changed, 4 insertions(+)
+>>
+>> diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
+>> index 3402e570d045c..1ae6fbec31298 100644
+>> --- a/drivers/crypto/inside-secure/safexcel_hash.c
+>> +++ b/drivers/crypto/inside-secure/safexcel_hash.c
+>> @@ -1993,6 +1993,7 @@ static int safexcel_xcbcmac_setkey(struct crypto_ahash *tfm, const u8 *key,
+>>   	ret = aes_prepareenckey(ctx->aes,
+>>   				(u8 *)key_tmp + 2 * AES_BLOCK_SIZE,
+>>   				AES_MIN_KEY_SIZE);
+>> +	memzero_explicit(key_tmp, sizeof(key_tmp));
+>>   	if (ret)
+>>   		return ret;
+>>   
+>> @@ -2104,6 +2105,9 @@ static int safexcel_cmac_setkey(struct crypto_ahash *tfm, const u8 *key,
+>>   	}
+>>   	ctx->cbcmac = false;
+>>   
+>> +
+> 
+> Sorry, I just noticed there's an extra empty line here.
+Oops, that's embarrassing, not sure how I missed that looking at the patch 
+multiple times already... Thanks for spotting it, I'll send a v3.
 
-These look great. Thanks for doing it!
+  Thomas
 
-The only wonky thing is how we're going to actually merge it. We
-obviously can't do patches 10-11 until all the "stop using" patches have
-been applied.
-
-I obviously 100% realize that it's during the merge window, but any acks
-that the maintainers of 5-9 provide in the next few weeks would be super
-helpful. Or, if any of those maintainers want to cherry pick their
-subsystem's stuff out of this series and apply it, that would be great too.
-
-But, the last time we did some MSR function munging, the tip tree
-carried most of the patches. I would expect we'll have a repeat of that
-here too. I'll pencil in the idea of just merging the lot around -rc1 time.
