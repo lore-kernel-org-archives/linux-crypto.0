@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68787473C7E;
-	Thu, 20 Aug 2026 14:03:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 370E235E949;
+	Thu, 20 Aug 2026 14:48:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787234637; cv=none; b=tu9esAObTZTgQHyAVybcfSHrRW+gzyVy0YtDgRnH6qqqnAoIlxHs22oe2VnbACskq+ni5syLifATc9vQ1+u3TBzu3XmhtqjQFD7XJW5eOxg6eKm221/81xh8bizogGrfsnmXDHay/W5gv/z1ZuYBrhYKvCpRESwBzVQcSkoeer8=
+	t=1787237335; cv=none; b=d9NWdwlU1P2rEoj8X3JU3hNfT8J58ufhRnwmPiIcD3RCorbw5Y97Ids8zTbwymJqQ+PjpaWjAEwWNuXEsAVCIn4DGC9rBWgeWqWo0yWgceZ9mXBNUFzY5Mw/khqEWdlPqgORP2/dX+j9zgdzB550VWNCgpTiPibDO4cVvS9o9yI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787234637; c=relaxed/simple;
-	bh=+ZDKNOryCZ2llirxaDaHob8gzf/ohY49o6kXASO+c7k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=C0wWeZXu+r/ZlKe+489N/C4K+pIDSgEQj0+xqwhI2Y84n/aSAGzS8XxuQSsPLlXTLNhbKaCYd2V0TQdXlHNzA4d03Io9A1RQPH46LGBGfUyWqo0vJKZgBA/LSJSL/KDM42O5cweNbI0gjrjI5bN1GBL+8BeIrAUy0svPAt8dwrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ftdTEWVP; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787237335; c=relaxed/simple;
+	bh=WruTjFVIfltARxvXQqQCPggZZVMjB3zCsVWzV1mvcQI=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=R1VNsFF4khGgBK8q12unbEN9uaKj68Ek4BRlbTFLJkYgcNfJD9SVGo0xZCgihqJpIvn4iDhf5k8/qbfYqe/gcKMWPlPI4WffV4ubta5ngeXrITE9jfsb9vr5AxVZP20oZ7Ll0MkWsJDqANkx9LE9RjLRUHRkbrSk5IqG1FH5pGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GlzIt9PC; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ftdTEWVP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D5FE1F00AC4;
-	Thu, 20 Aug 2026 14:03:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GlzIt9PC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CDDA1F000E9;
+	Thu, 20 Aug 2026 14:48:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787234636;
-	bh=86W3H8joPyyM/0CytnTE9QA8d+w7GYghkVYUOjhUZWA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=ftdTEWVPGBY6/50Mq+dhGPe2NFv6bmCarwDRkHcot0DhYfblBrdAsXYncf1fMeEu8
-	 cI387t963q3gEe76Ek6ZJd2kks8db64JWOpsn8yRD+D7ahOs32M/EuO+/M12QsriNP
-	 9TiQxzVHQ6/Jv44Mdy+1G+2E2Zdb1UQuzLAZbBQW3bzg5OBKVv/iJSXDPsJ1vGJPqt
-	 0W9bFOYf4hRr+R6Y7nrnAYLFX+DzO89i3X2CDnEZL67sx7EUHXcp/pu6la2VokTfEC
-	 A2KR6vZgVBhMUNTDjEycpq1LZycWLFw3dvYLNNdm8zajinLQQCiyVgyGFymTXKUuLk
-	 wAbYagTx1Tlmg==
-Message-ID: <822e98eb-8e08-499d-a48e-bf39f985c524@kernel.org>
-Date: Thu, 20 Aug 2026 16:03:51 +0200
+	s=k20260515; t=1787237333;
+	bh=ulG6ymSiANqVe7ic8z62FKuk43mKNWdcmzAZBJPzj0M=;
+	h=Date:From:Subject:To:Cc:References:In-Reply-To;
+	b=GlzIt9PCgvcGWEYEFbSttqoT37YyQx0g4T+GZ8RisfPohDie1WdptM7OUptnlsDgk
+	 SsQwnHeU+SGeamfLBrCKHGxMFRdJ9e4CTz6EhfsA3baR6jMwDUwmrD3cXv8G3KXPeE
+	 HkTbsIK93HpdtO2lmZwsGqK4HRwabyQKMibpO51rJmHn2gESeK49pPq6odkuiMJJuc
+	 lkYZOvT4gUnaghUFXfJXppYDB+huz2WWxD2nS2dQqAO/31Gq7WPMT5YJpQMZv7OO9x
+	 CXbWuE6zUt5uz39Cn5sjlDhxm+sB2hATPk2oFqkW21dhl1+5WmpaNpvHdfw+A37jsn
+	 Hn6GkIHqfZWWw==
+Message-ID: <4c21c057-a928-4723-86dd-2caffc7b0800@kernel.org>
+Date: Thu, 20 Aug 2026 16:48:47 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,20 +35,15 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: stm32/hash: fix autosuspend cleanup during
- teardown
-To: Guangshuo Li <lgs201920130244@gmail.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Thorsten Blum <thorsten.blum@linux.dev>,
- "lionel.debieve@st.com" <lionel.debieve@st.com>,
- linux-crypto@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Cc: stable@vger.kernel.org
-References: <20260808094114.2750088-1-lgs201920130244@gmail.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH] hwrng: cctrng: fix usage_count leak when
+ autosuspend_delay is negative
+To: Guangshuo Li <lgs201920130244@gmail.com>, Hadar Gat <hadar.gat@arm.com>,
+ Olivia Mackall <olivia@selenic.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: stable@vger.kernel.org
+References: <20260808064145.2615010-1-lgs201920130244@gmail.com>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -93,13 +88,13 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  K9bCVaboTA2T77QYkRcRJYSsO1alGX0ome/hMLD1daXlkrNUp1HWa3K4iytLRXjCSIorWiGs
  n+q3krnpXu3TFkA8qtOFZMdnIiFuiq1yLT8hptsV5xh1TA2nsVvSYiaCr3q4s4BKjS/KrLDb
  qoxzw8ISjdUp4pA85vb6YLCmb39NgidD+7PmAr65lBNveIFynTgsja1rRQ4=
-In-Reply-To: <20260808094114.2750088-1-lgs201920130244@gmail.com>
+In-Reply-To: <20260808064145.2615010-1-lgs201920130244@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 08/08/2026 11:41, Guangshuo Li wrote:
-> stm32_hash_probe() calls pm_runtime_use_autosuspend(), but neither the
-> probe failure path nor stm32_hash_remove() calls the matching
+On 08/08/2026 08:41, Guangshuo Li wrote:
+> cc_trng_pm_init() calls pm_runtime_use_autosuspend(), but
+> cc_trng_pm_fini() does not call the matching
 > pm_runtime_dont_use_autosuspend() before disabling runtime PM.
 > 
 > If the autosuspend delay is set to a negative value while autosuspend
@@ -108,12 +103,12 @@ On 08/08/2026 11:41, Guangshuo Li wrote:
 > during teardown, this reference is not dropped and usage_count remains
 > unbalanced.
 > 
-> Add the missing pm_runtime_dont_use_autosuspend() calls to both the
-> probe failure and remove paths before disabling runtime PM.
+> Add the missing pm_runtime_dont_use_autosuspend() call before disabling
+> runtime PM.
 > 
 > This issue was found by manual code inspection.
 > 
-> Fixes: 8b4d566de6a5 ("crypto: stm32/hash - Add power management support")
+> Fixes: a583ed310bb6 ("hwrng: cctrng - introduce Arm CryptoCell driver")
 > Cc: stable@vger.kernel.org
 > Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
 
