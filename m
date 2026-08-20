@@ -1,63 +1,130 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B72E3233D9E;
-	Thu, 20 Aug 2026 00:56:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E0C1A9FBC
+	for <linux-crypto@vger.kernel.org>; Thu, 20 Aug 2026 04:51:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787187386; cv=none; b=R3gZyiKBF85h7R9lJPZh7l8zq8zsXtF5E2vemNsF3NEsTecZrRtIDMV3Z69i40d5D+qpARFz9NxNOXyT9zRTw4C19kz2MvK0hdp+uPOPN65GUPIXXHhjSp/Dy/e6SMf6iW3ZwQkI//QKWjFKcPxXIUcYykkXrhmLPDRClAOaOpQ=
+	t=1787201494; cv=none; b=GRecMSGjputij+2TfpZR191jMPhdqBDTwq297GmByQo1ZdedPKWuESwpTfaZ8/DTQ9QiCjjmm7aiKkMTXgY64paqJo2jc4uMo+GNKHlVNiIvlGCYqpourZTLUcNGcFjtQ7mWYYH1ssSQMkmHMToMu3yeZhVYlCPgcxH9fMH8OaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787187386; c=relaxed/simple;
-	bh=tLhP4UpNs/LaEUPOVu2dHM+2i1iytSL/zEHhfgdsk2w=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=akIpciIQKssfQR4Q1qjdeRvQzfib2nQTlvo616LfdHGvmOgFphBO8vQme79lOfQZRQm9juIqxIT6SobafBUtE3hFNGj6pqEX9jJABOHxSoUJicZS7RLmVM8LZLT+Z9O7cJDFb5TrShDY354b+UaP4Oa3WhsxsQjMsuMfuCDeUHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SpUWkvs8; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787201494; c=relaxed/simple;
+	bh=3lHdil15QiCE9Kuc3lLu2AR/fo5ozuD90G0XzJ5dXI8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lK2GIZm1b1GSEvO1wL6xmyi6/4pdjUkErEFamE2/OaWLzZzADefEmwK/1qJvfPB+FHIaQ51bRs6aOMJQxxcZ7BR28P2bhqu6bvWdXNG4EosuKmdNHp1+OALrOuZPuPecQAUdTrBAqvDRsqkD0oD3fKBTo+8rkodJDxZ1zFQkUUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=p6aqST2Z; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SpUWkvs8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A14E81F000E9;
-	Thu, 20 Aug 2026 00:56:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787187385;
-	bh=XSxvtOmafHFZMIb0fiLqfHRDepDxDCE2FVGZlhrD9n0=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc;
-	b=SpUWkvs8FCF31VFat0D2KTtLpr/AO0CJDnhKS9rKhZh8UzLR7nCYEtMr+x8Sh0/mj
-	 sGN7INPay2t4m8vDrqwO7CEDrAZ7E2vrQaixQHWcuKGUSUz6h8dHIy//eWKShqEjQe
-	 luxRWravYPT28ipEjv292GeuZuYvu+Oq6NDAVVw3SM57OyC1D7kyHBaiPvjaRdKveg
-	 GSp8U4O1JUJt/cAb97VtuiKUN8THYQI5tgeeWAWbWVv2iXLn4jJQk8rKqbatSZ+9fK
-	 N//KXJ0A7IguOT1tVQcgwsS6t8YLSo5/UWTlSV8qoyPDuIelllhYtksF5OXk6bkcq+
-	 J7risJgys6eGg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 9396B3811A50;
-	Thu, 20 Aug 2026 00:55:37 +0000 (UTC)
-Subject: Re: [GIT PULL] Crypto Update for 7.3
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <aoQL-FPagOSHf8Ug@gondor.apana.org.au>
-References: <aoQL-FPagOSHf8Ug@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <aoQL-FPagOSHf8Ug@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6 tags/v7.3-p1
-X-PR-Tracked-Commit-Id: 7537036a2e6fe96f8ed82034f755c54714a0e417
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: a4ff2be345d0abc943da8dd8da98151843b750dc
-Message-Id: <178718733622.3758847.1813152833176803007.pr-tracker-bot@kernel.org>
-Date: Thu, 20 Aug 2026 00:55:36 +0000
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p6aqST2Z"
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-84830c774a0so1586449b3a.1
+        for <linux-crypto@vger.kernel.org>; Wed, 19 Aug 2026 21:51:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787201492; x=1787806292; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=WC7fnfY6tlfCjE+QDReQnq82aSG/q+In/W9p+rlT/zo=;
+        b=p6aqST2ZY8MoIPp+RKCG89WKl1nPr4t59Zgj82QckyrizIQEWo3JyPnV4oTwMz4OYj
+         Pmxiq5jyqTfY7ghgyPDn2aYvUq2ipvyVAWmgVPRuDsA1tbFfIJ44pChBd61vMrZ+X6qy
+         JDVMxu89PxdR0AB83pgLYPYscsbtB6ygivbC5NfjAau79wVCWx8eZncAHBvQc5x8DKOt
+         aTJg4E5cq5t5w5KTJNd3J0DII3EeH6HpfwMjFWka4ElNEZEeTK6XFRTucS3pF1zDrVss
+         bOjPeBn7Gasi+DKVpfbJumEuBs9Pyms3idOXfSdo5hL+jQ/JkxLQPvjDqoIQEYGe/Qrf
+         XSlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787201492; x=1787806292;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=WC7fnfY6tlfCjE+QDReQnq82aSG/q+In/W9p+rlT/zo=;
+        b=Efv2MuciVUJiNQ8+RFAsQulPFTYlu+uHt62g5yUunmFf5nTwnsNmpd0HAXQpkCLUfw
+         MD1PC5Q1ZUxyZErMG4zOe+QGeeH7OuEuoRCplrf2FLliPPdYNyx6S4BTRCPoLRmwRJOA
+         e3Ba17hl58sBI6+J73kXHSUe5/yKACRhsh/Qh0JCgihxNVXTeifmOvKKNaF5DEdjuDhn
+         NvNn/PKDTfFpj62J9IlgItKkOhP7v0S/N9h8wTyY4R8EgWlPs5eYcsh29YLKG/PiV4vf
+         /kGLZZdR3BtRhFRk1+dHsj+F8QuA5HqwaVVd0E4KsYQH9cwzw8Yz+4iur8bTkTUc/rOm
+         UpJw==
+X-Forwarded-Encrypted: i=1; AHgh+Rohklq3iBd/6NJQw0omyUviQFtzo5DMFwGUFkcOcoKagry5aDnthW/PnuDe8F1R0FJm+cZ63mEF3q6UbDA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwR/mLH2MK1EV8tgTMA3vGQrCsziAqnligYFwM/2CbQGglEuHnr
+	WnVhuNxBNJ6YyKuvJRQ3bPHAy32lu2ysL41f7u5ZeM07q5xrusbKMjY=
+X-Gm-Gg: AR+sD12+oVOEHx9+H13x4+otMBBeSk1d3eTQ9Xklbch6YkMDGSyhcZ3lTom/SaxEbRn
+	6cruwbZ+H/gmf4lGBrZ3ia+/L81X7XOUuA0rNXUvftrpC87/omYNcRH7NpCFJ9i59JYpiQVvf3H
+	/MDWdlttcXaT4ARmeI2djTUiiScQ3H7BxoAkg6yOhcH9fQNo/s6nRQH/e9WLW76A7Ze9NY/49BO
+	PsuS+CC9BiN3AbrcqRWDQ8Ec6m6RuPAeri48Y/7g0D95OmGnR/0oct4vfIa1KoSwK5uOfYeOPBi
+	r6fvDSCdWT6BvogMMVPUe2FBBxkvzW0mbKg1iGEekg+Gjo5hjMiIJZF2UWWswd8///2wxmCAczp
+	hZzpdgGFykiVtx5NUuoB80iKtWhKWDVFAc9RvvPGL6kwBvZlOUoa4PFbRNrlRj71mdVtq1V4DCR
+	XY6aaaHOFLBRmADfqbigytUakrTBPyrwvf/mXlBKsoi1usOpyoZNw5Eez96suAFpiUDkl4HcWkK
+	A==
+X-Received: by 2002:a05:6a00:4c0c:b0:845:e7ee:eae7 with SMTP id d2e1a72fcca58-851d387dc0cmr16690650b3a.5.1787201492015;
+        Wed, 19 Aug 2026 21:51:32 -0700 (PDT)
+Received: from DL2XHKPB4.dl.net ([103.63.104.162])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-851d3617434sm1237787b3a.29.2026.08.19.21.51.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Aug 2026 21:51:31 -0700 (PDT)
+From: Triet Hoang <triet.hoang.dev@gmail.com>
+To: dsaxena@plexity.net
+Cc: olivia@selenic.com,
+	herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Triet Hoang <triet.hoang.dev@gmail.com>
+Subject: [PATCH] omap-rng: Convert to DEFINE_SIMPLE_DEV_PM_OPS()
+Date: Thu, 20 Aug 2026 11:51:27 +0700
+Message-ID: <20260820045127.1960734-1-triet.hoang.dev@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-The pull request you sent on Tue, 18 Aug 2026 17:38:32 +1000:
+Convert the deprecated SIMPLE_DEV_PM_OPS
+to DEFINE_SIMPLE_DEV_PM_OPS and pm_sleep_ptr().
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6 tags/v7.3-p1
+This lets us drop the __maybe_unused annotations from its suspend and
+resume callbacks, and reduces kernel size in case CONFIG_PM or
+CONFIG_PM_SLEEP is disabled.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/a4ff2be345d0abc943da8dd8da98151843b750dc
+Signed-off-by: Triet Hoang <triet.hoang.dev@gmail.com>
+---
+ drivers/char/hw_random/omap-rng.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Thank you!
-
+diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
+index 9f0545c67774..22cde35ebe5d 100644
+--- a/drivers/char/hw_random/omap-rng.c
++++ b/drivers/char/hw_random/omap-rng.c
+@@ -530,7 +530,7 @@ static void omap_rng_remove(struct platform_device *pdev)
+ 	clk_disable_unprepare(priv->clk_reg);
+ }
+ 
+-static int __maybe_unused omap_rng_suspend(struct device *dev)
++static int omap_rng_suspend(struct device *dev)
+ {
+ 	struct omap_rng_dev *priv = dev_get_drvdata(dev);
+ 
+@@ -540,7 +540,7 @@ static int __maybe_unused omap_rng_suspend(struct device *dev)
+ 	return 0;
+ }
+ 
+-static int __maybe_unused omap_rng_resume(struct device *dev)
++static int omap_rng_resume(struct device *dev)
+ {
+ 	struct omap_rng_dev *priv = dev_get_drvdata(dev);
+ 	int ret;
+@@ -556,12 +556,12 @@ static int __maybe_unused omap_rng_resume(struct device *dev)
+ 	return 0;
+ }
+ 
+-static SIMPLE_DEV_PM_OPS(omap_rng_pm, omap_rng_suspend, omap_rng_resume);
++static DEFINE_SIMPLE_DEV_PM_OPS(omap_rng_pm, omap_rng_suspend, omap_rng_resume);
+ 
+ static struct platform_driver omap_rng_driver = {
+ 	.driver = {
+ 		.name		= "omap_rng",
+-		.pm		= &omap_rng_pm,
++		.pm		= pm_sleep_ptr(&omap_rng_pm),
+ 		.of_match_table = of_match_ptr(omap_rng_of_match),
+ 	},
+ 	.probe		= omap_rng_probe,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.53.0
+
