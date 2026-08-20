@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6475F2C2349;
-	Thu, 20 Aug 2026 14:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47B33367B6D;
+	Thu, 20 Aug 2026 14:49:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787237372; cv=none; b=g4poay/vVIjsYKP5ymHz18C3cXFTCCqTTjyp2JnqnKUslA1/Xtkxpo9Ci+3O9/4E6sMt+HDGbFHsIFJztpu+a0ASjPIWrhQ0k0S3SCRV+fg5SiwfMzGSxoM4SEj/D9QhPCTRhL84WTy4YV4HmBHrS4s6hdh0Jw6CtInpsy7qhe8=
+	t=1787237389; cv=none; b=JlkZuzGdiu0QyjTTTIQC4rTjWjzNFlKvT0VVEvF6PmJmZfgxLWEIxs19Z3kJM0xmjpOEG437G9dkSayEUrGFCol5nqaRe7kxXluGN4Z4LbK+ZErcCzG1UQU1DIxs+aecveO8XY5iKK9NCI1Wu3JNF6j+/WnEeVI/6vFkn/SDBn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787237372; c=relaxed/simple;
-	bh=IzR1eQSGjl3E9r7jwXCU0mck0iuyIvaEvL8phseKSlQ=;
+	s=arc-20240116; t=1787237389; c=relaxed/simple;
+	bh=A0OeZ74Kh4ZpcoVUny/Pz6jZqZYktIHQ5VjlmUhO+CA=;
 	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=iCnY5jlWvKuqhPpufg9RkQJkPRuGumnkB4+9i/s8A/exNkzDNokHpP76C9FaHlJUg7Dtot0iIfXnPctug4rhwjM6j4DV8MdvNzRS5ssND/KCzei2U/h67iZ7smQ9JW8Wib9V6n63M+CzLfNhgo19sPyXLsEImcrwBhpmXdVgrxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rw2KmWjz; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:Content-Type; b=FKek/Xg2M+kuFvMa4aKxU0K8lutfj4eStoqxOEQmki6aPjmyqXJwJSE+JyW0bezmKtqYEOIJSsoK8n7xKHoVE3sxUDV/rGB+Y5/6dw7e3qOnWTCrUXvuQdeQiWDt0j7aUSTZRYaYOJ9uTw3l2Js/4HwpnebA4dejw4UrudHTI9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iC8YWowG; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rw2KmWjz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82D771F000E9;
-	Thu, 20 Aug 2026 14:49:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iC8YWowG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71C031F00A3A;
+	Thu, 20 Aug 2026 14:49:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787237371;
-	bh=Lm/Rx78wMtGoWFPwmRHhjahPVlYyD41OMTehhsY0hbI=;
+	s=k20260515; t=1787237387;
+	bh=POY30+8+IPnBPBkgedSZL8fAdy6Ow+8r1LvS0tY8m2k=;
 	h=Date:From:Subject:To:Cc:References:In-Reply-To;
-	b=Rw2KmWjzcizZ7kU9/FqALNhvOYPtWjbMRtboICVxslrXufqtN5ORzV3ryxblwW4EO
-	 vGG7ZIWGW4D20Mxp4ae7GsWHrY4EXJeUm3aH9cJvg7Dwonlk8r3Axi5NMy7nffoDtF
-	 G+oXPVpL7muhZfpoU9C45C3YHfzDfKYZidCzJ5b3kVey/QOh6G8Q3pKvnOVWpHXVWb
-	 QKt4ExksIIhwVkMHSZ5FWJ4k2iFrr6M4dQNWqyvpCkJt/JIFp3V0Yb3lOIGk0GZSio
-	 B14rP2741r34n358EUND4IXqIQfjr6Lk5PhuzzZNYJmsrGuYNZSjwgpV1s3RWVbISP
-	 smU53jHPt/Daw==
-Message-ID: <218fb204-ad8d-4005-a995-6ae931fa9942@kernel.org>
-Date: Thu, 20 Aug 2026 16:49:25 +0200
+	b=iC8YWowGtdk0u/sjWcl2XTObHg47Ruq3yu6wCQl2Vbffw+DXqm5IrasJFZJBXFgwU
+	 dL6e9EPplBXIjmyiBPq3SgHmPoBb5XScl+HSfpJon6UZz2Bn/6Bb6sazZ8zu7TOhTf
+	 p+Xfe/H2Zyuey120FSK9On2dhBwgKvQ4IGU/iJV7vPTFisexsT98RsEjsHl3XwA4Ra
+	 cTIYo8UwMwOxsS9tKNJwJK2Um8io4Cuw4oa0C0iSPx52GJpJbFV3Pn8/51vZJKkZ6l
+	 mxbTHtt9q0bQaF47ez9krISx4Zc4a8pvxpSoebeVvZOcSSCOZVrD5BPmunqAiLUKiz
+	 i2vrzph8NeygA==
+Message-ID: <9e6142fb-bb69-459b-b7e7-4aaf2bbc3bc4@kernel.org>
+Date: Thu, 20 Aug 2026 16:49:39 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -36,16 +36,19 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 From: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: Re: [PATCH] crypto: rockchip: fix autosuspend cleanup during teardown
+Subject: Re: [PATCH] hwrng: npcm: fix usage_count leak when autosuspend_delay
+ is negative
 To: Guangshuo Li <lgs201920130244@gmail.com>,
- Corentin Labbe <clabbe@baylibre.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Heiko Stuebner <heiko@sntech.de>,
- John Keeping <john@keeping.me.uk>, linux-crypto@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org,
+ Andrew Jeffery <andrew@codeconstruct.com.au>,
+ Avi Fishman <avifishman70@gmail.com>, Tomer Maimon <tmaimon77@gmail.com>,
+ Tali Perry <tali.perry1@gmail.com>, Patrick Venture <venture@google.com>,
+ Nancy Yuen <yuenn@google.com>, Benjamin Fair <benjaminfair@google.com>,
+ Olivia Mackall <olivia@selenic.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>, Daniel Thompson <danielt@kernel.org>,
+ openbmc@lists.ozlabs.org, linux-crypto@vger.kernel.org,
  linux-kernel@vger.kernel.org
 Cc: stable@vger.kernel.org
-References: <20260808093016.2738659-1-lgs201920130244@gmail.com>
+References: <20260808073748.2649808-1-lgs201920130244@gmail.com>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -90,30 +93,29 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  K9bCVaboTA2T77QYkRcRJYSsO1alGX0ome/hMLD1daXlkrNUp1HWa3K4iytLRXjCSIorWiGs
  n+q3krnpXu3TFkA8qtOFZMdnIiFuiq1yLT8hptsV5xh1TA2nsVvSYiaCr3q4s4BKjS/KrLDb
  qoxzw8ISjdUp4pA85vb6YLCmb39NgidD+7PmAr65lBNveIFynTgsja1rRQ4=
-In-Reply-To: <20260808093016.2738659-1-lgs201920130244@gmail.com>
+In-Reply-To: <20260808073748.2649808-1-lgs201920130244@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 08/08/2026 11:30, Guangshuo Li wrote:
-> rk_crypto_pm_init() calls pm_runtime_use_autosuspend(), but the
-> autosuspend setting is not undone if pm_runtime_set_suspended() fails
-> or when runtime PM is later torn down by rk_crypto_pm_exit().
+On 08/08/2026 09:37, Guangshuo Li wrote:
+> npcm_rng_probe() calls pm_runtime_use_autosuspend(), but neither the
+> probe failure path nor npcm_rng_remove() calls the matching
+> pm_runtime_dont_use_autosuspend() before disabling runtime PM.
 > 
 > If the autosuspend delay is set to a negative value while autosuspend
 > is enabled, the runtime PM core increments usage_count to prevent
 > runtime suspend. Without calling pm_runtime_dont_use_autosuspend()
-> during cleanup, this reference is not dropped and usage_count remains
+> during teardown, this reference is not dropped and usage_count remains
 > unbalanced.
 > 
-> Undo the autosuspend setting when pm_runtime_set_suspended() fails and
-> in rk_crypto_pm_exit() before disabling runtime PM.
+> Add the missing pm_runtime_dont_use_autosuspend() calls to both the
+> probe failure and remove paths before disabling runtime PM.
 > 
 > This issue was found by manual code inspection.
 > 
-> Fixes: a216be3964c1 ("crypto: rockchip - introduce PM")
+> Fixes: c98429297d8b ("hwrng: npcm - add NPCM RNG driver")
 > Cc: stable@vger.kernel.org
 > Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
-> ---
 
 You sent vast amount of patches, all separate, making it very difficult
 to track and respond in efficient way. Do not do that.
