@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2EAB46C830;
-	Thu, 20 Aug 2026 14:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68787473C7E;
+	Thu, 20 Aug 2026 14:03:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787234588; cv=none; b=Juck62FARE6bsyKKAJC7NdJ6X6gt1J8+mgy3MpK2TVKXVFxTSKngxFLnZ+7GtadSKsLqZWETnFvgjRvAdW4CWr5FfHGf9ZzKMFkF4yRTBfdLCFE5o5+U2Bg/59yISPe1P/OS3lW6a6NS9wbeqQIlvNikwvu+2fwufiYtBHn/zqo=
+	t=1787234637; cv=none; b=tu9esAObTZTgQHyAVybcfSHrRW+gzyVy0YtDgRnH6qqqnAoIlxHs22oe2VnbACskq+ni5syLifATc9vQ1+u3TBzu3XmhtqjQFD7XJW5eOxg6eKm221/81xh8bizogGrfsnmXDHay/W5gv/z1ZuYBrhYKvCpRESwBzVQcSkoeer8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787234588; c=relaxed/simple;
-	bh=Na69ziPsRsqFwUXG6SifxjzBGuTBDF4WMUAsZv5ufpA=;
+	s=arc-20240116; t=1787234637; c=relaxed/simple;
+	bh=+ZDKNOryCZ2llirxaDaHob8gzf/ohY49o6kXASO+c7k=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PoNG0EkhJbNPhKqmd3iJs+h66jVD8MTnhOy8Fy9NDZM09T67615ReGwaFC8+i5C4BB1oM52pFMyidcw11a6C0T8D/39gR+hyjt0svx0ev4jyaDmTRmJjtlgmLBZNlsZ8pKCURchc4yGBlXOJF+ulLiLpCutsOsLpxkQQQ0m/kEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ijUyUkup; arc=none smtp.client-ip=100.103.45.18
+	 In-Reply-To:Content-Type; b=C0wWeZXu+r/ZlKe+489N/C4K+pIDSgEQj0+xqwhI2Y84n/aSAGzS8XxuQSsPLlXTLNhbKaCYd2V0TQdXlHNzA4d03Io9A1RQPH46LGBGfUyWqo0vJKZgBA/LSJSL/KDM42O5cweNbI0gjrjI5bN1GBL+8BeIrAUy0svPAt8dwrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ftdTEWVP; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ijUyUkup"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1485E1F000E9;
-	Thu, 20 Aug 2026 14:03:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ftdTEWVP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D5FE1F00AC4;
+	Thu, 20 Aug 2026 14:03:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787234587;
-	bh=O+olGW8sSAne5ztFBKekd93eZ1M4z5SDcIB1vPTjF88=;
+	s=k20260515; t=1787234636;
+	bh=86W3H8joPyyM/0CytnTE9QA8d+w7GYghkVYUOjhUZWA=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=ijUyUkupX2Xi+zBawxZ8mENBiIsdbIagiS+NTzvYrIWv+GUDl/jQsxc8WqLTBEYbb
-	 2Dl90auPBMXHpxpEx0Ct7ND0nSM/8P+EWscQJRbDAyQ9hQA8zw8jesQeREs5IqQthV
-	 X9uoPygiyqrdKFlbOtW/lCC7hrCrvqfCroKqdMU0w5tX8E2uVBxDX+Dt7uLN5Z4s4z
-	 WcAcujsqHnUpwwy1pEMTam5xRQP7pJr4xUUZvMJe44a+buv+kIqIa+Lwmmvpmy+pZL
-	 Qx7Ncg+AJOHt842a9ak1Bf1Do83qfwW+iiyROp0R/R0YgEpmhk1JfHGjNdYxbUOkzg
-	 di1W9v+rO0eSg==
-Message-ID: <2d997800-b7b5-4700-919c-c4b6e5e926aa@kernel.org>
-Date: Thu, 20 Aug 2026 16:03:04 +0200
+	b=ftdTEWVPGBY6/50Mq+dhGPe2NFv6bmCarwDRkHcot0DhYfblBrdAsXYncf1fMeEu8
+	 cI387t963q3gEe76Ek6ZJd2kks8db64JWOpsn8yRD+D7ahOs32M/EuO+/M12QsriNP
+	 9TiQxzVHQ6/Jv44Mdy+1G+2E2Zdb1UQuzLAZbBQW3bzg5OBKVv/iJSXDPsJ1vGJPqt
+	 0W9bFOYf4hRr+R6Y7nrnAYLFX+DzO89i3X2CDnEZL67sx7EUHXcp/pu6la2VokTfEC
+	 A2KR6vZgVBhMUNTDjEycpq1LZycWLFw3dvYLNNdm8zajinLQQCiyVgyGFymTXKUuLk
+	 wAbYagTx1Tlmg==
+Message-ID: <822e98eb-8e08-499d-a48e-bf39f985c524@kernel.org>
+Date: Thu, 20 Aug 2026 16:03:51 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,14 +35,19 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: ccree: fix autosuspend cleanup during teardown
+Subject: Re: [PATCH] crypto: stm32/hash: fix autosuspend cleanup during
+ teardown
 To: Guangshuo Li <lgs201920130244@gmail.com>,
- Gilad Ben-Yossef <gilad@benyossef.com>,
  Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ "David S. Miller" <davem@davemloft.net>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Thorsten Blum <thorsten.blum@linux.dev>,
+ "lionel.debieve@st.com" <lionel.debieve@st.com>,
+ linux-crypto@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 Cc: stable@vger.kernel.org
-References: <20260808091734.2727295-1-lgs201920130244@gmail.com>
+References: <20260808094114.2750088-1-lgs201920130244@gmail.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -88,13 +93,13 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  K9bCVaboTA2T77QYkRcRJYSsO1alGX0ome/hMLD1daXlkrNUp1HWa3K4iytLRXjCSIorWiGs
  n+q3krnpXu3TFkA8qtOFZMdnIiFuiq1yLT8hptsV5xh1TA2nsVvSYiaCr3q4s4BKjS/KrLDb
  qoxzw8ISjdUp4pA85vb6YLCmb39NgidD+7PmAr65lBNveIFynTgsja1rRQ4=
-In-Reply-To: <20260808091734.2727295-1-lgs201920130244@gmail.com>
+In-Reply-To: <20260808094114.2750088-1-lgs201920130244@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 08/08/2026 11:17, Guangshuo Li wrote:
-> init_cc_resources() calls pm_runtime_use_autosuspend(), but neither
-> the probe failure path nor cleanup_cc_resources() calls the matching
+On 08/08/2026 11:41, Guangshuo Li wrote:
+> stm32_hash_probe() calls pm_runtime_use_autosuspend(), but neither the
+> probe failure path nor stm32_hash_remove() calls the matching
 > pm_runtime_dont_use_autosuspend() before disabling runtime PM.
 > 
 > If the autosuspend delay is set to a negative value while autosuspend
@@ -104,11 +109,11 @@ On 08/08/2026 11:17, Guangshuo Li wrote:
 > unbalanced.
 > 
 > Add the missing pm_runtime_dont_use_autosuspend() calls to both the
-> probe failure and device cleanup paths before disabling runtime PM.
+> probe failure and remove paths before disabling runtime PM.
 > 
 > This issue was found by manual code inspection.
 > 
-> Fixes: 4c3f97276e15 ("crypto: ccree - introduce CryptoCell driver")
+> Fixes: 8b4d566de6a5 ("crypto: stm32/hash - Add power management support")
 > Cc: stable@vger.kernel.org
 > Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
 
