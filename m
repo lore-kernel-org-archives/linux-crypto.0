@@ -1,60 +1,63 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB992EEE66;
-	Wed, 19 Aug 2026 20:13:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B72E3233D9E;
+	Thu, 20 Aug 2026 00:56:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787170386; cv=none; b=XRuJ9KD8X2hNm33JWYzTNb+DN8FGdLca7xDi3gmvL8oISknrv8a3MuAvWyeK4pzuKothCe5mOJqcoAVIwUx+Dhptya4FDPY1Vf73igmBH7VIS5H8Enhrg4RCfa3hbBucrSSs62zGx9jepXaxOf9eh7yxuDBRXLUtWBXvpu0yYAo=
+	t=1787187386; cv=none; b=R3gZyiKBF85h7R9lJPZh7l8zq8zsXtF5E2vemNsF3NEsTecZrRtIDMV3Z69i40d5D+qpARFz9NxNOXyT9zRTw4C19kz2MvK0hdp+uPOPN65GUPIXXHhjSp/Dy/e6SMf6iW3ZwQkI//QKWjFKcPxXIUcYykkXrhmLPDRClAOaOpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787170386; c=relaxed/simple;
-	bh=8ez+qKirDM6VniJHUT7jJju4YM5DmduIl4wmXDfMROA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ItBjNZiqHpNCK6Pwf61knXAnkYansbzUxddWGc0YrsJ/qq2xPX8DB65Uhig55eMuwxo75ujLa7T6MCS4b9tVLo7/X0We/bjrX4uiAleVhyfwOhMlo68lBoY1+Mm8lfRuin+nvCzZP0HGESULqQT/t3NPbe9MHvtcAxJtg5urj3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ez5vr7uX; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787187386; c=relaxed/simple;
+	bh=tLhP4UpNs/LaEUPOVu2dHM+2i1iytSL/zEHhfgdsk2w=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=akIpciIQKssfQR4Q1qjdeRvQzfib2nQTlvo616LfdHGvmOgFphBO8vQme79lOfQZRQm9juIqxIT6SobafBUtE3hFNGj6pqEX9jJABOHxSoUJicZS7RLmVM8LZLT+Z9O7cJDFb5TrShDY354b+UaP4Oa3WhsxsQjMsuMfuCDeUHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SpUWkvs8; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ez5vr7uX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EA2F1F000E9;
-	Wed, 19 Aug 2026 20:13:05 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SpUWkvs8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A14E81F000E9;
+	Thu, 20 Aug 2026 00:56:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787170385;
-	bh=jfPhFrAlZ1QN5eRyTMyV/+u4CPeWu9l/un3pn+goY5E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=ez5vr7uX1hXfbbKcu6/lvVEzhXj/ZfWp/LSyIwcFp2d8yEp8jY2On3udJmTEGcUp1
-	 XQqpopBOGr+WQyAeeHxPsTGCjTbMRnFU7cSq9EKlDQ+r7x+59gVzXAiNhtAxU9NV1L
-	 KWn/E3om3TDFg73my/Xi5ri9WHDO50cQhEs/e4R05EURFSrZb7ZrQbauKnMD07ZSRR
-	 ZP3CpZq2SFuycnz5DBxXPdcqTB6uQoHs+shrDF28r5rVDRWdOEJoY2yd61UOa/FijL
-	 NGlMzP1JUQJ1+mjWqyRyl9PpBANdpGjxPI2Dd0AjBISnVbtJ1Fu75laawjUedV6zkX
-	 MIZ84WIc97T8Q==
-Date: Wed, 19 Aug 2026 20:13:03 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Abel Vesa <abel.vesa@oss.qualcomm.com>
-Cc: Bjorn Andersson <andersson@kernel.org>, linux-arm-msm@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] MAINTAINERS: Add Qualcomm Inline Crypto Engine entry
-Message-ID: <20260819201303.GA164716@google.com>
-References: <20260819-qcom-ice-add-maintainer-entry-v1-1-60fd2a7ccae7@oss.qualcomm.com>
+	s=k20260515; t=1787187385;
+	bh=XSxvtOmafHFZMIb0fiLqfHRDepDxDCE2FVGZlhrD9n0=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc;
+	b=SpUWkvs8FCF31VFat0D2KTtLpr/AO0CJDnhKS9rKhZh8UzLR7nCYEtMr+x8Sh0/mj
+	 sGN7INPay2t4m8vDrqwO7CEDrAZ7E2vrQaixQHWcuKGUSUz6h8dHIy//eWKShqEjQe
+	 luxRWravYPT28ipEjv292GeuZuYvu+Oq6NDAVVw3SM57OyC1D7kyHBaiPvjaRdKveg
+	 GSp8U4O1JUJt/cAb97VtuiKUN8THYQI5tgeeWAWbWVv2iXLn4jJQk8rKqbatSZ+9fK
+	 N//KXJ0A7IguOT1tVQcgwsS6t8YLSo5/UWTlSV8qoyPDuIelllhYtksF5OXk6bkcq+
+	 J7risJgys6eGg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 9396B3811A50;
+	Thu, 20 Aug 2026 00:55:37 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Update for 7.3
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <aoQL-FPagOSHf8Ug@gondor.apana.org.au>
+References: <aoQL-FPagOSHf8Ug@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <aoQL-FPagOSHf8Ug@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6 tags/v7.3-p1
+X-PR-Tracked-Commit-Id: 7537036a2e6fe96f8ed82034f755c54714a0e417
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: a4ff2be345d0abc943da8dd8da98151843b750dc
+Message-Id: <178718733622.3758847.1813152833176803007.pr-tracker-bot@kernel.org>
+Date: Thu, 20 Aug 2026 00:55:36 +0000
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260819-qcom-ice-add-maintainer-entry-v1-1-60fd2a7ccae7@oss.qualcomm.com>
 
-On Wed, Aug 19, 2026 at 10:59:02PM +0300, Abel Vesa wrote:
-> Add an entry for the Qualcomm Inline Crypto Engine driver and
-> its device tree bindings.
-> 
-> List myself as maintainer to keep an eye on it.
-> 
-> Signed-off-by: Abel Vesa <abel.vesa@oss.qualcomm.com>
-> ---
->  MAINTAINERS | 9 +++++++++
->  1 file changed, 9 insertions(+)
+The pull request you sent on Tue, 18 Aug 2026 17:38:32 +1000:
 
-Acked-by: Eric Biggers <ebiggers@kernel.org>
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6 tags/v7.3-p1
 
-- Eric
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/a4ff2be345d0abc943da8dd8da98151843b750dc
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
