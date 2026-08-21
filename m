@@ -1,152 +1,177 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CA8D4908D5
-	for <linux-crypto@vger.kernel.org>; Fri, 21 Aug 2026 15:13:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8126936D9EB;
+	Fri, 21 Aug 2026 17:21:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787325193; cv=none; b=kahFX9v7sFVHP+qqAsQfdjgscwxvK7JTtevXlfe7Jqc5p8N0/L9d9AP5huOzE0anmJWf3NVXrqA3lNDoWJWR5WFe2EnuHhb7TBqg4woMkycYWY8gkvoRyWlr5Lw9aVLM2cTTIpZ5drMtwEZLU0FqBUap9yfe4r0xCU+ZroMLJMg=
+	t=1787332868; cv=none; b=DcgH/8P86a9zXPMsKHPr4SA9/yjStetvjF6kwJZdePyoI55l1ANQGgpE/iMgcuSmLi0U1C9zgGaHpV0gsiYj46O7kAN6plMRriMCQsP5OqODrhBq9zOVDNQlt9nJfmEI8VJ3WER5pCjyoLClHaY2ah1LiRYCHd4vac1DpC7uzk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787325193; c=relaxed/simple;
-	bh=4znrndmYCirp6Jd+ENe3pr1q1vEyMeJ/JKR75ZjudZo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AUSxYR3XKcIlWg3+qLP5NlLj809+29rjAoKeIvSLEu8uP4C7ye+HZKZ6YnSUYWlLmdqcR3SaozOE1ZS1IvPeiMBoInmo5JPJN0EQ6fJyVII3iIj0mVnpK02PGilDkGOzCUJYdacnR2qW5i8qSG8bwEBvjgLJzLimOdMoAB7CDYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jmTTqENC; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1787332868; c=relaxed/simple;
+	bh=YaNpjgrpuouOPA/UV+QOTlHjV+5P6sII21PqrushHRU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A7NBaoBIbuAYmdPYZCN7lE0ySd0vviMW2nU55n0TcRcy3DGJHDxLCeBQSao3DR3W/7H78weT9z/KfVPmsRodpzPrziHt1FGMZpn+QY5EtsqBky4NRnpz1D+ZWiBAy5oYY8nwuk36WXR07L4LMnp94O/x88/DRXMlzBBTju8s83o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c3k6Yuec; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jmTTqENC"
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2d5655cc850so14002275ad.3
-        for <linux-crypto@vger.kernel.org>; Fri, 21 Aug 2026 08:13:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787325191; x=1787929991; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=pNfd98g7NohQi3HTw63l9CeOQLM+iGLJoEq3pvm3KGI=;
-        b=jmTTqENC+vD+NxQNYDueZtxq96n5fg+zBAa3loCM+cW0FNLy4XG+XmVwG6K8YuG0T2
-         pVH3s6prvlapvUCkHR6AAHmBLPugEL6JMVfiFX+XFwyf9GyZZebgNUPqGM/rQ6VbLNbr
-         VdkNtSqT0k2UGTBBTQ4FIJhlVr1CC4Uo9tghaJ13XMxa1VQLp95CBC5VmjwT5QgOLqyj
-         PpkpTMdBH0w2GzzD5oaNtgSAyjlNoXFHJWecs4OS8MwGHKSqYKLK6P4pvyzc6QeNtRhF
-         o8NUeyzlBW/9LAh7O9M08fJhcmCPwnVXjxPx12eR76BgjIy0eo/JvJsG0/odO2FFPUGL
-         s+Og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787325191; x=1787929991;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=pNfd98g7NohQi3HTw63l9CeOQLM+iGLJoEq3pvm3KGI=;
-        b=m2LiSiw8VKv5ayuEdQfRtSDZC9B05VVEcKveiKRJlZo+r2RIAHwgh6AdGUc4bEfg97
-         1X7157I3CI29GbM9HC0Oia/H/OGvccB8207adWTiKTu1Ev+64PriJ+LszsxLiP6XUAJc
-         iY86rfcuXQXouRcmDRjPSN1Up2sc4CrW4VrF0T82A+QIx3V8VO9nP/UUDZEhkhVLZKjL
-         YQFOApwg1VyvANFbkQi++cTwHib76v7M5+GYFj6czZkqcAYk5i8ooJbPRSpQb7aCqk0+
-         uWnRqI4uVOu6jYj4jT+H2J1FLdzvnYB5O9izePHKrCWGOtTy4I3vRWNvS7sEWaoktrHA
-         XCKg==
-X-Forwarded-Encrypted: i=1; AHgh+RpLNPFTAW/vXtownrccG/9tRcIE40ZiQ7tZLN+miPfmaTmkfpN766s1gdOD6kmHQAzQN2ofHgFk0ftZNQs=@vger.kernel.org
-X-Gm-Message-State: AFuF++nzritkZNAX+nCmXJhl4jxOS2bMwxhX68vhSV8dpTNUfsQZp5Dz
-	GB8GPOP8I8Ion+1JELulk6+iM2EDuQjUzRBy4lg9HH8gTHzTdlFqkSHx
-X-Gm-Gg: AR+sD12MyPpqdOpIJs7PmJ3mmLxGyRV9646H4so2j2sOZVrw6hIwa95KSJCq6w0P/Jv
-	uFzqk/gQg7IoJDKQQ0TR6p2z7g2Gpf/wIw4F0tQgAgGHJXrb4YQ7Kg+BuQHqkb4y3MUMDFxL+7d
-	EincqY/YXrHg7Vpfe5Ye1MXatMrLBVGJoxFUfbuC2s5U/IQn4yH0wVhZAwxpfDiuBakjb6qhGcX
-	lyaYcH3FNiqEexmMub3x2/u9dKQ4V8kGOPknsxkjJ20iBYKyjKuCuj6uf+n8fpQyyj5UTcV6YhN
-	OJ7vkgzl+Z76jd/4htwgSM593jK40i095XYJtOujO7n5UH1QxdfdeaLoWDy3cBR+OtZcxNBu8JJ
-	YAJIU8zudoZsCqjv8ZX4/bA0bXqr4GlGFvfGPK35RvRu6CwBXrJsRoN0rz7+362Yv2cihzveAZa
-	wQ0izFwmowo6X4l1PFbM5Y/Tt5+YXOwbGhMDvhaobK98+njWfMkR+629JHdU7ubEyOWrFLxulCw
-	lnq+ALY
-X-Received: by 2002:a17:903:390d:b0:2c9:fb11:1bf4 with SMTP id d9443c01a7336-2d64af4eea9mr143169085ad.7.1787325191275;
-        Fri, 21 Aug 2026 08:13:11 -0700 (PDT)
-Received: from kernel ([103.219.206.63])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2d62d5912f4sm21059155ad.29.2026.08.21.08.13.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Aug 2026 08:13:10 -0700 (PDT)
-From: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
-To: clabbe@baylibre.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Cc: skhan@linuxfoundation.org,
-	me@brighamcampbell.com,
-	jkoolstra@xs4all.nl,
-	linux-crypto@vger.kernel.org,
-	linux-amlogic@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
-Subject: [PATCH 2/2] crypto: amlogic: Use devm APIs for clock and engine management
-Date: Fri, 21 Aug 2026 20:43:03 +0530
-Message-ID: <20260821151303.8150-1-raizudeen.kerneldev@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c3k6Yuec"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B71951F000E9;
+	Fri, 21 Aug 2026 17:21:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1787332866;
+	bh=k8yK5B9qpvP8r3TX2oQi9M7VMrLKTb2kWkuu0dF51TQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=c3k6Yuec371NWtcRzkqBB4dL9GrTTA7Pr3AGCHr2Vim0ndozcMljYJ6P+5DMs4ER0
+	 DygunbUDh4id6Jsrg12Mjw5YHQ4B5obSwt5SsS7b2BsFT4wZyM6c8r2Vup4zVkYf+0
+	 cHD+7Fo0O5x/+wNRAZ6jdAjXcXYeXJo+NNp00lwp9+Mj+iiyNIPTPq54BsMBCtvGHk
+	 hkBosHkF10yD3e1ApCgpNE5DNqvVDSvElS+ORbWQwbbwUd8aB+XjfUyzBPKsJQJdQH
+	 oHHfgKc3TgSElEH2qTWB5+7m5HozXt5ndGHzR5SG59mZlJJUAllRxQ2eNffYyibzRu
+	 Ww+82HrXMjMTg==
+Date: Fri, 21 Aug 2026 18:20:58 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Ayush Singh <ayush@beagleboard.org>
+Cc: Jason Kridner <jkridner@beagleboard.org>, robertcnelson@gmail.com,
+	Johan Hovold <johan@kernel.org>, Alex Elder <elder@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
+	Gary Guo <gary@garyguo.net>,
+	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	Tamir Duberstein <tamird@kernel.org>,
+	Alexandre Courbot <acourbot@nvidia.com>,
+	Onur =?iso-8859-1?Q?=D6zkan?= <work@onurozkan.dev>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Ayush Singh <ayush@beagleboard.com>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, greybus-dev@lists.linaro.org,
+	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH 7/7] dt-bindings: beagle: Add BeagleConnect Freedom
+Message-ID: <20260821-zesty-penalty-a9a485150545@spud>
+References: <20260820-gb-uart-transport-v1-0-282da14ab7b7@beagleboard.org>
+ <20260820-gb-uart-transport-v1-7-282da14ab7b7@beagleboard.org>
+ <20260820-anytime-barrel-9a0547910a2c@spud>
+ <f93c5f18-580c-46ce-971f-8e2073485b4b@beagleboard.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="a75x6krVk/Unrjav"
+Content-Disposition: inline
+In-Reply-To: <f93c5f18-580c-46ce-971f-8e2073485b4b@beagleboard.org>
 
-Simplify the probe and remove function by utilizing device managed
-(devm) APIs. Replace devm_clk_get() and clk_prepare_enable() with
-devm_clk_get_enabled(), and replace crypto_engine_alloc_init() with
-devm_crypto_engine_alloc_init().
+--a75x6krVk/Unrjav
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This removes the need for manual cleanup in the error paths and the
-remove function, eliminating calls to clk_disable_unprepare() and
-crypto_engine_exit(). This simplifies the code and prevents potential
-resource leaks.
+On Fri, Aug 21, 2026 at 11:01:16AM +0530, Ayush Singh wrote:
+> On 8/21/26 12:03 AM, Conor Dooley wrote:
+>=20
+> > On Thu, Aug 20, 2026 at 02:55:49PM +0530, Ayush Singh wrote:
+> > > Add devicetree bindings for the BeagleBoard.org BeagleConnect Freedom,
+> > > a wireless-enabled board based on the TI CC1352P7. The board exposes =
+an
+> > > MCU that can be attached to a host over USB, UART, SPI or I2C, and is
+> > > described as a child node of the corresponding bus.
+> > >=20
+> > > Signed-off-by: Ayush Singh <ayush@beagleboard.org>
+> > > ---
+> > >   .../beagle/beagle,beagleconnect-freedom.yaml       | 30 +++++++++++=
++++++++++++
+> > >   MAINTAINERS                                        |  1 +
+> > >   2 files changed, 31 insertions(+)
+> > >=20
+> > > diff --git a/Documentation/devicetree/bindings/beagle/beagle,beagleco=
+nnect-freedom.yaml b/Documentation/devicetree/bindings/beagle/beagle,beagle=
+connect-freedom.yaml
+> > > new file mode 100644
+> > > index 000000000000..5a246f81261e
+> > > --- /dev/null
+> > > +++ b/Documentation/devicetree/bindings/beagle/beagle,beagleconnect-f=
+reedom.yaml
+> > > @@ -0,0 +1,30 @@
+> > > +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+> > > +%YAML 1.2
+> > > +---
+> > > +$id: http://devicetree.org/schemas/beagle/beagle,beagleconnect-freed=
+om.yaml#
+> > > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > > +
+> > > +title: BeagleBoard.org BeagleConnect Freedom
+> > > +
+> > > +description:
+> > > +  The BeagleBoard.org BeagleConnect Freedom board connected over USB=
+, UART, SPI or I2C.
+> > > +
+> > > +maintainers:
+> > > +  - Ayush Singh <ayush@beagleboard.org>
+> > > +
+> > > +properties:
+> > > +  compatible:
+> > > +    const: beagle,beagleconnect-freedom
+> > These compatible only devices always look suspect to me, I feel like
+> > these things probably at least have an optional regulator if the power
+> > source for the freedom is provided by the device running linux.
+>=20
+> Well, the power source can be provided, yes, so will add that. In my
+> testing, I was powering the BeagleConnect Freedom [0] via USB to view log=
+s.
+>=20
+>=20
+> > You're also short the required properties for dealing with anything
+> > other than uart, so spi or i2c. (I assume USB doesn't need devicetree to
+> > function).
+>=20
+> I have only tested with UART at the moment. Is just having
+> `additional_properties: true` sufficient? I think the reg property is the
 
-Signed-off-by: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
----
- drivers/crypto/amlogic/amlogic-gxl-core.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+No, only bindings intended to be included by others should have that.
+You should ref spi-peripheral-props if anything is relevant and have
+"{additional,unevaluated}Properties: false" depending on whether or not
+anything other than reg is.
 
-diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/amlogic/amlogic-gxl-core.c
-index 302b398405e2..950735f620e9 100644
---- a/drivers/crypto/amlogic/amlogic-gxl-core.c
-+++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
-@@ -140,7 +140,6 @@ DEFINE_SHOW_ATTRIBUTE(meson_debugfs);
- static void meson_free_chanlist(struct meson_dev *mc, int i)
- {
- 	while (i >= 0) {
--		crypto_engine_exit(mc->chanlist[i].engine);
- 		if (mc->chanlist[i].tl)
- 			dma_free_coherent(mc->dev, sizeof(struct meson_desc) * MAXDESC,
- 					  mc->chanlist[i].tl,
-@@ -164,7 +163,7 @@ static int meson_allocate_chanlist(struct meson_dev *mc)
- 	for (i = 0; i < MAXFLOW; i++) {
- 		init_completion(&mc->chanlist[i].complete);
- 
--		mc->chanlist[i].engine = crypto_engine_alloc_init(mc->dev, true);
-+		mc->chanlist[i].engine = devm_crypto_engine_alloc_init(mc->dev, true);
- 		if (!mc->chanlist[i].engine) {
- 			dev_err(mc->dev, "Cannot allocate engine\n");
- 			i--;
-@@ -244,10 +243,10 @@ static int meson_crypto_probe(struct platform_device *pdev)
- 	if (IS_ERR(mc->base))
- 		return PTR_ERR(mc->base);
- 
--	mc->busclk = devm_clk_get(&pdev->dev, "blkmv");
-+	mc->busclk = devm_clk_get_enabled(&pdev->dev, "blkmv");
- 	if (IS_ERR(mc->busclk)) {
- 		err = PTR_ERR(mc->busclk);
--		dev_err(&pdev->dev, "Cannot get core clock err=%d\n", err);
-+		dev_err(&pdev->dev, "Cannot get/enable core clock err=%d\n", err);
- 		return err;
- 	}
- 
-@@ -272,7 +271,7 @@ static int meson_crypto_probe(struct platform_device *pdev)
- 
- 	err = meson_allocate_chanlist(mc);
- 	if (err)
--		goto error_flow;
-+		return err;
- 
- 	err = meson_register_algs(mc);
- 	if (err)
-@@ -293,8 +292,6 @@ static int meson_crypto_probe(struct platform_device *pdev)
- error_alg:
- 	meson_unregister_algs(mc);
- 	meson_free_chanlist(mc, MAXFLOW - 1);
--error_flow:
--	clk_disable_unprepare(mc->busclk);
- 	return err;
- }
- 
--- 
-2.53.0
+> only thing SPI and I2C will require setting here.
 
+Ye, then add a "reg: maxItems: 1" for those cases then.
+
+pw-bot: changes-requested
+
+Cheers,
+Conor.
+
+>=20
+>=20
+> > pw-bot: changes-requested
+> >=20
+> > Thanks,
+> > Conor.
+>=20
+>=20
+> Best Regards,
+>=20
+> Ayush Singh
+>=20
+>=20
+> [0]: https://www.beagleboard.org/boards/beagleconnect-freedom
+>=20
+
+--a75x6krVk/Unrjav
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaoiI+gAKCRB4tDGHoIJi
+0nrIAQDkVc0ubhHL6rF29gNzJsw62O50YydlTCW6qD1J46ffUAEAgwWA8wEm8jw9
+fDvkjHAubs365zbZ3rQWbMMVTfa+0QY=
+=oN7i
+-----END PGP SIGNATURE-----
+
+--a75x6krVk/Unrjav--
