@@ -1,68 +1,33 @@
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 998053F4DE9
-	for <linux-crypto@vger.kernel.org>; Fri, 21 Aug 2026 05:31:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D47BA31960A;
+	Fri, 21 Aug 2026 06:20:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787290288; cv=none; b=nlFzthkxFhIKKOJf7e5NSf9EjrZ3YtcQXUl/FLWaXqn1TX4WcxV16P6JSVsY85R3Hg9atQEKIYS4/FVBkk73f3ERkbHB3r6eSD9W8K237ecVR40MX9tB24foAUGcSEdFtMZZ0Zeu5GUiNrpGc4CwBoLSJ9o+dvIae65Hc6PZBm8=
+	t=1787293217; cv=none; b=kACxtLMNTXLZZd7Gv17hGH4RuOj/LH/EqGZudvkCfL36vHYlig3kx+RDuQtwDFuabSjjVmtPe7+Y/h++Se2A36xANe3ZAzAy53/LLmM5D/f6HDnJO/O9alti+F1Yp9201YbLvoNgy+keO/nNSPgB6MEOw+aTSG16+Ctoh/RngTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787290288; c=relaxed/simple;
-	bh=inNrn8G8WFZnnfrNZ9E3BMtQ1vPeRWfBhWs8dXkjO1E=;
+	s=arc-20240116; t=1787293217; c=relaxed/simple;
+	bh=ylpyn6kQ4LVTp9CuiKs2d1ev5jUc/nF7WTS4STruaOc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WMhpX0RrWCqBfQoRxD61ZrUw59mXeRY2FAKQRSNy8/+MbPKjeCsTFxN5RWe+LhxK/cOcmkEgvnrfEbx8fQDvSBS35LbiKBmRVz9aje3Q0ai4PdcLlXFpGW0dWeejlVXNLa/Opw8kglVr+ybqOWpEYlrdU34VL03/jrogJpjuHK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=beagleboard.org; spf=fail smtp.mailfrom=beagleboard.org; dkim=pass (2048-bit key) header.d=beagleboard-org.20251104.gappssmtp.com header.i=@beagleboard-org.20251104.gappssmtp.com header.b=VrLMlt3s; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=beagleboard.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=beagleboard.org
+	 In-Reply-To:Content-Type; b=VMTwm+AH8UF2hmVrIa6vSICcQq7cMcbF7s0DmKBQ+RIv968s6PmOasIf7+7uFPSO21v/dfie5r9ElPlwXvMBOgZNeWtSOusa4kUw5ZpjZNkXJLk60LXr/mnHNEW+bBZUFqCxMkHzli1lj6AaUXdFwMSutle4sRILsYPKRamKmXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iSA4x4Qg; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=beagleboard-org.20251104.gappssmtp.com header.i=@beagleboard-org.20251104.gappssmtp.com header.b="VrLMlt3s"
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-84f77cc7302so188753b3a.3
-        for <linux-crypto@vger.kernel.org>; Thu, 20 Aug 2026 22:31:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=beagleboard-org.20251104.gappssmtp.com; s=20251104; t=1787290287; x=1787895087; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Y8SxG8MAv8S17KEvq/pF9OP7cYmFId3mpEeGKt4QpjY=;
-        b=VrLMlt3sLhd0V8t78MIHvLsBzc1+t3pDuJTlemBOc+7E7K8NWj10Gf+oE/BlEV+GWx
-         R9NDq2vAXbRLmrqctvdqcbS0ncmlYFjMIZHeIkf1P7LmB1oitsGXWDudbJD5u7aEYf3O
-         IVKhWqSbXWf7w42RG53ALrE4yse7kxEF55ekmd+3nSTDnU97qHfHnq7AgQ5Mzu0ZM+nz
-         7xABt1JxwkcDx51SfMWFY+vQhkkJ5CYvXoLDLpX2EgMHDTDUqT4NnlwPkOnLLRH4gHaj
-         E/4Qp39H0p3DDW45FaxqkT/4Bdi3z6EUfP6nJ6OVDO1FB1ae1C/I+vdwd9QAxZ0VJ3P4
-         Y/3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787290287; x=1787895087;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Y8SxG8MAv8S17KEvq/pF9OP7cYmFId3mpEeGKt4QpjY=;
-        b=CiQCxYTuirx77TC7fus7LmhXNyf4q8BO0UcC9QcioCy3zVMcCXUaz474r/4FMsqlrP
-         yfeor07KoTfPurCLAhymQsN2X3Ogl03YKzzPVH4rIAwFpdh9yu2ndLgUZ4/77I03fEcT
-         pv3dPoUqhJ+XyEkeqxq3kwnhnRNYKyd1aF87a9p2nuXeoA/A1uXvRUU91HOI0I+9btpH
-         EJrQc0alIgq9YEMkStGGf0tAn+KhkC/+8CzKuoFIJU3OLnYba8vKDO/AZsqv8C0kiBOU
-         88yrV1LTVZsFdi/iJ+hNf7Piq1vQKZYeLGyzvQp4pqTrEhVUu8NhJCtAIWZEirkq+wnC
-         bmNA==
-X-Forwarded-Encrypted: i=1; AHgh+RqcnSPqEDGtL5vG+o98LztFtZYp4FJnB3axBAHAYdGpmuL3S4jkrDDHsvTmqqu4HC3r0uh0I4PJzIvWJes=@vger.kernel.org
-X-Gm-Message-State: AFuF++k1y5VSKkpMAj+RmIDFH4Yhuj1eW1+LiVbHeWLd2O3cPkXqEN26
-	h30Gu2PeGo9Td9lR4tgDGx69hnBEy9DhtG1HTdw1Hf4xoxSEp5t4W37ojKr+r7IHiQ==
-X-Gm-Gg: AR+sD13luRQFklMvISOCSG9iOYbvX7C5JkVpif1esadVyqXKkqA1zgRU48f4MhZ/t4U
-	zZM+T1TFhrE0eDpFZtkAr+1JOY9hX6R17TY/tJnQKgetWW0T+kCP3JYnfe/Y0TPUvmnPzWmuo2z
-	a63v7CmN2v0Xn2++B76HlZXx5ZBGWGKbZXda3rROe3KnBZOk5fM5wqj2/37Grxh2734fk4D368K
-	QrApU9NMMjNXucWWnoYm9D1en4xwARV4UiOF5or+kqYGJf9BIA6r5MrFP4wUg2XO2JdJh7xaJuL
-	uX7syKLOBKDS/ZgyZdUFEcdPJhweL4hgTlq2C19UErZO/bneuf+pkKxg433WFAVzZtOteWGxcKm
-	n1JZZSHkaGRdCSiAp0+omLeP5Da9h+B7lvlAZLqmUcyXvnt8/lT2GHzgf58oUH+YL3Y9MdPrbMd
-	0derJKkNgt2zlFHZPEAaTyFTJ+ehBRxii1C7Q0Zo8CDqBT0RGTWLXlJEutkwHtg5z6IOwJ00T38
-	58VoLkOF7quk4rtNfesA4pLtMMnUM93CtzniGo=
-X-Received: by 2002:a05:6a00:9519:b0:847:9267:2104 with SMTP id d2e1a72fcca58-851f9f48a04mr4829658b3a.12.1787290286849;
-        Thu, 20 Aug 2026 22:31:26 -0700 (PDT)
-Received: from ?IPV6:2405:201:4019:32fc:3c55:6b24:5147:322b? ([2405:201:4019:32fc:3c55:6b24:5147:322b])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-851d31b01cfsm2388453b3a.0.2026.08.20.22.31.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Aug 2026 22:31:26 -0700 (PDT)
-Message-ID: <f93c5f18-580c-46ce-971f-8e2073485b4b@beagleboard.org>
-Date: Fri, 21 Aug 2026 11:01:16 +0530
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iSA4x4Qg"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 537741F000E9;
+	Fri, 21 Aug 2026 06:20:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1787293215;
+	bh=IiEnDItFVmnpizqazLkx3ANYJFj9I4zujqWxfL7x7Z4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=iSA4x4QghXWnfaXvx14i6UTTNZn0fUneH2yt66ksEjeJ42mSD04S0VZ+e6tV7kchI
+	 Wc2VxULBtsPNJst9vI6JWRMUY/fsyFtOHh2pkBoao0z4MCeuHLzYHhnX/RfsOCo3Yh
+	 yV+N0/yqWfItq19VvOhe8iMawpELp4ePrUas6QghG2PZ/PBoY94gMaqji81wf4/hj3
+	 5DXajmJGJectmXczX1/yslGfLBmlL3oRkRFctWoBKinznG/eb5XrApdVtNo4FI7yRc
+	 VeLwVaQZkGUItt1QTdVJjykLjssNlenUU736fTgN1SiBds4AR9VF8vcgB9fHFRr9Gn
+	 QiKB/nlGd3FWg==
+Message-ID: <a59989ba-58cb-4789-84df-88eca1e63080@kernel.org>
+Date: Fri, 21 Aug 2026 08:20:04 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -71,8 +36,8 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 7/7] dt-bindings: beagle: Add BeagleConnect Freedom
-To: Conor Dooley <conor@kernel.org>
-Cc: Jason Kridner <jkridner@beagleboard.org>, robertcnelson@gmail.com,
+To: Ayush Singh <ayush@beagleboard.org>,
+ Jason Kridner <jkridner@beagleboard.org>, robertcnelson@gmail.com,
  Johan Hovold <johan@kernel.org>, Alex Elder <elder@kernel.org>,
  Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
  Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
@@ -85,83 +50,104 @@ Cc: Jason Kridner <jkridner@beagleboard.org>, robertcnelson@gmail.com,
  <acourbot@nvidia.com>, =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>,
  Eric Biggers <ebiggers@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
  Ayush Singh <ayush@beagleboard.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, greybus-dev@lists.linaro.org,
- linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
- linux-crypto@vger.kernel.org, devicetree@vger.kernel.org
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>
+Cc: greybus-dev@lists.linaro.org, linux-kernel@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, linux-crypto@vger.kernel.org,
+ devicetree@vger.kernel.org
 References: <20260820-gb-uart-transport-v1-0-282da14ab7b7@beagleboard.org>
  <20260820-gb-uart-transport-v1-7-282da14ab7b7@beagleboard.org>
- <20260820-anytime-barrel-9a0547910a2c@spud>
+From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
-From: Ayush Singh <ayush@beagleboard.org>
-In-Reply-To: <20260820-anytime-barrel-9a0547910a2c@spud>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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
+In-Reply-To: <20260820-gb-uart-transport-v1-7-282da14ab7b7@beagleboard.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 8/21/26 12:03 AM, Conor Dooley wrote:
+On 20/08/2026 11:25, Ayush Singh wrote:
+> Add devicetree bindings for the BeagleBoard.org BeagleConnect Freedom,
+> a wireless-enabled board based on the TI CC1352P7. The board exposes an
+> MCU that can be attached to a host over USB, UART, SPI or I2C, and is
+> described as a child node of the corresponding bus.
+> 
+> Signed-off-by: Ayush Singh <ayush@beagleboard.org>
+> ---
+>  .../beagle/beagle,beagleconnect-freedom.yaml       | 30 ++++++++++++++++++++++
+>  MAINTAINERS                                        |  1 +
+>  2 files changed, 31 insertions(+)
+> 
 
-> On Thu, Aug 20, 2026 at 02:55:49PM +0530, Ayush Singh wrote:
->> Add devicetree bindings for the BeagleBoard.org BeagleConnect Freedom,
->> a wireless-enabled board based on the TI CC1352P7. The board exposes an
->> MCU that can be attached to a host over USB, UART, SPI or I2C, and is
->> described as a child node of the corresponding bus.
->>
->> Signed-off-by: Ayush Singh <ayush@beagleboard.org>
->> ---
->>   .../beagle/beagle,beagleconnect-freedom.yaml       | 30 ++++++++++++++++++++++
->>   MAINTAINERS                                        |  1 +
->>   2 files changed, 31 insertions(+)
->>
->> diff --git a/Documentation/devicetree/bindings/beagle/beagle,beagleconnect-freedom.yaml b/Documentation/devicetree/bindings/beagle/beagle,beagleconnect-freedom.yaml
->> new file mode 100644
->> index 000000000000..5a246f81261e
->> --- /dev/null
->> +++ b/Documentation/devicetree/bindings/beagle/beagle,beagleconnect-freedom.yaml
->> @@ -0,0 +1,30 @@
->> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
->> +%YAML 1.2
->> +---
->> +$id: http://devicetree.org/schemas/beagle/beagle,beagleconnect-freedom.yaml#
->> +$schema: http://devicetree.org/meta-schemas/core.yaml#
->> +
->> +title: BeagleBoard.org BeagleConnect Freedom
->> +
->> +description:
->> +  The BeagleBoard.org BeagleConnect Freedom board connected over USB, UART, SPI or I2C.
->> +
->> +maintainers:
->> +  - Ayush Singh <ayush@beagleboard.org>
->> +
->> +properties:
->> +  compatible:
->> +    const: beagle,beagleconnect-freedom
-> These compatible only devices always look suspect to me, I feel like
-> these things probably at least have an optional regulator if the power
-> source for the freedom is provided by the device running linux.
+Since there is going to be v2: please order patches correctly.
 
-Well, the power source can be provided, yes, so will add that. In my 
-testing, I was powering the BeagleConnect Freedom [0] via USB to view logs.
+Please organize the patch documenting the compatible (DT bindings)
+before the patch using that compatible.
+See also:
+https://elixir.bootlin.com/linux/v6.14-rc6/source/Documentation/devicetree/bindings/submitting-patches.rst#L46
 
 
-> You're also short the required properties for dealing with anything
-> other than uart, so spi or i2c. (I assume USB doesn't need devicetree to
-> function).
+> diff --git a/Documentation/devicetree/bindings/beagle/beagle,beagleconnect-freedom.yaml b/Documentation/devicetree/bindings/beagle/beagle,beagleconnect-freedom.yaml
+> new file mode 100644
+> index 000000000000..5a246f81261e
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/beagle/beagle,beagleconnect-freedom.yaml
+> @@ -0,0 +1,30 @@
+> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/beagle/beagle,beagleconnect-freedom.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: BeagleBoard.org BeagleConnect Freedom
+> +
+> +description:
+> +  The BeagleBoard.org BeagleConnect Freedom board connected over USB, UART, SPI or I2C.
 
-I have only tested with UART at the moment. Is just having 
-`additional_properties: true` sufficient? I think the reg property is 
-the only thing SPI and I2C will require setting here.
+Please wrap code according to the preferred limit expressed in Kernel
+coding style (checkpatch is not a coding style description, but only a
+tool).  However don't wrap blindly (see Kernel coding style).
 
 
-> pw-bot: changes-requested
->
-> Thanks,
-> Conor.
 
-
-Best Regards,
-
-Ayush Singh
-
-
-[0]: https://www.beagleboard.org/boards/beagleconnect-freedom
-
+Best regards,
+Krzysztof
