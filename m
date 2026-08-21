@@ -1,111 +1,121 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from oss.cyber.gouv.fr (oss.cyber.gouv.fr [51.159.188.251])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 249513BE155;
-	Fri, 21 Aug 2026 08:52:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E86653451AA;
+	Fri, 21 Aug 2026 09:56:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.159.188.251
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787302335; cv=none; b=AQ7dgRIN6afN2NV8XRXgOuuG2y9y6RB1EowPLx9yfB6N54sPdl/mGLq9YMKYZW885og7bf0L+9EkVvO/voD1Xeo2rC9PUHbrnhI6813bjW22uK0BvgjlD3/ieJd/cv31TBmWLAHo/Gtg05h4TaRJOyrniZjtKbE1w4Jq0eJpGJQ=
+	t=1787306174; cv=none; b=EwEYNYxBs5WnjbhNxVOaxZLNm74AwN9QgmGdtk+ZlSITfEsIY1/LtHUaZIs1M2PTYEqwuirg40FOM2sX5tQt0HSP+V4RqFhnz58myrCTS/CiatG3eFzNJb679XdiSXlyDP++t796K2gtoTR6WAGDdllgbAeKzgAeZQUflt1KnIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787302335; c=relaxed/simple;
-	bh=0kYolRfjhfBL7Kcx86cYGYpBiaWwgF97poYMRwYFUA8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N1l+qedl70qpZu3mJHe49ctGogfCw60Oynv//tjtJswYvQrwztefF4xS4DuUuJoSwlpUPNgOZMeCMVu3a99PUm6takM3y+AjUKiBQadCQokRxPOzIJ0IvGx+WeDXabB61rL2Pp9oMmkMxTWJ7HXNu1FT9wMn37vcGp5RRTpszoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EWC4oHmz; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1787306174; c=relaxed/simple;
+	bh=w8LA04LoIYEUcjE0gkBUX0d9RqKBEXPQzDdhkjqNxuM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ofep4/FlPNg0csxYKnaEfkeGSixQwXWnEgEIgHvSHPSoVi05HPwjL0EX4qxtq35miKqAXIhnxXj196xotiL69nRu8B8ytodHWeEQ/PKQLkf8qa+wBKKmns7RdVrcfO7zzYz+WwOiBaRNK10INy98HXxjvG2CbtbPms72nbO1JJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr; spf=pass smtp.mailfrom=oss.cyber.gouv.fr; dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b=FSQUVPcD; arc=none smtp.client-ip=51.159.188.251
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.cyber.gouv.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EWC4oHmz"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 4BCCB1F00A3A;
-	Fri, 21 Aug 2026 08:52:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787302333;
-	bh=XoHUqrSeOP/PVEAYqp4D6liGUEiEi36cwId27AAG5sI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=EWC4oHmzR5Su8pEEdQ1fxgybBz2JMe+f/cmQDUKK1KZP84f3jUojRiPb1IPlPpVZD
-	 DE2yiMUSuE9M/Sa1zSOHoE0jHzvx5Jy0dYJQZUU2DKdCxjm5jqK9y21k4JqvfD3rc/
-	 ZUmDDfB+XSl2jmOaZhC3eY3XrrN6YHbwnaVz70YTOHc5+es4lPr1+1y+XMW9u0wlke
-	 +ETiS1Z+BRKBxZ7cfENqt+Qmfjan6eFrAQ93lPoywHO0kFEGnBY3qu5aCrw9f+9eeK
-	 bBI/gavUCZiryO6cf7kprPJy5YSFbQJw69KwubrkORIAoLf9Wua9+qcX7o+rlEkukh
-	 /PqM3tGma7odA==
-Date: Fri, 21 Aug 2026 11:52:09 +0300
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: Ross Philipson <ross.philipson@gmail.com>, linux-kernel@vger.kernel.org,
-	x86@kernel.org, linux-integrity@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-efi@vger.kernel.org,
-	"Daniel P. Smith" <dpsmith@apertussolutions.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	"H . Peter Anvin" <hpa@zytor.com>, dave.hansen@linux.intel.com,
-	Matthew Garrett <mjg59@srcf.ucam.org>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	peterhuewe@gmx.de, Andy Lutomirski <luto@amacapital.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
-	Jonathan Corbet <corbet@lwn.net>, kanth.ghatraju@oracle.com,
-	daniel.kiper@oracle.com, Andrew Cooper <andrew.cooper3@citrix.com>,
-	trenchboot-devel@googlegroups.com
-Subject: Re: [PATCH v2 10/10] tpm-buf: Add TPM buffer support header for
- standalone reuse
-Message-ID: <aogRuZJhIZblfUXw@kernel.org>
-References: <20260711160110.267780-1-ross.philipson@gmail.com>
- <20260711160110.267780-11-ross.philipson@gmail.com>
- <alKI9mUBTOCjPbbG@kernel.org>
- <f85782ed-efb3-4045-9d37-2ed4847e1500@app.fastmail.com>
- <aoen10sB5zflLFRw@kernel.org>
- <aoevs3z1EnTNg2vJ@kernel.org>
- <d853a1aa-49b6-46ae-87e6-62ec038c648a@app.fastmail.com>
+	dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b="FSQUVPcD"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=oss.cyber.gouv.fr; s=default; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=MjJRCTzIuwOUuiLlMedmVuVLrxNVUmFbX7AcZgorUdg=; b=FSQUVPcDso9O6gJPcScetEBgCL
+	aCqKwJDLAjpir2XsFmOZMVOsZuAgppYUZFaM/mQdSCtd9hrBSn3OcjR4X+r6qc9sNscC7gm+SbPa8
+	+VYNqAk7+G+mSUKjrvHsQ1aQ2aPHN4E2MwGb/8FfNF2qn2VO4rnIMjvwDcjv+aAId5yEerD0rsMj0
+	kw8oA2Su86DF/2b9YinNg+HFgS2MmLxCvGPmu28Y5y3T705v/p1A99EBYVDWU07oazULQhChpxsd1
+	Xv686aTCEC2Viu4xzdlCtMPI9qHYl0NDUjydDXSRzPfDGuZWK//VV7IeiiCEiOR5KXB7J/Rl0yA61
+	VdmGiE4Q==;
+Received: from [151.115.150.205] (port=40286 helo=gepetto..)
+	by pf-012.whm.fr-par.scw.cloud with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.99.5)
+	(envelope-from <Jeremy.Jean@oss.cyber.gouv.fr>)
+	id 1wxLyo-00000004Lg0-074k;
+	Fri, 21 Aug 2026 11:56:05 +0200
+From: =?UTF-8?q?J=C3=A9r=C3=A9my=20Jean?= <Jeremy.Jean@oss.cyber.gouv.fr>
+To: arei.gonglei@huawei.com,
+	herbert@gondor.apana.org.au,
+	mst@redhat.com
+Cc: davem@davemloft.net,
+	jasowangio@gmail.com,
+	xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com,
+	linux-crypto@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	=?UTF-8?q?J=C3=A9r=C3=A9my=20Jean?= <Jeremy.Jean@oss.cyber.gouv.fr>
+Subject: [PATCH] crypto: virtio: validate akcipher completion length
+Date: Fri, 21 Aug 2026 09:55:12 +0000
+Message-ID: <20260821095511.3600564-2-Jeremy.Jean@oss.cyber.gouv.fr>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d853a1aa-49b6-46ae-87e6-62ec038c648a@app.fastmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - pf-012.whm.fr-par.scw.cloud
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - oss.cyber.gouv.fr
+X-Get-Message-Sender-Via: pf-012.whm.fr-par.scw.cloud: authenticated_id: jeremy.jean@oss.cyber.gouv.fr
+X-Authenticated-Sender: pf-012.whm.fr-par.scw.cloud: jeremy.jean@oss.cyber.gouv.fr
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-On Fri, Aug 21, 2026 at 09:31:23AM +0300, Ard Biesheuvel wrote:
-> 
-> On Fri, 21 Aug 2026, at 04:53, Jarkko Sakkinen wrote:
-> > On Fri, Aug 21, 2026 at 04:20:27AM +0300, Jarkko Sakkinen wrote:
-> >> On Wed, Aug 19, 2026 at 03:50:42PM +0300, Ard Biesheuvel wrote:
-> >> > 
-> >> > 
-> >> > On Sat, 11 Jul 2026, at 21:18, Jarkko Sakkinen wrote:
-> >> > > On Sat, Jul 11, 2026 at 09:01:10AM -0700, Ross Philipson wrote:
-> >> > >> Extract all the functions and definitions for TPM buffer handling
-> >> > >> and separate them into their own header.
-> >> > >> 
-> >> > >> Signed-off-by: Ross Philipson <ross.philipson@gmail.com>
-> >> > >> ---
-> >> > >>  drivers/char/tpm/tpm-buf.c |  3 +-
-> >> > >>  include/linux/tpm.h        | 34 +--------------------
-> >> > >>  include/linux/tpm_buf.h    | 60 ++++++++++++++++++++++++++++++++++++++
-> >> > >>  3 files changed, 63 insertions(+), 34 deletions(-)
-> >> > >>  create mode 100644 include/linux/tpm_buf.h
-> >> > >> 
-> >> > ...
-> >> > >
-> >> > > I would probably ack them all as I've seen these many times and
-> >> > > there's not much anything new. Just waiting for additional
-> >> > > feedback before applying them.
-> >> > >
-> >> > 
-> >> > Will these be going into v7.3 then?
-> >> > 
-> >> > 
-> >> 
-> >> I can piggyback them with to my PR and see what Linus thinks.
-> >
-> > Added:
-> >
-> > https://git.kernel.org/pub/scm/linux/kernel/git/jarkko/linux-tpmdd.git/log/?h=for-next-tpm
-> >
-> > I'll send v7.3 PR once these show up in -next.
-> >
-> 
-> Thanks Jarkko
+The device controls the used length returned for an akcipher request.
+Subtracting the status byte without validating that length can underflow
+dst_len, while accepting a payload larger than the submitted destination
+can make sg_copy_from_buffer() read past the response buffer.
 
-Seriously: thank you. Had a blank spot and I would have failed
-this with 100% certainty otherwise.
+Reject malformed completion lengths before updating dst_len or copying the
+response.
 
-BR, Jarkko
+Fixes: a36bd0ad9fbf ("virtio-crypto: adjust dst_len at ops callback")
+Assisted-by: Codex:gpt-5
+Signed-off-by: Jérémy Jean <Jeremy.Jean@oss.cyber.gouv.fr>
+---
+ drivers/crypto/virtio/virtio_crypto_akcipher_algs.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
+index d8d452cac391..886032abae80 100644
+--- a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
++++ b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
+@@ -69,6 +69,7 @@ static void virtio_crypto_dataq_akcipher_callback(struct virtio_crypto_request *
+ 	struct akcipher_request *akcipher_req =
+ 		container_of((void *)vc_akcipher_req, struct akcipher_request,
+ 			     __ctx);
++	unsigned int dst_len;
+ 	int error;
+ 
+ 	switch (vc_req->status) {
+@@ -88,9 +89,19 @@ static void virtio_crypto_dataq_akcipher_callback(struct virtio_crypto_request *
+ 	}
+ 
+ 	/* actual length may be less than dst buffer */
+-	akcipher_req->dst_len = len - sizeof(vc_req->status);
++	if (len < (int)sizeof(vc_req->status)) {
++		error = -EIO;
++		goto out;
++	}
++	dst_len = len - sizeof(vc_req->status);
++	if (dst_len > akcipher_req->dst_len) {
++		error = -EIO;
++		goto out;
++	}
++	akcipher_req->dst_len = dst_len;
+ 	sg_copy_from_buffer(akcipher_req->dst, sg_nents(akcipher_req->dst),
+ 			    vc_akcipher_req->dst_buf, akcipher_req->dst_len);
++out:
+ 	virtio_crypto_akcipher_finalize_req(vc_akcipher_req, akcipher_req, error);
+ }
+ 
+-- 
+2.47.3
+
