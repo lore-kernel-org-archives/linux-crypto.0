@@ -1,121 +1,123 @@
-Received: from oss.cyber.gouv.fr (oss.cyber.gouv.fr [51.159.188.251])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E86653451AA;
-	Fri, 21 Aug 2026 09:56:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.159.188.251
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ABA243BDC3
+	for <linux-crypto@vger.kernel.org>; Fri, 21 Aug 2026 15:12:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787306174; cv=none; b=EwEYNYxBs5WnjbhNxVOaxZLNm74AwN9QgmGdtk+ZlSITfEsIY1/LtHUaZIs1M2PTYEqwuirg40FOM2sX5tQt0HSP+V4RqFhnz58myrCTS/CiatG3eFzNJb679XdiSXlyDP++t796K2gtoTR6WAGDdllgbAeKzgAeZQUflt1KnIM=
+	t=1787325176; cv=none; b=hwRHUemBpySmSabtFGWAv6WQzUQpu7MUAr+zMcFscBKUMmrc149FaztEVWZIKnNqFfAiE4X7n+5y20sTXWXe7aIjghQe1QCS/iaSCMBAcAYFRubXyMvgd5RfTsP6l+JLGfDCgSJeDFLdy6s9IDobxKh2qfHpCqGPiYyvWrgtzBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787306174; c=relaxed/simple;
-	bh=w8LA04LoIYEUcjE0gkBUX0d9RqKBEXPQzDdhkjqNxuM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ofep4/FlPNg0csxYKnaEfkeGSixQwXWnEgEIgHvSHPSoVi05HPwjL0EX4qxtq35miKqAXIhnxXj196xotiL69nRu8B8ytodHWeEQ/PKQLkf8qa+wBKKmns7RdVrcfO7zzYz+WwOiBaRNK10INy98HXxjvG2CbtbPms72nbO1JJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr; spf=pass smtp.mailfrom=oss.cyber.gouv.fr; dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b=FSQUVPcD; arc=none smtp.client-ip=51.159.188.251
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.cyber.gouv.fr
+	s=arc-20240116; t=1787325176; c=relaxed/simple;
+	bh=fSnUC/Uevm5Vbrih7n+FM4vcyD9bqX8J6oiWP1kp/DY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bmVrqKIlLZp4kysnoWP+J7q/2gh5Aq8NtTeEV9b8KDjzJGbhGiaDP4k7NRlbwBN2gqWcZr9l3YC/IVaGiWoZs6Yd4K73fMeOZ5lCHFwzwYu8JoVI3l4xl0Q2f/S92CsAOGG1xpPsFhg186EBDIloMfBiabtI0iJ35IPlE4Pyk2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IiODAYOF; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b="FSQUVPcD"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=oss.cyber.gouv.fr; s=default; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=MjJRCTzIuwOUuiLlMedmVuVLrxNVUmFbX7AcZgorUdg=; b=FSQUVPcDso9O6gJPcScetEBgCL
-	aCqKwJDLAjpir2XsFmOZMVOsZuAgppYUZFaM/mQdSCtd9hrBSn3OcjR4X+r6qc9sNscC7gm+SbPa8
-	+VYNqAk7+G+mSUKjrvHsQ1aQ2aPHN4E2MwGb/8FfNF2qn2VO4rnIMjvwDcjv+aAId5yEerD0rsMj0
-	kw8oA2Su86DF/2b9YinNg+HFgS2MmLxCvGPmu28Y5y3T705v/p1A99EBYVDWU07oazULQhChpxsd1
-	Xv686aTCEC2Viu4xzdlCtMPI9qHYl0NDUjydDXSRzPfDGuZWK//VV7IeiiCEiOR5KXB7J/Rl0yA61
-	VdmGiE4Q==;
-Received: from [151.115.150.205] (port=40286 helo=gepetto..)
-	by pf-012.whm.fr-par.scw.cloud with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.99.5)
-	(envelope-from <Jeremy.Jean@oss.cyber.gouv.fr>)
-	id 1wxLyo-00000004Lg0-074k;
-	Fri, 21 Aug 2026 11:56:05 +0200
-From: =?UTF-8?q?J=C3=A9r=C3=A9my=20Jean?= <Jeremy.Jean@oss.cyber.gouv.fr>
-To: arei.gonglei@huawei.com,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IiODAYOF"
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-382ef647e20so1073949a91.1
+        for <linux-crypto@vger.kernel.org>; Fri, 21 Aug 2026 08:12:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787325174; x=1787929974; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=1HavqBuvOK9+7hkcuCpVB9Cv/dvjoerCr3RPaWhvFOI=;
+        b=IiODAYOFsOAuQ+eSZReAYZUaTNXQWZALnaBvKwIDVH30t38bppy74aLAeoNNTKF06n
+         DdLU5XcpDM9/YPfN3/Ke1KZNauX3HVCdE1fuiIwbeTQoEtrMz3oTh1u+aGx/R/zSq5RB
+         7UgwcXkIQDO+T8cnyOMb6GknloyxQVu9oYsZAWjiqioTlo1lM5QLVdKS9ci+CNNXEeHk
+         Ncqex42KIVoilAmso27QhYTStVCgoFvfpGoFY34bRPrmgnq3YZCZzy/1+Je3ajyCkoD2
+         6aAAqsKb1d1LOa82TEdidgT4t7vaP0NiDEuFWQTl/y7jN0OgfiLkMxPsPw4yasPpXd1F
+         0sYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787325174; x=1787929974;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=1HavqBuvOK9+7hkcuCpVB9Cv/dvjoerCr3RPaWhvFOI=;
+        b=R9v/Xf9V6DtIHha1fagw6ehoQNMv3LaaqcovQ1wOyRwX2t5Ov+jYBT7RhhgUk4KAcX
+         SxDzoX/I0Cq4a99VTqak0UZga7lbnGOatqTwgJR0cryOPntwfFQ90fEo0c9rH2QbZfgd
+         0PczHUck7u+mzOTlzehNYNJ+IFfN2WfPa9KvGDMIgF0SbqbhdWd/5Wq5tr6i7jYaUCoB
+         wQAN3f8x3Jtbzx3z3aV2k35KgfovWnOH2CcypLYMM949nrtVQJQlK+FcMDuD4MhaZ7A4
+         hCIlBVaeXFj5qYoNzqyvAnDKjJLSlNqQXKkQEp9+kqRoZ6Aq0+GMhbN2l5fF4IH6oa8Y
+         bI7A==
+X-Forwarded-Encrypted: i=1; AHgh+Roj7xA8kYjDeIdZR1O0aS8FiXUJrATvnIQPy5mdjfrthdOJRavYlNekbAHAlHkHJ20proDFYyHIRVhsidI=@vger.kernel.org
+X-Gm-Message-State: AFuF++m2k4PaXprWq7e0owQ0h7mf5OhLV8jdKQ232H5C80OHgOoqpZ/S
+	2mGEZ/+nBgzK2V4m8jCntEnkRpBN/SgRxyol2/L4tms4cVWiy25G53hM
+X-Gm-Gg: AR+sD13eW1UdkzPnL1u0G6afpDFm+6fpBFyW/FFvRy25FSYSzYsLkFLQL/18MQn2pQg
+	zQ9TNWBXcP9yo7ydvmAHVyBEbRe02dGjm49/NQVxOTuXv4G00VcjvV+KkdZ8MQpfoVfkzb8wAty
+	+zDDYEgsV+Eww2/dVw6IhE61stALPHOpYi4QBKo6FKZH0ZwQI5T5f8PKBwHMkHpZNLbxDBbv0OB
+	lAAngv6xirR4TY45upf1doUACEYu81Ms53kDOWgK9eOso3ON8X8WEzrqF5+3N/mZcYtmXgeO9bh
+	0c1UQQmok3ZYG4LoXp/QMho04BB5vN6VFdjWWYSIel7n6jWXEP9sLnUyhZ6HDkHtL3SE5n7PPEu
+	5caaJBptm26EdytEJuDGZMLS4c+4rL9abX2IOPJoBuCFvTvR3gYpcWcA6/TIQ3dk1H33LQL8J6I
+	GI7I6mjDF8wD9LkEm66WZQY8nvY014348YpoYEla9LT9lUeSd1efa0J1Wc2HAqUnOjOfgem8XPF
+	XcMlKQP
+X-Received: by 2002:a17:90b:4c0a:b0:38f:de97:b06 with SMTP id 98e67ed59e1d1-395c351386amr12380816a91.5.1787325174270;
+        Fri, 21 Aug 2026 08:12:54 -0700 (PDT)
+Received: from kernel ([103.219.206.63])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-395c4be666bsm3779132a91.11.2026.08.21.08.12.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Aug 2026 08:12:53 -0700 (PDT)
+From: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
+To: clabbe@baylibre.com,
 	herbert@gondor.apana.org.au,
-	mst@redhat.com
-Cc: davem@davemloft.net,
-	jasowangio@gmail.com,
-	xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com,
+	davem@davemloft.net
+Cc: skhan@linuxfoundation.org,
+	me@brighamcampbell.com,
+	jkoolstra@xs4all.nl,
 	linux-crypto@vger.kernel.org,
-	virtualization@lists.linux.dev,
+	linux-amlogic@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
-	=?UTF-8?q?J=C3=A9r=C3=A9my=20Jean?= <Jeremy.Jean@oss.cyber.gouv.fr>
-Subject: [PATCH] crypto: virtio: validate akcipher completion length
-Date: Fri, 21 Aug 2026 09:55:12 +0000
-Message-ID: <20260821095511.3600564-2-Jeremy.Jean@oss.cyber.gouv.fr>
-X-Mailer: git-send-email 2.47.3
+	Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH 1/2] crypto: amlogic: Fix IRQ handler return value and fallthrough logic
+Date: Fri, 21 Aug 2026 20:42:43 +0530
+Message-ID: <20260821151243.8125-1-raizudeen.kerneldev@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - pf-012.whm.fr-par.scw.cloud
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - oss.cyber.gouv.fr
-X-Get-Message-Sender-Via: pf-012.whm.fr-par.scw.cloud: authenticated_id: jeremy.jean@oss.cyber.gouv.fr
-X-Authenticated-Sender: pf-012.whm.fr-par.scw.cloud: jeremy.jean@oss.cyber.gouv.fr
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
 
-The device controls the used length returned for an akcipher request.
-Subtracting the status byte without validating that length can underflow
-dst_len, while accepting a payload larger than the submitted destination
-can make sg_copy_from_buffer() read past the response buffer.
+In irqreturn_t_meson_irq_handler(), when an interrupt matches a flow
+but the status register is empty, the driver prints an error but
+doesn't return. It falls through the loop and incorrectly prints an
+`unknown irq` message.
 
-Reject malformed completion lengths before updating dst_len or copying the
-response.
+Fix this by returning IRQ_HANDLED immediately after the error print.
 
-Fixes: a36bd0ad9fbf ("virtio-crypto: adjust dst_len at ops callback")
-Assisted-by: Codex:gpt-5
-Signed-off-by: Jérémy Jean <Jeremy.Jean@oss.cyber.gouv.fr>
+Additionally, the handler returns IRQ_HANDLED for genuinely unknown
+interrupts. This masks false interrupts and prevents the kernel from
+detecting interrupts. Return IRQ_NONE instead for unhandled
+interrupts.
+
+Cc: stable@vger.kernel.org
+Fixes: 48fe583fe5417 ("crypto: amlogic - Add crypto accelerator for amlogic GXL")
+Signed-off-by: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
 ---
- drivers/crypto/virtio/virtio_crypto_akcipher_algs.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ drivers/crypto/amlogic/amlogic-gxl-core.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
-index d8d452cac391..886032abae80 100644
---- a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
-+++ b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
-@@ -69,6 +69,7 @@ static void virtio_crypto_dataq_akcipher_callback(struct virtio_crypto_request *
- 	struct akcipher_request *akcipher_req =
- 		container_of((void *)vc_akcipher_req, struct akcipher_request,
- 			     __ctx);
-+	unsigned int dst_len;
- 	int error;
- 
- 	switch (vc_req->status) {
-@@ -88,9 +89,19 @@ static void virtio_crypto_dataq_akcipher_callback(struct virtio_crypto_request *
+diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/amlogic/amlogic-gxl-core.c
+index 6cb33949915f..302b398405e2 100644
+--- a/drivers/crypto/amlogic/amlogic-gxl-core.c
++++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
+@@ -38,11 +38,12 @@ static irqreturn_t meson_irq_handler(int irq, void *data)
+ 				return IRQ_HANDLED;
+ 			}
+ 			dev_err(mc->dev, "%s %d Got irq for flow %d but ctrl is empty\n", __func__, irq, flow);
++			return IRQ_HANDLED; 
+ 		}
  	}
  
- 	/* actual length may be less than dst buffer */
--	akcipher_req->dst_len = len - sizeof(vc_req->status);
-+	if (len < (int)sizeof(vc_req->status)) {
-+		error = -EIO;
-+		goto out;
-+	}
-+	dst_len = len - sizeof(vc_req->status);
-+	if (dst_len > akcipher_req->dst_len) {
-+		error = -EIO;
-+		goto out;
-+	}
-+	akcipher_req->dst_len = dst_len;
- 	sg_copy_from_buffer(akcipher_req->dst, sg_nents(akcipher_req->dst),
- 			    vc_akcipher_req->dst_buf, akcipher_req->dst_len);
-+out:
- 	virtio_crypto_akcipher_finalize_req(vc_akcipher_req, akcipher_req, error);
+ 	dev_err(mc->dev, "%s %d from unknown irq\n", __func__, irq);
+-	return IRQ_HANDLED;
++	return IRQ_NONE;
  }
  
+ static struct meson_alg_template mc_algs[] = {
 -- 
-2.47.3
+2.53.0
 
