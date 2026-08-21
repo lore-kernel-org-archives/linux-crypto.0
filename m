@@ -1,170 +1,89 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB3D3353A8D;
-	Thu, 20 Aug 2026 18:33:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F189475;
+	Fri, 21 Aug 2026 00:03:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787250801; cv=none; b=sYM6Pahvj28n6f+N93bedEI1RiSHlaPOGOnek0nQLv0mWZ0S7pO3w4kH7+RzNphxm1ZPYBvpKiv2SfGe279FsGPMeao4CzwevL9n1zyT8vno3epFEye1qiLsp/S855HTmavFt3oPdPffLpfnN/RKn4Yh5zI+35sU/x8IF2yQ7zM=
+	t=1787270613; cv=none; b=R5QYSMoczMqiIVeoENz+kOHZaaHKEyeNqCG/1xkwIBIt1p6Og3PLSIZTiDc6b03Ty75afNu9FRWanlvKLhELf9PPw6MCyS26YC1tLSsKJ+MGLfYYaATkW7CeGm4Skl+7VjLpONTpmVYzPd4vYdSOVLxbP1GU9m9qau38X8fKRSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787250801; c=relaxed/simple;
-	bh=UqB/dwHwXnZfh2VWnULlLZDFBTlJBsIxh4q8ia4I734=;
+	s=arc-20240116; t=1787270613; c=relaxed/simple;
+	bh=uOVKZFnPH8o5K67dQhSo+RueQptoFuVeeYd5o/6x+7k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WINRKXl+Qsp7hE5IGO7kMzv26pPut4A+gbFQJNUilPTcPKnMp4Jscrd6UkGZbBcT/8AiiT4cHUXH0MbzUzE3ekd/HxoQfpilM31zLSDCDnWXmdYAhcCJdan3QhFjUwZwa3ZDTwew9Lv98PiRsmo5MS4rodZEHAvCVENa45dNau4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G63YqMRk; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=kxL6NVHnQKKTKlaG+L8/NQ+ua87tUkf3PO/NjjBnf0n4Y9IzDKPqvgjF8Y82tRtJ3kB96aE8KF6Cn4j3UY6N6JSoHi0UjQZ/XH6Yr2Wvilg7sqTvP21p4r8vIQHNC8Kv6Ig2XG2j7bio1qr+zse9/awN7PuX/oWI068pVbN89Is=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q5n9wv3U; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G63YqMRk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 498061F00A3D;
-	Thu, 20 Aug 2026 18:33:14 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q5n9wv3U"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 332111F000E9;
+	Fri, 21 Aug 2026 00:03:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787250799;
-	bh=F2dRrOK0MCAkDIp4fOzdetA+pyw32S3jmLYP2LSLceA=;
+	s=k20260515; t=1787270611;
+	bh=ZMOaH3Ifg3zYiZwwfg92Dtd+BEAAcTWCMj96C6OWaGM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=G63YqMRk567nr4M1yDdJ3W23EYScIQs2KKdRE0rYlK58lhQ5DpyHLayaMyJMmRXHQ
-	 UGia96ZnRPcCPP5IEsu4OaonxtfBrQ3T7EugyNSz5PxWYcT1Z7lO6C4gNsiqg5RLAC
-	 SXBjYNc3rWFZdZ1zJw7R99CMDAMOX7fMg74SFNMBoAArSY7RqWBNXlDiDT3+usYvv3
-	 4UB+LEwtBBtmJep/Rxx98BE6mmThlFsSd59ZwZ6QKpIeGUTcWOSpbHYzOQIqXEurNZ
-	 5viu0yUrteUo061aqpEBMemvpYVgCfvHaZM3WeOKhzwxtg50UrO7TYNuWtR9lDtldD
-	 lpuHaN2OJc9CQ==
-Date: Thu, 20 Aug 2026 19:33:12 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Ayush Singh <ayush@beagleboard.org>
-Cc: Jason Kridner <jkridner@beagleboard.org>, robertcnelson@gmail.com,
-	Johan Hovold <johan@kernel.org>, Alex Elder <elder@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
-	Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Daniel Almeida <daniel.almeida@collabora.com>,
-	Tamir Duberstein <tamird@kernel.org>,
-	Alexandre Courbot <acourbot@nvidia.com>,
-	Onur =?iso-8859-1?Q?=D6zkan?= <work@onurozkan.dev>,
-	Eric Biggers <ebiggers@kernel.org>,
+	b=Q5n9wv3UMuIVNNtVKpB/5iBO0z0hHn44PwV1f8lGZiseBX3KpLBrj8LSwLjuHfYVi
+	 2xEJGYCUWNlSAoQGLMTu0n6W7+YVC0xM603C5E4M2LMnRwszD7U7apnB2DH7LyZEEy
+	 MewwkKkgwnfS93c8wliAkPhSz3uStjsRkXD1RiiUjUG7vrTQRZNy8SrkUS6TqjrAvs
+	 S4pQ+3I1A3ZmfLPA3mjgPM08n496rdfLcI0qvucw1QOIw6m8dvjh5j/THArm0ZQWB7
+	 VwghisgiE7f9jIgvXGML7lN8Gz51GaeSryRsFA9A23jXHeHIRHwXiAxVeXF3OF9kBE
+	 kYIzG0zQjDBuw==
+Date: Fri, 21 Aug 2026 03:03:27 +0300
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Eric Biggers <ebiggers@kernel.org>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
 	Ard Biesheuvel <ardb@kernel.org>,
-	Ayush Singh <ayush@beagleboard.com>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, greybus-dev@lists.linaro.org,
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH 7/7] dt-bindings: beagle: Add BeagleConnect Freedom
-Message-ID: <20260820-anytime-barrel-9a0547910a2c@spud>
-References: <20260820-gb-uart-transport-v1-0-282da14ab7b7@beagleboard.org>
- <20260820-gb-uart-transport-v1-7-282da14ab7b7@beagleboard.org>
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Mimi Zohar <zohar@linux.ibm.com>,
+	David Howells <dhowells@redhat.com>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org,
+	keyrings@vger.kernel.org, linux-security-module@vger.kernel.org
+Subject: Re: [PATCH 0/3] lib/crypto: Provide a function for zeroizing
+ hmac_sha1_ctx
+Message-ID: <aoeVz8FsDOEP32M2@kernel.org>
+References: <20260812163336.3103835-1-thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="j2SR/aNcWPdTYXYY"
-Content-Disposition: inline
-In-Reply-To: <20260820-gb-uart-transport-v1-7-282da14ab7b7@beagleboard.org>
-
---j2SR/aNcWPdTYXYY
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20260812163336.3103835-1-thuth@redhat.com>
 
-On Thu, Aug 20, 2026 at 02:55:49PM +0530, Ayush Singh wrote:
-> Add devicetree bindings for the BeagleBoard.org BeagleConnect Freedom,
-> a wireless-enabled board based on the TI CC1352P7. The board exposes an
-> MCU that can be attached to a host over USB, UART, SPI or I2C, and is
-> described as a child node of the corresponding bus.
->=20
-> Signed-off-by: Ayush Singh <ayush@beagleboard.org>
-> ---
->  .../beagle/beagle,beagleconnect-freedom.yaml       | 30 ++++++++++++++++=
-++++++
->  MAINTAINERS                                        |  1 +
->  2 files changed, 31 insertions(+)
->=20
-> diff --git a/Documentation/devicetree/bindings/beagle/beagle,beagleconnec=
-t-freedom.yaml b/Documentation/devicetree/bindings/beagle/beagle,beagleconn=
-ect-freedom.yaml
-> new file mode 100644
-> index 000000000000..5a246f81261e
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/beagle/beagle,beagleconnect-freed=
-om.yaml
-> @@ -0,0 +1,30 @@
-> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/beagle/beagle,beagleconnect-freedom.y=
-aml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: BeagleBoard.org BeagleConnect Freedom
-> +
-> +description:
-> +  The BeagleBoard.org BeagleConnect Freedom board connected over USB, UA=
-RT, SPI or I2C.
-> +
-> +maintainers:
-> +  - Ayush Singh <ayush@beagleboard.org>
-> +
-> +properties:
-> +  compatible:
-> +    const: beagle,beagleconnect-freedom
-
-These compatible only devices always look suspect to me, I feel like
-these things probably at least have an optional regulator if the power
-source for the freedom is provided by the device running linux.
-
-You're also short the required properties for dealing with anything
-other than uart, so spi or i2c. (I assume USB doesn't need devicetree to
-function).
-
-pw-bot: changes-requested
-
-Thanks,
-Conor.
-
-> +
-> +required:
-> +  - compatible
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    serial {
-> +      mcu {
-> +        compatible =3D "beagle,beagleconnect-freedom";
-> +      };
-> +    };
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 037a87b74800..49c6dac72748 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -11338,6 +11338,7 @@ GREYBUS UART NODE DRIVERS
->  M:	Ayush Singh <ayush@beagleboard.com>
->  L:	greybus-dev@lists.linaro.org (moderated for non-subscribers)
->  S:	Maintained
-> +F:	Documentation/devicetree/bindings/beagle/beagle,beagleconnect-freedom=
-=2Eyaml
->  F:	drivers/greybus/gb_uart_node.rs
-> =20
->  GREYBUS SUBSYSTEM
->=20
-> --=20
+On Wed, Aug 12, 2026 at 06:33:33PM +0200, Thomas Huth wrote:
+> It's maybe not worth the effort for hmac_sha1_ctx right now (since there
+> is only one spot that forgot to zeroize the structure in case of errors),
+> but offering a function for zeroizing the data via __cleanup might help to
+> get future code into the proper shape right from the start. Thus let's
+> introduce a hmac_sha1_zeroize_ctx() function now and use it in the
+> appropriate spots.
+> 
+> Thomas Huth (3):
+>   crypto: Provide a wrapper for zeroizing hmac_sha1_ctx
+>   security: keys: trusted: always clear the hmac_sha1_ctx before
+>     returning
+>   lib/crypto: sha1: Use hmac_sha1_zeroize_ctx() instead of
+>     memzero_explicit()
+> 
+>  include/crypto/sha1.h                     | 17 +++++++++++++++++
+>  lib/crypto/sha1.c                         |  2 +-
+>  security/keys/trusted-keys/trusted_tpm1.c |  2 +-
+>  3 files changed, 19 insertions(+), 2 deletions(-)
+> 
+> -- 
 > 2.55.0
->=20
+> 
 
---j2SR/aNcWPdTYXYY
-Content-Type: application/pgp-signature; name=signature.asc
+Looks right to me:
 
------BEGIN PGP SIGNATURE-----
 
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaodIaAAKCRB4tDGHoIJi
-0o4EAQD3MP/GgYlSZSQT6kBtNqBNMlLUCum5/jK7ItWG6lh4QAD/Yyz859M9yNiX
-TGCkKM35r9tRDJyMK2UVSVTiVWQhLg0=
-=nz6B
------END PGP SIGNATURE-----
+For 1-3:
 
---j2SR/aNcWPdTYXYY--
+Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+
+BR, Jarkko
