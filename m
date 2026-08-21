@@ -1,50 +1,55 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F189475;
-	Fri, 21 Aug 2026 00:03:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58983330D25;
+	Fri, 21 Aug 2026 01:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787270613; cv=none; b=R5QYSMoczMqiIVeoENz+kOHZaaHKEyeNqCG/1xkwIBIt1p6Og3PLSIZTiDc6b03Ty75afNu9FRWanlvKLhELf9PPw6MCyS26YC1tLSsKJ+MGLfYYaATkW7CeGm4Skl+7VjLpONTpmVYzPd4vYdSOVLxbP1GU9m9qau38X8fKRSI=
+	t=1787275232; cv=none; b=S6ripbcYR1UJNNtx5chMC9NdaNYjQCJNNeRb9MXZlKg04Q6Rg+S8qUwfDKjxzhP5W8sIIkHGcSWojky0TkmL6CjWdeAxRfXUrg/mJFa7cuM0h8c9uD0Dbqo8DunItbWMPoJ93BXBOR9kDepR1B91qQnWe5LyvG/3bjLfb6INILM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787270613; c=relaxed/simple;
-	bh=uOVKZFnPH8o5K67dQhSo+RueQptoFuVeeYd5o/6x+7k=;
+	s=arc-20240116; t=1787275232; c=relaxed/simple;
+	bh=Tyc9xvTio0v6Z4WuF62UIJtZ90pdoGGzafGUhqEO2V0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kxL6NVHnQKKTKlaG+L8/NQ+ua87tUkf3PO/NjjBnf0n4Y9IzDKPqvgjF8Y82tRtJ3kB96aE8KF6Cn4j3UY6N6JSoHi0UjQZ/XH6Yr2Wvilg7sqTvP21p4r8vIQHNC8Kv6Ig2XG2j7bio1qr+zse9/awN7PuX/oWI068pVbN89Is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q5n9wv3U; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=m2gmMD0JsID1yFnr3m4YhONAzRn1ytbm5r0RKV4t3JepJFq9YoUfgNoRxt0l8lQ0ZUM/AO51DQoe20PzWAKSOuTg0EOZe59FbYhNa8VGhEKMMrd548aiU9P5BvUEGWYT6R3Q21ZF3L5jNHhJGrWR3O5bB2wXfW4/91Mzxf+eS3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iO6uyp1i; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q5n9wv3U"
-Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 332111F000E9;
-	Fri, 21 Aug 2026 00:03:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iO6uyp1i"
+Received: by smtp.kernel.org (Postfix) with UTF8SMTPSA id 871E61F000E9;
+	Fri, 21 Aug 2026 01:20:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787270611;
-	bh=ZMOaH3Ifg3zYiZwwfg92Dtd+BEAAcTWCMj96C6OWaGM=;
+	s=k20260515; t=1787275227;
+	bh=CiKh4CxYC2laF+imBxYpz0FBf3Ank6thUDKWKVrQS14=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Q5n9wv3UMuIVNNtVKpB/5iBO0z0hHn44PwV1f8lGZiseBX3KpLBrj8LSwLjuHfYVi
-	 2xEJGYCUWNlSAoQGLMTu0n6W7+YVC0xM603C5E4M2LMnRwszD7U7apnB2DH7LyZEEy
-	 MewwkKkgwnfS93c8wliAkPhSz3uStjsRkXD1RiiUjUG7vrTQRZNy8SrkUS6TqjrAvs
-	 S4pQ+3I1A3ZmfLPA3mjgPM08n496rdfLcI0qvucw1QOIw6m8dvjh5j/THArm0ZQWB7
-	 VwghisgiE7f9jIgvXGML7lN8Gz51GaeSryRsFA9A23jXHeHIRHwXiAxVeXF3OF9kBE
-	 kYIzG0zQjDBuw==
-Date: Fri, 21 Aug 2026 03:03:27 +0300
+	b=iO6uyp1i6+dhb7CBqosQ0fDCHtNbLkeUaUA4ug10PyzWx0yPRYORo9Y4oP7427jaw
+	 eQPiGMnTpgI7+UcQGYTDqhAK7PrRsUkK0r/yGU9GQ2dTV3VZ2CJeGXw2CHAee9kcCX
+	 R8hCRQiMm7bFsK4J83aWikzlz5zkgw4Hl3bi0n1Ol6StfwNKuxXGmPoBE67S6PmdYB
+	 D+5snVDyn7magYyg/nRgqXyPB7vXaMZCw0QlNEpOi8CdGood4kVs09nfvlSapaut4n
+	 FTKAd1PPuLrffKU7IH5l3fdz2Dw17wfviFarlP5jeqqCgBhZrIDha0+BgjnLZL6+ne
+	 FAPBNAYC7BOcQ==
+Date: Fri, 21 Aug 2026 04:20:23 +0300
 From: Jarkko Sakkinen <jarkko@kernel.org>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Eric Biggers <ebiggers@kernel.org>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
+To: Ard Biesheuvel <ardb@kernel.org>
+Cc: Ross Philipson <ross.philipson@gmail.com>, linux-kernel@vger.kernel.org,
+	x86@kernel.org, linux-integrity@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-efi@vger.kernel.org,
+	"Daniel P. Smith" <dpsmith@apertussolutions.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	"H . Peter Anvin" <hpa@zytor.com>, dave.hansen@linux.intel.com,
+	Matthew Garrett <mjg59@srcf.ucam.org>,
 	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Mimi Zohar <zohar@linux.ibm.com>,
-	David Howells <dhowells@redhat.com>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-integrity@vger.kernel.org,
-	keyrings@vger.kernel.org, linux-security-module@vger.kernel.org
-Subject: Re: [PATCH 0/3] lib/crypto: Provide a function for zeroizing
- hmac_sha1_ctx
-Message-ID: <aoeVz8FsDOEP32M2@kernel.org>
-References: <20260812163336.3103835-1-thuth@redhat.com>
+	peterhuewe@gmx.de, Andy Lutomirski <luto@amacapital.net>,
+	Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+	Jonathan Corbet <corbet@lwn.net>, kanth.ghatraju@oracle.com,
+	daniel.kiper@oracle.com, Andrew Cooper <andrew.cooper3@citrix.com>,
+	trenchboot-devel@googlegroups.com
+Subject: Re: [PATCH v2 10/10] tpm-buf: Add TPM buffer support header for
+ standalone reuse
+Message-ID: <aoen10sB5zflLFRw@kernel.org>
+References: <20260711160110.267780-1-ross.philipson@gmail.com>
+ <20260711160110.267780-11-ross.philipson@gmail.com>
+ <alKI9mUBTOCjPbbG@kernel.org>
+ <f85782ed-efb3-4045-9d37-2ed4847e1500@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,37 +58,35 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260812163336.3103835-1-thuth@redhat.com>
+In-Reply-To: <f85782ed-efb3-4045-9d37-2ed4847e1500@app.fastmail.com>
 
-On Wed, Aug 12, 2026 at 06:33:33PM +0200, Thomas Huth wrote:
-> It's maybe not worth the effort for hmac_sha1_ctx right now (since there
-> is only one spot that forgot to zeroize the structure in case of errors),
-> but offering a function for zeroizing the data via __cleanup might help to
-> get future code into the proper shape right from the start. Thus let's
-> introduce a hmac_sha1_zeroize_ctx() function now and use it in the
-> appropriate spots.
+On Wed, Aug 19, 2026 at 03:50:42PM +0300, Ard Biesheuvel wrote:
 > 
-> Thomas Huth (3):
->   crypto: Provide a wrapper for zeroizing hmac_sha1_ctx
->   security: keys: trusted: always clear the hmac_sha1_ctx before
->     returning
->   lib/crypto: sha1: Use hmac_sha1_zeroize_ctx() instead of
->     memzero_explicit()
 > 
->  include/crypto/sha1.h                     | 17 +++++++++++++++++
->  lib/crypto/sha1.c                         |  2 +-
->  security/keys/trusted-keys/trusted_tpm1.c |  2 +-
->  3 files changed, 19 insertions(+), 2 deletions(-)
+> On Sat, 11 Jul 2026, at 21:18, Jarkko Sakkinen wrote:
+> > On Sat, Jul 11, 2026 at 09:01:10AM -0700, Ross Philipson wrote:
+> >> Extract all the functions and definitions for TPM buffer handling
+> >> and separate them into their own header.
+> >> 
+> >> Signed-off-by: Ross Philipson <ross.philipson@gmail.com>
+> >> ---
+> >>  drivers/char/tpm/tpm-buf.c |  3 +-
+> >>  include/linux/tpm.h        | 34 +--------------------
+> >>  include/linux/tpm_buf.h    | 60 ++++++++++++++++++++++++++++++++++++++
+> >>  3 files changed, 63 insertions(+), 34 deletions(-)
+> >>  create mode 100644 include/linux/tpm_buf.h
+> >> 
+> ...
+> >
+> > I would probably ack them all as I've seen these many times and
+> > there's not much anything new. Just waiting for additional
+> > feedback before applying them.
+> >
 > 
-> -- 
-> 2.55.0
+> Will these be going into v7.3 then?
+> 
 > 
 
-Looks right to me:
-
-
-For 1-3:
-
-Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+I can piggyback them with to my PR and see what Linus thinks.
 
 BR, Jarkko
