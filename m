@@ -1,77 +1,51 @@
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-gw02.astralinux.ru (mail-gw02.astralinux.ru [93.188.205.243])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D19A242D67
-	for <linux-crypto@vger.kernel.org>; Sat, 22 Aug 2026 07:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 525FB34FF79;
+	Sat, 22 Aug 2026 08:39:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.188.205.243
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787383244; cv=none; b=OvdDJTXJBDLp9JJltb/zJQTEH/cEjd9LnESCZyMnTOMRXVSIMqgaSk58vWuHhqCJIusDtv2jLI1GcF9T9wXI/nspxXTyJqFkkhzIOHCw8zwm9ACqjd5Z6EUaGAwjZU/sAea+bLJN0B3zF1V6Sb8tRielQGwyj2ASic6oZbThz6M=
+	t=1787387981; cv=none; b=pCDbkBnmN/sRv0aeSZ1ssyM16ePUO3hrwJzPh4uNMXeuQ7w5oPvOsvaL79xPncjqS4KonQUwt6f7r4o7nOzvISBRXycW4igMH8K6nxZMxXkOjiYMa4QFS+fF2yVs27C2vtF56cVqmtJCni8Vd1DxmJYX/HxKRpalVLPYsCKARSg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787383244; c=relaxed/simple;
-	bh=EMe0O0oAun09g3H2mTNI2xJBzXoNI5N35ldn1EuhJco=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Im/Iq5lTKYcRnkJimD+4eVs8GGgwLMTNn5q0qAHX0QZ4GAcvLqOgAXD5kutiEcwkmAFI2fodj4tm1TbAjZx3Zf3+sH3CqOH71YKmkqRjg1fZDLrxiiIOzFJE06TV2pGhGPrxvuJ5B8yrFvCfFCvNWpKu5ycVvO7b+FxHCym2fPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J11aCbe2; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1787387981; c=relaxed/simple;
+	bh=IByip44c4mzM/PU31oE5SNo2spQ+VThEYwPm17Z08OY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nrqGUT+T3Z4Mtyr+ZFITNKrAVJRPPPGK+YeTpJNhbj1l3/8JkKTF3wjvwVilnrmM9wBNOL7AMihdYebYqrqxw6hNP5vann2f/T/O/RrNGt3V4m1/0QJDFOmRfQeE4N5iz1EJbBDe3M9VL1eo8QywwAkSlJtpdaVVExzlTLONDEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=astralinux.ru; spf=pass smtp.mailfrom=astralinux.ru; dkim=pass (2048-bit key) header.d=astralinux.ru header.i=@astralinux.ru header.b=WNdekIp0; arc=none smtp.client-ip=93.188.205.243
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=astralinux.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=astralinux.ru
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J11aCbe2"
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-38e347638adso1606297a91.0
-        for <linux-crypto@vger.kernel.org>; Sat, 22 Aug 2026 00:20:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787383242; x=1787988042; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=3iQTnt9oJ3v6w7xIpplt3JgJj2kj/4e9mI/GL4WtqJk=;
-        b=J11aCbe2tXDP5EfPVeSTchs8dIS+jthwDW3VJAVXcolxuBaIUF8XYmrp7xgzQAx4Wr
-         lYI0bN77SqEnCL3bEOytMtt1qR5YhHMQ42k7hxTq/DOQK762kcaB+hq1qJQXPC5FvG0q
-         SS65JUgkHLLlJZVa5j4BMu8eKFQxpRjYsVYaW64GO1N0WpMTIqUxDrT+VVyhLgvmkEpc
-         u6aLVhLZYvmmtWU4VArdaKQklT5KfIuBTpkgI3pbsN1r3XwsbuANstD4KvT1aI8IbA12
-         M+wKO9Y72eSIemFZn9tr5UVZIKl34Q5HM07UE2rGGgMYUtzEDQqToT6rDPuvat4ScLfh
-         pO1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787383242; x=1787988042;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=3iQTnt9oJ3v6w7xIpplt3JgJj2kj/4e9mI/GL4WtqJk=;
-        b=flGBa4SBDR73WFDUvXhfbwfTLAH8LSkJjSItZNzX2RbZ6HdhZOKgS2iEbIS0ywO0zT
-         5DgwFNTcDf2JQIjCgbqzmQUPnKSZmqeR9hIFF32q6+17w+VA3Xefci8jQje/OOr8X/jb
-         QuS4H709z8vFiN0kBh0S8nj4Q2CgZDmt+B4z9SrVxozS4Ncmybw2nXJFq8CGcHNwalSM
-         LvFRFZbXnTAVIcBF9fouFC19wOKhnuSHnf6qoaX00Bu4wWHGzATkzEhAQHTJmyLOq6p9
-         mS9LhFVAxfU+7GTFeBI9xd/IiVKwFHKLV76VClh3dLOjWCyYzarVRljdgwnoYpFCWHuK
-         5mwg==
-X-Forwarded-Encrypted: i=1; AHgh+Rp1A5VA+NpVFnAgL/pjPWAiHeg0qr6KQg+2WP7jslvFVaotFw8GPeZBKeX8B3NCMri82TcSSmrlF4dCD5k=@vger.kernel.org
-X-Gm-Message-State: AFuF++mA8kZKNzx3nNGjDOVV2knnwsvjUOM+5IJRYqYzH6SjtXDTVkrq
-	hD/brVSCAVIqx8ojF+tGatyvKUILY8rrouvw8TLEUdNKAW2FRm0T+qtE
-X-Gm-Gg: AR+sD12XcI5fdfNIpDO9Ctds0QiYoU2mhe6Z0voT6+QDgMg/Fs7eSHoH5YkuzxWgwiM
-	8Yc6MNc5GYAwkKR5XcO7wK8lrjbXoc5b9QcNpGZ4R00Ke0XaQY5wv3TSqGWClmaVbl2ipxXs02i
-	SzuuyGB2iDVF8m7bjMusUOxnLrQxr+QGs/4lmDqttj4GFLdsqsY/xdFY3rMig35TZg25r2ktfi4
-	+oH2cgYoIoBn7ml/0tzmpQEpr6uMFxQHHCUCrJRF6hg5NKr2WJmmfspMZsm4OgDYbJcifidXoRg
-	OJ55FZa5ZLbNDEh1CobN3MtBYZkVLOE4MmE2qErbHrIwHWnLbLEl0JjslNCVDDDfHi3VmGsTYjx
-	nsQgfXurrolixvoMLAq2+aaII+OeRkHqlFy+b3zNmNY3k7diBM4YGGQUHuxKFoSuUoYAav83qi9
-	sl2AisJLQf0dsjCvAezMQ+4XCINGlL6sQvGOsgMG6G0rJgZuyX4gtFQRPl23+4a4IKuvZvRfbKN
-	hJu29i1
-X-Received: by 2002:a17:90b:538f:b0:38e:b400:a860 with SMTP id 98e67ed59e1d1-395df29e128mr7734335a91.13.1787383242533;
-        Sat, 22 Aug 2026 00:20:42 -0700 (PDT)
-Received: from kernel ([103.219.206.63])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-327f909a51fsm3290362eec.4.2026.08.22.00.20.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 22 Aug 2026 00:20:42 -0700 (PDT)
-From: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
-To: clabbe@baylibre.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Cc: skhan@linuxfoundation.org,
-	me@brighamcampbell.com,
-	jkoolstra@xs4all.nl,
+	dkim=pass (2048-bit key) header.d=astralinux.ru header.i=@astralinux.ru header.b="WNdekIp0"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=astralinux.ru;
+	s=mail; t=1787387458;
+	bh=IByip44c4mzM/PU31oE5SNo2spQ+VThEYwPm17Z08OY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=WNdekIp0UNQE4ZM1KxhxSmtA7YCPYc0GfORo5thUBCTOtnm+Qgvx0xUX4d9bQfrWT
+	 dBkBN0o6lgFtVnEF0tH7j5Ad6xuOLLnw4DHxgFYk91HnKZ6isIyqwEK5MwOniE+Ieu
+	 KHUWKIRyCX4qG5yxS6GClbOv0Pm0+QM43oNxbuXjXHvMek8Yp9dbqnOnXnWn+2S9++
+	 mne5IiA0TpsOdQ0pUjS5AoV24sDRw4jFvj9jqBU1nGf4Ob+Cnc9regmqwh//CzNj+f
+	 5cr0QGpOnzYP4bbV/N3xfggSAg0641K/r09z7esTrf4jqAlot6o+DMENapURa/iASU
+	 FWLf2OX6lvsbA==
+Received: from gca-msk-a-srv-ksmg01.astralinux.ru (localhost [127.0.0.1])
+	by mail-gw02.astralinux.ru (Postfix) with ESMTP id 6E0BE1F987;
+	Sat, 22 Aug 2026 11:30:58 +0300 (MSK)
+Received: from new-mail.astralinux.ru (unknown [10.205.207.10])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail-gw02.astralinux.ru (Postfix) with ESMTPS;
+	Sat, 22 Aug 2026 11:30:56 +0300 (MSK)
+Received: from astra.astra.ru (unknown [10.198.17.65])
+	by new-mail.astralinux.ru (Postfix) with ESMTPA id 4hRr3h4jy7zrB4;
+	Sat, 22 Aug 2026 11:30:56 +0300 (MSK)
+From: Timofei Novikov <tnovikov@astralinux.ru>
+To: David Howells <dhowells@redhat.com>
+Cc: keyrings@vger.kernel.org,
 	linux-crypto@vger.kernel.org,
-	linux-amlogic@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
-Subject: [PATCH] crypto: amlogic: Fix DMA memory leak in cipher error path
-Date: Sat, 22 Aug 2026 12:50:31 +0530
-Message-ID: <20260822072031.23042-1-raizudeen.kerneldev@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	Timofei Novikov <tnovikov@astralinux.ru>
+Subject: [PATCH 0/3] Add X.509 CRL support
+Date: Sat, 22 Aug 2026 11:26:39 +0300
+Message-ID: <20260822082642.48936-1-tnovikov@astralinux.ru>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -79,67 +53,50 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-KSMG-AntiPhishing: NotDetected
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Envelope-From: tnovikov@astralinux.ru
+X-KSMG-AntiSpam-Info: LuaCore: 116 0.3.116 e16f906af7c720a8bd440e8c76eb19faffaac9ce, {diag_burst_silent}, {Tracking_ml_letters}, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;astralinux.ru:7.1.1;new-mail.astralinux.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiSpam-Lua-Profiles: 205480 [Aug 21 2026]
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Version: 6.1.1.27
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.0.7854, bases: 2026/08/22 08:00:00 #28528350
+X-KSMG-AntiVirus-Status: NotDetected, skipped
+X-KSMG-LinksScanning: NotDetected
+X-KSMG-Message-Action: skipped
+X-KSMG-Rule-ID: 1
 
-In meson_cipher(), if the mapping of the destination scatterlist fails,
-the driver jumps to the end of the function. This skips the unmapping of
-the previously mapped source scatterlist and the key/IV buffer, causing
-a DMA memory leak.
+This series adds X.509 Certificate Revocation List (CRL) parsing with
+indirect CRL support per RFC 5280. Revoked certificates are blacklisted
+using SHA-256 hash of serial+issuer.
 
-Fix this by introducing proper error labels, error_src and error_keyiv
-to unmap the already mapped resources before returning the error.
+The ASN.1 compiler is fixed to handle OPTIONAL fields in SEQUENCE/SET OF
+and TYPE_REF constructs, which is required for the new CRL definitions.
 
-Fixes: 48fe583fe541 ("crypto: amlogic - Add crypto accelerator for amlogic GXL")
-Signed-off-by: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
----
- drivers/crypto/amlogic/amlogic-gxl-cipher.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+Timofei Novikov (3):
+  ASN.1: fix OPTIONAL for SEQUENCE OF and TYPE_REF
+  x509: add CRL parser with indirect CRL support
+  x509: add CRL signature verification support
 
-diff --git a/drivers/crypto/amlogic/amlogic-gxl-cipher.c b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-index 29048da6f50a..fc8569fd83fd 100644
---- a/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-+++ b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-@@ -178,9 +178,9 @@ static int meson_cipher(struct skcipher_request *areq)
- 		nr_sgs = dma_map_sg(mc->dev, areq->src, sg_nents(areq->src),
- 				    DMA_BIDIRECTIONAL);
- 		if (!nr_sgs) {
--			dev_err(mc->dev, "Invalid SG count %d\n", nr_sgs);
-+			dev_err(mc->dev, "Invalid BIDIR SG count %d\n", nr_sgs);
- 			err = -EINVAL;
--			goto theend;
-+			goto error_keyiv;
- 		}
- 		nr_sgd = nr_sgs;
- 	} else {
-@@ -189,14 +189,14 @@ static int meson_cipher(struct skcipher_request *areq)
- 		if (!nr_sgs || nr_sgs > MAXDESC - 3) {
- 			dev_err(mc->dev, "Invalid SG count %d\n", nr_sgs);
- 			err = -EINVAL;
--			goto theend;
-+			goto error_keyiv;
- 		}
- 		nr_sgd = dma_map_sg(mc->dev, areq->dst, sg_nents(areq->dst),
- 				    DMA_FROM_DEVICE);
- 		if (!nr_sgd || nr_sgd > MAXDESC - 3) {
- 			dev_err(mc->dev, "Invalid SG count %d\n", nr_sgd);
- 			err = -EINVAL;
--			goto theend;
-+			goto error_src;
- 		}
- 	}
- 
-@@ -251,6 +251,12 @@ static int meson_cipher(struct skcipher_request *areq)
- 						 ivsize, 0);
- 		}
- 	}
-+	goto theend;
-+
-+error_src:
-+	dma_unmap_sg(mc->dev, areq->src, sg_nents(areq->src), DMA_TO_DEVICE);
-+error_keyiv:
-+	dma_unmap_single(mc->dev, phykeyiv, keyivlen, DMA_TO_DEVICE);
- theend:
- 	kfree_sensitive(bkeyiv);
- 	kfree_sensitive(backup_iv);
+ certs/blacklist.c                         |  17 ++-
+ crypto/asymmetric_keys/Makefile           |   8 +-
+ crypto/asymmetric_keys/x509_cert_parser.c | 132 ++++++++++++++++++++++
+ crypto/asymmetric_keys/x509_crl.asn1      |  59 ++++++++++
+ crypto/asymmetric_keys/x509_idp.asn1      |  12 ++
+ crypto/asymmetric_keys/x509_loader.c      | 113 ++++++++++++++++++
+ crypto/asymmetric_keys/x509_parser.h      |  18 +++
+ crypto/asymmetric_keys/x509_public_key.c  |  21 ++++
+ include/keys/asymmetric-type.h            |   4 +
+ include/keys/system_keyring.h             |   2 +
+ include/linux/oid_registry.h              |   4 +
+ scripts/asn1_compiler.c                   |  12 +-
+ 12 files changed, 395 insertions(+), 7 deletions(-)
+ create mode 100644 crypto/asymmetric_keys/x509_crl.asn1
+ create mode 100644 crypto/asymmetric_keys/x509_idp.asn1
+
 -- 
-2.53.0
+2.43.0
 
