@@ -1,110 +1,145 @@
-Received: from oss.cyber.gouv.fr (oss.cyber.gouv.fr [51.159.188.251])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F12AE4078EE;
-	Fri, 21 Aug 2026 19:25:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.159.188.251
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D19A242D67
+	for <linux-crypto@vger.kernel.org>; Sat, 22 Aug 2026 07:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787340337; cv=none; b=iC5esqJgDSSspFmbTwLNnN4NUP+gnb+6a2bfIcKnR/bqklMeEtGsl+szQC83TCkMXGK9Nt3CDn9l3XNBkwOd26QXiiST0ycg6MODhwXCUqrJR9w+M1rhj4DbvtIkTJ1LFxEjynowBtrLmxeB+AokwZOViJfeXOo7ICojrxEL/tE=
+	t=1787383244; cv=none; b=OvdDJTXJBDLp9JJltb/zJQTEH/cEjd9LnESCZyMnTOMRXVSIMqgaSk58vWuHhqCJIusDtv2jLI1GcF9T9wXI/nspxXTyJqFkkhzIOHCw8zwm9ACqjd5Z6EUaGAwjZU/sAea+bLJN0B3zF1V6Sb8tRielQGwyj2ASic6oZbThz6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787340337; c=relaxed/simple;
-	bh=coC1wJYIa/Bk7cJ+Ao+mMXF5jUAofNGH5WfceLQBpBc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AVmt5b4ShT8cJrGB9UiCPuiiyjC1IZf+SzDmi/ALkozTyx5Y/4NL0HPqLODPEPa87AHZEGgRhivMkPGNuY3dtTktAW5yCb0k3DHd9ebK67H24pnNqXaGcx52aCfvaTfCgQZV6g8+Ssob55vByECYxMAvyn9xREIIBi/QhkbWyxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr; spf=pass smtp.mailfrom=oss.cyber.gouv.fr; dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b=RWnMcxyM; arc=none smtp.client-ip=51.159.188.251
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.cyber.gouv.fr
+	s=arc-20240116; t=1787383244; c=relaxed/simple;
+	bh=EMe0O0oAun09g3H2mTNI2xJBzXoNI5N35ldn1EuhJco=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Im/Iq5lTKYcRnkJimD+4eVs8GGgwLMTNn5q0qAHX0QZ4GAcvLqOgAXD5kutiEcwkmAFI2fodj4tm1TbAjZx3Zf3+sH3CqOH71YKmkqRjg1fZDLrxiiIOzFJE06TV2pGhGPrxvuJ5B8yrFvCfFCvNWpKu5ycVvO7b+FxHCym2fPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J11aCbe2; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b="RWnMcxyM"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=oss.cyber.gouv.fr; s=default; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=SrtsCDy6dLoKwXxO7io5lmiObGVJLfwxHYxffavVPKQ=; b=RWnMcxyMvabDzvJgmfKS0rPTpm
-	UHVE+6yY/9sUH9R1pnYtNhlQULNxdIghDRv6gEHggVr46ZJo2opNIsdUdQQULdcY0lSOUc5PLmK0N
-	3hibkW6VjQ41hXhXWdkHhiwmXZr5UBo1eojhWLtWNchgWUoBHRIyYRg2apIkuarHCQWNlS1PmxfYQ
-	LYN+zgyZOdGuAGPqMeh4xw2UP15md2kJZx2BOWhxUuOorTv7ZZcZZ6Q6mqXKVGTVliJGE+A86FDeq
-	7o+nV/yNnoshbaxDkOPossvWlBtiuuzX4Hu55r31XHLgjAxnPZEM6gG3ChNt7V28wD3KAEFcHPqu/
-	pa4xFVhQ==;
-Received: from [151.115.150.205] (port=42692 helo=gepetto..)
-	by pf-012.whm.fr-par.scw.cloud with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.99.5)
-	(envelope-from <Jeremy.Jean@oss.cyber.gouv.fr>)
-	id 1wxUrs-0000000DdqK-49Dd;
-	Fri, 21 Aug 2026 21:25:32 +0200
-From: =?UTF-8?q?J=C3=A9r=C3=A9my=20Jean?= <Jeremy.Jean@oss.cyber.gouv.fr>
-To: David Howells <dhowells@redhat.com>,
-	Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@linux.win>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	keyrings@vger.kernel.org,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J11aCbe2"
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-38e347638adso1606297a91.0
+        for <linux-crypto@vger.kernel.org>; Sat, 22 Aug 2026 00:20:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787383242; x=1787988042; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=3iQTnt9oJ3v6w7xIpplt3JgJj2kj/4e9mI/GL4WtqJk=;
+        b=J11aCbe2tXDP5EfPVeSTchs8dIS+jthwDW3VJAVXcolxuBaIUF8XYmrp7xgzQAx4Wr
+         lYI0bN77SqEnCL3bEOytMtt1qR5YhHMQ42k7hxTq/DOQK762kcaB+hq1qJQXPC5FvG0q
+         SS65JUgkHLLlJZVa5j4BMu8eKFQxpRjYsVYaW64GO1N0WpMTIqUxDrT+VVyhLgvmkEpc
+         u6aLVhLZYvmmtWU4VArdaKQklT5KfIuBTpkgI3pbsN1r3XwsbuANstD4KvT1aI8IbA12
+         M+wKO9Y72eSIemFZn9tr5UVZIKl34Q5HM07UE2rGGgMYUtzEDQqToT6rDPuvat4ScLfh
+         pO1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787383242; x=1787988042;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=3iQTnt9oJ3v6w7xIpplt3JgJj2kj/4e9mI/GL4WtqJk=;
+        b=flGBa4SBDR73WFDUvXhfbwfTLAH8LSkJjSItZNzX2RbZ6HdhZOKgS2iEbIS0ywO0zT
+         5DgwFNTcDf2JQIjCgbqzmQUPnKSZmqeR9hIFF32q6+17w+VA3Xefci8jQje/OOr8X/jb
+         QuS4H709z8vFiN0kBh0S8nj4Q2CgZDmt+B4z9SrVxozS4Ncmybw2nXJFq8CGcHNwalSM
+         LvFRFZbXnTAVIcBF9fouFC19wOKhnuSHnf6qoaX00Bu4wWHGzATkzEhAQHTJmyLOq6p9
+         mS9LhFVAxfU+7GTFeBI9xd/IiVKwFHKLV76VClh3dLOjWCyYzarVRljdgwnoYpFCWHuK
+         5mwg==
+X-Forwarded-Encrypted: i=1; AHgh+Rp1A5VA+NpVFnAgL/pjPWAiHeg0qr6KQg+2WP7jslvFVaotFw8GPeZBKeX8B3NCMri82TcSSmrlF4dCD5k=@vger.kernel.org
+X-Gm-Message-State: AFuF++mA8kZKNzx3nNGjDOVV2knnwsvjUOM+5IJRYqYzH6SjtXDTVkrq
+	hD/brVSCAVIqx8ojF+tGatyvKUILY8rrouvw8TLEUdNKAW2FRm0T+qtE
+X-Gm-Gg: AR+sD12XcI5fdfNIpDO9Ctds0QiYoU2mhe6Z0voT6+QDgMg/Fs7eSHoH5YkuzxWgwiM
+	8Yc6MNc5GYAwkKR5XcO7wK8lrjbXoc5b9QcNpGZ4R00Ke0XaQY5wv3TSqGWClmaVbl2ipxXs02i
+	SzuuyGB2iDVF8m7bjMusUOxnLrQxr+QGs/4lmDqttj4GFLdsqsY/xdFY3rMig35TZg25r2ktfi4
+	+oH2cgYoIoBn7ml/0tzmpQEpr6uMFxQHHCUCrJRF6hg5NKr2WJmmfspMZsm4OgDYbJcifidXoRg
+	OJ55FZa5ZLbNDEh1CobN3MtBYZkVLOE4MmE2qErbHrIwHWnLbLEl0JjslNCVDDDfHi3VmGsTYjx
+	nsQgfXurrolixvoMLAq2+aaII+OeRkHqlFy+b3zNmNY3k7diBM4YGGQUHuxKFoSuUoYAav83qi9
+	sl2AisJLQf0dsjCvAezMQ+4XCINGlL6sQvGOsgMG6G0rJgZuyX4gtFQRPl23+4a4IKuvZvRfbKN
+	hJu29i1
+X-Received: by 2002:a17:90b:538f:b0:38e:b400:a860 with SMTP id 98e67ed59e1d1-395df29e128mr7734335a91.13.1787383242533;
+        Sat, 22 Aug 2026 00:20:42 -0700 (PDT)
+Received: from kernel ([103.219.206.63])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-327f909a51fsm3290362eec.4.2026.08.22.00.20.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 22 Aug 2026 00:20:42 -0700 (PDT)
+From: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
+To: clabbe@baylibre.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: skhan@linuxfoundation.org,
+	me@brighamcampbell.com,
+	jkoolstra@xs4all.nl,
 	linux-crypto@vger.kernel.org,
-	=?UTF-8?q?J=C3=A9r=C3=A9my=20Jean?= <Jeremy.Jean@oss.cyber.gouv.fr>
-Subject: [PATCH] crypto: asymmetric_keys: copy X.509 TBS for data signature algorithms
-Date: Fri, 21 Aug 2026 19:25:03 +0000
-Message-ID: <20260821192502.3942767-2-Jeremy.Jean@oss.cyber.gouv.fr>
-X-Mailer: git-send-email 2.47.3
+	linux-amlogic@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
+Subject: [PATCH] crypto: amlogic: Fix DMA memory leak in cipher error path
+Date: Sat, 22 Aug 2026 12:50:31 +0530
+Message-ID: <20260822072031.23042-1-raizudeen.kerneldev@gmail.com>
+X-Mailer: git-send-email 2.53.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - pf-012.whm.fr-par.scw.cloud
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - oss.cyber.gouv.fr
-X-Get-Message-Sender-Via: pf-012.whm.fr-par.scw.cloud: authenticated_id: jeremy.jean@oss.cyber.gouv.fr
-X-Authenticated-Sender: pf-012.whm.fr-par.scw.cloud: jeremy.jean@oss.cyber.gouv.fr
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
 
-For signature algorithms operating on a message rather than a digest,
-x509_get_sig_params() points sig->m directly into cert->tbs.
-cert->tbs is the preparsed add_key() payload.  The syscall wipes and frees
-it on return, while the instantiated key retains public_key_signature.
+In meson_cipher(), if the mapping of the destination scatterlist fails,
+the driver jumps to the end of the function. This skips the unmapping of
+the previously mapped source scatterlist and the key/IV buffer, causing
+a DMA memory leak.
 
-A later KEYCTL_LINK into an asymmetric restricted keyring therefore passes
-a dangling message pointer to ML-DSA.  KASAN reports a slab-use-after-free
-in mldsa_verify(), with allocation and free provenance both leading to
-__do_sys_add_key().  Reuse is also an integrity issue: bytes occupying the
-freed object become the authenticated message instead of the certificate's
-own TBSCertificate.
+Fix this by introducing proper error labels, error_src and error_keyiv
+to unmap the already mapped resources before returning the error.
 
-Give the signature object its own copy of the TBS, as is already done for
-a precomputed digest, and release it through the existing m_free contract.
-
-Fixes: f3eccecd782d ("pkcs7: Allow the signing algo to do whatever digestion it wants itself")
-Signed-off-by: Jérémy Jean <Jeremy.Jean@oss.cyber.gouv.fr>
-Assisted-by: Codex:gpt-5
+Fixes: 48fe583fe541 ("crypto: amlogic - Add crypto accelerator for amlogic GXL")
+Signed-off-by: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
 ---
- crypto/asymmetric_keys/x509_public_key.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ drivers/crypto/amlogic/amlogic-gxl-cipher.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
-index 25cf8ac..5c9165a 100644
---- a/crypto/asymmetric_keys/x509_public_key.c
-+++ b/crypto/asymmetric_keys/x509_public_key.c
-@@ -53,9 +53,11 @@ int x509_get_sig_params(struct x509_certificate *cert)
- 
- 	if (sig->algo_takes_data) {
- 		/* The signature algorithm does whatever passes for hashing. */
--		sig->m = (u8 *)cert->tbs;
-+		sig->m = kmemdup(cert->tbs, cert->tbs_size, GFP_KERNEL);
-+		if (!sig->m)
-+			return -ENOMEM;
- 		sig->m_size = cert->tbs_size;
--		sig->m_free = false;
-+		sig->m_free = true;
- 		goto out;
+diff --git a/drivers/crypto/amlogic/amlogic-gxl-cipher.c b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
+index 29048da6f50a..fc8569fd83fd 100644
+--- a/drivers/crypto/amlogic/amlogic-gxl-cipher.c
++++ b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
+@@ -178,9 +178,9 @@ static int meson_cipher(struct skcipher_request *areq)
+ 		nr_sgs = dma_map_sg(mc->dev, areq->src, sg_nents(areq->src),
+ 				    DMA_BIDIRECTIONAL);
+ 		if (!nr_sgs) {
+-			dev_err(mc->dev, "Invalid SG count %d\n", nr_sgs);
++			dev_err(mc->dev, "Invalid BIDIR SG count %d\n", nr_sgs);
+ 			err = -EINVAL;
+-			goto theend;
++			goto error_keyiv;
+ 		}
+ 		nr_sgd = nr_sgs;
+ 	} else {
+@@ -189,14 +189,14 @@ static int meson_cipher(struct skcipher_request *areq)
+ 		if (!nr_sgs || nr_sgs > MAXDESC - 3) {
+ 			dev_err(mc->dev, "Invalid SG count %d\n", nr_sgs);
+ 			err = -EINVAL;
+-			goto theend;
++			goto error_keyiv;
+ 		}
+ 		nr_sgd = dma_map_sg(mc->dev, areq->dst, sg_nents(areq->dst),
+ 				    DMA_FROM_DEVICE);
+ 		if (!nr_sgd || nr_sgd > MAXDESC - 3) {
+ 			dev_err(mc->dev, "Invalid SG count %d\n", nr_sgd);
+ 			err = -EINVAL;
+-			goto theend;
++			goto error_src;
+ 		}
  	}
  
+@@ -251,6 +251,12 @@ static int meson_cipher(struct skcipher_request *areq)
+ 						 ivsize, 0);
+ 		}
+ 	}
++	goto theend;
++
++error_src:
++	dma_unmap_sg(mc->dev, areq->src, sg_nents(areq->src), DMA_TO_DEVICE);
++error_keyiv:
++	dma_unmap_single(mc->dev, phykeyiv, keyivlen, DMA_TO_DEVICE);
+ theend:
+ 	kfree_sensitive(bkeyiv);
+ 	kfree_sensitive(backup_iv);
 -- 
-2.47.3
+2.53.0
 
