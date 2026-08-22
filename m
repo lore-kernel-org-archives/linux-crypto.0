@@ -1,170 +1,110 @@
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from oss.cyber.gouv.fr (oss.cyber.gouv.fr [51.159.188.251])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D2F137FF53
-	for <linux-crypto@vger.kernel.org>; Sat, 22 Aug 2026 08:45:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 820A738399B;
+	Sat, 22 Aug 2026 21:27:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.159.188.251
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787388328; cv=none; b=Kxbn3JNMYSMxzWcjB/YtQnYMmQdAYsNEDslLvz5RJQsOkCJjcSi+a5F5Mp8TAo7fQuzOalrJJ9vNiIQT+u0ADFBB87Oro5EZG9YlfoKF9tIIo6qtSU/6lS3BUzWaMpI92VYxbOqSeUnwlIRM5hve2uwLp1IG1U/BwKWV07P0P6M=
+	t=1787434079; cv=none; b=JN3Y4P/E8FzGoLBFnKIaNHyVkyZhJMuQJEXAiq1SLpeEXklfWfzl+KVf6pawyhr3inf3HO5sO7Xr/Kqnm7litZc93KL37NHxtD8yIZYrjrg7891u6zbsFMFOStoy1kZWmEl9vPghosyTHEP+r/LjLFDBV30iWh7n1NKtMRukFmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787388328; c=relaxed/simple;
-	bh=LgJkC43UU3SzSb36mlfID1pfqacnkEZzBSfIu4rC31s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u4HKXn3itf9VL64VV+5tZU26fUVQHwLadN1XIAepBPaVZCIxsg8U+vvQaIw7BhthRLP5T+Svox3ZORFQM+4Suqnh02jyJo3DbNFvsmfQI41RXFdwWvT418EaewY4HsxBPz+1qJiBVBKMUGqGCwt6EjLXaFbbOdKsR1ewOvRWkQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=s6G0g6zW; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1787434079; c=relaxed/simple;
+	bh=RnvMjwr8PrhWW9LFmWiMs3Dz9ie40MXJYLQTRQlMpes=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=J8qrImY2tAoQWELyA/VxrRuSEzv9IJVdlqNRRxnHsJTwaulPqlRq0yiXpF9AyTvMtlxsrtdf7Co0Rnp3xqHqiu2KuM5Pcaw3i+K8cqm5bCgS4d6bETF9J5dWQgJQh5VzFCN94Vd+opyJK8yG7i91haa3ITR5W8pgYo+hLaZGUpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr; spf=pass smtp.mailfrom=oss.cyber.gouv.fr; dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b=BS21dDip; arc=none smtp.client-ip=51.159.188.251
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.cyber.gouv.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s6G0g6zW"
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-38dcbade417so1998215a91.1
-        for <linux-crypto@vger.kernel.org>; Sat, 22 Aug 2026 01:45:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787388317; x=1787993117; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=74796tnDJ+NCSB9SFK75OzCa7nSnHKFX91lyqQmVcl4=;
-        b=s6G0g6zWw+apEkNtqjMobA2qTbrVxYYeF9LLSPPPXbpT/rvgRTVcxDZkMcvajQ/SQv
-         PGPh1sYbK+qww7gDT0BPuSbGCI120yagdMik4/JwWd2O04WaZGziHY21p8V60+MsWgge
-         u7tdZmUDdvG8sct45n/N3ZWBHPLwq42Md7AIozTLLRSetCmzMOztkNWPUb/BAhu+M/id
-         iySj3ndnjTY96h4D8wwZ6tDme3SHolDolAz2cWY8ZTXdYQ3ULnuh7j84FqZfg2fcnOYj
-         EHlIf7P1ZoOLWpyijZ7zlKUjIPr1swv/xt39yvgzYhGUPW6fOJWGjTXxqj7KPNCJTl7N
-         yNIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787388317; x=1787993117;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=74796tnDJ+NCSB9SFK75OzCa7nSnHKFX91lyqQmVcl4=;
-        b=hmncjzkdrSBrAwLwE52WIgj+y92UaKVEe+OYIxn9BaOCCZPVTodLRVfzCBwbIR7Sz2
-         cULeU5v/qUE4q0meDpUa8b/xyW7YtZqbDKahvaGVuq2ZoRHN6lS/w9WxAS+b3niNiz+9
-         3pwD6NWnDyzJj3I/jOB7niAQUmI8q9HQNa27SSjWMbEHJs4nchsTDEfZZUe4PlYzKQgd
-         10PocvVpPTTxlP1pUn5skJTmbogzipF8AJCexto4CJ109WVnE6SzZto96EHdUxNjrNIS
-         1q9rc9ZqvNEREKGPyHm1QlyrOiYIP3Mr9qd4j+1416PBvKezislCNVjR62LdWQnRHeoU
-         PfWw==
-X-Forwarded-Encrypted: i=1; AHgh+RoGSUjKhfTHqToL/nfQBVGomSitxfXNx1h1f+FPctSRfQ/0d9bVU6OykSScpgSXUoXZyetksTnl3lNAQC4=@vger.kernel.org
-X-Gm-Message-State: AFuF++kLTK62XBqO5TFB735yX/vLv/9FFIW+vWGa4LkM84n4E/SHD17i
-	dBUMHT2a1GLesKsBEBSMgTyoHtgDhH1UNfs9UTlqg8Wa0TEV2PdDGmZq
-X-Gm-Gg: AR+sD13VkY3XKUCRs04p6Ar0zWknDrDbiNlYqW4kaiUoCipp+aA8iPE2V5OegUyHxvq
-	e3Vy+yVYty+LDoPR61uZuffDvTgcG2jj78cyTNWC4TyDcCJgY0AjQUEkq0g9mhB9QQltAqPjZzd
-	67H412+EpqWKBk3ImK+0MKC3pGWFsj8pyAw9/OdhpRnEuofOzK4T4IFv28Tk/j0VxMYxzI1B7jl
-	TTiFWdoEhHQTfBumM+m9LkjLWYTnlGWubF5khYSRwHLM3cNb9J8jP2SB51/K2jyMAHDelB/DG/p
-	RIAWvUmHSgSwZxkLbzRgGE6yNx/MgMMN5ue6UuuxdylUlSRZI/TIfgSKSIpzkkV92IQ7Q/a+HEU
-	ZkxFcki4IwqRcfZs1J3yOius8dXqiWPfGzbgv/WrQ1s/ihJApNqAmA7ifuJQTPg1SNeoZjVCO8G
-	9Cfrm9EfsRac9XB8iTGMwq35ipxozCtSD20RgzpFWBIdfMvqRYy0MXiS65XBikD9jq7tef5QnLR
-	Qf+qoSs
-X-Received: by 2002:a17:90a:ec8e:b0:38e:c7b0:84ad with SMTP id 98e67ed59e1d1-395c2f2a10bmr22322171a91.0.1787388317445;
-        Sat, 22 Aug 2026 01:45:17 -0700 (PDT)
-Received: from kernel ([103.219.206.63])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-327f909c6c9sm5467855eec.6.2026.08.22.01.45.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 22 Aug 2026 01:45:16 -0700 (PDT)
-From: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
-To: clabbe@baylibre.com,
+	dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b="BS21dDip"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=oss.cyber.gouv.fr; s=default; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=O2YyWvFNr3UAThA2597Fy+8bbmZ6au5P3Q7Z73hQufU=; b=BS21dDipKKnv/pLHJZTLcD9oFT
+	zPCLXIDWIs9asXvqpNunk+5yTQSEGDC2nvGdmCw9IG2BzxrdSSm17zy3tXh3vWDsGnXYLW8e4wMvU
+	tQsf0pZWPX6q5pAMPpb7lh4bpJih/YDS0KFH7bfW7fgX1XINpMc5yjj7k/MNv7twWW/Uhcyrnr/VM
+	LXtDScw+W+r/jONi1EuBMhLcHTX6UrsJOy1rVG9xlGHY8jiiV26ZgWuBGrPCUZMz1ZTI9IhAkWI7c
+	ERlkLUuzWEUFscnp1dXLoNIIvYlefTjgE1C7uSU9O/+miftPqWLce7L2Gjy+jTx1knqKZJsQgCtlp
+	YRAK44jw==;
+Received: from [151.115.150.205] (port=40898 helo=gepetto..)
+	by pf-012.whm.fr-par.scw.cloud with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.99.5)
+	(envelope-from <Jeremy.Jean@oss.cyber.gouv.fr>)
+	id 1wxtFu-00000002bTA-0eVE;
+	Sat, 22 Aug 2026 23:27:56 +0200
+From: =?UTF-8?q?J=C3=A9r=C3=A9my=20Jean?= <Jeremy.Jean@oss.cyber.gouv.fr>
+To: dhowells@redhat.com,
+	lukas@wunner.de,
+	ignat@linux.win,
 	herbert@gondor.apana.org.au,
 	davem@davemloft.net
-Cc: skhan@linuxfoundation.org,
-	me@brighamcampbell.com,
-	jkoolstra@xs4all.nl,
+Cc: keyrings@vger.kernel.org,
 	linux-crypto@vger.kernel.org,
-	linux-amlogic@lists.infradead.org,
+	linux-modules@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
-Subject: [PATCH v2] crypto: amlogic: Fix DMA memory leak in cipher error path
-Date: Sat, 22 Aug 2026 14:15:08 +0530
-Message-ID: <20260822084509.26385-1-raizudeen.kerneldev@gmail.com>
-X-Mailer: git-send-email 2.53.0
+	=?UTF-8?q?J=C3=A9r=C3=A9my=20Jean?= <Jeremy.Jean@oss.cyber.gouv.fr>
+Subject: [PATCH] pkcs7: Check all signers before waiving authattrs rejection
+Date: Sat, 22 Aug 2026 21:27:04 +0000
+Message-ID: <20260822212703.1019792-2-Jeremy.Jean@oss.cyber.gouv.fr>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - pf-012.whm.fr-par.scw.cloud
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - oss.cyber.gouv.fr
+X-Get-Message-Sender-Via: pf-012.whm.fr-par.scw.cloud: authenticated_id: jeremy.jean@oss.cyber.gouv.fr
+X-Authenticated-Sender: pf-012.whm.fr-par.scw.cloud: jeremy.jean@oss.cyber.gouv.fr
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-A DMA memory leak occurs in meson_cipher() on the mapping error paths.
-The driver jumps to the end of the function without unmapping the
-previously mapped source scatterlist and key/IV buffer when the
-destination apping fails.
+pkcs7_check_authattrs() only looks at the first SignerInfo when deciding
+whether rejection of authenticated attributes may be waived.  For the
+remaining signers it checks only that authenticated attributes are either
+present on all signers or absent from all of them.
 
-Additionally, a memory leak occurs when a scatterlist mapping succeeds
-but the returned count exceeds the driver's MAXDESC limit. In this case,
-the driver rejects the mapping without unmapping it. The BIDIRECTIONAL
-mapping branch also lacks the required 'MAXDESC -3' upper bound check.
+This means an unmatched ML-DSA signer can be placed first, followed by a
+trusted RSA, ECDSA, or ECRDSA signer.  Verification skips the unmatched
+signature and accepts the later trusted signer.  The first signer still
+leaves the waiver enabled for the whole message, so the non-ML-DSA signer
+can use an exception intended only for ML-DSA.
 
-Fix this by introducing proper error labels, error_src and error_keyiv
-and unmap resources immediately inside the calidation checks to ensure
-all successfully mapped resources are cleaned up before returning the
-error.
+Check each SignerInfo's public-key algorithm before leaving the waiver
+enabled.
 
-Fixes: 48fe583fe541 ("crypto: amlogic - Add crypto accelerator for amlogic GXL")
-Signed-off-by: Mohamad Raizudeen <raizudeen.kerneldev@gmail.com>
+Fixes: 91db696adea4 ("pkcs7: Allow authenticatedAttributes for ML-DSA")
+Assisted-by: Codex:gpt-5
+Signed-off-by: Jérémy Jean <Jeremy.Jean@oss.cyber.gouv.fr>
 ---
-Changes in v2:
-- Add missing '> MAXDESC - 3' upper bound check for the BIDIRECTIONAL
-  scatterlist mapping branch.
-- Unmap scatterlists immediately inside the 'if' block when the count
-  exceeds MAXDESC - 3, because dma_map_sg() actually succeeds in this
-  case and the mapping must be undone.
+ crypto/asymmetric_keys/pkcs7_parser.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
- drivers/crypto/amlogic/amlogic-gxl-cipher.c | 25 ++++++++++++++++-----
- 1 file changed, 20 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/crypto/amlogic/amlogic-gxl-cipher.c b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-index 29048da6f50a..39b44ec89997 100644
---- a/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-+++ b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-@@ -177,10 +177,13 @@ static int meson_cipher(struct skcipher_request *areq)
- 	if (areq->src == areq->dst) {
- 		nr_sgs = dma_map_sg(mc->dev, areq->src, sg_nents(areq->src),
- 				    DMA_BIDIRECTIONAL);
--		if (!nr_sgs) {
--			dev_err(mc->dev, "Invalid SG count %d\n", nr_sgs);
-+		if (!nr_sgs || nr_sgs > MAXDESC - 3) {
-+			dev_err(mc->dev, "Invalid BIDIR SG count %d\n", nr_sgs);
- 			err = -EINVAL;
--			goto theend;
-+			
-+			if (nr_sgs)
-+				dma_unmap_sg(mc->dev, areq->src, sg_nents(areq->src), DMA_BIDIRECTIONAL);
-+			goto error_keyiv;
- 		}
- 		nr_sgd = nr_sgs;
- 	} else {
-@@ -189,14 +192,20 @@ static int meson_cipher(struct skcipher_request *areq)
- 		if (!nr_sgs || nr_sgs > MAXDESC - 3) {
- 			dev_err(mc->dev, "Invalid SG count %d\n", nr_sgs);
- 			err = -EINVAL;
--			goto theend;
-+
-+			if (nr_sgs)
-+				dma_unmap_sg(mc->dev, areq->src, sg_nents(areq->src), DMA_TO_DEVICE);
-+			goto error_keyiv;
- 		}
- 		nr_sgd = dma_map_sg(mc->dev, areq->dst, sg_nents(areq->dst),
- 				    DMA_FROM_DEVICE);
- 		if (!nr_sgd || nr_sgd > MAXDESC - 3) {
- 			dev_err(mc->dev, "Invalid SG count %d\n", nr_sgd);
- 			err = -EINVAL;
--			goto theend;
-+
-+			if (nr_sgd)
-+				dma_unmap_sg(mc->dev, areq->dst, sg_nents(areq->dst), DMA_FROM_DEVICE);
-+			goto error_src;
- 		}
- 	}
+diff --git a/crypto/asymmetric_keys/pkcs7_parser.c b/crypto/asymmetric_keys/pkcs7_parser.c
+index 6e3ffda..7f00e45 100644
+--- a/crypto/asymmetric_keys/pkcs7_parser.c
++++ b/crypto/asymmetric_keys/pkcs7_parser.c
+@@ -111,6 +111,12 @@ static int pkcs7_check_authattrs(struct pkcs7_message *msg)
+ 		if (!!sinfo->authattrs != want)
+ 			goto inconsistent;
  
-@@ -251,6 +260,12 @@ static int meson_cipher(struct skcipher_request *areq)
- 						 ivsize, 0);
- 		}
- 	}
-+	goto theend;
++#ifdef CONFIG_PKCS7_WAIVE_AUTHATTRS_REJECTION_FOR_MLDSA
++		if (sinfo->authattrs &&
++		    strncmp(sinfo->sig->pkey_algo, "mldsa", 5) != 0)
++			msg->authattrs_rej_waivable = false;
++#endif
 +
-+error_src:
-+	dma_unmap_sg(mc->dev, areq->src, sg_nents(areq->src), DMA_TO_DEVICE);
-+error_keyiv:
-+	dma_unmap_single(mc->dev, phykeyiv, keyivlen, DMA_TO_DEVICE);
- theend:
- 	kfree_sensitive(bkeyiv);
- 	kfree_sensitive(backup_iv);
+ 		if (!sinfo->authattrs &&
+ 		    sinfo->sig->algo_takes_data)
+ 			sinfo->sig->hash_algo = "none";
 -- 
-2.53.0
+2.47.3
 
