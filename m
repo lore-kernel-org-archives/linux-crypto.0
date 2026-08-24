@@ -1,110 +1,134 @@
-Received: from oss.cyber.gouv.fr (oss.cyber.gouv.fr [51.159.188.251])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 820A738399B;
-	Sat, 22 Aug 2026 21:27:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.159.188.251
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C8BE3F3285
+	for <linux-crypto@vger.kernel.org>; Mon, 24 Aug 2026 10:17:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787434079; cv=none; b=JN3Y4P/E8FzGoLBFnKIaNHyVkyZhJMuQJEXAiq1SLpeEXklfWfzl+KVf6pawyhr3inf3HO5sO7Xr/Kqnm7litZc93KL37NHxtD8yIZYrjrg7891u6zbsFMFOStoy1kZWmEl9vPghosyTHEP+r/LjLFDBV30iWh7n1NKtMRukFmI=
+	t=1787566657; cv=none; b=dyRIxym3QRsX2yBjsAplrqd60udyhxAQiU/meIXYuoiMNbvhA8TR91V1qNbvFRllkuiV53+okcum8DF29W3xksOKKuH2lxSY4dM1IS3ODIEpn3KynKVNa+QbOkzaQ9wEfon05738q5R2egS0VPiEbztLTp2LOyVLaD0uyGbM+vI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787434079; c=relaxed/simple;
-	bh=RnvMjwr8PrhWW9LFmWiMs3Dz9ie40MXJYLQTRQlMpes=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=J8qrImY2tAoQWELyA/VxrRuSEzv9IJVdlqNRRxnHsJTwaulPqlRq0yiXpF9AyTvMtlxsrtdf7Co0Rnp3xqHqiu2KuM5Pcaw3i+K8cqm5bCgS4d6bETF9J5dWQgJQh5VzFCN94Vd+opyJK8yG7i91haa3ITR5W8pgYo+hLaZGUpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr; spf=pass smtp.mailfrom=oss.cyber.gouv.fr; dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b=BS21dDip; arc=none smtp.client-ip=51.159.188.251
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.cyber.gouv.fr
+	s=arc-20240116; t=1787566657; c=relaxed/simple;
+	bh=mr5RIBgSEVfYIX8fGLuNhzkfFdOkbVsOMC+b+fVh6ZE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eKldWNsX73EvAoySyjM8XYIvkZtjCIKxVnMwcBMS1dYS0MWGWmq6f7ALXs78ppTxp6WAaNpaFfja2tVo0o3WY+5xrXpEb98epeepeG4AZTTBgpjagsNZBmZpJkZOUmqIcJJcvMULwJiY6wDxEGbi2IooSSrWAxjRhsCYOCUZGak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dn9E7Z1v; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b="BS21dDip"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=oss.cyber.gouv.fr; s=default; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=O2YyWvFNr3UAThA2597Fy+8bbmZ6au5P3Q7Z73hQufU=; b=BS21dDipKKnv/pLHJZTLcD9oFT
-	zPCLXIDWIs9asXvqpNunk+5yTQSEGDC2nvGdmCw9IG2BzxrdSSm17zy3tXh3vWDsGnXYLW8e4wMvU
-	tQsf0pZWPX6q5pAMPpb7lh4bpJih/YDS0KFH7bfW7fgX1XINpMc5yjj7k/MNv7twWW/Uhcyrnr/VM
-	LXtDScw+W+r/jONi1EuBMhLcHTX6UrsJOy1rVG9xlGHY8jiiV26ZgWuBGrPCUZMz1ZTI9IhAkWI7c
-	ERlkLUuzWEUFscnp1dXLoNIIvYlefTjgE1C7uSU9O/+miftPqWLce7L2Gjy+jTx1knqKZJsQgCtlp
-	YRAK44jw==;
-Received: from [151.115.150.205] (port=40898 helo=gepetto..)
-	by pf-012.whm.fr-par.scw.cloud with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.99.5)
-	(envelope-from <Jeremy.Jean@oss.cyber.gouv.fr>)
-	id 1wxtFu-00000002bTA-0eVE;
-	Sat, 22 Aug 2026 23:27:56 +0200
-From: =?UTF-8?q?J=C3=A9r=C3=A9my=20Jean?= <Jeremy.Jean@oss.cyber.gouv.fr>
-To: dhowells@redhat.com,
-	lukas@wunner.de,
-	ignat@linux.win,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Cc: keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-modules@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	=?UTF-8?q?J=C3=A9r=C3=A9my=20Jean?= <Jeremy.Jean@oss.cyber.gouv.fr>
-Subject: [PATCH] pkcs7: Check all signers before waiving authattrs rejection
-Date: Sat, 22 Aug 2026 21:27:04 +0000
-Message-ID: <20260822212703.1019792-2-Jeremy.Jean@oss.cyber.gouv.fr>
-X-Mailer: git-send-email 2.47.3
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dn9E7Z1v"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1787566655; x=1819102655;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=mr5RIBgSEVfYIX8fGLuNhzkfFdOkbVsOMC+b+fVh6ZE=;
+  b=dn9E7Z1vooiNEU7f/6KF6Upf65JdgfSeU2WCiKJUSJ51DhzwbtKxikB5
+   zrEodDn0k2rBEhGxHHbt7zU3D2kokEZsVO+l8Ig+mkq/SEfR963oq5XYq
+   y5leP3nXMn3ffAIasWqq4xdVA/FMc2Qy8bht6uAZq4EqYwcdtwuWaL86v
+   4nYpryNGhDVuAcVYCDxHN45Ao114BrQa0fWwMsdkAn7mlUy/K+304qnP4
+   JJTeAkx/UYBCizqvRmaYm/31f5WawOZIgBOhqLlNhlAaeyjcXra3hb+IA
+   aaf8tvcMif9VSxuoKuwL305tH6FqSrE4LUcPSjKuET1y6uEtrPLBCXUCs
+   g==;
+X-CSE-ConnectionGUID: uekJybkyQeWdRM43ZpFPuA==
+X-CSE-MsgGUID: su5kTfifSx65dBsmxsgJaw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11884"; a="99174515"
+X-IronPort-AV: E=Sophos;i="6.25,240,1779174000"; 
+   d="scan'208";a="99174515"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2026 03:17:35 -0700
+X-CSE-ConnectionGUID: GJyie9EuSBmyMr7QkUxoZA==
+X-CSE-MsgGUID: Ks3keJ7EQBOsls1VqZKXVQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,240,1779174000"; 
+   d="scan'208";a="262670405"
+Received: from silpixa00401812.ir.intel.com ([10.20.226.90])
+  by fmviesa006.fm.intel.com with ESMTP; 24 Aug 2026 03:17:33 -0700
+From: Ahsan Atta <ahsan.atta@intel.com>
+To: herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org,
+	qat-linux@intel.com,
+	Ahsan Atta <ahsan.atta@intel.com>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH] crypto: qat - avoid OOB read when stripping RSA leading zeros
+Date: Mon, 24 Aug 2026 11:17:44 +0100
+Message-ID: <20260824101744.382099-1-ahsan.atta@intel.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - pf-012.whm.fr-par.scw.cloud
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - oss.cyber.gouv.fr
-X-Get-Message-Sender-Via: pf-012.whm.fr-par.scw.cloud: authenticated_id: jeremy.jean@oss.cyber.gouv.fr
-X-Authenticated-Sender: pf-012.whm.fr-par.scw.cloud: jeremy.jean@oss.cyber.gouv.fr
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 
-pkcs7_check_authattrs() only looks at the first SignerInfo when deciding
-whether rejection of authenticated attributes may be waived.  For the
-remaining signers it checks only that authenticated attributes are either
-present on all signers or absent from all of them.
+The logical AND operator uses short-circuit evaluation: the first
+operand is always evaluated, while the second is evaluated only if
+the first is true. Because the first operand dereferences a pointer,
+it may cause an out-of-bounds access before the bounds check in the
+second operand is evaluated.
 
-This means an unmatched ML-DSA signer can be placed first, followed by a
-trusted RSA, ECDSA, or ECRDSA signer.  Verification skips the unmatched
-signature and accepts the later trusted signer.  The first signer still
-leaves the waiver enabled for the whole message, so the non-ML-DSA signer
-can use an exception intended only for ML-DSA.
+Resolve this by checking the vlen prior to the pointer being dereferenced.
 
-Check each SignerInfo's public-key algorithm before leaving the waiver
-enabled.
-
-Fixes: 91db696adea4 ("pkcs7: Allow authenticatedAttributes for ML-DSA")
-Assisted-by: Codex:gpt-5
-Signed-off-by: Jérémy Jean <Jeremy.Jean@oss.cyber.gouv.fr>
+Fixes: a990532023b9 ("crypto: qat - Add support for RSA algorithm")
+Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- crypto/asymmetric_keys/pkcs7_parser.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/crypto/intel/qat/qat_common/qat_asym_algs.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/crypto/asymmetric_keys/pkcs7_parser.c b/crypto/asymmetric_keys/pkcs7_parser.c
-index 6e3ffda..7f00e45 100644
---- a/crypto/asymmetric_keys/pkcs7_parser.c
-+++ b/crypto/asymmetric_keys/pkcs7_parser.c
-@@ -111,6 +111,12 @@ static int pkcs7_check_authattrs(struct pkcs7_message *msg)
- 		if (!!sinfo->authattrs != want)
- 			goto inconsistent;
+diff --git a/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c b/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
+index 75c15c8e41db..aa2ea563f25f 100644
+--- a/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
++++ b/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
+@@ -987,7 +987,7 @@ static int qat_rsa_set_n(struct qat_rsa_ctx *ctx, const char *value,
+ 	const char *ptr = value;
+ 	int ret;
  
-+#ifdef CONFIG_PKCS7_WAIVE_AUTHATTRS_REJECTION_FOR_MLDSA
-+		if (sinfo->authattrs &&
-+		    strncmp(sinfo->sig->pkey_algo, "mldsa", 5) != 0)
-+			msg->authattrs_rej_waivable = false;
-+#endif
-+
- 		if (!sinfo->authattrs &&
- 		    sinfo->sig->algo_takes_data)
- 			sinfo->sig->hash_algo = "none";
+-	while (!*ptr && vlen) {
++	while (vlen && !*ptr) {
+ 		ptr++;
+ 		vlen--;
+ 	}
+@@ -1018,7 +1018,7 @@ static int qat_rsa_set_e(struct qat_rsa_ctx *ctx, const char *value,
+ 	struct device *dev = &GET_DEV(inst->accel_dev);
+ 	const char *ptr = value;
+ 
+-	while (!*ptr && vlen) {
++	while (vlen && !*ptr) {
+ 		ptr++;
+ 		vlen--;
+ 	}
+@@ -1044,7 +1044,7 @@ static int qat_rsa_set_d(struct qat_rsa_ctx *ctx, const char *value,
+ 	const char *ptr = value;
+ 	int ret;
+ 
+-	while (!*ptr && vlen) {
++	while (vlen && !*ptr) {
+ 		ptr++;
+ 		vlen--;
+ 	}
+@@ -1067,7 +1067,7 @@ static int qat_rsa_set_d(struct qat_rsa_ctx *ctx, const char *value,
+ 
+ static void qat_rsa_drop_leading_zeros(const char **ptr, unsigned int *len)
+ {
+-	while (!**ptr && *len) {
++	while (*len && !**ptr) {
+ 		(*ptr)++;
+ 		(*len)--;
+ 	}
 -- 
-2.47.3
+2.50.1
+
+--------------------------------------------------------------
+Intel Research and Development Ireland Limited
+Registered in Ireland
+Registered Office: Collinstown Industrial Park, Leixlip, County Kildare
+Registered Number: 308263
+
+
+This e-mail and any attachments may contain confidential material for the sole
+use of the intended recipient(s). Any review or distribution by others is
+strictly prohibited. If you are not the intended recipient, please contact the
+sender and delete all copies.
 
