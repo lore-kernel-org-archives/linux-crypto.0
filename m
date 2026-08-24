@@ -1,134 +1,147 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C8BE3F3285
-	for <linux-crypto@vger.kernel.org>; Mon, 24 Aug 2026 10:17:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1BE940DB4B
+	for <linux-crypto@vger.kernel.org>; Mon, 24 Aug 2026 11:30:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787566657; cv=none; b=dyRIxym3QRsX2yBjsAplrqd60udyhxAQiU/meIXYuoiMNbvhA8TR91V1qNbvFRllkuiV53+okcum8DF29W3xksOKKuH2lxSY4dM1IS3ODIEpn3KynKVNa+QbOkzaQ9wEfon05738q5R2egS0VPiEbztLTp2LOyVLaD0uyGbM+vI=
+	t=1787571021; cv=none; b=fIWFh2u3zkCPuW3aj7L3Iq/n6aSHACPMrnPoJbftiUONwS0rNVn1vIhYcV6A0aSKmhlWzR6q0deHUw9HanmR4jGK6h7NxBS6tKlcLN2otG7w8fMSPGpJamUMi+E57i4vG370azRA9V+0+aWGjKx/QoYUiwrP8uxMVx36iRw+4fY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787566657; c=relaxed/simple;
-	bh=mr5RIBgSEVfYIX8fGLuNhzkfFdOkbVsOMC+b+fVh6ZE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eKldWNsX73EvAoySyjM8XYIvkZtjCIKxVnMwcBMS1dYS0MWGWmq6f7ALXs78ppTxp6WAaNpaFfja2tVo0o3WY+5xrXpEb98epeepeG4AZTTBgpjagsNZBmZpJkZOUmqIcJJcvMULwJiY6wDxEGbi2IooSSrWAxjRhsCYOCUZGak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dn9E7Z1v; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1787571021; c=relaxed/simple;
+	bh=eIiHDNpGuJvlr6XzJzVZse8EFDoB8HDy4sppT9wCi+w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dxTz5eznYjHtFDTvCduQ2+5Lzl+rb6NbSwiW/Co67XOTY5ofzMWWAn0BRNr5/qPNdue0/cE5tGiifaBHRhPpjqx7bDPGziTXh2xJeFP081ZXLO79yZkEqjLLp/L5LK/EGiZt3KuQUmyiuuVVcoojvS2UAM6PNmYmfbiPqhXymxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V8x3jT9Y; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dn9E7Z1v"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1787566655; x=1819102655;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=mr5RIBgSEVfYIX8fGLuNhzkfFdOkbVsOMC+b+fVh6ZE=;
-  b=dn9E7Z1vooiNEU7f/6KF6Upf65JdgfSeU2WCiKJUSJ51DhzwbtKxikB5
-   zrEodDn0k2rBEhGxHHbt7zU3D2kokEZsVO+l8Ig+mkq/SEfR963oq5XYq
-   y5leP3nXMn3ffAIasWqq4xdVA/FMc2Qy8bht6uAZq4EqYwcdtwuWaL86v
-   4nYpryNGhDVuAcVYCDxHN45Ao114BrQa0fWwMsdkAn7mlUy/K+304qnP4
-   JJTeAkx/UYBCizqvRmaYm/31f5WawOZIgBOhqLlNhlAaeyjcXra3hb+IA
-   aaf8tvcMif9VSxuoKuwL305tH6FqSrE4LUcPSjKuET1y6uEtrPLBCXUCs
-   g==;
-X-CSE-ConnectionGUID: uekJybkyQeWdRM43ZpFPuA==
-X-CSE-MsgGUID: su5kTfifSx65dBsmxsgJaw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11884"; a="99174515"
-X-IronPort-AV: E=Sophos;i="6.25,240,1779174000"; 
-   d="scan'208";a="99174515"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2026 03:17:35 -0700
-X-CSE-ConnectionGUID: GJyie9EuSBmyMr7QkUxoZA==
-X-CSE-MsgGUID: Ks3keJ7EQBOsls1VqZKXVQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,240,1779174000"; 
-   d="scan'208";a="262670405"
-Received: from silpixa00401812.ir.intel.com ([10.20.226.90])
-  by fmviesa006.fm.intel.com with ESMTP; 24 Aug 2026 03:17:33 -0700
-From: Ahsan Atta <ahsan.atta@intel.com>
-To: herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org,
-	qat-linux@intel.com,
-	Ahsan Atta <ahsan.atta@intel.com>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH] crypto: qat - avoid OOB read when stripping RSA leading zeros
-Date: Mon, 24 Aug 2026 11:17:44 +0100
-Message-ID: <20260824101744.382099-1-ahsan.atta@intel.com>
-X-Mailer: git-send-email 2.50.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V8x3jT9Y"
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-84a4d8fd6ecso3386752b3a.1
+        for <linux-crypto@vger.kernel.org>; Mon, 24 Aug 2026 04:30:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787571019; x=1788175819; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=0Yqy+VWHRiQmqGDvTYaHpxheSZahwTkk9CcTJ304p/4=;
+        b=V8x3jT9YvM2MrlOBRgaZmcHR4FXpMpUbyk9NcsUuyixF2LqeSZC+16kLsA4iMJmOcH
+         LePSvI+wRfzIs+INpcWdtXh6V630fe1p/GVNRwdhYszG6WcSMVKmJYP8kvZP984ghHKM
+         mc6SRHOTi6oIbPB0NnUjycLLI2DlbNQmUNlMHF4sFZd12Fuctk2il0obUsksYLUFbcxx
+         xhPmeruxVEUXWFwEcm+Q2Q8mrq47t263BTqEdm3BEHe8IMpeMNOHUlJMZstBT3piabcO
+         0V1dVLkepeuEsBnG6B7svLSGLlxEn/p1i6qLIHH72uO8aeDnoUa6z2jLXbnqnjWwozYs
+         3rjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787571019; x=1788175819;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=0Yqy+VWHRiQmqGDvTYaHpxheSZahwTkk9CcTJ304p/4=;
+        b=GH0/kKlmooLvebBrtl8QxLNqrQqdoG3d72EllUmLfYazFm+arV7ohLLUdMMbWs7EuS
+         p49rfd8shFvRJfJjOfI3X0KiBl2vHPDOP9ERDDEUpb+Z3jLLtQTnZ5J4IDRJ238qGMOX
+         nBMUQdU+rN6X8a5gmIXQHZZcl5+mY4wnbZuEfS3XF48baRAkw0q4+l87Irbe7Zm/Sfal
+         KKvpaim3vPk8KpSxFaL2nJrQWrkEZCq2qO3eYDqPwSSjWWC/U1uRgd9pl2SAqdgV6oBc
+         AV4jN3echyrOEyka7/XApm5kwdolDh0kAOxMHoDogjSQMjG3/JoCe5feVqPEXNo8mbgw
+         FBjQ==
+X-Forwarded-Encrypted: i=1; AHgh+RoBaIore3BqhppRKBXPAY4lKYRTCJ7x53WFxyKget55BQDv3oS9hIFaNEyVv8phNHgH6RI/FD5/wPsTC2k=@vger.kernel.org
+X-Gm-Message-State: AFuF++kJ6JhVesfrs0liQ2CborY9yWN1gpw4Vs8iduOMaa/twSS5VjqB
+	nbrXePiKjaCDJ4Nf6lhwx/uPeH8jzHXX4CJJ5evkLaTLs/M8A+tR1lvK
+X-Gm-Gg: AR+sD11YFIDa+o49FmtlCu8dMl8fqpNERPeJy9bb9MmhVl2FpwotBrPm8N2QS/fos7g
+	tFDSo/zZRwVz6N77w2iZgo9AsUD8E0l1rA+3sioQ4Kuz0hWoxVsVa366hpg28StcmCBEbWPcVmO
+	S/8GVSkzlgjQT3AERIOGuEPgM9ssX1OBui2bpKYNm2dWm93OCEWqFZbS0zQ9olhGXTHaDdhgZmr
+	evVHMYDOXCDY4H5tmmJZ85HErKe3YpPJy4sv8ZGJ9noxci0nyYdc6d/ZUHPhs9yYMogtm582RHV
+	zqYbouGUcX9Ojeg38uGI1kU3VrERyaf3EH7/eciJ5bHtDDniOff3uu3lXdDyHh0a6tLfDZxl4eO
+	PDtVWgZ2lWM5Vaf0MmHocY8HNfuilBq3QAHgnfl2s6gaW4N7/88bUMCKNLadmMXkHIS0FqCzayA
+	wukOQa3pEmxoSHWEaZaKwiHcdggCFQZviFY74l5feBCp+Tya3dSPGiKC3ktAe+5a7fH0XKcEkZ
+X-Received: by 2002:a05:6a00:3690:b0:84f:d7e4:3404 with SMTP id d2e1a72fcca58-8520be6fd22mr30209102b3a.11.1787571018912;
+        Mon, 24 Aug 2026 04:30:18 -0700 (PDT)
+Received: from ancienth-X870E-Nova-WiFi ([125.186.72.2])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-8520f149ef3sm1870661b3a.41.2026.08.24.04.30.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Aug 2026 04:30:18 -0700 (PDT)
+From: Daehyeon Ko <4ncienth@gmail.com>
+To: dhowells@redhat.com,
+	jarkko@kernel.org,
+	lukas@wunner.de,
+	ignat@linux.win
+Cc: paul@paul-moore.com,
+	jmorris@namei.org,
+	serge@hallyn.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	keyrings@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Daehyeon Ko <4ncienth@gmail.com>
+Subject: [PATCH] keys: reject descriptions that exceed the index length
+Date: Mon, 24 Aug 2026 20:30:04 +0900
+Message-ID: <20260824113004.3755053-1-4ncienth@gmail.com>
+X-Mailer: git-send-email 2.54.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-The logical AND operator uses short-circuit evaluation: the first
-operand is always evaluated, while the second is evaluated only if
-the first is true. Because the first operand dereferences a pointer,
-it may cause an out-of-bounds access before the bounds check in the
-second operand is evaluated.
+struct keyring_index_key::desc_len is a u16.  User-provided key
+descriptions are limited to 4095 bytes, but a key type preparser can
+generate a longer description when the caller passes NULL.
 
-Resolve this by checking the vlen prior to the pointer being dereferenced.
+The X.509 parser forms a description from the certificate subject and
+twice the raw serial length.  A certificate with a two-byte subject and a
+32766-byte serial therefore produces a 65536-byte description.  Assigning
+strlen() to desc_len wraps it to zero, after which __key_link_begin() hits:
 
-Fixes: a990532023b9 ("crypto: qat - Add support for RSA algorithm")
-Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+    BUG_ON(index_key->desc_len == 0);
+
+This is reachable through add_key() by an unprivileged user and can panic
+the kernel when oopses are fatal.
+
+Measure generated descriptions before narrowing the length and reject
+values that cannot be represented.  The boundary input now returns EINVAL,
+while the one-byte-short control still reaches the normal quota check.
+
+Fixes: f771fde82051 ("keys: Simplify key description management")
+Cc: stable@vger.kernel.org
+Assisted-by: LLM
+Signed-off-by: Daehyeon Ko <4ncienth@gmail.com>
 ---
- drivers/crypto/intel/qat/qat_common/qat_asym_algs.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ security/keys/key.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c b/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
-index 75c15c8e41db..aa2ea563f25f 100644
---- a/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
-+++ b/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
-@@ -987,7 +987,7 @@ static int qat_rsa_set_n(struct qat_rsa_ctx *ctx, const char *value,
- 	const char *ptr = value;
+diff --git a/security/keys/key.c b/security/keys/key.c
+index b34a64d81d47ab..f2f472b45f4eee 100644
+--- a/security/keys/key.c
++++ b/security/keys/key.c
+@@ -14,6 +14,7 @@
+ #include <linux/workqueue.h>
+ #include <linux/random.h>
+ #include <linux/err.h>
++#include <linux/limits.h>
+ #include "internal.h"
+ 
+ struct kmem_cache *key_jar;
+@@ -820,6 +821,7 @@ static key_ref_t __key_create_or_update(key_ref_t keyring_ref,
+ 	const struct cred *cred = current_cred();
+ 	struct key *keyring, *key = NULL;
+ 	key_ref_t key_ref;
++	size_t desc_len;
  	int ret;
+ 	struct key_restriction *restrict_link = NULL;
  
--	while (!*ptr && vlen) {
-+	while (vlen && !*ptr) {
- 		ptr++;
- 		vlen--;
+@@ -865,7 +867,12 @@ static key_ref_t __key_create_or_update(key_ref_t keyring_ref,
+ 		if (!index_key.description)
+ 			goto error_free_prep;
  	}
-@@ -1018,7 +1018,7 @@ static int qat_rsa_set_e(struct qat_rsa_ctx *ctx, const char *value,
- 	struct device *dev = &GET_DEV(inst->accel_dev);
- 	const char *ptr = value;
+-	index_key.desc_len = strlen(index_key.description);
++	desc_len = strlen(index_key.description);
++	if (desc_len > U16_MAX) {
++		key_ref = ERR_PTR(-EINVAL);
++		goto error_free_prep;
++	}
++	index_key.desc_len = desc_len;
+ 	key_set_index_key(&index_key);
  
--	while (!*ptr && vlen) {
-+	while (vlen && !*ptr) {
- 		ptr++;
- 		vlen--;
- 	}
-@@ -1044,7 +1044,7 @@ static int qat_rsa_set_d(struct qat_rsa_ctx *ctx, const char *value,
- 	const char *ptr = value;
- 	int ret;
- 
--	while (!*ptr && vlen) {
-+	while (vlen && !*ptr) {
- 		ptr++;
- 		vlen--;
- 	}
-@@ -1067,7 +1067,7 @@ static int qat_rsa_set_d(struct qat_rsa_ctx *ctx, const char *value,
- 
- static void qat_rsa_drop_leading_zeros(const char **ptr, unsigned int *len)
- {
--	while (!**ptr && *len) {
-+	while (*len && !**ptr) {
- 		(*ptr)++;
- 		(*len)--;
- 	}
--- 
-2.50.1
+ 	ret = __key_link_lock(keyring, &index_key);
 
---------------------------------------------------------------
-Intel Research and Development Ireland Limited
-Registered in Ireland
-Registered Office: Collinstown Industrial Park, Leixlip, County Kildare
-Registered Number: 308263
-
-
-This e-mail and any attachments may contain confidential material for the sole
-use of the intended recipient(s). Any review or distribution by others is
-strictly prohibited. If you are not the intended recipient, please contact the
-sender and delete all copies.
-
+base-commit: 0a0d1d55dad570724bf8c7ea83409639cfb4be9b
