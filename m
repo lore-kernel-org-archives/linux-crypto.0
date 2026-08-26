@@ -1,107 +1,185 @@
-Received: from oss.cyber.gouv.fr (oss.cyber.gouv.fr [51.159.188.251])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta1.migadu.com (out-125.mta1.migadu.com [95.215.58.125])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52B92343882;
-	Wed, 26 Aug 2026 10:38:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.159.188.251
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CF413C4B6A
+	for <linux-crypto@vger.kernel.org>; Wed, 26 Aug 2026 12:17:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.125
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787740695; cv=none; b=Euxgk8lHYmWCXk5UA0JhaylvueZ8EFaXo2zQv1wlh9oPxbWgHocD3Kz89lSHLhg4RcO7uYffsIttvdP0S/2Sd60Gor8SP9mT75cJrMiGMNcxPCFgDlJ90ODKRs7+U47eKx7jPKBEHmoi4mo5GtY5gEK6AKXmbvWnXCJtCgr2nu0=
+	t=1787746659; cv=none; b=QiRa5KS+swHPkoCCp3sxiEm1gqE77bn83OrThpLjM16jGAd4+v/pJBKQzDqhqhgabuOBmmr193bRvVytrhlulIEUS6uPOlhnJnkui69DbIQvB8AGVDM0D34ljoxbzZ6VcrrJtBFTXH+KCH7hit94UwbQjBf63kvR4DP8Rzh3KFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787740695; c=relaxed/simple;
-	bh=xOtq8N0yTXbVgqWVbdE95NTVNt73l2Q02hilPm+V7BQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=q39YdxT3/6i5ACv6TJnmDybgYbstf4lv4XA8UJNVLRaIutjRuyUgh+/pqjI/VGlEWWPqhgvPFmQpwZX1kpCPGyKIYc3J8ghp9BP9XPT0gPePUnjxf7BTrYGgLIMds96Kf5a5O5G4JcC8xnxS1LMBvMhvRrZYiVz1pd8GwMWWnVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr; spf=pass smtp.mailfrom=oss.cyber.gouv.fr; dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b=jaEZlLHo; arc=none smtp.client-ip=51.159.188.251
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.cyber.gouv.fr
+	s=arc-20240116; t=1787746659; c=relaxed/simple;
+	bh=xDzobXxxxU222qeCn4cQI3aUxsYCUiL8/RnRnWerbaE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Bny1PEM3af1a06L4VUyK+dcY/PuD1bxwCAORxQwTsuZcNS+Mt3dV0bz1oBc1/TZ8CmSiUwZPHDcM5xHJl869XMe6oFBWw4Oxn1I8PKixPDc9c16TdrUqqU6A96kpFkioTVyHFh2Fmn9bUprYLBYuIrd/7eAPBGyb0Y8ZPxoAtf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mIfgBmX4; arc=none smtp.client-ip=95.215.58.125
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b="jaEZlLHo"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=oss.cyber.gouv.fr; s=default; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=q/amVWIVI0Gt7bEWVLy3Dj/gqdFme/iJdzcMmIU5NiM=; b=jaEZlLHoQQ2ANp5JtCtkgBWexu
-	q6FoAkehNiewSqj9ob+Y45cDYaZRfonZbdO0Lfjc+AcJppy6bP6EZf1sCbCSHxdfTrdNHQgQpvlT1
-	MZcpb3jpxhMTTe57M/Q+oUgPhTF5mp3FrUYKT9j9D9z+UOmVOnlTv7I3V9u9ZNhKkEAr0XFM2TEzj
-	ht2pVNUJue0HRzmlpa1XERNvAKCBtcXadvs1q/8jOq+NwmO6vDGIiuId7GrN2xTZBZiKgcA3JlVJr
-	73lEAdU7htqoW/DkTrOTS+78tMfsYgtfFRd5k9SaUK7+i09ib3Ilxi1ZX8EsxN4GZy+4+Wwir/aRN
-	mKHG4KxA==;
-Received: from [151.115.150.205] (port=37352 helo=gepetto..)
-	by pf-012.whm.fr-par.scw.cloud with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.99.5)
-	(envelope-from <Jeremy.Jean@oss.cyber.gouv.fr>)
-	id 1wzB1H-0000000GmVI-0kAW;
-	Wed, 26 Aug 2026 12:38:11 +0200
-From: =?UTF-8?q?J=C3=A9r=C3=A9my=20Jean?= <Jeremy.Jean@oss.cyber.gouv.fr>
-To: Lukas Wunner <lukas@wunner.de>,
-	Ignat Korchagin <ignat@linux.win>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	=?UTF-8?q?J=C3=A9r=C3=A9my=20Jean?= <Jeremy.Jean@oss.cyber.gouv.fr>
-Subject: [PATCH 2/2] crypto: rsassa-pkcs1: reject undersized keys when verifying
-Date: Wed, 26 Aug 2026 10:37:44 +0000
-Message-ID: <20260826103744.1554131-3-Jeremy.Jean@oss.cyber.gouv.fr>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20260826103744.1554131-1-Jeremy.Jean@oss.cyber.gouv.fr>
-References: <20260826103744.1554131-1-Jeremy.Jean@oss.cyber.gouv.fr>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mIfgBmX4"
+X-Envelope-To: linux-crypto@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=xDzobXxxxU222qeCn4cQI3aUxsYCUiL8/RnRnWerbaE=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1787746654; v=1; x=1788351454;
+ b=mIfgBmX4NhNZjm5zWR6Iz4XNDJSMQUS+9SuWsnqYfdwsKVrxmNsq32+OOXVG7PqG4s/j9w4+
+ EvNWoRwsct/CUVDHo73VES98bbCX9VdlYHCUwwO/kLozyeBvsnLEaE2OSKpRPDHoPSrKpJp4NN+
+ dRIBbtMlqcKHy0Lm6/c6FiI4=
+X-Envelope-To: linux-crypto@vger.kernel.org
+Received: from [192.168.50.204] (146.199.86.12)
+	by smtp.migadu.com with ESMTPS id d9e642eb430b8d0c;
+	Wed, 26 Aug 2026 12:17:24 +0000
+X-Mizu-Trace-ID: d9e642eb430b8d0c
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <4012253e-9a7a-47cf-9c0a-75cf77677f14@linux.dev>
+Date: Wed, 26 Aug 2026 13:17:23 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/2] crypto: zstd - avoid initializing the workspace twice
+To: Yosry Ahmed <yosry@kernel.org>
+Cc: davem@davemloft.net, dsterba@suse.com,
+ Herbert Xu <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, terrelln@fb.com, hannes@cmpxchg.org,
+ nphamcs@gmail.com, chengming.zhou@linux.dev, shakeel.butt@linux.dev,
+ kernel-team@meta.com
+References: <20260825220616.3842633-1-usama.arif@linux.dev>
+ <CAO9r8zP2FLCN5N3pJR=EiNW2ykF0mwSR8fwMXPXp6SdcPd82jA@mail.gmail.com>
+Content-Language: en-US
+From: Usama Arif <usama.arif@linux.dev>
+In-Reply-To: <CAO9r8zP2FLCN5N3pJR=EiNW2ykF0mwSR8fwMXPXp6SdcPd82jA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - pf-012.whm.fr-par.scw.cloud
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - oss.cyber.gouv.fr
-X-Get-Message-Sender-Via: pf-012.whm.fr-par.scw.cloud: authenticated_id: jeremy.jean@oss.cyber.gouv.fr
-X-Authenticated-Sender: pf-012.whm.fr-par.scw.cloud: jeremy.jean@oss.cyber.gouv.fr
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
 
-rsassa_pkcs1_verify() accepts any nonzero key size.
 
-With a one-byte key and a zero RSA result, the leading-zero handling
-decrements dst_len to zero and advances out_buf past the allocation.
-The next out_buf[0] access reads out of bounds.
 
-KASAN reports:
+On 25/08/2026 23:27, Yosry Ahmed wrote:
+> On Tue, Aug 25, 2026 at 3:06 PM Usama Arif <usama.arif@linux.dev> wrote:
+>>
+>> Both zstd_compress() and zstd_decompress() set up the shared per-CPU
+>> workspace as a C/DStream before walking the request, and then, when the
+>> first source and destination fragments each span the whole request, hand
+>> off to zstd_compress_one()/zstd_decompress_one(), which immediately
+>> overwrite that same ctx->wksp with a CCtx/DCtx. The stream setup is
+>> discarded without a byte having been processed.
+>>
+>> That one-shot path is not a corner case: zswap always takes it when
+>> storing, and takes it for a load whenever the stored object lies within a
+>> single zsmalloc page.
+>>
+>> These two patches defer the stream initialization to the first walk
+>> iteration that actually streams, guarded by a flag because that iteration
+>> can be reached more than once.
+>>
+>> A 4 KiB crypto_acomp benchmark [1], twelve runs of nine 30,000-operation
+>> rounds. Bare metal is an Intel Xeon Platinum 8321HC, turbo off,
+>> performance governor, pinned to one core; the VM is a one-vCPU KVM guest
+>> on a faster host.
+>>
+>>                   baseline    patched     delta
+>>   bare metal
+>>     compress      52,283 ns   51,038 ns   1,245 ns   2.4%
+>>     decompress     2,317 ns    1,998 ns     319 ns  13.8%
+>>   one-vCPU KVM
+>>     compress      16,675 ns   15,050 ns   1,625 ns   9.8%
+>>     decompress     3,516 ns    2,265 ns   1,251 ns  35.6%
+> 
+> Nice!
+> 
+>>
+>> The guest numbers are larger because the two CPUID instructions in
+>> ZSTD_cpuid() become unconditional VM exits there.
+> 
+> I wonder how much benefit we get from just doing CPUID once in
+> ZSTD_cpuid() and cache the results. There might still be value in
+> avoiding the overall initialization, but I think ZSTD_cpuid() should
+> only be executing CPUID once anyway (e.g. in case it's called in other
+> paths)?
+> 
 
-    BUG: KASAN: slab-out-of-bounds in rsassa_pkcs1_verify+0x79d/0x900
-    Read of size 1 at addr ...
-    The buggy address is located 0 bytes to the right of
-     allocated 73-byte region [...]
 
-Reject keys shorter than the minimum PKCS#1 v1.5 encoded message size.
+So I tried something like below and the numbers look really good on a VM:
+         compression      decompression
+Before   14523ns          2250ns
+After    13554ns (-6.7%)  973ns (-56.8%)
 
-Fixes: 3d5b1ecdea6f ("crypto: rsa - RSA padding algorithm")
-Assisted-by: Codex:gpt-5
-Signed-off-by: Jérémy Jean <Jeremy.Jean@oss.cyber.gouv.fr>
----
- crypto/rsassa-pkcs1.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+commit c169757935b9c4f4d0765227cdf989515f1987a2 (HEAD -> zstd_cpuid_cache)
+Author: Usama Arif <usama.arif@linux.dev>
+Date:   Wed Aug 26 04:03:35 2026 -0700
 
-diff --git a/crypto/rsassa-pkcs1.c b/crypto/rsassa-pkcs1.c
-index d0e4a885397f..39137476ce81 100644
---- a/crypto/rsassa-pkcs1.c
-+++ b/crypto/rsassa-pkcs1.c
-@@ -231,7 +231,7 @@ static int rsassa_pkcs1_verify(struct crypto_sig *tfm,
- 	int err;
- 
- 	/* RFC 8017 sec 8.2.2 step 1 - length checking */
--	if (!ctx->key_size ||
-+	if (ctx->key_size < 11 ||
- 	    slen != ctx->key_size ||
- 	    rsassa_pkcs1_invalid_hash_len(dlen, hash_prefix))
- 		return -EINVAL;
--- 
-2.47.3
+    zstd: probe the CPU for BMI2 support only once
+
+    ZSTD_cpuSupportsBmi2() issues CPUID on every context setup for an answer
+    that cannot change while the kernel is running.  On x86 that is two
+    serializing CPUID instructions, and the callers are not rare:
+    squashfs, erofs, btrfs, f2fs and crypto/zstd all initialise a context
+    per operation, so a busy squashfs or zswap workload pays for it per
+    block or per page.  Under KVM it is worse, because CPUID is an
+    unconditional VM exit.
+
+    Cache the result.  Keeping the cache as a single int with a negative
+    sentinel, rather than a copy of ZSTD_cpuid_t, keeps it to one word: a
+    racing pair of probes computes the same value from the same CPUID leaf,
+    so the unsynchronized access is benign, and READ_ONCE()/WRITE_ONCE()
+    keep the compiler and KCSAN in agreement about that.
+
+    ZSTD_cpuSupportsBmi2() is MEM_STATIC, so each translation unit that
+    inlines it gets its own cache - three in a modular build, plus one in
+    each preboot decompressor.  That is a handful of ints in bss and one
+    extra probe apiece, not worth avoiding.
+
+    The cached answer is the one the probing CPU reported.  zstd could
+    already be migrated between the probe and the use of the flag, so this
+    does not introduce a heterogeneity question that was not there before.
+
+    Suggested-by: Yosry Ahmed <yosry@kernel.org>
+    Signed-off-by: Usama Arif <usama.arif@linux.dev>
+
+diff --git a/lib/zstd/common/zstd_internal.h b/lib/zstd/common/zstd_internal.h
+index 41f190b533209..b179f44753598 100644
+--- a/lib/zstd/common/zstd_internal.h
++++ b/lib/zstd/common/zstd_internal.h
+@@ -312,8 +312,21 @@ size_t ZSTD_decodeSeqHeaders(ZSTD_DCtx* dctx, int* nbSeqPtr,
+ MEM_STATIC int ZSTD_cpuSupportsBmi2(void)
+ {
+ #if DYNAMIC_BMI2
+-    ZSTD_cpuid_t cpuid = ZSTD_cpuid();
+-    return ZSTD_cpuid_bmi1(cpuid) && ZSTD_cpuid_bmi2(cpuid);
++    /*
++     * The answer cannot change over the life of the kernel, so probe
++     * once.  Racing probes compute the same value, so the unsynchronized
++     * access is benign; the annotations are there to keep it that way.
++     */
++    static int supported = -1;
++    int s = READ_ONCE(supported);
++
++    if (s < 0) {
++        ZSTD_cpuid_t const cpuid = ZSTD_cpuid();
++
++        s = ZSTD_cpuid_bmi1(cpuid) && ZSTD_cpuid_bmi2(cpuid);
++        WRITE_ONCE(supported, s);
++    }
++    return s;
+ #else
+     /* Nothing looks at the flag in this configuration. */
+     return 0;
+
+>>
+>> [1] https://gist.github.com/uarif1/5cf02f0e22c23f0d1b3d84348f12914c
+>>
+>> Usama Arif (2):
+>>   crypto: zstd - Avoid redundant cstream initialization
+>>   crypto: zstd - Avoid redundant dstream initialization
+>>
+>>  crypto/zstd.c | 40 ++++++++++++++++++++++++++++------------
+>>  1 file changed, 28 insertions(+), 12 deletions(-)
+>>
+>>
+>> base-commit: 4b18edbd8e70f7e6860d56370f13244896d0f95c
+>> --
+>> 2.53.0-Meta
+>>
 
