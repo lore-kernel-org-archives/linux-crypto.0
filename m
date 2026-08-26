@@ -1,140 +1,199 @@
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4437D38425A
-	for <linux-crypto@vger.kernel.org>; Wed, 26 Aug 2026 17:10:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787764265; cv=pass; b=HXXdKRKenqRstL1svdmjKPPO7xwnjTFEy2MyuoKlMzpr63IwO7CUw+WsSbWCvCoF8mMRX6Bi8s6DYfYCCI3zgQjqr9DOSc469lLj0YdTe74i9lGH99M7KDVd9dFdtScZd2FhO+6IlQ0/7gu4BQGWtF4S59XNshERzZLCk3XdPyI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787764265; c=relaxed/simple;
-	bh=zpRXAe/tk52AlzcBOEsFifQ2bzrJm/4BiZ+5Fwp0hxo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=clZirKb4zT2cbEKvEgPiE2HqY4wwF1aPmU+VSFl3ajHzmivagyyh8+NQYd84u6DIWoYXqQ8uJUOsMalQQgz5uMY5PH7Muxh9Av3xp82Yzcv8Fi/hfZUITf9S1C6I7UIRi/NaKoFI3C15O4XHn57FtEtMbYSHc1vIuAqyaUtBBPw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sO7hteWt; arc=pass smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01BD73F6C58
+	for <linux-crypto@vger.kernel.org>; Wed, 26 Aug 2026 19:16:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787771820; cv=none; b=O92QjZvWdTLFpSkB4nCRngq/MJEq4Xw8pBNL0+SDD2nMieAljBWRoyOUwBrnldbaioMSuTU4UTTr6zQwT+v5IhagibaDuAYJ9gKdYidrIHo3gH/BhvubtKAmGSBym3Ct8KvieUvI/cWd9yc0e3n4nns7dK0BlROeEir6kenSkt4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787771820; c=relaxed/simple;
+	bh=EhZOmsiLTyAPqeWEbBa0NSn+Bs2IPQLepUO00ZQjj9c=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YaygT9CnhnvubwLI4h3+vDF+1ES8rVMXRMfdnkyFS+OuvZfUyzP8t+ub7FxSPJvALjePrS7iFzQ2ZlU0EDpWXY9oqkUPwEz9lIf49+rW6MOh8QS7mxJsBZBxQEOdO8AD3pbZ65a+kdeANPoyCNYt8bIKteItYvYNPncFPPU/mD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=eventprospectdata.com; spf=pass smtp.mailfrom=eventprospectdata.com; dkim=pass (2048-bit key) header.d=eventprospectdata-com.20251104.gappssmtp.com header.i=@eventprospectdata-com.20251104.gappssmtp.com header.b=dn/Adxdk; arc=none smtp.client-ip=209.85.215.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=eventprospectdata.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eventprospectdata.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sO7hteWt"
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-47db714766aso87996f8f.0
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Aug 2026 10:10:53 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1787764250; cv=none;
-        d=google.com; s=arc-20260327;
-        b=oA0ZVYwA0IQdJn+dCugRHgYfqdKjqrdlCQuHXgW64z5TNZrzajInnBRXyTI9UFkIm/
-         DUwIOx6muirgZFNaRvATmG+7YQyxGXA/SExb3g+fbMU+3DQP9jxJuSgGUmTYZSpHrgyN
-         /E6EZfhryXM194H6+VRr383HVFbJ4OMzJeaiQ3S21isOZHtglFJ1ZJdY2khCrNYbf90i
-         xMfzQ/ZBvC0ejj38OfPeTqLn0JyCnWPPZM4VF7iCBwzsgUtqKCevsmFNsEnekfoCciTP
-         eLPSXseIstnQpaLvnBei5dOCtaKpVI9q7oCbTaIK5b8xVDNxgVMTdndTR6XCVddmdr9C
-         IB9w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=C33/RTr3a45MhCrcAOe4IXwcMFotPZnSUAEPINGFBDg=;
-        fh=JdaJUd1pRJnuHdJ93Rqh1e431ZCtAu4uncHxb54eRWE=;
-        b=pi7ZmDbtMwnbmjhFDDpAVDplRhoN1/mwioPceZ/wB+u+CzRqtNb5GVUeCZmnydITsh
-         JXgnqqrIKRbVe6jGeA1/UpyqIP27u0h4gCqk3Qo56S6y1W8oJEa4CqgFs7WCeatNd1b/
-         ShBAuyEzWhxizi62tlmOGSTkA4ETvC0E/q+VVhlTxi2cGG9RVCFDbvGUg/rSjqFY9lhD
-         TPc5I7l1x3u67NWb53+1wFDHAaemu2EPcr/7bkmYkCksfNvQfC26hyVCBMgjPwdsy8E1
-         VTooM+HVXyCEGCvKEbHZwDbbwtkVDb1qI1xiYJMnLhIGQplUaOyPP8d1w1aELRbUv+pG
-         Q27A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	dkim=pass (2048-bit key) header.d=eventprospectdata-com.20251104.gappssmtp.com header.i=@eventprospectdata-com.20251104.gappssmtp.com header.b="dn/Adxdk"
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-cc1cf287ef8so515929a12.3
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Aug 2026 12:16:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787764250; x=1788369050; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=C33/RTr3a45MhCrcAOe4IXwcMFotPZnSUAEPINGFBDg=;
-        b=sO7hteWtQBIRfpcJEk78Avuz+RjD1GI3txY5K9r0dCukDfr+3ImEdBxiBJ+tDgafnG
-         JHMX7vznlMVbvWvHJbRN+wBlAdi2/G01r14SsSGh6/iZEqaA/fC32dv+82xpI+X5dFUS
-         vScJFOIGJX0pv2LAIEPLmRmIkXO1q7qMAI5Bq9iwbrshe0t4li1dQ/q/m6l76iDzUz5s
-         YVsbQq3DZjpZtQAYXkoTLdKgTL+A2v57Qr2lmLMiVw+diAswiCp0zdxToLvCNkeenaUO
-         UV00KfBYA4LSAdfHY8Ze/n20aprQLWi46fHgEu5Kl2csKI9yBHSvpomvDi5Kl71hEyu4
-         KQsw==
+        d=eventprospectdata-com.20251104.gappssmtp.com; s=20251104; t=1787771810; x=1788376610; darn=vger.kernel.org;
+        h=disposition-notification-to:content-language:thread-index
+         :content-type:mime-version:message-id:date:subject:to:from:from:to
+         :cc:subject:date:message-id:reply-to:content-type;
+        bh=aE8fiUo6jvo0Kwtq98EujPEP396oeKdnipp6R0GUto8=;
+        b=dn/AdxdkUF3SmIgVUBtvZ5XoBIkc5s+CP11YQ0RPnEIZd6tBTe0CMSwtJ9vkKUSax9
+         uvM4b6/SfakrKmSyxRsfTDUmufd75P4NfC6kv/k7Iu5qeQDjw5E5NKS5cgVa7DukQTwV
+         CyTZbe2CONceCw0CUu/uJdiT3ZP0NG57Dc0lczDZwFdqmlQm+8VYbI7AZfTZ6i+5xBG/
+         iFOuBSrV9u1qZn15dAdgPdEEZKnBIo+aokPRpbsoZYyyWnNy6FV+AdmY3PAginZny8NX
+         e8BW6J7RXkg8iPv1rn9SWO8vFt38dB2aTKkN0rN3l3tnCIcy3dzPb9m13XVQ8tAnyyWS
+         Uf3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787764250; x=1788369050;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
+        d=1e100.net; s=20251104; t=1787771810; x=1788376610;
+        h=disposition-notification-to:content-language:thread-index
+         :content-type:mime-version:message-id:date:subject:to:from:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=C33/RTr3a45MhCrcAOe4IXwcMFotPZnSUAEPINGFBDg=;
-        b=Imiok8ffsb39pwYP4lpRYmlDk+sxP4/ilmTmDm9v3/f+7uTCKzAL3MqRCmrfP3WgUu
-         M7JJ65aLOJlLyQTsF0B/Cux+H8n3OCqf4Ngaj9nUGqPIjBJwuRddtY/mgn+3PKVxtm93
-         qR1TKnWJe3MtCkLrkJx+NBiUQHIwTZ8+brU3HjHb9vHNqIWfUHZVnWioDc9e97QkxKVz
-         Zd9Yaq1hFNt9E9TyWWO5RDfD5J/DbGN1TdM7kcvcD50cTb9gJ0ndBNv7l51i9d+3dLQ9
-         e/45F3FNtNLaV29ZgRQaev/IS6i4hG3UY4PJbKmKMHwNs2OIFTeZaTOp5OTLyOJ+vdBH
-         tZ0g==
-X-Forwarded-Encrypted: i=1; AHgh+Rp4DnCS8A+7FYDubNxArf+JJ2aZ6bQfDLgGJesqGJXmeAcY74Z9h76cg74knxpoZPMIZtYNuHRx0LR5bqA=@vger.kernel.org
-X-Gm-Message-State: AFuF++mh5qqxZeJkUnBa++iQjHVzeXtqgHJJDT51fI4GG4W709QmVR8T
-	XZiF4hGnXwgQf1pQHkws+tOX/mx09jRxotIrSShysCiXbSztCyxaKLtmi1fGe7lgROKCDeRRHrB
-	L4c+VkNatNrAMqjkCA1FP70ECi0AAdgs=
-X-Gm-Gg: AR+sD12X+jM2oVFwancFZ5o5JWKtRN0IyB7Mdv+xUfv++HV2+GvcDYGayKOkhP+/JvL
-	CMxSWzA9dvrwoPClJArpMPxL+phiTZ+5ozyHB2c1CsVVSe6WHBlh6n6J/Tpllz+qqXRjKkIpNuS
-	UgJZFFDfkUoT6Bf4PVHLEwVCRL7SM78Qp9EcAZW26tRoxWn7q1sFEXCLD+/uDgF/klNtRaXluog
-	QQXt2xtGE2i9qpKG6UIdUW9Tv4INHt+/OuPf46iM6QFHm2nny7nVfb5WwP1L+oN7R9bbEX+CjTb
-	+KSucT9Go2QGTTupz93Id1cY2iETopnqPSnNZ+6Sj5iWCvzS4J8xjDWRnaxvd40vmFGSq0crVcA
-	2iA==
-X-Received: by 2002:a5d:6f0d:0:b0:47f:71a0:c060 with SMTP id
- ffacd0b85a97d-482eab5ff3cmr634773f8f.2.1787764250208; Wed, 26 Aug 2026
- 10:10:50 -0700 (PDT)
+        bh=aE8fiUo6jvo0Kwtq98EujPEP396oeKdnipp6R0GUto8=;
+        b=V2Pr7poTGn2xGVSARsycTOcAZgwf6BM1qcvzg2Sgmqm0exHW+KPeEKTdqDewqV+c6j
+         Drg0uXZ3WKSQfHA6vTaM5dXdlxwGtysJTLCKVpnJLxzkG5MsvhqtKnnfQVRhZHCzAVc4
+         TaN0wKhGGB/Fzpg3OSRs1ipDRY82wqsD3IUZsoWzLz9ek8svFP/R1LRBML9G+zWwVfWL
+         FhzuMSDpZvFL1+NMPFduGmDN+WHefzSnZhk4+ler5npHRKYueEzW1tTtldJ1m3YI8Etk
+         Wp+cdCBOLo2In0dXhtTAgltqZ7+X3xZa4OIr9D/yzpQz198MxJgKrheexcbe6RyeNpOW
+         dMlw==
+X-Gm-Message-State: AFuF++me4Ml5DwWG3ccTZ5YsDj2NqxvlNaEFRnuNMD4bUonA3oJB2uHN
+	d3Q/JbBiZuq7J1+vCfg8h3+uRSrAI+CLbLOy3v7ze+p843gDEOz5jZoigRaeloNJ30/t36b2dgo
+	eA4CC
+X-Gm-Gg: AR+sD13Hhfx7EwaynVcEQhOflHYBM6vXERubKhIaJu1yAJ8YQ3ahjyxZklTVJ2x9YOj
+	/BRXa0qlkujK575Q2izP+63JaOiSd+z9fN2IZ6t3u4n6nSABcn58qFVBcSlEXkSkAthYRBbb6Ed
+	AxiyUV+SluVPrJS7QCQQK09CQLXvrsVSv1cAQnuCkRLOQv50HMqngDO383ZnrkaHceSuTubLHPq
+	fWyh3piCRSPW68z880nWMjrJUAt2GODiTF7N4zzV0kN9XBW0o5klpPJJY23gY0W9R4vCDv/9Ncp
+	0JikOfv1x0q10zRANexD1626LUrAqSWK3ajTqVUVXSCWs8cusz9+S/xFSZi7GFuneyUAI97HuDf
+	tBwntkVoc3TH69ZNdiyYD2TBqKyg1ZJZR2hj6tRjSs5eGayEo1+euNmREibt5o/0k96+nfc8ISk
+	3bFagpbkasvQpyrbd7b0eJXQhrh3PtrLWYiIpsnKqMKAUXGtlLbKkMKDoinlAeToyd6p+c8Oyvx
+	MB+5L5CB5ObF8c=
+X-Received: by 2002:a17:90b:1804:b0:36b:bec8:94c5 with SMTP id 98e67ed59e1d1-3966d400328mr17727657a91.10.1787771810059;
+        Wed, 26 Aug 2026 12:16:50 -0700 (PDT)
+Received: from DESKTOPKFKOC8H ([2406:7400:11d:a556:f10e:6485:6459:9d71])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3283d8d208csm10656459eec.23.2026.08.26.12.16.47
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 26 Aug 2026 12:16:48 -0700 (PDT)
+From: "Monica Arellano" <monica.a@eventprospectdata.com>
+To: <linux-crypto@vger.kernel.org>
+Subject: Tech Show Madrid 2026 - Vger.Kernel
+Date: Wed, 26 Aug 2026 16:16:43 -0300
+Message-ID: <!&!AAAAAAAAAAAYAAAAAAAAAPk5ouWl8q9IoAKtFEFS7BHCgAAAGAAAAAAAAAD5OaLlpfKvSKACrRRBUuwRZEeyAAEAAAAA@eventprospectdata.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260826122558.2662013-1-usama.arif@linux.dev>
-In-Reply-To: <20260826122558.2662013-1-usama.arif@linux.dev>
-From: Nhat Pham <nphamcs@gmail.com>
-Date: Wed, 26 Aug 2026 10:10:38 -0700
-X-Gm-Features: AcwNN1UY_oOpB_Wq3_fowiaqVP0X_Osa5KQ5Tfmau1VqN-lIGJIFBmzzrbkdcK8
-Message-ID: <CAKEwX=NRXuqRTg9L3AjBVeaXhm5bxK_rHe8d7d_GUOGKjxC3xg@mail.gmail.com>
-Subject: Re: [PATCH 0/3] zstd: probe the CPU for BMI2 support once, not per context
-To: Usama Arif <usama.arif@linux.dev>
-Cc: dsterba@suse.com, linux-kernel@vger.kernel.org, terrelln@fb.com, 
-	linux-crypto@vger.kernel.org, yosry@kernel.org, hannes@cmpxchg.org, 
-	chengming.zhou@linux.dev, shakeel.butt@linux.dev, kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/mixed;
+	boundary="----=_NextPart_000_787B_01DD3576.4B3C9EE0"
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: Ad01j24tPyOCbXTaQQmgsP2G8rgLBA==
+Content-Language: en-us
+X-MS-TNEF-Correlator: 00000000F939A2E5A5F2AF48A002AD144152EC118447B200
 
-On Wed, Aug 26, 2026 at 5:26=E2=80=AFAM Usama Arif <usama.arif@linux.dev> w=
-rote:
->
-> zstd picks between BMI2 and generic code paths at runtime, and issues
-> CPUID to decide every time a compression or decompression context is set
-> up. The answer cannot change while the kernel is running.
->
-> It is not a cold path: squashfs calls zstd_init_dstream() for every block
-> it decompresses, and erofs, btrfs, f2fs and crypto/zstd all initialise a
-> context per operation. Each probe is two serializing CPUID instructions
-> on x86.
->
-> Patch 1 routes ZSTD_initStaticCCtx() through ZSTD_cpuSupportsBmi2()
-> instead of open-coding the probe, which also fixes it testing for BMI2
-> without BMI1 - the bodies it selects are tagged
-> TARGET_ATTRIBUTE("lzcnt,bmi,bmi2"), so both are needed. No CPU in the
-> field implements BMI2 without BMI1, so this is latent. Patch 2 skips the
-> probe when DYNAMIC_BMI2 is 0, where every consumer ignores the flag
-> anyway. Patch 3 caches the result.
->
-> A 4 KiB crypto_acomp benchmark [1] in a one-vCPU KVM guest, twelve boots
-> of nine 30,000-operation rounds, median per-round mean over 108 rounds:
->
->                     compress     decompress
->   unpatched         16,756 ns     3,455 ns
->   patched           13,646 ns     1,002 ns
->                     -3,110 ns    -2,452 ns
->                      (18.6%)      (71.0%)
->
-> The main reason is because CPUID is an unconditional VM exit.
->
-> [1] https://gist.github.com/uarif1/5cf02f0e22c23f0d1b3d84348f12914c
+This is a multipart message in MIME format.
 
-Awesome! I'm no zstd expert, but this looks very nice. Thanks for
-fixing it. I'll defer mostly to Nick (is the fb.com email still
-working?) and Herbert for correctness checking.
+------=_NextPart_000_787B_01DD3576.4B3C9EE0
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 
-BTW, I think this has been reported in the past:
+Hi,
 
-https://lore.kernel.org/all/CAJxJ_jhvyMukPLThpgcdCMHwbp3b3bFvc4Va1cK79_3z6u=
-bhwQ@mail.gmail.com/
+ 
+
+Would you be interested in acquiring the attendees email database for Tech
+Show Madrid 2026?
+
+ 
+
+Attendee Profiles: IT Directors, CIOs, CTOs, Cloud & Infrastructure
+Managers, Cybersecurity Professionals, Data & Analytics Leaders, Digital
+Transformation Managers, Network Administrators, IT Operations Managers,
+Software & Technology Professionals, System Architects, DevOps
+Professionals, and more!
+
+ 
+
+Please let me know if you're interested, and we can provide you with the
+total number of attendees and pricing details for your review.
+
+ 
+
+Best regards,
+
+Monica Arellano
+
+Trade Show & Events Data Specialist
+
+ 
+
+Note: If you're also interested in upcoming event lists or industry
+email/user lists, please feel free to let me know. I'd be happy to help you
+find the right data for your needs.
+
+
+------=_NextPart_000_787B_01DD3576.4B3C9EE0
+Content-Type: application/ms-tnef;
+	name="winmail.dat"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+	filename="winmail.dat"
+
+eJ8+Ii8TAQaQCAAEAAAAAAABAAEAAQeQBgAIAAAA5AQAAAAAAADoAAEIgAcAGAAAAElQTS5NaWNy
+b3NvZnQgTWFpbC5Ob3RlADEIAQOQBgCMDgAAKQAAAAsAAgABAAAAAwAmAAAAAAALACkAAQAAAAIB
+MQABAAAAVgAAAFBDREZFQjA5AAEAAgAAAAAAAAAAAAAAAAAYAAAAAAAAAPk5ouWl8q9IoAKtFEFS
+7BHCgAAAGAAAAAAAAAD5OaLlpfKvSKACrRRBUuwRZEeyAAEAAAAAAAAeAHAAAQAAACQAAABUZWNo
+IFNob3cgTWFkcmlkIDIwMjYgLSBWZ2VyLktlcm5lbAACAXEAAQAAABYAAAAB3TWPbi0/I4JtdNpB
+CaCw/YbyuAsEAAALAAEOAAAAAAIBCg4BAAAAGAAAAAAAAAD5OaLlpfKvSKACrRRBUuwRwoAAAAMA
+FA4BAAAAHgAoDgEAAABHAAAAMDAwMDAwMDgBbW9uaWNhLmFAZXZlbnRwcm9zcGVjdGRhdGEuY29t
+AW1vbmljYS5hQGV2ZW50cHJvc3BlY3RkYXRhLmNvbQAAHgApDgEAAABHAAAAMDAwMDAwMDgBbW9u
+aWNhLmFAZXZlbnRwcm9zcGVjdGRhdGEuY29tAW1vbmljYS5hQGV2ZW50cHJvc3BlY3RkYXRhLmNv
+bQAAAwAWEAAAAAADAN4/n04AAAMA8T8JBAAAAwACWQAAFgADAAlZAgAAAAMAEIAIIAYAAAAAAMAA
+AAAAAABGAAAAABCFAAAAAAAACwAcgAggBgAAAAAAwAAAAAAAAEYAAAAAA4UAAAAAAAADACKACCAG
+AAAAAADAAAAAAAAARgAAAAABhQAAAAAAAAsAeIAIIAYAAAAAAMAAAAAAAABGAAAAAAaFAAAAAAAA
+CwB6gAggBgAAAAAAwAAAAAAAAEYAAAAADoUAAAAAAAADAH2ACCAGAAAAAADAAAAAAAAARgAAAAAY
+hQAAAAAAAAsAkoAIIAYAAAAAAMAAAAAAAABGAAAAAIKFAAABAAAAHgDOgAggBgAAAAAAwAAAAAAA
+AEYBAAAAGAAAAEMAbwBtAHAAbwBzAGUAVAB5AHAAZQAAAAEAAAAIAAAAbmV3TWFpbAADANCACCAG
+AAAAAADAAAAAAAAARgAAAADrhQAACQQAAAIB2YAIIAYAAAAAAMAAAAAAAABGAQAAADYAAABJAG4A
+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
+8gepE0B0KYH+a/Xgc6A6wQcRM6ICwQIRXk9aAQ9jwhAHuFMi8Xf/SABKoAp/C48GN8YSP5AacFJn
+CR9TecAxbfXgcs8nwDrga+EJ8mV2EhDCEM8JPVXBNjDDMGUh3T/eT//iP/dP+F/lb+Z/54/8H+mv
+/+q/68/s3/yf/a/+v//PAN//3S8cb99P4F/hbx3PHt8f7/8g/yIPIx8kLyU/Jk8nXzmv3yl/Ko8r
+nyyvLbxQbnDC4utucHmwbUqgaxbgxpB3YeO/YTAPIzgyWDAxW/qgrz54B4G/2Bq0dweQY0BR+nAJ
+QHZ7IAeQv2JeoMFQR8FDApAOkm51bQhxIP8TcMGJGtJKwA2AwRIN8MKwf8JgwhDDIr9hYNBVYErw
+Zfx3Li6fL68znzSvNb82z/833zjvPs87DzwfPS8+Pz9P/0BfQW9Cf0OPLo9Q/zCvMb//Ms9SX1Nv
+VH9Vj1afV69Yv/9Zz1rfW+9uP+4v7z9df16Pb1+fYK9hv3X0QsAhSRFn/ROwZALAaP9qD/u/+j9+
+b/92T3dfeG95f3qPgc9j72ff/2jvfb9rD2wfbS+HD29PcF//cW9yf4H/gw+EH4Uvhj+U5J5ND5AN
+gApQGLBlbJMA/xbgh6+Iv4nPit+L74z/jg//jx+U/5E/kk+TX5RvlX+Wj/+Xn5ivmb8OwksRxmNk
+nxUPuQY3RXb2IBkwChRTEiD/TiCsIcAwm8+c353vnv+gD/+hH6Ivoz+pH6Vfpm+nf6iP/6mfqq+r
+v6zPrd+Hn7S/ZT//Zk9nX7Yfty+4P7lPul+7b/+8f72Pvp+/r9H/wc/C38Pv/8T/xgzVoBkAAfFF
+70b/SA8bSRIJ0W9JSUlBIHVw/GNvEQFOUBmAsnFFABEx507QTwFOMGR1BxEXMBiAvU6hL+OwTLHi
+8wLQcES0vwlgm2BO4EmQS/JFCi4CAB/dv97PSFsa8EygIGhh3HBwFzDmQUvgbNTwS0Lv9rAa4UvS
+COBnsRBOYAoy/U73bvZQfIBP78fvy9/M73/N/88P0B/RL9cP00/X1TBh7tEvZGl28k/2b2dGNdhR
+gJBvZHnvPjcXgHGxEtPAff3QAwANNP0/pQ4DAA80/T+lDgIBFDQBAAAAEAAAAE5JVEH5v7gBAKoA
+N9luAAACAX8AAQAAADEAAAAwMDAwMDAwMEY5MzlBMkU1QTVGMkFGNDhBMDAyQUQxNDQxNTJFQzEx
+ODQ0N0IyMDAAAAAAAwAGEESZ9ioDAAcQkQIAAAMAEBAAAAAAAwAREAEAAAAeAAgQAQAAAGUAAABI
+SSxXT1VMRFlPVUJFSU5URVJFU1RFRElOQUNRVUlSSU5HVEhFQVRURU5ERUVTRU1BSUxEQVRBQkFT
+RUZPUlRFQ0hTSE9XTUFEUklEMjAyNj9BVFRFTkRFRVBST0ZJTEVTOklUAAAAAD/w
+
+------=_NextPart_000_787B_01DD3576.4B3C9EE0--
+
