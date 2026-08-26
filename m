@@ -1,101 +1,96 @@
-Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
+Received: from mail-yx1-f52.google.com (mail-yx1-f52.google.com [74.125.224.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8370B3B71C9
-	for <linux-crypto@vger.kernel.org>; Wed, 26 Aug 2026 08:04:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58191223336
+	for <linux-crypto@vger.kernel.org>; Wed, 26 Aug 2026 08:05:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=74.125.224.52
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787731480; cv=pass; b=Al4knggAz8swZK1D5JBSzZDmA83wMH4XE43/Ced3LT/ya088NAxu1dwmUltbg3YB1xpijYvL+0s+5CVkOG2FNqh6d6ZP8sd/V+9WNPhMIdaWLLYSL+9wDM5ftd+oi1FUxD28U0pT7oa8zKPAlzmeEbPbelmVLZ94dfzhtdAmwxA=
+	t=1787731505; cv=pass; b=E98raHzScUo//o9jFM7M3B1oosUMEGR5XaWArFTlFC5V5S34Wf/x1g37k1A6w+nDhAuDA3pBkREOY4oZwK21xmYdeeQjXpjJ4eoBDqcLrH1TZUVEO+QuaMNWw6vem2n73InuM2OwWhK7PoiNeEj1+s1Ey9DPwbe/m8SYSsiy4Cw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787731480; c=relaxed/simple;
-	bh=gljENqI22pecVC7PFj3mqQuHtHE6FZCK6uxJWQ0B0nc=;
+	s=arc-20240116; t=1787731505; c=relaxed/simple;
+	bh=q1ptEiUS27cJ8PNXiFVfigkQBm1gnQDUPUh9u8WMA1Y=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gO36CORN3RFkwSvsASXROTbN90kImz8F0D7+NvRKx+kNXPaGd0j2G9EdE1WJg6IS6YOjKd9pm/5o4iApku6avAi/+CyLEDb0z4SJz1xlik/O/XoK8t+3BJZkNA119yzho5WVW8fa8g13FTWoXGDZ1dlapU8fYmfOpaKA2twPhX8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JZzpKw+A; arc=pass smtp.client-ip=74.125.224.53
+	 To:Cc:Content-Type; b=qEqL8pT7HHSbI+u1AJjBS0hKCDrOzsqSv6l2E8d7uqh8YloX20MoA6AsRk95VZBfMzonwJBNym6pxkZBBlykzAd8JU2oa0nyMqXgBwu+hi9nLIarANX6/29Q/cobkZjm37qDWIhBatlcyop9f7fEEWUEQ3CF8/hpeV9021ooYds=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=rmutVuZJ; arc=pass smtp.client-ip=74.125.224.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JZzpKw+A"
-Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-66d1442b24eso593452d50.1
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Aug 2026 01:04:38 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1787731477; cv=none;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rmutVuZJ"
+Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-66d0743503aso1076421d50.3
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Aug 2026 01:05:04 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1787731503; cv=none;
         d=google.com; s=arc-20260327;
-        b=Kdf2DOR2fK2hnUZglKaevosNXhTJirb3jRs5UlAkxUl+3hZckpHoy32GZiL5UzRVKi
-         uQaF763TzVMk69Zfp/KEVVmAZQSyHTF2fbprpUAPqyY07tdqVKR3REGoGgyG9cfHZFT4
-         +VGUljBG0VhT/GffdIHCOOD0KyVLo9dhnMMY8/fMJ0XiZgsk1KtceBig4WEG4OdcFcQL
-         mmGvlsGJs25xoTObnFuE+gSM5qkr7w9hlXTA6HL0PqbFCDus40I/suAWi8m401c6cHVK
-         0CoiBFoLQB1H+KtHshtgACSH+NkjfNtHWMzvUlye3Zou+tE9euFX0gZ06aX2zbFRwqVZ
-         Oa4w==
+        b=UiUZY0roWtJ/YGDmeV7wWsvGDqXL26zU0pua6t4xFS6KkEtUd6xqX41UyqTnob+4oa
+         m7B2n/V4drEIO1va/nG+BgE6m1b5yOTXeUaQBQ5Robm9Ua7MwJ5slc8rmWMmhfJKwV2J
+         5vvalpM2zmQU6fwHhrvztRd0j3Qee6vmBeurc4+IKW0hJeLc1DIHZfzLlyI0Vh9q4Ycz
+         MtiYWRk1ACsF5GcxmPQRD4Y37PaQCsHlD9mPNrUbzlNvHK8dH0vLtevjBUIRJU34jcm+
+         w+8ud098JiI+SPaO4ooeIXWl2FktA4OGoH1g249XtWFo/1Vpq8Utf6fxuTMLyQ8gcWh/
+         TF+g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:dkim-signature;
-        bh=gljENqI22pecVC7PFj3mqQuHtHE6FZCK6uxJWQ0B0nc=;
-        fh=jjNam1EaHnzOMZkjfp5tvVON+8H/A/Dji+agWGHhdkE=;
-        b=g3RIBlJFdd2pDH9NHIsC4OwmFoUw5JXhZx1rOmnOJBSqnjD228qKyBsy6MJROPjLHi
-         iYZUgxXtTG31QMWavVoIm+caNkOtN31Aprtv3mnYPTlGXkPjydPPteefbMb1RmVJXeTF
-         66KV3bIZDI85yc4ChR9G4116voXBqUuWncjhh6WPwwrXzSohm647RCTH49p37y47ZeDT
-         xJNa2P9Wds+wKVV8M4tBX15yfSwPuYE0QenBw9htxLXDYlUVgbeaZcqp4JwQNHtKd0FN
-         MbS30bXl6LQmxpD+0aE9LBka2GQvAo7KZwmml4gq0kgsC/sKc/e/lGBnhOPag5qwZEV6
-         1WoA==;
+        bh=q1ptEiUS27cJ8PNXiFVfigkQBm1gnQDUPUh9u8WMA1Y=;
+        fh=MvGYw80IrzxtKg5fgysPrC6+dVir0LcP+Ws5h370LXI=;
+        b=oZJQMJCCU0Zhu6S0sTiQzn5x9J0ec6sjDOlN+BxQW2qNskvn5W1TPP+OES1hayxPOw
+         pErNg7R/jCiEgM4JqxD/QePaBm+XBXktNkiNPDeq8pHDzZilDX/c4Z6ShYyrJUus6sM9
+         SNOEo1Bom18VZjmlrNK2fb/+s6coQCcclq1MnHdpxFV7MtYcxTvkp60tGil3E5Ka4C0O
+         yf+lUkKs4CE4+V7XhHLVPsycGPqvgYFrF0iP5EIrU41577VlPIQq90sJGvQu8hwj1kSh
+         ZqlBlCpbtz6QJ0WGdt/3Na0DRKJoRmT9cg1+2zwMTFldT/LbfoxDEM9reaCyA0qNWQnT
+         UbQw==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787731477; x=1788336277; darn=vger.kernel.org;
+        d=gmail.com; s=20251104; t=1787731503; x=1788336303; darn=vger.kernel.org;
         h=content-type:cc:to:subject:message-id:date:from:in-reply-to
          :references:mime-version:from:to:cc:subject:date:message-id:reply-to
          :content-type;
-        bh=gljENqI22pecVC7PFj3mqQuHtHE6FZCK6uxJWQ0B0nc=;
-        b=JZzpKw+AAPBmuxuCaGpy4CXoHmxkNgbKRfGxEHGIQgnR2E+xFmaLtyEaGqKB2i2YYt
-         AF8XIOQlvTZ584+HN+d52SEVrzy/479qIC0/T8ms+eWWuXsdlof3Qe4NcT4mIBb6dVJ+
-         Qo1mh96rwtVLvmOuk/MArJ2NvEscDFhV8jZOhXSmzw7uwUkM7znw94N+tiOU4npRJGXp
-         s3mZpPn/L2cNRtVEbDZIbJxQIOoZTPfi6RPES7Pik4NsBvxJAp0DcdEPUokKYUgMg7zT
-         is8TrdNKOK7OcEpSm9tWvQg8WYdF4WFsvuyfGNHBiELmj+2+/pEpCpfh0bLtfti8b8gn
-         pNHA==
+        bh=q1ptEiUS27cJ8PNXiFVfigkQBm1gnQDUPUh9u8WMA1Y=;
+        b=rmutVuZJrhUkQ0WIN/iG8Jc+ObgT4mV+6DQ5NqJ/Iftbnyzqqg0y5oR7m2mUPUkC3g
+         xBLQlmKoASwUVqcTwGqePoZCG49AePkUiXwC/qiFMTOkkzuL1mIXmf9acDo1NZaIsyAM
+         IH6hzpsZPKYx5krW3l4ogmyTB9oW49yAIGKiSdTCnMjD7TDx1xjlWeZkFfkVCMq8Oy9R
+         Se051HYJrJyrQ8HuOoA7q7ohjlrwbu+NONUal53B5vJDZNBvqxzF/6vDJEpu05CYs7pf
+         EFliOComyWRxwBWNcmIomhPmZmzYV8BiIppKZDx8PdEUkJn2Ygv4FR6LiJPjKyjQxzcQ
+         MCyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787731477; x=1788336277;
+        d=1e100.net; s=20251104; t=1787731503; x=1788336303;
         h=content-type:cc:to:subject:message-id:date:from:in-reply-to
          :references:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to:content-type;
-        bh=gljENqI22pecVC7PFj3mqQuHtHE6FZCK6uxJWQ0B0nc=;
-        b=m0okXKd1a7iVqfLMUoL88XrPgph8EzHAc9oLGrDg0+s67bULvNFrBDyACsKcJijUEi
-         I/fi1vsRGwX9vs29FoRuxz3/7uSPU/KA5QRryuPWeZvMmKpeOw9T3M0vZXAD6JpV6MD5
-         HD6tGFvy6LTNYZfvzejzCkxzXauegqmHxmcObeQ9kaLzYI+DxxoUAB3oN32mlK3mG6uw
-         r/oL5/9w3WsOu/rbhjSzE0/30IcQq6PqVn/N+YlG1uw9wFG/B0uid/NZwAKIMgClc+Zg
-         H/iAf45tl5AadAl3jQVUHPT1XRD476ZPPWKjy5wYBIzdgIbMwazC1/yPBRAOggTYFeBy
-         YayA==
-X-Forwarded-Encrypted: i=1; AHgh+RrTLwAxayltaX+l+ltuDw0AQB1VE88+/k3NWprRLNfltp8UdiqaHORZG+NUPvdp7YDFrNnzVlqaRXWpm90=@vger.kernel.org
-X-Gm-Message-State: AFuF++k4rcO7lXBzd0J7QRNR18saNY1ryIkp4nM0CzXRRiSy1oF/zQKm
-	P2ewX6PfXZrRbphRe/iEuYAujRzLBeJbMP5RExkukzo/SO38S+v8Y0cJxcQ5CV0R99oF8uJPyJ1
-	WZqW+pjyAyv8wWu1Ivl8p154pmnoBM98=
-X-Gm-Gg: AR+sD11ILJ0Or2Q7R/OheiPKts2wYv9Xlvsdx06A2qIkdlKMfk75sH5LzGlAYt6lj+V
-	aE1t1RCpxP8giimiKgM5ozeEj9cIzfUGiC49RF0I2K+LVyzWuKhPMXqS6oQZ0mWUxxY+N7U9OQD
-	GrmTTItQDc9uJPRlNFO6HRhP4IwpHZHOhP/6OI/zQIsQ4IvPZ9Liw6PYIE2phGZNPu+zF8If6eL
-	fUJOf1YQch3ATGBF9YgbTOgT9GS/C/jKsU7rlUeMkR0DHH/ucxj+OEMV4KyMMSgRnRegwE73TRR
-	qhi5szVezscmEyXw4jMWs4el6K+OZa+3wthqvZjB4o15HxM=
-X-Received: by 2002:a53:ac9c:0:b0:668:9fa5:b9cc with SMTP id
- 956f58d0204a3-66d2551013fmr1633452d50.0.1787731477460; Wed, 26 Aug 2026
- 01:04:37 -0700 (PDT)
+        bh=q1ptEiUS27cJ8PNXiFVfigkQBm1gnQDUPUh9u8WMA1Y=;
+        b=WG9nubgqokm5jXynWMO2tJVvD9453TbHNYzCT3qc1D757HyWg1voPtdsuLDXxUu8SN
+         wtU7Xxtf0WF3C81G30QoClohxbe2Za6jAk+A/N165jZqd7Ltff5+onfxO343aBXliqxK
+         tGXw98R0tCLsm39ROhEEEszCh3q8bBzgUg7mNWPA9o0UvCkDSlaZNVxOuSXpSaz2iHCb
+         b48lnLphmPyJaPyyUIYxjXF/kOvg0bDzEvsDRzqVSS0SBs8e6epUIn5wjQQOyNLhtpHG
+         be3HMLVTp0iVj0aW79EEMiADvzFj60+g8MHoLw+dvBoHn5pgJMjrT06Bi9+Jwnqh+uLz
+         BHGg==
+X-Forwarded-Encrypted: i=1; AHgh+RpeLKY41y5xN4Ips25+yVzg7wVVYua85g5Lgqxik3MSM4MBkalCMUqZJ6Nb7+ExV/VCO+cVF4CrT3ZFUHU=@vger.kernel.org
+X-Gm-Message-State: AFuF++n//GUEPErgxVCyT3J/APC23NIn2KQStnUU5mEDJtWfq/77fjQf
+	0jjhacE8xDwAorBqa36zxGPp4UExIRCcnUgbm4Vlh9iHAcIWketDKZ+X8+1AzhHoOkxk1smJEE3
+	HEkDRLUDApPQetTVD8KCjYvWIHh0r8Nk=
+X-Gm-Gg: AR+sD10Jmkia9kuPP+gXTxFQWFKfTgyVJ4RV5mFGA5JSjEJCz5R5kz1YGGagb3QFauH
+	8C1+Csol0ZCYjQdrJ3jB2ra/R/ik6eTMZENunL2AJYiFz7EK/8m3/A/1egWix7LJddSLCuGdqZY
+	2X4BST/geSt0ttkhCJhHS9J2v1yABfDeAmHXZbQ6PS1HUqv5EPuCr1SgRLsHUZMO54xBGAVioKW
+	fgzasUeaUI/kJEClkOtsxEEXsmF41SWwpyAUblhjg4/6plVuDmp9pt2hcYRl7AxFK/ITeWUVvn+
+	rqhUIPcZKNbVI1cyRmbD2S16v0P5mLi3qJc0HcCK5tY8MI8=
+X-Received: by 2002:a05:690e:b49:b0:667:dc6d:736b with SMTP id
+ 956f58d0204a3-66d257bd67fmr1671369d50.32.1787731502731; Wed, 26 Aug 2026
+ 01:05:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260808073748.2649808-1-lgs201920130244@gmail.com> <9e6142fb-bb69-459b-b7e7-4aaf2bbc3bc4@kernel.org>
-In-Reply-To: <9e6142fb-bb69-459b-b7e7-4aaf2bbc3bc4@kernel.org>
+References: <20260808084212.2704516-1-lgs201920130244@gmail.com> <cee7a7fa-25a7-4210-893b-2adeede359cc@kernel.org>
+In-Reply-To: <cee7a7fa-25a7-4210-893b-2adeede359cc@kernel.org>
 From: Guangshuo Li <lgs201920130244@gmail.com>
-Date: Wed, 26 Aug 2026 16:04:24 +0800
-X-Gm-Features: AcwNN1WTArxH-Wd9ybxPgMiQ8kdpjWn5ZJku5MGMoyUD_P2LJqYmH3XojzLPzC0
-Message-ID: <CANUHTR-Kqb+fw1EfPoD5W4SMYR6euBcy47jfGVYF0P0y7gfVtQ@mail.gmail.com>
-Subject: Re: [PATCH] hwrng: npcm: fix usage_count leak when autosuspend_delay
- is negative
+Date: Wed, 26 Aug 2026 16:04:49 +0800
+X-Gm-Features: AcwNN1VfY5pxYmdULwYtIxZ9KlhPIA1W0T9QQaUiBasP1BWhplGLoNCUt8lqaWk
+Message-ID: <CANUHTR_icbJKGJGdnPAm=nrKoRnjC1_dM0oxiTNKnDzrJ-LoyQ@mail.gmail.com>
+Subject: Re: [PATCH] crypto: omap-des: fix autosuspend cleanup during teardown
 To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Andrew Jeffery <andrew@codeconstruct.com.au>, Avi Fishman <avifishman70@gmail.com>, 
-	Tomer Maimon <tmaimon77@gmail.com>, Tali Perry <tali.perry1@gmail.com>, 
-	Patrick Venture <venture@google.com>, Nancy Yuen <yuenn@google.com>, 
-	Benjamin Fair <benjaminfair@google.com>, Olivia Mackall <olivia@selenic.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Daniel Thompson <danielt@kernel.org>, 
-	openbmc@lists.ozlabs.org, linux-crypto@vger.kernel.org, 
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Tero Kristo <t-kristo@ti.com>, linux-crypto@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
@@ -103,9 +98,9 @@ Hi Krzysztof,
 
 On Thu, 20 Aug 2026 at 22:49, Krzysztof Kozlowski <krzk@kernel.org> wrote:
 >
-> On 08/08/2026 09:37, Guangshuo Li wrote:
-> > npcm_rng_probe() calls pm_runtime_use_autosuspend(), but neither the
-> > probe failure path nor npcm_rng_remove() calls the matching
+> On 08/08/2026 10:42, Guangshuo Li wrote:
+> > omap_des_probe() calls pm_runtime_use_autosuspend(), but neither the
+> > probe failure path nor omap_des_remove() calls the matching
 > > pm_runtime_dont_use_autosuspend() before disabling runtime PM.
 > >
 > > If the autosuspend delay is set to a negative value while autosuspend
@@ -119,7 +114,7 @@ On Thu, 20 Aug 2026 at 22:49, Krzysztof Kozlowski <krzk@kernel.org> wrote:
 > >
 > > This issue was found by manual code inspection.
 > >
-> > Fixes: c98429297d8b ("hwrng: npcm - add NPCM RNG driver")
+> > Fixes: 418f2a8cf2eb ("crypto: omap-des - use runtime_pm autosuspend for clock handling")
 > > Cc: stable@vger.kernel.org
 > > Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
 >
