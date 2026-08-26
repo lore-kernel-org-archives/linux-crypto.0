@@ -1,68 +1,72 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A910540DB29
-	for <linux-crypto@vger.kernel.org>; Wed, 26 Aug 2026 16:30:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC092EEE80
+	for <linux-crypto@vger.kernel.org>; Wed, 26 Aug 2026 16:30:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787761826; cv=none; b=HeL6cX2vzEGXQBKkH3sQJN4luO3gkR4bljiTr/qLfIyHdb5gotf00dlaQA4D2l/d4XMlWFm+rktYW2K1Sv6m4o1Z4S7YzyfEFz7oGrjaux7RpqLL5L6p2EyyXo+ObnuDtFn4yMo9zbjdgSid4zd3nWCXFIIVQZM6Opz+AkwKFUk=
+	t=1787761839; cv=none; b=LND51B7YefVN4mZM7gc6On5OI5EwISbT10KpXZL/b85dtidjU2NPxf2hwNI5dP7XyVL2nL6WJsGxzbAOXP3ewGlJhDjLzA8NBnomyLmbnIEnkp7xosQ6nM5zH14NZgNxHivng+cUf7vnWNnZ6rtz0rodXGI+3gC8p1Gfi6SR7+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787761826; c=relaxed/simple;
-	bh=RerT+o0KR5aTPU/MGbXBoEQeMb8OggILxf1MgJ8bnwc=;
+	s=arc-20240116; t=1787761839; c=relaxed/simple;
+	bh=GIoAORWt9IybsRqPS1GJj9HG3FLaEgU1sXlbwWBRAII=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DLy9qyy2+Xb7jUYLDmPwhVMgnLiGQWULN/InzM7rTB6HVGP/PnMnbP6BNqBWg9lb+iD8iQow0KOQZWizqNrnzeQJlnpdMO5E/VJFlEbh2PDOAtP64zaCGLlvnDVtLA4QrpnuJ8zg/CkOlQU8o6DgIvXjJVKtsaCPot0Mw6f6LVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fireburn.co.uk; spf=none smtp.mailfrom=fireburn.co.uk; dkim=pass (2048-bit key) header.d=fireburn-co-uk.20251104.gappssmtp.com header.i=@fireburn-co-uk.20251104.gappssmtp.com header.b=XbOu6+Ua; arc=none smtp.client-ip=209.85.128.51
+	 MIME-Version; b=HEvl/kGuOwMke/+1Z8RfprbgH82c4C3VYgjSp3Yp+/1okw+9PCGgaDGL1LJSTcLMb6P26n9jKDdo7+d/8852h85IuX/TuBBQi96WPFQsGAxrIXvO+jLQBYovHCrq3CzJDcfq5qZrvp+khShXqN8OWV6zV+kaaBy0aBzqs7dEbi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fireburn.co.uk; spf=none smtp.mailfrom=fireburn.co.uk; dkim=pass (2048-bit key) header.d=fireburn-co-uk.20251104.gappssmtp.com header.i=@fireburn-co-uk.20251104.gappssmtp.com header.b=GtGS4tvk; arc=none smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fireburn.co.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=fireburn.co.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fireburn-co-uk.20251104.gappssmtp.com header.i=@fireburn-co-uk.20251104.gappssmtp.com header.b="XbOu6+Ua"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4955aa106b1so10803115e9.0
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Aug 2026 09:30:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=fireburn-co-uk.20251104.gappssmtp.com header.i=@fireburn-co-uk.20251104.gappssmtp.com header.b="GtGS4tvk"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4956242332dso9177675e9.2
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Aug 2026 09:30:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fireburn-co-uk.20251104.gappssmtp.com; s=20251104; t=1787761823; x=1788366623; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=MrQouyjITlfd1IzGNl6BiZWTcdxUJAaNMeQRpNhwBjk=;
-        b=XbOu6+UahBMWe9jTLkeJns5ZUxmJaMd+Lc/ZcB0Vjp1bL/+MPp6RK7lMiy8vLkMbqv
-         ysLvjj8PBnVYFKQGrfkPkuClKXm4tRfG+QvKFo5Dv1UsFW99WQBkND2HdyZgGWUqnw/F
-         HmZWWiGKxnido21DsOQIXKENnu0KTUUnF41sUuJgHXnWcI65GQZl6isrqspD3ajY1C9S
-         mlwSNKgE/Za2r3DJ4QRlaV6fg9e1ce7jIrM4z2dtmBS/8ngN5RRnGaEgXu7ZOiY+Zm/6
-         x57YXtpM/4AmP3fN9ak6dnu9lpRLJhijcrZlBlgCCX7F7O+Vv6mqtEMOM89wVPm0aYtB
-         bSPQ==
+        d=fireburn-co-uk.20251104.gappssmtp.com; s=20251104; t=1787761836; x=1788366636; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=ZGTnLkqhLuxg5PJ2xJQMDnvv9zoYk3OzTHOb4mq4+aw=;
+        b=GtGS4tvkclDQ4iYP0Wc0ogJxtWl6zZUcFZvn5WKHfIgGcyJuUaBhxfuGFUuLOs0iGR
+         hPZwiFdjzs0HT+ykAArOvDhqWq7VOwI2Eru0Il82BeHX5VINsXulN1EzrcGctm8JlerA
+         uT3Ixx61Q3Q/fv0WLRaqqgOwEDLjRO2LLmm0FMkcLDlQj78qdmckr/lOUmN62kP+cdSr
+         GkL+B4SgtL7h6r/XJ1tRxArLEuRN0v90/Xl5Dj8DYftvhfKufizphnoE4PKolJNeC41l
+         WAUURCaER57KEwJy+p6r0U7nEcPN645ZALVxn+d7THcyuf7BC3EU6/eCY5scCFLYNUW4
+         qrUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787761823; x=1788366623;
-        h=content-transfer-encoding:content-type:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=MrQouyjITlfd1IzGNl6BiZWTcdxUJAaNMeQRpNhwBjk=;
-        b=fVtNFcbEJSHD4Jl/NsQvgdKpz33tBIRrJkBBlV4I4oP2tc1Sf224tuZ+tSO5A9ErHm
-         PfkkEUspGCRfNAlxeB+KrLZxYtOONYsLUDXYCbPVizW2D6qtltZ1PX595Pn5UNZn4G9N
-         nxB5yE6LIH8XFagHZGk/8JPBgrC9vGQcGSg1kp+N7Jzouvfps9pnop6vNmXP3w+vCs0n
-         JsDLLtaU7tRUL3ceo0Ao7LTYJ2BGqO/Xa1CAZxY38P3jmY0uz17UF9oBJpM3jcL17SbN
-         FA399KwV91OGbw/DaGKdik5MenW7W1JrZTIfp7ix2hzOH0Hb/0huoriOO42gWtriRbkm
-         AZgw==
-X-Gm-Message-State: AFuF++kFs1xOVd1bOv18HI24h2JOENF/o8MV3hgHEjGEu0Ho+Pxe560c
-	BwymzyCjcCEUrHPhJvuVK8hJBm/HmIhxNvN97D76G2qxveufWNtA/tE+E/7cZjJMnnCBEtaKYyv
-	J2FmroJsu
-X-Gm-Gg: AR+sD11b7wWh+mwD2qZgQ5AX6HeIkWSnFW23FQ46uhZUqBAxnPeDKMKwyeZsRcq/ri1
-	2KdVGcaZPELY/ZET9X7PbZEm0oGFnP+cU66btuWbHlGlnnhSglVjLOe3AjfmWTV7W7NWaBUUHbi
-	FrwFaOYbcexnhX1ZpxopWgYKiVM0cwBSVGk2PbmlgGUm4Dv5toSBzroEmSAaFZSGHAl4bUMk8yQ
-	CNHCzmvCvl4dnpv1g903QnoVRH5UsL0Rbc2OVbVs23AYrzZt5SkM9bPIHbkRk9o/oPzragzd9UF
-	/GXkIkiyzhsdIyPDm2lQKWvmfJ6Nz70tm7C3JCpHLSLr6GqNz2fU6QTZXvnqsSkJvmLVtBoBtHw
-	2AkUwZ/ZMfZc/8EIO6/EL61Ia/iQYLrFERXV30hXs9q7s4IxGvUXca2Lf1NIfu+mSZPgeCR5GyE
-	+JjRPf3YbNN+mBMaOIOLK7ESGa9LgmVsKf/FRAqnpinpyKi70eX/D2cW3bwgTE0AfZ5KbfXi5KT
-	TKTMVKLmANbV4yB+vAE2Q8QIHtzTa8bwUgA
-X-Received: by 2002:a05:600c:3103:b0:499:484a:98e7 with SMTP id 5b1f17b1804b1-499dc8307d6mr76020915e9.14.1787761822719;
-        Wed, 26 Aug 2026 09:30:22 -0700 (PDT)
+        d=1e100.net; s=20251104; t=1787761836; x=1788366636;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=ZGTnLkqhLuxg5PJ2xJQMDnvv9zoYk3OzTHOb4mq4+aw=;
+        b=DvTyf1lgSUORMb+6wQsO3SmZM6CJlifPrb0FS/AQn0GfOoK02w76mwTCPRvwGoUByS
+         ctJMFJrAgwfgQkUIneUsaVezj7Clh5EXEvBoXywgaew7y3nO7h0tTJ1y8PGvLbXiKuPk
+         ty6GTA7XkIwUti+yPrcY1+nBU4d3H6ObGAsdqXUt7mbER2gSLEZ9NICElPHsCpWgahAw
+         u3nJYhdj+xbCZGjz3mkxCOG9lAy1JuasfeEELrnCrsLpIc7Fr+vwU/l2zQe8j8QWqMwR
+         DQhuyuec1zyM4wih/7NO2CkARWyM7C5rz7qtJm1ZzTfP62gngwti6esebgc9jX3w2q7E
+         crHQ==
+X-Gm-Message-State: AFuF++kwDalN3HeWSPGLbpJ5TsGJYTJBGUvako/GGob1P1/McoWqhKDL
+	zhCNMlgSCKJLa1CFr80ZNcw9/J++SupHQruonA2MmZSNwVtaN0E9TEaScgWlHzJqI5bN6SZMO7s
+	ZzvUUuXBf
+X-Gm-Gg: AR+sD131r1MyoFmm2WIRs5nqJ6vmBCV1mQp//tgSbMu/vU/namLjSezPJpIHxctLT/2
+	Eo6Kq6MKJSH3N1tH4OUtgpIAml4buhWVNudTTaS3XoAwohvQEaubzjUFISUyHursnc/qdoQKnR+
+	YtaaLkXL5WUOpNdZtDDtNiMjyosCdJKPHNTuy2WrjMnFSaZVQ3BM5OH0d0GUPR2sgSUsrBxkIAO
+	2ADivm8nOz4RhFQfGSgYmIwWKIjzFhwp493YS0vyzNHV5ghibt23KmgGPHbVHyp8fkHtcTglFoK
+	qxZ7GSzly7HM3/qm4ic8z6BVlkmIVLs34DSzKpubIdPvj0JpaiMsDZmfQsBV6f/WZxWeIiJGwB+
+	JRJsDu4J3csFrOPkqwnSxWkXFLAxkD/5msClIUY74HpmRUe/ZkK+P+OjT8DnWWl/kH86A6ZLZnd
+	YU9ORwVJk2AumtLjb/lNcynSpYEFdCl6wCnrrs4XGIWE42Y+ynDRSghOekg4XjecEn43vTL+TzQ
+	0ROxvXTWVPB3bm/QH3C1KzDW7xcgODJ0pOb
+X-Received: by 2002:a05:600c:698c:b0:493:cefc:d113 with SMTP id 5b1f17b1804b1-499dc6f5dcdmr85482585e9.5.1787761835321;
+        Wed, 26 Aug 2026 09:30:35 -0700 (PDT)
 Received: from axion.fireburn.co.uk ([2a01:4b00:d309:1c00:caf1:6b20:8531:818c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-499dc981bf3sm32323615e9.8.2026.08.26.09.30.19
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-499dc981bf3sm32323615e9.8.2026.08.26.09.30.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Aug 2026 09:30:21 -0700 (PDT)
+        Wed, 26 Aug 2026 09:30:33 -0700 (PDT)
 From: Mike Lothian <mike@fireburn.co.uk>
 To: linux-crypto@vger.kernel.org
 Cc: Mike Lothian <mike@fireburn.co.uk>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Biggers <ebiggers@kernel.org>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
 	Miguel Ojeda <ojeda@kernel.org>,
 	Boqun Feng <boqun@kernel.org>,
 	Gary Guo <gary@garyguo.net>,
@@ -79,15 +83,16 @@ Cc: Mike Lothian <mike@fireburn.co.uk>,
 	Lyude Paul <lyude@redhat.com>,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Asahi Lina <lina+kernel@asahilina.net>,
-	Matthew Maurer <mmaurer@google.com>,
+	Burak Emir <bqe@google.com>,
 	Lorenzo Stoakes <ljs@kernel.org>,
 	Joel Fernandes <joelagnelf@nvidia.com>,
-	Burak Emir <bqe@google.com>,
+	Yury Norov <ynorov@nvidia.com>,
+	David Gow <david@davidgow.net>,
 	linux-kernel@vger.kernel.org,
 	rust-for-linux@vger.kernel.org
-Subject: [PATCH v3 1/2] rust: crypto: add AES-128, AES-CMAC, SHA-256, and HMAC bindings
-Date: Wed, 26 Aug 2026 17:29:48 +0100
-Message-ID: <20260826163004.3365-2-mike@fireburn.co.uk>
+Subject: [PATCH v3 2/2] rust: crypto: add synchronous RSA akcipher support
+Date: Wed, 26 Aug 2026 17:29:49 +0100
+Message-ID: <20260826163004.3365-3-mike@fireburn.co.uk>
 X-Mailer: git-send-email 2.55.0
 In-Reply-To: <20260826163004.3365-1-mike@fireburn.co.uk>
 References: <20260826163004.3365-1-mike@fireburn.co.uk>
@@ -97,228 +102,605 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Expose the synchronous lib/crypto AES-128, AES-CMAC, SHA-256, and
-HMAC-SHA256 primitives through safe Rust APIs.
+Add an RAII Rust wrapper for RSA public keys backed by the kernel
+crypto_akcipher implementation. Encode modulus and exponent components
+in the PKCS#1 DER form accepted by the existing RSA transform and
+expose synchronous public-key encryption.
 
-Aes128 prepares the key schedule once and reuses it for block encryption
-and CMAC. The one-shot hash and HMAC helpers operate on slices, and
-every API uses fixed-size outputs. C shims cover interfaces that bindgen
-cannot represent and clear temporary key material before returning.
+Provide RSAES-OAEP with SHA-256 for consumers which need that standard
+encoding, while keeping the OAEP seed explicit for use with the kernel
+CSPRNG and deterministic known-answer tests. Wipe encoded messages,
+expanded AES keys, and Secret byte strings with memzero_explicit().
+
+Gate the AES, SHA-256, and akcipher bindings with dedicated Rust
+Kconfig symbols. Cover the DER encoder and OAEP path with a published
+Wycheproof vector.
 
 Assisted-by: Claude:claude-opus-5
 Signed-off-by: Mike Lothian <mike@fireburn.co.uk>
 ---
- rust/bindings/bindings_helper.h |   3 +
- rust/helpers/crypto.c           |  37 ++++++++++
- rust/helpers/helpers.c          |   1 +
- rust/kernel/crypto.rs           | 115 ++++++++++++++++++++++++++++++++
- rust/kernel/lib.rs              |   1 +
- 5 files changed, 157 insertions(+)
- create mode 100644 rust/helpers/crypto.c
- create mode 100644 rust/kernel/crypto.rs
+ crypto/Kconfig                  |  10 ++
+ lib/crypto/Kconfig              |  19 ++
+ rust/bindings/bindings_helper.h |   1 +
+ rust/helpers/crypto.c           |  27 +++
+ rust/kernel/Kconfig.test        |  14 ++
+ rust/kernel/crypto.rs           |  72 +++++++-
+ rust/kernel/crypto/akcipher.rs  | 298 ++++++++++++++++++++++++++++++++
+ 7 files changed, 435 insertions(+), 6 deletions(-)
+ create mode 100644 rust/kernel/crypto/akcipher.rs
 
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index f1e372195273..9b7cfdbef7c4 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -116,6 +116,16 @@ config CRYPTO_AKCIPHER
+ 	select CRYPTO_AKCIPHER2
+ 	select CRYPTO_ALGAPI
+ 
++config RUST_CRYPTO_AKCIPHER
++	bool
++	depends on RUST
++	select CRYPTO_AKCIPHER
++	help
++	  Enable safe Rust abstractions for the public-key cipher API. The
++	  crypto API core is built into the kernel because Rust abstractions
++	  are part of the built-in kernel crate; individual algorithms may
++	  remain modules.
++
+ config CRYPTO_KPP2
+ 	tristate
+ 	select CRYPTO_ALGAPI2
+diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
+index 591c1c2a7fb3..9d47fce62f54 100644
+--- a/lib/crypto/Kconfig
++++ b/lib/crypto/Kconfig
+@@ -36,6 +36,16 @@ config CRYPTO_LIB_AES_CBC_MACS
+ 	  this if your module uses any of the functions from
+ 	  <crypto/aes-cbc-macs.h>.
+ 
++config RUST_CRYPTO_LIB_AES
++	bool
++	depends on RUST
++	select CRYPTO_LIB_AES
++	select CRYPTO_LIB_AES_CBC_MACS
++	help
++	  Enable the Rust bindings for the synchronous AES library functions.
++	  The selected C libraries are built into the kernel because Rust
++	  abstractions are part of the built-in kernel crate.
++
+ config CRYPTO_LIB_AESGCM
+ 	tristate
+ 	select CRYPTO_LIB_AES
+@@ -216,6 +226,15 @@ config CRYPTO_LIB_SHA256
+ 	  Select this if your module uses any of these functions from
+ 	  <crypto/sha2.h>.
+ 
++config RUST_CRYPTO_LIB_SHA256
++	bool
++	depends on RUST
++	select CRYPTO_LIB_SHA256
++	help
++	  Enable the Rust bindings for the synchronous SHA-256 and HMAC-SHA256
++	  library functions. The selected C library is built into the kernel
++	  because Rust abstractions are part of the built-in kernel crate.
++
+ config CRYPTO_LIB_SHA256_ARCH
+ 	bool
+ 	depends on CRYPTO_LIB_SHA256 && !UML
 diff --git a/rust/bindings/bindings_helper.h b/rust/bindings/bindings_helper.h
-index 2d079f278a04..8d7489b8cce8 100644
+index 8d7489b8cce8..bb46317898c1 100644
 --- a/rust/bindings/bindings_helper.h
 +++ b/rust/bindings/bindings_helper.h
-@@ -28,6 +28,9 @@
+@@ -28,6 +28,7 @@
   */
  #include <linux/hrtimer_types.h>
  
-+#include <crypto/aes.h>
-+#include <crypto/sha2.h>
-+
- #include <linux/acpi.h>
- #include <linux/gpu_buddy.h>
- #include <drm/drm_device.h>
++#include <crypto/akcipher.h>
+ #include <crypto/aes.h>
+ #include <crypto/sha2.h>
+ 
 diff --git a/rust/helpers/crypto.c b/rust/helpers/crypto.c
-new file mode 100644
-index 000000000000..a18780231ce0
---- /dev/null
+index a18780231ce0..f0cdf7fa8a76 100644
+--- a/rust/helpers/crypto.c
 +++ b/rust/helpers/crypto.c
-@@ -0,0 +1,37 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <crypto/aes.h>
-+#include <crypto/aes-cbc-macs.h>
-+#include <linux/string.h>
-+
-+/*
-+ * aes_encrypt() takes a transparent union (aes_encrypt_arg) that bindgen cannot
-+ * express, so the single-block encrypt step is wrapped here. The key schedule
-+ * is prepared once (aes_prepareenckey() is a plain extern bound directly) and
-+ * the resulting struct aes_enckey is reused across blocks by the caller, so the
-+ * key is not re-expanded per block. SHA-256 and HMAC-SHA256 are plain extern
-+ * functions and are bound directly.
-+ */
-+__rust_helper void
-+rust_helper_aes_enckey_encrypt_block(const struct aes_enckey *key, u8 *out,
-+				     const u8 *in)
+@@ -1,9 +1,30 @@
+ // SPDX-License-Identifier: GPL-2.0
+ 
++#include <crypto/akcipher.h>
+ #include <crypto/aes.h>
+ #include <crypto/aes-cbc-macs.h>
+ #include <linux/string.h>
+ 
++__rust_helper void rust_helper_memzero_explicit(void *s, size_t count)
 +{
-+	aes_encrypt(key, out, in);
++	memzero_explicit(s, count);
 +}
 +
-+/*
-+ * AES-CMAC one-shot over the in-tree library (crypto/aes-cbc-macs.h): prepares
-+ * the 128-bit key, MACs @data and writes the 16-byte tag to @out. A helper
-+ * because both aes_cmac_preparekey()'s struct and the aes_cmac() one-shot are
-+ * not expressible from Rust directly. The key length is fixed at 128 bits, so
-+ * aes_cmac_preparekey() cannot fail; the prepared key is wiped before return.
-+ */
-+__rust_helper void
-+rust_helper_aes_cmac(const u8 *key, const u8 *data, size_t data_len, u8 *out)
++#ifdef CONFIG_RUST_CRYPTO_AKCIPHER
++__rust_helper void rust_helper_crypto_free_akcipher(struct crypto_akcipher *tfm)
 +{
-+	struct aes_cmac_key cmac_key;
-+
-+	aes_cmac_preparekey(&cmac_key, key, AES_KEYSIZE_128);
-+	aes_cmac(&cmac_key, data, data_len, out);
-+	memzero_explicit(&cmac_key, sizeof(cmac_key));
++	crypto_free_akcipher(tfm);
 +}
-diff --git a/rust/helpers/helpers.c b/rust/helpers/helpers.c
-index 0d85b5e68ec2..cb7c668bffa2 100644
---- a/rust/helpers/helpers.c
-+++ b/rust/helpers/helpers.c
-@@ -56,6 +56,7 @@
- #include "cpufreq.c"
- #include "cpumask.c"
- #include "cred.c"
-+#include "crypto.c"
- #include "device.c"
- #include "dma.c"
- #include "dma-resv.c"
++
++__rust_helper int
++rust_helper_crypto_akcipher_set_pub_key(struct crypto_akcipher *tfm,
++					const void *key, unsigned int key_len)
++{
++	return crypto_akcipher_set_pub_key(tfm, key, key_len);
++}
++#endif
++
++#ifdef CONFIG_RUST_CRYPTO_LIB_AES
+ /*
+  * aes_encrypt() takes a transparent union (aes_encrypt_arg) that bindgen cannot
+  * express, so the single-block encrypt step is wrapped here. The key schedule
+@@ -19,6 +40,11 @@ rust_helper_aes_enckey_encrypt_block(const struct aes_enckey *key, u8 *out,
+ 	aes_encrypt(key, out, in);
+ }
+ 
++__rust_helper void rust_helper_aes_enckey_zero(struct aes_enckey *key)
++{
++	memzero_explicit(key, sizeof(*key));
++}
++
+ /*
+  * AES-CMAC one-shot over the in-tree library (crypto/aes-cbc-macs.h): prepares
+  * the 128-bit key, MACs @data and writes the 16-byte tag to @out. A helper
+@@ -35,3 +61,4 @@ rust_helper_aes_cmac(const u8 *key, const u8 *data, size_t data_len, u8 *out)
+ 	aes_cmac(&cmac_key, data, data_len, out);
+ 	memzero_explicit(&cmac_key, sizeof(cmac_key));
+ }
++#endif
+diff --git a/rust/kernel/Kconfig.test b/rust/kernel/Kconfig.test
+index e6a5c7a795f0..32e1a0c17d08 100644
+--- a/rust/kernel/Kconfig.test
++++ b/rust/kernel/Kconfig.test
+@@ -83,4 +83,18 @@ config RUST_BITFIELD_KUNIT_TEST
+ 
+ 	  If unsure, say N.
+ 
++config RUST_CRYPTO_KUNIT_TEST
++	bool "KUnit tests for Rust crypto APIs" if !KUNIT_ALL_TESTS
++	default KUNIT_ALL_TESTS
++	select CRYPTO_RSA
++	select RUST_CRYPTO_AKCIPHER
++	select RUST_CRYPTO_LIB_SHA256
++	help
++	  This option enables KUnit tests for the safe Rust crypto APIs,
++	  including public-key encoding and encryption. The tests include
++	  published known-answer vectors and are intended for development and
++	  testing rather than regular kernel use cases.
++
++	  If unsure, say N.
++
+ endif
 diff --git a/rust/kernel/crypto.rs b/rust/kernel/crypto.rs
-new file mode 100644
-index 000000000000..5f7c301b2bb8
---- /dev/null
+index 5f7c301b2bb8..0cf38541c8d1 100644
+--- a/rust/kernel/crypto.rs
 +++ b/rust/kernel/crypto.rs
-@@ -0,0 +1,115 @@
+@@ -9,18 +9,75 @@
+ //! synchronously in the calling context with no allocation; the hashes and the
+ //! MAC are infallible.
+ //!
+-//! C headers: [`include/crypto/aes.h`](srctree/include/crypto/aes.h),
++//! Public-key ciphers are available through [`akcipher`] when
++//! `CONFIG_RUST_CRYPTO_AKCIPHER` is enabled.
++//!
++//! C headers: [`include/crypto/akcipher.h`](srctree/include/crypto/akcipher.h),
++//! [`include/crypto/aes.h`](srctree/include/crypto/aes.h),
+ //! [`include/crypto/aes-cbc-macs.h`](srctree/include/crypto/aes-cbc-macs.h),
+ //! [`include/crypto/sha2.h`](srctree/include/crypto/sha2.h).
+ 
+-use crate::{bindings, error::to_result, prelude::*};
++use core::ops::{Deref, DerefMut};
++
++use crate::bindings;
++#[cfg(any(
++    CONFIG_RUST_CRYPTO_AKCIPHER,
++    CONFIG_RUST_CRYPTO_LIB_AES,
++    CONFIG_RUST_CRYPTO_LIB_SHA256
++))]
++use crate::{error::to_result, prelude::*};
++
++#[cfg(CONFIG_RUST_CRYPTO_AKCIPHER)]
++pub mod akcipher;
+ 
+ /// Size of a SHA-256 / HMAC-SHA256 digest, in bytes.
+ pub const SHA256_DIGEST_SIZE: usize = 32;
+ /// AES-128 block and key size, in bytes.
+ pub const AES128_BLOCK_SIZE: usize = 16;
+ 
++/// A fixed-size byte string which is wiped when dropped.
++///
++/// This is intended for cryptographic keys and other sensitive intermediate
++/// values. Borrowing the contained bytes can still create copies which this
++/// type cannot track; callers should avoid copying them unnecessarily.
++pub struct Secret<const N: usize>([u8; N]);
++
++impl<const N: usize> Secret<N> {
++    /// Wraps bytes which should be wiped when their owner is dropped.
++    pub const fn new(bytes: [u8; N]) -> Self {
++        Self(bytes)
++    }
++
++    /// Creates an all-zero byte string.
++    pub const fn zeroed() -> Self {
++        Self([0; N])
++    }
++}
++
++impl<const N: usize> Deref for Secret<N> {
++    type Target = [u8; N];
++
++    fn deref(&self) -> &Self::Target {
++        &self.0
++    }
++}
++
++impl<const N: usize> DerefMut for Secret<N> {
++    fn deref_mut(&mut self) -> &mut Self::Target {
++        &mut self.0
++    }
++}
++
++impl<const N: usize> Drop for Secret<N> {
++    fn drop(&mut self) {
++        // SAFETY: `self.0` is valid for exactly `N` writable bytes. The helper
++        // uses `memzero_explicit()`, so the wipe is not optimised away.
++        unsafe { bindings::memzero_explicit(self.0.as_mut_ptr().cast(), N) };
++    }
++}
++
+ /// Returns the SHA-256 digest of `data`.
++#[cfg(CONFIG_RUST_CRYPTO_LIB_SHA256)]
+ pub fn sha256(data: &[u8]) -> [u8; SHA256_DIGEST_SIZE] {
+     let mut out = [0u8; SHA256_DIGEST_SIZE];
+     // SAFETY: `data` is valid for `data.len()` reads and `out` is a valid
+@@ -30,6 +87,7 @@
+ }
+ 
+ /// Returns `HMAC-SHA256(key, data)`.
++#[cfg(CONFIG_RUST_CRYPTO_LIB_SHA256)]
+ pub fn hmac_sha256(key: &[u8], data: &[u8]) -> [u8; SHA256_DIGEST_SIZE] {
+     let mut out = [0u8; SHA256_DIGEST_SIZE];
+     // SAFETY: `key` and `data` are valid for their respective lengths and `out`
+@@ -51,6 +109,7 @@
+ /// prepared and wiped internally; the call is infallible.
+ ///
+ /// [`include/crypto/aes-cbc-macs.h`]: srctree/include/crypto/aes-cbc-macs.h
++#[cfg(CONFIG_RUST_CRYPTO_LIB_AES)]
+ pub fn aes_cmac(key: &[u8; AES128_BLOCK_SIZE], data: &[u8]) -> [u8; AES128_BLOCK_SIZE] {
+     let mut out = [0u8; AES128_BLOCK_SIZE];
+     // SAFETY: `key` is a valid 16-byte key, `data` is valid for `data.len()`
+@@ -77,8 +136,10 @@
+ /// let _ct = cipher.encrypt_block(&[0u8; 16]);
+ /// # Ok::<(), Error>(())
+ /// ```
++#[cfg(CONFIG_RUST_CRYPTO_LIB_AES)]
+ pub struct Aes128(bindings::aes_enckey);
+ 
++#[cfg(CONFIG_RUST_CRYPTO_LIB_AES)]
+ impl Aes128 {
+     /// Expands an AES-128 key from 16 raw key bytes.
+     pub fn new(key: &[u8; AES128_BLOCK_SIZE]) -> Result<Self> {
+@@ -105,11 +166,10 @@ impl Aes128 {
+     }
+ }
+ 
++#[cfg(CONFIG_RUST_CRYPTO_LIB_AES)]
+ impl Drop for Aes128 {
+     fn drop(&mut self) {
+-        // SAFETY: `self.0` is a valid, owned `aes_enckey`; overwriting it with
+-        // an all-zero `aes_enckey` clears the expanded key schedule.
+-        // `write_volatile` keeps the store from being optimised away.
+-        unsafe { core::ptr::write_volatile(&mut self.0, core::mem::zeroed()) };
++        // SAFETY: `self.0` is a valid, owned `aes_enckey`.
++        unsafe { bindings::aes_enckey_zero(&mut self.0) };
+     }
+ }
+diff --git a/rust/kernel/crypto/akcipher.rs b/rust/kernel/crypto/akcipher.rs
+new file mode 100644
+index 000000000000..c5fc2ca0cfbe
+--- /dev/null
++++ b/rust/kernel/crypto/akcipher.rs
+@@ -0,0 +1,298 @@
 +// SPDX-License-Identifier: GPL-2.0
 +
-+//! Safe wrappers over the kernel's synchronous library crypto.
++//! Safe wrappers for the kernel public-key cipher API.
 +//!
-+//! Exposes the one-shot `lib/crypto` primitives — AES-128 (an [`Aes128`] key
-+//! prepared once for single-block encryption, the building block for modes the
-+//! library does not yet provide such as AES-CTR), the in-tree AES-CMAC
-+//! ([`aes_cmac`]), SHA-256 and HMAC-SHA256 — for use from Rust. They run
-+//! synchronously in the calling context with no allocation; the hashes and the
-+//! MAC are infallible.
-+//!
-+//! C headers: [`include/crypto/aes.h`](srctree/include/crypto/aes.h),
-+//! [`include/crypto/aes-cbc-macs.h`](srctree/include/crypto/aes-cbc-macs.h),
-+//! [`include/crypto/sha2.h`](srctree/include/crypto/sha2.h).
++//! C header: [`include/crypto/akcipher.h`](srctree/include/crypto/akcipher.h)
 +
-+use crate::{bindings, error::to_result, prelude::*};
++use core::ptr::NonNull;
 +
-+/// Size of a SHA-256 / HMAC-SHA256 digest, in bytes.
-+pub const SHA256_DIGEST_SIZE: usize = 32;
-+/// AES-128 block and key size, in bytes.
-+pub const AES128_BLOCK_SIZE: usize = 16;
++use crate::{
++    alloc::{Flags, KVec},
++    bindings, c_str,
++    crypto::{sha256, SHA256_DIGEST_SIZE},
++    error::{from_err_ptr, to_result},
++    prelude::*,
++};
 +
-+/// Returns the SHA-256 digest of `data`.
-+pub fn sha256(data: &[u8]) -> [u8; SHA256_DIGEST_SIZE] {
-+    let mut out = [0u8; SHA256_DIGEST_SIZE];
-+    // SAFETY: `data` is valid for `data.len()` reads and `out` is a valid
-+    // `SHA256_DIGEST_SIZE`-byte output buffer, as `sha256()` requires.
-+    unsafe { bindings::sha256(data.as_ptr(), data.len(), out.as_mut_ptr()) };
-+    out
++/// A configured RSA public key.
++///
++/// The key is backed by the existing kernel `"rsa"` akcipher implementation.
++/// Creating it converts unsigned big-endian modulus and exponent components
++/// into the PKCS#1 DER form consumed by the crypto API.
++pub struct RsaPublicKey {
++    tfm: NonNull<bindings::crypto_akcipher>,
++    size: usize,
 +}
 +
-+/// Returns `HMAC-SHA256(key, data)`.
-+pub fn hmac_sha256(key: &[u8], data: &[u8]) -> [u8; SHA256_DIGEST_SIZE] {
-+    let mut out = [0u8; SHA256_DIGEST_SIZE];
-+    // SAFETY: `key` and `data` are valid for their respective lengths and `out`
-+    // is a valid `SHA256_DIGEST_SIZE`-byte output buffer, as required.
-+    unsafe {
-+        bindings::hmac_sha256_usingrawkey(
-+            key.as_ptr(),
-+            key.len(),
-+            data.as_ptr(),
-+            data.len(),
-+            out.as_mut_ptr(),
-+        )
-+    };
-+    out
-+}
++impl RsaPublicKey {
++    /// Create an RSA public key from unsigned big-endian components.
++    pub fn new(modulus: &[u8], exponent: &[u8], flags: Flags) -> Result<Self> {
++        let modulus = trim_unsigned(modulus).ok_or(EINVAL)?;
++        let exponent = trim_unsigned(exponent).ok_or(EINVAL)?;
++        let der = encode_rsa_public_key(modulus, exponent, flags)?;
 +
-+/// Returns `AES-CMAC-128(key, data)` (RFC 4493), computed by the in-tree
-+/// AES-CMAC library ([`include/crypto/aes-cbc-macs.h`]). The 128-bit key is
-+/// prepared and wiped internally; the call is infallible.
-+///
-+/// [`include/crypto/aes-cbc-macs.h`]: srctree/include/crypto/aes-cbc-macs.h
-+pub fn aes_cmac(key: &[u8; AES128_BLOCK_SIZE], data: &[u8]) -> [u8; AES128_BLOCK_SIZE] {
-+    let mut out = [0u8; AES128_BLOCK_SIZE];
-+    // SAFETY: `key` is a valid 16-byte key, `data` is valid for `data.len()`
-+    // reads, and `out` is a valid `AES128_BLOCK_SIZE`-byte output buffer, as the
-+    // helper requires.
-+    unsafe { bindings::aes_cmac(key.as_ptr(), data.as_ptr(), data.len(), out.as_mut_ptr()) };
-+    out
-+}
++        // SAFETY: The name is NUL-terminated and remains live for the call.
++        let tfm = from_err_ptr(unsafe {
++            bindings::crypto_alloc_akcipher(c_str!("rsa").as_char_ptr(), 0, 0)
++        })?;
++        let tfm = NonNull::new(tfm).ok_or(ENOMEM)?;
 +
-+/// An AES-128 key, expanded once for single-block encryption.
-+///
-+/// The key schedule is computed in [`Aes128::new`] and reused across every
-+/// [`encrypt_block`](Aes128::encrypt_block) call, so encrypting a stream of
-+/// blocks (e.g. an AES-CTR keystream) does not re-expand the key per block. This
-+/// is a low-level building block: prefer a full mode of operation where the
-+/// library provides one (see [`aes_cmac`]); the bare block cipher is here only
-+/// for modes `lib/crypto` does not yet expose, such as AES-CTR.
-+///
-+/// # Examples
-+///
-+/// ```
-+/// use kernel::crypto::Aes128;
-+/// let cipher = Aes128::new(&[0u8; 16])?;
-+/// let _ct = cipher.encrypt_block(&[0u8; 16]);
-+/// # Ok::<(), Error>(())
-+/// ```
-+pub struct Aes128(bindings::aes_enckey);
++        // SAFETY: `tfm` is a live akcipher transform and `der` contains
++        // `der.len()` initialized bytes.
++        let result = to_result(unsafe {
++            bindings::crypto_akcipher_set_pub_key(
++                tfm.as_ptr(),
++                der.as_ptr().cast(),
++                der.len().try_into()?,
++            )
++        });
++        if let Err(err) = result {
++            // SAFETY: `tfm` was returned by `crypto_alloc_akcipher()` and has
++            // not been freed.
++            unsafe { bindings::crypto_free_akcipher(tfm.as_ptr()) };
++            return Err(err);
++        }
 +
-+impl Aes128 {
-+    /// Expands an AES-128 key from 16 raw key bytes.
-+    pub fn new(key: &[u8; AES128_BLOCK_SIZE]) -> Result<Self> {
-+        // SAFETY: `aes_enckey` is a plain-old-data key schedule (integer arrays
-+        // in a union of integer arrays); an all-zero bit pattern is a valid,
-+        // inert initial value, fully overwritten by `aes_prepareenckey()` below.
-+        let mut enckey: bindings::aes_enckey = unsafe { core::mem::zeroed() };
-+        // SAFETY: `enckey` is a valid, owned `aes_enckey`; `key` is a valid
-+        // 16-byte buffer; `AES128_BLOCK_SIZE` (16) is a supported key length.
-+        let ret =
-+            unsafe { bindings::aes_prepareenckey(&mut enckey, key.as_ptr(), AES128_BLOCK_SIZE) };
-+        to_result(ret)?;
-+        Ok(Self(enckey))
++        Ok(Self {
++            tfm,
++            size: modulus.len(),
++        })
 +    }
 +
-+    /// Encrypts one 16-byte block with the prepared key: returns
-+    /// `AES-128-ECB(key, block)`.
-+    pub fn encrypt_block(&self, block: &[u8; AES128_BLOCK_SIZE]) -> [u8; AES128_BLOCK_SIZE] {
-+        let mut out = [0u8; AES128_BLOCK_SIZE];
-+        // SAFETY: `self.0` is a prepared encryption key; `block` and `out` are
-+        // valid 16-byte buffers, as the helper requires.
-+        unsafe { bindings::aes_enckey_encrypt_block(&self.0, out.as_mut_ptr(), block.as_ptr()) };
-+        out
++    /// Return the RSA modulus size in bytes.
++    pub fn size(&self) -> usize {
++        self.size
++    }
++
++    /// Apply the raw RSA public-key operation to one already-encoded message.
++    ///
++    /// Both buffers must have the modulus size. The output is fixed-width,
++    /// unsigned, and big-endian. Prefer a padded scheme such as
++    /// [`oaep_sha256_encrypt`](Self::oaep_sha256_encrypt).
++    pub fn encrypt(&mut self, encoded: &[u8], out: &mut [u8]) -> Result {
++        if encoded.len() != self.size || out.len() != self.size {
++            return Err(EINVAL);
++        }
++
++        out.fill(0);
++        // SAFETY: `self.tfm` remains live and exclusively borrowed for the
++        // synchronous operation; both buffers are valid for their lengths.
++        to_result(unsafe {
++            bindings::crypto_akcipher_sync_encrypt(
++                self.tfm.as_ptr(),
++                encoded.as_ptr().cast(),
++                encoded.len().try_into()?,
++                out.as_mut_ptr().cast(),
++                out.len().try_into()?,
++            )
++        })
++    }
++
++    /// Encrypt a message using RSAES-OAEP with SHA-256 and an empty label.
++    ///
++    /// `seed` is a caller-provided random OAEP seed. It is explicit so callers
++    /// can use the kernel CSPRNG while tests can use published deterministic
++    /// vectors.
++    #[cfg(CONFIG_RUST_CRYPTO_LIB_SHA256)]
++    pub fn oaep_sha256_encrypt(
++        &mut self,
++        message: &[u8],
++        seed: &[u8; SHA256_DIGEST_SIZE],
++        out: &mut [u8],
++        flags: Flags,
++    ) -> Result {
++        let overhead = 2 * SHA256_DIGEST_SIZE + 2;
++        if out.len() != self.size || self.size < overhead || message.len() > self.size - overhead {
++            return Err(EINVAL);
++        }
++
++        let mut encoded = KVec::from_elem(0u8, self.size, flags)?;
++        let result = (|| {
++            encoded[1..1 + SHA256_DIGEST_SIZE].copy_from_slice(seed);
++            let db = &mut encoded[1 + SHA256_DIGEST_SIZE..];
++            db[..SHA256_DIGEST_SIZE].copy_from_slice(&sha256(&[]));
++            let separator = db.len() - message.len() - 1;
++            db[separator] = 1;
++            db[separator + 1..].copy_from_slice(message);
++
++            mgf1_sha256_xor(seed, db, flags)?;
++            let (seed_block, masked_db) = encoded[1..].split_at_mut(SHA256_DIGEST_SIZE);
++            mgf1_sha256_xor(masked_db, seed_block, flags)?;
++
++            self.encrypt(&encoded, out)
++        })();
++        encoded.fill(0);
++        result
 +    }
 +}
 +
-+impl Drop for Aes128 {
++impl Drop for RsaPublicKey {
 +    fn drop(&mut self) {
-+        // SAFETY: `self.0` is a valid, owned `aes_enckey`; overwriting it with
-+        // an all-zero `aes_enckey` clears the expanded key schedule.
-+        // `write_volatile` keeps the store from being optimised away.
-+        unsafe { core::ptr::write_volatile(&mut self.0, core::mem::zeroed()) };
++        // SAFETY: `self.tfm` was returned by `crypto_alloc_akcipher()` and is
++        // owned by this object.
++        unsafe { bindings::crypto_free_akcipher(self.tfm.as_ptr()) };
 +    }
 +}
-diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
-index d7ced2a4c11f..3c45e4730646 100644
---- a/rust/kernel/lib.rs
-+++ b/rust/kernel/lib.rs
-@@ -62,6 +62,7 @@
- pub mod cpufreq;
- pub mod cpumask;
- pub mod cred;
-+pub mod crypto;
- pub mod debugfs;
- pub mod device;
- pub mod device_id;
++
++#[cfg(CONFIG_RUST_CRYPTO_LIB_SHA256)]
++fn mgf1_sha256_xor(seed: &[u8], output: &mut [u8], flags: Flags) -> Result {
++    let mut input = KVec::with_capacity(seed.len().checked_add(4).ok_or(EOVERFLOW)?, flags)?;
++    let result = (|| {
++        let mut counter = 0u32;
++        for chunk in output.chunks_mut(SHA256_DIGEST_SIZE) {
++            input.clear();
++            input.extend_from_slice(seed, flags)?;
++            input.extend_from_slice(&counter.to_be_bytes(), flags)?;
++            let digest = sha256(&input);
++            for (byte, mask) in chunk.iter_mut().zip(digest) {
++                *byte ^= mask;
++            }
++            counter = counter.checked_add(1).ok_or(EOVERFLOW)?;
++        }
++        Ok(())
++    })();
++    input.fill(0);
++    result
++}
++
++fn trim_unsigned(value: &[u8]) -> Option<&[u8]> {
++    let value = value
++        .iter()
++        .position(|byte| *byte != 0)
++        .map(|i| &value[i..])?;
++    Some(value)
++}
++
++fn der_length_size(length: usize) -> Result<usize> {
++    if length < 128 {
++        return Ok(1);
++    }
++
++    let bytes = (usize::BITS - length.leading_zeros()).div_ceil(8) as usize;
++    if bytes > 126 {
++        return Err(EOVERFLOW);
++    }
++    Ok(1 + bytes)
++}
++
++fn push_der_length(out: &mut KVec<u8>, length: usize, flags: Flags) -> Result {
++    if length < 128 {
++        out.push(length as u8, flags)?;
++        return Ok(());
++    }
++
++    let bytes = der_length_size(length)? - 1;
++    out.push(0x80 | bytes as u8, flags)?;
++    for shift in (0..bytes).rev() {
++        out.push((length >> (shift * 8)) as u8, flags)?;
++    }
++    Ok(())
++}
++
++fn der_integer_size(value: &[u8]) -> Result<usize> {
++    let leading_zero = usize::from(value[0] & 0x80 != 0);
++    1usize
++        .checked_add(der_length_size(value.len() + leading_zero)?)
++        .and_then(|size| size.checked_add(value.len() + leading_zero))
++        .ok_or(EOVERFLOW)
++}
++
++fn push_der_integer(out: &mut KVec<u8>, value: &[u8], flags: Flags) -> Result {
++    let leading_zero = value[0] & 0x80 != 0;
++    out.push(0x02, flags)?;
++    push_der_length(out, value.len() + usize::from(leading_zero), flags)?;
++    if leading_zero {
++        out.push(0, flags)?;
++    }
++    out.extend_from_slice(value, flags)?;
++    Ok(())
++}
++
++fn encode_rsa_public_key(modulus: &[u8], exponent: &[u8], flags: Flags) -> Result<KVec<u8>> {
++    let content_len = der_integer_size(modulus)?
++        .checked_add(der_integer_size(exponent)?)
++        .ok_or(EOVERFLOW)?;
++    let total_len = 1usize
++        .checked_add(der_length_size(content_len)?)
++        .and_then(|size| size.checked_add(content_len))
++        .ok_or(EOVERFLOW)?;
++    let mut der = KVec::with_capacity(total_len, flags)?;
++    der.push(0x30, flags)?;
++    push_der_length(&mut der, content_len, flags)?;
++    push_der_integer(&mut der, modulus, flags)?;
++    push_der_integer(&mut der, exponent, flags)?;
++    Ok(der)
++}
++
++#[cfg(CONFIG_RUST_CRYPTO_KUNIT_TEST)]
++#[crate::macros::kunit_tests(rust_kernel_crypto_akcipher)]
++mod tests {
++    use super::*;
++    use crate::alloc::flags::GFP_KERNEL;
++
++    // Wycheproof rsa_oaep_2048_sha256_mgf1sha256_test.json, test case 3.
++    const OAEP_MODULUS: [u8; 256] = [
++        0xa2, 0xb4, 0x51, 0xa0, 0x7d, 0x0a, 0xa5, 0xf9, 0x6e, 0x45, 0x56, 0x71, 0x51, 0x35, 0x50,
++        0x51, 0x4a, 0x8a, 0x5b, 0x46, 0x2e, 0xbe, 0xf7, 0x17, 0x09, 0x4f, 0xa1, 0xfe, 0xe8, 0x22,
++        0x24, 0xe6, 0x37, 0xf9, 0x74, 0x6d, 0x3f, 0x7c, 0xaf, 0xd3, 0x18, 0x78, 0xd8, 0x03, 0x25,
++        0xb6, 0xef, 0x5a, 0x17, 0x00, 0xf6, 0x59, 0x03, 0xb4, 0x69, 0x42, 0x9e, 0x89, 0xd6, 0xea,
++        0xc8, 0x84, 0x50, 0x97, 0xb5, 0xab, 0x39, 0x31, 0x89, 0xdb, 0x92, 0x51, 0x2e, 0xd8, 0xa7,
++        0x71, 0x1a, 0x12, 0x53, 0xfa, 0xcd, 0x20, 0xf7, 0x9c, 0x15, 0xe8, 0x24, 0x7f, 0x3d, 0x3e,
++        0x42, 0xe4, 0x6e, 0x48, 0xc9, 0x8e, 0x25, 0x4a, 0x2f, 0xe9, 0x76, 0x53, 0x13, 0xa0, 0x3e,
++        0xff, 0x8f, 0x17, 0xe1, 0xa0, 0x29, 0x39, 0x7a, 0x1f, 0xa2, 0x6a, 0x8d, 0xce, 0x26, 0xf4,
++        0x90, 0xed, 0x81, 0x29, 0x96, 0x15, 0xd9, 0x81, 0x4c, 0x22, 0xda, 0x61, 0x04, 0x28, 0xe0,
++        0x9c, 0x7d, 0x96, 0x58, 0x59, 0x42, 0x66, 0xf5, 0xc0, 0x21, 0xd0, 0xfc, 0xec, 0xa0, 0x8d,
++        0x94, 0x5a, 0x12, 0xbe, 0x82, 0xde, 0x4d, 0x1e, 0xce, 0x6b, 0x4c, 0x03, 0x14, 0x5b, 0x5d,
++        0x34, 0x95, 0xd4, 0xed, 0x54, 0x11, 0xeb, 0x87, 0x8d, 0xaf, 0x05, 0xfd, 0x7a, 0xfc, 0x3e,
++        0x09, 0xad, 0xa0, 0xf1, 0x12, 0x64, 0x22, 0xf5, 0x90, 0x97, 0x5a, 0x19, 0x69, 0x81, 0x6f,
++        0x48, 0x69, 0x8b, 0xcb, 0xba, 0x1b, 0x4d, 0x9c, 0xae, 0x79, 0xd4, 0x60, 0xd8, 0xf9, 0xf8,
++        0x5e, 0x79, 0x75, 0x00, 0x5d, 0x9b, 0xc2, 0x2c, 0x4e, 0x5a, 0xc0, 0xf7, 0xc1, 0xa4, 0x5d,
++        0x12, 0x56, 0x9a, 0x62, 0x80, 0x7d, 0x3b, 0x9a, 0x02, 0xe5, 0xa5, 0x30, 0xe7, 0x73, 0x06,
++        0x6f, 0x45, 0x3d, 0x1f, 0x5b, 0x4c, 0x2e, 0x9c, 0xf7, 0x82, 0x02, 0x83, 0xf7, 0x42, 0xb9,
++        0xd5,
++    ];
++    const OAEP_SEED: [u8; 32] = [
++        0x70, 0x97, 0x14, 0xb0, 0x48, 0xc3, 0x69, 0x73, 0x22, 0x69, 0xa3, 0xd8, 0xf9, 0x23, 0x02,
++        0x50, 0x87, 0x70, 0xa4, 0x43, 0x68, 0x01, 0x4b, 0x3a, 0x5c, 0xb1, 0x85, 0xc0, 0xc9, 0x1d,
++        0x97, 0x2c,
++    ];
++    const OAEP_CIPHERTEXT: [u8; 256] = [
++        0x5e, 0xab, 0x3f, 0x07, 0x41, 0xe6, 0x39, 0x86, 0xed, 0x64, 0x7d, 0x53, 0xe1, 0xcd, 0x71,
++        0xdf, 0x04, 0x19, 0x86, 0x90, 0x08, 0x03, 0xd0, 0xf9, 0x9c, 0x68, 0x35, 0x5d, 0x24, 0x9a,
++        0x15, 0xa4, 0x7d, 0xc5, 0xb4, 0xf7, 0x0a, 0x19, 0x14, 0x77, 0x65, 0x42, 0x99, 0xe5, 0xa2,
++        0x73, 0x1f, 0x3b, 0x4e, 0xec, 0x76, 0xde, 0xa1, 0x82, 0x62, 0xfc, 0x69, 0x6a, 0xc7, 0x94,
++        0xe5, 0xf6, 0x6c, 0xbf, 0xcd, 0xda, 0xc4, 0x47, 0x2c, 0x57, 0x8e, 0x24, 0x6c, 0x26, 0x70,
++        0x75, 0x98, 0x05, 0x55, 0x84, 0x54, 0x0b, 0x83, 0x98, 0x36, 0xb1, 0x40, 0x4c, 0x56, 0x11,
++        0xae, 0x55, 0x8a, 0x98, 0x4c, 0xee, 0x8f, 0xd0, 0x36, 0xce, 0xa9, 0x24, 0xe0, 0xbe, 0x24,
++        0x74, 0xa9, 0x40, 0xf6, 0x1e, 0x0a, 0xcc, 0x14, 0xfc, 0xae, 0x95, 0xeb, 0xdc, 0x59, 0x94,
++        0x2a, 0x9c, 0xe9, 0xaf, 0x9a, 0x9c, 0x81, 0x99, 0x9f, 0x7f, 0x68, 0x15, 0xf0, 0x57, 0xff,
++        0xdc, 0x25, 0x33, 0xcb, 0x15, 0xd6, 0x39, 0x1d, 0x1e, 0x2d, 0x95, 0xf1, 0x6f, 0x9c, 0x04,
++        0x20, 0x9c, 0x88, 0x9a, 0x4c, 0x35, 0x9c, 0x7d, 0x29, 0x26, 0xd2, 0x8a, 0x66, 0xe2, 0xb0,
++        0x30, 0xa4, 0x16, 0xb9, 0x28, 0xd2, 0x82, 0x56, 0x27, 0x99, 0x8e, 0x51, 0x91, 0xfb, 0x49,
++        0x83, 0xa6, 0xe6, 0x50, 0x24, 0x26, 0x2d, 0x94, 0xfc, 0x09, 0x18, 0x7a, 0x2d, 0x78, 0x16,
++        0x21, 0x22, 0x43, 0x32, 0x51, 0xd1, 0xbf, 0xcc, 0x8e, 0x50, 0x7d, 0x06, 0xeb, 0xa2, 0xd2,
++        0x29, 0xc1, 0x00, 0x31, 0x26, 0x1d, 0xa3, 0x2a, 0xb8, 0xcc, 0xd1, 0x5f, 0x1c, 0x5f, 0x9f,
++        0xbf, 0x07, 0xed, 0x15, 0x84, 0x83, 0xd7, 0x36, 0xa1, 0x10, 0xaf, 0x4b, 0x44, 0xd6, 0xa4,
++        0xda, 0x60, 0xd6, 0xcb, 0x51, 0x9b, 0x44, 0x54, 0x21, 0x3c, 0xf9, 0xf0, 0xdc, 0x56, 0x0f,
++        0x2b,
++    ];
++
++    #[test]
++    fn rsa_der_encoding() -> Result {
++        let der = encode_rsa_public_key(&[0x80, 0x01], &[0x01, 0x00, 0x01], GFP_KERNEL)?;
++        assert_eq!(
++            der.as_slice(),
++            &[0x30, 0x0a, 0x02, 0x03, 0x00, 0x80, 0x01, 0x02, 0x03, 0x01, 0x00, 0x01]
++        );
++        Ok(())
++    }
++
++    #[test]
++    fn rsa_oaep_sha256_wycheproof() -> Result {
++        let mut key = RsaPublicKey::new(&OAEP_MODULUS, &[0x01, 0x00, 0x01], GFP_KERNEL)?;
++        let mut out = [0u8; 256];
++        key.oaep_sha256_encrypt(b"Test", &OAEP_SEED, &mut out, GFP_KERNEL)?;
++        assert_eq!(out, OAEP_CIPHERTEXT);
++        Ok(())
++    }
++}
