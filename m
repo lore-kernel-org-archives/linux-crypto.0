@@ -1,353 +1,140 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 313CD347FCD;
-	Wed, 26 Aug 2026 17:02:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787763755; cv=none; b=gMqDaYM00Q9bt3/3n9Bjz/UPJFCIOOuNnWrFUZTyW12adq6SpCm/nR+qlx3vjLH4Dv+gPIuT4ChKCzkrb4bLjBWIxQjq+oRBXbqOfJIpwSLGfjqlHoL9lLrbpNc5IlKn7KfnocwdFnel55lOwQOJhxEkInN0ycCAbJHjWllB6sQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787763755; c=relaxed/simple;
-	bh=u0RKM02wOzuvhntRLoFKu9oNmuIfFheu6cW7Dr4jCJQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iEcEt6X6aK0VV/mHNisM6hNSIkGmvbQ+biu3WYJhuJlWOL2EzZvrtqISjw5gHSTTmvHEOqmBCtJ9qysG3DNFprQnn6GCh8ZWqniYA1CTjBxhAcA3kR+7K9pMxTzJxPmYAbDD6VjzQ7eQKPE8/WjOk2UNWGlcoOPgXFQYv2EYHkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bn/DiV/G; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4437D38425A
+	for <linux-crypto@vger.kernel.org>; Wed, 26 Aug 2026 17:10:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.221.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787764265; cv=pass; b=HXXdKRKenqRstL1svdmjKPPO7xwnjTFEy2MyuoKlMzpr63IwO7CUw+WsSbWCvCoF8mMRX6Bi8s6DYfYCCI3zgQjqr9DOSc469lLj0YdTe74i9lGH99M7KDVd9dFdtScZd2FhO+6IlQ0/7gu4BQGWtF4S59XNshERzZLCk3XdPyI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787764265; c=relaxed/simple;
+	bh=zpRXAe/tk52AlzcBOEsFifQ2bzrJm/4BiZ+5Fwp0hxo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=clZirKb4zT2cbEKvEgPiE2HqY4wwF1aPmU+VSFl3ajHzmivagyyh8+NQYd84u6DIWoYXqQ8uJUOsMalQQgz5uMY5PH7Muxh9Av3xp82Yzcv8Fi/hfZUITf9S1C6I7UIRi/NaKoFI3C15O4XHn57FtEtMbYSHc1vIuAqyaUtBBPw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=sO7hteWt; arc=pass smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bn/DiV/G"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2EBA1F000E9;
-	Wed, 26 Aug 2026 17:02:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787763743;
-	bh=PvMhOpMtgahb/2g6h4rPwkBMlykF3l7pKxLhOb+mM+E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=Bn/DiV/GuREkqk9gLaLx9oQOgG/zG/4wjB0MvEVME582wC2HbgYlUE3fOR/KD8sYK
-	 oCBf2UdqvnKJ9wytcgrqwQVTkbinysLZ0yZz5oPZlMo9pSqLwYCsXEQhrrzYoxBA0R
-	 wEnMTcMArz+ogjjsExgFwpAwuLvyJovUy67/4qFCwoMeD++JRnmcm4KbH+lKP2QajX
-	 C+XapE8uFFYdvM+bW+q8IsgbwPhHCO9diw1dha1JdZgQBacL8KU9dtB/xdES3J1ndv
-	 vC0o3AN8uuJla0rAs/LFvDPR/bq6bkALmlomtA/wkxeSOibPN2luyhIryddfiEse/P
-	 ilQneArTa5cxg==
-Date: Wed, 26 Aug 2026 18:02:16 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Alex Ousherovitch <aousherovitch@rambus.com>
-Cc: Albert Ou <aou@eecs.berkeley.edu>, Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <pjw@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>,
-	Shuah Khan <shuah@kernel.org>, Alexandre Ghiti <alex@ghiti.fr>,
-	devicetree@vger.kernel.org,
-	Joel Wittenauer <Joel.Wittenauer@cryptography.com>,
-	linux-api@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-riscv@lists.infradead.org,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Thi Nguyen <thin@rambus.com>
-Subject: Re: [PATCH v4 01/19] dt-bindings: crypto: add Rambus CryptoManager
- Hub
-Message-ID: <20260826-unwritten-marshland-47cdf3c17cad@spud>
-References: <20260825221539.255951-1-aousherovitch@rambus.com>
- <20260825221539.255951-2-aousherovitch@rambus.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sO7hteWt"
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-47db714766aso87996f8f.0
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Aug 2026 10:10:53 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1787764250; cv=none;
+        d=google.com; s=arc-20260327;
+        b=oA0ZVYwA0IQdJn+dCugRHgYfqdKjqrdlCQuHXgW64z5TNZrzajInnBRXyTI9UFkIm/
+         DUwIOx6muirgZFNaRvATmG+7YQyxGXA/SExb3g+fbMU+3DQP9jxJuSgGUmTYZSpHrgyN
+         /E6EZfhryXM194H6+VRr383HVFbJ4OMzJeaiQ3S21isOZHtglFJ1ZJdY2khCrNYbf90i
+         xMfzQ/ZBvC0ejj38OfPeTqLn0JyCnWPPZM4VF7iCBwzsgUtqKCevsmFNsEnekfoCciTP
+         eLPSXseIstnQpaLvnBei5dOCtaKpVI9q7oCbTaIK5b8xVDNxgVMTdndTR6XCVddmdr9C
+         IB9w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=C33/RTr3a45MhCrcAOe4IXwcMFotPZnSUAEPINGFBDg=;
+        fh=JdaJUd1pRJnuHdJ93Rqh1e431ZCtAu4uncHxb54eRWE=;
+        b=pi7ZmDbtMwnbmjhFDDpAVDplRhoN1/mwioPceZ/wB+u+CzRqtNb5GVUeCZmnydITsh
+         JXgnqqrIKRbVe6jGeA1/UpyqIP27u0h4gCqk3Qo56S6y1W8oJEa4CqgFs7WCeatNd1b/
+         ShBAuyEzWhxizi62tlmOGSTkA4ETvC0E/q+VVhlTxi2cGG9RVCFDbvGUg/rSjqFY9lhD
+         TPc5I7l1x3u67NWb53+1wFDHAaemu2EPcr/7bkmYkCksfNvQfC26hyVCBMgjPwdsy8E1
+         VTooM+HVXyCEGCvKEbHZwDbbwtkVDb1qI1xiYJMnLhIGQplUaOyPP8d1w1aELRbUv+pG
+         Q27A==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787764250; x=1788369050; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=C33/RTr3a45MhCrcAOe4IXwcMFotPZnSUAEPINGFBDg=;
+        b=sO7hteWtQBIRfpcJEk78Avuz+RjD1GI3txY5K9r0dCukDfr+3ImEdBxiBJ+tDgafnG
+         JHMX7vznlMVbvWvHJbRN+wBlAdi2/G01r14SsSGh6/iZEqaA/fC32dv+82xpI+X5dFUS
+         vScJFOIGJX0pv2LAIEPLmRmIkXO1q7qMAI5Bq9iwbrshe0t4li1dQ/q/m6l76iDzUz5s
+         YVsbQq3DZjpZtQAYXkoTLdKgTL+A2v57Qr2lmLMiVw+diAswiCp0zdxToLvCNkeenaUO
+         UV00KfBYA4LSAdfHY8Ze/n20aprQLWi46fHgEu5Kl2csKI9yBHSvpomvDi5Kl71hEyu4
+         KQsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787764250; x=1788369050;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=C33/RTr3a45MhCrcAOe4IXwcMFotPZnSUAEPINGFBDg=;
+        b=Imiok8ffsb39pwYP4lpRYmlDk+sxP4/ilmTmDm9v3/f+7uTCKzAL3MqRCmrfP3WgUu
+         M7JJ65aLOJlLyQTsF0B/Cux+H8n3OCqf4Ngaj9nUGqPIjBJwuRddtY/mgn+3PKVxtm93
+         qR1TKnWJe3MtCkLrkJx+NBiUQHIwTZ8+brU3HjHb9vHNqIWfUHZVnWioDc9e97QkxKVz
+         Zd9Yaq1hFNt9E9TyWWO5RDfD5J/DbGN1TdM7kcvcD50cTb9gJ0ndBNv7l51i9d+3dLQ9
+         e/45F3FNtNLaV29ZgRQaev/IS6i4hG3UY4PJbKmKMHwNs2OIFTeZaTOp5OTLyOJ+vdBH
+         tZ0g==
+X-Forwarded-Encrypted: i=1; AHgh+Rp4DnCS8A+7FYDubNxArf+JJ2aZ6bQfDLgGJesqGJXmeAcY74Z9h76cg74knxpoZPMIZtYNuHRx0LR5bqA=@vger.kernel.org
+X-Gm-Message-State: AFuF++mh5qqxZeJkUnBa++iQjHVzeXtqgHJJDT51fI4GG4W709QmVR8T
+	XZiF4hGnXwgQf1pQHkws+tOX/mx09jRxotIrSShysCiXbSztCyxaKLtmi1fGe7lgROKCDeRRHrB
+	L4c+VkNatNrAMqjkCA1FP70ECi0AAdgs=
+X-Gm-Gg: AR+sD12X+jM2oVFwancFZ5o5JWKtRN0IyB7Mdv+xUfv++HV2+GvcDYGayKOkhP+/JvL
+	CMxSWzA9dvrwoPClJArpMPxL+phiTZ+5ozyHB2c1CsVVSe6WHBlh6n6J/Tpllz+qqXRjKkIpNuS
+	UgJZFFDfkUoT6Bf4PVHLEwVCRL7SM78Qp9EcAZW26tRoxWn7q1sFEXCLD+/uDgF/klNtRaXluog
+	QQXt2xtGE2i9qpKG6UIdUW9Tv4INHt+/OuPf46iM6QFHm2nny7nVfb5WwP1L+oN7R9bbEX+CjTb
+	+KSucT9Go2QGTTupz93Id1cY2iETopnqPSnNZ+6Sj5iWCvzS4J8xjDWRnaxvd40vmFGSq0crVcA
+	2iA==
+X-Received: by 2002:a5d:6f0d:0:b0:47f:71a0:c060 with SMTP id
+ ffacd0b85a97d-482eab5ff3cmr634773f8f.2.1787764250208; Wed, 26 Aug 2026
+ 10:10:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ijLsa67cbXpBs7zp"
-Content-Disposition: inline
-In-Reply-To: <20260825221539.255951-2-aousherovitch@rambus.com>
-
---ijLsa67cbXpBs7zp
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20260826122558.2662013-1-usama.arif@linux.dev>
+In-Reply-To: <20260826122558.2662013-1-usama.arif@linux.dev>
+From: Nhat Pham <nphamcs@gmail.com>
+Date: Wed, 26 Aug 2026 10:10:38 -0700
+X-Gm-Features: AcwNN1UY_oOpB_Wq3_fowiaqVP0X_Osa5KQ5Tfmau1VqN-lIGJIFBmzzrbkdcK8
+Message-ID: <CAKEwX=NRXuqRTg9L3AjBVeaXhm5bxK_rHe8d7d_GUOGKjxC3xg@mail.gmail.com>
+Subject: Re: [PATCH 0/3] zstd: probe the CPU for BMI2 support once, not per context
+To: Usama Arif <usama.arif@linux.dev>
+Cc: dsterba@suse.com, linux-kernel@vger.kernel.org, terrelln@fb.com, 
+	linux-crypto@vger.kernel.org, yosry@kernel.org, hannes@cmpxchg.org, 
+	chengming.zhou@linux.dev, shakeel.butt@linux.dev, kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Aug 25, 2026 at 03:15:20PM -0700, Alex Ousherovitch wrote:
-> Add device tree binding schema for the Rambus CryptoManager Hub (CMH)
-> hardware crypto accelerator.  The binding describes the parent
-> SoC-level node with its SIC register region and one queue@N child
-> node per mailbox the host owns, each carrying a reg (mailbox instance
-> index), an optional interrupt, VCQ ring geometry (rambus,num-slots /
-> rambus,slot-stride-bytes) and a rambus,cores affinity list.  Which crypto=
- cores
-> are present is discovered from the SIC CORE_ENABLE register at probe,
-> not described in the device tree.
->=20
-> Register the 'rambus' vendor prefix for Rambus Inc.
->=20
-> Signed-off-by: Alex Ousherovitch <aousherovitch@rambus.com>
-> Co-developed-by: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.=
-com>
-> Signed-off-by: Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.co=
-m>
-> ---
->  .../bindings/crypto/rambus,cmh-v1030.yaml     | 194 ++++++++++++++++++
->  .../devicetree/bindings/vendor-prefixes.yaml  |   2 +
->  2 files changed, 196 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/crypto/rambus,cmh-v=
-1030.yaml
->=20
-> diff --git a/Documentation/devicetree/bindings/crypto/rambus,cmh-v1030.ya=
-ml b/Documentation/devicetree/bindings/crypto/rambus,cmh-v1030.yaml
-> new file mode 100644
-> index 000000000000..d9598b0f3bbc
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/crypto/rambus,cmh-v1030.yaml
-> @@ -0,0 +1,194 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/crypto/rambus,cmh-v1030.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Rambus CryptoManager Hub (CMH) Hardware Crypto Accelerator
-> +
-> +maintainers:
-> +  - Alex Ousherovitch <aousherovitch@rambus.com>
-> +  - Saravanakrishnan Krishnamoorthy <skrishnamoorthy@rambus.com>
-> +  - Joel Wittenauer <Joel.Wittenauer@cryptography.com>
-> +
-> +description: |
-> +  The Rambus CryptoManager Hub (CMH) is a hardware cryptographic acceler=
-ator
-> +  accessed via a mailbox-based VCQ (Virtual Command Queue) interface.  T=
-he
-> +  host writes VCQ command sequences into per-mailbox DMA queue buffers a=
-nd
-> +  rings a doorbell; the CMH eSW processes them and signals completion via
-> +  interrupt.
-> +
-> +  The management host statically partitions the hardware mailboxes across
-> +  the SoC's host interfaces at integration time; the set of mailboxes a
-> +  given host owns is therefore fixed and not runtime-discoverable (a
-> +  mailbox locked to a host reads as unavailable in the SIC availability
-> +  register).  Each owned mailbox is described by a child node.  Which
-> +  crypto cores are present is a fixed silicon-build property indicated by
-> +  the SIC CORE_ENABLE register, so cores are not described in the device
-> +  tree.
-> +
-> +  CMH gates access to a locked mailbox by a hardware HOST ID presented on
-> +  the bus with every access, permitting only the owning host's ID.  An
-> +  integration must present a single, stable HOST ID for all accesses to a
-> +  given mailbox, independent of the issuing CPU (relevant on SMP hosts
-> +  whose interconnect encodes the issuing CPU in the HOST ID).
-> +
-> +properties:
-> +  compatible:
-> +    const: rambus,cmh-v1030
-> +    description:
-> +      Identifies the CryptoManager Hub v1.030 IP revision (register map =
-and
-> +      command ABI).  A specific SoC integration should list its own
-> +      "<vendor>,<soc>-cmh" compatible first with "rambus,cmh-v1030" as a
-> +      fallback; that extended form will be added when such a platform is
-> +      upstreamed.
+On Wed, Aug 26, 2026 at 5:26=E2=80=AFAM Usama Arif <usama.arif@linux.dev> w=
+rote:
+>
+> zstd picks between BMI2 and generic code paths at runtime, and issues
+> CPUID to decide every time a compression or decompression context is set
+> up. The answer cannot change while the kernel is running.
+>
+> It is not a cold path: squashfs calls zstd_init_dstream() for every block
+> it decompresses, and erofs, btrfs, f2fs and crypto/zstd all initialise a
+> context per operation. Each probe is two serializing CPUID instructions
+> on x86.
+>
+> Patch 1 routes ZSTD_initStaticCCtx() through ZSTD_cpuSupportsBmi2()
+> instead of open-coding the probe, which also fixes it testing for BMI2
+> without BMI1 - the bodies it selects are tagged
+> TARGET_ATTRIBUTE("lzcnt,bmi,bmi2"), so both are needed. No CPU in the
+> field implements BMI2 without BMI1, so this is latent. Patch 2 skips the
+> probe when DYNAMIC_BMI2 is 0, where every consumer ignores the flag
+> anyway. Patch 3 caches the result.
+>
+> A 4 KiB crypto_acomp benchmark [1] in a one-vCPU KVM guest, twelve boots
+> of nine 30,000-operation rounds, median per-round mean over 108 rounds:
+>
+>                     compress     decompress
+>   unpatched         16,756 ns     3,455 ns
+>   patched           13,646 ns     1,002 ns
+>                     -3,110 ns    -2,452 ns
+>                      (18.6%)      (71.0%)
+>
+> The main reason is because CPUID is an unconditional VM exit.
+>
+> [1] https://gist.github.com/uarif1/5cf02f0e22c23f0d1b3d84348f12914c
 
-This commentary should just not be here.
-Instead, do what's been done in sifive,clint.yaml for the clint2. I
-don't feel great about suggesting that, and it feels like it's becoming
-more common - although maybe that's a good thing because it means IP
-vendors are being more proactive about upstreaming.
+Awesome! I'm no zstd expert, but this looks very nice. Thanks for
+fixing it. I'll defer mostly to Nick (is the fb.com email still
+working?) and Herbert for correctness checking.
 
-> +
-> +  reg:
-> +    maxItems: 1
-> +    description:
-> +      SIC (System Interface Controller) MMIO region.  The registers of
-> +      mailbox instance N are at offset N * 0x1000 within this region.
-> +
-> +  clocks:
-> +    minItems: 1
-> +    items:
-> +      - description: Main functional clock ("core").
-> +      - description:
-> +          Half-rate "core-div2" clock (present only on configurations wi=
-th
-> +          side-channel-protected cores) or the "rt" real-time tick clock.
-> +      - description: Real-time tick clock ("rt") for the internal timer.
-> +
-> +  clock-names:
-> +    oneOf:
-> +      - items:
-> +          - const: core
-> +      - items:
-> +          - const: core
-> +          - const: core-div2
-> +      - items:
-> +          - const: core
-> +          - const: rt
-> +      - items:
-> +          - const: core
-> +          - const: core-div2
-> +          - const: rt
-> +
-> +  reset-gpios:
-> +    maxItems: 1
-> +    description:
-> +      Host-controlled reset for the CryptoManager Hub.  The hub has two
-> +      external, active-low reset inputs -- a power-on reset and a hard
-> +      reset; where a board routes one of them to a host GPIO, that line =
-is
-> +      described here.
-> +
-> +  "#address-cells":
-> +    const: 1
-> +
-> +  "#size-cells":
-> +    const: 0
-> +
-> +patternProperties:
-> +  "^queue@[0-9a-f]+$":
-> +    type: object
-> +    description:
-> +      One node per hardware mailbox (VCQ command queue) this host owns.
-> +      The set of owned mailboxes is fixed by the management host at
-> +      integration time and enumerated here.
-> +    properties:
-> +      reg:
-> +        maxItems: 1
-> +        description:
-> +          0-based mailbox instance index.  The instance's registers are
-> +          at reg * 0x1000 within the SIC region.
-> +
-> +      interrupts:
-> +        maxItems: 1
-> +        description: Completion/error interrupt for this mailbox.
-> +
-> +      rambus,num-slots:
-> +        $ref: /schemas/types.yaml#/definitions/uint32
-> +        enum: [2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 819=
-2,
-> +               16384, 32768]
-> +        default: 64
-> +        description:
-> +          Number of VCQ ring slots for this mailbox's command queue in
-> +          host DMA memory.  This is a per-board, per-mailbox host-memory
-> +          ring geometry -- boards built around the same SoC (hence the
-> +          same compatible) may use different ring sizes, so it is
-> +          described per mailbox rather than derived from the compatible.
-> +
-> +      rambus,slot-stride-bytes:
-> +        $ref: /schemas/types.yaml#/definitions/uint32
-> +        enum: [128, 256, 512, 1024]
-> +        default: 512
-> +        description:
-> +          Stride in bytes between consecutive VCQ ring slots for this
-> +          mailbox's command queue.  Like rambus,num-slots this is a
-> +          per-board host-memory ring geometry, not derived from the
-> +          compatible.
-> +
-> +      rambus,cores:
-> +        $ref: /schemas/types.yaml#/definitions/uint32-array
-> +        items:
-> +          enum: [0x02, 0x03, 0x04, 0x05, 0x08, 0x09, 0x0a, 0x18]
-> +        description: |
-> +          Core-affinity list: the hardware core IDs whose work is
-> +          dispatched to this mailbox.  A core ID may appear on at most o=
-ne
-> +          mailbox.  Cores not listed on any mailbox are load-balanced
-> +          across all mailboxes.  Optional (default: none -- the mailbox
-> +          only serves the load-balanced pool).
-> +
-> +          Because each core instance has a distinct ID, separate
-> +          instances of the same core type can be pinned to different
-> +          mailboxes.
-> +
-> +          Core IDs:
-> +            0x02 HC, 0x03 AES, 0x04 SM4, 0x05 SM3,
-> +            0x08 HCQ, 0x09 QSE, 0x0a PKE, 0x18 CCP.
+BTW, I think this has been reported in the past:
 
-You could just make this a string array, and then you'd not need this
-mapping of unintelligible hex values. Of course then your driver has to
-do it, but I'd rather see understandable (and portable, since a new
-revision could change the IDs) values in DT.
-
-> +
-> +    required:
-> +      - reg
-> +
-> +    additionalProperties: false
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - "#address-cells"
-> +  - "#size-cells"
-
-Surely clocks are also mandatory?
-
-pw-bot: changes-requested
-
-Cheers,
-Conor.
-
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    soc {
-> +        #address-cells =3D <2>;
-> +        #size-cells =3D <2>;
-> +
-> +        crypto@a4800000 {
-> +            compatible =3D "rambus,cmh-v1030";
-> +            reg =3D <0x0 0xa4800000 0x0 0x41000>;
-> +            clocks =3D <&cmh_core_clk>;
-> +            clock-names =3D "core";
-> +            #address-cells =3D <1>;
-> +            #size-cells =3D <0>;
-> +
-> +            /* Fast symmetric cores dedicated to mailbox 0:
-> +             * HC 0x02, AES 0x03, SM4 0x04, SM3 0x05, CCP 0x18 */
-> +            queue@0 {
-> +                reg =3D <0>;
-> +                interrupts =3D <1>;
-> +                rambus,cores =3D <0x02 0x03 0x04 0x05 0x18>;
-> +            };
-> +
-> +            /* Slow asymmetric/PQC cores dedicated to mailbox 1:
-> +             * HCQ 0x08, QSE 0x09, PKE 0x0a */
-> +            queue@1 {
-> +                reg =3D <1>;
-> +                interrupts =3D <2>;
-> +                rambus,cores =3D <0x08 0x09 0x0a>;
-> +                rambus,num-slots =3D <64>;
-> +                rambus,slot-stride-bytes =3D <512>;
-> +            };
-> +        };
-> +    };
-> diff --git a/Documentation/devicetree/bindings/vendor-prefixes.yaml b/Doc=
-umentation/devicetree/bindings/vendor-prefixes.yaml
-> index 396044f368e7..8b1a8f0a673d 100644
-> --- a/Documentation/devicetree/bindings/vendor-prefixes.yaml
-> +++ b/Documentation/devicetree/bindings/vendor-prefixes.yaml
-> @@ -1371,6 +1371,8 @@ patternProperties:
->      description: RaidSonic Technology GmbH
->    "^ralink,.*":
->      description: Mediatek/Ralink Technology Corp.
-> +  "^rambus,.*":
-> +    description: Rambus Inc.
->    "^ramtron,.*":
->      description: Ramtron International
->    "^raspberrypi,.*":
-> --=20
-> 2.43.7
->=20
-
---ijLsa67cbXpBs7zp
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCao8cGAAKCRB4tDGHoIJi
-0sjsAQCs5O4ETXRJy6kouRnk1/OQzmyoUsRPrpeb9rM/21hfJAD9EpAJQfU5xwoJ
-RERZNwRIPTsmZQlDVlrThF4+t3HV5wM=
-=dVOj
------END PGP SIGNATURE-----
-
---ijLsa67cbXpBs7zp--
+https://lore.kernel.org/all/CAJxJ_jhvyMukPLThpgcdCMHwbp3b3bFvc4Va1cK79_3z6u=
+bhwQ@mail.gmail.com/
