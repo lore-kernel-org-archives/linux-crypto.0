@@ -1,160 +1,172 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A33B63B9DA8;
-	Wed, 26 Aug 2026 15:45:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D41BA4457BB
+	for <linux-crypto@vger.kernel.org>; Wed, 26 Aug 2026 16:30:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787759137; cv=none; b=gAE9XUyiEf/c2V3Kq02yEhQj4W4CJDzyH8NdZUc86+1lhfxMoEUAj4c3Sl9zBWVB//hQj3FyBEMy8Hs45WBb+EfsAZl02l/nNC/w0Tx5F+VE3pLk6HASSHnJKSKxwO3BUtdnPwUF7bo4eH5aHSgcIOux7jaSJusltDZc6T1zDxE=
+	t=1787761817; cv=none; b=ige+3U4joY15tQmAhOa64B2A10lia6RzLLP4XzLRsIdvtVWdST3+CqWYXNtS5YtF5/HFweU0NeC6t4vyMW8Afg/uLHuFxH4daMxZ/030MzeoqWEQ83Kl/O9EuL6XsFtSFH1EoQ1jTAk2/Nb9cP1UuFwZOBAm7AcxrPNScu9qiEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787759137; c=relaxed/simple;
-	bh=KXcUPHVoaQJfAjh0Xr6CYc3qr686V/ZOfBvoUG+IKCA=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=aZqeqVB3kStSot76yvjB1y031R2LdV0LtzOtm1GXHfeeJNj9TI4NEPBP5LqOYNYkxnZa1yZTvJVFrUOZ6fymElsAIkvev25ncHR2ooJJA8yIMWYPuDbSvZ9fPutK/UVRbE8eqtIGFkigE7Cfn5F9McuEY7Gp/P0HVZ2P/DzBjzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=jkTTR/rM; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1787761817; c=relaxed/simple;
+	bh=gwIfm3sCQyiILWZQ7xFw6yNp7td9RDcFDuU2pI//xdw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DpUa1buqVrovvE15v+i0PirEhkKrbgn5soKPwaeX/KNOgCUcJ2CLlG7dqn9GIbqf2LFaV3cKYZJdkfrGrovg5smNsf5t4B9Fk6iV/NNolovYSf3CdJsaLpKh0P2kGb+SzGwYsno6VKqj1ahZojCqjNS+N5235aPEHh015g7nmIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fireburn.co.uk; spf=none smtp.mailfrom=fireburn.co.uk; dkim=pass (2048-bit key) header.d=fireburn-co-uk.20251104.gappssmtp.com header.i=@fireburn-co-uk.20251104.gappssmtp.com header.b=LsqMpOMs; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fireburn.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=fireburn.co.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jkTTR/rM"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67QE1hka4099807;
-	Wed, 26 Aug 2026 15:44:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=QHF3Ke
-	bkIZ+vGajKHXIlWCi+fcg+Ol06VbFwHvqxa1o=; b=jkTTR/rMq2EQrhbiRdeocp
-	957Pnj701hoAbAUxVDCdclrngvAWSxbFVoA61xcx3oiyk+by80JKBYh+TPI98JOl
-	rQClrkDZVL934D0GrE4vOGjWR0qjpOZH65/wQR2mfkqLMSYc7hQXpDdbHGeLYWST
-	WyP+Mtr8cbDaK2IlQWFVf7OEsho1JwsjjG6dExGQtU4o9iIGyNN/XXrT7FwPh5Dv
-	jAomC0yG43n7MtSl4KJeQvW2HKQp53O4SU8lWT4vk+nLAeME7i3oiYQFpdDAoreK
-	MGwYgzPpgD1C6KvYsuW8m420OyUkiJB9cqH8FSEeMaXJU3DlUtu1SDgoQosg77Kg
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4g716hyr5p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 26 Aug 2026 15:44:46 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 67QFfHXJ010818;
-	Wed, 26 Aug 2026 15:44:44 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4g7p3qay9g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 26 Aug 2026 15:44:44 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67QFigVA50462990
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 26 Aug 2026 15:44:42 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B5B2F20040;
-	Wed, 26 Aug 2026 15:44:42 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DF9F52004B;
-	Wed, 26 Aug 2026 15:44:40 +0000 (GMT)
-Received: from smtpclient.apple (unknown [9.124.213.3])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Wed, 26 Aug 2026 15:44:40 +0000 (GMT)
-Content-Type: text/plain;
-	charset=utf-8
+	dkim=pass (2048-bit key) header.d=fireburn-co-uk.20251104.gappssmtp.com header.i=@fireburn-co-uk.20251104.gappssmtp.com header.b="LsqMpOMs"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-498028b3d5eso10748215e9.1
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Aug 2026 09:30:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fireburn-co-uk.20251104.gappssmtp.com; s=20251104; t=1787761814; x=1788366614; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=G5JqemKnba64Z3g/kh1rqnazfKcGKeW7SjV07q49wE8=;
+        b=LsqMpOMsFvgMA5daSnkrAZT2lljVUtu6hRgd7fpAwNuPB13J1mENslhUBn/+xYYqqL
+         2dB/b8TiT6Dw1bw65FYI9jYuXQEgPBycpsIMg6pEwyqg/FbYiCieJC+lPkRMEJWlLdHD
+         Rz51CXECI7MLIZnNKByUc+R7azX1gW0Rso9z1GawcD/4NyiaqgNU2rlOazfghGVwNE9z
+         KAG1RX7oPXjBrDe4w737qGRyqulEMIjegBUMg9JP2CR6zuaSxugOd/ZZ/aOL4wbkWXE6
+         8rZKEU33MiptizNe+gtg82wzNb06F4f4m1G+zRthNmw+qY5zXfEE/SQRInU4tiLfb0zc
+         o5fQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787761814; x=1788366614;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=G5JqemKnba64Z3g/kh1rqnazfKcGKeW7SjV07q49wE8=;
+        b=qTSFLGYznSWYSby33DZTwq2fk7rgfqqIDjpUKq6MVhilafzFdLia5EGzjipBb/Iz5a
+         wY6EAw77i7QCWeiMqICsS+FXRWptUsI7P3xKHjpXJfo0B0tODN6gmHgsuN4YrOlCJirJ
+         435knt4VJ2zBaLD6Rc+nFbOeRV7QA/xIhy6/fwsmpmAiVPrq3WcNILkHsBV6QaBoRhDX
+         YYpoY2bvcfgXbLHQuHHnvWlL0D/E5Q10NbTpMoVaKbsfLrfnIvDPdN8FkdJoRt8N1NJ4
+         /YlyMwTkyqYIVAr6LO1whiuZjeidJKo4My+7Vqc1ECD0VCpaSRv+lNyixl4PJIZQ7xKB
+         PLDw==
+X-Gm-Message-State: AFuF++kmMsA1G66SmA3WTGmI+75L9hSsCEdjPx+ZZbOL2nYH0jKHWpJn
+	Nf7lXwobkVeFWKmwnL0t5l67HvGiZ4g8tk7HpkFNXslaHdmsL6G5wuEgB8KXBLdO1VeJU+wtFy/
+	uwAiQB5ej
+X-Gm-Gg: AR+sD11GV9AOd48cdduDw8SMmZ5QIuvr+Huqcd0tro/x+cNgj/lYYzEgLGc08PRGSxY
+	gpk/bQ8zUsdSeWpHUagDgV3R/d9ltnYBLX6ZnAe6CKeyQo4ZkktV5VFiRCB5U6rEvuJ5fAUF6CY
+	/u6H74FQP+fRg/ZTaIlLZ0lPoYCiYFi/7XO238YhUQ5E739IIGmIGx38hd191FjHudAnAgJ7RxO
+	3WtnjasoZm43Nufx7s+4Ln5tRKqwgGJtuoEHxyqCtD+ATJlvtL3yskK/DkKVIvUqMya3Vy1g8th
+	T1OkomyTZCPPphGs1P5JsPZMNbjhLHnHGWVTrn4bGMvrCBUt9dMBKQir4/gfCgUjcoL8J7ynn5x
+	uzERTq676Ovex+BqNHIgAzHf0m/RcTiRsGhkniPGaDWz4Edni1Ya47UMBvFEeDaQsZH4XOycJRh
+	mWusZMFXO3LZZoL8kMIFTU42m9LXwIG1C4d2CgEfhxZnvJsR15UAHQsMpZDfBNI3J+ovFXQJPvX
+	H23cGgwkV9iQqETvM3HVxISttqjatfEbfgJ
+X-Received: by 2002:a05:600c:c178:b0:499:621a:2ec2 with SMTP id 5b1f17b1804b1-499dc6efe07mr77963895e9.3.1787761814121;
+        Wed, 26 Aug 2026 09:30:14 -0700 (PDT)
+Received: from axion.fireburn.co.uk ([2a01:4b00:d309:1c00:caf1:6b20:8531:818c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-499dc981bf3sm32323615e9.8.2026.08.26.09.30.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Aug 2026 09:30:12 -0700 (PDT)
+From: Mike Lothian <mike@fireburn.co.uk>
+To: linux-crypto@vger.kernel.org
+Cc: Mike Lothian <mike@fireburn.co.uk>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Boqun Feng <boqun@kernel.org>,
+	Gary Guo <gary@garyguo.net>,
+	=?UTF-8?q?Bj=C3=B6rn=20Roy=20Baron?= <bjorn3_gh@protonmail.com>,
+	Benno Lossin <lossin@kernel.org>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Alice Ryhl <aliceryhl@google.com>,
+	Trevor Gross <tmgross@umich.edu>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	Tamir Duberstein <tamird@kernel.org>,
+	Alexandre Courbot <acourbot@nvidia.com>,
+	=?UTF-8?q?Onur=20=C3=96zkan?= <work@onurozkan.dev>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	rust-for-linux@vger.kernel.org,
+	llvm@lists.linux.dev
+Subject: [PATCH v3 0/2] rust: crypto: AES, CMAC, SHA-256, HMAC and RSA bindings
+Date: Wed, 26 Aug 2026 17:29:47 +0100
+Message-ID: <20260826163004.3365-1-mike@fireburn.co.uk>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3864.700.51.1.1\))
-Subject: Re: [PATCH 2/2] crypto: rsassa-pkcs1: reject undersized keys when
- verifying
-From: Sudhakar Kuppusamy <sudhakar@linux.ibm.com>
-In-Reply-To: <20260826103744.1554131-3-Jeremy.Jean@oss.cyber.gouv.fr>
-Date: Wed, 26 Aug 2026 21:14:30 +0530
-Cc: Lukas Wunner <lukas@wunner.de>, Ignat Korchagin <ignat@linux.win>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <DA520816-F403-4F8D-87BC-F4ABA923C06B@linux.ibm.com>
-References: <20260826103744.1554131-1-Jeremy.Jean@oss.cyber.gouv.fr>
- <20260826103744.1554131-3-Jeremy.Jean@oss.cyber.gouv.fr>
-To: =?utf-8?B?SsOpcsOpbXkgSmVhbg==?= <Jeremy.Jean@oss.cyber.gouv.fr>
-X-Mailer: Apple Mail (2.3864.700.51.1.1)
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODI2MDEyOSBTYWx0ZWRfX7qTLye1e0wro
- zWYuWJr0yq7pg5k5tjXKeebFu7jPDxhLZZtEQvFCTqg3c3r3gRDXR9c0BTww7Wv2v0Yt8hVZueP
- JsJPLWpau8/s1XcTCnJPOlWB+TDj0s8=
-X-Proofpoint-GUID: De3-inlnaXpaCoihQWPci-xmyBuLLUIs
-X-Proofpoint-ORIG-GUID: De3-inlnaXpaCoihQWPci-xmyBuLLUIs
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODI2MDEyOSBTYWx0ZWRfX6Q0iUrMjShJO
- HoCqoAeYT4J0ddps+8gFTx9CAgbsYUkeyIiCgXi9OHOl9/jZ3qOGObEIbINBf3K8XEhu4hneA20
- UhZRIHzRCqqodNiBqi14O+l9eGcT6wnEUbNgmXVnZN1UNH9Fl9+unVX6UO0iKBwHCEniJEXorSg
- nOX/VhjTozgZqFXa2mTv47S0Asm7C6XADFWrYR2RN1uSzyeO55ziftS9pCQY3GeFy08NfVdY0jx
- 7GIn1vqwiwmbAkt5I1BToTLu5QdKbQK+4PBbNoZQ9I1iUNbnRxD931YByzQD6UDfmjwA15dQ+cu
- b2YHpMWvF5mxWrTKaP5fxKFiPeVLFvvcfrAxZ13A7r1IQiQ65EYXH+lHYxNrg9D8vi409qI2S8i
- Bbs9vbey2J297dTPzW6cW/x5Gn/Xv3yxnfs5YthdTz3WD2PFe9BuzNaXTCyJUuNmgFINEeRbikt
- OZcG16FbApveM4r931A==
-X-Authority-Analysis: v=2.4 cv=H7brBeYi c=1 sm=1 tr=0 ts=6a8f09ee cx=c_pps
- a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17
- a=IkcTkHD0fZMA:10 a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=RnoormkPH1_aCDwRdu11:22 a=Y2IxJ9c9Rs8Kov3niI8_:22 a=VnNF1IyMAAAA:8
- a=Qxsn6e9zUWdzkDgwqbgA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-26_04,2026-08-26_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 malwarescore=0 lowpriorityscore=0 impostorscore=0 spamscore=0
- bulkscore=0 adultscore=0 priorityscore=1501 clxscore=1015 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608260129
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
+Synchronous crypto bindings for a driver that has to authenticate a device
+before it is allowed to drive it
 
+The first patch covers AES-128, AES-CMAC, SHA-256 and HMAC over the existing
+synchronous crypto API. The second adds RSA through akcipher, which HDCP 2.2
+needs to verify a device certificate and wrap a session key
 
-> On 26 Aug 2026, at 4:07=E2=80=AFPM, J=C3=A9r=C3=A9my Jean =
-<Jeremy.Jean@oss.cyber.gouv.fr> wrote:
->=20
-> rsassa_pkcs1_verify() accepts any nonzero key size.
->=20
-> With a one-byte key and a zero RSA result, the leading-zero handling
-> decrements dst_len to zero and advances out_buf past the allocation.
-> The next out_buf[0] access reads out of bounds.
->=20
-> KASAN reports:
->=20
->    BUG: KASAN: slab-out-of-bounds in rsassa_pkcs1_verify+0x79d/0x900
->    Read of size 1 at addr ...
->    The buggy address is located 0 bytes to the right of
->     allocated 73-byte region [...]
->=20
-> Reject keys shorter than the minimum PKCS#1 v1.5 encoded message size.
->=20
-> Fixes: 3d5b1ecdea6f ("crypto: rsa - RSA padding algorithm")
-> Assisted-by: Codex:gpt-5
-> Signed-off-by: J=C3=A9r=C3=A9my Jean <Jeremy.Jean@oss.cyber.gouv.fr>
+Changes since v2:
 
+  The hand-rolled AES-CMAC is gone, along with its own dbl() subkey
+    derivation. It delegates to the in-tree aes_cmac library through
+    include/crypto/aes-cbc-macs.h, which is what Eric Biggers asked for
+  There is no private RSA primitive either. Modexp goes through
+    crypto_alloc_akcipher("rsa"), and OAEP padding and the HDCP key material
+    are held in a memory-wiping secret type
+  v2's separate CMAC fix is folded into the commit that introduces the CMAC,
+    so this is two patches rather than three
 
-Reviewed-by: Sudhakar Kuppusamy <sudhakar@linux.ibm.com>
+Nothing here knows what HDCP is. The consumer is the DisplayLink driver at the
+end of the chain, whose control plane is sealed with AES-CTR and keyed by an
+HDCP 2.2 exchange
 
+v2: https://lore.kernel.org/r/20260703030056.2763-1-mike@fireburn.co.uk
 
-Thanks,
-Sudhakar
+The rest of the posting, which is one series per subsystem:
 
-> ---
-> crypto/rsassa-pkcs1.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/crypto/rsassa-pkcs1.c b/crypto/rsassa-pkcs1.c
-> index d0e4a885397f..39137476ce81 100644
-> --- a/crypto/rsassa-pkcs1.c
-> +++ b/crypto/rsassa-pkcs1.c
-> @@ -231,7 +231,7 @@ static int rsassa_pkcs1_verify(struct crypto_sig =
-*tfm,
-> int err;
->=20
-> /* RFC 8017 sec 8.2.2 step 1 - length checking */
-> - if (!ctx->key_size ||
-> + if (ctx->key_size < 11 ||
->    slen !=3D ctx->key_size ||
->    rsassa_pkcs1_invalid_hash_len(dlen, hash_prefix))
-> return -EINVAL;
-> --=20
-> 2.47.3
->=20
->=20
+  rust-core, 9 patches, rust-for-linux and linux-kernel
+  https://lore.kernel.org/r/20260826162851.2497-1-mike@fireburn.co.uk
+  rust-crypto, 2 patches, this one
+  rust-usb, 5 patches, to linux-usb and rust-for-linux, not sent yet
+  rust-drm, 23 patches, to dri-devel and rust-for-linux, not sent yet
+  rust-firmware, 1 patch, to linux-kernel and rust-for-linux, not sent yet
+  drm-vino, 13 patches, to dri-devel, not sent yet
 
+Vino is the user for all of them. The abstractions themselves are generic and
+carry no knowledge of DisplayLink
+
+The whole thing is one branch, base and prerequisites included, which is the
+quickest way to read it:
+
+  git clone -b vino-v3 https://github.com/FireBurn/linux
+  cd linux
+  make LLVM=1 rustavailable
+  make LLVM=1 -j$(nproc)
+  make LLVM=1 -j$(nproc) modules
+
+CONFIG_RUST=y and CONFIG_DRM_VINO=m are the two to set; DRM_VINO selects the
+rest of what it needs
+
+It is the exact tree these patches were generated from, at 4c9ba407018e, the
+drm-rust-next tip of 2026-08-06. drm-next has moved on since, and this follows
+drm-rust-next deliberately: the KMS layer underneath this work lives only there,
+and that tree picks up drm-next on its own schedule
+
+Two commits on the branch are not in any of the series above, because they
+enable no part of Vino: a scheduler call site that stops compiling under the
+locking-guard series, and the Kms associated type Tyr needs once the KMS
+registration trait requires one
+
+It applies to the base above on its own, with no unmerged work under it, so it
+can be taken without waiting for anything else here
+
+The reference branch also carries Boqun Feng's counted interrupt disabling
+series, which SpinLockIrq needs. One patch of it is already in tip locking/core
+as e901c1510e24
+
+These patches were written with the assistance of Claude (Anthropic), used
+through Claude Code as an interactive coding assistant, across the design, the
+implementation and the tests. Every patch it contributed to carries an
+Assisted-by trailer. The Signed-off-by is mine: I have reviewed and tested what
+is here and I stand behind it
+
+Mike Lothian (2):
+  rust: crypto: add AES-128, AES-CMAC, SHA-256, and HMAC bindings
+  rust: crypto: add synchronous RSA akcipher support
+
+ 9 files changed, 592 insertions(+), 6 deletions(-)
+
+base-commit: 4c9ba407018e8deb06dbc643112bac8f40404f95
