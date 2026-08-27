@@ -1,149 +1,95 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B69F37E5DA;
-	Thu, 27 Aug 2026 02:06:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F235B1C84D0;
+	Thu, 27 Aug 2026 02:41:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787796419; cv=none; b=dDWQFO8DL/fi6UGBQbXdAZQsuVZQ1TconYOzMFa0mGoBVGMiaSyMMR5ZBzbaapniDmb4oIC0jwuUfI6D+tM3Zy+s/vI09P4qTQLOwUDL+cftK//aHHIjlIk87Ny4Y/9/9Evr0DKoSOc2RFHa85yqCLl1rqG6VQm6AcaUlrPV2E8=
+	t=1787798510; cv=none; b=TXhtVkFfPWBQe26bUf1jFYN4ELGwOcvZBiuWFMDJagk6Iwj9q4F4M4Hf7vkXavT420vHyRwwjnspOdJ7fWiD9tTmIV/Ty49UlSWdjlpdUAZNJ4Hn6P8Q416IKGxUDAXs87VBJMgceub40hf3hLTdKpf/Gsdu7cBMmp8IFbCzhrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787796419; c=relaxed/simple;
-	bh=gL0phxzVoVhVemXwWCd4xZC1JDHdiO9EhSL9gt+YRbk=;
+	s=arc-20240116; t=1787798510; c=relaxed/simple;
+	bh=Pe6ebjgOySQG8KNJ1VVfaNeyeiwUQZQXsALIp8Pr0Ug=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lX7KkchheBw4rCiXNo0lThmunK4PbpX0LF7iAA0YybHuVONzKhU37m1GUl8beADe9kPxZ9FbpmAES76lkLPPoKdATBQIYxpTTRzBUms/0oXLF3Tu6gX9Z9PeXF68cxdwN3ahDuClqbWSEwHe1ofsfHM8nsA8D7W2ZVEVovTpa9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=bsrMXhAq; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	 Content-Type:Content-Disposition:In-Reply-To; b=CufRTT61ulQ9tnNh6N8iq/KHS5b0Ae6hblDGrLloobjIVIydjkfHZJ+we1xka3ZEwtXrrqb4JNZLB9rgGdhsRsk9dJOIsL492HauwDbtwyFSKg6hyTdpdtoqeSDbmP4HO0Ofk9c838LrDWaQbhx6zOGKFso2tvmT3ldJvkDE7SI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BP/YiBWD; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="bsrMXhAq"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 7D74840E01A2;
-	Thu, 27 Aug 2026 02:06:54 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id jd_fD0SB0TYW; Thu, 27 Aug 2026 02:06:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1787796402; bh=tvL5rKHzTbVYhzBl9qHb4PL59PMigbMXonEm7pq5+dQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bsrMXhAqesv5sWmU7bf5gApE2BR3rfOLkTFEj+daNgpEHVhRDtPz52LPifWUHlz3d
-	 DWBoKQT5Erwzv6MflMnL56czhzDNHWkoN40OPRdksiWLYPM6FY8iR4W+X0e1DCXQUL
-	 21E2Co0g+5FwhMBH5qIi4z1Z1bhlsTQyb0OrPRSIFKoKXQ5WIlLl7tAA/t0A3R6g2u
-	 5sJcuPSDYSvTF/TwAf5FARD2yEqH+G6Dy5sLa1LiQk8uVLgjmUws2Pbf3qAv5gYbV7
-	 vHqROTqRwdk2TTg4uig9vrhhtXBLinhrTUQPYl3BAdCVNZ8oeSW7lNoozEvzjSEnzL
-	 nQ+KhebLPX0iqv0E+1nozmQa1Wgb3duLUIWrxKFPOE43/pp23F4zpLOMwbmrJ4hsrI
-	 lp3O7hPL7Few4odcG4CzdpbLF2IbMuV9BZl3kyWQ7hTyEwrFRkdUX4cYoMaoC+MVnY
-	 iyPRtekgxShMRzfHmRfp44HFnIh3bCXEQcIax8+L33R/vTjRWXWP5INu6jsvcXCOOR
-	 bMGV2JG/uPOPzTxQRDJLrnIbHQ6lpoV3qY2Kkd4TjMo/o++XGeo0BrXEzGt2vfjlae
-	 UO6QA4P8YwJChK9R+9xFTsHRqAuzMs1AgId4IWKpYAX4KOtwH0upE3buqlYXV3gJaJ
-	 B6Yxn6S89nIktwbdRXcxN02Q=
-Received: from stx.tnic (unknown [IPv6:2600:1700:38ca:c00::1a])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id BDAEA40E00E6;
-	Thu, 27 Aug 2026 02:06:07 +0000 (UTC)
-Date: Wed, 26 Aug 2026 19:06:04 -0700
-From: Borislav Petkov <bp@alien8.de>
-To: Ashish Kalra <Ashish.Kalra@amd.com>
-Cc: tglx@kernel.org, mingo@redhat.com, dave.hansen@linux.intel.com,
-	x86@kernel.org, hpa@zytor.com, seanjc@google.com,
-	peterz@infradead.org, thomas.lendacky@amd.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org,
-	pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
-	KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com,
-	Nathan.Fontenot@amd.com, ackerleytng@google.com, jackyli@google.com,
-	pgonda@google.com, rientjes@google.com, jacobhxu@google.com,
-	xin@zytor.com, pawan.kumar.gupta@linux.intel.com,
-	babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com,
-	john.allen@amd.com, darwi@linutronix.de,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	kvm@vger.kernel.org, linux-coco@lists.linux.dev
-Subject: Re: [PATCH v12 3/5] x86/sev: Initialize RMPOPT configuration MSRs
-Message-ID: <20260827020604.GCao-bjMkHGnQlAWnL@fat_crate.local>
-References: <cover.1786389115.git.ashish.kalra@amd.com>
- <19b316f26a145646c521943f5fdd5dfc4b2d1e84.1786389115.git.ashish.kalra@amd.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BP/YiBWD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BD1C1F000E9;
+	Thu, 27 Aug 2026 02:41:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1787798508;
+	bh=0jL/52kKMOIHpqQcbC2UZp4pVJ+MTKjkZLk5/qlb7SM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=BP/YiBWD+3TcmZitorucd8VNk9N7uCYMgLIssSwWIctzVn4uwyV0delXCj7+vpN2X
+	 dyqAJycPGAY+KfZM57H+XNBNuLf/HonYBg4xc+mFcz8zKQeXRZmBcTDQj00Cn7d62I
+	 sTc1HAr0GRCugKUC7SGCgKhcQ7GVf7WpakaOWw4IAbOb9nXAPt2bpxDj7LBrX5ufkp
+	 jz1D/lozHm+SJueYetT/I/NfclDASej5KtZcoCSgeA+Zn6Eh3WB+o6jsJp1nmqKx9A
+	 8d+PyLkteaHUQ0NUzujhiyYgrS+n7cD2pgkYORaUzXTQlkyFMzcZUfBgFNGl4Fw7G7
+	 GlCNCnUdbQoaw==
+Date: Wed, 26 Aug 2026 19:39:43 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Usama Arif <usama.arif@linux.dev>
+Cc: dsterba@suse.com, linux-kernel@vger.kernel.org, terrelln@fb.com,
+	linux-crypto@vger.kernel.org, yosry@kernel.org, hannes@cmpxchg.org,
+	nphamcs@gmail.com, chengming.zhou@linux.dev, shakeel.butt@linux.dev,
+	kernel-team@meta.com
+Subject: Re: [PATCH 0/3] zstd: probe the CPU for BMI2 support once, not per
+ context
+Message-ID: <20260827023943.GA2327@sol>
+References: <20260826122558.2662013-1-usama.arif@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <19b316f26a145646c521943f5fdd5dfc4b2d1e84.1786389115.git.ashish.kalra@amd.com>
+In-Reply-To: <20260826122558.2662013-1-usama.arif@linux.dev>
 
-On Mon, Aug 10, 2026 at 07:21:53PM +0000, Ashish Kalra wrote:
-> From: Ashish Kalra <ashish.kalra@amd.com>
+On Wed, Aug 26, 2026 at 05:25:35AM -0700, Usama Arif wrote:
+> zstd picks between BMI2 and generic code paths at runtime, and issues
+> CPUID to decide every time a compression or decompression context is set
+> up. The answer cannot change while the kernel is running.
 > 
-> The new RMPOPT instruction helps manage per-CPU RMP optimization
-> structures inside the CPU. It takes a 1GB-aligned physical address
-> and either returns the status of the optimizations or tries to enable
-> the optimizations.
+> It is not a cold path: squashfs calls zstd_init_dstream() for every block
+> it decompresses, and erofs, btrfs, f2fs and crypto/zstd all initialise a
+> context per operation. Each probe is two serializing CPUID instructions
+> on x86.
 > 
-> Per-CPU RMPOPT tables support at most 2 TB of addressable memory for
-> RMP optimizations.
+> Patch 1 routes ZSTD_initStaticCCtx() through ZSTD_cpuSupportsBmi2()
+> instead of open-coding the probe, which also fixes it testing for BMI2
+> without BMI1 - the bodies it selects are tagged
+> TARGET_ATTRIBUTE("lzcnt,bmi,bmi2"), so both are needed. No CPU in the
+> field implements BMI2 without BMI1, so this is latent. Patch 2 skips the
+> probe when DYNAMIC_BMI2 is 0, where every consumer ignores the flag
+> anyway. Patch 3 caches the result.
 > 
-> Initialize the per-CPU RMPOPT table base to the starting physical
-> address. This enables RMP optimization for up to 2 TB of system RAM on
-> all CPUs.
+> A 4 KiB crypto_acomp benchmark [1] in a one-vCPU KVM guest, twelve boots
+> of nine 30,000-operation rounds, median per-round mean over 108 rounds:
 > 
-> Additionally, add support to setup and enable RMPOPT once SNP is
-> enabled and initialized.
+>                     compress     decompress
+>   unpatched         16,756 ns     3,455 ns
+>   patched           13,646 ns     1,002 ns
+>                     -3,110 ns    -2,452 ns
+>                      (18.6%)      (71.0%)
 > 
-> Suggested-by: Thomas Lendacky <thomas.lendacky@amd.com>
-> Suggested-by: Dave Hansen <dave.hansen@linux.intel.com>
-> Suggested-by: Borislav Petkov (AMD) <bp@alien8.de>
-> Suggested-by: K Prateek Nayak <kprateek.nayak@amd.com>
-> Reviewed-by: Dave Hansen <dave.hansen@linux.intel.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> ---
->  arch/x86/include/asm/msr-index.h |  3 ++
->  arch/x86/include/asm/sev.h       |  2 +
->  arch/x86/virt/svm/sev.c          | 75 +++++++++++++++++++++++++++++---
->  drivers/crypto/ccp/sev-dev.c     |  2 +
->  4 files changed, 77 insertions(+), 5 deletions(-)
+> The main reason is because CPUID is an unconditional VM exit.
+> 
+> [1] https://gist.github.com/uarif1/5cf02f0e22c23f0d1b3d84348f12914c
+>  
+> Usama Arif (3):
+>   zstd: use ZSTD_cpuSupportsBmi2() in ZSTD_initStaticCCtx()
+>   zstd: skip the BMI2 probe when dynamic BMI2 dispatch is disabled
+>   zstd: probe the CPU for BMI2 support only once
+> 
+>  lib/zstd/common/zstd_internal.h   | 22 ++++++++++++++++++++--
+>  lib/zstd/compress/zstd_compress.c |  2 +-
+>  2 files changed, 21 insertions(+), 3 deletions(-)
 
-Some cleanups ontop:
+Why not just use cpu_feature_enabled(X86_FEATURE_BMI2), which compiles
+down to a static branch?  All these issues are caused by lib/zstd/ using
+its own custom CPU feature detection code, instead of the normal CPU
+feature detection code that the rest of the kernel uses.
 
-diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
-index 923b7869acd1..982753002a3c 100644
---- a/arch/x86/virt/svm/sev.c
-+++ b/arch/x86/virt/svm/sev.c
-@@ -558,7 +558,7 @@ int snp_prepare(void)
- }
- EXPORT_SYMBOL_FOR_MODULES(snp_prepare, "ccp");
- 
--static void snp_cleanup_rmpopt(void)
-+static void rmpopt_disable(void)
- {
- 	int cpu;
- 
-@@ -577,8 +577,7 @@ void snp_shutdown(void)
- 	if (syscfg & MSR_AMD64_SYSCFG_SNP_EN)
- 		return;
- 
--	/* Disable RMPOPT while CPU hotplug is disabled. */
--	snp_cleanup_rmpopt();
-+	rmpopt_disable();
- 
- 	clear_rmp();
- 	on_each_cpu(mfd_reconfigure, NULL, 1);
-@@ -612,8 +611,7 @@ void snp_setup_rmpopt(void)
- 	}
- 
- 	/*
--	 * The RMPOPT_BASE MSR is per-core, so only one thread per core needs
--	 * to set up the RMPOPT_BASE MSR.  All primary threads are online,
-+	 * The RMPOPT_BASE MSR has core scope. All primary threads are online,
- 	 * otherwise SNP would not have been enabled.
- 	 */
- 	for_each_online_cpu(cpu)
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+- Eric
