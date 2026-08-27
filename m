@@ -1,135 +1,92 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF7E846C4C6
-	for <linux-crypto@vger.kernel.org>; Thu, 27 Aug 2026 14:59:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.182
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787842772; cv=pass; b=IJghU5fCOQrGwUj79X8jLfwf8AKuxhEb8DZ4d82vQFGK0wSS2o6qxdH7uvXQvbfNQmj3Nz9JL10G5j0uzQw15+tZ6HbsUoYoNz+GP6DTCyPBnbL6ew+0v4TtYKdlvaLiBKbr7d/ozkP0YFXJAOFFZRzkmrCPymXjBrhd0z+30kQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787842772; c=relaxed/simple;
-	bh=41WewWIErbX3yd9Z3vKfnXfsdNWRVLs4FM/DXBSS53c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=h41YAcgn9YOcIPZTLnvJR79oGiYaAXlv9CgavCzSRTCJEkeA1t8oTwfU622wCNPsjNnjph8+rD1TR59ERvAaAW2CQKXW0xzkXWC/VlqCWvEKIwvh7WmeZYxWQjCiCC1En0JKckhzdZDqIGE4bsy3VDAbKDogso9taCfXkGON4FM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QMdgmt1W; arc=pass smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 505BE48662D;
+	Thu, 27 Aug 2026 15:51:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787845887; cv=none; b=OpnML5054+gBx3XlzAwU5LmkDDkeY2awr0/smJivaY5jiWn015wFAIURrDGvsD8jmPgwW5Wz1FbDRcp6D9g/iIR/WEj2byJviFdzK3hasF8Xe92tLFFqBfgNeMbHhwhHELsmKTeCOl0q86E3cEsTAoR5jo3cgJngLU/fy7GFRug=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787845887; c=relaxed/simple;
+	bh=JQEA3P4mDGyLajqRCVZSW5kMkSPvgf5cDQmcexUrxZU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nV69ampRiPHiSsbS8QnrLNRmCDmmEZx9mx1re/tlsxwH4NSLhxjjxQ5Wjlya00TYe/9SFat/gYdJOp+vUGLwi/zr9L417Xl0g2r2andM+8EkLpURvZcegpVX/Twwm9jW9X9xBewl30DFZxuNn45p/ebbBvqCZxQp1LPL4BCxv/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YeGObAY7; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QMdgmt1W"
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2d590f4c291so4350195ad.0
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Aug 2026 07:59:30 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1787842770; cv=none;
-        d=google.com; s=arc-20260327;
-        b=T7bHlwAkNTsXaGruhQF1OdMjCz11+j1wu1ZYRNeO49CSWyqGvA7voJhb6BeAfo8RM9
-         j13TVP1w8P7TPQhR8Omf4xKqKvgJLEOKznDR8Ty9WUkz58xDl2eXcs4rxhE5wOqhdCmQ
-         H3omWr6v9RW31WL4homrotbzQIuyVZDp1uIpIa0hEQl1S18vr/TzH8sS0+eyExXlg15S
-         mbbIzMGADwc7Jgoxe+GxjC/Eck74CEPGM01ig58A8CZnepPJb+aNMQ8KNHgXigCqr5Ew
-         Ip9oss/MkhqjS76Wcf7HjAcfH/rYd8B0iVc3SsFBbIB/6Gtlyt0oqYzZvQ+s7qr4c/sr
-         uCxQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=3caV8jGIKYECCoF6AjoMVnw7A/xTQryGhAY1zu/DQLg=;
-        fh=/EP/5fvlJ3dt3mUbPJRvKw013YHgJ1oxZV6zFgto1Kw=;
-        b=fjDFY8z67W6Sv5RZziwziiTZ92lDM141lHjRror9ElQ43jQwYWGsQuZbsZoGhbMAi2
-         dsxycQEI3hqjh6SFl+cvAQQULrOCM/VdEEUE8gR9MrYdwngRVHev8RTOSX67n7bJk54v
-         xbkDVHscF58zMVfd4qLMuEWxvAMYj/L8X2RlTRV+UnQet235SX7c3I8+44BpKjI+p/cg
-         HcQJHhkSI7ymEQ+pP1Hz0VAEf12YfQFDXsIxn4YdrRTnRDr/tUy/HFp7vC1zgzg9CSjp
-         kvi/k1W3wpni1hxpjrfxz7hKUBXtSzbON6bCTluQWj8KzBOhv6LxFNrzamGV9m9X7Vid
-         MBmQ==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787842770; x=1788447570; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=3caV8jGIKYECCoF6AjoMVnw7A/xTQryGhAY1zu/DQLg=;
-        b=QMdgmt1Wt/TKna15326h1CQJqqJV9kNggWJ+6lruH2vsyUr3pyLDAXl1c406Xb4TSp
-         e0Xfvl1P2YgarMjFpi4zKv3MZYJHxJ2eZPxjpwHYjwrhbv7I035qamC3uI+a9coeOCqF
-         voyjznUmKCH+ijuX8JbDR0EeKIC88y4aNojx/eUQ5VKhsGtddpASqNP6vsHrJ8z47LTs
-         P7TNEw3YkA9YbveCPvwh1/8nD2NGrPqwuU/UEWmpOaqeqjE9Z6w6XKRVV3Sxn7xwcl1h
-         9pSYjBDsPPuR2QnXPMxiO3jziFPicio449EOuxntLVg+U4O1Oj92UNVKgtSx50uSxOMS
-         qchg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787842770; x=1788447570;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=3caV8jGIKYECCoF6AjoMVnw7A/xTQryGhAY1zu/DQLg=;
-        b=nl0t2Q5pYGWdXMOrKl5O3rMTLdBEioxR79Btu1u2PxH+lEVhdD4f4IFFWorHSl+diX
-         6yQpZ/Fg1eXf5jVv5oyo09xbR1k7Y/D5FB+wLiOBEePUtVnbzuOSJgb0FLxJmmFW7ca3
-         dgFmpeOccmckDxWY3otEu5HOtawzXZ9LOSog5WPeo1/BPs5ArgrH2LH/BJa2XoQVMw2+
-         F3O7Q+PRUGP6/+BmWHVJ3tyzj3+P7ml364bzPbzLYDcZagPpdL9kloRa1QcdWT5BBbEE
-         +gBhOeYznCzx+uAswMCdqs59aaqFKPHEXcNXYpiwZKl1UzjYeBwLCB65Jcn2KkhQDN8A
-         rlNA==
-X-Gm-Message-State: AFuF++kj00ySxqrCkfC+OBsZ9KIxPaG2mIs87kEkIXSNUuMajZ4OKpyY
-	wjSr2WwdV7NSAC1ZVumUk+kmpl7LI893We3qXTesN+AdmlMj8mQ2JjBChxb81d+0c4RRvuHnfcq
-	IOV3nBGDO7WjqXi82c3iUB7gnPq0opwo=
-X-Gm-Gg: AR+sD106FmYuzIe/t+yiglHQ2PXPbT8OdKDksHkFev3DgiErrVFBEY2YDi6uLF4z5B2
-	cBkGfV7nSLglJiP6OD2WBh9ihWKJaQC1JdtB51IOW6IxQgRbgkTPuLRHnwjP8dy0RjtlY6WxpCE
-	HbrqTWNL8Dw3eiylxxOeJRRpwHYC8QkoYFAoA7gB21+g6Nv3OkFa04XgeYYnd0dN8A7gz78P39+
-	WaFm6XsMOF3HFn34fYzgVS9sPnAPipKXguid+iL10lkeBOX0wZV4lH3UWP/uOBkLtweCKobySrH
-	ZKo9aFyxSAn1iiCfmuoqRIWjuSX02By7OzzU+IV8SXPBs5x+++2Gj0GOAzwYp3S5i5G9XfoodRO
-	2pQ5rXrggWnI8ajpJgdApj8uI1PWjT3X/IWQSRGnErX7ZR+wD9aZvTziUri4m
-X-Received: by 2002:a17:903:3504:b0:2cf:9e90:8be with SMTP id
- d9443c01a7336-2d71e4f74abmr88346095ad.4.1787842769819; Thu, 27 Aug 2026
- 07:59:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YeGObAY7"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1787845886; x=1819381886;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=JQEA3P4mDGyLajqRCVZSW5kMkSPvgf5cDQmcexUrxZU=;
+  b=YeGObAY79ddeWDk5iovX8n5joBijJCCFl34ThxKkUoYuFkWx0Fn6xcLi
+   DM/ANRlBMlxVzhCcmRZYlzOpbBzkw7oWvx9G5745ohki4ju51ExC8aaGt
+   lfWdQQkiIYGaL0XokWWU4Ogq57NuF6mJEMgOqpjlnGKkzgq/Cwi5QQ9es
+   roT12jMy78zEWKeuYgnRidEeXRhgLoZ0ODKBqJwvrU4Om4Oif0BPnTBn/
+   pRQRhbeaqfwDJCFNo5FFmJw/WUBqm3zPIk8KwTUqDTTibjgYeygvWV9js
+   qjdNIPnh1wq2I9AV1WvKiwZbWssBlDLK1ZCyF1uiXoZnNet1YxsJqNKw0
+   g==;
+X-CSE-ConnectionGUID: rVyyMb4NQXSvbFfvU6EW+Q==
+X-CSE-MsgGUID: brg+qereRBm11wcXG58OVg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11888"; a="99510542"
+X-IronPort-AV: E=Sophos;i="6.25,246,1779174000"; 
+   d="scan'208";a="99510542"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2026 08:51:25 -0700
+X-CSE-ConnectionGUID: DaDQK5qXQcGCrvgYh8EZJg==
+X-CSE-MsgGUID: Tls2E0W3SvuYcDvH5ZiRBQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,246,1779174000"; 
+   d="scan'208";a="297793920"
+Received: from smtp.ostc.intel.com ([10.54.69.131])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2026 08:51:25 -0700
+Received: from ray2.intel.com (unknown [10.125.109.108])
+	by smtp.ostc.intel.com (Postfix) with ESMTP id EEEA65E92;
+	Thu, 27 Aug 2026 08:51:24 -0700 (PDT)
+From: Dave Hansen <dave.hansen@linux.intel.com>
+To: linux-kernel@vger.kernel.org
+Cc: Dave Hansen <dave.hansen@linux.intel.com>,
+	Prabhjot Khurana <prabhjot.khurana@intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+Subject: [PATCH] crypto: keembay - Remove bouncing maintainer
+Date: Thu, 27 Aug 2026 08:51:20 -0700
+Message-ID: <20260827155120.2334898-1-dave.hansen@linux.intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260826163004.3365-1-mike@fireburn.co.uk> <20260826163004.3365-3-mike@fireburn.co.uk>
-In-Reply-To: <20260826163004.3365-3-mike@fireburn.co.uk>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Thu, 27 Aug 2026 16:59:15 +0200
-X-Gm-Features: AcwNN1W0d-V13zh5elWYWY1xq_Ye1PYxNifjQKCjt0be_UdVKV0D_eRNv-EoeZc
-Message-ID: <CANiq72nTu0JMOQ2ovkCnrHVr3sFE648f0e1My9nesqmKz1Gpig@mail.gmail.com>
-Subject: Re: [PATCH v3 2/2] rust: crypto: add synchronous RSA akcipher support
-To: Mike Lothian <mike@fireburn.co.uk>
-Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Biggers <ebiggers@kernel.org>, 
-	"Jason A. Donenfeld" <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, 
-	Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
-	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
-	=?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
-	Lyude Paul <lyude@redhat.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Asahi Lina <lina+kernel@asahilina.net>, Burak Emir <bqe@google.com>, 
-	Lorenzo Stoakes <ljs@kernel.org>, Joel Fernandes <joelagnelf@nvidia.com>, Yury Norov <ynorov@nvidia.com>, 
-	David Gow <david@davidgow.net>, linux-kernel@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Aug 26, 2026 at 6:30=E2=80=AFPM Mike Lothian <mike@fireburn.co.uk> =
-wrote:
->
-> +__rust_helper void rust_helper_aes_enckey_zero(struct aes_enckey *key)
-> +{
-> +       memzero_explicit(key, sizeof(*key));
-> +}
+The email for Mark Gross is bouncing. Remove the entry.
 
-Hmm... why does this one need to be a Rust helper? i.e. why doesn't it
-call the other helper from Rust?
+Signed-off-by: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: Prabhjot Khurana <prabhjot.khurana@intel.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+---
+ MAINTAINERS | 1 -
+ 1 file changed, 1 deletion(-)
 
-(Same for the other calls I notice here in the context of the patch to
-`memzero_explicit`.)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 7f147a95940ee..6d8de95f10ab8 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -13282,7 +13282,6 @@ F:	drivers/crypto/intel/keembay/ocs-aes.h
+ 
+ INTEL KEEM BAY OCS ECC CRYPTO DRIVER
+ M:	Prabhjot Khurana <prabhjot.khurana@intel.com>
+-M:	Mark Gross <mgross@linux.intel.com>
+ S:	Maintained
+ F:	Documentation/devicetree/bindings/crypto/intel,keembay-ocs-ecc.yaml
+ F:	drivers/crypto/intel/keembay/Kconfig
+-- 
+2.43.0
 
-i.e. helpers are meant to be as minimal as possible -- just forwarders
-to the same functions unless there is a good reason not to.
-
-And then you can have a safe function abstracting the call and use
-that from the different places you may need in Rust (e.g. from
-`Secret` and `Aes128`).
-
-Thanks!
-
-Cheers,
-Miguel
