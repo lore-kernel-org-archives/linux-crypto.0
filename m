@@ -1,62 +1,50 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5F81366075;
-	Thu, 27 Aug 2026 18:29:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48D1D381B0D;
+	Thu, 27 Aug 2026 18:42:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787855352; cv=none; b=HTMBF1wWYXZtpTQkgeOlzAVBzMxYNNnWL5bnJ/2ZsQqEvA5vYr9cq8bdSXaMZyktSLZdNYwgBDkqUShInlsPy6hnv2XzmOtmTp8KQvqMD6clyx8HTW3cYkkVZ3nSRGBp6MXqJjEQf4asf6koM4u/0pC8lC6Ke1piJOQk6GF3MH8=
+	t=1787856143; cv=none; b=uzYEORYyE0n61oBSSpsDOK9T2Z7SAWfpHVf0JZFf9g00OuBtSbXbSOpRUrbKDP160WPouewMuAj1Db3IZNilWVRcL+WteLr/YCSNq/u1KMqN6YdWy6srBLVfpiOOBsV0dHgnYHbfQzImmjgXYPCLzOCtD+Gnj/tJma/SCLunjc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787855352; c=relaxed/simple;
-	bh=hFDd7WwfRGCUYE0lkXdHmuSJnlTWM1ANDkV9+8cBjKU=;
+	s=arc-20240116; t=1787856143; c=relaxed/simple;
+	bh=BQxeBCzlpdIBx1IQubyGP4cIIBLKUfAEpmsojcE+y0o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MVKSdfl+A2BoGffL3BdGmpGA6YNWCEK+0Ecc8tvzzDo/bYB/vaSnciDHmfEwrMGJvKMxaHrWDwmAL8oNUxSRbV9suLKEBUqlhdmTiJu2mE53WkveedBp8J+Qwj5Pf7LUhUJK/CsFkMfGOeEQnWx4lMLmK9ElWlIJ9wKLibhU1bU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WCR4f8fx; arc=none smtp.client-ip=100.103.45.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=WwsbLJhSSRzo88WJWhuniaWbY4xu29Ut8jBgjORiPVs2rGKhGTArm3SMAcR3ZKJ/tK+Iy3HeRrKn71WcDNZ+Ec7PiLq9vbpwniYoJ2hImfrFFvdtMRglRJ4Vaj/RItdkbmRFbpDttQ+74yVutyzvYQ9fmBY3MBKw/yQn1eRfc2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JGyGZ1iF; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WCR4f8fx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66EFB1F000E9;
-	Thu, 27 Aug 2026 18:29:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JGyGZ1iF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5E891F000E9;
+	Thu, 27 Aug 2026 18:42:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1787855350;
-	bh=Enn2jVR+wGYS5PbDLLpikDc9ImvnNJB9B9qQYrMw8IQ=;
+	s=k20260515; t=1787856141;
+	bh=KHhkLS/1kvPLnma3IR3pFI9fv8AtiL1iUd3rkfzN1lg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=WCR4f8fx95jXrAut3gRLTI1ilBAeCz+uF/+vpixXxS482SYQ/R9ixnJkvz7HqMadO
-	 S98+YTw3/E2dhnDVcbw03SNuQyBwin6/dJKI+tPd+pVk62qS2Ea7Y+K+YrSCeKK3ZD
-	 0dpFoM+eQH9FFdAj+FpU3dPBs6Zr5NnvLi2m/alXwnvsRgsJ0hp+KXjVwk9lM1Ijwv
-	 GGBYwL7ZIS7tfJcXUvK4LHcK5Q/uzqgBzY/KO/55DbsPk8g39UmzwDC3DzrdmJvqbw
-	 pg8fvC3Cnz3QFpgJMX6HRKO4aRffRbaamH48sl7g9gY8KbHhk94zfqQ9gklYfffB4r
-	 X62429Ud7SrdA==
-Date: Thu, 27 Aug 2026 18:29:07 +0000
+	b=JGyGZ1iFBz3zCcmK5s+YpaPPkJwF8HLlFKvCFOqnrCOgPcUbrmKgH4FEBYa/xbr7a
+	 h/1ZV4SVVbM08ujfZXsGjzeLQi4WVe7WUlIBnKyfNROLYwwBE28tqTXgbthsIqCcr9
+	 ZTWE0eGpePQDRxQ4T0lnMZV/0ukCtizTYpLByJER98aCyL6tH9cbxgroRedeTOZdvL
+	 L4OLoDn9U3H0qcxLGzwu9kX45We7ZNJbUcASVdMW9I5BuakpxhZ1Nj+jjlWmKwxDYc
+	 IT4Z/cvAibf/UWNXsYhG8Xs0ZCsGG25RgCt0UAQWvVjYpyNU/7Ig3ny/dkKNLseFfP
+	 aDTjGRsQ/HeTg==
+Date: Thu, 27 Aug 2026 18:42:19 +0000
 From: Eric Biggers <ebiggers@kernel.org>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Mike Lothian <mike@fireburn.co.uk>, linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>, Miguel Ojeda <ojeda@kernel.org>,
-	Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Daniel Almeida <daniel.almeida@collabora.com>,
-	Tamir Duberstein <tamird@kernel.org>,
-	Alexandre Courbot <acourbot@nvidia.com>,
-	Onur =?iso-8859-1?Q?=D6zkan?= <work@onurozkan.dev>,
-	Lyude Paul <lyude@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Asahi Lina <lina+kernel@asahilina.net>, Burak Emir <bqe@google.com>,
-	Lorenzo Stoakes <ljs@kernel.org>,
-	Joel Fernandes <joelagnelf@nvidia.com>,
-	Yury Norov <ynorov@nvidia.com>, David Gow <david@davidgow.net>,
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] rust: crypto: add synchronous RSA akcipher support
-Message-ID: <20260827182907.GA2137493@google.com>
-References: <20260826163004.3365-1-mike@fireburn.co.uk>
- <20260826163004.3365-3-mike@fireburn.co.uk>
- <20260827030352.GB2327@sol>
- <CANiq72k3COcjo1s1MXdh=K7qRcOMMSq7-3_JCMtNKN3J0zQmjg@mail.gmail.com>
+To: Linlin Zhang <linlin.zhang@oss.qualcomm.com>
+Cc: axboe@kernel.dk, mst@redhat.com, jasowangio@gmail.com,
+	James.Bottomley@hansenpartnership.com, martin.petersen@oracle.com,
+	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+	linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-scsi@vger.kernel.org, virtualization@lists.linux.dev,
+	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	neeraj.soni@oss.qualcomm.com, gaurav.kashyap@oss.qualcomm.com,
+	mani@kernel.org, andersson@kernel.org, konradybcio@kernel.org,
+	bvanassche@acm.org, alim.akhtar@samsung.com,
+	avri.altman@sandisk.com, stefanha@redhat.com, pbonzini@redhat.com,
+	eperezma@redhat.com, xuanzhuo@linux.alibaba.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 00/11] FBE virtualization: inline encryption for
+ virtio-blk guests
+Message-ID: <20260827184219.GB2137493@google.com>
+References: <20260827160806.1295313-1-linlin.zhang@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -66,51 +54,38 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANiq72k3COcjo1s1MXdh=K7qRcOMMSq7-3_JCMtNKN3J0zQmjg@mail.gmail.com>
+In-Reply-To: <20260827160806.1295313-1-linlin.zhang@oss.qualcomm.com>
 
-On Thu, Aug 27, 2026 at 04:46:55PM +0200, Miguel Ojeda wrote:
-> On Thu, Aug 27, 2026 at 5:05 AM Eric Biggers <ebiggers@kernel.org> wrote:
-> >
-> > As I've been commenting on other of these bindings patches, it also
-> > doesn't really make sense to have the kconfig symbol be in lib/ but then
-> > have the actual code be in rust/.  They should be in the same place.
+On Thu, Aug 27, 2026 at 09:07:09AM -0700, Linlin Zhang wrote:
+> From: linlzhan <linlin.zhang@oss.qualcomm.com>
 > 
-> Did you see my reply at
+> Current virtio-blk does not provide a mechanism for a guest to
+> program hardware keys or submit encrypted I/O using pre-programmed
+> keyslots.  It drops the crypto context when issuing a bio request
+> to the virtio-blk queue, preventing inline-encryption-based FBE
+> on virtio block devices.
 > 
->   https://lore.kernel.org/rust-for-linux/CANiq72=uUR4Vo9W55Kq6tQjc+6Q4_+wiWhCo-VLdkvg6PJeoAw@mail.gmail.com/
-> 
-> ?
-> 
-> But if you feel strongly about it, I guess it can be temporarily
-> placed elsewhere, i.e. Kconfig symbols are not tied to the path anyway
-> so they should be easy to move later on.
+> This series enables File-Based Encryption in guest VMs on Qualcomm
+> GVM platforms where the ICE inline encryption hardware is shared
+> between the host and guests.  In this environment the guest kernel
+> has no access to the ICE hardware directly; it supplies a virtual
+> keyslot index and data unit number with each encrypted I/O request
+> via VIRTIO_BLK_F_INLINE_ENCRYPTION, and the host must translate the
+> virtual slot to a physical ICE keyslot and submit the bio — without
+> transferring raw key material across the VM boundary.
 
-Yes, it doesn't explain why they need to be inconsistent though.
+This seems to be designed incorrectly by not making virtio-blk itself
+support key programming and eviction.  That complicates things
+significantly by then having to handle the key programming and eviction
+out-of-band using Qualcomm-specific SCM calls.  It also means that
+adding other implementations of this would be very difficult.
 
-And if the code is "conceptually part of the subsystem", why is the
-MAINTAINERS entry for "CRYPTO LIBRARY" not being updated to include it?
+There are some claims that not transmitting keys across the VM boundary
+is desirable.  But that doesn't seem meaningful, given that all the I/O
+is transmitted across that boundary in plaintext anyway, and also it
+seems that hardware-wrapped keys will be supported too.
 
-FWIW: I do think the Rust bindings need to live alongside the code
-itself and be maintained by the same people.
-
-I just don't think it makes sense to mostly *not* be doing it that way,
-but then also having the kconfig options randomly be different.  We
-should at least be consistent.
-
-> If you mean a function in the standard library to zero memory without
-> being optimized out: no, there isn't.
-> 
-> For context: I added `memset_explicit` to the ISO C standard and
-> informally asked upstream Rust about adding an equivalent function
-> many years ago, but at least back then they didn't want to add it (or
-> at least in a way similar to how it is specified in C, which doesn't
-> really give guarantees, letting compiler writers do their best
-> effort).
-> 
-> I guess I can ask again since now we would finally have an actual user
-> in Linux... :)
-
-Userspace crypto libraries need this too, so it's kind of surprising it
-would just be coming up now.
+Please make virtio-blk support the key programming, eviction, and
+HW-wrapped key management operations that are needed for this to work.
 
 - Eric
