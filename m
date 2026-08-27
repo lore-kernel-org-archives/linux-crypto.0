@@ -1,188 +1,273 @@
-Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDFB833F5BE
-	for <linux-crypto@vger.kernel.org>; Thu, 27 Aug 2026 07:07:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2AFF306775
+	for <linux-crypto@vger.kernel.org>; Thu, 27 Aug 2026 07:54:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787814454; cv=none; b=M3ghChBjgjvLvSZpbwN4mVMeEUwYBd7ibWWJhP0kSfWqLWi2AnzIiRCVt5UrXB0sq2CPjlEU6yoglNvq542vuTM4fz1VsQmJsS3A5s0xLcIuyCdCCSLYDayj8/KEoSpcwOVjCiDcUyK0M5mgdYoHBYA8zNEX94AUqos3ZjF7GaY=
+	t=1787817295; cv=none; b=DACQr8Q1tDYIETDMMeE6J0/mESlGZDb0ZB9grTKHGqfqeTTN5UKBaYvSO4zCJZgI5Am3ailj20kVski08bQMPJNEvcfITohkK555Yq0VUHTBxNuO0E5wwoOVVc/tWCIoi9hKzT0h1XU2/Q/VGtx0UL3zbpnXBPPySNwQAkptB5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787814454; c=relaxed/simple;
-	bh=NYdl39J8PFJLQqPVxWoZ48WTDu1KlH7JMxY8On2/8LM=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=OI1uiMS+qCfTFitJCsA2XE2n3T1GwXmaKz5tQhIgxA+OxYgnpOhIXKtEnHA8n2tKfHm9JL7BBImrUlHYrgh3sBKBQlhCZ1hqYJCuTYIH1CGlAAiB2XpFhauQZNNIQrUAdNds06YE07uip0y4XbVeI9Yv+7XL6XoBY6VP8fLabu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Z0XFCTge; arc=none smtp.client-ip=113.46.200.221
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+	s=arc-20240116; t=1787817295; c=relaxed/simple;
+	bh=O07296HIjH3sXW22U+nMby2Sc/yzcqX5nvs3bBNIq0w=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=BEPl6OVHOh89XgydGO68n2Qm2bAMTgxU0hE3BU2xQdbWIJjvohdw/n+0nFadFDm+9d9K+qzuxN2/nYvVZWeqqBlkV27UzKozXwu7GF+qZcKNk2R8FpDMcJ7T6ytOMPpTs8lBZ3q6Yq/sMaxZhW8wE0LfZWVcHCEhoSa+p58qPok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=beagleboard.org; spf=fail smtp.mailfrom=beagleboard.org; dkim=pass (2048-bit key) header.d=beagleboard.org header.i=@beagleboard.org header.b=E+He/nfO; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=beagleboard.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=beagleboard.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="Z0XFCTge"
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=VhFh5ljgGCSfIu1nswzIhxNL6fMTFTwzByLdPH57qL4=;
-	b=Z0XFCTgeBP7J3/J7XTl05sD2BhWRVQhijidzT8p6JRzg9BcpJX+KdoyYV1bEgI/GCIKSyArYv
-	2/JpmacMWQdCOX7ZDkUEDd8BRClzEG7bW2e9hthHJUe8PB6mtZGhSc9+hT0cJLQUrxjeCgyiZg6
-	eZyD4hhoI0P00ZqWy+7QAc0=
-Received: from mail.maildlp.com (unknown [172.19.162.144])
-	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4hVskb6KflzRhVJ;
-	Thu, 27 Aug 2026 14:56:39 +0800 (CST)
-Received: from dggpemf500015.china.huawei.com (unknown [7.185.36.143])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2407640538;
-	Thu, 27 Aug 2026 15:07:24 +0800 (CST)
-Received: from [10.67.121.110] (10.67.121.110) by
- dggpemf500015.china.huawei.com (7.185.36.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 27 Aug 2026 15:07:23 +0800
-Subject: Re: [BUG] crypto: hisilicon/hpre: RSA request never completes during
- signed module verification on Kunpeng arm64
-To: Evanshenf <archwse@gmail.com>, <linux-crypto@vger.kernel.org>
-CC: Weili Qian <qianweili@huawei.com>, Zhou Wang <wangzhou1@hisilicon.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
-	<davem@davemloft.net>
-References: <178779980745.730913.5616603289665364629.hisi-hpre-7980@gmail.com>
-From: liulongfang <liulongfang@huawei.com>
-Message-ID: <5ec5464b-a84d-48c4-6ef7-d60944ae94a9@huawei.com>
-Date: Thu, 27 Aug 2026 15:07:20 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	dkim=pass (2048-bit key) header.d=beagleboard.org header.i=@beagleboard.org header.b="E+He/nfO"
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-39652a6e963so670252a91.0
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Aug 2026 00:54:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=beagleboard.org; s=google; t=1787817293; x=1788422093; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=RVJCcBAuS3izuvlvZhdPsxJ3W7iR8P4cqbeVqoSeh+Q=;
+        b=E+He/nfOyc+FYMfO8KTuXBVuOgH80tcM2eFsKs01FvEx4kX+MOQhEQ5OownVKsL+CD
+         W0FwL0OVmYi0xdE4ElRn7bE21kBTOiVG3dCqK5NFAk8VoQ2JAt0i92f0vCKifzdE4jlT
+         XBFwwMAEQWzNwDDkMKR54R9JMAUGTo5JKcBIN1OeOKZnBPJ0OoNZpRWOxXfz5oGOMMFc
+         S4XJEwdiSb9WNxhvZzIm130yXmh7v4d26eEd3m461Cb3Y96hlrGGop0Nu+jpBDLDaHaX
+         e/4xrsl2BBwtTfiFT8nBRrQ16xc5VRI0WDNwGq4OBUYEw4d1uG/DZdhl2Swx6r5UQbrk
+         vKEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787817293; x=1788422093;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=RVJCcBAuS3izuvlvZhdPsxJ3W7iR8P4cqbeVqoSeh+Q=;
+        b=WLBufIQ5UPeRzJ0lUjpVpHtctgJR2XX41NPtV0wqLTOF/HQaQkEpIsrNzkDYPhxPg6
+         rqedFLsOnNKVWeT9FsxoBkFo+1G6lTEdpeiDVvLFveIWUG93iWXt9yDmLbuPwnfcoUXe
+         8n8MmP4L/T6gZg16Q9OYE28ILLYYix9ciEy7r0RLhWsJa/Kp7/rCvVGTOqZ2OuHQUpZ/
+         XJVYtwoSjg03RksxXe08D5xjJw9u364D9Qs0EPXpy+LVT82+hMLSafIiH2G6EDqs4r4+
+         xb+nr7hR45MgxPa1jAsrT/RVSNAeK8yiZNSGKvKdY1U+kobGCGkBBg8IEDzBRz5y0N29
+         V/sg==
+X-Forwarded-Encrypted: i=1; AHgh+RrlNtMyw5T0vVMEpgIO4QwCxNIt6RjcuVpUMhcIAojeDXccrDg6hgbzZcqEBYiENYYTrIpPeRsxYZ9woTY=@vger.kernel.org
+X-Gm-Message-State: AFuF++kbZ2BFYBwyX1P7kl2Nc9JaT8QxKYHugH/I3iXRTfmiZZMZMJBm
+	U/HpobEx8kxZ+kk2vB55zZ9gdgHKvbkoTa0MNIBfygQFLVih8xhz+J5agZxyZAABaQ==
+X-Gm-Gg: AR+sD120nqFzBHtAR9jCaA1aPkK6J9aMkLBRu+asUU1/G2LwZftjoDrhgQQkWl5zCPX
+	41lj89eApyHgyRA1rRsZv9sl0U9LRYFfS2WfByR98t3NUMZUjR4ypNPtNoWj/ghDpyvnMPJh1we
+	gUoY8u97CsR5iSM5dGeiWk5MsyNX949o+jgiYqxLdo79cUeX8UzL+EoWEn6kuKedbdEfokV1o/F
+	63wjvxIlVzaI8C7m600P0u6af4cqk/JzfdfoVcrB73OIp21YwRKNHZYrD/yzErrjnjTHQqYINuE
+	Z0KdHDNbzeCp038Ck56Z7ByY1NArHHpebMPldp1Y8qo1ylBMsOox7f8mzfwnIRpQymobCr7F2FU
+	tCy3db7wDKZUnp3a2VlmFLfXhY1TkPnV9mIl+lVUrBIQD/WHY6gtB2d16qygfXxmdWIbfOlq4lS
+	cK50XpZJzSw+oNhm96uLBG/fjaCrP6bLHurl9BPxWFSuK8av89lM2TYmmRY+Ok5plaJDY4Zt4=
+X-Received: by 2002:a17:90b:35d1:b0:396:65b3:c05e with SMTP id 98e67ed59e1d1-3969bb1e82bmr6537161a91.9.1787817292922;
+        Thu, 27 Aug 2026 00:54:52 -0700 (PDT)
+Received: from [192.168.29.54] ([2405:201:4019:32fc:3c55:6b24:5147:322b])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-3283d60c2b4sm24641685eec.5.2026.08.27.00.54.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Aug 2026 00:54:52 -0700 (PDT)
+From: Ayush Singh <ayush@beagleboard.org>
+Subject: [PATCH v2 0/7] Add Greybus Sotfsvc and UART Node drivers
+Date: Thu, 27 Aug 2026 13:24:36 +0530
+Message-Id: <20260827-gb-uart-transport-v2-0-a03bb1f5fbd1@beagleboard.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <178779980745.730913.5616603289665364629.hisi-hpre-7980@gmail.com>
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- dggpemf500015.china.huawei.com (7.185.36.143)
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/22NwQrCMBBEf6Xs2UiyNG315H9ID5tmTQPSyKYWp
+ fTfjcWjt3kD82aFzBI5w7laQXiJOaapAB4qGEaaAqvoCwNqbHRntApOPUlmNQtN+ZFKOqG1vrG
+ 2HeoByu4hfIuv3XntC48xz0ne+8Vivu3Phv9si1FaYYeeTE2ude3FMYU7u0Tij0kC9Nu2fQBq4
+ iBWuAAAAA==
+X-Change-ID: 20260810-gb-uart-transport-9255d6557c4c
+To: Jason Kridner <jkridner@beagleboard.org>, robertcnelson@gmail.com, 
+ Johan Hovold <johan@kernel.org>, Alex Elder <elder@kernel.org>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>, 
+ Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+ Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+ Danilo Krummrich <dakr@kernel.org>, 
+ Daniel Almeida <daniel.almeida@collabora.com>, 
+ Tamir Duberstein <tamird@kernel.org>, 
+ Alexandre Courbot <acourbot@nvidia.com>, 
+ =?utf-8?q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
+ Eric Biggers <ebiggers@kernel.org>, Ard Biesheuvel <ardb@kernel.org>, 
+ Ayush Singh <ayush@beagleboard.com>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>, 
+ Vlastimil Babka <vbabka@kernel.org>, "Liam R. Howlett" <liam@infradead.org>, 
+ Uladzislau Rezki <urezki@gmail.com>
+Cc: greybus-dev@lists.linaro.org, linux-kernel@vger.kernel.org, 
+ rust-for-linux@vger.kernel.org, linux-crypto@vger.kernel.org, 
+ devicetree@vger.kernel.org, Ayush Singh <ayush@beagleboard.org>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=8005; i=ayush@beagleboard.org;
+ h=from:subject:message-id; bh=O07296HIjH3sXW22U+nMby2Sc/yzcqX5nvs3bBNIq0w=;
+ b=owEBbQKS/ZANAwAKAQXO9ceJ5Vp0AcsmYgBqj+1Cc6huTwI+9sLozSbo/yQUuyB4CH+Y+POwV
+ /Rliv0OTdKJAjMEAAEKAB0WIQTfzBMe8k8tZW+lBNYFzvXHieVadAUCao/tQgAKCRAFzvXHieVa
+ dBQlD/4iQuLDaYSy2Gi4Nqd6vbpyJrRFxtM5rQV53gnnPPTc9C//rc6uZe5sSqr5fDP0Sgx9VPa
+ it2YlMxbuMlItKYUG3DeN52ddmZZHy+MX9xv/N720oJCE10hkDXtVqGJmsx8r5eKkrNmdGwHkQV
+ YyP46EDliEeLzLTnM2AmXXGRwHEziNJPI2ckHjcaAC3c3gHqdncj8LjmWnPswISsYL3hoj9xrk3
+ vHdD4S42JcUL5khXp7bdBymoRDDzTbmE0UNpZhC9va0n5elBh5qnkmlKwLgNkt1KeMvoRQoey/l
+ f/twbtyraYgy1W8xgCW+L4FeF5sO01CWRJMjSASpj8mL9v9RLDg7lihVjh6BVdLwI8ULj3yW+nG
+ sRPQ3y4vwHh7WsTV048vbTptoAA5mMZxRLL8OocRvz0GImg7CcV0AQoX/GRQL/hwk1q7TGWmnyb
+ 0PeialWIe12vUZyH+fqa+lcTBvfhES3Lu58TBWGw5I1/xUF9WT1cYndvEoxBwMbhljdIYa8QVRQ
+ 8qRbiPblfYwbo6ItfOojrQB7bQHEGA38ItJEU/N9KGRv98a8hagwrx1ZgcwgCLCV95G2aQuVGfS
+ Y1unhTGky6mWTNiCmnsoNcLIGZM8tO9ehj1x/Fqrl2lW+kGlunhgIpYsdrQj+HbyjE+m/FD40l6
+ +eR35ZZFVPkkJqg==
+X-Developer-Key: i=ayush@beagleboard.org; a=openpgp;
+ fpr=DFCC131EF24F2D656FA504D605CEF5C789E55A74
 
-On 2026/8/27 11:03, Evanshenf wrote:
-> Hello,
-> 
-> I observed a permanently stuck RSA request in the HiSilicon HPRE driver
-> while a signed kernel module was being verified on a Kunpeng ARM64 server.
-> The lost completion subsequently blocked module loading and all PVE API
-> workers which invoked ss(8).
-> 
-> This was observed with a Proxmox kernel rather than a vanilla upstream
-> kernel.  I have not yet reproduced it on a mainline build, but the relevant
-> HPRE and rsassa-pkcs1 paths appear unchanged in current upstream source.
-> 
-> Environment:
-> 
->   architecture: arm64
->   CPU: TaiShan-v120 (Kunpeng)
->   system product: J353 G3
->   HPRE PCI ID: 19e5:a258 (four PFs)
->   kernel: 7.0.14-6-pve
->   kernel package: proxmox-kernel-7.0.14-6-pve-signed 7.0.14-6
->   CONFIG_MODULE_SIG=y
->   Secure Boot: disabled
-> 
-> Trigger and impact:
-> 
-> PVE executed:
-> 
->   /bin/ss -Htln sport = 5900
-> 
-> This requested net-pf-16-proto-4-type-2, which resolves to inet_diag.
-> Verification of the signed inet_diag module selected HPRE because the
-> registered algorithms were:
-> 
->   pkcs1(hpre-rsa,sha512) priority 1000
->   hpre-rsa                priority 1000
->   rsa-generic             priority 100
-> 
-> The first modprobe has remained in uninterruptible sleep for more than ten
-> hours.  Its stack is:
-> 
->   rsassa_pkcs1_verify+0x284/0x3a0
->   public_key_verify_signature+0x1e4/0x2b0
->   public_key_verify_signature_2+0x20/0x48
->   verify_signature+0x48/0xc0
->   pkcs7_validate_trust+0x23c/0x300
->   verify_pkcs7_message_sig+0x10c/0x190
->   verify_pkcs7_signature+0x78/0xe0
->   mod_verify_sig+0xac/0x150
->   module_sig_check+0x104/0x190
->   load_module+0x48/0x2a68
->   init_module_from_file+0x110/0x168
->   __arm64_sys_finit_module+0x220/0x398
-> 
-> All later ss processes became blocked in call_usermodehelper_exec() while
-> waiting for the same module request.  This exhausted all three pvedaemon
-> workers and caused PVE API login requests to time out with HTTP 596.
-> 
-> HPRE debugfs counters isolate the lost completion to one PF:
-> 
->   0000:3a:00.0 send=3  recv=3
->   0000:3e:00.0 send=25 recv=25
->   0000:7a:00.0 send=1  recv=0
->   0000:7e:00.0 send=1  recv=1
->
+A Greybus network needs an SVC (Supervisory Controller) to bring
+interfaces up, assign device IDs and connect CPorts to the AP. On a
+UniPro network the SVC is a real entity on the bus. On transports that
+merely carry Greybus messages - a UART, an I2C bus, a network link -
+nothing on the wire plays that role, so the SVC has to be emulated
+somewhere: in a user-space bridge (gbridge), in coprocessor firmware
+(cc1352p7 in gb-beagleplay), or open-coded inside the host driver itself.
 
-Hello!
+This series moves the emulation into the kernel and makes it shared.
+This was discussed in a prior RFC as well [2], but to keep things short,
+removing the need for an external SVC greatly simplifies the greybus
+network setup when nodes are directly connected over common transports
+such as UART, I2C etc.
+ 
+    gb-uart-node          gb-softsvc              greybus core
+   (transport, serdev) <-> (SVC + host device) <-> (bundles, protocols)
+        NodeOps            module_insert()
+     submit_message()      module_remove()
 
-We have received your report and have initiated internal analysis. Since we
-do not have access to your Proxmox kernel, we are using the open-source
-kernel 7.0.14 for analysis and testing. If you suspect this is an alignment
-issue, you could try modifying and verifying it.
+gb-softsvc registers itself as a Greybus host device and answers the
+SVC-side operations the core expects during interface bring-up and
+teardown. A host driver implements the NodeOps trait to push data
+towards its node, calls module_insert() to announce a new node,
+submit_message() to hand incoming Greybus messages back to the core,
+and module_remove() on disconnect.
 
-Thanks.
+The first user is gb-uart-node, a driver for Greybus nodes attached over
+a plain serial port. Framing is HDLC, with a one-byte address (0x01 for
+Greybus) and control byte, followed by the 16-bit CPort ID and the
+Greybus message. No SVC firmware is required on the far end, so the node
+can be a bare microcontroller speaking Greybus - a BeagleConnect Freedom
+over its serial link, in this case. The testing is performed with
+greybus-zephyr [0] implementation.
 
-> For 0000:7a:00.0, send_busy_cnt, send_fail_cnt, invalid_req_cnt,
-> abnormal_irq, aeq_irq, err_irq and dev_timeout are all zero.  The QM status
-> still reports "work".  Its completion IRQ vector has received zero
-> interrupts; the assigned CPU is online.
-> 
-> The signed kernel package passes dpkg verification.  hisi_hpre is not in
-> the initramfs and is loaded automatically through the PCI modalias.  It is
-> not exposed through UACCE and is not passed through to a VM.
-> 
-> Possible cause:
-> 
-> hpre_hw_data_init() directly maps a single full-size RSA scatterlist with
-> dma_map_single() through hpre_get_data_dma_addr(), without checking the
-> DMA/cacheline alignment.  rsassa_pkcs1_verify() uses the same scatterlist
-> as both source and destination for the child akcipher request.
-> 
-> HPRE already has hpre_prepare_dma_buf(), which allocates a coherent bounce
-> buffer, but the full-size RSA path bypasses it.  This resembles the recent
-> rsassa-pkcs1 alignment discussion, where it was noted that the underlying
-> accelerator driver must handle unaligned buffers:
-> 
->   https://lore.kernel.org/linux-crypto/20260731024446.786329-1-changwei.zou@canonical.com/
-> 
-> I cannot prove from the current stuck system that alignment is the only
-> cause, so this is a hypothesis rather than a conclusion.  Independently,
-> hpre_is_bd_timeout() only records elapsed time after a response callback;
-> it cannot recover a request whose completion never arrives.  The synchronous
-> crypto waiter therefore remains blocked indefinitely.
-> 
-> The production workaround is to blacklist hisi_hpre and reboot, which
-> causes signed-module verification to use rsa-generic.  The current request
-> cannot be killed or recovered without rebooting.
-> 
-> Would forcing unaligned or in-place RSA requests through the existing
-> coherent bounce-buffer path be an appropriate first fix?  Is there an
-> existing HPRE/QM recovery mechanism that can safely time out the request,
-> reset the affected queue, and complete or fall back to software without a
-> late-callback use-after-free risk?
-> 
-> The corresponding Proxmox report, including a sanitized diagnostic
-> attachment, is available here:
-> 
->   https://bugzilla.proxmox.com/show_bug.cgi?id=7980
-> 
-> Please let me know if a mainline reproduction, additional HPRE registers,
-> or testing of a candidate patch would be useful.  The affected production
-> host is currently being kept unchanged so that more read-only evidence can
-> still be collected before the maintenance reboot.
-> 
-> Regards,
-> Evanshenf
-> GitHub: https://github.com/Evanshenf
-> 
-> .
-> 
+Both drivers are written in Rust, which is why the middle of the series
+is abstractions rather than drivers. Only the APIs these two drivers
+need are covered: protocols.rs abstracts the SVC-facing parts of
+greybus_protocols.h, and types such as Greybus Interface do not
+implement AlwaysRefCounted yet. The intent is to grow this as more Rust
+host drivers appear rather than to abstract the whole subsystem up
+front.
+
+Patches 1 and 2 are small C-side preparations to the Greybus core:
+exporting gb_connection_get()/gb_connection_put() and adding
+gb_connection_hd_find_by_intf(), a lookup by remote interface and CPort
+id for callers that only know the far end of a connection. Patch 3 adds
+a CRC-CCITT abstraction, needed for HDLC frame checks. Patch 4 adds the
+Greybus abstractions, patches 5 and 6 the two drivers, and patch 7 the
+device tree binding for BeagleConnect Freedom.
+
+Open questions 
+***************
+
+- gb-uart-node imports types from gb-softsvc, so the series carries the
+  Rust-to-Rust cross-module calling setup from nova-core [1]:
+  gb_softsvc_exports.c plus the Makefile plumbing that emits crate
+  metadata and generates the export list. This is a workaround for the
+  build system not supporting Rust cross-module dependencies natively,
+  and it should go away once that lands.
+
+- Connection create/destroy and interface activate/resume in gb-softsvc
+  currently just acknowledge the request. Callbacks into NodeOps can be
+  added when a transport actually needs to act on them; I did not want
+  to invent an interface without a user.
+
+- Zerocopy is currently not being used in grebeybus/protocols.rs. They
+  cannot be derived yet since types generated by bindgen do not have
+  them, and it seems explicitly forbindden to manually impl the traits.
+  So using old traits from transmute.
+
+- The bindings are supposed to be created for actual device, but any MCU
+  that supports Zephyr, can run the greybus-zephyr firmware with UART
+  transport. So not sure if adding a beagle,beagleconnect-freedom
+  compatible is the correct choice here.
+
+- The individual patches can be spun off into independent patch series
+  if required. The reason for this single patch series is to provide a
+  complete picture of usage.
+
+- Since gb-softsvc currently is not being used from a C driver, no C API
+  is provided. However, if required, it can be added.
+
+- Writing to UART from gb-uart-node is currently a bit broken. I am not
+  quite sure what the safe way is to go from a non-bound device to a
+  bound device. Any suggestions on this front are welcome.
+
+- I am not sure if Rust abstractions should have a seperate entry in
+  MAINTAINERS with me as the maintainer, or if they should just be added
+  to the respective subsystem entries.
+
+[0]: https://github.com/beagleboard/greybus-zephyr
+[1]: https://lore.kernel.org/all/20260622-nova-exports-v5-0-6191773fc977@nvidia.com/
+[2]: https://lore.kernel.org/all/ecca8eb2-8e5a-4770-bcf6-3fb49773088b@beagleboard.org/
+
+Signed-off-by: Ayush Singh <ayush@beagleboard.org>
+---
+Changes in v2:
+- Fix possible null pointer dereference in
+  gb_connection_hd_find_by_intf. Flagged by sashiko-bot.
+- Remove prompt CONFIG_RUST_CRC_CCITT_ABSTRACTIONS Kconfig symbol.
+- Add CONFIG_RUST_GREYBUS_ABSTRACTIONS to ensure that greybus is
+  built-in for rust abstractions to work.
+- Use gfp_mask in message_send callback.
+- Only provide a Message reference in message_cancel callback.
+- Add invariant comment for Registration.
+- Call Registration->add directly in new, before constructing
+  Registration.
+- Add Send and Sync bounds to T in Registration<T>
+- Set endo_id as 0. Is not used anywhere.
+- Fix module_insert intf_count. Was hardcoded to 1 by mistake. Flagged by
+  sashiko-bot.
+- Check for empty intfs slice in Module::new.
+- Remove module in serdev::Driver::unbind instead of on drop.
+- Make gb_uart_node write atomic. Using temp buffer to build frame.
+- Fix import style.
+- Reorder beagleconnect-freedom dtbinding patch to be before gb_uart_node.
+- Add vbat-supply and reg properties to beagleconnect-freedom dtbinding.
+- Reference spi-peripheral-props in beagleconnect-freedom dtbinding.
+- Link to v1: https://lore.kernel.org/r/20260820-gb-uart-transport-v1-0-282da14ab7b7@beagleboard.org
+
+---
+Ayush Singh (7):
+      greybus: connection: Export gb_connection_get() and gb_connection_put()
+      greybus: connection: Add gb_connection_hd_find_by_intf()
+      rust: crc_ccitt: add CRC-CCITT abstraction
+      rust: kernel: Add greybus abstractions
+      drivers: greybus: Add software SVC implementation
+      dt-bindings: beagle: Add BeagleConnect Freedom
+      greybus: Add Rust UART node driver
+
+ .../beagle/beagle,beagleconnect-freedom.yaml       |  39 ++
+ MAINTAINERS                                        |  15 +
+ drivers/greybus/.gitignore                         |   1 +
+ drivers/greybus/Kconfig                            |  34 ++
+ drivers/greybus/Makefile                           |  50 ++
+ drivers/greybus/connection.c                       |  29 +-
+ drivers/greybus/gb_softsvc.rs                      | 504 +++++++++++++++++++++
+ drivers/greybus/gb_softsvc_exports.c               |  15 +
+ drivers/greybus/gb_uart_node.rs                    | 245 ++++++++++
+ include/linux/greybus/connection.h                 |   6 +
+ lib/crc/Kconfig                                    |   7 +
+ rust/bindings/bindings_helper.h                    |   2 +
+ rust/kernel/alloc.rs                               |   5 +
+ rust/kernel/crc_ccitt.rs                           |  26 ++
+ rust/kernel/greybus/hd.rs                          | 333 ++++++++++++++
+ rust/kernel/greybus/mod.rs                         | 232 ++++++++++
+ rust/kernel/greybus/protocols.rs                   | 392 ++++++++++++++++
+ rust/kernel/lib.rs                                 |   4 +
+ 18 files changed, 1937 insertions(+), 2 deletions(-)
+---
+base-commit: 6b8c8af514d739d0335f5579b585e02babe8a727
+change-id: 20260810-gb-uart-transport-9255d6557c4c
+
+Best regards,
+-- 
+Ayush Singh <ayush@beagleboard.org>
+
