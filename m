@@ -1,89 +1,89 @@
-Received: from mx0a-0002e601.pphosted.com (mx0a-0002e601.pphosted.com [148.163.150.75])
+Received: from mx0b-0002e601.pphosted.com (mx0b-0002e601.pphosted.com [148.163.154.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9413834F49F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 964B244E042;
 	Thu, 27 Aug 2026 13:24:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.150.75
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.154.28
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787837067; cv=fail; b=c60DnHTrykIYs/lliDKXf12vNLlCcXO0DpeIBMu3TUInk9vvSFs2afVkIH0BRfBkxDJOXsFXWd6tIwA8kvCXMzOm8UwwNRcuMwzn6Ph9SgNPBw9B+QR7o7g3s2/9D0B/SdS0DIihtaZnsb01klthnwzeqXHxgMAi1Ww5iCICa4c=
+	t=1787837067; cv=fail; b=VyskYCQ/lxK3Q7NZ9C2AVFSUuPehsiTURZ7xbuxKj0EEg4g1FNTaGWA/OGqi0ibEbMamvYJpURBRBt8JcHDxT0Pc3vyK9f2S1PbDOaGPVhGEIekHS6NmJCNTHyd/AvdMnRg+newJQKyi4RLuHl/BDdiIgRx6Yx42Cc4sPQDZ5Ao=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1787837067; c=relaxed/simple;
-	bh=NduprVZn6wgOkyKQIQV0q07lxKi+rgX0yR7H7LNM5Gw=;
+	bh=0J97k2ADQjTt5VgClQMfdh7rNSuYWap7NJhSkJJtdXU=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tq1Px+Od8dNXPge8xmXOE9PvqgseBDhOKXJ8vbNQMczLVfmp2mPDeOgrVhIdl8Trt0CIeMH+XEpwNFXFuwrVbgP42+bmK9D+SMjBkT57ygFFkUOksMJVtlGxiNhQEhFbGRkvg4/BTffs1cIahhQxGbIpPNtGD/w64meeOOMAc28=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (2048-bit key) header.d=ti.com header.i=@ti.com header.b=SF04Ds7Q; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=TxzC0kvy; arc=fail smtp.client-ip=148.163.150.75
+	 MIME-Version:Content-Type; b=tD2P0Bj1vVVdx6KgiUa4w+MCe83E7Ql7dwlW7uiGbRfoYPI1WfxZf6z51/l59Djg66q48ifP12Bfbpvia5VpTOEmPwHIwK+NkrlE8CdMqwdEGtiIRMcPq0LJ3SQrswZS9QtZNXCY5EykRS4FQTgwIjQPw21xBvpFUbrme5BmT9E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (2048-bit key) header.d=ti.com header.i=@ti.com header.b=DAHCyTY+; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=FPHtGfWS; arc=fail smtp.client-ip=148.163.154.28
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ti.com header.i=@ti.com header.b="SF04Ds7Q";
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="TxzC0kvy"
-Received: from pps.filterd (m0380145.ppops.net [127.0.0.1])
-	by m0380145.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 67RCA9Qv2915293;
-	Thu, 27 Aug 2026 08:24:11 -0500
+	dkim=pass (2048-bit key) header.d=ti.com header.i=@ti.com header.b="DAHCyTY+";
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="FPHtGfWS"
+Received: from pps.filterd (m0374956.ppops.net [127.0.0.1])
+	by mx0b-0002e601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67RCAJeX2720318;
+	Thu, 27 Aug 2026 08:24:08 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=
-	proofpoint-05-2026; bh=BZfGaRICbUgpq6No8cR0RHUKYNyu2R7EIt/5uF3Hr
-	PA=; b=SF04Ds7Qdlu+hP8V9SLibHvet9gLkRfweZtJ3x/3GPlQqUYLRugxutPu2
-	iEzs49oIc0zYJmpsxsVhHD8AhW9jBEg8tnSQYJWoLWkfGYVjGkqC/vbSeG8j7PgX
-	UOy47+xa58nJdxYr100buB0UFqonV6d6zFA39uEnd6Dhe0whIoPzv5fzaxK2RlBG
-	uKzryiMSyEzk8sA0Twv2AX6sD27eJl2/vHR8K+OlVToIjb13wgge7/6SRQGxrx0O
-	SWZCeH6pQLKUyroBge5f1aa56M4Giu3LywJRZnjtcHeWJsWj2InVKz6KjgzLa3M1
-	iIiaLz2pfxL/9pz0Z2ue4vgeiuq6A==
-Received: from dm1pr04cu001.outbound.protection.outlook.com (mail-centralusazon11010025.outbound.protection.outlook.com [52.101.61.25])
-	by m0380145.ppops.net (PPS) with ESMTPS id 4gahg39dbk-1
+	proofpoint-05-2026; bh=FX86iHTm/S2ECjFY6m5onM9+szkF2YYLpzTCdbj5G
+	Ds=; b=DAHCyTY+sEw5fl6e2yT7XdnI4FU8nQZy1xYbg54knvqwR3Y20ntPSyXAt
+	2Ohu9oQaMQ4HnVTxmULk47iRndp/B68Dyq3A/JbnIaIO1nyBpJ1vHzZBKkwyGwkv
+	JA1DmvnnwMDyayZ3CfPw2KsxG1yqhbsKJJ7zSKx/cGYqvij9C/BJcVbJ+j7O4VHA
+	XWf3d4xGjNguI8eAphYpBbqB/sWEXQY3Zx6HxOQetHOAHdKjzgQulwWaa30c/xWP
+	+/lJrSXaD8c8iv3pRt9axGkISqnsxbDtYFmXk7PJ7zhkMqVgSvIOlJAxIHB7Otkc
+	6jKOMjcJFWLlGiaG6EEoPdAVowRVg==
+Received: from co1pr03cu002.outbound.protection.outlook.com (mail-westus2azon11010060.outbound.protection.outlook.com [52.101.46.60])
+	by mx0b-0002e601.pphosted.com (PPS) with ESMTPS id 4gakag0wd6-1
 	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Thu, 27 Aug 2026 08:24:11 -0500 (CDT)
+	Thu, 27 Aug 2026 08:24:08 -0500 (CDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ypP19HW7KV2FSRFDc7Yhy7ErKr6sk2rguxb61OwpkaPvtrUbHXHiCNoomQB+YqryxkI28EVZZg0Lu+M5+1WTWBUJrpMBlmAmpPj9/Nql1y4NEwbyCUJktlmIvcCU7n7kQoHNGr4Dg7yYL6jE4DijWXyH4qGxiLonEVUAahIE6Mflpawu96PCbXIcSFN1akjtFmhKA1EpBLO86buXGcckyHk3U6N7JWOomexPCL634LdAUACwpUyfE24BlAIwBQKbNJ9Y/AYiy5Oo0N3Pj+qEjBz6CV9Rgb8uUGcfBc4HvFusDlhhw92zXgi+gkfMNS3htRagzKhGlKaR+lj7FVsFWA==
+ b=N/c6JaQUr/UtmrKcq3GwnvEFQ/3Rc2SvsHrrOuv5siDjBplCuuj2XEo8S8qajb65YpnZf46CO6ct0bPCXRfjrOMXQ66KllQbCIFMh1QB0bbXZvcjglgtOdWgJvRvS2v9fExzGqn2rXbmdvsfrNnwiA3ZVIKJXcHPywMuCW9W+4k/5hW7ESGOSiHcU4GJYLT0qFW7feS1gc9200oqOK5zAErcpqc6soVUCewrLccGt6Z1bXzXh4exdHkSd+izeClnwevp10LA83NUD6Bdu/rcXurfy6itekbBpyJyh1zydD/gmElArvS5M+p7nNQJs7/COvXx19tNxW6eBEYu3tKprQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BZfGaRICbUgpq6No8cR0RHUKYNyu2R7EIt/5uF3HrPA=;
- b=mjKyMl/80ff4mNa1vOkYnZx+W1GQFarm9mWEalEDj/5u7Pat0aEDqt1iSbadgalileWR6HhWLQtHmeGBOxqavWu7MU/dw+CDbDUdUcP4rpbbCj2zEJr3S1t0kh1nykbTpxX3ZLgpgqahrwLfDQUPBDexG+wbNMr2XWgR/HuNgQUhGQXet5U+CBbnCi3G8Qp6JNNWuTuNJV4jNLB8JPDvq6/3VglReGvnx05pc78Ems5xZ3hmio+lEfBrkyDrLq41hjW6vsXZ24odqTd1PCnRSMHvrbYTPuIlbfHeDyDcunl0uohp/yqMhzNHGNnVNcp1DcRxLDi6Kd6FTDI0gZRLpw==
+ bh=FX86iHTm/S2ECjFY6m5onM9+szkF2YYLpzTCdbj5GDs=;
+ b=twpgsb6CDp9pccuAppdyef3xt3sjJnEKBzX5GUbytajh7OJWlxMZamJ/oVvNwoQG29XGY1D7R7AQOhE5LQZ/0h0siR69Mj5T9sLmWfgZSYrVloxTpVQr0oUXgsUxL3N2kwAfg0YdjmlxOph0ehiegehlGjAlz+QaSNHD+pKYuU7vdCV1FgazQd+QXs3haQYDcNtO+m1R6zLnca4glh9Kegg+MQOGOo80PBgJjqHm0arP/Zvwv720K/1dvOLW4VTNdL3aPg/t+GhINbyd6BcACY5PmkjdmPlb9vYwgdrkzW862PbW4cUSGKgFxWr70/mp2tTHZ5W9pFc7gDNcNqC6cQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 198.47.23.195) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=ti.com;
+ 198.47.23.194) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=ti.com;
  dmarc=pass (p=quarantine sp=none pct=100) action=none header.from=ti.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BZfGaRICbUgpq6No8cR0RHUKYNyu2R7EIt/5uF3HrPA=;
- b=TxzC0kvylKdmwIat1Gpw5bdXQFvU6NIESJA2tbAn1Xb88wXk+rLk0lzj1f2KwQswNXrZLBehwq8EgUdSQP4To/GiQREk8/NnAvLZUmCsWr81R1T/FrgJFN4TplH/AahjawRY7hMUnHV5R64flUeKFm2QFlaiDTXCERr4DvIfkgs=
-Received: from PH7P220CA0097.NAMP220.PROD.OUTLOOK.COM (2603:10b6:510:32d::15)
- by SJ0PR10MB4750.namprd10.prod.outlook.com (2603:10b6:a03:2d5::7) with
+ bh=FX86iHTm/S2ECjFY6m5onM9+szkF2YYLpzTCdbj5GDs=;
+ b=FPHtGfWSEiTxBc6HJmi04gUk1sE5OXSmB4feBJ/8pqtS5GoaRM4XbOKTHljm+4ZgSbvzXa7RMhUvulPRqX2NZay6HhS+MAn9gX08XE188px/tMReyKXm47Z3KnyD8+Mx9Mlre9434cYONDwehUbskPrDClpS4wsE4/KlcJxXCIA=
+Received: from MW4PR04CA0267.namprd04.prod.outlook.com (2603:10b6:303:88::32)
+ by DS0PR10MB997675.namprd10.prod.outlook.com (2603:10b6:8:311::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.382.8; Thu, 27 Aug
- 2026 13:24:07 +0000
-Received: from CY4PEPF0000EDD3.namprd03.prod.outlook.com
- (2603:10b6:510:32d:cafe::d) by PH7P220CA0097.outlook.office365.com
- (2603:10b6:510:32d::15) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.382.5; Thu, 27 Aug
+ 2026 13:24:03 +0000
+Received: from SJ5PEPF000001D3.namprd05.prod.outlook.com
+ (2603:10b6:303:88:cafe::70) by MW4PR04CA0267.outlook.office365.com
+ (2603:10b6:303:88::32) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.21.360.10 via Frontend Transport; Thu,
- 27 Aug 2026 13:24:07 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.195)
+ 27 Aug 2026 13:24:03 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.194)
  smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
  action=none header.from=ti.com;
 Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
- 198.47.23.195 as permitted sender) receiver=protection.outlook.com;
- client-ip=198.47.23.195; helo=lewvzet201.ext.ti.com; pr=C
-Received: from lewvzet201.ext.ti.com (198.47.23.195) by
- CY4PEPF0000EDD3.mail.protection.outlook.com (10.167.241.199) with Microsoft
+ 198.47.23.194 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.23.194; helo=lewvzet200.ext.ti.com; pr=C
+Received: from lewvzet200.ext.ti.com (198.47.23.194) by
+ SJ5PEPF000001D3.mail.protection.outlook.com (10.167.242.55) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.360.3 via Frontend Transport; Thu, 27 Aug 2026 13:24:06 +0000
-Received: from DLEE215.ent.ti.com (157.170.170.118) by lewvzet201.ext.ti.com
- (10.4.14.104) with Microsoft SMTP Server (version=TLS1_2,
+ 15.21.360.3 via Frontend Transport; Thu, 27 Aug 2026 13:24:02 +0000
+Received: from DLEE201.ent.ti.com (157.170.170.76) by lewvzet200.ext.ti.com
+ (10.4.14.103) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45; Thu, 27 Aug
- 2026 08:23:44 -0500
-Received: from DLEE209.ent.ti.com (157.170.170.98) by DLEE215.ent.ti.com
- (157.170.170.118) with Microsoft SMTP Server (version=TLS1_2,
+ 2026 08:23:41 -0500
+Received: from DLEE205.ent.ti.com (157.170.170.85) by DLEE201.ent.ti.com
+ (157.170.170.76) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45; Thu, 27 Aug
- 2026 08:23:44 -0500
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE209.ent.ti.com
- (157.170.170.98) with Microsoft SMTP Server (version=TLS1_2,
+ 2026 08:23:41 -0500
+Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE205.ent.ti.com
+ (157.170.170.85) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.45 via Frontend
- Transport; Thu, 27 Aug 2026 08:23:44 -0500
+ Transport; Thu, 27 Aug 2026 08:23:41 -0500
 Received: from pratham-Workstation-PC (pratham-workstation-pc.dhcp.ti.com [10.24.53.205])
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 67RDNhIs894221;
-	Thu, 27 Aug 2026 08:23:43 -0500
+	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 67RDNeR31930988;
+	Thu, 27 Aug 2026 08:23:41 -0500
 From: T Pratham <t-pratham@ti.com>
 To: T Pratham <t-pratham@ti.com>, Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
@@ -92,10 +92,11 @@ CC: Sebin Francis <sebin.francis@ti.com>,
 	<m-chawdhry@ti.com>,
         Vishal Mahaveer <vishalm@ti.com>, Praneeth Bajjuri
 	<praneeth@ti.com>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v2 5/7] crypto: ti - Fix use-after-free of dev_data on DTHEv2 driver removal
-Date: Thu, 27 Aug 2026 18:53:16 +0530
-Message-ID: <20260827132318.613876-6-t-pratham@ti.com>
+        Kamlesh Gurudasani <kamlesh@ti.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH v2 4/7] crypto: ti - Trim scatterlists to correct length in AES
+Date: Thu, 27 Aug 2026 18:53:15 +0530
+Message-ID: <20260827132318.613876-5-t-pratham@ti.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20260827132318.613876-1-t-pratham@ti.com>
 References: <20260827132318.613876-1-t-pratham@ti.com>
@@ -109,214 +110,360 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EDD3:EE_|SJ0PR10MB4750:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8225ff8d-f165-41b3-8b5d-08df043e7879
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001D3:EE_|DS0PR10MB997675:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5eabca15-abc7-4769-bc61-08df043e765f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700016|30052699003|376014|23010399003|82310400026|1800799024|10067099003|56012099006|22082099003|18002099003;
+	BCL:0;ARA:13230040|376014|36860700016|1800799024|82310400026|23010399003|10067099003|56012099006|6133799003|22082099003|18002099003;
 X-Microsoft-Antispam-Message-Info:
-	5ewebvn8Iy1Sk3par5rb043T6a+jV/UsMQXClpg4vBoLJFuciyxMbkSqaICb4Z716or46HFVMPaNIFwf4XO7wLhEGMB2kO3/CBC154trAZ5B6yOMj2SrgAhoORGrW+/BN1OhRcH0msdi4H7p5s6Rq5OIii0okIMXxLrQRcWXkoW12QiBG4qtRQxLIITNZpcI+tT8CQd3v0LYy2/LqK/diVLg0d9t8YQ33HGiQFJVmomVWB3LuCWNNVsy7FfldNYGAvtukcq0VsWIEIq0OS5HRE5svHBus9osVy48AGn85FPQO5yCXt0o0idxppPbrZtIwkl49ex68VllLE2ZsWRXGWfmM2bTRlSUmION6fiideO/uig9nYZGZ6x4DVIrG+N3MufCcVWNt4vYd7GpJ0EJZ1KH4zcWVN7wMpe4zNElvIVTlqoo9sQZ1pty2uVb2UbMM9ZYgE9BwOv7I+skJ4CiO6U7mKVMdwkjLV8sSUD4OhJDvAMbEPEbtrl3Dyn7gMSZiFjX59VFrpzwBmOSuBtubbDXOYc+bs3AoAqb56rzp3UJ6XgxQ/EKL9F3BowZiKZ1u3jdy66ruO9TOCG6m3RwmcenUZrR53CmTo/+U4H1DCHZy1qjAD0ZC5byYqtb2y0OuIvck0XHsGUym45dh3wCVCgcLLGWxYqxdQsWc9FJziWZaPGyB7+bshh81w3Mt9tuQYXcBkh6AHUlREs0HPGjiw==
+	Kt9e6ftIsqfvriCk171pVKSuXTRSXCxBeJy8kfn2sO0Hd0yrSmDIChiuPgt4mPGbUod5soA7FmWivochMEs+NRbCyWkC3KuHojkm23hGtfSU1UqaOIPk3WcdyGIb4VbYLVmr28jtBHnhHcyOWOoJ+AmvpXcA88gccldxi8YBBpfRCSQ2mRaCBTB5PvylLRJjVNAJlh5ErrWVhtxMweR6Ck3UTnWgEekFiyT4Ak35VAuuRkqgRXbct5v28iLOaftxHIl3JSmC58rYooem5wBMNcSZ3xZMT+CEQzIlQyDHkkgeIZRUoa2/oRMayNIsiXa//nE42MJKeUIxnCA9JZ4KPABigm927htfu3XzKd2Jx+4nz/hPiW6ks9O9WCD2hcdgYwyxcWyTkaxci6sWJhngs/YIzcxn/fuBJTqczXio3v0QD0RNS4PPxsm/8W++fv+I0qjIj7fqMjrNOZYiy8A3yyHdrsS5IozNZbxJBHuB3yJ9rkfssVMN+nYn4weEwE9sDIs9sF6zvZTutI4Ihyg9NspTUR8YY94Aq6K0qr/36KVTMFKzlT3R+BeqixjDq79XAI+Ac4KsWhwSul6mV1S+1sbtMNTBTSjoEMuwv9eICsh3pylfNjxwN8YkeKIP/VJ6jshEEzq7UZVwJdb+kj8LCC+/7wKybpinVqAUIYxLjE9GNdlrSXe9jCTvYXc3c069SmOhCqtF1uNnhjbL0PJs4Q==
 X-Forefront-Antispam-Report:
-	CIP:198.47.23.195;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet201.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700016)(30052699003)(376014)(23010399003)(82310400026)(1800799024)(10067099003)(56012099006)(22082099003)(18002099003);DIR:OUT;SFP:1101;
+	CIP:198.47.23.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet200.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(36860700016)(1800799024)(82310400026)(23010399003)(10067099003)(56012099006)(6133799003)(22082099003)(18002099003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	sG2fHfY8E2c8lgONYuk5SHT4eJ314AnpetVSkYNxfupzNhHEZFGZeFbR4MYMpZfjc5y+HZNlD+lCsEg112+UnJYw8Ee/lnlz64wxfLIS6wg3plir6u/dvAgvY6Kab+T8T5+Y0o/RuCrsYztw9/Stw/A5N0S9ERd1G1QTVFEYsW1pJGweJPKVAjHIkHkFqMn3Wv1560sOdjy/nwDqHBW+P/M7va+V9b3dzeL1jq42HPW/tp5NLnceCliLbMo7OqVuNqH5FnaOJ5yzTdLaZtVmeJbM+M38lqdXfGhQROyj/eCt8wr8p+Ru9rPdJIBMn3rOzKPBNvDDGlHoZptPEv6JLLVYHH1fpGdVaLUCwGXP+v7sxptK5fLfPtlEmCmqiFswjkWZss9GGNc5vSrxcHVNVHbGKDEBOiJEMZDmpoFh3NOFo5NDYKXNWP5RhF/NWpY3
+	gppHysRWr4V+LXczYhMYfLnx1mo58uX6M2Ep74Yeo5ToU3c2KmHvrJmfqN4AzgLcysQMKxPfUYDojrOiWeKrFg9eKFqQV2/Jktpu4jd69TjkcHiYDS1+OtYWRrHHCtbeWUQSfZzvPrxiQB9kyMKz25MJjcF8dJsKBWzKXgKslyhOv3uIJUZ5fdgPvD/iMpNdo+dZWcd+utQFa/gwo1Bh3uhSv81PqMdk8/29n8Ks/d/zjR1SprSRndyVWRJo5usvAS7lHhLE8ZBczmkrHrAXSL7zsUxKZhmr1tM/IycLqxzwMtCIcsgYfYcpvlK0W4ZqbphoaQ0f25R65hGD7vGdZPdxxfbsyVg1/7m5gD6ODgvVkmWCssZO7ocMfxcSm7Co9z798mpr2+Da84tMi/+jYHBOOBoVRHyb0Dj1jJpYVYWzmjiPXxldpKx0/WNQQ3yI
 X-Exchange-RoutingPolicyChecked:
-	ormmLlK/XiPBmwDCzBg93jdnfhelqNLroTTzRc0snmv+Zs1OucfUGKPO2ZC6vmBO67GzudWOaJSx6aPIy2Er8jXF31qaiEoptn8z9mKH4de5CXEK3r/1u9lCXs/qCzonBnaMA5vaGX7pD2c9dfaEohuxhNmbqjfOXZINnL0WR/cE7Kz/Ou7rDTF9uGWY61WKPWdmWnRzh5jQOPsf/iYJZhcr8bpg4kNBhpsSaiW4oA4goJ/wMRZpkrn+LhldSIqh0U7m2nvMAQkLxtQFPuTtXMZC33rMGiTGydgsoPgsDHvzHIXbCherMmVWJjXDf/f7LqEXFN4X6Fm+RjWWYh9Fsg==
+	PMHizu0Y5EbzDWqtm4wxq5QPWwewX76CCLY9K0Z0zLAphu+GA7TZMkHG1pbBYsIiCHuotfVNCh4RBB1f/+Fe0SW9mVmVBcCq5AcZp/VgZgAqP8Ym67Q4oJRiN/L7CDwOh3N1iMRJqeGrh6AQIvy4AgLwiKnXQuys+kSnQaXhr3m9iFSOsR42YZh/l9krKliJGMNiUzK4RuVvbEef0ZTgtbkuo7QwQMGoL+Ctzqw2YgH6PJvKF/gXodeA4EhOhHwz+FPhSlCwOjNAYA+eSXHcTbpf+glErCRFz3srdfD7ew+dnaHmyK+t93cnhf1PeUS3deXAVMdbgUGuDpb6t9nZRQ==
 X-OriginatorOrg: ti.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Aug 2026 13:24:06.5065
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Aug 2026 13:24:02.9117
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8225ff8d-f165-41b3-8b5d-08df043e7879
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5eabca15-abc7-4769-bc61-08df043e765f
 X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.195];Helo=[lewvzet201.ext.ti.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.194];Helo=[lewvzet200.ext.ti.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EDD3.namprd03.prod.outlook.com
+	SJ5PEPF000001D3.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR10MB4750
-X-Proofpoint-GUID: UAzGGrFzZsU6ZDaJCwjFxWt0xF984Olk
-X-Authority-Analysis: v=2.4 cv=M4597Sws c=1 sm=1 tr=0 ts=6a903a7b cx=c_pps
- a=vcXwJhCbSog8BousImPcCw==:117 a=f+v6EHfkeJbVwR46tk4DMg==:17
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR10MB997675
+X-Proofpoint-ORIG-GUID: 2rPR7pfeqDL1_5kr4Y001HnAzVbweUJ6
+X-Proofpoint-GUID: 2rPR7pfeqDL1_5kr4Y001HnAzVbweUJ6
+X-Authority-Analysis: v=2.4 cv=VrMTxe2n c=1 sm=1 tr=0 ts=6a903a78 cx=c_pps
+ a=fY0JyvE1RNjZr0fjhzOn9Q==:117 a=WotqVVQAdb04rnGuttW3Kw==:17
  a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=Sv0fKeRqtYgA:10 a=s63m1ICgrNkA:10
  a=V5UXEbMT0ywA:10 a=VkNPw1HP01LnGYTKEx00:22 a=Z8NIEmU8O1QQgoT56wFK:22
- a=gO1vWkAQAl3rybz1DQOp:22 a=sozttTNsAAAA:8 a=2APMjrMfoq02II8ecpEA:9
-X-Proofpoint-ORIG-GUID: UAzGGrFzZsU6ZDaJCwjFxWt0xF984Olk
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODI3MDExMiBTYWx0ZWRfX7Nm2xRmNAHsG
- ssgchNbLuAhYqv/mnk226DQolGD5qRWJy4GOBYSBUttGeicl0GvRdx1MQAxPgIsssmQyiNNFYm/
- vZ66gmR0m1sjdwFVaXzu2gnUoacz18TlDXVpl7x72jQvOTDh90/QRrhkORfwHL91kfmGVRKntVY
- ujr9poZaRqrP7t6EAqpa8DU6TF1Zma/kotaAr71Q9HmJZ3lfAaI4U9P/rGOD9NDiT2+IWw28lVo
- Nxo4Y+7Oh7hXVRg+627qG73++HJHmpF6wuoqhxbIz2hI7UWfHecF7rBsyFrzg3lE+LB8wAAWE9+
- cmpWTGaF2ZgY4z8UALDt1xLHSFGSHzJX6ZJqkzyO1TKSV0LWaBETNud+YLDbWPBNAo+g+U4REP2
- TWQsbcKkks3pcYnzn2p9h0cu94KKYetwNnmB1lsZCYm3X2FTeq4FfjYFxgkY9e0HYc/ehpsof8o
- W3+tqbwQZhL8QMEGFow==
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODI3MDExMiBTYWx0ZWRfX0IxbyKfygrg4
- VLLLTIrYuJGOHVXAWJSWXvqgEvO7BpQf/oXHhN/G20E48QPdMeqJSum1sPEF+88q33m/wilQKiP
- FLGCOcMovcz71tIobSks43A5BtqEeME=
+ a=jwouBfj2j3NM8CExmVVE:22 a=sozttTNsAAAA:8 a=Tpn98H0sjD_mw3BxSIoA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODI3MDExMiBTYWx0ZWRfXxPAk/W0q+EPd
+ ew8Z+bnHaTlcxzs3r5vEE6ova4O2stOmKBpcqDEy/VTbQd9zXCAdRfXpKGA3+1LSI0D+pu3fbX8
+ QypMS/Tz3i2x6Tst9OD+H9jc8E55tUmHrwVY5Z1RW7i7P35QcaxUisBXvmGdnV1y42HWlbRwbqu
+ cJ/sDE+mwwQ3+0Aig5BtXdAtMS2I5Qo2FklroF/flYWKsuFC0EZSUnUpSig1jmRvk33sU9jY8YR
+ HZlRTH4PbaKB7WiXL/hXlTLwc8pQNaxDBuO6oACkMKqxbmlnFso6VFM9+6leFVSn1rmTNBdGI92
+ QnvS518ei7BeXUwC0HpDUviERc05PB5WVLw1jyzJWfBH2F47A3qtvz8Ikms3MHrU8HyJsw1XomO
+ X1XFTbNQrK8p5h8TSxdoXo9yVMKhN875hj3AoFxWeuSYx9E407Pus7v4vi8HV9ps1W0x50jCDsH
+ /47tIMzK45ROZp9cDpw==
+X-Proofpoint-Spam-Info: AW1haW4tMjYwODI3MDExMiBTYWx0ZWRfX201fAKzj5Uyd
+ ugnQIZDQk56EcpG9WbIIvijGUIOtHcElQpu6b29bGH+N+8EDtxPuO77/KzuiWn5apSSMauGICh/
+ ljL+4kStqEW/eYGyyCBgV7fPS7n6Qpc=
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
  definitions=2026-08-27_05,2026-08-26_02,2025-10-01_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 lowpriorityscore=0 impostorscore=0 spamscore=0 clxscore=1015
- bulkscore=0 priorityscore=1501 phishscore=0 suspectscore=0 adultscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608270112
+ lowpriorityscore=0 impostorscore=0 suspectscore=0 malwarescore=0
+ clxscore=1015 priorityscore=1501 phishscore=0 spamscore=0 adultscore=0
+ bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2606150000
+ definitions=main-2608270112
 
-Each *_init_tfm() caches a pointer to the per-instance struct dthe_data
-in its transform context (ctx->dev_data), but never takes a reference on
-it. If there are tfms in progress when dthe_remove() is called, the devm
-allocated dev_data gets freed. Then ctx->dev_data will point to a memory
-that has been freed.
+AES functions were using src and dst scatterlists directly provided by
+the request. This is problematic as it is not guaranteed that the input
+scatterlist is exactly the length reqired. This problem was seen in
+IPSec use case when the kernel provides the scatterlist which contains
+space for plaintext/ciphertext and TAG.
 
-Add a refcnt to struct dthe_data, incrementing it atomically in
-*_init_tfm() and decrementing atomically in *_exit_tfm().
+The problem comes when the scatterlist is mapped and sent via DMA. The
+K3 UDMA sends/waits for the amount of data equal to the length of
+scatterlist mapped. So when the last mapped nent contains some extra
+length, the DMA keeps waiting for the extra data and eventually times
+out and crashes.
 
-dthe_remove() now polls this count, with a bounded timeout, so tfms
-allocated before removal have a chance to be freed first. If the timeout
-expires, it warns and proceeds anyway rather than blocking removal
-indefinitely.
+Mitigate this by copying the nents to a local scatterlist, copying only
+exactly cryptlen of data. Note that this does not copy the whole data,
+but rather only the scatterlist mapping. So it is not as penalising on
+performance.
 
-Fixes: 52f641bc63a46 ("crypto: ti - Add driver for DTHE V2 AES Engine (ECB, CBC)")
+Fixes: 52f641bc63a4 ("crypto: ti - Add driver for DTHE V2 AES Engine (ECB, CBC)")
 Signed-off-by: T Pratham <t-pratham@ti.com>
+Reviewed-by: Kamlesh Gurudasani <kamlesh@ti.com>
 ---
- drivers/crypto/ti/dthev2-aes.c    |  4 ++++
- drivers/crypto/ti/dthev2-common.c | 22 +++++++++++++++++++++-
- drivers/crypto/ti/dthev2-common.h |  5 +++++
- 3 files changed, 30 insertions(+), 1 deletion(-)
+ drivers/crypto/ti/dthev2-aes.c | 146 ++++++++++++++++-----------------
+ 1 file changed, 69 insertions(+), 77 deletions(-)
 
 diff --git a/drivers/crypto/ti/dthev2-aes.c b/drivers/crypto/ti/dthev2-aes.c
-index 8998e02b0e86e..8ef54dacf63f2 100644
+index 4fdd24ee91637..8998e02b0e86e 100644
 --- a/drivers/crypto/ti/dthev2-aes.c
 +++ b/drivers/crypto/ti/dthev2-aes.c
-@@ -124,6 +124,7 @@ static int dthe_cipher_init_tfm(struct crypto_skcipher *tfm)
- 	if (IS_ERR(ctx->skcipher_fb)) {
- 		dev_err(dev_data->dev, "fallback driver %s couldn't be loaded\n",
- 			alg_name);
-+		dthe_put_dev(ctx);
- 		return PTR_ERR(ctx->skcipher_fb);
- 	}
+@@ -108,20 +108,6 @@ enum aes_ctrl_mode_masks {
+ #define POLL_TIMEOUT_INTERVAL			HZ
  
-@@ -135,6 +136,7 @@ static void dthe_cipher_exit_tfm(struct crypto_skcipher *tfm)
+ static int dthe_cipher_init_tfm(struct crypto_skcipher *tfm)
+-{
+-	struct dthe_tfm_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	struct dthe_data *dev_data = dthe_get_dev(ctx);
+-
+-	if (!dev_data)
+-		return -ENODEV;
+-
+-	ctx->dev_data = dev_data;
+-	ctx->keylen = 0;
+-
+-	return 0;
+-}
+-
+-static int dthe_cipher_init_tfm_fallback(struct crypto_skcipher *tfm)
+ {
+ 	struct dthe_tfm_ctx *ctx = crypto_skcipher_ctx(tfm);
+ 	struct dthe_data *dev_data = dthe_get_dev(ctx);
+@@ -155,19 +141,24 @@ static int dthe_aes_setkey(struct crypto_skcipher *tfm, const u8 *key, unsigned
+ {
  	struct dthe_tfm_ctx *ctx = crypto_skcipher_ctx(tfm);
  
- 	crypto_free_sync_skcipher(ctx->skcipher_fb);
-+	dthe_put_dev(ctx);
+-	if (keylen != AES_KEYSIZE_128 && keylen != AES_KEYSIZE_192 && keylen != AES_KEYSIZE_256)
+-		return -EINVAL;
+-
+ 	ctx->keylen = keylen;
+ 	memcpy(ctx->key, key, keylen);
+ 
+-	return 0;
++	crypto_sync_skcipher_clear_flags(ctx->skcipher_fb, CRYPTO_TFM_REQ_MASK);
++	crypto_sync_skcipher_set_flags(ctx->skcipher_fb,
++				       crypto_skcipher_get_flags(tfm) &
++				       CRYPTO_TFM_REQ_MASK);
++
++	return crypto_sync_skcipher_setkey(ctx->skcipher_fb, key, keylen);
  }
  
- static int dthe_aes_setkey(struct crypto_skcipher *tfm, const u8 *key, unsigned int keylen)
-@@ -577,6 +579,7 @@ static int dthe_aead_init_tfm(struct crypto_aead *tfm)
- 	if (IS_ERR(ctx->aead_fb)) {
- 		dev_err(dev_data->dev, "fallback driver %s couldn't be loaded\n",
- 			alg_name);
-+		dthe_put_dev(ctx);
- 		return PTR_ERR(ctx->aead_fb);
+ static int dthe_aes_ecb_setkey(struct crypto_skcipher *tfm, const u8 *key, unsigned int keylen)
+ {
+ 	struct dthe_tfm_ctx *ctx = crypto_skcipher_ctx(tfm);
+ 
++	if (keylen != AES_KEYSIZE_128 && keylen != AES_KEYSIZE_192 && keylen != AES_KEYSIZE_256)
++		return -EINVAL;
++
+ 	ctx->aes_mode = DTHE_AES_ECB;
+ 
+ 	return dthe_aes_setkey(tfm, key, keylen);
+@@ -177,6 +168,9 @@ static int dthe_aes_cbc_setkey(struct crypto_skcipher *tfm, const u8 *key, unsig
+ {
+ 	struct dthe_tfm_ctx *ctx = crypto_skcipher_ctx(tfm);
+ 
++	if (keylen != AES_KEYSIZE_128 && keylen != AES_KEYSIZE_192 && keylen != AES_KEYSIZE_256)
++		return -EINVAL;
++
+ 	ctx->aes_mode = DTHE_AES_CBC;
+ 
+ 	return dthe_aes_setkey(tfm, key, keylen);
+@@ -185,24 +179,19 @@ static int dthe_aes_cbc_setkey(struct crypto_skcipher *tfm, const u8 *key, unsig
+ static int dthe_aes_ctr_setkey(struct crypto_skcipher *tfm, const u8 *key, unsigned int keylen)
+ {
+ 	struct dthe_tfm_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	int ret = dthe_aes_setkey(tfm, key, keylen);
+ 
+-	if (ret)
+-		return ret;
++	if (keylen != AES_KEYSIZE_128 && keylen != AES_KEYSIZE_192 && keylen != AES_KEYSIZE_256)
++		return -EINVAL;
+ 
+ 	ctx->aes_mode = DTHE_AES_CTR;
+ 
+-	crypto_sync_skcipher_clear_flags(ctx->skcipher_fb, CRYPTO_TFM_REQ_MASK);
+-	crypto_sync_skcipher_set_flags(ctx->skcipher_fb,
+-				       crypto_skcipher_get_flags(tfm) &
+-				       CRYPTO_TFM_REQ_MASK);
+-
+-	return crypto_sync_skcipher_setkey(ctx->skcipher_fb, key, keylen);
++	return dthe_aes_setkey(tfm, key, keylen);
+ }
+ 
+ static int dthe_aes_xts_setkey(struct crypto_skcipher *tfm, const u8 *key, unsigned int keylen)
+ {
+ 	struct dthe_tfm_ctx *ctx = crypto_skcipher_ctx(tfm);
++	int ret;
+ 
+ 	if (keylen != 2 * AES_KEYSIZE_128 &&
+ 	    keylen != 2 * AES_KEYSIZE_192 &&
+@@ -210,15 +199,12 @@ static int dthe_aes_xts_setkey(struct crypto_skcipher *tfm, const u8 *key, unsig
+ 		return -EINVAL;
+ 
+ 	ctx->aes_mode = DTHE_AES_XTS;
+-	ctx->keylen = keylen / 2;
+-	memcpy(ctx->key, key, keylen);
+-
+-	crypto_sync_skcipher_clear_flags(ctx->skcipher_fb, CRYPTO_TFM_REQ_MASK);
+-	crypto_sync_skcipher_set_flags(ctx->skcipher_fb,
+-				       crypto_skcipher_get_flags(tfm) &
+-				       CRYPTO_TFM_REQ_MASK);
++	ret = dthe_aes_setkey(tfm, key, keylen);
++	if (ret)
++		return ret;
+ 
+-	return crypto_sync_skcipher_setkey(ctx->skcipher_fb, key, keylen);
++	ctx->keylen = keylen / 2;
++	return 0;
+ }
+ 
+ static void dthe_aes_set_ctrl_key(struct dthe_tfm_ctx *ctx,
+@@ -341,8 +327,10 @@ static int dthe_aes_run(struct crypto_engine *engine, void *areq)
+ 	struct dthe_aes_req_ctx *rctx = skcipher_request_ctx(req);
+ 
+ 	unsigned int len = req->cryptlen;
++	unsigned int pad_len = 0;
+ 	struct scatterlist *src = req->src;
+ 	struct scatterlist *dst = req->dst;
++	struct scatterlist *sg;
+ 
+ 	int src_nents = sg_nents_for_len(src, len);
+ 	int dst_nents = sg_nents_for_len(dst, len);
+@@ -385,38 +373,38 @@ static int dthe_aes_run(struct crypto_engine *engine, void *areq)
+ 	 * We need to handle the padding in the driver.
+ 	 */
+ 	if (ctx->aes_mode == DTHE_AES_CTR && req->cryptlen % AES_BLOCK_SIZE) {
+-		unsigned int pad_size = AES_BLOCK_SIZE - (req->cryptlen % AES_BLOCK_SIZE);
+-		u8 *pad_buf = rctx->padding;
+-		struct scatterlist *sg;
+-
+-		len += pad_size;
++		pad_len = AES_BLOCK_SIZE - (req->cryptlen % AES_BLOCK_SIZE);
++		len += pad_len;
+ 		src_nents++;
+ 		dst_nents++;
++	}
+ 
+-		src = kmalloc_array(src_nents, sizeof(*src), GFP_ATOMIC);
+-		if (!src) {
+-			ret = -ENOMEM;
+-			goto aes_ctr_src_alloc_err;
+-		}
+-
+-		sg_init_table(src, src_nents);
+-		sg = dthe_copy_sg(src, req->src, req->cryptlen);
+-		memzero_explicit(pad_buf, AES_BLOCK_SIZE);
+-		sg_set_buf(sg, pad_buf, pad_size);
++	src = kmalloc_array(src_nents, sizeof(*src), GFP_ATOMIC);
++	if (!src) {
++		ret = -ENOMEM;
++		goto aes_src_alloc_err;
++	}
+ 
+-		if (diff_dst) {
+-			dst = kmalloc_array(dst_nents, sizeof(*dst), GFP_ATOMIC);
+-			if (!dst) {
+-				ret = -ENOMEM;
+-				goto aes_ctr_dst_alloc_err;
+-			}
++	sg_init_table(src, src_nents);
++	sg = dthe_copy_sg(src, req->src, req->cryptlen);
++	if (pad_len > 0) {
++		memzero_explicit(rctx->padding, AES_BLOCK_SIZE);
++		sg_set_buf(sg, rctx->padding, pad_len);
++	}
+ 
+-			sg_init_table(dst, dst_nents);
+-			sg = dthe_copy_sg(dst, req->dst, req->cryptlen);
+-			sg_set_buf(sg, pad_buf, pad_size);
+-		} else {
+-			dst = src;
++	if (diff_dst) {
++		dst = kmalloc_array(dst_nents, sizeof(*dst), GFP_ATOMIC);
++		if (!dst) {
++			ret = -ENOMEM;
++			goto aes_dst_alloc_err;
+ 		}
++
++		sg_init_table(dst, dst_nents);
++		sg = dthe_copy_sg(dst, req->dst, req->cryptlen);
++		if (pad_len > 0)
++			sg_set_buf(sg, rctx->padding, pad_len);
++	} else {
++		dst = src;
  	}
  
-@@ -588,6 +591,7 @@ static void dthe_aead_exit_tfm(struct crypto_aead *tfm)
- 	struct dthe_tfm_ctx *ctx = crypto_aead_ctx(tfm);
+ 	tx_dev = dmaengine_get_dma_device(dev_data->dma_aes_tx);
+@@ -503,19 +491,19 @@ static int dthe_aes_run(struct crypto_engine *engine, void *areq)
+ 	dma_unmap_sg(tx_dev, src, src_nents, src_dir);
  
- 	crypto_free_sync_aead(ctx->aead_fb);
-+	dthe_put_dev(ctx);
- }
- 
- /**
-diff --git a/drivers/crypto/ti/dthev2-common.c b/drivers/crypto/ti/dthev2-common.c
-index 8628187a32e18..c5bb7fe7f9876 100644
---- a/drivers/crypto/ti/dthev2-common.c
-+++ b/drivers/crypto/ti/dthev2-common.c
-@@ -27,6 +27,10 @@
- 
- #define DRIVER_NAME	"dthev2"
- 
-+/* Interval and timeout for polling dthe_data::refcnt on removal */
-+#define DTHE_REFCNT_POLL_INTERVAL_US	20000
-+#define DTHE_REFCNT_POLL_TIMEOUT_US	1000000
+ aes_map_src_err:
+-	if (ctx->aes_mode == DTHE_AES_CTR && req->cryptlen % AES_BLOCK_SIZE) {
++	if (ctx->aes_mode == DTHE_AES_CTR && req->cryptlen % AES_BLOCK_SIZE)
+ 		memzero_explicit(rctx->padding, AES_BLOCK_SIZE);
+-		if (diff_dst)
+-			kfree(dst);
+-aes_ctr_dst_alloc_err:
+-		kfree(src);
+-aes_ctr_src_alloc_err:
+-		/*
+-		 * Fallback to software if ENOMEM
+-		 */
+-		if (ret == -ENOMEM)
+-			ret = dthe_aes_do_fallback(req);
+-	}
++	if (diff_dst)
++		kfree(dst);
 +
- static struct dthe_list dthe_dev_list = {
- 	.dev_list = LIST_HEAD_INIT(dthe_dev_list.dev_list),
- 	.lock = __SPIN_LOCK_UNLOCKED(dthe_dev_list.lock),
-@@ -41,13 +45,21 @@ struct dthe_data *dthe_get_dev(struct dthe_tfm_ctx *ctx)
++aes_dst_alloc_err:
++	kfree(src);
++aes_src_alloc_err:
++	/*
++	 * Fallback to software if ENOMEM
++	 */
++	if (ret == -ENOMEM)
++		ret = dthe_aes_do_fallback(req);
  
- 	spin_lock(&dthe_dev_list.lock);
- 	dev_data = list_first_entry_or_null(&dthe_dev_list.dev_list, struct dthe_data, list);
--	if (dev_data)
-+	if (dev_data) {
- 		list_move_tail(&dev_data->list, &dthe_dev_list.dev_list);
-+		atomic_inc(&dev_data->refcnt);
-+	}
- 	spin_unlock(&dthe_dev_list.lock);
- 
- 	return dev_data;
- }
- 
-+void dthe_put_dev(struct dthe_tfm_ctx *ctx)
-+{
-+	atomic_dec(&ctx->dev_data->refcnt);
-+	ctx->dev_data = NULL;
-+}
-+
- struct scatterlist *dthe_copy_sg(struct scatterlist *dst,
- 				 struct scatterlist *src,
- 				 unsigned int buflen)
-@@ -200,6 +212,7 @@ static int dthe_probe(struct platform_device *pdev)
- static void dthe_remove(struct platform_device *pdev)
- {
- 	struct dthe_data *dev_data = platform_get_drvdata(pdev);
-+	int refcnt, ret;
- 
- 	spin_lock(&dthe_dev_list.lock);
- 	list_del(&dev_data->list);
-@@ -207,6 +220,13 @@ static void dthe_remove(struct platform_device *pdev)
- 
- 	dthe_unregister_algs();
- 
-+	ret = readx_poll_timeout(atomic_read, &dev_data->refcnt, refcnt, !refcnt,
-+				 DTHE_REFCNT_POLL_INTERVAL_US, DTHE_REFCNT_POLL_TIMEOUT_US);
-+	if (ret)
-+		dev_warn(dev_data->dev,
-+			 "removing with %d transform context(s) still active\n",
-+			 refcnt);
-+
- 	crypto_engine_exit(dev_data->engine);
- 
- 	dma_release_channel(dev_data->dma_aes_rx);
-diff --git a/drivers/crypto/ti/dthev2-common.h b/drivers/crypto/ti/dthev2-common.h
-index 75d9a097650da..c4adeb34b14f3 100644
---- a/drivers/crypto/ti/dthev2-common.h
-+++ b/drivers/crypto/ti/dthev2-common.h
-@@ -18,6 +18,7 @@
- #include <crypto/internal/hash.h>
- #include <crypto/internal/skcipher.h>
- 
-+#include <linux/atomic.h>
- #include <linux/delay.h>
- #include <linux/dmaengine.h>
- #include <linux/dmapool.h>
-@@ -53,6 +54,7 @@ enum dthe_aes_mode {
-  * @dma_aes_rx: AES Rx DMA Channel
-  * @dma_aes_tx: AES Tx DMA Channel
-  * @dma_sha_tx: SHA Tx DMA Channel
-+ * @refcnt: Count of transform contexts currently holding a reference to this instance
-  */
- struct dthe_data {
- 	struct device *dev;
-@@ -64,6 +66,8 @@ struct dthe_data {
- 	struct dma_chan *dma_aes_tx;
- 
- 	struct dma_chan *dma_sha_tx;
-+
-+	atomic_t refcnt;
- };
- 
- /**
-@@ -113,6 +117,7 @@ struct dthe_aes_req_ctx {
- /* Struct definitions end */
- 
- struct dthe_data *dthe_get_dev(struct dthe_tfm_ctx *ctx);
-+void dthe_put_dev(struct dthe_tfm_ctx *ctx);
- 
- /**
-  * dthe_copy_sg - Copy sg entries from src to dst
+ 	local_bh_disable();
+ 	crypto_finalize_skcipher_request(dev_data->engine, req, ret);
+@@ -1214,6 +1202,7 @@ static int dthe_aead_decrypt(struct aead_request *req)
+ static struct skcipher_engine_alg cipher_algs[] = {
+ 	{
+ 		.base.init			= dthe_cipher_init_tfm,
++		.base.exit			= dthe_cipher_exit_tfm,
+ 		.base.setkey			= dthe_aes_ecb_setkey,
+ 		.base.encrypt			= dthe_aes_encrypt,
+ 		.base.decrypt			= dthe_aes_decrypt,
+@@ -1225,7 +1214,8 @@ static struct skcipher_engine_alg cipher_algs[] = {
+ 			.cra_priority		= 299,
+ 			.cra_flags		= CRYPTO_ALG_TYPE_SKCIPHER |
+ 						  CRYPTO_ALG_ASYNC |
+-						  CRYPTO_ALG_KERN_DRIVER_ONLY,
++						  CRYPTO_ALG_KERN_DRIVER_ONLY |
++						  CRYPTO_ALG_NEED_FALLBACK,
+ 			.cra_alignmask		= AES_BLOCK_SIZE - 1,
+ 			.cra_blocksize		= AES_BLOCK_SIZE,
+ 			.cra_ctxsize		= sizeof(struct dthe_tfm_ctx),
+@@ -1236,6 +1226,7 @@ static struct skcipher_engine_alg cipher_algs[] = {
+ 	}, /* ECB AES */
+ 	{
+ 		.base.init			= dthe_cipher_init_tfm,
++		.base.exit			= dthe_cipher_exit_tfm,
+ 		.base.setkey			= dthe_aes_cbc_setkey,
+ 		.base.encrypt			= dthe_aes_encrypt,
+ 		.base.decrypt			= dthe_aes_decrypt,
+@@ -1248,7 +1239,8 @@ static struct skcipher_engine_alg cipher_algs[] = {
+ 			.cra_priority		= 299,
+ 			.cra_flags		= CRYPTO_ALG_TYPE_SKCIPHER |
+ 						  CRYPTO_ALG_ASYNC |
+-						  CRYPTO_ALG_KERN_DRIVER_ONLY,
++						  CRYPTO_ALG_KERN_DRIVER_ONLY |
++						  CRYPTO_ALG_NEED_FALLBACK,
+ 			.cra_alignmask		= AES_BLOCK_SIZE - 1,
+ 			.cra_blocksize		= AES_BLOCK_SIZE,
+ 			.cra_ctxsize		= sizeof(struct dthe_tfm_ctx),
+@@ -1258,7 +1250,7 @@ static struct skcipher_engine_alg cipher_algs[] = {
+ 		.op.do_one_request = dthe_aes_run,
+ 	}, /* CBC AES */
+ 	{
+-		.base.init			= dthe_cipher_init_tfm_fallback,
++		.base.init			= dthe_cipher_init_tfm,
+ 		.base.exit			= dthe_cipher_exit_tfm,
+ 		.base.setkey			= dthe_aes_ctr_setkey,
+ 		.base.encrypt			= dthe_aes_encrypt,
+@@ -1283,7 +1275,7 @@ static struct skcipher_engine_alg cipher_algs[] = {
+ 		.op.do_one_request = dthe_aes_run,
+ 	}, /* CTR AES */
+ 	{
+-		.base.init			= dthe_cipher_init_tfm_fallback,
++		.base.init			= dthe_cipher_init_tfm,
+ 		.base.exit			= dthe_cipher_exit_tfm,
+ 		.base.setkey			= dthe_aes_xts_setkey,
+ 		.base.encrypt			= dthe_aes_encrypt,
 -- 
 2.34.1
 
