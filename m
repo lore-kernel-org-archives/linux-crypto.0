@@ -1,135 +1,139 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FA933DB328
-	for <linux-crypto@vger.kernel.org>; Thu, 27 Aug 2026 23:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.214.176
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787871653; cv=pass; b=ovQdu5Snd6HSXM//XSLdfD6LG+0JCukNArB0B1j1ZW/5A+kfclvvI5jTdxdgQ/4ySwTQD1TebE6GauWlYm/eSDa9GnWbIBkqAiXtMsedrybmimz2IpC3HJgHP13SE5W/c32ygULwknTrx+NizeMKJ5GG4cYhZD0aFhhny4d0m60=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787871653; c=relaxed/simple;
-	bh=PtOQ1ctrt5ChIryejtRZPvf9ci4aQrCJNC6i+HqoyYo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ikcAOvtS452fUi1Iyl9r0vT0K7Bp8w4nYULTCMcLut7lOYbwaSyXGIW1LPTGcGSb6hYE3FmAWVApRz9BBrQg2a9MCoVmD49/2JITqpkYY8YYdfZBRjKuoBkp0i5tznu3G6hS7epPcyp54WL859o1MfRzcnTNa7OdAUZVYdq+tOs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=p9+covru; arc=pass smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FDFB2ECE91;
+	Fri, 28 Aug 2026 00:54:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1787878498; cv=none; b=PUiK4XeHfefTfmZOI7zTePA5NHxJ/EOMAElDLxCeaz/+FH/qKARaQYtE/fU12tCxLIEaWaV9GlRQG3FZbsEyXvhJZcpfhgz5aIv5FuNfdfWJ5orkV2z92IQ5J9J3cWi5nOLlzP+DbtYfzYxR5AtDVcm71PEYe4zFs/WP9T43/CY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1787878498; c=relaxed/simple;
+	bh=lkLNCDmuOclJQul5e0NVXK6dZf+WeD60Xio5XflWVQE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=ldDCzbycFulmttuQEhUSpa3EDYFtBKPND/sb6TkHybetvoI6peEneuXOnGbpsNLVwRh7B3t/8wZgHrw1v+nf83siOqnrDV/1KsOY2abG7DsBrzlTaETx1QBQpAUviR57t97rLmBDZ12S9lxNmMmj6S6lYMZpF2qB7o2T3Fanlaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=leNsmW1+; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p9+covru"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2d03fcd26a6so252735ad.2
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Aug 2026 16:00:50 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1787871650; cv=none;
-        d=google.com; s=arc-20260327;
-        b=d7EdE5DcFzzN0n7TYm3AHWNkiWhqPgGKxOf1O87PhfuQbj5avlaSpPAigKH31a++vD
-         J+fa17pQF9VujNPVti+mKHm0qx7ss9okAhZ84OiYuDhKlO8fD6HJXMcIjyHV/SJUBO3A
-         TnnMRUwNc6D8ByP8uJ6pnjozsPWhVFg4kl0POUpj8R7BRpw24JA91Qtyv3Jl6u8nRdJt
-         adMk4/KBE4yUH4sWqSK9omoRIerxWnFfvAniKjm4aF5cBOyn+h59hGU368dSfiDL1XV+
-         EjvqQBQK5CtHIHr8Q9KodrxYwUYlf7X4POHti9Xff6bpR2KIQNRtUqkl60gGW8vK7Esp
-         9DrQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=PtOQ1ctrt5ChIryejtRZPvf9ci4aQrCJNC6i+HqoyYo=;
-        fh=8DMqfkpZ9NLkZudISPD9LJhyTtmne9HBjyRpbUCMV8M=;
-        b=KU1qiBhVACW58ESmAM9MLloszrQSQB9heFs3ikOizFasXIBG8gzmSjLHuaWQEPm/yE
-         1r9kMigVY3P1tZ1qxKICYGCnfL/j11x+l84ioMCYg7MjhU9JHnn8ozLa4Xa2CIJAU3ky
-         yWiJObZjyh3nF5n9Ufz7C4F0SR2kKoXpUXNiY7da5ciyWH420XJJNOAUdT9G52y14tjP
-         KkOLjoQO/+r3T2u90Budeh6Ige9UmPVXcOLLkky9NY2EiU8KHxmqfpOUH12dHa+/Yn5x
-         q5gu3nvl4QAHgscLwvILEKhqaK3R7dU7ILKjEHsaUz/GMLM4l0OBzShB2X+hQB2x+rN1
-         f92A==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1787871650; x=1788476450; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=PtOQ1ctrt5ChIryejtRZPvf9ci4aQrCJNC6i+HqoyYo=;
-        b=p9+covru2Hp5BxxPX+gS4B4kj8l3iQMWtHIkbuwbH++g0b4ZFXpIwAUUa06uTwE4Qe
-         Ie/QHJVFJmxZNI+YrdT6rxNByYEAqaFDnzMtvmtLvIumADy9Uja0h1eCjX6/8APpCb/F
-         v+pb/A/Kh//celSSa/C8KiuFfGDDWvoCJYzbMIiabWsZHjuO49l0uydKOyuJ8JDeFqSE
-         SISdkJV/TWoRYIUVtm0Mz7LSC/TTuZETu/PceOtahPw5m+rQCDuO/8qrF925bpxEYOvs
-         W3ZqyBT82TUFs5+Cnv55Nt2v3gtqfBcf5hG63gG8kAr0nfVYDDA2euCgXHBfQJSCWibK
-         WjYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1787871650; x=1788476450;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=PtOQ1ctrt5ChIryejtRZPvf9ci4aQrCJNC6i+HqoyYo=;
-        b=hs2qGWaB8aCJSjx4uWSE+eygIH2XwABjG9eP0LpashbHuAZjOuFamVoxUQFyVXBa/8
-         gmGmWlCO2oeKyI7fGpjs2tBtlgg+qWxbmQeEOQgbKEBEFOKw8/Ade0Vx3MtxJxnmCXlF
-         3XK/Jg7st0TaaNFX9n4APt2iMhuFQ0S4l8XchmR7CptLFvJGVmNwImf8HQsOGE64Xn2Q
-         texMoG2sJXVxPzcQUmYxVXzaWSxNMaADx2y5nC6Vt25YkHTksZyvphakzdg/gXSjleLp
-         R5VvsfMiSFPi0TEOEEjDotORIjSf79YQz/voFwY7rDx9UlaG5BTdnyw0Lvs4O97aQDA6
-         KkZQ==
-X-Forwarded-Encrypted: i=1; AHgh+RorNXzNlYbo7Eje51ylAC30HBhNjpjd8ensvPOMEBNuy8Ios0aGhmDaQqMe9NGucFzEzIAPv4okTxIxhr0=@vger.kernel.org
-X-Gm-Message-State: AFuF++maQztMnJBiBXldj9Ho5ksAsz+5bkKLuN8I5yJRxlAgLfyoyiG4
-	8cZSCW11WC7WTgfBW4ZjkYk5YxrASHlmFekHFl66zH7pedKMYGgSVY++tOXZcif20F0PeBI6XNH
-	Eoz0XfQHJR+xqX6nJcIpgguV/c7rUptY=
-X-Gm-Gg: AR+sD10AaPCcOWFVpUtd3yZzYjE7T3on83DE2yyyeiXpr9KwZWH44WVFHxpHEIU+8TO
-	spnox+B7edeYmz2x+y+vvCjUhHkqxXWFM+rCPK1WGvpghzJRcDhKLzgjxgd885ac+/1NAmPaSyv
-	PXar2X4nt3igQaR3E5nWJX8vaDrLGwArjcv3M4HN0nb6caVUpP2OuzoDQ/wj1mqTzUYt75hI2Oa
-	InUU6CCYgc/LBtY765zcNtc8TFfDIZac3haZGuaayvXvRWib7Jo2fruKW/p6aXjYowEDqQnju7f
-	+0uvMXjdU+Vr2WcthhYX0QYyfRJeIZ/vA+pr29WAqX2+U0bpn24IhV7A+tw4gOP0TUVy5wpEU2z
-	BFajtffEpS4Oo2GTicKkmwBXY6q2fTFtZCKLL61fSEXKFSzJ9Ggbu87xOwOoW
-X-Received: by 2002:a17:902:d2c7:b0:2c9:ed4a:c3a4 with SMTP id
- d9443c01a7336-2d74ce38075mr21203935ad.0.1787871649744; Thu, 27 Aug 2026
- 16:00:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="leNsmW1+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1787878496; x=1819414496;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding:in-reply-to;
+  bh=lkLNCDmuOclJQul5e0NVXK6dZf+WeD60Xio5XflWVQE=;
+  b=leNsmW1+JwKw0t0VHL7BswnsLz0nmUAQajMEMB37kEI6IP0Sw/TiWV5y
+   h/BbKjjwskuri/bX2WzZHHH/h+knocBRk/419saAgpq0ZtWgitvtTaLqp
+   3FtVUljLvO8640RYyDt+djHqbFvlh/qN195NPcl4UaCaIxJee6ebMIMX0
+   T73zRpuW6w/rl0d88R2YuI3tODiuBkHuwCarLksvuP6pQhm+PrBvoyTMD
+   bc/JX4uOuCghZlQoKeiJyjpqNIpT3iCbNmwXNy+gNuftb5r+kWmbjyNhj
+   Y9LyzLjbh2CZ5vu3mLclNGT6ReBYa0sLyQRFvmwhzkN/49l0+8y/u95Py
+   A==;
+X-CSE-ConnectionGUID: Vzxd+yC9RqGR5w6G2Kr48Q==
+X-CSE-MsgGUID: gM6dKnO6SXGKuL3j7gi6lQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11888"; a="99548810"
+X-IronPort-AV: E=Sophos;i="6.25,247,1779174000"; 
+   d="scan'208";a="99548810"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2026 17:54:56 -0700
+X-CSE-ConnectionGUID: 5UaGwS1vRNGl6pWq0sf0kg==
+X-CSE-MsgGUID: vYYcAbSKQAWvwI7oPBWoIg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,247,1779174000"; 
+   d="scan'208";a="268591115"
+Received: from ly-workstation.sh.intel.com (HELO ly-workstation) ([10.239.182.64])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2026 17:54:53 -0700
+Date: Fri, 28 Aug 2026 08:54:49 +0800
+From: kernel test robot <yi1.lai@intel.com>
+To: quanyeyang via B4 Relay <devnull+quanyemostima.gmail.com@kernel.org>
+Cc: oe-lkp@lists.linux.dev, lkp@intel.com, linux-crypto@vger.kernel.org,
+	Thomas Graf <tgraf@suug.ch>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	NeilBrown <neilb@suse.com>, "David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org,
+	syzbot+ef8d17bae14efb960935@syzkaller.appspotmail.com,
+	quanyeyang <quanyemostima@gmail.com>, yi1.lai@intel.com
+Subject: Re: [PATCH] rhashtable: use per-init-site lockdep classes for bucket
+ locks
+Message-ID: <202608280842.861e5949-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260826163004.3365-1-mike@fireburn.co.uk> <20260826163004.3365-3-mike@fireburn.co.uk>
- <20260827030352.GB2327@sol> <CANiq72k3COcjo1s1MXdh=K7qRcOMMSq7-3_JCMtNKN3J0zQmjg@mail.gmail.com>
- <20260827182907.GA2137493@google.com>
-In-Reply-To: <20260827182907.GA2137493@google.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Fri, 28 Aug 2026 01:00:35 +0200
-X-Gm-Features: AcwNN1XMEcBfhQK81kPdbiieX1lImw4sydc4Mu3cJx6g3SD17OlDU5gWr95b-jw
-Message-ID: <CANiq72n5swSHaTsDi3TYdneyCiePHF-gEAHuFk3ZWj4v0meR+w@mail.gmail.com>
-Subject: Re: [PATCH v3 2/2] rust: crypto: add synchronous RSA akcipher support
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Mike Lothian <mike@fireburn.co.uk>, linux-crypto@vger.kernel.org, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	"Jason A. Donenfeld" <Jason@zx2c4.com>, Ard Biesheuvel <ardb@kernel.org>, Miguel Ojeda <ojeda@kernel.org>, 
-	Boqun Feng <boqun@kernel.org>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
-	Danilo Krummrich <dakr@kernel.org>, Daniel Almeida <daniel.almeida@collabora.com>, 
-	Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot <acourbot@nvidia.com>, 
-	=?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>, 
-	Lyude Paul <lyude@redhat.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Asahi Lina <lina+kernel@asahilina.net>, Burak Emir <bqe@google.com>, 
-	Lorenzo Stoakes <ljs@kernel.org>, Joel Fernandes <joelagnelf@nvidia.com>, Yury Norov <ynorov@nvidia.com>, 
-	David Gow <david@davidgow.net>, linux-kernel@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20260801-fix-rhashtable-bucket-lockdep-v1-1-15a0f8ae094c@gmail.com>
 
-On Thu, Aug 27, 2026 at 8:29=E2=80=AFPM Eric Biggers <ebiggers@kernel.org> =
-wrote:
->
-> Yes, it doesn't explain why they need to be inconsistent though.
 
-It is simply because it is the end state that we want, i.e. both
-Kconfig and source code to be in the usual folder (so less things to
-move later), plus one normally wants the Kconfig options to show in
-the right place in the menus.
+Hello,
 
-> And if the code is "conceptually part of the subsystem", why is the
-> MAINTAINERS entry for "CRYPTO LIBRARY" not being updated to include it?
+kernel test robot noticed a 12.5% regression of stress-ng.shm-sysv.ops_per_sec on:
 
-I don't know, but it should be, indeed. That is what we have been
-asking subsystems to do since the beginning (modulo exceptional
-cases). Some take direct ownership, some request to have a maintainer
-dedicated to that in the entry, some add a new sub-subsystem, etc.
 
-I hope that clarifies.
+commit: 62d8460a4e7a3ee028e5134d86169001490e7a60 ("[PATCH] rhashtable: use per-init-site lockdep classes for bucket locks")
+url: https://github.com/intel-lab-lkp/linux/commits/quanyeyang-via-B4-Relay/rhashtable-use-per-init-site-lockdep-classes-for-bucket-locks/20260815-014140
+patch link: https://lore.kernel.org/all/20260801-fix-rhashtable-bucket-lockdep-v1-1-15a0f8ae094c@gmail.com/
+patch subject: [PATCH] rhashtable: use per-init-site lockdep classes for bucket locks
 
-Cheers,
-Miguel
+testcase: stress-ng
+config: x86_64-rhel-9.4
+compiler: gcc-14
+test machine: 224 threads 2 sockets Intel(R) Xeon(R) Platinum 8480CTDX (Sapphire Rapids) with 256G memory
+parameters:
+
+	nr_threads: 100%
+	testtime: 60s
+	test: shm-sysv
+	cpufreq_governor: performance
+
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <yi1.lai@intel.com>
+| Closes: https://lore.kernel.org/oe-lkp/202608280842.861e5949-lkp@intel.com
+
+
+Details are as below:
+-------------------------------------------------------------------------------------------------->
+
+
+The kernel config and materials to reproduce are available at:
+https://download.01.org/0day-ci/archive/20260828/202608280842.861e5949-lkp@intel.com
+
+=========================================================================================
+compiler/cpufreq_governor/kconfig/nr_threads/rootfs/tbox_group/test/testcase/testtime:
+  gcc-14/performance/x86_64-rhel-9.4/100%/debian-13-x86_64-20250902.cgz/lkp-spr-r02/shm-sysv/stress-ng/60s
+
+commit: 
+  0131b508c0 ("Merge tag 'ntfs-for-7.2-rc6' of git://git.kernel.org/pub/scm/linux/kernel/git/linkinjeon/ntfs")
+  62d8460a4e ("[PATCH] rhashtable: use per-init-site lockdep classes for bucket locks")
+
+0131b508c0e2489e 62d8460a4e7a3ee028e5134d861
+---------------- --------------------------- 
+    192413           +44.1%     277255        stress-ng.shm-sysv.nanosecs_per_shmat_call
+    349549           +24.2%     433996        stress-ng.shm-sysv.nanosecs_per_shmdt_call
+    174600           +51.9%     265191        stress-ng.shm-sysv.nanosecs_per_shmget_call
+    793610           -12.5%     694260        stress-ng.shm-sysv.ops
+     13236           -12.5%      11578        stress-ng.shm-sysv.ops_per_sec
+     65737           -10.0%      59167 ±  4%  stress-ng.time.involuntary_context_switches
+  53645785           -12.0%   47213499 ±  2%  stress-ng.time.minor_page_faults
+      4660           +24.6%       5806        stress-ng.time.percent_of_cpu_this_job_got
+      2585           +27.8%       3305        stress-ng.time.system_time
+    214.61           -14.7%     183.11        stress-ng.time.user_time
+  10735595            -7.0%    9986470        stress-ng.time.voluntary_context_switches
+ 
+
+Disclaimer:
+Results have been estimated based on internal Intel analysis and are provided
+for informational purposes only. Any difference in system hardware or software
+design or configuration may affect actual performance.
+
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
+
+
