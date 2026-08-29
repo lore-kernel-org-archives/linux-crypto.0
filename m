@@ -1,218 +1,164 @@
-Received: from BN8PR05CU002.outbound.protection.outlook.com (mail-eastus2azon11011015.outbound.protection.outlook.com [52.101.57.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93494382F03;
-	Sat, 29 Aug 2026 15:08:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.57.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788016085; cv=fail; b=h0ry9IK6qxJDSplTSnQ5Z5a+MSmGH6zd9pqXMsV4EEZMQ8OxDTI57ZiQepbH3HJmLtaeXyvJsFaxxs+UHnd/JDujtgoyr7tqDxcXfaJDp0ZPmsmUqRlZ3VAYcPSiyQta+Y14qDvlosRZUlGIYmP5/p8hTLMWOIhBg5I+P2TQ94E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788016085; c=relaxed/simple;
-	bh=fAWQAi8Bf0+G0X70kolOo5BvJmcy2vmoL6XGw1bwDqA=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=FSuao+Camx3Fhtj1T+xDSCPNuBXAYqngJLvLnAsAC2r9I5QYdwYAJHe1373akmZh8GkPyQd+Q44JSu6zGvNY/W3RKhBaCfR+rWmCtvsFYvNlsGqVQU957R9FkK2XdmgaXL+rahimjtMjAWi6/NvU/50ITeRFfrguBfbnM+C4Bss=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=PMGwYfJO; arc=fail smtp.client-ip=52.101.57.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486093B530F
+	for <linux-crypto@vger.kernel.org>; Sat, 29 Aug 2026 19:43:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788032603; cv=none; b=A3DRXLQDQBwy76rzZYjCWmk0cgw+mq6uUjNZbOKW+N+eo7YceegCmD4H3Ggil790ZZMP3G34oYIcuV02wVCXa2i9qhKpyz/ntY0wApahhtQqbZ3cwBsk9Lw0a9Tgr7a7ZjTUjicUjkPa7032+GYXC/LUzvfY9WxGwmuMVQ6ioQ0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788032603; c=relaxed/simple;
+	bh=IFvVvmjX2mZpey30mo30J5RQZMA0IA52T4KOH0GMTvM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=R2pTzFOKOsIreJcNbxVL0iFy4sdHZacigw6y5QR3gTAq2elmtTc0QPe7zOELtYUaU3Od6otnPimRQ4Im7O5ehYQJYv679aZmySRe21rO9WPLIF+jPTfWYUFXyJdcw2KMAs2QG0sMr52rRXZzNHVe+u3RzccTtNptdD+KhGu7bV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZCeFa6be; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="PMGwYfJO"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=BTfIB4yLVEib+GE9ORUdgyI+Fz2KLYzs6scNarzL8ugqRfps4zFUj5llp36vFuvJL6oqwH6p4nQSPqTJRGTmdr0PNafkVJSj5ya6nq8hm2KHisovCAlzxSCCZS1kbB9WqzwB4YCqJ4uxX20712yDFth9DRFAVDUywOZ1Fov9KKpDMclGanqGUAHGTxpQxZ1z1Pcsfkzo9zQ69ytJRC31neX3D9mcxgJ2ulQN6s4rY5XEshmvnRuh+cgBRQmWBvJq5myDeJTklVBqQ/vPBZqWKYQQ4LKS2PV892dfU5s7TOk8CFRJKtrxCVtvhJqFPJCfuHBzpbBO2rC8+KdKqOaNww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=g6alh7U1JJwHPfTATb7dW6Il5QcrUB3zUGu9aemhrvA=;
- b=gOnsQBQ2KOSOM8qIz+jYOODDoQj3RIkGIfoj0okuL+D6+bOYd20hPyeMcUes1TaGCWOmtiRGt8citFwfB2Ne4EflunK0hUNghM4VX4fhAPtImRQK/JnBlT0N66Ij/WhQhP3YEjSI9vLlI4mCX324nAoe+ly0ZfRbUbJEOnhgz8SyXUyqVR36gcDaTVPZOXE8QLPWOBFAKWwZN+wa4SOcs5ddIIyPIZv9GpOeAz+NxiNTdX5y9GWflouXNJAdo9GY+VpUSe+2SmoL0ogn0EJsU36V43enjdedXmRShLyEyb+oRvAXHcyeOQJKAVS6yQoglY04bjHu6Pv46816QGYlEA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=g6alh7U1JJwHPfTATb7dW6Il5QcrUB3zUGu9aemhrvA=;
- b=PMGwYfJOMAIxtSeKn1JYtgl6ex9WMJUC1SzqwGsax/lmKnF3bSy2zTVUos+cVA3O79ARWEL09E551ATJDpsNPIaE/Dnj2l4FPn1skoqejDsKt3Y6AUPfrSE8CAAuc1shxhcUrZF+LxA9NO74RRZofIBER/DlD4o9Vzn2Y/qGWqE=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from SN7PR12MB8131.namprd12.prod.outlook.com (2603:10b6:806:32d::12)
- by DM3PR12MB9287.namprd12.prod.outlook.com (2603:10b6:8:1ac::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.360.12; Sat, 29 Aug
- 2026 15:07:59 +0000
-Received: from SN7PR12MB8131.namprd12.prod.outlook.com
- ([fe80::c2dd:62c5:67fe:aa46]) by SN7PR12MB8131.namprd12.prod.outlook.com
- ([fe80::c2dd:62c5:67fe:aa46%4]) with mapi id 15.21.0360.008; Sat, 29 Aug 2026
- 15:07:58 +0000
-Message-ID: <8a00da60-ccdc-4579-804e-0c7d7c12ebe1@amd.com>
-Date: Sat, 29 Aug 2026 10:07:55 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: ccp: Initialize DBC ioctl mutex before
- registering device
-To: Runyu Xiao <runyu.xiao@seu.edu.cn>, mario.limonciello@amd.com
-Cc: jianhao.xu@seu.edu.cn, john.allen@amd.com, herbert@gondor.apana.org.au,
- davem@davemloft.net, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20260829133410.1708684-1-runyu.xiao@seu.edu.cn>
-Content-Language: en-US
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Autocrypt: addr=thomas.lendacky@amd.com; keydata=
- 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
- WiyqywZI5g==
-In-Reply-To: <20260829133410.1708684-1-runyu.xiao@seu.edu.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH2PR07CA0037.namprd07.prod.outlook.com
- (2603:10b6:610:5b::11) To SN7PR12MB8131.namprd12.prod.outlook.com
- (2603:10b6:806:32d::12)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZCeFa6be"
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-47fde295992so1644882f8f.0
+        for <linux-crypto@vger.kernel.org>; Sat, 29 Aug 2026 12:43:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788032598; x=1788637398; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=AVYKdNB/XEBKGA3j23bRZsJH20yuQZjaM4yMJs/fEPM=;
+        b=ZCeFa6beg/pxKRD9RvraxbPWpph8Qb2jACVMOSZ9j5z2rFkXzaF/fxGJ1UZ8f2QRTe
+         6P0RH2xUKdT2lhH8PNwfSAL+J7py4lKIZJwP1Palu/DH2VLr0xMdeN7CiY38K22KCysx
+         Dhn8U/NXRIehLk1Zs3HmcyPHduutd0jyPWl5/rrWW2Qxo3CF0IdClrdCnIFHH3OTcvxh
+         znRA51Ge6LZ5BfURBPUT6h4KwbttfpT5BQfU5Ty7hGnOHpWlwKiu/E6rlqtW5VB93lC1
+         M1QA03GyNRE4yvAzL+oeZzOVlyd94Tk7CaP5ECOkq5qB0oA1ohc8GpfS4uQRXHg5rGfS
+         1Fcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788032598; x=1788637398;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=AVYKdNB/XEBKGA3j23bRZsJH20yuQZjaM4yMJs/fEPM=;
+        b=gbB46liyAj6tdgj+V5rVPiaa2Jbk0qwin960dJuStTkZ0QQ+Wmjo2BIsoQtY788S1I
+         TcCNut66rhW/C5ngm47xvbRovNSv4KlIkaNxRgj+c6SG/Aziig7b4J1KM586ulpzCGjn
+         71uUbFMrU5LNnlbrJrzoRDUYN8543NywWqQNFGC+hWgDezwS4emCG0PBdSmAGSDAEA1a
+         BFaQgqEoIyMJUJ/fuWnc8KUiEEOdG58mfiUxuDn7GmGeImgWOkj1pWv9Pxux0nVNBSit
+         okoppQsuV7rMnDNM+GB6+sJtuwtr/93HrxAvRb6rDentTgxBZvJkDsDediZwKvJ0htgC
+         M0aw==
+X-Forwarded-Encrypted: i=1; AKwUvBw+C8lzcCtBjfG1MV8u/eiaZFFWdg+Vf4/8Z7ORx1HdZx/f+esajGKSIbrFC4KDgkYDhS7X1bHVrlgrrmA=@vger.kernel.org
+X-Gm-Message-State: AFuF++kLvT06uq4+c5wGpWrEAEq9lvOU0CKESBh1BxzpAoqQrjlCoQjA
+	A4L6vy80hPMB6MvyeuCoGh55KI4lIxagA+d/IEDYLwTN5j272W8gxpSrHVDUaqRr
+X-Gm-Gg: AYBFou3xIGFUn2y/ee9sDi17hDULCC/RWrgxwzbBMiWznkefhFS4zOlipxeXw1Sf8N6
+	D0zmwMNSswANo+9E1G1DC7l/RjLT+E4dKWfu+Hm7iA463bcLtNIQ5bjJJjcFsviTI+1ORT+NAiw
+	cEjfO3NDbTf/Z/aWh5GReCaVGz0/43q+Tsav3QOQPG1o7e4SH6Z2NEjuC0lpkGtIsJ3EikmXZxp
+	cQfz+VrdDshKvQsjMy8A6nGxN7rkw/kudk8o6xoKbxgg2ym3iyfw8gAuxEu+SxZyP5t0W9LhzKz
+	51oya11KNt0gkyjjRaxbNKsHAJc9Qd6cHRbD8mp1ZWrKYMm7TQnitIcBii6LkC8MmeXBcEe3j+6
+	M7qknmnbbuZAsOn06nH+zQ9DdA+R54JC2WZ0eIS/YRJe7qVCYQWJ44RP+h0f8cs/9YvezkBL9J3
+	s7otdt+9KzJ1sz/M1zDft/Kq6/K7jQxYu9sClkbtiowWdkL71iCXaus7+GJet/Jfv+/1sW7so96
+	f8p/Q28+sytzwRB2CAGU9nSwOPvZyE86HNMEopVC7l0SMU9v394y5Hn9zb5i0hJgrYNTmlKysAk
+	ij4C+cWinu2RN0zj20LSQoTkGW6rx/ItXQRgyxoeSYTHkLqPpbZyzxHzpyxbRWh3Ozc=
+X-Received: by 2002:a05:6000:2583:b0:484:361a:1c7b with SMTP id ffacd0b85a97d-484361a20b2mr2894856f8f.7.1788032597670;
+        Sat, 29 Aug 2026 12:43:17 -0700 (PDT)
+Received: from localhost.localdomain (dynamic-2a02-3100-ae86-1b01-80e2-8851-4221-68d8.310.pool.telefonica.de. [2a02:3100:ae86:1b01:80e2:8851:4221:68d8])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4843310ab41sm4441984f8f.7.2026.08.29.12.43.16
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Sat, 29 Aug 2026 12:43:17 -0700 (PDT)
+From: Karl Mehltretter <kmehltretter@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: Karl Mehltretter <kmehltretter@gmail.com>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH] crypto: lskcipher - preserve state across unaligned chunks
+Date: Sat, 29 Aug 2026 21:43:14 +0200
+Message-Id: <20260829194314.42685-1-kmehltretter@gmail.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR12MB8131:EE_|DM3PR12MB9287:EE_
-X-MS-Office365-Filtering-Correlation-Id: 45599b5d-766f-43b1-27be-08df05df4fee
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|23010399003|366016|376014|6133799003|10067099003|5023799004|11063799006|56012099006|18002099003|22082099003;
-X-Microsoft-Antispam-Message-Info:
-	K6CJHnFgsAmEKo2F04RRsAT6Az20zBcCPYtnPYhvG0vcwIeyWOwqlTomd9nLkfG/CFvXoCXQgqLTNZzLTb/q6OI6RMYlih8ltCDfNJ9MCT4tybR6vsXzAzTmO3+2+pNMQZf3NS11NCpNB/HG9mGxIjHsliXpXjw+XGA9Kj+ogXbpJ5ryjjo4GirtLsyAcdcO9S0HhHYgEx46Ib5kEpods2Vrt/s3HP9NIuKv2ryaXSgrbmZSfNAwFDjVrtWMoaV5KQVOsA+sBF+6prWKfv3i+9hCbQDppkTGl0bkj9VdZG5m8uls4gMmLN3OCJpfdA6bG3wktFQGJOHkQSFXm+IrD8FbwYKQpJMfybLdUAYMW2Q0vUsbJGwwLOxMIocwJsLvIxZKjtBfxPmd3PAvyY+YvKoB/qOgnBoEfXsLEn1Z+MvX288dlYqwjgu4U0A2vJv+O5Xf5E2FmP6WLfpFD7d3IP1SQoR+b13b1g6wdhCdUxQ1Dh/hJJML+bto5mh/399arb5sB4Ah7mlwAo+KSNM7Mw8j9MsFNpZz+vfaXtKPBWfMD9kJiGk8m+81WDmW8aEKj+wUqoGFyiMdZ9VTrcBVTyO/GCi3jYyOQkGg+J4uhOxTtWZEHtvA8L08Ni80iZ6pl6h7N1FV6TV4U6DwdMwqIdHG2E9wAfRb0e8VPIIwJu4=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR12MB8131.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(23010399003)(366016)(376014)(6133799003)(10067099003)(5023799004)(11063799006)(56012099006)(18002099003)(22082099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?SnVtbkdkb2tFcTVBRmhjQ3BQNzROV3RvS0xYcm1zSnI3aTZhNUZjc1NpOFdz?=
- =?utf-8?B?WjFvNVJDL3NteTE1MmxaSXhMUnBuSlFEOEpNMjg0bXFyNlZtMTU3c1VzS0xy?=
- =?utf-8?B?L21HT2Q5Nm52SERLdWFmay8yZjFtOWlhVENGajc5SVROZTNKSGhzUVBSaC9v?=
- =?utf-8?B?dEw0RUhyTTdTU1lNemtkcjhKb3g4Q1VOT25CV2grZnVKTm4rb1hLcEVpUW1Q?=
- =?utf-8?B?YjB3dHpqUVNuTklzb09CbHM5dHRSUkIzKzI5UHR2dXhwR3RWeHBvRC9GYkRp?=
- =?utf-8?B?S1BFQ3lDajFiNUs2U0NpUlQvdVI1NnBWNkJKQkdnT0k5WlVZcDUwQ3l4d3FZ?=
- =?utf-8?B?ZldmVlZVdkRNenh1elVlTEY3UkFoeDNNQ0dzajRILy9YcEtXNG1aOFZObklp?=
- =?utf-8?B?cUtWOE1INVJCNG94UlBlYTB3RFNiNHVxRHp2Y2wrN21Mc1ltL2ZuSkVUY09T?=
- =?utf-8?B?MjJzNlVNdENwWit6aHQxTlR5RDNlOE9vYUhxdWZOSGNaSi9wUUNpTDdCVWhx?=
- =?utf-8?B?ak1CcXNoSk9Sc0JoVmFsM0hkcVFRejI5TnhBaU4xREd3aUZMSmJ6MnFsZ1E4?=
- =?utf-8?B?SldUZUVMMVdyYktOTFJYZTZQOXJXbWJMaVdmZmNHMDEzbHdLUkxIUWdzL1pz?=
- =?utf-8?B?STRUVFIyRUs1MWFuUFZYZzRkYlVlZjRDTkZtZXlHNlNqOEpOMlJoVHlXN0lm?=
- =?utf-8?B?c0dBOC85cVhteDlFaDlRbTNVb3gyUWFVV1RLU3hVenNpQUJNdlZrTFVQRFoz?=
- =?utf-8?B?TkVGcXBhVGVJSHhCWUEvQkFLTTJLMkdNV2pwcHhhVmVBeXUwMmpWOSt0NnFM?=
- =?utf-8?B?ZXhaVW5VN2k4QmlMVHcyekY0YjhUcStFaFhDbDVoay9mbERtQ3JQYWtib3lC?=
- =?utf-8?B?Q3JkRURUdXE2YkgweE45VFdzaG9NZFE0b0J0YVNIQUtZd1hEVytCMGVybVRD?=
- =?utf-8?B?TCtXTHV2dkRFalZpV1FUM3VUQTQyOUZWcjdkVkRNckNwd2taK1BGNFVXM1B4?=
- =?utf-8?B?c0kvMi9sT0pGV3I0QmUrbnpLL3YrdDd3Y3BiQ3dkNGswWWNYQnExYWYwdExr?=
- =?utf-8?B?WDg2eXdCK2pVRXgxcUJCTkZZaWVwZVFVR2dNMGRFM0tSUUR6b2hsSmxDbGZw?=
- =?utf-8?B?ejY4TDJUdDM3YXE0djhrQmRnN1dXU0NTamJnRkFOZUhvYjgzOSs0UVg5Z0to?=
- =?utf-8?B?TkFRbnhCc2RyKzNZbG8waHNDR09hdWZGdTBhVm1DYVJXVkk3RzdDbTd5UUd0?=
- =?utf-8?B?ZjJPMHduVm5jUkxDeVYvV1hiVTB3eHN4bmtMWlJRcmJXbUNwQndYS2FET01r?=
- =?utf-8?B?Q1ByT2Jady8reTJVQ2lRY1Rhcy9VZjdZb3JDQzRDa2lva3l0Rmd3bzk5bXNK?=
- =?utf-8?B?VGk3d29RVENBVDF0OTR0M001SGlhdUFCZW5hK29TTmtZRDJmNGdpaEZ2ckJQ?=
- =?utf-8?B?bTZTN1ZWeEJXWnpuYUgwS29NZEUybTZsa3JITVQxVEVsOU5EOWhWOEJWMFJx?=
- =?utf-8?B?bWRiZ3B0SFZ2NEtsbXhlempRanhPZUVKQklyVks1cHhOdHdUWjlubmdMOHpX?=
- =?utf-8?B?UFgzbnJoQis5NVlFSVh5Tnl3V09abmk5TC9jL2Q1K0g5Tkk3cWdUNndUVUhv?=
- =?utf-8?B?d3RvWVBkRHZLM2NJTllNSWtaUllIazVZcnBwTkU4VEJXT3ViWkNqb0tRRVdq?=
- =?utf-8?B?OWYxNkIwTVhsbEVxK0kwaTdXODloV0ZKMDlGR2hvZmptemtoVVFsYXRYT0N1?=
- =?utf-8?B?MmJrQysvcWlwcUlGV1g2WHduTkd6SEN2b1krenRvRjB3dmFHUWlGRG9xZ0FK?=
- =?utf-8?B?YXhxaWJldG5pTkFkSjViVm5TTHdiT2RXa1dMRU1CTzZ5RWRndHpMTXNBSXpZ?=
- =?utf-8?B?ancwTXRvY2hRVkdneTRDSCt3Qlp6S3pycndYclI3VFFmMkZQSkE0WG9ISFZx?=
- =?utf-8?B?VUdWcllDSHpnT0xUR3BJejcwNTJ4SS9Kd2p4Q2VpTlpNblZyZjd3Nkl0SWI4?=
- =?utf-8?B?WFAzUXBVQjRTUkZ4LzhUbUlxdi9OYmFNN0cxelVXWmFDUkxUUnJDLy9oWEU3?=
- =?utf-8?B?UkNJV1pmWnNHSUdSUXB3cEljd1BwSUdUMEN2UlFSYXB3dW02K1pRMFROdXkw?=
- =?utf-8?B?d3d3YW83MTM3b0FFNHdQSFdPbTFOTitYN05XVHZKb2pTVHZaUGNHK3pKTVQr?=
- =?utf-8?B?VElGUWtkejRxOFF3eTZjdThlT01DdnljMzRLRWZHNGxJNVYyUXVlaXdjcGtI?=
- =?utf-8?B?YlRtcHBWQnBybUxNNm4vanFmYXlOdXFCM2lYUG12OU5SNHU4YVdxaXVSR21G?=
- =?utf-8?Q?EeYyxe6+kFBfL36r20?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 45599b5d-766f-43b1-27be-08df05df4fee
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR12MB8131.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Aug 2026 15:07:58.8137
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: S7WY4hE3GQtOppsdYyZ7ZFGC9sJ4Vaw6Ai/Ii3tsU/8OqhMVWxoHBYvU9Ur1FUbFkP6cJLgnQOMyxDDxTglMPA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR12MB9287
+Content-Transfer-Encoding: 8bit
 
-On 8/29/26 08:34, Runyu Xiao wrote:
-> dbc_dev_init() registers the DBC misc device before initializing
-> ioctl_mutex. Once misc_register() publishes the device, userspace can
-> open it and invoke dbc_ioctl() while the mutex is still uninitialized.
-> 
-> Initialize ioctl_mutex before calling misc_register() so the published
-> ioctl callback always sees an initialized mutex.
-> 
-> Fixes: c04cf9e14f10 ("crypto: ccp - Add support for fetching a nonce for dynamic boost control")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
-> Assisted-by: Codex:GPT-5
-> ---
->  drivers/crypto/ccp/dbc.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/crypto/ccp/dbc.c b/drivers/crypto/ccp/dbc.c
-> index 410084a90..00c864413 100644
-> --- a/drivers/crypto/ccp/dbc.c
-> +++ b/drivers/crypto/ccp/dbc.c
-> @@ -240,12 +240,12 @@ int dbc_dev_init(struct psp_device *psp)
->  	dbc_dev->char_dev.name = "dbc";
->  	dbc_dev->char_dev.fops = &dbc_fops;
->  	dbc_dev->char_dev.mode = 0600;
-> +	mutex_init(&dbc_dev->ioctl_mutex);
+crypto_lskcipher_crypt_unaligned() splits a request into page-sized
+chunks but never sets CRYPTO_LSKCIPHER_FLAG_CONT, so a stateful algorithm
+restarts from its keyed state at every page boundary. It also marks every
+chunk CRYPTO_LSKCIPHER_FLAG_FINAL, which is wrong but harmless: chunks are
+trimmed to a multiple of the chunk size, so the trailing partial block that
+FINAL guards against is caught after the loop instead.
 
-This mixes it in with the misc_register() settings and the call, move it
-to just before all the settings.
+ARC4 is the only lskcipher with internal state, and cbc, the other
+in-tree user of the direct API, never passes more than one block, so
+this went unnoticed. bpf_crypto_crypt() however hands
+__bpf_dynptr_data() to crypto_lskcipher_encrypt() unchecked, leaving
+both alignment and length to the BPF program. An 8192-byte ARC4 request
+offset by one byte comes back with its second page identical to its
+first: the keystream is reused.
 
-Thanks,
-Tom
+Set FINAL only on the last chunk and CONT after the first, mirroring the
+progression used by crypto_lskcipher_crypt_sg().
 
-> +
->  	ret = misc_register(&dbc_dev->char_dev);
->  	if (ret)
->  		goto cleanup_mbox;
->  
-> -	mutex_init(&dbc_dev->ioctl_mutex);
-> -
->  	return 0;
->  
->  cleanup_mbox:
+Fixes: 0ae4dcc1ebf6 ("crypto: skcipher - Add internal state support")
+Assisted-by: LLM
+Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+---
+Reproduced on a Raspberry Pi 400 (Cortex-A72) with a BPF program that
+creates a "skcipher"/"arc4" context, takes a dynptr over an 8192-byte map
+value, offsets it by one with bpf_dynptr_adjust() and calls
+bpf_crypto_encrypt(). Unpatched, the second page of the output equals the
+first; patched, it matches an aligned run exactly, final state included.
 
+Rebuilding that needs two programs: bpf_crypto_ctx_create() is KF_SLEEPABLE
+and only available to BPF_PROG_TYPE_SYSCALL, bpf_crypto_encrypt() only to
+SCHED_CLS/SCHED_ACT/XDP, so the context passes between them as a kptr.
+
+With CONFIG_CRYPTO_ARC4=m, load arc4 first: arc4.ko advertises only the
+legacy "ecb(arc4)" alias, so a cold create with algo "arc4" fails with
+-EOPNOTSUPP before reaching this path. CONFIG_CRYPTO_ARC4=y also works.
+
+ecb(aes), cbc(aes) and cbc(camellia) were checked the same way before and
+after at several lengths and misalignments and are unchanged; with generic
+ciphers they have alignmask 0 and never enter the helper.
+
+The helper is not dead code, in case removing it looks tempting: ecb() and
+cbc() inherit the wrapped cipher's alignmask (crypto/ecb.c), and geode-aes,
+padlock-aes and sparc64 camellia still declare one, so those instances use
+it today. They are all stateless, hence unaffected by the flag handling.
+
+Not an unprivileged surface: the crypto kfuncs need CAP_BPF, and
+bpf_crypto_encrypt() additionally CAP_NET_ADMIN.
+
+ crypto/lskcipher.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/crypto/lskcipher.c b/crypto/lskcipher.c
+index a8b07594005db..6c30436a11354 100644
+--- a/crypto/lskcipher.c
++++ b/crypto/lskcipher.c
+@@ -75,6 +75,7 @@ static int crypto_lskcipher_crypt_unaligned(
+ 	unsigned ivsize = crypto_lskcipher_ivsize(tfm);
+ 	unsigned bs = crypto_lskcipher_blocksize(tfm);
+ 	unsigned cs = crypto_lskcipher_chunksize(tfm);
++	u32 flags = 0;
+ 	int err;
+ 	u8 *tiv;
+ 	u8 *p;
+@@ -98,13 +99,16 @@ static int crypto_lskcipher_crypt_unaligned(
+ 
+ 		if (chunk > cs)
+ 			chunk &= ~(cs - 1);
++		if (chunk == len)
++			flags |= CRYPTO_LSKCIPHER_FLAG_FINAL;
+ 
+ 		memcpy(p, src, chunk);
+-		err = crypt(tfm, p, p, chunk, tiv, CRYPTO_LSKCIPHER_FLAG_FINAL);
++		err = crypt(tfm, p, p, chunk, tiv, flags);
+ 		if (err)
+ 			goto out;
+ 
+ 		memcpy(dst, p, chunk);
++		flags |= CRYPTO_LSKCIPHER_FLAG_CONT;
+ 		src += chunk;
+ 		dst += chunk;
+ 		len -= chunk;
+
+base-commit: cf72cbb39da84b6f02f90c07f33b102fc10b16f0
+-- 
+2.53.0
