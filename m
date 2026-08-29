@@ -1,164 +1,304 @@
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486093B530F
-	for <linux-crypto@vger.kernel.org>; Sat, 29 Aug 2026 19:43:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50F4F272E6D;
+	Sat, 29 Aug 2026 20:52:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788032603; cv=none; b=A3DRXLQDQBwy76rzZYjCWmk0cgw+mq6uUjNZbOKW+N+eo7YceegCmD4H3Ggil790ZZMP3G34oYIcuV02wVCXa2i9qhKpyz/ntY0wApahhtQqbZ3cwBsk9Lw0a9Tgr7a7ZjTUjicUjkPa7032+GYXC/LUzvfY9WxGwmuMVQ6ioQ0=
+	t=1788036782; cv=none; b=ClBn0fT5/fOeH/FkvWSP4LBXuFKl5k5OAuGy4Nc+tytgRy7MZ7uIxuLqJX1T7CSaBThl3E+s9VUSt7boPGsspXJeCynSx7HoxoNXvWugJMlT3gkESFMWNawhn9pyY+z/qE0gdY1Dr62cszs912kNP5zPvF30uDklTpxC+eWOIOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788032603; c=relaxed/simple;
-	bh=IFvVvmjX2mZpey30mo30J5RQZMA0IA52T4KOH0GMTvM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=R2pTzFOKOsIreJcNbxVL0iFy4sdHZacigw6y5QR3gTAq2elmtTc0QPe7zOELtYUaU3Od6otnPimRQ4Im7O5ehYQJYv679aZmySRe21rO9WPLIF+jPTfWYUFXyJdcw2KMAs2QG0sMr52rRXZzNHVe+u3RzccTtNptdD+KhGu7bV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZCeFa6be; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1788036782; c=relaxed/simple;
+	bh=B4zSGLdJ2v1MrTTIuygmOZOntoAOMbC/y04ayaQhSvQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rthWnrRS6CSVVTQ3zu3POlfSzxWIJ7HWRTfnCFR7HCbvcJaD3cvrrT+iMD8xT0Coh5rohlif9154wWNVaIGDgebTtH3ZPmDemVYP1irr1br86oNY2txga71+E8z4PxfOzDCOfi9TkAbNj676NRT5ELPJB9xFqa/6Ii1l5GoJa+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=U4cuRQLV; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZCeFa6be"
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-47fde295992so1644882f8f.0
-        for <linux-crypto@vger.kernel.org>; Sat, 29 Aug 2026 12:43:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788032598; x=1788637398; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=AVYKdNB/XEBKGA3j23bRZsJH20yuQZjaM4yMJs/fEPM=;
-        b=ZCeFa6beg/pxKRD9RvraxbPWpph8Qb2jACVMOSZ9j5z2rFkXzaF/fxGJ1UZ8f2QRTe
-         6P0RH2xUKdT2lhH8PNwfSAL+J7py4lKIZJwP1Palu/DH2VLr0xMdeN7CiY38K22KCysx
-         Dhn8U/NXRIehLk1Zs3HmcyPHduutd0jyPWl5/rrWW2Qxo3CF0IdClrdCnIFHH3OTcvxh
-         znRA51Ge6LZ5BfURBPUT6h4KwbttfpT5BQfU5Ty7hGnOHpWlwKiu/E6rlqtW5VB93lC1
-         M1QA03GyNRE4yvAzL+oeZzOVlyd94Tk7CaP5ECOkq5qB0oA1ohc8GpfS4uQRXHg5rGfS
-         1Fcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788032598; x=1788637398;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=AVYKdNB/XEBKGA3j23bRZsJH20yuQZjaM4yMJs/fEPM=;
-        b=gbB46liyAj6tdgj+V5rVPiaa2Jbk0qwin960dJuStTkZ0QQ+Wmjo2BIsoQtY788S1I
-         TcCNut66rhW/C5ngm47xvbRovNSv4KlIkaNxRgj+c6SG/Aziig7b4J1KM586ulpzCGjn
-         71uUbFMrU5LNnlbrJrzoRDUYN8543NywWqQNFGC+hWgDezwS4emCG0PBdSmAGSDAEA1a
-         BFaQgqEoIyMJUJ/fuWnc8KUiEEOdG58mfiUxuDn7GmGeImgWOkj1pWv9Pxux0nVNBSit
-         okoppQsuV7rMnDNM+GB6+sJtuwtr/93HrxAvRb6rDentTgxBZvJkDsDediZwKvJ0htgC
-         M0aw==
-X-Forwarded-Encrypted: i=1; AKwUvBw+C8lzcCtBjfG1MV8u/eiaZFFWdg+Vf4/8Z7ORx1HdZx/f+esajGKSIbrFC4KDgkYDhS7X1bHVrlgrrmA=@vger.kernel.org
-X-Gm-Message-State: AFuF++kLvT06uq4+c5wGpWrEAEq9lvOU0CKESBh1BxzpAoqQrjlCoQjA
-	A4L6vy80hPMB6MvyeuCoGh55KI4lIxagA+d/IEDYLwTN5j272W8gxpSrHVDUaqRr
-X-Gm-Gg: AYBFou3xIGFUn2y/ee9sDi17hDULCC/RWrgxwzbBMiWznkefhFS4zOlipxeXw1Sf8N6
-	D0zmwMNSswANo+9E1G1DC7l/RjLT+E4dKWfu+Hm7iA463bcLtNIQ5bjJJjcFsviTI+1ORT+NAiw
-	cEjfO3NDbTf/Z/aWh5GReCaVGz0/43q+Tsav3QOQPG1o7e4SH6Z2NEjuC0lpkGtIsJ3EikmXZxp
-	cQfz+VrdDshKvQsjMy8A6nGxN7rkw/kudk8o6xoKbxgg2ym3iyfw8gAuxEu+SxZyP5t0W9LhzKz
-	51oya11KNt0gkyjjRaxbNKsHAJc9Qd6cHRbD8mp1ZWrKYMm7TQnitIcBii6LkC8MmeXBcEe3j+6
-	M7qknmnbbuZAsOn06nH+zQ9DdA+R54JC2WZ0eIS/YRJe7qVCYQWJ44RP+h0f8cs/9YvezkBL9J3
-	s7otdt+9KzJ1sz/M1zDft/Kq6/K7jQxYu9sClkbtiowWdkL71iCXaus7+GJet/Jfv+/1sW7so96
-	f8p/Q28+sytzwRB2CAGU9nSwOPvZyE86HNMEopVC7l0SMU9v394y5Hn9zb5i0hJgrYNTmlKysAk
-	ij4C+cWinu2RN0zj20LSQoTkGW6rx/ItXQRgyxoeSYTHkLqPpbZyzxHzpyxbRWh3Ozc=
-X-Received: by 2002:a05:6000:2583:b0:484:361a:1c7b with SMTP id ffacd0b85a97d-484361a20b2mr2894856f8f.7.1788032597670;
-        Sat, 29 Aug 2026 12:43:17 -0700 (PDT)
-Received: from localhost.localdomain (dynamic-2a02-3100-ae86-1b01-80e2-8851-4221-68d8.310.pool.telefonica.de. [2a02:3100:ae86:1b01:80e2:8851:4221:68d8])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4843310ab41sm4441984f8f.7.2026.08.29.12.43.16
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sat, 29 Aug 2026 12:43:17 -0700 (PDT)
-From: Karl Mehltretter <kmehltretter@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: Karl Mehltretter <kmehltretter@gmail.com>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [PATCH] crypto: lskcipher - preserve state across unaligned chunks
-Date: Sat, 29 Aug 2026 21:43:14 +0200
-Message-Id: <20260829194314.42685-1-kmehltretter@gmail.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="U4cuRQLV"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 8889640E039E;
+	Sat, 29 Aug 2026 20:52:56 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id NNr9zwtt48Ym; Sat, 29 Aug 2026 20:52:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1788036766; bh=RXU+41X6N0UK5DI5Zk12OSxGRdbePYrhCOq4AMtWKbc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=U4cuRQLVzGJ+NTHQdYb273h+HBXCKwR2cC06XI9/4n/9QbsCPyFSiOF0/cVJbowOp
+	 EHHIuDv63tyNaN2mJ9ne5qcEQ3Jtm1HS8A2s9MvAvCb5f0B0yYAiiGPQohc1c1OQa/
+	 zBMtNu06C6XLNBTMarq4H2RjD6aMUyPSTA+wFzdpDjd+3Ol3ZMc7hEp32oEsFSYokx
+	 uoMG92Xop7mSFq/oFfKSECU1x/91eUFSI+SpuCpZo7tk1E2zZpio7dxXOlKJb2oW1h
+	 8787xuggW9V9CHkLmCVPg/03HZY55Pkk6Q9zW6v78xWF5QqKMkKWhUhoYmsABZWceA
+	 1eeeFqigi/sNvS/I0tYJMNKJ7Q4Csx8h/L3DPv8v8cV40bU9pIr4nkCzBipxAbTCs1
+	 Z8cY6LBWmw9vmvZ0OvAIHGFvN+KM9hXls8gEM8c3yNW989IRXgEufD3PRzaWh/3TTU
+	 J9VT9/EXDmjJdWKHEjnIzfco7bmeBXoezU5zMHLxZo57XyqZIJwM1bBILVySmmSwZR
+	 KzLfYcjiKc07Q9fAuBISkKGgQO02tZjjpn0tynmGmtWAUoNbFjJmqHdR2m83czQ9sh
+	 DJtpzqLo7oo2/xFdQOEakh0Cjb3VB7t0GgpOJJuPGOpT0x2DUPRYw04IeoHpiavuwn
+	 J4663te3s3uSVnrMCxhSVi5Y=
+Received: from stx.tnic (unknown [IPv6:2600:1700:38ca:c00::3a])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7504240E02C2;
+	Sat, 29 Aug 2026 20:52:11 +0000 (UTC)
+Date: Sat, 29 Aug 2026 13:52:08 -0700
+From: Borislav Petkov <bp@alien8.de>
+To: Ashish Kalra <Ashish.Kalra@amd.com>
+Cc: tglx@kernel.org, mingo@redhat.com, dave.hansen@linux.intel.com,
+	x86@kernel.org, hpa@zytor.com, seanjc@google.com,
+	peterz@infradead.org, thomas.lendacky@amd.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org,
+	pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
+	KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com,
+	Nathan.Fontenot@amd.com, ackerleytng@google.com, jackyli@google.com,
+	pgonda@google.com, rientjes@google.com, jacobhxu@google.com,
+	xin@zytor.com, pawan.kumar.gupta@linux.intel.com,
+	babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com,
+	john.allen@amd.com, darwi@linutronix.de,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	kvm@vger.kernel.org, linux-coco@lists.linux.dev
+Subject: Re: [PATCH v12 4/5] x86/sev: Add support to perform RMP
+ optimizations asynchronously
+Message-ID: <20260829205208.GDapNGeGMOs02IrkGS@fat_crate.local>
+References: <cover.1786389115.git.ashish.kalra@amd.com>
+ <9c9502278f68af9da19f0dd583ba303d0e6d66d2.1786389115.git.ashish.kalra@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <9c9502278f68af9da19f0dd583ba303d0e6d66d2.1786389115.git.ashish.kalra@amd.com>
 
-crypto_lskcipher_crypt_unaligned() splits a request into page-sized
-chunks but never sets CRYPTO_LSKCIPHER_FLAG_CONT, so a stateful algorithm
-restarts from its keyed state at every page boundary. It also marks every
-chunk CRYPTO_LSKCIPHER_FLAG_FINAL, which is wrong but harmless: chunks are
-trimmed to a multiple of the chunk size, so the trailing partial block that
-FINAL guards against is caught after the loop instead.
+On Mon, Aug 10, 2026 at 07:22:10PM +0000, Ashish Kalra wrote:
+> +/*
+> + * RMPOPT optimizations skip RMP checks at 1GB granularity if this range of
+> + * memory does not contain any SNP guest memory.
+> + *
+> + * @pa is a system physical address; RMPOPT operates on the containing 1GB.
+> + */
+> +static void rmpopt(u64 pa)
+> +{
+> +	u64 pa_start = ALIGN_DOWN(pa, SZ_1G);
+> +	enum rmpopt_op_type op = RMPOPT_OP_VERIFY_AND_REPORT_STATUS;
+> +
+> +	/*
+> +	 * RMPOPT (F2 0F 01 FC): RAX = 1GB-aligned SPA, RCX = op type, CF set if
+> +	 * the range was optimized (result unused on this path).
+> +	 *
+> +	 * Binutils does not support the RMPOPT mnemonic yet, so the instruction
+> +	 * is encoded with .byte.
+> +	 */
 
-ARC4 is the only lskcipher with internal state, and cbc, the other
-in-tree user of the direct API, never passes more than one block, so
-this went unnoticed. bpf_crypto_crypt() however hands
-__bpf_dynptr_data() to crypto_lskcipher_encrypt() unchecked, leaving
-both alignment and length to the BPF program. An 8192-byte ARC4 request
-offset by one byte comes back with its second page identical to its
-first: the keystream is reused.
+I don't know whether you've checked the binutils sources but this should have
+the version of binutils which supports it and I think there is no such version
+yet - I've pinged binutils team to see what their plans are.
 
-Set FINAL only on the last chunk and CONT after the first, mirroring the
-progression used by crypto_lskcipher_crypt_sg().
+> +	asm volatile(".byte 0xf2, 0x0f, 0x01, 0xfc"
+> +		     :: "a" (pa_start), "c" (op)
+> +		     : "memory", "cc");
+> +}
+> +
+> +/* on_each_cpu() callback: optimize the whole RMPOPT range on this CPU. */
+> +static void rmpopt_scan_range(void *arg)
+> +{
+> +	u64 pa;
+> +
+> +	for (pa = rmpopt_pa_start; pa < rmpopt_pa_end; pa += SZ_1G)
+> +		rmpopt(pa);
+> +}
+> +
+> +static void rmpopt_work_handler(struct work_struct *work)
+> +{
+> +	int this_cpu;
+> +
+> +	/*
+> +	 * RMPOPT scans the RMP table, stores the result of the scan in the
+> +	 * reserved processor memory. The RMP scan is the most expensive
+> +	 * part. If a second RMPOPT occurs, it can skip the expensive scan
+> +	 * if they can see a cached result in the reserved processor memory.
+> +	 *
+> +	 * Run RMPOPT on one CPU first (the leader), then on every other primary
+> +	 * thread (the followers).  A follower skips the expensive RMP scan by
+> +	 * reusing the cached scan results the leader produced.
+> +	 *
+> +	 * migrate_disable() pins this work to the current CPU so it stays the
+> +	 * leader for the whole leader loop: this_cpu remains valid and the
+> +	 * RMPOPT instruction runs on it.
+> +	 */
+> +	migrate_disable();
+> +	this_cpu = smp_processor_id();
+> +
+> +	cpumask_andnot(rmpopt_follower_mask, rmpopt_cpumask,
+> +		       topology_sibling_cpumask(this_cpu));
+> +
+> +	rmpopt_scan_range(NULL);
+> +
+> +	migrate_enable();
+> +
+> +	/*
+> +	 * Followers: one IPI per remaining core, each optimizing the whole
+> +	 * range.  Each runs with interrupts disabled, but only issues cache-hit
+> +	 * RMPOPTs (the leader populated the scan cache above), so the window is
+> +	 * short.  cpus_read_lock() is intentionally not held: CPU hotplug is
+> +	 * disabled the entire time SNP is active (see snp_prepare()), and this
+> +	 * work only runs while SNP is active, so the follower set stays valid.
+> +	 */
+> +	on_each_cpu_mask(rmpopt_follower_mask, rmpopt_scan_range, NULL, true);
 
-Fixes: 0ae4dcc1ebf6 ("crypto: skcipher - Add internal state support")
-Assisted-by: LLM
-Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
----
-Reproduced on a Raspberry Pi 400 (Cortex-A72) with a BPF program that
-creates a "skcipher"/"arc4" context, takes a dynptr over an 8192-byte map
-value, offsets it by one with bpf_dynptr_adjust() and calls
-bpf_crypto_encrypt(). Unpatched, the second page of the output equals the
-first; patched, it matches an aligned run exactly, final state included.
+If the leader ran once and the results are cached, then does it matter if
+I run RMPOPT on it again? IOW, what's stopping me from doing
 
-Rebuilding that needs two programs: bpf_crypto_ctx_create() is KF_SLEEPABLE
-and only available to BPF_PROG_TYPE_SYSCALL, bpf_crypto_encrypt() only to
-SCHED_CLS/SCHED_ACT/XDP, so the context passes between them as a kptr.
+	on_each_cpu_mask(rmpopt_cpumask, rmpopt_scan_range, NULL, true);
 
-With CONFIG_CRYPTO_ARC4=m, load arc4 first: arc4.ko advertises only the
-legacy "ecb(arc4)" alias, so a cold create with algo "arc4" fails with
--EOPNOTSUPP before reaching this path. CONFIG_CRYPTO_ARC4=y also works.
+and don't care about leaders and followers at all?
 
-ecb(aes), cbc(aes) and cbc(camellia) were checked the same way before and
-after at several lengths and misalignments and are unchanged; with generic
-ciphers they have alignmask 0 and never enter the helper.
+Also, rmpopt_mask is cpu_primary_thread_mask and you don't need any of those
+gymnastics.
 
-The helper is not dead code, in case removing it looks tempting: ecb() and
-cbc() inherit the wrapped cipher's alignmask (crypto/ecb.c), and geode-aes,
-padlock-aes and sparc64 camellia still declare one, so those instances use
-it today. They are all stateless, hence unaffected by the flag handling.
+IOW, this is how my cleanup ontop looks like so far:
 
-Not an unprivileged surface: the crypto kfuncs need CAP_BPF, and
-bpf_crypto_encrypt() additionally CAP_NET_ADMIN.
-
- crypto/lskcipher.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/crypto/lskcipher.c b/crypto/lskcipher.c
-index a8b07594005db..6c30436a11354 100644
---- a/crypto/lskcipher.c
-+++ b/crypto/lskcipher.c
-@@ -75,6 +75,7 @@ static int crypto_lskcipher_crypt_unaligned(
- 	unsigned ivsize = crypto_lskcipher_ivsize(tfm);
- 	unsigned bs = crypto_lskcipher_blocksize(tfm);
- 	unsigned cs = crypto_lskcipher_chunksize(tfm);
-+	u32 flags = 0;
- 	int err;
- 	u8 *tiv;
- 	u8 *p;
-@@ -98,13 +99,16 @@ static int crypto_lskcipher_crypt_unaligned(
+diff --git a/arch/x86/virt/svm/sev.c b/arch/x86/virt/svm/sev.c
+index 55a6e2319899..a1f6f3111517 100644
+--- a/arch/x86/virt/svm/sev.c
++++ b/arch/x86/virt/svm/sev.c
+@@ -125,7 +125,6 @@ static void *rmp_bookkeeping __ro_after_init;
  
- 		if (chunk > cs)
- 			chunk &= ~(cs - 1);
-+		if (chunk == len)
-+			flags |= CRYPTO_LSKCIPHER_FLAG_FINAL;
+ static u64 probed_rmp_base, probed_rmp_size;
  
- 		memcpy(p, src, chunk);
--		err = crypt(tfm, p, p, chunk, tiv, CRYPTO_LSKCIPHER_FLAG_FINAL);
-+		err = crypt(tfm, p, p, chunk, tiv, flags);
- 		if (err)
- 			goto out;
+-static cpumask_var_t rmpopt_cpumask, rmpopt_follower_mask;
+ static u64 rmpopt_pa_start, rmpopt_pa_end;
  
- 		memcpy(dst, p, chunk);
-+		flags |= CRYPTO_LSKCIPHER_FLAG_CONT;
- 		src += chunk;
- 		dst += chunk;
- 		len -= chunk;
+ enum rmpopt_op_type {
+@@ -587,11 +586,9 @@ static void rmpopt_disable(void)
+ 	cancel_delayed_work_sync(&rmpopt_delayed_work);
+ 	destroy_workqueue(rmpopt_wq);
+ 
+-	for_each_cpu(cpu, rmpopt_cpumask)
++	for_each_cpu(cpu, cpu_primary_thread_mask)
+ 		wrmsrq_on_cpu(cpu, MSR_AMD64_RMPOPT_BASE, 0);
+ 
+-	free_cpumask_var(rmpopt_cpumask);
+-	free_cpumask_var(rmpopt_follower_mask);
+ 	rmpopt_pa_start = rmpopt_pa_end = 0;
+ 	rmpopt_wq = NULL;
+ }
+@@ -632,16 +629,9 @@ static bool rmpopt_capable(void)
+  */
+ static void rmpopt(u64 pa)
+ {
+-	u64 pa_start = ALIGN_DOWN(pa, SZ_1G);
+ 	enum rmpopt_op_type op = RMPOPT_OP_VERIFY_AND_REPORT_STATUS;
++	u64 pa_start = ALIGN_DOWN(pa, SZ_1G);
+ 
+-	/*
+-	 * RMPOPT (F2 0F 01 FC): RAX = 1GB-aligned SPA, RCX = op type, CF set if
+-	 * the range was optimized (result unused on this path).
+-	 *
+-	 * Binutils does not support the RMPOPT mnemonic yet, so the instruction
+-	 * is encoded with .byte.
+-	 */
+ 	asm volatile(".byte 0xf2, 0x0f, 0x01, 0xfc"
+ 		     :: "a" (pa_start), "c" (op)
+ 		     : "memory", "cc");
+@@ -656,43 +646,22 @@ static void rmpopt_scan_range(void *arg)
+ 		rmpopt(pa);
+ }
+ 
+-static void rmpopt_work_handler(struct work_struct *work)
++static void do_rmpopt_work(struct work_struct *work)
+ {
+ 	int this_cpu;
+ 
+ 	/*
+-	 * RMPOPT scans the RMP table, stores the result of the scan in the
+-	 * reserved processor memory. The RMP scan is the most expensive
+-	 * part. If a second RMPOPT occurs, it can skip the expensive scan
+-	 * if they can see a cached result in the reserved processor memory.
+-	 *
+-	 * Run RMPOPT on one CPU first (the leader), then on every other primary
+-	 * thread (the followers).  A follower skips the expensive RMP scan by
+-	 * reusing the cached scan results the leader produced.
+-	 *
+-	 * migrate_disable() pins this work to the current CPU so it stays the
+-	 * leader for the whole leader loop: this_cpu remains valid and the
+-	 * RMPOPT instruction runs on it.
++	 * RMPOPT caches the results of a RMP table scan in reserved processor
++	 * memory, allowing future invocations to skip such costly operations.
+ 	 */
+ 	migrate_disable();
+ 	this_cpu = smp_processor_id();
+ 
+-	cpumask_andnot(rmpopt_follower_mask, rmpopt_cpumask,
+-		       topology_sibling_cpumask(this_cpu));
+-
+ 	rmpopt_scan_range(NULL);
+ 
+ 	migrate_enable();
+ 
+-	/*
+-	 * Followers: one IPI per remaining core, each optimizing the whole
+-	 * range.  Each runs with interrupts disabled, but only issues cache-hit
+-	 * RMPOPTs (the leader populated the scan cache above), so the window is
+-	 * short.  cpus_read_lock() is intentionally not held: CPU hotplug is
+-	 * disabled the entire time SNP is active (see snp_prepare()), and this
+-	 * work only runs while SNP is active, so the follower set stays valid.
+-	 */
+-	on_each_cpu_mask(rmpopt_follower_mask, rmpopt_scan_range, NULL, true);
++	on_each_cpu_mask(cpu_primary_thread_mask, rmpopt_scan_range, NULL, true);
+ }
+ 
+ void snp_setup_rmpopt(void)
+@@ -729,30 +698,7 @@ void snp_setup_rmpopt(void)
+ 		return;
+ 	}
+ 
+-	INIT_DELAYED_WORK(&rmpopt_delayed_work, rmpopt_work_handler);
+-
+-	if (!zalloc_cpumask_var(&rmpopt_cpumask, GFP_KERNEL)) {
+-		pr_err("Failed to allocate RMPOPT cpumask\n");
+-		destroy_workqueue(rmpopt_wq);
+-		rmpopt_wq = NULL;
+-		return;
+-	}
+-
+-	if (!zalloc_cpumask_var(&rmpopt_follower_mask, GFP_KERNEL)) {
+-		pr_err("Failed to allocate RMPOPT follower cpumask\n");
+-		free_cpumask_var(rmpopt_cpumask);
+-		destroy_workqueue(rmpopt_wq);
+-		rmpopt_wq = NULL;
+-		return;
+-	}
+-
+-	/*
+-	 * The RMPOPT_BASE MSR has core scope. All primary threads are online,
+-	 * otherwise SNP would not have been enabled.
+-	 */
+-	for_each_online_cpu(cpu)
+-		if (topology_is_primary_thread(cpu))
+-			cpumask_set_cpu(cpu, rmpopt_cpumask);
++	INIT_DELAYED_WORK(&rmpopt_delayed_work, do_rmpopt_work);
+ 
+ 	rmpopt_pa_start = ALIGN_DOWN(PFN_PHYS(min_low_pfn), SZ_1G);
+ 	rmpopt_base = rmpopt_pa_start | MSR_AMD64_RMPOPT_ENABLE;
+@@ -761,7 +707,7 @@ void snp_setup_rmpopt(void)
+ 	 * Per-CPU RMPOPT tables cover at most 2 TB.  Program each core's
+ 	 * RMPOPT_BASE with the start of RAM to optimize up to 2 TB.
+ 	 */
+-	for_each_cpu(cpu, rmpopt_cpumask)
++	for_each_cpu(cpu, cpu_primary_thread_mask)
+ 		wrmsrq_on_cpu(cpu, MSR_AMD64_RMPOPT_BASE, rmpopt_base);
+ 
+ 	rmpopt_pa_end = ALIGN(PFN_PHYS(max_pfn), SZ_1G);
 
-base-commit: cf72cbb39da84b6f02f90c07f33b102fc10b16f0
 -- 
-2.53.0
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
