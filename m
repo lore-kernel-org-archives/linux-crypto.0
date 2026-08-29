@@ -1,136 +1,122 @@
-Received: from mta1.migadu.com (out-148.mta1.migadu.com [95.215.58.148])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D60638BF70
-	for <linux-crypto@vger.kernel.org>; Fri, 28 Aug 2026 21:54:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3D3C8635D
+	for <linux-crypto@vger.kernel.org>; Sat, 29 Aug 2026 03:59:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1787954051; cv=none; b=Je7JNqz4eruzzrQ4t8iYrGIeaclZGl558YjEVyJ4tPUZF+883vpP1B3GnJyXzqMct328jMcXDj2Yo4N/r22Ci2DjFyY8gfRhOqMyTu22iTSOrgL8ZdYlyIcsiLpEiDrtf8JpsJCo05J6KrYb8wzz46LoI6nCVJZ8MabvZ9X2IVw=
+	t=1787975987; cv=none; b=oZ0LMppQmjTZY1MNGaxE/TY57MQ9jDqaK0Dc/6EpOlR0MvSkGyBwOjb7LYe3t0bkxgi+PY1NcyKxbvICW8fkVtHZm/aRQueFzXOPBLUzIgvz2/sx3XmAuEzo4S+MtNI8GVDZXXMcGtW5Dd6iNjlkf2kcUI/8EarfXEME/BoxmTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1787954051; c=relaxed/simple;
-	bh=5+eRRSBmCBRgSPBWzjUGNn9aTqnNzTiJA7y5CU2N/Gc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WwGglFeU9iIP+z4sht7Iwo/JsnDt2v/0mifsORp48LXFJvcvU1Q2M8d+Gi+nWRDaM127MdhHMlCoBr9qNXppAP+o9xD949j6lk50fANpRboB+ndpwqWOFYSdvgb2vPYAsbq1Asa6bUS3tncgX0iuDFzcqtBJ9kYevNWFCy1w7Uk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ly9si7oY; arc=none smtp.client-ip=95.215.58.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1787975987; c=relaxed/simple;
+	bh=rzJtIdLT8UA8L588NMG94kUUnaCb9UBM2MX+0o46NKo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rk5pAkNxDPB9uUA4ZcSMNps65FoAuwgCYggp6LA9aBpuVcGx5ISP44x5HGZXnl6Aa5jpA8JQMCHju66UNji1a+u05nyxxSWvpmrQ7EXAMp4+Zouf4cfyGZPsvIZTAy14gQVUIt/2qXlgrX9Pv5D3FiYuh5Qb38I/srMjDZbYCpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eHV+VNBG; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ly9si7oY"
-X-Envelope-To: linux-crypto@vger.kernel.org
-DKIM-Signature: a=rsa-sha256; bh=5+eRRSBmCBRgSPBWzjUGNn9aTqnNzTiJA7y5CU2N/Gc=;
- c=simple/simple; d=linux.dev;
- h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
- t=1787954048; v=1; x=1788558848;
- b=Ly9si7oYdpchxRPRjQuhwGTeuxijO5pRC4uJ/6u5kXTq2WXQ8P7KYtaz0Eb+CsblB9aW0Ntr
- aVWo5NuMe4Di1aX5rtpd4cLoydTqB/h6p3AWYVvhp6iHqLnI00QV83wc0gMXmP8LNHdtWNZA4T3
- fr6W1FjIry6OersGa1QI22o4=
-X-Envelope-To: linux-crypto@vger.kernel.org
-Received: by smtp.migadu.com with ESMTPS id a377096cbc5bc423;
-	Fri, 28 Aug 2026 21:54:08 +0000
-X-Mizu-Trace-ID: a377096cbc5bc423
-X-Migadu-Flow: FLOW_OUT
-Message-ID: <c0bca273-1395-419a-a2eb-5627f2243452@linux.dev>
-Date: Fri, 28 Aug 2026 22:54:07 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eHV+VNBG"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4953e04ef16so15723485e9.2
+        for <linux-crypto@vger.kernel.org>; Fri, 28 Aug 2026 20:59:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1787975984; x=1788580784; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=TUlNGUgQY5khe/spcmDkrmv1B33pEeDXrJ5iK2i5+wc=;
+        b=eHV+VNBG3Zs9Eng7apvvCq2tCRnC5t0Xp/UY89sAn5Jdllbu9JWkhQK8CGIJca4Dtw
+         mBPBzp4DgunQhS3JL2W5g8KBtzPk3M++NmTRQcLud7AdHtQ7ebLjRBJ/E1lB7fQRFJWO
+         Aj+umnyB6EWc9uVObEGHVEZqZseAlcNZx6Jft7NDQetLStI6o9ptDD+I6106aeo3V5xZ
+         FPDMizYiYKeWAzwJoRoOY5HRsET9E/zbaVxhyWtjBhOzfZ4CICzEC9R+KOiDBuE4S9xE
+         YA9/ClqQ0MAT+Uliw3vjgYrBP+LA7ImIS1039+/SF6mDIW+FkOazB7XS+0otTY/x3CtD
+         IzRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1787975984; x=1788580784;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=TUlNGUgQY5khe/spcmDkrmv1B33pEeDXrJ5iK2i5+wc=;
+        b=IKCzBGUQ1hynbV73XC8p4cAFJ/QBEnrJ5suum1kxAdzv75aevKH2+YcDs20fL5EPh8
+         uYFkHAXK0v85UoFb6M3lGpCY+F6nyoDzJbLS5tAYMxvN5pwsuZw27rAC4sw42uRqmXZb
+         kTeqmnrfr6bzK6mQ3XFWhBRW/7J4OY6ttWXHiFkY7v5Q+t7CJyIyQeK47TWO6yuOVUXl
+         SVAUDQVa25dZZQ02WsnVKIJB7ThkkPZ8Yfq+xDE2xnj87vljoriLA9j7m6yDTjpAXlGE
+         u3E3cPOX/afvAelglEvLkh9G3sMYI3xyA8OYszZLphU10R0apts1l0LazdJ4bJoyC22g
+         /uFw==
+X-Forwarded-Encrypted: i=1; AHgh+RosnfTlIH9SnDhXJ/5F/Us1gFDEQohDgkW0HAs9v2DaD/l2sxcIRSSlXqHtkpFaHySz/0n5luXFFm7WUto=@vger.kernel.org
+X-Gm-Message-State: AFuF++kf05X8AXs8S2izs9fTPeE2JjPWMhFFA7N1Rr6154I8GYLs4h87
+	emRsSSIrg19roUeFGE0vjqAen3GdZLEeR8d08Kx+k3jcwOzeIh9rGs2U
+X-Gm-Gg: AR+sD11ZtgWxAj2M+GBqjKYecy4383gg5oBy0jzTnOHJVxzkKfIkLdMuCth6yCIA+Ui
+	q/S+pTwhv3nXlDYJGxTjpNTY+VyPZiwg4cqHW7C92EoH8k1FgRTo4ox4Auu+C5qMjy98dE1jo/R
+	QigQ8vfGX1i9VyeP/5Cj5MaapqKnWY8CpGs8a/+r5GmTMH5qtGemWHGbd1mTwWvv2lrtLKq+5E7
+	+mYESHp2NGwv8ceAAKA04EyaLbr9Pg1iUi6ulsfw1QTpBNz2Iuz/lsJeI1kOPemId4E4o0XulDy
+	xgyZRfvg0L4yZ/M3umsnnLiD3nml3OaKWWOGsZJoMbnyPzMnxZFyb47VRQZQpiGNpxqUzSHik6J
+	NcLk9g8RaqECRbesXpuXx2jRGPLcsM5h6VZdn7/2cKzUDiqKtY6Z6G0K94KrIItZIDSVuVYjOwT
+	tirsSjsy/EhPYtmNl7jaFLmOTjiof/Lfflz8SLvdL6H6lZiH8G3R66u2OmGNV52PAOvfZ2/TH7z
+	vcDFi7u81kQQPuoV7qVzUEIWe9LxfGq4BMcI2dyQrwfGcWChW+2AELLSefELfbHWOlEBxRui3Um
+	hc25r8qbiFKnXdpFj/NN
+X-Received: by 2002:a05:600c:1c0a:b0:499:51f0:a9b2 with SMTP id 5b1f17b1804b1-49b91c1dd3fmr176903705e9.1.1787975983850;
+        Fri, 28 Aug 2026 20:59:43 -0700 (PDT)
+Received: from localhost.localdomain (dynamic-077-007-015-136.77.7.pool.telefonica.de. [77.7.15.136])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49b94dd2517sm100738355e9.7.2026.08.28.20.59.42
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Fri, 28 Aug 2026 20:59:43 -0700 (PDT)
+From: Karl Mehltretter <kmehltretter@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Karl Mehltretter <kmehltretter@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Pramod Gurav <pramod.gurav@smartplayin.com>,
+	linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: atmel-tdes - zero-initialize device state
+Date: Sat, 29 Aug 2026 05:58:21 +0200
+Message-Id: <20260829035821.67220-1-kmehltretter@gmail.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/3] zstd: probe the CPU for BMI2 support once, not per
- context
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Eric Biggers <ebiggers@kernel.org>, David Sterba <dsterba@suse.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Nick Terrell <terrelln@fb.com>,
- Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, yosry@kernel.org,
- Johannes Weiner <hannes@cmpxchg.org>, Nhat Pham <nphamcs@gmail.com>,
- Chengming Zhou <chengming.zhou@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>, Kernel Team <kernel-team@meta.com>
-References: <CAHk-=whZf9=X+qKkO9_pQzbLdOnbMw5yO8gu0TkahegVW3cC-g@mail.gmail.com>
-Content-Language: en-US
-From: Usama Arif <usama.arif@linux.dev>
-In-Reply-To: <CAHk-=whZf9=X+qKkO9_pQzbLdOnbMw5yO8gu0TkahegVW3cC-g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
+Commit c659d07f11a3 ("crypto: atmel-tdes - Switch to managed version of
+kzalloc") accidentally replaced kzalloc() with devm_kmalloc(), so the
+device state is no longer zeroed.
 
+atmel_tdes_hw_init() tests dd->flags during probe: a stale TDES_FLAGS_INIT
+skips the hardware reset, and a stale TDES_FLAGS_BUSY makes
+atmel_tdes_handle_queue() treat the engine as permanently busy, leaving
+every request queued and never dispatched.
 
-On 28/08/2026 21:19, Linus Torvalds wrote:
-> [ Sorry for breaking threading - I have turned off IMAP access to my
-> mailbox, and so I have issues replying to lore messages sanely ]
-> 
-> On Thu, 27 Aug 2026, Usama Arif wrote:
->>
->> On 27/08/2026 03:39, Eric Biggers wrote:
->>>
->>> Why not just use cpu_feature_enabled(X86_FEATURE_BMI2), which compiles
->>> down to a static branch?  All these issues are caused by lib/zstd/ using
->>> its own custom CPU feature detection code, instead of the normal CPU
->>> feature detection code that the rest of the kernel uses.
-> 
-> Yes, please. The zlib code is just broken in how it makes up its own
-> random inine asm that is actively worse than what the kernel already
-> exposes.
-> 
->> The only issue I saw with that was that zstd is a standalone library that
->> is imported
-> 
-> Let's ignore that part, and just make it work right. The Zstd people
-> should think about this problem on their side.
-> 
->> Keep the existing raw CPUID fallback for preboot and other builds which
->> cannot use the normal x86 feature infrastructure. Also retain the early
->> return when dynamic dispatch is disabled.
-> 
-> No, this is not great, that whole
-> 
->         cctx->bmi2 = ZSTD_cpuSupportsBmi2();
->         ...
->         if (bmi2) ...
-> 
-> model in zstd needs to just die.
-> 
-> For the kernel, the whole dynamic "test a variable" model is simply wrong.
-> It should expand to
-> 
->         if (cpu_feature_enabled(X86_FEATURE_BMI2))
-> 
-> because for the kernel, that becomes a simple static branch.
-> 
-> When zstd goes through that variable, it loses that entirely and
-> instead turns it in a static assignment and then a dynamic test (well,
-> not "entirely" - with inlining it could still recover the right code).
-> 
-> So zstd really should be fixed to get rid of that bad
-> 
->         #if DYNAMIC_BMI2
->             if (bmi2) {
->          ....
-> 
-> pattern entirely, and be taught to have a *helper* macro that just turns
-> into 0 for when DYNAMIC_BMI2 is not set, and turns into using that stupid
-> flag in user mode, and for the kernel it should just turn into that
-> "cpu_feature_enabled(X86_FEATURE_BMI2)"
-> 
-> Why does it check for both BMI1 and BMI2 anyway? And Arif added an
-> extra check for ABM. That all looks bogus. You can't have BMI2 without
-> having BMI1, so all this code looks completely bogus to begin with.
-> 
+Seen on a SAM9X75 Curiosity: the first TDES request after boot never
+completes and the TDES interrupt count stays at zero, while the AES and
+SHA engines on the same SoC work normally.
 
-The three checks came from interpreting BMI2_TARGET_ATTRIBUTE("lzcnt,bmi,bmi2")
-as requiring all three feature bits. Agreed that this is unnecessary here.
-The kernel path should check only X86_FEATURE_BMI2.
+Switch to devm_kzalloc(), matching the Atmel AES and SHA drivers.
 
-I was also trying to preserve zstd’s standalone-library behavior.
-I will instead make normal x86 kernel builds use a helper that expands directly to
-cpu_feature_enabled(X86_FEATURE_BMI2) at each dispatch site. The stored BMI2
-context flag and private CPUID probe will be removed from that path.
-Preboot and standalone builds will retain their existing caller-provided 
-lag and CPUID-based detection.
+Fixes: c659d07f11a3 ("crypto: atmel-tdes - Switch to managed version of kzalloc")
+Cc: stable@vger.kernel.org
+Assisted-by: LLM
+Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+---
+ drivers/crypto/atmel-tdes.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I will send a revised patch in a little bit.
+diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
+index ffea1db74651..2756dab3f4c7 100644
+--- a/drivers/crypto/atmel-tdes.c
++++ b/drivers/crypto/atmel-tdes.c
+@@ -933,7 +933,7 @@ static int atmel_tdes_probe(struct platform_device *pdev)
+ 	struct resource *tdes_res;
+ 	int err;
+ 
+-	tdes_dd = devm_kmalloc(&pdev->dev, sizeof(*tdes_dd), GFP_KERNEL);
++	tdes_dd = devm_kzalloc(&pdev->dev, sizeof(*tdes_dd), GFP_KERNEL);
+ 	if (!tdes_dd)
+ 		return -ENOMEM;
+ 
+-- 
+2.39.5 (Apple Git-154)
 
-Thanks!
-Usama
