@@ -1,35 +1,36 @@
 Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
 	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 979823B4E81;
-	Sun, 30 Aug 2026 13:08:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EA0E3B4407;
+	Sun, 30 Aug 2026 13:13:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788095286; cv=none; b=akNp4jpbdbmzHbysuLeC59uAkFDAKj/Le/ZDTd+2qRyIWVFEVAlRK83ILnDPILRuQjJkkaKZNn0H6I++Ljf5dgO5o+j/5+J2raxaaUvFF+wQ3EZI5C0WpI+YH5PlqUDmxDsA/MHr+4t1gvQw+EduhqwhTLZaF7OcppamBaNCEC8=
+	t=1788095588; cv=none; b=ZQn8wiWE0GFC1tShASYFPZca+a3ks3Cc5NR29f1i0YC4NjWyHJGISgWQgAqLA4oAjH5V14FiSC9URKS51NL996JxU/JeZJcnCXXLtv3sDP3fyPcDMGnGISk51Gv9z2rq7MW23juCpx3tZ1nHe1NbIwwGzGlH9dWf6jAFkHOaKDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788095286; c=relaxed/simple;
-	bh=g4dOvEXL4ZYUUCgoiTokQCfy9OFRqEFluD322yinIQE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LonozmLMA0DZc50u8FTQcWH3sIv0QXmF+fZIdWVvBBdVY+9cnqFtPmMezU9jGv25GtW0my+MYYehtrwLrttCkgRecmvoZXrB6DXotDGLkwo4AG9m1744RTNP4bhRj9amo+FchNmHKYS5Wq5SayTE2Nxkt+pw+sS+D5U7B24CZns=
+	s=arc-20240116; t=1788095588; c=relaxed/simple;
+	bh=B8uB5Qmc5dw+/mqdxiOxRI+9H01d8ITaC6Dx86OE+Fk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LAeMIUmiQ30YVwO3Q17OpiYBKtjycoYE5LHY5WATGf0GZ1yJSUhBt1pJffkWzKBaHL72Gm1RCMgEiwBbnATI7w/scHzXTjgpr0zn8VO2q3k/zT7BPrM0zSJWLn4Omdm9NyY17gAooQyetLzBZDPQ+rE+SVk17uB0vM1w53FTHO0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
 Received: from localhost.localdomain (unknown [111.196.241.250])
-	by APP-03 (Coremail) with SMTP id rQCowABncD4mK5Rqp9aaBg--.48169S2;
-	Sun, 30 Aug 2026 21:07:50 +0800 (CST)
+	by APP-03 (Coremail) with SMTP id rQCowABXXDpXLJRqpeeaBg--.33442S2;
+	Sun, 30 Aug 2026 21:12:55 +0800 (CST)
 From: Pengpeng Hou <pengpeng@iscas.ac.cn>
-To: Corentin Labbe <clabbe@baylibre.com>
+To: Olivia Mackall <olivia@selenic.com>
 Cc: Pengpeng Hou <pengpeng@iscas.ac.cn>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
+	Frank Li <Frank.Li@nxp.com>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
 	linux-crypto@vger.kernel.org,
+	imx@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
-	linux-rockchip@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: rockchip: propagate activation errors
-Date: Sun, 30 Aug 2026 21:07:48 +0800
-Message-ID: <20260830130748.944-1-pengpeng@iscas.ac.cn>
+Subject: [PATCH] hwrng: imx-rngc: propagate clock enable errors
+Date: Sun, 30 Aug 2026 21:12:53 +0800
+Message-ID: <20260830131253.2718-1-pengpeng@iscas.ac.cn>
 X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -38,11 +39,11 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowABncD4mK5Rqp9aaBg--.48169S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Aw1rGw1xuw1UGFy8XF47Arb_yoW8ZFW3pr
-	13GrZrArWkCr4xGa95tr1rZF4rX3ySyry3Jr47K3WfAw1aqw1IgrWayFy0vFnxAFy8J3y5
-	AFs7Aa48CF1xZFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9214x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+X-CM-TRANSID:rQCowABXXDpXLJRqpeeaBg--.33442S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Zry8tF45AF47JrWkWF47twb_yoW8GFy7pF
+	W5G3yF9r4DXrWUtFWDJFWxJ3ZYkw43CFWxK3y5Ka4xZFn5AF97tFySyFyvqF45ZFW0yF1a
+	qF4rJFykCas0vr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9I14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
 	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
 	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
 	6r4UJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Cr
@@ -53,71 +54,50 @@ X-Coremail-Antispam: 1UD129KBjvJXoW7Aw1rGw1xuw1UGFy8XF47Arb_yoW8ZFW3pr
 	Cjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWl
 	x4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1I6r
 	4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1lIxAIcVCF04k26cxKx2IYs7xG6r1j
-	6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYx
-	BIdaVFxhVjvjDU0xZFpf9x0JUgXocUUUUU=
+	6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJb
+	IYCTnIWIevJa73UjIFyTuYvjfU5dgADUUUU
 X-CM-SenderInfo: pshqw1xhqjqxpvfd2hldfou0/
 
-The Rockchip crypto driver ignores reset and crypto-engine start failures
-in
-probe, and ignores a reset deassertion failure during runtime resume. It
-can therefore publish or resume the crypto device without a usable engine.
+imx_rngc_probe() reads hardware registers after enabling its clock without
+checking the result, and the runtime resume callback always reports success
+after the same unchecked operation.
 
-Return reset and engine-start failures, and disable the clocks if a runtime
-resume reset deassertion fails.
+Propagate clock-enable errors before accessing the RNG and to the
+runtime-PM
+core on resume.
 
-Fixes: 433cd2c617bf ("crypto: rockchip - add crypto driver for rk3288")
+Fixes: 1d5449445bd0 ("hwrng: mx-rngc - add a driver for Freescale RNGC")
 Signed-off-by: Pengpeng Hou <pengpeng@iscas.ac.cn>
 ---
- drivers/crypto/rockchip/rk3288_crypto.c | 21 +++++++++++++++++----
- 1 file changed, 17 insertions(+), 4 deletions(-)
+ drivers/char/hw_random/imx-rngc.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/rockchip/rk3288_crypto.c b/drivers/crypto/rockchip/rk3288_crypto.c
-index 7cb1316b6f189..18ecbec1f101b 100644
---- a/drivers/crypto/rockchip/rk3288_crypto.c
-+++ b/drivers/crypto/rockchip/rk3288_crypto.c
-@@ -133,7 +133,12 @@ static int rk_crypto_pm_resume(struct device *dev)
- 	if (ret)
- 		return ret;
+diff --git a/drivers/char/hw_random/imx-rngc.c b/drivers/char/hw_random/imx-rngc.c
+index 7693328f10564..00a21d62c79c3 100644
+--- a/drivers/char/hw_random/imx-rngc.c
++++ b/drivers/char/hw_random/imx-rngc.c
+@@ -266,7 +266,9 @@ static int __init imx_rngc_probe(struct platform_device *pdev)
+ 	if (irq < 0)
+ 		return irq;
  
--	reset_control_deassert(rkdev->rst);
-+	ret = reset_control_deassert(rkdev->rst);
-+	if (ret) {
-+		rk_crypto_disable_clk(rkdev);
+-	clk_prepare_enable(rngc->clk);
++	ret = clk_prepare_enable(rngc->clk);
++	if (ret)
 +		return ret;
-+	}
-+
- 	return 0;
  
+ 	ver_id = readl(rngc->base + RNGC_VER_ID);
+ 	rng_type = FIELD_GET(RNG_TYPE, ver_id);
+@@ -338,9 +340,7 @@ static int imx_rngc_resume(struct device *dev)
+ {
+ 	struct imx_rngc *rngc = dev_get_drvdata(dev);
+ 
+-	clk_prepare_enable(rngc->clk);
+-
+-	return 0;
++	return clk_prepare_enable(rngc->clk);
  }
-@@ -341,9 +346,14 @@ static int rk_crypto_probe(struct platform_device *pdev)
- 		goto err_crypto;
- 	}
  
--	reset_control_assert(crypto_info->rst);
-+	err = reset_control_assert(crypto_info->rst);
-+	if (err)
-+		goto err_crypto;
-+
- 	usleep_range(10, 20);
--	reset_control_deassert(crypto_info->rst);
-+	err = reset_control_deassert(crypto_info->rst);
-+	if (err)
-+		goto err_crypto;
- 
- 	crypto_info->reg = devm_platform_ioremap_resource(pdev, 0);
- 	if (IS_ERR(crypto_info->reg)) {
-@@ -374,7 +384,10 @@ static int rk_crypto_probe(struct platform_device *pdev)
- 		goto err_crypto;
- 	}
- 
--	crypto_engine_start(crypto_info->engine);
-+	err = crypto_engine_start(crypto_info->engine);
-+	if (err)
-+		goto err_pm;
-+
- 	init_completion(&crypto_info->complete);
- 
- 	err = rk_crypto_pm_init(crypto_info);
+ static const struct dev_pm_ops imx_rngc_pm_ops = {
 
 base-commit: 08dbfad3f5040f5bdb6c529da20d6d4e81fefd72
 -- 
