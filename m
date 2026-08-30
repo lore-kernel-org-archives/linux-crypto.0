@@ -1,41 +1,67 @@
-Received: from mail-m49198.qiye.163.com (mail-m49198.qiye.163.com [45.254.49.198])
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9227725B0B9;
-	Sun, 30 Aug 2026 01:51:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52EA94086A;
+	Sun, 30 Aug 2026 10:24:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788054700; cv=none; b=XUu9/ZCyVr4XEy9u5hgR1N4hl/DVWni4HHRUROFzugWj5mYEy9lYYlsldD1N3GHXdrNpj7NJkLaGk0KQeFLvbjfIdqTGUoXB37Dahu8JO7q43J0eRzRWQsHcw488oN6bSp2GXrzrx2N0X0rvwf1Emder7VQWkDDxQf5zH2DIdRA=
+	t=1788085493; cv=none; b=tLAE+MHy/XE0zJolE5IsDXDztosF9bIbkPa7vnnkx23zxR8TRsJ48aI96ryhWjiLCy7lHcfa+cgUEgXVhqaJSC5rZ3RbNgs9pOPIXRa5AZ1+cOB7Cz22+EBJSkfDqtQRM+VupFLIJSp14HpfR4nl7GP5kzA9YxnmfkH8RqCneVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788054700; c=relaxed/simple;
-	bh=u+jOu82T2Vpuxz80KFOge2EQ0q7wFuyLh5VGuv89T6E=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nw+Y+3niYhHdtrLkLFtRpMHInw9C0wZLA5fsxsM+ujmcNhvaGQoDDpOVcjXbZVOE2xez9t+DosCJ+kR+G79BIP2RXuaX+z1uZmVQ7O0ZByNwmFyd5otFbYrOupLMrQKYmcPVJy6yCKSmnTNrJ9okOFTNVbDazMUHKYdRkCircXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=kWP/Ii4E; arc=none smtp.client-ip=45.254.49.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
+	s=arc-20240116; t=1788085493; c=relaxed/simple;
+	bh=/xQqq2F78uimG+g8/cBVSpRGnUqLT/RocKUf4xON28M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZBsXOIJ+lGADwzUgNaE0HqOdQzXrRDryF4Ei1fKlZgLKLBZ+qFQ0viaOP783+E0kiBq2uaD2W7K5OYDzgQbUQi9MPahAt/WoZ0JWASyiUo2GT1DLxq3EzMtR5WZSy0V016cs6VfD/TOXedyJPWi9fwF+hIXXEO50WTYFRZMVisI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=xJWjiFX3; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=xJNuYAFX; arc=none smtp.client-ip=80.241.56.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="kWP/Ii4E"
-Received: from PC-202605011814.localdomain (unknown [58.241.16.34])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 4bd15770c;
-	Sun, 30 Aug 2026 09:51:30 +0800 (GMT+08:00)
-From: Runyu Xiao <runyu.xiao@seu.edu.cn>
-To: mario.limonciello@amd.com
-Cc: thomas.lendacky@amd.com,
-	john.allen@amd.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="xJWjiFX3";
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="xJNuYAFX"
+Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4hXpCG6pNlz8v1Y;
+	Sun, 30 Aug 2026 12:24:42 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1788085482;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=hUg3LnMKjV9MVE0n08fRIjqBr7ECB//Eerd8cLFE4fg=;
+	b=xJWjiFX3MDMvqVROFKNrk7mkZgZsK6kOo1AgkAeTvkjLV1uBgfEwbLIhbUGM3CG8FKKoWH
+	2IM/VGqJ0jm4xvGnl7UDA8NgEPKkvf7zrRjO5YXE6tT255ixz4rXSrFEt6XBgyFUrMvTVV
+	bZQG05k0jt7GExNpZt76yGLGxCzjzcyUGTqiyVNqcXjCtPmIZTusIjR+i4AMKr23Zs1HBd
+	CtcgUXprBzLQ3xPEeSIWdhhKah0gs897b8nCBuegIsC/VTvAiDYn0VE0pA3uzeHN7KWqGZ
+	tlwga5nri3/5vqFHFTe2JjmNo4SxD1D2xFOraybRdexIHUvrYiXbGSXvg/s7og==
+Authentication-Results: outgoing_mbo_mout;
+	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b=xJNuYAFX;
+	spf=pass (outgoing_mbo_mout: domain of manuelebnerli@mailbox.org designates 2001:67c:2050:b231:465::1 as permitted sender) smtp.mailfrom=manuelebnerli@mailbox.org
+From: Manuel Ebner <manuelebnerli@mailbox.org>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1788085481;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=hUg3LnMKjV9MVE0n08fRIjqBr7ECB//Eerd8cLFE4fg=;
+	b=xJNuYAFXEVdbkpwFYuvr22tl1ozi5iicKwEomIUH6TPHkkArizub3FiJZl0KIAxxFC7qta
+	2zY2yIH6u8+X5nShRPFQ1fDvgqcU8vmGpUaGpvMsNYJCZIQCcofd2e/JvvgqaLhv2CMKrV
+	8mtnfqoHUDh3KbGG0+/C6CliIACOaIG91HLNBATxWobkxmZ5Q+6NAvvrv9udx6iEHWY//Y
+	2PLGrJk9tERSsq28shulSVaoMxAfbZ5DQnZxugIluN+53o5meM0SmtOO0UR0Oy24eXLhRE
+	taP0U0ZUFTf7Eo92gzkctj4rvmmcVOnqNHwf6/nnSK8tDy+QDGQZnqLbP5d23A==
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Cheng-Yang Chou <yphbchou0911@gmail.com>,
+	Eric Biggers <ebiggers@kernel.org>
+Cc: Manuel Ebner <manuelebnerli@mailbox.org>,
+	Kees Cook <kees@kernel.org>,
 	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	runyu.xiao@seu.edu.cn,
-	jianhao.xu@seu.edu.cn
-Subject: [PATCH v2] crypto: ccp: Initialize DBC ioctl mutex before registering device
-Date: Sun, 30 Aug 2026 09:51:04 +0800
-Message-Id: <20260830015104.2040153-1-runyu.xiao@seu.edu.cn>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20260829133410.1708684-1-runyu.xiao@seu.edu.cn>
-References: <20260829133410.1708684-1-runyu.xiao@seu.edu.cn>
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: arm64/aes-neonbs: transition to kmalloc_obj()
+Date: Sun, 30 Aug 2026 12:17:14 +0200
+Message-ID: <20260830101714.625728-3-manuelebnerli@mailbox.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -43,56 +69,46 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0aa0505d59dd03a1kunmd7826b21e7dac
-X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWRgWCB1ZQUpXWS1ZQUlXWQ8JGhUIEh9ZQVkZTE0dVkJLSxkdQxhISx9MGVYeHw
-	5VEwETFhoSFyQUDg9ZV1kYEgtZQVlOQ1VJT0pVSk1VSE9ZV1kWGg8SFR0UWUFZT0tIVUpLSEpPSE
-	xVSktLVUpCS0tZBg++
-DKIM-Signature: a=rsa-sha256;
-	b=kWP/Ii4EvbygR3rSFVn2CU7Yne0IWqlLSJDa3ujGm+YvViahMS7aJ9b0Hh7JXe4MdkqI6r5z5jdc+cH3/RFI+LShcyQztX3SSQ5C2jikmUB+aQiSpTqlX0Cup595xlEkV8367/jtGtup4Gr0XiNH5jjteiexQgj0Va5BZCfj3xM=; s=default; c=relaxed/relaxed; d=seu.edu.cn; v=1;
-	bh=y740TBYuiOL4j25V3xrb8r9hhghIl4Frs7wek9rWvUk=;
-	h=date:mime-version:subject:message-id:from;
+X-MBO-RS-META: ipfna54i738khrgexqrc7bq9u1f7nd7i
+X-MBO-RS-ID: 592fd02ed3e8ea0018b
+X-Rspamd-Queue-Id: 4hXpCG6pNlz8v1Y
 
-dbc_dev_init() registers the DBC misc device before initializing
-ioctl_mutex. Once misc_register() publishes the device, userspace can
-open it and invoke dbc_ioctl() while the mutex is still uninitialized.
+Convert to type aware allocation as suggested in commit 2932ba8d9c99
+("slab: Introduce kmalloc_obj() and family")
 
-Initialize ioctl_mutex before calling misc_register() so the published
-ioctl callback always sees an initialized mutex.
-
-Fixes: c04cf9e14f10 ("crypto: ccp - Add support for fetching a nonce for dynamic boost control")
-Cc: stable@vger.kernel.org
-Link: https://lore.kernel.org/all/20260829133410.1708684-1-runyu.xiao@seu.edu.cn/
-Signed-off-by: Runyu Xiao <runyu.xiao@seu.edu.cn>
-Assisted-by: Codex:GPT-5
+CC: Kees Cook <kees@kernel.org>
+Fixes: 652a3017c485 ("crypto: arm64/aes-neonbs - Move key expansion off the stack")
+Signed-off-by: Manuel Ebner <manuelebnerli@mailbox.org>
 ---
-v2:
-- Move mutex initialization before setting up the misc device, as suggested
-  by Tom Lendacky.
-
- drivers/crypto/ccp/dbc.c | 4 ++--
+I have a couple similar patches lined up but they could be automated or maybe
+the script is already made by Kees.
+Kees can you make a script assisted commit (again)?
+---
+ arch/arm64/crypto/aes-neonbs-glue.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/ccp/dbc.c b/drivers/crypto/ccp/dbc.c
-index 410084a9039c..4db49a14550c 100644
---- a/drivers/crypto/ccp/dbc.c
-+++ b/drivers/crypto/ccp/dbc.c
-@@ -235,6 +235,8 @@ int dbc_dev_init(struct psp_device *psp)
- 		goto cleanup_mbox;
- 	}
+diff --git a/arch/arm64/crypto/aes-neonbs-glue.c b/arch/arm64/crypto/aes-neonbs-glue.c
+index 5bcbac979..7cb1aede9 100644
+--- a/arch/arm64/crypto/aes-neonbs-glue.c
++++ b/arch/arm64/crypto/aes-neonbs-glue.c
+@@ -66,7 +66,7 @@ static int aesbs_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
+ 	struct crypto_aes_ctx *rk;
+ 	int err;
  
-+	mutex_init(&dbc_dev->ioctl_mutex);
-+
- 	dbc_dev->char_dev.minor = MISC_DYNAMIC_MINOR;
- 	dbc_dev->char_dev.name = "dbc";
- 	dbc_dev->char_dev.fops = &dbc_fops;
-@@ -243,8 +245,6 @@ int dbc_dev_init(struct psp_device *psp)
- 	if (ret)
- 		goto cleanup_mbox;
+-	rk = kmalloc(sizeof(*rk), GFP_KERNEL);
++	rk = kmalloc_obj(*rk);
+ 	if (!rk)
+ 		return -ENOMEM;
  
--	mutex_init(&dbc_dev->ioctl_mutex);
--
- 	return 0;
+@@ -128,7 +128,7 @@ static int aesbs_cbc_ctr_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
+ 	struct crypto_aes_ctx *rk;
+ 	int err;
  
- cleanup_mbox:
+-	rk = kmalloc(sizeof(*rk), GFP_KERNEL);
++	rk = kmalloc_obj(*rk);
+ 	if (!rk)
+ 		return -ENOMEM;
+ 
+-- 
+2.54.0
+
