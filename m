@@ -1,170 +1,172 @@
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C87EC3101A5
-	for <linux-crypto@vger.kernel.org>; Mon, 31 Aug 2026 20:47:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0787738888C;
+	Mon, 31 Aug 2026 21:08:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788209280; cv=none; b=MY/8YZrvkcL/QxHUPHfNbMtZCAeBlX8cBBMSXAY3xMCFveZRNEi9xOr1iRHXtZkgUj+ELCL2At9QaLdmomue0kGl3IUgwhnJWAuEscPiyo6swoF7nkxqonLx3qiiaNHAjfEig9PxK03+AIaC/0wR0cSNpkDgD9tnTtvQ6RFzDws=
+	t=1788210483; cv=none; b=dGRuy+X8iF6E7dGsV7Ni7+vqBhXAB2nD/BV4pNKMPKOaSnVC1ieYv3tLdGRoWs21qqWGP+ncvMeuG9xnx2bOXxvzdjEhBYLW8qQIZ+BohbUEPr6IBKAsSd6DX5x+hlrScYa1DJD47hdQVf15sP3SWWW3BRJkElKJlug8pK29JX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788209280; c=relaxed/simple;
-	bh=x0A0yYcEIp4UEd2rRguEMM1NflFS8AKy2GFpo950VOI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=h2DMnHWIoTPzghM0A+BDQW7X0n3bCVPI5DkkhGzEsWDWulJ7+68vPnQdVgipN/920wZCi6o5Xr0m5X+dvtrzRgnK5aC1s86jP4jdbk9HtYt+Ew+ngc44xQXTPWyUKvf/P7EtX28AhFD94RQZ1VrTdhb1xvoTeyP0UXCa1RNqV70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--shansinha.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nYyoursz; arc=none smtp.client-ip=209.85.214.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--shansinha.bounces.google.com
+	s=arc-20240116; t=1788210483; c=relaxed/simple;
+	bh=zcm8ggJed5PjXC+9lg/xPUfVJkdcYjA3JSXdynW72Sc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RCk8FuMGGRbP6gFH1w89+JwV3xu72qJ0LDttYk8dvjKUyRNX85QHhNasL2FnrP9rdNPT9e+S2KUugMuBhyoH4Is+7SXjuWehyH1lq9DbvAa7Bpvi5RrLRF00TjoMthXY/gSzB0sc9vGtnR5LOlv1OuMGtaUm1VIlF+jtFE+rU6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dKZUz43L; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nYyoursz"
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-2d54187d8b0so1796215ad.0
-        for <linux-crypto@vger.kernel.org>; Mon, 31 Aug 2026 13:47:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1788209278; x=1788814078; darn=vger.kernel.org;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=KHpyNbElWOK3TcOkKmWPd2BY5WxDBRm0wkAaJH7Inkg=;
-        b=nYyourszQj/m27eFoUr86f+Mkt32Ca48aNWhqnG6DvweVWwCeHdbSt4Jh5W7VLcbOS
-         hudBWrdrHcUInjELnzuqVE1pF31qKNAaubBIpjR+zHqb0BpOXug4xRpMvi1LNQgzk/DZ
-         h1CMcIVdx5iK11iSq0xQ42u9ZEdAYOb+qzfmFz9DPNfzbCofKOhQLtmXWQdGVjWU0UNw
-         MtK00uFVxUG7Ihr30GjEG6uScWamnN1eu2K68CziiJ3Fk+qUdLeCKJ6Hu/LKsuwAExRj
-         w4enG8L6fkkLVTdf7Zm0FWMhw4EtNOxaMnSQf7L3BfCM1m8Sf88ZovPruphrzPR2pa3g
-         sOFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788209278; x=1788814078;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=KHpyNbElWOK3TcOkKmWPd2BY5WxDBRm0wkAaJH7Inkg=;
-        b=oAzTI9QRpMT44YqzjHkAwMjmRoTfUkziaaQfgHMb++Kouf9VKLg4/DT5EfpDkeIG8J
-         PRzPRTNkETKIfqgIRVQVIA+NYwxIzduzVXEYRrkzd85zzCjJ4v31FfTlp/KrwFUm53rT
-         F6DyIqQGYbRf6eupVRHNOhxhKJZEXqXH6np/gn+05iMeWM1zIMDz1LL1k63jSuvsbNMH
-         D9UYQ2Sy6SEPGank3UoSUljTJ+SADG4cfNyeZ4itYvixq0C3EOJc9ISPuU0BGpfXK9vz
-         tkh3HSblMtaNTXknAhXkm3n6GzoI1rGjRFHT8R0XAasMTP+T5hz1XwUpkW211kZLmBO5
-         0VcA==
-X-Forwarded-Encrypted: i=1; AKwUvBzwNusiWiN9EnP8E5wKObKZVgNEPT8lpHVBiB0rUcS2eRGCE48mB1CmLny3LrOT6/y/b0Bsg9TQZ9/7lGs=@vger.kernel.org
-X-Gm-Message-State: AFuF++kIAANXjoe53E6aSvyEvrnod6jvjRnkpkeCQTU+d9pxQ4QyUsg+
-	u/q5I5hKIvhcWjiLEJkBAktVHjRTDoJ3eWVlS+tfz7RPebHXf8CHOhBgfnvTDzaLN8CA7bG+PRk
-	uzHaZ9r8liQ4OAFKsfQ==
-X-Received: from pldv19.prod.google.com ([2002:a17:902:ca93:b0:2d8:fd05:fddb])
- (user=shansinha job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:902:f791:b0:2d9:1dee:43db with SMTP id d9443c01a7336-2d91dee456dmr149239135ad.15.1788209277881;
- Mon, 31 Aug 2026 13:47:57 -0700 (PDT)
-Date: Mon, 31 Aug 2026 20:47:57 +0000
-In-Reply-To: <20260430160716.1120553-7-tycho@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dKZUz43L"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB7711F000E9;
+	Mon, 31 Aug 2026 21:08:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788210481;
+	bh=QYx9KC4MIYUH9ekoEcwCMnVwX3dAfHBqBgdU/xOfYwg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=dKZUz43LXHW4oXXwv67Upy9MfEsw9rlqnr503Dd1gXznuApyHbDBk35ZmgfAT56xJ
+	 SYTsg33QtvTaI1vJ0Izvyb+AtN39XfKYQisxJavxVwPCl1gLxBqnLqiO8CcOX00jMg
+	 SOh2f8zhfEcR4p1MHl52Z6hgOQsWZRti0dC9ua9cZOtAbsK1S2nkjd9JLgI742p4ex
+	 OcrFfMoBBZIdZ7zNRPD8CkEiAqVL5aUfP+PdBDbuUTXpes5cbCNp5Hif4c+/O26eWY
+	 ZK0QMiNhcCf9piH79cnMgt6mERIBc1Ep/m9kyTKThrwq+94DpMVgmdW1T4kxsVZRXb
+	 rAe1OX3iPbaTQ==
+Date: Mon, 31 Aug 2026 14:07:59 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Linlin Zhang <linlin.zhang@oss.qualcomm.com>
+Cc: axboe@kernel.dk, mst@redhat.com, jasowangio@gmail.com,
+	James.Bottomley@hansenpartnership.com, martin.petersen@oracle.com,
+	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+	linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-scsi@vger.kernel.org, virtualization@lists.linux.dev,
+	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	neeraj.soni@oss.qualcomm.com, gaurav.kashyap@oss.qualcomm.com,
+	mani@kernel.org, andersson@kernel.org, konradybcio@kernel.org,
+	bvanassche@acm.org, alim.akhtar@samsung.com,
+	avri.altman@sandisk.com, stefanha@redhat.com, pbonzini@redhat.com,
+	eperezma@redhat.com, xuanzhuo@linux.alibaba.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 00/11] FBE virtualization: inline encryption for
+ virtio-blk guests
+Message-ID: <20260831210759.GE86114@quark>
+References: <20260827160806.1295313-1-linlin.zhang@oss.qualcomm.com>
+ <20260827184219.GB2137493@google.com>
+ <d81e347e-8ca7-40a1-a428-5bce6f0d4b02@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20260430160716.1120553-7-tycho@kernel.org>
-X-Mailer: git-send-email 2.55.0.897.gb25b4bd76c-goog
-Message-ID: <20260831204757.436751-1-shansinha@google.com>
-Subject: Re: [PATCH 6/6] crypto/ccp: Implement SNP firmware live update
-From: Shantanu Sinha <shansinha@google.com>
-To: tycho@kernel.org
-Cc: shansinha@google.com, jackyli@google.com, aik@amd.com, 
-	ashish.kalra@amd.com, davem@davemloft.net, herbert@gondor.apana.org.au, 
-	john.allen@amd.com, kim.phillips@amd.com, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, michael.roth@amd.com, nikunj@amd.com, 
-	prsampat@amd.com, seanjc@google.com, thomas.lendacky@amd.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d81e347e-8ca7-40a1-a428-5bce6f0d4b02@oss.qualcomm.com>
 
-On Thu, Apr 30, 2026 at 10:07:16AM -0600, Tycho Andersen wrote:
-> +static int sev_firmware_shutdown_if_sev_initialized(struct sev_device *sev)
-> +{
-> +	int rc, error;
-> +	int sev_plat_state;
-> +
-> +	rc = sev_get_platform_state(&sev_plat_state, &error);
-> +	if (rc) {
-> +		if (error)
-> +			rc = error;
-> +		dev_dbg(sev->dev, "SEV get platform state failed %d\n", rc);
-> +		return rc;
-> +	}
-> +
-> +	switch (sev_plat_state) {
-> +	case SEV_STATE_UNINIT:
-> +		return 0;
-> +	case SEV_STATE_INIT:
-> +		error = 0;
-> +		rc = __sev_platform_shutdown_locked(&error);
-> +		if (rc) {
-> +			if (error)
-> +				rc = error;
-> +			dev_err(sev->dev, "SEV platform shutdown failed %d\n", rc);
-> +			return rc;
-> +		}
-> +
-> +		sev_firmware_needs_reinit = true;
-> +		return 0;
-
-Tested this on Milan and hit a failure during SEV re-init after firmware update.
-
-__sev_platform_shutdown_locked() sets the FW platform state to UNINIT, but
-sev_es_tmr and sev_init_ex_buffer remain firmware-owned in the RMP. When the
-new firmware comes up, SEV_CMD_INIT_EX rejects the stale page state and fails
-with SEV_RET_INVALID_PAGE_STATE (0x1A).
-
-Tearing down the buffers on shutdown fixes it for us:
-
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -1905,6 +1905,20 @@ static int sev_firmware_shutdown_if_sev_initialized(struct sev_device *sev)
-	}
- 
-+	if (sev_es_tmr) {
-+		wbinvd_on_all_cpus();
-+		__snp_free_firmware_pages(virt_to_page(sev_es_tmr),
-+					  get_order(sev_es_tmr_size),
-+					  true);
-+		sev_es_tmr = NULL;
-+	}
-+
-+	if (sev_init_ex_buffer) {
-+		__snp_free_firmware_pages(virt_to_page(sev_init_ex_buffer),
-+					  get_order(NV_LENGTH),
-+					  true);
-+		sev_init_ex_buffer = NULL;
-+	}
-+
-	sev_firmware_needs_reinit = true;
-	return 0;
-
-(Could also pull this and the cleanup in __sev_firmware_shutdown() into a shared
-helper. This logic is duplicated there.)
-
->	if (ret == FW_UPLOAD_ERR_NONE) {
->		error = 0;
+On Fri, Aug 28, 2026 at 11:37:57PM +0800, Linlin Zhang wrote:
+> Thanks for your comments!
 > 
->		rc = sev_get_api_version();
->		if (rc) {
->			if (error)
->				rc = error;
->			dev_err(sev->dev, "SEV query api version failed %d\n", rc);
->		}
->	}
+> Not making virtio-blk itself support key programming and eviction is
+> something done deliberately. Based on that HW-wrapped key management
+> operations are also handled in the out-of-band path.
 > 
-> +	if (!dlfwex_wants_rollback)
-> +		sev_firmware_reinit_if_shutdown(sev);
+> There are bellow 2 approaches I investigated to let virtio-blk programming
+> the key.
+> 
+>   1. virtio_blk implements blk_crypto_ll_ops interfaces, including program
+>      key and evict key interfaces.(Same to 'the virtio-blk interface standardized
+>      blk_crypto_ll_ops requests' mentioned by Stefan in the virtio SPEC thread)
+> 
+>      The guest's block crypto profile manages the keyslot in virtual slot
+>      format in this scenario.
+> 
+>       - block crypto key and virt_slot index it passed to the hypervisor's
+>        (EL2) device emulation (QEMU, using QEMU in the following) which
+>        runs in userspace of the host. Besides of transferring the virtual
+>        slot to the physical slot, a programming block crypto key UAPI need
+>        be added. Follow current blk-crypto design, it may be like
+>        BLKCRYPTOGENERATEKEY. I thought this results in a security risk that
+>        allows userspace process a key into a key slot.
+> 
+>      - For key eviction, it's similar to above key programming handling, also
+>        need a key eviction in blk IOCTLs, but leads to the security risk
+>        that allow userspace client to evict a key in a key slot.
+> 
+>     virt_slot, DUN and DUSize is appended to virtblk request during crypto
+>     I/O.
+> 
+>   2. virtio_blk implements blk_crypto_ll_ops interfaces, excluding program
+>      key and evict key interfaces.
+> 
+>      The guest's block crypto profile doesn't manage keyslot for the guest,
+>      the host's block crypto profile manages keyslot for both the guest and
+>      the host. The trigger of key programming operation is moved from the
+>      guest to the host.
+> 
+>        - The whole block crypto key (key size, key bytes, blk_crypto_config)
+>          and DUN are appended to the virtblk request during IO, a little
+>          high payload.
+> 
+>          The backend parses the crypto message in the virtio queue and
+>          construct a block crypto key and DUN for the bio_crypto_ctx
+>          set to the BIO. So that the IO flow in the host can program
+>          the key. 
+> 
+>          The question is that the blk-crypto-profile distinguishs the
+>          block crypto key via the key's address. But the host has
+>          different key addresses for the programming and eviction key
+>          operations of the same block crypto key from GVM, because the
+>          key is re-constructed in the host for the key program and
+>          eviction operations. 
+> 
+>          To fix it, the approach I thought is maintaining a new key
+>          hash table in the backend, and comparing the block crypto key
+>          content and DUN parsed from virtio queue with that in the key
+>          hash table. 
+>          My major concern is that this need keep the keys synchronization
+>          b/w this new hash table and the blk-crypto-profile's hash table
+>          carefully, avoiding that key is still present in the
+>          blk-crypto-profile's hash table, but removed in backend hash
+>          table. Another point is that the whole block crypto key and
+>          DUN are appended into virtio block request per crypto I/O.
+> 
+>        - For key eviction, adding a key eviction in blk IOCTLs allows
+>          userspace client to evict a key in a key slot. I thought this
+>          is a security concern.
+> 
+> 
+>      This option doesn't need map virt_slot to physical one.
+> 
+> 
+> Taking all the above into account, I made a compromise to implement
+> blk_crypto_ll_ops interfaces in a out-of-band path, which lets the virtio
+> blk only need focus on the data path. I agree that it is complex than
+> the second option mentioned in the above, but small payload (only
+> virt_slot, DUN, DUSize) in the virtio block request and no security
+> risk of key eviction from userspace.
+> 
+> 
+> I would like to hear your thoughts about the above and am appreciated
+> if you could share your insights about the design of inline
+> encryption in virtio block.
 
-If rc == SEV_RET_HWSEV_RET_UNSAFE, psp_dead is true but dlfwex_wants_rollback
-is false, so it still falls through to re-init. Even though it is
-recommended that the host should be rebooted after HARDWARE_UNSAFE,
-reboot tooling can lag and we may want some buffer. Plus the kernel shouldn't
-be touching a dead PSP anyway. Checking !psp_dead is a simple safeguard against
-extra churn while awaiting restart:
+Well, the way it should work is that each virtio-blk device should have
+its own set of *virtual* keyslots on the host side.  From the guest's
+perspective it would act very similarly to UFS / eMMC inline encryption,
+and it would be easy to integrate into the existing stack.
 
-+	if (!dlfwex_wants_rollback && !psp_dead)
-		sev_firmware_reinit_if_shutdown(sev);
+Then to process encrypted I/O, the host would use the keyslot number in
+the I/O to look up the blk_crypto_key it previously saved, and issue I/O
+using that key (using bio_crypt_set_ctx()).  The existing keyslot
+management logic in the block layer would allocate or wait for a
+physical keyslot as needed, so it should just work.
 
-I also moved the call to sev_firmware_reinit_if_shutdown() ahead of
-sev_get_api_version() so sev->state is already restored to INIT before sev
-status is queried. This is just to avoid unnecessary transient states.
-Curious if that logic makes sense to you. Am I missing something that made
-the original ordering strictly necessary?
+Eviction would similarly be passed through to blk_crypto_evict_key().
 
-Best,
-Shantanu
+Note that with this design, there would be no static partitioning of the
+physical keyslots.  The host would just allocate and release them as
+needed, similar to memory allocation.  The total number of virtual
+keyslots could be greater than the number of physical keyslots.
+
+This design would also work with hardware-wrapped keys.
+
+The hardest part is still the UAPIs for the VMM to do what it needs to
+do (assuming that it even needs to support physical inline encryption
+hardware at all, and not simply use the AES acceleration on the CPU),
+but that is the case with any of the proposals.
+
+- Eric
