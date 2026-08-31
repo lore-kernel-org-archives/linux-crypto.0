@@ -1,438 +1,267 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99F791F3BA2;
-	Mon, 31 Aug 2026 20:26:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C770F1F3BA2;
+	Mon, 31 Aug 2026 20:29:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788207966; cv=none; b=a+eQdGtG5fSr6cqYlFaD9dB42hZJ95uarkWjUaH/doKTgDFNRvXed+XqBFV960MHGwOR0p4A3diEyRJBsLtTY1RxyOf/4pW6l41WF2gcfBCKncimWZWvib/tq8h1WP+NpNhx/A0Bth9XL2I45lT4xB2mQ60bb57h98J/PNRigCI=
+	t=1788208145; cv=none; b=hJLLLHCKsUer7kvYTV03yc278kFX4pfJee5/J/EqZ5jagTa1Z61xRQVmciIxBuwAbGCjQ1rJoYL5bvRFfgCjYnMfc8kbVWCYwzs1LWUTy0nmG0l2nB0xr5CHW3ADH3UahMklb/7wI+GsS7VqqwZp80DR0ATGCbCIPGE7zLTIDCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788207966; c=relaxed/simple;
-	bh=pDs2zC8xzgnoGoWjqK5BP7H4Evzv/o9hNzAP61MjiwM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=i+SxGHgxbEbuaDpG9StsEZaMKiZbgOxWahG5CuhJRg1iNVvPudBChr9DDVlk3trhr3xtv5JNVzAbDOu5MbzBpNgzHW/ttrq40cTPMqN6GwwcNZ6kct4bAnixZJKsobvtWw3hUkBmbHK9oa7GZFrvp8gkw2Y2Hf5Ke+dqkoW48ws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jBStERy9; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788208145; c=relaxed/simple;
+	bh=a+GIM92rmgJeACBp1RoLsF/SPCU68ZuoZrXn/Nz71x8=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=VAAvzS7lD89qh+e+ExMLBGCHjXrfxsiZNVabhci0RgMD5ZStTMvjp9eJDxNa6eHruTzp8zjrgE+s3+6ZGRok9wXETFNNsyzaQ9Xq22VhFotER2AIyOp+UI3k3TsW9rHuZWCl6LubHuJ1Z5oBXRbpjUwyDzvkO+rh0Syk2orDlgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hxPE8hRo; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jBStERy9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A20751F00A3D;
-	Mon, 31 Aug 2026 20:26:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hxPE8hRo"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A23FD1F000E9;
+	Mon, 31 Aug 2026 20:29:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788207963;
-	bh=4thvBZnSRSl61e+RsCTJ6qMqdT2oOzwn39oOXDB3SAw=;
-	h=From:To:Cc:Subject:Date;
-	b=jBStERy9aKYdifPnKpuRvSuuTs8R2sH1S5mKJwE2c7D9Tof1ImWnCjdBzAr+DBrog
-	 xRyRO/LWKFbxJcpVpR60c1XrilO7BnH6nJlLqSKHYSCzM6mWYKncnABNcXDwk2ZSlw
-	 nOV2omwYGA8Makd0QKHh/JY6j1oWUch8m8zkIacOzG9i+CdguObJFEuap/h8ThUi/3
-	 Y03yj4LbvbG8hZN32209FGV73h3LpOprk2enAduCvtinzSMelWCsF3vAX6jMet0rx7
-	 i4fe3zL7BpkXSojdq5ROSKHjN+iUUbMHhkSTNcrpS7kgrxlncGIcYfbl6aJuz9pYya
-	 dZGi5qXuCBG+g==
-From: Eric Biggers <ebiggers@kernel.org>
-To: stable@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org,
-	Eric Biggers <ebiggers@kernel.org>,
-	Corentin Labbe <clabbe.montjoie@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 6.1] crypto: sun8i-ss - Remove crypto_rng interface
-Date: Mon, 31 Aug 2026 13:25:58 -0700
-Message-ID: <20260831202558.178746-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.55.0
+	s=k20260515; t=1788208143;
+	bh=wW/xUMPshJh+BjnoH/KxQ2ctdTr8ercnNXnopyZGx30=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date;
+	b=hxPE8hRoJ2HsM/zvd6zs/2yhix+aWMoxDNTSsSp25NZkGy9/HMxeC26BsZNQrui1r
+	 k+78JSwPuFeUVHQzDbu3pAZX1GAkQQta+Wdrh1lVVCNa7OOmDdCe15vw8EbCw9vTxW
+	 +tuN362zr1n8ebVGC+0NL9/HxfUQt/gMikudy/TddVxSRq0Fh+86Tzu1IZrTL4kDyE
+	 QPtG3NTkMCs1TT+aGjEWOyVjihHPGFcsedBwesLEP1vIuuIrafaOl5xTizJD1zHYAf
+	 0AQLgrZwZn47JRAQcTQaVdPHcNLz/osnS3lGGU7eE0cBhYlahWw3qjqNz7YzMKtihg
+	 2aXZ4lD3NyuVg==
+Content-Type: multipart/mixed; boundary="===============1722735103380655568=="
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Message-Id: <f829962635d9d46dc01bea9d7777a8099af30f79068d978e8e8bb5cd85f014f1@mail.kernel.org>
+In-Reply-To: <20260831192139.94895-1-ebiggers@kernel.org>
+References: <20260831192139.94895-1-ebiggers@kernel.org>
+Subject: Re: [PATCH bpf-next] bpf: crypto: Use AES-CBC and AES-ECB libraries
+From: bot+bpf-ci@kernel.org
+To: ebiggers@kernel.org,bpf@vger.kernel.org,vadim.fedorenko@linux.dev,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,eddyz87@gmail.com,memxor@gmail.com
+Cc: linux-crypto@vger.kernel.org,linux-kernel@vger.kernel.org,martin.lau@linux.dev,song@kernel.org,yonghong.song@linux.dev,jolsa@kernel.org,emil@etsalapatis.com,ihor.solodrai@linux.dev,john.fastabend@gmail.com,kmehltretter@gmail.com,ebiggers@kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,mason@kernel.org,ihor.solodrai@linux.dev
+Date: Mon, 31 Aug 2026 20:29:02 +0000 (UTC)
 
-commit a78446ee6fae86ac8733f120e3ffce2e5d9384f5 upstream.
+--===============1722735103380655568==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Since the crypto_rng interface for hardware PRNGs is unused and is
-redundant with hwrng and the actual Linux RNG, it's being phased out.
-Most drivers for it were already removed.  Go ahead and remove the
-sun8i-ss support which is one of the only remaining ones.
+> BPF crypto was implemented using the lskcipher API, which doesn't seem
+> to be going anywhere.  lskcipher supports only "arc4", "cbc(aes)",
+> "ecb(aes)", and only with unoptimized implementations.
 
-As usual for crypto_rng, this driver was also buggy: its ->generate()
-function had a use-after-free vulnerability due to using
-wait_for_completion_interruptible_timeout() without handling shutting
-down the DMA operation if a signal is sent.  Also, it had a buffer
-overread bug in the line 'memcpy(ctx->seed, d + dlen, ctx->slen);'.
-There's no point in fixing these bugs separately only to remove the code
-anyway, so this commit is marked with Fixes and Cc stable.
+The claim that lskcipher supports only these three specific algorithm
+names is not accurate. The cbc and ecb templates in crypto/cbc.c and
+crypto/ecb.c instantiate lskcipher interfaces for any plain cipher
+algorithm, not just AES:
 
-Fixes: ac2614d721de ("crypto: sun8i-ss - Add support for the PRNG")
-Cc: stable@vger.kernel.org
-Cc: Corentin Labbe <clabbe.montjoie@gmail.com>
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+crypto/cbc.c:crypto_cbc_create() calls lskcipher_alloc_instance_simple()
+crypto/ecb.c:crypto_ecb_create() calls lskcipher_alloc_instance_simple()
+
+So cbc(<any-cipher>) and ecb(<any-cipher>) are valid lskcipher
+algorithms. The kernel includes about 14 plain cipher algorithms besides
+AES, including sm4, des, des3_ede, camellia, twofish, aria, blowfish,
+cast5, cast6, serpent, seed, khazad, anubis, tea, and xtea.
+
+The pre-patch code passed params->algo directly to
+crypto_alloc_lskcipher() with no whitelist, so a BPF program could use
+cbc(sm4), cbc(des3_ede), ecb(camellia), or ecb(twofish).
+
+After this patch, bpf_crypto_find_algo() only matches the two-entry
+table with cbc(aes) and ecb(aes), so all non-AES cbc/ecb modes now fail.
+
+The changelog justifies dropping ARC4 but does not mention that this
+also drops support for all non-AES block ciphers. Should the commit
+message explicitly state that non-AES cbc()/ecb() support is being
+removed, or should the characterization of lskcipher's scope be
+corrected?
+
+Additionally, the error code for an unsupported algorithm changes from
+-EOPNOTSUPP (old has_algo failure path) to -ENOENT (new
+bpf_crypto_find_algo() path), which is a visible behavior change for
+existing BPF programs that inspect errno.
+
+[ ... ]
+
+> diff --git a/kernel/bpf/Kconfig b/kernel/bpf/Kconfig
+> index eb3de35734f09..822599b42be2e 100644
+> --- a/kernel/bpf/Kconfig
+> +++ b/kernel/bpf/Kconfig
+> @@ -87,6 +87,15 @@ config BPF_UNPRIV_DEFAULT_OFF
+>
+>  	  If you are unsure how to answer this question, answer Y.
+>
+> +config BPF_CRYPTO
+> +	def_bool y
+> +	depends on BPF_SYSCALL
+> +	select CRYPTO_LIB_AES_CBC
+> +	select CRYPTO_LIB_AES_ECB
+> +	help
+> +	  Provide the kfuncs needed for BPF programs to encrypt and decrypt
+> +	  data. The supported algorithms are AES-CBC and AES-ECB.
+> +
+
+The def_bool y makes BPF_CRYPTO invisible and unconditionally enabled
+whenever CONFIG_BPF_SYSCALL=y, so the AES library code is always linked
+with no opt-out.
+
+Before this patch, kernel/bpf/Makefile gated crypto.o on:
+
+  ifneq ($(CONFIG_CRYPTO),)
+  obj-$(CONFIG_BPF_SYSCALL) += crypto.o
+  endif
+
+so a CONFIG_BPF_SYSCALL=y, CONFIG_CRYPTO=n kernel previously built
+neither the BPF crypto kfuncs nor any AES code. Now the AES
+key-schedule, CBC, and ECB library code is unconditionally present.
+
+This is particularly notable given that the commit message says AES-ECB
+"isn't appropriate in new systems and should be dropped" yet it is now
+unconditionally linked into every BPF_SYSCALL kernel.
+
+Should this be a user-selectable option with a prompt like "bool 'BPF
+crypto kfuncs'" so it can be disabled, or is the intent really to make
+it always-on?
+
+[ ... ]
+
+> diff --git a/crypto/bpf_crypto_skcipher.c b/crypto/bpf_crypto_skcipher.c
+> deleted file mode 100644
+> index a88798d3e8c87..0000000000000
+> --- a/crypto/bpf_crypto_skcipher.c
+> +++ /dev/null
+> @@ -1,83 +0,0 @@
+[ ... ]
+> -static void *bpf_crypto_lskcipher_alloc_tfm(const char *algo)
+> -{
+> -	return crypto_alloc_lskcipher(algo, 0, 0);
+> -}
+
+Deleting this file removes the last in-tree caller of
+crypto_alloc_lskcipher(). After this patch, the symbol only exists at
+its definition and export in crypto/lskcipher.c, with no remaining
+callers anywhere in the tree.
+
+Given the premise that the lskcipher API "doesn't seem to be going
+anywhere," should crypto_alloc_lskcipher() be removed in a follow-up, or
+left as an exported API with zero users?
+
+[ ... ]
+
+> diff --git a/kernel/bpf/crypto.c b/kernel/bpf/crypto.c
+> index 51f89cecefb4d..8cdc16f9b374a 100644
+> --- a/kernel/bpf/crypto.c
+> +++ b/kernel/bpf/crypto.c
+[ ... ]
+> @@ -146,7 +99,6 @@ __bpf_kfunc struct bpf_crypto_ctx *
+>  bpf_crypto_ctx_create(const struct bpf_crypto_params *params, u32 params__sz,
+>  		      int *err)
+>  {
+> -	const struct bpf_crypto_type *type;
+>  	struct bpf_crypto_ctx *ctx;
+>
+>  	if (!params || params->reserved[0] || params->reserved[1] ||
+> @@ -155,69 +107,40 @@ bpf_crypto_ctx_create(const struct bpf_crypto_params *params, u32 params__sz,
+>  		return NULL;
+>  	}
+>
+[ ... ]
+> +	ctx = kzalloc_obj(*ctx);
+> +	if (!ctx) {
+> +		*err = -ENOMEM;
+> +		return NULL;
+> +	}
+> +
+> +	if (!bpf_crypto_find_algo(params, &ctx->algo)) {
+> +		*err = -ENOENT;
+> +		goto out;
+> +	}
+> +
+> +	switch (ctx->algo) {
+> +	case BPF_ALGO_AES_CBC:
+> +	case BPF_ALGO_AES_ECB:
+> +		if (params->authsize)
+> +			*err = -EOPNOTSUPP;
+> +		else
+> +			*err = aes_preparekey(&ctx->key.aes, params->key,
+> +					      params->key_len);
+> +		break;
+> +	default:
+> +		WARN_ON(1);
+> +		*err = -ENOENT;
+> +		break;
+> +	}
+> +
+> +out:
+> +	if (*err) {
+> +		kfree_sensitive(ctx);
+> +		return NULL;
+> +	}
+> +
+>  	refcount_set(&ctx->usage, 1);
+> -
+>  	return ctx;
+>  }
+
+Does this code have a double-fetch issue? The function now uses the
+caller-supplied 'int *err' out-parameter as its own internal success
+flag: every failure path stores into *err, then the 'if (*err)' at the
+'out:' label re-reads it to decide whether to free ctx and fail.
+
+The 'err' parameter is classified by the verifier as KF_ARG_PTR_TO_MEM,
+so a BPF program can legally pass a pointer into a shared map value
+rather than its own stack. That makes the store followed by the reload a
+double fetch of concurrently-writable memory.
+
+The pre-patch version never read *err - it used distinct error labels
+and returned NULL unconditionally on error, so the failure decision
+could not be influenced by the caller.
+
+If the reload observes 0 because another CPU zeroed the map value
+between the store and the load, the function takes the success path for
+a create that actually failed. For instance, if aes_preparekey() returns
+-EINVAL from aes_check_keylen() before assigning enc_key->len and
+enc_key->nrounds, the kzalloc'ed key stays all-zero with nrounds == 0.
+
+A later bpf_crypto_encrypt()/bpf_crypto_decrypt() on that ctx reaches
+aes_encrypt_generic()/aes_decrypt_generic(), which compute 'int n =
+nrounds - 1' (= -1) and then run 'do { ... } while (--n);', reading 16
+bytes past the round-key pointer per iteration for roughly 2^32
+iterations - an unbounded out-of-bounds read and unrecoverable soft
+lockup.
+
+The reload can also mis-handle the -ENOENT path from
+bpf_crypto_find_algo(), returning a ctx whose algo is uninitialized
+(BPF_ALGO_AES_CBC == 0) with no key.
+
+Could this be fixed by using a local 'int ret' for the internal flow and
+assigning '*err = ret' exactly once?
+
+[ ... ]
+
+> @@ -86,23 +83,17 @@ struct bpf_crypto_ctx {
+>   * As crypto API functions use GFP_KERNEL allocations, this function can
+>   * only be used in sleepable BPF programs.
+
+The kernel-doc for bpf_crypto_ctx_create() still justifies the
+KF_SLEEPABLE requirement with "As crypto API functions use GFP_KERNEL
+allocations."
+
+This patch removes every crypto API call from the function
+(crypto_alloc_lskcipher()/crypto_lskcipher_setkey() are gone). The body
+now only does kzalloc_obj(), bpf_crypto_find_algo(), and
+aes_preparekey(), and the AES library is documented as usable in "Any
+context".
+
+The conclusion still holds because kzalloc_obj() uses GFP_KERNEL, not
+because of the crypto API. Could the comment be updated to reflect the
+actual reason for the sleepable restriction after this refactoring?
+
+
 ---
- drivers/crypto/allwinner/Kconfig              |   8 -
- drivers/crypto/allwinner/sun8i-ss/Makefile    |   1 -
- .../crypto/allwinner/sun8i-ss/sun8i-ss-core.c |  39 ----
- .../crypto/allwinner/sun8i-ss/sun8i-ss-prng.c | 170 ------------------
- drivers/crypto/allwinner/sun8i-ss/sun8i-ss.h  |  23 ---
- 5 files changed, 241 deletions(-)
- delete mode 100644 drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 
-diff --git a/drivers/crypto/allwinner/Kconfig b/drivers/crypto/allwinner/Kconfig
-index 17bf9ead6ef2..d86ae005fbe2 100644
---- a/drivers/crypto/allwinner/Kconfig
-+++ b/drivers/crypto/allwinner/Kconfig
-@@ -105,14 +105,6 @@ config CRYPTO_DEV_SUN8I_SS_DEBUG
- 	  This will create /sys/kernel/debug/sun8i-ss/stats for displaying
- 	  the number of requests per flow and per algorithm.
- 
--config CRYPTO_DEV_SUN8I_SS_PRNG
--	bool "Support for Allwinner Security System PRNG"
--	depends on CRYPTO_DEV_SUN8I_SS
--	select CRYPTO_RNG
--	help
--	  Select this option if you want to provide kernel-side support for
--	  the Pseudo-Random Number Generator found in the Security System.
--
- config CRYPTO_DEV_SUN8I_SS_HASH
- 	bool "Enable support for hash on sun8i-ss"
- 	depends on CRYPTO_DEV_SUN8I_SS
-diff --git a/drivers/crypto/allwinner/sun8i-ss/Makefile b/drivers/crypto/allwinner/sun8i-ss/Makefile
-index aabfd893c817..2d6458a42e58 100644
---- a/drivers/crypto/allwinner/sun8i-ss/Makefile
-+++ b/drivers/crypto/allwinner/sun8i-ss/Makefile
-@@ -1,4 +1,3 @@
- obj-$(CONFIG_CRYPTO_DEV_SUN8I_SS) += sun8i-ss.o
- sun8i-ss-y += sun8i-ss-core.o sun8i-ss-cipher.o
--sun8i-ss-$(CONFIG_CRYPTO_DEV_SUN8I_SS_PRNG) += sun8i-ss-prng.o
- sun8i-ss-$(CONFIG_CRYPTO_DEV_SUN8I_SS_HASH) += sun8i-ss-hash.o
-diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-index ac2329e2b0e5..ffe6659a4407 100644
---- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-+++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-@@ -22,7 +22,6 @@
- #include <linux/platform_device.h>
- #include <linux/pm_runtime.h>
- #include <linux/reset.h>
--#include <crypto/internal/rng.h>
- #include <crypto/internal/skcipher.h>
- 
- #include "sun8i-ss.h"
-@@ -269,25 +268,6 @@ static struct sun8i_ss_alg_template ss_algs[] = {
- 		.decrypt	= sun8i_ss_skdecrypt,
- 	}
- },
--#ifdef CONFIG_CRYPTO_DEV_SUN8I_SS_PRNG
--{
--	.type = CRYPTO_ALG_TYPE_RNG,
--	.alg.rng = {
--		.base = {
--			.cra_name		= "stdrng",
--			.cra_driver_name	= "sun8i-ss-prng",
--			.cra_priority		= 300,
--			.cra_ctxsize = sizeof(struct sun8i_ss_rng_tfm_ctx),
--			.cra_module		= THIS_MODULE,
--			.cra_init		= sun8i_ss_prng_init,
--			.cra_exit		= sun8i_ss_prng_exit,
--		},
--		.generate               = sun8i_ss_prng_generate,
--		.seed                   = sun8i_ss_prng_seed,
--		.seedsize               = PRNG_SEED_SIZE,
--	}
--},
--#endif
- #ifdef CONFIG_CRYPTO_DEV_SUN8I_SS_HASH
- {	.type = CRYPTO_ALG_TYPE_AHASH,
- 	.ss_algo_id = SS_ID_HASH_MD5,
-@@ -473,12 +453,6 @@ static int sun8i_ss_debugfs_show(struct seq_file *seq, void *v)
- 			seq_printf(seq, "\tFallback due to SG numbers: %lu\n",
- 				   ss_algs[i].stat_fb_sgnum);
- 			break;
--		case CRYPTO_ALG_TYPE_RNG:
--			seq_printf(seq, "%s %s reqs=%lu tsize=%lu\n",
--				   ss_algs[i].alg.rng.base.cra_driver_name,
--				   ss_algs[i].alg.rng.base.cra_name,
--				   ss_algs[i].stat_req, ss_algs[i].stat_bytes);
--			break;
- 		case CRYPTO_ALG_TYPE_AHASH:
- 			seq_printf(seq, "%s %s reqs=%lu fallback=%lu\n",
- 				   ss_algs[i].alg.hash.halg.base.cra_driver_name,
-@@ -678,14 +652,6 @@ static int sun8i_ss_register_algs(struct sun8i_ss_dev *ss)
- 				return err;
- 			}
- 			break;
--		case CRYPTO_ALG_TYPE_RNG:
--			err = crypto_register_rng(&ss_algs[i].alg.rng);
--			if (err) {
--				dev_err(ss->dev, "Fail to register %s\n",
--					ss_algs[i].alg.rng.base.cra_name);
--				ss_algs[i].ss = NULL;
--			}
--			break;
- 		case CRYPTO_ALG_TYPE_AHASH:
- 			id = ss_algs[i].ss_algo_id;
- 			ss_method = ss->variant->alg_hash[id];
-@@ -727,11 +693,6 @@ static void sun8i_ss_unregister_algs(struct sun8i_ss_dev *ss)
- 				 ss_algs[i].alg.skcipher.base.cra_name);
- 			crypto_unregister_skcipher(&ss_algs[i].alg.skcipher);
- 			break;
--		case CRYPTO_ALG_TYPE_RNG:
--			dev_info(ss->dev, "Unregister %d %s\n", i,
--				 ss_algs[i].alg.rng.base.cra_name);
--			crypto_unregister_rng(&ss_algs[i].alg.rng);
--			break;
- 		case CRYPTO_ALG_TYPE_AHASH:
- 			dev_info(ss->dev, "Unregister %d %s\n", i,
- 				 ss_algs[i].alg.hash.halg.base.cra_name);
-diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c
-deleted file mode 100644
-index dd677e9ed06f..000000000000
---- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-prng.c
-+++ /dev/null
-@@ -1,170 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0
--/*
-- * sun8i-ss-prng.c - hardware cryptographic offloader for
-- * Allwinner A80/A83T SoC
-- *
-- * Copyright (C) 2015-2020 Corentin Labbe <clabbe@baylibre.com>
-- *
-- * This file handle the PRNG found in the SS
-- *
-- * You could find a link for the datasheet in Documentation/arm/sunxi.rst
-- */
--#include "sun8i-ss.h"
--#include <linux/dma-mapping.h>
--#include <linux/pm_runtime.h>
--#include <crypto/internal/rng.h>
--
--int sun8i_ss_prng_seed(struct crypto_rng *tfm, const u8 *seed,
--		       unsigned int slen)
--{
--	struct sun8i_ss_rng_tfm_ctx *ctx = crypto_rng_ctx(tfm);
--
--	if (ctx->seed && ctx->slen != slen) {
--		kfree_sensitive(ctx->seed);
--		ctx->slen = 0;
--		ctx->seed = NULL;
--	}
--	if (!ctx->seed)
--		ctx->seed = kmalloc(slen, GFP_KERNEL | GFP_DMA);
--	if (!ctx->seed)
--		return -ENOMEM;
--
--	memcpy(ctx->seed, seed, slen);
--	ctx->slen = slen;
--
--	return 0;
--}
--
--int sun8i_ss_prng_init(struct crypto_tfm *tfm)
--{
--	struct sun8i_ss_rng_tfm_ctx *ctx = crypto_tfm_ctx(tfm);
--
--	memset(ctx, 0, sizeof(struct sun8i_ss_rng_tfm_ctx));
--	return 0;
--}
--
--void sun8i_ss_prng_exit(struct crypto_tfm *tfm)
--{
--	struct sun8i_ss_rng_tfm_ctx *ctx = crypto_tfm_ctx(tfm);
--
--	kfree_sensitive(ctx->seed);
--	ctx->seed = NULL;
--	ctx->slen = 0;
--}
--
--int sun8i_ss_prng_generate(struct crypto_rng *tfm, const u8 *src,
--			   unsigned int slen, u8 *dst, unsigned int dlen)
--{
--	struct sun8i_ss_rng_tfm_ctx *ctx = crypto_rng_ctx(tfm);
--	struct rng_alg *alg = crypto_rng_alg(tfm);
--	struct sun8i_ss_alg_template *algt;
--	struct sun8i_ss_dev *ss;
--	dma_addr_t dma_iv, dma_dst;
--	unsigned int todo;
--	int err = 0;
--	int flow;
--	void *d;
--	u32 v;
--
--	algt = container_of(alg, struct sun8i_ss_alg_template, alg.rng);
--	ss = algt->ss;
--
--	if (ctx->slen == 0) {
--		dev_err(ss->dev, "The PRNG is not seeded\n");
--		return -EINVAL;
--	}
--
--	/* The SS does not give an updated seed, so we need to get a new one.
--	 * So we will ask for an extra PRNG_SEED_SIZE data.
--	 * We want dlen + seedsize rounded up to a multiple of PRNG_DATA_SIZE
--	 */
--	todo = dlen + PRNG_SEED_SIZE + PRNG_DATA_SIZE;
--	todo -= todo % PRNG_DATA_SIZE;
--
--	d = kzalloc(todo, GFP_KERNEL | GFP_DMA);
--	if (!d)
--		return -ENOMEM;
--
--	flow = sun8i_ss_get_engine_number(ss);
--
--#ifdef CONFIG_CRYPTO_DEV_SUN8I_SS_DEBUG
--	algt->stat_req++;
--	algt->stat_bytes += todo;
--#endif
--
--	v = SS_ALG_PRNG | SS_PRNG_CONTINUE | SS_START;
--	if (flow)
--		v |= SS_FLOW1;
--	else
--		v |= SS_FLOW0;
--
--	dma_iv = dma_map_single(ss->dev, ctx->seed, ctx->slen, DMA_TO_DEVICE);
--	if (dma_mapping_error(ss->dev, dma_iv)) {
--		dev_err(ss->dev, "Cannot DMA MAP IV\n");
--		err = -EFAULT;
--		goto err_free;
--	}
--
--	dma_dst = dma_map_single(ss->dev, d, todo, DMA_FROM_DEVICE);
--	if (dma_mapping_error(ss->dev, dma_dst)) {
--		dev_err(ss->dev, "Cannot DMA MAP DST\n");
--		err = -EFAULT;
--		goto err_iv;
--	}
--
--	err = pm_runtime_resume_and_get(ss->dev);
--	if (err < 0)
--		goto err_pm;
--	err = 0;
--
--	mutex_lock(&ss->mlock);
--	writel(dma_iv, ss->base + SS_IV_ADR_REG);
--	/* the PRNG act badly (failing rngtest) without SS_KEY_ADR_REG set */
--	writel(dma_iv, ss->base + SS_KEY_ADR_REG);
--	writel(dma_dst, ss->base + SS_DST_ADR_REG);
--	writel(todo / 4, ss->base + SS_LEN_ADR_REG);
--
--	reinit_completion(&ss->flows[flow].complete);
--	ss->flows[flow].status = 0;
--	/* Be sure all data is written before enabling the task */
--	wmb();
--
--	writel(v, ss->base + SS_CTL_REG);
--
--	wait_for_completion_interruptible_timeout(&ss->flows[flow].complete,
--						  msecs_to_jiffies(todo));
--	if (ss->flows[flow].status == 0) {
--		dev_err(ss->dev, "DMA timeout for PRNG (size=%u)\n", todo);
--		err = -EFAULT;
--	}
--	/* Since cipher and hash use the linux/cryptoengine and that we have
--	 * a cryptoengine per flow, we are sure that they will issue only one
--	 * request per flow.
--	 * Since the cryptoengine wait for completion before submitting a new
--	 * one, the mlock could be left just after the final writel.
--	 * But cryptoengine cannot handle crypto_rng, so we need to be sure
--	 * nothing will use our flow.
--	 * The easiest way is to grab mlock until the hardware end our requests.
--	 * We could have used a per flow lock, but this would increase
--	 * complexity.
--	 * The drawback is that no request could be handled for the other flow.
--	 */
--	mutex_unlock(&ss->mlock);
--
--	pm_runtime_put(ss->dev);
--
--err_pm:
--	dma_unmap_single(ss->dev, dma_dst, todo, DMA_FROM_DEVICE);
--err_iv:
--	dma_unmap_single(ss->dev, dma_iv, ctx->slen, DMA_TO_DEVICE);
--
--	if (!err) {
--		memcpy(dst, d, dlen);
--		/* Update seed */
--		memcpy(ctx->seed, d + dlen, ctx->slen);
--	}
--err_free:
--	kfree_sensitive(d);
--
--	return err;
--}
-diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss.h b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss.h
-index df6f08f6092f..06498aafbd32 100644
---- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss.h
-+++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss.h
-@@ -8,7 +8,6 @@
- #include <crypto/aes.h>
- #include <crypto/des.h>
- #include <crypto/engine.h>
--#include <crypto/rng.h>
- #include <crypto/skcipher.h>
- #include <linux/atomic.h>
- #include <linux/debugfs.h>
-@@ -27,7 +26,6 @@
- #define SS_ALG_DES		(1 << 2)
- #define SS_ALG_3DES		(2 << 2)
- #define SS_ALG_MD5		(3 << 2)
--#define SS_ALG_PRNG		(4 << 2)
- #define SS_ALG_SHA1		(6 << 2)
- #define SS_ALG_SHA224		(7 << 2)
- #define SS_ALG_SHA256		(8 << 2)
-@@ -68,8 +66,6 @@
- #define SS_FLOW0	BIT(30)
- #define SS_FLOW1	BIT(31)
- 
--#define SS_PRNG_CONTINUE	BIT(18)
--
- #define MAX_SG 8
- 
- #define MAXFLOW 2
-@@ -79,9 +75,6 @@
- #define SS_DIE_ID_SHIFT	20
- #define SS_DIE_ID_MASK	0x07
- 
--#define PRNG_DATA_SIZE (160 / 8)
--#define PRNG_SEED_SIZE DIV_ROUND_UP(175, 8)
--
- #define MAX_PAD_SIZE 4096
- 
- /*
-@@ -217,16 +210,6 @@ struct sun8i_cipher_tfm_ctx {
- 	struct crypto_skcipher *fallback_tfm;
- };
- 
--/*
-- * struct sun8i_ss_prng_ctx - context for PRNG TFM
-- * @seed:	The seed to use
-- * @slen:	The size of the seed
-- */
--struct sun8i_ss_rng_tfm_ctx {
--	void *seed;
--	unsigned int slen;
--};
--
- /*
-  * struct sun8i_ss_hash_tfm_ctx - context for an ahash TFM
-  * @enginectx:		crypto_engine used by this TFM
-@@ -280,7 +263,6 @@ struct sun8i_ss_alg_template {
- 	struct sun8i_ss_dev *ss;
- 	union {
- 		struct skcipher_alg skcipher;
--		struct rng_alg rng;
- 		struct ahash_alg hash;
- 	} alg;
- 	unsigned long stat_req;
-@@ -307,11 +289,6 @@ int sun8i_ss_skencrypt(struct skcipher_request *areq);
- int sun8i_ss_get_engine_number(struct sun8i_ss_dev *ss);
- 
- int sun8i_ss_run_task(struct sun8i_ss_dev *ss, struct sun8i_cipher_req_ctx *rctx, const char *name);
--int sun8i_ss_prng_generate(struct crypto_rng *tfm, const u8 *src,
--			   unsigned int slen, u8 *dst, unsigned int dlen);
--int sun8i_ss_prng_seed(struct crypto_rng *tfm, const u8 *seed, unsigned int slen);
--int sun8i_ss_prng_init(struct crypto_tfm *tfm);
--void sun8i_ss_prng_exit(struct crypto_tfm *tfm);
- 
- int sun8i_ss_hash_crainit(struct crypto_tfm *tfm);
- void sun8i_ss_hash_craexit(struct crypto_tfm *tfm);
-
-base-commit: d64a499eea6b62b5121beceed9e8a1f57b00d863
-prerequisite-patch-id: 8ea3f14da685065c9cdf0767802cac7c6e21b983
--- 
-2.55.0
-
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/33431341694
+--===============1722735103380655568==--
