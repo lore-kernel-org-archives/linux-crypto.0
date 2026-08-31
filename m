@@ -1,40 +1,36 @@
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-132.mta0.migadu.com [91.218.175.132])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 352433DE43E
-	for <linux-crypto@vger.kernel.org>; Mon, 31 Aug 2026 12:08:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360693E6DDA
+	for <linux-crypto@vger.kernel.org>; Mon, 31 Aug 2026 12:09:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788178099; cv=none; b=JsbGahvKw1G2uFCeWf1omeaE9fcscQd/Ucz08DoRLGmi09mdNM3cL1UOeUgVKHyFVb7y1mWEQUgAzuyqkoyJAfBAHFVh6lHFIRb9/JdcJ9wBYa5gXrCNLFnEIvfAGrrAoZG2mpg1qknmluhHa4QCATOP/2XqCSHWxYSwIWj4IZ8=
+	t=1788178166; cv=none; b=CivAXvIYe/K75pOO+ICDDwhL44Z5HfCSFgPBghILHazsIT16m0J4w1+mRHtccwdmnpmrTAA+LONAuCADCGQkJl+2TvrhdnSPRLf0fDT47c832RtdY9IIgmm8/En8oWl7VIFiuLaoVr2VIYM+mAq/9JkXKJp3YwTgRYoKeXN2TdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788178099; c=relaxed/simple;
-	bh=uaVHbHk7M9IGTybf9q0hDQElbdiNj1LNaTPfuiAnnWc=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=pZoa71kG688o3ID6DxDgQDDzse5b2SmveWNqXs+IgDwEGxoN2aCxvK8Ekz86QNdSlNzqHr598g/4nzV2QDPg4d9IZgIlkmBhvZob0VySKLTNrRkPPaCYuwHZH+oMj1TJExmkUsim7fHf4kYK1Ay90MJcLCp3CdmNMmQs9oVkLC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=dPPHuMpp; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	s=arc-20240116; t=1788178166; c=relaxed/simple;
+	bh=VY8BIT8QfLkUraG1i9FG2AkXjeQpQZ1ABuZnQEaNl2Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Q0BX9BFVHqc0IrVnxtlJuPKheqxKK8Hsx4g1Ok4foBmcuQATQiDKmVBbvTUfuHgKOyYRy3krwgnNmnaTbHf4RLR7XioL08L3bZgPklpNp9+QA6Z+48qYJYq/WZMyB09w7k9ZEaaUd1m/nlepuTy3UsXFhO2lrhPeX0j4/7Wwwdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=o9qzV6/t; arc=none smtp.client-ip=91.218.175.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="dPPHuMpp"
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 25E674E41488;
-	Mon, 31 Aug 2026 12:08:14 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id D9E2C6054B;
-	Mon, 31 Aug 2026 12:08:13 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 63BFB11C78AE0;
-	Mon, 31 Aug 2026 14:08:03 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1788178087; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=aZ5+lPFAk7HjRgWCwnN8U+IoVeVmfO1YLxxwKDuIJLE=;
-	b=dPPHuMppCmZRG/jS1t/O8otBqshafZygC6XeAsEkZqIY0Qiq/o/gOkWx7SCrqAcoO6uqMc
-	8G2h3KJPKot71TND7dZofYawf7MxikONGbIoUWiq8TS3ps1cC0SCgZc3RCByDLDsgx3Gu0
-	xIleC78D2j8yCpnTf3hiaMa0mSKF0QfF6z18WjHNKs+gDTmmK8RKkjRehjjKJf2I8OF1Wy
-	wC1PO8Sw0nvNyqINrrNMQ9vRG6KknX2zIVqzXnbBIu2hbzlj3H0nSXpsEa8ctnBG0riz0w
-	fzBJqJzZ5sPG16FhWhMcbYL69akPHJfT1VL08FfcfLFdKKsth3g9NXI98bzizw==
-Message-ID: <41bb0b65-3a30-4922-9aef-10f73c654852@bootlin.com>
-Date: Mon, 31 Aug 2026 14:08:02 +0200
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="o9qzV6/t"
+X-Envelope-To: linux-crypto@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=VY8BIT8QfLkUraG1i9FG2AkXjeQpQZ1ABuZnQEaNl2Q=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1788178160; v=1; x=1788782960;
+ b=o9qzV6/tIH6KZWL3kHJGaaPbSF0mLI5CZg+mHplYXUQBrtenJebU+rWAcFS9pVzt6wiC+aMz
+ u37kvPMClZL8+m+urIbjQbBQF98MlGeVasm7aBPFRJQvdpLdq/6YViHIYNfbcMayq0t46G5HLtp
+ tp1ImABeks9qczC4zGUmYQ6U=
+X-Envelope-To: linux-crypto@vger.kernel.org
+Received: by smtp.migadu.com with ESMTPS id 2c443c59b6b9db85;
+	Mon, 31 Aug 2026 12:09:10 +0000
+X-Mizu-Trace-ID: 2c443c59b6b9db85
+X-Migadu-Flow: FLOW_OUT
+Message-ID: <bed66f22-8bf1-4328-a400-d214e15693e2@linux.dev>
+Date: Mon, 31 Aug 2026 13:09:09 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,64 +38,111 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: ECDSA key parsing in crypto drivers
-From: Paul Louvel <paul.louvel@bootlin.com>
-To: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>
-Cc: Miquel Raynal <miquel.raynal@bootlin.com>, Jian Pan <jian.pan@se.com>
-References: <34094aaa-da49-4203-b176-ed3faa4b8692@bootlin.com>
+Subject: Re: [PATCH v2 2/2] zstd: use cpu_feature_enabled() for in-kernel BMI2
+ dispatch
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: dsterba@suse.com, linux-kernel@vger.kernel.org, terrelln@fb.com,
+ terrelln@meta.com, linux-crypto@vger.kernel.org, yosry@kernel.org,
+ ebiggers@kernel.org, hannes@cmpxchg.org, nphamcs@gmail.com,
+ chengming.zhou@linux.dev, shakeel.butt@linux.dev, kernel-team@meta.com
+References: <20260830222100.2706175-1-usama.arif@linux.dev>
+ <20260830222100.2706175-3-usama.arif@linux.dev>
+ <CAHk-=wg3d5HUkgdWq4Ac74xoUDU_BiHTC_ONacwYFoXnMQZ7Pw@mail.gmail.com>
 Content-Language: en-US
-In-Reply-To: <34094aaa-da49-4203-b176-ed3faa4b8692@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+From: Usama Arif <usama.arif@linux.dev>
+In-Reply-To: <CAHk-=wg3d5HUkgdWq4Ac74xoUDU_BiHTC_ONacwYFoXnMQZ7Pw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Adding Herbert Xu and David S. Miller as recipient.
 
-On 8/31/26 11:09 AM, Paul Louvel wrote:
-> Hi,
->
-> I am currently working on upstreaming the ECDSA part of a Public Key
-> Accelerator.
-> I have a question regarding which ASN.1 schema should I use when decoding the
-> buffer passed by the .set_pub_key() and .set_priv_key() callbacks in struct
-> sig_alg.
-> The documentation only mentions that the callbacks should "know how to decode
-> and interpret the BER encoded public key and parameters."
->
-> The kernel software implementation of ECDSA only supports verifying signatures,
-> and thus only implements the .set_pub_key() callback. In this callback, the
-> buffer should contain an ECC key as defined by RFC5480 section 2.2 [1].
->
-> In the downstream driver I am currently upstreaming, it expects a BER encoded
-> ASN.1 schema of SubjectPublicKeyInfo as defined in RFC5480 section 2 [2]. The
-> driver defines its own .asn1 file containing the ASN.1 schema of this sequence,
-> and uses the kernel's ASN.1 compiler/decoder to decode the buffer.
->
-> Because the PKA can be used to sign messages, there is a .set_priv_key()
-> callback that expects a BER encoded ASN.1 schema as defined in RFC5915 section
-> 3 [3]. The same remark applies to the public key: a .asn1 file is present and
-> defines the ASN.1 schema described by the RFC.
->
-> My question is: which ASN.1 schema should be used? Should a client of the
-> crypto API know in advance which format the driver expects? Also, for RSA,
-> there are helpers for parsing private and public keys: rsa_parse_priv_key() and
-> rsa_parse_pub_key(). These helpers use the kernel's ASN.1 decoder. Would it
-> make sense to have such helpers for ECDSA?
->
-> Thank you,
->
-> [1] RFC5480 Section 2.2 - ECC Key Format
-> https://tools.ietf.org/html/rfc5480#section-2.2
->
-> [2] RFC5480 Section 2 - SubjectPublicKeyInfo
-> https://tools.ietf.org/html/rfc5480#section-2
->
-> [3] RFC5915 Section 3 - Private Key Format
-> https://tools.ietf.org/html/rfc5915#section-3
->
--- 
-Paul Louvel, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+
+On 31/08/2026 00:06, Linus Torvalds wrote:
+> On Sun, 30 Aug 2026 at 15:21, Usama Arif <usama.arif@linux.dev> wrote:
+>>
+>> Add ZSTD_USE_BMI2() and use it at every runtime BMI2/default selector.
+> 
+> Thanks, this looks sane to me.
+> 
+> I do still react to a couple of places. Notably, this part (repeated a
+> couple of times):
+> 
+>> +#if !defined(ZSTD_USE_KERNEL_CPU_FEATURES)
+>>      cctx->bmi2 = ZSTD_cpuSupportsBmi2();
+>> +#endif
+> 
+> should probably be an "set state" macro the same way ZSTD_USE_BMI2()
+> is now a "get state" macro.
+> 
+
+Ack, have added ZSTD_SET_BMI2():
+
+#if !DYNAMIC_BMI2
+#  define ZSTD_USE_BMI2(bmi2) 0
+#  define ZSTD_SET_BMI2(state, value) do { } while (0)
+#elif defined(ZSTD_USE_KERNEL_CPU_FEATURES)
+#  define ZSTD_USE_BMI2(bmi2) cpu_feature_enabled(X86_FEATURE_BMI2)
+#  define ZSTD_SET_BMI2(state, value) do { } while (0)
+#else
+#  define ZSTD_USE_BMI2(bmi2) (bmi2)
+#  define ZSTD_SET_BMI2(state, value) do { (state) = (value); } while (0)
+#endif
+
+will use above in next revision.
+> And:
+> 
+>> +ccflags-$(CONFIG_X86) += -DZSTD_USE_KERNEL_CPU_FEATURES
+> 
+> We don't have anything like this for any other ZSTD defines, so my gut
+> feel is that either this is in the wrong place, and it should be in
+> something like
+> 
+>    lib/zstd/common/zstd_deps.h
+> 
+> which already has kernel-specific stuff in it, or it should just use
+> #ifdef __KERNEL__ like we use elsewhere for things that are also used
+> by user space.
+> 
+
+Ack, removed it from the Makefile for next revision.
+
+__KERNEL__ alone was insufficient because it is also defined for the x86
+compressed boot code. That environment defines __DISABLE_EXPORTS and cannot
+use the normal alternatives infrastructure, so it retains zstd’s raw-CPUID
+path.
+
+I have added 
+
+#if defined(__KERNEL__) && defined(CONFIG_X86) && \
+    !defined(__DISABLE_EXPORTS)
+#define ZSTD_USE_KERNEL_CPU_FEATURES
+#endif
+
+in lib/zstd/common/zstd_deps.h for the next revision.
+
+
+> The whole situation with ZSTD configuration is a bit strange. I note
+> that there are things like ZSTD_ARCH_ARM_NEON that the kernel never
+> uses.
+> 
+> Why is "DYNAMIC_BMI2" a settimg but things like that
+> ZSTD_ARCH_X86_SSE2 and ZSTD_ARCH_ARM_NEON are never set? This all
+> looks messy.
+> 
+
+DYNAMIC_BMI2 is defined in lib/zstd/common/portability_macros.h.
+
+ZSTD_ARCH_X86_SSE2 and ZSTD_ARCH_ARM_NEON are upstream zstd configuration
+knobs. The kernel import is generated with ZSTD_NO_INTRINSICS [1], so their
+automatic definitions are disabled even though some guarded references
+remain in the imported source. The kernel cannot use SSE/NEON transparently
+because that requires architecture-specific SIMD/FPU state management, whereas
+BMI2 operates only on general-purpose registers.
+
+[1] https://github.com/facebook/zstd/blob/dev/contrib/linux-kernel/Makefile#L30
+
+> Or is there some hidden config I didn't find?
+> 
+> Strange.
+> 
+>              Linus
 
