@@ -1,440 +1,217 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010011.outbound.protection.outlook.com [52.101.84.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D4AC5A4135;
-	Mon, 31 Aug 2026 13:52:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788184335; cv=none; b=kL8IKPAO/U+w3eD8pVqDj3Vhyp9ly1Fk+kGoZ1T9bzHtYhT+UC/N628/2UMPEtSGKOU/WSZsDBtuRQ3u2KxGnXyl+ACwnBV6a9++wHVTgtdM5LExKDLInOsyH4FACrXQDKXIeNAy5w0cRx6mFiGRy/dC7vbSCVMbr0aEx+K2vyU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788184335; c=relaxed/simple;
-	bh=nXu4cZUKZiyhevammCH2tMRDqODXdyQGcjjk44AEiy4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hqgaw/TPa9lAcQ4iAOXS4JzlhluTvHkSvoDQr2DArUVrCQGVMSscA+J4ynoF/Au3MQoZiL6xX3ZJMhdT3Ghim7TuetwvAJZ2/FWfPVT9nVnB9dzZ+mpoba7jCKPQ334faKgYmXTV2/3G2AYP8izwW2SY0P4/2jnBD5gXyS/92HE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fsGNhhlc; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4052C511232;
+	Mon, 31 Aug 2026 15:02:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788188526; cv=fail; b=mXlWuirfzcZdfTblbxYATxEox51JDw1bDYaBZ9aquSf34ruNRtFVjH3m/zrhQyRYpVMeWIDodW2v65bfihV70ow7fHK4T3y2wyzRbClQQWeulyZfuPK2J/tVg+/C4u5dYw/6hEKC6u4H78qQ1zFfCos3jO8369pgdmKPYfVQN2g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788188526; c=relaxed/simple;
+	bh=iXwo8CyVwfgnbXYWJORrAVP2l44vN65G8bIEHpQn+Xw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=mVYhimajqUsVs9VTf1BJFSyrDI9jpimNIKeF8WpcBd1qrXZyQduL3RR3E6CZhm6+jOkOiYXLVBKXKnwwvmPP0eAKZ3E86ca0aUlRfEnwecYI+cHEJJWPFUnwX4kCRCq+qNzJKK2GdmCkZBJo3j83q9pDj44/Im9MjXMP6wWG09Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=ppUgZPY6; arc=fail smtp.client-ip=52.101.84.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fsGNhhlc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0138C1F000E9;
-	Mon, 31 Aug 2026 13:52:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788184333;
-	bh=tilIhcIkJOC76/K2B7WhRWr6blwCJt6RVnQlspgCzn4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=fsGNhhlcuKL3ctem/YccE9THMU00ui4msXC0WySTUb+qg3b2+CygoCe8PqAhGXkFI
-	 7m9mzthJxaNmsqGHq6eNPLi7PgATOU+J02Z2UqOkZgDy+1mpgaHVw0VXUyVC1YoSEq
-	 kiAZzmy1J1n6+4V4z75ZKkcRIemjWmT/VRA4QJVSmpO3RMnXVhLLV/zDoxTxIGlfgM
-	 ozxkMrGg1esQBhg19JxofyLwrrM395gWgBVAPV1aGUPebkB5DPjjH4UjmV0ULT9upE
-	 cvZWMXZj6fok5zWQe2jVflWZeBYd/RocfZpnMqnMppCxq8av7ga3GTpnv1v/TZ1Rab
-	 FIcNTSrwlBO7A==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Thorsten Blum <thorsten.blum@linux.dev>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Sasha Levin <sashal@kernel.org>,
-	davem@davemloft.net,
-	nicolas.ferre@microchip.com,
-	alexandre.belloni@bootlin.com,
-	claudiu.beznea@tuxon.dev,
-	linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-5.10] crypto: atmel-ecc - add support for atecc608b
-Date: Mon, 31 Aug 2026 09:30:59 -0400
-Message-ID: <20260831133314.4125787-631-sashal@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260831133314.4125787-1-sashal@kernel.org>
-References: <20260831133314.4125787-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="ppUgZPY6"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=J+qcZN4JTgWreKEmcVSmp5Rt4o3gEShcX+LKAU4gsoDNNw1T3Hd+ie/kEdt3rKbM5UVtCpZf+xmmfkb5igrSf3ar6ZwlmNdcdsSMyHeJnX1Zkk08CmdKceYP8JTCrL1tlxMbzOQ2c/YYl06wC/dKzkRihgjZzhkrzVOAeo/jKrVm552yOvzHsBc0qBocgIoHOoFTlo8zPZFGVHvIPVtzKNq8Z38mF8W+RBskKrJok2dMUTXOzX7QaqtnGPpyhY7lydweVD56v++Ppr80bO0fLQRbj85w/96zIoQO1cBlICcTD1up/TrmglwJ0+VaDitNs0w1JeOCr5jFjmlzQh/5cA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LOyTxG4m7vc3Q8Se6/Wh3tGakVMSL/FRahEccUIWMI4=;
+ b=URb9iCVXjOl91aogysbl+EbB/hMqfaMlStVxIoz3gIaTz8V2hVzV52NjRl1AJkhIkv9joSjqjnGSuHMv091fygmA1ewiemKD9OgAFGZSKqDwmXfsMYIqc63ogSpJLnaFlKOSl7UjVyUznLao9GPM5nPnS1x4WGmDmE0tkETuPj4I7bCI9mZIfpFVzi4IZx9J7JDQw2sCDt5ihFq6yf5LKLlZNIQmGDJLO75G5M2LgwCv+cuNxsP3GF4MxCHw0KgD9HfpYL3FyMUx11vtF2PZDWMhRAbbZuIBzEu5jeSHAnTQNFRFYmUdm5J4zuy1YCEAotGJHngQ7mlJi8UsDJumAA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector1-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LOyTxG4m7vc3Q8Se6/Wh3tGakVMSL/FRahEccUIWMI4=;
+ b=ppUgZPY6j1KIDmd3+st2z8zUr8vQtkISDEIqXXR0TZGkcqPMTGgPcshuoOnqxUQbVdIEYaWCpnA1uPBId+2eIeQCuxOr1YKfL6Adfm7ykgTPEbf/1FCQhYmWTjh8UDRJLOBsratrPJlSZjK9QIi3xt1Ijs9IqZuReRcAljfG88xbN1uiQDdD633UKBUxEqYjy0dmGzlqjRJtpCaCFo98I7Ayh5rvPe76jlba7l8qi3qg/GDImoyaROSPXZRf+GomyCUVDVUFx7LxzzCsLyvdvE6oQ3h6fpsRncWOIWQLKyK9ygy3sB2UhF4xYqHuCultlvE+Ivj3VTylT+bGIiODGg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=oss.nxp.com;
+Received: from GV2PR04MB11799.eurprd04.prod.outlook.com (2603:10a6:150:2cf::9)
+ by AMBPR04MB754926.eurprd04.prod.outlook.com (2603:10a6:20b:787::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.360.13; Mon, 31 Aug
+ 2026 15:02:02 +0000
+Received: from GV2PR04MB11799.eurprd04.prod.outlook.com
+ ([fe80::2146:83a2:5329:b7c]) by GV2PR04MB11799.eurprd04.prod.outlook.com
+ ([fe80::2146:83a2:5329:b7c%7]) with mapi id 15.21.0360.008; Mon, 31 Aug 2026
+ 15:02:02 +0000
+Date: Mon, 31 Aug 2026 10:01:52 -0500
+From: Frank Li <Frank.li@oss.nxp.com>
+To: Linmao Li <lilinmao@kylinos.cn>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Frank Li <Frank.Li@nxp.com>, Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Leonard Crestez <cdleonard@gmail.com>,
+	Radu Solea <radu.solea@nxp.com>,
+	Franck LENORMAND <franck.lenormand@nxp.com>,
+	linux-crypto@vger.kernel.org, imx@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: mxs-dcp: handle zero-length skcipher requests
+Message-ID: <apWXYPYyPktawUru@SMW015318>
+References: <20260828093209.3179074-1-lilinmao@kylinos.cn>
+ <apHgn8-IcTshYnfv@SMW015318>
+ <6416cbee-35c7-4fc8-9a80-a25403eb1e6f@kylinos.cn>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6416cbee-35c7-4fc8-9a80-a25403eb1e6f@kylinos.cn>
+X-ClientProxiedBy: PH0P220CA0021.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:510:d3::9) To GV2PR04MB11799.eurprd04.prod.outlook.com
+ (2603:10a6:150:2cf::9)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.18.48
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-
-From: Thorsten Blum <thorsten.blum@linux.dev>
-
-[ Upstream commit b668edaf8dcc8d09f6f1e71797422b44d4bd22a3 ]
-
-Tested on hardware with an ATECC608B at 0x60. The device binds
-successfully, passes the driver's sanity check, and registers the
-ecdh-nist-p256 KPP algorithm.
-
-The hardware ECDH path was also exercised using a minimal KPP test
-module, covering private key generation, public key derivation, and
-shared secret computation.
-
-Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
-
-LLM Generated explanations, may be completely bogus:
-
-# Stable Backport Analysis: `crypto: atmel-ecc - add support for
-atecc608b`
-
-**Local tree:** Linux **6.18.43** (`v6.18.43-1-gc7f0dac02d232`, detached
-from `stable/linux-6.18.y`)
-
-**Upstream commit:** `b668edaf8dcc8d09f6f1e71797422b44d4bd22a3`
-**Candidate commit:** `beb0043891b43` (not yet in current HEAD)
-
----
-
-## PHASE 1: COMMIT MESSAGE FORENSICS
-
-### Step 1.1: Subject Line
-**Record:** `[crypto: atmel-ecc] [add] support for atecc608b` —
-subsystem is the Atmel ECC crypto driver; verb is “add” (hardware
-enablement, not a bug-fix verb).
-
-### Step 1.2: Tags
-**Record:**
-| Tag | Value |
-|-----|-------|
-| Signed-off-by | Thorsten Blum `<thorsten.blum@linux.dev>` |
-| Signed-off-by | Herbert Xu `<herbert@gondor.apana.org.au>` (crypto
-maintainer) |
-| Fixes: | **Absent** (expected for manual review) |
-| Cc: stable | **Absent** (expected) |
-| Reported-by: | **Absent** |
-| Tested-by: | **Absent** (but commit body describes hardware testing) |
-| Link: | **Absent** |
-
-Notable: crypto maintainer Signed-off-by; no syzbot/sanitizer signals.
-
-### Step 1.3: Body Analysis
-**Record:**
-- **Problem:** ATECC608B secure-element chips are not matched by the
-  existing `atmel-ecc` driver; they will not bind/probe.
-- **Symptom:** Device at I2C address 0x60 does not get a driver; ECDH
-  offload unavailable.
-- **Root cause:** Missing OF compatible (`atmel,atecc608b`) and I2C
-  device ID (`atecc608b`) in match tables.
-- **Verification:** Author tested binding, sanity check, and full ECDH
-  KPP path on real hardware.
-
-### Step 1.4: Hidden Bug Fix?
-**Record:** **No.** This is explicit hardware enablement via device-ID
-tables, not a disguised crash/leak/race fix. The driver logic is
-unchanged; only match tables are extended.
-
----
-
-## PHASE 2: DIFF ANALYSIS
-
-### Step 2.1: Inventory
-**Record:**
-| File | Changes |
-|------|---------|
-| `drivers/crypto/atmel-ecc.c` | +3 lines |
-
-**Functions modified:** None (only static data tables
-`atmel_ecc_dt_ids[]`, `atmel_ecc_id[]`).
-**Scope:** Single-file, surgical device-ID addition.
-
-### Step 2.2: Code Flow Change
-**Record:**
-- **Hunk 1 (OF table):** Before: only `atmel,atecc508a` matched. After:
-  also `atmel,atecc608b`.
-- **Hunk 2 (I2C ID table):** Before: only `"atecc508a"`. After: also
-  `"atecc608b"`.
-- **Affected path:** Device enumeration / driver probe only. No change
-  to ECDH algorithm code, locking, or error handling.
-
-### Step 2.3: Bug Mechanism
-**Record:** **Category: Hardware device-ID addition (not a runtime bug
-fix).** ATECC608B is protocol-compatible with the existing driver (same
-sanity check, same NIST P-256 ECDH path) but was excluded from match
-tables. Without these entries, the kernel never calls
-`atmel_ecc_probe()` for this hardware.
-
-### Step 2.4: Fix Quality
-**Record:** Obviously correct — standard pattern mirroring the existing
-`atecc508a` entry. Minimal risk; no new APIs, no logic changes.
-Regression risk: **very low**.
-
----
-
-## PHASE 3: GIT HISTORY INVESTIGATION
-
-### Step 3.1: Blame
-**Record:** Device-ID tables introduced in `5d324e5159d9e` (Merge tag
-`usb-6.18-rc8`, Nov 2025) with only `atecc508a`. No “buggy code” — just
-incomplete hardware coverage from initial driver landing.
-
-### Step 3.2: Fixes: Tag
-**Record:** **N/A** — no `Fixes:` tag present.
-
-### Step 3.3: Related File History
-**Record:** Recent `atmel-ecc.c` history in this tree:
-- `9c032781c2b1f` — `crypto: atmel-ecc - Release client on allocation
-  failure` (actual bug fix, already in tree)
-- `5d324e5159d9e` — driver introduction via usb-6.18-rc8 merge
-
-No prior atecc608b-related commits in HEAD. On `autosel` branch, later
-cleanup commits exist (`006bbe8db4c35`, etc.) but are not prerequisites
-for this 3-line ID addition.
-
-### Step 3.4: Author Context
-**Record:** Thorsten Blum submitted a 2-patch series. Herbert Xu replied
-“All applied. Thanks.” Patch 2/2 (`dt-bindings: trivial-devices: add
-atmel,atecc608b`) is a separate DT binding commit, not part of this
-candidate.
-
-### Step 3.5: Dependencies
-**Record:** **Standalone.** No functional dependency on other commits.
-Patch applies cleanly to current HEAD (`git apply --check` succeeded).
-DT binding patch 2/2 is complementary for DT schema validation but not
-required for the driver match tables themselves.
-
----
-
-## PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
-
-### Step 4.1: Original Discussion
-**Record:** `b4 dig -c beb0043891b43` found thread:
-https://patch.msgid.link/20260412095642.120815-3-thorsten.blum@linux.dev
-
-Series revisions: v1 (2026-03-30) and RESEND (2026-04-12). Committed
-version matches RESEND.
-
-### Step 4.2: Reviewers
-**Record:** `b4 dig -w` CC'd Herbert Xu, David S. Miller, Nicolas Ferre
-(Microchip), Alexandre Belloni, Claudiu Beznea, linux-crypto@, linux-
-arm-kernel@, linux-kernel@. Herbert Xu applied the series.
-
-### Step 4.3: Bug Reports
-**Record:** **N/A** — no bug report links. Hardware validation described
-in commit message.
-
-### Step 4.4: Related Patches
-**Record:** Part of `[PATCH RESEND 1/2]` series. Patch 2/2 adds
-`atmel,atecc608b` to `Documentation/devicetree/bindings/trivial-
-devices.yaml` (Acked-by: Rob Herring). That binding patch is separate;
-this driver patch is self-contained.
-
-### Step 4.5: Stable List History
-**Record:** **Not searched** — no stable-specific discussion found in
-the retrieved thread. Absence of `Cc: stable` is expected and not a
-negative signal.
-
----
-
-## PHASE 5: CODE SEMANTIC ANALYSIS
-
-### Step 5.1: Key Functions
-**Record:** No functions modified. Match tables feed into
-`atmel_ecc_driver` → `atmel_ecc_probe()` → `atmel_i2c_probe()` →
-`device_sanity_check()`.
-
-### Step 5.2: Callers
-**Record:** `atmel_ecc_probe()` is invoked by the I2C core during device
-enumeration when OF compatible or I2C device ID matches. Standard probe
-path on embedded boards with secure elements.
-
-### Step 5.3: Callees
-**Record:** `atmel_i2c_probe()` performs I2C functionality check, clock
-validation, and `device_sanity_check()` (verifies config/OTP zones are
-locked). Chip-family-agnostic.
-
-### Step 5.4: Reachability
-**Record:** Triggered at boot when ATECC608B is present on I2C bus with
-matching DT `compatible` or I2C board info. Common on embedded/IoT
-platforms (similar boards already use `atmel,atecc508a` in this tree’s
-DTS files).
-
-### Step 5.5: Similar Patterns
-**Record:** `atmel-sha204a.c` and other Atmel I2C crypto drivers use the
-same pattern of multiple compatible strings in OF/I2C tables. ATECC508A
-and ATECC608B share the same I2C command protocol for ECDH operations
-supported by this driver.
-
----
-
-## PHASE 6: CROSS-REFERENCING AGAINST LOCAL TREE
-
-### Step 6.1: Does Buggy Code Exist?
-**Record:** The **driver exists** in 6.18.43
-(`CONFIG_CRYPTO_DEV_ATMEL_ECC`, `drivers/crypto/atmel-ecc.c`). The
-**missing device IDs** also exist as a gap — only `atecc508a` is listed;
-`atecc608b` is absent. Driver introduced in 6.18 via `5d324e5159d9e`. No
-`atecc608b` references anywhere in the tree.
-
-### Step 6.2: Backport Complications
-**Record:** **Clean apply** — `git apply --check` on the diff against
-current HEAD succeeded with no conflicts.
-
-### Step 6.3: Related Fixes Already Present?
-**Record:** `9c032781c2b1f` (allocation-failure leak fix) is already in
-tree. No duplicate atecc608b support found.
-
----
-
-## PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
-
-### Step 7.1: Subsystem Criticality
-**Record:** `drivers/crypto/` — **IMPORTANT** (hardware crypto offload
-for embedded secure elements). Config-dependent
-(`CONFIG_CRYPTO_DEV_ATMEL_ECC`).
-
-### Step 7.2: Subsystem Activity
-**Record:** Driver is new to 6.18 (landed Nov 2025). Low churn in this
-tree since introduction (one bug-fix commit).
-
----
-
-## PHASE 8: IMPACT AND RISK ASSESSMENT
-
-### Step 8.1: Who Is Affected
-**Record:** Users of boards with **ATECC608B** secure elements on I2C,
-using `CONFIG_CRYPTO_DEV_ATMEL_ECC=m/y`. Currently zero support for this
-chip variant in 6.18.y.
-
-### Step 8.2: Trigger Conditions
-**Record:** ATECC608B present on I2C bus at boot. Not a security
-vulnerability or crash trigger — hardware simply does not bind without
-the ID.
-
-### Step 8.3: Failure Mode Severity
-**Record:** **LOW** for system stability (no crash/corruption).
-**MEDIUM** for functionality — secure-element ECDH offload is completely
-unavailable for ATECC608B users on 6.18.y without this patch.
-
-### Step 8.4: Risk-Benefit
-**Record:**
-- **Benefit:** Enables tested hardware on an existing driver; 3-line
-  change.
-- **Risk:** Very low — no logic changes, no API changes.
-- **Ratio:** Favorable for stable under the device-ID exception
-  category.
-
----
-
-## PHASE 9: FINAL SYNTHESIS
-
-### Step 9.1: Evidence Summary
-
-**FOR backport:**
-- Trivial I2C/OF device-ID addition to an **existing** driver (explicit
-  stable exception category)
-- Hardware-tested; crypto maintainer applied and Signed-off-by
-- Applies cleanly to 6.18.43
-- Driver already present in this tree since 6.18
-- Without it, ATECC608B hardware cannot use the driver at all
-
-**AGAINST backport:**
-- Not a bug fix (crash/leak/race/security)
-- Driver itself is new in 6.18 (limited exposure window)
-- Companion DT binding patch (2/2) is separate — needed for full DT
-  schema compliance but not for driver functionality
-- No user bug reports or syzbot findings
-
-### Step 9.2: Stable Rules Checklist
-
-| Criterion | Result |
-|-----------|--------|
-| 1. Obviously correct and tested? | **PASS** — hardware tested,
-maintainer applied |
-| 2. Fixes a real bug? | **PASS via exception** — device-ID addition
-enabling hardware that cannot bind otherwise |
-| 3. Important issue? | **PASS (moderate)** — hardware non-functional
-without it; not crash/security |
-| 4. Small and contained? | **PASS** — 3 lines, one file |
-| 5. No new features/APIs? | **PASS** — only match table entries; falls
-under device-ID exception |
-| 6. Can apply to local tree? | **PASS** — clean apply verified |
-
-### Step 9.3: Exception Category
-**Record:** **NEW DEVICE IDs** — adding OF compatible and I2C device ID
-to an existing driver. The `atmel-ecc` driver is already in 6.18.y; only
-the ID for ATECC608B is new.
-
-### Step 9.4: Decision Rationale
-
-This commit does not fix a kernel bug, but it is a textbook stable
-exception: a minimal device-ID addition to an existing driver that
-enables real hardware already validated by the author and accepted by
-the crypto maintainer. The driver is present in 6.18.43, the patch
-applies cleanly, and ATECC608B boards cannot use the driver without it.
-Risk is negligible.
-
----
-
-## Verification
-
-- **[Phase 1]** Parsed commit message from `git show beb0043891b43`:
-  subject, tags, body analyzed
-- **[Phase 2]** Diff analysis: 3 lines added to `atmel-ecc.c` device-ID
-  tables only
-- **[Phase 3]** `git blame -L 370,390`: tables from `5d324e5159d9e`
-  (6.18-rc8 merge)
-- **[Phase 3]** `git log -20 -- drivers/crypto/atmel-ecc.c`: driver +
-  one prior bug fix in tree
-- **[Phase 3]** `git merge-base --is-ancestor 5d324e5159d9e HEAD`:
-  driver merge is ancestor — driver exists
-- **[Phase 3]** `git apply --check` on commit diff: **applies cleanly**
-- **[Phase 4]** `b4 dig -c beb0043891b43`: lore URL found
-- **[Phase 4]** `b4 dig -a`: v1 and RESEND revisions found
-- **[Phase 4]** `b4 dig -w`: Herbert Xu, linux-crypto@ CC'd
-- **[Phase 4]** `b4 dig -m /tmp/atecc608b.mbox`: Herbert Xu “All
-  applied. Thanks.”; patch 2/2 identified as DT binding only
-- **[Phase 5]** Read `atmel-i2c.c` `device_sanity_check()`: chip-family-
-  agnostic sanity check
-- **[Phase 5]** Read `atmel_ecc_probe()`: standard probe path, no chip-
-  specific branches
-- **[Phase 6]** `git describe HEAD` + `make kernelversion`: tree is
-  **6.18.43**
-- **[Phase 6]** `grep atecc608`: **no matches** in current tree — IDs
-  absent
-- **[Phase 6]** `grep atecc508`: DTS files and driver present — driver
-  exists, only 508a supported
-- **[Phase 7]** `Kconfig CRYPTO_DEV_ATMEL_ECC`: driver is tristate,
-  depends on I2C
-- **[Phase 8]** No crash/corruption path identified; functional gap for
-  ATECC608B hardware
-
-**YES****Verdict: YES** — backport to this tree (Linux 6.18.43).
-
-This is a 3-line device-ID addition (`atmel,atecc608b` OF compatible +
-I2C ID) to the existing `atmel-ecc` driver. It enables ATECC608B
-hardware that otherwise won't bind; it was hardware-tested and accepted
-by Herbert Xu. The patch applies cleanly to the current tree.
-
-Note: it's patch 1/2 of a series — patch 2/2 adds the DT binding in
-`trivial-devices.yaml` and would be needed separately for full Device
-Tree schema compliance.
-
- drivers/crypto/atmel-ecc.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
-index 9da5a03880807..8988fc3d8b9fd 100644
---- a/drivers/crypto/atmel-ecc.c
-+++ b/drivers/crypto/atmel-ecc.c
-@@ -372,6 +372,8 @@ static void atmel_ecc_remove(struct i2c_client *client)
- static const struct of_device_id atmel_ecc_dt_ids[] = {
- 	{
- 		.compatible = "atmel,atecc508a",
-+	}, {
-+		.compatible = "atmel,atecc608b",
- 	}, {
- 		/* sentinel */
- 	}
-@@ -381,6 +383,7 @@ MODULE_DEVICE_TABLE(of, atmel_ecc_dt_ids);
- 
- static const struct i2c_device_id atmel_ecc_id[] = {
- 	{ "atecc508a" },
-+	{ "atecc608b" },
- 	{ }
- };
- MODULE_DEVICE_TABLE(i2c, atmel_ecc_id);
--- 
-2.53.0
-
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: GV2PR04MB11799:EE_|AMBPR04MB754926:EE_
+X-MS-Office365-Filtering-Correlation-Id: d6aec9a4-e569-40c0-8fc2-08df0770d023
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|19092799006|1800799024|23010399003|7416014|376014|10067099003|4143699003|56012099006|11063799006|18002099003|22082099003|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	1itxAnAY7539Rct7UgVArCKshgdAbygnLIPe7/NFKcyx5CwO8l63+mvOjcgQHA/xgEBf+uX5awQ8j1h8BhuE3LLQ+HlYQX8S1HdX5pv1L8lD5cTVtkNKcOcVGjyHl6gZxY/l5z+T6U3x+Br9P38ESg5F1kLO60JBfKZq3gbjj3T8U7TmDKrM1NzTbTh4N9usjRH8na19reqeyVr5njZinq+XY3dj0uH4CtP0uM+eo+7uqmAuRBEW5Xv9Vdc/m0zsis80sEOu/K/S4uRgsv6LavbENhtx+uffBKwRygQlack4CwXOcIN62LuK4VLuePxxv6+2aXszHW0uVVL92FrNinaZUkNBUMmH/canBm7vEnL3u7gBvkyry35TMbXPcHrIS9+yeIVzzfJkwz3O92Jbu5iF5y0CtkTilzocBjWwLaolMeDL6GcKe3rIODo+AxGy93zAPIrkGO0JORxGMDZXmA8eKWpeJaHkti/C+D8xlRDb9kpfOMJEyV9PKVu1uLGSRCx8Axluj+NGXulDIwsjqNsB/IWXmLF4k2FeULhZV86yYrcd5FwoTZuh6UMmNPUtdqQJrUtYUPdYNGGl42vpM5ZP/JyiYhlBciTL4OfK9YdWwhPgxOFE/ZFHKDv1XpappSItcgEAvsLq6C0Z62dhdLoK17BEl3TLbjflEvXbDYM=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV2PR04MB11799.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(19092799006)(1800799024)(23010399003)(7416014)(376014)(10067099003)(4143699003)(56012099006)(11063799006)(18002099003)(22082099003)(13003099007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?NWwxWkFQaHI5UVdjRWxEYUlidU9pYXdqU3Q5b0Nhck0zNlZ0SkpqQmpXaHh0?=
+ =?utf-8?B?cG1GV2w4ZHBsZHN2bWppY091cWRUKzNWeUtyN1hoZG9TMmpkNk5KRXpJWnd6?=
+ =?utf-8?B?RitXLzl4eWZydHlFWFc3N3R5TkdMaENHYzErcW5GMXpFUnd1cEo4cjd3eExG?=
+ =?utf-8?B?MnY2WXNvQ093VEtBUldFRnpVSnlnMHZwZDAxdy9zWUNuK0hzZ2FtR0xacm9V?=
+ =?utf-8?B?eTM3UjhTMHlIT3hoU0JwNXBmYlUzYm51YjZta0tkdHQ3dXV3cTlhcW1qNldv?=
+ =?utf-8?B?czVlYjV3SWRUaEc2T2NVdGhrMTdEOWI5dEh6OUUvWXhBNHZoeDVuemRjMzhW?=
+ =?utf-8?B?OW9kSm05aHBPR3lTMi92UlNpK1YvVHVNNlppWU42cTZFOHNrRDkyckNibFN4?=
+ =?utf-8?B?UWlTb0pzM0R0VTc0S2EzWk56MUNDTUVWK2N3V21VU2k0S2F3ZFZraG1TWFUy?=
+ =?utf-8?B?UWtyVHVmYTAwMXBlL1A2cGY1QU9TZEpUTVE0T29mZWswYklIRmdmak9yMlZY?=
+ =?utf-8?B?Q3NDVDZTY3lMMnByRlpXWFB6djV3NGIrb1lraU1ESUNYL0ZDOURTcnk1dW10?=
+ =?utf-8?B?YURVUy9GZDdmUzNDNjE2QUlTQkVBM201RHRxMitUU0RldTdsUCt2ZTRBWmRv?=
+ =?utf-8?B?YUN3VmFaQVcrTUdTeTMyaTRzaVB4Wm9tVHRPSkZ2WnQ1bVFJcGNNTTZFWTVt?=
+ =?utf-8?B?WEhMWlNFalVnZEZSeWRDM1ZWNVlxc1ZuOW00SEdSVjRpODFiTXJzUlgvVUhl?=
+ =?utf-8?B?NFdaZk14VnFjU0J6YVgzaFFqMFlEdHJyRytkNGdOR09xWlkxY3JBTndYWE5i?=
+ =?utf-8?B?NDZQeWpZK2Z0VmQ3V0tiYmZmZXE3ODh2WDlYU1pZbC9aSHRkUWcvYzIxdldu?=
+ =?utf-8?B?V2JhWkxFb0kzRG51UktMWGNQNWtML3hXZkcva0hTRE9RMFhHWjZZYlVuR3V1?=
+ =?utf-8?B?NHNNa1RYd09xKzg3djI5dUlrUzdtNXhTL21pYk5LeVdPK1lyZzlLVnRkL3JI?=
+ =?utf-8?B?SnF3WTZhSGd4cUMyamEyVGI0ZXMrdVkxbVhCb3FYZTVGODVtcWNrVkllWTg2?=
+ =?utf-8?B?VjR0TVpvaEVuME15Mk5Bc3ErdE1XQW1vdkhtcjdaN1daMTJmRDVRMlUzYXVQ?=
+ =?utf-8?B?dEUyNHMrMTJsK204RUxwM09FUlluVGlJRTdKSmxmaW4xR1A2eXBVS2NUcG5l?=
+ =?utf-8?B?T2p0RXQyUzh4bW5BNmYxVHFacnR5NG1ZRHhabGVPN3p3NEdSWmdhcVhyNktN?=
+ =?utf-8?B?STBUZ1hmZ3NKSExxNHRWWXpGL2NrTWRiWm83Zzgwc1dXZXRRUldqVVIveXRY?=
+ =?utf-8?B?TmJuRXd0alBKeTZjNkVRK2FhZzBEaWVWYzdONEdWcmJKbGxjTmd5MG0wQ2Y2?=
+ =?utf-8?B?bDRYeU50cUp5NVpuTE1YOUpCNm5lRCtzc0NXKzlSMFEzaHIxRkkxK3RJTGgz?=
+ =?utf-8?B?NHN4c1VPM0VlMld0RzBTOTRwOEk1cVdDWnMrY3VpNnFuQWUzNnZxVVNvUW1n?=
+ =?utf-8?B?cjhhSkRDY3A0Ums3VFJaNVhNN0l1YzdFZnhhUTZsNERabkd2KytEbnY0WmdX?=
+ =?utf-8?B?N1psdkRMTitnbll1MlFQVDEwY2tQWmdlRzczZU1mby9QSlVzNFFoTmNwelhZ?=
+ =?utf-8?B?bDVGY2ZCYXJvSHRZRVpaWWJlMUpnTitwNWt3MWtRM2pDZHVIaHpOSXBNYXdI?=
+ =?utf-8?B?cVRVcHZvcEpld01XbXpWUWI4SUdobXBGOE1WK0ZNRUJVeW9jcUVhQURQYzVa?=
+ =?utf-8?B?WlhHU0lBNml1OEg5Ym1PanVVcndkSm9qQUVFSklyY1RzbVpsZjRlN1FFaHIv?=
+ =?utf-8?B?c1V6RGQyaGtLZXZ2RjRyTDNaQzRyaXhRWE5rbmFYa3c1NkdNbGpDSWp0R2VR?=
+ =?utf-8?B?RWt2eVBkOVhUNjBGajdSTG41NmhBREdMRUNlUDdRU0ZEdzNDTjJDUC9HZ0M5?=
+ =?utf-8?B?T2RLTkVWcVEwOGY5MG95dWE0Mm1pSEJpL2laanRZR0JzQzdobnI5Q2lKWFlk?=
+ =?utf-8?B?UmMrR3FmcXNTRDVScFZOb1IwRmYrWW51MGxCTGZZbGM2a0xVTHYrWE85dmVt?=
+ =?utf-8?B?cnBlSFcyYjBKTVB6Z1VEOHRoTUl5SlhtUzQyUDFBQ1kzMHk5amNBTDUrMUU4?=
+ =?utf-8?B?TFhzeEthMWc0YlB3b3lWVjR2TjBLQnZLTW83VTNsRXFWdlNzenZDdmZTdW1N?=
+ =?utf-8?B?Y0J3bCtEK1dCTUh3NGVkOC9oWXpXWjBZVUdwd2xmNThMQjdBVUJMNGhqbWZK?=
+ =?utf-8?B?WjFmREtjZ2UvalZXdktYTk1tNndndFpDanF6OUFsdHE2QjhZSC9rZkFydDFE?=
+ =?utf-8?B?MkNCb252MW5nZmsxbm53Z1FyMTNrTGJ2L1RLVEJqN1Z1VzZPZjJ2NmUrT2pX?=
+ =?utf-8?Q?Cqy71HthsnIyA2fXjFg3em/rC6hvWa9MW5Y0S?=
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d6aec9a4-e569-40c0-8fc2-08df0770d023
+X-MS-Exchange-CrossTenant-AuthSource: GV2PR04MB11799.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Aug 2026 15:02:02.3271
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 40AnQfEPbAtlDXt59I0q3wlPNHJWSjrNoTIVdpV7FA1Y7z5wC1J4vfdJQjjt/Yb2qJ4611w78m4jAnMoTriUAUdbJlkaN5R5PJUJh7iGpvifnVSmIDjbxYJrlD+NKsyi
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AMBPR04MB754926
+
+On Mon, Aug 31, 2026 at 08:42:20PM +0800, Linmao Li wrote:
+> [You don't often get email from lilinmao@kylinos.cn. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
+>
+> 在 2026/8/29 3:25, Frank Li 写道:
+> > On Fri, Aug 28, 2026 at 05:32:09PM +0800, Linmao Li wrote:
+> > > [You don't often get email from lilinmao@kylinos.cn. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
+> > >
+> > > Zero-length skcipher requests are valid no-ops, but MXS-DCP queues them.
+> > Any document show it? if return 0 when cryptelen, it is async, no
+> > call crypto_request_complete.
+>   Yes. CRYPTO_ALG_ASYNC means that the implementation may complete a
+>   request asynchronously, not that every request must do so.
+>
+>   A return value of 0 indicates synchronous completion.  Only
+>   -EINPROGRESS and -EBUSY cause crypto_wait_req() to wait for the
+>   completion callback.  The existing fallback path relies on the same
+>   semantics.
+>
+>   There is also a direct precedent in commit 8a4e047c6cc0
+>   ("crypto: marvell/cesa - Handle zero-length skcipher requests").
+>   Marvell CESA registers asynchronous skcipher algorithms but handles a
+>   zero-length request with:
+>
+>           if (!req->cryptlen)
+>                   return 0;
+
+Thanks, but still not answer my question,
+
+Any document show "Zero-length skcipher requests are valid no-ops", why
+not API direct return 0, instead of pass to every driver to check it.
+
+I suppose it should be checked before call driver's callback.
+
+Frank
+
+>
+>
+> Thanks,
+> Linmao
+>
+> >
+> > Frank
+> >
+> > > When such a request reaches the worker, last_out_len remains zero. The
+> > > CBC completion path then subtracts AES_BLOCK_SIZE from this unsigned
+> > > value when updating the IV, causing the offset to underflow. On
+> > > decryption, the resulting source address precedes aes_in_buf.
+> > >
+> > > Return success before enqueueing zero-length requests. This avoids the
+> > > invalid source access and leaves the IV unchanged for a no-op.
+> > >
+> > > Fixes: fadd7a6e616b ("crypto: mxs-dcp - Fix AES issues")
+> > > Signed-off-by: Linmao Li <lilinmao@kylinos.cn>
+> > > ---
+> > >   drivers/crypto/mxs-dcp.c | 3 +++
+> > >   1 file changed, 3 insertions(+)
+> > >
+> > > diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
+> > > index 133ebc998236..60794b4d49fa 100644
+> > > --- a/drivers/crypto/mxs-dcp.c
+> > > +++ b/drivers/crypto/mxs-dcp.c
+> > > @@ -473,6 +473,9 @@ static int mxs_dcp_aes_enqueue(struct skcipher_request *req, int enc, int ecb)
+> > >          struct dcp_aes_req_ctx *rctx = skcipher_request_ctx(req);
+> > >          int ret;
+> > >
+> > > +       if (!req->cryptlen)
+> > > +               return 0;
+> > > +
+> > >          if (unlikely(actx->key_len != AES_KEYSIZE_128 && !actx->key_referenced))
+> > >                  return mxs_dcp_block_fallback(req, enc);
+> > >
+> > >
+> > > base-commit: 8d3ae59288f1e7d58d76558a6ee96d533bc5019f
+> > > --
+> > > 2.25.1
+> > >
+> > >
