@@ -1,47 +1,43 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A43444A3EE;
-	Mon, 31 Aug 2026 13:42:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F094566C4E;
+	Mon, 31 Aug 2026 13:48:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788183733; cv=none; b=OZ9+Bw+5eCIgj1MaTkubLcaBVJRm+y+JP1LQWzwatHjZfAcnYpUQk526KMnQ+9+N9IZmhQIGV6uR9Fin395UX0uFD7RUDvKMbMkS6ulso9VplchSwflYC2XsHpU2A3U+W4yW/xWVUTY5jE8fZLeQ1o2PbH21XyzHOIyMTJBGhGo=
+	t=1788184084; cv=none; b=uVCH5TJMUrhNPknBoek56ToLt5rhBaF5hnrtJrKXWVhLmfQw5QJQFxrCxNDlVFL51oipO7minfutb3ZDuXCmKNzEE0JGlQpOelIFF9p6UxziBM9SgmH90h1S73XUCFLlKKIRTnvnuRFTGsocvmLq4kLCWmLmxYq5Vwh+KZEPQfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788183733; c=relaxed/simple;
-	bh=esiWKftdgtlhrwVwueMMa4hZKzagSmx7NPKwEK/luSA=;
+	s=arc-20240116; t=1788184084; c=relaxed/simple;
+	bh=kVDwmKRyY7K+PV+CWmAPPeA6HKS068Y55C+8X3+eovI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L+IIwVj67InE8BAyHAGyp18YdEXDcWCsocjI6vhvs2p7Mg/Fm9vryZTOZiX9TEW/bd0u3slY+OPqVd6chRtBDzOFm+HHGtrkuetjuJjVnYGwudrFVWeHO2bcPwkV8qX2R4OkcHr8rVerAQ+14yJ1AJzsSH2nkP0uAU4Gde5tEuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=llwTR3zs; arc=none smtp.client-ip=100.103.45.18
+	 MIME-Version:Content-Type; b=C/oktysbU7cZ8KEy8JjxYb9rYNsGXJjyNHObqnVhbB+U6qzhJAL6/n/i6H3O7raK0B9/qpyY9zAN1q3gDcnA8pRrbdRhPIqxlAu4ypUOvV+bRlCFibyR9tffEJ/ICkomMPYRf6iJklV/jpn3Wdt5irFFtUwxoGkfEqrYyOOPwqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MX1puEAU; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="llwTR3zs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A1AC1F000E9;
-	Mon, 31 Aug 2026 13:42:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MX1puEAU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 741471F00ACF;
+	Mon, 31 Aug 2026 13:47:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788183731;
-	bh=LU1tCjaazAuuI5hKZKyA4j9n1PnyCCpNtt7AusBd1p4=;
+	s=k20260515; t=1788184080;
+	bh=/77pn6z30uvsynT2JfwXrNtm08jv46VHuqPUGer+tik=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=llwTR3zsWyqyYP+9BDu2JsnlDXClT0N1miM0MtgoSkcnoe2sSlje+C5goQM7T2X9d
-	 gPUTXjc4hdXVtXDaWRd/KwmxI8pupZoQdHXQvUsQVbOAcDzidwWVp0emS35a7cAYyl
-	 leHJP/T1gUcMLSGWL5bceuvL9ZbXNluTlBeEO5SapGerwt3xkAdiUdT3jFKkvDGFyf
-	 TcSrs9b+nMnO8t2vlRS4OVmOf/Tr5TH/CcjNNZObMeFuJ5iuvWwa2kTsY46nE1rVHf
-	 wX8iDLvE1VkeCU6dPoaepsg4ZzdYFIaHZPt5mWQ/ktlB7IM1vtlnzLrSHAaiRzKE9N
-	 negC8O9FLWCpw==
+	b=MX1puEAUAPcO5ns4rOTYtaZBH3dMCUaKRP8byzMc/+xqGPKxjRnKOQmX/nZFhwnPD
+	 K1AV3lsk+MMXoJToZOLBzyAPRpuxGW/mRROtTV+yeXCwo46CSFutJlE5jxmKorSFlc
+	 be988ilj7FLHwD5gylsQqKcmumSWJSUgsvT2ABK0r2QBhLoTdyirBpkNLAFZ1yYIfs
+	 NrLO6zDkrXrJ3xnbOv4sDNmGfz0geLd8x0SS/WebfqksC3kV7hJHvC8dTXPaL2e5sI
+	 8bhFkxZRUoe4afuh7fQsYYn3ov4S0gJwyGBIpTjM3SKEoFRYNYXGRK8CpnU7qElsGz
+	 bvOGUNnAXSc+w==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Ruoyu Wang <ruoyuw560@gmail.com>,
-	Linus Walleij <linusw@kernel.org>,
+Cc: Rosen Penev <rosenp@gmail.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Sasha Levin <sashal@kernel.org>,
-	kaloz@openwrt.org,
-	clabbe@baylibre.com,
 	davem@davemloft.net,
-	linux-arm-kernel@lists.infradead.org,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-5.15] crypto: ixp4xx - fix buffer chain unwind on allocation failure
-Date: Mon, 31 Aug 2026 09:24:58 -0400
-Message-ID: <20260831133314.4125787-270-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.18] crypto: amcc - convert irq_of_parse_and_map to platform_get_irq
+Date: Mon, 31 Aug 2026 09:28:27 -0400
+Message-ID: <20260831133314.4125787-479-sashal@kernel.org>
 X-Mailer: git-send-email 2.53.0
 In-Reply-To: <20260831133314.4125787-1-sashal@kernel.org>
 References: <20260831133314.4125787-1-sashal@kernel.org>
@@ -57,461 +53,461 @@ X-stable-base: Linux 6.18.48
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Ruoyu Wang <ruoyuw560@gmail.com>
+From: Rosen Penev <rosenp@gmail.com>
 
-[ Upstream commit 25056329384010a8672552b134f609601dc4f80e ]
+[ Upstream commit 1cecde1005399eb4e4069c036dcfcbe3c240b6e0 ]
 
-chainup_buffers() builds a linked list of buffer descriptors for a
-scatterlist. If dma_pool_alloc() fails while constructing the list, the
-current code sets buf to NULL and later dereferences it unconditionally
-at the end of the function:
+Replace the deprecated irq_of_parse_and_map() call with the modern
+platform_get_irq() in the probe function. This also improves error
+handling: platform_get_irq() returns a negative errno on failure,
+whereas irq_of_parse_and_map() returned 0.
 
-  buf->next = NULL;
-  buf->phys_next = 0;
+Change the irq field in struct crypto4xx_core_device from u32 to int
+to match the return type of platform_get_irq().
 
-This can lead to a null-pointer dereference on allocation failure.
-
-If the failure happens after part of the descriptor chain has already
-been allocated and DMA-mapped, the partially constructed chain also
-needs to be released.
-
-Fix this by terminating the partially constructed chain on allocation
-failure and letting the callers unwind it via their existing cleanup
-paths. Also fix ablk_perform() to preserve the hook pointers before
-checking for failure, so partially built chains can be freed correctly.
-
-Signed-off-by: Ruoyu Wang <ruoyuw560@gmail.com>
-Acked-by: Linus Walleij <linusw@kernel.org>
+Assisted-by: opencode:big-pickle
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-## Phase 1: Commit Message Forensics
+# Stable Backport Analysis: `crypto: amcc - convert irq_of_parse_and_map
+to platform_get_irq`
 
-**Step 1.1 — Subject line**
-
-Record: `[crypto: ixp4xx] [fix] fix buffer chain unwind on allocation
-failure in chainup_buffers()/ablk_perform()`
-
-**Step 1.2 — Tags**
-
-Record:
-- `Signed-off-by: Ruoyu Wang <ruoyuw560@gmail.com>` — author
-- `Acked-by: Linus Walleij <linusw@kernel.org>` — ARM/platform
-  maintainer ack
-- `Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>` — crypto
-  maintainer merge
-- No `Fixes:` tag (expected for manual review)
-- No `Reported-by:` / `Link:` / `Cc: stable@vger.kernel.org`
-- Notable: maintainer ack from Linus Walleij; Herbert Xu applied v2 per
-  lore
-
-**Step 1.3 — Body analysis**
-
-Record:
-- **Bug:** `chainup_buffers()` on `dma_pool_alloc()` failure sets `buf =
-  NULL`, breaks, then unconditionally does `buf->next = NULL` → NULL
-  pointer dereference.
-- **Secondary bug:** Partially built descriptor chains are not
-  terminated/freed on failure.
-- **Symptom:** Kernel oops on allocation failure; possible DMA-pool leak
-  if the NULL deref were avoided without proper unwind.
-- **Root cause:** Incorrect error handling in `chainup_buffers()`;
-  `ablk_perform()` checks return value before saving hook pointers, so
-  cleanup cannot free partial chains.
-- **Version info:** None in commit message.
-
-**Step 1.4 — Hidden bug fix?**
-
-Record: No — this is an explicit bug fix (NULL deref + resource leak on
-error path), not disguised cleanup.
+**Local tree:** `stable/linux-6.18.y` at `v6.18.44-1-g2736c32da98b9`
+(kernel version **6.18.44**)
 
 ---
 
-## Phase 2: Diff Analysis
+## PHASE 1: COMMIT MESSAGE FORENSICS
 
-**Step 2.1 — Inventory**
+### Step 1.1: PARSE THE SUBJECT LINE
+**Record:** `[crypto: amcc]` `[convert]` — Replace deprecated
+`irq_of_parse_and_map()` with `platform_get_irq()` in the AMCC PPC4xx
+crypto driver probe path.
 
-Record:
-- **File:** `drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c` (+14 / −11,
-  ~25 lines)
-- **Functions:** `chainup_buffers()`, `ablk_perform()`
-- **Scope:** Single-file surgical fix
+### Step 1.2: PARSE ALL COMMIT MESSAGE TAGS
+**Record:**
+- **Fixes:** — absent (expected for candidate review)
+- **Reported-by:** — none
+- **Tested-by:** — none
+- **Reviewed-by:** — none
+- **Acked-by:** — none
+- **Link:** — none
+- **Cc: stable@vger.kernel.org** — absent (expected)
+- **Signed-off-by:** Rosen Penev `<rosenp@gmail.com>`, Herbert Xu
+  `<herbert@gondor.apana.org.au>`
+- **Assisted-by:** opencode:big-pickle
+- **Notable patterns:** No fuzzer report, no user bug report, no
+  explicit stable nomination. Herbert Xu (crypto maintainer) signed off.
 
-**Step 2.2 — Code flow changes**
+### Step 1.3: ANALYZE THE COMMIT BODY TEXT
+**Record:**
+- **Bug described:** `irq_of_parse_and_map()` returns `0` on failure,
+  which is ambiguous and not a proper errno. `platform_get_irq()`
+  returns a negative errno on failure.
+- **Symptom/failure mode:** IRQ lookup failure is not detected before
+  `devm_request_irq()`; `-EPROBE_DEFER` from the OF IRQ path is
+  swallowed (converted to `0` by `irq_of_parse_and_map()`).
+- **Version information:** None stated.
+- **Root cause:** Deprecated IRQ API with incorrect failure signaling;
+  missing explicit error check before IRQ registration.
 
-Record:
-- **Hunk 1 (`chainup_buffers`):** Before: on alloc failure, `buf = NULL;
-  break;` then fall through to `buf->next = NULL` (crash). After:
-  terminate current `buf` chain (`buf->next = NULL; buf->phys_next = 0`)
-  and `return NULL` immediately.
-- **Hunk 2 (`ablk_perform`):** Before: `if (!chainup_buffers(...)) goto
-  cleanup` before saving `dst_hook`/`src_hook` into `req_ctx` and
-  `crypt`. After: assign return to `buf`, always save hook pointers
-  first, then `if (!buf) goto cleanup` — matching the pattern already
-  used in `aead_perform()`.
-
-**Step 2.3 — Bug mechanism**
-
-Record:
-- **Category:** NULL pointer dereference + error-path resource leak
-- **Mechanism:** On `dma_pool_alloc()` failure, `buf` becomes NULL but
-  is dereferenced at function end. Even if that were avoided,
-  `ablk_perform()` would jump to cleanup without populating
-  `req_ctx->dst/src` and `crypt->dst_buf/src_buf`, so `free_buf_chain()`
-  would not release partially allocated chains.
-
-**Step 2.4 — Fix quality**
-
-Record: Fix is minimal, obviously correct, and aligns `ablk_perform()`
-with the existing correct pattern in `aead_perform()`. Low regression
-risk — only affects failure paths.
-
----
-
-## Phase 3: Git History Investigation
-
-**Step 3.1 — Blame**
-
-Record: `git blame` on `chainup_buffers()` lines 872–902 attributes all
-lines to `5d324e5159d9e` (Nov 28, 2025 merge). This checkout’s history
-is shallow around this file; exact introduction commit of the buggy
-pattern could not be determined here. The driver itself dates to 2008
-per file header.
-
-**Step 3.2 — Fixes: tag**
-
-Record: N/A — no `Fixes:` tag present.
-
-**Step 3.3 — Related file history**
-
-Record: `git log --oneline -20 --
-drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c` shows only the merge commit
-in this tree. Fix commit is **not** present (`git log --grep="buffer
-chain"` returns nothing). Buggy code confirmed at lines 886–900 and
-1028–1040.
-
-**Step 3.4 — Author context**
-
-Record: No prior Ruoyu Wang commits in this tree’s
-`drivers/crypto/intel/ixp4xx/` history. Patch was reviewed by crypto
-maintainer Herbert Xu (v2 incorporated his feedback).
-
-**Step 3.5 — Dependencies**
-
-Record: Standalone fix; no series dependencies. `aead_perform()` in the
-same file already uses the post-fix calling convention, confirming the
-API contract.
+### Step 1.4: DETECT HIDDEN BUG FIXES
+**Record:** **Yes — hidden bug fix disguised as API modernization.**
+Beyond deprecation cleanup, it fixes:
+1. Missing probe error handling for IRQ lookup failure.
+2. Failure to propagate `-EPROBE_DEFER` (verified: `of_irq_get()`
+   returns `-EPROBE_DEFER` when `irq_find_host()` fails;
+   `irq_of_parse_and_map()` maps `of_irq_parse_one()` errors to `0`).
+3. Aligns with the same class of fix already backported to this tree for
+   another PPC 460-class driver (`sata_dwc_460ex`).
 
 ---
 
-## Phase 4: Mailing List and External Research
+## PHASE 2: DIFF ANALYSIS
 
-**Step 4.1 — Original discussion**
+### Step 2.1: INVENTORY THE CHANGES
+**Record:**
+- `drivers/crypto/amcc/crypto4xx_core.c`: +4 lines (error check added)
+- `drivers/crypto/amcc/crypto4xx_core.h`: 1 line (`u32 irq` → `int irq`)
+- **Functions modified:** `crypto4xx_probe()`
+- **Scope:** Single-subsystem, surgical, 2 files, 6 insertions / 2
+  deletions
 
-Record: Patch v2 submitted Apr 23, 2026 to linux-crypto. Thread:
-https://lists.openwall.net/linux-kernel/2026/04/23/864. v2 changes per
-Herbert Xu: keep unwind in callers, terminate partial chain, save hook
-pointers in `ablk_perform()`. Herbert Xu replied “Patch applied.
-Thanks.” (May 5, 2026).
+### Step 2.2: UNDERSTAND THE CODE FLOW CHANGE
+**Record:**
+- **Hunk 1 (probe):** Before: assign IRQ via `irq_of_parse_and_map()`,
+  proceed directly to `devm_request_irq()`. After: obtain IRQ via
+  `platform_get_irq()`, bail out with proper errno (including
+  `-EPROBE_DEFER`) if `< 0`, then request IRQ.
+- **Hunk 2 (header):** Before: `irq` stored as `u32`. After: `int` to
+  correctly hold negative errno values during assignment and positive
+  IRQ numbers on success.
+- **Path affected:** Platform driver probe, IRQ setup — initialization
+  path on `CONFIG_CRYPTO_DEV_PPC4XX` hardware.
 
-**Step 4.2 — Reviewers**
+### Step 2.3: IDENTIFY THE BUG MECHANISM
+**Record:**
+- **Bug category:** Logic/correctness fix + initialization/probe-
+  deferral fix
+- **Mechanism:** `irq_of_parse_and_map()` returns `0` on
+  `of_irq_parse_one()` failure (see `drivers/of/irq.c:44-45`),
+  conflating failure with a potentially valid IRQ number and never
+  returning `-EPROBE_DEFER`. The old code then called
+  `devm_request_irq()` with `0`, which returns `-EINVAL` via
+  `irq_to_desc(0)` returning NULL — causing permanent probe failure
+  instead of deferred reprobe. `platform_get_irq()` → `of_irq_get()`
+  correctly returns negative errnos including `-EPROBE_DEFER`.
 
-Record: To: Herbert Xu, Corentin Labbe, linux-crypto. Cc: Linus Walleij,
-Imre Kaloz, David S. Miller, linux-arm-kernel, linux-kernel. Appropriate
-maintainers were included.
-
-**Step 4.3 — Bug report**
-
-Record: No external bug report or syzbot report. Bug identified by code
-review / author analysis.
-
-**Step 4.4 — Series context**
-
-Record: v1 used internal `free_buf_chain()` in `chainup_buffers()`; v2
-(committed version) moved unwind to callers per maintainer feedback.
-Committed version is the latest revision.
-
-**Step 4.5 — Stable list discussion**
-
-Record: No stable-list discussion found. Absence of `Cc: stable` is not
-a negative signal per review guidelines.
-
----
-
-## Phase 5: Code Semantic Analysis
-
-**Step 5.1 — Key functions**
-
-Record: `chainup_buffers()`, `ablk_perform()`, `free_buf_chain()`
-
-**Step 5.2 — Callers**
-
-Record: `chainup_buffers()` called from:
-- `ablk_perform()` (lines 1028, 1038) — **buggy caller pattern**
-- `aead_perform()` (lines 1140, 1160) — **already correct pattern**
-
-`ablk_perform()` called from `ablk_encrypt()`, `ablk_decrypt()`,
-`ablk_rfc3686_crypt()`.
-
-**Step 5.3 — Callees**
-
-Record: `dma_pool_alloc()`, `dma_map_single()`, `sg_virt()`,
-`sg_next()`, `free_buf_chain()` (on error paths)
-
-**Step 5.4 — Reachability**
-
-Record: Reachable from userspace crypto operations (skcipher
-encrypt/decrypt) on systems with `CONFIG_CRYPTO_DEV_IXP4XX` and IXP4xx
-hardware (`ARCH_IXP4XX`). Trigger requires `dma_pool_alloc()` failure
-(memory pressure or pool exhaustion), most likely under `GFP_ATOMIC`
-when `CRYPTO_TFM_REQ_MAY_SLEEP` is unset.
-
-**Step 5.5 — Similar patterns**
-
-Record: `aead_perform()` already implements the correct post-fix
-pattern, demonstrating this is the intended API usage and
-`ablk_perform()` was simply inconsistent.
+### Step 2.4: ASSESS THE FIX QUALITY
+**Record:**
+- Fix is minimal, idiomatic, and matches kernel-wide pattern (documented
+  in `platform_get_irq()` kerneldoc).
+- `core_dev->irq` is only referenced at assignment and
+  `devm_request_irq()` call — `u32`→`int` change is safe.
+- **Regression risk:** Very low. Same author applied an analogous change
+  to `net: ibm: emac` already present in this stable tree.
+- **Minor concern:** On `-EPROBE_DEFER`, `err_iomap` path runs
+  `tasklet_kill()` and manual pool teardown before returning —
+  acceptable since probe will retry from scratch.
 
 ---
 
-## Phase 6: Cross-Reference Against Local Tree (6.18.43)
+## PHASE 3: GIT HISTORY INVESTIGATION
 
-**Step 6.1 — Buggy code present?**
+### Step 3.1: BLAME THE CHANGED LINES
+**Record:**
+- `irq_of_parse_and_map()` line introduced in `b0a191cebea13c`
+  (Christian Lamparter, 2017-12-22).
+- `devm_request_irq()` conversion in `0a53948477ca1d` (Rosen Penev,
+  2024-10-10).
+- Buggy IRQ pattern has been present since 2017; devm conversion in 2024
+  did not fix the error-handling gap.
 
-Record: **YES.** Local tree is `6.18.43` (`git describe`:
-`v6.18.43-1-gc7f0dac02d232`). Buggy code at:
+### Step 3.2: FOLLOW THE FIXES: TAG
+**Record:** No `Fixes:` tag present — not applicable.
 
-```886:901:drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c
-                if (!next_buf) {
-                        buf = NULL;
-                        break;
-                }
-                // ...
-        buf->next = NULL;
-        buf->phys_next = 0;
-        return buf;
+### Step 3.3: CHECK FILE HISTORY FOR RELATED CHANGES
+**Record:**
+- Related stable precedent: `678d874e6ae11` (`ata: sata_dwc_460ex: use
+  platform_get_irq()`) — same author (Rosen Penev), same PPC 4xx
+  platform family, same API migration, explicitly backported to
+  `stable/linux-6.18.y` with rationale citing missing
+  `irq_dispose_mapping()` and better error reporting.
+- Related author commit: `a598f66d91693` (`net: ibm: emac: use
+  platform_get_irq`) — same author, backported to this tree.
+- `bdd3f7fa77257` (2012): moved `err_iomap` label to cover
+  post-`irq_of_parse_and_map` cleanup — shows IRQ setup has long been in
+  this code region.
+- **Standalone:** Single-patch fix, not part of a series.
+
+### Step 3.4: CHECK THE AUTHOR'S OTHER COMMITS
+**Record:** Rosen Penev is an active contributor to this driver
+(`0a53948477ca1d` devm probe refactor, `7337b18f1ec75` resource
+cleanup). Same author has had similar IRQ API migrations accepted into
+this stable tree.
+
+### Step 3.5: CHECK FOR DEPENDENT/PREREQUISITE COMMITS
+**Record:** No dependencies. Commit `1cecde1005399` applies cleanly to
+current `6.18.44` tree (`git apply --check` succeeded). Standalone.
+
+---
+
+## PHASE 4: MAILING LIST AND EXTERNAL RESEARCH
+
+### Step 4.1: FIND THE ORIGINAL PATCH DISCUSSION
+**Record:**
+- `b4 dig -c 1cecde1005399`:
+  https://patch.msgid.link/20260602014645.522137-1-rosenp@gmail.com
+- **Series revisions:** v1 only (`b4 dig -a`)
+- **Lore content:** Could not fetch full thread (Anubis bot protection
+  on lore.kernel.org). No reviewer stable nominations verifiable from
+  fetched content.
+
+### Step 4.2: CHECK WHO REVIEWED THE PATCH
+**Record:** `b4 dig -w` recipients: Rosen Penev, `linux-
+crypto@vger.kernel.org`, Herbert Xu, David S. Miller, `linux-
+kernel@vger.kernel.org`. Herbert Xu (crypto maintainer) committed it. No
+explicit Reviewed-by in commit.
+
+### Step 4.3: SEARCH FOR THE BUG REPORT
+**Record:** No bug report, syzbot link, or user-reported crash. Bug
+identified by code inspection / API deprecation work.
+
+### Step 4.4: CHECK FOR RELATED PATCHES AND SERIES
+**Record:** Standalone patch. Related stable backport `678d874e6ae11`
+(sata_dwc_460ex, PPC 460ex) provides direct precedent in this same
+stable tree.
+
+### Step 4.5: CHECK STABLE MAILING LIST HISTORY
+**Record:** Not searched on lore stable list (fetch blocked). However,
+`678d874e6ae11` and `a598f66d91693` in `git log stable/linux-6.18.y`
+confirm stable maintainers accept this class of fix for PPC platform
+drivers.
+
+---
+
+## PHASE 5: CODE SEMANTIC ANALYSIS
+
+### Step 5.1: IDENTIFY KEY FUNCTIONS IN THE DIFF
+**Record:** `crypto4xx_probe()` — only function modified.
+
+### Step 5.2: TRACE CALLERS
+**Record:** `crypto4xx_probe()` is the `.probe` callback of the
+`platform_driver` for `CONFIG_CRYPTO_DEV_PPC4XX`. Called during kernel
+boot / module load when a matching OF platform device is registered on
+PowerPC 4xx SoCs. Not a hot path; runs once per device at
+initialization.
+
+### Step 5.3: TRACE CALLEES
+**Record:** Key callees in affected region: `platform_get_irq()` →
+`of_irq_get()`, `devm_request_irq()`, `tasklet_init()`,
+`devm_platform_ioremap_resource()`, pool build functions. IRQ path
+involves OF parsing and interrupt domain mapping.
+
+### Step 5.4: FOLLOW THE CALL CHAIN
+**Record:** Device tree match → `platform_device` registration →
+`crypto4xx_probe()` → IRQ setup → `devm_request_irq()`. Reachable on
+every boot for systems with `CRYPTO_DEV_PPC4XX=y/m` and matching
+hardware (e.g., AMCC PPC4xx crypto accelerator on embedded PowerPC
+boards).
+
+### Step 5.5: SEARCH FOR SIMILAR PATTERNS
+**Record:** Same `irq_of_parse_and_map` → `platform_get_irq` migration
+pattern backported in this tree for `sata_dwc_460ex` and `ibm emac`. No
+`irq_dispose_mapping()` anywhere in `drivers/crypto/amcc/` (verified via
+grep) — same cleanup gap cited in the sata stable backport.
+
+---
+
+## PHASE 6: CROSS-REFERENCING AGAINST THE LOCAL TREE
+
+### Step 6.1: DOES THE BUGGY CODE EXIST IN THIS TREE?
+**Record:** **Yes.** At `drivers/crypto/amcc/crypto4xx_core.c:1298`:
+```c
+core_dev->irq = irq_of_parse_and_map(ofdev->dev.of_node, 0);
 ```
+No error check before `devm_request_irq()`. `struct
+crypto4xx_core_device::irq` is still `u32` in `crypto4xx_core.h:109`.
+Bug present since 2017.
 
-and buggy `ablk_perform()` caller pattern at lines 1028–1040. Fix is
-**not** yet applied.
+### Step 6.2: CHECK FOR BACKPORT COMPLICATIONS
+**Record:** **Clean apply expected.** `git format-patch -1 1cecde1005399
+| git apply --check` succeeded with no conflicts. File structure matches
+upstream commit base.
 
-**Step 6.2 — Backport complications**
-
-Record: Expected **clean apply** — current source matches the patch’s
-`index fcc0cf4df..5b90cf0fb` base context exactly.
-
-**Step 6.3 — Related fixes already present?**
-
-Record: No equivalent fix found via `git log --grep`. `aead_perform()`
-already has correct hook-pointer handling but does not fix the
-`chainup_buffers()` NULL deref.
-
----
-
-## Phase 7: Subsystem and Maintainer Context
-
-**Step 7.1 — Subsystem**
-
-Record: `drivers/crypto/intel/ixp4xx/` — crypto hardware driver for
-Intel IXP4xx NPE. **Criticality: PERIPHERAL** (platform-specific
-embedded hardware), but error path is in common crypto request handling.
-
-**Step 7.2 — Activity**
-
-Record: `drivers/crypto/` has active maintenance in this tree (recent
-qat, tegra, cavium fixes). IXP4xx driver file shows limited recent churn
-in this checkout.
+### Step 6.3: CHECK IF RELATED FIXES ARE ALREADY HERE
+**Record:** Fix `1cecde1005399` is **not** in this tree. `git log
+stable/linux-6.18.y..1cecde1005399 -- drivers/crypto/amcc/` shows only
+this commit as relevant. No duplicate fix present.
 
 ---
 
-## Phase 8: Impact and Risk Assessment
+## PHASE 7: SUBSYSTEM AND MAINTAINER CONTEXT
 
-**Step 8.1 — Who is affected**
+### Step 7.1: IDENTIFY THE SUBSYSTEM AND ITS CRITICALITY
+**Record:** `drivers/crypto/amcc/` — crypto hardware accelerator driver.
+**Criticality: PERIPHERAL** (platform-specific; `depends on PPC &&
+4xx`). Affects crypto offload and optionally HW RNG on embedded PowerPC
+4xx systems.
 
-Record: Systems with `CONFIG_CRYPTO_DEV_IXP4XX` (depends on `ARCH_IXP4XX
-|| COMPILE_TEST`, plus `IXP4XX_QMGR` and `IXP4XX_NPE`). Primarily
-embedded IXP4xx/ARM routers and similar devices using hardware crypto
-acceleration.
-
-**Step 8.2 — Trigger conditions**
-
-Record: Skcipher crypto request through `ablk_perform()` when
-`dma_pool_alloc()` fails mid-chain. Uncommon but realistic under memory
-pressure. Userspace can initiate crypto ops; failure is not theoretical
-once pool is exhausted.
-
-**Step 8.3 — Failure mode severity**
-
-Record:
-- **Primary:** NULL pointer dereference → kernel oops (**CRITICAL** when
-  triggered)
-- **Secondary:** Partial buffer-chain leak on alloc failure without
-  proper hook setup (**HIGH** — DMA pool exhaustion)
-
-**Step 8.4 — Risk vs benefit**
-
-Record:
-- **Benefit:** Prevents kernel crash and fixes error-path resource leak
-  in hardware crypto path
-- **Risk:** Very low — ~25 lines, failure-path only, matches existing
-  `aead_perform()` pattern, maintainer-reviewed
-- **Ratio:** Clear benefit outweighs risk for this tree
+### Step 7.2: ASSESS SUBSYSTEM ACTIVITY
+**Record:** Moderately active — recent stable commits include ahash
+removal, gcc12 warning fix, devm conversion (2024). Driver is mature but
+still maintained.
 
 ---
 
-## Phase 9: Final Synthesis
+## PHASE 8: IMPACT AND RISK ASSESSMENT
 
-**Step 9.1 — Evidence summary**
+### Step 8.1: DETERMINE WHO IS AFFECTED
+**Record:** **Platform-specific / config-specific** — users of
+`CONFIG_CRYPTO_DEV_PPC4XX` on PowerPC 4xx SoCs (embedded systems, some
+legacy networking appliances). Small population, but real hardware.
 
-**FOR backport:**
-- Real, verifiable NULL deref on error path
-- Secondary resource-leak fix in `ablk_perform()`
-- Small, surgical, single-file change
-- Acked by Linus Walleij; applied by crypto maintainer Herbert Xu after
-  review
-- Buggy code confirmed present in local 6.18.43 tree; fix not yet
-  applied
-- Patch should apply cleanly
-- Same-file `aead_perform()` validates the fix approach
+### Step 8.2: DETERMINE THE TRIGGER CONDITIONS
+**Record:**
+- IRQ not yet available in device tree / interrupt parent not probed yet
+  → `-EPROBE_DEFER` mishandled.
+- Malformed or missing interrupt spec → `0` returned, probe fails at
+  `request_irq()` with `-EINVAL` instead of clean early error.
+- **Likelihood:** Boot-order race is realistic on deferred-probe
+  systems; missing IRQ spec is a DT configuration error.
+- **Unprivileged trigger:** No — requires specific hardware and kernel
+  config.
 
-**AGAINST backport:**
-- Niche hardware (IXP4xx only) — smaller user base
-- Requires `dma_pool_alloc()` failure — not everyday, but real under
-  pressure
-- No syzbot/user crash report (found via review)
+### Step 8.3: DETERMINE THE FAILURE MODE SEVERITY
+**Record:**
+- **Without fix:** Driver probe fails permanently (returns `-EINVAL`
+  instead of `-EPROBE_DEFER`), or proceeds with invalid IRQ `0`. Crypto
+  hardware acceleration unavailable; possible mis-registered interrupt
+  in edge cases.
+- **Severity: MEDIUM** — functional failure (hardware crypto offload
+  broken), not a system-wide crash, data corruption, or security
+  vulnerability. Important for affected embedded deployments.
 
-**Unresolved:** Exact commit that introduced the buggy `buf = NULL;
-break` pattern could not be determined from this tree’s shallow file
-history.
+### Step 8.4: CALCULATE RISK-BENEFIT RATIO
+**Record:**
+- **Benefit:** MEDIUM for PPC 4xx users — restores correct probe
+  deferral and proper IRQ error handling; aligns with already-accepted
+  stable precedent.
+- **Risk:** VERY LOW — 6-line change, applies cleanly, no API changes,
+  no behavior change on success path.
+- **Ratio:** Favorable for backport, especially given identical fix
+  already in this tree for `sata_dwc_460ex`.
 
-**Step 9.2 — Stable rules checklist**
+---
 
-1. Obviously correct and tested? **PASS** — logic is clear; maintainer
-   reviewed and applied v2
-2. Fixes a real bug? **PASS** — NULL deref + leak on alloc failure
-3. Important issue? **PASS** — kernel oops (CRITICAL when triggered);
-   memory leak (HIGH)
-4. Small and contained? **PASS** — 1 file, ~25 lines, failure paths only
-5. No new features/APIs? **PASS** — error-handling fix only
-6. Can apply to local tree? **PASS** — buggy code present; clean apply
-   expected
+## PHASE 9: FINAL SYNTHESIS
 
-**Step 9.3 — Exception categories**
+### Step 9.1: COMPILE THE EVIDENCE
 
-Record: None (not device ID, quirk, DT, build, or docs). Standard bug-
-fix backport.
+**FOR backporting:**
+- Real probe bug: `-EPROBE_DEFER` not propagated through
+  `irq_of_parse_and_map()`
+- Missing explicit IRQ error check before `devm_request_irq()`
+- Small, surgical, obviously correct fix
+- Applies cleanly to 6.18.44
+- Direct stable precedent: `678d874e6ae11` (same author, same PPC 4xx
+  family, same fix class) already in this tree
+- Same author's `a598f66d91693` (emac) also in this tree
+- Herbert Xu signed off
+- Buggy code confirmed present in local tree since 2017
 
-**Step 9.4 — Decision rationale**
+**AGAINST backporting:**
+- No user bug report or syzbot finding
+- Affects niche embedded hardware only
+- Failure mode is driver probe failure, not kernel crash/oops/corruption
+- Primarily described as API modernization
 
-For Linux **6.18.43**, this commit fixes a confirmed NULL pointer
-dereference and an associated error-path resource leak in an existing
-driver that is present and buggy in this tree. The fix is small,
-maintainer-reviewed, and follows an established pattern already used in
-the same file. While the hardware is niche, stable trees routinely
-accept driver crash fixes of this nature.
+**UNRESOLVED:**
+- Full lore review thread inaccessible (bot protection)
+- No explicit stable nomination in mailing list (unverifiable)
+
+### Step 9.2: STABLE RULES CHECKLIST
+1. Obviously correct and tested? **PASS** — idiomatic
+   `platform_get_irq()` pattern; no Tested-by on this specific commit,
+   but analogous change tested in related work.
+2. Fixes a real bug? **PASS** — EPROBE_DEFER mishandling and missing IRQ
+   error check verified in source.
+3. Important issue? **PASS (borderline)** — permanent probe failure on
+   affected hardware; not crash/corruption but functionally important
+   for PPC 4xx crypto users.
+4. Small and contained? **PASS** — 6 lines across 2 files.
+5. No new features or APIs? **PASS** — uses existing
+   `platform_get_irq()` API.
+6. Can apply to local tree? **PASS** — verified clean apply.
+
+### Step 9.3: EXCEPTION CATEGORIES
+**Record:** Not a device ID, quirk, DT, build, or documentation fix.
+Qualifies as a probe correctness fix.
+
+### Step 9.4: DECISION RATIONALE
+
+This commit fixes a genuine probe-path bug on hardware that exists in
+the 6.18.y tree (`CONFIG_CRYPTO_DEV_PPC4XX`, `PPC && 4xx`). The failure
+to propagate `-EPROBE_DEFER` can cause the crypto accelerator driver to
+fail permanently at boot when the interrupt parent has not yet probed —
+a real functional regression on affected embedded systems. The fix is
+minimal, low-risk, and follows the exact pattern already accepted for
+stable backport in this same tree (`ata: sata_dwc_460ex: use
+platform_get_irq()` by the same author on the same platform family).
+While the user population is small, stable trees explicitly serve
+embedded/LTS deployments where this hardware lives.
 
 ---
 
 ## Verification
 
-- [Phase 1] Parsed subject, tags, and body from provided commit message
-  and openwall lore thread
-- [Phase 1] Confirmed Acked-by: Linus Walleij; Herbert Xu merge SOB
-- [Phase 2] Read current `chainup_buffers()` at lines 886–901: confirmed
-  `buf = NULL; break` followed by `buf->next = NULL` (NULL deref)
-- [Phase 2] Read current `ablk_perform()` at lines 1028–1040: confirmed
-  hook pointers saved after failure check
-- [Phase 2] Read `aead_perform()` at lines 1140–1166: confirmed correct
-  post-fix pattern already present
-- [Phase 2] Read `free_buf_chain()` at lines 333–347: confirmed cleanup
-  depends on valid hook pointers
-- [Phase 3] `git describe HEAD` → `v6.18.43-1-gc7f0dac02d232`; `make
-  kernelversion` → `6.18.43`
-- [Phase 3] `git blame -L 872,902` → buggy lines present (attrib.
-  limited by tree history)
-- [Phase 3] `git log --grep="buffer chain"` → no fix commit in tree
-- [Phase 4] Fetched https://lists.openwall.net/linux-
-  kernel/2026/04/23/864 — v2 patch content and maintainer apply
-  confirmed
-- [Phase 4] UNVERIFIED: `b4 dig -c <hash>` — fix commit hash not in
-  local tree
-- [Phase 5] `grep chainup_buffers` — 3 call sites: 2 in `ablk_perform`,
-  2 in `aead_perform`
-- [Phase 6] Confirmed driver exists:
-  `drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c`
-- [Phase 6] Read Kconfig: `CONFIG_CRYPTO_DEV_IXP4XX` depends on
-  `ARCH_IXP4XX || COMPILE_TEST`
-- [Phase 6] Patch base context matches current file (lines 886–889,
-  1028–1040 identical to diff)
-- [Phase 8] Failure mode: NULL deref → kernel oops; partial chain leak
-  without `ablk_perform()` fix
+- **[Phase 1]** Parsed commit `1cecde1005399`: subject, tags, body
+  analyzed; no Reported-by/syzbot/Fixes tags.
+- **[Phase 2]** Diff analyzed: 2 files, `crypto4xx_probe()` only; error-
+  check and type change verified.
+- **[Phase 2]** Read `drivers/of/irq.c:39-50`: `irq_of_parse_and_map()`
+  returns `0` on `of_irq_parse_one()` failure.
+- **[Phase 2]** Read `drivers/of/irq.c:458-478`: `of_irq_get()` returns
+  `-EPROBE_DEFER` when `irq_find_host()` fails.
+- **[Phase 2]** Read `kernel/irq/manage.c:2106-2108`: `request_irq()`
+  returns `-EINVAL` when `irq_to_desc(irq)` is NULL.
+- **[Phase 3]** `git blame`: `irq_of_parse_and_map` from 2017
+  (`b0a191cebea13c`).
+- **[Phase 3]** `git log stable/linux-6.18.y`: found precedent commits
+  `678d874e6ae11`, `a598f66d91693`.
+- **[Phase 3]** `git show 678d874e6ae11`: sata_dwc_460ex stable backport
+  with same rationale.
+- **[Phase 3]** `git show a598f66d91693`: emac stable backport by same
+  author.
+- **[Phase 3]** `git apply --check`: patch applies cleanly to current
+  tree.
+- **[Phase 4]** `b4 dig -c 1cecde1005399`: found lore URL; v1 only;
+  recipients include Herbert Xu.
+- **[Phase 4]** WebFetch lore URL: blocked by Anubis — full thread
+  unverified.
+- **[Phase 5]** `grep core_dev->irq drivers/crypto/amcc/`: only used in
+  probe assignment and `devm_request_irq()`.
+- **[Phase 5]** Read `drivers/base/platform.c:260-270`:
+  `platform_get_irq()` behavior confirmed.
+- **[Phase 6]** `git describe HEAD`: v6.18.44 on `stable/linux-6.18.y`.
+- **[Phase 6]** Read current `crypto4xx_core.c:1297-1304`: buggy code
+  confirmed present.
+- **[Phase 6]** `git log stable/linux-6.18.y..1cecde1005399 --
+  drivers/crypto/amcc/`: fix not yet present.
+- **[Phase 7]** Read `drivers/crypto/Kconfig:294-306`:
+  `CRYPTO_DEV_PPC4XX` depends on `PPC && 4xx`.
+- **[Phase 8]** Assessed failure mode: permanent probe failure / missing
+  crypto offload, severity MEDIUM.
 
-**YES**
+**YES****Verdict: YES** — backport to this tree (`linux-6.18.y` /
+6.18.44).
 
- drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c | 25 ++++++++++++---------
- 1 file changed, 14 insertions(+), 11 deletions(-)
+The commit fixes real probe-path bugs in the AMCC PPC4xx crypto driver:
+`irq_of_parse_and_map()` returns `0` on failure (and swallows
+`-EPROBE_DEFER`), so IRQ setup can fail permanently instead of
+deferring. The fix is small (6 lines), applies cleanly, and matches the
+same pattern already backported here for `sata_dwc_460ex` by the same
+author.
 
-diff --git a/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c b/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c
-index fcc0cf4df637d..5b90cf0fb0e41 100644
---- a/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c
-+++ b/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c
-@@ -884,8 +884,9 @@ static struct buffer_desc *chainup_buffers(struct device *dev,
- 		ptr = sg_virt(sg);
- 		next_buf = dma_pool_alloc(buffer_pool, flags, &next_buf_phys);
- 		if (!next_buf) {
--			buf = NULL;
--			break;
-+			buf->next = NULL;
-+			buf->phys_next = 0;
-+			return NULL;
- 		}
- 		sg_dma_address(sg) = dma_map_single(dev, ptr, len, dir);
- 		buf->next = next_buf;
-@@ -983,7 +984,7 @@ static int ablk_perform(struct skcipher_request *req, int encrypt)
- 	unsigned int nbytes = req->cryptlen;
- 	enum dma_data_direction src_direction = DMA_BIDIRECTIONAL;
- 	struct ablk_ctx *req_ctx = skcipher_request_ctx(req);
--	struct buffer_desc src_hook;
-+	struct buffer_desc *buf, src_hook;
- 	struct device *dev = &pdev->dev;
- 	unsigned int offset;
- 	gfp_t flags = req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP ?
-@@ -1025,22 +1026,24 @@ static int ablk_perform(struct skcipher_request *req, int encrypt)
- 		/* This was never tested by Intel
- 		 * for more than one dst buffer, I think. */
- 		req_ctx->dst = NULL;
--		if (!chainup_buffers(dev, req->dst, nbytes, &dst_hook,
--				     flags, DMA_FROM_DEVICE))
--			goto free_buf_dest;
--		src_direction = DMA_TO_DEVICE;
-+		buf = chainup_buffers(dev, req->dst, nbytes, &dst_hook,
-+				      flags, DMA_FROM_DEVICE);
- 		req_ctx->dst = dst_hook.next;
- 		crypt->dst_buf = dst_hook.phys_next;
-+		if (!buf)
-+			goto free_buf_dest;
-+		src_direction = DMA_TO_DEVICE;
- 	} else {
- 		req_ctx->dst = NULL;
+**Scope:** Only affects `CONFIG_CRYPTO_DEV_PPC4XX` on PowerPC 4xx
+embedded hardware — niche, but a genuine functional bug for those
+systems.
+
+ drivers/crypto/amcc/crypto4xx_core.c | 6 +++++-
+ drivers/crypto/amcc/crypto4xx_core.h | 2 +-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
+index be55eb6a03164..d82b00cdc4e08 100644
+--- a/drivers/crypto/amcc/crypto4xx_core.c
++++ b/drivers/crypto/amcc/crypto4xx_core.c
+@@ -1295,7 +1295,11 @@ static int crypto4xx_probe(struct platform_device *ofdev)
  	}
- 	req_ctx->src = NULL;
--	if (!chainup_buffers(dev, req->src, nbytes, &src_hook, flags,
--			     src_direction))
--		goto free_buf_src;
--
-+	buf = chainup_buffers(dev, req->src, nbytes, &src_hook, flags,
-+			      src_direction);
- 	req_ctx->src = src_hook.next;
- 	crypt->src_buf = src_hook.phys_next;
-+	if (!buf)
-+		goto free_buf_src;
-+
- 	crypt->ctl_flags |= CTL_FLAG_PERFORM_ABLK;
- 	qmgr_put_entry(send_qid, crypt_virt2phys(crypt));
- 	BUG_ON(qmgr_stat_overflow(send_qid));
+ 
+ 	/* Register for Crypto isr, Crypto Engine IRQ */
+-	core_dev->irq = irq_of_parse_and_map(ofdev->dev.of_node, 0);
++	core_dev->irq = platform_get_irq(ofdev, 0);
++	if (core_dev->irq < 0) {
++		rc = core_dev->irq;
++		goto err_iomap;
++	}
+ 	rc = devm_request_irq(&ofdev->dev, core_dev->irq,
+ 			      is_revb ? crypto4xx_ce_interrupt_handler_revb :
+ 					crypto4xx_ce_interrupt_handler,
+diff --git a/drivers/crypto/amcc/crypto4xx_core.h b/drivers/crypto/amcc/crypto4xx_core.h
+index 3a028aec3f0c1..66a95733c86dd 100644
+--- a/drivers/crypto/amcc/crypto4xx_core.h
++++ b/drivers/crypto/amcc/crypto4xx_core.h
+@@ -106,7 +106,7 @@ struct crypto4xx_core_device {
+ 	struct crypto4xx_device *dev;
+ 	struct hwrng *trng;
+ 	u32 int_status;
+-	u32 irq;
++	int irq;
+ 	struct tasklet_struct tasklet;
+ 	spinlock_t lock;
+ };
 -- 
 2.53.0
 
