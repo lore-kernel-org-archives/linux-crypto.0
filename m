@@ -1,127 +1,98 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E89C73C10B5;
-	Mon, 31 Aug 2026 08:38:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05EF22D9EDB
+	for <linux-crypto@vger.kernel.org>; Mon, 31 Aug 2026 09:09:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788165538; cv=none; b=sWtdnV1iCHZDcvYaUiZGe+gWFurQ/KCfdm4xdi8sJ1GyfB6j1ILh4riDo3djzHx3Mq0cJnW21CZ7JGXZ8oZnluCTomM0lMMXkfrtR1bZlz3DLCoK6knqYhVtJ39L087/wa7zbpm4y6Dl3Wj0Wq/1yHGiocs2kIHkqEYO7w5jXVU=
+	t=1788167376; cv=none; b=eFyCz3bJlGuhfeBu99OJ2WmbaPDND/Vn4yLTUYvTXJtv2sMGNvuLeiV5KYy21DpLuS6SRHl81Nv0c2UkuIa5mo8blOLHhwJY+D3bJ48yPdue7Gp49fGKMMvSwwZsKWEm6nmW4RGhsHiXaSiX8dtVAshRSAJVXG68zhTX0J+m7Os=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788165538; c=relaxed/simple;
-	bh=ejzB1iKMIn4u9bg7Cq13/HRXh+7B+Fi6D9F5qX/CXpc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SCuq1whY7fZ79nkGAr1tpF4TYpQsjqIIYhB6+zXRbMc2tOV3+n7YMKvFk2Js6TygPyhhQk8rt7nGWEmlGcygGWHWBY9hYbFOX3zDYZBoYZgskTcSBaRFyT8WwIs8Ecdcn3d0B1EW09ipIaszV+p85lr1LzUi2TMFJUkHpzgntWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=e109AmRO; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1788167376; c=relaxed/simple;
+	bh=CM27XdfXzlAt2YX/Yyv+oZnaq8tkUaLo/uohsSh4wtg=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=FKXDGKuMJdZnePTULBrROcg6F/unuC0dOPh5vVGd1EAjgMeR8UnlBDyyqDnp+0pzGRQ/XLbsN6Ga92juN9hGsOehCQKYLZgir8NI2x2L9qsJbgIn0B657ziut4x3s0ZcBuMCzXNg98lHNWh2RU59t8qUZrvw6T86U7a6DotPjBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fFnAx8lQ; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="e109AmRO"
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 67V82PHk1640269;
-	Mon, 31 Aug 2026 08:38:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=Tj0u80JoJJMYZZcGH
-	iCpophjZNtpmxztHG40MT/itcE=; b=e109AmROKBCTRXmZRKt+2dF94x7XhfcQy
-	Wj1GscilsoFvMtepEy8mBJ78fWdhHtoxGi3VG8gPYh1GsMGPpcPXCm9XjD77OyqT
-	AL4oE7FQwSu+ZxbGkhqmpgG6NXiayhjISOSsX6e2bUuPfbFUcDWN/t3Fgu8KF9C1
-	0Gyca7D0l3vZ9YFHX0+ExOFT2UlmxGl4AuSkncbEmCYq/IiOajMU71DH2PtgXRoZ
-	cZO25YS63q3C//AuvRlW7FY3K09XxEsKe7Gn1RkDi1MqebFkYwH+IUw71vG7rHNJ
-	61Ewc9zr695B2ueOXB/ccedqrLEkrF+q5PgFRnPLe+mYBs/KzbgXA==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4gbq54g3qu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 31 Aug 2026 08:38:44 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.7/8.18.1.7) with ESMTP id 67V8QTb4004749;
-	Mon, 31 Aug 2026 08:38:43 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4gccexvn64-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 31 Aug 2026 08:38:43 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 67V8ceIA45220096
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 31 Aug 2026 08:38:40 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0539420040;
-	Mon, 31 Aug 2026 08:38:40 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DA9BC2004E;
-	Mon, 31 Aug 2026 08:38:39 +0000 (GMT)
-Received: from funtu2.ibm.com (unknown [9.111.165.38])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 31 Aug 2026 08:38:39 +0000 (GMT)
-From: Harald Freudenberger <freude@linux.ibm.com>
-To: Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        herbert@gondor.apana.org.au
-Cc: freude@linux.ibm.com, linux-s390@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH v7 9/9] s390/crypto: Enable CONTEXT_ANALYSIS
-Date: Mon, 31 Aug 2026 10:38:38 +0200
-Message-ID: <20260831083838.3703-10-freude@linux.ibm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20260831083838.3703-1-freude@linux.ibm.com>
-References: <20260831083838.3703-1-freude@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fFnAx8lQ"
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 56E2C1A18ED;
+	Mon, 31 Aug 2026 09:09:31 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 2B79760231;
+	Mon, 31 Aug 2026 09:09:31 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 03B1C11C78AE3;
+	Mon, 31 Aug 2026 11:09:25 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1788167366; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language;
+	bh=c0BR+dsQEncxRDdVU1dh1qyWGTdbrAOzg3TVqsPblzc=;
+	b=fFnAx8lQ2xI3ekDBqUzSJx1lz321FU9tE/5Ehj5FtD7Fx1svKJKnPSECedR1fzmgcvxrcI
+	JItVUnXdRsjNyG/g0Vry4DkvSY+3lOuiY2aOQTASZMCpz2dATn9iXY2HgJ7qBxdo6OE9Va
+	jb6OORDgAunfLY3oPtOTcYLSfLVonQqC2LNP3KMXoyS5P2TFGRLqNM529XqgdWZKRt2Af5
+	YrYzYaeYeeKib/Sdt28ZXxnOI22hueCsMtuvjDb2CuKALvslcHUWjcPVjA5Z/ickmOYtvy
+	XM55Tmj4QSKzIc7z6jupmL/GjqfCQRL3VPvPOEQGrRkHTP6j9SUyv5FoUYmkDg==
+Message-ID: <34094aaa-da49-4203-b176-ed3faa4b8692@bootlin.com>
+Date: Mon, 31 Aug 2026 11:09:25 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwODMxMDA3MiBTYWx0ZWRfX7xLitmiz2/zg
- KsjGMJH13LJrmYQZyDh9rQThmruJJW/EkyEJ+OzKY48PqZoCOCl9Trpkb/uNvW7vCOwNlxJWvnJ
- RrXOoLgAz9PD0IIEhFZ9cCr6BGpWFyo9naRkPXPgoFBGytDTm8tKwbqE1P17bo/1li3A0LUgXc1
- OW21OKGFt2bGsOVk0KxZPeO9QMv0uJFOnO4ljOGrLFD0ojVRmZfNKmUVKhapl6dUavABRx2Xlqp
- rLAPi5Pks+8EcTVaOv8HCc0FCRW4LOw51J/Di1RRoIyXjRESGoZyUGjQ+pSrOSClRpK/BIzOCQh
- onw2KjFVNaGsI/22M3rB2yyZKLmf0Vp2oYQJ4w2b+95CY4IAr5nNPBHghwHRPt+5Fv6YeYkVM4G
- jACuw+M2Em4sOKJBWom2y2zMFXVShSe5HjJz+HbIj301Gge/68Rh++a2RQo1kXnhc76e9nPwo6X
- QeaiRjoNtZYf7y2TCuQ==
-X-Proofpoint-ORIG-GUID: puLKfp-tFau4yTqLVWWaIR_gmEwxSyZf
-X-Authority-Analysis: v=2.4 cv=CNgamxrD c=1 sm=1 tr=0 ts=6a953d94 cx=c_pps
- a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
- a=Sv0fKeRqtYgA:10 a=VkNPw1HP01LnGYTKEx00:22 a=RnoormkPH1_aCDwRdu11:22
- a=U7nrCbtTmkRpXpFmAIza:22 a=VnNF1IyMAAAA:8 a=76iW4yKgqpReaEcOz0EA:9
-X-Proofpoint-GUID: puLKfp-tFau4yTqLVWWaIR_gmEwxSyZf
-X-Proofpoint-Spam-Info: AW1haW4tMjYwODMxMDA3MiBTYWx0ZWRfXzuv6dEzg+QRp
- MD7fggG3rvb79qvn+iHd7Imx2jHSrluCR3bHbe8h6lRWVEFoy6laV2TokTr4z0kiD0Zv6Zn8dno
- vPq0P61hYLZR68jJLhp9CC/qMnJuNlI=
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
- definitions=2026-08-31_03,2026-08-27_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 bulkscore=0 suspectscore=0 phishscore=0 lowpriorityscore=0
- priorityscore=1501 clxscore=1015 impostorscore=0 adultscore=0 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2608310072
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: linux-crypto@vger.kernel.org
+Cc: Miquel Raynal <miquel.raynal@bootlin.com>, Jian Pan <jian.pan@se.com>
+From: Paul Louvel <paul.louvel@bootlin.com>
+Subject: ECDSA key parsing in crypto drivers
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-From: Heiko Carstens <hca@linux.ibm.com>
+Hi,
 
-Enable CONTEXT_ANALYSIS since s390's crypto code compiles now without
-warnings.
+I am currently working on upstreaming the ECDSA part of a Public Key
+Accelerator.
+I have a question regarding which ASN.1 schema should I use when decoding the
+buffer passed by the .set_pub_key() and .set_priv_key() callbacks in struct
+sig_alg.
+The documentation only mentions that the callbacks should "know how to decode
+and interpret the BER encoded public key and parameters."
 
-Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
-Reviewed-by: Harald Freudenberger <freude@linux.ibm.com>
----
- arch/s390/crypto/Makefile | 2 ++
- 1 file changed, 2 insertions(+)
+The kernel software implementation of ECDSA only supports verifying signatures,
+and thus only implements the .set_pub_key() callback. In this callback, the
+buffer should contain an ECC key as defined by RFC5480 section 2.2 [1].
 
-diff --git a/arch/s390/crypto/Makefile b/arch/s390/crypto/Makefile
-index 48aeb0c0ffbd..1d6420813935 100644
---- a/arch/s390/crypto/Makefile
-+++ b/arch/s390/crypto/Makefile
-@@ -3,6 +3,8 @@
- # Cryptographic API
- #
- 
-+CONTEXT_ANALYSIS := y
-+
- obj-$(CONFIG_CRYPTO_AES_S390) += aes_s390.o
- obj-$(CONFIG_CRYPTO_PAES_S390) += paes_s390.o
- obj-$(CONFIG_S390_PRNG) += prng.o
+In the downstream driver I am currently upstreaming, it expects a BER encoded
+ASN.1 schema of SubjectPublicKeyInfo as defined in RFC5480 section 2 [2]. The
+driver defines its own .asn1 file containing the ASN.1 schema of this sequence,
+and uses the kernel's ASN.1 compiler/decoder to decode the buffer.
+
+Because the PKA can be used to sign messages, there is a .set_priv_key()
+callback that expects a BER encoded ASN.1 schema as defined in RFC5915 section
+3 [3]. The same remark applies to the public key: a .asn1 file is present and
+defines the ASN.1 schema described by the RFC.
+
+My question is: which ASN.1 schema should be used? Should a client of the
+crypto API know in advance which format the driver expects? Also, for RSA,
+there are helpers for parsing private and public keys: rsa_parse_priv_key() and
+rsa_parse_pub_key(). These helpers use the kernel's ASN.1 decoder. Would it
+make sense to have such helpers for ECDSA?
+
+Thank you,
+
+[1] RFC5480 Section 2.2 - ECC Key Format
+https://tools.ietf.org/html/rfc5480#section-2.2
+
+[2] RFC5480 Section 2 - SubjectPublicKeyInfo
+https://tools.ietf.org/html/rfc5480#section-2
+
+[3] RFC5915 Section 3 - Private Key Format
+https://tools.ietf.org/html/rfc5915#section-3
+
 -- 
-2.43.0
+Paul Louvel, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
