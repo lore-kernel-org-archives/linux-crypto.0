@@ -1,52 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78BED20A5C4;
-	Mon, 31 Aug 2026 19:21:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5372136EA8B;
+	Mon, 31 Aug 2026 19:25:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788204109; cv=none; b=toer2gC5IoYwCy+cJ8a1IaPrQBsLwVHs+DNZ07YaP7fkPqhks4Feq3iHYqBuwegsL4ojk68FN3YQzl53tBnrqrPUNsKHkpyJaSPvGdixctPd7L95LSy8ggxHgdK5zWaSrw6Wve2eZtL+juzw0SuzoBUE8iYCdxJGbT/x2Ykdiuo=
+	t=1788204354; cv=none; b=ToWm0Se7OsBowE2pAwbqh82gcaqVRh8Ul1uGjKlq8otPn/1Mqz2DQoOib2IVNZWMvb4QwW9rwafwKdRW60So4WjS4bAQFZCkuJsHTyHWbrFTvJ4Xao0hwt3XSTsV/ADtOe6gEafVw2jMQ0sbhhuK6s6YiP1bZfY77B9IteTYsXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788204109; c=relaxed/simple;
-	bh=zQPVufPKNcBIXiW0CKwQDfNfgHkccTecZZrH+1iOeUA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=b20390dHGkxmrIPoMi5BdXFLi8awWRtYX80l+H1tEyhviCTFT/D7PZP+PqiXKKrC+wvlgqhVGhqhZh2CfareT20bQ0SaS1SGSGA9IaGbH1FeohHIGdxT41qVsNeBqe6USt8C4t7zQ7h/R+ss3Su3zeAfhB+Tf3V+CcoE82eF1UQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fAEu7Uih; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788204354; c=relaxed/simple;
+	bh=G9QhhCagjvtn18l4/2aarjQSUwTP9Jfbcki9KCBqaWE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BTkjd/YsrXYpfuR0JDFKjNuSNo79MvKGxd+j5GrbgPYaTeF7QEOy8/WXTfnbQ3+cuXJ7W2ur9slaZLJXq/F+r9hJxSE2/a99QC9RObH62NrAGJDYoZXX2iwasTIwN+H1GyxAPBM4ypQX2nN/k6sCB+CJOiBfSoi6ccCxy5D8NAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cx2KOD5z; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fAEu7Uih"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 756BF1F000E9;
-	Mon, 31 Aug 2026 19:21:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cx2KOD5z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11BEB1F000E9;
+	Mon, 31 Aug 2026 19:25:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788204107;
-	bh=sXfD6dej8IYua/DTCdKP9q0yWpYofmCwekcE6fstowQ=;
+	s=k20260515; t=1788204353;
+	bh=6aqHLMLZT+gg18mKlo64TRGvpIb3cAJCp5jHu17KQ0U=;
 	h=From:To:Cc:Subject:Date;
-	b=fAEu7UihlBvs09NZ0Myv0MHtHSG3vVFxbg/BXm0RiUY8xlgtE7+nNn1PEZxs6L2BU
-	 4varcF5TNCb4AXXrECNKcYIWKR73hKFkAGRtulCA5VlrGu7nhrRhhQbvzTl7kIApNG
-	 q41UvznYlEImsWCYEGG4s+ll8qZB3JnA36gNTEe1e/plOW724o6B1SD46lnH1DOFSt
-	 CO9tuj6Wdi1h9kB2emMrATZe9kFiaPNOtTrJClEKB/ln0MGmAxY46rtuAor9ShDHgv
-	 RRQeVOExRWgPxmfiHEWwlPbUaPZRP3Zzs8fcA6bPL+bqz+IBO7ILvi+VoWMeCH3a9E
-	 /wtl7WRTY0Vug==
+	b=Cx2KOD5zR/CcvwWIkd8i1/3iqkcdFCKzP/wLqQMxEfK29nx10OGUdnLKg7Ic/PeET
+	 jhvbhyV3KNBne4R8ZmSBriQDVPOohdxSPZX8naxd4hdnFXmtIM5vKzmSFAzz4zsGc0
+	 vae1BaUQToTN2n+e40pJoinr+C67ulc7Kd5u9XylFeN48MpRhD3M2lrci+W1CjF0cZ
+	 YhvkQ1krOAlEIcKdCjowmmDu7EvBEeVywdt9UJxB1aagDUL9loKZBSsucKB+Bt+ZBF
+	 xuAKD2wTugVjrtxrkFywhszR79w0eFhOXq4xemXEcWCTL6oRDwOWC48aCmF0ujFlnd
+	 cBN1QrtUhBkrg==
 From: Eric Biggers <ebiggers@kernel.org>
-To: bpf@vger.kernel.org,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>
+To: linux-fscrypt@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Emil Tsalapatis <emil@etsalapatis.com>,
-	Ihor Solodrai <ihor.solodrai@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Karl Mehltretter <kmehltretter@gmail.com>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH bpf-next] bpf: crypto: Use AES-CBC and AES-ECB libraries
-Date: Mon, 31 Aug 2026 12:21:39 -0700
-Message-ID: <20260831192139.94895-1-ebiggers@kernel.org>
+Subject: [PATCH] fscrypt: Use aes_ecb_encrypt() for v1 key derivation
+Date: Mon, 31 Aug 2026 12:24:11 -0700
+Message-ID: <20260831192411.99035-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -56,629 +42,56 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-BPF crypto was implemented using the lskcipher API, which doesn't seem
-to be going anywhere.  lskcipher supports only "arc4", "cbc(aes)",
-"ecb(aes)", and only with unoptimized implementations.
+Now that there's a library function aes_ecb_encrypt(), use it instead of
+a loop of aes_encrypt() calls.
 
-Library APIs also have been found to be a much better approach, for a
-variety of reasons, including reduced overhead, greater flexibility, and
-having to be explicit about the crypto algorithms that are supported.
-
-We can safely ignore the theoretical ARC4 support in BPF crypto as
-unused, which leaves AES-CBC and AES-ECB.  AES-CBC was stated to be
-needed for decrypting packets using a homebrew UDP-based protocol
-(https://lore.kernel.org/r/d1cdfc23-b336-49a9-8833-29f05b5b9fec@linux.dev/).
-AES-ECB is used by the BPF self-tests, and it was stated to maybe be
-used in the future for QUIC-LB
-(https://lore.kernel.org/r/5f9c3aab-5339-463c-a86d-edac297e1e95@linux.dev/).
-
-Those reasons don't make much sense either, especially AES-ECB which
-isn't appropriate in new systems and should be dropped.  Regardless,
-let's assume that both AES-CBC and AES-ECB need to be kept for now.
-
-There are library APIs for both of these now, which are much easier to
-use and more efficient.  Reimplement BPF crypto on top of them, greatly
-simplifying the code.  As part of this, the bpf_crypto_type abstraction
-layer is removed, as it's not useful.
+Note that the use of AES-ECB here is purely for the key derivation
+function used by the deprecated v1 encryption policies.  v2 encryption
+policies use HKDF-SHA512 instead.  Nevertheless, the original version
+has to continue to be supported for backwards compatibility.
 
 Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 ---
- MAINTAINERS                  |   2 -
- crypto/Makefile              |   3 -
- crypto/bpf_crypto_skcipher.c |  83 -----------
- include/linux/bpf_crypto.h   |  24 ----
- kernel/bpf/Kconfig           |   9 ++
- kernel/bpf/Makefile          |   4 +-
- kernel/bpf/crypto.c          | 271 +++++++++++++++--------------------
- 7 files changed, 122 insertions(+), 274 deletions(-)
- delete mode 100644 crypto/bpf_crypto_skcipher.c
- delete mode 100644 include/linux/bpf_crypto.h
+ fs/crypto/Kconfig       | 2 +-
+ fs/crypto/keysetup_v1.c | 5 ++---
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 3a19da74d00c..16f13270ce1f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -4936,8 +4936,6 @@ BPF [CRYPTO]
- M:	Vadim Fedorenko <vadim.fedorenko@linux.dev>
- L:	bpf@vger.kernel.org
- S:	Maintained
--F:	crypto/bpf_crypto_skcipher.c
--F:	include/linux/bpf_crypto.h
- F:	kernel/bpf/crypto.c
+diff --git a/fs/crypto/Kconfig b/fs/crypto/Kconfig
+index cd934e31dec4..4cfbf4b51be7 100644
+--- a/fs/crypto/Kconfig
++++ b/fs/crypto/Kconfig
+@@ -5,7 +5,7 @@ config FS_ENCRYPTION
+ 	select BLK_INLINE_ENCRYPTION_FALLBACK if BLOCK
+ 	select CRYPTO
+ 	select CRYPTO_SKCIPHER
+-	select CRYPTO_LIB_AES
++	select CRYPTO_LIB_AES_ECB # for deprecated v1 key derivation function
+ 	select CRYPTO_LIB_SHA256
+ 	select CRYPTO_LIB_SHA512
+ 	select KEYS
+diff --git a/fs/crypto/keysetup_v1.c b/fs/crypto/keysetup_v1.c
+index 87fe13ccb253..d9ac7c4328f8 100644
+--- a/fs/crypto/keysetup_v1.c
++++ b/fs/crypto/keysetup_v1.c
+@@ -20,7 +20,7 @@
+  *    managed alongside the master keys in the filesystem-level keyring)
+  */
  
- BPF [DOCUMENTATION] (Related to Standardization)
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 8386d55a9755..33bb5ad595e8 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -22,9 +22,6 @@ crypto_skcipher-y += lskcipher.o
- crypto_skcipher-y += skcipher.o
- 
- obj-$(CONFIG_CRYPTO_SKCIPHER2) += crypto_skcipher.o
--ifeq ($(CONFIG_BPF_SYSCALL),y)
--obj-$(CONFIG_CRYPTO_SKCIPHER2) += bpf_crypto_skcipher.o
--endif
- 
- obj-$(CONFIG_CRYPTO_SEQIV) += seqiv.o
- obj-$(CONFIG_CRYPTO_ECHAINIV) += echainiv.o
-diff --git a/crypto/bpf_crypto_skcipher.c b/crypto/bpf_crypto_skcipher.c
-deleted file mode 100644
-index a88798d3e8c8..000000000000
---- a/crypto/bpf_crypto_skcipher.c
-+++ /dev/null
-@@ -1,83 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0-only
--/* Copyright (c) 2024 Meta, Inc */
--#include <linux/types.h>
--#include <linux/module.h>
--#include <linux/bpf_crypto.h>
--#include <crypto/skcipher.h>
--
--static void *bpf_crypto_lskcipher_alloc_tfm(const char *algo)
--{
--	return crypto_alloc_lskcipher(algo, 0, 0);
--}
--
--static void bpf_crypto_lskcipher_free_tfm(void *tfm)
--{
--	crypto_free_lskcipher(tfm);
--}
--
--static int bpf_crypto_lskcipher_has_algo(const char *algo)
--{
--	return crypto_has_skcipher(algo, CRYPTO_ALG_TYPE_LSKCIPHER, CRYPTO_ALG_TYPE_MASK);
--}
--
--static int bpf_crypto_lskcipher_setkey(void *tfm, const u8 *key, unsigned int keylen)
--{
--	return crypto_lskcipher_setkey(tfm, key, keylen);
--}
--
--static u32 bpf_crypto_lskcipher_get_flags(void *tfm)
--{
--	return crypto_lskcipher_get_flags(tfm);
--}
--
--static unsigned int bpf_crypto_lskcipher_ivsize(void *tfm)
--{
--	return crypto_lskcipher_ivsize(tfm);
--}
--
--static unsigned int bpf_crypto_lskcipher_statesize(void *tfm)
--{
--	return crypto_lskcipher_statesize(tfm);
--}
--
--static int bpf_crypto_lskcipher_encrypt(void *tfm, const u8 *src, u8 *dst,
--					unsigned int len, u8 *siv)
--{
--	return crypto_lskcipher_encrypt(tfm, src, dst, len, siv);
--}
--
--static int bpf_crypto_lskcipher_decrypt(void *tfm, const u8 *src, u8 *dst,
--					unsigned int len, u8 *siv)
--{
--	return crypto_lskcipher_decrypt(tfm, src, dst, len, siv);
--}
--
--static const struct bpf_crypto_type bpf_crypto_lskcipher_type = {
--	.alloc_tfm	= bpf_crypto_lskcipher_alloc_tfm,
--	.free_tfm	= bpf_crypto_lskcipher_free_tfm,
--	.has_algo	= bpf_crypto_lskcipher_has_algo,
--	.setkey		= bpf_crypto_lskcipher_setkey,
--	.encrypt	= bpf_crypto_lskcipher_encrypt,
--	.decrypt	= bpf_crypto_lskcipher_decrypt,
--	.ivsize		= bpf_crypto_lskcipher_ivsize,
--	.statesize	= bpf_crypto_lskcipher_statesize,
--	.get_flags	= bpf_crypto_lskcipher_get_flags,
--	.owner		= THIS_MODULE,
--	.name		= "skcipher",
--};
--
--static int __init bpf_crypto_skcipher_init(void)
--{
--	return bpf_crypto_register_type(&bpf_crypto_lskcipher_type);
--}
--
--static void __exit bpf_crypto_skcipher_exit(void)
--{
--	int err = bpf_crypto_unregister_type(&bpf_crypto_lskcipher_type);
--	WARN_ON_ONCE(err);
--}
--
--module_init(bpf_crypto_skcipher_init);
--module_exit(bpf_crypto_skcipher_exit);
--MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("Symmetric key cipher support for BPF");
-diff --git a/include/linux/bpf_crypto.h b/include/linux/bpf_crypto.h
-deleted file mode 100644
-index a41e71d4e2d9..000000000000
---- a/include/linux/bpf_crypto.h
-+++ /dev/null
-@@ -1,24 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0-only */
--/* Copyright (c) 2024 Meta Platforms, Inc. and affiliates. */
--#ifndef _BPF_CRYPTO_H
--#define _BPF_CRYPTO_H
--
--struct bpf_crypto_type {
--	void *(*alloc_tfm)(const char *algo);
--	void (*free_tfm)(void *tfm);
--	int (*has_algo)(const char *algo);
--	int (*setkey)(void *tfm, const u8 *key, unsigned int keylen);
--	int (*setauthsize)(void *tfm, unsigned int authsize);
--	int (*encrypt)(void *tfm, const u8 *src, u8 *dst, unsigned int len, u8 *iv);
--	int (*decrypt)(void *tfm, const u8 *src, u8 *dst, unsigned int len, u8 *iv);
--	unsigned int (*ivsize)(void *tfm);
--	unsigned int (*statesize)(void *tfm);
--	u32 (*get_flags)(void *tfm);
--	struct module *owner;
--	char name[14];
--};
--
--int bpf_crypto_register_type(const struct bpf_crypto_type *type);
--int bpf_crypto_unregister_type(const struct bpf_crypto_type *type);
--
--#endif /* _BPF_CRYPTO_H */
-diff --git a/kernel/bpf/Kconfig b/kernel/bpf/Kconfig
-index eb3de35734f0..822599b42be2 100644
---- a/kernel/bpf/Kconfig
-+++ b/kernel/bpf/Kconfig
-@@ -87,6 +87,15 @@ config BPF_UNPRIV_DEFAULT_OFF
- 
- 	  If you are unsure how to answer this question, answer Y.
- 
-+config BPF_CRYPTO
-+	def_bool y
-+	depends on BPF_SYSCALL
-+	select CRYPTO_LIB_AES_CBC
-+	select CRYPTO_LIB_AES_ECB
-+	help
-+	  Provide the kfuncs needed for BPF programs to encrypt and decrypt
-+	  data. The supported algorithms are AES-CBC and AES-ECB.
-+
- source "kernel/bpf/preload/Kconfig"
- 
- config BPF_LSM
-diff --git a/kernel/bpf/Makefile b/kernel/bpf/Makefile
-index 90255d80e5be..ab2e5d2782e6 100644
---- a/kernel/bpf/Makefile
-+++ b/kernel/bpf/Makefile
-@@ -55,9 +55,7 @@ obj-$(CONFIG_BPF_SYSCALL) += cpumask.o
- # semantics within pahole are revisited accordingly.
- obj-${CONFIG_BPF_LSM} += bpf_lsm_proto.o bpf_lsm.o
- endif
--ifneq ($(CONFIG_CRYPTO),)
--obj-$(CONFIG_BPF_SYSCALL) += crypto.o
--endif
-+obj-$(CONFIG_BPF_CRYPTO) += crypto.o
- obj-$(CONFIG_BPF_PRELOAD) += preload/
- 
- obj-$(CONFIG_BPF_SYSCALL) += relo_core.o
-diff --git a/kernel/bpf/crypto.c b/kernel/bpf/crypto.c
-index 51f89cecefb4..8cdc16f9b374 100644
---- a/kernel/bpf/crypto.c
-+++ b/kernel/bpf/crypto.c
-@@ -1,19 +1,13 @@
- // SPDX-License-Identifier: GPL-2.0-only
- /* Copyright (c) 2024 Meta, Inc */
- #include <linux/bpf.h>
--#include <linux/bpf_crypto.h>
- #include <linux/bpf_mem_alloc.h>
- #include <linux/btf.h>
- #include <linux/btf_ids.h>
- #include <linux/filter.h>
--#include <linux/scatterlist.h>
- #include <linux/skbuff.h>
--#include <crypto/skcipher.h>
--
--struct bpf_crypto_type_list {
--	const struct bpf_crypto_type *type;
--	struct list_head list;
--};
-+#include <crypto/aes-cbc.h>
+-#include <crypto/aes.h>
 +#include <crypto/aes-ecb.h>
+ #include <crypto/utils.h>
+ #include <keys/user-type.h>
+ #include <linux/hashtable.h>
+@@ -246,8 +246,7 @@ static int setup_v1_file_key_derived(struct fscrypt_inode_info *ci,
  
- /* BPF crypto initialization parameters struct */
- /**
-@@ -36,94 +30,53 @@ struct bpf_crypto_params {
- 	u32 authsize;
- };
+ 	static_assert(FSCRYPT_FILE_NONCE_SIZE == AES_KEYSIZE_128);
+ 	aes_prepareenckey(&aes, ci->ci_nonce, FSCRYPT_FILE_NONCE_SIZE);
+-	for (unsigned int i = 0; i < derived_keysize; i += AES_BLOCK_SIZE)
+-		aes_encrypt(&aes, &derived_key[i], &raw_master_key[i]);
++	aes_ecb_encrypt(derived_key, raw_master_key, derived_keysize, &aes);
  
--static LIST_HEAD(bpf_crypto_types);
--static DECLARE_RWSEM(bpf_crypto_types_sem);
-+enum bpf_crypto_algo_id {
-+	BPF_ALGO_AES_CBC,
-+	BPF_ALGO_AES_ECB,
-+};
-+
-+static const struct {
-+	const char *type_name;
-+	const char *algo_name;
-+	enum bpf_crypto_algo_id algo;
-+} bpf_crypto_algos[] = {
-+	{ "skcipher", "cbc(aes)", BPF_ALGO_AES_CBC },
-+	{ "skcipher", "ecb(aes)", BPF_ALGO_AES_ECB },
-+};
-+
-+static bool bpf_crypto_find_algo(const struct bpf_crypto_params *params,
-+				 enum bpf_crypto_algo_id *id_ret)
-+{
-+	for (size_t i = 0; i < ARRAY_SIZE(bpf_crypto_algos); i++) {
-+		if (strncmp(bpf_crypto_algos[i].type_name, params->type,
-+			    sizeof(params->type)) == 0 &&
-+		    strncmp(bpf_crypto_algos[i].algo_name, params->algo,
-+			    sizeof(params->algo)) == 0) {
-+			*id_ret = bpf_crypto_algos[i].algo;
-+			return true;
-+		}
-+	}
-+	return false;
-+}
+ 	err = fscrypt_set_per_file_enc_key(ci, derived_key);
  
- /**
-  * struct bpf_crypto_ctx - refcounted BPF crypto context structure
-- * @type:	The pointer to bpf crypto type
-- * @tfm:	The pointer to instance of crypto API struct.
-- * @siv_len:    Size of IV and state storage for cipher
-+ * @algo:	The crypto algorithm ID
-+ * @key:	The crypto key
-  * @rcu:	The RCU head used to free the crypto context with RCU safety.
-  * @usage:	Object reference counter. When the refcount goes to 0, the
-  *		memory is released back to the BPF allocator, which provides
-  *		RCU safety.
-  */
- struct bpf_crypto_ctx {
--	const struct bpf_crypto_type *type;
--	void *tfm;
--	u32 siv_len;
-+	enum bpf_crypto_algo_id algo;
-+	union {
-+		struct aes_key aes;
-+	} key;
- 	struct rcu_head rcu;
- 	refcount_t usage;
- };
- 
--int bpf_crypto_register_type(const struct bpf_crypto_type *type)
--{
--	struct bpf_crypto_type_list *node;
--	int err = -EBUSY;
--
--	down_write(&bpf_crypto_types_sem);
--	list_for_each_entry(node, &bpf_crypto_types, list) {
--		if (!strcmp(node->type->name, type->name))
--			goto unlock;
--	}
--
--	node = kmalloc_obj(*node);
--	err = -ENOMEM;
--	if (!node)
--		goto unlock;
--
--	node->type = type;
--	list_add(&node->list, &bpf_crypto_types);
--	err = 0;
--
--unlock:
--	up_write(&bpf_crypto_types_sem);
--
--	return err;
--}
--EXPORT_SYMBOL_GPL(bpf_crypto_register_type);
--
--int bpf_crypto_unregister_type(const struct bpf_crypto_type *type)
--{
--	struct bpf_crypto_type_list *node;
--	int err = -ENOENT;
--
--	down_write(&bpf_crypto_types_sem);
--	list_for_each_entry(node, &bpf_crypto_types, list) {
--		if (strcmp(node->type->name, type->name))
--			continue;
--
--		list_del(&node->list);
--		kfree(node);
--		err = 0;
--		break;
--	}
--	up_write(&bpf_crypto_types_sem);
--
--	return err;
--}
--EXPORT_SYMBOL_GPL(bpf_crypto_unregister_type);
--
--static const struct bpf_crypto_type *bpf_crypto_get_type(const char *name)
--{
--	const struct bpf_crypto_type *type = ERR_PTR(-ENOENT);
--	struct bpf_crypto_type_list *node;
--
--	down_read(&bpf_crypto_types_sem);
--	list_for_each_entry(node, &bpf_crypto_types, list) {
--		if (strcmp(node->type->name, name))
--			continue;
--
--		if (try_module_get(node->type->owner))
--			type = node->type;
--		break;
--	}
--	up_read(&bpf_crypto_types_sem);
--
--	return type;
--}
--
- __bpf_kfunc_start_defs();
- 
- /**
-@@ -146,7 +99,6 @@ __bpf_kfunc struct bpf_crypto_ctx *
- bpf_crypto_ctx_create(const struct bpf_crypto_params *params, u32 params__sz,
- 		      int *err)
- {
--	const struct bpf_crypto_type *type;
- 	struct bpf_crypto_ctx *ctx;
- 
- 	if (!params || params->reserved[0] || params->reserved[1] ||
-@@ -155,69 +107,40 @@ bpf_crypto_ctx_create(const struct bpf_crypto_params *params, u32 params__sz,
- 		return NULL;
- 	}
- 
--	type = bpf_crypto_get_type(params->type);
--	if (IS_ERR(type)) {
--		*err = PTR_ERR(type);
--		return NULL;
--	}
--
--	if (!type->has_algo(params->algo)) {
--		*err = -EOPNOTSUPP;
--		goto err_module_put;
--	}
--
--	if (!!params->authsize ^ !!type->setauthsize) {
--		*err = -EOPNOTSUPP;
--		goto err_module_put;
--	}
--
--	if (!params->key_len || params->key_len > sizeof(params->key)) {
--		*err = -EINVAL;
--		goto err_module_put;
--	}
--
- 	ctx = kzalloc_obj(*ctx);
- 	if (!ctx) {
- 		*err = -ENOMEM;
--		goto err_module_put;
-+		return NULL;
- 	}
- 
--	ctx->type = type;
--	ctx->tfm = type->alloc_tfm(params->algo);
--	if (IS_ERR(ctx->tfm)) {
--		*err = PTR_ERR(ctx->tfm);
--		goto err_free_ctx;
-+	if (!bpf_crypto_find_algo(params, &ctx->algo)) {
-+		*err = -ENOENT;
-+		goto out;
- 	}
- 
--	if (params->authsize) {
--		*err = type->setauthsize(ctx->tfm, params->authsize);
--		if (*err)
--			goto err_free_tfm;
-+	switch (ctx->algo) {
-+	case BPF_ALGO_AES_CBC:
-+	case BPF_ALGO_AES_ECB:
-+		if (params->authsize)
-+			*err = -EOPNOTSUPP;
-+		else
-+			*err = aes_preparekey(&ctx->key.aes, params->key,
-+					      params->key_len);
-+		break;
-+	default:
-+		WARN_ON(1);
-+		*err = -ENOENT;
-+		break;
- 	}
- 
--	*err = type->setkey(ctx->tfm, params->key, params->key_len);
--	if (*err)
--		goto err_free_tfm;
--
--	if (type->get_flags(ctx->tfm) & CRYPTO_TFM_NEED_KEY) {
--		*err = -EINVAL;
--		goto err_free_tfm;
-+out:
-+	if (*err) {
-+		kfree_sensitive(ctx);
-+		return NULL;
- 	}
- 
--	ctx->siv_len = type->ivsize(ctx->tfm) + type->statesize(ctx->tfm);
--
- 	refcount_set(&ctx->usage, 1);
--
- 	return ctx;
--
--err_free_tfm:
--	type->free_tfm(ctx->tfm);
--err_free_ctx:
--	kfree(ctx);
--err_module_put:
--	module_put(type->owner);
--
--	return NULL;
- }
- 
- static void crypto_free_cb(struct rcu_head *head)
-@@ -225,9 +148,7 @@ static void crypto_free_cb(struct rcu_head *head)
- 	struct bpf_crypto_ctx *ctx;
- 
- 	ctx = container_of(head, struct bpf_crypto_ctx, rcu);
--	ctx->type->free_tfm(ctx->tfm);
--	module_put(ctx->type->owner);
--	kfree(ctx);
-+	kfree_sensitive(ctx);
- }
- 
- /**
-@@ -267,27 +188,53 @@ __bpf_kfunc void bpf_crypto_ctx_release_dtor(void *ctx)
- }
- CFI_NOSEAL(bpf_crypto_ctx_release_dtor);
- 
-+static int bpf_aes_cbc_crypt(u8 *dst, u32 dst_len, const u8 *src, u32 src_len,
-+			     u8 *iv, u32 iv_len,
-+			     const struct bpf_crypto_ctx *ctx, bool decrypt)
-+{
-+	if (iv_len != AES_BLOCK_SIZE)
-+		return -EINVAL;
-+	if (src_len % AES_BLOCK_SIZE || dst_len < src_len)
-+		return -EINVAL;
-+	if (decrypt)
-+		aes_cbc_decrypt(dst, src, src_len, iv, &ctx->key.aes);
-+	else
-+		aes_cbc_encrypt(dst, src, src_len, iv, &ctx->key.aes);
-+	return 0;
-+}
-+
-+static int bpf_aes_ecb_crypt(u8 *dst, u32 dst_len, const u8 *src, u32 src_len,
-+			     u8 *iv, u32 iv_len,
-+			     const struct bpf_crypto_ctx *ctx, bool decrypt)
-+{
-+	if (iv_len != 0)
-+		return -EINVAL;
-+	if (src_len % AES_BLOCK_SIZE || dst_len < src_len)
-+		return -EINVAL;
-+	if (decrypt)
-+		aes_ecb_decrypt(dst, src, src_len, &ctx->key.aes);
-+	else
-+		aes_ecb_encrypt(dst, src, src_len, &ctx->key.aes);
-+	return 0;
-+}
-+
- static int bpf_crypto_crypt(const struct bpf_crypto_ctx *ctx,
- 			    const struct bpf_dynptr_kern *src,
- 			    const struct bpf_dynptr_kern *dst,
--			    const struct bpf_dynptr_kern *siv,
-+			    const struct bpf_dynptr_kern *iv,
- 			    bool decrypt)
- {
--	u32 src_len, dst_len, siv_len;
-+	u32 src_len, dst_len, iv_len;
- 	const u8 *psrc;
- 	u8 *pdst, *piv;
--	int err;
- 
- 	if (__bpf_dynptr_is_rdonly(dst))
- 		return -EINVAL;
- 
--	siv_len = siv ? __bpf_dynptr_size(siv) : 0;
-+	iv_len = iv ? __bpf_dynptr_size(iv) : 0;
- 	src_len = __bpf_dynptr_size(src);
- 	dst_len = __bpf_dynptr_size(dst);
--	if (!src_len || !dst_len || src_len > dst_len)
--		return -EINVAL;
--
--	if (siv_len != ctx->siv_len)
-+	if (!src_len || !dst_len)
- 		return -EINVAL;
- 
- 	psrc = __bpf_dynptr_data(src, src_len);
-@@ -297,14 +244,20 @@ static int bpf_crypto_crypt(const struct bpf_crypto_ctx *ctx,
- 	if (!pdst)
- 		return -EINVAL;
- 
--	piv = siv_len ? __bpf_dynptr_data_rw(siv, siv_len) : NULL;
--	if (siv_len && !piv)
-+	piv = iv_len ? __bpf_dynptr_data_rw(iv, iv_len) : NULL;
-+	if (iv_len && !piv)
- 		return -EINVAL;
- 
--	err = decrypt ? ctx->type->decrypt(ctx->tfm, psrc, pdst, src_len, piv)
--		      : ctx->type->encrypt(ctx->tfm, psrc, pdst, src_len, piv);
--
--	return err;
-+	switch (ctx->algo) {
-+	case BPF_ALGO_AES_CBC:
-+		return bpf_aes_cbc_crypt(pdst, dst_len, psrc, src_len, piv,
-+					 iv_len, ctx, decrypt);
-+	case BPF_ALGO_AES_ECB:
-+		return bpf_aes_ecb_crypt(pdst, dst_len, psrc, src_len, piv,
-+					 iv_len, ctx, decrypt);
-+	default:
-+		return -EINVAL;
-+	}
- }
- 
- /**
-@@ -312,20 +265,20 @@ static int bpf_crypto_crypt(const struct bpf_crypto_ctx *ctx,
-  * @ctx:		The crypto context being used. The ctx must be a trusted pointer.
-  * @src:		bpf_dynptr to the encrypted data. Must be a trusted pointer.
-  * @dst:		bpf_dynptr to the buffer where to store the result. Must be a trusted pointer.
-- * @siv__nullable:	bpf_dynptr to IV data and state data to be used by decryptor. May be NULL.
-+ * @iv__nullable:	bpf_dynptr to the initialization vector. May be NULL.
-  *
-  * Decrypts provided buffer using IV data and the crypto context. Crypto context must be configured.
-  */
- __bpf_kfunc int bpf_crypto_decrypt(struct bpf_crypto_ctx *ctx,
- 				   const struct bpf_dynptr *src,
- 				   const struct bpf_dynptr *dst,
--				   const struct bpf_dynptr *siv__nullable)
-+				   const struct bpf_dynptr *iv__nullable)
- {
- 	const struct bpf_dynptr_kern *src_kern = (struct bpf_dynptr_kern *)src;
- 	const struct bpf_dynptr_kern *dst_kern = (struct bpf_dynptr_kern *)dst;
--	const struct bpf_dynptr_kern *siv_kern = (struct bpf_dynptr_kern *)siv__nullable;
-+	const struct bpf_dynptr_kern *iv_kern = (struct bpf_dynptr_kern *)iv__nullable;
- 
--	return bpf_crypto_crypt(ctx, src_kern, dst_kern, siv_kern, true);
-+	return bpf_crypto_crypt(ctx, src_kern, dst_kern, iv_kern, true);
- }
- 
- /**
-@@ -333,20 +286,20 @@ __bpf_kfunc int bpf_crypto_decrypt(struct bpf_crypto_ctx *ctx,
-  * @ctx:		The crypto context being used. The ctx must be a trusted pointer.
-  * @src:		bpf_dynptr to the plain data. Must be a trusted pointer.
-  * @dst:		bpf_dynptr to the buffer where to store the result. Must be a trusted pointer.
-- * @siv__nullable:	bpf_dynptr to IV data and state data to be used by decryptor. May be NULL.
-+ * @iv__nullable:	bpf_dynptr to the initialization vector. May be NULL.
-  *
-  * Encrypts provided buffer using IV data and the crypto context. Crypto context must be configured.
-  */
- __bpf_kfunc int bpf_crypto_encrypt(struct bpf_crypto_ctx *ctx,
- 				   const struct bpf_dynptr *src,
- 				   const struct bpf_dynptr *dst,
--				   const struct bpf_dynptr *siv__nullable)
-+				   const struct bpf_dynptr *iv__nullable)
- {
- 	const struct bpf_dynptr_kern *src_kern = (struct bpf_dynptr_kern *)src;
- 	const struct bpf_dynptr_kern *dst_kern = (struct bpf_dynptr_kern *)dst;
--	const struct bpf_dynptr_kern *siv_kern = (struct bpf_dynptr_kern *)siv__nullable;
-+	const struct bpf_dynptr_kern *iv_kern = (struct bpf_dynptr_kern *)iv__nullable;
- 
--	return bpf_crypto_crypt(ctx, src_kern, dst_kern, siv_kern, false);
-+	return bpf_crypto_crypt(ctx, src_kern, dst_kern, iv_kern, false);
- }
- 
- __bpf_kfunc_end_defs();
 
 base-commit: cee9395acd8043be0644b25c34bfa86623f2b935
 -- 
