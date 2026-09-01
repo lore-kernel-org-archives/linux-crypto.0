@@ -1,140 +1,148 @@
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360A84A386A
-	for <linux-crypto@vger.kernel.org>; Tue,  1 Sep 2026 20:37:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788295062; cv=none; b=tiL9sLm7ecg10Pl+byd99kDUn9EJgm86T8a/bEMsSAgbNVxRdZ6VZslxbyPZ4nU/FazmWXpHMYuQ2BGQOvriHqCZo0cYbOTOvlyhf+uMdGfHUZutzpM7ZzXsseE+riBy+t0QUoOcduLDih6LcXfcDVDqOreU+KY9qDXOL01B1u8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788295062; c=relaxed/simple;
-	bh=7kWtNHnkgon39160jWf0bk9sq15XmJRpmJ8WMiYmKjE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=adfcn6aEo9BM6zFX4IQGe0yp2OchxQ+uHHBkVFbyGMnyjV9uUgs24pjcEYi6fi2IlRU3LXsAuKfZwhnCs5XZK9sJzPtUDgDCSmiwr6ijTTrNAQLDQxnYdX0GOFqEEKzMmy0yzbcNSY9RxX4+tI3rr26tahVWwdeD69xiBB9cTnQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=keTKunij; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF0DE4A13AF
+	for <linux-crypto@vger.kernel.org>; Tue,  1 Sep 2026 20:39:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788295155; cv=pass; b=F3zxPa0nGYJC6V9IKiSNbVYFQAhVnqWwIBKdZtQydxurJrSsmrtPagDZzD7G5/t6nR8z9uM0ZcclFMpxsps9lB8Lxzkj0bp1/1IKfjXQDRFS4KzAMvg33uAH9gzxlUmVeZvjrRhAKo3YmVbdY5zV/4MX1iqvJuyZxq1x0UR67+c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788295155; c=relaxed/simple;
+	bh=zMXQqnAx/G3j/QNYM2LWpXw58ytOME0jkznw3ohEhIA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BeKi/5LriI+mGo127u6TnBFwzXigyDy1nG9nF4+6QskyPQl019mvQ3C+NUDMF3sEtbiQTIW0e26evSvJx9u4yvmwrlOyz3qZywJu/Wf6o5EgcRaJxgPE/EShf55AZysioDC6hc3924chEfNqXYj/Hbxz0FQZYU9VsKCzRkvWtAU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KxrvSSNx; arc=pass smtp.client-ip=209.85.208.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="keTKunij"
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-398d2b28acfso243795a91.1
-        for <linux-crypto@vger.kernel.org>; Tue, 01 Sep 2026 13:37:39 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KxrvSSNx"
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-6a60d406a5cso544728a12.0
+        for <linux-crypto@vger.kernel.org>; Tue, 01 Sep 2026 13:39:13 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1788295152; cv=none;
+        d=google.com; s=arc-20260327;
+        b=HCDjCVSCqFckmmvDKGon2HFjEACr7+Fk8Jk58X/SjE9WRVdt46VIhcooUikVNc9Tvm
+         edEILuOVsZByTZihj5Swhe+2VWOZ+2uBFoyopFyrl7x39Am9Y67+VZzNAbiUWQLBL9+l
+         1E5FPJSFIvGck1f7Pkf3WJpMzxpvkiRmrWeC3j6NY89GsrWUyTzy6oLgWyZmg3o1T8hR
+         f3IRHlRt7N+R3PDjtwNSet9XHrCC1CGi33aMBOWQha/TwFHC/jBh/63fMYnagW5DeYwn
+         s2z2WDrkrG1TXWWh2bh6Zibl9mO5Q8ztNVupkhQyzb/R0GVu//RGtUbAu+G5c8aE2Wpt
+         2yjQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=iMSVbAMMClabJnl3yUfS4i27AaasElWu73GA2BM0Mik=;
+        fh=WW+Gq8OkQL9qg8ga6AiMElZwoyCzy287JUA8h6DLl2A=;
+        b=jbrRX51Bz2u0g6aIZnjUyQwHi3fG8lMGgmI0idxcvNTYj+UzWmHIjoaG/Ce9OH1Us+
+         LMWPzxZGdWUvLPLJCGFFHx/TIWYJ86dDhL1xnbdZsbnZyh+ujWc8JFuoX7dF5t2+hy82
+         0WPnTYjJMfIzYmmVcp0dFJph5BeCZ0hRfEClLMFUER0/KsQQ4NrnN75gtBxR1+zxhkwr
+         ce8JtnYAvI9ypi9aW9HhMDLeIAKdKNL9UlsckzOCb4OtZU4gcsr1eheduMWPXEDCDuD4
+         j04rBUi1AuA/Rk0npwW7g/t53SF5XAH8jW7bRfIaUc0j9SKAlGOVyjSdEEgUW8bclhQf
+         GY0Q==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788295059; x=1788899859; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
-        bh=trO+aYhWZ0cKdRoRTUvzCd7Am7CExDkHP+dQWJTMJHc=;
-        b=keTKunij1gq8rW6ly4tNjmer4Lpi6FLtJdZcPkfaGDxG4ycwFKU2IKrNSqVpLEJ97c
-         SbL9YhOW388SLnvrxfPDmthP+dwvjHJKbA+ms5Hrrv9Zy/upzwCzT8ERi3c9BBVkUUTh
-         YC6BLpBVf3apNn6pq2EWMGYa5wYqVsXJHhF1nWypqz/KYhMX92dQEXiptM3B5GHoBYaN
-         0/ttTlu+24HK7aIHcRiYZrmdT2XfOJ7by7CakPrJ+XrUBx2/MayRsk0b1ihnRpBZsfb1
-         qHhXaLB8LRYN5Xq+SQwIV3zoZnS47k2vnhJuxI/TUP4hJ8zEwSm873WT9iDS6ajktaDs
-         sSiw==
+        d=gmail.com; s=20251104; t=1788295152; x=1788899952; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=iMSVbAMMClabJnl3yUfS4i27AaasElWu73GA2BM0Mik=;
+        b=KxrvSSNx4a0vucLe6PhZiunmKB1ppV8M9Wwy+WzJQbelssBPIYCCZyos26/L3b0w+f
+         HQFveJHWyRa5J7shqRKrBeleU2D5HwXMaX6wO+3NoaHH2UfvOmGLVaRK7oIv3tl0OhVk
+         cDANjOfWYql9g776UmyXreetVyCuJGhECdlkcvBGpu5csMf8TqnmDNeUy/pbTd0Rwk2a
+         tPHZiataGNm7fWBv5rhYZ4kB8GK2PHOCLcF1NeixySnBUEnlcYvn29BTsAswrdQGIptm
+         unDJE9VI6F0hmyhtQDx2XG1V8T4jkuBOZAixdnhNLHMCvTp0LCQ/9ilEaiRRKYLJTAyV
+         SHVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788295059; x=1788899859;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=trO+aYhWZ0cKdRoRTUvzCd7Am7CExDkHP+dQWJTMJHc=;
-        b=WnJimainfovq3pM3mtx/LipL8Ihlj5pgaLXkRBTnO+aEzT/UmUG4C2za0IZs5A60p4
-         oZ5eIXk6SWr8D3dUB1NVapJv762B9c3Qz5QGm0sYUK+qpkh6nqX9P7+yAceTwI3XXwgy
-         T9KFJv435PlyzszwGU8hmAUKNO0XKXB9uPhQ+orWjKZJeQd5qw6JJ4ZTqmDCa7A65HLX
-         u2IcgyGoks81J5Ih6qvX5bjkquijXF3bIEbnEbM2901H6KgLSLaKf5/eKcg5Q+sjHCDz
-         IRPqVPPULTUkUZZ6YHfa+eNikJg0GQmUwM5AJW58NHdvqS0rQcJg9TR/1jcbKOjCadL/
-         qcSg==
-X-Gm-Message-State: AFuF++nJo+xBmcoWCD5Ca3PM/o9Z4ywlAR4MxV1/35s1I02g8q9Qxi3A
-	PKM+8qh9w7bWso8LuR+jIBnDj3Z+QMddWGklrdisvp7LznWtdjggeSsuyZ+aig==
-X-Gm-Gg: AYBFou2LRrFwKhwZqjS2MUAxQSwJG1BuBfQH1pZMjFLM/G4uyu2RcvqrsmCm2qXMEvl
-	fBekDLNXgABmG7eppDCVJgXy5eujYOZhlVl92nWCscjAY0weKBg7wlwKgpQ/w+fUx1NySzoWV0y
-	f8v7HreUy80qzEK3Uhe/pCezPta2w+iGG9DQdNpW+IRmqe4QWwUfFhBvH2LdHPEx6WIondL4InC
-	csrXr2M4Csxcv7thBXlfTuXZdWxuTXW713dJSv93CDs1l7mSJQPHzKP3g3j99r9uK4GhqstTGVX
-	jHRdltU95dsAKhiQnKF5ypQIABH4NV8APtU+3jz3NbD5oFllircUIjTogrZSOwIeJaf4QCB53sH
-	IOnVvlgKdpuoYKXGic3gyxg5q+BCkrbTAXGUj2NkFLB9fqTa3lO0jiEAlze/KW2lG0RtSCddk2M
-	C6ehcqvyzSdhmq/m3X4Vbes3aL539i2Nz4GJo2uJIi166hCg3oTvx/YLCoh0gDJz7vKsmoibRqZ
-	XcQdark4oXn3jbBPN4ikqXdT1ui6QWvsr2rn4k7SUoE2siObwpS6q+QY4hTRa1Qa8L/TKOemrza
-	VhdRg7JWo2A/LStp5/Y/FL4feWfmLN/YZ7uJHw==
-X-Received: by 2002:a17:90b:380c:b0:37d:f206:a2ac with SMTP id 98e67ed59e1d1-39907b170f8mr15313233a91.7.1788295058594;
-        Tue, 01 Sep 2026 13:37:38 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8000:7a86::e35])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3990d75fc49sm7430467a91.12.2026.09.01.13.37.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Sep 2026 13:37:38 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: linux-crypto@vger.kernel.org
-Cc: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-	Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Gaurav Jain <gaurav.jain@nxp.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Rosen Penev <rosenp@gmail.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH] crypto: caam: map job ring registers without claiming region
-Date: Tue,  1 Sep 2026 13:37:36 -0700
-Message-ID: <20260901203736.13248-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.55.0
+        d=1e100.net; s=20251104; t=1788295152; x=1788899952;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=iMSVbAMMClabJnl3yUfS4i27AaasElWu73GA2BM0Mik=;
+        b=ZglZYjeKU8rA8ZqzZhi6rzbi/izStnaHPdJELJgCpvks973qI8jb7wh+k6hwOgOW/l
+         PoQphcqexb/1J43iraOsWv2EevJZ/I/vmy0YhHIKDa/TLLPfuqBj1neL1rNPnaaifUaR
+         pn8w/EQaXLrLLrdPe/hSj1YE00oBYEPsZ8OHdqOr1BkhC5/3cU+/dKJAT6zcHokVI4NT
+         NQTt86/uAdJ+ExSQBxmCtnZ07PyytfrXe4U8GbrQQZYOOZu6EDt+f6c1o0AA5WubdMOK
+         bpY69Y+EFgoTQqJsU+oFj+MOSn5tQJ9+v2X331sdpBejzDM18DBkiQmo2s9lBI6d7+FL
+         wUTg==
+X-Forwarded-Encrypted: i=1; AKwUvBxp/+CSnZ0oPT7SyPeHD22Uk3ABBLBeukuJ/oNI0BMJX58rSUufOD5kkcOr0n+NMF4y+98tRD4UW8FXVYU=@vger.kernel.org
+X-Gm-Message-State: AFuF++mSzku+YUBy618JAiYcSc1RWwoFWG8h3DnJL1sxxDhbmXv9qRS/
+	gphnjmT+nRkPZfJpUsjzJ5HcXRW6A+wdTMIe0iSEWARWzgtgq1c/ZZP84+kQ9laoFm5IOGj926A
+	wKJ8lE/fA1FUMiPYYzqE9u6KftvRA1rg=
+X-Gm-Gg: AYBFou0ntE9N9ko1xD8tvIdaVr9sd07XDOj2NF3YiJ845VMVk0VQnb4xfQM3pbG303I
+	vPMKMJzIDvlHLjQyZJz+cun8RVwQG/C8HdtqEtyJn2/VYp6MovYhrPfG3AwAERddD7nUo3QySc0
+	t6wfoPWHwoJ60efZskJgm28KnpeErHb3jJFLZwgo60QXL3NEzy25IBL+5ujJ1fqi3g8mPoLLC7y
+	ged9sE0Jf8AmeAtRvlm7k+5EhllsBLZ3/vuLbXxYl3IgiBuiUOiBODLyQmpyAG0PTMKHb6ML406
+	tkIdkWUfi5TytEnbsSeQj1+iusQ7cI/OswFKp/t3TBoByqfsY2+MOsLr1WwpOdSoCTJL8LBzQvl
+	do4+Z5QSZyJRneYGK6L5+hUFTznK1w+dbT4X1WVXmYPohQCF3VMs3bT2fU5ug1p2nLTdU3Ld2vK
+	mD8vzEELgmIthVbZ1cFcU4mX+ZN3WkVCwsPbaG1m5prUS3vFQOVHg/cavHexMn9Dw1mA==
+X-Received: by 2002:a05:6402:4585:b0:6a6:776f:5859 with SMTP id
+ 4fb4d7f45d1cf-6a682ac2b12mr255347a12.17.1788295151738; Tue, 01 Sep 2026
+ 13:39:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20260730204722.1101805-1-rosenp@gmail.com> <20260901194524.908240-1-ghidoliemanuele@gmail.com>
+In-Reply-To: <20260901194524.908240-1-ghidoliemanuele@gmail.com>
+From: Rosen Penev <rosenp@gmail.com>
+Date: Tue, 1 Sep 2026 13:39:00 -0700
+X-Gm-Features: AcwNN1WlvzKl5Ma1R8rX-hNwpVEErP-nMy6eoOGTbH_FUp8tWYaCb1AqEhDSbAA
+Message-ID: <CAKxU2N9rW7PpNqUX0w8AR1Doc=LrRPJNct0rYJCTOm3Vskd7Qg@mail.gmail.com>
+Subject: Re: [PATCH] crypto: caam: simplify probe resource and IRQ handling
+To: Emanuele Ghidoli <ghidoliemanuele@gmail.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>, 
+	Pankaj Gupta <pankaj.gupta@nxp.com>, Gaurav Jain <gaurav.jain@nxp.com>, 
+	"David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, regressions@lists.linux.dev, 
+	Emanuele Ghidoli <emanuele.ghidoli@toradex.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-devm_platform_ioremap_resource() ends up calling request_mem_region(),
-which fails with -EBUSY on i.MX SoCs:
-
-There the job rings are modelled as sub-regions of their parent
-fsl,sec-v4.0 register window, and caam_probe() already reserves the
-whole window exclusively via devm_of_iomap() before the children are
-populated.  Every job ring therefore collides with its own parent and
-fails to probe, taking the hardware RNG offline (seen on i.MX6, i.MX7
-and i.MX8 boards such as colibri-imx7 and verdin-imx8mp).
-
-Map the job ring registers with devm_ioremap() instead, which does not
-claim the (already owned) region.
-
-Fixes: 9a955c0a7d11 ("crypto: caam - simplify probe resource and IRQ handling")
-Assisted-by: opencode:big-pickle
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- drivers/crypto/caam/jr.c | 23 ++++++++++++++++++++---
- 1 file changed, 20 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-index f9e029945b51..2ed8229d4733 100644
---- a/drivers/crypto/caam/jr.c
-+++ b/drivers/crypto/caam/jr.c
-@@ -583,12 +583,29 @@ static int caam_jr_probe(struct platform_device *pdev)
- 	struct caam_drv_private_jr *jrpriv;
- 	static int total_jobrs;
- 	void __iomem *ctrl;
-+	struct resource *r;
- 	int error;
- 	int irq;
- 
--	ctrl = devm_platform_ioremap_resource(pdev, 0);
--	if (IS_ERR(ctrl))
--		return PTR_ERR(ctrl);
-+	/*
-+	 * The job rings live inside the register window of their parent
-+	 * fsl,sec-v4.0 node, which caam_probe() already reserves (and maps)
-+	 * via devm_of_iomap().  A requested region that overlaps that
-+	 * reservation, e.g. from devm_platform_ioremap_resource(), would
-+	 * therefore fail with -EBUSY, so map the registers without claiming
-+	 * the region here.
-+	 */
-+	r = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-+	if (!r) {
-+		dev_err(&pdev->dev, "platform_get_resource() failed\n");
-+		return -EINVAL;
-+	}
-+
-+	ctrl = devm_ioremap(&pdev->dev, r->start, resource_size(r));
-+	if (!ctrl) {
-+		dev_err(&pdev->dev, "devm_ioremap() failed\n");
-+		return -ENOMEM;
-+	}
- 
- 	irq = platform_get_irq(pdev, 0);
- 	if (irq < 0)
--- 
-2.55.0
-
+On Tue, Sep 1, 2026 at 12:45=E2=80=AFPM Emanuele Ghidoli
+<ghidoliemanuele@gmail.com> wrote:
+>
+> On Thu, Jul 30, 2026 at 01:47:22PM -0700, Rosen Penev wrote:
+> > Replace the open-coded platform_get_resource() plus devm_ioremap()
+> > sequence with devm_platform_ioremap_resource(), which fetches the
+> > resource, requests the region and maps it in one call.
+> >
+> > Each fsl,sec-*-job-ring node has a distinct 0x10000 reg region and
+> > interrupts property, so the region reservation added by
+> > devm_ioremap_resource() is exclusive and does not introduce overlap
+> > failures.
+>
+> This patch, now commit 9a955c0a7d11 in v7.3-rc1, breaks CAAM on most i.MX
+> SoCs (i.MX6, i.MX7, i.MX8). All job rings fail to probe and the machine
+> loses its hardware RNG:
+Sent fix.
+>
+>   caam_jr 30902000.jr: error -EBUSY: can't request region for resource [m=
+em 0x30902000-0x30902fff]
+>   caam_jr 30902000.jr: probe with driver caam_jr failed with error -16
+>   caam_jr 30903000.jr: error -EBUSY: can't request region for resource [m=
+em 0x30903000-0x30903fff]
+>   caam_jr 30903000.jr: probe with driver caam_jr failed with error -16
+>
+> The job rings do not overlap each other, but they all sit inside the reg
+> window of their parent fsl,sec-v4.0 node, which caam_probe() already
+> reserves exclusively via devm_of_iomap() before it populates the children=
+.
+> So each job ring now collides with its own parent.
+>
+> Seen on these boards (CI/CD):
+>  - apalis-imx6
+>  - apalis-imx8
+>  - colibri-imx6
+>  - colibri-imx7
+>  - colibri-imx8
+>  - verdin-imx8mm
+>  - verdin-imx8mp
+>
+> Reverting 9a955c0a7d11 on colibri-imx7 makes the errors disappear.
+>
+> #regzbot introduced: 9a955c0a7d11
+>
+> Thanks,
+> Emanuele
