@@ -1,330 +1,238 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011049.outbound.protection.outlook.com [52.101.65.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFC4D4A090E
-	for <linux-crypto@vger.kernel.org>; Tue,  1 Sep 2026 19:06:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788289611; cv=none; b=YuSeWrCTXxbd+y1CnoNDSy5OVKKRU9tuHwEnAVNsWAFmtR5kyGimgmv7Q9j528N61LmyWssdObY5ulR2JaTMqu1+M054BSh7WwXi6nYSjeqERVpoqBO1KnW0Y4vM6on2SUiJ+TQKfrvZLtqJReCF439M9fysPAIMnUpPlFwbl3E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788289611; c=relaxed/simple;
-	bh=NL8uP9mXcv5YlmIYafsmjVCCgsE5TReqtVLIrXALZkY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LQknaQPeKYfYvtQlHbWOGtceq/NU2QOTfujlbwLLp4eHxpGNz+PacHvuxCMM1bP3APLdl0dt3FMlVdOcVrkzbxeF90b728eN9p70s5WrKthXojS5L2Ye9QC77QH2AFy1nVqynh2XjBs8f2O0nSXlUHLSsbQWBfcPP/Wo0S7AHA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CNAoxkSj; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCFC539769B;
+	Tue,  1 Sep 2026 19:07:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788289677; cv=fail; b=dgLTd6jFX/NU3u4pvAm1v0xPlMsSatjVx2cnmJSe3xh1eFlf8lCbzAY4rAubEoGt0TVUXy6M7EcqtWaFk8SRTlN7K4jVQ6jx3dZ5s+tXPDUEd6JFDhj0U1QW8odZ1ZgACL5yfvg71cUSlAeY2XUThGH2iyMHEo2qlHaogADWm+8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788289677; c=relaxed/simple;
+	bh=/WhpCBENTngWCq1pcLQbfECSnWs0TgHd+R1AEUfAy/c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Za6sQARIgu4cCHmSIAMvrTJ37duPcZ8aDnMPUtnzW9tRk/Ak1dFYgn/8jPRChJh2O2P/nNxAOh+WdLRR2ASYskhNoorSoDeVgDBnKlDKrRX5vLz1QhwwbySVv2yNN/Ceyuo4pFfAe+t8qg5FPltSktF/RE0/3wKxNUABs0s4o58=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=SfpPKWa/; arc=fail smtp.client-ip=52.101.65.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CNAoxkSj"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1788289607;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rpR05mO04ugLQKCafQxRkfUKWWr5jCrxssepYzcFjvk=;
-	b=CNAoxkSjLcZTcf9B/P5DG+JSm99FGlo+JYvxyTTUh9ePPQpU+xN0EXtS/mvDCawZxVMVVk
-	w/hEbR6mTnGWfMo8r4XvBibMazDyJsIi4t/sXffCbh6wQUpJjHr4m/6aLlkXLy8TpWopnC
-	e8jLU0BQ1ddiKRWG1u54j4NjvXIeZFM=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-638-XNm1M7c8Nge7KOvuIaRshg-1; Tue,
- 01 Sept 2026 15:06:42 -0400
-X-MC-Unique: XNm1M7c8Nge7KOvuIaRshg-1
-X-Mimecast-MFC-AGG-ID: XNm1M7c8Nge7KOvuIaRshg_1788289599
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AE9CD1944F10;
-	Tue,  1 Sep 2026 19:06:38 +0000 (UTC)
-Received: from localhost (headnet04.pony-001.prod.iad2.dc.redhat.com [10.2.32.116])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 21A971800257;
-	Tue,  1 Sep 2026 19:06:36 +0000 (UTC)
-Date: Tue, 1 Sep 2026 15:06:35 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Linlin Zhang <linlin.zhang@oss.qualcomm.com>
-Cc: ebiggers@kernel.org, axboe@kernel.dk, mst@redhat.com,
-	jasowangio@gmail.com, James.Bottomley@hansenpartnership.com,
-	martin.petersen@oracle.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, linux-block@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-scsi@vger.kernel.org,
-	virtualization@lists.linux.dev, devicetree@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, neeraj.soni@oss.qualcomm.com,
-	gaurav.kashyap@oss.qualcomm.com, mani@kernel.org,
-	andersson@kernel.org, konradybcio@kernel.org, bvanassche@acm.org,
-	alim.akhtar@samsung.com, avri.altman@sandisk.com,
-	pbonzini@redhat.com, eperezma@redhat.com,
-	xuanzhuo@linux.alibaba.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 05/11] blk-crypto: add slot-based inline encryption
- path
-Message-ID: <20260901190635.GA729142@fedora>
-References: <20260827160806.1295313-1-linlin.zhang@oss.qualcomm.com>
- <20260827160806.1295313-6-linlin.zhang@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="SfpPKWa/"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=LSNbS5IlpRYinHAzw2Y+IROcIM2kKeCN1b+WUWf5iKo3CoHfZqYAEHViy15UsEXEVol+amTpNNy/iygKdBdGosPpUMt7W0o8f6vd2AcxqaZBJBdsc2M1atSUn6UH0UEvXe5GhvVyXf3L7vSPy3lfSqYiuVD/x0NcnDuP358/E/S/NDR2sGP2sUxRMaXszv+5tCD+nRFjAz20b8LWdL3Z1/aHJUhRPiq/mZ+BGfFjo6F5au9AvqZ8A/A8L9uxc0jP20hQRz91brGrHSZLHk7sMbmY94sg5///tus/C9gp/jXGMyn+Mstrc2xiRHCRYchPmC9e8AM5BtkXeAOywpOBtg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=G65HChs2d3I4puGF5AaZ5m3jZR+7JmUE74crLw6Hs54=;
+ b=RLQxe6rR6NpNSb+PzJ5ixkbAcsTQTxrnCX8PkFVnZq9p8g74h0bfWAqc4HvyEQCGd7eEcVa1kn/FvMQB+8/r4IgTKwOX+G4Kqh0vAZ9twqRbo5ULmIY2jJUrpMBAkCNdQxz3I1DuGehciGGb3G6XIxZpXQcgQE3SksUrAkRUJie2v08/NyByMPj0Sz2AxUunF0OxcIiwnWKWfz5IW3vNi8HZH5FmMTFvqvgC3n/vEIQBLENCEpiNvV9xxo0KX9FRmiER3x9r+Q6T43zpG3et/Cyr5pcw9fG7NkeU4EE1VjC74mFxTCfwzjK7eylByOagPa31hs/f2e1trlavgTjKzw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector1-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=G65HChs2d3I4puGF5AaZ5m3jZR+7JmUE74crLw6Hs54=;
+ b=SfpPKWa/CnugnX9eReM3JCvOj3TWu14fK2eDQPV02pqijo5D3mcKbLUzxWPWvTFIPtAPZo7BcJgXctf+JRkjwYp4suclzCcZ8ICXfxsWn09Neeq5QcibKYB+V9d6cApkaRWH3syd0oLD3jIE54ahod0PohIiouQs0D3FU/C5dwemHpnQMVkX5EiV2KUzwVv86IWbXTy22+89Qg77hDDsWMltBiBi+9Qnx1xldpvgAn7f6X79SBZb2YKjeEJC7/WAnF4TPT1ntvcgLrph9ZTT6g5bb5Byz5kovovKTMpi0Z/3FcLl3prxbbOf+Ob2iyslSdZYxniiEUJnyw2LwWwANw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=oss.nxp.com;
+Received: from GV2PR04MB11799.eurprd04.prod.outlook.com (2603:10a6:150:2cf::9)
+ by AM7PR04MB6919.eurprd04.prod.outlook.com (2603:10a6:20b:10e::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.360.13; Tue, 1 Sep
+ 2026 19:07:52 +0000
+Received: from GV2PR04MB11799.eurprd04.prod.outlook.com
+ ([fe80::2146:83a2:5329:b7c]) by GV2PR04MB11799.eurprd04.prod.outlook.com
+ ([fe80::2146:83a2:5329:b7c%7]) with mapi id 15.21.0360.008; Tue, 1 Sep 2026
+ 19:07:52 +0000
+Date: Tue, 1 Sep 2026 14:07:43 -0500
+From: Frank Li <Frank.li@oss.nxp.com>
+To: Linmao Li <lilinmao@kylinos.cn>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Frank Li <Frank.Li@nxp.com>, Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Leonard Crestez <cdleonard@gmail.com>,
+	Radu Solea <radu.solea@nxp.com>,
+	Franck LENORMAND <franck.lenormand@nxp.com>,
+	linux-crypto@vger.kernel.org, imx@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: mxs-dcp: handle zero-length skcipher requests
+Message-ID: <apcify8QdDGOHVi-@SMW015318>
+References: <20260828093209.3179074-1-lilinmao@kylinos.cn>
+ <apHgn8-IcTshYnfv@SMW015318>
+ <6416cbee-35c7-4fc8-9a80-a25403eb1e6f@kylinos.cn>
+ <apWXYPYyPktawUru@SMW015318>
+ <649d8c23-4af8-4e50-90be-0bdd83f373f1@kylinos.cn>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <649d8c23-4af8-4e50-90be-0bdd83f373f1@kylinos.cn>
+X-ClientProxiedBy: CYXPR03CA0050.namprd03.prod.outlook.com
+ (2603:10b6:930:d1::15) To GV2PR04MB11799.eurprd04.prod.outlook.com
+ (2603:10a6:150:2cf::9)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="wKZb190Ph5vaNUIG"
-Content-Disposition: inline
-In-Reply-To: <20260827160806.1295313-6-linlin.zhang@oss.qualcomm.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: GV2PR04MB11799:EE_|AM7PR04MB6919:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9f173e2e-a27a-489f-032e-08df085c5238
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|19092799006|23010399003|7416014|376014|18002099003|22082099003|56012099006|13003099007|10067099003|11063799006|4143699003;
+X-Microsoft-Antispam-Message-Info:
+	yAL1aXbQQ8nVR12sKWM48It/uf5WazmlOPe7HM6iyaEUujpQP2d5JjbnP4bTwyDCROdmp5cFTvExoZcq0Rn4LmLFDSbjbFMRMZ0V5a9G8rRyVz/WaNrN1KOINTrN+MIzIqDwZohQW02nxt2yqAhA8eLkQ/uWsfPQawtuR869fkaV4d2xwqDCjnKTMz4Sfnu8gIgdArLG2VPGyz6CL9al84SyEyTZaPx0SZ5oJGcd3F9trXZ2ZKbgn6tfQY+u40CyQDVDDlwTWwWCWBgdVWw3rXkG2unmfs8pOk1a5LochKwHaUHjW6CZoFdkHwhiIWRddGImU2mbwGoHgdR0hh5otm5otLo2dmlBMTNDen7HJHGNW3P1i4X880q3I1Q9wcKgQU/amIXYnCWS9F1V9m37trKldOscNW8TMbbEbf5Ym7lVv3aoao/Q76c+CEg+pjhoBI3o32zCaLwytup6Coj7cV1jGHJ83M4PEU/6/xP2LuDXbAEzZ2Ct6SdYeuNqhxk/jdbS4fhMj79ZT6/ySjTvQbeAV2DitEjjf+JExQrqocBdD0q9tWblgJgSEpNKtkChNaZv+uIl9HLJQ/yyDVibPhOTAbroqQBC2ikWqa3UXQ3vhxeP6AFo5BY97HGYa6Z+bjTTG61X4PxA2RIoqT8VAWJJ92zd0hicKDZO3z1jg4U=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV2PR04MB11799.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(19092799006)(23010399003)(7416014)(376014)(18002099003)(22082099003)(56012099006)(13003099007)(10067099003)(11063799006)(4143699003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Z3g0azkyZEdzdkdtRTBrbGpGdzhyYlNmUDVZTWpRVUJvVHNyc080Rkw5MHo2?=
+ =?utf-8?B?Q1k1bGw0b0czTnR2MlRReDVyMUVjUzE4MkRlKzYxTmdDWjBiZ1o2cDZIOEVJ?=
+ =?utf-8?B?Vk9kZXAzSVprdHhhMDV3R1NCdlRQS1FCYllVdkwwRytGNS9yUTRsRGcyZGhr?=
+ =?utf-8?B?SFFxbmZnbktTMXphcnpIeEVxbE8rYzF3Y25BZUFZMDIwUjRaRXkvbkVCUmVN?=
+ =?utf-8?B?czNHVlBaV0t2eFZRTEYzZXBIVzRyZWJ6aUxlc0tiZU1tRUM3MzdLMEN2TDVP?=
+ =?utf-8?B?T2NaNjh5MG5xMlFHTER5aDh5OHhKMUxROS9vL0l6Qjd4YURDMTN5QzhlWGFs?=
+ =?utf-8?B?c0JoWlJEM3NYK0k0cFBiTHNQcXJ4dnVqMnFVbXU1ZVBIcEFBNWlnY0t0bUJH?=
+ =?utf-8?B?MXlub0dvTmdTZElya3lxckpFY21NWFZVMWVFeDRQQWZuUnVMaDJZVFdVZGZo?=
+ =?utf-8?B?emFKdXpuNGw2VGNEWFVScTJqeU8zdWduUVVDZFRqLzJNeDNqSFNkbjJxcGtI?=
+ =?utf-8?B?SnVBcE4vZWkwdkdtMjQ4MGdxaW5jYlFYYmN2eFJEanFPUGt2YVRhK1psalJz?=
+ =?utf-8?B?YWQyM2NmQ2tGVXg3RjBKV2pDUE93VzV0bGlQc3kvVGd4K2Y3bGhZUDdvSkNp?=
+ =?utf-8?B?VTB2Zkd0cW41Vm5DaForUFBac2pNOXdTZGFUckZnRVVBaU5DTTVoeUozSDdn?=
+ =?utf-8?B?TkpPQy9DcjdoOWk0b2FFRHBUMWw1Q3RyN0VKamxjWnYvYkMyVk5MTFlNQWJl?=
+ =?utf-8?B?OG41K2ladVZGNWprRnh6Tlkwc3c5ZmdsWnh1V1lBRGJIcHltOHppRVlQZFNK?=
+ =?utf-8?B?TWdQMGJXVTQ3dkZEbmtnWEpOQlp6WFJ6akNiMHNGTzJUbHlhM0hIc1d5MDJC?=
+ =?utf-8?B?bFBHbnA1VmN0TWswdWtBR0JpTUVvQis1bTJKN2MxMzR1azlndDl2TG5LSFdT?=
+ =?utf-8?B?UmNsN2N6dTRBTVZTM1o2VnV2cDJvdm1iQnNVNVFpckRicnNYVEFSamQyTVVx?=
+ =?utf-8?B?RUdyMEwxTHdtUWhCWlhnSE9BdFY5cEo3aExGc2ZveTR2Y2xNY3NEM2lHVUFr?=
+ =?utf-8?B?ZC9UQ3Z1WXFNb1dUbkZURkQ1S0NJTjdmN2JVQ1FlWmV5RGY5N3dqTzREQ3du?=
+ =?utf-8?B?V2VkWWlKMzRlVUtRMWdjcHR5VWprOXBvOE1FS2ZLTG9PQVhYM2xjZ2k3cVJV?=
+ =?utf-8?B?WFlsaDloYVNkRjJCeUFpby9QR0JtMVJsTXNoc1FjUE85dXBKZEU0bWhQcHhz?=
+ =?utf-8?B?Z2R3RnFoaWFaUGhMQ28ycjdrSkhSandBR2dDa2RrUDF1QWJ6aHZZRUJhTjJa?=
+ =?utf-8?B?cnR0d3BtMmdaUitBenpFNCtIV2JnL280RGk0ZU45anlvL2N2NlJ5cXBCcGRR?=
+ =?utf-8?B?NEljV25WMEN2cEdmbnhMYWhQZ3hGSnREK3JGa2c4M2VxazUzSExNWDNmNGZm?=
+ =?utf-8?B?NGQ0OE9lUnpHNnpxOVJEbk9KdzRzTFhQSStPa1o5TGhQdzE5WGtRL0M5eHVt?=
+ =?utf-8?B?TW5pZWJPU2k0aGNWS0c3V3JYMDJEN2hYNGF0OXJmSUF6R1ZNU1BUSzlmdWQ0?=
+ =?utf-8?B?YWRDVVZRRTFIMnUzNFJsNEdNVDRvVXpyV1hocnh6NVZQNk1Sd04rbEhxbWNY?=
+ =?utf-8?B?Z3htRUM1dkIyNS9VTXorTEJGSENLTGJndUVPbUNJM1ZiNHcvNFgxdThpbStP?=
+ =?utf-8?B?TkwyRlNpN2JCUUdNR25DeGFTblppRTVCU25GSWtPLzYweWp1elIvSkpOWWc1?=
+ =?utf-8?B?aW9ZUExIY0V5dUJVejZ3eGtsNzdpSjFIcEJFMTFWaG15M0tVdFVrV3BtSVBT?=
+ =?utf-8?B?NkJmZTc0dm1aNHVpZVJiM2tDa2VDOHRoNlRaSG54VmhhRjhGbmZjSHJwMGpS?=
+ =?utf-8?B?Ujd3T1YvQ2VlNjN2bW5BdllETW9HdldGRk9Tem1GMHZ3VEk1Y1JLVWx3U2tU?=
+ =?utf-8?B?VmtuRTZTSFl2Z3puMS9ZTVV4SzZSSjJFWC9makRrR3Y2NEMzZTg1RTZUSU05?=
+ =?utf-8?B?TjBwckJvd2YySm9uVnFEdkR1MHBvTmZNK1Q3eGJTWWVtOW1Xd29LQkNUbldF?=
+ =?utf-8?B?RWhDbERjLzB0emNER1dMa3U5MHZDYVBSdXJtay9qTlA2WWMyM3NIL0JHOEk2?=
+ =?utf-8?B?MkpnTU5nYTJvV1Zla1VQKzN2QVp5KzBkdk5nNjRFdWxCblo2VU8wWXFWK0Ry?=
+ =?utf-8?B?TGRhLzRlRzQ1TUNHUEtpcXZHU0djWjB0Nk52RnNwZ3VSdUZjeWlSd1NYcjZJ?=
+ =?utf-8?B?Y0xjdlJGREQzNUhCbnRjYzNjWWR3akZUcitBeW1ZYnZMZTZvMjZaeDFzdmE2?=
+ =?utf-8?B?RXZvRkVVUVgzUW5rMFdkQkRleVcrSUp6Q3RlaUYxZGpkbHBOdFBwUmlkUE5K?=
+ =?utf-8?Q?W4IR31zD4/DrIybUZ3J464jMEzg2b0LIPifx+?=
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9f173e2e-a27a-489f-032e-08df085c5238
+X-MS-Exchange-CrossTenant-AuthSource: GV2PR04MB11799.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Sep 2026 19:07:52.2193
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mzpEMJpWnMuS/Qx6yy5MgPDxkdgHr1H1DTvIC3bY2H3wbt0eVNAsb5Zn7wMzMXbi8QqeUmP0Ogrr7Qukpr2NrlxFi5DQYgx6aTpgZxZivO3W2kCwNbVaw4KDFrc/w32P
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR04MB6919
 
---wKZb190Ph5vaNUIG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Tue, Sep 01, 2026 at 11:05:30AM +0800, Linmao Li wrote:
+>
+> 在 2026/8/31 23:01, Frank Li 写道:
+> > On Mon, Aug 31, 2026 at 08:42:20PM +0800, Linmao Li wrote:
+> > > [You don't often get email from lilinmao@kylinos.cn. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
+> > >
+> > > 在 2026/8/29 3:25, Frank Li 写道:
+> > > > On Fri, Aug 28, 2026 at 05:32:09PM +0800, Linmao Li wrote:
+> > > > > [You don't often get email from lilinmao@kylinos.cn. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
+> > > > >
+> > > > > Zero-length skcipher requests are valid no-ops, but MXS-DCP queues them.
+> > > > Any document show it? if return 0 when cryptelen, it is async, no
+> > > > call crypto_request_complete.
+> > >    Yes. CRYPTO_ALG_ASYNC means that the implementation may complete a
+> > >    request asynchronously, not that every request must do so.
+> > >
+> > >    A return value of 0 indicates synchronous completion.  Only
+> > >    -EINPROGRESS and -EBUSY cause crypto_wait_req() to wait for the
+> > >    completion callback.  The existing fallback path relies on the same
+> > >    semantics.
+> > >
+> > >    There is also a direct precedent in commit 8a4e047c6cc0
+> > >    ("crypto: marvell/cesa - Handle zero-length skcipher requests").
+> > >    Marvell CESA registers asynchronous skcipher algorithms but handles a
+> > >    zero-length request with:
+> > >
+> > >            if (!req->cryptlen)
+> > >                    return 0;
+> > Thanks, but still not answer my question,
+> >
+> > Any document show "Zero-length skcipher requests are valid no-ops", why
+> > not API direct return 0, instead of pass to every driver to check it.
+> >
+> > I suppose it should be checked before call driver's callback.
+>   You are right; I could not find an explicit Crypto API document defining
+>   the zero-length behavior, so the wording "valid no-ops" was too broad.
+>
+>   With the current API, simply returning 0 in the core for every
+>   zero-length request would change XTS semantics, since the generic XTS
+>   implementation returns -EINVAL.  MXS-DCP only implements ECB and CBC
+>   here, whose generic implementations currently return 0.  Handling it in
+>   the driver therefore matches existing behavior; centralizing this would
+>   require algorithm-specific length information.
+>
+>   I agree that the commit message should describe this as existing ECB/CBC
+>   behavior rather than a general skcipher API rule.
 
-On Thu, Aug 27, 2026 at 09:07:14AM -0700, Linlin Zhang wrote:
-> From: linlzhan <linlin.zhang@oss.qualcomm.com>
->=20
-> For the virtio-blk inline encryption use case, the guest kernel goes
-> through the normal blk_crypto_key programming flow via SMC call in a
-> virtual slot format before I/O starts.  It then requests the host to
-> handle that I/O with the key programmed into the corresponding physical
-> keyslot.
+Okay
 
-Just a note for other reviewers: This patch is specific to the
-out-of-band key slot programming approach taken in this series. We are
-discussing in-band key slot programming where this patch probably won't
-be necessary.
-
-I am skipping this patch for now.
-
->=20
-> Introduce a "slot path" that lets a bio carry a pre-programmed physical
-> ICE keyslot index rather than a blk_crypto_key pointer.  Add struct
-> blk_crypto_slot, containing the physical slot index (phy_slot) and
-> data_unit_size_bits, and embed it in struct bio_crypt_ctx alongside the
-> existing bc_key pointer.  A NULL bc_key indicates the slot path.
->=20
-> Provide bio_crypt_set_ctx_by_slot() as the caller-facing API for this
-> path.  Update the internal consumers of bio_crypt_ctx to handle both
-> paths:
->=20
->   - __bio_crypt_advance() and bio_crypt_dun_is_contiguous() use
->     bc_slot.data_unit_size_bits to update the DUN when bc_key is NULL.
->   - bio_crypt_ctx_compatible() compares phy_slot and data_unit_size_bits
->     when bc_key is NULL, preserving request-merging for slot-based bios.
->   - __blk_crypto_submit_bio() short-circuits for the slot path: if the
->     device exposes a crypto_profile the bio is passed through as-is;
->     otherwise it fails with BLK_STS_NOTSUPP.  The software fallback is
->     not attempted since the guest has no key material.
->   - blk_crypto_rq_get_keyslot() skips kernel-side keyslot allocation
->     when bc_key is NULL.
->=20
-> There is no functional change to the existing key-based path.
->=20
-> Signed-off-by: linlzhan <linlin.zhang@oss.qualcomm.com>
-> ---
->  block/blk-crypto-internal.h |  2 +-
->  block/blk-crypto.c          | 57 ++++++++++++++++++++++++++++++++++---
->  include/linux/blk-crypto.h  | 25 ++++++++++++++++
->  3 files changed, 79 insertions(+), 5 deletions(-)
->=20
-> diff --git a/block/blk-crypto-internal.h b/block/blk-crypto-internal.h
-> index 2c7a0446572a..04035d237f03 100644
-> --- a/block/blk-crypto-internal.h
-> +++ b/block/blk-crypto-internal.h
-> @@ -176,7 +176,7 @@ static inline void bio_crypt_do_front_merge(struct re=
-quest *rq,
->  blk_status_t __blk_crypto_rq_get_keyslot(struct request *rq);
->  static inline blk_status_t blk_crypto_rq_get_keyslot(struct request *rq)
->  {
-> -	if (blk_crypto_rq_is_encrypted(rq))
-> +	if (blk_crypto_rq_is_encrypted(rq) && rq->crypt_ctx->bc_key)
->  		return __blk_crypto_rq_get_keyslot(rq);
->  	return BLK_STS_OK;
->  }
-> diff --git a/block/blk-crypto.c b/block/blk-crypto.c
-> index bc3a9f59574b..2212d06d3c11 100644
-> --- a/block/blk-crypto.c
-> +++ b/block/blk-crypto.c
-> @@ -113,11 +113,31 @@ void bio_crypt_set_ctx(struct bio *bio, const struc=
-t blk_crypto_key *key,
-> =20
->  	bc->bc_key =3D key;
->  	memcpy(bc->bc_dun, dun, sizeof(bc->bc_dun));
-> +	memset(&bc->bc_slot, 0, sizeof(bc->bc_slot));
-> =20
->  	bio->bi_crypt_context =3D bc;
->  }
->  EXPORT_SYMBOL_GPL(bio_crypt_set_ctx);
-> =20
-> +void bio_crypt_set_ctx_by_slot(struct bio *bio,
-> +			       const struct blk_crypto_slot *slot,
-> +			       const u64 dun[BLK_CRYPTO_DUN_ARRAY_SIZE],
-> +			       gfp_t gfp_mask)
-> +{
-> +	struct bio_crypt_ctx *bc;
-> +
-> +	WARN_ON_ONCE(!(gfp_mask & __GFP_DIRECT_RECLAIM));
-> +
-> +	bc =3D mempool_alloc(bio_crypt_ctx_pool, gfp_mask);
-> +
-> +	bc->bc_key =3D NULL;
-> +	bc->bc_slot =3D *slot;
-> +	memcpy(bc->bc_dun, dun, sizeof(bc->bc_dun));
-> +
-> +	bio->bi_crypt_context =3D bc;
-> +}
-> +EXPORT_SYMBOL_GPL(bio_crypt_set_ctx_by_slot);
-> +
->  void __bio_crypt_free_ctx(struct bio *bio)
->  {
->  	mempool_free(bio->bi_crypt_context, bio_crypt_ctx_pool);
-> @@ -156,8 +176,12 @@ void __bio_crypt_advance(struct bio *bio, unsigned i=
-nt bytes)
->  {
->  	struct bio_crypt_ctx *bc =3D bio->bi_crypt_context;
-> =20
-> -	bio_crypt_dun_increment(bc->bc_dun,
-> -				bytes >> bc->bc_key->data_unit_size_bits);
-> +	if (bc->bc_key)
-> +		bio_crypt_dun_increment(bc->bc_dun,
-> +					bytes >> bc->bc_key->data_unit_size_bits);
-> +	else if (bc->bc_slot.data_unit_size_bits)
-> +		bio_crypt_dun_increment(bc->bc_dun,
-> +					bytes >> bc->bc_slot.data_unit_size_bits);
->  }
-> =20
->  /*
-> @@ -169,7 +193,14 @@ bool bio_crypt_dun_is_contiguous(const struct bio_cr=
-ypt_ctx *bc,
->  				 const u64 next_dun[BLK_CRYPTO_DUN_ARRAY_SIZE])
->  {
->  	int i;
-> -	unsigned int carry =3D bytes >> bc->bc_key->data_unit_size_bits;
-> +	unsigned int carry;
-> +
-> +	if (bc->bc_key)
-> +		carry =3D bytes >> bc->bc_key->data_unit_size_bits;
-> +	else if (bc->bc_slot.data_unit_size_bits) {
-> +		carry =3D bytes >> bc->bc_slot.data_unit_size_bits;
-> +	} else
-> +		return false;
-> =20
->  	for (i =3D 0; i < BLK_CRYPTO_DUN_ARRAY_SIZE; i++) {
->  		if (bc->bc_dun[i] + carry !=3D next_dun[i])
-> @@ -198,7 +229,12 @@ static bool bio_crypt_ctx_compatible(struct bio_cryp=
-t_ctx *bc1,
->  	if (!bc1)
->  		return !bc2;
-> =20
-> -	return bc2 && bc1->bc_key =3D=3D bc2->bc_key;
-> +	if (bc1->bc_key)
-> +		return bc2 && bc1->bc_key =3D=3D bc2->bc_key;
-> +	else
-> +		return bc2 && !bc2->bc_key &&
-> +		       bc1->bc_slot.phy_slot =3D=3D bc2->bc_slot.phy_slot &&
-> +		       bc1->bc_slot.data_unit_size_bits =3D=3D bc2->bc_slot.data_unit_=
-size_bits;
->  }
-> =20
->  bool bio_crypt_rq_ctx_compatible(struct request *rq, struct bio *bio)
-> @@ -260,6 +296,19 @@ bool __blk_crypto_submit_bio(struct bio *bio)
->  		return false;
->  	}
-> =20
-> +	if (!bc_key) {
-> +		/*
-> +		* Slot path: the ICE keyslot was pre-programmed by the
-> +		* hypervisor. The target device must natively support inline
-> +		* encryption; there is no fallback for slot-based crypto.
-> +		*/
-> +		if (!bdev_get_queue(bdev)->crypto_profile) {
-> +			bio_endio_status(bio, BLK_STS_NOTSUPP);
-> +			return false;
-> +		}
-> +		return true;
-> +	}
-> +
->  	/*
->  	 * If the device does not natively support the encryption context, try =
-to use
->  	 * the fallback if available.
-> diff --git a/include/linux/blk-crypto.h b/include/linux/blk-crypto.h
-> index 938ff536838c..33ae52b77522 100644
-> --- a/include/linux/blk-crypto.h
-> +++ b/include/linux/blk-crypto.h
-> @@ -119,9 +119,28 @@ struct blk_crypto_key {
->  #define BLK_CRYPTO_MAX_IV_SIZE		32
->  #define BLK_CRYPTO_DUN_ARRAY_SIZE	(BLK_CRYPTO_MAX_IV_SIZE / sizeof(u64))
-> =20
-> +/**
-> + * struct blk_crypto_slot - physical slot context for slot-based inline =
-crypto
-> + * @phy_slot:           Physical ICE keyslot index (already resolved fro=
-m virt).
-> + * @data_unit_size_bits: log2 of the encryption data unit size; used by
-> + *                       __bio_crypt_advance() to increment the DUN corr=
-ectly
-> + *                       when a bio is split.  0 means unknown/unset.
-> + *
-> + * Used when a bio carries inline crypto context by physical slot index =
-rather
-> + * than by a blk_crypto_key pointer (i.e. bc_key =3D=3D NULL in bio_cryp=
-t_ctx).
-> + * Set by crypto_vblk when building the bio for a GVM VIRTIO_BLK_T_CRYPT=
-O_IN/OUT
-> + * request; left zeroed for all other bio types.
-> + */
-> +struct blk_crypto_slot {
-> +	unsigned int phy_slot;
-> +	unsigned int data_unit_size_bits;
-> +};
-> +
->  /**
->   * struct bio_crypt_ctx - an inline encryption context
->   * @bc_key: the key, algorithm, and data unit size to use
-> + * @bc_slot: physical slot + data_unit_size_bits for slot-based crypto
-> + *           (used when bc_key =3D=3D NULL)
->   * @bc_dun: the data unit number (starting IV) to use
->   *
->   * A bio_crypt_ctx specifies that the contents of the bio will be encryp=
-ted (for
-> @@ -130,6 +149,7 @@ struct blk_crypto_key {
->   */
->  struct bio_crypt_ctx {
->  	const struct blk_crypto_key	*bc_key;
-> +	struct blk_crypto_slot		 bc_slot;
->  	u64				bc_dun[BLK_CRYPTO_DUN_ARRAY_SIZE];
->  };
-> =20
-> @@ -152,6 +172,11 @@ void bio_crypt_set_ctx(struct bio *bio, const struct=
- blk_crypto_key *key,
->  		       const u64 dun[BLK_CRYPTO_DUN_ARRAY_SIZE],
->  		       gfp_t gfp_mask);
-> =20
-> +void bio_crypt_set_ctx_by_slot(struct bio *bio,
-> +			       const struct blk_crypto_slot *slot,
-> +			       const u64 dun[BLK_CRYPTO_DUN_ARRAY_SIZE],
-> +			       gfp_t gfp_mask);
-> +
->  bool bio_crypt_dun_is_contiguous(const struct bio_crypt_ctx *bc,
->  				 unsigned int bytes,
->  				 const u64 next_dun[BLK_CRYPTO_DUN_ARRAY_SIZE]);
-> --=20
-> 2.34.1
->=20
-
---wKZb190Ph5vaNUIG
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmqXIjsACgkQnKSrs4Gr
-c8gIsAgAjxY1AuCye1sw9H4sjqZsfj0jPTgKoNqMfnOBNaQiIfFkrD6/oOL8BMg6
-JFz5bBHobx5DmK+dDZE65Hku8bMijIzZ9ZOueGjQuXv83InuB60l6tHqtVDXkbE9
-jETy31d+aBbBbP76d9iwJQ/X2AdqywtaN6J9O5jr1sOPv1wxh2SAFacqLDWZWL+B
-n86AKJzAkA6iAxqTWuTAJ0CtngqbNaPpV3x/Amp1n1H61fT/hs8k/6HECuQMJ4At
-5Q0ODPOBUhPD5BapzzgzzAFfMdWLIvMeHdwMIq2VPLERD4yz46VlQRy5TiqFIqOF
-R+UoasO0aVBF4KdvWhDuu0d3lYIdDw==
-=bouA
------END PGP SIGNATURE-----
-
---wKZb190Ph5vaNUIG--
-
+Frank
+>
+>   Thanks,
+>   Linmao
+> >
+> > Frank
+> >
+> > >
+> > > Thanks,
+> > > Linmao
+> > >
+> > > > Frank
+> > > >
+> > > > > When such a request reaches the worker, last_out_len remains zero. The
+> > > > > CBC completion path then subtracts AES_BLOCK_SIZE from this unsigned
+> > > > > value when updating the IV, causing the offset to underflow. On
+> > > > > decryption, the resulting source address precedes aes_in_buf.
+> > > > >
+> > > > > Return success before enqueueing zero-length requests. This avoids the
+> > > > > invalid source access and leaves the IV unchanged for a no-op.
+> > > > >
+> > > > > Fixes: fadd7a6e616b ("crypto: mxs-dcp - Fix AES issues")
+> > > > > Signed-off-by: Linmao Li <lilinmao@kylinos.cn>
+> > > > > ---
+> > > > >    drivers/crypto/mxs-dcp.c | 3 +++
+> > > > >    1 file changed, 3 insertions(+)
+> > > > >
+> > > > > diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
+> > > > > index 133ebc998236..60794b4d49fa 100644
+> > > > > --- a/drivers/crypto/mxs-dcp.c
+> > > > > +++ b/drivers/crypto/mxs-dcp.c
+> > > > > @@ -473,6 +473,9 @@ static int mxs_dcp_aes_enqueue(struct skcipher_request *req, int enc, int ecb)
+> > > > >           struct dcp_aes_req_ctx *rctx = skcipher_request_ctx(req);
+> > > > >           int ret;
+> > > > >
+> > > > > +       if (!req->cryptlen)
+> > > > > +               return 0;
+> > > > > +
+> > > > >           if (unlikely(actx->key_len != AES_KEYSIZE_128 && !actx->key_referenced))
+> > > > >                   return mxs_dcp_block_fallback(req, enc);
+> > > > >
+> > > > >
+> > > > > base-commit: 8d3ae59288f1e7d58d76558a6ee96d533bc5019f
+> > > > > --
+> > > > > 2.25.1
+> > > > >
+> > > > >
