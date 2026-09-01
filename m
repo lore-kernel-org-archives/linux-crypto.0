@@ -1,308 +1,126 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E9DC3DAAC5
-	for <linux-crypto@vger.kernel.org>; Tue,  1 Sep 2026 19:45:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01D2243CE45
+	for <linux-crypto@vger.kernel.org>; Tue,  1 Sep 2026 19:45:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788291903; cv=none; b=Ahlnvq8jiH1GFvyZmbnuJ7rddxskNVCX9Kt2x01ZqHCt0llPNLp211qwORnhi+nKmPueNgCPDpsEVZyD8krY8QjL9aZ4psThMcyXgQFgN4Ylo/OoMs/quV3ne0eHbyETyNqvLDQ8vQybp3WivJYrWeaxDletwwLWN+VPqXBnCFw=
+	t=1788291953; cv=none; b=ZueRkesoHVnXZlykAZA+DvJ9eApIx0pyaCRaEfCyxzyMoqQCeprV3wzkYLnUrJNA4bEJdD/Vq5tSQM34kvqYA9WaCiSepWdo75LPT8BhCjZwfTRn5TJC/0XQmoGjDBZBKL9GI2vfTdxKTV0X4P1/icSE87pvZtrXhwYDiqwMFGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788291903; c=relaxed/simple;
-	bh=qns4i0vzSza9eI1E6ltQNoq6qlBATVjFAq09uyq6JPc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=beN03YXvnKhDGGu/QBumG+gnio1p3NcBxTpOObvC5ZqItIKuXdZYrl/lC/hS9cTWl1AaQTtDpUdRblVf4DlcVG1qmYdtqQhBgX86jEBki8bz0JxDzFZcgVqRNagCOVpvEBnPiYJf5tMkKYf8KL3mkU/txH2C1x3c3t3yFd4W8zA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D2dkNDmo; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1788291953; c=relaxed/simple;
+	bh=noIwLroC3QxdO9H9YOTtZZGb08Agpt6CN69Saip6HSE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=GTNa5oyfLg0PFqmtj6wMVKVzrpiYNn2/2fZWSaTlMcgFzYFUH1Xz8MoUyEmCSnp47Jb6g55gtK2Ct/4JKTog1kM/FWVmF5dMev+lTxJdbOv/l6zLkdun2GLfe8qwvU5WrRqgqrfNpEaZpCzM2htg7Gz8OUyW7fabaYVWQHLrsg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nYEuRlny; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D2dkNDmo"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1788291901;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wIhbsrwMr09604DPmSKwiuTmZlNDoR3Q+zpCXUlj+6w=;
-	b=D2dkNDmoekfRF62Ro+4CjO796om0u4WaIzR0xlnp0OJ3QNphcLm03zT+rKwZkaooFXdz8L
-	XruE3NzmjRTFERp66vFAnNWCGiRHu+B6jscubthXbSDdo6YnfZxNPWDcDcOMohnEq+2m07
-	+TCwheLQj7x8F8UjUG/cG37Ab3CjNU8=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-498-huxZQ2l0OP6dx2nzCofDrA-1; Tue,
- 01 Sept 2026 15:44:54 -0400
-X-MC-Unique: huxZQ2l0OP6dx2nzCofDrA-1
-X-Mimecast-MFC-AGG-ID: huxZQ2l0OP6dx2nzCofDrA_1788291891
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8585C195411F;
-	Tue,  1 Sep 2026 19:44:50 +0000 (UTC)
-Received: from localhost (headnet04.pony-001.prod.iad2.dc.redhat.com [10.2.32.116])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E5BF418005B8;
-	Tue,  1 Sep 2026 19:44:48 +0000 (UTC)
-Date: Tue, 1 Sep 2026 15:44:47 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Linlin Zhang <linlin.zhang@oss.qualcomm.com>
-Cc: Eric Biggers <ebiggers@kernel.org>, axboe@kernel.dk, mst@redhat.com,
-	jasowangio@gmail.com, James.Bottomley@hansenpartnership.com,
-	martin.petersen@oracle.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, linux-block@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-scsi@vger.kernel.org,
-	virtualization@lists.linux.dev, devicetree@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, neeraj.soni@oss.qualcomm.com,
-	gaurav.kashyap@oss.qualcomm.com, mani@kernel.org,
-	andersson@kernel.org, konradybcio@kernel.org, bvanassche@acm.org,
-	alim.akhtar@samsung.com, avri.altman@sandisk.com,
-	pbonzini@redhat.com, eperezma@redhat.com,
-	xuanzhuo@linux.alibaba.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 00/11] FBE virtualization: inline encryption for
- virtio-blk guests
-Message-ID: <20260901194447.GE527638@fedora>
-References: <20260827160806.1295313-1-linlin.zhang@oss.qualcomm.com>
- <20260827184219.GB2137493@google.com>
- <d81e347e-8ca7-40a1-a428-5bce6f0d4b02@oss.qualcomm.com>
- <20260831210759.GE86114@quark>
- <ca838905-f0f8-4f0a-96aa-2bc05ab6c0a7@oss.qualcomm.com>
- <d7ce6c39-d9c0-4746-ba18-1c37a929819b@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nYEuRlny"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4998b5a63e2so1813185e9.1
+        for <linux-crypto@vger.kernel.org>; Tue, 01 Sep 2026 12:45:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788291950; x=1788896750; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=egjLnBNnYVR/hTviRogWVrzKsRnzbjObGE015hZhVf8=;
+        b=nYEuRlnyvYuUTVHVEGw1CFg38PvUZLtZhR8ugfQHHMlriqJXVOcmkfK7xvh1lWRyfj
+         bkvQCYzIzj1BMlfO9c/rKChnHICHE84sl7b7+BxTvd24dSPaoIThSiZslUykDhAXT5j0
+         VOzjijFudsIGXMmV70gpsgX/jCcA4Nhp9RCtoAK+BT1HcMy4ZqtDGCql8yR0j/Fmx95x
+         9O26rIy4XgicGpLBVm38Ce7vV6Woc/ZXL6yvvRx/IqSVbCc4VhC3aYsEPxIqeVNUAHSU
+         +ZeV8NdK5Ytsu1GkotdlEHYpJzuJAnPPU0ah0TT3/Bu1T2a32Sjl/91F5JRK5mxTluL9
+         163w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788291950; x=1788896750;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=egjLnBNnYVR/hTviRogWVrzKsRnzbjObGE015hZhVf8=;
+        b=Mem6HCYmzYvmWAMEHyI57WjrcFeAv3cXHFE4F3FAExnsP25QYEDxBIG5WrOk8dgaVd
+         ZNsZtQuyOxGGb6a9j/d8T3lMYlviIg7JNTk3UYiauq9si8Nr293oZWBeVex3TeBuWuZU
+         YamBIPNJNfKXZm2pVPuePe4Dqa6jpo/xEr11pREKPc6WoxbkyYPlZ71FP5xyr21qSlqa
+         zctCNM2jqu4lJ2zBzysoomhUWXgNuvk+WEG8Bn4iQ++pw6nfY10meAQemoz0wZMvnQo+
+         yLlrnV+ZfhMup4O+mC/d/jaUp+4heW8Wd3C3lJM81s8PpGJqXWpq3aj1kB/kcYRylS4K
+         tSFg==
+X-Forwarded-Encrypted: i=1; AHgh+RrqXFRQyqDI4N31MeS8lK6KsqEf/FiU+GDuRd+CHO6bM59GyX2wdq2Mk2waP5Sfdt4poDI9pe5LpNtNUNc=@vger.kernel.org
+X-Gm-Message-State: AFuF++na0j5yq9wahcnIZxP9gVvQ2149nGsVYjB9n+Lu/CZY39iqcB9S
+	1A5i/u9zAnJW+cIOw0r/Vod1IEVfhjMpahMzq0uLDi3F9C51on78QSMn
+X-Gm-Gg: AR+sD1218WMvWTZFoN58/qXysIcMRvO2u6Xs81UUwuMAf/ED/nVB3GPBklJjWZrqGuz
+	sGJyoDWhs2Qu9mlXkQS1/RkCG4c5+zqacwpp7hUTeya95rYEJbyfME0OMsibudkTIQT1P6GCud7
+	Q26jxE76dMjjdKB6ezjC7EanooHivQk4XDgcKLyZHAy6b7lHMK5N+QvvubRxN+J1t+ToWqlmoyf
+	SvC2ZxjdfWD5xtdttpHS5g91T3vrHcWJnp29Xae5uCIWrjX0h9qtE4JjdVlOJcYEAyuKsXenIjH
+	SfuNwcGV/kTXgzqitkc27ycdWWTl0O1a8W5Q6v+iC8/CGABpqKptXyJaLitNYzjt8kH8966flNk
+	uRMY8133yOugBlI2K9Iy5vnLRNB9aDHEG6fV4d91amzO7CPJdo1bfw0IHTVEj3Uw5L6s0xZyZ3z
+	ayBhyy5josU9BFhI+b4vnkx7z4MZmcaTx395sxsubkxP/aSjn8gZ/WzyHJLekQn12I1fOE/uyTe
+	K1mSjW6IGvlDllBpdoIaf4InJepHWoe0WZmTEpnXsoTbIQQj6h4DM2PQr8lonWvfgjRe6j2eI2c
+	dLey
+X-Received: by 2002:a05:600c:a55:b0:499:60bf:c6f7 with SMTP id 5b1f17b1804b1-49b91c4cc2cmr646542415e9.13.1788291949789;
+        Tue, 01 Sep 2026 12:45:49 -0700 (PDT)
+Received: from emanueleg-nb.corp.toradex.com (248.201.173.83.static.wline.lns.sme.cust.swisscom.ch. [83.173.201.248])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49cdce4a804sm103691665e9.15.2026.09.01.12.45.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Sep 2026 12:45:49 -0700 (PDT)
+From: Emanuele Ghidoli <ghidoliemanuele@gmail.com>
+To: Rosen Penev <rosenp@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+	Pankaj Gupta <pankaj.gupta@nxp.com>,
+	Gaurav Jain <gaurav.jain@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	regressions@lists.linux.dev,
+	Emanuele Ghidoli <emanuele.ghidoli@toradex.com>
+Subject: Re: [PATCH] crypto: caam: simplify probe resource and IRQ handling
+Date: Tue,  1 Sep 2026 21:45:19 +0200
+Message-ID: <20260901194524.908240-1-ghidoliemanuele@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20260730204722.1101805-1-rosenp@gmail.com>
+References: <20260730204722.1101805-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="KTDsgjxbEoEJOa6J"
-Content-Disposition: inline
-In-Reply-To: <d7ce6c39-d9c0-4746-ba18-1c37a929819b@oss.qualcomm.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Transfer-Encoding: 8bit
 
---KTDsgjxbEoEJOa6J
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Thu, Jul 30, 2026 at 01:47:22PM -0700, Rosen Penev wrote:
+> Replace the open-coded platform_get_resource() plus devm_ioremap()
+> sequence with devm_platform_ioremap_resource(), which fetches the
+> resource, requests the region and maps it in one call.
+>
+> Each fsl,sec-*-job-ring node has a distinct 0x10000 reg region and
+> interrupts property, so the region reservation added by
+> devm_ioremap_resource() is exclusive and does not introduce overlap
+> failures.
 
-On Tue, Sep 01, 2026 at 04:45:19PM +0800, Linlin Zhang wrote:
->=20
->=20
-> On 9/1/2026 4:22 PM, Linlin Zhang wrote:
-> >=20
-> >=20
-> > On 9/1/2026 5:07 AM, Eric Biggers wrote:
-> >> On Fri, Aug 28, 2026 at 11:37:57PM +0800, Linlin Zhang wrote:
-> >>> Thanks for your comments!
-> >>>
-> >>> Not making virtio-blk itself support key programming and eviction is
-> >>> something done deliberately. Based on that HW-wrapped key management
-> >>> operations are also handled in the out-of-band path.
-> >>>
-> >>> There are bellow 2 approaches I investigated to let virtio-blk progra=
-mming
-> >>> the key.
-> >>>
-> >>>   1. virtio_blk implements blk_crypto_ll_ops interfaces, including pr=
-ogram
-> >>>      key and evict key interfaces.(Same to 'the virtio-blk interface =
-standardized
-> >>>      blk_crypto_ll_ops requests' mentioned by Stefan in the virtio SP=
-EC thread)
-> >>>
-> >>>      The guest's block crypto profile manages the keyslot in virtual =
-slot
-> >>>      format in this scenario.
-> >>>
-> >>>       - block crypto key and virt_slot index it passed to the hypervi=
-sor's
-> >>>        (EL2) device emulation (QEMU, using QEMU in the following) whi=
-ch
-> >>>        runs in userspace of the host. Besides of transferring the vir=
-tual
-> >>>        slot to the physical slot, a programming block crypto key UAPI=
- need
-> >>>        be added. Follow current blk-crypto design, it may be like
-> >>>        BLKCRYPTOGENERATEKEY. I thought this results in a security ris=
-k that
-> >>>        allows userspace process a key into a key slot.
-> >>>
-> >>>      - For key eviction, it's similar to above key programming handli=
-ng, also
-> >>>        need a key eviction in blk IOCTLs, but leads to the security r=
-isk
-> >>>        that allow userspace client to evict a key in a key slot.
-> >>>
-> >>>     virt_slot, DUN and DUSize is appended to virtblk request during c=
-rypto
-> >>>     I/O.
-> >>>
-> >>>   2. virtio_blk implements blk_crypto_ll_ops interfaces, excluding pr=
-ogram
-> >>>      key and evict key interfaces.
-> >>>
-> >>>      The guest's block crypto profile doesn't manage keyslot for the =
-guest,
-> >>>      the host's block crypto profile manages keyslot for both the gue=
-st and
-> >>>      the host. The trigger of key programming operation is moved from=
- the
-> >>>      guest to the host.
-> >>>
-> >>>        - The whole block crypto key (key size, key bytes, blk_crypto_=
-config)
-> >>>          and DUN are appended to the virtblk request during IO, a lit=
-tle
-> >>>          high payload.
-> >>>
-> >>>          The backend parses the crypto message in the virtio queue and
-> >>>          construct a block crypto key and DUN for the bio_crypto_ctx
-> >>>          set to the BIO. So that the IO flow in the host can program
-> >>>          the key.=20
-> >>>
-> >>>          The question is that the blk-crypto-profile distinguishs the
-> >>>          block crypto key via the key's address. But the host has
-> >>>          different key addresses for the programming and eviction key
-> >>>          operations of the same block crypto key from GVM, because the
-> >>>          key is re-constructed in the host for the key program and
-> >>>          eviction operations.=20
-> >>>
-> >>>          To fix it, the approach I thought is maintaining a new key
-> >>>          hash table in the backend, and comparing the block crypto key
-> >>>          content and DUN parsed from virtio queue with that in the key
-> >>>          hash table.=20
-> >>>          My major concern is that this need keep the keys synchroniza=
-tion
-> >>>          b/w this new hash table and the blk-crypto-profile's hash ta=
-ble
-> >>>          carefully, avoiding that key is still present in the
-> >>>          blk-crypto-profile's hash table, but removed in backend hash
-> >>>          table. Another point is that the whole block crypto key and
-> >>>          DUN are appended into virtio block request per crypto I/O.
-> >>>
-> >>>        - For key eviction, adding a key eviction in blk IOCTLs allows
-> >>>          userspace client to evict a key in a key slot. I thought this
-> >>>          is a security concern.
-> >>>
-> >>>
-> >>>      This option doesn't need map virt_slot to physical one.
-> >>>
-> >>>
-> >>> Taking all the above into account, I made a compromise to implement
-> >>> blk_crypto_ll_ops interfaces in a out-of-band path, which lets the vi=
-rtio
-> >>> blk only need focus on the data path. I agree that it is complex than
-> >>> the second option mentioned in the above, but small payload (only
-> >>> virt_slot, DUN, DUSize) in the virtio block request and no security
-> >>> risk of key eviction from userspace.
-> >>>
-> >>>
-> >>> I would like to hear your thoughts about the above and am appreciated
-> >>> if you could share your insights about the design of inline
-> >>> encryption in virtio block.
-> >>
-> >> Well, the way it should work is that each virtio-blk device should have
-> >> its own set of *virtual* keyslots on the host side.  From the guest's
-> >> perspective it would act very similarly to UFS / eMMC inline encryptio=
-n,
-> >> and it would be easy to integrate into the existing stack.
-> >>
-> >> Then to process encrypted I/O, the host would use the keyslot number in
-> >> the I/O to look up the blk_crypto_key it previously saved, and issue I=
-/O
-> >> using that key (using bio_crypt_set_ctx()).  The existing keyslot
-> >> management logic in the block layer would allocate or wait for a
-> >> physical keyslot as needed, so it should just work.
-> >>
-> >> Eviction would similarly be passed through to blk_crypto_evict_key().
-> >>
-> >> Note that with this design, there would be no static partitioning of t=
-he
-> >> physical keyslots.  The host would just allocate and release them as
-> >> needed, similar to memory allocation.  The total number of virtual
-> >> keyslots could be greater than the number of physical keyslots.
-> >>
-> >> This design would also work with hardware-wrapped keys.
-> >>
-> >> The hardest part is still the UAPIs for the VMM to do what it needs to
-> >> do (assuming that it even needs to support physical inline encryption
-> >> hardware at all, and not simply use the AES acceleration on the CPU),
-> >> but that is the case with any of the proposals.
-> >>
-> >> - Eric
-> >=20
-> > Thanks for your insights and clarification.
-> >=20
-> > This is a very clear architecture for virtio-blk inline encryption supp=
-ort
-> > and is quite similar to what I referred to as approach 1, with a few no=
-table
-> > differences:
-> >=20
-> >   - The host maintains a set of virtual keyslots per virtio-blk device.
-> >   - Physical keyslots are not statically partitioned.
-> >   - The virtual-to-physical slot mapping is managed as part of the virt=
-io-blk
-> >     device implementation rather than being tied to a VM-wide slot tabl=
-e.
-> >=20
-> > With this design, I believe there would be two VM exits associated with
-> > encrypted I/O:
-> >   1. Key programming
-> >      Before encrypted I/O can be submitted, the guest needs to program =
-a key
-> >      into a virtual keyslot:
-> >     =20
-> >      Guest virtio-blk driver
-> >          -> VM exit
-> >          -> virtio-blk backend (e.g. QEMU)
-> >          -> ioctl
-> >          -> host virtio-blk proxy driver
-> >             (stores the blk_crypto_key in a virtual keyslot)
-> >=20
-> >   2. Encrypted I/O submission
-> >      The I/O request carries the virtual keyslot number and DUN:
-> >=20
-> >      Guest virtio-blk driver
-> >         -> VM exit
-> >         -> virtio-blk backend (e.g. QEMU)
-> >         -> ioctl
-> >         -> host virtio-blk proxy driver
-> >            (looks up the blk_crypto_key associated with the virtual key=
-slot
-> >             and submits I/O using bio_crypt_set_ctx())
->=20
-> Supplementation.
-> This may be a potential security concern. The host virtio-blk proxy drive=
-r exposes
-> API for key programming, the input parameters are blk_crypto key and virt=
-ual
-> slot. If a malicious program replace the key in a specific virtual slot b=
-etween
-> key program call and I/O submission via this API, the data would be encry=
-pted
-> by the unintentional key.
+This patch, now commit 9a955c0a7d11 in v7.3-rc1, breaks CAAM on most i.MX
+SoCs (i.MX6, i.MX7, i.MX8). All job rings fail to probe and the machine
+loses its hardware RNG:
 
-If the virtual key slots in the uapi are per file descriptor rather than
-per inode, then other programs cannot interfere with each other's
-virtual key slots. Each program gets its own virtual key space when it
-opens a file descriptor. Sharing is only possible by inheriting or
-passing a file descriptor to another process and that's good for
-security.
+  caam_jr 30902000.jr: error -EBUSY: can't request region for resource [mem 0x30902000-0x30902fff]
+  caam_jr 30902000.jr: probe with driver caam_jr failed with error -16
+  caam_jr 30903000.jr: error -EBUSY: can't request region for resource [mem 0x30903000-0x30903fff]
+  caam_jr 30903000.jr: probe with driver caam_jr failed with error -16
 
-Stefan
+The job rings do not overlap each other, but they all sit inside the reg
+window of their parent fsl,sec-v4.0 node, which caam_probe() already
+reserves exclusively via devm_of_iomap() before it populates the children.
+So each job ring now collides with its own parent.
 
---KTDsgjxbEoEJOa6J
-Content-Type: application/pgp-signature; name=signature.asc
+Seen on these boards (CI/CD):
+ - apalis-imx6
+ - apalis-imx8
+ - colibri-imx6
+ - colibri-imx7
+ - colibri-imx8
+ - verdin-imx8mm
+ - verdin-imx8mp
 
------BEGIN PGP SIGNATURE-----
+Reverting 9a955c0a7d11 on colibri-imx7 makes the errors disappear.
 
-iQEzBAEBCgAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmqXKy8ACgkQnKSrs4Gr
-c8jlIwf/XtrVPKfbvVHOezfxoBBhyVjeR1eN6QSR80TwYiZGnwvAAfJmUt+TyFvd
-3QY3hxHd2SoscVPH6yikmmXWRCFBwr00Ud2aHqarQBwZ2Qdgpf4D6XXpMogM7QRK
-jgncJtStCEvt1vBuN8S6uYFw7mcK5uIQY5bQzM2tlBgZ6eoAh6DfNYKB8aUlWdrt
-DnxE7S4YM4CgeEPIleGL/q9kmwZJfFNdM42cVoXdrheyrBCxf+jYqBw3zWIqdfmm
-k7GPAVo6uhJGCyRNK86PY0I+7onsxKf4/epTETxsDTFw1RAdLj6hbyaZnWKH69n+
-WR6Bhot/CtallVCNZApsVjfifkADRA==
-=hDIx
------END PGP SIGNATURE-----
+#regzbot introduced: 9a955c0a7d11
 
---KTDsgjxbEoEJOa6J--
-
+Thanks,
+Emanuele
