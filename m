@@ -1,31 +1,30 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2246740EB9C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 223C73D890B;
 	Tue,  1 Sep 2026 14:58:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788274694; cv=none; b=e2IIekv8L77QswseacdhtJGoVdxjXJui6tKlohfny9+muNiccdiIHvsK9JYykexJk3pxrZ2cE/4YZZZ1R5ElbrBgrCaf5W/cG8uvEtcEwBpV8lydU+20ml9zDi0teFz8x9gblu1k2yyX3wZqIa7EMpvL5cZZnIox2e/mhuZqLcg=
+	t=1788274694; cv=none; b=PVbhLo99eylpLEbooL9wVupZO57kXktPE5DKglEt1rx46zgODVtG/cGDJo2J8J5qyu3ee4J+0zRGDCOyxk84FIHAn+GM+GXJvreGdU9Ii3PAMb/tCCUQHg0qVGJX/OiNJILpNnwHwG5t87r8GPLTN7sJBGMOVzvyNJHswjo4oTQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1788274694; c=relaxed/simple;
-	bh=zH06ZKSgGhEhXr0gPfiGkd8DxI44+kr5wz8zEOUWQZk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TPsUY4dOw1d2yBYI5RYaRyKZ5pdxmXb0NxrYAHPtnufcE/X0h4oBwZH4uwXsidhe5xdJmrTgyRu5mHKP+/7ebbBzM2uraSmdRtb2I27o87CLS/SP6Ak6eVg49r+OVRnVXU9cPI0LW8XoaVMhr0TbhzU+x9CdwI/lcAFdr7N3RfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cysZZLRF; arc=none smtp.client-ip=100.103.45.18
+	bh=y83eikXk8GUd2cBtc2uTCXIv0/Xzw6ZdWBcjEeeINTQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sh17K30AiT2rJmVdqvNmT+thowEIZuV+hPiyH0lku6o+MbUMN6lRCtuNzSPaGvjjEZDXNPzT6OZmiD4BJP/IdD7e333Cd+n7WH5AJwKSwiLO8bcBzn1+jG2dzbVBU0/6CZYSHhP3zDggvUG9znV3uzb1wyYt7wxpuGVOEzXA8ig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hSmZEpip; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cysZZLRF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 945BD1F00A3A;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hSmZEpip"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3573A1F000E9;
 	Tue,  1 Sep 2026 14:58:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
 	s=k20260515; t=1788274692;
-	bh=56BaSgitaCOqK+plEdyRoTXW75Ul7dUQbsnofeonq2Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=cysZZLRFOedPPPO//ebfnqWoUAq3ACVHOVowkBLYsRGJLs6dfZ4GNpCIgWF8XKMl1
-	 +j2GuQzQOQYK2TfKBNUBNFBBBDAome86zQr8Y51X0jKUXLbqT7cUPA5HtWWPlVeWYp
-	 q9mPHrT1s2gFffWPqNKVAgQzr/VaTwoUwNWRsBSMphHqgRR6Nr3HvGEVWWc4XryRgv
-	 MPKfD0cf/YATfgKkrTbxcTyyJeOhB37+rZm0meKJhRjmx/HJ7FE+qIGsBHR0i1j4Er
-	 woSJpjWbnwlL67kE3yJx7iy9nBBIo5e9Cggk0yhLyETt1PzFjhw+8uWH6XGUw+Nn7d
-	 Nd9Xn71cRSTxA==
+	bh=iUpjiTv1KRvFABoYYph8lVPGE+bZqchdutvEQG6SYQI=;
+	h=From:To:Cc:Subject:Date;
+	b=hSmZEpipj6ibJ/5DHn71+dcqM3a8A0IRF+6SKnv018OiWNgwKD6W6tTBe/4ljcULg
+	 dLoEAdMBZgUJPLm/f9deS/q4OirmzNLs0IlmRHjRgE7MTNhMQFbyZEz7mp1gJMqs2V
+	 IyKJVxwWwMgbnXNLLQOEb3zXGB+omA6fos0RdiczaNc1di9yOPE/iZmc1NkicK3/Rf
+	 aekc8fEDWh0e8iusb1w5e88WMt5jLecI1HUkP00GCsq/LMSYFcdcLYE2gdv8S8FCYv
+	 sToypstdm6rsI2Jt9K09+tSTD//r1pyD7jiM2KTuZWsm3ZjuFKKD6RbmS/9TFP6YLa
+	 UXU//mxVpX1hw==
 From: Eric Biggers <ebiggers@kernel.org>
 To: x86@kernel.org
 Cc: linux-um@lists.infradead.org,
@@ -35,12 +34,10 @@ Cc: linux-um@lists.infradead.org,
 	Christoph Hellwig <hch@lst.de>,
 	Andrew Morton <akpm@linux-foundation.org>,
 	Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH v5 1/8] x86/fpu: Check for missing AVX and AVX-512 xstate bits
-Date: Tue,  1 Sep 2026 07:57:33 -0700
-Message-ID: <20260901145740.42337-2-ebiggers@kernel.org>
+Subject: [PATCH v5 0/8] x86: Remove cpu_has_xfeatures() and add AVX-512 xor_gen()
+Date: Tue,  1 Sep 2026 07:57:32 -0700
+Message-ID: <20260901145740.42337-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260901145740.42337-1-ebiggers@kernel.org>
-References: <20260901145740.42337-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,77 +46,84 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If the CPU declares AVX or AVX-512 support, verify that the
-corresponding xstate bits are also set.  If not, warn and clear them.
+This series consolidates and cleans up how the kernel handles CPU
+feature flags for AVX and AVX-512 when the underlying OS or hypervisor
+(if any) doesn't enable the required xstate features in XCR0.
 
-This eliminates the perceived need for AVX and AVX-512 optimized code in
-the kernel to call cpu_has_xfeatures().  That has never been universally
-done, which strongly suggests that it has never really been needed in
-practice, but this should remove any remaining doubt.
+Specifically, it makes the checks for xstate features be done in a
+single place at boot time for both UML and native x86, instead of
+everywhere kernel code wants to check for AVX or AVX-512 support.
 
-Acked-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- arch/x86/kernel/fpu/xstate.c | 25 +++++++++++++++++++++++--
- 1 file changed, 23 insertions(+), 2 deletions(-)
+Patch 8 then adds an AVX-512 optimized implementation of xor_gen() for
+RAID, which had been blocked on confusion around cpu_has_xfeatures() and
+its lack of implementation on UML.
 
-diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
-index a7b6524a9dea..97cfd4fb6cc0 100644
---- a/arch/x86/kernel/fpu/xstate.c
-+++ b/arch/x86/kernel/fpu/xstate.c
-@@ -806,7 +806,7 @@ static u64 __init guest_default_mask(void)
- void __init fpu__init_system_xstate(unsigned int legacy_size)
- {
- 	unsigned int eax, ebx, ecx, edx;
--	u64 xfeatures;
-+	u64 xfeatures, mask;
- 	int err;
- 	int i;
- 
-@@ -818,6 +818,8 @@ void __init fpu__init_system_xstate(unsigned int legacy_size)
- 	if (!boot_cpu_has(X86_FEATURE_XSAVE)) {
- 		pr_info("x86/fpu: x87 FPU will use %s\n",
- 			boot_cpu_has(X86_FEATURE_FXSR) ? "FXSAVE" : "FSAVE");
-+		/* Disable all dependent flags too */
-+		setup_clear_cpu_cap(X86_FEATURE_XSAVE);
- 		return;
- 	}
- 
-@@ -833,7 +835,8 @@ void __init fpu__init_system_xstate(unsigned int legacy_size)
- 	cpuid_count(CPUID_LEAF_XSTATE, 1, &eax, &ebx, &ecx, &edx);
- 	fpu_kernel_cfg.max_features |= ecx + ((u64)edx << 32);
- 
--	if ((fpu_kernel_cfg.max_features & XFEATURE_MASK_FPSSE) != XFEATURE_MASK_FPSSE) {
-+	mask = XFEATURE_MASK_FPSSE;
-+	if ((fpu_kernel_cfg.max_features & mask) != mask) {
- 		/*
- 		 * This indicates that something really unexpected happened
- 		 * with the enumeration.  Disable XSAVE and try to continue
-@@ -844,6 +847,24 @@ void __init fpu__init_system_xstate(unsigned int legacy_size)
- 		goto out_disable;
- 	}
- 
-+	mask |= XFEATURE_MASK_YMM;
-+	if (boot_cpu_has(X86_FEATURE_AVX)) {
-+		if ((fpu_kernel_cfg.max_features & mask) != mask) {
-+			pr_err(FW_BUG
-+			       "x86/fpu: Disabling AVX support due to missing xstate features\n");
-+			setup_clear_cpu_cap(X86_FEATURE_AVX);
-+		}
-+	}
-+
-+	mask |= XFEATURE_MASK_AVX512;
-+	if (boot_cpu_has(X86_FEATURE_AVX512F)) {
-+		if ((fpu_kernel_cfg.max_features & mask) != mask) {
-+			pr_err(FW_BUG
-+			       "x86/fpu: Disabling AVX-512 support due to missing xstate features\n");
-+			setup_clear_cpu_cap(X86_FEATURE_AVX512F);
-+		}
-+	}
-+
- 	if (fpu_kernel_cfg.max_features & XFEATURE_MASK_APX &&
- 	    fpu_kernel_cfg.max_features & (XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR)) {
- 		/*
+Please consider this series for the x86 tree for 7.4.
+
+Changed in v5:
+  - Replaced benchmark results with the new xor_benchmark
+  - Consolidated the vzeroupper in xor-avx512.c into one location
+
+Changed in v4:
+  - Added missing vzeroupper instructions in xor-avx512.c
+
+Changed in v3:
+  - Updated the implementation of fpu__init_system_xstate() as suggested
+    by Borislav
+  - Added Acked-by tags
+  - Used "xor:" commit subject
+
+Changed in v2:
+  - Made x86 clear the AVX* bits if FPU or XSAVE features are missing.
+  - Updated comment in x86 arch_xor_init().
+  - Updated commit message for the UML commit to clarify that checking
+    XCR0 is standard practice in userspace
+
+
+Eric Biggers (8):
+  x86/fpu: Check for missing AVX and AVX-512 xstate bits
+  um: Check for missing AVX and AVX-512 xstate bits
+  crypto: x86 - Stop using cpu_has_xfeatures()
+  lib/crypto: x86: Stop using cpu_has_xfeatures()
+  lib/crc: x86: Stop using cpu_has_xfeatures()
+  x86/fpu: Remove cpu_has_xfeatures()
+  xor: Remove redundant X86_FEATURE_OSXSAVE check
+  xor: Add AVX-512 optimized xor_gen()
+
+ arch/um/kernel/um_arch.c                   |  78 ++++++++++++-
+ arch/x86/crypto/aegis128-aesni-glue.c      |   3 +-
+ arch/x86/crypto/aesni-intel_glue.c         |   7 +-
+ arch/x86/crypto/aria_aesni_avx2_glue.c     |  11 +-
+ arch/x86/crypto/aria_aesni_avx_glue.c      |  11 +-
+ arch/x86/crypto/aria_gfni_avx512_glue.c    |  11 +-
+ arch/x86/crypto/camellia_aesni_avx2_glue.c |  11 +-
+ arch/x86/crypto/camellia_aesni_avx_glue.c  |  11 +-
+ arch/x86/crypto/cast5_avx_glue.c           |   7 +-
+ arch/x86/crypto/cast6_avx_glue.c           |   7 +-
+ arch/x86/crypto/serpent_avx2_glue.c        |   9 +-
+ arch/x86/crypto/serpent_avx_glue.c         |   7 +-
+ arch/x86/crypto/sm4_aesni_avx2_glue.c      |  11 +-
+ arch/x86/crypto/sm4_aesni_avx_glue.c       |  11 +-
+ arch/x86/crypto/twofish_avx_glue.c         |   6 +-
+ arch/x86/include/asm/fpu/api.h             |   9 --
+ arch/x86/kernel/fpu/xstate.c               |  69 +++++-------
+ lib/crc/x86/crc-pclmul-template.h          |   6 +-
+ lib/crypto/x86/blake2s.h                   |   4 +-
+ lib/crypto/x86/chacha.h                    |   3 +-
+ lib/crypto/x86/nh.h                        |   4 +-
+ lib/crypto/x86/poly1305.h                  |   7 +-
+ lib/crypto/x86/sha1.h                      |   4 +-
+ lib/crypto/x86/sha256.h                    |   4 +-
+ lib/crypto/x86/sha512.h                    |   3 +-
+ lib/crypto/x86/sm3.h                       |   3 +-
+ lib/raid/xor/Makefile                      |   2 +-
+ lib/raid/xor/x86/xor-avx512.c              | 122 +++++++++++++++++++++
+ lib/raid/xor/x86/xor_arch.h                |  31 ++++--
+ 29 files changed, 276 insertions(+), 196 deletions(-)
+ create mode 100644 lib/raid/xor/x86/xor-avx512.c
+
+
+base-commit: cee9395acd8043be0644b25c34bfa86623f2b935
 -- 
 2.55.0
 
