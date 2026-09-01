@@ -1,301 +1,359 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F013849F124
-	for <linux-crypto@vger.kernel.org>; Tue,  1 Sep 2026 18:47:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A77354A0F09;
+	Tue,  1 Sep 2026 18:54:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788288461; cv=none; b=poift5R6ErIZdbMBI131FPGHKsTQfosF/IJkwqqantfc9mojuoAt0+Il1fU7SObNewmD2lE5Z7GLlo5g1VYXH+L1BTZexE1KIQIm0s6p8hsu+SIkmmUCmHYOWVlThGNqRtoUzFYZ+SO7rjxXCkHvlyi6lCKZFNtHPNStoMTuOHc=
+	t=1788288890; cv=none; b=lFOemFPZkHRfMd+D11Uu9i42OX4ItFwkh8Vu8+FKqMkGvMVH/AIjztHLiAlWGryqbwbCEK3DC/XKuYQpn/64f6TnPcHrjKTaxStgn1A4kqwXikuAcsig1eoIRKk88CYUNKu+RfnH7Cje9Gnxo8aaW4wd4XS7M1f0z0WwF/CGor4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788288461; c=relaxed/simple;
-	bh=37Jyf2Og03HL2RNpJK6fCzQGF/A6jmxwa298hL04IW4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pw0QKdKOlAzQ7yMBM9CvwJ8iCrMIpWuiaGa0P6nLTOp/s6pnW7rA5v1LEAI6BCV3BiWwQTm6aulgLCzEPvNJn9Yl6meVPsrPJRMj1uCj5zXnwkj1alv92uj58XRZGnnBBILn/0Azd1knSNRSlnvHu/e2YQs1pdBVQQ5kYbSzjCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DMavSJuN; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1788288890; c=relaxed/simple;
+	bh=vtFfG+JMUv9XOKazKyZsQccPhs2fG2Xk/8Vhzv1ift4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kuwM/HHZHq6vTnM/z2eNEydCpq6gUaf5p6IXXmSb8l15cpmgA5p7wl04wCJoIvs1pVbu2jJLappi6oxAAY2Nj2jEmavJzlokFlEehCyc5Z4RUKjx6bZD0yCQVnGSw2Wsw7SdEEmkjflVt/nHbg34JndnmQdvlyW+YCUI8SyEBsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=pass smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=vsrrADMA; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DMavSJuN"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1788288456;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=h4yzqurxJCh3TbmATixRFTedMTmqRz4G3gTD9h2e+jg=;
-	b=DMavSJuNKlu4XelZLbhIUOexi2A/sWBiKwMih5vP2RDySa4jxKs7mXLQxum4uNAKGkjb3Q
-	9Yk4rry7hdZkCRv7FNjuqEcWr40Ik30kF6dZDsAQ/hWCzo3HSJt2e5tRf5CrkWn4wRCaqN
-	ficJ013TghjSn+/K68xSNKCU2Rl/4r8=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-28-sVJaRTP2MUSGMiEowFh_EA-1; Tue,
- 01 Sept 2026 14:47:33 -0400
-X-MC-Unique: sVJaRTP2MUSGMiEowFh_EA-1
-X-Mimecast-MFC-AGG-ID: sVJaRTP2MUSGMiEowFh_EA_1788288449
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 185B7180133D;
-	Tue,  1 Sep 2026 18:47:28 +0000 (UTC)
-Received: from localhost (headnet04.pony-001.prod.iad2.dc.redhat.com [10.2.32.116])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E83B21955F09;
-	Tue,  1 Sep 2026 18:47:25 +0000 (UTC)
-Date: Tue, 1 Sep 2026 14:47:24 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Linlin Zhang <linlin.zhang@oss.qualcomm.com>
-Cc: Eric Biggers <ebiggers@kernel.org>, axboe@kernel.dk, mst@redhat.com,
-	jasowangio@gmail.com, James.Bottomley@hansenpartnership.com,
-	martin.petersen@oracle.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, linux-block@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-scsi@vger.kernel.org,
-	virtualization@lists.linux.dev, devicetree@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, neeraj.soni@oss.qualcomm.com,
-	gaurav.kashyap@oss.qualcomm.com, mani@kernel.org,
-	andersson@kernel.org, konradybcio@kernel.org, bvanassche@acm.org,
-	alim.akhtar@samsung.com, avri.altman@sandisk.com,
-	pbonzini@redhat.com, eperezma@redhat.com,
-	xuanzhuo@linux.alibaba.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 00/11] FBE virtualization: inline encryption for
- virtio-blk guests
-Message-ID: <20260901184724.GD527638@fedora>
-References: <20260827160806.1295313-1-linlin.zhang@oss.qualcomm.com>
- <20260827184219.GB2137493@google.com>
- <d81e347e-8ca7-40a1-a428-5bce6f0d4b02@oss.qualcomm.com>
- <20260831204122.GC527638@fedora>
- <71fcde90-3d26-4f34-8908-7a0947d8ceb9@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vsrrADMA"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=B2YTmETQ3V6ePI5Q0Gy5QnG7ZGu8CldDtrSct0RkzFU=; b=vsrrADMA8PEr+Mc4uWKsMHH9BR
+	NWRBQqmtUSoKBvc08KZwbkuPKzGGwwEChldIP/108AUMdDhRNEbZtHmqOn+NmWyMo3LXwJL/mpAEn
+	1FIoUSNn6yuWzSVPTWmYkalXYcHftzfDXJuLNPIpG0BIdmC9JXs42bC1NEJA7soqinOu0Nk7y3Zd+
+	1R4/USFdYeGUGtP3pfl+tlYQdsdGipU3+f+BT9nhPy64x+VBSdC/3wTw/UHbKciM73RxYHCLyXdCq
+	9ZcXlk7PpReE9c7KNuEZAjXSzuedjCUnm7mMQSNDXmuKIBF33AZS9xRHJyieo3M/ogMktdnnakx3u
+	ChJaEf2g==;
+Received: from [50.53.43.113] (helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtpsa (Exim 4.99.1 #2 (Red Hat Linux))
+	id 1x1Td3-0000000D8O2-1CuZ;
+	Tue, 01 Sep 2026 18:54:42 +0000
+From: Randy Dunlap <rdunlap@infradead.org>
+To: linux-kernel@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	John Allen <john.allen@amd.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org
+Subject: [PATCH] crypto: ccp.h - repair all kernel-doc comments
+Date: Tue,  1 Sep 2026 11:54:38 -0700
+Message-ID: <20260901185438.31038-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="le1+zzq4kRSwMP92"
-Content-Disposition: inline
-In-Reply-To: <71fcde90-3d26-4f34-8908-7a0947d8ceb9@oss.qualcomm.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Transfer-Encoding: 8bit
 
---le1+zzq4kRSwMP92
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Eliminate all kernel-doc warnings in <linux/ccp.h>:
+- add Returns: for function return values
+- use the enum keyword when describing an enum in kernel-doc
+- add missing enum value descriptions
+- add or repair missing struct member descriptions
+- use nested struct notation as needed
 
-On Tue, Sep 01, 2026 at 05:21:53PM +0800, Linlin Zhang wrote:
->=20
->=20
-> On 9/1/2026 4:41 AM, Stefan Hajnoczi wrote:
-> > On Fri, Aug 28, 2026 at 11:37:57PM +0800, Linlin Zhang wrote:
-> >>
-> >>
-> >> On 8/28/2026 2:42 AM, Eric Biggers wrote:
-> >>> On Thu, Aug 27, 2026 at 09:07:09AM -0700, Linlin Zhang wrote:
-> >>>> From: linlzhan <linlin.zhang@oss.qualcomm.com>
-> >>>>
-> >>>> Current virtio-blk does not provide a mechanism for a guest to
-> >>>> program hardware keys or submit encrypted I/O using pre-programmed
-> >>>> keyslots.  It drops the crypto context when issuing a bio request
-> >>>> to the virtio-blk queue, preventing inline-encryption-based FBE
-> >>>> on virtio block devices.
-> >>>>
-> >>>> This series enables File-Based Encryption in guest VMs on Qualcomm
-> >>>> GVM platforms where the ICE inline encryption hardware is shared
-> >>>> between the host and guests.  In this environment the guest kernel
-> >>>> has no access to the ICE hardware directly; it supplies a virtual
-> >>>> keyslot index and data unit number with each encrypted I/O request
-> >>>> via VIRTIO_BLK_F_INLINE_ENCRYPTION, and the host must translate the
-> >>>> virtual slot to a physical ICE keyslot and submit the bio =E2=80=94 =
-without
-> >>>> transferring raw key material across the VM boundary.
-> >>>
-> >>> This seems to be designed incorrectly by not making virtio-blk itself
-> >>> support key programming and eviction.  That complicates things
-> >>> significantly by then having to handle the key programming and evicti=
-on
-> >>> out-of-band using Qualcomm-specific SCM calls.  It also means that
-> >>> adding other implementations of this would be very difficult.
-> >>>
-> >>> There are some claims that not transmitting keys across the VM bounda=
-ry
-> >>> is desirable.  But that doesn't seem meaningful, given that all the I=
-/O
-> >>> is transmitted across that boundary in plaintext anyway, and also it
-> >>> seems that hardware-wrapped keys will be supported too.
-> >>>
-> >>> Please make virtio-blk support the key programming, eviction, and
-> >>> HW-wrapped key management operations that are needed for this to work.
-> >>>
-> >>> - Eric
-> >>
-> >> Thanks for your comments!
-> >>
-> >> Not making virtio-blk itself support key programming and eviction is
-> >> something done deliberately. Based on that HW-wrapped key management
-> >> operations are also handled in the out-of-band path.
-> >>
-> >> There are bellow 2 approaches I investigated to let virtio-blk program=
-ming
-> >> the key.
-> >>
-> >>   1. virtio_blk implements blk_crypto_ll_ops interfaces, including pro=
-gram
-> >>      key and evict key interfaces.(Same to 'the virtio-blk interface s=
-tandardized
-> >>      blk_crypto_ll_ops requests' mentioned by Stefan in the virtio SPE=
-C thread)
-> >>
-> >>      The guest's block crypto profile manages the keyslot in virtual s=
-lot
-> >>      format in this scenario.
-> >>
-> >>       - block crypto key and virt_slot index it passed to the hypervis=
-or's
-> >>        (EL2) device emulation (QEMU, using QEMU in the following) which
-> >>        runs in userspace of the host. Besides of transferring the virt=
-ual
-> >>        slot to the physical slot, a programming block crypto key UAPI =
-need
-> >>        be added. Follow current blk-crypto design, it may be like
-> >>        BLKCRYPTOGENERATEKEY. I thought this results in a security risk=
- that
-> >>        allows userspace process a key into a key slot.
-> >>
-> >>      - For key eviction, it's similar to above key programming handlin=
-g, also
-> >>        need a key eviction in blk IOCTLs, but leads to the security ri=
-sk
-> >>        that allow userspace client to evict a key in a key slot.
-> >=20
-> > Yes, userspace shouldn't have access to the entire physical key slot
-> > range. The host kernel or other VMs may need key slots and an untrusted
-> > QEMU process must not be able to modify those key slots or use them for
-> > I/O.
-> >=20
-> > The uapi design should include a solution for this. For example, there
-> > could be an ioctl like BLKCRYPTOSEALKEYS that permanently restricts the
-> > key range on this block device file descriptor and cannot be undone.
-> > Libvirt or other management tooling would call this ioctl with
-> > CAP_SYS_ADMIN before passing the file descriptor when launching QEMU
-> > without CAP_SYS_ADMIN. This prevents QEMU from ever having access to the
-> > full physical key range.
-> >=20
-> > Just an idea. Those familiar with blk-crypto may have a better one. It
-> > seems likely that we can find a design that matches the level of
-> > security of the out-of-band approach.
->=20
-> Thanks for your comment!
->=20
-> Eric mentioned a proposal that each virtio block device has its own *virt=
-ual*
-> keyslots in the host, which is not static partitioning of the physical ke=
-yslots.
-> I have concerns about the new key programing UAPI and 2 VM exits per encr=
-ypted
-> I/O. I'll confirm with Eric if that needs be considered and if we need pa=
-ss
-> through the crypto to the host blk-crypto-profile (which means the max sl=
-ots
-> of blk-crypto-profile in the guest is 0, and virtio block driver only doe=
-sn't
-> implement the key program interface in blk_crypto_ll_ops).
->=20
-> >=20
-> >>
-> >>     virt_slot, DUN and DUSize is appended to virtblk request during cr=
-ypto
-> >>     I/O.
-> >>
-> >>   2. virtio_blk implements blk_crypto_ll_ops interfaces, excluding pro=
-gram
-> >>      key and evict key interfaces.
-> >>
-> >>      The guest's block crypto profile doesn't manage keyslot for the g=
-uest,
-> >>      the host's block crypto profile manages keyslot for both the gues=
-t and
-> >>      the host. The trigger of key programming operation is moved from =
-the
-> >>      guest to the host.
-> >>
-> >>        - The whole block crypto key (key size, key bytes, blk_crypto_c=
-onfig)
-> >>          and DUN are appended to the virtblk request during IO, a litt=
-le
-> >>          high payload.
-> >>
-> >>          The backend parses the crypto message in the virtio queue and
-> >>          construct a block crypto key and DUN for the bio_crypto_ctx
-> >>          set to the BIO. So that the IO flow in the host can program
-> >>          the key.=20
-> >>
-> >>          The question is that the blk-crypto-profile distinguishs the
-> >>          block crypto key via the key's address. But the host has
-> >>          different key addresses for the programming and eviction key
-> >>          operations of the same block crypto key from GVM, because the
-> >>          key is re-constructed in the host for the key program and
-> >>          eviction operations.=20
-> >>
-> >>          To fix it, the approach I thought is maintaining a new key
-> >>          hash table in the backend, and comparing the block crypto key
-> >>          content and DUN parsed from virtio queue with that in the key
-> >>          hash table.=20
-> >>          My major concern is that this need keep the keys synchronizat=
-ion
-> >>          b/w this new hash table and the blk-crypto-profile's hash tab=
-le
-> >>          carefully, avoiding that key is still present in the
-> >>          blk-crypto-profile's hash table, but removed in backend hash
-> >>          table. Another point is that the whole block crypto key and
-> >>          DUN are appended into virtio block request per crypto I/O.
-> >=20
-> > This sounds like an approach that skips key programming and instead
-> > sends the keys along with each I/O request. The device implementation is
-> > responsible for managing key slots on the physical ICE. My main concern
-> > with this would be whether the blk_crypto_ll_ops semantics can be
-> > faithfully replicated (e.g. error reporting) without explicit key
-> > programming operations.
-> >=20
-> > Stefan
->=20
-> You're right. When the virtio-blk device processes encrypted I/O, it
-> would be responsible for extracting the blk_crypto_key and DUN from the
-> virtqueue and attaching them to the bio (via bio_crypt_set_ctx()). The
-> existing keyslot management logic in the block layer would then handle
-> physical keyslot allocation and waiting as needed, so the rest of the
-> blk-crypto infrastructure should continue to work unchanged.
->=20
-> Regarding your concern, there is already a somewhat similar
-> implementation in the device-mapper layer (
-> dm_table_construct_crypto_profile() implements a passthrough
-> blk_crypto_ll_ops profile. See
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/d=
-rivers/md/dm-table.c?h=3Dv7.3-rc1
-> ).
->=20
-> Based on my current understanding, I don't see any obvious
-> architectural issues with this approach. However, I may be missing
-> something, so I'd appreciate any feedback if you see flaws in the
-> design or potential problems that should be taken into account.
+Warning: include/linux/ccp.h:30 No description found for return value
+ of 'ccp_present'
+Warning: include/linux/ccp.h:42 No description found for return value
+ of 'ccp_version'
+Warning: include/linux/ccp.h:67 No description found for return value
+ of 'ccp_enqueue_cmd'
+Warning: include/linux/ccp.h:97 cannot understand function prototype:
+ 'enum ccp_aes_type'
+Warning: include/linux/ccp.h:114 cannot understand function prototype:
+ 'enum ccp_aes_mode'
+Warning: include/linux/ccp.h:128 Enum value 'CCP_AES_MODE_GHASH' not
+ described in enum 'ccp_aes_mode'
+Warning: include/linux/ccp.h:128 Enum value 'CCP_AES_MODE_GCTR' not
+ described in enum 'ccp_aes_mode'
+Warning: include/linux/ccp.h:128 Enum value 'CCP_AES_MODE_GCM' not
+ described in enum 'ccp_aes_mode'
+Warning: include/linux/ccp.h:128 Enum value 'CCP_AES_MODE_GMAC' not
+ described in enum 'ccp_aes_mode'
+Warning: include/linux/ccp.h:134 cannot understand function prototype:
+ 'enum ccp_aes_action'
+Warning: include/linux/ccp.h:190 struct member 'authsize' not described
+ in 'ccp_aes_engine'
+Warning: include/linux/ccp.h:190 struct member 'aad_len' not described
+ in 'ccp_aes_engine'
+Warning: include/linux/ccp.h:202 cannot understand function prototype:
+ 'enum ccp_xts_aes_unit_size'
+Warning: include/linux/ccp.h:245 struct member 'type' not described in
+ 'ccp_xts_aes_engine'
+Warning: include/linux/ccp.h:255 cannot understand function prototype:
+ 'enum ccp_sha_type'
+Warning: include/linux/ccp.h:394 cannot understand function prototype:
+ 'enum ccp_passthru_bitwise'
+Warning: include/linux/ccp.h:410 cannot understand function prototype:
+ 'enum ccp_passthru_byteswap'
+Warning: include/linux/ccp.h:472 struct member 'src_dma' not described
+ in 'ccp_passthru_nomap_engine'
+Warning: include/linux/ccp.h:472 struct member 'dst_dma' not described
+ in 'ccp_passthru_nomap_engine'
+Warning: include/linux/ccp.h:472 Excess struct member 'src' description in
+ 'ccp_passthru_nomap_engine' (did you mean one of: 'src_len', 'src_dma')
+Warning: include/linux/ccp.h:472 Excess struct member 'dst' description in
+ 'ccp_passthru_nomap_engine' (did you mean one of: 'dst_dma')
+Warning: include/linux/ccp.h:489 cannot understand function prototype:
+ 'enum ccp_ecc_function'
+Warning: include/linux/ccp.h:587 struct member 'u' not described in
+ 'ccp_ecc_engine'
+Warning: include/linux/ccp.h:587 Excess struct member 'mm' description in
+ 'ccp_ecc_engine' (did you mean one of: 'u.mm')
+Warning: include/linux/ccp.h:587 Excess struct member 'pm' description in
+ 'ccp_ecc_engine' (did you mean one of: 'u.pm')
+Warning: include/linux/ccp.h:602 cannot understand function prototype:
+ 'enum ccp_engine'
 
-I don't have enough blk-crypto knowledge to give good feedback on the
-details of this approach, but Eric and others could help with that.
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+---
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: John Allen <john.allen@amd.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
 
-Stefan
+ include/linux/ccp.h |   58 +++++++++++++++++++++++++++---------------
+ 1 file changed, 38 insertions(+), 20 deletions(-)
 
---le1+zzq4kRSwMP92
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmqXHbwACgkQnKSrs4Gr
-c8gZXAgAyk+ykFlJgnNUvYAfetdqn3qvfOcLaR2xVwjxEk0NzBDFP/HZW/wgWzwe
-ugHuAyKQ44stXShQ8DVuF5yalv17oZSE2LgxtKfIH/eHUSzCA7S08xRAXbZci9cn
-0ZcZ0WfXv6EroR6pGugfa5A4NjLHAONVYl9/z8jr1nStq8CqzDui1K5SLQjzr5Ou
-vVPsa26fU5+2U944ctg1Fw+3cjIndA5krRUN4DvNlmY3qseFoves6mlc271wzus7
-RpN1+wGrBVa6nb5WMF31dgoAm5TcFOXAX98RnjnyOzZgD5gwlG28LH6qM/POvCbC
-HwYdUNvLgBP2bm9xfMTBPXTXnK+Ryw==
-=1s2S
------END PGP SIGNATURE-----
-
---le1+zzq4kRSwMP92--
-
+--- linux-next-20260831.orig/include/linux/ccp.h
++++ linux-next-20260831/include/linux/ccp.h
+@@ -26,7 +26,7 @@ struct ccp_cmd;
+ /**
+  * ccp_present - check if a CCP device is present
+  *
+- * Returns zero if a CCP device is present, -ENODEV otherwise.
++ * Returns: zero if a CCP device is present, -ENODEV otherwise.
+  */
+ int ccp_present(void);
+ 
+@@ -38,7 +38,7 @@ int ccp_present(void);
+ /**
+  * ccp_version - get the version of the CCP
+  *
+- * Returns a positive version number, or zero if no CCP
++ * Returns: a positive version number, or zero if no CCP
+  */
+ unsigned int ccp_version(void);
+ 
+@@ -61,9 +61,9 @@ unsigned int ccp_version(void);
+  * will be -EINPROGRESS. Any other "err" value during callback is
+  * the result of the operation.
+  *
+- * The cmd has been successfully queued if:
+- *   the return code is -EINPROGRESS or
+- *   the return code is -EBUSY and CCP_CMD_MAY_BACKLOG flag is set
++ * Returns: The cmd has been successfully queued if:
++ * * the return code is -EINPROGRESS or
++ * * the return code is -EBUSY and CCP_CMD_MAY_BACKLOG flag is set
+  */
+ int ccp_enqueue_cmd(struct ccp_cmd *cmd);
+ 
+@@ -89,7 +89,7 @@ static inline int ccp_enqueue_cmd(struct
+ 
+ /***** AES engine *****/
+ /**
+- * ccp_aes_type - AES key size
++ * enum ccp_aes_type - AES key size
+  *
+  * @CCP_AES_TYPE_128: 128-bit key
+  * @CCP_AES_TYPE_192: 192-bit key
+@@ -99,11 +99,12 @@ enum ccp_aes_type {
+ 	CCP_AES_TYPE_128 = 0,
+ 	CCP_AES_TYPE_192,
+ 	CCP_AES_TYPE_256,
++	/* private: */
+ 	CCP_AES_TYPE__LAST,
+ };
+ 
+ /**
+- * ccp_aes_mode - AES operation mode
++ * enum ccp_aes_mode - AES operation mode
+  *
+  * @CCP_AES_MODE_ECB: ECB mode
+  * @CCP_AES_MODE_CBC: CBC mode
+@@ -111,6 +112,10 @@ enum ccp_aes_type {
+  * @CCP_AES_MODE_CFB: CFB mode
+  * @CCP_AES_MODE_CTR: CTR mode
+  * @CCP_AES_MODE_CMAC: CMAC mode
++ * @CCP_AES_MODE_GHASH: GHASH mode
++ * @CCP_AES_MODE_GCTR: GCTR mode
++ * @CCP_AES_MODE_GCM: GCM mode
++ * @CCP_AES_MODE_GMAC: GMAC mode
+  */
+ enum ccp_aes_mode {
+ 	CCP_AES_MODE_ECB = 0,
+@@ -123,11 +128,12 @@ enum ccp_aes_mode {
+ 	CCP_AES_MODE_GCTR,
+ 	CCP_AES_MODE_GCM,
+ 	CCP_AES_MODE_GMAC,
++	/* private: */
+ 	CCP_AES_MODE__LAST,
+ };
+ 
+ /**
+- * ccp_aes_mode - AES operation mode
++ * enum ccp_aes_action - AES operation mode
+  *
+  * @CCP_AES_ACTION_DECRYPT: AES decrypt operation
+  * @CCP_AES_ACTION_ENCRYPT: AES encrypt operation
+@@ -135,6 +141,7 @@ enum ccp_aes_mode {
+ enum ccp_aes_action {
+ 	CCP_AES_ACTION_DECRYPT = 0,
+ 	CCP_AES_ACTION_ENCRYPT,
++	/* private: */
+ 	CCP_AES_ACTION__LAST,
+ };
+ /* Overloaded field */
+@@ -146,6 +153,7 @@ enum ccp_aes_action {
+  * @type: AES operation key size
+  * @mode: AES operation mode
+  * @action: AES operation (decrypt/encrypt)
++ * @authsize: AES block request size
+  * @key: key to be used for this AES operation
+  * @key_len: length in bytes of key
+  * @iv: IV to be used for this AES operation
+@@ -156,6 +164,7 @@ enum ccp_aes_action {
+  * @cmac_final: indicates final operation when running in CMAC mode
+  * @cmac_key: K1/K2 key used in final CMAC operation
+  * @cmac_key_len: length in bytes of cmac_key
++ * @aad_len: length in bytes of Additional Authenticated Data
+  *
+  * Variables required to be set when calling ccp_enqueue_cmd():
+  *   - type, mode, action, key, key_len, src, dst, src_len
+@@ -192,7 +201,7 @@ struct ccp_aes_engine {
+ 
+ /***** XTS-AES engine *****/
+ /**
+- * ccp_xts_aes_unit_size - XTS unit size
++ * enum ccp_xts_aes_unit_size - XTS unit size
+  *
+  * @CCP_XTS_AES_UNIT_SIZE_16: Unit size of 16 bytes
+  * @CCP_XTS_AES_UNIT_SIZE_512: Unit size of 512 bytes
+@@ -206,11 +215,13 @@ enum ccp_xts_aes_unit_size {
+ 	CCP_XTS_AES_UNIT_SIZE_1024,
+ 	CCP_XTS_AES_UNIT_SIZE_2048,
+ 	CCP_XTS_AES_UNIT_SIZE_4096,
++	/* private: */
+ 	CCP_XTS_AES_UNIT_SIZE__LAST,
+ };
+ 
+ /**
+  * struct ccp_xts_aes_engine - CCP XTS AES operation
++ * @type: ccp_aes_type - AES key size
+  * @action: AES operation (decrypt/encrypt)
+  * @unit_size: unit size of the XTS operation
+  * @key: key to be used for this XTS AES operation
+@@ -247,11 +258,13 @@ struct ccp_xts_aes_engine {
+ 
+ /***** SHA engine *****/
+ /**
+- * ccp_sha_type - type of SHA operation
++ * enum ccp_sha_type - type of SHA operation
+  *
+  * @CCP_SHA_TYPE_1: SHA-1 operation
+  * @CCP_SHA_TYPE_224: SHA-224 operation
+  * @CCP_SHA_TYPE_256: SHA-256 operation
++ * @CCP_SHA_TYPE_384: SHA-384 operation
++ * @CCP_SHA_TYPE_512: SHA-512 operation
+  */
+ enum ccp_sha_type {
+ 	CCP_SHA_TYPE_1 = 1,
+@@ -259,6 +272,7 @@ enum ccp_sha_type {
+ 	CCP_SHA_TYPE_256,
+ 	CCP_SHA_TYPE_384,
+ 	CCP_SHA_TYPE_512,
++	/* private: */
+ 	CCP_SHA_TYPE__LAST,
+ };
+ 
+@@ -384,7 +398,7 @@ struct ccp_rsa_engine {
+ 
+ /***** Passthru engine *****/
+ /**
+- * ccp_passthru_bitwise - type of bitwise passthru operation
++ * enum ccp_passthru_bitwise - type of bitwise passthru operation
+  *
+  * @CCP_PASSTHRU_BITWISE_NOOP: no bitwise operation performed
+  * @CCP_PASSTHRU_BITWISE_AND: perform bitwise AND of src with mask
+@@ -398,11 +412,12 @@ enum ccp_passthru_bitwise {
+ 	CCP_PASSTHRU_BITWISE_OR,
+ 	CCP_PASSTHRU_BITWISE_XOR,
+ 	CCP_PASSTHRU_BITWISE_MASK,
++	/* private: */
+ 	CCP_PASSTHRU_BITWISE__LAST,
+ };
+ 
+ /**
+- * ccp_passthru_byteswap - type of byteswap passthru operation
++ * enum ccp_passthru_byteswap - type of byteswap passthru operation
+  *
+  * @CCP_PASSTHRU_BYTESWAP_NOOP: no byte swapping performed
+  * @CCP_PASSTHRU_BYTESWAP_32BIT: swap bytes within 32-bit words
+@@ -412,6 +427,7 @@ enum ccp_passthru_byteswap {
+ 	CCP_PASSTHRU_BYTESWAP_NOOP = 0,
+ 	CCP_PASSTHRU_BYTESWAP_32BIT,
+ 	CCP_PASSTHRU_BYTESWAP_256BIT,
++	/* private: */
+ 	CCP_PASSTHRU_BYTESWAP__LAST,
+ };
+ 
+@@ -450,8 +466,8 @@ struct ccp_passthru_engine {
+  * @byte_swap: byteswap operation to perform
+  * @mask: mask to be applied to data
+  * @mask_len: length in bytes of mask
+- * @src: data to be used for this operation
+- * @dst: data produced by this operation
++ * @src_dma: data to be used for this operation
++ * @dst_dma: data produced by this operation
+  * @src_len: length in bytes of data used for this operation
+  * @final: indicate final pass-through operation
+  *
+@@ -478,7 +494,7 @@ struct ccp_passthru_nomap_engine {
+ #define CCP_ECC_MAX_OUTPUTS	3
+ 
+ /**
+- * ccp_ecc_function - type of ECC function
++ * enum ccp_ecc_function - type of ECC function
+  *
+  * @CCP_ECC_FUNCTION_MMUL_384BIT: 384-bit modular multiplication
+  * @CCP_ECC_FUNCTION_MADD_384BIT: 384-bit modular addition
+@@ -564,8 +580,9 @@ struct ccp_ecc_point_math {
+  * @function: ECC function to perform
+  * @mod: ECC modulus
+  * @mod_len: length in bytes of modulus
+- * @mm: module math parameters
+- * @pm: point math parameters
++ * @u: union for math parameters
++ * @u.mm: module math parameters
++ * @u.pm: point math parameters
+  * @ecc_result: result of the ECC operation
+  *
+  * Variables required to be set when calling ccp_enqueue_cmd():
+@@ -589,11 +606,11 @@ struct ccp_ecc_engine {
+ 
+ 
+ /**
+- * ccp_engine - CCP operation identifiers
++ * enum ccp_engine - CCP operation identifiers
+  *
+  * @CCP_ENGINE_AES: AES operation
+- * @CCP_ENGINE_XTS_AES: 128-bit XTS AES operation
+- * @CCP_ENGINE_RSVD1: unused
++ * @CCP_ENGINE_XTS_AES_128: 128-bit XTS AES operation
++ * @CCP_ENGINE_DES3: 3DES operation
+  * @CCP_ENGINE_SHA: SHA operation
+  * @CCP_ENGINE_RSA: RSA operation
+  * @CCP_ENGINE_PASSTHRU: pass-through operation
+@@ -609,6 +626,7 @@ enum ccp_engine {
+ 	CCP_ENGINE_PASSTHRU,
+ 	CCP_ENGINE_ZLIB_DECOMPRESS,
+ 	CCP_ENGINE_ECC,
++	/* private: */
+ 	CCP_ENGINE__LAST,
+ };
+ 
