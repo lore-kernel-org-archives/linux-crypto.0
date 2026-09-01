@@ -1,301 +1,190 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C40FC41D135;
-	Tue,  1 Sep 2026 14:58:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DD5A481A94;
+	Tue,  1 Sep 2026 16:53:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788274697; cv=none; b=qbzcY7aE8g9IyTRD6XSEe6oN93K42+CPm6EZ441n2pHrvej5LaH60Ys0DwjwIaqo4SOohAPucIsEKDhpLlwTXMn65tG2SHeQ9ATWtlHZ5TvHlfnrQ2D1M0sI2F3b4hx/P09ouTqRLyHC+BUtdak9GSEV5G7WKgE5jU/KTwwbRz4=
+	t=1788281639; cv=none; b=VWUQ6njBZT8ZAvP32VTlF3heZZ8gO9Mlx2/Vo4iH06CRQxi8XYmZqVHivqDULfGKjTYNmtezYuZPPA2hwe250pOfgh8M7oY5VpBt9kN9OvTLBmih18Zm1MUQ7wfsdlC0aMARuGtKgbx99fwZQcv0wTHl7ST1TWkRTlO/sb/HI8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788274697; c=relaxed/simple;
-	bh=0NZj8dzHMvDPafeShpBt1PLgjhP7gFYn0JXz851agAI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qVcxduYfeuBd6iy5Ay/NtrE9LR8b6SOdIdGqwhnX0YcMZVcAmjXUjbBReRfWaRvB0c08cJcJf0G6d1JSNlJXlPdn3S/x1rg4aIyj1d0WlUJ3X+a25TcD88+uTRvGCfLyIKtjqkvsoYWNoSVd7eaLh7M2WAVZLYbFLJrWi+xx9bo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fHmVoYtD; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788281639; c=relaxed/simple;
+	bh=GC0N5vr6MZj4SjETvMthe13Ho23hLrm9X8Dz3cwucio=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nl3YT2O4paFiNH/o/hJXP6IxTvXEepyunacTjxLMJy0R+F9EHp/j7vbR4Jr2RPAbfsIFkgNHm1PmH276vxPPpYQ+1F9A0iTX72mpiNS5PVlXpkyDh4YBfa1Nei07FpyXXv2ThdbMqLUMrjDYqcTgB8BjFtFus6+tKUz4fkJk1L0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R5GNQNEB; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fHmVoYtD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CF741F00ADE;
-	Tue,  1 Sep 2026 14:58:15 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R5GNQNEB"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51A8B1F000E9;
+	Tue,  1 Sep 2026 16:53:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788274695;
-	bh=UTvJDIw3wcg7xi4i0kyVSun0Dn6RIuyJL6Ze7BRUb5M=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=fHmVoYtD48si7U4QBauUocNTZRD1pcYnoGOdDynX3BhCHV/UgsIB+z2JK1nYO11t8
-	 JVRGqHItgAbcTdxPsb66Wk+Ro3HzpCxFUkarQlX9yShbQVZAejZNohwd3QUzip7HTx
-	 kOlFQBv5nTbH304V+gsJvn+5WY3k++rpVpkiiOnLMYI3i/byofcDRs/VEYNnsetO46
-	 AXWLkz3z1eMUD06SvLIF7oLZFGEIqd2oC54Tu7qs/JVJ81jzKMbS+H5YtJFCZe4Z03
-	 OJi+j8iP4uy6xNa0eMsl4tyPxiNMtFDlv0RJU5uAGwo0iMO7kt5OmA+k/MUp8WvYfO
-	 ioQkgoguf72Lg==
+	s=k20260515; t=1788281637;
+	bh=3o2BkarRCOxJdhLlpKyzUTsHTVM+DwUWlayVRBHvgzI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=R5GNQNEBOH9dw+c2rWRaw/7DcSumudYvkYYoj49kZnu5BEdTmkeIeYuMsVKWFAZf0
+	 OkxquJXuwrlL1UNafkdnMRnUso5AIST/jeCE0rjWzvUMfN5IO5wmEq6uGoTVVw7Mlr
+	 mN1grRxPEoVaK+EdxNRTX5HBUAsXe+H3mtQPOfJuAPvBrlsYT/3DbRDS/B86W+XTbt
+	 DVbBOuoEBvlC46y3QPZgul3agjkpqceDjIfG876KsLmQneF0ave/Fnb2eTwAHWh683
+	 4+qGQz4sSKV8SlJMD99mQhLD03ASomsz6bcT2B0JAr8eU23ys6Q6qOtnQydzwxo5dI
+	 P/VP5ErcpXTlw==
+Date: Tue, 1 Sep 2026 16:53:55 +0000
 From: Eric Biggers <ebiggers@kernel.org>
-To: x86@kernel.org
-Cc: linux-um@lists.infradead.org,
-	linux-raid@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Christoph Hellwig <hch@lst.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	David Laight <david.laight.linux@gmail.com>
-Subject: [PATCH v5 8/8] xor: Add AVX-512 optimized xor_gen()
-Date: Tue,  1 Sep 2026 07:57:40 -0700
-Message-ID: <20260901145740.42337-9-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.55.0
-In-Reply-To: <20260901145740.42337-1-ebiggers@kernel.org>
-References: <20260901145740.42337-1-ebiggers@kernel.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>, x86@kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 00/11] libcrypto: Provide more __cleanup functions for
+ zeroizing data
+Message-ID: <20260901165355.GA2775257@google.com>
+References: <20260813134953.979481-1-thuth@redhat.com>
+ <20260901001245.GA220448@quark>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260901001245.GA220448@quark>
 
-Add an implementation of xor_gen() using AVX-512.
+On Mon, Aug 31, 2026 at 05:12:45PM -0700, Eric Biggers wrote:
+> Hi Thomas,
+> 
+> On Thu, Aug 13, 2026 at 03:49:38PM +0200, Thomas Huth wrote:
+> > Code that uses crypto-related structures (containing keys or context data)
+> > should zeroize their local structures on the stack after use to avoid
+> > leaking this sensitive material via the stack when the function returns.
+> > Using the __cleanup() marker is a very elegant way to assert that the
+> > data is zeroized without having to painfully verify that each early return
+> > in a function might miss it.
+> > 
+> > Thus this series introduces zeroization functions for many crypto-related
+> > structures that can be used with __cleanup(). The series focuses on the
+> > introduction of the functions - most call sights will be adjusted to use
+> > these new functions in separate patch series later (since each subsystem
+> > needs separate review from the corresponding maintainer). However, I
+> > already included the two "safexcel" patches, since they already got ack'ed
+> > by the maintainer Antoine, so I think they should be fine to go via the
+> > libcrypto tree.
+> > 
+> > Note there is one minor ugliness in patch 10: Since sha2.h is also used
+> > in the x86 purgatory code, and that code ships with its own implementation
+> > of string functions, we have to compile the purgatory.c file with
+> > -D__NO_FORTIFY now to be able to include <linux/string.h> in sha2.h.
+> > I hope that solution is OK (especially since the sha256.c file in the
+> > same folder gets that treatment already, too), if not - I'm certainly
+> > open for other suggestions here!
+> > 
+> > Thomas Huth (11):
+> >   lib/crypto: aes: Provide a wrapper function for zeroizing
+> >     crypto_aes_ctx
+> >   crypto: safexcel - Simplify the check for a valid AES key
+> >   crypto: safexcel - zeroize crypto_aes_ctx with
+> >     __cleanup(aes_zeroize_ctx)
+> >   lib/crypto: aes: Provide functions for zeroizing aes_key and
+> >     aes_enckey
+> >   lib/crypto: aes: Use aes_zeroize_*key() instead of memzero_explicit()
+> >   lib/crypto: md5: Provide a function for zeroizing hmac_md5_ctx
+> >     structures
+> >   lib/crypto: md5: Use hmac_md5_zeroize_ctx() instead of
+> >     memzero_explicit()
+> >   lib/crypto: sha1: Provide a wrapper for zeroizing hmac_sha1_ctx
+> >   lib/crypto: sha1: Use hmac_sha1_zeroize_ctx() instead of
+> >     memzero_explicit()
+> >   x86/purgatory: Compile purgatory.c with -D__NO_FORTIFY
+> >   lib/crypto: sha2: Provide wrappers for zeroizing SHA2 hmac_sha*_ctx
+> >     structures
+> 
+> I'm taking a look at these again for 7.3.  This is still missing quite a
+> few of the crypto library structs.  I would prefer to handle them all in
+> a consistent way.
+> 
+> Also, given that we'll end up with a lot of these, we should be
+> thoughtful about the kerneldoc.  Using aes_enckey as an example:
+> 
+> /**
+>  * aes_zeroize_enckey() - Zeroize an aes_enckey structure
+>  * @key: The location of the key structure that should be zeroized
+>  *
+>  * Explicitly fills the aes_enckey with zeroes. For example, use it with
+>  * __cleanup() for local aes_enckey structures on the stack, so that their
+>  * content is not leaked when the context is left.
+>  */
+> 
+> It's not clear what is meant by "context".  And it doesn't explicitly
+> connect the zeroization requirement to the lifetime of the struct, so I
+> don't think it makes it clear when this should be called.  It also says
+> nothing about kfree_sensitive() which many users should use instead.
+> 
+> Meanwhile, aes_prepareenckey() already has the following, which at least
+> connects the zeroization requirement to the lifetime of the key:
+> 
+>    * The caller is responsible for zeroizing both the struct aes_enckey and the    
+>    * raw key once they are no longer needed.
+> 
+> How about we remove that and the free-form description of
+> aes_zeroize_enckey(), and instead expand the comment on the struct
+> itself:
+> 
+> /**
+>  * struct aes_enckey - An AES key prepared for encryption
+>  * ...
+>  * Once prepared, users must zeroize this struct at the end of its lifetime.     
+>  * For stack-allocated structs, use __cleanup(aes_zeroize_enckey) to zeroize     
+>  * when the variable goes out of scope.  For slab-allocated structs, use         
+>  * kfree_sensitive() or else call aes_zeroize_enckey() before freeing.       
+>  */
+> 
+> That would connect the zeroization requirement to the actual struct and
+> its lifetime, and make it clear how to handle each case.  It would also
+> make it clear that stack allocation is supported for this struct, which
+> might not have been obvious before.
+> 
+> aes_zeroize_enckey() would then omit a free-form description, which
+> makes sense as it's a trivial wrapper around memzero_explicit():
+> 
+> /**
+>  * aes_zeroize_enckey() - Zeroize an aes_enckey structure
+>  * @key: The aes_enckey to zeroize
+>  */
+> static inline void aes_zeroize_enckey(struct aes_enckey *key)
+> {
+> 	memzero_explicit(key, sizeof(*key));
+> }
+> 
+> Similarly for all the other structs, of course.
+> 
+> (For the hash contexts, the struct comment should mention that the
+> finalization function zeroizes as well.)
+> 
+> Does that sound good?
 
-It uses 512-bit vectors, i.e. ZMM registers.  It also uses the
-vpternlogq instruction to do three-input XORs when applicable.
+There's also the subtlety that __cleanup shouldn't be used in functions
+that are already using goto-based cleanup.
 
-It's enabled on x86_64 CPUs that have AVX512F && !PREFER_YMM.  In
-practice that means:
+And any kernel code preparing a key also has the raw key too and has to
+zeroize that too, otherwise doing so for the prepared key is pointless.
 
-    - AMD Zen 4 and later (client and server)
-    - Intel Sapphire Rapids and later (server)
-    - Intel Rocket Lake (client)
-    - Intel Nova Lake and later (client)
+... unless it's not actually a secret key, which sometimes it isn't.
+We've been getting a lot of zeroization patches that try to add
+zeroization for public keys, which is nonsense.  And also for pointers
+to keys, which people confuse with the keys themselves.
 
-The !PREFER_YMM condition excludes the older AVX-512 implementations in
-Intel Skylake Server and Intel Ice Lake.  They could run this code, but
-they're known to have overly-eager downclocking when ZMM registers are
-used.  This is the same policy that the crypto and CRC code uses.
+There are also Rust bindings being proposed, and they handle zeroization
+by calling memzero_explicit() directly.  So that's yet another case
+where these new functions are not applicable.
 
-Results from xor_benchmark on AMD Ryzen 9 9950X (Zen 5):
+I'm increasingly thinking that we shouldn't try to explain all the
+zeroization stuff in the kerneldoc, and instead add a documentation file
+in Documentation/crypto/ that properly explains the conventions for
+crypto key zeroization in the kernel and defer to that.
 
-Before:
+The struct-specific zeroization functions are still worthwhile, but I
+think they should be seen as trivial wrappers around memzero_explicit().
+So maybe just add all of them with minimal comments like I suggested
+above (maybe even just add them for all the algorithms in a single
+patch), and add a file Documentation/crypto/zeroization.rst separately.
 
-    # xor_benchmark:           	 4096 bytes	16384 bytes
-    # xor_benchmark:   4 disks:	  256  GB/s	  185  GB/s
-    # xor_benchmark:   5 disks:	  233  GB/s	  165  GB/s
-    # xor_benchmark:   6 disks:	  243  GB/s	  174  GB/s
-    # xor_benchmark:   7 disks:	  244  GB/s	  176  GB/s
-    # xor_benchmark:   8 disks:	  265  GB/s	  179  GB/s
-    # xor_benchmark:  10 disks:	  249  GB/s	  175  GB/s
-    # xor_benchmark:  12 disks:	  219  GB/s	  173  GB/s
-    # xor_benchmark:  15 disks:	  206  GB/s	  177  GB/s
-    # xor_benchmark:  16 disks:	  212  GB/s	  180  GB/s
-    # xor_benchmark:  32 disks:	  193  GB/s	  177  GB/s
-
-After:
-
-    # xor_benchmark:           	 4096 bytes	16384 bytes
-    # xor_benchmark:   4 disks:	  492  GB/s	  202  GB/s
-    # xor_benchmark:   5 disks:	  436  GB/s	  191  GB/s
-    # xor_benchmark:   6 disks:	  466  GB/s	  193  GB/s
-    # xor_benchmark:   7 disks:	  491  GB/s	  194  GB/s
-    # xor_benchmark:   8 disks:	  513  GB/s	  205  GB/s
-    # xor_benchmark:  10 disks:	  454  GB/s	  199  GB/s
-    # xor_benchmark:  12 disks:	  330  GB/s	  204  GB/s
-    # xor_benchmark:  15 disks:	  266  GB/s	  198  GB/s
-    # xor_benchmark:  16 disks:	  243  GB/s	  177  GB/s
-    # xor_benchmark:  32 disks:	  187  GB/s	  165  GB/s
-
-Reviewed-by: David Laight <david.laight.linux@gmail.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Eric Biggers <ebiggers@kernel.org>
----
- lib/raid/xor/Makefile         |   2 +-
- lib/raid/xor/x86/xor-avx512.c | 122 ++++++++++++++++++++++++++++++++++
- lib/raid/xor/x86/xor_arch.h   |  30 ++++++---
- 3 files changed, 143 insertions(+), 11 deletions(-)
- create mode 100644 lib/raid/xor/x86/xor-avx512.c
-
-diff --git a/lib/raid/xor/Makefile b/lib/raid/xor/Makefile
-index 9b0fad459cdb..e1e3455c219d 100644
---- a/lib/raid/xor/Makefile
-+++ b/lib/raid/xor/Makefile
-@@ -31,7 +31,7 @@ xor-$(CONFIG_SPARC32)		+= sparc/xor-sparc32.o
- xor-$(CONFIG_SPARC64)		+= sparc/xor-sparc64.o sparc/xor-sparc64-glue.o
- xor-$(CONFIG_S390)		+= s390/xor.o
- xor-$(CONFIG_X86_32)		+= x86/xor-avx.o x86/xor-sse.o x86/xor-mmx.o
--xor-$(CONFIG_X86_64)		+= x86/xor-avx.o x86/xor-sse.o
-+xor-$(CONFIG_X86_64)		+= x86/xor-avx.o x86/xor-sse.o x86/xor-avx512.o
- obj-y				+= tests/
- 
- CFLAGS_xor-neon.o		+= $(CC_FLAGS_FPU) -I$(src)/$(SRCARCH)
-diff --git a/lib/raid/xor/x86/xor-avx512.c b/lib/raid/xor/x86/xor-avx512.c
-new file mode 100644
-index 000000000000..c11d83441875
---- /dev/null
-+++ b/lib/raid/xor/x86/xor-avx512.c
-@@ -0,0 +1,122 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * AVX-512 optimized implementation of xor_gen()
-+ *
-+ * Copyright 2026 Google LLC
-+ */
-+
-+#include <linux/types.h>
-+#include <asm/fpu/api.h>
-+#include "xor_impl.h"
-+#include "xor_arch.h"
-+
-+/*
-+ * Implementation notes:
-+ *
-+ * Unrolling by the number of buffers (2-5) is very important.
-+ *
-+ * Unrolling by length is less important, especially when using register-indexed
-+ * addressing with negative indices from the end of the buffers.  That approach
-+ * results in just two loop control instructions being needed per iteration,
-+ * regardless of the number of buffers.
-+ *
-+ * In fact, benchmarks showed that the 2 and 3 buffer cases require only 2x
-+ * unrolling by length, while the 4 and 5 buffer cases don't require any
-+ * unrolling by length.  Benchmarks also showed that the register-indexed
-+ * addressing isn't a bottleneck either; i.e., we can't do any better by
-+ * incrementing the pointers as we go along, even with more unrolling.
-+ */
-+
-+static void xor_avx512_2(long bytes, u8 *p1, const u8 *p2)
-+{
-+	long i = -bytes;
-+
-+	asm volatile("1: vmovdqa64 (%1,%0), %%zmm0\n"
-+		     "vmovdqa64 64(%1,%0), %%zmm1\n"
-+		     "vpxorq (%2,%0), %%zmm0, %%zmm0\n"
-+		     "vpxorq 64(%2,%0), %%zmm1, %%zmm1\n"
-+		     "vmovdqa64 %%zmm0, (%1,%0)\n"
-+		     "vmovdqa64 %%zmm1, 64(%1,%0)\n"
-+		     "add $128, %0\n"
-+		     "jnz 1b\n"
-+		     : "+&r"(i)
-+		     : "r"(p1 + bytes), "r"(p2 + bytes)
-+		     : "memory", "cc");
-+}
-+
-+static void xor_avx512_3(long bytes, u8 *p1, const u8 *p2, const u8 *p3)
-+{
-+	long i = -bytes;
-+
-+	asm volatile("1: vmovdqa64 (%1,%0), %%zmm0\n"
-+		     "vmovdqa64 64(%1,%0), %%zmm1\n"
-+		     "vmovdqa64 (%2,%0), %%zmm2\n"
-+		     "vmovdqa64 64(%2,%0), %%zmm3\n"
-+		     "vpternlogq $0x96, (%3,%0), %%zmm2, %%zmm0\n"
-+		     "vpternlogq $0x96, 64(%3,%0), %%zmm3, %%zmm1\n"
-+		     "vmovdqa64 %%zmm0, (%1,%0)\n"
-+		     "vmovdqa64 %%zmm1, 64(%1,%0)\n"
-+		     "add $128, %0\n"
-+		     "jnz 1b\n"
-+		     : "+&r"(i)
-+		     : "r"(p1 + bytes), "r"(p2 + bytes), "r"(p3 + bytes)
-+		     : "memory", "cc");
-+}
-+
-+static void xor_avx512_4(long bytes, u8 *p1, const u8 *p2, const u8 *p3,
-+			 const u8 *p4)
-+{
-+	long i = -bytes;
-+
-+	asm volatile("1: vmovdqa64 (%1,%0), %%zmm0\n"
-+		     "vmovdqa64 (%2,%0), %%zmm1\n"
-+		     "vpxorq (%3,%0), %%zmm0, %%zmm0\n"
-+		     "vpternlogq $0x96, (%4,%0), %%zmm1, %%zmm0\n"
-+		     "vmovdqa64 %%zmm0, (%1,%0)\n"
-+		     "add $64, %0\n"
-+		     "jnz 1b\n"
-+		     : "+&r"(i)
-+		     : "r"(p1 + bytes), "r"(p2 + bytes), "r"(p3 + bytes),
-+		       "r"(p4 + bytes)
-+		     : "memory", "cc");
-+}
-+
-+static void xor_avx512_5(long bytes, u8 *p1, const u8 *p2, const u8 *p3,
-+			 const u8 *p4, const u8 *p5)
-+{
-+	long i = -bytes;
-+
-+	asm volatile("1: vmovdqa64 (%1,%0), %%zmm0\n"
-+		     "vmovdqa64 (%2,%0), %%zmm1\n"
-+		     "vpternlogq $0x96, (%3,%0), %%zmm1, %%zmm0\n"
-+		     "vmovdqa64 (%4,%0), %%zmm1\n"
-+		     "vpternlogq $0x96, (%5,%0), %%zmm1, %%zmm0\n"
-+		     "vmovdqa64 %%zmm0, (%1,%0)\n"
-+		     "add $64, %0\n"
-+		     "jnz 1b\n"
-+		     : "+&r"(i)
-+		     : "r"(p1 + bytes), "r"(p2 + bytes), "r"(p3 + bytes),
-+		       "r"(p4 + bytes), "r"(p5 + bytes)
-+		     : "memory", "cc");
-+}
-+
-+DO_XOR_BLOCKS(avx512_inner, xor_avx512_2, xor_avx512_3, xor_avx512_4,
-+	      xor_avx512_5);
-+
-+/*
-+ * Preconditions: bytes is a nonzero multiple of 512, and all buffers are
-+ * 64-byte aligned.
-+ */
-+static void xor_gen_avx512(void *dest, void **srcs, unsigned int src_cnt,
-+			   unsigned int bytes)
-+{
-+	kernel_fpu_begin();
-+	xor_gen_avx512_inner(dest, srcs, src_cnt, bytes);
-+	asm volatile("vzeroupper");
-+	kernel_fpu_end();
-+}
-+
-+struct xor_block_template xor_block_avx512 = {
-+	.name = "avx512",
-+	.xor_gen = xor_gen_avx512,
-+};
-diff --git a/lib/raid/xor/x86/xor_arch.h b/lib/raid/xor/x86/xor_arch.h
-index 991abe3f4bbd..ed5921d2e2aa 100644
---- a/lib/raid/xor/x86/xor_arch.h
-+++ b/lib/raid/xor/x86/xor_arch.h
-@@ -6,21 +6,31 @@ extern struct xor_block_template xor_block_p5_mmx;
- extern struct xor_block_template xor_block_sse;
- extern struct xor_block_template xor_block_sse_pf64;
- extern struct xor_block_template xor_block_avx;
-+extern struct xor_block_template xor_block_avx512;
- 
--/*
-- * When SSE is available, use it as it can write around L2.  We may also be able
-- * to load into the L1 only depending on how the cpu deals with a load to a line
-- * that is being prefetched.
-- *
-- * When AVX2 is available, force using it as it is better by all measures.
-- *
-- * 32-bit without MMX can fall back to the generic routines.
-- */
- static __always_inline void __init arch_xor_init(void)
- {
--	if (boot_cpu_has(X86_FEATURE_AVX)) {
-+	if (IS_ENABLED(CONFIG_X86_64) && boot_cpu_has(X86_FEATURE_AVX512F) &&
-+	    !boot_cpu_has(X86_FEATURE_PREFER_YMM)) {
-+		/*
-+		 * Use the AVX-512 code on CPUs that support AVX-512 without
-+		 * overly-eager downclocking.  On such CPUs the AVX-512 code
-+		 * should always work at least as well as the AVX code, so
-+		 * runtime selection is unnecessary.
-+		 *
-+		 * The AVX-512 code can work on X86_32.  However, due to lack of
-+		 * use case for that, for now it's built only for X86_64.
-+		 */
-+		xor_force(&xor_block_avx512);
-+	} else if (boot_cpu_has(X86_FEATURE_AVX)) {
-+		/* AVX will be the best; no need to try others. */
- 		xor_force(&xor_block_avx);
- 	} else if (IS_ENABLED(CONFIG_X86_64) || boot_cpu_has(X86_FEATURE_XMM)) {
-+		/*
-+		 * When SSE is available, use it as it can write around L2.  We
-+		 * may also be able to load into the L1 only depending on how
-+		 * the cpu deals with a load to a line that is being prefetched.
-+		 */
- 		xor_register(&xor_block_sse);
- 		xor_register(&xor_block_sse_pf64);
- 	} else if (boot_cpu_has(X86_FEATURE_MMX)) {
--- 
-2.55.0
-
+- Eric
