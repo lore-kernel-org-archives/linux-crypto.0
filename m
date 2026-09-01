@@ -1,145 +1,140 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B761D446067
-	for <linux-crypto@vger.kernel.org>; Tue,  1 Sep 2026 19:48:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360A84A386A
+	for <linux-crypto@vger.kernel.org>; Tue,  1 Sep 2026 20:37:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788292113; cv=none; b=LRtMv7E/VT+W3+VcPqtXL1ZYoNy0APTEwZeb8j3wjXGXxV14QpLcCEicJVx7W81X4vBqG00m6mSzU96nAmMuTUReVMhhmeBzBd9/F+skY44RvV+3RlFqQZRjT4Y881hPvtU3DXLcc4cQ8IrL7/vAAa12AG6wWQl75OQgKSEsQPQ=
+	t=1788295062; cv=none; b=tiL9sLm7ecg10Pl+byd99kDUn9EJgm86T8a/bEMsSAgbNVxRdZ6VZslxbyPZ4nU/FazmWXpHMYuQ2BGQOvriHqCZo0cYbOTOvlyhf+uMdGfHUZutzpM7ZzXsseE+riBy+t0QUoOcduLDih6LcXfcDVDqOreU+KY9qDXOL01B1u8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788292113; c=relaxed/simple;
-	bh=1XA3Iq64Qh5S96yUdeRyZkUWOMJWh2wuTH7qZS7tpF0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a6SNd7CccxODN4whYHHE2r4UNF6KyA/trenupJJrIiUcrNPjOfK2WVmcNhgtxEU2QPInCtd6HVb3lzgX/7yr4gjcrUkDuo7GuMFGy8f2rxNUWpvgjai4Gy+6V5uZ8yxdfZ5l7zpF9OG1Y8jvntR/JxbHDlDSMxgRGo/V5osZOP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z5lr8aYX; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1788295062; c=relaxed/simple;
+	bh=7kWtNHnkgon39160jWf0bk9sq15XmJRpmJ8WMiYmKjE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=adfcn6aEo9BM6zFX4IQGe0yp2OchxQ+uHHBkVFbyGMnyjV9uUgs24pjcEYi6fi2IlRU3LXsAuKfZwhnCs5XZK9sJzPtUDgDCSmiwr6ijTTrNAQLDQxnYdX0GOFqEEKzMmy0yzbcNSY9RxX4+tI3rr26tahVWwdeD69xiBB9cTnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=keTKunij; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z5lr8aYX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1788292109;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PdHg9I4oGgxBB+BPGUebv8panrT4iRjdZZ8owiahDtA=;
-	b=Z5lr8aYXhAIQG5omqHEOaP1XJGAZZ2qMv26YQeJ3cJpmF/308STCCXofpKedNaIvhM0cbU
-	UqdxxRZFw/E82/QtUiA0PQ186MEVbUVqDGp9rzlmCcm9rpzCQlNZNoYBfl7vD4Ct/pcS33
-	1dNinnznIONgXMjXrCYk2nOVxbenenI=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-561-Ydnij9yYPvO9lR82MlwnUQ-1; Tue,
- 01 Sept 2026 15:48:24 -0400
-X-MC-Unique: Ydnij9yYPvO9lR82MlwnUQ-1
-X-Mimecast-MFC-AGG-ID: Ydnij9yYPvO9lR82MlwnUQ_1788292100
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CE97719539AC;
-	Tue,  1 Sep 2026 19:48:19 +0000 (UTC)
-Received: from localhost (headnet04.pony-001.prod.iad2.dc.redhat.com [10.2.32.116])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 544051955F70;
-	Tue,  1 Sep 2026 19:48:18 +0000 (UTC)
-Date: Tue, 1 Sep 2026 15:48:17 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Linlin Zhang <linlin.zhang@oss.qualcomm.com>
-Cc: ebiggers@kernel.org, axboe@kernel.dk, mst@redhat.com,
-	jasowangio@gmail.com, James.Bottomley@hansenpartnership.com,
-	martin.petersen@oracle.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, linux-block@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-scsi@vger.kernel.org,
-	virtualization@lists.linux.dev, devicetree@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, neeraj.soni@oss.qualcomm.com,
-	gaurav.kashyap@oss.qualcomm.com, mani@kernel.org,
-	andersson@kernel.org, konradybcio@kernel.org, bvanassche@acm.org,
-	alim.akhtar@samsung.com, avri.altman@sandisk.com,
-	pbonzini@redhat.com, eperezma@redhat.com,
-	xuanzhuo@linux.alibaba.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 01/11] virtio_blk: add inline encryption support
-Message-ID: <20260901194817.GE729142@fedora>
-References: <20260827160806.1295313-1-linlin.zhang@oss.qualcomm.com>
- <20260827160806.1295313-2-linlin.zhang@oss.qualcomm.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="keTKunij"
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-398d2b28acfso243795a91.1
+        for <linux-crypto@vger.kernel.org>; Tue, 01 Sep 2026 13:37:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788295059; x=1788899859; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=trO+aYhWZ0cKdRoRTUvzCd7Am7CExDkHP+dQWJTMJHc=;
+        b=keTKunij1gq8rW6ly4tNjmer4Lpi6FLtJdZcPkfaGDxG4ycwFKU2IKrNSqVpLEJ97c
+         SbL9YhOW388SLnvrxfPDmthP+dwvjHJKbA+ms5Hrrv9Zy/upzwCzT8ERi3c9BBVkUUTh
+         YC6BLpBVf3apNn6pq2EWMGYa5wYqVsXJHhF1nWypqz/KYhMX92dQEXiptM3B5GHoBYaN
+         0/ttTlu+24HK7aIHcRiYZrmdT2XfOJ7by7CakPrJ+XrUBx2/MayRsk0b1ihnRpBZsfb1
+         qHhXaLB8LRYN5Xq+SQwIV3zoZnS47k2vnhJuxI/TUP4hJ8zEwSm873WT9iDS6ajktaDs
+         sSiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788295059; x=1788899859;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=trO+aYhWZ0cKdRoRTUvzCd7Am7CExDkHP+dQWJTMJHc=;
+        b=WnJimainfovq3pM3mtx/LipL8Ihlj5pgaLXkRBTnO+aEzT/UmUG4C2za0IZs5A60p4
+         oZ5eIXk6SWr8D3dUB1NVapJv762B9c3Qz5QGm0sYUK+qpkh6nqX9P7+yAceTwI3XXwgy
+         T9KFJv435PlyzszwGU8hmAUKNO0XKXB9uPhQ+orWjKZJeQd5qw6JJ4ZTqmDCa7A65HLX
+         u2IcgyGoks81J5Ih6qvX5bjkquijXF3bIEbnEbM2901H6KgLSLaKf5/eKcg5Q+sjHCDz
+         IRPqVPPULTUkUZZ6YHfa+eNikJg0GQmUwM5AJW58NHdvqS0rQcJg9TR/1jcbKOjCadL/
+         qcSg==
+X-Gm-Message-State: AFuF++nJo+xBmcoWCD5Ca3PM/o9Z4ywlAR4MxV1/35s1I02g8q9Qxi3A
+	PKM+8qh9w7bWso8LuR+jIBnDj3Z+QMddWGklrdisvp7LznWtdjggeSsuyZ+aig==
+X-Gm-Gg: AYBFou2LRrFwKhwZqjS2MUAxQSwJG1BuBfQH1pZMjFLM/G4uyu2RcvqrsmCm2qXMEvl
+	fBekDLNXgABmG7eppDCVJgXy5eujYOZhlVl92nWCscjAY0weKBg7wlwKgpQ/w+fUx1NySzoWV0y
+	f8v7HreUy80qzEK3Uhe/pCezPta2w+iGG9DQdNpW+IRmqe4QWwUfFhBvH2LdHPEx6WIondL4InC
+	csrXr2M4Csxcv7thBXlfTuXZdWxuTXW713dJSv93CDs1l7mSJQPHzKP3g3j99r9uK4GhqstTGVX
+	jHRdltU95dsAKhiQnKF5ypQIABH4NV8APtU+3jz3NbD5oFllircUIjTogrZSOwIeJaf4QCB53sH
+	IOnVvlgKdpuoYKXGic3gyxg5q+BCkrbTAXGUj2NkFLB9fqTa3lO0jiEAlze/KW2lG0RtSCddk2M
+	C6ehcqvyzSdhmq/m3X4Vbes3aL539i2Nz4GJo2uJIi166hCg3oTvx/YLCoh0gDJz7vKsmoibRqZ
+	XcQdark4oXn3jbBPN4ikqXdT1ui6QWvsr2rn4k7SUoE2siObwpS6q+QY4hTRa1Qa8L/TKOemrza
+	VhdRg7JWo2A/LStp5/Y/FL4feWfmLN/YZ7uJHw==
+X-Received: by 2002:a17:90b:380c:b0:37d:f206:a2ac with SMTP id 98e67ed59e1d1-39907b170f8mr15313233a91.7.1788295058594;
+        Tue, 01 Sep 2026 13:37:38 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8000:7a86::e35])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3990d75fc49sm7430467a91.12.2026.09.01.13.37.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Sep 2026 13:37:38 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: linux-crypto@vger.kernel.org
+Cc: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+	Pankaj Gupta <pankaj.gupta@nxp.com>,
+	Gaurav Jain <gaurav.jain@nxp.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Rosen Penev <rosenp@gmail.com>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH] crypto: caam: map job ring registers without claiming region
+Date: Tue,  1 Sep 2026 13:37:36 -0700
+Message-ID: <20260901203736.13248-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="9aX0ODMiNe3QBG+4"
-Content-Disposition: inline
-In-Reply-To: <20260827160806.1295313-2-linlin.zhang@oss.qualcomm.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Transfer-Encoding: 8bit
 
---9aX0ODMiNe3QBG+4
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+devm_platform_ioremap_resource() ends up calling request_mem_region(),
+which fails with -EBUSY on i.MX SoCs:
 
-On Thu, Aug 27, 2026 at 09:07:10AM -0700, Linlin Zhang wrote:
-> From: linlzhan <linlzhan@qti.qualcomm.com>
->=20
-> Negotiate VIRTIO_BLK_F_INLINE_ENCRYPTION with the host and wire it into
-> the block layer's inline-crypto framework to enable inline encryption
-> on virtio block device.
->=20
-> When the feature is present, the driver reads crypto characteristics from
-> virtio config space (key-slot count, DUN size, supported key types) and
-> issues VIRTIO_BLK_T_GET_CRYPTO_MODES to discover supported cipher and
-> data-unit-size combinations.  Encrypted requests use new request types
-> VIRTIO_BLK_T_CRYPTO_IN/OUT, which append a virtio_blk_crypto_msg
-> (keyslot index, DUN, data-unit-size-bits) to the standard outhdr.
->=20
-> A new virtio block crypto extension driver (virtio_blk_crypto_ext),
-> owns the blk_crypto_profile singleton and the blk_crypto_ll_ops dispatch
-> table. Actual key operations are forwarded to a platform-specific
-> backend registered via virtblk_set_crypto_ops(); without one,
-> VIRTIO_BLK_F_INLINE_ENCRYPTION is still negotiated and the
-> profile is registered, but every keyslot operation returns -EOPNOTSUPP.
->=20
-> The shared profile is a singleton as per blk_crypto_profile is
-> corresponding to one ICE hardware: the first device to negotiate the
-> feature initializes it; subsequent devices reuse it only when their
-> negotiated capabilities (slot count, DUN size, key types) match exactly.
->=20
-> Signed-off-by: linlzhan <linlin.zhang@oss.qualcomm.com>
-> ---
->  drivers/block/Kconfig                 |  13 ++
->  drivers/block/Makefile                |   2 +
->  drivers/block/virtio_blk.c            | 199 ++++++++++++++++--
->  drivers/block/virtio_blk_crypto_ext.c | 283 ++++++++++++++++++++++++++
->  include/linux/virtio_blk_crypto_ext.h |  78 +++++++
->  include/uapi/linux/virtio_blk.h       |  62 ++++++
->  6 files changed, 623 insertions(+), 14 deletions(-)
->  create mode 100644 drivers/block/virtio_blk_crypto_ext.c
->  create mode 100644 include/linux/virtio_blk_crypto_ext.h
+There the job rings are modelled as sub-regions of their parent
+fsl,sec-v4.0 register window, and caam_probe() already reserves the
+whole window exclusively via devm_of_iomap() before the children are
+populated.  Every job ring therefore collides with its own parent and
+fails to probe, taking the hardware RNG offline (seen on i.MX6, i.MX7
+and i.MX8 boards such as colibri-imx7 and verdin-imx8mp).
 
-Thanks for sending this as we discuss the VIRTIO spec changes.
+Map the job ring registers with devm_ioremap() instead, which does not
+claim the (already owned) region.
 
-Although it's nice to have all the Linux patches together, there are two
-separate parts: 1. the virtio_blk.ko guest driver changes and 2. the
-hypervisor blk-crypto uapi. I suggest splitting this into two patch
-series to avoid confusion between these parts. It may also make review
-and merging easier if we stay focussed on just the guest or just the
-host parts.
+Fixes: 9a955c0a7d11 ("crypto: caam - simplify probe resource and IRQ handling")
+Assisted-by: opencode:big-pickle
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ drivers/crypto/caam/jr.c | 23 ++++++++++++++++++++---
+ 1 file changed, 20 insertions(+), 3 deletions(-)
 
-Stefan
-
---9aX0ODMiNe3QBG+4
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmqXLAEACgkQnKSrs4Gr
-c8gA+QgAqDS7OZpv76XEz3ux6y5Md9USN6fgNjmMguv95TrS/+5BA5hTQoo/oRLD
-Tyk3iCHL+q76w6ukHAbFg75WHzYnE/1ylnCcq8Mu0xrXMjWX7/jOe5/EgXv594De
-ZQI/hrpfc8FZ42giSJBp2SWIVxa9ZaKnUL+33Lf57l2HelEsBrK2C8uhm3HBa9gq
-VVwdgoHixN5DIclvKSmI/lCv3sW7AexMGRjBe6dskR08f84Xn0AisTB3OuzyRJMG
-vHjIzGapZrQVw2jubuAhztBcAedmEhuRJKrCt9HtBMheyWwAfxfkb7FTmVmsIbfd
-37a52DGnb2PYe0N70Q8MmaSi/n/kfw==
-=jTU8
------END PGP SIGNATURE-----
-
---9aX0ODMiNe3QBG+4--
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index f9e029945b51..2ed8229d4733 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -583,12 +583,29 @@ static int caam_jr_probe(struct platform_device *pdev)
+ 	struct caam_drv_private_jr *jrpriv;
+ 	static int total_jobrs;
+ 	void __iomem *ctrl;
++	struct resource *r;
+ 	int error;
+ 	int irq;
+ 
+-	ctrl = devm_platform_ioremap_resource(pdev, 0);
+-	if (IS_ERR(ctrl))
+-		return PTR_ERR(ctrl);
++	/*
++	 * The job rings live inside the register window of their parent
++	 * fsl,sec-v4.0 node, which caam_probe() already reserves (and maps)
++	 * via devm_of_iomap().  A requested region that overlaps that
++	 * reservation, e.g. from devm_platform_ioremap_resource(), would
++	 * therefore fail with -EBUSY, so map the registers without claiming
++	 * the region here.
++	 */
++	r = platform_get_resource(pdev, IORESOURCE_MEM, 0);
++	if (!r) {
++		dev_err(&pdev->dev, "platform_get_resource() failed\n");
++		return -EINVAL;
++	}
++
++	ctrl = devm_ioremap(&pdev->dev, r->start, resource_size(r));
++	if (!ctrl) {
++		dev_err(&pdev->dev, "devm_ioremap() failed\n");
++		return -ENOMEM;
++	}
+ 
+ 	irq = platform_get_irq(pdev, 0);
+ 	if (irq < 0)
+-- 
+2.55.0
 
