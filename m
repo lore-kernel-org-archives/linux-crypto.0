@@ -1,158 +1,99 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A83734A013A
-	for <linux-crypto@vger.kernel.org>; Tue,  1 Sep 2026 19:13:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0765649CF22;
+	Tue,  1 Sep 2026 19:21:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788290042; cv=none; b=QyaECpmmjJXgA48H0akDj/2YUUo5OIhQyklEy643KTv5uLMzVphbxJ77LiaZjH2o7uP5dCh8J0ZBBpHBinXnp4+DBX/kxOFG+TYMGnLxnzLzviZsLIDQzwbbBJjyCWVp46nXTLhRRjUQ0exAsNkLlnRCtMn+fLRB040hNiWd1Tg=
+	t=1788290480; cv=none; b=tH2JB+dskSsnPDxdvPIgd5e4mDq2gEB0cBCg/hNEnbmmgOB2S8ah8vP9okzDA/CaTFGHLfTEZcSS0it+qrqhIKsDrSqgAm6nhvcUMrIn4QF832wbbkD31+v3NXWuYjFB9ju3BXMYRebSO4eH+OFexylXOdgmn9+aDVltIINSXUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788290042; c=relaxed/simple;
-	bh=rlnEpoQqZM0q1JKCIvkU4Yzcc1HivHI0aGOTf4jB2Lo=;
+	s=arc-20240116; t=1788290480; c=relaxed/simple;
+	bh=rFCR4wvJPqtoOsLRqFRiTraJfKJOCvUH3Vowulw0ArM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AY7xQR5GO1u2V0GWQZ5E12s0oPCmhHUI5gQqKXVIbOat3ivYn3ihN7wzoWUN1EanmOKJhFUX2y5QOrVBD+262XbpFhCBsKd9Kv/AisNZrq7/q30N8WNBzpdHsAjj5ksSJi+ws8Pt4bTqxki50G1uNfrBAyBPwG0gnuuPZ/SnLLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZjaBugoD; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=pmdLCBQmO7TaUK4sSbym+yx0TJKFQQ10Of4zMvOXW50QpMXlDchrTGN7ufXFkbPizg8dI+3bqo1F1IR2SxWd9qz3OD+wOqN+adVW9okbhrtF3aiuau9wnhbxO9M3CdhPMixmsSI6uUXswQgAyCu4pG35Yw9Uxdwq5XZDLYaTzaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=JOO1+1L2; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZjaBugoD"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1788290035;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2Gc0ait3L/IgveRSbsQEV85pq6/ltievYnmCwsbLN8s=;
-	b=ZjaBugoDmGco2ZFcfSuUKYjeUsYi8/f6xbNOG42obS9fkiLZFBIlRiNn1OvNksnUlz+jP6
-	NwnPjiCaz2trIKRpNMS6rJhljZnWejRKUbVX7NNbtOJ5B+J8NFzhAPsAXefajNdx2cHzeV
-	hskwo0pRg1KKI2KMl9K0qiony+p683k=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-634-k8giU1h9OVCJTn1H8fntNg-1; Tue,
- 01 Sept 2026 15:13:49 -0400
-X-MC-Unique: k8giU1h9OVCJTn1H8fntNg-1
-X-Mimecast-MFC-AGG-ID: k8giU1h9OVCJTn1H8fntNg_1788290026
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="JOO1+1L2"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id D31DA40E01DD;
+	Tue,  1 Sep 2026 19:21:13 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 42J7P_o6H5Nz; Tue,  1 Sep 2026 19:21:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1788290463; bh=RnB4UBwIEU5ra0mwZ01BUCuLPy+58IVs4ew37pEMoXc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JOO1+1L273NyqfcFGwz2MT94SkwUY+b8uVgDoJa653eT5gtWzVONMMzv+jX3TL0QK
+	 DQnQ1yJgZDcxC2tOpBvs1nRWJ8ymnlElQZruVLAJQm4PazrZPgQepckG7RcltsVl8V
+	 BuZfc5wfOkZ49YdT8GpN69T5jtUrDID6WbiCmzORwtXRAZVd3DjlGCWkoYiZ8dYbYt
+	 llHUv/QtmuDgnr38XOSvF5OazHwO+dq0CEVUc24j5nvvkc2TlugkxKGwWuFe/+GppP
+	 Vq1A5SoJxK7qDyytsvsepZ4Q+MdSgqX2L/xm5sAvDbTjabHYNh0mbtnizA615wYU74
+	 mNnUPQE17VxdwaHDbzEE2ZRPOADmraP7VF/10NsKy5hEZN7FSnTwB78Pxjg4A7PEmg
+	 fk6LBPgj36NvAo3jOYO6HNQ7+sZ1Sph9tEzExKoBfZ0+8IqECTzz/VgMz3F9V28m4L
+	 o+uSE7S0TEU+K9mLOb79Qh7RXIccMC7tKxbewNLSrz0k6JjWM07GACH1vf1H4xBFGF
+	 ha1kCJjMcTGmfm/101WrWNpsG92FTbxQHADRecgAxHi6n5T2H04SM/0I3Nfl6sxBo2
+	 L3TDgOkyJTZS+UmOlYk6CU4GLAwqZdemIvs8It0MMpWW8i0Lf3XEdMfIpeZ3Q4IM8s
+	 g4XXoiThC2RTKS3y5TOVozmc=
+Received: from stx.tnic (unknown [IPv6:2600:1700:38ca:c00::e])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A6D0B195411F;
-	Tue,  1 Sep 2026 19:13:45 +0000 (UTC)
-Received: from localhost (headnet04.pony-001.prod.iad2.dc.redhat.com [10.2.32.116])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 000DC30001A2;
-	Tue,  1 Sep 2026 19:13:43 +0000 (UTC)
-Date: Tue, 1 Sep 2026 15:13:42 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Linlin Zhang <linlin.zhang@oss.qualcomm.com>
-Cc: ebiggers@kernel.org, axboe@kernel.dk, mst@redhat.com,
-	jasowangio@gmail.com, James.Bottomley@hansenpartnership.com,
-	martin.petersen@oracle.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, linux-block@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-scsi@vger.kernel.org,
-	virtualization@lists.linux.dev, devicetree@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, neeraj.soni@oss.qualcomm.com,
-	gaurav.kashyap@oss.qualcomm.com, mani@kernel.org,
-	andersson@kernel.org, konradybcio@kernel.org, bvanassche@acm.org,
-	alim.akhtar@samsung.com, avri.altman@sandisk.com,
-	pbonzini@redhat.com, eperezma@redhat.com,
-	xuanzhuo@linux.alibaba.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1 07/11] blk-crypto: move bio_crypt_dun_increment() to
- the public header
-Message-ID: <20260901191342.GC729142@fedora>
-References: <20260827160806.1295313-1-linlin.zhang@oss.qualcomm.com>
- <20260827160806.1295313-8-linlin.zhang@oss.qualcomm.com>
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id CD76340E01E1;
+	Tue,  1 Sep 2026 19:20:28 +0000 (UTC)
+Date: Tue, 1 Sep 2026 12:20:25 -0700
+From: Borislav Petkov <bp@alien8.de>
+To: "Kalra, Ashish" <ashish.kalra@amd.com>
+Cc: tglx@kernel.org, mingo@redhat.com, dave.hansen@linux.intel.com,
+	x86@kernel.org, hpa@zytor.com, seanjc@google.com,
+	peterz@infradead.org, thomas.lendacky@amd.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org,
+	pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
+	KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com,
+	Nathan.Fontenot@amd.com, ackerleytng@google.com, jackyli@google.com,
+	pgonda@google.com, rientjes@google.com, jacobhxu@google.com,
+	xin@zytor.com, pawan.kumar.gupta@linux.intel.com,
+	babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com,
+	john.allen@amd.com, darwi@linutronix.de,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	kvm@vger.kernel.org, linux-coco@lists.linux.dev
+Subject: Re: [PATCH v12 4/5] x86/sev: Add support to perform RMP
+ optimizations asynchronously
+Message-ID: <20260901192025.GHapcleQABEDuwZc3I@fat_crate.local>
+References: <cover.1786389115.git.ashish.kalra@amd.com>
+ <9c9502278f68af9da19f0dd583ba303d0e6d66d2.1786389115.git.ashish.kalra@amd.com>
+ <20260829205208.GDapNGeGMOs02IrkGS@fat_crate.local>
+ <c699a686-dab2-4e7b-af6e-3ea89cbed202@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="PEA6fpBf2bNc3JFu"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20260827160806.1295313-8-linlin.zhang@oss.qualcomm.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+In-Reply-To: <c699a686-dab2-4e7b-af6e-3ea89cbed202@amd.com>
 
---PEA6fpBf2bNc3JFu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Mon, Aug 31, 2026 at 03:00:25PM -0500, Kalra, Ashish wrote:
+> And we drop the leader/follower bookkeeping, but the warm-up stays.
+> 
+> Minor nit with the patch below : with the andnot gone, this_cpu is now unused, so please drop it.
 
-On Thu, Aug 27, 2026 at 09:07:16AM -0700, Linlin Zhang wrote:
-> From: linlzhan <linlin.zhang@oss.qualcomm.com>
->=20
-> bio_crypt_dun_increment() is currently declared only in
-> block/blk-crypto-internal.h, which is not accessible to code
-> outside of block/.  Drivers that manage inline-encrypted I/O
-> directly need to advance the DUN across bio_vecs within a bio,
-> or across multiple bios in a request, and have no other way
-> to call this function.
->=20
-> Move the declaration from block/blk-crypto-internal.h to
-> include/linux/blk-crypto.h alongside the existing
-> bio_crypt_dun_is_contiguous() and blk_crypto_init_key()
-> declarations. The implementation in block/blk-crypto.c is
-> unchanged.
->=20
-> Signed-off-by: linlzhan <linlin.zhang@oss.qualcomm.com>
-> ---
->  block/blk-crypto-internal.h | 3 ---
->  include/linux/blk-crypto.h  | 3 +++
->  2 files changed, 3 insertions(+), 3 deletions(-)
+Ok, these changes mean, the previous patch "x86/sev: Initialize RMPOPT
+configuration MSRs" needs to be redone too so that it doesn't add
+rmpopt_cpumask at all.
 
-Other include/linux/blk-crypto.h functions export their symbols. Does
-bio_crypt_dun_increment() need EXPORT_SYMBOL_GPL() like
-bio_crypt_set_ctx() and friends?
+So please take all the cleanups from this thread and send a new revision
+after integrating and testing them.
 
->=20
-> diff --git a/block/blk-crypto-internal.h b/block/blk-crypto-internal.h
-> index 04035d237f03..32c720aabba7 100644
-> --- a/block/blk-crypto-internal.h
-> +++ b/block/blk-crypto-internal.h
-> @@ -26,9 +26,6 @@ int blk_crypto_sysfs_register(struct gendisk *disk);
-> =20
->  void blk_crypto_sysfs_unregister(struct gendisk *disk);
-> =20
-> -void bio_crypt_dun_increment(u64 dun[BLK_CRYPTO_DUN_ARRAY_SIZE],
-> -			     unsigned int inc);
-> -
->  bool bio_crypt_rq_ctx_compatible(struct request *rq, struct bio *bio);
-> =20
->  bool bio_crypt_ctx_mergeable(struct bio_crypt_ctx *bc1, unsigned int bc1=
-_bytes,
-> diff --git a/include/linux/blk-crypto.h b/include/linux/blk-crypto.h
-> index 33ae52b77522..c9f436b6b2ef 100644
-> --- a/include/linux/blk-crypto.h
-> +++ b/include/linux/blk-crypto.h
-> @@ -181,6 +181,9 @@ bool bio_crypt_dun_is_contiguous(const struct bio_cry=
-pt_ctx *bc,
->  				 unsigned int bytes,
->  				 const u64 next_dun[BLK_CRYPTO_DUN_ARRAY_SIZE]);
-> =20
-> +void bio_crypt_dun_increment(u64 dun[BLK_CRYPTO_DUN_ARRAY_SIZE],
-> +			     unsigned int inc);
-> +
->  int blk_crypto_init_key(struct blk_crypto_key *blk_key,
->  			const u8 *key_bytes, size_t key_size,
->  			enum blk_crypto_key_type key_type,
-> --=20
-> 2.34.1
->=20
+Thx.
 
---PEA6fpBf2bNc3JFu
-Content-Type: application/pgp-signature; name=signature.asc
+-- 
+Regards/Gruss,
+    Boris.
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmqXI+YACgkQnKSrs4Gr
-c8iM3Qf/XFmILiCbeSjbXunU0k6T8u+dWvrzWNhq4pxK9Sj3ejQwcBFSp0YgWTeP
-huZvq2kGaf90TF7mw48y1hF3UnUHN9YCdADHFCePBQjaUsXeCtVguebgzFhhqvCe
-govoIFLmGhVjuU08W4/32X2McSZm/RU7nEaXkwX8baWQGmT6OJeteJsng7GyyCWW
-FHCOoHLTI3UKR40LJrijN1S/cnP/vZvYMs9X2LCwGmHua5uaTdoI0APEWwH34397
-u7yXS7G74oYNxIFC3zuqZ2ikoZQ7LDpNqrlTb4WttYP1sOhForEze0lQO6gFt/s/
-8Iyi2gjGMdOLc56RWntVSrqktDwQYA==
-=lhw/
------END PGP SIGNATURE-----
-
---PEA6fpBf2bNc3JFu--
-
+https://people.kernel.org/tglx/notes-about-netiquette
