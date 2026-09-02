@@ -1,80 +1,103 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mta0.migadu.com (out-55.mta0.migadu.com [91.218.175.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42E624AA3E6;
-	Wed,  2 Sep 2026 17:12:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6151047F786
+	for <linux-crypto@vger.kernel.org>; Wed,  2 Sep 2026 17:17:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788369134; cv=none; b=C6OZATJdjz2qqQUSH6S3nePAd8bPGxmfdZVwM/moyzP8WiX/VtJnDSk3CvdHpFKTtIB4Ibj+rd34wu/xiylK5oDFo3yZSCl+5p+312KUsGspkhMKFVX0gfxTPsqx+i2oGH8BxcK6GhXWYNcInm5et47vE9sfDoiLSjHdKtHUDnQ=
+	t=1788369429; cv=none; b=RkOHniDT1RZCArcnMUOLyJGQgrnNqCkzMN6VhnhVkSzc44clSFpVUr4wbgmrkgtY4XVy/EvSeyob/UEFzTMhjr8izWTPB89WFDaL/+KSKzxWTB27J3EwnAfHoGANlo6an/jC3PMmqcjBB0wSyeInkw5NQVSUoIOyHCHvB1T8lvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788369134; c=relaxed/simple;
-	bh=fZuLt8422EjD3gqkd171TzZ29ULAApNcig44A2pECCM=;
+	s=arc-20240116; t=1788369429; c=relaxed/simple;
+	bh=kbN2T3HRxTE8CcU7FkVYnjiHCvTMBx8FujkNyQbwo6o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xx968n9gom6197Fb/T+CF6cbUIPu4C7N5u1w8yiqOhffy82RByEVGWmVQbveInNUHv5DtBlPLtjV3oCHQvw4sTeoxWrP0fNhc0dJnXuqj3ZT6OtWSE+AGpgwBkMc/aiKkwVGj1kDrjI3SymXf/hdXnJSkBGBziRzgV6l2zMdqv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=VFo0VC5y; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	 Content-Type:Content-Disposition:In-Reply-To; b=u7x0/vJGySCKrlsg9w+eBpzEmiZifdnflSNavXjF5WD6tTcqCBXsy0687EfOVdwhDILXzzwz2pXWZHKNGAJ/2Wxs+IkQ2vzSLpU/7kP0yTVg6/k3CgTLefpqLqXZM54X/S517n+oOH86IXJK5L8bqsrNmNX5wcLQGPw+JUpQ+yA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mJISh18u; arc=none smtp.client-ip=91.218.175.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="VFo0VC5y"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id DD9BF40E024B;
-	Wed,  2 Sep 2026 17:12:09 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id PrFqerI28FwX; Wed,  2 Sep 2026 17:12:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1788369119; bh=BYnxpZ5PuXcKYcCY+vQ9h01RB6KiigJqE6JVM0/EOWY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VFo0VC5yDMFz9x4xJVqpMuX5QSExt3QmhkPOx6kWaDCARZQGlOLfarhmUjSG7wWwS
-	 PzwWYnKuNN1RhtsfoE5oyKuWeSETTiYjq1uBHWxR8SIMK+fUuD/m0iIE41P89Eq01S
-	 pqnk4BThuLg2bdx3dGNpA4wzTHuCOvNBi+wC2bw+fSdfTf/GsYLKmaLa9pOGNTtVAN
-	 Nxj9HD6kkULdCv9jgV0411H5lwnLuvTQCCyPZssnEEddJ5rY6PS71YbjbR/+OIVdGv
-	 474i6Uh0dZxDDGA7sl5HdVGPmKyOz8U3nqMK+586CRLE0I9rRrDQpo1L/Chs67Nra5
-	 GsdKRiomMuzYIvC9F/sPWAo7nDDicoSA0DQ9PndoknAGkIr5MSpG2DOLAARibk0HB6
-	 WV4TIiDdwP2gf4pDekZhlvEtL1LF1qUHUSo1SHaQPDxwZOODHyHFOAyR4l1D9D6U3H
-	 gBEBjhejERQXpQNuRalRFn+K1o6W708YU8juwFqMMY3KQlbHNb4D+G7gtv/B8VG6jy
-	 db1vMbk0exYnV9aeP3VKZ1pKc0bJiwiMCtk2f2ucEFySNq5wPjn5lyFxFOFSYwrJwa
-	 DaF0l2q+GHZaXcA+2d3V11EM8EGk9IBmCeNB8KbsK67lnHAdMJcNZgGQlZtLogU8sL
-	 dcCMcKKrO9Hm/Kx3WcoBaOUE=
-Received: from stx.tnic (unknown [IPv6:2600:1700:38ca:c00::a])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1325840E027F;
-	Wed,  2 Sep 2026 17:11:50 +0000 (UTC)
-Date: Wed, 2 Sep 2026 10:11:47 -0700
-From: Borislav Petkov <bp@alien8.de>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: x86@kernel.org, linux-um@lists.infradead.org,
-	linux-raid@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v5 0/8] x86: Remove cpu_has_xfeatures() and add AVX-512
- xor_gen()
-Message-ID: <20260902171147.GKaphY04eCQFoweH04@fat_crate.local>
-References: <20260901145740.42337-1-ebiggers@kernel.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mJISh18u"
+X-Envelope-To: linux-crypto@vger.kernel.org
+DKIM-Signature: a=rsa-sha256; bh=kbN2T3HRxTE8CcU7FkVYnjiHCvTMBx8FujkNyQbwo6o=;
+ c=simple/simple; d=linux.dev;
+ h=from:to:subject:date:message-id:mime-version:content-type; s=key1;
+ t=1788369424; v=1; x=1788974224;
+ b=mJISh18usSyksGynG0cxc4RIvEDwxbD6UZO69me3t4fCYcBkAmhFblRH4MCX8MCclmC7v3ET
+ pvDcw9yrjAovso+kk3C6MLJEbCisS7NOzPaHAr/3PGhpHYA/wOo/i1vEgrFTenEwTKWrGmfibHg
+ xnUSzwLfKPw8DyAEK3Y3wukI=
+X-Envelope-To: linux-crypto@vger.kernel.org
+Received: by mta10.migadu.com with ESMTPS id 29a99734ea6f9c70;
+	Wed, 02 Sep 2026 17:17:04 +0000
+X-Mizu-Trace-ID: 29a99734ea6f9c70
+X-Migadu-Flow: FLOW_OUT
+Date: Wed, 2 Sep 2026 19:16:57 +0200
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Karl Mehltretter <kmehltretter@gmail.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: atmel-tdes - sync output bounce buffer before DMA
+Message-ID: <aphaCSSkk_pDjyqz@linux.dev>
+References: <20260829045316.92931-1-kmehltretter@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20260901145740.42337-1-ebiggers@kernel.org>
+In-Reply-To: <20260829045316.92931-1-kmehltretter@gmail.com>
 
-On Tue, Sep 01, 2026 at 07:57:32AM -0700, Eric Biggers wrote:
-> Please consider this series for the x86 tree for 7.4.
+On Sat, Aug 29, 2026 at 06:53:16AM +0200, Karl Mehltretter wrote:
+> The slow path DMAs into a bounce buffer mapped once at probe with
+> DMA_FROM_DEVICE.  On reuse, nothing invalidates the CPU cache for it
+> before the DMA writes, so the copy-out can read stale data.
+> 
+> This was hidden by the copy-out calling dma_sync_single_for_device()
+> instead of dma_sync_single_for_cpu(): on ARM the misplaced for_device call
+> invalidates the cache, which is exactly what the missing pre-DMA sync
+> should have done.  Commit c8a9a647532f ("crypto: atmel-tdes - fix DMA sync
+> direction") corrected that call.  On ARM926 dma_unmap_area is a no-op, so
+> for_cpu does not invalidate and the SAM9X60 and SAM9X7 parts lost their
+> only invalidate.
+> 
+> With CONFIG_CRYPTO_SELFTESTS=y all four DES/TDES algorithms now fail on
+> SAM9X75:
+> 
+>   alg: skcipher: atmel-ecb-tdes encryption test failed (wrong result) on
+>   test vector 2, cfg="unaligned buffer, offset=1"
+> 
+> Sync the output buffer for the device before starting the DMA, in both
+> the PDC and DMA engine paths.
+> 
+> Fixes: c8a9a647532f ("crypto: atmel-tdes - fix DMA sync direction")
+> Cc: stable@vger.kernel.org
+> Assisted-by: LLM
+> Signed-off-by: Karl Mehltretter <kmehltretter@gmail.com>
+> ---
+> Tested on top of:
+> 
+>   crypto: atmel-tdes - zero-initialize device state
+>   https://lore.kernel.org/r/20260829035821.67220-1-kmehltretter@gmail.com/
+> 
+> Without that fix, on the tested SAM9X75 the DES/TDES self-tests hang on
+> their first requests before reaching this test vector, so the failure
+> fixed here is not observable on an otherwise unpatched tree.
+> 
+> The two patches are independent and apply in either order.
+> 
+>  drivers/crypto/atmel-tdes.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 
-Yeah, lemme take a look.
+The code change looks correct to me.
 
-Thx.
+However, I find the first two paragraphs of the changelog difficult to
+understand. Could you please reword those and consistently use full
+function names with trailing parentheses?
 
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Thanks,
+Thorsten
