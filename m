@@ -1,96 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F73847208F;
-	Wed,  2 Sep 2026 10:53:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43F5B49B1E1
+	for <linux-crypto@vger.kernel.org>; Wed,  2 Sep 2026 11:58:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788346433; cv=none; b=HZx8MDPtjqthLLDQr7qXYDCqAYBs7n24G1xOanbM7ONfh+R3GnbK+j7GJXaCm2wGtzTLTBiZOTVu91S1PfDY4EtvJw3rad3rB7TakJkqFxAv9SKDtgOOtLgx4Ej8wpz5Lm+980pCXIyI5qJ+JUNpN/6cd9SBe20pi0wx9fGaN9I=
+	t=1788350340; cv=none; b=ZOupTN9uLAM05uHRadZpTf4k7LVPSeK/o37hi/8TXYLCr399IZ/wHZ8eqkfD4g29TUqZCslO3XeQezUuUNOfSOXiCCoc6d1bLT8ZrsG5rSa0UuTHiE2l6CoQDdOPaknDDRr/fQ7BVNzYE/nD4sTYL8ZCs9duweOVQBVMhzP/bOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788346433; c=relaxed/simple;
-	bh=A4aOhSi1XFVZt7IZdETUA0i7eLg+8wvC5W3myX5o/SU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=S6ktchB+xEykWASwEdH9bJ70EfI6q8BeoWLZmWhlLFLFgIzxoyb0KMB6wvxSRQKbDn556WqJQqHL/1Lg+Lw9O/K23qvVCSZx17RLE0CinIbP+mWsoE9zi/W59LZV/XyXc/c/z0nI8KZliUDtstEfGXGh+jHZq/5CoWClte1JgO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RZpIK0aD; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788350340; c=relaxed/simple;
+	bh=D231sYpNvPXi3QG2syP6L8V0BuwGKvnwBXeth/8D62M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=a6c7ql6Sp+yA7yaQBvs0bGq5bnPYqS/HEYmdvaPLAIqVCfHcPipfejDuRDRwn1NVbqIJqhma4Gc+oC0YNwE5UyMBEzxs+j+/DlSCyYBw5STSlB9dataKouhVHLJ/UZi2Kg/1KFe5r009ebPjL+M/tQMmUOSM8lYOW/fEjnKkicc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=2bmN0L/U; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RZpIK0aD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B31511F00AC4;
-	Wed,  2 Sep 2026 10:53:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788346406;
-	bh=pBvmiL72fAJ8jJ3Wa5Ngf7lvySzdLWObGSlNEBCm2Dc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=RZpIK0aDEi/GC603PkbYdFX6exJUq+TXNJ0ojoeJiu4Q+dEuvnSSbk6TjJnnKsNrm
-	 N6SFVEmvs4k09IOGfysifsajrJ1px5/SQrhjYez9bidBhgSCaEs/xolgAoVeeBhwT1
-	 vSJxsEl5eFL7+7IO49Wz0xWtii3nRkx3G16M6trLoZEtDm2XqPVMc17HdaqomxEX3s
-	 Z1JzZHccbg2AtqwBMGUttQEKSo5dNZKJlrU8twE0y9fkhYNQU+2BB2wzfHaARv3Q3s
-	 RXVKMlDHUsCIkHeb4yHiZHdUrdndkFSJv5WWCTkII5Bn8ANrIvVVhSd7Hr0qX4C7C+
-	 i9MdPtc2jRmbg==
-From: Sasha Levin <sashal@kernel.org>
-To: stable@vger.kernel.org
-Cc: Lee Jones <lee.jones@linaro.org>,
-	Tudor Ambarus <tudor.ambarus@microchip.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Ludovic Desroches <ludovic.desroches@microchip.com>,
-	linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.10.y 2/5] crypto: atmel-ecc - Struct headers need to start with keyword 'struct'
-Date: Wed,  2 Sep 2026 06:53:19 -0400
-Message-ID: <20260902105322.2048136-2-sashal@kernel.org>
-X-Mailer: git-send-email 2.53.0
-In-Reply-To: <20260902105322.2048136-1-sashal@kernel.org>
-References: <2026083113-premiere-tables-885d@gregkh>
- <20260902105322.2048136-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="2bmN0L/U"
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 834DC4E414CA;
+	Wed,  2 Sep 2026 11:58:42 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 508F56053C;
+	Wed,  2 Sep 2026 11:58:42 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B205011C79305;
+	Wed,  2 Sep 2026 13:58:33 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1788350317; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=Argkh8fOXqu3RtX8B0Djo/lbWhOGIiKDY4XvkMuUyEA=;
+	b=2bmN0L/U/l1wkab6qS0vlVWsFLQHTytjpDHHd9KVDU17A/duoDcrYhRAjOfmitfZQBpXM7
+	K5ebNKDACTbEFkmNkk12AHbixpCyOwOyF8QAfsbpcUNymeWnosXxQ1N6X3ymUy/o+Dj6hG
+	HjObCpcGtSc4W+0KEt7ApJjbEJW48+riOKCdjG9NFKEs9E/o2+kwV+ksS1zjWIgABMIJOi
+	9H6c9WtaS5WL8oI2p+TMjKnCigoEgrYtsGiVY4ClCkRkj32tDfyPaQHk5wMajfIQaAY9ip
+	x7tG1Ztycr+IEMJ8iScFM+N8eZWgVdQZereVEbkzcAyOcNHVpxj5aqVgAbbF2A==
+Message-ID: <c413ff04-61bd-4352-98fe-c2c01f075042@bootlin.com>
+Date: Wed, 2 Sep 2026 13:58:33 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: ECDSA key parsing in crypto drivers
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Miquel Raynal <miquel.raynal@bootlin.com>, Jian Pan <jian.pan@se.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+References: <34094aaa-da49-4203-b176-ed3faa4b8692@bootlin.com>
+ <41bb0b65-3a30-4922-9aef-10f73c654852@bootlin.com>
+ <apff2HnJS3IjlT4p@gondor.apana.org.au>
+Content-Language: en-US
+From: Paul Louvel <paul.louvel@bootlin.com>
+In-Reply-To: <apff2HnJS3IjlT4p@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-From: Lee Jones <lee.jones@linaro.org>
+Hi Herbert,
 
-[ Upstream commit 71057841feaa6c1b5a80959013e588b2cdf9aef1 ]
+On 9/2/26 10:35 AM, Herbert Xu wrote:
+> On Mon, Aug 31, 2026 at 02:08:02PM +0200, Paul Louvel wrote:
+>>> My question is: which ASN.1 schema should be used? Should a client of the
+>>> crypto API know in advance which format the driver expects? Also, for RSA,
+>>> there are helpers for parsing private and public keys: rsa_parse_priv_key() and
+>>> rsa_parse_pub_key(). These helpers use the kernel's ASN.1 decoder. Would it
+>>> make sense to have such helpers for ECDSA?
+> The driver needs to match the generic C implementation of the
+> same algorithm.
+>
+> Cheers,
 
-Fixes the following W=1 kernel build warning(s):
+By "generic C implementation", do you mean the implementation in ecdsa.c ? For
+verify operation, this is clear. But signing is not implemented, so there is no
+callback for setting the private key.
 
- drivers/crypto/atmel-ecc.c:41: warning: cannot understand function prototype: 'struct atmel_ecdh_ctx '
+Best regards,
 
-Cc: Tudor Ambarus <tudor.ambarus@microchip.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Nicolas Ferre <nicolas.ferre@microchip.com>
-Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>
-Cc: Ludovic Desroches <ludovic.desroches@microchip.com>
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-arm-kernel@lists.infradead.org
-Signed-off-by: Lee Jones <lee.jones@linaro.org>
-Reviewed-by: Tudor Ambarus <tudor.ambarus@microchip.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Stable-dep-of: f07a0d251db7 ("crypto: atmel-ecc - avoid stale fallback key after set_secret failure")
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/crypto/atmel-ecc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
-index 5dd3e37f6715a..004d87cbfa221 100644
---- a/drivers/crypto/atmel-ecc.c
-+++ b/drivers/crypto/atmel-ecc.c
-@@ -26,7 +26,7 @@
- static struct atmel_ecc_driver_data driver_data;
- 
- /**
-- * atmel_ecdh_ctx - transformation context
-+ * struct atmel_ecdh_ctx - transformation context
-  * @client     : pointer to i2c client device
-  * @fallback   : used for unsupported curves or when user wants to use its own
-  *               private key.
 -- 
-2.53.0
+Paul Louvel, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
