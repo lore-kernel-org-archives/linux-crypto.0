@@ -1,127 +1,80 @@
-Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com [209.85.215.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C736E4AD4BD
-	for <linux-crypto@vger.kernel.org>; Wed,  2 Sep 2026 17:06:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42E624AA3E6;
+	Wed,  2 Sep 2026 17:12:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788368769; cv=none; b=VLTQ0gr+wMgDeN7rOhuqKM5AcHAVOmcYhGEfhb9thXPc85vqNMhFjsc2yFemQyYsSPLEZ0af3m1eKYGL5eIupUaQ+z9FeMpeMzvIdGcK3jgxccpKxtBPuRhTwb/mLV0TNXGZ4j67GRGe4m5cBQU7OpoMSCUhtgtcx45+DNfLGPo=
+	t=1788369134; cv=none; b=C6OZATJdjz2qqQUSH6S3nePAd8bPGxmfdZVwM/moyzP8WiX/VtJnDSk3CvdHpFKTtIB4Ibj+rd34wu/xiylK5oDFo3yZSCl+5p+312KUsGspkhMKFVX0gfxTPsqx+i2oGH8BxcK6GhXWYNcInm5et47vE9sfDoiLSjHdKtHUDnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788368769; c=relaxed/simple;
-	bh=1qyWm9FBS4lwMn+l0z/+FmSGpRC7Wsn68Pil4y+CNuo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=b6R/QBTO3uzJEQAiZubvJtSU0gU3BiF/mkg6jR6k/bTCOKKG/2sp4b6G9LIifgtxTpsKaBIEpP8vG6xwpyYuf8ld6VOioAxAdGSnvcM5WDGQM3tMjRZm2VK7MVRa2pzq5lt0JRoKnYa+ngXNnoPo9Mgkrk2Tnhh225tMqF8wLEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=okGfq5qS; arc=none smtp.client-ip=209.85.215.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1788369134; c=relaxed/simple;
+	bh=fZuLt8422EjD3gqkd171TzZ29ULAApNcig44A2pECCM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Xx968n9gom6197Fb/T+CF6cbUIPu4C7N5u1w8yiqOhffy82RByEVGWmVQbveInNUHv5DtBlPLtjV3oCHQvw4sTeoxWrP0fNhc0dJnXuqj3ZT6OtWSE+AGpgwBkMc/aiKkwVGj1kDrjI3SymXf/hdXnJSkBGBziRzgV6l2zMdqv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=VFo0VC5y; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="okGfq5qS"
-Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-cc1bbd7d6e6so1527735a12.3
-        for <linux-crypto@vger.kernel.org>; Wed, 02 Sep 2026 10:06:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20251104; t=1788368767; x=1788973567; darn=vger.kernel.org;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=2OU53ojU8l8wGUtd3KV+CqsYwkI7GFM3tHWbQYKqcr0=;
-        b=okGfq5qSR52Eg5Qzuw8Iwhb5JA/lUy8KYG36TZcZ8Ai04BHIS5kobDHEXzv8p7fmM5
-         hYSD49TMlL1XiRpOWmbzOD8wSaUqmdQ6K353PsO/IFIOfZjxR7hWYPfuEgJNQpH49Iwr
-         gWuEyD/Mq+NqZ3gSCHzoLjr9KNbV+NIV6NgUVH8tTvpN0CG1BnrhafdfjAOQrrqlk85i
-         l+lpPC3A10Fz8TLbXTnB+bF7/I0s5VuqXUo+49UvdBeH91WtZeB27jYb7exC7pwNYxgv
-         5DduiPbeuYxm+OXCyZGg4ofXLWJ+xKONEpKKcOBZHQ0/yfBlYMhERfNguGU00Nx8T9ua
-         J47Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788368767; x=1788973567;
-        h=content-type:cc:to:from:subject:message-id:references:mime-version
-         :in-reply-to:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=2OU53ojU8l8wGUtd3KV+CqsYwkI7GFM3tHWbQYKqcr0=;
-        b=pMG8kQk3q2UZhoyjMIP0AwbokLNoE6hh2hXBMCAOJiT9qwUE5X+PGhut09anxwp4vC
-         /qzw7sAn+ZomSvASNvrW3W2V9g4ifhJxwpweO351Fbuk9QwhSeTz/okecmQfI34sju0+
-         6LXw7JheWLDgC9CX4zbPj4OF6xLA1Sp90al5mNPpye80Hv9tpiCoZrCV/Z6uz2wtyYkb
-         hFJCqvL/Im+SQBwGBzYOlYzNfU+0uwAEU6WwcAvQKsalMI0Isn4MNLOK5oVrbAN7W46Y
-         +oIjXw1j712PULrDNXN9fL/UE8D9WFcde/wn31Pfx6rUE2ixtibG/uZ8lLKcl2jx9ox7
-         aGUw==
-X-Forwarded-Encrypted: i=1; AKwUvBzg10wPOcuN/5DSSyh/8ijDjh+Uso3GBRaFjet2lf89ig7mmnpxPOgtcFiNIXNVRx4qdV3P73ImJL9v2DE=@vger.kernel.org
-X-Gm-Message-State: AFuF++mVzN7a28x4bgpfYfodvAGabMc3pfxBH8wuPM0P5SDcf/wdTnWm
-	tSodfISpCBBcFyiAXQYYJz9cBYWHnkT5Z0Z8ZwBvd7Jpoi8lK3QX0XdR1lYSPIlh6KcutpfVOKl
-	kO9mGSA==
-X-Received: from pjbie23.prod.google.com ([2002:a17:90b:4017:b0:398:d6ef:84d])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:c106:b0:380:f85c:94b4
- with SMTP id 98e67ed59e1d1-39aedf1a98dmr10201213a91.7.1788368766542; Wed, 02
- Sep 2026 10:06:06 -0700 (PDT)
-Date: Wed, 2 Sep 2026 10:06:05 -0700
-In-Reply-To: <CALAyJWrn7OQyQMd5OPoifn_3qe6iWNf1+xSSg_six-+po9kpvQ@mail.gmail.com>
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="VFo0VC5y"
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id DD9BF40E024B;
+	Wed,  2 Sep 2026 17:12:09 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id PrFqerI28FwX; Wed,  2 Sep 2026 17:12:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1788369119; bh=BYnxpZ5PuXcKYcCY+vQ9h01RB6KiigJqE6JVM0/EOWY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VFo0VC5yDMFz9x4xJVqpMuX5QSExt3QmhkPOx6kWaDCARZQGlOLfarhmUjSG7wWwS
+	 PzwWYnKuNN1RhtsfoE5oyKuWeSETTiYjq1uBHWxR8SIMK+fUuD/m0iIE41P89Eq01S
+	 pqnk4BThuLg2bdx3dGNpA4wzTHuCOvNBi+wC2bw+fSdfTf/GsYLKmaLa9pOGNTtVAN
+	 Nxj9HD6kkULdCv9jgV0411H5lwnLuvTQCCyPZssnEEddJ5rY6PS71YbjbR/+OIVdGv
+	 474i6Uh0dZxDDGA7sl5HdVGPmKyOz8U3nqMK+586CRLE0I9rRrDQpo1L/Chs67Nra5
+	 GsdKRiomMuzYIvC9F/sPWAo7nDDicoSA0DQ9PndoknAGkIr5MSpG2DOLAARibk0HB6
+	 WV4TIiDdwP2gf4pDekZhlvEtL1LF1qUHUSo1SHaQPDxwZOODHyHFOAyR4l1D9D6U3H
+	 gBEBjhejERQXpQNuRalRFn+K1o6W708YU8juwFqMMY3KQlbHNb4D+G7gtv/B8VG6jy
+	 db1vMbk0exYnV9aeP3VKZ1pKc0bJiwiMCtk2f2ucEFySNq5wPjn5lyFxFOFSYwrJwa
+	 DaF0l2q+GHZaXcA+2d3V11EM8EGk9IBmCeNB8KbsK67lnHAdMJcNZgGQlZtLogU8sL
+	 dcCMcKKrO9Hm/Kx3WcoBaOUE=
+Received: from stx.tnic (unknown [IPv6:2600:1700:38ca:c00::a])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1325840E027F;
+	Wed,  2 Sep 2026 17:11:50 +0000 (UTC)
+Date: Wed, 2 Sep 2026 10:11:47 -0700
+From: Borislav Petkov <bp@alien8.de>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: x86@kernel.org, linux-um@lists.infradead.org,
+	linux-raid@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v5 0/8] x86: Remove cpu_has_xfeatures() and add AVX-512
+ xor_gen()
+Message-ID: <20260902171147.GKaphY04eCQFoweH04@fat_crate.local>
+References: <20260901145740.42337-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <CALAyJWrn7OQyQMd5OPoifn_3qe6iWNf1+xSSg_six-+po9kpvQ@mail.gmail.com>
-Message-ID: <aphXfTJicnEde3R4@google.com>
-Subject: Re: [REGRESSION] [6.12.y] crypto: ccp - Move SEV/SNP Platform
- initialization to KVM breaks SEV-ES VM launch
-From: Sean Christopherson <seanjc@google.com>
-To: Andrew Wilson <wizlonex@gmail.com>
-Cc: ashish.kalra@amd.com, aik@amd.com, herbert@gondor.apana.org.au, 
-	stable@vger.kernel.org, regressions@lists.linux.dev, thomas.lendacky@amd.com, 
-	john.allen@amd.com, davem@davemloft.net, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, 1145026@bugs.debian.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20260901145740.42337-1-ebiggers@kernel.org>
 
-On Wed, Sep 02, 2026, Andrew Wilson wrote:
-> #regzbot introduced: 3f8f0133a5fc9b32d0c308530320c3f2430ba5ab
-> 
-> Hi all,
-> 
-> I am writing to report a regression affecting AMD SEV-ES VM launches
-> on the 6.12 stable branch (first noticed in 6.12.97+ / 6.12.101).
-> 
-> I completed a git bisect between working and failing kernels, which pointed to:
-> 
-> Commit: bb1c84647025 ("crypto: ccp - Move SEV/SNP Platform
-> initialization to KVM")
-> Upstream commit: 3f8f0133a5fc9b32d0c308530320c3f2430ba5ab
-> 
-> ### Bisect & Verification Details:
-> * Last Known Working: 8a599f4f74d4
-> * First Broken Commit: bb1c84647025
-> * Tested on 6.12.101: Cleanly reverting bb1c84647025 immediately
-> resolves the issue and allows SEV-ES guests to boot normally.
+On Tue, Sep 01, 2026 at 07:57:32AM -0700, Eric Biggers wrote:
+> Please consider this series for the x86 tree for 7.4.
 
-Can you try v6.12.104 or later?  I'm pretty sure this is fixed by commit
-6b748c39d18e ("KVM: SVM: Add support to initialize SEV/SNP functionality in KVM"),
-i.e. is the same thing as:
-https://lore.kernel.org/all/20260814100652.225499-1-jinpu.wang@ionos.com
+Yeah, lemme take a look.
 
-Note, SNP is still buggered on 6.12.y if CONFIG_KVM_AMD=y, I'll try and send a
-backport for that soonish.
-https://lore.kernel.org/all/521b22fa-ef09-4449-909f-0120edfc4b24@oracle.com
+Thx.
 
-> ### Failure Description:
-> With commit bb1c84647025 applied, `sev_platform_init(&args)` is
-> removed from `sev_pci_init()`, assuming KVM handles on-demand
-> initialization.
-> 
-> On bare metal, the PSP firmware appears to remain uninitialized (does
-> not reach SEV_STATE_INIT at probe time). When QEMU initializes KVM and
-> queries host SEV-ES capabilities, the ioctl fails with -EPERM:
-> 
->   qemu-system-x86_64: -accel kvm: sev_common_kvm_init: guest policy
-> requires SEV-ES, but host SEV-ES support unavailable
->   qemu-system-x86_64: -accel kvm: failed to initialize kvm: Operation
-> not permitted
-> 
-> ### Hardware & Environment:
-> * Tested on: AMD EPYC (Rome / Milan) Supermicro platforms
-> * Kernel: Linux 6.12.101
-> * Hypervisor: QEMU / KVM
-> 
-> I have access to Naples, Rome, and Milan test hardware and am happy to
-> test any patches, provide dmesg traces, or assist with debugging.  I
-> am not a tech-expert of any kind, but I have time to do some testing
-> if it helps.  THANK YOU for the great work.
-> 
-> Original Debian bug reference:
-> https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1145026
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
