@@ -1,254 +1,216 @@
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011011.outbound.protection.outlook.com [40.93.194.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533A5373C17;
-	Wed,  2 Sep 2026 17:44:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F309E361974
+	for <linux-crypto@vger.kernel.org>; Wed,  2 Sep 2026 19:15:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.160.45
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788371052; cv=fail; b=t3Vx7h1W3gcfUsxHIG0nyI5Fvg1Pb+CoQqgYvXQPUZtrvQ32JM78urmaD3gBXj3lUlHxMMMbIDnf28Ej7ZQ2yuUmjjNGpqReT67Fceos0nnAzxxviNMUUXM0VKjOO/WYghXtp4YehBcfQkUl/62AG/rTB40ix6p54OTxyuFWufQ=
+	t=1788376508; cv=pass; b=GbtGEtN+pDvPD2rMqYK931XKMZoQ3DRr+oocWDFZN3KBJIoBkPo+j5NHG9X+AbWoPnqjAa3D2k9B5KSy2h+IextZHXxqTSa/eiLDUZVO2rM9l3t1T7fDOWVSLObZnt67YILQTi6jC3bwoMhJVCez2NpayEpvaEKawTj07HZxjmU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788371052; c=relaxed/simple;
-	bh=EZ9UCOR4jD6zPsYjiFp/1Y2wfcfS0y5XjOsteE/iVAQ=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=VSd0gtWlImdcYdVv0LZ2seOHejSxpFsOeXsY8lG5MULAeUuQGlBnhfmMcc5n/XUNk2j3wfjv4ID9ybp8eiilXLshWkgZWFWyG1U+g1nC4/Aa7dzgjflWndELSvANyjWSzaXYQBGcRLKEx6bm4/n0JSHbSpssZaqWj6EK+0AsbxU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=yhrMC4Vd; arc=fail smtp.client-ip=40.93.194.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1788376508; c=relaxed/simple;
+	bh=JLV8Ofox8i3452kiplk76hZfUPxaEK+vxS1pmKYEFNM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Rg9oCNjLralrYh/ExgxPS5G7RRLE6+bzz9dtAYgn05poUjumlYC75BGyNZWZda1/pzyjc54a3vU3IqWokGC9+mMQkt01a9/5GdWrUyOyUqEc+sKY5/BgNrTejXGEskvgBf5Mvr4w1vfc3O6mM1WPsw7FYpZ9qjX6mjnOl5Y25co=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Witbb4Sk; arc=pass smtp.client-ip=209.85.160.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="yhrMC4Vd"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Q0vgS0dIyP5W7X/hqtwtspwqDm1rgYuO1QaiAm3tRDHs9OVCaL7b6SweIIDxydCOea7vpTedzaLIcuyZYt0hfXI+1AU0BOZQVbTceF0UaTEKwvuyY8SrQg+P0ACoNCladEAnxH5fOQqW501B7126fh/p/cSXqs6MwOUf0TbuvCypwSAzwq3pGS6rYqOTQF5NRaI8aB1bceJDLKQ73QH3BvXgq1ZQ1P98qRmRLL7ybmyXEBz4aPcTEdZaPn1nRAuEn/7UjAOQaTGFV11JobrV6wjpGYgt2i9rQKFzPYL+jcLwJ+0tQTDCNHXvs4sp1+Fex0HEYf+LCDk0CUgDJ6ji/Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=U1LrR6A4EGpHyvgi42uig9x/OYlBXj3XpgOI5GUo4cE=;
- b=cJ6fr3ofhNKcKNlCtewUxGDfdiV37n/qC+IfoENQT+W30nHxeMilqDYE+bTgpi3cdNKcz74Gp5p1AqtKQyxC1cTUFrgUj8yNvomRjCrsTs+n3YrP0vzxYFclCJDS3LbqAOjXzuf4+jKRFRDYEA2P7zseuKiJNteeUhn5A+RZGUpSeEyFdpprJit2xr2JT57Dbrc/e2PSXXEg4xTMl9BHHoYzdtDo4S6FCWE7yPYgu7+rp7Pt68LE+eJiKfj+qFmJIg1KPwI62Vt4iGU8PW9Tcbwm5GssohvEhgwckZrVSfpaEtcr2jHwO54eJeReOxJK3K0Y/DyBz4TZGs7pMpU/2w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=U1LrR6A4EGpHyvgi42uig9x/OYlBXj3XpgOI5GUo4cE=;
- b=yhrMC4VdhjqVULnFNnmvkxjC8UAx/NOjH0bCeQErlPMPDGMNLgRFIC5Ik/JGXydPTscTpKgGIxGkw7z34knTSxm8ZT5vl1nWlOy0RVtDktErbWjFUaFcNCvAnKDQm7RFpkgk7iSjJXJHntiRFRS5w+V5YbfwPg+tmcuKm3AZT6g=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from CH3PR12MB8660.namprd12.prod.outlook.com (2603:10b6:610:177::5)
- by SJ2PR12MB9162.namprd12.prod.outlook.com (2603:10b6:a03:555::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.360.13; Wed, 2 Sep
- 2026 17:44:05 +0000
-Received: from CH3PR12MB8660.namprd12.prod.outlook.com
- ([fe80::87aa:52e5:4b72:d5f3]) by CH3PR12MB8660.namprd12.prod.outlook.com
- ([fe80::87aa:52e5:4b72:d5f3%5]) with mapi id 15.21.0382.007; Wed, 2 Sep 2026
- 17:44:05 +0000
-Message-ID: <cf23d9ee-2bae-4393-8435-c04a80778069@amd.com>
-Date: Wed, 2 Sep 2026 13:44:00 -0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 6/6] crypto/ccp: Implement SNP firmware live update
-To: Shantanu Sinha <shansinha@google.com>, tycho@kernel.org
-Cc: jackyli@google.com, aik@amd.com, ashish.kalra@amd.com,
- davem@davemloft.net, herbert@gondor.apana.org.au, john.allen@amd.com,
- kim.phillips@amd.com, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, michael.roth@amd.com, nikunj@amd.com,
- seanjc@google.com, thomas.lendacky@amd.com
-References: <20260430160716.1120553-7-tycho@kernel.org>
- <20260831204757.436751-1-shansinha@google.com>
-Content-Language: en-US
-From: "Pratik R. Sampat" <prsampat@amd.com>
-In-Reply-To: <20260831204757.436751-1-shansinha@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BLAP220CA0020.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:208:32c::25) To CH3PR12MB8660.namprd12.prod.outlook.com
- (2603:10b6:610:177::5)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Witbb4Sk"
+Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-46adf49ff3dso833599fac.3
+        for <linux-crypto@vger.kernel.org>; Wed, 02 Sep 2026 12:15:01 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1788376499; cv=none;
+        d=google.com; s=arc-20260327;
+        b=qCH8D56hkcRy9fJ5IbcnoGL0WvMMKbxjZKI7/Mq0JFarwbT84K/Hznx316pf+7GTKz
+         JmARPY/wE8sKbvftTHpiEW94ISTdDWtjKLZpvhhaoZr53c6LtsgHNwASuGtJdO00ZfG0
+         29Zs353fsew0ycKH8jDYS6aFQ5FOhrPFcIjfKToUE7mSONZ/hElQgNo8A2kLfG+Q4Gbz
+         oayzmkesdiiOKrIaHD/PnrtHN0WJJFh7XFpkP9pCFjV849L7pvROewLYcwql2UmVgqjy
+         rPWRc2mx68Ywod/CT+7NxQT/HkZqgrBTZ1P4UFT+oNGVVTmb8IW2e1iGX7bInZeM7Ksc
+         +vQw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:dkim-signature;
+        bh=fhVgVDsfplRoO6QIS0+PaSfH5QyM7tCi3PZGVPNp3Fk=;
+        fh=QTCIWmkHenY/NopVzwlddVQ9JHlgQYwehMBbZ3PIrKY=;
+        b=XFV5Z0gQe1VubEFlmDtsTbCygkr8Sqcxrm3wbgLGt7odZIC3GBcVLRtJpb1QorpZR5
+         F7Unha3R5zBRyoiLfWSREACly4u1/ZRAQhocBaIfEPUfxDEWcqoq903g2ljPPFEVIvoG
+         E6QtcnBgI+LX+UDr4st5ZruBc0XZwR8kpboQjQdF0tlT6DegLK2jfW0xiAJUHN3n2gkf
+         uK6LoB1XXYl1eCqJuL/R2DIZojjhSFRMi//fowHnAXfdAo1NxoUWyVm+MrxN513/lIOn
+         OBJayzFt+ZSODVINaZmIwTfZs/UaQ0OCD2x8Vmcq9M8zqBI0WO20HXd5BxClh+/nNklR
+         muRA==;
+        darn=vger.kernel.org
+ARC-Authentication-Results: i=1; mx.google.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788376499; x=1788981299; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to:content-type;
+        bh=fhVgVDsfplRoO6QIS0+PaSfH5QyM7tCi3PZGVPNp3Fk=;
+        b=Witbb4Skocb5WQRQSOcB/3AErxnQrFz23C5G/uqNu3pwzdauX5St7OloyoaM36jF7v
+         xpwcjnXpXvgbPm/QqMMxe20sfjzKtRICJtUxf/PoZ/AqFBR6no97U2+8dtujOL4KiTjq
+         Ld40Tgjo73QX7jLRnMwlbfXgFvSxJ/E7bObYULtmYt4uX1yrU8qnT67twjAkOzDhgoMp
+         IvSGNVOm2VMzSLJu6tBQm8/w8IiBxMuV1OjEtsZjoe7VNYuyjxDa8lZ21NvsdmTtMBAZ
+         eQKjBMoG3MBCqyedLKrQBEwkKW5z0NYnXhpPgXyTD9jCE9IO+GkvcaR+4Rb6PPK0ARzl
+         tl2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788376499; x=1788981299;
+        h=content-transfer-encoding:content-type:cc:to:subject:message-id
+         :date:from:in-reply-to:references:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=fhVgVDsfplRoO6QIS0+PaSfH5QyM7tCi3PZGVPNp3Fk=;
+        b=cCVdSHzkje0jo2YrU73ksRDxAo1LUY6re8Jzq2WF8jXrYkb5vKaIjk/AKdAz5eVtd1
+         h2+ZHifJ4do1rIxSF9W7x2fZJ7oEOn8S5lIpApL5YmGE7DQh3VmKrxtH00tGEzW2yVVz
+         8yndY7DaZiXLkBd7ZyHjf5+Mq8FdrNcOzZadmF90Zjngc1QCSvOAol+h2tvl0YzTf/Of
+         mujBYL6/xcbQPEEBXP5O6q3obA4Hpq7/RcqcHA8LvXm0176Pj0PllklsVzdD9gPAUxH6
+         QI6Vinp78J4f7rpnG3GUyb+2pTLycXbeFZnDkmQ4bqQK1y8YBvCAJzU/XQRs+cB7Pcv0
+         1k+Q==
+X-Forwarded-Encrypted: i=1; AKwUvBwinPTSwYmapgLhAyZ+Dcfujhxhs9NR7838u3vZHIMEU9vX76Dd9hjG22T2j8fphyLxLvuU0+LXDMiwPfA=@vger.kernel.org
+X-Gm-Message-State: AFuF++mKnI6bIknV13Vat0fEV90tNYJ6Jmy//3I4zOXXtDnm/uTbFM57
+	xslm2YvAM7ZrhvuZycWWhLcGX1tRVWN0YU8QRFDe0dnLSfdtiiKxcZ/rzlElFmNFhrCBjCTslBp
+	djmWYe4G3F6dfcUh1w2NQ3Upqyolcfq8=
+X-Gm-Gg: AYBFou2EeFFE9sHt67xmuHOMfIsaJ1ucES2hCkVfp0ZGqmgPzaENyeUieQ8yVoZsdRG
+	Lq1HCmmQkW1ll46oHuB8vq2yi2DuqnWu+VPsJoAuE0/zGq2DQyCsqNzesDP9GYXGMtRwq6zkh/v
+	lklrlfEkm1BX1bzuRCcxgnN8FlK6i26JYDfR9viVKC+YQfx63hF+POXnvx9zqN6VOTO9yvL11Ap
+	xduPFPyf4lSXz4AVNwXv4UIHRisAgva5PcPwMPGnpvJ4lr2BxWRmHv6DH2SmFgAv5jiicloEoOD
+	44inOi6XAqsupemRiYUrgFspTYBTOOblpQ18GA6xnKLCbZXOILOtKDLnyW9nrv5BvV8I8nskNal
+	gEQoBemSmax2GggmgV8zaW43/i92tLrhjK1QxnhldCR2ehMUg8qeaPCjRxGve4cTZddqebSgC+p
+	vRGISuBCD+p2s3s3ETaILTo8UxvWu7aWbkau3LrDIa
+X-Received: by 2002:a05:6870:270:b0:46a:e87f:a7f3 with SMTP id
+ 586e51a60fabf-46f88507af1mr6165405fac.2.1788376499042; Wed, 02 Sep 2026
+ 12:14:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB8660:EE_|SJ2PR12MB9162:EE_
-X-MS-Office365-Filtering-Correlation-Id: b260ff8e-e283-4b27-b43c-08df0919c858
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|23010399003|366016|22082099003|56012099006|10067099003|11063799006|4143699003|18002099003;
-X-Microsoft-Antispam-Message-Info:
-	r2Et89PExkE7WJ635GVCXy/DtXXMhGDrT+8Tbi7XhlKiBpb40+HvnnseIMuzm+0QLFMduOZaiNKhOokPNJJytyXPsV5dbmq7GONS7lLh+GCb99F3rJ85aPmGoPGt5r0vws+b8WqvK7GwyjEAe+nR4ksTWjpObVnBTwNDnA5tX1YFLoOrdkxpXrnIjqnWUJnsRRR2x4VNZnJSJHJyRdwQ2jzyow5piaduQx3w4muTpm5wUeQoC1MD4+4M/Rluyy7PPI8Mh9/JPKdljlxl/kZCf3h/rqfgSYX5p1AgSRTBoYZxPVIOJBAHLLDh9nH2/1y3VlFTvgKRh8/71/8T8jp91nofWslvmkTry9ldKQmXnZ8O41iAcXtcY+XFPLIC1WKHBsvrpJGPgWwGASiQ43wHPmt8PzbLMMj571mNQJkN1ALfWWw6OJNmkWL3ThC5gmJuXUmimTS4kMmlGp0ePmCqD91gaayLpEEM46bP9LEmuYX0F4GNpdNhHV3xsjLSvpzMnvNcAID1EV9GdqT3W9QDu+xXQjaafgxW0DD8ZabgjtRNnYE6tRX3H8b8RuFTWE9ncdsafe7zu0YGQ+NlQS32r///Lw/qHxX/6sTLR64PlQ6VJBGM42Hi+wgaHEy9fa5gUp8FLkiax82rZcT6hlokveqqEz+50mai+cpKlkw4+KI=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB8660.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(23010399003)(366016)(22082099003)(56012099006)(10067099003)(11063799006)(4143699003)(18002099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?dnh4cTFISFcwZERGZlFRc3ppcGl6UTBhR0V3MHRpMVI4U0dnc2NMY3U5Qkdw?=
- =?utf-8?B?NU1mVHgyK0FiUlZMZXUzWEhRWUJCTmNGM0swSDZzc1NZS1QxTnZPQmplRk1H?=
- =?utf-8?B?cXdpT3VoTXV4bUkzdjVWSjE0RE1MNUo3eit3cFZSYjZlUWZSdFdjdmdEaEhm?=
- =?utf-8?B?WlFrK2p5M2lXU044eVZqMjVqcFd2ejNWc01LU1B0cWV3Q2NaQStUc0h4bGFh?=
- =?utf-8?B?OUxBRWdpNmVLRU1FcVkxNTVGQVhUS3J3dFRJQkU3SDRRQUpnc0o4Rkl5Um03?=
- =?utf-8?B?SmZIcitDMGVmL1cwczZaaU91Wlc4Vk95anFiaCtZTGlKQ0hHclp4ZWR0dDhw?=
- =?utf-8?B?SGxXcmNwRG5LTXROaURrYng4RHNSRm9CeUpWcXg1RG9MZjU5a1NmYzdyNlZ2?=
- =?utf-8?B?bmVXU2dlZ2V2TEJuK2NaZUhGeWIxQ2RDQVl4ek9rd0xwVmxLaUppY2hTaHZ3?=
- =?utf-8?B?ODloTWczbWJGZVNValphd0hTUW84RHVWYVlSYnNmaDlxOC9LNCs0cXpSZ0JO?=
- =?utf-8?B?d2cyZWE2cUhmNktNTGNobXI3MEcyRk5IUEYzVG0zWE9oVkwzcWlBQnJydDFH?=
- =?utf-8?B?YVY4eU1abEV0WjNHTC9NdUFhUnVleVhHOHJyV1dkQW9qSEdSQ0JFdG04d1lE?=
- =?utf-8?B?RWF0RkJDQ0M0Q0pONUZ0Y2N5Z2c0U0VBYjRPSFlXdmtZd0wvQU1IbWlKb2xt?=
- =?utf-8?B?ZU5vZzk4WGR1M3Z2YWZnZHhlOG9wbzFVeDBNKzVQMkhudTV1YWtxUEFaaGpw?=
- =?utf-8?B?b1lMTHZUMHNVMVZjbEVOZmp5cEVKM2tnVXdZV1g3VXhmRVI3ait6RGZNVVlR?=
- =?utf-8?B?SlNqaXFwSVJqUjU4TkFLZTFHdFFienFBcndTZjBqNXZKYU1SLzJ5a2IzU2Nk?=
- =?utf-8?B?ajdtUVdGcnhvMUhnY2ZhWm5zbUw3Mkd5SDBLTkZoQ0V4eERIc0xUT2gzUG5X?=
- =?utf-8?B?WHFpUU56QWI5NEduamNJbkFMM0N5VXl2TnB3SWp5R3pINk5YN0E2M2E1SmZN?=
- =?utf-8?B?NzArcm5DRmlYTmdzTU9QYjhWeTN5SFpVVURZbnRzVllac0lFaU42QldZRnJq?=
- =?utf-8?B?ZXJ4TU5Yb24zNFUxSWJQcDRGM3dmNHlMR0hVd0VRQkZZVlFvVmMwaWJhS0Iv?=
- =?utf-8?B?T3NVR1VNejkzZGUrUzd3dERsM2VQM3RHYzZON0lkUkRTRFpXM1BSdlZIY3JX?=
- =?utf-8?B?WS9qdkl5NDdZMU9vZ1dqVkN1UU12ZWJUZXNoL3c4UlZMSVRMT1doNUc5aXBo?=
- =?utf-8?B?Q1IyNUJSNG9yQmlQUzBqNjJMTTREUjlsaWJ0Q0tESk56Wk9lTFBHYmo5TVdF?=
- =?utf-8?B?cnR5M3lqV0I5VnVKQlQyaTlpSCs0c21tRDRaQXZBVWJadk5RakV4YWtBcERr?=
- =?utf-8?B?VVR0WDFIa0FqcEpxM0dWSUdkUHhZL0htSXhieDZVdHN5aVBNTGpFNzQralR4?=
- =?utf-8?B?Zzl0NE56eFJWUVl6NERMVi9kQ3RmRHF5M2szSVJVWFdUdGhmaDRpM21Mb2Vz?=
- =?utf-8?B?djJodGVIS01OVE16YWlSNGYyLytuMjVSRkttRThaNFJPZnVQQVI4RU1tUGZL?=
- =?utf-8?B?VytBenVFL1Z6RnJiaVh5Vk5Ndk9tdllxZExROXpDaE5Ca3k5b2NINFJVeXhv?=
- =?utf-8?B?M21BOHRCYkJpVUtsSThGcXlNRWNkeFhYWVlEOGVod3h4M2VJNnB6M005Nkxy?=
- =?utf-8?B?RHVxMjJIMUZyelFjb25JWlFnL0NHUTg2SUxVRlBwNWx5T0pJSEJ4ZmZCbitE?=
- =?utf-8?B?STZZbDJJNnQ4VnVRRWFqNVpKZHcrWFo3SkpHNmNkUjZTNFhhYUJUNGo5NnBa?=
- =?utf-8?B?Si9WblREclBoZVQyMEVmaWpIZXdRUThlcURiTTVWV0RrME5EMTAyZXdpZFVK?=
- =?utf-8?B?aTdwdWhqRXNyS2pnUXRVYlZKSjIzbEhHWldJMitQUkdXa3VNdkU2ekV2YlBJ?=
- =?utf-8?B?b0MyTHl4dkV4TzlTd3ZsdGxvVFJmK2hWTXRYa1YwYlc4aE1abkdGTHFmUzh2?=
- =?utf-8?B?YWhVb1c4RlNEdGxLUmIrd3NFY0svVVRzZGtqRUxTUzhoZ1JPVUNFRFhXVHNU?=
- =?utf-8?B?WDNDQ3N5UWFDam9FMXlEOHV6T0FwNzlTU1JuZ0ZFbExnY0h1ZktKS1QrZTRa?=
- =?utf-8?B?RndlTkVxV3k4bWhhbU44RWFEdW44L2taS25zOW8yL3hBc2gvMjRReURlT0Zx?=
- =?utf-8?B?R3ZKQWRScUpPZFpmeXNrY094Qk5sU210WVFlYkR0MGRHaTJVUWNVcUl4UUpB?=
- =?utf-8?B?TnNZL0gvMFZNaUc1Q2VZTnpCcHVkMzNDaFJ6L1A2R3ZsRmc1dlNLTitKSWdY?=
- =?utf-8?Q?8L5frpHSxEk1+baHUD?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b260ff8e-e283-4b27-b43c-08df0919c858
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB8660.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Sep 2026 17:44:05.2028
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yZG+1L62+QM99Ea2t+hI+/hSVChwLKkstz3FirtN3wLTt+HfLEG7UYr5Lvo2MAXRbf1l9YX/vp+ZDD78KYCMyw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB9162
+References: <CALAyJWrn7OQyQMd5OPoifn_3qe6iWNf1+xSSg_six-+po9kpvQ@mail.gmail.com>
+ <aphXfTJicnEde3R4@google.com>
+In-Reply-To: <aphXfTJicnEde3R4@google.com>
+From: Andrew Wilson <wizlonex@gmail.com>
+Date: Wed, 2 Sep 2026 15:14:48 -0400
+X-Gm-Features: AcwNN1UJNnt-8ayL0xjmSoouIWQ2GFKkS-vOs8cL869hId8ajPvh2JfxnCOJoF8
+Message-ID: <CALAyJWqXT=LFr2wAi4egPPQX57=NRK5tXJh_t4nOKqrJbfga3A@mail.gmail.com>
+Subject: Re: [REGRESSION] [6.12.y] crypto: ccp - Move SEV/SNP Platform
+ initialization to KVM breaks SEV-ES VM launch
+To: Sean Christopherson <seanjc@google.com>
+Cc: ashish.kalra@amd.com, aik@amd.com, herbert@gondor.apana.org.au, 
+	stable@vger.kernel.org, regressions@lists.linux.dev, thomas.lendacky@amd.com, 
+	john.allen@amd.com, davem@davemloft.net, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, 1145026@bugs.debian.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Shantanu,
+Hi Sean, Salvatore,
 
-Thanks for the review. Tycho is out for the next few weeks so picking on this
-in the meantime.
+Tested-by: Andrew Wilson <your.email@address.com>
 
-On 8/31/26 4:47 PM, Shantanu Sinha wrote:
-> [You don't often get email from shansinha@google.com. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
-> 
-> On Thu, Apr 30, 2026 at 10:07:16AM -0600, Tycho Andersen wrote:
->> +static int sev_firmware_shutdown_if_sev_initialized(struct sev_device *sev)
->> +{
->> +     int rc, error;
->> +     int sev_plat_state;
->> +
->> +     rc = sev_get_platform_state(&sev_plat_state, &error);
->> +     if (rc) {
->> +             if (error)
->> +                     rc = error;
->> +             dev_dbg(sev->dev, "SEV get platform state failed %d\n", rc);
->> +             return rc;
->> +     }
->> +
->> +     switch (sev_plat_state) {
->> +     case SEV_STATE_UNINIT:
->> +             return 0;
->> +     case SEV_STATE_INIT:
->> +             error = 0;
->> +             rc = __sev_platform_shutdown_locked(&error);
->> +             if (rc) {
->> +                     if (error)
->> +                             rc = error;
->> +                     dev_err(sev->dev, "SEV platform shutdown failed %d\n", rc);
->> +                     return rc;
->> +             }
->> +
->> +             sev_firmware_needs_reinit = true;
->> +             return 0;
-> 
-> Tested this on Milan and hit a failure during SEV re-init after firmware update.
-> 
-> __sev_platform_shutdown_locked() sets the FW platform state to UNINIT, but
-> sev_es_tmr and sev_init_ex_buffer remain firmware-owned in the RMP. When the
-> new firmware comes up, SEV_CMD_INIT_EX rejects the stale page state and fails
-> with SEV_RET_INVALID_PAGE_STATE (0x1A).
-> 
-> Tearing down the buffers on shutdown fixes it for us:
-> 
-> --- a/drivers/crypto/ccp/sev-dev.c
-> +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -1905,6 +1905,20 @@ static int sev_firmware_shutdown_if_sev_initialized(struct sev_device *sev)
->         }
-> 
-> +       if (sev_es_tmr) {
-> +               wbinvd_on_all_cpus();
-> +               __snp_free_firmware_pages(virt_to_page(sev_es_tmr),
-> +                                         get_order(sev_es_tmr_size),
-> +                                         true);
-> +               sev_es_tmr = NULL;
-> +       }
-> +
-> +       if (sev_init_ex_buffer) {
-> +               __snp_free_firmware_pages(virt_to_page(sev_init_ex_buffer),
-> +                                         get_order(NV_LENGTH),
-> +                                         true);
-> +               sev_init_ex_buffer = NULL;
-> +       }
-> +
->         sev_firmware_needs_reinit = true;
->         return 0;
-> 
-> (Could also pull this and the cleanup in __sev_firmware_shutdown() into a shared
-> helper. This logic is duplicated there.)
+(With strong assistance from Gemini guiding me through builds, module
+DKMS rebuilds, and interpreting logs!)
 
-Releasing the TMR and sev_init_ex_buffer pages makes sense here.
+I can confirm that commit 6b748c39d18e completely resolves the issue,
+and SEV, SEV-ES, AND SEV-SNP are fully functional on official Debian
+packages (tested on EPYC Rome and EPYC Milan servers).
 
-> 
->>       if (ret == FW_UPLOAD_ERR_NONE) {
->>               error = 0;
->>
->>               rc = sev_get_api_version();
->>               if (rc) {
->>                       if (error)
->>                               rc = error;
->>                       dev_err(sev->dev, "SEV query api version failed %d\n", rc);
->>               }
->>       }
->>
->> +     if (!dlfwex_wants_rollback)
->> +             sev_firmware_reinit_if_shutdown(sev);
-> 
-> If rc == SEV_RET_HWSEV_RET_UNSAFE, psp_dead is true but dlfwex_wants_rollback
-> is false, so it still falls through to re-init. Even though it is
-> recommended that the host should be rebooted after HARDWARE_UNSAFE,
-> reboot tooling can lag and we may want some buffer. Plus the kernel shouldn't
-> be touching a dead PSP anyway. Checking !psp_dead is a simple safeguard against
-> extra churn while awaiting restart:
-> 
-> +       if (!dlfwex_wants_rollback && !psp_dead)
->                 sev_firmware_reinit_if_shutdown(sev);
+Here are the test results from bare-metal hardware:
 
-Agreed. Matters more with the teardown above. init re-marks the TMR
-private before failing, stranding 2MB.
+1. Upstream v6.12.104 (Source build) on AMD EPYC (Rome):
+   * Tested SEV-ES: Functional, VMs launch cleanly.
 
-> 
-> I also moved the call to sev_firmware_reinit_if_shutdown() ahead of
-> sev_get_api_version() so sev->state is already restored to INIT before sev
-> status is queried. This is just to avoid unnecessary transient states.
-> Curious if that logic makes sense to you. Am I missing something that made
-> the original ordering strictly necessary?
-> 
+2. Debian 6.12.107-1 (linux-image-6.12.107+deb13-amd64) on AMD EPYC (Rome):
+   * Tested SEV & SEV-ES: Functional.
+   [    3.676036] kvm_amd: SEV enabled (ASIDs 16 - 253)
+   [    3.690542] kvm_amd: SEV-ES enabled (ASIDs 1 - 15)
+   [    3.735896] ccp 0000:26:00.1: SEV API:0.24 build:22
 
-Having an ordering isn't particularly necessary from what I can tell. It's
-arguably better than what we had where early-returns on the cached state, so
-re-initing first keys off the driver's own record of having shut down rather
-than off whatever the new firmware reports.
+3. Debian 6.12.107-1 (linux-image-6.12.107+deb13-amd64) on AMD EPYC (Milan)=
+:
+   * Tested SEV-SNP: Fully functional!
+   * Host log:
+     [    4.678767] kvm_amd: SEV enabled (ASIDs 256 - 509)
+     [    4.684694] kvm_amd: SEV-ES enabled (ASIDs 1 - 255)
+     [    4.690563] kvm_amd: SEV-SNP enabled (ASIDs 1 - 255)
+     [    6.212275] ccp 0000:47:00.1: SEV-SNP API:1.58 build:2
+   * Guest dmesg:
+     [    0.908804] Memory Encryption Features active: AMD SEV SEV-ES SEV-S=
+NP
+     [    0.908820] SEV: Status: SEV SEV-ES SEV-SNP
+     [    2.109524] SEV: SNP running at VMPL0.
+     [    3.439649] sev-guest sev-guest: Initialized SEV guest driver
+(using VMPCK0 communication key)
 
-The only issue I see is that it reports a stale API version. Refreshing the
-platform status within __sev_platform_init_locked() should do the trick.
+Because Debian builds KVM as a module (CONFIG_KVM_AMD=3Dm), we avoid the
+built-in CONFIG_KVM_AMD=3Dy SNP race on 6.12.y, so both SEV-ES and
+SEV-SNP are completely working out-of-the-box on 6.12.107-1.
 
-Thanks,
---Pratik
+Salvatore: Debian bug #1145026 can be marked fully resolved by
+linux-image-6.12.107-1.
+
+Thank you all very much!
+
+Very Respectfully,
+
+Andrew Wilson
+
+On Wed, Sep 2, 2026 at 1:06=E2=80=AFPM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> On Wed, Sep 02, 2026, Andrew Wilson wrote:
+> > #regzbot introduced: 3f8f0133a5fc9b32d0c308530320c3f2430ba5ab
+> >
+> > Hi all,
+> >
+> > I am writing to report a regression affecting AMD SEV-ES VM launches
+> > on the 6.12 stable branch (first noticed in 6.12.97+ / 6.12.101).
+> >
+> > I completed a git bisect between working and failing kernels, which poi=
+nted to:
+> >
+> > Commit: bb1c84647025 ("crypto: ccp - Move SEV/SNP Platform
+> > initialization to KVM")
+> > Upstream commit: 3f8f0133a5fc9b32d0c308530320c3f2430ba5ab
+> >
+> > ### Bisect & Verification Details:
+> > * Last Known Working: 8a599f4f74d4
+> > * First Broken Commit: bb1c84647025
+> > * Tested on 6.12.101: Cleanly reverting bb1c84647025 immediately
+> > resolves the issue and allows SEV-ES guests to boot normally.
+>
+> Can you try v6.12.104 or later?  I'm pretty sure this is fixed by commit
+> 6b748c39d18e ("KVM: SVM: Add support to initialize SEV/SNP functionality =
+in KVM"),
+> i.e. is the same thing as:
+> https://lore.kernel.org/all/20260814100652.225499-1-jinpu.wang@ionos.com
+>
+> Note, SNP is still buggered on 6.12.y if CONFIG_KVM_AMD=3Dy, I'll try and=
+ send a
+> backport for that soonish.
+> https://lore.kernel.org/all/521b22fa-ef09-4449-909f-0120edfc4b24@oracle.c=
+om
+>
+> > ### Failure Description:
+> > With commit bb1c84647025 applied, `sev_platform_init(&args)` is
+> > removed from `sev_pci_init()`, assuming KVM handles on-demand
+> > initialization.
+> >
+> > On bare metal, the PSP firmware appears to remain uninitialized (does
+> > not reach SEV_STATE_INIT at probe time). When QEMU initializes KVM and
+> > queries host SEV-ES capabilities, the ioctl fails with -EPERM:
+> >
+> >   qemu-system-x86_64: -accel kvm: sev_common_kvm_init: guest policy
+> > requires SEV-ES, but host SEV-ES support unavailable
+> >   qemu-system-x86_64: -accel kvm: failed to initialize kvm: Operation
+> > not permitted
+> >
+> > ### Hardware & Environment:
+> > * Tested on: AMD EPYC (Rome / Milan) Supermicro platforms
+> > * Kernel: Linux 6.12.101
+> > * Hypervisor: QEMU / KVM
+> >
+> > I have access to Naples, Rome, and Milan test hardware and am happy to
+> > test any patches, provide dmesg traces, or assist with debugging.  I
+> > am not a tech-expert of any kind, but I have time to do some testing
+> > if it helps.  THANK YOU for the great work.
+> >
+> > Original Debian bug reference:
+> > https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D1145026
