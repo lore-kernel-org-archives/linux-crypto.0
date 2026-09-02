@@ -1,50 +1,50 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83725413789;
-	Wed,  2 Sep 2026 21:36:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E78F4156FB;
+	Wed,  2 Sep 2026 21:37:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788384987; cv=none; b=VZ2jL1t6CijwUGu8bSzAebAuliPoEIud7vrswXiVVg8WfGnakVRtOc4w0hA/b955I5GcQVAc9b0kdcf9KGoOum17j4E6ZM/9Q3fSJcoOgUnXrDZh4XX/px99ypd0I3ahNRGgwGKtpqZLPlsafZkFsMhvbt4sVGX7+OYWkUUmjAg=
+	t=1788385039; cv=none; b=hAkhN/UWcjVJbgfrhTmPHXEIchKnc+tkaew2DBxAwBr1wBZ6aPHoDai4P/TKpas5HB4S1mVZqB5woRJ+ZIQlu3MqRNsN31StTuEJOTjg0drFMrGFoWg4yr2pqy07n10CMKSGn/uO7qaZ1VUxxpIEOWuIExFtzaxbqbaBont6s3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788384987; c=relaxed/simple;
-	bh=zPSdr+IvxP/V26ObBujgDG1I0hyayyzwehYcHX1nEe8=;
+	s=arc-20240116; t=1788385039; c=relaxed/simple;
+	bh=femY5lXBC+Srs3D/BfBUm8u/ecaAqzJAew5l9YhpZSE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hHgbT16rOYe14WW82dHVeDvqM5PeOEBwjW6wQGt6Itq/t9w+uzjrQmqkuzB7XUELRcSZ0/5uSHMtVFCFaNhhOmah2i9Lxz6ktkrhjiWTEqgIwvLdb5v/RPZcprY34BcqjYAP5YXWR0EoixJ1+QdGQCpOZXW4CunEHgRW4ze+qr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OKZXWGaA; arc=none smtp.client-ip=192.198.163.16
+	 In-Reply-To:Content-Type; b=ee/1XlQ7EdF4PA3g6K17JNCzDZ+uPEyoAZ/qYWUq5fYyYSZguJPY/7Fv7Owd8y5/HSHdhIQM8YtEdbGoUhwnmOJfeuebiNYtn5qaB3+RiPI3v4EWbliwwpHlm3uQ72F7B+0RDhO3wfPsxD3VLlPCQ72tXok0P/RiJPhfQ0wh2Lc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fzXpCqzF; arc=none smtp.client-ip=192.198.163.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OKZXWGaA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fzXpCqzF"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1788384983; x=1819920983;
+  t=1788385029; x=1819921029;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=zPSdr+IvxP/V26ObBujgDG1I0hyayyzwehYcHX1nEe8=;
-  b=OKZXWGaABGggzV4LpUR7qSjCrU5zcNTfpdYB9GE8TX0+zm0m50k+dEit
-   gfa6IgbBWIcAYYr8CvdxiBq7s1gYgAIx+pjebWOFi+tODbJDrrBPrRytD
-   z802EepJTDPIYsWaRfIvosJKakpsz/7VBH5FMsVewHz3jw++qlGy1Ftvt
-   h3AGX/TuUwQmkPeeM3sJd+vK49ieD6Q4Fn6GJl8BXFzy3lYJiEFt5xsK2
-   Wcah3HsLhnaw0nARrszhf+VnNsCLbpBw3ZgIsjEZB0hj3852CaqJFSlk+
-   dwPTBHrBXhoCCl7ymB/B752MeD4f3P9HDAUuar8PapaMyfbrobXLq1GVj
+  bh=femY5lXBC+Srs3D/BfBUm8u/ecaAqzJAew5l9YhpZSE=;
+  b=fzXpCqzFA8CbKBTHOO3eEtt+zqSThc1WhUzj5FZ3LhsrIJKD/MOG68e1
+   CLQpZp6LTbvTokmNCI9/ugxChSiDV6+vYHDm+5jOFYWhMMYVkg1BH5e4K
+   BTM1NUIWPLUJRtTnnZVF2XzhGPoK64RQh4S29MzedrSsCHHoG3ex40Yu8
+   oegg0VLzEAgnxqbmB8atkbPKYIsGcY+zXZDF0okSWpqi2EAOeFutK4uZM
+   bhJ0nzd4Fjdxw/l32uWlNWOwmhD6HB8kILt/LYxNtKXv1QArgFHztHglC
+   JpD2k3RRE2NnjYuXGWpXAN3lLV3mQOkNgksjHWg/94NFM9J9cqPWr7sQ7
    w==;
-X-CSE-ConnectionGUID: IZWZHu8QQ16KRwPGMJhxWg==
-X-CSE-MsgGUID: ykz5VemZTlmwvMNfO0V66Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11894"; a="76411902"
+X-CSE-ConnectionGUID: CpcU6/2MQVOl9RbyPCGxqg==
+X-CSE-MsgGUID: J/oNviswQ1SyCDioia0rpw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11894"; a="76412063"
 X-IronPort-AV: E=Sophos;i="6.25,258,1779174000"; 
-   d="scan'208";a="76411902"
+   d="scan'208";a="76412063"
 Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2026 14:36:18 -0700
-X-CSE-ConnectionGUID: BPREO4koT0G6FY2J3C+IfA==
-X-CSE-MsgGUID: A4n66Lg4TQioJT4sDbhDdg==
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2026 14:37:05 -0700
+X-CSE-ConnectionGUID: 1rwl89KwRY6m3EdPYB8JZA==
+X-CSE-MsgGUID: 5L49yWTER9iE9DNsinY6/Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.25,258,1779174000"; 
-   d="scan'208";a="268983533"
+   d="scan'208";a="268983626"
 Received: from cjhill-mobl.amr.corp.intel.com (HELO [10.125.110.134]) ([10.125.110.134])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2026 14:36:17 -0700
-Message-ID: <f36a65e9-a17b-410d-8e7c-2ed3265cdc50@intel.com>
-Date: Wed, 2 Sep 2026 14:36:16 -0700
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2026 14:37:03 -0700
+Message-ID: <9eeccb79-2b89-4d91-bbbd-75a26347ee15@intel.com>
+Date: Wed, 2 Sep 2026 14:37:02 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,8 +52,8 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 4/5] x86/sev: Add support to perform RMP optimizations
- asynchronously
+Subject: Re: [PATCH v13 5/5] x86/sev: Re-enable RMP optimizations on SNP guest
+ shutdown
 To: Ashish Kalra <Ashish.Kalra@amd.com>, tglx@kernel.org, mingo@redhat.com,
  bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
  seanjc@google.com, peterz@infradead.org, thomas.lendacky@amd.com,
@@ -66,7 +66,7 @@ Cc: pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
  nikunj@amd.com, darwi@linutronix.de, linux-kernel@vger.kernel.org,
  linux-crypto@vger.kernel.org, kvm@vger.kernel.org, linux-coco@lists.linux.dev
 References: <cover.1788296083.git.ashish.kalra@amd.com>
- <a31fc8c6d3f6c6bbe50dc4542c7091b0899d3e1b.1788296083.git.ashish.kalra@amd.com>
+ <e8a8d0ec63bda2db61cde7cf298a4ccb6a502c20.1788296083.git.ashish.kalra@amd.com>
 From: Dave Hansen <dave.hansen@intel.com>
 Content-Language: en-US
 Autocrypt: addr=dave.hansen@intel.com; keydata=
@@ -112,14 +112,18 @@ Autocrypt: addr=dave.hansen@intel.com; keydata=
  MTsCeQDdjpgHsj+P2ZDeEKCbma4m6Ez/YWs4+zDm1X8uZDkZcfQlD9NldbKDJEXLIjYWo1PH
  hYepSffIWPyvBMBTW2W5FRjJ4vLRrJSUoEfJuPQ3vW9Y73foyo/qFoURHO48AinGPZ7PC7TF
  vUaNOTjKedrqHkaOcqB185ahG2had0xnFsDPlx5y
-In-Reply-To: <a31fc8c6d3f6c6bbe50dc4542c7091b0899d3e1b.1788296083.git.ashish.kalra@amd.com>
+In-Reply-To: <e8a8d0ec63bda2db61cde7cf298a4ccb6a502c20.1788296083.git.ashish.kalra@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 9/2/26 14:28, Ashish Kalra wrote:
-> Add support for performing RMP optimizations asynchronously using a
-> dedicated workqueue.
+On 9/2/26 14:29, Ashish Kalra wrote:
+> Perform the re-optimization after a delay, using mod_delayed_work() so
+> that the delay timer is reset on each call. This batches multiple guest
+> terminations into a single pass: the re-optimization runs 10 seconds
+> after the *last* termination rather than after the first.
+> mod_delayed_work() also re-queues work that is already in-flight, so a
+> re-scan request during an active scan is not silently dropped.
 
-This is looking fine to me at this point:
+Simple enough.
 
 Reviewed-by: Dave Hansen <dave.hansen@linux.intel.com>
