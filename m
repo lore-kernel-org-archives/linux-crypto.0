@@ -1,118 +1,89 @@
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1F214E8E14
-	for <linux-crypto@vger.kernel.org>; Thu,  3 Sep 2026 15:42:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EDAB4EE869;
+	Thu,  3 Sep 2026 19:27:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788450160; cv=none; b=ux/4XiDEYRAkyBvmT7Iq+oLo6uxmJablHEeqdAvQwVpxfUKmBUyQXrumLkOzuKILmN6vgCaIcvnSqEROZErPQWI2izHnP8bfLdWwMtQ8eS/1S5qlIAaLnltbar/xpQNlMnk1z5n+ck0Qu+bzXJ9aLmsCvcbtG+b8hr1rbq2Irv4=
+	t=1788463628; cv=none; b=Sbppym602OFFRvaHJLZsNdaLzDKcHRJ30fY/oOqmFI6ovWZltXOEC4nITtOPJ5ASYI7wBhtbxAi0ngirPLUYHElRbJvj32QVTgrXRHrXPzrIIb4j+3b9WrDGhyb+OUsVm3hiLB+4IUsqKgTY6ju9dt4i97AIsqgaWigRtk6wo0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788450160; c=relaxed/simple;
-	bh=Krkxe12J+zKExjm+ys4pq56wu8sANIl9Xl6198K8bxs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=PF0CtOm47kytTxmUnSFurf+RMzGWu3saK4wMebMrL3zT0Ido/hYIKFIYeVDfBl9LZcSbTFPOcVGyIPuop+Suh+71aVVoP5rhw/Az0EhGBPWKIFnzPzTDrAMiN04bgNtEseoih1mgfIzsIIls1iNpsMLcYW3jEv3PRdQdOBFYoCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=thegoodpenguin.co.uk; spf=pass smtp.mailfrom=thegoodpenguin.co.uk; dkim=pass (2048-bit key) header.d=thegoodpenguin-co-uk.20251104.gappssmtp.com header.i=@thegoodpenguin-co-uk.20251104.gappssmtp.com header.b=wyQ6JHWa; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=thegoodpenguin.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=thegoodpenguin.co.uk
+	s=arc-20240116; t=1788463628; c=relaxed/simple;
+	bh=BgP8+95/6vEmrlIraHj47/zkIwElt+b1Drvj5uQW69w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B1zKsuynIa4ofiIV7gcSyM7VJLef66GiH2tC0CJ1/bWv+wIibQxxVJVspZ0TNLLMlLjMF/94OtM09G5PVnGXPtp+p9g7CDES+vH2tmNx6JuFcG7IQc+Eo6gr6Dc6dUw0k2wgR8SAIL9a20hEgq9PwMygfGtSiZ5VsTY1J8VYtZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iR+n84GJ; arc=none smtp.client-ip=100.103.45.18
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=thegoodpenguin-co-uk.20251104.gappssmtp.com header.i=@thegoodpenguin-co-uk.20251104.gappssmtp.com header.b="wyQ6JHWa"
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-39647aa9d52so1426186a91.0
-        for <linux-crypto@vger.kernel.org>; Thu, 03 Sep 2026 08:42:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=thegoodpenguin-co-uk.20251104.gappssmtp.com; s=20251104; t=1788450157; x=1789054957; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=vrQF0RfWVSyrposIdYBuKXDlowmFEDCZ8WICH5uaiDM=;
-        b=wyQ6JHWahQCr/IsIoFLyhycDxqzhtZVJL6sddGKAPpsVMcngER55T9sjuS41gxvlUe
-         9vJp/21lgttDY/+j7Jxez2+v9zn2lmpzFZp8DBaJktKE/5PkmFRg7EIlzkuLMThgZpHH
-         O8FECGN/BU7g5MouQRWM+5dS0irlqgQDtEgIJN7CKpr++NsP0P31eLAbIg2FS/4Ow5sz
-         YkPjgZhx5ODBbMFvpoOSs020w6npNPQ55mq66buPZ7OpEdlCmx7ncRg4lTu4thIA/P+j
-         mDjqQQyAE93RMPAnpKLWClob3mnRQaBKXyzgFrRqReYY1yuE/xgFOvLCnQ+vAaG2RhMj
-         ll8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788450157; x=1789054957;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :content-type:mime-version:subject:date:from:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=vrQF0RfWVSyrposIdYBuKXDlowmFEDCZ8WICH5uaiDM=;
-        b=dxYAuTNCTJB79O+CjPLlr9/sVCRcG3906qAUW1NT9cs2Lk513LoDjwP99dfgyxA2x3
-         k6+T5RON4gj3n18GpMawNSDIdZWlow0tVyHOUNsufHONlv51tOQZj0sCxl41P2WCuK8Y
-         3W6RuCkliF5b4SH/+DTHDCwNcz/JHdAS4QP5tuWxT5+xOcjoSnSUQ9lPhM/D8IZbcNxF
-         ytyzBboMRN22tWNBCxenlFWtmtmHUjvLORUZxBtg1X4O/GFd8l0h3P8svnbaRmaVeL3Z
-         y4Zc/2UUo7ZDT1uGZV0GiznH66d8nABUWuygsDuLK6SFT/eUgb8pl3Xz+tX3z2J/aLs7
-         +tRA==
-X-Gm-Message-State: AFuF++lRE0VlPzkb1DdFic+Y9bKqyFomleCzNuwhO151XjweyKvv14/t
-	8U6fHRY2HSq1Irl2QUlUl+Oz//Ie1+ysvonYQIuNzjFvHtdui2wvPnFCHvNhCxR/GnYs7ic5+QB
-	IOJQ94Xs=
-X-Gm-Gg: AYBFou16qJNNMFYIfg7Je0tfNE2wPxX/FS04d+xuMCdz50btm+oBkuo53h57/htC5LK
-	niYHDX3EwExLVRrhhlkQ2EiO7OJWjw/fgklvSiBkGw+BX94gmtGlxo0KZ/e6laKRN6oLtN7bL8r
-	bD/FPG0D8gg/WtQbK0yxKHK82cl1VamryTCv3UdvwgjHG8hk4Jk8ZNWMqBtp0f2lv/NZXK0VkCX
-	rWZqwpgZQq+fVYGGLD/3otMGcIePfI0/KatpcZzMJ7HCwCBfKm1LO86Q+YzkuNo6l26Q/upzwFB
-	zKzMTiMIoIPtO6zlse9wfxMcol3O232rp5S6jub9Dg6uRxEvwHiAGgbHcRgEN22WDiEZ9BqU1js
-	9vfQL23WqepzI13figA69yuodHPWAIEvK7LAj8228ftv/7DcF0biF41rL+2IFk+IqaQgzV3C/1M
-	/A7HmlUOrUhYo1TdxaMohP0CoOX6ErYU281K5nUq6kLwjDq9FhnxmPl4aUzy7yrJeIyYK9MFeD+
-	6L5H/4xXE8d+F9m
-X-Received: by 2002:a17:90b:518c:b0:38f:cfe2:fd3a with SMTP id 98e67ed59e1d1-39b0865357bmr7566591a91.15.1788450156766;
-        Thu, 03 Sep 2026 08:42:36 -0700 (PDT)
-Received: from [10.42.0.1] ([2a00:23c7:1d1a:9c01:521a:d95c:2f1e:64be])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-14324356931sm522926c88.4.2026.09.03.08.42.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Sep 2026 08:42:36 -0700 (PDT)
-From: "Pawel Zalewski (The Capable Hub)" <pzalewski@thegoodpenguin.co.uk>
-Date: Thu, 03 Sep 2026 16:42:17 +0100
-Subject: [PATCH 2/2] crypto: hisilicon/sec: use named initializers for
- acpi_device_id
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iR+n84GJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B22F1F000E9;
+	Thu,  3 Sep 2026 19:26:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1788463620;
+	bh=OvxzmwmAQY0Tv3mevNOknHbiI1QZip1if+quZm55a0Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=iR+n84GJ2aCL6sHqe5gvYhazIQroLXGxeWI5qlY5mq+gXYKcaimflwMa1EMJzd718
+	 CVk+c5qDFzZ6DoCiHVlp8/VLy9KcYecVKSIldSNBzv9uX3rngRvu2TBVuXuBiLgIZ8
+	 mvcj4wrdqh4HqM/tFS4hLHs7XuhcEn3DSz/ICeUePlrhGmoRYcVFHxd2PB+4r8OKtA
+	 W8g3RXTYo1pzhv3zSw4prgEQgtjWBndz/Mf8vk6KehojQGIaIdtWBah0h2HtUv/vo0
+	 iCSXm0ajhs1oNDmT7/b5aLCeCH0CKlPO57TU5VWzQRFFDcIAfMlNCe1AV5sHwF3h0o
+	 0IWVUxCqNokZw==
+Date: Thu, 3 Sep 2026 14:26:57 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: Ard Biesheuvel <ardb@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] lib/crc: arm64: Fix const keyword in asm prototypes
+Message-ID: <20260903192657.GA2344@quark>
+References: <1073b77747354d8d46d8804970acd80245e4c318.1788436846.git.geert+renesas@glider.be>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20260903-acpi-crypto-v1-2-253cc6fd9836@thegoodpenguin.co.uk>
-References: <20260903-acpi-crypto-v1-0-253cc6fd9836@thegoodpenguin.co.uk>
-In-Reply-To: <20260903-acpi-crypto-v1-0-253cc6fd9836@thegoodpenguin.co.uk>
-To: Tom Lendacky <thomas.lendacky@amd.com>, John Allen <john.allen@amd.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>, 
- "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
- "Pawel Zalewski (The Capable Hub)" <pzalewski@thegoodpenguin.co.uk>
-X-Mailer: b4 0.15.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1788450148; l=979;
- i=pzalewski@thegoodpenguin.co.uk; s=20260430; h=from:subject:message-id;
- bh=Krkxe12J+zKExjm+ys4pq56wu8sANIl9Xl6198K8bxs=;
- b=LMdxkZ9u2EsjjrwjJsmPaw1+YmF8oPJQ+Rs1S9Yq0E9Z+NHj/qHAxOcg1F42wFjFniWD3INu5
- tySBfldbaTBDSEASyy7uVONgqNAmblw47lNyLqTnfHY1ZSfld37CvYA
-X-Developer-Key: i=pzalewski@thegoodpenguin.co.uk; a=ed25519;
- pk=vHq4n9IonORH2GTzLv8r6CWAFHzgfBuNkQPXA8NSly0=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1073b77747354d8d46d8804970acd80245e4c318.1788436846.git.geert+renesas@glider.be>
 
-Use a designated initializer for the acpi_device_id fields
-which makes the code more readable and consistent with how
-lists are initialized in the rest of the kernel code base.
-Also drop explicitly setting fields to 0 where it is redundant.
+On Thu, Sep 03, 2026 at 02:03:50PM +0200, Geert Uytterhoeven wrote:
+> Commit d36cebe03c3ae4ea ("lib/crc32: improve support for arch-specific
+> overrides") corrected the position of the "const" keyword in the
+> arch-specific funcions, and replaced "unsigned char" by "u8" for
+> consistency.
+> 
+> Make the same change to the forward declarations for the asm
+> implementations.
+> 
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> ---
+>  lib/crc/arm64/crc32.h | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/lib/crc/arm64/crc32.h b/lib/crc/arm64/crc32.h
+> index 1939a5dee4772972..332d9092ba2f3875 100644
+> --- a/lib/crc/arm64/crc32.h
+> +++ b/lib/crc/arm64/crc32.h
+> @@ -7,13 +7,13 @@
+>  // The minimum input length to consider the 4-way interleaved code path
+>  static const size_t min_len = 1024;
+>  
+> -asmlinkage u32 crc32_le_arm64(u32 crc, unsigned char const *p, size_t len);
+> -asmlinkage u32 crc32c_le_arm64(u32 crc, unsigned char const *p, size_t len);
+> -asmlinkage u32 crc32_be_arm64(u32 crc, unsigned char const *p, size_t len);
+> +asmlinkage u32 crc32_le_arm64(u32 crc, const u8 *p, size_t len);
+> +asmlinkage u32 crc32c_le_arm64(u32 crc, const u8 *p, size_t len);
+> +asmlinkage u32 crc32_be_arm64(u32 crc, const u8 *p, size_t len);
+>  
+> -asmlinkage u32 crc32_le_arm64_4way(u32 crc, unsigned char const *p, size_t len);
+> -asmlinkage u32 crc32c_le_arm64_4way(u32 crc, unsigned char const *p, size_t len);
+> -asmlinkage u32 crc32_be_arm64_4way(u32 crc, unsigned char const *p, size_t len);
+> +asmlinkage u32 crc32_le_arm64_4way(u32 crc, const u8 *p, size_t len);
+> +asmlinkage u32 crc32c_le_arm64_4way(u32 crc, const u8 *p, size_t len);
+> +asmlinkage u32 crc32_be_arm64_4way(u32 crc, const u8 *p, size_t len);
 
-Signed-off-by: Pawel Zalewski (The Capable Hub) <pzalewski@thegoodpenguin.co.uk>
----
- drivers/crypto/hisilicon/sec/sec_drv.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+It's worth cleaning this up to use the usual convention, but we
+shouldn't claim that this is a "fix".
 
-diff --git a/drivers/crypto/hisilicon/sec/sec_drv.c b/drivers/crypto/hisilicon/sec/sec_drv.c
-index 2514a5e1f9b4..7d3fb8d67203 100644
---- a/drivers/crypto/hisilicon/sec/sec_drv.c
-+++ b/drivers/crypto/hisilicon/sec/sec_drv.c
-@@ -1285,7 +1285,7 @@ static const __maybe_unused struct of_device_id sec_match[] = {
- MODULE_DEVICE_TABLE(of, sec_match);
- 
- static const __maybe_unused struct acpi_device_id sec_acpi_match[] = {
--	{ "HISI02C1", 0 },
-+	{ .id = "HISI02C1" },
- 	{ }
- };
- MODULE_DEVICE_TABLE(acpi, sec_acpi_match);
-
--- 
-2.43.0
-
+- Eric
