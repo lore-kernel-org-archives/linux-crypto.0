@@ -1,122 +1,242 @@
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A860551FCA1
-	for <linux-crypto@vger.kernel.org>; Fri,  4 Sep 2026 18:36:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.208.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788546979; cv=pass; b=QbBn2NYMEl4qwEjMTzijCVHsqVTpdVnn34PPpE3bXl8/iUko89bq3wnqxKVd7FvnIcKxp0BovqoOWH6T/i1aV7cibwY2Om/bf9eyJa34m5xZ3NkhtSdSPxZ5zyX85tGhT74ZDDUPeWzo3QJ7Zgh82I4Y9whAOwuwYCnE54z/ps0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788546979; c=relaxed/simple;
-	bh=L+kEvddOAYt+2p4d1QGytEK36KNFtDsH3dz0SJzHKNg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=D9vlFusZUPsjqxcYWvUfKt5fQsCTMI8VV9H/+GWoAn8M8KngXISN5ooQb9zFVL5up6hKUOTBoRh5zVYLEQQKvGNAu3Gp7IE47k4I1eoJqaX/VBFQJzTeg37XYgCSq6GDBjcXKbpvVCL6TzE7WHB4Qv8ix7ikPhsitd5LIiSVVSQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ButpDVyu; arc=pass smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ButpDVyu"
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-6a5ebf75d62so2017940a12.1
-        for <linux-crypto@vger.kernel.org>; Fri, 04 Sep 2026 11:36:17 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1788546975; cv=none;
-        d=google.com; s=arc-20260327;
-        b=s3UMfDCfdWauTvyveaJZPsf+nVUxSjWMn51gzvk44bJX3boHC73eeMrShJHy66NpZv
-         YPPPA3GGj3XHWUTCj2b0NeFoETh8pft97EY3LBasKXuR2b6wDfiilx1saX8uMWuJl2cU
-         VRaUBAvWKfRAyGOy3qFJWREgFEDc9nfjOLpWUTRxpcbeIw4XAjckToDB44TRYydIbMQc
-         swqM8HDXFjEGPMkY0vPBUBX/3r9VEhX5ihZwCqdRSL9xwYUUJbVddOOnTEenno8vJ30H
-         +qYSlm0Q5SifARzvGOGuafwnOj6JcMGoRxYSHAzlW9jq8K5EikU55jfHXJUnQofc+hfk
-         ZPUg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20260327;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=gOkqG6TuNgAD5h74emORdEhCfU9eyK97BAx9wxJ6SUQ=;
-        fh=7cvKoD2ulm76bq8attQYd1bGL8l2sFn2Er3bgX41a6U=;
-        b=frfQ4EyFnzHmxTzKvZzb6Qp7zDTUZrAqv5qvZ//e4JTlebaEhda0KiWv4TisbKv+JP
-         NdjmRK86KuorKVWTc9gHTZ8DhlDPbu5Q1SmRM4VnFVfm683CMVU/jiv8HS1T10FkX8I9
-         4StBFkWJOZyxktS1iENMy8J3py94l9JCpALLy8OnN6KwtdZZ1AnSiGaQmkZL1nh8i96X
-         WU1t/DWisoQ6cLgrPJ97tLnJYA5RaH0dYjBoHopADl76jQ26w2FzeENcgpLaZiNoaBOv
-         tFRozyQuC4FXjLzpTHYAJtCq28sBhPTYvb6dmEWVO1DBHwJur0C1hKd8i2S2ev5rBLOI
-         KYnA==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20251104; t=1788546975; x=1789151775; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to:content-type;
-        bh=gOkqG6TuNgAD5h74emORdEhCfU9eyK97BAx9wxJ6SUQ=;
-        b=ButpDVyu1dZw7dqnMkU/XikTgVfwgYOEVGG801mbk2jZ4AJqnaKFrARMqqLFu3QK2H
-         q3reNMrkCH2AXolkBZ5XvcIyCpj4sOsPVwf5b3mYI234dgdA9TNeVZb3JfW/rOYjAwD4
-         mpQVnw8EN0rOH4t1ZxzbTUIWA2RE5aiFXImtPd6KhjlyJDpJ/Sg2N+i6rTsAN9Neszpv
-         knt/6OoBufFU1c5ZZqziC5Uzph9q0ezeRbnHJGUwEKagcFCqSFwCyE1UEuzDc+2Rlgbf
-         Aze8gxVye/i/9Of8R6meKFPEhvXpvBaSvwVQoeEIaJf6WAd/ZXz3HSZY9QFhpjdOul1N
-         NZzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788546975; x=1789151775;
-        h=content-transfer-encoding:content-type:cc:to:subject:message-id
-         :date:from:in-reply-to:references:mime-version:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=gOkqG6TuNgAD5h74emORdEhCfU9eyK97BAx9wxJ6SUQ=;
-        b=pyMcLOxYbGBZQLQJGTaoDB/CYe0rgAks78oViyaJw0BZXFezACnhoWQT9JBQ2NqSG7
-         cU9YnaKGs1mPpGSbYx/HBe5wHAw2+NMgRuX2fEBFFOOpbbyrbBKusSCdGeaTWyYEWzAz
-         6NCVO98sOcsVg9dBlzNxDVVtErE/laLncQzcEp22GEhdBLyMhJutqUNCMU+LzMDzRRnA
-         Cq5JKCPJzG3/Jgrl8Px9Ijz2TmCYZPNxNMALB00+6PCjfniL2pRRiDe24TDomPL3ltc5
-         Dg8hokV8ZsFapAd/XAfPpd75ddlCVX5o5SURxb1C8d1t5+Z0W7AKQm9b5WS4YZwpdnI2
-         H3Mw==
-X-Gm-Message-State: AFuF++m6UFrdxZqM4dM/AQa5tYTaHep5Hj5WMoUDSrVSgGZC0nT3sPKj
-	PUJ1yUdfQjiUDypa8F2UbLuBmmhi1d8wzRRIytjL5jszz1BxrkjeTuj6hgOOzloJ9W7jdbdHX9N
-	3Y3EX8r82aawfYHjQw1ZSsTvaP6lsi7M=
-X-Gm-Gg: AYBFou1Bmwlu2cuEyN8r5RgKtE5CFP0HkM11mOV60Kn6mh7xom2mkqqGBkGd9SHdhck
-	mLzX6/SAKKW0bHkiazw8JGgw9wCCpq2v4JEXtX7Is+m4nPr4B433V6olxMylLs5X4mf3Th3tEYE
-	zm8XCjhic2m1S9ctlNMigZQiq6BIXSrSN2MXzZkmWsrQxfqmC9HiKkfQG/0N75LApzwrYUKk8WL
-	EQFo2XaVAFA4xwyNr+gXaEUwCtMpLnJHVZuu1NwvcWDr7M/CoPJuO9pCmL5eGpu9Dkwws7kNAQr
-	B6snDQCciHfTkRcogp5G/kCPjvNkUIdgFZg+P5om4+LZYL1hlxEnekOkQtelqDi6J4URutl3+wT
-	FNY/SjB2LCLDS19K5Ida1HpTdsZ1iJBUFisD7DvGt4D8Ec6StLSJyfTcWj8uTSatgxBFqtR24qH
-	i/MCwFYbNpUrhbaeO3XHJ1dVKg523YFTan9Dj8mz0bJFW1G6RW/waaWIGGd4WTTGs/Hw==
-X-Received: by 2002:a05:6402:270c:b0:6a6:b2b9:61f9 with SMTP id
- 4fb4d7f45d1cf-6a7e9520211mr2501315a12.13.1788546975225; Fri, 04 Sep 2026
- 11:36:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79CEB37CD29;
+	Fri,  4 Sep 2026 18:53:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788548022; cv=none; b=BepW/RS+KbbPNWJCvHwKvfvLfsd6zxH5aLOcZtj8Qw16ZiYn7fqG/i0pj2JbG4syjEQj5agyLBk5GvGT7kLvjgKPsd6kGfMgRKl94rFQR9SAK/g+CRv/jPRUY2HqtkPgGHIWqHsbGWMxKG8/dFiYDubxzKfp9AvvJlPzxryy0HE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788548022; c=relaxed/simple;
+	bh=P7P537Dc8V/nS3XfHG9UWLma5/GgBOb4VKbgf/u9KCk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=iRakUx8OWmmhFqFqRlU0X9kWaC0mx9IUNsOlAaEDEnCjPLCUkvd3XUBthA6utvaqyC39M6dqo2QGo5Dd9O5XoaLIIaPnh49dXHsKXVAAd11xpLZYbVEGuS9h/RYo/JSqADkNIweeRy9nq8kOv/kQR3GwHN7JdjvtsMhIIANnavo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 171316035B; Fri, 04 Sep 2026 20:53:38 +0200 (CEST)
+From: Florian Westphal <fw@strlen.de>
+To: <netfilter-devel@vger.kernel.org>
+Cc: Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org
+Subject: [PATCH nf-next v4 01/13] rhashtable: add rhashtable_flush_and_free helper
+Date: Fri,  4 Sep 2026 20:53:09 +0200
+Message-ID: <20260904185321.30313-2-fw@strlen.de>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260904185321.30313-1-fw@strlen.de>
+References: <20260904185321.30313-1-fw@strlen.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260812185747.79173-1-rosenp@gmail.com> <apqPiw_Oar-BaAtv@gondor.apana.org.au>
-In-Reply-To: <apqPiw_Oar-BaAtv@gondor.apana.org.au>
-From: Rosen Penev <rosenp@gmail.com>
-Date: Fri, 4 Sep 2026 11:36:03 -0700
-X-Gm-Features: AcwNN1VP2B8NfhJAXVOMzia2qg2zEOCOf_CklIrufd2iLP7DY1YOBJrTMm_wENQ
-Message-ID: <CAKxU2N8ytLFpf_dCR_ymi6MmOqNDj+4XdxyPttYnr_pgrmyuVg@mail.gmail.com>
-Subject: Re: [PATCH] crypto: amcc: trng: use devm_of_iomap()
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Sep 4, 2026 at 2:29=E2=80=AFAM Herbert Xu <herbert@gondor.apana.org=
-.au> wrote:
->
-> On Wed, Aug 12, 2026 at 11:57:47AM -0700, Rosen Penev wrote:
-> > Convert of_iomap() to devm_of_iomap() so that the TRNG register
-> > mapping is automatically unmapped on driver detach, eliminating
-> > the need for manual iounmap() calls in the error and remove paths.
-> >
-> > Assisted-by: opencode:big-pickle
-> > Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> > ---
-> >  drivers/crypto/amcc/crypto4xx_trng.c | 7 ++-----
-> >  1 file changed, 2 insertions(+), 5 deletions(-)
->
-> Please check Sashiko:
->
-> https://sashiko.dev/#/patchset/20260812185747.79173-1-rosenp%40gmail.com
->
-> Thanks,
-So I guess conversion from void to int is needed beforehand.
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Will be used by upcoming ipset rhashtable conversion.
+
+"walk rht with unlink+free" triggers LLM reject pattern:
+"possible softirq CPU stall".
+
+"walk rht with unlink+free + cond_resched" triggers
+"possibly skipped elements".
+
+Add a helper to detach current hash backend storage from the
+rhashtable, then iterate and flush all contained elements.
+
+Cc: herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org
+Link: https://sashiko.dev/#/patchset/20260828152256.8759-1-fw%40strlen.de
+Assisted-by: Claude:claude-sonnet-5
+Signed-off-by: Florian Westphal <fw@strlen.de>
+---
+ Herbert: If you prefer to take this via the crypto tree, please
+ let me know.
+ Otherwise, an explicit Ack would be appreciated, so this can
+ be handled via nf-next.  Thanks.
+
+ net/ipv6/ila/ could be converted to use this helper too.
+
+ include/linux/rhashtable.h |  19 ++++++
+ lib/rhashtable.c           | 127 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 146 insertions(+)
+
+diff --git a/include/linux/rhashtable.h b/include/linux/rhashtable.h
+index 57a2a29bef0e..213e1cb77d45 100644
+--- a/include/linux/rhashtable.h
++++ b/include/linux/rhashtable.h
+@@ -255,6 +255,10 @@ void rhashtable_free_and_destroy(struct rhashtable *ht,
+ 				 void *arg);
+ void rhashtable_destroy(struct rhashtable *ht);
+ 
++void rhashtable_flush_and_free(struct rhashtable *ht,
++			       void (*free_fn)(void *ptr, void *arg),
++			       void *arg);
++
+ struct rhash_lock_head __rcu **rht_bucket_nested(
+ 	const struct bucket_table *tbl, unsigned int hash);
+ struct rhash_lock_head __rcu **__rht_bucket_nested(
+@@ -1335,4 +1339,19 @@ static inline void rhltable_destroy(struct rhltable *hlt)
+ 	rhltable_free_and_destroy(hlt, NULL, NULL);
+ }
+ 
++/**
++ * rhltable_flush_and_free - unlink and free all elements in the hash list table
++ * @hlt:	the hash list table to destroy
++ * @free_fn:	callback to release resources of element
++ * @arg:	pointer passed to free_fn
++ *
++ * See documentation for rhashtable_flush_and_free.
++ */
++static inline void rhltable_flush_and_free(struct rhltable *hlt,
++					   void (*free_fn)(void *ptr,
++							   void *arg),
++					   void *arg)
++{
++	rhashtable_flush_and_free(&hlt->ht, free_fn, arg);
++}
+ #endif /* _LINUX_RHASHTABLE_H */
+diff --git a/lib/rhashtable.c b/lib/rhashtable.c
+index 6362896e4f09..656c5021d8b2 100644
+--- a/lib/rhashtable.c
++++ b/lib/rhashtable.c
+@@ -1339,6 +1339,133 @@ void rhashtable_destroy(struct rhashtable *ht)
+ }
+ EXPORT_SYMBOL_GPL(rhashtable_destroy);
+ 
++struct rht_flush_arg {
++	struct rhashtable *ht;
++	void (*free_fn)(void *ptr, void *arg);
++	void *arg;
++};
++
++static void flush_cb(void *ptr, void *arg)
++{
++	struct rht_flush_arg *fa = arg;
++
++	atomic_dec(&fa->ht->nelems);
++	if (fa->free_fn)
++		fa->free_fn(ptr, fa->arg);
++}
++
++static void rhashtable_flush_one(struct rhashtable *ht, struct rhash_head *obj,
++				 void (*free_fn)(void *ptr, void *arg),
++				 void *arg)
++{
++	struct rht_flush_arg fa = {
++		.ht = ht,
++		.free_fn = free_fn,
++		.arg = arg,
++	};
++
++	rhashtable_free_one(ht, obj, flush_cb, &fa);
++}
++
++static void rhashtable_flush_chain(struct rhashtable *ht,
++				   struct bucket_table *tbl,
++				   unsigned int hash,
++				   void (*free_fn)(void *ptr, void *arg),
++				   void *arg)
++{
++	struct rhash_lock_head __rcu **bkt = rht_bucket_var(tbl, hash);
++	struct rhash_head *pos, *next;
++	unsigned long flags;
++
++	if (!bkt)
++		return;
++
++	flags = rht_lock(tbl, bkt);
++	pos = rht_ptr(bkt, tbl, hash);
++	rht_assign_unlock(tbl, bkt, NULL, flags);
++
++	/* Nothing can reach @pos through @tbl any more: the bucket has
++	 * been emptied above, and @tbl itself is unreachable from ht->tbl
++	 * (see rhashtable_flush_and_free()). Walk it the same way
++	 * rhashtable_free_and_destroy() walks a table it exclusively
++	 * owns.
++	 */
++	while (!rht_is_a_nulls(pos)) {
++		next = rcu_dereference_raw(pos->next);
++		rhashtable_flush_one(ht, pos, free_fn, arg);
++		pos = next;
++	}
++}
++
++/**
++ * rhashtable_flush_and_free - detach and discard all current elements
++ * @ht:		the hash table to flush
++ * @free_fn:	callback to release resources of an element, may be %NULL
++ * @arg:	pointer passed to free_fn
++ *
++ * Swaps the bucket table backing @ht for a new, empty table.
++ *
++ * The detached table is then walked and every element found is
++ * unlinked, and, if @free_fn is given, handed to it for release.
++ * Note that RCU protected readers may still be accessing the elements.
++ * Releasing of resources must occur in a compatible manner.
++ *
++ * Unlike rhashtable_destroy(), @ht is left fully initialized and may
++ * continue to be used for lookups, insertions, and removals.
++ *
++ * This function may sleep, it cannot be called from atomic context or
++ * RCU read-side critical sections.
++ */
++void rhashtable_flush_and_free(struct rhashtable *ht,
++			       void (*free_fn)(void *ptr, void *arg),
++			       void *arg)
++{
++	struct bucket_table *tbl, *old_tbl, *last_tbl, *new_tbl;
++	struct rhashtable_walker *walker;
++	unsigned int i;
++
++	new_tbl = bucket_table_alloc(ht, rounded_hashtable_size(&ht->p),
++				     GFP_KERNEL);
++	if (!new_tbl)
++		new_tbl = bucket_table_alloc(ht, ht->p.min_size,
++					     GFP_KERNEL | __GFP_NOFAIL);
++
++	mutex_lock(&ht->mutex);
++
++	/* Splice the new, empty table onto the tail of the live table ... */
++	old_tbl = rht_dereference(ht->tbl, ht);
++	do {
++		last_tbl = rhashtable_last_table(ht, old_tbl);
++	} while (rhashtable_rehash_attach(ht, last_tbl, new_tbl));
++
++	/* ...then publish it as ht->tbl. */
++	rcu_assign_pointer(ht->tbl, new_tbl);
++	mutex_unlock(&ht->mutex);
++
++	tbl = old_tbl;
++	do {
++		struct bucket_table *next_tbl = rcu_dereference_raw(tbl->future_tbl);
++
++		for (i = 0; i < tbl->size; i++) {
++			cond_resched();
++			rhashtable_flush_chain(ht, tbl, i, free_fn, arg);
++		}
++
++		spin_lock(&ht->lock);
++		list_for_each_entry(walker, &tbl->walkers, list)
++			walker->tbl = NULL;
++		/* See rhashtable_rehash_table(): done under ->lock so
++		 * rhashtable_walk_stop() can use rcu_head_after_call_rcu()
++		 * to decide whether to re-link the walker onto this table.
++		 */
++		call_rcu(&tbl->rcu, bucket_table_free_rcu);
++		spin_unlock(&ht->lock);
++
++		tbl = next_tbl;
++	} while (tbl && tbl != new_tbl);
++}
++EXPORT_SYMBOL_GPL(rhashtable_flush_and_free);
++
+ struct rhash_lock_head __rcu **__rht_bucket_nested(
+ 	const struct bucket_table *tbl, unsigned int hash)
+ {
+-- 
+2.55.0
+
