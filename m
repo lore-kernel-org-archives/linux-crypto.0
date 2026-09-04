@@ -1,432 +1,1627 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A07244052B3
-	for <linux-crypto@vger.kernel.org>; Fri,  4 Sep 2026 05:18:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C473372B4B;
+	Fri,  4 Sep 2026 05:38:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788499099; cv=none; b=m1YuprLI7iaPFg5lvlcNjl6hHXjLoavFxZqkHhbcYGucwr6L6JB5eBcdpgAYdi3DAnSquO7wFffV4SRXDZSgiaq7cvIie+5byvJQ977WSbR+EwbBKPS0R8yu7iNB4kth6oukG2Yd/G9F6c39sToZG4RU5DTgiquGZ9gMD/QW2u0=
+	t=1788500286; cv=none; b=KmhjwutcPp93uwJkyY9uAqS/CeLsz82TlHoJPBXOVZuhxYygdi10BFo4pnSDSrnXGv5oGUfQBsmuCYUdWuVL8S0KrUckTsLPe8r6Vbp4nMjLlwb/8+lH0GDTlCwy6ht6qC6dGIu+hFq3crvLtbZNgKAR55V+khrnOGYr/REzc4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788499099; c=relaxed/simple;
-	bh=PVZ9eHReuYnTMoyciAfMl+RD98428HxfjYeb9Wer9fo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ufo8IEO48dMIAQXvtsJsiyQNTRNqaAZv1YL0CNVdVwoGBy2cp9YC29gA6BQh2VUmLHMkkMQqeh46Tr/NfDfZzQ5aLTPsnjb29qx1A2KWj56bHX8HXQLRorVBg7wCrOiwk2AM/KRLU7oSz7Je1pStYc7b4AdvCZCpw9nYq+T4Cgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=beagleboard.org; spf=fail smtp.mailfrom=beagleboard.org; dkim=pass (2048-bit key) header.d=beagleboard.org header.i=@beagleboard.org header.b=NjhBSzJ3; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=beagleboard.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=beagleboard.org
+	s=arc-20240116; t=1788500286; c=relaxed/simple;
+	bh=xlTchjCZDsfmY4IzifrC+s9Mgxsp4BSMfvqW1XF5fPI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D9HtkhSV2HSFUZrx7f2EMmAySeLRlIhKV8v3Jd10BbeafyxOMBmZ8qWAu5HHTRbuZz0P4ZhzNmmXJPlJneFKnfH0oQxSzBjZzTRvuPMqkpAH8bAjGrtaFmliuhj3W/Rks+cFz4mfUQVRp303LmE7UQWPg0SEkTSjVhKoghCf2WQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=CqK3g0sP; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=beagleboard.org header.i=@beagleboard.org header.b="NjhBSzJ3"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2d944747d41so7364685ad.0
-        for <linux-crypto@vger.kernel.org>; Thu, 03 Sep 2026 22:18:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=beagleboard.org; s=google; t=1788499096; x=1789103896; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to
-         :content-type;
-        bh=Z2hQFqjUjUJQ8GhG2goFYJH6oWr2LV0yBObso/k+lbM=;
-        b=NjhBSzJ35RF9q3X79+Ui7hi/Zm1kF7BqFPbFFfxSQX7SpXymfN5zapcPR/Bevnd/OZ
-         9+rMLuDquz0hKEyQ49/a7Zqy7eI1s1TcrTiaaZ3V1S62arefZoeNrrRz3r3Py5SaZz8Q
-         iqGaB+n5NO8L+jWElFLJQZ/Lx6PwnBe9lhqQzIJ3a/B+Is7Zw5DoZSdaS672oAGk35C8
-         l1qUobg3bF6dAdqGWIw6tkNKW7hD46CeMwkOnA/txSPnMR8xNz2i4J4T/SSmujb3Ztnw
-         BMRRXSH5Q3VVQ0dUn+Ysa9ikZA0fWDerLJ4kqEW+YacDBGBZELYsZwzeGY9DU+00T8vK
-         tPqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20251104; t=1788499096; x=1789103896;
-        h=content-transfer-encoding:content-type:in-reply-to:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to:content-type;
-        bh=Z2hQFqjUjUJQ8GhG2goFYJH6oWr2LV0yBObso/k+lbM=;
-        b=lS33tLYp4f4IpyZXB6E4Dtan+g/pfMg1WOt3eDE+evVuoy1tl+loVZXYS/wR8Urdb2
-         xVQ4P6RFAPFcOtq4UdK35CIHafpqCDjBmce0HkZMUAvIKS8iyanfue6YFqJQ6dAIAdie
-         p/KUSNv0UKR6AQarX3XWjNyewCduibUdQkkNzrUJkOzzNXwMEGd+jX5oR3Pnhf7BVSxC
-         GXI3qMGN3o+M3QgDRG7qcMfumTR7BMtH3dzrNpnNV2IetELRW4Q4FYNvnzg9jg61cQzW
-         Hz3hLlT4X+xOElIFP6hw3zJ4Z7D6VjnYGAw15CfQqqdNaaRzrBJQyn8fIJTnd+zMUbM4
-         9i6g==
-X-Forwarded-Encrypted: i=1; AKwUvBxiJjkM0z83mqEEQVeIC1RjdbePXCZQbPvjszv1ZPtlJ9jY8yZXmLdn9qmlmxZAEuwZqevY6d6BQbKwRqM=@vger.kernel.org
-X-Gm-Message-State: AFuF++kfbC9PhkLOaONI7G61ftAz5i+ULilCapUzME6npCqsL3Y8UzDr
-	TYfEgKAdF3Z6xdUKoxytIEZ3DhdAGzuqdAFLtkSvtWp977pJXqfLCwBGJ+0DDZ6nhA==
-X-Gm-Gg: AYBFou1BeirfMGvt+Ovi+Nox4MEBt54zRTFxEbfuyq2m6J1n3EE3vg/rgkAwNWYXU8v
-	+5hLwKDvpn8Xu6YbVf9HLhZiNvhnkUsCccoYOR2Uyb7cFMdq/xnQnDwcIChqa/wo0PehrpwEDpR
-	VcBAJ8xeoZz6w0cnGdriIyRzzw6k+zahfOfKbuVe06/EdAK8C3SEADjS6gvnTxBPuhTjfEkIxe7
-	1UTqsXfEGtUoMkPlGH7SlVs5qOUnbAuTkVbvbJPJIsRpkH4ShU0ZYOE/moh0VdVSuI8A3ooFV0z
-	3aAnmriZSgrM3DXbWlPwwoAD6hrH/OzneB6vzqxys5BlRTbBPyxXVBh39b365nM4tkPH+1EA9yk
-	zteRDdXvhyrmyRrymjsypI4d7i8n/PwITTvC/y6H1Bl2RmLAOWoh9ou5Mb6XRgW//0Y9YLW1pv/
-	D2IGl77RmIMh2pLqB37zx0quKLzr4lXjJ+g4C25pMzjJLyOaZJ/zb1c9u5LuBNiDq0nWKFvsktd
-	LC31Omj+9bW1ja+UqWY/duaTEOiVfPRUQ5hJfU=
-X-Received: by 2002:a17:90b:5844:b0:398:e436:370 with SMTP id 98e67ed59e1d1-39b260ff0e9mr6299886a91.2.1788499095839;
-        Thu, 03 Sep 2026 22:18:15 -0700 (PDT)
-Received: from ?IPV6:2405:201:4019:32fc:3c55:6b24:5147:322b? ([2405:201:4019:32fc:3c55:6b24:5147:322b])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2db148404d1sm4836965ad.6.2026.09.03.22.18.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Sep 2026 22:18:15 -0700 (PDT)
-Message-ID: <40f71ade-9266-4373-b584-634d91bdf670@beagleboard.org>
-Date: Fri, 4 Sep 2026 10:48:05 +0530
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="CqK3g0sP"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=P4QFGemLqNsWd4oZv1yCsm/W09oDs/+uk73ZRfcx0Rg=; 
+	b=CqK3g0sPZQ7QNdIlu+uUgi444w8LuM2lPmqvBgsVS45Nb1RgYKhC1mjpRzhpeEYt0W/fsV0kHQh
+	gFznNX8T9fYwI849EsTd67FhB1f/Hi9N/WouBqYn2bx7FLR0mB2uIXC+/VaHtd7DsUPEAR79ryc+2
+	//t5dXsgtrGR5uc9o/MXw6BHEnqo2uhNiTgh86AE+NYv5ZAGNUBPGPz56AsuimgaWF1HOgWdkwM9o
+	Tzq1C+M2qg/lp2PGv/TKRUPuDYkj+K2hwU5Px+ks7oS0ia8mhNMoaEEQkAMZGAbG5cL4EYRfh6tCT
+	xETAY2eyIkzQMco1BBmTQew+u8wYVMlBe6gA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1x2Mcb-0000000Aikr-46ZM;
+	Fri, 04 Sep 2026 13:37:55 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 04 Sep 2026 15:37:53 +1000
+Date: Fri, 4 Sep 2026 15:37:53 +1000
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Changwei Zou <changwei.zou@canonical.com>
+Cc: davem@davemloft.net, gaurav.jain@nxp.com, horia.geanta@nxp.com,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	lukas@wunner.de, pankaj.gupta@nxp.com
+Subject: [PATCH] crypto: caam - Remove public key support
+Message-ID: <appZMZ7WS-KNaHbc@gondor.apana.org.au>
+References: <an-6Mew-8fQaf5sb@gondor.apana.org.au>
+ <20260821051824.808269-1-changwei.zou@canonical.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 7/7] greybus: Add Rust UART node driver
-To: Markus Probst <markus.probst@posteo.de>,
- Jason Kridner <jkridner@beagleboard.org>, robertcnelson@gmail.com,
- Johan Hovold <johan@kernel.org>, Alex Elder <elder@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Miguel Ojeda <ojeda@kernel.org>, Boqun Feng <boqun@kernel.org>,
- Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?=
- <bjorn3_gh@protonmail.com>, Benno Lossin <lossin@kernel.org>,
- Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>,
- Trevor Gross <tmgross@umich.edu>, Danilo Krummrich <dakr@kernel.org>,
- Daniel Almeida <daniel.almeida@collabora.com>,
- Tamir Duberstein <tamird@kernel.org>, Alexandre Courbot
- <acourbot@nvidia.com>, =?UTF-8?Q?Onur_=C3=96zkan?= <work@onurozkan.dev>,
- Eric Biggers <ebiggers@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
- Ayush Singh <ayush@beagleboard.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Lorenzo Stoakes <ljs@kernel.org>,
- Vlastimil Babka <vbabka@kernel.org>, "Liam R. Howlett" <liam@infradead.org>,
- Uladzislau Rezki <urezki@gmail.com>
-Cc: greybus-dev@lists.linaro.org, linux-kernel@vger.kernel.org,
- rust-for-linux@vger.kernel.org, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org
-References: <20260827-gb-uart-transport-v2-0-a03bb1f5fbd1@beagleboard.org>
- <20260827-gb-uart-transport-v2-7-a03bb1f5fbd1@beagleboard.org>
- <08c89a754cd7cd43b0cc6d5f1e84cd6df7253c68.camel@posteo.de>
-Content-Language: en-US
-From: Ayush Singh <ayush@beagleboard.org>
-In-Reply-To: <08c89a754cd7cd43b0cc6d5f1e84cd6df7253c68.camel@posteo.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20260821051824.808269-1-changwei.zou@canonical.com>
 
-On 9/4/26 2:19 AM, Markus Probst wrote:
+On Fri, Aug 21, 2026 at 03:18:24PM +1000, Changwei Zou wrote:
+> 
+> A new version with two patches and a cover letter is available at the following link.
 
-> On Thu, 2026-08-27 at 13:24 +0530, Ayush Singh wrote:
->> Add a driver for Greybus nodes attached over a plain serial port. The
->> node is registered with the software SVC (gb-softsvc), which handles the
->> SVC protocol on behalf of the AP, so no dedicated coprocessor running
->> SVC firmware is needed.
->>
->> Greybus messages are carried over HDLC framing on the wire. Each frame
->> carries a one-byte address (0x01 for Greybus) and control byte, followed
->> by the 16-bit CPort ID and the Greybus message itself.
->>
->> Port parameters are taken from the firmware node: "baudrate" if
->> present, otherwise 115200, with flow control and parity disabled.
->>
->> Since gb-uart-node imports types from gb-softsvc, Rust to Rust calling
->> setup from nova-core [0] is being used.
->>
->> [0]: https://lore.kernel.org/all/20260622-nova-exports-v5-0-6191773fc977@nvidia.com/
->>
->> Signed-off-by: Ayush Singh <ayush@beagleboard.org>
->> ---
->>   MAINTAINERS                     |   1 +
->>   drivers/greybus/.gitignore      |   1 +
->>   drivers/greybus/Kconfig         |  15 +++
->>   drivers/greybus/Makefile        |  48 ++++++++
->>   drivers/greybus/gb_uart_node.rs | 245 ++++++++++++++++++++++++++++++++++++++++
->>   5 files changed, 310 insertions(+)
->>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index d047090be5f4..49c6dac72748 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -11339,6 +11339,7 @@ M:	Ayush Singh <ayush@beagleboard.com>
->>   L:	greybus-dev@lists.linaro.org (moderated for non-subscribers)
->>   S:	Maintained
->>   F:	Documentation/devicetree/bindings/beagle/beagle,beagleconnect-freedom.yaml
->> +F:	drivers/greybus/gb_uart_node.rs
->>   
->>   GREYBUS SUBSYSTEM
->>   M:	Johan Hovold <johan@kernel.org>
->> diff --git a/drivers/greybus/.gitignore b/drivers/greybus/.gitignore
->> new file mode 100644
->> index 000000000000..ff9c4a3539b4
->> --- /dev/null
->> +++ b/drivers/greybus/.gitignore
->> @@ -0,0 +1 @@
->> +exports_gb_softsvc_generated.h
->> diff --git a/drivers/greybus/Kconfig b/drivers/greybus/Kconfig
->> index 381d1a6ee135..34de913af287 100644
->> --- a/drivers/greybus/Kconfig
->> +++ b/drivers/greybus/Kconfig
->> @@ -60,5 +60,20 @@ config GREYBUS_SOFTSVC
->>   	  To compile this code as a module, choose M here: the module
->>   	  will be called gb-softsvc.ko
->>   
->> +config GREYBUS_UART_NODE
->> +	tristate "Greybus UART node transport"
->> +	depends on RUST
->> +	depends on GREYBUS_SOFTSVC
->> +	depends on RUST_SERIAL_DEV_BUS_ABSTRACTIONS
->> +	select RUST_CRC_CCITT_ABSTRACTIONS
->> +	help
->> +	  Select this option if you have a Greybus node connected over a
->> +	  serial port. The node is registered with the software SVC, which
->> +	  handles the SVC protocol on behalf of the AP, so no dedicated
->> +	  coprocessor running SVC firmware is required.
->> +
->> +	  To compile this code as a module, choose M here: the module
->> +	  will be called gb-uart-node.ko
->> +
->>   endif	# GREYBUS
->>   
->> diff --git a/drivers/greybus/Makefile b/drivers/greybus/Makefile
->> index e6f594128802..81151963c01e 100644
->> --- a/drivers/greybus/Makefile
->> +++ b/drivers/greybus/Makefile
->> @@ -28,3 +28,51 @@ obj-$(CONFIG_GREYBUS_ES2)	+= gb-es2.o
->>   obj-$(CONFIG_GREYBUS_SOFTSVC)	+= gb-softsvc.o
->>   gb-softsvc-y			+= gb_softsvc.o gb_softsvc_exports.o
->>   
->> +obj-$(CONFIG_GREYBUS_UART_NODE)	+= gb-uart-node.o
->> +gb-uart-node-y			+= gb_uart_node.o
->> +
->> +# Export Rust symbols from gb-softsvc only if gb-uart-node actually references them.
->> +gb-softsvc-export-deps := $(if $(CONFIG_GREYBUS_UART_NODE),$(obj)/gb_uart_node.o)
->> +
->> +rust_needed_exports = \
->> +	{ $(if $(strip $(2)),$(NM) -u $(2);,) echo "__DEFINED_RUST_SYMBOLS__"; \
->> +	  $(NM) -p --defined-only $(1); } | \
->> +	awk -v fmt='$(3)' ' \
->> +		/^__DEFINED_RUST_SYMBOLS__$$/ { defs = 1; next } \
->> +		!defs { if ($$NF ~ /^_R/) needed[$$NF] = 1; next } \
->> +		defs && $$2 ~ /(T|R|D|B)/ && $$3 ~ /^_R/ && \
->> +			$$3 !~ /_(init|cleanup)_module$$/ && \
->> +			$$3 !~ /__(pfx|cfi|odr_asan)/ && \
->> +			$$3 in needed { printf fmt, $$3 } \
->> +	'
->> +
->> +quiet_cmd_exports = EXPORTS $@
->> +      cmd_exports = \
->> +	$(call rust_needed_exports,$<,$(gb-softsvc-export-deps),EXPORT_SYMBOL_RUST_GPL(%s);\n) > $@
->> +
->> +$(obj)/exports_gb_softsvc_generated.h: $(obj)/gb_softsvc.o $(gb-softsvc-export-deps) FORCE
->> +	$(call if_changed,exports)
->> +
->> +targets += exports_gb_softsvc_generated.h
->> +
->> +$(obj)/gb_softsvc_exports.o: $(obj)/exports_gb_softsvc_generated.h
->> +CFLAGS_gb_softsvc_exports.o := -I $(objtree)/$(obj)
->> +
->> +ifdef CONFIG_MODVERSIONS
->> +# The C export shim declares Rust symbols as `extern int`, so reuse its export
->> +# list but generate symbol CRCs from the Rust object instead of the shim's DWARF.
->> +$(obj)/gb_softsvc_exports.o: private cmd_gensymtypes_c = \
->> +	$(call getexportsymbols,\1) | \
->> +	$(objtree)/scripts/gendwarfksyms/gendwarfksyms \
->> +		$(if $(KBUILD_GENDWARFKSYMS_STABLE), --stable) \
->> +		$(if $(KBUILD_SYMTYPES), --symtypes $(@:.o=.symtypes),) \
->> +		$(obj)/gb_softsvc.o
->> +endif
->> +
->> +# Output nova-core's crate metadata for use by nova-drm at compile time.
->> +RUSTFLAGS_gb_softsvc.o += \
->> +	--emit=metadata=$(objtree)/$(obj)/libgb_softsvc.rmeta
->> +
->> +# Allow nova-drm to import nova-core's types.
->> +$(obj)/gb_uart_node.o: $(obj)/gb_softsvc.o
->> +RUSTFLAGS_gb_uart_node.o := -L $(objtree)/$(obj) --extern gb_softsvc
->> diff --git a/drivers/greybus/gb_uart_node.rs b/drivers/greybus/gb_uart_node.rs
->> new file mode 100644
->> index 000000000000..3eb4f8ab3655
->> --- /dev/null
->> +++ b/drivers/greybus/gb_uart_node.rs
->> @@ -0,0 +1,245 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +
->> +//! Greybus UART Node driver
->> +
->> +use kernel::{
->> +    alloc::Flags,
->> +    crc_ccitt::crc_ccitt,
->> +    device::{
->> +        AsBusDevice,
->> +        Bound,
->> +        Core, //
->> +    },
->> +    error::code,
->> +    new_spinlock, of,
->> +    prelude::*,
->> +    serdev,
->> +    sync::{
->> +        aref::ARef,
->> +        Arc,
->> +        SpinLock, //
->> +    },
->> +};
->> +
->> +use zerocopy::little_endian;
->> +use zerocopy_derive::{FromBytes, Immutable, KnownLayout};
->> +
->> +const HDLC_MAX_FRAME_LEN: usize = 256;
->> +
->> +const HDLC_FRAME: u8 = 0x7E;
->> +const HDLC_ESC: u8 = 0x7D;
->> +const HDLC_XOR: u8 = 0x20;
->> +const HDLC_EXPECTED_CRC: u16 = 0xf0b8;
->> +
->> +const ADDRESS_GREYBUS: u8 = 0x01;
->> +
->> +#[repr(C, packed)]
->> +#[derive(FromBytes, Immutable, KnownLayout)]
->> +struct GreybusFrame {
->> +    cport: little_endian::U16,
->> +    msg: [u8],
->> +}
->> +
->> +struct HdlcRx {
->> +    rx_buf: KVec<u8>,
->> +    rx_in_esc: bool,
->> +    sdev: ARef<serdev::Device>,
->> +    node: gb_softsvc::Module,
->> +}
->> +
->> +impl HdlcRx {
->> +    fn new(sdev: ARef<serdev::Device>, node: gb_softsvc::Module) -> Result<Self> {
->> +        Ok(Self {
->> +            node,
->> +            sdev,
->> +            rx_buf: KVec::with_capacity(HDLC_MAX_FRAME_LEN, GFP_KERNEL)?,
->> +            rx_in_esc: false,
->> +        })
->> +    }
->> +
->> +    fn frame_finish(&self) -> Result<()> {
->> +        if self.rx_buf.len() < 4 {
->> +            return Err(code::EFAULT);
->> +        }
->> +
->> +        let crc = crc_ccitt(0xffff, &self.rx_buf);
->> +        if crc != HDLC_EXPECTED_CRC {
->> +            dev_warn!(self.sdev.as_ref(), "CRC failed {}", crc);
->> +            return Ok(());
->> +        }
->> +
->> +        let addr = self.rx_buf[0];
->> +        let _ctrl = self.rx_buf[1];
->> +        let payload = &self.rx_buf[2..self.rx_buf.len() - size_of::<u16>()];
->> +
->> +        match addr {
->> +            ADDRESS_GREYBUS => {
->> +                let frame = GreybusFrame::ref_from_bytes(payload).map_err(|_| code::EINVAL)?;
->> +                self.node.submit_message(0, frame.cport.into(), &frame.msg)
->> +            }
->> +            _ => Err(code::EINVAL),
->> +        }
->> +    }
->> +
->> +    fn rx(&mut self, data: &[u8]) -> usize {
->> +        for i in data.iter() {
->> +            match *i {
->> +                HDLC_FRAME => {
->> +                    if !self.rx_buf.is_empty() {
->> +                        if let Err(e) = self.frame_finish() {
->> +                            dev_warn!(self.sdev.as_ref(), "bad frame: {e:?}\n");
->> +                        }
->> +                    }
->> +
->> +                    self.rx_buf.clear();
->> +                    self.rx_in_esc = false;
->> +                }
->> +                HDLC_ESC => self.rx_in_esc = true,
->> +                _ => {
->> +                    let c = if self.rx_in_esc { *i ^ HDLC_XOR } else { *i };
->> +                    self.rx_in_esc = false;
->> +
->> +                    if self.rx_buf.push_within_capacity(c).is_err() {
->> +                        dev_warn!(self.sdev.as_ref(), "buffer overflow. Dropping frame");
->> +
->> +                        self.rx_buf.clear();
->> +                        self.rx_in_esc = false;
->> +                    }
->> +                }
->> +            }
->> +        }
->> +
->> +        data.len()
->> +    }
->> +}
->> +
->> +struct GbNode {
->> +    sdev: ARef<serdev::Device>,
->> +}
->> +
->> +impl GbNode {
->> +    const fn new(sdev: ARef<serdev::Device>) -> Self {
->> +        Self { sdev }
->> +    }
->> +
->> +    fn fill_buf(mut crc: u16, data: &[u8], buf: &mut KVec<u8>) -> Result<u16> {
->> +        for i in data {
->> +            crc = crc_ccitt(crc, &[*i]);
->> +            if *i == HDLC_ESC || *i == HDLC_FRAME {
->> +                buf.push_within_capacity(HDLC_ESC)?;
->> +                buf.push_within_capacity(i ^ HDLC_XOR)?;
->> +            } else {
->> +                buf.push_within_capacity(*i)?;
->> +            }
->> +        }
->> +
->> +        Ok(crc)
->> +    }
->> +}
->> +
->> +impl gb_softsvc::InterfaceOps for GbNode {
->> +    fn write(&self, data: &[u8], cport: u16, gfp_mask: Flags) -> Result<()> {
->> +        // SAFETY: `GbNode` only exists while its serdev driver is bound, so the device is in the
->> +        // `Bound` state for the duration of this call.
->> +        let bound: &serdev::Device<Bound> =
->> +            unsafe { serdev::Device::from_device(self.sdev.as_ref().as_bound()) };
->> +
->> +        let mut buf = KVec::with_capacity(HDLC_MAX_FRAME_LEN, gfp_mask)?;
->> +
->> +        let mut crc = 0xffff;
->> +
->> +        buf.push_within_capacity(HDLC_FRAME)?;
->> +
->> +        crc = Self::fill_buf(crc, &[ADDRESS_GREYBUS, 0x03], &mut buf)?;
->> +        crc = Self::fill_buf(crc, &cport.to_le_bytes(), &mut buf)?;
->> +        crc = Self::fill_buf(crc, data, &mut buf)?;
->> +
->> +        crc ^= 0xffff;
->> +        Self::fill_buf(crc, &crc.to_le_bytes(), &mut buf)?;
->> +
->> +        buf.push_within_capacity(HDLC_FRAME)?;
->> +
->> +        bound.write_all(&buf, 0)?;
->> +
->> +        Ok(())
->> +    }
->> +}
->> +
->> +#[pin_data]
->> +struct GbUartNode {
->> +    #[pin]
->> +    rx: SpinLock<Option<HdlcRx>>,
-> (add me to CC please)
->
-> Instead of using a lock here, it might be a better idea to
-> synchronize/stop the receive callback before unbind is called in the
-> serdev rust abstraction. This would allow the abstraction to provide
-> mutable references to the driver data in `receive` and `unbind`. It
-> would also remove the Sync requirement.
->
-> I will send a patch soon.
->
-> Thanks
-> - Markus Probst
+This driver hasn't been actively maintained for years.
 
-That sounds great. The lock here was basically only for getting a mut 
-ref. I will base the next version on top of your patches.
+Let's just remove it:
 
-I have added your email for the next patch version.
+---8<---
+Remove the public key part of the caam driver because it has been
+unmaintained and there are serious bugs in it.
 
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Best Regards,
-
-Ayush Singh
-
+diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
+deleted file mode 100644
+index cb001aa1de66..000000000000
+--- a/drivers/crypto/caam/caampkc.c
++++ /dev/null
+@@ -1,1230 +0,0 @@
+-// SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
+-/*
+- * caam - Freescale FSL CAAM support for Public Key Cryptography
+- *
+- * Copyright 2016 Freescale Semiconductor, Inc.
+- * Copyright 2018-2019, 2023 NXP
+- *
+- * There is no Shared Descriptor for PKC so that the Job Descriptor must carry
+- * all the desired key parameters, input and output pointers.
+- */
+-#include "compat.h"
+-#include "regs.h"
+-#include "intern.h"
+-#include "jr.h"
+-#include "error.h"
+-#include "desc_constr.h"
+-#include "sg_sw_sec4.h"
+-#include "caampkc.h"
+-#include <crypto/internal/engine.h>
+-#include <linux/dma-mapping.h>
+-#include <linux/err.h>
+-#include <linux/kernel.h>
+-#include <linux/slab.h>
+-#include <linux/string.h>
+-
+-#define DESC_RSA_PUB_LEN	(2 * CAAM_CMD_SZ + SIZEOF_RSA_PUB_PDB)
+-#define DESC_RSA_PRIV_F1_LEN	(2 * CAAM_CMD_SZ + \
+-				 SIZEOF_RSA_PRIV_F1_PDB)
+-#define DESC_RSA_PRIV_F2_LEN	(2 * CAAM_CMD_SZ + \
+-				 SIZEOF_RSA_PRIV_F2_PDB)
+-#define DESC_RSA_PRIV_F3_LEN	(2 * CAAM_CMD_SZ + \
+-				 SIZEOF_RSA_PRIV_F3_PDB)
+-#define CAAM_RSA_MAX_INPUT_SIZE	512 /* for a 4096-bit modulus */
+-
+-/* buffer filled with zeros, used for padding */
+-static u8 *zero_buffer;
+-
+-/*
+- * variable used to avoid double free of resources in case
+- * algorithm registration was unsuccessful
+- */
+-static bool init_done;
+-
+-struct caam_akcipher_alg {
+-	struct akcipher_engine_alg akcipher;
+-	bool registered;
+-};
+-
+-static void rsa_io_unmap(struct device *dev, struct rsa_edesc *edesc,
+-			 struct akcipher_request *req)
+-{
+-	struct caam_rsa_req_ctx *req_ctx = akcipher_request_ctx(req);
+-
+-	dma_unmap_sg(dev, req->dst, edesc->dst_nents, DMA_FROM_DEVICE);
+-	dma_unmap_sg(dev, req_ctx->fixup_src, edesc->src_nents, DMA_TO_DEVICE);
+-
+-	if (edesc->sec4_sg_bytes)
+-		dma_unmap_single(dev, edesc->sec4_sg_dma, edesc->sec4_sg_bytes,
+-				 DMA_TO_DEVICE);
+-}
+-
+-static void rsa_pub_unmap(struct device *dev, struct rsa_edesc *edesc,
+-			  struct akcipher_request *req)
+-{
+-	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+-	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx_dma(tfm);
+-	struct caam_rsa_key *key = &ctx->key;
+-	struct rsa_pub_pdb *pdb = &edesc->pdb.pub;
+-
+-	dma_unmap_single(dev, pdb->n_dma, key->n_sz, DMA_TO_DEVICE);
+-	dma_unmap_single(dev, pdb->e_dma, key->e_sz, DMA_TO_DEVICE);
+-}
+-
+-static void rsa_priv_f1_unmap(struct device *dev, struct rsa_edesc *edesc,
+-			      struct akcipher_request *req)
+-{
+-	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+-	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx_dma(tfm);
+-	struct caam_rsa_key *key = &ctx->key;
+-	struct rsa_priv_f1_pdb *pdb = &edesc->pdb.priv_f1;
+-
+-	dma_unmap_single(dev, pdb->n_dma, key->n_sz, DMA_TO_DEVICE);
+-	dma_unmap_single(dev, pdb->d_dma, key->d_sz, DMA_TO_DEVICE);
+-}
+-
+-static void rsa_priv_f2_unmap(struct device *dev, struct rsa_edesc *edesc,
+-			      struct akcipher_request *req)
+-{
+-	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+-	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx_dma(tfm);
+-	struct caam_rsa_key *key = &ctx->key;
+-	struct rsa_priv_f2_pdb *pdb = &edesc->pdb.priv_f2;
+-	size_t p_sz = key->p_sz;
+-	size_t q_sz = key->q_sz;
+-
+-	dma_unmap_single(dev, pdb->d_dma, key->d_sz, DMA_TO_DEVICE);
+-	dma_unmap_single(dev, pdb->p_dma, p_sz, DMA_TO_DEVICE);
+-	dma_unmap_single(dev, pdb->q_dma, q_sz, DMA_TO_DEVICE);
+-	dma_unmap_single(dev, pdb->tmp1_dma, p_sz, DMA_BIDIRECTIONAL);
+-	dma_unmap_single(dev, pdb->tmp2_dma, q_sz, DMA_BIDIRECTIONAL);
+-}
+-
+-static void rsa_priv_f3_unmap(struct device *dev, struct rsa_edesc *edesc,
+-			      struct akcipher_request *req)
+-{
+-	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+-	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx_dma(tfm);
+-	struct caam_rsa_key *key = &ctx->key;
+-	struct rsa_priv_f3_pdb *pdb = &edesc->pdb.priv_f3;
+-	size_t p_sz = key->p_sz;
+-	size_t q_sz = key->q_sz;
+-
+-	dma_unmap_single(dev, pdb->p_dma, p_sz, DMA_TO_DEVICE);
+-	dma_unmap_single(dev, pdb->q_dma, q_sz, DMA_TO_DEVICE);
+-	dma_unmap_single(dev, pdb->dp_dma, p_sz, DMA_TO_DEVICE);
+-	dma_unmap_single(dev, pdb->dq_dma, q_sz, DMA_TO_DEVICE);
+-	dma_unmap_single(dev, pdb->c_dma, p_sz, DMA_TO_DEVICE);
+-	dma_unmap_single(dev, pdb->tmp1_dma, p_sz, DMA_BIDIRECTIONAL);
+-	dma_unmap_single(dev, pdb->tmp2_dma, q_sz, DMA_BIDIRECTIONAL);
+-}
+-
+-/* RSA Job Completion handler */
+-static void rsa_pub_done(struct device *dev, u32 *desc, u32 err, void *context)
+-{
+-	struct akcipher_request *req = context;
+-	struct caam_rsa_req_ctx *req_ctx = akcipher_request_ctx(req);
+-	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
+-	struct rsa_edesc *edesc;
+-	int ecode = 0;
+-	bool has_bklog;
+-
+-	if (err)
+-		ecode = caam_jr_strstatus(dev, err);
+-
+-	edesc = req_ctx->edesc;
+-	has_bklog = edesc->bklog;
+-
+-	rsa_pub_unmap(dev, edesc, req);
+-	rsa_io_unmap(dev, edesc, req);
+-	kfree(edesc);
+-
+-	/*
+-	 * If no backlog flag, the completion of the request is done
+-	 * by CAAM, not crypto engine.
+-	 */
+-	if (!has_bklog)
+-		akcipher_request_complete(req, ecode);
+-	else
+-		crypto_finalize_akcipher_request(jrp->engine, req, ecode);
+-}
+-
+-static void rsa_priv_f_done(struct device *dev, u32 *desc, u32 err,
+-			    void *context)
+-{
+-	struct akcipher_request *req = context;
+-	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+-	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
+-	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx_dma(tfm);
+-	struct caam_rsa_key *key = &ctx->key;
+-	struct caam_rsa_req_ctx *req_ctx = akcipher_request_ctx(req);
+-	struct rsa_edesc *edesc;
+-	int ecode = 0;
+-	bool has_bklog;
+-
+-	if (err)
+-		ecode = caam_jr_strstatus(dev, err);
+-
+-	edesc = req_ctx->edesc;
+-	has_bklog = edesc->bklog;
+-
+-	switch (key->priv_form) {
+-	case FORM1:
+-		rsa_priv_f1_unmap(dev, edesc, req);
+-		break;
+-	case FORM2:
+-		rsa_priv_f2_unmap(dev, edesc, req);
+-		break;
+-	case FORM3:
+-		rsa_priv_f3_unmap(dev, edesc, req);
+-	}
+-
+-	rsa_io_unmap(dev, edesc, req);
+-	kfree(edesc);
+-
+-	/*
+-	 * If no backlog flag, the completion of the request is done
+-	 * by CAAM, not crypto engine.
+-	 */
+-	if (!has_bklog)
+-		akcipher_request_complete(req, ecode);
+-	else
+-		crypto_finalize_akcipher_request(jrp->engine, req, ecode);
+-}
+-
+-/**
+- * caam_rsa_count_leading_zeros - Count leading zeros, need it to strip,
+- *                                from a given scatterlist
+- *
+- * @sgl   : scatterlist to count zeros from
+- * @nbytes: number of zeros, in bytes, to strip
+- * @flags : operation flags
+- */
+-static int caam_rsa_count_leading_zeros(struct scatterlist *sgl,
+-					unsigned int nbytes,
+-					unsigned int flags)
+-{
+-	struct sg_mapping_iter miter;
+-	int lzeros, ents;
+-	unsigned int len;
+-	unsigned int tbytes = nbytes;
+-	const u8 *buff;
+-
+-	ents = sg_nents_for_len(sgl, nbytes);
+-	if (ents < 0)
+-		return ents;
+-
+-	sg_miter_start(&miter, sgl, ents, SG_MITER_FROM_SG | flags);
+-
+-	lzeros = 0;
+-	len = 0;
+-	while (nbytes > 0) {
+-		/* do not strip more than given bytes */
+-		while (len && !*buff && lzeros < nbytes) {
+-			lzeros++;
+-			len--;
+-			buff++;
+-		}
+-
+-		if (len && *buff)
+-			break;
+-
+-		if (!sg_miter_next(&miter))
+-			break;
+-
+-		buff = miter.addr;
+-		len = miter.length;
+-
+-		nbytes -= lzeros;
+-		lzeros = 0;
+-	}
+-
+-	miter.consumed = lzeros;
+-	sg_miter_stop(&miter);
+-	nbytes -= lzeros;
+-
+-	return tbytes - nbytes;
+-}
+-
+-static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
+-					 size_t desclen)
+-{
+-	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+-	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx_dma(tfm);
+-	struct device *dev = ctx->dev;
+-	struct caam_rsa_req_ctx *req_ctx = akcipher_request_ctx(req);
+-	struct caam_rsa_key *key = &ctx->key;
+-	struct rsa_edesc *edesc;
+-	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
+-		       GFP_KERNEL : GFP_ATOMIC;
+-	int sg_flags = (flags == GFP_ATOMIC) ? SG_MITER_ATOMIC : 0;
+-	int sec4_sg_index, sec4_sg_len = 0, sec4_sg_bytes;
+-	int src_nents, dst_nents;
+-	int mapped_src_nents, mapped_dst_nents;
+-	unsigned int diff_size = 0;
+-	int lzeros;
+-
+-	if (req->src_len > key->n_sz) {
+-		/*
+-		 * strip leading zeros and
+-		 * return the number of zeros to skip
+-		 */
+-		lzeros = caam_rsa_count_leading_zeros(req->src, req->src_len -
+-						      key->n_sz, sg_flags);
+-		if (lzeros < 0)
+-			return ERR_PTR(lzeros);
+-
+-		req_ctx->fixup_src = scatterwalk_ffwd(req_ctx->src, req->src,
+-						      lzeros);
+-		req_ctx->fixup_src_len = req->src_len - lzeros;
+-	} else {
+-		/*
+-		 * input src is less then n key modulus,
+-		 * so there will be zero padding
+-		 */
+-		diff_size = key->n_sz - req->src_len;
+-		req_ctx->fixup_src = req->src;
+-		req_ctx->fixup_src_len = req->src_len;
+-	}
+-
+-	src_nents = sg_nents_for_len(req_ctx->fixup_src,
+-				     req_ctx->fixup_src_len);
+-	dst_nents = sg_nents_for_len(req->dst, req->dst_len);
+-
+-	mapped_src_nents = dma_map_sg(dev, req_ctx->fixup_src, src_nents,
+-				      DMA_TO_DEVICE);
+-	if (unlikely(!mapped_src_nents)) {
+-		dev_err(dev, "unable to map source\n");
+-		return ERR_PTR(-ENOMEM);
+-	}
+-	mapped_dst_nents = dma_map_sg(dev, req->dst, dst_nents,
+-				      DMA_FROM_DEVICE);
+-	if (unlikely(!mapped_dst_nents)) {
+-		dev_err(dev, "unable to map destination\n");
+-		goto src_fail;
+-	}
+-
+-	if (!diff_size && mapped_src_nents == 1)
+-		sec4_sg_len = 0; /* no need for an input hw s/g table */
+-	else
+-		sec4_sg_len = mapped_src_nents + !!diff_size;
+-	sec4_sg_index = sec4_sg_len;
+-
+-	if (mapped_dst_nents > 1)
+-		sec4_sg_len += pad_sg_nents(mapped_dst_nents);
+-	else
+-		sec4_sg_len = pad_sg_nents(sec4_sg_len);
+-
+-	sec4_sg_bytes = sec4_sg_len * sizeof(struct sec4_sg_entry);
+-
+-	/* allocate space for base edesc, hw desc commands and link tables */
+-	edesc = kzalloc(sizeof(*edesc) + desclen + sec4_sg_bytes, flags);
+-	if (!edesc)
+-		goto dst_fail;
+-
+-	edesc->sec4_sg = (void *)edesc + sizeof(*edesc) + desclen;
+-	if (diff_size)
+-		dma_to_sec4_sg_one(edesc->sec4_sg, ctx->padding_dma, diff_size,
+-				   0);
+-
+-	if (sec4_sg_index)
+-		sg_to_sec4_sg_last(req_ctx->fixup_src, req_ctx->fixup_src_len,
+-				   edesc->sec4_sg + !!diff_size, 0);
+-
+-	if (mapped_dst_nents > 1)
+-		sg_to_sec4_sg_last(req->dst, req->dst_len,
+-				   edesc->sec4_sg + sec4_sg_index, 0);
+-
+-	/* Save nents for later use in Job Descriptor */
+-	edesc->src_nents = src_nents;
+-	edesc->dst_nents = dst_nents;
+-
+-	req_ctx->edesc = edesc;
+-
+-	if (!sec4_sg_bytes)
+-		return edesc;
+-
+-	edesc->mapped_src_nents = mapped_src_nents;
+-	edesc->mapped_dst_nents = mapped_dst_nents;
+-
+-	edesc->sec4_sg_dma = dma_map_single(dev, edesc->sec4_sg,
+-					    sec4_sg_bytes, DMA_TO_DEVICE);
+-	if (dma_mapping_error(dev, edesc->sec4_sg_dma)) {
+-		dev_err(dev, "unable to map S/G table\n");
+-		goto sec4_sg_fail;
+-	}
+-
+-	edesc->sec4_sg_bytes = sec4_sg_bytes;
+-
+-	print_hex_dump_debug("caampkc sec4_sg@" __stringify(__LINE__) ": ",
+-			     DUMP_PREFIX_ADDRESS, 16, 4, edesc->sec4_sg,
+-			     edesc->sec4_sg_bytes, 1);
+-
+-	return edesc;
+-
+-sec4_sg_fail:
+-	kfree(edesc);
+-dst_fail:
+-	dma_unmap_sg(dev, req->dst, dst_nents, DMA_FROM_DEVICE);
+-src_fail:
+-	dma_unmap_sg(dev, req_ctx->fixup_src, src_nents, DMA_TO_DEVICE);
+-	return ERR_PTR(-ENOMEM);
+-}
+-
+-static int akcipher_do_one_req(struct crypto_engine *engine, void *areq)
+-{
+-	struct akcipher_request *req = container_of(areq,
+-						    struct akcipher_request,
+-						    base);
+-	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+-	struct caam_rsa_req_ctx *req_ctx = akcipher_request_ctx(req);
+-	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx_dma(tfm);
+-	struct device *jrdev = ctx->dev;
+-	u32 *desc = req_ctx->edesc->hw_desc;
+-	int ret;
+-
+-	req_ctx->edesc->bklog = true;
+-
+-	ret = caam_jr_enqueue(jrdev, desc, req_ctx->akcipher_op_done, req);
+-
+-	if (ret == -ENOSPC && engine->retry_support)
+-		return ret;
+-
+-	if (ret != -EINPROGRESS) {
+-		rsa_pub_unmap(jrdev, req_ctx->edesc, req);
+-		rsa_io_unmap(jrdev, req_ctx->edesc, req);
+-		kfree(req_ctx->edesc);
+-	} else {
+-		ret = 0;
+-	}
+-
+-	return ret;
+-}
+-
+-static int set_rsa_pub_pdb(struct akcipher_request *req,
+-			   struct rsa_edesc *edesc)
+-{
+-	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+-	struct caam_rsa_req_ctx *req_ctx = akcipher_request_ctx(req);
+-	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx_dma(tfm);
+-	struct caam_rsa_key *key = &ctx->key;
+-	struct device *dev = ctx->dev;
+-	struct rsa_pub_pdb *pdb = &edesc->pdb.pub;
+-	int sec4_sg_index = 0;
+-
+-	pdb->n_dma = dma_map_single(dev, key->n, key->n_sz, DMA_TO_DEVICE);
+-	if (dma_mapping_error(dev, pdb->n_dma)) {
+-		dev_err(dev, "Unable to map RSA modulus memory\n");
+-		return -ENOMEM;
+-	}
+-
+-	pdb->e_dma = dma_map_single(dev, key->e, key->e_sz, DMA_TO_DEVICE);
+-	if (dma_mapping_error(dev, pdb->e_dma)) {
+-		dev_err(dev, "Unable to map RSA public exponent memory\n");
+-		dma_unmap_single(dev, pdb->n_dma, key->n_sz, DMA_TO_DEVICE);
+-		return -ENOMEM;
+-	}
+-
+-	if (edesc->mapped_src_nents > 1) {
+-		pdb->sgf |= RSA_PDB_SGF_F;
+-		pdb->f_dma = edesc->sec4_sg_dma;
+-		sec4_sg_index += edesc->mapped_src_nents;
+-	} else {
+-		pdb->f_dma = sg_dma_address(req_ctx->fixup_src);
+-	}
+-
+-	if (edesc->mapped_dst_nents > 1) {
+-		pdb->sgf |= RSA_PDB_SGF_G;
+-		pdb->g_dma = edesc->sec4_sg_dma +
+-			     sec4_sg_index * sizeof(struct sec4_sg_entry);
+-	} else {
+-		pdb->g_dma = sg_dma_address(req->dst);
+-	}
+-
+-	pdb->sgf |= (key->e_sz << RSA_PDB_E_SHIFT) | key->n_sz;
+-	pdb->f_len = req_ctx->fixup_src_len;
+-
+-	return 0;
+-}
+-
+-static int set_rsa_priv_f1_pdb(struct akcipher_request *req,
+-			       struct rsa_edesc *edesc)
+-{
+-	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+-	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx_dma(tfm);
+-	struct caam_rsa_key *key = &ctx->key;
+-	struct device *dev = ctx->dev;
+-	struct rsa_priv_f1_pdb *pdb = &edesc->pdb.priv_f1;
+-	int sec4_sg_index = 0;
+-
+-	pdb->n_dma = dma_map_single(dev, key->n, key->n_sz, DMA_TO_DEVICE);
+-	if (dma_mapping_error(dev, pdb->n_dma)) {
+-		dev_err(dev, "Unable to map modulus memory\n");
+-		return -ENOMEM;
+-	}
+-
+-	pdb->d_dma = dma_map_single(dev, key->d, key->d_sz, DMA_TO_DEVICE);
+-	if (dma_mapping_error(dev, pdb->d_dma)) {
+-		dev_err(dev, "Unable to map RSA private exponent memory\n");
+-		dma_unmap_single(dev, pdb->n_dma, key->n_sz, DMA_TO_DEVICE);
+-		return -ENOMEM;
+-	}
+-
+-	if (edesc->mapped_src_nents > 1) {
+-		pdb->sgf |= RSA_PRIV_PDB_SGF_G;
+-		pdb->g_dma = edesc->sec4_sg_dma;
+-		sec4_sg_index += edesc->mapped_src_nents;
+-
+-	} else {
+-		struct caam_rsa_req_ctx *req_ctx = akcipher_request_ctx(req);
+-
+-		pdb->g_dma = sg_dma_address(req_ctx->fixup_src);
+-	}
+-
+-	if (edesc->mapped_dst_nents > 1) {
+-		pdb->sgf |= RSA_PRIV_PDB_SGF_F;
+-		pdb->f_dma = edesc->sec4_sg_dma +
+-			     sec4_sg_index * sizeof(struct sec4_sg_entry);
+-	} else {
+-		pdb->f_dma = sg_dma_address(req->dst);
+-	}
+-
+-	pdb->sgf |= (key->d_sz << RSA_PDB_D_SHIFT) | key->n_sz;
+-
+-	return 0;
+-}
+-
+-static int set_rsa_priv_f2_pdb(struct akcipher_request *req,
+-			       struct rsa_edesc *edesc)
+-{
+-	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+-	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx_dma(tfm);
+-	struct caam_rsa_key *key = &ctx->key;
+-	struct device *dev = ctx->dev;
+-	struct rsa_priv_f2_pdb *pdb = &edesc->pdb.priv_f2;
+-	int sec4_sg_index = 0;
+-	size_t p_sz = key->p_sz;
+-	size_t q_sz = key->q_sz;
+-
+-	pdb->d_dma = dma_map_single(dev, key->d, key->d_sz, DMA_TO_DEVICE);
+-	if (dma_mapping_error(dev, pdb->d_dma)) {
+-		dev_err(dev, "Unable to map RSA private exponent memory\n");
+-		return -ENOMEM;
+-	}
+-
+-	pdb->p_dma = dma_map_single(dev, key->p, p_sz, DMA_TO_DEVICE);
+-	if (dma_mapping_error(dev, pdb->p_dma)) {
+-		dev_err(dev, "Unable to map RSA prime factor p memory\n");
+-		goto unmap_d;
+-	}
+-
+-	pdb->q_dma = dma_map_single(dev, key->q, q_sz, DMA_TO_DEVICE);
+-	if (dma_mapping_error(dev, pdb->q_dma)) {
+-		dev_err(dev, "Unable to map RSA prime factor q memory\n");
+-		goto unmap_p;
+-	}
+-
+-	pdb->tmp1_dma = dma_map_single(dev, key->tmp1, p_sz, DMA_BIDIRECTIONAL);
+-	if (dma_mapping_error(dev, pdb->tmp1_dma)) {
+-		dev_err(dev, "Unable to map RSA tmp1 memory\n");
+-		goto unmap_q;
+-	}
+-
+-	pdb->tmp2_dma = dma_map_single(dev, key->tmp2, q_sz, DMA_BIDIRECTIONAL);
+-	if (dma_mapping_error(dev, pdb->tmp2_dma)) {
+-		dev_err(dev, "Unable to map RSA tmp2 memory\n");
+-		goto unmap_tmp1;
+-	}
+-
+-	if (edesc->mapped_src_nents > 1) {
+-		pdb->sgf |= RSA_PRIV_PDB_SGF_G;
+-		pdb->g_dma = edesc->sec4_sg_dma;
+-		sec4_sg_index += edesc->mapped_src_nents;
+-	} else {
+-		struct caam_rsa_req_ctx *req_ctx = akcipher_request_ctx(req);
+-
+-		pdb->g_dma = sg_dma_address(req_ctx->fixup_src);
+-	}
+-
+-	if (edesc->mapped_dst_nents > 1) {
+-		pdb->sgf |= RSA_PRIV_PDB_SGF_F;
+-		pdb->f_dma = edesc->sec4_sg_dma +
+-			     sec4_sg_index * sizeof(struct sec4_sg_entry);
+-	} else {
+-		pdb->f_dma = sg_dma_address(req->dst);
+-	}
+-
+-	pdb->sgf |= (key->d_sz << RSA_PDB_D_SHIFT) | key->n_sz;
+-	pdb->p_q_len = (q_sz << RSA_PDB_Q_SHIFT) | p_sz;
+-
+-	return 0;
+-
+-unmap_tmp1:
+-	dma_unmap_single(dev, pdb->tmp1_dma, p_sz, DMA_BIDIRECTIONAL);
+-unmap_q:
+-	dma_unmap_single(dev, pdb->q_dma, q_sz, DMA_TO_DEVICE);
+-unmap_p:
+-	dma_unmap_single(dev, pdb->p_dma, p_sz, DMA_TO_DEVICE);
+-unmap_d:
+-	dma_unmap_single(dev, pdb->d_dma, key->d_sz, DMA_TO_DEVICE);
+-
+-	return -ENOMEM;
+-}
+-
+-static int set_rsa_priv_f3_pdb(struct akcipher_request *req,
+-			       struct rsa_edesc *edesc)
+-{
+-	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+-	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx_dma(tfm);
+-	struct caam_rsa_key *key = &ctx->key;
+-	struct device *dev = ctx->dev;
+-	struct rsa_priv_f3_pdb *pdb = &edesc->pdb.priv_f3;
+-	int sec4_sg_index = 0;
+-	size_t p_sz = key->p_sz;
+-	size_t q_sz = key->q_sz;
+-
+-	pdb->p_dma = dma_map_single(dev, key->p, p_sz, DMA_TO_DEVICE);
+-	if (dma_mapping_error(dev, pdb->p_dma)) {
+-		dev_err(dev, "Unable to map RSA prime factor p memory\n");
+-		return -ENOMEM;
+-	}
+-
+-	pdb->q_dma = dma_map_single(dev, key->q, q_sz, DMA_TO_DEVICE);
+-	if (dma_mapping_error(dev, pdb->q_dma)) {
+-		dev_err(dev, "Unable to map RSA prime factor q memory\n");
+-		goto unmap_p;
+-	}
+-
+-	pdb->dp_dma = dma_map_single(dev, key->dp, p_sz, DMA_TO_DEVICE);
+-	if (dma_mapping_error(dev, pdb->dp_dma)) {
+-		dev_err(dev, "Unable to map RSA exponent dp memory\n");
+-		goto unmap_q;
+-	}
+-
+-	pdb->dq_dma = dma_map_single(dev, key->dq, q_sz, DMA_TO_DEVICE);
+-	if (dma_mapping_error(dev, pdb->dq_dma)) {
+-		dev_err(dev, "Unable to map RSA exponent dq memory\n");
+-		goto unmap_dp;
+-	}
+-
+-	pdb->c_dma = dma_map_single(dev, key->qinv, p_sz, DMA_TO_DEVICE);
+-	if (dma_mapping_error(dev, pdb->c_dma)) {
+-		dev_err(dev, "Unable to map RSA CRT coefficient qinv memory\n");
+-		goto unmap_dq;
+-	}
+-
+-	pdb->tmp1_dma = dma_map_single(dev, key->tmp1, p_sz, DMA_BIDIRECTIONAL);
+-	if (dma_mapping_error(dev, pdb->tmp1_dma)) {
+-		dev_err(dev, "Unable to map RSA tmp1 memory\n");
+-		goto unmap_qinv;
+-	}
+-
+-	pdb->tmp2_dma = dma_map_single(dev, key->tmp2, q_sz, DMA_BIDIRECTIONAL);
+-	if (dma_mapping_error(dev, pdb->tmp2_dma)) {
+-		dev_err(dev, "Unable to map RSA tmp2 memory\n");
+-		goto unmap_tmp1;
+-	}
+-
+-	if (edesc->mapped_src_nents > 1) {
+-		pdb->sgf |= RSA_PRIV_PDB_SGF_G;
+-		pdb->g_dma = edesc->sec4_sg_dma;
+-		sec4_sg_index += edesc->mapped_src_nents;
+-	} else {
+-		struct caam_rsa_req_ctx *req_ctx = akcipher_request_ctx(req);
+-
+-		pdb->g_dma = sg_dma_address(req_ctx->fixup_src);
+-	}
+-
+-	if (edesc->mapped_dst_nents > 1) {
+-		pdb->sgf |= RSA_PRIV_PDB_SGF_F;
+-		pdb->f_dma = edesc->sec4_sg_dma +
+-			     sec4_sg_index * sizeof(struct sec4_sg_entry);
+-	} else {
+-		pdb->f_dma = sg_dma_address(req->dst);
+-	}
+-
+-	pdb->sgf |= key->n_sz;
+-	pdb->p_q_len = (q_sz << RSA_PDB_Q_SHIFT) | p_sz;
+-
+-	return 0;
+-
+-unmap_tmp1:
+-	dma_unmap_single(dev, pdb->tmp1_dma, p_sz, DMA_BIDIRECTIONAL);
+-unmap_qinv:
+-	dma_unmap_single(dev, pdb->c_dma, p_sz, DMA_TO_DEVICE);
+-unmap_dq:
+-	dma_unmap_single(dev, pdb->dq_dma, q_sz, DMA_TO_DEVICE);
+-unmap_dp:
+-	dma_unmap_single(dev, pdb->dp_dma, p_sz, DMA_TO_DEVICE);
+-unmap_q:
+-	dma_unmap_single(dev, pdb->q_dma, q_sz, DMA_TO_DEVICE);
+-unmap_p:
+-	dma_unmap_single(dev, pdb->p_dma, p_sz, DMA_TO_DEVICE);
+-
+-	return -ENOMEM;
+-}
+-
+-static int akcipher_enqueue_req(struct device *jrdev,
+-				void (*cbk)(struct device *jrdev, u32 *desc,
+-					    u32 err, void *context),
+-				struct akcipher_request *req)
+-{
+-	struct caam_drv_private_jr *jrpriv = dev_get_drvdata(jrdev);
+-	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+-	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx_dma(tfm);
+-	struct caam_rsa_key *key = &ctx->key;
+-	struct caam_rsa_req_ctx *req_ctx = akcipher_request_ctx(req);
+-	struct rsa_edesc *edesc = req_ctx->edesc;
+-	u32 *desc = edesc->hw_desc;
+-	int ret;
+-
+-	req_ctx->akcipher_op_done = cbk;
+-	/*
+-	 * Only the backlog request are sent to crypto-engine since the others
+-	 * can be handled by CAAM, if free, especially since JR has up to 1024
+-	 * entries (more than the 10 entries from crypto-engine).
+-	 */
+-	if (req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)
+-		ret = crypto_transfer_akcipher_request_to_engine(jrpriv->engine,
+-								 req);
+-	else
+-		ret = caam_jr_enqueue(jrdev, desc, cbk, req);
+-
+-	if ((ret != -EINPROGRESS) && (ret != -EBUSY)) {
+-		switch (key->priv_form) {
+-		case FORM1:
+-			rsa_priv_f1_unmap(jrdev, edesc, req);
+-			break;
+-		case FORM2:
+-			rsa_priv_f2_unmap(jrdev, edesc, req);
+-			break;
+-		case FORM3:
+-			rsa_priv_f3_unmap(jrdev, edesc, req);
+-			break;
+-		default:
+-			rsa_pub_unmap(jrdev, edesc, req);
+-		}
+-		rsa_io_unmap(jrdev, edesc, req);
+-		kfree(edesc);
+-	}
+-
+-	return ret;
+-}
+-
+-static int caam_rsa_enc(struct akcipher_request *req)
+-{
+-	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+-	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx_dma(tfm);
+-	struct caam_rsa_key *key = &ctx->key;
+-	struct device *jrdev = ctx->dev;
+-	struct rsa_edesc *edesc;
+-	int ret;
+-
+-	if (unlikely(!key->n || !key->e))
+-		return -EINVAL;
+-
+-	if (req->dst_len < key->n_sz) {
+-		req->dst_len = key->n_sz;
+-		dev_err(jrdev, "Output buffer length less than parameter n\n");
+-		return -EOVERFLOW;
+-	}
+-
+-	/* Allocate extended descriptor */
+-	edesc = rsa_edesc_alloc(req, DESC_RSA_PUB_LEN);
+-	if (IS_ERR(edesc))
+-		return PTR_ERR(edesc);
+-
+-	/* Set RSA Encrypt Protocol Data Block */
+-	ret = set_rsa_pub_pdb(req, edesc);
+-	if (ret)
+-		goto init_fail;
+-
+-	/* Initialize Job Descriptor */
+-	init_rsa_pub_desc(edesc->hw_desc, &edesc->pdb.pub);
+-
+-	return akcipher_enqueue_req(jrdev, rsa_pub_done, req);
+-
+-init_fail:
+-	rsa_io_unmap(jrdev, edesc, req);
+-	kfree(edesc);
+-	return ret;
+-}
+-
+-static int caam_rsa_dec_priv_f1(struct akcipher_request *req)
+-{
+-	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+-	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx_dma(tfm);
+-	struct device *jrdev = ctx->dev;
+-	struct rsa_edesc *edesc;
+-	int ret;
+-
+-	/* Allocate extended descriptor */
+-	edesc = rsa_edesc_alloc(req, DESC_RSA_PRIV_F1_LEN);
+-	if (IS_ERR(edesc))
+-		return PTR_ERR(edesc);
+-
+-	/* Set RSA Decrypt Protocol Data Block - Private Key Form #1 */
+-	ret = set_rsa_priv_f1_pdb(req, edesc);
+-	if (ret)
+-		goto init_fail;
+-
+-	/* Initialize Job Descriptor */
+-	init_rsa_priv_f1_desc(edesc->hw_desc, &edesc->pdb.priv_f1);
+-
+-	return akcipher_enqueue_req(jrdev, rsa_priv_f_done, req);
+-
+-init_fail:
+-	rsa_io_unmap(jrdev, edesc, req);
+-	kfree(edesc);
+-	return ret;
+-}
+-
+-static int caam_rsa_dec_priv_f2(struct akcipher_request *req)
+-{
+-	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+-	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx_dma(tfm);
+-	struct device *jrdev = ctx->dev;
+-	struct rsa_edesc *edesc;
+-	int ret;
+-
+-	/* Allocate extended descriptor */
+-	edesc = rsa_edesc_alloc(req, DESC_RSA_PRIV_F2_LEN);
+-	if (IS_ERR(edesc))
+-		return PTR_ERR(edesc);
+-
+-	/* Set RSA Decrypt Protocol Data Block - Private Key Form #2 */
+-	ret = set_rsa_priv_f2_pdb(req, edesc);
+-	if (ret)
+-		goto init_fail;
+-
+-	/* Initialize Job Descriptor */
+-	init_rsa_priv_f2_desc(edesc->hw_desc, &edesc->pdb.priv_f2);
+-
+-	return akcipher_enqueue_req(jrdev, rsa_priv_f_done, req);
+-
+-init_fail:
+-	rsa_io_unmap(jrdev, edesc, req);
+-	kfree(edesc);
+-	return ret;
+-}
+-
+-static int caam_rsa_dec_priv_f3(struct akcipher_request *req)
+-{
+-	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+-	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx_dma(tfm);
+-	struct device *jrdev = ctx->dev;
+-	struct rsa_edesc *edesc;
+-	int ret;
+-
+-	/* Allocate extended descriptor */
+-	edesc = rsa_edesc_alloc(req, DESC_RSA_PRIV_F3_LEN);
+-	if (IS_ERR(edesc))
+-		return PTR_ERR(edesc);
+-
+-	/* Set RSA Decrypt Protocol Data Block - Private Key Form #3 */
+-	ret = set_rsa_priv_f3_pdb(req, edesc);
+-	if (ret)
+-		goto init_fail;
+-
+-	/* Initialize Job Descriptor */
+-	init_rsa_priv_f3_desc(edesc->hw_desc, &edesc->pdb.priv_f3);
+-
+-	return akcipher_enqueue_req(jrdev, rsa_priv_f_done, req);
+-
+-init_fail:
+-	rsa_io_unmap(jrdev, edesc, req);
+-	kfree(edesc);
+-	return ret;
+-}
+-
+-static int caam_rsa_dec(struct akcipher_request *req)
+-{
+-	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+-	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx_dma(tfm);
+-	struct caam_rsa_key *key = &ctx->key;
+-	int ret;
+-
+-	if (unlikely(!key->n || !key->d))
+-		return -EINVAL;
+-
+-	if (req->dst_len < key->n_sz) {
+-		req->dst_len = key->n_sz;
+-		dev_err(ctx->dev, "Output buffer length less than parameter n\n");
+-		return -EOVERFLOW;
+-	}
+-
+-	if (key->priv_form == FORM3)
+-		ret = caam_rsa_dec_priv_f3(req);
+-	else if (key->priv_form == FORM2)
+-		ret = caam_rsa_dec_priv_f2(req);
+-	else
+-		ret = caam_rsa_dec_priv_f1(req);
+-
+-	return ret;
+-}
+-
+-static void caam_rsa_free_key(struct caam_rsa_key *key)
+-{
+-	kfree_sensitive(key->d);
+-	kfree_sensitive(key->p);
+-	kfree_sensitive(key->q);
+-	kfree_sensitive(key->dp);
+-	kfree_sensitive(key->dq);
+-	kfree_sensitive(key->qinv);
+-	kfree_sensitive(key->tmp1);
+-	kfree_sensitive(key->tmp2);
+-	kfree(key->e);
+-	kfree(key->n);
+-	memset(key, 0, sizeof(*key));
+-}
+-
+-static void caam_rsa_drop_leading_zeros(const u8 **ptr, size_t *nbytes)
+-{
+-	while (!**ptr && *nbytes) {
+-		(*ptr)++;
+-		(*nbytes)--;
+-	}
+-}
+-
+-/**
+- * caam_read_rsa_crt - Used for reading dP, dQ, qInv CRT members.
+- * dP, dQ and qInv could decode to less than corresponding p, q length, as the
+- * BER-encoding requires that the minimum number of bytes be used to encode the
+- * integer. dP, dQ, qInv decoded values have to be zero-padded to appropriate
+- * length.
+- *
+- * @ptr   : pointer to {dP, dQ, qInv} CRT member
+- * @nbytes: length in bytes of {dP, dQ, qInv} CRT member
+- * @dstlen: length in bytes of corresponding p or q prime factor
+- */
+-static u8 *caam_read_rsa_crt(const u8 *ptr, size_t nbytes, size_t dstlen)
+-{
+-	u8 *dst;
+-
+-	caam_rsa_drop_leading_zeros(&ptr, &nbytes);
+-	if (!nbytes)
+-		return NULL;
+-
+-	dst = kzalloc(dstlen, GFP_KERNEL);
+-	if (!dst)
+-		return NULL;
+-
+-	memcpy(dst + (dstlen - nbytes), ptr, nbytes);
+-
+-	return dst;
+-}
+-
+-/**
+- * caam_read_raw_data - Read a raw byte stream as a positive integer.
+- * The function skips buffer's leading zeros, copies the remained data
+- * to a buffer allocated in the GFP_KERNEL zone and returns
+- * the address of the new buffer.
+- *
+- * @buf   : The data to read
+- * @nbytes: The amount of data to read
+- */
+-static inline u8 *caam_read_raw_data(const u8 *buf, size_t *nbytes)
+-{
+-
+-	caam_rsa_drop_leading_zeros(&buf, nbytes);
+-	if (!*nbytes)
+-		return NULL;
+-
+-	return kmemdup(buf, *nbytes, GFP_KERNEL);
+-}
+-
+-static int caam_rsa_check_key_length(unsigned int len)
+-{
+-	if (len > 4096)
+-		return -EINVAL;
+-	return 0;
+-}
+-
+-static int caam_rsa_set_pub_key(struct crypto_akcipher *tfm, const void *key,
+-				unsigned int keylen)
+-{
+-	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx_dma(tfm);
+-	struct rsa_key raw_key = {NULL};
+-	struct caam_rsa_key *rsa_key = &ctx->key;
+-	int ret;
+-
+-	/* Free the old RSA key if any */
+-	caam_rsa_free_key(rsa_key);
+-
+-	ret = rsa_parse_pub_key(&raw_key, key, keylen);
+-	if (ret)
+-		return ret;
+-
+-	/* Copy key in DMA zone */
+-	rsa_key->e = kmemdup(raw_key.e, raw_key.e_sz, GFP_KERNEL);
+-	if (!rsa_key->e)
+-		goto err;
+-
+-	/*
+-	 * Skip leading zeros and copy the positive integer to a buffer
+-	 * allocated in the GFP_KERNEL zone. The decryption descriptor
+-	 * expects a positive integer for the RSA modulus and uses its length as
+-	 * decryption output length.
+-	 */
+-	rsa_key->n = caam_read_raw_data(raw_key.n, &raw_key.n_sz);
+-	if (!rsa_key->n)
+-		goto err;
+-
+-	if (caam_rsa_check_key_length(raw_key.n_sz << 3)) {
+-		caam_rsa_free_key(rsa_key);
+-		return -EINVAL;
+-	}
+-
+-	rsa_key->e_sz = raw_key.e_sz;
+-	rsa_key->n_sz = raw_key.n_sz;
+-
+-	return 0;
+-err:
+-	caam_rsa_free_key(rsa_key);
+-	return -ENOMEM;
+-}
+-
+-static int caam_rsa_set_priv_key_form(struct caam_rsa_ctx *ctx,
+-				       struct rsa_key *raw_key)
+-{
+-	struct caam_rsa_key *rsa_key = &ctx->key;
+-	size_t p_sz = raw_key->p_sz;
+-	size_t q_sz = raw_key->q_sz;
+-	unsigned aligned_size;
+-
+-	rsa_key->p = caam_read_raw_data(raw_key->p, &p_sz);
+-	if (!rsa_key->p)
+-		return -ENOMEM;
+-	rsa_key->p_sz = p_sz;
+-
+-	rsa_key->q = caam_read_raw_data(raw_key->q, &q_sz);
+-	if (!rsa_key->q)
+-		goto free_p;
+-	rsa_key->q_sz = q_sz;
+-
+-	aligned_size = ALIGN(raw_key->p_sz, dma_get_cache_alignment());
+-	rsa_key->tmp1 = kzalloc(aligned_size, GFP_KERNEL);
+-	if (!rsa_key->tmp1)
+-		goto free_q;
+-
+-	aligned_size = ALIGN(raw_key->q_sz, dma_get_cache_alignment());
+-	rsa_key->tmp2 = kzalloc(aligned_size, GFP_KERNEL);
+-	if (!rsa_key->tmp2)
+-		goto free_tmp1;
+-
+-	rsa_key->priv_form = FORM2;
+-
+-	rsa_key->dp = caam_read_rsa_crt(raw_key->dp, raw_key->dp_sz, p_sz);
+-	if (!rsa_key->dp)
+-		goto free_tmp2;
+-
+-	rsa_key->dq = caam_read_rsa_crt(raw_key->dq, raw_key->dq_sz, q_sz);
+-	if (!rsa_key->dq)
+-		goto free_dp;
+-
+-	rsa_key->qinv = caam_read_rsa_crt(raw_key->qinv, raw_key->qinv_sz,
+-					  q_sz);
+-	if (!rsa_key->qinv)
+-		goto free_dq;
+-
+-	rsa_key->priv_form = FORM3;
+-
+-	return 0;
+-
+-free_dq:
+-	kfree_sensitive(rsa_key->dq);
+-free_dp:
+-	kfree_sensitive(rsa_key->dp);
+-free_tmp2:
+-	kfree_sensitive(rsa_key->tmp2);
+-free_tmp1:
+-	kfree_sensitive(rsa_key->tmp1);
+-free_q:
+-	kfree_sensitive(rsa_key->q);
+-free_p:
+-	kfree_sensitive(rsa_key->p);
+-	return -ENOMEM;
+-}
+-
+-static int caam_rsa_set_priv_key(struct crypto_akcipher *tfm, const void *key,
+-				 unsigned int keylen)
+-{
+-	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx_dma(tfm);
+-	struct rsa_key raw_key = {NULL};
+-	struct caam_rsa_key *rsa_key = &ctx->key;
+-	int ret;
+-
+-	/* Free the old RSA key if any */
+-	caam_rsa_free_key(rsa_key);
+-
+-	ret = rsa_parse_priv_key(&raw_key, key, keylen);
+-	if (ret)
+-		return ret;
+-
+-	/* Copy key in DMA zone */
+-	rsa_key->d = kmemdup(raw_key.d, raw_key.d_sz, GFP_KERNEL);
+-	if (!rsa_key->d)
+-		goto err;
+-
+-	rsa_key->e = kmemdup(raw_key.e, raw_key.e_sz, GFP_KERNEL);
+-	if (!rsa_key->e)
+-		goto err;
+-
+-	/*
+-	 * Skip leading zeros and copy the positive integer to a buffer
+-	 * allocated in the GFP_KERNEL zone. The decryption descriptor
+-	 * expects a positive integer for the RSA modulus and uses its length as
+-	 * decryption output length.
+-	 */
+-	rsa_key->n = caam_read_raw_data(raw_key.n, &raw_key.n_sz);
+-	if (!rsa_key->n)
+-		goto err;
+-
+-	if (caam_rsa_check_key_length(raw_key.n_sz << 3)) {
+-		caam_rsa_free_key(rsa_key);
+-		return -EINVAL;
+-	}
+-
+-	rsa_key->d_sz = raw_key.d_sz;
+-	rsa_key->e_sz = raw_key.e_sz;
+-	rsa_key->n_sz = raw_key.n_sz;
+-
+-	ret = caam_rsa_set_priv_key_form(ctx, &raw_key);
+-	if (ret)
+-		goto err;
+-
+-	return 0;
+-
+-err:
+-	caam_rsa_free_key(rsa_key);
+-	return -ENOMEM;
+-}
+-
+-static unsigned int caam_rsa_max_size(struct crypto_akcipher *tfm)
+-{
+-	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx_dma(tfm);
+-
+-	return ctx->key.n_sz;
+-}
+-
+-/* Per session pkc's driver context creation function */
+-static int caam_rsa_init_tfm(struct crypto_akcipher *tfm)
+-{
+-	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx_dma(tfm);
+-
+-	akcipher_set_reqsize(tfm, sizeof(struct caam_rsa_req_ctx));
+-
+-	ctx->dev = caam_jr_alloc();
+-
+-	if (IS_ERR(ctx->dev)) {
+-		pr_err("Job Ring Device allocation for transform failed\n");
+-		return PTR_ERR(ctx->dev);
+-	}
+-
+-	ctx->padding_dma = dma_map_single(ctx->dev, zero_buffer,
+-					  CAAM_RSA_MAX_INPUT_SIZE - 1,
+-					  DMA_TO_DEVICE);
+-	if (dma_mapping_error(ctx->dev, ctx->padding_dma)) {
+-		dev_err(ctx->dev, "unable to map padding\n");
+-		caam_jr_free(ctx->dev);
+-		return -ENOMEM;
+-	}
+-
+-	return 0;
+-}
+-
+-/* Per session pkc's driver context cleanup function */
+-static void caam_rsa_exit_tfm(struct crypto_akcipher *tfm)
+-{
+-	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx_dma(tfm);
+-	struct caam_rsa_key *key = &ctx->key;
+-
+-	dma_unmap_single(ctx->dev, ctx->padding_dma, CAAM_RSA_MAX_INPUT_SIZE -
+-			 1, DMA_TO_DEVICE);
+-	caam_rsa_free_key(key);
+-	caam_jr_free(ctx->dev);
+-}
+-
+-static struct caam_akcipher_alg caam_rsa = {
+-	.akcipher.base = {
+-		.encrypt = caam_rsa_enc,
+-		.decrypt = caam_rsa_dec,
+-		.set_pub_key = caam_rsa_set_pub_key,
+-		.set_priv_key = caam_rsa_set_priv_key,
+-		.max_size = caam_rsa_max_size,
+-		.init = caam_rsa_init_tfm,
+-		.exit = caam_rsa_exit_tfm,
+-		.base = {
+-			.cra_name = "rsa",
+-			.cra_driver_name = "rsa-caam",
+-			.cra_priority = 3000,
+-			.cra_module = THIS_MODULE,
+-			.cra_ctxsize = sizeof(struct caam_rsa_ctx) +
+-				       CRYPTO_DMA_PADDING,
+-		},
+-	},
+-	.akcipher.op = {
+-		.do_one_request = akcipher_do_one_req,
+-	},
+-};
+-
+-/* Public Key Cryptography module initialization handler */
+-int caam_pkc_init(struct device *ctrldev)
+-{
+-	struct caam_drv_private *priv = dev_get_drvdata(ctrldev);
+-	u32 pk_inst, pkha;
+-	int err;
+-	init_done = false;
+-
+-	/* Determine public key hardware accelerator presence. */
+-	if (priv->era < 10) {
+-		pk_inst = (rd_reg32(&priv->jr[0]->perfmon.cha_num_ls) &
+-			   CHA_ID_LS_PK_MASK) >> CHA_ID_LS_PK_SHIFT;
+-	} else {
+-		pkha = rd_reg32(&priv->jr[0]->vreg.pkha);
+-		pk_inst = pkha & CHA_VER_NUM_MASK;
+-
+-		/*
+-		 * Newer CAAMs support partially disabled functionality. If this is the
+-		 * case, the number is non-zero, but this bit is set to indicate that
+-		 * no encryption or decryption is supported. Only signing and verifying
+-		 * is supported.
+-		 */
+-		if (pkha & CHA_VER_MISC_PKHA_NO_CRYPT)
+-			pk_inst = 0;
+-	}
+-
+-	/* Do not register algorithms if PKHA is not present. */
+-	if (!pk_inst)
+-		return 0;
+-
+-	/* allocate zero buffer, used for padding input */
+-	zero_buffer = kzalloc(CAAM_RSA_MAX_INPUT_SIZE - 1, GFP_KERNEL);
+-	if (!zero_buffer)
+-		return -ENOMEM;
+-
+-	err = crypto_engine_register_akcipher(&caam_rsa.akcipher);
+-
+-	if (err) {
+-		kfree(zero_buffer);
+-		dev_warn(ctrldev, "%s alg registration failed\n",
+-			 caam_rsa.akcipher.base.base.cra_driver_name);
+-	} else {
+-		init_done = true;
+-		caam_rsa.registered = true;
+-		dev_info(ctrldev, "caam pkc algorithms registered in /proc/crypto\n");
+-	}
+-
+-	return err;
+-}
+-
+-void caam_pkc_exit(void)
+-{
+-	if (!init_done)
+-		return;
+-
+-	if (caam_rsa.registered)
+-		crypto_engine_unregister_akcipher(&caam_rsa.akcipher);
+-
+-	kfree(zero_buffer);
+-}
+diff --git a/drivers/crypto/caam/caampkc.h b/drivers/crypto/caam/caampkc.h
+deleted file mode 100644
+index 96d03704c9be..000000000000
+--- a/drivers/crypto/caam/caampkc.h
++++ /dev/null
+@@ -1,155 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-/*
+- * caam - Freescale FSL CAAM support for Public Key Cryptography descriptors
+- *
+- * Copyright 2016 Freescale Semiconductor, Inc.
+- *
+- * There is no Shared Descriptor for PKC so that the Job Descriptor must carry
+- * all the desired key parameters, input and output pointers.
+- */
+-
+-#ifndef _PKC_DESC_H_
+-#define _PKC_DESC_H_
+-#include "compat.h"
+-#include "pdb.h"
+-
+-/**
+- * caam_priv_key_form - CAAM RSA private key representation
+- * CAAM RSA private key may have either of three forms.
+- *
+- * 1. The first representation consists of the pair (n, d), where the
+- *    components have the following meanings:
+- *        n      the RSA modulus
+- *        d      the RSA private exponent
+- *
+- * 2. The second representation consists of the triplet (p, q, d), where the
+- *    components have the following meanings:
+- *        p      the first prime factor of the RSA modulus n
+- *        q      the second prime factor of the RSA modulus n
+- *        d      the RSA private exponent
+- *
+- * 3. The third representation consists of the quintuple (p, q, dP, dQ, qInv),
+- *    where the components have the following meanings:
+- *        p      the first prime factor of the RSA modulus n
+- *        q      the second prime factor of the RSA modulus n
+- *        dP     the first factors's CRT exponent
+- *        dQ     the second factors's CRT exponent
+- *        qInv   the (first) CRT coefficient
+- *
+- * The benefit of using the third or the second key form is lower computational
+- * cost for the decryption and signature operations.
+- */
+-enum caam_priv_key_form {
+-	FORM1,
+-	FORM2,
+-	FORM3
+-};
+-
+-/**
+- * caam_rsa_key - CAAM RSA key structure. Keys are allocated in DMA zone.
+- * @n           : RSA modulus raw byte stream
+- * @e           : RSA public exponent raw byte stream
+- * @d           : RSA private exponent raw byte stream
+- * @p           : RSA prime factor p of RSA modulus n
+- * @q           : RSA prime factor q of RSA modulus n
+- * @dp          : RSA CRT exponent of p
+- * @dp          : RSA CRT exponent of q
+- * @qinv        : RSA CRT coefficient
+- * @tmp1        : CAAM uses this temporary buffer as internal state buffer.
+- *                It is assumed to be as long as p.
+- * @tmp2        : CAAM uses this temporary buffer as internal state buffer.
+- *                It is assumed to be as long as q.
+- * @n_sz        : length in bytes of RSA modulus n
+- * @e_sz        : length in bytes of RSA public exponent
+- * @d_sz        : length in bytes of RSA private exponent
+- * @p_sz        : length in bytes of RSA prime factor p of RSA modulus n
+- * @q_sz        : length in bytes of RSA prime factor q of RSA modulus n
+- * @priv_form   : CAAM RSA private key representation
+- */
+-struct caam_rsa_key {
+-	u8 *n;
+-	u8 *e;
+-	u8 *d;
+-	u8 *p;
+-	u8 *q;
+-	u8 *dp;
+-	u8 *dq;
+-	u8 *qinv;
+-	u8 *tmp1;
+-	u8 *tmp2;
+-	size_t n_sz;
+-	size_t e_sz;
+-	size_t d_sz;
+-	size_t p_sz;
+-	size_t q_sz;
+-	enum caam_priv_key_form priv_form;
+-};
+-
+-/**
+- * caam_rsa_ctx - per session context.
+- * @key         : RSA key in DMA zone
+- * @dev         : device structure
+- * @padding_dma : dma address of padding, for adding it to the input
+- */
+-struct caam_rsa_ctx {
+-	struct caam_rsa_key key;
+-	struct device *dev;
+-	dma_addr_t padding_dma;
+-
+-};
+-
+-/**
+- * caam_rsa_req_ctx - per request context.
+- * @src           : input scatterlist (stripped of leading zeros)
+- * @fixup_src     : input scatterlist (that might be stripped of leading zeros)
+- * @fixup_src_len : length of the fixup_src input scatterlist
+- * @edesc         : s/w-extended rsa descriptor
+- * @akcipher_op_done : callback used when operation is done
+- */
+-struct caam_rsa_req_ctx {
+-	struct scatterlist src[2];
+-	struct scatterlist *fixup_src;
+-	unsigned int fixup_src_len;
+-	struct rsa_edesc *edesc;
+-	void (*akcipher_op_done)(struct device *jrdev, u32 *desc, u32 err,
+-				 void *context);
+-};
+-
+-/**
+- * rsa_edesc - s/w-extended rsa descriptor
+- * @src_nents     : number of segments in input s/w scatterlist
+- * @dst_nents     : number of segments in output s/w scatterlist
+- * @mapped_src_nents: number of segments in input h/w link table
+- * @mapped_dst_nents: number of segments in output h/w link table
+- * @sec4_sg_bytes : length of h/w link table
+- * @bklog         : stored to determine if the request needs backlog
+- * @sec4_sg_dma   : dma address of h/w link table
+- * @sec4_sg       : pointer to h/w link table
+- * @pdb           : specific RSA Protocol Data Block (PDB)
+- * @hw_desc       : descriptor followed by link tables if any
+- */
+-struct rsa_edesc {
+-	int src_nents;
+-	int dst_nents;
+-	int mapped_src_nents;
+-	int mapped_dst_nents;
+-	int sec4_sg_bytes;
+-	bool bklog;
+-	dma_addr_t sec4_sg_dma;
+-	struct sec4_sg_entry *sec4_sg;
+-	union {
+-		struct rsa_pub_pdb pub;
+-		struct rsa_priv_f1_pdb priv_f1;
+-		struct rsa_priv_f2_pdb priv_f2;
+-		struct rsa_priv_f3_pdb priv_f3;
+-	} pdb;
+-	u32 hw_desc[];
+-};
+-
+-/* Descriptor construction primitives. */
+-void init_rsa_pub_desc(u32 *desc, struct rsa_pub_pdb *pdb);
+-void init_rsa_priv_f1_desc(u32 *desc, struct rsa_priv_f1_pdb *pdb);
+-void init_rsa_priv_f2_desc(u32 *desc, struct rsa_priv_f2_pdb *pdb);
+-void init_rsa_priv_f3_desc(u32 *desc, struct rsa_priv_f3_pdb *pdb);
+-
+-#endif
+diff --git a/drivers/crypto/caam/pkc_desc.c b/drivers/crypto/caam/pkc_desc.c
+deleted file mode 100644
+index 0d5ee762e036..000000000000
+--- a/drivers/crypto/caam/pkc_desc.c
++++ /dev/null
+@@ -1,73 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0
+-/*
+- * caam - Freescale FSL CAAM support for Public Key Cryptography descriptors
+- *
+- * Copyright 2016 Freescale Semiconductor, Inc.
+- *
+- * There is no Shared Descriptor for PKC so that the Job Descriptor must carry
+- * all the desired key parameters, input and output pointers.
+- */
+-#include "caampkc.h"
+-#include "desc_constr.h"
+-
+-/* Descriptor for RSA Public operation */
+-void init_rsa_pub_desc(u32 *desc, struct rsa_pub_pdb *pdb)
+-{
+-	init_job_desc_pdb(desc, 0, SIZEOF_RSA_PUB_PDB);
+-	append_cmd(desc, pdb->sgf);
+-	append_ptr(desc, pdb->f_dma);
+-	append_ptr(desc, pdb->g_dma);
+-	append_ptr(desc, pdb->n_dma);
+-	append_ptr(desc, pdb->e_dma);
+-	append_cmd(desc, pdb->f_len);
+-	append_operation(desc, OP_TYPE_UNI_PROTOCOL | OP_PCLID_RSAENC_PUBKEY);
+-}
+-
+-/* Descriptor for RSA Private operation - Private Key Form #1 */
+-void init_rsa_priv_f1_desc(u32 *desc, struct rsa_priv_f1_pdb *pdb)
+-{
+-	init_job_desc_pdb(desc, 0, SIZEOF_RSA_PRIV_F1_PDB);
+-	append_cmd(desc, pdb->sgf);
+-	append_ptr(desc, pdb->g_dma);
+-	append_ptr(desc, pdb->f_dma);
+-	append_ptr(desc, pdb->n_dma);
+-	append_ptr(desc, pdb->d_dma);
+-	append_operation(desc, OP_TYPE_UNI_PROTOCOL | OP_PCLID_RSADEC_PRVKEY |
+-			 RSA_PRIV_KEY_FRM_1);
+-}
+-
+-/* Descriptor for RSA Private operation - Private Key Form #2 */
+-void init_rsa_priv_f2_desc(u32 *desc, struct rsa_priv_f2_pdb *pdb)
+-{
+-	init_job_desc_pdb(desc, 0, SIZEOF_RSA_PRIV_F2_PDB);
+-	append_cmd(desc, pdb->sgf);
+-	append_ptr(desc, pdb->g_dma);
+-	append_ptr(desc, pdb->f_dma);
+-	append_ptr(desc, pdb->d_dma);
+-	append_ptr(desc, pdb->p_dma);
+-	append_ptr(desc, pdb->q_dma);
+-	append_ptr(desc, pdb->tmp1_dma);
+-	append_ptr(desc, pdb->tmp2_dma);
+-	append_cmd(desc, pdb->p_q_len);
+-	append_operation(desc, OP_TYPE_UNI_PROTOCOL | OP_PCLID_RSADEC_PRVKEY |
+-			 RSA_PRIV_KEY_FRM_2);
+-}
+-
+-/* Descriptor for RSA Private operation - Private Key Form #3 */
+-void init_rsa_priv_f3_desc(u32 *desc, struct rsa_priv_f3_pdb *pdb)
+-{
+-	init_job_desc_pdb(desc, 0, SIZEOF_RSA_PRIV_F3_PDB);
+-	append_cmd(desc, pdb->sgf);
+-	append_ptr(desc, pdb->g_dma);
+-	append_ptr(desc, pdb->f_dma);
+-	append_ptr(desc, pdb->c_dma);
+-	append_ptr(desc, pdb->p_dma);
+-	append_ptr(desc, pdb->q_dma);
+-	append_ptr(desc, pdb->dp_dma);
+-	append_ptr(desc, pdb->dq_dma);
+-	append_ptr(desc, pdb->tmp1_dma);
+-	append_ptr(desc, pdb->tmp2_dma);
+-	append_cmd(desc, pdb->p_q_len);
+-	append_operation(desc, OP_TYPE_UNI_PROTOCOL | OP_PCLID_RSADEC_PRVKEY |
+-			 RSA_PRIV_KEY_FRM_3);
+-}
+diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
+index ec57bf6aaf6c..94f19126f61b 100644
+--- a/drivers/crypto/caam/Kconfig
++++ b/drivers/crypto/caam/Kconfig
+@@ -133,15 +133,6 @@ config CRYPTO_DEV_FSL_CAAM_AHASH_API
+ 	  Selecting this will offload ahash for users of the
+ 	  scatterlist crypto API to the SEC4 via job ring.
+ 
+-config CRYPTO_DEV_FSL_CAAM_PKC_API
+-	bool "Register public key cryptography implementations with Crypto API"
+-	default y
+-	select CRYPTO_RSA
+-	help
+-	  Selecting this will allow SEC Public key support for RSA.
+-	  Supported cryptographic primitives: encryption, decryption,
+-	  signature and verification.
+-
+ config CRYPTO_DEV_FSL_CAAM_RNG_API
+ 	bool "Register caam device for hwrng API"
+ 	default y
+diff --git a/drivers/crypto/caam/Makefile b/drivers/crypto/caam/Makefile
+index a17e3cf14c61..87a82474b841 100644
+--- a/drivers/crypto/caam/Makefile
++++ b/drivers/crypto/caam/Makefile
+@@ -20,7 +20,6 @@ caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API) += caamalg.o
+ caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI) += caamalg_qi.o
+ caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_AHASH_API) += caamhash.o
+ caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_API) += caamrng.o
+-caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_PKC_API) += caampkc.o pkc_desc.o
+ caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_BLOB_GEN) += blob_gen.o
+ 
+ caam-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI) += qi.o
+diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
+index 6e48bf7d6054..744b6586171c 100644
+--- a/drivers/crypto/caam/intern.h
++++ b/drivers/crypto/caam/intern.h
+@@ -178,24 +178,6 @@ static inline void caam_algapi_hash_exit(void)
+ 
+ #endif /* CONFIG_CRYPTO_DEV_FSL_CAAM_AHASH_API */
+ 
+-#ifdef CONFIG_CRYPTO_DEV_FSL_CAAM_PKC_API
+-
+-int caam_pkc_init(struct device *dev);
+-void caam_pkc_exit(void);
+-
+-#else
+-
+-static inline int caam_pkc_init(struct device *dev)
+-{
+-	return 0;
+-}
+-
+-static inline void caam_pkc_exit(void)
+-{
+-}
+-
+-#endif /* CONFIG_CRYPTO_DEV_FSL_CAAM_PKC_API */
+-
+ #ifdef CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_API
+ 
+ int caam_rng_init(struct device *dev);
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index 239469f6882e..2c1e8275ddaf 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -38,7 +38,6 @@ static void register_algs(struct caam_drv_private_jr *jrpriv,
+ 
+ 	caam_algapi_init(dev);
+ 	caam_algapi_hash_init(dev);
+-	caam_pkc_init(dev);
+ 	jrpriv->hwrng = !caam_rng_init(dev);
+ 	caam_qi_algapi_init(dev);
+ 
+@@ -54,7 +53,6 @@ static void unregister_algs(void)
+ 		goto algs_unlock;
+ 
+ 	caam_qi_algapi_exit();
+-	caam_pkc_exit();
+ 	caam_algapi_hash_exit();
+ 	caam_algapi_exit();
+ 
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
