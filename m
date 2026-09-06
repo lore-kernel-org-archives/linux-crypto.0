@@ -1,290 +1,152 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEA3B2D6E58;
-	Sat,  5 Sep 2026 01:30:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B46F11CA9
+	for <linux-crypto@vger.kernel.org>; Sun,  6 Sep 2026 11:02:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788571840; cv=none; b=pS+1I7XsD0V1J2QWtV23JnYYXonpi3R0Wtluu7BUeEUfbJOnvt/YyWF8qGNcMfs4Xeck3nopnfuyZTdqOFkPH/WlO+0Gp6On9lG20gk0tP7GbiBN+5fycFmQsySv/AM6VuIta+2BL8yeXRGE4mONoMnBQR8cLOdlg1ZQ0d0Xsug=
+	t=1788692536; cv=none; b=rqrfZ823ZShdkj+yJuxUIt5QkQSfYTAXBQpRT+VO8JgQ49im2lwwNyNF52ADk4BxXF+YYh51CFoo3ybAXzP397ayy1xJJuEKyNE5lY9/zzJ0xTmKuSakUh1dySt0oktIEr+10hj/PXqo5pr3rk5JSLoeJ5SRlSGHXKgm9CNEsaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788571840; c=relaxed/simple;
-	bh=d/CBhLFjbPlAhNAItDfQ/4uJXM2tKA1e3jC+k9LNt3g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l01bCsFzIIyfm/jJw6LQnKvlXHRIHJDxHn/7r2ms35ux+ykPBvdZF6e3Tf9xcA0lpLLySUDixYEyj32asSWD/+vDJc694xmEsxwNwwt3v1dw4jGwtBkff4bgIiLC0lV1XBFBZh2lqYjLk9RurqCedE5BaRztF2njwmhpjiC9sf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=kULah2Ng; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	s=arc-20240116; t=1788692536; c=relaxed/simple;
+	bh=xjHNZdArQMCZb650b76E3RrOioBC8s4U6npUhtP28jk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Tqh7L9xhQ+V8O3UBd3ICEctIe2xEJsU2Vm0W9IexMf8rvpmSiLDc3OGO2klSzOKdsd9BqREk0lBaW7ojM0A8LQveLUpuKAu/6RMb0CizjrKD/LE4I5I1F/eR1f0GxC1eSdtXNL8ETxW6E/6ZoCfa1LvxzTTzepGv1yWTBHPp2hA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Iv1ANG1w; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="kULah2Ng"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 5AA9940E00E6;
-	Sat,  5 Sep 2026 01:30:34 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id Z7EqV71p49rx; Sat,  5 Sep 2026 01:30:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1788571822; bh=YtdiCM8T6f78OsecQ90guY/JrJBZ0tS0yXbieswmS08=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kULah2NgfTSLlX2Udor074ue9WpiuYORPvPvOS85ijeG26D6s8FyHKB7u0BJs7LpF
-	 ZWpGJpQ1DjFUPJ/WwN3oiOJxs4AsiExWIcivL9TTkfOrVp1QU6pRvUX9Nx7oKyH7z5
-	 UbMPUy4QVBTQhpkLcU6M4rNYjcyarjoL5Ex1QAoGlM/TiId4cFdao22W8s+JJufISC
-	 F4esj/j3RCyOwQWJHRKClQIZ7yxDAtgGuQ+sjRR1SDklAohN+mnGLVnnRTbk8xJ05Y
-	 n7ngBSKqN0HwlsBGXie9J6B8c6gaET8pb5R1FS26rCrPr0YyBAcFVh/8pq1jkcQca9
-	 DMET8/9OhsqNssYHnIM8CNpttwy5+EQy6CQkJ3aW+0P1nms/9zMcwNeT/8YHDC2nQm
-	 MjjcWy0gl+nemC0RHkl9qYP+MA2YQnM3dueO3eYfv3KwZI1wFgby7gcIqwB3A2Ze5O
-	 WXwrLr2J4JIERVKVc+Ls75QFb22TILUZt8WRosY9E7V/abD4P0L3IMY8hfUS8iQyoX
-	 SgCMfbXcCyYOjlx7moNJCAezN3KQ2rrSDrGuMqIOYfpb1Gvs0oAoxDgzf+/ClVVy0f
-	 8MT0YqACHgwJf3sUyBTvH35+S9/FGS2UOlW+5rZiLW6Gs7UjWhd1RLIrAj4I/jonR4
-	 6dbFLY9/i9KALy34IeIIRxQ8=
-Received: from stx.tnic (unknown [IPv6:2600:1700:38ca:c00::2a])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 652B840E016C;
-	Sat,  5 Sep 2026 01:29:48 +0000 (UTC)
-Date: Fri, 4 Sep 2026 18:29:45 -0700
-From: Borislav Petkov <bp@alien8.de>
-To: Ashish Kalra <Ashish.Kalra@amd.com>
-Cc: tglx@kernel.org, mingo@redhat.com, dave.hansen@linux.intel.com,
-	x86@kernel.org, hpa@zytor.com, seanjc@google.com,
-	peterz@infradead.org, thomas.lendacky@amd.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net, ardb@kernel.org,
-	pbonzini@redhat.com, aik@amd.com, Michael.Roth@amd.com,
-	KPrateek.Nayak@amd.com, Tycho.Andersen@amd.com,
-	Nathan.Fontenot@amd.com, ackerleytng@google.com, jackyli@google.com,
-	pgonda@google.com, rientjes@google.com, jacobhxu@google.com,
-	xin@zytor.com, pawan.kumar.gupta@linux.intel.com,
-	babu.moger@amd.com, dyoung@redhat.com, nikunj@amd.com,
-	darwi@linutronix.de, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
-	linux-coco@lists.linux.dev
-Subject: Re: [PATCH v13 4/5] x86/sev: Add support to perform RMP
- optimizations asynchronously
-Message-ID: <20260905012945.GPaptwicVjJ-SwXYzl@fat_crate.local>
-References: <cover.1788296083.git.ashish.kalra@amd.com>
- <a31fc8c6d3f6c6bbe50dc4542c7091b0899d3e1b.1788296083.git.ashish.kalra@amd.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Iv1ANG1w"
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-84faf0fa17eso2614303b3a.2
+        for <linux-crypto@vger.kernel.org>; Sun, 06 Sep 2026 04:02:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788692534; x=1789297334; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=zsoQ3WWbLMeracKBU+KB0eYOl3CW7WFSrJU6E+v+qnU=;
+        b=Iv1ANG1wWZgpAPCr+lLGmw7SZUiypQkhxDVAFoyVJYNPZ7s3jNzNjngIfpsSRu3clH
+         K0Om1YZ/e4ByFUr1kGpIpmAQcyx5WDeMunAhSQxFfaYZC7b8m6Yy6QouOaL7wiyM7Qxu
+         TuQsHXq6q1qaf1vPXDyRp8Er3Y8WIgejlqsLohTVg4Bp9zoqhcJnbKq0z8dKuTo0EN7i
+         hHdwLK3xSdKCcDdaBQDaLrABywg/f5wx2SuePusByIJDgHEVYLsb7FVvNxaMceCirH+a
+         5dQDosqouGlEpIhTMdnq0PbpKGGX4JN4QO0qkmujDLOEzk1xqOHqilCxrFYFqcx2Xz28
+         /VDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788692534; x=1789297334;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to:content-type;
+        bh=zsoQ3WWbLMeracKBU+KB0eYOl3CW7WFSrJU6E+v+qnU=;
+        b=sII0Kdq6zrpjnfrTDblgdRwr7wU/fzrjUgdjgtFkpcD/8JAN2SJ7M0gAzaZf2+5bwE
+         Mpzryq9WnCs+GJPLI/e4r5Heyf6J1gWY+Idpxa533DJpewRPmLN55WBAG0NFNiX2sDpu
+         h2zR3mbJ0rpKQKhWRhivaZNqMr6oC66Epl75tfK6K2IRlt6qRVPnu+QVeAYcns6U8drt
+         i34QDILn+QmfmAcv4nAMuTcoX0aXEpYzoQzcA8wxer/mGD7VKQ9+GnIQ6lVMEoDGf/av
+         K3U5nQvR7c889r2MDi4WJbwOJNKnIr/9Kk49j/DWS1KIHitxs36KBsvmF2bJmhM5Bk//
+         TqYA==
+X-Forwarded-Encrypted: i=1; AKwUvByE/WoRwx5P7mD1R4JxqYgnAOl0F/95uCT+7J7+u17xzlKz2qKJMnwaDwhiqSmIkOfH/Z7DmwO1OGZW5FA=@vger.kernel.org
+X-Gm-Message-State: AFuF++naOVhLkvgprFXq/p3jxwhoSVWkRdoQSwlTBAGHph7/maB9myqn
+	BT9lJ8+78jOp45s2mpWwGh/TvGGV7dJ5Lp3Sf8fnmM+wOG7gpCvyFS8A
+X-Gm-Gg: AYBFou13iNBCGBiaX7S/7JvIVfWxNzaGNcxMwSzzbHcnN1b23JX3l6gUY8TVmQ8/ZDK
+	9kgf5FJBUGaRgMsm3NN+zcmYMyWep4eDzHUxaFs7PPphSQlrjZqjPsHI/x1SZpg0uRQlU4vfUrB
+	PlXQwjzxTJ/fdYtWsIwezPHdW5x1qmwQZFaRblN2BSXGm3kzwXt3Ow/Ujp8c6rgSFsW9jHvmMzr
+	xAxsh6rHHDFvuvNkpTNERk7u24+1XfcvQtCG4IZl3TkZF9eD6Ds+gy9J8J/M5eyjtujRBfD44Wq
+	8HklHYqXfqR6u+hXGZn7e6Kt+U+uR9KAnwob27PiJyvJ0Dz66mBGgMmHqt+BVUQvwTgECmKpCRw
+	lKyJLvQw0NFZZ9r+Bh/VX0ccoO/CZBn0ENJFMp/ur+vlYfpwI73DR5TX1NgDSayZw4Zc8XC3uvy
+	/P7OhL7JUDZnAU2CvDpX5S9vR2SU7p5/VDMoyZ6mVPJ3keIBtd/EvpI5UCuIKz8tO5s26rGD7+p
+	sSGPz6RMVn5q+UZSlJm
+X-Received: by 2002:a05:6a00:349a:b0:848:56ff:6ced with SMTP id d2e1a72fcca58-8616819d66fmr24558258b3a.8.1788692533606;
+        Sun, 06 Sep 2026 04:02:13 -0700 (PDT)
+Received: from 192.168.50.3 ([183.193.115.0])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-862810e0cf7sm2015708b3a.48.2026.09.06.04.02.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 06 Sep 2026 04:02:12 -0700 (PDT)
+From: Weiming Shi <bestswngs@gmail.com>
+To: David Howells <dhowells@redhat.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	Ignat Korchagin <ignat@linux.win>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>
+Cc: keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	James Morris <james.morris@microsoft.com>,
+	Denis Kenzior <denkenz@gmail.com>,
+	Xiang Mei <xmei5@asu.edu>,
+	Weiming Shi <bestswngs@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v3] asymmetric_keys: reject trust keys without IDs
+Date: Sun,  6 Sep 2026 19:01:53 +0800
+Message-ID: <20260906110152.240426-2-bestswngs@gmail.com>
+X-Mailer: git-send-email 2.55.0
+In-Reply-To: <20260502163328.696098-2-bestswngs@gmail.com>
+References: <20260502163328.696098-2-bestswngs@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <a31fc8c6d3f6c6bbe50dc4542c7091b0899d3e1b.1788296083.git.ashish.kalra@amd.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Sep 02, 2026 at 09:28:57PM +0000, Ashish Kalra wrote:
-> Subject: Re: [PATCH v13 4/5] x86/sev: Add support to perform RMP optimizations asynchronously
+The PKCS#8 parser deliberately leaves the asym_key_ids payload slot
+empty. key_or_keyring_common() unconditionally dereferences that slot
+when a PKCS#8 key is supplied to a key_or_keyring restriction. Both the
+plain and :chain forms reach this branch, allowing an unprivileged caller
+to trigger a NULL pointer dereference through KEYCTL_RESTRICT_KEYRING
+followed by add_key().
 
-s/Add support to perform/Perform/
+ Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000
+ KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+ RIP: 0010:key_or_keyring_common (crypto/asymmetric_keys/restrict.c:205 crypto/asymmetric_keys/restrict.c:279)
+ Call Trace:
+  <TASK>
+  __key_create_or_update (security/keys/key.c:884)
+  key_create_or_update (security/keys/key.c:1021)
+  __do_sys_add_key (security/keys/keyctl.c:134)
+  do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
+  entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+  </TASK>
+ Kernel panic - not syncing: Fatal exception
 
-> From: Ashish Kalra <ashish.kalra@amd.com>
-> 
-> When SNP is enabled, all writes to memory are checked to ensure memory
-> integrity. This imposes performance overhead on the whole system.
-> 
-> RMPOPT is a new instruction that minimizes the performance overhead of
-> RMP checks on the hypervisor and on non-SNP guests by allowing RMP
-> checks to be skipped for 1GB regions of memory that are known not to
-> contain any SNP guest memory.
-> 
-> Add support for performing RMP optimizations asynchronously using a
-> dedicated workqueue.
-> 
-> At RMP initialization time, run an optimization pass over all physical
-> memory (up to 2TB of system RAM, starting from the lowest physical
-> memory address aligned down to a 1GB boundary), skipping RMP checks for
-> 1GB regions that do not contain SNP guest memory (excluding preassigned
-> pages such as the RMP table and firmware pages).
-> 
-> As SNP guests are launched, RMPUPDATE assigns their private pages to
-> guest-owned state; when such a page falls within an optimized 1GB
-> region, the hardware clears that region's RMPOPT optimization and RMP
-> checks resume there to protect the guest memory.
-> 
-> Since launching SNP guests clears these optimizations, perform them
-> again asynchronously using the dedicated workqueue.
-> 
-> Suggested-by: Thomas Lendacky <thomas.lendacky@amd.com>
-> Suggested-by: Dave Hansen <dave.hansen@linux.intel.com>
-> Suggested-by: K Prateek Nayak <kprateek.nayak@amd.com>
-> Suggested-by: Borislav Petkov (AMD) <bp@alien8.de>
-> Reviewed-by: Ackerley Tng <ackerleytng@google.com>
-> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+Reject an asymmetric restriction key without key IDs. A PKCS#8 private
+key cannot identify the signer of a candidate certificate and is not a
+valid trust anchor.
 
-R-by's need to get dropped when a patch changes in more or less significant
-way.
+Fixes: 3c58b2362ba8 ("KEYS: Implement PKCS#8 RSA Private Key parser [ver #2]")
+Cc: stable@vger.kernel.org
+Reported-by: Xiang Mei <xmei5@asu.edu>
+Link: https://lore.kernel.org/r/20260429181629.110802-2-bestswngs@gmail.com
+Assisted-by: Claude:claude-opus-4-8
+Signed-off-by: Weiming Shi <bestswngs@gmail.com>
+---
+Changes in v3:
+- Drop the unnecessary find_asymmetric_key() check.
+- Reject a trust key without IDs instead of continuing the chain lookup.
+- Use the PKCS#8 parser commit as the Fixes target.
 
-> @@ -561,10 +571,26 @@ static void rmpopt_disable(void)
->  {
->  	int cpu;
->  
-> +	guard(mutex)(&rmpopt_wq_mutex);
-> +
-> +	/*
-> +	 * rmpopt_wq is non-NULL only after RMPOPT has been fully set up: the
-> +	 * workqueue is allocated and the RMPOPT_BASE MSRs are programmed.
-> +	 * snp_setup_rmpopt() resets it to NULL if any of those steps fail, so a
-> +	 * NULL rmpopt_wq means nothing was set up and there is nothing to tear
-> +	 * down.
-> +	 */
-> +	if (!rmpopt_wq)
+ crypto/asymmetric_keys/restrict.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-Now take your patch and rip all that gunk which destroys the setup work done
-by snp_setup_rmpopt(). Instead, you init things once and do not touch them
-even if RMP optimizations are disabled.
-
-In case they get enabled again later, you simply reactivate them instead of
-doing useless setup work all over again.
-
-> +		return;
-> +
-> +	cancel_delayed_work_sync(&rmpopt_delayed_work);
-> +	destroy_workqueue(rmpopt_wq);
-> +
->  	for_each_cpu(cpu, cpu_primary_thread_mask)
->  		wrmsrq_on_cpu(cpu, MSR_AMD64_RMPOPT_BASE, 0);
->  
-> -	rmpopt_pa_start = 0;
-> +	rmpopt_pa_start = rmpopt_pa_end = 0;
-> +	rmpopt_wq = NULL;
->  }
->  
->  void snp_shutdown(void)
-> @@ -595,6 +621,44 @@ static bool rmpopt_capable(void)
->  	       cc_platform_has(CC_ATTR_HOST_SEV_SNP);
->  }
->  
-> +/*
-> + * RMPOPT optimizations skip RMP checks at 1GB granularity if this range of
-> + * memory does not contain any SNP guest memory.
-> + *
-> + * @pa is a system physical address; RMPOPT operates on the containing 1GB.
-> + */
-> +static void rmpopt(u64 pa)
-> +{
-> +	enum rmpopt_op_type op = RMPOPT_OP_VERIFY_AND_REPORT_STATUS;
-> +	u64 pa_start = ALIGN_DOWN(pa, SZ_1G);
-> +
-
-	/* Supported by binutils 2.48+ */
-
-> +	asm volatile(".byte 0xf2, 0x0f, 0x01, 0xfc"
-> +		     :: "a" (pa_start), "c" (op)
-> +		     : "memory", "cc");
-> +}
-
-
-
-> +
-> +/* on_each_cpu() callback: optimize the whole RMPOPT range on this CPU. */
-> +static void rmpopt_scan_range(void *arg)
-> +{
-> +	u64 pa;
-> +
-> +	for (pa = rmpopt_pa_start; pa < rmpopt_pa_end; pa += SZ_1G)
-> +		rmpopt(pa);
-> +}
-> +
-> +static void do_rmpopt_work(struct work_struct *work)
-> +{
-> +	/*
-> +	 * RMPOPT caches the results of a RMP table scan in reserved processor
-> +	 * memory, allowing future invocations to skip such costly operations.
-> +	 */
-
-We know already. Drop this comment.
-
-> +	migrate_disable();
-> +	rmpopt_scan_range(NULL);
-> +	migrate_enable();
-> +
-> +	on_each_cpu_mask(cpu_primary_thread_mask, rmpopt_scan_range, NULL, true);
-> +}
-> +
->  void snp_setup_rmpopt(void)
->  {
->  	u64 rmpopt_base;
-> @@ -603,6 +667,34 @@ void snp_setup_rmpopt(void)
->  	if (!rmpopt_capable())
->  		return;
->  
-> +	guard(mutex)(&rmpopt_wq_mutex);
-> +
-> +	/*
-> +	 * On re-initialization after a legacy SNP shutdown (SNP_SHUTDOWN_EX
-> +	 * with x86_snp_shutdown=0), snp_shutdown() and thus rmpopt_disable() are
-> +	 * skipped, so the workqueue, delayed work and per-CPU RMPOPT_BASE MSRs
-> +	 * are still set up and valid (SnpEn stayed set and CPU hotplug stayed
-> +	 * disabled).  Rather than re-doing the setup, which would leak the
-> +	 * existing state, just re-queue the optimization pass to re-optimize any
-> +	 * memory the previous SNP session de-optimized.
-> +	 */
-> +	if (rmpopt_wq) {
-> +		queue_delayed_work(rmpopt_wq, &rmpopt_delayed_work, 0);
-> +		return;
-> +	}
-> +
-> +	/*
-> +	 * Create an RMPOPT-specific workqueue to avoid scheduling
-> +	 * RMPOPT workitem on the global system workqueue.
-> +	 */
-
-Why?
-
-> +	rmpopt_wq = alloc_workqueue("rmpopt_wq", WQ_UNBOUND, 1);
-> +	if (!rmpopt_wq) {
-> +		pr_err("Failed to allocate RMPOPT workqueue\n");
-> +		return;
-> +	}
-> +
-> +	INIT_DELAYED_WORK(&rmpopt_delayed_work, do_rmpopt_work);
-> +
->  	rmpopt_pa_start = ALIGN_DOWN(PFN_PHYS(min_low_pfn), SZ_1G);
->  	rmpopt_base = rmpopt_pa_start | MSR_AMD64_RMPOPT_ENABLE;
->  
-> @@ -612,6 +704,23 @@ void snp_setup_rmpopt(void)
->  	 */
->  	for_each_cpu(cpu, cpu_primary_thread_mask)
->  		wrmsrq_on_cpu(cpu, MSR_AMD64_RMPOPT_BASE, rmpopt_base);
-> +
-> +	rmpopt_pa_end = ALIGN(PFN_PHYS(max_pfn), SZ_1G);
-> +
-> +	/* Limit memory scanning to 2TB of RAM */
-
-No need for that comment - we know.
-
-> +	if ((rmpopt_pa_end - rmpopt_pa_start) > SZ_2T) {
-> +		pr_info("RMPOPT coverage limited to 2TB; memory above 0x%llx not optimized\n",
-
-No need for that print - nothing we can do about it anyway.
-
-> +			rmpopt_pa_start + SZ_2T);
-> +		rmpopt_pa_end = rmpopt_pa_start + SZ_2T;
-> +	}
-> +
-> +	/*
-> +	 * Once all per-CPU RMPOPT tables have been configured, enable RMPOPT
-> +	 * optimizations on all physical memory.
-> +	 */
-
-Drop this comment too.
-
-> +	queue_delayed_work(rmpopt_wq, &rmpopt_delayed_work, 0);
-> +
-> +	pr_info("RMPOPT optimizations enabled\n");
->  }
->  EXPORT_SYMBOL_FOR_MODULES(snp_setup_rmpopt, "ccp");
->  
-> -- 
-> 2.43.0
-> 
-
+diff --git a/crypto/asymmetric_keys/restrict.c b/crypto/asymmetric_keys/restrict.c
+index 86292965f..0e4783ff7 100644
+--- a/crypto/asymmetric_keys/restrict.c
++++ b/crypto/asymmetric_keys/restrict.c
+@@ -243,10 +243,14 @@ static int key_or_keyring_common(struct key *dest_keyring,
+ 			if (IS_ERR(key))
+ 				key = NULL;
+ 		} else if (trusted->type == &key_type_asymmetric) {
++			const struct asymmetric_key_ids *kids;
+ 			const struct asymmetric_key_id **signer_ids;
+ 
+-			signer_ids = (const struct asymmetric_key_id **)
+-				asymmetric_key_ids(trusted)->id;
++			kids = asymmetric_key_ids(trusted);
++			if (!kids)
++				return -ENOKEY;
++
++			signer_ids = (const struct asymmetric_key_id **)kids->id;
+ 
+ 			/*
+ 			 * The auth_ids come from the candidate key (the
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+2.55.0
