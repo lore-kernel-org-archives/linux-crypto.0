@@ -1,375 +1,230 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B5DC41D107
-	for <linux-crypto@vger.kernel.org>; Mon,  7 Sep 2026 14:12:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788790333; cv=none; b=mXuNDdSPoweKEg09MSX8cmpuXoz4YUMkdt4oNpJMogsokMUfSz5BQoP37OOqtAiKwKJ1i8t5i5/zRUsjK/cxB2ps3EQbHPa5zBlNB52ryqIbj0izUBkBTG554YZ0S7K81yON/8bZZFuJuIqxB2Z3ljY11a6gFHfusUlkimqhhNQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788790333; c=relaxed/simple;
-	bh=fS+geZIdxtmX7yxbcEzrvKuspfoxDdUwZsyfHCvJ/GY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jMxGnfxI6iSYBKIHWLn8Ens4u/wImdMRLaGe5ppcPz4K1ILxtvfaJnt34V9gZ42ubLSKTCrjg8tJUv08W4lJMTcDr/pfXLQ56ClLhVy26qIGOmZPxlno5ZCeBSPAPghKGzPWtu/D5hZyF19i52YD9Br0tRNzvchTb5oCEGjRa74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TjcSxl9u; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32B6B503BC0
+	for <linux-crypto@vger.kernel.org>; Mon,  7 Sep 2026 15:30:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788795010; cv=fail; b=nO06QrR9FOouc62sZ+a+d4ZGHdUakSpgceK8aNqYU6cSvtuL8gKbkL678yrTJ26uGex3a5fWOcN+fYtrI9Cwin5rFn8u/A5dI3pyQUqCiHhnVDoWknyBnbuvuQnT9cneuOMAEHVfK6K1pMAlNOQONZMVwGjKzY3ngco0Eri+5Vs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788795010; c=relaxed/simple;
+	bh=4sPrkwDghNSnzlRBU9K8wl0PVeq8W5Ywnsp9f+n0Jrk=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=WOSr/4qapnGmd/G5KL0JrdlcPa65fYjv87O+KRipAEtK+1Rqv8RlXvQbNJPGwzIv18W7hQpEHcQ/P2n0iLHkErmf2fCyj3sWcDOL1dzML8fnaWrs1YVaOGKCahgC0A30d4UY960yrws4kOdGIPwdZ35wJB/wlelvM9QEGe+TBm8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HT7r3tBO; arc=fail smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TjcSxl9u"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27AAE1F00A3F
-	for <linux-crypto@vger.kernel.org>; Mon,  7 Sep 2026 14:12:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788790330;
-	bh=4j34JVFyI4cB1/rq3EimeqA7+T20tu0tgDX1NSgvu/8=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc;
-	b=TjcSxl9usDzSzcnm6PbtlAErVDzLwHmd9WRMJSnD1x9BZXSLSmh1YVwU98ynQlEhP
-	 PUGfZKuK43jzT4cR36HKNojmr2Ak9EVDUDVjXmUm6Uu5MVVovdwBV3ywLmP3AnvF+y
-	 JgPIiOh7CHmYNfmrynpNHh96iH/iqeapdOkCwc1cm3vS27lB2dLWnbU6Gwazs+vGFs
-	 U9YX80+dCAWjha7oVXCQP3SS72gDtdxCKw4bxE8MkaS8laqV63KqZBoV5t64NqXipo
-	 LpCKns58HEN8yEPuhCtwFnWJuEA2CibNNnEezMec684Md/bBDBYxJb5UI4QCJCqDjm
-	 y1qr2k5391j3A==
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-6a7f27637d6so4766643a12.3
-        for <linux-crypto@vger.kernel.org>; Mon, 07 Sep 2026 07:12:10 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AKwUvBy2z/rjFmB5YcXaUfLZgwqRQeNnH2T4P/dJENGoW1BquJb5J+GBIu/1e1jKXoNx5qg7zUxo7TG0mkG527g=@vger.kernel.org
-X-Gm-Message-State: AFuF++kmvpcWHHrPVo4sEWeq/vBb95oo9F6xXsVcqtUlgpu9PjgWb2M4
-	/iGhm8xScO3qt8duD4NWNMnqwoXAklpZo+RSBl5+rALSjcuHgXehMknCxl6Tj74WrsdpyR9F9xN
-	2VtgMxgJNTUGmroXpFlZ509zifX0dw8U=
-X-Received: by 2002:a05:6402:325a:b0:6a6:1a05:8b30 with SMTP id
- 4fb4d7f45d1cf-6a7e8d53f89mr12222359a12.6.1788790328635; Mon, 07 Sep 2026
- 07:12:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HT7r3tBO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1788795007; x=1820331007;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=4sPrkwDghNSnzlRBU9K8wl0PVeq8W5Ywnsp9f+n0Jrk=;
+  b=HT7r3tBOOMaTmUIa0zN9qOCJxeOnrzloeNfsW+Fb7nbA9RogIqhykXaW
+   ih5MoAXkbLQB+2w+7W3dBiXqVGsMwkDVZPf4Ymw429bS/aZbgLJTF3UdZ
+   1KU3OhFItaCiXSkRVAcuSp4kBnjPQxN9Rn/HgHXbrCQGrGlNAbLbQsq8U
+   7dPWCpVR+BcGz3JZYxb+9IAONysx6fTQ3bAic+lw5/hJNzv/LNmY6y+CA
+   r8S5U28QJxGBWNrW0n3KsuLreS/sLNH+l+4kimMjPnXYOnqti07JiXvKA
+   a+rkYY1pJ5mfVgCZNCJvZyQQI5mVZpCaFZ7VinNc+gGr7W6wZSZ4kosAC
+   Q==;
+X-CSE-ConnectionGUID: ze5dct1fRQmhv/3ufMno/Q==
+X-CSE-MsgGUID: 1vOan1azQQ6m08zhnzZVCg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11899"; a="99857718"
+X-IronPort-AV: E=Sophos;i="6.25,267,1779174000"; 
+   d="scan'208";a="99857718"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Sep 2026 08:30:06 -0700
+X-CSE-ConnectionGUID: m4mXwN6aR6WN8DwvmHASFA==
+X-CSE-MsgGUID: +HHRRNKAQhSebEsuk4+E9Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.25,267,1779174000"; 
+   d="scan'208";a="274251389"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Sep 2026 08:30:07 -0700
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.46; Mon, 7 Sep 2026 08:30:05 -0700
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.46 via Frontend Transport; Mon, 7 Sep 2026 08:30:05 -0700
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (40.93.195.24)
+ by edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.46; Mon, 7 Sep 2026 08:30:04 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qX6/psIoFYKLX3kd/3fo+1wTz74klEF+krRsW1+lq1OyFkhVKAeHQ7Ta5AHTfzE2gNV9Tm10qL1BnpWITOYAa3wt0d8oEBc5TkCW/ekymVyjXk0lOcApBvgzOioyJErB1PQ/ugHorUZYlfMGPLmxhMPlFKE1epbF98BVXkg1onXjHOWQRMjJYjAYX8Kfun/Fp92y1MvI0PWMddp4xLVq6VMSq6q+sS5V82si7vGEzQvXt5cNJuoJY8xLpO3Z+mJeQugKirhsPoopHq0v3wEUErmVTHmgRA9DZrlvEPzamev0w16JQ3dVnEHQWMYyFU2rZx3s7LQYHfIwsSUyBaq+UQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DNL2+svyNVdZxJJktn2ul5x1CAVJ9x+IAwx8uMXCYzU=;
+ b=SYHkY28wGHQgl8rG0nD2cvD7eBW05q61/LfSkroQO3y4oR/gFtIB9Ys9lW74qkmiNM7v1AyYS1x0ouaOi6MoHtgh+ldoJWk4TbkyezF+ACrlWKuOmJHcE5lJ2el0SCT9JN4TTMec9havtMVJZYFFJyse3MJN58/zav/5XRTBu+nZzcS2yF/1hu9QQQ/+pQzhw0SaAnb3EUqXVv2vd7mGQx79gme9viTxok6kr7t4dGngyjsnWuy/eou+NFW6iwNxym+ls6l9A+yckov5ggSCR1j9VxEHWcCwPR78L6Kt2/ZHy+XVNDWDa/5LvZ/3r3R73mTpWdixH+iU6hH79C68FA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB7960.namprd11.prod.outlook.com (2603:10b6:8:fe::22) by
+ IA3PR11MB8987.namprd11.prod.outlook.com (2603:10b6:208:574::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.382.15; Mon, 7 Sep
+ 2026 15:30:01 +0000
+Received: from DS0PR11MB7960.namprd11.prod.outlook.com
+ ([fe80::db04:2d0e:9ecd:e9c4]) by DS0PR11MB7960.namprd11.prod.outlook.com
+ ([fe80::db04:2d0e:9ecd:e9c4%4]) with mapi id 15.21.0382.014; Mon, 7 Sep 2026
+ 15:30:01 +0000
+Date: Mon, 7 Sep 2026 16:29:56 +0100
+From: Ahsan Atta <ahsan.atta@intel.com>
+To: Thomas Huth <thuth@redhat.com>
+CC: <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
+	<qat-linux@intel.com>, Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: Re: [PATCH] crypto: qat - fix active_devs leak on crypto alg
+ registration failure
+Message-ID: <ap7YdIh7r9JtjYPu@soc-PF5467PW.clients.intel.com>
+References: <20260902101216.1226292-1-ahsan.atta@intel.com>
+ <2cd6e3c2-bd01-47df-b58c-f1f207f856c6@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <2cd6e3c2-bd01-47df-b58c-f1f207f856c6@redhat.com>
+X-ClientProxiedBy: DB9PR01CA0009.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:1d8::14) To DS0PR11MB7960.namprd11.prod.outlook.com
+ (2603:10b6:8:fe::22)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20260907023827.14905-1-zhaoqunqin@163.com> <20260907023827.14905-3-zhaoqunqin@163.com>
-In-Reply-To: <20260907023827.14905-3-zhaoqunqin@163.com>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Mon, 7 Sep 2026 22:12:01 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H6M+MKs+YYB9dKofVi56wKSoY1y9KYWP9wJfjz=cK9waw@mail.gmail.com>
-X-Gm-Features: AcwNN1VHJCFS1XdyxdMPGv6MTjODmAr6tsGUPDrJQz9tSWNPnmxPSO_egWRxx8A
-Message-ID: <CAAhV-H6M+MKs+YYB9dKofVi56wKSoY1y9KYWP9wJfjz=cK9waw@mail.gmail.com>
-Subject: Re: [PATCH v6 2/2] mfd: loongson-se: Fix miscellaneous issues
-To: Qunqin Zhao <zhaoqunqin@163.com>
-Cc: lee@kernel.org, linux-kernel@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-crypto@vger.kernel.org, mfd@lists.linux.dev, 
-	Qunqin Zhao <zhaoqunqin@loongson.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB7960:EE_|IA3PR11MB8987:EE_
+X-MS-Office365-Filtering-Correlation-Id: 01b08de5-2b81-40fa-fb1c-08df0cf4e1f7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|10070799003|366016|23010399003|1800799024|10067099003|56012099006|4143699003|11063799006|18002099003|22082099003;
+X-Microsoft-Antispam-Message-Info: f/zQI+W/iMdTRL4JUF6nDaIlgaZN/zgiyNtooVdcZDJhf9uv7r3tcIiW4QxmYMB1PcAV/oc9W8cY0Nq5N2HCTGEAd1goV6hudB9dSff6s/pUVY1l9hfi/K+vsXPCqIT5D8g7SLRdr3JaEQPe61SCQq1yAbFslgl+p5uW2i2sZRcv4cNW2LIASQUJMmM1XUjZxwpnDf+Wv/BWefY2ci5WEyoetyIEO7jBd3UOPSmSIhxH/jdUD2Rc5UUZfrUWnX8gYKVWiSbJ0JUBoDHsFAzY6/7sdUmQwIVWHm9kmgk/UoZ7/uKtuRhdqPCeaGqS6coAebzfh2iTxjKRrWCbASfPynTGx6LfHaCbOXKN19/mxEmgZyJr9TXiTqKDcUxgJMBbqmwShtvd3efaJWo7ioiPQjGY018/oS/J/B1tZDu5pfc10OWGT10YU127jrIP2O/2BpQF5vej+dd3VnR5UG/fg4otBkCVH116rhwzH7WnSZaBD2qfIRfFk6zcuWdE7cE4KsvNUCXvFNAKddJNwwZ2AOfl5oi52maaliVMqRp9opairROzjtRKkIvEXyA7VBEO+KjJolg8NjOLCJaIBW/YC6ttWmMYhww1vC8lr8oJazmJMF2iEifhJeGFlT6/u1OgutvTlMWnswLJrGYe+C9j1R8auE4e7bibXVfqvMKoASQ=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7960.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(10070799003)(366016)(23010399003)(1800799024)(10067099003)(56012099006)(4143699003)(11063799006)(18002099003)(22082099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 2
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?IrMcb2Ahg4Mx4+edLSNNTSDA0eIm8zN411GMEgZvZJMAkbJ0VZ1cxR5ftdGK?=
+ =?us-ascii?Q?nMWuM7RAEDbXAfpH1/pe+SDW1SOtRBNQZpWaJ2HJxoCFHxWhUeJBaXCH4vB3?=
+ =?us-ascii?Q?pWP3DYiH7yUw9VW/GtUgXcQpUxOzETGQo/RBp/IYmJmw5hE8m6w6nF9H92eZ?=
+ =?us-ascii?Q?AFSodVbjsuuvJcq+HcewSIblOpW/vReepaMgxBx5S98/zqNb6Sdop8xAscZS?=
+ =?us-ascii?Q?9i8YdaFAMvaLHxW3OiLswugiOoFMNT2VMzbLUfgG1O2lq9P108GEnI5u7FJS?=
+ =?us-ascii?Q?Sb5PODtaL7VMZKgkkA+R9qf4iXeIhVBtQbKu62VV9pbK6NhXDYvxENI1MDWq?=
+ =?us-ascii?Q?cOUkfmMN/WN9Q2SErir53RAUAyPPXugRPR0wbR+ehbXclR6cyy5UpVZ6kyUy?=
+ =?us-ascii?Q?DleV5Xs3wm8sZQvyRTN6RyRtDeovh4PmjNWpQ2Gw9scWcjs4hMZd2ryj37SE?=
+ =?us-ascii?Q?OSiJ44RuQxPOCFsnQvVWuU4m8Y4NDXcatFskYaZ4McdIAUnIwYRxQtW+f0tV?=
+ =?us-ascii?Q?SOmwVQhUBE59jcpmehO70wFP9t9iHSbbbqw/EAmj3GzMHsJz5pGXdMV1sayU?=
+ =?us-ascii?Q?MvF4N3tbsJlodmIxAaMC7fwLbhYdN49V/Rtt8HInmZ3GpJZVPpjreIj3rsuC?=
+ =?us-ascii?Q?THMh2CpVW6J4W6aitjTILduwGZxTWGO71Br/YUUWgqQhrEA7iWC1dAcqWA5f?=
+ =?us-ascii?Q?1Q/vyGTYJ18TdeK9ErsECJf0mDTaL2CuO1JUzB59pY8nOljRPgy5FlJOzMDr?=
+ =?us-ascii?Q?xXFsO3B0FbccmXsadZ+xdqhhu4UACC18i6WtLhulUaoadI8T4RcNI3TxQho5?=
+ =?us-ascii?Q?OiTi7z3yoHbBm47HyyIq/rfTdouHtjS0kkLsTFLJEBwv63zG0St+3GHehFTb?=
+ =?us-ascii?Q?m6qBFhziQTfCCMJm92tl+Zx0fRgtbAacZWjJoWOavy954RQXvxlwMPycFCkc?=
+ =?us-ascii?Q?Ls+Nnew6iDbppg2YA7go0dVmjoghi0U+lTWdFt2ZGXRf/Px55Wa0UVufzFXB?=
+ =?us-ascii?Q?XV22gFgIdtTwFLg25yHjCOnBOFVnSLBrR6nHAJFJQ+EMNuUodmQApxLIBXH4?=
+ =?us-ascii?Q?tKygG8OmqBFfCGjiI3xjkAPi1PUX+hmgoIQv3AVQt2FFnKRKHAu3X4OY4txe?=
+ =?us-ascii?Q?keKtOyC2dutm9lsxmTHkDMioFmGd9oKE2v7aVyPtIjV9Bga/oks9y1e9sAy8?=
+ =?us-ascii?Q?yEPffhW4ePSVWhg2yGd/iJxz6X9LH6htei52UC5/GKEMdGkxD8Eo/vmfqtgM?=
+ =?us-ascii?Q?ultdCvaf2N9zrjRzsklsz1ROgkDDRuwunBraWX5Umrt2oWd6d6bQrnJqomNO?=
+ =?us-ascii?Q?bkjWFO7nwXMTBzXmtRdrWTaKGBHbw0WRwgmpEjatq3L+65bBb1sFQOlBhROW?=
+ =?us-ascii?Q?FLTFQet9aZ32+x2Q5hRhbWylAtJcW+EzlAZz+S/9FdwQR1kVuC6tY7/HwnsT?=
+ =?us-ascii?Q?jjevA5DqwPAtpFqgewpplNzAVCxkaq3rsb+h2vswg1obS99ZCY2s2K+v/ONc?=
+ =?us-ascii?Q?gBlEs6zfwM08nuyw7Qhhs+eHU9vOBoMsqdWBQrgJa0fivoEqj416o/+uXQB1?=
+ =?us-ascii?Q?dpaiUAhgi57ea++tG6cljeJ/lo+JUQ5vquGBUoO2LW9rg5rfUxl+jGN7S/kU?=
+ =?us-ascii?Q?n4LJNqwcAjBY71xJLOsRxZECBuXetmxDvpYFMI4iy2h0DMIPXTefZsdBoqnS?=
+ =?us-ascii?Q?tXts+2dygEyRkedgOfNUhalH/18Ucu0xeX9JeCuLfPlZvL/4ALqJmb0U5S59?=
+ =?us-ascii?Q?XT9JtEHjYjab9MymngMsL7KMSAGITkMP3ngPRd0yR/q77zA7CZ51ZZ6/lo92?=
+X-MS-Exchange-AntiSpam-MessageData-1: tzgRvJcEQIhcYQ==
+X-Exchange-RoutingPolicyChecked: EIVX0rh9wrwj+D70vUr7/AJL5Omr5ZDnGfXvHAczqfTb4X8rdCwqRUVwmV0856IYpMIJkL4hg/CWpPdQGO/sBeKAa2XtAJcefgUcnwcaPxQAYxMGWNm3uYcYhqoUCnMAHHeP1tPaWpJezSv5L/zm2aOZ0H4BUTN/P2NmsuJZyG7YP5+YjlIKKFxefpAFwBtsi+xUNH+941H3msh3Xdj0qKHVBUisIrQo/Y6D9rVAci8gF4r3zqX68WoMemkeRTe33GKJiPwu5AavqgByKPqwMenzCcntT0y0jm8Qp4Ul/W0+W4fTE7JEPo/g229N8zmFGVtUOEhIoM0FcFmJi0UXZg==
+X-MS-Exchange-CrossTenant-Network-Message-Id: 01b08de5-2b81-40fa-fb1c-08df0cf4e1f7
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7960.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Sep 2026 15:30:01.4369
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3g0qeijckcKUu70tJEekB7ijdNq1ftNaGVxk1ci1K9vfItgI1Ioqo8qs0FPqhLvrgFHsHTtsxq7S9dGSitf18w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA3PR11MB8987
+X-OriginatorOrg: intel.com
 
-Hi, Qunqin,
+On Mon, Sep 07, 2026 at 03:51:19PM +0200, Thomas Huth wrote:
+> On 02/09/2026 12.12, Ahsan Atta wrote:
+> > adf_dev_start() registered both alg sets in a single condition.
+> > If qat_algs_register() succeeds but qat_asym_algs_register() fails,
+> > ADF_STATUS_CRYPTO_ALGS_REGISTERED is left clear, so adf_dev_stop() skips
+> > qat_algs_unregister(): the skciphers and aeads stay registered with
+> > active_devs stuck at 1, pinning the module.
+> > 
+> > Both helpers leak active_devs internally as well - they increment it and
+> > return without decrementing when a crypto_register_*() call fails, and
+> > the asym path also leaves the already-registered akcipher behind.
+> > 
+> > Split the registration in adf_dev_start() so that an asym failure
+> > unregisters qat_algs, and unwind active_devs (and the akcipher) on the
+> > error paths of both register helpers.
+> > 
+> > Fixes: 9b2f33a1bfcd ("crypto: qat - fix unregistration of crypto algorithms")
+> > Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
+> > Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> > ---
+> >   .../crypto/intel/qat/qat_common/adf_init.c    | 22 +++++++++++-----
+> >   .../crypto/intel/qat/qat_common/qat_algs.c    | 15 ++++++-----
+> >   .../intel/qat/qat_common/qat_asym_algs.c      | 26 ++++++++++++++-----
+> >   3 files changed, 43 insertions(+), 20 deletions(-)
+> > 
+> > diff --git a/drivers/crypto/intel/qat/qat_common/adf_init.c b/drivers/crypto/intel/qat/qat_common/adf_init.c
+> > index 3e39c53814de..558467dea1a5 100644
+> > --- a/drivers/crypto/intel/qat/qat_common/adf_init.c
+> > +++ b/drivers/crypto/intel/qat/qat_common/adf_init.c
+> > @@ -260,13 +260,21 @@ static int adf_dev_start(struct adf_accel_dev *accel_dev)
+> >   	clear_bit(ADF_STATUS_STARTING, &accel_dev->status);
+> >   	set_bit(ADF_STATUS_STARTED, &accel_dev->status);
+> > -	if (!list_empty(&accel_dev->crypto_list) &&
+> > -	    (qat_algs_register() || qat_asym_algs_register())) {
+> > -		dev_err(&GET_DEV(accel_dev),
+> > -			"Failed to register crypto algs\n");
+> > -		set_bit(ADF_STATUS_STARTING, &accel_dev->status);
+> > -		clear_bit(ADF_STATUS_STARTED, &accel_dev->status);
+> > -		return -EFAULT;
+> > +	if (!list_empty(&accel_dev->crypto_list)) {
+> > +		if (qat_algs_register()) {
+> > +			dev_err(&GET_DEV(accel_dev), "Failed to register crypto algs\n");
+> > +			set_bit(ADF_STATUS_STARTING, &accel_dev->status);
+> > +			clear_bit(ADF_STATUS_STARTED, &accel_dev->status);
+> > +			return -EFAULT;
+> > +		}
+> > +
+> > +		if (qat_asym_algs_register()) {
+> > +			dev_err(&GET_DEV(accel_dev), "Failed to register crypto asym algs\n");
+> > +			qat_algs_unregister();
+> > +			set_bit(ADF_STATUS_STARTING, &accel_dev->status);
+> > +			clear_bit(ADF_STATUS_STARTED, &accel_dev->status);
+> > +			return -EFAULT;
+> 
+> EFAULT is the error code that should be used if accessing memory failed,
+> it's a very bad choice for an error code in this case here.
+> So while you're at it, could you maybe change this to return a more sane
+> value here? I think the best option is likely to pass along the return value
+> from qat_algs_register / qat_asym_algs_register.
 
-On Mon, Sep 7, 2026 at 10:38=E2=80=AFAM Qunqin Zhao <zhaoqunqin@163.com> wr=
-ote:
->
-> From: Qunqin Zhao <zhaoqunqin@loongson.cn>
->
-> Address multiple historical driver issues discovered by the Sashiko
-> Automation system within the loongson_se_probe() initialization flow
-> and the driver's interrupt service routines [1].
->
-> - Add an explicit bounds check in se_irq_handler() before accessing
->   the engines array to prevent an out-of-bounds memory access.
->
-> - Switch from devm_kmalloc() to devm_kzalloc() and explicitly
->   initialize all engine completion structures in probe() to avoid a
->   kernel panic from complete() dereferencing a NULL wait head when a
->   spurious interrupt fires before child drivers call
->   loongson_se_init_engine().
->
-> - Serialize command submission with a new poll_lock spinlock and
->   protect the completion reset with the interrupt lock.  Before
->   issuing a command, mask the target interrupt, clear any pending
->   status, and reinitialize the completion under dev_lock, then
->   re-enable the interrupt after the command has been triggered.  This
->   closes the race where a stale interrupt from a previously
->   interrupted command could complete the current command's
->   completion.  The spin_lock_irq() around the 10 ms poll is dropped so
->   interrupts are not disabled for the full busy-wait.
->
-> - Fix EPROBE_DEFER handling: propagate the error directly from
->   platform_irq_count() instead of overwriting it with ENODEV so that
->   probe deferral works when the interrupt provider is not yet ready.
->
-> - Validate dmam_size from firmware against the minimum required size
->   to keep the command buffers of all engines within engine 0's data
->   region and prevent overlapping DMA buffers.
->
-> - Return the error code from devm_request_irq() instead of silently
->   continuing to prevent an indefinite hang.
->
-> - Add a loongson_se_stop() cleanup handler registered with
->   devm_add_action_or_reset() before loongson_se_init() so that a
->   failed init still stops the controller and masks all interrupts via
->   devres, preventing DMA access to freed memory.
->
-> - Zero-initialize the local controller command structures in
->   loongson_se_init() and loongson_se_init_engine() to prevent
->   uninitialized stack data from being written to device registers.
->
-> - Add the SE_CMD_STOP command definition.
->
-> Link: https://lore.kernel.org/all/20260618095949.GB1672911@google.com/ [1=
-]
-> Fixes: e551fa3159e3 ("mfd: Add support for Loongson Security Engine chip =
-controller")
-> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
-> ---
->  drivers/mfd/loongson-se.c       | 90 +++++++++++++++++++++++++++++----
->  include/linux/mfd/loongson-se.h |  1 +
->  2 files changed, 82 insertions(+), 9 deletions(-)
->
-> diff --git a/drivers/mfd/loongson-se.c b/drivers/mfd/loongson-se.c
-> index 7f552a8ee..1d332c418 100644
-> --- a/drivers/mfd/loongson-se.c
-> +++ b/drivers/mfd/loongson-se.c
-> @@ -23,6 +23,8 @@
->  struct loongson_se {
->         void __iomem *base;
->         spinlock_t dev_lock;
-> +       /* Synchronizes command submission between users of different eng=
-ines */
-> +       spinlock_t poll_lock;
-Can't we reuse dev_lock?
+Hi,
+Thanks for your feedback. I'll send a v2.
 
-Huacai
+Regards,
+Ahsan
+--------------------------------------------------------------
+Intel Research and Development Ireland Limited
+Registered in Ireland
+Registered Office: Collinstown Industrial Park, Leixlip, County Kildare
+Registered Number: 308263
 
->         struct completion cmd_completion;
->
->         void *dmam_base;
-> @@ -42,7 +44,7 @@ static int loongson_se_poll(struct loongson_se *se, u32=
- int_bit)
->         u32 status;
->         int err;
->
-> -       spin_lock_irq(&se->dev_lock);
-> +       spin_lock(&se->poll_lock);
->
->         /* Notify the controller that the engine needs to be started */
->         writel(int_bit, se->base + SE_L2SINT_SET);
-> @@ -52,17 +54,48 @@ static int loongson_se_poll(struct loongson_se *se, u=
-32 int_bit)
->                                                 !(status & int_bit),
->                                                 1, LOONGSON_ENGINE_CMD_TI=
-MEOUT_US);
->
-> -       spin_unlock_irq(&se->dev_lock);
-> +       /*
-> +        * Re-enable the interrupt that loongson_se_reinit_completion() m=
-asked.
-> +        * The hardware guarantees that once the interrupt is re-enabled,=
- only
-> +        * interrupts for the command just issued can arrive, so a stale
-> +        * interrupt from a previously interrupted command can never comp=
-lete
-> +        * this command's completion.
-> +        */
-> +       writel(int_bit | readl(se->base + SE_S2LINT_EN), se->base + SE_S2=
-LINT_EN);
-> +
-> +       spin_unlock(&se->poll_lock);
->
->         return err;
->  }
->
-> +/*
-> + * Prepare a completion for a new command: mask the corresponding interr=
-upt,
-> + * clear any pending interrupt status, and reset the completion.  This r=
-uns
-> + * under dev_lock so that the IRQ handler cannot race with it.  The inte=
-rrupt
-> + * is re-enabled in loongson_se_poll() after the command has been issued=
-.
-> + */
-> +static void loongson_se_reinit_completion(struct loongson_se *se,
-> +                                         struct completion *completion, =
-u32 int_bit)
-> +{
-> +       spin_lock_irq(&se->dev_lock);
-> +
-> +       writel(readl(se->base + SE_S2LINT_EN) & ~int_bit, se->base + SE_S=
-2LINT_EN);
-> +
-> +       writel(int_bit, se->base + SE_S2LINT_CL);
-> +
-> +       reinit_completion(completion);
-> +
-> +       spin_unlock_irq(&se->dev_lock);
-> +}
-> +
->  static int loongson_se_send_controller_cmd(struct loongson_se *se,
->                                            struct loongson_se_controller_=
-cmd *cmd)
->  {
->         u32 *send_cmd =3D (u32 *)cmd;
->         int err, i;
->
-> +       loongson_se_reinit_completion(se, &se->cmd_completion, SE_INT_CON=
-TROLLER);
-> +
->         for (i =3D 0; i < SE_SEND_CMD_REG_LEN; i++)
->                 writel(send_cmd[i], se->base + SE_SEND_CMD_REG + i * 4);
->
-> @@ -75,12 +108,16 @@ static int loongson_se_send_controller_cmd(struct lo=
-ongson_se *se,
->
->  int loongson_se_send_engine_cmd(struct loongson_se_engine *engine)
->  {
-> +       int err;
-> +
-> +       loongson_se_reinit_completion(engine->se, &engine->completion, BI=
-T(engine->id));
-> +
->         /*
->          * After engine initialization, the controller already knows
->          * where to obtain engine commands from. Now all we need to
->          * do is notify the controller that the engine needs to be starte=
-d.
->          */
-> -       int err =3D loongson_se_poll(engine->se, BIT(engine->id));
-> +       err =3D loongson_se_poll(engine->se, BIT(engine->id));
->
->         if (err)
->                 return err;
-> @@ -93,7 +130,7 @@ struct loongson_se_engine *loongson_se_init_engine(str=
-uct device *dev, int id)
->  {
->         struct loongson_se *se =3D dev_get_drvdata(dev);
->         struct loongson_se_engine *engine =3D &se->engines[id];
-> -       struct loongson_se_controller_cmd cmd;
-> +       struct loongson_se_controller_cmd cmd =3D {0};
->
->         engine->se =3D se;
->         engine->id =3D id;
-> @@ -155,7 +192,8 @@ static irqreturn_t se_irq_handler(int irq, void *dev_=
-id)
->         /* For engines */
->         while (int_status) {
->                 id =3D __ffs(int_status);
-> -               complete(&se->engines[id].completion);
-> +               if (id < SE_ENGINE_MAX)
-> +                       complete(&se->engines[id].completion);
->                 int_status &=3D ~BIT(id);
->                 writel(BIT(id), se->base + SE_S2LINT_CL);
->         }
-> @@ -167,7 +205,7 @@ static irqreturn_t se_irq_handler(int irq, void *dev_=
-id)
->
->  static int loongson_se_init(struct loongson_se *se, dma_addr_t addr, int=
- size)
->  {
-> -       struct loongson_se_controller_cmd cmd;
-> +       struct loongson_se_controller_cmd cmd =3D {0};
->         int err;
->
->         cmd.command_id =3D SE_CMD_START;
-> @@ -188,6 +226,17 @@ static const struct mfd_cell engines[] =3D {
->         { .name =3D "tpm_loongson" },
->  };
->
-> +static void loongson_se_stop(void *data)
-> +{
-> +       struct loongson_se *se =3D data;
-> +       struct loongson_se_controller_cmd cmd =3D {0};
-> +
-> +       cmd.command_id =3D SE_CMD_STOP;
-> +       loongson_se_send_controller_cmd(se, &cmd);
-> +
-> +       writel(0, se->base + SE_S2LINT_EN);
-> +}
-> +
->  static int loongson_se_probe(struct platform_device *pdev)
->  {
->         struct device *dev =3D &pdev->dev;
-> @@ -195,19 +244,34 @@ static int loongson_se_probe(struct platform_device=
- *pdev)
->         int nr_irq, irq, err, i;
->         dma_addr_t paddr;
->
-> -       se =3D devm_kmalloc(dev, sizeof(*se), GFP_KERNEL);
-> +       se =3D devm_kzalloc(dev, sizeof(*se), GFP_KERNEL);
->         if (!se)
->                 return -ENOMEM;
->
->         dev_set_drvdata(dev, se);
->         init_completion(&se->cmd_completion);
->         spin_lock_init(&se->dev_lock);
-> +       spin_lock_init(&se->poll_lock);
->         mutex_init(&se->engine_init_lock);
->
-> +       for (i =3D 0; i < SE_ENGINE_MAX; i++)
-> +               init_completion(&se->engines[i].completion);
-> +
->         dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
->         if (device_property_read_u32(dev, "dmam_size", &se->dmam_size))
->                 return -ENODEV;
->
-> +       /*
-> +        * Engine 0 does not exist and its data buffer is reused as the c=
-ommand
-> +        * buffer for the other engines.  The command buffers of all engi=
-nes
-> +        * therefore must fit within engine 0's data region, i.e.
-> +        * dmam_size / SE_ENGINE_MAX >=3D SE_ENGINE_MAX * 2 * SE_ENGINE_C=
-MD_SIZE.
-> +        * Enforce this to keep each engine's data and command buffers fr=
-om
-> +        * overlapping.
-> +        */
-> +       if ((se->dmam_size / SE_ENGINE_MAX) < (SE_ENGINE_MAX * 2 * SE_ENG=
-INE_CMD_SIZE))
-> +               return -EINVAL;
-> +
->         se->dmam_base =3D dmam_alloc_coherent(dev, se->dmam_size, &paddr,=
- GFP_KERNEL);
->         if (!se->dmam_base)
->                 return -ENOMEM;
-> @@ -217,20 +281,28 @@ static int loongson_se_probe(struct platform_device=
- *pdev)
->                 return PTR_ERR(se->base);
->
->         nr_irq =3D platform_irq_count(pdev);
-> -       if (nr_irq <=3D 0)
-> +       if (nr_irq =3D=3D 0)
->                 return -ENODEV;
-> +       if (nr_irq < 0)
-> +               return nr_irq;
->
->         writel(SE_INT_ALL, se->base + SE_S2LINT_CL);
->
->         for (i =3D 0; i < nr_irq; i++) {
->                 irq =3D platform_get_irq(pdev, i);
->                 err =3D devm_request_irq(dev, irq, se_irq_handler, IRQF_S=
-HARED, "loongson-se", se);
-> -               if (err)
-> +               if (err) {
->                         dev_err(dev, "failed to request IRQ: %d\n", irq);
-> +                       return err;
-> +               }
->         }
->
->         writel(SE_INT_ALL, se->base + SE_S2LINT_EN);
->
-> +       err =3D devm_add_action_or_reset(dev, loongson_se_stop, se);
-> +       if (err)
-> +               return err;
-> +
->         err =3D loongson_se_init(se, paddr, se->dmam_size);
->         if (err)
->                 return err;
-> diff --git a/include/linux/mfd/loongson-se.h b/include/linux/mfd/loongson=
--se.h
-> index 07afa0c25..8237ccab7 100644
-> --- a/include/linux/mfd/loongson-se.h
-> +++ b/include/linux/mfd/loongson-se.h
-> @@ -9,6 +9,7 @@
->  #define SE_SEND_CMD_REG_LEN            0x8
->  /* Controller command ID */
->  #define SE_CMD_START                   0x0
-> +#define SE_CMD_STOP                    0x1
->  #define SE_CMD_SET_DMA                 0x3
->  #define SE_CMD_SET_ENGINE_CMDBUF       0x4
->
-> --
-> 2.47.2
->
+
+This e-mail and any attachments may contain confidential material for the sole
+use of the intended recipient(s). Any review or distribution by others is
+strictly prohibited. If you are not the intended recipient, please contact the
+sender and delete all copies.
+
