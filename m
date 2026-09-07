@@ -1,298 +1,212 @@
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.75.44.102])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20CCD389453;
-	Mon,  7 Sep 2026 06:05:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.75.44.102
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EEBC46983C
+	for <linux-crypto@vger.kernel.org>; Mon,  7 Sep 2026 12:04:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788761133; cv=none; b=tlnn2rl5s6MEVlJIWdU5q2zmoICwpj6jKsvgm4pDKGyqKoAKgMr112BftjNQPL5KAHyuhUFwsTDCjtRDXyhLwC0FvjErNphQGBem1P+QNpyras65Yu6/nuH7oXeiEmWLyg8+l3vbcoxA+Etc6OpA3Sn8ZzLlR/eaLTWnEU2Ihy4=
+	t=1788782642; cv=none; b=gvnz7qKMkBx5vlFmwC4bGBnYPYdt1Anp1f3/QGpPN4YGpNRlgqjdTqLDi0QDvZH7Yg2T27EYCP+/QtMXJNcz22glI/w/0bnxvNLZWQUFmJKsgrZS4ZwjLT/yb4Qi+QbXrv5cXBkp6iWAWxs29pMWU12s+mqDmV2TLYWcrx8jDCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788761133; c=relaxed/simple;
-	bh=hBPwP8hp9KnGpZiFqIkc4EiMciV273dLIcexWcmIMBU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dVzEqB3W/K6gSaBVxaltCQ6O/bubrnVGs/SKaL22CpH96ZK991IeW7qiRUom0h7fbwsKTn4gOjgdGyaxhtlhP155x2EXMnJjQDCKMf8lupafDygTKu5z4QKcc40lR2o9m/gClCZiJEOikPXbcyw4Rm4dsnGRxF8APl2KvPHUJLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=13.75.44.102
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from zju.edu.cn (unknown [10.98.66.117])
-	by mtasvr (Coremail) with SMTP id _____wAn0zwXVJ5q93T5AA--.14170S3;
-	Mon, 07 Sep 2026 14:05:12 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.98.66.117])
-	by mail-app4 (Coremail) with SMTP id zi_KCgDH+TAWVJ5qo3ygAw--.7687S2;
-	Mon, 07 Sep 2026 14:05:11 +0800 (CST)
-From: Fan Wu <fanwu01@zju.edu.cn>
-To: thomas.lendacky@amd.com,
-	john.allen@amd.com
-Cc: herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Fan Wu <fanwu01@zju.edu.cn>,
-	Song Li <songl@zju.edu.cn>
-Subject: [PATCH] crypto: ccp - Fix use-after-free in backlog cmd advancement
-Date: Mon,  7 Sep 2026 06:04:15 +0000
-Message-Id: <20260907060415.575656-1-fanwu01@zju.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1788782642; c=relaxed/simple;
+	bh=VX6P7IoF/cjZL162t+C5V/5S1ERwS0fh6IeQzsD8XMk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=B4Rs/+sKyV/QWCPy9LpwdU1jmHxtXq1mHbCohSNFlLpEOwlk3PLAZMpPt3ZqnvyPYlaLrkEVn7ruFvswyXESoTvEcaAM+NChJMgwDzTRcoVLc2+C7bN78zaxyiSp4GPQ5tmDHhiT2fFOk25CD2pnv/WlsL0Mdo6uaAmgWSKVYP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=SIxawg6I; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=P3vytNzR; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="SIxawg6I";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="P3vytNzR"
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 687An1jH3230465
+	for <linux-crypto@vger.kernel.org>; Mon, 7 Sep 2026 12:03:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=OKrdm9QYkmyxBbFELr5idM
+	lYO9UjCfFo9zaXdkXtZQE=; b=SIxawg6I1D3F2xlk/QKis/ZXTYnc4RSIo52nFd
+	Z3Y0lStLGj+luD5lN6Y5kg2COSH5fZSKFiJFSw75jPmXg85ISCJEEPPgYbX7mQqQ
+	/0gAaa/1OmifsWBXO/4x5xQsSu9rqfyD66l3wh0nzo+BH4qdPZJcZ7zt9x6OSzhE
+	zqySdJKJQigBDEF+S/TeDLhJoZjTbBZTDSh7rwkKgQnyn+ISvXH7Us4LHlLTGGZe
+	6RG9EBu5UUcQJOfw52RKaDC/JWg1e9N3WNGVOyWbOMUSeIP55a487hSnN5WLGbFD
+	Hu2kr7nq04inhdHWJZROBJm3v4jIrTQu+rLDXPWgdJmJcYVQ==
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ghfxktk7e-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Mon, 07 Sep 2026 12:03:59 +0000 (GMT)
+Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-6b1ac969b92so3669721eaf.2
+        for <linux-crypto@vger.kernel.org>; Mon, 07 Sep 2026 05:03:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1788782638; x=1789387438; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:from:to:cc:subject:date:message-id
+         :reply-to:content-type;
+        bh=OKrdm9QYkmyxBbFELr5idMlYO9UjCfFo9zaXdkXtZQE=;
+        b=P3vytNzR3PG6RRLzx848/9XQAchRdCdG1+MPX1ezW8YtlABW9H74C/WGVyjkrJggBh
+         XHW7ZIPkh9n8y2SN47e5WQtGbicUstsF/069y148EtwhQnrensP0O3MLA1CBjht3xr4w
+         yFoCmy0dq90BVMMW/KZZ0crHmgznun/8yJlPuk9JAbk7B7YpiOp9oW6BuG6n4WP7nIRq
+         i1yMWJud5+bJxLpN4xkISRvx/lTv0q6vYAp7iwUTYoq1/qriB7CvFFY/+STdRS+1JfTX
+         Vubv81PJMQOzh3tXOkwdH7Ovgb984NaHxgvV8+aBTKH7TOZLgdg/oMh6uGh47O7hLatm
+         Tv2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788782638; x=1789387438;
+        h=cc:to:content-transfer-encoding:content-type:mime-version
+         :message-id:date:subject:from:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=OKrdm9QYkmyxBbFELr5idMlYO9UjCfFo9zaXdkXtZQE=;
+        b=ZLLbVUwvWPU2Ye39sYZ1sAIhu1aCqC5S+/yIDxP4N1kwAGLsWZm+0uKFkwbhPJF2O0
+         NaZvvod38G7XjI3bELKHUR4MpH/Mutk2SmBLOzN2h/d80FScygzrV+ap5jRQ17S7cTeK
+         5WyaMh78eX3M13ySHndAELV8ssXpx1En4jHyN9VrmryJc2d9j3b9ek+6tN3v7nm4VbMJ
+         ChM5YCBU99vRAiruuTIQHLgu8Qqn/RaZzOK1LeWtcB/qFScGS/xYD6+BGJt9mNPX+Pba
+         lMrgahvXAzFKPW8vCDLtC4vfJxdEksQtXx3MfkY2n6HHAkj12yUIiFp5JYRnd6xEXSdV
+         ZfWg==
+X-Forwarded-Encrypted: i=1; AKwUvByB30Cu3c4iYklaVA4B6HDRkH7+P5dm9urJfnJkywHueSHahOpxX1FQ9lPZSt77wcWzdPb23dVmzLUg/uY=@vger.kernel.org
+X-Gm-Message-State: AFuF++nvzqRVxbpz9ROnm+5lOfet0NpLzfbMxNLunL3bUd491Igiu7gL
+	a6MyiV8ijvC5Q1lPMibv2JYpbe49NNWTnORbmvPIqc06gGjppgi9+5Ukk+E561wtew0OOUN5+gk
+	Y1aaQSlh9Yr4TlSwQpgFGmtEHk3RkxDSlUVL8bYHmOjEsV1Ltjss683EoBHocDzQ9fhc=
+X-Gm-Gg: AYBFou1NW52B+BQ0jLT6knMBvJbXWiDmr0N9BZOO9kMuJ4R9ZKi1bLX1bmC6w0ruFX+
+	GYRTKfraaro+DaDQvo5LDmg7MPVrh4HG763DrQNoOrHmBN98g/DILXaipP+Rgm0UzXM9+MRf77N
+	W4+bk8LvT4dS7wJDdxQvbrJpZ+MI6wq9rk/VASLTxi3YmZL0ioG2TfCJGC5GVwssXnaV+MDE8cJ
+	IM07VBTyple8f0Gkf31uTxVj8kd/KgoED47FXfN567SwXga5g5oLlvHsPFW/4m0EuWkmxDgmICO
+	dQHwvOzbEufkUNroxR+CJSgCKUH17t0jQFJWYjEUsLPSCC60jZgtsFajaP5NI/s6uMkj61mzWwG
+	zjtsXYTSt1W85JWYWepKwLWXxiKjLAk10jw==
+X-Received: by 2002:a05:6820:818e:b0:6b7:8415:d78e with SMTP id 006d021491bc7-6b78415d959mr10612364eaf.57.1788782638355;
+        Mon, 07 Sep 2026 05:03:58 -0700 (PDT)
+X-Received: by 2002:a05:6820:818e:b0:6b7:8415:d78e with SMTP id 006d021491bc7-6b78415d959mr10612309eaf.57.1788782637854;
+        Mon, 07 Sep 2026 05:03:57 -0700 (PDT)
+Received: from hu-kuldsing-hyd.qualcomm.com ([202.46.23.25])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-333959d5f69sm26345960eec.0.2026.09.07.05.03.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Sep 2026 05:03:57 -0700 (PDT)
+From: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
+Subject: [PATCH v6 0/2] Shikra: Support for QCE
+Date: Mon, 07 Sep 2026 17:33:35 +0530
+Message-Id: <20260907-b4-shikra_crypto_changse-v6-0-0676f61894b3@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zi_KCgDH+TAWVJ5qo3ygAw--.7687S2
-X-CM-SenderInfo: qrstjiaswqq6lmxovvfxof0/
-X-CM-DELIVERINFO: =?B?50IpDgXKKxbFmtjJiESix3B1w3vZ3A9ovKVTomAyoQazvoRs/NHSP8GI2EvgeEEW7R
-	sfnXz+g1OQfMo27QHy5TwQyZy/t4PGctaocqOsNIP6GE/UUmFCxnK2Sp8FNgLAUIiRKKN7
-	iy/VYjujIOzmHLN18sIB5rM+H8XhqwExY4Cjs2QP
-X-Coremail-Antispam: 1Uk129KBj93XoW3Xw4UWr1xZFWDuFWDAr15WrX_yoW3Cryrpa
-	1rJry5trWvqr47G3y3Zw4UXryfXFsYva4DK3yxW3WFkw15tFWFgrWfGFWjya4UZFykuF17
-	JFW7uFy5Cr4IywcCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUU9lb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AK
-	xVW0oVCq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc804V
-	CY07AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AK
-	xVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48Icx
-	kI7VAKI48JM4x0Y48IcxkI7VAKI48G6xCjnVAKz4kxMxAIw28IcxkI7VAKI48JMxC20s02
-	6xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_Jr
-	I_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v2
-	6r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj4
-	0_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8
-	JbIYCTnIWIevJa73UjIFyTuYvjxU7gAwDUUUU
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABeonmoC/33SzY6CMBAH8FcxPW/NdOiH7Mn32BhDS7t0V0VaI
+ BrDu2+BTfQgXJpMMv39p5k+SLTB20g+Nw8SbO+jry+pkB8bYqri8m2pL1NNEFCCAkY1p7Hyv6E
+ 4mnC/tvVxaouWOixlKbQDrgVJ16/BOn+b6K/DXMdO/1jTjt7YUfnY1uE+Zfds7JtjBLKFjJ5Ro
+ MAENyY3Bkq7r2PcNl1xMvX5vE0HGaN6fGIKcHnmHpMnJVOZQ4c7ne2b1r/xsldPrnhZ8jDT3CA
+ IjqgW5uMvHuMrHh/fKwtui1wlM1/wxNPbIax4gjKqwGoOHJxG8cYb5l0F23TpN7T/CxyGP2PwM
+ 4krAgAA
+X-Change-ID: 20260701-b4-shikra_crypto_changse-f2d6d5bf04b5
+To: Bartosz Golaszewski <brgl@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>
+Cc: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>,
+        Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>,
+        linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+X-Mailer: b4 0.15.2
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjYwOTA3MDEzMyBTYWx0ZWRfX7Vxp1fPViRKc
+ IebszcidSkVXnAAGf34bQ+9FO6f2ofcWHHHJbksEXfqRGQKgIRFe0rssjhIivR3MLyej4p8u0EM
+ eBEFbwDBKuquEMc6xQxDi2v4+T04W2eKoP86dnXu3Ydz573rNFZd57+5UJFaOmkGLFU+VB1AEe4
+ jPO43z7bm6A/j3LQqquA5TwPtvwhBw7BWRQB+ttBcYTSiCp0T23/+5fhAYW7Kz11onnWCIwQ558
+ PVPe59ycVIe3rn0s02pkAWPSpVG+hcTx7rQHdesVYB2r01q8GsPlNrCjoNpxo6jihY38FeMXBPJ
+ ynfl3SFttuWhEPzZwf0l4yUBq/f+51CcPNuW9sTRTDLsitkr9p1Fx8tc+lwrZ+XdQA1Jnj+grwQ
+ vLh9KlNl9/+c9HWVqDuMbna2WbZVcovpqI0oMfLjXlsjRuQlldxaWW6fQWmMu0k1dM9dLL8+YY5
+ e/+DHVHcQBXTfAwWSYA==
+X-Proofpoint-GUID: G8hjD4k4i0ixUVSCzvJOEu9QzYlVLFpo
+X-Proofpoint-Spam-Info: AW1haW4tMjYwOTA3MDEzMyBTYWx0ZWRfX19GG4H9EjmDP
+ ZAAn9Lvyr0T6NxlfEcl+aOzPDP2EzTtbWZWXx1yXhbe2rFLhBW/Js4uZ4iOWhGprK2CVKbPoisq
+ ZfsTZwZlqzT0URi062Gve/LirqxiMJI=
+X-Authority-Analysis: v=2.4 cv=daOwG3Xe c=1 sm=1 tr=0 ts=6a9ea82f cx=c_pps
+ a=lkkFf9KBb43tY3aOjL++dA==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+ a=IkcTkHD0fZMA:10 a=VdqzKS8jKosA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=u7WPNUs3qKkmUXheDGA7:22 a=yx91gb_oNiZeI1HMLzn7:22
+ a=VwQbUJbxAAAA:8 a=bC-a23v3AAAA:8 a=EUspDBNiAAAA:8 a=FNyBlpCuAAAA:8
+ a=J1Y8HTJGAAAA:8 a=BIZn_r5IHwd3nK8cIaQA:9 a=QEXdDO2ut3YA:10
+ a=k4UEASGLJojhI9HsvVT1:22 a=FO4_E8m0qiDe52t0p3_H:22 a=RlW-AWeGUCXs_Nkyno-6:22
+ a=y1Q9-5lHfBjTkpIzbSAN:22
+X-Proofpoint-ORIG-GUID: G8hjD4k4i0ixUVSCzvJOEu9QzYlVLFpo
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1176,Hydra:6.1.134,FMLib:17.12.100.49
+ definitions=2026-09-07_03,2026-09-07_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 priorityscore=1501 bulkscore=0 spamscore=0 phishscore=0
+ lowpriorityscore=0 adultscore=0 malwarescore=0 impostorscore=0 clxscore=1015
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2606150000 definitions=main-2609070133
 
-CCP_CMD_MAY_BACKLOG commands are removed from ccp->backlog by a
-queue kthread and advanced asynchronously by ccp_do_cmd_backlog().
-The promoted command is no longer on either command list.
+This patch series enable QCE support on Shikra.
+Shikra is derived from agatti target and QCE was using different
+compatible configuration.
+Also, one more reason to update QCE is, clk-smd-rpm was doing proxy
+voting and crypto was consuming it. With proxy vote removal, qce need to
+vote for it's own clocks explicitly which is already being done for
+agatti target. Adapt same mechanism to Shikra QCE too.
+https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/tree/arch/arm64/boot/dts/qcom/agatti.dtsi#n889
 
-During device removal, ccp*_destroy() stops the queue kthreads and
-flushes the lists, but does not wait for a promoted work on system_wq.
-That work can subsequently access the devm-allocated ccp_device after
-it has been released, and wake a queue kthread whose task_struct
-kthread_stop() has already released.
+The current qce configuration will still work but this one is more
+appropriately describing the hardware.
 
-Use a per-device workqueue for backlog advancement and destroy it after
-stopping all queue kthreads, so every promoted work has completed before
-the command lists are flushed. The queue kthreads are the only source
-of backlog works, so no new work can be queued once they are stopped.
-Individual cancellation is not possible because a promoted command is
-no longer reachable from either list.
-
-Mark the device as halting before teardown. A draining backlog work
-then completes its command with -ENODEV instead of re-queuing it.
-Keep the halting check and the kthread wake under cmd_lock so teardown
-cannot stop the selected kthread between them.
-
-This issue was found by an in-house static analysis tool.
-
-Fixes: 63b945091a07 ("crypto: ccp - CCP device driver and interface support")
-Cc: stable@vger.kernel.org
-Assisted-by: Codex:gpt-5.6
-Co-developed-by: Song Li <songl@zju.edu.cn>
-Signed-off-by: Song Li <songl@zju.edu.cn>
-Signed-off-by: Fan Wu <fanwu01@zju.edu.cn>
+Signed-off-by: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
 ---
- drivers/crypto/ccp/ccp-dev-v3.c | 19 +++++++++++++++++++
- drivers/crypto/ccp/ccp-dev-v5.c | 18 ++++++++++++++++++
- drivers/crypto/ccp/ccp-dev.c    | 33 ++++++++++++++++++++++++++++-----
- drivers/crypto/ccp/ccp-dev.h    |  4 ++++
- 4 files changed, 69 insertions(+), 5 deletions(-)
+Changes in v6:
+- Update QCE bindings and fallback compatible
+- Define clocks for crypto and cryptobam. 
+- Link to v5: https://patch.msgid.link/20260820-b4-shikra_crypto_changse-v5-1-70eb4040fb25@oss.qualcomm.com
 
-diff --git a/drivers/crypto/ccp/ccp-dev-v3.c b/drivers/crypto/ccp/ccp-dev-v3.c
-index fe69053b2394..b84ac117ea25 100644
---- a/drivers/crypto/ccp/ccp-dev-v3.c
-+++ b/drivers/crypto/ccp/ccp-dev-v3.c
-@@ -460,6 +460,14 @@ static int ccp_init(struct ccp_device *ccp)
- 		tasklet_init(&ccp->irq_tasklet, ccp_irq_bh,
- 			     (unsigned long)ccp);
- 
-+	ccp->backlog_wq = alloc_workqueue("%s-backlog", WQ_MEM_RECLAIM, 0,
-+					  ccp->name);
-+	if (!ccp->backlog_wq) {
-+		dev_err(dev, "unable to allocate backlog workqueue\n");
-+		ret = -ENOMEM;
-+		goto e_irq;
-+	}
-+
- 	dev_dbg(dev, "Starting threads...\n");
- 	/* Create a kthread for each queue */
- 	for (i = 0; i < ccp->cmd_q_count; i++) {
-@@ -501,10 +509,15 @@ static int ccp_init(struct ccp_device *ccp)
- 	ccp_unregister_rng(ccp);
- 
- e_kthread:
-+	ccp_halt_cmds(ccp);
-+
- 	for (i = 0; i < ccp->cmd_q_count; i++)
- 		if (ccp->cmd_q[i].kthread)
- 			kthread_stop(ccp->cmd_q[i].kthread);
- 
-+	destroy_workqueue(ccp->backlog_wq);
-+
-+e_irq:
- 	sp_free_ccp_irq(ccp->sp, ccp);
- 
- e_pool:
-@@ -520,6 +533,9 @@ static void ccp_destroy(struct ccp_device *ccp)
- 	struct ccp_cmd *cmd;
- 	unsigned int i;
- 
-+	/* Complete pending backlog cmds instead of executing them */
-+	ccp_halt_cmds(ccp);
-+
- 	/* Unregister the DMA engine */
- 	ccp_dmaengine_unregister(ccp);
- 
-@@ -546,6 +562,9 @@ static void ccp_destroy(struct ccp_device *ccp)
- 
- 	sp_free_ccp_irq(ccp->sp, ccp);
- 
-+	/* Drain promoted backlog commands before flushing the command lists. */
-+	destroy_workqueue(ccp->backlog_wq);
-+
- 	for (i = 0; i < ccp->cmd_q_count; i++)
- 		dma_pool_destroy(ccp->cmd_q[i].dma_pool);
- 
-diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v5.c
-index 7b73332d6aa1..307a408eff89 100644
---- a/drivers/crypto/ccp/ccp-dev-v5.c
-+++ b/drivers/crypto/ccp/ccp-dev-v5.c
-@@ -943,6 +943,14 @@ static int ccp5_init(struct ccp_device *ccp)
- 		ccp->cmd_q[i].sb_ctx = ccp_lsb_alloc(&ccp->cmd_q[i], 2);
- 	}
- 
-+	ccp->backlog_wq = alloc_workqueue("%s-backlog", WQ_MEM_RECLAIM, 0,
-+					  ccp->name);
-+	if (!ccp->backlog_wq) {
-+		dev_err(dev, "unable to allocate backlog workqueue\n");
-+		ret = -ENOMEM;
-+		goto e_irq;
-+	}
-+
- 	dev_dbg(dev, "Starting threads...\n");
- 	/* Create a kthread for each queue */
- 	for (i = 0; i < ccp->cmd_q_count; i++) {
-@@ -989,10 +997,14 @@ static int ccp5_init(struct ccp_device *ccp)
- 	ccp_unregister_rng(ccp);
- 
- e_kthread:
-+	ccp_halt_cmds(ccp);
-+
- 	for (i = 0; i < ccp->cmd_q_count; i++)
- 		if (ccp->cmd_q[i].kthread)
- 			kthread_stop(ccp->cmd_q[i].kthread);
- 
-+	destroy_workqueue(ccp->backlog_wq);
-+
- e_irq:
- 	sp_free_ccp_irq(ccp->sp, ccp);
- 
-@@ -1009,6 +1021,9 @@ static void ccp5_destroy(struct ccp_device *ccp)
- 	struct ccp_cmd *cmd;
- 	unsigned int i;
- 
-+	/* Complete pending backlog cmds instead of executing them */
-+	ccp_halt_cmds(ccp);
-+
- 	/* Unregister the DMA engine */
- 	ccp_dmaengine_unregister(ccp);
- 
-@@ -1047,6 +1062,9 @@ static void ccp5_destroy(struct ccp_device *ccp)
- 
- 	sp_free_ccp_irq(ccp->sp, ccp);
- 
-+	/* Drain promoted backlog commands before flushing the command lists. */
-+	destroy_workqueue(ccp->backlog_wq);
-+
- 	/* Flush the cmd and backlog queue */
- 	while (!list_empty(&ccp->cmd)) {
- 		/* Invoke the callback directly with an error code */
-diff --git a/drivers/crypto/ccp/ccp-dev.c b/drivers/crypto/ccp/ccp-dev.c
-index 246801912e1a..b8eeaf0c3c95 100644
---- a/drivers/crypto/ccp/ccp-dev.c
-+++ b/drivers/crypto/ccp/ccp-dev.c
-@@ -177,6 +177,15 @@ void ccp_del_device(struct ccp_device *ccp)
- 	write_unlock_irqrestore(&ccp_unit_lock, flags);
- }
- 
-+/* Mark the device halting so draining backlog works complete with -ENODEV. */
-+void ccp_halt_cmds(struct ccp_device *ccp)
-+{
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&ccp->cmd_lock, flags);
-+	ccp->halting = true;
-+	spin_unlock_irqrestore(&ccp->cmd_lock, flags);
-+}
- 
- 
- int ccp_register_rng(struct ccp_device *ccp)
-@@ -349,6 +358,20 @@ static void ccp_do_cmd_backlog(struct work_struct *work)
- 	unsigned long flags;
- 	unsigned int i;
- 
-+	spin_lock_irqsave(&ccp->cmd_lock, flags);
-+	if (ccp->halting) {
-+		spin_unlock_irqrestore(&ccp->cmd_lock, flags);
-+
-+		/* The device is being removed; the cmd can no longer be
-+		 * executed, so complete it with an error like the cmds
-+		 * still queued on the cmd and backlog lists
-+		 */
-+		cmd->callback(cmd->data, -ENODEV);
-+
-+		return;
-+	}
-+	spin_unlock_irqrestore(&ccp->cmd_lock, flags);
-+
- 	cmd->callback(cmd->data, -EINPROGRESS);
- 
- 	spin_lock_irqsave(&ccp->cmd_lock, flags);
-@@ -364,11 +387,11 @@ static void ccp_do_cmd_backlog(struct work_struct *work)
- 		break;
- 	}
- 
--	spin_unlock_irqrestore(&ccp->cmd_lock, flags);
--
--	/* If we found an idle queue, wake it up */
--	if (i < ccp->cmd_q_count)
-+	/* Keep this under cmd_lock so teardown cannot stop this kthread first. */
-+	if (!ccp->halting && i < ccp->cmd_q_count)
- 		wake_up_process(ccp->cmd_q[i].kthread);
-+
-+	spin_unlock_irqrestore(&ccp->cmd_lock, flags);
- }
- 
- static struct ccp_cmd *ccp_dequeue_cmd(struct ccp_cmd_queue *cmd_q)
-@@ -410,7 +433,7 @@ static struct ccp_cmd *ccp_dequeue_cmd(struct ccp_cmd_queue *cmd_q)
- 
- 	if (backlog) {
- 		INIT_WORK(&backlog->work, ccp_do_cmd_backlog);
--		schedule_work(&backlog->work);
-+		queue_work(ccp->backlog_wq, &backlog->work);
- 	}
- 
- 	return cmd;
-diff --git a/drivers/crypto/ccp/ccp-dev.h b/drivers/crypto/ccp/ccp-dev.h
-index 83350e2d9821..91b303ec46a9 100644
---- a/drivers/crypto/ccp/ccp-dev.h
-+++ b/drivers/crypto/ccp/ccp-dev.h
-@@ -374,6 +374,9 @@ struct ccp_device {
- 	struct list_head cmd;
- 	struct list_head backlog;
- 
-+	struct workqueue_struct *backlog_wq;
-+	bool halting;
-+
- 	/* The command queues. These represent the queues available on the
- 	 * CCP that are available for processing cmds
- 	 */
-@@ -630,6 +633,7 @@ struct ccp5_desc {
- 
- void ccp_add_device(struct ccp_device *ccp);
- void ccp_del_device(struct ccp_device *ccp);
-+void ccp_halt_cmds(struct ccp_device *ccp);
- 
- extern void ccp_log_error(struct ccp_device *, unsigned int);
- 
+Changes in v5:
+- Rebase onto latest linux-next; patches 1-5 of v4 are merged.
+- Update sdhc_ice power domain to match sdhc_1 PD.(Sashiko review).
+- Link to v4: https://patch.msgid.link/20260714-b4-shikra_crypto_changse-v4-0-06a4ea97c209@oss.qualcomm.com
+
+Changes in v4:
+- Update Patch 1/6 commit message to accustom hawi special case.
+- Collects tags(Krzysztof)
+- Link to v3: https://patch.msgid.link/20260706-b4-shikra_crypto_changse-v3-0-23b4c2054227@oss.qualcomm.com
+
+Changes in v3:
+- Fix commit messages.
+- Collect Ack and Reviewed-by tags.
+- Link to v2: https://patch.msgid.link/20260702-b4-shikra_crypto_changse-v2-0-66173f2f28b3@qti.qualcomm.com
+
+Changes in v2:
+- Add fix in ice bindings to specify 2 clocks defauly for non-legacy Soc
+  compatibles.
+- Update commit messages.
+- Link to v1: https://patch.msgid.link/20260521-shikra_crypto_changse-v1-0-0154cc9cc0de@oss.qualcomm.com/
+
+To: Bartosz Golaszewski <brgl@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+To: "David S. Miller" <davem@davemloft.net>
+To: Rob Herring <robh@kernel.org>
+To: Krzysztof Kozlowski <krzk+dt@kernel.org>
+To: Conor Dooley <conor+dt@kernel.org>
+To: Bjorn Andersson <andersson@kernel.org>
+To: Konrad Dybcio <konradybcio@kernel.org>
+To: Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Cc: linux-arm-msm@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+Cc: devicetree@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+
+---
+Kuldeep Singh (2):
+      dt-bindings: crypto: Adjust Shikra compatible hierarchy
+      arm64: dts: qcom: shikra: Correct QCE node configuration
+
+ Documentation/devicetree/bindings/crypto/qcom-qce.yaml | 3 ++-
+ arch/arm64/boot/dts/qcom/shikra.dtsi                   | 9 +++++----
+ 2 files changed, 7 insertions(+), 5 deletions(-)
+---
+base-commit: af5f12805e5cefa4fe68d6127c7e1fb78cd5535c
+change-id: 20260701-b4-shikra_crypto_changse-f2d6d5bf04b5
+
+Best regards,
+--  
+Kuldeep Singh <kuldeep.singh@oss.qualcomm.com>
 
