@@ -1,29 +1,30 @@
 Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F8853AA1B0;
-	Mon,  7 Sep 2026 02:38:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB8672E4257;
+	Mon,  7 Sep 2026 02:39:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788748741; cv=none; b=hRUzqR9SmQ1ZKudhTqsjBp+caoTkjszvFyWMXaHVES36PAdEaubsbOK93ILA0i1cliEdbuF2BcyWR2gp0+WRO00yXYgVEEj4NpJaIT9k5gjwYNDy6G+Usy9NPckJtCtkGPZoGYHYnXMMAWYchcnbokyrxpnwkjuwtn8iqkmF2Q0=
+	t=1788748747; cv=none; b=MxvflxbAawK3W82enDfh0g1Ywy249GVJ2EtxxM6cjm6CHkK7Un18nmuqwaoe2lNaOG35xEpaOIq7ytk7wBYNcCiKtNBjuMURhKFL+G1JbITrjZxU/dbLlwWWK6O/CKOIwg3QJWmCBpZDY1fPnvMoYN6USxHd3viD5HO23zn6JB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788748741; c=relaxed/simple;
-	bh=pEfTD7XRTj7vv40tU/H4w2ItBtIf6jB6kOmsKCjhRYI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pYLptgIcnpUGvkls48TTyXDJNEe0UT5igPbNrHulmPBPP7DAmWTEh2DNvcsZSqeu8O7ar7FaImmGNDBEE4TVljgknGNwav7/FdScDocg0s74mTfYCkgjWu992dXw7ihoF6Mt8BmzPtitofoGp7X3irYmVhgfYYBj1m5YZcUfXWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=RFLUqz51; arc=none smtp.client-ip=117.135.210.4
+	s=arc-20240116; t=1788748747; c=relaxed/simple;
+	bh=hSIGrk2mt5B+Xdd2xCfJaHUWpDgJ2YWMheurAlXWEUY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=asjVrRzwkVPci/WGBqoi+5anbYDjRDCEKskqSuxuV/vNh6J85dAHQpYFD/eVa50AJFwntLOXAsq6q5LP/wuzBzI0ncxZ+KSLnLTGmAbLDxgb37bLGV6GoFUnJ8XN5mW3NA7NMvzobc69eRx1+3WDvOhvMSnPLpAB5HVxsAt+ZCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=M9bH4NXY; arc=none smtp.client-ip=117.135.210.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="RFLUqz51"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="M9bH4NXY"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=xS
-	p8M10DEpKkRdDFCj4PAI7qKkNrbLVIt/0nGZ318Lo=; b=RFLUqz51tu3YP/fWBR
-	W7+cU7LCzo0JvRzhOXRmy/eX32+VHbGJ0dcp8b/Atxema/+qWSVX/k+UGqz4FhlI
-	TPaUHIZnL8g4399WGRHPuBdQEDni01fhjkFwXM61c9Ubee0vaCowBM87o3p5FSuV
-	kuO46ONfhx5fE8yVQ8d/GsuOM=
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=Cr
+	xSBECOKPhLXIN/4BbTxw490tz1oJNoqOXCUUeLjXg=; b=M9bH4NXYnOVkUPjg7Z
+	B9VUJmW3h7aMNVRC1ZLpsNokS2MDhuhtvBDql4Obgq9AT9GKj1qbAtRlGqFmzEuF
+	ccwG287sfY2Q4INKtD6icbauzQtM1rEwDDk4ZjZU7gM3bmoe6YUNhbndV3DklAOv
+	WGOPmbZfQNH2w753ucNaIhYDI=
 Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-0 (Coremail) with SMTP id _____wD399KkI55qynlmBA--.44662S2;
-	Mon, 07 Sep 2026 10:38:29 +0800 (CST)
+	by gzga-smtp-mtada-g1-0 (Coremail) with SMTP id _____wD399KkI55qynlmBA--.44662S4;
+	Mon, 07 Sep 2026 10:38:35 +0800 (CST)
 From: Qunqin Zhao <zhaoqunqin@163.com>
 To: lee@kernel.org
 Cc: chenhuacai@kernel.org,
@@ -32,10 +33,12 @@ Cc: chenhuacai@kernel.org,
 	linux-crypto@vger.kernel.org,
 	mfd@lists.linux.dev,
 	Qunqin Zhao <zhaoqunqin@loongson.cn>
-Subject: [PATCH v6 0/2] mfd: loongson-se: Add multi-node support and fix miscellaneous issues
-Date: Mon,  7 Sep 2026 10:38:25 +0800
-Message-Id: <20260907023827.14905-1-zhaoqunqin@163.com>
+Subject: [PATCH v6 2/2] mfd: loongson-se: Fix miscellaneous issues
+Date: Mon,  7 Sep 2026 10:38:27 +0800
+Message-Id: <20260907023827.14905-3-zhaoqunqin@163.com>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20260907023827.14905-1-zhaoqunqin@163.com>
+References: <20260907023827.14905-1-zhaoqunqin@163.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -43,66 +46,283 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD399KkI55qynlmBA--.44662S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7Zr4UWF17ur13Xw15tr43Jrb_yoW8KryfpF
-	W5W345Ar4DKrWIkwnxXF409r1rXrWrCF45Can7W347A3srtr1vqF43ta45u3y7CFZ7t3W2
-	qFWUta18uF18C3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07bj4SwUUUUU=
-X-CM-SenderInfo: 52kd01pxqtx0i6rwjhhfrp/xtbCxQU0c2qeI6W02AAA3Z
+X-CM-TRANSID:_____wD399KkI55qynlmBA--.44662S4
+X-Coremail-Antispam: 1Uf129KBjvJXoWxtrWktw4xWF4Dtw15ZFWfuFg_yoWftw4UpF
+	W5CayYkr4Yqr48CwsxJr90vFyayrZ5tr9rCa93Kw4xAF1kJ3s5WFW5KFyUWayrurWDtF17
+	XFWkKFWru3W8C3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07bbEfOUUUUU=
+X-CM-SenderInfo: 52kd01pxqtx0i6rwjhhfrp/xtbC7gw2dWqeI6x3KgAA3H
 
 From: Qunqin Zhao <zhaoqunqin@loongson.cn>
 
-- Patch 1 introduces the multi-node platform support.
+Address multiple historical driver issues discovered by the Sashiko
+Automation system within the loongson_se_probe() initialization flow
+and the driver's interrupt service routines [1].
 
-  v6: No changes
-  v5: Clear pending interrupts with S2LINT_CL before requesting IRQs,
-       and move S2LINT_EN to after all interrupt handlers are registered.
-  v4: Safely handling shared interrupt handler returns.
-  v3: Using shared interrupts (IRQF_SHARED) instead of manually
-      iterating through all devices to check for interrupts.
+- Add an explicit bounds check in se_irq_handler() before accessing
+  the engines array to prevent an out-of-bounds memory access.
 
-- Patch 2 focuses on structural and error-path hardening for the
-  pre-existing baseline code. This includes resolving critical issues
-  discovered by the Sashiko Automation system such as: completion
-  race conditions, missing engine completion initialization, spinlock
-  held with interrupts disabled for up to 10 ms, EPROBE_DEFER
-  handling, DMA buffer overflow validation, interrupt cleanup on
-  probe failure, and device removal ordering.
+- Switch from devm_kmalloc() to devm_kzalloc() and explicitly
+  initialize all engine completion structures in probe() to avoid a
+  kernel panic from complete() dereferencing a NULL wait head when a
+  spurious interrupt fires before child drivers call
+  loongson_se_init_engine().
 
-  v6:
-       - Still use init_completion() in loongson_se_init_engine.
-       - Serialize command submission with a new poll_lock spinlock
-       - Mask the target interrupt, clear pending status, and
-         reinitialize the completion under dev_lock before issuing a
-         command, re-enabling the interrupt after triggering new cmd
-       - Keep the original engine_init_lock scope instead of the
-         broader cmd_lock mutex.
-       - Reuse loongson_se_send_controller_cmd() in the STOP path and
-         register the stop handler before loongson_se_init()
-       - Correct the dmam_size validation formula
+- Serialize command submission with a new poll_lock spinlock and
+  protect the completion reset with the interrupt lock.  Before
+  issuing a command, mask the target interrupt, clear any pending
+  status, and reinitialize the completion under dev_lock, then
+  re-enable the interrupt after the command has been triggered.  This
+  closes the race where a stale interrupt from a previously
+  interrupted command could complete the current command's
+  completion.  The spin_lock_irq() around the 10 ms poll is dropped so
+  interrupts are not disabled for the full busy-wait.
 
-  v5: Fix all issues reported by Sashiko analysis:
-       - Initialize engine completions in probe to avoid NULL deref
-       - Use cmd_lock mutex for command serialization, drop spin_lock_irq
-       - Add reinit_completion to controller and engine command paths
-       - Fix EPROBE_DEFER handling in platform_irq_count()
-       - Validate dmam_size against minimum required size
-       - Disable IRQs in probe error path after init failure
-       - Add loongson_se_stop() devres cleanup with proper ordering
-       - Use non-interruptible wait for STOP command
-  v4: new patch
+- Fix EPROBE_DEFER handling: propagate the error directly from
+  platform_irq_count() instead of overwriting it with ENODEV so that
+  probe deferral works when the interrupt provider is not yet ready.
 
+- Validate dmam_size from firmware against the minimum required size
+  to keep the command buffers of all engines within engine 0's data
+  region and prevent overlapping DMA buffers.
 
-Qunqin Zhao (2):
-  mfd: loongson-se: Add multi-node support
-  mfd: loongson-se: Fix miscellaneous issues
+- Return the error code from devm_request_irq() instead of silently
+  continuing to prevent an indefinite hang.
 
- drivers/mfd/loongson-se.c       | 105 ++++++++++++++++++++++++++++----
- include/linux/mfd/loongson-se.h |   1 +
- 2 files changed, 93 insertions(+), 13 deletions(-)
+- Add a loongson_se_stop() cleanup handler registered with
+  devm_add_action_or_reset() before loongson_se_init() so that a
+  failed init still stops the controller and masks all interrupts via
+  devres, preventing DMA access to freed memory.
 
+- Zero-initialize the local controller command structures in
+  loongson_se_init() and loongson_se_init_engine() to prevent
+  uninitialized stack data from being written to device registers.
 
-base-commit: cee9395acd8043be0644b25c34bfa86623f2b935
+- Add the SE_CMD_STOP command definition.
+
+Link: https://lore.kernel.org/all/20260618095949.GB1672911@google.com/ [1]
+Fixes: e551fa3159e3 ("mfd: Add support for Loongson Security Engine chip controller")
+Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
+---
+ drivers/mfd/loongson-se.c       | 90 +++++++++++++++++++++++++++++----
+ include/linux/mfd/loongson-se.h |  1 +
+ 2 files changed, 82 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/mfd/loongson-se.c b/drivers/mfd/loongson-se.c
+index 7f552a8ee..1d332c418 100644
+--- a/drivers/mfd/loongson-se.c
++++ b/drivers/mfd/loongson-se.c
+@@ -23,6 +23,8 @@
+ struct loongson_se {
+ 	void __iomem *base;
+ 	spinlock_t dev_lock;
++	/* Synchronizes command submission between users of different engines */
++	spinlock_t poll_lock;
+ 	struct completion cmd_completion;
+ 
+ 	void *dmam_base;
+@@ -42,7 +44,7 @@ static int loongson_se_poll(struct loongson_se *se, u32 int_bit)
+ 	u32 status;
+ 	int err;
+ 
+-	spin_lock_irq(&se->dev_lock);
++	spin_lock(&se->poll_lock);
+ 
+ 	/* Notify the controller that the engine needs to be started */
+ 	writel(int_bit, se->base + SE_L2SINT_SET);
+@@ -52,17 +54,48 @@ static int loongson_se_poll(struct loongson_se *se, u32 int_bit)
+ 						!(status & int_bit),
+ 						1, LOONGSON_ENGINE_CMD_TIMEOUT_US);
+ 
+-	spin_unlock_irq(&se->dev_lock);
++	/*
++	 * Re-enable the interrupt that loongson_se_reinit_completion() masked.
++	 * The hardware guarantees that once the interrupt is re-enabled, only
++	 * interrupts for the command just issued can arrive, so a stale
++	 * interrupt from a previously interrupted command can never complete
++	 * this command's completion.
++	 */
++	writel(int_bit | readl(se->base + SE_S2LINT_EN), se->base + SE_S2LINT_EN);
++
++	spin_unlock(&se->poll_lock);
+ 
+ 	return err;
+ }
+ 
++/*
++ * Prepare a completion for a new command: mask the corresponding interrupt,
++ * clear any pending interrupt status, and reset the completion.  This runs
++ * under dev_lock so that the IRQ handler cannot race with it.  The interrupt
++ * is re-enabled in loongson_se_poll() after the command has been issued.
++ */
++static void loongson_se_reinit_completion(struct loongson_se *se,
++					  struct completion *completion, u32 int_bit)
++{
++	spin_lock_irq(&se->dev_lock);
++
++	writel(readl(se->base + SE_S2LINT_EN) & ~int_bit, se->base + SE_S2LINT_EN);
++
++	writel(int_bit, se->base + SE_S2LINT_CL);
++
++	reinit_completion(completion);
++
++	spin_unlock_irq(&se->dev_lock);
++}
++
+ static int loongson_se_send_controller_cmd(struct loongson_se *se,
+ 					   struct loongson_se_controller_cmd *cmd)
+ {
+ 	u32 *send_cmd = (u32 *)cmd;
+ 	int err, i;
+ 
++	loongson_se_reinit_completion(se, &se->cmd_completion, SE_INT_CONTROLLER);
++
+ 	for (i = 0; i < SE_SEND_CMD_REG_LEN; i++)
+ 		writel(send_cmd[i], se->base + SE_SEND_CMD_REG + i * 4);
+ 
+@@ -75,12 +108,16 @@ static int loongson_se_send_controller_cmd(struct loongson_se *se,
+ 
+ int loongson_se_send_engine_cmd(struct loongson_se_engine *engine)
+ {
++	int err;
++
++	loongson_se_reinit_completion(engine->se, &engine->completion, BIT(engine->id));
++
+ 	/*
+ 	 * After engine initialization, the controller already knows
+ 	 * where to obtain engine commands from. Now all we need to
+ 	 * do is notify the controller that the engine needs to be started.
+ 	 */
+-	int err = loongson_se_poll(engine->se, BIT(engine->id));
++	err = loongson_se_poll(engine->se, BIT(engine->id));
+ 
+ 	if (err)
+ 		return err;
+@@ -93,7 +130,7 @@ struct loongson_se_engine *loongson_se_init_engine(struct device *dev, int id)
+ {
+ 	struct loongson_se *se = dev_get_drvdata(dev);
+ 	struct loongson_se_engine *engine = &se->engines[id];
+-	struct loongson_se_controller_cmd cmd;
++	struct loongson_se_controller_cmd cmd = {0};
+ 
+ 	engine->se = se;
+ 	engine->id = id;
+@@ -155,7 +192,8 @@ static irqreturn_t se_irq_handler(int irq, void *dev_id)
+ 	/* For engines */
+ 	while (int_status) {
+ 		id = __ffs(int_status);
+-		complete(&se->engines[id].completion);
++		if (id < SE_ENGINE_MAX)
++			complete(&se->engines[id].completion);
+ 		int_status &= ~BIT(id);
+ 		writel(BIT(id), se->base + SE_S2LINT_CL);
+ 	}
+@@ -167,7 +205,7 @@ static irqreturn_t se_irq_handler(int irq, void *dev_id)
+ 
+ static int loongson_se_init(struct loongson_se *se, dma_addr_t addr, int size)
+ {
+-	struct loongson_se_controller_cmd cmd;
++	struct loongson_se_controller_cmd cmd = {0};
+ 	int err;
+ 
+ 	cmd.command_id = SE_CMD_START;
+@@ -188,6 +226,17 @@ static const struct mfd_cell engines[] = {
+ 	{ .name = "tpm_loongson" },
+ };
+ 
++static void loongson_se_stop(void *data)
++{
++	struct loongson_se *se = data;
++	struct loongson_se_controller_cmd cmd = {0};
++
++	cmd.command_id = SE_CMD_STOP;
++	loongson_se_send_controller_cmd(se, &cmd);
++
++	writel(0, se->base + SE_S2LINT_EN);
++}
++
+ static int loongson_se_probe(struct platform_device *pdev)
+ {
+ 	struct device *dev = &pdev->dev;
+@@ -195,19 +244,34 @@ static int loongson_se_probe(struct platform_device *pdev)
+ 	int nr_irq, irq, err, i;
+ 	dma_addr_t paddr;
+ 
+-	se = devm_kmalloc(dev, sizeof(*se), GFP_KERNEL);
++	se = devm_kzalloc(dev, sizeof(*se), GFP_KERNEL);
+ 	if (!se)
+ 		return -ENOMEM;
+ 
+ 	dev_set_drvdata(dev, se);
+ 	init_completion(&se->cmd_completion);
+ 	spin_lock_init(&se->dev_lock);
++	spin_lock_init(&se->poll_lock);
+ 	mutex_init(&se->engine_init_lock);
+ 
++	for (i = 0; i < SE_ENGINE_MAX; i++)
++		init_completion(&se->engines[i].completion);
++
+ 	dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
+ 	if (device_property_read_u32(dev, "dmam_size", &se->dmam_size))
+ 		return -ENODEV;
+ 
++	/*
++	 * Engine 0 does not exist and its data buffer is reused as the command
++	 * buffer for the other engines.  The command buffers of all engines
++	 * therefore must fit within engine 0's data region, i.e.
++	 * dmam_size / SE_ENGINE_MAX >= SE_ENGINE_MAX * 2 * SE_ENGINE_CMD_SIZE.
++	 * Enforce this to keep each engine's data and command buffers from
++	 * overlapping.
++	 */
++	if ((se->dmam_size / SE_ENGINE_MAX) < (SE_ENGINE_MAX * 2 * SE_ENGINE_CMD_SIZE))
++		return -EINVAL;
++
+ 	se->dmam_base = dmam_alloc_coherent(dev, se->dmam_size, &paddr, GFP_KERNEL);
+ 	if (!se->dmam_base)
+ 		return -ENOMEM;
+@@ -217,20 +281,28 @@ static int loongson_se_probe(struct platform_device *pdev)
+ 		return PTR_ERR(se->base);
+ 
+ 	nr_irq = platform_irq_count(pdev);
+-	if (nr_irq <= 0)
++	if (nr_irq == 0)
+ 		return -ENODEV;
++	if (nr_irq < 0)
++		return nr_irq;
+ 
+ 	writel(SE_INT_ALL, se->base + SE_S2LINT_CL);
+ 
+ 	for (i = 0; i < nr_irq; i++) {
+ 		irq = platform_get_irq(pdev, i);
+ 		err = devm_request_irq(dev, irq, se_irq_handler, IRQF_SHARED, "loongson-se", se);
+-		if (err)
++		if (err) {
+ 			dev_err(dev, "failed to request IRQ: %d\n", irq);
++			return err;
++		}
+ 	}
+ 
+ 	writel(SE_INT_ALL, se->base + SE_S2LINT_EN);
+ 
++	err = devm_add_action_or_reset(dev, loongson_se_stop, se);
++	if (err)
++		return err;
++
+ 	err = loongson_se_init(se, paddr, se->dmam_size);
+ 	if (err)
+ 		return err;
+diff --git a/include/linux/mfd/loongson-se.h b/include/linux/mfd/loongson-se.h
+index 07afa0c25..8237ccab7 100644
+--- a/include/linux/mfd/loongson-se.h
++++ b/include/linux/mfd/loongson-se.h
+@@ -9,6 +9,7 @@
+ #define SE_SEND_CMD_REG_LEN		0x8
+ /* Controller command ID */
+ #define SE_CMD_START			0x0
++#define SE_CMD_STOP			0x1
+ #define SE_CMD_SET_DMA			0x3
+ #define SE_CMD_SET_ENGINE_CMDBUF	0x4
+ 
 -- 
 2.47.2
 
