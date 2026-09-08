@@ -1,31 +1,43 @@
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9F1B242D84;
-	Tue,  8 Sep 2026 05:30:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 483DE2475F7;
+	Tue,  8 Sep 2026 05:31:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788845416; cv=none; b=kJJ95x/vpj1Pvhnso2FTPCCsSdtO+2idcy/26EpYBX0f+k9ctACT2iRwyeTxwa3xLpE8sYS9yZKmi41/Qd/95G30+38zNkMaehfQ0J1hXMZ+ICu/1mhDphec+WGlvxZiiNY0IvrN2YBrYiHcITSMNy68B7nbRuh4W9zCMmn40gU=
+	t=1788845515; cv=none; b=FFRxXxhFzQBeTy70oV6cVeHr09mwuWMe66m0RDAzxROTq64czN1shrFvhIe5JOAvwgz+C9cHOLy2EI9iUwPNZJ6ojN8LPFSypC4Ucdi0YQEwUfGUfiH3NRhxXZQ4lcH2wchlFQNtSEHh1IcG5DNYIccN1XBARfiVablsgYmZYqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788845416; c=relaxed/simple;
-	bh=vsUv/m6hbvGfGaNk1NXnzkD4XIRMhgLdRUVY/qAB5SE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bezAcVVRlHi6tAqgeq8VuH5idtuqRVZ2MKWawkvuuqMZ9m1CYLGHWV/PQjaqXKLTDnNOdKoEITwiY9O+lpasTx/D05xlV6h7It9c0/QDvyc12YSAaCXDgwtSJfXRyudeUvV05oxyjQD9AeIbjySS8SD/pzi80zsL0t+NZHY+d18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 315876025B; Tue, 08 Sep 2026 07:30:11 +0200 (CEST)
-Date: Tue, 8 Sep 2026 07:30:10 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: netfilter-devel@vger.kernel.org, kadlec@netfilter.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH nf-next v4 01/13] rhashtable: add
- rhashtable_flush_and_free helper
-Message-ID: <ap-dYotn2QqdTVqf@strlen.de>
-References: <20260904185321.30313-2-fw@strlen.de>
- <ap-ZOyOS6j_K5gmZ@gondor.apana.org.au>
+	s=arc-20240116; t=1788845515; c=relaxed/simple;
+	bh=ZznVUXC3Db8jyf7E+lVXxPCCkO313FilWJc3iundR8s=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Idc+7Hn7fnfzWp3+oaukhbMcNMwXtSpZNjq+l1ET9IPAY4Rfa9hXdagz3obYIFxF29RphRxptEAQrBmHQCwie5P7eINO+GkGWbBI8niS0sbfCBz8aM2CEQd0evwKaF7w5JIVjO5/RoEbm+ikCo5R7N95tgUHzUXuj8tUV+UKZ4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=SwrwstyX; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="SwrwstyX"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=Content-Type:MIME-Version:Message-ID:Subject:
+	To:From:Date:cc:to:subject:message-id:date:from:content-type:in-reply-to:
+	references:reply-to; bh=sU49Ut99usXq+/72Lxs2bGMm4+3EgcIUTNtn7K8dkTc=; b=Swrws
+	tyXTPk+/bkv7fbfycb8JjEl/9OAqjvWaJomXP0eJD0mjJUVJIkdY6lk6Q7yxZIPa3HTaIvSEn9ri+
+	CefLhwYcL4FVYHUpLY2+nnXMwp8K6OS2+B/BnQty86ixXJ2MTIWgNNue5SeAFTWJojcMa0Iktmhi6
+	2O9kgnd1QdXmY0uQIHyqZ4xcj9qsqwdxbh5x31CnBtlgxcGK1/h00TZedjdlyQuwVgONMermMVim/
+	LCtf3JMaOln7ydWGvLalRT82IcWVt8ALGs8kd4xHCmUiHSlKDWyoxlVAaIiYE6hiyS249s2MRUf6W
+	JkJ3+l2kdUKZLg7R95ZdiCOgMnRGA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1x3oQs-0000000BjUN-2CvX;
+	Tue, 08 Sep 2026 13:31:47 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 08 Sep 2026 15:31:46 +1000
+Date: Tue, 8 Sep 2026 15:31:46 +1000
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT PULL] Crypto Fixes for 7.3
+Message-ID: <ap-dwlnQ8f2QSSDj@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -34,88 +46,35 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ap-ZOyOS6j_K5gmZ@gondor.apana.org.au>
 
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> Florian Westphal <fw@strlen.de> wrote:
-> > Will be used by upcoming ipset rhashtable conversion.
-> > 
-> > "walk rht with unlink+free" triggers LLM reject pattern:
-> > "possible softirq CPU stall".
-> > 
-> > "walk rht with unlink+free + cond_resched" triggers
-> > "possibly skipped elements".
-> > 
-> > Add a helper to detach current hash backend storage from the
-> > rhashtable, then iterate and flush all contained elements.
-> > 
-> > Cc: herbert@gondor.apana.org.au
-> > Cc: linux-crypto@vger.kernel.org
-> > Link: https://sashiko.dev/#/patchset/20260828152256.8759-1-fw%40strlen.de
-> > Assisted-by: Claude:claude-sonnet-5
-> > Signed-off-by: Florian Westphal <fw@strlen.de>
-> > ---
-> > Herbert: If you prefer to take this via the crypto tree, please
-> > let me know.
-> > Otherwise, an explicit Ack would be appreciated, so this can
-> > be handled via nf-next.  Thanks.
-> > 
-> > net/ipv6/ila/ could be converted to use this helper too.
-> > 
-> > include/linux/rhashtable.h |  19 ++++++
-> > lib/rhashtable.c           | 127 +++++++++++++++++++++++++++++++++++++
-> > 2 files changed, 146 insertions(+)
-> 
-> Sorry I wasn't paying attention.
-> 
-> So is the problem that there is no way to remove all elements for
-> a given key in an rhltable?
+Hi Linus:
 
-No.  The problem is that I am too dumb to remove them without having
-an LLM tell me to go fuck myself.
+The following changes since commit cee9395acd8043be0644b25c34bfa86623f2b935:
 
-> If that is what's needed then we should just add it for rhltable
-> since normal rhashtable's do not contain duplicate objects for a
-> given key.
+  Linux 7.3-rc1 (2026-08-30 13:34:40 -0700)
 
-I don't understand this response.  This isn't about rhashtable vs.
-rhltable.  This is about my incompetence to flush an rhashtable or
-rhashtable.  Simple version:
+are available in the Git repository at:
 
-        rhashtable_walk_enter();
-        rhashtable_walk_start();
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6 tags/v7.3-p3
 
-        while ((he = rhashtable_walk_next())) {
-                if (IS_ERR(he)) {
-                        if (PTR_ERR(he) != -EAGAIN) { ..  break; }
-                        continue;
-                }
+for you to fetch changes up to 60892a384aa1e65d0e703e1c513417bdf0c80777:
 
-		rhashtable_remove_fast()
-		/* free */
-        }
+  crypto: x86/aria - add missing vzeroupper in AVX-512 code (2026-09-04 18:45:51 +1000)
 
-        rhashtable_walk_stop();
-        rhashtable_walk_exit();
+----------------------------------------------------------------
+This push adds missing vzeroupper instructions to x86/aria.
+----------------------------------------------------------------
 
-... tells that this causes softirq lockup for huge tables.
+Eric Biggers (2):
+      crypto: x86/aria - add missing vzeroupper in AVX2 code
+      crypto: x86/aria - add missing vzeroupper in AVX-512 code
 
-Adding a lock-break after N elements via
-if (flushed > 64) {
-	rhashtable_walk_stop();
-	cond_resched();
-	rhashtable_walk_start();
-}
+ arch/x86/crypto/aria-aesni-avx2-asm_64.S  | 6 ++++++
+ arch/x86/crypto/aria-gfni-avx512-asm_64.S | 3 +++
+ 2 files changed, 9 insertions(+)
 
-... tells that this will skip some elements.
-
-
-... Full restart on atomic_read(->nelems) > 0 post loop
-seems wrong to me too.
-
-So, to get out of this I tried to add a 'flush all elements' helper to
-the core that just replaces backend storage.
-
-Does adding such a helper make sense or not?  Thats the only question
-here.  If yes, I'll make a v2. If no, I will go back to V1.  Unless you
-have a better idea.
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
