@@ -1,130 +1,99 @@
-Received: from oss.cyber.gouv.fr (oss.cyber.gouv.fr [51.159.188.251])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61C96519913;
-	Tue,  8 Sep 2026 09:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.159.188.251
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 509044AA595;
+	Tue,  8 Sep 2026 09:44:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788860254; cv=none; b=ky9RaRddmxRik2fB+MNmC9A2sjQz45zj2FLxfnll1A5lUSlnllYsb3lQmhf+6lAYNPEZU7BkWitmdKRAvzdNGHHuQ48MnIaCFcHk8wZky/+qGerTOwJmMS1RpLAF/pt2bff/0/AsOWPOVdNSmMutT0QYe2a5p/VNaRf3vRH09+g=
+	t=1788860689; cv=none; b=uLSR60VL189q+XdpVZU3vwptrtUxlFIBbl9NbiPp8n024CRsf8ESYEht/MtCyBJA68L42XEcpoRzOfMWMocX7AMxbzgy5ho6f5O3I92+z+hqwlSPCPMYVUHv6eWcX7UZmBNv4hKCM2iiWBgm7KI/I0eCm7vXnFSUgF9Tz81SNdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788860254; c=relaxed/simple;
-	bh=Uzro9sQyNbEXpshQpInNR8RyMssihPgj7sRtvoTsTRQ=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=rn00IGjsoYq1rKnShMsaXDyCiTnMqod06r+HY6G/8Ns6rqZPL9nLh8s0wuEEpTZ3MO36Ia+7Y9MUsjXezNgbwLIaWPfxSplFilMKz9dSZY4RB2t6AjVZ6JsX5rXGu2BlNX+bPM6toVX/sfDx4jNj/ZBaDPxn/heowBPrXpfuUVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr; spf=pass smtp.mailfrom=oss.cyber.gouv.fr; dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b=o2sFK7r+; arc=none smtp.client-ip=51.159.188.251
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.cyber.gouv.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.cyber.gouv.fr
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oss.cyber.gouv.fr header.i=@oss.cyber.gouv.fr header.b="o2sFK7r+"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=oss.cyber.gouv.fr; s=default; h=Content-Transfer-Encoding:Content-Type:
-	Message-ID:References:In-Reply-To:Subject:Cc:To:From:Date:MIME-Version:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=yCthNr5mJM9tAeqQeJQ8svvk+g0Q+GqxOFfeKxDoCjk=; b=o2sFK7r+mVqe1wEsO8jOZ4Zzi6
-	amtR+kji1nwyTlsmWpU3Mbgkz+z5kzixEgJjF7A7doqBj3VswbhSs3vmiae0dS5Z5aWfdmYQeGX/i
-	LznBj2F1AM1zJVfAtmF9b7cI56C9FN041WxfOgJTEuCPaZawtRTGzMMhPDz4CEEuOouTjTQutZODt
-	zrN4OJ+fTo6/EKYaTZOCZyno0Jyi1gZeCeIaL3vHYATK5DrXCyoLI6A7sMExZf59fe55XJF8ji2Fa
-	QfgmLo7rW21LC6hsigjmTxM7jFgjVMRdGXIUkaFDd1g2uKnbi+hQJdgrAvEyvsm3nOBRI8sc3Q9ZC
-	nDAwSJ0w==;
-Received: from [::1] (port=34328 helo=pf-012.whm.fr-par.scw.cloud)
-	by pf-012.whm.fr-par.scw.cloud with esmtpa (Exim 4.99.5)
-	(envelope-from <jeremy.jean@oss.cyber.gouv.fr>)
-	id 1x3sGi-0000000ABeP-3g1Q;
-	Tue, 08 Sep 2026 11:37:31 +0200
+	s=arc-20240116; t=1788860689; c=relaxed/simple;
+	bh=hZE62hYy80JCmRJl8frLe8BRekVemno7foWWlr7ByQA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oznXUkV7GN7jfeUHEOmJArXfnt/tyOSM7v29C2c3iWi+37AhkhR7VjesEWJdu6B2iuS1YCZA2yQFdbrxEyr9ohWd1tM2m0tn0ZqBTdbK/oUiphhSOS8zuUOFUw/Ni4x4WgJgEEeO7HJQt+UWy3ScnsFi5v27/H+uUDm77dUks7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: ea830a7aab6911f19a56ed5b684f684d-20260908
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.19,REQID:1aaeb123-10e7-410a-b55b-6715d5593966,IP:0,U
+	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-5
+X-CID-META: VersionHash:7db8b62,CLOUDID:b7342ac129824bbfa49c5374921c0be9,BulkI
+	D:nil,BulkQuantity:0,SF:102|136|850|865|898,TC:nil,Content:0|15|50|99,EDM:
+	-3|-100,IP:nil,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,O
+	SA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: ea830a7aab6911f19a56ed5b684f684d-20260908
+X-User: lilinmao@kylinos.cn
+Received: from localhost.localdomain [(10.44.16.150)] by mailgw.kylinos.cn
+	(envelope-from <lilinmao@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 1401455100; Tue, 08 Sep 2026 17:44:41 +0800
+From: Linmao Li <lilinmao@kylinos.cn>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: Frank Li <Frank.Li@oss.nxp.com>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Leonard Crestez <cdleonard@gmail.com>,
+	Radu Solea <radu.solea@nxp.com>,
+	Franck LENORMAND <franck.lenormand@nxp.com>,
+	linux-crypto@vger.kernel.org,
+	imx@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Linmao Li <lilinmao@kylinos.cn>
+Subject: [PATCH v2] crypto: mxs-dcp: handle zero-length skcipher requests
+Date: Tue,  8 Sep 2026 17:44:37 +0800
+Message-Id: <20260908094437.1548278-1-lilinmao@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 08 Sep 2026 11:37:30 +0200
-From: =?UTF-8?Q?J=C3=A9r=C3=A9my_Jean?= <jeremy.jean@oss.cyber.gouv.fr>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: arei.gonglei@huawei.com, mst@redhat.com, davem@davemloft.net,
- jasowangio@gmail.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
- linux-crypto@vger.kernel.org, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, Bryam Vargas <hexlabsecurity@proton.me>
-Subject: Re: [PATCH] crypto: virtio: validate akcipher completion length
-In-Reply-To: <ap_TatiabFuXiiad@gondor.apana.org.au>
-References: <20260821095511.3600564-2-Jeremy.Jean@oss.cyber.gouv.fr>
- <ap_TatiabFuXiiad@gondor.apana.org.au>
-User-Agent: Roundcube Webmail/1.6.18
-Message-ID: <7fc9c66a8d89113854ecf8cc54ecb0c5@oss.cyber.gouv.fr>
-X-Sender: jeremy.jean@oss.cyber.gouv.fr
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
 Content-Transfer-Encoding: 8bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - pf-012.whm.fr-par.scw.cloud
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - oss.cyber.gouv.fr
-X-Get-Message-Sender-Via: pf-012.whm.fr-par.scw.cloud: authenticated_id: jeremy.jean@oss.cyber.gouv.fr
-X-Authenticated-Sender: pf-012.whm.fr-par.scw.cloud: jeremy.jean@oss.cyber.gouv.fr
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
 
-On 2026-09-08 11:20, Herbert Xu wrote:
-> On Fri, Aug 21, 2026 at 09:55:12AM +0000, Jérémy Jean wrote:
->> The device controls the used length returned for an akcipher request.
->> Subtracting the status byte without validating that length can 
->> underflow
->> dst_len, while accepting a payload larger than the submitted 
->> destination
->> can make sg_copy_from_buffer() read past the response buffer.
->> 
->> Reject malformed completion lengths before updating dst_len or copying 
->> the
->> response.
->> 
->> Fixes: a36bd0ad9fbf ("virtio-crypto: adjust dst_len at ops callback")
->> Assisted-by: Codex:gpt-5
->> Signed-off-by: Jérémy Jean <Jeremy.Jean@oss.cyber.gouv.fr>
->> ---
->>  drivers/crypto/virtio/virtio_crypto_akcipher_algs.c | 13 
->> ++++++++++++-
->>  1 file changed, 12 insertions(+), 1 deletion(-)
->> 
->> diff --git a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c 
->> b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
->> index d8d452cac391..886032abae80 100644
->> --- a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
->> +++ b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
->> @@ -69,6 +69,7 @@ static void 
->> virtio_crypto_dataq_akcipher_callback(struct virtio_crypto_request *
->>  	struct akcipher_request *akcipher_req =
->>  		container_of((void *)vc_akcipher_req, struct akcipher_request,
->>  			     __ctx);
->> +	unsigned int dst_len;
->>  	int error;
->> 
->>  	switch (vc_req->status) {
->> @@ -88,9 +89,19 @@ static void 
->> virtio_crypto_dataq_akcipher_callback(struct virtio_crypto_request *
->>  	}
->> 
->>  	/* actual length may be less than dst buffer */
->> -	akcipher_req->dst_len = len - sizeof(vc_req->status);
-> 
-> This appears to have already been fixed by
-> 
-> commit f77a956f6a19f9463ef1527c9d0cda50dded6b92
-> Author: Bryam Vargas <hexlabsecurity@proton.me>
-> Date:   Mon Jun 22 01:52:15 2026 -0500
-> 
->     crypto: virtio - bound the akcipher result length
-> 
-> Please check that commit and see if it's sufficient or not.
-> 
-> Thanks,
+The generic ECB and CBC implementations return success for zero-length
+requests, but MXS-DCP queues them anyway. When such a request reaches
+the worker, last_out_len remains zero. The CBC completion path then
+subtracts AES_BLOCK_SIZE from this unsigned value when updating the IV,
+causing the offset to underflow. On decryption, the resulting source
+address precedes aes_in_buf.
 
-Hello,
+Return success before enqueueing zero-length requests, matching the
+generic implementations. This avoids the invalid source access and
+leaves the IV unchanged.
 
-Indeed, this fixes the bug.
-Thanks for the pointer, I missed that patch.
+Fixes: fadd7a6e616b ("crypto: mxs-dcp - Fix AES issues")
+Signed-off-by: Linmao Li <lilinmao@kylinos.cn>
+---
+v2: Clarify commit message: describe zero-length return-0 as existing
+    generic ECB/CBC behavior rather than a general API rule (Frank Li).
+ drivers/crypto/mxs-dcp.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Regards,
-Jérémy
+diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
+index 133ebc998236..60794b4d49fa 100644
+--- a/drivers/crypto/mxs-dcp.c
++++ b/drivers/crypto/mxs-dcp.c
+@@ -473,6 +473,9 @@ static int mxs_dcp_aes_enqueue(struct skcipher_request *req, int enc, int ecb)
+ 	struct dcp_aes_req_ctx *rctx = skcipher_request_ctx(req);
+ 	int ret;
+ 
++	if (!req->cryptlen)
++		return 0;
++
+ 	if (unlikely(actx->key_len != AES_KEYSIZE_128 && !actx->key_referenced))
+ 		return mxs_dcp_block_fallback(req, enc);
+ 
+
+base-commit: 8d3ae59288f1e7d58d76558a6ee96d533bc5019f
+-- 
+2.25.1
+
