@@ -1,75 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-alma10-1.taild15c8.ts.net [100.103.45.18])
+Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80B043A9605;
-	Tue,  8 Sep 2026 07:54:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=100.103.45.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96097519917;
+	Tue,  8 Sep 2026 09:04:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788854086; cv=none; b=mf9CJQeMnbReii/Lc6HaeSIRyF9aHHKEHvWytuJolZxovQeIDWXth/BM7l4+wiXsO9zO9ozAZA8PcKl/b0JEE2OSiXa5f/2Bxogv12cfBSwkZlci2I9AyoghUYCE0FVmMtvOXks2ySoMT4pOpeds9ZeQSRSyCG6iUQLbwkM9OB0=
+	t=1788858270; cv=none; b=FfdYld3iOZbt1TzDsG102P+9wj8rcWCpH0Z9+lCt/qZkCFVkX7H0z3YgZcYfxTNsFwSK5Uq6HxWBAZHVHUG3B9gXhVBZiPScZi29Nx8g8IDBTEVAREA4neObCVpy7t82KczGVzWBoTwer8fXHIvOFvWpDti/4I+0qfmHBmVWNT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788854086; c=relaxed/simple;
-	bh=PPzNN39B7L/5123kefcOgUmHTJUIHSjPPl6fOtNhApQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oR+rzllRcBHgEsKEQSmA18xvdmbzgcLtBuVVz7sCf+64inbyaboG+0NYCnqW6n2rieoF8ysMkBXhVSYe+f0Wvs67mngmhrem91daHEthEFrbxv2JbhLWJyesLLN3g8NOxd42LDiXGkUxWZ7y2gC0gp3SsHOrvqoH84tDqRZcWAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TdL6EJMo; arc=none smtp.client-ip=100.103.45.18
+	s=arc-20240116; t=1788858270; c=relaxed/simple;
+	bh=PHIZ7h9xq+n1EzIQPJwPi3y89CFNA4yF/OY0bv2E2Bg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gt6f3KPoNMu88+cOItBllE9B3QhAUirDgV6mqxVFX4Akk2KgNh/Yz7KHm1GL0JeYiq3e6L3yOIQuoTtGGlNA8JZmDK1iuuDb5mXEvBFCHLbgE1M+Ko+h41++fWZAegEcZiJ1Z0rAKFerslPXIis0LSMP1gmRybzb7w8JrvG4AiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=ZxkpM+16; arc=none smtp.client-ip=180.181.231.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TdL6EJMo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC6101F00A3E;
-	Tue,  8 Sep 2026 07:54:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1788854085;
-	bh=tES0q+TYNnYuVdAOmyqrMv/w+xs/tzZD1dDvpgip1pg=;
-	h=From:To:Cc:Subject:Date;
-	b=TdL6EJMolIsymQu0svjdSII2NkiWQlfkoqG5jZHPcnz7py7Xt/XHJJkbrF7CpTJ7u
-	 9WOWQw3LXOGUb8QfmYoZRBCmLr5Gni2PTjxYmv00F2L/pDVJJjBpTqY5K3WL9Q2z+8
-	 HxAS99E17yZAmobOxyyTiWhAynDcX8QUPL4tysoKyZyIjUMsqEXpRN5WF1WImKbi9I
-	 2sp5GpvtdNJBN5OtTpKxHjO1sy3H45eV6wS1TB84i7THOFuNCrHEHOPscsYbDK548k
-	 Go1RIYDOXNjvaz2SeKwUe3mCWGhO0KBp1a/wjsZW9efyUJboFTHRjb8Z5Ti5tYAHow
-	 4Y4VbaUqMl2vg==
-From: Thorsten Blum <blum@kernel.org>
-To: Harsha <harsha.harsha@amd.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Michal Simek <michal.simek@amd.com>
-Cc: Thorsten Blum <blum@kernel.org>,
-	linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: zynqmp-sha - fix NULL pointer dereference in init_tfm
-Date: Tue,  8 Sep 2026 09:53:40 +0200
-Message-ID: <20260908075339.396499-2-blum@kernel.org>
-X-Mailer: git-send-email 2.55.0
+	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="ZxkpM+16"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
+	from:content-type:reply-to; bh=0+1cWH9ZzdahSEqEWtOTJjInFzoOaQDwMsGM0RltdUU=; 
+	b=ZxkpM+16QSixs1x3kV9D79qqBbESwWq4mm1bhi6W4wqNVfmcuBtL1o0HBoj0yoSGslmVxfERC89
+	EEu6puXcobsVEKOk2GEivr5g+72bUOBvm2RlOtq5mpMjXjqw9hi3mnViT+UNYDYI9Z5tvg/af5CGh
+	nPWPti0Y2bBBLI4Fsris0h5lHaUX8WHCMucplfiSTJwzyOpqgkwQjY2k3R/4JK7x96kw23+riZrBW
+	2CBluwHzAVzvz+UdZtAQnr0ZLNUUq4nvvKiM3uqOC4C1z1pVvRib0TXVPB+ra3Fs09NuvSJ9YDZAT
+	GVQIMURceSH2GFcwCL71/DJkkuN3G/Kjzk4Q==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
+	id 1x3rka-0000000BnG5-3UMB;
+	Tue, 08 Sep 2026 17:04:21 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 08 Sep 2026 19:04:20 +1000
+Date: Tue, 8 Sep 2026 19:04:20 +1000
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Florian Westphal <fw@strlen.de>
+Cc: netfilter-devel@vger.kernel.org, kadlec@netfilter.org,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH nf-next v4 01/13] rhashtable: add
+ rhashtable_flush_and_free helper
+Message-ID: <ap_PlDqTNOnB0Y83@gondor.apana.org.au>
+References: <20260904185321.30313-2-fw@strlen.de>
+ <ap-ZOyOS6j_K5gmZ@gondor.apana.org.au>
+ <ap-dYotn2QqdTVqf@strlen.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1049; i=blum@kernel.org; h=from:subject; bh=PPzNN39B7L/5123kefcOgUmHTJUIHSjPPl6fOtNhApQ=; b=owGbwMvMwCUWt7pQ4caZUj3G02pJDFnz9zMfXPBuy+ODFzaLvazjecqfe8Xt/IsDa6erzulP+ Hf4w6enbR2lLAxiXAyyYoosD2b9mOFbWlO5ySRiJ8wcViaQIQxcnAIwkac+DP+9ObwqrZpc+JTX Bx7I/m1mJFgQm2jDYPtC3u64Ep/IplkM/yvK9Z4+WHjT7AHz1w/u9nsbU/gOyV+u0u+LtFh54Jh LHxMA
-X-Developer-Key: i=blum@kernel.org; a=openpgp; fpr=1D60735E8AEF3BE473B69D84733678FD8DFEEAD4
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ap-dYotn2QqdTVqf@strlen.de>
 
-zynqmp_sha_init_tfm() checks crypto_shash_statesize(tfm_ctx->fbk_tfm)
-before assigning the fallback transform to it, which dereferences a NULL
-pointer since the transform context is zero-initialized. Use the local
-fallback_tfm pointer for the size check instead.
+On Tue, Sep 08, 2026 at 07:30:10AM +0200, Florian Westphal wrote:
+> 
+> I don't understand this response.  This isn't about rhashtable vs.
+> rhltable.  This is about my incompetence to flush an rhashtable or
+> rhashtable.  Simple version:
+> 
+>         rhashtable_walk_enter();
+>         rhashtable_walk_start();
 
-Fixes: c1dd353d18e5 ("crypto: zynqmp-sha - Make descsize an algorithm attribute")
-Cc: stable@vger.kernel.org
-Signed-off-by: Thorsten Blum <blum@kernel.org>
----
- drivers/crypto/xilinx/zynqmp-sha.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+You should never use rhashtable_walk for real work.  It was only ever
+intended for the very limited case of netlink dumping where stability
+or accuracy was not a requirement.
 
-diff --git a/drivers/crypto/xilinx/zynqmp-sha.c b/drivers/crypto/xilinx/zynqmp-sha.c
-index 5813017b6b79..cd051e1f4275 100644
---- a/drivers/crypto/xilinx/zynqmp-sha.c
-+++ b/drivers/crypto/xilinx/zynqmp-sha.c
-@@ -59,7 +59,7 @@ static int zynqmp_sha_init_tfm(struct crypto_shash *hash)
- 		return PTR_ERR(fallback_tfm);
- 
- 	if (crypto_shash_descsize(hash) <
--	    crypto_shash_statesize(tfm_ctx->fbk_tfm)) {
-+	    crypto_shash_statesize(fallback_tfm)) {
- 		crypto_free_shash(fallback_tfm);
- 		return -EINVAL;
- 	}
+>         while ((he = rhashtable_walk_next())) {
+>                 if (IS_ERR(he)) {
+>                         if (PTR_ERR(he) != -EAGAIN) { ..  break; }
+>                         continue;
+>                 }
+> 
+> 		rhashtable_remove_fast()
+
+So you want to free the entire table, right?
+
+We already have rhashtable_free_and_destroy, any reason why it
+doesn't work?
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
