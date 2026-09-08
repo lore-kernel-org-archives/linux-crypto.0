@@ -1,48 +1,35 @@
-Received: from abb.hmeau.com (abb.hmeau.com [180.181.231.80])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82EC5538D68;
-	Tue,  8 Sep 2026 12:40:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.181.231.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A006054DAD4;
+	Tue,  8 Sep 2026 13:25:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788871207; cv=none; b=CEUor2odbPnHPVN+qrXBOJQJeEy0KuytfcKqmkIh98d9EbDzDggRS0qEjAn3kM/GDX3yK34JbIyNX70FlR+4PSky16b6jzMRROKGkVPXRPYEEFlaSPCS0YYHGG2oI/vDZalSyeWDzfojK/ndHL4CmE+qu2oaFG798mA0axsCvgY=
+	t=1788873927; cv=none; b=iLBuo/GXUWSDE7ZNrUPIv7sFI6ek+HGRP10QFhAhZrmHOKEUQstPyNMXweMWzieaABDLDCR1M0lD9RpU+4tbK9hdGqjbC6IpDhCLrhXUrYVgS4lfQF4y4lhNUh8O/VjX788yFQD0XFrwgQwWopQKwNUqMk0OzhEFSt00KWcepWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788871207; c=relaxed/simple;
-	bh=/JXhB81t4vh165IPnOGrXiPDLavFd40GSsb8yFVj8Qc=;
+	s=arc-20240116; t=1788873927; c=relaxed/simple;
+	bh=uN4lvdFxbED3DM91BJZNZFCBmNtJPw5u2R8V2RpYR2k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WUPG643HMNms8L7xmVtXqKqkT6iujkjMGqyU7JmWk4c1hXQ7qc6r6cLUsv9x0lS6JwuEnguigXfiXxXWMEa1Sf5XsV/fywwhu6igBCZVdGFj3F606F1MEkzYGjtoSZNJROwD58ULjcQoPAW6KyFXGh5XGiHhLUl4dk2lnmwQ2/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b=MSoNjosy; arc=none smtp.client-ip=180.181.231.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gondor.apana.org.au header.i=@gondor.apana.org.au header.b="MSoNjosy"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=gondor.apana.org.au; s=h01; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:cc:to:subject:message-id:date:
-	from:content-type:reply-to; bh=dEiRV/rRc+sTuGxfDNPLfPu+P8vNEri9cYQaNM8FeaE=; 
-	b=MSoNjosyxyqLFRrh43m0rX9qZ2MUF0CkaWUJXnlAeoxUwMkZntjr4gopVUsnpcxUPyKgYUr1ECL
-	2Np0kHaaNYJmompzNuYKWE8geRaKXb82iuCAh7YgHh2f/FXNsdKNnEMLm5gTCPVaI4kELVYewmyBd
-	r9LVukqv8aL6lSmcZ4Dk6/HF5IIlnXqLLZf35Wsq4WxFzDZH9vnF9mcpjtNyW0xlA+umCa9dp+myN
-	P+uM/jfONFPjNjf3aZFmDFHb+zScxFvpEg15r41uMYDn4FvXOcnoiRxmdwcpfO/na6VFEuBfiXgCO
-	/rMgT8KhfdFcmPU/nJbLHj5/Y+cRWrxheVfw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.98.2 #2 (Debian))
-	id 1x3v7H-0000000Bs5u-2BX7;
-	Tue, 08 Sep 2026 20:40:00 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 08 Sep 2026 22:39:59 +1000
-Date: Tue, 8 Sep 2026 22:39:59 +1000
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Florian Westphal <fw@strlen.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y9uH0zcn8XhMKztpyN0a9Oeu/pa/Sp7kDRtRY/yuN9hG8jDr6NqrN66vkJD3HSvG4Y6Vf1zC3ecOxA6ODD4gZNc6T4NGblkIGCfW3mb19+p7IRAoMIEx6sY74NT1rp8XhjMXSUyDoxddYLuzAr1dN7//Z3QMEXob2ZpIPbS3Th0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 5C1AA6059E; Tue, 08 Sep 2026 15:25:14 +0200 (CEST)
+Date: Tue, 8 Sep 2026 15:25:13 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: netfilter-devel@vger.kernel.org, kadlec@netfilter.org,
 	linux-crypto@vger.kernel.org
 Subject: Re: [PATCH nf-next v4 01/13] rhashtable: add
  rhashtable_flush_and_free helper
-Message-ID: <aqACH2VVNGmgW-5B@gondor.apana.org.au>
+Message-ID: <aqAMuQhG4l2mMLw2@strlen.de>
 References: <20260904185321.30313-2-fw@strlen.de>
  <ap-ZOyOS6j_K5gmZ@gondor.apana.org.au>
  <ap-dYotn2QqdTVqf@strlen.de>
  <ap_PlDqTNOnB0Y83@gondor.apana.org.au>
  <ap_budC8D-k4k67v@strlen.de>
+ <aqACH2VVNGmgW-5B@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,19 +38,29 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ap_budC8D-k4k67v@strlen.de>
+In-Reply-To: <aqACH2VVNGmgW-5B@gondor.apana.org.au>
 
-On Tue, Sep 08, 2026 at 11:56:09AM +0200, Florian Westphal wrote:
->
-> > So you want to free the entire table, right?
+Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> > No, remove all elements. Concurrent insertion is not disabled.
 > 
-> No, remove all elements. Concurrent insertion is not disabled.
+> So what's the desired semantics for insertions that occur while
+> you're flushing the table?
 
-So what's the desired semantics for insertions that occur while
-you're flushing the table?
+In current ipset home-grown hashes:
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+If the insertion is into a region not yet scanned -> will be dropped
+If the insertion is into a region already scanned -> will exist after flush.
+
+i.e. no guarantee that table is empty after flush, but all
+elements that existed before the flush are gone.
+
+For the rhashtable variant I had proposed:
+
+If the insertion is before the moment future_tbl is updated: will be dropped
+If the insertion is after future_tbl update: will exist after flush
+
+which I think is matches existing semantics of ipsets homegrown hash
+tables (that I'd like to replace with rhashtable/rhltable).
+
+Thanks,
+Florian
