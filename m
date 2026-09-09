@@ -1,169 +1,165 @@
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013033.outbound.protection.outlook.com [40.107.159.33])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7098C319871;
-	Wed,  9 Sep 2026 21:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.33
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788987796; cv=fail; b=tzuOb/AJ5Lc0kj13zSLLSCRcH5YQ0XPvl3t7gnf1hp+W7b2TdF7kKWYmph0Ymo2B5NrtMcQcNtojeY9Ay1A5IbMtN0Iw5E5W30cs3yKepecsTZ9GvPlhUCE+IAO6z3vpT9CZUIig8c7qbms4PDpYkndqDgwQ5+r2EM4QhUyIi00=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788987796; c=relaxed/simple;
-	bh=SfcaoJlgkIBTu7dNI7UrD8ziMhtSWNhgddsDbfv9iT8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=AjXxjS1JFPZj22+bcV6XHeLBk5bgPSlwOi+aPS1H6oZ3rcHU6APhS7d8mABe1pjpGFKmayLAm9vpcn1B3cQlrzEIcKCBKAUYvOfKchJ9vLndCOyqxg9zPwdQqflb5+7VUEr2cfxxF6Nx7ezcm5XSVdPkGWeBezpN9DplFqCAQiA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=P0lF4h5L; arc=fail smtp.client-ip=40.107.159.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE0E395ACB
+	for <linux-crypto@vger.kernel.org>; Wed,  9 Sep 2026 21:12:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1788988343; cv=none; b=uvqGOdc8tKdKdjAqkzq8DYA19oo/yTM1gZ1lTfbCDa3p2x7VjAVrbskLsxt/zAaVmJLrSg1kUEB9emH+zOdyu1mMw9Ak1HpKuHs2f7E36m2d9C6VRkaqsBD/yFsAhq6fmr2P4QoClpWnEwD7X4QIT/pLXlvL6JgrWnQCX0DMR8c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1788988343; c=relaxed/simple;
+	bh=lsJH/m1wwMGY3Tdn1zmWxqy3WlMlbk6ChjZYpxUGVoY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XjcY988UksNjvhcwJvzNraGYRRlbYdUJDe1HV8ufZ6mYKLl3w4H0n6QEDYEQmednVhpNE4fTmGw4g6Ba/Jr+wZHrAVUE3xPPkGmY+RXZGG+2CXqxScKilRV4bxGYoMgrrEIDw/noXdKc4DKIiEuz5uD/BqyjcEF4MbU0ve5CV6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=s5Trg4VS; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="P0lF4h5L"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=f7fxSVi921bRbp/1EtsIqtANDXUm2VQ9x9hm0UUZrR3rXteisUCqMl6Yhi+o/1a9jl3bkFRDKPQ5PGEqIaIANOFUH9nkDxza4dXJRURWh6iVxYUasSjeMwTq01tL10rABnsp4psbif0GNf6X+n+tO2+Zw9GrdnhtXqQBN3xdGW4brDqAqMXss6AkgBXvVBLuNct2cMdgOg89S9KLZ6Jc5Mx9HG/PIcTeZ51uwJHwTCmCORJDbTSsp+rmm2nEi6yX1hO/VbyDuZLJmIcsG7sctfBUuc6h/0T7y98OM+FmijbSrhXuvGOnpMHxJVwMyiY8kVrw/toLXgCMpB0r/mJ22Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1FjJQxImiAzkLyG3uq3veFiggE+2UisuLKHUfG61M7w=;
- b=V5hruOxJaxGydrUF9GaL7KJJgsLXBZ/NdMuWGTwxTGzjq76ZNIvsIbZn9pK0Nx+qLtVGFqm53LwYBkD1vpTw4t8KjzohzC2xCv1xbh+am+/+O3vPqOeADF+ybDsciL1SaG205co0UjWLVlxKOABftnFkrfw91gseNVeKtSbGNCIBYbo0zM6o5ScxbHg3FoSm+NlpZbTNQLEr81oCq+0CKUrL61zsYWrjWE73UKlIsklh6VCX/+u2YrRXCHY8v6cTQi4Y/xO6//B54UBhJSWBiRA3zJkER0AmYuUetYQwMPrjNyTIOsPHFbLBQmIi+P3W+uil43fi3k+iJHt911+YcA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
- dkim=pass header.d=oss.nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
- s=selector1-NXP1-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1FjJQxImiAzkLyG3uq3veFiggE+2UisuLKHUfG61M7w=;
- b=P0lF4h5Lo4hY8r4pKSqyu+IFPwEKGq5w5RhngsSQTeKntCDXjSMNy5RQDqWIVJnfK3Puz13z/d2W5EILDNvKo0OakYoy1Lyd/b084163JPQe+1IRuo5q/Go/DCd1aPGhafI1xBq7Qb8n3lt0OuKf3V06vYz8YQZD82lbRrqHzY0r8yaXknCahYItxq6BxfxZfU3cBij9XTpLMOD7bXbjPbYNTZverC/1Cl+dtqXq/VEU1fYZ4D3phssqhJGn2O24kPfx38qOsPsCK/ZcebGb5/9yvtDaSPpihvbulfKkGGMeIrOChy7Udei2SBoLWrNJQu519iwhvHrMRriwrplLOg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=oss.nxp.com;
-Received: from GV2PR04MB11799.eurprd04.prod.outlook.com (2603:10a6:150:2cf::9)
- by AM9PR04MB8969.eurprd04.prod.outlook.com (2603:10a6:20b:408::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.406.9; Wed, 9 Sep 2026
- 21:03:12 +0000
-Received: from GV2PR04MB11799.eurprd04.prod.outlook.com
- ([fe80::2146:83a2:5329:b7c]) by GV2PR04MB11799.eurprd04.prod.outlook.com
- ([fe80::2146:83a2:5329:b7c%7]) with mapi id 15.21.0406.005; Wed, 9 Sep 2026
- 21:03:12 +0000
-Date: Wed, 9 Sep 2026 16:03:02 -0500
-From: Frank Li <Frank.li@oss.nxp.com>
-To: Linmao Li <lilinmao@kylinos.cn>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s5Trg4VS"
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-cc147d86bebso387813a12.0
+        for <linux-crypto@vger.kernel.org>; Wed, 09 Sep 2026 14:12:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20251104; t=1788988341; x=1789593141; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=u495ibL0ejeSjktkIJ/W4ElwT//FuX3YHoHh4p8PAXg=;
+        b=s5Trg4VSzO5/hVmDqRO/N5qJpuYhhB7yql21kib/w71oEqY8cHVZ0s3rqgW1MmoSoI
+         q5OqM9mc8vS9xA2r26zrp0+l/FBTvi86xw7L0OFV1JFR2dn71vXVmSUXJedyvOI3pGXk
+         CX/PgLPu+/J+CAjqhc9DCzPiVoB6oD4QRrg9zKIAScgfwHsznUxxhmLG4PFkELkYm5Az
+         xQcEQJ/qb/oQK5u4AcmWTjoZzRl5Z3oNCewBz0cMFRE/gDgVxzvO/ETq8tyNGhMp/7R+
+         bsKoL/ALutNci89O5QzyoTKOavAuzYvehlps0metk8CqVfKoGS/f2WYrlRovt58AP0J8
+         fxkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788988341; x=1789593141;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=u495ibL0ejeSjktkIJ/W4ElwT//FuX3YHoHh4p8PAXg=;
+        b=nKO/zqWNufEJ8nFl+vfbhRLZvEOSBK0jyppDL+Ug+MI9jEg668ws3jevvmuJPZUa74
+         8DoFOv+UXzqy2K8UmFqtq7aMZFnKbxI7kFvq2Rc2rMKHf+PQouwKs/Sm1SsSv+amFk/x
+         ihtHcYnkIT33FpYogAumB4uiHRO6DIlNqjht5lT0N6gylb80+0n3qMX3x76JHHxsaXu8
+         7ZKvD42jafCBheNNOrdbmsFwWNBFIAUioj7D4FQIPuOZoS3MZK+7qjHi42NC8ZbuNVR/
+         PuCSFDQVwL5D1hccy2vLG94FO4kI1YzFpLUB/5SU+IRelcndmVoUlJzXPo2D2h2ounOk
+         H8Jw==
+X-Gm-Message-State: AFuF++nCAacREQOcIiyj5Fep7j5cPnVXhRfaSTWWs/OdkuOLhXPm0Mke
+	u2zzAO+hBHjMJFbsFbV44qK2ema+ArRhppX2lv8Oq9N7ea1ZM/4XhMKDR5FhEA==
+X-Gm-Gg: AYBFou2QwqEWAmpa4N9us9Wjw8jnE+sMQZSrSDf4dKOqSghhUoYvB4IhM3CCXS5noAi
+	bcYVfylzXGzOSApLd1VreG9TpV9vV3wCz9eaPkdREdB+yFKdxEzHCJFobYaRHV2Dsm7q880URSO
+	5GXtHdnkvxH4Tq4P4eeuS2ftub2oQzSmVJouvomM5Xt3WYXbJ3FFekdf6rhgWsdoyc77yFP7xMe
+	QfGOk/tKyQb3nhlPWnCEO5C49qeyqKvROOxofJHMaBtzTrjUVT4iqOnW4w1oMRtQFXkcRHfiHJf
+	RhqCcly5jgyk9b2qCSHhw2YYjYCXfLFo1uwhBY2N6gGte5SEJOfbm65EbNrrhxcIdxIlk1MWe6f
+	ItC6D47a+QxEDL9dX3jVLdIWoYky7EdLqywDMvShT75S+8a/mcm7X4VdmmSiv2Xwu66RwmLQ5zr
+	7NO7jEo8twyFdvWex9poeEITwksKTPjgai4p1tIK1RpmTU3hD0eRb0I267RI+Gl4TJ+O8UJgT3w
+	CvnY6RALVWRmeFriGdapf1l904z1M8gG7Mdz5RbrJUrSo178T5Ynx4dSigZabTrXDGuBXuKFKOQ
+	vf4Avg6U9Yrsu+TL8MLvxo4Bp8JssPb753IZPRW7SX+xxOkT
+X-Received: by 2002:a05:6a20:258b:b0:3bf:b7e8:68ab with SMTP id adf61e73a8af0-3dad26bda32mr1323463637.2.1788988341177;
+        Wed, 09 Sep 2026 14:12:21 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8000:7a86::e35])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-cc46b4cd51esm6000615a12.2.2026.09.09.14.12.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Sep 2026 14:12:20 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: linux-crypto@vger.kernel.org
+Cc: Christian Marangi <ansuelsmth@gmail.com>,
+	Antoine Tenart <atenart@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Leonard Crestez <cdleonard@gmail.com>,
-	Radu Solea <radu.solea@nxp.com>,
-	Franck LENORMAND <franck.lenormand@nxp.com>,
-	linux-crypto@vger.kernel.org, imx@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] crypto: mxs-dcp: handle zero-length skcipher requests
-Message-ID: <aqHJhrSE2_pcCp8L@SMW015318>
-References: <20260908094437.1548278-1-lilinmao@kylinos.cn>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20260908094437.1548278-1-lilinmao@kylinos.cn>
-X-ClientProxiedBy: PH7PR17CA0060.namprd17.prod.outlook.com
- (2603:10b6:510:325::24) To GV2PR04MB11799.eurprd04.prod.outlook.com
- (2603:10a6:150:2cf::9)
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH] crypto: eip93: fix IRQ teardown ordering in remove path
+Date: Wed,  9 Sep 2026 14:12:18 -0700
+Message-ID: <20260909211218.15388-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.55.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: GV2PR04MB11799:EE_|AM9PR04MB8969:EE_
-X-MS-Office365-Filtering-Correlation-Id: 64fa9a19-886c-468b-32a8-08df0eb5c246
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|23010399003|7416014|366016|1800799024|19092799006|22082099003|18002099003|11063799006|56012099006|10067099003;
-X-Microsoft-Antispam-Message-Info:
-	GVfcsQwz/nAQ36hOQup/+XmBmYvOV+NpevvtMGJfwlksHCDSiSF+OL9j2gW/HBhkKNXv8H9vFZQCzcRCgMai3DQtko/P+qncMfQ1/En0t0BVVRUXJtzXvvKtgvcTwmrvddvtzpubaPTAN8oh6cg6wqP0pDkJSHnVs9Vkj/1V+k9ptX24OjdMKsg/WOSXoI37hLep0e8nTaGQ8FmOhcUV/N+Y7dQFOZhKD+4rimWoNpvbXIkn4Px1DpX02c0VDiRQ+Hmc1LxmVEvlB0NqrZhJpey6n8/x6SHSWF/hazoSulFt3pfpgJzzcTysU4/C/WdeX6rtpjmwavH4mKJlnG5TkD+VZVJZYJvt5I4D8nheaEkYHvGAL8iC2aSbJcpceU1NtqQz4IkvarSIHa1M/C7dTkOUJTaBdrJfUESea8En9i8jdTfv1MeL0EPciQihrKWukrE3mKqZNwDls9Nh6LiswKIV1p4Rf+6tyHwAE1iTKii+tkqm7LZOYZCxmjrd0j6FRRX/CJBbbWvGO8VwzZpkwGEwJh+f5kv66R4yvnHW3UFrXk66hhHofmw2U5eMwakQcmCOTUa0oe5htnA+YCzKmyodYXUmTeC+LLp8RECLSbitW4bBwgfwo6fHHgaYwiMSkPqFcCrL+Y/IQuhlKHtHMQ+mejSc9OT9Pr4sore9Wmg=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV2PR04MB11799.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(23010399003)(7416014)(366016)(1800799024)(19092799006)(22082099003)(18002099003)(11063799006)(56012099006)(10067099003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?fa/KsfOaj6E66YsT/C2Yp00b61jByx8U+zVMdJ4nVbd0WeFIf+4Gz/Wrm55H?=
- =?us-ascii?Q?mLopQVs1AAr35cCNINC2FERCF5xpgGYCKUjcpYO71DBz10l77/SZOd9Wd8JY?=
- =?us-ascii?Q?3tktktj0JJ0lki4FQibaXAZPECIkNwAXo03DKQ+zFMtg0zzh0ppTg5s3RPTK?=
- =?us-ascii?Q?Ou+dS1Ao1hmvjsGmvkMmBKmLQsKAKFkNA9e3du6dl//fv/DAwuYtW8emXYxI?=
- =?us-ascii?Q?mdBh4/5ANQUWBFzd9lVeS+csx6tGra03Whz/VmonNOIFAOhpifvmT7o5YOl1?=
- =?us-ascii?Q?7ND/xVpxt8Io9dBY+mMQHCv6knnpI4lADFcLLzfdoZTmruhY1Rl27rXW83sR?=
- =?us-ascii?Q?0Tfx6ctuBbNUIxCLu96qICXgn+4QVAt5wQHqjOHUFYpaAnBVMKE6isrqtqaN?=
- =?us-ascii?Q?gngchOOuDCUU83jlu5RvDH8tbJiaRgzdInfXU5ZuuiX+M9ZHryRUkVosoQyU?=
- =?us-ascii?Q?0KOfwxhXBqlt/uAv6ZgDJxsRQmiw+A7GN4DkTfQ9TC6q2uIP9ItHB7+iMMV3?=
- =?us-ascii?Q?pMS+n1ltLzs2CvYXNcB8OChwv0ISR5UqcXZa+SZWaQKB+ZGRnGmF5jGUSGJY?=
- =?us-ascii?Q?vAVcwHWnwAr09/o59hy1LIEp2vB+ZwjEznlp8K0S8jabW/izPjshU26ttDXX?=
- =?us-ascii?Q?zbCUgXWCqTWY74mO2YTq9bEQ4RyQnFxx/JssQKvmurjuDHeN0HntjqFIJHN3?=
- =?us-ascii?Q?a96ZdBpx7TDo4bPEcTe0/2i6/AsEDJwDBd4Ks4/NlLXDIrMmLYWzDIaEPdgF?=
- =?us-ascii?Q?jOh2EmjiZn+V3gLFt7/pLhEfPsm3gkIQuTAIBF/gU3vXjvjTX6S+T3+tK8z0?=
- =?us-ascii?Q?b9GeEVL7Bb14GQWOJmZnoN5nw1U81h+jUnMoXH4zY1yNSWCOeJNOHXYX/28n?=
- =?us-ascii?Q?J6NNAHhqsH0UI/mNdewQgIIBBabWoRzJtv8Wl0IH1F0NTN+GaOWChInaOXTF?=
- =?us-ascii?Q?y+vGcj5IOZVtMPrBlYdR8Wp8vTYcB42brwiZ0JOtH+qPjgjOyVHFWBV2/xsL?=
- =?us-ascii?Q?J2za0uEOY2CRkZM1kAoSGKEKxXr01YWXCNND7nhQNbK7jXtX9X+66ICRi8NO?=
- =?us-ascii?Q?gR+OQrFenqV9ZGx6VjY48WfpWW9QdnA0Vw2lGjPYupx/CZf+K5XOJMdQPIjU?=
- =?us-ascii?Q?zd85NMpFJSTejajd1X2fQ68W6evPyYh4G3vh68FyEFqHtRRiTk/kjrLnieRk?=
- =?us-ascii?Q?G20z/LQZH1mlXgDEiLv4Qz0+aWn9B+Cp//bYGWFdwRbLNh+zctt+VnUZlFHX?=
- =?us-ascii?Q?zZqyR0UuGnOJ5+aMktwP1llvIBDSxB7mweyUCiRwfu9KJ76xBX9qf1060YuN?=
- =?us-ascii?Q?ENjr9HowUBH5BKFPOmkBD0xle61p2tmYMHXhvPRElzD8J/1h7vtT8SovyVbH?=
- =?us-ascii?Q?56YvG8lpTD0vflGg6bTCpPiGonmVdHuMYwng3rhjZYt1A0fjDDH7hr2ItMZf?=
- =?us-ascii?Q?PZrdSTPWXRtaYkqgqluAmkrq84dxRIz+Lqp7EjTfgWH+zeWjn2rX069wKzD1?=
- =?us-ascii?Q?Gk7MNqf1KnF+KYi8H0POkzBC6kLvk7O9qaVe4CmEwvs73ONSmh0FAjCKakpS?=
- =?us-ascii?Q?c7MXoglUmZGFY34Pbm16/ASnV2qTeCuGp2QWqtDB3zCtGL3jm5HRTE16+ero?=
- =?us-ascii?Q?99xMlqCPLx7vNCtdAX3fT0gMmNIEWgWfLlm2Sj6l8mv1AqYFO3xpsXMdVhsy?=
- =?us-ascii?Q?2/6jsPyhSVCr4QCE6ur30xJhkfzSLldHrjKvFEe08gMjoSb83fbBEYONJ95t?=
- =?us-ascii?Q?gIsVznAmhNbdGaoNc/2j8bdF3P+Gw+2kzqM3ydZxQ297VJk8/NZ1?=
-X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 64fa9a19-886c-468b-32a8-08df0eb5c246
-X-MS-Exchange-CrossTenant-AuthSource: GV2PR04MB11799.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Sep 2026 21:03:12.4007
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3H09etBTCCXlWAO9e2ZoLYGol691R2n9+rp0JHWY0JrNO1pyD9SaESygIvkzUIzFyKhvL4q8M4wApPMkXrEPiSMIr8GHBi/TAsyKpGeFUyfR5xI9WAugbz662ruMTKuf
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8969
+Content-Transfer-Encoding: 8bit
 
-On Tue, Sep 08, 2026 at 05:44:37PM +0800, Linmao Li wrote:
-> The generic ECB and CBC implementations return success for zero-length
-> requests, but MXS-DCP queues them anyway. When such a request reaches
-> the worker, last_out_len remains zero. The CBC completion path then
-> subtracts AES_BLOCK_SIZE from this unsigned value when updating the IV,
-> causing the offset to underflow. On decryption, the resulting source
-> address precedes aes_in_buf.
->
-> Return success before enqueueing zero-length requests, matching the
-> generic implementations. This avoids the invalid source access and
-> leaves the IV unchanged.
->
-> Fixes: fadd7a6e616b ("crypto: mxs-dcp - Fix AES issues")
-> Signed-off-by: Linmao Li <lilinmao@kylinos.cn>
-> ---
+Switch from devm_request_threaded_irq() to request_threaded_irq() so
+that free_irq() can be called at the correct position in the remove
+path.  Move the IRQ registration after tasklet_init() in probe to
+ensure the tasklet is ready before the handler can fire.
 
-Reviewed-by: Frank Li <Frank.Li@nxp.com>
+Reorder eip93_cleanup() to:
+  1. disable device interrupts (HW)
+  2. free_irq() - synchronizes and removes the handler
+  3. tasklet_kill() - safe, no new IRQs can arrive
 
-> v2: Clarify commit message: describe zero-length return-0 as existing
->     generic ECB/CBC behavior rather than a general API rule (Frank Li).
->  drivers/crypto/mxs-dcp.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
-> index 133ebc998236..60794b4d49fa 100644
-> --- a/drivers/crypto/mxs-dcp.c
-> +++ b/drivers/crypto/mxs-dcp.c
-> @@ -473,6 +473,9 @@ static int mxs_dcp_aes_enqueue(struct skcipher_request *req, int enc, int ecb)
->  	struct dcp_aes_req_ctx *rctx = skcipher_request_ctx(req);
->  	int ret;
->
-> +	if (!req->cryptlen)
-> +		return 0;
-> +
->  	if (unlikely(actx->key_len != AES_KEYSIZE_128 && !actx->key_referenced))
->  		return mxs_dcp_block_fallback(req, enc);
->
->
-> base-commit: 8d3ae59288f1e7d58d76558a6ee96d533bc5019f
-> --
-> 2.25.1
->
+The previous order (tasklet_kill before interrupt disable) could race:
+an IRQ arriving after tasklet_kill() would schedule the already-killed
+tasklet.  With devm_request_threaded_irq(), free_irq() ran after the
+remove callback returned, leaving the handler registered while device
+state was being torn down.
+
+Assisted-by: opencode:big-pickle
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ .../crypto/inside-secure/eip93/eip93-main.c   | 27 ++++++++++++-------
+ 1 file changed, 18 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/crypto/inside-secure/eip93/eip93-main.c b/drivers/crypto/inside-secure/eip93/eip93-main.c
+index e62785952b0d..4cfddfd1935b 100644
+--- a/drivers/crypto/inside-secure/eip93/eip93-main.c
++++ b/drivers/crypto/inside-secure/eip93/eip93-main.c
+@@ -395,12 +395,16 @@ static int eip93_desc_init(struct eip93_device *eip93)
+ 
+ static void eip93_cleanup(struct eip93_device *eip93)
+ {
+-	tasklet_kill(&eip93->ring->done_task);
+-
+-	/* Clear/ack all interrupts before disable all */
++	/* Stop HW from asserting IRQ first */
+ 	eip93_irq_clear(eip93, EIP93_INT_ALL);
+ 	eip93_irq_disable(eip93, EIP93_INT_ALL);
+ 
++	/* Synchronize and unregister the IRQ handler */
++	free_irq(eip93->irq, eip93);
++
++	/* No new IRQs can arrive - safe to kill the tasklet */
++	tasklet_kill(&eip93->ring->done_task);
++
+ 	writel(0, eip93->base + EIP93_REG_PE_CLOCK_CTRL);
+ 
+ 	eip93_desc_free(eip93);
+@@ -430,12 +434,6 @@ static int eip93_crypto_probe(struct platform_device *pdev)
+ 	if (eip93->irq < 0)
+ 		return eip93->irq;
+ 
+-	ret = devm_request_threaded_irq(eip93->dev, eip93->irq, eip93_irq_handler,
+-					NULL, IRQF_ONESHOT,
+-					dev_name(eip93->dev), eip93);
+-	if (ret)
+-		return ret;
+-
+ 	ret = eip93_desc_init(eip93);
+ 	if (ret)
+ 		return ret;
+@@ -448,6 +446,11 @@ static int eip93_crypto_probe(struct platform_device *pdev)
+ 	spin_lock_init(&eip93->ring->idr_lock);
+ 	idr_init(&eip93->ring->crypto_async_idr);
+ 
++	ret = request_threaded_irq(eip93->irq, eip93_irq_handler, NULL,
++				   IRQF_ONESHOT, dev_name(eip93->dev), eip93);
++	if (ret)
++		goto err_free_tasklet;
++
+ 	algo_flags = readl(eip93->base + EIP93_REG_PE_OPTION_1);
+ 
+ 	eip93_initialize(eip93, algo_flags);
+@@ -472,6 +475,12 @@ static int eip93_crypto_probe(struct platform_device *pdev)
+ 		 readl(eip93->base + EIP93_REG_PE_OPTION_0));
+ 
+ 	return 0;
++
++err_free_tasklet:
++	idr_destroy(&eip93->ring->crypto_async_idr);
++	tasklet_kill(&eip93->ring->done_task);
++	eip93_desc_free(eip93);
++	return ret;
+ }
+ 
+ static void eip93_crypto_remove(struct platform_device *pdev)
+-- 
+2.55.0
+
