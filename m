@@ -1,204 +1,184 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E972157266D
-	for <linux-crypto@vger.kernel.org>; Wed,  9 Sep 2026 14:15:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D3D29B200
+	for <linux-crypto@vger.kernel.org>; Wed,  9 Sep 2026 14:37:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788963302; cv=none; b=O67Uqs5GlCf8s2kXCejn6StVoNrOzFsIxxFI2Hdrne68ejeooXq9kh1SD/hvDWzpNyijyMdvnS0PhHlljErIUxbjjN3JZM7Ae9E+/p7VAUgEfMwLMMgIgOHpCZcT8Of8QR6O6Uox24AGtdqfvY+pDeBEwnsIONR8x/+Mex4/ZXU=
+	t=1788964625; cv=none; b=VZISUhmisUj2/ZsPnJDzAZ/HmxLinFuMpCIgvI5p4G9owcY+SC0BbiPBnw84bTZDw7hfO2lbBhcbr1pdzcwADwTIpbpXOaa76Fj59WUFadEc8793xMXOh8iPjV0pi5YJ8+dfo75wUUTjFnVaekyOC+FrGuFtYpD6ppXqBtmKBok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788963302; c=relaxed/simple;
-	bh=1mmv9SUJrh2Qx1Udfn/iunbjNIEPsbxrznYo8XhDt3c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kZ2kCIKh9qaMD6r5ovxyB/FUr2/FeKYzrQaN2QlRUzsK9Ue+WAheXteTX8BYsU2zCp8yEju6UU1NkM232gbMBSxLQv9f80k8w5sqcn4vBmRg6RNDslfSHvhUKCPDF0m01bdFTanJNJiDFjVamUiZ/xdzhZ++Ss1c5/Nw2Lawf/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JYnWJ0Qp; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1788964625; c=relaxed/simple;
+	bh=qgh8cq+GBXevS49T3N8s10vizXRzbGlS3p2jOaxKhLk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kq32gKoUIe9/nfmUMmLoD2PcqTldZbASF4ORuwFcQw/fGKktWlqAyBn+k8YClKsMt5OKniJ3/NZBJczUcCHfNkN1H4kJ0ckMubu1BDnJd+gj9/peZGBI9WULjDpcsNYSRkjymvdQmDelmsrljrCt6sWzonffWa1HycS4IFg71Zw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UjmRnded; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=JQ54Pu1a; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JYnWJ0Qp"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1788963301; x=1820499301;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=1mmv9SUJrh2Qx1Udfn/iunbjNIEPsbxrznYo8XhDt3c=;
-  b=JYnWJ0QpYpwwPs92kicRqknHVgKRzo6H/vzKwDQMoJm67/F/GgPLI2bV
-   /9daJIDWcoeRbeyIWRtCg/5QTnuq26/p0u5upq6Wf+/pauNw2iiiYJiDB
-   VRHX9tfGhZl8xPPqt1xqXj5b/0UOEbKMuI6GMUyx0wkAHad+m+GLqBi00
-   tMub7L2fDkeBSZBs5+HF2YNqn3UNWD2F/cu/hKFt6qnl8HvspGBD9sNYD
-   P/6QHkArVP9nDzXAIK/+bMmujLWgsBE4YoVROllSyzSV6vYbbVkjP6Cm8
-   VxaZ2kLwApy2HyxjqBhKPlmjyvqU+tRZOyY74GDwrVI5KTI1kzGWl05op
-   Q==;
-X-CSE-ConnectionGUID: v8hk/Kj7SAGLuwndD4sTBw==
-X-CSE-MsgGUID: nrtGY7/5Q2m9Bj+UyuHBvA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11900"; a="89260001"
-X-IronPort-AV: E=Sophos;i="6.25,270,1779174000"; 
-   d="scan'208";a="89260001"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2026 07:15:00 -0700
-X-CSE-ConnectionGUID: 2oyzhpk2TvOXXkERWZYDZw==
-X-CSE-MsgGUID: bWDt9nC6QKO3J62Gjr0iVQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.25,270,1779174000"; 
-   d="scan'208";a="269565819"
-Received: from silpixa00401812.ir.intel.com ([10.20.226.90])
-  by orviesa006.jf.intel.com with ESMTP; 09 Sep 2026 07:14:58 -0700
-From: Ahsan Atta <ahsan.atta@intel.com>
-To: herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org,
-	qat-linux@intel.com,
-	Ahsan Atta <ahsan.atta@intel.com>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Thomas Huth <thuth@redhat.com>
-Subject: [PATCH v3] crypto: qat - fix active_devs leak on crypto alg registration failure
-Date: Wed,  9 Sep 2026 15:15:21 +0100
-Message-ID: <20260909141521.1821101-1-ahsan.atta@intel.com>
-X-Mailer: git-send-email 2.50.1
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UjmRnded";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="JQ54Pu1a"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1788964622;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=6z0vb7jFmVZwRL61UmhAH1J2R42fJJdVb15beRTLwfM=;
+	b=UjmRnded83ikLDdM0IDvfjIoNCOC/t/pvTR1SCv2DbGQ4wSJtT7av/9cONQjPyXkxbcXjY
+	x18/uNhZSDnafsHydzCwjFVDf7j5R5nwjvuTAXfbRieiozCdJIjEEWCeV+xawAKS4WRU8j
+	pFN9jkdIJv2XcpHd6wAU2pO+kLcWR1Y=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-258-c9bI3v7pPA2A5vE6RBznzQ-1; Wed, 09 Sep 2026 10:37:01 -0400
+X-MC-Unique: c9bI3v7pPA2A5vE6RBznzQ-1
+X-Mimecast-MFC-AGG-ID: c9bI3v7pPA2A5vE6RBznzQ_1788964620
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-49d0ae342b9so29950005e9.1
+        for <linux-crypto@vger.kernel.org>; Wed, 09 Sep 2026 07:37:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1788964620; x=1789569420; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=6z0vb7jFmVZwRL61UmhAH1J2R42fJJdVb15beRTLwfM=;
+        b=JQ54Pu1azjwXwWxgXxy9A1WDaRR5jYrQ14xO/GE9weOtozXq8jpH7Uf64hF0RZIJUV
+         cfBogN/tx2LjBEtak3fe4nsJLOXBJcC9coI0li5q8VNMsCD6CsKDgH8snZy0nMiSx/v0
+         Q1cLAoeUrDo2RT/VvYAQEHmNiwdLOyatZnXG6fv/UrIUjDUsEBrvjYS2/v31EyY6Qsjy
+         8eibNGNKcZAbWqjrDIEfrY52hVyCtbVe6zPV2fE4BepeeYt4pDO8MoxyoPw9Mc6rM7c3
+         zZcLWz4+Su+mir8B428TLHkxls7E9ACYT1Prf4gLOrIvrUUoRGEgwZx3CDpCWe2vpZzY
+         +PwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20251104; t=1788964620; x=1789569420;
+        h=content-transfer-encoding:content-type:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=6z0vb7jFmVZwRL61UmhAH1J2R42fJJdVb15beRTLwfM=;
+        b=AeZl51mgN3uNwbhmPW/fnbxFGv3KAFSpi2OnWq0EBCP+tR1pGF43nSjqgLDcnE0kQx
+         GOLQgsWqTDoWSb1eXJnMeCpxkuROsfgBms1GEjtsyei891fkcvQxNzRQZiis4rBJiLEY
+         OaPwOqcIHHvSaHkqvsvuejpCEjlOvQqFHOLBGDJKL9o9PExI5+8jQIlxntzRio3Toeps
+         OfyQjwgKfed43XgSY2ydExX5rtVm2k2rS8GO4/DdWRDFTB3jKSHo94nEq1hBB+1FFOHt
+         W8prCplq74EmiKp98+hnaDkAxXm6uEWt5XsEXhnHNG2rAWPi9d59UkSXh5N0ZIA5VJV/
+         VoDQ==
+X-Forwarded-Encrypted: i=1; AKwUvBzhhhHvi5VaL10ssZ51E7LMzNssFzLFpYANdWGeJGYr8bv4E9OXuM7hlM33NeiTOy3v9xC9Wc4tY6Sdh3g=@vger.kernel.org
+X-Gm-Message-State: AFuF++kIEulPd0Bx/sO2HIxqboLYknmbtls1/JB4mQCYPwifBOtWZ9EV
+	VfEpVBt9caVs/n4LFNL2B+YA2SLaKn+MRzzkTztsNS2yfoQSTX7S8GDYcuv1tVzy4UGJO6E13AC
+	rlNMyEBzA+jJQrBkzhUPKPYFaGOZnocwuhavaqx93fRfQiLr0WWSmOBmQkA55fGtM8g==
+X-Gm-Gg: AYBFou2mFyRGtW3ni5VRscQLtSf2+3rAOhnDDY9PGdSahPtLITXQIH6s5P0kqF+Qdaq
+	8uMY3H9G5sdhXwKj4U+3+iJfESt3Ss7jy5cn9VlWWJtneIyePXrxcfIWyJN0oJhJNsFi4e+A15Q
+	nX9s3nABejlRMKmKBwB3OGi4fmHFbCg2Rr84YgEyH9+dVaJUK6emAkYHRQkVquqkW8wyZstfYtv
+	Da2Js/IIYavh4gGr1EiN7rRpv10H4MF9OW+N8xc/i0MYu/MTxFV1t+/eRpTUMGhaYeUN5nFkDMK
+	LmQEdZoQNGIkycfiBle/aGN2fra6prSBESce9pVuOOedrihRPqIDPrHawZWB0kUJrcYxsop9oQ=
+	=
+X-Received: by 2002:a05:600c:3588:b0:49c:fc6e:a3d7 with SMTP id 5b1f17b1804b1-49cfc6ea7d5mr340867335e9.22.1788964619768;
+        Wed, 09 Sep 2026 07:36:59 -0700 (PDT)
+X-Received: by 2002:a05:600c:3588:b0:49c:fc6e:a3d7 with SMTP id 5b1f17b1804b1-49cfc6ea7d5mr340867045e9.22.1788964619344;
+        Wed, 09 Sep 2026 07:36:59 -0700 (PDT)
+Received: from [192.168.0.9] ([47.64.114.243])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-49cee80eda4sm559571965e9.15.2026.09.09.07.36.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Sep 2026 07:36:58 -0700 (PDT)
+Message-ID: <9926908a-5f08-43ba-99dd-b83c7067d52b@redhat.com>
+Date: Wed, 9 Sep 2026 16:36:57 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: testmgr - block Crypto API xxhash64 in FIPS mode
+To: Joachim Vandersmissen <git@jvdsn.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ linux-crypto@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20260303060509.246038-1-git@jvdsn.com>
+ <abTuFto8Tc3mhRRe@gondor.apana.org.au>
+ <64592fee-1956-4a70-a751-9ac3335cfc27@jvdsn.com>
+Content-Language: en-US
+From: Thomas Huth <thuth@redhat.com>
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <64592fee-1956-4a70-a751-9ac3335cfc27@jvdsn.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-adf_dev_start() registered both alg sets in a single condition.
-If qat_algs_register() succeeds but qat_asym_algs_register() fails,
-ADF_STATUS_CRYPTO_ALGS_REGISTERED is left clear, so adf_dev_stop() skips
-qat_algs_unregister(): the skciphers and aeads stay registered with
-active_devs stuck at 1, pinning the module.
+On 15/03/2026 01.43, Joachim Vandersmissen wrote:
+> Hi Herbert,
+> 
+> I don't think this one can be applied yet since dm-integrity still uses 
+> xxhash64 through the crypto API. This would break fips=1 systems that use it.
 
-Both helpers leak active_devs internally as well - they increment it and
-return without decrementing when a crypto_register_*() call fails, and
-the asym path also leaves the already-registered akcipher behind.
+Out of curiosity: Wouldn't such a system be FIPS-incompliant anyway? If 
+xxhash64 isn't FIPS-compliant, nobody should use it for dm-integrity there, 
+right? So I doubt that there are any systems out there that use fips=1 and 
+use xxhash64 at the same time?
 
-Split the registration in adf_dev_start() so that an asym failure
-unregisters qat_algs, and unwind active_devs (and the akcipher) on the
-error paths of both register helpers. While at it, propagate the error
-code returned by the register helpers instead of a blanket -EFAULT.
+  Thomas
 
-Fixes: 9b2f33a1bfcd ("crypto: qat - fix unregistration of crypto algorithms")
-Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
----
-Changes in v3:
-- Added Reviewed-by tag from Thomas Huth.
-
-Changes in v2:
-- adf_dev_start(): propagate the error code returned by qat_algs_register()
-  and qat_asym_algs_register() instead of returning a blanket -EFAULT.
-
- .../crypto/intel/qat/qat_common/adf_init.c    | 24 ++++++++++++-----
- .../crypto/intel/qat/qat_common/qat_algs.c    | 15 ++++++-----
- .../intel/qat/qat_common/qat_asym_algs.c      | 26 ++++++++++++++-----
- 3 files changed, 45 insertions(+), 20 deletions(-)
-
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_init.c b/drivers/crypto/intel/qat/qat_common/adf_init.c
-index 3e39c53814de..81cb5e6c9f4a 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_init.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_init.c
-@@ -260,13 +260,23 @@ static int adf_dev_start(struct adf_accel_dev *accel_dev)
- 	clear_bit(ADF_STATUS_STARTING, &accel_dev->status);
- 	set_bit(ADF_STATUS_STARTED, &accel_dev->status);
- 
--	if (!list_empty(&accel_dev->crypto_list) &&
--	    (qat_algs_register() || qat_asym_algs_register())) {
--		dev_err(&GET_DEV(accel_dev),
--			"Failed to register crypto algs\n");
--		set_bit(ADF_STATUS_STARTING, &accel_dev->status);
--		clear_bit(ADF_STATUS_STARTED, &accel_dev->status);
--		return -EFAULT;
-+	if (!list_empty(&accel_dev->crypto_list)) {
-+		ret = qat_algs_register();
-+		if (ret) {
-+			dev_err(&GET_DEV(accel_dev), "Failed to register crypto algs\n");
-+			set_bit(ADF_STATUS_STARTING, &accel_dev->status);
-+			clear_bit(ADF_STATUS_STARTED, &accel_dev->status);
-+			return ret;
-+		}
-+
-+		ret = qat_asym_algs_register();
-+		if (ret) {
-+			dev_err(&GET_DEV(accel_dev), "Failed to register crypto asym algs\n");
-+			qat_algs_unregister();
-+			set_bit(ADF_STATUS_STARTING, &accel_dev->status);
-+			clear_bit(ADF_STATUS_STARTED, &accel_dev->status);
-+			return ret;
-+		}
- 	}
- 	set_bit(ADF_STATUS_CRYPTO_ALGS_REGISTERED, &accel_dev->status);
- 
-diff --git a/drivers/crypto/intel/qat/qat_common/qat_algs.c b/drivers/crypto/intel/qat/qat_common/qat_algs.c
-index cb669fb66162..2ec19104787f 100644
---- a/drivers/crypto/intel/qat/qat_common/qat_algs.c
-+++ b/drivers/crypto/intel/qat/qat_common/qat_algs.c
-@@ -1319,19 +1319,22 @@ int qat_algs_register(void)
- 	ret = crypto_register_skciphers(qat_skciphers,
- 					ARRAY_SIZE(qat_skciphers));
- 	if (ret)
--		goto unlock;
-+		goto err_dec;
- 
- 	ret = crypto_register_aeads(qat_aeads, ARRAY_SIZE(qat_aeads));
- 	if (ret)
--		goto unreg_algs;
-+		goto err_unreg_skciphers;
- 
--unlock:
- 	mutex_unlock(&algs_lock);
--	return ret;
-+	return 0;
- 
--unreg_algs:
-+err_unreg_skciphers:
- 	crypto_unregister_skciphers(qat_skciphers, ARRAY_SIZE(qat_skciphers));
--	goto unlock;
-+err_dec:
-+	active_devs--;
-+unlock:
-+	mutex_unlock(&algs_lock);
-+	return ret;
- }
- 
- void qat_algs_unregister(void)
-diff --git a/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c b/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
-index 1049c583f84f..77d59e977472 100644
---- a/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
-+++ b/drivers/crypto/intel/qat/qat_common/qat_asym_algs.c
-@@ -1340,13 +1340,25 @@ int qat_asym_algs_register(void)
- 	int ret = 0;
- 
- 	mutex_lock(&algs_lock);
--	if (++active_devs == 1) {
--		rsa.base.cra_flags = 0;
--		ret = crypto_register_akcipher(&rsa);
--		if (ret)
--			goto unlock;
--		ret = crypto_register_kpp(&dh);
--	}
-+	if (++active_devs != 1)
-+		goto unlock;
-+
-+	rsa.base.cra_flags = 0;
-+	ret = crypto_register_akcipher(&rsa);
-+	if (ret)
-+		goto err_dec;
-+
-+	ret = crypto_register_kpp(&dh);
-+	if (ret)
-+		goto err_unreg_akcipher;
-+
-+	mutex_unlock(&algs_lock);
-+	return 0;
-+
-+err_unreg_akcipher:
-+	crypto_unregister_akcipher(&rsa);
-+err_dec:
-+	active_devs--;
- unlock:
- 	mutex_unlock(&algs_lock);
- 	return ret;
--- 
-2.50.1
+> 
+> On 3/14/26 12:11 AM, Herbert Xu wrote:
+>> On Tue, Mar 03, 2026 at 12:05:09AM -0600, Joachim Vandersmissen wrote:
+>>> xxhash64 is not a cryptographic hash algorithm, but is offered in the
+>>> same API (shash) as actual cryptographic hash algorithms such as
+>>> SHA-256. The Cryptographic Module Validation Program (CMVP), managing
+>>> FIPS certification, believes that this could cause confusion. xxhash64
+>>> must therefore be blocked in FIPS mode.
+>>>
+>>> The only usage of xxhash64 in the kernel is btrfs. Commit fe11ac191ce0
+>>> ("btrfs: switch to library APIs for checksums") recently modified the
+>>> btrfs code to use the lib/crypto API, avoiding the Kernel Cryptographic
+>>> API. Consequently, the removal of xxhash64 from the Crypto API in FIPS
+>>> mode should now have no impact on btrfs usage.
+>>>
+>>> Signed-off-by: Joachim Vandersmissen <git@jvdsn.com>
+>>> ---
+>>>   crypto/testmgr.c | 1 -
+>>>   1 file changed, 1 deletion(-)
+>> Patch applied.  Thanks.
+> 
 
