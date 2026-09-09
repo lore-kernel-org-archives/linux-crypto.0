@@ -1,70 +1,66 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDA5454B1B7
-	for <linux-crypto@vger.kernel.org>; Wed,  9 Sep 2026 11:56:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AC9F550DBC
+	for <linux-crypto@vger.kernel.org>; Wed,  9 Sep 2026 11:56:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788954969; cv=none; b=mIYj4UQcwjwH6AXmFqaIpNXyR2NdwaN2DJypykdC2XXJ9aRWs36mIJ6ItgwIPqNDXEJCaVhdtxhH0qnzWjj0H+cRbknn3Xj+AI1CVtScaGxacqObNQbSHMKnM5J02EEHixgO/vd4C8rcEO/Qv/uoBmog8d1qysn3HXgsQTHANZs=
+	t=1788954973; cv=none; b=cRZTFPpaQqXmIpUfDmbZHlr+oysFuyB4g+kgidXVywuiJEwuW7S/wr1n8D+G8m1XWkoIFN6QuJBnYRl6eOnFr6XpxobZraiYQSPXUDE0umqAWxH88Bp5mggOIssM+68ck4WkaWKycCmOECjhfbcDJf8+E6Tw7i9sgK7f4dZfSbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788954969; c=relaxed/simple;
-	bh=HsLRaYuEbq7ZzzRNl6uSIAKV4rQlZ2M6v1OhzKK4PeA=;
+	s=arc-20240116; t=1788954973; c=relaxed/simple;
+	bh=LvHU+WY1XnXcp3J6reMyDn4V7yDRysf1KLcYrbeZDcw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WVWm0VzZiEIBxR+6QfOnMc+KKt7rLbUxbFxKIyKkXQ7O1bl9CKCh8sY/3KgmahCmApeRJEyGj85SKDU9U29AGdf628VlFvRBLetLyeJGall6dLu/VMjAAuUdyQo2H0lO5bVhn64eDKWx2gPNv51rJvFyTNV6QdcwVDqvWlwDJd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KdG4XH2b; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=fLN3hXADRQQWEfKnYfJciiVp/l4ye0I0AVFcbarB39s9C1mw0BVVzRpn3xuQ+P63c7+q85R29OiWHNSCFZ3L+f5Ug8mONIix/JvyLKyeFc9eZMNRPNmGgBtLK8i0LcDUR38SDID84cklgZyh4No5n7uk3sxvUfpg7zlxwnRao5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=geOdCrPr; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KdG4XH2b"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="geOdCrPr"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1788954966;
+	s=mimecast20190719; t=1788954971;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=hUSOoW0g30UFVhZc7yIBkWk1BVCAbM29mk2RKcbK+JY=;
-	b=KdG4XH2bx48RkGoXn/tGZGqjXD/c3l5F1k6FhdX3GFMSCFduxH5tb/kk/e6ByQeokEAqrY
-	PZUZBjVy0jY6YCgk4uEregHQ3yI45GTjNaHtJF04nHU6mqHLr9JYsyZfakpeBEIeVJhumw
-	tg2LnV3x7fjUmfyVOctK/exBFZ/ocM0=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=c4eejlWwd5v95yqiSdhvvCd5zgSHMIu25fflPX5vypA=;
+	b=geOdCrPr4SnE0SV9OQSJwoRagHpJiHnZrPYsHZmaC6ft6jw3Bw81uxgnhUbN67rhlr7Hl0
+	F2yoSL/Aiwjc2nBJxBDHWZzAXWWMKXh2B+FPp2Sl9ivLKj8OJWZ0p2Y8A4nepVPZEc88PP
+	LPu5RQeVqfBMpDr4RtmZQHbK7C02LnQ=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-665-LTe7h3VOOKKbGcjQM4I0FQ-1; Wed,
- 09 Sep 2026 07:56:01 -0400
-X-MC-Unique: LTe7h3VOOKKbGcjQM4I0FQ-1
-X-Mimecast-MFC-AGG-ID: LTe7h3VOOKKbGcjQM4I0FQ_1788954959
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-14-8MsdSkmzP-CU4zuPdIGbJA-1; Wed,
+ 09 Sep 2026 07:56:07 -0400
+X-MC-Unique: 8MsdSkmzP-CU4zuPdIGbJA-1
+X-Mimecast-MFC-AGG-ID: 8MsdSkmzP-CU4zuPdIGbJA_1788954965
 Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id ED3CF19541AC;
-	Wed,  9 Sep 2026 11:55:58 +0000 (UTC)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 29D301800627;
+	Wed,  9 Sep 2026 11:56:05 +0000 (UTC)
 Received: from thuth-p1g4.redhat.corp (headnet05.pony-001.prod.iad2.dc.redhat.com [10.2.32.117])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7D4991956088;
-	Wed,  9 Sep 2026 11:55:53 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 18B4A1956088;
+	Wed,  9 Sep 2026 11:55:59 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: Eric Biggers <ebiggers@kernel.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	"Jason A. Donenfeld" <Jason@zx2c4.com>,
 	Ard Biesheuvel <ardb@kernel.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Namjae Jeon <linkinjeon@kernel.org>
+	Jonathan Corbet <corbet@lwn.net>
 Cc: linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Thomas Gleixner <tglx@kernel.org>,
 	Ingo Molnar <mingo@redhat.com>,
 	Borislav Petkov <bp@alien8.de>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org
-Subject: [PATCH v2 12/13] smb: client: Use hmac_sha256_zeroize_ctx function to clear hmac_sha256_ctx
-Date: Wed,  9 Sep 2026 13:54:48 +0200
-Message-ID: <20260909115455.157093-13-thuth@redhat.com>
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	linux-doc@vger.kernel.org
+Subject: [PATCH v2 13/13] lib/crypto: Add documentation about zeroization of key and context data
+Date: Wed,  9 Sep 2026 13:54:49 +0200
+Message-ID: <20260909115455.157093-14-thuth@redhat.com>
 In-Reply-To: <20260909115455.157093-1-thuth@redhat.com>
 References: <20260909115455.157093-1-thuth@redhat.com>
 Precedence: bulk
@@ -76,36 +72,162 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-It's just cosmetics, but now that we have a helper function for clearing
-hmac_sha256_ctx with a __cleanup() statement, we can also use it in the smb
-client code for good measure.
+Add a central document about zeroization in libcrypto so we don't
+have to repeat this information in the individual kernel docs of
+the zeroization functions all over the place.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- fs/smb/client/smb2transport.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ .../crypto/libcrypto-zeroization.rst          | 129 ++++++++++++++++++
+ Documentation/crypto/libcrypto.rst            |   1 +
+ 2 files changed, 130 insertions(+)
+ create mode 100644 Documentation/crypto/libcrypto-zeroization.rst
 
-diff --git a/fs/smb/client/smb2transport.c b/fs/smb/client/smb2transport.c
-index c407f30e00401..080864b24a0c5 100644
---- a/fs/smb/client/smb2transport.c
-+++ b/fs/smb/client/smb2transport.c
-@@ -212,7 +212,7 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
- 	unsigned char smb2_signature[SMB2_HMACSHA256_SIZE];
- 	struct kvec *iov = rqst->rq_iov;
- 	struct smb2_hdr *shdr = (struct smb2_hdr *)iov[0].iov_base;
--	struct hmac_sha256_ctx hmac_ctx;
-+	struct hmac_sha256_ctx hmac_ctx __cleanup(hmac_sha256_zeroize_ctx);
- 	struct smb_rqst drqst;
- 	__u64 sid = le64_to_cpu(shdr->SessionId);
- 	u8 key[SMB2_NTLMV2_SESSKEY_SIZE];
-@@ -250,7 +250,6 @@ smb2_calc_signature(struct smb_rqst *rqst, struct TCP_Server_Info *server)
- 		memcpy(shdr->Signature, smb2_signature, SMB2_SIGNATURE_SIZE);
- 
- 	memzero_explicit(key, sizeof(key));
--	memzero_explicit(&hmac_ctx, sizeof(hmac_ctx));
- 	return rc;
- }
- 
+diff --git a/Documentation/crypto/libcrypto-zeroization.rst b/Documentation/crypto/libcrypto-zeroization.rst
+new file mode 100644
+index 0000000000000..ba9b05320ad53
+--- /dev/null
++++ b/Documentation/crypto/libcrypto-zeroization.rst
+@@ -0,0 +1,129 @@
++.. SPDX-License-Identifier: GPL-2.0-or-later
++
++Crypto Key Zeroization
++======================
++
++This document describes the conventions for zeroizing crypto structures in the
++kernel.
++
++.. contents::
++
++Overview
++--------
++
++Cryptographic key material and intermediate state (such as HMAC contexts) must
++be zeroized after use to prevent sensitive data from lingering on the stack or
++heap, where it could be leaked through memory disclosure vulnerabilities,
++crash dumps, or cold-boot attacks.
++
++For memory that has been allocated with kmalloc() or a similar function,
++kfree_sensitive() should be used instead of kfree() to release the memory.
++
++For other cases, the kernel provides ``memzero_explicit()`` for clearing the
++memory.  Unlike plain ``memset()``, ``memzero_explicit()`` is guaranteed not
++to be optimized away by the compiler, even when the memory being cleared
++appears to be dead.
++
++The crypto library builds on ``memzero_explicit()`` by providing typed
++zeroization helpers for each key and context structure.  These helpers serve
++two purposes:
++
++1. They make ``__cleanup()`` annotations possible, so that structures on
++   the stack are automatically zeroized when they go out of scope.
++
++2. They improve readability by replacing ``memzero_explicit(&key, sizeof(key))``
++   with a self-documenting call like ``aes_zeroize_key(&key)``.
++
++
++What to zeroize
++---------------
++
++The following types of structures hold sensitive material and should be
++zeroized after use:
++
++- **Key structures** (e.g. ``struct aes_key``, ``struct hmac_sha256_key``):
++  contain expanded round keys or prepared key material.
++
++- **HMAC/MAC context structures** (e.g. ``struct hmac_sha256_ctx``,
++  ``struct aes_cmac_ctx``): contain inner and outer hash states derived from
++  the key.
++
++- **Hash context structures** (e.g. ``struct sha256_ctx``): may contain
++  sensitive data being hashed.
++
++Not all of these require explicit cleanup by callers.  Many ``..._final()``
++functions already zeroize their context internally (see `Automatic vs. manual
++zeroization`_ below).
++
++
++Zeroization helpers
++-------------------
++
++Each crypto structure that callers may need to zeroize should have a
++corresponding inline helper function.  The naming convention is::
++
++    <algorithm>_zeroize_<type>(struct <algorithm>_<type> *p);
++
++For example::
++
++    void aes_zeroize_key(struct aes_key *key);
++    void aes_zeroize_enckey(struct aes_enckey *key);
++    void hmac_sha256_zeroize_ctx(struct hmac_sha256_ctx *ctx);
++    void aes_cmac_zeroize_key(struct aes_cmac_key *key);
++    void aes_cmac_zeroize_ctx(struct aes_cmac_ctx *ctx);
++
++Each helper is a ``static inline`` function in the algorithm's header that
++wraps ``memzero_explicit()``, for example::
++
++    static inline void hmac_sha256_zeroize_ctx(struct hmac_sha256_ctx *ctx)
++    {
++            memzero_explicit(ctx, sizeof(*ctx));
++    }
++
++These helpers should include kernel-doc comments following the standard
++conventions::
++
++    /**
++     * hmac_sha256_zeroize_ctx() - Zeroize an hmac_sha256_ctx structure
++     * @ctx: The hmac_sha256_ctx context to zeroize
++     */
++
++
++Using __cleanup for automatic zeroization
++-----------------------------------------
++
++The preferred way to zeroize stack-allocated key and context structures is
++with the ``__cleanup()`` attribute.  This ensures zeroization happens on all
++exit paths, including error returns and early exits.
++
++Note that __cleanup() attributes should not be used in functions that use
++"goto" statements. The benefit of cleanup helpers is the removal of "gotos",
++and that "goto" statements can jump between scopes, so the expectation is
++that usage of "goto" and cleanup helpers is never mixed in the same function.
++
++
++Automatic vs. manual zeroization
++--------------------------------
++
++Many ``..._final()`` functions in the crypto library automatically zeroize
++their context before returning.  When this is the case, the kernel-doc for the
++function documents it::
++
++    After finishing, this zeroizes @ctx.  So the caller does not need to do it.
++
++In these cases, callers on simple code paths (where ``..._final()`` is always
++reached) do not need to add ``__cleanup()`` or explicit zeroization.
++However, ``__cleanup()`` is still recommended whenever there are error paths
++that bypass ``..._final()``, as it ensures zeroization on all paths.
++
++For algorithms where ``_final()`` does *not* zeroize the context (such as the
++SHAKE XOFs, where ``shake_squeeze()`` can be called multiple times), callers
++must explicitly zeroize the context by calling the appropriate helper or using
++``__cleanup()``, for example::
++
++    struct shake_ctx ctx __cleanup(shake_zeroize_ctx);
++
++    shake256_init(&ctx);
++    shake_update(&ctx, data, data_len);
++    shake_squeeze(&ctx, out, out_len);
++    /* ctx is automatically zeroized at end of scope */
+diff --git a/Documentation/crypto/libcrypto.rst b/Documentation/crypto/libcrypto.rst
+index e911e05215979..9533c12caa79d 100644
+--- a/Documentation/crypto/libcrypto.rst
++++ b/Documentation/crypto/libcrypto.rst
+@@ -165,4 +165,5 @@ API documentation
+    libcrypto-signature
+    libcrypto-unauth-encryption
+    libcrypto-utils
++   libcrypto-zeroization
+    sha3
 -- 
 2.55.0
 
