@@ -1,54 +1,55 @@
-Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010014.outbound.protection.outlook.com [52.101.193.14])
+Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010032.outbound.protection.outlook.com [52.101.56.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8326857F73E;
-	Wed,  9 Sep 2026 14:57:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9FED5650F4;
+	Wed,  9 Sep 2026 15:39:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1788965875; cv=fail; b=Xi1OyCDq4wCWTF9z6bARgqt3f7qXE0ARJ9OBpr56kDzVxqHnM86gSd08s43+e2QvvvHYAAOVE/2vS/7acZA3+B11n/bauXMAd9S9Bq4KzbEoyQCPq3F05X8RbWDzHSfamG+2B0DlTDrwXsoSYDAGVPLLLzhZK9xfvXWUbvrvNY4=
+	t=1788968355; cv=fail; b=Bbf1xQjrQ9fxqOa5Mgp01zPvw2eBXgCuxmAdfYuvzY1Pq9BQAHZDUNLqyKEcuXE5NZbU7MoD2ojE9MWG8isk4gcHBzlHD9+X+3+uZXue/Yvv+zbgegfJ8nT7OlehJfZK3Hn5llCF7FygT1l8gcp69TjhqqnLF5lCpcxQZ2Prr7g=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1788965875; c=relaxed/simple;
-	bh=GxnUgJ+uw4BYBTPHtYIC/yRW+UFaOD0b4aWQoEmijAU=;
+	s=arc-20240116; t=1788968355; c=relaxed/simple;
+	bh=Ww57bbSN/4Btv/oN9QaOfvOt9zJuYgGVkejBJEjGusA=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=hnAmEVG4dzOy/R4RcoDIuWjFquzY2whwkVenGbQfBeCCl8z1RpBvdkwdAkKvsT+9GbpHw+nvsgY1IlF2dvzVL+VWUqnWD3WexproANHGAK8rtCEGuouzJ/X2jjunF5Kj/O1EX2L9RxntmE7X6CsN+rF6KEOpW/xMIePV+C3kPBk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=N2aFKO+v; arc=fail smtp.client-ip=52.101.193.14
+	 Content-Type:MIME-Version; b=sBQiG7N+uI5ow0PXcZ6Zif6F7o6occ8FmGMP+EZHGw3g0qu3CAcfJDy8x+YyBGI4PZOFYnTjO7fyx9M7ntshOGqImovdAAoPbo4ExjCPwLpmvhZ/68F7OKSXLOouJeHBhs6sD0npZOTpuwd0HI5lrbcOylZaQhIn6G7seogVHYw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=PxjkV4zr; arc=fail smtp.client-ip=52.101.56.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="N2aFKO+v"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="PxjkV4zr"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ohdKp+lJ0SEFBToqrTG8t6jKpBhL8gl6IvPcrI8Zi/QCvRCoYGhdOnVsxU+BRyqYaPHp2opnqcLVIi2NYsZrDlEpilOv0PQ2LVhebyXBy6sIxZcViya195rbOlKj2LgXnKwCl7r8noeeh9wPGlkpSCuXC3r4JXwAqHuhLTl0HWYZybmkrEcyUaczNnQe+n8+NAkgSLhsvfgxXgiRzVS5kB5sHPdvlUcVkVVLkpN7FlCiag+pgG//cEDyDeu4mKthB/Abx0us5VAbtRNJKOsq5dpKpxTShfQvvx5waRLyui9inW4N0UBsNJpuBcq/4+cTUmTJHDZp7yQhgmbUYi8LXA==
+ b=cP0Ii2xuMy14zUk5VjBxttwQza5YGZAqmZOj2hrVE9w0AE4ePJQnjI/rHYBk5rBoMEmwcZsWiPKAGA4TcmkYMc8BAEo6J+CO9/8xGhS48tVXSBy2Dv7/1t6Xs/pWBRb30LtdXSgmi7R0GkQJNEQZZxBNdSlKTPet/pLHJRer915EqvdQcVcLGvS8hl04w3xnr2Zhf7VfK+3iwYtcvLqsomoF+6PksSR1BhIQD/6j8b85CbJCcNmuL8V6onvEAIuWfQDzMHNUIwYT9UvrriAMFVoYcror08ugZ/A60N0KTqewsXE5YQdnAD6p1PCZR575PvyRta1OOQj/XTqDrwSZjQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=X4ZcNlBxOgc2fxKLuAfFJ6YmxKy6r2ecJG803v4UgOU=;
- b=k+LG8r3Phh51l0ZjjmGC9OUoksTt+XdCaDtydC8nnMXFVcHk0jlFM4w+L8MBa+b8y8U+ZK9yxPUMWzVvhqJTNONq0rHkfr5UiewjFo0dPCJZHrAH91w2a1l1iVd5Rub9UD3GfFqKw1Z+iuzyhYOrzin90Hpao/HPxMEbIc26KPAF1eZ8hY1CD/HDpJTy07iZmnsEA0F44mc+coGOH3CObiWE84oarl7CKbcyag+ICwDK/dePv/KArXPicPPyUq3wCT9mE5pN4/g8sDt46jGb8PX9fZzggfbpKIVOs8lvkHaizVtuOJ0JMRRbfbi/0RDepZFTjfEmibaLOZwbjVGNjA==
+ bh=uF0mknmLsOhxzvU/z1W/LvLXZ/ZEH4BDWT9ZILPiAEQ=;
+ b=XbaaG0FI78sKugeQsLHJQQvE7iqY/CbS+ooNXDpROGVUKtVVIoMMKPDZZlw0cPTPOfO6WV212pjQhmq07KDxNS3Gq+JniTFB+1ewO0f/9rFBCsA3oWYHzw9lpH2VL0iDjzXa5H11dGqvIvNhsR6yNb2SvPjqHNVYUJ7/779/G8+PWym6hidqq5RW8HcKmjvUaQ3KiYUQhXLzTQnqngyA773kTGZFnl538m4GsLdAQ11eFF5MnTDJYY9FlVR7IcR5pEBFSUSHozBqxa4XzJ9E9iCtCL+EgmnKAKWoVlB2dZYklqGTEdA2foIpYIIFu0vZUHaRwOi2jLLLgoB1xVYvBQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=X4ZcNlBxOgc2fxKLuAfFJ6YmxKy6r2ecJG803v4UgOU=;
- b=N2aFKO+vBVgTSsZvomrx20yv1dQBJ0KfCX636nZRkRc+zI1AIZp/wKHmpi04IKwCxtcIhu11rSFONjirSlLIs5vSSQgxHMokjbZq9VWf/6QkKunbhUzGXFhEgLpFMZpYfssh6heRDtCgdhU4NW8Q1JzUGjl35pdMpz+2dnl8ENc=
+ bh=uF0mknmLsOhxzvU/z1W/LvLXZ/ZEH4BDWT9ZILPiAEQ=;
+ b=PxjkV4zrL5fUy1/N4Iz8E7ldv3p9ElpcMj7L5JF/hwzyf1jyemj3unygMjeKfqDOZcbsv9JaJBUobJSDJeZ+QeByYwZ3fqhGJqCNGvuOjtON9nd5WfDxq5efWb9b4NmrsdC6gefgbn4FmtWd+lQyWizRItuF92vXxbuib9y8w0s=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from SJ2PR12MB8136.namprd12.prod.outlook.com (2603:10b6:a03:4f8::6)
- by DS7PR12MB5910.namprd12.prod.outlook.com (2603:10b6:8:7b::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.21.406.7; Wed, 9 Sep 2026 14:57:45 +0000
+ by CY0PR12MB708545.namprd12.prod.outlook.com (2603:10b6:930:130::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.21.406.8; Wed, 9 Sep 2026
+ 15:39:11 +0000
 Received: from SJ2PR12MB8136.namprd12.prod.outlook.com
  ([fe80::e5a6:6049:4f4c:afe2]) by SJ2PR12MB8136.namprd12.prod.outlook.com
  ([fe80::e5a6:6049:4f4c:afe2%6]) with mapi id 15.21.0406.007; Wed, 9 Sep 2026
- 14:57:45 +0000
-Message-ID: <108bb0a4-d6a0-4a6a-8fae-33d3d9484b57@amd.com>
-Date: Wed, 9 Sep 2026 09:57:43 -0500
+ 15:39:11 +0000
+Message-ID: <e99e34d6-c5d7-439e-965b-b0bef5951fee@amd.com>
+Date: Wed, 9 Sep 2026 10:39:08 -0500
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: ccp: psp-sev.h: clean up kernel-doc warnings
+Subject: Re: [PATCH] crypto: ccp.h - repair all kernel-doc comments
 To: Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org
-Cc: Ashish Kalra <ashish.kalra@amd.com>, linux-crypto@vger.kernel.org,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>
-References: <20260901001438.3917854-1-rdunlap@infradead.org>
+Cc: John Allen <john.allen@amd.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
+ linux-crypto@vger.kernel.org
+References: <20260901185438.31038-1-rdunlap@infradead.org>
 Content-Language: en-US
 From: Tom Lendacky <thomas.lendacky@amd.com>
 Autocrypt: addr=thomas.lendacky@amd.com; keydata=
@@ -95,11 +96,11 @@ Autocrypt: addr=thomas.lendacky@amd.com; keydata=
  qFAgP+x+ODm6/SYn0LE0VLbYuEGfyx5XcdNnSvww1NLUxSvuShcJMII0bSgP3+KJtFqrUx9z
  l+/NCGvn/wMy6NpYUpRSOmsqVv0N71LbtXnHRrJ42LzWiRW2I5IWsb1TfdMAyVToHPNaEb0i
  WiyqywZI5g==
-In-Reply-To: <20260901001438.3917854-1-rdunlap@infradead.org>
+In-Reply-To: <20260901185438.31038-1-rdunlap@infradead.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH0PR03CA0054.namprd03.prod.outlook.com
- (2603:10b6:610:b3::29) To SJ2PR12MB8136.namprd12.prod.outlook.com
+X-ClientProxiedBy: YT1PR01CA0043.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:2e::12) To SJ2PR12MB8136.namprd12.prod.outlook.com
  (2603:10b6:a03:4f8::6)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -108,627 +109,379 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ2PR12MB8136:EE_|DS7PR12MB5910:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6f3e2764-7c77-4bb8-bb49-08df0e82b4ff
+X-MS-TrafficTypeDiagnostic: SJ2PR12MB8136:EE_|CY0PR12MB708545:EE_
+X-MS-Office365-Filtering-Correlation-Id: a62fe8af-eb21-46e0-c5b8-08df0e887e65
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|23010399003|1800799024|376014|366016|10067099003|3023799007|18002099003|22082099003|11063799006|56012099006;
+	BCL:0;ARA:13230040|366016|23010399003|376014|1800799024|22082099003|18002099003|11063799006|5023799004|56012099006|10067099003|3023799007;
 X-Microsoft-Antispam-Message-Info:
-	/ta3VuHgmY9CeN6QZ2Gd4LqGTuMRBhvS8dWY6ZPyMWyzxV9lwINbCNIyFRH2L0tb5iIbmXcuFLyVzQhcLsH0Xy7AJEvwY4UXLt6UC0PQ8LBe3nKQ3DY+XaB+zFPoGvq57ugEFoiTJztam9ddHdoKbqKoxcODqKc1BDkdhFjNn8Az90WCa96275nojotjZ40+F8njYDg9x6/w3Au3PSQ6FdnVezox4splmG1XYb4VCHiuNTG/ynw1i2K7fkH1LoKw/26o+kdyBsDcE5mULqtrOTp8yXmjyk7asFYAtiVDUfLaz7otlR7UneMUBb+AWXV0ryYMtpHyi92/+U7ag082aoYk2H9zoTWqNoAhzYHpCJSjDVzJGiQ0XqQNiZPnHZmPKM+zKFg1MgLekUrzmKIVWhdKsPDVW3BnJMXH5u2IQnXFxYjpC8D4LQRCNMwN/U+SbDonC4a9/snGT9n/0/ega6mttyc6b0NyfwSTAWiUF4jslybOVNlZCPHpplVpgu2bq8vx7Gc7RobxGBAk2LOPHUbO6WYFfaC62MzZAVEic4eTYGkUzKUmig+3a7OJQ/U/TjNKXIavNg+60IspiCxcwVwNT1bKEA+RLtYILTlXJq9DqHk6Ae6L1GYvK3iV03q+
+	vPpJ4IpeOHsdr2DSzsURbwEJA9sBOehoEA7RAK5vaXZHxG8rh6pnvcRCuesWLusiG4gCXKMDPZ88VOCDOzbtHlKTLVBoinId7A+2zUAhNzRMhFGNi+RUhfZv1yFyZhYMDfiQcgu4hjWekrVLN6Eowwhs9SXh6bOIpstZ/obFPjUCasoKj5IP5Qi0TvBcg49kp1osuV8DlDNu/jVPVpH8rgrGWY4d60lYQCgqyaV3/SUqoLyAQArBDpU77k/k3mjk1oDXaHk3r6dAOag1tAyhKjB6fQQn+N06BmCJj0SdDy53PqOF3rvvgp0nq83e4HjWEDc3fKJIhkRpiHMTG8zfjpIpJ3c0LxUayvW3OplQO/ESju92G1JnBUZ7cRLbpLaDUfkhAIGGsnSAK6fGAtYVN+rVTJ9LbM3P4kBlKZ+/IP6OZoCzKSo+DiJgvql/IwsU2BB6VH+ri9vgEC0ByBQPqRuMiGqTXgQz3U/krrFcxOhfQDFLcOmelbAWEt8cUJeiuMDSTdf4eL0id93SQguHGO4J5ovGyKK/XAsrbMEo4HgqIpLkVWXFiJvJVeR5SgkOHgKVqLScABjtcni6ByZ1FxhR0loLdiwx88MVWNVHf/g=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR12MB8136.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(23010399003)(1800799024)(376014)(366016)(10067099003)(3023799007)(18002099003)(22082099003)(11063799006)(56012099006);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR12MB8136.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(23010399003)(376014)(1800799024)(22082099003)(18002099003)(11063799006)(5023799004)(56012099006)(10067099003)(3023799007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Ty9qUElkWDZzV2NEbHovTy9iZUlQWkxZUGdFblo3M0V2b3dXbEhDWmhRTjFU?=
- =?utf-8?B?b0dQMTBJS2NLcllDUkFjRTF6akRydEtJUGp3VFJ5YUt3V2JIWEpvWEU4ZGIx?=
- =?utf-8?B?clpPTGZlN2Z2dTdvQWpZM1p5OU95aEFPcHVBbG1VaDdLQlhpbVk4bk41WUdX?=
- =?utf-8?B?QkFlSUh4bjYzTlhpVjd0YklZMEtxR0NGMFBuQ3Rjc2pTb3JIbDV1MjdRdmsr?=
- =?utf-8?B?aFZoaEtCQ3FMTHNob2FFcFUxbkYzV3RieC9Cb1RLR0ZUMG9LOGE2dlFWYVJ1?=
- =?utf-8?B?bUFlVTUyamE3bFBKK1ZuOVlzNE4vbWJTRjBJUEI0L29vdzFTenVlR0I5UUN4?=
- =?utf-8?B?UDdXVGQzeDc3elVTeitFOUdtSmdrNThBK0dXV1RmaVZwdWo0UmJ4Y1lUS1R4?=
- =?utf-8?B?KytPQWwxMGxrUVluYTN3VEtudGYwM0UrdkwwdHZheG9XSGNvM24xNUp5Smkx?=
- =?utf-8?B?N0l5ODE0eEtHdmpIbGxwcCtsZVQyZVpXQUhQaTYvbkxmdTU1YStpa1ZRUzF4?=
- =?utf-8?B?elAvSm1YcmNGckZHU2JhRzUxYkl1YTRNR1lYWHZHaHljS3BUWXpUVHhyWUk0?=
- =?utf-8?B?UTFvN0xyKzQ0c0lTUzhxK3NuUGlxc3pQR0lZZDdvS1VvUXVKL0lvYStiRHpN?=
- =?utf-8?B?TXNuY3J1L0VHQmFQMG44OUtqSkV5UURJOTh3OUc5Q3l0WlloR2piaU5vS2pa?=
- =?utf-8?B?MVM0anNRRWI4NE1NamwzcVpBaUNBUzNaYUJnTWpGOVVJcGJna2oxdkF5UkZw?=
- =?utf-8?B?VmJYY0FQKzk1TjNLRThtM1l5bkZoM3BIbVdzWVI5VkFUU3RneU1neHRxczlO?=
- =?utf-8?B?SFlWc3FteDZiejJmdllUN2dZZ2hTd1JkMUhCb3ZkTkRzQmVwUGpNVDZDY2Nv?=
- =?utf-8?B?TXh2QStFUmxYeTh4emxQaGV6QzNqa2pLZEJrZUNLekwwSUFhTG4xd0cyd25G?=
- =?utf-8?B?N2VoN2lQWmxtRFFyOUp0bG9UMWl1MXJiYTJJemZ0Ri9ZbXlLekJCcE9zWlRH?=
- =?utf-8?B?U1kwN05OSzZuQjJBcnRrQnJ1eVdmRmFmNy9yUGY4amdPY0NLYnRCWU0xTlhP?=
- =?utf-8?B?MHRMTzRoOWhYK2g2dXlUWGNaeENSMlNmd1REZ0hXZWhINTU0RmRranJ2bDhv?=
- =?utf-8?B?WWFTWmF4SWd1KzR3RWUrL0xqTmV4SVB2Ty9WSG9EUDNEN1BmMFV6TWkybzln?=
- =?utf-8?B?clpoc2l6MkpOK2JwMzR2QUd3MG1aSXQrRDg0RGZuSUVDeEE2UXFFWWhXMTh1?=
- =?utf-8?B?QXlrdXdIWEhMUmJpdVlHaWpOSytrN2FWK3dESng1MVRPNWVacUdzUmE3THhY?=
- =?utf-8?B?SUdyZnN2ZlVCUlAvSWxSUmxqOXAxWjZmc1I2ZTdRVjJxVmNJVHFCK1I3S3N1?=
- =?utf-8?B?cTNJMWdlYlltNGZzR1hsc2M0RVhFNUNUd1FHUUFrVVNNVkk5Zi8xMmZIaXEy?=
- =?utf-8?B?OW80TiswcElpOUtPTytsd045TWwzLzdtM1VtM01PKzAwTCt3TkF6eEl1d3Bv?=
- =?utf-8?B?ZWE5L2NIWU1wb25SNFBLVE5pOG5ZNHpoOHpLYStoRTFJZEZObTMwcXpBTjhV?=
- =?utf-8?B?blZYemVwRnRBWXMwL1lqVGFEeVE3MzlNMXgvWlhRM1ZjckVNMWxiYS9JZjFv?=
- =?utf-8?B?WE1iMjZaem1Lbjk5S3BJOFhlTFdrd2VubXVZRjlCWVJKWXJ6aXpRNjVNTUVq?=
- =?utf-8?B?Q0hrNGxxaHVRVThuTlN5OTZsU043ZlFGQ0ZTb2J5aUY1cHdrRklRTXB3cXU2?=
- =?utf-8?B?TER1b3E5NlhvQTBpaUxjTmc3WTR2SUJzRjFJK2tPQlFSdEJjNlBETXdkdnky?=
- =?utf-8?B?MUdWUUErTzE3MjZOazg0Wi9HVmNKUzZWTXZKNmNiR2FNUm5ZYXhNa1BEWHdC?=
- =?utf-8?B?ZHJjcG5jZlQzT0ZKNS9tOXpTcU9sTVpSaVRkb3diUUx3QTBnS0xmTXEvK3dw?=
- =?utf-8?B?RFhWcGQyd3dyUE5QSjRYK0F5WUZBRWtJS3ZIeFJpMi9sVFljaFg0b3poU0JW?=
- =?utf-8?B?Wmh4VWdPbm9PYUxWUTA2Mmx2ekRvOGNLWWJvSjlPbFFrNUtiSThFSTR3WHNk?=
- =?utf-8?B?L0tBcGNpc3ovMDdkWW45TU9CYlRsSzVGZjcxbTRYOG5hcFRtbXZqTWRTdFZG?=
- =?utf-8?B?a2xFd01OZS9TczlYUXNXaW5WekcrSGhSUnkxa1BPd2NPdEVjTXBvRXpVWkYr?=
- =?utf-8?B?bWNuZ1ZqbXhJSnJmb3NCbVZhS1pLbldLUDc5WFZNMmtpdUIxaWp5eFI1a215?=
- =?utf-8?B?b2FEWFMxNEVCRE1Jdk94d1AxcllwNnM0Z2p0WnZyY1g3cFdKR3loeW9WZGxQ?=
- =?utf-8?Q?mcP7BuYhIJ3OBeam57?=
+	=?utf-8?B?WlI3eWN0RTVYRVFpaTB2UE5Sd0d6K1B4aFdCeXhHckVEN3lnVnN4UmE5U3ZK?=
+ =?utf-8?B?Zm96cmxEZzY3bEdYUStSbzFVdTZPQ3pHQkNuQnYxVzZMZlRaQmhFY2ltNTZw?=
+ =?utf-8?B?eGVTelA2QS9Gb3I2MzlJa2pmRDcxVlM4WnFWSWNzN2xydmE5MDIraWVBbzA5?=
+ =?utf-8?B?aDhmSWl0YzV6Q3JyMjFRcEZQQ05KbXZWdkx3MVZNTkxMeE5zcXduMDVDdS9M?=
+ =?utf-8?B?bTFLMXozeldka2t3cVNBV1hkMFkwNGtSV0ZxTFByMmJsSXplYlYyNVJGWnJx?=
+ =?utf-8?B?QVRXTXhGb0ZMRXRJSzJRMnBpSGhieDVBd2EwTHVDNnEzbytnSWN6S3M2N3lk?=
+ =?utf-8?B?aVRuNWhYY0dFUUc2cWdqQVdiTkpZWmROT1phWEowZGtIKytkNnZnWG51YUYy?=
+ =?utf-8?B?VHlJdWhWTE41NXRIaDVnZ28xQXJvOVNTRnhMcGQzRHZIQlFNcUo2Vy9oeFls?=
+ =?utf-8?B?elV1Q3NRV1lIR1BhYUxVVktsS1NoZkNrQm5rSWVvOUZGUUM1a3puVXE1aUR4?=
+ =?utf-8?B?bzc1SGtha21HdGNGaVhjLzBJeFlLZ3loeGdGeEEzR0dGZFJGKyt1TzVXSHFB?=
+ =?utf-8?B?T0hrLzhNV0c0L3hZTjl4bkp5OUhXcXYrUE9TN1Y5NjdPMXVDNmU1R3J3WlpP?=
+ =?utf-8?B?RUcvR2ZpZDQyVE9Zenlhd2lhWVB2UCtSM2VCc2dSK2M4cFJHVmZGdUtmNjdZ?=
+ =?utf-8?B?eVpnSjBIL21uR2VIeGVxYnVXQXE3UTVkL0hJZEpGK1hMYzczMjJGTCsvajlG?=
+ =?utf-8?B?ZzJodngwQkVwM2ZFaE9PdW00RzBKTFV1SnZrMXJoRnE3NEFCU0Q0bFc4TnlU?=
+ =?utf-8?B?S09BOXFYTjJweG5Obit6bTgxQ1RLdHFwY01JU0VMeFBHTy8xbW55cmtvRnhH?=
+ =?utf-8?B?WXE2amd1SVRBaTlJOExFVVZWam41VDdoZWIvL2lmYlVFenlzV29JL0Q0SjFK?=
+ =?utf-8?B?a0JFaWhCSDFtemgzRlEzNEpxeGtIcVk2dmJSM0dDTVByYTAyZmJIbGhacTZv?=
+ =?utf-8?B?dU1FeTN0MFJGTjE2QitCTFBRV3A2OUdqaUpoQXFseFRMMW1YTFhxYUlTSXJw?=
+ =?utf-8?B?dmVQYW5Ia0QyZTdQTXBkSjlxdExSdnhFVld0ckVQQlEyOVEyQnlpNkNGdnZp?=
+ =?utf-8?B?cWVGR3hvUUJiTEU3S29kdk1leTh0cSt4SFVLUDhHK0w0MVovZStWaEVQVld3?=
+ =?utf-8?B?alVjaTBUVGZsTm9peEx3RTJCbmlSVSt5MDNaemNoVnNKRnRxUXpVSTh1TVc4?=
+ =?utf-8?B?SlBFYXBSdm80d1ljakNac3IzK1FsSWt0K1c4L0hOVUF5OEJPb3RUSjNPWEdZ?=
+ =?utf-8?B?NXNpbnR2NFZid21KZzlJSFpuSGJTZjlZRnQ5VGlZQzRvRWs4Qk9LUUZBSlZP?=
+ =?utf-8?B?blRRM2c1enlMeXRuQnMxQUhUR1E1cEExMHkwZUtuN0NWRWVBZFEwTnBLMU5m?=
+ =?utf-8?B?V3lJcHJhTkdISFVvbHlHdzdsNk5CZ0VmRmFHQTdzeldDcXdLK1lscnFIdkZY?=
+ =?utf-8?B?YnRnbzBWZC92eTYycDlqNk5iRFk3UTFDTUptZExscnNBbmpkTGc4d1BIbmFu?=
+ =?utf-8?B?a2RvZGR5RlhiYXNiUjlYMFVaM2YxODJsSXFlNHhudUw3dXlGYlU2bGdPYWEy?=
+ =?utf-8?B?RDFnS0xxQjk5SHByaE02cnpGK0F3ZEt4MURSWTlOVy9BWU00d3ltdnZqQTk1?=
+ =?utf-8?B?OTEvZ00rQS9ua0RjNjcwalZaZERFQ0Q5Tm1keldJM2lKSlJsUVpUK0JPQmxu?=
+ =?utf-8?B?MUFvYW53UWlPVjFPRjJiM0MzQnlhcXpMeHlYTjBWN2o4VEhaOE9VWEc3Yk9K?=
+ =?utf-8?B?TTAzWXhib2hjVHFmUTYzSlNVUHFYNWV5OHE3eWNyNWJZODR0ZHJrcStJb3hQ?=
+ =?utf-8?B?T0o5Qkt4aGhmOFA4T3VzN2VvcG55ZUMwcE1Yd3lnNVN3WDc3SHp0NXJXQ3hR?=
+ =?utf-8?B?YjZDbzU1U2FOaERHYTR4T08vYkN2dzVLMGhKZStqdmJTNmp4L0lRVjVyazcx?=
+ =?utf-8?B?UjZpa2t3S0hpQXdtZjJySk9nMnZsZ2U5TGZMZ2FqL3JYRmFXRjBUdDBsMzdm?=
+ =?utf-8?B?SWFqeXExUElhb2hUYlM5Y1RFM0dMODhQelJocEZ0SzlYK2Z6dEJmbFk5TENl?=
+ =?utf-8?B?UDZKdytDMVdZdmdOVjdyWTV4QUFJeDBCd2hFMU4zckpQSU9VRnJZNHExNll2?=
+ =?utf-8?B?UWkvcFhLQ05MMG16bHVWSmNNOEpDYURVTWZvM1pqbXoxRUw4UG9UNy9pbzgv?=
+ =?utf-8?B?UlEvUGpBVzh0SmFiVVRxMis2ZDZMUzlzUEZJYkt2clhrNmEvajhGSXRaM0w5?=
+ =?utf-8?Q?1KhudHl9oPrUwc5RfN?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6f3e2764-7c77-4bb8-bb49-08df0e82b4ff
+X-MS-Exchange-CrossTenant-Network-Message-Id: a62fe8af-eb21-46e0-c5b8-08df0e887e65
 X-MS-Exchange-CrossTenant-AuthSource: SJ2PR12MB8136.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Sep 2026 14:57:45.7066
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Sep 2026 15:39:11.1188
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hVv1TEz9+ewd8OE3LaAHslNG+lOqRlGS4lOCG0sJ3ifJpzJjXsyvlYzAh8QZtgjkclFebTvh73S0c4zTZVrqPw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5910
+X-MS-Exchange-CrossTenant-UserPrincipalName: qjwzGMkvoY9z/XppbFtbL7lboBUTJ6xVpZicYnGTl9QdD+EtXlXeiIZHWOfuNA9bNwvJSZ5ES3dVX8JiPGp5tQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY0PR12MB708545
 
-On 8/31/26 19:14, Randy Dunlap wrote:
-> Clean up kernel-doc comments to prevent warnings in both
-> <linux/psp-sev.h> and <uapi/linux/psp-sev.h>.
+On 9/1/26 13:54, Randy Dunlap wrote:
+> Eliminate all kernel-doc warnings in <linux/ccp.h>:
+> - add Returns: for function return values
+> - use the enum keyword when describing an enum in kernel-doc
+> - add missing enum value descriptions
+> - add or repair missing struct member descriptions
+> - use nested struct notation as needed
 > 
-> Binary files are the same before and after this patch.
-> 
-> include/linux/psp-sev.h: (62 lines; edited for brevity)
-> Warning: include/linux/psp-sev.h:52 This comment starts with '/**', but isn't a kernel-doc comment.
->  * SEV platform state
-> Warning: include/linux/psp-sev.h:63 This comment starts with '/**', but isn't a kernel-doc comment.
->  * SEV platform and guest management commands
-> Warning: include/linux/psp-sev.h:167 struct member 'reserved' not described in 'sev_data_init'
-> Warning: include/linux/psp-sev.h:187 struct member 'reserved' not described in 'sev_data_init_ex'
-> Warning: include/linux/psp-sev.h:216 expecting prototype for struct sev_data_cert_import. Prototype was for struct sev_data_pek_cert_import instead
-> Warning: include/linux/psp-sev.h:253 struct member 'pdh_cert_address' not described in 'sev_data_pdh_cert_export'
-> Warning: include/linux/psp-sev.h:253 struct member 'pdh_cert_len' not described in 'sev_data_pdh_cert_export'
-> Warning: include/linux/psp-sev.h:253 struct member 'reserved' not described in 'sev_data_pdh_cert_export'
-> Warning: include/linux/psp-sev.h:253 Excess struct member 'pdh_address' description in 'sev_data_pdh_cert_export' (did you mean one of: 'pdh_cert_address', 'cert_chain_address')
-> Warning: include/linux/psp-sev.h:253 Excess struct member 'pdh_len' description in 'sev_data_pdh_cert_export' (did you mean one of: 'pdh_cert_len')
-> Warning: include/linux/psp-sev.h:446 expecting prototype for struct sev_data_send_update. Prototype was for struct sev_data_send_update_data instead
-> Warning: include/linux/psp-sev.h:469 expecting prototype for struct sev_data_send_update. Prototype was for struct sev_data_send_update_vmsa instead
-> Warning: include/linux/psp-sev.h:506 struct member 'policy' not described in 'sev_data_receive_start'
-> Warning: include/linux/psp-sev.h:799 struct member 'rapl_dis' not described in 'sev_data_snp_init_ex'
-> Warning: include/linux/psp-sev.h:799 struct member 'ciphertext_hiding_en' not described in 'sev_data_snp_init_ex'
-> Warning: include/linux/psp-sev.h:799 struct member 'tio_en' not described in 'sev_data_snp_init_ex'
-> Warning: include/linux/psp-sev.h:799 struct member 'max_snp_asid' not described in 'sev_data_snp_init_ex'
-> Warning: include/linux/psp-sev.h:843 missing initial short description on line:
->  * struct sev_platform_init_args
-> Warning: include/linux/psp-sev.h:893 expecting prototype for struct feature_info. Prototype was for struct snp_feature_info instead
-> Warning: include/linux/psp-sev.h:956 missing initial short description on line:
->  * struct sev_snp_tcb_version_genoa_milan
-> Warning: include/linux/psp-sev.h:973 missing initial short description on line:
->  * struct sev_snp_tcb_version_turin
-> Warning: include/linux/psp-sev.h:1053 function parameter 'filep' not described in 'sev_issue_cmd_external_user'
-> Warning: include/linux/psp-sev.h:1053 function parameter 'id' not described in 'sev_issue_cmd_external_user'
-> Warning: include/linux/psp-sev.h:1112 function parameter 'data' not described in 'sev_guest_decommission'
-> Warning: include/linux/psp-sev.h:1112 function parameter 'error' not described in 'sev_guest_decommission'
-> Warning: include/linux/psp-sev.h:1112 Excess function parameter 'decommission' description in 'sev_guest_decommission'
-> Warning: include/linux/psp-sev.h:1112 Excess function parameter 'sev_ret' description in 'sev_guest_decommission'
-> 
-> include/uapi/linux/psp-sev.h:
-> Warning: include/uapi/linux/psp-sev.h:18 This comment starts with '/**', but isn't a kernel-doc comment.
->  * SEV platform commands
-> Warning: include/uapi/linux/psp-sev.h:39 This comment starts with '/**', but isn't a kernel-doc comment.
->  * SEV Firmware status code
-> Warning: include/uapi/linux/psp-sev.h:125 struct member 'api_major' not described in 'sev_user_data_status'
-> Warning: include/uapi/linux/psp-sev.h:125 struct member 'api_minor' not described in 'sev_user_data_status'
-> Warning: include/uapi/linux/psp-sev.h:125 Excess struct member 'major' description in 'sev_user_data_status' (did you mean one of: 'api_major')
-> Warning: include/uapi/linux/psp-sev.h:125 Excess struct member 'minor' description in 'sev_user_data_status' (did you mean one of: 'api_minor')
-> Warning: include/uapi/linux/psp-sev.h:153 expecting prototype for struct sev_user_data_cert_import. Prototype was for struct sev_user_data_pek_cert_import instead
-> Warning: include/uapi/linux/psp-sev.h:168 struct member 'pdh_cert_address' not described in 'sev_user_data_pdh_cert_export'
-> Warning: include/uapi/linux/psp-sev.h:168 struct member 'pdh_cert_len' not described in 'sev_user_data_pdh_cert_export'
-> Warning: include/uapi/linux/psp-sev.h:168 Excess struct member 'pdh_address' description in 'sev_user_data_pdh_cert_export' (did you mean one of: 'pdh_cert_address', 'cert_chain_address')
-> Warning: include/uapi/linux/psp-sev.h:168 Excess struct member 'pdh_len' description in 'sev_user_data_pdh_cert_export' (did you mean one of: 'pdh_cert_len')
-> Warning: include/uapi/linux/psp-sev.h:263 expecting prototype for struct sev_data_snp_vlek_load. Prototype was for struct sev_user_data_snp_vlek_load instead
-> Warning: include/uapi/linux/psp-sev.h:273 expecting prototype for struct sev_user_data_snp_vlek_wrapped_vlek_hashstick. Prototype was for struct sev_user_data_snp_wrapped_vlek_hashstick instead
+> Warning: include/linux/ccp.h:30 No description found for return value
+>  of 'ccp_present'
+> Warning: include/linux/ccp.h:42 No description found for return value
+>  of 'ccp_version'
+> Warning: include/linux/ccp.h:67 No description found for return value
+>  of 'ccp_enqueue_cmd'
+> Warning: include/linux/ccp.h:97 cannot understand function prototype:
+>  'enum ccp_aes_type'
+> Warning: include/linux/ccp.h:114 cannot understand function prototype:
+>  'enum ccp_aes_mode'
+> Warning: include/linux/ccp.h:128 Enum value 'CCP_AES_MODE_GHASH' not
+>  described in enum 'ccp_aes_mode'
+> Warning: include/linux/ccp.h:128 Enum value 'CCP_AES_MODE_GCTR' not
+>  described in enum 'ccp_aes_mode'
+> Warning: include/linux/ccp.h:128 Enum value 'CCP_AES_MODE_GCM' not
+>  described in enum 'ccp_aes_mode'
+> Warning: include/linux/ccp.h:128 Enum value 'CCP_AES_MODE_GMAC' not
+>  described in enum 'ccp_aes_mode'
+> Warning: include/linux/ccp.h:134 cannot understand function prototype:
+>  'enum ccp_aes_action'
+> Warning: include/linux/ccp.h:190 struct member 'authsize' not described
+>  in 'ccp_aes_engine'
+> Warning: include/linux/ccp.h:190 struct member 'aad_len' not described
+>  in 'ccp_aes_engine'
+> Warning: include/linux/ccp.h:202 cannot understand function prototype:
+>  'enum ccp_xts_aes_unit_size'
+> Warning: include/linux/ccp.h:245 struct member 'type' not described in
+>  'ccp_xts_aes_engine'
+> Warning: include/linux/ccp.h:255 cannot understand function prototype:
+>  'enum ccp_sha_type'
+> Warning: include/linux/ccp.h:394 cannot understand function prototype:
+>  'enum ccp_passthru_bitwise'
+> Warning: include/linux/ccp.h:410 cannot understand function prototype:
+>  'enum ccp_passthru_byteswap'
+> Warning: include/linux/ccp.h:472 struct member 'src_dma' not described
+>  in 'ccp_passthru_nomap_engine'
+> Warning: include/linux/ccp.h:472 struct member 'dst_dma' not described
+>  in 'ccp_passthru_nomap_engine'
+> Warning: include/linux/ccp.h:472 Excess struct member 'src' description in
+>  'ccp_passthru_nomap_engine' (did you mean one of: 'src_len', 'src_dma')
+> Warning: include/linux/ccp.h:472 Excess struct member 'dst' description in
+>  'ccp_passthru_nomap_engine' (did you mean one of: 'dst_dma')
+> Warning: include/linux/ccp.h:489 cannot understand function prototype:
+>  'enum ccp_ecc_function'
+> Warning: include/linux/ccp.h:587 struct member 'u' not described in
+>  'ccp_ecc_engine'
+> Warning: include/linux/ccp.h:587 Excess struct member 'mm' description in
+>  'ccp_ecc_engine' (did you mean one of: 'u.mm')
+> Warning: include/linux/ccp.h:587 Excess struct member 'pm' description in
+>  'ccp_ecc_engine' (did you mean one of: 'u.pm')
+> Warning: include/linux/ccp.h:602 cannot understand function prototype:
+>  'enum ccp_engine'
 > 
 > Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+
+Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
+
 > ---
-> Cc: Ashish Kalra <ashish.kalra@amd.com>
 > Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Cc: linux-crypto@vger.kernel.org
+> Cc: John Allen <john.allen@amd.com>
 > Cc: Herbert Xu <herbert@gondor.apana.org.au>
 > Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: linux-crypto@vger.kernel.org
 > 
->  include/linux/psp-sev.h      |  114 +++++++++++++++++++++++++--------
->  include/uapi/linux/psp-sev.h |   26 +++----
->  2 files changed, 101 insertions(+), 39 deletions(-)
+>  include/linux/ccp.h |   58 +++++++++++++++++++++++++++---------------
+>  1 file changed, 38 insertions(+), 20 deletions(-)
 > 
-> --- linux-next-20260828.orig/include/linux/psp-sev.h
-> +++ linux-next-20260828/include/linux/psp-sev.h
-> @@ -49,7 +49,7 @@
->  
->  #define SEV_FW_BLOB_MAX_SIZE	0x4000	/* 16KB */
->  
-> -/**
-> +/*
->   * SEV platform state
->   */
->  enum sev_state {
-> @@ -60,7 +60,7 @@ enum sev_state {
->  	SEV_STATE_MAX
->  };
->  
-> -/**
-> +/*
->   * SEV platform and guest management commands
->   */
->  enum sev_cmd {
-> @@ -162,7 +162,9 @@ enum sev_cmd {
->   */
->  struct sev_data_init {
->  	u32 flags;			/* In */
-> +	/* private: */
->  	u32 reserved;			/* In */
-
-I noticed that, for example, struct sev_snp_tcb_version_genoa_milan has
-the reserved field as part of the kernel-doc, which seems to eliminate
-the need for the "/* private: */" and "/* public: */" comments. Would it
-be better to instead just add the reserved fields to the kernel doc?
-
-Thanks,
-Tom
-
-> +	/* public: */
->  	u64 tmr_address;		/* In */
->  	u32 tmr_len;			/* In */
->  } __packed;
-> @@ -182,7 +184,9 @@ struct sev_data_init_ex {
->  	u32 flags;                      /* In */
->  	u64 tmr_address;                /* In */
->  	u32 tmr_len;                    /* In */
-> +	/* private: */
->  	u32 reserved;                   /* In */
-> +	/* public: */
->  	u64 nv_address;                 /* In/Out */
->  	u32 nv_len;                     /* In */
->  } __packed;
-> @@ -201,17 +205,19 @@ struct sev_data_pek_csr {
->  } __packed;
->  
+> --- linux-next-20260831.orig/include/linux/ccp.h
+> +++ linux-next-20260831/include/linux/ccp.h
+> @@ -26,7 +26,7 @@ struct ccp_cmd;
 >  /**
-> - * struct sev_data_cert_import - PEK_CERT_IMPORT command parameters
-> + * struct sev_data_pek_cert_import - PEK_CERT_IMPORT command parameters
+>   * ccp_present - check if a CCP device is present
 >   *
-> - * @pek_address: PEK certificate chain
-> - * @pek_len: len of PEK certificate
-> - * @oca_address: OCA certificate chain
-> - * @oca_len: len of OCA certificate
-> + * @pek_cert_address: PEK certificate chain
-> + * @pek_cert_len: len of PEK certificate
-> + * @oca_cert_address: OCA certificate chain
-> + * @oca_cert_len: len of OCA certificate
+> - * Returns zero if a CCP device is present, -ENODEV otherwise.
+> + * Returns: zero if a CCP device is present, -ENODEV otherwise.
 >   */
->  struct sev_data_pek_cert_import {
->  	u64 pek_cert_address;			/* In */
->  	u32 pek_cert_len;			/* In */
-> +	/* private: */
->  	u32 reserved;				/* In */
-> +	/* public: */
->  	u64 oca_cert_address;			/* In */
->  	u32 oca_cert_len;			/* In */
->  } __packed;
-> @@ -240,15 +246,17 @@ struct sev_data_get_id {
->  /**
->   * struct sev_data_pdh_cert_export - PDH_CERT_EXPORT command parameters
->   *
-> - * @pdh_address: PDH certificate address
-> - * @pdh_len: len of PDH certificate
-> + * @pdh_cert_address: PDH certificate address
-> + * @pdh_cert_len: len of PDH certificate
->   * @cert_chain_address: PDH certificate chain
->   * @cert_chain_len: len of PDH certificate chain
->   */
->  struct sev_data_pdh_cert_export {
->  	u64 pdh_cert_address;			/* In */
->  	u32 pdh_cert_len;			/* In/Out */
-> +	/* private: */
->  	u32 reserved;				/* In */
-> +	/* public: */
->  	u64 cert_chain_address;			/* In */
->  	u32 cert_chain_len;			/* In/Out */
->  } __packed;
-> @@ -312,7 +320,9 @@ struct sev_data_launch_start {
->  	u32 policy;				/* In */
->  	u64 dh_cert_address;			/* In */
->  	u32 dh_cert_len;			/* In */
-> +	/* private: */
->  	u32 reserved;				/* In */
-> +	/* public: */
->  	u64 session_address;			/* In */
->  	u32 session_len;			/* In */
->  } __packed;
-> @@ -326,7 +336,9 @@ struct sev_data_launch_start {
->   */
->  struct sev_data_launch_update_data {
->  	u32 handle;				/* In */
-> +	/* private: */
->  	u32 reserved;
-> +	/* public: */
->  	u64 address;				/* In */
->  	u32 len;				/* In */
->  } __packed;
-> @@ -340,7 +352,9 @@ struct sev_data_launch_update_data {
->   */
->  struct sev_data_launch_update_vmsa {
->  	u32 handle;				/* In */
-> +	/* private: */
->  	u32 reserved;
-> +	/* public: */
->  	u64 address;				/* In */
->  	u32 len;				/* In */
->  } __packed;
-> @@ -354,7 +368,9 @@ struct sev_data_launch_update_vmsa {
->   */
->  struct sev_data_launch_measure {
->  	u32 handle;				/* In */
-> +	/* private: */
->  	u32 reserved;
-> +	/* public: */
->  	u64 address;				/* In */
->  	u32 len;				/* In/Out */
->  } __packed;
-> @@ -372,13 +388,19 @@ struct sev_data_launch_measure {
->   */
->  struct sev_data_launch_secret {
->  	u32 handle;				/* In */
-> +	/* private: */
->  	u32 reserved1;
-> +	/* public: */
->  	u64 hdr_address;			/* In */
->  	u32 hdr_len;				/* In */
-> +	/* private: */
->  	u32 reserved2;
-> +	/* public: */
->  	u64 guest_address;			/* In */
->  	u32 guest_len;				/* In */
-> +	/* private: */
->  	u32 reserved3;
-> +	/* public: */
->  	u64 trans_address;			/* In */
->  	u32 trans_len;				/* In */
->  } __packed;
-> @@ -411,19 +433,25 @@ struct sev_data_send_start {
->  	u32 policy;				/* Out */
->  	u64 pdh_cert_address;			/* In */
->  	u32 pdh_cert_len;			/* In */
-> +	/* private: */
->  	u32 reserved1;
-> +	/* public: */
->  	u64 plat_certs_address;			/* In */
->  	u32 plat_certs_len;			/* In */
-> +	/* private: */
->  	u32 reserved2;
-> +	/* public: */
->  	u64 amd_certs_address;			/* In */
->  	u32 amd_certs_len;			/* In */
-> +	/* private: */
->  	u32 reserved3;
-> +	/* public: */
->  	u64 session_address;			/* In */
->  	u32 session_len;			/* In/Out */
->  } __packed;
+>  int ccp_present(void);
 >  
+> @@ -38,7 +38,7 @@ int ccp_present(void);
 >  /**
-> - * struct sev_data_send_update - SEND_UPDATE_DATA command
-> + * struct sev_data_send_update_data - SEND_UPDATE_DATA command
+>   * ccp_version - get the version of the CCP
 >   *
->   * @handle: handle of the VM to process
->   * @hdr_address: physical address containing packet header
-> @@ -435,19 +463,25 @@ struct sev_data_send_start {
+> - * Returns a positive version number, or zero if no CCP
+> + * Returns: a positive version number, or zero if no CCP
 >   */
->  struct sev_data_send_update_data {
->  	u32 handle;				/* In */
-> +	/* private: */
->  	u32 reserved1;
-> +	/* public: */
->  	u64 hdr_address;			/* In */
->  	u32 hdr_len;				/* In/Out */
-> +	/* private: */
->  	u32 reserved2;
-> +	/* public: */
->  	u64 guest_address;			/* In */
->  	u32 guest_len;				/* In */
-> +	/* private: */
->  	u32 reserved3;
-> +	/* public: */
->  	u64 trans_address;			/* In */
->  	u32 trans_len;				/* In */
->  } __packed;
+>  unsigned int ccp_version(void);
 >  
->  /**
-> - * struct sev_data_send_update - SEND_UPDATE_VMSA command
-> + * struct sev_data_send_update_vmsa - SEND_UPDATE_VMSA command
+> @@ -61,9 +61,9 @@ unsigned int ccp_version(void);
+>   * will be -EINPROGRESS. Any other "err" value during callback is
+>   * the result of the operation.
 >   *
->   * @handle: handle of the VM to process
->   * @hdr_address: physical address containing packet header
-> @@ -461,10 +495,14 @@ struct sev_data_send_update_vmsa {
->  	u32 handle;				/* In */
->  	u64 hdr_address;			/* In */
->  	u32 hdr_len;				/* In/Out */
-> +	/* private: */
->  	u32 reserved2;
-> +	/* public: */
->  	u64 guest_address;			/* In */
->  	u32 guest_len;				/* In */
-> +	/* private: */
->  	u32 reserved3;
-> +	/* public: */
->  	u64 trans_address;			/* In */
->  	u32 trans_len;				/* In */
->  } __packed;
-> @@ -491,6 +529,7 @@ struct sev_data_send_cancel {
->   * struct sev_data_receive_start - RECEIVE_START command parameters
->   *
->   * @handle: handle of the VM to perform receive operation
-> + * @policy: policy information for the VM
->   * @pdh_cert_address: system physical address containing PDH certificate blob
->   * @pdh_cert_len: len of PDH certificate blob
->   * @session_address: system physical address containing session blob
-> @@ -501,7 +540,9 @@ struct sev_data_receive_start {
->  	u32 policy;				/* In */
->  	u64 pdh_cert_address;			/* In */
->  	u32 pdh_cert_len;			/* In */
-> +	/* private: */
->  	u32 reserved1;
-> +	/* public: */
->  	u64 session_address;			/* In */
->  	u32 session_len;			/* In */
->  } __packed;
-> @@ -519,13 +560,19 @@ struct sev_data_receive_start {
+> - * The cmd has been successfully queued if:
+> - *   the return code is -EINPROGRESS or
+> - *   the return code is -EBUSY and CCP_CMD_MAY_BACKLOG flag is set
+> + * Returns: The cmd has been successfully queued if:
+> + * * the return code is -EINPROGRESS or
+> + * * the return code is -EBUSY and CCP_CMD_MAY_BACKLOG flag is set
 >   */
->  struct sev_data_receive_update_data {
->  	u32 handle;				/* In */
-> +	/* private: */
->  	u32 reserved1;
-> +	/* public: */
->  	u64 hdr_address;			/* In */
->  	u32 hdr_len;				/* In */
-> +	/* private: */
->  	u32 reserved2;
-> +	/* public: */
->  	u64 guest_address;			/* In */
->  	u32 guest_len;				/* In */
-> +	/* private: */
->  	u32 reserved3;
-> +	/* public: */
->  	u64 trans_address;			/* In */
->  	u32 trans_len;				/* In */
->  } __packed;
-> @@ -543,13 +590,19 @@ struct sev_data_receive_update_data {
->   */
->  struct sev_data_receive_update_vmsa {
->  	u32 handle;				/* In */
-> +	/* private: */
->  	u32 reserved1;
-> +	/* public: */
->  	u64 hdr_address;			/* In */
->  	u32 hdr_len;				/* In */
-> +	/* private: */
->  	u32 reserved2;
-> +	/* public: */
->  	u64 guest_address;			/* In */
->  	u32 guest_len;				/* In */
-> +	/* private: */
->  	u32 reserved3;
-> +	/* public: */
->  	u64 trans_address;			/* In */
->  	u32 trans_len;				/* In */
->  } __packed;
-> @@ -573,7 +626,9 @@ struct sev_data_receive_finish {
->   */
->  struct sev_data_dbg {
->  	u32 handle;				/* In */
-> +	/* private: */
->  	u32 reserved;
-> +	/* public: */
->  	u64 src_addr;				/* In */
->  	u64 dst_addr;				/* In */
->  	u32 len;				/* In */
-> @@ -589,7 +644,9 @@ struct sev_data_dbg {
->   */
->  struct sev_data_attestation_report {
->  	u32 handle;				/* In */
-> +	/* private: */
->  	u32 reserved;
-> +	/* public: */
->  	u64 address;				/* In */
->  	u8 mnonce[16];				/* In */
->  	u32 len;				/* In/Out */
-> @@ -781,9 +838,14 @@ struct sev_data_snp_guest_request {
->   *
->   * @init_rmp: indicate that the RMP should be initialized.
->   * @list_paddr_en: indicate that list_paddr is valid
-> + * @rapl_dis: whether RAPL is disabled
-> + * @ciphertext_hiding_en: whether ciphertext hiding is enabled
-> + * @tio_en: Indicates that SNP_INIT_EX initialized the RMP for SEV-TIO
->   * @rsvd: reserved
->   * @rsvd1: reserved
->   * @list_paddr: system physical address of range list
-> + * @max_snp_asid: When non-zero, enable ciphertext hiding and specify the
-> + *  maximum ASID that can be used for an SEV-SNP guest.
->   * @rsvd2: reserved
->   */
->  struct sev_data_snp_init_ex {
-> @@ -841,7 +903,7 @@ struct sev_data_snp_shutdown_ex {
->  } __packed;
+>  int ccp_enqueue_cmd(struct ccp_cmd *cmd);
 >  
->  /**
-> - * struct sev_platform_init_args
-> + * struct sev_platform_init_args - parameters for sev_platform_init()
->   *
->   * @error: SEV firmware error code
->   * @probe: True if this is being called as part of CCP module probe, which
-> @@ -879,12 +941,12 @@ struct sev_data_snp_feature_info {
->  } __packed;
+> @@ -89,7 +89,7 @@ static inline int ccp_enqueue_cmd(struct
 >  
+>  /***** AES engine *****/
 >  /**
-> - * struct feature_info - FEATURE_INFO structure
-> + * struct snp_feature_info - FEATURE_INFO structure
+> - * ccp_aes_type - AES key size
+> + * enum ccp_aes_type - AES key size
 >   *
->   * @eax: output of SNP_FEATURE_INFO command
->   * @ebx: output of SNP_FEATURE_INFO command
->   * @ecx: output of SNP_FEATURE_INFO command
-> - * #edx: output of SNP_FEATURE_INFO command
-> + * @edx: output of SNP_FEATURE_INFO command
->   */
->  struct snp_feature_info {
->  	u32 eax;
-> @@ -954,7 +1016,7 @@ struct sev_data_snp_verify_mitigation_ds
->  } __packed;
->  
->  /**
-> - * struct sev_snp_tcb_version_genoa_milan
-> + * struct sev_snp_tcb_version_genoa_milan - v1 SVN payload
->   *
->   * @boot_loader: SVN of PSP bootloader
->   * @tee: SVN of PSP operating system
-> @@ -971,7 +1033,7 @@ struct sev_snp_tcb_version_genoa_milan {
+>   * @CCP_AES_TYPE_128: 128-bit key
+>   * @CCP_AES_TYPE_192: 192-bit key
+> @@ -99,11 +99,12 @@ enum ccp_aes_type {
+>  	CCP_AES_TYPE_128 = 0,
+>  	CCP_AES_TYPE_192,
+>  	CCP_AES_TYPE_256,
+> +	/* private: */
+>  	CCP_AES_TYPE__LAST,
 >  };
 >  
 >  /**
-> - * struct sev_snp_tcb_version_turin
-> + * struct sev_snp_tcb_version_turin - v2 SVN payload
+> - * ccp_aes_mode - AES operation mode
+> + * enum ccp_aes_mode - AES operation mode
 >   *
->   * @fmc: SVN of FMC firmware
->   * @boot_loader: SVN of PSP bootloader
-> @@ -1037,9 +1099,9 @@ int sev_platform_status(struct sev_user_
->   * behalf of userspace. The caller must pass a valid SEV file descriptor
->   * so that we know that it has access to SEV device.
->   *
-> - * @filep - SEV device file pointer
-> - * @cmd - command to issue
-> - * @data - command buffer
-> + * @filep: SEV device file pointer
-> + * @id: command to issue
-> + * @data: command buffer
->   * @error: SEV command return code
->   *
->   * Returns:
-> @@ -1056,8 +1118,8 @@ int sev_issue_cmd_external_user(struct f
->  /**
->   * sev_guest_deactivate - perform SEV DEACTIVATE command
->   *
-> - * @deactivate: sev_data_deactivate structure to be processed
-> - * @sev_ret: sev command return code
-> + * @data: sev_data_deactivate structure to be processed
-> + * @error: sev command return code
->   *
->   * Returns:
->   * 0 if the sev successfully processed the command
-> @@ -1071,8 +1133,8 @@ int sev_guest_deactivate(struct sev_data
->  /**
->   * sev_guest_activate - perform SEV ACTIVATE command
->   *
-> - * @activate: sev_data_activate structure to be processed
-> - * @sev_ret: sev command return code
-> + * @data: sev_data_activate structure to be processed
-> + * @error: sev command return code
->   *
->   * Returns:
->   * 0 if the sev successfully processed the command
-> @@ -1086,7 +1148,7 @@ int sev_guest_activate(struct sev_data_a
->  /**
->   * sev_guest_df_flush - perform SEV DF_FLUSH command
->   *
-> - * @sev_ret: sev command return code
-> + * @error: sev command return code
->   *
->   * Returns:
->   * 0 if the sev successfully processed the command
-> @@ -1100,8 +1162,8 @@ int sev_guest_df_flush(int *error);
->  /**
->   * sev_guest_decommission - perform SEV DECOMMISSION command
->   *
-> - * @decommission: sev_data_decommission structure to be processed
-> - * @sev_ret: sev command return code
-> + * @data: sev_data_decommission structure to be processed
-> + * @error: sev command return code
->   *
->   * Returns:
->   * 0 if the sev successfully processed the command
-> --- linux-next-20260828.orig/include/uapi/linux/psp-sev.h
-> +++ linux-next-20260828/include/uapi/linux/psp-sev.h
-> @@ -15,7 +15,7 @@
->  
->  #include <linux/types.h>
->  
-> -/**
-> +/*
->   * SEV platform commands
+>   * @CCP_AES_MODE_ECB: ECB mode
+>   * @CCP_AES_MODE_CBC: CBC mode
+> @@ -111,6 +112,10 @@ enum ccp_aes_type {
+>   * @CCP_AES_MODE_CFB: CFB mode
+>   * @CCP_AES_MODE_CTR: CTR mode
+>   * @CCP_AES_MODE_CMAC: CMAC mode
+> + * @CCP_AES_MODE_GHASH: GHASH mode
+> + * @CCP_AES_MODE_GCTR: GCTR mode
+> + * @CCP_AES_MODE_GCM: GCM mode
+> + * @CCP_AES_MODE_GMAC: GMAC mode
 >   */
->  enum {
-> @@ -36,7 +36,7 @@ enum {
->  	SEV_MAX,
+>  enum ccp_aes_mode {
+>  	CCP_AES_MODE_ECB = 0,
+> @@ -123,11 +128,12 @@ enum ccp_aes_mode {
+>  	CCP_AES_MODE_GCTR,
+>  	CCP_AES_MODE_GCM,
+>  	CCP_AES_MODE_GMAC,
+> +	/* private: */
+>  	CCP_AES_MODE__LAST,
 >  };
 >  
-> -/**
-> +/*
->   * SEV Firmware status code
->   */
->  typedef enum {
-> @@ -109,8 +109,8 @@ typedef enum {
 >  /**
->   * struct sev_user_data_status - PLATFORM_STATUS command parameters
+> - * ccp_aes_mode - AES operation mode
+> + * enum ccp_aes_action - AES operation mode
 >   *
-> - * @major: major API version
-> - * @minor: minor API version
-> + * @api_major: major API version
-> + * @api_minor: minor API version
->   * @state: platform state
->   * @flags: platform config flags
->   * @build: firmware build id for API version
-> @@ -139,12 +139,12 @@ struct sev_user_data_pek_csr {
->  } __packed;
+>   * @CCP_AES_ACTION_DECRYPT: AES decrypt operation
+>   * @CCP_AES_ACTION_ENCRYPT: AES encrypt operation
+> @@ -135,6 +141,7 @@ enum ccp_aes_mode {
+>  enum ccp_aes_action {
+>  	CCP_AES_ACTION_DECRYPT = 0,
+>  	CCP_AES_ACTION_ENCRYPT,
+> +	/* private: */
+>  	CCP_AES_ACTION__LAST,
+>  };
+>  /* Overloaded field */
+> @@ -146,6 +153,7 @@ enum ccp_aes_action {
+>   * @type: AES operation key size
+>   * @mode: AES operation mode
+>   * @action: AES operation (decrypt/encrypt)
+> + * @authsize: AES block request size
+>   * @key: key to be used for this AES operation
+>   * @key_len: length in bytes of key
+>   * @iv: IV to be used for this AES operation
+> @@ -156,6 +164,7 @@ enum ccp_aes_action {
+>   * @cmac_final: indicates final operation when running in CMAC mode
+>   * @cmac_key: K1/K2 key used in final CMAC operation
+>   * @cmac_key_len: length in bytes of cmac_key
+> + * @aad_len: length in bytes of Additional Authenticated Data
+>   *
+>   * Variables required to be set when calling ccp_enqueue_cmd():
+>   *   - type, mode, action, key, key_len, src, dst, src_len
+> @@ -192,7 +201,7 @@ struct ccp_aes_engine {
+>  
+>  /***** XTS-AES engine *****/
+>  /**
+> - * ccp_xts_aes_unit_size - XTS unit size
+> + * enum ccp_xts_aes_unit_size - XTS unit size
+>   *
+>   * @CCP_XTS_AES_UNIT_SIZE_16: Unit size of 16 bytes
+>   * @CCP_XTS_AES_UNIT_SIZE_512: Unit size of 512 bytes
+> @@ -206,11 +215,13 @@ enum ccp_xts_aes_unit_size {
+>  	CCP_XTS_AES_UNIT_SIZE_1024,
+>  	CCP_XTS_AES_UNIT_SIZE_2048,
+>  	CCP_XTS_AES_UNIT_SIZE_4096,
+> +	/* private: */
+>  	CCP_XTS_AES_UNIT_SIZE__LAST,
+>  };
 >  
 >  /**
-> - * struct sev_user_data_cert_import - PEK_CERT_IMPORT command parameters
-> + * struct sev_user_data_pek_cert_import - PEK_CERT_IMPORT command parameters
->   *
-> - * @pek_address: PEK certificate chain
-> - * @pek_len: length of PEK certificate
-> - * @oca_address: OCA certificate chain
-> - * @oca_len: length of OCA certificate
-> + * @pek_cert_address: PEK certificate chain
-> + * @pek_cert_len: length of PEK certificate
-> + * @oca_cert_address: OCA certificate chain
-> + * @oca_cert_len: length of OCA certificate
->   */
->  struct sev_user_data_pek_cert_import {
->  	__u64 pek_cert_address;			/* In */
-> @@ -156,8 +156,8 @@ struct sev_user_data_pek_cert_import {
+>   * struct ccp_xts_aes_engine - CCP XTS AES operation
+> + * @type: ccp_aes_type - AES key size
+>   * @action: AES operation (decrypt/encrypt)
+>   * @unit_size: unit size of the XTS operation
+>   * @key: key to be used for this XTS AES operation
+> @@ -247,11 +258,13 @@ struct ccp_xts_aes_engine {
+>  
+>  /***** SHA engine *****/
 >  /**
->   * struct sev_user_data_pdh_cert_export - PDH_CERT_EXPORT command parameters
+> - * ccp_sha_type - type of SHA operation
+> + * enum ccp_sha_type - type of SHA operation
 >   *
-> - * @pdh_address: PDH certificate address
-> - * @pdh_len: length of PDH certificate
-> + * @pdh_cert_address: PDH certificate address
-> + * @pdh_cert_len: length of PDH certificate
->   * @cert_chain_address: PDH certificate chain
->   * @cert_chain_len: length of PDH certificate chain
+>   * @CCP_SHA_TYPE_1: SHA-1 operation
+>   * @CCP_SHA_TYPE_224: SHA-224 operation
+>   * @CCP_SHA_TYPE_256: SHA-256 operation
+> + * @CCP_SHA_TYPE_384: SHA-384 operation
+> + * @CCP_SHA_TYPE_512: SHA-512 operation
 >   */
-> @@ -248,7 +248,7 @@ struct sev_user_data_snp_config {
->  } __packed;
+>  enum ccp_sha_type {
+>  	CCP_SHA_TYPE_1 = 1,
+> @@ -259,6 +272,7 @@ enum ccp_sha_type {
+>  	CCP_SHA_TYPE_256,
+>  	CCP_SHA_TYPE_384,
+>  	CCP_SHA_TYPE_512,
+> +	/* private: */
+>  	CCP_SHA_TYPE__LAST,
+>  };
+>  
+> @@ -384,7 +398,7 @@ struct ccp_rsa_engine {
+>  
+>  /***** Passthru engine *****/
+>  /**
+> - * ccp_passthru_bitwise - type of bitwise passthru operation
+> + * enum ccp_passthru_bitwise - type of bitwise passthru operation
+>   *
+>   * @CCP_PASSTHRU_BITWISE_NOOP: no bitwise operation performed
+>   * @CCP_PASSTHRU_BITWISE_AND: perform bitwise AND of src with mask
+> @@ -398,11 +412,12 @@ enum ccp_passthru_bitwise {
+>  	CCP_PASSTHRU_BITWISE_OR,
+>  	CCP_PASSTHRU_BITWISE_XOR,
+>  	CCP_PASSTHRU_BITWISE_MASK,
+> +	/* private: */
+>  	CCP_PASSTHRU_BITWISE__LAST,
+>  };
 >  
 >  /**
-> - * struct sev_data_snp_vlek_load - SNP_VLEK_LOAD structure
-> + * struct sev_user_data_snp_vlek_load - SNP_VLEK_LOAD structure
+> - * ccp_passthru_byteswap - type of byteswap passthru operation
+> + * enum ccp_passthru_byteswap - type of byteswap passthru operation
 >   *
->   * @len: length of the command buffer read by the PSP
->   * @vlek_wrapped_version: version of wrapped VLEK hashstick (Must be 0h)
-> @@ -264,7 +264,7 @@ struct sev_user_data_snp_vlek_load {
->  } __packed;
+>   * @CCP_PASSTHRU_BYTESWAP_NOOP: no byte swapping performed
+>   * @CCP_PASSTHRU_BYTESWAP_32BIT: swap bytes within 32-bit words
+> @@ -412,6 +427,7 @@ enum ccp_passthru_byteswap {
+>  	CCP_PASSTHRU_BYTESWAP_NOOP = 0,
+>  	CCP_PASSTHRU_BYTESWAP_32BIT,
+>  	CCP_PASSTHRU_BYTESWAP_256BIT,
+> +	/* private: */
+>  	CCP_PASSTHRU_BYTESWAP__LAST,
+>  };
+>  
+> @@ -450,8 +466,8 @@ struct ccp_passthru_engine {
+>   * @byte_swap: byteswap operation to perform
+>   * @mask: mask to be applied to data
+>   * @mask_len: length in bytes of mask
+> - * @src: data to be used for this operation
+> - * @dst: data produced by this operation
+> + * @src_dma: data to be used for this operation
+> + * @dst_dma: data produced by this operation
+>   * @src_len: length in bytes of data used for this operation
+>   * @final: indicate final pass-through operation
+>   *
+> @@ -478,7 +494,7 @@ struct ccp_passthru_nomap_engine {
+>  #define CCP_ECC_MAX_OUTPUTS	3
 >  
 >  /**
-> - * struct sev_user_data_snp_vlek_wrapped_vlek_hashstick - Wrapped VLEK data
-> + * struct sev_user_data_snp_wrapped_vlek_hashstick - Wrapped VLEK data
+> - * ccp_ecc_function - type of ECC function
+> + * enum ccp_ecc_function - type of ECC function
 >   *
->   * @data: Opaque data provided by AMD KDS (as described in SEV-SNP Firmware ABI
->   *        1.54, SNP_VLEK_LOAD)
+>   * @CCP_ECC_FUNCTION_MMUL_384BIT: 384-bit modular multiplication
+>   * @CCP_ECC_FUNCTION_MADD_384BIT: 384-bit modular addition
+> @@ -564,8 +580,9 @@ struct ccp_ecc_point_math {
+>   * @function: ECC function to perform
+>   * @mod: ECC modulus
+>   * @mod_len: length in bytes of modulus
+> - * @mm: module math parameters
+> - * @pm: point math parameters
+> + * @u: union for math parameters
+> + * @u.mm: module math parameters
+> + * @u.pm: point math parameters
+>   * @ecc_result: result of the ECC operation
+>   *
+>   * Variables required to be set when calling ccp_enqueue_cmd():
+> @@ -589,11 +606,11 @@ struct ccp_ecc_engine {
+>  
+>  
+>  /**
+> - * ccp_engine - CCP operation identifiers
+> + * enum ccp_engine - CCP operation identifiers
+>   *
+>   * @CCP_ENGINE_AES: AES operation
+> - * @CCP_ENGINE_XTS_AES: 128-bit XTS AES operation
+> - * @CCP_ENGINE_RSVD1: unused
+> + * @CCP_ENGINE_XTS_AES_128: 128-bit XTS AES operation
+> + * @CCP_ENGINE_DES3: 3DES operation
+>   * @CCP_ENGINE_SHA: SHA operation
+>   * @CCP_ENGINE_RSA: RSA operation
+>   * @CCP_ENGINE_PASSTHRU: pass-through operation
+> @@ -609,6 +626,7 @@ enum ccp_engine {
+>  	CCP_ENGINE_PASSTHRU,
+>  	CCP_ENGINE_ZLIB_DECOMPRESS,
+>  	CCP_ENGINE_ECC,
+> +	/* private: */
+>  	CCP_ENGINE__LAST,
+>  };
+>  
 
